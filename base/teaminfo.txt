@@ -1,0 +1,55 @@
+//
+// Team definition is as follows
+//
+// English name
+// asset name
+// 5 team member names ( can be character or aliases or if non-existant, assumed to be human
+//
+// Three assets are loaded based on the above asset name
+// "asset name" - general branding logo used in the ui and to brand levels
+// "asset name_metal" - metal logo for ui
+// "asset name_name" - graphic represenation of the name
+//
+// Turtle Man: ...yeah 36 characters WAY to many for me to plan on making.
+//             The way it is currently, it may be better to have teams of 4, instead of 5.
+//             I shouldn't be wasting time on this right now anyway...
+teams {
+	// The "Ideal" teams/characters.
+	// //Main: Leo, Raph, Don, Mikey, Splinter --no?
+	// Blades: Leo, Karai, Miyamoto Usagi, Faraji Ngala, ?
+	// Tech: Don, April, Leatherhead, Adam McKay, Fugatiod?
+	// Hotheads: Raph, Casey, Traximus, Joi Reynard, ?
+	// Outcasts: Mikey, Nobody, Zog, Tora Yoshida, RatKing?
+	// ???: Splinter, Hamato Yoshi?, Mortu, Ancient One, ?
+	// Foot: Shredder, Foot, Foot Tech, Foot Mech, ?
+	// Dragons: Hun, Two Ton?, Dragon1, Dragon2, Dragon3
+
+	{ "Sais"  "ui/assets/sais" "James" "Janet" "Enforcer" "Aria" "Deadeye" }
+	{ "Katanas" "ui/assets/katanas" "Janet" "James" "Icarus" "Gladiator" "Paracyte" }
+	{ "Dummy" "ui/assets/katanas" "Janet" "James" "Icarus" "Gladiator" "Paracyte" }
+}
+
+// character name ( used for display and head derivation ), sex
+characters {
+	// MISSIONPACK demo
+	{ "James"  "male" }
+	{ "Janet"  "female" }
+
+	// TMNT Characters.
+	{ "Raph"   "male" }
+}
+
+aliases {
+	{ "Bradamante"			"Janet"		"d"			}
+	{ "Furioso"			"James"	"a"				}
+	{ "Aria"			"Janet" 	"o"			  	}
+	{ "Deadeye"			"James"		"d"				}
+	{ "Enforcer"			"Janet"	"d"			}
+	{ "Icarus"			"James"		"o"		}
+	{ "Gammy"			"Janet"		"a"			}
+	{ "Gladiator"			"Janet"		"d"				}
+	{ "Paracyte"			"James"	"a"			}
+	{ "James"			"James"	"a"			}
+	{ "Janet"			"Janet"	"a"			}
+}
+

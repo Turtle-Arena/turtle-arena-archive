@@ -1,0 +1,72 @@
+// Single Player
+// Stage 1
+{
+map			"sp1a1"
+longname	"Stage 1: Area 1"
+type		"single"
+}
+
+{
+map			"sp1a2"
+longname	"Stage 1: Area 2"
+type		"single"
+}
+
+{
+map			"sp1a3"
+longname	"Stage 1: Area 3"
+type		"single"
+}
+
+{
+map			"sp1a4"
+longname	"Stage 1: Area 4"
+type		"single"
+}
+
+
+// Stage 2
+{
+map			"sp2a1"
+longname	"Stage 2: Area 1"
+type		"single"
+}
+
+{
+map			"sp2a2"
+longname	"Stage 2: Area 2"
+type		"single"
+}
+
+{
+map			"sp2a3"
+longname	"Stage 2: Area 3"
+type		"single"
+}
+
+{
+map			"sp2a4"
+longname	"Stage 2: Area 4"
+type		"single"
+}
+
+// FFA
+{
+map			"ffa1"
+longname	"FFA Test"
+type		"ffa tourney"
+}
+
+// Duel
+{
+map			"duel1"
+longname	"Sky Duel"
+type		"tourney"
+}
+
+// CTF
+{
+map			"ctf1"
+longname	"CTF Test"
+type		"ctf team"
+}

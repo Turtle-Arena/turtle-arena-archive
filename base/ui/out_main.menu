@@ -1,0 +1,313 @@
+// TMNT Arena
+// Main menu
+// Base on rfactory.org out_main.menu
+#include "ui/menudef.h"
+
+{
+	assetGlobalDef
+	{
+		font "fonts/font" 16
+		smallFont "fonts/smallfont" 12
+		bigFont "fonts/bigfont" 20
+		cursor "ui/assets/3_cursor3"
+		itemFocusSound "sound/misc/menu2.wav"
+
+		fadeClamp 1.0
+		fadeCycle 1
+		fadeAmount 0.1
+	}
+
+	menuDef
+	{
+		name "main"
+		fullScreen MENU_TRUE
+		focusColor 1 0.43 0 1.25
+		onOpen
+		{
+			//playlooped "music/menu.wav" ;
+			//setcvar "ui_q3model" 1 ;
+			//setcvar "model" raph ;
+			//setcvar "headmodel" raph ;
+		}
+
+		/*onESC
+		{
+			uiScript "quit"
+		}*/
+
+		//
+		// Player Model PreLoad
+		//
+		itemDef
+		{
+			name modelselection
+			ownerdraw UI_PLAYERMODEL
+			rect 0 0 0 0
+			decoration
+			visible MENU_TRUE
+		}
+
+		//
+		// menu background
+		//
+		itemDef
+		{
+			name background
+			style WINDOW_STYLE_SHADER
+			rect 0 0 640 480
+			background "ui/assets/out_menuback"
+			visible MENU_TRUE
+			decoration
+		}
+
+		//
+		// Title Banner
+		//
+		itemDef
+		{
+			name titlebanner
+			style WINDOW_STYLE_SHADER
+			rect 192 12 256 128
+			background "ui/assets/titlebanner"
+			visible MENU_TRUE
+			decoration
+		}
+
+		//
+		// Play Button
+		//
+		itemDef
+		{
+			name newgamebutton
+			type ITEM_TYPE_BUTTON
+			rect 255 235 130 24
+			text "Play"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show newgametext
+			}
+			mouseExit
+			{
+				hide newgametext
+			}
+			action
+			{
+				close "main";
+				open "play"
+			}
+		}
+		//
+		// Multiplayer Button
+		//
+		itemDef
+		{
+			name multiplayerbutton
+			text "Multiplayer"
+			type ITEM_TYPE_BUTTON
+			rect 255 265 130 24
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show multiplayertext
+			}
+			mouseExit
+			{
+				hide multiplayertext
+			}
+			action
+			{
+				close "main";
+				open "multiplayer"
+			}
+		}
+
+		//
+		// Options Button
+		//
+		itemDef
+		{
+			name optionsbutton
+			text "Options"
+			type ITEM_TYPE_BUTTON
+			rect 255 295 130 24
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show optionstext
+			}
+			mouseExit
+			{
+				hide optionstext
+			}
+			action
+			{
+				close "main";
+				open "options"
+			}
+		}
+
+		//
+		// Credits button, replace with MODS?
+		//
+		itemDef
+		{
+			name creditbutton
+			text "Credits"
+			type ITEM_TYPE_BUTTON
+			rect 255 325 130 24
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show credittext
+			}
+			mouseExit
+			{
+				hide credittext
+			}
+			action
+			{
+				close "main";
+				open "credits"
+			}
+		}
+
+		//
+		// Quit button
+		//
+		itemDef
+		{
+			name exitbutton
+			text "Quit"
+			type ITEM_TYPE_BUTTON
+			rect 255 355 130 24
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show exittext
+			}
+			mouseExit
+			{
+				hide exittext
+			}
+			action
+			{
+				hide "exittext";
+				open "quit"
+			}
+		}
+
+		//
+		// Focus Text for the buttons
+		//
+		itemDef
+		{
+			name newgametext
+			rect 0 444 640 24
+			text "Play a game"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+
+		itemDef
+		{
+			name multiplayertext
+			rect 0 444 640 24
+			text "Play a network game"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+
+		itemDef
+		{
+			name optionstext
+			rect 0 444 640 24
+			text "Configure game settings"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+
+		itemDef
+		{
+			name credittext
+			rect 0 444 640 24
+			text "Show game credits"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+
+		itemDef
+		{
+			name exittext
+			rect 0 444 640 24
+			text "Exit game"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+	}
+}
