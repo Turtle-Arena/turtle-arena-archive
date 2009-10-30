@@ -8,7 +8,7 @@ QUIT
 
 == PLAY ==
 === NEW GAME ===
-[File select? Like SRB2 1.1]
+[File select like SRB2 1.1?]
 Player select menu. (Do after stage select?)
 Stage select.
 If the there is more then one area and the first has been cleared, allow area select.
@@ -70,11 +70,11 @@ Ask for confirm, exit program.
 Resume Game
 : if gametype < GT_TEAM
 :: if spectator
-Join --Turtle Man: "Join Game"?
+Join Game
 :: else
 Spectate
 : else
-Team Select --Was "Join", but New name still isn't lot more good-er.'
+Team Select --Was "Join", but new name still isn't lot more good-er.'
 : end if
 Add/Remove Bots --server/admin only?
 Player

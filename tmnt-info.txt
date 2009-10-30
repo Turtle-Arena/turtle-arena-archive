@@ -16,11 +16,11 @@ Nothing has been written though there some ideas;
 === Demo 1 ===
 It should have a working player, working melee weapon(s), working bots, and some maps.
 
-* Raph player model <sup>Almost finished mesh, needs skin work, not animated</sup>
+* Raph player model <sup>Model mesh is "done", skin looks okay, animations need work.</sup>
 * Largely changed weapon system from ioquake3, players can hold only two weapons at a time (default and pickup) <sup>working</sup>
 * Melee weapons, as well as gun weapons <sup>Melee not finished, Gun working</sup>
-* Working bots, using OpenArena's botfiles as Quake3's were not released under the GPL. <sup>Needs work still</sup>
-* Shurikens <sup>Almost finished, thrown shurikens rotation is wrong</sup>
+* Working bots, using OpenArena's botfiles as Quake3's were not released under the GPL. <sup>working</sup>
+* Shurikens <sup>Working</sup>
 * Hold multiple items at once, Pizza-to-Go and Shurikens. <sup>Working</sup>
 * One or more maps for each gametype (Single Player, Duel (1 vs 1), Free For All, Team Death Match, Capture The Flag, One Flag CTF, Overload) <sup>maps need work</sup>
 
@@ -36,7 +36,7 @@ It should have a working player, working melee weapon(s), working bots, and some
 * id software (For making and releasing Quake 3's source code)
 * ioquake3 devoplers (For improving, fixing, and cleaning up Quake 3's source code)
 * Open Arena (For botfiles and some images - readme.txt will include list of files)
-* Turtle Man
+* ZTurtleMan
 
 === Special Thanks ===
 * Sonic Team Jr. - for making Sonic Robo Blast 2 which inspired TMNT Arena.
@@ -85,7 +85,7 @@ Lets say there is a player who uses Sais but there Sais look different then Raph
 === Shurikens<sup>Mostly done</sup> ===
 Shurikens are separate from the normal weapons, they are holdable items with multiple uses.
 
-Currently they can be throw (they do damage, explode, bounce, ect) but do not rotate correctly. Also the electric shuriken does not stun players or electrify water. In the future the electric, fire, and laser shurikens will be more than just recolored models, by adding sparks, flames, and glowing effects.
+Currently they can be throw and they do damage, explode, bounce, etc. Also the electric shuriken does not stun players or electrify water. In the future the electric, fire, and laser shurikens will be more than just recolored models, by adding sparks, flames, and glowing effects.
 
 == External Links ==
 * Download TMNT Arena

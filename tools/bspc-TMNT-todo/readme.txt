@@ -6,7 +6,7 @@ Removed disabled BFG Jumping code.
 -grapplereach is true by default, -nograpplereach disables it.
 
 == Source ==
-The source is in /source/engine/code/bspc/ , it also uses other files in /source/engine/code/botlib and /source/engine/code/qcommon directories see source/engine/code/bspc/Makefile for which files.
+The source is in ../engine/code/bspc/ , it also uses other files in /source/engine/code/botlib and /source/engine/code/qcommon directories see source/engine/code/bspc/Makefile for which files.
 
 == Usage ==
 TODO
