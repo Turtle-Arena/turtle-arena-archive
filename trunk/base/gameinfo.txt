@@ -1,0 +1,47 @@
+// Game type info
+//
+// description, g_gametype enum
+//
+// 0 - GT_FFA,				// free for all
+// 1 - GT_TOURNAMENT,		// one on one tournament
+// 2 - GT_SINGLE_PLAYER,	// single player ffa
+// 3 - GT_TEAM,				// team deathmatch
+// 4 - GT_CTF,				// capture the flag
+// 5 - GT_1FCTF,			// one flag ctf
+// 6 - GT_OBELISK,			// obelisk
+// 7 - GT_HARVESTER,		// harvester
+
+// Used in "Single Player" and "Start Server"
+gametypes {
+  { "Free For All" 0 }
+  { "Duel" 1 } // Tournament
+  { "Single Player" 2 }
+  { "Team Deathmatch" 3 }
+  { "Capture the Flag" 4 }
+  { "One Flag CTF" 5 }
+  //{ "Overload" 6 }
+  //{ "Harvester" 7 }
+}
+
+// mapName, mapLoadName, teamMembers, opponentName, gametypenum "timetobeat" gametypenum "timetobeat" ...
+maps {
+	// MISSIONPACK demo.
+	{ "Inner Sanctums" "mpteam3" "3"		  "Sarge"			2 "0" 4 "240" 5 "210" 6 "210" 7 "210" }
+
+	// TMNT
+	{ "FFA1" "ffa1" "1"		  "Raph"			0 "0" }
+}
+
+// Used when joining multiplayer?
+joingametypes {
+  { "All" -1 }
+  { "Free For All" 0 }
+  { "Duel" 1 } // Tournament
+  { "Cooperative" 2 }
+  { "Team Deathmatch" 3 }
+  { "Capture the Flag" 4 }
+  { "One Flag CTF" 5 }
+  //{ "Overload" 6 }
+  //{ "Harvester" 7 }
+}
+
