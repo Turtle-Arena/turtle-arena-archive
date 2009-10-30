@@ -197,6 +197,9 @@ static void S_AL_BufferUseDefault(sfxHandle_t sfx)
 	if(sfx == default_sfx)
 		Com_Error(ERR_FATAL, "Can't load default sound effect %s\n", knownSfx[sfx].filename);
 
+#ifdef TMNT // DISABLED MESSAGE, REENABLE WHEN SOUND IS ADDED.
+	if (qfalse)
+#endif
 	Com_Printf( S_COLOR_YELLOW "WARNING: Using default sound for %s\n", knownSfx[sfx].filename);
 	knownSfx[sfx].isDefault = qtrue;
 	knownSfx[sfx].buffer = knownSfx[default_sfx].buffer;
@@ -384,7 +387,11 @@ qboolean S_AL_BufferInit( void )
 	numSfx = 0;
 
 	// Load the default sound, and lock it
+#ifdef TMNT // OpenArena code.
+	default_sfx = S_AL_BufferFind("sound/misc/silence.wav");
+#else
 	default_sfx = S_AL_BufferFind("sound/feedback/hit.wav");
+#endif
 	S_AL_BufferUse(default_sfx);
 	knownSfx[default_sfx].isLocked = qtrue;
 
@@ -572,6 +579,9 @@ static qboolean S_AL_HearingThroughEntity( int entityNum )
 
 	if( clc.clientNum == entityNum )
 	{
+#if 0 // #ifdef TMNT // Turtle Man: FIXME: I can change the cgame API so that this doesn't have to be a hack.
+
+#else
 		// FIXME: <tim@ngus.net> 28/02/06 This is an outrageous hack to detect
 		// whether or not the player is rendering in third person or not. We can't
 		// ask the renderer because the renderer has no notion of entities and we
@@ -586,6 +596,7 @@ static qboolean S_AL_HearingThroughEntity( int entityNum )
 			return qfalse; //we're the player, but third person
 		else
 			return qtrue;  //we're the player
+#endif
 	}
 	else
 		return qfalse; //not the player

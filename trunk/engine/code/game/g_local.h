@@ -67,6 +67,91 @@ typedef enum {
 typedef struct gentity_s gentity_t;
 typedef struct gclient_s gclient_t;
 
+#ifdef SP_NPC
+typedef enum {
+	NPC_ST_INACTIVE,
+	NPC_ST_ACTIVE,
+	NPC_ST_DEAD
+} npcState_t;
+
+typedef enum {
+	NPC_COM_NONE,
+	NPC_COM_WAIT,
+	NPC_COM_GOTO,
+	NPC_COM_ATTACK,
+	NPC_COM_SEARCH
+} npcCommand_t;
+
+typedef struct {
+	playerState_t	ps;
+	vec3_t			initpos;
+	vec3_t			obj;
+	vec3_t			real_obj;
+	gentity_t		*enemy;
+	npcCommand_t	command;
+	npcState_t		state;
+	int				flyingAlt;
+	int				painAcum;
+	int				dontMoveTime;
+	float			ideal_angle;
+	int				attackTime;
+	int				toFire;
+	int				fireTime;
+	int				meleeTime;
+	int				canStand;
+	int				checkTime;
+	float			shot_factor;
+	int				inFlight;
+	int				altitude;
+	int				goingBack;
+	int				fireCount;
+	int				quakeTime;
+} npcData_t;
+
+typedef struct {
+	vec3_t		forward, right, up;
+	float		frametime;
+	int			msec;
+	int			can_do_back_move;
+	qboolean	walking;
+	qboolean	groundPlane;
+	trace_t		groundTrace;
+	float		impactSpeed;
+	vec3_t		previous_origin;
+	vec3_t		previous_velocity;
+	int			previous_waterlevel;
+} npml_t;
+
+typedef struct {
+	// state (in / out)
+	playerState_t	*ps;
+	bgnpc_t		*npc;
+	npcData_t	*ns;
+	// command (in)
+	usercmd_t	cmd;
+	int			tracemask;			// collide against these types of surfaces
+	int			debugLevel;			// if set, diagnostic output will be printed
+	qboolean	noFootsteps;		// if the game is setup for no footsteps by the server
+	qboolean	gauntletHit;		// true if a gauntlet attack would actually hit something
+	int			framecount;
+	// results (out)
+	int			numtouch;
+	int			touchents[MAXTOUCH];
+	vec3_t		mins, maxs;			// bounding box size
+	int			watertype;
+	int			waterlevel;
+	float		xyspeed;
+	// for fixed msec Pmove
+	int			pmove_fixed;
+	int			pmove_msec;
+	// callbacks to test the world
+	// these will be different functions during game and cgame
+	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins,
+             const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
+	int			(*pointcontents)( const vec3_t point, int passEntityNum );
+} npmove_t;
+#endif
+
 struct gentity_s {
 	entityState_t	s;				// communicated by server to clients
 	entityShared_t	r;				// shared by both the server system and game
@@ -112,6 +197,9 @@ struct gentity_s {
 	gentity_t	*parent;
 	gentity_t	*nextTrain;
 	gentity_t	*prevTrain;
+#ifdef TMNTPATHS
+	int			pathflags;
+#endif
 	vec3_t		pos1, pos2;
 
 	char		*message;
@@ -120,6 +208,9 @@ struct gentity_s {
 
 	float		angle;			// set in editor, -1 = up, -2 = down
 	char		*target;
+#ifdef TMNTENTITIES
+	char		*paintarget;
+#endif
 	char		*targetname;
 	char		*team;
 	char		*targetShaderName;
@@ -175,6 +266,12 @@ struct gentity_s {
 	float		random;
 
 	gitem_t		*item;			// for bonus items
+
+#ifdef SP_NPC
+	bgnpc_t		*npc;
+	npcData_t	ns;
+	int			slow_event;
+#endif
 };
 
 
@@ -252,8 +349,10 @@ typedef struct {
 	int			voteCount;			// to prevent people from constantly calling votes
 	int			teamVoteCount;		// to prevent people from constantly calling votes
 	qboolean	teamInfo;			// send team overlay updates?
+#ifdef TMNTPLAYERSYS
+    bg_playercfg_t playercfg;        // data loaded from animation.cfg
+#endif
 } clientPersistant_t;
-
 
 // this structure is cleared on each ClientSpawn(),
 // except for 'client->pers' and 'client->sess'
@@ -280,7 +379,9 @@ struct gclient_s {
 
 	// sum up damage over an entire frame, so
 	// shotgun blasts give a single big kick
+#ifndef TMNT // NOARMOR
 	int			damage_armor;		// damage absorbed by armor
+#endif
 	int			damage_blood;		// damage taken out of health
 	int			damage_knockback;	// impact damage
 	vec3_t		damage_from;		// origin for vector calculation
@@ -306,6 +407,10 @@ struct gclient_s {
 
 	int			lastKillTime;		// for multiple kill rewards
 
+#ifdef TMNTSP
+	int			finishTime; // when the client finished the level.
+#endif
+
 	qboolean	fireHeld;			// used for hook
 	gentity_t	*hook;				// grapple hook if out
 
@@ -319,12 +424,18 @@ struct gclient_s {
 	gentity_t	*persistantPowerup;
 	int			portalID;
 	int			ammoTimes[WP_NUM_WEAPONS];
+#ifndef TMNT // POWERS
 	int			invulnerabilityTime;
+#endif
 #endif
 
 	char		*areabits;
 };
 
+#ifdef TMNTCAMERA
+void G_ClientCameraThink(gclient_s *client);
+void G_ClientCameraReset(gclient_s *client);
+#endif
 
 //
 // this structure is cleared as each map is entered
@@ -464,11 +575,17 @@ void SaveRegisteredItems( void );
 //
 int G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
+#ifdef TMNT // Particles
+int G_ParticleAreaIndex( char *str );
+#endif
 void	G_TeamCommand( team_t team, char *cmd );
 void	G_KillBox (gentity_t *ent);
 gentity_t *G_Find (gentity_t *from, int fieldofs, const char *match);
 gentity_t *G_PickTarget (char *targetname);
 void	G_UseTargets (gentity_t *ent, gentity_t *activator);
+#ifdef TMNTENTITIES
+void	G_UseTargets2(gentity_t *ent, gentity_t *activator, const char *target);
+#endif
 void	G_SetMovedir ( vec3_t angles, vec3_t movedir);
 
 void	G_InitGentity( gentity_t *e );
@@ -491,6 +608,11 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm );
 void G_SetOrigin( gentity_t *ent, vec3_t origin );
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 const char *BuildShaderStateConfig( void );
+
+#ifdef TMNTWEAPONS
+gentity_t *G_FindRadius(gentity_t *from, vec3_t org, float rad);
+qboolean G_Visible( gentity_t *ent1, gentity_t *ent2 );
+#endif
 
 //
 // g_combat.c
@@ -520,15 +642,33 @@ void TossClientCubes( gentity_t *self );
 //
 void G_RunMissile( gentity_t *ent );
 
+#ifdef TMNTHOLDABLE
+gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t dir, holdable_t holdable);
+#endif
+#ifdef TMNTWEAPONS
+gentity_t *fire_gun(gentity_t *self, vec3_t start, vec3_t aimdir);
+gentity_t *fire_homingrocket(gentity_t *self, vec3_t start, vec3_t aimdir);
+#else
 gentity_t *fire_blaster (gentity_t *self, vec3_t start, vec3_t aimdir);
+#endif
 gentity_t *fire_plasma (gentity_t *self, vec3_t start, vec3_t aimdir);
+#ifndef TMNTWEAPONS
 gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t aimdir);
+#endif
 gentity_t *fire_rocket (gentity_t *self, vec3_t start, vec3_t dir);
+#ifndef TMNTWEAPONS
 gentity_t *fire_bfg (gentity_t *self, vec3_t start, vec3_t dir);
+#endif
 gentity_t *fire_grapple (gentity_t *self, vec3_t start, vec3_t dir);
+#ifndef TMNTWEAPONS
 #ifdef MISSIONPACK
 gentity_t *fire_nail( gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up );
 gentity_t *fire_prox( gentity_t *self, vec3_t start, vec3_t aimdir );
+#endif
+#endif
+#ifdef SP_NPC
+gentity_t *fire_flybot_shot (gentity_t *self, vec3_t start, vec3_t dir);
+gentity_t *fire_mouser_shot (gentity_t *self, vec3_t start, vec3_t dir, gentity_t *enemy);
 #endif
 
 
@@ -548,6 +688,9 @@ void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace
 // g_misc.c
 //
 void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles );
+#ifdef SINGLEPLAYER // entity
+void G_RunMD3Anim( gentity_t *ent );
+#endif
 #ifdef MISSIONPACK
 void DropPortalSource( gentity_t *ent );
 void DropPortalDestination( gentity_t *ent );
@@ -560,9 +703,21 @@ void DropPortalDestination( gentity_t *ent );
 qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker );
 void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint );
 void SnapVectorTowards( vec3_t v, vec3_t to );
+#ifdef TMNTHOLDABLE
+void G_ThrowShuriken(gentity_t *ent, holdable_t holdable);
+#endif
+#ifdef TMNTWEAPSYS // MELEEATTACK
+qboolean G_MeleeAttack( gentity_t *ent );
+void G_StartMeleeAttack(gentity_t *ent);
+#endif
+#ifndef TMNTWEAPONS
 qboolean CheckGauntletAttack( gentity_t *ent );
+#endif
 void Weapon_HookFree (gentity_t *ent);
 void Weapon_HookThink (gentity_t *ent);
+#ifdef SP_NPC
+void NPC_FireWeapon(gentity_t *ent, vec3_t angle);
+#endif
 
 
 //
@@ -606,6 +761,34 @@ void G_StartKamikaze( gentity_t *ent );
 void MoveClientToIntermission (gentity_t *client);
 void G_SetStats (gentity_t *ent);
 void DeathmatchScoreboardMessage (gentity_t *client);
+
+#ifdef SP_NPC
+//
+// g_npcs.c
+//
+extern int npc_skill;
+void ClearRegisteredNPCs( void );
+void RegisterNPC( bgnpc_t *npc );
+void SaveRegisteredNPCs( void );
+void G_RunNPC( gentity_t *ent );
+//
+// g_npcmove.c
+//
+void NPC_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean snap );
+void NPM_StartLegsAnim(int anim);
+void NPM_ForceLegsAnim(int anim);
+void NPM_ContinueLegsAnim(int anim);
+void NPmove( npmove_t *pmove );
+//
+// g_npcthink.c
+//
+void NPC_ThinkMove(gentity_t *ent,usercmd_t *ucmd);
+void NPC_ThinkView(gentity_t *ent,usercmd_t *ucmd);
+void NPC_FindTarget(gentity_t *ent);
+int NPC_RecalcLinearObj(gentity_t *ent);
+qboolean NPC_InFieldOfVision(vec3_t viewangles, float fov, vec3_t angles);
+int NPC_IsVisible(gentity_t *viewer,gentity_t *ent);
+#endif
 
 //
 // g_cmds.c
@@ -671,8 +854,10 @@ void G_WriteSessionData( void );
 // g_arenas.c
 //
 void UpdateTournamentInfo( void );
+#ifndef TMNTSP
 void SpawnModelsOnVictoryPads( void );
 void Svcmd_AbortPodium_f( void );
+#endif
 
 //
 // g_bot.c
@@ -686,6 +871,40 @@ qboolean G_BotConnect( int clientNum, qboolean restart );
 void Svcmd_AddBot_f( void );
 void Svcmd_BotList_f( void );
 void BotInterbreedEndMatch( void );
+
+#ifdef TMNTSP // Load/save
+//
+// g_savestate.c
+//
+void G_LoadGame(fileHandle_t f);
+qboolean G_SaveGame(fileHandle_t f);
+#endif
+
+#ifdef TMNTPATHS
+//
+// g_paths.c
+//
+// Path type, save in entities?
+typedef enum
+{
+	PATH_UNKNOWN= 0x00,		// zero value
+
+	// values returned by G_SetupPath
+	PATH_ERROR	= 0x01,		// Path failed linking.
+	PATH_CIRCIT	= 0x02,		// Path is a circit.
+	PATH_LINE	= 0x04,		// Path has a start and end.
+					// ... (rename? doesn't mean its a strait line, just not a circit)
+
+	// other flags (saved in path entities)
+	PATH_FIRST	= 0x08,
+	PATH_LAST	= 0x10,
+
+	PATH_DUMMY
+} gpathtype_e;
+
+gpathtype_e G_SetupPath(gentity_t *ent, const char *target);
+//qboolean G_NextPath(gentity_t *ent);
+#endif
 
 // ai_main.c
 #define MAX_FILEPATH			144
@@ -713,6 +932,15 @@ extern	level_locals_t	level;
 extern	gentity_t		g_entities[MAX_GENTITIES];
 
 #define	FOFS(x) ((size_t)&(((gentity_t *)0)->x))
+
+#ifdef TMNTSP // save/load
+void G_SavePersistant(char *nextmap);
+void G_LoadPersistant(void);
+#endif
+#ifdef SP_NPC
+// Turtle Man: Changed int to size_t
+//#define NPCOFS(x) ((size_t)&(((bgnpc_t *)0)->x))
+#endif
 
 extern	vmCvar_t	g_gametype;
 extern	vmCvar_t	g_dedicated;
@@ -763,7 +991,12 @@ extern	vmCvar_t	g_rankings;
 extern	vmCvar_t	g_enableDust;
 extern	vmCvar_t	g_enableBreath;
 extern	vmCvar_t	g_singlePlayer;
+#ifdef TMNTSP
+extern	vmCvar_t	g_spSaveData;
+#endif
+#ifndef TMNTWEAPONS // missionpack
 extern	vmCvar_t	g_proxMineTimeout;
+#endif
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
@@ -867,7 +1100,11 @@ void	trap_EA_Action(int client, int action);
 void	trap_EA_Gesture(int client);
 void	trap_EA_Talk(int client);
 void	trap_EA_Attack(int client);
+#ifdef TMNTHOLDSYS
+void	trap_EA_Use(int client, int holdable);
+#else
 void	trap_EA_Use(int client);
+#endif
 void	trap_EA_Respawn(int client);
 void	trap_EA_Crouch(int client);
 void	trap_EA_MoveUp(int client);
@@ -876,7 +1113,11 @@ void	trap_EA_MoveForward(int client);
 void	trap_EA_MoveBack(int client);
 void	trap_EA_MoveLeft(int client);
 void	trap_EA_MoveRight(int client);
+#ifdef TMNTWEAPSYS2 // BOTLIB
+void	trap_EA_DropWeapon(int client);
+#else
 void	trap_EA_SelectWeapon(int client, int weapon);
+#endif
 void	trap_EA_Jump(int client);
 void	trap_EA_DelayedJump(int client);
 void	trap_EA_Move(int client, vec3_t dir, float speed);

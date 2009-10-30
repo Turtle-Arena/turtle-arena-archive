@@ -3132,6 +3132,9 @@ static bind_t g_bindings[] =
 {
 	{"+scores",			 K_TAB,				-1,		-1, -1},
 	{"+button2",		 K_ENTER,			-1,		-1, -1},
+#ifdef TMNTHOLDSYS // +nextholdable
+	{"+button12",		 '\'',				-1,		-1, -1},
+#endif
 	{"+speed", 			 K_SHIFT,			-1,		-1,	-1},
 	{"+forward", 		 K_UPARROW,		-1,		-1, -1},
 	{"+back", 			 K_DOWNARROW,	-1,		-1, -1},
@@ -3161,8 +3164,12 @@ static bind_t g_bindings[] =
 	{"weapon 12",		 -1,					-1,		-1, -1},
 	{"weapon 13",		 -1,					-1,		-1, -1},
 	{"+attack", 		 K_CTRL,				-1,		-1, -1},
+#ifdef TMNTWEAPSYS2 // +dropweapon
+	{"+button13",		 ';',					-1,		-1, -1},
+#else
 	{"weapprev",		 '[',					-1,		-1, -1},
 	{"weapnext", 		 ']',					-1,		-1, -1},
+#endif
 	{"+button3", 		 K_MOUSE3,			-1,		-1, -1},
 	{"+button4", 		 K_MOUSE4,			-1,		-1, -1},
 	{"prevTeamMember", 'w',					-1,		-1, -1},

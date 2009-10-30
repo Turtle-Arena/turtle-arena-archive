@@ -174,6 +174,12 @@ or configs will never get loaded from disk!
 
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
+#ifdef TMNT
+#define NUM_DEFAULT_PAKS 1 // allows for pak0 through pak8
+static const unsigned pak_checksums[NUM_DEFAULT_PAKS] = {
+	2192442826u
+};
+#else
 #define	DEMO_PAK0_CHECKSUM	2985612116u
 static const unsigned pak_checksums[] = {
 	1566731103u,
@@ -186,6 +192,7 @@ static const unsigned pak_checksums[] = {
 	908855077u,
 	977125798u
 };
+#endif
 
 // if this is defined, the executable positively won't work with any paks other
 // than the demo pak, even if productid is present.  This is only used for our
@@ -2702,9 +2709,11 @@ void FS_Shutdown( qboolean closemfp ) {
 #endif
 }
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 void Com_AppendCDKey( const char *filename );
 void Com_ReadCDKey( const char *filename );
+#endif
 #endif
 
 /*
@@ -2806,6 +2815,7 @@ static void FS_Startup( const char *gameName )
 		}
 	}
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 	if(!Cvar_VariableIntegerValue("com_standalone"))
 	{
@@ -2818,6 +2828,7 @@ static void FS_Startup( const char *gameName )
 		}
 	}
 #endif
+#endif // Turtle Man: CDKEY
 
 	// add our commands
 	Cmd_AddCommand ("path", FS_Path_f);
@@ -2945,6 +2956,73 @@ static void FS_CheckPak0( void )
 	
 	if(foundPak & 1)
 		Cvar_Set("com_standalone", "0");
+}
+#endif
+
+#ifdef TMNT
+/*
+===================
+FS_CheckPaks
+
+Checks that pak0.pk3 is present and its checksum is correct
+Note: If you're building a game that doesn't depend on the
+Q3 media pak0.pk3, you'll want to remove this function
+===================
+*/
+static void FS_CheckPaks( void )
+{
+#ifdef TMNTRELEASE // Only for release version.
+	searchpath_t	*path;
+	unsigned foundPak = 0;
+	unsigned invalidPak = 0;
+
+	for( path = fs_searchpaths; path; path = path->next )
+	{
+		const char *pakBasename = path->pack->pakBasename;
+
+		if (!path->pack)
+			continue;
+
+		if(!Q_stricmpn( path->pack->pakGamename, BASEGAME, MAX_OSPATH )
+			&& strlen(pakBasename) == 4 && !Q_stricmpn( pakBasename, "pak", 3 )
+			&& pakBasename[3] >= '0' && pakBasename[3] < '0'+NUM_DEFAULT_PAKS)
+		{
+			if( path->pack->checksum != pak_checksums[pakBasename[3]-'0'] )
+			{
+				Com_Printf("\n\n"
+					"**************************************************\n"
+					"WARNING: pak%d.pk3 is present but its checksum (%u)\n"
+					"is not correct. Please re-install the point release\n"
+					"**************************************************\n\n\n",
+					pakBasename[3]-'0', path->pack->checksum );
+
+				invalidPak |= 1<<(pakBasename[3]-'0');
+			}
+			else
+			{
+				// Found pk3 AND its checksum matches.
+				foundPak |= 1<<(pakBasename[3]-'0');
+			}
+		}
+	}
+
+	if ( !(foundPak & (1<<NUM_DEFAULT_PAKS)) || invalidPak )
+	{
+		Com_Printf("\n\n"
+			"Check that the executable is in\n"
+			"the correct place and that every file\n"
+			"in the '%s' directory is present and readable.\n\n", BASEGAME);
+
+		if (invalidPak)
+		{
+			Com_Error(ERR_FATAL, "Default Pk3 files are missing, corrupt, or modified.\nYou need to reinstall TMNT Arena in order to play");
+		}
+		else
+		{
+			Com_Error(ERR_FATAL, "Missing default Pk3 files.\nYou need to reinstall TMNT Arena in order to play");
+		}
+	}
+#endif
 }
 #endif
 
@@ -3318,6 +3396,9 @@ void FS_InitFilesystem( void ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
+#ifdef TMNT
+	FS_CheckPaks();
+#endif
 #ifndef STANDALONE
 	FS_CheckPak0( );
 #endif
@@ -3353,6 +3434,9 @@ void FS_Restart( int checksumFeed ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
+#ifdef TMNT
+	FS_CheckPaks();
+#endif
 #ifndef STANDALONE
 	FS_CheckPak0( );
 #endif

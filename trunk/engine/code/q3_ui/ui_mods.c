@@ -125,7 +125,11 @@ static void UI_Mods_LoadMods( void ) {
 
 	// always start off with baseq3
 	s_mods.list.numitems = 1;
+#ifdef TMNT
+	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "TMNT Arena";
+#else
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Quake III Arena";
+#endif
 	s_mods.fs_gameList[0] = "";
 
 	numdirs = trap_FS_GetFileList( "$modlist", "", dirlist, sizeof(dirlist) );

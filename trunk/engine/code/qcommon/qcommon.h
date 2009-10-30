@@ -567,10 +567,18 @@ issues.
 
 #define	MAX_FILE_HANDLES	64
 
+#ifdef TMNT // Config file name
+#ifdef DEDICATED
+#	define Q3CONFIG_CFG "config_server.cfg"
+#else
+#	define Q3CONFIG_CFG "config.cfg"
+#endif
+#else
 #ifdef DEDICATED
 #	define Q3CONFIG_CFG "q3config_server.cfg"
 #else
 #	define Q3CONFIG_CFG "q3config.cfg"
+#endif
 #endif
 
 qboolean FS_Initialized( void );
@@ -732,9 +740,11 @@ MISC
 ==============================================================
 */
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 // centralizing the declarations for cl_cdkey
 // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=470
 extern char cl_cdkey[34];
+#endif
 
 // returned by Sys_GetProcessorFeatures
 typedef enum
@@ -818,6 +828,12 @@ extern	cvar_t	*com_maxfpsUnfocused;
 extern	cvar_t	*com_minimized;
 extern	cvar_t	*com_maxfpsMinimized;
 extern	cvar_t	*com_altivec;
+#ifdef ANALOG // cl vars
+extern	cvar_t	*cl_thirdPerson;
+extern	cvar_t	*cl_thirdPersonAngle;
+extern	cvar_t	*cl_thirdPersonRange;
+extern	cvar_t	*cl_thirdPersonAnalog;
+#endif
 
 // both client and server must agree to pause
 extern	cvar_t	*cl_paused;
@@ -951,8 +967,10 @@ void	CL_ForwardCommandToServer( const char *string );
 // things like godmode, noclip, etc, are commands directed to the server,
 // so when they are typed in at the console, they will need to be forwarded.
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 void CL_CDDialog( void );
 // bring up the "need a cd to play" dialog
+#endif
 
 void CL_ShutdownAll( void );
 // shutdown all the client stuff
@@ -988,7 +1006,9 @@ qboolean SV_GameCommand( void );
 // UI interface
 //
 qboolean UI_GameCommand( void );
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 qboolean UI_usesUniqueCDKey(void);
+#endif
 
 /*
 ==============================================================

@@ -57,6 +57,9 @@ extern vmCvar_t	ui_spAwards;
 extern vmCvar_t	ui_spVideos;
 extern vmCvar_t	ui_spSkill;
 
+#ifdef TMNTSP
+extern vmCvar_t ui_spStage;
+#endif
 extern vmCvar_t	ui_spSelection;
 
 extern vmCvar_t	ui_browserMaster;
@@ -87,8 +90,10 @@ extern vmCvar_t	ui_server14;
 extern vmCvar_t	ui_server15;
 extern vmCvar_t	ui_server16;
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 extern vmCvar_t	ui_cdkey;
 extern vmCvar_t	ui_cdkeychecked;
+#endif
 
 extern vmCvar_t	ui_captureLimit;
 extern vmCvar_t	ui_fragLimit;
@@ -118,7 +123,9 @@ extern vmCvar_t	ui_scoreImpressives;
 extern vmCvar_t	ui_scoreExcellents;
 extern vmCvar_t	ui_scoreDefends;
 extern vmCvar_t	ui_scoreAssists;
+#ifndef TMNTWEAPONS
 extern vmCvar_t	ui_scoreGauntlets;
+#endif
 extern vmCvar_t	ui_scoreScore;
 extern vmCvar_t	ui_scorePerfect;
 extern vmCvar_t	ui_scoreTeam;
@@ -326,6 +333,9 @@ extern vec4_t		color_yellow;
 extern vec4_t		color_blue;
 extern vec4_t		color_orange;
 extern vec4_t		color_red;
+#ifdef TMNT // I changed red so that it is white, so I need a new "red"...
+extern vec4_t		color_TMNTred;
+#endif
 extern vec4_t		color_dim;
 extern vec4_t		name_color;
 extern vec4_t		list_color;
@@ -428,12 +438,14 @@ extern void UI_CinematicsMenu_Cache( void );
 extern void UI_ModsMenu( void );
 extern void UI_ModsMenu_Cache( void );
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 //
 // ui_cdkey.c
 //
 extern void UI_CDKeyMenu( void );
 extern void UI_CDKeyMenu_Cache( void );
 extern void UI_CDKeyMenu_f( void );
+#endif
 
 //
 // ui_playermodel.c
@@ -532,9 +544,16 @@ typedef struct {
 	qhandle_t		headModel;
 	qhandle_t		headSkin;
 
+#ifdef TMNTPLAYERSYS
+	bg_playercfg_t	playercfg;
+#else
 	animation_t		animations[MAX_TOTALANIMATIONS];
+#endif
 
 	qhandle_t		weaponModel;
+#ifdef TMNTWEAPSYS
+	qhandle_t		weaponModel2;
+#endif
 	qhandle_t		barrelModel;
 	qhandle_t		flashModel;
 	vec3_t			flashDlightColor;
@@ -590,7 +609,9 @@ typedef struct {
 	qhandle_t		menuBackNoLogoShader;
 	qhandle_t		charset;
 	qhandle_t		charsetProp;
+#ifndef TMNT
 	qhandle_t		charsetPropGlow;
+#endif
 	qhandle_t		charsetPropB;
 	qhandle_t		cursor;
 	qhandle_t		rb_on;
@@ -899,6 +920,14 @@ void UI_SPLevelMenu_ReInit( void );
 // ui_spArena.c
 //
 void UI_SPArena_Start( const char *arenaInfo );
+#ifdef TMNTSP
+void UI_SPMenu( void );
+void UI_SPMenu_f( void );
+void UI_SPMenu_Cache( void );
+void UI_StageMenu( void );
+void UI_StageMenu_f( void );
+void UI_StageMenu_Cache( void );
+#endif
 
 //
 // ui_spPostgame.c
@@ -983,8 +1012,10 @@ void			trap_LAN_ResetPings(int n);
 int				trap_LAN_ServerStatus( const char *serverAddress, char *serverStatus, int maxLen );
 int				trap_LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 );
 int				trap_MemoryRemaining( void );
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 void			trap_GetCDKey( char *buf, int buflen );
 void			trap_SetCDKey( char *buf );
+#endif
 void			trap_R_RegisterFont(const char *pFontname, int pointSize, fontInfo_t *font);
 void			trap_S_StopBackgroundTrack( void );
 void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
@@ -995,7 +1026,9 @@ void			trap_CIN_DrawCinematic (int handle);
 void			trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
 int				trap_RealTime(qtime_t *qtime);
 void			trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset );
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 qboolean		trap_VerifyCDKey( const char *key, const char *chksum);
+#endif
 
 void			trap_SetPbClStatus( int status );
 
@@ -1053,9 +1086,13 @@ void UI_NetworkOptionsMenu( void );
 //
 typedef enum {
 	AWARD_ACCURACY,
+#ifndef TMNTWEAPONS
 	AWARD_IMPRESSIVE,
+#endif
 	AWARD_EXCELLENT,
+#ifndef TMNTWEAPONS
 	AWARD_GAUNTLET,
+#endif
 	AWARD_FRAGS,
 	AWARD_PERFECT
 } awardType_t;
@@ -1122,7 +1159,9 @@ typedef struct postGameInfo_s {
 	int excellents;
 	int defends;
 	int assists;
+#ifndef TMNTWEAPONS
 	int gauntlets;
+#endif
 	int	captures;
 	int time;
 	int timeBonus;

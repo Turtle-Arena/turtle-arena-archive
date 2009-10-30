@@ -27,18 +27,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE DISCARDABLE
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE DISCARDABLE
 BEGIN
     "#include ""winres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE DISCARDABLE
 BEGIN
     "\0"
 END
@@ -53,6 +53,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+
 #ifndef __MINGW32__
 IDI_ICON1               ICON    DISCARDABLE     "../quake3.ico"
 #else
@@ -65,9 +66,13 @@ IDI_ICON1               ICON    DISCARDABLE     "misc/quake3.ico"
 // String Table
 //
 
-STRINGTABLE DISCARDABLE 
+STRINGTABLE DISCARDABLE
 BEGIN
+#if 1 // Turtle Man
+    IDS_STRING1             "TMNTArena"
+#else
     IDS_STRING1             "Quake3"
+#endif
 END
 
 #endif    // English (U.S.) resources

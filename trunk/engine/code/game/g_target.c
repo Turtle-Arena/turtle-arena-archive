@@ -420,7 +420,11 @@ void SP_target_position( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 }
 
+#ifdef TMNTSP // Save/load
+void target_location_linkup(gentity_t *ent)
+#else
 static void target_location_linkup(gentity_t *ent)
+#endif
 {
 	int i;
 	int n;
@@ -465,3 +469,111 @@ void SP_target_location( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 }
 
+#ifdef TMNTSP
+/*QUAKED target_level_end (1 0 0) (-16 -16 -24) (16 16 32)
+when triggered, the level ends
+"message"	use it to set the name of the next level without any extension
+targetname: To trigger the level end.
+*/
+
+void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
+	char buf[MAX_QPATH];
+	char *nx = self->message;
+
+	if (nx == NULL || *nx == '\0')
+	{
+		// Invalid map name, do nothing.
+		return;
+	}
+	if (g_gametype.integer != GT_SINGLE_PLAYER)
+	{
+		// Only exit in single player.
+		return;
+	}
+
+	// If trigered by a client, that isn't a spectator,
+	//  and that hasn't finished the level.
+	if (activator && activator->client
+		&& activator->client->sess.sessionTeam != TEAM_SPECTATOR
+		&& !activator->client->finishTime)
+	{
+		// Set finish time.
+		activator->client->finishTime = level.time;
+		// Print message,
+		if (!g_singlePlayer.integer)
+		{
+			G_Printf("%s finished the level.\n", activator->client->pers.netname );
+		}
+	}
+	else
+	{
+		// Not a valid client.
+		return;
+	}
+
+	// Save client data for next level.
+	G_SavePersistant(nx);
+
+	// Set cvar for level change.
+	Com_sprintf(buf, MAX_QPATH, "map %s", nx);
+	trap_Cvar_Set("nextmap", buf);
+}
+
+void SP_target_level_end( gentity_t *self ) {
+	self->use = target_level_end_use;
+
+	// Check for invalid map name on spawn, easier to find bugs in maps.
+	if (self->message == NULL || *self->message == '\0')
+	{
+		// Invalid map name.
+		G_Printf("target_level_end: Invalid map name.\n");
+	}
+}
+#endif
+
+#ifdef CAMERASCRIPT // Turtle Man: i made this
+
+/*QUAKED target_start_camera (1 0 0) (-16 -16 -24) (16 16 32) redteam blueteam private
+when triggered, starts a camera script.
+"message"	use it to set the name of the camera script without any extension or "cameras/" dir
+targetname: To trigger the camera script.
+If "private", only the activator gets the camera.  If no checks, all clients get the camera.
+Turtle Man: TODO: Option for whether it can be skipped.
+*/
+void target_start_camera_use(gentity_t *ent, gentity_t *other, gentity_t *activator) {
+	if (ent->message == NULL || *ent->message == '\0') {
+		// Invalid script filename, do nothing.
+		return;
+	}
+
+	if ( activator->client && ( ent->spawnflags & 4 ) ) {
+		trap_SendServerCommand( activator-g_entities, va("camera \"%s\"", ent->message ));
+		return;
+	}
+
+	if ( ent->spawnflags & 3 ) {
+		if ( ent->spawnflags & 1 ) {
+			G_TeamCommand( TEAM_RED, va("camera \"%s\"", ent->message) );
+		}
+		if ( ent->spawnflags & 2 ) {
+			G_TeamCommand( TEAM_BLUE, va("camera \"%s\"", ent->message) );
+		}
+		return;
+	}
+
+	trap_SendServerCommand( -1, va("camera \"%s\"", ent->message ));
+}
+
+void SP_target_start_camera( gentity_t *self ) {
+	char *scrname = self->message;
+
+	self->use = target_start_camera_use;
+
+	// Check for invalid script filename on spawn, easier to find bugs in maps.
+	if (scrname == NULL || *scrname == '\0')
+	{
+		// Invalid map name.
+		G_Printf("target_start_camera: Invalid script filename.\n");
+	}
+}
+#endif

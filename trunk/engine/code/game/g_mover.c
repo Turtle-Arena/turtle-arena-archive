@@ -319,7 +319,7 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 	for ( e = 0 ; e < listedEntities ; e++ ) {
 		check = &g_entities[ entityList[ e ] ];
 
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 		if ( check->s.eType == ET_MISSILE ) {
 			// if it is a prox mine
 			if ( !strcmp(check->classname, "prox mine") ) {
@@ -356,7 +356,14 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 		}
 #endif
 		// only push items and players
-		if ( check->s.eType != ET_ITEM && check->s.eType != ET_PLAYER && !check->physicsObject ) {
+		if ( check->s.eType != ET_ITEM && check->s.eType != ET_PLAYER &&
+#ifdef SP_NPC
+			check->s.eType != ET_NPC &&
+#endif
+#ifdef SINGLEPLAYER // entity
+			check->s.eType != ET_MODELANIM &&
+#endif
+			!check->physicsObject ) {
 			continue;
 		}
 
@@ -807,6 +814,10 @@ void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 			Team_DroppedFlagThink( other );
 			return;
 		}
+#ifdef SP_NPC
+		if (other->s.eType == ET_NPC)
+			return;
+#endif
 		G_TempEntity( other->s.origin, EV_ITEM_POP );
 		G_FreeEntity( other );
 		return;
@@ -1331,6 +1342,12 @@ Link all the corners together
 ===============
 */
 void Think_SetupTrainTargets( gentity_t *ent ) {
+#ifdef TMNTPATHS
+	if (G_SetupPath(ent, ent->target) == PATH_ERROR)
+	{
+		return;
+	}
+#else
 	gentity_t		*path, *next, *start;
 
 	ent->nextTrain = G_Find( NULL, FOFS(targetname), ent->target );
@@ -1367,6 +1384,7 @@ void Think_SetupTrainTargets( gentity_t *ent ) {
 
 		path->nextTrain = next;
 	}
+#endif
 
 	// start the train moving from the first corner
 	Reached_Train( ent );

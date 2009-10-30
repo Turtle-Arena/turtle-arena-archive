@@ -26,11 +26,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-
+#ifndef TMNTSP
 gentity_t	*podium1;
 gentity_t	*podium2;
 gentity_t	*podium3;
-
+#endif
 
 /*
 ==================
@@ -108,17 +108,30 @@ void UpdateTournamentInfo( void ) {
 		} else {
 			perfect = 0;
 		}
+#ifdef TMNTWEAPONS
+		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
+			0, player->client->ps.persistant[PERS_EXCELLENT_COUNT],player->client->ps.persistant[PERS_DEFEND_COUNT],
+			player->client->ps.persistant[PERS_ASSIST_COUNT], 0, player->client->ps.persistant[PERS_SCORE],
+			perfect, score1, score2, level.time, player->client->ps.persistant[PERS_CAPTURES] );
+#else
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
 			player->client->ps.persistant[PERS_IMPRESSIVE_COUNT], player->client->ps.persistant[PERS_EXCELLENT_COUNT],player->client->ps.persistant[PERS_DEFEND_COUNT],
 			player->client->ps.persistant[PERS_ASSIST_COUNT], player->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], player->client->ps.persistant[PERS_SCORE],
 			perfect, score1, score2, level.time, player->client->ps.persistant[PERS_CAPTURES] );
-
+#endif
 #else
 		perfect = ( level.clients[playerClientNum].ps.persistant[PERS_RANK] == 0 && player->client->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
+#ifdef TMNTWEAPONS
+		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
+			0, player->client->ps.persistant[PERS_EXCELLENT_COUNT],
+			0, player->client->ps.persistant[PERS_SCORE],
+			perfect );
+#else
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
 			player->client->ps.persistant[PERS_IMPRESSIVE_COUNT], player->client->ps.persistant[PERS_EXCELLENT_COUNT],
 			player->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], player->client->ps.persistant[PERS_SCORE],
 			perfect );
+#endif
 #endif
 	}
 
@@ -135,7 +148,7 @@ void UpdateTournamentInfo( void ) {
 	trap_SendConsoleCommand( EXEC_APPEND, msg );
 }
 
-
+#ifndef TMNTSP
 static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity_t *ent, int place ) {
 	gentity_t	*body;
 	vec3_t		vec;
@@ -162,6 +175,12 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 	body->s.pos.trType = TR_STATIONARY;
 	body->s.groundEntityNum = ENTITYNUM_WORLD;
 	body->s.legsAnim = LEGS_IDLE;
+#ifdef TMNTWEAPSYS
+	if( body->s.weapon == WP_NONE || body->s.weapon == WP_DEFAULT) {
+		body->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
+	}
+	body->s.torsoAnim = BG_TorsoStandForPlayerState(&ent->client->ps);
+#else
 	body->s.torsoAnim = TORSO_STAND;
 	if( body->s.weapon == WP_NONE ) {
 		body->s.weapon = WP_MACHINEGUN;
@@ -169,6 +188,7 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 	if( body->s.weapon == WP_GAUNTLET) {
 		body->s.torsoAnim = TORSO_STAND2;
 	}
+#endif
 	body->s.event = 0;
 	body->r.svFlags = ent->r.svFlags;
 	VectorCopy (ent->r.mins, body->r.mins);
@@ -203,12 +223,16 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 static void CelebrateStop( gentity_t *player ) {
 	int		anim;
 
+#ifdef TMNTWEAPSYS
+	anim = BG_TorsoStandForPlayerState(&player->client->ps);
+#else
 	if( player->s.weapon == WP_GAUNTLET) {
 		anim = TORSO_STAND2;
 	}
 	else {
 		anim = TORSO_STAND;
 	}
+#endif
 	player->s.torsoAnim = ( ( player->s.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | anim;
 }
 
@@ -226,7 +250,6 @@ static void CelebrateStart( gentity_t *player ) {
 	*/
 	G_AddEvent(player, EV_TAUNT, 0);
 }
-
 
 static vec3_t	offsetFirst  = {0, 0, 74};
 static vec3_t	offsetSecond = {-10, 60, 54};
@@ -287,7 +310,6 @@ static void PodiumPlacementThink( gentity_t *podium ) {
 	}
 }
 
-
 static gentity_t *SpawnPodium( void ) {
 	gentity_t	*podium;
 	vec3_t		vec;
@@ -319,7 +341,6 @@ static gentity_t *SpawnPodium( void ) {
 	return podium;
 }
 
-
 /*
 ==================
 SpawnModelsOnVictoryPads
@@ -332,6 +353,7 @@ void SpawnModelsOnVictoryPads( void ) {
 	podium1 = NULL;
 	podium2 = NULL;
 	podium3 = NULL;
+
 
 	podium = SpawnPodium();
 
@@ -357,8 +379,9 @@ void SpawnModelsOnVictoryPads( void ) {
 		}
 	}
 }
+#endif
 
-
+#ifndef TMNTSP
 /*
 ===============
 Svcmd_AbortPodium_f
@@ -374,3 +397,4 @@ void Svcmd_AbortPodium_f( void ) {
 		podium1->think = CelebrateStop;
 	}
 }
+#endif

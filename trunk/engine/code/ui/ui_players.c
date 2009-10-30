@@ -76,31 +76,97 @@ tryagain:
 	}
 
 	if ( item->classname ) {
+#ifdef TMNTWEAPSYS
+		if (item->world_model[2]) {
+			pi->weaponModel = trap_R_RegisterModel( item->world_model[2] );
+		}
+		else if (item->world_model[0]) {
 		pi->weaponModel = trap_R_RegisterModel( item->world_model[0] );
 	}
 
+		if (item->world_model[3]) {
+			pi->weaponModel2 = trap_R_RegisterModel( item->world_model[3] );
+		}
+		else {
+			pi->weaponModel2 = pi->weaponModel;
+		}
+#else
+		pi->weaponModel = trap_R_RegisterModel( item->world_model[0] );
+#endif
+	}
+
 	if( pi->weaponModel == 0 ) {
+#if defined TMNTPLAYERSYS && defined TMNTPLAYERS
+		if( weaponNum == pi->playercfg.default_weapon ) {
+			weaponNum = WP_NONE;
+			goto tryagain;
+		}
+		weaponNum = pi->playercfg.default_weapon;
+#elif defined TMNTWEAPONS
+		if( weaponNum == WP_GUN ) {
+			weaponNum = WP_NONE;
+			goto tryagain;
+		}
+		weaponNum = WP_GUN;
+#else
 		if( weaponNum == WP_MACHINEGUN ) {
 			weaponNum = WP_NONE;
 			goto tryagain;
 		}
 		weaponNum = WP_MACHINEGUN;
+#endif
 		goto tryagain;
 	}
 
+#ifdef TMNTWEAPONS
+	if ( weaponNum == WP_GUN ) {
+#else
 	if ( weaponNum == WP_MACHINEGUN || weaponNum == WP_GAUNTLET || weaponNum == WP_BFG ) {
+#endif
+#ifdef TMNTWEAPSYS
+		if (item->world_model[2])
+			strcpy( path, item->world_model[2] );
+		else
+#endif
 		strcpy( path, item->world_model[0] );
 		COM_StripExtension(path, path, sizeof(path));
 		strcat( path, "_barrel.md3" );
 		pi->barrelModel = trap_R_RegisterModel( path );
 	}
 
+#ifdef TMNTWEAPSYS
+	if (item->world_model[2]) {
+		strcpy( path, item->world_model[2] );
+	}
+	else
+#endif
 	strcpy( path, item->world_model[0] );
 	COM_StripExtension(path, path, sizeof(path));
 	strcat( path, "_flash.md3" );
 	pi->flashModel = trap_R_RegisterModel( path );
 
 	switch( weaponNum ) {
+#ifdef TMNTWEAPONS
+	case WP_GUN:
+		MAKERGB( pi->flashDlightColor, 1, 0.75f, 0 );
+		break;
+
+	case WP_ELECTRIC_LAUNCHER:
+		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
+		break;
+
+	case WP_ROCKET_LAUNCHER:
+		MAKERGB( pi->flashDlightColor, 1, 0.75f, 0 );
+		break;
+
+	case WP_HOMING_LAUNCHER:
+		MAKERGB( pi->flashDlightColor, 1, 0.75f, 0 );
+		break;
+
+	case WP_GRAPPLING_HOOK:
+		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
+		break;
+#else
 	case WP_GAUNTLET:
 		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
 		break;
@@ -140,6 +206,7 @@ tryagain:
 	case WP_GRAPPLING_HOOK:
 		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
 		break;
+#endif
 
 	default:
 		MAKERGB( pi->flashDlightColor, 1, 1, 1 );
@@ -353,7 +420,11 @@ static void UI_SetLerpFrameAnimation( playerInfo_t *ci, lerpFrame_t *lf, int new
 		trap_Error( va("Bad animation number: %i", newAnimation) );
 	}
 
+#ifdef TMNTPLAYERSYS
+	anim = &ci->playercfg.animations[ newAnimation ];
+#else
 	anim = &ci->animations[ newAnimation ];
+#endif
 
 	lf->animation = anim;
 	lf->animationTime = lf->frameTime + anim->initialLerp;
@@ -694,6 +765,9 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	refEntity_t		torso;
 	refEntity_t		head;
 	refEntity_t		gun;
+#ifdef TMNTWEAPSYS
+	refEntity_t		gun_left;
+#endif
 	refEntity_t		barrel;
 	refEntity_t		flash;
 	vec3_t			origin;
@@ -703,7 +777,12 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	float			len;
 	float			xx;
 
-	if ( !pi->legsModel || !pi->torsoModel || !pi->headModel || !pi->animations[0].numFrames ) {
+	if ( !pi->legsModel || !pi->torsoModel || !pi->headModel
+#ifdef TMNTPLAYERSYS
+	|| !pi->playercfg.animations[0].numFrames ) {
+#else
+	|| !pi->animations[0].numFrames ) {
+#endif
 		return;
 	}
 
@@ -826,15 +905,58 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		memset( &gun, 0, sizeof(gun) );
 		gun.hModel = pi->weaponModel;
 		VectorCopy( origin, gun.lightingOrigin );
+#ifdef TMNT_SUPPORTQ3 // TOOD: Support "tag_hand_primary" here too
+		/*if (1)
+		{
+			UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary");
+		}
+		else*/
+		{
 		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
+		}
+#elif defined TMNTPLAYERS
+		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary");
+#else
+		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
+#endif
 		gun.renderfx = renderfx;
 		trap_R_AddRefEntityToScene( &gun );
+#ifdef TMNTWEAPSYS
+		// Secondary weapon
+		memset( &gun_left, 0, sizeof(gun_left) );
+		gun_left.hModel = pi->weaponModel2;
+		VectorCopy( origin, gun_left.lightingOrigin );
+
+		if (gun_left.hModel)
+		{
+#ifdef TMNT_SUPPORTQ3 // TOOD: Support "tag_hand_secondary" here too
+			/*if (1)
+			{
+				UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_secondary");
+	}
+			else*/
+			{
+				UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_flag");
+			}
+#elif defined TMNTPLAYERS
+			UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_hand_secondary");
+#else
+			UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_flag");
+#endif
+			gun_left.renderfx = renderfx;
+			trap_R_AddRefEntityToScene( &gun_left );
+		}
+#endif
 	}
 
 	//
 	// add the spinning barrel
 	//
+#ifdef TMNTWEAPONS
+	if ( pi->realWeapon == WP_GUN ) {
+#else
 	if ( pi->realWeapon == WP_MACHINEGUN || pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG ) {
+#endif
 		vec3_t	angles;
 
 		memset( &barrel, 0, sizeof(barrel) );
@@ -845,10 +967,12 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		angles[YAW] = 0;
 		angles[PITCH] = 0;
 		angles[ROLL] = UI_MachinegunSpinAngle( pi );
+#ifndef TMNTWEAPONS
 		if( pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG ) {
 			angles[PITCH] = angles[ROLL];
 			angles[ROLL] = 0;
 		}
+#endif
 		AnglesToAxis( angles, barrel.axis );
 
 		UI_PositionRotatedEntityOnTag( &barrel, &gun, pi->weaponModel, "tag_barrel");
@@ -880,7 +1004,11 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	// add the chat icon
 	//
 	if ( pi->chat ) {
+#ifdef TMNT // shaders
+		UI_PlayerFloatSprite( pi, origin, trap_R_RegisterShaderNoMip( "sprites/talkBalloon" ) );
+#else
 		UI_PlayerFloatSprite( pi, origin, trap_R_RegisterShaderNoMip( "sprites/balloon3" ) );
+#endif
 	}
 
 	//
@@ -1016,6 +1144,7 @@ static qboolean	UI_RegisterClientSkin( playerInfo_t *pi, const char *modelName, 
 }
 
 
+#ifndef TMNTPLAYERSYS // Moved to bg_misc.c BG_LoadPlayerCFGFile
 /*
 ======================
 UI_ParseAnimationFile
@@ -1138,6 +1267,7 @@ static qboolean UI_ParseAnimationFile( const char *filename, animation_t *animat
 
 	return qtrue;
 }
+#endif // TMNTPLAYERSYS
 
 /*
 ==========================
@@ -1222,6 +1352,8 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 	}
 
 	// if any skins failed to load, fall back to default
+#ifdef TMNT // Turtle Man: FIXME: Use same skin loading in UI as in cgame.
+#endif
 	if ( !UI_RegisterClientSkin( pi, modelName, skinName, headModelName, headSkinName, teamName) ) {
 		if ( !UI_RegisterClientSkin( pi, modelName, "default", headModelName, "default", teamName ) ) {
 			Com_Printf( "Failed to load skin file: %s : %s\n", modelName, skinName );
@@ -1230,6 +1362,9 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 	}
 
 	// load the animations
+#ifdef TMNTPLAYERSYS
+	return BG_LoadPlayerCFGFile(modelName, &pi->playercfg);
+#else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/animation.cfg", modelName );
 	if ( !UI_ParseAnimationFile( filename, pi->animations ) ) {
 		Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/animation.cfg", modelName );
@@ -1240,6 +1375,7 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 	}
 
 	return qtrue;
+#endif
 }
 
 
@@ -1251,7 +1387,13 @@ UI_PlayerInfo_SetModel
 void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model, const char *headmodel, char *teamName ) {
 	memset( pi, 0, sizeof(*pi) );
 	UI_RegisterClientModelname( pi, model, headmodel, teamName );
+#if defined TMNTPLAYERSYS && defined TMNTPLAYERS
+	pi->weapon = pi->playercfg.default_weapon;
+#elif defined TMNTWEAPONS
+	pi->weapon = WP_GUN;
+#else
 	pi->weapon = WP_MACHINEGUN;
+#endif
 	pi->currentWeapon = pi->weapon;
 	pi->lastWeapon = pi->weapon;
 	pi->pendingWeapon = -1;
@@ -1344,6 +1486,11 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	}
 
 	// torso animation
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Better TORSO_STAND checking
+	if ( torsoAnim == TORSO_STAND || torsoAnim == TORSO_STAND2 ) {
+		torsoAnim = BG_TorsoStandForWeapon(weaponNum);
+	}
+#else
 	if ( torsoAnim == TORSO_STAND || torsoAnim == TORSO_STAND2 ) {
 		if ( weaponNum == WP_NONE || weaponNum == WP_GAUNTLET ) {
 			torsoAnim = TORSO_STAND2;
@@ -1352,7 +1499,15 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 			torsoAnim = TORSO_STAND;
 		}
 	}
+#endif
 
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Better TORSO_ATTACK checking
+	if ( torsoAnim == TORSO_ATTACK || torsoAnim == TORSO_ATTACK2 ) {
+		torsoAnim = BG_TorsoAttackForWeapon(weaponNum);
+		pi->muzzleFlashTime = dp_realtime + UI_TIMER_MUZZLE_FLASH;
+		//FIXME play firing sound here
+	}
+#else
 	if ( torsoAnim == TORSO_ATTACK || torsoAnim == TORSO_ATTACK2 ) {
 		if ( weaponNum == WP_NONE || weaponNum == WP_GAUNTLET ) {
 			torsoAnim = TORSO_ATTACK2;
@@ -1363,6 +1518,7 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 		pi->muzzleFlashTime = dp_realtime + UI_TIMER_MUZZLE_FLASH;
 		//FIXME play firing sound here
 	}
+#endif
 
 	currentAnim = pi->torsoAnim & ~ANIM_TOGGLEBIT;
 

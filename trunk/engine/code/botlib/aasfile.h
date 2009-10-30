@@ -47,7 +47,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TRAVEL_TELEPORT				10		//teleportation
 #define TRAVEL_ELEVATOR				11		//travel by elevator
 #define TRAVEL_ROCKETJUMP			12		//rocket jumping required for travel
+#ifndef TMNTWEAPSYS
 #define TRAVEL_BFGJUMP				13		//bfg jumping required for travel
+#endif
 #define TRAVEL_GRAPPLEHOOK			14		//grappling hook required for travel
 #define TRAVEL_DOUBLEJUMP			15		//double jump
 #define TRAVEL_RAMPJUMP				16		//ramp jump

@@ -556,7 +556,11 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		botlib_export->ea.EA_Attack( args[1] );
 		return 0;
 	case BOTLIB_EA_USE:
+#ifdef TMNTHOLDSYS
+		botlib_export->ea.EA_Use( args[1], args[2] );
+#else
 		botlib_export->ea.EA_Use( args[1] );
+#endif
 		return 0;
 	case BOTLIB_EA_RESPAWN:
 		botlib_export->ea.EA_Respawn( args[1] );
@@ -583,9 +587,15 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		botlib_export->ea.EA_MoveRight( args[1] );
 		return 0;
 
+#ifdef TMNTWEAPSYS2 // BOTLIB
+	case BOTLIB_EA_DROP_WEAPON:
+		botlib_export->ea.EA_DropWeapon( args[1] );
+		return 0;
+#else
 	case BOTLIB_EA_SELECT_WEAPON:
 		botlib_export->ea.EA_SelectWeapon( args[1], args[2] );
 		return 0;
+#endif
 	case BOTLIB_EA_JUMP:
 		botlib_export->ea.EA_Jump( args[1] );
 		return 0;

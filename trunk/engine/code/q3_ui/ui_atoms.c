@@ -545,6 +545,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		return;
 	}
 
+
 	if ( style & UI_PULSE ) {
 		drawcolor[0] = color[0] * 0.7;
 		drawcolor[1] = color[1] * 0.7;
@@ -552,11 +553,22 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[3] = color[3];
 		UI_DrawProportionalString2( x, y, str, color, sizeScale, uis.charsetProp );
 
+#ifdef TMNT // Turtle Man: Main menu text drawing.
+        // Turtle Man: hack-ish thing to do?...
+		drawcolor[0] = text_color_highlight[0];
+		drawcolor[1] = text_color_highlight[1];
+		drawcolor[2] = text_color_highlight[2];
+#else
 		drawcolor[0] = color[0];
 		drawcolor[1] = color[1];
 		drawcolor[2] = color[2];
+#endif
 		drawcolor[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
+#ifdef TMNT
+		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, uis.charsetProp );
+#else
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, uis.charsetPropGlow );
+#endif
 		return;
 	}
 
@@ -789,6 +801,7 @@ qboolean UI_IsFullscreen( void ) {
 	return qfalse;
 }
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 static void NeedCDAction( qboolean result ) {
 	if ( !result ) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, "quit\n" );
@@ -800,6 +813,7 @@ static void NeedCDKeyAction( qboolean result ) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, "quit\n" );
 	}
 }
+#endif
 
 void UI_SetActiveMenu( uiMenuCommand_t menu ) {
 	// this should be the ONLY way the menu system is brought up
@@ -813,12 +827,14 @@ void UI_SetActiveMenu( uiMenuCommand_t menu ) {
 	case UIMENU_MAIN:
 		UI_MainMenu();
 		return;
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	case UIMENU_NEED_CD:
 		UI_ConfirmMenu( "Insert the CD", 0, NeedCDAction );
 		return;
 	case UIMENU_BAD_CD_KEY:
 		UI_ConfirmMenu( "Bad CD Key", 0, NeedCDKeyAction );
 		return;
+#endif
 	case UIMENU_INGAME:
 		/*
 		//GRank
@@ -971,6 +987,12 @@ void UI_Cache_f( void ) {
 	UI_DisplayOptionsMenu_Cache();
 	UI_SoundOptionsMenu_Cache();
 	UI_NetworkOptionsMenu_Cache();
+#ifdef TMNTSP
+	UI_SPMenu_Cache();
+	UI_StageMenu_Cache();
+	LoadGame_Cache();
+	SpecifySave_Cache();
+#endif
 	UI_SPLevelMenu_Cache();
 	UI_SPSkillMenu_Cache();
 	UI_SPPostgameMenu_Cache();
@@ -981,7 +1003,9 @@ void UI_Cache_f( void ) {
 //	UI_LoadConfig_Cache();
 //	UI_SaveConfigMenu_Cache();
 	UI_BotSelectMenu_Cache();
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	UI_CDKeyMenu_Cache();
+#endif
 	UI_ModsMenu_Cache();
 
 }
@@ -999,6 +1023,18 @@ qboolean UI_ConsoleCommand( int realTime ) {
 
 	// ensure minimum menu data is available
 	Menu_Cache();
+
+#ifdef TMNTSP
+	if ( Q_stricmp (cmd, "singleplayermenu") == 0 ) {
+		UI_SPMenu_f();
+		return qtrue;
+	}
+
+	if ( Q_stricmp (cmd, "stageselect") == 0 ) {
+		UI_StageMenu_f();
+		return qtrue;
+	}
+#endif
 
 	if ( Q_stricmp (cmd, "levelselect") == 0 ) {
 		UI_SPLevelMenu_f();
@@ -1035,10 +1071,12 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		return qtrue;
 	}
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	if ( Q_stricmp (cmd, "ui_cdkey") == 0 ) {
 		UI_CDKeyMenu_f();
 		return qtrue;
 	}
+#endif
 
 	return qfalse;
 }

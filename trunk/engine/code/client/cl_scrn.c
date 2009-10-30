@@ -362,7 +362,11 @@ void SCR_DrawVoipMeter( void ) {
 		return;  // not connected to a server.
 	else if (!cl_connectedToVoipServer)
 		return;  // server doesn't support VoIP.
-	else if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive"))
+	else if (
+#ifndef TMNTSP
+	Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
+#endif
+	Cvar_VariableValue("ui_singlePlayerActive"))
 		return;  // single player game.
 	else if (clc.demoplaying)
 		return;  // playing back a demo.

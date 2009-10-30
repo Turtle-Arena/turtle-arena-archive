@@ -68,9 +68,17 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
 			cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime)/60000,
 			scoreFlags, g_entities[level.sortedClients[i]].s.powerups, accuracy, 
+#ifdef TMNTWEAPONS // Turtle Man: FIXME: Completely remove.
+			0,
+#else
 			cl->ps.persistant[PERS_IMPRESSIVE_COUNT],
+#endif
 			cl->ps.persistant[PERS_EXCELLENT_COUNT],
+#ifdef TMNTWEAPONS // Turtle Man: FIXME: Completely remove.
+			0,
+#else
 			cl->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], 
+#endif
 			cl->ps.persistant[PERS_DEFEND_COUNT], 
 			cl->ps.persistant[PERS_ASSIST_COUNT], 
 			perfect,
@@ -247,6 +255,30 @@ void Cmd_Give_f (gentity_t *ent)
 	else
 		give_all = qfalse;
 
+#ifdef TMNTHOLDSYS
+	if (give_all || Q_stricmp( name, "holdable") == 0)
+	{
+		// Skip HI_NONE
+		for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
+			ent->client->ps.holdable[i] = 1;
+		}
+		// Change to first holdable.
+		ent->client->ps.holdableIndex = 1;
+		if (!give_all)
+			return;
+	}
+	if (/*give_all || */Q_stricmp( name, "holdable_unlimited") == 0)
+	{
+		// Skip HI_NONE
+		for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
+			ent->client->ps.holdable[i] = -1;
+		}
+		// Change to first holdable.
+		ent->client->ps.holdableIndex = 1;
+		return;
+	}
+#endif
+
 	if (give_all || Q_stricmp( name, "health") == 0)
 	{
 		ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
@@ -254,23 +286,50 @@ void Cmd_Give_f (gentity_t *ent)
 			return;
 	}
 
+#ifdef TMNTWEAPSYS2
+	// \give weapon1
+	// The above will give WP_KATANAS
+	if (Q_strncmp(name, "weapon", 6) == 0)
+	{
+		int w;
+		w = atoi(&name[6]);
+		if (w == WP_DEFAULT)
+			w = ent->client->ps.stats[STAT_DEFAULTWEAPON];
+		if (w < WP_NONE) w = WP_NONE;
+		if (w >= WP_NUM_WEAPONS) w = WP_NUM_WEAPONS-1;
+
+		ent->client->ps.stats[STAT_NEWWEAPON] = w;
+	}
+#else
 	if (give_all || Q_stricmp(name, "weapons") == 0)
 	{
+#ifdef TMNTWEAPSYS // Give grapple too.
 		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 - 
+			( 1 << WP_NONE );
+#else
+		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 -
 			( 1 << WP_GRAPPLING_HOOK ) - ( 1 << WP_NONE );
+#endif
 		if (!give_all)
 			return;
 	}
+#endif
 
 	if (give_all || Q_stricmp(name, "ammo") == 0)
 	{
+#ifdef TMNTWEAPSYS2
+		ent->client->ps.stats[STAT_SAVEDAMMO] = 999;
+		ent->client->ps.stats[STAT_AMMO] = 999;
+#else
 		for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
 			ent->client->ps.ammo[i] = 999;
 		}
+#endif
 		if (!give_all)
 			return;
 	}
 
+#ifndef TMNT // NOARMOR
 	if (give_all || Q_stricmp(name, "armor") == 0)
 	{
 		ent->client->ps.stats[STAT_ARMOR] = 200;
@@ -278,11 +337,13 @@ void Cmd_Give_f (gentity_t *ent)
 		if (!give_all)
 			return;
 	}
+#endif
 
 	if (Q_stricmp(name, "excellent") == 0) {
 		ent->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
 		return;
 	}
+#ifndef TMNTWEAPONS
 	if (Q_stricmp(name, "impressive") == 0) {
 		ent->client->ps.persistant[PERS_IMPRESSIVE_COUNT]++;
 		return;
@@ -291,6 +352,7 @@ void Cmd_Give_f (gentity_t *ent)
 		ent->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT]++;
 		return;
 	}
+#endif
 	if (Q_stricmp(name, "defend") == 0) {
 		ent->client->ps.persistant[PERS_DEFEND_COUNT]++;
 		return;
@@ -1113,6 +1175,7 @@ static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
 		who = g_entities + ent->client->lastkilled_client;
 		if (who->client) {
 			// who is the person I just killed
+#ifndef TMNTWEAPONS // MOD
 			if (who->client->lasthurt_mod == MOD_GAUNTLET) {
 				if (!(who->r.svFlags & SVF_BOT)) {
 					G_Voice( ent, who, SAY_TELL, VOICECHAT_KILLGAUNTLET, qfalse );	// and I killed them with a gauntlet
@@ -1120,7 +1183,9 @@ static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
 				if (!(ent->r.svFlags & SVF_BOT)) {
 					G_Voice( ent, ent, SAY_TELL, VOICECHAT_KILLGAUNTLET, qfalse );
 				}
-			} else {
+			} else
+#endif
+			{
 				if (!(who->r.svFlags & SVF_BOT)) {
 					G_Voice( ent, who, SAY_TELL, VOICECHAT_KILLINSULT, qfalse );	// and I killed them with something else
 				}
@@ -1198,7 +1263,11 @@ void Cmd_Where_f( gentity_t *ent ) {
 
 static const char *gameNames[] = {
 	"Free For All",
+#ifdef TMNT
+	"Duel",
+#else
 	"Tournament",
+#endif
 	"Single Player",
 	"Team Deathmatch",
 	"Capture the Flag",
@@ -1260,7 +1329,11 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	} else if ( !Q_stricmp( arg1, "clientkick" ) ) {
 	} else if ( !Q_stricmp( arg1, "g_doWarmup" ) ) {
 	} else if ( !Q_stricmp( arg1, "timelimit" ) ) {
+#ifdef TMNT // frag to score
+	} else if ( !Q_stricmp( arg1, "scorelimit" ) ) {
+#else
 	} else if ( !Q_stricmp( arg1, "fraglimit" ) ) {
+#endif
 	} else {
 		trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
 		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>.\n\"" );
@@ -1276,7 +1349,11 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	// special case for g_gametype, check for bad values
 	if ( !Q_stricmp( arg1, "g_gametype" ) ) {
 		i = atoi( arg2 );
-		if( i == GT_SINGLE_PLAYER || i < GT_FFA || i >= GT_MAX_GAME_TYPE) {
+		if(
+#ifndef TMNTSP
+		i == GT_SINGLE_PLAYER ||
+#endif
+		i < GT_FFA || i >= GT_MAX_GAME_TYPE) {
 			trap_SendServerCommand( ent-g_entities, "print \"Invalid gametype.\n\"" );
 			return;
 		}

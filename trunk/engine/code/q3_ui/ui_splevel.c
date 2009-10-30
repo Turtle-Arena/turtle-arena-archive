@@ -363,7 +363,11 @@ static void UI_SPLevelMenu_ResetAction( qboolean result ) {
 
 	// clear game variables
 	UI_NewGame();
+#ifdef TMNTSP // Turtle Man: -4 starts on training (trainingTier) level (i dont have one)
+	trap_Cvar_SetValue( "ui_spSelection", 0 );
+#else
 	trap_Cvar_SetValue( "ui_spSelection", -4 );
+#endif
 
 	// make the level select menu re-initialize
 	UI_PopMenu();
@@ -596,7 +600,11 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 		}
 	}
 
+#ifdef TMNTSP
+	UI_DrawProportionalString( 18, 38, va( "Stage %i", selectedArenaSet + 1 ), UI_LEFT|UI_SMALLFONT, color_orange );
+#else
 	UI_DrawProportionalString( 18, 38, va( "Tier %i", selectedArenaSet + 1 ), UI_LEFT|UI_SMALLFONT, color_orange );
+#endif
 
 	for ( n = 0; n < levelMenuInfo.numMaps; n++ ) {
 		x = levelMenuInfo.item_maps[n].generic.x;
@@ -624,6 +632,9 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 
 		if ( n == selectedArena ) {
 			if( Menu_ItemAtCursor( &levelMenuInfo.menu ) == &levelMenuInfo.item_maps[n] ) {
+#ifdef TMNT // MENU
+				UI_DrawHandlePic( x-31, y-30, 256, 256-27, levelMenuInfo.levelFocusPic);
+#endif
 				trap_R_SetColor( color );
 			}
 			UI_DrawHandlePic( x-1, y-1, 130, 130 - 14, levelMenuInfo.levelSelectedPic ); 
@@ -733,7 +744,11 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_banner.generic.type			= MTYPE_BTEXT;
 	levelMenuInfo.item_banner.generic.x				= 320;
 	levelMenuInfo.item_banner.generic.y				= 16;
+#ifdef TMNTSP
+	levelMenuInfo.item_banner.string				= "CHOOSE AREA";
+#else
 	levelMenuInfo.item_banner.string				= "CHOOSE LEVEL";
+#endif
 	levelMenuInfo.item_banner.color					= color_red;
 	levelMenuInfo.item_banner.style					= UI_CENTER;
 

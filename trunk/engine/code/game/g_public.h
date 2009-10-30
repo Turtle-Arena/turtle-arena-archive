@@ -287,7 +287,11 @@ typedef enum {
 	BOTLIB_EA_MOVE_LEFT,
 	BOTLIB_EA_MOVE_RIGHT,
 
+#ifdef TMNTWEAPSYS2 // BOTLIB
+	BOTLIB_EA_DROP_WEAPON,
+#else
 	BOTLIB_EA_SELECT_WEAPON,
+#endif
 	BOTLIB_EA_JUMP,
 	BOTLIB_EA_DELAYED_JUMP,
 	BOTLIB_EA_MOVE,
@@ -424,6 +428,13 @@ typedef enum {
 	// The game can issue trap_argc() / trap_argv() commands to get the command
 	// and parameters.  Return qfalse if the game doesn't recognize it as a command.
 
+#ifdef TMNTSP // Save/load
+	GAME_SAVEGAME, // ( fileHandle_t f );
+
+	GAME_LOADGAME, // ( fileHandle_t f );
+#endif
+
 	BOTAI_START_FRAME				// ( int time );
+
 } gameExport_t;
 

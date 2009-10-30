@@ -280,6 +280,26 @@ BotWeaponNameForMeansOfDeath
 
 char *BotWeaponNameForMeansOfDeath(int mod) {
 	switch(mod) {
+#ifdef TMNTWEAPONS // MOD
+		case MOD_FIST: return "Fist";
+		case MOD_KATANA: return "Katana";
+		case MOD_WAKIZASHI: return "Wakizashi";
+		case MOD_SAI: return "Sai";
+		case MOD_NUNCHUK: return "Nunchuk";
+		case MOD_HAMMER: return "Hammer";
+		case MOD_AXE: return "Axe";
+		case MOD_SWORD: return "Sword";
+		case MOD_BAT: return "Baseball Bat";
+		case MOD_BO: return "Bo";
+		case MOD_BAMBOOBO: return "Bamboo Bo";
+		case MOD_GUN: return "Gun";
+		case MOD_ELECTRIC:
+		case MOD_ELECTRIC_SPLASH: return "Electric Launcher";
+		case MOD_ROCKET:
+		case MOD_ROCKET_SPLASH: return "Rocket Launcher";
+		case MOD_HOMING:
+		case MOD_HOMING_SPLASH: return "Homing-Rocket Launcher";
+#else
 		case MOD_SHOTGUN: return "Shotgun";
 		case MOD_GAUNTLET: return "Gauntlet";
 		case MOD_MACHINEGUN: return "Machinegun";
@@ -300,6 +320,7 @@ char *BotWeaponNameForMeansOfDeath(int mod) {
 		case MOD_KAMIKAZE: return "Kamikaze";
 		case MOD_JUICED: return "Prox mine";
 #endif
+#endif
 		case MOD_GRAPPLE: return "Grapple";
 		default: return "[unknown weapon]";
 	}
@@ -313,12 +334,33 @@ BotRandomWeaponName
 char *BotRandomWeaponName(void) {
 	int rnd;
 
+#ifdef TMNTWEAPONS
+	rnd = random() * 14.9;
+#else
 #ifdef MISSIONPACK
 	rnd = random() * 11.9;
 #else
 	rnd = random() * 8.9;
 #endif
+#endif
 	switch(rnd) {
+#ifdef TMNTWEAPONS // weapon names
+		case 0: return "Fist";
+		case 1: return "Katana";
+		case 2: return "Daisho";
+		case 3: return "Sai";
+		case 4: return "Nunchuk";
+		case 5: return "Hammer";
+		case 6: return "Axe";
+		case 7: return "Sword";
+		case 8: return "Baseball Bat";
+		case 9: return "Bo";
+		case 10: return "Bamboo Bo";
+		case 11: return "Gun";
+		case 12: return "Electric Launcher";
+		case 13: return "Rocket Launcher";
+		default: return "Homing-Rocket Launcher";
+#else
 		case 0: return "Gauntlet";
 		case 1: return "Shotgun";
 		case 2: return "Machinegun";
@@ -333,6 +375,7 @@ char *BotRandomWeaponName(void) {
 		case 10: return "Proximity Launcher";
 #endif
 		default: return "BFG10K";
+#endif
 	}
 }
 
@@ -616,6 +659,9 @@ int BotChat_Death(bot_state_t *bs) {
 				bs->botdeathtype == MOD_SUICIDE ||
 				bs->botdeathtype == MOD_TARGET_LASER ||
 				bs->botdeathtype == MOD_TRIGGER_HURT ||
+#ifdef TMNTENTITIES
+				bs->botdeathtype == MOD_EXPLOSION ||
+#endif
 				bs->botdeathtype == MOD_UNKNOWN)
 			BotAI_BotInitialChat(bs, "death_suicide", BotRandomOpponentName(bs), NULL);
 		else if (bs->botdeathtype == MOD_TELEFRAG)
@@ -625,6 +671,9 @@ int BotChat_Death(bot_state_t *bs) {
 			BotAI_BotInitialChat(bs, "death_kamikaze", name, NULL);
 #endif
 		else {
+#ifdef TMNTWEAPONS // MOD // FIXME?
+
+#else
 			if ((bs->botdeathtype == MOD_GAUNTLET ||
 				bs->botdeathtype == MOD_RAILGUN ||
 				bs->botdeathtype == MOD_BFG ||
@@ -647,7 +696,9 @@ int BotChat_Death(bot_state_t *bs) {
 							NULL);
 			}
 			//choose between insult and praise
-			else if (random() < trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_INSULT, 0, 1)) {
+			else
+#endif
+			if (random() < trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_INSULT, 0, 1)) {
 				BotAI_BotInitialChat(bs, "death_insult",
 							name,												// 0
 							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
@@ -705,13 +756,16 @@ int BotChat_Kill(bot_state_t *bs) {
 			return qfalse;			// don't wait
 		}
 		//
+#ifndef TMNTWEAPONS
 		if (bs->enemydeathtype == MOD_GAUNTLET) {
 			BotAI_BotInitialChat(bs, "kill_gauntlet", name, NULL);
 		}
 		else if (bs->enemydeathtype == MOD_RAILGUN) {
 			BotAI_BotInitialChat(bs, "kill_rail", name, NULL);
 		}
-		else if (bs->enemydeathtype == MOD_TELEFRAG) {
+		else
+#endif
+		if (bs->enemydeathtype == MOD_TELEFRAG) {
 			BotAI_BotInitialChat(bs, "kill_telefrag", name, NULL);
 		}
 #ifdef MISSIONPACK

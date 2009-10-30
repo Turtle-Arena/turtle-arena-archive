@@ -381,9 +381,13 @@ float *CG_TeamColor( int team ) {
 CG_GetColorForHealth
 =================
 */
+#ifdef TMNT // NOARMOR
+void CG_GetColorForHealth( int health, vec4_t hcolor ) {
+#else
 void CG_GetColorForHealth( int health, int armor, vec4_t hcolor ) {
 	int		count;
 	int		max;
+#endif
 
 	// calculate the total points of damage that can
 	// be sustained at the current health / armor level
@@ -392,12 +396,14 @@ void CG_GetColorForHealth( int health, int armor, vec4_t hcolor ) {
 		hcolor[3] = 1;
 		return;
 	}
+#ifndef TMNT // NOARMOR
 	count = armor;
 	max = health * ARMOR_PROTECTION / ( 1.0 - ARMOR_PROTECTION );
 	if ( max < count ) {
 		count = max;
 	}
 	health += count;
+#endif
 
 	// set the color based on health
 	hcolor[0] = 1.0;
@@ -426,8 +432,12 @@ CG_ColorForHealth
 */
 void CG_ColorForHealth( vec4_t hcolor ) {
 
+#ifdef TMNT // NOARMOR
+	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], hcolor );
+#else
 	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], 
 		cg.snap->ps.stats[STAT_ARMOR], hcolor );
+#endif
 }
 
 
@@ -805,11 +815,23 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[3] = color[3];
 		UI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
 
+#ifdef TMNT // Turtle Man: This is like the UI Main menu text drawing, but its not.
+        // Turtle Man: hack-ish thing to do?...
+        // text_color_highlight is UI local...
+		drawcolor[0] = 1.00f;//text_color_highlight[0];
+		drawcolor[1] = 0.43f;//text_color_highlight[1];
+		drawcolor[2] = 0.00f;//text_color_highlight[2];
+#else
 		drawcolor[0] = color[0];
 		drawcolor[1] = color[1];
 		drawcolor[2] = color[2];
+#endif
 		drawcolor[3] = 0.5 + 0.5 * sin( cg.time / PULSE_DIVISOR );
+#ifdef TMNT
+		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetProp );
+#else
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow );
+#endif
 		return;
 	}
 

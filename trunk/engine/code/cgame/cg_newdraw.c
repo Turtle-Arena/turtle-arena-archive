@@ -159,6 +159,7 @@ void CG_SelectPrevPlayer( void ) {
 }
 
 
+#ifndef TMNT // NOARMOR
 static void CG_DrawPlayerArmorIcon( rectDef_t *rect, qboolean draw2D ) {
 	centity_t	*cent;
 	playerState_t	*ps;
@@ -208,6 +209,7 @@ static void CG_DrawPlayerArmorValue(rectDef_t *rect, float scale, vec4_t color, 
 	  CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 	}
 }
+#endif // !TMNT
 
 #ifndef MISSIONPACK
 static float healthColors[4][4] = { 
@@ -218,6 +220,7 @@ static float healthColors[4][4] = {
   { 1.0f, 1.0f, 1.0f, 1.0f } };		// health > 100
 #endif
 
+#ifndef TMNTWEAPSYS
 static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 	centity_t	*cent;
 	playerState_t	*ps;
@@ -244,6 +247,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
   	}
   }
 }
+#endif // !TMNTWEAPSYS
 
 static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
 	char	num[16];
@@ -255,7 +259,11 @@ static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, q
 	ps = &cg.snap->ps;
 
 	if ( cent->currentState.weapon ) {
+#ifdef TMNTWEAPSYS2
+		value = ps->stats[STAT_AMMO];
+#else
 		value = ps->ammo[cent->currentState.weapon];
+#endif
 		if ( value > -1 ) {
 			if (shader) {
 		    trap_R_SetColor( color );
@@ -270,7 +278,6 @@ static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, q
 	}
 
 }
-
 
 
 static void CG_DrawPlayerHead(rectDef_t *rect, qboolean draw2D) {
@@ -343,6 +350,7 @@ static void CG_DrawSelectedPlayerHealth( rectDef_t *rect, float scale, vec4_t co
 	}
 }
 
+#ifndef TMNT // NOARMOR
 static void CG_DrawSelectedPlayerArmor( rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
 	clientInfo_t *ci;
 	int value;
@@ -362,6 +370,7 @@ static void CG_DrawSelectedPlayerArmor( rectDef_t *rect, float scale, vec4_t col
 		}
  	}
 }
+#endif // !TMNT
 
 qhandle_t CG_StatusHandle(int task) {
 	qhandle_t h = cgs.media.assaultShader;
@@ -486,7 +495,11 @@ static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qboolean draw2D) {
 	int		value;
   vec3_t origin, angles;
 
+#ifdef TMNTHOLDSYS
+	value = BG_ItemNumForHoldableNum(cg.snap->ps.holdableIndex);
+#else
 	value = cg.snap->ps.stats[STAT_HOLDABLE_ITEM];
+#endif
 	if ( value ) {
 		CG_RegisterItemVisuals( value );
 
@@ -562,7 +575,11 @@ static void CG_DrawSelectedPlayerHead( rectDef_t *rect, qboolean draw2D, qboolea
   		origin[0] = len / 0.268;	// len / tan( fov/2 )
 
   		// allow per-model tweaking
+#ifdef TMNTPLAYERSYS
+		VectorAdd( origin, ci->playercfg.headOffset, origin );
+#else
   		VectorAdd( origin, ci->headOffset, origin );
+#endif
 
     	angles[PITCH] = 0;
     	angles[YAW] = 180;
@@ -682,7 +699,7 @@ static void CG_DrawBlueFlagHead(rectDef_t *rect) {
 	  if ( cgs.clientinfo[i].infoValid && cgs.clientinfo[i].team == TEAM_RED  && cgs.clientinfo[i].powerups & ( 1<< PW_BLUEFLAG )) {
       vec3_t angles;
       VectorClear( angles );
- 		  angles[YAW] = 180 + 20 * sin( cg.time / 650.0 );;
+ 		  angles[YAW] = 180 + 20 * sin( cg.time / 650.0 );
       CG_DrawHead( rect->x, rect->y, rect->w, rect->h, 0,angles );
       return;
     }
@@ -917,20 +934,28 @@ float CG_GetValue(int ownerDraw) {
 	ps = &cg.snap->ps;
 
   switch (ownerDraw) {
+#ifndef TMNT // NOARMOR
   case CG_SELECTEDPLAYER_ARMOR:
     ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
     return ci->armor;
     break;
+#endif
   case CG_SELECTEDPLAYER_HEALTH:
     ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
     return ci->health;
     break;
+#ifndef TMNT // NOARMOR
   case CG_PLAYER_ARMOR_VALUE:
 		return ps->stats[STAT_ARMOR];
     break;
+#endif
   case CG_PLAYER_AMMO_VALUE:
 		if ( cent->currentState.weapon ) {
+#ifdef TMNTWEAPSYS2
+		  return ps->stats[STAT_AMMO];
+#else
 		  return ps->ammo[cent->currentState.weapon];
+#endif
 		}
     break;
   case CG_PLAYER_SCORE:
@@ -1133,7 +1158,11 @@ static void CG_DrawAreaChat(rectDef_t *rect, float scale, vec4_t color, qhandle_
 const char *CG_GetKillerText(void) {
 	const char *s = "";
 	if ( cg.killerName[0] ) {
+#ifdef TMNT // frag to KO
+		s = va("Knocked out by %s", cg.killerName );
+#else
 		s = va("Fragged by %s", cg.killerName );
+#endif
 	}
 	return s;
 }
@@ -1323,7 +1352,11 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 			// FIXME: max of 3 powerups shown properly
 			xx = rect->x + (PIC_WIDTH * 3) + 2;
 
+#ifdef TMNT // NOARMOR
+			CG_GetColorForHealth( ci->health, hcolor );
+#else
 			CG_GetColorForHealth( ci->health, ci->armor, hcolor );
+#endif
 			trap_R_SetColor(hcolor);
 			CG_DrawPic( xx, y + 1, PIC_WIDTH - 2, PIC_WIDTH - 2, cgs.media.heartShader );
 
@@ -1528,6 +1561,7 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   rect.h = h;
 
   switch (ownerDraw) {
+#ifndef TMNT // NOARMOR
   case CG_PLAYER_ARMOR_ICON:
     CG_DrawPlayerArmorIcon(&rect, ownerDrawFlags & CG_SHOW_2DONLY);
     break;
@@ -1537,12 +1571,15 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   case CG_PLAYER_ARMOR_VALUE:
     CG_DrawPlayerArmorValue(&rect, scale, color, shader, textStyle);
     break;
+#endif
+#ifndef TMNTWEAPSYS
   case CG_PLAYER_AMMO_ICON:
     CG_DrawPlayerAmmoIcon(&rect, ownerDrawFlags & CG_SHOW_2DONLY);
     break;
   case CG_PLAYER_AMMO_ICON2D:
     CG_DrawPlayerAmmoIcon(&rect, qtrue);
     break;
+#endif
   case CG_PLAYER_AMMO_VALUE:
     CG_DrawPlayerAmmoValue(&rect, scale, color, shader, textStyle);
     break;
@@ -1558,9 +1595,11 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   case CG_SELECTEDPLAYER_STATUS:
     CG_DrawSelectedPlayerStatus(&rect);
     break;
+#ifndef TMNT // NOARMOR
   case CG_SELECTEDPLAYER_ARMOR:
     CG_DrawSelectedPlayerArmor(&rect, scale, color, shader, textStyle);
     break;
+#endif
   case CG_SELECTEDPLAYER_HEALTH:
     CG_DrawSelectedPlayerHealth(&rect, scale, color, shader, textStyle);
     break;

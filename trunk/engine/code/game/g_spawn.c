@@ -103,6 +103,9 @@ field_t fields[] = {
 	{"spawnflags", FOFS(spawnflags), F_INT},
 	{"speed", FOFS(speed), F_FLOAT},
 	{"target", FOFS(target), F_LSTRING},
+#ifdef TMNTENTITIES
+	{"paintarget", FOFS(paintarget), F_LSTRING},
+#endif
 	{"targetname", FOFS(targetname), F_LSTRING},
 	{"message", FOFS(message), F_LSTRING},
 	{"team", FOFS(team), F_LSTRING},
@@ -143,6 +146,9 @@ void SP_func_button (gentity_t *ent);
 void SP_func_door (gentity_t *ent);
 void SP_func_train (gentity_t *ent);
 void SP_func_timer (gentity_t *self);
+#ifdef TMNTENTITIES // BREAKABLE
+void SP_func_breakable (gentity_t *self);
+#endif
 
 void SP_trigger_always (gentity_t *ent);
 void SP_trigger_multiple (gentity_t *ent);
@@ -164,6 +170,12 @@ void SP_target_kill (gentity_t *ent);
 void SP_target_position (gentity_t *ent);
 void SP_target_location (gentity_t *ent);
 void SP_target_push (gentity_t *ent);
+#ifdef TMNTSP
+void SP_target_level_end (gentity_t *ent);
+#endif
+#ifdef CAMERASCRIPT // Turtle Man: i made this
+void SP_target_start_camera (gentity_t *ent);
+#endif
 
 void SP_light (gentity_t *self);
 void SP_info_null (gentity_t *self);
@@ -173,6 +185,9 @@ void SP_path_corner (gentity_t *self);
 
 void SP_misc_teleporter_dest (gentity_t *self);
 void SP_misc_model(gentity_t *ent);
+#ifdef SINGLEPLAYER // entity
+void SP_misc_model_anim(gentity_t *ent);
+#endif
 void SP_misc_portal_camera(gentity_t *ent);
 void SP_misc_portal_surface(gentity_t *ent);
 
@@ -192,6 +207,11 @@ void SP_team_redobelisk( gentity_t *ent );
 void SP_team_neutralobelisk( gentity_t *ent );
 #endif
 void SP_item_botroam( gentity_t *ent ) { }
+#ifdef SP_NPC
+void SP_npc( gentity_t *ent, bgnpc_t *npc );
+void SP_npcpath( gentity_t *ent );
+#endif
+
 
 spawn_t	spawns[] = {
 	// info entities don't do anything at all, but provide positional
@@ -213,6 +233,12 @@ spawn_t	spawns[] = {
 	{"func_train", SP_func_train},
 	{"func_group", SP_info_null},
 	{"func_timer", SP_func_timer},			// rename trigger_timer?
+#ifdef TMNTENTITIES // BREAKABLE
+	// Entities based on Star Trek: Elite Force entities
+	//{"func_usable", SP_func_usable},
+	{"func_breakable", SP_func_breakable},
+	//{"func_door_rotating", SP_func_door_rotating},
+#endif
 
 	// Triggers are brush objects that cause an effect when contacted
 	// by a living player, usually involving firing targets.
@@ -240,12 +266,26 @@ spawn_t	spawns[] = {
 	{"target_position", SP_target_position},
 	{"target_location", SP_target_location},
 	{"target_push", SP_target_push},
+#ifdef TMNTSP
+	{"target_level_end", SP_target_level_end},
+#endif
+#ifdef CAMERASCRIPT // Turtle Man: i made this
+	{"target_start_camera", SP_target_start_camera},
+#endif
 
 	{"light", SP_light},
 	{"path_corner", SP_path_corner},
+#ifdef TMNTPATHS
+	{"path_start", SP_path_corner},
+	{"path_center", SP_path_corner},
+	{"path_end", SP_path_corner},
+#endif
 
 	{"misc_teleporter_dest", SP_misc_teleporter_dest},
 	{"misc_model", SP_misc_model},
+#ifdef SINGLEPLAYER // entity
+	{"misc_model_anim", SP_misc_model_anim},
+#endif
 	{"misc_portal_surface", SP_misc_portal_surface},
 	{"misc_portal_camera", SP_misc_portal_camera},
 
@@ -265,6 +305,9 @@ spawn_t	spawns[] = {
 	{"team_neutralobelisk", SP_team_neutralobelisk},
 #endif
 	{"item_botroam", SP_item_botroam},
+#ifdef SP_NPC
+	{"npcpath", SP_npcpath},
+#endif
 
 	{NULL, 0}
 };
@@ -280,6 +323,9 @@ returning qfalse if not found
 qboolean G_CallSpawn( gentity_t *ent ) {
 	spawn_t	*s;
 	gitem_t	*item;
+#ifdef SP_NPC
+	bgnpc_t *npc;
+#endif
 
 	if ( !ent->classname ) {
 		G_Printf ("G_CallSpawn: NULL classname\n");
@@ -293,6 +339,16 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
+
+#ifdef SP_NPC
+	// check npc spawn functions
+	for ( npc=bg_npclist ; npc->classname ; npc++ ) {
+		if ( !strcmp(npc->classname, ent->classname) ) {
+			SP_npc( ent, npc );
+			return qtrue;
+		}
+	}
+#endif
 
 	// check normal spawn functions
 	for ( s=spawns ; s->name ; s++ ) {
@@ -409,7 +465,11 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	int			i;
 	gentity_t	*ent;
 	char		*s, *value, *gametypeName;
+#ifdef TMNT // tornament to duel
+	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
+#else
 	static char *gametypeNames[] = {"ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
+#endif
 
 	// get the next free entity
 	ent = G_Spawn();
@@ -441,6 +501,13 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 		}
 	}
 
+#ifdef TMNT
+	G_SpawnInt( "nottmnt", "0", &i );
+	if ( i ) {
+		G_FreeEntity( ent );
+		return;
+	}
+#else
 #ifdef MISSIONPACK
 	G_SpawnInt( "notta", "0", &i );
 	if ( i ) {
@@ -453,6 +520,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 		G_FreeEntity( ent );
 		return;
 	}
+#endif
 #endif
 
 	if( G_SpawnString( "gametype", NULL, &value ) ) {

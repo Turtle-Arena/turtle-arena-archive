@@ -116,7 +116,16 @@ typedef struct {
 	int			joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
 
 	// cgame communicates a few values to the client system
+#ifdef TMNTWEAPSYS2
+#ifdef TMNTHOLDSYS2
+	int			cgameUserCmdValue;	// current holdable to add to usercmd_t
+#endif
+#else
 	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
+#ifdef TMNTHOLDSYS2
+	int			cgameHoldableValue;	// current holdable to add to usercmd_t
+#endif
+#endif
 	float		cgameSensitivity;
 
 	// cmds[cmdNumber] is the predicted command, [cmdNumber-1] is the last
@@ -295,13 +304,17 @@ typedef struct {
 	int			maxPing;
 	int			ping;
 	qboolean	visible;
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	int			punkbuster;
+#endif
 } serverInfo_t;
 
 typedef struct {
 	connstate_t	state;				// connection status
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	qboolean	cddialog;			// bring up the cd needed dialog next frame
+#endif
 
 	char		servername[MAX_OSPATH];		// name of server from original connect (used by reconnect)
 

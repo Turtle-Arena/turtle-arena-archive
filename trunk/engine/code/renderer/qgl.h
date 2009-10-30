@@ -32,6 +32,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #	include <SDL_opengl.h>
 #endif
 
+// Turtle Man:
+#if !defined(APIENTRYP)
+#  define APIENTRYP APIENTRY*
+#endif
+// Turtle Man:
+// http://svn.icculus.org/quake3/branches/unified-sdl/code/renderer/qgl.h?revision=775&view=markup&pathrev=1156
+// S3TC compression constants
+#define GL_RGB_S3TC                         0x83A0
+#define GL_RGB4_S3TC                        0x83A1
+
+
 extern void (APIENTRYP qglActiveTextureARB) (GLenum texture);
 extern void (APIENTRYP qglClientActiveTextureARB) (GLenum texture);
 extern void (APIENTRYP qglMultiTexCoord2fARB) (GLenum target, GLfloat s, GLfloat t);

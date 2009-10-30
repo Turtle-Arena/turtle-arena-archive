@@ -198,7 +198,13 @@ void InGame_MenuInit( void ) {
 	s_ingame.addbots.string				= "ADD BOTS";
 	s_ingame.addbots.color				= color_red;
 	s_ingame.addbots.style				= UI_CENTER|UI_SMALLFONT;
-	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" ) || (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)) {
+	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" )
+#ifdef TMNTSP
+	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
+#else
+	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
+#endif
+	) {
 		s_ingame.addbots.generic.flags |= QMF_GRAYED;
 	}
 
@@ -212,7 +218,13 @@ void InGame_MenuInit( void ) {
 	s_ingame.removebots.string				= "REMOVE BOTS";
 	s_ingame.removebots.color				= color_red;
 	s_ingame.removebots.style				= UI_CENTER|UI_SMALLFONT;
-	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" ) || (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)) {
+	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" )
+#ifdef TMNTSP
+	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
+#else
+	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
+#endif
+	) {
 		s_ingame.removebots.generic.flags |= QMF_GRAYED;
 	}
 
@@ -245,7 +257,11 @@ void InGame_MenuInit( void ) {
 	s_ingame.setup.generic.y			= y;
 	s_ingame.setup.generic.id			= ID_SETUP;
 	s_ingame.setup.generic.callback		= InGame_Event; 
+#ifdef TMNTSP // New menus
+	s_ingame.setup.string				= "OPTIONS";
+#else
 	s_ingame.setup.string				= "SETUP";
+#endif
 	s_ingame.setup.color				= color_red;
 	s_ingame.setup.style				= UI_CENTER|UI_SMALLFONT;
 

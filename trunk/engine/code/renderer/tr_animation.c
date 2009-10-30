@@ -328,7 +328,15 @@ void R_MDRAddAnimSurfaces( trRefEntity_t *ent ) {
 
 	header = (mdrHeader_t *) tr.currentModel->md4;
 	
+	// don't add third_person objects if not in a portal
+#ifdef IOQ3ZTM
+	// Turtle Man: FIXME: This q3 seems to do this poorly.
+	// This check is to find out if we are in first person,
+	//  and it is are player model, and not drawing a mirror.
+	personalModel = (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal;
+#else
 	personalModel = (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal;
+#endif
 	
 	if ( ent->e.renderfx & RF_WRAP_FRAMES )
 	{

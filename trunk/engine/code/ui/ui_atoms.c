@@ -76,6 +76,7 @@ void UI_StartDemoLoop( void ) {
 }
 
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef MISSIONPACK
 static void NeedCDAction( qboolean result ) {
 	if ( !result ) {
@@ -91,6 +92,7 @@ static void NeedCDKeyAction( qboolean result ) {
 	}
 }
 #endif // MISSIONPACK
+#endif
 
 char *UI_Argv( int arg ) {
 	static char	buffer[MAX_STRING_CHARS];
@@ -117,7 +119,9 @@ void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
 	trap_Cvar_Set("ui_scoreExcellents", 	va("%i", newInfo->excellents));
 	trap_Cvar_Set("ui_scoreDefends", 			va("%i", newInfo->defends));
 	trap_Cvar_Set("ui_scoreAssists", 			va("%i", newInfo->assists));
+#ifndef TMNTWEAPONS
 	trap_Cvar_Set("ui_scoreGauntlets", 		va("%i", newInfo->gauntlets));
+#endif
 	trap_Cvar_Set("ui_scoreScore", 				va("%i", newInfo->score));
 	trap_Cvar_Set("ui_scorePerfect",	 		va("%i", newInfo->perfects));
 	trap_Cvar_Set("ui_scoreTeam",					va("%i to %i", newInfo->redScore, newInfo->blueScore));
@@ -133,7 +137,9 @@ void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
 		trap_Cvar_Set("ui_scoreExcellents2", 	va("%i", newInfo->excellents));
 		trap_Cvar_Set("ui_scoreDefends2", 			va("%i", newInfo->defends));
 		trap_Cvar_Set("ui_scoreAssists2", 			va("%i", newInfo->assists));
+#ifndef TMNTWEAPONS
 		trap_Cvar_Set("ui_scoreGauntlets2", 		va("%i", newInfo->gauntlets));
+#endif
 		trap_Cvar_Set("ui_scoreScore2", 				va("%i", newInfo->score));
 		trap_Cvar_Set("ui_scorePerfect2",	 		va("%i", newInfo->perfects));
 		trap_Cvar_Set("ui_scoreTeam2",					va("%i to %i", newInfo->redScore, newInfo->blueScore));
@@ -248,7 +254,11 @@ static void UI_CalcPostGameStats( void ) {
 	newInfo.excellents = atoi(UI_Argv(5));
 	newInfo.defends = atoi(UI_Argv(6));
 	newInfo.assists = atoi(UI_Argv(7));
+#ifdef TMNTWEAPONS
+	// NOTE: I pass 0 as argv 8 so I don't have to change numbers...
+#else
 	newInfo.gauntlets = atoi(UI_Argv(8));
+#endif
 	newInfo.baseScore = atoi(UI_Argv(9));
 	newInfo.perfects = atoi(UI_Argv(10));
 	newInfo.redScore = atoi(UI_Argv(11));
@@ -297,7 +307,11 @@ static void UI_CalcPostGameStats( void ) {
  
 	// put back all the ui overrides
 	trap_Cvar_Set("capturelimit", UI_Cvar_VariableString("ui_saveCaptureLimit"));
+#ifdef TMNT // frag to score
+	trap_Cvar_Set("scorelimit", UI_Cvar_VariableString("ui_saveScoreLimit"));
+#else
 	trap_Cvar_Set("fraglimit", UI_Cvar_VariableString("ui_saveFragLimit"));
+#endif
 	trap_Cvar_Set("cg_drawTimer", UI_Cvar_VariableString("ui_drawTimer"));
 	trap_Cvar_Set("g_doWarmup", UI_Cvar_VariableString("ui_doWarmup"));
 	trap_Cvar_Set("g_Warmup", UI_Cvar_VariableString("ui_Warmup"));
@@ -372,10 +386,12 @@ qboolean UI_ConsoleCommand( int realTime ) {
 	}
 
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	if ( Q_stricmp (cmd, "ui_cdkey") == 0 ) {
 		//UI_CDKeyMenu_f();
 		return qtrue;
 	}
+#endif
 
 	return qfalse;
 }

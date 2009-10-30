@@ -310,10 +310,17 @@ static void CG_TouchItem( centity_t *cent ) {
 
 	// if its a weapon, give them some predicted ammo so the autoswitch will work
 	if ( item->giType == IT_WEAPON ) {
+#ifdef TMNTWEAPSYS2
+		cg.predictedPlayerState.stats[STAT_NEWWEAPON] = item->giTag;
+		if ( !cg.predictedPlayerState.stats[STAT_AMMO] ) {
+			cg.predictedPlayerState.stats[STAT_AMMO] = 1;
+		}
+#else
 		cg.predictedPlayerState.stats[ STAT_WEAPONS ] |= 1 << item->giTag;
 		if ( !cg.predictedPlayerState.ammo[ item->giTag ] ) {
 			cg.predictedPlayerState.ammo[ item->giTag ] = 1;
 		}
+#endif
 	}
 }
 
@@ -443,6 +450,9 @@ void CG_PredictPlayerState( void ) {
 
 	// prepare for pmove
 	cg_pmove.ps = &cg.predictedPlayerState;
+#ifdef TMNTPLAYERSYS // Pmove
+	cg_pmove.playercfg = &cgs.clientinfo[ cg.clientNum ].playercfg;
+#endif
 	cg_pmove.trace = CG_Trace;
 	cg_pmove.pointcontents = CG_PointContents;
 	if ( cg_pmove.ps->pm_type == PM_DEAD ) {
@@ -580,6 +590,17 @@ void CG_PredictPlayerState( void ) {
 		if ( cg_pmove.pmove_fixed ) {
 			cg_pmove.cmd.serverTime = ((cg_pmove.cmd.serverTime + pmove_msec.integer-1) / pmove_msec.integer) * pmove_msec.integer;
 		}
+
+#ifdef CAMERASCRIPT
+		if (cgs.scrFadeAlphaCurrent) {
+			cg_pmove.cmd.buttons = 0;
+			cg_pmove.cmd.forwardmove = 0;
+			cg_pmove.cmd.rightmove = 0;
+			cg_pmove.cmd.upmove = 0;
+			if (cg_pmove.cmd.serverTime - cg.predictedPlayerState.commandTime > 1)
+				cg_pmove.cmd.serverTime = cg.predictedPlayerState.commandTime + 1;
+		}
+#endif
 
 		Pmove (&cg_pmove);
 

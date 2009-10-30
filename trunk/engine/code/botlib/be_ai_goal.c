@@ -94,14 +94,26 @@ typedef enum {
 	GT_TOURNAMENT,		// one on one tournament
 	GT_SINGLE_PLAYER,	// single player tournament
 
+#if 0 // #ifdef TMNT
+	GT_LMS,				// Last Man Standing
+	GT_KOTH,			// King Of The Hill
+	GT_KEEPAWAY,		// Keep Away
+#endif
+
 	//-- team games go after this --
 
 	GT_TEAM,			// team deathmatch
+#if 0 // #ifdef TMNT
+	GT_LTEAMS,			// last team standing
+#endif
 	GT_CTF,				// capture the flag
 #ifdef MISSIONPACK
 	GT_1FCTF,
 	GT_OBELISK,
 	GT_HARVESTER,
+#if 0 // Turtle Man: In the gametype name arrays there is a Team Tournament.
+	GT_TEAMTOURNAMENT,
+#endif
 #endif
 	GT_MAX_GAME_TYPE
 } gametype_t;

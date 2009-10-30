@@ -111,6 +111,15 @@ static void CG_ParseScores( void ) {
 =================
 CG_ParseTeamInfo
 
+#ifdef TMNT
+Format:
+"tinfo" numstrings string(there are numstrings strings)
+// NOARMOR
+Each string is "clientNum location health weapon powerups"
+// with-armor is
+Each string is "clientNum location health armor weapon powerups"
+#endif
+
 =================
 */
 static void CG_ParseTeamInfo( void ) {
@@ -126,6 +135,18 @@ static void CG_ParseTeamInfo( void ) {
 	}
 
 	for ( i = 0 ; i < numSortedTeamPlayers ; i++ ) {
+#ifdef TMNT // NOARMOR
+		//
+		client = atoi( CG_Argv( i * 5 + 2 ) );
+
+		sortedTeamPlayers[i] = client;
+
+		cgs.clientinfo[ client ].location = atoi( CG_Argv( i * 5 + 3 ) );
+		cgs.clientinfo[ client ].health = atoi( CG_Argv( i * 5 + 4 ) );
+		//cgs.clientinfo[ client ].armor = 0;
+		cgs.clientinfo[ client ].curWeapon = atoi( CG_Argv( i * 5 + 5 ) );
+		cgs.clientinfo[ client ].powerups = atoi( CG_Argv( i * 5 + 6 ) );
+#else
 		client = atoi( CG_Argv( i * 6 + 2 ) );
 		if( client < 0 || client >= MAX_CLIENTS )
 		{
@@ -140,6 +161,7 @@ static void CG_ParseTeamInfo( void ) {
 		cgs.clientinfo[ client ].armor = atoi( CG_Argv( i * 6 + 5 ) );
 		cgs.clientinfo[ client ].curWeapon = atoi( CG_Argv( i * 6 + 6 ) );
 		cgs.clientinfo[ client ].powerups = atoi( CG_Argv( i * 6 + 7 ) );
+#endif
 	}
 }
 
@@ -356,6 +378,13 @@ static void CG_ConfigStringModified( void ) {
 	else if ( num == CS_SHADERSTATE ) {
 		CG_ShaderStateChanged();
 	}
+#ifdef TMNT // Particles
+	else if (num >= CS_PARTICLES && num < CS_PARTICLES+MAX_PARTICLES_AREAS)
+	{
+		// Allow new particle areas to be added after level load.
+		CG_NewParticleArea(num);
+	}
+#endif
 		
 }
 
@@ -471,7 +500,11 @@ static void CG_MapRestart( void ) {
 	// we really should clear more parts of cg here and stop sounds
 
 	// play the "fight" sound if this is a restart without warmup
-	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */) {
+	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */
+#ifdef TMNTSP // Not in single player
+    && !cg_singlePlayer.integer
+#endif
+	) {
 		trap_S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
 		CG_CenterPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
 	}
@@ -483,7 +516,11 @@ static void CG_MapRestart( void ) {
 		}
 	}
 #endif
+#ifdef TMNT
+	trap_Cvar_Set("cg_thirdPerson", "1");
+#else
 	trap_Cvar_Set("cg_thirdPerson", "0");
+#endif
 }
 
 #define MAX_VOICEFILESIZE	16384
@@ -760,7 +797,11 @@ voiceChatList_t *CG_VoiceChatListForClient( int clientNum ) {
 			}
 		}
 	}
+#ifdef TMNTPLAYERSYS
+	gender = ci->playercfg.gender;
+#else
 	gender = ci->gender;
+#endif
 	for (k = 0; k < 2; k++) {
 		// just pick the first with the right gender
 		for ( i = 0; i < MAX_VOICEFILES; i++ ) {
@@ -951,7 +992,10 @@ void CG_VoiceChat( int mode ) {
 
 	if (cg_noTaunt.integer != 0) {
 		if (!strcmp(cmd, VOICECHAT_KILLINSULT)  || !strcmp(cmd, VOICECHAT_TAUNT) || \
-			!strcmp(cmd, VOICECHAT_DEATHINSULT) || !strcmp(cmd, VOICECHAT_KILLGAUNTLET) || \
+			!strcmp(cmd, VOICECHAT_DEATHINSULT) ||
+#ifndef TMNTWEAPONS
+			!strcmp(cmd, VOICECHAT_KILLGAUNTLET) ||
+#endif
 			!strcmp(cmd, VOICECHAT_PRAISE)) {
 			return;
 		}
@@ -996,6 +1040,19 @@ static void CG_ServerCommand( void ) {
 		// server claimed the command
 		return;
 	}
+
+#ifdef CAMERASCRIPT
+	if ( !strcmp( cmd, "startCam" ) ) {
+		CG_StartCamera( CG_Argv(1), atoi(CG_Argv(2)), atoi(CG_Argv(3)) );
+		return;
+	}
+#endif
+#ifdef TMNTSP
+	if ( !strcmp( cmd, "letterbox" ) ) {
+		CG_ToggleLetterbox( atoi(CG_Argv(1)), atoi(CG_Argv(2)) );
+		return;
+	}
+#endif
 
 	if ( !strcmp( cmd, "cp" ) ) {
 		CG_CenterPrint( CG_Argv(1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );

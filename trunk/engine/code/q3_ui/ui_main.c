@@ -78,8 +78,10 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 	case UI_DRAW_CONNECT_SCREEN:
 		UI_DrawConnectScreen( arg0 );
 		return 0;
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	case UI_HASUNIQUECDKEY:				// mod authors need to observe this
 		return qtrue;  // change this to qfalse for mods!
+#endif
 	}
 
 	return -1;
@@ -124,6 +126,10 @@ vmCvar_t	ui_spAwards;
 vmCvar_t	ui_spVideos;
 vmCvar_t	ui_spSkill;
 
+#ifdef TMNTSP
+vmCvar_t	ui_singlePlayerActive;
+vmCvar_t	ui_spStage;
+#endif
 vmCvar_t	ui_spSelection;
 
 vmCvar_t	ui_browserMaster;
@@ -158,13 +164,25 @@ vmCvar_t	ui_cdkeychecked;
 vmCvar_t	ui_ioq3;
 
 static cvarTable_t		cvarTable[] = {
+#ifdef TMNT // frag to score
+	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "20", CVAR_ARCHIVE },
+#else
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
+#endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
+#ifdef TMNT // frag to score
+	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
+#else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
+#endif
 	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "15", CVAR_ARCHIVE },
 
+#ifdef TMNT // frag to score
+	{ &ui_team_fraglimit, "ui_team_scorelimit", "0", CVAR_ARCHIVE },
+#else
 	{ &ui_team_fraglimit, "ui_team_fraglimit", "0", CVAR_ARCHIVE },
+#endif
 	{ &ui_team_timelimit, "ui_team_timelimit", "20", CVAR_ARCHIVE },
 	{ &ui_team_friendly, "ui_team_friendly",  "1", CVAR_ARCHIVE },
 
@@ -183,6 +201,10 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE | CVAR_LATCH },
 
+#ifdef TMNTSP
+	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", 0},
+	{ &ui_spStage, "ui_spStage", "0", CVAR_ROM },
+#endif
 	{ &ui_spSelection, "ui_spSelection", "", CVAR_ROM },
 
 	{ &ui_browserMaster, "ui_browserMaster", "0", CVAR_ARCHIVE },
@@ -213,7 +235,9 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_server15, "server15", "", CVAR_ARCHIVE },
 	{ &ui_server16, "server16", "", CVAR_ARCHIVE },
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	{ &ui_cdkeychecked, "ui_cdkeychecked", "0", CVAR_ROM },
+#endif
 	{ &ui_ioq3, "ui_ioq3", "1", CVAR_ROM }
 };
 

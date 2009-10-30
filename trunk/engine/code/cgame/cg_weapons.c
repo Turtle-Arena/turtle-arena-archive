@@ -23,6 +23,130 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cg_weapons.c -- events and effects dealing with weapons
 #include "cg_local.h"
 
+#ifdef TMNTHOLDSYS2
+/*
+===============
+CG_NextHoldable_f
+Based on CG_NextWeapon_f
+===============
+*/
+void CG_NextHoldable_f( void ) {
+	int		i;
+	int		original;
+
+	if ( !cg.snap ) {
+		return;
+	}
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+		return;
+	}
+
+	//cg.weaponSelectTime = cg.time;
+	original = cg.holdableSelect;
+
+	for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
+		cg.holdableSelect++;
+		if ( cg.holdableSelect == HI_NUM_HOLDABLE ) {
+			cg.holdableSelect = 1;
+		}
+
+#ifndef MISSIONPACK // if not MP skip its holdables.
+		if (cg.holdableSelect == HI_KAMIKAZE || cg.holdableSelect == HI_PORTAL
+#ifndef TMNT // POWERS
+			|| cg.holdableSelect == HI_INVULNERABILITY
+#endif
+			) {
+			continue;
+		}
+#endif
+
+		if ( cg.snap->ps.holdable[cg.holdableSelect] != 0 ) {
+			break;
+		}
+	}
+	if ( i == HI_NUM_HOLDABLE ) {
+		cg.holdableSelect = original;
+	}
+}
+
+/*
+===============
+CG_PrevHoldable_f
+Based on CG_PrevWeapon_f
+===============
+*/
+void CG_PrevHoldable_f( void ) {
+	int		i;
+	int		original;
+
+	if ( !cg.snap ) {
+		return;
+	}
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+		return;
+	}
+
+	//cg.weaponSelectTime = cg.time;
+	original = cg.holdableSelect;
+
+	for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
+		cg.holdableSelect--;
+		if ( cg.holdableSelect == 0 ) {
+			cg.holdableSelect = HI_NUM_HOLDABLE - 1;
+		}
+
+#ifndef MISSIONPACK // if not MP skip its holdables.
+		if (cg.holdableSelect == HI_KAMIKAZE || cg.holdableSelect == HI_PORTAL
+#ifndef TMNT // POWERS
+			|| cg.holdableSelect == HI_INVULNERABILITY
+#endif
+			) {
+			continue;
+		}
+#endif
+
+		if ( cg.snap->ps.holdable[cg.holdableSelect] != 0 ) {
+			break;
+		}
+	}
+	if ( i == HI_NUM_HOLDABLE ) {
+		cg.holdableSelect = original;
+	}
+}
+
+/*
+===============
+CG_Holdable_f
+Based on CG_Weapon_f
+===============
+*/
+void CG_Holdable_f( void ) {
+	int		num;
+
+	if ( !cg.snap ) {
+		return;
+	}
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+		return;
+	}
+
+	num = atoi( CG_Argv( 1 ) );
+
+	if ( num < 0 || num >= HI_NUM_HOLDABLE ) {
+		return;
+	}
+
+	if (num != 0 && cg.snap->ps.holdable[num] == 0) {
+		return;		// don't have the holdable item
+	}
+
+	cg.holdableSelect = num;
+#ifndef TMNTREALESE
+	CG_Printf("DEBUG: Selecting holdable item (%i)...\n", num);
+#endif
+}
+#endif
+
 /*
 ==========================
 CG_MachineGunEjectBrass
@@ -95,6 +219,7 @@ static void CG_MachineGunEjectBrass( centity_t *cent ) {
 	le->leMarkType = LEMT_NONE;
 }
 
+#ifndef TMNTWEAPONS
 /*
 ==========================
 CG_ShotgunEjectBrass
@@ -206,7 +331,6 @@ static void CG_NailgunEjectBrass( centity_t *cent ) {
 }
 #endif
 
-
 /*
 ==========================
 CG_RailTrail
@@ -316,6 +440,7 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
         j = j + ROTATION < 36 ? j + ROTATION : (j + ROTATION) % 36;
 	}
 }
+#endif // TMNTWEAPONS
 
 /*
 ==========================
@@ -384,6 +509,7 @@ static void CG_RocketTrail( centity_t *ent, const weaponInfo_t *wi ) {
 
 }
 
+#ifndef TMNTWEAPONS
 #ifdef MISSIONPACK
 /*
 ==========================
@@ -451,6 +577,7 @@ static void CG_NailTrail( centity_t *ent, const weaponInfo_t *wi ) {
 	}
 
 }
+#endif
 #endif
 
 /*
@@ -576,7 +703,11 @@ void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi ) {
 		return; // Don't draw if close
 
 	beam.reType = RT_LIGHTNING;
+#ifdef TMNT
+	beam.customShader = cgs.media.grappleCable;
+#else
 	beam.customShader = cgs.media.lightningShader;
+#endif
 
 	AxisClear( beam.axis );
 	beam.shaderRGBA[0] = 0xff;
@@ -586,6 +717,7 @@ void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi ) {
 	trap_R_AddRefEntityToScene( &beam );
 }
 
+#ifndef TMNTWEAPONS
 /*
 ==========================
 CG_GrenadeTrail
@@ -594,7 +726,34 @@ CG_GrenadeTrail
 static void CG_GrenadeTrail( centity_t *ent, const weaponInfo_t *wi ) {
 	CG_RocketTrail( ent, wi );
 }
+#endif
 
+#ifdef TMNTHOLDABLE
+void CG_RegisterHoldable( int holdableNum )
+{
+	switch (holdableNum)
+	{
+		case HI_SHURIKEN:
+			if (!cgs.media.shurikenModel)
+				cgs.media.shurikenModel = trap_R_RegisterModel( "models/shurikens/shuriken.md3" );
+			break;
+		case HI_FIRESHURIKEN:
+			if (!cgs.media.shurikenFireModel)
+				cgs.media.shurikenFireModel = trap_R_RegisterModel( "models/shurikens/shurikenfire.md3" );
+			break;
+		case HI_ELECTRICSHURIKEN:
+			if (!cgs.media.shurikenElectricModel)
+				cgs.media.shurikenElectricModel = trap_R_RegisterModel( "models/shurikens/shurikenelectric.md3" );
+			break;
+		case HI_LASERSHURIKEN:
+			if (!cgs.media.shurikenLaserModel)
+				cgs.media.shurikenLaserModel = trap_R_RegisterModel( "models/shurikens/shurikenlaser.md3" );
+			break;
+		default:
+			break;
+	}
+}
+#endif
 
 /*
 =================
@@ -605,16 +764,26 @@ The server says this item is used on this level
 */
 void CG_RegisterWeapon( int weaponNum ) {
 	weaponInfo_t	*weaponInfo;
+#ifdef TMNTWEAPSYS
+	gitem_t			*item;
+#else
 	gitem_t			*item, *ammo;
+#endif
 	char			path[MAX_QPATH];
 	vec3_t			mins, maxs;
 	int				i;
 
 	weaponInfo = &cg_weapons[weaponNum];
 
+#ifdef TMNTWEAPONS
+	if ( weaponNum <= 0 ) {
+		return;
+	}
+#else
 	if ( weaponNum == 0 ) {
 		return;
 	}
+#endif
 
 	if ( weaponInfo->registered ) {
 		return;
@@ -622,6 +791,15 @@ void CG_RegisterWeapon( int weaponNum ) {
 
 	memset( weaponInfo, 0, sizeof( *weaponInfo ) );
 	weaponInfo->registered = qtrue;
+
+#ifdef TMNTWEAPONS
+	// Turtle Man: FIXME: WP_FISTS doesn't have a map object...
+	if (weaponNum == WP_FISTS)
+	{
+		CG_Printf("Skipping WP_FISTS to avoid crash...\n");
+		return;
+	}
+#endif
 
 	for ( item = bg_itemlist + 1 ; item->classname ; item++ ) {
 		if ( item->giType == IT_WEAPON && item->giTag == weaponNum ) {
@@ -635,7 +813,25 @@ void CG_RegisterWeapon( int weaponNum ) {
 	CG_RegisterItemVisuals( item - bg_itemlist );
 
 	// load cmodel before model so filecache works
+#ifdef TMNTWEAPSYS
+	// Load weapon models
+	//{ "models/default.md3", NULL, "models/primary.md3", "models/secondary.md3" }
+	if (item->world_model[2]) {
+		weaponInfo->weaponModel = trap_R_RegisterModel( item->world_model[2] );
+	}
+	else if (item->world_model[0]) {
 	weaponInfo->weaponModel = trap_R_RegisterModel( item->world_model[0] );
+	}
+
+	if (item->world_model[3]) {
+		weaponInfo->weaponModel2 = trap_R_RegisterModel( item->world_model[3] );
+	}
+	else {
+		weaponInfo->weaponModel2 = weaponInfo->weaponModel;
+	}
+#else
+	weaponInfo->weaponModel = trap_R_RegisterModel( item->world_model[0] );
+#endif
 
 	// calc midpoint for rotation
 	trap_R_ModelBounds( weaponInfo->weaponModel, mins, maxs );
@@ -644,6 +840,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 	}
 
 	weaponInfo->weaponIcon = trap_R_RegisterShader( item->icon );
+#ifndef TMNTWEAPSYS
 	weaponInfo->ammoIcon = trap_R_RegisterShader( item->icon );
 
 	for ( ammo = bg_itemlist + 1 ; ammo->classname ; ammo++ ) {
@@ -654,6 +851,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 	if ( ammo->classname && ammo->world_model[0] ) {
 		weaponInfo->ammoModel = trap_R_RegisterModel( ammo->world_model[0] );
 	}
+#endif
 
 	strcpy( path, item->world_model[0] );
 	COM_StripExtension(path, path, sizeof(path));
@@ -671,12 +869,19 @@ void CG_RegisterWeapon( int weaponNum ) {
 	weaponInfo->handsModel = trap_R_RegisterModel( path );
 
 	if ( !weaponInfo->handsModel ) {
+#ifdef TMNT
+		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/gun/gun_hand.md3" );
+#else
 		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/shotgun/shotgun_hand.md3" );
+#endif
 	}
 
 	weaponInfo->loopFireSound = qfalse;
 
+#ifdef TMNTWEAPSYS2 // Turtle Man: FIXME: What of the Melee weapons?
+#endif
 	switch ( weaponNum ) {
+#ifndef TMNTWEAPONS
 	case WP_GAUNTLET:
 		MAKERGB( weaponInfo->flashDlightColor, 0.6f, 0.6f, 1.0f );
 		weaponInfo->firingSound = trap_S_RegisterSound( "sound/weapons/melee/fstrun.wav", qfalse );
@@ -696,19 +901,48 @@ void CG_RegisterWeapon( int weaponNum ) {
 		cgs.media.sfx_lghit3 = trap_S_RegisterSound( "sound/weapons/lightning/lg_hit3.wav", qfalse );
 
 		break;
+#endif
 
 	case WP_GRAPPLING_HOOK:
+#ifdef TMNT
+		// Load grapple trail shader.
+		cgs.media.grappleCable = trap_R_RegisterShader( "GrappleCable");
+#endif
 		MAKERGB( weaponInfo->flashDlightColor, 0.6f, 0.6f, 1.0f );
+#ifdef TMNT
+		weaponInfo->missileModel = trap_R_RegisterModel( "models/weapons2/grapple/claw.md3" );
+#else
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/ammo/rocket/rocket.md3" );
+#endif
 		weaponInfo->missileTrailFunc = CG_GrappleTrail;
+#ifndef TMNT
 		weaponInfo->missileDlight = 200;
+#endif
 		weaponInfo->wiTrailTime = 2000;
 		weaponInfo->trailRadius = 64;
+#ifndef TMNT
 		MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
+#endif
 		weaponInfo->readySound = trap_S_RegisterSound( "sound/weapons/melee/fsthum.wav", qfalse );
 		weaponInfo->firingSound = trap_S_RegisterSound( "sound/weapons/melee/fstrun.wav", qfalse );
 		break;
 
+#ifdef TMNTWEAPONS
+	case WP_GUN:
+		weaponInfo->missileModel = trap_R_RegisterModel( "models/ammo/bullet/bullet.md3" );
+		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/gun/gunfire.wav", qfalse );
+		weaponInfo->missileDlight = 200;
+		weaponInfo->wiTrailTime = 2000;
+		weaponInfo->trailRadius = 64;
+
+		MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
+		MAKERGB( weaponInfo->flashDlightColor, 1, 0.75f, 0 );
+
+		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/gun/gunf1a.wav", qfalse );
+		weaponInfo->ejectBrassFunc = CG_MachineGunEjectBrass;
+		cgs.media.bulletExplosionShader = trap_R_RegisterShader( "bulletExplosion" );
+		break;
+#else
 #ifdef MISSIONPACK
 	case WP_CHAINGUN:
 		weaponInfo->firingSound = trap_S_RegisterSound( "sound/weapons/vulcan/wvulfire.wav", qfalse );
@@ -738,7 +972,11 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/shotgun/sshotf1b.wav", qfalse );
 		weaponInfo->ejectBrassFunc = CG_ShotgunEjectBrass;
 		break;
+#endif
 
+#ifdef TMNTWEAPONS
+	case WP_HOMING_LAUNCHER:
+#endif
 	case WP_ROCKET_LAUNCHER:
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/ammo/rocket/rocket.md3" );
 		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
@@ -754,6 +992,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 		cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 		break;
 
+#ifndef TMNTWEAPONS
 #ifdef MISSIONPACK
 	case WP_PROX_LAUNCHER:
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/weaphits/proxmine.md3" );
@@ -788,8 +1027,13 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( "sound/weapons/nailgun/wnalfire.wav", qfalse );
 		break;
 #endif
+#endif
 
+#ifdef TMNTWEAPONS
+	case WP_ELECTRIC_LAUNCHER:
+#else
 	case WP_PLASMAGUN:
+#endif
 //		weaponInfo->missileModel = cgs.media.invulnerabilityPowerupModel;
 		weaponInfo->missileTrailFunc = CG_PlasmaTrail;
 		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/plasma/lasfly.wav", qfalse );
@@ -799,6 +1043,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 		cgs.media.railRingsShader = trap_R_RegisterShader( "railDisc" );
 		break;
 
+#ifndef TMNTWEAPONS
 	case WP_RAILGUN:
 		weaponInfo->readySound = trap_S_RegisterSound( "sound/weapons/railgun/rg_hum.wav", qfalse );
 		MAKERGB( weaponInfo->flashDlightColor, 1, 0.5f, 0 );
@@ -816,6 +1061,7 @@ void CG_RegisterWeapon( int weaponNum ) {
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/weaphits/bfg.md3" );
 		weaponInfo->missileSound = trap_S_RegisterSound( "sound/weapons/rocket/rockfly.wav", qfalse );
 		break;
+#endif
 
 	 default:
 		MAKERGB( weaponInfo->flashDlightColor, 1, 1, 1 );
@@ -856,12 +1102,20 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	if ( item->giType == IT_WEAPON ) {
 		CG_RegisterWeapon( item->giTag );
 	}
+#ifdef TMNTHOLDABLE
+	if ( item->giType == IT_HOLDABLE ) {
+		CG_RegisterHoldable( item->giTag );
+	}
+#endif
 
 	//
 	// powerups have an accompanying ring or sphere
 	//
 	if ( item->giType == IT_POWERUP || item->giType == IT_HEALTH || 
-		item->giType == IT_ARMOR || item->giType == IT_HOLDABLE ) {
+#ifndef TMNT // NOARMOR
+		item->giType == IT_ARMOR ||
+#endif
+		item->giType == IT_HOLDABLE ) {
 		if ( item->world_model[1] ) {
 			itemInfo->models[1] = trap_R_RegisterModel( item->world_model[1] );
 		}
@@ -885,6 +1139,25 @@ CG_MapTorsoToWeaponFrame
 */
 static int CG_MapTorsoToWeaponFrame( clientInfo_t *ci, int frame ) {
 
+#ifdef TMNTPLAYERS
+	// change weapon
+	if ( frame >= ci->playercfg.animations[TORSO_DROP].firstFrame
+		&& frame < ci->playercfg.animations[TORSO_DROP].firstFrame + 9 ) {
+		return frame - ci->playercfg.animations[TORSO_DROP].firstFrame + 6;
+	}
+
+	// stand attack
+	if ( frame >= ci->playercfg.animations[TORSO_ATTACK].firstFrame
+		&& frame < ci->playercfg.animations[TORSO_ATTACK].firstFrame + 6 ) {
+		return 1 + frame - ci->playercfg.animations[TORSO_ATTACK].firstFrame;
+	}
+
+	// stand attack 2
+	if ( frame >= ci->playercfg.animations[TORSO_ATTACK2].firstFrame
+		&& frame < ci->playercfg.animations[TORSO_ATTACK2].firstFrame + 6 ) {
+		return 1 + frame - ci->playercfg.animations[TORSO_ATTACK2].firstFrame;
+	}
+#else
 	// change weapon
 	if ( frame >= ci->animations[TORSO_DROP].firstFrame 
 		&& frame < ci->animations[TORSO_DROP].firstFrame + 9 ) {
@@ -902,6 +1175,7 @@ static int CG_MapTorsoToWeaponFrame( clientInfo_t *ci, int frame ) {
 		&& frame < ci->animations[TORSO_ATTACK2].firstFrame + 6 ) {
 		return 1 + frame - ci->animations[TORSO_ATTACK2].firstFrame;
 	}
+#endif
 	
 	return 0;
 }
@@ -960,6 +1234,7 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 }
 
 
+#ifndef TMNTWEAPONS
 /*
 ===============
 CG_LightningBolt
@@ -1144,6 +1419,7 @@ static void CG_SpawnRailTrail( centity_t *cent, vec3_t origin ) {
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 	CG_RailTrail( ci, origin, cent->pe.railgunImpact );
 }
+#endif // TMNTWEAPONS
 
 
 /*
@@ -1174,10 +1450,12 @@ static float	CG_MachinegunSpinAngle( centity_t *cent ) {
 		cent->pe.barrelTime = cg.time;
 		cent->pe.barrelAngle = AngleMod( angle );
 		cent->pe.barrelSpinning = !!(cent->currentState.eFlags & EF_FIRING);
+#ifndef TMNTWEAPONS // missionpack
 #ifdef MISSIONPACK
 		if ( cent->currentState.weapon == WP_CHAINGUN && !cent->pe.barrelSpinning ) {
 			trap_S_StartSound( NULL, cent->currentState.number, CHAN_WEAPON, trap_S_RegisterSound( "sound/weapons/vulcan/wvulwind.wav", qfalse ) );
 		}
+#endif
 #endif
 	}
 
@@ -1198,6 +1476,7 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups ) {
 	} else {
 		trap_R_AddRefEntityToScene( gun );
 
+#ifndef TMNT // POWERS
 		if ( powerups & ( 1 << PW_BATTLESUIT ) ) {
 			gun->customShader = cgs.media.battleWeaponShader;
 			trap_R_AddRefEntityToScene( gun );
@@ -1206,6 +1485,7 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups ) {
 			gun->customShader = cgs.media.quadWeaponShader;
 			trap_R_AddRefEntityToScene( gun );
 		}
+#endif
 	}
 }
 
@@ -1219,6 +1499,10 @@ The main player will have this called for BOTH cases, so effects like light and
 sound should only be done on the world model case.
 =============
 */
+#ifdef TMNTWEAPSYS
+// Turlte Man: TODO: Draw default weapon at "tag_wp_away_right" and "tag_wp_away_left"
+//                   When a different weapon is being used.
+#endif
 void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team ) {
 	refEntity_t	gun;
 	refEntity_t	barrel;
@@ -1228,11 +1512,38 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	weaponInfo_t	*weapon;
 	centity_t	*nonPredictedCent;
 //	int	col;
+#ifdef TMNTWEAPSYS
+	weapontype_t weaponType;
+	refEntity_t	gun_left; // Left hand weapon.
+	//refEntity_t	gun; // Right hand weapon.
+	// When both hand use the same weapon, primary hand is used.
+	qboolean draw_primary = qfalse, draw_secondary = qfalse;
+#endif
+#ifdef TMNT_SUPPORTQ3
+	clientInfo_t	*ci;
+
+	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+#endif
 
 	weaponNum = cent->currentState.weapon;
 
 	CG_RegisterWeapon( weaponNum );
 	weapon = &cg_weapons[weaponNum];
+
+#ifdef TMNTWEAPSYS
+	if ( ps )
+	{
+		weaponType = BG_WeaponTypeForPlayerState(ps);
+	}
+	else
+	{
+		weaponType = BG_WeaponTypeForNum(weaponNum);
+	}
+	if (weaponType == WT_NONE)
+	{
+		return;
+	}
+#endif
 
 	// add the weapon
 	memset( &gun, 0, sizeof( gun ) );
@@ -1242,6 +1553,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	// set custom shading for railgun refire rate
 	if ( ps ) {
+#ifndef TMNTWEAPONS
 		if ( cg.predictedPlayerState.weapon == WP_RAILGUN 
 			&& cg.predictedPlayerState.weaponstate == WEAPON_FIRING ) {
 			float	f;
@@ -1250,18 +1562,33 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			gun.shaderRGBA[1] = 0;
 			gun.shaderRGBA[0] = 
 			gun.shaderRGBA[2] = 255 * ( 1.0 - f );
-		} else {
+		} else
+#endif
+		{
 			gun.shaderRGBA[0] = 255;
 			gun.shaderRGBA[1] = 255;
 			gun.shaderRGBA[2] = 255;
 			gun.shaderRGBA[3] = 255;
 		}
+
 	}
+#ifdef TMNTWEAPSYS
+	// Copy the primary hand weapon to the secondary hand weapon.
+	memcpy( &gun_left, &gun, sizeof( gun_left ) );
+#endif
 
 	gun.hModel = weapon->weaponModel;
+#ifdef TMNTWEAPSYS
+	// Turtle Man: Allow different model to be used in each hand!
+	gun_left.hModel = weapon->weaponModel2;
+	if (!gun.hModel && !gun_left.hModel) {
+		return;
+	}
+#else
 	if (!gun.hModel) {
 		return;
 	}
+#endif
 
 	if ( !ps ) {
 		// add weapon ready sound
@@ -1275,9 +1602,64 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		}
 	}
 
+#ifdef TMNTWEAPSYS
+	// get hands from info
+	if (bg_weapontypeinfo[weaponType].hands & HAND_PRIMARY)
+	{
+		draw_primary = qtrue;
+	}
+	if (bg_weapontypeinfo[weaponType].hands & HAND_SECONDARY)
+	{
+		draw_secondary = qtrue;
+	}
+
+	// Primary weapon.
+	if ( draw_primary && gun.hModel ) {
+#ifdef TMNT_SUPPORTQ3
+		if (ci->tagInfo & TI_TAG_HAND_PRIMARY)
+		{
+			CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_hand_primary");
+		}
+		else
+		{
+	CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_weapon");
+		}
+#elif defined TMNTPLAYERS
+		CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_hand_primary");
+#else
+		CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_weapon");
+#endif
+
+	CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
+	}
+
+//#ifdef TMNTPLAYERS
+	// Secondary weapon.
+	if ( draw_secondary && gun_left.hModel ) {
+#ifdef TMNT_SUPPORTQ3
+		if (ci->tagInfo & TI_TAG_HAND_SECONDARY)
+		{
+			CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_hand_secondary");
+		}
+		else if (ci->tagInfo & TI_TAG_FLAG)
+		{
+			CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_flag");
+		}
+#elif defined TMNTPLAYERS
+		CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_hand_secondary");
+#else
+		CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_flag");
+#endif
+		CG_AddWeaponWithPowerups( &gun_left, cent->currentState.powerups );
+	}
+//#endif
+
+	// NOTE: Any weapon type can have a barrel model and/or flash model.
+#else
 	CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_weapon");
 
 	CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
+#endif
 
 	// add the spinning barrel
 	if ( weapon->barrelModel ) {
@@ -1308,7 +1690,11 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	}
 
 	// add the flash
+#ifdef TMNTWEAPONS
+	if ( ( weaponNum == WP_GRAPPLING_HOOK )
+#else
 	if ( ( weaponNum == WP_LIGHTNING || weaponNum == WP_GAUNTLET || weaponNum == WP_GRAPPLING_HOOK )
+#endif
 		&& ( nonPredictedCent->currentState.eFlags & EF_FIRING ) ) 
 	{
 		// continuous flash
@@ -1333,6 +1719,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	angles[ROLL] = crandom() * 10;
 	AnglesToAxis( angles, flash.axis );
 
+#ifndef TMNTWEAPONS
 	// colorize the railgun blast
 	if ( weaponNum == WP_RAILGUN ) {
 		clientInfo_t	*ci;
@@ -1342,17 +1729,20 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		flash.shaderRGBA[1] = 255 * ci->color1[1];
 		flash.shaderRGBA[2] = 255 * ci->color1[2];
 	}
+#endif
 
 	CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, "tag_flash");
 	trap_R_AddRefEntityToScene( &flash );
 
 	if ( ps || cg.renderingThirdPerson ||
 		cent->currentState.number != cg.predictedPlayerState.clientNum ) {
+#ifndef TMNTWEAPONS
 		// add lightning bolt
 		CG_LightningBolt( nonPredictedCent, flash.origin );
 
 		// add rail trail
 		CG_SpawnRailTrail( cent, flash.origin );
+#endif
 
 		if ( weapon->flashDlightColor[0] || weapon->flashDlightColor[1] || weapon->flashDlightColor[2] ) {
 			trap_R_AddLightToScene( flash.origin, 300 + (rand()&31), weapon->flashDlightColor[0],
@@ -1368,6 +1758,8 @@ CG_AddViewWeapon
 Add the weapon, and flash for the player's view
 ==============
 */
+#ifdef TMNTWEAPSYS // Turtle Man: Check weapon type ect here?
+#endif
 void CG_AddViewWeapon( playerState_t *ps ) {
 	refEntity_t	hand;
 	centity_t	*cent;
@@ -1385,14 +1777,19 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	}
 
 	// no gun if in third person view or a camera is active
+#ifdef CAMERASCRIPT
+	if ( cg.renderingThirdPerson || cg.cameraMode) {
+#else
 	//if ( cg.renderingThirdPerson || cg.cameraMode) {
 	if ( cg.renderingThirdPerson ) {
+#endif
 		return;
 	}
 
 
 	// allow the gun to be completely removed
 	if ( !cg_drawGun.integer ) {
+#ifndef TMNTWEAPONS
 		vec3_t		origin;
 
 		if ( cg.predictedPlayerState.eFlags & EF_FIRING ) {
@@ -1401,6 +1798,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 			VectorMA( origin, -8, cg.refdef.viewaxis[2], origin );
 			CG_LightningBolt( &cg_entities[ps->clientNum], origin );
 		}
+#endif
 		return;
 	}
 
@@ -1459,6 +1857,7 @@ WEAPON SELECTION
 ==============================================================================
 */
 
+#ifndef TMNTWEAPSYS2
 /*
 ===================
 CG_DrawWeaponSelect
@@ -1532,8 +1931,8 @@ void CG_DrawWeaponSelect( void ) {
 	}
 
 	trap_R_SetColor( NULL );
-}
 
+}
 
 /*
 ===============
@@ -1575,9 +1974,11 @@ void CG_NextWeapon_f( void ) {
 		if ( cg.weaponSelect == MAX_WEAPONS ) {
 			cg.weaponSelect = 0;
 		}
+#ifndef TMNTWEAPONS
 		if ( cg.weaponSelect == WP_GAUNTLET ) {
 			continue;		// never cycle to gauntlet
 		}
+#endif
 		if ( CG_WeaponSelectable( cg.weaponSelect ) ) {
 			break;
 		}
@@ -1611,9 +2012,11 @@ void CG_PrevWeapon_f( void ) {
 		if ( cg.weaponSelect == -1 ) {
 			cg.weaponSelect = MAX_WEAPONS - 1;
 		}
+#ifndef TMNTWEAPONS
 		if ( cg.weaponSelect == WP_GAUNTLET ) {
 			continue;		// never cycle to gauntlet
 		}
+#endif
 		if ( CG_WeaponSelectable( cg.weaponSelect ) ) {
 			break;
 		}
@@ -1640,6 +2043,14 @@ void CG_Weapon_f( void ) {
 
 	num = atoi( CG_Argv( 1 ) );
 
+#ifdef TMNTWEAPSYS
+	// Special case for WP_DEFAULT
+	if (num == WP_DEFAULT)
+	{
+		num = cg.snap->ps.stats[STAT_DEFAULTWEAPON];
+	}
+#endif
+
 	if ( num < 1 || num > MAX_WEAPONS-1 ) {
 		return;
 	}
@@ -1661,6 +2072,11 @@ The current weapon has just run out of ammo
 ===================
 */
 void CG_OutOfAmmoChange( void ) {
+#ifdef TMNTWEAPSYS
+	// Change to default weapon
+	cg.weaponSelectTime = cg.time;
+	cg.weaponSelect = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+#else
 	int		i;
 
 	cg.weaponSelectTime = cg.time;
@@ -1671,7 +2087,9 @@ void CG_OutOfAmmoChange( void ) {
 			break;
 		}
 	}
+#endif
 }
+#endif // TMNTWEAPSYS2
 
 
 
@@ -1709,17 +2127,21 @@ void CG_FireWeapon( centity_t *cent ) {
 	// append the flash to the weapon model
 	cent->muzzleFlashTime = cg.time;
 
+#ifndef TMNTWEAPONS
 	// lightning gun only does this this on initial press
 	if ( ent->weapon == WP_LIGHTNING ) {
 		if ( cent->pe.lightningFiring ) {
 			return;
 		}
 	}
+#endif
 
+#ifndef TMNT // POWERS
 	// play quad sound if needed
 	if ( cent->currentState.powerups & ( 1 << PW_QUAD ) ) {
 		trap_S_StartSound (NULL, cent->currentState.number, CHAN_ITEM, cgs.media.quadSound );
 	}
+#endif
 
 	// play a sound
 	for ( c = 0 ; c < 4 ; c++ ) {
@@ -1741,6 +2163,37 @@ void CG_FireWeapon( centity_t *cent ) {
 	}
 }
 
+#ifdef TMNTWEAPONS
+/*
+=================
+CG_MeleeHit
+
+Based on CG_Bleed
+=================
+*/
+void CG_MeleeHit( vec3_t origin/*, int entityNum */) {
+	localEntity_t	*ex;
+	int r = rand()%3;
+
+	ex = CG_AllocLocalEntity();
+	ex->leType = LE_EXPLOSION;
+
+	ex->startTime = cg.time;
+	ex->endTime = ex->startTime + 500;
+
+	VectorCopy ( origin, ex->refEntity.origin);
+	ex->refEntity.reType = RT_SPRITE;
+	ex->refEntity.rotation = rand() % 360;
+	ex->refEntity.radius = 24;
+
+	if (r < 1)
+		ex->refEntity.customShader = cgs.media.meleeHit1Shader;
+	else if (r < 2)
+		ex->refEntity.customShader = cgs.media.meleeHit2Shader;
+	else
+		ex->refEntity.customShader = cgs.media.meleeHit3Shader;
+}
+#endif
 
 /*
 =================
@@ -1758,7 +2211,9 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	float			light;
 	vec3_t			lightColor;
 	localEntity_t	*le;
+#ifndef TMNTWEAPONS
 	int				r;
+#endif
 	qboolean		alphaFade;
 	qboolean		isSprite;
 	int				duration;
@@ -1779,8 +2234,46 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	isSprite = qfalse;
 	duration = 600;
 
+#ifdef TMNTWEAPONS
+	// Melee Weapon hit wall.
+	if (BG_WeapTypeIsMelee(BG_WeaponTypeForNum(weapon)))
+	{
+		CG_MeleeHit(origin);
+
+		/*if( soundType == IMPACTSOUND_FLESH ) {
+			sfx = cgs.media.sfx_meleehitflesh;
+		} else if( soundType == IMPACTSOUND_METAL ) {
+			sfx = cgs.media.sfx_meleehitmetal;
+		} else {
+			sfx = cgs.media.sfx_meleehit;
+		}*/
+
+		if (BG_WeaponTypeForNum(weapon) == WT_HAMMER ||
+			BG_WeaponTypeForNum(weapon) == WT_HAMMER_PRIMARY)
+		{
+			//mark = cgs.media.burnMarkShader;
+			mark = cgs.media.holeMarkShader;
+			radius = 32;
+		}
+		else
+		{
+			mark = cgs.media.holeMarkShader;
+			radius = 12;
+		}
+	}
+	else
+#endif
 	switch ( weapon ) {
 	default:
+#ifdef TMNTWEAPONS
+	case WP_GRAPPLING_HOOK:
+		// sound...
+		//sfx = 0;
+
+		mark = cgs.media.holeMarkShader;
+		radius = 12;
+		break;
+#else
 #ifdef MISSIONPACK
 	case WP_NAILGUN:
 		if( soundType == IMPACTSOUND_FLESH ) {
@@ -1827,6 +2320,10 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		light = 300;
 		isSprite = qtrue;
 		break;
+#endif
+#ifdef TMNTWEAPONS
+	case WP_HOMING_LAUNCHER:
+#endif
 	case WP_ROCKET_LAUNCHER:
 		mod = cgs.media.dishFlashModel;
 		shader = cgs.media.rocketExplosionShader;
@@ -1847,6 +2344,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
 		}
 		break;
+#ifndef TMNTWEAPONS
 	case WP_RAILGUN:
 		mod = cgs.media.ringFlashModel;
 		shader = cgs.media.railExplosionShader;
@@ -1854,13 +2352,19 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		mark = cgs.media.energyMarkShader;
 		radius = 24;
 		break;
+#endif
+#ifdef TMNTWEAPONS
+	case WP_ELECTRIC_LAUNCHER:
+#else
 	case WP_PLASMAGUN:
+#endif
 		mod = cgs.media.ringFlashModel;
 		shader = cgs.media.plasmaExplosionShader;
 		sfx = cgs.media.sfx_plasmaexp;
 		mark = cgs.media.energyMarkShader;
 		radius = 16;
 		break;
+#ifndef TMNTWEAPONS
 	case WP_BFG:
 		mod = cgs.media.dishFlashModel;
 		shader = cgs.media.bfgExplosionShader;
@@ -1918,6 +2422,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 
 		radius = 8;
 		break;
+#endif
 	}
 
 	if ( sfx ) {
@@ -1933,27 +2438,31 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 							   duration, isSprite );
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
+#ifndef TMNTWEAPONS
 		if ( weapon == WP_RAILGUN ) {
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
 		}
+#endif
 	}
 
 	//
 	// impact mark
 	//
 	alphaFade = (mark == cgs.media.energyMarkShader);	// plasma fades alpha, all others fade color
+#ifndef TMNTWEAPONS
 	if ( weapon == WP_RAILGUN ) {
 		float	*color;
 
 		// colorize with client color
 		color = cgs.clientinfo[clientNum].color2;
 		CG_ImpactMark( mark, origin, dir, random()*360, color[0],color[1], color[2],1, alphaFade, radius, qfalse );
-	} else {
+	} else
+#endif
+	{
 		CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, alphaFade, radius, qfalse );
 	}
 }
-
 
 /*
 =================
@@ -1963,15 +2472,30 @@ CG_MissileHitPlayer
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum ) {
 	CG_Bleed( origin, entityNum );
 
+#ifdef TMNTWEAPONS // FINISHME
+	// Spawn "hit marker", do in CG_Bleed if no blood?
+	if (// !cg_blood.integer && // Only if not blood?
+		BG_WeapTypeIsMelee(BG_WeaponTypeForNum(weapon)))
+	{
+		CG_MissileHitWall( weapon, 0, origin, dir, IMPACTSOUND_FLESH );
+		return;
+	}
+#endif
+
 	// some weapons will make an explosion with the blood, while
 	// others will just make the blood
 	switch ( weapon ) {
+#ifdef TMNTWEAPONS
+	case WP_ROCKET_LAUNCHER:
+	case WP_HOMING_LAUNCHER:
+#else
 	case WP_GRENADE_LAUNCHER:
 	case WP_ROCKET_LAUNCHER:
 #ifdef MISSIONPACK
 	case WP_NAILGUN:
 	case WP_CHAINGUN:
 	case WP_PROX_LAUNCHER:
+#endif
 #endif
 		CG_MissileHitWall( weapon, 0, origin, dir, IMPACTSOUND_FLESH );
 		break;
@@ -1981,7 +2505,7 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 }
 
 
-
+#ifndef TMNTWEAPONS
 /*
 ============================================================================
 
@@ -2025,8 +2549,18 @@ static void CG_ShotgunPellet( vec3_t start, vec3_t end, int skipNum ) {
 		return;
 	}
 
+#ifdef SP_NPC
+	if ( cg_entities[tr.entityNum].currentState.eType == ET_PLAYER
+		|| cg_entities[tr.entityNum].currentState.eType == ET_NPC) {
+#if 1 // Turtle Man: I think this will work with NPCs too.
+		CG_MissileHitPlayer( WP_SHOTGUN, tr.endpos, tr.plane.normal, tr.entityNum );
+#else
+		CG_Bleed( tr.endpos, tr.entityNum );
+#endif
+#else
 	if ( cg_entities[tr.entityNum].currentState.eType == ET_PLAYER ) {
 		CG_MissileHitPlayer( WP_SHOTGUN, tr.endpos, tr.plane.normal, tr.entityNum );
+#endif
 	} else {
 		if ( tr.surfaceFlags & SURF_NOIMPACT ) {
 			// SURF_NOIMPACT will not make a flame puff or a mark
@@ -2097,6 +2631,7 @@ void CG_ShotgunFire( entityState_t *es ) {
 	}
 	CG_ShotgunPattern( es->pos.trBase, es->origin2, es->eventParm, es->otherEntityNum );
 }
+#endif
 
 /*
 ============================================================================
@@ -2271,7 +2806,11 @@ void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, 
 	if ( flesh ) {
 		CG_Bleed( end, fleshEntityNum );
 	} else {
+#ifdef TMNTWEAPONS
+		CG_MissileHitWall( WP_GUN, 0, end, normal, IMPACTSOUND_DEFAULT );
+#else
 		CG_MissileHitWall( WP_MACHINEGUN, 0, end, normal, IMPACTSOUND_DEFAULT );
+#endif
 	}
 
 }

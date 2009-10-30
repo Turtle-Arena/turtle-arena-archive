@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 #include "../ui/ui_shared.h"
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 extern menuDef_t *menuScoreboard;
 #endif
 
@@ -86,7 +86,7 @@ static void CG_Viewpos_f (void) {
 
 static void CG_ScoresDown_f( void ) {
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 		CG_BuildSpectatorString();
 #endif
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
@@ -115,7 +115,7 @@ static void CG_ScoresUp_f( void ) {
 	}
 }
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 extern menuDef_t *menuScoreboard;
 void Menu_Reset( void );			// FIXME: add to right include file
 
@@ -240,7 +240,7 @@ static void CG_VoiceTellAttacker_f( void ) {
 	trap_SendClientCommand( command );
 }
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 static void CG_NextTeamMember_f( void ) {
   CG_SelectNextPlayer();
 }
@@ -357,9 +357,11 @@ static void CG_TauntDeathInsult_f (void ) {
 	trap_SendConsoleCommand("cmd vsay death_insult\n");
 }
 
+#ifndef TMNTWEAPONS
 static void CG_TauntGauntlet_f (void ) {
 	trap_SendConsoleCommand("cmd vsay kill_guantlet\n");
 }
+#endif
 
 static void CG_TaskSuicide_f (void ) {
 	int		clientNum;
@@ -431,6 +433,37 @@ static void CG_StartOrbit_f( void ) {
 	}
 }
 
+#ifdef CAMERASCRIPT
+/*
+==============
+CG_StartCamera
+==============
+*/
+void CG_StartCamera( const char *name, qboolean startBlack, qboolean endBlack) {
+	char lname[MAX_QPATH];
+	COM_StripExtension(name, lname, MAX_QPATH);
+	Q_strcat( lname, sizeof(lname), ".camera" );
+	if (trap_loadCamera(va("cameras/%s", lname))) {
+		cg.cameraMode = qtrue;
+		if(startBlack) {
+			CG_Fade(255, 0, 0);	// go black
+			CG_Fade(0, cg.time, 1500);
+		}
+
+		CG_ToggleLetterbox(qtrue, startBlack);
+		cg.cameraEndBlack = endBlack;
+		trap_startCamera(cg.time);	// camera on in client
+	} else {
+		CG_Printf ("Unable to load camera %s\n",name);
+	}
+}
+
+static void CG_Camera_f( void ) {
+	char name[MAX_QPATH];
+	trap_Argv( 1, name, sizeof(name));
+	CG_StartCamera(name, qfalse, qfalse );
+}
+#else
 /*
 static void CG_Camera_f( void ) {
 	char name[1024];
@@ -443,7 +476,22 @@ static void CG_Camera_f( void ) {
 	}
 }
 */
+#endif
 
+#ifdef TMNTSP
+void CG_Letterbox(void)
+{
+	qboolean onscreen, instant;
+	char name[MAX_QPATH];
+
+	trap_Argv( 1, name, sizeof(name));
+	onscreen = atoi(name);
+	trap_Argv( 2, name, sizeof(name));
+	instant = atoi(name);
+
+	CG_ToggleLetterbox( onscreen, instant );
+}
+#endif
 
 typedef struct {
 	char	*cmd;
@@ -464,15 +512,22 @@ static consoleCommand_t	commands[] = {
 	{ "-zoom", CG_ZoomUp_f },
 	{ "sizeup", CG_SizeUp_f },
 	{ "sizedown", CG_SizeDown_f },
+#ifndef TMNTWEAPSYS2
 	{ "weapnext", CG_NextWeapon_f },
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },
+#endif
+#ifdef TMNTHOLDSYS2
+	{ "holdnext", CG_NextHoldable_f },
+	{ "holdprev", CG_PrevHoldable_f },
+	{ "holdable", CG_Holdable_f },
+#endif
 	{ "tell_target", CG_TellTarget_f },
 	{ "tell_attacker", CG_TellAttacker_f },
 	{ "vtell_target", CG_VoiceTellTarget_f },
 	{ "vtell_attacker", CG_VoiceTellAttacker_f },
 	{ "tcmd", CG_TargetCommand_f },
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	{ "loadhud", CG_LoadHud_f },
 	{ "nextTeamMember", CG_NextTeamMember_f },
 	{ "prevTeamMember", CG_PrevTeamMember_f },
@@ -492,14 +547,23 @@ static consoleCommand_t	commands[] = {
 	{ "tauntPraise", CG_TauntPraise_f },
 	{ "tauntTaunt", CG_TauntTaunt_f },
 	{ "tauntDeathInsult", CG_TauntDeathInsult_f },
+#ifndef TMNTWEAPONS
 	{ "tauntGauntlet", CG_TauntGauntlet_f },
+#endif
 	{ "spWin", CG_spWin_f },
 	{ "spLose", CG_spLose_f },
 	{ "scoresDown", CG_scrollScoresDown_f },
 	{ "scoresUp", CG_scrollScoresUp_f },
 #endif
 	{ "startOrbit", CG_StartOrbit_f },
+#ifdef CAMERASCRIPT
+	{ "camera", CG_Camera_f },
+#else
 	//{ "camera", CG_Camera_f },
+#endif
+#ifdef TMNTSP
+	{ "letterbox", CG_Letterbox },
+#endif
 	{ "loaddeferred", CG_LoadDeferredPlayers }	
 };
 
@@ -575,4 +639,7 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("stats");
 	trap_AddCommand ("teamtask");
 	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
+#ifdef TMNTSP
+	trap_AddCommand ("letterbox" );
+#endif
 }

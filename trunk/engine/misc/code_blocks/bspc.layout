@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug Win32" />
+	<File name="../../code/bspc/aas_cfg.c" open="0" top="0" tabpos="0">
+		<Cursor position="7568" topLine="236" />
+	</File>
+	<File name="../../code/bspc/aas_create.c" open="0" top="0" tabpos="0">
+		<Cursor position="6707" topLine="199" />
+	</File>
+	<File name="../../code/bspc/bspc.c" open="0" top="0" tabpos="0">
+		<Cursor position="27523" topLine="967" />
+	</File>
+	<File name="../../code/bspc/l_math.h" open="0" top="0" tabpos="0">
+		<Cursor position="1801" topLine="55" />
+	</File>
+	<File name="../../code/bspc/qbsp.h" open="0" top="0" tabpos="0">
+		<Cursor position="1412" topLine="47" />
+	</File>
+</CodeBlocks_layout_file>

@@ -100,6 +100,13 @@ void CG_LoadingClient( int clientNum ) {
 	char			model[MAX_QPATH];
 	char			iconName[MAX_QPATH];
 
+#ifdef TMNTSP
+	if (cgs.gametype == GT_SINGLE_PLAYER)
+	{
+		return;
+	}
+#endif
+
 	info = CG_ConfigString( CS_PLAYERS + clientNum );
 
 	if ( loadingPlayerIconCount < MAX_LOADING_PLAYER_ICONS ) {
@@ -239,10 +246,19 @@ void CG_DrawInformation( void ) {
 		s = "Free For All";
 		break;
 	case GT_SINGLE_PLAYER:
+#ifdef TMNTSP
+		if (!cg_singlePlayer.integer)
+			s = "Cooperative";
+		else
+#endif
 		s = "Single Player";
 		break;
 	case GT_TOURNAMENT:
+#ifdef TMNT
+		s = "Duel";
+#else
 		s = "Tournament";
+#endif
 		break;
 	case GT_TEAM:
 		s = "Team Deathmatch";
@@ -250,7 +266,7 @@ void CG_DrawInformation( void ) {
 	case GT_CTF:
 		s = "Capture The Flag";
 		break;
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	case GT_1FCTF:
 		s = "One Flag CTF";
 		break;
@@ -276,11 +292,24 @@ void CG_DrawInformation( void ) {
 		y += PROP_HEIGHT;
 	}
 
-	if (cgs.gametype < GT_CTF ) {
+	if (
+#ifdef TMNTSP
+	cgs.gametype != GT_SINGLE_PLAYER &&
+#endif
+	cgs.gametype < GT_CTF ) {
+#ifdef TMNT // frag to score
+		value = atoi( Info_ValueForKey( info, "scorelimit" ) );
+#else
 		value = atoi( Info_ValueForKey( info, "fraglimit" ) );
+#endif
 		if ( value ) {
+#ifdef TMNT // frag to score
+			UI_DrawProportionalString( 320, y, va( "scorelimit %i", value ),
+				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+#else
 			UI_DrawProportionalString( 320, y, va( "fraglimit %i", value ),
 				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+#endif
 			y += PROP_HEIGHT;
 		}
 	}

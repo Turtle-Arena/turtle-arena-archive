@@ -203,6 +203,7 @@ void CG_SpawnEffect( vec3_t org ) {
 
 
 #ifdef MISSIONPACK
+#ifndef TMNTWEAPONS
 /*
 ===============
 CG_LightningBoltBeam
@@ -227,6 +228,7 @@ void CG_LightningBoltBeam( vec3_t start, vec3_t end ) {
 	beam->reType = RT_LIGHTNING;
 	beam->customShader = cgs.media.lightningShader;
 }
+#endif
 
 /*
 ==================
@@ -303,6 +305,7 @@ void CG_ObeliskPain( vec3_t org ) {
 }
 
 
+#ifndef TMNT // POWERS
 /*
 ==================
 CG_InvulnerabilityImpact
@@ -377,6 +380,7 @@ void CG_InvulnerabilityJuiced( vec3_t org ) {
 	trap_S_StartSound (org, ENTITYNUM_NONE, CHAN_BODY, cgs.media.invulnerabilityJuicedSound );
 }
 
+#endif // TMNT // POWERS
 #endif
 
 /*
@@ -515,12 +519,17 @@ void CG_Bleed( vec3_t origin, int entityNum ) {
 
 	// don't show player's own blood in view
 	if ( entityNum == cg.snap->ps.clientNum ) {
+#ifdef IOQ3ZTM
+		ex->refEntity.renderfx |= RF_ONLY_MIRROR;		// only draw from mirrors
+#else
 		ex->refEntity.renderfx |= RF_THIRD_PERSON;
+#endif
 	}
 }
 
 
 
+#ifndef NOTRATEDM // No gibs.
 /*
 ==================
 CG_LaunchGib
@@ -715,4 +724,4 @@ void CG_BigExplode( vec3_t playerOrigin ) {
 	velocity[2] = EXP_JUMP + crandom()*EXP_VELOCITY;
 	CG_LaunchExplode( origin, velocity, cgs.media.smoke2 );
 }
-
+#endif

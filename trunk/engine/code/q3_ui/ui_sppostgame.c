@@ -95,7 +95,7 @@ char	*ui_medalSounds[] = {
 	"sound/feedback/perfect.wav"
 };
 
-
+#ifndef TMNTSP
 /*
 =================
 UI_SPPostgameMenu_AgainEvent
@@ -109,6 +109,7 @@ static void UI_SPPostgameMenu_AgainEvent( void* ptr, int event )
 	UI_PopMenu();
 	trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 }
+#endif
 
 
 /*
@@ -182,7 +183,9 @@ static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
 	}
 
 	if( postgameMenuInfo.phase == 1 ) {
+#ifndef TMNTSP
 		trap_Cmd_ExecuteText( EXEC_APPEND, "abort_podium\n" );
+#endif
 		postgameMenuInfo.phase = 2;
 		postgameMenuInfo.starttime = uis.realtime;
 		postgameMenuInfo.ignoreKeysTime	= uis.realtime + 250;
@@ -417,9 +420,13 @@ void UI_SPPostgameMenu_Cache( void ) {
 	}
 
 	if( buildscript ) {
+#ifdef TMNTSP
+		trap_S_RegisterSound( "music/win.wav", qfalse );
+#else
 		trap_S_RegisterSound( "music/loss.wav", qfalse );
 		trap_S_RegisterSound( "music/win.wav", qfalse );
 		trap_S_RegisterSound( "sound/player/announce/youwin.wav", qfalse );
+#endif
 	}
 }
 
@@ -448,6 +455,7 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_menu.height				= 64;
 	postgameMenuInfo.item_menu.focuspic				= ART_MENU1;
 
+#ifndef TMNTSP
 	postgameMenuInfo.item_again.generic.type		= MTYPE_BITMAP;
 	postgameMenuInfo.item_again.generic.name		= ART_REPLAY0;
 	postgameMenuInfo.item_again.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
@@ -458,6 +466,7 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_again.width				= 128;
 	postgameMenuInfo.item_again.height				= 64;
 	postgameMenuInfo.item_again.focuspic			= ART_REPLAY1;
+#endif
 
 	postgameMenuInfo.item_next.generic.type			= MTYPE_BITMAP;
 	postgameMenuInfo.item_next.generic.name			= ART_NEXT0;
@@ -471,11 +480,14 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_next.focuspic				= ART_NEXT1;
 
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_menu );
+#ifndef TMNTSP
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_again );
+#endif
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_next );
 }
 
 
+#ifndef TMNTSP
 static void Prepname( int index ) {
 	int		len;
 	char	name[64];
@@ -493,6 +505,7 @@ static void Prepname( int index ) {
 
 	Q_strncpyz( postgameMenuInfo.placeNames[index], name, sizeof(postgameMenuInfo.placeNames[index]) );
 }
+#endif
 
 
 /*
@@ -547,9 +560,17 @@ void UI_SPPostgameMenu_f( void ) {
 
 	// process award stats and prepare presentation data
 	awardValues[AWARD_ACCURACY] = atoi( UI_Argv( 3 ) );
+#ifdef TMNTWEAPONS
+	// Turtle Man: FIXME: I was lazy at removal, so 0 is passed as the AWARD_IMPRESSIVE var.
+#else
 	awardValues[AWARD_IMPRESSIVE] = atoi( UI_Argv( 4 ) );
+#endif
 	awardValues[AWARD_EXCELLENT] = atoi( UI_Argv( 5 ) );
+#ifdef TMNTWEAPONS
+	// Turtle Man: FIXME: I was lazy at removal, so ... AWARD_GAUNTLET ...
+#else
 	awardValues[AWARD_GAUNTLET] = atoi( UI_Argv( 6 ) );
+#endif
 	awardValues[AWARD_FRAGS] = atoi( UI_Argv( 7 ) );
 	awardValues[AWARD_PERFECT] = atoi( UI_Argv( 8 ) );
 
@@ -562,12 +583,14 @@ void UI_SPPostgameMenu_f( void ) {
 		postgameMenuInfo.numAwards++;
 	}
 
+#ifndef TMNTWEAPONS
 	if( awardValues[AWARD_IMPRESSIVE] ) {
 		UI_LogAwardData( AWARD_IMPRESSIVE, awardValues[AWARD_IMPRESSIVE] );
 		postgameMenuInfo.awardsEarned[postgameMenuInfo.numAwards] = AWARD_IMPRESSIVE;
 		postgameMenuInfo.awardsLevels[postgameMenuInfo.numAwards] = awardValues[AWARD_IMPRESSIVE];
 		postgameMenuInfo.numAwards++;
 	}
+#endif
 
 	if( awardValues[AWARD_EXCELLENT] ) {
 		UI_LogAwardData( AWARD_EXCELLENT, awardValues[AWARD_EXCELLENT] );
@@ -576,12 +599,14 @@ void UI_SPPostgameMenu_f( void ) {
 		postgameMenuInfo.numAwards++;
 	}
 
+#ifndef TMNTWEAPONS
 	if( awardValues[AWARD_GAUNTLET] ) {
 		UI_LogAwardData( AWARD_GAUNTLET, awardValues[AWARD_GAUNTLET] );
 		postgameMenuInfo.awardsEarned[postgameMenuInfo.numAwards] = AWARD_GAUNTLET;
 		postgameMenuInfo.awardsLevels[postgameMenuInfo.numAwards] = awardValues[AWARD_GAUNTLET];
 		postgameMenuInfo.numAwards++;
 	}
+#endif
 
 	oldFrags = UI_GetAwardLevel( AWARD_FRAGS ) / 100;
 	UI_LogAwardData( AWARD_FRAGS, awardValues[AWARD_FRAGS] );
@@ -615,6 +640,12 @@ void UI_SPPostgameMenu_f( void ) {
 	UI_SPPostgameMenu_Init();
 	UI_PushMenu( &postgameMenuInfo.menu );
 
+#ifdef TMNTSP
+	Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_next );
+
+	postgameMenuInfo.winnerSound = trap_S_RegisterSound( "sound/player/announce/youwin.wav", qfalse );
+	trap_Cmd_ExecuteText( EXEC_APPEND, "music music/win\n" );
+#else
 	if ( playerGameRank == 1 ) {
 		Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_next );
 	}
@@ -634,6 +665,7 @@ void UI_SPPostgameMenu_f( void ) {
 		postgameMenuInfo.winnerSound = trap_S_RegisterSound( "sound/player/announce/youwin.wav", qfalse );
 		trap_Cmd_ExecuteText( EXEC_APPEND, "music music/win\n" );
 	}
+#endif
 
 	postgameMenuInfo.phase = 1;
 

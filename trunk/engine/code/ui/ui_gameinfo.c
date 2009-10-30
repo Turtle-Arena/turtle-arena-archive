@@ -186,6 +186,11 @@ void UI_LoadArenas( void ) {
 			if( strstr( type, "tourney" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_TOURNAMENT);
 			}
+#ifdef TMNT // TMNTSP?
+			if( strstr( type, "single" ) ) {
+				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_SINGLE_PLAYER);
+			}
+#endif
 			if( strstr( type, "ctf" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_CTF);
 			}
@@ -320,5 +325,9 @@ char *UI_GetBotNameByNumber( int num ) {
 	if (info) {
 		return Info_ValueForKey( info, "name" );
 	}
+#ifdef TMNT // DEFAULT_PLAYER
+	return "Raph";
+#else
 	return "Sarge";
+#endif
 }

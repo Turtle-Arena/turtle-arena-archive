@@ -1292,6 +1292,39 @@ BotSelectActivateWeapon
 */
 int BotSelectActivateWeapon(bot_state_t *bs) {
 	//
+#ifdef TMNTWEAPSYS2
+    // Decide if the pickup waepon is better then default weapon.
+
+    //weapontype_t wt;
+    //weapontype_t dwt;
+
+	if ((bs->inventory[INVENTORY_WEAPON] == bs->inventory[INVENTORY_DEFAULTWEAPON])
+        || bs->inventory[INVENTORY_WEAPON] <= 0)
+    {
+		return bs->inventory[INVENTORY_DEFAULTWEAPON];
+    }
+
+	//wt = BG_WeaponTypeForNum(bs->inventory[INVENTORY_WEAPON]);
+	//dwt = BG_WeaponTypeForNum(bs->inventory[INVENTORY_DEFAULTWEAPON]);
+
+    // Gun with no ammo.
+    if (BG_WeapUseAmmo(bs->inventory[INVENTORY_WEAPON]) && !bs->inventory[INVENTORY_AMMO])
+		return bs->inventory[INVENTORY_DEFAULTWEAPON];
+
+    return bs->inventory[INVENTORY_WEAPON];
+#elif defined TMNTWEAPONS // BETA // Guns only
+	if (bs->inventory[INVENTORY_GUN] > 0 && bs->inventory[INVENTORY_AMMOGUN] > 0)
+		return WEAPONINDEX_GUN;
+	else if (bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOELECTRIC] > 0)
+		return WEAPONINDEX_ELECTRIC_LAUNCHER;
+	else if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOHOMING] > 0)
+		return WEAPONINDEX_HOMING_LAUNCHER;
+	else if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOROCKET] > 0)
+		return WEAPONINDEX_ROCKET_LAUNCHER;
+	else {
+		return -1;
+	}
+#else
 	if (bs->inventory[INVENTORY_MACHINEGUN] > 0 && bs->inventory[INVENTORY_BULLETS] > 0)
 		return WEAPONINDEX_MACHINEGUN;
 	else if (bs->inventory[INVENTORY_SHOTGUN] > 0 && bs->inventory[INVENTORY_SHELLS] > 0)
@@ -1315,6 +1348,7 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 	else {
 		return -1;
 	}
+#endif
 }
 
 /*
@@ -1325,8 +1359,10 @@ BotClearPath
 ==================
 */
 void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
+#ifndef TMNTWEAPONS
 	int i, bestmine;
 	float dist, bestdist;
+#endif
 	vec3_t target, dir;
 	bsp_trace_t bsptrace;
 	entityState_t state;
@@ -1369,6 +1405,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 	if (moveresult->flags & MOVERESULT_BLOCKEDBYAVOIDSPOT) {
 		bs->blockedbyavoidspot_time = FloatTime() + 5;
 	}
+#ifndef TMNTWEAPONS
 	// if blocked by an avoid spot and the view angles and weapon are used for movement
 	if (bs->blockedbyavoidspot_time > FloatTime() &&
 		!(moveresult->flags & (MOVERESULT_MOVEMENTVIEW | MOVERESULT_MOVEMENTWEAPON)) ) {
@@ -1395,6 +1432,58 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			VectorSubtract(target, bs->eye, dir);
 			vectoangles(dir, moveresult->ideal_viewangles);
 			// if the bot has a weapon that does splash damage
+#ifdef TMNTWEAPSYS2
+            moveresult->weapon = 0;
+            if (bs->inventory[INVENTORY_AMMO] > 0)
+            {
+                switch (bs->inventory[INVENTORY_WEAPON])
+                {
+#ifdef TMNTWEAPONS
+                    case WEAPONINDEX_ELECTRIC_LAUNCHER:
+                    case WEAPONINDEX_ROCKET_LAUNCHER:
+                    case WEAPONINDEX_HOMING_LAUNCHER:
+#else
+					case WEAPONINDEX_PLASMAGUN:
+                    case WEAPONINDEX_ROCKET_LAUNCHER:
+                    case WEAPONINDEX_BFG:
+#endif
+                        moveresult->weapon = bs->inventory[INVENTORY_WEAPON];
+                    default:
+                        break;
+                }
+            }
+            if (!moveresult->weapon)
+            {
+                if (bs->inventory[INVENTORY_DEFAULTAMMO] > 0)
+                {
+                    switch (bs->inventory[INVENTORY_DEFAULTWEAPON])
+                    {
+#ifdef TMNTWEAPONS
+						case WEAPONINDEX_ELECTRIC_LAUNCHER:
+						case WEAPONINDEX_ROCKET_LAUNCHER:
+						case WEAPONINDEX_HOMING_LAUNCHER:
+#else
+						case WEAPONINDEX_PLASMAGUN:
+						case WEAPONINDEX_ROCKET_LAUNCHER:
+						case WEAPONINDEX_BFG:
+#endif
+                            moveresult->weapon = bs->inventory[INVENTORY_DEFAULTWEAPON];
+                        default:
+                            break;
+                    }
+                }
+            }
+#elif defined TMNTWEAPONS // BETA
+			if (bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOELECTRIC] > 0)
+				moveresult->weapon = WEAPONINDEX_ELECTRIC_LAUNCHER;
+			else if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOROCKET] > 0)
+				moveresult->weapon = WEAPONINDEX_ROCKET_LAUNCHER;
+			else if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOHOMING] > 0)
+				moveresult->weapon = WEAPONINDEX_HOMING_LAUNCHER;
+			else {
+				moveresult->weapon = 0;
+			}
+#else
 			if (bs->inventory[INVENTORY_PLASMAGUN] > 0 && bs->inventory[INVENTORY_CELLS] > 0)
 				moveresult->weapon = WEAPONINDEX_PLASMAGUN;
 			else if (bs->inventory[INVENTORY_ROCKETLAUNCHER] > 0 && bs->inventory[INVENTORY_ROCKETS] > 0)
@@ -1404,6 +1493,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			else {
 				moveresult->weapon = 0;
 			}
+#endif
 			if (moveresult->weapon) {
 				//
 				moveresult->flags |= MOVERESULT_MOVEMENTWEAPON | MOVERESULT_MOVEMENTVIEW;
@@ -1423,6 +1513,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			}
 		}
 	}
+#endif // !TMNTWEAPONS
 }
 
 /*

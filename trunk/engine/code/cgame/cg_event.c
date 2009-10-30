@@ -143,19 +143,28 @@ static void CG_Obituary( entityState_t *ent ) {
 	case MOD_TRIGGER_HURT:
 		message = "was in the wrong place";
 		break;
+#ifdef TMNTENTITIES
+	case MOD_EXPLOSION:
+		message = "was in the explosion";
+#endif
 	default:
 		message = NULL;
 		break;
 	}
 
 	if (attacker == target) {
+#ifdef TMNTPLAYERSYS
+		gender = ci->playercfg.gender;
+#else
 		gender = ci->gender;
+#endif
 		switch (mod) {
 #ifdef MISSIONPACK
 		case MOD_KAMIKAZE:
 			message = "goes out with a bang";
 			break;
 #endif
+#ifndef TMNTWEAPONS // MOD
 		case MOD_GRENADE_SPLASH:
 			if ( gender == GENDER_FEMALE )
 				message = "tripped on her own grenade";
@@ -164,6 +173,21 @@ static void CG_Obituary( entityState_t *ent ) {
 			else
 				message = "tripped on his own grenade";
 			break;
+#endif
+#ifdef TMNTWEAPONS // MOD
+		case MOD_ELECTRIC_SPLASH:
+			if ( gender == GENDER_FEMALE )
+				message = "electrocuted herself";
+			else if ( gender == GENDER_NEUTER )
+				message = "electrocuted itself";
+			else
+				message = "electrocuted himself";
+			break;
+		case MOD_HOMING_SPLASH:
+#endif
+#ifdef TMNTHOLDABLE
+		case MOD_FIRESHURIKEN_EXPLOSION:
+#endif
 		case MOD_ROCKET_SPLASH:
 			if ( gender == GENDER_FEMALE )
 				message = "blew herself up";
@@ -172,6 +196,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			else
 				message = "blew himself up";
 			break;
+#ifndef TMNTWEAPONS // MOD
 		case MOD_PLASMA_SPLASH:
 			if ( gender == GENDER_FEMALE )
 				message = "melted herself";
@@ -194,6 +219,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			}
 			break;
 #endif
+#endif
 		default:
 			if ( gender == GENDER_FEMALE )
 				message = "killed herself";
@@ -214,6 +240,15 @@ static void CG_Obituary( entityState_t *ent ) {
 	if ( attacker == cg.snap->ps.clientNum ) {
 		char	*s;
 
+#ifdef TMNT // frag to KO
+		if ( cgs.gametype < GT_TEAM ) {
+			s = va("You knocked out %s\n%s place with %i", targetName,
+				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
+				cg.snap->ps.persistant[PERS_SCORE] );
+		} else {
+			s = va("You knocked out %s", targetName );
+		}
+#else
 		if ( cgs.gametype < GT_TEAM ) {
 			s = va("You fragged %s\n%s place with %i", targetName, 
 				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
@@ -221,6 +256,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		} else {
 			s = va("You fragged %s", targetName );
 		}
+#endif
 #ifdef MISSIONPACK
 		if (!(cg_singlePlayerActive.integer && cg_cameraOrbit.integer)) {
 			CG_CenterPrint( s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
@@ -250,6 +286,86 @@ static void CG_Obituary( entityState_t *ent ) {
 		case MOD_GRAPPLE:
 			message = "was caught by";
 			break;
+#ifdef TMNTWEAPONS // MOD
+		case MOD_FIST:
+			message = "was killed by";
+			message2 = "'s fist";
+			break;
+
+		case MOD_KATANA:
+			message = "was killed by";
+			message2 = "'s katana";
+			break;
+
+		case MOD_WAKIZASHI:
+			message = "was killed by";
+			message2 = "'s wakizashi";
+			break;
+
+		// \sais
+		case MOD_SAI:
+			message = "was killed by";
+			message2 = "'s sai";
+			break;
+
+		// \nunchuks
+		case MOD_NUNCHUK:
+			message = "was killed by";
+			message2 = "'s nunchuk";
+			break;
+
+		// \hammers
+		case MOD_HAMMER:
+			message = "was killed by";
+			message2 = "'s hammer";
+			break;
+		case MOD_AXE:
+			message = "was killed by";
+			message2 = "'s axe";
+			break;
+		//WP_BAMBOOHAMMER,
+
+		// \sword1_both
+		case MOD_SWORD:
+			message = "was killed by";
+			message2 = "'s sword";
+			break;
+		case MOD_BAT:
+			message = "was killed by";
+			message2 = "'s baseball bat";
+			break;
+		//WP_SPIKEDCLUB,
+
+		// \bos
+		case MOD_BO:
+			message = "was killed by";
+			message2 = "'s bo";
+			break;
+		case MOD_BAMBOOBO:
+			message = "was killed by";
+			message2 = "'s bamboo bo";
+			break;
+
+		// \guns
+		case MOD_GUN:
+			message = "was killed by";
+			message2 = "'s bullet";
+			break;
+		case MOD_ELECTRIC:
+		case MOD_ELECTRIC_SPLASH:
+			message = "was electrocuted by";
+			break;
+		case MOD_ROCKET:
+		case MOD_ROCKET_SPLASH:
+			message = "was killed by";
+			message2 = "'s rocket";
+			break;
+		case MOD_HOMING:
+		case MOD_HOMING_SPLASH:
+			message = "was killed by";
+			message2 = "'s homing rocket";
+			break;
+#else
 		case MOD_GAUNTLET:
 			message = "was pummeled by";
 			break;
@@ -260,7 +376,11 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was gunned down by";
 			break;
 		case MOD_GRENADE:
+#ifdef TMNT
+			message = "was killed by";
+#else
 			message = "ate";
+#endif
 			message2 = "'s grenade";
 			break;
 		case MOD_GRENADE_SPLASH:
@@ -268,7 +388,11 @@ static void CG_Obituary( entityState_t *ent ) {
 			message2 = "'s shrapnel";
 			break;
 		case MOD_ROCKET:
+#ifdef TMNT
+			message = "was killed by";
+#else
 			message = "ate";
+#endif
 			message2 = "'s rocket";
 			break;
 		case MOD_ROCKET_SPLASH:
@@ -294,7 +418,9 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was blasted by";
 			message2 = "'s BFG";
 			break;
+#endif
 #ifdef MISSIONPACK
+#ifndef TMNTWEAPONS // MOD
 		case MOD_NAIL:
 			message = "was nailed by";
 			break;
@@ -306,12 +432,37 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was too close to";
 			message2 = "'s Prox Mine";
 			break;
+#endif
 		case MOD_KAMIKAZE:
 			message = "falls to";
 			message2 = "'s Kamikaze blast";
 			break;
+#ifndef TMNTWEAPONS // MOD
 		case MOD_JUICED:
 			message = "was juiced by";
+			break;
+#endif
+#endif
+#ifdef TMNTHOLDABLE
+		case MOD_SHURIKEN:
+			message = "was killed by";
+			message2 = "'s shuriken";
+			break;
+		case MOD_FIRESHURIKEN:
+			message = "was killed by";
+			message2 = "'s fire shuriken";
+			break;
+		case MOD_FIRESHURIKEN_EXPLOSION:
+			message = "almost dodged";
+			message2 = "'s fire shuriken";
+			break;
+		case MOD_ELECTRICSHURIKEN:
+			message = "was killed by";
+			message2 = "'s electric shuriken";
+			break;
+		case MOD_LASERSHURIKEN:
+			message = "was killed by";
+			message2 = "'s laser shuriken";
 			break;
 #endif
 		case MOD_TELEFRAG:
@@ -358,7 +509,11 @@ static void CG_UseItem( centity_t *cent ) {
 	if ( es->number == cg.snap->ps.clientNum ) {
 		if ( !itemNum ) {
 			CG_CenterPrint( "No item to use", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
-		} else {
+		} else
+#ifdef TMNTHOLDABLE
+		if (itemNum < HI_SHURIKEN || itemNum > HI_LASERSHURIKEN)
+#endif
+		{
 			item = BG_FindItemForHoldable( itemNum );
 			CG_CenterPrint( va("Use %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 		}
@@ -370,8 +525,10 @@ static void CG_UseItem( centity_t *cent ) {
 		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.useNothingSound );
 		break;
 
+#ifndef TMNTHOLDABLE // no q3 teleprter
 	case HI_TELEPORTER:
 		break;
+#endif
 
 	case HI_MEDKIT:
 		clientNum = cent->currentState.clientNum;
@@ -388,8 +545,21 @@ static void CG_UseItem( centity_t *cent ) {
 
 	case HI_PORTAL:
 		break;
+#ifndef TMNT // POWERS
 	case HI_INVULNERABILITY:
 		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.useInvulnerabilitySound );
+		break;
+#endif
+#endif
+#ifdef TMNTHOLDABLE // Turtle Man: Holdable
+	// Turtle Man: Play shuriken use sound
+	case HI_SHURIKEN:
+	case HI_ELECTRICSHURIKEN:
+	case HI_FIRESHURIKEN:
+		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.shurikenSound );
+		break;
+	case HI_LASERSHURIKEN:
+		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.laserShurikenSound );
 		break;
 #endif
 	}
@@ -407,15 +577,49 @@ static void CG_ItemPickup( int itemNum ) {
 	cg.itemPickup = itemNum;
 	cg.itemPickupTime = cg.time;
 	cg.itemPickupBlendTime = cg.time;
+
+#ifdef TMNTHOLDSYS
+	if (bg_itemlist[itemNum].giType == IT_HOLDABLE)
+	{
+#ifdef TMNTHOLDSYS2
+		// Select the holdable
+		cg.holdableSelect = bg_itemlist[itemNum].giTag;
+#endif
+
+		//cg.predictedPlayerState.holdableIndex = bg_itemlist[itemNum].giTag;
+
+		// holdable is really given in game, but do it anyway...
+		if (bg_itemlist[itemNum].quantity == 0)
+			cg.predictedPlayerState.holdable[bg_itemlist[itemNum].giTag] = 1;
+		else
+			cg.predictedPlayerState.holdable[bg_itemlist[itemNum].giTag] += bg_itemlist[itemNum].quantity;
+
+		//if (bg_itemlist[itemNum].giTag >= HI_SHURIKEN && bg_itemlist[itemNum].giTag <= HI_LASERSHURIKEN)
+		{
+			if (cg.predictedPlayerState.holdable[bg_itemlist[itemNum].giTag] < MAX_SHURIKENS)
+				cg.predictedPlayerState.holdable[bg_itemlist[itemNum].giTag] = MAX_SHURIKENS;
+		}
+	}
+#endif
 	// see if it should be the grabbed weapon
 	if ( bg_itemlist[itemNum].giType == IT_WEAPON ) {
 		// select it immediately
+#ifdef TMNTWEAPSYS2
+		// always switch
+		{
+#elif defined TMNTWEAPONS
+		if ( cg_autoswitch.integer ) {
+#else
 		if ( cg_autoswitch.integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN ) {
+#endif
+#ifdef TMNTWEAPSYS2 // The weapon "should" be selected in game and sent in the next snap too
+			cg.predictedPlayerState.stats[STAT_NEWWEAPON] = bg_itemlist[itemNum].giTag;
+#else
 			cg.weaponSelectTime = cg.time;
 			cg.weaponSelect = bg_itemlist[itemNum].giTag;
+#endif
 		}
 	}
-
 }
 
 
@@ -451,7 +655,119 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	cent->pe.painDirection ^= 1;
 }
 
+#ifdef TMNTENTITIES
+/*
+CG_Chunks
 
+Turtle Man: FIXME: NON-GPL Code from Star Trek: Elite Force (code-DM)
+*/
+void CG_Chunks( vec3_t origin, vec3_t dir, float scale, material_type_t type )
+{
+	int				i, j, k;
+	int				numChunks;
+	float			baseScale = 1.0f, dist, radius;
+	vec3_t			v;
+	//sfxHandle_t		snd = 0;
+	localEntity_t	*le;
+	refEntity_t		*re;
+	float fracment_radius = 0.0f; // it was le->data.fragment.radius in ST:EF, I haven't look into it.
+
+	if ( type == MT_NONE )
+		return;
+
+	if (type == MT_GLASS || type == MT_GLASS_METAL) {
+		//snd = cgs.media.glassChunkSound;
+	}
+	else
+	{
+		// MT_METAL, MT_WOOD, MT_STONE, ect...
+		//snd = cgs.media.metalChunkSound;
+	}
+
+	//trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_BODY, snd );
+
+	numChunks = irandom( 8, 12 );
+
+	// LOD num chunks
+	VectorSubtract( cg.snap->ps.origin, origin, v );
+	dist = VectorLength( v );
+
+	if ( dist > 512 )
+	{
+		numChunks *= 512.0 / dist;		// 1/2 at 1024, 1/4 at 2048, etc.
+	}
+
+	// attempt to scale the size of the chunks based on the size of the brush
+	radius = baseScale + ( ( scale - 128 ) / 128.0f );
+
+	for ( i = 0; i < numChunks; i++ )
+	{
+		le = CG_AllocLocalEntity();
+		re = &le->refEntity;
+
+		le->leType = LE_FRAGMENT;
+		le->endTime = cg.time + 2000;
+
+		VectorCopy( origin, re->origin );
+
+		for ( j = 0; j < 3; j++ )
+		{
+			re->origin[j] += crandom() * 12;
+		}
+		VectorCopy( re->origin, le->pos.trBase );
+
+		//Velocity
+		VectorSet( v, crandom(), crandom(), crandom() );
+		VectorAdd( v, dir, v );
+		VectorScale( v, flrandom( 100, 350 ), le->pos.trDelta );
+
+		//Angular Velocity
+		VectorSet( le->angles.trBase, crandom() * 360, crandom() * 360, crandom() * 360 );
+		VectorSet( le->angles.trDelta, crandom() * 90, crandom() * 90, crandom() * 90 );
+
+		AxisCopy( axisDefault, re->axis );
+
+		fracment_radius = flrandom( radius * 0.7f, radius * 1.3f );
+
+		re->nonNormalizedAxes = qtrue;
+
+		if (type == MT_GLASS_METAL)
+		{
+			if ( rand() & 1 )
+			{
+				re->hModel = cgs.media.chunkModels[MT_METAL][irandom(0,NUM_CHUNKS-1)];
+			}
+			else
+			{
+				re->hModel = cgs.media.chunkModels[MT_GLASS][irandom(0,NUM_CHUNKS-1)];
+			}
+		}
+		else if (type >= 0 && type < NUM_CHUNK_TYPES)
+		{
+			re->hModel = cgs.media.chunkModels[type][irandom(0,NUM_CHUNKS-1)];
+		}
+		else
+		{
+			re->hModel = cgs.media.chunkModels[MT_METAL][irandom(0,NUM_CHUNKS-1)];
+		}
+
+		le->pos.trType = TR_GRAVITY;
+		le->pos.trTime = cg.time;
+		le->angles.trType = TR_INTERPOLATE;
+		le->angles.trTime = cg.time;
+		le->bounceFactor = 0.2f + random() * 0.2f;
+		le->leFlags |= LEF_TUMBLE;
+
+		re->shaderRGBA[0] = re->shaderRGBA[1] = re->shaderRGBA[2] = re->shaderRGBA[3] = 255;
+
+		// Make sure that we have the desired start size set
+		for( k = 0; k < 3; k++)
+		{
+			VectorScale( le->refEntity.axis[k], fracment_radius, le->refEntity.axis[k] );
+		}
+	}
+}
+#endif
 
 /*
 ==============
@@ -496,7 +812,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_FOOTSTEP");
 		if (cg_footsteps.integer) {
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, 
+#ifdef TMNTPLAYERSYS
+				cgs.media.footsteps[ ci->playercfg.footsteps ][rand()&3] );
+#else
 				cgs.media.footsteps[ ci->footsteps ][rand()&3] );
+#endif
 		}
 		break;
 	case EV_FOOTSTEP_METAL:
@@ -740,6 +1060,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	//
 	// weapon events
 	//
+#ifdef TMNTWEAPSYS2
+	case EV_DROP_WEAPON:
+		DEBUGNAME("EV_DROP_WEAPON");
+		// Start a sound when a weapon is dropped?
+		break;
+#else
 	case EV_NOAMMO:
 		DEBUGNAME("EV_NOAMMO");
 //		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.noAmmoSound );
@@ -747,6 +1073,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			CG_OutOfAmmoChange();
 		}
 		break;
+#endif
 	case EV_CHANGE_WEAPON:
 		DEBUGNAME("EV_CHANGE_WEAPON");
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.selectSound );
@@ -816,6 +1143,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_USE_ITEM14");
 		CG_UseItem( cent );
 		break;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use holdable 15
+	case EV_USE_ITEM15:
+		DEBUGNAME("EV_USE_ITEM15");
+		CG_UseItem( cent );
+		break;
+#endif
 
 	//=================================================================
 
@@ -844,6 +1177,16 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.respawnSound );
 		break;
 
+#ifdef TMNTHOLDABLE
+	case EV_LASERSHURIKEN_BOUNCE: // HI_LASERSHURIKEN
+		DEBUGNAME("EV_LASERSHURIKEN_BOUNCE");
+		if (es->eventParm == 1) {
+			// Turtle Man: TODO: Laser shuriken just died.
+		} else {
+			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.laserShurikenSound );
+		}
+		break;
+#else
 	case EV_GRENADE_BOUNCE:
 		DEBUGNAME("EV_GRENADE_BOUNCE");
 		if ( rand() & 1 ) {
@@ -852,8 +1195,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.hgrenb2aSound );
 		}
 		break;
+#endif
 
 #ifdef MISSIONPACK
+#ifndef TMNTWEAPONS
 	case EV_PROXIMITY_MINE_STICK:
 		DEBUGNAME("EV_PROXIMITY_MINE_STICK");
 		if( es->eventParm & SURF_FLESH ) {
@@ -869,6 +1214,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_PROXIMITY_MINE_TRIGGER");
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.wstbactvSound );
 		break;
+#endif
 	case EV_KAMIKAZE:
 		DEBUGNAME("EV_KAMIKAZE");
 		CG_KamikazeEffect( cent->lerpOrigin );
@@ -881,6 +1227,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_OBELISKPAIN");
 		CG_ObeliskPain( cent->lerpOrigin );
 		break;
+#ifndef TMNT // POWERS
 	case EV_INVUL_IMPACT:
 		DEBUGNAME("EV_INVUL_IMPACT");
 		CG_InvulnerabilityImpact( cent->lerpOrigin, cent->currentState.angles );
@@ -891,13 +1238,23 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 	case EV_LIGHTNINGBOLT:
 		DEBUGNAME("EV_LIGHTNINGBOLT");
+#ifndef TMNTWEAPONS
 		CG_LightningBoltBeam(es->origin2, es->pos.trBase);
+#endif
 		break;
+#endif
 #endif
 	case EV_SCOREPLUM:
 		DEBUGNAME("EV_SCOREPLUM");
 		CG_ScorePlum( cent->currentState.otherEntityNum, cent->lerpOrigin, cent->currentState.time );
 		break;
+#ifdef TMNTENTITIES
+	case EV_FX_CHUNKS:
+		DEBUGNAME("EV_FX_CHUNKS");
+		//UnVectorShort( cent->currentState.angles2 );
+		CG_Chunks( cent->lerpOrigin, cent->currentState.angles2, cent->currentState.time2, cent->currentState.powerups );
+		break;
+#endif
 
 	//
 	// missile impacts
@@ -922,9 +1279,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_RAILTRAIL:
 		DEBUGNAME("EV_RAILTRAIL");
+#ifndef TMNTWEAPONS
 		cent->currentState.weapon = WP_RAILGUN;
 		// if the end was on a nomark surface, don't make an explosion
 		CG_RailTrail( ci, es->origin2, es->pos.trBase );
+#endif
 		if ( es->eventParm != 255 ) {
 			ByteToDir( es->eventParm, dir );
 			CG_MissileHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
@@ -944,7 +1303,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_SHOTGUN:
 		DEBUGNAME("EV_SHOTGUN");
+#ifndef TMNTWEAPONS
 		CG_ShotgunFire( es );
+#endif
 		break;
 
 	case EV_GENERAL_SOUND:
@@ -1006,7 +1367,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					}
 					else {
 					if (cgs.clientinfo[cg.clientNum].team == TEAM_BLUE) {
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 							if (cgs.gametype == GT_1FCTF) 
 								CG_AddBufferedSound( cgs.media.yourTeamTookTheFlagSound );
 							else
@@ -1014,7 +1375,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 						 	CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
 						}
 						else if (cgs.clientinfo[cg.clientNum].team == TEAM_RED) {
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 							if (cgs.gametype == GT_1FCTF)
 								CG_AddBufferedSound( cgs.media.enemyTookTheFlagSound );
 							else
@@ -1029,7 +1390,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					}
 					else {
 						if (cgs.clientinfo[cg.clientNum].team == TEAM_RED) {
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 							if (cgs.gametype == GT_1FCTF)
 								CG_AddBufferedSound( cgs.media.yourTeamTookTheFlagSound );
 							else
@@ -1037,7 +1398,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 							CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
 						}
 						else if (cgs.clientinfo[cg.clientNum].team == TEAM_BLUE) {
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 							if (cgs.gametype == GT_1FCTF)
 								CG_AddBufferedSound( cgs.media.enemyTookTheFlagSound );
 							else
@@ -1134,6 +1495,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.regenSound );
 		break;
 
+#ifndef NOTRATEDM // No gibs.
 	case EV_GIB_PLAYER:
 		DEBUGNAME("EV_GIB_PLAYER");
 		// don't play gib sound when using the kamikaze because it interferes
@@ -1144,6 +1506,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 		CG_GibPlayer( cent->lerpOrigin );
 		break;
+#endif
 
 	case EV_STOPLOOPINGSOUND:
 		DEBUGNAME("EV_STOPLOOPINGSOUND");

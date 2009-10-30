@@ -131,6 +131,7 @@ void CL_ShowIP_f(void);
 void CL_ServerStatus_f(void);
 void CL_ServerStatusResponse( netadr_t from, msg_t *msg );
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 /*
 ===============
 CL_CDDialog
@@ -141,6 +142,7 @@ Called by Com_Error when a cd is needed
 void CL_CDDialog( void ) {
 	cls.cddialog = qtrue;	// start it next frame
 }
+#endif
 
 #ifdef USE_MUMBLE
 static
@@ -221,7 +223,11 @@ void CL_Voip_f( void )
 		reason = "Speex not initialized";
 	else if (!cl_connectedToVoipServer)
 		reason = "Server doesn't support VoIP";
-	else if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive"))
+	else if (
+#ifndef TMNTSP
+	Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
+#endif
+	Cvar_VariableValue("ui_singlePlayerActive"))
 		reason = "running in single-player mode";
 
 	if (reason != NULL) {
@@ -301,7 +307,11 @@ void CL_CaptureVoip(void)
 			dontCapture = qtrue;  // not connected to a server.
 		else if (!cl_connectedToVoipServer)
 			dontCapture = qtrue;  // server doesn't support VoIP.
-		else if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive"))
+		else if (
+#ifndef TMNTSP
+		Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
+#endif
+		Cvar_VariableValue("ui_singlePlayerActive"))
 			dontCapture = qtrue;  // single player game.
 		else if (clc.demoplaying)
 			dontCapture = qtrue;  // playing back a demo.
@@ -1360,6 +1370,7 @@ in anyway.
 */
 #ifndef STANDALONE
 void CL_RequestAuthorization( void ) {
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	char	nums[64];
 	int		i, j, l;
 	cvar_t	*fs;
@@ -1401,6 +1412,7 @@ void CL_RequestAuthorization( void ) {
 	fs = Cvar_Get ("cl_anonymous", "0", CVAR_INIT|CVAR_SYSTEMINFO );
 
 	NET_OutOfBandPrint(NS_CLIENT, cls.authorizeServer, "getKeyAuthorize %i %s", fs->integer, nums );
+#endif
 }
 #endif
 /*
@@ -2589,11 +2601,14 @@ void CL_Frame ( int msec ) {
 	}
 #endif
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	if ( cls.cddialog ) {
 		// bring up the cd error dialog if needed
 		cls.cddialog = qfalse;
 		VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_NEED_CD );
-	} else	if ( cls.state == CA_DISCONNECTED && !( Key_GetCatcher( ) & KEYCATCH_UI )
+	} else
+#endif
+	if ( cls.state == CA_DISCONNECTED && !( Key_GetCatcher( ) & KEYCATCH_UI )
 		&& !com_sv_running->integer && uivm ) {
 		// if disconnected, bring up the menu
 		S_StopAllSounds();
@@ -3089,9 +3104,11 @@ void CL_Init( void ) {
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
 
+#ifndef TMNTWEAPSYS2
 	// init autoswitch so the ui will have it correctly even
 	// if the cgame hasn't been started
 	Cvar_Get ("cg_autoswitch", "1", CVAR_ARCHIVE);
+#endif
 
 	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);
 	m_yaw = Cvar_Get ("m_yaw", "0.022", CVAR_ARCHIVE);
@@ -3119,12 +3136,27 @@ void CL_Init( void ) {
 	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("rate", "3000", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("snaps", "20", CVAR_USERINFO | CVAR_ARCHIVE );
+#ifdef TMNT
+	// DEFAULT_PLAYER
+#ifdef TMNTSP // SPMODEL
+	Cvar_Get ("spmodel", "raph", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
+	Cvar_Get ("spheadmodel", "raph", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
+#endif
+	Cvar_Get ("model", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("headmodel", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("team_model", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("team_headmodel", "*raph", CVAR_USERINFO | CVAR_ARCHIVE );
+	// DEFAULT_TEAMS
+	Cvar_Get ("g_redTeam", "Sais", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	Cvar_Get ("g_blueTeam", "Katanas", CVAR_SERVERINFO | CVAR_ARCHIVE);
+#else
 	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("headmodel", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_model", "james", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_headmodel", "*james", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
+#endif
 	Cvar_Get ("color1",  "4", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("color2", "5", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
@@ -3290,7 +3322,9 @@ static void CL_SetServerInfo(serverInfo_t *server, const char *info, int ping) {
 			server->netType = atoi(Info_ValueForKey(info, "nettype"));
 			server->minPing = atoi(Info_ValueForKey(info, "minping"));
 			server->maxPing = atoi(Info_ValueForKey(info, "maxping"));
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 			server->punkbuster = atoi(Info_ValueForKey(info, "punkbuster"));
+#endif
 		}
 		server->ping = ping;
 	}
@@ -3408,7 +3442,9 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.localServers[i].game[0] = '\0';
 	cls.localServers[i].gameType = 0;
 	cls.localServers[i].netType = from.type;
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	cls.localServers[i].punkbuster = 0;
+#endif
 									 
 	Q_strncpyz( info, MSG_ReadString( msg ), MAX_INFO_STRING );
 	if (strlen(info)) {
@@ -4117,6 +4153,9 @@ bool CL_CDKeyValidate
 =================
 */
 qboolean CL_CDKeyValidate( const char *key, const char *checksum ) {
+#ifndef IOQUAKE3 // Turtle Man: CDKEY
+	return qtrue;
+#else
 	char	ch;
 	byte	sum;
 	char	chs[3];
@@ -4173,5 +4212,6 @@ qboolean CL_CDKeyValidate( const char *key, const char *checksum ) {
 	}
 
 	return qfalse;
+#endif
 }
 #endif

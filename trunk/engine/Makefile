@@ -1,5 +1,5 @@
 #
-# ioq3 Makefile
+# TMNT Arena Makefile
 #
 # GNU Make required
 #
@@ -41,6 +41,9 @@ endif
 ifndef BUILD_GAME_QVM
   BUILD_GAME_QVM   =
 endif
+ifndef BUILD_BASEGAME
+  BUILD_BASEGAME   =
+endif
 ifndef BUILD_MISSIONPACK
   BUILD_MISSIONPACK=
 endif
@@ -48,6 +51,104 @@ endif
 ifneq ($(PLATFORM),darwin)
   BUILD_CLIENT_SMP = 0
 endif
+
+#Turtle Man
+ifndef BUILD_SPLINES
+  BUILD_SPLINES=
+endif
+ifndef BUILD_DEFINES
+  BUILD_DEFINES=
+endif
+ifndef BUILD_IOQUAKE3
+  BUILD_IOQUAKE3=
+endif
+ifndef BUILD_REALIOQUAKE3
+  BUILD_REALIOQUAKE3=
+endif
+ifndef BUILD_SONIC
+  BUILD_SONIC=
+endif
+
+#
+# Start build type
+#
+# -DIOQUAKE3  - Enables CD key check and punkbuster code
+# -DIOQ3ZTM   - Misc changes and "fixes" that I always want to be enabled.
+#                 It was part of the TMNT define before.
+# -DNOTRATEDM - Disable stuff in Quake3 engine that made it rated M. (blood, gibs, strong lang)
+#            This however doesn't change the gamedata, like the botfiles strong lang, bloody textures, ect
+#            Turtle Man: TODO: Rename this define to ...?
+#
+ifeq ($(BUILD_IOQUAKE3),1)
+
+    ifeq ($(BUILD_REALIOQUAKE3),1)
+	    # Build real ioquake3.
+	    BUILD_DEFINES=-DIOQUAKE3
+	else
+		# Modified ioquake3
+		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM
+    endif
+
+else # END QUAKE3
+
+### START SONIC
+ifeq ($(BUILD_SONIC),1)
+
+	# SRB2 clone... Sonic Blast Arena
+	#  Should it be its own EXE or a mod for TMNT Arena? (or (io)qauke3 mod?)...
+	# Someday I hope do more work on this, but it is outside of my main goal of a TMNT fangame.
+	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM
+	BUILD_DEFINES += -DSONIC -DTMNTWEAPSYS -DSONICWEAPONS -DTMNTPLAYERSYS
+
+	USE_CODEC_VORBIS=1
+
+	# Mission Pack defaults to off.
+	#  It can be enabled by using "BUILD_MISSIONPACK=1" in the make commnd or in Makefile.local.
+	ifneq ($BUILD_MISSIONPACK),1)
+		BUILD_MISSIONPACK=0
+	endif
+
+else # END SONIC
+
+	###################################################################
+	# Default TMNT config
+	#  - All of this can be overriden by makefile.local.
+	###################################################################
+
+	# Music will be ogg vorbis, after there is some, that is...
+	USE_CODEC_VORBIS=1
+
+	# This should always be on in TMNT (but can be over-riden). (Currently unused...)
+	BUILD_SPLINES=1
+
+	# TMNT defines
+	# -DTMNTHUD only effects quake3 hud, not missionpack hud
+	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM
+	BUILD_DEFINES += -DTMNT -DTMNTHUD -DTMNTHOLDSYS -DTMNTHOLDABLE -DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS \
+				-DTMNTSP -DTMNTPLAYERSYS -DTMNTPLAYERS -DTMNT_SUPPORTQ3 -DTMNTENTITIES -DTMNTPATHS
+
+	# undefined defines.
+	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
+	# -DANALOG		 # TODO: Finish analog input.
+	# -DARRAYMAX     # TODO: This was going to remove the bit max problem with Q3 network (ie more then 16 weapons).
+	# Non-GPL code. Needs rewrite.
+	# -DSINGLEPLAYER # Mostly rewritten now by TMNTSP. It still has savegames, misc_model_anim, and target_earthquake.
+	# -DSP_NPC       # rfactory.org NPCs. I haven't yet started to replace this yet.
+
+	# TMNT HOLDABLE SYSTEM 2: 
+	# Allows players to change to any holdable, not just the next one. (Based on Q3's weapon changing)
+	# Currently causes auto changing holdables not to work (As cg.holdableSelect can't  be changed in bg_pmove.c)
+	#BUILD_DEFINES+=-DTMNTHOLDSYS2
+
+	# TMNT HOLDABLE SYSTEM 2 BOT: Currently needed for bots to use holdables when TMNTHOLDSYS is defined.
+	# It was part of TMNTHOLDABLE2, but is needed for bots when TMNTHOLDSYS is defined as well.
+	BUILD_DEFINES+=-DTMNTHOLDSYS2BOT
+
+	# Enable Raven MDR model support. (I may use MDR for my player models)
+	BUILD_DEFINES+=-DRAVENMDR
+
+endif # BUILD_SONIC
+endif # BUILD_IOQUAKE3
 
 #############################################################################
 #
@@ -88,7 +189,16 @@ endif
 export CROSS_COMPILING
 
 ifndef COPYDIR
+# Turtle Man
+ifeq ($(BUILD_IOQUAKE3),1)
 COPYDIR="/usr/local/games/quake3"
+else
+ifeq ($(BUILD_SONIC),1)
+COPYDIR="/usr/local/games/sonicblastarena"
+else # TMNT
+COPYDIR="/usr/local/games/tmntarena"
+endif # end sonic
+endif # end ioquake3
 endif
 
 ifndef MOUNT_DIR
@@ -176,6 +286,8 @@ NSISDIR=misc/nsis
 SDLHDIR=$(MOUNT_DIR)/SDL12
 LIBSDIR=$(MOUNT_DIR)/libs
 TEMPDIR=/tmp
+#Turtle Man
+SPLNDIR=$(MOUNT_DIR)/splines
 
 # set PKG_CONFIG_PATH to influence this, e.g.
 # PKG_CONFIG_PATH=/opt/cross/i386-mingw32msvc/lib/pkgconfig
@@ -486,10 +598,6 @@ ifeq ($(PLATFORM),mingw32)
     endif
   endif
 
-  ifeq ($(USE_CODEC_VORBIS),1)
-    CLIENT_LIBS += -lvorbisfile -lvorbis -logg
-  endif
-
   ifeq ($(ARCH),x86)
     # build 32bit
     BASE_CFLAGS += -m32
@@ -504,9 +612,19 @@ ifeq ($(PLATFORM),mingw32)
     BASE_CFLAGS += -I$(SDLHDIR)/include
     CLIENT_LIBS += $(LIBSDIR)/win32/libSDLmain.a \
                       $(LIBSDIR)/win32/libSDL.dll.a
+    # Turtle Man include ogg vorbis
+    ifeq ($(USE_CODEC_VORBIS),1)
+      BASE_CFLAGS += -I$(LIBSDIR)/win32/include
+      CLIENT_LIBS += $(LIBSDIR)/win32/libvorbisfile.a \
+                        $(LIBSDIR)/win32/libvorbis.a\
+						$(LIBSDIR)/win32/libogg.a
+    endif
   else
     BASE_CFLAGS += $(SDL_CFLAGS)
     CLIENT_LIBS += $(SDL_LIBS)
+    ifeq ($(USE_CODEC_VORBIS),1)
+      CLIENT_LIBS += -lvorbisfile -lvorbis -logg
+  endif
   endif
 
 
@@ -785,22 +903,31 @@ endif #SunOS
 
 TARGETS =
 
+#Turtle Man
+ifeq ($(BUILD_SPLINES),1)
+  TARGETS += $(B)/splines/libsplines.a
+  BUILD_DEFINES += -DCAMERASCRIPT
+  CLIENT_LIBS += $(B)/splines/libsplines.a
+endif
+
 ifneq ($(BUILD_SERVER),0)
-  TARGETS += $(B)/ioq3ded.$(ARCH)$(BINEXT)
+  TARGETS += $(B)/tmntarena-ded.$(ARCH)$(BINEXT)
 endif
 
 ifneq ($(BUILD_CLIENT),0)
-  TARGETS += $(B)/ioquake3.$(ARCH)$(BINEXT)
+  TARGETS += $(B)/tmntarena.$(ARCH)$(BINEXT)
   ifneq ($(BUILD_CLIENT_SMP),0)
-    TARGETS += $(B)/ioquake3-smp.$(ARCH)$(BINEXT)
+    TARGETS += $(B)/tmntarena-smp.$(ARCH)$(BINEXT)
   endif
 endif
 
 ifneq ($(BUILD_GAME_SO),0)
+  ifneq ($(BUILD_BASEGAME),0)
   TARGETS += \
     $(B)/baseq3/cgame$(ARCH).$(SHLIBEXT) \
     $(B)/baseq3/qagame$(ARCH).$(SHLIBEXT) \
     $(B)/baseq3/ui$(ARCH).$(SHLIBEXT)
+  endif
   ifneq ($(BUILD_MISSIONPACK),0)
     TARGETS += \
     $(B)/missionpack/cgame$(ARCH).$(SHLIBEXT) \
@@ -811,10 +938,12 @@ endif
 
 ifneq ($(BUILD_GAME_QVM),0)
   ifneq ($(CROSS_COMPILING),1)
+    ifneq ($(BUILD_BASEGAME),0)
     TARGETS += \
       $(B)/baseq3/vm/cgame.qvm \
       $(B)/baseq3/vm/qagame.qvm \
       $(B)/baseq3/vm/ui.qvm
+	endif
     ifneq ($(BUILD_MISSIONPACK),0)
       TARGETS += \
       $(B)/missionpack/vm/qagame.qvm \
@@ -856,6 +985,10 @@ else
 endif
 
 BASE_CFLAGS += -DPRODUCT_VERSION=\\\"$(VERSION)\\\"
+# Turtle Man
+BASE_CFLAGS += $(BUILD_DEFINES)
+CFLAGS += $(BUILD_DEFINES)
+TOOLS_CFLAGS += $(BUILD_DEFINES)
 
 ifeq ($(V),1)
 echo_cmd=@:
@@ -967,7 +1100,15 @@ release:
 # an informational message, then start building
 targets: makedirs
 	@echo ""
+ifeq ($(BUILD_IOQUAKE3),1)
 	@echo "Building ioquake3 in $(B):"
+else
+ifeq ($(BUILD_SONIC),1)
+	@echo "Building Sonic Blast Arena in $(B):"
+else
+	@echo "Building TMNT Arena in $(B):"
+endif
+endif
 	@echo "  PLATFORM: $(PLATFORM)"
 	@echo "  ARCH: $(ARCH)"
 	@echo "  VERSION: $(VERSION)"
@@ -1027,6 +1168,10 @@ makedirs:
 	@if [ ! -d $(B)/tools/rcc ];then $(MKDIR) $(B)/tools/rcc;fi
 	@if [ ! -d $(B)/tools/cpp ];then $(MKDIR) $(B)/tools/cpp;fi
 	@if [ ! -d $(B)/tools/lburg ];then $(MKDIR) $(B)/tools/lburg;fi
+#Turtle Man
+ifeq ($(BUILD_SPLINES),1)
+	@if [ ! -d $(B)/splines ];then $(MKDIR) $(B)/splines;fi
+endif
 
 #############################################################################
 # QVM BUILD TOOLS
@@ -1147,44 +1292,45 @@ $(Q3LCC): $(Q3LCCOBJ) $(Q3RCC) $(Q3CPP)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(TOOLS_CFLAGS) $(TOOLS_LDFLAGS) -o $@ $(Q3LCCOBJ) $(TOOLS_LIBS)
 
+#Turtle Man : Added $(BUILD_DEFINES) to the below 8 DO_* defines
 define DO_Q3LCC
 $(echo_cmd) "Q3LCC $<"
-$(Q)$(Q3LCC) -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_CGAME_Q3LCC
 $(echo_cmd) "CGAME_Q3LCC $<"
-$(Q)$(Q3LCC) -DCGAME -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DCGAME -o $@ $<
 endef
 
 define DO_GAME_Q3LCC
 $(echo_cmd) "GAME_Q3LCC $<"
-$(Q)$(Q3LCC) -DQAGAME -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DQAGAME -o $@ $<
 endef
 
 define DO_UI_Q3LCC
 $(echo_cmd) "UI_Q3LCC $<"
-$(Q)$(Q3LCC) -DUI -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DUI -o $@ $<
 endef
 
 define DO_Q3LCC_MISSIONPACK
 $(echo_cmd) "Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) -DMISSIONPACK -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -o $@ $<
 endef
 
 define DO_CGAME_Q3LCC_MISSIONPACK
 $(echo_cmd) "CGAME_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) -DMISSIONPACK -DCGAME -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DCGAME -o $@ $<
 endef
 
 define DO_GAME_Q3LCC_MISSIONPACK
 $(echo_cmd) "GAME_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) -DMISSIONPACK -DQAGAME -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DQAGAME -o $@ $<
 endef
 
 define DO_UI_Q3LCC_MISSIONPACK
 $(echo_cmd) "UI_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) -DMISSIONPACK -DUI -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DUI -o $@ $<
 endef
 
 
@@ -1199,6 +1345,53 @@ $(Q3ASM): $(Q3ASMOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(TOOLS_CFLAGS) $(TOOLS_LDFLAGS) -o $@ $^ $(TOOLS_LIBS)
 
+#############################################################################
+# SPLINES
+#############################################################################
+# Turtle Man
+
+SPLINESOBJ =
+
+ifeq ($(BUILD_SPLINES),1)
+
+SPLINESCFLAGS = -W -O2 -c -DNDEBUG -D_LIB
+
+# Only define on mingw32?
+ifeq ($(PLATFORM),mingw32)
+SPLINESCFLAGS += -DWIN32
+endif
+
+define DO_SPLINES_CXX
+$(echo_cmd) "SPLINES_CXX $<"
+$(Q)$(CXX) $(SPLINESCFLAGS) -o $@ $<
+endef
+
+$(B)/splines/%.o: $(SPLNDIR)/%.cpp
+	$(DO_SPLINES_CXX)
+
+SPLINESOBJ = \
+    $(B)/splines/math_angles.o\
+    $(B)/splines/math_matrix.o\
+    $(B)/splines/math_quaternion.o\
+    $(B)/splines/math_vector.o\
+    $(B)/splines/q_parse.o\
+    $(B)/splines/q_shared.o\
+    $(B)/splines/splines.o\
+    $(B)/splines/util_str.o
+
+# Set defaults
+ifndef AR
+AR=ar
+endif
+ifndef RANLIB
+RANLIB=ranlib
+endif
+
+$(B)/splines/libsplines.a: $(SPLINESOBJ)
+	$(echo_cmd) "LD $@"
+	$(AR) rc $@ $^
+	$(RANLIB) $@
+endif
 
 #############################################################################
 # CLIENT/SERVER
@@ -1473,17 +1666,35 @@ Q3POBJ += \
 Q3POBJ_SMP += \
   $(B)/clientsmp/sdl_glimp.o
 
-$(B)/ioquake3.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+#Turtle Man
+ifeq ($(BUILD_SPLINES),1)
+# TTimo: splines code requires C++ linking, but splines have
+# not been officially included in the codebase
+# Turtle Man: now it has, so use C++ linking.
+$(B)/tmntarena.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+	$(echo_cmd) "LD $@"
+	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
+		-o $@ $(Q3OBJ) $(Q3POBJ) \
+		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
+
+$(B)/tmntarena-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
+	$(echo_cmd) "LD $@"
+	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
+		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
+		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
+else
+$(B)/tmntarena.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 
-$(B)/ioquake3-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
+$(B)/tmntarena-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
 		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
+endif
 
 ifneq ($(strip $(LIBSDLMAIN)),)
 ifneq ($(strip $(LIBSDLMAINSRC)),)
@@ -1613,7 +1824,7 @@ else
     $(B)/ded/con_tty.o
 endif
 
-$(B)/ioq3ded.$(ARCH)$(BINEXT): $(Q3DOBJ)
+$(B)/tmntarena-ded.$(ARCH)$(BINEXT): $(Q3DOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3DOBJ) $(LIBS)
 
@@ -1649,6 +1860,10 @@ Q3CGOBJ_ = \
   \
   $(B)/baseq3/qcommon/q_math.o \
   $(B)/baseq3/qcommon/q_shared.o
+
+#Turtle Man
+Q3CGOBJ_ += $(B)/baseq3/cgame/cg_npcs.o
+
 
 Q3CGOBJ = $(Q3CGOBJ_) $(B)/baseq3/cgame/cg_syscalls.o
 Q3CGVMOBJ = $(Q3CGOBJ_:%.o=%.asm)
@@ -1693,6 +1908,9 @@ MPCGOBJ_ = \
   \
   $(B)/missionpack/qcommon/q_math.o \
   $(B)/missionpack/qcommon/q_shared.o
+
+#Turtle Man
+MPCGOBJ_ += $(B)/missionpack/cgame/cg_npcs.o
 
 MPCGOBJ = $(MPCGOBJ_) $(B)/missionpack/cgame/cg_syscalls.o
 MPCGVMOBJ = $(MPCGOBJ_:%.o=%.asm)
@@ -1747,6 +1965,13 @@ Q3GOBJ_ = \
   $(B)/baseq3/qcommon/q_math.o \
   $(B)/baseq3/qcommon/q_shared.o
 
+#Turtle Man
+Q3GOBJ_ += $(B)/baseq3/game/g_npc.o \
+  $(B)/baseq3/game/g_npcmove.o \
+  $(B)/baseq3/game/g_npcthink.o \
+  $(B)/baseq3/game/g_savestate.o \
+  $(B)/baseq3/game/g_paths.o
+
 Q3GOBJ = $(Q3GOBJ_) $(B)/baseq3/game/g_syscalls.o
 Q3GVMOBJ = $(Q3GOBJ_:%.o=%.asm)
 
@@ -1797,6 +2022,13 @@ MPGOBJ_ = \
   \
   $(B)/missionpack/qcommon/q_math.o \
   $(B)/missionpack/qcommon/q_shared.o
+
+#Turtle Man
+MPGOBJ_ += $(B)/missionpack/game/g_npc.o \
+  $(B)/missionpack/game/g_npcmove.o \
+  $(B)/missionpack/game/g_npcthink.o \
+  $(B)/missionpack/game/g_savestate.o \
+  $(B)/missionpack/game/g_paths.o
 
 MPGOBJ = $(MPGOBJ_) $(B)/missionpack/game/g_syscalls.o
 MPGVMOBJ = $(MPGOBJ_:%.o=%.asm)
@@ -2061,6 +2293,10 @@ OBJ = $(Q3OBJ) $(Q3POBJ) $(Q3POBJ_SMP) $(Q3DOBJ) \
   $(MPGVMOBJ) $(Q3GVMOBJ) $(Q3CGVMOBJ) $(MPCGVMOBJ) $(Q3UIVMOBJ) $(MPUIVMOBJ)
 TOOLSOBJ = $(LBURGOBJ) $(Q3CPPOBJ) $(Q3RCCOBJ) $(Q3LCCOBJ) $(Q3ASMOBJ)
 
+#Turtle Man
+ifeq ($(BUILD_SPLINES),1)
+OBJ+= $(SPLINESOBJ)
+endif
 
 copyfiles: release
 	@if [ ! -d $(COPYDIR)/baseq3 ]; then echo "You need to set COPYDIR to where your Quake3 data is!"; fi
@@ -2068,27 +2304,29 @@ copyfiles: release
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack
 
 ifneq ($(BUILD_CLIENT),0)
-	$(INSTALL) -s -m 0755 $(BR)/ioquake3.$(ARCH)$(BINEXT) $(COPYDIR)/ioquake3.$(ARCH)$(BINEXT)
+	$(INSTALL) -s -m 0755 $(BR)/tmntarena.$(ARCH)$(BINEXT) $(COPYDIR)/tmntarena.$(ARCH)$(BINEXT)
 endif
 
 # Don't copy the SMP until it's working together with SDL.
 #ifneq ($(BUILD_CLIENT_SMP),0)
-#	$(INSTALL) -s -m 0755 $(BR)/ioquake3-smp.$(ARCH)$(BINEXT) $(COPYDIR)/ioquake3-smp.$(ARCH)$(BINEXT)
+#	$(INSTALL) -s -m 0755 $(BR)/tmntarena-smp.$(ARCH)$(BINEXT) $(COPYDIR)/tmntarena-smp.$(ARCH)$(BINEXT)
 #endif
 
 ifneq ($(BUILD_SERVER),0)
-	@if [ -f $(BR)/ioq3ded.$(ARCH)$(BINEXT) ]; then \
-		$(INSTALL) -s -m 0755 $(BR)/ioq3ded.$(ARCH)$(BINEXT) $(COPYDIR)/ioq3ded.$(ARCH)$(BINEXT); \
+	@if [ -f $(BR)/tmntarena-ded.$(ARCH)$(BINEXT) ]; then \
+		$(INSTALL) -s -m 0755 $(BR)/tmntarena-ded.$(ARCH)$(BINEXT) $(COPYDIR)/tmntarena-ded.$(ARCH)$(BINEXT); \
 	fi
 endif
 
 ifneq ($(BUILD_GAME_SO),0)
+  ifneq ($(BUILD_BASEGAME),0)
 	$(INSTALL) -s -m 0755 $(BR)/baseq3/cgame$(ARCH).$(SHLIBEXT) \
 					$(COPYDIR)/baseq3/.
 	$(INSTALL) -s -m 0755 $(BR)/baseq3/qagame$(ARCH).$(SHLIBEXT) \
 					$(COPYDIR)/baseq3/.
 	$(INSTALL) -s -m 0755 $(BR)/baseq3/ui$(ARCH).$(SHLIBEXT) \
 					$(COPYDIR)/baseq3/.
+  endif
   ifneq ($(BUILD_MISSIONPACK),0)
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack
 	$(INSTALL) -s -m 0755 $(BR)/missionpack/cgame$(ARCH).$(SHLIBEXT) \
@@ -2144,10 +2382,10 @@ else
 endif
 
 dist:
-	rm -rf ioquake3-$(VERSION)
-	svn export . ioquake3-$(VERSION)
-	tar --owner=root --group=root --force-local -cjf ioquake3-$(VERSION).tar.bz2 ioquake3-$(VERSION)
-	rm -rf ioquake3-$(VERSION)
+	rm -rf tmntarena-$(VERSION)
+	svn export . tmntarena-$(VERSION)
+	tar --owner=root --group=root --force-local -cjf tmntarena-$(VERSION).tar.bz2 tmntarena-$(VERSION)
+	rm -rf tmntarena-$(VERSION)
 
 #############################################################################
 # DEPENDENCIES

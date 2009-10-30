@@ -47,9 +47,11 @@ static botSpawnQueue_t	botSpawnQueue[BOT_SPAWN_QUEUE_DEPTH];
 
 vmCvar_t bot_minplayers;
 
+#ifndef TMNTSP
 extern gentity_t	*podium1;
 extern gentity_t	*podium2;
 extern gentity_t	*podium3;
+#endif
 
 float trap_Cvar_VariableValue( const char *var_name ) {
 	char buf[128];
@@ -242,6 +244,12 @@ void G_AddRandomBot( int team ) {
 	num = 0;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
+#ifdef RANDOMBOT // Turtle Man: Random bot
+		// Skip random bot.
+		if ( !Q_stricmp( value, "Random" ) ) {
+			continue;
+		}
+#endif
 		//
 		for ( i=0 ; i< g_maxclients.integer ; i++ ) {
 			cl = level.clients + i;
@@ -265,6 +273,12 @@ void G_AddRandomBot( int team ) {
 	num = random() * num;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
+#ifdef RANDOMBOT // Turtle Man: Random bot
+		// Skip random bot.
+		if ( !Q_stricmp( value, "Random" ) ) {
+			continue;
+		}
+#endif
 		//
 		for ( i=0 ; i< g_maxclients.integer ; i++ ) {
 			cl = level.clients + i;
@@ -570,6 +584,29 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	char			*headmodel;
 	char			userinfo[MAX_INFO_STRING];
 
+#ifdef RANDOMBOT // Turtle Man: Random bot
+    // Turtle Man: Check for random bot.
+    if (Q_stricmp(name, "Random") == 0)
+    {
+#if 1 // Use Quake3's own code, it works better than mine...
+		if (Q_stricmp(team, "blue") == 0)
+			G_AddRandomBot(TEAM_BLUE);
+		else if (Q_stricmp(team, "red") == 0)
+			G_AddRandomBot(TEAM_RED);
+		else
+			G_AddRandomBot(TEAM_FREE);
+		return;
+#else
+        // Randomly select a bot.
+        // 0 though g_numBots-1
+        int num = (abs(rand())%g_numBots);
+
+        // Get info of randomly selected bot.
+        botinfo = G_GetBotInfoByNumber(num);
+#endif
+    }
+    else
+#endif
 	// get the botinfo from bots.txt
 	botinfo = G_GetBotInfoByName( name );
 	if ( !botinfo ) {
@@ -606,7 +643,11 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	key = "model";
 	model = Info_ValueForKey( botinfo, key );
 	if ( !*model ) {
+#ifdef TMNT // DEFAULT_MODEL
+		model = "raph/default";
+#else
 		model = "visor/default";
+#endif
 	}
 	Info_SetValueForKey( userinfo, key, model );
 	key = "team_model";
@@ -777,9 +818,15 @@ void Svcmd_BotList_f( void ) {
 			strcpy(funname, "");
 		}
 		strcpy(model, Info_ValueForKey( g_botInfos[i], "model" ));
+#ifdef TMNT // DEFAULT_MODEL
+		if ( !*model ) {
+			strcpy(model, "raph/default");
+		}
+#else
 		if ( !*model ) {
 			strcpy(model, "visor/default");
 		}
+#endif
 		strcpy(aifile, Info_ValueForKey( g_botInfos[i], "aifile"));
 		if (!*aifile ) {
 			strcpy(aifile, "bots/default_c.c");
@@ -801,9 +848,11 @@ static void G_SpawnBots( char *botList, int baseDelay ) {
 	int			delay;
 	char		bots[MAX_INFO_VALUE];
 
+#ifndef TMNTSP
 	podium1 = NULL;
 	podium2 = NULL;
 	podium3 = NULL;
+#endif
 
 	skill = trap_Cvar_VariableValue( "g_spSkill" );
 	if( skill < 1 ) {
@@ -977,6 +1026,24 @@ void G_InitBots( qboolean restart ) {
 			return;
 		}
 
+#ifdef TMNT // frag to score
+		strValue = Info_ValueForKey( arenainfo, "scorelimit" );
+		fragLimit = atoi( strValue );
+#ifdef TMNT_SUPPORTQ3
+		// Support Q3 "fraglimit" in arenas.txt
+		if ( !fragLimit )
+		{
+		strValue = Info_ValueForKey( arenainfo, "fraglimit" );
+		fragLimit = atoi( strValue );
+		}
+#endif
+		if ( fragLimit ) {
+			trap_Cvar_Set( "scorelimit", strValue );
+		}
+		else {
+			trap_Cvar_Set( "scorelimit", "0" );
+		}
+#else
 		strValue = Info_ValueForKey( arenainfo, "fraglimit" );
 		fragLimit = atoi( strValue );
 		if ( fragLimit ) {
@@ -985,6 +1052,7 @@ void G_InitBots( qboolean restart ) {
 		else {
 			trap_Cvar_Set( "fraglimit", "0" );
 		}
+#endif
 
 		strValue = Info_ValueForKey( arenainfo, "timelimit" );
 		timeLimit = atoi( strValue );
@@ -996,7 +1064,11 @@ void G_InitBots( qboolean restart ) {
 		}
 
 		if ( !fragLimit && !timeLimit ) {
+#ifdef TMNT // frag to score
+			trap_Cvar_Set( "scorelimit", "10" );
+#else
 			trap_Cvar_Set( "fraglimit", "10" );
+#endif
 			trap_Cvar_Set( "timelimit", "0" );
 		}
 

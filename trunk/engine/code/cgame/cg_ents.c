@@ -185,7 +185,11 @@ static void CG_General( centity_t *cent ) {
 
 	// player model
 	if (s1->number == cg.snap->ps.clientNum) {
+#ifdef IOQ3ZTM
+		ent.renderfx |= RF_ONLY_MIRROR;		// only draw from mirrors
+#else
 		ent.renderfx |= RF_THIRD_PERSON;	// only draw from mirrors
+#endif
 	}
 
 	// convert angles to axis
@@ -194,6 +198,165 @@ static void CG_General( centity_t *cent ) {
 	// add to refresh list
 	trap_R_AddRefEntityToScene (&ent);
 }
+
+#ifdef SINGLEPLAYER // entity
+static qboolean CG_ParseMD3AnimationFile( const char *filename, animation_t *anim ) {
+	char		fname[MAX_QPATH];
+	int			len;
+	char		*token;
+	float		fps;
+	char		text[10000], *text_p;
+	fileHandle_t	f;
+
+	strcpy(fname,filename);
+	text_p=fname+strlen(fname);
+	while (*text_p!='.' && *text_p!='\\' && text_p!=fname)
+		text_p--;
+	if (*text_p=='.')
+		*text_p=0;
+	Q_strcat(fname,sizeof(fname),".anim");
+	// load the file
+	len = trap_FS_FOpenFile( fname, &f, FS_READ );
+	if ( len <= 0 ) {
+		CG_Printf( "File %s too short (exists?)\n", fname );
+		return qfalse;
+	}
+	if ( len >= sizeof( text ) - 1 ) {
+		CG_Printf( "File %s too long\n", fname );
+		return qfalse;
+	}
+	trap_FS_Read( text, len, f );
+	text[len] = 0;
+	trap_FS_FCloseFile( f );
+	// parse the text
+	text_p=text;
+	token = COM_Parse( &text_p );
+	if ( !*token ) {
+		CG_Printf("%s%s\n",fname);
+		return qfalse;
+	}
+	anim->firstFrame = atoi( token );
+		token = COM_Parse( &text_p );
+	if ( !*token ) {
+		CG_Printf("%s%s\n",fname);
+		return qfalse;
+	}
+	anim->numFrames = atoi( token );
+		anim->reversed = qfalse;
+	anim->flipflop = qfalse;
+	// if numFrames is negative the animation is reversed
+	if (anim->numFrames < 0) {
+		anim->numFrames = -anim->numFrames;
+		anim->reversed = qtrue;
+	}
+		token = COM_Parse( &text_p );
+	if ( !*token ) {
+		CG_Printf("%s%s\n",fname);
+		return qfalse;
+	}
+	anim->loopFrames = atoi( token );
+		token = COM_Parse( &text_p );
+	if ( !*token ) {
+		CG_Printf("%s%s\n",fname);
+		return qfalse;
+	}
+	fps = atof( token );
+	if ( fps == 0 ) {
+		fps = 1;
+	}
+	anim->frameLerp = 1000 / fps;
+	anim->initialLerp = 1000 / fps;
+	return qtrue;
+}
+
+static void CG_ModelAnimate( centity_t *cent, int *md3Old, int *md3, float *md3BackLerp ) {
+	entityState_t		*s1;
+	lerpFrame_t *model=&cent->md3.model;
+	s1 = &cent->currentState;
+	if (cent->currentState.eFlags & EF_FORCE_END_FRAME ) {
+		cent->md3.state &= ~2;
+		cent->md3.state &= ~4;
+	}
+	if (s1->modelindex2!=cent->md3.lastCode)	// are we being triggered from the server?
+	{
+		cent->md3.lastCode=s1->modelindex2;
+		if (!(cent->md3.state & 2))	// is it animating?
+		{
+			cent->md3.state |= 4;	// show model
+			cent->md3.state |= 2;	// if not, activate animation
+			cent->md3.state ^= ANIM_TOGGLEBIT;
+			CG_ClearLerpFrameNPC(&cent->md3.anim, model, cent->md3.state & ANIM_TOGGLEBIT);
+		}
+	}
+	if (cent->currentState.eFlags & EF_FORCE_END_FRAME ) {
+		model->frame = model->animation->firstFrame; // + model->animation->numFrames - 1;
+		model->oldFrame = model->frame;
+		model->backlerp = 0;
+		cent->md3.state &= ~2;
+	}
+	if (cent->md3.state & 2)	// do we have to animate?
+	{
+		CG_RunLerpFrameNPC( &cent->md3.anim, model, cent->md3.state & ANIM_TOGGLEBIT, cent->md3.speed );
+		if (model->oldFrame==model->frame &&
+			model->frame==model->animation->numFrames+model->animation->firstFrame-1)	// finished?
+		{
+			cent->md3.state &= ~2;			// stop animation processing
+			if (s1->generic1 & 2)		// dissapear if HIDDEN_END is turned on
+				cent->md3.state &= ~4;
+		}
+	}
+	*md3Old = model->oldFrame;
+	*md3 = model->frame;
+	*md3BackLerp = model->backlerp;
+}
+
+/*
+==================
+CG_ModelAnim
+==================
+*/
+static void CG_ModelAnim( centity_t *cent ) {
+	refEntity_t			ent;
+	entityState_t		*s1;
+	s1 = &cent->currentState;
+	// if set to invisible, skip
+	if (!s1->modelindex) {
+		return;
+	}
+	if (!(cent->md3.state & 1))  // was animation config loaded?
+	{
+		const char *modelName;
+		modelName = CG_ConfigString( CS_MODELS+cg_entities[s1->number].currentState.modelindex );
+		if (!CG_ParseMD3AnimationFile(modelName,&cent->md3.anim))
+		{
+			// for debugging
+			cent->md3.anim.firstFrame=0;
+			cent->md3.anim.flipflop=0;
+			cent->md3.anim.frameLerp=100;
+			cent->md3.anim.initialLerp=100;
+			cent->md3.anim.loopFrames=10;
+			cent->md3.anim.numFrames=10;
+			cent->md3.anim.reversed=0;
+		}
+		cent->md3.state |= 1;
+		if (!(s1->generic1 & 1))	// show if HIDDEN_START is turned off
+			cent->md3.state|=4;
+
+		cent->md3.speed = (float)(s1->generic1 & 0xF0) / 16;
+	}
+	memset (&ent, 0, sizeof(ent));
+	CG_ModelAnimate(cent,&ent.oldframe,&ent.frame,&ent.backlerp);
+	if (!(cent->md3.state & 4))		// do nothing if visible flag is not set
+		return;
+	VectorCopy( cent->lerpOrigin, ent.origin);
+	VectorCopy( cent->lerpOrigin, ent.oldorigin);
+	ent.hModel = cgs.gameModels[s1->modelindex];
+	// convert angles to axis
+	AnglesToAxis( cent->lerpAngles, ent.axis );
+	// add to refresh list
+	trap_R_AddRefEntityToScene (&ent);
+}
+#endif
 
 /*
 ==================
@@ -259,11 +422,20 @@ static void CG_Item( centity_t *cent ) {
 
 	// items bob up and down continuously
 	scale = 0.005 + cent->currentState.number * 0.00001;
+#ifdef TMNT // CRATE
+	if (item->giType != IT_CRATE)
+#endif
 	cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
 
 	memset (&ent, 0, sizeof(ent));
 
+#ifdef TMNT // CRATE
+	if (item->giType == IT_CRATE)
+		; // Don't rotate automaticly.
+	else
+#endif
 	// autorotate at one of two speeds
+	// shurikenAngles
 	if ( item->giType == IT_HEALTH ) {
 		VectorCopy( cg.autoAnglesFast, cent->lerpAngles );
 		AxisCopy( cg.autoAxisFast, ent.axis );
@@ -315,10 +487,14 @@ static void CG_Item( centity_t *cent ) {
 
 	// items without glow textures need to keep a minimum light value
 	// so they are always visible
+#ifdef TMNT
+	ent.renderfx |= RF_MINLIGHT;
+#else
 	if ( ( item->giType == IT_WEAPON ) ||
 		 ( item->giType == IT_ARMOR ) ) {
 		ent.renderfx |= RF_MINLIGHT;
 	}
+#endif
 
 	// increase the size of the weapons when they are presented as items
 	if ( item->giType == IT_WEAPON ) {
@@ -397,6 +573,183 @@ static void CG_Item( centity_t *cent ) {
 
 //============================================================================
 
+#ifdef TMNTHOLDABLE
+/*
+===============
+RotateAroundDirection
+===============
+*/
+/*
+void RotateAroundDirection3( vec3_t axis[3], vec3_t angles ) {
+	vec3_t	temp;
+
+	// create an arbitrary axis[1]
+	PerpendicularVector( axis[1], axis[0] );
+
+#if 0
+	// rotate it around axis[0] by pitch
+	if ( angles[0] ) {
+		//vec3_t	temp;
+
+		VectorCopy( axis[0], temp );
+		RotatePointAroundVector( axis[0], axis[0], temp, angles[0] );
+	}
+#else
+	// rotate it around axis[1] by pitch
+	if ( angles[0] ) {
+		//vec3_t	temp;
+
+		VectorCopy( axis[0], temp );
+		RotatePointAroundVector( axis[0], axis[1], temp, angles[0] );
+	}
+#endif
+
+	// cross to get axis[2]
+	CrossProduct( axis[1], axis[0], axis[2] );
+
+	// rotate it around axis[0] by yaw
+	if ( angles[1] ) {
+		//vec3_t	temp;
+
+		VectorCopy( axis[1], temp );
+		RotatePointAroundVector( axis[1], axis[0], temp, angles[1] );
+	}
+
+	// cross to get axis[2]
+	CrossProduct( axis[0], axis[1], axis[2] );
+
+	// rotate it around axis[0] by roll
+	if ( angles[2] ) {
+		//vec3_t	temp;
+
+		VectorCopy( axis[2], temp );
+		RotatePointAroundVector( axis[2], axis[0], temp, angles[2] );
+	}
+}*/
+
+float vectoyaw( const vec3_t vec ) {
+	float	yaw;
+
+	if (vec[YAW] == 0 && vec[PITCH] == 0) {
+		yaw = 0;
+	} else {
+		if (vec[PITCH]) {
+			yaw = ( atan2( vec[YAW], vec[PITCH]) * 180 / M_PI );
+		} else if (vec[YAW] > 0) {
+			yaw = 90;
+		} else {
+			yaw = 270;
+		}
+		if (yaw < 0) {
+			yaw += 360;
+		}
+	}
+
+	return yaw;
+}
+
+
+/*
+===============
+CG_Shuriken
+Based on CG_MISSILE
+
+Turtle Man: FIXME: Finish rotating.
+===============
+*/
+static void CG_Shuriken( centity_t *cent, holdable_t holdable ) {
+	refEntity_t			ent;
+	entityState_t		*s1;
+	vec3_t dir;
+
+/*
+	// add trails
+	if ( weapon->missileTrailFunc )
+	{
+		weapon->missileTrailFunc( cent, weapon );
+	}
+
+	// add dynamic light
+	if ( weapon->missileDlight ) {
+		trap_R_AddLightToScene(cent->lerpOrigin, weapon->missileDlight,
+			weapon->missileDlightColor[0], weapon->missileDlightColor[1], weapon->missileDlightColor[2] );
+	}
+
+	// add missile sound
+	if ( weapon->missileSound ) {
+		vec3_t	velocity;
+
+		BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
+
+		trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, weapon->missileSound );
+	}
+*/
+
+	s1 = &cent->currentState;
+
+	// create the render entity
+	memset (&ent, 0, sizeof(ent));
+
+	VectorCopy( cent->lerpOrigin, ent.origin);
+	VectorCopy( cent->lerpOrigin, ent.oldorigin);
+
+	// flicker between two skins
+	ent.skinNum = cg.clientFrame & 1;
+
+	switch (holdable)
+	{
+		case HI_SHURIKEN:
+			ent.hModel = cgs.media.shurikenModel;
+			break;
+		case HI_FIRESHURIKEN:
+			ent.hModel = cgs.media.shurikenFireModel;
+			break;
+		case HI_ELECTRICSHURIKEN:
+			ent.hModel = cgs.media.shurikenElectricModel;
+			break;
+		case HI_LASERSHURIKEN:
+			ent.hModel = cgs.media.shurikenLaserModel;
+			break;
+		default:
+			ent.hModel = 0;
+			break;
+	}
+	ent.renderfx = RF_NOSHADOW;
+
+	// calculate the axis
+	// convert direction of travel into axis
+	if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
+		ent.axis[0][2] = 1;
+	}
+
+	ent.nonNormalizedAxes = qfalse;
+
+	//vectoangles( ent.axis[0], cent->lerpAngles );
+#if 1
+	VectorSubtract(s1->pos.trDelta, s1->pos.trBase, dir);
+	cent->lerpAngles[0] = cg.shurikenAngles[0];
+	cent->lerpAngles[1] = vectoyaw(dir)+90;//s1->angles[1];
+	cent->lerpAngles[2] = 0;//s1->angles[2];
+	AnglesToAxis( cent->lerpAngles, ent.axis );
+#else
+	//VectorCopy( s1->angles, cent->lerpAngles);
+	VectorCopy( cg.shurikenAngles, cent->lerpAngles );
+	AxisCopy( cg.shurikenAxis, ent.axis );
+#endif
+
+	// spin as it moves
+	if ( s1->pos.trType != TR_STATIONARY ) {
+		//RotateAroundDirection( ent.axis, cg.time / 4 );
+		//RotateAroundDirection( ent.axis, cent->lerpAngles[1]);
+	} else {
+		// Stuck in wall?
+	}
+
+	// add to refresh list, possibly with quad glow
+	CG_AddRefEntityWithPowerups( &ent, s1, TEAM_FREE );
+}
+#endif
+
 /*
 ===============
 CG_Missile
@@ -407,11 +760,34 @@ static void CG_Missile( centity_t *cent ) {
 	entityState_t		*s1;
 	const weaponInfo_t		*weapon;
 //	int	col;
+#ifdef TMNTHOLDABLE
+	int holdable;
 
 	s1 = &cent->currentState;
+	if ( s1->weapon >= WP_NUM_WEAPONS ) {
+		holdable = s1->weapon - WP_NUM_WEAPONS;
+		switch (holdable)
+		{
+			case HI_SHURIKEN:
+			case HI_FIRESHURIKEN:
+			case HI_ELECTRICSHURIKEN:
+			case HI_LASERSHURIKEN:
+				CG_Shuriken(cent, holdable);
+				return;
+			default:
+				s1->weapon = 0;
+		}
+	}
+#else
+	s1 = &cent->currentState;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
+	if ( s1->weapon >= WP_NUM_WEAPONS )
+#else
 	if ( s1->weapon > WP_NUM_WEAPONS ) {
+#endif
 		s1->weapon = 0;
 	}
+#endif
 	weapon = &cg_weapons[s1->weapon];
 
 	// calculate the axis
@@ -459,7 +835,11 @@ static void CG_Missile( centity_t *cent ) {
 	VectorCopy( cent->lerpOrigin, ent.origin);
 	VectorCopy( cent->lerpOrigin, ent.oldorigin);
 
+#ifdef TMNTWEAPONS
+	if ( cent->currentState.weapon == WP_ELECTRIC_LAUNCHER ) {
+#else
 	if ( cent->currentState.weapon == WP_PLASMAGUN ) {
+#endif
 		ent.reType = RT_SPRITE;
 		ent.radius = 16;
 		ent.rotation = 0;
@@ -473,7 +853,7 @@ static void CG_Missile( centity_t *cent ) {
 	ent.hModel = weapon->missileModel;
 	ent.renderfx = weapon->missileRenderfx | RF_NOSHADOW;
 
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 	if ( cent->currentState.weapon == WP_PROX_LAUNCHER ) {
 		if (s1->generic1 == TEAM_BLUE) {
 			ent.hModel = cgs.media.blueProxMine;
@@ -490,7 +870,7 @@ static void CG_Missile( centity_t *cent ) {
 	if ( s1->pos.trType != TR_STATIONARY ) {
 		RotateAroundDirection( ent.axis, cg.time / 4 );
 	} else {
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 		if ( s1->weapon == WP_PROX_LAUNCHER ) {
 			AnglesToAxis( cent->lerpAngles, ent.axis );
 		}
@@ -979,6 +1359,16 @@ static void CG_AddCEntity( centity_t *cent ) {
 	case ET_TEAM:
 		CG_TeamBase( cent );
 		break;
+#ifdef SP_NPC
+	case ET_NPC:
+		CG_NPC( cent );
+		break;
+#endif
+#ifdef SINGLEPLAYER // entity
+	case ET_MODELANIM:
+		CG_ModelAnim( cent );
+		break;
+#endif
 	}
 }
 
@@ -1019,6 +1409,14 @@ void CG_AddPacketEntities( void ) {
 
 	AnglesToAxis( cg.autoAngles, cg.autoAxis );
 	AnglesToAxis( cg.autoAnglesFast, cg.autoAxisFast );
+
+#ifdef TMNTHOLDABLE
+	cg.shurikenAngles[0] = ( cg.time & 2047 ) * 360 / 2048.0;
+	cg.shurikenAngles[1] = 0;
+	cg.shurikenAngles[2] = 0;
+
+	AnglesToAxis( cg.shurikenAngles, cg.shurikenAxis );
+#endif
 
 	// generate and add the entity from the playerstate
 	ps = &cg.predictedPlayerState;

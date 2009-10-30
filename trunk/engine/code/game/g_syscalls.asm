@@ -124,6 +124,7 @@ equ trap_EA_MoveLeft					-415
 equ trap_EA_MoveRight					-416
 
 equ trap_EA_SelectWeapon				-417
+equ trap_EA_DropWeapon				-417
 equ trap_EA_Jump						-418
 equ trap_EA_DelayedJump					-419
 equ trap_EA_Move						-420

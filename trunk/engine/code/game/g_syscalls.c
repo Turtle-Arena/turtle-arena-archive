@@ -399,9 +399,15 @@ void trap_EA_Attack(int client) {
 	syscall( BOTLIB_EA_ATTACK, client );
 }
 
+#ifdef TMNTHOLDSYS
+void trap_EA_Use(int client, int holdable) {
+	syscall( BOTLIB_EA_USE, client, holdable );
+}
+#else
 void trap_EA_Use(int client) {
 	syscall( BOTLIB_EA_USE, client );
 }
+#endif
 
 void trap_EA_Respawn(int client) {
 	syscall( BOTLIB_EA_RESPAWN, client );
@@ -435,9 +441,15 @@ void trap_EA_MoveRight(int client) {
 	syscall( BOTLIB_EA_MOVE_RIGHT, client );
 }
 
+#ifdef TMNTWEAPSYS2 // BOTLIB
+void trap_EA_DropWeapon(int client) {
+	syscall( BOTLIB_EA_DROP_WEAPON, client );
+}
+#else
 void trap_EA_SelectWeapon(int client, int weapon) {
 	syscall( BOTLIB_EA_SELECT_WEAPON, client, weapon );
 }
+#endif
 
 void trap_EA_Jump(int client) {
 	syscall( BOTLIB_EA_JUMP, client );

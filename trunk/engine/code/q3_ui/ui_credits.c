@@ -39,7 +39,7 @@ typedef struct {
 
 static creditsmenu_t	s_credits;
 
-
+#ifndef TMNT
 /*
 ===============
 UI_CreditMenu_Draw_ioq3
@@ -78,7 +78,7 @@ static void UI_CreditMenu_Draw_ioq3( void ) {
 
 	UI_DrawString( 320, 459, "http://www.ioquake3.org/", UI_CENTER|UI_SMALLFONT, color_red );
 }
-
+#endif
 
 /*
 =================
@@ -90,10 +90,13 @@ static sfxHandle_t UI_CreditMenu_Key( int key ) {
 		return 0;
 	}
 
+#ifndef TMNT
 	s_credits.frame++;
 	if (s_credits.frame == 1) {
 		s_credits.menu.draw = UI_CreditMenu_Draw_ioq3;
-	} else {
+	} else
+#endif
+	{
 		trap_Cmd_ExecuteText( EXEC_APPEND, "quit\n" );
 	}
 	return 0;
@@ -108,6 +111,42 @@ UI_CreditMenu_Draw
 static void UI_CreditMenu_Draw( void ) {
 	int		y;
 
+#ifdef TMNT
+	// Credit id software and ioquake3, and legal stuff.
+	y = 72;
+	UI_DrawProportionalString( 320, y, "Credits", UI_CENTER|UI_SMALLFONT, color_white );
+
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "id Software - www.idsoftware.com", UI_CENTER|UI_SMALLFONT, color_white );
+
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "ioquake3 - www.ioquake3.org", UI_CENTER|UI_SMALLFONT, color_white );
+
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "Turtle Man", UI_CENTER|UI_SMALLFONT, color_white );
+
+	// Gap.
+	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
+
+	// This is a unoffial game.
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "Copyright", UI_CENTER|UI_SMALLFONT, color_white );
+
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "This is a fangame there is no connection to", UI_CENTER|UI_SMALLFONT, color_white );
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "Mirage Studios, Konami, 4KidsTV, or anyone else.", UI_CENTER|UI_SMALLFONT, color_white );
+
+	// Copyright.
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "TMNT(c) 1984-2009 Mirage Studios", UI_CENTER|UI_SMALLFONT, color_white );
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "TMNT Arena(c) 2009 Turtle Man", UI_CENTER|UI_SMALLFONT, color_white );
+
+	// Gap.
+	//y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
+	//UI_DrawProportionalString( 320, y, "This game should not be sold.", UI_CENTER|UI_SMALLFONT, color_TMNTred );
+#else
 	y = 12;
 	UI_DrawProportionalString( 320, y, "id Software is:", UI_CENTER|UI_SMALLFONT, color_white );
 
@@ -157,6 +196,7 @@ static void UI_CreditMenu_Draw( void ) {
 	UI_DrawString( 320, y, "To order: 1-800-idgames     www.quake3arena.com     www.idsoftware.com", UI_CENTER|UI_SMALLFONT, color_red );
 	y += SMALLCHAR_HEIGHT;
 	UI_DrawString( 320, y, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color_red );
+#endif
 }
 
 

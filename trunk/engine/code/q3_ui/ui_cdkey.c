@@ -31,6 +31,7 @@ CD KEY MENU
 
 #include "ui_local.h"
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 
 #define ART_FRAME		"menu/art/cut_frame"
 #define ART_ACCEPT0		"menu/art/accept_0"
@@ -289,3 +290,5 @@ UI_CDKeyMenu_f
 void UI_CDKeyMenu_f( void ) {
 	UI_CDKeyMenu();
 }
+
+#endif // IOQUAKE3 // Turtle Man: CDKEY
