@@ -167,7 +167,7 @@ qhandle_t RE_RegisterModel( const char *name ) {
 		if(!buf.u)
 		{
 #ifdef IOQ3ZTM // Always atemp to load MDR first!
-			// We didn't say we wanted a mdr model, so try MD3.
+			// They didn't say we wanted a mdr model, so try MD3.
 			if (Q_stricmp(fext, "mdr") != 0)
 			{
 				//ri.Printf (PRINT_WARNING,"RE_RegisterModel: couldn't load %s\n", namebuf);

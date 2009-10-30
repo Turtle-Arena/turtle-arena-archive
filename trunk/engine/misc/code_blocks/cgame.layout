@@ -1,25 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="" />
-	<File name="..\..\code\cgame\cg_ents.c" open="0" top="0" tabpos="0">
-		<Cursor position="5513" topLine="194" />
-	</File>
-	<File name="..\..\code\cgame\cg_event.c" open="0" top="0" tabpos="0">
-		<Cursor position="3687" topLine="139" />
-	</File>
-	<File name="..\..\code\cgame\cg_local.h" open="0" top="0" tabpos="0">
-		<Cursor position="6797" topLine="263" />
-	</File>
-	<File name="..\..\code\cgame\cg_main.c" open="0" top="0" tabpos="0">
-		<Cursor position="38122" topLine="989" />
-	</File>
-	<File name="..\..\code\game\bg_public.h" open="0" top="0" tabpos="0">
-		<Cursor position="42407" topLine="1585" />
-	</File>
-	<File name="..\..\code\qcommon\q_math.c" open="0" top="0" tabpos="0">
-		<Cursor position="8261" topLine="155" />
-	</File>
-	<File name="..\..\code\qcommon\q_shared.h" open="0" top="0" tabpos="0">
-		<Cursor position="16662" topLine="587" />
+	<File name="..\..\code\ui\ui_shared.c" open="0" top="0" tabpos="0">
+		<Cursor position="42770" topLine="1731" />
 	</File>
 </CodeBlocks_layout_file>

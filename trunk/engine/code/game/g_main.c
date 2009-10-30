@@ -68,7 +68,9 @@ vmCvar_t	g_doWarmup;
 vmCvar_t	g_restarted;
 vmCvar_t	g_logfile;
 vmCvar_t	g_logfileSync;
+#ifndef NOBLOOD
 vmCvar_t	g_blood;
+#endif
 vmCvar_t	g_podiumDist;
 vmCvar_t	g_podiumDrop;
 vmCvar_t	g_allowVote;
@@ -171,10 +173,12 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_debugDamage, "g_debugDamage", "0", 0, 0, qfalse },
 	{ &g_debugAlloc, "g_debugAlloc", "0", 0, 0, qfalse },
 	{ &g_motd, "g_motd", "", 0, 0, qfalse },
-#ifndef NOTRATEDM // Turtle Man: Default to no blood.
+#ifndef NOBLOOD
+#ifdef NOTRATEDM // Turtle Man: Default to no blood.
 	{ &g_blood, "com_blood", "0", 0, 0, qfalse },
 #else
 	{ &g_blood, "com_blood", "1", 0, 0, qfalse },
+#endif
 #endif
 
 	{ &g_podiumDist, "g_podiumDist", "80", 0, 0, qfalse },

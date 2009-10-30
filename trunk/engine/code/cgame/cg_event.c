@@ -143,7 +143,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	case MOD_TRIGGER_HURT:
 		message = "was in the wrong place";
 		break;
-#ifdef TMNTENTITIES
+#ifdef STYEF_ENTITY
 	case MOD_EXPLOSION:
 		message = "was in the explosion";
 #endif
@@ -565,8 +565,8 @@ static void CG_UseItem( centity_t *cent ) {
 #ifdef TMNTHOLDABLE // Turtle Man: Holdable
 	// Turtle Man: Play shuriken use sound
 	case HI_SHURIKEN:
-	case HI_ELECTRICSHURIKEN:
 	case HI_FIRESHURIKEN:
+	case HI_ELECTRICSHURIKEN:
 		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.shurikenSound );
 		break;
 	case HI_LASERSHURIKEN:
@@ -666,7 +666,7 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	cent->pe.painDirection ^= 1;
 }
 
-#ifdef TMNTENTITIES // non free
+#ifdef STYEF_ENTITY // non free
 /*
 CG_Chunks
 
@@ -1213,7 +1213,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_USE_ITEM14");
 		CG_UseItem( cent );
 		break;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Use holdable 15
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use holdable 15?
 	case EV_USE_ITEM15:
 		DEBUGNAME("EV_USE_ITEM15");
 		CG_UseItem( cent );
@@ -1320,7 +1320,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_SCOREPLUM");
 		CG_ScorePlum( cent->currentState.otherEntityNum, cent->lerpOrigin, cent->currentState.time );
 		break;
-#ifdef TMNTENTITIES // non free
+#ifdef STYEF_ENTITY // non free
 	case EV_FX_CHUNKS:
 		DEBUGNAME("EV_FX_CHUNKS");
 		//UnVectorShort( cent->currentState.angles2 );
@@ -1604,7 +1604,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	default:
 		DEBUGNAME("UNKNOWN");
+#ifdef IOQ3ZTM
+		CG_Error( "Unknown event: %i (max=%i)", event, EV_MAX);
+#else
 		CG_Error( "Unknown event: %i", event );
+#endif
 		break;
 	}
 

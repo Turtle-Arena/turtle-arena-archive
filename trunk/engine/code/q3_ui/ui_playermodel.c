@@ -191,7 +191,9 @@ static void PlayerModel_UpdateModel( void )
 
 	UI_PlayerInfo_SetModel( &s_playermodel.playerinfo, s_playermodel.modelskin );
 #ifdef TMNTWEAPSYS
-	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, s_playermodel.playerinfo.weapon, qfalse );
+	Com_Printf("PlayerModel_UpdateModel: pre-weapon=%i\n", s_playermodel.playerinfo.weapon);
+	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playermodel.playerinfo.weapon), viewangles, moveangles, s_playermodel.playerinfo.weapon, qfalse );
+	Com_Printf("PlayerModel_UpdateModel: after-weapon=%i\n", s_playermodel.playerinfo.weapon);
 #else
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, WP_MACHINEGUN, qfalse );
 #endif
@@ -206,8 +208,10 @@ static void PlayerModel_SaveChanges( void )
 {
 	trap_Cvar_Set( "model", s_playermodel.modelskin );
 	trap_Cvar_Set( "headmodel", s_playermodel.modelskin );
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
 	trap_Cvar_Set( "team_model", s_playermodel.modelskin );
 	trap_Cvar_Set( "team_headmodel", s_playermodel.modelskin );
+#endif
 }
 
 /*
@@ -257,6 +261,9 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 
 	switch (key)
 	{
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+		case K_MOUSE2:
+#endif
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
 			m = Menu_ItemAtCursor(&s_playermodel.menu);
@@ -304,7 +311,9 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 			}
 			break;
 			
+#ifndef TMNTMISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
+#endif
 		case K_ESCAPE:
 			PlayerModel_SaveChanges();
 			break;
@@ -430,7 +439,7 @@ static void PlayerModel_BuildList( void )
 			continue;
 			
 		// iterate all skin files in directory
-#ifdef IOQ3ZTM // Turtle Man: TODO: Is there a better way to list all image files? (tga/png/jpg/Ect.)
+#ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "", filelist, 2048 );
 #else
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );

@@ -98,11 +98,34 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define SORT_GAME			3
 #define SORT_PING			4
 
+#ifdef TMNT // MP_GAMETYPES
+#define GAMES_ALL			0
+#define GAMES_FFA			1
+#define GAMES_TOURNEY		2
+#define GAMES_COOP			3
+#define GAMES_TEAMPLAY		4
+#define GAMES_CTF			5
+#ifdef MISSIONPACK
+#define GAMES_1FCTF			6
+#define GAMES_OBELISK		7
+#ifdef MISSIONPACK_HARVESTER
+#define GAMES_HARVESTER		8
+#endif // MISSIONPACK_HARVESTER
+#endif // MISSIONPACK
+#else
 #define GAMES_ALL			0
 #define GAMES_FFA			1
 #define GAMES_TEAMPLAY		2
 #define GAMES_TOURNEY		3
 #define GAMES_CTF			4
+#ifdef MISSIONPACK
+#define GAMES_1FCTF			5
+#define GAMES_OBELISK		6
+#ifdef MISSIONPACK_HARVESTER
+#define GAMES_HARVESTER		7
+#endif // MISSIONPACK_HARVESTER
+#endif // MISSIONPACK
+#endif
 
 static const char *master_items[] = {
 	"Local",
@@ -118,16 +141,26 @@ static const char *master_items[] = {
 static const char *servertype_items[] = {
 	"All",
 	"Free For All",
+#ifndef TMNT // MP_GAMETYPES
 	"Team Deathmatch",
+#endif
 #ifdef TMNTMISC // tornament to duel
 	"Duel",
 #else
 	"Tournament",
 #endif
-	"Capture the Flag",
-#ifdef TMNTSP
+#ifdef TMNT // MP_GAMETYPES
 	"Cooperative",
+	"Team Deathmatch",
 #endif
+	"Capture the Flag",
+#ifdef MISSIONPACK
+	"1 Flag CTF",
+	"Overload",
+#ifdef MISSIONPACK_HARVESTER
+	"Harvester",
+#endif // MISSIONPACK_HARVESTER
+#endif // MISSIONPACK
 	NULL
 };
 
@@ -143,23 +176,41 @@ static const char *sortkey_items[] = {
 static char* gamenames[] = {
 	"DM ",	// deathmatch
 	"1v1",	// tournament
+#ifdef TMNTSP
+	"Co-op",	// single player
+#else
 	"SP ",	// single player
+#endif
 	"Team DM",	// team deathmatch
 	"CTF",	// capture the flag
 	"One Flag CTF",		// one flag ctf
 	"OverLoad",				// Overload
 	"Harvester",			// Harvester
+#ifndef TMNT
 	"Rocket Arena 3",	// Rocket Arena 3
 	"Q3F",						// Q3F
 	"Urban Terror",		// Urban Terror
 	"OSP",						// Orange Smoothie Productions
+#endif
 	"???",			// unknown
 	NULL
 };
+#ifdef IOQ3ZTM // Net gametype browse
+#ifdef TMNT
+int numNetGametypes = 8; // 7 + unknown
+#else
+int numNetGametypes = 12; // 11 + unknown
+#endif
+#endif
 
 static char* netnames[] = {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
+	"??? ",
+	"UDP ",
+#else
 	"???",
 	"UDP",
+#endif
 	"UDP6",
 	NULL
 };
@@ -526,11 +577,13 @@ static void ArenaServers_UpdateMenu( void ) {
 			}
 			break;
 
+#ifndef TMNT // MP_GAMETYPES
 		case GAMES_TEAMPLAY:
 			if( servernodeptr->gametype != GT_TEAM ) {
 				continue;
 			}
 			break;
+#endif
 
 		case GAMES_TOURNEY:
 			if( servernodeptr->gametype != GT_TOURNAMENT ) {
@@ -538,11 +591,46 @@ static void ArenaServers_UpdateMenu( void ) {
 			}
 			break;
 
+#ifdef TMNT // MP_GAMETYPES
+		case GAMES_COOP:
+			if( servernodeptr->gametype != GT_SINGLE_PLAYER ) {
+				continue;
+			}
+			break;
+
+		case GAMES_TEAMPLAY:
+			if( servernodeptr->gametype != GT_TEAM ) {
+				continue;
+			}
+			break;
+#endif
+
 		case GAMES_CTF:
 			if( servernodeptr->gametype != GT_CTF ) {
 				continue;
 			}
 			break;
+
+#ifdef MISSIONPACK // MP_GAMETYPES
+		case GAMES_1FCTF:
+			if( servernodeptr->gametype != GT_1FCTF ) {
+				continue;
+			}
+			break;
+
+		case GAMES_OBELISK:
+			if( servernodeptr->gametype != GT_OBELISK ) {
+				continue;
+			}
+			break;
+#ifdef MISSIONPACK_HARVESTER
+		case GAMES_HARVESTER:
+			if( servernodeptr->gametype != GT_HARVESTER ) {
+				continue;
+			}
+			break;
+#endif
+#endif
 		}
 
 		if( servernodeptr->pingtime < servernodeptr->minPing ) {
@@ -562,12 +650,20 @@ static void ArenaServers_UpdateMenu( void ) {
 		}
 
 #ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
+		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s%s%3d " S_COLOR_YELLOW "%s",
+#else
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s %s%3d " S_COLOR_YELLOW "%s", 
+#endif
 			servernodeptr->hostname, servernodeptr->mapname, servernodeptr->numclients,
  			servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime, servernodeptr->bPB ? "Yes" : "No" );
 #else // Turtle Man: No punkbuster
+#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
+		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s%s%3d " S_COLOR_YELLOW "",
+#else
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s %s%3d " S_COLOR_YELLOW "",
+#endif
 			servernodeptr->hostname, servernodeptr->mapname, servernodeptr->numclients,
  			servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime);
@@ -676,11 +772,15 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 
 	Q_strncpyz( servernodeptr->hostname, Info_ValueForKey( info, "hostname"), MAX_HOSTNAMELENGTH );
 	Q_CleanStr( servernodeptr->hostname );
+#ifndef IOQ3ZTM // Allow lower case hostnames.
 	Q_strupr( servernodeptr->hostname );
+#endif
 
 	Q_strncpyz( servernodeptr->mapname, Info_ValueForKey( info, "mapname"), MAX_MAPNAMELENGTH );
 	Q_CleanStr( servernodeptr->mapname );
+#ifndef IOQ3ZTM // Breaks on linux without pak files.
 	Q_strupr( servernodeptr->mapname );
+#endif
 
 	servernodeptr->numclients = atoi( Info_ValueForKey( info, "clients") );
 	servernodeptr->maxclients = atoi( Info_ValueForKey( info, "sv_maxclients") );
@@ -714,9 +814,15 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	if( i < 0 ) {
 		i = 0;
 	}
+#ifdef IOQ3ZTM // Net gametype browse
+	else if (i > numNetGametypes) {
+		i = numNetGametypes;
+	}
+#else
 	else if( i > 11 ) {
 		i = 12;
 	}
+#endif
 	if( *s ) {
 		servernodeptr->gametype = i;//-1;
 		Q_strncpyz( servernodeptr->gamename, s, sizeof(servernodeptr->gamename) );
@@ -1064,17 +1170,44 @@ static void ArenaServers_StartRefresh( void )
 			strcpy( myargs, " ffa" );
 			break;
 
+#ifndef TMNT // MP_GAMETYPES
 		case GAMES_TEAMPLAY:
 			strcpy( myargs, " team" );
 			break;
+#endif
 
 		case GAMES_TOURNEY:
 			strcpy( myargs, " tourney" );
 			break;
 
+#ifdef TMNT // MP_GAMETYPES
+		case GAMES_COOP:
+			strcpy( myargs, " coop" );
+			break;
+
+		case GAMES_TEAMPLAY:
+			strcpy( myargs, " team" );
+			break;
+#endif
+
 		case GAMES_CTF:
 			strcpy( myargs, " ctf" );
 			break;
+
+#ifdef MISSIONPACK // MP_GAMETYPES
+		case GAMES_1FCTF:
+			strcpy( myargs, " 1flag" );
+			break;
+
+		case GAMES_OBELISK:
+			strcpy( myargs, " overload" );
+			break;
+#ifdef MISSIONPACK_HARVESTER
+		case GAMES_OBELISK:
+			strcpy( myargs, " harvester" );
+			break;
+#endif
+#endif
 		}
 
 

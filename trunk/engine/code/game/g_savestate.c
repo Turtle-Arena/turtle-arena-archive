@@ -111,7 +111,8 @@ void WriteMinimumClient(fileHandle_t f, int clnum);
 void ReadMinimumClient(fileHandle_t f, int clnum);
 
 #if 1 // GPL CODE
-//#define ALLOW_MINIMUM_SAVE // No longer needed.
+#define ALLOW_MINIMUM_SAVE // No longer needed, but is still used to autosave levels...
+// it allows cheating...
 
 /*
 G_SaveGame
@@ -345,7 +346,7 @@ void G_LoadGame(fileHandle_t f, int map_loaded)
 				{
 					if (last < MAX_CLIENTS)
 					{
-						trap_DropClient( last, "Not in savegame." );
+						trap_DropClient( last, "Client not in savegame." );
 					} else
 					{
 						G_FreeEntity( &g_entities[last] );
@@ -410,14 +411,14 @@ void G_LoadGame(fileHandle_t f, int map_loaded)
 	    int j;
 		for (j = 0; j < MAX_CLIENTS; j++)
 		{
-			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
-			if (i < 0)
+			readInt(&j, f); // trap_FS_Read (&j, sizeof(j), f);
+			if (j < 0)
 				break;
-			if (i > MAX_CLIENTS) {
+			if (j > MAX_CLIENTS) {
 				trap_FS_FCloseFile( f ); // Must close before G_Error?
 				G_Error( "G_LoadGame: clientnum out of range\n" );
 			}
-			ReadMinimumClient(f, i);
+			ReadMinimumClient(f, j);
 		}
 	}
 #endif
@@ -426,7 +427,7 @@ void G_LoadGame(fileHandle_t f, int map_loaded)
 
 	return;
 }
-#else // Turtle Man: FIXME: NON-GPL CODE
+#else // Turtle Man: FIXME: NON-GPL CODE // Can I remove this yet?
 /*
 ===============
 G_SaveGame
@@ -738,7 +739,7 @@ void G_LoadGame(fileHandle_t f, int map_loaded)
 	trap_Cvar_Set( "ui_singlePlayerActive", "1" );
 }
 #endif
-#ifndef SINGLEPLAYER // New GPL version ...
+#if 0 // #ifndef SINGLEPLAYER // New GPL version ...
 void WriteEntity(fileHandle_t f, gentity_t *ent)
 {
 	// ...

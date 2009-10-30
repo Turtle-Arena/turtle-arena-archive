@@ -33,8 +33,8 @@ int forceModelModificationCount = -1;
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
-#ifdef IOQ3ZTM_NO_COMPATIBILITY
-int CG_ViewType(int entityNum); // CG_VIEW_TYPE
+#ifdef IOQ3ZTM2
+int CG_ViewType(void); // CG_VIEW_TYPE
 #endif
 
 
@@ -77,9 +77,9 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 	case CG_EVENT_HANDLING:
 		CG_EventHandling(arg0);
 		return 0;
-#ifdef IOQ3ZTM_NO_COMPATIBILITY
+#ifdef IOQ3ZTM2
 	case CG_VIEW_TYPE:
-		return CG_ViewType(arg0);
+		return CG_ViewType();
 #endif
 	default:
 		CG_Error( "vmMain: unknown command %i", command );
@@ -175,7 +175,9 @@ vmCvar_t 	cg_stats;
 vmCvar_t 	cg_buildScript;
 vmCvar_t 	cg_forceModel;
 vmCvar_t	cg_paused;
+#ifndef NOBLOOD
 vmCvar_t	cg_blood;
+#endif
 vmCvar_t	cg_predictItems;
 vmCvar_t	cg_deferPlayers;
 vmCvar_t	cg_drawTeamOverlay;
@@ -245,7 +247,11 @@ static cvarTable_t cvarTable[] = {
 #endif
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
+#ifdef TMNTMISC // FOV
+	{ &cg_fov, "cg_fov", "70", CVAR_ARCHIVE },
+#else
 	{ &cg_fov, "cg_fov", "90", CVAR_ARCHIVE },
+#endif
 	{ &cg_viewsize, "cg_viewsize", "100", CVAR_ARCHIVE },
 	{ &cg_shadows, "cg_shadows", "1", CVAR_ARCHIVE  },
 #ifndef NOTRATEDM // No gibs.
@@ -253,7 +259,7 @@ static cvarTable_t cvarTable[] = {
 #endif
 	{ &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE  },
 	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE  },
-#ifdef TMNTMISC // IOQ3ZTM ?
+#ifdef TMNTMISC // Show the time on the HUD.
 	{ &cg_drawTimer, "cg_drawTimer", "1", CVAR_ARCHIVE  },
 #else
 	{ &cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE  },
@@ -305,8 +311,8 @@ static cvarTable_t cvarTable[] = {
 #ifdef ANALOG // cg var
 	{ &cg_thirdPersonAnalog, "cg_thirdPersonAnalog", "1", 0 },
 #endif
-#ifdef IOQ3ZTM // Turtle Man: I want to play with these vars...
-	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", 0 },
+#ifdef TMNTMISC // FOV
+	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "70", 0 },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", 0 },
 #else
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
@@ -337,10 +343,12 @@ static cvarTable_t cvarTable[] = {
 	// but we also reference them here
 	{ &cg_buildScript, "com_buildScript", "0", 0 },	// force loading of all possible data amd error on failures
 	{ &cg_paused, "cl_paused", "0", CVAR_ROM },
-#ifndef NOTRATEDM // Turtle Man: Default to no blood.
+#ifndef NOBLOOD
+#ifdef NOTRATEDM // Turtle Man: Default to no blood.
 	{ &cg_blood, "com_blood", "0", CVAR_ARCHIVE },
 #else
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
+#endif
 #endif
 	{ &cg_synchronousClients, "g_synchronousClients", "0", 0 },	// communicated by systeminfo
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
@@ -382,8 +390,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
 	{ &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
 #ifdef TMNTWEAPONS
-	{ &cg_oldRocket, "cg_oldRocket", "0", CVAR_ARCHIVE},
-	{ &cg_oldPlasma, "cg_oldPlasma", "1", CVAR_ARCHIVE},
+	{ &cg_oldRocket, "cg_oldRocket", "1", CVAR_ARCHIVE},
+	{ &cg_oldPlasma, "cg_oldPlasma", "0", CVAR_ARCHIVE},
 #else
 	{ &cg_oldRail, "cg_oldRail", "1", CVAR_ARCHIVE},
 	{ &cg_oldRocket, "cg_oldRocket", "1", CVAR_ARCHIVE},
@@ -422,8 +430,10 @@ void CG_RegisterCvars( void ) {
 #endif
 	trap_Cvar_Register(NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 	trap_Cvar_Register(NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
 	trap_Cvar_Register(NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 	trap_Cvar_Register(NULL, "team_headmodel", DEFAULT_TEAM_HEAD, CVAR_USERINFO | CVAR_ARCHIVE );
+#endif
 }
 
 /*																																			
@@ -950,7 +960,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.botSkillShaders[3] = trap_R_RegisterShader( "menu/art/skill4.tga" );
 	cgs.media.botSkillShaders[4] = trap_R_RegisterShader( "menu/art/skill5.tga" );
 
+#ifndef NOBLOOD
 	cgs.media.viewBloodShader = trap_R_RegisterShader( "viewBloodBlend" );
+#endif
 
 	cgs.media.deferShader = trap_R_RegisterShaderNoMip( "gfx/2d/defer.tga" );
 
@@ -967,7 +979,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.blueProxMine = trap_R_RegisterModel( "models/weaphits/proxmineb.md3" );
 #endif
 	cgs.media.plasmaBallShader = trap_R_RegisterShader( "sprites/plasma1" );
+#ifndef NOTRATEDM // No gibs.
 	cgs.media.bloodTrailShader = trap_R_RegisterShader( "bloodTrail" );
+#endif
 	cgs.media.lagometerShader = trap_R_RegisterShader("lagometer" );
 	cgs.media.connectionShader = trap_R_RegisterShader( "disconnected" );
 
@@ -993,8 +1007,11 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.invisShader = trap_R_RegisterShader("powerups/invisibility" );
 	cgs.media.regenShader = trap_R_RegisterShader("powerups/regen" );
 	cgs.media.hastePuffShader = trap_R_RegisterShader("hasteSmokePuff" );
+#ifdef TMNT // EF_TELE_EFFECT
+	cgs.media.playerTeleportShader = trap_R_RegisterShader("playerTeleportEffect" );
+#endif
 
-#ifdef TMNTENTITIES
+#ifdef STYEF_ENTITY
 	// Load models for chunks
 	for (i = 0; i < NUM_CHUNKS; i++)
 	{
@@ -1044,7 +1061,7 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.blueFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/blue.skin" );
 #endif // TMNTDATASYS
 #ifdef MISSIONPACK
-#ifndef TMNTDATASYS
+#ifndef TMNTDATASYS // TMNT supports MISSIONPACK CTF flags
 		cgs.media.flagPoleModel = trap_R_RegisterModel( "models/flag2/flagpole.md3" );
 		cgs.media.flagFlapModel = trap_R_RegisterModel( "models/flag2/flagflap3.md3" );
 
@@ -1082,6 +1099,8 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.flag_animations[FLAG_STAND2RUN].frameLerp = 1000 / 15;
 		cgs.media.flag_animations[FLAG_STAND2RUN].initialLerp = 1000 / 15;
 		cgs.media.flag_animations[FLAG_STAND2RUN].reversed = qtrue;
+		//FLAG_RUNUP
+		//FLAG_RUNDOWN
 #endif
 	}
 
@@ -1110,6 +1129,14 @@ static void CG_RegisterGraphics( void ) {
 	}
 #endif
 
+#ifdef TMNTWEAPSYS // MELEE_TRAIL
+	cgs.media.weaponTrailShader = trap_R_RegisterShader( "weaponTrail" );
+	if (!cgs.media.flagFlapModel)
+	{
+		cgs.media.flagFlapModel = trap_R_RegisterModel( "models/flag2/flagflap3.md3" );
+	}
+#endif
+
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	cgs.media.redKamikazeShader = trap_R_RegisterShader( "models/weaphits/kamikred" );
 #endif
@@ -1117,7 +1144,19 @@ static void CG_RegisterGraphics( void ) {
 #endif
 
 	if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
+#ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
+		// Elite Force uses this.
+		cgs.media.blueFriendShader = trap_R_RegisterShader( "sprites/team_blue" );
+		cgs.media.friendShader = trap_R_RegisterShader( "sprites/team_red" );
+#ifdef TMNT_SUPPORTQ3 // Fall back to Q3 friend shader
+		if (!cgs.media.friendShader)
+		{
+			cgs.media.friendShader = trap_R_RegisterShader( "sprites/foe" );
+		}
+#endif
+#else
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/foe" );
+#endif
 #ifndef TMNT // POWERS
 		cgs.media.redQuadShader = trap_R_RegisterShader("powerups/blueflag" );
 #endif
@@ -1164,7 +1203,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.balloonShader = trap_R_RegisterShader( "sprites/balloon3" );
 #endif
 
+#ifndef NOBLOOD
 	cgs.media.bloodExplosionShader = trap_R_RegisterShader( "bloodExplosion" );
+#endif
 #ifdef TMNTWEAPONS
 	cgs.media.meleeHit1Shader = trap_R_RegisterShader( "meleeHit1" );
 	cgs.media.meleeHit2Shader = trap_R_RegisterShader( "meleeHit2" );
@@ -2056,6 +2097,7 @@ void CG_AssetCache( void ) {
 	//Assets.background = trap_R_RegisterShaderNoMip( ASSET_BACKGROUND );
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
 	cgDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	cgDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
 	cgDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	cgDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
@@ -2064,6 +2106,7 @@ void CG_AssetCache( void ) {
 	cgDC.Assets.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
 	cgDC.Assets.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
 	cgDC.Assets.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
+#endif
 	cgDC.Assets.scrollBar = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
 	cgDC.Assets.scrollBarArrowDown = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
 	cgDC.Assets.scrollBarArrowUp = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
@@ -2114,7 +2157,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CG_InitConsoleCommands();
 
 #ifdef TMNTHOLDSYS2
-	cg.holdableSelect = HI_NONE;
+	cg.holdableSelect = HI_NO_SELECT;
 #endif
 #ifdef TMNTWEAPSYS
 	// Turtle Man: Select our default weapon.
@@ -2205,10 +2248,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	trap_S_ClearLoopingSounds( qtrue );
 }
 
-#ifdef IOQ3ZTM_NO_COMPATIBILITY
+#ifdef IOQ3ZTM2
 /*
 =================
-CG_Shutdown
+CG_ViewType
 
 Called by CG_VIEW_TYPE.
 
@@ -2217,12 +2260,8 @@ Return 1 if in third person.
 Return 2 if in third person using analog control.
 =================
 */
-int CG_ViewType(int entityNum)
+int CG_ViewType(void)
 {
-	(void)entityNum;
-	// entityNum is THIS player.
-	//if (entityNum == cg.clientNum)
-	{
 #ifdef ANALOG
 		if (cg.renderingThirdPerson)
 		{
@@ -2235,7 +2274,6 @@ int CG_ViewType(int entityNum)
 #endif
 
 		return cg.renderingThirdPerson;
-	}
 }
 #endif
 

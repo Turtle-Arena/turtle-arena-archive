@@ -650,8 +650,10 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 #endif
 	}
 	Info_SetValueForKey( userinfo, key, model );
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
 	key = "team_model";
 	Info_SetValueForKey( userinfo, key, model );
+#endif
 #ifdef TMNTSP // SPMODEL
 	key = "spmodel";
 	Info_SetValueForKey( userinfo, key, model );

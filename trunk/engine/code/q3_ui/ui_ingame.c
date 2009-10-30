@@ -46,6 +46,10 @@ INGAME MENU
 #define ID_QUIT					17
 #define ID_RESUME				18
 #define ID_TEAMORDERS			19
+#ifdef TMNTMISC // SMART_JOIN_MENU
+#define ID_JOINGAME				20
+#define ID_SPECTATE				21
+#endif
 
 
 typedef struct {
@@ -110,6 +114,18 @@ void InGame_Event( void *ptr, int notification ) {
 	case ID_TEAM:
 		UI_TeamMainMenu();
 		break;
+
+#ifdef TMNTMISC // SMART_JOIN_MENU
+	case ID_JOINGAME:
+		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team free\n" );
+		UI_ForceMenuOff();
+		break;
+
+	case ID_SPECTATE:
+		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team spectator\n" );
+		UI_ForceMenuOff();
+		break;
+#endif
 
 	case ID_SETUP:
 		UI_SetupMenu();
@@ -178,6 +194,47 @@ void InGame_MenuInit( void ) {
 
 	//y = 96;
 	y = 88;
+#ifdef TMNTMISC // SMART_JOIN_MENU
+	if( (trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
+		s_ingame.team.generic.type			= MTYPE_PTEXT;
+		s_ingame.team.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+		s_ingame.team.generic.x				= 320;
+		s_ingame.team.generic.y				= y;
+		s_ingame.team.generic.id			= ID_TEAM;
+		s_ingame.team.generic.callback		= InGame_Event;
+		s_ingame.team.string				= "START";
+		s_ingame.team.color					= color_red;
+		s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
+	}
+	else {
+		trap_GetClientState( &cs );
+		trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
+		team = atoi( Info_ValueForKey( info, "t" ) );
+		if( team == TEAM_SPECTATOR ) {
+			s_ingame.team.generic.type			= MTYPE_PTEXT;
+			s_ingame.team.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+			s_ingame.team.generic.x				= 320;
+			s_ingame.team.generic.y				= y;
+			s_ingame.team.generic.id			= ID_JOINGAME;
+			s_ingame.team.generic.callback		= InGame_Event;
+			s_ingame.team.string				= "JOIN GAME";
+			s_ingame.team.color					= color_red;
+			s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
+		}
+		else
+		{
+			s_ingame.team.generic.type			= MTYPE_PTEXT;
+			s_ingame.team.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+			s_ingame.team.generic.x				= 320;
+			s_ingame.team.generic.y				= y;
+			s_ingame.team.generic.id			= ID_SPECTATE;
+			s_ingame.team.generic.callback		= InGame_Event;
+			s_ingame.team.string				= "SPECTATE";
+			s_ingame.team.color					= color_red;
+			s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
+		}
+	}
+#else
 	s_ingame.team.generic.type			= MTYPE_PTEXT;
 	s_ingame.team.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_ingame.team.generic.x				= 320;
@@ -187,6 +244,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.team.string				= "START";
 	s_ingame.team.color					= color_red;
 	s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
+#endif
 
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.addbots.generic.type		= MTYPE_PTEXT;

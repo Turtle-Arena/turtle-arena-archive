@@ -72,29 +72,33 @@ endif
 #
 # Start build type
 #
+# Common Defines;
 # -DIOQUAKE3  - Enables CD key check and punkbuster code
 # -DIOQ3ZTM   - Misc changes and "fixes" that I always want to be enabled.
-#                 It was part of the TMNT define before.
-# -DIOQ3ZTM_NO_COMPATIBLITY - Breaks compatiblity with normal Q3 and Q3 mods.
-# -DNOTRATEDM - Disable stuff in Quake3 engine that made it rated M. (blood, gibs, strong lang)
-#            This however doesn't change the gamedata, like the botfiles strong lang, bloody textures, ect
+# -DIOQ3ZTM2  - Breaks compatiblity with Q3 mod qvms. CG_Error("vmMain: unknown command 9")
+#								It fixes checking if we are in first person in sound code.
+# -DIOQ3ZTM3  - It moves Q_acos from qcommon/common.c to qcommon/q_math.c. Now in vms "acos" is just "acos" not Q_acos.
+#					Breaks compatibliy with mods?
+# -DIOQ3ZTM_NO_TEAM_MODEL - Could messup Team Arena, unsure.
+# -DNOTRATEDM - Disable stuff in Quake3 engine that made it rated M. (disable blood, remove gibs, remove strong lang)
+#            This however doesn't change the gamedata, like the botfiles strong lang, bloody textures, etc
+#			 NOTE: This can be defined without defining "NOBLOOD"
 #            Turtle Man: TODO: Rename this define to ...?
+# -DNOBLOOD - Removes blood, if this is defined "NOTRATEDM" must also be.
 #
 ifeq ($(BUILD_IOQUAKE3),1)
 
     ifeq ($(BUILD_REALIOQUAKE3),1)
-	    # Build real ioquake3.
+		# Build unmodified ioquake3.
 	    BUILD_DEFINES=-DIOQUAKE3
 	else
-		# Modified ioquake3
-		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPATIBILITY -DNOTRATEDM
-
-		# Reuse TMNT system stuff.
-		BUILD_DEFINES += -DTMNTWEAPSYS -DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS -DTMNTDATASYS
-
+		# Build modified ioquake3
+		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM2 -DNOTRATEDM -DNOBLOOD \
+							-DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS
     endif
 
-	BASEQ3_FLAGS =
+	BASEGAME=baseq3
+	BASEGAME_FLAGS =
 	MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
 
 else # END QUAKE3
@@ -106,13 +110,13 @@ ifeq ($(BUILD_SONIC),1)
 	#  Should it be its own EXE or a mod for TMNT Arena? (or (io)qauke3 mod?)...
 	# Someday I hope do more work on this, but it is outside of my goal of a TMNT fangame...
 
-	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPATIBILITY -DNOTRATEDM
+	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM2 -DNOTRATEDM -DNOBLOOD \
+						-DTHIRD_PERSON
 
 	# Sonic only stuff.
 	BUILD_DEFINES += -DSONIC -DSONICWEAPONS
 
 	# Reuse TMNT system stuff.
-	BUILD_DEFINES += -DTHIRD_PERSON
 	BUILD_DEFINES += -DTMNTMISC -DTMNTWEAPSYS -DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS -DTMNTDATASYS
 
 	USE_CODEC_VORBIS=1
@@ -123,7 +127,8 @@ ifeq ($(BUILD_SONIC),1)
 		BUILD_MISSIONPACK=0
 	endif
 
-	BASEQ3_FLAGS =
+	BASEGAME=basesonic
+	BASEGAME_FLAGS =
 	MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
 
 else # END SONIC
@@ -133,17 +138,19 @@ else # END SONIC
 	#  - All of this can be overriden by makefile.local.
 	###################################################################
 
+	# Notes; it can be compiled with as few as 2 defines (-DSTANDALONE -DTMNT) it will not work well however.
+
 	# Music will be ogg vorbis, after there is some, that is...
 	USE_CODEC_VORBIS=1
 
-	# This should always be on in TMNT (but can be over-riden). (Currently unused...)
-	BUILD_SPLINES=1
+	# Currently unused...
+	#BUILD_SPLINES=1
 
 	# TMNT defines
 	# -DTMNTHUD only effects quake3 hud, not missionpack hud
-	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPATIBILITY -DNOTRATEDM
-	BUILD_DEFINES += -DTHIRD_PERSON
-	BUILD_DEFINES += -DTMNT -DTMNTMISC -DTMNTHUD -DTMNTSP -DTMNTHOLDSYS -DTMNTHOLDABLE \
+	BUILD_DEFINES = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM2 -DIOQ3ZTM3 -DNOTRATEDM -DNOBLOOD \
+						-DTHIRD_PERSON -DIOQ3ZTM_NO_TEAM_MODEL \
+					-DTMNT -DTMNTMISC -DTMNTHUD -DTMNTSP -DTMNTHOLDSYS -DTMNTHOLDABLE \
 						-DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS -DTMNTPLAYERSYS -DTMNTPLAYERS\
 						-DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
 						-DTMNTDATASYS -DTMNTDATA
@@ -164,8 +171,7 @@ else # END SONIC
 	BUILD_DEFINES+=-DTMNTHOLDSYS2BOT
 
 	# Non-GPL code. Needs rewrite/removal.
-	# 				 # HOMING (search word), TMNTWEAPONS homing rocket
-	# -DTMNTENTITIES # CODE IS DIRECTLY OR IS BASED ON non-free code FROM STY:EF
+	# -DSTYEF_ENTITY # CODE IS DIRECTLY OR IS BASED ON non-free code FROM STY:EF
 	# -DSINGLEPLAYER # Mostly rewritten now by TMNTSP. It still has savegames, and misc_model_anim.
 	#                Savegames will be GPL sometime, and misc_model_anim is going to be rewrite
 	#                 by misc_object (That can animate and be damaged, and maybe respawn, and maybe spawn item on death)
@@ -174,9 +180,16 @@ else # END SONIC
 	# Enable Raven MDR (Based on id's MD4) model support. (I may use MDR for my player models)
 	BUILD_DEFINES+=-DRAVENMD4
 
-	# TMNT Arena currently use MISSIONPACK game/cgame and BASEQ3 ui
-	BASEQ3_FLAGS =
-	MISSIONPACK_FLAGS = -DMISSIONPACK #-DMISSIONPACK_HUD
+	# TMNT Arena currently use MISSIONPACK game/cgame and baseq3-based ui
+	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3",
+	BASEGAME=base
+	BASEGAME_FLAGS= -DMISSIONPACK
+	MISSIONPACK_FLAGS= -DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
+
+	# Disable building scriptable hud and scriptable ui version
+	ifneq ($BUILD_MISSIONPACK),1)
+		BUILD_MISSIONPACK=0
+	endif
 
 endif # BUILD_SONIC
 endif # BUILD_IOQUAKE3
@@ -955,9 +968,9 @@ endif
 ifneq ($(BUILD_GAME_SO),0)
   ifneq ($(BUILD_BASEGAME),0)
   TARGETS += \
-    $(B)/baseq3/cgame$(ARCH).$(SHLIBEXT) \
-    $(B)/baseq3/qagame$(ARCH).$(SHLIBEXT) \
-    $(B)/baseq3/ui$(ARCH).$(SHLIBEXT)
+	$(B)/$(BASEGAME)/cgame$(ARCH).$(SHLIBEXT) \
+	$(B)/$(BASEGAME)/qagame$(ARCH).$(SHLIBEXT) \
+	$(B)/$(BASEGAME)/ui$(ARCH).$(SHLIBEXT)
   endif
   ifneq ($(BUILD_MISSIONPACK),0)
     TARGETS += \
@@ -971,9 +984,9 @@ ifneq ($(BUILD_GAME_QVM),0)
   ifneq ($(CROSS_COMPILING),1)
     ifneq ($(BUILD_BASEGAME),0)
     TARGETS += \
-      $(B)/baseq3/vm/cgame.qvm \
-      $(B)/baseq3/vm/qagame.qvm \
-      $(B)/baseq3/vm/ui.qvm
+      $(B)/$(BASEGAME)/vm/cgame.qvm \
+      $(B)/$(BASEGAME)/vm/qagame.qvm \
+      $(B)/$(BASEGAME)/vm/ui.qvm
 	endif
     ifneq ($(BUILD_MISSIONPACK),0)
       TARGETS += \
@@ -1018,8 +1031,9 @@ endif
 BASE_CFLAGS += -DPRODUCT_VERSION=\\\"$(VERSION)\\\"
 # Turtle Man
 BASE_CFLAGS += $(BUILD_DEFINES)
-CFLAGS += $(BUILD_DEFINES)
-TOOLS_CFLAGS += $(BUILD_DEFINES)
+NOTSHLIBCFLAGS += $(BUILD_DEFINES)
+SHLIBCFLAGS += $(BUILD_DEFINES)
+#TOOLS_CFLAGS += $(BUILD_DEFINES)
 
 ifeq ($(V),1)
 echo_cmd=@:
@@ -1050,25 +1064,25 @@ endif
 
 define DO_SHLIB_CC
 $(echo_cmd) "SHLIB_CC $<"
-$(Q)$(CC) $(BASEQ3_FLAGS) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(BASEGAME_FLAGS) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_GAME_CC
 $(echo_cmd) "GAME_CC $<"
-$(Q)$(CC) $(BASEQ3_FLAGS) -DQAGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(BASEGAME_FLAGS) -DQAGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_CGAME_CC
 $(echo_cmd) "CGAME_CC $<"
-$(Q)$(CC) $(BASEQ3_FLAGS) -DCGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(BASEGAME_FLAGS) -DCGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_UI_CC
 $(echo_cmd) "UI_CC $<"
-$(Q)$(CC) $(BASEQ3_FLAGS) -DUI $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(BASEGAME_FLAGS) -DUI $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
@@ -1181,18 +1195,26 @@ makedirs:
 	@if [ ! -d $(B)/client ];then $(MKDIR) $(B)/client;fi
 	@if [ ! -d $(B)/clientsmp ];then $(MKDIR) $(B)/clientsmp;fi
 	@if [ ! -d $(B)/ded ];then $(MKDIR) $(B)/ded;fi
-	@if [ ! -d $(B)/baseq3 ];then $(MKDIR) $(B)/baseq3;fi
-	@if [ ! -d $(B)/baseq3/cgame ];then $(MKDIR) $(B)/baseq3/cgame;fi
-	@if [ ! -d $(B)/baseq3/game ];then $(MKDIR) $(B)/baseq3/game;fi
-	@if [ ! -d $(B)/baseq3/ui ];then $(MKDIR) $(B)/baseq3/ui;fi
-	@if [ ! -d $(B)/baseq3/qcommon ];then $(MKDIR) $(B)/baseq3/qcommon;fi
-	@if [ ! -d $(B)/baseq3/vm ];then $(MKDIR) $(B)/baseq3/vm;fi
+ifneq ($(BUILD_BASEGAME),0)
+	@if [ ! -d $(B)/$(BASEGAME) ];then $(MKDIR) $(B)/$(BASEGAME);fi
+	@if [ ! -d $(B)/$(BASEGAME)/cgame ];then $(MKDIR) $(B)/$(BASEGAME)/cgame;fi
+	@if [ ! -d $(B)/$(BASEGAME)/game ];then $(MKDIR) $(B)/$(BASEGAME)/game;fi
+	@if [ ! -d $(B)/$(BASEGAME)/ui ];then $(MKDIR) $(B)/$(BASEGAME)/ui;fi
+	@if [ ! -d $(B)/$(BASEGAME)/qcommon ];then $(MKDIR) $(B)/$(BASEGAME)/qcommon;fi
+	@if [ ! -d $(B)/$(BASEGAME)/vm ];then $(MKDIR) $(B)/$(BASEGAME)/vm;fi
+endif
+
 	@if [ ! -d $(B)/missionpack ];then $(MKDIR) $(B)/missionpack;fi
+ifneq ($(BUILD_MISSIONPACK),0)
 	@if [ ! -d $(B)/missionpack/cgame ];then $(MKDIR) $(B)/missionpack/cgame;fi
 	@if [ ! -d $(B)/missionpack/game ];then $(MKDIR) $(B)/missionpack/game;fi
 	@if [ ! -d $(B)/missionpack/ui ];then $(MKDIR) $(B)/missionpack/ui;fi
 	@if [ ! -d $(B)/missionpack/qcommon ];then $(MKDIR) $(B)/missionpack/qcommon;fi
 	@if [ ! -d $(B)/missionpack/vm ];then $(MKDIR) $(B)/missionpack/vm;fi
+else
+# Need dir for ui_syscalls.o
+	@if [ ! -d $(B)/missionpack/ui ];then $(MKDIR) $(B)/missionpack/ui;fi
+endif
 	@if [ ! -d $(B)/tools ];then $(MKDIR) $(B)/tools;fi
 	@if [ ! -d $(B)/tools/asm ];then $(MKDIR) $(B)/tools/asm;fi
 	@if [ ! -d $(B)/tools/etc ];then $(MKDIR) $(B)/tools/etc;fi
@@ -1323,45 +1345,44 @@ $(Q3LCC): $(Q3LCCOBJ) $(Q3RCC) $(Q3CPP)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(TOOLS_CFLAGS) $(TOOLS_LDFLAGS) -o $@ $(Q3LCCOBJ) $(TOOLS_LIBS)
 
-#Turtle Man : Added $(BUILD_DEFINES) to the below 8 DO_* defines
 define DO_Q3LCC
 $(echo_cmd) "Q3LCC $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -o $@ $<
+$(Q)$(Q3LCC) $(BASEGAME_FLAGS) $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_CGAME_Q3LCC
 $(echo_cmd) "CGAME_Q3LCC $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DCGAME -o $@ $<
+$(Q)$(Q3LCC) $(BASEGAME_FLAGS) -DCGAME $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_GAME_Q3LCC
 $(echo_cmd) "GAME_Q3LCC $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DQAGAME -o $@ $<
+$(Q)$(Q3LCC) $(BASEGAME_FLAGS) -DQAGAME $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_UI_Q3LCC
 $(echo_cmd) "UI_Q3LCC $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DUI -o $@ $<
+$(Q)$(Q3LCC) $(BASEGAME_FLAGS) -DUI $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_Q3LCC_MISSIONPACK
 $(echo_cmd) "Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DMISSIONPACK_UI -o $@ $<
+$(Q)$(Q3LCC) $(MISSIONPACK_FLAGS) $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_CGAME_Q3LCC_MISSIONPACK
 $(echo_cmd) "CGAME_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DMISSIONPACK_UI -DCGAME -o $@ $<
+$(Q)$(Q3LCC) $(MISSIONPACK_FLAGS) -DCGAME $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_GAME_Q3LCC_MISSIONPACK
 $(echo_cmd) "GAME_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DMISSIONPACK_UI -DQAGAME -o $@ $<
+$(Q)$(Q3LCC) $(MISSIONPACK_FLAGS) -DQAGAME $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_UI_Q3LCC_MISSIONPACK
 $(echo_cmd) "UI_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DMISSIONPACK_UI -DUI -o $@ $<
+$(Q)$(Q3LCC) $(MISSIONPACK_FLAGS) -DUI $(BUILD_DEFINES) -o $@ $<
 endef
 
 
@@ -1862,49 +1883,50 @@ $(B)/tmntarena-ded.$(ARCH)$(BINEXT): $(Q3DOBJ)
 
 
 #############################################################################
-## BASEQ3 CGAME
+## BASEGAME CGAME
 #############################################################################
 
 Q3CGOBJ_ = \
-  $(B)/baseq3/cgame/cg_main.o \
-  $(B)/baseq3/cgame/bg_misc.o \
-  $(B)/baseq3/cgame/bg_pmove.o \
-  $(B)/baseq3/cgame/bg_slidemove.o \
-  $(B)/baseq3/cgame/bg_lib.o \
-  $(B)/baseq3/cgame/cg_consolecmds.o \
-  $(B)/baseq3/cgame/cg_draw.o \
-  $(B)/baseq3/cgame/cg_drawtools.o \
-  $(B)/baseq3/cgame/cg_effects.o \
-  $(B)/baseq3/cgame/cg_ents.o \
-  $(B)/baseq3/cgame/cg_event.o \
-  $(B)/baseq3/cgame/cg_info.o \
-  $(B)/baseq3/cgame/cg_localents.o \
-  $(B)/baseq3/cgame/cg_marks.o \
-  $(B)/baseq3/cgame/cg_particles.o \
-  $(B)/baseq3/cgame/cg_players.o \
-  $(B)/baseq3/cgame/cg_playerstate.o \
-  $(B)/baseq3/cgame/cg_predict.o \
-  $(B)/baseq3/cgame/cg_scoreboard.o \
-  $(B)/baseq3/cgame/cg_servercmds.o \
-  $(B)/baseq3/cgame/cg_snapshot.o \
-  $(B)/baseq3/cgame/cg_view.o \
-  $(B)/baseq3/cgame/cg_weapons.o \
+  $(B)/$(BASEGAME)/cgame/cg_main.o \
+  $(B)/$(BASEGAME)/cgame/bg_misc.o \
+  $(B)/$(BASEGAME)/cgame/bg_pmove.o \
+  $(B)/$(BASEGAME)/cgame/bg_slidemove.o \
+  $(B)/$(BASEGAME)/cgame/bg_lib.o \
+  $(B)/$(BASEGAME)/cgame/cg_consolecmds.o \
+  $(B)/$(BASEGAME)/cgame/cg_newdraw.o \
+  $(B)/$(BASEGAME)/cgame/cg_draw.o \
+  $(B)/$(BASEGAME)/cgame/cg_drawtools.o \
+  $(B)/$(BASEGAME)/cgame/cg_effects.o \
+  $(B)/$(BASEGAME)/cgame/cg_ents.o \
+  $(B)/$(BASEGAME)/cgame/cg_event.o \
+  $(B)/$(BASEGAME)/cgame/cg_info.o \
+  $(B)/$(BASEGAME)/cgame/cg_localents.o \
+  $(B)/$(BASEGAME)/cgame/cg_marks.o \
+  $(B)/$(BASEGAME)/cgame/cg_particles.o \
+  $(B)/$(BASEGAME)/cgame/cg_players.o \
+  $(B)/$(BASEGAME)/cgame/cg_playerstate.o \
+  $(B)/$(BASEGAME)/cgame/cg_predict.o \
+  $(B)/$(BASEGAME)/cgame/cg_scoreboard.o \
+  $(B)/$(BASEGAME)/cgame/cg_servercmds.o \
+  $(B)/$(BASEGAME)/cgame/cg_snapshot.o \
+  $(B)/$(BASEGAME)/cgame/cg_view.o \
+  $(B)/$(BASEGAME)/cgame/cg_weapons.o \
   \
-  $(B)/baseq3/qcommon/q_math.o \
-  $(B)/baseq3/qcommon/q_shared.o
+  $(B)/$(BASEGAME)/qcommon/q_math.o \
+  $(B)/$(BASEGAME)/qcommon/q_shared.o
 
 #Turtle Man
-Q3CGOBJ_ += $(B)/baseq3/cgame/cg_npcs.o
+Q3CGOBJ_ += $(B)/$(BASEGAME)/cgame/cg_npcs.o
 
 
-Q3CGOBJ = $(Q3CGOBJ_) $(B)/baseq3/cgame/cg_syscalls.o
+Q3CGOBJ = $(Q3CGOBJ_) $(B)/$(BASEGAME)/cgame/cg_syscalls.o
 Q3CGVMOBJ = $(Q3CGOBJ_:%.o=%.asm)
 
-$(B)/baseq3/cgame$(ARCH).$(SHLIBEXT): $(Q3CGOBJ)
+$(B)/$(BASEGAME)/cgame$(ARCH).$(SHLIBEXT): $(Q3CGOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3CGOBJ)
 
-$(B)/baseq3/vm/cgame.qvm: $(Q3CGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
+$(B)/$(BASEGAME)/vm/cgame.qvm: $(Q3CGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(Q3CGVMOBJ) $(CGDIR)/cg_syscalls.asm
 
@@ -1959,60 +1981,60 @@ $(B)/missionpack/vm/cgame.qvm: $(MPCGVMOBJ) $(CGDIR)/cg_syscalls.asm $(Q3ASM)
 
 
 #############################################################################
-## BASEQ3 GAME
+## BASEGAME GAME
 #############################################################################
 
 Q3GOBJ_ = \
-  $(B)/baseq3/game/g_main.o \
-  $(B)/baseq3/game/ai_chat.o \
-  $(B)/baseq3/game/ai_cmd.o \
-  $(B)/baseq3/game/ai_dmnet.o \
-  $(B)/baseq3/game/ai_dmq3.o \
-  $(B)/baseq3/game/ai_main.o \
-  $(B)/baseq3/game/ai_team.o \
-  $(B)/baseq3/game/ai_vcmd.o \
-  $(B)/baseq3/game/bg_misc.o \
-  $(B)/baseq3/game/bg_pmove.o \
-  $(B)/baseq3/game/bg_slidemove.o \
-  $(B)/baseq3/game/bg_lib.o \
-  $(B)/baseq3/game/g_active.o \
-  $(B)/baseq3/game/g_arenas.o \
-  $(B)/baseq3/game/g_bot.o \
-  $(B)/baseq3/game/g_client.o \
-  $(B)/baseq3/game/g_cmds.o \
-  $(B)/baseq3/game/g_combat.o \
-  $(B)/baseq3/game/g_items.o \
-  $(B)/baseq3/game/g_mem.o \
-  $(B)/baseq3/game/g_misc.o \
-  $(B)/baseq3/game/g_missile.o \
-  $(B)/baseq3/game/g_mover.o \
-  $(B)/baseq3/game/g_session.o \
-  $(B)/baseq3/game/g_spawn.o \
-  $(B)/baseq3/game/g_svcmds.o \
-  $(B)/baseq3/game/g_target.o \
-  $(B)/baseq3/game/g_team.o \
-  $(B)/baseq3/game/g_trigger.o \
-  $(B)/baseq3/game/g_utils.o \
-  $(B)/baseq3/game/g_weapon.o \
+  $(B)/$(BASEGAME)/game/g_main.o \
+  $(B)/$(BASEGAME)/game/ai_chat.o \
+  $(B)/$(BASEGAME)/game/ai_cmd.o \
+  $(B)/$(BASEGAME)/game/ai_dmnet.o \
+  $(B)/$(BASEGAME)/game/ai_dmq3.o \
+  $(B)/$(BASEGAME)/game/ai_main.o \
+  $(B)/$(BASEGAME)/game/ai_team.o \
+  $(B)/$(BASEGAME)/game/ai_vcmd.o \
+  $(B)/$(BASEGAME)/game/bg_misc.o \
+  $(B)/$(BASEGAME)/game/bg_pmove.o \
+  $(B)/$(BASEGAME)/game/bg_slidemove.o \
+  $(B)/$(BASEGAME)/game/bg_lib.o \
+  $(B)/$(BASEGAME)/game/g_active.o \
+  $(B)/$(BASEGAME)/game/g_arenas.o \
+  $(B)/$(BASEGAME)/game/g_bot.o \
+  $(B)/$(BASEGAME)/game/g_client.o \
+  $(B)/$(BASEGAME)/game/g_cmds.o \
+  $(B)/$(BASEGAME)/game/g_combat.o \
+  $(B)/$(BASEGAME)/game/g_items.o \
+  $(B)/$(BASEGAME)/game/g_mem.o \
+  $(B)/$(BASEGAME)/game/g_misc.o \
+  $(B)/$(BASEGAME)/game/g_missile.o \
+  $(B)/$(BASEGAME)/game/g_mover.o \
+  $(B)/$(BASEGAME)/game/g_session.o \
+  $(B)/$(BASEGAME)/game/g_spawn.o \
+  $(B)/$(BASEGAME)/game/g_svcmds.o \
+  $(B)/$(BASEGAME)/game/g_target.o \
+  $(B)/$(BASEGAME)/game/g_team.o \
+  $(B)/$(BASEGAME)/game/g_trigger.o \
+  $(B)/$(BASEGAME)/game/g_utils.o \
+  $(B)/$(BASEGAME)/game/g_weapon.o \
   \
-  $(B)/baseq3/qcommon/q_math.o \
-  $(B)/baseq3/qcommon/q_shared.o
+  $(B)/$(BASEGAME)/qcommon/q_math.o \
+  $(B)/$(BASEGAME)/qcommon/q_shared.o
 
 #Turtle Man
-Q3GOBJ_ += $(B)/baseq3/game/g_npc.o \
-  $(B)/baseq3/game/g_npcmove.o \
-  $(B)/baseq3/game/g_npcthink.o \
-  $(B)/baseq3/game/g_savestate.o \
-  $(B)/baseq3/game/g_paths.o
+Q3GOBJ_ += $(B)/$(BASEGAME)/game/g_npc.o \
+  $(B)/$(BASEGAME)/game/g_npcmove.o \
+  $(B)/$(BASEGAME)/game/g_npcthink.o \
+  $(B)/$(BASEGAME)/game/g_savestate.o \
+  $(B)/$(BASEGAME)/game/g_paths.o
 
-Q3GOBJ = $(Q3GOBJ_) $(B)/baseq3/game/g_syscalls.o
+Q3GOBJ = $(Q3GOBJ_) $(B)/$(BASEGAME)/game/g_syscalls.o
 Q3GVMOBJ = $(Q3GOBJ_:%.o=%.asm)
 
-$(B)/baseq3/qagame$(ARCH).$(SHLIBEXT): $(Q3GOBJ)
+$(B)/$(BASEGAME)/qagame$(ARCH).$(SHLIBEXT): $(Q3GOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3GOBJ)
 
-$(B)/baseq3/vm/qagame.qvm: $(Q3GVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
+$(B)/$(BASEGAME)/vm/qagame.qvm: $(Q3GVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(Q3GVMOBJ) $(GDIR)/g_syscalls.asm
 
@@ -2077,63 +2099,63 @@ $(B)/missionpack/vm/qagame.qvm: $(MPGVMOBJ) $(GDIR)/g_syscalls.asm $(Q3ASM)
 
 
 #############################################################################
-## BASEQ3 UI
+## BASEGAME UI
 #############################################################################
 
 Q3UIOBJ_ = \
-  $(B)/baseq3/ui/ui_main.o \
-  $(B)/baseq3/ui/bg_misc.o \
-  $(B)/baseq3/ui/bg_lib.o \
-  $(B)/baseq3/ui/ui_addbots.o \
-  $(B)/baseq3/ui/ui_atoms.o \
-  $(B)/baseq3/ui/ui_cdkey.o \
-  $(B)/baseq3/ui/ui_cinematics.o \
-  $(B)/baseq3/ui/ui_confirm.o \
-  $(B)/baseq3/ui/ui_connect.o \
-  $(B)/baseq3/ui/ui_controls2.o \
-  $(B)/baseq3/ui/ui_credits.o \
-  $(B)/baseq3/ui/ui_demo2.o \
-  $(B)/baseq3/ui/ui_display.o \
-  $(B)/baseq3/ui/ui_gameinfo.o \
-  $(B)/baseq3/ui/ui_ingame.o \
-  $(B)/baseq3/ui/ui_loadconfig.o \
-  $(B)/baseq3/ui/ui_menu.o \
-  $(B)/baseq3/ui/ui_mfield.o \
-  $(B)/baseq3/ui/ui_mods.o \
-  $(B)/baseq3/ui/ui_network.o \
-  $(B)/baseq3/ui/ui_options.o \
-  $(B)/baseq3/ui/ui_playermodel.o \
-  $(B)/baseq3/ui/ui_players.o \
-  $(B)/baseq3/ui/ui_playersettings.o \
-  $(B)/baseq3/ui/ui_preferences.o \
-  $(B)/baseq3/ui/ui_qmenu.o \
-  $(B)/baseq3/ui/ui_removebots.o \
-  $(B)/baseq3/ui/ui_saveconfig.o \
-  $(B)/baseq3/ui/ui_serverinfo.o \
-  $(B)/baseq3/ui/ui_servers2.o \
-  $(B)/baseq3/ui/ui_setup.o \
-  $(B)/baseq3/ui/ui_sound.o \
-  $(B)/baseq3/ui/ui_sparena.o \
-  $(B)/baseq3/ui/ui_specifyserver.o \
-  $(B)/baseq3/ui/ui_splevel.o \
-  $(B)/baseq3/ui/ui_sppostgame.o \
-  $(B)/baseq3/ui/ui_spskill.o \
-  $(B)/baseq3/ui/ui_startserver.o \
-  $(B)/baseq3/ui/ui_team.o \
-  $(B)/baseq3/ui/ui_teamorders.o \
-  $(B)/baseq3/ui/ui_video.o \
+  $(B)/$(BASEGAME)/ui/ui_main.o \
+  $(B)/$(BASEGAME)/ui/bg_misc.o \
+  $(B)/$(BASEGAME)/ui/bg_lib.o \
+  $(B)/$(BASEGAME)/ui/ui_addbots.o \
+  $(B)/$(BASEGAME)/ui/ui_atoms.o \
+  $(B)/$(BASEGAME)/ui/ui_cdkey.o \
+  $(B)/$(BASEGAME)/ui/ui_cinematics.o \
+  $(B)/$(BASEGAME)/ui/ui_confirm.o \
+  $(B)/$(BASEGAME)/ui/ui_connect.o \
+  $(B)/$(BASEGAME)/ui/ui_controls2.o \
+  $(B)/$(BASEGAME)/ui/ui_credits.o \
+  $(B)/$(BASEGAME)/ui/ui_demo2.o \
+  $(B)/$(BASEGAME)/ui/ui_display.o \
+  $(B)/$(BASEGAME)/ui/ui_gameinfo.o \
+  $(B)/$(BASEGAME)/ui/ui_ingame.o \
+  $(B)/$(BASEGAME)/ui/ui_loadconfig.o \
+  $(B)/$(BASEGAME)/ui/ui_menu.o \
+  $(B)/$(BASEGAME)/ui/ui_mfield.o \
+  $(B)/$(BASEGAME)/ui/ui_mods.o \
+  $(B)/$(BASEGAME)/ui/ui_network.o \
+  $(B)/$(BASEGAME)/ui/ui_options.o \
+  $(B)/$(BASEGAME)/ui/ui_playermodel.o \
+  $(B)/$(BASEGAME)/ui/ui_players.o \
+  $(B)/$(BASEGAME)/ui/ui_playersettings.o \
+  $(B)/$(BASEGAME)/ui/ui_preferences.o \
+  $(B)/$(BASEGAME)/ui/ui_qmenu.o \
+  $(B)/$(BASEGAME)/ui/ui_removebots.o \
+  $(B)/$(BASEGAME)/ui/ui_saveconfig.o \
+  $(B)/$(BASEGAME)/ui/ui_serverinfo.o \
+  $(B)/$(BASEGAME)/ui/ui_servers2.o \
+  $(B)/$(BASEGAME)/ui/ui_setup.o \
+  $(B)/$(BASEGAME)/ui/ui_sound.o \
+  $(B)/$(BASEGAME)/ui/ui_sparena.o \
+  $(B)/$(BASEGAME)/ui/ui_specifyserver.o \
+  $(B)/$(BASEGAME)/ui/ui_splevel.o \
+  $(B)/$(BASEGAME)/ui/ui_sppostgame.o \
+  $(B)/$(BASEGAME)/ui/ui_spskill.o \
+  $(B)/$(BASEGAME)/ui/ui_startserver.o \
+  $(B)/$(BASEGAME)/ui/ui_team.o \
+  $(B)/$(BASEGAME)/ui/ui_teamorders.o \
+  $(B)/$(BASEGAME)/ui/ui_video.o \
   \
-  $(B)/baseq3/qcommon/q_math.o \
-  $(B)/baseq3/qcommon/q_shared.o
+  $(B)/$(BASEGAME)/qcommon/q_math.o \
+  $(B)/$(BASEGAME)/qcommon/q_shared.o
 
 Q3UIOBJ = $(Q3UIOBJ_) $(B)/missionpack/ui/ui_syscalls.o
 Q3UIVMOBJ = $(Q3UIOBJ_:%.o=%.asm)
 
-$(B)/baseq3/ui$(ARCH).$(SHLIBEXT): $(Q3UIOBJ)
+$(B)/$(BASEGAME)/ui$(ARCH).$(SHLIBEXT): $(Q3UIOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3UIOBJ)
 
-$(B)/baseq3/vm/ui.qvm: $(Q3UIVMOBJ) $(UIDIR)/ui_syscalls.asm $(Q3ASM)
+$(B)/$(BASEGAME)/vm/ui.qvm: $(Q3UIVMOBJ) $(UIDIR)/ui_syscalls.asm $(Q3ASM)
 	$(echo_cmd) "Q3ASM $@"
 	$(Q)$(Q3ASM) -o $@ $(Q3UIVMOBJ) $(UIDIR)/ui_syscalls.asm
 
@@ -2241,16 +2263,16 @@ endif
 ## GAME MODULE RULES
 #############################################################################
 
-$(B)/baseq3/cgame/bg_%.o: $(GDIR)/bg_%.c
+$(B)/$(BASEGAME)/cgame/bg_%.o: $(GDIR)/bg_%.c
 	$(DO_CGAME_CC)
 
-$(B)/baseq3/cgame/%.o: $(CGDIR)/%.c
+$(B)/$(BASEGAME)/cgame/%.o: $(CGDIR)/%.c
 	$(DO_CGAME_CC)
 
-$(B)/baseq3/cgame/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
+$(B)/$(BASEGAME)/cgame/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
 	$(DO_CGAME_Q3LCC)
 
-$(B)/baseq3/cgame/%.asm: $(CGDIR)/%.c $(Q3LCC)
+$(B)/$(BASEGAME)/cgame/%.asm: $(CGDIR)/%.c $(Q3LCC)
 	$(DO_CGAME_Q3LCC)
 
 $(B)/missionpack/cgame/bg_%.o: $(GDIR)/bg_%.c
@@ -2266,10 +2288,10 @@ $(B)/missionpack/cgame/%.asm: $(CGDIR)/%.c $(Q3LCC)
 	$(DO_CGAME_Q3LCC_MISSIONPACK)
 
 
-$(B)/baseq3/game/%.o: $(GDIR)/%.c
+$(B)/$(BASEGAME)/game/%.o: $(GDIR)/%.c
 	$(DO_GAME_CC)
 
-$(B)/baseq3/game/%.asm: $(GDIR)/%.c $(Q3LCC)
+$(B)/$(BASEGAME)/game/%.asm: $(GDIR)/%.c $(Q3LCC)
 	$(DO_GAME_Q3LCC)
 
 $(B)/missionpack/game/%.o: $(GDIR)/%.c
@@ -2279,16 +2301,16 @@ $(B)/missionpack/game/%.asm: $(GDIR)/%.c $(Q3LCC)
 	$(DO_GAME_Q3LCC_MISSIONPACK)
 
 
-$(B)/baseq3/ui/bg_%.o: $(GDIR)/bg_%.c
+$(B)/$(BASEGAME)/ui/bg_%.o: $(GDIR)/bg_%.c
 	$(DO_UI_CC)
 
-$(B)/baseq3/ui/%.o: $(Q3UIDIR)/%.c
+$(B)/$(BASEGAME)/ui/%.o: $(Q3UIDIR)/%.c
 	$(DO_UI_CC)
 
-$(B)/baseq3/ui/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
+$(B)/$(BASEGAME)/ui/bg_%.asm: $(GDIR)/bg_%.c $(Q3LCC)
 	$(DO_UI_Q3LCC)
 
-$(B)/baseq3/ui/%.asm: $(Q3UIDIR)/%.c $(Q3LCC)
+$(B)/$(BASEGAME)/ui/%.asm: $(Q3UIDIR)/%.c $(Q3LCC)
 	$(DO_UI_Q3LCC)
 
 $(B)/missionpack/ui/bg_%.o: $(GDIR)/bg_%.c
@@ -2304,10 +2326,10 @@ $(B)/missionpack/ui/%.asm: $(UIDIR)/%.c $(Q3LCC)
 	$(DO_UI_Q3LCC_MISSIONPACK)
 
 
-$(B)/baseq3/qcommon/%.o: $(CMDIR)/%.c
+$(B)/$(BASEGAME)/qcommon/%.o: $(CMDIR)/%.c
 	$(DO_SHLIB_CC)
 
-$(B)/baseq3/qcommon/%.asm: $(CMDIR)/%.c $(Q3LCC)
+$(B)/$(BASEGAME)/qcommon/%.asm: $(CMDIR)/%.c $(Q3LCC)
 	$(DO_Q3LCC)
 
 $(B)/missionpack/qcommon/%.o: $(CMDIR)/%.c
@@ -2332,8 +2354,8 @@ OBJ+= $(SPLINESOBJ)
 endif
 
 copyfiles: release
-	@if [ ! -d $(COPYDIR)/baseq3 ]; then echo "You need to set COPYDIR to where your Quake3 data is!"; fi
-	-$(MKDIR) -p -m 0755 $(COPYDIR)/baseq3
+	@if [ ! -d $(COPYDIR)/$(BASEGAME) ]; then echo "You need to set COPYDIR to where your Quake3 data is!"; fi
+	-$(MKDIR) -p -m 0755 $(COPYDIR)/$(BASEGAME)
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack
 
 ifneq ($(BUILD_CLIENT),0)
@@ -2353,12 +2375,12 @@ endif
 
 ifneq ($(BUILD_GAME_SO),0)
   ifneq ($(BUILD_BASEGAME),0)
-	$(INSTALL) -s -m 0755 $(BR)/baseq3/cgame$(ARCH).$(SHLIBEXT) \
-					$(COPYDIR)/baseq3/.
-	$(INSTALL) -s -m 0755 $(BR)/baseq3/qagame$(ARCH).$(SHLIBEXT) \
-					$(COPYDIR)/baseq3/.
-	$(INSTALL) -s -m 0755 $(BR)/baseq3/ui$(ARCH).$(SHLIBEXT) \
-					$(COPYDIR)/baseq3/.
+	$(INSTALL) -s -m 0755 $(BR)/$(BASEGAME)/cgame$(ARCH).$(SHLIBEXT) \
+					$(COPYDIR)/$(BASEGAME)/.
+	$(INSTALL) -s -m 0755 $(BR)/$(BASEGAME)/qagame$(ARCH).$(SHLIBEXT) \
+					$(COPYDIR)/$(BASEGAME)/.
+	$(INSTALL) -s -m 0755 $(BR)/$(BASEGAME)/ui$(ARCH).$(SHLIBEXT) \
+					$(COPYDIR)/$(BASEGAME)/.
   endif
   ifneq ($(BUILD_MISSIONPACK),0)
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack

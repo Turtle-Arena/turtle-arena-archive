@@ -216,11 +216,13 @@ static void InitOpenGL( void )
 	if (first_time == qtrue)
 	{
 		first_time = qfalse;
-#endif
+
 	// print info
 	GfxInfo_f();
-#ifdef IOQ3ZTM
 	}
+#else
+	// print info
+	GfxInfo_f();
 #endif
 
 	// set default state
@@ -523,6 +525,11 @@ levelshots are specialized 128*128 thumbnails for
 the menu system, sampled down from full screen distorted images
 ====================
 */
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+// Q3 used 128x128, Team Arena used 192x192
+#define LEVELSHOT_HEIGHT	192
+#define LEVELSHOT_WIDTH		192
+#endif
 void R_LevelShot( void ) {
 	char		checkname[MAX_OSPATH];
 	byte		*buffer;
@@ -533,24 +540,46 @@ void R_LevelShot( void ) {
 	float		xScale, yScale;
 	int			xx, yy;
 
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	sprintf( checkname, "levelshots/%s_small.tga", tr.world->baseName );
+#else
 	sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
+#endif
 
 	source = ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight * 3 );
 
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	buffer = ri.Hunk_AllocateTempMemory( LEVELSHOT_HEIGHT * LEVELSHOT_WIDTH*3 + 18);
+#else
 	buffer = ri.Hunk_AllocateTempMemory( 128 * 128*3 + 18);
+#endif
 	Com_Memset (buffer, 0, 18);
 	buffer[2] = 2;		// uncompressed type
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	buffer[12] = LEVELSHOT_WIDTH & 255;
+	buffer[13] = LEVELSHOT_WIDTH >> 8;
+	buffer[14] = LEVELSHOT_HEIGHT & 255;
+	buffer[15] = LEVELSHOT_HEIGHT >> 8;
+#else
 	buffer[12] = 128;
 	buffer[14] = 128;
+#endif
 	buffer[16] = 24;	// pixel size
 
 	qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGB, GL_UNSIGNED_BYTE, source ); 
 
 	// resample from source
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	xScale = glConfig.vidWidth / (LEVELSHOT_WIDTH * 4);
+	yScale = glConfig.vidHeight / (LEVELSHOT_HEIGHT * 3);
+	for ( y = 0 ; y < LEVELSHOT_HEIGHT ; y++ ) {
+		for ( x = 0 ; x < LEVELSHOT_WIDTH ; x++ ) {
+#else
 	xScale = glConfig.vidWidth / 512.0f;
 	yScale = glConfig.vidHeight / 384.0f;
 	for ( y = 0 ; y < 128 ; y++ ) {
 		for ( x = 0 ; x < 128 ; x++ ) {
+#endif
 			r = g = b = 0;
 			for ( yy = 0 ; yy < 3 ; yy++ ) {
 				for ( xx = 0 ; xx < 4 ; xx++ ) {
@@ -560,7 +589,11 @@ void R_LevelShot( void ) {
 					b += src[2];
 				}
 			}
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+			dst = buffer + 18 + 3 * ( y * LEVELSHOT_WIDTH + x );
+#else
 			dst = buffer + 18 + 3 * ( y * 128 + x );
+#endif
 			dst[0] = b / 12;
 			dst[1] = g / 12;
 			dst[2] = r / 12;
@@ -569,10 +602,18 @@ void R_LevelShot( void ) {
 
 	// gamma correct
 	if ( glConfig.deviceSupportsGamma ) {
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+		R_GammaCorrect( buffer + 18, LEVELSHOT_HEIGHT * LEVELSHOT_WIDTH * 3 );
+#else
 		R_GammaCorrect( buffer + 18, 128 * 128 * 3 );
+#endif
 	}
 
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	ri.FS_WriteFile( checkname, buffer, LEVELSHOT_HEIGHT * LEVELSHOT_WIDTH*3 + 18 );
+#else
 	ri.FS_WriteFile( checkname, buffer, 128 * 128*3 + 18 );
+#endif
 
 	ri.Hunk_FreeTempMemory( buffer );
 	ri.Hunk_FreeTempMemory( source );
@@ -596,11 +637,23 @@ void R_ScreenShot_f (void) {
 	char	checkname[MAX_OSPATH];
 	static	int	lastNumber = -1;
 	qboolean	silent;
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	qboolean	levelshot;
+#endif
 
 	if ( !strcmp( ri.Cmd_Argv(1), "levelshot" ) ) {
 		R_LevelShot();
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+		levelshot = qtrue;
+#else
 		return;
+#endif
 	}
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	else {
+		levelshot = qfalse;
+	}
+#endif
 
 	if ( !strcmp( ri.Cmd_Argv(1), "silent" ) ) {
 		silent = qtrue;
@@ -608,6 +661,13 @@ void R_ScreenShot_f (void) {
 		silent = qfalse;
 	}
 
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	if (levelshot)
+	{
+		sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
+	}
+	else
+#endif
 	if ( ri.Cmd_Argc() == 2 && !silent ) {
 		// explicit filename
 		Com_sprintf( checkname, MAX_OSPATH, "screenshots/%s.tga", ri.Cmd_Argv( 1 ) );
@@ -649,11 +709,23 @@ void R_ScreenShotJPEG_f (void) {
 	char		checkname[MAX_OSPATH];
 	static	int	lastNumber = -1;
 	qboolean	silent;
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	qboolean	levelshot;
+#endif
 
 	if ( !strcmp( ri.Cmd_Argv(1), "levelshot" ) ) {
 		R_LevelShot();
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+		levelshot = qtrue;
+#else
 		return;
+#endif
 	}
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	else {
+		levelshot = qfalse;
+	}
+#endif
 
 	if ( !strcmp( ri.Cmd_Argv(1), "silent" ) ) {
 		silent = qtrue;
@@ -661,6 +733,13 @@ void R_ScreenShotJPEG_f (void) {
 		silent = qfalse;
 	}
 
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	if (levelshot)
+	{
+		sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
+	}
+	else
+#endif
 	if ( ri.Cmd_Argc() == 2 && !silent ) {
 		// explicit filename
 		Com_sprintf( checkname, MAX_OSPATH, "screenshots/%s.jpg", ri.Cmd_Argv( 1 ) );

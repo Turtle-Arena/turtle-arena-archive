@@ -237,10 +237,16 @@ static void CelebrateStop( gentity_t *player ) {
 }
 
 
+#ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 #define	TIMER_GESTURE	(34*66+50)
+#endif
 static void CelebrateStart( gentity_t *player ) {
 	player->s.torsoAnim = ( ( player->s.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | TORSO_GESTURE;
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+	player->nextthink = level.time + BG_AnimationTime(&player->client->pers.playercfg.animations[TORSO_GESTURE]);
+#else
 	player->nextthink = level.time + TIMER_GESTURE;
+#endif
 	player->think = CelebrateStop;
 
 	/*

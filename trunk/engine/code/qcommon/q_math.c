@@ -160,7 +160,7 @@ float	Q_crandom( int *seed ) {
 	return 2.0 * ( Q_random( seed ) - 0.5 );
 }
 
-#ifdef TMNTENTITIES
+#ifdef STYEF_ENTITY
 // Returns value is more or equal to min and less then max (max value is max-0.000001)
 float flrandom(float min, float max)
 {
@@ -389,7 +389,35 @@ void RotateAroundDirection( vec3_t axis[3], float yaw ) {
 	CrossProduct( axis[0], axis[1], axis[2] );
 }
 
+#ifdef IOQ3ZTM3 // XREAL
+/*
+=====================
+Q_acos
 
+the msvc acos doesn't always return a value between -PI and PI:
+
+int i;
+i = 1065353246;
+acos(*(float*) &i) == -1.#IND0
+=====================
+*/
+float Q_acos(float c)
+{
+	float           angle;
+
+	angle = acos(c);
+
+	if (angle > M_PI)
+	{
+		return (float)M_PI;
+	}
+	else if (angle < -M_PI)
+	{
+		return (float)M_PI;
+	}
+	return angle;
+}
+#endif
 
 void vectoangles( const vec3_t value1, vec3_t angles ) {
 	float	forward;
@@ -642,6 +670,32 @@ float AngleDelta ( float angle1, float angle2 ) {
 	return AngleNormalize180( angle1 - angle2 );
 }
 
+#ifdef TMNTWEAPONS // XREAL
+/*
+=================
+AngleBetweenVectors
+
+returns the angle between two vectors normalized to the range [0 <= angle <= 180]
+=================
+*/
+float AngleBetweenVectors(const vec3_t a, const vec3_t b)
+{
+	vec_t           alen, blen;
+
+	alen = VectorLength(a);
+	blen = VectorLength(b);
+
+	if(!alen || !blen)
+		return 0;
+
+	// complete dot product of two vectors a, b is |a| * |b| * cos(angle)
+	// this results in:
+	//
+	// angle = acos( (a * b) / (|a| * |b|) )
+	// !!must have IOQ3ZTM3 defined here!!
+	return RAD2DEG(Q_acos(DotProduct(a, b) / (alen * blen)));
+}
+#endif
 
 //============================================================
 

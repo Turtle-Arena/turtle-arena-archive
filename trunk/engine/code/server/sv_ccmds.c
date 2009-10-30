@@ -180,7 +180,7 @@ static void SV_Map_f( void ) {
 		// may not set sv_maxclients directly, always set latched
 		Cvar_SetLatched( "sv_maxclients", "8" );
 		cmd += 2;
-#ifdef IOQ3ZTM // Random fix, fixes spdevmap
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix spdevmap
 		if (!Q_stricmp( cmd, "devmap" ) ) {
 			cheat = qtrue;
 		} else {
@@ -194,7 +194,7 @@ static void SV_Map_f( void ) {
 	}
 	else {
 		if ( !Q_stricmp( cmd, "devmap" )
-#ifndef IOQ3ZTM // Random fix, fixes spdevmap
+#ifndef IOQ3ZTM // IOQ3BUGFIX: Fix spdevmap
 		|| !Q_stricmp( cmd, "spdevmap" )
 #endif
 		) {
@@ -1251,18 +1251,6 @@ static void SV_LoadGame_f(void) {
 			Com_Printf("Error: Can't find map.\n");
 			return;
 		}
-		/* OLD LOADING CODE.
-#if 0 // Turtle Man: FIXME: savegame workaround
-		// Load the map then run the cmd again... THIS LOCKED UP MY COMPUTER...
-		SP_LoadGame(f, filename);
-		Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s\n", savegame));
-		return;
-#else
-		// Turtle Man: FIXME: Load savegames at the menu!
-		Com_Printf("Error: Can't load a savegame if not in a level, this is a known bug.\n");
-		return;
-#endif
-		*/
 	}
 
 	// Load the savefile.

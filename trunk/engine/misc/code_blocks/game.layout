@@ -1,40 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="" />
-	<File name="..\..\code\game\ai_chat.c" open="0" top="0" tabpos="0">
-		<Cursor position="18024" topLine="654" />
-	</File>
-	<File name="..\..\code\game\g_active.c" open="0" top="0" tabpos="0">
-		<Cursor position="33179" topLine="1289" />
-	</File>
-	<File name="..\..\code\game\g_combat.c" open="0" top="0" tabpos="0">
-		<Cursor position="24156" topLine="966" />
-	</File>
-	<File name="..\..\code\game\g_local.h" open="0" top="0" tabpos="0">
-		<Cursor position="21054" topLine="693" />
-	</File>
-	<File name="..\..\code\game\g_main.c" open="0" top="0" tabpos="0">
-		<Cursor position="49819" topLine="1944" />
-	</File>
-	<File name="..\..\code\game\g_misc.c" open="0" top="0" tabpos="0">
-		<Cursor position="13874" topLine="577" />
-	</File>
-	<File name="..\..\code\game\g_missile.c" open="0" top="0" tabpos="0">
-		<Cursor position="31897" topLine="1167" />
-	</File>
-	<File name="..\..\code\game\g_mover.c" open="0" top="0" tabpos="0">
-		<Cursor position="10111" topLine="354" />
-	</File>
-	<File name="..\..\code\game\g_savestate.c" open="0" top="0" tabpos="0">
-		<Cursor position="1231" topLine="15" />
-	</File>
-	<File name="..\..\code\game\g_spawn.c" open="0" top="0" tabpos="0">
-		<Cursor position="8968" topLine="280" />
-	</File>
-	<File name="..\..\code\game\g_trigger.c" open="0" top="0" tabpos="0">
-		<Cursor position="11882" topLine="457" />
-	</File>
-	<File name="..\..\code\game\g_weapon.c" open="0" top="0" tabpos="0">
-		<Cursor position="22266" topLine="831" />
-	</File>
 </CodeBlocks_layout_file>

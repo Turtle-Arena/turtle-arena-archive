@@ -1075,7 +1075,9 @@ int BotAI(int client, float thinktime) {
         }
         else if (bs->weaponnum != bs->cur_ps.stats[STAT_NEWWEAPON])
         {
-            Com_Printf("bots wants weapon %i, but can't have it only %i and %i\n", bs->weaponnum, bs->cur_ps.stats[STAT_NEWWEAPON], bs->cur_ps.stats[STAT_DEFAULTWEAPON]);
+#ifndef TMNTRELEASE
+            Com_Printf("DEBUG: bot wants weapon %i, but can't have it only %i and %i\n", bs->weaponnum, bs->cur_ps.stats[STAT_NEWWEAPON], bs->cur_ps.stats[STAT_DEFAULTWEAPON]);
+#endif
         }
     }
 #else

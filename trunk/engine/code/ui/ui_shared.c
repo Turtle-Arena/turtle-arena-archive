@@ -1191,14 +1191,22 @@ void Script_SetFocus(itemDef_t *item, char **args) {
 void Script_SetPlayerModel(itemDef_t *item, char **args) {
   const char *name;
   if (String_Parse(args, &name)) {
+#ifdef IOQ3ZTM_NO_TEAM_MODEL
+    DC->setCVar("model", name);
+#else
     DC->setCVar("team_model", name);
+#endif
   }
 }
 
 void Script_SetPlayerHead(itemDef_t *item, char **args) {
   const char *name;
   if (String_Parse(args, &name)) {
+#ifdef IOQ3ZTM_NO_TEAM_MODEL
+    DC->setCVar("headmodel", name);
+#else
     DC->setCVar("team_headmodel", name);
+#endif
   }
 }
 
@@ -1727,7 +1735,11 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 		max = Item_ListBox_MaxScroll(item);
 		if (item->window.flags & WINDOW_HORIZONTAL) {
 			viewmax = (item->window.rect.w / listPtr->elementWidth);
-			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW ) 
+			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+				|| key == K_MOUSE2
+#endif
+			)
 			{
 				if (!listPtr->notselectable) {
 					listPtr->cursorPos--;
@@ -2115,7 +2127,11 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 				return qtrue;
 			}
 
-			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW ) 
+			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW
+#if 0 // #ifdef TMNTMISC // MENU: Right Mouse button = left arrow // NOT HERE
+				|| key == K_MOUSE2
+#endif
+			)
 			{
 				if ( item->cursorPos > 0 ) {
 					item->cursorPos--;

@@ -53,9 +53,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "match.h"				//string matching types and vars
 
 // for the voice chats
-#ifdef MISSIONPACK
-#include "../../ui/menudef.h"
-#endif
+//#ifdef MISSIONPACK
+//#include "../../ui/menudef.h"
+//#endif
 
 #define TIME_BETWEENCHATTING	25
 
@@ -317,7 +317,9 @@ char *BotWeaponNameForMeansOfDeath(int mod) {
 		case MOD_NAIL: return "Nailgun";
 		case MOD_CHAINGUN: return "Chaingun";
 		case MOD_PROXIMITY_MINE: return "Proximity Launcher";
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE: return "Kamikaze";
+#endif
 		case MOD_JUICED: return "Prox mine";
 #endif
 #endif
@@ -659,7 +661,7 @@ int BotChat_Death(bot_state_t *bs) {
 				bs->botdeathtype == MOD_SUICIDE ||
 				bs->botdeathtype == MOD_TARGET_LASER ||
 				bs->botdeathtype == MOD_TRIGGER_HURT ||
-#ifdef TMNTENTITIES
+#ifdef STYEF_ENTITY
 				bs->botdeathtype == MOD_EXPLOSION ||
 #endif
 				bs->botdeathtype == MOD_UNKNOWN)
@@ -766,7 +768,7 @@ int BotChat_Kill(bot_state_t *bs) {
 		if (bs->enemydeathtype == MOD_TELEFRAG) {
 			BotAI_BotInitialChat(bs, "kill_telefrag", name, NULL);
 		}
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		else if (bs->botdeathtype == MOD_KAMIKAZE && trap_BotNumInitialChats(bs->cs, "kill_kamikaze"))
 			BotAI_BotInitialChat(bs, "kill_kamikaze", name, NULL);
 #endif

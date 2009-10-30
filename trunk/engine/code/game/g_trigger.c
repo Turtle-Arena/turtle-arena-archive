@@ -462,7 +462,7 @@ void SP_func_timer( gentity_t *self ) {
 	self->r.svFlags = SVF_NOCLIENT;
 }
 
-#ifdef TMNTENTITIES // BREAKABLE
+#ifdef STYEF_ENTITY // BREAKABLE
 /*
 ==============================================================================
 
@@ -687,8 +687,8 @@ void SP_func_breakable(gentity_t *self)
 		self->pain = breakable_pain;
 	}
 
-	// Turtle Man: FIXME: Why do I have to -1 ?
-	self->s.powerups = G_SpawnInt( "mtype", "1", &i )-1;
+	// Turtle Man: FIXME: Why do I have to - 1 ?
+	self->s.powerups = G_SpawnInt( "mtype", "1", &i ) - 1;
 
 	if (!self->model) {
 		G_Error("func_breakable with NULL model\n");

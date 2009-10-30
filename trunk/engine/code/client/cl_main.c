@@ -3154,23 +3154,29 @@ void CL_Init( void ) {
 #endif
 	Cvar_Get ("model", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("headmodel", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
 	Cvar_Get ("team_model", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_headmodel", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
+#endif
 	// DEFAULT_TEAMS
 	Cvar_Get ("g_redTeam", "Sais", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("g_blueTeam", "Katanas", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #elif defined SONIC
 	Cvar_Get ("model", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("headmodel", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
 	Cvar_Get ("team_model", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_headmodel", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
+#endif
 	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #else
 	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("headmodel", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
 	Cvar_Get ("team_model", "james", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_headmodel", "*james", CVAR_USERINFO | CVAR_ARCHIVE );
+#endif
 	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #endif

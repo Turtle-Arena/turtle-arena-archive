@@ -51,6 +51,14 @@ GAME OPTIONS MENU
 #define ID_DRAWTEAMOVERLAY		136
 #define ID_ALLOWDOWNLOAD			137
 #define ID_BACK					138
+#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifndef NOBLOOD
+#define ID_SHOWBLOOD			139
+#endif
+#ifndef NOTRATEDM
+#define ID_SHOWGIBS				140
+#endif
+#endif
 
 #define	NUM_CROSSHAIRS			10
 
@@ -73,6 +81,14 @@ typedef struct {
 	menuradiobutton_s	forcemodel;
 	menulist_s			drawteamoverlay;
 	menuradiobutton_s	allowdownload;
+#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifndef NOBLOOD
+	menuradiobutton_s	showblood;
+#endif
+#ifndef NOTRATEDM
+	menuradiobutton_s	showgibs;
+#endif
+#endif
 	menubitmap_s		back;
 
 	qhandle_t			crosshairShader[NUM_CROSSHAIRS];
@@ -101,6 +117,14 @@ static void Preferences_SetMenuItems( void ) {
 	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_forcemodel" ) != 0;
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
+#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifndef NOBLOOD
+	s_preferences.showblood.curvalue	= trap_Cvar_VariableValue( "com_blood" ) != 0;
+#endif
+#ifndef NOTRATEDM
+	s_preferences.showgibs.curvalue	= trap_Cvar_VariableValue( "cg_gibs" ) != 0;
+#endif
+#endif
 }
 
 
@@ -161,6 +185,19 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "cl_allowDownload", s_preferences.allowdownload.curvalue );
 		trap_Cvar_SetValue( "sv_allowDownload", s_preferences.allowdownload.curvalue );
 		break;
+
+#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifndef NOBLOOD
+	case ID_SHOWBLOOD:
+		trap_Cvar_SetValue( "com_blood", s_preferences.showblood.curvalue );
+		break;
+#endif
+#ifndef NOTRATEDM
+	case ID_SHOWGIBS:
+		trap_Cvar_SetValue( "cg_gibs", s_preferences.showgibs.curvalue );
+		break;
+#endif
+#endif
 
 	case ID_BACK:
 		UI_PopMenu();
@@ -356,6 +393,29 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.allowdownload.generic.x	       = PREFERENCES_X_POS;
 	s_preferences.allowdownload.generic.y	       = y;
 
+#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifndef NOBLOOD
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences.showblood.generic.type     = MTYPE_RADIOBUTTON;
+	s_preferences.showblood.generic.name	   = "Show Blood:";
+	s_preferences.showblood.generic.flags	   = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences.showblood.generic.callback = Preferences_Event;
+	s_preferences.showblood.generic.id       = ID_SHOWBLOOD;
+	s_preferences.showblood.generic.x	       = PREFERENCES_X_POS;
+	s_preferences.showblood.generic.y	       = y;
+#endif
+#ifndef NOTRATEDM
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences.showgibs.generic.type     = MTYPE_RADIOBUTTON;
+	s_preferences.showgibs.generic.name	   = "Show Gibs:";
+	s_preferences.showgibs.generic.flags	   = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences.showgibs.generic.callback = Preferences_Event;
+	s_preferences.showgibs.generic.id       = ID_SHOWGIBS;
+	s_preferences.showgibs.generic.x	       = PREFERENCES_X_POS;
+	s_preferences.showgibs.generic.y	       = y;
+#endif
+#endif
+
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.back.generic.type	    = MTYPE_BITMAP;
 	s_preferences.back.generic.name     = ART_BACK0;
@@ -383,6 +443,14 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.forcemodel );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
+#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifndef NOBLOOD
+	Menu_AddItem( &s_preferences.menu, &s_preferences.showblood );
+#endif
+#ifndef NOTRATEDM
+	Menu_AddItem( &s_preferences.menu, &s_preferences.showgibs );
+#endif
+#endif
 
 	Menu_AddItem( &s_preferences.menu, &s_preferences.back );
 

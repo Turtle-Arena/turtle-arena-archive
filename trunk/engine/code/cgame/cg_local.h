@@ -83,11 +83,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEAM_OVERLAY_MAXNAME_WIDTH	12
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
 
+#ifndef TMNTPLAYERSYS // Moved to bg_public.h
 #ifdef TMNT // DEFAULT_PLAYER // currently no james.
 #define	DEFAULT_MODEL			"raph"
 #define	DEFAULT_TEAM_MODEL		"raph"
 #define	DEFAULT_TEAM_HEAD		"raph"
-#else
+#else // Q3
 #define	DEFAULT_MODEL			"sarge"
 #ifdef MISSIONPACK
 #define	DEFAULT_TEAM_MODEL		"james"
@@ -106,7 +107,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define DEFAULT_BLUETEAM_NAME		"Pagans"
 #endif
 
-#ifndef TMNTPLAYERSYS
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
@@ -126,7 +126,7 @@ typedef enum {
 	IMPACTSOUND_FLESH
 } impactSound_t;
 
-#ifdef TMNTENTITIES // non free?
+#ifdef STYEF_ENTITY // non free?
 typedef enum
 {
 	MT_NONE = -1,
@@ -182,12 +182,28 @@ typedef struct {
 } lerpFrame_t;
 #endif
 
+#ifdef TMNTWEAPSYS // MELEE_TRAIL
+typedef struct
+{
+	float yawAngle;
+	qboolean yawing;
+} meleeTrail_t;
+
+// Currently limited to one trail per-weapon
+//   It would be nice for Sais to have three.
+#define MAX_WEAPON_TRAILS 2
+#endif
 
 typedef struct {
 	lerpFrame_t		legs, torso, flag;
 	int				painTime;
 	int				painDirection;	// flip from 0 to 1
 	int				lightningFiring;
+
+#ifdef TMNTWEAPSYS // MELEE_TRAIL
+	// melee weapon trails
+	meleeTrail_t weaponTrails[MAX_WEAPON_TRAILS];
+#endif
 
 	// railgun trail spawning
 	vec3_t			railgunImpact;
@@ -232,6 +248,7 @@ enum
 {
 	MOF_ONLY_MIRROR = 1,
 	MOF_NOT_MIRROR = 2,
+	MOF_SETUP			= 4, // true if did one time setup.
 };
 
 #define MAX_MISC_OBJECT_ANIMATIONS 5
@@ -422,6 +439,8 @@ enum
 	TI_TAG_FLAG = 2,
 	TI_TAG_HAND_PRIMARY = 4,
 	TI_TAG_HAND_SECONDARY = 8,
+	TI_TAG_WP_AWAY_PRIMARY = 16,
+	TI_TAG_WP_AWAY_SECONDARY = 32,
 };
 #endif
 
@@ -843,7 +862,7 @@ typedef enum
 typedef struct {
 	qhandle_t	charsetShader;
 	qhandle_t	charsetProp;
-#ifndef TMNT
+#ifndef TMNTDATA
 	qhandle_t	charsetPropGlow;
 #endif
 	qhandle_t	charsetPropB;
@@ -930,13 +949,18 @@ typedef struct {
 	qhandle_t	grappleCable;
 #endif
 
+#ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
+	qhandle_t	blueFriendShader;
+#endif
 	qhandle_t	friendShader;
 
 	qhandle_t	balloonShader;
 	qhandle_t	connectionShader;
 
 	qhandle_t	selectShader;
+#ifndef NOBLOOD
 	qhandle_t	viewBloodShader;
+#endif
 	qhandle_t	tracerShader;
 	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 	qhandle_t	lagometerShader;
@@ -948,7 +972,9 @@ typedef struct {
 	qhandle_t	shotgunSmokePuffShader;
 	qhandle_t	plasmaBallShader;
 	qhandle_t	waterBubbleShader;
+#ifndef NOTRATEDM // No gibs.
 	qhandle_t	bloodTrailShader;
+#endif
 #if defined MISSIONPACK && !defined TMNTWEAPONS
 	qhandle_t	nailPuffShader;
 	qhandle_t	blueProxMine;
@@ -987,6 +1013,9 @@ typedef struct {
 	qhandle_t	redKamikazeShader;
 	qhandle_t	blueKamikazeShader;
 #endif
+#ifdef TMNT // EF_TELE_EFFECT
+	qhandle_t	playerTeleportShader;
+#endif
 
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
@@ -1001,7 +1030,9 @@ typedef struct {
 	qhandle_t	rocketExplosionShader;
 	qhandle_t	grenadeExplosionShader;
 	qhandle_t	bfgExplosionShader;
+#ifndef NOBLOOD
 	qhandle_t	bloodExplosionShader;
+#endif
 #ifdef TMNTWEAPONS
 	qhandle_t	meleeHit1Shader;
 	qhandle_t	meleeHit2Shader;
@@ -1250,8 +1281,11 @@ typedef struct {
 	sfxHandle_t	wstbimpdSound;
 	sfxHandle_t	wstbactvSound;
 #endif
-#ifdef TMNTENTITIES
+#ifdef STYEF_ENTITY
 	qhandle_t	chunkModels[NUM_CHUNK_TYPES][NUM_CHUNKS];
+#endif
+#ifdef TMNTWEAPSYS // MELEE_TRAIL
+	qhandle_t	weaponTrailShader;
 #endif
 
 } cgMedia_t;
@@ -1442,7 +1476,9 @@ extern	vmCvar_t		cg_stats;
 extern	vmCvar_t 		cg_forceModel;
 extern	vmCvar_t 		cg_buildScript;
 extern	vmCvar_t		cg_paused;
+#ifndef NOBLOOD
 extern	vmCvar_t		cg_blood;
+#endif
 extern	vmCvar_t		cg_predictItems;
 extern	vmCvar_t		cg_deferPlayers;
 extern	vmCvar_t		cg_drawFriend;
@@ -1616,6 +1652,10 @@ qhandle_t CG_StatusHandle(int task);
 //
 void CG_Player( centity_t *cent );
 void CG_ResetPlayerEntity( centity_t *cent );
+#ifdef TMNTWEAPSYS
+void CG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
+					float speed, float *angle, qboolean *swinging );
+#endif
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team );
 void CG_NewClientInfo( int clientNum );
 sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
@@ -1648,10 +1688,15 @@ void CG_AddPacketEntities( void );
 void CG_Beam( centity_t *cent );
 void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out );
 
-void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
+#ifdef TMNTWEAPSYS
+qboolean CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 							qhandle_t parentModel, char *tagName );
-void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
+qboolean CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 							qhandle_t parentModel, char *tagName );
+#else
+void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
+							qhandle_t parentModel, char *tagName );
+#endif
 
 
 
@@ -1745,7 +1790,9 @@ void CG_GibPlayer( vec3_t playerOrigin );
 void CG_BigExplode( vec3_t playerOrigin );
 #endif
 
+#ifndef NOBLOOD
 void CG_Bleed( vec3_t origin, int entityNum );
+#endif
 
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 								qhandle_t hModel, qhandle_t shader, int msec,

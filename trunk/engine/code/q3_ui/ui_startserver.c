@@ -101,6 +101,55 @@ typedef struct {
 
 static startserver_t s_startserver;
 
+#ifdef TMNT
+// Gametype names
+static const char *gametype_items[] = {
+	"Free For All",
+#ifdef TMNTMISC // tornament to duel
+	"Duel",
+#else
+	"Tournament",
+#endif
+	"Cooperative",
+	"Team Deathmatch",
+	"Capture the Flag",
+#ifdef MISSIONPACK
+	"1 Flag CTF",
+	"Overload",
+#ifdef MISSIONPACK_HARVESTER
+	"Harvester",
+#endif
+#endif
+	NULL
+};
+
+// Order of gametypes in "gametype select list"
+static int gametype_remap[] = {GT_FFA, GT_TOURNAMENT, GT_SINGLE_PLAYER, GT_TEAM, GT_CTF
+#ifdef MISSIONPACK
+,GT_1FCTF,GT_OBELISK
+#ifdef MISSIONPACK_HARVESTER
+,GT_HARVESTER
+#endif
+#endif
+};
+
+// Order of gametype_items, must
+// Turtle Man: NOTE: Why does this need to be seperate from gametype_remap?
+static int gametype_remap2[] = {
+	0,		// Free For All
+	1,		// Duel
+	2,		// Cooperative
+	3,		// Team Deathmatch
+	4		// Capture the Flag
+#ifdef MISSIONPACK
+	,5		// 1 Flag CTF
+	,6		// Overload
+#ifdef MISSIONPACK_HARVESTER
+	,7		// Harvester
+#endif
+#endif
+};
+#else
 static const char *gametype_items[] = {
 	"Free For All",
 	"Team Deathmatch",
@@ -110,22 +159,33 @@ static const char *gametype_items[] = {
 	"Tournament",
 #endif
 	"Capture the Flag",
-#ifdef TMNTSP
-	"Cooperative",
+#ifdef MISSIONPACK
+	"1 Flag CTF",
+	"Overload",
+#ifdef MISSIONPACK_HARVESTER
+	"Harvester",
+#endif
 #endif
 	NULL
 };
 
 static int gametype_remap[] = {GT_FFA, GT_TEAM, GT_TOURNAMENT, GT_CTF
-#ifdef TMNTSP
-,GT_SINGLE_PLAYER
+#ifdef MISSIONPACK
+,GT_1FCTF,GT_OBELISK
+#ifdef MISSIONPACK_HARVESTER
+,GT_HARVESTER
+#endif
 #endif
 };
 static int gametype_remap2[] = {0, 2, 0, 1, 3
-#ifdef TMNTSP
-,4
+#ifdef MISSIONPACK
+,4,5
+#ifdef MISSIONPACK_HARVESTER
+,6
+#endif
 #endif
 };
+#endif
 
 #ifdef IOQUAKE3 // Turtle Man: punkbuster
 // use ui_servers2.c definition
@@ -182,7 +242,7 @@ static int GametypeBits( char *string ) {
 			bits |= 1 << GT_1FCTF;
 			continue;
 		}
-		if( Q_stricmp( token, "obelisk" ) == 0 ) {
+		if( Q_stricmp( token, "overload" ) == 0 ) {
 			bits |= 1 << GT_OBELISK;
 			continue;
 		}
@@ -262,7 +322,9 @@ static void StartServer_Update( void ) {
 		strcpy( s_startserver.mapname.string, s_startserver.maplist[s_startserver.currentmap] );
 	}
 	
+#ifndef IOQ3ZTM // Breaks on linux without pak files.
 	Q_strupr( s_startserver.mapname.string );
+#endif
 }
 
 
@@ -314,7 +376,9 @@ static void StartServer_GametypeEvent( void* ptr, int event ) {
 		}
 
 		Q_strncpyz( s_startserver.maplist[s_startserver.nummaps], Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
+#ifndef IOQ3ZTM // Breaks on linux without pak files.
 		Q_strupr( s_startserver.maplist[s_startserver.nummaps] );
+#endif
 		s_startserver.mapGamebits[s_startserver.nummaps] = gamebits;
 		s_startserver.nummaps++;
 	}
@@ -642,7 +706,9 @@ void StartServer_Cache( void )
 		info = UI_GetArenaInfoByNumber( i );
 
 		Q_strncpyz( s_startserver.maplist[i], Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
+#ifndef IOQ3ZTM // Breaks on linux without pak files.
 		Q_strupr( s_startserver.maplist[i] );
+#endif
 		s_startserver.mapGamebits[i] = GametypeBits( Info_ValueForKey( info, "type") );
 
 		if( precache ) {
@@ -848,25 +914,6 @@ static void ServerOptions_Start( void ) {
 		trap_Cvar_SetValue( "ui_tourney_timelimit", timelimit );
 		break;
 
-	case GT_TEAM:
-#ifdef TMNTMISC // frag to score
-		trap_Cvar_SetValue( "ui_team_scorelimit", fraglimit );
-#else
-		trap_Cvar_SetValue( "ui_team_fraglimit", fraglimit );
-#endif
-		trap_Cvar_SetValue( "ui_team_timelimit", timelimit );
-		trap_Cvar_SetValue( "ui_team_friendlt", friendlyfire );
-		break;
-
-	case GT_CTF:
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Wrong name used for Cvar "ui_ctf_fraglimit", also used fRag not fLag
-		trap_Cvar_SetValue( "ui_ctf_capturelimit", flaglimit );
-#else
-		trap_Cvar_SetValue( "ui_ctf_fraglimit", fraglimit );
-#endif
-		trap_Cvar_SetValue( "ui_ctf_timelimit", timelimit );
-		trap_Cvar_SetValue( "ui_ctf_friendlt", friendlyfire );
-		break;
 #ifdef TMNTSP
 	case GT_SINGLE_PLAYER:
 		// Is this needed here?
@@ -875,6 +922,56 @@ static void ServerOptions_Start( void ) {
 		else
 			trap_Cvar_SetValue( "ui_singlePlayerActive", 1 );
 		break;
+#endif
+
+	case GT_TEAM:
+#ifdef TMNTMISC // frag to score
+		trap_Cvar_SetValue( "ui_team_scorelimit", fraglimit );
+#else
+		trap_Cvar_SetValue( "ui_team_fraglimit", fraglimit );
+#endif
+		trap_Cvar_SetValue( "ui_team_timelimit", timelimit );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Miss named cvar
+		trap_Cvar_SetValue( "ui_team_friendly", friendlyfire );
+#else
+		trap_Cvar_SetValue( "ui_team_friendlt", friendlyfire );
+#endif
+		break;
+
+	case GT_CTF:
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Wrong name used for Cvar "ui_ctf_fraglimit", also used fRaglimit not fLaglimit
+		trap_Cvar_SetValue( "ui_ctf_capturelimit", flaglimit );
+#else
+		trap_Cvar_SetValue( "ui_ctf_fraglimit", fraglimit );
+#endif
+		trap_Cvar_SetValue( "ui_ctf_timelimit", timelimit );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Miss named cvar
+		trap_Cvar_SetValue( "ui_ctf_friendly", friendlyfire );
+#else
+		trap_Cvar_SetValue( "ui_ctf_friendlt", friendlyfire );
+#endif
+		break;
+
+#ifdef MISSIONPACK // MP_GAMETYPES
+	case GT_1FCTF:
+		trap_Cvar_SetValue( "ui_1flag_capturelimit", flaglimit );
+		trap_Cvar_SetValue( "ui_1flag_timelimit", timelimit );
+		trap_Cvar_SetValue( "ui_1flag_friendly", friendlyfire );
+		break;
+
+	case GT_OBELISK:
+		trap_Cvar_SetValue( "ui_obelisk_capturelimit", flaglimit );
+		trap_Cvar_SetValue( "ui_obelisk_timelimit", timelimit );
+		trap_Cvar_SetValue( "ui_obelisk_friendly", friendlyfire );
+		break;
+
+#ifdef MISSIONPACK_HARVESTER
+	case GT_HARVESTER:
+		trap_Cvar_SetValue( "ui_harvester_capturelimit", flaglimit );
+		trap_Cvar_SetValue( "ui_harvester_timelimit", timelimit );
+		trap_Cvar_SetValue( "ui_harvester_friendly", friendlyfire );
+		break;
+#endif
 #endif
 	}
 
@@ -1274,6 +1371,14 @@ static void ServerOptions_SetMenuItems( void ) {
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_timelimit" ) ) );
 		break;
 
+#ifdef TMNTSP
+	case GT_SINGLE_PLAYER:
+		Com_sprintf( s_serveroptions.flaglimit.field.buffer, 4, "%i", 0 );
+		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", 0 );
+		s_serveroptions.friendlyfire.curvalue = 0;
+		break;
+#endif
+
 	case GT_TEAM:
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_fraglimit" ) ) );
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_timelimit" ) ) );
@@ -1286,12 +1391,26 @@ static void ServerOptions_SetMenuItems( void ) {
 		s_serveroptions.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_ctf_friendly" ) );
 		break;
 
-#ifdef TMNTSP
-	case GT_SINGLE_PLAYER:
-		Com_sprintf( s_serveroptions.flaglimit.field.buffer, 4, "%i", 0 );
-		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", 0 );
-		s_serveroptions.friendlyfire.curvalue = 0;
+#ifdef MISSIONPACK // MP_GAMETYPES
+	case GT_1FCTF:
+		Com_sprintf( s_serveroptions.flaglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 100, trap_Cvar_VariableValue( "ui_1flag_capturelimit" ) ) );
+		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_1flag_timelimit" ) ) );
+		s_serveroptions.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_1flag_friendly" ) );
 		break;
+
+	case GT_OBELISK:
+		Com_sprintf( s_serveroptions.flaglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 100, trap_Cvar_VariableValue( "ui_obelisk_capturelimit" ) ) );
+		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_obelisk_timelimit" ) ) );
+		s_serveroptions.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_obelisk_friendly" ) );
+		break;
+
+#ifdef MISSIONPACK_HARVESTER
+	case GT_HARVESTER:
+		Com_sprintf( s_serveroptions.flaglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 100, trap_Cvar_VariableValue( "ui_harvester_capturelimit" ) ) );
+		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_harvester_timelimit" ) ) );
+		s_serveroptions.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_harvester_friendly" ) );
+		break;
+#endif
 #endif
 	}
 
@@ -1304,7 +1423,9 @@ static void ServerOptions_SetMenuItems( void ) {
 
 	// set the map name
 	strcpy( s_serveroptions.mapnamebuffer, s_startserver.mapname.string );
+#ifndef IOQ3ZTM // Breaks on linux without pak files.
 	Q_strupr( s_serveroptions.mapnamebuffer );
+#endif
 
 	// get the player selections initialized
 	ServerOptions_InitPlayerItems();
@@ -1414,7 +1535,12 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	if (s_serveroptions.gametype != GT_SINGLE_PLAYER)
 	{
 #endif
-	if( s_serveroptions.gametype != GT_CTF ) {
+#ifdef MISSIONPACK // TMNTMISSIONPACK
+	if( s_serveroptions.gametype <= GT_TEAM )
+#else
+	if( s_serveroptions.gametype != GT_CTF )
+#endif
+	{
 		s_serveroptions.fraglimit.generic.type       = MTYPE_FIELD;
 #ifdef TMNTMISC // frag to KO
 		s_serveroptions.fraglimit.generic.name       = "Knock Out Limit:";
@@ -1608,7 +1734,12 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	if (s_serveroptions.gametype != GT_SINGLE_PLAYER)
 	{
 #endif
-	if( s_serveroptions.gametype != GT_CTF ) {
+#ifdef MISSIONPACK // TMNTMISSIONPACK
+	if( s_serveroptions.gametype <= GT_TEAM )
+#else
+	if( s_serveroptions.gametype != GT_CTF )
+#endif
+	{
 		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.fraglimit );
 	}
 	else {

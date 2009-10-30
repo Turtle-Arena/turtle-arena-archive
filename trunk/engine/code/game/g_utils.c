@@ -709,29 +709,35 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin ) {
 	VectorCopy( origin, ent->r.currentOrigin );
 }
 
-#ifdef TMNTWEAPONS // TREMULOUS
-// from quakestyle.telefragged.com
-// (NOBODY): Code helper function
-//
-gentity_t *G_FindRadius( gentity_t *from, vec3_t org, float rad )
+#ifdef TMNTWEAPONS // XREAL r2785
+/*
+=================
+G_FindRadius
+
+Returns entities that have origins within a spherical area
+
+G_FindRadius (origin, radius)
+=================
+*/
+gentity_t *G_FindRadius(gentity_t *from, const vec3_t org, float rad)
 {
   vec3_t  eorg;
   int j;
 
-  if( !from )
+	if(!from)
     from = g_entities;
   else
     from++;
 
-  for( ; from < &g_entities[ level.num_entities ]; from++ )
+	for(; from < &g_entities[level.num_entities]; from++)
   {
-    if( !from->inuse )
+		if(!from->inuse)
       continue;
 
-    for( j = 0; j < 3; j++ )
-      eorg[ j ] = org[ j ] - ( from->r.currentOrigin[ j ] + ( from->r.mins[ j ] + from->r.maxs[ j ] ) * 0.5 );
+		for(j = 0; j < 3; j++)
+			eorg[j] = org[j] - (from->s.origin[j] + (from->r.mins[j] + from->r.maxs[j]) * 0.5);
 
-    if( VectorLength( eorg ) > rad )
+		if(VectorLength(eorg) > rad)
       continue;
 
     return from;
@@ -740,22 +746,17 @@ gentity_t *G_FindRadius( gentity_t *from, vec3_t org, float rad )
   return NULL;
 }
 
-/*
-===============
-G_Visible
-
-Test for a LOS between two entities
-===============
-*/
-qboolean G_Visible( gentity_t *ent1, gentity_t *ent2 )
+// Visiblilty check
+qboolean G_IsVisible(const gentity_t *self, const vec3_t goal)
 {
   trace_t trace;
 
-  trap_Trace( &trace, ent1->s.pos.trBase, NULL, NULL, ent2->s.pos.trBase, ent1->s.number, MASK_SHOT );
+	trap_Trace(&trace, self->r.currentOrigin, NULL, NULL, goal, self->s.number, MASK_SHOT);
 
-  if( trace.contents & CONTENTS_SOLID )
+	// Yes we can see it
+	if(trace.contents & CONTENTS_SOLID)
     return qfalse;
-
+	else
   return qtrue;
 }
 #endif

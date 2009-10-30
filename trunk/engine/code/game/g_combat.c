@@ -392,7 +392,7 @@ char	*modNames[] = {
 	"MOD_SUICIDE",
 	"MOD_TARGET_LASER",
 	"MOD_TRIGGER_HURT",
-#ifdef TMNTENTITIES
+#ifdef STYEF_ENTITY
 	"MOD_EXPLOSION",
 #endif
 #ifdef MISSIONPACK
@@ -401,7 +401,9 @@ char	*modNames[] = {
 	"MOD_CHAINGUN",
 	"MOD_PROXIMITY_MINE",
 #endif
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	"MOD_KAMIKAZE",
+#endif
 #ifndef TMNTWEAPONS // MOD
 	"MOD_JUICED",
 #endif
@@ -729,6 +731,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	// don't allow respawn until the death anim is done
 	// g_forcerespawn may force spawning at some later time
+#ifdef TMNTPLAYERSYS // Turtle Man: FIXME: Use real animation time here! This means we have to tell bg which animation to use...
+#endif
 	self->client->respawnTime = level.time + 1700;
 
 	// remove powerups
@@ -971,7 +975,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	// shootable doors / buttons don't actually have any health
 	if ( targ->s.eType == ET_MOVER
-#ifdef TMNTENTITIES // BREAKABLE
+#ifdef STYEF_ENTITY // BREAKABLE
 		&& Q_stricmp("func_breakable", targ->classname) != 0
 		//&& Q_stricmp("misc_model_breakable", targ->classname) != 0
 #endif
