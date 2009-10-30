@@ -32,6 +32,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define FLAGI		6
 #define ROAMI		7
 
+/*
 iteminfo "holdable_teleporter"
 {
 name		"Personal Teleporter"
@@ -43,6 +44,7 @@ respawntime	60
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
+*/
 
 iteminfo "holdable_medkit"
 {
@@ -57,6 +59,7 @@ maxs		{13,13,13}
 }
 
 
+/*
 iteminfo "holdable_kamikaze"
 {
 name		"Kamikaze"
@@ -67,9 +70,8 @@ index		INVENTORY_KAMIKAZE
 respawntime	30
 mins		{-13,-13,-13}
 maxs		{13,13,13}
-} 
+}*/
 
-// Unless in TMNT, it does nothing
 /*
 iteminfo "holdable_invulnerability"
 {
@@ -572,6 +574,7 @@ mins		{-14, -14, 1}
 maxs		{14, 14, 87}
 } 
 
+/*
 iteminfo "item_redcube"
 {
 name		"Red Cube"
@@ -593,6 +596,7 @@ index		INVENTORY_BLUECUBE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
+*/
 
 iteminfo "item_botroam"
 {
@@ -605,7 +609,7 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
-// Turtle Man: Not used by Q3A?... It also is not supported by TMNT changes, botlib wasn't loading.
+// Turtle Man: Not used by Q3... It is also not supported by TMNT, disabled as the botlib wasn't loading.
 //Domination points:
 /*
 iteminfo "team_dom_pointWhite"

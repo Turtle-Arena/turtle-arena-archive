@@ -1,0 +1,91 @@
+'''TMNT Arena''' (working title) is a TMNT Fangame being made by Turtle Man based on the ioquake3 engine.
+
+== Story ==
+Currently the story is planned to take place between Season 5 (Ninja Tribunal) and Season 6 (Fast Forward) of the 2003 TV series.
+
+Nothing has been written though there some ideas;
+* It should fit into the TV series, by not conflicting any of the episodes.
+* I'd like to have there be 13 "episodes" to "finish" the fifth season.
+* I'd like to have one of the stages take place in Usagi's world
+* I'd like to have one of the stages take place in Moo Mesa
+* The Purple Dragons will appear
+* The Earth Protection Force (Agent Bishop) may appear.
+* It is unknown it The Foot will appear.
+
+== Planned Stuff ==
+=== Demo 1 ===
+It should have a working player, working melee weapon(s), working bots, and some maps.
+
+* Raph player model <sup>Almost finished mesh, needs skin work, not animated</sup>
+* Largely changed weapon system from ioquake3, players can hold only two weapons at a time (default and pickup) <sup>working</sup>
+* Melee weapons, as well as gun weapons <sup>Melee not finished, Gun working</sup>
+* Working bots, using OpenArena's botfiles as Quake3's were not released under the GPL. <sup>Needs work still</sup>
+* Shurikens <sup>Almost finished, thrown shurikens rotation is wrong</sup>
+* Hold multiple items at once, Pizza-to-Go and Shurikens. <sup>Working</sup>
+* One or more maps for each gametype (Single Player, Duel (1 vs 1), Free For All, Team Death Match, Capture The Flag, One Flag CTF, Overload) <sup>maps need work</sup>
+
+=== Later ===
+* Remake UI/HUD using Quake III: Team Arena menu scripting
+* DONE: Add Quake III: Team Arena gametypes?
+* New gametypes, Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
+* NiGHTS mode (Instead of being NiGHTS maybe a dragon-form, like in Season 5) (Dragons are sort of like nightmarens...)
+* 2D mode (like the first NES game and the first 2 GBA games) (using NiGHTS "track")
+* 2.5D mode (like TMNT: Turtles in Time) (maybe using NiGHTS track?)
+
+== Credits ==
+* id software (For making and releasing Quake 3's source code)
+* ioquake3 devoplers (For improving, fixing, and cleaning up Quake 3's source code)
+* Open Arena (For botfiles and some images - readme.txt will include list of files)
+* Turtle Man
+
+=== Special Thanks ===
+* Sonic Team Jr. - for making Sonic Robo Blast 2 which inspired TMNT Arena.
+
+== Overview ==
+This is the overview of how things ''should'' work, it should be noted with the status.
+
+=== Models<sup>need more</sup> ===
+Raph, who is most likely the most important model, is incomplete. The model (Mesh) is almost finished, the shapes and size still don't seem right. There is a basic skin for the head and legs, but the torso is not skined correctly.
+
+There are models for the holdable pizza, instant pizza (health pickups), shurikens (pickup and thrown), CTF flags (pickup and held), and traffic cones.
+
+There are also temporary models for the 5 powerups (defense, invisible, invul, speed, and strength).
+
+There are currently temporary gun weapon models, and one melee weapon model (Sai) (A few have been made/started, but not skined or md3'd)
+
+There is currently no scenery (Well, there is a traffic cone).
+
+=== Weapon System<sup>unfinished</sup>===
+:'''Status'''
+* Default weapon: Working
+* Pickup weapons: Working
+* Guns: Working
+* Melee weapon: unfinished
+
+The weapon system is based on that of TMNT: Mutant Melee.
+
+Each player has a default weapon that they always have. Each player may pickup a extra weapon and may not use there default weapon while holding a extra weapon. The player is limited to one pickup weapon and one default weapon. Currently when a player pickup a pickup weapon when holding a pickup weapon, they have three weapon while "changing" from old pickup weapon to new pickup weapon.
+
+In TMNT: Mutant Melee, button press is required to pickup weapons, instead of by touch.<sup>not started, bad idea?</sup>
+
+:'''Setting default weapon'''
+The server tells everyone what their default weapon is base on the players that they have, with a default ''default weapon'' if the server doesn't have the player.
+
+=== Player game config<sup>working</sup> ===
+"animations.cfg" is loaded by "game" to get more information about the player, allowing players to be more different from each other (a lot like in SRB2).
+
+It can hold the player's default weapon, bounding box, max speed, and acceleration. In the future it may also hold other various things.
+
+=== Custom Weapons<sup>not started</sup> ===
+By having a subdirectory a custom model can replace the weapon model for only that player, but use the AI of one of the normal weapons. Allowing for "custom" weapons for each player but using the same AI.
+But should the custom model only be used when attached to the player, or pickup items too?
+
+Lets say there is a player who uses Sais but there Sais look different then Raph's Sais, the model could have custom Sais but use the same AI.
+
+=== Shurikens<sup>Mostly done</sup> ===
+Shurikens are separate from the normal weapons, they are holdable items with multiple uses.
+
+Currently they can be throw (they do damage, explode, bounce, ect) but do not rotate correctly. Also the electric shuriken does not stun players or electrify water. In the future the electric, fire, and laser shurikens will be more than just recolored models, by adding sparks, flames, and glowing effects.
+
+== External Links ==
+* Download TMNT Arena

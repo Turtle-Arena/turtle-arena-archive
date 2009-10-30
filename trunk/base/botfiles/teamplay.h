@@ -179,7 +179,7 @@ type "kill_start"
 "I'm going to kill ", 0,", wish me luck.";
 0, " will be toast.";
 0, " is a goner.";
-0, " will be given a pair of cement shoes.";
+//0, " will be given a pair of cement shoes.";
 "Ok";
 "What ever you say";
 "Finally some fun!";
@@ -189,7 +189,7 @@ type "kill_done"
 {
 "Well that was easy. ", 0, " is dead.";
 0, " has been wacked.";
-0, " was given cement shoes.";
+//0, " was given cement shoes.";
 0, " kicked the bucket.";
 0, " was taken out.";
 0, " just bought the farm.";

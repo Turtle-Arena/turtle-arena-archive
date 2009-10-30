@@ -1,12 +1,12 @@
 // textures/common shader file.
 
-// While this isn't "textures/common/*" it doesn't need its own file.
+// While this isn't "textures/common/*" it doesn't need its own file...
 textures/REGION
 {
 	surfaceparm nolightmap
 }
 
-// OPEN ARENA : /scripts/common.shader //
+// FROM OPEN ARENA : scripts/common.shader
 
 //12-12-06 removed redundant nodrop
 //12-23-06 fixed the b0rked invisible shader
@@ -19,6 +19,7 @@ textures/REGION
 //for the idiot bots out there use instead of botclip!!!!
 textures/common/donotenter
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm nonsolid
 	surfaceparm trans
@@ -28,6 +29,7 @@ textures/common/donotenter
 
 textures/common/clip
 {
+    qer_trans 0.5
 	surfaceparm nolightmap
 	surfaceparm nomarks
 	surfaceparm nodraw
@@ -40,26 +42,27 @@ textures/common/caulk
 {
 	surfaceparm nodraw
 	surfaceparm nomarks
-        surfaceparm nolightmap
+	surfaceparm nolightmap
 }
 
 textures/common/invisible
 {
-	surfaceparm nolightmap			
-                        
-        {
+	qer_editorimage textures/common/invisible.jpg
+    qer_trans 0.5
+	surfaceparm nolightmap
+	{
 		map textures/common/invisible.tga
 		alphaFunc GE128
 		depthWrite
 		rgbGen vertex
 	}
-        
 }
 
 //use this near the trigger hurts, lava, death fogs, etc.
 // to keep weapons and powerups from piling up...
 textures/common/nodrop
 {
+    qer_trans 0.5
 	surfaceparm 	trans
 	surfaceparm	nonsolid
 	surfaceparm	nomarks
@@ -71,12 +74,14 @@ textures/common/nodrop
 //need this for the teleporters in cbctf1
 textures/common/trigger
 {
+    qer_trans 0.5
 	surfaceparm nodraw
-	
 }
+
 //also needed for for cbctf1
 textures/common/origin
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm nonsolid
 	surfaceparm origin
@@ -84,6 +89,7 @@ textures/common/origin
 //aids in VIS compiles
 textures/common/hint
 {
+    qer_trans 0.5
 	surfaceparm hint
 	surfaceparm nodraw
 	surfaceparm nonsolid
@@ -94,6 +100,7 @@ textures/common/hint
 
 textures/common/nodraw
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm nonsolid
 	surfaceparm nomarks
@@ -102,6 +109,7 @@ textures/common/nodraw
 //for an icy effect
 textures/common/slick
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm nomarks
 	surfaceparm trans
@@ -110,6 +118,7 @@ textures/common/slick
 
 textures/common/cushion
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm nomarks
 	surfaceparm nodamage
@@ -119,6 +128,7 @@ textures/common/cushion
 //to keep certain textures from being shot up
 textures/common/weapclip
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm trans
 	surfaceparm nomarks
@@ -127,6 +137,7 @@ textures/common/weapclip
 //for every stupid q3dm17 remake
 textures/common/nodrawnonsolid
 {
+    qer_trans 0.5
 	surfaceparm	nonsolid
 	surfaceparm	nodraw
 }
@@ -134,6 +145,7 @@ textures/common/nodrawnonsolid
 //hint for the bots
 textures/common/clusterportal
 {
+    qer_trans 0.5
 	qer_nocarve
 	surfaceparm nodraw
 	surfaceparm nonsolid
@@ -143,34 +155,23 @@ textures/common/clusterportal
 }
 
 //can also be used as a mirror
+// Same as textures/common/mirror1
 textures/common/portal
 {
-	qer_editorimage textures/common/invisible.tga
+	qer_editorimage textures/common/portal.jpg
 	surfaceparm nolightmap
 	portal
 	{
 		map textures/common/invisible.tga
 		blendfunc GL_ONE GL_ONE_MINUS_SRC_ALPHA
 		depthWrite
-
 	}
 }
 
 //Added for Mirrors
-textures/common/mirror
-{
-	portal
-	q3map_nolightmap
-    {
-        map textures/common/invisible.tga
-        blendFunc GL_ONE GL_ONE_MINUS_SRC_ALPHA
-        depthWrite
-    }
-}
-
 textures/common/timportal
 {
-	qer_editorimage textures/common/invisible.tga
+	qer_editorimage textures/common/portal.jpg
 	surfaceparm nolightmap
 	portal
 	{
@@ -179,12 +180,15 @@ textures/common/timportal
 		depthWrite
 
 	}
+
+	//
 	{
-		map textures/oa_fogs/kc_fogcloud3.jpg
-		blendfunc gl_src_alpha gl_one_minus_src_alpha
+		//map textures/oa_fogs/kc_fogcloud3.jpg
+		map textures/skies/testsky_clouds.png
+		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		alphagen portal 512
 		rgbGen identity	
-		tcmod rotate .1 
+		tcmod rotate .1
 		tcmod scroll .04 .01
 	}
 }
@@ -192,24 +196,20 @@ textures/common/timportal
 //nicked from nexuiz for backwards compat 
 textures/common/mirror1
 {
-	qer_editorimage textures/common/invisible.tga
+	qer_editorimage textures/common/mirror1.jpg
 	surfaceparm nolightmap
 	portal
-  
-	{
+  	{
 		map textures/common/invisible.tga
 		blendfunc GL_ONE GL_ONE_MINUS_SRC_ALPHA
 		depthWrite
 	}
-       
-        
-
 }
 
 //nicked from nexuiz w/added turb. for backwards compat 
 textures/common/mirror2
 {
-	qer_editorimage textures/common/invisible.tga
+	qer_editorimage textures/common/mirror1.jpg
 	surfaceparm nolightmap
 	portal
 	{
@@ -217,12 +217,12 @@ textures/common/mirror2
 		blendfunc GL_ONE GL_ONE_MINUS_SRC_ALPHA
 		depthWrite
 	}
-        {
-               map textures/sfx/mirror.tga
-	       tcMod turb 0 0.25 0 0.05
-	       blendFunc GL_ZERO GL_ONE_MINUS_SRC_COLOR
-        }
-
+	{
+		//map textures/sfx/mirror.tga
+		map textures/skies/testsky_clouds.png
+		tcMod turb 0 0.25 0 0.05
+		blendFunc GL_ZERO GL_ONE_MINUS_SRC_COLOR
+	}
 }
 
 //nicked from nexuiz
@@ -230,15 +230,15 @@ textures/common/terrain
 {
 	q3map_terrain
 	surfaceparm nodraw
-        surfaceparm nolightmap
+	surfaceparm nolightmap
 	surfaceparm nomarks
 }
 
 //nicked from nexuiz
 textures/common/terrain2
 {
-	q3map_terrain
 	qer_editorimage textures/common/common.tga
+	q3map_terrain
 	surfaceparm dust
 	surfaceparm nodraw
 	surfaceparm nomarks
@@ -248,6 +248,7 @@ textures/common/terrain2
 //nicked from nexuiz
 textures/common/metalclip
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm nolightmap
 	surfaceparm nonsolid
@@ -258,22 +259,9 @@ textures/common/metalclip
 	surfaceparm metalsteps
 }
 
-// acts as player clip only for the bots
-// can keep them from being pushed into voids
-// do not use, use donotenter instead :-P
-textures/common/botclip
-{
-	surfaceparm nodraw
-	surfaceparm nolightmap
-	surfaceparm nonsolid
-	surfaceparm trans
-	surfaceparm nomarks
-	surfaceparm noimpact
-	surfaceparm botclip
-}
-
 textures/common/missileclip
 {
+    qer_trans 0.5
 	surfaceparm nodamage
 	surfaceparm nomarks
 	surfaceparm nodraw
@@ -283,12 +271,14 @@ textures/common/missileclip
 
 textures/common/full_clip
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm playerclip
 }
 
 textures/common/antiportal
 {
+    qer_trans 0.5
 	qer_nocarve
 	surfaceparm nodraw
 	surfaceparm nonsolid
@@ -299,6 +289,7 @@ textures/common/antiportal
 
 textures/common/areaportal
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm nolightmap
 	surfaceparm nonsolid
@@ -310,6 +301,7 @@ textures/common/areaportal
 
 textures/common/lightgrid
 {
+    qer_trans 0.5
 	surfaceparm nodraw
 	surfaceparm nolightmap
 	surfaceparm nonsolid

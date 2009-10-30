@@ -1,4 +1,4 @@
-// shaders for the new UI
+// Shaders for the new (missionpack based) UI
 
 ui/assets/titlebanner
 {

@@ -1,0 +1,113 @@
+Needed files, currently only needed ''models'' are listed. List is incomplete.
+
+There are unfinished / unskined models in /base-src/models/weapons2
+
+General:
+
+Player Teleport:
+
+Quake3 only     : models/misc/telep.md3  (and teleportEffect shader)
+MissionPack only: models/powerups/pop.md3
+
+Weapons:
+
+models/ammo/bullet/bullet.md3
+DONE: models/ammo/rocket/rocket.md3
+models/weaphits/*
+
+models/weapons2/shells/m_shell.md3
+
+models/weapons2/*name*/*name*.md3
+
+Powerup models:
+
+models/powerups/holdable/*
+
+DONE: medkit.md3
+<s>teleporter.md3</s> --unneeded
+DONE: shuriken.md3
+UNFIN: shurikenelectric.md3
+UNFIN: shurikenfire.md3
+UNFIN: shurikenlaser.md3
+
+models/powerups/instant/*
+
+TEMP: defense.md3
+TEMP: strength.md3
+TEMP: speed.md3
+regen.md3
+TEMP: invis.md3
+TEMP: invul.md3
+
+Defense - Shield or yellow sphere?
+Strength - "Arm showing stregth"? or red sphere?...
+Speed - Blue sphere?...
+Invisibility - Transparent, envmapped, sphere?
+
+Health Regen - regen.md3 Red "+"?
+Flight - flight.md3 Red Cape, on blue man? (superman-ish)
+
+Invulnerability - White sphere?
+
+MISSIONPACK
+Scout - "S" with word "Scout" "floating" around it
+Guard - "G" with word "Guard" ...
+Doubler "D" with word "Doubler" ...
+AmmoRegen "A" with word "Ammo" ...
+
+CTF:
+
+DONE: icons/iconf_blu1
+DONE: icons/iconf_blu2
+DONE: icons/iconf_blu3
+DONE: icons/iconf_red1
+DONE: icons/iconf_red2
+DONE: icons/iconf_red3
+
+DONE: models/flags/r_flag.md3
+DONE: models/flags/b_flag.md3
+
+MISSIONPACK 1 flag CTF
+DONE: models/flags/n_flag.md3
+DONE: icons/iconf_neutral1
+DONE: icons/iconf_neutral3
+
+MISSIONPACK CTF flags.
+
+DONE: models/flag2/flagpole.md3
+
+UNANIMATED: models/flag2/flagflap3.md3
+
+DONE: models/flag2/red.skin
+DONE: models/flag2/blue.skin
+DONE: models/flag2/white.skin
+
+models/mapobjects/flagbase/red_base.md3
+models/mapobjects/flagbase/blue_base.md3
+models/mapobjects/flagbase/ntrl_base.md3
+
+
+Four medals don't have images, they are only used in sppostgame which needs rewrite anyway... The first two were used in cgame, but removed by TMNTWEAPONS
+
+"menu/medals/medal_impressive"
+"menu/medals/medal_gauntlet"
+"menu/medals/medal_frags"
+"menu/medals/medal_victory"
+
+
+While replacing stuff I was deleting what I had replaced or was no longer used in the demoq3 pak0.pk3
+the following were not removed from the pak; (I have a list so I can delete the pak)
+
+/gfx/misc/lightning3.jpg			--unused
+/gfx/misc/railcorethin_mono.jpg		--unused
+/gfx/misc/raildisc_mono2.jpg		--unused
+/menu/art/frame1_l.tga
+/menu/medals/medal_accuracy.tga
+/menu/medals/medal_gauntlet.tga
+/menu/medals/medal_victory.tga
+/models/ammo/rocket/*				--replaced
+/models/misc/telep.md3
+/models/powerups/*
+/models/weaphits/*
+/models/weapons2/*					--replaced/unused
+

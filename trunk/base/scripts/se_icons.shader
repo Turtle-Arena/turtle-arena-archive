@@ -1,31 +1,7 @@
-// From OpenArena -> iconsprites.shader
+// Turtle Man: Based on OpenArena -> iconsprites.shader
 // just simple icon shaders needed
 
-lagometer
-{
-	nopicmip
-	{
-		map gfx/2d/lag.tga
-	}
-}
-
-disconnected
-{
-	nopicmip
-	{
-		map gfx/2d/net.tga
-	}
-}
-
 // HOLDABLE ICONS
-icons/teleporter
-{
-	nopicmip
-	{
-		map icons/teleporter.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
 icons/medkit
 {
 	nopicmip
@@ -73,27 +49,27 @@ icons/shurikenlaser
 }
 
 // POWERUP ICONS
-icons/envirosuit
+icons/defense
 {
 	nopicmip
 	{
-		map icons/envirosuit.tga
+		map icons/defense.tga
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
-icons/quad
+icons/strength
 {
 	nopicmip
 	{
-		map icons/quad.tga
+		map icons/strength.tga
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
-icons/haste
+icons/speed
 {
 	nopicmip
 	{
-		map icons/haste.tga
+		map icons/speed.tga
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -122,39 +98,21 @@ icons/flight
 	}
 }
 
-// MEDAL ICONS
-medal_impressive
+icons/invul
 {
 	nopicmip
 	{
-		clampmap menu/medals/medal_impressive.tga
-		blendFunc blend
+		map icons/invul.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
 
-medal_frags
-{
-	nopicmip
-	{
-		clampmap menu/medals/medal_frags.tga
-		blendFunc blend
-	}
-}
-
+// MEDAL ICONS -- Turtle Man: Move to se_sprites.shader ?
 medal_excellent
 {
 	nopicmip
 	{
 		clampmap menu/medals/medal_excellent.tga
-		blendFunc blend
-	}
-}
-
-medal_gauntlet
-{
-	nopicmip
-	{
-		clampmap menu/medals/medal_gauntlet.tga
 		blendFunc blend
 	}
 }
@@ -332,10 +290,6 @@ icons/iconw_grapple
 }
 
 // HEALTH ICONS
-// Turtle Man: Renamed 3 (of 4) health icons;
-// Q3: green - TMNT: small
-// Q3: yellow - TMNT: medium
-// Q3: red - TMNT: large
 icons/iconh_small
 {
 	nopicmip
@@ -361,7 +315,6 @@ icons/iconh_large
 		map icons/iconh_large.tga
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
-
 }
 
 icons/iconh_mega
@@ -374,6 +327,7 @@ icons/iconh_mega
 }
 
 // CTF FLAG ICONS
+// Images have no alpha
 //blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 icons/iconf_red1
 {
@@ -440,106 +394,6 @@ icons/iconf_neutral3
 }
 
 
-
-gfx/2d/menuinfo
-{
-	nopicmip
-	{
-		map gfx/2d/menuinfo.tga
-	}
-}
-
-gfx/2d/menuinfo2
-{
-	nopicmip
-	{
-		map gfx/2d/menuinfo2.tga
-	}
-}
-
-gfx/2d/quit
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/2d/quit.tga
-	}
-}
-
-gfx/2d/cursor
-{
-    nopicmip
-	nomipmaps
-    {
-        map gfx/2d/cursor.tga
-    }
-}
-
-viewBloodBlend
-{
-	sort	nearest
-	{
-		//map models/weaphits/blood201.tga
-                map gfx/damage/blood_screen.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identityLighting
-		alphaGen vertex
-	}
-}
-
-Grareflaader
-{
-	cull none
-	{
-		map gfx/misc/flare.tga
-		blendFunc GL_ONE GL_ONE
-		rgbGen vertex
-	}
-}
-boens
-{
-	cull none
-	{
-		map gfx/misc/sun.tga
-		blendFunc GL_ONE GL_ONE
-		rgbGen vertex
-	}
-}
-gfx/misc/tracer
-{
-	cull none
-	{
-		map	gfx/misc/tracer2.tga
-		blendFunc GL_ONE GL_ONE
-	}
-}
-
-bloodMark
-{
-	nopicmip
-	polygonOffset
-	{
-		clampmap gfx/damage/blood_stain.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identityLighting
-		alphaGen vertex
-	}
-}
-
-bloodTrail
-{
-
-	nopicmip
-	entityMergable
-	{
-		//clampmap gfx/misc/blood.tga
-                clampmap gfx/damage/blood_spurt.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen		vertex
-		alphaGen	vertex
-	}
-}
-
 scoreboardName
 {
 	nopicmip
@@ -580,358 +434,8 @@ scoreboardPing
 	}
 }
 
-gfx/2d/crosshair
-{
-	nopicmip
-	{
-		map gfx/2d/crosshair.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-        rgbGen identity
-	}
-}
-
-gfx/2d/crosshairb
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairb.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshairc
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairc.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshaird
-{
-	nopicmip
-	{
-		map gfx/2d/crosshaird.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshaire
-{
-	nopicmip
-	{
-		map gfx/2d/crosshaire.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshairf
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairf.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshairg
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairg.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshairh
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairh.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshairi
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairi.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-
-}
-gfx/2d/crosshairj
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairj.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-gfx/2d/crosshairk
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairk.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-
-
-
-gfx/2d/bigchars
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/2d/bigchars.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/select
-{
-	nopicmip
-	{
-		map gfx/2d/select.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-		rgbgen vertex
-	}
-}
-
-
-gfx/2d/assault1d
-{
-	nopicmip
-	{
-		map gfx/2d/assault1d.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-gfx/2d/armor1h
-{
-	nopicmip
-	{
-		map gfx/2d/armor1h.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-gfx/2d/health
-{
-	nopicmip
-	{
-		map gfx/2d/health.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-gfx/2d/blank
-{
-	nopicmip
-	{
-		map gfx/2d/blank.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-gfx/2d/numbers/zero_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/zero_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/one_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/one_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/two_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/two_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/three_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/three_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/four_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/four_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/five_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/five_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/six_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/six_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/seven_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/seven_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/eight_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/eight_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/nine_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/nine_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-gfx/2d/numbers/minus_32b
-{
-	nopicmip
-	{
-		map gfx/2d/numbers/minus_32b.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-
 
 // missionpack icons
-
-icons/iconw_chaingun
-{
-	nopicmip
-	{
-		map icons/iconw_chaingun.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_chaingun_cl1
-{
-	nopicmip
-	{
-		map icons/iconw_chaingun_cl1.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_chaingun_cl2
-{
-	nopicmip
-	{
-		map icons/iconw_chaingun_cl2.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_kamikaze
-{
-	nopicmip
-	{
-		map icons/iconw_kamikaze.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_nailgun
-{
-	nopicmip
-	{
-		map icons/iconw_nailgun.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_proxlauncher
-{
-	nopicmip
-	{
-		map icons/iconw_proxlauncher.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_chaingun
-{
-	nopicmip
-	{
-		map icons/icona_chaingun.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-
-icons/icona_proxlauncher
-{
-	nopicmip
-	{
-		map icons/icona_proxlauncher.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-
-icons/icona_nailgun
-{
-	nopicmip
-	{
-		map icons/icona_nailgun.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
 
 icons/guard
 {
@@ -965,79 +469,6 @@ icons/scout
 	nopicmip
 	{
 		map icons/scout.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-
-icons/icona_red
-{
-	nopicmip
-	{
-		map icons/icona_red.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_blue
-{
-	nopicmip
-	{
-		map icons/icona_blue.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_white
-{
-	nopicmip
-	{
-		map icons/icona_white.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconb_red
-{
-	nopicmip
-	{
-		map icons/iconb_red.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconb_blue
-{
-	nopicmip
-	{
-		map icons/iconb_blue.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconb_white
-{
-	nopicmip
-	{
-		map icons/iconb_white.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_red
-{
-	nopicmip
-	{
-		map icons/icona_red.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_blue
-{
-	nopicmip
-	{
-		map icons/icona_blue.tga
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
