@@ -35,10 +35,12 @@ MAIN MENU
 #define ID_SINGLEPLAYER			10
 #define ID_MULTIPLAYER			11
 #define ID_SETUP				12
+#ifndef TMNTSP
 #define ID_DEMOS				13
 #define ID_CINEMATICS			14
 #define ID_TEAMARENA		15
 #define ID_MODS					16
+#endif
 #define ID_EXIT					17
 
 #define MAIN_BANNER_MODEL				"models/mapobjects/banner/banner5.md3"
@@ -51,10 +53,12 @@ typedef struct {
 	menutext_s		singleplayer;
 	menutext_s		multiplayer;
 	menutext_s		setup;
+#ifndef TMNTSP
 	menutext_s		demos;
 	menutext_s		cinematics;
 	menutext_s		teamArena;
 	menutext_s		mods;
+#endif
 	menutext_s		exit;
 
 	qhandle_t		bannerModel;
@@ -97,7 +101,11 @@ void Main_MenuEvent (void* ptr, int event) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_SINGLEPLAYER:
+#ifdef TMNTSP
+		UI_SPMenu();
+#else
 		UI_SPLevelMenu();
+#endif
 		break;
 
 	case ID_MULTIPLAYER:
@@ -108,6 +116,7 @@ void Main_MenuEvent (void* ptr, int event) {
 		UI_SetupMenu();
 		break;
 
+#ifndef TMNTSP
 	case ID_DEMOS:
 		UI_DemosMenu();
 		break;
@@ -124,6 +133,7 @@ void Main_MenuEvent (void* ptr, int event) {
 		trap_Cvar_Set( "fs_game", "missionpack");
 		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart;" );
 		break;
+#endif
 
 	case ID_EXIT:
 		UI_ConfirmMenu( "EXIT GAME?", 0, MainMenu_ExitAction );
@@ -162,7 +172,9 @@ static void Main_MenuDraw( void ) {
 	vec3_t			angles;
 	float			adjust;
 	float			x, y, w, h;
+#ifndef TMNT
 	vec4_t			color = {0.5, 0, 0, 1};
+#endif
 
 	// setup the refdef
 
@@ -221,15 +233,20 @@ static void Main_MenuDraw( void ) {
 		Menu_Draw( &s_main.menu );		
 	}
 
+#ifdef TMNT // Legal stuff...
+	//UI_DrawString( 320, 450, "This is a fangame, TMNT is used without permission. TMNT(c) Mirage Studios.", UI_CENTER|UI_SMALLFONT, color );
+#else
 	if (uis.demoversion) {
 		UI_DrawProportionalString( 320, 372, "DEMO      FOR MATURE AUDIENCES      DEMO", UI_CENTER|UI_SMALLFONT, color );
 		UI_DrawString( 320, 400, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );
 	} else {
 		UI_DrawString( 320, 450, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );
 	}
+#endif
 }
 
 
+#ifndef TMNTSP
 /*
 ===============
 UI_TeamArenaExists
@@ -255,6 +272,7 @@ static qboolean UI_TeamArenaExists( void ) {
 	}
 	return qfalse;
 }
+#endif
 
 
 /*
@@ -268,11 +286,14 @@ and that local cinematics are killed
 */
 void UI_MainMenu( void ) {
 	int		y;
+#ifndef TMNTSP
 	qboolean teamArena = qfalse;
+#endif
 	int		style = UI_CENTER | UI_DROPSHADOW;
 
 	trap_Cvar_Set( "sv_killserver", "1" );
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	if( !uis.demoversion && !ui_cdkeychecked.integer ) {
 		char	key[17];
 
@@ -282,6 +303,7 @@ void UI_MainMenu( void ) {
 			return;
 		}
 	}
+#endif
 	
 	memset( &s_main, 0 ,sizeof(mainmenu_t) );
 	memset( &s_errorMessage, 0 ,sizeof(errorMessage_t) );
@@ -310,14 +332,22 @@ void UI_MainMenu( void ) {
 	s_main.menu.wrapAround = qtrue;
 	s_main.menu.showlogo = qtrue;
 
+#ifdef TMNTSP
+	y = 480 - (MAIN_MENU_VERTICAL_SPACING * 6);
+#else
 	y = 134;
+#endif
 	s_main.singleplayer.generic.type		= MTYPE_PTEXT;
 	s_main.singleplayer.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_main.singleplayer.generic.x			= 320;
 	s_main.singleplayer.generic.y			= y;
 	s_main.singleplayer.generic.id			= ID_SINGLEPLAYER;
 	s_main.singleplayer.generic.callback	= Main_MenuEvent; 
+#ifdef TMNTSP // Moved to PLAY Menu.
+	s_main.singleplayer.string				= "PLAY";
+#else
 	s_main.singleplayer.string				= "SINGLE PLAYER";
+#endif
 	s_main.singleplayer.color				= color_red;
 	s_main.singleplayer.style				= style;
 
@@ -339,10 +369,15 @@ void UI_MainMenu( void ) {
 	s_main.setup.generic.y					= y;
 	s_main.setup.generic.id					= ID_SETUP;
 	s_main.setup.generic.callback			= Main_MenuEvent; 
+#ifdef TMNTSP // Moved to OPTIONS Menu.
+	s_main.setup.string						= "OPTIONS";
+#else
 	s_main.setup.string						= "SETUP";
+#endif
 	s_main.setup.color						= color_red;
 	s_main.setup.style						= style;
 
+#ifndef TMNTSP // Moved to PLAY Menu.
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.demos.generic.type				= MTYPE_PTEXT;
 	s_main.demos.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -389,6 +424,7 @@ void UI_MainMenu( void ) {
 	s_main.mods.string					= "MODS";
 	s_main.mods.color					= color_red;
 	s_main.mods.style					= style;
+#endif
 
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.exit.generic.type				= MTYPE_PTEXT;
@@ -404,12 +440,14 @@ void UI_MainMenu( void ) {
 	Menu_AddItem( &s_main.menu,	&s_main.singleplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.multiplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.setup );
+#ifndef TMNTSP // Moved to PLAY Menu.
 	Menu_AddItem( &s_main.menu,	&s_main.demos );
 	Menu_AddItem( &s_main.menu,	&s_main.cinematics );
 	if (teamArena) {
 		Menu_AddItem( &s_main.menu,	&s_main.teamArena );
 	}
 	Menu_AddItem( &s_main.menu,	&s_main.mods );
+#endif
 	Menu_AddItem( &s_main.menu,	&s_main.exit );             
 
 	trap_Key_SetCatcher( KEYCATCH_UI );

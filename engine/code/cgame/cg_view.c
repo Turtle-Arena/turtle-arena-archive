@@ -569,9 +569,15 @@ static void CG_DamageBlendBlob( void ) {
 		return;
 	}
 
+#ifdef CAMERASCRIPT
+	if (cg.cameraMode) {
+		return;
+	}
+#else
 	//if (cg.cameraMode) {
 	//	return;
 	//}
+#endif
 
 	// ragePro systems can't fade blends, so don't obscure the screen
 	if ( cgs.glconfig.hardwareType == GLHW_RAGEPRO ) {
@@ -623,6 +629,33 @@ static int CG_CalcViewValues( void ) {
 	CG_CalcVrect();
 
 	ps = &cg.predictedPlayerState;
+#ifdef CAMERASCRIPT
+	if (cg.cameraMode) {
+		vec3_t origin, angles;
+		float fov = 90;
+		float x;
+		if (trap_getCameraInfo(cg.time, &origin, &angles, &fov)) {
+			VectorCopy(origin, cg.refdef.vieworg);
+			angles[ROLL] = 0;
+			angles[PITCH] = -angles[PITCH]; // Bug Fix for GtkRadiant cameras
+			VectorCopy(angles, cg.refdefViewAngles);
+			AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
+			x = cg.refdef.width / tan( fov / 360 * M_PI );
+			cg.refdef.fov_y = atan2( cg.refdef.height, x );
+			cg.refdef.fov_y = cg.refdef.fov_y * 360 / M_PI;
+			cg.refdef.fov_x = fov;
+			return 0;
+		} else {
+			cg.cameraMode = qfalse;
+			if (cg.cameraEndBlack) {
+				CG_Fade(255, 0, 0);				// go black
+				CG_Fade(0, cg.time + 200, 1500);	// then fadeup
+			}
+
+			CG_ToggleLetterbox(qfalse, cg.cameraEndBlack);
+		}
+	}
+#else
 /*
 	if (cg.cameraMode) {
 		vec3_t origin, angles;
@@ -637,8 +670,29 @@ static int CG_CalcViewValues( void ) {
 		}
 	}
 */
+#endif
+#ifdef TMNTCAMERA
+	// If not a Q3 camera use new camera code.
+	if (ps->camera.mode != CAM_FIRSTPERSON && ps->camera.mode != CAM_Q3THIRDPERSON)
+	{
+		if ( cg.hyperspace ) {
+			cg.refdef.rdflags |= RDF_NOWORLDMODEL | RDF_HYPERSPACE;
+		}
+
+		// Turtle Man: TODO: Perdiction.
+		VectorCopy(ps->camera.angles, cg.refdefViewAngles);
+		VectorCopy(ps->camera.pos, cg.refdef.vieworg);
+		AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
+
+		return CG_CalcFov();
+	}
+#endif
 	// intermission view
-	if ( ps->pm_type == PM_INTERMISSION ) {
+	if ( ps->pm_type == PM_INTERMISSION
+#ifdef TMNTSP
+		&& cgs.gametype != GT_SINGLE_PLAYER
+#endif
+	) {
 		VectorCopy( ps->origin, cg.refdef.vieworg );
 		VectorCopy( ps->viewangles, cg.refdefViewAngles );
 		AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
@@ -674,6 +728,20 @@ static int CG_CalcViewValues( void ) {
 		}
 	}
 
+#ifdef ANALOG // Turtle Man: TODO: Analog camera.
+	if (cg_thirdPerson.integer && cg_thirdPersonAnalog.integer)
+	{
+		// Analog camera.
+		cg.refdef.vieworg[0] = 0;
+		cg.refdef.vieworg[1] = 0;
+		cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight*2;
+
+		cg.refdefViewAngles[ROLL] = 0;
+		cg.refdefViewAngles[PITCH] = 0;
+		cg.refdefViewAngles[YAW] = 0;
+	}
+	else
+#endif
 	if ( cg.renderingThirdPerson ) {
 		// back away from character
 		CG_OffsetThirdPersonView();
@@ -792,7 +860,19 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	}
 
 	// let the client system know what our weapon and zoom settings are
+#ifdef TMNTWEAPSYS2
+#ifdef TMNTHOLDSYS2
+	trap_SetUserCmdValue( cg.holdableSelect, cg.zoomSensitivity );
+#else
+	trap_SetUserCmdValue( 0, cg.zoomSensitivity );
+#endif
+#else
+#ifdef TMNTHOLDSYS2
+	trap_SetUserCmdValue( cg.weaponSelect, cg.holdableSelect, cg.zoomSensitivity );
+#else
 	trap_SetUserCmdValue( cg.weaponSelect, cg.zoomSensitivity );
+#endif
+#endif
 
 	// this counter will be bumped for every valid scene we generate
 	cg.clientFrame++;
@@ -801,7 +881,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	CG_PredictPlayerState();
 
 	// decide on third person view
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, if spectator always be in first person.
+	cg.renderingThirdPerson = (cg_thirdPerson.integer && cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR)
+								|| (cg.snap->ps.stats[STAT_HEALTH] <= 0);
+#else
 	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
+#endif
 
 	// build cg.refdef
 	inwater = CG_CalcViewValues();

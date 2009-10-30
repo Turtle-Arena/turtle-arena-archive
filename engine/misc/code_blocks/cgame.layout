@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="" />
+	<File name="../../code/cgame/cg_consolecmds.c" open="0" top="0" tabpos="0">
+		<Cursor position="4595" topLine="170" />
+	</File>
+	<File name="../../code/cgame/cg_draw.c" open="0" top="0" tabpos="0">
+		<Cursor position="65805" topLine="2938" />
+	</File>
+	<File name="../../code/cgame/cg_drawtools.c" open="0" top="0" tabpos="0">
+		<Cursor position="17752" topLine="822" />
+	</File>
+	<File name="../../code/cgame/cg_effects.c" open="0" top="0" tabpos="0">
+		<Cursor position="17372" topLine="713" />
+	</File>
+	<File name="../../code/cgame/cg_ents.c" open="0" top="0" tabpos="0">
+		<Cursor position="5297" topLine="195" />
+	</File>
+	<File name="../../code/cgame/cg_event.c" open="0" top="0" tabpos="0">
+		<Cursor position="28072" topLine="1143" />
+	</File>
+	<File name="../../code/cgame/cg_info.c" open="0" top="0" tabpos="0">
+		<Cursor position="7879" topLine="298" />
+	</File>
+	<File name="../../code/cgame/cg_local.h" open="0" top="0" tabpos="0">
+		<Cursor position="5414" topLine="210" />
+	</File>
+	<File name="../../code/cgame/cg_localents.c" open="0" top="0" tabpos="0">
+		<Cursor position="18387" topLine="692" />
+	</File>
+	<File name="../../code/cgame/cg_main.c" open="0" top="0" tabpos="0">
+		<Cursor position="33877" topLine="861" />
+	</File>
+	<File name="../../code/cgame/cg_marks.c" open="0" top="0" tabpos="0">
+		<Cursor position="26279" topLine="1093" />
+	</File>
+	<File name="../../code/cgame/cg_newdraw.c" open="0" top="0" tabpos="0">
+		<Cursor position="26667" topLine="929" />
+	</File>
+	<File name="../../code/cgame/cg_players.c" open="0" top="0" tabpos="0">
+		<Cursor position="38567" topLine="1318" />
+	</File>
+	<File name="../../code/cgame/cg_playerstate.c" open="0" top="0" tabpos="0">
+		<Cursor position="11891" topLine="430" />
+	</File>
+	<File name="../../code/cgame/cg_predict.c" open="0" top="0" tabpos="0">
+		<Cursor position="1259" topLine="22" />
+	</File>
+	<File name="../../code/cgame/cg_scoreboard.c" open="0" top="0" tabpos="0">
+		<Cursor position="8706" topLine="302" />
+	</File>
+	<File name="../../code/cgame/cg_servercmds.c" open="0" top="0" tabpos="0">
+		<Cursor position="14363" topLine="511" />
+	</File>
+	<File name="../../code/cgame/cg_view.c" open="0" top="0" tabpos="0">
+		<Cursor position="22676" topLine="876" />
+	</File>
+	<File name="../../code/cgame/cg_weapons.c" open="0" top="0" tabpos="0">
+		<Cursor position="19245" topLine="774" />
+	</File>
+	<File name="../../code/game/bg_misc.c" open="0" top="0" tabpos="0">
+		<Cursor position="75999" topLine="3110" />
+	</File>
+	<File name="../../code/game/bg_pmove.c" open="0" top="0" tabpos="0">
+		<Cursor position="39299" topLine="1775" />
+	</File>
+	<File name="../../code/game/bg_public.h" open="0" top="0" tabpos="0">
+		<Cursor position="11428" topLine="331" />
+	</File>
+	<File name="../../code/qcommon/q_shared.h" open="0" top="0" tabpos="0">
+		<Cursor position="29644" topLine="999" />
+	</File>
+	<File name="../../code/ui/ui_shared.c" open="0" top="0" tabpos="0">
+		<Cursor position="81486" topLine="3140" />
+	</File>
+</CodeBlocks_layout_file>

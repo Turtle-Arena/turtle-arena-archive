@@ -123,9 +123,11 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 		UI_PreferencesMenu();
 		break;
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	case ID_CDKEY:
 		UI_CDKeyMenu();
 		break;
+#endif
 
 //	case ID_LOAD:
 //		UI_LoadConfigMenu();
@@ -163,7 +165,11 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.banner.generic.type				= MTYPE_BTEXT;
 	setupMenuInfo.banner.generic.x					= 320;
 	setupMenuInfo.banner.generic.y					= 16;
+#ifdef TMNTSP // New menus
+	setupMenuInfo.banner.string						= "OPTIONS";
+#else
 	setupMenuInfo.banner.string						= "SETUP";
+#endif
 	setupMenuInfo.banner.color						= color_white;
 	setupMenuInfo.banner.style						= UI_CENTER;
 
@@ -227,6 +233,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.game.color						= color_red;
 	setupMenuInfo.game.style						= UI_CENTER;
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	y += SETUP_MENU_VERTICAL_SPACING;
 	setupMenuInfo.cdkey.generic.type				= MTYPE_PTEXT;
 	setupMenuInfo.cdkey.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -237,6 +244,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.cdkey.string						= "CD Key";
 	setupMenuInfo.cdkey.color						= color_red;
 	setupMenuInfo.cdkey.style						= UI_CENTER;
+#endif
 
 	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
 #if 0
@@ -293,7 +301,9 @@ static void UI_SetupMenu_Init( void ) {
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupcontrols );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupsystem );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.game );
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.cdkey );
+#endif
 //	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.load );
 //	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.save );
 	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {

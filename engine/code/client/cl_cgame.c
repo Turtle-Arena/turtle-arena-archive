@@ -31,7 +31,11 @@ extern	botlib_export_t	*botlib_export;
 
 extern qboolean loadCamera(const char *name);
 extern void startCamera(int time);
+#ifdef CAMERASCRIPT
+extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles, float *fov);
+#else
 extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
+#endif
 
 /*
 ====================
@@ -170,10 +174,20 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 CL_SetUserCmdValue
 =====================
 */
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) {
+#if defined TMNTHOLDSYS2 && !defined TMNTWEAPSYS2
+void CL_SetUserCmdValue( int userCmdValue, int holdableValue, float sensitivityScale ) {
 	cl.cgameUserCmdValue = userCmdValue;
+	cl.cgameHoldableValue = holdableValue;
 	cl.cgameSensitivity = sensitivityScale;
 }
+#else
+void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) {
+#if !defined TMNTWEAPSYS2 || (defined TMNTWEAPSYS2 && defined TMNTHOLDSYS2)
+	cl.cgameUserCmdValue = userCmdValue;
+#endif
+	cl.cgameSensitivity = sensitivityScale;
+}
+#endif
 
 /*
 =====================
@@ -598,7 +612,11 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_GETUSERCMD:
 		return CL_GetUserCmd( args[1], VMA(2) );
 	case CG_SETUSERCMDVALUE:
+#if defined TMNTHOLDSYS2 && !defined TMNTWEAPSYS2
+		CL_SetUserCmdValue( args[1], args[2], VMF(3) );
+#else
 		CL_SetUserCmdValue( args[1], VMF(2) );
+#endif
 		return 0;
 	case CG_MEMORY_REMAINING:
 		return Hunk_MemoryRemaining();
@@ -681,6 +699,17 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		re.RemapShader( VMA(1), VMA(2), VMA(3) );
 		return 0;
 
+#ifdef CAMERASCRIPT
+	case CG_LOADCAMERA:
+		return loadCamera(VMA(1));
+
+	case CG_STARTCAMERA:
+		startCamera(args[1]);
+		return 0;
+
+	case CG_GETCAMERAINFO:
+		return getCameraInfo(args[1], VMA(2), VMA(3), VMA(4));
+#else
 /*
 	case CG_LOADCAMERA:
 		return loadCamera(VMA(1));
@@ -692,6 +721,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_GETCAMERAINFO:
 		return getCameraInfo(args[1], VMA(2), VMA(3));
 */
+#endif
 	case CG_GET_ENTITY_TOKEN:
 		return re.GetEntityToken( VMA(1), args[2] );
 	case CG_R_INPVS:

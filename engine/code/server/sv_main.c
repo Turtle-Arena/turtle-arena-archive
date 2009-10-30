@@ -229,7 +229,11 @@ but not on every player enter or exit.
 ================
 */
 #define	HEARTBEAT_MSEC	300*1000
+#ifdef TMNT
+#define	HEARTBEAT_GAME	"TMNTArena-1"
+#else
 #define	HEARTBEAT_GAME	"QuakeArena-1"
+#endif
 void SV_MasterHeartbeat( void ) {
 	static netadr_t	adr[MAX_MASTER_SERVERS];
 	int			i;
@@ -333,7 +337,13 @@ void SVC_Status( netadr_t from ) {
 	char	infostring[MAX_INFO_STRING];
 
 	// ignore if we are in single player
-	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ) {
+	if (
+#ifdef TMNTSP
+	Cvar_VariableValue("ui_singlePlayerActive")
+#else
+	Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER
+#endif
+	) {
 		return;
 	}
 
@@ -378,7 +388,11 @@ void SVC_Info( netadr_t from ) {
 	char	infostring[MAX_INFO_STRING];
 
 	// ignore if we are in single player
-	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER || Cvar_VariableValue("ui_singlePlayerActive")) {
+	if (
+#ifndef TMNTSP
+	Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
+#endif
+	Cvar_VariableValue("ui_singlePlayerActive")) {
 		return;
 	}
 

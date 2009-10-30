@@ -156,12 +156,15 @@ CG_FragmentBounceMark
 void CG_FragmentBounceMark( localEntity_t *le, trace_t *trace ) {
 	int			radius;
 
+#ifndef NOTRATEDM // No gibs.
 	if ( le->leMarkType == LEMT_BLOOD ) {
 
 		radius = 16 + (rand()&31);
 		CG_ImpactMark( cgs.media.bloodMarkShader, trace->endpos, trace->plane.normal, random()*360,
 			1,1,1,1, qtrue, radius, qfalse );
-	} else if ( le->leMarkType == LEMT_BURN ) {
+	} else
+#endif
+	if ( le->leMarkType == LEMT_BURN ) {
 
 		radius = 8 + (rand()&15);
 		CG_ImpactMark( cgs.media.burnMarkShader, trace->endpos, trace->plane.normal, random()*360,
@@ -180,6 +183,7 @@ CG_FragmentBounceSound
 ================
 */
 void CG_FragmentBounceSound( localEntity_t *le, trace_t *trace ) {
+#ifndef NOTRATEDM // No gibs.
 	if ( le->leBounceSoundType == LEBS_BLOOD ) {
 		// half the gibs will make splat sounds
 		if ( rand() & 1 ) {
@@ -195,7 +199,10 @@ void CG_FragmentBounceSound( localEntity_t *le, trace_t *trace ) {
 			}
 			trap_S_StartSound( trace->endpos, ENTITYNUM_WORLD, CHAN_AUTO, s );
 		}
-	} else if ( le->leBounceSoundType == LEBS_BRASS ) {
+	}
+	else
+#endif
+	if ( le->leBounceSoundType == LEBS_BRASS ) {
 
 	}
 
@@ -287,10 +294,12 @@ void CG_AddFragment( localEntity_t *le ) {
 
 		trap_R_AddRefEntityToScene( &le->refEntity );
 
+#ifndef NOTRATEDM // No gibs.
 		// add a blood trail
 		if ( le->leBounceSoundType == LEBS_BLOOD ) {
 			CG_BloodTrail( le );
 		}
+#endif
 
 		return;
 	}
@@ -688,11 +697,14 @@ void CG_AddInvulnerabilityJuiced( localEntity_t *le ) {
 		le->refEntity.axis[1][1] = (float) 1.0 + 0.3 * (t - 3000) / 2000;
 		le->refEntity.axis[2][2] = (float) 0.7 + 0.3 * (2000 - (t - 3000)) / 2000;
 	}
+#ifndef NOTRATEDM // No gibs.
 	if ( t > 5000 ) {
 		le->endTime = 0;
 		CG_GibPlayer( le->refEntity.origin );
 	}
-	else {
+	else
+#endif
+	{
 		trap_R_AddRefEntityToScene( &le->refEntity );
 	}
 }

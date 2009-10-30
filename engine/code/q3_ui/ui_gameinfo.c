@@ -366,6 +366,19 @@ static void UI_LoadBots( void ) {
 
 	ui_numBots = 0;
 
+#ifdef RANDOMBOT // Turtle Man: Init Random bot.
+    {
+        char info[MAX_INFO_STRING];
+        Info_SetValueForKey(info, "name", "Random");
+        // Random bot doesn't have a model, but it has a icon.
+        Info_SetValueForKey(info, "model", "Random");
+        ui_botInfos[ui_numBots] = UI_Alloc(strlen(info) + strlen("\\num\\") + strlen(va("%d", MAX_ARENAS)) + 1);
+		if (ui_botInfos[ui_numBots])
+			strcpy(ui_botInfos[ui_numBots], info);
+        ui_numBots++;
+    }
+#endif
+
 	trap_Cvar_Register( &botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM );
 	if( *botsFile.string ) {
 		UI_LoadBotsFromFile(botsFile.string);

@@ -157,6 +157,10 @@ static void UI_CinematicsMenu_Init( void ) {
 	cinematicsMenuInfo.cin_idlogo.string			= "ID LOGO";
 	cinematicsMenuInfo.cin_idlogo.color				= color_red;
 	cinematicsMenuInfo.cin_idlogo.style				= UI_CENTER;
+#ifdef TMNT
+    // Turtle Man: Always disable...
+    cinematicsMenuInfo.cin_idlogo.generic.flags |= QMF_GRAYED;
+#endif
 
 	y += VERTICAL_SPACING;
 	cinematicsMenuInfo.cin_intro.generic.type		= MTYPE_PTEXT;
@@ -168,9 +172,14 @@ static void UI_CinematicsMenu_Init( void ) {
 	cinematicsMenuInfo.cin_intro.string				= "INTRO";
 	cinematicsMenuInfo.cin_intro.color				= color_red;
 	cinematicsMenuInfo.cin_intro.style				= UI_CENTER;
+#ifdef TMNT
+    // Turtle Man: Always disable...
+    cinematicsMenuInfo.cin_intro.generic.flags |= QMF_GRAYED;
+#else
 	if( uis.demoversion ) {
 		cinematicsMenuInfo.cin_intro.generic.flags |= QMF_GRAYED;
 	}
+#endif
 
 	y += VERTICAL_SPACING;
 	cinematicsMenuInfo.cin_tier1.generic.type		= MTYPE_PTEXT;

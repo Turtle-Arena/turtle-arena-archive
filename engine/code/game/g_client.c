@@ -84,8 +84,14 @@ qboolean SpotWouldTelefrag( gentity_t *spot ) {
 	gentity_t	*hit;
 	vec3_t		mins, maxs;
 
+#if 0 // #ifdef TMNTPLAYERSYS
+	// Turtle Man: FIXME: Use per-player bounding box for telefrag checking!
+	VectorAdd( spot->s.origin, wut->playercfg.bbmins, mins );
+	VectorAdd( spot->s.origin, wut->playercfg.bbmaxs, maxs );
+#else
 	VectorAdd( spot->s.origin, playerMins, mins );
 	VectorAdd( spot->s.origin, playerMaxs, maxs );
+#endif
 	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
 
 	for (i=0 ; i<num ; i++) {
@@ -270,6 +276,64 @@ gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) 
 	*/
 }
 
+#ifdef TMNTSP
+/*
+===========
+SelectSinglePlayerSpawnPoint
+
+Trys to find info_player_start with client num,
+if none uses info_player_start for client 0,
+if none uses last info_player_start found.
+if none uses 'initial' deathmatch spawn point,
+if none uses deathmatch spawn point.
+============
+*/
+gentity_t *SelectSinglePlayerSpawnPoint( int clientnum, vec3_t origin, vec3_t angles ) {
+	gentity_t	*spot = NULL;
+	gentity_t	*spot0 = NULL;
+	gentity_t	*spotlast = NULL;
+
+	while ((spot = G_Find (spot, FOFS(classname), "info_player_start")) != NULL) {
+		spotlast = spot;
+		// Save spot 0 as it will be the default there isn't one for this client.
+		if (spot->count == 0) {
+			spot0 = spot;
+		}
+		if ( clientnum < 0 || spot->count == clientnum ) {
+			break;
+		}
+	}
+	if (!spot && spot0) {
+		spot = spot0;
+	}
+	if (!spot && spotlast) {
+		spot = spotlast;
+	}
+
+	// There are no info_player_start, use a deathmatch start.
+	if (!spot)
+	{
+		G_Printf("Warning: Map missing info_player_start atemping to use deathmacth spawn.\n");
+
+		while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
+			if ( spot->spawnflags & 1 ) {
+				break;
+			}
+		}
+	}
+
+	if ( !spot || SpotWouldTelefrag( spot ) ) {
+		return SelectSpawnPoint( vec3_origin, origin, angles );
+	}
+
+	VectorCopy (spot->s.origin, origin);
+	origin[2] += 9;
+	VectorCopy (spot->s.angles, angles);
+
+	return spot;
+}
+#endif
+
 /*
 ===========
 SelectInitialSpawnPoint
@@ -282,6 +346,7 @@ gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles ) {
 	gentity_t	*spot;
 
 	spot = NULL;
+
 	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
 		if ( spot->spawnflags & 1 ) {
 			break;
@@ -456,12 +521,16 @@ void CopyToBodyQue( gentity_t *ent ) {
 
 	body->die = body_die;
 
+#ifdef NOTRATEDM // No gibs.
+	body->takedamage = qtrue;
+#else
 	// don't take more damage if already gibbed
 	if ( ent->health <= GIB_HEALTH ) {
 		body->takedamage = qfalse;
 	} else {
 		body->takedamage = qtrue;
 	}
+#endif
 
 
 	VectorCopy ( body->s.pos.trBase, body->r.currentOrigin );
@@ -502,6 +571,12 @@ void respawn( gentity_t *ent ) {
 	CopyToBodyQue (ent);
 	ClientSpawn(ent);
 
+#if 0 //#ifdef TMNTSP // No teleport effect in Single Player
+    if (g_gametype.integer == GT_SINGLE_PLAYER)
+    {
+        return;
+    }
+#endif
 	// add a teleportation effect
 	tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
 	tent->s.clientNum = ent->s.clientNum;
@@ -688,6 +763,105 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 	}
 }
 
+#ifdef TMNTPLAYERSYS
+/*
+===========
+G_LoadPlayer
+
+Load animation.cfg
+
+The function is called when a player updates there info string,
+  like changing models, handiecap, or even CTF team names...
+
+Turtle Man: FIXME: Only call when changing models!
+                   Currently it gets called to much,
+                    and can't support weapons that have limited uses (like guns).
+============
+*/
+void G_LoadPlayer(int clientNum, const char *inModelName)
+{
+    char *p;
+    char model[MAX_QPATH];
+    gentity_t *ent;
+    gclient_t *client;
+    bg_playercfg_t *playercfg;
+    weapon_t oldDefault;
+
+	ent = &g_entities[clientNum];
+	client = ent->client;
+	playercfg = &client->pers.playercfg;
+
+    Q_strncpyz(model, inModelName, MAX_QPATH);
+
+    // Remove skin
+	if ((p = Q_strrchr(model, '/')) != 0) {
+		*p = 0;
+	}
+
+	// load animation.cfg
+	if (!model[0] || !BG_LoadPlayerCFGFile(model, playercfg))
+	{
+		G_Printf("G_LoadPlayer: Loading player failed (%s)\n", inModelName);
+		// Default to raph.
+		Q_strncpyz(model, "raph"/*DEFAULT_MODEL ...cg local*/, MAX_QPATH);
+		if (!BG_LoadPlayerCFGFile(model, playercfg))
+		{
+			G_Printf("G_LoadPlayer: Loading default player failed (%s)\n", inModelName);
+			// The defaults were loaded in BG_LoadPlayerCFGFile,
+			//   so we should be able to continue...
+		}
+	}
+
+	VectorCopy (client->pers.playercfg.bbmins, ent->r.mins);
+	VectorCopy (client->pers.playercfg.bbmaxs, ent->r.maxs);
+
+#ifdef TMNTWEAPSYS
+	// DEFAULT_DEFAULT_WEAPON
+	oldDefault = g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON];
+
+	g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON] = playercfg->default_weapon;
+
+	// Don't keep default weapon from the pervious player,
+	//  the weapon will not be spawned as we lie and say it has 0 ammo.
+
+	if (!BG_WeapUseAmmo(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]))
+	{
+		// Make sure melee weapons (and grapple) have unlimited "ammo"
+		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = -1;
+	}
+	else
+	{
+		// GUNS_AS_DEFAULT
+#if 1
+		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = -1;
+#else
+		// Guns are cheatable, for now anyway.
+		gitem_t *item = BG_FindItemForWeapon(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]);
+		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = item->quantity;
+#endif
+	}
+
+	// If not holding new default, change to it.
+	if (g_entities[clientNum].client->ps.weapon != g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON])
+	{
+		// Check if it is the old default weapon
+		if (g_entities[clientNum].client->ps.weapon == oldDefault)
+		{
+			// Don't allow the weapon to be picked up, as it is the players default.
+			g_entities[clientNum].client->ps.stats[STAT_AMMO] = 0;
+
+			// Change to default
+			g_entities[clientNum].client->ps.stats[STAT_NEWWEAPON] = g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON];
+		}
+	}
+	else
+	{
+		// Only update "ammo"
+		g_entities[clientNum].client->ps.stats[STAT_AMMO] = g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO];
+	}
+#endif
+}
+#endif
 
 /*
 ===========
@@ -777,6 +951,12 @@ void ClientUserinfoChanged( int clientNum ) {
 	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 
 	// set model
+#ifdef TMNTSP // SPMODEL
+	if ( g_singlePlayer.integer /* && g_gametype.integer == GT_SINGLE_PLAYER*/ ) {
+		Q_strncpyz( model, Info_ValueForKey (userinfo, "spmodel"), sizeof( model ) );
+		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "spheadmodel"), sizeof( headModel ) );
+	} else
+#endif
 	if( g_gametype.integer >= GT_TEAM ) {
 		Q_strncpyz( model, Info_ValueForKey (userinfo, "team_model"), sizeof( model ) );
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "team_headmodel"), sizeof( headModel ) );
@@ -784,6 +964,11 @@ void ClientUserinfoChanged( int clientNum ) {
 		Q_strncpyz( model, Info_ValueForKey (userinfo, "model"), sizeof( model ) );
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "headmodel"), sizeof( headModel ) );
 	}
+
+#ifdef TMNTPLAYERSYS
+    // Load game.cfg
+    G_LoadPlayer(clientNum, model);
+#endif
 
 	// bots set their team a few frames later
 	if (g_gametype.integer >= GT_TEAM && g_entities[clientNum].r.svFlags & SVF_BOT) {
@@ -965,7 +1150,13 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	ClientUserinfoChanged( clientNum );
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
-	if ( firstTime ) {
+#ifdef TMNTSP
+    // If its single player don't add message.
+	if ( firstTime && !g_singlePlayer.integer)
+#else
+	if ( firstTime )
+#endif
+	{
 		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 	}
 
@@ -1028,7 +1219,11 @@ void ClientBegin( int clientNum ) {
 	// locate ent at a spawn point
 	ClientSpawn( ent );
 
-	if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
+	if (
+#ifdef TMNTSP
+	!g_singlePlayer.integer &&
+#endif
+	client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		// send event
 		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
 		tent->s.clientNum = ent->s.clientNum;
@@ -1083,6 +1278,10 @@ void ClientSpawn(gentity_t *ent) {
 						client->sess.sessionTeam, 
 						client->pers.teamState.state, 
 						spawn_origin, spawn_angles);
+#ifdef TMNTSP
+	} else if (g_gametype.integer == GT_SINGLE_PLAYER) {
+		spawnPoint = SelectSinglePlayerSpawnPoint(index, spawn_origin, spawn_angles);
+#endif
 	} else {
 		do {
 			// the first spawn should be at a good looking spot
@@ -1175,11 +1374,105 @@ void ClientSpawn(gentity_t *ent) {
 	ent->watertype = 0;
 	ent->flags = 0;
 	
+#ifdef TMNTPLAYERSYS
+	VectorCopy (client->pers.playercfg.bbmins, ent->r.mins);
+	VectorCopy (client->pers.playercfg.bbmaxs, ent->r.maxs);
+#else
 	VectorCopy (playerMins, ent->r.mins);
 	VectorCopy (playerMaxs, ent->r.maxs);
+#endif
 
 	client->ps.clientNum = index;
 
+#ifdef TMNTCAMERA
+	G_ClientCameraReset(client);
+#endif
+
+#ifdef SP_NPC
+	ent->slow_event=level.time+1000;
+#endif
+
+#ifdef TMNTHOLDSYS
+	client->ps.holdableIndex = HI_NONE;
+#endif
+#ifdef TMNTWEAPSYS // Turtle Man: Respawn code. Start with default weapon. Set ammo values.
+	// Set default weapon
+#if defined TMNTPLAYERSYS && TMNTPLAYERS
+	client->ps.stats[STAT_DEFAULTWEAPON] = client->pers.playercfg.default_weapon;
+#else
+	client->ps.stats[STAT_DEFAULTWEAPON] = DEFAULT_DEFAULT_WEAPON;
+#endif
+
+	client->ps.stats[STAT_OLDWEAPON] = WP_NONE;
+
+#ifdef TMNTWEAPSYS2
+	// Set default ammo values.
+	client->ps.stats[STAT_SAVEDAMMO] = -1;
+	client->ps.stats[STAT_OLDAMMO] = -1;
+	client->ps.stats[STAT_NEWAMMO] = -1;
+	client->ps.stats[STAT_AMMO] = -1;
+#else
+	// Set default ammo values.
+	{
+		int i;
+		for (i = 0; i < MAX_WEAPONS/*WP_NUM_WEAPONS*/; ++i)
+		{
+			if (BG_WeapUseAmmo(i))
+			{
+				client->ps.ammo[i] = 0;
+			}
+			else
+			{
+				// If its not a gun, no ammo.
+				client->ps.ammo[i] = -1;
+			}
+		}
+	}
+#endif
+
+	{
+		// Turtle Man: Start with default weapon.
+		gitem_t *item;
+		weapon_t weapon;
+
+		weapon = client->ps.stats[STAT_DEFAULTWEAPON];
+#ifdef TMNTWEAPSYS2
+		client->ps.stats[STAT_NEWWEAPON] = weapon;
+#else
+		client->ps.stats[STAT_WEAPONS] = ( 1 << weapon);
+#endif
+
+		item = BG_FindItemForWeapon( weapon );
+
+		if (item->quantity == 0)
+		{
+			// Weapon that doesn't use ammo.
+#ifdef TMNTWEAPSYS2
+			client->ps.stats[STAT_AMMO] = -1;
+#else
+			client->ps.ammo[weapon] = -1;
+#endif
+		}
+		else
+		{
+#ifdef TMNTWEAPSYS2
+			client->ps.stats[STAT_AMMO] = item->quantity;
+
+			if ( g_gametype.integer == GT_TEAM )
+			{
+				client->ps.stats[STAT_AMMO] /= 2;
+			}
+#else
+			client->ps.ammo[weapon] = item->quantity;
+
+			if ( g_gametype.integer == GT_TEAM )
+			{
+				client->ps.ammo[weapon] /= 2;
+			}
+#endif
+		}
+	}
+#else
 	client->ps.stats[STAT_WEAPONS] = ( 1 << WP_MACHINEGUN );
 	if ( g_gametype.integer == GT_TEAM ) {
 		client->ps.ammo[WP_MACHINEGUN] = 50;
@@ -1190,9 +1483,14 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_GAUNTLET );
 	client->ps.ammo[WP_GAUNTLET] = -1;
 	client->ps.ammo[WP_GRAPPLING_HOOK] = -1;
+#endif
 
+#ifdef TMNT // no health countdown
+	ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH];
+#else
 	// health will count down towards max_health
 	ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH] + 25;
+#endif
 
 	G_SetOrigin( ent, spawn_origin );
 	VectorCopy( spawn_origin, client->ps.origin );
@@ -1210,7 +1508,12 @@ void ClientSpawn(gentity_t *ent) {
 		trap_LinkEntity (ent);
 
 		// force the base weapon up
+#ifdef TMNTWEAPSYS // Turtle Man: Set ready weapon to default weapon.
+		// Turtle Man: Start with default weapon.
+		client->ps.weapon = client->ps.stats[STAT_DEFAULTWEAPON];
+#else
 		client->ps.weapon = WP_MACHINEGUN;
+#endif
 		client->ps.weaponstate = WEAPON_READY;
 
 	}
@@ -1233,6 +1536,7 @@ void ClientSpawn(gentity_t *ent) {
 		// fire the targets of the spawn point
 		G_UseTargets( spawnPoint, ent );
 
+#ifndef TMNTWEAPSYS2 // don't select any weapon after spawning
 		// select the highest weapon number available, after any
 		// spawn given items have fired
 		client->ps.weapon = 1;
@@ -1242,7 +1546,16 @@ void ClientSpawn(gentity_t *ent) {
 				break;
 			}
 		}
+#endif
 	}
+
+#ifdef TMNTSP
+	//
+	// Load persistant data
+	// Turtle Man: FIXME: Load after all clients have spawned!
+	//
+	G_LoadPersistant(); // get data
+#endif
 
 	// run a client frame to drop exactly to the floor,
 	// initialize animations and other things
@@ -1355,4 +1668,245 @@ void ClientDisconnect( int clientNum ) {
 	}
 }
 
+#ifdef TMNTSP // save/load
+#if 1 // Use Cvars to store data instead of a file on FS_WRITE
+/* =============
+G_SavePersistant
 
+Saves the data in a cvar so we don't have to write a file
+after each level in SinglePlayer.
+
+Should allow 64 client single player games...
+
+Save the lives, score, and holdable stuff.
+================*/
+void G_SavePersistant(char *nextmap)
+{
+	char savedata[MAX_CVAR_VALUE_STRING*2];
+	char *s;
+	int i;
+	gclient_t *client;
+#ifdef TMNTHOLDSYS
+	int j;
+	char holdableData[(MAX_HOLDABLE*2)+1];
+	int save_array;
+#endif
+	int skill;
+
+	// If in real single player auto-save on save end? in case of crash or something?...
+	if (g_singlePlayer.integer) {
+		trap_SendConsoleCommand( EXEC_APPEND, va("savegame autosave -minimum %s", nextmap) );
+	}
+	skill = trap_Cvar_VariableValue( "g_spSkill" );
+
+	memset(savedata, 0, sizeof(savedata));
+	// Save game settings.
+	Com_sprintf(savedata, sizeof(savedata), "map\\%s\\sk\\%i\\", nextmap, skill);
+	//G_Printf("DEBUG: Savedata=%s\n", savedata);
+	// Hack for CVAR_SEVERINFO
+	for (i = 0; i < strlen(savedata); i++)
+	{
+		if (savedata[i] == '\\')
+			savedata[i] = '/';
+	}
+	trap_Cvar_Set("g_spSaveData", savedata);
+	savedata[0] = '\0';
+
+	for (i = 0; i < level.maxclients; i++)
+	{
+		client = &level.clients[i];
+		if (strlen(client->pers.netname) < 1) {
+			continue;
+		}
+
+#ifdef TMNTHOLDSYS
+		s = va("n\\%s\\livs\\%d\\scr\\%i\\hi\\%i",
+				client->pers.netname, /*lives*/3,
+				client->ps.persistant[PERS_SCORE], client->ps.holdableIndex);
+#else
+		s = va("n\\%s\\livs\\%d\\scr\\%i",
+				client->pers.netname, /*lives*/3,
+				client->ps.persistant[PERS_SCORE]);
+#endif
+		Q_strncpyz(savedata, s, sizeof(savedata));
+
+#ifdef TMNTHOLDSYS
+		// Save arrays.
+		holdableData[0] = '\0';
+		save_array = 0;
+		for (j = 1; j < MAX_HOLDABLE; j++)
+		{
+			if (client->ps.holdable[j] > 0) {
+				// Only need to save holdables up to save_array.
+				save_array = j;
+			}
+			s = va("%s%i", client->ps.holdable[j] < 10 ? "0" : "", client->ps.holdable[j]);
+			strcat(holdableData, s);
+		}
+		if (save_array)
+		{
+			strcat(savedata, "\\hd\\"); // holdable data
+			holdableData[save_array*2 - 1] = 0;
+			strcat(savedata, holdableData);
+		}
+#endif
+
+		// Check var bounds
+		if (strlen(savedata) > MAX_CVAR_VALUE_STRING)
+		{
+			// Turtle Man: This shouldn't happen.
+			trap_Cvar_Set("g_spSaveData", "");
+
+			if (g_singlePlayer.value)
+				G_Error("Saving SP client data failed\ntoo much data! (%i/%i)\n%s\n", strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
+			else // Don't error to network
+				G_Printf("Saving SP client data failed\ntoo much data! (%i/%i)\n%s\n", strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
+
+			return;
+		}
+
+		// Hack for CVAR_SEVERINFO
+		for (i = 0; i < strlen(savedata); i++)
+		{
+			if (savedata[i] == '\\')
+				savedata[i] = '/';
+		}
+
+		G_Printf("DEBUG: Savedata=%s\n", savedata);
+		trap_Cvar_Set(va("g_spSaveData%i", i), savedata);
+		savedata[0] = '\0';
+	}
+}
+
+void G_LoadPersistant(void)
+{
+	char savedata[1000];
+	gclient_t *client;
+	int h, i;
+	char *config;
+	char *s;
+#ifdef TMNTHOLDSYS
+	int j;
+	int array_len;
+	char array_data[3];
+#endif
+	char currentMap[MAX_QPATH];
+	int skill;
+
+	//trap_SendConsoleCommand( EXEC_APPEND, "loadgame autosave" );
+
+	memset(savedata, 0, sizeof(savedata));
+	trap_Cvar_VariableStringBuffer("g_spSaveData", savedata, sizeof(savedata));
+	config = savedata;
+
+	if (!strlen(savedata)) {
+		return; // nothing to load.
+	}
+
+	// Hack for CVAR_SEVERINFO
+	for (i = 0; i < strlen(savedata); i++)
+	{
+		if (savedata[i] == '/')
+			savedata[i] = '\\';
+	}
+	G_Printf("DEBUG: Savedata=%s\n", savedata);
+
+	s = Info_ValueForKey(config, "map");
+	trap_Cvar_VariableStringBuffer( "mapname", currentMap, sizeof(currentMap) );
+	if (strcmp(currentMap, s) != 0)
+	{
+		trap_Cvar_Set("g_spSaveData", "");
+		return;
+	}
+
+	// Read skill
+	s = Info_ValueForKey(config, "sk");
+	skill = atoi(s);
+	if (skill < 1) {
+		skill = 1;
+	}
+	if (skill > 5) {
+		skill = 5;
+	}
+	if (skill != trap_Cvar_VariableValue( "g_spSkill" ))
+	{
+		trap_Cvar_Set("g_spSkill", va("%i", skill));
+		// Map needs to be reloaded!
+		G_Error("SP skill mismatch, is %i should be %i.\n", trap_Cvar_VariableValue( "g_spSkill" ), skill);
+	}
+
+	for (h = 0; h < MAX_CLIENTS; h++)
+	{
+		memset(savedata, 0, sizeof(savedata));
+		trap_Cvar_VariableStringBuffer(va("g_spSaveData%i", h), savedata, sizeof(savedata));
+		config = savedata;
+
+		if (!strlen(savedata)) {
+			continue; // nothing to load.
+		}
+
+		// name is used to restore playerdata
+		// Turtle Man: FIXME: what if player changes there name at intermission?
+		s = Info_ValueForKey(config, "n");
+		for (i = 0; i < level.maxclients; i++)
+		{
+			client = &level.clients[i];
+			if (strlen(s) < 1)
+				continue;
+			if (strcmp(client->pers.netname, s) == 0)
+			{
+				break;
+			}
+		}
+		if (i < level.maxclients)
+		{
+			G_Printf("DEBUG: LOADING SP DATA FOR %s\n", s);
+			// Found client.
+			//s = Info_ValueForKey(config, "livs");
+			client->ps.persistant[PERS_SCORE] = atoi(Info_ValueForKey(config, "scr"));
+#ifdef TMNTHOLDSYS
+			client->ps.holdableIndex = atoi(Info_ValueForKey(config, "hi"));
+
+			// Read array
+			array_data[2] = 0;
+			s = Info_ValueForKey(config, "hd");
+			array_len = strlen(s) / 2;
+			for (j = 0; j < array_len && j < MAX_HOLDABLE; j++)
+			{
+				array_data[0] = s[j*2];
+				array_data[1] = s[(j*2)+1];
+				client->ps.holdable[j+1] = atoi(array_data);
+			}
+#endif
+		}
+
+		// Don't ever load this data again.
+		trap_Cvar_Set(va("g_spSaveData%i", h),"");
+	}
+
+	trap_Cvar_Set("g_spSaveData", "");
+}
+#else
+/*
+	Write a savefile so the data can be reloaded next level...
+*/
+void G_SavePersistant(char *nextmap)
+{
+	trap_SendConsoleCommand( EXEC_APPEND, va("savegame autosave -minimum %s", nextmap) );
+}
+
+/*
+	Reloaded data from file...
+*/
+void G_LoadPersistant(void)
+{
+	int save_loading = trap_Cvar_VariableIntegerValue("ui_spSaveLoading");
+	//G_Printf("ui_spSaveLoading = %d\n", save_loading);
+	if (save_loading == 2 || save_loading == 3) // level change or restart
+	{
+		trap_SendConsoleCommand( EXEC_APPEND, "loadgame autosave" );
+		trap_Cvar_Set("ui_spSaveLoading","0"); // set to no loading
+	}
+}
+#endif
+#endif

@@ -53,11 +53,19 @@ char *Sys_DefaultHomePath(void)
 		if( ( p = getenv( "HOME" ) ) != NULL )
 		{
 			Q_strncpyz( homePath, p, sizeof( homePath ) );
+#ifdef TMNT
+#ifdef MACOS_X
+			Q_strcat( homePath, sizeof( homePath ), "/Library/Application Support/TMNTArena" );
+#else
+			Q_strcat( homePath, sizeof( homePath ), "/.tmntarena" );
+#endif
+#else
 #ifdef MACOS_X
 			Q_strcat( homePath, sizeof( homePath ), "/Library/Application Support/Quake3" );
 #else
 			Q_strcat( homePath, sizeof( homePath ), "/.q3a" );
 #endif
+#endif // !TMNT
 			if( mkdir( homePath, 0777 ) )
 			{
 				if( errno != EEXIST )

@@ -80,6 +80,26 @@ void TossClientItems( gentity_t *self ) {
 	int			i;
 	gentity_t	*drop;
 
+#ifdef TMNTWEAPSYS2 // FIXME: Drop STAT_NEWWEAPON and STAT_OLDWEAPON
+	if (self->client)
+	{
+		// Clients can have two weapon, pickup and default,
+		//  pickup will be in s.weapon if s.weapon != STAT_DEFAULTWEAPON
+		weapon = self->s.weapon;
+
+		// check if dropping weapon
+		if (self->client->ps.weaponstate == WEAPON_DROPPING)
+			weapon = self->client->ps.stats[STAT_NEWWEAPON];
+
+		// don't drop default weapon
+		if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON])
+			weapon = WP_NONE;
+	}
+	else
+	{
+		weapon = self->s.weapon;
+	}
+#else
 	// drop the weapon if not a gauntlet or machinegun
 	weapon = self->s.weapon;
 
@@ -87,7 +107,11 @@ void TossClientItems( gentity_t *self ) {
 	// weapon that isn't the mg or gauntlet.  Without this, a client
 	// can pick up a weapon, be killed, and not drop the weapon because
 	// their weapon change hasn't completed yet and they are still holding the MG.
+#ifdef TMNTWEAPONS
+	if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON] ) {
+#else
 	if ( weapon == WP_MACHINEGUN || weapon == WP_GRAPPLING_HOOK ) {
+#endif
 		if ( self->client->ps.weaponstate == WEAPON_DROPPING ) {
 			weapon = self->client->pers.cmd.weapon;
 		}
@@ -95,14 +119,41 @@ void TossClientItems( gentity_t *self ) {
 			weapon = WP_NONE;
 		}
 	}
+#endif // TMNTWEWAPONS3
 
+#ifdef TMNTWEAPSYS2
+	// Turtle Man: Drop all valid weapons.
+	if (weapon > WP_NONE && weapon < WP_NUM_WEAPONS)
+#elif defined TMNTWEAPSYS
+	// Turtle Man: Drop all weapons except default.
+	if ( weapon != self->client->ps.stats[STAT_DEFAULTWEAPON] )
+#else
 	if ( weapon > WP_MACHINEGUN && weapon != WP_GRAPPLING_HOOK && 
-		self->client->ps.ammo[ weapon ] ) {
+		self->client->ps.ammo[ weapon ] )
+#endif
+	{
 		// find the item type for this weapon
 		item = BG_FindItemForWeapon( weapon );
 
 		// spawn the item
+#ifdef TMNTWEAPSYS
+		drop = Drop_Item( self, item, 0 );
+		if (drop) {
+			int ammo = 0;
+#ifdef TMNTWEAPSYS2
+			if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON])
+				ammo = self->client->ps.stats[STAT_SAVEDAMMO];
+			else if (weapon == self->client->ps.weapon)
+				ammo = self->client->ps.stats[STAT_AMMO];
+#else
+			ammo = self->client->ps.ammo[weapon];
+#endif
+
+			drop->count = ammo;
+		}
+#else
 		Drop_Item( self, item, 0 );
+#endif
 	}
 
 	// drop all the powerups if not in teamplay
@@ -234,6 +285,7 @@ void LookAtKiller( gentity_t *self, gentity_t *inflictor, gentity_t *attacker ) 
 	angles[ROLL] = 0;
 }
 
+#ifndef NOTRATEDM // No gibs.
 /*
 ==================
 GibEntity
@@ -263,6 +315,7 @@ void GibEntity( gentity_t *self, int killer ) {
 	self->s.eType = ET_INVISIBLE;
 	self->r.contents = 0;
 }
+#endif
 
 /*
 ==================
@@ -270,6 +323,7 @@ body_die
 ==================
 */
 void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
+#ifndef NOTRATEDM // No gibs.
 	if ( self->health > GIB_HEALTH ) {
 		return;
 	}
@@ -279,12 +333,33 @@ void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 	}
 
 	GibEntity( self, 0 );
+#endif
 }
 
 
 // these are just for logging, the client prints its own messages
 char	*modNames[] = {
 	"MOD_UNKNOWN",
+#ifdef TMNTWEAPONS // MOD
+	"MOD_FIST",
+	"MOD_KATANAS",
+	"MOD_WAKIZASHI",
+	"MOD_SAI",
+	"MOD_NUNCHUK",
+	"MOD_HAMMER",
+	"MOD_AXE",
+	"MOD_SWORD",
+	"MOD_BAT",
+	"MOD_BO",
+	"MOD_BAMBOOBO",
+	"MOD_GUN",
+	"MOD_ELECTRIC",
+	"MOD_ELECTRIC_SPLASH",
+	"MOD_ROCKET",
+	"MOD_ROCKET_SPLASH",
+	"MOD_HOMING",
+	"MOD_HOMING_SPLASH",
+#else
 	"MOD_SHOTGUN",
 	"MOD_GAUNTLET",
 	"MOD_MACHINEGUN",
@@ -298,6 +373,14 @@ char	*modNames[] = {
 	"MOD_LIGHTNING",
 	"MOD_BFG",
 	"MOD_BFG_SPLASH",
+#endif
+#ifdef TMNTHOLDABLE
+	"MOD_SHURIKEN",
+	"MOD_FIRESHURIKEN",
+	"MOD_FIRESHURIKEN_EXPLOSION",
+	"MOD_ELECTRICSHURIKEN",
+	"MOD_LASERSHURIKEN",
+#endif
 	"MOD_WATER",
 	"MOD_SLIME",
 	"MOD_LAVA",
@@ -307,12 +390,19 @@ char	*modNames[] = {
 	"MOD_SUICIDE",
 	"MOD_TARGET_LASER",
 	"MOD_TRIGGER_HURT",
+#ifdef TMNTENTITIES
+	"MOD_EXPLOSION",
+#endif
 #ifdef MISSIONPACK
+#ifndef TMNTWEAPONS // MOD
 	"MOD_NAIL",
 	"MOD_CHAINGUN",
 	"MOD_PROXIMITY_MINE",
+#endif
 	"MOD_KAMIKAZE",
+#ifndef TMNTWEAPONS // MOD
 	"MOD_JUICED",
+#endif
 #endif
 	"MOD_GRAPPLE"
 };
@@ -348,6 +438,7 @@ void Kamikaze_DeathTimer( gentity_t *self ) {
 
 #endif
 
+#ifndef NOTRATEDM // Disable strong lang.
 /*
 ==================
 CheckAlmostCapture
@@ -430,6 +521,7 @@ void CheckAlmostScored( gentity_t *self, gentity_t *attacker ) {
 		}
 	}
 }
+#endif
 
 /*
 ==================
@@ -452,15 +544,17 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		return;
 	}
 
+#ifndef NOTRATEDM // Disable strong lang.
 	// check for an almost capture
 	CheckAlmostCapture( self, attacker );
 	// check for a player that almost brought in cubes
 	CheckAlmostScored( self, attacker );
+#endif
 
 	if (self->client && self->client->hook) {
 		Weapon_HookFree(self->client->hook);
 	}
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 	if ((self->client->ps.eFlags & EF_TICKING) && self->activator) {
 		self->client->ps.eFlags &= ~EF_TICKING;
 		self->activator->think = G_FreeEntity;
@@ -515,6 +609,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		} else {
 			AddScore( attacker, self->r.currentOrigin, 1 );
 
+#ifndef TMNTWEAPONS
 			if( meansOfDeath == MOD_GAUNTLET ) {
 				
 				// play humiliation on player
@@ -528,6 +623,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 				// also play humiliation on target
 				self->client->ps.persistant[PERS_PLAYEREVENTS] ^= PLAYEREVENT_GAUNTLETREWARD;
 			}
+#endif
 
 			// check for two kills in a short amount of time
 			// if this is close enough to the last kill, give a reward sound
@@ -536,7 +632,11 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 				attacker->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
 
 				// add the sprite over the player's head
+#ifdef TMNTWEAPONS
+				attacker->client->ps.eFlags &= ~EF_AWARD_BITS;
+#else
 				attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
+#endif
 				attacker->client->ps.eFlags |= EF_AWARD_EXCELLENT;
 				attacker->client->rewardTime = level.time + REWARD_SPRITE_TIME;
 			}
@@ -631,10 +731,13 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	memset( self->client->ps.powerups, 0, sizeof(self->client->ps.powerups) );
 
 	// never gib in a nodrop
+#ifndef NOTRATEDM // No gibs.
 	if ( (self->health <= GIB_HEALTH && !(contents & CONTENTS_NODROP) && g_blood.integer) || meansOfDeath == MOD_SUICIDE) {
 		// gib death
 		GibEntity( self, killer );
-	} else {
+	} else
+#endif
+	{
 		// normal death
 		static int i;
 
@@ -651,11 +754,13 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			break;
 		}
 
+#ifndef NOTRATEDM // No gibs.
 		// for the no-blood option, we need to prevent the health
 		// from going to gib level
 		if ( self->health <= GIB_HEALTH ) {
 			self->health = GIB_HEALTH+1;
 		}
+#endif
 
 		self->client->ps.legsAnim = 
 			( ( self->client->ps.legsAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | anim;
@@ -682,6 +787,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 }
 
 
+#ifndef TMNT // NOARMOR
 /*
 ================
 CheckArmor
@@ -717,6 +823,7 @@ int CheckArmor (gentity_t *ent, int damage, int dflags)
 
 	return save;
 }
+#endif
 
 /*
 ================
@@ -755,7 +862,7 @@ int RaySphereIntersections( vec3_t origin, float radius, vec3_t point, vec3_t di
 	return 0;
 }
 
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNT // POWERS
 /*
 ================
 G_InvulnerabilityEffect
@@ -823,10 +930,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	gclient_t	*client;
 	int			take;
 	int			save;
+#ifndef TMNT // NOARMOR
 	int			asave;
+#endif
 	int			knockback;
 	int			max;
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNT // POWERS
 	vec3_t		bouncedir, impactpoint;
 #endif
 
@@ -839,7 +948,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( level.intermissionQueued ) {
 		return;
 	}
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNT // POWERS
 	if ( targ->client && mod != MOD_JUICED) {
 		if ( targ->client->invulnerabilityTime > level.time) {
 			if ( dir && point ) {
@@ -857,7 +966,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	}
 
 	// shootable doors / buttons don't actually have any health
-	if ( targ->s.eType == ET_MOVER ) {
+	if ( targ->s.eType == ET_MOVER
+#ifdef TMNTENTITIES // BREAKABLE
+		&& Q_stricmp("func_breakable", targ->classname) != 0
+		//&& Q_stricmp("misc_model_breakable", targ->classname) != 0
+#endif
+	) {
 		if ( targ->use && targ->moverState == MOVER_POS1 ) {
 			targ->use( targ, inflictor, attacker );
 		}
@@ -938,7 +1052,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// if TF_NO_FRIENDLY_FIRE is set, don't do damage to the target
 		// if the attacker was on the same team
 #ifdef MISSIONPACK
+#ifdef TMNTWEAPONS
+		if ( targ != attacker && !(dflags & DAMAGE_NO_TEAM_PROTECTION) && OnSameTeam (targ, attacker)  ) {
+#else
 		if ( mod != MOD_JUICED && targ != attacker && !(dflags & DAMAGE_NO_TEAM_PROTECTION) && OnSameTeam (targ, attacker)  ) {
+#endif
 #else	
 		if ( targ != attacker && OnSameTeam (targ, attacker)  ) {
 #endif
@@ -946,6 +1064,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 				return;
 			}
 		}
+#ifndef TMNTWEAPONS // MOD
 #ifdef MISSIONPACK
 		if (mod == MOD_PROXIMITY_MINE) {
 			if (inflictor && inflictor->parent && OnSameTeam(targ, inflictor->parent)) {
@@ -955,6 +1074,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 				return;
 			}
 		}
+#endif
 #endif
 
 		// check for godmode
@@ -967,12 +1087,22 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	// and protects 50% against all damage
 	if ( client && client->ps.powerups[PW_BATTLESUIT] ) {
 		G_AddEvent( targ, EV_POWERUP_BATTLESUIT, 0 );
+#ifndef TMNT // POWERS
 		if ( ( dflags & DAMAGE_RADIUS ) || ( mod == MOD_FALLING ) ) {
 			return;
 		}
+#endif
 		damage *= 0.5;
 	}
+#ifdef TMNT // POWERS
+	// never take any damage.
+	if ( client && client->ps.powerups[PW_INVUL] ) {
+		G_AddEvent( targ, EV_POWERUP_BATTLESUIT, 0 );
+		return;
+	}
+#endif
 
+#ifndef SP_NPC
 	// add to the attacker's hit counter (if the target isn't a general entity like a prox mine)
 	if ( attacker->client && client
 			&& targ != attacker && targ->health > 0
@@ -983,8 +1113,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		} else {
 			attacker->client->ps.persistant[PERS_HITS]++;
 		}
+#ifdef TMNT // NOARMOR
+		attacker->client->ps.persistant[PERS_ATTACKEE_HEALTH] = targ->health;
+#else
 		attacker->client->ps.persistant[PERS_ATTACKEE_ARMOR] = (targ->health<<8)|(client->ps.stats[STAT_ARMOR]);
+#endif
 	}
+#endif
 
 	// always give half damage if hurting self
 	// calculated after knockback, so rocket jumping works
@@ -998,13 +1133,20 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	take = damage;
 	save = 0;
 
+#ifndef TMNT // NOARMOR
 	// save some from armor
 	asave = CheckArmor (targ, take, dflags);
 	take -= asave;
+#endif
 
 	if ( g_debugDamage.integer ) {
+#ifdef TMNT // NOARMOR
+		G_Printf( "%i: client:%i health:%i damage:%i\n", level.time, targ->s.number,
+			targ->health, take );
+#else
 		G_Printf( "%i: client:%i health:%i damage:%i armor:%i\n", level.time, targ->s.number,
 			targ->health, take, asave );
+#endif
 	}
 
 	// add to the damage inflicted on a player this frame
@@ -1016,7 +1158,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		} else {
 			client->ps.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
 		}
+#ifndef TMNT // NOARMOR
 		client->damage_armor += asave;
+#endif
 		client->damage_blood += take;
 		client->damage_knockback += knockback;
 		if ( dir ) {

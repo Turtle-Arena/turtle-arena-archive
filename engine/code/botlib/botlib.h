@@ -29,7 +29,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
+#ifdef TMNT // Botlib is not compatible with (io)quake3 (or anyone else)
+// Should only be if TMNTWEAPSYS2 or TMNTHOLDSYS or TMNTHOLDSYS2 or TMNTHOLDSYS2BOT?
+#define	BOTLIB_API_VERSION		3
+#else
 #define	BOTLIB_API_VERSION		2
+#endif
 
 struct aas_clientmove_s;
 struct aas_entityinfo_s;
@@ -100,6 +105,9 @@ struct weaponinfo_s;
 #define ACTION_GUARDBASE		0x1000000
 #define ACTION_PATROL			0x2000000
 #define ACTION_FOLLOWME			0x8000000
+#ifdef TMNTWEAPSYS2 // BOTLIB
+#define ACTION_DROP_WEAPON		0x10000000
+#endif
 
 //the bot input, will be converted to an usercmd_t
 typedef struct bot_input_s
@@ -109,7 +117,12 @@ typedef struct bot_input_s
 	float speed;			//speed in the range [0, 400]
 	vec3_t viewangles;		//the view angles
 	int actionflags;		//one of the ACTION_? flags
+#ifndef TMNTWEAPSYS2 // BOTLIB
 	int weapon;				//weapon to use
+#endif
+#ifdef TMNTHOLDSYS
+	int holdable;			//holdable to use
+#endif
 } bot_input_t;
 
 #ifndef BSPTRACE
@@ -275,7 +288,11 @@ typedef struct ea_export_s
 	void	(*EA_Gesture)(int client);
 	void	(*EA_Talk)(int client);
 	void	(*EA_Attack)(int client);
+#ifdef TMNTHOLDSYS
+	void	(*EA_Use)(int client, int holdable);
+#else
 	void	(*EA_Use)(int client);
+#endif
 	void	(*EA_Respawn)(int client);
 	void	(*EA_MoveUp)(int client);
 	void	(*EA_MoveDown)(int client);
@@ -285,7 +302,11 @@ typedef struct ea_export_s
 	void	(*EA_MoveRight)(int client);
 	void	(*EA_Crouch)(int client);
 
+#ifdef TMNTWEAPSYS2 // BOTLIB
+	void	(*EA_DropWeapon)(int client);
+#else
 	void	(*EA_SelectWeapon)(int client, int weapon);
+#endif
 	void	(*EA_Jump)(int client);
 	void	(*EA_DelayedJump)(int client);
 	void	(*EA_Move)(int client, vec3_t dir, float speed);
@@ -494,7 +515,9 @@ name:						default:			module(s):			description:
 "ai_gametype"				"0"					be_ai_goal.c		game type
 "droppedweight"				"1000"				be_ai_goal.c		additional dropped item weight
 "weapindex_rocketlauncher"	"5"					be_ai_move.c		rl weapon index for rocket jumping
+#ifndef TMNTWEAPSYS
 "weapindex_bfg10k"			"9"					be_ai_move.c		bfg weapon index for bfg jumping
+#endif
 "weapindex_grapple"			"10"				be_ai_move.c		grapple weapon index for grappling
 "entitytypemissile"			"3"					be_ai_move.c		ET_MISSILE
 "offhandgrapple"			"0"					be_ai_move.c		enable off hand grapple hook

@@ -329,9 +329,15 @@ qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return syscall( CG_GETUSERCMD, cmdNumber, ucmd );
 }
 
+#if defined TMNTHOLDSYS && !defined TMNTWEAPSYS2 // Turtle Man: MULTIHOLDABLE
+void		trap_SetUserCmdValue( int stateValue, int holdableStateValue, float sensitivityScale ) {
+	syscall( CG_SETUSERCMDVALUE, stateValue, holdableStateValue, PASSFLOAT(sensitivityScale) );
+}
+#else
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale ) {
 	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale) );
 }
+#endif
 
 void		testPrintInt( char *string, int i ) {
 	syscall( CG_TESTPRINTINT, string, i );
@@ -422,6 +428,19 @@ void trap_CIN_SetExtents (int handle, int x, int y, int w, int h) {
   syscall(CG_CIN_SETEXTENTS, handle, x, y, w, h);
 }
 
+#ifdef CAMERASCRIPT
+qboolean trap_loadCamera( const char *name ) {
+	return syscall( CG_LOADCAMERA, name );
+}
+
+void trap_startCamera(int time) {
+	syscall(CG_STARTCAMERA, time);
+}
+
+qboolean trap_getCameraInfo( int time, vec3_t *origin, vec3_t *angles, float *fov) {
+	return syscall( CG_GETCAMERAINFO, time, origin, angles, fov);
+}
+#else
 /*
 qboolean trap_loadCamera( const char *name ) {
 	return syscall( CG_LOADCAMERA, name );
@@ -435,6 +454,7 @@ qboolean trap_getCameraInfo( int time, vec3_t *origin, vec3_t *angles) {
 	return syscall( CG_GETCAMERAINFO, time, origin, angles );
 }
 */
+#endif
 
 qboolean trap_GetEntityToken( char *buffer, int bufferSize ) {
 	return syscall( CG_GET_ENTITY_TOKEN, buffer, bufferSize );

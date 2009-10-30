@@ -307,7 +307,11 @@ void CL_AdjustAngles( void ) {
 		speed = 0.001 * cls.frametime;
 	}
 
-	if ( !in_strafe.active ) {
+	if ( !in_strafe.active
+#ifdef ANALOG // ANALOG CAMERA!
+	&& !(cl_thirdPerson->integer && cl_thirdPersonAnalog->integer)
+#endif
+	) {
 		cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right);
 		cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left);
 	}
@@ -315,6 +319,103 @@ void CL_AdjustAngles( void ) {
 	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup);
 	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown);
 }
+
+#ifdef ANALOG
+/*
+================
+CL_AnalogMove
+================
+*/
+void CL_AnalogMove(usercmd_t *cmd, vec3_t angles)
+{
+	static int last_yaw = 0;
+
+	if (last_yaw == 0) last_yaw = ANGLE2SHORT(angles[YAW]);
+
+
+	if ( !in_strafe.active) {
+		// cl.viewangles[YAW] -= ...;
+		if (qtrue) // run
+		{
+			cmd->rightmove -= 128*CL_KeyState (&in_right);
+			cmd->rightmove += 128*CL_KeyState (&in_left);
+		}
+		else
+		{
+			cmd->rightmove -= 64*CL_KeyState (&in_right);
+			cmd->rightmove += 64*CL_KeyState (&in_left);
+		}
+	}
+
+	// Turtle Man: TODO: ANALOG: Change movement based on angles.
+
+
+	// Use forward and side to set the yaw.
+	if (cmd->forwardmove != 0 && cmd->rightmove == 0)
+	{
+		if (cmd->forwardmove > 0)
+		{
+			// Face away from the camera.
+			cmd->angles[YAW] = ANGLE2SHORT(angles[YAW]);
+		}
+		else
+		{
+			// Face the camera.
+			cmd->angles[YAW] = ANGLE2SHORT(angles[YAW]+180);
+			cmd->forwardmove *= -1; // switch dir!
+		}
+		last_yaw = cmd->angles[YAW];
+	}
+	else if (cmd->forwardmove == 0 && cmd->rightmove != 0)
+	{
+		if (cmd->rightmove > 0)
+		{
+			// Face left.
+			cmd->angles[YAW] = ANGLE2SHORT(angles[YAW]+90);
+		}
+		else
+		{
+			// Face right.
+			cmd->angles[YAW] = ANGLE2SHORT(angles[YAW]-90);
+			cmd->rightmove *= -1; // switch dir!
+		}
+		last_yaw = cmd->angles[YAW];
+	}
+	else if (cmd->forwardmove == 0 && cmd->rightmove == 0)
+	{
+		cmd->angles[YAW] = last_yaw; // FIXME?
+	}
+	else // if (cmd->forward != 0 && cmd->rightmove != 0)
+	{
+		cmd->angles[YAW] = last_yaw; // temp...
+
+		// forward and side must be merged.
+		if (cmd->forwardmove > cmd->rightmove)
+		{
+			static int f_more_s = 0;
+			++f_more_s;
+			Com_Printf("ANALOG: cmd->forward > cmd->side (%d)\n", f_more_s);
+		}
+		else if (cmd->forwardmove < cmd->rightmove)
+		{
+			static int f_less_s = 0;
+			++f_less_s;
+			Com_Printf("ANALOG: cmd->forward < cmd->side (%d)\n", f_less_s);
+		}
+		else
+		{
+			static int f_equal_s = 0;
+			++f_equal_s;
+			Com_Printf("ANALOG: cmd->forward == cmd->side (%d)\n", f_equal_s);
+		}
+	}
+
+	//Cvar_Set("cg_thirdPersonAngle", va("%f", SHORT2ANGLE(angles[YAW])+180));
+
+	cmd->angles[ROLL] = ANGLE2SHORT(angles[ROLL]);
+	cmd->angles[PITCH] = ANGLE2SHORT(angles[PITCH]);
+}
+#endif
 
 /*
 ================
@@ -343,6 +444,30 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	forward = 0;
 	side = 0;
 	up = 0;
+#if 0 //#ifdef ANALOG // Turtle Man: Analog
+	// Only use analog when chase cam is on.
+	// Turtle Man: FIXME: I think the main analog code should go here!
+    if (cl_thirdPerson->integer && cl_thirdPersonAnalog->integer)
+    {
+	if ( in_strafe.active ) {
+		side += movespeed * CL_KeyState (&in_right);
+		side -= movespeed * CL_KeyState (&in_left);
+	}
+        side += movespeed * CL_KeyState (&in_moveright);
+        side -= movespeed * CL_KeyState (&in_moveleft);
+
+
+        up += movespeed * CL_KeyState (&in_up);
+        up -= movespeed * CL_KeyState (&in_down);
+
+        forward += movespeed * CL_KeyState (&in_forward);
+        forward -= movespeed * CL_KeyState (&in_back);
+
+    	CL_AnalogMove(cmd, forward, up, side);
+    }
+    else
+    {
+#endif
 	if ( in_strafe.active ) {
 		side += movespeed * CL_KeyState (&in_right);
 		side -= movespeed * CL_KeyState (&in_left);
@@ -357,6 +482,9 @@ void CL_KeyMove( usercmd_t *cmd ) {
 
 	forward += movespeed * CL_KeyState (&in_forward);
 	forward -= movespeed * CL_KeyState (&in_back);
+#if 0 // #ifdef ANALOG // Turtle Man: Analog
+    }
+#endif
 
 	cmd->forwardmove = ClampChar( forward );
 	cmd->rightmove = ClampChar( side );
@@ -414,6 +542,22 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 	} else {
 		anglespeed = 0.001 * cls.frametime;
 	}
+
+#if 0 //#ifdef ANALOG
+	if (cl_thirdPerson->integer && cl_thirdPersonAnalog->integer)
+	{
+		cl.viewangles[YAW] = (cl.viewangles[YAW]+cl_thirdPersonAngle + (anglespeed * cl_yawspeed->value * cl.joystickAxis[AXIS_SIDE])
+
+		//cl.viewangles[YAW] += anglespeed * cl_yawspeed->value * cl.joystickAxis[AXIS_SIDE];
+
+		cmd->forwardmove = ClampChar( cmd->forwardmove + cl.joystickAxis[AXIS_FORWARD] );
+
+		cmd->upmove = ClampChar( cmd->upmove + cl.joystickAxis[AXIS_UP] );
+
+		CL_AnalogMove(cmd, cmd->forwardmove + cl.joystickAxis[AXIS_FORWARD], ...);
+		return;
+	}
+#endif
 
 	if ( !in_strafe.active ) {
 		cl.viewangles[YAW] += anglespeed * cl_yawspeed->value * cl.joystickAxis[AXIS_SIDE];
@@ -525,15 +669,41 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	int		i;
 
 	// copy the state that the cgame is currently sending
+#ifdef TMNTWEAPSYS2
+#ifdef TMNTHOLDSYS2
+	cmd->holdable = cl.cgameUserCmdValue;
+#endif
+#else
 	cmd->weapon = cl.cgameUserCmdValue;
+#ifdef TMNTHOLDSYS2
+	cmd->holdable = cl.cgameHoldableValue;
+#endif
+#endif
+#if !defined TMNTHOLDSYS2 && defined TMNTHOLDSYS2BOT
+	cmd->holdable = 0;
+#endif
 
 	// send the current server time so the amount of movement
 	// can be determined without allowing cheating
 	cmd->serverTime = cl.serverTime;
 
+#ifdef ANALOG // Lastly do analog!
+	if (cl_thirdPerson->integer && cl_thirdPersonAnalog->integer)
+	{
+		CL_AnalogMove(cmd, cl.viewangles);
+	}
+	else
+	{
+		// Non-analog only
 	for (i=0 ; i<3 ; i++) {
 		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);
 	}
+}
+#else
+	for (i=0 ; i<3 ; i++) {
+		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);
+	}
+#endif
 }
 
 
@@ -996,6 +1166,16 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-button13", IN_Button13Up);
 	Cmd_AddCommand ("+button14", IN_Button14Down);
 	Cmd_AddCommand ("-button14", IN_Button14Up);
+#if 0 //#ifdef TMNTHOLDSYS // NEXTHOLDABLE
+	// Turtle Man: I think BUTTON_NEXT_HOLDABLE is 12, and "should" be used when Button12* happens.
+	Cmd_AddCommand ("+nextholdable", IN_Button12Down);
+	Cmd_AddCommand ("-nextholdable", IN_Button12Up);
+#endif
+#if 0 //#ifdef TMNTWEAPSYS2
+	// Turtle Man: I think BUTTON_DROP_WEAPON is 13, and "should" be used when Button13* happens.
+	Cmd_AddCommand ("+dropweapon", IN_Button13Down);
+	Cmd_AddCommand ("-dropweapon", IN_Button13Up);
+#endif
 	Cmd_AddCommand ("+mlook", IN_MLookDown);
 	Cmd_AddCommand ("-mlook", IN_MLookUp);
 

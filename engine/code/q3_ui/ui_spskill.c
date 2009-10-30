@@ -228,7 +228,11 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_baby.generic.y			= 170;
 	skillMenuInfo.item_baby.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_baby.generic.id			= ID_BABY;
+#if defined TMNT || defined SONIC // rip off SRB2 skills...
+	skillMenuInfo.item_baby.string				= "Easy";
+#else
 	skillMenuInfo.item_baby.string				= "I Can Win";
+#endif
 	skillMenuInfo.item_baby.color				= color_red;
 	skillMenuInfo.item_baby.style				= UI_CENTER;
 
@@ -238,7 +242,11 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_easy.generic.y			= 198;
 	skillMenuInfo.item_easy.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_easy.generic.id			= ID_EASY;
+#if defined TMNT || defined SONIC // rip off SRB2 skills...
+	skillMenuInfo.item_easy.string				= "Normal";
+#else
 	skillMenuInfo.item_easy.string				= "Bring It On";
+#endif
 	skillMenuInfo.item_easy.color				= color_red;
 	skillMenuInfo.item_easy.style				= UI_CENTER;
 
@@ -248,7 +256,11 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_medium.generic.y			= 227;
 	skillMenuInfo.item_medium.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_medium.generic.id		= ID_MEDIUM;
+#if defined TMNT || defined SONIC // rip off SRB2 skills...
+	skillMenuInfo.item_medium.string			= "Hard";
+#else
 	skillMenuInfo.item_medium.string			= "Hurt Me Plenty";
+#endif
 	skillMenuInfo.item_medium.color				= color_red;
 	skillMenuInfo.item_medium.style				= UI_CENTER;
 
@@ -258,7 +270,11 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_hard.generic.y			= 255;
 	skillMenuInfo.item_hard.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_hard.generic.id			= ID_HARD;
+#if defined TMNT || defined SONIC // rip off SRB2 skills...
+	skillMenuInfo.item_hard.string				= "Very Hard";
+#else
 	skillMenuInfo.item_hard.string				= "Hardcore";
+#endif
 	skillMenuInfo.item_hard.color				= color_red;
 	skillMenuInfo.item_hard.style				= UI_CENTER;
 
@@ -268,7 +284,11 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_nightmare.generic.y			= 283;
 	skillMenuInfo.item_nightmare.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_nightmare.generic.id			= ID_NIGHTMARE;
+#if defined TMNT || defined SONIC // rip off SRB2 skills...
+	skillMenuInfo.item_nightmare.string				= "Ultimate";
+#else
 	skillMenuInfo.item_nightmare.string				= "NIGHTMARE!";
+#endif
 	skillMenuInfo.item_nightmare.color				= color_red;
 	skillMenuInfo.item_nightmare.style				= UI_CENTER;
 

@@ -634,7 +634,11 @@ void SV_Init (void) {
 
 	// serverinfo vars
 	Cvar_Get ("dmflags", "0", CVAR_SERVERINFO);
+#ifdef TMNT // frag to score
+	Cvar_Get ("scorelimit", "20", CVAR_SERVERINFO);
+#else
 	Cvar_Get ("fraglimit", "20", CVAR_SERVERINFO);
+#endif
 	Cvar_Get ("timelimit", "0", CVAR_SERVERINFO);
 	sv_gametype = Cvar_Get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_LATCH );
 	Cvar_Get ("sv_keywords", "", CVAR_SERVERINFO);

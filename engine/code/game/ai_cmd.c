@@ -1518,6 +1518,9 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 	bot_goal_t goal;
 	char netname[MAX_MESSAGE_SIZE];
 	char *nearbyitems[] = {
+#ifdef TMNTWEAPONS // FINISHME
+
+#else
 		"Shotgun",
 		"Grenade Launcher",
 		"Rocket Launcher",
@@ -1525,6 +1528,10 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 		"Railgun",
 		"Lightning Gun",
 		"BFG10K",
+#endif
+#ifdef TMNT // POWERS, NOARMOR // Turtle Man: FIXME: FINISHME
+
+#else
 		"Quad Damage",
 		"Regeneration",
 		"Battle Suit",
@@ -1533,12 +1540,15 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 		"Flight",
 		"Armor",
 		"Heavy Armor",
+#endif
 		"Red Flag",
 		"Blue Flag",
 #ifdef MISSIONPACK
+#ifndef TMNTWEAPONS
 		"Nailgun",
 		"Prox Launcher",
 		"Chaingun",
+#endif
 		"Scout",
 		"Guard",
 		"Doubler",

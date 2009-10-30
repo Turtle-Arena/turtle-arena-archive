@@ -44,11 +44,19 @@ static const char *MonthAbbrev[] = {
 
 
 static const char *skillLevels[] = {
+#if defined TMNT || defined SONIC // rip off SRB2 skills...
+  "Easy",
+  "Normal",
+  "Hard",
+  "Very Hard",
+  "Ultimate"
+#else
   "I Can Win",
   "Bring It On",
   "Hurt Me Plenty",
   "Hardcore",
   "Nightmare"
+#endif
 };
 
 static const int numSkillLevels = sizeof(skillLevels) / sizeof(const char*);
@@ -64,7 +72,11 @@ static const int numNetSources = sizeof(netSources) / sizeof(const char*);
 
 static const serverFilter_t serverFilters[] = {
 	{"All", "" },
+#ifdef TMNT
+	{"TMNT Arena", "" },
+#else
 	{"Quake 3 Arena", "" },
+#endif
 	{"Team Arena", "missionpack" },
 	{"Rocket Arena", "arena" },
 	{"Alliance", "alliance20" },
@@ -74,13 +86,17 @@ static const serverFilter_t serverFilters[] = {
 
 static const char *teamArenaGameTypes[] = {
 	"FFA",
+#ifdef TMNT // tournament to duel
+	"DUEL",
+#else
 	"TOURNAMENT",
+#endif
 	"SP",
 	"TEAM DM",
 	"CTF",
 	"1FCTF",
 	"OVERLOAD",
-	"HARVESTER",
+	"HARVESTER"
 	"TEAMTOURNAMENT"
 };
 
@@ -89,7 +105,11 @@ static int const numTeamArenaGameTypes = sizeof(teamArenaGameTypes) / sizeof(con
 
 static const char *teamArenaGameNames[] = {
 	"Free For All",
+#ifdef TMNT
+	"Duel",
+#else
 	"Tournament",
+#endif
 	"Single Player",
 	"Team Deathmatch",
 	"Capture the Flag",
@@ -120,7 +140,11 @@ static char* netnames[] = {
 };
 
 #ifndef MISSIONPACK
+#ifdef TMNT // Turtle Man: TODO: Add a url, ect?
+static char quake3worldMessage[] = "";
+#else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
+#endif
 #endif
 
 static int gamecodetoui[] = {4,2,3,0,5,1,6};
@@ -202,8 +226,10 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 	  case UI_DRAW_CONNECT_SCREEN:
 		  UI_DrawConnectScreen( arg0 );
 		  return 0;
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	  case UI_HASUNIQUECDKEY: // mod authors need to observe this
 	    return qtrue; // change this to qfalse for mods!
+#endif
 
 	}
 
@@ -577,7 +603,11 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t 
 
 void UI_ShowPostGame(qboolean newHigh) {
 	trap_Cvar_Set ("cg_cameraOrbit", "0");
+#ifdef TMNT // Set thirdPerson to On. // Should it be off here?
+	trap_Cvar_Set("cg_thirdPerson", "1");
+#else
 	trap_Cvar_Set("cg_thirdPerson", "0");
+#endif
 	uiInfo.soundHighScore = newHigh;
   _UI_SetActiveMenu(UIMENU_POSTGAME);
 }
@@ -1034,10 +1064,18 @@ static void UI_SetCapFragLimits(qboolean uiVars) {
 	}
 	if (uiVars) {
 		trap_Cvar_Set("ui_captureLimit", va("%d", cap));
+#ifdef TMNT // frag to score
+		trap_Cvar_Set("ui_scoreLimit", va("%d", frag));
+#else
 		trap_Cvar_Set("ui_fragLimit", va("%d", frag));
+#endif
 	} else {
 		trap_Cvar_Set("capturelimit", va("%d", cap));
+#ifdef TMNT // frag to score
+		trap_Cvar_Set("scorelimit", va("%d", frag));
+#else
 		trap_Cvar_Set("fraglimit", va("%d", frag));
+#endif
 	}
 }
 // ui_gameType assumes gametype 0 is -1 ALL and will not show
@@ -1299,7 +1337,11 @@ static void UI_DrawPlayerModel(rectDef_t *rect) {
   	viewangles[ROLL]  = 0;
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info, model, head, team);
+#ifdef TMNT // TMNTWEAPSYS
+    UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info.weapon, qfalse );
+#else
     UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
+#endif
 //		UI_RegisterClientModelname( &info, model, head, team);
     updateModel = qfalse;
   }
@@ -1495,7 +1537,11 @@ static void UI_DrawOpponent(rectDef_t *rect) {
   	viewangles[ROLL]  = 0;
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info2, model, headmodel, "");
+#ifdef TMNT // TMNTWEAPSYS
+    UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info2.weapon, qfalse );
+#else
     UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
+#endif
 		UI_RegisterClientModelname( &info2, model, headmodel, team);
     updateOpponentModel = qfalse;
   }
@@ -2326,6 +2372,25 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 		int oldCount = UI_MapCountByGameType(qtrue);
 
+#ifdef TMNT // Removed skipping ffa and sp
+		if (key == K_MOUSE2) {
+			ui_gameType.integer--;
+			if (ui_gameType.integer < 0) {
+				ui_gameType.integer = uiInfo.numGameTypes - 1;
+			}
+		} else {
+			ui_gameType.integer++;
+			if (ui_gameType.integer >= uiInfo.numGameTypes) {
+				ui_gameType.integer = 0;
+			}
+		}
+
+		if (uiInfo.gameTypes[ui_gameType.integer].gtEnum < GT_TEAM) {
+			trap_Cvar_Set("ui_Q3Model", "1");
+		} else {
+			trap_Cvar_Set("ui_Q3Model", "0");
+		}
+#else
 		// hard coded mess here
 		if (key == K_MOUSE2) {
 			ui_gameType.integer--;
@@ -2348,6 +2413,7 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
 		} else {
 			trap_Cvar_Set("ui_Q3Model", "0");
 		}
+#endif
 
 		trap_Cvar_Set("ui_gameType", va("%d", ui_gameType.integer));
 		UI_SetCapFragLimits(qtrue);
@@ -2968,8 +3034,13 @@ static void UI_StartSkirmish(qboolean next) {
 	// set up sp overrides, will be replaced on postgame
 	temp = trap_Cvar_VariableValue( "capturelimit" );
 	trap_Cvar_Set("ui_saveCaptureLimit", va("%i", temp));
+#ifdef TMNT // frag to score
+	temp = trap_Cvar_VariableValue( "scorelimit" );
+	trap_Cvar_Set("ui_saveScoreLimit", va("%i", temp));
+#else
 	temp = trap_Cvar_VariableValue( "fraglimit" );
 	trap_Cvar_Set("ui_saveFragLimit", va("%i", temp));
+#endif
 
 	UI_SetCapFragLimits(qfalse);
 
@@ -2987,7 +3058,11 @@ static void UI_StartSkirmish(qboolean next) {
 	trap_Cvar_Set("ui_pure", va("%i", temp));
 
 	trap_Cvar_Set("cg_cameraOrbit", "0");
+#ifdef TMNT // Set thirdPerson to On.
+	trap_Cvar_Set("cg_thirdPerson", "1");
+#else
 	trap_Cvar_Set("cg_thirdPerson", "0");
+#endif
 	trap_Cvar_Set("cg_drawTimer", "1");
 	trap_Cvar_Set("g_doWarmup", "1");
 	trap_Cvar_Set("g_warmup", "15");
@@ -3156,7 +3231,11 @@ static void UI_RunMenuScript(char **args) {
 		if (Q_stricmp(name, "StartServer") == 0) {
 			int i, clients, oldclients;
 			float skill;
+#ifdef TMNT // Set thirdPerson to On.
+			trap_Cvar_Set("cg_thirdPerson", "1");
+#else
 			trap_Cvar_Set("cg_thirdPerson", "0");
+#endif
 			trap_Cvar_Set("cg_cameraOrbit", "0");
 			trap_Cvar_Set("ui_singlePlayerActive", "0");
 			trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, ui_dedicated.integer ) );
@@ -3223,6 +3302,7 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cvar_Set("com_introPlayed", "1" );
 			trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 		} else if (Q_stricmp(name, "getCDKey") == 0) {
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 			char out[17];
 			trap_GetCDKey(buff, 17);
 			trap_Cvar_Set("cdkey1", "");
@@ -3239,8 +3319,9 @@ static void UI_RunMenuScript(char **args) {
 				Q_strncpyz(out, buff + 12, 5);
 				trap_Cvar_Set("cdkey4", out);
 			}
-
+#endif
 		} else if (Q_stricmp(name, "verifyCDKey") == 0) {
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 			buff[0] = '\0';
 			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey1")); 
 			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey2")); 
@@ -3253,6 +3334,7 @@ static void UI_RunMenuScript(char **args) {
 			} else {
 				trap_Cvar_Set("ui_cdkeyvalid", "CD Key does not appear to be valid.");
 			}
+#endif
 		} else if (Q_stricmp(name, "loadArenas") == 0) {
 			UI_LoadArenas();
 			UI_MapCountByGameType(qfalse);
@@ -3336,7 +3418,11 @@ static void UI_RunMenuScript(char **args) {
 			uiInfo.serverStatusInfo.numLines = 0;
 			Menu_SetFeederSelection(NULL, FEEDER_FINDPLAYER, 0, NULL);
 		} else if (Q_stricmp(name, "JoinServer") == 0) {
+#ifdef TMNT // Set thirdPerson to On.
+			trap_Cvar_Set("cg_thirdPerson", "1");
+#else
 			trap_Cvar_Set("cg_thirdPerson", "0");
+#endif
 			trap_Cvar_Set("cg_cameraOrbit", "0");
 			trap_Cvar_Set("ui_singlePlayerActive", "0");
 			if (uiInfo.serverStatus.currentServer >= 0 && uiInfo.serverStatus.currentServer < uiInfo.serverStatus.numDisplayServers) {
@@ -3851,7 +3937,11 @@ serverStatusCvar_t serverStatusCvars[] = {
 	{"version", ""},
 	{"protocol", ""},
 	{"timelimit", ""},
+#ifdef TMNT // frag to score
+	{"scorelimit", ""},
+#else
 	{"fraglimit", ""},
+#endif
 	{NULL, NULL}
 };
 
@@ -4290,7 +4380,11 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 		return UI_SelectedMap(index, &actual);
 	} else if (feederID == FEEDER_SERVERS) {
 		if (index >= 0 && index < uiInfo.serverStatus.numDisplayServers) {
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 			int ping, game, punkbuster;
+#else // Turtle Man: No punkbuster
+			int ping, game;
+#endif
 			if (lastColumn != column || lastTime > uiInfo.uiDC.realTime + 5000) {
 				trap_LAN_GetServerInfo(ui_netSource.integer, uiInfo.serverStatus.displayServers[index], info, MAX_STRING_CHARS);
 				lastColumn = column;
@@ -4334,6 +4428,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 					} else {
 						return Info_ValueForKey(info, "ping");
 					}
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 				case SORT_PUNKBUSTER:
 					punkbuster = atoi(Info_ValueForKey(info, "punkbuster"));
 					if ( punkbuster ) {
@@ -4341,6 +4436,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 					} else {
 						return "No";
 					}
+#endif
 			}
 		}
 	} else if (feederID == FEEDER_SERVERSTATUS) {
@@ -5263,6 +5359,7 @@ void _UI_SetActiveMenu( uiMenuCommand_t menu ) {
 			trap_Key_SetCatcher( KEYCATCH_UI );
       Menus_ActivateByName("team");
 		  return;
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	  case UIMENU_NEED_CD:
 			// no cd check in TA
 			//trap_Key_SetCatcher( KEYCATCH_UI );
@@ -5275,6 +5372,7 @@ void _UI_SetActiveMenu( uiMenuCommand_t menu ) {
       //Menus_ActivateByName("badcd");
 		  //UI_ConfirmMenu( "Bad CD Key", NULL, NeedCDKeyAction );
 		  return;
+#endif
 	  case UIMENU_POSTGAME:
 			trap_Cvar_Set( "sv_killserver", "1" );
 			trap_Key_SetCatcher( KEYCATCH_UI );
@@ -5599,6 +5697,9 @@ vmCvar_t	ui_spAwards;
 vmCvar_t	ui_spVideos;
 vmCvar_t	ui_spSkill;
 
+#ifdef TMNTSP
+vmCvar_t	ui_spStage;
+#endif
 vmCvar_t	ui_spSelection;
 
 vmCvar_t	ui_browserMaster;
@@ -5629,7 +5730,9 @@ vmCvar_t	ui_server14;
 vmCvar_t	ui_server15;
 vmCvar_t	ui_server16;
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 vmCvar_t	ui_cdkeychecked;
+#endif
 
 vmCvar_t	ui_redteam;
 vmCvar_t	ui_redteam1;
@@ -5671,7 +5774,9 @@ vmCvar_t	ui_scoreExcellents;
 vmCvar_t	ui_scoreCaptures;
 vmCvar_t	ui_scoreDefends;
 vmCvar_t	ui_scoreAssists;
+#ifndef TMNTWEAPONS
 vmCvar_t	ui_scoreGauntlets;
+#endif
 vmCvar_t	ui_scoreScore;
 vmCvar_t	ui_scorePerfect;
 vmCvar_t	ui_scoreTeam;
@@ -5693,13 +5798,25 @@ vmCvar_t	ui_realWarmUp;
 vmCvar_t	ui_serverStatusTimeOut;
 
 static cvarTable_t		cvarTable[] = {
+#ifdef TMNT // frag to score
+	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "20", CVAR_ARCHIVE },
+#else
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
+#endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
+#ifdef TMNT // frag to score
+	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
+#else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
+#endif
 	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "15", CVAR_ARCHIVE },
 
+#ifdef TMNT // frag to score
+	{ &ui_team_fraglimit, "ui_team_scorelimit", "0", CVAR_ARCHIVE },
+#else
 	{ &ui_team_fraglimit, "ui_team_fraglimit", "0", CVAR_ARCHIVE },
+#endif
 	{ &ui_team_timelimit, "ui_team_timelimit", "20", CVAR_ARCHIVE },
 	{ &ui_team_friendly, "ui_team_friendly",  "1", CVAR_ARCHIVE },
 
@@ -5718,6 +5835,9 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE },
 
+#ifdef TMNTSP
+	{ &ui_spStage, "ui_spStage", "0", CVAR_ROM },
+#endif
 	{ &ui_spSelection, "ui_spSelection", "", CVAR_ROM },
 
 	{ &ui_browserMaster, "ui_browserMaster", "0", CVAR_ARCHIVE },
@@ -5747,14 +5867,23 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_server14, "server14", "", CVAR_ARCHIVE },
 	{ &ui_server15, "server15", "", CVAR_ARCHIVE },
 	{ &ui_server16, "server16", "", CVAR_ARCHIVE },
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	{ &ui_cdkeychecked, "ui_cdkeychecked", "0", CVAR_ROM },
+#endif
 	{ &ui_new, "ui_new", "0", CVAR_TEMP },
 	{ &ui_debug, "ui_debug", "0", CVAR_TEMP },
 	{ &ui_initialized, "ui_initialized", "0", CVAR_TEMP },
+#ifdef TMNT // DEFAULT_TEAMS
+	{ &ui_teamName, "ui_teamName", "Sais", CVAR_ARCHIVE },
+	{ &ui_opponentName, "ui_opponentName", "Katanas", CVAR_ARCHIVE },
+	{ &ui_redteam, "ui_redteam", "Sais", CVAR_ARCHIVE },
+	{ &ui_blueteam, "ui_blueteam", "Katanas", CVAR_ARCHIVE },
+#else
 	{ &ui_teamName, "ui_teamName", "Pagans", CVAR_ARCHIVE },
 	{ &ui_opponentName, "ui_opponentName", "Stroggs", CVAR_ARCHIVE },
 	{ &ui_redteam, "ui_redteam", "Pagans", CVAR_ARCHIVE },
 	{ &ui_blueteam, "ui_blueteam", "Stroggs", CVAR_ARCHIVE },
+#endif
 	{ &ui_dedicated, "ui_dedicated", "0", CVAR_ARCHIVE },
 	{ &ui_gameType, "ui_gametype", "3", CVAR_ARCHIVE },
 	{ &ui_joinGameType, "ui_joinGametype", "0", CVAR_ARCHIVE },
@@ -5790,7 +5919,9 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_scoreCaptures, "ui_scoreCaptures", "0", CVAR_ARCHIVE},
 	{ &ui_scoreDefends, "ui_scoreDefends", "0", CVAR_ARCHIVE},
 	{ &ui_scoreAssists, "ui_scoreAssists", "0", CVAR_ARCHIVE},
+#ifndef TMNTWEAPONS
 	{ &ui_scoreGauntlets, "ui_scoreGauntlets", "0",CVAR_ARCHIVE},
+#endif
 	{ &ui_scoreScore, "ui_scoreScore", "0", CVAR_ARCHIVE},
 	{ &ui_scorePerfect, "ui_scorePerfect", "0", CVAR_ARCHIVE},
 	{ &ui_scoreTeam, "ui_scoreTeam", "0 to 0", CVAR_ARCHIVE},
@@ -5803,7 +5934,11 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_captureLimit, "ui_captureLimit", "5", 0},
 	{ &ui_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
 	{ &ui_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
+#ifdef TMNT // DEFAULT_PLAYER
+	{ &ui_findPlayer, "ui_findPlayer", "Raph", CVAR_ARCHIVE},
+#else
 	{ &ui_findPlayer, "ui_findPlayer", "Sarge", CVAR_ARCHIVE},
+#endif
 	{ &ui_Q3Model, "ui_q3model", "0", CVAR_ARCHIVE},
 	{ &ui_hudFiles, "cg_hudFiles", "ui/hud.txt", CVAR_ARCHIVE},
 	{ &ui_recordSPDemo, "ui_recordSPDemo", "0", CVAR_ARCHIVE},

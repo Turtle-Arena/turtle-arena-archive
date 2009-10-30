@@ -27,11 +27,19 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // A user mod should never modify this file
 
 #ifdef STANDALONE
+  #ifdef TMNT // Turtle Man: Changed game info defines.
+    #define PRODUCT_NAME			"TMNT Arena"
+    #define BASEGAME			"base"
+    #define CLIENT_WINDOW_TITLE     	"TMNT Arena"
+    #define CLIENT_WINDOW_MIN_TITLE 	"TMNT Arena"
+    #define GAMENAME_FOR_MASTER		"TMNTArena"
+  #else
   #define PRODUCT_NAME			"iofoo3"
   #define BASEGAME			"foobar"
   #define CLIENT_WINDOW_TITLE     	"changeme"
   #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
   #define GAMENAME_FOR_MASTER		"iofoo3"	// must NOT contain whitespaces
+  #endif
 #else
   #define PRODUCT_NAME			"ioq3"
   #define BASEGAME			"baseq3"
@@ -40,7 +48,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define GAMENAME_FOR_MASTER		"Quake3Arena"
 #endif
 
-#ifdef _MSC_VER
+#ifdef TMNTSP
+  // Its really "fs_game\\saves", so each mod has its own saves dir.
+  #define SAVEGAMEDIR "saves"
+#endif
+
+//#ifdef _MSC_VER
+#ifndef PRODUCT_VERSION // Turtle Man: Added "#ifndef" and the below define.
   #define PRODUCT_VERSION "1.35"
 #endif
 
@@ -243,7 +257,9 @@ typedef enum {
 	ERR_DROP,					// print to console and disconnect from game
 	ERR_SERVERDISCONNECT,		// don't kill server
 	ERR_DISCONNECT,				// client disconnected from the server
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	ERR_NEED_CD					// pop up the need-cd dialog
+#endif
 } errorParm_t;
 
 
@@ -302,7 +318,6 @@ MATHLIB
 
 ==============================================================
 */
-
 
 typedef float vec_t;
 typedef vec_t vec2_t[2];
@@ -504,6 +519,7 @@ static ID_INLINE vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
 	return VectorLength( v );
 }
 
+
 static ID_INLINE vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 ) {
 	vec3_t	v;
 
@@ -570,6 +586,11 @@ float	Q_crandom( int *seed );
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
 
+#ifdef TMNTENTITIES
+float	flrandom(float min, float max);
+int		irandom(int min, int max);
+#endif
+
 void vectoangles( const vec3_t value1, vec3_t angles);
 void AnglesToAxis( const vec3_t angles, vec3_t axis[3] );
 
@@ -595,7 +616,9 @@ float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
 
+#ifndef BSPC // Turtle Man: BSP2
 qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
+#endif
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
 void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
 void RotateAroundDirection( vec3_t axis[3], float yaw );
@@ -621,7 +644,9 @@ void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 
 void	COM_BeginParseSession( const char *name );
 int		COM_GetCurrentParseLine( void );
+#ifndef BSPC // Turtle Man: BSP2
 char	*COM_Parse( char **data_p );
+#endif
 char	*COM_ParseExt( char **data_p, qboolean allowLineBreak );
 int		COM_Compress( char *data_p );
 void	COM_ParseError( char *format, ... ) __attribute__ ((format (printf, 1, 2)));
@@ -852,7 +877,9 @@ PlaneTypeForNormal
 =================
 */
 
+#ifndef BSPC // Turtle Man: BSP2
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
+#endif
 
 // plane_t structure
 // !!! if this is changed, it must be changed in asm code too !!!
@@ -940,6 +967,9 @@ typedef enum {
 //
 #define	MAX_CLIENTS			64		// absolute limit
 #define MAX_LOCATIONS		64
+#ifdef TMNT // Particles
+#define MAX_PARTICLES_AREAS 64
+#endif
 
 #define	GENTITYNUM_BITS		10		// don't need to send any more
 #define	MAX_GENTITIES		(1<<GENTITYNUM_BITS)
@@ -974,15 +1004,58 @@ typedef struct {
 
 //=========================================================
 
+#ifdef ARRAYMAX  // IOQ3ZTM
+// array limits, these can be incresed if needed
+//    Only if you are building a EXE, if just a mod don't change theses.
+#define	MAX_STATS				16
+#define	MAX_PERSISTANT			16
+#define	MAX_POWERUPS			16 // PW_* are still limited by bit fields.
+#define	MAX_WEAPONS				16 // If not TMNTWEAPSYS2 limited to 16
+#ifdef TMNTHOLDSYS
+#define	MAX_HOLDABLE			16
+#endif
+#else
 // bit field limits
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16
 #define	MAX_WEAPONS				16		
+#ifdef TMNTHOLDSYS
+#define	MAX_HOLDABLE			16
+#endif
+#endif
 
 #define	MAX_PS_EVENTS			2
 
 #define PS_PMOVEFRAMECOUNTBITS	6
+
+#ifdef TMNTCAMERA
+typedef enum
+{
+	CAM_FIRSTPERSON, ///< Q3 default
+	CAM_Q3THIRDPERSON, ///< Q3 optional camera
+	CAM_THIRDPERSON, ///<
+	CAM_OVERHEAD,	 ///< Camera is above player, good for analog control.
+	CAM_LOCALOVERHEAD,///< One camera for all of the local players
+	CAM_ALLOVERHEAD, ///< Try to watch all players, not just local.
+
+	CAM_MAXMODES
+} cameraMode_e;
+
+// This would only be needed for cgame, but game will use it for analog input.
+typedef struct
+{
+	cameraMode_e mode;
+	vec3_t angles;
+	vec3_t pos;
+
+	cameraMode_e last_mode; // mode that was used for the last thinker
+	vec3_t last_angles;
+	vec3_t last_pos;
+	int last_time; // Last time that the camera thinker was run.
+
+} camera_t;
+#endif
 
 // playerState_t is the information needed by both the client and server
 // to predict player motion and actions
@@ -1037,9 +1110,16 @@ typedef struct playerState_s {
 	int			clientNum;		// ranges from 0 to MAX_CLIENTS-1
 	int			weapon;			// copied to entityState_t->weapon
 	int			weaponstate;
+#ifdef TMNTHOLDSYS
+	int			holdableIndex; // Index of holdable items, for shurikens.
+#endif
 
+#ifdef TMNTCAMERA
+	camera_t	camera;
+#else
 	vec3_t		viewangles;		// for fixed views
 	int			viewheight;
+#endif
 
 	// damage feedback
 	int			damageEvent;	// when it changes, latch the other parms
@@ -1050,11 +1130,32 @@ typedef struct playerState_s {
 	int			stats[MAX_STATS];
 	int			persistant[MAX_PERSISTANT];	// stats that aren't cleared on death
 	int			powerups[MAX_POWERUPS];	// level.time that the powerup runs out
+#ifndef TMNTWEAPSYS2
 	int			ammo[MAX_WEAPONS];
+#endif
+#ifdef TMNTHOLDSYS
+	int			holdable[MAX_HOLDABLE];
+#endif
 
 	int			generic1;
 	int			loopSound;
 	int			jumppad_ent;	// jumppad entity hit this frame
+
+#ifdef TMNTWEAPSYS // MELEEATTACK
+	//
+	// Melee weapons
+	//
+	//  Melee weapons have three attacks (3 attack combo)
+	//  Allow each weapon to have a different combo length?
+	int		meleeAttack; // Attack Combo number, this is for attacks and
+						 //  doesn't count damage hits.
+	int		meleeTime; // Time left in the current attack.
+	int		meleeDelay; // Time before player can use a melee attack
+	int		comboTime; // Time left till the combo ends
+
+	//
+	qboolean attack_melee; // qtrue if attack was pressed and started a melee attack
+#endif
 
 	// not communicated over the net at all
 	int			ping;			// server to game info for scoreboard
@@ -1090,6 +1191,13 @@ typedef struct playerState_s {
 
 #define	BUTTON_ANY			2048			// any key whatsoever
 
+#ifdef TMNTHOLDSYS // NEXTHOLDABLE
+#define	BUTTON_NEXT_HOLDABLE			4096
+#endif
+#ifdef TMNTWEAPSYS2
+#define BUTTON_DROP_WEAPON			8192
+#endif
+
 #define	MOVE_RUN			120			// if forwardmove or rightmove are >= MOVE_RUN,
 										// then BUTTON_WALKING should be set
 
@@ -1098,7 +1206,12 @@ typedef struct usercmd_s {
 	int				serverTime;
 	int				angles[3];
 	int 			buttons;
+#ifndef TMNTWEAPSYS2
 	byte			weapon;           // weapon 
+#endif
+#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+	byte			holdable;         // holdable
+#endif
 	signed char	forwardmove, rightmove, upmove;
 } usercmd_t;
 
@@ -1274,8 +1387,9 @@ typedef enum _flag_status {
 #define SAY_TEAM	1
 #define SAY_TELL	2
 
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #define CDKEY_LEN 16
 #define CDCHKSUM_LEN 2
-
+#endif
 
 #endif	// __Q_SHARED_H

@@ -115,6 +115,10 @@ cvar_t	*r_singleShader;
 cvar_t	*r_roundImagesDown;
 cvar_t	*r_colorMipLevels;
 cvar_t	*r_picmip;
+#ifdef CELSHADING
+cvar_t	*r_celshadalgo; // Cell shading algorithm selection.
+cvar_t	*r_celoutline; // enable/disable cel bordering all together.
+#endif
 cvar_t	*r_showtris;
 cvar_t	*r_showsky;
 cvar_t	*r_shownormals;
@@ -170,6 +174,9 @@ int		max_polyverts;
 static void InitOpenGL( void )
 {
 	char renderer_buffer[1024];
+#ifdef IOQ3ZTM
+	static qboolean first_time = qtrue;
+#endif
 
 	//
 	// initialize OS specific portions of the renderer
@@ -205,8 +212,16 @@ static void InitOpenGL( void )
 	// init command buffers and SMP
 	R_InitCommandBuffers();
 
+#ifdef IOQ3ZTM // Only print OpenGL stuff to the log file once.
+	if (first_time == qtrue)
+	{
+		first_time = qfalse;
+#endif
 	// print info
 	GfxInfo_f();
+#ifdef IOQ3ZTM
+	}
+#endif
 
 	// set default state
 	GL_SetDefaultState();
@@ -995,6 +1010,10 @@ void R_Register( void )
 	r_logFile = ri.Cvar_Get( "r_logFile", "0", CVAR_CHEAT );
 	r_debugSurface = ri.Cvar_Get ("r_debugSurface", "0", CVAR_CHEAT);
 	r_nobind = ri.Cvar_Get ("r_nobind", "0", CVAR_CHEAT);
+#ifdef CELSHADING
+	r_celshadalgo = ri.Cvar_Get ("r_celshadalgo", "0", CVAR_ARCHIVE|CVAR_LATCH);
+	r_celoutline = ri.Cvar_Get("r_celoutline","0", CVAR_ARCHIVE);
+#endif
 	r_showtris = ri.Cvar_Get ("r_showtris", "0", CVAR_CHEAT);
 	r_showsky = ri.Cvar_Get ("r_showsky", "0", CVAR_CHEAT);
 	r_shownormals = ri.Cvar_Get ("r_shownormals", "0", CVAR_CHEAT);

@@ -137,6 +137,23 @@ void EA_Command(int client, char *command)
 {
 	botimport.BotClientCommand(client, command);
 } //end of the function EA_Command
+#ifdef TMNTWEAPSYS2 // BOTLIB
+//===========================================================================
+//
+// Parameter:			-
+// Returns:				-
+// Changes Globals:		-
+//===========================================================================
+void EA_DropWeapon(int client)
+{
+	bot_input_t *bi;
+
+	bi = &botinputs[client];
+
+	bi->actionflags |= ACTION_DROP_WEAPON;
+
+} //end of the function EA_DropWeapon
+#else
 //===========================================================================
 //
 // Parameter:			-
@@ -151,6 +168,7 @@ void EA_SelectWeapon(int client, int weapon)
 
 	bi->weapon = weapon;
 } //end of the function EA_SelectWeapon
+#endif
 //===========================================================================
 //
 // Parameter:			-
@@ -185,13 +203,20 @@ void EA_Talk(int client)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
+#ifdef TMNTHOLDSYS
+void EA_Use(int client, int holdable)
+#else
 void EA_Use(int client)
+#endif
 {
 	bot_input_t *bi;
 
 	bi = &botinputs[client];
 
 	bi->actionflags |= ACTION_USE;
+#ifdef TMNTHOLDSYS
+	bi->holdable = holdable;
+#endif
 } //end of the function EA_Use
 //===========================================================================
 //

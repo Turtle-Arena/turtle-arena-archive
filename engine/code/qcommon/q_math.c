@@ -160,6 +160,29 @@ float	Q_crandom( int *seed ) {
 	return 2.0 * ( Q_random( seed ) - 0.5 );
 }
 
+#ifdef TMNTENTITIES
+// Returns value is more or equal to min and less then max (max equal is max-0.000001)
+float flrandom(float min, float max)
+{
+#if 0 // Turtle Man: i made this
+	// Turtle Man: FIXME: This is not random, always returns the same!
+	return min+((min+max)/2.0f);
+#else // Turtle Man: FIXME: NON-GPL code from Star Trek: Elite Force (code-DM)
+	return ((rand() * (max - min)) / 32768.0f) + min;
+#endif
+}
+
+// Return is more or equal to min and less or equal to max
+int irandom(int min, int max)
+{
+#if 1 // Turtle Man: i made this
+	return min + (rand() % ((max + 1) - min));
+#else // Turtle Man: FIXME: NON-GPL code from Star Trek: Elite Force (code-DM)
+	return ((rand() * ((max + 1) - min)) >> 15) + min;
+#endif
+}
+#endif
+
 //=======================================================
 
 signed char ClampChar( int i ) {

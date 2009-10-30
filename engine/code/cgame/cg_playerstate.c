@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
+#ifndef TMNTWEAPSYS // Turtle Man: No ammo warnings.
 /*
 ==============
 CG_CheckAmmo
@@ -80,6 +81,7 @@ void CG_CheckAmmo( void ) {
 		trap_S_StartLocalSound( cgs.media.noAmmoSound, CHAN_LOCAL_SOUND );
 	}
 }
+#endif
 
 /*
 ==============
@@ -192,11 +194,16 @@ void CG_Respawn( void ) {
 	// no error decay on player movement
 	cg.thisFrameTeleport = qtrue;
 
+#ifndef TMNTWEAPSYS2
 	// display weapons available
 	cg.weaponSelectTime = cg.time;
 
 	// select the weapon the server says we are using
 	cg.weaponSelect = cg.snap->ps.weapon;
+#endif
+#ifdef TMNTHOLDSYS2
+	cg.holdableSelect = cg.snap->ps.holdableIndex;
+#endif
 }
 
 extern char *eventnames[];
@@ -295,7 +302,11 @@ CG_CheckLocalSounds
 ==================
 */
 void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
+#ifdef TMNT // NOARMOR
+	int			highScore, health, reward;
+#else
 	int			highScore, health, armor, reward;
+#endif
 	sfxHandle_t sfx;
 
 	// don't play the sounds if the player just changed teams
@@ -305,9 +316,14 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 
 	// hit changes
 	if ( ps->persistant[PERS_HITS] > ops->persistant[PERS_HITS] ) {
+#ifdef TMNT // NOARMOR
+		//armor  = 0;
+		health = ps->persistant[PERS_ATTACKEE_HEALTH];
+#else
 		armor  = ps->persistant[PERS_ATTACKEE_ARMOR] & 0xff;
 		health = ps->persistant[PERS_ATTACKEE_ARMOR] >> 8;
-#ifdef MISSIONPACK
+#endif
+#if defined MISSIONPACK && !defined TMNT // NOARMOR
 		if (armor > 50 ) {
 			trap_S_StartLocalSound( cgs.media.hitSoundHighArmor, CHAN_LOCAL_SOUND );
 		} else if (armor || health > 100) {
@@ -342,6 +358,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("capture\n");
 	}
+#ifndef TMNTWEAPONS
 	if (ps->persistant[PERS_IMPRESSIVE_COUNT] != ops->persistant[PERS_IMPRESSIVE_COUNT]) {
 #ifdef MISSIONPACK
 		if (ps->persistant[PERS_IMPRESSIVE_COUNT] == 1) {
@@ -356,6 +373,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("impressive\n");
 	}
+#endif
 	if (ps->persistant[PERS_EXCELLENT_COUNT] != ops->persistant[PERS_EXCELLENT_COUNT]) {
 #ifdef MISSIONPACK
 		if (ps->persistant[PERS_EXCELLENT_COUNT] == 1) {
@@ -370,6 +388,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("excellent\n");
 	}
+#ifndef TMNTWEAPONS
 	if (ps->persistant[PERS_GAUNTLET_FRAG_COUNT] != ops->persistant[PERS_GAUNTLET_FRAG_COUNT]) {
 #ifdef MISSIONPACK
 		if (ops->persistant[PERS_GAUNTLET_FRAG_COUNT] == 1) {
@@ -384,6 +403,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("guantlet frag\n");
 	}
+#endif
 	if (ps->persistant[PERS_DEFEND_COUNT] != ops->persistant[PERS_DEFEND_COUNT]) {
 		pushReward(cgs.media.defendSound, cgs.media.medalDefend, ps->persistant[PERS_DEFEND_COUNT]);
 		reward = qtrue;
@@ -394,22 +414,30 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("assist\n");
 	}
+#if !defined TMNT || !defined TMNTWEAPONS || !defined NOTRATEDM
 	// if any of the player event bits changed
 	if (ps->persistant[PERS_PLAYEREVENTS] != ops->persistant[PERS_PLAYEREVENTS]) {
+#ifndef TMNT
 		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD)) {
 			trap_S_StartLocalSound( cgs.media.deniedSound, CHAN_ANNOUNCER );
 		}
+#endif
+#ifndef TMNTWEAPONS
 		else if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD)) {
 			trap_S_StartLocalSound( cgs.media.humiliationSound, CHAN_ANNOUNCER );
 		}
+#endif
+#ifndef NOTRATEDM // Disable strong lang.
 		else if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_HOLYSHIT)) {
 			trap_S_StartLocalSound( cgs.media.holyShitSound, CHAN_ANNOUNCER );
 		}
+#endif
 		reward = qtrue;
 	}
+#endif
 
 	// check for flag pickup
 	if ( cgs.gametype >= GT_TEAM ) {
@@ -511,8 +539,10 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 		CG_CheckLocalSounds( ps, ops );
 	}
 
+#ifndef TMNTWEAPSYS // Turtle Man: No ammo warnings.
 	// check for going low on ammo
 	CG_CheckAmmo();
+#endif
 
 	// run events
 	CG_CheckPlayerstateEvents( ps, ops );

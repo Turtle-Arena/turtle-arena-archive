@@ -3035,7 +3035,7 @@ static int huft_build(uInt *b, uInt n, uInt s, const uInt *d, const uInt *e, inf
   uInt mask;                    /* (1 << w) - 1, to avoid cc -O bug on HP */
   register uInt *p;            /* pointer into c[], b[], or v[] */
   inflate_huft *q;              /* points to current table */
-  struct inflate_huft_s r = {{{0, 0}}};      /* table entry for structure assignment */
+  struct inflate_huft_s r = {{{0, 0}},0};      /* table entry for structure assignment */
   inflate_huft *u[BMAX];        /* table stack */
   register int w;               /* bits before this table == (l * h) */
   uInt x[BMAX+1];               /* bit offsets, then code stack */
@@ -3129,7 +3129,7 @@ static int huft_build(uInt *b, uInt n, uInt s, const uInt *d, const uInt *e, inf
 
         /* compute minimum size table less than or equal to l bits */
         z = g - w;
-        z = z > (uInt)l ? l : z;        /* table size upper limit */
+        z = z > (uInt)l ? (uInt)l : z;        /* table size upper limit */
         if ((f = 1 << (j = k - w)) > a + 1)     /* try a k-w bit table */
         {                       /* too few codes for k-w bit table */
           f -= a + 1;           /* deduct codes from patterns left */

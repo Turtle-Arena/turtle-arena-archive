@@ -307,7 +307,11 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 	// fragged by ... line
 	if ( cg.killerName[0] ) {
+#ifdef TMNT // frag to KO
+		s = va("Knocked out by %s", cg.killerName );
+#else
 		s = va("Fragged by %s", cg.killerName );
+#endif
 		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 		x = ( SCREEN_WIDTH - w ) / 2;
 		y = 40;

@@ -71,6 +71,8 @@ functions imported from the main executable
 
 #define	CGAME_IMPORT_API_VERSION	4
 
+// Turtle Man: Note to self: The order is important and if any
+//             more are added update cg_syscalls.ASM
 typedef enum {
 	CG_PRINT,
 	CG_ERROR,
@@ -165,11 +167,17 @@ typedef enum {
 	// 1.32
 	CG_FS_SEEK,
 
+#ifdef CAMERASCRIPT
+	CG_LOADCAMERA,
+	CG_STARTCAMERA,
+	CG_GETCAMERAINFO,
+#else
 /*
 	CG_LOADCAMERA,
 	CG_STARTCAMERA,
 	CG_GETCAMERAINFO,
 */
+#endif
 
 	CG_MEMSET = 100,
 	CG_MEMCPY,

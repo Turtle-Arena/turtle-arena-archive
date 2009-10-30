@@ -121,6 +121,19 @@ int G_SoundIndex( char *name ) {
 	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, qtrue);
 }
 
+#ifdef TMNT // Particles
+// str should be
+// int  f f f   f f f   int         int   int
+// type origin origin2 numparticles turb snum
+// "1   0.1 0.4 11.55  0.1 0.4 11.55  256  1  1"
+// str will be parsed and used in CG_NewParticleArea
+// Turtle Man: I have no idea what they all do.
+//
+int G_ParticleAreaIndex( char *str ) {
+	return G_FindConfigstringIndex (str, CS_PARTICLES, MAX_PARTICLES_AREAS, qtrue);
+}
+#endif
+
 //=====================================================================
 
 
@@ -232,6 +245,60 @@ match (string)self.target and call their .use function
 
 ==============================
 */
+#ifdef TMNTENTITIES
+void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *target ) {
+	gentity_t		*t;
+
+	if ( !ent ) {
+		return;
+	}
+
+	if (ent->targetShaderName && ent->targetShaderNewName) {
+		float f = level.time * 0.001;
+		AddRemap(ent->targetShaderName, ent->targetShaderNewName, f);
+		trap_SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+	}
+
+	if ( !target ) {
+		return;
+	}
+
+	t = NULL;
+	while ( (t = G_Find (t, FOFS(targetname), target)) != NULL ) {
+		if ( t == ent ) {
+			G_Printf ("WARNING: Entity used itself.\n");
+		} else {
+			if ( t->use ) {
+				t->use (t, ent, activator);
+			}
+		}
+		if ( !ent->inuse ) {
+			G_Printf("entity was removed while using targets\n");
+			return;
+		}
+#ifdef TMNTWEAPSYS // Check if weapon_default was given.
+        if (ent->s.weapon == WP_DEFAULT)
+        {
+            if (ent->client)
+            {
+                ent->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
+            }
+            else
+            {
+                ent->s.weapon = WP_NONE;
+            }
+        }
+#endif
+	}
+}
+
+void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
+	if ( !ent ) {
+		return;
+	}
+	G_UseTargets2(ent, activator, ent->target);
+}
+#else
 void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 	gentity_t		*t;
 	
@@ -262,9 +329,22 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 			G_Printf("entity was removed while using targets\n");
 			return;
 		}
+#ifdef TMNTWEAPSYS // Check if weapon_default was given.
+        if (ent->s.weapon == WP_DEFAULT)
+        {
+            if (ent->client)
+            {
+                ent->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
+	}
+            else
+            {
+                ent->s.weapon = WP_NONE;
+}
+        }
+#endif
 	}
 }
-
+#endif
 
 /*
 =============
@@ -664,3 +744,57 @@ int DebugLine(vec3_t start, vec3_t end, int color) {
 
 	return trap_DebugPolygonCreate(color, 4, points);
 }
+
+#ifdef TMNTWEAPONS
+/*
+=================
+Quake2 (GPL v2): findradius
+
+Returns entities that have origins within a spherical area
+
+Turtle Man: Renamed from findradius to G_FindRadius.
+			Changes were made to make it work in Quake3.
+			Thanks goto "Nobody" at http://quakestyle.telefragged.com/quake3/tutorial10.htm
+=================
+*/
+gentity_t *G_FindRadius (gentity_t *from, vec3_t org, float rad)
+{
+	vec3_t	eorg;
+	int		j;
+
+	if (!from)
+		from = g_entities;
+	else
+		from++;
+	for ( ; from < &g_entities[level.num_entities]; from++)
+	{
+		if (!from->inuse)
+			continue;
+		//if (from->solid == SOLID_NOT)
+			//continue;
+		for (j=0 ; j<3 ; j++)
+			eorg[j] = org[j] - (from->r.currentOrigin[j] + (from->r.mins[j] + from->r.maxs[j])*0.5);
+		if (VectorLength(eorg) > rad)
+			continue;
+		return from;
+	}
+
+	return NULL;
+}
+
+// Turtle Man: FIXME: NON-GPL from QuakeStyle (5 lines)
+// FROM: Nobody of QuakeStyle; http://quakestyle.telefragged.com/quake3/tutorial11.htm
+// (NOBODY): Code helper function
+// visible
+qboolean G_Visible( gentity_t *ent1, gentity_t *ent2 ) {
+	trace_t         trace;
+
+	trap_Trace (&trace, ent1->s.pos.trBase, NULL, NULL, ent2->s.pos.trBase, ent1->s.number, MASK_SHOT );
+
+	if ( trace.contents & CONTENTS_SOLID ) {
+		return qfalse;
+	}
+
+	return qtrue;
+}
+#endif

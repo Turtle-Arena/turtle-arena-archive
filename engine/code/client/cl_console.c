@@ -536,7 +536,11 @@ void Con_DrawNotify (void)
 			continue;
 		text = con.text + (i % con.totallines)*con.linewidth;
 
-		if (cl.snap.ps.pm_type != PM_INTERMISSION && Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
+		if (cl.snap.ps.pm_type != PM_INTERMISSION
+#ifdef TMNTSP
+		&& cl.snap.ps.pm_type != PM_SPINTERMISSION
+#endif
+		&& Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
 			continue;
 		}
 
@@ -619,16 +623,27 @@ void Con_DrawSolidConsole( float frac ) {
 		SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
 	}
 
+#ifdef TMNT // Console
+	color[0] = 0;
+	color[1] = 1;
+	color[2] = 0;
+	color[3] = 1;
+#else
 	color[0] = 1;
 	color[1] = 0;
 	color[2] = 0;
 	color[3] = 1;
+#endif
 	SCR_FillRect( 0, y, SCREEN_WIDTH, 2, color );
 
 
 	// draw the version number
 
+#ifdef TMNT // Console
+	re.SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
+#else
 	re.SetColor( g_color_table[ColorIndex(COLOR_RED)] );
+#endif
 
 	i = strlen( Q3_VERSION );
 

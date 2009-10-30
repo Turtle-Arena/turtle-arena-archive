@@ -94,6 +94,41 @@ typedef struct
 #define ID_MOUSELOOK	14
 #define ID_CENTERVIEW	15
 #define ID_ZOOMVIEW		16
+
+#ifdef TMNTWEAPSYS2
+#define ID_ATTACK		17
+#define ID_WEAPDROP		18
+#define ID_GESTURE		19
+#define ID_CHAT			20
+#define ID_CHAT2		21
+#define ID_CHAT3		22
+#define ID_CHAT4		23
+
+#ifdef TMNTHOLDSYS // Why isn't this a enum?...
+#define ID_NEXTITEM		24
+
+// all others
+#define ID_FREELOOK		25
+#define ID_INVERTMOUSE	26
+#define ID_ALWAYSRUN	27
+#define ID_MOUSESPEED	28
+#define ID_JOYENABLE	29
+#define ID_JOYTHRESHOLD	30
+#define ID_SMOOTHMOUSE	31
+
+#else
+
+// all others
+#define ID_FREELOOK		24
+#define ID_INVERTMOUSE	25
+#define ID_ALWAYSRUN	26
+#define ID_MOUSESPEED	27
+#define ID_JOYENABLE	28
+#define ID_JOYTHRESHOLD	29
+#define ID_SMOOTHMOUSE	30
+#endif // TMNTHOLDSYS
+
+#else
 #define ID_WEAPON1		17	
 #define ID_WEAPON2		18	
 #define ID_WEAPON3		19	
@@ -112,6 +147,19 @@ typedef struct
 #define ID_CHAT3		32
 #define ID_CHAT4		33
 
+#ifdef TMNTHOLDSYS // Why isn't this a enum?...
+#define ID_NEXTITEM		34
+
+// all others
+#define ID_FREELOOK		35
+#define ID_INVERTMOUSE	36
+#define ID_ALWAYSRUN	37
+#define ID_AUTOSWITCH	38
+#define ID_MOUSESPEED	39
+#define ID_JOYENABLE	40
+#define ID_JOYTHRESHOLD	41
+#define ID_SMOOTHMOUSE	42
+#else
 // all others
 #define ID_FREELOOK		34
 #define ID_INVERTMOUSE	35
@@ -121,6 +169,9 @@ typedef struct
 #define ID_JOYENABLE	39
 #define ID_JOYTHRESHOLD	40
 #define ID_SMOOTHMOUSE	41
+#endif // TMNTHOLDSYS
+
+#endif // TMNTWEAPSYS2
 
 #define ANIM_IDLE		0
 #define ANIM_RUN		1
@@ -134,6 +185,7 @@ typedef struct
 #define ANIM_TURNRIGHT	9
 #define ANIM_LOOKUP		10
 #define ANIM_LOOKDOWN	11
+#ifndef TMNTWEAPSYS2
 #define ANIM_WEAPON1	12
 #define ANIM_WEAPON2	13
 #define ANIM_WEAPON3	14
@@ -144,6 +196,7 @@ typedef struct
 #define ANIM_WEAPON8	19
 #define ANIM_WEAPON9	20
 #define ANIM_WEAPON10	21
+#endif // TMNTWEAPSYS2
 #define ANIM_ATTACK		22
 #define ANIM_GESTURE	23
 #define ANIM_DIE		24
@@ -173,6 +226,7 @@ typedef struct
 	menuaction_s		turnright;
 	menuaction_s		sidestep;
 	menuaction_s		run;
+#ifndef TMNTWEAPSYS2
 	menuaction_s		machinegun;
 	menuaction_s		chainsaw;
 	menuaction_s		shotgun;
@@ -182,9 +236,14 @@ typedef struct
 	menuaction_s		railgun;
 	menuaction_s		plasma;
 	menuaction_s		bfg;
+#endif
 	menuaction_s		attack;
+#ifdef TMNTWEAPSYS2
+	menuaction_s		dropweapon;
+#else
 	menuaction_s		prevweapon;
 	menuaction_s		nextweapon;
+#endif
 	menuaction_s		lookup;
 	menuaction_s		lookdown;
 	menuaction_s		mouselook;
@@ -197,8 +256,13 @@ typedef struct
 	menuradiobutton_s	smoothmouse;
 	menuradiobutton_s	alwaysrun;
 	menuaction_s		showscores;
+#ifndef TMNTWEAPSYS2
 	menuradiobutton_s	autoswitch;
+#endif
 	menuaction_s		useitem;
+#ifdef TMNTHOLDSYS
+	menuaction_s		nextitem;
+#endif
 	playerInfo_t		playerinfo;
 	qboolean			changesmade;
 	menuaction_s		chat;
@@ -244,6 +308,7 @@ static bind_t g_bindings[] =
 	{"+mlook", 			"mouse look",		ID_MOUSELOOK,	ANIM_IDLE,		'/',			-1,		-1, -1},
 	{"centerview", 		"center view",		ID_CENTERVIEW,	ANIM_IDLE,		K_END,			-1,		-1, -1},
 	{"+zoom", 			"zoom view",		ID_ZOOMVIEW,	ANIM_IDLE,		-1,				-1,		-1, -1},
+#ifndef TMNTWEAPSYS2
 	{"weapon 1",		"gauntlet",			ID_WEAPON1,		ANIM_WEAPON1,	'1',			-1,		-1, -1},
 	{"weapon 2",		"machinegun",		ID_WEAPON2,		ANIM_WEAPON2,	'2',			-1,		-1, -1},
 	{"weapon 3",		"shotgun",			ID_WEAPON3,		ANIM_WEAPON3,	'3',			-1,		-1, -1},
@@ -253,14 +318,22 @@ static bind_t g_bindings[] =
 	{"weapon 7",		"railgun",			ID_WEAPON7,		ANIM_WEAPON7,	'7',			-1,		-1, -1},
 	{"weapon 8",		"plasma gun",		ID_WEAPON8,		ANIM_WEAPON8,	'8',			-1,		-1, -1},
 	{"weapon 9",		"BFG",				ID_WEAPON9,		ANIM_WEAPON9,	'9',			-1,		-1, -1},
+#endif
 	{"+attack", 		"attack",			ID_ATTACK,		ANIM_ATTACK,	K_CTRL,			-1,		-1, -1},
+#ifdef TMNTWEAPSYS2
+	{"+button13",		"drop weapon",		ID_WEAPDROP,	ANIM_IDLE,		';',			-1,		-1, -1},
+#else
 	{"weapprev",		"prev weapon",		ID_WEAPPREV,	ANIM_IDLE,		'[',			-1,		-1, -1},
 	{"weapnext", 		"next weapon",		ID_WEAPNEXT,	ANIM_IDLE,		']',			-1,		-1, -1},
+#endif
 	{"+button3", 		"gesture",			ID_GESTURE,		ANIM_GESTURE,	K_MOUSE3,		-1,		-1, -1},
 	{"messagemode", 	"chat",				ID_CHAT,		ANIM_CHAT,		't',			-1,		-1, -1},
 	{"messagemode2", 	"chat - team",		ID_CHAT2,		ANIM_CHAT,		-1,				-1,		-1, -1},
 	{"messagemode3", 	"chat - target",	ID_CHAT3,		ANIM_CHAT,		-1,				-1,		-1, -1},
 	{"messagemode4", 	"chat - attacker",	ID_CHAT4,		ANIM_CHAT,		-1,				-1,		-1, -1},
+#ifdef TMNTHOLDSYS // Turtle Man: FIXME: "use item" is gone in the menu and meun doesn't work right.
+	{"+button12",		"next item",		ID_NEXTITEM,	ANIM_IDLE,		'\'',			-1,		-1, -1},
+#endif
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
 };
 
@@ -268,7 +341,9 @@ static configcvar_t g_configcvars[] =
 {
 	{"cl_run",			0,					0},
 	{"m_pitch",			0,					0},
+#ifndef TMNTWEAPSYS2
 	{"cg_autoswitch",	0,					0},
+#endif
 	{"sensitivity",		0,					0},
 	{"in_joystick",		0,					0},
 	{"joy_threshold",	0,					0},
@@ -295,6 +370,9 @@ static menucommon_s *g_movement_controls[] =
 
 static menucommon_s *g_weapons_controls[] = {
 	(menucommon_s *)&s_controls.attack,           
+#ifdef TMNTWEAPSYS2
+	(menucommon_s *)&s_controls.dropweapon,
+#else
 	(menucommon_s *)&s_controls.nextweapon,
 	(menucommon_s *)&s_controls.prevweapon,
 	(menucommon_s *)&s_controls.autoswitch,    
@@ -307,6 +385,7 @@ static menucommon_s *g_weapons_controls[] = {
 	(menucommon_s *)&s_controls.railgun,          
 	(menucommon_s *)&s_controls.plasma,           
 	(menucommon_s *)&s_controls.bfg,              
+#endif
 	NULL,
 };
 
@@ -328,6 +407,9 @@ static menucommon_s *g_looking_controls[] = {
 static menucommon_s *g_misc_controls[] = {
 	(menucommon_s *)&s_controls.showscores, 
 	(menucommon_s *)&s_controls.useitem,
+#ifdef TMNTHOLDSYS
+	(menucommon_s *)&s_controls.nextitem,
+#endif
 	(menucommon_s *)&s_controls.gesture,
 	(menucommon_s *)&s_controls.chat,
 	(menucommon_s *)&s_controls.chat2,
@@ -480,6 +562,22 @@ static void Controls_UpdateModel( int anim ) {
 		s_controls.playerViewangles[PITCH] = 45;
 		break;
 
+#ifdef TMNTWEAPSYS // Turtle Man: Fixme?
+#ifndef TMNTWEAPSYS2
+	case ANIM_WEAPON1:
+	case ANIM_WEAPON2:
+	case ANIM_WEAPON3:
+	case ANIM_WEAPON4:
+	case ANIM_WEAPON5:
+	case ANIM_WEAPON6:
+	case ANIM_WEAPON7:
+	case ANIM_WEAPON8:
+	case ANIM_WEAPON9:
+	case ANIM_WEAPON10:
+		s_controls.playerWeapon = DEFAULT_DEFAULT_WEAPON;
+		break;
+#endif
+#else
 	case ANIM_WEAPON1:
 		s_controls.playerWeapon = WP_GAUNTLET;
 		break;
@@ -519,6 +617,7 @@ static void Controls_UpdateModel( int anim ) {
 	case ANIM_WEAPON10:
 		s_controls.playerWeapon = WP_GRAPPLING_HOOK;
 		break;
+#endif
 
 	case ANIM_ATTACK:
 		s_controls.playerTorso = TORSO_ATTACK;
@@ -806,7 +905,9 @@ static void Controls_GetConfig( void )
 	s_controls.invertmouse.curvalue  = Controls_GetCvarValue( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "m_filter" ) );
 	s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_run" ) );
+#ifndef TMNTWEAPSYS2
 	s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cg_autoswitch" ) );
+#endif
 	s_controls.sensitivity.curvalue  = UI_ClampCvar( 2, 30, Controls_GetCvarValue( "sensitivity" ) );
 	s_controls.joyenable.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "in_joystick" ) );
 	s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( "joy_threshold" ) );
@@ -848,7 +949,9 @@ static void Controls_SetConfig( void )
 
 	trap_Cvar_SetValue( "m_filter", s_controls.smoothmouse.curvalue );
 	trap_Cvar_SetValue( "cl_run", s_controls.alwaysrun.curvalue );
+#ifndef TMNTWEAPSYS2
 	trap_Cvar_SetValue( "cg_autoswitch", s_controls.autoswitch.curvalue );
+#endif
 	trap_Cvar_SetValue( "sensitivity", s_controls.sensitivity.curvalue );
 	trap_Cvar_SetValue( "in_joystick", s_controls.joyenable.curvalue );
 	trap_Cvar_SetValue( "joy_threshold", s_controls.joythreshold.curvalue );
@@ -882,7 +985,9 @@ static void Controls_SetDefaults( void )
 	s_controls.invertmouse.curvalue  = Controls_GetCvarDefault( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = Controls_GetCvarDefault( "m_filter" );
 	s_controls.alwaysrun.curvalue    = Controls_GetCvarDefault( "cl_run" );
+#ifndef TMNTWEAPSYS2
 	s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( "cg_autoswitch" );
+#endif
 	s_controls.sensitivity.curvalue  = Controls_GetCvarDefault( "sensitivity" );
 	s_controls.joyenable.curvalue    = Controls_GetCvarDefault( "in_joystick" );
 	s_controls.joythreshold.curvalue = Controls_GetCvarDefault( "joy_threshold" );
@@ -1114,7 +1219,9 @@ static void Controls_MenuEvent( void* ptr, int event )
 		case ID_INVERTMOUSE:
 		case ID_SMOOTHMOUSE:
 		case ID_ALWAYSRUN:
+#ifndef TMNTWEAPSYS2
 		case ID_AUTOSWITCH:
+#endif
 		case ID_JOYENABLE:
 		case ID_JOYTHRESHOLD:
 			if (event == QM_ACTIVATED)
@@ -1173,7 +1280,25 @@ static void Controls_InitWeapons( void ) {
 		if ( item->giType != IT_WEAPON ) {
 			continue;
 		}
+#ifdef TMNTWEAPSYS
+		// weap1
+		if (item->world_model[2]) {
+			trap_R_RegisterModel( item->world_model[2] );
+		}
+		else if (item->world_model[0]) {
 		trap_R_RegisterModel( item->world_model[0] );
+	}
+
+		// weap2
+		if (item->world_model[3]) {
+			trap_R_RegisterModel( item->world_model[3] );
+}
+		else {
+			// uses weap1
+		}
+#else
+		trap_R_RegisterModel( item->world_model[0] );
+#endif
 	}
 }
 
@@ -1338,6 +1463,7 @@ static void Controls_MenuInit( void )
 	s_controls.run.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.run.generic.id        = ID_SPEED;
 
+#ifndef TMNTWEAPSYS2
 	s_controls.chainsaw.generic.type	  = MTYPE_ACTION;
 	s_controls.chainsaw.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.chainsaw.generic.callback  = Controls_ActionEvent;
@@ -1391,6 +1517,7 @@ static void Controls_MenuInit( void )
 	s_controls.bfg.generic.callback  = Controls_ActionEvent;
 	s_controls.bfg.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.bfg.generic.id        = ID_WEAPON9;
+#endif
 
 	s_controls.attack.generic.type	    = MTYPE_ACTION;
 	s_controls.attack.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
@@ -1398,6 +1525,13 @@ static void Controls_MenuInit( void )
 	s_controls.attack.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.attack.generic.id        = ID_ATTACK;
 
+#ifdef TMNTWEAPSYS2
+	s_controls.dropweapon.generic.type	    = MTYPE_ACTION;
+	s_controls.dropweapon.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.dropweapon.generic.callback  = Controls_ActionEvent;
+	s_controls.dropweapon.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.dropweapon.generic.id        = ID_WEAPDROP;
+#else
 	s_controls.prevweapon.generic.type	    = MTYPE_ACTION;
 	s_controls.prevweapon.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.prevweapon.generic.callback  = Controls_ActionEvent;
@@ -1409,6 +1543,7 @@ static void Controls_MenuInit( void )
 	s_controls.nextweapon.generic.callback  = Controls_ActionEvent;
 	s_controls.nextweapon.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.nextweapon.generic.id        = ID_WEAPNEXT;
+#endif
 
 	s_controls.lookup.generic.type	    = MTYPE_ACTION;
 	s_controls.lookup.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
@@ -1454,6 +1589,14 @@ static void Controls_MenuInit( void )
 	s_controls.useitem.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.useitem.generic.id        = ID_USEITEM;
 
+#ifdef TMNTHOLDSYS
+	s_controls.nextitem.generic.type	  = MTYPE_ACTION;
+	s_controls.nextitem.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.nextitem.generic.callback  = Controls_ActionEvent;
+	s_controls.nextitem.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.nextitem.generic.id        = ID_NEXTITEM;
+#endif
+
 	s_controls.showscores.generic.type	    = MTYPE_ACTION;
 	s_controls.showscores.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.showscores.generic.callback  = Controls_ActionEvent;
@@ -1484,6 +1627,7 @@ static void Controls_MenuInit( void )
 	s_controls.alwaysrun.generic.callback  = Controls_MenuEvent;
 	s_controls.alwaysrun.generic.statusbar = Controls_StatusBar;
 
+#ifndef TMNTWEAPSYS2
 	s_controls.autoswitch.generic.type      = MTYPE_RADIOBUTTON;
 	s_controls.autoswitch.generic.flags	    = QMF_SMALLFONT;
 	s_controls.autoswitch.generic.x	        = SCREEN_WIDTH/2;
@@ -1491,6 +1635,7 @@ static void Controls_MenuInit( void )
 	s_controls.autoswitch.generic.id        = ID_AUTOSWITCH;
 	s_controls.autoswitch.generic.callback  = Controls_MenuEvent;
 	s_controls.autoswitch.generic.statusbar = Controls_StatusBar;
+#endif
 
 	s_controls.sensitivity.generic.type	     = MTYPE_SLIDER;
 	s_controls.sensitivity.generic.x		 = SCREEN_WIDTH/2;
@@ -1594,6 +1739,9 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.sidestep );
 
 	Menu_AddItem( &s_controls.menu, &s_controls.attack );
+#ifdef TMNTWEAPSYS2
+	Menu_AddItem( &s_controls.menu, &s_controls.dropweapon );
+#else
 	Menu_AddItem( &s_controls.menu, &s_controls.nextweapon );
 	Menu_AddItem( &s_controls.menu, &s_controls.prevweapon );
 	Menu_AddItem( &s_controls.menu, &s_controls.autoswitch );
@@ -1606,9 +1754,13 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.railgun );
 	Menu_AddItem( &s_controls.menu, &s_controls.plasma );
 	Menu_AddItem( &s_controls.menu, &s_controls.bfg );
+#endif
 
 	Menu_AddItem( &s_controls.menu, &s_controls.showscores );
 	Menu_AddItem( &s_controls.menu, &s_controls.useitem );
+#ifdef TMNTHOLDSYS
+	Menu_AddItem( &s_controls.menu, &s_controls.nextitem );
+#endif
 	Menu_AddItem( &s_controls.menu, &s_controls.gesture );
 	Menu_AddItem( &s_controls.menu, &s_controls.chat );
 	Menu_AddItem( &s_controls.menu, &s_controls.chat2 );

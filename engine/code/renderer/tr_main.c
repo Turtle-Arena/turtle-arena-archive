@@ -1232,7 +1232,12 @@ void R_AddEntitySurfaces (void) {
 			// self blood sprites, talk balloons, etc should not be drawn in the primary
 			// view.  We can't just do this check for all entities, because md3
 			// entities may still want to cast shadows from them
+#ifdef IOQ3ZTM
+			if ( ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
+				|| ((ent->e.renderfx & RF_NOT_MIRROR) && tr.viewParms.isPortal)) {
+#else
 			if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
+#endif
 				continue;
 			}
 			shader = R_GetShaderByHandle( ent->e.customShader );
@@ -1260,10 +1265,21 @@ void R_AddEntitySurfaces (void) {
 					break;
 #endif
 				case MOD_BRUSH:
+#ifdef IOQ3ZTM
+					if ( ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
+						|| ((ent->e.renderfx & RF_NOT_MIRROR) && tr.viewParms.isPortal)) {
+						break;
+					}
+#endif
 					R_AddBrushModelSurfaces( ent );
 					break;
 				case MOD_BAD:		// null model axis
+#ifdef IOQ3ZTM
+					if ( ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
+						|| ((ent->e.renderfx & RF_NOT_MIRROR) && tr.viewParms.isPortal)) {
+#else
 					if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
+#endif
 						break;
 					}
 					shader = R_GetShaderByHandle( ent->e.customShader );

@@ -75,7 +75,12 @@ char *Sys_DefaultHomePath( void )
 			return NULL;
 		}
 		Q_strncpyz( homePath, szPath, sizeof( homePath ) );
+#ifdef TMNT
+		// Turtle Man: Don't put it with Quake3 stuff.
+		Q_strcat( homePath, sizeof( homePath ), "\\TMNTArena" );
+#else
 		Q_strcat( homePath, sizeof( homePath ), "\\Quake3" );
+#endif
 		FreeLibrary(shfolder);
 		if( !CreateDirectory( homePath, NULL ) )
 		{

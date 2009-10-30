@@ -172,7 +172,9 @@ typedef struct bot_state_s
 	float stand_time;								//time the bot is standing still
 	float lastchat_time;							//time the bot last selected a chat
 	float kamikaze_time;							//time to check for kamikaze usage
+#ifndef TMNT // POWERS
 	float invulnerability_time;						//time to check for invulnerability usage
+#endif
 	float standfindenemy_time;						//time to find enemy while standing
 	float attackstrafe_time;						//time the bot is strafing in one dir
 	float attackcrouch_time;						//time the bot will stop crouching
@@ -205,8 +207,10 @@ typedef struct bot_state_s
 	vec3_t enemyorigin;								//enemy origin 0.5 secs ago during battle
 	//
 	int kamikazebody;								//kamikaze body
+#ifndef TMNTWEAPONS
 	int proxmines[MAX_PROXMINES];
 	int numproxmines;
+#endif
 	//
 	int character;									//the bot character
 	int ms;											//move state of the bot

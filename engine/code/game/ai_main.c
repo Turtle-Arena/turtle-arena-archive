@@ -839,6 +839,12 @@ void BotInputToUserCommand(bot_input_t *bi, usercmd_t *ucmd, int delta_angles[3]
 	if (bi->actionflags & ACTION_TALK) ucmd->buttons |= BUTTON_TALK;
 	if (bi->actionflags & ACTION_GESTURE) ucmd->buttons |= BUTTON_GESTURE;
 	if (bi->actionflags & ACTION_USE) ucmd->buttons |= BUTTON_USE_HOLDABLE;
+#ifdef TMNTHOLDSYS // NEXTHOLDABLE
+	//if (bi->actionflags & ACTION_NEXT_HOLDABLE) ucmd->buttons |= BUTTON_NEXT_HOLDABLE;
+#endif
+#ifdef TMNTWEAPON3
+	if (bi->actionflags & ACTION_DROP_WEAPON) ucmd->buttons |= BUTTON_DROP_WEAPON;
+#endif
 	if (bi->actionflags & ACTION_WALK) ucmd->buttons |= BUTTON_WALKING;
 	if (bi->actionflags & ACTION_AFFIRMATIVE) ucmd->buttons |= BUTTON_AFFIRMATIVE;
 	if (bi->actionflags & ACTION_NEGATIVE) ucmd->buttons |= BUTTON_NEGATIVE;
@@ -847,7 +853,12 @@ void BotInputToUserCommand(bot_input_t *bi, usercmd_t *ucmd, int delta_angles[3]
 	if (bi->actionflags & ACTION_PATROL) ucmd->buttons |= BUTTON_PATROL;
 	if (bi->actionflags & ACTION_FOLLOWME) ucmd->buttons |= BUTTON_FOLLOWME;
 	//
+#ifndef TMNTWEAPSYS2
 	ucmd->weapon = bi->weapon;
+#endif
+#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+	ucmd->holdable = bi->holdable;
+#endif
 	//set the view angles
 	//NOTE: the ucmd->angles are the angles WITHOUT the delta angles
 	ucmd->angles[PITCH] = ANGLE2SHORT(bi->viewangles[PITCH]);
@@ -1039,10 +1050,30 @@ int BotAI(int client, float thinktime) {
 	bs->eye[2] += bs->cur_ps.viewheight;
 	//get the area the bot is in
 	bs->areanum = BotPointAreaNum(bs->origin);
+#ifdef TMNTWEAPSYS2
+    BotChooseWeapon(bs);
+#endif
 	//the real AI
 	BotDeathmatchAI(bs, thinktime);
+#ifdef TMNTWEAPSYS2
+    if (bs->cur_ps.weapon != bs->weaponnum)
+    {
+        // Wants a different weapon,
+        // so lets see if we can fulfill there want.
+        if (bs->weaponnum == bs->cur_ps.stats[STAT_DEFAULTWEAPON])
+        {
+            // Wants to change to default weapon.
+            trap_EA_DropWeapon(bs->client);
+        }
+        else if (bs->weaponnum != bs->cur_ps.stats[STAT_NEWWEAPON])
+        {
+            Com_Printf("bots wants weapon %i, but can't have it only %i and %i\n", bs->weaponnum, bs->cur_ps.stats[STAT_NEWWEAPON], bs->cur_ps.stats[STAT_DEFAULTWEAPON]);
+        }
+    }
+#else
 	//set the weapon selection every AI frame
 	trap_EA_SelectWeapon(bs->client, bs->weaponnum);
+#endif
 	//subtract the delta angles
 	for (j = 0; j < 3; j++) {
 		bs->viewangles[j] = AngleMod(bs->viewangles[j] - SHORT2ANGLE(bs->cur_ps.delta_angles[j]));
@@ -1367,8 +1398,10 @@ int BotAILoadMap( int restart ) {
 	return qtrue;
 }
 
+#ifndef TMNTWEAPONS // missionpack
 #ifdef MISSIONPACK
 void ProximityMine_Trigger( gentity_t *trigger, gentity_t *other, trace_t *trace );
+#endif
 #endif
 
 /*
@@ -1484,6 +1517,7 @@ int BotAIStartFrame(int time) {
 				trap_BotLibUpdateEntity(i, NULL);
 				continue;
 			}
+#ifndef TMNTWEAPONS // missionpack
 #ifdef MISSIONPACK
 			// never link prox mine triggers
 			if (ent->r.contents == CONTENTS_TRIGGER) {
@@ -1493,6 +1527,7 @@ int BotAIStartFrame(int time) {
 				}
 			}
 #endif
+#endif // TMNTWEAPONS
 			//
 			memset(&state, 0, sizeof(bot_entitystate_t));
 			//
@@ -1630,6 +1665,13 @@ int BotInitLibrary(void) {
 	trap_Cvar_VariableStringBuffer("fs_homepath", buf, sizeof(buf));
 	if (strlen(buf)) trap_BotLibVarSet("homedir", buf);
 	//
+#ifdef TMNT
+	trap_BotLibDefine("TMNT");
+
+	//trap_BotLibVarSet("offhandgrapple", "0"); // not needed?...
+	trap_BotLibVarSet("weapindex_rocket", va("%i", WP_ROCKET_LAUNCHER));
+	trap_BotLibVarSet("weapindex_grapple", va("%i", WP_GRAPPLING_HOOK));
+#endif
 #ifdef MISSIONPACK
 	trap_BotLibDefine("MISSIONPACK");
 #endif

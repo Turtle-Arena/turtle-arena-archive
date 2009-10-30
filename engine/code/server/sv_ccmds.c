@@ -180,20 +180,35 @@ static void SV_Map_f( void ) {
 		// may not set sv_maxclients directly, always set latched
 		Cvar_SetLatched( "sv_maxclients", "8" );
 		cmd += 2;
+#ifdef IOQ3ZTM // Random fix, fixes spdevmap
+		if (!Q_stricmp( cmd, "devmap" ) ) {
+			cheat = qtrue;
+		} else {
+		cheat = qfalse;
+		}
+		killBots = qtrue;
+#else
 		cheat = qfalse;
 		killBots = qtrue;
+#endif
 	}
 	else {
-		if ( !Q_stricmp( cmd, "devmap" ) || !Q_stricmp( cmd, "spdevmap" ) ) {
+		if ( !Q_stricmp( cmd, "devmap" )
+#ifndef IOQ3ZTM // Random fix, fixes spdevmap
+		|| !Q_stricmp( cmd, "spdevmap" )
+#endif
+		) {
 			cheat = qtrue;
 			killBots = qtrue;
 		} else {
 			cheat = qfalse;
 			killBots = qfalse;
 		}
+#ifndef TMNTSP // Allow SP on net!
 		if( sv_gametype->integer == GT_SINGLE_PLAYER ) {
 			Cvar_SetValue( "g_gametype", GT_FFA );
 		}
+#endif
 	}
 
 	// save the map name here cause on a map restart we reload the q3config.cfg
@@ -1049,6 +1064,129 @@ static void SV_KillServer_f( void ) {
 	SV_Shutdown( "killserver" );
 }
 
+#ifdef TMNTSP // Save/load
+static void SV_SaveGame_f(void) {
+	char savegame[MAX_TOKEN_CHARS];
+	char filename[MAX_QPATH];
+	fileHandle_t f;
+	char *curpos;
+	int i;
+
+	// make sure server is running
+	if ( !com_sv_running->integer ) {
+		Com_Printf( "Server is not running.\n" );
+		return;
+	}
+
+	// Set savefile name.
+	if ( Cmd_Argc() < 2 ) {
+		strcpy(savegame, "autosave");
+	}
+	else
+	{
+		Cmd_ArgvBuffer( 1, savegame, sizeof( savegame ) );
+	}
+
+	// validate the filename
+	for (i = 0; i < strlen(savegame); i++) {
+		if (!isalnum(savegame[i]) && savegame[i] != '_' && savegame[i] != '-')
+		{
+			Com_Printf( "savegame: '%s'.  Invalid character (%c) in filename.\n", savegame, savegame[i]);
+			return;
+		}
+	}
+
+	if(!(curpos = Cvar_VariableString("fs_game")) || !*curpos)
+		curpos = BASEGAME;
+
+	// path is "base/saves/name.sav"
+	Com_sprintf( filename, MAX_QPATH, "%s/%s/%s.sav", curpos, SAVEGAMEDIR, savegame );
+
+    // Open file
+	f = FS_SV_FOpenFileWrite(filename);
+
+	//Com_Printf( "savegame: (%s)\n", filegame );
+	VM_Call( gvm, GAME_SAVEGAME, f );
+
+	// Close file here?
+}
+
+/*
+==================
+SP_LoadGame
+See save_header_t in g_savestate.c for more info.
+==================
+*/
+void SP_LoadGame(fileHandle_t f, char *filename)
+{
+	char loadmap[MAX_QPATH];
+	byte i;
+
+	FS_Read2 (&i, 1, f); // version
+	FS_Read2 (&i, 1, f); // save_type
+
+	FS_Read2 (loadmap, MAX_QPATH, f); // map name
+	FS_FCloseFile( f );
+
+	Cbuf_ExecuteText(EXEC_NOW, va("spmap %s\n", loadmap));
+}
+
+// Turtle Man: Added a Load cmd like the save one.
+static void SV_LoadGame_f(void) {
+	char savegame[MAX_TOKEN_CHARS];
+	char filename[MAX_QPATH];
+	fileHandle_t f;
+	int len;
+	char *curpos;
+
+	// Set savefile name.
+	if ( Cmd_Argc() < 2 ) {
+		strcpy(savegame, "autosave");
+	}
+	else
+	{
+		Cmd_ArgvBuffer( 1, savegame, sizeof( savegame ) );
+	}
+
+	if(!(curpos = Cvar_VariableString("fs_game")) || !*curpos)
+		curpos = BASEGAME;
+
+	// path is "base/saves/name.sav"
+	Com_sprintf( filename, MAX_QPATH, "%s/%s/%s.sav", curpos, SAVEGAMEDIR, savegame );
+
+    // Must open file here, this function can't be used in game.
+	len = FS_SV_FOpenFileRead(filename, &f);
+
+    if (len == -1)
+    {
+        Com_Printf("Failed to open savefile (%s)!\n", filename);
+        FS_FCloseFile( f );
+        return;
+    }
+
+	//Com_Printf( "loadgame: (%s, %s)\n", filegame, mapname );
+
+	Cvar_Get("ui_singlePlayerActive", "1", CVAR_ROM);
+
+	// gvm is NULL when called from main menu
+	if (gvm == NULL)
+	{
+#if 0 // Turtle Man: FIXME: savegame workaround
+		// Load the map then run the cmd again... THIS LOCKED UP MY COMPUTER...
+		SP_LoadGame(f, filename);
+		Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s\n", savegame));
+		return;
+#else
+		// Turtle Man: FIXME: Load savegames at the menu!
+		Com_Printf("Error: Can't load a savegame if not in a level, this is a known bug.\n");
+		return;
+#endif
+	}
+
+	//G_LoadGame(savegame);
+	VM_Call( gvm, GAME_LOADGAME, f);
+}
+#endif
 //===========================================================
 
 /*
@@ -1113,6 +1251,10 @@ void SV_AddOperatorCommands( void ) {
 	Cmd_AddCommand("bandel", SV_BanDel_f);
 	Cmd_AddCommand("exceptdel", SV_ExceptDel_f);
 	Cmd_AddCommand("flushbans", SV_FlushBans_f);
+#ifdef TMNTSP // Save/load
+	Cmd_AddCommand("savegame", SV_SaveGame_f);
+	Cmd_AddCommand("loadgame", SV_LoadGame_f);
+#endif
 }
 
 /*

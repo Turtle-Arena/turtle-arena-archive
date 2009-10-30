@@ -83,6 +83,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEAM_OVERLAY_MAXNAME_WIDTH	12
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
 
+#ifdef TMNT // DEFAULT_PLAYER // currently no james.
+#define	DEFAULT_MODEL			"raph"
+#define	DEFAULT_TEAM_MODEL		"raph"
+#define	DEFAULT_TEAM_HEAD		"raph"
+#else
 #define	DEFAULT_MODEL			"sarge"
 #ifdef MISSIONPACK
 #define	DEFAULT_TEAM_MODEL		"james"
@@ -91,10 +96,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	DEFAULT_TEAM_MODEL		"sarge"
 #define	DEFAULT_TEAM_HEAD		"sarge"
 #endif
+#endif // TMNT
 
+#ifdef TMNT // DEFAULT_TEAMS
+#define DEFAULT_REDTEAM_NAME		"Sais"
+#define DEFAULT_BLUETEAM_NAME		"Katanas"
+#else
 #define DEFAULT_REDTEAM_NAME		"Stroggs"
 #define DEFAULT_BLUETEAM_NAME		"Pagans"
+#endif
 
+#ifndef TMNTPLAYERSYS
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
@@ -106,12 +118,37 @@ typedef enum {
 
 	FOOTSTEP_TOTAL
 } footstep_t;
+#endif
 
 typedef enum {
 	IMPACTSOUND_DEFAULT,
 	IMPACTSOUND_METAL,
 	IMPACTSOUND_FLESH
 } impactSound_t;
+
+#ifdef TMNTENTITIES
+typedef enum
+{
+	MT_NONE = -1,
+	MT_METAL = 0,
+	MT_GLASS,
+	MT_WOOD,
+	MT_STONE,
+	MT_CRATE, // Just use wood?
+	//If any more types are added update cg_main.c's CG_RegisterGraphics
+	//MT_ELECTRICAL, // sparks? -- "fake" type?
+	//MT_DIRT,
+
+	NUM_CHUNK_TYPES,
+
+	// Fake types
+	MT_GLASS_METAL = NUM_CHUNK_TYPES //mixed chunk type
+
+} material_type_t;
+
+// Chunk Models Per Material type
+#define NUM_CHUNKS		6
+#endif
 
 //=================================================
 
@@ -162,7 +199,30 @@ typedef struct {
 
 //=================================================
 
+#ifdef SP_NPC
+#define MAX_SOUNDS_NPC 10
 
+typedef struct npcSounds_s {
+	int count;
+	int frame[MAX_SOUNDS_NPC];
+	sfxHandle_t	sound[MAX_SOUNDS_NPC];
+} npcSounds_t;
+
+typedef struct {
+	lerpFrame_t		body;
+	int				sound;
+} npcEntity_t;
+#endif
+
+#ifdef SINGLEPLAYER // entity
+typedef struct {
+	int				state;
+	lerpFrame_t		model;
+	animation_t		anim;
+	int				lastCode;
+	float			speed;
+} md3Entity_t;
+#endif
 
 // centity_t have a direct corespondence with gentity_t in the game, but
 // only the entityState_t is directly communicated to the cgame
@@ -183,6 +243,12 @@ typedef struct centity_s {
 	int				snapShotTime;	// last time this entity was found in a snapshot
 
 	playerEntity_t	pe;
+#ifdef SP_NPC
+	npcEntity_t		ne;
+#endif
+#ifdef SINGLEPLAYER // entity
+	md3Entity_t		md3;
+#endif
 
 	int				errorTime;		// decay the error from this time
 	vec3_t			errorOrigin;
@@ -243,13 +309,17 @@ typedef enum {
 
 typedef enum {
 	LEMT_NONE,
-	LEMT_BURN,
-	LEMT_BLOOD
+	LEMT_BURN
+#ifndef NOTRATEDM // No gibs.
+	,LEMT_BLOOD
+#endif
 } leMarkType_t;			// fragment local entities can leave marks on walls
 
 typedef enum {
 	LEBS_NONE,
+#ifndef NOTRATEDM // No gibs.
 	LEBS_BLOOD,
+#endif
 	LEBS_BRASS
 } leBounceSoundType_t;	// fragment local entities can make sounds on impacts
 
@@ -310,6 +380,19 @@ typedef struct {
 // usually as a result of a userinfo (name, model, etc) change
 #define	MAX_CUSTOM_SOUNDS	32
 
+#ifdef TMNT_SUPPORTQ3
+// Support using "tag_weapon" for the primary weapon,
+//           and "tag_flag" for the secondary weapon / flag.
+// So it will allow team arena models to be ported easier?...
+enum
+{
+	TI_TAG_WEAPON = 1,
+	TI_TAG_FLAG = 2,
+	TI_TAG_HAND_PRIMARY = 4,
+	TI_TAG_HAND_SECONDARY = 8,
+};
+#endif
+
 typedef struct {
 	qboolean		infoValid;
 
@@ -324,7 +407,9 @@ typedef struct {
 	int				score;			// updated by score servercmds
 	int				location;		// location index for team mode
 	int				health;			// you only get this info about your teammates
+#ifndef TMNT // NOARMOR
 	int				armor;
+#endif
 	int				curWeapon;
 
 	int				handicap;
@@ -336,8 +421,10 @@ typedef struct {
 	int				powerups;		// so can display quad/flag status
 
 	int				medkitUsageTime;
+#ifndef TMNT // POWERS
 	int				invulnerabilityStartTime;
 	int				invulnerabilityStopTime;
+#endif
 
 	int				breathPuffTime;
 
@@ -352,13 +439,19 @@ typedef struct {
 	char			blueTeam[MAX_TEAMNAME];
 	qboolean		deferred;
 
+#ifdef TMNT_SUPPORTQ3
+	int				tagInfo;
+#else
 	qboolean		newAnims;		// true if using the new mission pack animations
+#endif
+#ifndef TMNTPLAYERSYS
 	qboolean		fixedlegs;		// true if legs yaw is always the same as torso yaw
 	qboolean		fixedtorso;		// true if torso never changes yaw
 
 	vec3_t			headOffset;		// move head in icon views
 	footstep_t		footsteps;
 	gender_t		gender;			// from model
+#endif
 
 	qhandle_t		legsModel;
 	qhandle_t		legsSkin;
@@ -371,7 +464,11 @@ typedef struct {
 
 	qhandle_t		modelIcon;
 
+#ifdef TMNTPLAYERSYS
+	bg_playercfg_t  playercfg;
+#else
 	animation_t		animations[MAX_TOTALANIMATIONS];
+#endif
 
 	sfxHandle_t		sounds[MAX_CUSTOM_SOUNDS];
 } clientInfo_t;
@@ -386,6 +483,9 @@ typedef struct weaponInfo_s {
 
 	qhandle_t		handsModel;			// the hands don't actually draw, they just position the weapon
 	qhandle_t		weaponModel;
+#ifdef TMNTWEAPSYS
+	qhandle_t		weaponModel2; // Secondary weapon
+#endif
 	qhandle_t		barrelModel;
 	qhandle_t		flashModel;
 
@@ -396,9 +496,11 @@ typedef struct weaponInfo_s {
 	sfxHandle_t		flashSound[4];		// fast firing weapons randomly choose
 
 	qhandle_t		weaponIcon;
+#ifndef TMNTWEAPSYS
 	qhandle_t		ammoIcon;
 
 	qhandle_t		ammoModel;
+#endif
 
 	qhandle_t		missileModel;
 	sfxHandle_t		missileSound;
@@ -417,6 +519,17 @@ typedef struct weaponInfo_s {
 	qboolean		loopFireSound;
 } weaponInfo_t;
 
+#ifdef SP_NPC
+//
+// Each NPC type has an associated npcInfo_t
+//
+typedef struct {
+	qboolean		registered;
+	qhandle_t		model;
+	animation_t		animations[MAX_TOTALANIMATIONS];
+	npcSounds_t		sounds[MAX_ANIMATIONS_NPC];
+} npcInfo_t;
+#endif
 
 // each IT_* item has an associated itemInfo_t
 // that constains media references necessary to present the
@@ -511,13 +624,23 @@ typedef struct {
 	int			landTime;
 
 	// input state sent to server
+#ifndef TMNTWEAPSYS2
 	int			weaponSelect;
+#endif
+#ifdef TMNTHOLDSYS2
+	int			holdableSelect;
+#endif
 
 	// auto rotating items
 	vec3_t		autoAngles;
 	vec3_t		autoAxis[3];
 	vec3_t		autoAnglesFast;
 	vec3_t		autoAxisFast[3];
+#ifdef TMNTHOLDABLE
+	// Thrown shuriken rotate pitch
+	vec3_t		shurikenAngles;
+	vec3_t		shurikenAxis[3];
+#endif
 
 	// view rendering
 	refdef_t	refdef;
@@ -563,8 +686,10 @@ typedef struct {
 	// low ammo warning state
 	int			lowAmmoWarning;		// 1 = low, 2 = empty
 
+#ifndef IOQ3ZTM // IOQ3BUGFIX: unused in the source code.
 	// kill timers for carnage reward
 	int			lastKillTime;
+#endif
 
 	// crosshair client ID
 	int			crosshairClientNum;
@@ -606,7 +731,9 @@ typedef struct {
 	int			itemPickupTime;
 	int			itemPickupBlendTime;	// the pulse around the crosshair is timed seperately
 
+#ifndef TMNTWEAPSYS2
 	int			weaponSelectTime;
+#endif
 	int			weaponAnimation;
 	int			weaponAnimationTime;
 
@@ -637,7 +764,18 @@ typedef struct {
 	float		xyspeed;
 	int     nextOrbitTime;
 
+#ifdef CAMERASCRIPT
+	qboolean cameraMode;		// if rendering from a loaded camera
+	qboolean cameraEndBlack;	// go black after camera ends.
+#else
 	//qboolean cameraMode;		// if rendering from a loaded camera
+#endif
+#ifdef TMNTSP
+	// Use CG_ToggleLetterbox to change letterbox mode
+	qboolean letterbox;	// qtrue if moving onto the screen, or is done moving on.
+						// qfalse if moving off, or is off
+	int		letterboxTime; // Time that the letter box move was started, or -1 if instant.
+#endif
 
 
 	// development tool
@@ -655,14 +793,18 @@ typedef struct {
 typedef struct {
 	qhandle_t	charsetShader;
 	qhandle_t	charsetProp;
+#ifndef TMNT
 	qhandle_t	charsetPropGlow;
+#endif
 	qhandle_t	charsetPropB;
 	qhandle_t	whiteShader;
 
+#ifdef MISSIONPACK // IOQ3BUGFIX: THIS IS MISSIONPACK STUFF. But it didn't have a #ifdef.
 	qhandle_t	redCubeModel;
 	qhandle_t	blueCubeModel;
 	qhandle_t	redCubeIcon;
 	qhandle_t	blueCubeIcon;
+#endif
 	qhandle_t	redFlagModel;
 	qhandle_t	blueFlagModel;
 	qhandle_t	neutralFlagModel;
@@ -693,13 +835,16 @@ typedef struct {
 	qhandle_t	harvesterNeutralModel;
 #endif
 
+#ifndef TMNT // NOARMOR
 	qhandle_t	armorModel;
 	qhandle_t	armorIcon;
+#endif
 
 	qhandle_t	teamStatusBar;
 
 	qhandle_t	deferShader;
 
+#ifndef NOTRATEDM // No gibs.
 	// gib explosions
 	qhandle_t	gibAbdomen;
 	qhandle_t	gibArm;
@@ -713,14 +858,22 @@ typedef struct {
 	qhandle_t	gibBrain;
 
 	qhandle_t	smoke2;
+#endif
 
 	qhandle_t	machinegunBrassModel;
+#ifndef TMNTWEAPONS
 	qhandle_t	shotgunBrassModel;
+#endif
 
 	qhandle_t	railRingsShader;
 	qhandle_t	railCoreShader;
 
+#ifndef TMNTWEAPONS
 	qhandle_t	lightningShader;
+#endif
+#ifdef TMNT
+	qhandle_t	grappleCable;
+#endif
 
 	qhandle_t	friendShader;
 
@@ -754,20 +907,26 @@ typedef struct {
 
 	// wall mark shaders
 	qhandle_t	wakeMarkShader;
+#ifndef NOTRATEDM // No gibs.
 	qhandle_t	bloodMarkShader;
+#endif
 	qhandle_t	bulletMarkShader;
 	qhandle_t	burnMarkShader;
 	qhandle_t	holeMarkShader;
 	qhandle_t	energyMarkShader;
 
 	// powerup shaders
+#ifndef TMNT // POWERS
 	qhandle_t	quadShader;
 	qhandle_t	redQuadShader;
 	qhandle_t	quadWeaponShader;
+#endif
 	qhandle_t	invisShader;
 	qhandle_t	regenShader;
+#ifndef TMNT // POWERS
 	qhandle_t	battleSuitShader;
 	qhandle_t	battleWeaponShader;
+#endif
 	qhandle_t	hastePuffShader;
 	qhandle_t	redKamikazeShader;
 	qhandle_t	blueKamikazeShader;
@@ -786,6 +945,11 @@ typedef struct {
 	qhandle_t	grenadeExplosionShader;
 	qhandle_t	bfgExplosionShader;
 	qhandle_t	bloodExplosionShader;
+#ifdef TMNTWEAPONS
+	qhandle_t	meleeHit1Shader;
+	qhandle_t	meleeHit2Shader;
+	qhandle_t	meleeHit3Shader;
+#endif
 
 	// special effects models
 	qhandle_t	teleportEffectModel;
@@ -805,7 +969,19 @@ typedef struct {
 	qhandle_t	dustPuffShader;
 	qhandle_t	heartShader;
 #endif
+#ifdef TMNT // POWERS
+	qhandle_t	strengthPowerupModel;
+	qhandle_t	defensePowerupModel;
+	qhandle_t	speedPowerupModel;
+#endif
 	qhandle_t	invulnerabilityPowerupModel;
+
+#ifdef TMNTHOLDABLE
+	qhandle_t	shurikenModel;
+	qhandle_t	shurikenFireModel;
+	qhandle_t	shurikenElectricModel;
+	qhandle_t	shurikenLaserModel;
+#endif
 
 	// scoreboard headers
 	qhandle_t	scoreboardName;
@@ -814,9 +990,13 @@ typedef struct {
 	qhandle_t	scoreboardTime;
 
 	// medals shown during gameplay
+#ifndef TMNTWEAPONS
 	qhandle_t	medalImpressive;
+#endif
 	qhandle_t	medalExcellent;
+#ifndef TMNTWEAPONS
 	qhandle_t	medalGauntlet;
+#endif
 	qhandle_t	medalDefend;
 	qhandle_t	medalAssist;
 	qhandle_t	medalCapture;
@@ -861,10 +1041,12 @@ typedef struct {
 	sfxHandle_t	loserSound;
 	sfxHandle_t	youSuckSound;
 #endif
+#ifndef NOTRATEDM // No gibs.
 	sfxHandle_t	gibSound;
 	sfxHandle_t	gibBounce1Sound;
 	sfxHandle_t	gibBounce2Sound;
 	sfxHandle_t	gibBounce3Sound;
+#endif
 	sfxHandle_t	teleInSound;
 	sfxHandle_t	teleOutSound;
 	sfxHandle_t	noAmmoSound;
@@ -883,18 +1065,30 @@ typedef struct {
 	sfxHandle_t oneFragSound;
 
 	sfxHandle_t hitSound;
+#ifndef TMNT // NOARMOR
 	sfxHandle_t hitSoundHighArmor;
 	sfxHandle_t hitSoundLowArmor;
+#endif
 	sfxHandle_t hitTeamSound;
+#ifndef TMNTWEAPONS
 	sfxHandle_t impressiveSound;
+#endif
 	sfxHandle_t excellentSound;
+#ifndef TMNT
 	sfxHandle_t deniedSound;
+#endif
+#ifndef TMNTWEAPONS
 	sfxHandle_t humiliationSound;
+#endif
 	sfxHandle_t assistSound;
 	sfxHandle_t defendSound;
+#ifndef TMNTWEAPONS
 	sfxHandle_t firstImpressiveSound;
+#endif
 	sfxHandle_t firstExcellentSound;
+#ifndef TMNTWEAPONS
 	sfxHandle_t firstHumiliationSound;
+#endif
 
 	sfxHandle_t takenLeadSound;
 	sfxHandle_t tiedLeadSound;
@@ -910,6 +1104,10 @@ typedef struct {
 
 	sfxHandle_t flightSound;
 	sfxHandle_t medkitSound;
+#ifdef TMNTHOLDABLE
+	sfxHandle_t shurikenSound;
+	sfxHandle_t laserShurikenSound;
+#endif
 
 	sfxHandle_t weaponHoverSound;
 
@@ -937,7 +1135,9 @@ typedef struct {
 	sfxHandle_t yourTeamTookTheFlagSound;
 	sfxHandle_t	youHaveFlagSound;
 	sfxHandle_t yourBaseIsUnderAttackSound;
+#ifndef NOTRATEDM // Disable strong lang.
 	sfxHandle_t holyShitSound;
+#endif
 
 	// tournament sounds
 	sfxHandle_t	count3Sound;
@@ -977,6 +1177,9 @@ typedef struct {
 	sfxHandle_t	wstbimpmSound;
 	sfxHandle_t	wstbimpdSound;
 	sfxHandle_t	wstbactvSound;
+#ifdef TMNTENTITIES
+	qhandle_t	chunkModels[NUM_CHUNK_TYPES][NUM_CHUNKS];
+#endif
 
 } cgMedia_t;
 
@@ -1064,6 +1267,11 @@ typedef struct {
 	int acceptTask;
 	int acceptLeader;
 	char acceptVoice[MAX_NAME_LENGTH];
+#ifdef CAMERASCRIPT
+	float	scrFadeAlpha, scrFadeAlphaCurrent;
+	int		scrFadeStartTime;
+	int		scrFadeDuration;
+#endif
 
 	// media
 	cgMedia_t		media;
@@ -1075,8 +1283,15 @@ typedef struct {
 extern	cgs_t			cgs;
 extern	cg_t			cg;
 extern	centity_t		cg_entities[MAX_GENTITIES];
+#ifdef TMNTWEAPSYS
+extern	weaponInfo_t	cg_weapons[WP_NUM_WEAPONS];
+#else
 extern	weaponInfo_t	cg_weapons[MAX_WEAPONS];
+#endif
 extern	itemInfo_t		cg_items[MAX_ITEMS];
+#ifdef SP_NPC
+extern	npcInfo_t		cg_npcs[NPC_NUMNPCS];
+#endif
 extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 
 extern	vmCvar_t		cg_centertime;
@@ -1087,7 +1302,9 @@ extern	vmCvar_t		cg_bobpitch;
 extern	vmCvar_t		cg_bobroll;
 extern	vmCvar_t		cg_swingSpeed;
 extern	vmCvar_t		cg_shadows;
+#ifndef NOTRATEDM // No gibs.
 extern	vmCvar_t		cg_gibs;
+#endif
 extern	vmCvar_t		cg_drawTimer;
 extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
@@ -1109,7 +1326,9 @@ extern	vmCvar_t		cg_animSpeed;
 extern	vmCvar_t		cg_debugAnim;
 extern	vmCvar_t		cg_debugPosition;
 extern	vmCvar_t		cg_debugEvents;
+#ifndef TMNTWEAPONS
 extern	vmCvar_t		cg_railTrailTime;
+#endif
 extern	vmCvar_t		cg_errorDecay;
 extern	vmCvar_t		cg_nopredict;
 extern	vmCvar_t		cg_noPlayerAnims;
@@ -1126,7 +1345,9 @@ extern	vmCvar_t		cg_viewsize;
 extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
 extern	vmCvar_t		cg_tracerLength;
+#ifndef TMNTWEAPSYS2
 extern	vmCvar_t		cg_autoswitch;
+#endif
 extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;
 extern	vmCvar_t		cg_fov;
@@ -1134,6 +1355,9 @@ extern	vmCvar_t		cg_zoomFov;
 extern	vmCvar_t		cg_thirdPersonRange;
 extern	vmCvar_t		cg_thirdPersonAngle;
 extern	vmCvar_t		cg_thirdPerson;
+#ifdef ANALOG // cg var
+extern	vmCvar_t		cg_thirdPersonAnalog;
+#endif
 extern	vmCvar_t		cg_lagometer;
 extern	vmCvar_t		cg_drawAttacker;
 extern	vmCvar_t		cg_synchronousClients;
@@ -1165,22 +1389,33 @@ extern  vmCvar_t		cg_smallFont;
 extern  vmCvar_t		cg_bigFont;
 extern	vmCvar_t		cg_noTaunt;
 extern	vmCvar_t		cg_noProjectileTrail;
+#ifndef TMNTWEAPONS
 extern	vmCvar_t		cg_oldRail;
+#endif
 extern	vmCvar_t		cg_oldRocket;
 extern	vmCvar_t		cg_oldPlasma;
 extern	vmCvar_t		cg_trueLightning;
+#if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
+extern	vmCvar_t		cg_redTeamName;
+extern	vmCvar_t		cg_blueTeamName;
+#endif
 #ifdef MISSIONPACK
 extern	vmCvar_t		cg_redTeamName;
 extern	vmCvar_t		cg_blueTeamName;
 extern	vmCvar_t		cg_currentSelectedPlayer;
 extern	vmCvar_t		cg_currentSelectedPlayerName;
+#ifndef TMNTSP
 extern	vmCvar_t		cg_singlePlayer;
+#endif
 extern	vmCvar_t		cg_enableDust;
 extern	vmCvar_t		cg_enableBreath;
 extern	vmCvar_t		cg_singlePlayerActive;
 extern  vmCvar_t		cg_recordSPDemo;
 extern  vmCvar_t		cg_recordSPDemoName;
 extern	vmCvar_t		cg_obeliskRespawnDelay;
+#endif
+#ifdef TMNTSP
+extern	vmCvar_t		cg_singlePlayer;
 #endif
 
 //
@@ -1247,7 +1482,11 @@ float	*CG_FadeColor( int startMsec, int totalMsec );
 float *CG_TeamColor( int team );
 void CG_TileClear( void );
 void CG_ColorForHealth( vec4_t hcolor );
+#ifdef TMNT // NOARMOR
+void CG_GetColorForHealth( int health, vec4_t hcolor );
+#else
 void CG_GetColorForHealth( int health, int armor, vec4_t hcolor );
+#endif
 
 void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
 void CG_DrawRect( float x, float y, float width, float height, float size, const float *color );
@@ -1305,6 +1544,13 @@ void CG_ResetPlayerEntity( centity_t *cent );
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team );
 void CG_NewClientInfo( int clientNum );
 sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
+#ifdef SP_NPC
+void CG_RunLerpFrameNPC( animation_t *ai, lerpFrame_t *lf, int newAnimation, float speedScale );
+#endif
+#ifdef SINGLEPLAYER // entity
+void CG_ClearLerpFrameNPC( animation_t *ai, lerpFrame_t *lf, int animationNumber ) ;
+#endif
+
 
 //
 // cg_predict.c
@@ -1344,10 +1590,20 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 //
 // cg_weapons.c
 //
+#ifdef TMNTHOLDSYS2
+void CG_NextHoldable_f( void );
+void CG_PrevHoldable_f( void );
+void CG_Holdable_f( void );
+#endif
+#ifndef TMNTWEAPSYS2
 void CG_NextWeapon_f( void );
 void CG_PrevWeapon_f( void );
 void CG_Weapon_f( void );
+#endif
 
+#ifdef TMNTHOLDABLE
+void CG_RegisterHoldable( int holdableNum );
+#endif
 void CG_RegisterWeapon( int weaponNum );
 void CG_RegisterItemVisuals( int itemNum );
 
@@ -1357,13 +1613,17 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 void CG_ShotgunFire( entityState_t *es );
 void CG_Bullet( vec3_t origin, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum );
 
+#ifndef TMNTWEAPONS
 void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end );
+#endif
 void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi );
 void CG_AddViewWeapon (playerState_t *ps);
 void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team );
+#ifndef TMNTWEAPSYS2
 void CG_DrawWeaponSelect( void );
 
 void CG_OutOfAmmoChange( void );	// should this be in pmove?
+#endif
 
 //
 // cg_marks.c
@@ -1402,20 +1662,32 @@ void CG_SpawnEffect( vec3_t org );
 void CG_KamikazeEffect( vec3_t org );
 void CG_ObeliskExplode( vec3_t org, int entityNum );
 void CG_ObeliskPain( vec3_t org );
+#ifndef TMNTWEAPONS
 void CG_InvulnerabilityImpact( vec3_t org, vec3_t angles );
 void CG_InvulnerabilityJuiced( vec3_t org );
 void CG_LightningBoltBeam( vec3_t start, vec3_t end );
 #endif
+#endif
 void CG_ScorePlum( int client, vec3_t org, int score );
 
+#ifndef NOTRATEDM // No gibs.
 void CG_GibPlayer( vec3_t playerOrigin );
 void CG_BigExplode( vec3_t playerOrigin );
+#endif
 
 void CG_Bleed( vec3_t origin, int entityNum );
 
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 								qhandle_t hModel, qhandle_t shader, int msec,
 								qboolean isSprite );
+#ifdef CAMERASCRIPT
+void CG_Fade( int a, int time, int duration );
+void CG_DrawFlashFade( void );
+#endif
+#ifdef TMNTSP
+void CG_ToggleLetterbox(qboolean onscreen, qboolean instant);
+void CG_DrawLetterbox(void);
+#endif
 
 //
 // cg_snapshot.c
@@ -1460,6 +1732,13 @@ void CG_Respawn( void );
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void CG_CheckChangedPredictableEvents( playerState_t *ps );
 
+#ifdef SP_NPC
+//
+// cg_npcs.c
+//
+void CG_NPC( centity_t *cent );
+void CG_RegisterNPCVisuals( int itemNum );
+#endif
 
 //===============================================
 
@@ -1615,8 +1894,13 @@ int			trap_GetCurrentCmdNumber( void );
 
 qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
 
+#if defined TMNTHOLDSYS && !defined TMNTWEAPSYS2 // Turtle Man: MULTIHOLDABLE
+// used for the weapon select, holdable select, and zoom
+void		trap_SetUserCmdValue( int stateValue, int holdableStateValue, float sensitivityScale );
+#else
 // used for the weapon select and zoom
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale );
+#endif
 
 // aids for VM testing
 void		testPrintInt( char *string, int i );
@@ -1647,7 +1931,12 @@ void trap_SnapVector( float *v );
 
 qboolean	trap_loadCamera(const char *name);
 void		trap_startCamera(int time);
+#ifdef CAMERASCRIPT
+qboolean	trap_getCameraInfo(int time, vec3_t *origin, vec3_t *angles, float *fov);
+void		CG_StartCamera(const char *name, qboolean startBlack, qboolean endBlack );
+#else
 qboolean	trap_getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
+#endif
 
 qboolean	trap_GetEntityToken( char *buffer, int bufferSize );
 

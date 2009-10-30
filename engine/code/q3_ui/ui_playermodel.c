@@ -29,9 +29,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODEL_FRAMEL		"menu/art/frame1_l"
 #define MODEL_FRAMER		"menu/art/frame1_r"
 #define MODEL_PORTS			"menu/art/player_models_ports"
+#ifdef TMNT
+#define MODEL_ARROWS		"menu/art/arrows_horz_0"
+#define MODEL_ARROWSL		"menu/art/arrows_horz_left"
+#define MODEL_ARROWSR		"menu/art/arrows_horz_right"
+#define MODEL_ARROWS_WIDTH 128
+#define MODEL_ARROWS_HEIGHT 64
+#else
 #define MODEL_ARROWS		"menu/art/gs_arrows_0"
 #define MODEL_ARROWSL		"menu/art/gs_arrows_l"
 #define MODEL_ARROWSR		"menu/art/gs_arrows_r"
+#endif
 
 #define LOW_MEMORY			(5 * 1024 * 1024)
 
@@ -182,7 +190,11 @@ static void PlayerModel_UpdateModel( void )
 	VectorClear( moveangles );
 
 	UI_PlayerInfo_SetModel( &s_playermodel.playerinfo, s_playermodel.modelskin );
+#ifdef TMNT // TMNTWEAPSYS
+	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, s_playermodel.playerinfo.weapon, qfalse );
+#else
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, WP_MACHINEGUN, qfalse );
+#endif
 }
 
 /*
@@ -576,7 +588,9 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.pics[k].width  		   = 64;
 			s_playermodel.pics[k].height  		   = 64;
 			s_playermodel.pics[k].focuspic         = MODEL_SELECTED;
+#ifndef TMNT
 			s_playermodel.pics[k].focuscolor       = colorRed;
+#endif
 
 			s_playermodel.picbuttons[k].generic.type	 = MTYPE_BITMAP;
 			s_playermodel.picbuttons[k].generic.flags    = QMF_LEFT_JUSTIFY|QMF_NODEFAULTINIT|QMF_PULSEIFFOCUS;
@@ -591,7 +605,9 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.picbuttons[k].width  		     = 128;
 			s_playermodel.picbuttons[k].height  		 = 128;
 			s_playermodel.picbuttons[k].focuspic  		 = MODEL_SELECT;
+#ifndef TMNT
 			s_playermodel.picbuttons[k].focuscolor  	 = colorRed;
+#endif
 
 			x += 64+6;
 		}
@@ -635,8 +651,13 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.arrows.generic.flags		= QMF_INACTIVE;
 	s_playermodel.arrows.generic.x			= 125;
 	s_playermodel.arrows.generic.y			= 340;
+#ifdef TMNT
+	s_playermodel.arrows.width				= MODEL_ARROWS_WIDTH;
+	s_playermodel.arrows.height				= MODEL_ARROWS_HEIGHT;
+#else
 	s_playermodel.arrows.width				= 128;
 	s_playermodel.arrows.height				= 32;
+#endif
 
 	s_playermodel.left.generic.type			= MTYPE_BITMAP;
 	s_playermodel.left.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -644,18 +665,32 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.left.generic.id			= ID_PREVPAGE;
 	s_playermodel.left.generic.x			= 125;
 	s_playermodel.left.generic.y			= 340;
+#ifdef TMNT
+	s_playermodel.left.width  				= MODEL_ARROWS_WIDTH/2;
+	s_playermodel.left.height  				= MODEL_ARROWS_HEIGHT;
+#else
 	s_playermodel.left.width  				= 64;
 	s_playermodel.left.height  				= 32;
+#endif
 	s_playermodel.left.focuspic				= MODEL_ARROWSL;
 
 	s_playermodel.right.generic.type	    = MTYPE_BITMAP;
 	s_playermodel.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_playermodel.right.generic.callback	= PlayerModel_MenuEvent;
 	s_playermodel.right.generic.id			= ID_NEXTPAGE;
+#ifdef TMNT
+	s_playermodel.right.generic.x			= 125+MODEL_ARROWS_WIDTH/2;
+#else
 	s_playermodel.right.generic.x			= 125+61;
+#endif
 	s_playermodel.right.generic.y			= 340;
+#ifdef TMNT
+	s_playermodel.right.width  				= MODEL_ARROWS_WIDTH/2;
+	s_playermodel.right.height  			= MODEL_ARROWS_HEIGHT;
+#else
 	s_playermodel.right.width  				= 64;
 	s_playermodel.right.height  		    = 32;
+#endif
 	s_playermodel.right.focuspic			= MODEL_ARROWSR;
 
 	s_playermodel.back.generic.type	    = MTYPE_BITMAP;
