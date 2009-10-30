@@ -1,0 +1,80 @@
+This file may help with creating addons for TMNT Arena. Currently it won't help much.
+
+== Overview ==
+:''If you have editing knowlegde of Quake3 or any other id tech 3 game you can skip this.''
+In TMNT Arena all of the data is stored in a .pk3 files, which are simply renamed .zip files.
+Pk3 files can be extracted with any zip program.
+
+TODO: More on this later.
+
+== Maps ==
+Map can be created using a Quake 3 map editor, such as GtkRadiant 1.5.0 or NetRadiant.
+
+Currently there just information on setting up NetRadiant and adding the TMNT Arean config, but no information on mapping it self.
+After setting up Radiant check out http://en.wikibooks.org/wiki/GtkRadiant for how to use Radiant
+
+=== NetRadiant ===
+NetRadiant is a map editor which is a fork of GtkRadiant that fixes bug and adds new features.
+For information on installing and compiling see http://www.icculus.org/netradiant/ or use the setup below.
+
+==== NetRadiant Setup ====
+First you need to install a map editor, such as NetRadiant.
+Go to http://www.icculus.org/netradiant/ and download NetRadiant for your operating system, or build it from source.
+
+:''If building from source, skip this step.''
+After downloading extract NetRadiant to a directory such as "C:\Program Files\NetRadiant\" on windows or "/usr/share/netradiant/" on linux.
+
+Copy the files inside of the "TMNT_Arena/tools/radiant-cfg/" directory into the directory were you install NetRadiant (ie "C:\Program Files\NetRadiant")
+
+When you start NetRadiant select "TMNT Arena" in the drop-down list of games. You can also set "Show Global Preferences" to unchecked to always go into TMNT mapping, skipping the game select if you are not going to edit maps for other games (This can be changed later in the Edit -> Preferences -> Global -> Game).
+
+== Players ==
+There isn't a guide yet but if you open /base/pak0.pk3 and look in "/models/players/raph/" there is a full Raph player. It is mostly the same as a Quake3 player, so you should be able to find information on the Web.
+
+=== Animation.cfg ===
+TMNT Arena addes new keywords to animation.cfg
+
+TODO: More on this later.
+
+=== Skins ===
+Below is the seach order for ".skin" files in TMNT Arena. It uses code from Team Arena to allow per-team skins. So Team Arena Players work in Team gametypes as well as Quake 3 players.
+
+==== Head ====
+:Team play
+team_headmodel = raph/mirage
+team = red
+
+models/players/raph/mirage/head_red.skin
+models/players/raph/head_red.skin
+models/players/heads/raph/mirage/head_red.skin
+models/players/heads/raph/head_red.skin
+
+:Non-Team play
+headmodel = raph/red
+
+models/players/raph/head_red.skin
+models/players/heads/raph/head_red.skin
+
+Note: If headmodel starts with '*' the "heads" directory is checked then "players" directory is check.
+
+==== Body (lower/upper) ====
+:Team play
+team_model = raph/mirage
+team = red
+g_redTeam = Sais
+
+models/players/raph/Sais/lower_mirage_red.skin
+models/players/raph/Sais/lower_red.skin
+models/players/raph/lower_mirage_red.skin
+models/players/raph/lower_red.skin
+models/players/characters/raph/Sais/lower_mirage_red.skin
+models/players/characters/raph/Sais/lower_red.skin
+models/players/characters/raph/lower_mirage_red.skin
+models/players/characters/raph/lower_red.skin
+
+:Non-Team play
+model = raph/mirage
+
+models/players/raph/lower_mirage.skin
+models/players/characters/raph/lower_mirage.skin
+

@@ -473,7 +473,7 @@
 // brush 52
 {
 ( 248 -472 256 ) ( 248 -480 256 ) ( 192 -472 256 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 248 -472 312 ) ( 192 -472 312 ) ( 248 -472 184 ) ctf/ctf_blueflag 0 0 0 0.5 0.5 0 0 0
+( 248 -472 312 ) ( 192 -472 312 ) ( 248 -472 184 ) ctf/ctf_blueflag 0 0 0 -0.5 0.5 0 0 0
 ( 256 -472 272 ) ( 256 -472 144 ) ( 256 -480 272 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( 192 -496 128 ) ( 248 -496 128 ) ( 192 -488 128 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( 192 -480 144 ) ( 192 -480 272 ) ( 248 -480 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
@@ -482,7 +482,7 @@
 // brush 53
 {
 ( -200 -472 256 ) ( -200 -480 256 ) ( -256 -472 256 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( -200 -472 312 ) ( -256 -472 312 ) ( -200 -472 184 ) ctf/ctf_blueflag 0 0 0 0.5 0.5 0 0 0
+( -200 -472 312 ) ( -256 -472 312 ) ( -200 -472 184 ) ctf/ctf_blueflag 0 0 0 -0.5 0.5 0 0 0
 ( -192 -472 272 ) ( -192 -472 144 ) ( -192 -480 272 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( -256 -496 128 ) ( -200 -496 128 ) ( -256 -488 128 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( -256 -480 144 ) ( -256 -480 272 ) ( -200 -480 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
@@ -511,6 +511,7 @@
 {
 "classname" "team_CTF_blueflag"
 "origin" "0 -1088 40"
+"gametype" "ctf, oneflag"
 }
 // entity 2
 {
@@ -560,6 +561,7 @@
 {
 "classname" "team_CTF_redflag"
 "origin" "0 1136 40"
+"gametype" "ctf, oneflag"
 }
 // entity 11
 {
@@ -646,4 +648,24 @@
 {
 "classname" "weapon_axe"
 "origin" "-192 208 32"
+}
+// entity 26
+{
+"classname" "team_redobelisk"
+"origin" "0.000000 1112.000000 24.000000"
+"angle" "-90.000000"
+"gametype" "obelisk,harvester"
+}
+// entity 27
+{
+"classname" "team_neutralobelisk"
+"origin" "0.000000 0.000000 16.000000"
+"gametype" "obelisk,harvester"
+}
+// entity 28
+{
+"classname" "team_blueobelisk"
+"origin" "0.000000 -1064.000000 24.000000"
+"gametype" "obelisk,harvester"
+"angle" "90"
 }

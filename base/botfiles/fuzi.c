@@ -248,6 +248,7 @@ weight "weapon_grapplinghook"
 	}
 }
 
+/* Removed from TMNT Arena
 weight "holdable_teleporter"
 {
 	switch(INVENTORY_TELEPORTER)
@@ -256,6 +257,7 @@ weight "holdable_teleporter"
 	default: return 0;
 	}
 }
+*/
 
 weight "holdable_medkit"
 {
@@ -266,6 +268,7 @@ weight "holdable_medkit"
 	}
 }
 
+/*
 weight "holdable_kamikaze"
 {
 	switch(INVENTORY_KAMIKAZE) // Turtle Man: BUGFIX?: Was INVENTORY_TELEPORTER
@@ -274,6 +277,7 @@ weight "holdable_kamikaze"
 	default: return 0;
 	}
 }
+*/
 
 weight "holdable_portal"
 {
@@ -284,7 +288,7 @@ weight "holdable_portal"
 	}
 }
 
-// unless in TMNT, it doesn't do anything
+// useless in TMNT, it doesn't do anything
 /*
 weight "holdable_invulnerability"
 {

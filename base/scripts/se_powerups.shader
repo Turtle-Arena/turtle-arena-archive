@@ -1,4 +1,4 @@
-// Powerup shaders.
+// Powerup shaders
 //
 
 // General Powerups

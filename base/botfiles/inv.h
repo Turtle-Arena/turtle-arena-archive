@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#ifdef TMNT//WEAPONS // TMNT // TODO: FINISH THIS
+#ifdef TMNT//WEAPONS // TMNT // Turtle Man: TODO: FINISH THIS
 #define INVENTORY_NONE				0
 #define INVENTORY_HEALTH			1
 
@@ -65,10 +65,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // holdable items, currently there is a max of 16
 // Q3 holdable defines.
-#define INVENTORY_TELEPORTER		21
+//#define INVENTORY_TELEPORTER		21
 #define INVENTORY_MEDKIT			22
 //MISSIONPACK
-#define INVENTORY_KAMIKAZE			23
+//#define INVENTORY_KAMIKAZE		23
 #define INVENTORY_PORTAL			24
 //#define INVENTORY_INVULNERABILITY	25
 
@@ -128,24 +128,24 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODELINDEX_HEALTHMEGA		4
 
 #define MODELINDEX_DEFAULTWEAPON	5 // weapon index -1
-//#define MODELINDEX_FISTS			no index
-#define MODELINDEX_KATANAS			6
-#define MODELINDEX_DAISHO			7
-#define MODELINDEX_SAIS				8
-#define MODELINDEX_NUNCHUKS			9
-#define MODELINDEX_HAMMER			10
-#define MODELINDEX_AXE				11
-#define MODELINDEX_LONGSWORD		12
-#define MODELINDEX_BAT				13
-#define MODELINDEX_BO				14
-#define MODELINDEX_BAMBOOBO			15
-#define MODELINDEX_GUN				16
-#define MODELINDEX_ELECTRICLAUNCHER	17
-#define MODELINDEX_ROCKETLAUNCHER	18
-#define MODELINDEX_HOMINGLAUNCHER	19
-#define MODELINDEX_GRAPPLINGHOOK	20
+#define MODELINDEX_FISTS			6
+#define MODELINDEX_KATANAS			7
+#define MODELINDEX_DAISHO			8
+#define MODELINDEX_SAIS				9
+#define MODELINDEX_NUNCHUKS			10
+#define MODELINDEX_HAMMER			11
+#define MODELINDEX_AXE				12
+#define MODELINDEX_LONGSWORD		13
+#define MODELINDEX_BAT				14
+#define MODELINDEX_BO				15
+#define MODELINDEX_BAMBOOBO			16
+#define MODELINDEX_GUN				17
+#define MODELINDEX_ELECTRICLAUNCHER	18
+#define MODELINDEX_ROCKETLAUNCHER	19
+#define MODELINDEX_HOMINGLAUNCHER	20
+#define MODELINDEX_GRAPPLINGHOOK	21
 
-#define MODELINDEX_TELEPORTER		21
+//#define MODELINDEX_TELEPORTER		0
 #define MODELINDEX_MEDKIT			22
 #define MODELINDEX_SHURIKEN			23
 #define MODELINDEX_ELECTRICSHURIKEN	24
@@ -167,26 +167,32 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // mission pack only defines
 
-#define MODELINDEX_KAMIKAZE			36
-#define MODELINDEX_PORTAL			37
-#define MODELINDEX_INVULNERABILITY	38
+//#define MODELINDEX_KAMIKAZE			0
+#define MODELINDEX_PORTAL			36
+//#define MODELINDEX_INVULNERABILITY	0
 
-#define MODELINDEX_SCOUT			39
-#define MODELINDEX_GUARD			40
-#define MODELINDEX_DOUBLER			41
-#define MODELINDEX_AMMOREGEN		42
+#define MODELINDEX_SCOUT			37
+#define MODELINDEX_GUARD			38
+#define MODELINDEX_DOUBLER			39
+#define MODELINDEX_AMMOREGEN		40
 
-#define MODELINDEX_NEUTRALFLAG		43
-#define MODELINDEX_REDCUBE			44
-#define MODELINDEX_BLUECUBE			45
+#define MODELINDEX_NEUTRALFLAG		41
+//#ifdef MISSIONPACK_HARVESTER
+//#define MODELINDEX_REDCUBE			0
+//#define MODELINDEX_BLUECUBE			0
+//#endif
 
-//#define MODELINDEX_NAILGUN			46
-//#define MODELINDEX_PROXLAUNCHER		47
-//#define MODELINDEX_CHAINGUN			48
+//#define MODELINDEX_NAILGUN			0
+//#define MODELINDEX_PROXLAUNCHER		0
+//#define MODELINDEX_CHAINGUN			0
 
+// TMNT item
+#define MODELINDEX_CRATE			42
 
 // WEAPONINDEX_*
-//#ifdef TMNTWEAPONS
+#ifdef TMNTWEAPONS
+//#define WEAPONINDEX_DEFAULT				-1
+//#define WEAPONINDEX_NONE				0
 #define WEAPONINDEX_FISTS				1
 #define WEAPONINDEX_KATANAS				2
 #define WEAPONINDEX_DAISHO				3
@@ -204,7 +210,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define WEAPONINDEX_HOMING_LAUNCHER		15
 #define WEAPONINDEX_GRAPPLING_HOOK		16
 
-/*#else
+#else
 
 #define WEAPONINDEX_GAUNTLET			1
 #define WEAPONINDEX_MACHINEGUN			2
@@ -247,7 +253,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_MINES				27
 #define INVENTORY_BELT				28
 
-#endif*/
+#endif
 
 #else // NOT TMNT ===================================================
 
@@ -397,4 +403,3 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define WEAPONINDEX_CHAINGUN			13
 
 #endif // TMNT
-

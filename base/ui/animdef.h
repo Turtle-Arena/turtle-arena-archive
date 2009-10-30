@@ -1,7 +1,26 @@
-// Turtle Man: Everything that is in this file relexes enums in the Quake3 source, which is GPL'd.
+/*
+===========================================================================
+Copyright (C) 2009 by Turtle Man
 
-// Currently uses Quake3 player animations as the TMNT ones are unfinished.
+This file is part of TMNT Arena source code.
 
+TMNT Arena source code is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
+
+TMNT Arena source code is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TMNT Arena; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+===========================================================================
+*/
+
+// Quake3 player animations
 #define BOTH_DEATH1 0
 #define BOTH_DEAD1 1
 #define BOTH_DEATH2 2
@@ -46,11 +65,12 @@
 
 #define LEGS_BACKCR 31
 #define LEGS_BACKWALK 32
-#define FLAG_RUN 33
-#define FLAG_STAND 34
-#define FLAG_STAND2RUN 35
 
-// TMNT Weapon numbers
+// TMNT player animations
+//  ...unfinished
+
+
+// TMNT weapon numbers
 #define WP_NONE 0
 
 #define WP_FISTS 1

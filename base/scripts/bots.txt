@@ -26,3 +26,10 @@ name		RaphBlue
 model		raph/blue
 aifile	bots/raph_c.c
 }
+// animated bot...
+{
+name		Tron
+model		tron/red
+aifile	bots/raph_c.c
+}
+

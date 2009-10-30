@@ -1,4 +1,5 @@
 // Single Player
+
 // Stage 1
 {
 map			"sp1a1"
@@ -50,6 +51,21 @@ longname	"Stage 2: Area 4"
 type		"single"
 }
 
+// Special Stage keywords
+// special		"Training" (First level, in a Tier by its self)
+// special		"Final" (Last level, in a Tier by its self)
+//{
+//map			"sp0a1"
+//longname	"Introduction"
+//type		"single"
+//}
+
+//{
+//map			"sp13a5"
+//longname	"Final Battle"
+//type		"single tourney"
+//}
+
 // FFA
 {
 map			"ffa1"
@@ -64,9 +80,10 @@ longname	"Sky Duel"
 type		"tourney"
 }
 
-// CTF
+// CTF (Support all team gametypes)
+// oneflag obelisk harvester keywords are currently only supported by missionpack UI.
 {
 map			"ctf1"
-longname	"CTF Test"
-type		"ctf team"
+longname	"Teamplay Test"
+type		"team ctf oneflag obelisk harvester"
 }

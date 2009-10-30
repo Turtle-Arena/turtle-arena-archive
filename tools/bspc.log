@@ -1,0 +1,707 @@
+BSPC version 2.1h, May  6 2001 16:15:03 by Mr Elusive
+forcesidesvisible = true
+grapplereach = true
+bsp2aas: ..\base\maps\ctf1.bsp to ..\base\maps\ctf1.aas
+-- Q3_LoadMapFromBSP --
+Loading map from ..\base\maps\ctf1.bsp...
+creating planar surface planes...
+searching visible brush sides...
+     0 brush sides343 brush sides textured out of 343
+-------- Brush CSG ---------
+   112 original brushes
+    80 output brushes
+-------- Brush BSP ---------
+    80 brushes
+   402 visible faces
+     0 nonvisible faces
+   494 total sides
+Win32 multi-threading
+     1 threads max
+depth first bsp building
+  1075 splits
+   215 KB of peak total bsp memory
+BSP tree created in     0 seconds
+------- Prune Nodes --------
+  418 pruned nodes
+---- Node Portalization ----
+   657 nodes portalized
+     0 tiny portals
+   122 KB of portal memory
+   246 KB of winding memory
+------ FloodEntities -------
+------- FillOutside --------
+  135 solid leaves
+  159 leaves filled
+   35 inside leaves
+AAS_CreateAreas
+    35 areas created
+AAS_MergeAreaFaces
+    35 face merges
+AAS_GravitationalSubdivision
+    17 gravitational subdivisions
+AAS_MergeAreaFaces
+     0 face merges
+AAS_MergeAreas
+    13 areas merged
+AAS_PruneNodes
+   225 nodes pruned
+    39 areas checked for shared face flipping
+AAS_MergeAreaFaces
+    33 face merges
+AAS_MergePlaneFaces
+     0 plane face merges
+AAS_LadderSubdivision
+     0 ladder subdivisions
+AAS_MeltAreaFaceWindings
+   148 edges melted
+AAS_RemoveTinyFaces
+0 tiny faces removed
+AAS_CreateAreaSettings
+allocated 57 KB and 296 bytes of AAS memory
+AAS_StoreFile
+    40 areas stored
+
+AAS created in     0 seconds
+loading collision map...
+CM_LoadMap( ..\base\maps\ctf1.bsp, 0 )
+0 weapon jump areas
+calculating reachability...
+
+please wait while storing reachability...
+calculating clusters...
+     0 forced portal areas
+possible portal: 13
+possible portal: 12
+possible portal: 29
+possible portal: 28
+portal area 12 has no front cluster
+portal area 28 has no front cluster
+
+portal 1: area 13
+portal 2: area 29
+     3 portals created
+     4 clusters created
+cluster 1 has 6 reachability areas
+cluster 2 has 9 reachability areas
+cluster 3 has 7 reachability areas
+    22 total reachability areas
+   696 AAS memory/CPU usage (the lower the better)
+writing ..\base\maps\ctf1.aas
+numvertexes = 211
+numplanes = 174
+numedges = 411
+edgeindexsize = 1104
+numfaces = 240
+faceindexsize = 335
+numareas = 40
+numareasettings = 40
+reachabilitysize = 68
+numnodes = 121
+numportals = 3
+portalindexsize = 4
+numclusters = 4
+    38 walk
+     0 crouch
+     0 barrier jump
+     0 jump
+     0 ladder
+    10 walk off ledge
+     0 swim
+     0 water jump
+     0 teleport
+     0 elevator
+     0 rocket jump
+     0 bfg jump
+    19 grapple hook
+     0 double jump
+     0 ramp jump
+     0 strafe jump
+     0 jump pad
+     0 func bob
+freed 57 KB and 296 bytes of AAS memory
+bsp2aas: ..\base\maps\duel1.bsp to ..\base\maps\duel1.aas
+-- Q3_LoadMapFromBSP --
+Loading map from ..\base\maps\duel1.bsp...
+creating planar surface planes...
+searching visible brush sides...
+     0 brush sides54 brush sides textured out of 54
+-------- Brush CSG ---------
+    16 original brushes
+    16 output brushes
+-------- Brush BSP ---------
+    16 brushes
+    76 visible faces
+     0 nonvisible faces
+    96 total sides
+Win32 multi-threading
+     1 threads max
+depth first bsp building
+   117 splits
+   207 KB of peak total bsp memory
+BSP tree created in     0 seconds
+------- Prune Nodes --------
+    8 pruned nodes
+---- Node Portalization ----
+   109 nodes portalized
+     0 tiny portals
+    19 KB of portal memory
+   209 KB of winding memory
+------ FloodEntities -------
+------- FillOutside --------
+   23 solid leaves
+   22 leaves filled
+   10 inside leaves
+AAS_CreateAreas
+    10 areas created
+AAS_MergeAreaFaces
+     0 face merges
+AAS_GravitationalSubdivision
+     7 gravitational subdivisions
+AAS_MergeAreaFaces
+     0 face merges
+AAS_MergeAreas
+     7 areas merged
+AAS_PruneNodes
+   257 nodes pruned
+    10 areas checked for shared face flipping
+AAS_MergeAreaFaces
+    18 face merges
+AAS_MergePlaneFaces
+     2 plane face merges
+AAS_LadderSubdivision
+     0 ladder subdivisions
+AAS_MeltAreaFaceWindings
+    36 edges melted
+AAS_RemoveTinyFaces
+0 tiny faces removed
+AAS_CreateAreaSettings
+allocated 16 KB and 948 bytes of AAS memory
+AAS_StoreFile
+    11 areas stored
+
+AAS created in     0 seconds
+loading collision map...
+CM_LoadMap( ..\base\maps\duel1.bsp, 0 )
+0 weapon jump areas
+calculating reachability...
+
+please wait while storing reachability...
+trigger_multiple model = "*1"
+calculating clusters...
+     0 forced portal areas
+
+     1 portals created
+     2 clusters created
+cluster 1 has 9 reachability areas
+     9 total reachability areas
+   270 AAS memory/CPU usage (the lower the better)
+writing ..\base\maps\duel1.aas
+numvertexes = 52
+numplanes = 56
+numedges = 101
+edgeindexsize = 272
+numfaces = 60
+faceindexsize = 88
+numareas = 11
+numareasettings = 11
+reachabilitysize = 35
+numnodes = 30
+numportals = 1
+portalindexsize = 0
+numclusters = 2
+    24 walk
+     0 crouch
+     0 barrier jump
+     2 jump
+     0 ladder
+     8 walk off ledge
+     0 swim
+     0 water jump
+     0 teleport
+     0 elevator
+     0 rocket jump
+     0 bfg jump
+     0 grapple hook
+     0 double jump
+     0 ramp jump
+     0 strafe jump
+     0 jump pad
+     0 func bob
+freed 16 KB and 948 bytes of AAS memory
+bsp2aas: ..\base\maps\ffa1.bsp to ..\base\maps\ffa1.aas
+-- Q3_LoadMapFromBSP --
+Loading map from ..\base\maps\ffa1.bsp...
+creating planar surface planes...
+searching visible brush sides...
+     0 brush sides252 brush sides textured out of 252
+-------- Brush CSG ---------
+   112 original brushes
+   100 output brushes
+-------- Brush BSP ---------
+   100 brushes
+   561 visible faces
+     0 nonvisible faces
+   733 total sides
+Win32 multi-threading
+     1 threads max
+depth first bsp building
+two tiny brushes
+two tiny brushes
+two tiny brushes
+two tiny brushes
+  1937 splits
+   559 KB of peak total bsp memory
+BSP tree created in     1 seconds
+------- Prune Nodes --------
+ 1352 pruned nodes
+---- Node Portalization ----
+   585 nodes portalized
+    33 tiny portals
+   107 KB of portal memory
+   456 KB of winding memory
+------ FloodEntities -------
+------- FillOutside --------
+  146 solid leaves
+   70 leaves filled
+   77 inside leaves
+AAS_CreateAreas
+    77 areas created
+AAS_MergeAreaFaces
+    30 face merges
+AAS_GravitationalSubdivision
+found 1 epsilon faces trying to split area 82
+found 4 epsilon faces trying to split area 93
+found 6 epsilon faces trying to split area 99
+found 5 epsilon faces trying to split area 103
+found 7 epsilon faces trying to split area 104
+found 6 epsilon faces trying to split area 23
+    20 gravitational subdivisions
+AAS_MergeAreaFaces
+     0 face merges
+AAS_MergeAreas
+    29 areas merged
+AAS_PruneNodes
+   349 nodes pruned
+    68 areas checked for shared face flipping
+AAS_MergeAreaFaces
+    72 face merges
+AAS_MergePlaneFaces
+     7 plane face merges
+AAS_LadderSubdivision
+     0 ladder subdivisions
+AAS_MeltAreaFaceWindings
+   195 edges melted
+AAS_RemoveTinyFaces
+25 tiny faces removed
+AAS_CreateAreaSettings
+allocated 100 KB and 968 bytes of AAS memory
+AAS_StoreFile
+AAS_GetFace: face 45 had degenerate edge 3-4
+AAS_GetFace: face 111 had degenerate edge 1-2
+AAS_GetFace: face 115 had degenerate edge 1-2
+AAS_GetFace: face 116 had degenerate edge 1-2
+AAS_GetFace: face 116 had degenerate edge 5-6
+AAS_GetFace: face 121 had degenerate edge 3-4
+AAS_GetFace: face 122 had degenerate edge 0-1
+AAS_GetFace: face 124 had degenerate edge 0-1
+AAS_GetFace: face 125 had degenerate edge 3-4
+AAS_GetFace: face 126 had degenerate edge 5-6
+AAS_GetFace: face 129 had degenerate edge 0-1
+AAS_GetFace: face 142 had degenerate edge 5-0
+AAS_GetFace: face 150 had degenerate edge 0-1
+AAS_GetFace: face 151 had degenerate edge 2-3
+AAS_GetFace: face 187 had degenerate edge 1-2
+AAS_GetFace: face 193 had degenerate edge 2-3
+    69 areas stored
+
+AAS created in     1 seconds
+loading collision map...
+CM_LoadMap( ..\base\maps\ffa1.bsp, 0 )
+0 weapon jump areas
+calculating reachability...
+
+please wait while storing reachability...
+calculating clusters...
+     0 forced portal areas
+possible portal: 34
+possible portal: 57
+possible portal: 55
+portal area 34 has no back cluster
+portal area 55 has no front cluster
+
+portal 1: area 57
+     2 portals created
+     3 clusters created
+cluster 1 has 34 reachability areas
+cluster 2 has 8 reachability areas
+    42 total reachability areas
+  3912 AAS memory/CPU usage (the lower the better)
+writing ..\base\maps\ffa1.aas
+numvertexes = 326
+numplanes = 288
+numedges = 693
+edgeindexsize = 1638
+numfaces = 363
+faceindexsize = 553
+numareas = 69
+numareasettings = 69
+reachabilitysize = 192
+numnodes = 221
+numportals = 2
+portalindexsize = 2
+numclusters = 3
+   107 walk
+     0 crouch
+     5 barrier jump
+     0 jump
+     0 ladder
+    21 walk off ledge
+    16 swim
+     2 water jump
+     0 teleport
+     0 elevator
+     0 rocket jump
+     0 bfg jump
+    40 grapple hook
+     0 double jump
+     0 ramp jump
+     0 strafe jump
+     0 jump pad
+     0 func bob
+freed 100 KB and 968 bytes of AAS memory
+bsp2aas: ..\base\maps\sp1a1.bsp to ..\base\maps\sp1a1.aas
+-- Q3_LoadMapFromBSP --
+Loading map from ..\base\maps\sp1a1.bsp...
+creating planar surface planes...
+searching visible brush sides...
+     0 brush sides205 brush sides textured out of 205
+-------- Brush CSG ---------
+    65 original brushes
+    63 output brushes
+-------- Brush BSP ---------
+    63 brushes
+   255 visible faces
+     0 nonvisible faces
+   380 total sides
+Win32 multi-threading
+     1 threads max
+depth first bsp building
+   591 splits
+   480 KB of peak total bsp memory
+BSP tree created in     0 seconds
+------- Prune Nodes --------
+  358 pruned nodes
+---- Node Portalization ----
+   233 nodes portalized
+    33 tiny portals
+    45 KB of portal memory
+   457 KB of winding memory
+------ FloodEntities -------
+------- FillOutside --------
+   50 solid leaves
+   34 leaves filled
+   33 inside leaves
+AAS_CreateAreas
+    33 areas created
+AAS_MergeAreaFaces
+    18 face merges
+AAS_GravitationalSubdivision
+    18 gravitational subdivisions
+AAS_MergeAreaFaces
+     6 face merges
+AAS_MergeAreas
+    24 areas merged
+AAS_PruneNodes
+   387 nodes pruned
+    27 areas checked for shared face flipping
+AAS_MergeAreaFaces
+    57 face merges
+AAS_MergePlaneFaces
+     0 plane face merges
+AAS_LadderSubdivision
+     0 ladder subdivisions
+AAS_MeltAreaFaceWindings
+   128 edges melted
+AAS_RemoveTinyFaces
+0 tiny faces removed
+AAS_CreateAreaSettings
+allocated 46 KB and 656 bytes of AAS memory
+AAS_StoreFile
+    28 areas stored
+
+AAS created in     0 seconds
+loading collision map...
+CM_LoadMap( ..\base\maps\sp1a1.bsp, 0 )
+2 weapon jump areas
+calculating reachability...
+
+please wait while storing reachability...
+trigger_multiple model = "*1"
+calculating clusters...
+     0 forced portal areas
+
+     1 portals created
+     2 clusters created
+cluster 1 has 22 reachability areas
+    22 total reachability areas
+  1518 AAS memory/CPU usage (the lower the better)
+writing ..\base\maps\sp1a1.aas
+numvertexes = 158
+numplanes = 170
+numedges = 306
+edgeindexsize = 828
+numfaces = 176
+faceindexsize = 261
+numareas = 28
+numareasettings = 28
+reachabilitysize = 80
+numnodes = 97
+numportals = 1
+portalindexsize = 0
+numclusters = 2
+    52 walk
+     0 crouch
+     0 barrier jump
+     0 jump
+     0 ladder
+    15 walk off ledge
+     8 swim
+     4 water jump
+     0 teleport
+     0 elevator
+     0 rocket jump
+     0 bfg jump
+     0 grapple hook
+     0 double jump
+     0 ramp jump
+     0 strafe jump
+     0 jump pad
+     0 func bob
+freed 46 KB and 656 bytes of AAS memory
+bsp2aas: ..\base\maps\sp1a2.bsp to ..\base\maps\sp1a2.aas
+-- Q3_LoadMapFromBSP --
+Loading map from ..\base\maps\sp1a2.bsp...
+creating planar surface planes...
+searching visible brush sides...
+     0 brush sides360 brush sides textured out of 360
+-------- Brush CSG ---------
+   116 original brushes
+   112 output brushes
+-------- Brush BSP ---------
+   112 brushes
+   493 visible faces
+     0 nonvisible faces
+   672 total sides
+Win32 multi-threading
+     1 threads max
+depth first bsp building
+  1151 splits
+   627 KB of peak total bsp memory
+BSP tree created in     0 seconds
+------- Prune Nodes --------
+  386 pruned nodes
+---- Node Portalization ----
+   765 nodes portalized
+    33 tiny portals
+   142 KB of portal memory
+   690 KB of winding memory
+------ FloodEntities -------
+------- FillOutside --------
+  169 solid leaves
+  134 leaves filled
+   80 inside leaves
+AAS_CreateAreas
+    80 areas created
+AAS_MergeAreaFaces
+    28 face merges
+AAS_GravitationalSubdivision
+     3 gravitational subdivisions
+AAS_MergeAreaFaces
+     1 face merges
+AAS_MergeAreas
+    41 areas merged
+AAS_PruneNodes
+   576 nodes pruned
+    42 areas checked for shared face flipping
+AAS_MergeAreaFaces
+   104 face merges
+AAS_MergePlaneFaces
+     3 plane face merges
+AAS_LadderSubdivision
+     0 ladder subdivisions
+AAS_MeltAreaFaceWindings
+   163 edges melted
+AAS_RemoveTinyFaces
+0 tiny faces removed
+AAS_CreateAreaSettings
+allocated 64 KB and 368 bytes of AAS memory
+AAS_StoreFile
+    43 areas stored
+
+AAS created in     0 seconds
+loading collision map...
+CM_LoadMap( ..\base\maps\sp1a2.bsp, 0 )
+0 weapon jump areas
+calculating reachability...
+
+please wait while storing reachability...
+trigger_multiple model = "*1"
+calculating clusters...
+     0 forced portal areas
+possible portal: 19
+possible portal: 18
+possible portal: 29
+possible portal: 28
+portal area 18 has no front cluster
+portal area 28 has no front cluster
+
+portal 1: area 19
+portal 2: area 29
+     3 portals created
+     4 clusters created
+cluster 1 has 9 reachability areas
+cluster 2 has 3 reachability areas
+cluster 3 has 3 reachability areas
+    15 total reachability areas
+   432 AAS memory/CPU usage (the lower the better)
+writing ..\base\maps\sp1a2.aas
+numvertexes = 233
+numplanes = 162
+numedges = 447
+edgeindexsize = 1167
+numfaces = 252
+faceindexsize = 361
+numareas = 43
+numareasettings = 43
+reachabilitysize = 33
+numnodes = 197
+numportals = 3
+portalindexsize = 4
+numclusters = 4
+    28 walk
+     0 crouch
+     0 barrier jump
+     0 jump
+     0 ladder
+     4 walk off ledge
+     0 swim
+     0 water jump
+     0 teleport
+     0 elevator
+     0 rocket jump
+     0 bfg jump
+     0 grapple hook
+     0 double jump
+     0 ramp jump
+     0 strafe jump
+     0 jump pad
+     0 func bob
+freed 64 KB and 368 bytes of AAS memory
+bsp2aas: ..\base\maps\test.bsp to ..\base\maps\test.aas
+-- Q3_LoadMapFromBSP --
+Loading map from ..\base\maps\test.bsp...
+creating planar surface planes...
+searching visible brush sides...
+     0 brush sides36 brush sides textured out of 36
+-------- Brush CSG ---------
+    12 original brushes
+    12 output brushes
+-------- Brush BSP ---------
+    12 brushes
+    52 visible faces
+     0 nonvisible faces
+    72 total sides
+Win32 multi-threading
+     1 threads max
+depth first bsp building
+    65 splits
+   643 KB of peak total bsp memory
+BSP tree created in     0 seconds
+------- Prune Nodes --------
+   22 pruned nodes
+---- Node Portalization ----
+    43 nodes portalized
+    33 tiny portals
+     8 KB of portal memory
+   633 KB of winding memory
+------ FloodEntities -------
+------- FillOutside --------
+    6 solid leaves
+   14 leaves filled
+    2 inside leaves
+AAS_CreateAreas
+     2 areas created
+AAS_MergeAreaFaces
+     0 face merges
+AAS_GravitationalSubdivision
+     0 gravitational subdivisions
+AAS_MergeAreaFaces
+     0 face merges
+AAS_MergeAreas
+     0 areas merged
+AAS_PruneNodes
+   586 nodes pruned
+     2 areas checked for shared face flipping
+AAS_MergeAreaFaces
+     0 face merges
+AAS_MergePlaneFaces
+     0 plane face merges
+AAS_LadderSubdivision
+     0 ladder subdivisions
+AAS_MeltAreaFaceWindings
+     0 edges melted
+AAS_RemoveTinyFaces
+0 tiny faces removed
+AAS_CreateAreaSettings
+allocated 4 KB and 724 bytes of AAS memory
+AAS_StoreFile
+     3 areas stored
+
+AAS created in     0 seconds
+loading collision map...
+CM_LoadMap( ..\base\maps\test.bsp, 0 )
+3 weapon jump areas
+calculating reachability...
+
+please wait while storing reachability...
+calculating clusters...
+     0 forced portal areas
+
+     1 portals created
+     1 clusters created
+     0 total reachability areas
+     0 AAS memory/CPU usage (the lower the better)
+writing ..\base\maps\test.aas
+numvertexes = 12
+numplanes = 22
+numedges = 21
+edgeindexsize = 44
+numfaces = 12
+faceindexsize = 12
+numareas = 3
+numareasettings = 3
+reachabilitysize = 1
+numnodes = 12
+numportals = 1
+portalindexsize = 0
+numclusters = 1
+     0 walk
+     0 crouch
+     0 barrier jump
+     0 jump
+     0 ladder
+     0 walk off ledge
+     0 swim
+     0 water jump
+     0 teleport
+     0 elevator
+     0 rocket jump
+     0 bfg jump
+     0 grapple hook
+     0 double jump
+     0 ramp jump
+     0 strafe jump
+     0 jump pad
+     0 func bob
+freed 4 KB and 724 bytes of AAS memory
+BSPC run time is     1 seconds

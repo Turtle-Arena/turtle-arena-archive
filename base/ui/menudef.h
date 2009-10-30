@@ -309,3 +309,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif*/
 #define VOICECHAT_PRAISE			"praise"				// you did something good
 
+// Lang
+#include "ui/lang_english.h"
+
+// Theme
+#include "ui/theme_default.h"
+

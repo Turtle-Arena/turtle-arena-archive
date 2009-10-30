@@ -1,18 +1,8 @@
 // Sprite shaders.
 // A sprite is a image in the 3D world that always faces the camera.
 
-// Talk balloon
-// Q3: sprites/balloon3 -> map sprites/balloon4.tga
+// Turtle Man: Drawn over player's head when in console or chat mode.
 sprites/talkBalloon
-{
-	{
-		map sprites/talkBalloon.tga
-		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-// works with Q3...
-sprites/balloon3
 {
 	{
 		map sprites/talkBalloon.tga
@@ -45,7 +35,7 @@ smokePuff
 	}
 }
 
-// Draw at player's feet when player has speed powerups
+// Turtle Man: Drawn at player's feet when player has speed powerups
 hasteSmokePuff
 {
 	cull none
@@ -59,6 +49,7 @@ hasteSmokePuff
 	}
 }
 
+// Turtle Man:
 // Empty transparent image.
 smokePuffRagePro
 {
@@ -70,6 +61,7 @@ smokePuffRagePro
 	}
 }
 
+// Turtle Man:
 // Used for breath, g_enableBreath 1 in console
 // or "enableBreath" "1" in worldspawn
 shotgunSmokePuff
@@ -78,7 +70,7 @@ shotgunSmokePuff
 	{
 		map gfx/misc/smokepuff2b.tga
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		alphaGen entity		
+		alphaGen entity
 		rgbGen entity
 	}
 }
@@ -92,6 +84,7 @@ flareShader
 		rgbGen vertex
 	}
 }
+
 sun
 {
 	cull none
@@ -102,6 +95,7 @@ sun
 	}
 }
 
+// Turtle Man:
 // Used in Team modes, it is above your teammate's head.
 //  This should be "sprites/friend" not "sprites/foe".
 /////              "map sprites/friend1.tga"
@@ -112,5 +106,15 @@ sprites/foe
 	{
 		map sprites/foe2.tga
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+sprites/plasma1
+{
+	cull disable
+	{
+		clampmap sprites/plasmaa.tga
+		blendfunc GL_ONE GL_ONE
+                tcMod rotate 931
 	}
 }

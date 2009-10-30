@@ -1,0 +1,264 @@
+TMNT Arena TODO file
+
+http://i39.tinypic.com/33fep9y.jpg
+
+TODO: Get code/ogg and code/vobis from XReal? (Ogg vorbis works but should the code for it be in are source?)
+
+TODO: Use freetype for TTF rendering, instead of q3font.exe's output files of a TTF. (Done in Xreal)
+
+Support STV:EF (SP?) models/players/name/animsounds.cfg?
+
+Finish writing MDR plugin for Misfit Model 3D
+
+Have the HUD have a left side and a right side, so they can be drawn aspect-correct.
+
+
+Default cg_fov to 70 (Need to fix first person weapon offset?) (old 90)
+Default cg_thirdPersonRange to 70 (old 40)
+If PW_AMMO_REGEN don't drop guns with no ammo.
+
+== General ==
+General things that need to be done.
+
+=== Demo 1 ===
+* Finish a player model
+* Add models for weapons and items (All pickup items (not weapons) have models now)
+
+* Review the chages in Meld (Checking for errors).
+
+=== Demo 1 or later ===
+* Use per-player bounding box (playercfg.bbmins/playercfg.maxs) when checking for telefrag (SpotWouldTelefrag)
+* http://xreal.svn.sourceforge.net/viewvc/xreal?view=rev&revision=3049 ?
+
+* Rewrite CTF flag drawing so that there is one flag model with three skins
+: This may help http://xreal.svn.sourceforge.net/viewvc/xreal?view=rev&revision=3173
+: and this      http://xreal.svn.sourceforge.net/viewvc/xreal?view=rev&revision=3202
+
+* NPCs
+* Add music
+* Add sounds
+* New camera system : merge CAMERASCRIPT with realtime camera.
+* Savegames for single player / offline play.
+
+== To Be Remove ==
+=== Excellent Award ===
+:Excellent award? given when two KOs happen close together by one attacker
+
+firstExcellentSound
+excellentSound
+medalExcellent
+PERS_EXCELLENT_COUNT
+EF_AWARD_EXCELLENT
+AWARD_EXCELLENT
+
+== Players ==
+This was said about the 2003 series first console game.
+    Leonardo
+    Strength: Best attack accuracy.
+    Weakness:-Cannot dodge attacks as well as everyone else.
+
+    Donatello
+    Strength: Longest attack reach.
+    Weakness: Slowest.
+
+    Michaelangelo
+    Strength: Fastest
+    Weakness: Lowest attack accuracy
+
+    Raphael
+    Strength: Most powerful of all the turtles.
+    Weakness: Shortest attack reach.
+
+== Player Models ==
+List of tags by models.
+
+head.md3
++ tag_head
+//+tag_bandana -- TODO: Bandanas, how hard can it be right?... yeah. right.
+
+upper.md3
++ tag_torso
++ tag_head
++ tag_hand_primary   -- Player's right hand. Used for holding guns/melee weapons.
++ tag_hand_secondary -- Player's left hand. Used for holding CTF flags/melee weapons.
+// TODO: Hold default weapon of the player when not in use.
+//+ tag_wp_away_right
+//+ tag_wp_away_left
+// Should I just use tag_weapon / tag_flag so that TMNT skins can be used in Quake 3 and Team arena?...
++ tag_weapon (for Quake 3/STV:EF capatibility) -- Use like tag_hand_primary
++ tag_flag   (for Team Arena capatibility) -- Use like tag_hand_secondary
+//+ tag_lhand  ?? (for Elite Force capatibility?) -- Use like tag_hand_secondary?
+
+lower.md3
++ tag_legs
+
+Melee Weapon attack animations.
+      TMNT Mutant Melee: sword type, axe/hammer type, gun type (Already in Q3...)
+      TMNT Arena: TMNT:MM types plus Bo, Nunchuk, and more sword types
+
+=== Real Melee Attacking ===
+If we move LerpFrame stuff from cg/ui to bg, we would have the animations correct
+	but we would still need the model (which can't be used in ded server mode) to find the tag locations,
+	so we would need to load the tags from the models, without using the render.
+
+Move lerpFrame_t to bg_public.h
+Copy CG_RunLerpFrame CG_SetLerpFrameAnimation and CG_ClearLerpFrame to bg as BG_*
+Disable CG_RunLerpFrame CG_SetLerpFrameAnimation and CG_ClearLerpFrame
+Disable UI_RunLerpFrame UI_SetLerpFrameAnimation
+Add "lerpFrame_t legs, torso;" to gclient_s
+Run the gclient_s legs/torso lerp in game
+
+Side Effects:
+* Use more net bandwith; If lerpFrame was move to bg, the torso and legs would have to be sent across
+	the network as only the "local player" is run though Pmove().
+** fix -- Leave legs/torso/flag to playerEntity_t, but use BG_* lerp funtions.
+
+* Use more memory (Loading player tags seperate from model, and with model)
+** fix: -- i don't care
+
+LerpFrame stuff:
+lerpFrame_t
+CG_RunLerpFrame CG_SetLerpFrameAnimation and CG_ClearLerpFrame
+UI_RunLerpFrame UI_SetLerpFrameAnimation
+
+== Camera ==
+The Q3 camera system needs to be rewritten, third person with be the default camera so it needs to work better.
+The new camera system should be desined to
+* work with Analog Control in online/offline play.
+* run "scripts", I hope to remove the need for external textfiles from the map.
+* Possible "base" on ZCam? (--Non-GPL...) It is a enhanced spectator camera.
+* Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
+* more.
+
+=== Analog Control ===
+TODO Analog mode:
+Analog should work in Netplay as well as offline. Should analog be client side or server side?,
+	clients can predicted it as well (if on server side)?
+
+cg_thirdPersonAnalog
+cg_thirdPersonAngle - Modify while cg_thirdPersonAnalog is 1.
+cg_thirdPersonRange
+cg.predictedPlayerState.viewheight?
+See also: CL_CreateCmd
+
+== Announcer ==
+Vote Gyoji, of the Battle Nexus, for TMNT Arena Announcer!
+
+== MISSIONPACK ==
+Use parts of MISSIONPACK
+ui scripting, 1 flag CTF, and better team play stuff?
+Use redFlagBaseModel and blueFlagBaseModel?
+
+DONE: Use MISSIONPACK's new CTF flag code, flagPoleModel, flagFlapModel, and redFlagFlapSkin
+DONE: Per-Team skins in team play.
+
+=== Menu ===
+Use MISSIONPACK scripted menus.
+See tmnt-menus.txt
+
+=== HUD ===
+Use MISSIONPACK scripted hud.
+
+== Objects ==
+TODO: Make more mapobjects;
+
+Trees, bushes, flowers, tall-grasses,
+Traffic barrel-thingy? Traffic "saw-horse"-thingy
+Firehydroant, lightpole,
+street-signs (one-way, 3rd street, Stop, Yield, people crossing, speed limit)
+
+Most of the mapobjects should be breakable... time to make a new entity type.
+
+misc_object
+Style 1: Option to animate and trigger "target" on touch,
+Style 2: Damageable and have a "paintarget" and trigger "target" on death.
+			Also option to spawn item on death, and option to respawn.
+
+== Weapons ==
+TMNTWEAPSYS Main changes to Q3's weapon system.
+* Adds melee weapon
+* Adds default weapon (Currently limited to one default weapon)
+* It may do other things to Q3 weapon system, but I don't remember.
+
+TMNTWEAPSYS2 is weapon code that adds on to TMNTWEAPSYS, making it more complete (But not something for Quake3).
+* Each client can hold only 2 weapons (instead of 16), one is the default and the other is a pickup weapon, if holding a pickup weapon the default weapon can't be used.
+* Remove 16 total weapons limit.
+* Picked up weapons can be dropped via a button to use the default weapon again.
+* Disables ammo warnings (AMMO_WARNINGS), fix CG_CheckAmmo to support TMNTWEAPSYS2?
+
+TMNTWEAPONS Replace/remove Q3/TA's weapons with TMNT weapons.
+: Use homing-rocket from ? http://www.codeproject.com/KB/directx/QuakeD.aspx
+
+TMNTHOLDSYS Allow up to 16 holdable items to be held at once
+TMNTHOLDSYS2 Allows players to change to any holdable, not just the next.
+TMNTHOLDSYS2BOT Allow Bots to use holdables, when TMNTHOLDSYS is defined, was part of TMNTHOLDSYS2
+
+TMNTHOLDABLE Adds shurikens (Which are holdable items) and disables some Q3/TA holdables.
+Q3's weapons have "_hand.md3" models for each gun, I currently use one of OpenArena for all guns.
+
+Weapon dirs;
+1: /models/*playername*/weaponname/weaponname.md3
+2: /models/weapons2/weaponname/weaponname.md3
+
+Player Animations;
+Have TORSO_* and LEGS_*? for each attack.
+If the LEGS_* startframe is -1 don't change animation.
+
+Weapon Types;
+Add more stock weapons/types?
+Ultimate Ninja's claw?... (WT_GAUNTLET?)
+Bow and Arrow? (Like LOZ: TP...?) { Camera looks over players shoulder }
+
+== Misc ==
+DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
+
+target_player_stop? - see http://rfactory.org/singleEntities.html
+
+Have a intro (.RoQ file or image(s)) before the menu.
+
+TODO: Disable telefrag code in GT_SINGLE_PLAYER (or all gametypes?), players may share spawn points.
+		Allow players to walk through each other? or move the player when teleport in to not telefrag.
+
+== What is wanted ==
+I was reading some reviews of the 2003 series games and I decide to make a list of what people said is missing or needs in the games. Its very incomplete.
+
+* 4-player support (lacked in the first game) --Will 64 players on LAN/internet do?...
+* Good stages
+* Better attack controls
+
+== Stages ==
+Idea: have a "stages.txt" that contains.
+Support up to 9 maps.
+
+{
+name = "Stage 1"
+image = levelshots/stage1.png
+caption = ??? // Support caption/desction about the Stage?
+showareaselect = 0 // Don't show even if beat the first area.
+showareaselect = 1 // default --if more then one area, and the first is beat, show area select
+showareaselect = 2 // Show even if only one area or the first hasn't been beat.
+map1 = sp1a1
+map2 = sp1a2
+map3 = sp1a3
+map4 = sp1a4
+}
+
+{
+name = "Stage 2"
+image = /levelshots/stage2.png
+map1 = sp2a1
+map2 = sp2a2
+map3 = sp2a3
+map4 = sp2a4
+map5 = sp2a5
+}
+
+{
+name = "Stage 3 (Beta)"
+//no "image"
+map1 = sp3a1
+}
+
+== External Links ==
+http://xreal.sourceforge.net/
+
