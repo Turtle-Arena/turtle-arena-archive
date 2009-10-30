@@ -1417,7 +1417,7 @@ void Key_SetCatcher( int catcher ) {
 
 // This must not exceed MAX_CMD_LINE
 #define			MAX_CONSOLE_SAVE_BUFFER	1024
-#ifdef TMNT // History file name
+#ifdef TMNTMISC // History file name
 #define			CONSOLE_HISTORY_FILE    "history"
 #else
 #define			CONSOLE_HISTORY_FILE    "q3history"

@@ -103,7 +103,7 @@ field_t fields[] = {
 	{"spawnflags", FOFS(spawnflags), F_INT},
 	{"speed", FOFS(speed), F_FLOAT},
 	{"target", FOFS(target), F_LSTRING},
-#ifdef TMNTENTITIES
+#ifdef TMNTENTSYS
 	{"paintarget", FOFS(paintarget), F_LSTRING},
 #endif
 	{"targetname", FOFS(targetname), F_LSTRING},
@@ -187,6 +187,9 @@ void SP_misc_teleporter_dest (gentity_t *self);
 void SP_misc_model(gentity_t *ent);
 #ifdef SINGLEPLAYER // entity
 void SP_misc_model_anim(gentity_t *ent);
+#endif
+#ifdef TMNTENTSYS // MISC_OBJECT
+void SP_misc_object(gentity_t *ent);
 #endif
 void SP_misc_portal_camera(gentity_t *ent);
 void SP_misc_portal_surface(gentity_t *ent);
@@ -275,7 +278,7 @@ spawn_t	spawns[] = {
 
 	{"light", SP_light},
 	{"path_corner", SP_path_corner},
-#ifdef TMNTPATHS
+#ifdef TMNTPATHSYS
 	{"path_start", SP_path_corner},
 	{"path_center", SP_path_corner},
 	{"path_end", SP_path_corner},
@@ -286,12 +289,20 @@ spawn_t	spawns[] = {
 #ifdef SINGLEPLAYER // entity
 	{"misc_model_anim", SP_misc_model_anim},
 #endif
+#ifdef TMNTENTSYS // MISC_OBJECT
+	{"misc_object", SP_misc_object},
+#endif
 	{"misc_portal_surface", SP_misc_portal_surface},
 	{"misc_portal_camera", SP_misc_portal_camera},
 
 	{"shooter_rocket", SP_shooter_rocket},
+#ifdef TMNTWEAPONS
+	{"shooter_homing", SP_shooter_grenade},
+	{"shooter_electric", SP_shooter_plasma},
+#else
 	{"shooter_grenade", SP_shooter_grenade},
 	{"shooter_plasma", SP_shooter_plasma},
+#endif
 
 	{"team_CTF_redplayer", SP_team_CTF_redplayer},
 	{"team_CTF_blueplayer", SP_team_CTF_blueplayer},
@@ -465,7 +476,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	int			i;
 	gentity_t	*ent;
 	char		*s, *value, *gametypeName;
-#ifdef TMNT // tornament to duel
+#ifdef TMNTMISC // tornament to duel
 	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
 #else
 	static char *gametypeNames[] = {"ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
@@ -503,6 +514,12 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 
 #ifdef TMNT
 	G_SpawnInt( "nottmnt", "0", &i );
+	if ( i ) {
+		G_FreeEntity( ent );
+		return;
+	}
+#elif defined SONIC
+	G_SpawnInt( "notsonic", "0", &i );
 	if ( i ) {
 		G_FreeEntity( ent );
 		return;

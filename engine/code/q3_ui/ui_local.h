@@ -462,6 +462,7 @@ extern void DriverInfo_Cache( void );
 // ui_players.c
 //
 
+#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // moved to bg_public.h
 //FIXME ripped from cg_local.h
 typedef struct {
 	int			oldFrame;
@@ -481,6 +482,7 @@ typedef struct {
 	animation_t	*animation;
 	int			animationTime;		// time when the first frame of the animation will be exact
 } lerpFrame_t;
+#endif
 
 typedef struct {
 	// model info
@@ -495,7 +497,7 @@ typedef struct {
 	qhandle_t		headModel;
 	qhandle_t		headSkin;
 
-#ifdef TMNTPLAYERSYS // playercfg
+#ifdef TMNTPLAYERSYS
 	bg_playercfg_t	playercfg;
 #else
 	animation_t		animations[MAX_ANIMATIONS];

@@ -561,13 +561,13 @@ void UI_SPPostgameMenu_f( void ) {
 	// process award stats and prepare presentation data
 	awardValues[AWARD_ACCURACY] = atoi( UI_Argv( 3 ) );
 #ifdef TMNTWEAPONS
-	// Turtle Man: FIXME: I was lazy at removal, so 0 is passed as the AWARD_IMPRESSIVE var.
+	// Turtle Man: TODO: I was lazy at removal, so 0 is passed as the AWARD_IMPRESSIVE var.
 #else
 	awardValues[AWARD_IMPRESSIVE] = atoi( UI_Argv( 4 ) );
 #endif
 	awardValues[AWARD_EXCELLENT] = atoi( UI_Argv( 5 ) );
 #ifdef TMNTWEAPONS
-	// Turtle Man: FIXME: I was lazy at removal, so ... AWARD_GAUNTLET ...
+	// Turtle Man: TODO: I was lazy at removal, so 0 is passed as the AWARD_GAUNTLET var.
 #else
 	awardValues[AWARD_GAUNTLET] = atoi( UI_Argv( 6 ) );
 #endif

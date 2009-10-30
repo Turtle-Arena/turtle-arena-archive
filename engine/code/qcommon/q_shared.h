@@ -33,6 +33,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     #define CLIENT_WINDOW_TITLE     	"TMNT Arena"
     #define CLIENT_WINDOW_MIN_TITLE 	"TMNT Arena"
     #define GAMENAME_FOR_MASTER		"TMNTArena"
+  #elif defined SONIC
+    #define PRODUCT_NAME			"Sonic Blast Arena"
+    #define BASEGAME			"sonic"
+    #define CLIENT_WINDOW_TITLE     	"Sonic Blast Arena"
+    #define CLIENT_WINDOW_MIN_TITLE 	"Sonic Blast Arena"
+    #define GAMENAME_FOR_MASTER		"SonicBlastArena"
   #else
   #define PRODUCT_NAME			"iofoo3"
   #define BASEGAME			"foobar"
@@ -55,7 +61,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //#ifdef _MSC_VER
 #ifndef PRODUCT_VERSION // Turtle Man: Added "#ifndef" and the below define.
-  #define PRODUCT_VERSION "1.35"
+  #define PRODUCT_VERSION "1.36"
 #endif
 
 #define Q3_VERSION PRODUCT_NAME " " PRODUCT_VERSION
@@ -967,7 +973,7 @@ typedef enum {
 //
 #define	MAX_CLIENTS			64		// absolute limit
 #define MAX_LOCATIONS		64
-#ifdef TMNT // Particles
+#ifdef TMNTMISC // Particles
 #define MAX_PARTICLES_AREAS 64
 #endif
 
@@ -1153,6 +1159,8 @@ typedef struct playerState_s {
 	int		meleeDelay; // Time before player can use a melee attack
 	int		comboTime; // Time left till the combo ends
 
+	int			weaponHands;	// HAND_NONE, HAND_PRIMARY, HAND_SECONDARY, or HAND_BOTH
+
 	//
 	qboolean attack_melee; // qtrue if attack was pressed and started a melee attack
 #endif
@@ -1284,6 +1292,9 @@ typedef struct entityState_s {
 	int		weapon;			// determines weapon and flash model, etc
 	int		legsAnim;		// mask off ANIM_TOGGLEBIT
 	int		torsoAnim;		// mask off ANIM_TOGGLEBIT
+#ifdef TMNTWEAPSYS
+	int		weaponHands;
+#endif
 
 	int		generic1;
 } entityState_t;

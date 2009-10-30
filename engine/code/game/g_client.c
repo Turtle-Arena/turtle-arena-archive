@@ -86,8 +86,8 @@ qboolean SpotWouldTelefrag( gentity_t *spot ) {
 
 #if 0 // #ifdef TMNTPLAYERSYS
 	// Turtle Man: FIXME: Use per-player bounding box for telefrag checking!
-	VectorAdd( spot->s.origin, wut->playercfg.bbmins, mins );
-	VectorAdd( spot->s.origin, wut->playercfg.bbmaxs, maxs );
+	VectorAdd( spot->s.origin, something->playercfg.bbmins, mins );
+	VectorAdd( spot->s.origin, something->playercfg.bbmaxs, maxs );
 #else
 	VectorAdd( spot->s.origin, playerMins, mins );
 	VectorAdd( spot->s.origin, playerMaxs, maxs );
@@ -432,7 +432,7 @@ just like the existing corpse to leave behind.
 =============
 */
 void CopyToBodyQue( gentity_t *ent ) {
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	gentity_t	*e;
 	int i;
 #endif
@@ -455,7 +455,7 @@ void CopyToBodyQue( gentity_t *ent ) {
 
 	body->s = ent->s;
 	body->s.eFlags = EF_DEAD;		// clear EF_TALK, etc
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	if ( ent->s.eFlags & EF_KAMIKAZE ) {
 		body->s.eFlags |= EF_KAMIKAZE;
 
@@ -769,23 +769,20 @@ static void ClientCleanName( const char *in, char *out, int outSize ) {
 G_LoadPlayer
 
 Load animation.cfg
-
-The function is called when a player updates there info string,
-  like changing models, handiecap, or even CTF team names...
-
-Turtle Man: FIXME: Only call when changing models!
-                   Currently it gets called to much,
-                    and can't support weapons that have limited uses (like guns).
 ============
 */
 void G_LoadPlayer(int clientNum, const char *inModelName)
 {
     char *p;
     char model[MAX_QPATH];
+    char filename[MAX_QPATH];
     gentity_t *ent;
     gclient_t *client;
     bg_playercfg_t *playercfg;
     weapon_t oldDefault;
+#ifdef IOQ3ZTM // PLAYER_DIR
+	int i;
+#endif
 
 	ent = &g_entities[clientNum];
 	client = ent->client;
@@ -798,7 +795,74 @@ void G_LoadPlayer(int clientNum, const char *inModelName)
 		*p = 0;
 	}
 
-	// load animation.cfg
+#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+	// Load model tags
+#ifdef IOQ3ZTM // PLAYER_DIR
+	for (i = 0; bg_playerDirs[i] != NULL; i++)
+	{
+		if (i == 0 || !client->pers.torsoTags)
+		{
+			Com_sprintf( filename, sizeof( filename ), "%s/%s/upper.md3", bg_playerDirs[i], model );
+			client->pers.torsoTags = trap_RegisterTags(filename);
+		}
+		if (i == 0 || !client->pers.legsTags)
+		{
+			Com_sprintf( filename, sizeof( filename ), "%s/%s/lower.md3", bg_playerDirs[i], model );
+			client->pers.legsTags = trap_RegisterTags(filename);
+		}
+	}
+
+	// Server doesn't have the player,,, fall back to DEFAULT_MODEL
+	if (!client->pers.torsoTags)
+	{
+		client->pers.torsoTags = trap_RegisterTags("models/players/raph/upper.md3");
+	}
+	if (!client->pers.legsTags)
+	{
+		client->pers.legsTags = trap_RegisterTags("models/players/raph/lower.md3");
+	}
+#else
+	Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", model );
+	client->pers.torsoTags = trap_RegisterTags(filename);
+	if (!client->pers.torsoTags)
+	{
+		client->pers.torsoTags = trap_RegisterTags("models/players/raph/upper.md3");
+	}
+
+	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", model );
+	client->pers.legsTags = trap_RegisterTags(filename);
+	if (!client->pers.legsTags)
+	{
+		client->pers.legsTags = trap_RegisterTags("models/players/raph/lower.md3");
+	}
+#endif
+#endif
+
+
+	// Check if player has really changed!
+#ifdef IOQ3ZTM // PLAYER_DIR
+	for (i = 0; bg_playerDirs[i] != NULL; i++)
+	{
+		Com_sprintf( filename, sizeof( filename ), "%s/%s/animation.cfg", bg_playerDirs[i], model );
+		if ( Q_stricmpn(model, playercfg->filename, MAX_QPATH) == 0 ) {
+			// no change
+			return;
+		}
+	}
+#else
+	Com_sprintf( filename, sizeof( filename ), "models/players/%s/animation.cfg", model );
+	if ( Q_stricmpn(model, playercfg->filename, MAX_QPATH) == 0 ) {
+		// no change
+		return;
+	}
+	Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/animation.cfg", model );
+	if ( Q_stricmpn(model, playercfg->filename, MAX_QPATH) == 0 ) {
+		// no change
+		return;
+	}
+#endif
+
+	// Load animation.cfg
 	if (!model[0] || !BG_LoadPlayerCFGFile(model, playercfg))
 	{
 		G_Printf("G_LoadPlayer: Loading player failed (%s)\n", inModelName);
@@ -833,6 +897,7 @@ void G_LoadPlayer(int clientNum, const char *inModelName)
 	{
 		// GUNS_AS_DEFAULT
 #if 1
+		// unlimited ammo so nobody can "cheat" the ammo system...
 		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = -1;
 #else
 		// Guns are cheatable, for now anyway.
@@ -1311,8 +1376,10 @@ void ClientSpawn(gentity_t *ent) {
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
 
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	// always clear the kamikaze flag
 	ent->s.eFlags &= ~EF_KAMIKAZE;
+#endif
 
 	// toggle the teleport bit so the client knows to not lerp
 	// and never clear the voted flag
@@ -1389,7 +1456,7 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 
 #ifdef SP_NPC
-	ent->slow_event=level.time+1000;
+	ent->slow_event = level.time + 1000;
 #endif
 
 #ifdef TMNTHOLDSYS
@@ -1397,7 +1464,7 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 #ifdef TMNTWEAPSYS // Turtle Man: Respawn code. Start with default weapon. Set ammo values.
 	// Set default weapon
-#if defined TMNTPLAYERSYS && TMNTPLAYERS
+#if defined TMNTPLAYERSYS// && defined TMNTWEAPSYS
 	client->ps.stats[STAT_DEFAULTWEAPON] = client->pers.playercfg.default_weapon;
 #else
 	client->ps.stats[STAT_DEFAULTWEAPON] = DEFAULT_DEFAULT_WEAPON;
@@ -1485,7 +1552,7 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.ammo[WP_GRAPPLING_HOOK] = -1;
 #endif
 
-#ifdef TMNT // no health countdown
+#ifdef TMNTMISC // no health countdown
 	ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH];
 #else
 	// health will count down towards max_health
@@ -1504,6 +1571,9 @@ void ClientSpawn(gentity_t *ent) {
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 
 	} else {
+#ifdef TMNTSP
+		// Turtle Man: FIXME: Disable telefraging to Single Player?
+#endif
 		G_KillBox( ent );
 		trap_LinkEntity (ent);
 
@@ -1511,6 +1581,8 @@ void ClientSpawn(gentity_t *ent) {
 #ifdef TMNTWEAPSYS // Turtle Man: Set ready weapon to default weapon.
 		// Turtle Man: Start with default weapon.
 		client->ps.weapon = client->ps.stats[STAT_DEFAULTWEAPON];
+		// Set default hands.
+		client->ps.weaponHands = BG_WeaponHandsForWeaponNum(client->ps.stats[STAT_DEFAULTWEAPON]);
 #else
 		client->ps.weapon = WP_MACHINEGUN;
 #endif
@@ -1624,9 +1696,11 @@ void ClientDisconnect( int clientNum ) {
 		TossClientItems( ent );
 #ifdef MISSIONPACK
 		TossClientPersistantPowerups( ent );
+#ifdef MISSIONPACK_HARVESTER
 		if( g_gametype.integer == GT_HARVESTER ) {
 			TossClientCubes( ent );
 		}
+#endif
 #endif
 
 	}
@@ -1772,7 +1846,9 @@ void G_SavePersistant(char *nextmap)
 				savedata[i] = '/';
 		}
 
+#ifndef TMNTRELEASE
 		G_Printf("DEBUG: Savedata=%s\n", savedata);
+#endif
 		trap_Cvar_Set(va("g_spSaveData%i", i), savedata);
 		savedata[0] = '\0';
 	}
@@ -1809,7 +1885,9 @@ void G_LoadPersistant(void)
 		if (savedata[i] == '/')
 			savedata[i] = '\\';
 	}
+#ifndef TMNTRELEASE
 	G_Printf("DEBUG: Savedata=%s\n", savedata);
+#endif
 
 	s = Info_ValueForKey(config, "map");
 	trap_Cvar_VariableStringBuffer( "mapname", currentMap, sizeof(currentMap) );
@@ -1847,6 +1925,7 @@ void G_LoadPersistant(void)
 
 		// name is used to restore playerdata
 		// Turtle Man: FIXME: what if player changes there name at intermission?
+		//                    Do the clients stay in the same indexes?
 		s = Info_ValueForKey(config, "n");
 		for (i = 0; i < level.maxclients; i++)
 		{
@@ -1860,7 +1939,9 @@ void G_LoadPersistant(void)
 		}
 		if (i < level.maxclients)
 		{
+#ifndef TMNTRELEASE
 			G_Printf("DEBUG: LOADING SP DATA FOR %s\n", s);
+#endif
 			// Found client.
 			//s = Info_ValueForKey(config, "livs");
 			client->ps.persistant[PERS_SCORE] = atoi(Info_ValueForKey(config, "scr"));

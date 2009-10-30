@@ -564,7 +564,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[2] = color[2];
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
-#ifdef TMNT
+#ifdef TMNTDATA
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, uis.charsetProp );
 #else
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, uis.charsetPropGlow );

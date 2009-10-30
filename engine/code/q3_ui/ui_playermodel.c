@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODEL_FRAMEL		"menu/art/frame1_l"
 #define MODEL_FRAMER		"menu/art/frame1_r"
 #define MODEL_PORTS			"menu/art/player_models_ports"
-#ifdef TMNT
+#ifdef TMNTDATASYS
 #define MODEL_ARROWS		"menu/art/arrows_horz_0"
 #define MODEL_ARROWSL		"menu/art/arrows_horz_left"
 #define MODEL_ARROWSR		"menu/art/arrows_horz_right"
@@ -190,7 +190,7 @@ static void PlayerModel_UpdateModel( void )
 	VectorClear( moveangles );
 
 	UI_PlayerInfo_SetModel( &s_playermodel.playerinfo, s_playermodel.modelskin );
-#ifdef TMNT // TMNTWEAPSYS
+#ifdef TMNTWEAPSYS
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, s_playermodel.playerinfo.weapon, qfalse );
 #else
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, WP_MACHINEGUN, qfalse );
@@ -430,7 +430,11 @@ static void PlayerModel_BuildList( void )
 			continue;
 			
 		// iterate all skin files in directory
+#ifdef IOQ3ZTM // Turtle Man: TODO: Is there a better way to list all image files? (tga/png/jpg/Ect.)
+		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "", filelist, 2048 );
+#else
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );
+#endif
 		fileptr  = filelist;
 		for (j=0; j<numfiles && s_playermodel.nummodels < MAX_PLAYERMODELS;j++,fileptr+=filelen+1)
 		{
@@ -588,7 +592,7 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.pics[k].width  		   = 64;
 			s_playermodel.pics[k].height  		   = 64;
 			s_playermodel.pics[k].focuspic         = MODEL_SELECTED;
-#ifndef TMNT
+#ifndef TMNTDATASYS
 			s_playermodel.pics[k].focuscolor       = colorRed;
 #endif
 
@@ -605,7 +609,7 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.picbuttons[k].width  		     = 128;
 			s_playermodel.picbuttons[k].height  		 = 128;
 			s_playermodel.picbuttons[k].focuspic  		 = MODEL_SELECT;
-#ifndef TMNT
+#ifndef TMNTDATASYS
 			s_playermodel.picbuttons[k].focuscolor  	 = colorRed;
 #endif
 
@@ -651,7 +655,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.arrows.generic.flags		= QMF_INACTIVE;
 	s_playermodel.arrows.generic.x			= 125;
 	s_playermodel.arrows.generic.y			= 340;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	s_playermodel.arrows.width				= MODEL_ARROWS_WIDTH;
 	s_playermodel.arrows.height				= MODEL_ARROWS_HEIGHT;
 #else
@@ -665,7 +669,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.left.generic.id			= ID_PREVPAGE;
 	s_playermodel.left.generic.x			= 125;
 	s_playermodel.left.generic.y			= 340;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	s_playermodel.left.width  				= MODEL_ARROWS_WIDTH/2;
 	s_playermodel.left.height  				= MODEL_ARROWS_HEIGHT;
 #else
@@ -678,13 +682,13 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_playermodel.right.generic.callback	= PlayerModel_MenuEvent;
 	s_playermodel.right.generic.id			= ID_NEXTPAGE;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	s_playermodel.right.generic.x			= 125+MODEL_ARROWS_WIDTH/2;
 #else
 	s_playermodel.right.generic.x			= 125+61;
 #endif
 	s_playermodel.right.generic.y			= 340;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	s_playermodel.right.width  				= MODEL_ARROWS_WIDTH/2;
 	s_playermodel.right.height  			= MODEL_ARROWS_HEIGHT;
 #else

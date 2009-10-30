@@ -1333,9 +1333,9 @@ static void PM_CheckDuck (void)
 
 	if (pm->ps->pm_type == PM_DEAD)
 	{
-#if 0 //#ifdef TMNTPLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 		if (pm->playercfg)
-			pm->maxs[2] = -8; // Turtle Man: CHANGEME?
+			pm->maxs[2] = pm->playercfg->bbmaxs[2] - 40;
 		else
 #endif
 		pm->maxs[2] = -8;
@@ -1368,7 +1368,7 @@ static void PM_CheckDuck (void)
 	{
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 		if (pm->playercfg)
-			pm->maxs[2] = pm->playercfg->bbmaxs[2] / 2.0f;
+			pm->maxs[2] = pm->playercfg->bbmaxs[2] / 2;
 		else
 #endif
 		pm->maxs[2] = 16;
@@ -1563,15 +1563,18 @@ static void PM_BeginWeaponChange( int weapon ) {
 	PM_AddEvent( EV_CHANGE_WEAPON );
 	pm->ps->weaponstate = WEAPON_DROPPING;
 	pm->ps->weaponTime += 200;
-#ifdef TMNTPLAYERS
+#ifdef TMNTPLAYERS // WEAPONS
 	if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
 	{
-		if (pm->ps->powerups[PW_BLUEFLAG] > 0 || pm->ps->powerups[PW_REDFLAG] > 0
-			|| pm->ps->powerups[PW_NEUTRALFLAG] > 0)
+		if (pm->ps->weaponHands == HAND_PRIMARY)
 		{
 			PM_StartTorsoAnim( TORSO_PUTDEFAULT_PRIMARY );
 		}
-		else
+		else if (pm->ps->weaponHands == HAND_SECONDARY)
+		{
+			PM_StartTorsoAnim( TORSO_PUTDEFAULT_SECONDARY );
+		}
+		else if (pm->ps->weaponHands == HAND_BOTH)
 		{
 			PM_StartTorsoAnim( TORSO_PUTDEFAULT_BOTH );
 		}
@@ -1579,7 +1582,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 	else
 	{
 	PM_StartTorsoAnim( TORSO_DROP );
-}
+	}
 #else
 	PM_StartTorsoAnim( TORSO_DROP );
 #endif
@@ -1612,15 +1615,21 @@ static void PM_FinishWeaponChange( void ) {
 	pm->ps->weapon = weapon;
 	pm->ps->weaponstate = WEAPON_RAISING;
 	pm->ps->weaponTime += 250;
-#ifdef TMNTPLAYERS
+#ifdef TMNTWEAPSYS
+	pm->ps->weaponHands = BG_WeaponHandsForPlayerState(pm->ps);
+#endif
+#ifdef TMNTPLAYERS // WEAPONS
 	if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
 	{
-		if (pm->ps->powerups[PW_BLUEFLAG] > 0 || pm->ps->powerups[PW_REDFLAG] > 0
-			|| pm->ps->powerups[PW_NEUTRALFLAG] > 0)
+		if (pm->ps->weaponHands == HAND_PRIMARY)
 		{
 			PM_StartTorsoAnim( TORSO_GETDEFAULT_PRIMARY );
 		}
-		else
+		else if (pm->ps->weaponHands == HAND_SECONDARY)
+		{
+			PM_StartTorsoAnim( TORSO_GETDEFAULT_SECONDARY );
+		}
+		else if (pm->ps->weaponHands == HAND_BOTH)
 		{
 			PM_StartTorsoAnim( TORSO_GETDEFAULT_BOTH );
 		}
@@ -1628,12 +1637,121 @@ static void PM_FinishWeaponChange( void ) {
 	else
 	{
 	PM_StartTorsoAnim( TORSO_RAISE );
-}
+	}
 #else
 	PM_StartTorsoAnim( TORSO_RAISE );
 #endif
 }
 
+#ifdef TMNTPLAYERS // WEAPONS
+/*
+===============
+PM_BeginWeaponChange
+
+hands = 0 = can't attack, caring a object over head?
+hands = 1 = primary only
+hands = 2 = secondary only
+hands = 3 = primary and secondary.
+
+===============
+*/
+static void PM_BeginWeaponHandsChange( int hands ) {
+	int last_hands;
+
+	if ( hands < HAND_NONE || hands > HAND_BOTH ) {
+		return;
+	}
+
+	if ( pm->ps->weaponstate == WEAPON_DROPPING
+		|| pm->ps->weaponstate == WEAPON_HAND_CHANGE ) {
+		return;
+	}
+
+	if (hands == pm->ps->weaponHands) {
+		// no change
+		return;
+	}
+
+	PM_AddEvent( EV_CHANGE_WEAPON ); // Play change sound here?
+	pm->ps->weaponstate = WEAPON_HAND_CHANGE;
+	pm->ps->weaponTime += 200;
+	last_hands = pm->ps->weaponHands;
+
+	// Store hands to be set in PM_FinishWeaponHandsChange
+	pm->ps->stats[STAT_NEW_WEAPON_HANDS] = hands;
+
+	if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
+	{
+		// Turtle Man: FIXME: Should this always over ride?...
+		pm->ps->torsoTimer = 0;
+
+		// both hands
+		if (last_hands == HAND_BOTH && hands == HAND_NONE)
+		{
+			PM_StartTorsoAnim( TORSO_PUTDEFAULT_BOTH );
+		}
+		else if (last_hands == HAND_NONE && hands == HAND_BOTH)
+		{
+			PM_StartTorsoAnim( TORSO_GETDEFAULT_BOTH );
+		}
+		// primary hand
+		else if (last_hands == HAND_BOTH && hands == HAND_SECONDARY)
+		{
+			PM_StartTorsoAnim( TORSO_PUTDEFAULT_PRIMARY );
+		}
+		else if (last_hands == HAND_SECONDARY && hands == HAND_BOTH)
+		{
+			PM_StartTorsoAnim( TORSO_GETDEFAULT_PRIMARY );
+		}
+		// secondary hand
+		else if (last_hands == HAND_BOTH && hands == HAND_PRIMARY)
+		{
+			PM_StartTorsoAnim( TORSO_PUTDEFAULT_SECONDARY );
+		}
+		else if (last_hands == HAND_PRIMARY && hands == HAND_BOTH)
+		{
+			PM_StartTorsoAnim( TORSO_GETDEFAULT_SECONDARY );
+		}
+		else
+		{
+			// Turtle Man: Shouldn't happen.
+			Com_Printf("PM_BeginDefaultWeaponChange: Bad hands; last_hands=%i, hands=%i\n", last_hands, hands);
+		}
+
+		pm->ps->torsoTimer = 200;
+	}
+	else
+	{
+		// Turtle Man: FIXME: Render the "pickup weapon" secondary weapon somewhere on the player!
+		PM_StartTorsoAnim( TORSO_DROP );
+	}
+}
+
+
+/*
+===============
+PM_FinishWeaponHandsChange
+===============
+*/
+static void PM_FinishWeaponHandsChange( void ) {
+
+	// Reusing WEAPON_RAISING should be okay here.
+	pm->ps->weaponstate = WEAPON_RAISING;
+	pm->ps->weaponTime += 250;
+
+	pm->ps->weaponHands = pm->ps->stats[STAT_NEW_WEAPON_HANDS];
+
+	if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
+	{
+		// Just let the animation run.
+		pm->ps->torsoTimer += 250;
+	}
+	else
+	{
+		PM_StartTorsoAnim( TORSO_RAISE );
+	}
+}
+#endif
 
 /*
 ==============
@@ -1657,15 +1775,9 @@ static void PM_TorsoAnimation( void ) {
 }
 
 #ifdef TMNTHOLDSYS
-// Turtle Man: FIXME: Doesn't work when TMNTHOLDSYS2 is defined.
-//        This is do to holdableSelect having its own holdable index, which is sent each frame (cmd.holdable).
-//         and with noway to change it from the BG code, it will have to be done to Cgame.
-//         OR add STAT_WANTHOLDABLE to replace holdableSelect.
 static void PM_NextHoldable(void)
 {
 	int i, original;
-
-	//pm->ps->pm_flags |= PMF_NEXT_ITEM_HELD;
 
 	// Change to the next valid holdable item.
 	original = pm->ps->holdableIndex;
@@ -1677,7 +1789,11 @@ static void PM_NextHoldable(void)
 		}
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
-		if (pm->ps->holdableIndex == HI_KAMIKAZE || pm->ps->holdableIndex == HI_PORTAL
+		if (
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+		pm->ps->holdableIndex == HI_KAMIKAZE ||
+#endif
+		pm->ps->holdableIndex == HI_PORTAL
 #ifndef TMNT // POWERS
 			|| pm->ps->holdableIndex == HI_INVULNERABILITY
 #endif
@@ -1695,8 +1811,6 @@ static void PM_NextHoldable(void)
 		// None are valid so use none.
 		pm->ps->holdableIndex = HI_NONE;
 	}
-	// Override cmd, doesn't work...
-	//pm->cmd.holdable = pm->ps->holdableIndex;
 }
 #endif
 
@@ -1722,62 +1836,13 @@ static void PM_Weapon( void ) {
 
 	// check for dead player
 	if ( pm->ps->stats[STAT_HEALTH] <= 0 ) {
-#ifdef TMNTPLAYERS
-		pm->ps->stats[STAT_FLAGTIME] = 0;
-#endif
 		pm->ps->weapon = WP_NONE;
 		return;
 	}
 
-#if 0 //#ifdef TMNTPLAYERS // Turtle Man: FIXME: Flag pickup! --breaks weapons.
-	if (pm->ps->stats[STAT_FLAGTIME] > 0)
-	{
-		pm->ps->stats[STAT_FLAGTIME] -= pml.msec;
-		if (pm->ps->stats[STAT_FLAGTIME] < 0 )
-			pm->ps->stats[STAT_FLAGTIME] = 0;
-	}
-	else if (pm->ps->stats[STAT_FLAGTIME] < 0)
-	{
-		pm->ps->stats[STAT_FLAGTIME] += pml.msec;
-		if (pm->ps->stats[STAT_FLAGTIME] > 0 )
-			pm->ps->stats[STAT_FLAGTIME] = 0;
-	}
-
-	// Pickup flag!
-	if (pm->ps->stats[STAT_FLAGTIME] <= 0 && (pm->ps->stats[PW_BLUEFLAG] > 0
-		|| pm->ps->stats[PW_REDFLAG] > 0 || pm->ps->stats[PW_NEUTRALFLAG] > 0))
-	{
-		pm->ps->stats[STAT_FLAGTIME] = FLAG_CHANGE_TIME;
-		pm->ps->weaponTime += FLAG_CHANGE_TIME;
-	}
-	// Drop flag!
-	else if (pm->ps->stats[STAT_FLAGTIME] >= 0 && !(pm->ps->stats[PW_BLUEFLAG] > 0
-		|| pm->ps->stats[PW_REDFLAG] > 0 || pm->ps->stats[PW_NEUTRALFLAG] > 0))
-	{
-		pm->ps->stats[STAT_FLAGTIME] = -FLAG_CHANGE_TIME;
-		pm->ps->weaponTime += FLAG_CHANGE_TIME;
-	}
-
-	// Check for pickup/dropping CTF flags!
-	if ( pm->ps->stats[STAT_FLAGTIME] > 0
-		&& pm->ps->weapon == pm->ps->stats[STAT_DEFAULTWEAPON])
-	{
-		// picked up flag
-		PM_ContinueTorsoAnim( TORSO_PUTDEFAULT_SECONDARY );
-	}
-	else if (pm->ps->stats[STAT_FLAGTIME] < 0
-		&& pm->ps->weapon == pm->ps->stats[STAT_DEFAULTWEAPON])
-	{
-		// dropped flag
-		PM_ContinueTorsoAnim( TORSO_GETDEFAULT_SECONDARY );
-	}
-#endif
-
 #ifdef TMNTHOLDSYS
-#ifdef TMNTHOLDSYS2
-	pm->ps->holdableIndex = pm->cmd.holdable;
-#elif defined TMNTHOLDSYS2BOT
-	if (pm->cmd.holdable > 0) // Turtle Man: FIXME: Only for bots
+#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+	if (pm->cmd.holdable > 0)
 	{
 		pm->ps->holdableIndex = pm->cmd.holdable;
 	}
@@ -1867,6 +1932,26 @@ static void PM_Weapon( void ) {
 			PM_BeginWeaponChange( pm->cmd.weapon );
 		}
 #endif
+#ifdef TMNTPLAYERS // WEAPONS
+		// Just check the ones we can do it in?
+		if (pm->ps->weaponstate != WEAPON_DROPPING
+			&& pm->ps->weaponstate != WEAPON_HAND_CHANGE)
+		{
+#if 1
+			int hands = BG_WeaponHandsForPlayerState(pm->ps);
+			if (pm->ps->weaponHands != hands)
+			{
+				PM_BeginWeaponHandsChange(hands);
+			}
+#else
+			if ((pm->ps->stats[PW_BLUEFLAG] > 0 || pm->ps->stats[PW_REDFLAG] > 0
+				|| pm->ps->stats[PW_NEUTRALFLAG] > 0) && (pm->ps->weaponHands & HAND_SECONDARY))
+			{
+				PM_BeginWeaponHandsChange(HAND_PRIMARY);
+			}
+#endif
+		}
+#endif
 	}
 
 	if ( pm->ps->weaponTime > 0 ) {
@@ -1929,6 +2014,13 @@ static void PM_Weapon( void ) {
 #endif
 		return;
 	}
+
+#ifdef TMNTPLAYERS // WEAPONS
+	if ( pm->ps->weaponstate == WEAPON_HAND_CHANGE ) {
+		PM_FinishWeaponHandsChange();
+		return;
+	}
+#endif
 
 #ifdef TMNTWEAPSYS // Turtle Man: Weapon type code.
 	// MELEEATTACK
@@ -2373,7 +2465,7 @@ void PmoveSingle (pmove_t *pmove) {
 
 	PM_DropTimers();
 
-#ifdef TMNTPLAYERS
+#ifdef TMNTPLAYERSYS
     // Setup accelerates based on the per-player one.
     if (pm->playercfg)
 		pm_accelerate = pm->playercfg->accelerate_speed;

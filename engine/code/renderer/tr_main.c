@@ -1211,14 +1211,32 @@ void R_AddEntitySurfaces (void) {
 		// preshift the value we are going to OR into the drawsurf sort
 		tr.shiftedEntityNum = tr.currentEntityNum << QSORT_ENTITYNUM_SHIFT;
 
+#ifdef IOQ3ZTM // RENDERFLAGS
+		//
+		// Check the flags to see if we should draw the model.
+		//
+		if ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
+		{
+			continue;
+		}
+#endif
+
 		//
 		// the weapon model must be handled special --
 		// we don't want the hacked weapon position showing in 
 		// mirrors, because the true body position will already be drawn
 		//
+#ifdef IOQ3ZTM // RENDERFLAGS
+		if (((ent->e.renderfx & RF_NOT_MIRROR) || (ent->e.renderfx & RF_FIRST_PERSON))
+				&& tr.viewParms.isPortal)
+		{
+			continue;
+		}
+#else
 		if ( (ent->e.renderfx & RF_FIRST_PERSON) && tr.viewParms.isPortal) {
 			continue;
 		}
+#endif
 
 		// simple generated models, like sprites and beams, are not culled
 		switch ( ent->e.reType ) {
@@ -1232,12 +1250,7 @@ void R_AddEntitySurfaces (void) {
 			// self blood sprites, talk balloons, etc should not be drawn in the primary
 			// view.  We can't just do this check for all entities, because md3
 			// entities may still want to cast shadows from them
-#ifdef IOQ3ZTM
-			if ( ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
-				|| ((ent->e.renderfx & RF_NOT_MIRROR) && tr.viewParms.isPortal)) {
-#else
 			if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
-#endif
 				continue;
 			}
 			shader = R_GetShaderByHandle( ent->e.customShader );
@@ -1265,21 +1278,10 @@ void R_AddEntitySurfaces (void) {
 					break;
 #endif
 				case MOD_BRUSH:
-#ifdef IOQ3ZTM
-					if ( ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
-						|| ((ent->e.renderfx & RF_NOT_MIRROR) && tr.viewParms.isPortal)) {
-						break;
-					}
-#endif
 					R_AddBrushModelSurfaces( ent );
 					break;
 				case MOD_BAD:		// null model axis
-#ifdef IOQ3ZTM
-					if ( ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
-						|| ((ent->e.renderfx & RF_NOT_MIRROR) && tr.viewParms.isPortal)) {
-#else
 					if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
-#endif
 						break;
 					}
 					shader = R_GetShaderByHandle( ent->e.customShader );

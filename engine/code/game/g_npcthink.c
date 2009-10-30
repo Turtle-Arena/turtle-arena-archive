@@ -608,7 +608,7 @@ void NPC_ThinkMove(gentity_t *ent,usercmd_t *ucmd)
 				}
 				else
 				{
-					// Turtle Man: TODO: TMNTPATHS, G_NextPath
+					// Turtle Man: TODO: TMNTPATHSYS, G_NextPath
 					VectorCopy(ent->nextTrain->s.pos.trBase,npc->obj);
 					ent->nextTrain=ent->nextTrain->nextTrain;
 				}

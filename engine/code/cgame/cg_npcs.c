@@ -216,10 +216,10 @@ static void CG_NPCAnimation( centity_t *cent, int *bodyOld, int *body, float *bo
 	ni = &cg_npcs[ npcNum ];
 
 
-//  CG_ClearLerpFrame is not yet used!!
+//  BG_ClearLerpFrame is not yet used!!
 
 
-	CG_RunLerpFrameNPC( &ni->animations[0], &cent->ne.body, es->modelindex2, 1.0 );
+	BG_RunLerpFrame( &cent->ne.body, &ni->animations[0], es->modelindex2, cg.time, 1.0 );
 
 	anim=es->modelindex2 & ~ANIM_TOGGLEBIT;
 	if (ni->sounds[anim].count)

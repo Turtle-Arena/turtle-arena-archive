@@ -298,12 +298,14 @@ void BotReportStatus(bot_state_t *bs) {
 			else strcpy(flagstatus, S_COLOR_BLUE"F ");
 		}
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		if (BotHarvesterCarryingCubes(bs)) {
 			if (BotTeam(bs) == TEAM_RED) Com_sprintf(flagstatus, sizeof(flagstatus), S_COLOR_RED"%2d", bs->inventory[INVENTORY_REDCUBE]);
 			else Com_sprintf(flagstatus, sizeof(flagstatus), S_COLOR_BLUE"%2d", bs->inventory[INVENTORY_BLUECUBE]);
 		}
 	}
+#endif
 #endif
 
 	switch(bs->ltgtype) {
@@ -368,11 +370,13 @@ void BotReportStatus(bot_state_t *bs) {
 			BotAI_Print(PRT_MESSAGE, "%-20s%s%s: attacking the enemy base\n", netname, leader, flagstatus);
 			break;
 		}
+#ifdef MISSIONPACK_HARVESTER
 		case LTG_HARVEST:
 		{
 			BotAI_Print(PRT_MESSAGE, "%-20s%s%s: harvesting\n", netname, leader, flagstatus);
 			break;
 		}
+#endif
 		default:
 		{
 			BotAI_Print(PRT_MESSAGE, "%-20s%s%s: roaming\n", netname, leader, flagstatus);
@@ -446,12 +450,14 @@ void BotSetInfoConfigString(bot_state_t *bs) {
 			strcpy(carrying, "F ");
 		}
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		if (BotHarvesterCarryingCubes(bs)) {
 			if (BotTeam(bs) == TEAM_RED) Com_sprintf(carrying, sizeof(carrying), "%2d", bs->inventory[INVENTORY_REDCUBE]);
 			else Com_sprintf(carrying, sizeof(carrying), "%2d", bs->inventory[INVENTORY_BLUECUBE]);
 		}
 	}
+#endif
 #endif
 
 	switch(bs->ltgtype) {
@@ -516,11 +522,13 @@ void BotSetInfoConfigString(bot_state_t *bs) {
 			Com_sprintf(action, sizeof(action), "attacking the enemy base");
 			break;
 		}
+#ifdef MISSIONPACK_HARVESTER
 		case LTG_HARVEST:
 		{
 			Com_sprintf(action, sizeof(action), "harvesting");
 			break;
 		}
+#endif
 		default:
 		{
 			trap_BotGetTopGoal(bs->gs, &goal);
@@ -1665,12 +1673,21 @@ int BotInitLibrary(void) {
 	trap_Cvar_VariableStringBuffer("fs_homepath", buf, sizeof(buf));
 	if (strlen(buf)) trap_BotLibVarSet("homedir", buf);
 	//
-#ifdef TMNT
-	trap_BotLibDefine("TMNT");
-
-	//trap_BotLibVarSet("offhandgrapple", "0"); // not needed?...
+#ifdef IOQ3ZTM // Turtle Man: Always sure these are correct...
 	trap_BotLibVarSet("weapindex_rocket", va("%i", WP_ROCKET_LAUNCHER));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", WP_GRAPPLING_HOOK));
+#endif
+#ifdef TMNT
+	trap_BotLibDefine("TMNT");
+#endif
+#ifdef TMNTWEAPONS
+	trap_BotLibDefine("TMNTWEAPONS");
+#endif
+#ifdef SONIC
+	trap_BotLibDefine("SONIC");
+#endif
+#ifdef SONICWEAPONS
+	trap_BotLibDefine("SONICWEAPONS");
 #endif
 #ifdef MISSIONPACK
 	trap_BotLibDefine("MISSIONPACK");

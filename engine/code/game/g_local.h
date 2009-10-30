@@ -197,7 +197,7 @@ struct gentity_s {
 	gentity_t	*parent;
 	gentity_t	*nextTrain;
 	gentity_t	*prevTrain;
-#ifdef TMNTPATHS
+#ifdef TMNTPATHSYS
 	int			pathflags;
 #endif
 	vec3_t		pos1, pos2;
@@ -208,7 +208,7 @@ struct gentity_s {
 
 	float		angle;			// set in editor, -1 = up, -2 = down
 	char		*target;
-#ifdef TMNTENTITIES
+#ifdef TMNTENTSYS
 	char		*paintarget;
 #endif
 	char		*targetname;
@@ -251,7 +251,7 @@ struct gentity_s {
 	gentity_t	*teamchain;		// next entity in team
 	gentity_t	*teammaster;	// master of the team
 
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	int			kamikazeTime;
 	int			kamikazeShockTime;
 #endif
@@ -351,6 +351,17 @@ typedef struct {
 	qboolean	teamInfo;			// send team overlay updates?
 #ifdef TMNTPLAYERSYS
     bg_playercfg_t playercfg;        // data loaded from animation.cfg
+#endif
+#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+	// loaded using trap_RegisterTags, used in trap_LerpTag
+	qhandle_t	torsoTags;
+	qhandle_t	legsTags;
+
+	// Used with ps.torsoAnim/legsAnim to find tag locations
+	lerpFrame_t torso, legs;
+
+	// Player axis, setup using G_PlayerAngles
+	vec3_t legsAxis[3], torsoAxis[3], headAxis[3];
 #endif
 } clientPersistant_t;
 
@@ -575,7 +586,7 @@ void SaveRegisteredItems( void );
 //
 int G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
-#ifdef TMNT // Particles
+#ifdef TMNTMISC // Particles
 int G_ParticleAreaIndex( char *str );
 #endif
 void	G_TeamCommand( team_t team, char *cmd );
@@ -583,7 +594,7 @@ void	G_KillBox (gentity_t *ent);
 gentity_t *G_Find (gentity_t *from, int fieldofs, const char *match);
 gentity_t *G_PickTarget (char *targetname);
 void	G_UseTargets (gentity_t *ent, gentity_t *activator);
-#ifdef TMNTENTITIES
+#ifdef TMNTENTSYS
 void	G_UseTargets2(gentity_t *ent, gentity_t *activator, const char *target);
 #endif
 void	G_SetMovedir ( vec3_t angles, vec3_t movedir);
@@ -611,7 +622,7 @@ const char *BuildShaderStateConfig( void );
 
 #ifdef TMNTWEAPONS
 gentity_t *G_FindRadius(gentity_t *from, vec3_t org, float rad);
-qboolean G_Visible( gentity_t *ent1, gentity_t *ent2 );
+qboolean G_Visible(gentity_t *ent1, gentity_t *ent2);
 #endif
 
 //
@@ -707,7 +718,7 @@ void SnapVectorTowards( vec3_t v, vec3_t to );
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable);
 #endif
 #ifdef TMNTWEAPSYS // MELEEATTACK
-qboolean G_MeleeAttack( gentity_t *ent );
+qboolean G_MeleeAttack( gentity_t *ent, qboolean nodamage );
 void G_StartMeleeAttack(gentity_t *ent);
 #endif
 #ifndef TMNTWEAPONS
@@ -751,7 +762,7 @@ qboolean G_FilterPacket (char *from);
 // g_weapon.c
 //
 void FireWeapon( gentity_t *ent );
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 void G_StartKamikaze( gentity_t *ent );
 #endif
 
@@ -876,11 +887,11 @@ void BotInterbreedEndMatch( void );
 //
 // g_savestate.c
 //
-void G_LoadGame(fileHandle_t f);
+void G_LoadGame(fileHandle_t f, int map_loaded);
 qboolean G_SaveGame(fileHandle_t f);
 #endif
 
-#ifdef TMNTPATHS
+#ifdef TMNTPATHSYS
 //
 // g_paths.c
 //
@@ -1043,6 +1054,12 @@ qboolean	trap_GetEntityToken( char *buffer, int bufferSize );
 
 int		trap_DebugPolygonCreate(int color, int numPoints, vec3_t *points);
 void	trap_DebugPolygonDelete(int id);
+
+#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+qhandle_t trap_RegisterTags( const char *name );
+int trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
+					   float frac, const char *tagName );
+#endif
 
 int		trap_BotLibSetup( void );
 int		trap_BotLibShutdown( void );

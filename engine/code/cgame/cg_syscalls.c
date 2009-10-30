@@ -329,7 +329,7 @@ qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return syscall( CG_GETUSERCMD, cmdNumber, ucmd );
 }
 
-#if defined TMNTHOLDSYS && !defined TMNTWEAPSYS2 // Turtle Man: MULTIHOLDABLE
+#if defined TMNTHOLDSYS2 && !defined TMNTWEAPSYS2
 void		trap_SetUserCmdValue( int stateValue, int holdableStateValue, float sensitivityScale ) {
 	syscall( CG_SETUSERCMDVALUE, stateValue, holdableStateValue, PASSFLOAT(sensitivityScale) );
 }

@@ -363,7 +363,7 @@ void FinishSpawningNPC( gentity_t *ent )
 
 	if (ent->target)
 	{
-#ifdef TMNTPATHS
+#ifdef TMNTPATHSYS
 		if (G_SetupPath(ent, ent->target) != PATH_ERROR)
 		{
 			// Path is ok to use.

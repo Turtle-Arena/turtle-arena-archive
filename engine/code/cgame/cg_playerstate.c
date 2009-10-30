@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
-#ifndef TMNTWEAPSYS // Turtle Man: No ammo warnings.
+#ifndef TMNTWEAPSYS2 // AMMO_WARNINGS
 /*
 ==============
 CG_CheckAmmo
@@ -414,10 +414,10 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("assist\n");
 	}
-#if !defined TMNT || !defined TMNTWEAPONS || !defined NOTRATEDM
+#if !defined TMNTMISC || !defined TMNTWEAPONS || !defined NOTRATEDM
 	// if any of the player event bits changed
 	if (ps->persistant[PERS_PLAYEREVENTS] != ops->persistant[PERS_PLAYEREVENTS]) {
-#ifndef TMNT
+#ifndef TMNTMISC
 		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD)) {
 			trap_S_StartLocalSound( cgs.media.deniedSound, CHAN_ANNOUNCER );

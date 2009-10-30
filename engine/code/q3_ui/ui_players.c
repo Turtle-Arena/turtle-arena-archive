@@ -94,7 +94,7 @@ tryagain:
 	}
 
 	if( pi->weaponModel == 0 ) {
-#if defined TMNTPLAYERSYS && defined TMNTPLAYERS
+#if defined TMNTPLAYERSYS && defined TMNTWEAPSYS
 		if( weaponNum == pi->playercfg.default_weapon ) {
 			weaponNum = WP_NONE;
 			goto tryagain;
@@ -355,14 +355,28 @@ static void UI_LegsSequencing( playerInfo_t *pi ) {
 UI_PositionEntityOnTag
 ======================
 */
+#ifdef TMNTPLAYERS
+static qboolean UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
+							clipHandle_t parentModel, char *tagName )
+#else
 static void UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
-							clipHandle_t parentModel, char *tagName ) {
+							clipHandle_t parentModel, char *tagName )
+#endif
+{
 	int				i;
 	orientation_t	lerped;
 	
 	// lerp the tag
+#ifdef TMNTPLAYERS
+	if (!trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+		1.0 - parent->backlerp, tagName ))
+	{
+		return qfalse;
+	}
+#else
 	trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
+#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -373,6 +387,9 @@ static void UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 	// cast away const because of compiler problems
 	MatrixMultiply( lerped.axis, ((refEntity_t*)parent)->axis, entity->axis );
 	entity->backlerp = parent->backlerp;
+#ifdef TMNTPLAYERS
+	return qtrue;
+#endif
 }
 
 
@@ -403,6 +420,7 @@ static void UI_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_
 }
 
 
+#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 /*
 ===============
 UI_SetLerpFrameAnimation
@@ -489,6 +507,7 @@ static void UI_RunLerpFrame( playerInfo_t *ci, lerpFrame_t *lf, int newAnimation
 		lf->backlerp = 1.0 - (float)( dp_realtime - lf->oldFrameTime ) / ( lf->frameTime - lf->oldFrameTime );
 	}
 }
+#endif
 
 
 /*
@@ -508,9 +527,29 @@ static void UI_PlayerAnimation( playerInfo_t *pi, int *legsOld, int *legs, float
 	UI_LegsSequencing( pi );
 
 	if ( pi->legs.yawing && ( pi->legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE ) {
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+		BG_RunLerpFrame( &pi->legs,
+#ifdef TMNTPLAYERSYS
+			pi->playercfg.animations,
+#else
+			pi->animations,
+#endif
+			LEGS_TURN, dp_realtime, 1.0f );
+#else
 		UI_RunLerpFrame( pi, &pi->legs, LEGS_TURN );
+#endif
 	} else {
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+		BG_RunLerpFrame( &pi->legs,
+#ifdef TMNTPLAYERSYS
+			pi->playercfg.animations,
+#else
+			pi->animations,
+#endif
+			pi->legsAnim, dp_realtime, 1.0f );
+#else
 		UI_RunLerpFrame( pi, &pi->legs, pi->legsAnim );
+#endif
 	}
 	*legsOld = pi->legs.oldFrame;
 	*legs = pi->legs.frame;
@@ -524,7 +563,17 @@ static void UI_PlayerAnimation( playerInfo_t *pi, int *legsOld, int *legs, float
 
 	UI_TorsoSequencing( pi );
 
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+	BG_RunLerpFrame( &pi->torso,
+#ifdef TMNTPLAYERSYS
+		pi->playercfg.animations,
+#else
+		pi->animations,
+#endif
+		pi->torsoAnim, dp_realtime, 1.0f );
+#else
 	UI_RunLerpFrame( pi, &pi->torso, pi->torsoAnim );
+#endif
 	*torsoOld = pi->torso.oldFrame;
 	*torso = pi->torso.frame;
 	*torsoBackLerp = pi->torso.backlerp;
@@ -898,12 +947,8 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		memset( &gun, 0, sizeof(gun) );
 		gun.hModel = pi->weaponModel;
 		VectorCopy( origin, gun.lightingOrigin );
-#ifdef TMNT_SUPPORTQ3 // TOOD: Support "tag_hand_primary" here too
-		/*if (1)
-		{
-			UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary");
-		}
-		else*/
+#ifdef TMNT_SUPPORTQ3
+		if (!UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary"))
 		{
 		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
 		}
@@ -922,12 +967,8 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 
 		if (gun_left.hModel)
 		{
-#ifdef TMNT_SUPPORTQ3 // TOOD: Support "tag_hand_primary" here too
-			/*if (1)
-			{
-				//UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary");
-	}
-			else*/
+#ifdef TMNT_SUPPORTQ3
+			if (!UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_hand_primary"))
 			{
 				UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_flag");
 			}
@@ -997,7 +1038,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	// add the chat icon
 	//
 	if ( pi->chat ) {
-#ifdef TMNT // shaders
+#ifdef TMNTDATASYS
 		UI_PlayerFloatSprite( pi, origin, trap_R_RegisterShaderNoMip( "sprites/talkBalloon" ) );
 #else
 		UI_PlayerFloatSprite( pi, origin, trap_R_RegisterShaderNoMip( "sprites/balloon3" ) );
@@ -1179,6 +1220,11 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 	char		skinName[MAX_QPATH];
 	char		filename[MAX_QPATH];
 	char		*slash;
+#ifdef IOQ3ZTM // PLAYER_DIR
+	int			i;
+
+	char *headModelName = modelName;
+#endif
 
 	pi->torsoModel = 0;
 	pi->headModel = 0;
@@ -1201,6 +1247,69 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 
 	// load cmodels before models so filecache works
 
+#ifdef IOQ3ZTM // PLAYER_DIR // Same code in CG_RegisterClientModelname and missionpack ui
+	for (i=0; bg_playerDirs[i] != NULL; i++)
+	{
+		if (i == 0 || !pi->legsModel)
+		{
+			Com_sprintf( filename, sizeof( filename ), "%s/%s/lower.md3", bg_playerDirs[i], modelName );
+			pi->legsModel = trap_R_RegisterModel( filename );
+		}
+		if (i == 0 || !pi->torsoModel )
+		{
+			Com_sprintf( filename, sizeof( filename ), "%s/%s/upper.md3", bg_playerDirs[i], modelName );
+			pi->torsoModel = trap_R_RegisterModel( filename );
+		}
+	}
+
+	// failed?
+	if ( !pi->legsModel ) {
+		Com_Printf( "Failed to load model file %s\n", filename );
+		return qfalse;
+	}
+	if ( !pi->torsoModel ) {
+		Com_Printf( "Failed to load model file %s\n", filename );
+		return qfalse;
+	}
+
+	// load head model
+	pi->headModel = 0;
+
+	if (headModelName[0] == '*' ) {
+		Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/%s.md3", &headModelName[1], &headModelName[1] );
+		pi->headModel = trap_R_RegisterModel( filename );
+	}
+
+	if (!pi->headModel)
+	{
+		for (i=0; bg_playerDirs[i] != NULL; i++)
+		{
+			if (headModelName[0] == '*')
+			{
+				Com_sprintf( filename, sizeof( filename ), "%s/%s/head.md3", bg_playerDirs[i], &headModelName[1] );
+			}
+			else
+			{
+				Com_sprintf( filename, sizeof( filename ), "%s/%s/head.md3", bg_playerDirs[i], headModelName );
+			}
+			pi->headModel = trap_R_RegisterModel( filename );
+			if (pi->headModel)
+			{
+				break;
+			}
+		}
+	}
+
+	if ( !pi->headModel && headModelName[0] != '*') {
+		Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/%s.md3", headModelName, headModelName );
+		pi->headModel = trap_R_RegisterModel( filename );
+	}
+
+	if (!pi->headModel) {
+		Com_Printf( "Failed to load model file %s\n", filename );
+		return qfalse;
+	}
+#else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", modelName );
 	pi->legsModel = trap_R_RegisterModel( filename );
 	if ( !pi->legsModel ) {
@@ -1221,6 +1330,7 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
 	}
+#endif
 
 	// if any skins failed to load, fall back to default
 	if ( !UI_RegisterClientSkin( pi, modelName, skinName ) ) {
@@ -1253,7 +1363,7 @@ UI_PlayerInfo_SetModel
 void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model ) {
 	memset( pi, 0, sizeof(*pi) );
 	UI_RegisterClientModelname( pi, model );
-#if defined TMNTPLAYERSYS && defined TMNTPLAYERS
+#if defined TMNTPLAYERSYS && defined TMNTWEAPSYS
 	pi->weapon = pi->playercfg.default_weapon;
 #elif defined TMNTWEAPONS
 	pi->weapon = WP_GUN;
@@ -1352,8 +1462,9 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	}
 
 	// torso animation
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Better TORSO_STAND checking
-	if ( torsoAnim == TORSO_STAND || torsoAnim == TORSO_STAND2 ) {
+#ifdef TMNTWEAPSYS
+	if (BG_PlayerStandAnim(torsoAnim))
+	{
 		torsoAnim = BG_TorsoStandForWeapon(weaponNum);
 	}
 #else
@@ -1367,15 +1478,16 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	}
 #endif
 
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Better TORSO_ATTACK checking
-	if ( torsoAnim == TORSO_ATTACK || torsoAnim == TORSO_ATTACK2 ) {
+#ifdef TMNTWEAPSYS
+	if (BG_PlayerAttackAnim(torsoAnim))
+	{
 		torsoAnim = BG_TorsoAttackForWeapon(weaponNum);
 		pi->muzzleFlashTime = dp_realtime + UI_TIMER_MUZZLE_FLASH;
 		//FIXME play firing sound here
 	}
 #else
 	if ( torsoAnim == TORSO_ATTACK || torsoAnim == TORSO_ATTACK2 ) {
-		if ( weaponNum == WP_NONE || weaponNum == WP_GAUNTLET ) {
+		if ( weaponNum == WP_NONE || weaponNum == WP_GAUNTLET) {
 			torsoAnim = TORSO_ATTACK2;
 		}
 		else {

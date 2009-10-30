@@ -295,6 +295,7 @@ void GibEntity( gentity_t *self, int killer ) {
 	gentity_t *ent;
 	int i;
 
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	//if this entity still has kamikaze
 	if (self->s.eFlags & EF_KAMIKAZE) {
 		// check if there is a kamikaze timer around for this owner
@@ -310,6 +311,7 @@ void GibEntity( gentity_t *self, int killer ) {
 			break;
 		}
 	}
+#endif
 	G_AddEvent( self, EV_GIB_PLAYER, killer );
 	self->takedamage = qfalse;
 	self->s.eType = ET_INVISIBLE;
@@ -342,7 +344,7 @@ char	*modNames[] = {
 	"MOD_UNKNOWN",
 #ifdef TMNTWEAPONS // MOD
 	"MOD_FIST",
-	"MOD_KATANAS",
+	"MOD_KATANA",
 	"MOD_WAKIZASHI",
 	"MOD_SAI",
 	"MOD_NUNCHUK",
@@ -407,7 +409,7 @@ char	*modNames[] = {
 	"MOD_GRAPPLE"
 };
 
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 Kamikaze_DeathActivate
@@ -684,9 +686,11 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	}
 #ifdef MISSIONPACK
 	TossClientPersistantPowerups( self );
+#ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
 		TossClientCubes( self );
 	}
+#endif
 #endif
 
 	Cmd_Score_f( self );		// show scores
@@ -775,7 +779,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		// globally cycle through the different death animations
 		i = ( i + 1 ) % 3;
 
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		if (self->s.eFlags & EF_KAMIKAZE) {
 			Kamikaze_DeathTimer( self );
 		}

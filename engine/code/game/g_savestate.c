@@ -28,30 +28,31 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 
 #ifdef TMNTSP
-#ifndef SINGLEPLAYER // GPL code
-#define	SAVE_VERSION 2 // version of save/load routines
-#else
 #define	SAVE_VERSION 1 // version of save/load routines
-#endif
 
 typedef enum
 {
+	// NOTE: Engine thinks SAVE_MINIMUM is 0. Don't change.
+
 	// Remove SAVE_MINIMUM?, it was made for G_SavePersistant, which uses cvars now.
-    SAVE_MINIMUM,	// Save data from one level to the next.
-    SAVE_FULL,		// Full save of the level, includes all entities.
+    SAVE_MINIMUM = 0,	// Save data from one level to the next.
+    SAVE_FULL = 1,		// Full save of the level, includes all entities.
     SAVE_UNKNOWN
 
 } save_type_e;
-
-// Note: Save files should always be the same endianness on all platforms.
 
 // !! If save_header_t is changed update HEADER_SIZE !!
 #define HEADER_SIZE (1+1+MAX_QPATH+4+1+4+4)
 typedef struct
 {
+	// server exspects these in this order...
+	//
     byte version; // Save file version.
     byte save_type; // Type of save file.
     char mapname[MAX_QPATH];
+
+	// game only, server doesn't read them.
+	//
     byte level_time[4]; // int --unused in minimum save type.
     byte skill;
 
@@ -102,13 +103,15 @@ void readInt(int *i, fileHandle_t f)
 #endif
 }
 
-#ifndef SINGLEPLAYER // GPL code
-void WriteEntity(fileHandle_t f, int entity);
-void ReadEntity(fileHandle_t f, int entity);
-void WriteClient(fileHandle_t f, int clnum);
-void ReadClient(fileHandle_t f, int clnum);
+void WriteEntity(fileHandle_t f, gentity_t *ent);
+void ReadEntity(fileHandle_t f, gentity_t *ent, int size, int leveltime);
+void WriteClient(fileHandle_t f, gclient_t *cl);
+void ReadClient(fileHandle_t f, gclient_t *cl, int size);
 void WriteMinimumClient(fileHandle_t f, int clnum);
 void ReadMinimumClient(fileHandle_t f, int clnum);
+
+#if 1 // GPL CODE
+//#define ALLOW_MINIMUM_SAVE // No longer needed.
 
 /*
 G_SaveGame
@@ -118,29 +121,33 @@ Saves the current level data so that the game can be restored later.
 qboolean G_SaveGame(fileHandle_t f)
 {
 	save_header_t header;
+#ifdef ALLOW_MINIMUM_SAVE
 	qboolean fullsave = qtrue;
 	char argv[MAX_QPATH];
+#endif
 	int i;
 
-	if (g_gametype.integer != GT_SINGLE_PLAYER || !g_singlePlayer.integer) {
+	if (!g_singlePlayer.integer) {
 		G_Printf("Can't savegame, saving is for single player only!\n");
-		trap_FS_FCloseFile( f );
 		return qfalse;
 	}
 
+	//if (g_gametype.integer == GT_SINGLE_PLAYER)
+	{
 	// Check for living client
 	for (i=0; i < level.maxclients; i++)
 	{
-		if (g_entities[i].health > 0) {
+			if (g_entities[i].inuse && g_entities[i].health > 0) {
 			break;
 		}
 	}
 	if (i >= level.maxclients) {
 		G_Printf("Can't savegame, there must be a living player!\n");
-		trap_FS_FCloseFile( f );
 		return qfalse;
 	}
+	}
 
+#ifdef ALLOW_MINIMUM_SAVE
 	// Check for minimum save
 	if (trap_Argc() > 2)
 	{
@@ -152,25 +159,35 @@ qboolean G_SaveGame(fileHandle_t f)
 	}
 
 	G_Printf("Saving game...%s\n", fullsave ? "" :  " (minimum save)");
+#else
+	G_Printf("Saving game...\n");
+#endif
 
 	// Setup header
     memset(&header, 0, HEADER_SIZE);
 
     header.version = SAVE_VERSION;
 
+#ifdef ALLOW_MINIMUM_SAVE
 	if (fullsave == qtrue)
 		header.save_type = SAVE_FULL;
 	else
 		header.save_type = SAVE_MINIMUM;
+#else
+	header.save_type = SAVE_FULL;
+#endif
+
 
 	memset(header.mapname, 0, MAX_QPATH);
 
 	// Check for map name override
+#ifdef ALLOW_MINIMUM_SAVE
 	if (trap_Argc() > 3)
 	{
 		trap_Argv(3, header.mapname, MAX_QPATH);
 	}
 	else
+#endif
 	{
 		trap_Cvar_VariableStringBuffer( "mapname", header.mapname, MAX_QPATH );
 	}
@@ -186,54 +203,63 @@ qboolean G_SaveGame(fileHandle_t f)
     // Write header
 	trap_FS_Write(&header, HEADER_SIZE, f);
 
+#ifdef ALLOW_MINIMUM_SAVE
 	if (fullsave == qtrue)
+#endif
 	{
-		//gentity_t	*ent;
-		gclient_t	*cl;
-
 		for (i = 0; i < level.num_entities; i++)
 		{
 			// Check if it should be written?
             writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
-			WriteEntity(f, i);
+			WriteEntity(f, &level.gentities[i]);
 		}
 		i = -1;
 		writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
 		for (i = 0; i < level.maxclients; i++)
 		{
-			cl = &level.clients[i];
-			if (cl->pers.connected != CON_CONNECTED)
+			if (level.clients[i].pers.connected != CON_CONNECTED)
 				continue;
             writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
-			WriteClient(f, i);
+			WriteClient(f, &level.clients[i]);
 		}
 	}
+#ifdef ALLOW_MINIMUM_SAVE
 	else
 	{
-		gclient_t	*cl;
 		for (i = 0; i < level.maxclients; i++)
 		{
-			cl = &level.clients[i];
-			if (cl->pers.connected != CON_CONNECTED)
+			if (level.clients[i].pers.connected != CON_CONNECTED)
 				continue;
             writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
 			WriteMinimumClient(f, i);
 		}
 	}
+#endif
 
 	// End save file.
 	i = -1;
 	writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
 
-	// Close file
-	trap_FS_FCloseFile( f );
 	return qtrue;
 }
 
-void G_LoadGame(fileHandle_t f)
+// map_loaded means the engine loaded the map for us.
+// NOTE: The Engine always loads the map now...
+void G_LoadGame(fileHandle_t f, int map_loaded)
 {
 	save_header_t header;
+#ifdef ALLOW_MINIMUM_SAVE
 	qboolean fullsave;
+#endif
+	int leveltime;
+	int size;
+
+	if (!map_loaded)
+	{
+		// Engine doesn't call if map load failed...
+		//G_Printf("Engine failed to load map for savegame!\n");
+		return;
+	}
 
 	// Read header
     memset(&header, 0, HEADER_SIZE);
@@ -245,35 +271,490 @@ void G_LoadGame(fileHandle_t f)
         return;
 	}
 
+#ifdef ALLOW_MINIMUM_SAVE
 	fullsave = (header.save_type == SAVE_FULL);
+#endif
+	leveltime = bytesToInt(header.level_time);
 
-	G_Printf("Savegame save-type is %s\n", fullsave ? "Full save" : "Minimum save");
+    // set the skill level
+	trap_Cvar_Set( "g_spSkill", va("%i",header.skill) );
 
-	// FINISHME
-	G_Printf("Sorry the GPL savegame loading code isn't done yet\n");
+	//G_Printf("Savegame save-type is %s\n", fullsave ? "Full save" : "Minimum save");
 
+#ifdef ALLOW_MINIMUM_SAVE
+	if (fullsave)
+#endif
+	{
+		size = bytesToInt(header.entity_size);
+		if (size != sizeof(gentity_t))
+		{
+			G_Printf( "Warning: Loading a savegame with a different entity size! (saved=%i,current=%i)\n", size, sizeof(gentity_t));
+		}
+	}
 
-	// Close file
-	trap_FS_FCloseFile( f );
+	// read the client structures
+	size = bytesToInt(header.client_size);
+	if (size != sizeof(gclient_t))
+	{
+		G_Printf( "Warning: Loading a savegame with a different client size! (saved=%i,current=%i)\n", size, sizeof(gclient_t));
+	}
+
+#ifdef ALLOW_MINIMUM_SAVE
+	if (fullsave == qtrue)
+#endif
+	{
+#if 1 // Turtle Man: FIXME: NON-GPL CODE
+		qboolean serverEntityUpdate;
+		int last, i;
+		char strhdr[5];
+		gentity_t *ent;
+		gclient_t *cl;
+
+		last = 0;
+		serverEntityUpdate = qfalse;
+
+		while (1)
+		{
+			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
+			if (i < 0)
+				break;
+			if (i >= MAX_GENTITIES)
+			{
+				trap_FS_FCloseFile( f ); // Must close before G_Error?
+				G_Error( "G_LoadGame: entitynum out of range (%i, MAX = %i)\n", i, MAX_GENTITIES );
+			}
+			if (i >= level.num_entities)
+			{	// notify server
+				level.num_entities = i + 1;
+				serverEntityUpdate = qtrue;
+			}
+			trap_FS_Read (strhdr, 4, f);
+			strhdr[4] = 0;
+			if (Q_stricmp (strhdr, "GENT") != 0)
+			{
+				trap_FS_FCloseFile( f ); // Must close before G_Error?
+				G_Error ("Load Entity : Unknown header '%s'\ncannot load game", strhdr);
+			}
+			ent = &g_entities[i];
+			ReadEntity (f, ent, size, leveltime);
+
+			// free all entities that we skipped
+			for ( ; last < i; last++)
+			{
+				if (g_entities[last].inuse && i != ENTITYNUM_WORLD)
+				{
+					if (last < MAX_CLIENTS)
+					{
+						trap_DropClient( last, "Not in savegame." );
+					} else
+					{
+						G_FreeEntity( &g_entities[last] );
+					}
+				}
+			}
+			last = i+1;
+		}
+
+		// clear all remaining entities
+		for (ent = &g_entities[last]; last < MAX_GENTITIES; last++, ent++)
+		{
+			memset (ent, 0, sizeof(*ent));
+			ent->classname = "freed";
+			ent->freetime = level.time;
+			ent->inuse = qfalse;
+		}
+
+		// read the client structures
+		size = bytesToInt(header.client_size);
+		if (size != sizeof(gclient_t))
+		{
+			G_Printf( "Warning: Loading a savegame with a different client size! (saved=%i,current=%i)\n", size, sizeof(gclient_t));
+		}
+		while (1)
+		{
+			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
+			if (i < 0)
+				break;
+			if (i > MAX_CLIENTS) {
+				trap_FS_FCloseFile( f ); // Must close before G_Error?
+				G_Error( "G_LoadGame: clientnum out of range\n" );
+			}
+
+			cl = &level.clients[i];
+			//if (cl->pers.connected == CON_DISCONNECTED) {
+			//	trap_FS_FCloseFile( f ); // Must close before G_Error?
+			//	G_Error( "G_LoadGame: client mis-match in savegame" );
+			//}
+
+			trap_FS_Read (strhdr, 4, f);
+			strhdr[4] = 0;
+			if (Q_stricmp (strhdr, "CLEN") != 0)
+			{
+				trap_FS_FCloseFile( f ); // Must close before G_Error?
+				G_Error ("Load Client : Unknown header '%s'\ncannot load game", strhdr);
+			}
+			ReadClient (f, cl, size);
+		}
+#endif
+
+		if (serverEntityUpdate)
+		{
+			// let the server system know that there are more entities
+			trap_LocateGameData( level.gentities, level.num_entities, sizeof( gentity_t ),
+				&level.clients[0].ps, sizeof( level.clients[0] ) );
+		}
+	}
+#ifdef ALLOW_MINIMUM_SAVE
+	else // only the minimum was saved.
+	{
+	    int j;
+		for (j = 0; j < MAX_CLIENTS; j++)
+		{
+			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
+			if (i < 0)
+				break;
+			if (i > MAX_CLIENTS) {
+				trap_FS_FCloseFile( f ); // Must close before G_Error?
+				G_Error( "G_LoadGame: clientnum out of range\n" );
+			}
+			ReadMinimumClient(f, i);
+		}
+	}
+#endif
+
+	trap_Cvar_Set( "ui_singlePlayerActive", "1" );
+
 	return;
 }
+#else // Turtle Man: FIXME: NON-GPL CODE
+/*
+===============
+G_SaveGame
 
-void WriteEntity(fileHandle_t f, int entity)
+Note: only call using the console,
+
+"savegame filename <-minimum> <-[mapname-overide]>"
+
+  returns qtrue if successful
+
+===============
+*/
+qboolean G_SaveGame(fileHandle_t f)
+{
+	int	i;
+	gentity_t	*ent;
+	gclient_t	*cl;
+	save_header_t header;
+	qboolean fullsave = qtrue;
+
+	if (g_entities[0].health <= 0) {
+		G_Printf("Can't savegame when dead\n");
+		return qfalse;
+	}
+
+	if (g_gametype.integer != GT_SINGLE_PLAYER || !g_singlePlayer.integer) {
+		G_Printf("Can't savegame, saving is for single player only\n");
+		return qfalse;
+	}
+
+	if (trap_Argc() > 2)
+	{
+		trap_Argv(2, header.mapname, MAX_QPATH);
+		fullsave = Q_stricmp(header.mapname, "-minimum");
+		if (fullsave)
+			fullsave = Q_stricmp(header.mapname, "-min");
+	}
+
+	G_Printf("Saving game...%s\n", fullsave ? "" :  "(minimum save)");
+
+    memset(&header, 0, HEADER_SIZE);
+
+    header.version = SAVE_VERSION;
+
+	if (fullsave == qtrue)
+		header.save_type = SAVE_FULL;
+	else
+		header.save_type = SAVE_MINIMUM;
+
+	memset(header.mapname, 0, MAX_QPATH);
+
+	// map name override.
+	if (trap_Argc() > 3)
+	{
+		trap_Argv(3, header.mapname, MAX_QPATH);
+	}
+	else
+	{
+		trap_Cvar_VariableStringBuffer( "mapname", header.mapname, MAX_QPATH );
+	}
+	header.mapname[MAX_QPATH-1] = 0;
+
+    intToBytes(level.time, header.level_time);
+
+    header.skill = trap_Cvar_VariableValue( "g_spSkill" );
+
+    intToBytes(sizeof(gentity_t), header.entity_size);
+    intToBytes(sizeof(gclient_t), header.client_size);
+
+    // Write header
+	trap_FS_Write (&header, HEADER_SIZE, f);
+
+	if (fullsave == qtrue)
+	{
+		for (i = 0; i<level.num_entities; i++)
+		{
+			ent = &g_entities[i];
+			if (!ent->inuse || ent->s.number == ENTITYNUM_WORLD)
+				continue;
+			writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
+			WriteEntity (f, ent);
+		}
+		i = -1;
+		writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
+
+		// write out the client structures
+		for (i=0 ; i<MAX_CLIENTS ; i++)
+		{
+			cl = &level.clients[i];
+			if (cl->pers.connected != CON_CONNECTED)
+				continue;
+			writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
+			WriteClient (f, cl);
+		}
+		i = -1;
+		writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
+	}
+	else // save only the minimum.
+	{
+		for (i=0 ; i<MAX_CLIENTS ; i++)
+		{
+			cl = &level.clients[i];
+			if (cl->pers.connected != CON_CONNECTED)
+				continue;
+            writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
+			WriteMinimumClient(f, i);
+		}
+		i = -1;
+		writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
+	}
+
+	return qtrue;
+}
+
+/*
+===============
+G_LoadGame
+
+map_loaded means the engine loaded the map.
+
+Note: Only call using the console cmd, "loadgame"
+===============
+*/
+void G_LoadGame(fileHandle_t f, int map_loaded)
+{
+	int	i, leveltime, size, last;
+	gentity_t	*ent;
+	gclient_t	*cl;
+	qboolean	serverEntityUpdate = qfalse;
+	char strhdr[5];
+	save_header_t header;
+    qboolean fullsave;
+    char map[MAX_QPATH];
+    qboolean second_load = qfalse;
+
+	// The server loaded the map so load the game, even if not "single player"
+	if (!map_loaded)
+	{
+		if (!g_singlePlayer.integer) {
+			G_Printf( "Can't loadgame, loading is for single player only.\n");
+			return;
+		}
+
+		if (trap_Argc() > 2)
+		{
+			trap_Argv(2, map, MAX_QPATH);
+			second_load = (Q_stricmp(map, "-two") == 0);
+		}
+	}
+
+    memset(&header, 0, HEADER_SIZE);
+	trap_FS_Read(&header, HEADER_SIZE, f);
+
+	if (header.version != SAVE_VERSION)
+	{
+	    G_Printf( "Error: Savegame version is %i, expected %i!\n", header.version, SAVE_VERSION);
+        return;
+	}
+
+	fullsave = (header.save_type == SAVE_FULL);
+
+	// LOAD MAP
+	if (!map_loaded)
+	{
+		// Check if the map is loaded.
+		trap_Cvar_VariableStringBuffer( "mapname", map, sizeof(map) );
+		if (!map_loaded && Q_stricmp(map, header.mapname) != 0)
+		{
+#if 1
+			if (second_load == qfalse)
+			{
+				// Try to load the map
+				trap_SendConsoleCommand( EXEC_APPEND, va( "spmap %s\n", header.mapname ) );
+
+				trap_Argv(1, map, MAX_QPATH);
+				trap_SendConsoleCommand( EXEC_APPEND, va( "loadgame %s -two\n", map) );
+	}
+	else
+	{
+				// Already tried to load the map, it failed.
+				G_Printf("loadgame: Error failed to load map.\n");
+			}
+#else
+			G_Printf("loadgame: Error savegame is for map '%s'\n", header.mapname);
+#endif
+			return;
+		}
+	}
+
+	G_Printf( "Loading game... %s(map %s)\n", fullsave ? "" : "minimum save ", header.mapname);
+
+	// set the level time
+	leveltime = bytesToInt(header.level_time);
+
+    // set the skill level
+	trap_Cvar_Set( "g_spSkill", va("%i",header.skill) );
+
+	size = bytesToInt(header.entity_size);
+	if (size != sizeof(gentity_t))
+	{
+	    G_Printf( "Warning: Loading a savegame with a different entity size! (saved=%i,current=%i)\n", size, sizeof(gentity_t));
+	}
+
+	if (fullsave == qtrue)
+	{
+		last = 0;
+		while (1)
+		{
+			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
+			if (i < 0)
+				break;
+			if (i >= MAX_GENTITIES)
+		{
+				trap_FS_FCloseFile( f ); // Must close before G_Error?
+				G_Error( "G_LoadGame: entitynum out of range (%i, MAX = %i)\n", i, MAX_GENTITIES );
+		}
+			if (i >= level.num_entities)
+			{	// notify server
+				level.num_entities = i + 1;
+				serverEntityUpdate = qtrue;
+	}
+			trap_FS_Read (strhdr, 4, f);
+			strhdr[4] = 0;
+			if (Q_stricmp (strhdr, "GENT") != 0)
+	{
+				G_Error ("Load Entity : Unknown header '%s'\ncannot load game", strhdr);
+			}
+			ent = &g_entities[i];
+			ReadEntity (f, ent, size, leveltime);
+
+			// free all entities that we skipped
+			for ( ; last < i; last++)
+		{
+				if (g_entities[last].inuse && i != ENTITYNUM_WORLD)
+				{
+					if (last < MAX_CLIENTS)
+					{
+						trap_DropClient( last, "" );
+					} else
+					{
+						G_FreeEntity( &g_entities[last] );
+		}
+	}
+			}
+			last = i+1;
+		}
+
+		// clear all remaining entities
+		for (ent = &g_entities[last]; last < MAX_GENTITIES; last++, ent++) {
+			memset (ent, 0, sizeof(*ent));
+			ent->classname = "freed";
+			ent->freetime = level.time;
+			ent->inuse = qfalse;
+		}
+
+		// read the client structures
+		size = bytesToInt(header.client_size);
+		if (size != sizeof(gclient_t))
+	{
+			G_Printf( "Warning: Loading a savegame with a different client size! (saved=%i,current=%i)\n", size, sizeof(gclient_t));
+		}
+		while (1)
+		{
+			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
+			if (i < 0)
+				break;
+			if (i > MAX_CLIENTS) {
+				trap_FS_FCloseFile( f ); // Must close before G_Error?
+				G_Error( "G_LoadGame: clientnum out of range\n" );
+	}
+
+			cl = &level.clients[i];
+			//if (cl->pers.connected == CON_DISCONNECTED) {
+			//	trap_FS_FCloseFile( f ); // Must close before G_Error?
+			//	G_Error( "G_LoadGame: client mis-match in savegame" );
+			//}
+
+			trap_FS_Read (strhdr, 4, f);
+			strhdr[4] = 0;
+			if (Q_stricmp (strhdr, "CLEN") != 0)
+				G_Error ("Load Client : Unknown header '%s'\ncannot load game", strhdr);
+			ReadClient (f, cl, size);
+		}
+	}
+	else // only the minimum was saved.
+	{
+	    int j;
+		for (j=0; j<MAX_CLIENTS; j++)
+		{
+			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
+			if (i < 0)
+				break;
+			if (i > MAX_CLIENTS) {
+				trap_FS_FCloseFile( f ); // Must close before G_Error?
+				G_Error( "G_LoadGame: clientnum out of range\n" );
+			}
+			ReadMinimumClient(f, i);
+		}
+	}
+
+	// inform server of entity count if it has increased
+	if (serverEntityUpdate)
+	{
+		// let the server system know that there are more entities
+		trap_LocateGameData( level.gentities, level.num_entities, sizeof( gentity_t ),
+			&level.clients[0].ps, sizeof( level.clients[0] ) );
+	}
+
+	trap_Cvar_Set( "ui_singlePlayerActive", "1" );
+}
+#endif
+#ifndef SINGLEPLAYER // New GPL version ...
+void WriteEntity(fileHandle_t f, gentity_t *ent)
 {
 	// ...
 }
 
-void ReadEntity(fileHandle_t f, int entity)
+void ReadEntity(fileHandle_t f, gentity_t *ent, int size, int leveltime)
 {
 	// ...
 }
 
-void WriteClient(fileHandle_t f, int clnum)
+void WriteClient(fileHandle_t f, gclient_t *cl)
 {
 	// ...
 }
 
-void ReadClient(fileHandle_t f, int clnum)
+void ReadClient(fileHandle_t f, gclient_t *cl, int size)
 {
 	// ...
 }
@@ -287,8 +768,7 @@ void ReadMinimumClient(fileHandle_t f, int clnum)
 {
 	// ...
 }
-#else
-// Turtle Man: FIXME: NON-GPL Code, my changes are GPL but the rest isn't...
+#else // Turtle Man: FIXME: NON-GPL CODE
 //
 // Function Conversion
 //
@@ -401,7 +881,7 @@ extern void target_level_end_use ( gentity_t * self , gentity_t * other , gentit
 #ifdef SP_NPC
 extern void trig_FinishSpawningNPC ( gentity_t * ent , gentity_t * a , gentity_t * b ) ;
 #endif
-// Turtle Man: FIXME: target_player_stop : http://rfactory.org/singleEntities.html
+// Turtle Man: TODO: target_player_stop? : http://rfactory.org/singleEntities.html
 #ifdef SINGLEPLAYER // entity
 //extern void target_player_stop ( gentity_t * self , gentity_t * other , gentity_t * activator ) ;
 extern void ActivateAnimModel ( gentity_t * ent , gentity_t * other , gentity_t * activator ) ;
@@ -505,7 +985,7 @@ ent3_funcList_t ent3_funcList[] = {
 #ifdef SP_NPC
 	{"trig_FinishSpawningNPC", trig_FinishSpawningNPC},
 #endif
-// Turtle Man: FIXME: target_player_stop : http://rfactory.org/singleEntities.html
+// Turtle Man: TODO: target_player_stop? : http://rfactory.org/singleEntities.html
 #ifdef SINGLEPLAYER // entity
 	//{"target_player_stop", target_player_stop},
 	{"ActivateAnimModel", ActivateAnimModel},
@@ -565,7 +1045,7 @@ static minimumField_t gclientPersFields[] = {
 	{0, 0}
 };
 
-void WriteMinimumCLient(fileHandle_t f, int clnum)
+void WriteMinimumClient(fileHandle_t f, int clnum)
 {
 	minimumField_t *field;
 	gclient_t *cl = &level.clients[clnum];
@@ -588,7 +1068,7 @@ void WriteMinimumCLient(fileHandle_t f, int clnum)
 	}
 }
 
-void ReadMinimumCLient(fileHandle_t f, int clnum)
+void ReadMinimumClient(fileHandle_t f, int clnum)
 {
 	minimumField_t *field;
 	gclient_t *cl = &level.clients[clnum];
@@ -645,7 +1125,7 @@ static saveField_t gentityFields[] = {
 	{FOFS(prevTrain),	F_ENTITY},
 	{FOFS(message),		F_STRING},
 	{FOFS(target),		F_STRING},
-#ifdef TMNTENTITIES
+#ifdef TMNTENTSYS
 	{FOFS(paintarget),		F_STRING},
 #endif
 	{FOFS(targetname),	F_STRING},
@@ -993,9 +1473,9 @@ void WriteEntity(fileHandle_t f, gentity_t *ent)
 
 	// change the pointers to lengths or indexes
 	for (field=gentityFields ; field->type ; field++)
-	{
+		{
 		WriteField1 (field, (byte *)&temp);
-	}
+		}
 
 	trap_FS_Write ("GENT", 4, f);
 	// write the block
@@ -1005,127 +1485,9 @@ void WriteEntity(fileHandle_t f, gentity_t *ent)
 
 	// now write any allocated data following the edict
 	for (field=gentityFields ; field->type ; field++)
-	{
+		{
 		WriteField2 (f, field, (byte *)ent);
 	}
-}
-
-/*
-===============
-G_SaveGame
-
-Note: only call using the console,
-
-"savegame filename <-minimum> <-[mapname-overide]>"
-
-  returns qtrue if successful
-
-===============
-*/
-qboolean G_SaveGame(fileHandle_t f)
-{
-	int	i;
-	gentity_t	*ent;
-	gclient_t	*cl;
-	save_header_t header;
-	qboolean fullsave = qtrue;
-
-	if (g_entities[0].health <= 0) {
-		G_Printf("Can't savegame when dead\n");
-		trap_FS_FCloseFile( f );
-		return qfalse;
-	}
-
-	if (g_gametype.integer != GT_SINGLE_PLAYER || !g_singlePlayer.integer) {
-		G_Printf("Can't savegame, saving is for single player only\n");
-		trap_FS_FCloseFile( f );
-		return qfalse;
-	}
-
-	if (trap_Argc() > 2)
-	{
-		trap_Argv(2, header.mapname, MAX_QPATH);
-		fullsave = Q_stricmp(header.mapname, "-minimum");
-		if (fullsave)
-			fullsave = Q_stricmp(header.mapname, "-min");
-	}
-
-	G_Printf("Saving game...%s\n", fullsave ? "" :  "(minimum save)");
-
-    memset(&header, 0, HEADER_SIZE);
-
-    header.version = SAVE_VERSION;
-
-	if (fullsave == qtrue)
-		header.save_type = SAVE_FULL;
-	else
-		header.save_type = SAVE_MINIMUM;
-
-	memset(header.mapname, 0, MAX_QPATH);
-
-	// map name override.
-	if (trap_Argc() > 3)
-	{
-		trap_Argv(3, header.mapname, MAX_QPATH);
-	}
-	else
-	{
-		trap_Cvar_VariableStringBuffer( "mapname", header.mapname, MAX_QPATH );
-	}
-	header.mapname[MAX_QPATH-1] = 0;
-
-    intToBytes(level.time, header.level_time);
-
-    header.skill = trap_Cvar_VariableValue( "g_spSkill" );
-
-    intToBytes(sizeof(gentity_t), header.entity_size);
-    intToBytes(sizeof(gclient_t), header.client_size);
-
-    // Write header
-	trap_FS_Write (&header, HEADER_SIZE, f);
-
-	if (fullsave == qtrue)
-	{
-		for (i = 0; i<level.num_entities; i++)
-		{
-			ent = &g_entities[i];
-			if (!ent->inuse || ent->s.number == ENTITYNUM_WORLD)
-				continue;
-			writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
-			WriteEntity (f, ent);
-		}
-		i = -1;
-		writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
-
-		// write out the client structures
-		for (i=0 ; i<MAX_CLIENTS ; i++)
-		{
-			cl = &level.clients[i];
-			if (cl->pers.connected != CON_CONNECTED)
-				continue;
-			writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
-			WriteClient (f, cl);
-		}
-		i = -1;
-		writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
-	}
-	else // save only the minimum.
-	{
-		for (i=0 ; i<MAX_CLIENTS ; i++)
-		{
-			cl = &level.clients[i];
-			if (cl->pers.connected != CON_CONNECTED)
-				continue;
-            writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
-			WriteMinimumCLient(f, i);
-		}
-		i = -1;
-		writeInt(&i, f); // trap_FS_Write (&i, sizeof(i), f);
-	}
-
-	trap_FS_FCloseFile( f );
-
-	return qtrue;
 }
 
 //
@@ -1391,194 +1753,6 @@ void ReadEntity (fileHandle_t f, gentity_t *ent, int size, int leveltime)
 			}
 		}
 	}
-
-}
-
-/*
-===============
-G_LoadGame
-
-Note: Only call using the console cmd, "loadgame"
-===============
-*/
-void G_LoadGame(fileHandle_t f)
-{
-	int	i, leveltime, size, last;
-	gentity_t	*ent;
-	gclient_t	*cl;
-	qboolean	serverEntityUpdate = qfalse;
-	char strhdr[5];
-	save_header_t header;
-    qboolean fullsave;
-    char map[MAX_QPATH];
-    qboolean second_load = qfalse;
-
-	if (g_gametype.integer != GT_SINGLE_PLAYER || !g_singlePlayer.integer) {
-		G_Printf( "Can't loadgame, loading is for single player only.\n");
-		return;
-	}
-
-	if (trap_Argc() > 2)
-	{
-		trap_Argv(2, map, MAX_QPATH);
-		second_load = (Q_stricmp(map, "-two") == 0);
-	}
-
-    memset(&header, 0, HEADER_SIZE);
-	trap_FS_Read(&header, HEADER_SIZE, f);
-
-	if (header.version != SAVE_VERSION)
-	{
-	    G_Printf( "Error: Savegame version is %i, expected %i!\n", header.version, SAVE_VERSION);
-        return;
-	}
-
-	fullsave = (header.save_type == SAVE_FULL);
-
-	// LOAD MAP
-
-	// Check if the map is loaded.
-	trap_Cvar_VariableStringBuffer( "mapname", map, sizeof(map) );
-	if (Q_stricmp(map, header.mapname) != 0)
-	{
-#if 1
-		if (second_load == qfalse)
-		{
-			// Try to load the map
-			trap_SendConsoleCommand( EXEC_APPEND, va( "spmap %s\n", header.mapname ) );
-
-			trap_Argv(1, map, MAX_QPATH);
-			trap_SendConsoleCommand( EXEC_APPEND, va( "loadgame %s -two\n", map) );
-		}
-		else
-		{
-			// Already tried to load the map, it failed.
-			G_Printf("loadgame: Error failed to load map.\n");
-		}
-#else
-		G_Printf("loadgame: Error savegame is for map '%s'\n", header.mapname);
-#endif
-		trap_FS_FCloseFile( f );
-		return;
-	}
-
-	G_Printf( "Loading game... %s(map %s)\n", fullsave ? "" : "minimum save ", header.mapname);
-
-	// set the level time
-	leveltime = bytesToInt(header.level_time);
-
-    // set the skill level
-	trap_Cvar_Set( "g_spSkill", va("%i",header.skill) );
-
-	size = bytesToInt(header.entity_size);
-	if (size != sizeof(gentity_t))
-	{
-	    G_Printf( "Warning: Loading a savegame with a different entity size! (saved=%i,current=%i)\n", size, sizeof(gentity_t));
-	}
-
-	if (fullsave == qtrue)
-	{
-		last = 0;
-		while (1)
-		{
-			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
-			if (i < 0)
-				break;
-			if (i >= MAX_GENTITIES)
-			{
-				trap_FS_FCloseFile( f );
-				G_Error( "G_LoadGame: entitynum out of range (%i, MAX = %i)\n", i, MAX_GENTITIES );
-			}
-			if (i >= level.num_entities)
-			{	// notify server
-				level.num_entities = i + 1;
-				serverEntityUpdate = qtrue;
-			}
-			trap_FS_Read (strhdr, 4, f);
-			strhdr[4] = 0;
-			if (Q_stricmp (strhdr, "GENT") != 0)
-			{
-				G_Error ("Load Entity : Unknown header '%s'\ncannot load game", strhdr);
-			}
-			ent = &g_entities[i];
-			ReadEntity (f, ent, size, leveltime);
-
-			// free all entities that we skipped
-			for ( ; last < i; last++)
-			{
-				if (g_entities[last].inuse && i != ENTITYNUM_WORLD)
-				{
-					if (last < MAX_CLIENTS)
-					{
-						trap_DropClient( last, "" );
-					} else
-					{
-						G_FreeEntity( &g_entities[last] );
-					}
-				}
-			}
-			last = i+1;
-		}
-
-		// clear all remaining entities
-		for (ent = &g_entities[last]; last < MAX_GENTITIES; last++, ent++) {
-			memset (ent, 0, sizeof(*ent));
-			ent->classname = "freed";
-			ent->freetime = level.time;
-			ent->inuse = qfalse;
-		}
-
-		// read the client structures
-		size = bytesToInt(header.client_size);
-		if (size != sizeof(gclient_t))
-		{
-			G_Printf( "Warning: Loading a savegame with a different client size! (saved=%i,current=%i)\n", size, sizeof(gclient_t));
-		}
-		while (1)
-		{
-			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
-			if (i < 0)
-				break;
-			if (i > MAX_CLIENTS) {
-				trap_FS_FCloseFile( f );
-				G_Error( "G_LoadGame: clientnum out of range\n" );
-			}
-			cl = &level.clients[i];
-			if (cl->pers.connected == CON_DISCONNECTED) {
-				trap_FS_FCloseFile( f );
-				G_Error( "G_LoadGame: client mis-match in savegame" );
-			}
-			trap_FS_Read (strhdr, 4, f);
-			strhdr[4] = 0;
-			if (Q_stricmp (strhdr, "CLEN") != 0)
-				G_Error ("Load Client : Unknown header '%s'\ncannot load game", strhdr);
-			ReadClient (f, cl, size);
-		}
-	}
-	else // only the minimum was saved.
-	{
-	    int j;
-		for (j=0; j<MAX_CLIENTS; j++)
-		{
-			readInt(&i, f); // trap_FS_Read (&i, sizeof(i), f);
-			if (i < 0)
-				break;
-			if (i > MAX_CLIENTS) {
-				trap_FS_FCloseFile( f );
-				G_Error( "G_LoadGame: clientnum out of range\n" );
-			}
-			ReadMinimumCLient(f, i);
-		}
-	}
-
-	// inform server of entity count if it has increased
-	if (serverEntityUpdate) {
-		// let the server system know that there are more entities
-		trap_LocateGameData( level.gentities, level.num_entities, sizeof( gentity_t ),
-			&level.clients[0].ps, sizeof( level.clients[0] ) );
-	}
-
-	trap_FS_FCloseFile( f );
 }
 #endif // SINGLEPLAYER
 #endif // TMNTSP

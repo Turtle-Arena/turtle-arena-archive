@@ -150,13 +150,30 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	}
 
 #ifdef RAVENMD4
+#ifdef IOQ3ZTM // Always atemp to load MDR first!
+	while (qtrue)
+#else
 	if(!Q_stricmp(fext, "mdr"))
+#endif
 	{
 		int filesize;
 		
+#ifdef IOQ3ZTM // Always atemp to load MDR first!
+		Com_sprintf(namebuf, sizeof(namebuf), "%s.mdr", filename);
+		filesize = ri.FS_ReadFile(namebuf, (void **) &buf.v);
+#else
 		filesize = ri.FS_ReadFile(name, (void **) &buf.v);
+#endif
 		if(!buf.u)
 		{
+#ifdef IOQ3ZTM // Always atemp to load MDR first!
+			// We didn't say we wanted a mdr model, so try MD3.
+			if (Q_stricmp(fext, "mdr") != 0)
+			{
+				//ri.Printf (PRINT_WARNING,"RE_RegisterModel: couldn't load %s\n", namebuf);
+				break;
+			}
+#endif
 			ri.Printf (PRINT_WARNING,"RE_RegisterModel: couldn't load %s\n", name);
 			mod->type = MOD_BAD;
 			return 0;
@@ -164,13 +181,21 @@ qhandle_t RE_RegisterModel( const char *name ) {
 		
 		ident = LittleLong(*(unsigned *)buf.u);
 		if(ident == MDR_IDENT)
+#ifdef IOQ3ZTM // Always atemp to load MDR first!
+			loaded = R_LoadMDR(mod, buf.u, filesize, namebuf);
+#else
 			loaded = R_LoadMDR(mod, buf.u, filesize, name);
+#endif
 
 		ri.FS_FreeFile (buf.v);
 		
 		if(!loaded)
 		{
+#ifdef IOQ3ZTM // Always atemp to load MDR first!
+			ri.Printf(PRINT_WARNING,"RE_RegisterModel: couldn't load mdr file %s\n", namebuf);
+#else
 			ri.Printf(PRINT_WARNING,"RE_RegisterModel: couldn't load mdr file %s\n", name);
+#endif
 			mod->type = MOD_BAD;
 			return 0;
 		}

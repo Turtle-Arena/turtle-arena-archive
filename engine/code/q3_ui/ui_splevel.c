@@ -632,7 +632,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 
 		if ( n == selectedArena ) {
 			if( Menu_ItemAtCursor( &levelMenuInfo.menu ) == &levelMenuInfo.item_maps[n] ) {
-#ifdef TMNT // MENU
+#ifdef TMNTDATASYS // MENU
 				UI_DrawHandlePic( x-31, y-30, 256, 256-27, levelMenuInfo.levelFocusPic);
 #endif
 				trap_R_SetColor( color );

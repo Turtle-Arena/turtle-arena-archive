@@ -229,6 +229,11 @@ typedef enum {
 	// 1.32
 	G_FS_SEEK,
 
+#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+	G_REGISTERTAGS, // CG_R_REGISTERMODEL
+	G_LERPTAG,		// CG_R_LERPTAG
+#endif
+
 	BOTLIB_SETUP = 200,				// ( void );
 	BOTLIB_SHUTDOWN,				// ( void );
 	BOTLIB_LIBVAR_SET,

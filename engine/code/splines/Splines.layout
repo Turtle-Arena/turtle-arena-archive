@@ -1,16 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="" />
-	<File name="math_angles.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="126" topLine="0" />
-	</File>
-	<File name="math_vector.h" open="0" top="0" tabpos="0">
-		<Cursor position="9733" topLine="380" />
-	</File>
-	<File name="q_shared.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="17379" topLine="906" />
-	</File>
-	<File name="splines.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="14647" topLine="560" />
-	</File>
 </CodeBlocks_layout_file>

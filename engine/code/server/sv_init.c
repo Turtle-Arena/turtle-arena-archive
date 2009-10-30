@@ -565,6 +565,16 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 		}
 	}	
 
+#ifdef TMNTSP
+	// GAME_LOADGAME
+	if (svs.loadgame[0])
+	{
+		// We were loading a savegame...
+		Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s\n", svs.loadgame));
+		svs.loadgame[0] = '\0';
+	}
+#endif
+
 	// run another frame to allow things to look at all the players
 	VM_Call (gvm, GAME_RUN_FRAME, sv.time);
 	SV_BotFrame (sv.time);
@@ -634,7 +644,7 @@ void SV_Init (void) {
 
 	// serverinfo vars
 	Cvar_Get ("dmflags", "0", CVAR_SERVERINFO);
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 	Cvar_Get ("scorelimit", "20", CVAR_SERVERINFO);
 #else
 	Cvar_Get ("fraglimit", "20", CVAR_SERVERINFO);

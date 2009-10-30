@@ -26,9 +26,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 /*
 	New general path code, for trains, camera "scripts", NPCs, NiGHTS mode?, 2D mode?
 		and what not.
+
+	It is however unfinish and untested.
 */
 
-#ifdef TMNTPATHS
+#ifdef TMNTPATHSYS
 typedef enum
 {
 	PATHF_BEGIN		= 0x01, // path can start on this entity
@@ -50,7 +52,7 @@ typedef struct
 // The first must have a non-NULL classname
 gpathinfo_t gpathinfo[] =
 {
-	// Quake 3 (and ect) compatiblity
+	// Quake 3 (and ect) compatibility
 	{ "path_corner", PATHF_BEGIN | PATHF_POINT },
 
 	// TDC NPC compatiblity

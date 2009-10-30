@@ -75,6 +75,7 @@ endif
 # -DIOQUAKE3  - Enables CD key check and punkbuster code
 # -DIOQ3ZTM   - Misc changes and "fixes" that I always want to be enabled.
 #                 It was part of the TMNT define before.
+# -DIOQ3ZTM_NO_COMPATIBLITY - Breaks compatiblity with normal Q3 and Q3 mods.
 # -DNOTRATEDM - Disable stuff in Quake3 engine that made it rated M. (blood, gibs, strong lang)
 #            This however doesn't change the gamedata, like the botfiles strong lang, bloody textures, ect
 #            Turtle Man: TODO: Rename this define to ...?
@@ -86,8 +87,15 @@ ifeq ($(BUILD_IOQUAKE3),1)
 	    BUILD_DEFINES=-DIOQUAKE3
 	else
 		# Modified ioquake3
-		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM
+		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPATIBILITY -DNOTRATEDM
+
+		# Reuse TMNT system stuff.
+		BUILD_DEFINES += -DTMNTWEAPSYS -DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS -DTMNTDATASYS
+
     endif
+
+	BASEQ3_FLAGS =
+	MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
 
 else # END QUAKE3
 
@@ -96,9 +104,16 @@ ifeq ($(BUILD_SONIC),1)
 
 	# SRB2 clone... Sonic Blast Arena
 	#  Should it be its own EXE or a mod for TMNT Arena? (or (io)qauke3 mod?)...
-	# Someday I hope do more work on this, but it is outside of my main goal of a TMNT fangame.
-	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM
-	BUILD_DEFINES += -DSONIC -DTMNTWEAPSYS -DSONICWEAPONS -DTMNTPLAYERSYS
+	# Someday I hope do more work on this, but it is outside of my goal of a TMNT fangame...
+
+	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPATIBILITY -DNOTRATEDM
+
+	# Sonic only stuff.
+	BUILD_DEFINES += -DSONIC -DSONICWEAPONS
+
+	# Reuse TMNT system stuff.
+	BUILD_DEFINES += -DTHIRD_PERSON
+	BUILD_DEFINES += -DTMNTMISC -DTMNTWEAPSYS -DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS -DTMNTDATASYS
 
 	USE_CODEC_VORBIS=1
 
@@ -107,6 +122,9 @@ ifeq ($(BUILD_SONIC),1)
 	ifneq ($BUILD_MISSIONPACK),1)
 		BUILD_MISSIONPACK=0
 	endif
+
+	BASEQ3_FLAGS =
+	MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
 
 else # END SONIC
 
@@ -123,29 +141,42 @@ else # END SONIC
 
 	# TMNT defines
 	# -DTMNTHUD only effects quake3 hud, not missionpack hud
-	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM
-	BUILD_DEFINES += -DTMNT -DTMNTHUD -DTMNTHOLDSYS -DTMNTHOLDABLE -DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS \
-				-DTMNTSP -DTMNTPLAYERSYS -DTMNTPLAYERS -DTMNT_SUPPORTQ3 -DTMNTENTITIES -DTMNTPATHS
+	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPATIBILITY -DNOTRATEDM
+	BUILD_DEFINES += -DTHIRD_PERSON
+	BUILD_DEFINES += -DTMNT -DTMNTMISC -DTMNTHUD -DTMNTSP -DTMNTHOLDSYS -DTMNTHOLDABLE \
+						-DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS -DTMNTPLAYERSYS -DTMNTPLAYERS\
+						-DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
+						-DTMNTDATASYS -DTMNTDATA
 
-	# undefined defines.
+	# temp define while I finish game model tag code.
+	BUILD_DEFINES += -DTMNTWEAPSYS_1
+
 	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
 	# -DANALOG		 # TODO: Finish analog input.
 	# -DARRAYMAX     # TODO: This was going to remove the bit max problem with Q3 network (ie more then 16 weapons).
-	# Non-GPL code. Needs rewrite.
-	# -DSINGLEPLAYER # Mostly rewritten now by TMNTSP. It still has savegames, misc_model_anim, and target_earthquake.
-	# -DSP_NPC       # rfactory.org NPCs. I haven't yet started to replace this yet.
 
 	# TMNT HOLDABLE SYSTEM 2: 
 	# Allows players to change to any holdable, not just the next one. (Based on Q3's weapon changing)
-	# Currently causes auto changing holdables not to work (As cg.holdableSelect can't  be changed in bg_pmove.c)
-	#BUILD_DEFINES+=-DTMNTHOLDSYS2
+	BUILD_DEFINES+=-DTMNTHOLDSYS2
 
 	# TMNT HOLDABLE SYSTEM 2 BOT: Currently needed for bots to use holdables when TMNTHOLDSYS is defined.
 	# It was part of TMNTHOLDABLE2, but is needed for bots when TMNTHOLDSYS is defined as well.
 	BUILD_DEFINES+=-DTMNTHOLDSYS2BOT
 
-	# Enable Raven MDR model support. (I may use MDR for my player models)
-	BUILD_DEFINES+=-DRAVENMDR
+	# Non-GPL code. Needs rewrite/removal.
+	# 				 # HOMING (search word), TMNTWEAPONS homing rocket
+	# -DTMNTENTITIES # CODE IS DIRECTLY OR IS BASED ON non-free code FROM STY:EF
+	# -DSINGLEPLAYER # Mostly rewritten now by TMNTSP. It still has savegames, and misc_model_anim.
+	#                Savegames will be GPL sometime, and misc_model_anim is going to be rewrite
+	#                 by misc_object (That can animate and be damaged, and maybe respawn, and maybe spawn item on death)
+	# -DSP_NPC       # rfactory.org / TDC NPCs. I haven't started to replace this yet.
+
+	# Enable Raven MDR (Based on id's MD4) model support. (I may use MDR for my player models)
+	BUILD_DEFINES+=-DRAVENMD4
+
+	# TMNT Arena currently use MISSIONPACK game/cgame and BASEQ3 ui
+	BASEQ3_FLAGS =
+	MISSIONPACK_FLAGS = -DMISSIONPACK #-DMISSIONPACK_HUD
 
 endif # BUILD_SONIC
 endif # BUILD_IOQUAKE3
@@ -433,7 +464,7 @@ ifeq ($(PLATFORM),linux)
     CLIENT_LIBS += -lrt
   endif
 
-ifeq ($(USE_LOCAL_HEADERS),1)
+  ifeq ($(USE_LOCAL_HEADERS),1)
     BASE_CFLAGS += -I$(SDLHDIR)/include
   endif
 
@@ -1019,49 +1050,49 @@ endif
 
 define DO_SHLIB_CC
 $(echo_cmd) "SHLIB_CC $<"
-$(Q)$(CC) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(BASEQ3_FLAGS) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_GAME_CC
 $(echo_cmd) "GAME_CC $<"
-$(Q)$(CC) -DQAGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(BASEQ3_FLAGS) -DQAGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_CGAME_CC
 $(echo_cmd) "CGAME_CC $<"
-$(Q)$(CC) -DCGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(BASEQ3_FLAGS) -DCGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_UI_CC
 $(echo_cmd) "UI_CC $<"
-$(Q)$(CC) -DUI $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(BASEQ3_FLAGS) -DUI $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_SHLIB_CC_MISSIONPACK
 $(echo_cmd) "SHLIB_CC_MISSIONPACK $<"
-$(Q)$(CC) -DMISSIONPACK $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(MISSIONPACK_FLAGS) $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_GAME_CC_MISSIONPACK
 $(echo_cmd) "GAME_CC_MISSIONPACK $<"
-$(Q)$(CC) -DMISSIONPACK -DQAGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(MISSIONPACK_FLAGS) -DQAGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_CGAME_CC_MISSIONPACK
 $(echo_cmd) "CGAME_CC_MISSIONPACK $<"
-$(Q)$(CC) -DMISSIONPACK -DCGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(MISSIONPACK_FLAGS) -DCGAME $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_UI_CC_MISSIONPACK
 $(echo_cmd) "UI_CC_MISSIONPACK $<"
-$(Q)$(CC) -DMISSIONPACK -DUI $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
+$(Q)$(CC) $(MISSIONPACK_FLAGS) -DUI $(CFLAGS) $(SHLIBCFLAGS) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
@@ -1315,22 +1346,22 @@ endef
 
 define DO_Q3LCC_MISSIONPACK
 $(echo_cmd) "Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DMISSIONPACK_UI -o $@ $<
 endef
 
 define DO_CGAME_Q3LCC_MISSIONPACK
 $(echo_cmd) "CGAME_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DCGAME -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DMISSIONPACK_UI -DCGAME -o $@ $<
 endef
 
 define DO_GAME_Q3LCC_MISSIONPACK
 $(echo_cmd) "GAME_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DQAGAME -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DMISSIONPACK_UI -DQAGAME -o $@ $<
 endef
 
 define DO_UI_Q3LCC_MISSIONPACK
 $(echo_cmd) "UI_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DUI -o $@ $<
+$(Q)$(Q3LCC) $(BUILD_DEFINES) -DMISSIONPACK -DMISSIONPACK_UI -DUI -o $@ $<
 endef
 
 
@@ -1849,6 +1880,7 @@ Q3CGOBJ_ = \
   $(B)/baseq3/cgame/cg_info.o \
   $(B)/baseq3/cgame/cg_localents.o \
   $(B)/baseq3/cgame/cg_marks.o \
+  $(B)/baseq3/cgame/cg_particles.o \
   $(B)/baseq3/cgame/cg_players.o \
   $(B)/baseq3/cgame/cg_playerstate.o \
   $(B)/baseq3/cgame/cg_predict.o \
@@ -1896,6 +1928,7 @@ MPCGOBJ_ = \
   $(B)/missionpack/cgame/cg_info.o \
   $(B)/missionpack/cgame/cg_localents.o \
   $(B)/missionpack/cgame/cg_marks.o \
+  $(B)/missionpack/cgame/cg_particles.o \
   $(B)/missionpack/cgame/cg_players.o \
   $(B)/missionpack/cgame/cg_playerstate.o \
   $(B)/missionpack/cgame/cg_predict.o \

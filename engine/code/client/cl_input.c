@@ -446,7 +446,7 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	up = 0;
 #if 0 //#ifdef ANALOG // Turtle Man: Analog
 	// Only use analog when chase cam is on.
-	// Turtle Man: FIXME: I think the main analog code should go here!
+	// Turtle Man: TODO: I think the main analog code should go here!
     if (cl_thirdPerson->integer && cl_thirdPersonAnalog->integer)
     {
 	if ( in_strafe.active ) {
@@ -698,7 +698,7 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	for (i=0 ; i<3 ; i++) {
 		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);
 	}
-}
+	}
 #else
 	for (i=0 ; i<3 ; i++) {
 		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);

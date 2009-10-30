@@ -652,6 +652,10 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	Info_SetValueForKey( userinfo, key, model );
 	key = "team_model";
 	Info_SetValueForKey( userinfo, key, model );
+#ifdef TMNTSP // SPMODEL
+	key = "spmodel";
+	Info_SetValueForKey( userinfo, key, model );
+#endif
 
 	key = "headmodel";
 	headmodel = Info_ValueForKey( botinfo, key );
@@ -661,6 +665,10 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	Info_SetValueForKey( userinfo, key, headmodel );
 	key = "team_headmodel";
 	Info_SetValueForKey( userinfo, key, headmodel );
+#ifdef TMNTSP // SPMODEL
+	key = "spheadmodel";
+	Info_SetValueForKey( userinfo, key, headmodel );
+#endif
 
 	key = "gender";
 	s = Info_ValueForKey( botinfo, key );
@@ -1026,7 +1034,7 @@ void G_InitBots( qboolean restart ) {
 			return;
 		}
 
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 		strValue = Info_ValueForKey( arenainfo, "scorelimit" );
 		fragLimit = atoi( strValue );
 #ifdef TMNT_SUPPORTQ3
@@ -1064,7 +1072,7 @@ void G_InitBots( qboolean restart ) {
 		}
 
 		if ( !fragLimit && !timeLimit ) {
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 			trap_Cvar_Set( "scorelimit", "10" );
 #else
 			trap_Cvar_Set( "fraglimit", "10" );

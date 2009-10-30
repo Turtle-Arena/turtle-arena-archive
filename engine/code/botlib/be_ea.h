@@ -48,7 +48,7 @@ void EA_Attack(int client);
 void EA_Respawn(int client);
 void EA_Talk(int client);
 void EA_Gesture(int client);
-#ifdef TMNTHOLDABLE // Turtle Man: MULTIHOLDABLE
+#ifdef TMNTHOLDSYS
 void EA_Use(int client, int holdable);
 #else
 void EA_Use(int client);

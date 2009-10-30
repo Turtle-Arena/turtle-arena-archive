@@ -313,7 +313,12 @@ CG_FindClientModelFile
 ==========================
 */
 static qboolean	CG_FindClientModelFile( char *filename, int length, clientInfo_t *ci, const char *teamName, const char *modelName, const char *skinName, const char *base, const char *ext ) {
+#ifdef IOQ3ZTM // PLAYER_DIR
+	char *team;
+	int h;
+#else
 	char *team, *charactersFolder;
+#endif
 	int i;
 
 	if ( cgs.gametype >= GT_TEAM ) {
@@ -331,6 +336,50 @@ static qboolean	CG_FindClientModelFile( char *filename, int length, clientInfo_t
 	else {
 		team = "default";
 	}
+#ifdef IOQ3ZTM // PLAYER_DIR
+	for (h=0; bg_playerDirs[h] != NULL; h++)
+	{
+		for ( i = 0; i < 2; i++ ) {
+			if ( i == 0 && teamName && *teamName ) {
+				//								"models/players/characters/james/stroggs/lower_lily_red.skin"
+				Com_sprintf( filename, length, "%s/%s/%s%s_%s_%s.%s", bg_playerDirs[h], modelName, teamName, base, skinName, team, ext );
+			}
+			else {
+				//								"models/players/characters/james/lower_lily_red.skin"
+				Com_sprintf( filename, length, "%s/%s/%s_%s_%s.%s", bg_playerDirs[h], modelName, base, skinName, team, ext );
+			}
+			if ( CG_FileExists( filename ) ) {
+				return qtrue;
+			}
+			if ( cgs.gametype >= GT_TEAM ) {
+				if ( i == 0 && teamName && *teamName ) {
+					//								"models/players/characters/james/stroggs/lower_red.skin"
+					Com_sprintf( filename, length, "%s/%s/%s%s_%s.%s", bg_playerDirs[h], modelName, teamName, base, team, ext );
+				}
+				else {
+					//								"models/players/characters/james/lower_red.skin"
+					Com_sprintf( filename, length, "%s/%s/%s_%s.%s", bg_playerDirs[h], modelName, base, team, ext );
+				}
+			}
+			else {
+				if ( i == 0 && teamName && *teamName ) {
+					//								"models/players/characters/james/stroggs/lower_lily.skin"
+					Com_sprintf( filename, length, "%s/%s/%s%s_%s.%s", bg_playerDirs[h], modelName, teamName, base, skinName, ext );
+				}
+				else {
+					//								"models/players/characters/james/lower_lily.skin"
+					Com_sprintf( filename, length, "%s/%s/%s_%s.%s", bg_playerDirs[h], modelName, base, skinName, ext );
+				}
+			}
+			if ( CG_FileExists( filename ) ) {
+				return qtrue;
+			}
+			if ( !teamName || !*teamName ) {
+				break;
+			}
+		}
+	}
+#else
 	charactersFolder = "";
 	while(1) {
 		for ( i = 0; i < 2; i++ ) {
@@ -378,6 +427,7 @@ static qboolean	CG_FindClientModelFile( char *filename, int length, clientInfo_t
 		}
 		charactersFolder = "characters/";
 	}
+#endif
 
 	return qfalse;
 }
@@ -388,11 +438,13 @@ CG_FindClientHeadFile
 ==========================
 */
 static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t *ci, const char *teamName, const char *headModelName, const char *headSkinName, const char *base, const char *ext ) {
-	char *team, *headsFolder;
-	int i;
-#ifdef TMNTPLAYERSYS // non-playercfg
+#ifdef IOQ3ZTM // PLAYER_DIR
+	const char *team, *headsFolder;
 	int h;
+#else
+	char *team, *headsFolder;
 #endif
+	int i;
 
 	if ( cgs.gametype >= GT_TEAM ) {
 		switch ( ci->team ) {
@@ -410,6 +462,77 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 		team = "default";
 	}
 
+#ifdef IOQ3ZTM // PLAYER_DIR
+	// if '*' checks models/players/heads/ directory,
+	// then models/players/ and models/players/characters directory,
+	// if not '*', does players_dirs then models/players/heads/
+	for ( h = 0; h == 0 || (h > 0 && bg_playerDirs[h-1] != NULL); h++ )
+	{
+		if (headModelName[0] == '*')
+		{
+			if (h == 0)
+			{
+				headsFolder = "models/players/heads";
+				headModelName++;
+			}
+			else if (h == 1)
+			{
+				headModelName--;
+				headsFolder = bg_playerDirs[h-1];
+			}
+			else
+			{
+				headsFolder = bg_playerDirs[h-1];
+			}
+		}
+		else
+		{
+			if (bg_playerDirs[h] == NULL)
+			{
+				headsFolder = "models/players/heads";
+				headModelName++;
+			}
+			else
+			{
+				headsFolder = bg_playerDirs[h];
+			}
+		}
+
+		for ( i = 0; i < 2; i++ ) {
+			if ( i == 0 && teamName && *teamName ) {
+				Com_sprintf( filename, length, "%s/%s/%s/%s%s_%s.%s", headsFolder, headModelName, headSkinName, teamName, base, team, ext );
+			}
+			else {
+				Com_sprintf( filename, length, "%s/%s/%s/%s_%s.%s", headsFolder, headModelName, headSkinName, base, team, ext );
+			}
+			if ( CG_FileExists( filename ) ) {
+				return qtrue;
+			}
+			if ( cgs.gametype >= GT_TEAM ) {
+				if ( i == 0 &&  teamName && *teamName ) {
+					Com_sprintf( filename, length, "%s/%s/%s%s_%s.%s", headsFolder, headModelName, teamName, base, team, ext );
+				}
+				else {
+					Com_sprintf( filename, length, "%s/%s/%s_%s.%s", headsFolder, headModelName, base, team, ext );
+				}
+			}
+			else {
+				if ( i == 0 && teamName && *teamName ) {
+					Com_sprintf( filename, length, "%s/%s/%s%s_%s.%s", headsFolder, headModelName, teamName, base, headSkinName, ext );
+				}
+				else {
+					Com_sprintf( filename, length, "%s/%s/%s_%s.%s", headsFolder, headModelName, base, headSkinName, ext );
+				}
+			}
+			if ( CG_FileExists( filename ) ) {
+				return qtrue;
+			}
+			if ( !teamName || !*teamName ) {
+				break;
+			}
+		}
+	}
+#else
 	if ( headModelName[0] == '*' ) {
 		headsFolder = "heads/";
 		headModelName++;
@@ -417,13 +540,9 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 	else {
 		headsFolder = "";
 	}
-#ifdef TMNTPLAYERSYS // non-playercfg
-	// if '*' checks heads/ directory, then players/ directory,
-	// if not '*', does players/ then heads/
-	for ( h = 0; h < 2; h++ ) {
-#else
-	while(1) {
-#endif
+
+	while(1)
+	{
 		for ( i = 0; i < 2; i++ ) {
 			if ( i == 0 && teamName && *teamName ) {
 				Com_sprintf( filename, length, "models/players/%s%s/%s/%s%s_%s.%s", headsFolder, headModelName, headSkinName, teamName, base, team, ext );
@@ -459,15 +578,11 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 		}
 		// if tried the heads folder first
 		if ( headsFolder[0] ) {
-#ifdef TMNTPLAYERSYS // non-playercfg
-			headsFolder = "";
-			continue;
-#else
 			break;
-#endif
 		}
 		headsFolder = "heads/";
 	}
+#endif
 
 	return qfalse;
 }
@@ -539,6 +654,9 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	char	filename[MAX_QPATH*2];
 	const char		*headName;
 	char newTeamName[MAX_QPATH*2];
+#ifdef IOQ3ZTM // PLAYER_DIR
+	int			i;
+#endif
 
 	if ( headModelName[0] == '\0' ) {
 		headName = modelName;
@@ -546,6 +664,70 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	else {
 		headName = headModelName;
 	}
+
+#ifdef IOQ3ZTM // PLAYER_DIR // Same code in UI_RegisterClientModelname
+	for (i=0; bg_playerDirs[i] != NULL; i++)
+	{
+		if (i == 0 || !ci->legsModel)
+		{
+			Com_sprintf( filename, sizeof( filename ), "%s/%s/lower.md3", bg_playerDirs[i], modelName );
+			ci->legsModel = trap_R_RegisterModel( filename );
+		}
+		if (i == 0 || !ci->torsoModel )
+		{
+			Com_sprintf( filename, sizeof( filename ), "%s/%s/upper.md3", bg_playerDirs[i], modelName );
+			ci->torsoModel = trap_R_RegisterModel( filename );
+		}
+	}
+
+	// failed?
+	if ( !ci->legsModel ) {
+		Com_Printf( "Failed to load model file %s\n", filename );
+		return qfalse;
+	}
+	if ( !ci->torsoModel ) {
+		Com_Printf( "Failed to load model file %s\n", filename );
+		return qfalse;
+	}
+
+	// load head model
+	ci->headModel = 0;
+
+	if (headModelName[0] == '*' ) {
+		Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/%s.md3", &headModelName[1], &headModelName[1] );
+		ci->headModel = trap_R_RegisterModel( filename );
+	}
+
+	if (!ci->headModel)
+	{
+		for (i=0; bg_playerDirs[i] != NULL; i++)
+		{
+			if (headModelName[0] == '*')
+			{
+				Com_sprintf( filename, sizeof( filename ), "%s/%s/head.md3", bg_playerDirs[i], &headModelName[1] );
+			}
+			else
+			{
+				Com_sprintf( filename, sizeof( filename ), "%s/%s/head.md3", bg_playerDirs[i], headModelName );
+			}
+			ci->headModel = trap_R_RegisterModel( filename );
+			if (ci->headModel)
+			{
+				break;
+			}
+		}
+	}
+
+	if ( !ci->headModel && headModelName[0] != '*') {
+		Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/%s.md3", headModelName, headModelName );
+		ci->headModel = trap_R_RegisterModel( filename );
+	}
+
+	if (!ci->headModel) {
+		Com_Printf( "Failed to load model file %s\n", filename );
+		return qfalse;
+	}
+#else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", modelName );
 	ci->legsModel = trap_R_RegisterModel( filename );
 	if ( !ci->legsModel ) {
@@ -591,6 +773,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
 	}
+#endif
 
 	// if any skins failed to load, return failure
 	if ( !CG_RegisterClientSkin( ci, teamName, modelName, skinName, headName, headSkinName ) ) {
@@ -629,12 +812,30 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	}
 #endif
 
+#ifdef IOQ3ZTM // Support all image formats for player icons
+	if (
+#ifdef TMNTDATASYS // Load PNG first.
+		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "png" ) ||
+#endif
+		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "tga" ) ||
+		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "jpg" ) ||
+		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "jpeg" ) ||
+#ifndef TMNTDATASYS
+		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "png" ) ||
+#endif
+		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "pcx" ) ||
+		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "bmp" ) )
+	{
+		ci->modelIcon = trap_R_RegisterShaderNoMip( filename );
+	}
+#else
 	if ( CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "skin" ) ) {
 		ci->modelIcon = trap_R_RegisterShaderNoMip( filename );
 	}
 	else if ( CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "tga" ) ) {
 		ci->modelIcon = trap_R_RegisterShaderNoMip( filename );
 	}
+#endif
 
 	if ( !ci->modelIcon ) {
 		return qfalse;
@@ -754,9 +955,9 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	}
 #endif
 
-#if defined TMNTPLAYERSYS && defined TMNTPLAYERS // DEFAULT_DEFAULT_WEAPON
+#if defined TMNTPLAYERSYS && defined TMNTWEAPSYS // DEFAULT_DEFAULT_WEAPON
 	// If it is the local client update default weapon.
-	if (clientNum == cg.clientNum)
+	if (clientNum == cg.predictedPlayerState.clientNum)
 	{
 		cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
 	}
@@ -791,7 +992,11 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	}
 
 	// sounds
+#ifdef TMNTPLAYERSYS // SOUNDPATH
+	dir = ci->playercfg.soundpath;
+#else
 	dir = ci->modelName;
+#endif
 	fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL : DEFAULT_MODEL;
 
 	for ( i = 0 ; i < MAX_CUSTOM_SOUNDS ; i++ ) {
@@ -803,6 +1008,11 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 		// if the model didn't load use the sounds of the default model
 		if (modelloaded) {
 			ci->sounds[i] = trap_S_RegisterSound( va("sound/player/%s/%s", dir, s + 1), qfalse );
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF // Elite Force player sounds are in a different directory.
+			if ( !ci->sounds[i] ) {
+				ci->sounds[i] = trap_S_RegisterSound( va("sound/voice/%s/%s", dir, s + 1), qfalse );
+			}
+#endif
 		}
 		if ( !ci->sounds[i] ) {
 			ci->sounds[i] = trap_S_RegisterSound( va("sound/player/%s/%s", fallback, s + 1), qfalse );
@@ -1192,7 +1402,7 @@ PLAYER ANIMATION
 =============================================================================
 */
 
-
+#ifndef IOQ3ZTM // Moved to BG and LERP_FRAME_CLIENT_LESS
 /*
 ===============
 CG_SetLerpFrameAnimation
@@ -1200,21 +1410,35 @@ CG_SetLerpFrameAnimation
 may include ANIM_TOGGLEBIT
 ===============
 */
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+void CG_SetLerpFrameAnimation( lerpFrame_t *lf, animation_t *animations, int newAnimation ) {
+#else
 static void CG_SetLerpFrameAnimation( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation ) {
+#endif
 	animation_t	*anim;
 
 	lf->animationNumber = newAnimation;
 	newAnimation &= ~ANIM_TOGGLEBIT;
 
-	if ( newAnimation < 0 || newAnimation >= MAX_TOTALANIMATIONS ) {
+	if ( newAnimation < 0
+#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+	|| newAnimation >= MAX_TOTALANIMATIONS
+#endif
+	) {
 		CG_Error( "Bad animation number: %i", newAnimation );
 	}
 
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+	// Turtle Man: TDC's NPC version used "anim = animations+newAnimation;"
+	//               shouldn't make a difference.
+	anim = &animations[ newAnimation ];
+#else
 #ifdef TMNTPLAYERSYS
 	anim = &ci->playercfg.animations[ newAnimation ];
 #else
 	anim = &ci->animations[ newAnimation ];
 #endif
+#endif
 
 	lf->animation = anim;
 	lf->animationTime = lf->frameTime + anim->initialLerp;
@@ -1223,117 +1447,6 @@ static void CG_SetLerpFrameAnimation( clientInfo_t *ci, lerpFrame_t *lf, int new
 		CG_Printf( "Anim: %i\n", newAnimation );
 	}
 }
-
-#ifdef SP_NPC
-static void CG_SetLerpFrameAnimationNPC( animation_t *ai, lerpFrame_t *lf, int newAnimation ) {
-	animation_t	*anim;
-	lf->animationNumber = newAnimation;
-	newAnimation &= ~ANIM_TOGGLEBIT;
-	if ( newAnimation < 0 || newAnimation >= MAX_TOTALANIMATIONS ) {
-		CG_Error( "Bad animation number: %i", newAnimation );
-	}
-	anim = ai+newAnimation;
-	lf->animation = anim;
-	lf->animationTime = lf->frameTime + anim->initialLerp;
-	if ( cg_debugAnim.integer ) {
-		CG_Printf( "Anim: %i\n", newAnimation );
-	}
-}
-/*
-===============
-CG_RunLerpFrameNPC
-Sets cg.snap, cg.oldFrame, and cg.backlerp
-cg.time should be between oldFrameTime and frameTime after exit
-===============
-*/
-void CG_RunLerpFrameNPC( animation_t *ai, lerpFrame_t *lf, int newAnimation, float speedScale ) {
-	int		f,numFrames;
-	animation_t	*anim;
-	// debugging tool to get no animations
-	if ( cg_animSpeed.integer == 0 ) {
-		lf->oldFrame = lf->frame = lf->backlerp = 0;
-		return;
-	}
-	// see if the animation sequence is switching
-	if ( newAnimation != lf->animationNumber || !lf->animation ) {
-		CG_SetLerpFrameAnimationNPC( ai, lf, newAnimation );
-	}
-	// if we have passed the current frame, move it to
-	// oldFrame and calculate a new frame
-	if ( cg.time >= lf->frameTime ) {
-		lf->oldFrame = lf->frame;
-		lf->oldFrameTime = lf->frameTime;
-		// get the next frame based on the animation
-		anim = lf->animation;
-		if ( !anim->frameLerp ) {
-			return;		// shouldn't happen
-		}
-		if ( cg.time < lf->animationTime ) {
-			lf->frameTime = lf->animationTime;		// initial lerp
-		} else {
-			lf->frameTime = lf->oldFrameTime + anim->frameLerp;
-		}
-		f = ( lf->frameTime - lf->animationTime ) / anim->frameLerp;
-		f *= speedScale;		// adjust for haste, etc
-		numFrames = anim->numFrames;
-		if (anim->flipflop) {
-			numFrames *= 2;
-		}
-		if ( f >= numFrames ) {
-			f -= numFrames;
-			if ( anim->loopFrames ) {
-				f %= anim->loopFrames;
-				f += anim->numFrames - anim->loopFrames;
-			} else {
-				f = numFrames - 1;
-				// the animation is stuck at the end, so it
-				// can immediately transition to another sequence
-				lf->frameTime = cg.time;
-			}
-		}
-		if ( anim->reversed ) {
-			lf->frame = anim->firstFrame + anim->numFrames - 1 - f;
-		}
-		else if (anim->flipflop && f>=anim->numFrames) {
-			lf->frame = anim->firstFrame + anim->numFrames - 1 - (f%anim->numFrames);
-		}
-		else {
-			lf->frame = anim->firstFrame + f;
-		}
-		if ( cg.time > lf->frameTime ) {
-			lf->frameTime = cg.time;
-			if ( cg_debugAnim.integer ) {
-				CG_Printf( "Clamp lf->frameTime\n");
-			}
-		}
-	}
-	if ( lf->frameTime > cg.time + 200 ) {
-		lf->frameTime = cg.time;
-	}
-	if ( lf->oldFrameTime > cg.time ) {
-		lf->oldFrameTime = cg.time;
-	}
-	// calculate current lerp value
-	if ( lf->frameTime == lf->oldFrameTime ) {
-		lf->backlerp = 0;
-	} else {
-		lf->backlerp = 1.0 - (float)( cg.time - lf->oldFrameTime ) / ( lf->frameTime - lf->oldFrameTime );
-	}
-}
-#endif
-
-#ifdef SINGLEPLAYER // entity
-/*
-===============
-CG_ClearLerpFrame
-===============
-*/
-void CG_ClearLerpFrameNPC( animation_t *ai, lerpFrame_t *lf, int animationNumber ) {
-	lf->frameTime = lf->oldFrameTime = cg.time;
-	CG_SetLerpFrameAnimationNPC( ai, lf, animationNumber );
-	lf->oldFrame = lf->frame = lf->animation->firstFrame;
-}
-#endif
 
 /*
 ===============
@@ -1343,7 +1456,11 @@ Sets cg.snap, cg.oldFrame, and cg.backlerp
 cg.time should be between oldFrameTime and frameTime after exit
 ===============
 */
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+void CG_RunLerpFrame( lerpFrame_t *lf, animation_t *animations, int newAnimation, float speedScale ) {
+#else
 static void CG_RunLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation, float speedScale ) {
+#endif
 	int			f, numFrames;
 	animation_t	*anim;
 
@@ -1355,7 +1472,11 @@ static void CG_RunLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation
 
 	// see if the animation sequence is switching
 	if ( newAnimation != lf->animationNumber || !lf->animation ) {
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+		CG_SetLerpFrameAnimation( lf, animations, newAnimation );
+#else
 		CG_SetLerpFrameAnimation( ci, lf, newAnimation );
+#endif
 	}
 
 	// if we have passed the current frame, move it to
@@ -1431,11 +1552,20 @@ static void CG_RunLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation
 CG_ClearLerpFrame
 ===============
 */
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+void CG_ClearLerpFrame( lerpFrame_t *lf, animation_t *animations, int animationNumber ) {
+#else
 static void CG_ClearLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int animationNumber ) {
+#endif
 	lf->frameTime = lf->oldFrameTime = cg.time;
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+	CG_SetLerpFrameAnimation( lf, animations, animationNumber );
+#else
 	CG_SetLerpFrameAnimation( ci, lf, animationNumber );
+#endif
 	lf->oldFrame = lf->frame = lf->animation->firstFrame;
 }
+#endif // IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 
 
 /*
@@ -1466,16 +1596,46 @@ static void CG_PlayerAnimation( centity_t *cent, int *legsOld, int *legs, float 
 
 	// do the shuffle turn frames locally
 	if ( cent->pe.legs.yawing && ( cent->currentState.legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE ) {
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+		BG_RunLerpFrame( &cent->pe.legs,
+#ifdef TMNTPLAYERSYS
+			ci->playercfg.animations,
+#else
+			ci->animations,
+#endif
+			LEGS_TURN, cg.time, speedScale );
+#else
 		CG_RunLerpFrame( ci, &cent->pe.legs, LEGS_TURN, speedScale );
+#endif
 	} else {
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+		BG_RunLerpFrame( &cent->pe.legs,
+#ifdef TMNTPLAYERSYS
+			ci->playercfg.animations,
+#else
+			ci->animations,
+#endif
+			cent->currentState.legsAnim, cg.time, speedScale );
+#else
 		CG_RunLerpFrame( ci, &cent->pe.legs, cent->currentState.legsAnim, speedScale );
+#endif
 	}
 
 	*legsOld = cent->pe.legs.oldFrame;
 	*legs = cent->pe.legs.frame;
 	*legsBackLerp = cent->pe.legs.backlerp;
 
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+	BG_RunLerpFrame( &cent->pe.torso,
+#ifdef TMNTPLAYERSYS
+		ci->playercfg.animations,
+#else
+		ci->animations,
+#endif
+		cent->currentState.torsoAnim, cg.time, speedScale );
+#else
 	CG_RunLerpFrame( ci, &cent->pe.torso, cent->currentState.torsoAnim, speedScale );
+#endif
 
 	*torsoOld = cent->pe.torso.oldFrame;
 	*torso = cent->pe.torso.frame;
@@ -1651,10 +1811,11 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
 		ci = &cgs.clientinfo[ clientNum ];
 #ifdef TMNTPLAYERSYS
-		if ( ci->playercfg.fixedtorso ) {
+		if ( ci->playercfg.fixedtorso )
 #else
-		if ( ci->fixedtorso ) {
+		if ( ci->fixedtorso )
 #endif
+		{
 			torsoAngles[PITCH] = 0.0f;
 		}
 	}
@@ -1684,10 +1845,11 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
 		ci = &cgs.clientinfo[ clientNum ];
 #ifdef TMNTPLAYERSYS
-		if ( ci->playercfg.fixedlegs ) {
+		if ( ci->playercfg.fixedlegs )
 #else
-		if ( ci->fixedlegs ) {
+		if ( ci->fixedlegs )
 #endif
+		{
 			legsAngles[YAW] = torsoAngles[YAW];
 			legsAngles[PITCH] = 0.0f;
 			legsAngles[ROLL] = 0.0f;
@@ -1721,7 +1883,11 @@ static void CG_HasteTrail( centity_t *cent ) {
 	if ( cent->trailTime > cg.time ) {
 		return;
 	}
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+	anim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
+#else
 	anim = cent->pe.legs.animationNumber & ~ANIM_TOGGLEBIT;
+#endif
 	if ( anim != LEGS_RUN && anim != LEGS_BACK ) {
 		return;
 	}
@@ -1802,7 +1968,11 @@ static void CG_DustTrail( centity_t *cent ) {
 		return;
 	}
 
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+	anim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
+#else
 	anim = cent->pe.legs.animationNumber & ~ANIM_TOGGLEBIT;
+#endif
 	if ( anim != LEGS_LANDB && anim != LEGS_LAND ) {
 		return;
 	}
@@ -1846,7 +2016,7 @@ static void CG_TrailItem( centity_t *cent, qhandle_t hModel ) {
 	vec3_t			axis[3];
 
 #ifdef IOQ3ZTM // Don't draw CTF flag for the holder in third person.
-	if (cent->currentState.clientNum == cg.clientNum
+	if (cent->currentState.clientNum == cg.predictedPlayerState.clientNum
 		&& cg_thirdPerson.integer)
 	{
 		// if its the current player and their in third person view,
@@ -1995,7 +2165,11 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #ifndef TMNT_SUPPORTQ3
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #endif
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // FLAG_ANIMATIONS
+	BG_RunLerpFrame( &cent->pe.flag, cgs.media.flag_animations, flagAnim, cg.time, 1 );
+#else
 	CG_RunLerpFrame( ci, &cent->pe.flag, flagAnim, 1 );
+#endif
 	flag.oldframe = cent->pe.flag.oldFrame;
 	flag.frame = cent->pe.flag.frame;
 	flag.backlerp = cent->pe.flag.backlerp;
@@ -2007,7 +2181,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 }
 
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK_HARVESTER
 /*
 ===============
 CG_PlayerTokens
@@ -2196,7 +2370,7 @@ static void CG_PlayerFloatSprite( centity_t *cent, qhandle_t shader
 		&& !cg.renderingThirdPerson)
 #endif
 	{
-#ifdef IOQ3ZTM
+#ifdef IOQ3ZTM // RENDERFLAGS
 		rf = RF_ONLY_MIRROR;		// only show in mirrors
 #else
 		rf = RF_THIRD_PERSON;		// only show in mirrors
@@ -2240,7 +2414,7 @@ static void CG_PlayerSprites( centity_t *cent ) {
 		return;
 	}
 
-#ifdef TMNTSP // Turtle Man: FIXME: There is always a talk balloon at sp inter, so I always disable it.
+#ifdef TMNTSP // Turtle Man: FIXME: There is always a talk balloon at sp intermission, so I always disable it.
 	if ( (cent->currentState.eFlags & EF_TALK) && !cg.intermissionStarted && cg.snap->ps.pm_type != PM_SPINTERMISSION ) {
 #else
 	if ( cent->currentState.eFlags & EF_TALK ) {
@@ -2589,14 +2763,20 @@ void CG_Player( centity_t *cent ) {
 	refEntity_t		powerup;
 #endif
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	refEntity_t		skull;
+#endif
 #ifndef TMNT // POWERS
 	refEntity_t		powerup;
 #endif
 	int				t;
 	float			c;
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	float			angle;
 	vec3_t			dir, angles;
+#else
+	vec3_t			angles;
+#endif
 #endif
 
 	// the client number is stored in clientNum.  It can't be derived
@@ -2618,11 +2798,7 @@ void CG_Player( centity_t *cent ) {
 	renderfx = 0;
 	if ( cent->currentState.number == cg.snap->ps.clientNum) {
 		if (!cg.renderingThirdPerson) {
-#ifdef IOQ3ZTM
-			renderfx = RF_ONLY_MIRROR;			// only draw in mirrors
-#else
 			renderfx = RF_THIRD_PERSON;			// only draw in mirrors
-#endif
 		} else {
 			if (cg_cameraMode.integer) {
 				return;
@@ -2655,7 +2831,7 @@ void CG_Player( centity_t *cent ) {
 		renderfx |= RF_SHADOW_PLANE;
 	}
 	renderfx |= RF_LIGHTING_ORIGIN;			// use the same origin for all
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK_HARVESTER
 	if( cgs.gametype == GT_HARVESTER ) {
 		CG_PlayerTokens( cent, renderfx );
 	}
@@ -2735,6 +2911,7 @@ void CG_Player( centity_t *cent ) {
 	}
 #endif
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	if ( cent->currentState.eFlags & EF_KAMIKAZE ) {
 
 		memset( &skull, 0, sizeof(skull) );
@@ -2843,6 +3020,7 @@ void CG_Player( centity_t *cent ) {
 			trap_R_AddRefEntityToScene( &skull );
 		}
 	}
+#endif // TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 
 	if ( cent->currentState.powerups & ( 1 << PW_GUARD ) ) {
 		memcpy(&powerup, &torso, sizeof(torso));
@@ -2893,11 +3071,7 @@ void CG_Player( centity_t *cent ) {
 		powerup.hModel = cgs.media.invulnerabilityPowerupModel;
 		powerup.customSkin = 0;
 		// always draw
-#ifdef IOQ3ZTM
-		powerup.renderfx &= ~(RF_ONLY_MIRROR|RF_NOT_MIRROR);
-#else
 		powerup.renderfx &= ~RF_THIRD_PERSON;
-#endif
 		VectorCopy(cent->lerpOrigin, powerup.origin);
 
 		if ( cg.time - ci->invulnerabilityStartTime < 250 ) {
@@ -2922,11 +3096,7 @@ void CG_Player( centity_t *cent ) {
 		powerup.hModel = cgs.media.medkitUsageModel;
 		powerup.customSkin = 0;
 		// always draw
-#ifdef IOQ3ZTM
-		powerup.renderfx &= ~(RF_ONLY_MIRROR|RF_NOT_MIRROR);
-#else
 		powerup.renderfx &= ~RF_THIRD_PERSON;
-#endif
 		VectorClear(angles);
 		AnglesToAxis(angles, powerup.axis);
 		VectorCopy(cent->lerpOrigin, powerup.origin);
@@ -2995,8 +3165,18 @@ void CG_ResetPlayerEntity( centity_t *cent ) {
 	cent->errorTime = -99999;		// guarantee no error decay added
 	cent->extrapolated = qfalse;	
 
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+#ifdef TMNTPLAYERSYS
+	BG_ClearLerpFrame( &cent->pe.legs, cgs.clientinfo[ cent->currentState.clientNum ].playercfg.animations, cent->currentState.legsAnim, cg.time );
+	BG_ClearLerpFrame( &cent->pe.torso, cgs.clientinfo[ cent->currentState.clientNum ].playercfg.animations, cent->currentState.torsoAnim, cg.time );
+#else
+	BG_ClearLerpFrame( &cent->pe.legs, cgs.clientinfo[ cent->currentState.clientNum ].animations, cent->currentState.legsAnim, cg.time );
+	BG_ClearLerpFrame( &cent->pe.torso, cgs.clientinfo[ cent->currentState.clientNum ].animations, cent->currentState.torsoAnim, cg.time );
+#endif
+#else
 	CG_ClearLerpFrame( &cgs.clientinfo[ cent->currentState.clientNum ], &cent->pe.legs, cent->currentState.legsAnim );
 	CG_ClearLerpFrame( &cgs.clientinfo[ cent->currentState.clientNum ], &cent->pe.torso, cent->currentState.torsoAnim );
+#endif
 
 	BG_EvaluateTrajectory( &cent->currentState.pos, cg.time, cent->lerpOrigin );
 	BG_EvaluateTrajectory( &cent->currentState.apos, cg.time, cent->lerpAngles );
@@ -3010,7 +3190,7 @@ void CG_ResetPlayerEntity( centity_t *cent ) {
 	cent->pe.legs.pitchAngle = 0;
 	cent->pe.legs.pitching = qfalse;
 
-	memset( &cent->pe.torso, 0, sizeof( cent->pe.legs ) );
+	memset( &cent->pe.torso, 0, sizeof( cent->pe.torso ) );
 	cent->pe.torso.yawAngle = cent->rawAngles[YAW];
 	cent->pe.torso.yawing = qfalse;
 	cent->pe.torso.pitchAngle = cent->rawAngles[PITCH];

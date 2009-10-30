@@ -154,10 +154,15 @@ static void UI_CinematicsMenu_Init( void ) {
 	cinematicsMenuInfo.cin_idlogo.generic.y			= y;
 	cinematicsMenuInfo.cin_idlogo.generic.id		= ID_CIN_IDLOGO;
 	cinematicsMenuInfo.cin_idlogo.generic.callback	= UI_CinematicsMenu_Event; 
+#if defined TMNT || defined SONIC
+	cinematicsMenuInfo.cin_idlogo.string			= "MAIN";
+#else
 	cinematicsMenuInfo.cin_idlogo.string			= "ID LOGO";
+#endif
 	cinematicsMenuInfo.cin_idlogo.color				= color_red;
 	cinematicsMenuInfo.cin_idlogo.style				= UI_CENTER;
-#ifdef TMNT
+#if defined TMNT || defined SONIC
+	// Turtle Man: FIXME: Check for video file!
     // Turtle Man: Always disable...
     cinematicsMenuInfo.cin_idlogo.generic.flags |= QMF_GRAYED;
 #endif
@@ -172,7 +177,8 @@ static void UI_CinematicsMenu_Init( void ) {
 	cinematicsMenuInfo.cin_intro.string				= "INTRO";
 	cinematicsMenuInfo.cin_intro.color				= color_red;
 	cinematicsMenuInfo.cin_intro.style				= UI_CENTER;
-#ifdef TMNT
+#if defined TMNT || defined SONIC
+	// Turtle Man: FIXME: Check for video file!
     // Turtle Man: Always disable...
     cinematicsMenuInfo.cin_intro.generic.flags |= QMF_GRAYED;
 #else

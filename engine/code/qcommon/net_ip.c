@@ -325,13 +325,8 @@ static qboolean Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int s
 		else
 			Com_Printf("Sys_StringToSockaddr: Error resolving %s: No address of required type found.\n", s);
 	}
-#ifdef __MINGW32__ // Turtle Man: FIXME
-	else
-		Com_Printf("Sys_StringToSockaddr: Error resolving %s: FIXME_MINGW32 (retval is %d)\n", s, retval);
-#else
 	else
 		Com_Printf("Sys_StringToSockaddr: Error resolving %s: %s\n", s, gai_strerror(retval));
-#endif
 	
 	if(res)
 		freeaddrinfo(res);

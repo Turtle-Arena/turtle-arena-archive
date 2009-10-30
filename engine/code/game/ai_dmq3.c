@@ -282,6 +282,7 @@ qboolean EntityHasQuad(aas_entityinfo_t *entinfo) {
 }
 
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 EntityHasKamikze
@@ -293,7 +294,9 @@ qboolean EntityHasKamikaze(aas_entityinfo_t *entinfo) {
 	}
 	return qfalse;
 }
+#endif
 
+#ifdef MISSIONPACK_HARVESTER
 /*
 ==================
 EntityCarriesCubes
@@ -310,6 +313,7 @@ qboolean EntityCarriesCubes(aas_entityinfo_t *entinfo) {
 		return qtrue;
 	return qfalse;
 }
+#endif
 
 /*
 ==================
@@ -323,6 +327,7 @@ int Bot1FCTFCarryingFlag(bot_state_t *bs) {
 	return qfalse;
 }
 
+#ifdef MISSIONPACK_HARVESTER
 /*
 ==================
 BotHarvesterCarryingCubes
@@ -335,6 +340,7 @@ int BotHarvesterCarryingCubes(bot_state_t *bs) {
 	if (bs->inventory[INVENTORY_BLUECUBE] > 0) return qtrue;
 	return qfalse;
 }
+#endif
 #endif
 
 /*
@@ -370,7 +376,10 @@ void BotSetTeamStatus(bot_state_t *bs) {
 		case LTG_TEAMACCOMPANY:
 			BotEntityInfo(bs->teammate, &entinfo);
 			if ( ( (gametype == GT_CTF || gametype == GT_1FCTF) && EntityCarriesFlag(&entinfo))
-				|| ( gametype == GT_HARVESTER && EntityCarriesCubes(&entinfo)) ) {
+#ifdef MISSIONPACK_HARVESTER
+				|| ( gametype == GT_HARVESTER && EntityCarriesCubes(&entinfo))
+#endif
+				) {
 				teamtask = TEAMTASK_ESCORT;
 			}
 			else {
@@ -402,9 +411,11 @@ void BotSetTeamStatus(bot_state_t *bs) {
 		case LTG_KILL:
 			teamtask = TEAMTASK_PATROL;
 			break;
+#ifdef MISSIONPACK_HARVESTER
 		case LTG_HARVEST:
 			teamtask = TEAMTASK_OFFENSE;
 			break;
+#endif
 		case LTG_ATTACKENEMYBASE:
 			teamtask = TEAMTASK_OFFENSE;
 			break;
@@ -1129,6 +1140,7 @@ void BotObeliskSeekGoals(bot_state_t *bs) {
 	}
 }
 
+#ifdef MISSIONPACK_HARVESTER
 /*
 ==================
 BotGoHarvest
@@ -1145,6 +1157,7 @@ void BotGoHarvest(bot_state_t *bs) {
 	bs->harvestaway_time = 0;
 	BotSetTeamStatus(bs);
 }
+#endif
 
 /*
 ==================
@@ -1155,6 +1168,7 @@ void BotObeliskRetreatGoals(bot_state_t *bs) {
 	//nothing special
 }
 
+#ifdef MISSIONPACK_HARVESTER
 /*
 ==================
 BotHarvesterSeekGoals
@@ -1316,6 +1330,7 @@ void BotHarvesterRetreatGoals(bot_state_t *bs) {
 		return;
 	}
 }
+#endif // #ifdef MISSIONPACK_HARVESTER
 #endif
 
 /*
@@ -1336,9 +1351,11 @@ void BotTeamGoals(bot_state_t *bs, int retreat) {
 		else if (gametype == GT_OBELISK) {
 			BotObeliskRetreatGoals(bs);
 		}
+#ifdef MISSIONPACK_HARVESTER
 		else if (gametype == GT_HARVESTER) {
 			BotHarvesterRetreatGoals(bs);
 		}
+#endif
 #endif
 	}
 	else {
@@ -1353,9 +1370,11 @@ void BotTeamGoals(bot_state_t *bs, int retreat) {
 		else if (gametype == GT_OBELISK) {
 			BotObeliskSeekGoals(bs);
 		}
+#ifdef MISSIONPACK_HARVESTER
 		else if (gametype == GT_HARVESTER) {
 			BotHarvesterSeekGoals(bs);
 		}
+#endif
 #endif
 	}
 	// reset the order time which is used to see if
@@ -1550,10 +1569,12 @@ int BotSynonymContext(bot_state_t *bs) {
 		if (BotTeam(bs) == TEAM_RED) context |= CONTEXT_OBELISKREDTEAM;
 		else context |= CONTEXT_OBELISKBLUETEAM;
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		if (BotTeam(bs) == TEAM_RED) context |= CONTEXT_HARVESTERREDTEAM;
 		else context |= CONTEXT_HARVESTERBLUETEAM;
 	}
+#endif
 #endif
 	return context;
 }
@@ -1634,10 +1655,12 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 		return;
 
 	offence = -1;
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	// go into offence if picked up the kamikaze or invulnerability
 	if (!oldinventory[INVENTORY_KAMIKAZE] && bs->inventory[INVENTORY_KAMIKAZE] >= 1) {
 		offence = qtrue;
 	}
+#endif
 #ifdef TMNT // POWERS
 	if (!oldinventory[INVENTORY_INVUL] && bs->inventory[INVENTORY_INVUL] >= 1) {
 		offence = qtrue;
@@ -1648,11 +1671,10 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 	}
 #endif
 	// if not already wearing the kamikaze or invulnerability
-	if (!bs->inventory[INVENTORY_KAMIKAZE]
-#ifdef TMNT // POWERS
-	&& !bs->inventory[INVENTORY_INVUL])
+#ifdef IOQ3ZTM
+	if (offence == -1)
 #else
-	&& !bs->inventory[INVENTORY_INVULNERABILITY])
+	if (!bs->inventory[INVENTORY_KAMIKAZE] && !bs->inventory[INVENTORY_INVULNERABILITY])
 #endif
 	{
 		if (!oldinventory[INVENTORY_SCOUT] && bs->inventory[INVENTORY_SCOUT] >= 1) {
@@ -1682,8 +1704,11 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 				}
 				else if (g_spSkill.integer <= 3) {
 					if ( bs->ltgtype != LTG_GETFLAG &&
-						 bs->ltgtype != LTG_ATTACKENEMYBASE &&
-						 bs->ltgtype != LTG_HARVEST ) {
+						 bs->ltgtype != LTG_ATTACKENEMYBASE
+#ifdef MISSIONPACK_HARVESTER
+						 && bs->ltgtype != LTG_HARVEST
+#endif
+						 ) {
 						//
 						if ((gametype != GT_CTF || (bs->redflagstatus == 0 && bs->blueflagstatus == 0)) &&
 							(gametype != GT_1FCTF || bs->neutralflagstatus == 0) ) {
@@ -1873,7 +1898,9 @@ void BotUpdateInventory(bot_state_t *bs) {
 #endif
 	bs->inventory[INVENTORY_MEDKIT] = bs->cur_ps.holdable[HI_MEDKIT] != 0;
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	bs->inventory[INVENTORY_KAMIKAZE] = bs->cur_ps.holdable[HI_KAMIKAZE] != 0;
+#endif
 	bs->inventory[INVENTORY_PORTAL] = bs->cur_ps.holdable[HI_PORTAL] != 0;
 #ifndef TMNT // POWERS
 	bs->inventory[INVENTORY_INVULNERABILITY] = bs->cur_ps.holdable[HI_INVULNERABILITY] != 0;
@@ -1884,7 +1911,9 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_TELEPORTER] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_TELEPORTER;
 	bs->inventory[INVENTORY_MEDKIT] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_MEDKIT;
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	bs->inventory[INVENTORY_KAMIKAZE] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_KAMIKAZE;
+#endif
 	bs->inventory[INVENTORY_PORTAL] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_PORTAL;
 #ifndef TMNT // POWERS
 	bs->inventory[INVENTORY_INVULNERABILITY] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_INVULNERABILITY;
@@ -1940,6 +1969,7 @@ void BotUpdateBattleInventory(bot_state_t *bs, int enemy) {
 }
 
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 BotUseKamikaze
@@ -2031,6 +2061,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 			}
 		}
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		//
 		if (BotHarvesterCarryingCubes(bs))
@@ -2057,6 +2088,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 			}
 		}
 	}
+#endif
 	//
 	BotVisibleTeamMatesAndEnemies(bs, &teammates, &enemies, KAMIKAZE_DIST);
 	//
@@ -2069,6 +2101,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 		return;
 	}
 }
+#endif
 
 #ifndef TMNT // POWERS // INVENTORY_INVULNERABILITY is disabled
 /*
@@ -2153,6 +2186,7 @@ void BotUseInvulnerability(bot_state_t *bs) {
 			}
 		}
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		//
 		if (BotHarvesterCarryingCubes(bs))
@@ -2177,6 +2211,7 @@ void BotUseInvulnerability(bot_state_t *bs) {
 			}
 		}
 	}
+#endif
 }
 #endif // TMNT // POWERS
 #endif
@@ -2215,7 +2250,9 @@ void BotBattleUseItems(bot_state_t *bs) {
 		}
 	}
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	BotUseKamikaze(bs);
+#endif
 #ifndef TMNT // POWERS
 	BotUseInvulnerability(bs);
 #endif
@@ -2588,10 +2625,12 @@ int BotWantsToRetreat(bot_state_t *bs) {
 		}
 		return qfalse;
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		//if carrying cubes then always retreat
 		if (BotHarvesterCarryingCubes(bs)) return qtrue;
 	}
+#endif
 #endif
 	//
 	if (bs->enemy >= 0) {
@@ -2645,11 +2684,13 @@ int BotWantsToChase(bot_state_t *bs) {
 			}
 		}
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		//never chase if carrying cubes
 		if (BotHarvesterCarryingCubes(bs))
 			return qfalse;
 	}
+#endif
 #endif
 	//if the bot is getting the flag
 	if (bs->ltgtype == LTG_GETFLAG)
@@ -3628,7 +3669,7 @@ void BotVisibleTeamMatesAndEnemies(bot_state_t *bs, int *teammates, int *enemies
 	}
 }
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK_HARVESTER
 /*
 ==================
 BotTeamCubeCarrierVisible
@@ -5218,6 +5259,7 @@ void BotCheckForProxMines(bot_state_t *bs, entityState_t *state) {
 }
 #endif // TMNTWEAPONS
 
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 BotCheckForKamikazeBody
@@ -5233,6 +5275,7 @@ void BotCheckForKamikazeBody(bot_state_t *bs, entityState_t *state) {
 	//remember this kamikaze body
 	bs->kamikazebody = state->number;
 }
+#endif
 #endif
 
 /*
@@ -5525,8 +5568,10 @@ void BotCheckSnapshot(bot_state_t *bs) {
 		//check for proximity mines which the bot should deactivate
 		BotCheckForProxMines(bs, &state);
 #endif
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		//check for dead bodies with the kamikaze effect which should be gibbed
 		BotCheckForKamikazeBody(bs, &state);
+#endif
 #endif
 	}
 	//check the player state for events
@@ -5675,6 +5720,7 @@ void BotSetupAlternativeRouteGoals(void) {
 									ALTROUTEGOAL_CLUSTERPORTALS|
 									ALTROUTEGOAL_VIEWPORTALS);
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		//
 		red_numaltroutegoals = trap_AAS_AlternativeRouteGoals(
@@ -5690,6 +5736,7 @@ void BotSetupAlternativeRouteGoals(void) {
 									ALTROUTEGOAL_CLUSTERPORTALS|
 									ALTROUTEGOAL_VIEWPORTALS);
 	}
+#endif
 #endif
 	altroutegoals_setup = qtrue;
 }
@@ -5887,7 +5934,7 @@ void BotSetupDeathmatchAI(void) {
 	gametype = trap_Cvar_VariableIntegerValue("g_gametype");
 	maxclients = trap_Cvar_VariableIntegerValue("sv_maxclients");
 
-#ifdef TMNT // BOTLIB
+#ifdef TMNTMISC // BOTLIB
 	trap_Cvar_Register(&bot_rocketjump, "bot_rocketjump", "0", 0);
 	trap_Cvar_Register(&bot_grapple, "bot_grapple", "1", 0);
 #else
@@ -5924,6 +5971,7 @@ void BotSetupDeathmatchAI(void) {
 			BotAI_Print(PRT_WARNING, "Obelisk without blue obelisk\n");
 		BotSetEntityNumForGoal(&blueobelisk, "team_blueobelisk");
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		if (trap_BotGetLevelItemGoal(-1, "Red Obelisk", &redobelisk) < 0)
 			BotAI_Print(PRT_WARNING, "Harvester without red obelisk\n");
@@ -5935,6 +5983,7 @@ void BotSetupDeathmatchAI(void) {
 			BotAI_Print(PRT_WARNING, "Harvester without neutral obelisk\n");
 		BotSetEntityNumForGoal(&neutralobelisk, "team_neutralobelisk");
 	}
+#endif
 #endif
 
 	max_bspmodelindex = 0;

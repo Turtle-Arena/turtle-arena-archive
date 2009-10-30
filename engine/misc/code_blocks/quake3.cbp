@@ -254,6 +254,7 @@
 		<Unit filename="../../code/botlib/be_ea.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/botlib/be_ea.h" />
 		<Unit filename="../../code/botlib/be_interface.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -2059,6 +2059,7 @@ void BotTeamAI(bot_state_t *bs) {
 			}
 			break;
 		}
+#ifdef MISSIONPACK_HARVESTER
 		case GT_HARVESTER:
 		{
 			if (bs->numteammates != numteammates || bs->forceorders) {
@@ -2074,6 +2075,7 @@ void BotTeamAI(bot_state_t *bs) {
 			}
 			break;
 		}
+#endif
 #endif
 	}
 }

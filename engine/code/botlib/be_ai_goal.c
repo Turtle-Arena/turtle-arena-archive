@@ -110,7 +110,9 @@ typedef enum {
 #ifdef MISSIONPACK
 	GT_1FCTF,
 	GT_OBELISK,
+#ifdef MISSIONPACK_HARVESTER
 	GT_HARVESTER,
+#endif
 #if 0 // Turtle Man: In the gametype name arrays there is a Team Tournament.
 	GT_TEAMTOURNAMENT,
 #endif

@@ -1,19 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug Win32" />
-	<File name="../../code/ui/ui_atoms.c" open="0" top="0" tabpos="0">
-		<Cursor position="9424" topLine="303" />
-	</File>
-	<File name="../../code/ui/ui_gameinfo.c" open="0" top="0" tabpos="0">
-		<Cursor position="4912" topLine="182" />
-	</File>
-	<File name="../../code/ui/ui_local.h" open="0" top="0" tabpos="0">
-		<Cursor position="14787" topLine="604" />
-	</File>
-	<File name="../../code/ui/ui_main.c" open="0" top="0" tabpos="0">
-		<Cursor position="93970" topLine="3226" />
-	</File>
-	<File name="../../code/ui/ui_players.c" open="0" top="0" tabpos="0">
-		<Cursor position="2011" topLine="64" />
-	</File>
 </CodeBlocks_layout_file>
