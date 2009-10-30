@@ -1,0 +1,40 @@
+TMNT Arena BUGS file
+
+Bug that have found that have not been fixed yet.
+
+== q3_ui ==
+[bug] Doesn't load score data for single player (Caused by NOT making map names upper (IOQ3ZTM // Breaks linux [...])? )
+
+[bug] Doesn't draw weapon on player models.
+
+[bug] Right mouse button goes to pervious menu instead of changing listbox down (etc)
+:(I think a #ifndef got change to #ifdef)
+
+[todo?] Can't add fav servers to browser with out a master server.
+
+
+== cgame ==
+[todo] Have the HUD have a left side and a right side, so they can be drawn aspect-correct for 16:9 displays (and others).
+
+[todo] Have dropped weapons blink/flash before disaparing
+
+
+== game / bg ==
+[bug] Grapple hook gets removed by PMF_GRAPPLE_SHOT does not.
+
+[bug] Fire Shuriken splash damage, it seems to have stopped working... It only works after using a rocket launcher???
+
+
+== cgame / game / bg ??? ==
+[bug] misc_object starts in damage animation and goes to stand anim when damaged?
+
+
+
+== Data ==
+
+[bug] Raph's backward run animation need to be fixed so /both/ of his feet go to the ground.
+
+[todo] Rocket Explosion shader is missing image(s) so it uses "No image" image.
+
+[todo] Weapon change sound. (sound/weapons/change.wav)
+

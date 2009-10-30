@@ -7,8 +7,8 @@ What MISSIONPACK adds to TMNT, the plan is to remove and intagrate all parts of 
 *** Take the center flag to the other team's base.
 ** Overload [Obelisk] --TODO: Add data support (and rename?).
 *** Defend object at base and attack other teams base object.
-** Harvester --Removed (!MISSIONPACK_HARVESTER)
-*** kill people, then a skull (of the attacker's team color) when spawn at the center object, then attacker's team must take the skull to the other team's base, if killee's team touch it [object that spawned at center], it is gone.)
+** Harvester --Removed (!defined MISSIONPACK_HARVESTER)
+*** kill people, then a skull (of the attacker's team color) will spawn at the center object, then attacker's team must take the skull to the other team's base, if killee's team touch it [object that spawned at center], it is removed.)
 * Teams, good for multiplayer with bots in Team Gametypes (and for clans online?). (Is that all?)
 * Persistant Powerups (For Teamgame types)
 ** Scout (Incressed speed, and no armor?(armor is removed in TMNT anyway) )
@@ -25,17 +25,16 @@ What MISSIONPACK adds to TMNT, the plan is to remove and intagrate all parts of 
 * 3 New Holdable Items
 ** Kamikaze holdable item (Removed)
 ** Invul holdable item (Removed)
-** Portal (Not in final game, still in code (I haven't disabled it))
+** Portal (Not used in final game, still in code (I haven't disabled it))
 
 == Remove ==
-LE_SHOWREFENTITY ?
-
 === Kamikaze ===
-: Possibly reuse Kamikaze explotions? For Oil Barrels (or something)?
+: Possibly reuse Kamikaze explotions? For Oil Barrels or something?
 
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#endif
 
-MOD_KAMIKAZE
+MOD_KAMIKAZE			-- removed
 
 HI_KAMIKAZE				-- removed
 EF_KAMIKAZE				-- removed
