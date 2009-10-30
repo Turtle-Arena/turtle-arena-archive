@@ -29,11 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // renderfx flags
 #define	RF_MINLIGHT		0x0001		// allways have some light (viewmodel, some items)
-#ifdef IOQ3ZTM
-#define	RF_ONLY_MIRROR		0x0002		// only draw in mirrors (player bodies (in first person), chat sprites)
-#else
 #define	RF_THIRD_PERSON		0x0002		// don't draw through eyes, only mirrors (player bodies, chat sprites)
-#endif
 #define	RF_FIRST_PERSON		0x0004		// only draw through eyes (view weapon, damage blood blob)
 #define	RF_DEPTHHACK		0x0008		// for view weapon Z crunching
 
@@ -52,8 +48,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	RF_SHADOW_PLANE		0x0100		// use refEntity->shadowPlane
 #define	RF_WRAP_FRAMES		0x0200		// mod the model frames by the maxframes to allow continuous
 
-#ifdef IOQ3ZTM
-#define	RF_NOT_MIRROR		0x0400		// do not draw in mirrors
+#ifdef IOQ3ZTM // RENDERFLAGS
+// Turtle Man: FIXME: I don't like RF_THIRD_PERSON or RF_FIRST_PERSON
+#define	RF_ONLY_MIRROR		0x0400		// only draw in mirrors
+#define	RF_NOT_MIRROR		0x0800		// do not draw in mirrors
 #endif
 
 // refdef flags

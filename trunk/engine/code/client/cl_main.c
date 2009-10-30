@@ -1304,6 +1304,16 @@ void CL_RequestMotd( void ) {
 	if ( !cl_motd->integer ) {
 		return;
 	}
+
+#ifdef IOQ3ZTM
+	// Turtle Man: Check if there is there a valid motd server
+	//             Because in TMNT/SONIC there isn't.
+	if (strlen(UPDATE_SERVER_NAME) < 1)
+	{
+		return;
+	}
+#endif
+
 	Com_Printf( "Resolving %s\n", UPDATE_SERVER_NAME );
 	if ( !NET_StringToAdr( UPDATE_SERVER_NAME, &cls.updateServer, NA_IP ) ) {
 		Com_Printf( "Couldn't resolve address\n" );
@@ -3139,16 +3149,23 @@ void CL_Init( void ) {
 #ifdef TMNT
 	// DEFAULT_PLAYER
 #ifdef TMNTSP // SPMODEL
-	Cvar_Get ("spmodel", "raph", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
-	Cvar_Get ("spheadmodel", "raph", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
+	Cvar_Get ("spmodel", "raph", CVAR_USERINFO | CVAR_ROM );
+	Cvar_Get ("spheadmodel", "raph", CVAR_USERINFO | CVAR_ROM );
 #endif
 	Cvar_Get ("model", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("headmodel", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_model", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("team_headmodel", "*raph", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("team_headmodel", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
 	// DEFAULT_TEAMS
 	Cvar_Get ("g_redTeam", "Sais", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("g_blueTeam", "Katanas", CVAR_SERVERINFO | CVAR_ARCHIVE);
+#elif defined SONIC
+	Cvar_Get ("model", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("headmodel", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("team_model", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("team_headmodel", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #else
 	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("headmodel", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );

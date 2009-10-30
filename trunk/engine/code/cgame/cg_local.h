@@ -126,7 +126,7 @@ typedef enum {
 	IMPACTSOUND_FLESH
 } impactSound_t;
 
-#ifdef TMNTENTITIES
+#ifdef TMNTENTITIES // non free?
 typedef enum
 {
 	MT_NONE = -1,
@@ -159,6 +159,7 @@ typedef enum
 // because corpses after respawn are outside the normal
 // client numbering range
 
+#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 // when changing animation, set animationTime to frameTime + lerping time
 // The current lerp will finish out, then it will lerp to the new animation
 typedef struct {
@@ -179,6 +180,7 @@ typedef struct {
 	animation_t	*animation;
 	int			animationTime;		// time when the first frame of the animation will be exact
 } lerpFrame_t;
+#endif
 
 
 typedef struct {
@@ -224,6 +226,27 @@ typedef struct {
 } md3Entity_t;
 #endif
 
+#ifdef TMNTENTSYS // MISC_OBJECT
+// misc_object data
+enum
+{
+	MOF_ONLY_MIRROR = 1,
+	MOF_NOT_MIRROR = 2,
+};
+
+#define MAX_MISC_OBJECT_ANIMATIONS 5
+
+typedef struct
+{
+	lerpFrame_t		lerp;
+	animation_t		animations[MAX_MISC_OBJECT_ANIMATIONS];
+	int				anim; // current animation ( may have ANIM_TOGGLEBIT )
+	float			speed; // Allow speeding up the animations?
+
+	int				flags; // Special flags.
+} cg_miscObject_t;
+#endif
+
 // centity_t have a direct corespondence with gentity_t in the game, but
 // only the entityState_t is directly communicated to the cgame
 typedef struct centity_s {
@@ -248,6 +271,9 @@ typedef struct centity_s {
 #endif
 #ifdef SINGLEPLAYER // entity
 	md3Entity_t		md3;
+#endif
+#ifdef TMNTENTSYS // MISC_OBJECT
+	cg_miscObject_t	miscObj; // misc_object data
 #endif
 
 	int				errorTime;		// decay the error from this time
@@ -293,9 +319,13 @@ typedef enum {
 	LE_SCALE_FADE,
 	LE_SCOREPLUM,
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	LE_KAMIKAZE,
+#endif
+#ifndef TMNT // POWERS
 	LE_INVULIMPACT,
 	LE_INVULJUICED,
+#endif
 	LE_SHOWREFENTITY
 #endif
 } leType_t;
@@ -303,8 +333,10 @@ typedef enum {
 typedef enum {
 	LEF_PUFF_DONT_SCALE  = 0x0001,			// do not scale size over time
 	LEF_TUMBLE			 = 0x0002,			// tumble over time, used for ejecting shells
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	LEF_SOUND1			 = 0x0004,			// sound 1 for kamikaze
 	LEF_SOUND2			 = 0x0008			// sound 2 for kamikaze
+#endif
 } leFlag_t;
 
 typedef enum {
@@ -546,12 +578,14 @@ typedef struct {
 } powerupInfo_t;
 
 
+#ifdef MISSIONPACK_HARVESTER
 #define MAX_SKULLTRAIL		10
 
 typedef struct {
 	vec3_t positions[MAX_SKULLTRAIL];
 	int numpositions;
 } skulltrail_t;
+#endif
 
 
 #define MAX_REWARDSTACK		10
@@ -673,8 +707,10 @@ typedef struct {
 	int				spectatorOffset;										// current offset from start
 	int				spectatorPaintLen; 									// current offset from start
 
+#ifdef MISSIONPACK_HARVESTER
 	// skull trails
 	skulltrail_t	skulltrails[MAX_CLIENTS];
+#endif
 
 	// centerprinting
 	int			centerPrintTime;
@@ -683,8 +719,10 @@ typedef struct {
 	char		centerPrint[1024];
 	int			centerPrintLines;
 
+#ifndef TMNTWEAPSYS2 // AMMO_WARNINGS
 	// low ammo warning state
 	int			lowAmmoWarning;		// 1 = low, 2 = empty
+#endif
 
 #ifndef IOQ3ZTM // IOQ3BUGFIX: unused in the source code.
 	// kill timers for carnage reward
@@ -785,6 +823,18 @@ typedef struct {
 
 } cg_t;
 
+#ifdef IOQ3ZTM // FLAG_ANIMATIONS
+typedef enum
+{
+	FLAG_RUN,
+	FLAG_STAND,
+	FLAG_STAND2RUN,
+	//FLAG_RUNUP,
+	//FLAG_RUNDOWN,
+
+	MAX_FLAG_ANIMATIONS
+} flagAnimNumber_t;
+#endif
 
 // all of the model, shader, and sound references that are
 // loaded at gamestate time are stored in cgMedia_t
@@ -822,6 +872,11 @@ typedef struct {
 	qhandle_t	redFlagBaseModel;
 	qhandle_t	blueFlagBaseModel;
 	qhandle_t	neutralFlagBaseModel;
+
+#ifdef IOQ3ZTM // FLAG_ANIMATIONS
+	// Flag animations when flag is held by player.
+	animation_t flag_animations[MAX_FLAG_ANIMATIONS];
+#endif
 
 #ifdef MISSIONPACK
 	qhandle_t	overloadBaseModel;
@@ -871,7 +926,7 @@ typedef struct {
 #ifndef TMNTWEAPONS
 	qhandle_t	lightningShader;
 #endif
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	qhandle_t	grappleCable;
 #endif
 
@@ -894,7 +949,7 @@ typedef struct {
 	qhandle_t	plasmaBallShader;
 	qhandle_t	waterBubbleShader;
 	qhandle_t	bloodTrailShader;
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 	qhandle_t	nailPuffShader;
 	qhandle_t	blueProxMine;
 #endif
@@ -928,8 +983,10 @@ typedef struct {
 	qhandle_t	battleWeaponShader;
 #endif
 	qhandle_t	hastePuffShader;
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	qhandle_t	redKamikazeShader;
 	qhandle_t	blueKamikazeShader;
+#endif
 
 	// weapon effect models
 	qhandle_t	bulletFlashModel;
@@ -953,7 +1010,9 @@ typedef struct {
 
 	// special effects models
 	qhandle_t	teleportEffectModel;
+#ifndef MISSIONPACK // Turtle Man: MP removes loading and using...
 	qhandle_t	teleportEffectShader;
+#endif
 #ifdef MISSIONPACK
 	qhandle_t	kamikazeEffectModel;
 	qhandle_t	kamikazeShockWave;
@@ -963,8 +1022,10 @@ typedef struct {
 	qhandle_t	scoutPowerupModel;
 	qhandle_t	doublerPowerupModel;
 	qhandle_t	ammoRegenPowerupModel;
+#ifndef TMNT // POWERS
 	qhandle_t	invulnerabilityImpactModel;
 	qhandle_t	invulnerabilityJuicedModel;
+#endif
 	qhandle_t	medkitUsageModel;
 	qhandle_t	dustPuffShader;
 	qhandle_t	heartShader;
@@ -1018,6 +1079,7 @@ typedef struct {
 	sfxHandle_t	sfx_rockexp;
 	sfxHandle_t	sfx_plasmaexp;
 #ifdef MISSIONPACK
+#ifndef TMNTWEAPONS
 	sfxHandle_t	sfx_proxexp;
 	sfxHandle_t	sfx_nghit;
 	sfxHandle_t	sfx_nghitflesh;
@@ -1025,21 +1087,28 @@ typedef struct {
 	sfxHandle_t	sfx_chghit;
 	sfxHandle_t	sfx_chghitflesh;
 	sfxHandle_t	sfx_chghitmetal;
+#endif
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	sfxHandle_t kamikazeExplodeSound;
 	sfxHandle_t kamikazeImplodeSound;
 	sfxHandle_t kamikazeFarSound;
+#endif
+#ifndef TMNT // POWERS
 	sfxHandle_t useInvulnerabilitySound;
 	sfxHandle_t invulnerabilityImpactSound1;
 	sfxHandle_t invulnerabilityImpactSound2;
 	sfxHandle_t invulnerabilityImpactSound3;
 	sfxHandle_t invulnerabilityJuicedSound;
+#endif
 	sfxHandle_t obeliskHitSound1;
 	sfxHandle_t obeliskHitSound2;
 	sfxHandle_t obeliskHitSound3;
 	sfxHandle_t	obeliskRespawnSound;
 	sfxHandle_t	winnerSound;
 	sfxHandle_t	loserSound;
+#ifndef IOQ3ZTM // UNUSED
 	sfxHandle_t	youSuckSound;
+#endif
 #endif
 #ifndef NOTRATEDM // No gibs.
 	sfxHandle_t	gibSound;
@@ -1074,7 +1143,7 @@ typedef struct {
 	sfxHandle_t impressiveSound;
 #endif
 	sfxHandle_t excellentSound;
-#ifndef TMNT
+#ifndef TMNTMISC
 	sfxHandle_t deniedSound;
 #endif
 #ifndef TMNTWEAPONS
@@ -1171,12 +1240,16 @@ typedef struct {
 	sfxHandle_t	regenSound;
 	sfxHandle_t	protectSound;
 	sfxHandle_t	n_healthSound;
+#ifndef TMNTHOLDABLE
 	sfxHandle_t	hgrenb1aSound;
 	sfxHandle_t	hgrenb2aSound;
+#endif
+#ifndef TMNTWEAPONS
 	sfxHandle_t	wstbimplSound;
 	sfxHandle_t	wstbimpmSound;
 	sfxHandle_t	wstbimpdSound;
 	sfxHandle_t	wstbactvSound;
+#endif
 #ifdef TMNTENTITIES
 	qhandle_t	chunkModels[NUM_CHUNK_TYPES][NUM_CHUNKS];
 #endif
@@ -1310,7 +1383,9 @@ extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_draw3dIcons;
 extern	vmCvar_t		cg_drawIcons;
+#ifndef TMNTWEAPSYS2 // AMMO_WARNINGS
 extern	vmCvar_t		cg_drawAmmoWarning;
+#endif
 extern	vmCvar_t		cg_drawCrosshair;
 extern	vmCvar_t		cg_drawCrosshairNames;
 extern	vmCvar_t		cg_drawRewards;
@@ -1544,13 +1619,6 @@ void CG_ResetPlayerEntity( centity_t *cent );
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team );
 void CG_NewClientInfo( int clientNum );
 sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
-#ifdef SP_NPC
-void CG_RunLerpFrameNPC( animation_t *ai, lerpFrame_t *lf, int newAnimation, float speedScale );
-#endif
-#ifdef SINGLEPLAYER // entity
-void CG_ClearLerpFrameNPC( animation_t *ai, lerpFrame_t *lf, int animationNumber ) ;
-#endif
-
 
 //
 // cg_predict.c
@@ -1659,7 +1727,9 @@ localEntity_t *CG_SmokePuff( const vec3_t p,
 void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing );
 void CG_SpawnEffect( vec3_t org );
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 void CG_KamikazeEffect( vec3_t org );
+#endif
 void CG_ObeliskExplode( vec3_t org, int entityNum );
 void CG_ObeliskPain( vec3_t org );
 #ifndef TMNTWEAPONS
@@ -1894,7 +1964,7 @@ int			trap_GetCurrentCmdNumber( void );
 
 qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
 
-#if defined TMNTHOLDSYS && !defined TMNTWEAPSYS2 // Turtle Man: MULTIHOLDABLE
+#if defined TMNTHOLDSYS2 && !defined TMNTWEAPSYS2
 // used for the weapon select, holdable select, and zoom
 void		trap_SetUserCmdValue( int stateValue, int holdableStateValue, float sensitivityScale );
 #else

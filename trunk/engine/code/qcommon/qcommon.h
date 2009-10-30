@@ -232,17 +232,33 @@ PROTOCOL
 ==============================================================
 */
 
+#ifdef TMNT
+#define	PROTOCOL_VERSION	1
+#else
 #define	PROTOCOL_VERSION	68
 // 1.31 - 67
+#endif
 
 // maintain a list of compatible protocols for demo playing
 // NOTE: that stuff only works with two digits protocols
 extern int demo_protocols[];
 
+#ifdef TMNT // Don't talk to quake3arena.com.
+#define	UPDATE_SERVER_NAME	""
+#elif defined SONIC
+#define	UPDATE_SERVER_NAME	""
+#else
 #define	UPDATE_SERVER_NAME	"update.quake3arena.com"
+#endif
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
+#ifdef TMNT // Don't talk to quake3arena.com.
+#define MASTER_SERVER_NAME	""
+#elif defined SONIC
+#define MASTER_SERVER_NAME	""
+#else
 #define MASTER_SERVER_NAME	"master.quake3arena.com"
+#endif
 #endif
 
 #ifndef STANDALONE
@@ -567,7 +583,7 @@ issues.
 
 #define	MAX_FILE_HANDLES	64
 
-#ifdef TMNT // Config file name
+#ifdef TMNTMISC // Config file name
 #ifdef DEDICATED
 #	define Q3CONFIG_CFG "config_server.cfg"
 #else

@@ -74,6 +74,8 @@ static const serverFilter_t serverFilters[] = {
 	{"All", "" },
 #ifdef TMNT
 	{"TMNT Arena", "" },
+#elif defined SONIC
+	{"Sonic Blast Arena", "" },
 #else
 	{"Quake 3 Arena", "" },
 #endif
@@ -86,7 +88,7 @@ static const serverFilter_t serverFilters[] = {
 
 static const char *teamArenaGameTypes[] = {
 	"FFA",
-#ifdef TMNT // tournament to duel
+#ifdef TMNTMISC // tournament to duel
 	"DUEL",
 #else
 	"TOURNAMENT",
@@ -105,7 +107,7 @@ static int const numTeamArenaGameTypes = sizeof(teamArenaGameTypes) / sizeof(con
 
 static const char *teamArenaGameNames[] = {
 	"Free For All",
-#ifdef TMNT
+#ifdef TMNTMISC
 	"Duel",
 #else
 	"Tournament",
@@ -140,7 +142,7 @@ static char* netnames[] = {
 };
 
 #ifndef MISSIONPACK
-#ifdef TMNT // Turtle Man: TODO: Add a url, ect?
+#ifdef TMNTMISC // Turtle Man: TODO: Add a url, ect?
 static char quake3worldMessage[] = "";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
@@ -603,7 +605,7 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t 
 
 void UI_ShowPostGame(qboolean newHigh) {
 	trap_Cvar_Set ("cg_cameraOrbit", "0");
-#ifdef TMNT // Set thirdPerson to On. // Should it be off here?
+#ifdef THIRD_PERSON // Set thirdPerson to On. // Should it be off here?
 	trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
@@ -1059,19 +1061,21 @@ static void UI_SetCapFragLimits(qboolean uiVars) {
 	int frag = 10;
 	if (uiInfo.gameTypes[ui_gameType.integer].gtEnum == GT_OBELISK) {
 		cap = 4;
+#ifdef MISSIONPACK_HARVESTER
 	} else if (uiInfo.gameTypes[ui_gameType.integer].gtEnum == GT_HARVESTER) {
 		cap = 15;
+#endif
 	}
 	if (uiVars) {
 		trap_Cvar_Set("ui_captureLimit", va("%d", cap));
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_Set("ui_scoreLimit", va("%d", frag));
 #else
 		trap_Cvar_Set("ui_fragLimit", va("%d", frag));
 #endif
 	} else {
 		trap_Cvar_Set("capturelimit", va("%d", cap));
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_Set("scorelimit", va("%d", frag));
 #else
 		trap_Cvar_Set("fraglimit", va("%d", frag));
@@ -1337,7 +1341,7 @@ static void UI_DrawPlayerModel(rectDef_t *rect) {
   	viewangles[ROLL]  = 0;
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info, model, head, team);
-#ifdef TMNT // TMNTWEAPSYS
+#ifdef TMNTWEAPSYS
     UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info.weapon, qfalse );
 #else
     UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
@@ -1537,7 +1541,7 @@ static void UI_DrawOpponent(rectDef_t *rect) {
   	viewangles[ROLL]  = 0;
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info2, model, headmodel, "");
-#ifdef TMNT // TMNTWEAPSYS
+#ifdef TMNTWEAPSYS
     UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info2.weapon, qfalse );
 #else
     UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
@@ -2372,7 +2376,7 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 		int oldCount = UI_MapCountByGameType(qtrue);
 
-#ifdef TMNT // Removed skipping ffa and sp
+#ifdef TMNTMISC // Removed skipping ffa and sp
 		if (key == K_MOUSE2) {
 			ui_gameType.integer--;
 			if (ui_gameType.integer < 0) {
@@ -3034,7 +3038,7 @@ static void UI_StartSkirmish(qboolean next) {
 	// set up sp overrides, will be replaced on postgame
 	temp = trap_Cvar_VariableValue( "capturelimit" );
 	trap_Cvar_Set("ui_saveCaptureLimit", va("%i", temp));
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 	temp = trap_Cvar_VariableValue( "scorelimit" );
 	trap_Cvar_Set("ui_saveScoreLimit", va("%i", temp));
 #else
@@ -3058,7 +3062,7 @@ static void UI_StartSkirmish(qboolean next) {
 	trap_Cvar_Set("ui_pure", va("%i", temp));
 
 	trap_Cvar_Set("cg_cameraOrbit", "0");
-#ifdef TMNT // Set thirdPerson to On.
+#ifdef THIRD_PERSON // Set thirdPerson to On.
 	trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
@@ -3231,7 +3235,7 @@ static void UI_RunMenuScript(char **args) {
 		if (Q_stricmp(name, "StartServer") == 0) {
 			int i, clients, oldclients;
 			float skill;
-#ifdef TMNT // Set thirdPerson to On.
+#ifdef THIRD_PERSON // Set thirdPerson to On.
 			trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 			trap_Cvar_Set("cg_thirdPerson", "0");
@@ -3418,7 +3422,7 @@ static void UI_RunMenuScript(char **args) {
 			uiInfo.serverStatusInfo.numLines = 0;
 			Menu_SetFeederSelection(NULL, FEEDER_FINDPLAYER, 0, NULL);
 		} else if (Q_stricmp(name, "JoinServer") == 0) {
-#ifdef TMNT // Set thirdPerson to On.
+#ifdef THIRD_PERSON // Set thirdPerson to On.
 			trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 			trap_Cvar_Set("cg_thirdPerson", "0");
@@ -3653,7 +3657,18 @@ static int UI_MapCountByGameType(qboolean singlePlayer) {
 
 qboolean UI_hasSkinForBase(const char *base, const char *team) {
 	char	test[1024];
+#ifdef IOQ3ZTM // PLAYER_DIR
+	int i;
+
+	for (i=0; bg_playerDirs[i] != NULL; i++)
+	{
+		Com_sprintf( test, sizeof( test ), "%s/%s/%s/lower_default.skin", bg_playerDirs[i], base, team );
 	
+		if (trap_FS_FOpenFile(test, NULL, FS_READ)) {
+			return qtrue;
+		}
+	}
+#else
 	Com_sprintf( test, sizeof( test ), "models/players/%s/%s/lower_default.skin", base, team );
 
 	if (trap_FS_FOpenFile(test, NULL, FS_READ)) {
@@ -3664,6 +3679,7 @@ qboolean UI_hasSkinForBase(const char *base, const char *team) {
 	if (trap_FS_FOpenFile(test, NULL, FS_READ)) {
 		return qtrue;
 	}
+#endif
 	return qfalse;
 }
 
@@ -3937,7 +3953,7 @@ serverStatusCvar_t serverStatusCvars[] = {
 	{"version", ""},
 	{"protocol", ""},
 	{"timelimit", ""},
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 	{"scorelimit", ""},
 #else
 	{"fraglimit", ""},
@@ -4681,10 +4697,22 @@ static qboolean Character_Parse(char **p) {
       uiInfo.characterList[uiInfo.characterCount].headImage = -1;
 			uiInfo.characterList[uiInfo.characterCount].imageName = String_Alloc(va("models/players/heads/%s/icon_default.tga", uiInfo.characterList[uiInfo.characterCount].name));
 
+	// Turtle Man: FIXME: characters block in teaminfo.txt
+	//             They list "male" and "female" for the base model to
+	//                 James and Janet
+	//             Should it april and casey? or remove this "male" "female" check?
 	  if (tempStr && (!Q_stricmp(tempStr, "female"))) {
+#if 0 //#ifdef TMNTDATA // Deafult female player
+        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("April"));
+#else
         uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("Janet"));
+#endif
       } else if (tempStr && (!Q_stricmp(tempStr, "male"))) {
+#if 0 // #ifdef TMNTDATA // Deafult male player
+        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("Casey"));
+#else
         uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("James"));
+#endif
 	  } else {
         uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("%s",tempStr));
 	  }
@@ -5071,7 +5099,11 @@ static void UI_BuildQ3Model_List( void )
 			continue;
 			
 		// iterate all skin files in directory
+#ifdef IOQ3ZTM // Turtle Man: TODO: Is there a better way to list all image files? (tga/png/jpg/Ect.)
+		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "", filelist, 2048 );
+#else
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );
+#endif
 		fileptr  = filelist;
 		for (j=0; j<numfiles && uiInfo.q3HeadCount < MAX_PLAYERMODELS;j++,fileptr+=filelen+1)
 		{
@@ -5798,21 +5830,21 @@ vmCvar_t	ui_realWarmUp;
 vmCvar_t	ui_serverStatusTimeOut;
 
 static cvarTable_t		cvarTable[] = {
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "20", CVAR_ARCHIVE },
 #else
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 #endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
 #endif
 	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "15", CVAR_ARCHIVE },
 
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 	{ &ui_team_fraglimit, "ui_team_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_team_fraglimit, "ui_team_fraglimit", "0", CVAR_ARCHIVE },
@@ -5936,6 +5968,8 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
 #ifdef TMNT // DEFAULT_PLAYER
 	{ &ui_findPlayer, "ui_findPlayer", "Raph", CVAR_ARCHIVE},
+#elif defined SONIC // DEFAULT_PLAYER
+	{ &ui_findPlayer, "ui_findPlayer", "Sonic", CVAR_ARCHIVE},
 #else
 	{ &ui_findPlayer, "ui_findPlayer", "Sarge", CVAR_ARCHIVE},
 #endif

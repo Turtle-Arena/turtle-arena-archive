@@ -228,6 +228,17 @@ void trap_SnapVector( float *v ) {
 	return;
 }
 
+#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+qhandle_t trap_RegisterTags( const char *name ) {
+	return syscall( G_REGISTERTAGS, name );
+}
+
+int		trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
+					   float frac, const char *tagName ) {
+	return syscall( G_LERPTAG, tag, handle, startFrame, endFrame, PASSFLOAT(frac), tagName );
+}
+#endif
+
 // BotLib traps start here
 int trap_BotLibSetup( void ) {
 	return syscall( BOTLIB_SETUP );

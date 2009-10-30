@@ -126,7 +126,7 @@ static cvarTable_t		gameCvarTable[] = {
 
 	// change anytime vars
 	{ &g_dmflags, "dmflags", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 	{ &g_fraglimit, "scorelimit", "20", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 #else
 	{ &g_fraglimit, "fraglimit", "20", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
@@ -275,7 +275,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 	case GAME_SAVEGAME:
 		return G_SaveGame((fileHandle_t)arg0);
 	case GAME_LOADGAME:
-		G_LoadGame((fileHandle_t)arg0);
+		G_LoadGame((fileHandle_t)arg0, arg1);
 		return 0;
 #endif
 	case BOTAI_START_FRAME:
@@ -365,7 +365,7 @@ void G_FindTeams( void ) {
 }
 
 void G_RemapTeamShaders( void ) {
-#if defined MISSIONPACK || defined IOQ3ZTM // TMNT? // Do it in TMNT as well.
+#if defined MISSIONPACK || defined IOQ3ZTM // TMNT? // Turtle Man: Do it in TMNT as well.
 	char string[1024];
 	float f = level.time * 0.001;
 	Com_sprintf( string, sizeof(string), "team_icon/%s_red", g_redteam.string );
@@ -1471,7 +1471,7 @@ void CheckExitRules( void ) {
 
 	if ( g_gametype.integer < GT_CTF && g_fraglimit.integer ) {
 		if ( level.teamScores[TEAM_RED] >= g_fraglimit.integer ) {
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 			trap_SendServerCommand( -1, "print \"Red hit the scorelimit.\n\"" );
 			LogExit( "Scorelimit hit." );
 #else
@@ -1482,7 +1482,7 @@ void CheckExitRules( void ) {
 		}
 
 		if ( level.teamScores[TEAM_BLUE] >= g_fraglimit.integer ) {
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 			trap_SendServerCommand( -1, "print \"Blue hit the scorelimit.\n\"" );
 			LogExit( "Scorelimit hit." );
 #else
@@ -1502,7 +1502,7 @@ void CheckExitRules( void ) {
 			}
 
 			if ( cl->ps.persistant[PERS_SCORE] >= g_fraglimit.integer ) {
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 				LogExit( "Scorelimit hit." );
 				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the scorelimit.\n\"",
 					cl->pers.netname ) );

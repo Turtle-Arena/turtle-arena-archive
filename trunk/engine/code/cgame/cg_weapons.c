@@ -51,7 +51,11 @@ void CG_NextHoldable_f( void ) {
 		}
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
-		if (cg.holdableSelect == HI_KAMIKAZE || cg.holdableSelect == HI_PORTAL
+		if (
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+		cg.holdableSelect == HI_KAMIKAZE ||
+#endif
+		cg.holdableSelect == HI_PORTAL
 #ifndef TMNT // POWERS
 			|| cg.holdableSelect == HI_INVULNERABILITY
 #endif
@@ -96,7 +100,11 @@ void CG_PrevHoldable_f( void ) {
 		}
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
-		if (cg.holdableSelect == HI_KAMIKAZE || cg.holdableSelect == HI_PORTAL
+		if (
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+		cg.holdableSelect == HI_KAMIKAZE ||
+#endif
+		cg.holdableSelect == HI_PORTAL
 #ifndef TMNT // POWERS
 			|| cg.holdableSelect == HI_INVULNERABILITY
 #endif
@@ -136,14 +144,11 @@ void CG_Holdable_f( void ) {
 		return;
 	}
 
-	if (num != 0 && cg.snap->ps.holdable[num] == 0) {
-		return;		// don't have the holdable item
-	}
+	//if (num != 0 && cg.snap->ps.holdable[num] == 0) {
+	//	return;		// don't have the holdable item
+	//}
 
 	cg.holdableSelect = num;
-#ifndef TMNTREALESE
-	CG_Printf("DEBUG: Selecting holdable item (%i)...\n", num);
-#endif
 }
 #endif
 
@@ -703,7 +708,7 @@ void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi ) {
 		return; // Don't draw if close
 
 	beam.reType = RT_LIGHTNING;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	beam.customShader = cgs.media.grappleCable;
 #else
 	beam.customShader = cgs.media.lightningShader;
@@ -792,15 +797,6 @@ void CG_RegisterWeapon( int weaponNum ) {
 	memset( weaponInfo, 0, sizeof( *weaponInfo ) );
 	weaponInfo->registered = qtrue;
 
-#ifdef TMNTWEAPONS
-	// Turtle Man: FIXME: WP_FISTS doesn't have a map object...
-	if (weaponNum == WP_FISTS)
-	{
-		CG_Printf("Skipping WP_FISTS to avoid crash...\n");
-		return;
-	}
-#endif
-
 	for ( item = bg_itemlist + 1 ; item->classname ; item++ ) {
 		if ( item->giType == IT_WEAPON && item->giTag == weaponNum ) {
 			weaponInfo->item = item;
@@ -869,8 +865,11 @@ void CG_RegisterWeapon( int weaponNum ) {
 	weaponInfo->handsModel = trap_R_RegisterModel( path );
 
 	if ( !weaponInfo->handsModel ) {
-#ifdef TMNT
+#ifdef TMNTDATA
 		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/gun/gun_hand.md3" );
+#elif defined SONICWEAPONS
+		// Turtle Man: FIXME: Sonic weapons
+		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/shotgun/shotgun_hand.md3" );
 #else
 		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/shotgun/shotgun_hand.md3" );
 #endif
@@ -904,23 +903,23 @@ void CG_RegisterWeapon( int weaponNum ) {
 #endif
 
 	case WP_GRAPPLING_HOOK:
-#ifdef TMNT
+#ifdef TMNTDATASYS
 		// Load grapple trail shader.
 		cgs.media.grappleCable = trap_R_RegisterShader( "GrappleCable");
 #endif
 		MAKERGB( weaponInfo->flashDlightColor, 0.6f, 0.6f, 1.0f );
-#ifdef TMNT
+#ifdef TMNTDATASYS
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/weapons2/grapple/claw.md3" );
 #else
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/ammo/rocket/rocket.md3" );
 #endif
 		weaponInfo->missileTrailFunc = CG_GrappleTrail;
-#ifndef TMNT
+#ifndef TMNTDATASYS
 		weaponInfo->missileDlight = 200;
 #endif
 		weaponInfo->wiTrailTime = 2000;
 		weaponInfo->trailRadius = 64;
-#ifndef TMNT
+#ifndef TMNTDATASYS
 		MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 #endif
 		weaponInfo->readySound = trap_S_RegisterSound( "sound/weapons/melee/fsthum.wav", qfalse );
@@ -1139,7 +1138,7 @@ CG_MapTorsoToWeaponFrame
 */
 static int CG_MapTorsoToWeaponFrame( clientInfo_t *ci, int frame ) {
 
-#ifdef TMNTPLAYERS
+#ifdef TMNTPLAYERSYS
 	// change weapon
 	if ( frame >= ci->playercfg.animations[TORSO_DROP].firstFrame
 		&& frame < ci->playercfg.animations[TORSO_DROP].firstFrame + 9 ) {
@@ -1490,6 +1489,11 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups ) {
 }
 
 
+
+#ifdef TMNTWEAPSYS
+// Turlte Man: TODO: Draw default weapon at "tag_wp_away_right" and "tag_wp_away_left"
+//                   When a different weapon is being used.
+#endif
 /*
 =============
 CG_AddPlayerWeapon
@@ -1499,11 +1503,7 @@ The main player will have this called for BOTH cases, so effects like light and
 sound should only be done on the world model case.
 =============
 */
-#ifdef TMNTWEAPSYS
-// Turlte Man: TODO: Draw default weapon at "tag_wp_away_right" and "tag_wp_away_left"
-//                   When a different weapon is being used.
-#endif
-void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team ) {
+void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team) {
 	refEntity_t	gun;
 	refEntity_t	barrel;
 	refEntity_t	flash;
@@ -1531,14 +1531,8 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	weapon = &cg_weapons[weaponNum];
 
 #ifdef TMNTWEAPSYS
-	if ( ps )
-	{
-		weaponType = BG_WeaponTypeForPlayerState(ps);
-	}
-	else
-	{
-		weaponType = BG_WeaponTypeForNum(weaponNum);
-	}
+	weaponType = BG_WeaponTypeForEntityState(&cent->currentState);
+
 	if (weaponType == WT_NONE)
 	{
 		return;
@@ -1603,12 +1597,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	}
 
 #ifdef TMNTWEAPSYS
-	// get hands from info
-	if (bg_weapontypeinfo[weaponType].hands & HAND_PRIMARY)
+	// get hands from cent
+	if (cent->currentState.weaponHands & HAND_PRIMARY)
 	{
 		draw_primary = qtrue;
 	}
-	if (bg_weapontypeinfo[weaponType].hands & HAND_SECONDARY)
+	if (cent->currentState.weaponHands & HAND_SECONDARY)
 	{
 		draw_secondary = qtrue;
 	}
@@ -1633,7 +1627,6 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
 	}
 
-//#ifdef TMNTPLAYERS
 	// Secondary weapon.
 	if ( draw_secondary && gun_left.hModel ) {
 #ifdef TMNT_SUPPORTQ3
@@ -1652,7 +1645,6 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 		CG_AddWeaponWithPowerups( &gun_left, cent->currentState.powerups );
 	}
-//#endif
 
 	// NOTE: Any weapon type can have a barrel model and/or flash model.
 #else

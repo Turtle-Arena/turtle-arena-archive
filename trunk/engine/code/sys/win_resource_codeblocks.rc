@@ -53,17 +53,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-
-// Turtle Man: Use "../quake3.ico" when compiling in Code::Blocks.
-#if 1 // Code::Blocks
 IDI_ICON1               ICON    DISCARDABLE     "../quake3.ico"
-#else
-#ifndef __MINGW32__
-IDI_ICON1               ICON    DISCARDABLE     "../quake3.ico"
-#else
-IDI_ICON1               ICON    DISCARDABLE     "misc/quake3.ico"
-#endif
-#endif
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -73,11 +63,7 @@ IDI_ICON1               ICON    DISCARDABLE     "misc/quake3.ico"
 
 STRINGTABLE DISCARDABLE
 BEGIN
-#if 1 // Turtle Man
-    IDS_STRING1             "TMNTArena"
-#else
-    IDS_STRING1             "Quake3"
-#endif
+    IDS_STRING1             "TMNTArena" // Turtle Man: Changed from "Quake3"
 END
 
 #endif    // English (U.S.) resources

@@ -174,7 +174,7 @@ or configs will never get loaded from disk!
 
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
-#ifdef TMNT
+#ifdef TMNTMISC
 #define NUM_DEFAULT_PAKS 1 // allows for pak0 through pak8
 static const unsigned pak_checksums[NUM_DEFAULT_PAKS] = {
 	2192442826u
@@ -2959,7 +2959,7 @@ static void FS_CheckPak0( void )
 }
 #endif
 
-#ifdef TMNT
+#ifdef TMNTMISC
 /*
 ===================
 FS_CheckPaks
@@ -3396,7 +3396,7 @@ void FS_InitFilesystem( void ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-#ifdef TMNT
+#ifdef TMNTMISC
 	FS_CheckPaks();
 #endif
 #ifndef STANDALONE
@@ -3434,7 +3434,7 @@ void FS_Restart( int checksumFeed ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-#ifdef TMNT
+#ifdef TMNTMISC
 	FS_CheckPaks();
 #endif
 #ifndef STANDALONE

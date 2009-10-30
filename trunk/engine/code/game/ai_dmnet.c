@@ -956,6 +956,7 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
 			return qtrue;
 		}
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if (gametype == GT_HARVESTER) {
 		//if rushing to the base
 		if (bs->ltgtype == LTG_RUSHBASE) {
@@ -1029,6 +1030,7 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
 			return qtrue;
 		}
 	}
+#endif // #ifdef MISSIONPACK_HARVESTER
 #endif
 	//normal goal stuff
 	return BotGetItemLongTermGoal(bs, tfl, goal);
@@ -1974,10 +1976,12 @@ int AINode_Seek_LTG(bot_state_t *bs)
 			if (Bot1FCTFCarryingFlag(bs))
 				range = 50;
 		}
+#ifdef MISSIONPACK_HARVESTER
 		else if (gametype == GT_HARVESTER) {
 			if (BotHarvesterCarryingCubes(bs))
 				range = 80;
 		}
+#endif
 #endif
 		//
 		if (BotNearbyGoal(bs, bs->tfl, &goal, range)) {
@@ -2493,10 +2497,12 @@ int AINode_Battle_Retreat(bot_state_t *bs) {
 			if (Bot1FCTFCarryingFlag(bs))
 				range = 50;
 		}
+#ifdef MISSIONPACK_HARVESTER
 		else if (gametype == GT_HARVESTER) {
 			if (BotHarvesterCarryingCubes(bs))
 				range = 80;
 		}
+#endif
 #endif
 		//
 		if (BotNearbyGoal(bs, bs->tfl, &goal, range)) {

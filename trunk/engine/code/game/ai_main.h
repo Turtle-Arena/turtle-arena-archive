@@ -54,7 +54,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define LTG_PATROL					9	//patrol
 #define LTG_GETITEM					10	//get an item
 #define LTG_KILL					11	//kill someone
+#ifdef MISSIONPACK_HARVESTER
 #define LTG_HARVEST					12	//harvest skulls
+#endif
 #define LTG_ATTACKENEMYBASE			13	//attack the enemy base
 #define LTG_MAKELOVE_UNDER			14
 #define LTG_MAKELOVE_ONTOP			15
@@ -68,7 +70,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEAM_GETITEM_TIME			60	//1 minute
 #define	TEAM_KILL_SOMEONE			180	//3 minute to kill someone
 #define TEAM_ATTACKENEMYBASE_TIME	600	//10 minutes
+#ifdef MISSIONPACK_HARVESTER
 #define TEAM_HARVEST_TIME			120	//2 minutes
+#endif
 #define CTF_GETFLAG_TIME			600	//10 minutes ctf get flag time
 #define CTF_RUSHBASE_TIME			120	//2 minutes ctf rush base time
 #define CTF_RETURNFLAG_TIME			180	//3 minutes to return the flag
@@ -86,8 +90,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define PRESENCE_NONE				1
 #define PRESENCE_NORMAL				2
 #define PRESENCE_CROUCH				4
+#ifndef TMNTWEAPONS
 //
 #define MAX_PROXMINES				64
+#endif
 
 //check points
 typedef struct bot_waypoint_s

@@ -1491,13 +1491,13 @@ typedef struct
 // when there are multiple images of different formats available
 static imageExtToLoaderMap_t imageLoaders[ ] =
 {
-#ifdef TMNT // Load PNG first.
+#ifdef TMNTMISC // Load PNG first.
 	{ "png",  R_LoadPNG },
 #endif
 	{ "tga",  R_LoadTGA },
 	{ "jpg",  R_LoadJPG },
 	{ "jpeg", R_LoadJPG },
-#ifndef TMNT
+#ifndef TMNTMISC
 	{ "png",  R_LoadPNG },
 #endif
 	{ "pcx",  R_LoadPCX },
@@ -1625,7 +1625,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 			break;
 		default:
 			break;
-}
+	}
 #endif // CELSHADING
 }
 

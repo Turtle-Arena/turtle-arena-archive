@@ -59,6 +59,12 @@ char *Sys_DefaultHomePath(void)
 #else
 			Q_strcat( homePath, sizeof( homePath ), "/.tmntarena" );
 #endif
+#elif defined SONIC
+#ifdef MACOS_X
+			Q_strcat( homePath, sizeof( homePath ), "/Library/Application Support/SonicBlastArena" );
+#else
+			Q_strcat( homePath, sizeof( homePath ), "/.sonicblastarena" );
+#endif
 #else
 #ifdef MACOS_X
 			Q_strcat( homePath, sizeof( homePath ), "/Library/Application Support/Quake3" );

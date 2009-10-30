@@ -186,7 +186,7 @@ void UI_LoadArenas( void ) {
 			if( strstr( type, "tourney" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_TOURNAMENT);
 			}
-#ifdef TMNT // TMNTSP?
+#ifdef TMNTMISC // TMNTSP?
 			if( strstr( type, "single" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_SINGLE_PLAYER);
 			}
@@ -200,9 +200,11 @@ void UI_LoadArenas( void ) {
 			if( strstr( type, "overload" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_OBELISK);
 			}
+#ifdef MISSIONPACK_HARVESTER
 			if( strstr( type, "harvester" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_HARVESTER);
 			}
+#endif
 		} else {
 			uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_FFA);
 		}
@@ -327,6 +329,8 @@ char *UI_GetBotNameByNumber( int num ) {
 	}
 #ifdef TMNT // DEFAULT_PLAYER
 	return "Raph";
+#elif defined SONIC
+	return "Sonic";
 #else
 	return "Sarge";
 #endif

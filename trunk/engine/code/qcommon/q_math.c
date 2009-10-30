@@ -161,7 +161,7 @@ float	Q_crandom( int *seed ) {
 }
 
 #ifdef TMNTENTITIES
-// Returns value is more or equal to min and less then max (max equal is max-0.000001)
+// Returns value is more or equal to min and less then max (max value is max-0.000001)
 float flrandom(float min, float max)
 {
 #if 0 // Turtle Man: i made this

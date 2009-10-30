@@ -119,7 +119,7 @@ static const char *servertype_items[] = {
 	"All",
 	"Free For All",
 	"Team Deathmatch",
-#ifdef TMNT // tornament to duel
+#ifdef TMNTMISC // tornament to duel
 	"Duel",
 #else
 	"Tournament",

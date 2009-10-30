@@ -46,7 +46,7 @@ vec4_t color_yellow	    = {1.00f, 1.00f, 0.00f, 1.00f};
 vec4_t color_blue	    = {0.00f, 0.00f, 1.00f, 1.00f};
 vec4_t color_lightOrange    = {1.00f, 0.68f, 0.00f, 1.00f };
 vec4_t color_orange	    = {1.00f, 0.43f, 0.00f, 1.00f};
-#ifdef TMNT
+#ifdef TMNTMISC
 // Turtle Man: White is the new red.
 vec4_t color_red    = {1.00f, 1.00f, 1.00f, 1.00f};
 vec4_t color_TMNTred = {1.00f, 0.00f, 0.00f, 1.00f};
@@ -1726,7 +1726,7 @@ void Menu_Cache( void )
 {
 	uis.charset			= trap_R_RegisterShaderNoMip( "gfx/2d/bigchars" );
 	uis.charsetProp		= trap_R_RegisterShaderNoMip( "menu/art/font1_prop.tga" );
-#ifndef TMNT
+#ifndef TMNTDATASYS
 	uis.charsetPropGlow	= trap_R_RegisterShaderNoMip( "menu/art/font1_prop_glo.tga" );
 #endif
 	uis.charsetPropB	= trap_R_RegisterShaderNoMip( "menu/art/font2_prop.tga" );

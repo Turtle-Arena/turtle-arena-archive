@@ -231,6 +231,8 @@ but not on every player enter or exit.
 #define	HEARTBEAT_MSEC	300*1000
 #ifdef TMNT
 #define	HEARTBEAT_GAME	"TMNTArena-1"
+#elif defined
+#define	HEARTBEAT_GAME	"SonicBlastArena-1"
 #else
 #define	HEARTBEAT_GAME	"QuakeArena-1"
 #endif

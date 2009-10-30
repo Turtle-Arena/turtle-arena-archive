@@ -287,7 +287,11 @@ static void CG_TouchItem( centity_t *cent ) {
 			return;
 		}
 	}
-	if( cgs.gametype == GT_CTF || cgs.gametype == GT_HARVESTER ) {
+	if( cgs.gametype == GT_CTF
+#ifdef MISSIONPACK_HARVESTER
+	|| cgs.gametype == GT_HARVESTER
+#endif
+	) {
 #else
 	if( cgs.gametype == GT_CTF ) {
 #endif
@@ -451,7 +455,7 @@ void CG_PredictPlayerState( void ) {
 	// prepare for pmove
 	cg_pmove.ps = &cg.predictedPlayerState;
 #ifdef TMNTPLAYERSYS // Pmove
-	cg_pmove.playercfg = &cgs.clientinfo[ cg.clientNum ].playercfg;
+	cg_pmove.playercfg = &cgs.clientinfo[ cg.predictedPlayerState.clientNum ].playercfg;
 #endif
 	cg_pmove.trace = CG_Trace;
 	cg_pmove.pointcontents = CG_PointContents;
@@ -612,6 +616,12 @@ void CG_PredictPlayerState( void ) {
 		// check for predictable events that changed from previous predictions
 		//CG_CheckChangedPredictableEvents(&cg.predictedPlayerState);
 	}
+
+#ifdef TMNTHOLDSYS2 // Turtle Man: Fix for auto changing in PMove!
+	if (cg_pmove.ps) {
+		cg.holdableSelect = 0;//cg_pmove.ps->holdableIndex;
+	}
+#endif
 
 	if ( cg_showmiss.integer > 1 ) {
 		CG_Printf( "[%i : %i] ", cg_pmove.cmd.serverTime, cg.time );

@@ -99,6 +99,9 @@ void CG_LoadingClient( int clientNum ) {
 	char			personality[MAX_QPATH];
 	char			model[MAX_QPATH];
 	char			iconName[MAX_QPATH];
+#ifdef IOQ3ZTM // PLAYER_DIR
+	int				i;
+#endif
 
 #ifdef TMNTSP
 	if (cgs.gametype == GT_SINGLE_PLAYER)
@@ -118,6 +121,18 @@ void CG_LoadingClient( int clientNum ) {
 			skin = "default";
 		}
 
+#ifdef IOQ3ZTM // PLAYER_DIR
+		for (i = 0; bg_playerDirs[i] != NULL; i++)
+		{
+			Com_sprintf( iconName, MAX_QPATH, "%s/%s/icon_%s.tga", bg_playerDirs[i], model, skin );
+			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
+
+			if (loadingPlayerIcons[loadingPlayerIconCount])
+			{
+				break;
+			}
+		}
+#else
 		Com_sprintf( iconName, MAX_QPATH, "models/players/%s/icon_%s.tga", model, skin );
 		
 		loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
@@ -125,6 +140,7 @@ void CG_LoadingClient( int clientNum ) {
 			Com_sprintf( iconName, MAX_QPATH, "models/players/characters/%s/icon_%s.tga", model, skin );
 			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
 		}
+#endif
 		if ( !loadingPlayerIcons[loadingPlayerIconCount] ) {
 			Com_sprintf( iconName, MAX_QPATH, "models/players/%s/icon_%s.tga", DEFAULT_MODEL, "default" );
 			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
@@ -254,7 +270,7 @@ void CG_DrawInformation( void ) {
 		s = "Single Player";
 		break;
 	case GT_TOURNAMENT:
-#ifdef TMNT
+#ifdef TMNTMISC // tournament to duel
 		s = "Duel";
 #else
 		s = "Tournament";
@@ -273,9 +289,11 @@ void CG_DrawInformation( void ) {
 	case GT_OBELISK:
 		s = "Overload";
 		break;
+#ifdef MISSIONPACK_HARVESTER
 	case GT_HARVESTER:
 		s = "Harvester";
 		break;
+#endif
 #endif
 	default:
 		s = "Unknown Gametype";
@@ -297,13 +315,13 @@ void CG_DrawInformation( void ) {
 	cgs.gametype != GT_SINGLE_PLAYER &&
 #endif
 	cgs.gametype < GT_CTF ) {
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 		value = atoi( Info_ValueForKey( info, "scorelimit" ) );
 #else
 		value = atoi( Info_ValueForKey( info, "fraglimit" ) );
 #endif
 		if ( value ) {
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 			UI_DrawProportionalString( 320, y, va( "scorelimit %i", value ),
 				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 #else

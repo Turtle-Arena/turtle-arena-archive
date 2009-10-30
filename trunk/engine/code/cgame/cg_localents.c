@@ -546,6 +546,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 
 
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ====================
 CG_AddKamikaze
@@ -673,7 +674,9 @@ void CG_AddKamikaze( localEntity_t *le ) {
 		trap_R_AddRefEntityToScene( &shockwave );
 	}
 }
+#endif
 
+#ifndef TMNT // POWERS
 /*
 ===================
 CG_AddInvulnerabilityImpact
@@ -708,6 +711,7 @@ void CG_AddInvulnerabilityJuiced( localEntity_t *le ) {
 		trap_R_AddRefEntityToScene( &le->refEntity );
 	}
 }
+#endif
 
 /*
 ===================
@@ -876,15 +880,19 @@ void CG_AddLocalEntities( void ) {
 			break;
 
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		case LE_KAMIKAZE:
 			CG_AddKamikaze( le );
 			break;
+#endif
+#ifndef TMNT // POWERS
 		case LE_INVULIMPACT:
 			CG_AddInvulnerabilityImpact( le );
 			break;
 		case LE_INVULJUICED:
 			CG_AddInvulnerabilityJuiced( le );
 			break;
+#endif
 		case LE_SHOWREFENTITY:
 			CG_AddRefEntity( le );
 			break;

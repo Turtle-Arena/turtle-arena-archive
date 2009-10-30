@@ -48,7 +48,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 	int			quantity;
-#ifndef TMNT
+#ifndef TMNTMISC
 	int			i;
 	gclient_t	*client;
 #endif
@@ -68,7 +68,7 @@ int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 
 	other->client->ps.powerups[ent->item->giTag] += quantity * 1000;
 
-#ifndef TMNT
+#ifndef TMNTMISC
 	// give any nearby players a "denied" anti-reward
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		vec3_t		delta;
@@ -220,9 +220,11 @@ int Pickup_Holdable( gentity_t *ent, gentity_t *other ) {
 	other->client->ps.stats[STAT_HOLDABLE_ITEM] = ent->item - bg_itemlist;
 #endif
 
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	if( ent->item->giTag == HI_KAMIKAZE ) {
 		other->client->ps.eFlags |= EF_KAMIKAZE;
 	}
+#endif
 
 	return RESPAWN_HOLDABLE;
 }
@@ -252,7 +254,7 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 			stat = STAT_SAVEDAMMO;
 		}
 		else {
-			G_Printf("DEBUG: Player got ammo for a weapon they don't own! weapon=%1, ammo=%i\n", weapon, count);
+			G_Printf("DEBUG: Add_Ammo: Player got ammo for a weapon they don't own! weaponNum=%1, ammo_count=%i\n", weapon, count);
 			return;
 		}
 	}
@@ -330,7 +332,7 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 
 #ifndef TMNTWEAPSYS
 		// dropped items and teamplay weapons always have full ammo
-		if ( ! (ent->flags & FL_DROPPED_ITEM) && g_gametype.integer != GT_TEAM ) {
+		if (!(ent->flags & FL_DROPPED_ITEM) && g_gametype.integer != GT_TEAM ) {
 			// respawning rules
 			// drop the quantity if the already have over the minimum
 			if ( other->client->ps.ammo[ ent->item->giTag ] < quantity ) {
@@ -376,7 +378,7 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	int			max;
 	int			quantity;
 
-#ifdef TMNT
+#ifdef TMNTMISC
 	// no health items go over max (unlike in Q3).
 	max = other->client->ps.stats[STAT_MAX_HEALTH];
 #else
@@ -492,6 +494,7 @@ void RespawnItem( gentity_t *ent ) {
 		te->r.svFlags |= SVF_BROADCAST;
 	}
 
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	if ( ent->item->giType == IT_HOLDABLE && ent->item->giTag == HI_KAMIKAZE ) {
 		// play powerup spawn sound to all clients
 		gentity_t	*te;
@@ -506,6 +509,7 @@ void RespawnItem( gentity_t *ent ) {
 		te->s.eventParm = G_SoundIndex( "sound/items/kamikazerespawn.wav" );
 		te->r.svFlags |= SVF_BROADCAST;
 	}
+#endif
 
 	// play the normal respawn sound only to nearby clients
 	G_AddEvent( ent, EV_ITEM_RESPAWN, 0 );
@@ -878,6 +882,7 @@ void G_CheckTeamItems( void ) {
 		}
 	}
 
+#ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
 		gentity_t	*ent;
 
@@ -901,6 +906,7 @@ void G_CheckTeamItems( void ) {
 		}
 	}
 #endif
+#endif
 }
 
 /*
@@ -923,7 +929,7 @@ void ClearRegisteredItems( void ) {
 	RegisterItem( BG_FindItemForWeapon( WP_SEA2 ) );
 	RegisterItem( BG_FindItemForWeapon( WP_GUN ) );
 #endif
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
 		RegisterItem( BG_FindItem( "Red Cube" ) );
 		RegisterItem( BG_FindItem( "Blue Cube" ) );

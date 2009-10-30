@@ -141,6 +141,9 @@
 		<Unit filename="../../code/cgame/cg_npcs.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/cgame/cg_particles.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/cgame/cg_players.c">
 			<Option compilerVar="CC" />
 		</Unit>

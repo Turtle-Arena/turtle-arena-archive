@@ -159,7 +159,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		gender = ci->gender;
 #endif
 		switch (mod) {
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE:
 			message = "goes out with a bang";
 			break;
@@ -240,7 +240,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	if ( attacker == cg.snap->ps.clientNum ) {
 		char	*s;
 
-#ifdef TMNT // frag to KO
+#ifdef TMNTMISC // frag to KO
 		if ( cgs.gametype < GT_TEAM ) {
 			s = va("You knocked out %s\n%s place with %i", targetName,
 				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
@@ -376,7 +376,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was gunned down by";
 			break;
 		case MOD_GRENADE:
-#ifdef TMNT
+#ifdef TMNTMISC
 			message = "was killed by";
 #else
 			message = "ate";
@@ -388,7 +388,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message2 = "'s shrapnel";
 			break;
 		case MOD_ROCKET:
-#ifdef TMNT
+#ifdef TMNTMISC
 			message = "was killed by";
 #else
 			message = "ate";
@@ -433,10 +433,12 @@ static void CG_Obituary( entityState_t *ent ) {
 			message2 = "'s Prox Mine";
 			break;
 #endif
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE:
 			message = "falls to";
 			message2 = "'s Kamikaze blast";
 			break;
+#endif
 #ifndef TMNTWEAPONS // MOD
 		case MOD_JUICED:
 			message = "was juiced by";
@@ -515,6 +517,13 @@ static void CG_UseItem( centity_t *cent ) {
 #endif
 		{
 			item = BG_FindItemForHoldable( itemNum );
+#ifdef TMNTHOLDABLE // TMNTDATA : Eat pizza, don't "use" it.
+			if (itemNum == HI_MEDKIT)
+			{
+				CG_CenterPrint( va("Ate %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+			}
+			else
+#endif
 			CG_CenterPrint( va("Use %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 		}
 	}
@@ -540,8 +549,10 @@ static void CG_UseItem( centity_t *cent ) {
 		break;
 
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	case HI_KAMIKAZE:
 		break;
+#endif
 
 	case HI_PORTAL:
 		break;
@@ -655,7 +666,7 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	cent->pe.painDirection ^= 1;
 }
 
-#ifdef TMNTENTITIES
+#ifdef TMNTENTITIES // non free
 /*
 CG_Chunks
 
@@ -766,6 +777,65 @@ void CG_Chunks( vec3_t origin, vec3_t dir, float scale, material_type_t type )
 			VectorScale( le->refEntity.axis[k], fracment_radius, le->refEntity.axis[k] );
 		}
 	}
+}
+#endif
+#ifdef TMNTWEAPSYS_1 // DEBUG_ORIGIN
+// Based on CG_Item
+void CG_DebugOrigin(centity_t *cent)
+{
+	entityState_t	*es;
+	float			frac;
+	localEntity_t	*le;
+	refEntity_t		*re;
+
+	es = &cent->currentState;
+
+	// if set to invisible, skip
+	//if ( es->eFlags & EF_NODRAW ) {
+	//	return;
+	//}
+
+	le = CG_AllocLocalEntity();
+	re = &le->refEntity;
+
+#ifdef MISSIONPACK
+	le->leType = LE_SHOWREFENTITY;//LE_FRAGMENT;
+#else
+	le->leType = LE_FRAGMENT;
+#endif
+	le->endTime = cg.time + 100;
+
+	le->pos.trType = TR_STATIONARY;
+	le->pos.trTime = cg.time;
+
+	// Draw a colored model (like a powerup sphere ...)
+	if (cent->currentState.eventParm == 1) // blue
+	{
+		re->hModel = trap_R_RegisterModel( "models/powerups/instant/speed_1.md3" );
+	}
+	else if (cent->currentState.eventParm == 2) // yellow
+	{
+		re->hModel = trap_R_RegisterModel( "models/powerups/instant/defense_1.md3" );
+	}
+	else if (cent->currentState.eventParm == 3) // grey
+	{
+		re->hModel = trap_R_RegisterModel( "models/powerups/instant/invul_1.md3" );
+	}
+	else // red
+	{
+		re->hModel = trap_R_RegisterModel( "models/powerups/instant/strength_1.md3" );
+	}
+
+	VectorCopy( cent->currentState.pos.trBase, re->origin );
+
+	AxisCopy( axisDefault, re->axis );
+
+	// scale down
+	frac = 0.20f;
+	VectorScale( re->axis[0], frac, re->axis[0] );
+	VectorScale( re->axis[1], frac, re->axis[1] );
+	VectorScale( re->axis[2], frac, re->axis[2] );
+	re->nonNormalizedAxes = qtrue;
 }
 #endif
 
@@ -1181,7 +1251,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_LASERSHURIKEN_BOUNCE: // HI_LASERSHURIKEN
 		DEBUGNAME("EV_LASERSHURIKEN_BOUNCE");
 		if (es->eventParm == 1) {
-			// Turtle Man: TODO: Laser shuriken just died.
+			// Turtle Man: TODO: Laser shuriken just died, play sound?
 		} else {
 			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.laserShurikenSound );
 		}
@@ -1215,10 +1285,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.wstbactvSound );
 		break;
 #endif
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	case EV_KAMIKAZE:
 		DEBUGNAME("EV_KAMIKAZE");
 		CG_KamikazeEffect( cent->lerpOrigin );
 		break;
+#endif
 	case EV_OBELISKEXPLODE:
 		DEBUGNAME("EV_OBELISKEXPLODE");
 		CG_ObeliskExplode( cent->lerpOrigin, es->eventParm );
@@ -1248,7 +1320,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_SCOREPLUM");
 		CG_ScorePlum( cent->currentState.otherEntityNum, cent->lerpOrigin, cent->currentState.time );
 		break;
-#ifdef TMNTENTITIES
+#ifdef TMNTENTITIES // non free
 	case EV_FX_CHUNKS:
 		DEBUGNAME("EV_FX_CHUNKS");
 		//UnVectorShort( cent->currentState.angles2 );
@@ -1433,7 +1505,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				case GTS_TEAMS_ARE_TIED:
 					CG_AddBufferedSound( cgs.media.teamsTiedSound );
 					break;
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 				case GTS_KAMIKAZE:
 					trap_S_StartLocalSound(cgs.media.kamikazeFarSound, CHAN_ANNOUNCER);
 					break;
@@ -1498,12 +1570,16 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifndef NOTRATEDM // No gibs.
 	case EV_GIB_PLAYER:
 		DEBUGNAME("EV_GIB_PLAYER");
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		// don't play gib sound when using the kamikaze because it interferes
 		// with the kamikaze sound, downside is that the gib sound will also
 		// not be played when someone is gibbed while just carrying the kamikaze
 		if ( !(es->eFlags & EF_KAMIKAZE) ) {
 			trap_S_StartSound( NULL, es->number, CHAN_BODY, cgs.media.gibSound );
 		}
+#else
+		trap_S_StartSound( NULL, es->number, CHAN_BODY, cgs.media.gibSound );
+#endif
 		CG_GibPlayer( cent->lerpOrigin );
 		break;
 #endif
@@ -1518,6 +1594,13 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_DEBUG_LINE");
 		CG_Beam( cent );
 		break;
+
+#ifdef TMNTWEAPSYS_1 // DEBUG_ORIGIN
+	case EV_DEBUG_ORIGIN:
+		DEBUGNAME("EV_DEBUG_LINE");
+		CG_DebugOrigin( cent );
+		break;
+#endif
 
 	default:
 		DEBUGNAME("UNKNOWN");

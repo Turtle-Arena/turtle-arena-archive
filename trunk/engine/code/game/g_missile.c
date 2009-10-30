@@ -595,7 +595,7 @@ void G_RunMissile( gentity_t *ent ) {
 		if ( tr.surfaceFlags & SURF_NOIMPACT ) {
 			// If grapple, reset owner
 			if (ent->parent && ent->parent->client && ent->parent->client->hook == ent) {
-#ifdef TMNTWEAPONS // Turtle Man: TODO: Pull grapple back.
+#ifdef TMNTWEAPONS // Turtle Man: TODO: Pull grapple back to player, like LoZ: TP.
 #endif
 				ent->parent->client->hook = NULL;
 			}
@@ -646,11 +646,11 @@ gentity_t *fire_gun(gentity_t *self, vec3_t start, vec3_t dir) {
 	bolt->s.weapon = WP_GUN;
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
-	bolt->damage = 100;
-	bolt->splashDamage = 100;
-	bolt->splashRadius = 120;
+	bolt->damage = 10;
+	bolt->splashDamage = 0;
+	bolt->splashRadius = 0;
 	bolt->methodOfDeath = MOD_GUN;
-	bolt->splashMethodOfDeath = MOD_GUN; // ???
+	bolt->splashMethodOfDeath = MOD_UNKNOWN;
 	bolt->clipmask = MASK_SHOT;
 	bolt->target_ent = NULL;
 
@@ -667,11 +667,15 @@ gentity_t *fire_gun(gentity_t *self, vec3_t start, vec3_t dir) {
 //=============================================================================
 
 // start HOMING
+void G_HomingMissile( gentity_t *ent )
+{
+#if 0
+	// Turtle Man: TODO: Rewrite homing rocket thinker
+
+#else
 // Turtle Man: FIXME: NON-GPL code from QuakeStyle
 // HOMING code is by "Ukai Naoto" of QuakeStyle
 //  http://quakestyle.telefragged.com/quake3/tutorial12.htm
-void G_HomingMissile( gentity_t *ent )
-{
 	gentity_t	*target = NULL;
 	gentity_t	*blip = NULL;
 	vec3_t  dir, blipdir, temp_dir;
@@ -711,8 +715,13 @@ void G_HomingMissile( gentity_t *ent )
 	}
 
 	if (target == NULL)	{
+#if 1
+		// Turtle Man: Better luck next time.
+		ent->nextthink = level.time + 500;
+#else
 		ent->nextthink = level.time + 10000;
 		// if once the rocket lose target,it will not search new enemy any more,and go away.
+#endif
 	} else {
 		ent->s.pos.trTime = level.time;
 		VectorCopy(ent->r.currentOrigin, ent->s.pos.trBase );
@@ -735,6 +744,7 @@ void G_HomingMissile( gentity_t *ent )
 		SnapVector (ent->s.pos. trDelta); // save net bandwidth
 		ent->nextthink = level.time + 100; // decrease this value also makes fast swing.
 	}
+#endif
 }
 //end HOMING
 
@@ -752,8 +762,8 @@ gentity_t *fire_homingrocket(gentity_t *self, vec3_t start, vec3_t dir) {
 	bolt = G_Spawn();
 	bolt->classname = "homingrocket";
 	// start HOMING
+	bolt->nextthink = level.time + 20;
 	bolt->think = G_HomingMissile;
-	bolt->nextthink = level.time + 60;
 	// else HOMING
 	//bolt->nextthink = level.time + 15000;
 	//bolt->think = G_ExplodeMissile;
@@ -767,8 +777,13 @@ gentity_t *fire_homingrocket(gentity_t *self, vec3_t start, vec3_t dir) {
 	// end HOMING
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
-	bolt->damage = 100;
-	bolt->splashDamage = 100;
+	// start HOMING
+	bolt->damage = 25;
+	bolt->splashDamage = 25;
+	// else HOMING
+	//bolt->damage = 100;
+	//bolt->splashDamage = 100;
+	// end HOMING
 	bolt->splashRadius = 120;
 	// Turtle Man: Changed methods Of Death
 	bolt->methodOfDeath = MOD_HOMING;
@@ -779,7 +794,7 @@ gentity_t *fire_homingrocket(gentity_t *self, vec3_t start, vec3_t dir) {
 	bolt->s.pos.trType = TR_LINEAR;
 	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
 	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, 900, bolt->s.pos.trDelta );
+	VectorScale( dir, 450, bolt->s.pos.trDelta ); // speed was 900
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
 
@@ -943,8 +958,13 @@ gentity_t *fire_rocket (gentity_t *self, vec3_t start, vec3_t dir) {
 	bolt->s.weapon = WP_ROCKET_LAUNCHER;
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
+#ifdef TMNTWEAPONS
+	bolt->damage = 50;
+	bolt->splashDamage = 50;
+#else
 	bolt->damage = 100;
 	bolt->splashDamage = 100;
+#endif
 	bolt->splashRadius = 120;
 	bolt->methodOfDeath = MOD_ROCKET;
 	bolt->splashMethodOfDeath = MOD_ROCKET_SPLASH;

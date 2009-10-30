@@ -185,11 +185,7 @@ static void CG_General( centity_t *cent ) {
 
 	// player model
 	if (s1->number == cg.snap->ps.clientNum) {
-#ifdef IOQ3ZTM
-		ent.renderfx |= RF_ONLY_MIRROR;		// only draw from mirrors
-#else
 		ent.renderfx |= RF_THIRD_PERSON;	// only draw from mirrors
-#endif
 	}
 
 	// convert angles to axis
@@ -198,6 +194,130 @@ static void CG_General( centity_t *cent ) {
 	// add to refresh list
 	trap_R_AddRefEntityToScene (&ent);
 }
+
+#ifdef TMNTENTSYS // MISC_OBJECT
+static void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *backlerp ) {
+	entityState_t		*s1;
+
+	s1 = &cent->currentState;
+
+	// Unanimated misc_object
+	if (cent->miscObj.anim == -1)
+	{
+		*frame = s1->frame;
+		*oldframe = *frame;
+		*backlerp = 0;
+	}
+	else
+	{
+		// Animated misc_object
+
+		// Check for frame change
+		if (s1->modelindex2 != cent->miscObj.anim)
+		{
+			cent->miscObj.anim = s1->modelindex2;
+
+			// Do we need to clear it?
+			BG_ClearLerpFrame( &cent->miscObj.lerp, cent->miscObj.animations, cent->miscObj.anim, cg.time);
+		}
+
+		BG_RunLerpFrame( &cent->miscObj.lerp, cent->miscObj.animations, cent->miscObj.anim, cg.time, cent->miscObj.speed );
+
+		*frame = cent->miscObj.lerp.frame;
+		*oldframe = cent->miscObj.lerp.oldFrame;
+		*backlerp = cent->miscObj.lerp.backlerp;
+	}
+}
+
+// TODO: Make this / G_SetFileExt be Com_SetFileExt ?
+void CG_SetFileExt(char *filename, char *ext)
+{
+	int i;
+
+	for (i = 0; filename[i] && filename[i] != '.'; i++)
+	{
+		// just increase i.
+	}
+	filename[i] = 0;
+
+	Q_strcat(filename, MAX_QPATH, ext);
+}
+
+static void CG_MiscObject( centity_t *cent ) {
+	refEntity_t			ent;
+	entityState_t		*s1;
+
+	s1 = &cent->currentState;
+
+	// if set to invisible, skip
+	if (!s1->modelindex) {
+		return;
+	}
+
+	// Check if config was loaded
+	if (cent->miscObj.speed < 1.0)
+	{
+		const char *modelName;
+		char filename[MAX_QPATH];
+
+		const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
+		{
+			"OBJECT_NORMAL",
+			"OBJECT_DAMAGED1",
+			"OBJECT_DAMAGED2",
+			"OBJECT_DAMAGED3",
+			"OBJECT_KILLED"
+		};
+
+		cent->miscObj.speed = 1.0f;
+
+		modelName = CG_ConfigString( CS_MODELS + s1->modelindex );
+
+		Q_strncpyz(filename, modelName, MAX_QPATH);
+
+		CG_SetFileExt(filename, ".cfg");
+
+		if (BG_ParseObjectCFGFile(filename, misc_object_anim_names,
+			cent->miscObj.animations, MAX_MISC_OBJECT_ANIMATIONS,
+			NULL, NULL, NULL, NULL, &cent->miscObj.speed))
+		{
+			// Loaded file.
+			cent->miscObj.anim = 0;
+			BG_ClearLerpFrame( &cent->miscObj.lerp, cent->miscObj.animations, cent->miscObj.anim, cg.time);
+		}
+		else
+		{
+			cent->miscObj.anim = -1;
+		}
+	}
+
+	memset (&ent, 0, sizeof(ent));
+
+	// set frame
+	CG_MiscObjectAnimate(cent, &ent.oldframe, &ent.frame, &ent.backlerp);
+
+	VectorCopy( cent->lerpOrigin, ent.origin);
+	VectorCopy( cent->lerpOrigin, ent.oldorigin);
+
+	ent.hModel = cgs.gameModels[s1->modelindex];
+
+	// Flags for only drawing or not drawing a object in mirrors
+	if (cent->miscObj.flags & MOF_ONLY_MIRROR)
+	{
+		ent.renderfx |= RF_ONLY_MIRROR;
+	}
+	else if (cent->miscObj.flags & MOF_NOT_MIRROR)
+	{
+		ent.renderfx |= RF_NOT_MIRROR;
+	}
+
+	// convert angles to axis
+	AnglesToAxis( cent->lerpAngles, ent.axis );
+
+	// add to refresh list
+	trap_R_AddRefEntityToScene (&ent);
+}
+#endif
 
 #ifdef SINGLEPLAYER // entity
 static qboolean CG_ParseMD3AnimationFile( const char *filename, animation_t *anim ) {
@@ -271,8 +391,11 @@ static qboolean CG_ParseMD3AnimationFile( const char *filename, animation_t *ani
 
 static void CG_ModelAnimate( centity_t *cent, int *md3Old, int *md3, float *md3BackLerp ) {
 	entityState_t		*s1;
-	lerpFrame_t *model=&cent->md3.model;
+	lerpFrame_t 		*model;
+
 	s1 = &cent->currentState;
+	model=&cent->md3.model;
+
 	if (cent->currentState.eFlags & EF_FORCE_END_FRAME ) {
 		cent->md3.state &= ~2;
 		cent->md3.state &= ~4;
@@ -285,7 +408,7 @@ static void CG_ModelAnimate( centity_t *cent, int *md3Old, int *md3, float *md3B
 			cent->md3.state |= 4;	// show model
 			cent->md3.state |= 2;	// if not, activate animation
 			cent->md3.state ^= ANIM_TOGGLEBIT;
-			CG_ClearLerpFrameNPC(&cent->md3.anim, model, cent->md3.state & ANIM_TOGGLEBIT);
+			BG_ClearLerpFrame(model, &cent->md3.anim, cent->md3.state & ANIM_TOGGLEBIT, cg.time);
 		}
 	}
 	if (cent->currentState.eFlags & EF_FORCE_END_FRAME ) {
@@ -296,7 +419,7 @@ static void CG_ModelAnimate( centity_t *cent, int *md3Old, int *md3, float *md3B
 	}
 	if (cent->md3.state & 2)	// do we have to animate?
 	{
-		CG_RunLerpFrameNPC( &cent->md3.anim, model, cent->md3.state & ANIM_TOGGLEBIT, cent->md3.speed );
+		BG_RunLerpFrame( model, &cent->md3.anim, cent->md3.state & ANIM_TOGGLEBIT, cg.time, cent->md3.speed );
 		if (model->oldFrame==model->frame &&
 			model->frame==model->animation->numFrames+model->animation->firstFrame-1)	// finished?
 		{
@@ -406,7 +529,13 @@ static void CG_Item( centity_t *cent ) {
 	}
 
 	item = &bg_itemlist[ es->modelindex ];
-	if ( cg_simpleItems.integer && item->giType != IT_TEAM ) {
+#ifdef IOQ3ZTM // If missing item model, use item sprite.
+	// Turtle Man: Not all of the items have models yet, so use the sprite!
+	if ( (!cg_items[es->modelindex].models[0] || cg_simpleItems.integer) && item->giType != IT_TEAM )
+#else
+	if ( cg_simpleItems.integer && item->giType != IT_TEAM )
+#endif
+	{
 		memset( &ent, 0, sizeof( ent ) );
 		ent.reType = RT_SPRITE;
 		VectorCopy( cent->lerpOrigin, ent.origin );
@@ -487,7 +616,7 @@ static void CG_Item( centity_t *cent ) {
 
 	// items without glow textures need to keep a minimum light value
 	// so they are always visible
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	ent.renderfx |= RF_MINLIGHT;
 #else
 	if ( ( item->giType == IT_WEAPON ) ||
@@ -507,7 +636,7 @@ static void CG_Item( centity_t *cent ) {
 #endif
 	}
 
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	if ( item->giType == IT_HOLDABLE && item->giTag == HI_KAMIKAZE ) {
 		VectorScale( ent.axis[0], 2, ent.axis[0] );
 		VectorScale( ent.axis[1], 2, ent.axis[1] );
@@ -540,6 +669,7 @@ static void CG_Item( centity_t *cent ) {
 	}
 #endif
 
+#ifndef TMNTDATA // no extra models for items
 	// accompanying rings / spheres for powerups
 	if ( !cg_simpleItems.integer ) 
 	{
@@ -569,6 +699,7 @@ static void CG_Item( centity_t *cent ) {
 			}
 		}
 	}
+#endif
 }
 
 //============================================================================
@@ -742,7 +873,7 @@ static void CG_Shuriken( centity_t *cent, holdable_t holdable ) {
 		//RotateAroundDirection( ent.axis, cg.time / 4 );
 		//RotateAroundDirection( ent.axis, cent->lerpAngles[1]);
 	} else {
-		// Stuck in wall?
+		// Turtle Man: TODO: Stuck in wall?
 	}
 
 	// add to refresh list, possibly with quad glow
@@ -781,7 +912,7 @@ static void CG_Missile( centity_t *cent ) {
 #else
 	s1 = &cent->currentState;
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
-	if ( s1->weapon >= WP_NUM_WEAPONS )
+	if ( s1->weapon >= WP_NUM_WEAPONS ) {
 #else
 	if ( s1->weapon > WP_NUM_WEAPONS ) {
 #endif
@@ -1278,6 +1409,7 @@ static void CG_TeamBase( centity_t *cent ) {
 			trap_R_AddRefEntityToScene( &model );
 		}
 	}
+#ifdef MISSIONPACK_HARVESTER
 	else if ( cgs.gametype == GT_HARVESTER ) {
 		// show harvester model
 		memset(&model, 0, sizeof(model));
@@ -1300,6 +1432,7 @@ static void CG_TeamBase( centity_t *cent ) {
 		}
 		trap_R_AddRefEntityToScene( &model );
 	}
+#endif
 #endif
 }
 
@@ -1367,6 +1500,11 @@ static void CG_AddCEntity( centity_t *cent ) {
 #ifdef SINGLEPLAYER // entity
 	case ET_MODELANIM:
 		CG_ModelAnim( cent );
+		break;
+#endif
+#ifdef TMNTENTSYS // MISC_OBJECT
+	case ET_MISCOBJECT:
+		CG_MiscObject( cent );
 		break;
 #endif
 	}

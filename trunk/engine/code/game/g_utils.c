@@ -121,7 +121,7 @@ int G_SoundIndex( char *name ) {
 	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, qtrue);
 }
 
-#ifdef TMNT // Particles
+#ifdef TMNTMISC // Particles
 // str should be
 // int  f f f   f f f   int         int   int
 // type origin origin2 numparticles turb snum
@@ -245,7 +245,7 @@ match (string)self.target and call their .use function
 
 ==============================
 */
-#ifdef TMNTENTITIES
+#ifdef TMNTENTSYS
 void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *target ) {
 	gentity_t		*t;
 
@@ -339,7 +339,7 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
             else
             {
                 ent->s.weapon = WP_NONE;
-}
+            }
         }
 #endif
 	}
@@ -709,6 +709,57 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin ) {
 	VectorCopy( origin, ent->r.currentOrigin );
 }
 
+#ifdef TMNTWEAPONS // TREMULOUS
+// from quakestyle.telefragged.com
+// (NOBODY): Code helper function
+//
+gentity_t *G_FindRadius( gentity_t *from, vec3_t org, float rad )
+{
+  vec3_t  eorg;
+  int j;
+
+  if( !from )
+    from = g_entities;
+  else
+    from++;
+
+  for( ; from < &g_entities[ level.num_entities ]; from++ )
+  {
+    if( !from->inuse )
+      continue;
+
+    for( j = 0; j < 3; j++ )
+      eorg[ j ] = org[ j ] - ( from->r.currentOrigin[ j ] + ( from->r.mins[ j ] + from->r.maxs[ j ] ) * 0.5 );
+
+    if( VectorLength( eorg ) > rad )
+      continue;
+
+    return from;
+  }
+
+  return NULL;
+}
+
+/*
+===============
+G_Visible
+
+Test for a LOS between two entities
+===============
+*/
+qboolean G_Visible( gentity_t *ent1, gentity_t *ent2 )
+{
+  trace_t trace;
+
+  trap_Trace( &trace, ent1->s.pos.trBase, NULL, NULL, ent2->s.pos.trBase, ent1->s.number, MASK_SHOT );
+
+  if( trace.contents & CONTENTS_SOLID )
+    return qfalse;
+
+  return qtrue;
+}
+#endif
+
 /*
 ================
 DebugLine
@@ -744,57 +795,3 @@ int DebugLine(vec3_t start, vec3_t end, int color) {
 
 	return trap_DebugPolygonCreate(color, 4, points);
 }
-
-#ifdef TMNTWEAPONS
-/*
-=================
-Quake2 (GPL v2): findradius
-
-Returns entities that have origins within a spherical area
-
-Turtle Man: Renamed from findradius to G_FindRadius.
-			Changes were made to make it work in Quake3.
-			Thanks goto "Nobody" at http://quakestyle.telefragged.com/quake3/tutorial10.htm
-=================
-*/
-gentity_t *G_FindRadius (gentity_t *from, vec3_t org, float rad)
-{
-	vec3_t	eorg;
-	int		j;
-
-	if (!from)
-		from = g_entities;
-	else
-		from++;
-	for ( ; from < &g_entities[level.num_entities]; from++)
-	{
-		if (!from->inuse)
-			continue;
-		//if (from->solid == SOLID_NOT)
-			//continue;
-		for (j=0 ; j<3 ; j++)
-			eorg[j] = org[j] - (from->r.currentOrigin[j] + (from->r.mins[j] + from->r.maxs[j])*0.5);
-		if (VectorLength(eorg) > rad)
-			continue;
-		return from;
-	}
-
-	return NULL;
-}
-
-// Turtle Man: FIXME: NON-GPL from QuakeStyle (5 lines)
-// FROM: Nobody of QuakeStyle; http://quakestyle.telefragged.com/quake3/tutorial11.htm
-// (NOBODY): Code helper function
-// visible
-qboolean G_Visible( gentity_t *ent1, gentity_t *ent2 ) {
-	trace_t         trace;
-
-	trap_Trace (&trace, ent1->s.pos.trBase, NULL, NULL, ent2->s.pos.trBase, ent1->s.number, MASK_SHOT );
-
-	if ( trace.contents & CONTENTS_SOLID ) {
-		return qfalse;
-	}
-
-	return qtrue;
-}
-#endif

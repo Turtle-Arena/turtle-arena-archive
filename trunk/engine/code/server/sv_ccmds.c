@@ -1108,36 +1108,59 @@ static void SV_SaveGame_f(void) {
 	//Com_Printf( "savegame: (%s)\n", filegame );
 	VM_Call( gvm, GAME_SAVEGAME, f );
 
-	// Close file here?
+	// Close file
+	FS_FCloseFile( f );
 }
 
 /*
 ==================
 SP_LoadGame
 See save_header_t in g_savestate.c for more info.
+
+Return value
+0 - no map changing needed.
+1 - file type requires map reload
+2 - no map loaded or wrong map loaded.
 ==================
 */
-void SP_LoadGame(fileHandle_t f, char *filename)
+int SP_LoadGame(fileHandle_t f, char *filename, char *loadmap)
 {
-	char loadmap[MAX_QPATH];
-	byte i;
+	char currentmap[MAX_QPATH];
+	byte version;
+	byte save_type;
 
-	FS_Read2 (&i, 1, f); // version
-	FS_Read2 (&i, 1, f); // save_type
+	FS_Read2 (&version, 1, f); // version
+	FS_Read2 (&save_type, 1, f); // save_type
 
 	FS_Read2 (loadmap, MAX_QPATH, f); // map name
-	FS_FCloseFile( f );
 
-	Cbuf_ExecuteText(EXEC_NOW, va("spmap %s\n", loadmap));
+	Cvar_VariableStringBuffer( "mapname", currentmap, sizeof(currentmap) );
+
+	// If different map is loaded,
+	//   or no map is loaded.
+	if ((Q_stricmp(currentmap, loadmap) != 0)
+		|| (gvm == NULL))
+	{
+		// Load the map from the savegame.
+		return 2;
+	}
+	// This is a full save, must reload map.
+	if (save_type > 0)
+	{
+		return 1;
+	}
+	return 0;
 }
 
 // Turtle Man: Added a Load cmd like the save one.
 static void SV_LoadGame_f(void) {
+	char loadmap[MAX_QPATH];
 	char savegame[MAX_TOKEN_CHARS];
 	char filename[MAX_QPATH];
 	fileHandle_t f;
 	int len;
 	char *curpos;
+	static short load_atemp = 0;
 
 	// Set savefile name.
 	if ( Cmd_Argc() < 2 ) {
@@ -1164,13 +1187,71 @@ static void SV_LoadGame_f(void) {
         return;
     }
 
-	//Com_Printf( "loadgame: (%s, %s)\n", filegame, mapname );
+#if 1
+	// Due to the problem with being unable to load savegames
+	// at the menu, savegames are ALWAYS loaded before calling
+	// G_LoadGame
 
-	Cvar_Get("ui_singlePlayerActive", "1", CVAR_ROM);
+	if (load_atemp == 0)
+	{
+		if (SP_LoadGame(f, filename, loadmap) > 0)
+		{
+			FS_FCloseFile( f );
+			load_atemp = 1;
+			Cbuf_ExecuteText(EXEC_APPEND, va("spmap %s\n", loadmap));
+			// Moved calling "loadgame" to SV_SpawnServer
+			//Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s\n", savegame));
+			Q_strncpyz(svs.loadgame, savegame, sizeof (svs.loadgame));
+			return;
+		}
+		else
+		{
+			// Don't need to load a map.
+			// so just continue to load savegame.
+		}
+	}
+	else
+	{
+		load_atemp = 0;
+		if (SP_LoadGame(f, filename, loadmap) > 1)
+		{
+			FS_FCloseFile( f );
+			// We still need to load the map, so quit.
+			//Com_Error( ERR_DROP, "Can't find map for savefile.\n%s\n", loadmap );
+			Com_Printf( "Error: Can't find map for savefile. (%s)\n", loadmap );
+			return;
+		}
+	}
 
+	//Com_Printf( "loadgame: (%s, %s)\n", filename, loadmap );
+
+	// Reset file reading.
+	FS_Seek(f, 0, FS_SEEK_SET);
+
+	// Load the savefile.
+	VM_Call( gvm, GAME_LOADGAME, f, 1);
+
+	// Close file
+	FS_FCloseFile( f );
+#else
 	// gvm is NULL when called from main menu
 	if (gvm == NULL)
 	{
+		if (load_atemp == 0)
+		{
+			// Turtle Man: Load the map then run the cmd again...
+			load_atemp = 1;
+			SP_LoadGame(f, filename);
+			Cbuf_ExecuteText(EXEC_APPEND, va("wait ; loadgame %s\n", savegame));
+		}
+		else
+		{
+			load_atemp = 0;
+			// Turtle Man: We should have the game vm/dll/so loaded now...
+			Com_Printf("Error: Can't find map.\n");
+			return;
+		}
+		/* OLD LOADING CODE.
 #if 0 // Turtle Man: FIXME: savegame workaround
 		// Load the map then run the cmd again... THIS LOCKED UP MY COMPUTER...
 		SP_LoadGame(f, filename);
@@ -1181,10 +1262,18 @@ static void SV_LoadGame_f(void) {
 		Com_Printf("Error: Can't load a savegame if not in a level, this is a known bug.\n");
 		return;
 #endif
+		*/
 	}
 
-	//G_LoadGame(savegame);
-	VM_Call( gvm, GAME_LOADGAME, f);
+	// Load the savefile.
+	VM_Call( gvm, GAME_LOADGAME, f, load_atemp);
+
+	// Reset load atemp.
+	load_atemp = 0;
+
+	// Close file
+	FS_FCloseFile( f );
+#endif
 }
 #endif
 //===========================================================

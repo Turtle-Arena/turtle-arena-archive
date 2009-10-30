@@ -363,6 +363,9 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 #ifdef SINGLEPLAYER // entity
 			check->s.eType != ET_MODELANIM &&
 #endif
+#ifdef TMNTENTSYS // MISC_OBJECT
+			check->s.eType != ET_MISCOBJECT &&
+#endif
 			!check->physicsObject ) {
 			continue;
 		}
@@ -1342,7 +1345,7 @@ Link all the corners together
 ===============
 */
 void Think_SetupTrainTargets( gentity_t *ent ) {
-#ifdef TMNTPATHS
+#ifdef TMNTPATHSYS
 	if (G_SetupPath(ent, ent->target) == PATH_ERROR)
 	{
 		return;

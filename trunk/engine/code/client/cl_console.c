@@ -628,6 +628,11 @@ void Con_DrawSolidConsole( float frac ) {
 	color[1] = 1;
 	color[2] = 0;
 	color[3] = 1;
+#elif defined SONIC // Console
+	color[0] = 0;
+	color[1] = 0;
+	color[2] = 1;
+	color[3] = 1;
 #else
 	color[0] = 1;
 	color[1] = 0;
@@ -641,6 +646,8 @@ void Con_DrawSolidConsole( float frac ) {
 
 #ifdef TMNT // Console
 	re.SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
+#elif SONIC
+	re.SetColor( g_color_table[ColorIndex(COLOR_BLUE)] );
 #else
 	re.SetColor( g_color_table[ColorIndex(COLOR_RED)] );
 #endif

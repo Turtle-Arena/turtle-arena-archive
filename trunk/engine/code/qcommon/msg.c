@@ -883,6 +883,9 @@ netField_t	entityStateFields[] =
 { NETF(angles2[2]), 0 },
 { NETF(constantLight), 32 },
 { NETF(frame), 16 }
+#ifdef TMNTWEAPSYS
+,{ NETF(weaponHands), 4 }
+#endif
 };
 
 
@@ -1205,6 +1208,7 @@ netField_t	playerStateFields[] =
 { PSF(meleeTime), 16 },
 { PSF(meleeDelay), 16 },
 { PSF(comboTime), 16 },
+{ PSF(weaponHands), 4 },
 { PSF(attack_melee), 1 }
 #endif
 };
@@ -1506,7 +1510,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 					MSG_WriteShort (msg, to->holdable[n+i]);
 
 			n += NUM_INTEGER_BITS;
-}
+		}
 #else
 		MSG_WriteBits( msg, holdablebits, MAX_HOLDABLE );
 		for (i=0 ; i<MAX_HOLDABLE ; i++)

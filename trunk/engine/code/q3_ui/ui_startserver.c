@@ -43,7 +43,7 @@ START SERVER MENU *****
 #define GAMESERVER_FIGHT0		"menu/art/fight_0"
 #define GAMESERVER_FIGHT1		"menu/art/fight_1"
 #define GAMESERVER_UNKNOWNMAP	"menu/art/unknownmap"
-#ifdef TMNT
+#ifdef TMNTDATASYS
 #define GAMESERVER_ARROWS		"menu/art/arrows_horz_0"
 #define GAMESERVER_ARROWSL		"menu/art/arrows_horz_left"
 #define GAMESERVER_ARROWSR		"menu/art/arrows_horz_right"
@@ -104,7 +104,7 @@ static startserver_t s_startserver;
 static const char *gametype_items[] = {
 	"Free For All",
 	"Team Deathmatch",
-#ifdef TMNT // tornament to duel
+#ifdef TMNTMISC // tornament to duel
 	"Duel",
 #else
 	"Tournament",
@@ -177,6 +177,22 @@ static int GametypeBits( char *string ) {
 			bits |= 1 << GT_CTF;
 			continue;
 		}
+#ifdef MISSIONPACK // Turtle Man: Support MISSIONPACK gametypes!
+		if( Q_stricmp( token, "oneflag" ) == 0 ) {
+			bits |= 1 << GT_1FCTF;
+			continue;
+		}
+		if( Q_stricmp( token, "obelisk" ) == 0 ) {
+			bits |= 1 << GT_OBELISK;
+			continue;
+		}
+#ifdef MISSIONPACK_HARVESTER
+		if( Q_stricmp( token, "harvester" ) == 0 ) {
+			bits |= 1 << GT_HARVESTER;
+			continue;
+		}
+#endif
+#endif
 	}
 
 	return bits;
@@ -237,7 +253,7 @@ static void StartServer_Update( void ) {
 		if ( i >=0 && i < MAX_MAPSPERPAGE ) 
 		{
 			s_startserver.mappics[i].generic.flags    |= QMF_HIGHLIGHT;
-#ifndef TMNT // MENU
+#ifndef TMNTDATASYS // MENU
 			s_startserver.mapbuttons[i].generic.flags &= ~QMF_PULSEIFFOCUS;
 #endif
 		}
@@ -491,7 +507,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.arrows.generic.flags = QMF_INACTIVE;
 	s_startserver.arrows.generic.x	   = 260;
 	s_startserver.arrows.generic.y	   = 400;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	s_startserver.arrows.width  	   = GAMESERVER_ARROWS_WIDTH;
 	s_startserver.arrows.height  	   = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -505,7 +521,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.prevpage.generic.id	    = ID_PREVPAGE;
 	s_startserver.prevpage.generic.x		= 260;
 	s_startserver.prevpage.generic.y		= 400;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	s_startserver.prevpage.width  		    = GAMESERVER_ARROWS_WIDTH/2;
 	s_startserver.prevpage.height  		    = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -518,13 +534,13 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.nextpage.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_startserver.nextpage.generic.callback = StartServer_MenuEvent;
 	s_startserver.nextpage.generic.id	    = ID_NEXTPAGE;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	s_startserver.nextpage.generic.x		= 260+GAMESERVER_ARROWS_WIDTH/2;
 #else
 	s_startserver.nextpage.generic.x		= 321;
 #endif
 	s_startserver.nextpage.generic.y		= 400;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	s_startserver.nextpage.width  		    = GAMESERVER_ARROWS_WIDTH/2;
 	s_startserver.nextpage.height  		    = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -815,7 +831,7 @@ static void ServerOptions_Start( void ) {
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_SetValue( "ui_ffa_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_ffa_fraglimit", fraglimit );
@@ -824,7 +840,7 @@ static void ServerOptions_Start( void ) {
 		break;
 
 	case GT_TOURNAMENT:
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_SetValue( "ui_tourney_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_tourney_fraglimit", fraglimit );
@@ -833,7 +849,7 @@ static void ServerOptions_Start( void ) {
 		break;
 
 	case GT_TEAM:
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_SetValue( "ui_team_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_team_fraglimit", fraglimit );
@@ -865,7 +881,7 @@ static void ServerOptions_Start( void ) {
 	trap_Cvar_SetValue( "sv_maxclients", Com_Clamp( 0, 12, maxclients ) );
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, dedicated ) );
 	trap_Cvar_SetValue ("timelimit", Com_Clamp( 0, timelimit, timelimit ) );
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 	trap_Cvar_SetValue ("scorelimit", Com_Clamp( 0, fraglimit, fraglimit ) );
 #else
 	trap_Cvar_SetValue ("fraglimit", Com_Clamp( 0, fraglimit, fraglimit ) );
@@ -1134,6 +1150,12 @@ static void ServerOptions_InitBotNames( void ) {
 		if( s_serveroptions.gametype == GT_TEAM ) {
 			Q_strncpyz( s_serveroptions.playerNameBuffers[3], "RaphBlue", 16 );
 		}
+#elif defined SONIC
+		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "SonicBlue", 16 );
+		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "SonicBlue", 16 );
+		if( s_serveroptions.gametype == GT_TEAM ) {
+			Q_strncpyz( s_serveroptions.playerNameBuffers[3], "SonicBlue", 16 );
+		}
 #else
 		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "grunt", 16 );
 		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "major", 16 );
@@ -1153,6 +1175,13 @@ static void ServerOptions_InitBotNames( void ) {
 		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "RaphRed", 16 );
 		if( s_serveroptions.gametype == GT_TEAM ) {
 			Q_strncpyz( s_serveroptions.playerNameBuffers[9], "RaphRed", 16 );
+		}
+#elif defined SONIC
+		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "SonicRed", 16 );
+		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "SonicRed", 16 );
+		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "SonicRed", 16 );
+		if( s_serveroptions.gametype == GT_TEAM ) {
+			Q_strncpyz( s_serveroptions.playerNameBuffers[9], "SonicRed", 16 );
 		}
 #else
 		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "sarge", 16 );
@@ -1387,8 +1416,8 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 #endif
 	if( s_serveroptions.gametype != GT_CTF ) {
 		s_serveroptions.fraglimit.generic.type       = MTYPE_FIELD;
-#ifdef TMNT // frag to KO
-		s_serveroptions.fraglimit.generic.name       = "KO Limit:";
+#ifdef TMNTMISC // frag to KO
+		s_serveroptions.fraglimit.generic.name       = "Knock Out Limit:";
 #else
 		s_serveroptions.fraglimit.generic.name       = "Frag Limit:";
 #endif
@@ -1653,7 +1682,7 @@ BOT SELECT MENU *****
 #define BOTSELECT_ACCEPT1		"menu/art/accept_1"
 #define BOTSELECT_SELECT		"menu/art/opponents_select"
 #define BOTSELECT_SELECTED		"menu/art/opponents_selected"
-#ifdef TMNT
+#ifdef TMNTDATASYS
 #define BOTSELECT_ARROWS		"menu/art/arrows_horz_0"
 #define BOTSELECT_ARROWSL		"menu/art/arrows_horz_left"
 #define BOTSELECT_ARROWSR		"menu/art/arrows_horz_right"
@@ -2030,7 +2059,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 			botSelectInfo.pics[k].width						= 64;
 			botSelectInfo.pics[k].height					= 64;
 			botSelectInfo.pics[k].focuspic					= BOTSELECT_SELECTED;
-#ifndef TMNT
+#ifndef TMNTDATASYS
 			botSelectInfo.pics[k].focuscolor				= colorRed;
 #endif
 
@@ -2047,7 +2076,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 			botSelectInfo.picbuttons[k].width				= 128;
 			botSelectInfo.picbuttons[k].height				= 128;
 			botSelectInfo.picbuttons[k].focuspic			= BOTSELECT_SELECT;
-#ifndef TMNT
+#ifndef TMNTDATASYS
 			botSelectInfo.picbuttons[k].focuscolor			= colorRed;
 #endif
 
@@ -2068,7 +2097,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.arrows.generic.name		= BOTSELECT_ARROWS;
 	botSelectInfo.arrows.generic.flags		= QMF_INACTIVE;
 	botSelectInfo.arrows.generic.x			= 260;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	botSelectInfo.arrows.generic.y			= 400;
 	botSelectInfo.arrows.width				= BOTSELECT_ARROWS_WIDTH;
 	botSelectInfo.arrows.height				= BOTSELECT_ARROWS_HEIGHT;
@@ -2082,7 +2111,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.left.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	botSelectInfo.left.generic.callback		= UI_BotSelectMenu_LeftEvent;
 	botSelectInfo.left.generic.x			= 260;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	botSelectInfo.left.generic.y			= 400;
 	botSelectInfo.left.width  				= BOTSELECT_ARROWS_WIDTH/2;
 	botSelectInfo.left.height  				= BOTSELECT_ARROWS_HEIGHT;
@@ -2096,7 +2125,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.right.generic.type	    = MTYPE_BITMAP;
 	botSelectInfo.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	botSelectInfo.right.generic.callback	= UI_BotSelectMenu_RightEvent;
-#ifdef TMNT
+#ifdef TMNTDATASYS
 	botSelectInfo.right.generic.x			= 260+BOTSELECT_ARROWS_WIDTH/2;
 	botSelectInfo.right.generic.y			= 400;
 	botSelectInfo.right.width  				= BOTSELECT_ARROWS_WIDTH/2;

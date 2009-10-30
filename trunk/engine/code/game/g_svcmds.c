@@ -363,6 +363,11 @@ void	Svcmd_EntityList_f (void) {
 		case ET_GRAPPLE:
 			G_Printf("ET_GRAPPLE          ");
 			break;
+#ifdef TMNTENTSYS
+		case ET_MISCOBJECT:
+			G_Printf("ET_MISCOBJECT       ");
+			break;
+#endif
 		default:
 			G_Printf("%3i                 ", check->s.eType);
 			break;

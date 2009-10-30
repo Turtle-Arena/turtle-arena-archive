@@ -142,8 +142,8 @@ void SP_misc_model( gentity_t *ent ) {
 
 #if 0
 	ent->s.modelindex = G_ModelIndex( ent->model );
-	VectorSet (ent->mins, -16, -16, -16);
-	VectorSet (ent->maxs, 16, 16, 16);
+	VectorSet (ent->r.mins, -16, -16, -16);
+	VectorSet (ent->r.maxs, 16, 16, 16);
 	trap_LinkEntity (ent);
 
 	G_SetOrigin( ent, ent->s.origin );
@@ -356,7 +356,7 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_grenade( gentity_t *ent ) {
-#ifdef TMNTWEAPONS // Turtle Man: FIXME: Rename shooter_grenade.
+#ifdef TMNTWEAPONS
 	InitShooter( ent, WP_HOMING_LAUNCHER);
 #else
 	InitShooter( ent, WP_GRENADE_LAUNCHER);
@@ -404,7 +404,7 @@ void DropPortalDestination( gentity_t *player ) {
 	ent->count = player->client->portalID;
 
 	// give the item back so they can drop the source now
-#ifdef TMNTHOLDABLE // Turtle Man: MULTIHOLDABLE
+#ifdef TMNTHOLDSYS
 	player->client->ps.holdableIndex = HI_PORTAL;
 #else
 	player->client->ps.stats[STAT_HOLDABLE_ITEM] = BG_FindItem( "Portal" ) - bg_itemlist;
@@ -647,5 +647,291 @@ void G_RunMD3Anim( gentity_t *ent ) {
 		G_FreeEntity( ent );
 		return;
 	}
+}
+#endif
+#ifdef TMNTENTSYS // MISC_OBJECT
+// Turtle Man: TODO: There should also be func_* for brushes that acts mostly the same.
+
+/*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath
+"model"		arbitrary .md3 file to display
+
+: TODO: Animated objects!
+: "*_anim" "first   count   looping   fps"
+"normal_anim"	Start on spawn
+"d1_anim"		Play/change to on damage (level 1)
+"d2_anim"		Play/change to on damage (level 2)
+"d3_anim"		Play/change to on damage (level 3)
+"dead_anim"		Play/change to on death  (level 4)
+
+"health"	if health > 0 object can be damaged and killed. (default 0)
+"mins"		object's min bounds (default "-16 -16 0")
+"maxs"		object's max bounds (default "16 16 32")
+"targetname" TODO: Kill (or damage?) when triggered.
+"target"    if inital health > 0, trigger targets on death, else trigger targets on touch.
+"paintarget" Called on pain (if health > 0)
+"wait"      Time in seconds before respawning (default 0)
+*/
+
+// misc_object flags
+#define MOBJF_SUSPENDED 1
+#define MOBJF_KNOCKBACK 2
+#define MOBJF_UNSOLIDDEATH 4
+
+// animations
+#define OBJECT_NORMAL		0
+#define OBJECT_DAMAGED1		1
+#define OBJECT_DAMAGED2		2
+#define OBJECT_DAMAGED3		3
+#define OBJECT_KILLED		4
+
+void misc_object_pain(gentity_t *self, gentity_t *attacker, int damage)
+{
+	// Change to damge animation at X health
+	if (self->health < (self->activator->health/5) * 2)
+	{
+		self->s.modelindex2 = OBJECT_DAMAGED3;
+	}
+	else if (self->health < (self->activator->health/5) * 3)
+	{
+		self->s.modelindex2 = OBJECT_DAMAGED2;
+	}
+	else if (self->health < (self->activator->health/5) * 4)
+	{
+		self->s.modelindex2 = OBJECT_DAMAGED1;
+	}
+
+	// TODO: Limit how soon to call paintarget again?
+	if ( self->paintarget )
+	{
+		G_UseTargets2(self, attacker, self->paintarget);
+	}
+}
+
+gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles);
+
+void misc_object_respawn(gentity_t *self)
+{
+	if (self->activator->spawnflags & MOBJF_KNOCKBACK)
+	{
+		// Turtle Man: FIXME: Not right if "self" moved from origin.
+
+		// MOBJ_KNOCKBACK doesn't work with respawning if...
+		//  clone spawning or on train? (or other moving brush?)
+		misc_object_spawn(self->activator, self->activator->s.origin, self->activator->s.angles);
+	}
+	else
+	{
+		misc_object_spawn(self->activator, self->s.origin, self->s.angles);
+	}
+
+	G_FreeEntity(self);
+}
+
+void misc_object_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
+{
+	// Change to dead animation.
+	self->s.modelindex2 = OBJECT_KILLED;
+
+	// DEBUG: Stop drawing model, so I know its dead...
+	//self->s.modelindex = 0;
+
+	if (self->activator->spawnflags & MOBJF_UNSOLIDDEATH)
+	{
+		// Remove body flag
+		self->r.contents = 0;
+	}
+
+	// if respawn
+	if (self->wait > 0)
+	{
+		// Respawn after X seconds? -if a flag is set?
+		//  -time should be editable
+		self->nextthink = level.time + (self->wait * 1000);
+		self->think = misc_object_respawn;
+	}
+
+	if( self->target )
+	{
+		G_UseTargets(self, attacker);
+	}
+}
+
+void misc_object_think(gentity_t *self)
+{
+	self->nextthink = level.time + 1000;
+
+	// Do once per-second thinking code.
+	// Such as animation (that should be in cgame...)
+}
+
+void misc_object_touch(gentity_t *self, gentity_t *activator, trace_t *trace)
+{
+	if( self->target )
+	{
+		G_UseTargets(self, activator);
+	}
+}
+
+// Basd on SpawnObelisk
+// Use info in owner to spawn object at origin with angles.
+//  should allow "clone" spawning of misc_objects and easy respawning
+gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
+{
+	trace_t		tr;
+	vec3_t		dest;
+	gentity_t	*ent;
+
+	ent = G_Spawn();
+
+	VectorCopy( origin, ent->s.origin );
+	VectorCopy( origin, ent->s.pos.trBase );
+	VectorCopy( origin, ent->r.currentOrigin );
+
+	VectorCopy( angles, ent->s.angles );
+	VectorCopy( ent->s.angles, ent->s.apos.trBase );
+
+	VectorCopy(owner->r.mins, ent->r.mins);
+	VectorCopy(owner->r.maxs, ent->r.maxs);
+	ent->target = owner->target;
+
+	ent->s.eType = ET_MISCOBJECT; // ET_GENERAL;
+	if (!(owner->spawnflags & MOBJF_KNOCKBACK)) {
+		ent->flags = FL_NO_KNOCKBACK;
+	}
+
+	// Setup stuff.
+	ent->s.modelindex = G_ModelIndex( owner->model );
+
+	// undamaged animation
+	ent->s.modelindex2 = OBJECT_NORMAL;
+
+	if (owner->health > 0) {
+		ent->r.contents = CONTENTS_BODY;// CONTENTS_SOLID;
+		ent->health = owner->health;
+		//if (ent->health) {
+			ent->takedamage = qtrue;
+		//}
+		ent->die = misc_object_die;
+		ent->pain = misc_object_pain;
+		ent->think = misc_object_think;
+		ent->nextthink = level.time + 1000;
+	}
+	else if ( ent->target ) {
+		ent->r.contents = CONTENTS_TRIGGER;
+		ent->touch = misc_object_touch;
+	}
+
+	if ( owner->spawnflags & MOBJF_SUSPENDED ) {
+		// suspended
+		G_SetOrigin( ent, ent->s.origin );
+	} else {
+		// mappers like to put them exactly on the floor, but being coplanar
+		// will sometimes show up as starting in solid, so lif it up one pixel
+		ent->s.origin[2] += 1;
+
+		// drop to floor
+		VectorSet( dest, ent->s.origin[0], ent->s.origin[1], ent->s.origin[2] - 4096 );
+		trap_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID );
+		if ( tr.startsolid ) {
+			ent->s.origin[2] -= 1;
+			G_Printf( "Misc_object: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin) );
+
+			ent->s.groundEntityNum = ENTITYNUM_NONE;
+			G_SetOrigin( ent, ent->s.origin );
+		}
+		else {
+			// allow to ride movers
+			ent->s.groundEntityNum = tr.entityNum;
+			G_SetOrigin( ent, tr.endpos );
+		}
+	}
+
+	ent->activator = owner;
+
+	trap_LinkEntity( ent );
+
+	return ent;
+}
+
+// TODO: Make this / CG_SetFileExt be Com_SetFileExt ?
+void G_SetFileExt(char *filename, char *ext)
+{
+	int i;
+
+	for (i = 0; filename[i] && filename[i] != '.'; i++)
+	{
+		// just increase i.
+	}
+	filename[i] = 0;
+
+	Q_strcat(filename, MAX_QPATH, ext);
+}
+
+// Based on SP_misc_model and SP_team_redobelisk
+// The passed "ent" is the misc_object controler.
+void SP_misc_object( gentity_t *ent ) {
+	G_SpawnVector( "mins", "-16 -16 0", ent->r.mins );
+	G_SpawnVector( "maxs", "16 16 32", ent->r.maxs );
+
+	G_SetOrigin( ent, ent->s.origin );
+	VectorCopy( ent->s.angles, ent->s.apos.trBase );
+
+	// Use a animation config file!
+	{
+		/*
+		#define MAX_MISC_OBJECT_ANIMATIONS 5
+		const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
+		{
+			"OBJECT_NORMAL",
+			"OBJECT_DAMAGED1",
+			"OBJECT_DAMAGED2",
+			"OBJECT_DAMAGED3",
+			"OBJECT_KILLED"
+		};
+
+		animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
+		*/
+		char filename[MAX_QPATH];
+		int health;
+		int wait;
+		float speed;
+
+		// so we can check if they were changed.
+		health = wait = speed = -2;
+
+		trap_GetConfigstring( CS_MODELS + ent->s.modelindex, filename, sizeof(filename));
+
+		G_SetFileExt(filename, ".cfg");
+
+		BG_ParseObjectCFGFile(filename, NULL, NULL, 0, // names, animations, max_anim
+			ent->r.mins, ent->r.maxs, &health, &wait, &speed);
+
+		// The data in this entity over-rides the cfg file.
+		//  if loaded data from cfg and ent had default, use cfg data
+		if (health != -2 && ent->health == 0)
+		{
+			// Use health from cfg.
+			ent->health = health;
+		}
+		if (wait != -2 && ent->wait == 0)
+		{
+			// Use wait from cfg.
+			ent->wait = wait;
+		}
+		if (speed != -2 && ent->speed == 0)
+		{
+			// Use speed from cfg.
+			ent->speed = speed;
+		}
+
+		if (ent->speed < 1.0f)
+		{
+			ent->speed = 1.0f;
+		}
+	}
+
+	misc_object_spawn(ent, ent->s.origin, ent->s.angles);
+
+	trap_LinkEntity (ent);
 }
 #endif

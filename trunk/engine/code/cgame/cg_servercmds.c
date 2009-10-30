@@ -101,7 +101,7 @@ static void CG_ParseScores( void ) {
 
 		cg.scores[i].team = cgs.clientinfo[cg.scores[i].client].team;
 	}
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK_HUD
 	CG_SetScoreSelection(NULL);
 #endif
 
@@ -213,7 +213,13 @@ static void CG_ParseWarmup( void ) {
 
 	} else if ( warmup > 0 && cg.warmup <= 0 ) {
 #ifdef MISSIONPACK
-		if (cgs.gametype >= GT_CTF && cgs.gametype <= GT_HARVESTER) {
+		if (cgs.gametype >= GT_CTF
+#ifndef MISSIONPACK_HARVESTER
+		&& cgs.gametype <= GT_OBELISK
+#else
+		&& cgs.gametype <= GT_HARVESTER
+#endif
+		) {
 			trap_S_StartLocalSound( cgs.media.countPrepareTeamSound, CHAN_ANNOUNCER );
 		} else
 #endif
@@ -378,7 +384,7 @@ static void CG_ConfigStringModified( void ) {
 	else if ( num == CS_SHADERSTATE ) {
 		CG_ShaderStateChanged();
 	}
-#ifdef TMNT // Particles
+#ifdef TMNTMISC // Particles
 	else if (num >= CS_PARTICLES && num < CS_PARTICLES+MAX_PARTICLES_AREAS)
 	{
 		// Allow new particle areas to be added after level load.
@@ -516,7 +522,7 @@ static void CG_MapRestart( void ) {
 		}
 	}
 #endif
-#ifdef TMNT
+#ifdef THIRD_PERSON
 	trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
@@ -524,7 +530,11 @@ static void CG_MapRestart( void ) {
 }
 
 #define MAX_VOICEFILESIZE	16384
+#ifdef IOQ3ZTM // LOAD_VOICE_FILES
+#define MAX_VOICEFILES		64
+#else
 #define MAX_VOICEFILES		8
+#endif
 #define MAX_VOICECHATS		64
 #define MAX_VOICESOUNDS		64
 #define MAX_CHATSIZE		64
@@ -554,6 +564,9 @@ typedef struct headModelVoiceChat_s
 
 voiceChatList_t voiceChatLists[MAX_VOICEFILES];
 headModelVoiceChat_t headModelVoiceChat[MAX_HEADMODELS];
+#ifdef IOQ3ZTM // LOAD_VOICE_FILES
+unsigned int numVoiceChats = 0;
+#endif
 
 /*
 =================
@@ -656,6 +669,10 @@ int CG_ParseVoiceChats( const char *filename, voiceChatList_t *voiceChatList, in
 	return qtrue;
 }
 
+#ifdef TMNTDATASYS // LOAD_VOICE_FILES
+int CG_HeadModelVoiceChats( char *filename );
+#endif
+
 /*
 =================
 CG_LoadVoiceChats
@@ -665,6 +682,18 @@ void CG_LoadVoiceChats( void ) {
 	int size;
 
 	size = trap_MemoryRemaining();
+#if defined TMNTDATASYS && defined IOQ3ZTM // LOAD_VOICE_FILES
+#ifdef IOQ3ZTM // LOAD_VOICE_FILES
+	numVoiceChats = 0;
+#endif
+	// First loaded voice chat is default
+	CG_HeadModelVoiceChats("scripts/default.vc");
+
+#ifdef TMNT
+	// Turtle Man: TODO: Pre-cache voice chats?
+	//CG_HeadModelVoiceChats("scripts/raph.vc");
+#endif
+#else
 	CG_ParseVoiceChats( "scripts/female1.voice", &voiceChatLists[0], MAX_VOICECHATS );
 	CG_ParseVoiceChats( "scripts/female2.voice", &voiceChatLists[1], MAX_VOICECHATS );
 	CG_ParseVoiceChats( "scripts/female3.voice", &voiceChatLists[2], MAX_VOICECHATS );
@@ -673,6 +702,10 @@ void CG_LoadVoiceChats( void ) {
 	CG_ParseVoiceChats( "scripts/male3.voice", &voiceChatLists[5], MAX_VOICECHATS );
 	CG_ParseVoiceChats( "scripts/male4.voice", &voiceChatLists[6], MAX_VOICECHATS );
 	CG_ParseVoiceChats( "scripts/male5.voice", &voiceChatLists[7], MAX_VOICECHATS );
+#ifdef IOQ3ZTM // LOAD_VOICE_FILES
+	numVoiceChats = 8;
+#endif
+#endif
 	CG_Printf("voice chat memory size = %d\n", size - trap_MemoryRemaining());
 }
 
@@ -711,13 +744,25 @@ int CG_HeadModelVoiceChats( char *filename ) {
 		return -1;
 	}
 
+#ifdef IOQ3ZTM // LOAD_VOICE_FILES
+	for ( i = 0; i < numVoiceChats; i++ ) {
+#else
 	for ( i = 0; i < MAX_VOICEFILES; i++ ) {
+#endif
 		if ( !Q_stricmp(token, voiceChatLists[i].name) ) {
 			return i;
 		}
 	}
 
-	//FIXME: maybe try to load the .voice file which name is stored in token?
+#ifdef IOQ3ZTM // LOAD_VOICE_FILES
+	// Try to load the .voice file which name is stored in token
+	if (numVoiceChats < MAX_VOICEFILES // Check for free slot
+		&& CG_ParseVoiceChats(token, &voiceChatLists[numVoiceChats], MAX_VOICECHATS))
+	{
+		numVoiceChats++;
+		return numVoiceChats-1;
+	}
+#endif
 
 	return -1;
 }

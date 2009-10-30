@@ -39,7 +39,7 @@ typedef struct {
 
 static creditsmenu_t	s_credits;
 
-#ifndef TMNT
+#if !defined TMNT && !defined SONIC
 /*
 ===============
 UI_CreditMenu_Draw_ioq3
@@ -90,7 +90,7 @@ static sfxHandle_t UI_CreditMenu_Key( int key ) {
 		return 0;
 	}
 
-#ifndef TMNT
+#if !defined TMNT && !defined SONIC
 	s_credits.frame++;
 	if (s_credits.frame == 1) {
 		s_credits.menu.draw = UI_CreditMenu_Draw_ioq3;
@@ -111,7 +111,7 @@ UI_CreditMenu_Draw
 static void UI_CreditMenu_Draw( void ) {
 	int		y;
 
-#ifdef TMNT
+#if defined TMNT || defined SONIC
 	// Credit id software and ioquake3, and legal stuff.
 	y = 72;
 	UI_DrawProportionalString( 320, y, "Credits", UI_CENTER|UI_SMALLFONT, color_white );
@@ -123,7 +123,7 @@ static void UI_CreditMenu_Draw( void ) {
 	UI_DrawProportionalString( 320, y, "ioquake3 - www.ioquake3.org", UI_CENTER|UI_SMALLFONT, color_white );
 
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Turtle Man", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Gap.
 	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
@@ -134,18 +134,25 @@ static void UI_CreditMenu_Draw( void ) {
 
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "This is a fangame there is no connection to", UI_CENTER|UI_SMALLFONT, color_white );
+#ifdef TMNT
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Mirage Studios, Konami, 4KidsTV, or anyone else.", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "Mirage Studios, Konami, or 4KidsTV.", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Copyright.
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "TMNT(c) 1984-2009 Mirage Studios", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "TMNT Arena(c) 2009 Turtle Man", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "TMNT Arena(c) 2009 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
+#else // sonic credits
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "SEGA, Sonic Team, or 4KidsTV.", UI_CENTER|UI_SMALLFONT, color_white );
 
-	// Gap.
-	//y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
-	//UI_DrawProportionalString( 320, y, "This game should not be sold.", UI_CENTER|UI_SMALLFONT, color_TMNTred );
+	// Copyright.
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "Sonic the Hedgehog(c) 1991-2009 SEGA", UI_CENTER|UI_SMALLFONT, color_white );
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "Sonic Blast Arena(c) 2009 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
+#endif
 #else
 	y = 12;
 	UI_DrawProportionalString( 320, y, "id Software is:", UI_CENTER|UI_SMALLFONT, color_white );

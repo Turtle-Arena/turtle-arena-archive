@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 #ifdef TMNT // Botlib is not compatible with (io)quake3 (or anyone else)
-// Should only be if TMNTWEAPSYS2 or TMNTHOLDSYS or TMNTHOLDSYS2 or TMNTHOLDSYS2BOT?
+// Turtle Man: FIXME: Should only be if TMNTWEAPSYS2 or TMNTHOLDSYS or TMNTHOLDSYS2 or TMNTHOLDSYS2BOT ?
 #define	BOTLIB_API_VERSION		3
 #else
 #define	BOTLIB_API_VERSION		2

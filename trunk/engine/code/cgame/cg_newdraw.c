@@ -27,14 +27,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "cg_local.h"
 #include "../ui/ui_shared.h"
 
+#ifdef MISSIONPACK_HUD
 extern displayContextDef_t cgDC;
+#endif
 
 
 // set in CG_ParseTeamInfo
 
 //static int sortedTeamPlayers[TEAM_MAXOVERLAY];
 //static int numSortedTeamPlayers;
+#ifdef MISSIONPACK_HUD
 int drawTeamOverlayModificationCount = -1;
+#endif
 
 //static char systemChat[256];
 //static char teamChat1[256];
@@ -158,7 +162,7 @@ void CG_SelectPrevPlayer( void ) {
 	CG_SetSelectedPlayerName();
 }
 
-
+#ifdef MISSIONPACK_HUD
 #ifndef TMNT // NOARMOR
 static void CG_DrawPlayerArmorIcon( rectDef_t *rect, qboolean draw2D ) {
 	centity_t	*cent;
@@ -668,12 +672,14 @@ static void CG_DrawBlueFlagName(rectDef_t *rect, float scale, vec4_t color, int 
 
 static void CG_DrawBlueFlagStatus(rectDef_t *rect, qhandle_t shader) {
 	if (cgs.gametype != GT_CTF && cgs.gametype != GT_1FCTF) {
+#ifdef MISSIONPACK_HARVESTER
 		if (cgs.gametype == GT_HARVESTER) {
 		  vec4_t color = {0, 0, 1, 1};
 		  trap_R_SetColor(color);
 	    CG_DrawPic( rect->x, rect->y, rect->w, rect->h, cgs.media.blueCubeIcon );
 		  trap_R_SetColor(NULL);
 		}
+#endif
 		return;
 	}
   if (shader) {
@@ -718,12 +724,14 @@ static void CG_DrawRedFlagName(rectDef_t *rect, float scale, vec4_t color, int t
 
 static void CG_DrawRedFlagStatus(rectDef_t *rect, qhandle_t shader) {
 	if (cgs.gametype != GT_CTF && cgs.gametype != GT_1FCTF) {
+#ifdef MISSIONPACK_HARVESTER
 		if (cgs.gametype == GT_HARVESTER) {
 		  vec4_t color = {1, 0, 0, 1};
 		  trap_R_SetColor(color);
 	    CG_DrawPic( rect->x, rect->y, rect->w, rect->h, cgs.media.redCubeIcon );
 		  trap_R_SetColor(NULL);
 		}
+#endif
 		return;
 	}
   if (shader) {
@@ -756,6 +764,7 @@ static void CG_DrawRedFlagHead(rectDef_t *rect) {
   }
 }
 
+#ifdef MISSIONPACK_HARVESTER
 static void CG_HarvesterSkulls(rectDef_t *rect, float scale, vec4_t color, qboolean force2D, int textStyle ) {
 	char num[16];
 	vec3_t origin, angles;
@@ -797,6 +806,7 @@ static void CG_HarvesterSkulls(rectDef_t *rect, float scale, vec4_t color, qbool
 		}
 	}
 }
+#endif
 
 static void CG_OneFlagStatus(rectDef_t *rect) {
 	if (cgs.gametype != GT_1FCTF) {
@@ -975,6 +985,7 @@ float CG_GetValue(int ownerDraw) {
   }
 	return -1;
 }
+#endif // MISSIONPACK_HUD
 
 qboolean CG_OtherTeamHasFlag(void) {
 	if (cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF) {
@@ -1024,6 +1035,7 @@ qboolean CG_YourTeamHasFlag(void) {
 	return qfalse;
 }
 
+#ifdef MISSIONPACK_HUD
 // THINKABOUTME: should these be exclusive or inclusive.. 
 // 
 qboolean CG_OwnerDrawVisible(int flags) {
@@ -1066,11 +1078,15 @@ qboolean CG_OwnerDrawVisible(int flags) {
 	}
 
 	if (flags & CG_SHOW_HARVESTER) {
+#ifndef MISSIONPACK_HARVESTER
+		return qfalse;
+#else
 		if( cgs.gametype == GT_HARVESTER ) {
 			return qtrue;
     } else {
       return qfalse;
     }
+#endif
 	}
 
 	if (flags & CG_SHOW_ONEFLAG) {
@@ -1158,7 +1174,7 @@ static void CG_DrawAreaChat(rectDef_t *rect, float scale, vec4_t color, qhandle_
 const char *CG_GetKillerText(void) {
 	const char *s = "";
 	if ( cg.killerName[0] ) {
-#ifdef TMNT // frag to KO
+#ifdef TMNTMISC // frag to KO
 		s = va("Knocked out by %s", cg.killerName );
 #else
 		s = va("Fragged by %s", cg.killerName );
@@ -1228,11 +1244,14 @@ const char *CG_GameTypeString(void) {
 		return "One Flag CTF";
 	} else if ( cgs.gametype == GT_OBELISK ) {
 		return "Overload";
+#ifdef MISSIONPACK_HARVESTER
 	} else if ( cgs.gametype == GT_HARVESTER ) {
 		return "Harvester";
 	}
+#endif
 	return "";
 }
+
 static void CG_DrawGameType(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
 	CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, CG_GameTypeString(), 0, 0, textStyle);
 }
@@ -1849,6 +1868,7 @@ void CG_KeyEvent(int key, qboolean down) {
 		}
 	}
 }
+#endif // MISSIONPACK_HUD
 
 int CG_ClientNumFromName(const char *p) {
   int i;
@@ -1861,9 +1881,11 @@ int CG_ClientNumFromName(const char *p) {
 }
 
 void CG_ShowResponseHead(void) {
+#ifdef MISSIONPACK_HUD
   Menus_OpenByName("voiceMenu");
 	trap_Cvar_Set("cl_conXOffset", "72");
 	cg.voiceTime = cg.time;
+#endif // MISSIONPACK_HUD
 }
 
 void CG_RunMenuScript(char **args) {

@@ -125,7 +125,7 @@ static	void R_ColorShiftLightingBytes( byte in[4], byte out[4] ) {
 	out[3] = in[3];
 }
 
-#ifndef IOQUAKE3 // Turtle Man: Load external lightmaps, as well as internal.
+#ifdef IOQ3ZTM // EXTERNAL_LIGHTMAPS // Turtle Man: Load external lightmaps, as well as internal ones.
 /*
 ===============
 R_LoadLightmaps & LightmapNameCompare
@@ -302,14 +302,14 @@ static void R_LoadLightmaps(lump_t * l/*, const char *bspName*/)
 	}
 
 	tr.numLightmaps = numLightmaps;
-	ri.Printf(PRINT_ALL, "...loading %i external lightmaps\n", tr.numLightmaps);
+	ri.Printf(PRINT_DEVELOPER, "...loading %i external lightmaps\n", tr.numLightmaps);
 
 	// we are about to upload textures
 	R_SyncRenderThread();
 
 	for(i = 0; i < numLightmaps; i++)
 	{
-		//ri.Printf(PRINT_ALL, "...loading external lightmap '%s/%s'\n", mapName, lightmapFiles[i]);
+		ri.Printf(PRINT_DEVELOPER, "...loading external lightmap '%s/%s'\n", mapName, lightmapFiles[i]);
 
 		tr.lightmaps[i] = R_FindImageFile(va("%s/%s", mapName, lightmapFiles[i]),qfalse,qfalse, GL_CLAMP_TO_EDGE);
 	}

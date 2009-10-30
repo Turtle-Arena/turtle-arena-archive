@@ -331,7 +331,7 @@ static bind_t g_bindings[] =
 	{"messagemode2", 	"chat - team",		ID_CHAT2,		ANIM_CHAT,		-1,				-1,		-1, -1},
 	{"messagemode3", 	"chat - target",	ID_CHAT3,		ANIM_CHAT,		-1,				-1,		-1, -1},
 	{"messagemode4", 	"chat - attacker",	ID_CHAT4,		ANIM_CHAT,		-1,				-1,		-1, -1},
-#ifdef TMNTHOLDSYS // Turtle Man: FIXME: "use item" is gone in the menu and meun doesn't work right.
+#ifdef TMNTHOLDSYS
 	{"+button12",		"next item",		ID_NEXTITEM,	ANIM_IDLE,		'\'',			-1,		-1, -1},
 #endif
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
@@ -562,7 +562,7 @@ static void Controls_UpdateModel( int anim ) {
 		s_controls.playerViewangles[PITCH] = 45;
 		break;
 
-#ifdef TMNTWEAPSYS // Turtle Man: Fixme?
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: ?
 #ifndef TMNTWEAPSYS2
 	case ANIM_WEAPON1:
 	case ANIM_WEAPON2:
@@ -1292,7 +1292,7 @@ static void Controls_InitWeapons( void ) {
 		// weap2
 		if (item->world_model[3]) {
 			trap_R_RegisterModel( item->world_model[3] );
-}
+		}
 		else {
 			// uses weap1
 		}

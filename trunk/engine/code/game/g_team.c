@@ -314,7 +314,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 
 	// did the attacker frag the flag carrier?
 	tokens = 0;
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
 		tokens = targ->client->ps.generic1;
 	}
@@ -323,7 +323,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->pers.teamState.lastfraggedcarrier = level.time;
 		AddScore(attacker, targ->r.currentOrigin, CTF_FRAG_CARRIER_BONUS);
 		attacker->client->pers.teamState.fragcarrier++;
-#ifdef TMNT // frag to KO
+#ifdef TMNTMISC // frag to KO
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " knocked out %s's flag carrier!\n",
 #else
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " fragged %s's flag carrier!\n",
@@ -345,7 +345,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->pers.teamState.lastfraggedcarrier = level.time;
 		AddScore(attacker, targ->r.currentOrigin, CTF_FRAG_CARRIER_BONUS * tokens * tokens);
 		attacker->client->pers.teamState.fragcarrier++;
-#ifdef TMNT // frag to KO
+#ifdef TMNTMISC // frag to KO
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " knocked out %s's skull carrier!\n",
 #else
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " fragged %s's skull carrier!\n",
@@ -426,9 +426,11 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 			return;
 		}
 		
+#ifdef MISSIONPACK_HARVESTER
 	} else if (g_gametype.integer == GT_HARVESTER ) {
 		// find the center obelisk
 		c = "team_neutralobelisk";
+#endif
 	} else {
 #endif
 	// find the flag
@@ -896,6 +898,7 @@ int Pickup_Team( gentity_t *ent, gentity_t *other ) {
 		return 0;
 	}
 
+#ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
 		// the only team items that can be picked up in harvester are the cubes
 		if( ent->spawnflags != cl->sess.sessionTeam ) {
@@ -904,6 +907,7 @@ int Pickup_Team( gentity_t *ent, gentity_t *other ) {
 		G_FreeEntity( ent );
 		return 0;
 	}
+#endif
 #endif
 	// figure out what team this flag is
 	if( strcmp(ent->classname, "team_CTF_redflag") == 0 ) {
@@ -1316,6 +1320,7 @@ static void ObeliskDie( gentity_t *self, gentity_t *inflictor, gentity_t *attack
 }
 
 
+#ifdef MISSIONPACK_HARVESTER
 static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	int			tokens;
 
@@ -1355,6 +1360,7 @@ static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 
 	Team_CaptureFlagSound( self, self->spawnflags );
 }
+#endif // #ifdef MISSIONPACK_HARVESTER
 
 static void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage ) {
 	int actualDamage = damage / 10;
@@ -1395,10 +1401,12 @@ gentity_t *SpawnObelisk( vec3_t origin, int team, int spawnflags) {
 		ent->think = ObeliskRegen;
 		ent->nextthink = level.time + g_obeliskRegenPeriod.integer * 1000;
 	}
+#ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
 		ent->r.contents = CONTENTS_TRIGGER;
 		ent->touch = ObeliskTouch;
 	}
+#endif
 
 	if ( spawnflags & 1 ) {
 		// suspended
@@ -1449,10 +1457,12 @@ void SP_team_redobelisk( gentity_t *ent ) {
 		ent->s.modelindex2 = 0xff;
 		ent->s.frame = 0;
 	}
+#ifdef MISSIONPACK_HARVESTER
 	if ( g_gametype.integer == GT_HARVESTER ) {
 		obelisk = SpawnObelisk( ent->s.origin, TEAM_RED, ent->spawnflags );
 		obelisk->activator = ent;
 	}
+#endif
 	ent->s.modelindex = TEAM_RED;
 	trap_LinkEntity(ent);
 }
@@ -1474,10 +1484,12 @@ void SP_team_blueobelisk( gentity_t *ent ) {
 		ent->s.modelindex2 = 0xff;
 		ent->s.frame = 0;
 	}
+#ifdef MISSIONPACK_HARVESTER
 	if ( g_gametype.integer == GT_HARVESTER ) {
 		obelisk = SpawnObelisk( ent->s.origin, TEAM_BLUE, ent->spawnflags );
 		obelisk->activator = ent;
 	}
+#endif
 	ent->s.modelindex = TEAM_BLUE;
 	trap_LinkEntity(ent);
 }
@@ -1485,6 +1497,7 @@ void SP_team_blueobelisk( gentity_t *ent ) {
 /*QUAKED team_neutralobelisk (0 0 1) (-16 -16 0) (16 16 88)
 */
 void SP_team_neutralobelisk( gentity_t *ent ) {
+#ifdef MISSIONPACK_HARVESTER
 	if ( g_gametype.integer != GT_1FCTF && g_gametype.integer != GT_HARVESTER ) {
 		G_FreeEntity(ent);
 		return;
@@ -1496,6 +1509,7 @@ void SP_team_neutralobelisk( gentity_t *ent ) {
 	}
 	ent->s.modelindex = TEAM_FREE;
 	trap_LinkEntity(ent);
+#endif
 }
 
 

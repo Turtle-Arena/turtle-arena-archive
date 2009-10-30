@@ -462,7 +462,9 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 			if (client->ps.meleeAttack == max_combo)
 			{
+#ifndef TMNTRELEASE
 				G_Printf("DEBUG: client %i finished last combo (%i)\n", ent - g_entities, client->ps.meleeAttack);
+#endif
 
 				client->ps.meleeDelay = weap_delay;
 				client->ps.weaponTime = client->ps.meleeDelay; // Don't let them use a gun...
@@ -780,7 +782,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				ent->client->ps.powerups[ j ] = 0;
 			}
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK_HARVESTER
 			if ( g_gametype.integer == GT_HARVESTER ) {
 				if ( ent->client->ps.generic1 > 0 ) {
 					if ( ent->client->sess.sessionTeam == TEAM_RED ) {
@@ -817,6 +819,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			break;
 
 #ifdef MISSIONPACK
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 #ifdef TMNTHOLDSYS
 				case HI_KAMIKAZE:
 #else
@@ -829,6 +832,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			// start the kamikze
 			G_StartKamikaze( ent );
 			break;
+#endif
 
 #ifdef TMNTHOLDSYS
 				case HI_PORTAL:
@@ -1079,7 +1083,7 @@ void ClientThink_real( gentity_t *ent ) {
 	client->ps.gravity = g_gravity.value;
 
 	// set speed
-#ifdef TMNTPLAYERS
+#ifdef TMNTPLAYERSYS
 	client->ps.speed = client->pers.playercfg.max_speed * (g_speed.value / 320);
 #else
 	client->ps.speed = g_speed.value;
@@ -1124,7 +1128,12 @@ void ClientThink_real( gentity_t *ent ) {
 
 	if (client->ps.meleeTime > 0 && BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&client->ps)))
 	{
-		pm.gauntletHit = G_MeleeAttack( ent );
+		pm.gauntletHit = G_MeleeAttack( ent, qfalse );
+	}
+	else
+	{
+		// DEBUG: Draw weapon tag locations.
+		G_MeleeAttack( ent, qtrue );
 	}
 
 #ifndef TMNTWEAPONS
@@ -1178,7 +1187,7 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 
 	pm.ps = &client->ps;
-#ifdef TMNTPLAYERSYS // Pmove
+#ifdef TMNTPLAYERSYS // PMove
 	pm.playercfg = &client->pers.playercfg;
 #endif
 	pm.cmd = *ucmd;
@@ -1280,7 +1289,7 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
 		// wait for the attack button to be pressed
 		if ( level.time > client->respawnTime ) {
-#ifdef TMNTSP
+#ifdef TMNTSP // Turtle Man: FIXME: In SinglePlayer, what should happen when we die?
 			if (g_gametype.integer == GT_SINGLE_PLAYER)
 			{
 				// Auto respawn in 3 seconds, or if client pressed attack or use.
@@ -1350,8 +1359,241 @@ void ClientThink( int clientNum ) {
 	}
 }
 
+#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+/*
+==================
+BG_SwingAngles
+
+Turtle Man: TODO: Move to bg_misc.c ?
+
+Based on CG_SwingAngles
+* frametime should be;
+** game - (level.time - level.previousTime)
+** q3_ui - uis.frametime
+** ui - uiInfo.uiDC.frameTime
+** cgame - cg.frametime
+==================
+*/
+void BG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
+					float speed, float *angle, qboolean *swinging, int frametime ) {
+	float	swing;
+	float	move;
+	float	scale;
+
+	if ( !*swinging ) {
+		// see if a swing should be started
+		swing = AngleSubtract( *angle, destination );
+		if ( swing > swingTolerance || swing < -swingTolerance ) {
+			*swinging = qtrue;
+		}
+	}
+
+	if ( !*swinging ) {
+		return;
+	}
+
+	// modify the speed depending on the delta
+	// so it doesn't seem so linear
+	swing = AngleSubtract( destination, *angle );
+	scale = fabs( swing );
+	if ( scale < swingTolerance * 0.5 ) {
+		scale = 0.5;
+	} else if ( scale < swingTolerance ) {
+		scale = 1.0;
+	} else {
+		scale = 2.0;
+	}
+
+	// swing towards the destination angle
+	if ( swing >= 0 ) {
+		move = frametime * scale * speed;
+		if ( move >= swing ) {
+			move = swing;
+			*swinging = qfalse;
+		}
+		*angle = AngleMod( *angle + move );
+	} else if ( swing < 0 ) {
+		move = frametime * scale * -speed;
+		if ( move <= swing ) {
+			move = swing;
+			*swinging = qfalse;
+		}
+		*angle = AngleMod( *angle + move );
+	}
+
+	// clamp to no more than tolerance
+	swing = AngleSubtract( destination, *angle );
+	if ( swing > clampTolerance ) {
+		*angle = AngleMod( destination - (clampTolerance - 1) );
+	} else if ( swing < -clampTolerance ) {
+		*angle = AngleMod( destination + (clampTolerance - 1) );
+	}
+}
+
+
+#define SWING_SPEED 0.3 // cg_swingSpeed.value
+/*
+===============
+CG_PlayerAngles
+
+Handles seperate torso motion
+
+  legs pivot based on direction of movement
+
+  head always looks exactly at ent->angles (cent->lerpAngles in cgame)
+
+  if motion < 20 degrees, show in head only
+  if < 45 degrees, also show in torso
+===============
+*/
+// Game version of CG_PlayerAngles
+void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t head[3] )
+{
+	vec3_t		legsAngles, torsoAngles, headAngles;
+	float		dest;
+	static	int	movementOffsets[8] = { 0, 22, 45, -22, 0, 22, -45, -22 };
+	vec3_t		velocity;
+	float		speed;
+	int			dir;
+	int frametime = (level.time - level.previousTime);
+
+	VectorCopy( ent->client->ps.viewangles, headAngles );
+	headAngles[YAW] = AngleMod( headAngles[YAW] );
+	VectorClear( legsAngles );
+	VectorClear( torsoAngles );
+
+	// --------- yaw -------------
+
+	// allow yaw to drift a bit
+	if ( ( ent->client->ps.legsAnim & ~ANIM_TOGGLEBIT ) != LEGS_IDLE
+		|| ( ent->client->ps.torsoAnim & ~ANIM_TOGGLEBIT ) != TORSO_STAND  ) {
+		// if not standing still, always point all in the same direction
+		ent->client->pers.torso.yawing = qtrue;	// always center
+		ent->client->pers.torso.pitching = qtrue;	// always center
+		ent->client->pers.legs.yawing = qtrue;	// always center
+	}
+
+	// adjust legs for movement dir
+	if ( ent->client->ps.eFlags & EF_DEAD ) {
+		// don't let dead bodies twitch
+		dir = 0;
+	} else {
+		dir = ent->client->ps.movementDir;
+		if ( dir < 0 || dir > 7 ) {
+			Com_Error(ERR_DROP, "G_PlayerAngles: Bad player movement angle" );
+		}
+	}
+	legsAngles[YAW] = headAngles[YAW] + movementOffsets[ dir ];
+	torsoAngles[YAW] = headAngles[YAW] + 0.25 * movementOffsets[ dir ];
+
+	// torso
+	BG_SwingAngles( torsoAngles[YAW], 25, 90, SWING_SPEED, &ent->client->pers.torso.yawAngle, &ent->client->pers.torso.yawing, frametime );
+	BG_SwingAngles( legsAngles[YAW], 40, 90, SWING_SPEED, &ent->client->pers.legs.yawAngle, &ent->client->pers.legs.yawing, frametime );
+
+	torsoAngles[YAW] = ent->client->pers.torso.yawAngle;
+	legsAngles[YAW] = ent->client->pers.legs.yawAngle;
+
+
+	// --------- pitch -------------
+
+	// only show a fraction of the pitch angle in the torso
+	if ( headAngles[PITCH] > 180 ) {
+		dest = (-360 + headAngles[PITCH]) * 0.75f;
+	} else {
+		dest = headAngles[PITCH] * 0.75f;
+	}
+	BG_SwingAngles( dest, 15, 30, 0.1f, &ent->client->pers.torso.pitchAngle, &ent->client->pers.torso.pitching, frametime );
+	torsoAngles[PITCH] = ent->client->pers.torso.pitchAngle;
+
+	//
+#ifdef TMNTPLAYERSYS
+	if ( ent->client->pers.playercfg.fixedtorso )
+#else
+	if ( qfalse )
+#endif
+	{
+		torsoAngles[PITCH] = 0.0f;
+	}
+
+	// --------- roll -------------
+
+
+	// lean towards the direction of travel
+	VectorCopy( ent->s.pos.trDelta, velocity );
+	speed = VectorNormalize( velocity );
+	if ( speed ) {
+		vec3_t	axis[3];
+		float	side;
+
+		speed *= 0.05f;
+
+		AnglesToAxis( legsAngles, axis );
+		side = speed * DotProduct( velocity, axis[1] );
+		legsAngles[ROLL] -= side;
+
+		side = speed * DotProduct( velocity, axis[0] );
+		legsAngles[PITCH] += side;
+	}
+
+	//
+#ifdef TMNTPLAYERSYS
+	if ( ent->client->pers.playercfg.fixedlegs )
+#else
+	if ( qfalse )
+#endif
+	{
+		legsAngles[YAW] = torsoAngles[YAW];
+		legsAngles[PITCH] = 0.0f;
+		legsAngles[ROLL] = 0.0f;
+	}
+
+	// Turtle Man: TODO: Add pain twitch ?
+	//CG_AddPainTwitch( cent, torsoAngles );
+
+	// pull the angles back out of the hierarchial chain
+	AnglesSubtract( headAngles, torsoAngles, headAngles );
+	AnglesSubtract( torsoAngles, legsAngles, torsoAngles );
+	AnglesToAxis( legsAngles, legs );
+	AnglesToAxis( torsoAngles, torso );
+	AnglesToAxis( headAngles, head );
+}
+
+// Game version of CG_PlayerAnimation / UI_PlayerAnimation
+void G_PlayerAnimation( gentity_t *ent )
+{
+	int legsAnim;
+
+	if ( ent->client->pers.legs.yawing && ( ent->client->ps.legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE )
+		legsAnim = LEGS_TURN;
+	else
+		legsAnim = ent->client->ps.legsAnim;
+
+	BG_RunLerpFrame( &ent->client->pers.legs,
+#ifdef TMNTPLAYERSYS
+		ent->client->pers.playercfg.animations,
+#else
+#error "ERROR: TMNTPLAYERSYS needs to be defined."
+		NULL, // Turtle Man: This must be valid!
+#endif
+		legsAnim, level.time, ent->client->ps.powerups[PW_HASTE] ? 1.5f : 1.0f );
+
+	BG_RunLerpFrame( &ent->client->pers.torso,
+#ifdef TMNTPLAYERSYS
+		ent->client->pers.playercfg.animations,
+#else
+#error "ERROR: TMNTPLAYERSYS needs to be defined."
+		NULL, // Turtle Man: This must be valid!
+#endif
+		ent->client->ps.torsoAnim, level.time, ent->client->ps.powerups[PW_HASTE] ? 1.5f : 1.0f );
+}
+#endif
 
 void G_RunClient( gentity_t *ent ) {
+#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+	G_PlayerAngles(ent, ent->client->pers.legsAxis, ent->client->pers.torsoAxis, ent->client->pers.headAxis);
+
+	G_PlayerAnimation(ent);
+#endif
 	if ( !(ent->r.svFlags & SVF_BOT) && !g_synchronousClients.integer ) {
 		return;
 	}

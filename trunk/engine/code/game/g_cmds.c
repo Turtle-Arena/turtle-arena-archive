@@ -1263,7 +1263,7 @@ void Cmd_Where_f( gentity_t *ent ) {
 
 static const char *gameNames[] = {
 	"Free For All",
-#ifdef TMNT
+#ifdef TMNTMISC // tournament to duel
 	"Duel",
 #else
 	"Tournament",
@@ -1329,7 +1329,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	} else if ( !Q_stricmp( arg1, "clientkick" ) ) {
 	} else if ( !Q_stricmp( arg1, "g_doWarmup" ) ) {
 	} else if ( !Q_stricmp( arg1, "timelimit" ) ) {
-#ifdef TMNT // frag to score
+#ifdef TMNTMISC // frag to score
 	} else if ( !Q_stricmp( arg1, "scorelimit" ) ) {
 #else
 	} else if ( !Q_stricmp( arg1, "fraglimit" ) ) {

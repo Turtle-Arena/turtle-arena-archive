@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 #include "../ui/ui_shared.h"
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK_HUD
 extern menuDef_t *menuScoreboard;
 #endif
 
@@ -86,7 +86,7 @@ static void CG_Viewpos_f (void) {
 
 static void CG_ScoresDown_f( void ) {
 
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK_HUD
 		CG_BuildSpectatorString();
 #endif
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
@@ -115,7 +115,7 @@ static void CG_ScoresUp_f( void ) {
 	}
 }
 
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK_HUD
 extern menuDef_t *menuScoreboard;
 void Menu_Reset( void );			// FIXME: add to right include file
 
@@ -154,8 +154,9 @@ static void CG_scrollScoresUp_f( void) {
 		Menu_ScrollFeeder(menuScoreboard, FEEDER_BLUETEAM_LIST, qfalse);
 	}
 }
+#endif
 
-
+#ifdef MISSIONPACK
 static void CG_spWin_f( void) {
 	trap_Cvar_Set("cg_cameraOrbit", "2");
 	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
@@ -240,7 +241,7 @@ static void CG_VoiceTellAttacker_f( void ) {
 	trap_SendClientCommand( command );
 }
 
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 static void CG_NextTeamMember_f( void ) {
   CG_SelectNextPlayer();
 }
@@ -527,8 +528,10 @@ static consoleCommand_t	commands[] = {
 	{ "vtell_target", CG_VoiceTellTarget_f },
 	{ "vtell_attacker", CG_VoiceTellAttacker_f },
 	{ "tcmd", CG_TargetCommand_f },
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
+#ifdef MISSIONPACK_HUD
 	{ "loadhud", CG_LoadHud_f },
+#endif
 	{ "nextTeamMember", CG_NextTeamMember_f },
 	{ "prevTeamMember", CG_PrevTeamMember_f },
 	{ "nextOrder", CG_NextOrder_f },
@@ -552,8 +555,10 @@ static consoleCommand_t	commands[] = {
 #endif
 	{ "spWin", CG_spWin_f },
 	{ "spLose", CG_spLose_f },
+#ifdef MISSIONPACK_HUD
 	{ "scoresDown", CG_scrollScoresDown_f },
 	{ "scoresUp", CG_scrollScoresUp_f },
+#endif
 #endif
 	{ "startOrbit", CG_StartOrbit_f },
 #ifdef CAMERASCRIPT
