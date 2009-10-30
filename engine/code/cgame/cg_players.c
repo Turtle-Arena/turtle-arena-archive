@@ -441,6 +441,7 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 #ifdef IOQ3ZTM // PLAYER_DIR
 	const char *team, *headsFolder;
 	int h;
+	qboolean heads_first;
 #else
 	char *team, *headsFolder;
 #endif
@@ -466,19 +467,23 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 	// if '*' checks models/players/heads/ directory,
 	// then models/players/ and models/players/characters directory,
 	// if not '*', does players_dirs then models/players/heads/
+	if (headModelName[0] == '*')
+	{
+		headModelName++; // Skip '*'
+		heads_first = qtrue;
+	}
+	else
+	{
+		heads_first = qfalse;
+	}
+
 	for ( h = 0; h == 0 || (h > 0 && bg_playerDirs[h-1] != NULL); h++ )
 	{
-		if (headModelName[0] == '*')
+		if (heads_first)
 		{
 			if (h == 0)
 			{
 				headsFolder = "models/players/heads";
-				headModelName++;
-			}
-			else if (h == 1)
-			{
-				headModelName--;
-				headsFolder = bg_playerDirs[h-1];
 			}
 			else
 			{
@@ -490,7 +495,6 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 			if (bg_playerDirs[h] == NULL)
 			{
 				headsFolder = "models/players/heads";
-				headModelName++;
 			}
 			else
 			{
@@ -691,6 +695,10 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	}
 
 	// load head model
+	// If starts with '*', then load from heads dir
+	// if not loaded head yet, then load from models/players/NAME/head.md3 (atemps all bg_playerDirs)
+	// if not loaded head yet and not start with '*' load from heads dir
+	// if not loaded head yet, then failed to load.
 	ci->headModel = 0;
 
 	if (headModelName[0] == '*' ) {
@@ -762,13 +770,6 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 		Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/%s.md3", headModelName, headModelName );
 		ci->headModel = trap_R_RegisterModel( filename );
 	}
-#ifdef TMNTPLAYERSYS // non-playercfg
-	// This is true for "*raph" ...
-	if ( !ci->headModel && headName[0] == '*' ) {
-		Com_sprintf( filename, sizeof( filename ), "models/players/%s/head.md3", &headModelName[1] );
-		ci->headModel = trap_R_RegisterModel( filename );
-	}
-#endif
 	if ( !ci->headModel ) {
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
@@ -812,7 +813,8 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	}
 #endif
 
-#ifdef IOQ3ZTM // Support all image formats for player icons
+#ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
+	// Support all image formats for player icons
 	if (
 #ifdef TMNTDATASYS // Load PNG first.
 		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "png" ) ||
@@ -900,13 +902,26 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	}
 #endif
 	modelloaded = qtrue;
-#ifdef IOQ3ZTM // Support MissionPack players. in Q3 and Q3 players in MissionPack.
+#ifdef IOQ3ZTM // Support MissionPack players in Q3 and Q3 players in MissionPack.
 	// Try to loading teamname, for Team Arena players.
 	if ( !CG_RegisterClientModelname( ci, ci->modelName, ci->skinName, ci->headModelName, ci->headSkinName, teamname ) ) {
-		teamname[0] = 0;
+		if (cgs.gametype < GT_TEAM)
+		{
+			// in non-team, try loading with teamname, for Team Arena players
+			if( ci->team == TEAM_BLUE ) {
+				Q_strncpyz(teamname, cg_blueTeamName.string, sizeof(teamname) );
+			} else {
+				Q_strncpyz(teamname, cg_redTeamName.string, sizeof(teamname) );
+			}
+		}
+		else
+		{
 		// in teamplay, try loading with no teamname, for Q3 players.
-		if ( cgs.gametype < GT_TEAM || !CG_RegisterClientModelname( ci, ci->modelName, ci->skinName, ci->headModelName, ci->headSkinName, teamname ) ) {
-			if ( (cgs.gametype >= GT_TEAM) && cg_buildScript.integer ) {
+			teamname[0] = 0;
+		}
+		if (!CG_RegisterClientModelname( ci, ci->modelName, ci->skinName, ci->headModelName, ci->headSkinName, teamname ) )
+		{
+			if (cg_buildScript.integer ) {
 				CG_Error( "CG_RegisterClientModelname( %s, %s, %s, %s %s ) failed", ci->modelName, ci->skinName, ci->headModelName, ci->headSkinName, teamname );
 			}
 
@@ -982,6 +997,12 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 		}
 		if ( trap_R_LerpTag( &tag, ci->torsoModel, 0, 0, 1, "tag_hand_secondary" ) ) {
 			ci->tagInfo |= TI_TAG_HAND_SECONDARY;
+		}
+		if ( trap_R_LerpTag( &tag, ci->torsoModel, 0, 0, 1, "tag_wp_away_primary" ) ) {
+			ci->tagInfo |= TI_TAG_WP_AWAY_PRIMARY;
+		}
+		if ( trap_R_LerpTag( &tag, ci->torsoModel, 0, 0, 1, "tag_wp_away_secondary" ) ) {
+			ci->tagInfo |= TI_TAG_WP_AWAY_SECONDARY;
 		}
 #else
 		// if the torso model has the "tag_flag"
@@ -1655,7 +1676,10 @@ PLAYER ANGLES
 CG_SwingAngles
 ==================
 */
-static void CG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
+#ifndef TMNTWEAPSYS
+static
+#endif
+void CG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
 					float speed, float *angle, qboolean *swinging ) {
 	float	swing;
 	float	move;
@@ -2015,7 +2039,7 @@ static void CG_TrailItem( centity_t *cent, qhandle_t hModel ) {
 	vec3_t			angles;
 	vec3_t			axis[3];
 
-#ifdef IOQ3ZTM // Don't draw CTF flag for the holder in third person.
+#ifdef IOQ3ZTM // Don't draw CTF flag for the holder in third person, blocks view.
 	if (cent->currentState.clientNum == cg.predictedPlayerState.clientNum
 		&& cg_thirdPerson.integer)
 	{
@@ -2094,6 +2118,9 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	legsAnim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
 	if( legsAnim == LEGS_IDLE || legsAnim == LEGS_IDLECR ) {
 		flagAnim = FLAG_STAND;
+#ifdef IOQ3ZTM // Turtle Man: TEST: Always update flag angles
+		updateangles = qtrue;
+#endif
 	} else if ( legsAnim == LEGS_WALK || legsAnim == LEGS_WALKCR ) {
 		flagAnim = FLAG_STAND;
 		updateangles = qtrue;
@@ -2119,7 +2146,11 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 			else if (d < -1.0f) {
 				d = -1.0f;
 			}
+#ifdef IOQ3ZTM3
+			angle = Q_acos(d);
+#else
 			angle = acos(d);
+#endif
 
 			d = DotProduct(pole.axis[1], dir);
 			if (d < 0) {
@@ -2414,7 +2445,7 @@ static void CG_PlayerSprites( centity_t *cent ) {
 		return;
 	}
 
-#ifdef TMNTSP // Turtle Man: FIXME: There is always a talk balloon at sp intermission, so I always disable it.
+#ifdef TMNTSP // Turtle Man: FIXME: There is always a talk balloon at sp intermission, so I always disable it. Need to do a Pmove to fix?
 	if ( (cent->currentState.eFlags & EF_TALK) && !cg.intermissionStarted && cg.snap->ps.pm_type != PM_SPINTERMISSION ) {
 #else
 	if ( cent->currentState.eFlags & EF_TALK ) {
@@ -2487,14 +2518,30 @@ static void CG_PlayerSprites( centity_t *cent ) {
 
 	team = cgs.clientinfo[ cent->currentState.clientNum ].team;
 	if ( !(cent->currentState.eFlags & EF_DEAD) && 
+#ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
+		((cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR && cgs.media.blueFriendShader)
+			|| cg.snap->ps.persistant[PERS_TEAM] == team) &&
+#else
 		cg.snap->ps.persistant[PERS_TEAM] == team &&
+#endif
 		cgs.gametype >= GT_TEAM) {
 		if (cg_drawFriend.integer) {
+#ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
+			if (team == TEAM_BLUE && cgs.media.blueFriendShader)
+			{
+				CG_PlayerFloatSprite( cent, cgs.media.blueFriendShader, qtrue);
+			}
+			else
+			{
+				CG_PlayerFloatSprite( cent, cgs.media.friendShader, qtrue);
+			}
+#else
 			CG_PlayerFloatSprite( cent, cgs.media.friendShader
 #ifdef IOQ3ZTM // IOQ3BUGFIX: BAD AWARD DRAWING
 			, qtrue
 #endif
 			);
+#endif
 		}
 		return;
 	}
@@ -2692,6 +2739,13 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 #ifndef TMNT // POWERS
 		if ( state->powerups & ( 1 << PW_BATTLESUIT ) ) {
 			ent->customShader = cgs.media.battleSuitShader;
+			trap_R_AddRefEntityToScene( ent );
+		}
+#endif
+#ifdef TMNT // tele.md3 // pop.md3
+		//
+		if ( state->eFlags & EF_TELE_EFFECT ) {
+			ent->customShader = cgs.media.playerTeleportShader;
 			trap_R_AddRefEntityToScene( ent );
 		}
 #endif

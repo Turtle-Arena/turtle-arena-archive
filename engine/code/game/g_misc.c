@@ -103,6 +103,9 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	// toggle the teleport bit so the client knows to not lerp
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
+#ifdef TMNT
+	player->client->teleEffectTime = level.time;
+#endif
 
 	// set angles
 	SetClientViewAngle( player, angles );
@@ -406,6 +409,7 @@ void DropPortalDestination( gentity_t *player ) {
 	// give the item back so they can drop the source now
 #ifdef TMNTHOLDSYS
 	player->client->ps.holdableIndex = HI_PORTAL;
+	player->client->ps.holdable[HI_PORTAL] = 1;
 #else
 	player->client->ps.stats[STAT_HOLDABLE_ITEM] = BG_FindItem( "Portal" ) - bg_itemlist;
 #endif

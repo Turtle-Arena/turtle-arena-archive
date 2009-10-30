@@ -33,14 +33,28 @@ Modifies the entities position and axis by the given
 tag location
 ======================
 */
+#ifdef TMNTWEAPSYS
+qboolean CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
+							qhandle_t parentModel, char *tagName )
+#else
 void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
-							qhandle_t parentModel, char *tagName ) {
+							qhandle_t parentModel, char *tagName )
+#endif
+{
 	int				i;
 	orientation_t	lerped;
 	
 	// lerp the tag
+#ifdef TMNTWEAPSYS
+	if (!trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+		1.0 - parent->backlerp, tagName ))
+	{
+		return qfalse;
+	}
+#else
 	trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
+#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -51,6 +65,9 @@ void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 	// had to cast away the const to avoid compiler problems...
 	MatrixMultiply( lerped.axis, ((refEntity_t *)parent)->axis, entity->axis );
 	entity->backlerp = parent->backlerp;
+#ifdef TMNTWEAPSYS
+	return qtrue;
+#endif
 }
 
 
@@ -62,16 +79,30 @@ Modifies the entities position and axis by the given
 tag location
 ======================
 */
+#ifdef TMNTWEAPSYS
+qboolean CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
+							qhandle_t parentModel, char *tagName )
+#else
 void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
-							qhandle_t parentModel, char *tagName ) {
+							qhandle_t parentModel, char *tagName )
+#endif
+{
 	int				i;
 	orientation_t	lerped;
 	vec3_t			tempAxis[3];
 
 //AxisClear( entity->axis );
 	// lerp the tag
+#ifdef TMNTWEAPSYS
+	if (!trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+		1.0 - parent->backlerp, tagName ))
+	{
+		return qfalse;
+	}
+#else
 	trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
+#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -82,6 +113,9 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 	// had to cast away the const to avoid compiler problems...
 	MatrixMultiply( entity->axis, lerped.axis, tempAxis );
 	MatrixMultiply( tempAxis, ((refEntity_t *)parent)->axis, entity->axis );
+#ifdef TMNTWEAPSYS
+	return qfalse;
+#endif
 }
 
 
@@ -255,7 +289,7 @@ static void CG_MiscObject( centity_t *cent ) {
 	}
 
 	// Check if config was loaded
-	if (cent->miscObj.speed < 1.0)
+	if (!(cent->miscObj.flags & MOF_SETUP))
 	{
 		const char *modelName;
 		char filename[MAX_QPATH];
@@ -269,6 +303,9 @@ static void CG_MiscObject( centity_t *cent ) {
 			"OBJECT_KILLED"
 		};
 
+		cent->miscObj.flags |= MOF_SETUP;
+
+		// Set defaults
 		cent->miscObj.speed = 1.0f;
 
 		modelName = CG_ConfigString( CS_MODELS + s1->modelindex );
@@ -287,6 +324,8 @@ static void CG_MiscObject( centity_t *cent ) {
 		}
 		else
 		{
+			// no config file or failed to load cfg file.
+			// so disable animation.
 			cent->miscObj.anim = -1;
 		}
 	}
@@ -455,8 +494,8 @@ static void CG_ModelAnim( centity_t *cent ) {
 			// for debugging
 			cent->md3.anim.firstFrame=0;
 			cent->md3.anim.flipflop=0;
-			cent->md3.anim.frameLerp=100;
-			cent->md3.anim.initialLerp=100;
+			cent->md3.anim.frameLerp=100; // 10 fps
+			cent->md3.anim.initialLerp=100; // 10 fps
 			cent->md3.anim.loopFrames=10;
 			cent->md3.anim.numFrames=10;
 			cent->md3.anim.reversed=0;
@@ -520,7 +559,11 @@ static void CG_Item( centity_t *cent ) {
 
 	es = &cent->currentState;
 	if ( es->modelindex >= bg_numItems ) {
+#ifdef IOQ3ZTM
+		CG_Error( "Bad item index %i on entity (max=%i)", es->modelindex, bg_numItems );
+#else
 		CG_Error( "Bad item index %i on entity", es->modelindex );
+#endif
 	}
 
 	// if set to invisible, skip
@@ -529,6 +572,14 @@ static void CG_Item( centity_t *cent ) {
 	}
 
 	item = &bg_itemlist[ es->modelindex ];
+#ifdef IOQ3ZTM // move icons as well as models.
+	// items bob up and down continuously
+	scale = 0.005 + cent->currentState.number * 0.00001;
+#ifdef TMNT // CRATE
+	if (item->giType != IT_CRATE)
+#endif
+	cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
+#endif
 #ifdef IOQ3ZTM // If missing item model, use item sprite.
 	// Turtle Man: Not all of the items have models yet, so use the sprite!
 	if ( (!cg_items[es->modelindex].models[0] || cg_simpleItems.integer) && item->giType != IT_TEAM )
@@ -549,12 +600,14 @@ static void CG_Item( centity_t *cent ) {
 		return;
 	}
 
+#ifndef IOQ3ZTM // move icons as well as models.
 	// items bob up and down continuously
 	scale = 0.005 + cent->currentState.number * 0.00001;
 #ifdef TMNT // CRATE
 	if (item->giType != IT_CRATE)
 #endif
 	cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
+#endif
 
 	memset (&ent, 0, sizeof(ent));
 
@@ -616,7 +669,7 @@ static void CG_Item( centity_t *cent ) {
 
 	// items without glow textures need to keep a minimum light value
 	// so they are always visible
-#ifdef TMNTDATASYS
+#ifdef TMNT // TMNTDATASYS // NOARMOR
 	ent.renderfx |= RF_MINLIGHT;
 #else
 	if ( ( item->giType == IT_WEAPON ) ||
@@ -784,14 +837,11 @@ float vectoyaw( const vec3_t vec ) {
 ===============
 CG_Shuriken
 Based on CG_MISSILE
-
-Turtle Man: FIXME: Finish rotating.
 ===============
 */
 static void CG_Shuriken( centity_t *cent, holdable_t holdable ) {
 	refEntity_t			ent;
 	entityState_t		*s1;
-	vec3_t dir;
 
 /*
 	// add trails
@@ -832,11 +882,11 @@ static void CG_Shuriken( centity_t *cent, holdable_t holdable ) {
 		case HI_SHURIKEN:
 			ent.hModel = cgs.media.shurikenModel;
 			break;
-		case HI_FIRESHURIKEN:
-			ent.hModel = cgs.media.shurikenFireModel;
-			break;
 		case HI_ELECTRICSHURIKEN:
 			ent.hModel = cgs.media.shurikenElectricModel;
+			break;
+		case HI_FIRESHURIKEN:
+			ent.hModel = cgs.media.shurikenFireModel;
 			break;
 		case HI_LASERSHURIKEN:
 			ent.hModel = cgs.media.shurikenLaserModel;
@@ -847,34 +897,46 @@ static void CG_Shuriken( centity_t *cent, holdable_t holdable ) {
 	}
 	ent.renderfx = RF_NOSHADOW;
 
-	// calculate the axis
+	// spin pitch and use fired yaw!
+	//if (qtrue)
+	{
+		if ( s1->pos.trType != TR_STATIONARY )
+		{
+			cent->lerpAngles[0] = cg.shurikenAngles[0]; // Spin pitch!
+		}
+		else
+		{
+			// Does the "engine" change lerpAngles[0] or is it the last value it was?
+		}
+		cent->lerpAngles[1] = s1->angles[1];		// Angle it was shot at.
+		cent->lerpAngles[2] = 0;					// Don't roll.
+		AnglesToAxis( cent->lerpAngles, ent.axis );
+	}
+#if 0
+	// CG_Missile spin code.
+	else // spin roll and point pitch to dir of travel.
+	{
 	// convert direction of travel into axis
 	if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
 		ent.axis[0][2] = 1;
 	}
 
-	ent.nonNormalizedAxes = qfalse;
-
-	//vectoangles( ent.axis[0], cent->lerpAngles );
-#if 1
-	VectorSubtract(s1->pos.trDelta, s1->pos.trBase, dir);
-	cent->lerpAngles[0] = cg.shurikenAngles[0];
-	cent->lerpAngles[1] = vectoyaw(dir)+90;//s1->angles[1];
-	cent->lerpAngles[2] = 0;//s1->angles[2];
-	AnglesToAxis( cent->lerpAngles, ent.axis );
-#else
-	//VectorCopy( s1->angles, cent->lerpAngles);
-	VectorCopy( cg.shurikenAngles, cent->lerpAngles );
-	AxisCopy( cg.shurikenAxis, ent.axis );
-#endif
-
 	// spin as it moves
 	if ( s1->pos.trType != TR_STATIONARY ) {
-		//RotateAroundDirection( ent.axis, cg.time / 4 );
-		//RotateAroundDirection( ent.axis, cent->lerpAngles[1]);
+			RotateAroundDirection( ent.axis, cg.time / 4 );
 	} else {
-		// Turtle Man: TODO: Stuck in wall?
+#if defined MISSIONPACK && !defined TMNTWEAPONS
+			if ( s1->weapon == WP_PROX_LAUNCHER ) {
+				AnglesToAxis( cent->lerpAngles, ent.axis );
+			}
+			else
+#endif
+			{
+				RotateAroundDirection( ent.axis, s1->time );
+			}
+		}
 	}
+#endif
 
 	// add to refresh list, possibly with quad glow
 	CG_AddRefEntityWithPowerups( &ent, s1, TEAM_FREE );
@@ -900,8 +962,8 @@ static void CG_Missile( centity_t *cent ) {
 		switch (holdable)
 		{
 			case HI_SHURIKEN:
-			case HI_FIRESHURIKEN:
 			case HI_ELECTRICSHURIKEN:
+			case HI_FIRESHURIKEN:
 			case HI_LASERSHURIKEN:
 				CG_Shuriken(cent, holdable);
 				return;
@@ -912,10 +974,11 @@ static void CG_Missile( centity_t *cent ) {
 #else
 	s1 = &cent->currentState;
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
-	if ( s1->weapon >= WP_NUM_WEAPONS ) {
+	if ( s1->weapon >= WP_NUM_WEAPONS )
 #else
-	if ( s1->weapon > WP_NUM_WEAPONS ) {
+	if ( s1->weapon > WP_NUM_WEAPONS )
 #endif
+	{
 		s1->weapon = 0;
 	}
 #endif
@@ -1029,7 +1092,12 @@ static void CG_Grapple( centity_t *cent ) {
 	const weaponInfo_t		*weapon;
 
 	s1 = &cent->currentState;
-	if ( s1->weapon > WP_NUM_WEAPONS ) {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
+	if ( s1->weapon >= WP_NUM_WEAPONS )
+#else
+	if ( s1->weapon > WP_NUM_WEAPONS )
+#endif
+	{
 		s1->weapon = 0;
 	}
 	weapon = &cg_weapons[s1->weapon];
@@ -1371,7 +1439,11 @@ static void CG_TeamBase( centity_t *cent ) {
 					cent->muzzleFlashTime = 1;
 				}
 				VectorCopy(cent->currentState.angles, angles);
+#ifdef IOQ3ZTM3
+				angles[YAW] += (float) 16 * Q_acos(1-c) * 180 / M_PI;
+#else
 				angles[YAW] += (float) 16 * acos(1-c) * 180 / M_PI;
+#endif
 				AnglesToAxis( angles, model.axis );
 
 				VectorScale( model.axis[0], c, model.axis[0]);

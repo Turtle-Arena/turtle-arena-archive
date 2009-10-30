@@ -563,7 +563,7 @@ typedef struct {
 	qhandle_t			menuBackNoLogoShader;
 	qhandle_t			charset;
 	qhandle_t			charsetProp;
-#ifndef TMNT
+#ifndef TMNTDATA
 	qhandle_t			charsetPropGlow;
 #endif
 	qhandle_t			charsetPropB;

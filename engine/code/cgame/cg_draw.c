@@ -672,9 +672,10 @@ static void CG_DrawStatusBar( void ) {
 
 	// LINE 1: Score
 	value = ps->persistant[PERS_SCORE];
-	CG_DrawFieldSmall(x+25,y,5,value);
+	CG_DrawFieldSmall(x+25, y, 5, value);
 	x += (3 * (CHAR_WIDTH/2));
 
+	// Space between line 1 and 3
 	y += CHAR_HEIGHT/2;
 	x = start_x;
 
@@ -693,23 +694,25 @@ static void CG_DrawStatusBar( void ) {
 
 	// stretch the health up when taking damage
 #if 1
-	CG_DrawFieldSmall(x+25,y,3,value);
+	CG_DrawFieldSmall(x + 25, y, 5, value);
 	x += (3 * (CHAR_WIDTH/2));
 #else
-	CG_DrawField ( x + 25, y, 3, value);
+	CG_DrawField ( x + 25, y, 5, value);
 	x += (3 * CHAR_WIDTH);
 #endif
 	//CG_ColorForHealth( hcolor );
 	//trap_R_SetColor( hcolor );
 	trap_R_SetColor( NULL );
 
-	y += CHAR_HEIGHT/2;
+	// Space between line 2 and 3
+	y += CHAR_HEIGHT/2 + (CHAR_HEIGHT/2)/8;
 	x = start_x;
 
 /*
 	// LINE3: Lives (Single Player)
 
-	y += GIANT_HEIGHT + 5;
+	// Space between line 3 and 4
+	y += GIANT_HEIGHT;
 	x = start_x;
 */
 
@@ -821,6 +824,7 @@ static void CG_DrawStatusBar( void ) {
 		CG_DrawStatusBarFlag( 185 + CHAR_WIDTH*3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_FREE );
 	}
 
+#ifndef TMNT // NOARMOR
 	if ( ps->stats[ STAT_ARMOR ] ) {
 		origin[0] = 90;
 		origin[1] = 0;
@@ -829,6 +833,7 @@ static void CG_DrawStatusBar( void ) {
 		CG_Draw3DModel( 370 + CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE,
 					   cgs.media.armorModel, 0, origin, angles );
 	}
+#endif
 	//
 	// ammo
 	//
@@ -884,6 +889,7 @@ static void CG_DrawStatusBar( void ) {
 	trap_R_SetColor( hcolor );
 
 
+#ifndef TMNT // NOARMOR
 	//
 	// armor
 	//
@@ -898,6 +904,7 @@ static void CG_DrawStatusBar( void ) {
 		}
 
 	}
+#endif
 #endif // TMNTHUD
 }
 #endif // MISSIONPACK_HUD
@@ -1573,6 +1580,13 @@ static int CG_DrawPickupItem( int y ) {
 	y -= ICON_SIZE;
 
 	value = cg.itemPickup;
+#ifdef TMNTWEAPONS // When pickup default weapon remap to correct weapon.
+	if (value && bg_itemlist[ value ].giType == IT_WEAPON
+		&& bg_itemlist[ value ].giTag == WP_DEFAULT)
+	{
+		value = BG_FindItemForWeapon(cgs.clientinfo[cg.snap->ps.clientNum].playercfg.default_weapon) - bg_itemlist;
+	}
+#endif
 	if ( value ) {
 		fadeColor = CG_FadeColor( cg.itemPickupTime, 3000 );
 		if ( fadeColor ) {
@@ -1715,14 +1729,19 @@ static void CG_DrawHoldableItem( void ) {
 CG_DrawPersistantPowerup
 ===================
 */
-#if 0 // sos001208 - DEAD
+//#if 0 // sos001208 - DEAD
+#ifndef MISSIONPACK_HUD // IOQ3ZTM // Turtle Man: For playing MISSIONPACK without new HUD.
 static void CG_DrawPersistantPowerup( void ) { 
 	int		value;
 
 	value = cg.snap->ps.stats[STAT_PERSISTANT_POWERUP];
 	if ( value ) {
 		CG_RegisterItemVisuals( value );
+#ifdef TMNTHUD
+		CG_DrawPic( HUD_X, (SCREEN_HEIGHT-ICON_SIZE)/2 - ICON_SIZE, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
+#else
 		CG_DrawPic( 640-ICON_SIZE, (SCREEN_HEIGHT-ICON_SIZE)/2 - ICON_SIZE, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
+#endif
 	}
 }
 #endif
@@ -2514,7 +2533,7 @@ CG_DrawIntermission
 */
 static void CG_DrawIntermission( void ) {
 //	int key;
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK_HUD
 	//if (cg_singlePlayer.integer) {
 	//	CG_DrawCenterString();
 	//	return;
@@ -2870,12 +2889,12 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			CG_DrawWeaponSelect();
 #endif
 
-#ifndef TMNTHUD
 #ifndef MISSIONPACK
+#ifndef TMNTHUD
 			CG_DrawHoldableItem();
-#else
-			//CG_DrawPersistantPowerup();
 #endif
+#elif !defined MISSIONPACK_HUD // IOQ3ZTM // Turtle Man: For playing MISSIONPACK without new HUD.
+			CG_DrawPersistantPowerup();
 #endif
 			CG_DrawReward();
 		}

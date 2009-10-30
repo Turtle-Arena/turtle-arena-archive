@@ -137,7 +137,10 @@ typedef enum {
 	UI_ATAN2,
 	UI_SQRT,
 	UI_FLOOR,
-	UI_CEIL
+	UI_CEIL,
+#ifdef IOQ3ZTM3
+	UI_ACOS
+#endif
 } uiImport_t;
 
 typedef enum {

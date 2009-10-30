@@ -65,12 +65,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // holdable items, currently there is a max of 16
 // Q3 holdable defines.
-//#define INVENTORY_TELEPORTER		21
+#define INVENTORY_TELEPORTER		21	// removed
 #define INVENTORY_MEDKIT			22
 //MISSIONPACK
-//#define INVENTORY_KAMIKAZE		23
+#define INVENTORY_KAMIKAZE			23	// removed
 #define INVENTORY_PORTAL			24
-//#define INVENTORY_INVULNERABILITY	25
+#define INVENTORY_INVULNERABILITY	25	// removed
 
 // TMNT holdable defines.
 // HI_SHURIKEN, HI_ELECTRICSHURIKEN, HI_FIRESHURIKEN, HI_LASERSHURIKEN
@@ -145,7 +145,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODELINDEX_HOMINGLAUNCHER	20
 #define MODELINDEX_GRAPPLINGHOOK	21
 
-//#define MODELINDEX_TELEPORTER		0
+#define MODELINDEX_TELEPORTER		0	// removed
 #define MODELINDEX_MEDKIT			22
 #define MODELINDEX_SHURIKEN			23
 #define MODELINDEX_ELECTRICSHURIKEN	24
@@ -167,9 +167,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // mission pack only defines
 
-//#define MODELINDEX_KAMIKAZE			0
+#define MODELINDEX_KAMIKAZE			0	// removed
 #define MODELINDEX_PORTAL			36
-//#define MODELINDEX_INVULNERABILITY	0
+#define MODELINDEX_INVULNERABILITY	0	// removed
 
 #define MODELINDEX_SCOUT			37
 #define MODELINDEX_GUARD			38

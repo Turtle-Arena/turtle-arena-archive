@@ -136,22 +136,22 @@ static void UI_CreditMenu_Draw( void ) {
 	UI_DrawProportionalString( 320, y, "This is a fangame there is no connection to", UI_CENTER|UI_SMALLFONT, color_white );
 #ifdef TMNT
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Mirage Studios, Konami, or 4KidsTV.", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "Mirage Studios, 4KidsTV, Konami, or Ubisoft.", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Copyright.
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "TMNT(c) 1984-2009 Mirage Studios", UI_CENTER|UI_SMALLFONT, color_white );
-	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "TMNT Arena(c) 2009 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
-#else // sonic credits
+	//y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	//UI_DrawProportionalString( 320, y, "TMNT Arena(c) 2009 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
+#else // SONIC credits
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "SEGA, Sonic Team, or 4KidsTV.", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Copyright.
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "Sonic the Hedgehog(c) 1991-2009 SEGA", UI_CENTER|UI_SMALLFONT, color_white );
-	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Sonic Blast Arena(c) 2009 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
+	//y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	//UI_DrawProportionalString( 320, y, "Sonic Blast Arena(c) 2009 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
 #endif
 #else
 	y = 12;

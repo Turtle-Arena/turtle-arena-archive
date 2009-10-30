@@ -346,6 +346,9 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 		// set up for pmove
 		memset (&pm, 0, sizeof(pm));
 		pm.ps = &client->ps;
+#ifdef TMNTPLAYERSYS // Pmove
+		pm.playercfg = &client->pers.playercfg;
+#endif
 		pm.cmd = *ucmd;
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
 		pm.trace = trap_Trace;
@@ -463,7 +466,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			if (client->ps.meleeAttack == max_combo)
 			{
 #ifndef TMNTRELEASE
-				G_Printf("DEBUG: client %i finished last combo (%i)\n", ent - g_entities, client->ps.meleeAttack);
+				//G_Printf("DEBUG: client %i finished last combo (%i)\n", ent - g_entities, client->ps.meleeAttack);
 #endif
 
 				client->ps.meleeDelay = weap_delay;
@@ -1046,6 +1049,8 @@ void ClientThink_real( gentity_t *ent ) {
 	//
 	if ( level.intermissiontime ) {
 		ClientIntermissionThink( client );
+#ifdef TMNTSP // Turtle Man: FIXME: Need to do a Pmove to update player to avoid talk balloon, and lag-o-meter?
+#endif
 		return;
 	}
 
@@ -1083,7 +1088,7 @@ void ClientThink_real( gentity_t *ent ) {
 	client->ps.gravity = g_gravity.value;
 
 	// set speed
-#ifdef TMNTPLAYERSYS
+#ifdef TMNTPLAYERSYS // PER_PLAYER_SPEED
 	client->ps.speed = client->pers.playercfg.max_speed * (g_speed.value / 320);
 #else
 	client->ps.speed = g_speed.value;
@@ -1113,8 +1118,8 @@ void ClientThink_real( gentity_t *ent ) {
 #ifdef TMNTWEAPSYS // MELEEATTACK
 	if (ucmd->buttons & BUTTON_ATTACK)
 	{
-		if (!( ucmd->buttons & BUTTON_TALK ) && !client->ps.meleeDelay &&
-			!client->ps.meleeTime && !client->ps.weaponTime
+		if (!( ucmd->buttons & BUTTON_TALK ) && !client->ps.meleeDelay
+			&& !client->ps.meleeTime && !client->ps.weaponTime
 			&& !client->ps.attack_melee)
 		{
 			client->ps.attack_melee = qtrue;
@@ -1126,7 +1131,10 @@ void ClientThink_real( gentity_t *ent ) {
 		client->ps.attack_melee = qfalse;
 	}
 
-	if (client->ps.meleeTime > 0 && BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&client->ps)))
+	if (BG_WeaponTypeForPlayerState(&client->ps) == WT_GAUNTLET)
+	{
+		if (!(ucmd->buttons & BUTTON_TALK) && (ucmd->buttons & BUTTON_ATTACK)
+			&& client->ps.weaponTime <= 0 )
 	{
 		pm.gauntletHit = G_MeleeAttack( ent, qfalse );
 	}
@@ -1135,14 +1143,16 @@ void ClientThink_real( gentity_t *ent ) {
 		// DEBUG: Draw weapon tag locations.
 		G_MeleeAttack( ent, qtrue );
 	}
-
-#ifndef TMNTWEAPONS
-	if (BG_WeaponTypeForPlayerState(&client->ps) == WT_GAUNTLET
-		&& !( ucmd->buttons & BUTTON_TALK ) && ( ucmd->buttons & BUTTON_ATTACK )
-		&& client->ps.weaponTime <= 0 ) {
-		pm.gauntletHit = CheckGauntletAttack( ent );
 	}
-#endif
+	else if (client->ps.meleeTime > 0 && BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&client->ps)))
+	{
+		G_MeleeAttack( ent, qfalse );
+	}
+	else
+	{
+		// DEBUG: Draw weapon tag locations.
+		G_MeleeAttack( ent, qtrue );
+	}
 #else // Disable gauntlet attack
 	// check for the hit-scan gauntlet, don't let the action
 	// go through as an attack unless it actually hits something
@@ -1223,10 +1233,8 @@ void ClientThink_real( gentity_t *ent ) {
 				ent->client->ps.pm_type = PM_SPINTERMISSION;
 			}
 		}
-		Pmove (&pm);
-#else
-		Pmove (&pm);
 #endif
+	Pmove (&pm);
 
 	// save results of pmove
 	if ( ent->client->ps.eventSequence != oldEventSequence ) {
@@ -1711,6 +1719,22 @@ void ClientEndFrame( gentity_t *ent ) {
 	if ( level.intermissiontime ) {
 		return;
 	}
+
+#ifdef TMNT // teleport effect
+	// Remove tele effect from player.
+	if (ent->client->teleEffectTime > 0)
+	{
+		if (ent->client->teleEffectTime + 5000 < level.time)
+		{
+			ent->client->ps.eFlags &= ~EF_TELE_EFFECT;
+			ent->client->teleEffectTime = 0;
+		}
+		else
+		{
+			ent->client->ps.eFlags |= EF_TELE_EFFECT;
+		}
+	}
+#endif
 
 	// burn from lava, etc
 	P_WorldEffects (ent);

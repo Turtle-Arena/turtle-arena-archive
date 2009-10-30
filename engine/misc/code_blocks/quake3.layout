@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release TA Win32" />
-	<File name="..\..\code\renderer\tr_local.h" open="0" top="0" tabpos="0">
-		<Cursor position="11856" topLine="443" />
-	</File>
-	<File name="..\..\code\server\server.h" open="0" top="0" tabpos="0">
-		<Cursor position="3065" topLine="78" />
-	</File>
 </CodeBlocks_layout_file>

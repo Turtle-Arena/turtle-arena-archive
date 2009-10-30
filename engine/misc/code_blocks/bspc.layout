@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug Win32" />
-	<File name="..\..\code\bspc\l_bsp_ent.c" open="0" top="0" tabpos="0">
-		<Cursor position="1144" topLine="24" />
-	</File>
 </CodeBlocks_layout_file>

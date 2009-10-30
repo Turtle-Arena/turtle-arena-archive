@@ -459,6 +459,12 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 		ex->refEntity.rotation = rand() % 360;
 		VectorScale( dir, 16, tmpVec );
 		VectorAdd( tmpVec, origin, newOrigin );
+
+#ifdef TMNTWEAPSYS
+		// Allow sprite explosion to be different sizes.
+		ex->radius = 30;
+		ex->refEntity.radius = 42;
+#endif
 	} else {
 		ex->leType = LE_EXPLOSION;
 		VectorCopy( origin, newOrigin );
@@ -492,6 +498,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 }
 
 
+#ifndef NOBLOOD
 /*
 =================
 CG_Bleed
@@ -528,6 +535,7 @@ void CG_Bleed( vec3_t origin, int entityNum ) {
 #endif
 	}
 }
+#endif
 
 
 

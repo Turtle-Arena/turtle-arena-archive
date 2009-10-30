@@ -20,9 +20,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#ifndef MISSIONPACK
-#error This file not be used for classic Q3A.
-#endif
+//#ifndef MISSIONPACK
+//#error This file not be used for classic Q3A.
+//#endif
+#ifdef MISSIONPACK
 
 #include "cg_local.h"
 #include "../ui/ui_shared.h"
@@ -1247,8 +1248,8 @@ const char *CG_GameTypeString(void) {
 #ifdef MISSIONPACK_HARVESTER
 	} else if ( cgs.gametype == GT_HARVESTER ) {
 		return "Harvester";
-	}
 #endif
+	}
 	return "";
 }
 
@@ -1676,12 +1677,14 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   case CG_RED_FLAGNAME:
     CG_DrawRedFlagName(&rect, scale, color, textStyle);
     break;
+#ifdef MISSIONPACK_HARVESTER
   case CG_HARVESTER_SKULLS:
     CG_HarvesterSkulls(&rect, scale, color, qfalse, textStyle);
     break;
   case CG_HARVESTER_SKULLS2D:
     CG_HarvesterSkulls(&rect, scale, color, qtrue, textStyle);
     break;
+#endif
   case CG_ONEFLAG_STATUS:
     CG_OneFlagStatus(&rect);
     break;
@@ -1908,3 +1911,5 @@ void CG_GetTeamColor(vec4_t *color) {
 	}
 }
 
+
+#endif // MISSIONPACK

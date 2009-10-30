@@ -573,6 +573,10 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 		Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s\n", svs.loadgame));
 		svs.loadgame[0] = '\0';
 	}
+	else
+	{
+		// Turtle Man: TODO: Call G_LoadPersistant here?
+	}
 #endif
 
 	// run another frame to allow things to look at all the players

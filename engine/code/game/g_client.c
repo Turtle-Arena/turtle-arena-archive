@@ -775,13 +775,17 @@ void G_LoadPlayer(int clientNum, const char *inModelName)
 {
     char *p;
     char model[MAX_QPATH];
-    char filename[MAX_QPATH];
     gentity_t *ent;
     gclient_t *client;
     bg_playercfg_t *playercfg;
+#ifdef TMNTWEAPSYS
     weapon_t oldDefault;
+#endif
+#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+    char filename[MAX_QPATH];
 #ifdef IOQ3ZTM // PLAYER_DIR
 	int i;
+#endif
 #endif
 
 	ent = &g_entities[clientNum];
@@ -797,6 +801,11 @@ void G_LoadPlayer(int clientNum, const char *inModelName)
 
 #ifdef TMNTWEAPSYS_1 // GAME_TAGS
 	// Load model tags
+
+	// Currently uses models, so they are invalid after vid_restart / level change...?
+	client->pers.torsoTags = 0;
+	client->pers.legsTags = 0;
+
 #ifdef IOQ3ZTM // PLAYER_DIR
 	for (i = 0; bg_playerDirs[i] != NULL; i++)
 	{
@@ -815,11 +824,13 @@ void G_LoadPlayer(int clientNum, const char *inModelName)
 	// Server doesn't have the player,,, fall back to DEFAULT_MODEL
 	if (!client->pers.torsoTags)
 	{
-		client->pers.torsoTags = trap_RegisterTags("models/players/raph/upper.md3");
+		Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", DEFAULT_MODEL );
+		client->pers.torsoTags = trap_RegisterTags(filename);
 	}
 	if (!client->pers.legsTags)
 	{
-		client->pers.legsTags = trap_RegisterTags("models/players/raph/lower.md3");
+		Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", DEFAULT_MODEL );
+		client->pers.legsTags = trap_RegisterTags(filename);
 	}
 #else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", model );
@@ -838,36 +849,21 @@ void G_LoadPlayer(int clientNum, const char *inModelName)
 #endif
 #endif
 
-
 	// Check if player has really changed!
-#ifdef IOQ3ZTM // PLAYER_DIR
-	for (i = 0; bg_playerDirs[i] != NULL; i++)
-	{
-		Com_sprintf( filename, sizeof( filename ), "%s/%s/animation.cfg", bg_playerDirs[i], model );
 		if ( Q_stricmpn(model, playercfg->filename, MAX_QPATH) == 0 ) {
 			// no change
 			return;
 		}
-	}
-#else
-	Com_sprintf( filename, sizeof( filename ), "models/players/%s/animation.cfg", model );
-	if ( Q_stricmpn(model, playercfg->filename, MAX_QPATH) == 0 ) {
-		// no change
-		return;
-	}
-	Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/animation.cfg", model );
-	if ( Q_stricmpn(model, playercfg->filename, MAX_QPATH) == 0 ) {
-		// no change
-		return;
-	}
-#endif
+
+	// Turtle Man: NOTE: This message was used to tell how many times a client get playercfg loaded.
+	//G_Printf("DEBUG: Changed player old=%s, new=%s\n", playercfg->filename, model);
 
 	// Load animation.cfg
 	if (!model[0] || !BG_LoadPlayerCFGFile(model, playercfg))
 	{
 		G_Printf("G_LoadPlayer: Loading player failed (%s)\n", inModelName);
-		// Default to raph.
-		Q_strncpyz(model, "raph"/*DEFAULT_MODEL ...cg local*/, MAX_QPATH);
+		// Fall back to DEFAULT_MODEL
+		Q_strncpyz(model, DEFAULT_MODEL, MAX_QPATH);
 		if (!BG_LoadPlayerCFGFile(model, playercfg))
 		{
 			G_Printf("G_LoadPlayer: Loading default player failed (%s)\n", inModelName);
@@ -1022,16 +1018,18 @@ void ClientUserinfoChanged( int clientNum ) {
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "spheadmodel"), sizeof( headModel ) );
 	} else
 #endif
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
 	if( g_gametype.integer >= GT_TEAM ) {
 		Q_strncpyz( model, Info_ValueForKey (userinfo, "team_model"), sizeof( model ) );
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "team_headmodel"), sizeof( headModel ) );
-	} else {
+	} else
+#endif
+	{
 		Q_strncpyz( model, Info_ValueForKey (userinfo, "model"), sizeof( model ) );
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "headmodel"), sizeof( headModel ) );
 	}
 
 #ifdef TMNTPLAYERSYS
-    // Load game.cfg
     G_LoadPlayer(clientNum, model);
 #endif
 
@@ -1281,14 +1279,18 @@ void ClientBegin( int clientNum ) {
 	memset( &client->ps, 0, sizeof( client->ps ) );
 	client->ps.eFlags = flags;
 
+#ifdef TMNTPLAYERSYS
+	G_LoadPlayer(clientNum, client->pers.playercfg.filename);
+#endif
+
 	// locate ent at a spawn point
 	ClientSpawn( ent );
 
-	if (
+	if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
 #ifdef TMNTSP
-	!g_singlePlayer.integer &&
+		if (!(g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER))
+		{
 #endif
-	client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		// send event
 		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
 		tent->s.clientNum = ent->s.clientNum;
@@ -1296,6 +1298,9 @@ void ClientBegin( int clientNum ) {
 		if ( g_gametype.integer != GT_TOURNAMENT  ) {
 			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
 		}
+#ifdef TMNTSP
+		}
+#endif
 	}
 	G_LogPrintf( "ClientBegin: %i\n", clientNum );
 
@@ -1416,6 +1421,10 @@ void ClientSpawn(gentity_t *ent) {
 	// increment the spawncount so the client will detect the respawn
 	client->ps.persistant[PERS_SPAWN_COUNT]++;
 	client->ps.persistant[PERS_TEAM] = client->sess.sessionTeam;
+
+#ifdef TMNT // EF_TELE_EFFECT
+	client->teleEffectTime = level.time;
+#endif
 
 	client->airOutTime = level.time + 12000;
 
@@ -1624,9 +1633,10 @@ void ClientSpawn(gentity_t *ent) {
 #ifdef TMNTSP
 	//
 	// Load persistant data
-	// Turtle Man: FIXME: Load after all clients have spawned!
 	//
-	G_LoadPersistant(); // get data
+	// Turtle Man: TODO: Load after all clients have spawned?
+	//
+	G_LoadPersistant(index); // get data
 #endif
 
 	// run a client frame to drop exactly to the floor,
@@ -1752,7 +1762,7 @@ after each level in SinglePlayer.
 
 Should allow 64 client single player games...
 
-Save the lives, score, and holdable stuff.
+Save the lives (todo), score, and holdable stuff.
 ================*/
 void G_SavePersistant(char *nextmap)
 {
@@ -1767,7 +1777,7 @@ void G_SavePersistant(char *nextmap)
 #endif
 	int skill;
 
-	// If in real single player auto-save on save end? in case of crash or something?...
+	// If in real single player auto-save on level end? in case of crash or something?...
 	if (g_singlePlayer.integer) {
 		trap_SendConsoleCommand( EXEC_APPEND, va("savegame autosave -minimum %s", nextmap) );
 	}
@@ -1854,9 +1864,9 @@ void G_SavePersistant(char *nextmap)
 	}
 }
 
-void G_LoadPersistant(void)
+void G_LoadPersistant(int clientnum)
 {
-	char savedata[1000];
+	char savedata[MAX_CVAR_VALUE_STRING+1];
 	gclient_t *client;
 	int h, i;
 	char *config;
@@ -1868,6 +1878,12 @@ void G_LoadPersistant(void)
 #endif
 	char currentMap[MAX_QPATH];
 	int skill;
+
+	// Single Player and Co-op only
+	if (g_gametype.integer != GT_SINGLE_PLAYER)
+	{
+		return;
+	}
 
 	//trap_SendConsoleCommand( EXEC_APPEND, "loadgame autosave" );
 
@@ -1919,7 +1935,7 @@ void G_LoadPersistant(void)
 		trap_Cvar_VariableStringBuffer(va("g_spSaveData%i", h), savedata, sizeof(savedata));
 		config = savedata;
 
-		if (!strlen(savedata)) {
+		if (strlen(savedata) < 1) {
 			continue; // nothing to load.
 		}
 
@@ -1927,17 +1943,28 @@ void G_LoadPersistant(void)
 		// Turtle Man: FIXME: what if player changes there name at intermission?
 		//                    Do the clients stay in the same indexes?
 		s = Info_ValueForKey(config, "n");
+		if (strlen(s) < 1)
+			continue;
+#if 1 // CLIENTNUM
+		// Check if clientnum
+		client = &level.clients[clientnum];
+
+		if (strlen(client->pers.netname) < 1)
+			return;
+		if (strcmp(client->pers.netname, s) != 0)
+			continue;
+#else
 		for (i = 0; i < level.maxclients; i++)
 		{
 			client = &level.clients[i];
-			if (strlen(s) < 1)
+			if (strlen(client->pers.netname) < 1)
 				continue;
 			if (strcmp(client->pers.netname, s) == 0)
-			{
 				break;
 			}
-		}
+
 		if (i < level.maxclients)
+#endif
 		{
 #ifndef TMNTRELEASE
 			G_Printf("DEBUG: LOADING SP DATA FOR %s\n", s);
@@ -1965,7 +1992,9 @@ void G_LoadPersistant(void)
 		trap_Cvar_Set(va("g_spSaveData%i", h),"");
 	}
 
+#if 0 // CLIENTNUM // Need it so can load all clients.
 	trap_Cvar_Set("g_spSaveData", "");
+#endif
 }
 #else
 /*
@@ -1979,8 +2008,10 @@ void G_SavePersistant(char *nextmap)
 /*
 	Reloaded data from file...
 */
-void G_LoadPersistant(void)
+void G_LoadPersistant(int clientnum)
 {
+	(void)clientnum;
+
 	int save_loading = trap_Cvar_VariableIntegerValue("ui_spSaveLoading");
 	//G_Printf("ui_spSaveLoading = %d\n", save_loading);
 	if (save_loading == 2 || save_loading == 3) // level change or restart

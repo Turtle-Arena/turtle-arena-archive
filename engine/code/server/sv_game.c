@@ -289,7 +289,7 @@ void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) {
 // Turtle Man: FIXME: This should NOT use render functions (Can't use in ded server!)
 //        We only need the tags so we don't need the load the "model"!
 //    After I replace using models here, should non-ded still use models?
-//        (Use less memory reuse cache etc?)
+//        (Use less memory by reusing cache etc?)
 #ifndef DEDICATED
 int RE_RegisterModel( const char *name );
 int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
@@ -903,6 +903,10 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case TRAP_CEIL:
 		return FloatAsInt( ceil( VMF(1) ) );
 
+#ifdef IOQ3ZTM3
+	case TRAP_ACOS:
+		return FloatAsInt( acos( VMF(1) ) );
+#endif
 
 	default:
 		Com_Error( ERR_DROP, "Bad game system trap: %ld", (long int) args[0] );

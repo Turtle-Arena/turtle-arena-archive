@@ -248,8 +248,14 @@ static void Demos_MenuInit( void ) {
 		
 		// strip extension
 		len = strlen( demoname );
+#ifdef IOQ3ZTM // back ported from missionpack ui.
+		if (!Q_stricmp(demoname +  len - strlen(extension), extension)) {
+			demoname[len-strlen(extension)-1] = '\0';
+		}
+#else
 		if (!Q_stricmp(demoname +  len - 4,".dm3"))
 			demoname[len-4] = '\0';
+#endif
 
 //		Q_strupr(demoname);
 

@@ -111,6 +111,7 @@ or generates more localentities along a trail.
 ====================================================================================
 */
 
+#ifndef NOTRATEDM // No gibs.
 /*
 ================
 CG_BloodTrail
@@ -146,6 +147,7 @@ void CG_BloodTrail( localEntity_t *le ) {
 		blood->pos.trDelta[2] = 40;
 	}
 }
+#endif
 
 
 /*
@@ -525,7 +527,19 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 	re.shaderRGBA[3] = 0xff * c * 0.33;
 
 	re.reType = RT_SPRITE;
+#ifdef TMNTWEAPSYS // SPR_EXP_SCALE
+	// CG_MakeExplosion
+	//if (le->radius > 0 && le->refEntity.radius > 0)
+	//{
+		re.radius = le->refEntity.radius * ( 1.0 - c ) + le->radius;
+	//}
+	//else
+	//{
+	//	re.radius = 42 * ( 1.0 - c ) + 30;
+	//}
+#else
 	re.radius = 42 * ( 1.0 - c ) + 30;
+#endif
 
 	trap_R_AddRefEntityToScene( &re );
 

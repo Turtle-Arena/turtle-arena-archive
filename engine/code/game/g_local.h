@@ -421,6 +421,9 @@ struct gclient_s {
 #ifdef TMNTSP
 	int			finishTime; // when the client finished the level.
 #endif
+#ifdef TMNT // EF_TELE_EFFECT
+	int			teleEffectTime;
+#endif
 
 	qboolean	fireHeld;			// used for hook
 	gentity_t	*hook;				// grapple hook if out
@@ -620,9 +623,9 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin );
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 const char *BuildShaderStateConfig( void );
 
-#ifdef TMNTWEAPONS
-gentity_t *G_FindRadius(gentity_t *from, vec3_t org, float rad);
-qboolean G_Visible(gentity_t *ent1, gentity_t *ent2);
+#ifdef TMNTWEAPONS // XREAL r2785
+gentity_t *G_FindRadius(gentity_t *from, const vec3_t org, float rad);
+qboolean G_IsVisible(const gentity_t *self, const vec3_t goal);
 #endif
 
 //
@@ -720,8 +723,7 @@ void G_ThrowShuriken(gentity_t *ent, holdable_t holdable);
 #ifdef TMNTWEAPSYS // MELEEATTACK
 qboolean G_MeleeAttack( gentity_t *ent, qboolean nodamage );
 void G_StartMeleeAttack(gentity_t *ent);
-#endif
-#ifndef TMNTWEAPONS
+#else
 qboolean CheckGauntletAttack( gentity_t *ent );
 #endif
 void Weapon_HookFree (gentity_t *ent);
@@ -946,7 +948,7 @@ extern	gentity_t		g_entities[MAX_GENTITIES];
 
 #ifdef TMNTSP // save/load
 void G_SavePersistant(char *nextmap);
-void G_LoadPersistant(void);
+void G_LoadPersistant(int clientnum);
 #endif
 #ifdef SP_NPC
 // Turtle Man: Changed int to size_t
@@ -982,7 +984,9 @@ extern	vmCvar_t	g_synchronousClients;
 extern	vmCvar_t	g_motd;
 extern	vmCvar_t	g_warmup;
 extern	vmCvar_t	g_doWarmup;
+#ifndef NOBLOOD
 extern	vmCvar_t	g_blood;
+#endif
 extern	vmCvar_t	g_allowVote;
 extern	vmCvar_t	g_teamAutoJoin;
 extern	vmCvar_t	g_teamForceBalance;

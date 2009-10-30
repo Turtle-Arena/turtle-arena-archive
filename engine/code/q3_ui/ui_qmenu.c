@@ -480,6 +480,9 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 		case K_KP_ENTER:
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+		case K_MOUSE2:
+#endif
 		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 			rb->curvalue = !rb->curvalue;
@@ -598,6 +601,9 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 				sound = 0;
 			break;
 
+#if 0 //#ifdef TMNTMISC // MENU: Right Mouse button = left arrow // NOT HERE.
+		case K_MOUSE2:
+#endif
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
 			if (s->curvalue > s->minvalue)
@@ -811,14 +817,27 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 	switch (key)
 	{
 		case K_MOUSE1:
+#ifdef TMNTMISC // MENU: listbox goes around.
+		case K_KP_RIGHTARROW:
+		case K_RIGHTARROW:
+#endif
 			s->curvalue++;
 			if (s->curvalue >= s->numitems)
 				s->curvalue = 0;
 			sound = menu_move_sound;
 			break;
 		
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+		case K_MOUSE2:
+#endif
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
+#ifdef TMNTMISC // MENU: listbox goes around.
+			s->curvalue--;
+			if (s->curvalue < 0)
+				s->curvalue = s->numitems-1;
+			sound = menu_move_sound;
+#else
 			if (s->curvalue > 0)
 			{
 				s->curvalue--;
@@ -826,8 +845,10 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 			}
 			else
 				sound = menu_buzz_sound;
+#endif
 			break;
 
+#ifndef TMNTMISC // MENU: listbox goes around.
 		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 			if (s->curvalue < s->numitems-1)
@@ -838,6 +859,7 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 			else
 				sound = menu_buzz_sound;
 			break;
+#endif
 	}
 
 	if ( sound && s->generic.callback )
@@ -1106,6 +1128,9 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 
 			return menu_move_sound;
 
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+		case K_MOUSE2:
+#endif
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
 			if( l->columns == 1 ) {
@@ -1600,7 +1625,9 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 	// menu system keys
 	switch ( key )
 	{
+#ifndef TMNTMISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
+#endif
 		case K_ESCAPE:
 			UI_PopMenu();
 			return menu_out_sound;
@@ -1726,7 +1753,7 @@ void Menu_Cache( void )
 {
 	uis.charset			= trap_R_RegisterShaderNoMip( "gfx/2d/bigchars" );
 	uis.charsetProp		= trap_R_RegisterShaderNoMip( "menu/art/font1_prop.tga" );
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 	uis.charsetPropGlow	= trap_R_RegisterShaderNoMip( "menu/art/font1_prop_glo.tga" );
 #endif
 	uis.charsetPropB	= trap_R_RegisterShaderNoMip( "menu/art/font2_prop.tga" );

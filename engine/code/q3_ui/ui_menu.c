@@ -43,13 +43,20 @@ MAIN MENU
 #endif
 #define ID_EXIT					17
 
+#ifdef TMNT // BANNER_IMAGE
+#define ART_BANNER_IMAGE				"ui/assets/titlebanner"
+#else
 #define MAIN_BANNER_MODEL				"models/mapobjects/banner/banner5.md3"
+#endif
 #define MAIN_MENU_VERTICAL_SPACING		34
 
 
 typedef struct {
 	menuframework_s	menu;
 
+#ifdef TMNT // BANNER_IMAGE
+	menubitmap_s	banner_image;
+#endif
 	menutext_s		singleplayer;
 	menutext_s		multiplayer;
 	menutext_s		setup;
@@ -148,7 +155,9 @@ MainMenu_Cache
 ===============
 */
 void MainMenu_Cache( void ) {
+#ifndef TMNT // BANNER_IMAGE
 	s_main.bannerModel = trap_R_RegisterModel( MAIN_BANNER_MODEL );
+#endif
 }
 
 sfxHandle_t ErrorMessage_Key(int key)
@@ -166,16 +175,19 @@ TTimo: this function is common to the main menu and errorMessage menu
 */
 
 static void Main_MenuDraw( void ) {
+#ifndef TMNT // BANNER_IMAGE
 	refdef_t		refdef;
 	refEntity_t		ent;
 	vec3_t			origin;
 	vec3_t			angles;
 	float			adjust;
 	float			x, y, w, h;
+#endif
 #if !defined TMNT && !defined SONIC
 	vec4_t			color = {0.5, 0, 0, 1};
 #endif
 
+#ifndef TMNT // BANNER_IMAGE
 	// setup the refdef
 
 	memset( &refdef, 0, sizeof( refdef ) );
@@ -222,6 +234,7 @@ static void Main_MenuDraw( void ) {
 	trap_R_AddRefEntityToScene( &ent );
 
 	trap_R_RenderScene( &refdef );
+#endif
 	
 	if (strlen(s_errorMessage.errorMessage))
 	{
@@ -334,6 +347,16 @@ void UI_MainMenu( void ) {
 	s_main.menu.wrapAround = qtrue;
 	s_main.menu.showlogo = qtrue;
 
+#ifdef TMNT // BANNER_IMAGE
+	s_main.banner_image.generic.type				= MTYPE_BITMAP;
+	s_main.banner_image.generic.name				= ART_BANNER_IMAGE;
+	s_main.banner_image.generic.flags				= QMF_INACTIVE;
+	s_main.banner_image.generic.x					= 90;
+	s_main.banner_image.generic.y					= 36;
+	s_main.banner_image.width  						= 460;
+	s_main.banner_image.height  					= 200;
+#endif
+
 #ifdef TMNTSP
 	y = 480 - (MAIN_MENU_VERTICAL_SPACING * 6);
 #else
@@ -439,6 +462,9 @@ void UI_MainMenu( void ) {
 	s_main.exit.color						= color_red;
 	s_main.exit.style						= style;
 
+#ifdef TMNT // BANNER_IMAGE
+	Menu_AddItem( &s_main.menu,	&s_main.banner_image );
+#endif
 	Menu_AddItem( &s_main.menu,	&s_main.singleplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.multiplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.setup );

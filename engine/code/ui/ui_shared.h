@@ -80,6 +80,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_SCRIPT_ARGS 12
 #define MAX_EDITFIELD 256
 
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 #define ART_FX_BASE			"menu/art/fx_base"
 #define ART_FX_BLUE			"menu/art/fx_blue"
 #define ART_FX_CYAN			"menu/art/fx_cyan"
@@ -88,6 +89,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ART_FX_TEAL			"menu/art/fx_teal"
 #define ART_FX_WHITE		"menu/art/fx_white"
 #define ART_FX_YELLOW		"menu/art/fx_yel"
+#endif
 
 #define ASSET_GRADIENTBAR "ui/assets/gradientbar2.tga"
 #define ASSET_SCROLLBAR             "ui/assets/scrollbar.tga"
@@ -304,8 +306,10 @@ typedef struct {
   qboolean fontRegistered;
 
   // player settings
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	qhandle_t fxBasePic;
   qhandle_t fxPic[7];
+#endif
 	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 
 } cachedAssets_t;

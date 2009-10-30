@@ -37,6 +37,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CONTENTS_NOTTEAM2		0x0100
 #define CONTENTS_NOBOTCLIP		0x0200
 
+#ifdef TMNT // TMNTWEAPONS // XREAL
+// Turtle Man: Used for rockets
+#define CONTENTS_SHOOTABLE		0x0400	// Tr3B: used for game entities that can be destroyed like railgun spheres
+#endif
+
 #define	CONTENTS_AREAPORTAL		0x8000
 
 #define	CONTENTS_PLAYERCLIP		0x10000

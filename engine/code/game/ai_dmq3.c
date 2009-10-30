@@ -2228,7 +2228,9 @@ void BotBattleUseItems(bot_state_t *bs) {
 			if (!BotCTFCarryingFlag(bs)
 #ifdef MISSIONPACK
 				&& !Bot1FCTFCarryingFlag(bs)
+#ifdef MISSIONPACK_HARVESTER
 				&& !BotHarvesterCarryingCubes(bs)
+#endif
 #endif
 				) {
 				trap_EA_Use(bs->client
@@ -3168,8 +3170,7 @@ bot_moveresult_t BotAttackMove(bot_state_t *bs, int tfl) {
 		}
 	}
 #ifdef TMNTWEAPONS
-	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))
-		|| BG_WeaponTypeForPlayerState(&bs->cur_ps) == WT_GAUNTLET) {
+	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))) {
 #else
 	if (bs->cur_ps.weapon == WP_GAUNTLET) {
 #endif
@@ -4114,8 +4115,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	VectorSubtract(bs->aimtarget, bs->eye, dir);
 	//
 #ifdef TMNTWEAPONS
-	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))
-		|| BG_WeaponTypeForPlayerState(&bs->cur_ps) == WT_GAUNTLET) {
+	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))) {
 #else
 	if (bs->weaponnum == WP_GAUNTLET) {
 #endif

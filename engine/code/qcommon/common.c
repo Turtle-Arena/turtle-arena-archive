@@ -76,7 +76,9 @@ cvar_t	*com_cl_running;
 cvar_t	*com_logfile;		// 1 = buffer log, 2 = flush after each print
 cvar_t	*com_showtrace;
 cvar_t	*com_version;
+#ifndef NOBLOOD
 cvar_t	*com_blood;
+#endif
 cvar_t	*com_buildScript;	// for automated data building scripts
 cvar_t	*com_introPlayed;
 cvar_t	*cl_paused;
@@ -2603,10 +2605,12 @@ void Com_Init( char *commandLine ) {
 	//
 	com_altivec = Cvar_Get ("com_altivec", "1", CVAR_ARCHIVE);
 	com_maxfps = Cvar_Get ("com_maxfps", "85", CVAR_ARCHIVE);
-#ifndef NOTRATEDM // Turtle Man: Default to no blood.
+#ifndef NOBLOOD
+#ifdef NOTRATEDM // Turtle Man: Default to no blood.
 	com_blood = Cvar_Get ("com_blood", "0", CVAR_ARCHIVE);
 #else
 	com_blood = Cvar_Get ("com_blood", "1", CVAR_ARCHIVE);
+#endif
 #endif
 
 	com_developer = Cvar_Get ("developer", "0", CVAR_TEMP );
@@ -2624,7 +2628,11 @@ void Com_Init( char *commandLine ) {
 	// Get client game vars.
 	cl_thirdPerson = Cvar_Get ("cg_thirdPerson", "1", 0);
 	cl_thirdPersonAngle = Cvar_Get ("cg_thirdPersonAngle", "0", 0);
+#ifdef TMNTMISC // FOV
+	cl_thirdPersonRange = Cvar_Get ("cg_thirdPersonRange", "70", 0);
+#else
 	cl_thirdPersonRange = Cvar_Get ("cg_thirdPersonRange", "40", 0);
+#endif
 	cl_thirdPersonAnalog = Cvar_Get ("cg_thirdPersonAnalog", "1", 0);
 #endif
 
@@ -3049,6 +3057,7 @@ void Com_Shutdown (void) {
 //------------------------------------------------------------------------
 
 
+#ifndef IOQ3ZTM3 // TMNTWEAPONS // XREAL
 /*
 =====================
 Q_acos
@@ -3076,6 +3085,7 @@ float Q_acos(float c) {
 	}
 	return angle;
 }
+#endif
 
 /*
 ===========================================

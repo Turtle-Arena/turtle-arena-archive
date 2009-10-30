@@ -655,7 +655,11 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_CEIL:
 		return FloatAsInt( ceil( VMF(1) ) );
 	case CG_ACOS:
+#ifdef IOQ3ZTM3
+		return FloatAsInt( acos( VMF(1) ) );
+#else
 		return FloatAsInt( Q_acos( VMF(1) ) );
+#endif
 
 	case CG_PC_ADD_GLOBAL_DEFINE:
 		return botlib_export->PC_AddGlobalDefine( VMA(1) );

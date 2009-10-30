@@ -224,7 +224,9 @@ static void UI_SPLevelMenu_SetMenuArena( int n, int level, const char *arenaInfo
 	Q_strncpyz( map, Info_ValueForKey( arenaInfo, "map" ), sizeof(map) );
 
 	Q_strncpyz( levelMenuInfo.levelNames[n], map, sizeof(levelMenuInfo.levelNames[n]) );
+#ifndef IOQ3ZTM // Breaks on linux without pak files.
 	Q_strupr( levelMenuInfo.levelNames[n] );
+#endif
 
 	UI_GetBestScore( level, &levelMenuInfo.levelScores[n], &levelMenuInfo.levelScoresSkill[n] );
 	if( levelMenuInfo.levelScores[n] > 8 ) {
@@ -650,7 +652,9 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	// show map name and long name of selected level
 	y = 192;
 	Q_strncpyz( buf, Info_ValueForKey( levelMenuInfo.selectedArenaInfo, "map" ), 20 );
+#ifndef IOQ3ZTM // Breaks on linux without pak files.
 	Q_strupr( buf );
+#endif
 	Com_sprintf( string, sizeof(string), "%s: %s", buf, Info_ValueForKey( levelMenuInfo.selectedArenaInfo, "longname" ) );
 	UI_DrawProportionalString( 320, y, string, UI_CENTER|UI_SMALLFONT, color_orange );
 

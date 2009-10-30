@@ -91,29 +91,49 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	trap_LinkEntity( ent );
 }
 
+#ifdef TMNTWEAPONS
+/*
+================
+G_Missile_Die
+
+From XREAL r3036
+================
+*/
+static void G_Missile_Die(gentity_t * ent, gentity_t * inflictor, gentity_t * attacker, int damage, int mod)
+{
+	ent->nextthink = level.time + 1;
+	ent->think = G_ExplodeMissile;
+}
+#endif
+
 #ifdef TMNTHOLDABLE
 /*
 =================
-fire_rocket
+fire_shuriken
 =================
 */
 gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t dir, holdable_t holdable) {
 	gentity_t	*bolt;
+	vec3_t          mins = { -8, -8, -8 };
+	vec3_t			maxs = { 8, 8, 8 };
 
 	VectorNormalize (dir);
 
 	bolt = G_Spawn();
 
+	// So that CG_Shuriken has the right yaw.
+	bolt->s.angles[1] = self->client->ps.viewangles[1];
+
 	// Shuriken: 10 damage.
 	// Electric Shuriken: Low Damage (5) TODO: Stun player and electricfy water.
 	// Fire Shuriken: Higher damage (15), plus explode
-	// Laser Shuriken: Faster, bounce (max of 10), low damage (5).
+	// Laser Shuriken: Faster, bounce (max of 3), low damage (7).
 
 	if (holdable == HI_LASERSHURIKEN)
 	{
 		bolt->classname = "thrown laser shuriken";
 		bolt->s.eFlags = EF_BOUNCE;
-		bolt->s.generic1 = 10; // Limit to 10 bounces.
+		bolt->s.generic1 = 3; // Die on 3rd bounce
 
 		bolt->damage = 7;
 		bolt->splashDamage = 0;
@@ -122,6 +142,18 @@ gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t dir, holdable_t 
 		bolt->splashMethodOfDeath = MOD_UNKNOWN;
 
 		VectorScale( dir, 400, bolt->s.pos.trDelta );
+	}
+	else if (holdable == HI_FIRESHURIKEN)
+	{
+		bolt->classname = "thrown fire shuriken";
+
+		bolt->damage = 15;
+		bolt->splashDamage = 100;//15;
+		bolt->splashRadius = 120;//60; //120;
+		bolt->methodOfDeath = MOD_FIRESHURIKEN;
+		bolt->splashMethodOfDeath = MOD_FIRESHURIKEN_EXPLOSION;
+
+		VectorScale( dir, 700, bolt->s.pos.trDelta );
 	}
 	else if (holdable == HI_ELECTRICSHURIKEN)
 	{
@@ -132,18 +164,6 @@ gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t dir, holdable_t 
 		bolt->splashRadius = 0;
 		bolt->methodOfDeath = MOD_ELECTRICSHURIKEN;
 		bolt->splashMethodOfDeath = MOD_UNKNOWN;
-
-		VectorScale( dir, 700, bolt->s.pos.trDelta );
-	}
-	else if (holdable == HI_FIRESHURIKEN)
-	{
-		bolt->classname = "thrown fire shuriken";
-
-		bolt->damage = 15;
-		bolt->splashDamage = 15;
-		bolt->splashRadius = 120;
-		bolt->methodOfDeath = MOD_FIRESHURIKEN;
-		bolt->splashMethodOfDeath = MOD_FIRESHURIKEN_EXPLOSION;
 
 		VectorScale( dir, 700, bolt->s.pos.trDelta );
 	}
@@ -176,6 +196,14 @@ gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t dir, holdable_t 
 	VectorCopy( start, bolt->s.pos.trBase );
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 	VectorCopy (start, bolt->r.currentOrigin);
+
+	// make the rocket shootable
+	bolt->r.contents = CONTENTS_SHOOTABLE;
+	VectorCopy(mins, bolt->r.mins);
+	VectorCopy(maxs, bolt->r.maxs);
+	bolt->takedamage = qtrue;
+	bolt->health = 10;
+	bolt->die = G_Missile_Die;
 
 	return bolt;
 }
@@ -297,12 +325,15 @@ static void ProximityMine_ExplodeOnPlayer( gentity_t *mine ) {
 	player = mine->enemy;
 	player->client->ps.eFlags &= ~EF_TICKING;
 
+#ifndef TMNT // POWERS
 	if ( player->client->invulnerabilityTime > level.time ) {
 		G_Damage( player, mine->parent, mine->parent, vec3_origin, mine->s.origin, 1000, DAMAGE_NO_KNOCKBACK, MOD_JUICED );
 		player->client->invulnerabilityTime = 0;
 		G_TempEntity( player->client->ps.origin, EV_JUICED );
 	}
-	else {
+	else
+#endif
+	{
 		G_SetOrigin( mine, player->s.pos.trBase );
 		// make sure the explosion gets to the client
 		mine->r.svFlags &= ~SVF_NOCLIENT;
@@ -341,10 +372,13 @@ static void ProximityMine_Player( gentity_t *mine, gentity_t *player ) {
 
 	mine->enemy = player;
 	mine->think = ProximityMine_ExplodeOnPlayer;
+#ifndef TMNT // POWERS
 	if ( player->client->invulnerabilityTime > level.time ) {
 		mine->nextthink = level.time + 2 * 1000;
 	}
-	else {
+	else
+#endif
+	{
 		mine->nextthink = level.time + 10 * 1000;
 	}
 }
@@ -368,8 +402,11 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	if ( !other->takedamage &&
 		( ent->s.eFlags & ( EF_BOUNCE | EF_BOUNCE_HALF ) ) ) {
 		G_BounceMissile( ent, trace );
-#ifdef TMNTHOLDABLE
-		// Limit to 10 bounces
+#ifdef TMNTHOLDABLE // HI_LASERSHURIKEN
+		// If its a laser shuriken
+		if (ent->s.weapon == WP_NUM_WEAPONS+HI_LASERSHURIKEN)
+		{
+			// Die on 3rd bounce
 		if (ent->s.generic1) // generic1 is used by Prox Mines, but they don't have EF_BOUNCE
 		{
 			--ent->s.generic1;
@@ -382,7 +419,13 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			}
 		}
 		G_AddEvent( ent, EV_LASERSHURIKEN_BOUNCE, 0 );
-#else
+			G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
+		}
+#ifndef TMNTWEAPONS
+		else
+#endif
+#endif
+#ifndef TMNTWEAPONS
 		G_AddEvent( ent, EV_GRENADE_BOUNCE, 0 );
 #endif
 		return;
@@ -429,8 +472,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 	}
 
-#ifndef TMNTWEAPONS // missionpack
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 	if( ent->s.weapon == WP_PROX_LAUNCHER ) {
 		if( ent->s.pos.trType != TR_GRAVITY ) {
 			return;
@@ -465,7 +507,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 		return;
 	}
-#endif
 #endif
 
 	if (!strcmp(ent->classname, "hook")) {
@@ -564,13 +605,11 @@ void G_RunMissile( gentity_t *ent ) {
 	if ( ent->target_ent ) {
 		passent = ent->target_ent->s.number;
 	}
-#ifndef TMNTWEAPONS // missionpack
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 	// prox mines that left the owner bbox will attach to anything, even the owner
 	else if (ent->s.weapon == WP_PROX_LAUNCHER && ent->count) {
 		passent = ENTITYNUM_NONE;
 	}
-#endif
 #endif
 	else {
 		// ignore interactions with the missile owner
@@ -607,8 +646,7 @@ void G_RunMissile( gentity_t *ent ) {
 			return;		// exploded
 		}
 	}
-#ifndef TMNTWEAPONS // missionpack
-#ifdef MISSIONPACK
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 	// if the prox mine wasn't yet outside the player body
 	if (ent->s.weapon == WP_PROX_LAUNCHER && !ent->count) {
 		// check if the prox mine is outside the owner bbox
@@ -618,7 +656,6 @@ void G_RunMissile( gentity_t *ent ) {
 		}
 	}
 #endif
-#endif // TMNTWEAPONS
 	// check think function after bouncing
 	G_RunThink( ent );
 }
@@ -666,141 +703,227 @@ gentity_t *fire_gun(gentity_t *self, vec3_t start, vec3_t dir) {
 
 //=============================================================================
 
-// start HOMING
-void G_HomingMissile( gentity_t *ent )
-{
-#if 0
-	// Turtle Man: TODO: Rewrite homing rocket thinker
+/*
+================
+G_HomingMissile
 
-#else
-// Turtle Man: FIXME: NON-GPL code from QuakeStyle
-// HOMING code is by "Ukai Naoto" of QuakeStyle
-//  http://quakestyle.telefragged.com/quake3/tutorial12.htm
+From XREAL r3036
+================
+*/
+void G_HomingMissile(gentity_t * ent)
+{
 	gentity_t	*target = NULL;
 	gentity_t	*blip = NULL;
-	vec3_t  dir, blipdir, temp_dir;
+	vec3_t          dir, blipdir;
+	vec_t           angle;
+	//qboolean        chaff;
+	//qboolean        ignorechaff = qfalse;
+	const int		HOMING_THINK_TIME = 60;
 
-	while ((blip = G_FindRadius(blip, ent->r.currentOrigin, 2000)) != NULL) {
-		if (blip->client == NULL)		continue;
-		if (blip == ent->parent)		continue;
-		if (blip->health <= 0)			continue;
-		if (blip->client->sess.sessionTeam == TEAM_SPECTATOR)
+#if 0 // Turtle Man: FIXME: need to add spawnTime for this to work.
+	// explode after 15 seconds without a hit
+	if (ent->spawnTime + 15000 <= level.time)
+	{
+		G_ExplodeMissile(ent);
+		return;
+	}
+#endif
+
+	/*
+	if(ent->parent->health <= 0)
+	{
+		ent->nextthink = level.time + 15000;
+		ent->think = G_ExplodeMissile;
+		return;
+	}
+	*/
+
+	/*
+	if(ent->parent && ent->parent->client)
+	{
+		ignorechaff = (ent->parent->client->ps.powerups[PW_ACCURACY] > 0);
+	}
+	*/
+
+	while((blip = G_FindRadius(blip, ent->r.currentOrigin, 2000)) != NULL)
+	{
+#if 0
+		if(blip->s.weapon == WP_CHAFF)
+		{
+			if(ignorechaff)
+			{
+				continue;
+			}
+
+			chaff = qtrue;
+		}
+		else
+#endif
+		{
+			//chaff = qfalse;
+
+			if(blip->client == NULL)
+				continue;
+
+			if(blip == ent->parent)
+				continue;
+
+			if(blip->health <= 0)
 			continue;
 
-		if ((g_gametype.integer == GT_TEAM || g_gametype.integer == GT_CTF) &&
-			blip->client->sess.sessionTeam == ent->parent->client->sess.sessionTeam)
+			if(blip->client->sess.sessionTeam >= TEAM_SPECTATOR)
 			continue;
-		// In old code, this ent->parent->client was blip->parent->client,
-		// So didn't work in CTF and team deathmatch. Now it will work.
 
-		if (!G_Visible(ent, blip))
+#if 1 // Turtle Man
+			if(g_gametype.integer >= GT_TEAM && OnSameTeam(blip, ent->parent))
+#else
+			if((g_gametype.integer == GT_TEAM || g_gametype.integer == GT_CTF) && OnSameTeam(blip, ent->parent))
+#endif
+				continue;
+		}
+
+		if(!G_IsVisible(ent, blip->r.currentOrigin))
 			continue;
 
 		VectorSubtract(blip->r.currentOrigin, ent->r.currentOrigin, blipdir);
-		blipdir[2] += 16;
-		if ((target == NULL) || (VectorLength(blipdir) < VectorLength(dir)))
+
+		//if(chaff)
+		//{
+		//	VectorScale(blipdir, 0.5, blipdir);
+		//}
+
+		if((target == NULL) || (VectorLength(blipdir) < VectorLength(dir)))
 		{
-			//if new target is the nearest
-			VectorCopy(blipdir,temp_dir);
-			VectorNormalize(temp_dir);
-			VectorAdd(temp_dir,ent->r.currentAngles,temp_dir);
-			//now the longer temp_dir length is the more straight path for the rocket.
-			if(VectorLength(temp_dir)>1.6)
+			//if(chaff)
+			//{
+			//	VectorScale(blipdir, 2, blipdir);
+			//}
+
+			angle = AngleBetweenVectors(ent->r.currentAngles, blipdir);
+
+			if(angle < 120.0f)
 			{
-				//if this 1.6 were smaller,the rocket also get to target the enemy on his back.
+				// We add it as our target
 				target = blip;
 				VectorCopy(blipdir, dir);
 			}
 		}
 	}
 
-	if (target == NULL)	{
-#if 1
-		// Turtle Man: Better luck next time.
-		ent->nextthink = level.time + 500;
-#else
-		ent->nextthink = level.time + 10000;
-		// if once the rocket lose target,it will not search new enemy any more,and go away.
-#endif
-	} else {
-		ent->s.pos.trTime = level.time;
-		VectorCopy(ent->r.currentOrigin, ent->s.pos.trBase );
-		// for exact trajectory calculation,set current point to base.
+	if(target == NULL)
+	{
+		ent->nextthink = level.time + HOMING_THINK_TIME;	// + 10000;
+		ent->think = G_HomingMissile;
+	}
+	else
+	{
+		// for exact trajectory calculation, set current point to base.
+		VectorCopy(ent->r.currentOrigin, ent->s.pos.trBase);
 
 		VectorNormalize(dir);
-		VectorScale(dir, 0.3, dir);
+		// 0.5 is swing rate.
+		VectorScale(dir, 0.5, dir);
 		VectorAdd(dir, ent->r.currentAngles, dir);
-		// this 0.3 is swing rate.this value is cheap,I think.try 0.8 or 1.5.
-		// if you want fastest swing,comment out these 3 lines.
 
+		// turn nozzle to target angle
 		VectorNormalize(dir);
 		VectorCopy(dir, ent->r.currentAngles);
-		// locate nozzle to target
 
-		VectorScale (dir, VectorLength(ent->s.pos.trDelta)*1.1, ent->s.pos.trDelta);
-		// trDelta is actual vector for movement. Because the rockets slow down
-		// when swing large angle, so accelalate them.
-
-		SnapVector (ent->s.pos. trDelta); // save net bandwidth
-		ent->nextthink = level.time + 100; // decrease this value also makes fast swing.
+#if 0 // Turtle Man: XREAL
+		// scale direction, put into trDelta
+		if(g_rocketAcceleration.integer)
+		{
+			// use acceleration instead of linear velocity
+			ent->s.pos.trType = TR_ACCELERATION;
+			ent->s.pos.trAcceleration = g_rocketAcceleration.value;
+			VectorScale(dir, g_rocketVelocity.value, ent->s.pos.trDelta);
 	}
+		else
 #endif
+		{
+			ent->s.pos.trType = TR_LINEAR;
+#if 1 // Turtle Man
+			VectorScale(dir, 450, ent->s.pos.trDelta);
+#else // XREAL
+			VectorScale(dir, g_rocketVelocity.value * 0.25, ent->s.pos.trDelta);
+#endif
+		}
+
+		ent->s.pos.trTime = level.time;
+
+		SnapVector(ent->s.pos.trDelta);	// save net bandwidth
+		ent->nextthink = level.time + HOMING_THINK_TIME;	// decrease this value also makes fast swing
+		ent->think = G_HomingMissile;
+
+		//G_Printf("targeting %s\n", target->classname);
+	}
 }
-//end HOMING
 
 /*
 =================
 fire_homingrocket
 
+Based on XREAL's fire_homing r2785
 =================
 */
-gentity_t *fire_homingrocket(gentity_t *self, vec3_t start, vec3_t dir) {
+gentity_t *fire_homingrocket(gentity_t * self, vec3_t start, vec3_t dir)
+{
 	gentity_t	*bolt;
+	vec3_t          mins = { -8, -8, -8 };
+	vec3_t			maxs = { 8, 8, 8 };
 
-	VectorNormalize (dir);
+	VectorNormalize(dir);
 
 	bolt = G_Spawn();
-	bolt->classname = "homingrocket";
-	// start HOMING
-	bolt->nextthink = level.time + 20;
+	bolt->classname = "homingrocket";//"rocket_homing";
+	bolt->nextthink = level.time + 600;
 	bolt->think = G_HomingMissile;
-	// else HOMING
-	//bolt->nextthink = level.time + 15000;
-	//bolt->think = G_ExplodeMissile;
-	// end HOMING
-	bolt->s.eType = ET_MISSILE;
+	bolt->s.eType = ET_MISSILE; //ET_PROJECTILE;
 	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	// start HOMING
-	bolt->s.weapon = WP_HOMING_LAUNCHER;
-	// else HOMING
-	//bolt->s.weapon = WP_ROCKET_LAUNCHER;
-	// end HOMING
+	bolt->s.weapon = WP_HOMING_LAUNCHER; // WP_ROCKET_LAUNCHER;
 	bolt->r.ownerNum = self->s.number;
 	bolt->parent = self;
-	// start HOMING
-	bolt->damage = 25;
-	bolt->splashDamage = 25;
-	// else HOMING
-	//bolt->damage = 100;
-	//bolt->splashDamage = 100;
-	// end HOMING
-	bolt->splashRadius = 120;
-	// Turtle Man: Changed methods Of Death
-	bolt->methodOfDeath = MOD_HOMING;
-	bolt->splashMethodOfDeath = MOD_HOMING_SPLASH;
+	bolt->damage = 25; // 100;
+	bolt->splashDamage = 25; // 100;
+	bolt->splashRadius = 60; // 120;
+	bolt->methodOfDeath = MOD_HOMING; // MOD_ROCKET;
+	bolt->splashMethodOfDeath = MOD_HOMING_SPLASH; // MOD_ROCKET_SPLASH;
 	bolt->clipmask = MASK_SHOT;
 	bolt->target_ent = NULL;
 
-	bolt->s.pos.trType = TR_LINEAR;
-	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
-	VectorCopy( start, bolt->s.pos.trBase );
-	VectorScale( dir, 450, bolt->s.pos.trDelta ); // speed was 900
-	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
+	// make the rocket shootable
+	bolt->r.contents = CONTENTS_SHOOTABLE;
+	VectorCopy(mins, bolt->r.mins);
+	VectorCopy(maxs, bolt->r.maxs);
+	bolt->takedamage = qtrue;
+	bolt->health = 25; // 50;
+	bolt->die = G_Missile_Die;
 
-	// start HOMING
-	VectorCopy (dir, bolt->r.currentAngles);
-	// end HOMING
+#if 0 // Turtle Man
+	if(g_rocketAcceleration.integer)
+	{
+		// use acceleration instead of linear velocity
+		bolt->s.pos.trType = TR_ACCELERATION;
+		bolt->s.pos.trAcceleration = g_rocketAcceleration.value;
+		VectorScale(dir, g_rocketVelocity.value, bolt->s.pos.trDelta);
+	}
+	else
+#endif
+	{
+	bolt->s.pos.trType = TR_LINEAR;
+#if 1	// Turtle Man
+		VectorScale(dir, 450, bolt->s.pos.trDelta);
+#else
+		VectorScale(dir, g_rocketVelocity.value * 0.25, bolt->s.pos.trDelta);
+#endif
+	}
+
+	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
+	VectorCopy(start, bolt->s.pos.trBase);
+
+	SnapVector(bolt->s.pos.trDelta);	// save net bandwidth
+	VectorCopy(start, bolt->r.currentOrigin);
+
 	return bolt;
 }
 #endif
@@ -946,6 +1069,10 @@ fire_rocket
 */
 gentity_t *fire_rocket (gentity_t *self, vec3_t start, vec3_t dir) {
 	gentity_t	*bolt;
+#ifdef TMNTWEAPONS
+	vec3_t          mins = { -8, -8, -8 };
+	vec3_t			maxs = { 8, 8, 8 };
+#endif
 
 	VectorNormalize (dir);
 
@@ -970,6 +1097,16 @@ gentity_t *fire_rocket (gentity_t *self, vec3_t start, vec3_t dir) {
 	bolt->splashMethodOfDeath = MOD_ROCKET_SPLASH;
 	bolt->clipmask = MASK_SHOT;
 	bolt->target_ent = NULL;
+
+#ifdef TMNTWEAPONS // XREAL r2785
+	// make the rocket shootable
+	bolt->r.contents = CONTENTS_SHOOTABLE;
+	VectorCopy(mins, bolt->r.mins);
+	VectorCopy(maxs, bolt->r.maxs);
+	bolt->takedamage = qtrue;
+	bolt->health = 25;
+	bolt->die = G_Missile_Die;
+#endif
 
 	bolt->s.pos.trType = TR_LINEAR;
 	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
@@ -1013,6 +1150,9 @@ gentity_t *fire_grapple (gentity_t *self, vec3_t start, vec3_t dir) {
 	VectorCopy (start, hook->r.currentOrigin);
 
 	self->client->hook = hook;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
+	self->client->ps.pm_flags |= PMF_GRAPPLE_SHOT;
+#endif
 
 	return hook;
 }

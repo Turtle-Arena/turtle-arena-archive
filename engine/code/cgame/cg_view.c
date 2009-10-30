@@ -486,7 +486,11 @@ static int CG_CalcFov( void ) {
 		// user selectable
 		if ( cgs.dmflags & DF_FIXED_FOV ) {
 			// dmflag to prevent wide fov for all clients
+#ifdef TMNTMISC // FOV
+			fov_x = 70;
+#else
 			fov_x = 90;
+#endif
 		} else {
 			fov_x = cg_fov.value;
 			if ( fov_x < 1 ) {
@@ -554,6 +558,7 @@ static int CG_CalcFov( void ) {
 
 
 
+#ifndef NOBLOOD // Should be NOTRATEDM ?
 /*
 ===============
 CG_DamageBlendBlob
@@ -607,6 +612,7 @@ static void CG_DamageBlendBlob( void ) {
 	ent.shaderRGBA[3] = 200 * ( 1.0 - ((float)t / maxTime) );
 	trap_R_AddRefEntityToScene( &ent );
 }
+#endif
 
 
 /*
@@ -891,10 +897,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	// build cg.refdef
 	inwater = CG_CalcViewValues();
 
+#ifndef NOBLOOD // Should be NOTRATEDM ?
 	// first person blend blobs, done after AnglesToAxis
 	if ( !cg.renderingThirdPerson ) {
 		CG_DamageBlendBlob();
 	}
+#endif
 
 	// build the render lists
 	if ( !cg.hyperspace ) {

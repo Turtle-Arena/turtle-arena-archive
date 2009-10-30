@@ -521,7 +521,7 @@ static void _S_AL_SanitiseVector( vec3_t v, int line )
 }
 
 
-#ifndef IOQ3ZTM_NO_COMPATIBILITY
+#ifndef IOQ3ZTM2
 #define AL_THIRD_PERSON_THRESHOLD_SQ (48.0f*48.0f)
 #endif
 
@@ -574,15 +574,15 @@ S_AL_HearingThroughEntity
 */
 static qboolean S_AL_HearingThroughEntity( int entityNum )
 {
-#ifndef IOQ3ZTM_NO_COMPATIBILITY
+#ifndef IOQ3ZTM2
 	float	distanceSq;
 #endif
 
 	if( clc.clientNum == entityNum )
 	{
-#ifdef IOQ3ZTM_NO_COMPATIBILITY // Breaks compatibilty with Quake3 mods.
+#ifdef IOQ3ZTM2 // Breaks compatibilty with Quake3 mods.
 		// Turtle Man: I changed the cgame API so that this doesn't have to be a hack.
-		if (VM_Call(cgvm, CG_VIEW_TYPE, entityNum) == 0)
+		if (VM_Call(cgvm, CG_VIEW_TYPE) == 0)
 		{
 			//we're the player
 			return qtrue;

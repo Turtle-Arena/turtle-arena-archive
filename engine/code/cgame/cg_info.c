@@ -121,7 +121,14 @@ void CG_LoadingClient( int clientNum ) {
 			skin = "default";
 		}
 
-#ifdef IOQ3ZTM // PLAYER_DIR
+#ifdef IOQ3ZTM // PLAYER_DIR // Support Team Arena players.
+		if (model[0] == '*')
+		{
+			Com_sprintf( iconName, MAX_QPATH, "models/players/heads/%s/icon_%s.tga", &model[1], skin );
+			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
+		}
+		if (!loadingPlayerIcons[loadingPlayerIconCount])
+		{
 		for (i = 0; bg_playerDirs[i] != NULL; i++)
 		{
 			Com_sprintf( iconName, MAX_QPATH, "%s/%s/icon_%s.tga", bg_playerDirs[i], model, skin );
@@ -131,6 +138,13 @@ void CG_LoadingClient( int clientNum ) {
 			{
 				break;
 			}
+		}
+		}
+		// Try heads directory.
+		if (!loadingPlayerIcons[loadingPlayerIconCount])
+		{
+			Com_sprintf( iconName, MAX_QPATH, "models/players/heads/%s/icon_%s.tga", model, skin );
+			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
 		}
 #else
 		Com_sprintf( iconName, MAX_QPATH, "models/players/%s/icon_%s.tga", model, skin );

@@ -349,6 +349,9 @@ typedef enum {
 
 	TRAP_TESTPRINTINT,
 	TRAP_TESTPRINTFLOAT
+#ifdef IOQ3ZTM3
+	,TRAP_ACOS
+#endif
 } sharedTraps_t;
 
 void	VM_Init( void );
@@ -834,7 +837,9 @@ extern	cvar_t	*com_timescale;
 extern	cvar_t	*com_sv_running;
 extern	cvar_t	*com_cl_running;
 extern	cvar_t	*com_version;
+#ifndef NOBLOOD
 extern	cvar_t	*com_blood;
+#endif
 extern	cvar_t	*com_buildScript;		// for building release pak files
 extern	cvar_t	*com_journal;
 extern	cvar_t	*com_cameraMode;

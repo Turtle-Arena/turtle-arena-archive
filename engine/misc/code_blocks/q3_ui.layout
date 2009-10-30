@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="" />
+	<File name="..\..\code\q3_ui\ui_playermodel.c" open="0" top="0" tabpos="0">
+		<Cursor position="6904" topLine="280" />
+	</File>
+	<File name="..\..\code\q3_ui\ui_qmenu.c" open="0" top="0" tabpos="0">
+		<Cursor position="10687" topLine="478" />
+	</File>
 </CodeBlocks_layout_file>

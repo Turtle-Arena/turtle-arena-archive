@@ -146,7 +146,7 @@ void SP_func_button (gentity_t *ent);
 void SP_func_door (gentity_t *ent);
 void SP_func_train (gentity_t *ent);
 void SP_func_timer (gentity_t *self);
-#ifdef TMNTENTITIES // BREAKABLE
+#ifdef STYEF_ENTITY // BREAKABLE
 void SP_func_breakable (gentity_t *self);
 #endif
 
@@ -236,7 +236,7 @@ spawn_t	spawns[] = {
 	{"func_train", SP_func_train},
 	{"func_group", SP_info_null},
 	{"func_timer", SP_func_timer},			// rename trigger_timer?
-#ifdef TMNTENTITIES // BREAKABLE
+#ifdef STYEF_ENTITY // BREAKABLE
 	// Entities based on Star Trek: Elite Force entities
 	//{"func_usable", SP_func_usable},
 	{"func_breakable", SP_func_breakable},

@@ -583,7 +583,9 @@ void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out );
 void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out );
 int Q_log2(int val);
 
+#ifndef IOQ3ZTM3 // TMNTWEAPONS // XREAL
 float Q_acos(float c);
+#endif
 
 int		Q_rand( int *seed );
 float	Q_random( int *seed );
@@ -592,7 +594,7 @@ float	Q_crandom( int *seed );
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
 
-#ifdef TMNTENTITIES
+#ifdef STYEF_ENTITY
 float	flrandom(float min, float max);
 int		irandom(int min, int max);
 #endif
@@ -621,6 +623,9 @@ void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
 float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
+#ifdef TMNTWEAPONS // XREAL
+float AngleBetweenVectors(const vec3_t a, const vec3_t b);
+#endif
 
 #ifndef BSPC // Turtle Man: BSP2
 qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
@@ -628,6 +633,9 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
 void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
 void RotateAroundDirection( vec3_t axis[3], float yaw );
+#ifdef IOQ3ZTM3 // TMNTWEAPONS // XREAL
+float Q_acos(float c);
+#endif
 void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
 // perpendicular vector could be replaced by this
 

@@ -1,1 +1,935 @@
 # depslib dependency file v1.0
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/asm/ftola.s
+	"qasm.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/asm/qasm.h
+	"../qcommon/q_platform.h"
+
+1239325258 /host/Data/Zack/TMNT_Arena/src/engine/code/qcommon/q_platform.h
+	<endian.h>
+	<sys/types.h>
+	<machine/endian.h>
+	<stdint.h>
+	<sys/byteorder.h>
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/asm/matha.s
+	"qasm.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/asm/snapvectora.s
+	"qasm.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/asm/snd_mixa.s
+	"qasm.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_bspq3.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_aas_def.h"
+
+1241042359 /host/Data/Zack/TMNT_Arena/src/engine/code/qcommon/q_shared.h
+	"../game/bg_lib.h"
+	<assert.h>
+	<math.h>
+	<stdio.h>
+	<stdarg.h>
+	<string.h>
+	<stdlib.h>
+	<time.h>
+	<ctype.h>
+	<limits.h>
+	<io.h>
+	<stdint.h>
+	"q_platform.h"
+	"surfaceflags.h"
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/game/bg_lib.h
+
+1239325258 /host/Data/Zack/TMNT_Arena/src/engine/code/qcommon/surfaceflags.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_memory.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_script.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_precomp.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_struct.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/aasfile.h
+
+1241299042 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/botlib.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_funcs.h
+	"be_aas_main.h"
+	"be_aas_entity.h"
+	"be_aas_sample.h"
+	"be_aas_cluster.h"
+	"be_aas_reach.h"
+	"be_aas_route.h"
+	"be_aas_routealt.h"
+	"be_aas_debug.h"
+	"be_aas_file.h"
+	"be_aas_optimize.h"
+	"be_aas_bsp.h"
+	"be_aas_move.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_main.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_entity.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_sample.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_cluster.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_reach.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_route.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_routealt.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_debug.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_file.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_optimize.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_bsp.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_move.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_def.h
+	"be_aas_main.h"
+	"be_aas_entity.h"
+	"be_aas_sample.h"
+	"be_aas_cluster.h"
+	"be_aas_reach.h"
+	"be_aas_route.h"
+	"be_aas_routealt.h"
+	"be_aas_debug.h"
+	"be_aas_file.h"
+	"be_aas_optimize.h"
+	"be_aas_bsp.h"
+	"be_aas_move.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_cluster.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_log.h"
+	"l_memory.h"
+	"l_libvar.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_aas_def.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_log.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_libvar.h
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_debug.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_libvar.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_interface.h"
+	"be_aas_funcs.h"
+	"be_aas_def.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_interface.h
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_entity.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_utils.h"
+	"l_log.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_aas_def.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_utils.h
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_file.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_libvar.h"
+	"l_utils.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_aas_def.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_main.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_libvar.h"
+	"l_utils.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_log.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_aas_def.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_move.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_libvar.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_aas_def.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_optimize.c
+	"../qcommon/q_shared.h"
+	"l_libvar.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_aas_def.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_reach.c
+	"../qcommon/q_shared.h"
+	"l_log.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_libvar.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_aas_def.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_route.c
+	"../qcommon/q_shared.h"
+	"l_utils.h"
+	"l_memory.h"
+	"l_log.h"
+	"l_crc.h"
+	"l_libvar.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_aas_def.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_crc.h
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_routealt.c
+	"../qcommon/q_shared.h"
+	"l_utils.h"
+	"l_memory.h"
+	"l_log.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_aas_def.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_aas_sample.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_libvar.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_interface.h"
+	"be_aas_funcs.h"
+	"be_aas_def.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_char.c
+	"../qcommon/q_shared.h"
+	"l_log.h"
+	"l_memory.h"
+	"l_utils.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_libvar.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_ai_char.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_char.h
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_chat.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_libvar.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_utils.h"
+	"l_log.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_ea.h"
+	"be_ai_chat.h"
+
+1240518514 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ea.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_chat.h
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_gen.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_log.h"
+	"l_utils.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_ai_gen.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_gen.h
+
+1239909402 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_goal.c
+	"../qcommon/q_shared.h"
+	"l_utils.h"
+	"l_libvar.h"
+	"l_memory.h"
+	"l_log.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_ai_weight.h"
+	"be_ai_goal.h"
+	"be_ai_move.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_weight.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_goal.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_move.h
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_move.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_libvar.h"
+	"l_utils.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_ea.h"
+	"be_ai_goal.h"
+	"be_ai_move.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_weap.c
+	"../qcommon/q_shared.h"
+	"l_libvar.h"
+	"l_log.h"
+	"l_memory.h"
+	"l_utils.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_ai_weight.h"
+	"be_ai_weap.h"
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_weap.h
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ai_weight.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_log.h"
+	"l_utils.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_libvar.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_interface.h"
+	"be_ai_weight.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_ea.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"botlib.h"
+	"be_interface.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/be_interface.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_log.h"
+	"l_libvar.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"aasfile.h"
+	"botlib.h"
+	"be_aas.h"
+	"be_aas_funcs.h"
+	"be_aas_def.h"
+	"be_interface.h"
+	"be_ea.h"
+	"be_ai_weight.h"
+	"be_ai_goal.h"
+	"be_ai_move.h"
+	"be_ai_weap.h"
+	"be_ai_chat.h"
+	"be_ai_char.h"
+	"be_ai_gen.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_crc.c
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	"../qcommon/q_shared.h"
+	"botlib.h"
+	"be_interface.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_libvar.c
+	"../qcommon/q_shared.h"
+	"l_memory.h"
+	"l_libvar.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_log.c
+	<stdlib.h>
+	<stdio.h>
+	<string.h>
+	"../qcommon/q_shared.h"
+	"botlib.h"
+	"be_interface.h"
+	"l_libvar.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_memory.c
+	"../qcommon/q_shared.h"
+	"botlib.h"
+	"l_log.h"
+	"be_interface.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_precomp.c
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<string.h>
+	<stdarg.h>
+	<time.h>
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"../qcommon/q_shared.h"
+	"botlib.h"
+	"be_interface.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_log.h"
+	"qcc.h"
+	"time.h"
+	"math.h"
+	"l_memory.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_log.h"
+	"../bspc/qbsp.h"
+	"../bspc/l_log.h"
+	"../bspc/l_mem.h"
+	"l_precomp.h"
+	"l_utils.h"
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/qbsp.h
+	<io.h>
+	<malloc.h>
+	"l_cmd.h"
+	"l_math.h"
+	"l_poly.h"
+	"l_threads.h"
+	"../botlib/l_script.h"
+	"l_bsp_ent.h"
+	"q2files.h"
+	"l_mem.h"
+	"l_utils.h"
+	"l_log.h"
+	"l_qfiles.h"
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/l_cmd.h
+	<stdio.h>
+	<string.h>
+	<stdlib.h>
+	<errno.h>
+	<ctype.h>
+	<time.h>
+	<stdarg.h>
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/l_math.h
+	<math.h>
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/l_poly.h
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/l_threads.h
+
+1239325256 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/l_bsp_ent.h
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/q2files.h
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/l_mem.h
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/l_utils.h
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/l_log.h
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/bspc/l_qfiles.h
+	"../qcommon/unzip.h"
+
+1239325258 /host/Data/Zack/TMNT_Arena/src/engine/code/qcommon/unzip.h
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_script.c
+	<stdio.h>
+	<stdlib.h>
+	<limits.h>
+	<string.h>
+	<stdarg.h>
+	"l_memory.h"
+	"l_script.h"
+	"../qcommon/q_shared.h"
+	"botlib.h"
+	"be_interface.h"
+	"l_script.h"
+	"l_memory.h"
+	"l_log.h"
+	"l_libvar.h"
+	"qcc.h"
+	"l_script.h"
+	"l_memory.h"
+	"l_log.h"
+	"../bspc/qbsp.h"
+	"../bspc/l_log.h"
+	"../bspc/l_mem.h"
+
+1239325256 source:/host/Data/Zack/TMNT_Arena/src/engine/code/botlib/l_struct.c
+	"../qcommon/q_shared.h"
+	"botlib.h"
+	"l_script.h"
+	"l_precomp.h"
+	"l_struct.h"
+	"l_utils.h"
+	"be_interface.h"
+	"../bspc/qbsp.h"
+	"../bspc/l_log.h"
+	"../bspc/l_mem.h"
+	"l_precomp.h"
+	"l_struct.h"
+
+1239325257 source:/host/Data/Zack/TMNT_Arena/src/engine/code/client/cl_avi.c
+	"client.h"
+	"snd_local.h"
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/client/client.h
+	"../qcommon/q_shared.h"
+	"../qcommon/qcommon.h"
+	"../renderer/tr_public.h"
+	"../ui/ui_public.h"
+	"keys.h"
+	"snd_public.h"
+	"../cgame/cg_public.h"
+	"../game/bg_public.h"
+	"cl_curl.h"
+	"speex/speex.h"
+	"speex/speex_preprocess.h"
+
+1241041627 /host/Data/Zack/TMNT_Arena/src/engine/code/qcommon/qcommon.h
+	"../qcommon/cm_public.h"
+
+1239325258 /host/Data/Zack/TMNT_Arena/src/engine/code/qcommon/cm_public.h
+	"qfiles.h"
+
+1239325258 /host/Data/Zack/TMNT_Arena/src/engine/code/qcommon/qfiles.h
+
+1239325259 /host/Data/Zack/TMNT_Arena/src/engine/code/renderer/tr_public.h
+	"tr_types.h"
+
+1240516606 /host/Data/Zack/TMNT_Arena/src/engine/code/renderer/tr_types.h
+
+1239325259 /host/Data/Zack/TMNT_Arena/src/engine/code/ui/ui_public.h
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/client/keys.h
+	"keycodes.h"
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/client/keycodes.h
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/client/snd_public.h
+
+1241744571 /host/Data/Zack/TMNT_Arena/src/engine/code/cgame/cg_public.h
+
+1241749314 /host/Data/Zack/TMNT_Arena/src/engine/code/game/bg_public.h
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/client/cl_curl.h
+	"../qcommon/q_shared.h"
+	"../qcommon/qcommon.h"
+	"../libcurl/curl/curl.h"
+	<curl/curl.h>
+
+1213825802 /host/Data/Zack/TMNT_Arena/src/engine/code/libcurl/curl/curl.h
+	"curlver.h"
+	<stdio.h>
+	<limits.h>
+	<types.h>
+	<time.h>
+	<sys/types.h>
+	<time.h>
+	<support/SupportDefs.h>
+	"easy.h"
+	"multi.h"
+
+1213825802 /host/Data/Zack/TMNT_Arena/src/engine/code/libcurl/curl/curlver.h
+
+1213825802 /host/Data/Zack/TMNT_Arena/src/engine/code/libcurl/curl/easy.h
+
+1213825802 /host/Data/Zack/TMNT_Arena/src/engine/code/libcurl/curl/multi.h
+	<winsock2.h>
+	<sys/select.h>
+	<sys/socket.h>
+	<sys/time.h>
+	<sys/types.h>
+	"curl.h"
+
+1213825812 /host/Data/Zack/TMNT_Arena/src/engine/code/libspeex/include/speex/speex.h
+	"speex/speex_bits.h"
+	"speex/speex_types.h"
+
+1213825812 /host/Data/Zack/TMNT_Arena/src/engine/code/libspeex/include/speex/speex_bits.h
+
+1213825812 /host/Data/Zack/TMNT_Arena/src/engine/code/libspeex/include/speex/speex_types.h
+	<_G_config.h>
+	<sys/types.h>
+	<sys/types.h>
+	<inttypes.h>
+	<speex/speex_config_types.h>
+
+1213825811 /host/Data/Zack/TMNT_Arena/src/engine/code/libspeex/include/speex/speex_config_types.h
+	<stdint.h>
+
+1213825811 /host/Data/Zack/TMNT_Arena/src/engine/code/libspeex/include/speex/speex_preprocess.h
+	"speex/speex_types.h"
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/client/snd_local.h
+	"../qcommon/q_shared.h"
+	"../qcommon/qcommon.h"
+	"snd_public.h"
+
+1239325257 source:/host/Data/Zack/TMNT_Arena/src/engine/code/client/cl_cgame.c
+	"client.h"
+	"../botlib/botlib.h"
+	"libmumblelink.h"
+
+1239325257 /host/Data/Zack/TMNT_Arena/src/engine/code/client/libmumblelink.h
+
+1239325257 source:/host/Data/Zack/TMNT_Arena/src/engine/code/client/cl_cin.c
+	"client.h"
+	"snd_local.h"
+
+1241041033 source:/host/Data/Zack/TMNT_Arena/src/engine/code/client/cl_console.c
+	"client.h"
+
+1241806808 source:/host/Data/Zack/TMNT_Arena/src/engine/code/client/cl_curl.c
+	"client.h"
+	"../sys/sys_loadlib.h"
+
+1239325259 /host/Data/Zack/TMNT_Arena/src/engine/code/sys/sys_loadlib.h
+	<windows.h>
+	<dlfcn.h>
+	"SDL.h"
+	"SDL_loadso.h"
+	<SDL.h>
+	<SDL_loadso.h>
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL.h
+	"SDL_main.h"
+	"SDL_stdinc.h"
+	"SDL_audio.h"
+	"SDL_cdrom.h"
+	"SDL_cpuinfo.h"
+	"SDL_endian.h"
+	"SDL_error.h"
+	"SDL_events.h"
+	"SDL_loadso.h"
+	"SDL_mutex.h"
+	"SDL_rwops.h"
+	"SDL_thread.h"
+	"SDL_timer.h"
+	"SDL_video.h"
+	"SDL_version.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_main.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_stdinc.h
+	"SDL_config.h"
+	<sys/types.h>
+	<stdio.h>
+	<stdlib.h>
+	<stddef.h>
+	<stdarg.h>
+	<stdlib.h>
+	<malloc.h>
+	<stddef.h>
+	<stdarg.h>
+	<memory.h>
+	<string.h>
+	<strings.h>
+	<inttypes.h>
+	<stdint.h>
+	<ctype.h>
+	<iconv.h>
+	"begin_code.h"
+	<alloca.h>
+	<malloc.h>
+	<malloc.h>
+	<stdlib.h>
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_config.h
+	"SDL_platform.h"
+	"SDL_config_amiga.h"
+	"SDL_config_dreamcast.h"
+	"SDL_config_macos.h"
+	"SDL_config_macosx.h"
+	"SDL_config_win32.h"
+	"SDL_config_os2.h"
+	"SDL_config_minimal.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_platform.h
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_config_amiga.h
+	"SDL_platform.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_config_dreamcast.h
+	"SDL_platform.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_config_macos.h
+	"SDL_platform.h"
+	<MacTypes.h>
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_config_macosx.h
+	"SDL_platform.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_config_win32.h
+	"SDL_platform.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_config_os2.h
+	"SDL_platform.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_config_minimal.h
+	"SDL_platform.h"
+	<stdarg.h>
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/begin_code.h
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/close_code.h
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_audio.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_endian.h"
+	"SDL_mutex.h"
+	"SDL_thread.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_error.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_endian.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_mutex.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_thread.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_mutex.h"
+	"begin_code.h"
+	<process.h>
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_rwops.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_cdrom.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_cpuinfo.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_events.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_active.h"
+	"SDL_keyboard.h"
+	"SDL_mouse.h"
+	"SDL_joystick.h"
+	"SDL_quit.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_active.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_keyboard.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_keysym.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_keysym.h
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_mouse.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_video.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_video.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"SDL_rwops.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_joystick.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_quit.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_loadso.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_timer.h
+	"SDL_stdinc.h"
+	"SDL_error.h"
+	"begin_code.h"
+	"close_code.h"
+
+1213825794 /host/Data/Zack/TMNT_Arena/src/engine/code/SDL12/include/SDL_version.h
+	"SDL_stdinc.h"
+	"begin_code.h"
+	"close_code.h"
+
+1240421180 source:/host/Data/Zack/TMNT_Arena/src/engine/code/client/cl_input.c
+	"client.h"
+
+1241040998 source:/host/Data/Zack/TMNT_Arena/src/engine/code/client/cl_keys.c
+	"client.h"
+

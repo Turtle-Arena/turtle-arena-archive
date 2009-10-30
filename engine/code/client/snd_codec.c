@@ -131,6 +131,57 @@ void S_CodecRegister(snd_codec_t *codec)
 	codecs = codec;
 }
 
+#ifdef IOQ3ZTM // OPENARENA // Load Ogg sounds
+// STOLEN FROM IOSTVOY by thilo!!!!  HA HA HA but it works :(
+qboolean S_TheCheckExtension(char *filename)
+{
+	fileHandle_t hnd;
+	char fn[MAX_QPATH];
+	int stringlen = strlen(filename);
+	char *extptr;
+
+	strncpy(fn, filename, stringlen+1);
+	extptr = strrchr(fn, '.');
+
+	if(!extptr)
+	{
+		extptr = &fn[stringlen];
+
+		extptr[0] = '.';
+		extptr[1] = 'w';
+		extptr[2] = 'a';
+		extptr[3] = 'v';
+		extptr[4] = '\0';
+
+		stringlen += 4;
+	}
+
+	FS_FOpenFileRead(fn, &hnd, qtrue);
+
+	if(!hnd)
+	{
+		if(!strcmp(++extptr, "wav"))
+		{
+			extptr[0] = 'o';
+			extptr[1] = 'g';
+			extptr[2] = 'g';
+
+			FS_FOpenFileRead(fn, &hnd, qtrue);
+
+			if(!hnd)
+				return qfalse;
+		}
+		else
+			return qfalse;
+	}
+
+	FS_FCloseFile(hnd);
+	strcpy(filename, fn);
+
+	return qtrue;
+}
+#endif
+
 /*
 =================
 S_CodecLoad
@@ -141,15 +192,26 @@ void *S_CodecLoad(const char *filename, snd_info_t *info)
 	snd_codec_t *codec;
 	char fn[MAX_QPATH];
 
+#ifdef IOQ3ZTM // OPENARENA // Load Ogg sounds
+	codec = NULL;
+	strncpy(fn, filename, sizeof(fn));
+	if (S_TheCheckExtension(fn))
+	{
+		codec = S_FindCodecForFile(fn);
+	}
+#else
 	codec = S_FindCodecForFile(filename);
+#endif
 	if(!codec)
 	{
 		Com_Printf("Unknown extension for %s\n", filename);
 		return NULL;
 	}
 
+#ifndef IOQ3ZTM	// OPENARENA // Load Ogg sounds
 	strncpy(fn, filename, sizeof(fn));
 	COM_DefaultExtension(fn, sizeof(fn), codec->ext);
+#endif
 
 	return codec->load(fn, info);
 }

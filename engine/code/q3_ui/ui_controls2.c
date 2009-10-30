@@ -328,7 +328,11 @@ static bind_t g_bindings[] =
 #endif
 	{"+button3", 		"gesture",			ID_GESTURE,		ANIM_GESTURE,	K_MOUSE3,		-1,		-1, -1},
 	{"messagemode", 	"chat",				ID_CHAT,		ANIM_CHAT,		't',			-1,		-1, -1},
+#ifdef TMNTMISC // team chat
+	{"messagemode2", 	"chat - team",		ID_CHAT2,		ANIM_CHAT,		'y',				-1,		-1, -1},
+#else
 	{"messagemode2", 	"chat - team",		ID_CHAT2,		ANIM_CHAT,		-1,				-1,		-1, -1},
+#endif
 	{"messagemode3", 	"chat - target",	ID_CHAT3,		ANIM_CHAT,		-1,				-1,		-1, -1},
 	{"messagemode4", 	"chat - attacker",	ID_CHAT4,		ANIM_CHAT,		-1,				-1,		-1, -1},
 #ifdef TMNTHOLDSYS
@@ -511,7 +515,11 @@ static void Controls_UpdateModel( int anim ) {
 	s_controls.playerViewangles[YAW] = 180 - 30;
 	s_controls.playerMoveangles[YAW] = s_controls.playerViewangles[YAW];
 	s_controls.playerLegs		     = LEGS_IDLE;
+#ifdef TMNTWEAPSYS
+	s_controls.playerTorso			 = BG_TorsoStandForWeapon(s_controls.playerinfo.playercfg.default_weapon);
+#else
 	s_controls.playerTorso			 = TORSO_STAND;
+#endif
 	s_controls.playerWeapon			 = -1;
 	s_controls.playerChat			 = qfalse;
 
@@ -562,8 +570,8 @@ static void Controls_UpdateModel( int anim ) {
 		s_controls.playerViewangles[PITCH] = 45;
 		break;
 
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: ?
 #ifndef TMNTWEAPSYS2
+#ifdef TMNTWEAPONS // Turtle Man: WONTFIX: Not in tended gameplay (and I have more then 10 weapons).
 	case ANIM_WEAPON1:
 	case ANIM_WEAPON2:
 	case ANIM_WEAPON3:
@@ -576,7 +584,6 @@ static void Controls_UpdateModel( int anim ) {
 	case ANIM_WEAPON10:
 		s_controls.playerWeapon = DEFAULT_DEFAULT_WEAPON;
 		break;
-#endif
 #else
 	case ANIM_WEAPON1:
 		s_controls.playerWeapon = WP_GAUNTLET;
@@ -617,6 +624,7 @@ static void Controls_UpdateModel( int anim ) {
 	case ANIM_WEAPON10:
 		s_controls.playerWeapon = WP_GRAPPLING_HOOK;
 		break;
+#endif
 #endif
 
 	case ANIM_ATTACK:
