@@ -165,6 +165,7 @@ qboolean S_TheCheckExtension(char *filename)
 			extptr[0] = 'o';
 			extptr[1] = 'g';
 			extptr[2] = 'g';
+			extptr[3] = '\0';
 
 			FS_FOpenFileRead(fn, &hnd, qtrue);
 
@@ -195,10 +196,12 @@ void *S_CodecLoad(const char *filename, snd_info_t *info)
 #ifdef IOQ3ZTM // OPENARENA // Load Ogg sounds
 	codec = NULL;
 	strncpy(fn, filename, sizeof(fn));
-	if (S_TheCheckExtension(fn))
+	if (!S_TheCheckExtension(fn))
 	{
-		codec = S_FindCodecForFile(fn);
+		// Didn't find file.
+		return NULL;
 	}
+	codec = S_FindCodecForFile(fn);
 #else
 	codec = S_FindCodecForFile(filename);
 #endif

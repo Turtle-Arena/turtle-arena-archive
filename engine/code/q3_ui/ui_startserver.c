@@ -276,7 +276,11 @@ static void StartServer_Update( void ) {
 		if (top+i >= s_startserver.nummaps)
 			break;
 
+#ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
+		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s_small", s_startserver.maplist[top+i] );
+#else
 		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s", s_startserver.maplist[top+i] );
+#endif
 
 		s_startserver.mappics[i].generic.flags &= ~QMF_HIGHLIGHT;
 		s_startserver.mappics[i].generic.name   = picname[i];
@@ -712,7 +716,11 @@ void StartServer_Cache( void )
 		s_startserver.mapGamebits[i] = GametypeBits( Info_ValueForKey( info, "type") );
 
 		if( precache ) {
+#ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
+			Com_sprintf( picname, sizeof(picname), "levelshots/%s_small", s_startserver.maplist[i] );
+#else
 			Com_sprintf( picname, sizeof(picname), "levelshots/%s", s_startserver.maplist[i] );
+#endif
 			trap_R_RegisterShaderNoMip(picname);
 		}
 	}
@@ -1241,17 +1249,21 @@ static void ServerOptions_InitBotNames( void ) {
 	char		bots[MAX_INFO_STRING];
 
 	if( s_serveroptions.gametype >= GT_TEAM ) {
-#ifdef TMNT // DEFAULT_PLAYER
-		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "RaphBlue", 16 );
-		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "RaphBlue", 16 );
-		if( s_serveroptions.gametype == GT_TEAM ) {
-			Q_strncpyz( s_serveroptions.playerNameBuffers[3], "RaphBlue", 16 );
+#ifdef IOQ3ZTM
+		// set the rest of the bot slots to "---"
+		for( n = 1; n < PLAYER_SLOTS; n++ ) {
+#ifdef RANDOMBOT
+			strcpy( s_serveroptions.playerNameBuffers[n], "Random" );
+#else
+			strcpy( s_serveroptions.playerNameBuffers[n], "--------" );
+#endif
 		}
-#elif defined SONIC
-		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "SonicBlue", 16 );
-		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "SonicBlue", 16 );
+#endif
+#if defined TMNT || defined SONIC // DEFAULT_PLAYER
+		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "Random", 16 ); // RaphBlue
+		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "Random", 16 ); // RaphBlue
 		if( s_serveroptions.gametype == GT_TEAM ) {
-			Q_strncpyz( s_serveroptions.playerNameBuffers[3], "SonicBlue", 16 );
+			Q_strncpyz( s_serveroptions.playerNameBuffers[3], "Random", 16 ); // RaphBlue
 		}
 #else
 		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "grunt", 16 );
@@ -1266,19 +1278,12 @@ static void ServerOptions_InitBotNames( void ) {
 		s_serveroptions.playerType[4].curvalue = 2;
 		s_serveroptions.playerType[5].curvalue = 2;
 
-#ifdef TMNT // DEFAULT_PLAYER
-		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "RaphRed", 16 );
-		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "RaphRed", 16 );
-		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "RaphRed", 16 );
+#if defined TMNT || defined SONIC // DEFAULT_PLAYER
+		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "Random", 16 ); // RaphRed
+		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "Random", 16 ); // RaphRed
+		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "Random", 16 ); // RaphRed
 		if( s_serveroptions.gametype == GT_TEAM ) {
-			Q_strncpyz( s_serveroptions.playerNameBuffers[9], "RaphRed", 16 );
-		}
-#elif defined SONIC
-		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "SonicRed", 16 );
-		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "SonicRed", 16 );
-		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "SonicRed", 16 );
-		if( s_serveroptions.gametype == GT_TEAM ) {
-			Q_strncpyz( s_serveroptions.playerNameBuffers[9], "SonicRed", 16 );
+			Q_strncpyz( s_serveroptions.playerNameBuffers[9], "Random", 16 ); // RaphRed
 		}
 #else
 		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "sarge", 16 );
@@ -1334,7 +1339,11 @@ static void ServerOptions_InitBotNames( void ) {
 
 	// set the rest of the bot slots to "---"
 	for( n = count; n < PLAYER_SLOTS; n++ ) {
+#ifdef RANDOMBOT
+		strcpy( s_serveroptions.playerNameBuffers[n], "Random" );
+#else
 		strcpy( s_serveroptions.playerNameBuffers[n], "--------" );
+#endif
 	}
 
 	// pad up to #8 as open slots
@@ -1362,12 +1371,20 @@ static void ServerOptions_SetMenuItems( void ) {
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
+#ifdef TMNTMISC // frag to score
+		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_ffa_scorelimit" ) ) );
+#else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_ffa_fraglimit" ) ) );
+#endif
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_ffa_timelimit" ) ) );
 		break;
 
 	case GT_TOURNAMENT:
+#ifdef TMNTMISC // frag to score
+		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_scorelimit" ) ) );
+#else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_fraglimit" ) ) );
+#endif
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_timelimit" ) ) );
 		break;
 
@@ -1380,7 +1397,11 @@ static void ServerOptions_SetMenuItems( void ) {
 #endif
 
 	case GT_TEAM:
+#ifdef TMNTMISC // frag to score
+		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_scorelimit" ) ) );
+#else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_fraglimit" ) ) );
+#endif
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_timelimit" ) ) );
 		s_serveroptions.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_team_friendly" ) );
 		break;
@@ -1418,7 +1439,11 @@ static void ServerOptions_SetMenuItems( void ) {
 	s_serveroptions.pure.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_pure" ) );
 
 	// set the map pic
+#ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
+	Com_sprintf( picname, 64, "levelshots/%s_small", s_startserver.maplist[s_startserver.currentmap] );
+#else
 	Com_sprintf( picname, 64, "levelshots/%s", s_startserver.maplist[s_startserver.currentmap] );
+#endif
 	s_serveroptions.mappic.generic.name = picname;
 
 	// set the map name

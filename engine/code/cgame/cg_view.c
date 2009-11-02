@@ -263,6 +263,20 @@ static void CG_OffsetThirdPersonView( void ) {
 	// in a solid block.  Use an 8 by 8 block to prevent the view from near clipping anything
 
 	if (!cg_cameraMode.integer) {
+#ifdef IOQ3ZTM // Smooth steps.
+		// add step offset
+		//CG_StepOffset();
+		{
+			int		timeDelta;
+
+			// smooth out stair climbing
+			timeDelta = cg.time - cg.stepTime;
+			if ( timeDelta < STEP_TIME ) {
+				view[2] -= cg.stepChange
+					* (STEP_TIME - timeDelta) / STEP_TIME;
+			}
+		}
+#endif
 		CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 
 		if ( trace.fraction != 1.0 ) {
@@ -448,6 +462,9 @@ void CG_ZoomDown_f( void ) {
 	}
 	cg.zoomed = qtrue;
 	cg.zoomTime = cg.time;
+#ifdef TMNTMISC
+	CG_ToggleLetterbox(qtrue, qfalse);
+#endif
 }
 
 void CG_ZoomUp_f( void ) { 
@@ -456,6 +473,9 @@ void CG_ZoomUp_f( void ) {
 	}
 	cg.zoomed = qfalse;
 	cg.zoomTime = cg.time;
+#ifdef TMNTMISC
+	CG_ToggleLetterbox(qfalse, qfalse);
+#endif
 }
 
 
@@ -481,7 +501,11 @@ static int CG_CalcFov( void ) {
 
 	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		// if in intermission, use a fixed value
+#ifdef TMNTMISC // FOV
+		fov_x = 70;
+#else
 		fov_x = 90;
+#endif
 	} else {
 		// user selectable
 		if ( cgs.dmflags & DF_FIXED_FOV ) {
@@ -658,7 +682,9 @@ static int CG_CalcViewValues( void ) {
 				CG_Fade(0, cg.time + 200, 1500);	// then fadeup
 			}
 
+#ifdef TMNTMISC
 			CG_ToggleLetterbox(qfalse, cg.cameraEndBlack);
+#endif
 		}
 	}
 #else
@@ -867,13 +893,13 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// let the client system know what our weapon and zoom settings are
 #ifdef TMNTWEAPSYS2
-#ifdef TMNTHOLDSYS2
+#ifdef TMNTHOLDSYS/*2*/
 	trap_SetUserCmdValue( cg.holdableSelect, cg.zoomSensitivity );
 #else
 	trap_SetUserCmdValue( 0, cg.zoomSensitivity );
 #endif
 #else
-#ifdef TMNTHOLDSYS2
+#ifdef TMNTHOLDSYS/*2*/
 	trap_SetUserCmdValue( cg.weaponSelect, cg.holdableSelect, cg.zoomSensitivity );
 #else
 	trap_SetUserCmdValue( cg.weaponSelect, cg.zoomSensitivity );

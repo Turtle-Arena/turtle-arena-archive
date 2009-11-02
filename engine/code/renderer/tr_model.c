@@ -21,7 +21,178 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // tr_models.c -- model loading and caching
 
+#if defined TMNT_GAME_MODELS && defined DEDICATED
+#define RENDERLESS_MODELS // Turtle Man: Ded server needs the tags for melee attacks
+#endif
+
+#ifdef RENDERLESS_MODELS
+#include "../server/server.h"
+
+// any changes in surfaceType must be mirrored in rb_surfaceTable[]
+typedef enum {
+	SF_BAD,
+	SF_SKIP,				// ignore
+	SF_FACE,
+	SF_GRID,
+	SF_TRIANGLES,
+	SF_POLY,
+	SF_MD3,
+	SF_MD4,
+#ifdef RAVENMD4
+	SF_MDR,
+#endif
+	SF_FLARE,
+	SF_ENTITY,				// beams, rails, lightning, etc that can be determined by entity
+	SF_DISPLAY_LIST,
+
+	SF_NUM_SURFACE_TYPES,
+	SF_MAX = 0x7fffffff			// ensures that sizeof( surfaceType_t ) == sizeof( int )
+} surfaceType_t;
+
+typedef enum {
+	MOD_BAD,
+	MOD_BRUSH,
+	MOD_MESH,
+	MOD_MD4,
+#ifdef RAVENMD4
+	MOD_MDR
+#endif
+} modtype_t;
+
+typedef struct model_s {
+	char		name[MAX_QPATH];
+	modtype_t	type;
+	int			index;				// model = tr.models[model->index]
+
+	int			dataSize;			// just for listing purposes
+	// Turtle Man: Not needed by ded
+	//bmodel_t	*bmodel;			// only if type == MOD_BRUSH
+	md3Header_t	*md3[MD3_MAX_LODS];	// only if type == MOD_MESH
+	void	*md4;				// only if type == (MOD_MD4 | MOD_MDR)
+
+	int			 numLods;
+} model_t;
+
+#define	MAX_MOD_KNOWN	1024
+
+/*
+** trGlobals_t
+**
+** Most renderer globals are defined here.
+** backend functions should never modify any of these fields,
+** but may read fields that aren't dynamically modified
+** by the frontend.
+*/
+typedef struct {
+#if 0
+	qboolean				registered;		// cleared at shutdown, set at beginRegistration
+
+	int						visCount;		// incremented every time a new vis cluster is entered
+	int						frameCount;		// incremented every frame
+	int						sceneCount;		// incremented every scene
+	int						viewCount;		// incremented every view (twice a scene if portaled)
+											// and every R_MarkFragments call
+
+	int						smpFrame;		// toggles from 0 to 1 every endFrame
+
+	int						frameSceneNum;	// zeroed at RE_BeginFrame
+
+	qboolean				worldMapLoaded;
+	world_t					*world;
+
+	const byte				*externalVisData;	// from RE_SetWorldVisData, shared with CM_Load
+
+	image_t					*defaultImage;
+	image_t					*scratchImage[32];
+	image_t					*fogImage;
+	image_t					*dlightImage;	// inverse-quare highlight for projective adding
+	image_t					*flareImage;
+	image_t					*whiteImage;			// full of 0xff
+	image_t					*identityLightImage;	// full of tr.identityLightByte
+
+	shader_t				*defaultShader;
+	shader_t				*shadowShader;
+	shader_t				*projectionShadowShader;
+
+	shader_t				*flareShader;
+	shader_t				*sunShader;
+
+	int						numLightmaps;
+	image_t					*lightmaps[MAX_LIGHTMAPS];
+
+	trRefEntity_t			*currentEntity;
+	trRefEntity_t			worldEntity;		// point currentEntity at this when rendering world
+	int						currentEntityNum;
+	int						shiftedEntityNum;	// currentEntityNum << QSORT_ENTITYNUM_SHIFT
+	model_t					*currentModel;
+
+	viewParms_t				viewParms;
+
+	float					identityLight;		// 1.0 / ( 1 << overbrightBits )
+	int						identityLightByte;	// identityLight * 255
+	int						overbrightBits;		// r_overbrightBits->integer, but set to 0 if no hw gamma
+
+	orientationr_t			or;					// for current entity
+
+	trRefdef_t				refdef;
+
+	int						viewCluster;
+
+	vec3_t					sunLight;			// from the sky shader for this level
+	vec3_t					sunDirection;
+
+	frontEndCounters_t		pc;
+	int						frontEndMsec;		// not in pc due to clearing issue
+#endif
+
+	//
+	// put large tables at the end, so most elements will be
+	// within the +/32K indexed range on risc processors
+	//
+	model_t					*models[MAX_MOD_KNOWN];
+	int						numModels;
+
+#if 0
+	int						numImages;
+	image_t					*images[MAX_DRAWIMAGES];
+
+	// shader indexes from other modules will be looked up in tr.shaders[]
+	// shader indexes from drawsurfs will be looked up in sortedShaders[]
+	// lower indexed sortedShaders must be rendered first (opaque surfaces before translucent)
+	int						numShaders;
+	shader_t				*shaders[MAX_SHADERS];
+	shader_t				*sortedShaders[MAX_SHADERS];
+
+	int						numSkins;
+	skin_t					*skins[MAX_SKINS];
+
+	float					sinTable[FUNCTABLE_SIZE];
+	float					squareTable[FUNCTABLE_SIZE];
+	float					triangleTable[FUNCTABLE_SIZE];
+	float					sawToothTable[FUNCTABLE_SIZE];
+	float					inverseSawToothTable[FUNCTABLE_SIZE];
+	float					fogTable[FOG_TABLE_SIZE];
+#endif
+} trGlobals_t;
+
+trGlobals_t tr;
+
+void R_ModelInit( void );
+
+/*
+===============
+R_Init
+===============
+*/
+void R_Init( void ) {
+	// clear all our internal state
+	Com_Memset( &tr, 0, sizeof( tr ) );
+
+	R_ModelInit();
+}
+#else
 #include "tr_local.h"
+#endif
 
 #define	LL(x) x=LittleLong(x)
 
@@ -29,6 +200,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *name
 static qboolean R_LoadMD4 (model_t *mod, void *buffer, const char *name );
 #ifdef RAVENMD4
 static qboolean R_LoadMDR (model_t *mod, void *buffer, int filesize, const char *name );
+void MC_UnCompress(float mat[3][4],const unsigned char * comp);
 #endif
 
 model_t	*loadmodel;
@@ -61,7 +233,11 @@ model_t *R_AllocModel( void ) {
 		return NULL;
 	}
 
+#ifdef RENDERLESS_MODELS
+	mod = Hunk_Alloc( sizeof( *tr.models[tr.numModels] ), h_low );
+#else
 	mod = ri.Hunk_Alloc( sizeof( *tr.models[tr.numModels] ), h_low );
+#endif
 	mod->index = tr.numModels;
 	tr.models[tr.numModels] = mod;
 	tr.numModels++;
@@ -95,7 +271,11 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	char		*fext, defex[] = "md3", filename[MAX_QPATH], namebuf[MAX_QPATH+20];
 
 	if ( !name || !name[0] ) {
+#ifdef RENDERLESS_MODELS
+		Com_Printf( "RE_RegisterModel: NULL name\n" );
+#else
 		ri.Printf( PRINT_ALL, "RE_RegisterModel: NULL name\n" );
+#endif
 		return 0;
 	}
 
@@ -120,7 +300,11 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	// allocate a new model_t
 
 	if ( ( mod = R_AllocModel() ) == NULL ) {
+#ifdef RENDERLESS_MODELS
+		Com_Printf( "RE_RegisterModel: R_AllocModel() failed for '%s'\n", name);
+#else
 		ri.Printf( PRINT_WARNING, "RE_RegisterModel: R_AllocModel() failed for '%s'\n", name);
+#endif
 		return 0;
 	}
 
@@ -128,8 +312,10 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	Q_strncpyz( mod->name, name, sizeof( mod->name ) );
 
 
+#ifndef RENDERLESS_MODELS
 	// make sure the render thread is stopped
 	R_SyncRenderThread();
+#endif
 
 	mod->numLods = 0;
 
@@ -158,11 +344,19 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	{
 		int filesize;
 		
-#ifdef IOQ3ZTM // Always atemp to load MDR first!
+#ifdef IOQ3ZTM // Always atempt to load MDR first!
 		Com_sprintf(namebuf, sizeof(namebuf), "%s.mdr", filename);
+#ifdef RENDERLESS_MODELS
+		filesize = FS_ReadFile(namebuf, (void **) &buf.v);
+#else
 		filesize = ri.FS_ReadFile(namebuf, (void **) &buf.v);
+#endif
+#else
+#ifdef RENDERLESS_MODELS
+		filesize = FS_ReadFile(name, (void **) &buf.v);
 #else
 		filesize = ri.FS_ReadFile(name, (void **) &buf.v);
+#endif
 #endif
 		if(!buf.u)
 		{
@@ -174,7 +368,11 @@ qhandle_t RE_RegisterModel( const char *name ) {
 				break;
 			}
 #endif
+#ifdef RENDERLESS_MODELS
+			Com_Printf ("RE_RegisterModel: couldn't load %s\n", name);
+#else
 			ri.Printf (PRINT_WARNING,"RE_RegisterModel: couldn't load %s\n", name);
+#endif
 			mod->type = MOD_BAD;
 			return 0;
 		}
@@ -187,14 +385,26 @@ qhandle_t RE_RegisterModel( const char *name ) {
 			loaded = R_LoadMDR(mod, buf.u, filesize, name);
 #endif
 
+#ifdef RENDERLESS_MODELS
+		FS_FreeFile (buf.v);
+#else
 		ri.FS_FreeFile (buf.v);
+#endif
 		
 		if(!loaded)
 		{
 #ifdef IOQ3ZTM // Always atemp to load MDR first!
+#ifdef RENDERLESS_MODELS
+			Com_Printf("RE_RegisterModel: couldn't load mdr file %s\n", namebuf);
+#else
 			ri.Printf(PRINT_WARNING,"RE_RegisterModel: couldn't load mdr file %s\n", namebuf);
+#endif
+#else
+#ifdef RENDERLESS_MODELS
+			Com_Printf("RE_RegisterModel: couldn't load mdr file %s\n", name);
 #else
 			ri.Printf(PRINT_WARNING,"RE_RegisterModel: couldn't load mdr file %s\n", name);
+#endif
 #endif
 			mod->type = MOD_BAD;
 			return 0;
@@ -212,7 +422,11 @@ qhandle_t RE_RegisterModel( const char *name ) {
 		else
 			Com_sprintf(namebuf, sizeof(namebuf), "%s.%s", filename, fext);
 
+#ifdef RENDERLESS_MODELS
+		FS_ReadFile( namebuf, &buf.v );
+#else
 		ri.FS_ReadFile( namebuf, &buf.v );
+#endif
 		if ( !buf.u ) {
 			continue;
 		}
@@ -224,14 +438,22 @@ qhandle_t RE_RegisterModel( const char *name ) {
 			loaded = R_LoadMD4( mod, buf.u, name );
 		} else {
 			if ( ident != MD3_IDENT ) {
+#ifdef RENDERLESS_MODELS
+				Com_Printf ("RE_RegisterModel: unknown fileid for %s\n", name);
+#else
 				ri.Printf (PRINT_WARNING,"RE_RegisterModel: unknown fileid for %s\n", name);
+#endif
 				goto fail;
 			}
 
 			loaded = R_LoadMD3( mod, lod, buf.u, name );
 		}
 		
+#ifdef RENDERLESS_MODELS
+		FS_FreeFile (buf.v);
+#else
 		ri.FS_FreeFile (buf.v);
+#endif
 
 		if ( !loaded ) {
 			if ( lod == 0 ) {
@@ -263,7 +485,11 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	}
 #ifdef _DEBUG
 	else {
+#ifdef RENDERLESS_MODELS
+		Com_Printf ("RE_RegisterModel: couldn't load %s\n", name);
+#else
 		ri.Printf (PRINT_WARNING,"RE_RegisterModel: couldn't load %s\n", name);
+#endif
 	}
 #endif
 
@@ -297,15 +523,24 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
 
 	version = LittleLong (pinmodel->version);
 	if (version != MD3_VERSION) {
+#ifdef RENDERLESS_MODELS
+		Com_Printf( "R_LoadMD3: %s has wrong version (%i should be %i)\n",
+				 mod_name, version, MD3_VERSION);
+#else
 		ri.Printf( PRINT_WARNING, "R_LoadMD3: %s has wrong version (%i should be %i)\n",
 				 mod_name, version, MD3_VERSION);
+#endif
 		return qfalse;
 	}
 
 	mod->type = MOD_MESH;
 	size = LittleLong(pinmodel->ofsEnd);
 	mod->dataSize += size;
+#ifdef RENDERLESS_MODELS
+	mod->md3[lod] = Hunk_Alloc( size, h_low );
+#else
 	mod->md3[lod] = ri.Hunk_Alloc( size, h_low );
+#endif
 
 	Com_Memcpy (mod->md3[lod], buffer, LittleLong(pinmodel->ofsEnd) );
 
@@ -320,7 +555,9 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
     LL(mod->md3[lod]->ofsEnd);
 
 	if ( mod->md3[lod]->numFrames < 1 ) {
+#ifndef RENDERLESS_MODELS
 		ri.Printf( PRINT_WARNING, "R_LoadMD3: %s has no frames\n", mod_name );
+#endif
 		return qfalse;
 	}
     
@@ -362,6 +599,21 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
         LL(surf->ofsXyzNormals);
         LL(surf->ofsEnd);
 		
+#ifndef RENDERLESS_MODELS
+#ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
+		if ( surf->numVerts > SHADER_MAX_VERTEXES ) {
+			ri.Printf(PRINT_WARNING, "R_LoadMD3: %s has more than %i verts on %s (%i)",
+				mod_name, SHADER_MAX_VERTEXES, surf->name[0] == '\0' ? "a surface" : surf->name,
+				surf->numVerts );
+			return qfalse;
+		}
+		if ( surf->numTriangles*3 > SHADER_MAX_INDEXES ) {
+			ri.Printf(PRINT_WARNING, "R_LoadMD3: %s has more than %i triangles on %s (%i)",
+				mod_name, SHADER_MAX_INDEXES / 3, surf->name[0] == '\0' ? "a surface" : surf->name,
+				surf->numTriangles );
+			return qfalse;
+		}
+#else
 		if ( surf->numVerts > SHADER_MAX_VERTEXES ) {
 			ri.Error (ERR_DROP, "R_LoadMD3: %s has more than %i verts on a surface (%i)",
 				mod_name, SHADER_MAX_VERTEXES, surf->numVerts );
@@ -370,6 +622,8 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
 			ri.Error (ERR_DROP, "R_LoadMD3: %s has more than %i triangles on a surface (%i)",
 				mod_name, SHADER_MAX_INDEXES / 3, surf->numTriangles );
 		}
+#endif
+#endif
 	
 		// change to surface identifier
 		surf->ident = SF_MD3;
@@ -387,6 +641,9 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
         // register the shaders
         shader = (md3Shader_t *) ( (byte *)surf + surf->ofsShaders );
         for ( j = 0 ; j < surf->numShaders ; j++, shader++ ) {
+#ifdef RENDERLESS_MODELS
+			shader->shaderIndex = 0;
+#else
             shader_t	*sh;
 
             sh = R_FindShader( shader->name, LIGHTMAP_NONE, qtrue );
@@ -395,6 +652,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
 			} else {
 				shader->shaderIndex = sh->index;
 			}
+#endif
         }
 
 		// swap all the triangles
@@ -451,14 +709,20 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	mdrWeight_t			*weight, *curweight;
 	mdrTag_t			*tag, *curtag;
 	int					size;
+#ifndef RENDERLESS_MODELS
 	shader_t			*sh;
+#endif
 
 	pinmodel = (mdrHeader_t *)buffer;
 
 	pinmodel->version = LittleLong(pinmodel->version);
 	if (pinmodel->version != MDR_VERSION) 
 	{
+#ifdef RENDERLESS_MODELS
+		Com_Printf("R_LoadMDR: %s has wrong version (%i should be %i)\n", mod_name, pinmodel->version, MDR_VERSION);
+#else
 		ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has wrong version (%i should be %i)\n", mod_name, pinmodel->version, MDR_VERSION);
+#endif
 		return qfalse;
 	}
 
@@ -466,7 +730,11 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	
 	if(size > filesize)
 	{
+#ifdef RENDERLESS_MODELS
+		Com_Printf("R_LoadMDR: Header of %s is broken. Wrong filesize declared!\n", mod_name);
+#else
 		ri.Printf(PRINT_WARNING, "R_LoadMDR: Header of %s is broken. Wrong filesize declared!\n", mod_name);
+#endif
 		return qfalse;
 	}
 	
@@ -490,12 +758,20 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	if(pinmodel->numBones < 0 ||
 		sizeof(*mdr) + pinmodel->numFrames * (sizeof(*frame) + (pinmodel->numBones - 1) * sizeof(*frame->bones)) > size)
 	{
+#ifdef RENDERLESS_MODELS
+		Com_Printf("R_LoadMDR: %s has broken structure.\n", mod_name);
+#else
 		ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
+#endif
 		return qfalse;
 	}
 
 	mod->dataSize += size;
+#ifdef RENDERLESS_MODELS
+	mod->md4 = mdr = Hunk_Alloc( size, h_low );
+#else
 	mod->md4 = mdr = ri.Hunk_Alloc( size, h_low );
+#endif
 
 	// Copy all the values over from the file and fix endian issues in the process, if necessary.
 	
@@ -512,7 +788,9 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 
 	if ( mdr->numFrames < 1 ) 
 	{
+#ifndef RENDERLESS_MODELS
 		ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has no frames\n", mod_name);
+#endif
 		return qfalse;
 	}
 
@@ -604,7 +882,9 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 		// simple bounds check
 		if((byte *) (lod + 1) > (byte *) mdr + size)
 		{
+#ifndef RENDERLESS_MODELS
 			ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
+#endif
 			return qfalse;
 		}
 
@@ -620,7 +900,9 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			// simple bounds check
 			if((byte *) (surf + 1) > (byte *) mdr + size)
 			{
+#ifndef RENDERLESS_MODELS
 				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
+#endif
 				return qfalse;
 			}
 
@@ -636,7 +918,24 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			surf->numTriangles = LittleLong(cursurf->numTriangles);
 			// numBoneReferences and BoneReferences generally seem to be unused
 			
+#ifndef RENDERLESS_MODELS
 			// now do the checks that may fail.
+#ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
+			if ( surf->numVerts > SHADER_MAX_VERTEXES )
+			{
+				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i verts on %s (%i)",
+					  mod_name, SHADER_MAX_VERTEXES, surf->name[0] == '\0' ? "a surface" : surf->name,
+					  surf->numVerts );
+				return qfalse;
+			}
+			if ( surf->numTriangles*3 > SHADER_MAX_INDEXES )
+			{
+				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i triangles on %s (%i)",
+					  mod_name, SHADER_MAX_INDEXES / 3, surf->name[0] == '\0' ? "a surface" : surf->name,
+					  surf->numTriangles );
+				return qfalse;
+			}
+#else
 			if ( surf->numVerts > SHADER_MAX_VERTEXES ) 
 			{
 				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i verts on a surface (%i)",
@@ -649,9 +948,14 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 					  mod_name, SHADER_MAX_INDEXES / 3, surf->numTriangles );
 				return qfalse;
 			}
+#endif
+#endif
 			// lowercase the surface name so skin compares are faster
 			Q_strlwr( surf->name );
 
+#ifdef RENDERLESS_MODELS
+			surf->shaderIndex = 0;
+#else
 			// register the shaders
 			sh = R_FindShader(surf->shader, LIGHTMAP_NONE, qtrue);
 			if ( sh->defaultShader ) {
@@ -659,6 +963,7 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			} else {
 				surf->shaderIndex = sh->index;
 			}
+#endif
 			
 			// now copy the vertexes.
 			v = (mdrVertex_t *) (surf + 1);
@@ -672,7 +977,9 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 				// simple bounds check
 				if(curv->numWeights < 0 || (byte *) (v + 1) + (curv->numWeights - 1) * sizeof(*weight) > (byte *) mdr + size)
 				{
+#ifndef RENDERLESS_MODELS
 					ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
+#endif
 					return qfalse;
 				}
 
@@ -713,7 +1020,9 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			// simple bounds check
 			if(surf->numTriangles < 0 || (byte *) (tri + surf->numTriangles) > (byte *) mdr + size)
 			{
+#ifndef RENDERLESS_MODELS
 				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
+#endif
 				return qfalse;
 			}
 
@@ -751,7 +1060,9 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	// simple bounds check
 	if(mdr->numTags < 0 || (byte *) (tag + mdr->numTags) > (byte *) mdr + size)
 	{
+#ifndef RENDERLESS_MODELS
 		ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
+#endif
 		return qfalse;
 	}
 	
@@ -789,22 +1100,30 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 	md4Vertex_t			*v;
 	int					version;
 	int					size;
+#ifndef RENDERLESS_MODELS
 	shader_t			*sh;
+#endif
 	int					frameSize;
 
 	pinmodel = (md4Header_t *)buffer;
 
 	version = LittleLong (pinmodel->version);
 	if (version != MD4_VERSION) {
+#ifndef RENDERLESS_MODELS
 		ri.Printf( PRINT_WARNING, "R_LoadMD4: %s has wrong version (%i should be %i)\n",
 				 mod_name, version, MD4_VERSION);
+#endif
 		return qfalse;
 	}
 
 	mod->type = MOD_MD4;
 	size = LittleLong(pinmodel->ofsEnd);
 	mod->dataSize += size;
+#ifdef RENDERLESS_MODELS
+	md4 = mod->md4 = Hunk_Alloc( size, h_low );
+#else
 	md4 = mod->md4 = ri.Hunk_Alloc( size, h_low );
+#endif
 
 	Com_Memcpy(md4, buffer, size);
 
@@ -818,7 +1137,9 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
     md4->ofsEnd = size;
 
 	if ( md4->numFrames < 1 ) {
+#ifndef RENDERLESS_MODELS
 		ri.Printf( PRINT_WARNING, "R_LoadMD4: %s has no frames\n", mod_name );
+#endif
 		return qfalse;
 	}
 
@@ -853,6 +1174,21 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 			LL(surf->ofsVerts);
 			LL(surf->ofsEnd);
 			
+#ifndef RENDERLESS_MODELS
+#ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
+			if ( surf->numVerts > SHADER_MAX_VERTEXES ) {
+				ri.Printf(PRINT_WARNING, "R_LoadMD4: %s has more than %i verts on %s (%i)",
+					mod_name, SHADER_MAX_VERTEXES, surf->name[0] == '\0' ? "a surface" : surf->name,
+					surf->numVerts );
+				return qfalse;
+			}
+			if ( surf->numTriangles*3 > SHADER_MAX_INDEXES ) {
+				ri.Printf(PRINT_WARNING, "R_LoadMD4: %s has more than %i triangles on %s (%i)",
+					mod_name, SHADER_MAX_INDEXES / 3, surf->name[0] == '\0' ? "a surface" : surf->name,
+					surf->numTriangles );
+				return qfalse;
+			}
+#else
 			if ( surf->numVerts > SHADER_MAX_VERTEXES ) {
 				ri.Error (ERR_DROP, "R_LoadMD3: %s has more than %i verts on a surface (%i)",
 					mod_name, SHADER_MAX_VERTEXES, surf->numVerts );
@@ -861,6 +1197,8 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 				ri.Error (ERR_DROP, "R_LoadMD3: %s has more than %i triangles on a surface (%i)",
 					mod_name, SHADER_MAX_INDEXES / 3, surf->numTriangles );
 			}
+#endif
+#endif
 
 			// change to surface identifier
 			surf->ident = SF_MD4;
@@ -869,12 +1207,16 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 			Q_strlwr( surf->name );
 		
 			// register the shaders
+#ifdef RENDERLESS_MODELS
+			surf->shaderIndex = 0;
+#else
 			sh = R_FindShader( surf->shader, LIGHTMAP_NONE, qtrue );
 			if ( sh->defaultShader ) {
 				surf->shaderIndex = 0;
 			} else {
 				surf->shaderIndex = sh->index;
 			}
+#endif
 
 			// swap all the triangles
 			tri = (md4Triangle_t *) ( (byte *)surf + surf->ofsTriangles );
@@ -929,6 +1271,7 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 
 //=============================================================================
 
+#ifndef RENDERLESS_MODELS
 /*
 ** RE_BeginRegistration
 */
@@ -951,6 +1294,7 @@ void RE_BeginRegistration( glconfig_t *glconfigOut ) {
 	// first time the level shot would not be drawn
 //	RE_StretchPic(0, 0, 0, 0, 0, 0, 1, 1, 0);
 }
+#endif
 
 //=============================================================================
 
@@ -970,6 +1314,7 @@ void R_ModelInit( void ) {
 }
 
 
+#ifndef RENDERLESS_MODELS
 /*
 ================
 R_Modellist_f
@@ -1001,6 +1346,7 @@ void R_Modellist_f( void ) {
 	}
 #endif
 }
+#endif
 
 
 //=============================================================================
@@ -1151,11 +1497,13 @@ void R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs ) {
 
 	model = R_GetModelByHandle( handle );
 
+#ifndef RENDERLESS_MODELS
 	if ( model->bmodel ) {
 		VectorCopy( model->bmodel->bounds[0], mins );
 		VectorCopy( model->bmodel->bounds[1], maxs );
 		return;
 	}
+#endif
 
 	if ( !model->md3[0] ) {
 		VectorClear( mins );
@@ -1171,3 +1519,113 @@ void R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs ) {
 	VectorCopy( frame->bounds[1], maxs );
 }
 
+#ifdef RAVENMD4
+//
+#define MC_BITS_X (16)
+#define MC_BITS_Y (16)
+#define MC_BITS_Z (16)
+#define MC_BITS_VECT (16)
+
+#define MC_SCALE_X (1.0f/64)
+#define MC_SCALE_Y (1.0f/64)
+#define MC_SCALE_Z (1.0f/64)
+
+//
+#define MC_MASK_X ((1<<(MC_BITS_X))-1)
+#define MC_MASK_Y ((1<<(MC_BITS_Y))-1)
+#define MC_MASK_Z ((1<<(MC_BITS_Z))-1)
+#define MC_MASK_VECT ((1<<(MC_BITS_VECT))-1)
+
+#define MC_SCALE_VECT (1.0f/(float)((1<<(MC_BITS_VECT-1))-2))
+
+#define MC_POS_X (0)
+#define MC_SHIFT_X (0)
+
+#define MC_POS_Y ((((MC_BITS_X))/8))
+#define MC_SHIFT_Y ((((MC_BITS_X)%8)))
+
+#define MC_POS_Z ((((MC_BITS_X+MC_BITS_Y))/8))
+#define MC_SHIFT_Z ((((MC_BITS_X+MC_BITS_Y)%8)))
+
+#define MC_POS_V11 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z))/8))
+#define MC_SHIFT_V11 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z)%8)))
+
+#define MC_POS_V12 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT))/8))
+#define MC_SHIFT_V12 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT)%8)))
+
+#define MC_POS_V13 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*2))/8))
+#define MC_SHIFT_V13 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*2)%8)))
+
+#define MC_POS_V21 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*3))/8))
+#define MC_SHIFT_V21 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*3)%8)))
+
+#define MC_POS_V22 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*4))/8))
+#define MC_SHIFT_V22 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*4)%8)))
+
+#define MC_POS_V23 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*5))/8))
+#define MC_SHIFT_V23 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*5)%8)))
+
+#define MC_POS_V31 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*6))/8))
+#define MC_SHIFT_V31 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*6)%8)))
+
+#define MC_POS_V32 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*7))/8))
+#define MC_SHIFT_V32 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*7)%8)))
+
+#define MC_POS_V33 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*8))/8))
+#define MC_SHIFT_V33 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*8)%8)))
+
+void MC_UnCompress(float mat[3][4],const unsigned char * comp)
+{
+	int val;
+
+	val=(int)((unsigned short *)(comp))[0];
+	val-=1<<(MC_BITS_X-1);
+	mat[0][3]=((float)(val))*MC_SCALE_X;
+
+	val=(int)((unsigned short *)(comp))[1];
+	val-=1<<(MC_BITS_Y-1);
+	mat[1][3]=((float)(val))*MC_SCALE_Y;
+
+	val=(int)((unsigned short *)(comp))[2];
+	val-=1<<(MC_BITS_Z-1);
+	mat[2][3]=((float)(val))*MC_SCALE_Z;
+
+	val=(int)((unsigned short *)(comp))[3];
+	val-=1<<(MC_BITS_VECT-1);
+	mat[0][0]=((float)(val))*MC_SCALE_VECT;
+
+	val=(int)((unsigned short *)(comp))[4];
+	val-=1<<(MC_BITS_VECT-1);
+	mat[0][1]=((float)(val))*MC_SCALE_VECT;
+
+	val=(int)((unsigned short *)(comp))[5];
+	val-=1<<(MC_BITS_VECT-1);
+	mat[0][2]=((float)(val))*MC_SCALE_VECT;
+
+
+	val=(int)((unsigned short *)(comp))[6];
+	val-=1<<(MC_BITS_VECT-1);
+	mat[1][0]=((float)(val))*MC_SCALE_VECT;
+
+	val=(int)((unsigned short *)(comp))[7];
+	val-=1<<(MC_BITS_VECT-1);
+	mat[1][1]=((float)(val))*MC_SCALE_VECT;
+
+	val=(int)((unsigned short *)(comp))[8];
+	val-=1<<(MC_BITS_VECT-1);
+	mat[1][2]=((float)(val))*MC_SCALE_VECT;
+
+
+	val=(int)((unsigned short *)(comp))[9];
+	val-=1<<(MC_BITS_VECT-1);
+	mat[2][0]=((float)(val))*MC_SCALE_VECT;
+
+	val=(int)((unsigned short *)(comp))[10];
+	val-=1<<(MC_BITS_VECT-1);
+	mat[2][1]=((float)(val))*MC_SCALE_VECT;
+
+	val=(int)((unsigned short *)(comp))[11];
+	val-=1<<(MC_BITS_VECT-1);
+	mat[2][2]=((float)(val))*MC_SCALE_VECT;
+}
+#endif

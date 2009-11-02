@@ -2,7 +2,7 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="quake3" />
+		<Option title="ioquake3" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
@@ -232,21 +232,27 @@
 		<Unit filename="../../code/botlib/be_ai_char.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/botlib/be_ai_char.h" />
 		<Unit filename="../../code/botlib/be_ai_chat.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/botlib/be_ai_chat.h" />
 		<Unit filename="../../code/botlib/be_ai_gen.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/botlib/be_ai_gen.h" />
 		<Unit filename="../../code/botlib/be_ai_goal.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/botlib/be_ai_goal.h" />
 		<Unit filename="../../code/botlib/be_ai_move.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/botlib/be_ai_move.h" />
 		<Unit filename="../../code/botlib/be_ai_weap.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/botlib/be_ai_weap.h" />
 		<Unit filename="../../code/botlib/be_ai_weight.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -742,6 +748,9 @@
 		<Unit filename="../../code/renderer/tr_backend.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/renderer/tr_bloom.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/renderer/tr_bsp.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -871,6 +880,11 @@
 		</Unit>
 		<Unit filename="../../code/sys/sys_main.c">
 			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/sys/sys_unix.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="../../code/sys/sys_win32.c">
 			<Option compilerVar="CC" />

@@ -288,6 +288,15 @@ qboolean CG_DrawOldScoreboard( void ) {
 		return qfalse;
 	}
 
+#ifdef TMNTSP
+	if ( cgs.gametype == GT_SINGLE_PLAYER && cg.predictedPlayerState.stats[STAT_HEALTH] <= 0
+		&& !cg.showScores )
+	{
+		cg.deferredPlayerLoading = 0;
+		return qfalse;
+	}
+#endif
+
 	if ( cg.showScores || cg.predictedPlayerState.pm_type == PM_DEAD ||
 		 cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		fade = 1.0;

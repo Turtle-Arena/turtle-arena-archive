@@ -435,7 +435,11 @@ static void ArenaServers_UpdatePicture( void ) {
 	}
 	else {
 		servernodeptr = g_arenaservers.table[g_arenaservers.list.curvalue].servernode;
+#ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
+		Com_sprintf( picname, sizeof(picname), "levelshots/%s_small", servernodeptr->mapname );
+#else
 		Com_sprintf( picname, sizeof(picname), "levelshots/%s.tga", servernodeptr->mapname );
+#endif
 		g_arenaservers.mappic.generic.name = picname;
 	
 	}
@@ -860,6 +864,9 @@ void ArenaServers_InsertFavorites( void )
 		if ( j >= g_numfavoriteservers)
 		{
 			// not in list, add it
+#ifdef IOQ3ZTM // "No Response (%s)"
+			Info_SetValueForKey( info, "hostname", g_arenaservers.favoriteaddresses[i] );
+#endif
 			ArenaServers_Insert( g_arenaservers.favoriteaddresses[i], info, ArenaServers_MaxPing() );
 		}
 	}
@@ -1129,7 +1136,10 @@ static void ArenaServers_DoRefresh( void )
 ArenaServers_StartRefresh
 =================
 */
-static void ArenaServers_StartRefresh( void )
+#ifndef IOQ3ZTM
+static
+#endif
+void ArenaServers_StartRefresh( void )
 {
 	int		i;
 	char	myargs[32], protocol[32];
@@ -1423,6 +1433,10 @@ static void ArenaServers_Event( void* ptr, int event ) {
 		break;
 
 	case ID_SPECIFY:
+#ifdef IOQ3ZTM // SPECIFY_FAV
+		ArenaServers_StopRefresh();
+		ArenaServers_SaveChanges();
+#endif
 		UI_SpecifyServerMenu();
 		break;
 

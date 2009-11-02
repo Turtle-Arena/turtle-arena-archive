@@ -36,7 +36,25 @@ MARK POLYS
 markPoly_t	cg_activeMarkPolys;			// double linked list
 markPoly_t	*cg_freeMarkPolys;			// single linked list
 markPoly_t	cg_markPolys[MAX_MARK_POLYS];
+#ifndef IOQ3ZTM
 static		int	markTotal;
+#endif
+
+#ifdef TMNTWEAPSYS_2 // MELEE_MARKS
+#define	MAX_MELEE_MARK_POLYS		64 // MAX_MARK_POLYS is 256
+typedef struct
+{
+	meleeMarkPoly_t	activeMarkPolys;			// double linked list
+	meleeMarkPoly_t	*freeMarkPolys;			// single linked list
+	meleeMarkPoly_t	markPolys[MAX_MELEE_MARK_POLYS];
+	meleeMarkPoly_t *lastMark;
+	int chainNumber;
+	int chainIndex;
+
+} meleeMarks_t;
+
+meleeMarks_t clientMeleeMarks[MAX_CLIENTS];
+#endif
 
 /*
 ===================
@@ -47,6 +65,9 @@ This is called at startup and for tournement restarts
 */
 void	CG_InitMarkPolys( void ) {
 	int		i;
+#ifdef TMNTWEAPSYS_2 // MELEE_MARKS
+	int		j;
+#endif
 
 	memset( cg_markPolys, 0, sizeof(cg_markPolys) );
 
@@ -56,6 +77,23 @@ void	CG_InitMarkPolys( void ) {
 	for ( i = 0 ; i < MAX_MARK_POLYS - 1 ; i++ ) {
 		cg_markPolys[i].nextMark = &cg_markPolys[i+1];
 	}
+
+#ifdef TMNTWEAPSYS_2 // MELEE_MARKS
+	for (i = 0; i < MAX_CLIENTS; i++)
+	{
+		memset( clientMeleeMarks[i].markPolys, 0, sizeof(clientMeleeMarks[i].markPolys) );
+
+		clientMeleeMarks[i].activeMarkPolys.nextMark = &clientMeleeMarks[i].activeMarkPolys;
+		clientMeleeMarks[i].activeMarkPolys.prevMark = &clientMeleeMarks[i].activeMarkPolys;
+		clientMeleeMarks[i].freeMarkPolys = clientMeleeMarks[i].markPolys;
+		for ( j = 0 ; j < MAX_MELEE_MARK_POLYS - 1 ; j++ ) {
+			clientMeleeMarks[i].markPolys[j].nextMark = &clientMeleeMarks[i].markPolys[j+1];
+		}
+		clientMeleeMarks[i].lastMark = NULL;
+		clientMeleeMarks[i].chainNumber = 0;
+		clientMeleeMarks[i].chainIndex = 0;
+	}
+#endif
 }
 
 
@@ -148,9 +186,11 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 		CG_Error( "CG_ImpactMark called with <= 0 radius" );
 	}
 
+#ifndef IOQ3ZTM
 	//if ( markTotal >= MAX_MARK_POLYS ) {
 	//	return;
 	//}
+#endif
 
 	// create the texture axis
 	VectorNormalize2( dir, axis[0] );
@@ -217,10 +257,16 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 		mark->color[2] = blue;
 		mark->color[3] = alpha;
 		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
+#ifndef IOQ3ZTM
 		markTotal++;
+#endif
 	}
 }
 
+
+#ifdef TMNTWEAPSYS_2 // MELEE_MARKS
+void CG_AddMeleeMarks( int clientNum );
+#endif
 
 /*
 ===============
@@ -253,7 +299,12 @@ void CG_AddMarks( void ) {
 		}
 
 		// fade out the energy bursts
-		if ( mp->markShader == cgs.media.energyMarkShader ) {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use alphaFade instead of shader num (As only energyMark used alphaFade)
+		if ( mp->alphaFade )
+#else
+		if ( mp->markShader == cgs.media.energyMarkShader )
+#endif
+		{
 
 			fade = 450 - 450 * ( (cg.time - mp->time ) / 3000.0 );
 			if ( fade < 255 ) {
@@ -290,4 +341,358 @@ void CG_AddMarks( void ) {
 
 		trap_R_AddPolyToScene( mp->markShader, mp->poly.numVerts, mp->verts );
 	}
+#ifdef TMNTWEAPSYS_2 // MELEE_MARKS
+	for (j = 0; j < MAX_CLIENTS; j++)
+	{
+		CG_AddMeleeMarks(j);
+	}
+#endif
 }
+
+#ifdef TMNTWEAPSYS_2 // MELEE_MARKS
+/*
+==================
+CG_FreeMarkPoly
+==================
+*/
+void CG_FreeMeleeMarkPoly( meleeMarkPoly_t *le, int clientNum ) {
+	if ( !le->prevMark ) {
+		CG_Error( "CG_FreeMeleeMarkPoly: not active (!le->prevMark)" );
+	}
+
+	if (le == clientMeleeMarks[clientNum].lastMark)
+	{
+		clientMeleeMarks[clientNum].lastMark = NULL;
+	}
+
+	// remove from the doubly linked active list
+	le->prevMark->nextMark = le->nextMark;
+	if ( le->nextMark ) {
+		le->nextMark->prevMark = le->prevMark;
+	}
+
+	// the free list is only singly linked
+	le->nextMark = clientMeleeMarks[clientNum].freeMarkPolys;
+	clientMeleeMarks[clientNum].freeMarkPolys = le;
+}
+
+/*
+===================
+CG_AllocMark
+
+Will allways succeed, even if it requires freeing an old active mark
+===================
+*/
+meleeMarkPoly_t	*CG_AllocMeleeMark( int clientNum ) {
+	meleeMarkPoly_t	*le;
+	int time;
+
+	if ( !clientMeleeMarks[clientNum].freeMarkPolys ) {
+		// no free entities, so free the one at the end of the chain
+		// remove the oldest active entity
+		time = clientMeleeMarks[clientNum].activeMarkPolys.prevMark->time;
+		while (clientMeleeMarks[clientNum].activeMarkPolys.prevMark && time == clientMeleeMarks[clientNum].activeMarkPolys.prevMark->time) {
+			CG_FreeMeleeMarkPoly( clientMeleeMarks[clientNum].activeMarkPolys.prevMark, clientNum );
+		}
+	}
+
+	le = clientMeleeMarks[clientNum].freeMarkPolys;
+	clientMeleeMarks[clientNum].freeMarkPolys = clientMeleeMarks[clientNum].freeMarkPolys->nextMark;
+
+	memset( le, 0, sizeof( *le ) );
+
+	// link into the active list
+	le->nextMark = clientMeleeMarks[clientNum].activeMarkPolys.nextMark;
+	le->prevMark = &clientMeleeMarks[clientNum].activeMarkPolys;
+	clientMeleeMarks[clientNum].activeMarkPolys.nextMark->prevMark = le;
+	clientMeleeMarks[clientNum].activeMarkPolys.nextMark = le;
+	return le;
+}
+
+/*
+================
+CG_MeleeImpactMark
+================
+*/
+#define HEIGHT_RADIUS (radius/4)
+#define WIDTH_RADIUS (radius/2)
+qboolean CG_MeleeImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
+				   float orientation,
+				   float red, float green, float blue, float alpha,
+				   qboolean alphaFade, float radius, int clientNum )
+{
+	vec3_t			axis[3];
+	float			texCoordScale;
+	vec3_t			originalPoints[4];
+	byte			colors[4];
+	int				i, j;
+	int				numFragments;
+	markFragment_t	markFragments[MAX_MARK_FRAGMENTS], *mf;
+	vec3_t			markPoints[MAX_MARK_POINTS];
+	vec3_t			projection;
+	meleeMarkPoly_t *lastMark;
+
+	if ( !cg_addMarks.integer ) {
+		return qfalse;
+	}
+
+	if ( radius <= 0 ) {
+		CG_Error( "CG_MeleeImpactMark called with <= 0 radius" );
+	}
+
+	lastMark = NULL;
+
+	// Turtle Man: Testing
+	markShader = 1;
+
+	// Do a dist test and stuff
+	// if too close return
+	// if too far, start new markChain.
+	if (clientMeleeMarks[clientNum].lastMark != NULL)
+	{
+		meleeMarkPoly_t *mark = clientMeleeMarks[clientNum].lastMark;
+		vec3_t dist, lastOrigin;
+		float fdist;
+
+		// setup origin and radius
+		VectorSubtract(mark->verts[0].xyz, mark->verts[1].xyz, dist);
+		VectorScale(dist, 0.5f, dist);
+		VectorAdd(mark->verts[0].xyz, dist, lastOrigin);
+
+		VectorSubtract(lastOrigin, origin, dist);
+		fdist = VectorLength(dist);
+
+		if (fdist > 10) // Too far.
+		{
+			mark = NULL;
+			clientMeleeMarks[clientNum].lastMark = NULL;
+		}
+		else if (fdist <= WIDTH_RADIUS-1) // Too close
+			return qfalse;
+
+		if (mark && orientation == 0) {
+			// Use orientation of lastMark.
+		}
+	}
+
+	// Check if this mark should be added to the chain,
+	//  or if we should start a new chain.
+	if (clientMeleeMarks[clientNum].lastMark == NULL)
+	{
+		// Broke chain (or first chain)
+		clientMeleeMarks[clientNum].chainNumber++;
+		clientMeleeMarks[clientNum].chainIndex = 0;
+	}
+
+	// create the texture axis
+	VectorNormalize2( dir, axis[0] );
+	PerpendicularVector( axis[1], axis[0] );
+	RotatePointAroundVector( axis[2], axis[0], axis[1], orientation );
+	CrossProduct( axis[0], axis[2], axis[1] );
+
+	texCoordScale = 0.5 * 1.0 / radius;
+
+	// create the full polygon
+	for ( i = 0 ; i < 3 ; i++ ) {
+		originalPoints[0][i] = origin[i] /*- WIDTH_RADIUS * axis[1][i]*/ - HEIGHT_RADIUS * axis[2][i];
+		originalPoints[1][i] = origin[i] + WIDTH_RADIUS * axis[1][i] - HEIGHT_RADIUS * axis[2][i];
+		originalPoints[2][i] = origin[i] + WIDTH_RADIUS * axis[1][i] + HEIGHT_RADIUS * axis[2][i];
+		originalPoints[3][i] = origin[i] /*- WIDTH_RADIUS * axis[1][i]*/ + HEIGHT_RADIUS * axis[2][i];
+	}
+
+	// Turtle Man: FIXME: Melee shouldn't have fragments
+	// get the fragments
+	VectorScale( dir, -20, projection );
+	numFragments = trap_CM_MarkFragments( 4, (void *)originalPoints,
+					projection, MAX_MARK_POINTS, markPoints[0],
+					MAX_MARK_FRAGMENTS, markFragments );
+
+	colors[0] = red * 255;
+	colors[1] = green * 255;
+	colors[2] = blue * 255;
+	colors[3] = alpha * 255;
+
+	for ( i = 0, mf = markFragments ; i < numFragments ; i++, mf++ ) {
+		polyVert_t	*v;
+		polyVert_t	verts[MAX_VERTS_ON_POLY];
+		meleeMarkPoly_t	*mark;
+
+		// we have an upper limit on the complexity of polygons
+		// that we store persistantly
+		if ( mf->numPoints > MAX_VERTS_ON_POLY ) {
+			mf->numPoints = MAX_VERTS_ON_POLY;
+		}
+		for ( j = 0, v = verts ; j < mf->numPoints ; j++, v++ ) {
+			vec3_t		delta;
+
+			VectorCopy( markPoints[mf->firstPoint + j], v->xyz );
+
+			VectorSubtract( v->xyz, origin, delta );
+			v->st[0] = 0.5 + DotProduct( delta, axis[1] ) * texCoordScale;
+			v->st[1] = 0.5 + DotProduct( delta, axis[2] ) * texCoordScale;
+			*(int *)v->modulate = *(int *)colors;
+		}
+
+#if 0
+		// if it is a temporary (shadow) mark, add it immediately and forget about it
+		if ( temporary ) {
+			trap_R_AddPolyToScene( markShader, mf->numPoints, verts );
+			continue;
+		}
+#endif
+
+		// otherwise save it persistantly
+		mark = CG_AllocMeleeMark(clientNum);
+		mark->time = cg.time;
+		mark->alphaFade = alphaFade;
+		mark->markShader = markShader;
+		mark->poly.numVerts = mf->numPoints;
+		mark->color[0] = red;
+		mark->color[1] = green;
+		mark->color[2] = blue;
+		mark->color[3] = alpha;
+		memcpy( mark->verts, verts, mf->numPoints * sizeof( verts[0] ) );
+		mark->meleeNumber = clientMeleeMarks[clientNum].chainNumber;
+		mark->meleeChain = clientMeleeMarks[clientNum].chainIndex;
+		lastMark = mark;
+	}
+	// no fragments
+	if (lastMark == NULL)
+		return qfalse;
+
+	// All fragment use same chainIndex
+	clientMeleeMarks[clientNum].chainIndex++;
+
+	// Hook last mark to new mark!
+	if (clientMeleeMarks[clientNum].lastMark)
+	{
+		vec3_t dist;
+		vec3_t lastOrigin;
+		meleeMarkPoly_t	*oldLastMark = clientMeleeMarks[clientNum].lastMark;
+		static int runCount = 0;
+
+		runCount++;
+		if (runCount > 1)
+		{
+			Com_Printf("runCount overflow is %d.\n", runCount);
+			runCount = 0;
+			return qtrue;
+		}
+
+		// Clear lastMark so we don't get stuck...
+		clientMeleeMarks[clientNum].lastMark = NULL;
+
+		// setup origin and radius
+		VectorSubtract(oldLastMark->verts[0].xyz, oldLastMark->verts[1].xyz, dist);
+		VectorScale(dist, 0.5f, dist);
+
+		radius = VectorLength(dist);
+
+		VectorAdd(oldLastMark->verts[0].xyz, dist, lastOrigin);
+
+		// Turtle Man: FIXME: Setup dir, orientation
+		//VectorClear(dir); // Use dir of new poly... because I don't know how to get it.
+		orientation = 0; // Set or so that origin will point at newOrigin
+
+		if (orientation == 0) // 0 means use orientation of last mark...
+			orientation++;
+
+		CG_MeleeImpactMark( oldLastMark->markShader, lastOrigin, dir,
+				   orientation,
+				   oldLastMark->color[0]/255, oldLastMark->color[1]/255, oldLastMark->color[2]/255, oldLastMark->color[3]/255,
+				   oldLastMark->alphaFade, radius, clientNum );
+
+		{
+			// Now remove lastMark and all other with the same meleeNumber and meleeChain
+			meleeMarkPoly_t	*mp, *next;
+
+			mp = clientMeleeMarks[clientNum].activeMarkPolys.nextMark;
+			for ( ; mp != &clientMeleeMarks[clientNum].activeMarkPolys ; mp = next ) {
+				// grab next now, so if the local entity is freed we
+				// still have it
+				next = mp->nextMark;
+
+				// see if it is time to completely remove it
+				if ( mp->meleeNumber == oldLastMark->meleeNumber
+					&& mp->meleeChain == oldLastMark->meleeChain) {
+					CG_FreeMeleeMarkPoly( mp, clientNum );
+					continue;
+				}
+			}
+			CG_FreeMeleeMarkPoly( oldLastMark, clientNum );
+		}
+	}
+
+	// Set new lastMark
+	clientMeleeMarks[clientNum].lastMark = lastMark;
+
+	return qtrue;
+}
+
+
+void CG_AddMeleeMarks( int clientNum )
+{
+	int			j;
+	meleeMarkPoly_t	*mp, *next;
+	int			t;
+	int			fade;
+
+	//if ( !cg_addMarks.integer ) {
+	//	return;
+	//}
+
+	mp = clientMeleeMarks[clientNum].activeMarkPolys.nextMark;
+	for ( ; mp != &clientMeleeMarks[clientNum].activeMarkPolys ; mp = next ) {
+		// grab next now, so if the local entity is freed we
+		// still have it
+		next = mp->nextMark;
+
+		// see if it is time to completely remove it
+		if ( cg.time > mp->time + MARK_TOTAL_TIME ) {
+			CG_FreeMeleeMarkPoly( mp, clientNum );
+			continue;
+		}
+
+		// fade out the energy bursts
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use alphaFade instead of shader num (As only energyMark used alphaFade)
+		if ( mp->alphaFade )
+#else
+		if ( mp->markShader == cgs.media.energyMarkShader )
+#endif
+		{
+			fade = 450 - 450 * ( (cg.time - mp->time ) / 3000.0 );
+			if ( fade < 255 ) {
+				if ( fade < 0 ) {
+					fade = 0;
+				}
+				if ( mp->verts[0].modulate[0] != 0 ) {
+					for ( j = 0 ; j < mp->poly.numVerts ; j++ ) {
+						mp->verts[j].modulate[0] = mp->color[0] * fade;
+						mp->verts[j].modulate[1] = mp->color[1] * fade;
+						mp->verts[j].modulate[2] = mp->color[2] * fade;
+					}
+				}
+			}
+		}
+
+		// fade all marks out with time
+		t = mp->time + MARK_TOTAL_TIME - cg.time;
+		if ( t < MARK_FADE_TIME ) {
+			fade = 255 * t / MARK_FADE_TIME;
+			if ( mp->alphaFade ) {
+				for ( j = 0 ; j < mp->poly.numVerts ; j++ ) {
+					mp->verts[j].modulate[3] = fade;
+				}
+			} else {
+				for ( j = 0 ; j < mp->poly.numVerts ; j++ ) {
+					mp->verts[j].modulate[0] = mp->color[0] * fade;
+					mp->verts[j].modulate[1] = mp->color[1] * fade;
+					mp->verts[j].modulate[2] = mp->color[2] * fade;
+				}
+			}
+		}
+
+		trap_R_AddPolyToScene( mp->markShader, mp->poly.numVerts, mp->verts );
+	}
+}
+#endif

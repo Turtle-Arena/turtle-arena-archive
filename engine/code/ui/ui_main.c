@@ -76,6 +76,9 @@ static const serverFilter_t serverFilters[] = {
 	{"TMNT Arena", "" },
 #elif defined SONIC
 	{"Sonic Blast Arena", "" },
+#endif
+#if defined TMNT || defined SONIC
+	{"Quake 3 Arena", "baseq3" },
 #else
 	{"Quake 3 Arena", "" },
 #endif
@@ -4721,22 +4724,15 @@ static qboolean Character_Parse(char **p) {
       uiInfo.characterList[uiInfo.characterCount].headImage = -1;
 			uiInfo.characterList[uiInfo.characterCount].imageName = String_Alloc(va("models/players/heads/%s/icon_default.tga", uiInfo.characterList[uiInfo.characterCount].name));
 
-	// Turtle Man: FIXME: characters block in teaminfo.txt
-	//             They list "male" and "female" for the base model to
-	//                 James and Janet
-	//             Should it april and casey? or remove this "male" "female" check?
+	  /* Turtle Man: NOTE: About characters block in teaminfo.txt ...
+	               In Team Arena they just list "male" and "female"
+	                   for the base model meaning James and Janet.
+	               I plan to just list the name (Casey/April), but it is left for compatiblity.
+	  */
 	  if (tempStr && (!Q_stricmp(tempStr, "female"))) {
-#if 0 //#ifdef TMNTDATA // Default female player
-        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("April"));
-#else
         uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("Janet"));
-#endif
       } else if (tempStr && (!Q_stricmp(tempStr, "male"))) {
-#if 0 // #ifdef TMNTDATA // Default male player
-        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("Casey"));
-#else
         uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("James"));
-#endif
 	  } else {
         uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("%s",tempStr));
 	  }
@@ -5103,6 +5099,9 @@ static void UI_BuildQ3Model_List( void )
 	char	scratch[256];
 	char*	dirptr;
 	char*	fileptr;
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+	int		h;
+#endif
 	int		i;
 	int		j, k, dirty;
 	int		dirlen;
@@ -5110,8 +5109,15 @@ static void UI_BuildQ3Model_List( void )
 
 	uiInfo.q3HeadCount = 0;
 
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+  for (h = 0; h < 2 && bg_playerDirs[h] != NULL; h++)
+  {
+	// iterate directory of all player models
+	numdirs = trap_FS_GetFileList(bg_playerDirs[h], "/", dirlist, 2048 );
+#else
 	// iterate directory of all player models
 	numdirs = trap_FS_GetFileList("models/players", "/", dirlist, 2048 );
+#endif
 	dirptr  = dirlist;
 	for (i=0; i<numdirs && uiInfo.q3HeadCount < MAX_PLAYERMODELS; i++,dirptr+=dirlen+1)
 	{
@@ -5123,10 +5129,18 @@ static void UI_BuildQ3Model_List( void )
 			continue;
 			
 		// iterate all skin files in directory
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+#ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
+		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "", filelist, 2048 );
+#else
+		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "tga", filelist, 2048 );
+#endif
+#else
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "", filelist, 2048 );
 #else
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );
+#endif
 #endif
 		fileptr  = filelist;
 		for (j=0; j<numfiles && uiInfo.q3HeadCount < MAX_PLAYERMODELS;j++,fileptr+=filelen+1)
@@ -5152,13 +5166,20 @@ static void UI_BuildQ3Model_List( void )
 				}
 				if (!dirty) {
 					Com_sprintf( uiInfo.q3HeadNames[uiInfo.q3HeadCount], sizeof(uiInfo.q3HeadNames[uiInfo.q3HeadCount]), "%s", scratch);
-					uiInfo.q3HeadIcons[uiInfo.q3HeadCount++] = trap_R_RegisterShaderNoMip(va("models/players/%s/%s",dirptr,skinname));
+					uiInfo.q3HeadIcons[uiInfo.q3HeadCount++] =
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+							trap_R_RegisterShaderNoMip(va("%s/%s/%s",bg_playerDirs[h],dirptr,skinname));
+#else
+							trap_R_RegisterShaderNoMip(va("models/players/%s/%s",dirptr,skinname));
+#endif
 				}
 			}
 
 		}
 	}	
-
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+  }
+#endif
 }
 
 
@@ -5176,6 +5197,9 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	UI_RegisterCvars();
 	UI_InitMemory();
+#ifdef TMNTWEAPSYS_2
+	BG_InitWeaponInfo();
+#endif
 
 	// cache redundant calulations
 	trap_GetGlconfig( &uiInfo.uiDC.glconfig );
@@ -5863,8 +5887,8 @@ static cvarTable_t		cvarTable[] = {
 #endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
-#ifdef TMNTMISC // frag to score
-	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
+#ifdef TMNTMISC // frag to score and changed KO limit to 3
+	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "3", CVAR_ARCHIVE },
 #else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
 #endif

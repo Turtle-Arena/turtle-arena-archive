@@ -1,4 +1,115 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release TA Win32" />
+	<File name="../../code/botlib/aasfile.h" open="0" top="0" tabpos="0">
+		<Cursor position="2247" topLine="50" />
+	</File>
+	<File name="../../code/botlib/be_aas_move.c" open="0" top="0" tabpos="0">
+		<Cursor position="13503" topLine="362" />
+	</File>
+	<File name="../../code/botlib/be_ai_move.c" open="0" top="0" tabpos="1">
+		<Cursor position="4649" topLine="128" />
+	</File>
+	<File name="../../code/botlib/be_ai_weap.c" open="0" top="0" tabpos="9">
+		<Cursor position="1656" topLine="45" />
+	</File>
+	<File name="../../code/botlib/be_ai_weap.h" open="0" top="0" tabpos="8">
+		<Cursor position="1267" topLine="30" />
+	</File>
+	<File name="../../code/botlib/be_interface.c" open="0" top="0" tabpos="7">
+		<Cursor position="27838" topLine="843" />
+	</File>
+	<File name="../../code/botlib/botlib.h" open="0" top="0" tabpos="6">
+		<Cursor position="16899" topLine="401" />
+	</File>
+	<File name="../../code/botlib/l_struct.c" open="0" top="0" tabpos="5">
+		<Cursor position="6885" topLine="236" />
+	</File>
+	<File name="../../code/client/cl_cgame.c" open="0" top="0" tabpos="4">
+		<Cursor position="16605" topLine="592" />
+	</File>
+	<File name="../../code/client/cl_main.c" open="0" top="0" tabpos="4">
+		<Cursor position="38546" topLine="1599" />
+	</File>
+	<File name="../../code/client/cl_ui.c" open="0" top="0" tabpos="0">
+		<Cursor position="7224" topLine="279" />
+	</File>
+	<File name="../../code/game/bg_public.h" open="0" top="0" tabpos="0">
+		<Cursor position="2744" topLine="73" />
+	</File>
+	<File name="../../code/libspeex/cb_search_arm4.h" open="0" top="0" tabpos="0">
+		<Cursor position="2295" topLine="47" />
+	</File>
+	<File name="../../code/libspeex/nb_celp.c" open="0" top="0" tabpos="0">
+		<Cursor position="18518" topLine="568" />
+	</File>
+	<File name="../../code/qcommon/msg.c" open="0" top="0" tabpos="0">
+		<Cursor position="19599" topLine="843" />
+	</File>
+	<File name="../../code/qcommon/net_chan.c" open="0" top="0" tabpos="0">
+		<Cursor position="17769" topLine="729" />
+	</File>
+	<File name="../../code/qcommon/net_ip.c" open="0" top="0" tabpos="0">
+		<Cursor position="33803" topLine="1330" />
+	</File>
+	<File name="../../code/qcommon/qcommon.h" open="0" top="0" tabpos="0">
+		<Cursor position="973" topLine="17" />
+	</File>
+	<File name="../../code/qcommon/qfiles.h" open="0" top="0" tabpos="0">
+		<Cursor position="13809" topLine="548" />
+	</File>
+	<File name="../../code/renderer/tr_backend.c" open="0" top="0" tabpos="0">
+		<Cursor position="27946" topLine="1165" />
+	</File>
+	<File name="../../code/renderer/tr_bloom.c" open="0" top="0" tabpos="0">
+		<Cursor position="10099" topLine="313" />
+	</File>
+	<File name="../../code/renderer/tr_bsp.c" open="0" top="0" tabpos="0">
+		<Cursor position="42121" topLine="1477" />
+	</File>
+	<File name="../../code/renderer/tr_curve.c" open="0" top="0" tabpos="0">
+		<Cursor position="12436" topLine="492" />
+	</File>
+	<File name="../../code/renderer/tr_flares.c" open="0" top="0" tabpos="0">
+		<Cursor position="974" topLine="13" />
+	</File>
+	<File name="../../code/renderer/tr_init.c" open="0" top="0" tabpos="0">
+		<Cursor position="36283" topLine="1327" />
+	</File>
+	<File name="../../code/renderer/tr_local.h" open="0" top="0" tabpos="0">
+		<Cursor position="18834" topLine="768" />
+	</File>
+	<File name="../../code/renderer/tr_model.c" open="0" top="0" tabpos="0">
+		<Cursor position="38421" topLine="1419" />
+	</File>
+	<File name="../../code/renderer/tr_shade.c" open="0" top="0" tabpos="0">
+		<Cursor position="26658" topLine="1019" />
+	</File>
+	<File name="../../code/renderer/tr_shade_calc.c" open="0" top="0" tabpos="0">
+		<Cursor position="2765" topLine="109" />
+	</File>
+	<File name="../../code/renderer/tr_shader.c" open="0" top="0" tabpos="0">
+		<Cursor position="23267" topLine="916" />
+	</File>
+	<File name="../../code/renderer/tr_types.h" open="0" top="0" tabpos="0">
+		<Cursor position="2428" topLine="43" />
+	</File>
+	<File name="../../code/server/server.h" open="0" top="0" tabpos="5">
+		<Cursor position="5051" topLine="137" />
+	</File>
+	<File name="../../code/server/sv_ccmds.c" open="0" top="0" tabpos="0">
+		<Cursor position="9981" topLine="407" />
+	</File>
+	<File name="../../code/server/sv_client.c" open="0" top="0" tabpos="0">
+		<Cursor position="2620" topLine="81" />
+	</File>
+	<File name="../../code/server/sv_game.c" open="0" top="0" tabpos="3">
+		<Cursor position="6748" topLine="289" />
+	</File>
+	<File name="../../code/server/sv_init.c" open="0" top="0" tabpos="0">
+		<Cursor position="10262" topLine="428" />
+	</File>
+	<File name="../../code/server/sv_main.c" open="0" top="0" tabpos="0">
+		<Cursor position="8433" topLine="273" />
+	</File>
 </CodeBlocks_layout_file>

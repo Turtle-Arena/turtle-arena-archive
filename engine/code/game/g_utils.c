@@ -446,6 +446,9 @@ float vectoyaw( const vec3_t vec ) {
 
 void G_InitGentity( gentity_t *e ) {
 	e->inuse = qtrue;
+#ifdef TMNTMISC // XREAL
+	e->spawnTime = level.time;
+#endif
 	e->classname = "noclass";
 	e->s.number = e - g_entities;
 	e->r.ownerNum = ENTITYNUM_NONE;
@@ -709,7 +712,7 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin ) {
 	VectorCopy( origin, ent->r.currentOrigin );
 }
 
-#ifdef TMNTWEAPONS // XREAL r2785
+#ifdef TMNTWEAPSYS // XREAL r2785
 /*
 =================
 G_FindRadius

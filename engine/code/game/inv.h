@@ -22,27 +22,27 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef TMNT // Turtle Man: TODO: FINISH THIS (Is it done yet?)
 #define INVENTORY_NONE				0
-#define INVENTORY_HEALTH			1
+#define INVENTORY_HEALTH			55
 
 //#ifdef TMNTWEAPSYS2
 // The most weapons a player can have is 2!
 //  (well they do have 3 when switching pickup for pickup and have a default weapon)
 // Default weapon for the player,
 // If INVENTORY_WAEPON is different, the default can be used by dropping current weapon.
-#define INVENTORY_DEFAULTWEAPON		55
+#define INVENTORY_DEFAULTWEAPON		56
 // Weapon the player is using
-#define INVENTORY_WEAPON			56
+#define INVENTORY_WEAPON			57
 
-#define INVENTORY_DEFAULTAMMO 57 // Ammo for default weapon.
-#define INVENTORY_AMMO 		58 // Ammo for current weapon,
+#define INVENTORY_DEFAULTAMMO 58 // Ammo for default weapon.
+#define INVENTORY_AMMO 		59 // Ammo for current weapon,
 //#endif
 
 //#ifdef TMNTWEAPONS
-// weapons, currently there is a max of 16 - which I am over...
+// weapons, currently (if !defined TMNTWEAPSYS2) there is a max of 16 - which I am over...
 //#define INVENTORY_WP_NONE			0
-#define INVENTORY_FISTS				59 // FIXME
+#define INVENTORY_FISTS				1
 #define INVENTORY_KATANAS			2
-#define INVENTORY_DAISHO			3 // Usagi's weapon
+#define INVENTORY_DAISHO			3 // Usagi's weapons
 #define INVENTORY_SAIS				4
 #define INVENTORY_NUNCHUKS			5
 #define INVENTORY_HAMMER			6
@@ -113,6 +113,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // other MISSIONPACK
 #define INVENTORY_REDCUBE			53
 #define INVENTORY_BLUECUBE			54
+
+// 55-59 are at top of file.
+#define INVENTORY_PERSISTANT_POWER 60
 
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200

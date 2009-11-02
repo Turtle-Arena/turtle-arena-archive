@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="" />
+	<File name="math_angles.cpp" open="0" top="0" tabpos="31">
+		<Cursor position="1320" topLine="35" />
+	</File>
+	<File name="math_matrix.h" open="0" top="0" tabpos="0">
+		<Cursor position="2786" topLine="77" />
+	</File>
+	<File name="q_parse.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1028" topLine="16" />
+	</File>
+	<File name="q_shared.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="9503" topLine="452" />
+	</File>
+	<File name="q_shared.h" open="0" top="0" tabpos="0">
+		<Cursor position="8214" topLine="328" />
+	</File>
 </CodeBlocks_layout_file>

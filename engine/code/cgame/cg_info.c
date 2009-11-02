@@ -79,7 +79,11 @@ CG_LoadingItem
 void CG_LoadingItem( int itemNum ) {
 	gitem_t		*item;
 
+#ifdef TMNTWEAPSYS_2
+	item = BG_ItemForItemNum(itemNum);
+#else
 	item = &bg_itemlist[itemNum];
+#endif
 	
 	if ( item->icon && loadingItemIconCount < MAX_LOADING_ITEM_ICONS ) {
 		loadingItemIcons[loadingItemIconCount++] = trap_R_RegisterShaderNoMip( item->icon );
@@ -277,7 +281,7 @@ void CG_DrawInformation( void ) {
 		break;
 	case GT_SINGLE_PLAYER:
 #ifdef TMNTSP
-		if (!cg_singlePlayer.integer)
+		if (!cg_singlePlayerActive.integer)
 			s = "Cooperative";
 		else
 #endif

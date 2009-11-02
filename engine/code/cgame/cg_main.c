@@ -33,8 +33,8 @@ int forceModelModificationCount = -1;
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
-#ifdef IOQ3ZTM2
-int CG_ViewType(void); // CG_VIEW_TYPE
+#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
+int CG_ViewType(void);
 #endif
 
 
@@ -77,7 +77,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 	case CG_EVENT_HANDLING:
 		CG_EventHandling(arg0);
 		return 0;
-#ifdef IOQ3ZTM2
+#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
 	case CG_VIEW_TYPE:
 		return CG_ViewType();
 #endif
@@ -92,10 +92,16 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 cg_t				cg;
 cgs_t				cgs;
 centity_t			cg_entities[MAX_GENTITIES];
+#ifdef TMNTWEAPSYS_2
+projectileInfo_t	cg_projectiles[MAX_BG_PROJ];
+weaponInfo_t		cg_weapons[MAX_BG_WEAPONS];
+weaponGroupInfo_t	cg_weapongroups[MAX_BG_WEAPON_GROUPS];
+#else
 #ifdef TMNTWEAPSYS
 weaponInfo_t		cg_weapons[WP_NUM_WEAPONS];
 #else
 weaponInfo_t		cg_weapons[MAX_WEAPONS];
+#endif
 #endif
 itemInfo_t			cg_items[MAX_ITEMS];
 #ifdef SP_NPC
@@ -219,7 +225,7 @@ vmCvar_t 	cg_redTeamName;
 vmCvar_t 	cg_blueTeamName;
 vmCvar_t	cg_currentSelectedPlayer;
 vmCvar_t	cg_currentSelectedPlayerName;
-#ifndef TMNTSP
+#ifndef IOQ3ZTM
 vmCvar_t	cg_singlePlayer;
 #endif
 vmCvar_t	cg_enableDust;
@@ -228,9 +234,6 @@ vmCvar_t	cg_singlePlayerActive;
 vmCvar_t	cg_recordSPDemo;
 vmCvar_t	cg_recordSPDemoName;
 vmCvar_t	cg_obeliskRespawnDelay;
-#endif
-#ifdef TMNTSP
-vmCvar_t	cg_singlePlayer;
 #endif
 
 typedef struct {
@@ -360,7 +363,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 	{ &cg_currentSelectedPlayer, "cg_currentSelectedPlayer", "0", CVAR_ARCHIVE},
 	{ &cg_currentSelectedPlayerName, "cg_currentSelectedPlayerName", "", CVAR_ARCHIVE},
-#ifndef TMNTSP
+#ifndef IOQ3ZTM
 	{ &cg_singlePlayer, "ui_singlePlayerActive", "0", CVAR_USERINFO},
 #endif
 	{ &cg_enableDust, "g_enableDust", "0", CVAR_SERVERINFO},
@@ -369,10 +372,9 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_recordSPDemo, "ui_recordSPDemo", "0", CVAR_ARCHIVE},
 	{ &cg_recordSPDemoName, "ui_recordSPDemoName", "", CVAR_ARCHIVE},
 	{ &cg_obeliskRespawnDelay, "g_obeliskRespawnDelay", "10", CVAR_SERVERINFO},
+#ifdef MISSIONPACK_HUD
 	{ &cg_hudFiles, "cg_hudFiles", "ui/hud.txt", CVAR_ARCHIVE},
 #endif
-#ifdef TMNTSP
-	{ &cg_singlePlayer, "ui_singlePlayerActive", "0", CVAR_USERINFO},
 #endif
 	{ &cg_cameraOrbit, "cg_cameraOrbit", "0", CVAR_CHEAT},
 	{ &cg_cameraOrbitDelay, "cg_cameraOrbitDelay", "50", CVAR_ARCHIVE},
@@ -576,7 +578,11 @@ static void CG_RegisterItemSounds( int itemNum ) {
 	char			*s, *start;
 	int				len;
 
+#ifdef TMNTWEAPSYS_2
+	item = BG_ItemForItemNum(itemNum);
+#else
 	item = &bg_itemlist[ itemNum ];
+#endif
 
 	if( item->pickup_sound ) {
 		trap_S_RegisterSound( item->pickup_sound, qfalse );
@@ -748,8 +754,8 @@ static void CG_RegisterSounds( void ) {
 
 #ifndef TMNTWEAPONS
 	cgs.media.impressiveSound = trap_S_RegisterSound( "sound/feedback/impressive.wav", qtrue );
-#endif
 	cgs.media.excellentSound = trap_S_RegisterSound( "sound/feedback/excellent.wav", qtrue );
+#endif
 #ifndef TMNTMISC
 	cgs.media.deniedSound = trap_S_RegisterSound( "sound/feedback/denied.wav", qtrue );
 #endif
@@ -761,9 +767,7 @@ static void CG_RegisterSounds( void ) {
 #ifdef MISSIONPACK
 #ifndef TMNTWEAPONS
 	cgs.media.firstImpressiveSound = trap_S_RegisterSound( "sound/feedback/first_impressive.wav", qtrue );
-#endif
 	cgs.media.firstExcellentSound = trap_S_RegisterSound( "sound/feedback/first_excellent.wav", qtrue );
-#ifndef TMNTWEAPONS
 	cgs.media.firstHumiliationSound = trap_S_RegisterSound( "sound/feedback/first_gauntlet.wav", qtrue );
 #endif
 #endif
@@ -810,7 +814,12 @@ static void CG_RegisterSounds( void ) {
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
 
-	for ( i = 1 ; i < bg_numItems ; i++ ) {
+#ifdef TMNTWEAPSYS_2
+	for ( i = 1 ; i < NUM_BG_ITEMS ; i++ )
+#else
+	for ( i = 1 ; i < bg_numItems ; i++ )
+#endif
+	{
 //		if ( items[ i ] == '1' || cg_buildScript.integer ) {
 			CG_RegisterItemSounds( i );
 //		}
@@ -925,6 +934,9 @@ static void CG_RegisterGraphics( void ) {
 #ifdef SP_NPC
 	char		npcs[NPC_NUMNPCS+1];
 #endif
+#ifdef TMNTMISC // MATERIALS
+	char		name[MAX_QPATH];
+#endif
 	static char		*sb_nums[11] = {
 		"gfx/2d/numbers/zero_32b",
 		"gfx/2d/numbers/one_32b",
@@ -978,7 +990,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.nailPuffShader = trap_R_RegisterShader( "nailtrail" );
 	cgs.media.blueProxMine = trap_R_RegisterModel( "models/weaphits/proxmineb.md3" );
 #endif
+#ifndef TMNTWEAPSYS_2
 	cgs.media.plasmaBallShader = trap_R_RegisterShader( "sprites/plasma1" );
+#endif
 #ifndef NOTRATEDM // No gibs.
 	cgs.media.bloodTrailShader = trap_R_RegisterShader( "bloodTrail" );
 #endif
@@ -1011,20 +1025,10 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.playerTeleportShader = trap_R_RegisterShader("playerTeleportEffect" );
 #endif
 
-#ifdef STYEF_ENTITY
-	// Load models for chunks
-	for (i = 0; i < NUM_CHUNKS; i++)
-	{
-		cgs.media.chunkModels[MT_METAL][i] = trap_R_RegisterModel( va( "models/chunks/metal/chunks_%i.md3", i+1 ) );
-		cgs.media.chunkModels[MT_GLASS][i] = trap_R_RegisterModel( va( "models/chunks/glass/chunks_%i.md3", i+1 ) );
-		cgs.media.chunkModels[MT_WOOD][i] = trap_R_RegisterModel( va( "models/chunks/wood/chunks_%i.md3", i+1 ) );
-		cgs.media.chunkModels[MT_STONE][i] = trap_R_RegisterModel( va( "models/chunks/stone/chunks_%i.md3", i+1 ) );
-		cgs.media.chunkModels[MT_CRATE][i] = trap_R_RegisterModel( va( "models/chunks/crate/chunks_%i.md3", i+1 ) );
-	}
-#endif
-
 #ifdef MISSIONPACK_HARVESTER // Turtle Man: THIS IS MISSIONPACK STUFF.
-#ifdef MISSIONPACK
+#ifdef IOQ3ZTM
+	if ( cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
+#elif defined MISSIONPACK
 	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
 #else
 	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
@@ -1034,7 +1038,7 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.redCubeIcon = trap_R_RegisterShader( "icons/skull_red" );
 		cgs.media.blueCubeIcon = trap_R_RegisterShader( "icons/skull_blue" );
 	}
-#endif // Turtle Man
+#endif
 
 #ifdef MISSIONPACK
 	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF
@@ -1045,8 +1049,10 @@ static void CG_RegisterGraphics( void ) {
 #else
 	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
 #endif
+#ifndef TMNTDATASYS // FLAG_MODEL
 		cgs.media.redFlagModel = trap_R_RegisterModel( "models/flags/r_flag.md3" );
 		cgs.media.blueFlagModel = trap_R_RegisterModel( "models/flags/b_flag.md3" );
+#endif
 		cgs.media.redFlagShader[0] = trap_R_RegisterShaderNoMip( "icons/iconf_red1" );
 		cgs.media.redFlagShader[1] = trap_R_RegisterShaderNoMip( "icons/iconf_red2" );
 		cgs.media.redFlagShader[2] = trap_R_RegisterShaderNoMip( "icons/iconf_red3" );
@@ -1054,24 +1060,33 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.blueFlagShader[1] = trap_R_RegisterShaderNoMip( "icons/iconf_blu2" );
 		cgs.media.blueFlagShader[2] = trap_R_RegisterShaderNoMip( "icons/iconf_blu3" );
 #ifdef TMNTDATASYS // TMNT supports MISSIONPACK CTF flags
-		cgs.media.flagPoleModel = trap_R_RegisterModel( "models/flag2/flagpole.md3" );
-		cgs.media.flagFlapModel = trap_R_RegisterModel( "models/flag2/flagflap3.md3" );
-
-		cgs.media.redFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/red.skin" );
-		cgs.media.blueFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/blue.skin" );
-#endif // TMNTDATASYS
-#ifdef MISSIONPACK
-#ifndef TMNTDATASYS // TMNT supports MISSIONPACK CTF flags
+#if 0 // FLAG_MODEL, no longer used
 		cgs.media.flagPoleModel = trap_R_RegisterModel( "models/flag2/flagpole.md3" );
 		cgs.media.flagFlapModel = trap_R_RegisterModel( "models/flag2/flagflap3.md3" );
 
 		cgs.media.redFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/red.skin" );
 		cgs.media.blueFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/blue.skin" );
 #endif
-		cgs.media.neutralFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/white.skin" );
 
 		cgs.media.redFlagBaseModel = trap_R_RegisterModel( "models/mapobjects/flagbase/red_base.md3" );
 		cgs.media.blueFlagBaseModel = trap_R_RegisterModel( "models/mapobjects/flagbase/blue_base.md3" );
+#endif // TMNTDATASYS
+#ifdef MISSIONPACK
+#ifndef TMNTDATASYS // TMNT supports MISSIONPACK CTF flags // FLAG_MODEL
+		cgs.media.flagPoleModel = trap_R_RegisterModel( "models/flag2/flagpole.md3" );
+		cgs.media.flagFlapModel = trap_R_RegisterModel( "models/flag2/flagflap3.md3" );
+
+		cgs.media.redFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/red.skin" );
+		cgs.media.blueFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/blue.skin" );
+#endif
+#ifndef TMNTDATASYS // FLAG_MODEL
+		cgs.media.neutralFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/white.skin" );
+#endif
+
+#ifndef TMNTDATASYS // TMNT supports MISSIONPACK CTF flags
+		cgs.media.redFlagBaseModel = trap_R_RegisterModel( "models/mapobjects/flagbase/red_base.md3" );
+		cgs.media.blueFlagBaseModel = trap_R_RegisterModel( "models/mapobjects/flagbase/blue_base.md3" );
+#endif
 		cgs.media.neutralFlagBaseModel = trap_R_RegisterModel( "models/mapobjects/flagbase/ntrl_base.md3" );
 #endif
 #ifdef IOQ3ZTM // FLAG_ANIMATIONS
@@ -1106,7 +1121,9 @@ static void CG_RegisterGraphics( void ) {
 
 #ifdef MISSIONPACK
 	if ( cgs.gametype == GT_1FCTF || cg_buildScript.integer ) {
+#ifndef TMNTDATASYS // FLAG_MODEL
 		cgs.media.neutralFlagModel = trap_R_RegisterModel( "models/flags/n_flag.md3" );
+#endif
 		cgs.media.flagShader[0] = trap_R_RegisterShaderNoMip( "icons/iconf_neutral1" );
 		cgs.media.flagShader[1] = trap_R_RegisterShaderNoMip( "icons/iconf_red2" );
 		cgs.media.flagShader[2] = trap_R_RegisterShaderNoMip( "icons/iconf_blu2" );
@@ -1148,7 +1165,7 @@ static void CG_RegisterGraphics( void ) {
 		// Elite Force uses this.
 		cgs.media.blueFriendShader = trap_R_RegisterShader( "sprites/team_blue" );
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/team_red" );
-#ifdef TMNT_SUPPORTQ3 // Fall back to Q3 friend shader
+#if !defined TMNT || defined TMNT_SUPPORTQ3 // Fall back to Q3 friend shader
 		if (!cgs.media.friendShader)
 		{
 			cgs.media.friendShader = trap_R_RegisterShader( "sprites/foe" );
@@ -1215,7 +1232,9 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.bulletFlashModel = trap_R_RegisterModel("models/weaphits/bullet.md3");
 	cgs.media.ringFlashModel = trap_R_RegisterModel("models/weaphits/ring02.md3");
 	cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
-#ifdef MISSIONPACK
+#ifdef TMNT
+	cgs.media.teleportEffectModel = trap_R_RegisterModel( "models/misc/telep.md3" );
+#elif defined MISSIONPACK
 	cgs.media.teleportEffectModel = trap_R_RegisterModel( "models/powerups/pop.md3" );
 #else
 	cgs.media.teleportEffectModel = trap_R_RegisterModel( "models/misc/telep.md3" );
@@ -1248,23 +1267,58 @@ static void CG_RegisterGraphics( void ) {
 #endif
 #ifndef TMNTWEAPONS
 	cgs.media.medalImpressive = trap_R_RegisterShaderNoMip( "medal_impressive" );
-#endif
 	cgs.media.medalExcellent = trap_R_RegisterShaderNoMip( "medal_excellent" );
-#ifndef TMNTWEAPONS
 	cgs.media.medalGauntlet = trap_R_RegisterShaderNoMip( "medal_gauntlet" );
 #endif
 	cgs.media.medalDefend = trap_R_RegisterShaderNoMip( "medal_defend" );
 	cgs.media.medalAssist = trap_R_RegisterShaderNoMip( "medal_assist" );
 	cgs.media.medalCapture = trap_R_RegisterShaderNoMip( "medal_capture" );
 
+#ifdef TMNTMISC // MATERIALS
+	// Load models for materials
+	for (i=0 ; i<NUM_MATERIAL_MODELS ; i++) {
+		Com_sprintf (name, sizeof(name), "models/materials/dirt%i.md3", i+1);
+		cgs.media.matModels[MT_DIRT][i] = trap_R_RegisterModel(name);
+
+		Com_sprintf (name, sizeof(name), "models/materials/grass%i.md3", i+1);
+		cgs.media.matModels[MT_GRASS][i] = trap_R_RegisterModel(name);
+
+		Com_sprintf (name, sizeof(name), "models/materials/wood%i.md3", i+1);
+		cgs.media.matModels[MT_WOOD][i] = trap_R_RegisterModel(name);
+
+		Com_sprintf (name, sizeof(name), "models/materials/stone%i.md3", i+1);
+		cgs.media.matModels[MT_STONE][i] = trap_R_RegisterModel(name);
+
+		Com_sprintf (name, sizeof(name), "models/materials/metal%i.md3", i+1);
+		cgs.media.matModels[MT_METAL][i] = trap_R_RegisterModel(name);
+
+		Com_sprintf (name, sizeof(name), "models/materials/sparks%i.md3", i+1);
+		cgs.media.matModels[MT_SPARKS][i] = trap_R_RegisterModel(name);
+
+		Com_sprintf (name, sizeof(name), "models/materials/glass%i.md3", i+1);
+		cgs.media.matModels[MT_GLASS][i] = trap_R_RegisterModel(name);
+	}
+#endif
+
 
 	memset( cg_items, 0, sizeof( cg_items ) );
+#ifdef TMNTWEAPSYS_2
+	memset( cg_projectiles, 0, sizeof( cg_projectiles ) );
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );
+	memset( cg_weapongroups, 0, sizeof( cg_weapongroups ) );
+#else
+	memset( cg_weapons, 0, sizeof( cg_weapons ) );
+#endif
 
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
 
-	for ( i = 1 ; i < bg_numItems ; i++ ) {
+#ifdef TMNTWEAPSYS_2
+	for ( i = 1 ; i < NUM_BG_ITEMS ; i++ )
+#else
+	for ( i = 1 ; i < bg_numItems ; i++ )
+#endif
+	{
 		if ( items[ i ] == '1' || cg_buildScript.integer ) {
 			CG_LoadingItem( i );
 			CG_RegisterItemVisuals( i );
@@ -2132,7 +2186,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( &cgs, 0, sizeof( cgs ) );
 	memset( &cg, 0, sizeof( cg ) );
 	memset( cg_entities, 0, sizeof(cg_entities) );
+#ifdef TMNTWEAPSYS_2
+	memset( cg_projectiles, 0, sizeof( cg_projectiles ) );
+	memset( cg_weapons, 0, sizeof( cg_weapons ) );
+	memset( cg_weapongroups, 0, sizeof( cg_weapongroups ) );
+#else
 	memset( cg_weapons, 0, sizeof(cg_weapons) );
+#endif
 	memset( cg_items, 0, sizeof(cg_items) );
 #ifdef SP_NPC
 	memset( cg_npcs, 0, sizeof(cg_npcs) );
@@ -2156,7 +2216,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_InitConsoleCommands();
 
-#ifdef TMNTHOLDSYS2
+#ifdef TMNTHOLDSYS/*2*/
 	cg.holdableSelect = HI_NO_SELECT;
 #endif
 #ifdef TMNTWEAPSYS
@@ -2178,8 +2238,27 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	// get the rendering configuration from the client system
 	trap_GetGlconfig( &cgs.glconfig );
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	// Turtle Man: Don't strech HUD, make it a cvar?
+	cgs.screenXScaleFit = cgs.glconfig.vidWidth * (1.0/640.0);
+	cgs.screenYScaleFit = cgs.glconfig.vidHeight * (1.0/480.0);
+	if ( cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
+		cgs.screenXScale = cgs.glconfig.vidWidth * (1.0/640.0);
+		cgs.screenYScale = cgs.glconfig.vidHeight * (1.0/480.0);
+		// wide screen
+		cgs.screenXBias = 0.5 * ( cgs.glconfig.vidWidth - ( cgs.glconfig.vidHeight * (640.0/480.0) ) );
+		cgs.screenXScale = cgs.screenYScale;
+	}
+	else {
+		cgs.screenXScale = cgs.screenXScaleFit;
+		cgs.screenYScale = cgs.screenYScaleFit;
+		// no wide screen
+		cgs.screenXBias = 0;
+	}
+#else
 	cgs.screenXScale = cgs.glconfig.vidWidth / 640.0;
 	cgs.screenYScale = cgs.glconfig.vidHeight / 480.0;
+#endif
 
 	// get the gamestate from the client system
 	trap_GetGameState( &cgs.gameState );
@@ -2205,6 +2284,12 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 #endif
 
 	cg.loading = qtrue;		// force players to load instead of defer
+
+#ifdef TMNTWEAPSYS_2
+	CG_LoadingString( "weapons" );
+
+	BG_InitWeaponInfo();
+#endif
 
 	CG_LoadingString( "sounds" );
 
@@ -2248,7 +2333,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	trap_S_ClearLoopingSounds( qtrue );
 }
 
-#ifdef IOQ3ZTM2
+#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
 /*
 =================
 CG_ViewType

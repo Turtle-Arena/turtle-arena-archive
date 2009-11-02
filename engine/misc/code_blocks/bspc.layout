@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug Win32" />
+	<File name="../../code/bspc/aas_map.c" open="0" top="0" tabpos="1">
+		<Cursor position="21566" topLine="711" />
+	</File>
+	<File name="../../code/bspc/l_bsp_hl.c" open="0" top="0" tabpos="0">
+		<Cursor position="7295" topLine="247" />
+	</File>
+	<File name="../../code/bspc/l_cmd.c" open="0" top="0" tabpos="0">
+		<Cursor position="7095" topLine="398" />
+	</File>
+	<File name="../../code/bspc/map.c" open="0" top="0" tabpos="0">
+		<Cursor position="3789" topLine="130" />
+	</File>
+	<File name="../../code/bspc/q3files.h" open="0" top="0" tabpos="0">
+		<Cursor position="3521" topLine="125" />
+	</File>
+	<File name="../../code/bspc/qbsp.h" open="0" top="0" tabpos="0">
+		<Cursor position="1411" topLine="39" />
+	</File>
 </CodeBlocks_layout_file>

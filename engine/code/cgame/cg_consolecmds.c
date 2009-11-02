@@ -451,7 +451,9 @@ void CG_StartCamera( const char *name, qboolean startBlack, qboolean endBlack) {
 			CG_Fade(0, cg.time, 1500);
 		}
 
+#ifdef TMNTMISC
 		CG_ToggleLetterbox(qtrue, startBlack);
+#endif
 		cg.cameraEndBlack = endBlack;
 		trap_startCamera(cg.time);	// camera on in client
 	} else {
@@ -479,7 +481,7 @@ static void CG_Camera_f( void ) {
 */
 #endif
 
-#ifdef TMNTSP
+#ifdef TMNTMISC
 void CG_Letterbox(void)
 {
 	qboolean onscreen, instant;
@@ -518,7 +520,7 @@ static consoleCommand_t	commands[] = {
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },
 #endif
-#ifdef TMNTHOLDSYS2
+#ifdef TMNTHOLDSYS/*2*/
 	{ "holdnext", CG_NextHoldable_f },
 	{ "holdprev", CG_PrevHoldable_f },
 	{ "holdable", CG_Holdable_f },

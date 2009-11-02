@@ -225,7 +225,7 @@ static float healthColors[4][4] = {
   { 1.0f, 1.0f, 1.0f, 1.0f } };		// health > 100
 #endif
 
-#ifndef TMNTWEAPSYS
+#ifndef TMNTWEAPONS
 static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 	centity_t	*cent;
 	playerState_t	*ps;
@@ -237,22 +237,37 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 
 	if ( draw2D || (!cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 	  qhandle_t	icon;
+#ifdef TMNTWEAPSYS_2
+		icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].ammoIcon;
+#else
     icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
+#endif
 		if ( icon ) {
 		  CG_DrawPic( rect->x, rect->y, rect->w, rect->h, icon );
 		}
   } else if (cg_draw3dIcons.integer) {
-  	if ( cent->currentState.weapon && cg_weapons[ cent->currentState.weapon ].ammoModel ) {
+  	if ( cent->currentState.weapon &&
+#ifdef TMNTWEAPSYS_2
+  	cg_weapongroups[ cent->currentState.weapon ].ammoModel
+#else
+  	cg_weapons[ cent->currentState.weapon ].ammoModel
+#endif
+  	) {
 	    VectorClear( angles );
 	  	origin[0] = 70;
   		origin[1] = 0;
   		origin[2] = 0;
   		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
-  		CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h, cg_weapons[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
+  		CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h,
+#ifdef TMNTWEAPSYS_2
+			cg_weapongroups[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
+#else
+			cg_weapons[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
+#endif
   	}
   }
 }
-#endif // !TMNTWEAPSYS
+#endif // !TMNTWEAPONS
 
 static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
 	char	num[16];
@@ -473,9 +488,16 @@ static void CG_DrawSelectedPlayerWeapon( rectDef_t *rect ) {
 
   ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
   if (ci) {
+#ifdef TMNTWEAPSYS_2
+		if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
+			CG_DrawPic( rect->x, rect->y, rect->w, rect->h, cg_weapongroups[ci->curWeapon].weaponIcon );
+		}
+#else
 	  if ( cg_weapons[ci->curWeapon].weaponIcon ) {
 	    CG_DrawPic( rect->x, rect->y, rect->w, rect->h, cg_weapons[ci->curWeapon].weaponIcon );
-		} else {
+		}
+#endif
+		else {
   	  CG_DrawPic( rect->x, rect->y, rect->w, rect->h, cgs.media.deferShader);
     }
   }
@@ -1388,9 +1410,16 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 
 // weapon used is not that useful, use the space for task
 #if 0
+#ifdef TMNTWEAPSYS_2
+			if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
+				CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, cg_weapongroups[ci->curWeapon].weaponIcon );
+			}
+#else
 			if ( cg_weapons[ci->curWeapon].weaponIcon ) {
 				CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, cg_weapons[ci->curWeapon].weaponIcon );
-			} else {
+			}
+#endif
+			else {
 				CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, cgs.media.deferShader );
 			}
 #endif
@@ -1592,7 +1621,7 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
     CG_DrawPlayerArmorValue(&rect, scale, color, shader, textStyle);
     break;
 #endif
-#ifndef TMNTWEAPSYS
+#ifndef TMNTWEAPONS
   case CG_PLAYER_AMMO_ICON:
     CG_DrawPlayerAmmoIcon(&rect, ownerDrawFlags & CG_SHOW_2DONLY);
     break;

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
 #include "../qcommon/q_shared.h"
-#include "bg_public.h"
+#include "bg_misc.h"
 #include "bg_local.h"
 
 pmove_t		*pm;
@@ -238,7 +238,7 @@ Handles user intended acceleration
 ==============
 */
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
-#if 1
+#ifndef TMNTMISC
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;
@@ -1658,6 +1658,8 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 	// Store hands to be set in PM_FinishWeaponHandsChange
 	pm->ps->stats[STAT_NEW_WEAPON_HANDS] = hands;
 
+	//Com_Printf("DEBUG: Changing hands (new=%d, old=%d)\n", hands, last_hands);
+
 	{
 		int anim = TORSO_DROP;
 
@@ -1698,16 +1700,22 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 
 			// The animation is "drop" and "raise", so split time in half.
 			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
+			// Don't override gesture when capturing the flag.
+			if (!pm->ps->torsoTimer) {
 			PM_StartTorsoAnim( anim );
 	}
+		}
 	else
 	{
 			// Turtle Man: FIXME: Draw the "pickup weapon" secondary weapon somewhere on the player!
 
 			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
+			// Don't override gesture when capturing the flag.
+			if (!pm->ps->torsoTimer) {
 			PM_StartTorsoAnim( anim );
 		}
 	}
+}
 }
 
 
@@ -1762,13 +1770,20 @@ static void PM_FinishWeaponHandsChange( void ) {
 
 			// Just let the animation run.
 			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
+			// If started a animation, continue it.
+			if ( ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) >= TORSO_PUTDEFAULT_BOTH
+				&& ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) <= TORSO_GETDEFAULT_SECONDARY) {
 			PM_ContinueTorsoAnim( anim );
+			}
 			return;
 		}
 
 		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
+		// Don't override gesture when capturing the flag.
+		if (!pm->ps->torsoTimer) {
 		PM_StartTorsoAnim( anim );
 	}
+}
 }
 #endif
 
@@ -1855,32 +1870,27 @@ static void PM_Weapon( void ) {
 
 	// check for dead player
 	if ( pm->ps->stats[STAT_HEALTH] <= 0 ) {
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Shouldn't be done if player died in NODROP...
+		qboolean nodrop = qfalse;
+
+		// Player should let go of the dropped weapon.
+		if (!nodrop && pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON])
+		{
 		pm->ps->weapon = WP_NONE;
+		}
+#else
+		pm->ps->weapon = WP_NONE;
+#endif
 		return;
 	}
 
 #ifdef TMNTHOLDSYS
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
 	// Check if valid, in cgame we have to
 	//   pass HI_NO_SELECT (-1) (as a byte its 255)
 	//   so bg can change to the next holdable.
 	if (pm->cmd.holdable < HI_NUM_HOLDABLE)
 	{
 		pm->ps->holdableIndex = pm->cmd.holdable;
-	}
-#endif
-
-    // NEXTHOLDABLE
-	if ( pm->cmd.buttons & BUTTON_NEXT_HOLDABLE ) {
-		if ( ! ( pm->ps->pm_flags & PMF_NEXT_ITEM_HELD ) ) {
-            pm->ps->pm_flags |= PMF_NEXT_ITEM_HELD;
-
-			PM_NextHoldable();
-		}
-	}
-	else
-	{
-		pm->ps->pm_flags &= ~PMF_NEXT_ITEM_HELD;
 	}
 #endif
 
@@ -1891,10 +1901,13 @@ static void PM_Weapon( void ) {
 			&& pm->ps->holdable[pm->ps->holdableIndex] != 0
 #endif
 		) {
+			if (
 #ifdef TMNTHOLDSYS
-			if ( pm->ps->holdableIndex == HI_MEDKIT
+			pm->ps->holdableIndex == HI_MEDKIT
+#elif defined TMNTWEAPSYS_2
+			BG_ItemForItemNum(pm->ps->stats[STAT_HOLDABLE_ITEM])->giTag == HI_MEDKIT
 #else
-			if ( bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag == HI_MEDKIT
+			bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag == HI_MEDKIT
 #endif
 				&& pm->ps->stats[STAT_HEALTH] >= (pm->ps->stats[STAT_MAX_HEALTH] + 25) ) {
 				// don't use medkit if at max health
@@ -1902,6 +1915,8 @@ static void PM_Weapon( void ) {
 				pm->ps->pm_flags |= PMF_USE_ITEM_HELD;
 #ifdef TMNTHOLDSYS
 				PM_AddEvent( EV_USE_ITEM0 + pm->ps->holdableIndex );
+#elif defined TMNTWEAPSYS_2
+				PM_AddEvent( EV_USE_ITEM0 + BG_ItemForItemNum(pm->ps->stats[STAT_HOLDABLE_ITEM])->giTag );
 #else
 				PM_AddEvent( EV_USE_ITEM0 + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag );
 #endif
@@ -1937,7 +1952,11 @@ static void PM_Weapon( void ) {
 		&& ((pm->cmd.buttons & BUTTON_DROP_WEAPON)
 		|| (pm->ps->stats[STAT_AMMO] == 0
 #ifdef MISSIONPACK // TMNT only // Turtle Man: Don't auto drop if have ammo regen!
+#ifdef TMNTWEAPSYS_2
+		&& BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag != PW_AMMOREGEN
+#else
 		&& bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag != PW_AMMOREGEN
+#endif
 #endif
 		))
 		&& pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON])
@@ -2041,9 +2060,15 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
+
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
 	// Handle grapple
+#ifdef TMNTWEAPSYS_2
+	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0] &&
+		bg_projectileinfo[bg_weapongroupinfo[pm->ps->weapon].weapon[0]->proj].grappling)
+#else
 	if (pm->ps->weapon == WP_GRAPPLING_HOOK)
+#endif
 	{
 		// If player has a shot grapple don't play attack animation.
 		if (pm->ps->pm_flags & PMF_GRAPPLE_SHOT)
@@ -2085,6 +2110,9 @@ static void PM_Weapon( void ) {
 		}
 		pm->ps->weaponTime = pm->ps->meleeDelay;
 		pm->ps->weaponstate = WEAPON_FIRING;
+
+		// fire weapon (Play sound, spawn brass, etc)
+		//PM_AddEvent( EV_FIRE_WEAPON );
 		return;
 	}
 
@@ -2168,6 +2196,13 @@ static void PM_Weapon( void ) {
 	// fire weapon
 	PM_AddEvent( EV_FIRE_WEAPON );
 
+#ifdef TMNTWEAPSYS_2
+	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0])
+	{
+		addTime = bg_weapongroupinfo[pm->ps->weapon].weapon[0]->attackDelay;
+	}
+	else
+#endif
 	switch( pm->ps->weapon ) {
 	default:
 #ifdef TMNTWEAPONS
@@ -2231,11 +2266,21 @@ static void PM_Weapon( void ) {
 	}
 
 #ifdef MISSIONPACK
-	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT ) {
+#ifdef TMNTWEAPSYS_2
+	if( BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
+#else
+	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
+#endif
+	{
 		addTime /= 1.5;
 	}
 	else
-	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN ) {
+#ifdef TMNTWEAPSYS_2
+	if( BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
+#else
+	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )
+#endif
+	{
 		addTime /= 1.3;
   }
   else
@@ -2434,11 +2479,17 @@ void PmoveSingle (pmove_t *pmove) {
 
 	// set the firing flag for continuous beam weapons
 	if ( !(pm->ps->pm_flags & PMF_RESPAWNED) && pm->ps->pm_type != PM_INTERMISSION
-		&& ( pm->cmd.buttons & BUTTON_ATTACK )
+#ifdef TMNTWEAPSYS
+		&& ( pm->ps->meleeTime ||
+			(( pm->cmd.buttons & BUTTON_ATTACK )
 #ifdef TMNTWEAPSYS2
-		&& pm->ps->stats[STAT_AMMO]
+			&& pm->ps->stats[STAT_AMMO] != 0
 #else
-		&& pm->ps->ammo[ pm->ps->weapon ]
+			&& pm->ps->ammo[ pm->ps->weapon ] != 0
+#endif
+			) )
+#else
+		&& ( pm->cmd.buttons & BUTTON_ATTACK ) && pm->ps->ammo[ pm->ps->weapon ]
 #endif
 		) {
 		pm->ps->eFlags |= EF_FIRING;

@@ -478,9 +478,9 @@ targetname: To trigger the level end.
 
 void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
 	char buf[MAX_QPATH];
-	char *nx = self->message;
+	char *nextMap = self->message;
 
-	if (nx == NULL || *nx == '\0')
+	if (nextMap == NULL || *nextMap == '\0')
 	{
 		// Invalid map name, do nothing.
 		return;
@@ -512,10 +512,10 @@ void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activat
 	}
 
 	// Save client data for next level.
-	G_SavePersistant(nx);
+	G_SavePersistant(nextMap);
 
 	// Set cvar for level change.
-	Com_sprintf(buf, MAX_QPATH, "map %s", nx);
+	Com_sprintf(buf, MAX_QPATH, "map %s", nextMap);
 	trap_Cvar_Set("nextmap", buf);
 }
 

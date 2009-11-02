@@ -367,6 +367,7 @@ float AAS_BFGJumpZVelocity(vec3_t origin)
 //===========================================================================
 void AAS_Accelerate(vec3_t velocity, float frametime, vec3_t wishdir, float wishspeed, float accel)
 {
+#ifndef TMNTMISC
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;
@@ -384,6 +385,24 @@ void AAS_Accelerate(vec3_t velocity, float frametime, vec3_t wishdir, float wish
 	for (i=0 ; i<3 ; i++) {
 		velocity[i] += accelspeed*wishdir[i];	
 	}
+#else
+	// proper way (avoids strafe jump maxspeed bug), but feels bad
+	vec3_t		wishVelocity;
+	vec3_t		pushDir;
+	float		pushLen;
+	float		canPush;
+
+	VectorScale( wishdir, wishspeed, wishVelocity );
+	VectorSubtract( wishVelocity, velocity, pushDir );
+	pushLen = VectorNormalize( pushDir );
+
+	canPush = accel*frametime*wishspeed;
+	if (canPush > pushLen) {
+		canPush = pushLen;
+	}
+
+	VectorMA( velocity, canPush, pushDir, velocity );
+#endif
 } //end of the function AAS_Accelerate
 //===========================================================================
 //

@@ -254,9 +254,9 @@ static void PlayerSettings_DrawPlayer( void *self ) {
 		viewangles[PITCH] = 0;
 		viewangles[ROLL]  = 0;
 #ifdef TMNTWEAPSYS
-		Com_Printf("PlayerSettings_DrawPlayer: pre-weapon=%i\n", s_playersettings.playerinfo.weapon);
+		//Com_Printf("PlayerSettings_DrawPlayer: pre-weapon=%i\n", s_playersettings.playerinfo.weapon);
 		UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playersettings.playerinfo.weapon), viewangles, vec3_origin, s_playersettings.playerinfo.weapon, qfalse );
-		Com_Printf("PlayerSettings_DrawPlayer: after-weapon=%i\n", s_playersettings.playerinfo.weapon);
+		//Com_Printf("PlayerSettings_DrawPlayer: after-weapon=%i\n", s_playersettings.playerinfo.weapon);
 #else
 		UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
 #endif

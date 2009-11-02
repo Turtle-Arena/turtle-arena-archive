@@ -1585,9 +1585,27 @@ BotChooseWeapon
 ==================
 */
 void BotChooseWeapon(bot_state_t *bs) {
-#ifdef TMNTWEAPSYS2 // BOTLIB Fixme?
-	// Should it be 'bs->weaponnum = bs->cur_ps.weapon'?
-    bs->weaponnum = bs->cur_ps.stats[STAT_NEWWEAPON];
+#ifdef TMNTWEAPSYS2 // Turtle Man: FIXME: botlib fixme?
+	int newweaponnum;
+
+	bs->weaponnum = bs->cur_ps.weapon;
+
+	if (bs->cur_ps.weaponstate == WEAPON_RAISING ||
+			bs->cur_ps.weaponstate == WEAPON_DROPPING) {
+		// Just waiting for pickup to finish change.
+	}
+	else {
+		newweaponnum = trap_BotChooseBestFightWeapon(bs->ws, bs->inventory);
+		if (newweaponnum == bs->cur_ps.stats[STAT_DEFAULTWEAPON])
+		{
+			bs->weaponnum = newweaponnum;
+			//bs->weaponchange_time = FloatTime();
+		}
+		else if (newweaponnum != bs->cur_ps.weapon)
+		{
+			// If not current or default can't have it...
+		}
+	}
 #else
 	int newweaponnum;
 
@@ -1930,6 +1948,9 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_INVUL] = bs->cur_ps.powerups[PW_INVUL] != 0;
 #endif
 #ifdef MISSIONPACK
+#ifdef TMNT
+	bs->inventory[INVENTORY_PERSISTANT_POWER] = bs->cur_ps.stats[STAT_PERSISTANT_POWERUP];
+#endif
 	bs->inventory[INVENTORY_SCOUT] = bs->cur_ps.stats[STAT_PERSISTANT_POWERUP] == MODELINDEX_SCOUT;
 	bs->inventory[INVENTORY_GUARD] = bs->cur_ps.stats[STAT_PERSISTANT_POWERUP] == MODELINDEX_GUARD;
 	bs->inventory[INVENTORY_DOUBLER] = bs->cur_ps.stats[STAT_PERSISTANT_POWERUP] == MODELINDEX_DOUBLER;
@@ -2402,6 +2423,25 @@ int TeamPlayIsOn(void) {
 	return ( gametype >= GT_TEAM );
 }
 
+#ifdef TMNTWEAPSYS
+qboolean BotCanUseShurikens(bot_state_t *bs)
+{
+#ifdef TMNTHOLDABLE
+	if (bs->inventory[ENEMY_HORIZONTAL_DIST] < 200)
+		return qfalse;
+
+	if ((bs->cur_ps.holdableIndex >= HI_SHURIKEN &&
+		bs->cur_ps.holdableIndex <= HI_LASERSHURIKEN)
+		&& bs->cur_ps.holdable[bs->cur_ps.holdableIndex] > 0)
+	{
+		return qtrue;
+	}
+#endif
+
+	return qfalse;
+}
+#endif
+
 /*
 ==================
 BotAggression
@@ -2411,8 +2451,9 @@ float BotAggression(bot_state_t *bs) {
 	//if the bot has quad
 	if (bs->inventory[INVENTORY_QUAD]) {
 		//if the bot is not holding the gauntlet or the enemy is really nearby
-#ifdef TMNTWEAPONS
+#ifdef TMNTWEAPSYS
         if (!BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(&bs->cur_ps) )
+			|| BotCanUseShurikens(bs)
             || bs->inventory[ENEMY_HORIZONTAL_DIST] < 80)
 #else
 		if (bs->weaponnum != WP_GAUNTLET
@@ -2434,6 +2475,21 @@ float BotAggression(bot_state_t *bs) {
 	if (bs->inventory[INVENTORY_HEALTH] < 80) {
 		//if the bot has insufficient armor
 		if (bs->inventory[INVENTORY_ARMOR] < 40) return 0;
+	}
+#endif
+#ifdef TMNTHOLDABLE
+	switch (bs->cur_ps.holdableIndex)
+	{
+		case HI_SHURIKEN:
+			return 80;
+		case HI_ELECTRICSHURIKEN:
+			return 80;
+		case HI_FIRESHURIKEN:
+			return 90;
+		case HI_LASERSHURIKEN:
+			return 90;
+		default:
+			break;
 	}
 #endif
 #ifdef TMNTWEAPSYS2
@@ -2511,7 +2567,7 @@ float BotAggression(bot_state_t *bs) {
 	// Guns
 	//if the bot can use the homing rocketlauncher
 	if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 &&
-			bs->inventory[INVENTORY_AMMOHOMING] > 5) return 95;
+			bs->inventory[INVENTORY_AMMOHOMING] > 3) return 95;
 	//if the bot can use the rocketlauncher
 	if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 &&
 			bs->inventory[INVENTORY_AMMOROCKET] > 5) return 90;
@@ -2852,7 +2908,7 @@ int BotHasPersistantPowerupAndWeapon(bot_state_t *bs) {
 	// Guns
 	//if the bot can use the homing rocketlauncher
 	if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 &&
-			bs->inventory[INVENTORY_AMMOHOMING] > 5) return qtrue;
+			bs->inventory[INVENTORY_AMMOHOMING] > 3) return qtrue;
 	//if the bot can use the rocketlauncher
 	if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 &&
 			bs->inventory[INVENTORY_AMMOROCKET] > 5) return qtrue;
@@ -3169,11 +3225,13 @@ bot_moveresult_t BotAttackMove(bot_state_t *bs, int tfl) {
 			bs->attackjump_time = FloatTime() + 1;
 		}
 	}
-#ifdef TMNTWEAPONS
-	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))) {
+#ifdef TMNTWEAPSYS
+	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))
+		&& !BotCanUseShurikens(bs))
 #else
-	if (bs->cur_ps.weapon == WP_GAUNTLET) {
+	if (bs->cur_ps.weapon == WP_GAUNTLET)
 #endif
+	{
 		attack_dist = 0;
 		attack_range = 0;
 	}
@@ -3744,7 +3802,11 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	float dist, f, aim_skill, aim_accuracy, speed, reactiontime;
 	vec3_t dir, bestorigin, end, start, groundtarget, cmdmove, enemyvelocity;
 	vec3_t mins = {-4,-4,-4}, maxs = {4, 4, 4};
+#ifdef TMNTWEAPSYS_2
+	bg_projectileinfo_t *bgProj;
+#else
 	weaponinfo_t wi;
+#endif
 	aas_entityinfo_t entinfo;
 	bot_goal_t goal;
 	bsp_trace_t trace;
@@ -3787,8 +3849,20 @@ void BotAimAtEnemy(bot_state_t *bs) {
 		if (bs->teleport_time > FloatTime() - reactiontime) return;
 	}
 
+#ifdef TMNTWEAPSYS_2
+	if (bg_weapongroupinfo[bs->weaponnum].weapon[0])
+	{
+		bgProj = &bg_projectileinfo[bg_weapongroupinfo[bs->weaponnum].weapon[0]->proj];
+	}
+	else
+	{
+		bgProj = &bg_projectileinfo[0];
+	}
+#else
 	//get the weapon information
 	trap_BotGetWeaponInfo(bs->ws, bs->weaponnum, &wi);
+#endif
+#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME: Fix support for per-weapon aim_accuracy/aim_skill?
 	//get the weapon specific aim accuracy and or aim skill
 #ifdef TMNTWEAPONS
 	if (wi.number == WP_GUN){
@@ -3837,6 +3911,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
 		aim_skill = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_SKILL_BFG10K, 0, 1);
 	}
 #endif
+#endif // TMNTWEAPSYS_2
 	//
 	if (aim_accuracy <= 0) aim_accuracy = 0.0001f;
 	//get the enemy entity information
@@ -3878,7 +3953,12 @@ void BotAimAtEnemy(bot_state_t *bs) {
 		//NOTE: the x and y projectile start offsets are ignored
 		VectorCopy(bs->origin, start);
 		start[2] += bs->cur_ps.viewheight;
+#ifdef TMNTWEAPSYS_2
+		if (bg_weapongroupinfo[bs->weaponnum].weapon[0])
+			start[2] += bg_weapongroupinfo[bs->weaponnum].weapon[0]->aimOffset[2];
+#else
 		start[2] += wi.offset[2];
+#endif
 		//
 		BotAI_Trace(&trace, start, mins, maxs, bestorigin, bs->entitynum, MASK_SHOT);
 		//if the enemy is NOT hit
@@ -3886,7 +3966,12 @@ void BotAimAtEnemy(bot_state_t *bs) {
 			bestorigin[2] += 16;
 		}
 		//if it is not an instant hit weapon the bot might want to predict the enemy
-		if (wi.speed) {
+#ifdef TMNTWEAPSYS_2
+		if (bgProj->speed)
+#else
+		if (wi.speed)
+#endif
+		{
 			//
 			VectorSubtract(bestorigin, bs->origin, dir);
 			dist = VectorLength(dir);
@@ -3916,7 +4001,12 @@ void BotAimAtEnemy(bot_state_t *bs) {
 					trap_AAS_PredictClientMovement(&move, bs->enemy, origin,
 														PRESENCE_CROUCH, qfalse,
 														dir, cmdmove, 0,
-														dist * 10 / wi.speed, 0.1f, 0, 0, qfalse);
+#ifdef TMNTWEAPSYS_2
+														dist * 10 / bgProj->speed,
+#else
+														dist * 10 / wi.speed,
+#endif
+														0.1f, 0, 0, qfalse);
 					VectorCopy(move.endpos, bestorigin);
 					//BotAI_Print(PRT_MESSAGE, "%1.1f predicted speed = %f, frames = %f\n", FloatTime(), VectorLength(dir), dist * 10 / wi.speed);
 				}
@@ -3932,12 +4022,23 @@ void BotAimAtEnemy(bot_state_t *bs) {
 					speed = VectorNormalize(dir) / entinfo.update_time;
 					//botimport.Print(PRT_MESSAGE, "speed = %f, wi->speed = %f\n", speed, wi->speed);
 					//best spot to aim at
+#ifdef TMNTWEAPSYS_2
+					VectorMA(entinfo.origin, (dist / bgProj->speed) * speed, dir, bestorigin);
+#else
 					VectorMA(entinfo.origin, (dist / wi.speed) * speed, dir, bestorigin);
+#endif
 				}
 			}
 		}
 		//if the projectile does radial damage
-		if (aim_skill > 0.6 && wi.proj.damagetype & DAMAGETYPE_RADIAL) {
+		if (aim_skill > 0.6 &&
+#ifdef TMNTWEAPSYS_2
+			(bgProj->damagetype & DAMAGETYPE_RADIAL)
+#else
+			wi.proj.damagetype & DAMAGETYPE_RADIAL
+#endif
+			)
+		{
 			//if the enemy isn't standing significantly higher than the bot
 			if (entinfo.origin[2] < bs->origin[2] + 16) {
 				//try to aim at the ground in front of the enemy
@@ -3981,16 +4082,22 @@ void BotAimAtEnemy(bot_state_t *bs) {
 		//if the bot is skilled anough
 		if (aim_skill > 0.5) {
 			//do prediction shots around corners
-#ifdef TMNTWEAPONS
+#ifdef TMNTWEAPSYS_2 // This works the same as quake3
+			if ((bgProj->damagetype & DAMAGETYPE_RADIAL) &&
+				bgProj->speed > 0 && bgProj->splashDamage > 0 &&
+				// not plasmagun?
+				bgProj->splashRadius > 20)
+#elif defined TMNTWEAPONS
 			// wi.number != WP_GUN
 			if (wi.number == WP_ELECTRIC_LAUNCHER ||
 				wi.number == WP_ROCKET_LAUNCHER ||
-				wi.number == WP_HOMING_LAUNCHER) {
+				wi.number == WP_HOMING_LAUNCHER)
 #else
 			if (wi.number == WP_BFG ||
 				wi.number == WP_ROCKET_LAUNCHER ||
-				wi.number == WP_GRENADE_LAUNCHER) {
+				wi.number == WP_GRENADE_LAUNCHER)
 #endif
+			{
 				//create the chase goal
 				goal.entitynum = bs->client;
 				goal.areanum = bs->areanum;
@@ -4020,20 +4127,24 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	//get aim direction
 	VectorSubtract(bestorigin, bs->eye, dir);
 	//
-#ifdef TMNTWEAPONS
-	if (wi.number == WP_GUN) {
+#if !defined TMNTWEAPONS || defined TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS_2
+	if (bg_weapongroupinfo[bs->weaponnum].weapon[0] &&
+		bg_projectileinfo[bg_weapongroupinfo[bs->weaponnum].weapon[0]->proj].instantDamage)
 #else
 	if (wi.number == WP_MACHINEGUN ||
 		wi.number == WP_SHOTGUN ||
 		wi.number == WP_LIGHTNING ||
-		wi.number == WP_RAILGUN) {
+		wi.number == WP_RAILGUN)
 #endif
+	{
 		//distance towards the enemy
 		dist = VectorLength(dir);
 		if (dist > 150) dist = 150;
 		f = 0.6 + dist / 150 * 0.4;
 		aim_accuracy *= f;
 	}
+#endif
 	//add some random stuff to the aim direction depending on the aim accuracy
 	if (aim_accuracy < 0.8) {
 		VectorNormalize(dir);
@@ -4042,9 +4153,13 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	//set the ideal view angles
 	vectoangles(dir, bs->ideal_viewangles);
 	//take the weapon spread into account for lower skilled bots
+#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME: vspread was always 0, why fix?
 	bs->ideal_viewangles[PITCH] += 6 * wi.vspread * crandom() * (1 - aim_accuracy);
+#endif
 	bs->ideal_viewangles[PITCH] = AngleMod(bs->ideal_viewangles[PITCH]);
+#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME: hspread was always 0, why fix?
 	bs->ideal_viewangles[YAW] += 6 * wi.hspread * crandom() * (1 - aim_accuracy);
+#endif
 	bs->ideal_viewangles[YAW] = AngleMod(bs->ideal_viewangles[YAW]);
 	//if the bots should be really challenging
 	if (bot_challenge.integer) {
@@ -4069,7 +4184,15 @@ void BotCheckAttack(bot_state_t *bs) {
 	bsp_trace_t bsptrace;
 	//float selfpreservation;
 	vec3_t forward, right, start, end, dir, angles;
+#ifdef TMNTWEAPSYS_2
+	vec3_t offset;
+	bg_projectileinfo_t *bgProj;
+#ifdef TMNTHOLDABLE
+	qboolean firedShuriken = qfalse;
+#endif
+#else
 	weaponinfo_t wi;
+#endif
 	bsp_trace_t trace;
 	aas_entityinfo_t entinfo;
 	vec3_t mins = {-8, -8, -8}, maxs = {8, 8, 8};
@@ -4114,11 +4237,13 @@ void BotCheckAttack(bot_state_t *bs) {
 	//
 	VectorSubtract(bs->aimtarget, bs->eye, dir);
 	//
-#ifdef TMNTWEAPONS
-	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))) {
+#ifdef TMNTWEAPSYS
+	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))
+		&& !BotCanUseShurikens(bs))
 #else
-	if (bs->weaponnum == WP_GAUNTLET) {
+	if (bs->weaponnum == WP_GAUNTLET)
 #endif
+	{
 		if (VectorLengthSquared(dir) > Square(60)) {
 			return;
 		}
@@ -4135,15 +4260,68 @@ void BotCheckAttack(bot_state_t *bs) {
 	if (bsptrace.fraction < 1 && bsptrace.ent != attackentity)
 		return;
 
+#ifdef TMNTWEAPSYS_2
+	bgProj = NULL;
+#ifdef TMNTHOLDABLE
+	if (BotCanUseShurikens(bs))
+	{
+		int projnum = 0;
+		switch (bs->cur_ps.holdableIndex)
+		{
+			case HI_SHURIKEN:
+				projnum = BG_ProjectileIndexForName("p_shuriken");
+				break;
+			case HI_ELECTRICSHURIKEN:
+				projnum = BG_ProjectileIndexForName("p_electricshuriken");
+				break;
+			case HI_FIRESHURIKEN:
+				projnum = BG_ProjectileIndexForName("p_fireshuriken");
+				break;
+			case HI_LASERSHURIKEN:
+				projnum = BG_ProjectileIndexForName("p_lasershuriken");
+				break;
+			default:
+				break;
+		}
+		if (projnum > 0) {
+			bgProj = &bg_projectileinfo[projnum];
+			firedShuriken = qtrue;
+		}
+	}
+#endif
+	if (!BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))
+		&& bgProj == NULL &&
+		bg_weapongroupinfo[bs->weaponnum].weapon[0])
+	{
+		bgProj = &bg_projectileinfo[bg_weapongroupinfo[bs->weaponnum].weapon[0]->proj];
+	}
+	else
+	{
+		bgProj = &bg_projectileinfo[0];
+	}
+#else
 	//get the weapon info
 	trap_BotGetWeaponInfo(bs->ws, bs->weaponnum, &wi);
+#endif
 	//get the start point shooting from
 	VectorCopy(bs->origin, start);
 	start[2] += bs->cur_ps.viewheight;
 	AngleVectors(bs->viewangles, forward, right, NULL);
+#ifdef TMNTWEAPSYS_2
+	offset[0] = offset[1] = offset[2] = 0;
+	if (bg_weapongroupinfo[bs->weaponnum].weapon[0])
+	{
+		VectorCopy(bg_weapongroupinfo[bs->weaponnum].weapon[0]->aimOffset, offset);
+	}
+
+	start[0] += forward[0] * offset[0] + right[0] * offset[1];
+	start[1] += forward[1] * offset[0] + right[1] * offset[1];
+	start[2] += forward[2] * offset[0] + right[2] * offset[1] + offset[2];
+#else
 	start[0] += forward[0] * wi.offset[0] + right[0] * wi.offset[1];
 	start[1] += forward[1] * wi.offset[0] + right[1] * wi.offset[1];
 	start[2] += forward[2] * wi.offset[0] + right[2] * wi.offset[1] + wi.offset[2];
+#endif
 	//end point aiming at
 	VectorMA(start, 1000, forward, end);
 	//a little back to make sure not inside a very close enemy
@@ -4160,6 +4338,18 @@ void BotCheckAttack(bot_state_t *bs) {
 	//if won't hit the enemy or not attacking a player (obelisk)
 	if (trace.ent != attackentity || attackentity >= MAX_CLIENTS) {
 		//if the projectile does radial damage
+#ifdef TMNTWEAPSYS_2
+		if (bgProj->damagetype & DAMAGETYPE_RADIAL)
+		{
+			if (trace.fraction * 1000 < bgProj->splashRadius) {
+				points = (bgProj->splashDamage - 0.5 * trace.fraction * 1000) * 0.5;
+				if (points > 0) {
+					return;
+				}
+			}
+			//FIXME: check if a teammate gets radial damage
+		}
+#else
 		if (wi.proj.damagetype & DAMAGETYPE_RADIAL) {
 			if (trace.fraction * 1000 < wi.proj.radius) {
 				points = (wi.proj.damage - 0.5 * trace.fraction * 1000) * 0.5;
@@ -4169,14 +4359,25 @@ void BotCheckAttack(bot_state_t *bs) {
 			}
 			//FIXME: check if a teammate gets radial damage
 		}
+#endif
 	}
+#ifdef TMNTHOLDABLE
+	if (firedShuriken)
+	{
+		trap_EA_Use(bs->client, bs->cur_ps.holdableIndex);
+	}
+	else
+#endif
 	//if fire has to be release to activate weapon
+#ifndef TMNTWEAPSYS_2 // not used by Quake3:Team Arena or anything?
 	if (wi.flags & WFL_FIRERELEASED) {
 		if (bs->flags & BFL_ATTACKED) {
 			trap_EA_Attack(bs->client);
 		}
 	}
-	else {
+	else
+#endif
+	{
 		trap_EA_Attack(bs->client);
 	}
 	bs->flags ^= BFL_ATTACKED;
@@ -4755,6 +4956,12 @@ int BotGetActivateGoal(bot_state_t *bs, int entitynum, bot_activategoal_t *activ
 	if (!strcmp(classname, "func_button")) {
 		return 0;
 	}
+#ifdef TMNTENTSYS // BREAKABLE
+	// if it is a breakable, okay for bot to damage it.
+ 	if (!strcmp(classname, "func_breakable")) {
+ 		return ent;
+ 	}
+#endif
 	// get the targetname so we can find an entity with a matching target
 	if (!trap_AAS_ValueForBSPEpairKey(ent, "targetname", targetname[0], sizeof(targetname[0]))) {
 		if (bot_developer.integer) {
@@ -5220,13 +5427,18 @@ BotCheckEvents
 ==================
 */
 void BotCheckForGrenades(bot_state_t *bs, entityState_t *state) {
-#ifndef TMNTWEAPONS
 	// if this is not a grenade
-	if (state->eType != ET_MISSILE || state->weapon != WP_GRENADE_LAUNCHER)
+	if (state->eType != ET_MISSILE ||
+#ifdef TMNTWEAPSYS_2 // Must have gravity and bounce
+	!(bg_projectileinfo[state->weapon].flags & PF_USE_GRAVITY)
+	|| bg_projectileinfo[state->weapon].bounceType != PB_NONE
+#else
+	state->weapon != WP_GRENADE_LAUNCHER
+#endif
+	)
 		return;
 	// try to avoid the grenade
 	trap_BotAddAvoidSpot(bs->ms, state->pos.trBase, 160, AVOID_ALWAYS);
-#endif
 }
 
 #ifdef MISSIONPACK
@@ -5257,7 +5469,7 @@ void BotCheckForProxMines(bot_state_t *bs, entityState_t *state) {
 	bs->proxmines[bs->numproxmines] = state->number;
 	bs->numproxmines++;
 }
-#endif // TMNTWEAPONS
+#endif
 
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
@@ -5705,7 +5917,14 @@ void BotSetupAlternativeRouteGoals(void) {
 	}
 	else if (gametype == GT_OBELISK) {
 		if (trap_BotGetLevelItemGoal(-1, "Neutral Obelisk", &neutralobelisk) < 0)
+#ifdef IOQ3ZTM // Fall back to 1flag if missing.
+		{
+			if (trap_BotGetLevelItemGoal(-1, "Neutral Flag", &neutralobelisk/*ctf_neutralflag*/) < 0)
+				BotAI_Print(PRT_WARNING, "no alt routes without Neutral Obelisk/Flag\n");
+		}
+#else
 			BotAI_Print(PRT_WARNING, "Harvester without neutral obelisk\n");
+#endif
 		//
 		red_numaltroutegoals = trap_AAS_AlternativeRouteGoals(
 									neutralobelisk.origin, neutralobelisk.areanum,

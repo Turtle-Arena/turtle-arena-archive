@@ -213,9 +213,14 @@ void EA_Use(int client)
 
 	bi = &botinputs[client];
 
-	bi->actionflags |= ACTION_USE;
 #ifdef TMNTHOLDSYS
+	// Turtle Man: no change is -1
+	if (holdable >= 0) {
+		bi->actionflags |= ACTION_USE;
+	}
 	bi->holdable = holdable;
+#else
+	bi->actionflags |= ACTION_USE;
 #endif
 } //end of the function EA_Use
 //===========================================================================

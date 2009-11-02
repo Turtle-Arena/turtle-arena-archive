@@ -1359,6 +1359,18 @@ infoParm_t	infoParms[] = {
 	{"nolightmap",	0,	SURF_NOLIGHTMAP,0 },	// don't generate a lightmap
 	{"nodlight",	0,	SURF_NODLIGHT, 0 },		// don't ever add dynamic lights
 	{"dust",		0,	SURF_DUST, 0}			// leave a dust trail when walking on this surface
+
+#ifdef TMNTMISC // MATERIALS
+	,
+	// material surface types
+	{"dirt",		0,	SURF_DIRT,		0 },
+	{"grass",		0,	SURF_GRASS,		0 },
+	{"wood",		0,	SURF_WOOD,		0 },
+	{"stone",		0,	SURF_STONE,		0 },
+	{"metal",		0,	SURF_METALSTEPS,0 },
+	{"sparks",		0,	SURF_SPARKS,	0 },
+	{"glass",		0,	SURF_GLASS,		0 }
+#endif
 };
 
 
@@ -1596,6 +1608,21 @@ static qboolean ParseShader( char **text )
 			ParseSort( text );
 			continue;
 		}
+#ifdef IOQ3ZTM // Turtle Man: TODO: Clone a shader.
+		else if ( !Q_stricmp( token, "clone" ) )
+		{
+			token = COM_ParseExt( text, qfalse );
+			if ( token[0] == 0 )
+			{
+				ri.Printf( PRINT_WARNING, "WARNING: missing clone shader in shader '%s'\n", shader.name );
+				continue;
+			}
+
+			// TODO: Copy shader "token" to this shader.
+			ri.Printf( PRINT_WARNING, "WARNING: \"clone\" keyword isn't finished, in shader '%s'\n", shader.name );
+			continue;
+		}
+#endif
 		else
 		{
 			ri.Printf( PRINT_WARNING, "WARNING: unknown general shader parameter '%s' in '%s'\n", token, shader.name );

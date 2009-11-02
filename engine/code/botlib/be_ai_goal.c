@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 #include "../qcommon/q_shared.h"
+#include "../game/bg_public.h"
 #include "l_utils.h"
 #include "l_libvar.h"
 #include "l_memory.h"
@@ -88,6 +89,7 @@ typedef struct campspot_s
 	struct campspot_s *next;
 } campspot_t;
 
+#if 0 // FIXED (somewhat): bg_misc.h
 //FIXME: these are game specific
 typedef enum {
 	GT_FFA,				// free for all
@@ -119,6 +121,7 @@ typedef enum {
 #endif
 	GT_MAX_GAME_TYPE
 } gametype_t;
+#endif
 
 typedef struct levelitem_s
 {
@@ -1017,8 +1020,10 @@ void BotFindEntityForLevelItem(levelitem_t *li)
 // Changes Globals:		-
 //===========================================================================
 
+#if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h
 //NOTE: enum entityType_t in bg_public.h
 #define ET_ITEM			2
+#endif
 
 void BotUpdateEntityItems(void)
 {

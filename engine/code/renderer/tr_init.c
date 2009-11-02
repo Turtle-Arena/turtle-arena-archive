@@ -527,8 +527,13 @@ the menu system, sampled down from full screen distorted images
 */
 #ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
 // Q3 used 128x128, Team Arena used 192x192
+#if 1 // Team Arena
 #define LEVELSHOT_HEIGHT	192
 #define LEVELSHOT_WIDTH		192
+#else
+#define LEVELSHOT_HEIGHT	128
+#define LEVELSHOT_WIDTH		128
+#endif
 #endif
 void R_LevelShot( void ) {
 	char		checkname[MAX_OSPATH];
@@ -570,8 +575,8 @@ void R_LevelShot( void ) {
 
 	// resample from source
 #ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
-	xScale = glConfig.vidWidth / (LEVELSHOT_WIDTH * 4);
-	yScale = glConfig.vidHeight / (LEVELSHOT_HEIGHT * 3);
+	xScale = glConfig.vidWidth / (float)(LEVELSHOT_HEIGHT * 4.0f);
+	yScale = glConfig.vidHeight / (float)(LEVELSHOT_WIDTH * 3.0f);
 	for ( y = 0 ; y < LEVELSHOT_HEIGHT ; y++ ) {
 		for ( x = 0 ; x < LEVELSHOT_WIDTH ; x++ ) {
 #else
@@ -994,7 +999,11 @@ void R_Register( void )
 	r_colorbits = ri.Cvar_Get( "r_colorbits", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_stencilbits = ri.Cvar_Get( "r_stencilbits", "8", CVAR_ARCHIVE | CVAR_LATCH );
 	r_depthbits = ri.Cvar_Get( "r_depthbits", "0", CVAR_ARCHIVE | CVAR_LATCH );
+#ifdef TMNTMISC // Default "r_overBrightBits" to 0.
+	r_overBrightBits = ri.Cvar_Get ("r_overBrightBits", "0", CVAR_ARCHIVE | CVAR_LATCH );
+#else
 	r_overBrightBits = ri.Cvar_Get ("r_overBrightBits", "1", CVAR_ARCHIVE | CVAR_LATCH );
+#endif
 	r_ignorehwgamma = ri.Cvar_Get( "r_ignorehwgamma", "0", CVAR_ARCHIVE | CVAR_LATCH);
 	r_mode = ri.Cvar_Get( "r_mode", "3", CVAR_ARCHIVE | CVAR_LATCH );
 	r_fullscreen = ri.Cvar_Get( "r_fullscreen", "1", CVAR_ARCHIVE );
@@ -1016,7 +1025,11 @@ void R_Register( void )
 	r_displayRefresh = ri.Cvar_Get( "r_displayRefresh", "0", CVAR_LATCH );
 	ri.Cvar_CheckRange( r_displayRefresh, 0, 200, qtrue );
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", CVAR_LATCH|CVAR_CHEAT );
+#ifdef TMNTMISC // Default "r_mapOverBrightBits" to 1.
+	r_mapOverBrightBits = ri.Cvar_Get ("r_mapOverBrightBits", "1", CVAR_LATCH );
+#else
 	r_mapOverBrightBits = ri.Cvar_Get ("r_mapOverBrightBits", "2", CVAR_LATCH );
+#endif
 	r_intensity = ri.Cvar_Get ("r_intensity", "1", CVAR_LATCH );
 	r_singleShader = ri.Cvar_Get ("r_singleShader", "0", CVAR_CHEAT | CVAR_LATCH );
 
@@ -1025,7 +1038,11 @@ void R_Register( void )
 	//
 	r_lodCurveError = ri.Cvar_Get( "r_lodCurveError", "250", CVAR_ARCHIVE|CVAR_CHEAT );
 	r_lodbias = ri.Cvar_Get( "r_lodbias", "0", CVAR_ARCHIVE );
+#ifdef IOQ3ZTM // Enable light flares by default
+	r_flares = ri.Cvar_Get ("r_flares", "1", CVAR_ARCHIVE );
+#else
 	r_flares = ri.Cvar_Get ("r_flares", "0", CVAR_ARCHIVE );
+#endif
 	r_znear = ri.Cvar_Get( "r_znear", "4", CVAR_CHEAT );
 	ri.Cvar_CheckRange( r_znear, 0.001f, 200, qfalse );
 	r_zproj = ri.Cvar_Get( "r_zproj", "64", CVAR_ARCHIVE );
@@ -1180,6 +1197,10 @@ void R_Init( void ) {
 	R_NoiseInit();
 
 	R_Register();
+
+#ifdef OA_BLOOM
+	R_BloomInit();
+#endif
 
 	max_polys = r_maxpolys->integer;
 	if (max_polys < MAX_POLYS)

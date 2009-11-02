@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../renderer/tr_types.h"
 #include "ui_public.h"
 #include "../client/keycodes.h"
-#include "../game/bg_public.h"
+#include "../game/bg_misc.h"
 #include "ui_shared.h"
 
 // global display context
@@ -511,7 +511,7 @@ extern void DriverInfo_Cache( void );
 // ui_players.c
 //
 
-#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // moved to bg_public.h
+#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // moved to bg_misc.h
 //FIXME ripped from cg_local.h
 typedef struct {
 	int			oldFrame;
@@ -608,7 +608,9 @@ typedef struct {
 	qhandle_t		whiteShader;
 	qhandle_t		menuBackShader;
 	qhandle_t		menuBackShader2;
+#ifndef TMNTDATASYS
 	qhandle_t		menuBackNoLogoShader;
+#endif
 	qhandle_t		charset;
 	qhandle_t		charsetProp;
 #ifndef TMNTDATA
@@ -1092,9 +1094,7 @@ typedef enum {
 	AWARD_ACCURACY,
 #ifndef TMNTWEAPONS
 	AWARD_IMPRESSIVE,
-#endif
 	AWARD_EXCELLENT,
-#ifndef TMNTWEAPONS
 	AWARD_GAUNTLET,
 #endif
 	AWARD_FRAGS,

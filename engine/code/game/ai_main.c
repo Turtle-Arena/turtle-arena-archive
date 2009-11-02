@@ -864,7 +864,7 @@ void BotInputToUserCommand(bot_input_t *bi, usercmd_t *ucmd, int delta_angles[3]
 #ifndef TMNTWEAPSYS2
 	ucmd->weapon = bi->weapon;
 #endif
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+#ifdef TMNTHOLDSYS/*2*/
 	ucmd->holdable = bi->holdable;
 #endif
 	//set the view angles
@@ -939,6 +939,9 @@ void BotUpdateInput(bot_state_t *bs, int time, int elapsed_time) {
 	for (j = 0; j < 3; j++) {
 		bs->viewangles[j] = AngleMod(bs->viewangles[j] - SHORT2ANGLE(bs->cur_ps.delta_angles[j]));
 	}
+#ifdef TMNTHOLDSYS
+	trap_EA_Use(bs->client, HI_NO_SELECT);
+#endif
 }
 
 /*
@@ -1073,10 +1076,16 @@ int BotAI(int client, float thinktime) {
             // Wants to change to default weapon.
             trap_EA_DropWeapon(bs->client);
         }
-        else if (bs->weaponnum != bs->cur_ps.stats[STAT_NEWWEAPON])
+        // At the begining of the intermission bots want 0
+        // If they want the new pickup weapon, they have to wait
+        else if (bs->weaponnum != 0
+			&& bs->weaponnum != bs->cur_ps.stats[STAT_NEWWEAPON])
         {
 #ifndef TMNTRELEASE
-            Com_Printf("DEBUG: bot wants weapon %i, but can't have it only %i and %i\n", bs->weaponnum, bs->cur_ps.stats[STAT_NEWWEAPON], bs->cur_ps.stats[STAT_DEFAULTWEAPON]);
+			if (bs->cur_ps.weapon == bs->cur_ps.stats[STAT_DEFAULTWEAPON])
+				Com_Printf("DEBUG: bot wants weapon %i, but can't have it only %i\n", bs->weaponnum, bs->cur_ps.weapon);
+			else
+				Com_Printf("DEBUG: bot wants weapon %i, but can't have it only %i and %i\n", bs->weaponnum, bs->cur_ps.weapon, bs->cur_ps.stats[STAT_DEFAULTWEAPON]);
 #endif
         }
     }
@@ -1518,7 +1527,13 @@ int BotAIStartFrame(int time) {
 				continue;
 			}
 			// do not update missiles
-			if (ent->s.eType == ET_MISSILE && ent->s.weapon != WP_GRAPPLING_HOOK) {
+			if (ent->s.eType == ET_MISSILE &&
+#ifdef TMNTWEAPSYS_2
+				(!ent->parent || !ent->parent->client || ent != ent->parent->client->hook)
+#else
+				ent->s.weapon != WP_GRAPPLING_HOOK
+#endif
+				) {
 				trap_BotLibUpdateEntity(i, NULL);
 				continue;
 			}
@@ -1537,7 +1552,7 @@ int BotAIStartFrame(int time) {
 				}
 			}
 #endif
-#endif // TMNTWEAPONS
+#endif
 			//
 			memset(&state, 0, sizeof(bot_entitystate_t));
 			//
@@ -1676,8 +1691,13 @@ int BotInitLibrary(void) {
 	if (strlen(buf)) trap_BotLibVarSet("homedir", buf);
 	//
 #ifdef IOQ3ZTM // Turtle Man: Always sure these are correct...
+#ifdef TMNTWEAPSYS_2 // Use index from file.
+	trap_BotLibVarSet("weapindex_rocket", va("%i", BG_WeaponGroupIndexForName("wp_rocket_launcher")));
+	trap_BotLibVarSet("weapindex_grapple", va("%i", BG_WeaponGroupIndexForName("wp_grappling_hook")));
+#else
 	trap_BotLibVarSet("weapindex_rocket", va("%i", WP_ROCKET_LAUNCHER));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", WP_GRAPPLING_HOOK));
+#endif
 #endif
 #ifdef TMNT
 	trap_BotLibDefine("TMNT");

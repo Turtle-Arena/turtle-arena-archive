@@ -583,7 +583,7 @@ void Vector4Scale( const vec4_t in, vec_t scale, vec4_t out );
 void VectorRotate( vec3_t in, vec3_t matrix[3], vec3_t out );
 int Q_log2(int val);
 
-#ifndef IOQ3ZTM3 // TMNTWEAPONS // XREAL
+#ifndef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 float Q_acos(float c);
 #endif
 
@@ -593,11 +593,6 @@ float	Q_crandom( int *seed );
 
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
-
-#ifdef STYEF_ENTITY
-float	flrandom(float min, float max);
-int		irandom(int min, int max);
-#endif
 
 void vectoangles( const vec3_t value1, vec3_t angles);
 void AnglesToAxis( const vec3_t angles, vec3_t axis[3] );
@@ -623,7 +618,7 @@ void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
 float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
-#ifdef TMNTWEAPONS // XREAL
+#if defined TMNTWEAPONS || defined TMNTWEAPSYS_2 // XREAL
 float AngleBetweenVectors(const vec3_t a, const vec3_t b);
 #endif
 
@@ -633,7 +628,7 @@ qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const ve
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
 void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, float degrees );
 void RotateAroundDirection( vec3_t axis[3], float yaw );
-#ifdef IOQ3ZTM3 // TMNTWEAPONS // XREAL
+#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 float Q_acos(float c);
 #endif
 void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
@@ -1024,7 +1019,11 @@ typedef struct {
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16 // PW_* are still limited by bit fields.
-#define	MAX_WEAPONS				16 // If not TMNTWEAPSYS2 limited to 16
+#ifdef TMNTWEAPSYS_2
+#define	MAX_WEAPONS				32
+#else
+#define	MAX_WEAPONS				16 // If not TMNTWEAPSYS_2 limited to 16
+#endif
 #ifdef TMNTHOLDSYS
 #define	MAX_HOLDABLE			16
 #endif
@@ -1168,9 +1167,6 @@ typedef struct playerState_s {
 	int		comboTime; // Time left till the combo ends
 
 	int			weaponHands;	// HAND_NONE, HAND_PRIMARY, HAND_SECONDARY, or HAND_BOTH
-
-	//
-	qboolean attack_melee; // qtrue if attack was pressed and started a melee attack
 #endif
 
 	// not communicated over the net at all
@@ -1225,7 +1221,7 @@ typedef struct usercmd_s {
 #ifndef TMNTWEAPSYS2
 	byte			weapon;           // weapon 
 #endif
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+#ifdef TMNTHOLDSYS/*2*/
 	byte			holdable;         // holdable
 #endif
 	signed char	forwardmove, rightmove, upmove;

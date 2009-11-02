@@ -360,9 +360,6 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 #ifdef SP_NPC
 			check->s.eType != ET_NPC &&
 #endif
-#ifdef SINGLEPLAYER // entity
-			check->s.eType != ET_MODELANIM &&
-#endif
 #ifdef TMNTENTSYS // MISC_OBJECT
 			check->s.eType != ET_MISCOBJECT &&
 #endif
@@ -790,6 +787,16 @@ void InitMover( gentity_t *ent ) {
 	if ( ent->s.pos.trDuration <= 0 ) {
 		ent->s.pos.trDuration = 1;
 	}
+
+#ifdef TMNTENTSYS // BREAKABLE
+	//if (ent->health == 0)
+	//	G_SpawnInt( "health", "0", &ent->health );
+	if (ent->health > 0)
+	{
+		ent->takedamage = qtrue;
+		// TODO: Set damage and pain?
+	}
+#endif
 }
 
 
@@ -1010,13 +1017,23 @@ void SP_func_door (gentity_t *ent) {
 	ent->nextthink = level.time + FRAMETIME;
 
 	if ( ! (ent->flags & FL_TEAMSLAVE ) ) {
+#ifdef TMNTENTSYS // BREAKABLE // Doors are not killable...
+		if (ent->health)
+		{
+			ent->takedamage = qtrue;
+			ent->health = -1;
+		}
+		if ( ent->targetname || ent->takedamage )
+#else
 		int health;
 
 		G_SpawnInt( "health", "0", &health );
 		if ( health ) {
 			ent->takedamage = qtrue;
 		}
-		if ( ent->targetname || health ) {
+		if ( ent->targetname || health )
+#endif
+		{
 			// non touch/shoot doors
 			ent->think = Think_MatchTeam;
 		} else {
@@ -1245,6 +1262,9 @@ void SP_func_button( gentity_t *ent ) {
 	if (ent->health) {
 		// shootable button
 		ent->takedamage = qtrue;
+#ifdef TMNTENTSYS // BREAKABLE // Buttons are not killable...
+		ent->health = -1;
+#endif
 	} else {
 		// touchable button
 		ent->touch = Touch_Button;
@@ -1477,6 +1497,42 @@ void SP_func_static( gentity_t *ent ) {
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 }
+
+
+#ifdef TMNTENTSYS // BREAKABLE
+/*
+===============================================================================
+
+BREAKABLE
+
+All movers (less func_door and func_button) can be killed,
+	but func_breakables are the only ones that bots will attack.
+
+/ *QUAKED all func_* (less func_door and func_button)
+"health" Mover's health, if 0 can't be killed (default 0)
+"paintarget" Trigers target ent on pain.
+* /
+
+Turtle Man: TODO: Support STY:EF func_breakable entity?
+===============================================================================
+*/
+
+
+/*QUAKED func_breakable (0 .5 .8) ?
+Damageable entity that when killed can spawn glass and other materials.
+It's like func_static, except that bots will attack it.
+
+"model2"	.md3 model to also draw
+"color"		constantLight color
+"light"		constantLight radius
+*/
+void SP_func_breakable( gentity_t *ent ) {
+	trap_SetBrushModel( ent, ent->model );
+	InitMover( ent );
+	VectorCopy( ent->s.origin, ent->s.pos.trBase );
+	VectorCopy( ent->s.origin, ent->r.currentOrigin );
+}
+#endif
 
 
 /*

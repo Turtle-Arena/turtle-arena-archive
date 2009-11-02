@@ -32,9 +32,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define SPECIFYSERVER_BACK1		"menu/art/back_1"
 #define SPECIFYSERVER_FIGHT0	"menu/art/fight_0"
 #define SPECIFYSERVER_FIGHT1	"menu/art/fight_1"
+#ifdef IOQ3ZTM // SPECIFY_FAV
+#define SPECIFYSERVER_ADD0		"menu/art/accept_0"
+#define SPECIFYSERVER_ADD1		"menu/art/accept_1"
+#endif
+
 
 #define ID_SPECIFYSERVERBACK	102
 #define ID_SPECIFYSERVERGO		103
+#ifdef IOQ3ZTM // SPECIFY_FAV
+#define ID_SPECIFYSERVERADD		104
+
+void ArenaServers_LoadFavorites( void );
+void ArenaServers_StartRefresh( void );
+#endif
 
 static char* specifyserver_artlist[] =
 {
@@ -44,6 +55,10 @@ static char* specifyserver_artlist[] =
 	SPECIFYSERVER_BACK1,	
 	SPECIFYSERVER_FIGHT0,
 	SPECIFYSERVER_FIGHT1,
+#ifdef IOQ3ZTM // SPECIFY_FAV
+	SPECIFYSERVER_ADD0,
+	SPECIFYSERVER_ADD1,
+#endif
 	NULL
 };
 
@@ -55,6 +70,9 @@ typedef struct
 	menubitmap_s	framer;
 	menufield_s		domain;
 	menufield_s		port;
+#ifdef IOQ3ZTM // SPECIFY_FAV
+	menubitmap_s	add;
+#endif
 	menubitmap_s	go;
 	menubitmap_s	back;
 } specifyserver_t;
@@ -86,6 +104,57 @@ static void SpecifyServer_Event( void* ptr, int event )
 			}
 			break;
 
+#ifdef IOQ3ZTM // SPECIFY_FAV
+		case ID_SPECIFYSERVERADD:
+			if (event != QM_ACTIVATED)
+				break;
+
+			if (s_specifyserver.domain.field.buffer[0])
+			{
+				strcpy(buff,s_specifyserver.domain.field.buffer);
+#if 0 // Turtle Man: FIXME: Support port? It can't be in fav server address?
+				if (s_specifyserver.port.field.buffer[0])
+					Com_sprintf( buff+strlen(buff), 128, ":%s", s_specifyserver.port.field.buffer );
+#endif
+
+				// From serverinfo
+				{
+					int		i;
+					int		best;
+					char adrstr[256];
+
+					best = 0;
+					for (i=0; i<MAX_FAVORITESERVERS; i++)
+					{
+						trap_Cvar_VariableStringBuffer( va("server%d",i+1), adrstr, sizeof(adrstr) );
+						if (!Q_stricmp(buff,adrstr))
+						{
+							// already in list
+							// Turtle Man: TODO: Show message.("Already in list")
+							return;
+						}
+
+						// use first empty or non-numeric available slot
+						if ((adrstr[0]  < '0' || adrstr[0] > '9' ) && !best)
+							best = i+1;
+					}
+
+					if (best)
+					{
+						trap_Cvar_Set( va("server%d",best), buff);
+						ArenaServers_LoadFavorites();
+						UI_PopMenu();
+						ArenaServers_StartRefresh();
+					}
+					else
+					{
+						// Turtle Man: TODO: Show message. ("Can't add, all fav slots full.")
+					}
+				}
+			}
+			break;
+#endif
+
 		case ID_SPECIFYSERVERBACK:
 			if (event != QM_ACTIVATED)
 				break;
@@ -113,7 +182,11 @@ void SpecifyServer_MenuInit( void )
 	s_specifyserver.banner.generic.type	 = MTYPE_BTEXT;
 	s_specifyserver.banner.generic.x     = 320;
 	s_specifyserver.banner.generic.y     = 16;
+#ifdef IOQ3ZTM // SPECIFY_FAV
+	s_specifyserver.banner.string		 = "SPECIFY FAVORITE";
+#else
 	s_specifyserver.banner.string		 = "SPECIFY SERVER";
+#endif
 	s_specifyserver.banner.color  		 = color_white;
 	s_specifyserver.banner.style  		 = UI_CENTER;
 
@@ -142,13 +215,40 @@ void SpecifyServer_MenuInit( void )
 	s_specifyserver.domain.field.maxchars     = 80;
 
 	s_specifyserver.port.generic.type       = MTYPE_FIELD;
+#ifdef IOQ3ZTM // SPECIFY_FAV
+	s_specifyserver.port.generic.name	    = "Port (Fight Only):";
+#else
 	s_specifyserver.port.generic.name	    = "Port:";
+#endif
 	s_specifyserver.port.generic.flags	    = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_specifyserver.port.generic.x	        = 206;
 	s_specifyserver.port.generic.y	        = 250;
 	s_specifyserver.port.field.widthInChars = 6;
 	s_specifyserver.port.field.maxchars     = 5;
 
+#ifdef IOQ3ZTM // SPECIFY_FAV
+	s_specifyserver.add.generic.type	= MTYPE_BITMAP;
+	s_specifyserver.add.generic.name	= SPECIFYSERVER_ADD0;
+	s_specifyserver.add.generic.flags	= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_specifyserver.add.generic.callback= SpecifyServer_Event;
+	s_specifyserver.add.generic.id		= ID_SPECIFYSERVERADD;
+	s_specifyserver.add.generic.x		= 640;
+	s_specifyserver.add.generic.y		= 480-64;
+	s_specifyserver.add.width			= 128;
+	s_specifyserver.add.height			= 64;
+	s_specifyserver.add.focuspic		= SPECIFYSERVER_ADD1;
+
+	s_specifyserver.go.generic.type	    = MTYPE_BITMAP;
+	s_specifyserver.go.generic.name     = SPECIFYSERVER_FIGHT0;
+	s_specifyserver.go.generic.flags    = QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_specifyserver.go.generic.callback = SpecifyServer_Event;
+	s_specifyserver.go.generic.id	    = ID_SPECIFYSERVERGO;
+	s_specifyserver.go.generic.x		= 320;
+	s_specifyserver.go.generic.y		= 480-64;
+	s_specifyserver.go.width  		    = 128;
+	s_specifyserver.go.height  		    = 64;
+	s_specifyserver.go.focuspic         = SPECIFYSERVER_FIGHT1;
+#else
 	s_specifyserver.go.generic.type	    = MTYPE_BITMAP;
 	s_specifyserver.go.generic.name     = SPECIFYSERVER_FIGHT0;
 	s_specifyserver.go.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -159,6 +259,7 @@ void SpecifyServer_MenuInit( void )
 	s_specifyserver.go.width  		    = 128;
 	s_specifyserver.go.height  		    = 64;
 	s_specifyserver.go.focuspic         = SPECIFYSERVER_FIGHT1;
+#endif
 
 	s_specifyserver.back.generic.type	  = MTYPE_BITMAP;
 	s_specifyserver.back.generic.name     = SPECIFYSERVER_BACK0;
@@ -176,9 +277,13 @@ void SpecifyServer_MenuInit( void )
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.framer );
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.domain );
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.port );
+#ifdef IOQ3ZTM // SPECIFY_FAV
+	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.add );
+#endif
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.go );
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.back );
 
+	// Turtle Man: NOTE: If PORT_SERVER is changed update this.
 	Com_sprintf( s_specifyserver.port.field.buffer, 6, "%i", 27960 );
 }
 

@@ -49,7 +49,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	RF_WRAP_FRAMES		0x0200		// mod the model frames by the maxframes to allow continuous
 
 #ifdef IOQ3ZTM // RENDERFLAGS
-// Turtle Man: FIXME: I don't like RF_THIRD_PERSON or RF_FIRST_PERSON
+// Turtle Man: FIXME: I don't like RF_THIRD_PERSON or RF_FIRST_PERSON ...
 #define	RF_ONLY_MIRROR		0x0400		// only draw in mirrors
 #define	RF_NOT_MIRROR		0x0800		// do not draw in mirrors
 #endif

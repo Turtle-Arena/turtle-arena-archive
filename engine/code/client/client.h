@@ -117,12 +117,12 @@ typedef struct {
 
 	// cgame communicates a few values to the client system
 #ifdef TMNTWEAPSYS2
-#ifdef TMNTHOLDSYS2
+#ifdef TMNTHOLDSYS/*2*/
 	int			cgameUserCmdValue;	// current holdable to add to usercmd_t
 #endif
 #else
 	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
-#ifdef TMNTHOLDSYS2
+#ifdef TMNTHOLDSYS/*2*/
 	int			cgameHoldableValue;	// current holdable to add to usercmd_t
 #endif
 #endif

@@ -89,6 +89,51 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 	}
 }
 
+#ifdef TMNTWEAPSYS_2
+/*
+==================
+CG_BulletBubbleTrail
+
+Bullets shot underwater
+
+returns qfalse if no impact marks should be added.
+==================
+*/
+qboolean CG_BulletBubbleTrail( vec3_t start, vec3_t end, int skipNum ) {
+	trace_t		tr;
+	int sourceContentType, destContentType;
+
+	CG_Trace( &tr, start, NULL, NULL, end, skipNum, MASK_SHOT );
+
+	sourceContentType = trap_CM_PointContents( start, 0 );
+	destContentType = trap_CM_PointContents( tr.endpos, 0 );
+
+	// do a complete bubble trail if necessary
+	if ( sourceContentType == destContentType ) {
+		if ( sourceContentType & CONTENTS_WATER ) {
+			CG_BubbleTrail( start, tr.endpos, 32 );
+		}
+	// bubble trail from water into air
+	} else if ( sourceContentType & CONTENTS_WATER ) {
+		trace_t trace;
+
+		trap_CM_BoxTrace( &trace, end, start, NULL, NULL, 0, CONTENTS_WATER );
+		CG_BubbleTrail( start, trace.endpos, 32 );
+	// bubble trail from air into water
+	} else if ( destContentType & CONTENTS_WATER ) {
+		trace_t trace;
+
+		trap_CM_BoxTrace( &trace, start, end, NULL, NULL, 0, CONTENTS_WATER );
+		CG_BubbleTrail( tr.endpos, trace.endpos, 32 );
+	}
+
+	if (  tr.surfaceFlags & SURF_NOIMPACT ) {
+		return qfalse;
+	}
+	return qtrue;
+}
+#endif
+
 /*
 =====================
 CG_SmokePuff
@@ -187,14 +232,14 @@ void CG_SpawnEffect( vec3_t org ) {
 	re->reType = RT_MODEL;
 	re->shaderTime = cg.time / 1000.0f;
 
-#ifndef MISSIONPACK
+#if !defined MISSIONPACK && !defined TMNT
 	re->customShader = cgs.media.teleportEffectShader;
 #endif
 	re->hModel = cgs.media.teleportEffectModel;
 	AxisClear( re->axis );
 
 	VectorCopy( org, re->origin );
-#ifdef MISSIONPACK
+#if defined MISSIONPACK || defined TMNT // Center teleport effect model Z
 	re->origin[2] += 16;
 #else
 	re->origin[2] -= 24;

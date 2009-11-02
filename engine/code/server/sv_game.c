@@ -285,46 +285,6 @@ void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) {
 	*cmd = svs.clients[clientNum].lastUsercmd;
 }
 
-#ifdef TMNTWEAPSYS_1 // GAME_TAGS
-// Turtle Man: FIXME: This should NOT use render functions (Can't use in ded server!)
-//        We only need the tags so we don't need the load the "model"!
-//    After I replace using models here, should non-ded still use models?
-//        (Use less memory by reusing cache etc?)
-#ifndef DEDICATED
-int RE_RegisterModel( const char *name );
-int R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
-					 float frac, const char *tagName );
-#endif
-
-int SV_RegisterTags( const char *name )
-{
-	int index;
-
-#ifdef DEDICATED
-	index = 0;
-#else
-	index = RE_RegisterModel(name);
-#endif
-
-	return index;
-}
-
-int SV_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
-					 float frac, const char *tagName )
-{
-	int rtn;
-
-
-#ifdef DEDICATED
-	rtn = qfalse;
-#else
-	rtn = R_LerpTag( tag, handle, startFrame, endFrame, frac, tagName );
-#endif
-
-	return rtn;
-}
-#endif
-
 //==============================================
 
 static int	FloatAsInt( float f ) {
@@ -332,6 +292,12 @@ static int	FloatAsInt( float f ) {
 	fi.f = f;
 	return fi.i;
 }
+
+#ifdef TMNT_GAME_MODELS
+qhandle_t	RE_RegisterModel( const char *name );
+int			R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
+					 float frac, const char *tagName );
+#endif
 
 /*
 ====================
@@ -479,11 +445,11 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_SNAPVECTOR:
 		Sys_SnapVector( VMA(1) );
 		return 0;
-#ifdef TMNTWEAPSYS_1 // GAME_TAGS
-	case G_REGISTERTAGS:
-		return SV_RegisterTags( VMA(1) );
+#ifdef TMNT_GAME_MODELS
+	case G_REGISTERMODEL:
+		return RE_RegisterModel( VMA(1) );
 	case G_LERPTAG:
-		return SV_LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
+		return R_LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
 #endif
 
 		//====================================
@@ -845,7 +811,9 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case BOTLIB_AI_CHOOSE_BEST_FIGHT_WEAPON:
 		return botlib_export->ai.BotChooseBestFightWeapon( args[1], VMA(2) );
 	case BOTLIB_AI_GET_WEAPON_INFO:
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 		botlib_export->ai.BotGetWeaponInfo( args[1], args[2], VMA(3) );
+#endif
 		return 0;
 	case BOTLIB_AI_LOAD_WEAPON_WEIGHTS:
 		return botlib_export->ai.BotLoadWeaponWeights( args[1], VMA(2) );
@@ -903,7 +871,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case TRAP_CEIL:
 		return FloatAsInt( ceil( VMF(1) ) );
 
-#ifdef IOQ3ZTM3
+#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 	case TRAP_ACOS:
 		return FloatAsInt( acos( VMF(1) ) );
 #endif

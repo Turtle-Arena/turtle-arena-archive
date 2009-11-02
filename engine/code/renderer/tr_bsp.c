@@ -203,7 +203,7 @@ static void R_LoadLightmaps(lump_t * l/*, const char *bspName*/)
 
 	Q_strncpyz(mapName, bspName, sizeof(mapName));
 	COM_StripExtension(mapName, mapName, sizeof(mapName));
-	strcat(mapName, "/lightmaps"); //HACK: Loads external lightmaps inside mapName/lightmaps/lm_0000.tga etc etc
+	//strcat(mapName, "/lightmaps"); //HACK: Loads external lightmaps inside mapName/lightmaps/lm_0000.tga etc etc
 	lightmapFiles = ri.FS_ListFiles(mapName, ".tga", &numLightmaps);
 
 	if(!lightmapFiles || !numLightmaps)

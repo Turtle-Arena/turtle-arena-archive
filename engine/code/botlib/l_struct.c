@@ -239,19 +239,44 @@ int ReadStructure(source_t *source, structdef_t *def, char *structure)
 	fielddef_t *fd;
 	void *p;
 	int num;
+#ifdef TMNTWEAPSYS_2_NOCOMPAT
+	int level;
+#endif
 
 	if (!PC_ExpectTokenString(source, "{")) return 0;
+#ifdef TMNTWEAPSYS_2_NOCOMPAT
+	level = 1;
+#endif
 	while(1)
 	{
 		if (!PC_ExpectAnyToken(source, &token)) return qfalse;
+#ifdef TMNTWEAPSYS_2_NOCOMPAT // In weaponinfo.txt there are unparsed sub-structs...
+		if (!strcmp(token.string, "{"))
+		{
+			level++;
+		}
+		if (!strcmp(token.string, "}"))
+		{
+			level--;
+			if (!level)
+				break;
+		}
+#else
 		//if end of structure
 		if (!strcmp(token.string, "}")) break;
+#endif
 		//find the field with the name
 		fd = FindField(def->fields, token.string);
 		if (!fd)
 		{
+#ifdef TMNTWEAPSYS_2_NOCOMPAT
+			// weaponinfo.txt has lots of info that botlib doesn't load...
+			//SourceWarning(source, "unknown structure field %s", token.string);
+			continue;
+#else
 			SourceError(source, "unknown structure field %s", token.string);
 			return qfalse;
+#endif
 		} //end if
 		if (fd->type & FT_ARRAY)
 		{

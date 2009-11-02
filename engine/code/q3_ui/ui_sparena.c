@@ -530,9 +530,10 @@ void UI_SpecifySaveMenu( void )
 #define ID_SP_NEWGAME	11
 #define ID_SP_LOADGAME	12
 //#define ID_SP_SAVEGAME	13
-#define ID_SP_DEMOS		14
-#define ID_SP_CINEMATICS	15
-#define ID_SP_MODS		16
+#define ID_SP_CUSTOM	14
+#define ID_SP_DEMOS		15
+#define ID_SP_CINEMATICS	16
+#define ID_SP_MODS		17
 
 typedef struct {
 	menuframework_s	menu;
@@ -542,6 +543,7 @@ typedef struct {
 	menutext_s		sp_newgame;
 	menutext_s		sp_loadgame;
 	//menutext_s		sp_savegame;
+	menutext_s		sp_custom; // skirmish
 	menutext_s		sp_demos;
 	menutext_s		sp_cinematics;
 	menutext_s		sp_mods;
@@ -592,6 +594,10 @@ static void UI_SPMenu_Event( void *ptr, int event ) {
 		//case ID_SP_SAVEGAME:
 			//UI_SpecifySaveMenu();
 			//break;
+
+		case ID_SP_CUSTOM: // skirmish
+			UI_StartServerMenu( qfalse );
+			break;
 
 		case ID_SP_DEMOS:
 			UI_DemosMenu();
@@ -644,14 +650,19 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.framer.width  			= 256;
 	spMenuInfo.framer.height  			= 334;
 
-	y = 200;
+	y = 150;
 	spMenuInfo.sp_newgame.generic.type		= MTYPE_PTEXT;
 	spMenuInfo.sp_newgame.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	spMenuInfo.sp_newgame.generic.x			= 320;
 	spMenuInfo.sp_newgame.generic.y			= y;
 	spMenuInfo.sp_newgame.generic.id		= ID_SP_NEWGAME;
 	spMenuInfo.sp_newgame.generic.callback	= UI_SPMenu_Event;
+#ifdef TMNTRELEASE
+	spMenuInfo.sp_newgame.string			= "New Game (to do)";
+	spMenuInfo.sp_newgame.generic.flags |= QMF_GRAYED;
+#else
 	spMenuInfo.sp_newgame.string			= "New Game";
+#endif
 	spMenuInfo.sp_newgame.color				= color_red;
 	spMenuInfo.sp_newgame.style				= UI_CENTER;
 
@@ -662,12 +673,17 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.generic.y			= y;
 	spMenuInfo.sp_loadgame.generic.id			= ID_SP_LOADGAME;
 	spMenuInfo.sp_loadgame.generic.callback	= UI_SPMenu_Event;
+#ifdef TMNTRELEASE
+	spMenuInfo.sp_loadgame.string				= "Load Game (to do)";
+	spMenuInfo.sp_loadgame.generic.flags |= QMF_GRAYED;
+#else
 	spMenuInfo.sp_loadgame.string				= "Load Game";
+#endif
 	spMenuInfo.sp_loadgame.color				= color_red;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
 
-	y += VERTICAL_SPACING;
 #if 0
+	y += VERTICAL_SPACING;
 	spMenuInfo.sp_savegame.generic.type		= MTYPE_PTEXT;
 	spMenuInfo.sp_savegame.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	spMenuInfo.sp_savegame.generic.x			= 320;
@@ -684,6 +700,21 @@ static void UI_SPMenu_Init( void ) {
 		spMenuInfo.sp_savegame.generic.flags |= QMF_GRAYED;
 	}
 #endif
+
+	// Extra space.
+	y += VERTICAL_SPACING;
+
+	// Moved here from SP arena select
+	y += VERTICAL_SPACING;
+	spMenuInfo.sp_custom.generic.type				= MTYPE_PTEXT;
+	spMenuInfo.sp_custom.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	spMenuInfo.sp_custom.generic.x					= 320;
+	spMenuInfo.sp_custom.generic.y					= y;
+	spMenuInfo.sp_custom.generic.id					= ID_SP_CUSTOM;
+	spMenuInfo.sp_custom.generic.callback			= UI_SPMenu_Event;
+	spMenuInfo.sp_custom.string						= "Custom Game"; // Skirmish
+	spMenuInfo.sp_custom.color						= color_red;
+	spMenuInfo.sp_custom.style						= UI_CENTER;
 
 	// Moved here from q3 main menu.
 	y += VERTICAL_SPACING;
@@ -754,6 +785,7 @@ static void UI_SPMenu_Init( void ) {
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_newgame );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_loadgame );
 	//Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_savegame );
+	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_custom );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_demos );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_cinematics );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_mods );
