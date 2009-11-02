@@ -182,10 +182,10 @@ DEATH_DROWN2 = {
 }
 
 D_PRAISE0 = {
-	"Nice shot.";
+	//"Nice shot.";
 	"Care to show how that move is accomplished in slow motion?";
 	"You are good.";
-	"Nice 1";
+	"Nice one."; // "Nice 1";
 }
 
 D_PRAISE1 = {
@@ -205,7 +205,7 @@ D_PRAISE3 = {
 	"Do you think you could ease up and give the rest of us a chance?";
 	"So... maybe I should just stay dead.";
 	"So much for effort.";
-	"Wow... I mean WOW!  That was a good shot!";
+	//"Wow... I mean WOW!  That was a good shot!";
 }
 
 LEVEL_END0 = {
@@ -408,14 +408,14 @@ LEVEL_START0 = {
 	"Oooh, I like ", 4, " always fun.";
 	4, " again?  Sheesh someone cycle the maps!";
 	"Ahh, ", 4, " my favorite place.";
-	"I can remember ", 4, " before they screwed it up.";
+	//"I can remember ", 4, " before they screwed it up.";
 }
 
 LEVEL_START1 = {
 	"Are you ", fighter, "s ready to die in ", 4, "?";
-	"Dibs on the rocket launcher!";
+	//"Dibs on the rocket launcher!";
 	"Your shoelace is untied.";
-	"Isn't that your ", family_member, " calling you?";
+	//"Isn't that your ", family_member, " calling you?";
 }
 
 LEVEL_START2 = {
@@ -439,8 +439,8 @@ TAUNT0 = {
 }
 
 TAUNT1 = {
-	"*NEWS FLASH*, ", 0, " gave my ", family_member, " ", disease, ".";
-	"Does your mother know how you spend your time?";
+	//"*NEWS FLASH*, ", 0, " gave my ", family_member, " ", disease, ".";
+	//"Does your mother know how you spend your time?";
 	"I wish I could be as lame as you.";
 	"Oh just admit it, ", 0, " you think Visual Basic is a great language.";
 }
@@ -583,7 +583,7 @@ LEVEL_END_VICTORY0 = {
 }
 
 LEVEL_END_VICTORY1 = {
-	"I'd like to thank my ", family_member, " and my ", counselor, " for this.";
+	//"I'd like to thank my ", family_member, " and my ", counselor, " for this.";
 	"When will you ", fighter, "s learn?  This is my game!";
 	"Here I am again, at the top like it should be.";
 	"I didn't even break a sweat.";
@@ -862,10 +862,10 @@ immaturity01 = {
 
 proposition01 = {
 	"Sorry I've got a headache.";
-	"No, your ", family_member, " told me that you have ", disease, ".";
-	"No, I don't swing that way.";
+	//"No, your ", family_member, " told me that you have ", disease, ".";
+	//"No, I don't swing that way.";
 	"I'm not into pimples.";
-	"Sorry, I'm not ready for a relationship yet, but thanks for the offer.";
+	//"Sorry, I'm not ready for a relationship yet, but thanks for the offer.";
 	"I'd rather go fishing";
 }
 

@@ -1,15 +1,15 @@
-TMNT Arena (working title) is a WIP TMNT fangame based on the ioquake3 engine.
+TMNT Arena (working title) is a work in progress TMNT fangame based on the ioquake3 engine.
 
 == Version ==
-TMNT Arena Alpha 1.0.6 June 2, 2009
+TMNT Arena Alpha 0.1.0 June 6, 2009
 
 == Credits ==
 id software
 ioquake3
-Tremulous
-OpenArena
 GNU Freefonts
-Turtle Man
+Zack "ZTurtleMan" Middleton
+
+Also see "Code" section for full list.
 
 == Installing ==
 Extract TMNT Arena into a directory, such as
@@ -30,78 +30,46 @@ Mac OS X: /Users/NAME/Library/Application Support/TMNTArena/
 Linux: /home/NAME/.tmntarena/
 
 == Compiling ==
-Currently the easist way to compile TMNT Arena is GNU Make.
-
-1) Unzip "tmnt-src-*.zip" into the main TMNT Arena directory (There is a directory named "src" inside zip)
-
-=== GNU Make ===
-2) In a terminal change to the src/engine/ directory and run "make"
-3) Output will be in src/engine/build/*dir*/ (Where *dir* is something like "release-mingw32-x86")
-
-=== Code::Blocks ===
-NOTE: Compiling only works on Windows.
-NOTE: However it can be used to view and edit the source on linux (less code/sys/sys_unix.c)
-2) Open src/engine/misc/code_blocks/ioq3.workspace
-3) Rebuild workspace.
-4) Output will be in src/engine/build
-
-=== Microsoft Visual C++ ===
-Currently unsupported. There are project files for ioquake3 in source/misc/msvc/.
-
-Below are changes that /should/ make the ioquake3 projects compile TMNT Arena. This is untested.
-
-Worspace:
-src/engine/code/splines/Splines.vcproj
-
-Quake3 project:
-Link to output libraryof Splines project.
-
-Cgame project:
-Add below to project
-src/tmnta-engine/code/cgame/cg_npcs.c
-
-Game project:
-Add below to project
-src/engine/code/game/g_npc.c
-src/engine/code/game/g_npcmove.c
-src/engine/code/game/g_npcthink.c
-src/engine/code/game/g_savestate.c
-src/engine/code/game/g_paths.c
-
-Copy the defines from the TMNT config section of the Makefile into all project less Splines.
-:(note to self): Move the defining to a .h file?
+See tmnt-compiling.txt
 
 == Code ==
 TMNT Arena uses code directly or based on code from the following.
-Currently not all of the code is released under a free software license,
-	it is however mark in the code ("FIXME: NON-GPL").
 
 === GPL ===
-* ioquake3 : http://ioquake3.org/
+* ioquake3 (Base engine): http://ioquake3.org/
+** Jay "TT1" Weisskopf (ASPECT_RATIO): https://bugzilla.icculus.org/show_bug.cgi?id=3475
+** (VOIP_INFO): http://bugzilla.icculus.org/show_bug.cgi?id=4018
+
 * OpenArena (OPENARENA): http://openarena.ws --Changed default sound filename. Load Ogg sounds (when no wav).
+** OA_BLOOM OpenArena's bloom effect, disabled by default. (r_bloom 1 to enable)
+
 * Xreal (XREAL): http://www.xreal-project.net/
 ** Homing rockets (Xreal svn r2785)
 ** Fired rockets and homing-rockets can be destroyed (Xreal svn r > 2785)
 ** Used Xreal to find what to change to add per-player bounding boxes (Xreal svn r3050)
 ** Jeff "Jeffro11" Attwood (EXTERNAL_LIGHTMAPS): http://ioquake.org/forums/viewtopic.php?f=2&t=100
-* Jay "TT1" Weisskopf (ASPECT_RATIO): https://bugzilla.icculus.org/show_bug.cgi?id=3475
 
-=== Non-Free ===
+* Smokin' Guns (SMOKIN_GUNS): http://www.smokin-guns.net/
+** Fixed animation timing based on PM_AnimLength from Smokin' Guns' bg_pmove.c
+
+=== Non-Free (Disabled) ===
 :''All of the non-free will be rewritten or removed.''
-The code is in the source but is disable, so none of it is in the EXE, DLLs, or VMs.
 
-* rfactory (SINGLEPLAYER): http://www.rfactory.org/
+The code is in the source but is disable, so none of it is in the binarys...
+
 * The Dark Conjunction (via rfactory) (SP_NPC): http://tdc.planetquake.gamespy.com/news.htm
-* Star Trek Voyager: Elite Forces [multiplayer] ("func_breakable" code) (STYEF_ENTITY)
+
+=== Other ===
+: Code based on guides, etc.
+* rfactory: http://www.rfactory.org/
+* "inolan.com": http://www.quake3hut.co.uk/q3coding/Breakable%20Glass.htm
 
 == Data ==
-"Data" refers to the contants of "base/pak0.pk3"
+"Data" refers to the contants of "base/pak0.pk3".
 
-There are source files for some of the data in tmnt-src-*.zip/base-src/
+There are source files for some of the data in tmnt-src-*.zip/src/base-src/
 
-All data is license under a GNU General Public License.
-
-All data, unless otherwise noted, is Copyright(c) 2009 Turtle Man
+All data, unless otherwise noted, is Copyright(c) 2009 Zack "ZTurtleMan" Middleton
 	and is license under the GNU General Public License version 2 or later.
 
 The following are from OpenArena and are Copyright (C) 2006 Dmn_clown
@@ -123,10 +91,9 @@ base/botfiles/weapons.h
 The following are from OpenArena,
 	and are license under the GNU General Public License version 2 or later
 
-: Currently used by the Quake3 UI (That I plan to replace with a Team Arena scripted menu)
+: Currently used by the Quake3 UI (That I plan to replace with a Team Arena scripted menu, sometime...)
 base/menu/art/font1_prop.tga
 base/menu/art/font2_prop.tga
-base/gfx/2d/numbers/*.tga --All 11 files
 base/gfx/2d/bigchars.tga
 
 : Currently don't plan on replacing these.
@@ -140,24 +107,29 @@ base/gfx/2d/crosshairg.tga
 base/gfx/2d/crosshairh.tga
 base/gfx/2d/crosshairi.tga
 base/gfx/2d/crosshairj.tga
-base/models/weaphits/boom01.md3 (Its two triangles. I deleted four of the six triangles from openarena.)
+base/models/weaphits/boom01.md3 (Its two triangles. I deleted four of the six triangles from OpenArena.)
 
 : Currently plan to replace these.
+base/textures/base_light/baslt4_1.tga
+base/textures/base_light/baslt4_1.blend.tga
+base/textures/base_light/ceil1_4.tga
+base/textures/base_light/ceil1_4.blend.tga
 base/gfx/damage/bullet_mrk.jpg
 base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
 base/gfx/damage/shadow.tga
+base/gfx/misc/flare.jpg
 base/sprites/bubble.tga
 base/sprites/splash.tga
 base/ui/assets/statusbar/camp.tga
 base/ui/assets/statusbar/escort.tga
 base/ui/assets/statusbar/follow.tga
-base/models/weapons2/shotgun/shotgun_hand.md3 (Renamed to base/models/weapons2/gun/gun_hand.md3)
+base/models/weapons2/gun/gun_hand.md3 (Copied from OA's base/models/weapons2/shotgun/shotgun_hand.md3)
 
 The following files were generated by q3font.exe using the font "FreeSans.ttf", which is part of GNU Freefonts,
 	and are license under the GNU General Public License version 3 or later.
 
-: ''I should have use a font that is license under "GPL v2 or later"...''
+: ''I should have use a font that is license under "GPL v2 or later"...?''
 
 base/fonts/fontImage_0_12.tga
 base/fonts/fontImage_0_16.tga

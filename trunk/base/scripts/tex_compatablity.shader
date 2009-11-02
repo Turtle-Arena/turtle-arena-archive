@@ -1,5 +1,5 @@
 // Shaders that are not need (and shouldn't be used by TMNT Arena maps),
-//  but we have them for "map compatablity"... They may be removed leter.
+//  but we have them for "quake3 map compatablity"... They may be removed leter.
 
 // See textures/common/mirror1 in tex_common.shader
 textures/common/mirror

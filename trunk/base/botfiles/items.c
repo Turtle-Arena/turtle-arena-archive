@@ -58,7 +58,6 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
-
 /*
 iteminfo "holdable_kamikaze"
 {

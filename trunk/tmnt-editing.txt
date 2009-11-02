@@ -1,14 +1,14 @@
 This file may help with creating addons for TMNT Arena. Currently it won't help much.
 
 == Overview ==
-:''If you have editing knowlegde of Quake3 or any other id tech 3 game you can skip this.''
+:''If you have editing knowlegde of Quake III Arena or any other id tech 3 game you can skip this.''
 In TMNT Arena all of the data is stored in a .pk3 files, which are simply renamed .zip files.
 Pk3 files can be extracted with any zip program.
 
 TODO: More on this later.
 
 == Maps ==
-Map can be created using a Quake 3 map editor, such as GtkRadiant 1.5.0 or NetRadiant.
+Map can be created using a Quake III map editor, such as GtkRadiant 1.5.0 or NetRadiant.
 
 Currently there just information on setting up NetRadiant and adding the TMNT Arean config, but no information on mapping it self.
 After setting up Radiant check out http://en.wikibooks.org/wiki/GtkRadiant for how to use Radiant
@@ -22,9 +22,9 @@ First you need to install a map editor, such as NetRadiant.
 Go to http://www.icculus.org/netradiant/ and download NetRadiant for your operating system, or build it from source.
 
 :''If building from source, skip this step.''
-After downloading extract NetRadiant to a directory such as "C:\Program Files\NetRadiant\" on windows or "/usr/share/netradiant/" on linux.
+After downloading extract NetRadiant to a directory such as "C:\Program Files\NetRadiant\" on windows or "/usr/share/netradiant/"? on linux.
 
-Copy the files inside of the "TMNT_Arena/tools/radiant-cfg/" directory into the directory were you install NetRadiant (ie "C:\Program Files\NetRadiant")
+Copy the files inside of the "TMNTArena/tmnt-src-*.zip/src/radiant-cfg/" directory into the directory were you install NetRadiant (ie "C:\Program Files\NetRadiant")
 
 When you start NetRadiant select "TMNT Arena" in the drop-down list of games. You can also set "Show Global Preferences" to unchecked to always go into TMNT mapping, skipping the game select if you are not going to edit maps for other games (This can be changed later in the Edit -> Preferences -> Global -> Game).
 
@@ -38,14 +38,18 @@ TMNT Arena addes new keywords to animation.cfg
 
 TODO: More on this later.
 
+==== SoundPath ====
+By placing "soundpath dir" in animation.cfg the player will use sounds from "sound/dir/*" instead of "sound/PLAYERDIR/*"
+
+
 === Skins ===
-Below is the seach order for ".skin" files in TMNT Arena. It uses code from Team Arena to allow per-team skins. So Team Arena Players work in Team gametypes as well as Quake 3 players.
+Below is the seach order for ".skin" files in TMNT Arena. It uses code from Quake III: Team Arena to allow per-team skins. So Team Arena Players work in Team gametypes as well as Quake 3 players.
 
 Note: "raph/mirage" is a example; raph is the model, mirage is the skin.
 
 ==== Head ====
 :Team play
-team_headmodel = raph/mirage
+headmodel = raph/mirage
 team = red
 
 models/players/raph/mirage/head_red.skin
@@ -63,7 +67,7 @@ Note: If headmodel starts with '*' ("*raph/mirage") the "heads" directory is che
 
 ==== Body (lower/upper) ====
 :Team play
-team_model = raph/mirage
+model = raph/mirage
 team = red
 g_redTeam = Sais
 

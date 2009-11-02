@@ -1,4 +1,5 @@
-// TMNT Arena (Shell Engine) shader list
+// this file lists all the separate shader files
+// "Shell Engine" non-texture shader files
 se_gfx
 se_icons
 se_menu
@@ -7,8 +8,9 @@ se_powerups
 se_sprites
 se_ui
 
-// Texture shaders
+// Texture shader files
 tex_base_floor
+tex_base_light
 tex_base_wall
 tex_common
 tex_ctf

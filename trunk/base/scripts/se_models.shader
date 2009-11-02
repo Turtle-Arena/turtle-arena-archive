@@ -1,112 +1,145 @@
 // Shaders for the models.
 
+//
 // Player shaders
-// Raph's eyes should always be fullwhite, currently unused
-models/players/raph/eyes
+//
+
+// Raph's eyes/mouth should be lighter then normal textures
+//   and TODO: the brightness should change base on how close we are, I think they are whiter farer away.
+models/players/raph/white
 {
-	cull disable
+	//cull disable
 	{
 		map $whiteimage
+		rgbGen const ( 0.9 0.9 0.9 )
 	}
+	//{
+		//map $whiteimage
+		//rgbGen const ( 0.0 0.0 0.0 )
+		//AlphaGen portal 256
+	//}
 }
 
 models/players/raph/belt
 {
-	//cull disable
 	{
 		map models/players/raph/belt.png
-		//tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
 
 models/players/raph/body
 {
-	//cull disable
 	{
 		map models/players/raph/body.png
-		//tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
 
 models/players/raph/head
 {
-	//cull disable
 	{
 		map models/players/raph/head.png
-		//tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
 
 models/players/raph/legs
 {
-	//cull disable
 	{
 		map models/players/raph/legs.png
-		//tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
 
 models/players/raph/belt_blue
 {
-	//cull disable
 	{
 		map models/players/raph/belt_blue.png
-		//tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
 
 models/players/raph/body_blue
 {
-	//cull disable
 	{
 		map models/players/raph/body_blue.png
-		//tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
 
 models/players/raph/head_blue
 {
-	//cull disable
 	{
 		map models/players/raph/head_blue.png
-		//tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
 
 models/players/raph/belt_red
 {
-	//cull disable
 	{
 		map models/players/raph/belt_red.png
-		//tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
 
 models/players/raph/body_red
 {
-	//cull disable
 	{
 		map models/players/raph/body_red.png
-		//tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
 
 models/players/raph/head_red
 {
-	//cull disable
 	{
 		map models/players/raph/head_red.png
-		//tcGen environment
 		rgbGen lightingDiffuse
+	}
+}
+
+// Raph/Fungioid skin!
+// green eyes and mouth
+models/players/raph/green
+{
+	{
+		map $whiteimage
+		rgbGen const ( 0.0 0.9 0.0 )
+	}
+}
+
+models/players/raph/body_fugitoid
+{
+	{
+		map $whiteimage
+		rgbGen const ( 0.4 0.4 0.4 )
+	}
+	{
+		map textures/effects/tinfx.png
+		tcGen environment
+		rgbGen lightingDiffuse
+		//alphaGen wave sin .6 .2 0 .6
+	}
+}
+
+//
+// TELEPORT
+//
+
+// Spawn effect
+models/misc/telep
+{
+	cull disable
+	{
+		map models/misc/telep.png
+		tcGen environment
+		//tcMod turb 0 0.1 0 0.1
+		//tcmod rotate 311
+		//tcmod scroll 1 1
+		blendfunc Add
+		rgbGen entity
 	}
 }
 
@@ -189,54 +222,107 @@ models/powerups/health/health
 	}
 }
 
-models/powerups/instant/defense
-{
-	//cull disable
-	{
-		map models/powerups/instant/defense.png
-		rgbGen lightingDiffuse
-	}
-}
-
 // Based on "powerups/invisibility" (se_powerups.shader)
 models/powerups/instant/invis
 {
-	//cull disable
 	{
 		//map models/powerups/instant/invis.png
 		map textures/effects/invismap.tga
-			//map textures/sfx/specular.tga
 		blendfunc GL_ONE GL_ONE
+		rgbGen lightingDiffuse
 		tcMod turb 0 0.15 0 0.25
 		tcGen environment
+		alphaGen wave sin .6 .2 0 .6
+	}
+}
+
+models/powerups/instant/defense
+{
+	{
+		map models/powerups/instant/defense.png
+		blendfunc GL_ONE GL_ONE
+		rgbGen lightingDiffuse
+		tcMod turb 0 0.15 0 0.25
+		tcGen environment
+		alphaGen wave sin .6 .2 0 .6
 	}
 }
 
 models/powerups/instant/invul
 {
-	//cull disable
 	{
 		map models/powerups/instant/invul.png
+		blendfunc GL_ONE GL_ONE
 		rgbGen lightingDiffuse
+		tcMod turb 0 0.15 0 0.25
+		tcGen environment
+		alphaGen wave sin .6 .2 0 .6
 	}
 }
 
 models/powerups/instant/speed
 {
-	//cull disable
 	{
 		map models/powerups/instant/speed.png
+		blendfunc GL_ONE GL_ONE
 		rgbGen lightingDiffuse
+		tcMod turb 0 0.15 0 0.25
+		tcGen environment
+		alphaGen wave sin .6 .2 0 .6
 	}
 }
 
 models/powerups/instant/strength
 {
-	//cull disable
 	{
 		map models/powerups/instant/strength.png
+		blendfunc GL_ONE GL_ONE
+		rgbGen lightingDiffuse
+		tcMod turb 0 0.15 0 0.25
+		tcGen environment
+		alphaGen wave sin .5 .4 0 .6
+	}
+}
+
+// Weapons
+models/weapons2/katana_leo/w_katana
+{
+	{
+		map models/weapons2/katana_leo/w_katana.png
+		blendFunc GL_ONE GL_ZERO
 		rgbGen lightingDiffuse
 	}
+	{
+		map models/weapons2/katana_leo/w_katana_spec.png
+		blendFunc GL_SRC_ALPHA GL_ONE
+		detail
+		alphaGen lightingSpecular
+	}
+	//{
+	//	map models/weapons2/blade_enviro.jpg
+	//	blendFunc GL_DST_COLOR GL_SRC_COLOR
+	//	tcGen environment
+	//}
+}
+
+models/weapons2/sai/w_sai
+{
+	{
+		map models/weapons2/sai/w_sai.png
+		blendFunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+	//{
+	//	map models/weapons2/sai/w_sai_spec.png
+	//	blendFunc GL_SRC_ALPHA GL_ONE
+	//	detail
+	//	alphaGen lightingSpecular
+	//}
+	//{
+	//	map models/weapons2/blade_enviro.jpg
+	//	blendFunc GL_DST_COLOR GL_SRC_COLOR
+	//	tcGen environment
+	//}
 }
 
 // CTF FLAGS / MISSIONPACK CTF FLAGS
@@ -257,7 +343,7 @@ models/flags/skull
 {
 	{
 		map models/flags/skull.tga
-		//tcGen environment
+		tcGen environment
 		rgbGen lightingDiffuse
 	}
 }
@@ -481,3 +567,271 @@ models/flag2/w_flag2
 		rgbGen identity
 	}
 }
+//
+// Below are from missionpack's models2.shader
+//
+
+// overload_base.md3
+models/powerups/ob2_1
+{
+	{
+		//map models/powerups/overload_map.tga
+		//blendFunc GL_ONE GL_ZERO`
+		//tcGen environment
+		//rgbGen identity
+
+		map models/powerups/overload_base.tga
+		//rgbGen lightingDiffuse
+	}
+}
+
+// overload_target.md3
+models/powerups/ob2_2
+{
+	{
+		//map models/powerups/overload_mapbw.tga
+		map textures/effects/tinfx.png
+		//blendFunc GL_ONE GL_ZERO
+	//	tcGen environment
+		rgbGen entity
+
+		// Turtle Man: Invul powerup shader
+		//map models/powerups/instant/invul.png
+		blendfunc GL_ONE GL_ONE
+		//rgbGen lightingDiffuse
+		//tcMod turb 0 0.15 0 0.25
+		tcMod scroll .3 .3
+		//tcGen environment
+		alphaGen wave sin .6 .2 0 .6
+	}
+}
+
+// overload_lights.md3
+models/powerups/ob2_3
+{
+	{
+		map models/powerups/overload_lights.tga
+		tcmod scroll 1 1
+		rgbGen entity
+	}
+}
+
+// overload_energy.md3
+models/powerups/ob2_4
+{
+	cull disable
+	{
+		// Turtle Man: Don't have pop_bw
+		//map models/powerups/pop_bw.tga
+		map textures/effects/tinfx.png
+		tcMod turb 0 0.1 0 0.1
+		tcmod rotate 311
+		tcmod scroll 1 1
+		blendfunc Add
+		rgbGen entity
+	}
+}
+
+
+// Based on id's Team Arena 'models/mapobjects/flagbase/swirl_blue'
+models/mapobjects/flagbase/base_blue
+{
+	{
+		map models/mapobjects/flagbase/swirl_blue.png
+		blendFunc GL_ONE GL_ZERO
+		tcmod rotate 130
+		tcMod stretch sin .8 0.2 0 .2
+		rgbGen identity
+	}
+	{
+		map models/mapobjects/flagbase/swirl_blue.png
+		blendFunc Add
+		tcmod rotate 80
+		tcMod stretch sin .8 0.2 0 .1
+		rgbGen identity
+	}
+
+	{
+		map models/mapobjects/flagbase/base_blue.png
+		blendFunc blend
+		rgbGen lightingdiffuse
+	}
+}
+
+models/mapobjects/flagbase/base_red
+{
+	{
+		map models/mapobjects/flagbase/swirl_red.png
+		blendFunc GL_ONE GL_ZERO
+		tcmod rotate 130
+		tcMod stretch sin .8 0.2 0 .2
+		rgbGen identity
+	}
+	{
+		map models/mapobjects/flagbase/swirl_red.png
+		blendFunc Add
+		tcmod rotate 80
+		tcMod stretch sin .8 0.2 0 .1
+		rgbGen identity
+	}
+	{
+		map models/mapobjects/flagbase/base_red.png
+		blendFunc blend
+		rgbGen lightingdiffuse
+	}
+}
+
+models/mapobjects/flagbase/base_ntrl
+{
+	{
+		map models/mapobjects/flagbase/swirl_ntrl.png
+		blendFunc GL_ONE GL_ZERO
+		tcmod rotate 130
+		tcMod stretch sin .8 0.2 0 .2
+		rgbGen identity
+	}
+	{
+		map models/mapobjects/flagbase/swirl_ntrl.png
+		blendFunc Add
+		tcmod rotate 80
+		tcMod stretch sin .8 0.2 0 .1
+		rgbGen identity
+	}
+	{
+		map models/mapobjects/flagbase/base_ntrl.png
+		blendFunc blend
+		rgbGen lightingdiffuse
+	}
+}
+
+models/mapobjects/flagbase/beam_blue
+{
+	surfaceparm	trans
+	nomipmaps
+	cull disable
+	{
+		map models/mapobjects/flagbase/beam_blue.tga
+		blendFunc add
+		tcmod scroll -.5 0
+		rgbGen wave sin .5 .5 0.5 0.09
+	}
+}
+models/mapobjects/flagbase/beam_ntrl
+{
+	surfaceparm trans
+	nomipmaps
+	cull disable
+	{
+		map models/mapobjects/flagbase/beam_ntrl.tga
+		blendFunc add
+		tcmod scroll -.5 0
+		rgbGen wave sin .5 .5 0.5 0.09
+	}
+}
+models/mapobjects/flagbase/beam_red
+{
+	surfaceparm	trans
+	nomipmaps
+	cull disable
+	{
+		map models/mapobjects/flagbase/beam_red.tga
+		blendFunc add
+		tcmod scroll -.5 0
+		rgbGen wave sin .5 .5 0.5 0.09
+	}
+}
+
+
+//
+// Missionpack powerups
+//
+
+// Note: Yallow/orange in Q3/TA
+models/powerups/ammo1
+{
+	{
+		map textures/effects/envmapgreen.tga
+		tcGen environment
+		blendfunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+
+models/powerups/ammo2
+{
+    cull disable
+	{
+		map models/powerups/ammo2.tga
+		blendfunc Add
+		// Turtle Man: Go the same speed as others.
+		//tcmod Scroll 1.3 0
+		tcmod Scroll .9 0
+		rgbGen identity
+	}
+}
+
+
+// Note: Green in Q3/TA
+models/powerups/scout1
+{
+	{
+		map textures/effects/envmapblue.tga
+		tcGen environment
+		blendfunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+
+models/powerups/scout2
+{
+    cull disable
+        {
+	        map models/powerups/scout2.tga
+		blendfunc Add
+                tcmod Scroll .9 0
+                rgbGen identity
+        }
+}
+
+// Note: Blue in Q3/TA
+models/powerups/guard1
+{
+	{
+		map textures/effects/envmapmach.tga
+		tcGen environment
+		blendfunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+models/powerups/guard2
+{
+	cull disable
+	{
+		map models/powerups/guard2.tga
+		blendfunc Add
+		tcmod Scroll .9 0
+		rgbGen identity
+	}
+}
+
+models/powerups/doubler1
+{
+	{
+		map textures/effects/envmaproc.tga
+		tcGen environment
+		blendfunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+models/powerups/doubler2
+{
+	cull disable
+	{
+		map models/powerups/doubler2.tga
+		blendfunc Add
+		tcmod Scroll .9 0
+		rgbGen identity
+	}
+}
+
+

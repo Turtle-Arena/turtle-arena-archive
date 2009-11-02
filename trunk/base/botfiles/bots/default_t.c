@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /*
 NOTE: death_gauntlet, death_rail, death_bfg, kill_rail and kill_gauntlet
-		are not used in TMNT.
+		are not used in TMNT Arena.
 */
 
 chat "default"

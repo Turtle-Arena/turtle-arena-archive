@@ -1,6 +1,42 @@
 // Shaders that are not used by TMNT Arena,
 //  but we have them for "quake3 engine compatablity"... They may be removed leter.
 
+// Turtle Man: TMNT Arena uses shader name set in model, "models/misc/telep"
+//             While Q3 uses hardcoded name.
+teleportEffect
+{
+	cull disable
+	{
+		map models/misc/telep.png
+		tcGen environment
+		//tcMod turb 0 0.1 0 0.1
+		//tcmod rotate 311
+		//tcmod scroll 1 1
+		blendfunc Add
+		rgbGen entity
+	}
+}
+
+// TMNT Arena no longer uses "no logo" version
+menubacknologo
+{
+	nopicmip
+	nomipmaps
+	{
+		map menu/art/menuback
+		//blendFunc GL_ONE GL_ZERO
+		tcMod scroll .04  .02
+		//tcMod scale 1.2 1.2
+	}
+	//{
+	//	map menu/art/menuback
+	//	blendFunc add
+	//	tcMod scroll .02  .01
+	//	tcMod scale .9 .9
+	//	tcMod turb 0 .1 0 .1
+	//}
+}
+
 // Turtle Man: Removed HI_TELEPORTER
 icons/teleporter
 {
@@ -16,7 +52,7 @@ icons/envirosuit
 {
 	nopicmip
 	{
-		map icons/defense.tga
+		map icons/defense.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -24,7 +60,7 @@ icons/quad
 {
 	nopicmip
 	{
-		map icons/strength.tga
+		map icons/strength.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -32,12 +68,21 @@ icons/haste
 {
 	nopicmip
 	{
-		map icons/speed.tga
+		map icons/speed.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
 
 // Medals not used by TMNT.
+medal_excellent
+{
+	nopicmip
+	{
+		clampmap menu/medals/medal_excellent.tga
+		blendFunc blend
+	}
+}
+
 medal_impressive
 {
 	nopicmip
@@ -74,7 +119,7 @@ icons/iconh_green
 {
 	nopicmip
 	{
-		map icons/iconh_small.tga
+		map icons/iconh_small.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -83,7 +128,7 @@ icons/iconh_yellow
 {
 	nopicmip
 	{
-		map icons/iconh_medium.tga
+		map icons/iconh_medium.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -92,7 +137,7 @@ icons/iconh_red
 {
 	nopicmip
 	{
-		map icons/iconh_large.tga
+		map icons/iconh_large.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 
@@ -100,238 +145,22 @@ icons/iconh_red
 
 // icons/iconh_mega -- same as in q3.
 
-// missionpack icons (That are not used by TMNT Arena, delete?)
-
-icons/iconw_chaingun
-{
-	nopicmip
-	{
-		map icons/iconw_chaingun.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_chaingun_cl1
-{
-	nopicmip
-	{
-		map icons/iconw_chaingun_cl1.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_chaingun_cl2
-{
-	nopicmip
-	{
-		map icons/iconw_chaingun_cl2.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_kamikaze
-{
-	nopicmip
-	{
-		map icons/iconw_kamikaze.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_nailgun
-{
-	nopicmip
-	{
-		map icons/iconw_nailgun.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconw_proxlauncher
-{
-	nopicmip
-	{
-		map icons/iconw_proxlauncher.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_chaingun
-{
-	nopicmip
-	{
-		map icons/icona_chaingun.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_proxlauncher
-{
-	nopicmip
-	{
-		map icons/icona_proxlauncher.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_nailgun
-{
-	nopicmip
-	{
-		map icons/icona_nailgun.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-// openarena icons --domination icons ???
-
-icons/icona_red
-{
-	nopicmip
-	{
-		map icons/icona_red.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_blue
-{
-	nopicmip
-	{
-		map icons/icona_blue.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_white
-{
-	nopicmip
-	{
-		map icons/icona_white.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconb_red
-{
-	nopicmip
-	{
-		map icons/iconb_red.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconb_blue
-{
-	nopicmip
-	{
-		map icons/iconb_blue.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/iconb_white
-{
-	nopicmip
-	{
-		map icons/iconb_white.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_red
-{
-	nopicmip
-	{
-		map icons/icona_red.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-icons/icona_blue
-{
-	nopicmip
-	{
-		map icons/icona_blue.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
 // Turtle Man: Renamed to sprites/talkBalloon ...
 sprites/balloon3
 {
 	{
-		map sprites/talkBalloon.tga
+		map sprites/talkBalloon.png
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
 
-
-
-// Q3 shaders that are not used by Q3. (remove???)
-gfx/2d/menuinfo
+// Turtle Man: Used in Team modes, it is above your teammate's head.
+sprites/foe
 {
-	nopicmip
-	{
-		map gfx/2d/menuinfo.tga
-	}
-}
-
-gfx/2d/menuinfo2
-{
-	nopicmip
-	{
-		map gfx/2d/menuinfo2.tga
-	}
-}
-
-gfx/2d/quit
-{
-	nopicmip
 	nomipmaps
 	{
-		map gfx/2d/quit.tga
+		map sprites/friend_r.png
+		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
 
-gfx/2d/cursor
-{
-    nopicmip
-	nomipmaps
-    {
-        map gfx/2d/cursor.tga
-    }
-}
-
-gfx/2d/assault1d
-{
-	nopicmip
-	{
-		map gfx/2d/assault1d.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-gfx/2d/armor1h
-{
-	nopicmip
-	{
-		map gfx/2d/armor1h.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-gfx/2d/health
-{
-	nopicmip
-	{
-		map gfx/2d/health.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-gfx/2d/blank
-{
-	nopicmip
-	{
-		map gfx/2d/blank.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}

@@ -5,7 +5,7 @@
  Version: 1.0
  Last updated: 2009-04-17
 
- Changes from Quake3:
+ Changes from Quake3 config:
 	Added target_level_end and target_start_camera
 
 	Removed all of Quake3's weapons and ammo. Added the below weapons.
@@ -48,6 +48,12 @@
 
       May 30, 2009:
 		Added forgotten weapon_daisho ...
+
+      June 6, 2009:
+        Added misc_object
+
+      June 9, 2009:
+        Enabled "team_neutralobelisk" it is used for the model under the "Neutral Flag".
 -->
 <classes>
 <!--
@@ -1149,7 +1155,7 @@ Generic placeholder for inserting MD3 models in game. Requires compilation of ma
 -->
 
 <point name="misc_model_anim" color="1 .5 .25" box="-16 -16 -16 16 16 16">
-Generic placeholder for inserting animated MD3 models in game.
+Generic placeholder for inserting animated MD3/MDR models in game. Use "misc_object" instead.
 -------- KEYS --------
 <angle key="angle" name="Yaw Angle">direction in which model will be oriented.</angle>
 <model key="model" name="Model File">path/name of model to use (eg: models/mapobjects/teleporter/teleporter.md3).</model>
@@ -1159,6 +1165,27 @@ Generic placeholder for inserting animated MD3 models in game.
 <flag key="HIDDEN_START" name="Start Hidden" bit="0">model will be invisible till trigered</flag>
 <flag key="HIDDEN_END" name="Disapear" bit="1">makes the portal camera rotate faster along the roll axis.</flag>
 <flag key="NOTSUSPENDED" name="Drop to Floor" bit="2">model will fall to ground</flag>
+</point>
+
+<!--
+=============================================================================
+-->
+
+<point name="misc_object" color="1 .5 .25" box="-16 -16 -16 16 16 16">
+Generic placeholder for inserting animated MD3/MDR models in game.
+-------- KEYS --------
+<angle key="angle" name="Yaw Angle">direction in which model will be oriented.</angle>
+<model key="model" name="Model File">path/name of model to use (eg: models/mapobjects/teleporter/teleporter.md3).</model>
+<targetname key="targetname" name="Target Name">TODO: Kill or damage the object?</targetname>
+<integer key="health" name="Health">object's health, if 0 can't be damaged or killed. (default 0)</integer>
+<target key="target" name="Target">killing (or touching if spawn health is 0) the object will trigger the entity this points to.</target>
+<target key="paintarget" name="Pain Target">damaging the object will trigger the entity this points to.</target>
+<integer key="wait" name="Respawn Time">time in seconds for the object to respawn when killed, if 0 doesn't respawn. (default 0)</integer>
+-------- SPAWNFLAGS --------
+<flag key="SUSPENDED" name="No Drop To Floor" bit="0">object will spawn where it was placed in map and won't drop to the floor.</flag>
+<flag key="KNOCKBACK" name="Allow Knockback" bit="1">model can move when damaged.</flag>
+<flag key="UNSOLIDDEATH" name="Unsolid on Death" bit="2">makes the object non-solid when killed.</flag>
+
 </point>
 
 <!--
@@ -1739,13 +1766,11 @@ Blue team Obelisk. Used for Overload and Harvester game types. Facing needs to b
 Do not assign a gametype to this item. It is used in all four team game types. the The game will call for it as needed.
 </point>
 
-<!-- 
 <point name="team_neutralobelisk" color="1 .2 1" box="16 -16 0 16 16 88" model="models/powerups/obelisk/obelisk.md3">
-Neutral Obelisk (Harvester only).
-==KEYS== Turtle Man: Had to remove the '-'s so weapon_*s would show up...
+Neutral Flag base in 1 flag CTF. In Quake III: Team Arena is was also the "Neutral Obelisk" in the Harvester gametype.
+-------- KEYS --------
 <string key="gametype" name="Game Type">the valid values are ffa, tournament, single, team, ctf, oneflag, obelisk, harvester. Once a value for this key is set, it will ONLY appear in the listed gametype(s). Separate gametypes by commas.</string>
 </point>
--->
 
 <!--
 =============================================================================
@@ -2012,7 +2037,7 @@ When the random key is set, its value is used to calculate a minimum and a maxim
 -->
 
 <point name="weapon_grapplinghook" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/grapple/grapple.md3">
-Grappling Hook. Spawns in the game and works but is unskinned.
+Grappling Hook.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>

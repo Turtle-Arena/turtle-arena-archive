@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEXT_NEW_GAME "New Game"
 #define TEXT_LOAD_GAME "Load Game"
 #define TEXT_DEMOS "Demos"
-#define TEXT_MOVIES "Movies" // Cinematics ?
+#define TEXT_MOVIES "Videos" // Cinematics ?
 #define TEXT_MODS "Mods"
 
 // New Game menu
@@ -41,4 +41,3 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEXT_SAVE_GAME "Exit game?"
 #define TEXT_YES "Yes"
 #define TEXT_NO "No"
-

@@ -47,7 +47,7 @@ type "whereis"
 "Where is ", 0, "?"; // Turtle Man
 //"Where the hell is ", 0, "?";
 "Since when am I ", 0, "'s keeper?";
-} 
+}
 
 	//the bot asks where you are
 type "whereareyou"
@@ -67,21 +67,21 @@ type "cannotfind"
 //"Where the hell is a ", 0, "?";
 "Where is a ", 0, " in this level?";
 "Is there a, ", 0, " in this level? I sure can't find it, I must be blind.";
-} 
+}
 
 	//bot tells where he/she is
 type "location"
 {
 "By the ", 0," what are you blind?";
 "I am at the ", 0;
-} 
+}
 
 //bot tells where he/she is and near which base
 type "teamlocation"
 {
 "I'm near the ", 0, " in the ", 1, "base.";
 "By the ", 0, " in the ", 1, " base.";
-} 
+}
 
 	//start helping
 type "help_start"
@@ -115,7 +115,7 @@ type "accompany_cannotfind"
 "Where are you hiding ", 0, "?";
 0, "... come out, come out wherever you are...";
 
-} 
+}
 
 	//arrived at companion
 type "accompany_arrive"
@@ -309,7 +309,7 @@ type "helping"
 type "accompanying"
 {
 "I'm shadowing ", 0, ".  Is that alright?";
-"Following ", 0, ", trying not to get shot.";
+"Following ", 0, ", trying not to get hit."; // Turtle Man: Changed "shot" tp "hit"
 }
 
 	//the bot is defending something
@@ -380,9 +380,9 @@ type "harvesting"
 	//the bot is just roaming a bit
 type "roaming"
 {
-"Rambling around, fragging at whim.";
+//"Rambling around, fragging at whim.";
 "Mindlessly roaming around, like I was told.";
-"~Wacking fools piece-meal.";
+//"~Wacking fools piece-meal.";
 }
 
 type "wantoffence"
@@ -411,7 +411,7 @@ type "keepinmind"
 	//team mate killed the bot
 type "death_teammate"
 {
-"Same team bonehead!";//"Same team, dumbass!"; // Turtle Man
+"Same team stupid!";//"Same team, dumbass!"; // Turtle Man
 "Hey ", 0," I'm on your team... idiot!";
 "Why did you kill me?";
 }

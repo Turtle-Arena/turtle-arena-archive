@@ -20,29 +20,28 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#ifdef TMNT//WEAPONS // TMNT // Turtle Man: TODO: FINISH THIS
 #define INVENTORY_NONE				0
-#define INVENTORY_HEALTH			1
+#define INVENTORY_HEALTH			55
 
 //#ifdef TMNTWEAPSYS2
 // The most weapons a player can have is 2!
 //  (well they do have 3 when switching pickup for pickup and have a default weapon)
 // Default weapon for the player,
 // If INVENTORY_WAEPON is different, the default can be used by dropping current weapon.
-#define INVENTORY_DEFAULTWEAPON		55
+#define INVENTORY_DEFAULTWEAPON		56
 // Weapon the player is using
-#define INVENTORY_WEAPON			56
+#define INVENTORY_WEAPON			57
 
-#define INVENTORY_DEFAULTAMMO 57 // Ammo for default weapon.
-#define INVENTORY_AMMO 		58 // Ammo for current weapon,
+#define INVENTORY_DEFAULTAMMO 58 // Ammo for default weapon.
+#define INVENTORY_AMMO 		59 // Ammo for current weapon,
 //#endif
 
 //#ifdef TMNTWEAPONS
 // weapons, currently there is a max of 16 - which I am over...
 //#define INVENTORY_WP_NONE			0
-#define INVENTORY_FISTS				59 // FIXME
+#define INVENTORY_FISTS				1
 #define INVENTORY_KATANAS			2
-#define INVENTORY_DAISHO			3 // Usagi's weapon
+#define INVENTORY_DAISHO			3 // Usagi's weapons
 #define INVENTORY_SAIS				4
 #define INVENTORY_NUNCHUKS			5
 #define INVENTORY_HAMMER			6
@@ -65,12 +64,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // holdable items, currently there is a max of 16
 // Q3 holdable defines.
-//#define INVENTORY_TELEPORTER		21
+#define INVENTORY_TELEPORTER		21	// removed
 #define INVENTORY_MEDKIT			22
 //MISSIONPACK
-//#define INVENTORY_KAMIKAZE		23
+#define INVENTORY_KAMIKAZE			23	// removed
 #define INVENTORY_PORTAL			24
-//#define INVENTORY_INVULNERABILITY	25
+#define INVENTORY_INVULNERABILITY	25	// removed
 
 // TMNT holdable defines.
 // HI_SHURIKEN, HI_ELECTRICSHURIKEN, HI_FIRESHURIKEN, HI_LASERSHURIKEN
@@ -114,6 +113,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_REDCUBE			53
 #define INVENTORY_BLUECUBE			54
 
+// 55-59 are at top of file.
+#define INVENTORY_PERSISTANT_POWER 60
+
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
 #define ENEMY_HEIGHT				201
@@ -145,7 +147,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODELINDEX_HOMINGLAUNCHER	20
 #define MODELINDEX_GRAPPLINGHOOK	21
 
-//#define MODELINDEX_TELEPORTER		0
+#define MODELINDEX_TELEPORTER		0	// removed
 #define MODELINDEX_MEDKIT			22
 #define MODELINDEX_SHURIKEN			23
 #define MODELINDEX_ELECTRICSHURIKEN	24
@@ -167,9 +169,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // mission pack only defines
 
-//#define MODELINDEX_KAMIKAZE			0
+#define MODELINDEX_KAMIKAZE			0	// removed
 #define MODELINDEX_PORTAL			36
-//#define MODELINDEX_INVULNERABILITY	0
+#define MODELINDEX_INVULNERABILITY	0	// removed
 
 #define MODELINDEX_SCOUT			37
 #define MODELINDEX_GUARD			38
@@ -189,217 +191,3 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // TMNT item
 #define MODELINDEX_CRATE			42
 
-// WEAPONINDEX_*
-#ifdef TMNTWEAPONS
-//#define WEAPONINDEX_DEFAULT				-1
-//#define WEAPONINDEX_NONE				0
-#define WEAPONINDEX_FISTS				1
-#define WEAPONINDEX_KATANAS				2
-#define WEAPONINDEX_DAISHO				3
-#define WEAPONINDEX_SAIS				4
-#define WEAPONINDEX_NUNCHUKS			5
-#define WEAPONINDEX_HAMMER				6
-#define WEAPONINDEX_AXE					7
-#define WEAPONINDEX_LONGSWORD			8
-#define WEAPONINDEX_BAT					9
-#define WEAPONINDEX_BO					10
-#define WEAPONINDEX_BAMBOOBO			11
-#define WEAPONINDEX_GUN					12
-#define WEAPONINDEX_ELECTRIC_LAUNCHER	13
-#define WEAPONINDEX_ROCKET_LAUNCHER		14
-#define WEAPONINDEX_HOMING_LAUNCHER		15
-#define WEAPONINDEX_GRAPPLING_HOOK		16
-
-#else
-
-#define WEAPONINDEX_GAUNTLET			1
-#define WEAPONINDEX_MACHINEGUN			2
-#define WEAPONINDEX_SHOTGUN				3
-#define WEAPONINDEX_GRENADE_LAUNCHER	4
-#define WEAPONINDEX_ROCKET_LAUNCHER		5
-#define WEAPONINDEX_LIGHTNING			6
-#define WEAPONINDEX_RAILGUN				7
-#define WEAPONINDEX_PLASMAGUN			8
-#define WEAPONINDEX_BFG					9
-#define WEAPONINDEX_GRAPPLING_HOOK		10
-#define WEAPONINDEX_NAILGUN				11
-#define WEAPONINDEX_PROXLAUNCHER		12
-#define WEAPONINDEX_CHAINGUN			13
-
-
-#define INVENTORY_GAUNTLET			4
-#define INVENTORY_SHOTGUN			5
-#define INVENTORY_MACHINEGUN		6
-#define INVENTORY_GRENADELAUNCHER	7
-#define INVENTORY_ROCKETLAUNCHER	8
-#define INVENTORY_LIGHTNING			9
-#define INVENTORY_RAILGUN			10
-#define INVENTORY_PLASMAGUN			11
-#define INVENTORY_BFG10K			13
-#define INVENTORY_GRAPPLINGHOOK		14
-#define INVENTORY_NAILGUN			15
-#define INVENTORY_PROXLAUNCHER		16
-#define INVENTORY_CHAINGUN			17
-//ammo
-#define INVENTORY_SHELLS			18
-#define INVENTORY_BULLETS			19
-#define INVENTORY_GRENADES			20
-#define INVENTORY_CELLS				21
-#define INVENTORY_LIGHTNINGAMMO		22
-#define INVENTORY_ROCKETS			23
-#define INVENTORY_SLUGS				24
-#define INVENTORY_BFGAMMO			25
-#define INVENTORY_NAILS				26
-#define INVENTORY_MINES				27
-#define INVENTORY_BELT				28
-
-#endif
-
-#else // NOT TMNT ===================================================
-
-#define INVENTORY_NONE				0
-//armor
-#define INVENTORY_ARMOR				1
-//weapons
-#define INVENTORY_GAUNTLET			4
-#define INVENTORY_SHOTGUN			5
-#define INVENTORY_MACHINEGUN		6
-#define INVENTORY_GRENADELAUNCHER	7
-#define INVENTORY_ROCKETLAUNCHER	8
-#define INVENTORY_LIGHTNING			9
-#define INVENTORY_RAILGUN			10
-#define INVENTORY_PLASMAGUN			11
-#define INVENTORY_BFG10K			13
-#define INVENTORY_GRAPPLINGHOOK		14
-#define INVENTORY_NAILGUN			15
-#define INVENTORY_PROXLAUNCHER		16
-#define INVENTORY_CHAINGUN			17
-//ammo
-#define INVENTORY_SHELLS			18
-#define INVENTORY_BULLETS			19
-#define INVENTORY_GRENADES			20
-#define INVENTORY_CELLS				21
-#define INVENTORY_LIGHTNINGAMMO		22
-#define INVENTORY_ROCKETS			23
-#define INVENTORY_SLUGS				24
-#define INVENTORY_BFGAMMO			25
-#define INVENTORY_NAILS				26
-#define INVENTORY_MINES				27
-#define INVENTORY_BELT				28
-//powerups
-#define INVENTORY_HEALTH			29
-#define INVENTORY_TELEPORTER		30
-#define INVENTORY_MEDKIT			31
-#define INVENTORY_KAMIKAZE			32
-#define INVENTORY_PORTAL			33
-#define INVENTORY_INVULNERABILITY	34
-#define INVENTORY_QUAD				35
-#define INVENTORY_ENVIRONMENTSUIT	36
-#define INVENTORY_HASTE				37
-#define INVENTORY_INVISIBILITY		38
-#define INVENTORY_REGEN				39
-#define INVENTORY_FLIGHT			40
-#define INVENTORY_SCOUT				41
-#define INVENTORY_GUARD				42
-#define INVENTORY_DOUBLER			43
-#define INVENTORY_AMMOREGEN			44
-
-#define INVENTORY_REDFLAG			45
-#define INVENTORY_BLUEFLAG			46
-#define INVENTORY_NEUTRALFLAG		47
-#define INVENTORY_REDCUBE			48
-#define INVENTORY_BLUECUBE			49
-//enemy stuff
-#define ENEMY_HORIZONTAL_DIST		200
-#define ENEMY_HEIGHT				201
-#define NUM_VISIBLE_ENEMIES			202
-#define NUM_VISIBLE_TEAMMATES		203
-
-// if running the mission pack
-#ifdef MISSIONPACK
-
-//#error "running mission pack"
-
-#endif
-
-//item numbers (make sure they are in sync with bg_itemlist in bg_misc.c)
-#define MODELINDEX_ARMORSHARD		1
-#define MODELINDEX_ARMORCOMBAT		2
-#define MODELINDEX_ARMORBODY		3
-#define MODELINDEX_HEALTHSMALL		4
-#define MODELINDEX_HEALTH			5
-#define MODELINDEX_HEALTHLARGE		6
-#define MODELINDEX_HEALTHMEGA		7
-
-#define MODELINDEX_GAUNTLET			8
-#define MODELINDEX_SHOTGUN			9
-#define MODELINDEX_MACHINEGUN		10
-#define MODELINDEX_GRENADELAUNCHER	11
-#define MODELINDEX_ROCKETLAUNCHER	12
-#define MODELINDEX_LIGHTNING		13
-#define MODELINDEX_RAILGUN			14
-#define MODELINDEX_PLASMAGUN		15
-#define MODELINDEX_BFG10K			16
-#define MODELINDEX_GRAPPLINGHOOK	17
-
-#define MODELINDEX_SHELLS			18
-#define MODELINDEX_BULLETS			19
-#define MODELINDEX_GRENADES			20
-#define MODELINDEX_CELLS			21
-#define MODELINDEX_LIGHTNINGAMMO	22
-#define MODELINDEX_ROCKETS			23
-#define MODELINDEX_SLUGS			24
-#define MODELINDEX_BFGAMMO			25
-
-#define MODELINDEX_TELEPORTER		26
-#define MODELINDEX_MEDKIT			27
-#define MODELINDEX_QUAD				28
-#define MODELINDEX_ENVIRONMENTSUIT	29
-#define MODELINDEX_HASTE			30
-#define MODELINDEX_INVISIBILITY		31
-#define MODELINDEX_REGEN			32
-#define MODELINDEX_FLIGHT			33
-
-#define MODELINDEX_REDFLAG			34
-#define MODELINDEX_BLUEFLAG			35
-
-// mission pack only defines
-
-#define MODELINDEX_KAMIKAZE			36
-#define MODELINDEX_PORTAL			37
-#define MODELINDEX_INVULNERABILITY	38
-
-#define MODELINDEX_NAILS			39
-#define MODELINDEX_MINES			40
-#define MODELINDEX_BELT				41
-
-#define MODELINDEX_SCOUT			42
-#define MODELINDEX_GUARD			43
-#define MODELINDEX_DOUBLER			44
-#define MODELINDEX_AMMOREGEN		45
-
-#define MODELINDEX_NEUTRALFLAG		46
-#define MODELINDEX_REDCUBE			47
-#define MODELINDEX_BLUECUBE			48
-
-#define MODELINDEX_NAILGUN			49
-#define MODELINDEX_PROXLAUNCHER		50
-#define MODELINDEX_CHAINGUN			51
-
-
-//
-#define WEAPONINDEX_GAUNTLET			1
-#define WEAPONINDEX_MACHINEGUN			2
-#define WEAPONINDEX_SHOTGUN				3
-#define WEAPONINDEX_GRENADE_LAUNCHER	4
-#define WEAPONINDEX_ROCKET_LAUNCHER		5
-#define WEAPONINDEX_LIGHTNING			6
-#define WEAPONINDEX_RAILGUN				7
-#define WEAPONINDEX_PLASMAGUN			8
-#define WEAPONINDEX_BFG					9
-#define WEAPONINDEX_GRAPPLING_HOOK		10
-#define WEAPONINDEX_NAILGUN				11
-#define WEAPONINDEX_PROXLAUNCHER		12
-#define WEAPONINDEX_CHAINGUN			13
-
-#endif // TMNT

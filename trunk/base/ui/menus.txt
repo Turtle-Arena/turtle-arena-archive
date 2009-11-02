@@ -1,5 +1,5 @@
 //
-// menu defs for non-ingame menus
+// menu defs for the main menu.
 //
 {
 	loadMenu { "ui/out_main.menu" }

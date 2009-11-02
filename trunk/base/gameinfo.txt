@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // Used in MISSIONPACK "Single Player" and Start Server menus
 gametypes {
   { "Free For All" 0 }
-  { "Duel" 1 } // Tournament in Q3
+  { "Duel" 1 } // Renamed from Tournament
   { "Cooperative" 2 }
   { "Team Deathmatch" 3 }
   { "Capture the Flag" 4 }
@@ -36,7 +36,7 @@ gametypes {
 joingametypes {
   { "All" -1 }
   { "Free For All" 0 }
-  { "Duel" 1 } // Tournament in Q3
+  { "Duel" 1 } // Renamed from Tournament
   { "Cooperative" 2 }
   { "Team Deathmatch" 3 }
   { "Capture the Flag" 4 }
@@ -47,6 +47,6 @@ joingametypes {
 
 // mapName, mapLoadName, teamMembers, opponentName, gametypenum "timetobeat" gametypenum "timetobeat" ...
 maps {
-	{ "Teamplay Test" "ctf1" "1"		  "Raph"			0 "0" 4 "240" 5 "210" 6 "210"}
+	{ "Subway" "subway" "1"		  "Raph"			0 "0" 4 "240" 5 "210" 6 "210" }
 }
 

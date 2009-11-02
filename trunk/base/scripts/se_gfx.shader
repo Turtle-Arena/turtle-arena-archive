@@ -1,5 +1,15 @@
 // Based on OpenArena's /scripts/decals.shader
 
+// Weapon Trail
+weaponTrail
+{
+	cull disable
+	{
+		map models/misc/telep.png
+		blendfunc GL_ONE GL_ONE
+		tcGen environment
+	}
+}
 
 // Grappling Hook Cable, grapple trail shader --Turtle Man
 GrappleCable
@@ -323,16 +333,7 @@ gfx/misc/tracer
 	}
 }
 
-gfx/damage/bullet_mrk
-{
-	polygonoffset
-	{
-		map gfx/damage/bulletmult.tga
-		blendfunc gl_dst_color gl_src_color
-		alphaGen Vertex
-	}
-}
-
+// Turtle Man: Used by unfinished WP_GUN
 gfx/damage/bullet_mrk
 {
 	polygonoffset
@@ -343,6 +344,7 @@ gfx/damage/bullet_mrk
 	}
 }
 
+// Turtle Man: Used by rocket launcher and homing-rocket launcher
 gfx/damage/burn_med_mrk
 {
 	polygonoffset
@@ -353,6 +355,7 @@ gfx/damage/burn_med_mrk
 	}
 }
 
+// Turtle Man: Used by grapple and melee weapons.
 gfx/damage/hole_lg_mrk
 {
 	polygonoffset
@@ -363,11 +366,12 @@ gfx/damage/hole_lg_mrk
 	}
 }
 
+// Turtle Man: Used by the electric launcher
 gfx/damage/plasma_mrk
 {
 	polygonoffset
 	{
-		map gfx/damage/plasma_mrk.tga
+		map gfx/damage/plasma_mrk.png
 		blendfunc blend
 		rgbGen Vertex
 		alphaGen Vertex
@@ -407,6 +411,54 @@ meleeHit3
 }
 
 
+//
+// Explosions
+//
+
+plasmaExplosion
+{
+	cull disable
+	{
+		clampmap models/weaphits/plasmaboom.tga
+		blendfunc add
+
+		tcMod stretch triangle .6 0.1 0 8
+		tcmod rotate 999
+		rgbGen wave inversesawtooth 0 1 0 1.5
+	}
+}
+
+bulletExplosion
+{
+	cull disable
+	{
+		animmap 5 models/weaphits/bullet1.tga  models/weaphits/bullet2.tga  models/weaphits/bullet3.tga gfx/colors/black.tga
+		rgbGen wave inversesawtooth 0 1 0 5
+		blendfunc add
+	}
+	{
+		animmap 5 models/weaphits/bullet2.tga  models/weaphits/bullet3.tga  gfx/colors/black.tga gfx/colors/black.tga
+		rgbGen wave sawtooth 0 1 0 5
+		blendfunc add
+	}
+}
+
+rocketExplosion
+{
+	cull disable
+	{
+		animmap 8 models/weaphits/rlboom/rlboom_1.tga  models/weaphits/rlboom/rlboom_2.tga models/weaphits/rlboom/rlboom_3.tga models/weaphits/rlboom/rlboom_4.tga models/weaphits/rlboom/rlboom_5.tga models/weaphits/rlboom/rlboom_6.tga models/weaphits/rlboom/rlboom_7.tga models/weaphits/rlboom/rlboom_8.tga
+		rgbGen wave inversesawtooth 0 1 0 8
+		blendfunc add
+	}
+	{
+		animmap 8 models/weaphits/rlboom/rlboom_2.tga models/weaphits/rlboom/rlboom_3.tga models/weaphits/rlboom/rlboom_4.tga models/weaphits/rlboom/rlboom_5.tga models/weaphits/rlboom/rlboom_6.tga models/weaphits/rlboom/rlboom_7.tga models/weaphits/rlboom/rlboom_8.tga gfx/colors/black.tga
+		rgbGen wave sawtooth 0 1 0 8
+		blendfunc add
+	}
+}
+
+//explode1 (explode11 to explode122) See id software's quake3 pak7.pk3 ... and cg_oldRocket 0
 
 //
 // blood shaders
@@ -433,6 +485,7 @@ viewBloodBlend
 	}
 }
 
+// gibs hit ground
 bloodMark
 {
 	nopicmip
@@ -445,6 +498,7 @@ bloodMark
 	}
 }
 
+// gibs trail
 bloodTrail
 {
 	nopicmip

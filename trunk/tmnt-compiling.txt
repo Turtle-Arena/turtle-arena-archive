@@ -1,0 +1,44 @@
+Currently the easist way to compile TMNT Arena is GNU Make.
+
+1) Unzip "tmnt-src-*.zip" into the main TMNT Arena directory (There is a directory named "src" inside zip)
+
+=== GNU Make ===
+2) In a terminal change to the src/engine/ directory and run "make"
+3) Output will be in src/engine/build/*dir*/ (Where *dir* is something like "release-linux-x86")
+
+=== Code::Blocks ===
+NOTE: Compiling only works on Windows. However it can be used to view and edit the source on GNU/Linux.
+2) Open src/engine/misc/code_blocks/ioq3.workspace
+3) Rebuild workspace.
+4) Output will be in src/engine/build
+
+Defines maybe out of date... so copy the defines from the TMNT config section of the Makefile
+	into all projects less Splines.
+:(note to self): Move the defining to a header file?
+
+=== Microsoft Visual C++ ===
+Currently unsupported. There are project files for ioquake3 in src/engine/misc/msvc/.
+
+Below are changes that ''should'' make the ioquake3 projects compile TMNT Arena. This is untested.
+
+Worspace:
+src/engine/code/splines/Splines.vcproj
+
+Quake3 project:
+Link to output library of Splines project.
+
+Cgame project:
+Add below to project
+src/tmnta-engine/code/cgame/cg_npcs.c
+
+Game project:
+Add below to project
+src/engine/code/game/g_npc.c
+src/engine/code/game/g_npcmove.c
+src/engine/code/game/g_npcthink.c
+src/engine/code/game/g_save.c
+src/engine/code/game/g_paths.c
+
+Copy the defines from the TMNT config section of the Makefile into all projects less Splines.
+:(note to self): Move the defining to a header file?
+

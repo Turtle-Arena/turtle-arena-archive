@@ -28,14 +28,16 @@
 //		blendfunc GL_ONE GL_ONE
 //	}
 //}
+// Turtle Man: Added rgbGen and alphaGen 
 powerups/invisibility
 {
 	{
 		map textures/effects/invismap.tga
-                //map textures/sfx/specular.tga
 		blendfunc GL_ONE GL_ONE
+		rgbGen lightingDiffuse
 		tcMod turb 0 0.15 0 0.25
 		tcGen environment
+		alphaGen wave sin .6 .2 0 .6
 	}
 }
 //powerups/quad
@@ -72,6 +74,21 @@ powerups/regen
                 tcmod rotate 30
 		//tcMod turb 0 0.2 0 .2
                 tcmod scroll 1 .1
+	}
+}
+
+// teleport effect
+playerTeleportEffect
+{
+	//deformVertexes wave 100 sin 3 0 0 0
+	{
+		//map textures/effects/regenmap2.tga
+		map models/misc/telep.png
+		blendfunc GL_ONE GL_ONE
+		tcGen environment
+                //tcmod rotate 30
+		//tcMod turb 0 0.2 0 .2
+                //tcmod scroll 1 .1
 	}
 }
 

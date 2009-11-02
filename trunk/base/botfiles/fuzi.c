@@ -110,7 +110,7 @@ weight "item_health_mega"
 
 weight "weapon_default"
 {
-	return 1;
+	return 0;
 }
 
 weight "weapon_katanas"
@@ -374,7 +374,8 @@ weight "item_invul"
 
 weight "item_scout"
 {
-	switch(INVENTORY_SCOUT)
+	//switch(INVENTORY_SCOUT)
+	switch(INVENTORY_PERSISTANT_POWER)
 	{
 	case 1: return PS(SCW);
 	default: return 0;
@@ -383,8 +384,8 @@ weight "item_scout"
 
 weight "item_guard"
 {
-	// Turtle Man: BUGFIX?: Was INVENTORY_SCOUT in OpenArena
-	switch(INVENTORY_GUARD)
+	//switch(INVENTORY_SCOUT)
+	switch(INVENTORY_PERSISTANT_POWER)
 	{
 	case 1: return PS(GUW);
 	default: return 0;
@@ -393,8 +394,8 @@ weight "item_guard"
 
 weight "item_doubler"
 {
-	// Turtle Man: BUGFIX?: Was INVENTORY_SCOUT in OpenArena
-	switch(INVENTORY_DOUBLER)
+	//switch(INVENTORY_SCOUT)
+	switch(INVENTORY_PERSISTANT_POWER)
 	{
 	case 1: return PS(DUBW);
 	default: return 0;
@@ -403,8 +404,8 @@ weight "item_doubler"
 
 weight "item_ammoregen"
 {
-	// Turtle Man: BUGFIX?: Was INVENTORY_SCOUT in OpenArena
-	switch(INVENTORY_AMMOREGEN)
+	//switch(INVENTORY_SCOUT)
+	switch(INVENTORY_PERSISTANT_POWER)
 	{
 	case 1: return PS(AMRW);
 	default: return 0;

@@ -108,15 +108,6 @@ icons/invul
 }
 
 // MEDAL ICONS -- Turtle Man: Move to se_sprites.shader ?
-medal_excellent
-{
-	nopicmip
-	{
-		clampmap menu/medals/medal_excellent.tga
-		blendFunc blend
-	}
-}
-
 medal_assist
 {
 	nopicmip

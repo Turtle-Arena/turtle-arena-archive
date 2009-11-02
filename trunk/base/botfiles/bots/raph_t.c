@@ -79,7 +79,7 @@ chat "raph"
 		"Excuse me, I was talking!";
 		"You are so going to paid for that!";
 		"Bonehead.";
-		"Is there a sign over my head that reads 'shoot me'?";
+		//"Is there a sign over my head that reads 'shoot me'?";
 	}
 
 	type "hit_nodeath"
@@ -93,7 +93,7 @@ chat "raph"
 	type "hit_nokill"
 	{
 		"Maybe you should try using a real weapon!";
-		// TODO: 1 = weapon name (fists - sai - katana - bo - ect)
+		// TODO: 1 = weapon name (fist - sai - katana - bo - ect)
 		//"Do you even know how to use your ", 1, "?";
 		"Nice try!";
 		"Try again, I dear you!";
@@ -144,25 +144,22 @@ chat "raph"
 		"I am never going hear the end of this.";
 		"Gr... that did not just happen.";
 		//"...";
-
-		// 1987 Raph...
-		//"Kids don't try this at home, were trained profesionals.";
 	}
 
 /* Turtle Man: No longer used.
 	type "death_gauntlet"
 	{
-		"...";
+		"Ow";
 	}
 
 	type "death_rail"
 	{
-		"...";
+		"That was cheap";
 	}
 
 	type "death_bfg"
 	{
-		"...";
+		"That was cheap";
 	}
 */
 
@@ -197,7 +194,7 @@ chat "raph"
 */
 	type "kill_telefrag"
 	{
-		"Oh you were standing there? -Well I am now.";
+		"Oh you were standing there?  I am now.";
 		"Why don't you stay down!";
 		"Got ya!";
 		TELEFRAGGED0;
@@ -224,7 +221,7 @@ chat "raph"
 	{
 		"Not bad.";
 		"It seems you getting better.";
-		"You know, your pretty good for a wimp.";
+		"You know, your not bad for a wimp.";
 		D_PRAISE1;
 	}
 
