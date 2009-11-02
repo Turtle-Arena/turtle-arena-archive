@@ -1,4 +1,4 @@
-// From Q3's MISSIONPACK addon's demo's ctf2.shader
+// From Team Arena demo's ctf2.shader
 
 textures/ctf2/redteam02
 {

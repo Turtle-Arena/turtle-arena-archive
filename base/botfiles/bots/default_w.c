@@ -27,7 +27,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "inv.h"
 
-//melee weapons
+//
+// Melee Weapons
+//
+
 //katanas
 #define KTW				200
 //daisho
@@ -48,7 +51,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define BOW				160
 //bamboo-bo
 #define BBW				160
-//guns
+
+//
+// Guns
+//
+
 //gun
 #define GNW				150
 //electric launcher

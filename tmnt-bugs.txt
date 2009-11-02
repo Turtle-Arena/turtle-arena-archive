@@ -1,40 +1,156 @@
-TMNT Arena BUGS file
+TMNT Arena TODO/BUGS file
 
-Bug that have found that have not been fixed yet.
+Bugs that have found that have not been fixed yet, and things that should to be done (or that I'd like to done...).
 
-== q3_ui ==
-[bug] Doesn't load score data for single player (Caused by NOT making map names upper (IOQ3ZTM // Breaks linux [...])? )
+== engine (server/client/game/cgame/ui) ==
+[todo] Review the chages in Meld, checking for errors.
 
-[bug] Doesn't draw weapon on player models.
+[bug] cgame's perdicted client's currentState.eFlags doesn't have EF_TELE_EFFECT when the game gent->s.eFlags does?
 
-[bug] Right mouse button goes to pervious menu instead of changing listbox down (etc)
-:(I think a #ifndef got change to #ifdef)
+[todo] Allow mover entites to be killed (set health in entity) and spawn glass and/or other materials on death.
 
-[todo?] Can't add fav servers to browser with out a master server.
+[todo] Allow using two guns at once and fix weapon hand offset stuff etc.
+* May help?
+http://web.archive.org/web/20071219193415/http://code3arena.planetquake.gamespy.com/tutorials/tutorial26.shtml
+
+[todo] Add optional run animations for torso?
+
+[todo] Add code so that Nunchuk can spin when attacking (and standing?), and when not spining have gravity
+	(like CTF flag)
+* Base on weapon barrel code.
+
+DONE?: Learn how to enable coronas (light flares). (r_flares cvar, base/gfx/misc/flare.jpg, and q3map2 -meta -flares)
+
+[todo] Have weapons be seperate entities (ET_WEAPON) from the player,
+		allowing one rendering function that can be use for all weapons,
+		and do collision so that weapons don't go into the wall. (And bounce back if you hit the wall?)
+
+[todo] Weapon trails; Every-so-often while attacking send EV_TRAIL_POS with the clientnum, trailnum,
+	and trail base and top origins.
+		When the trail end send EV_TRAIL_END clientnum and trailnum, so the next trail doesn't connect to last trail.
+		When rendering create polygons connecting the trail.
+		Each client think move the base of the trail up, and if (base[Z] > top[Z]) remove this trail base/top
+
+[todo] Change TMNTWEAPONS stuff that is system to TMNTWEAPSYS[|2|_2]
+
+[todo] TMNTWEAPSYS_2: Have only one shooter_* and use message for weapon name.
+
+[todo] Merge TMNTWEAPSYS_2 into TMNTWEAPSYS (Then I can remove the code that TMNTWEAPSYS_2 disables, etc)
+
+WORKING(NotDone?): Have bots use shurikens.
+
+[todo] Add red_projectile and blue_projectile to allow different models (for q3 prox) and other stuff as well...
+: If *_projectile isn't found fallback to projectile (So only blue_proj would be needed for q3 prox)
+
+[todo] Third person crosshair (like JK2/JKA) for shurikens/guns,
+	do trace and draw sprite (must scale so it doesn't get really small)?
+
+[todo] Use vertex lighting on misc_model entities? http://xreal.svn.sourceforge.net/viewvc/xreal?view=rev&revision=3049
+: Turtle Man: I could add a option to use lightmapping in the entity (so that static model could use lightmapping),
+	or I could add a option so use vertex lighting?
+
+[todo] Throw shurikens with secondary hand, so can't with CTF flag? Have only one attack animation.
+[todo if above is done] Must put secondary weapon away to throw shuriken, then get it back put? So Don can throw shurikens sooner than Leo/Raph/Mike?
+
+[todo] Finish new path system "g_paths.c" for movers (trains), NPCs?, (and hopefully players; cutscenes?, NiGHTS mode!)
+
+// The below are somewhat long...
+
+[todo] Merge Quake3 and Team Arena bot chat system;
+* Problem: Team Arena adds voice chats, which are only used in gametypes >= GT_TEAM. There was also players that could only be used in gametypes >= GT_TEAM that did not have q3 chats. Leaving q3 players for FFA and Duel (with there normal q3 chats) (The TA players have no q3 chats and the players can't be used in q3, q3 players can't be used in gametypes >= GT_TEAM and have no voice chats.) So Team Arena had two seperate chat systems. TMNT Arena supports Q3 and Team Arena players in all gametypes and allows merged Q3/TA players. But in the gametypes >= GT_TEAM ONLY the TA voice chats are used. And like wise in non-team gametypes only "Q3 chats" are used.
+* Fix: Merge systems.
+** Allow sound filenames in Q3 chat files?
+** Everywhere that passes a "Q3 chat" name use voice chats instead.
+** Set voicechat filename and soundpath in "head.cfg" in player head directory. Head animations would go in it as well.
+*** Or Load it from animation.cfg and allow loading 2 animation.cfg files for each player, one for body and one for head.
+
+[todo] Weapons Info System redesin; (Started, TMNTWEAPSYS_2 )
+: Reduce weapontype_t enum (WT_NONE, WT_GAUNTLET (cross of gun and melee), WT_GUN, WT_MELEE). Have "weaponinfo" (weapontype, mod, (blade)damage, (blade)trail, sounds, bit-flags, "blades" (points of damage/trail), wallmark, wallhit sounds) and "weapongroup" (pointers to "weaponinfo"s, player animations, animations when holding CTF flag, combo/chain limits, ???). "weapon_t" enum would index "weapon groups".
+* It is working, still need to generalize all of the weapons so that there is no WP_* enum.
+** DONE: Spawn weapon items from weaponinfo.txt, instead of hardcoded weapon items.
+: If I make it so weapon items are in data, should I have all items in iteminfo.txt (and *.item) too?...
+
+[todo] Rewrite player Upper, Lower, and Both animations ( TMNTPLAYERSYS_2 )
+: Allow all animations to be anytype (Upper, lower, or both), when changing to a animations use "STAND" (instead of "TORSO_STAND") and check for BOTH_STAND if not found try TORSO_STAND AND LEGS_STAND.
+
+[todo] Finish misc_object, with animation, triggering, taking-damage, and dieing.
+: Maybe with spawning a item on death, respawning, and pushable options.
+: I will need some test models (with animation)
+
+=== q3_ui ===
+[bug] Doesn't load q3 score data for single player.
+	Caused by NOT making map names upper "IOQ3ZTM // Breaks linux [...]" ?
+
+=== cgame ===
+[todo] Have the HUD have a left side and a right side, so they can be drawn aspect-correct for 16:9 displays
+	(and others).
+* Have center too?
+
+[todo] Have dropped ET_ITEMs (weapons, holdables, powerups, etc) blink/flash before disaparing
+
+[bug/todo] First Person weapon doesn't draw correctly (It draws too near to the screen)
+			This happens due to changing the field of view to 70 (Q3 uses 90)
+
+=== game / bg ===
+[todo] Pull grapple back to player before removing entity, like LoZ: TP?
 
 
-== cgame ==
-[todo] Have the HUD have a left side and a right side, so they can be drawn aspect-correct for 16:9 displays (and others).
-
-[todo] Have dropped weapons blink/flash before disaparing
+=== botlib ===
+[todo] Load weapon items from "scripts/weaponinfo.txt" instead of from "botfiles/items.c"
 
 
-== game / bg ==
-[bug] Grapple hook gets removed by PMF_GRAPPLE_SHOT does not.
+== BSPC ==
+// BSPC is the BSP map to .aas (Arena Awareness System) compiler. The aas file is used by bots.
+[todo] Fix compiling/using BSPC.exe
 
-[bug] Fire Shuriken splash damage, it seems to have stopped working... It only works after using a rocket launcher???
 
-
-== cgame / game / bg ??? ==
-[bug] misc_object starts in damage animation and goes to stand anim when damaged?
-
+== Master Server ==
+[todo] Should dpmaster be modified for TMNT Arena? (It should work as is)
 
 
 == Data ==
+DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
+		(Also it appears that the full version doesn't add data I need, just players, maps, and textures, (other?))
 
-[bug] Raph's backward run animation need to be fixed so /both/ of his feet go to the ground.
-
-[todo] Rocket Explosion shader is missing image(s) so it uses "No image" image.
+[bug] Raph's torso_attack_gun only the head moves (Need to remake the skeloton)
 
 [todo] Weapon change sound. (sound/weapons/change.wav)
+
+[todo] Add announcer sound files (That sound like the Gyoji of the Battle Nexus?)
+[todo] Have Announcer use "voice chats" so that the text is printed as well as sounded
+[todo] Allow multiple Announcers? Have a cg_announcer cvar { "none", "male", or "female" }
+
+[todo] Have weapon models for all weapons;
+* Missing Katana (Leo/pickup and Daisho), Wakizashi (Daisho), Longsword, Bamboo, Daisho pickup,
+* Nunchuk (Need to code first?...)
+
+[todo] Have models for all items (Currently just missing pw_flight model, but I am going to remove it anyways).
+
+[todo] Casey's feet look ugly (fix them), and allow the toes to bend.
+
+[todo] Fix flare image
+
+[todo] Have a intro video (video/intro.roq) before the menu. (Not happening anytime soon...)
+
+[todo] Have shurikens in all multi-player maps? (Having them be part of standard gameplay?)
+
+== Editor Config ==
+[todo] Add a note about team_red/blueoblesik are ctf flag base models as well.
+
+[todo] Change website url
+
+
+== Misfit Model 3D ==
+: Stuff I'd like to do to the MD3 part of MM3D...
+
+[todo] Replace hardcode loopframe list with ' "MD3_LOOPFRAMES" "00010101010" ' in the metadata
+
+[todo] Make sure the MD3_PATH is set when exporting a player, because I have to open and save the model
+	(with no change) to fix lighting?
+
+[todo] Finish writing (and porting my work from old verion to svn head) MDR plugin for Misfit Model 3D
+
+== Other ==
+[todo] Learn more of Smokin' Guns ".hit" format used for player models? (I don't think it will help me much...)
+
 

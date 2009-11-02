@@ -44,30 +44,31 @@ teams {
 //             I shouldn't be wasting time on this right now anyway...
 }
 
-// character name ( used for display and head derivation ), base model (male=James, female=Janet, else custom)
-//     (James and Janet maybe replaced with Casey and April ...)
+// character name ( used for display and head derivation ), base model (male=James, female=Janet, else uses text)
 characters {
-	// Turtle Man: MISSIONPACK demo ...
-	{ "James"  "male" }
-	{ "Janet"  "female" }
+	// name (display and head model), base model (torso/legs)
+
+	// Turtle Man: Example Players
+	{ "Casey"  "casey" }
+	{ "April"  "april" }
 
 	// Turtle Man: Characters
-	{ "Raph"   "Raph" }
+	{ "Raph"   "raph" }
 }
 
 // three tokens per line,
 // character name, bot alias (in bots.txt), and preferred action (a - all purpose, d - defense, o - offense)
 aliases {
 	// Turtle Man: Example Players
-	{ "James"			"James"			"a"	}
-	{ "John"			"James"			"d"	}
-	{ "Jimmy"			"James"			"o"	}
+	{ "Casey"			"casey"			"a"	}
+	{ "John"			"casey"			"d"	}
+	{ "Jimmy"			"casey"			"o"	}
 
-	{ "Janet"			"Janet"			"a"	}
-	{ "Karai"			"Janet"			"d"	}
-	{ "Renet"			"Janet"			"o"	}
+	{ "April"			"april"			"a"	}
+	{ "Amy"				"april"			"d"	}
+	{ "Jane"			"april"			"o"	}
 
 	// Turtle Man: Aliases
-	{ "Raph"			"Raph",			"o" }
+	{ "Raph"			"raph",			"o" }
 }
 

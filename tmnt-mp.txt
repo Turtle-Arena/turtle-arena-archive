@@ -1,21 +1,24 @@
 What MISSIONPACK adds to TMNT, the plan is to remove and intagrate all parts of the MP into base TMNT.
+It doesn't seem like it adds much.
+
 
 * Scriptable UI
 * Scriptable HUD
 * 3 more gametypes
 ** One Flag CTF --Supported (with data)
 *** Take the center flag to the other team's base.
-** Overload [Obelisk] --TODO: Add data support (and rename?).
+** Overload --Supported (with data)
 *** Defend object at base and attack other teams base object.
 ** Harvester --Removed (!defined MISSIONPACK_HARVESTER)
 *** kill people, then a skull (of the attacker's team color) will spawn at the center object, then attacker's team must take the skull to the other team's base, if killee's team touch it [object that spawned at center], it is removed.)
-* Teams, good for multiplayer with bots in Team Gametypes (and for clans online?). (Is that all?)
-* Persistant Powerups (For Teamgame types)
-** Scout (Incressed speed, and no armor?(armor is removed in TMNT anyway) )
-** Guard (Incressed health)
-** Doubler (Player weapons do double damage.)
+* Teams, 5 bots team-name and gfx, good for multiplayer with bots in Team Gametypes (and for clans online?). (Is that all?)
+* Persistant Powerups (For Team gametypes)
+** Scout (Incressed speed, and no armor? (armor is removed in TMNT anyway) ) (Is this the same speed of PW_HASTE?)
+** Guard (Incressed health)                             (2x health, PW_BATTLESUIT is .5 damage receive)
+** Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, I set it 2x damage)
 ** Ammo Regen (Player ammo counts slowly increment, what of melee weapons?)
-* Voice chats for bots
+* Voice chats for bots and humans
+* Per-team skins for players
 
 
 * 3 New Weapons
@@ -29,7 +32,7 @@ What MISSIONPACK adds to TMNT, the plan is to remove and intagrate all parts of 
 
 == Remove ==
 === Kamikaze ===
-: Possibly reuse Kamikaze explotions? For Oil Barrels or something?
+: Possibly reuse Kamikaze explotions? For Oil Barrels or something? --no
 
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 #endif

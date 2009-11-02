@@ -22,7 +22,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // Changed for TMNT weapons, based on Open Arena's fuzw.c
-// Turtle Man: TODO: Don't want melee weapons that are your default weapon?
 
 weight "Default Weapon"
 {
@@ -121,66 +120,70 @@ weight "Bamboo Bo"
 
 weight "Gun"
 {
-	switch(INVENTORY_GUN)
-	{
-		case 1:
-		{
-		    switch(INVENTORY_AMMOGUN)
-		    {
-		        case 1: return 0;
-		        default: return GNW;
-		    }
-		}
-		default: return GNW;
-	}
+	//switch(INVENTORY_GUN)
+	//{
+		//case 1:
+		//{
+		    //switch(INVENTORY_AMMOGUN)
+		    //{
+		    //    case 1: return 0;
+		    //    default: return GNW;
+		    //}
+		//}
+		//default: return GNW;
+	//}
+	return GNW;
 }
 
 weight "Electric Launcher"
 {
-	switch(INVENTORY_ELECTRIC_LAUNCHER)
-	{
-		case 1:
-		{
-		    switch(INVENTORY_AMMOELECTRIC)
-		    {
-		        case 1: return 0;
-		        default: return ELW;
-		    }
-		}
-		default: return ELW;
-	}
+	//switch(INVENTORY_ELECTRIC_LAUNCHER)
+	//{
+		//case 1:
+		//{
+		    //switch(INVENTORY_AMMOELECTRIC)
+		    //{
+		    //    case 1: return 0;
+		    //    default: return ELW;
+		    //}
+		//}
+		//default: return ELW;
+	//}
+	return ELW;
 }
 
 weight "Homing Launcher"
 {
-	switch(INVENTORY_HOMING_LAUNCHER)
-	{
-		case 1:
-		{
-		    switch(INVENTORY_AMMOHOMING)
-		    {
-		        case 1: return 0;
-		        default: return HLW;
-		    }
-		}
-		default: return HLW;
-	}
+	//switch(INVENTORY_HOMING_LAUNCHER)
+	//{
+		//case 1:
+		//{
+		    //switch(INVENTORY_AMMOHOMING)
+		    //{
+		    //    case 1: return 0;
+		    //    default: return HLW;
+		    //}
+		//}
+		//default: return HLW;
+	//}
+	return HLW;
 }
 
 weight "Rocket Launcher"
 {
-	switch(INVENTORY_ROCKET_LAUNCHER)
-	{
-		case 1:
-		{
-		    switch(INVENTORY_AMMO)
-		    {
-		        case 1: return 0;
-		        default: return RLW;
-		    }
-		}
-		default: return RLW;
-	}
+	//switch(INVENTORY_ROCKET_LAUNCHER)
+	//{
+		//case 1:
+		//{
+		    //switch(INVENTORY_AMMO)
+		    //{
+		    //    case 1: return 0;
+		    //    default: return RLW;
+		    //}
+		//}
+		//default: return RLW;
+	//}
+	return RLW;
 }
 
 weight "Grappling Hook"

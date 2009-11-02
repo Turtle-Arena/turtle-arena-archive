@@ -1,24 +1,26 @@
+// Note: Added a dummy sound at sound/feedback/hit.wav so unmoded Quake3 can start with only TMNT sounds.
+
 // Needed sounds from CG_RegisterSounds upto footsteps loading.
 
-sound/feedback/1_minute.wav - Gyoji: 
-sound/feedback/5_minute.wav - Gyoji: 
-sound/feedback/sudden_death.wav - Gyoji: "Sudden Death."
-sound/feedback/1_frag.wav - Gyoji: 
-sound/feedback/2_frags.wav - Gyoji: 
-sound/feedback/3_frags.wav - Gyoji: 
-sound/feedback/three.wav
-sound/feedback/two.wav
-sound/feedback/one.wav
-sound/feedback/fight.wav - Gyoji: "Fight" or "Begin" ?
+TEMP: sound/feedback/1_minute.wav - Gyoji: "One minute remaining" ?
+TEMP: sound/feedback/5_minute.wav - Gyoji: "Five minutes remaining" ?
+TEMP: sound/feedback/sudden_death.wav - Gyoji: "Sudden Death."
+TEMP: sound/feedback/1_frag.wav - Gyoji: "One knockout remaining" ?
+TEMP: sound/feedback/2_frags.wav - Gyoji: "Two knockouts remaining" ?
+TEMP: sound/feedback/3_frags.wav - Gyoji: "Three knockouts remaining" ?
+TEMP: sound/feedback/three.wav - Gyoji: "Three"
+TEMP: sound/feedback/two.wav - Gyoji: "Two"
+TEMP: sound/feedback/one.wav - Gyoji: "One"
+TEMP: sound/feedback/fight.wav - Gyoji: "Fight" or "Begin" ?
 sound/feedback/prepare.wav - Gyoji: 
 sound/feedback/prepare_team.wav - Gyoji: 
 
-sound/feedback/vote_now.wav - Gyoji: "Voting has begun."
+TEMP: sound/feedback/vote_now.wav - Gyoji: "Voting has begun."
 sound/feedback/vote_passed.wav - Gyoji: "Vote passed."
 sound/feedback/vote_failed.wav - Gyoji: "Vote failed."
-sound/feedback/takenlead.wav - Gyoji: "You have taken the lead."
-sound/feedback/tiedlead.wav - Gyoji: "Your tied for the Lead."
-sound/feedback/lostlead.wav - Gyoji: "You lost the Lead."
+TEMP: sound/feedback/takenlead.wav - Gyoji: "You have taken the lead."
+TEMP: sound/feedback/tiedlead.wav - Gyoji: "Your tied for the lead."
+TEMP: sound/feedback/lostlead.wav - Gyoji: "You lost the lead."
 
 	cgs.media.tracerSound = trap_S_RegisterSound( "sound/weapons/machinegun/buletby1.wav", qfalse );
 	cgs.media.selectSound = trap_S_RegisterSound( "sound/weapons/change.wav", qfalse );
@@ -42,7 +44,7 @@ sound/feedback/lostlead.wav - Gyoji: "You lost the Lead."
 	cgs.media.noAmmoSound = trap_S_RegisterSound( "sound/weapons/noammo.wav", qfalse );
 
 	cgs.media.talkSound = trap_S_RegisterSound( "sound/player/talk.wav", qfalse );
-	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav", qfalse);
+TEMP:	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav", qfalse);
 
 	cgs.media.hitSound = trap_S_RegisterSound( "sound/feedback/hit.wav", qfalse );
 

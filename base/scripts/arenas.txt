@@ -66,11 +66,11 @@ type		"single"
 //type		"single tourney"
 //}
 
-// FFA
+// Free For All (Some also support Dual and Team Deathmatch)
 {
-map			"ffa1"
-longname	"FFA Test"
-type		"ffa tourney"
+map			"dm1"
+longname	"Deathmatch Test"
+type		"ffa tourney team"
 }
 
 // Duel
@@ -80,10 +80,27 @@ longname	"Sky Duel"
 type		"tourney"
 }
 
-// CTF (Support all team gametypes)
-// oneflag obelisk harvester keywords are currently only supported by missionpack UI.
+// Team (Support all team gametypes)
 {
-map			"ctf1"
+map			"team1"
 longname	"Teamplay Test"
-type		"team ctf oneflag obelisk harvester"
+type		"ctf oneflag overload harvester"
 }
+
+//Subway level set
+//textures; tan wall, tiled floor, subway tracks
+//models; Subway car?
+//ceiling lights
+{
+map			"subway"
+longname	"Subway"
+type		"ctf oneflag overload harvester"
+}
+
+// Test maps
+{
+map			"test"
+longname	"Item Test map"
+type		"ffa tourney team ctf oneflag overload harvester"
+}
+

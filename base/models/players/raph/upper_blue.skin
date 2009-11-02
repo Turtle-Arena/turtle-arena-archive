@@ -1,7 +1,9 @@
-u_torso,models/players/raph/body_blue.png
-u_torso2,models/players/raph/body_blue.png
-u_torso3,models/players/raph/body_blue.png
+u_torso_right,models/players/raph/torso.png
+u_torso_left,models/players/raph/torso.png
+u_torso_right_hand,models/players/raph/torso.png
+u_torso_left_hand,models/players/raph/torso.png
 u_plastron,models/players/raph/plastron.png
+u_carapace,models/players/raph/carapace.png
 u_belt,models/players/raph/belt.png
 tag_flag,
 tag_weapon,

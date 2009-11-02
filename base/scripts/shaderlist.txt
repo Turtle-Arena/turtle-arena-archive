@@ -9,6 +9,7 @@ se_ui
 
 // Texture shaders
 tex_base_floor
+tex_base_light
 tex_base_wall
 tex_common
 tex_ctf

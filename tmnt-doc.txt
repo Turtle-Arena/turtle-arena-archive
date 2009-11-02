@@ -1,0 +1,75 @@
+TMNT Arena documentation
+
+== Planned Stuff ==
+=== Demo 1 ===
+It should have a working player, working melee weapon(s), working bots, and some maps.
+
+* Raph player model <sup>Model mesh is "done", skin looks okay ("done"), animations need work.</sup>
+* Largely changed weapon system from ioquake3, players can hold only two weapons at a time (default and pickup) <sup>working</sup>
+* Melee weapons, as well as gun weapons <sup>Melee not finished, Gun working</sup>
+* Working bots, using OpenArena's botfiles as Quake3's were not released under the GPL. <sup>working</sup>
+* Shurikens <sup>Working</sup>
+* Hold multiple items at once, Pizza-to-Go and Shurikens. <sup>Working</sup>
+* One or more maps for each map style (Duel (1 vs 1), Free For All(Death Match)/Team Death Match, Capture The Flag/One Flag CTF/Overload) <sup>maps need work</sup>
+** Single Player isn't ready for maps yets
+* "Single Player" offline player vs. bots (Like in Quake3)
+
+=== Later ===
+* True Single Player mode with NPCs and all that.
+* Remake UI/HUD using Quake III: Team Arena menu scripting
+* New gametypes, Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
+* NiGHTS mode (Maybe instead NiGHTS use a dragon-form like in Season 5, Dragons are sort of like Nightmarens...)
+
+
+
+== Overview ==
+This is the overview of how things ''should'' work, it should be noted with the status.
+
+=== Story ===
+Currently the story is planned to take place between Season 5 (Ninja Tribunal) and Season 6 (Fast Forward) of the Ninja Turtles 2003 TV series.
+
+Nothing has been written though there some ideas;
+* It should fit into the TV series, by not conflicting ''any'' of the episodes.
+* I'd like to have there be 13 "episodes" to "finish" the fifth season.
+* I'd like to have one of the stages take place in Usagi's world
+* I'd like to have one of the stages take place in Moo Mesa
+* The Purple Dragons will appear
+* The Earth Protection Force (Agent Bishop) may appear.
+* It is unknown if The Foot will appear.
+
+=== Models<sup>need more</sup> ===
+Raph, who is most likely the most important model, is incomplete. The model (Mesh) is almost finished, the shapes and size still don't seem right. There is a basic skin for the head and legs, but the torso is not skined correctly.
+
+There are models for the holdable pizza, instant pizza (health pickups), shurikens (pickup and thrown), CTF flags (pickup and held), and traffic cones.
+
+There are also temporary models for the 5 powerups (defense, invisible, invul, speed, and strength).
+
+There are currently temporary gun weapon models, and one melee weapon model (Sai) (A few have been made/started, but not skined or md3'd)
+
+There is currently no scenery (Well, there is a traffic cone).
+
+=== Weapon System<sup>unfinished</sup>===
+:'''Status'''
+* Default weapon: Working
+* Pickup weapons: Working
+* Guns: Working
+* Melee weapon: Unfinished
+
+The weapon system is based on that of TMNT: Mutant Melee.
+
+Each player has a default weapon that they always have. Each player may pickup a extra weapon and may not use there default weapon while holding a extra weapon. The player is limited to one pickup weapon and one default weapon. Currently when a player pickup a pickup weapon when holding a pickup weapon, they have three weapon while "changing" from old pickup weapon to new pickup weapon.
+
+In TMNT: Mutant Melee, button press is required to pickup weapons, instead of by touch.<sup>not started, bad idea</sup>
+
+:'''Setting default weapon'''
+The server tells everyone what their default weapon is base on the players that they have, with a default ''default weapon'' if the server doesn't have the player.
+
+=== Player game config<sup>working</sup> ===
+"animations.cfg" is loaded by "game" to get more information about the player, allowing players to be more different from each other (a lot like in SRB2).
+
+It can hold the player's default weapon, bounding box, max speed, and acceleration. In the future it may hold other various things as well.
+
+=== Shurikens<sup>Working</sup> ===
+Shurikens are separate from the normal weapons, they are holdable items with multiple uses.
+
+Currently they can be throw and they do damage, explode, bounce, etc. The electric shuriken does not yet stun players or electrify water. In the future the electric, fire, and laser shurikens will be more than just recolored models, by adding sparks, flames, and glowing effects.

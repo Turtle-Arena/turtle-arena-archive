@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // Turtle Man: Changed for TMNT weapons.
+// NOTE: If TMNTWEAPSYS_2_BOT is defined this file is not used.
+//         Instead the need data is loaded from "scripts/weaponinfo.txt"
 
 #include "inv.h"
 
@@ -42,7 +44,7 @@ weaponinfo
 name				"Default Weapon"
 number				0
 projectile			"defaultdamage"
-numprojectiles			1
+numprojectiles		1
 speed				0
 }
 
@@ -247,7 +249,7 @@ speed				2000
 projectileinfo
 {
 name				"rocket"
-damage				100
+damage				50
 radius				120
 damagetype			$evalint(IMPACT_DAMAGE|SPLASH_DAMAGE)
 }

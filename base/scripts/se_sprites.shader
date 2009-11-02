@@ -4,6 +4,7 @@
 // Turtle Man: Drawn over player's head when in console or chat mode.
 sprites/talkBalloon
 {
+	entityMergable // Turtle Man: Should be okay.
 	{
 		map sprites/talkBalloon.tga
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
@@ -49,8 +50,7 @@ hasteSmokePuff
 	}
 }
 
-// Turtle Man:
-// Empty transparent image.
+// Turtle Man: Empty transparent image.
 smokePuffRagePro
 {
 	cull none
@@ -66,6 +66,7 @@ smokePuffRagePro
 // or "enableBreath" "1" in worldspawn
 shotgunSmokePuff
 {
+	entityMergable // Turtle Man: Should be okay.
 	cull none
 	{
 		map gfx/misc/smokepuff2b.tga
@@ -77,6 +78,7 @@ shotgunSmokePuff
 
 flareShader
 {
+	entityMergable // Turtle Man: Should be okay.
 	cull none
 	{
 		map gfx/misc/flare.tga
@@ -87,6 +89,7 @@ flareShader
 
 sun
 {
+	entityMergable // Turtle Man: Should be okay.
 	cull none
 	{
 		map gfx/misc/sun.tga
@@ -95,26 +98,54 @@ sun
 	}
 }
 
-// Turtle Man:
-// Used in Team modes, it is above your teammate's head.
-//  This should be "sprites/friend" not "sprites/foe".
-/////              "map sprites/friend1.tga"
-sprites/foe
+// Turtle Man: Used in Team modes, it is above your teammate's head.
+sprites/team_red
 {
+	entityMergable // Turtle Man: Should be okay.
 	nomipmaps
 	nopicmip
 	{
-		map sprites/foe2.tga
+		map sprites/friend_r.png
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
 
+sprites/team_blue
+{
+	entityMergable // Turtle Man: Should be okay.
+	nomipmaps
+	nopicmip
+	{
+		map sprites/friend_b.png
+		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+// Can't use "entityMergable" each rotates seperate.
 sprites/plasma1
 {
 	cull disable
 	{
-		clampmap sprites/plasmaa.tga
+		clampmap sprites/plasmaa.png
 		blendfunc GL_ONE GL_ONE
-                tcMod rotate 931
+		tcMod rotate 931
+	}
+
+	// Turtle Man: Looks cool.
+	{
+		clampmap sprites/plasmaa.png
+		blendfunc GL_ONE GL_ONE
+		tcMod rotate 460
+	}
+}
+
+// Plasm trail (\cg_oldPlasm 0)
+railDisc
+{
+	cull disable
+	{
+		clampmap sprites/plasmaa.png
+		blendfunc GL_ONE GL_ONE
+		tcMod rotate 931
 	}
 }
