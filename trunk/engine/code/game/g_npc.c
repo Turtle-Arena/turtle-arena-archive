@@ -487,7 +487,7 @@ void G_RunNPC( gentity_t *ent )
 #ifndef TMNTWEAPSYS2
 	ucmd.weapon=0;
 #endif
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+#ifdef TMNTHOLDSYS/*2*/
 	ucmd.holdable = 0;
 #endif
 	ucmd.forwardmove=0;

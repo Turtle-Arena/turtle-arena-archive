@@ -560,6 +560,13 @@ int AAS_ValidEntity(entity_t *mapent)
 		//FIXME: easy/medium/hard/deathmatch specific?
 		return true;
 	} //end else if
+#ifdef TMNTENTSYS // BREAKABLE
+	else if (!strcmp("func_breakable", ValueForKey(mapent, "classname")))
+	{
+		//FIXME: easy/medium/hard/deathmatch specific?
+		return true;
+	} //end else if
+#endif
 	else if (!strcmp("func_door", ValueForKey(mapent, "classname")))
 	{
 		return true;
@@ -710,6 +717,16 @@ void AAS_PositionBrush(entity_t *mapent, mapbrush_t *brush)
 			model = ValueForKey(mapent, "model");
 			brush->modelnum = atoi(model+1);
 		} //end if
+#ifdef TMNTENTSYS // BREAKABLE
+		else if (!strcmp("func_breakable", ValueForKey(mapent, "classname")))
+		{
+			//set mover contents
+			brush->contents = CONTENTS_MOVER;
+			//get the model number
+			model = ValueForKey(mapent, "model");
+			brush->modelnum = atoi(model+1);
+		} //end if
+#endif
 	} //end else
 } //end of the function AAS_PositionBrush
 //===========================================================================

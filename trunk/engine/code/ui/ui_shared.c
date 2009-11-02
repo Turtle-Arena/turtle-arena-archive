@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // 
 // string allocation/managment
+// Turtle Man: NOTE: Shared by ui and cgame
 
 #include "ui_shared.h"
 
@@ -3148,8 +3149,9 @@ static bind_t g_bindings[] =
 {
 	{"+scores",			 K_TAB,				-1,		-1, -1},
 	{"+button2",		 K_ENTER,			-1,		-1, -1},
-#ifdef TMNTHOLDSYS // +nextholdable
-	{"+button12",		 '\'',				-1,		-1, -1},
+#ifdef TMNTHOLDSYS/*2*/
+	{"holdnext",		 K_MWHEELUP,		'\'',	-1, -1},
+	{"holdprev",		 K_MWHEELDOWN,		-1,		-1, -1},
 #endif
 	{"+speed", 			 K_SHIFT,			-1,		-1,	-1},
 	{"+forward", 		 K_UPARROW,		-1,		-1, -1},

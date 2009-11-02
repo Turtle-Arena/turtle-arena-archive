@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-/*
+/* Turtle Man: TODO: Finish new g_paths.c
 	New general path code, for trains, camera "scripts", NPCs, NiGHTS mode?, 2D mode?
 		and what not.
 
@@ -61,7 +61,7 @@ gpathinfo_t gpathinfo[] =
 	// TMNT Path entities
 	{ "path_start", PATHF_BEGIN | PATHF_POINT }, // Is there a reason for "start"?
 	{ "path_point", PATHF_POINT },
-	{ "path_axis", PATHF_AXIS }, // Like SRB2's MT_AXIS, for NiGHTS mode.
+	{ "path_axis", PATHF_AXIS }, // Like SRB2's MT_AXIS, for NiGHTS mode. (entity is point to be rotated around)
 	{ "path_end", PATHF_FINISH }, // A end it not needed if circit path, just link "end" to path_start.
 
 	// end of list marker

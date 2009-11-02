@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug TA Win32">
-				<Option output="..\..\build\game_debug_ta\qagamex86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\game_debug_ta" />
+				<Option output="../../build/game_debug_ta/qagamex86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/game_debug_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -28,8 +28,8 @@
 				</Compiler>
 			</Target>
 			<Target title="Debug Win32">
-				<Option output="..\..\build\game_debug\qagamex86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\game_debug" />
+				<Option output="../../build/game_debug/qagamex86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/game_debug" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -49,8 +49,8 @@
 				</Compiler>
 			</Target>
 			<Target title="Release Win32">
-				<Option output="..\..\build\game_release\qagamex86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\game_release" />
+				<Option output="../../build/game_release/qagamex86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/game_release" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -66,8 +66,8 @@
 				</Compiler>
 			</Target>
 			<Target title="Release TA Win32">
-				<Option output="..\..\build\game_release_ta\qagamex86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\game_release_ta" />
+				<Option output="../../build/game_release_ta/qagamex86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/game_release_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -109,151 +109,142 @@
 			<Add library="winmm" />
 			<Add library="SDL" />
 		</Linker>
-		<Unit filename="..\..\code\game\ai_chat.c">
+		<Unit filename="../../code/game/ai_chat.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\ai_chat.h" />
-		<Unit filename="..\..\code\game\ai_cmd.c">
+		<Unit filename="../../code/game/ai_chat.h" />
+		<Unit filename="../../code/game/ai_cmd.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\ai_cmd.h" />
-		<Unit filename="..\..\code\game\ai_dmnet.c">
+		<Unit filename="../../code/game/ai_cmd.h" />
+		<Unit filename="../../code/game/ai_dmnet.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\ai_dmnet.h" />
-		<Unit filename="..\..\code\game\ai_dmq3.c">
+		<Unit filename="../../code/game/ai_dmnet.h" />
+		<Unit filename="../../code/game/ai_dmq3.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\ai_dmq3.h" />
-		<Unit filename="..\..\code\game\ai_main.c">
+		<Unit filename="../../code/game/ai_dmq3.h" />
+		<Unit filename="../../code/game/ai_main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\ai_main.h" />
-		<Unit filename="..\..\code\game\ai_team.c">
+		<Unit filename="../../code/game/ai_main.h" />
+		<Unit filename="../../code/game/ai_team.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\ai_team.h" />
-		<Unit filename="..\..\code\game\ai_vcmd.c">
+		<Unit filename="../../code/game/ai_team.h" />
+		<Unit filename="../../code/game/ai_vcmd.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\ai_vcmd.h" />
-		<Unit filename="..\..\code\game\be_aas.h" />
-		<Unit filename="..\..\code\game\be_ai_char.h" />
-		<Unit filename="..\..\code\game\be_ai_chat.h" />
-		<Unit filename="..\..\code\game\be_ai_gen.h" />
-		<Unit filename="..\..\code\game\be_ai_goal.h" />
-		<Unit filename="..\..\code\game\be_ai_move.h" />
-		<Unit filename="..\..\code\game\be_ai_weap.h" />
-		<Unit filename="..\..\code\game\be_ea.h" />
-		<Unit filename="..\..\code\game\bg_lib.c">
+		<Unit filename="../../code/game/ai_vcmd.h" />
+		<Unit filename="../../code/game/bg_lib.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="..\..\code\game\bg_local.h" />
-		<Unit filename="..\..\code\game\bg_misc.c">
+		<Unit filename="../../code/game/bg_local.h" />
+		<Unit filename="../../code/game/bg_misc.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\bg_pmove.c">
+		<Unit filename="../../code/game/bg_misc.h" />
+		<Unit filename="../../code/game/bg_pmove.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\bg_public.h" />
-		<Unit filename="..\..\code\game\bg_slidemove.c">
+		<Unit filename="../../code/game/bg_slidemove.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\botlib.h" />
-		<Unit filename="..\..\code\game\chars.h" />
-		<Unit filename="..\..\code\game\g_active.c">
+		<Unit filename="../../code/game/chars.h" />
+		<Unit filename="../../code/game/g_active.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_arenas.c">
+		<Unit filename="../../code/game/g_arenas.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_bot.c">
+		<Unit filename="../../code/game/g_bot.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_client.c">
+		<Unit filename="../../code/game/g_client.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_cmds.c">
+		<Unit filename="../../code/game/g_cmds.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_combat.c">
+		<Unit filename="../../code/game/g_combat.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_items.c">
+		<Unit filename="../../code/game/g_items.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_local.h" />
-		<Unit filename="..\..\code\game\g_main.c">
+		<Unit filename="../../code/game/g_local.h" />
+		<Unit filename="../../code/game/g_main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_mem.c">
+		<Unit filename="../../code/game/g_mem.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_misc.c">
+		<Unit filename="../../code/game/g_misc.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_missile.c">
+		<Unit filename="../../code/game/g_missile.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_mover.c">
+		<Unit filename="../../code/game/g_mover.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_npc.c">
+		<Unit filename="../../code/game/g_npc.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_npcmove.c">
+		<Unit filename="../../code/game/g_npcmove.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_npcthink.c">
+		<Unit filename="../../code/game/g_npcthink.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_paths.c">
+		<Unit filename="../../code/game/g_paths.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_public.h" />
-		<Unit filename="..\..\code\game\g_savestate.c">
+		<Unit filename="../../code/game/g_public.h" />
+		<Unit filename="../../code/game/g_save.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_session.c">
+		<Unit filename="../../code/game/g_session.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_spawn.c">
+		<Unit filename="../../code/game/g_spawn.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_svcmds.c">
+		<Unit filename="../../code/game/g_svcmds.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_syscalls.c">
+		<Unit filename="../../code/game/g_syscalls.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_target.c">
+		<Unit filename="../../code/game/g_target.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_team.c">
+		<Unit filename="../../code/game/g_team.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_team.h" />
-		<Unit filename="..\..\code\game\g_trigger.c">
+		<Unit filename="../../code/game/g_team.h" />
+		<Unit filename="../../code/game/g_trigger.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_utils.c">
+		<Unit filename="../../code/game/g_utils.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\g_weapon.c">
+		<Unit filename="../../code/game/g_weapon.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\inv.h" />
-		<Unit filename="..\..\code\game\match.h" />
-		<Unit filename="..\..\code\game\syn.h" />
-		<Unit filename="..\..\code\qcommon\q_math.c">
+		<Unit filename="../../code/game/inv.h" />
+		<Unit filename="../../code/game/match.h" />
+		<Unit filename="../../code/game/syn.h" />
+		<Unit filename="../../code/qcommon/q_math.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\qcommon\q_shared.c">
+		<Unit filename="../../code/qcommon/q_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\qcommon\q_shared.h" />
-		<Unit filename="..\..\code\qcommon\surfaceflags.h" />
+		<Unit filename="../../code/qcommon/q_shared.h" />
+		<Unit filename="../../code/qcommon/surfaceflags.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -73,33 +73,66 @@ endif
 # Start build type
 #
 # Common Defines;
-# -DIOQUAKE3  - Enables CD key check and punkbuster code
+# -DIOQUAKE3  - Enables CD key check and punkbuster [ui] code
 # -DIOQ3ZTM   - Misc changes and "fixes" that I always want to be enabled.
-# -DIOQ3ZTM2  - Breaks compatiblity with Q3 mod qvms. CG_Error("vmMain: unknown command 9")
-#								It fixes checking if we are in first person in sound code.
-# -DIOQ3ZTM3  - It moves Q_acos from qcommon/common.c to qcommon/q_math.c. Now in vms "acos" is just "acos" not Q_acos.
-#					Breaks compatibliy with mods?
-# -DIOQ3ZTM_NO_TEAM_MODEL - Could messup Team Arena, unsure.
-# -DNOTRATEDM - Disable stuff in Quake3 engine that made it rated M. (disable blood, remove gibs, remove strong lang)
-#            This however doesn't change the gamedata, like the botfiles strong lang, bloody textures, etc
-#			 NOTE: This can be defined without defining "NOBLOOD"
+# -DIOQ3ZTM_NO_COMPAT - Breaks compatiblity with Q3 mod qvms.
+#
+#   1. EAR_IN_ENTITY; It fixes checking if we are in first person in sound code.
+#       Q3 mods will CG_Error("vmMain: unknown command 9") however...
+#   2. FIXED_ACOS; It moves Q_acos from qcommon/common.c to qcommon/q_math.c.
+#                    Now in vms "acos" is just "acos" not Q_acos.
+#		Does it break compatibliy with mods? (But only when server/client is compiled with MS VC?)
+#
+# -DIOQ3ZTM_NO_TEAM_MODEL - Removes team_model and team_headmodel cvars.
+#                             Could messup Team Arena (and other mods), unsure.
+# -DNOTRATEDM - Disable stuff in Quake3 engine that made it rated M. (default blood to off, remove gibs,
+#            remove strong lang) This however doesn't change the gamedata, like the botfiles strong lang,
+#            bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
 #            Turtle Man: TODO: Rename this define to ...?
 # -DNOBLOOD - Removes blood, if this is defined "NOTRATEDM" must also be.
 #
 ifeq ($(BUILD_IOQUAKE3),1)
+QUAKE3=1
+endif
+ifeq ($(BUILD_REALIOQUAKE3),1)
+QUAKE3=1
+endif
+ifeq ($(QUAKE3),1)
 
     ifeq ($(BUILD_REALIOQUAKE3),1)
 		# Build unmodified ioquake3.
 	    BUILD_DEFINES=-DIOQUAKE3
+
+		SERVERBIN=ioq3ded
+		CLIENTBIN=ioquake3
 	else
-		# Build modified ioquake3
-		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM2 -DNOTRATEDM -DNOBLOOD \
-							-DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS
+		# Build modified ioquake3; should be compatible with quake3 mods.
+		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
+							-DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
+							-DTMNTWEAPSYS -DTMNTWEAPSYS_2 -DRAVENMD4 -DOA_BLOOM
+
+		# Use model tags for "true" melee attacking (Used for gauntlet)
+		# (Can't be used as a quake3 mod, as it uses new VM-to-server calls.
+		#    It doesn't break compatiblity with other q3 mods however)
+		DED_USE_MODELS=1
+		BUILD_DEFINES += -DTMNT_GAME_MODELS
+
+		#
+		# Break compatibility because I don't play q3 nor its mods.
+		#
+		BUILD_DEFINES += -DIOQ3ZTM_NO_COMPAT -DTMNTWEAPSYS_2_NOCOMPAT
+
+		SERVERBIN=ioq3ztmded
+		CLIENTBIN=ioq3ztm
     endif
 
 	BASEGAME=baseq3
 	BASEGAME_FLAGS =
 	MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+
+	ifndef COPYDIR
+	COPYDIR="/usr/local/games/quake3"
+	endif
 
 else # END QUAKE3
 
@@ -109,15 +142,21 @@ ifeq ($(BUILD_SONIC),1)
 	# SRB2 clone... Sonic Blast Arena
 	#  Should it be its own EXE or a mod for TMNT Arena? (or (io)qauke3 mod?)...
 	# Someday I hope do more work on this, but it is outside of my goal of a TMNT fangame...
+	# Sonic build hasn't been tested.
 
-	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM2 -DNOTRATEDM -DNOBLOOD \
-						-DTHIRD_PERSON
+	BUILD_DEFINES  = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DNOTRATEDM -DNOBLOOD \
+						-DTHIRD_PERSON -DRAVENMD4 \
+						-DTMNTMISC -DTMNTWEAPSYS -DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
+						-DTMNTDATASYS -DOA_BLOOM
 
 	# Sonic only stuff.
 	BUILD_DEFINES += -DSONIC -DSONICWEAPONS
 
-	# Reuse TMNT system stuff.
-	BUILD_DEFINES += -DTMNTMISC -DTMNTWEAPSYS -DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS -DTMNTDATASYS
+	# Use model tags for "true" melee attacking (Used for gauntlet)
+	# (Can't be used in a Quake3 mod, as it uses new VM-to-server calls.
+	#    It doesn't break compatiblity with other q3 mods however)
+	DED_USE_MODELS=1
+	BUILD_DEFINES += -DTMNT_GAME_MODELS
 
 	USE_CODEC_VORBIS=1
 
@@ -127,9 +166,15 @@ ifeq ($(BUILD_SONIC),1)
 		BUILD_MISSIONPACK=0
 	endif
 
+	SERVERBIN=ioq3ded
+	CLIENTBIN=ioquake3
 	BASEGAME=basesonic
 	BASEGAME_FLAGS =
 	MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+
+	ifndef COPYDIR
+	COPYDIR="/usr/local/games/sonicblastarena"
+	endif
 
 else # END SONIC
 
@@ -138,57 +183,60 @@ else # END SONIC
 	#  - All of this can be overriden by makefile.local.
 	###################################################################
 
-	# Notes; it can be compiled with as few as 2 defines (-DSTANDALONE -DTMNT) it will not work well however.
-
-	# Music will be ogg vorbis, after there is some, that is...
-	USE_CODEC_VORBIS=1
-
-	# Currently unused...
-	#BUILD_SPLINES=1
-
-	# TMNT defines
-	# -DTMNTHUD only effects quake3 hud, not missionpack hud
-	BUILD_DEFINES = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM2 -DIOQ3ZTM3 -DNOTRATEDM -DNOBLOOD \
-						-DTHIRD_PERSON -DIOQ3ZTM_NO_TEAM_MODEL \
-					-DTMNT -DTMNTMISC -DTMNTHUD -DTMNTSP -DTMNTHOLDSYS -DTMNTHOLDABLE \
-						-DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS -DTMNTPLAYERSYS -DTMNTPLAYERS\
-						-DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
-						-DTMNTDATASYS -DTMNTDATA
-
-	# temp define while I finish game model tag code.
-	BUILD_DEFINES += -DTMNTWEAPSYS_1
-
+	# Non-GPL code. Needs rewrite/removal.
+	# -DSP_NPC       # rfactory.org / TDC NPCs. I haven't started to replace this yet.
+	# GPL
 	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
 	# -DANALOG		 # TODO: Finish analog input.
 	# -DARRAYMAX     # TODO: This was going to remove the bit max problem with Q3 network (ie more then 16 weapons).
+	# -DTMNTWEAPSYS is (or was...) the core changes to the weapon system
+	# -DTMNTWEAPSYS2 changes from holding multiple weapons to only one default and one pickup.
+	# -DTMNTHOLDSYS Allow players to hold multiple holdable items and change to any holdable.
+	#					(Based on Q3's weapon changing)
 
-	# TMNT HOLDABLE SYSTEM 2: 
-	# Allows players to change to any holdable, not just the next one. (Based on Q3's weapon changing)
-	BUILD_DEFINES+=-DTMNTHOLDSYS2
+	# -DTMNTWEAPSYS_2 loads the weapons from a text file, allowing for easy modifing,
+	#						and new custom default weapons for players.
+	# 				  This should be merged with TMNTWEAPSYS.
 
-	# TMNT HOLDABLE SYSTEM 2 BOT: Currently needed for bots to use holdables when TMNTHOLDSYS is defined.
-	# It was part of TMNTHOLDABLE2, but is needed for bots when TMNTHOLDSYS is defined as well.
-	BUILD_DEFINES+=-DTMNTHOLDSYS2BOT
+	# TMNTWEAPSYS_2_NOCOMPAT remove loading "botfiles/weapons.c" because when TMNTWEAPSYS_2 is define
+	#  only the number of weapon groups is needed, which is got by loading "scripts/weaponinfo.txt" instead.
+	# TODO: Load "scripts/*.weap" files too?
+	# 				  After TMNTWEAPSYS_2 is merged with TMNTWEAPSYS
+	#					this should be renamed to TMNTWEAPSYS_NOCOMPAT.
 
-	# Non-GPL code. Needs rewrite/removal.
-	# -DSTYEF_ENTITY # CODE IS DIRECTLY OR IS BASED ON non-free code FROM STY:EF
-	# -DSINGLEPLAYER # Mostly rewritten now by TMNTSP. It still has savegames, and misc_model_anim.
-	#                Savegames will be GPL sometime, and misc_model_anim is going to be rewrite
-	#                 by misc_object (That can animate and be damaged, and maybe respawn, and maybe spawn item on death)
-	# -DSP_NPC       # rfactory.org / TDC NPCs. I haven't started to replace this yet.
+	# Notes; it can be compiled with as few as 2 defines (-DSTANDALONE -DTMNT) it will not work well however.
+	BUILD_DEFINES = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
+						-DNOTRATEDM -DNOBLOOD -DTHIRD_PERSON -DRAVENMD4 \
+					-DTMNT -DTMNTMISC -DTMNTHUD -DTMNTSP -DTMNTHOLDSYS -DTMNTHOLDABLE \
+						-DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS -DTMNTPLAYERSYS -DTMNTPLAYERS\
+						-DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
+						-DTMNTDATASYS -DTMNTDATA -DTMNTWEAPSYS_2 -DTMNTWEAPSYS_2_NOCOMPAT -DOA_BLOOM
 
-	# Enable Raven MDR (Based on id's MD4) model support. (I may use MDR for my player models)
-	BUILD_DEFINES+=-DRAVENMD4
+	# Currently TMNT Arena doesn't use camera scripts.
+	BUILD_SPLINES=0 # -DCAMERASCRIPT
+
+	# Use model tags for true melee attacking
+	DED_USE_MODELS=1
+	BUILD_DEFINES += -DTMNT_GAME_MODELS
+
+	# TMNT Arena's music and sounds will be ogg vorbis
+	USE_CODEC_VORBIS=1
 
 	# TMNT Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3",
+	SERVERBIN=tmntarena-ded
+	CLIENTBIN=tmntarena
 	BASEGAME=base
-	BASEGAME_FLAGS= -DMISSIONPACK
+	BASEGAME_FLAGS = -DMISSIONPACK -DTMNTHUD
 	MISSIONPACK_FLAGS= -DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
 
 	# Disable building scriptable hud and scriptable ui version
 	ifneq ($BUILD_MISSIONPACK),1)
 		BUILD_MISSIONPACK=0
+	endif
+
+	ifndef COPYDIR
+	COPYDIR="/usr/local/games/tmntarena"
 	endif
 
 endif # BUILD_SONIC
@@ -231,19 +279,6 @@ else
   endif
 endif
 export CROSS_COMPILING
-
-ifndef COPYDIR
-# Turtle Man
-ifeq ($(BUILD_IOQUAKE3),1)
-COPYDIR="/usr/local/games/quake3"
-else
-ifeq ($(BUILD_SONIC),1)
-COPYDIR="/usr/local/games/sonicblastarena"
-else # TMNT
-COPYDIR="/usr/local/games/tmntarena"
-endif # end sonic
-endif # end ioquake3
-endif
 
 ifndef MOUNT_DIR
 MOUNT_DIR=code
@@ -955,13 +990,13 @@ ifeq ($(BUILD_SPLINES),1)
 endif
 
 ifneq ($(BUILD_SERVER),0)
-  TARGETS += $(B)/tmntarena-ded.$(ARCH)$(BINEXT)
+  TARGETS += $(B)/$(SERVERBIN).$(ARCH)$(BINEXT)
 endif
 
 ifneq ($(BUILD_CLIENT),0)
-  TARGETS += $(B)/tmntarena.$(ARCH)$(BINEXT)
+  TARGETS += $(B)/$(CLIENTBIN).$(ARCH)$(BINEXT)
   ifneq ($(BUILD_CLIENT_SMP),0)
-    TARGETS += $(B)/tmntarena-smp.$(ARCH)$(BINEXT)
+    TARGETS += $(B)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT)
   endif
 endif
 
@@ -1408,7 +1443,6 @@ ifeq ($(BUILD_SPLINES),1)
 
 SPLINESCFLAGS = -W -O2 -c -DNDEBUG -D_LIB
 
-# Only define on mingw32?
 ifeq ($(PLATFORM),mingw32)
 SPLINESCFLAGS += -DWIN32
 endif
@@ -1580,6 +1614,7 @@ Q3OBJ = \
   \
   $(B)/client/tr_animation.o \
   $(B)/client/tr_backend.o \
+  $(B)/client/tr_bloom.o \
   $(B)/client/tr_bsp.o \
   $(B)/client/tr_cmds.o \
   $(B)/client/tr_curve.o \
@@ -1723,25 +1758,25 @@ ifeq ($(BUILD_SPLINES),1)
 # TTimo: splines code requires C++ linking, but splines have
 # not been officially included in the codebase
 # Turtle Man: now it has, so use C++ linking.
-$(B)/tmntarena.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN).$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 
-$(B)/tmntarena-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
 		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 else
-$(B)/tmntarena.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN).$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 
-$(B)/tmntarena-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
@@ -1843,6 +1878,12 @@ ifeq ($(ARCH),x86)
       $(B)/ded/snapvectora.o \
       $(B)/ded/matha.o
 endif
+#Turtle Man: if TMNT_GAME_TAGS
+ifeq ($(DED_USE_MODELS),1)
+Q3DOBJ += \
+      $(B)/ded/tr_model.o
+endif
+
 
 ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),i386)
@@ -1876,7 +1917,7 @@ else
     $(B)/ded/con_tty.o
 endif
 
-$(B)/tmntarena-ded.$(ARCH)$(BINEXT): $(Q3DOBJ)
+$(B)/$(SERVERBIN).$(ARCH)$(BINEXT): $(Q3DOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3DOBJ) $(LIBS)
 
@@ -2020,11 +2061,13 @@ Q3GOBJ_ = \
   $(B)/$(BASEGAME)/qcommon/q_math.o \
   $(B)/$(BASEGAME)/qcommon/q_shared.o
 
-#Turtle Man
+#Turtle Man: SP_NPC
 Q3GOBJ_ += $(B)/$(BASEGAME)/game/g_npc.o \
   $(B)/$(BASEGAME)/game/g_npcmove.o \
-  $(B)/$(BASEGAME)/game/g_npcthink.o \
-  $(B)/$(BASEGAME)/game/g_savestate.o \
+  $(B)/$(BASEGAME)/game/g_npcthink.o
+
+#Turtle Man: Files I added.
+Q3GOBJ_ += $(B)/$(BASEGAME)/game/g_save.o \
   $(B)/$(BASEGAME)/game/g_paths.o
 
 Q3GOBJ = $(Q3GOBJ_) $(B)/$(BASEGAME)/game/g_syscalls.o
@@ -2082,7 +2125,7 @@ MPGOBJ_ = \
 MPGOBJ_ += $(B)/missionpack/game/g_npc.o \
   $(B)/missionpack/game/g_npcmove.o \
   $(B)/missionpack/game/g_npcthink.o \
-  $(B)/missionpack/game/g_savestate.o \
+  $(B)/missionpack/game/g_save.o \
   $(B)/missionpack/game/g_paths.o
 
 MPGOBJ = $(MPGOBJ_) $(B)/missionpack/game/g_syscalls.o
@@ -2251,6 +2294,12 @@ $(B)/ded/%.o: $(SYSDIR)/%.rc
 $(B)/ded/%.o: $(NDIR)/%.c
 	$(DO_DED_CC)
 
+# Turtle Man: TMNT_GAME_TAGS ded
+ifeq ($(DED_USE_MODELS),1)
+$(B)/ded/%.o: $(RDIR)/%.c
+	$(DO_DED_CC)
+endif
+
 # Extra dependencies to ensure the SVN version is incorporated
 ifeq ($(USE_SVN),1)
   $(B)/client/cl_console.o : .svn/entries
@@ -2359,17 +2408,17 @@ copyfiles: release
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack
 
 ifneq ($(BUILD_CLIENT),0)
-	$(INSTALL) -s -m 0755 $(BR)/tmntarena.$(ARCH)$(BINEXT) $(COPYDIR)/tmntarena.$(ARCH)$(BINEXT)
+	$(INSTALL) -s -m 0755 $(BR)/$(CLIENTBIN).$(ARCH)$(BINEXT) $(COPYDIR)/$(CLIENTBIN).$(ARCH)$(BINEXT)
 endif
 
 # Don't copy the SMP until it's working together with SDL.
 #ifneq ($(BUILD_CLIENT_SMP),0)
-#	$(INSTALL) -s -m 0755 $(BR)/tmntarena-smp.$(ARCH)$(BINEXT) $(COPYDIR)/tmntarena-smp.$(ARCH)$(BINEXT)
+#	$(INSTALL) -s -m 0755 $(BR)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT) $(COPYDIR)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT)
 #endif
 
 ifneq ($(BUILD_SERVER),0)
-	@if [ -f $(BR)/tmntarena-ded.$(ARCH)$(BINEXT) ]; then \
-		$(INSTALL) -s -m 0755 $(BR)/tmntarena-ded.$(ARCH)$(BINEXT) $(COPYDIR)/tmntarena-ded.$(ARCH)$(BINEXT); \
+	@if [ -f $(BR)/$(SERVERBIN).$(ARCH)$(BINEXT) ]; then \
+		$(INSTALL) -s -m 0755 $(BR)/$(SERVERBIN).$(ARCH)$(BINEXT) $(COPYDIR)/$(SERVERBIN).$(ARCH)$(BINEXT); \
 	fi
 endif
 
@@ -2437,10 +2486,10 @@ else
 endif
 
 dist:
-	rm -rf tmntarena-$(VERSION)
-	svn export . tmntarena-$(VERSION)
-	tar --owner=root --group=root --force-local -cjf tmntarena-$(VERSION).tar.bz2 tmntarena-$(VERSION)
-	rm -rf tmntarena-$(VERSION)
+	rm -rf $(CLIENTBIN)-$(VERSION)
+	svn export . $(CLIENTBIN)-$(VERSION)
+	tar --owner=root --group=root --force-local -cjf $(CLIENTBIN)-$(VERSION).tar.bz2 $(CLIENTBIN)-$(VERSION)
+	rm -rf $(CLIENTBIN)-$(VERSION)
 
 #############################################################################
 # DEPENDENCIES

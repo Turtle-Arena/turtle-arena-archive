@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #undef UI_API_VERSION
 #define UI_API_VERSION	4
 #include "../client/keycodes.h"
-#include "../game/bg_public.h"
+#include "../game/bg_misc.h"
 
 typedef void (*voidfunc_f)(void);
 
@@ -48,6 +48,22 @@ extern vmCvar_t	ui_team_friendly;
 extern vmCvar_t	ui_ctf_capturelimit;
 extern vmCvar_t	ui_ctf_timelimit;
 extern vmCvar_t	ui_ctf_friendly;
+
+#ifdef MISSIONPACK // Turtle Man: MP_GAMETYPES
+extern vmCvar_t	ui_1flag_capturelimit;
+extern vmCvar_t	ui_1flag_timelimit;
+extern vmCvar_t	ui_1flag_friendly;
+
+extern vmCvar_t	ui_obelisk_capturelimit;
+extern vmCvar_t	ui_obelisk_timelimit;
+extern vmCvar_t	ui_obelisk_friendly;
+
+#ifdef MISSIONPACK_HARVESTER
+extern vmCvar_t	ui_harvester_capturelimit;
+extern vmCvar_t	ui_harvester_timelimit;
+extern vmCvar_t	ui_harvester_friendly;
+#endif
+#endif
 
 extern vmCvar_t	ui_arenasFile;
 extern vmCvar_t	ui_botsFile;
@@ -462,7 +478,7 @@ extern void DriverInfo_Cache( void );
 // ui_players.c
 //
 
-#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // moved to bg_public.h
+#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // moved to bg_misc.h
 //FIXME ripped from cg_local.h
 typedef struct {
 	int			oldFrame;
@@ -560,7 +576,9 @@ typedef struct {
 	qboolean			debug;
 	qhandle_t			whiteShader;
 	qhandle_t			menuBackShader;
+#ifndef TMNTDATASYS
 	qhandle_t			menuBackNoLogoShader;
+#endif
 	qhandle_t			charset;
 	qhandle_t			charsetProp;
 #ifndef TMNTDATA
@@ -776,9 +794,7 @@ typedef enum {
 	AWARD_ACCURACY,
 #ifndef TMNTWEAPONS
 	AWARD_IMPRESSIVE,
-#endif
 	AWARD_EXCELLENT,
-#ifndef TMNTWEAPONS
 	AWARD_GAUNTLET,
 #endif
 	AWARD_FRAGS,

@@ -128,7 +128,11 @@ int Pickup_PersistantPowerup( gentity_t *ent, gentity_t *other ) {
 	float	handicap;
 	int		max;
 
+#ifdef IOQ3ZTM
+	other->client->ps.stats[STAT_PERSISTANT_POWERUP] = ITEM_INDEX(ent->item);
+#else
 	other->client->ps.stats[STAT_PERSISTANT_POWERUP] = ent->item - bg_itemlist;
+#endif
 	other->client->persistantPowerup = ent;
 
 	switch( ent->item->giTag ) {
@@ -217,7 +221,11 @@ int Pickup_Holdable( gentity_t *ent, gentity_t *other ) {
 		}
 	}
 #else
+#ifdef IOQ3ZTM
+	other->client->ps.stats[STAT_HOLDABLE_ITEM] = ITEM_INDEX(ent->item);
+#else
 	other->client->ps.stats[STAT_HOLDABLE_ITEM] = ent->item - bg_itemlist;
+#endif
 #endif
 
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
@@ -311,13 +319,16 @@ int Pickup_Ammo (gentity_t *ent, gentity_t *other)
 
 int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 	int		quantity;
-
 #ifdef TMNTWEAPSYS
-	int old_giTag = ent->item->giTag;
+	int		weaponNum;
 
 	if ( ent->item->giTag == WP_DEFAULT)
 	{
-		ent->item->giTag = other->client->ps.stats[STAT_DEFAULTWEAPON];
+		weaponNum = other->client->ps.stats[STAT_DEFAULTWEAPON];
+	}
+	else
+	{
+		weaponNum = ent->item->giTag;
 	}
 #endif
 
@@ -330,37 +341,76 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 			quantity = ent->item->quantity;
 		}
 
-#ifndef TMNTWEAPSYS
+#ifdef TMNTWEAPSYS
+		// Dropped items have the ammo from the player who dropped it
+		//   so don't mess with it.
+		if ( !(ent->flags & FL_DROPPED_ITEM) )
+#else
 		// dropped items and teamplay weapons always have full ammo
-		if (!(ent->flags & FL_DROPPED_ITEM) && g_gametype.integer != GT_TEAM ) {
+		if ( !(ent->flags & FL_DROPPED_ITEM) && g_gametype.integer != GT_TEAM )
+#endif
+		{
 			// respawning rules
 			// drop the quantity if the already have over the minimum
-			if ( other->client->ps.ammo[ ent->item->giTag ] < quantity ) {
-				quantity = quantity - other->client->ps.ammo[ ent->item->giTag ];
+#ifdef TMNTWEAPSYS2
+			int stat = STAT_AMMO;
+
+			// Not ammo for are current weapon
+			if (weaponNum != other->client->ps.weapon)
+			{
+				// When picking up a new weapon we haven't change weapons yet when we get the ammo.
+				stat = STAT_NEWAMMO;
+			}
+
+			if ( other->client->ps.stats[stat] < quantity) {
+				quantity = quantity - other->client->ps.stats[stat];
+				if (other->client->ps.stats[stat] == -1) {
+					quantity--;
+				}
 			} else {
 				quantity = 1;		// only add a single shot
 			}
+#else
+#ifdef TMNTWEAPSYS
+			if ( other->client->ps.ammo[ weaponNum ] < quantity ) {
+				quantity = quantity - other->client->ps.ammo[ weaponNum ];
+				if (other->client->ps.ammo[ weaponNum ] == -1) {
+					quantity--;
+				}
+			}
+#else
+			if ( other->client->ps.ammo[ ent->item->giTag ] < quantity ) {
+				quantity = quantity - other->client->ps.ammo[ ent->item->giTag ];
 		}
 #endif
+			else {
+				quantity = 1;		// only add a single shot
+			}
+#endif
+		}
 	}
 
 #ifdef TMNTWEAPSYS2
 	// change to weapon
-	other->client->ps.stats[STAT_NEWWEAPON] = ent->item->giTag;
+	other->client->ps.stats[STAT_NEWWEAPON] = weaponNum;
 #else
 	// add the weapon
+#ifdef TMNTWEAPSYS
+	other->client->ps.stats[STAT_WEAPONS] |= ( 1 << weaponNum );
+#else
 	other->client->ps.stats[STAT_WEAPONS] |= ( 1 << ent->item->giTag );
 #endif
+#endif
 
+#ifdef TMNTWEAPSYS
+	Add_Ammo( other, weaponNum, quantity );
+#else
 	Add_Ammo( other, ent->item->giTag, quantity );
+#endif
 
 #ifndef TMNTWEAPSYS
 	if (ent->item->giTag == WP_GRAPPLING_HOOK)
 		other->client->ps.ammo[ent->item->giTag] = -1; // unlimited ammo
-#endif
-
-#ifdef TMNTWEAPSYS
-	ent->item->giTag = old_giTag;
 #endif
 
 	// team deathmatch has slow weapon respawns
@@ -384,7 +434,12 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 #else
 	// small and mega healths will go over the max
 #ifdef MISSIONPACK
-	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD ) {
+#ifdef TMNTWEAPSYS_2
+	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
+#else
+	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
+#endif
+	{
 		max = other->client->ps.stats[STAT_MAX_HEALTH];
 	}
 	else
@@ -425,7 +480,12 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
 
 	other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
 
-	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD ) {
+#ifdef TMNTWEAPSYS_2
+	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
+#else
+	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
+#endif
+	{
 		upperBound = other->client->ps.stats[STAT_MAX_HEALTH];
 	}
 	else {
@@ -676,7 +736,11 @@ gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity ) {
 	dropped = G_Spawn();
 
 	dropped->s.eType = ET_ITEM;
+#ifdef IOQ3ZTM
+	dropped->s.modelindex = ITEM_INDEX(item);	// store item number in modelindex
+#else
 	dropped->s.modelindex = item - bg_itemlist;	// store item number in modelindex
+#endif
 	dropped->s.modelindex2 = 1; // This is non-zero is it's a dropped item
 
 	dropped->classname = item->classname;
@@ -765,7 +829,11 @@ void FinishSpawningItem( gentity_t *ent ) {
 	VectorSet( ent->r.maxs, ITEM_RADIUS, ITEM_RADIUS, ITEM_RADIUS );
 
 	ent->s.eType = ET_ITEM;
+#ifdef IOQ3ZTM
+	ent->s.modelindex = ITEM_INDEX(ent->item);		// store item number in modelindex
+#else
 	ent->s.modelindex = ent->item - bg_itemlist;		// store item number in modelindex
+#endif
 	ent->s.modelindex2 = 0; // zero indicates this isn't a dropped item
 
 #ifdef TMNT // CRATE : solid
@@ -838,11 +906,21 @@ void G_CheckTeamItems( void ) {
 
 		// check for the two flags
 		item = BG_FindItem( "Red Flag" );
-		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
+#ifdef IOQ3ZTM
+		if ( !item || !itemRegistered[ ITEM_INDEX(item) ] )
+#else
+		if ( !item || !itemRegistered[ item - bg_itemlist ] )
+#endif
+		{
 			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
 		}
 		item = BG_FindItem( "Blue Flag" );
-		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
+#ifdef IOQ3ZTM
+		if ( !item || !itemRegistered[ ITEM_INDEX(item) ] )
+#else
+		if ( !item || !itemRegistered[ item - bg_itemlist ] )
+#endif
+		{
 			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
 		}
 	}
@@ -852,15 +930,30 @@ void G_CheckTeamItems( void ) {
 
 		// check for all three flags
 		item = BG_FindItem( "Red Flag" );
-		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
+#ifdef IOQ3ZTM
+		if ( !item || !itemRegistered[ ITEM_INDEX(item) ] )
+#else
+		if ( !item || !itemRegistered[ item - bg_itemlist ] )
+#endif
+		{
 			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
 		}
 		item = BG_FindItem( "Blue Flag" );
-		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
+#ifdef IOQ3ZTM
+		if ( !item || !itemRegistered[ ITEM_INDEX(item) ] )
+#else
+		if ( !item || !itemRegistered[ item - bg_itemlist ] )
+#endif
+		{
 			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
 		}
 		item = BG_FindItem( "Neutral Flag" );
-		if ( !item || !itemRegistered[ item - bg_itemlist ] ) {
+#ifdef IOQ3ZTM
+		if ( !item || !itemRegistered[ ITEM_INDEX(item) ] )
+#else
+		if ( !item || !itemRegistered[ item - bg_itemlist ] )
+#endif
+		{
 			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_neutralflag in map" );
 		}
 	}
@@ -918,7 +1011,11 @@ void ClearRegisteredItems( void ) {
 	memset( itemRegistered, 0, sizeof( itemRegistered ) );
 
 	// players always start with the base weapon
-#ifndef TMNTWEAPSYS // Turtle Man: We don't have any weapons that we can register here.
+#ifdef TMNTHOLDABLE // Start with shurikens
+	RegisterItem( BG_FindItemForHoldable( HI_SHURIKEN ) );
+#endif
+#ifndef TMNTWEAPSYS_2
+#if !defined TMNTWEAPONS && !defined SONICWEAPONS // Turtle Man: We don't have any weapons that we can register here.
 	RegisterItem( BG_FindItemForWeapon( WP_MACHINEGUN ) );
 	RegisterItem( BG_FindItemForWeapon( WP_GAUNTLET ) );
 #endif
@@ -928,6 +1025,7 @@ void ClearRegisteredItems( void ) {
 	RegisterItem( BG_FindItemForWeapon( WP_SEA1 ) );
 	RegisterItem( BG_FindItemForWeapon( WP_SEA2 ) );
 	RegisterItem( BG_FindItemForWeapon( WP_GUN ) );
+#endif
 #endif
 #ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
@@ -945,10 +1043,25 @@ The item will be added to the precache list
 ===============
 */
 void RegisterItem( gitem_t *item ) {
+#ifdef TMNTWEAPSYS_2
+	int itemNum;
+#endif
 	if ( !item ) {
 		G_Error( "RegisterItem: NULL" );
 	}
+#ifdef TMNTWEAPSYS_2
+	itemNum = BG_ItemNumForItem(item);
+	if (itemNum < 0 || itemNum >= MAX_ITEMS)
+	{
+		G_Error( "RegisterItem: itemNum %d out of range [0-%d]\n", itemNum, MAX_ITEMS-1);
+		return;
+	}
+	itemRegistered[ itemNum ] = qtrue;
+#elif defined IOQ3ZTM
+	itemRegistered[ ITEM_INDEX(item) ] = qtrue;
+#else
 	itemRegistered[ item - bg_itemlist ] = qtrue;
+#endif
 }
 
 
@@ -966,7 +1079,12 @@ void SaveRegisteredItems( void ) {
 	int		count;
 
 	count = 0;
-	for ( i = 0 ; i < bg_numItems ; i++ ) {
+#ifdef TMNTWEAPSYS_2
+	for ( i = 0 ; i < NUM_BG_ITEMS ; i++ )
+#else
+	for ( i = 0 ; i < bg_numItems ; i++ )
+#endif
+	{
 		if ( itemRegistered[i] ) {
 			count++;
 			string[i] = '1';
@@ -974,7 +1092,11 @@ void SaveRegisteredItems( void ) {
 			string[i] = '0';
 		}
 	}
+#ifdef TMNTWEAPSYS_2
+	string[ NUM_BG_ITEMS ] = 0;
+#else
 	string[ bg_numItems ] = 0;
+#endif
 
 	G_Printf( "%i items registered\n", count );
 	trap_SetConfigstring(CS_ITEMS, string);

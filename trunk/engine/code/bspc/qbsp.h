@@ -45,7 +45,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TMNTWEAPSYS2
 #define TMNTWEAPONS
 
-#define BSPC_VERSION		"2.1h [TMNT]"
+#define BSPC_VERSION		"2.1h [TMNT Arena]"
 #else
 #define BSPC_VERSION		"2.1h"
 #endif

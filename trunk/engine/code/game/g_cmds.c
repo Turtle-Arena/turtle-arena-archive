@@ -68,15 +68,13 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
 			cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime)/60000,
 			scoreFlags, g_entities[level.sortedClients[i]].s.powerups, accuracy, 
-#ifdef TMNTWEAPONS // Turtle Man: FIXME: Completely remove.
+#ifdef TMNTWEAPONS // Turtle Man: FIXME: Completely remove. See postgame
+			0,
+			0,
 			0,
 #else
 			cl->ps.persistant[PERS_IMPRESSIVE_COUNT],
-#endif
 			cl->ps.persistant[PERS_EXCELLENT_COUNT],
-#ifdef TMNTWEAPONS // Turtle Man: FIXME: Completely remove.
-			0,
-#else
 			cl->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], 
 #endif
 			cl->ps.persistant[PERS_DEFEND_COUNT], 
@@ -260,22 +258,13 @@ void Cmd_Give_f (gentity_t *ent)
 	{
 		// Skip HI_NONE
 		for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
-			ent->client->ps.holdable[i] = 1;
+			ent->client->ps.holdable[i] = MAX_SHURIKENS;
 		}
 		// Change to first holdable.
+		if (!ent->client->ps.holdableIndex)
 		ent->client->ps.holdableIndex = 1;
 		if (!give_all)
 			return;
-	}
-	if (/*give_all || */Q_stricmp( name, "holdable_unlimited") == 0)
-	{
-		// Skip HI_NONE
-		for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
-			ent->client->ps.holdable[i] = -1;
-		}
-		// Change to first holdable.
-		ent->client->ps.holdableIndex = 1;
-		return;
 	}
 #endif
 
@@ -303,7 +292,7 @@ void Cmd_Give_f (gentity_t *ent)
 #else
 	if (give_all || Q_stricmp(name, "weapons") == 0)
 	{
-#ifdef TMNTWEAPSYS // Give grapple too.
+#ifdef IOQ3ZTM // Give grapple too.
 		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 - 
 			( 1 << WP_NONE );
 #else
@@ -318,10 +307,15 @@ void Cmd_Give_f (gentity_t *ent)
 	if (give_all || Q_stricmp(name, "ammo") == 0)
 	{
 #ifdef TMNTWEAPSYS2
+		if (BG_WeapUseAmmo(ent->client->ps.stats[STAT_DEFAULTWEAPON]))
 		ent->client->ps.stats[STAT_SAVEDAMMO] = 999;
+		if (BG_WeapUseAmmo(ent->client->ps.weapon))
 		ent->client->ps.stats[STAT_AMMO] = 999;
 #else
 		for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
+#ifdef TMNTWEAPSYS
+			if (BG_WeapUseAmmo(i))
+#endif
 			ent->client->ps.ammo[i] = 999;
 		}
 #endif
@@ -339,11 +333,11 @@ void Cmd_Give_f (gentity_t *ent)
 	}
 #endif
 
+#ifndef TMNTWEAPONS
 	if (Q_stricmp(name, "excellent") == 0) {
 		ent->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
 		return;
 	}
-#ifndef TMNTWEAPONS
 	if (Q_stricmp(name, "impressive") == 0) {
 		ent->client->ps.persistant[PERS_IMPRESSIVE_COUNT]++;
 		return;
@@ -841,6 +835,19 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 		if ( clientnum < 0 ) {
 			clientnum = level.maxclients - 1;
 		}
+
+#if 0 // #ifdef IOQ3ZTM // Turtle Man: Switch to free as well.
+		if (clientnum == ent->client - level.clients )
+		{
+			if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
+				ent->client->sess.spectatorClient = clientnum;
+				StopFollowing(ent);
+				return;
+			} else {
+				continue;
+			}
+		}
+#endif
 
 		// can only follow connected clients
 		if ( level.clients[ clientnum ].pers.connected != CON_CONNECTED ) {

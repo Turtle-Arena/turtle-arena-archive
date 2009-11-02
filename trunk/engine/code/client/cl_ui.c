@@ -39,7 +39,12 @@ static void GetClientState( uiClientState_t *state ) {
 	Q_strncpyz( state->servername, cls.servername, sizeof( state->servername ) );
 	Q_strncpyz( state->updateInfoString, cls.updateInfoString, sizeof( state->updateInfoString ) );
 	Q_strncpyz( state->messageString, clc.serverMessage, sizeof( state->messageString ) );
+#ifdef IOQ3ZTM // SPECTATOR_FIX // Correct clientNum
+	// Turtle Man: TODO: See if this works with Team Arena?
+	state->clientNum = clc.clientNum;
+#else
 	state->clientNum = cl.snap.ps.clientNum;
+#endif
 }
 
 /*
@@ -763,7 +768,11 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 	case UI_CMD_EXECUTETEXT:
+#ifdef IOQ3ZTM
+		if(args[1] == EXEC_NOW
+#else
 		if(args[1] == 0
+#endif
 		&& (!strncmp(VMA(2), "snd_restart", 11)
 		|| !strncmp(VMA(2), "vid_restart", 11)
 		|| !strncmp(VMA(2), "quit", 5)))
@@ -1016,7 +1025,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 	case UI_CEIL:
 		return FloatAsInt( ceil( VMF(1) ) );
 
-#ifdef IOQ3ZTM3
+#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 	case UI_ACOS:
 		return FloatAsInt( acos( VMF(1) ) );
 #endif

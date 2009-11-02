@@ -375,6 +375,63 @@ Used for both the status bar and the scoreboard
 ================
 */
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D ) {
+#ifdef TMNTDATASYS
+	gitem_t *item;
+	int itemIndex;
+
+	if( team == TEAM_RED ) {
+		item = BG_FindItemForPowerup( PW_REDFLAG );
+	} else if( team == TEAM_BLUE ) {
+		item = BG_FindItemForPowerup( PW_BLUEFLAG );
+	} else if( team == TEAM_FREE ) {
+		item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
+	} else {
+		return;
+	}
+	if (!item) {
+		return;
+	}
+	itemIndex = ITEM_INDEX(item);
+
+	if ( !force2D && cg_draw3dIcons.integer )
+	{
+		float			len;
+		vec3_t			origin, angles;
+		vec3_t			mins, maxs;
+		qhandle_t		model;
+		qhandle_t		skin;
+
+		VectorClear( angles );
+
+		model = cg_items[ itemIndex ].models[0];
+		skin = cg_items[ itemIndex ].skin;
+
+		// offset the origin y and z to center the flag
+		trap_R_ModelBounds( model, mins, maxs );
+
+		origin[2] = -0.5 * ( mins[2] + maxs[2] );
+		origin[1] = 0.5 * ( mins[1] + maxs[1] );
+
+		// calculate distance so the flag nearly fills the box
+		// assume heads are taller than wide
+		len = 0.5 * ( maxs[2] - mins[2] );
+		origin[0] = len / 0.268;	// len / tan( fov/2 )
+
+		CG_Draw3DModel( x, y, w, h, model, skin, origin, angles );
+
+		// Draw flag flap
+		model = cg_items[ itemIndex ].models[1];
+		skin = cg_items[ itemIndex ].skin;
+
+		angles[YAW] = 60 * sin( cg.time / 2000.0 );
+
+		CG_Draw3DModel( x, y, w, h, model, skin, origin, angles );
+	}
+	else
+	{
+		CG_DrawPic( x, y, w, h, cg_items[ itemIndex ].icon );
+	}
+#else
 	qhandle_t		cm;
 	float			len;
 	vec3_t			origin, angles;
@@ -426,6 +483,7 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean fo
 		  CG_DrawPic( x, y, w, h, cg_items[ ITEM_INDEX(item) ].icon );
 		}
 	}
+#endif
 }
 
 /*
@@ -608,13 +666,13 @@ CG_DrawStatusBar
 */
 #ifdef TMNTHUD // TMNT
 /*
-Draw team background
+Draw "team" background
 Draw head (model or icon)
 Draw "Score" and value
 Draw "Health" and value
-//Draw "Lives" and value (In sp only)
 Draw weapon icon and ammo
 Draw holdable icon and uses
+Draw "Lives" and value (In sp/coop only)
 */
 #endif
 #ifndef MISSIONPACK_HUD
@@ -693,13 +751,9 @@ static void CG_DrawStatusBar( void ) {
 	}
 
 	// stretch the health up when taking damage
-#if 1
 	CG_DrawFieldSmall(x + 25, y, 5, value);
 	x += (3 * (CHAR_WIDTH/2));
-#else
-	CG_DrawField ( x + 25, y, 5, value);
-	x += (3 * CHAR_WIDTH);
-#endif
+
 	//CG_ColorForHealth( hcolor );
 	//trap_R_SetColor( hcolor );
 	trap_R_SetColor( NULL );
@@ -708,15 +762,7 @@ static void CG_DrawStatusBar( void ) {
 	y += CHAR_HEIGHT/2 + (CHAR_HEIGHT/2)/8;
 	x = start_x;
 
-/*
-	// LINE3: Lives (Single Player)
-
-	// Space between line 3 and 4
-	y += GIANT_HEIGHT;
-	x = start_x;
-*/
-
-	// LINE4: Weapon
+	// LINE3: Weapon
 	if ( cent->currentState.weapon ) {
 #ifdef TMNTWEAPSYS2
 		value = ps->stats[STAT_AMMO];
@@ -724,10 +770,17 @@ static void CG_DrawStatusBar( void ) {
 		value = ps->ammo[cent->currentState.weapon];
 #endif
 		// Draw weapon icon
+#ifdef TMNTWEAPSYS_2
+		if ( cg_weapongroups[cent->currentState.weapon].weaponIcon ) {
+			CG_DrawPic( x, y, ICON_SIZE, ICON_SIZE,
+				cg_weapongroups[cent->currentState.weapon].weaponIcon );
+		}
+#else
 		if ( cg_weapons[cent->currentState.weapon].weaponIcon ) {
 			CG_DrawPic( x, y, ICON_SIZE, ICON_SIZE,
 				cg_weapons[cent->currentState.weapon].weaponIcon );
 		}
+#endif
 		if (value == 0) {
 			CG_DrawPic( x, y, ICON_SIZE, ICON_SIZE,
 				cgs.media.noammoShader );
@@ -750,21 +803,13 @@ static void CG_DrawStatusBar( void ) {
 			}
 			trap_R_SetColor( colors[color] );
 
-#if 1
 			CG_DrawFieldSmall(x-CHAR_WIDTH/2, y, 3, value);
-#else
-			CG_DrawField ( x-CHAR_WIDTH, y, 3, value);
-#endif
 			trap_R_SetColor( NULL );
 		}
-#if 1
 			x += (2 * (CHAR_WIDTH/2));
-#else
-			x += (2 * CHAR_WIDTH);
-#endif
 	}
 
-	// LINE4: Holdable item
+	// LINE3: Holdable item
 #ifdef TMNTHOLDSYS
 	value = BG_ItemNumForHoldableNum(cg.snap->ps.holdableIndex);
 #else
@@ -779,12 +824,16 @@ static void CG_DrawStatusBar( void ) {
 
 #ifdef TMNTHOLDSYS
 		// draw value
+#ifdef TMNTWEAPSYS_2
+		if (BG_ItemForItemNum(value)->quantity > 0)
+#else
 		if (bg_itemlist[ value ].quantity > 0)
+#endif
 		{
-			value = cg.snap->ps.holdable[cg.snap->ps.holdableIndex];
-			if (value > 0)
+			int useCount = cg.snap->ps.holdable[cg.snap->ps.holdableIndex];
+			if (useCount > 0)
 			{
-				CG_DrawFieldSmall(x,y,2,value);
+				CG_DrawFieldSmall(x, y, 2, useCount);
 				x += (2 * (CHAR_WIDTH/2));
 			}
 		}
@@ -795,6 +844,24 @@ static void CG_DrawStatusBar( void ) {
 		x += ICON_SIZE;
 		x += (2 * (CHAR_WIDTH/2));
 	}
+
+#ifdef TMNTSP
+	// LINE4: Lives (Single Player and Co-op only)
+	if (cgs.gametype == GT_SINGLE_PLAYER)
+	{
+		// Space between line 3 and 4
+		y += GIANT_HEIGHT;
+		x = start_x;
+
+		CG_DrawSmallString( x, y, va("Lives %d", ps->persistant[PERS_LIVES]), 1.0F );
+
+		value = ps->persistant[PERS_CONTINUES];
+		if (value) {
+			y += SMALLCHAR_HEIGHT;
+			CG_DrawSmallString( x, y, va("Continues %d", value), 1.0F );
+		}
+	}
+#endif
 #else
 	// draw the team background
 	CG_DrawTeamBackground( 0, 420, 640, 60, 0.33f, cg.snap->ps.persistant[PERS_TEAM] );
@@ -805,13 +872,22 @@ static void CG_DrawStatusBar( void ) {
 	VectorClear( angles );
 
 	// draw any 3D icons first, so the changes back to 2D are minimized
-	if ( cent->currentState.weapon && cg_weapons[ cent->currentState.weapon ].ammoModel ) {
+#ifdef TMNTWEAPSYS_2
+	if ( cent->currentState.weapon && cg_weapongroups[ cent->currentState.weapon ].ammoModel )
+#else
+	if ( cent->currentState.weapon && cg_weapons[ cent->currentState.weapon ].ammoModel )
+#endif
+	{
 		origin[0] = 70;
 		origin[1] = 0;
 		origin[2] = 0;
 		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
 		CG_Draw3DModel( CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE,
+#ifdef TMNTWEAPSYS_2
+					   cg_weapongroups[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
+#else
 					   cg_weapons[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
+#endif
 	}
 
 	CG_DrawStatusBarHead( 185 + CHAR_WIDTH*3 + TEXT_ICON_SPACE );
@@ -860,7 +936,11 @@ static void CG_DrawStatusBar( void ) {
 			if ( !cg_draw3dIcons.integer && cg_drawIcons.integer ) {
 				qhandle_t	icon;
 
+#ifdef TMNTWEAPSYS_2
+				icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].ammoIcon;
+#else
 				icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
+#endif
 				if ( icon ) {
 					CG_DrawPic( CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE, icon );
 				}
@@ -1195,10 +1275,18 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 			// draw weapon icon
 			xx += TINYCHAR_WIDTH * 3;
 
+#ifdef TMNTWEAPSYS_2
+			if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
+				CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
+					cg_weapongroups[ci->curWeapon].weaponIcon );
+			}
+#else
 			if ( cg_weapons[ci->curWeapon].weaponIcon ) {
 				CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
 					cg_weapons[ci->curWeapon].weaponIcon );
-			} else {
+			}
+#endif
+			else {
 				CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 
 					cgs.media.deferShader );
 			}
@@ -1360,6 +1448,32 @@ static float CG_DrawScores( float y ) {
 			x -= w;
 			CG_DrawBigString( x + 4, y, s, 1.0F);
 		}
+#ifdef MISSIONPACK // Turtle Man: Support missionpack with old hud; oddly flagShader wasn't used
+		if ( cgs.gametype == GT_1FCTF ) {
+			// Display flag status
+			item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
+
+			if (item) {
+				y1 = y - BIGCHAR_HEIGHT - 8;
+				if( cgs.flagStatus >= 0 && cgs.flagStatus <= 4 ) {
+					vec4_t color = {1, 1, 1, 1};
+					int index = 0;
+					if (cgs.flagStatus == FLAG_TAKEN_RED) {
+						color[1] = color[2] = 0;
+						index = 1;
+					} else if (cgs.flagStatus == FLAG_TAKEN_BLUE) {
+						color[0] = color[1] = 0;
+						index = 1;
+					} else if (cgs.flagStatus == FLAG_DROPPED) {
+						index = 2;
+					}
+					trap_R_SetColor(color);
+					CG_DrawPic( x, y1-4, w, BIGCHAR_HEIGHT+8, cgs.media.flagShaders[index] );
+					trap_R_SetColor(NULL);
+				}
+			}
+		}
+#endif
 
 	} else
 #ifdef TMNTHUD // Not ffa or sp, but still in tournament?
@@ -1467,7 +1581,7 @@ static float CG_DrawPowerups( float y ) {
 		if ( !ps->powerups[ i ] ) {
 			continue;
 		}
-#ifdef MISSIONPACK // IOQ3ZTM // Turtle Man: Skip persis powers!
+#ifdef MISSIONPACK // IOQ3ZTM // Turtle Man: Skip persistant powerups!
 		if (i == PW_SCOUT
 			|| i == PW_GUARD
 			|| i == PW_DOUBLER
@@ -1572,6 +1686,9 @@ CG_DrawPickupItem
 static int CG_DrawPickupItem( int y ) {
 	int		value;
 	float	*fadeColor;
+#ifdef TMNTWEAPSYS_2
+	gitem_t *item;
+#endif
 
 	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 ) {
 		return y;
@@ -1580,11 +1697,19 @@ static int CG_DrawPickupItem( int y ) {
 	y -= ICON_SIZE;
 
 	value = cg.itemPickup;
-#ifdef TMNTWEAPONS // When pickup default weapon remap to correct weapon.
+#ifdef TMNTWEAPSYS_2
+	item = BG_ItemForItemNum(value);
+	if (item && item->giType == IT_WEAPON
+		&& item->giTag == WP_DEFAULT)
+	{
+		item = BG_FindItemForWeapon(cgs.clientinfo[cg.snap->ps.clientNum].playercfg.default_weapon);
+		value = ITEM_INDEX(item);
+	}
+#elif defined TMNTWEAPSYS // When pickup default weapon remap to correct weapon.
 	if (value && bg_itemlist[ value ].giType == IT_WEAPON
 		&& bg_itemlist[ value ].giTag == WP_DEFAULT)
 	{
-		value = BG_FindItemForWeapon(cgs.clientinfo[cg.snap->ps.clientNum].playercfg.default_weapon) - bg_itemlist;
+		value = ITEM_INDEX(BG_FindItemForWeapon(cgs.clientinfo[cg.snap->ps.clientNum].playercfg.default_weapon));
 	}
 #endif
 	if ( value ) {
@@ -1593,7 +1718,11 @@ static int CG_DrawPickupItem( int y ) {
 			CG_RegisterItemVisuals( value );
 			trap_R_SetColor( fadeColor );
 			CG_DrawPic( 8, y, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
+#ifdef TMNTWEAPSYS_2
+			CG_DrawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), item->pickup_name, fadeColor[0] );
+#else
 			CG_DrawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), bg_itemlist[ value ].pickup_name, fadeColor[0] );
+#endif
 			trap_R_SetColor( NULL );
 		}
 	}
@@ -2200,7 +2329,11 @@ static void CG_DrawCrosshair(void)
 
 	x = cg_crosshairX.integer;
 	y = cg_crosshairY.integer;
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	CG_AdjustFrom640Fit( &x, &y, &w, &h );
+#else
 	CG_AdjustFrom640( &x, &y, &w, &h );
+#endif
 
 	ca = cg_drawCrosshair.integer;
 	if (ca < 0) {
@@ -2383,7 +2516,11 @@ static void CG_DrawSpectator(void) {
 		CG_DrawBigString(320 - 15 * 8, 460, "waiting to play", 1.0F);
 	}
 	else if ( cgs.gametype >= GT_TEAM ) {
+#ifdef IOQ3ZTM
+		CG_DrawBigString(320 - 39 * 8, 460, "press ESC and use the START menu to play", 1.0F);
+#else
 		CG_DrawBigString(320 - 39 * 8, 460, "press ESC and use the JOIN menu to play", 1.0F);
+#endif
 	}
 }
 
@@ -2605,7 +2742,7 @@ static void CG_DrawAmmoWarning( void ) {
 	w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
 	CG_DrawBigString(320 - w / 2, 64, s, 1.0F);
 }
-#endif // TMNTWEAPONS
+#endif
 
 #if defined MISSIONPACK && !defined TMNTWEAPONS
 /*
@@ -3026,16 +3163,16 @@ void CG_DrawFlashFade( void ) {
 	if (cgs.scrFadeAlphaCurrent > 0.0) {
 		VectorClear( col );
 		col[3] = cgs.scrFadeAlphaCurrent;
-		CG_FillRect( 0, 0, 640, 480, col );
+		CG_FillRectFit( 0, 0, 640, 480, col );
 	}
 }
 #endif
 
-#ifdef TMNTSP
+#ifdef TMNTMISC
 /*
-	LETTER BOX VIEW
-
-	Turtle Man: target_player_stop : http://rfactory.org/singleEntities.html
+=============
+CG_ToggleLetterbox
+=============
 */
 void CG_ToggleLetterbox(qboolean onscreen, qboolean instant)
 {
@@ -3058,6 +3195,11 @@ void CG_ToggleLetterbox(qboolean onscreen, qboolean instant)
 	// Turtle Man: TODO: Play sound like in LOZ:TP?
 }
 
+/*
+=============
+CG_DrawLetterbox
+=============
+*/
 void CG_DrawLetterbox(void)
 {
 	const int letterbox_movetime = 150; // Time in msec to move the letterbox on or off of the screen.
@@ -3096,7 +3238,7 @@ void CG_DrawLetterbox(void)
 		return;
 	}
 
-	CG_FillRect(0, 0, 640, pixels, color);
-	CG_FillRect(0, 480-pixels, 640, pixels, color);
+	CG_FillRectFit(0, 0, 640, pixels, color);
+	CG_FillRectFit(0, 480-pixels, 640, pixels, color);
 }
 #endif

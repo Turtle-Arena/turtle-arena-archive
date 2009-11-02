@@ -2582,7 +2582,11 @@ qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring ) {
 		havepak = qfalse;
 
 		// never autodownload any of the id paks
-		if ( FS_idPak(fs_serverReferencedPakNames[i], BASEGAME) || FS_idPak(fs_serverReferencedPakNames[i], "missionpack") ) {
+		if ( FS_idPak(fs_serverReferencedPakNames[i], BASEGAME)
+#ifdef STANDALONE // IOQ3ZTM // Someone could use id paks as a mod.
+		|| FS_idPak(fs_serverReferencedPakNames[i], "baseq3")
+#endif
+		|| FS_idPak(fs_serverReferencedPakNames[i], "missionpack") ) {
 			continue;
 		}
 
@@ -2971,7 +2975,9 @@ Q3 media pak0.pk3, you'll want to remove this function
 */
 static void FS_CheckPaks( void )
 {
-#ifdef TMNTRELEASE // Only for release version.
+#if 0 //#ifdef TMNTRELEASE // Only for release version.
+	// Turtle Man: Make sure all of the pk3 files are found and unmodified.
+	//             Like in SRB2...
 	searchpath_t	*path;
 	unsigned foundPak = 0;
 	unsigned invalidPak = 0;

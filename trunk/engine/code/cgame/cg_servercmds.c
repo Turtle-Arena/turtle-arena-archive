@@ -508,7 +508,7 @@ static void CG_MapRestart( void ) {
 	// play the "fight" sound if this is a restart without warmup
 	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */
 #ifdef TMNTSP // Not in single player
-    && !cg_singlePlayer.integer
+    && !cg_singlePlayerActive.integer
 #endif
 	) {
 		trap_S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
@@ -690,7 +690,7 @@ void CG_LoadVoiceChats( void ) {
 	CG_HeadModelVoiceChats("scripts/default.vc");
 
 #ifdef TMNT
-	// Turtle Man: TODO: Pre-cache voice chats?
+	// Turtle Man: TODO: Pre-cache voice chats? ( currently have no voice chats )
 	//CG_HeadModelVoiceChats("scripts/raph.vc");
 #endif
 #else
@@ -1036,7 +1036,7 @@ void CG_VoiceChat( int mode ) {
 	cmd = CG_Argv(4);
 
 	if (cg_noTaunt.integer != 0) {
-		if (!strcmp(cmd, VOICECHAT_KILLINSULT)  || !strcmp(cmd, VOICECHAT_TAUNT) || \
+		if (!strcmp(cmd, VOICECHAT_KILLINSULT)  || !strcmp(cmd, VOICECHAT_TAUNT) ||
 			!strcmp(cmd, VOICECHAT_DEATHINSULT) ||
 #ifndef TMNTWEAPONS
 			!strcmp(cmd, VOICECHAT_KILLGAUNTLET) ||
@@ -1092,7 +1092,7 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 #endif
-#ifdef TMNTSP
+#ifdef TMNTMISC
 	if ( !strcmp( cmd, "letterbox" ) ) {
 		CG_ToggleLetterbox( atoi(CG_Argv(1)), atoi(CG_Argv(2)) );
 		return;

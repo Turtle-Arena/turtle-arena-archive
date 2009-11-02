@@ -167,7 +167,7 @@ typedef enum {
 	// 1.32
 	CG_FS_SEEK,
 
-#ifdef CAMERASCRIPT
+#if defined CAMERASCRIPT || defined TMNTWEAPSYS_2
 	CG_LOADCAMERA,
 	CG_STARTCAMERA,
 	CG_GETCAMERAINFO,
@@ -177,6 +177,10 @@ typedef enum {
 	CG_STARTCAMERA,
 	CG_GETCAMERAINFO,
 */
+#endif
+
+#ifdef TMNTWEAPSYS_2
+	CG_FS_GETFILELIST,
 #endif
 
 	CG_MEMSET = 100,
@@ -241,7 +245,7 @@ typedef enum {
 //	void	(*CG_MouseEvent)( int dx, int dy );
 	CG_EVENT_HANDLING,
 //	void (*CG_EventHandling)(int type);
-#ifdef IOQ3ZTM2
+#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
 	CG_VIEW_TYPE
 //	int (*CG_ViewType)( void );
 #endif

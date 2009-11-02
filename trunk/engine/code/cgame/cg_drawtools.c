@@ -23,6 +23,23 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cg_drawtools.c -- helper functions called by cg_draw, cg_scoreboard, cg_info, etc
 #include "cg_local.h"
 
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+/*
+================
+CG_AdjustFrom640Fit
+
+Adjusted for resolution, doesn't keep screen aspect ratio
+================
+*/
+void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
+	// scale for screen sizes
+	*x *= cgs.screenXScaleFit;
+	*y *= cgs.screenYScaleFit;
+	*w *= cgs.screenXScaleFit;
+	*h *= cgs.screenYScaleFit;
+}
+#endif
+
 /*
 ================
 CG_AdjustFrom640
@@ -31,6 +48,9 @@ Adjusted for resolution and screen aspect ratio
 ================
 */
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	*x = *x * cgs.screenXScale + cgs.screenXBias;
+#else
 #if 0
 	// adjust for wide screens
 	if ( cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
@@ -39,6 +59,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 #endif
 	// scale for screen sizes
 	*x *= cgs.screenXScale;
+#endif
 	*y *= cgs.screenYScale;
 	*w *= cgs.screenXScale;
 	*h *= cgs.screenYScale;
@@ -60,6 +81,24 @@ void CG_FillRect( float x, float y, float width, float height, const float *colo
 	trap_R_SetColor( NULL );
 }
 
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+/*
+================
+CG_FillRect
+
+Coordinates are 640*480 virtual values
+=================
+*/
+void CG_FillRectFit( float x, float y, float width, float height, const float *color ) {
+	trap_R_SetColor( color );
+
+	CG_AdjustFrom640Fit( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cgs.media.whiteShader );
+
+	trap_R_SetColor( NULL );
+}
+#endif
+
 /*
 ================
 CG_DrawSides
@@ -68,14 +107,22 @@ Coords are virtual 640x480
 ================
 */
 void CG_DrawSides(float x, float y, float w, float h, float size) {
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	CG_AdjustFrom640Fit( &x, &y, &w, &h );
+#else
 	CG_AdjustFrom640( &x, &y, &w, &h );
+#endif
 	size *= cgs.screenXScale;
 	trap_R_DrawStretchPic( x, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 	trap_R_DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 }
 
 void CG_DrawTopBottom(float x, float y, float w, float h, float size) {
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	CG_AdjustFrom640Fit( &x, &y, &w, &h );
+#else
 	CG_AdjustFrom640( &x, &y, &w, &h );
+#endif
 	size *= cgs.screenYScale;
 	trap_R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
 	trap_R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
@@ -614,7 +661,11 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 	trap_R_SetColor( color );
 	
 	ax = x * cgs.screenXScale + cgs.screenXBias;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Does this cause a problem?
+	ay = y * cgs.screenYScale;
+#else
 	ay = y * cgs.screenXScale;
+#endif
 
 	s = str;
 	while ( *s )

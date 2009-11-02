@@ -30,6 +30,12 @@ SINGLE PLAYER POSTGAME MENU
 
 #include "ui_local.h"
 
+#ifndef TMNTSP
+#ifdef TMNTWEAPONS
+#define MAX_UI_AWARDS		3
+#endif
+#endif
+
 #define MAX_SCOREBOARD_CLIENTS		8
 
 #define AWARD_PRESENTATION_TIME		2000
@@ -66,10 +72,18 @@ typedef struct {
 	int				level;
 	int				numClients;
 	int				won;
+#ifndef TMNTSP
 	int				numAwards;
+#ifdef TMNTWEAPONS
+	int				awardsEarned[MAX_UI_AWARDS];
+	int				awardsLevels[MAX_UI_AWARDS];
+	qboolean		playedSound[MAX_UI_AWARDS];
+#else
 	int				awardsEarned[6];
 	int				awardsLevels[6];
 	qboolean		playedSound[6];
+#endif
+#endif
 	int				lastTier;
 	sfxHandle_t		winnerSound;
 } postgameMenuInfo_t;
@@ -77,25 +91,33 @@ typedef struct {
 static postgameMenuInfo_t	postgameMenuInfo;
 static char					arenainfo[MAX_INFO_VALUE];
 
-char	*ui_medalNames[] = {"Accuracy", "Impressive", "Excellent", "Gauntlet", "Frags", "Perfect"};
+#ifndef TMNTSP
+char	*ui_medalNames[] = {"Accuracy",
+#ifndef TMNTWEAPONS
+"Impressive", "Excellent", "Gauntlet",
+#endif
+"Frags", "Perfect"};
 char	*ui_medalPicNames[] = {
 	"menu/medals/medal_accuracy",
+#ifndef TMNTWEAPONS
 	"menu/medals/medal_impressive",
 	"menu/medals/medal_excellent",
 	"menu/medals/medal_gauntlet",
+#endif
 	"menu/medals/medal_frags",
 	"menu/medals/medal_victory"
 };
 char	*ui_medalSounds[] = {
 	"sound/feedback/accuracy.wav",
+#ifndef TMNTWEAPONS
 	"sound/feedback/impressive_a.wav",
 	"sound/feedback/excellent_a.wav",
 	"sound/feedback/gauntlet.wav",
+#endif
 	"sound/feedback/frags.wav",
 	"sound/feedback/perfect.wav"
 };
 
-#ifndef TMNTSP
 /*
 =================
 UI_SPPostgameMenu_AgainEvent
@@ -207,7 +229,12 @@ static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
 }
 
 
+#ifndef TMNTSP
+#ifdef TMNTWEAPONS
+static int medalLocations[MAX_UI_AWARDS] = {144, 32, 560};
+#else
 static int medalLocations[6] = {144, 448, 88, 504, 32, 560};
+#endif
 
 static void UI_SPPostgameMenu_DrawAwardsMedals( int max ) {
 	int		n;
@@ -258,6 +285,7 @@ static void UI_SPPostgameMenu_DrawAwardsPresentation( int timer ) {
 		trap_S_StartLocalSound( trap_S_RegisterSound( ui_medalSounds[postgameMenuInfo.awardsEarned[awardNum]], qfalse ), CHAN_ANNOUNCER );
 	}
 }
+#endif
 
 
 /*
@@ -334,7 +362,9 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 	// phase 2
 	if( postgameMenuInfo.phase == 2 ) {
 		timer = uis.realtime - postgameMenuInfo.starttime;
+#ifndef TMNTSP
 		if( timer >= ( postgameMenuInfo.numAwards * AWARD_PRESENTATION_TIME ) ) {
+#endif
 
 			if( timer < 5000 ) {
 				return;
@@ -342,10 +372,12 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 
 			postgameMenuInfo.phase = 3;
 			postgameMenuInfo.starttime = uis.realtime;
+#ifndef TMNTSP
 		}
 		else {
 			UI_SPPostgameMenu_DrawAwardsPresentation( timer );
 		}
+#endif
 	}
 
 	// phase 3
@@ -374,7 +406,9 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 		postgameMenuInfo.item_next.generic.flags &= ~QMF_INACTIVE;
 		postgameMenuInfo.item_menu.generic.flags &= ~QMF_INACTIVE;
 
+#ifndef TMNTSP
 		UI_SPPostgameMenu_DrawAwardsMedals( postgameMenuInfo.numAwards );
+#endif
 
 		Menu_Draw( &postgameMenuInfo.menu );
 	}
@@ -403,7 +437,9 @@ UI_SPPostgameMenu_Cache
 =================
 */
 void UI_SPPostgameMenu_Cache( void ) {
+#ifndef TMNTSP
 	int			n;
+#endif
 	qboolean	buildscript;
 
 	buildscript = trap_Cvar_VariableValue("com_buildscript");
@@ -414,10 +450,17 @@ void UI_SPPostgameMenu_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_REPLAY1 );
 	trap_R_RegisterShaderNoMip( ART_NEXT0 );
 	trap_R_RegisterShaderNoMip( ART_NEXT1 );
-	for( n = 0; n < 6; n++ ) {
+#ifndef TMNTSP
+#ifdef TMNTWEAPONS
+	for( n = 0; n < MAX_UI_AWARDS; n++ )
+#else
+	for( n = 0; n < 6; n++ )
+#endif
+	{
 		trap_R_RegisterShaderNoMip( ui_medalPicNames[n] );
 		trap_S_RegisterSound( ui_medalSounds[n], qfalse );
 	}
+#endif
 
 	if( buildscript ) {
 #ifdef TMNTSP
@@ -517,9 +560,17 @@ void UI_SPPostgameMenu_f( void ) {
 	int			playerGameRank;
 	int			playerClientNum;
 	int			n;
+#ifndef TMNTSP
 	int			oldFrags, newFrags;
+#endif
 	const char	*arena;
+#ifndef TMNTSP
+#ifdef TMNTWEAPONS
+	int			awardValues[MAX_UI_AWARDS];
+#else
 	int			awardValues[6];
+#endif
+#endif
 	char		map[MAX_QPATH];
 	char		info[MAX_INFO_STRING];
 
@@ -558,17 +609,14 @@ void UI_SPPostgameMenu_f( void ) {
 
 	UI_SetBestScore( postgameMenuInfo.level, playerGameRank );
 
+#ifndef TMNTSP
 	// process award stats and prepare presentation data
 	awardValues[AWARD_ACCURACY] = atoi( UI_Argv( 3 ) );
 #ifdef TMNTWEAPONS
-	// Turtle Man: TODO: I was lazy at removal, so 0 is passed as the AWARD_IMPRESSIVE var.
+	// Turtle Man: TODO: I was lazy at removal, so 0 is passed as the AWARD_IMPRESSIVE, etc.
 #else
 	awardValues[AWARD_IMPRESSIVE] = atoi( UI_Argv( 4 ) );
-#endif
 	awardValues[AWARD_EXCELLENT] = atoi( UI_Argv( 5 ) );
-#ifdef TMNTWEAPONS
-	// Turtle Man: TODO: I was lazy at removal, so 0 is passed as the AWARD_GAUNTLET var.
-#else
 	awardValues[AWARD_GAUNTLET] = atoi( UI_Argv( 6 ) );
 #endif
 	awardValues[AWARD_FRAGS] = atoi( UI_Argv( 7 ) );
@@ -590,7 +638,6 @@ void UI_SPPostgameMenu_f( void ) {
 		postgameMenuInfo.awardsLevels[postgameMenuInfo.numAwards] = awardValues[AWARD_IMPRESSIVE];
 		postgameMenuInfo.numAwards++;
 	}
-#endif
 
 	if( awardValues[AWARD_EXCELLENT] ) {
 		UI_LogAwardData( AWARD_EXCELLENT, awardValues[AWARD_EXCELLENT] );
@@ -599,7 +646,6 @@ void UI_SPPostgameMenu_f( void ) {
 		postgameMenuInfo.numAwards++;
 	}
 
-#ifndef TMNTWEAPONS
 	if( awardValues[AWARD_GAUNTLET] ) {
 		UI_LogAwardData( AWARD_GAUNTLET, awardValues[AWARD_GAUNTLET] );
 		postgameMenuInfo.awardsEarned[postgameMenuInfo.numAwards] = AWARD_GAUNTLET;
@@ -623,6 +669,7 @@ void UI_SPPostgameMenu_f( void ) {
 		postgameMenuInfo.awardsLevels[postgameMenuInfo.numAwards] = 1;
 		postgameMenuInfo.numAwards++;
 	}
+#endif
 
 	if ( playerGameRank == 1 ) {
 		postgameMenuInfo.won = UI_TierCompleted( postgameMenuInfo.level );

@@ -143,7 +143,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	case MOD_TRIGGER_HURT:
 		message = "was in the wrong place";
 		break;
-#ifdef STYEF_ENTITY
+#ifdef TMNTENTSYS
 	case MOD_EXPLOSION:
 		message = "was in the explosion";
 #endif
@@ -585,49 +585,70 @@ A new item was picked up this frame
 ================
 */
 static void CG_ItemPickup( int itemNum ) {
+#if defined TMNTWEAPSYS_2 || defined TMNTHOLDSYS
+	gitem_t *item;
+
+#ifdef TMNTWEAPSYS_2
+	item = BG_ItemForItemNum(itemNum);
+#else
+	item = &bg_itemlist[itemNum];
+#endif
+#endif
 	cg.itemPickup = itemNum;
 	cg.itemPickupTime = cg.time;
 	cg.itemPickupBlendTime = cg.time;
 
 #ifdef TMNTHOLDSYS
-	if (bg_itemlist[itemNum].giType == IT_HOLDABLE)
+	if (item->giType == IT_HOLDABLE)
 	{
-#ifdef TMNTHOLDSYS2
+#ifdef TMNTHOLDSYS/*2*/
 		// Select the holdable
-		cg.holdableSelect = bg_itemlist[itemNum].giTag;
+		cg.holdableSelect = item->giTag;
 #endif
 
-		//cg.predictedPlayerState.holdableIndex = bg_itemlist[itemNum].giTag;
-
 		// holdable is really given in game, but do it anyway...
-		if (bg_itemlist[itemNum].quantity == 0)
-			cg.predictedPlayerState.holdable[bg_itemlist[itemNum].giTag] = 1;
+		if (item->quantity == 0)
+			cg.predictedPlayerState.holdable[item->giTag] = 1;
 		else
-			cg.predictedPlayerState.holdable[bg_itemlist[itemNum].giTag] += bg_itemlist[itemNum].quantity;
+			cg.predictedPlayerState.holdable[item->giTag] += item->quantity;
 
-		//if (bg_itemlist[itemNum].giTag >= HI_SHURIKEN && bg_itemlist[itemNum].giTag <= HI_LASERSHURIKEN)
-		{
-			if (cg.predictedPlayerState.holdable[bg_itemlist[itemNum].giTag] < MAX_SHURIKENS)
-				cg.predictedPlayerState.holdable[bg_itemlist[itemNum].giTag] = MAX_SHURIKENS;
-		}
+		if (cg.predictedPlayerState.holdable[item->giTag] > MAX_SHURIKENS)
+			cg.predictedPlayerState.holdable[item->giTag] = MAX_SHURIKENS;
 	}
 #endif
 	// see if it should be the grabbed weapon
-	if ( bg_itemlist[itemNum].giType == IT_WEAPON ) {
+#ifdef TMNTWEAPSYS_2
+	if ( item->giType == IT_WEAPON )
+#else
+	if ( bg_itemlist[itemNum].giType == IT_WEAPON )
+#endif
+	{
 		// select it immediately
 #ifdef TMNTWEAPSYS2
 		// always switch
-		{
 #elif defined TMNTWEAPONS
-		if ( cg_autoswitch.integer ) {
+		if ( cg_autoswitch.integer )
 #else
-		if ( cg_autoswitch.integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN ) {
+#if defined TMNTWEAPSYS_2 || defined IOQ3ZTM
+		if ( cg_autoswitch.integer )
+#else
+		if ( cg_autoswitch.integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN )
 #endif
+#endif
+		{
 #ifdef TMNTWEAPSYS2 // The weapon "should" be selected in game and sent in the next snap too
+#ifdef TMNTWEAPSYS_2
+			cg.predictedPlayerState.stats[STAT_NEWWEAPON] = item->giTag;
+#else
 			cg.predictedPlayerState.stats[STAT_NEWWEAPON] = bg_itemlist[itemNum].giTag;
+#endif
 #else
 			cg.weaponSelectTime = cg.time;
+#ifdef TMNTWEAPSYS_2
+			cg.weaponSelect = item->giTag;
+#else
 			cg.weaponSelect = bg_itemlist[itemNum].giTag;
+#endif
 #endif
 		}
 	}
@@ -666,121 +687,8 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	cent->pe.painDirection ^= 1;
 }
 
-#ifdef STYEF_ENTITY // non free
-/*
-CG_Chunks
-
-Turtle Man: FIXME: NON-GPL Code from Star Trek: Elite Force (code-DM)
-*/
-void CG_Chunks( vec3_t origin, vec3_t dir, float scale, material_type_t type )
-{
-	int				i, j, k;
-	int				numChunks;
-	float			baseScale = 1.0f, dist, radius;
-	vec3_t			v;
-	//sfxHandle_t		snd = 0;
-	localEntity_t	*le;
-	refEntity_t		*re;
-	float fracment_radius = 0.0f; // it was le->data.fragment.radius in ST:EF, I haven't look into it.
-
-	if ( type == MT_NONE )
-		return;
-
-	if (type == MT_GLASS || type == MT_GLASS_METAL) {
-		//snd = cgs.media.glassChunkSound;
-	}
-	else
-	{
-		// MT_METAL, MT_WOOD, MT_STONE, ect...
-		//snd = cgs.media.metalChunkSound;
-	}
-
-	//trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_BODY, snd );
-
-	numChunks = irandom( 8, 12 );
-
-	// LOD num chunks
-	VectorSubtract( cg.snap->ps.origin, origin, v );
-	dist = VectorLength( v );
-
-	if ( dist > 512 )
-	{
-		numChunks *= 512.0 / dist;		// 1/2 at 1024, 1/4 at 2048, etc.
-	}
-
-	// attempt to scale the size of the chunks based on the size of the brush
-	radius = baseScale + ( ( scale - 128 ) / 128.0f );
-
-	for ( i = 0; i < numChunks; i++ )
-	{
-		le = CG_AllocLocalEntity();
-		re = &le->refEntity;
-
-		le->leType = LE_FRAGMENT;
-		le->endTime = cg.time + 2000;
-
-		VectorCopy( origin, re->origin );
-
-		for ( j = 0; j < 3; j++ )
-		{
-			re->origin[j] += crandom() * 12;
-		}
-		VectorCopy( re->origin, le->pos.trBase );
-
-		//Velocity
-		VectorSet( v, crandom(), crandom(), crandom() );
-		VectorAdd( v, dir, v );
-		VectorScale( v, flrandom( 100, 350 ), le->pos.trDelta );
-
-		//Angular Velocity
-		VectorSet( le->angles.trBase, crandom() * 360, crandom() * 360, crandom() * 360 );
-		VectorSet( le->angles.trDelta, crandom() * 90, crandom() * 90, crandom() * 90 );
-
-		AxisCopy( axisDefault, re->axis );
-
-		fracment_radius = flrandom( radius * 0.7f, radius * 1.3f );
-
-		re->nonNormalizedAxes = qtrue;
-
-		if (type == MT_GLASS_METAL)
-		{
-			if ( rand() & 1 )
-			{
-				re->hModel = cgs.media.chunkModels[MT_METAL][irandom(0,NUM_CHUNKS-1)];
-			}
-			else
-			{
-				re->hModel = cgs.media.chunkModels[MT_GLASS][irandom(0,NUM_CHUNKS-1)];
-			}
-		}
-		else if (type >= 0 && type < NUM_CHUNK_TYPES)
-		{
-			re->hModel = cgs.media.chunkModels[type][irandom(0,NUM_CHUNKS-1)];
-		}
-		else
-		{
-			re->hModel = cgs.media.chunkModels[MT_METAL][irandom(0,NUM_CHUNKS-1)];
-		}
-
-		le->pos.trType = TR_GRAVITY;
-		le->pos.trTime = cg.time;
-		le->angles.trType = TR_INTERPOLATE;
-		le->angles.trTime = cg.time;
-		le->bounceFactor = 0.2f + random() * 0.2f;
-		le->leFlags |= LEF_TUMBLE;
-
-		re->shaderRGBA[0] = re->shaderRGBA[1] = re->shaderRGBA[2] = re->shaderRGBA[3] = 255;
-
-		// Make sure that we have the desired start size set
-		for( k = 0; k < 3; k++)
-		{
-			VectorScale( le->refEntity.axis[k], fracment_radius, le->refEntity.axis[k] );
-		}
-	}
-}
-#endif
-#ifdef TMNTWEAPSYS_1 // DEBUG_ORIGIN
-// Based on CG_Item
+#ifdef TMNTMISC // DEBUG_ORIGIN
+// Based on CG_Item, used to be game model tags working ( TMNTWEAPSYS_1 )
 void CG_DebugOrigin(centity_t *cent)
 {
 	entityState_t	*es;
@@ -1066,10 +974,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-			if ( index < 1 || index >= bg_numItems ) {
+#ifdef TMNTWEAPSYS_2
+			if ( index < 1 || index >= NUM_BG_ITEMS )
+#else
+			if ( index < 1 || index >= bg_numItems )
+#endif
+			{
 				break;
 			}
+#ifdef TMNTWEAPSYS_2
+			item = BG_ItemForItemNum(index);
+#else
 			item = &bg_itemlist[ index ];
+#endif
 
 			// powerups and team items will have a separate global sound, this one
 			// will be played at prediction time
@@ -1111,10 +1028,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-			if ( index < 1 || index >= bg_numItems ) {
+#ifdef TMNTWEAPSYS_2
+			if ( index < 1 || index >= NUM_BG_ITEMS )
+#else
+			if ( index < 1 || index >= bg_numItems )
+#endif
+			{
 				break;
 			}
+#ifdef TMNTWEAPSYS_2
+			item = BG_ItemForItemNum(index);
+#else
 			item = &bg_itemlist[ index ];
+#endif
 			// powerup pickups are global
 			if( item->pickup_sound ) {
 				trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
@@ -1250,10 +1176,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifdef TMNTHOLDABLE
 	case EV_LASERSHURIKEN_BOUNCE: // HI_LASERSHURIKEN
 		DEBUGNAME("EV_LASERSHURIKEN_BOUNCE");
-		if (es->eventParm == 1) {
-			// Turtle Man: TODO: Laser shuriken just died, play sound?
+		if (es->eventParm == 255) {
+			CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 		} else {
 			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.laserShurikenSound );
+			ByteToDir( es->eventParm, dir );
+			CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 		}
 		break;
 #else
@@ -1320,13 +1248,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_SCOREPLUM");
 		CG_ScorePlum( cent->currentState.otherEntityNum, cent->lerpOrigin, cent->currentState.time );
 		break;
-#ifdef STYEF_ENTITY // non free
-	case EV_FX_CHUNKS:
-		DEBUGNAME("EV_FX_CHUNKS");
-		//UnVectorShort( cent->currentState.angles2 );
-		CG_Chunks( cent->lerpOrigin, cent->currentState.angles2, cent->currentState.time2, cent->currentState.powerups );
-		break;
-#endif
 
 	//
 	// missile impacts
@@ -1334,19 +1255,44 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_MISSILE_HIT:
 		DEBUGNAME("EV_MISSILE_HIT");
 		ByteToDir( es->eventParm, dir );
+#ifdef TMNTWEAPSYS_2
+		if (bg_projectileinfo[es->weapon].trailType == PT_BULLET)
+		{
+			CG_Bullet( es->pos.trBase, es->clientNum, dir, qtrue, es->otherEntityNum, es->weapon );
+			break;
+		}
+#endif
 		CG_MissileHitPlayer( es->weapon, position, dir, es->otherEntityNum );
 		break;
 
 	case EV_MISSILE_MISS:
 		DEBUGNAME("EV_MISSILE_MISS");
 		ByteToDir( es->eventParm, dir );
+#ifdef TMNTWEAPSYS_2
+		if (bg_projectileinfo[es->weapon].trailType == PT_BULLET)
+		{
+			CG_Bullet( es->pos.trBase, es->clientNum, dir, qfalse, es->otherEntityNum, es->weapon );
+			break;
+		}
+		CG_MissileHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
+#else
 		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
+#endif
 		break;
 
 	case EV_MISSILE_MISS_METAL:
 		DEBUGNAME("EV_MISSILE_MISS_METAL");
 		ByteToDir( es->eventParm, dir );
+#ifdef TMNTWEAPSYS_2
+		if (bg_projectileinfo[es->weapon].trailType == PT_BULLET)
+		{
+			CG_Bullet( es->pos.trBase, es->clientNum, dir, qfalse, es->otherEntityNum, es->weapon );
+			break;
+		}
+		CG_MissileHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_METAL );
+#else
 		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_METAL );
+#endif
 		break;
 
 	case EV_RAILTRAIL:
@@ -1362,23 +1308,69 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 		break;
 
+#ifndef TMNTWEAPSYS_2
 	case EV_BULLET_HIT_WALL:
 		DEBUGNAME("EV_BULLET_HIT_WALL");
 		ByteToDir( es->eventParm, dir );
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD );
+		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD
+#ifdef TMNTWEAPSYS_2
+				, es->weapon
+#endif
+				);
 		break;
 
 	case EV_BULLET_HIT_FLESH:
 		DEBUGNAME("EV_BULLET_HIT_FLESH");
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qtrue, es->eventParm );
+		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qtrue, es->eventParm
+#ifdef TMNTWEAPSYS_2
+				, es->weapon
+#endif
+				);
 		break;
+#endif
 
+#if !defined TMNTWEAPONS && !defined TMNTWEAPSYS_2
 	case EV_SHOTGUN:
 		DEBUGNAME("EV_SHOTGUN");
-#ifndef TMNTWEAPONS
 		CG_ShotgunFire( es );
+		break;
+#endif
+
+#ifdef TMNTWEAPSYS
+	//
+	// Melee weapon impacts
+	//
+
+	case EV_WEAPON_HIT:
+		DEBUGNAME("EV_WEAPON_HIT");
+		ByteToDir( es->eventParm, dir );
+#ifdef TMNTWEAPSYS_2
+		CG_WeaponHitPlayer( es->weapon, position, dir, es->otherEntityNum );
+#else
+		CG_MissileHitPlayer( es->weapon, position, dir, es->otherEntityNum );
 #endif
 		break;
+
+	case EV_WEAPON_MISS:
+		DEBUGNAME("EV_WEAPON_MISS");
+		ByteToDir( es->eventParm, dir );
+#ifdef TMNTWEAPSYS_2
+		CG_WeaponHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
+#else
+		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
+#endif
+		break;
+
+	case EV_WEAPON_MISS_METAL:
+		DEBUGNAME("EV_WEAPON_MISS_METAL");
+		ByteToDir( es->eventParm, dir );
+#ifdef TMNTWEAPSYS_2
+		CG_WeaponHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_METAL );
+#else
+		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_METAL );
+#endif
+		break;
+#endif
 
 	case EV_GENERAL_SOUND:
 		DEBUGNAME("EV_GENERAL_SOUND");
@@ -1595,7 +1587,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_Beam( cent );
 		break;
 
-#ifdef TMNTWEAPSYS_1 // DEBUG_ORIGIN
+#ifdef TMNTMISC // DEBUG_ORIGIN
 	case EV_DEBUG_ORIGIN:
 		DEBUGNAME("EV_DEBUG_LINE");
 		CG_DebugOrigin( cent );

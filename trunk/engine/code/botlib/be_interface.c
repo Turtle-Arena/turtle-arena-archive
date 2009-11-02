@@ -846,7 +846,9 @@ static void Init_AI_Export( ai_export_t *ai ) {
 	// be_ai_weap.h
 	//-----------------------------------
 	ai->BotChooseBestFightWeapon = BotChooseBestFightWeapon;
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 	ai->BotGetWeaponInfo = BotGetWeaponInfo;
+#endif
 	ai->BotLoadWeaponWeights = BotLoadWeaponWeights;
 	ai->BotAllocWeaponState = BotAllocWeaponState;
 	ai->BotFreeWeaponState = BotFreeWeaponState;

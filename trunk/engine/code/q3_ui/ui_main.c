@@ -115,6 +115,22 @@ vmCvar_t	ui_ctf_capturelimit;
 vmCvar_t	ui_ctf_timelimit;
 vmCvar_t	ui_ctf_friendly;
 
+#ifdef MISSIONPACK // Turtle Man: MP_GAMETYPES
+vmCvar_t	ui_1flag_capturelimit;
+vmCvar_t	ui_1flag_timelimit;
+vmCvar_t	ui_1flag_friendly;
+
+vmCvar_t	ui_obelisk_capturelimit;
+vmCvar_t	ui_obelisk_timelimit;
+vmCvar_t	ui_obelisk_friendly;
+
+#ifdef MISSIONPACK_HARVESTER
+vmCvar_t	ui_harvester_capturelimit;
+vmCvar_t	ui_harvester_timelimit;
+vmCvar_t	ui_harvester_friendly;
+#endif
+#endif
+
 vmCvar_t	ui_arenasFile;
 vmCvar_t	ui_botsFile;
 vmCvar_t	ui_spScores1;
@@ -129,6 +145,8 @@ vmCvar_t	ui_spSkill;
 #ifdef TMNTSP
 vmCvar_t	ui_singlePlayerActive;
 vmCvar_t	ui_spStage;
+vmCvar_t	ui_saveVersions;
+vmCvar_t	ui_saveTypes;
 #endif
 vmCvar_t	ui_spSelection;
 
@@ -171,8 +189,8 @@ static cvarTable_t		cvarTable[] = {
 #endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
-#ifdef TMNTMISC // frag to score
-	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
+#ifdef TMNTMISC // frag to score and changed KO limit to 3
+	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "3", CVAR_ARCHIVE },
 #else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
 #endif
@@ -186,9 +204,29 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_team_timelimit, "ui_team_timelimit", "20", CVAR_ARCHIVE },
 	{ &ui_team_friendly, "ui_team_friendly",  "1", CVAR_ARCHIVE },
 
+#ifdef TMNTMISC
+	{ &ui_ctf_capturelimit, "ui_ctf_capturelimit", "5", CVAR_ARCHIVE },
+#else
 	{ &ui_ctf_capturelimit, "ui_ctf_capturelimit", "8", CVAR_ARCHIVE },
+#endif
 	{ &ui_ctf_timelimit, "ui_ctf_timelimit", "30", CVAR_ARCHIVE },
 	{ &ui_ctf_friendly, "ui_ctf_friendly",  "0", CVAR_ARCHIVE },
+
+#ifdef MISSIONPACK // Turtle Man: MP_GAMETYPES
+	{ &ui_1flag_capturelimit, "ui_1flag_capturelimit", "5", CVAR_ARCHIVE },
+	{ &ui_1flag_timelimit, "ui_1flag_timelimit", "30", CVAR_ARCHIVE },
+	{ &ui_1flag_friendly, "ui_1flag_friendly",  "0", CVAR_ARCHIVE },
+
+	{ &ui_obelisk_capturelimit, "ui_obelisk_capturelimit", "5", CVAR_ARCHIVE },
+	{ &ui_obelisk_timelimit, "ui_obelisk_timelimit", "20", CVAR_ARCHIVE },
+	{ &ui_obelisk_friendly, "ui_obelisk_friendly",  "0", CVAR_ARCHIVE },
+
+#ifdef MISSIONPACK_HARVESTER
+	{ &ui_harvester_capturelimit, "ui_harvester_capturelimit", "5", CVAR_ARCHIVE },
+	{ &ui_harvester_timelimit, "ui_harvester_timelimit", "30", CVAR_ARCHIVE },
+	{ &ui_harvester_friendly, "ui_harvester_friendly",  "0", CVAR_ARCHIVE },
+#endif
+#endif
 
 	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM },
 	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM },
@@ -204,6 +242,8 @@ static cvarTable_t		cvarTable[] = {
 #ifdef TMNTSP
 	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", 0},
 	{ &ui_spStage, "ui_spStage", "0", CVAR_ROM },
+	{ &ui_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM },
+	{ &ui_saveTypes, "g_saveTypes", BG_SAVE_TYPES, CVAR_ROM },
 #endif
 	{ &ui_spSelection, "ui_spSelection", "", CVAR_ROM },
 

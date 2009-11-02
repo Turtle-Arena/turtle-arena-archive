@@ -34,11 +34,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static const int STR_ALLOC_GRAN = 20;
 
-char *idStr::toLower
-   (
-   char *s1
-   )
-   
+char *idStr::toLower( char *s1 )
    {
    char *s;
 
@@ -52,11 +48,7 @@ char *idStr::toLower
    return s1;
    }
 
-char *idStr::toUpper
-   (
-   char *s1
-   )
-   
+char *idStr::toUpper( char *s1  )
    {
    char *s;
 
@@ -71,13 +63,7 @@ char *idStr::toUpper
    }
 
 
-int idStr::icmpn
-   (
-   const char *s1, 
-   const char *s2, 
-   int n
-   )
-   
+int idStr::icmpn( const char *s1, const char *s2, int n )
    {
 	int c1;
    int c2;
@@ -123,12 +109,7 @@ int idStr::icmpn
 	return 0;
    }
 
-int idStr::icmp
-   (
-   const char *s1,
-   const char *s2
-   )
-   
+int idStr::icmp( const char *s1, const char *s2 )
    {
 	int c1;
    int c2;
@@ -168,13 +149,7 @@ int idStr::icmp
 	return 0;
    }
 
-int idStr::cmpn
-   (
-   const char *s1, 
-   const char *s2, 
-   int n
-   )
-   
+int idStr::cmpn( const char *s1, const char *s2, int n )
    {
 	int c1;
    int c2;
@@ -207,12 +182,7 @@ int idStr::cmpn
 	return 0;
    }
 
-int idStr::cmp
-   (
-   const char *s1, 
-   const char *s2
-   )
-   
+int idStr::cmp( const char *s1, const char *s2 )
    {
 	int c1;
    int c2;
@@ -246,11 +216,7 @@ IsNumeric
 Checks a string to see if it contains only numerical values.
 ============
 */
-bool idStr::isNumeric
-   (
-   const char *str
-   )
-
+bool idStr::isNumeric( const char *str )
    {
 	int len;
 	int i;
@@ -279,12 +245,7 @@ bool idStr::isNumeric
 	return true;
    }
 
-idStr operator+
-   (
-   const idStr& a,
-   const float b
-   )
-
+idStr operator+( const idStr& a, const float b )
    {
    char text[ 20 ];
 
@@ -296,12 +257,7 @@ idStr operator+
 	return result;
    }
 
-idStr operator+
-   (
-   const idStr& a,
-   const int b
-   )
-
+idStr operator+( const idStr& a, const int b )
    {
    char text[ 20 ];
 
@@ -313,12 +269,7 @@ idStr operator+
 	return result;
    }
 
-idStr operator+
-   (
-   const idStr& a,
-   const unsigned b
-   )
-
+idStr operator+( const idStr& a, const unsigned b )
    {
    char text[ 20 ];
 
@@ -330,11 +281,7 @@ idStr operator+
 	return result;
    }
 
-idStr& idStr::operator+=
-	(
-	const float a
-	)
-
+idStr& idStr::operator+=( const float a )
 	{
    char text[ 20 ];
 
@@ -344,11 +291,7 @@ idStr& idStr::operator+=
    return *this;
 	}
 
-idStr& idStr::operator+=
-	(
-	const int a
-	)
-
+idStr& idStr::operator+=( const int a )
 	{
    char text[ 20 ];
 
@@ -358,11 +301,7 @@ idStr& idStr::operator+=
    return *this;
 	}
 
-idStr& idStr::operator+=
-	(
-	const unsigned a
-	)
-
+idStr& idStr::operator+=( const unsigned a )
 	{
    char text[ 20 ];
 
@@ -372,11 +311,7 @@ idStr& idStr::operator+=
    return *this;
 	}
 
-void idStr::CapLength 
-   (
-   int newlen 
-   )
-
+void idStr::CapLength( int newlen )
    {
    assert ( m_data );
    
@@ -389,11 +324,7 @@ void idStr::CapLength
    m_data->len = newlen;
    }
 
-void idStr::EnsureDataWritable 
-   (
-   void
-   )
-
+void idStr::EnsureDataWritable( void )
    {
    assert ( m_data );
    strdata *olddata;
@@ -414,8 +345,8 @@ void idStr::EnsureDataWritable
    olddata->DelRef ();
    }
 
-void idStr::EnsureAlloced (int amount, bool keepold) {
-
+void idStr::EnsureAlloced (int amount, bool keepold)
+{
 	if ( !m_data ) {
       m_data = new strdata();
 	}
@@ -455,11 +386,7 @@ void idStr::EnsureAlloced (int amount, bool keepold) {
 	m_data->data = newbuffer;
 }
 
-void idStr::BackSlashesToSlashes
-   (
-   void
-   )
-
+void idStr::BackSlashesToSlashes( void )
    {
    int i;
 
@@ -472,14 +399,7 @@ void idStr::BackSlashesToSlashes
       }
    }
 
-void idStr::snprintf 
-   (
-   char *dst,
-   int size,
-   const char *fmt, 
-   ...
-   )
-
+void idStr::snprintf( char *dst, int size, const char *fmt, ... )
    {
    char buffer[0x10000];
 	int		len;
@@ -509,11 +429,7 @@ Add more tests as functionality is changed.  Tests should include
 any possible bounds violation and NULL data tests.
 =================
 */
-void TestStringClass
-	(
-	void 
-	)
-
+void TestStringClass( void )
 	{
 	char	ch;							// ch == ?
 	idStr	*t;							// t == ?

@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 #include "../qcommon/q_shared.h"
+#include "../game/bg_public.h"
 #include "l_memory.h"
 #include "l_script.h"
 #include "l_precomp.h"
@@ -45,6 +46,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define MASK_SOLID		CONTENTS_PLAYERCLIP
 
+#if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h
 //FIXME: these might change
 enum {
 	ET_GENERAL,
@@ -53,6 +55,7 @@ enum {
 	ET_MISSILE,
 	ET_MOVER
 };
+#endif
 
 //===========================================================================
 //

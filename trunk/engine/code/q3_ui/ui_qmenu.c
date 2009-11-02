@@ -1768,7 +1768,9 @@ void Menu_Cache( void )
 	} else {
 		uis.menuBackShader	= trap_R_RegisterShaderNoMip( "menuback" );
 	}
+#ifndef TMNTDATASYS
 	uis.menuBackNoLogoShader = trap_R_RegisterShaderNoMip( "menubacknologo" );
+#endif
 
 	menu_in_sound	= trap_S_RegisterSound( "sound/misc/menu1.wav", qfalse );
 	menu_move_sound	= trap_S_RegisterSound( "sound/misc/menu2.wav", qfalse );

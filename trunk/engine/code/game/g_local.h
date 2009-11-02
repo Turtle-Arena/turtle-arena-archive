@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // g_local.h -- local definitions for game module
 
 #include "../qcommon/q_shared.h"
-#include "bg_public.h"
+#include "bg_misc.h"
 #include "g_public.h"
 
 //==================================================================
@@ -174,6 +174,10 @@ struct gentity_s {
 
 	char		*model;
 	char		*model2;
+
+#ifdef TMNTMISC // XREAL
+	int			spawnTime;			// level.time when the object was spawned
+#endif
 	int			freetime;			// level.time when the object was freed
 	
 	int			eventTime;			// events will be cleared EVENT_VALID_MSEC after set
@@ -352,10 +356,10 @@ typedef struct {
 #ifdef TMNTPLAYERSYS
     bg_playercfg_t playercfg;        // data loaded from animation.cfg
 #endif
-#ifdef TMNTWEAPSYS_1 // GAME_TAGS
-	// loaded using trap_RegisterTags, used in trap_LerpTag
-	qhandle_t	torsoTags;
-	qhandle_t	legsTags;
+#ifdef TMNT_GAME_MODELS
+	// loaded using trap_RegisterModel, used in trap_LerpTag
+	qhandle_t	torsoModel;
+	qhandle_t	legsModel;
 
 	// Used with ps.torsoAnim/legsAnim to find tag locations
 	lerpFrame_t torso, legs;
@@ -416,7 +420,9 @@ struct gclient_s {
 
 	int			airOutTime;
 
+#ifndef TMNTWEAPONS
 	int			lastKillTime;		// for multiple kill rewards
+#endif
 
 #ifdef TMNTSP
 	int			finishTime; // when the client finished the level.
@@ -438,6 +444,9 @@ struct gclient_s {
 	gentity_t	*persistantPowerup;
 	int			portalID;
 	int			ammoTimes[WP_NUM_WEAPONS];
+#ifdef TMNTHOLDABLE // REGEN_SHURIKENS
+	int			holdableTimes[HI_NUM_HOLDABLE];
+#endif
 #ifndef TMNT // POWERS
 	int			invulnerabilityTime;
 #endif
@@ -623,7 +632,7 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin );
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
 const char *BuildShaderStateConfig( void );
 
-#ifdef TMNTWEAPONS // XREAL r2785
+#ifdef TMNTWEAPSYS // XREAL r2785
 gentity_t *G_FindRadius(gentity_t *from, const vec3_t org, float rad);
 qboolean G_IsVisible(const gentity_t *self, const vec3_t goal);
 #endif
@@ -656,13 +665,31 @@ void TossClientCubes( gentity_t *self );
 //
 void G_RunMissile( gentity_t *ent );
 
+#ifdef TMNTWEAPSYS_2
 #ifdef TMNTHOLDABLE
-gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t dir, holdable_t holdable);
+qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward,
+		vec3_t right, vec3_t up, holdable_t holdable);
+#endif
+
+qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
+		vec3_t right, vec3_t up, int projnum, float quadFactor,
+		int mod, int splashMod);
+
+qboolean fire_weapon(gentity_t *self, vec3_t start, vec3_t forward,
+		vec3_t right, vec3_t up, int weaponnum, float quadFactor);
+
+qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir,
+		int weaponnum, float quadFactor);
+#else
+#ifdef TMNTHOLDABLE
+gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward,
+		vec3_t right, vec3_t up, holdable_t holdable);
 #endif
 #ifdef TMNTWEAPONS
 gentity_t *fire_gun(gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_homingrocket(gentity_t *self, vec3_t start, vec3_t aimdir);
-#else
+#endif
+#ifndef IOQ3ZTM // unused
 gentity_t *fire_blaster (gentity_t *self, vec3_t start, vec3_t aimdir);
 #endif
 gentity_t *fire_plasma (gentity_t *self, vec3_t start, vec3_t aimdir);
@@ -680,9 +707,6 @@ gentity_t *fire_nail( gentity_t *self, vec3_t start, vec3_t forward, vec3_t righ
 gentity_t *fire_prox( gentity_t *self, vec3_t start, vec3_t aimdir );
 #endif
 #endif
-#ifdef SP_NPC
-gentity_t *fire_flybot_shot (gentity_t *self, vec3_t start, vec3_t dir);
-gentity_t *fire_mouser_shot (gentity_t *self, vec3_t start, vec3_t dir, gentity_t *enemy);
 #endif
 
 
@@ -702,9 +726,6 @@ void trigger_teleporter_touch (gentity_t *self, gentity_t *other, trace_t *trace
 // g_misc.c
 //
 void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles );
-#ifdef SINGLEPLAYER // entity
-void G_RunMD3Anim( gentity_t *ent );
-#endif
 #ifdef MISSIONPACK
 void DropPortalSource( gentity_t *ent );
 void DropPortalDestination( gentity_t *ent );
@@ -721,7 +742,7 @@ void SnapVectorTowards( vec3_t v, vec3_t to );
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable);
 #endif
 #ifdef TMNTWEAPSYS // MELEEATTACK
-qboolean G_MeleeAttack( gentity_t *ent, qboolean nodamage );
+qboolean G_MeleeAttack( gentity_t *ent, qboolean forceDamage );
 void G_StartMeleeAttack(gentity_t *ent);
 #else
 qboolean CheckGauntletAttack( gentity_t *ent );
@@ -740,7 +761,11 @@ team_t TeamCount( int ignoreClientNum, int team );
 int TeamLeader( int team );
 team_t PickTeam( int ignoreClientNum );
 void SetClientViewAngle( gentity_t *ent, vec3_t angle );
+#ifdef TMNTPLAYERSYS
+gentity_t *SelectSpawnPoint ( gentity_t *ent, vec3_t origin, vec3_t angles );
+#else
 gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles );
+#endif
 void CopyToBodyQue( gentity_t *ent );
 void respawn (gentity_t *ent);
 void BeginIntermission (void);
@@ -751,7 +776,11 @@ void ClientSpawn( gentity_t *ent );
 void player_die (gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
 void AddScore( gentity_t *ent, vec3_t origin, int score );
 void CalculateRanks( void );
+#ifdef TMNTPLAYERSYS
+qboolean SpotWouldTelefrag( gentity_t *spot, gentity_t *ent );
+#else
 qboolean SpotWouldTelefrag( gentity_t *spot );
+#endif
 
 //
 // g_svcmds.c
@@ -889,7 +918,7 @@ void BotInterbreedEndMatch( void );
 //
 // g_savestate.c
 //
-void G_LoadGame(fileHandle_t f, int map_loaded);
+void G_LoadGame(fileHandle_t f);
 qboolean G_SaveGame(fileHandle_t f);
 #endif
 
@@ -1059,8 +1088,8 @@ qboolean	trap_GetEntityToken( char *buffer, int bufferSize );
 int		trap_DebugPolygonCreate(int color, int numPoints, vec3_t *points);
 void	trap_DebugPolygonDelete(int id);
 
-#ifdef TMNTWEAPSYS_1 // GAME_TAGS
-qhandle_t trap_RegisterTags( const char *name );
+#ifdef TMNT_GAME_MODELS
+qhandle_t trap_RegisterModel( const char *name );
 int trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
 					   float frac, const char *tagName );
 #endif
@@ -1221,7 +1250,9 @@ void	trap_BotInitMoveState(int handle, void /* struct bot_initmove_s */ *initmov
 void	trap_BotAddAvoidSpot(int movestate, vec3_t origin, float radius, int type);
 
 int		trap_BotChooseBestFightWeapon(int weaponstate, int *inventory);
+#ifndef TMNTWEAPSYS_2
 void	trap_BotGetWeaponInfo(int weaponstate, int weapon, void /* struct weaponinfo_s */ *weaponinfo);
+#endif
 int		trap_BotLoadWeaponWeights(int weaponstate, char *filename);
 int		trap_BotAllocWeaponState(void);
 void	trap_BotFreeWeaponState(int weaponstate);

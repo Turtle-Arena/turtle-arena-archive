@@ -3057,7 +3057,7 @@ void Com_Shutdown (void) {
 //------------------------------------------------------------------------
 
 
-#ifndef IOQ3ZTM3 // TMNTWEAPONS // XREAL
+#ifndef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 /*
 =====================
 Q_acos

@@ -349,7 +349,7 @@ typedef enum {
 
 	TRAP_TESTPRINTINT,
 	TRAP_TESTPRINTFLOAT
-#ifdef IOQ3ZTM3
+#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 	,TRAP_ACOS
 #endif
 } sharedTraps_t;

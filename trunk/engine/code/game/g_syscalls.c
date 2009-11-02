@@ -228,9 +228,9 @@ void trap_SnapVector( float *v ) {
 	return;
 }
 
-#ifdef TMNTWEAPSYS_1 // GAME_TAGS
-qhandle_t trap_RegisterTags( const char *name ) {
-	return syscall( G_REGISTERTAGS, name );
+#ifdef TMNT_GAME_MODELS
+qhandle_t trap_RegisterModel( const char *name ) {
+	return syscall( G_REGISTERMODEL, name );
 }
 
 int		trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
@@ -772,9 +772,11 @@ int trap_BotChooseBestFightWeapon(int weaponstate, int *inventory) {
 	return syscall( BOTLIB_AI_CHOOSE_BEST_FIGHT_WEAPON, weaponstate, inventory );
 }
 
+#ifndef TMNTWEAPSYS_2
 void trap_BotGetWeaponInfo(int weaponstate, int weapon, void /* struct weaponinfo_s */ *weaponinfo) {
 	syscall( BOTLIB_AI_GET_WEAPON_INFO, weaponstate, weapon, weaponinfo );
 }
+#endif
 
 int trap_BotLoadWeaponWeights(int weaponstate, char *filename) {
 	return syscall( BOTLIB_AI_LOAD_WEAPON_WEIGHTS, weaponstate, filename );

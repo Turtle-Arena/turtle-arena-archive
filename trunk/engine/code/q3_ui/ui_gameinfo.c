@@ -363,12 +363,14 @@ static void UI_LoadBots( void ) {
 	char*		dirptr;
 	int			i;
 	int			dirlen;
+#ifdef RANDOMBOT // Turtle Man: Random bot
+	char info[MAX_INFO_STRING];
+#endif
 
 	ui_numBots = 0;
 
 #ifdef RANDOMBOT // Turtle Man: Init Random bot.
-    {
-        char info[MAX_INFO_STRING];
+	memset(info, 0, MAX_INFO_STRING);
         Info_SetValueForKey(info, "name", "Random");
         // Random bot doesn't have a model, but it has a icon.
         Info_SetValueForKey(info, "model", "Random");
@@ -376,7 +378,6 @@ static void UI_LoadBots( void ) {
 		if (ui_botInfos[ui_numBots])
 			strcpy(ui_botInfos[ui_numBots], info);
         ui_numBots++;
-    }
 #endif
 
 	trap_Cvar_Register( &botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM );
@@ -822,6 +823,9 @@ void UI_InitGameinfo( void ) {
 
 	UI_InitMemory();
 	UI_LoadArenas();
+#ifdef TMNTWEAPSYS_2
+	BG_InitWeaponInfo();
+#endif
 	UI_LoadBots();
 
 	uis.demoversion = qfalse;

@@ -138,7 +138,7 @@ typedef enum {
 	UI_SQRT,
 	UI_FLOOR,
 	UI_CEIL,
-#ifdef IOQ3ZTM3
+#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 	UI_ACOS
 #endif
 } uiImport_t;

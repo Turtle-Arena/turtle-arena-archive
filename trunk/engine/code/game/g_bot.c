@@ -230,15 +230,30 @@ static void PlayerIntroSound( const char *modelAndSkin ) {
 	trap_SendConsoleCommand( EXEC_APPEND, va( "play sound/player/announce/%s.wav\n", skin ) );
 }
 
+
+#ifdef RANDOMBOT
+/*
+===============
+G_SelectRandomBotForAdd
+===============
+*/
+int G_SelectRandomBotForAdd( int team )
+#else
 /*
 ===============
 G_AddRandomBot
 ===============
 */
-void G_AddRandomBot( int team ) {
+void G_AddRandomBot( int team )
+#endif
+{
 	int		i, n, num;
+#ifdef RANDOMBOT
+	char	*value;
+#else
 	float	skill;
 	char	*value, netname[36], *teamstr;
+#endif
 	gclient_t	*cl;
 
 	num = 0;
@@ -298,6 +313,9 @@ void G_AddRandomBot( int team ) {
 		if (i >= g_maxclients.integer) {
 			num--;
 			if (num <= 0) {
+#ifdef RANDOMBOT
+				return n;
+#else
 				skill = trap_Cvar_VariableValue( "g_spSkill" );
 				if (team == TEAM_RED) teamstr = "red";
 				else if (team == TEAM_BLUE) teamstr = "blue";
@@ -307,10 +325,45 @@ void G_AddRandomBot( int team ) {
 				Q_CleanStr(netname);
 				trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", netname, skill, teamstr, 0) );
 				return;
+#endif
 			}
 		}
 	}
+#ifdef RANDOMBOT
+	// If we made it here all of the bot types are used in this team (or game if non-team)
+	//  Happens when there isn't enough bots types.
+
+	// Randomly select any bot.
+	return abs(rand())%g_numBots;
+#endif
 }
+
+#ifdef RANDOMBOT
+/*
+===============
+G_AddRandomBot
+===============
+*/
+void G_AddRandomBot( int team ) {
+	int n;
+	char *value, netname[36], *teamstr;
+	float	skill;
+
+	n = G_SelectRandomBotForAdd(team);
+
+	// Get name of selected bot.
+	value = Info_ValueForKey( g_botInfos[n], "name" );
+
+	skill = trap_Cvar_VariableValue( "g_spSkill" );
+	if (team == TEAM_RED) teamstr = "red";
+	else if (team == TEAM_BLUE) teamstr = "blue";
+	else teamstr = "";
+	strncpy(netname, value, sizeof(netname)-1);
+	netname[sizeof(netname)-1] = '\0';
+	Q_CleanStr(netname);
+	trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", netname, skill, teamstr, 0) );
+}
+#endif
 
 /*
 ===============
@@ -588,22 +641,17 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
     // Turtle Man: Check for random bot.
     if (Q_stricmp(name, "Random") == 0)
     {
-#if 1 // Use Quake3's own code, it works better than mine...
+    	int t;
+
 		if (Q_stricmp(team, "blue") == 0)
-			G_AddRandomBot(TEAM_BLUE);
+			t = TEAM_BLUE;
 		else if (Q_stricmp(team, "red") == 0)
-			G_AddRandomBot(TEAM_RED);
+			t = TEAM_RED;
 		else
-			G_AddRandomBot(TEAM_FREE);
-		return;
-#else
-        // Randomly select a bot.
-        // 0 though g_numBots-1
-        int num = (abs(rand())%g_numBots);
+			t = TEAM_FREE;
 
         // Get info of randomly selected bot.
-        botinfo = G_GetBotInfoByNumber(num);
-#endif
+		botinfo = G_GetBotInfoByNumber(G_SelectRandomBotForAdd(t));
     }
     else
 #endif
@@ -1039,7 +1087,7 @@ void G_InitBots( qboolean restart ) {
 #ifdef TMNTMISC // frag to score
 		strValue = Info_ValueForKey( arenainfo, "scorelimit" );
 		fragLimit = atoi( strValue );
-#ifdef TMNT_SUPPORTQ3
+#if !defined TMNT || defined TMNT_SUPPORTQ3
 		// Support Q3 "fraglimit" in arenas.txt
 		if ( !fragLimit )
 		{

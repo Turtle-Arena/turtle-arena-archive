@@ -201,7 +201,7 @@ void CG_Respawn( void ) {
 	// select the weapon the server says we are using
 	cg.weaponSelect = cg.snap->ps.weapon;
 #endif
-#ifdef TMNTHOLDSYS2
+#ifdef TMNTHOLDSYS/*2*/
 	cg.holdableSelect = cg.snap->ps.holdableIndex;
 #endif
 }
@@ -307,7 +307,9 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 #else
 	int			highScore, health, armor, reward;
 #endif
+#ifndef TMNTWEAPONS
 	sfxHandle_t sfx;
+#endif
 
 	// don't play the sounds if the player just changed teams
 	if ( ps->persistant[PERS_TEAM] != ops->persistant[PERS_TEAM] ) {
@@ -373,7 +375,6 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("impressive\n");
 	}
-#endif
 	if (ps->persistant[PERS_EXCELLENT_COUNT] != ops->persistant[PERS_EXCELLENT_COUNT]) {
 #ifdef MISSIONPACK
 		if (ps->persistant[PERS_EXCELLENT_COUNT] == 1) {
@@ -388,7 +389,6 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("excellent\n");
 	}
-#ifndef TMNTWEAPONS
 	if (ps->persistant[PERS_GAUNTLET_FRAG_COUNT] != ops->persistant[PERS_GAUNTLET_FRAG_COUNT]) {
 #ifdef MISSIONPACK
 		if (ops->persistant[PERS_GAUNTLET_FRAG_COUNT] == 1) {

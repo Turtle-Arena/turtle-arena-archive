@@ -82,11 +82,10 @@ public:
 	friend mat3_t	SkewSymmetric( idVec3_t const &src );
 };
 
-#if 1 // Turtle Man: Moved out of mat3_t class.
+// Turtle Man: Moved out of mat3_t class.
 void		toMatrix( quat_t const &src, mat3_t &dst );
 void		toMatrix( angles_t const &src, mat3_t &dst );
 void		toMatrix( idVec3_t const &src, mat3_t &dst );
-#endif
 
 ID_INLINE mat3_t::mat3_t() {
 }

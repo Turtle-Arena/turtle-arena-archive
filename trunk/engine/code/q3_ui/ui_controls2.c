@@ -106,15 +106,16 @@ typedef struct
 
 #ifdef TMNTHOLDSYS // Why isn't this a enum?...
 #define ID_NEXTITEM		24
+#define ID_PREVITEM		25
 
 // all others
-#define ID_FREELOOK		25
-#define ID_INVERTMOUSE	26
-#define ID_ALWAYSRUN	27
-#define ID_MOUSESPEED	28
-#define ID_JOYENABLE	29
-#define ID_JOYTHRESHOLD	30
-#define ID_SMOOTHMOUSE	31
+#define ID_FREELOOK		26
+#define ID_INVERTMOUSE	27
+#define ID_ALWAYSRUN	28
+#define ID_MOUSESPEED	29
+#define ID_JOYENABLE	30
+#define ID_JOYTHRESHOLD	31
+#define ID_SMOOTHMOUSE	32
 
 #else
 
@@ -149,16 +150,17 @@ typedef struct
 
 #ifdef TMNTHOLDSYS // Why isn't this a enum?...
 #define ID_NEXTITEM		34
+#define ID_PREVITEM		35
 
 // all others
-#define ID_FREELOOK		35
-#define ID_INVERTMOUSE	36
-#define ID_ALWAYSRUN	37
-#define ID_AUTOSWITCH	38
-#define ID_MOUSESPEED	39
-#define ID_JOYENABLE	40
-#define ID_JOYTHRESHOLD	41
-#define ID_SMOOTHMOUSE	42
+#define ID_FREELOOK		36
+#define ID_INVERTMOUSE	37
+#define ID_ALWAYSRUN	38
+#define ID_AUTOSWITCH	39
+#define ID_MOUSESPEED	40
+#define ID_JOYENABLE	41
+#define ID_JOYTHRESHOLD	42
+#define ID_SMOOTHMOUSE	43
 #else
 // all others
 #define ID_FREELOOK		34
@@ -260,8 +262,9 @@ typedef struct
 	menuradiobutton_s	autoswitch;
 #endif
 	menuaction_s		useitem;
-#ifdef TMNTHOLDSYS
+#ifdef TMNTHOLDSYS/*2*/
 	menuaction_s		nextitem;
+	menuaction_s		previtem;
 #endif
 	playerInfo_t		playerinfo;
 	qboolean			changesmade;
@@ -335,8 +338,9 @@ static bind_t g_bindings[] =
 #endif
 	{"messagemode3", 	"chat - target",	ID_CHAT3,		ANIM_CHAT,		-1,				-1,		-1, -1},
 	{"messagemode4", 	"chat - attacker",	ID_CHAT4,		ANIM_CHAT,		-1,				-1,		-1, -1},
-#ifdef TMNTHOLDSYS
-	{"+button12",		"next item",		ID_NEXTITEM,	ANIM_IDLE,		'\'',			-1,		-1, -1},
+#ifdef TMNTHOLDSYS/*2*/
+	{"holdnext",		"next item",		ID_NEXTITEM,	ANIM_IDLE,		K_MWHEELUP,		'\'',	-1, -1},
+	{"holdprev",		"prev item",		ID_PREVITEM,	ANIM_IDLE,		K_MWHEELDOWN,	-1,		-1, -1},
 #endif
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
 };
@@ -411,8 +415,9 @@ static menucommon_s *g_looking_controls[] = {
 static menucommon_s *g_misc_controls[] = {
 	(menucommon_s *)&s_controls.showscores, 
 	(menucommon_s *)&s_controls.useitem,
-#ifdef TMNTHOLDSYS
+#ifdef TMNTHOLDSYS/*2*/
 	(menucommon_s *)&s_controls.nextitem,
+	(menucommon_s *)&s_controls.previtem,
 #endif
 	(menucommon_s *)&s_controls.gesture,
 	(menucommon_s *)&s_controls.chat,
@@ -1282,9 +1287,11 @@ Controls_InitWeapons
 =================
 */
 static void Controls_InitWeapons( void ) {
+#ifndef TMNTWEAPSYS2 // We don't change weapons in controls menu...
 	gitem_t *	item;
 
-	for ( item = bg_itemlist + 1 ; item->classname ; item++ ) {
+	for ( item = bg_itemlist + 1 ; item->classname ; item++ )
+	{
 		if ( item->giType != IT_WEAPON ) {
 			continue;
 		}
@@ -1308,6 +1315,7 @@ static void Controls_InitWeapons( void ) {
 		trap_R_RegisterModel( item->world_model[0] );
 #endif
 	}
+#endif
 }
 
 /*
@@ -1597,12 +1605,18 @@ static void Controls_MenuInit( void )
 	s_controls.useitem.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.useitem.generic.id        = ID_USEITEM;
 
-#ifdef TMNTHOLDSYS
+#ifdef TMNTHOLDSYS/*2*/
 	s_controls.nextitem.generic.type	  = MTYPE_ACTION;
 	s_controls.nextitem.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.nextitem.generic.callback  = Controls_ActionEvent;
 	s_controls.nextitem.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.nextitem.generic.id        = ID_NEXTITEM;
+
+	s_controls.previtem.generic.type	  = MTYPE_ACTION;
+	s_controls.previtem.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.previtem.generic.callback  = Controls_ActionEvent;
+	s_controls.previtem.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.previtem.generic.id        = ID_PREVITEM;
 #endif
 
 	s_controls.showscores.generic.type	    = MTYPE_ACTION;
@@ -1766,8 +1780,9 @@ static void Controls_MenuInit( void )
 
 	Menu_AddItem( &s_controls.menu, &s_controls.showscores );
 	Menu_AddItem( &s_controls.menu, &s_controls.useitem );
-#ifdef TMNTHOLDSYS
+#ifdef TMNTHOLDSYS/*2*/
 	Menu_AddItem( &s_controls.menu, &s_controls.nextitem );
+	Menu_AddItem( &s_controls.menu, &s_controls.previtem );
 #endif
 	Menu_AddItem( &s_controls.menu, &s_controls.gesture );
 	Menu_AddItem( &s_controls.menu, &s_controls.chat );

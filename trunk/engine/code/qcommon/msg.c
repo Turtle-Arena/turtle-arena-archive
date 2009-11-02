@@ -673,7 +673,7 @@ void MSG_WriteDeltaUsercmd( msg_t *msg, usercmd_t *from, usercmd_t *to ) {
 #ifndef TMNTWEAPSYS2
 	MSG_WriteDelta( msg, from->weapon, to->weapon, 8 );
 #endif
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+#ifdef TMNTHOLDSYS/*2*/
 	MSG_WriteDelta( msg, from->holdable, to->holdable, 8 );
 #endif
 }
@@ -700,7 +700,7 @@ void MSG_ReadDeltaUsercmd( msg_t *msg, usercmd_t *from, usercmd_t *to ) {
 #ifndef TMNTWEAPSYS2
 	to->weapon = MSG_ReadDelta( msg, from->weapon, 8);
 #endif
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+#ifdef TMNTHOLDSYS/*2*/
 	to->holdable = MSG_ReadDelta( msg, from->holdable, 8);
 #endif
 }
@@ -728,7 +728,7 @@ void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *
 #ifndef TMNTWEAPSYS2
 		&& from->weapon == to->weapon
 #endif
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+#ifdef TMNTHOLDSYS/*2*/
 		&& from->holdable == to->holdable
 #endif
 		) {
@@ -748,7 +748,7 @@ void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *
 #ifndef TMNTWEAPSYS2
 	MSG_WriteDeltaKey( msg, key, from->weapon, to->weapon, 8 );
 #endif
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+#ifdef TMNTHOLDSYS/*2*/
 	MSG_WriteDeltaKey( msg, key, from->holdable, to->holdable, 8 );
 #endif
 }
@@ -777,7 +777,7 @@ void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *t
 #ifndef TMNTWEAPSYS2
 		to->weapon = MSG_ReadDeltaKey( msg, key, from->weapon, 8);
 #endif
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+#ifdef TMNTHOLDSYS/*2*/
 		to->holdable = MSG_ReadDeltaKey( msg, key, from->holdable, 8);
 #endif
 	} else {
@@ -791,7 +791,7 @@ void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *t
 #ifndef TMNTWEAPSYS2
 		to->weapon = from->weapon;
 #endif
-#if defined TMNTHOLDSYS2 || defined TMNTHOLDSYS2BOT
+#ifdef TMNTHOLDSYS/*2*/
 		to->holdable = from->holdable;
 #endif
 	}
@@ -849,7 +849,11 @@ netField_t	entityStateFields[] =
 { NETF(legsAnim), 8 },
 { NETF(groundEntityNum), GENTITYNUM_BITS },
 { NETF(pos.trType), 8 },
+#ifdef TMNT // IOQ3ZTM? Turtle Man: FIXME: Are all the flags (EF_*) being sent?!
+{ NETF(eFlags), 32 },
+#else
 { NETF(eFlags), 19 },
+#endif
 { NETF(otherEntityNum), GENTITYNUM_BITS },
 { NETF(weapon), 8 },
 { NETF(clientNum), 8 },
@@ -1209,7 +1213,6 @@ netField_t	playerStateFields[] =
 { PSF(meleeDelay), 16 },
 { PSF(comboTime), 16 },
 { PSF(weaponHands), 4 },
-{ PSF(attack_melee), 1 }
 #endif
 };
 

@@ -146,7 +146,7 @@ void SP_func_button (gentity_t *ent);
 void SP_func_door (gentity_t *ent);
 void SP_func_train (gentity_t *ent);
 void SP_func_timer (gentity_t *self);
-#ifdef STYEF_ENTITY // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 void SP_func_breakable (gentity_t *self);
 #endif
 
@@ -185,9 +185,6 @@ void SP_path_corner (gentity_t *self);
 
 void SP_misc_teleporter_dest (gentity_t *self);
 void SP_misc_model(gentity_t *ent);
-#ifdef SINGLEPLAYER // entity
-void SP_misc_model_anim(gentity_t *ent);
-#endif
 #ifdef TMNTENTSYS // MISC_OBJECT
 void SP_misc_object(gentity_t *ent);
 #endif
@@ -236,11 +233,8 @@ spawn_t	spawns[] = {
 	{"func_train", SP_func_train},
 	{"func_group", SP_info_null},
 	{"func_timer", SP_func_timer},			// rename trigger_timer?
-#ifdef STYEF_ENTITY // BREAKABLE
-	// Entities based on Star Trek: Elite Force entities
-	//{"func_usable", SP_func_usable},
+#ifdef TMNTENTSYS // BREAKABLE
 	{"func_breakable", SP_func_breakable},
-	//{"func_door_rotating", SP_func_door_rotating},
 #endif
 
 	// Triggers are brush objects that cause an effect when contacted
@@ -286,9 +280,6 @@ spawn_t	spawns[] = {
 
 	{"misc_teleporter_dest", SP_misc_teleporter_dest},
 	{"misc_model", SP_misc_model},
-#ifdef SINGLEPLAYER // entity
-	{"misc_model_anim", SP_misc_model_anim},
-#endif
 #ifdef TMNTENTSYS // MISC_OBJECT
 	{"misc_object", SP_misc_object},
 #endif
@@ -337,11 +328,28 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 #ifdef SP_NPC
 	bgnpc_t *npc;
 #endif
+#ifdef TMNTWEAPSYS_2
+	int i;
+	int max;
+#endif
 
 	if ( !ent->classname ) {
 		G_Printf ("G_CallSpawn: NULL classname\n");
 		return qfalse;
 	}
+
+#ifdef TMNTWEAPSYS_2
+	// Turtle Man: NOTE: Placed before items so if weapon is on both list
+	//                    uses external item.
+	// check weapon item spawn functions
+	max = BG_NumWeaponGroups();
+	for ( i = 0; i < max; i++ ) {
+		if ( !strcmp(bg_weapongroupinfo[i].itemName, ent->classname) ) {
+			G_SpawnItem( ent, &bg_weapongroupinfo[i].item );
+			return qtrue;
+		}
+	}
+#endif
 
 	// check item spawn functions
 	for ( item=bg_itemlist+1 ; item->classname ; item++ ) {

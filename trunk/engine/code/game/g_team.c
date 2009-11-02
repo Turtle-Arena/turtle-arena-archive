@@ -173,6 +173,27 @@ OnSameTeam
 ==============
 */
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 ) {
+#ifdef SP_NPC // Turtle Man: (i made this)
+	int team1, team2;
+
+	if ( ent1->client)
+		team1 = ent1->client->sess.sessionTeam;
+	//else if (ent1->s.eType == ET_NPC)
+	//	team1 = 0;
+	else
+		return qfalse;
+
+	if ( ent2->client)
+		team2 = ent2->client->sess.sessionTeam;
+	//else if (ent1->s.eType == ET_NPC)
+	//	team2 = 0;
+	else
+		return qfalse;
+
+	if ( team1 == team2 ) {
+		return qtrue;
+	}
+#else
 	if ( !ent1->client || !ent2->client ) {
 		return qfalse;
 	}
@@ -184,6 +205,7 @@ qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 ) {
 	if ( ent1->client->sess.sessionTeam == ent2->client->sess.sessionTeam ) {
 		return qtrue;
 	}
+#endif
 
 	return qfalse;
 }
@@ -375,7 +397,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
 		team = attacker->client->sess.sessionTeam;
 		// add the sprite over the player's head
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 		attacker->client->ps.eFlags &= ~EF_AWARD_BITS;
 #else
 		attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
@@ -397,7 +419,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
 		team = attacker->client->sess.sessionTeam;
 		// add the sprite over the player's head
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 		attacker->client->ps.eFlags &= ~EF_AWARD_BITS;
 #else
 		attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
@@ -481,7 +503,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 
 		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
 		// add the sprite over the player's head
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 		attacker->client->ps.eFlags &= ~EF_AWARD_BITS;
 #else
 		attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
@@ -506,7 +528,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 
 			attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
 			// add the sprite over the player's head
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 			attacker->client->ps.eFlags &= ~EF_AWARD_BITS;
 #else
 			attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
@@ -783,7 +805,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 
 	other->client->pers.teamState.captures++;
 	// add the sprite over the player's head
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	other->client->ps.eFlags &= ~EF_AWARD_BITS;
 #else
 	other->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
@@ -802,13 +824,19 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 		player = &g_entities[i];
 		if (!player->inuse)
 			continue;
+#ifdef IOQ3ZTM // Don't give bonus points to player who captured the flag.
+		if (player == other)
+			continue;
+#endif
 
 		if (player->client->sess.sessionTeam !=
 			cl->sess.sessionTeam) {
 			player->client->pers.teamState.lasthurtcarrier = -5;
 		} else if (player->client->sess.sessionTeam ==
 			cl->sess.sessionTeam) {
+#ifndef IOQ3ZTM
 			if (player != other)
+#endif
 				AddScore(player, ent->r.currentOrigin, CTF_TEAM_BONUS);
 			// award extra points for capture assists
 			if (player->client->pers.teamState.lastreturnedflag + 
@@ -818,7 +846,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 
 				player->client->ps.persistant[PERS_ASSIST_COUNT]++;
 				// add the sprite over the player's head
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 				player->client->ps.eFlags &= ~EF_AWARD_BITS;
 #else
 				player->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
@@ -832,7 +860,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 				other->client->pers.teamState.assists++;
 				player->client->ps.persistant[PERS_ASSIST_COUNT]++;
 				// add the sprite over the player's head
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 				player->client->ps.eFlags &= ~EF_AWARD_BITS;
 #else
 				player->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
@@ -880,7 +908,9 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 	}
 #endif
 
+#if !defined IOQ3ZTM || (CTF_FLAG_BONUS != 0) // Turtle Man: Does a "0" spawn in Q3?
 	AddScore(other, ent->r.currentOrigin, CTF_FLAG_BONUS);
+#endif
 	cl->pers.teamState.flagsince = level.time;
 	Team_TakeFlagSound( ent, team );
 
@@ -1021,7 +1051,12 @@ go to a random point that doesn't telefrag
 ================
 */
 #define	MAX_TEAM_SPAWN_POINTS	32
-gentity_t *SelectRandomTeamSpawnPoint( int teamstate, team_t team ) {
+gentity_t *SelectRandomTeamSpawnPoint(
+#ifdef TMNTPLAYERSYS
+	gentity_t *ent,
+#endif
+	int teamstate, team_t team )
+{
 	gentity_t	*spot;
 	int			count;
 	int			selection;
@@ -1048,7 +1083,11 @@ gentity_t *SelectRandomTeamSpawnPoint( int teamstate, team_t team ) {
 	spot = NULL;
 
 	while ((spot = G_Find (spot, FOFS(classname), classname)) != NULL) {
-		if ( SpotWouldTelefrag( spot ) ) {
+		if ( SpotWouldTelefrag( spot
+#ifdef TMNTPLAYERSYS
+			, ent
+#endif
+		) ) {
 			continue;
 		}
 		spots[ count ] = spot;
@@ -1071,13 +1110,26 @@ SelectCTFSpawnPoint
 
 ============
 */
-gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles ) {
+gentity_t *SelectCTFSpawnPoint (
+#ifdef TMNTPLAYERSYS
+	gentity_t *ent,
+#endif
+	team_t team, int teamstate, vec3_t origin, vec3_t angles )
+{
 	gentity_t	*spot;
 
-	spot = SelectRandomTeamSpawnPoint ( teamstate, team );
+	spot = SelectRandomTeamSpawnPoint (
+#ifdef TMNTPLAYERSYS
+			ent,
+#endif
+			teamstate, team );
 
 	if (!spot) {
+#ifdef TMNTPLAYERSYS
+		return SelectSpawnPoint( ent, origin, angles );
+#else
 		return SelectSpawnPoint( vec3_origin, origin, angles );
+#endif
 	}
 
 	VectorCopy (spot->s.origin, origin);
@@ -1306,7 +1358,7 @@ static void ObeliskDie( gentity_t *self, gentity_t *inflictor, gentity_t *attack
 	AddScore(attacker, self->r.currentOrigin, CTF_CAPTURE_BONUS);
 
 	// add the sprite over the player's head
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	attacker->client->ps.eFlags &= ~EF_AWARD_BITS;
 #else
 	attacker->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
@@ -1346,7 +1398,7 @@ static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	AddScore(other, self->r.currentOrigin, CTF_CAPTURE_BONUS*tokens);
 
 	// add the sprite over the player's head
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	other->client->ps.eFlags &= ~EF_AWARD_BITS;
 #else
 	other->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
@@ -1497,19 +1549,23 @@ void SP_team_blueobelisk( gentity_t *ent ) {
 /*QUAKED team_neutralobelisk (0 0 1) (-16 -16 0) (16 16 88)
 */
 void SP_team_neutralobelisk( gentity_t *ent ) {
+	if ( g_gametype.integer != GT_1FCTF
 #ifdef MISSIONPACK_HARVESTER
-	if ( g_gametype.integer != GT_1FCTF && g_gametype.integer != GT_HARVESTER ) {
+		&& g_gametype.integer != GT_HARVESTER
+#endif
+		) {
 		G_FreeEntity(ent);
 		return;
 	}
 	ent->s.eType = ET_TEAM;
+#ifdef MISSIONPACK_HARVESTER
 	if ( g_gametype.integer == GT_HARVESTER) {
 		neutralObelisk = SpawnObelisk( ent->s.origin, TEAM_FREE, ent->spawnflags);
 		neutralObelisk->spawnflags = TEAM_FREE;
 	}
+#endif
 	ent->s.modelindex = TEAM_FREE;
 	trap_LinkEntity(ent);
-#endif
 }
 
 

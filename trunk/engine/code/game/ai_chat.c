@@ -353,7 +353,7 @@ char *BotRandomWeaponName(void) {
 		case 3: return "Sai";
 		case 4: return "Nunchuk";
 		case 5: return "Hammer";
-		case 6: return "Axe";
+		case 6: return "Battle Axe";
 		case 7: return "Sword";
 		case 8: return "Baseball Bat";
 		case 9: return "Bo";
@@ -661,7 +661,7 @@ int BotChat_Death(bot_state_t *bs) {
 				bs->botdeathtype == MOD_SUICIDE ||
 				bs->botdeathtype == MOD_TARGET_LASER ||
 				bs->botdeathtype == MOD_TRIGGER_HURT ||
-#ifdef STYEF_ENTITY
+#ifdef TMNTENTSYS
 				bs->botdeathtype == MOD_EXPLOSION ||
 #endif
 				bs->botdeathtype == MOD_UNKNOWN)

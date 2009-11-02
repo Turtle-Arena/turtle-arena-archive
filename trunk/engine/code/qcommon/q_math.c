@@ -160,29 +160,6 @@ float	Q_crandom( int *seed ) {
 	return 2.0 * ( Q_random( seed ) - 0.5 );
 }
 
-#ifdef STYEF_ENTITY
-// Returns value is more or equal to min and less then max (max value is max-0.000001)
-float flrandom(float min, float max)
-{
-#if 0 // Turtle Man: i made this
-	// Turtle Man: FIXME: This is not random, always returns the same!
-	return min+((min+max)/2.0f);
-#else // Turtle Man: FIXME: NON-GPL code from Star Trek: Elite Force (code-DM)
-	return ((rand() * (max - min)) / 32768.0f) + min;
-#endif
-}
-
-// Return is more or equal to min and less or equal to max
-int irandom(int min, int max)
-{
-#if 1 // Turtle Man: i made this
-	return min + (rand() % ((max + 1) - min));
-#else // Turtle Man: FIXME: NON-GPL code from Star Trek: Elite Force (code-DM)
-	return ((rand() * ((max + 1) - min)) >> 15) + min;
-#endif
-}
-#endif
-
 //=======================================================
 
 signed char ClampChar( int i ) {
@@ -389,7 +366,7 @@ void RotateAroundDirection( vec3_t axis[3], float yaw ) {
 	CrossProduct( axis[0], axis[1], axis[2] );
 }
 
-#ifdef IOQ3ZTM3 // XREAL
+#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS // XREAL?
 /*
 =====================
 Q_acos
@@ -670,7 +647,7 @@ float AngleDelta ( float angle1, float angle2 ) {
 	return AngleNormalize180( angle1 - angle2 );
 }
 
-#ifdef TMNTWEAPONS // XREAL
+#if defined TMNTWEAPONS || defined TMNTWEAPSYS_2 // XREAL
 /*
 =================
 AngleBetweenVectors
@@ -692,7 +669,7 @@ float AngleBetweenVectors(const vec3_t a, const vec3_t b)
 	// this results in:
 	//
 	// angle = acos( (a * b) / (|a| * |b|) )
-	// !!must have IOQ3ZTM3 defined here!!
+	// Turtle Man: NOTE: Must have IOQ3ZTM3 defined here
 	return RAD2DEG(Q_acos(DotProduct(a, b) / (alen * blen)));
 }
 #endif

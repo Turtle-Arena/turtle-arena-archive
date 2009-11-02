@@ -243,6 +243,9 @@ static void CG_NPCAnimation( centity_t *cent, int *bodyOld, int *body, float *bo
 			}
 		}
 	}
+#if 0
+	// Turtle Man: NOTE: No long have full level saving
+	//   (plus if dead had its own anim like players wouldn't need this)
 //
 // changes for load/save
 //
@@ -251,6 +254,7 @@ static void CG_NPCAnimation( centity_t *cent, int *bodyOld, int *body, float *bo
 		cent->ne.body.oldFrame = cent->ne.body.frame;
 		cent->ne.body.backlerp = 0;
 	}
+#endif
 //
 // end changes
 //
@@ -303,7 +307,11 @@ void CG_NPC( centity_t *cent ) {
 		// the first three animations (0,1,2) are DEATH!
 		&& (cent->currentState.modelindex2 & ~ANIM_TOGGLEBIT)>2)
 	{
+#ifdef TMNTWEAPSYS_2
+		weapon = &cg_weapongroups[npc->weapon];
+#else
 		weapon = &cg_weapons[npc->weapon];
+#endif
 		memset( &gun, 0, sizeof( gun ) );
 		VectorCopy( body.lightingOrigin, gun.lightingOrigin );
 		gun.shadowPlane = body.shadowPlane;

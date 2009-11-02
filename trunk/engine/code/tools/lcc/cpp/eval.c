@@ -107,7 +107,8 @@ eval(Tokenrow *trp, int kw)
 
 	trp->tp++;
 	if (kw==KIFDEF || kw==KIFNDEF) {
-		if (trp->lp - trp->bp != 4 || trp->tp->type!=NAME) {
+		if (trp->lp - trp->bp != 4 || trp->tp->type!=NAME)
+		{
 			error(ERROR, "Syntax error in #ifdef/#ifndef");
 			return 0;
 		}

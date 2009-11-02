@@ -901,7 +901,12 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 						// now that we know the file is referenced,
 						// check whether it's legal to download it.
 						missionPack = FS_idPak(pakbuf, "missionpack");
+#ifdef STANDALONE // IOQ3ZTM
+						idPack = missionPack || FS_idPak(pakbuf, "baseq3")
+								|| FS_idPak(pakbuf, BASEGAME);
+#else
 						idPack = missionPack || FS_idPak(pakbuf, BASEGAME);
+#endif
 
 						break;
 					}

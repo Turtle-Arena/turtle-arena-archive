@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 #ifdef TMNT // Botlib is not compatible with (io)quake3 (or anyone else)
-// Turtle Man: FIXME: Should only be if TMNTWEAPSYS2 or TMNTHOLDSYS or TMNTHOLDSYS2 or TMNTHOLDSYS2BOT ?
+// Turtle Man: FIXME: Should only be if TMNTWEAPSYS2 or TMNTHOLDSYS ?
 #define	BOTLIB_API_VERSION		3
 #else
 #define	BOTLIB_API_VERSION		2
@@ -404,7 +404,9 @@ typedef struct ai_export_s
 	// be_ai_weap.h
 	//-----------------------------------
 	int		(*BotChooseBestFightWeapon)(int weaponstate, int *inventory);
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 	void	(*BotGetWeaponInfo)(int weaponstate, int weapon, struct weaponinfo_s *weaponinfo);
+#endif
 	int		(*BotLoadWeaponWeights)(int weaponstate, char *filename);
 	int		(*BotAllocWeaponState)(void);
 	void	(*BotFreeWeaponState)(int weaponstate);

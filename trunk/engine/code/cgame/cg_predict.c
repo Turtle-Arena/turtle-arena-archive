@@ -277,7 +277,11 @@ static void CG_TouchItem( centity_t *cent ) {
 		return;		// can't hold it
 	}
 
+#ifdef TMNTWEAPSYS_2
+	item = BG_ItemForItemNum(cent->currentState.modelindex);
+#else
 	item = &bg_itemlist[ cent->currentState.modelindex ];
+#endif
 
 	// Special case for flags.  
 	// We don't predict touching our own flag
@@ -617,10 +621,8 @@ void CG_PredictPlayerState( void ) {
 		//CG_CheckChangedPredictableEvents(&cg.predictedPlayerState);
 	}
 
-#ifdef TMNTHOLDSYS2 // Turtle Man: Fix for auto changing in PMove!
-	if (cg_pmove.ps) {
+#ifdef TMNTHOLDSYS/*2*/ // Turtle Man: Fix for auto changing in PMove!
 		cg.holdableSelect = HI_NO_SELECT;
-	}
 #endif
 
 	if ( cg_showmiss.integer > 1 ) {

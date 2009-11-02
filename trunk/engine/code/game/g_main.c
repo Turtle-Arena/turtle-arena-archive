@@ -108,6 +108,8 @@ vmCvar_t	g_proxMineTimeout;
 vmCvar_t	g_singlePlayer;
 vmCvar_t	g_spSaveData; // Used to save data between levels.
 //vmCvar_t	g_spSaveDataNet[MAX_CLIENTS]; // Save data for all clients
+vmCvar_t	g_saveVersions;
+vmCvar_t	g_saveTypes;
 #endif
 
 static cvarTable_t		gameCvarTable[] = {
@@ -210,6 +212,8 @@ static cvarTable_t		gameCvarTable[] = {
 #ifdef TMNTSP
 	{ &g_singlePlayer, "ui_singlePlayerActive", "", 0, 0, qfalse, qfalse  },
 	{ &g_spSaveData, "g_spSaveData", "", CVAR_SYSTEMINFO, 0, qfalse, qfalse  },
+	{ &g_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM, 0, 0, qfalse },
+	{ &g_saveTypes, "g_saveTypes", BG_SAVE_TYPES, CVAR_ROM, 0, 0, qfalse },
 #endif
 #ifdef IOQ3ZTM
 #ifdef TMNT // DEFAULT_TEAMS
@@ -279,7 +283,7 @@ intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, 
 	case GAME_SAVEGAME:
 		return G_SaveGame((fileHandle_t)arg0);
 	case GAME_LOADGAME:
-		G_LoadGame((fileHandle_t)arg0, arg1);
+		G_LoadGame((fileHandle_t)arg0);
 		return 0;
 #endif
 	case BOTAI_START_FRAME:
@@ -544,6 +548,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	ClearRegisteredItems();
 #ifdef SP_NPC
 	ClearRegisteredNPCs();
+#endif
+#ifdef TMNTWEAPSYS_2
+	BG_InitWeaponInfo();
 #endif
 
 	// parse the key/value pairs and spawn gentities
@@ -1023,7 +1030,11 @@ void FindIntermissionPoint( void ) {
 	// find the intermission spot
 	ent = G_Find (NULL, FOFS(classname), "info_player_intermission");
 	if ( !ent ) {	// the map creator forgot to put in an intermission point...
+#ifdef TMNTPLAYERSYS
+		SelectSpawnPoint ( NULL, level.intermission_origin, level.intermission_angle );
+#else
 		SelectSpawnPoint ( vec3_origin, level.intermission_origin, level.intermission_angle );
+#endif
 	} else {
 		VectorCopy (ent->s.origin, level.intermission_origin);
 		VectorCopy (ent->s.angles, level.intermission_angle);
@@ -1434,6 +1445,9 @@ void CheckExitRules( void ) {
 	if ( g_gametype.integer == GT_SINGLE_PLAYER
 		&& !level.intermissionQueued )
 	{
+		int numClients = 0; // Number of clients in the game.
+		int deadClients = 0; // No lives or continues.
+
 		for ( i=0 ; i< g_maxclients.integer ; i++ ) {
 			cl = level.clients + i;
 			if ( cl->pers.connected != CON_CONNECTED ) {
@@ -1449,6 +1463,38 @@ void CheckExitRules( void ) {
 				// Start intermission.
 				LogExit( "Completed level." );
 				return;
+			}
+
+			// Don't count spectators
+			if (cl->sess.sessionTeam == TEAM_SPECTATOR)
+				continue;
+
+			numClients++;
+			if (!cl->ps.persistant[PERS_LIVES] && !cl->ps.persistant[PERS_CONTINUES])
+			{
+				// Client has tried to respawn (or waited 3 seconds) with no lives or continues.
+				if (cl->respawnTime == -1) {
+					deadClients++;
+				}
+			}
+		}
+		// Check for Game Over
+		if (numClients > 0 && numClients == deadClients)
+		{
+			if (g_singlePlayer.integer)
+			{
+				// Return to the title screen.
+				trap_DropClient( 0, "Game Over" );
+			}
+			else
+			{
+				// Restart at map sp1a1?
+				char buf[MAX_QPATH];
+
+				Com_sprintf(buf, sizeof(buf), "spmap sp1a1");
+				trap_Cvar_Set("nextmap", buf);
+
+				ExitLevel();
 			}
 		}
 		return;
@@ -1936,6 +1982,13 @@ int start, end;
 			continue;
 		}
 
+#ifdef TMNTENTSYS // MISC_OBJECT
+		if ( ent->s.eType == ET_MISCOBJECT ) {
+			G_RunItem( ent );
+			continue;
+		}
+#endif
+
 		if ( ent->s.eType == ET_ITEM || ent->physicsObject ) {
 			G_RunItem( ent );
 			continue;
@@ -1944,13 +1997,6 @@ int start, end;
 #ifdef SP_NPC
 		if (ent->s.eType == ET_NPC) {
 			G_RunNPC(ent);
-			continue;
-		}
-#endif
-
-#ifdef SINGLEPLAYER // entity
-		if (ent->s.eType == ET_MODELANIM) {
-			G_RunMD3Anim(ent);
 			continue;
 		}
 #endif

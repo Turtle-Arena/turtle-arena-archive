@@ -875,6 +875,10 @@ typedef struct {
 	qboolean	projection2D;	// if qtrue, drawstretchpic doesn't need to change modes
 	byte		color2D[4];
 	qboolean	vertexes2D;		// shader needs to be finished
+#ifdef OA_BLOOM
+	qboolean	doneBloom;		// done bloom this frame
+	qboolean	doneSurfaces;   // done any 3d surfaces already
+#endif
 	trRefEntity_t	entity2D;	// currentEntity will point at this when doing 2D rendering
 } backEndState_t;
 
@@ -1464,7 +1468,7 @@ void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, fl
 void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_RenderScene( const refdef_t *fd );
 
-#ifdef RAVENMD4
+#if 0 // #ifdef RAVENMD4 // Turtle Man: Moved to tr_model.c
 /*
 =============================================================
 
@@ -1702,6 +1706,9 @@ void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
 void RE_SetColor( const float *rgba );
 void RE_StretchPic ( float x, float y, float w, float h, 
 					  float s1, float t1, float s2, float t2, qhandle_t hShader );
+#ifdef OA_BLOOM
+void RB_SetGL2D (void);
+#endif
 void RE_BeginFrame( stereoFrame_t stereoFrame );
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
 void SaveJPG(char * filename, int quality, int image_width, int image_height, unsigned char *image_buffer);
@@ -1716,5 +1723,10 @@ void R_InitFreeType( void );
 void R_DoneFreeType( void );
 void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font);
 
+#ifdef OA_BLOOM
+//Bloom Stuff
+void R_BloomInit( void );
+void R_BloomScreen( void );
+#endif
 
 #endif //TR_LOCAL_H

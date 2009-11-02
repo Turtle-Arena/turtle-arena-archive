@@ -104,6 +104,7 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	// toggle the teleport bit so the client knows to not lerp
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
 #ifdef TMNT
+	player->client->ps.eFlags |= EF_TELE_EFFECT;
 	player->client->teleEffectTime = level.time;
 #endif
 
@@ -273,6 +274,13 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 
 	VectorNormalize( dir );
 
+#ifdef TMNTWEAPSYS_2
+	if (!fire_weapon(ent, ent->s.origin, dir, right, up,
+				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], 1))
+	{
+		return;
+	}
+#else
 	switch ( ent->s.weapon ) {
 #ifdef TMNTWEAPONS
 	case WP_GUN:
@@ -299,6 +307,7 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 		break;
 #endif
 	}
+#endif
 
 	G_AddEvent( ent, EV_FIRE_WEAPON, 0 );
 }
@@ -339,7 +348,11 @@ Fires at either the target or the current direction.
 "random" the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_rocket( gentity_t *ent ) {
+#ifdef TMNTWEAPSYS_2
+	InitShooter( ent, BG_WeaponIndexForName("wp_rocket_launcher") );
+#else
 	InitShooter( ent, WP_ROCKET_LAUNCHER );
+#endif
 }
 
 /*QUAKED shooter_plasma (1 0 0) (-16 -16 -16) (16 16 16)
@@ -347,7 +360,13 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_plasma( gentity_t *ent ) {
+#ifdef TMNTWEAPSYS_2
 #ifdef TMNTWEAPONS
+	InitShooter( ent, BG_WeaponIndexForName("wp_electric_launcher") );
+#else
+	InitShooter( ent, BG_WeaponIndexForName("wp_plasmagun") );
+#endif
+#elif defined TMNTWEAPONS
 	InitShooter( ent, WP_ELECTRIC_LAUNCHER);
 #else
 	InitShooter( ent, WP_PLASMAGUN);
@@ -359,7 +378,9 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_grenade( gentity_t *ent ) {
-#ifdef TMNTWEAPONS
+#ifdef TMNTWEAPSYS_2
+	InitShooter( ent, BG_WeaponIndexForName("wp_homing_launcher") );
+#elif defined TMNTWEAPONS
 	InitShooter( ent, WP_HOMING_LAUNCHER);
 #else
 	InitShooter( ent, WP_GRENADE_LAUNCHER);
@@ -409,9 +430,13 @@ void DropPortalDestination( gentity_t *player ) {
 	// give the item back so they can drop the source now
 #ifdef TMNTHOLDSYS
 	player->client->ps.holdableIndex = HI_PORTAL;
-	player->client->ps.holdable[HI_PORTAL] = 1;
+	player->client->ps.holdable[HI_PORTAL]++;
+#else
+#ifdef IOQ3ZTM
+	player->client->ps.stats[STAT_HOLDABLE_ITEM] = ITEM_INDEX( BG_FindItem( "Portal" ) );
 #else
 	player->client->ps.stats[STAT_HOLDABLE_ITEM] = BG_FindItem( "Portal" ) - bg_itemlist;
+#endif
 #endif
 }
 
@@ -515,146 +540,8 @@ void DropPortalSource( gentity_t *player ) {
 
 }
 #endif
-#ifdef SINGLEPLAYER // entity
-void FinishSpawningMD3Anim( gentity_t *ent ) {
-	trace_t		tr;
-	vec3_t		dest;
-	ent->s.modelindex = G_ModelIndex( ent->model );
-	ent->s.eType = ET_MODELANIM;
-
-	if ( ! (ent->spawnflags & 4 )) {
-		// suspended
-		G_SetOrigin( ent, ent->s.origin );
-	} else {
-		// drop to floor
-		ent->r.contents = CONTENTS_BODY;
-		VectorSet( ent->r.mins, -24, -24, -24 );
-		VectorSet( ent->r.maxs, 24, 24, 24 );
-		{
-			char modelName[MAX_QPATH];
-			char		fname[MAX_QPATH];
-			int			len;
-			char		text[10000],*text_p;
-			fileHandle_t	f;
-
-			trap_GetConfigstring( CS_MODELS+ent->s.modelindex ,modelName,sizeof(modelName));
-			strcpy(fname,modelName);
-
-			text_p=fname+strlen(fname);
-			while (*text_p!='.' && *text_p!='\\' && text_p!=fname)
-				text_p--;
-			if (*text_p=='.')
-				*text_p=0;
-			Q_strcat(fname,sizeof(fname),".cfg");
-			len = trap_FS_FOpenFile( fname, &f, FS_READ );
-			if ( len <= 0 )
-			{
-				G_Printf("No config file found for %s , defaults will be used.\n",modelName);
-				goto read_times;
-			}
-			if ( len >= sizeof( text ) - 1 )
-			{
-				G_Printf( "File %s too long\n", fname );
-				goto read_times;
-			}
-			trap_FS_Read( text, len, f );
-			text[len] = 0;
-			trap_FS_FCloseFile( f );
-			text_p=text;
-			Parse1DMatrix (&text_p, 3, ent->r.mins);
-			Parse1DMatrix (&text_p, 3, ent->r.maxs);
-		read_times:
-			;
-		}
-		VectorSet( dest, ent->s.origin[0], ent->s.origin[1], ent->s.origin[2] - 4096 );
-		trap_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID );
-		if ( tr.startsolid ) {
-			G_Printf ("FinishSpawningMD3Anim: %s startsolid at %s\n",
-                     ent->classname, vtos(ent->s.origin));
-			G_FreeEntity( ent );
-			return;
-		}
-		// allow to ride movers
-		ent->s.groundEntityNum = tr.entityNum;
-		G_SetOrigin( ent, tr.endpos );
-	}
-	trap_LinkEntity (ent);
-}
-
-void ActivateAnimModel(gentity_t *ent,gentity_t *other,gentity_t *activator) {
-	ent->s.modelindex2++;
-}
-
-/*QUAKED misc_model_anim (1 0 0) (-16 -16 -16) (16 16 16) HIDDEN_START HIDDEN_END NOTSUSPENDED
-Animated MD3, select HIDDEN_START for the model to be hidden until de animation
- is triggered, and HIDDEN_END for disappearing after it's finished.
-"model"		arbitrary .md3 file to display/animate
-"speed"		speed scale (not less than 1.0) - used to scale ".anim" fps data (default = 1)
-"wait"		1=wait for trigger activation  0=animate w/o waiting (default = 0)
-*/
-
-void SP_misc_model_anim( gentity_t *ent ) {
-	G_SpawnFloat( "speed", "1.0", &ent->speed);
-	if (ent->speed<1) ent->speed=1;
-	VectorCopy( ent->s.angles, ent->s.apos.trBase );
-	ent->nextthink = level.time + FRAMETIME * 2;
-	ent->think = FinishSpawningMD3Anim;
-	G_SpawnFloat( "wait", "0", &ent->wait);
-	ent->s.modelindex2=0;
-	ent->s.generic1=ent->spawnflags + ((int)(ent->speed * 16) & 0xF0);	// solo 3 flags
-	if (ent->wait==0)
-		ActivateAnimModel(ent,ent,ent);
-	else
-		ent->use = ActivateAnimModel;
-}
-
-void G_RunMD3Anim( gentity_t *ent ) {
-	vec3_t		origin;
-	trace_t		tr;
-	int			contents;
-	int			mask;
-	// if groundentity has been set to -1, it may have been pushed off an edge
-	if ( ent->s.groundEntityNum == -1 ) {
-		if ( ent->s.pos.trType != TR_GRAVITY ) {
-			ent->s.pos.trType = TR_GRAVITY;
-			ent->s.pos.trTime = level.time;
-		}
-	}
-	if ( ent->s.pos.trType == TR_STATIONARY ) {
-		// check think function
-		G_RunThink( ent );
-		return;
-	}
-	// get current position
-	BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );
-	// trace a line from the previous position to the current position
-	if ( ent->clipmask ) {
-		mask = ent->clipmask;
-	} else {
-		mask = MASK_PLAYERSOLID & ~CONTENTS_BODY;//MASK_SOLID;
-	}
-	trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin,
-		ent->r.ownerNum, mask );
-	VectorCopy( tr.endpos, ent->r.currentOrigin );
-	if ( tr.startsolid ) {
-		tr.fraction = 0;
-	}
-	trap_LinkEntity( ent );	// FIXME: avoid this for stationary?
-	// check think function
-	G_RunThink( ent );
-	if ( tr.fraction == 1 ) {
-		return;
-	}
-	// if it is in a nodrop volume, remove it
-	contents = trap_PointContents( ent->r.currentOrigin, -1 );
-	if ( contents & CONTENTS_NODROP ) {
-		G_FreeEntity( ent );
-		return;
-	}
-}
-#endif
 #ifdef TMNTENTSYS // MISC_OBJECT
-// Turtle Man: TODO: There should also be func_* for brushes that acts mostly the same.
+// Turtle Man: TODO: There should also be func_* for brushes that acts mostly the same?
 
 /*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath
 "model"		arbitrary .md3 file to display
@@ -676,35 +563,42 @@ void G_RunMD3Anim( gentity_t *ent ) {
 "wait"      Time in seconds before respawning (default 0)
 */
 
-// misc_object flags
+// misc_object spawn flags
 #define MOBJF_SUSPENDED 1
 #define MOBJF_KNOCKBACK 2
 #define MOBJF_UNSOLIDDEATH 4
 
-// animations
-#define OBJECT_NORMAL		0
-#define OBJECT_DAMAGED1		1
-#define OBJECT_DAMAGED2		2
-#define OBJECT_DAMAGED3		3
-#define OBJECT_KILLED		4
-
 void misc_object_pain(gentity_t *self, gentity_t *attacker, int damage)
 {
+	int anim = OBJECT_NONE;
+	//G_Printf("misc_object_pain: damaging...\n");
 	// Change to damge animation at X health
 	if (self->health < (self->activator->health/5) * 2)
 	{
-		self->s.modelindex2 = OBJECT_DAMAGED3;
+		anim = OBJECT_DAMAGED3;
+		//G_Printf("    anim = OBJECT_DAMAGED3\n");
 	}
 	else if (self->health < (self->activator->health/5) * 3)
 	{
-		self->s.modelindex2 = OBJECT_DAMAGED2;
+		anim = OBJECT_DAMAGED2;
+		//G_Printf("    anim = OBJECT_DAMAGED2\n");
 	}
 	else if (self->health < (self->activator->health/5) * 4)
 	{
-		self->s.modelindex2 = OBJECT_DAMAGED1;
+		anim = OBJECT_DAMAGED1;
+		//G_Printf("    anim = OBJECT_DAMAGED1\n");
+	}
+
+	if (anim != OBJECT_NONE)
+	{
+		if (!(self->s.modelindex2 & ANIM_TOGGLEBIT))
+			self->s.modelindex2 = (anim|ANIM_TOGGLEBIT);
+		else
+			self->s.modelindex2 = anim;
 	}
 
 	// TODO: Limit how soon to call paintarget again?
+	// pain_debounce
 	if ( self->paintarget )
 	{
 		G_UseTargets2(self, attacker, self->paintarget);
@@ -715,6 +609,7 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles);
 
 void misc_object_respawn(gentity_t *self)
 {
+	G_Printf("misc_object_respawn: respawning...\n");
 	if (self->activator->spawnflags & MOBJF_KNOCKBACK)
 	{
 		// Turtle Man: FIXME: Not right if "self" moved from origin.
@@ -733,23 +628,29 @@ void misc_object_respawn(gentity_t *self)
 
 void misc_object_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
 {
+	if (!self->takedamage)
+		return;
+	self->takedamage = qfalse;
+
 	// Change to dead animation.
+	if (!(self->s.modelindex2 & ANIM_TOGGLEBIT))
+		self->s.modelindex2 = (OBJECT_KILLED|ANIM_TOGGLEBIT);
+	else
 	self->s.modelindex2 = OBJECT_KILLED;
 
-	// DEBUG: Stop drawing model, so I know its dead...
-	//self->s.modelindex = 0;
+	//G_Printf("misc_object_die: killed object.\n");
 
 	if (self->activator->spawnflags & MOBJF_UNSOLIDDEATH)
 	{
-		// Remove body flag
 		self->r.contents = 0;
+		trap_LinkEntity( self );
+		//G_Printf("    unsolid misc_object\n");
 	}
 
 	// if respawn
 	if (self->wait > 0)
 	{
-		// Respawn after X seconds? -if a flag is set?
-		//  -time should be editable
+		// Respawn after X seconds
 		self->nextthink = level.time + (self->wait * 1000);
 		self->think = misc_object_respawn;
 	}
@@ -765,11 +666,12 @@ void misc_object_think(gentity_t *self)
 	self->nextthink = level.time + 1000;
 
 	// Do once per-second thinking code.
-	// Such as animation (that should be in cgame...)
+	// Such as animation (but that should be in cgame...)
 }
 
 void misc_object_touch(gentity_t *self, gentity_t *activator, trace_t *trace)
 {
+	//G_Printf("misc_object_touch: touched\n");
 	if( self->target )
 	{
 		G_UseTargets(self, activator);
@@ -798,7 +700,7 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 	VectorCopy(owner->r.maxs, ent->r.maxs);
 	ent->target = owner->target;
 
-	ent->s.eType = ET_MISCOBJECT; // ET_GENERAL;
+	ent->s.eType = ET_MISCOBJECT;
 	if (!(owner->spawnflags & MOBJF_KNOCKBACK)) {
 		ent->flags = FL_NO_KNOCKBACK;
 	}
@@ -807,28 +709,34 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 	ent->s.modelindex = G_ModelIndex( owner->model );
 
 	// undamaged animation
+	if (!(ent->s.modelindex2 & ANIM_TOGGLEBIT))
+		ent->s.modelindex2 = (OBJECT_NORMAL|ANIM_TOGGLEBIT);
+	else
 	ent->s.modelindex2 = OBJECT_NORMAL;
 
 	if (owner->health > 0) {
-		ent->r.contents = CONTENTS_BODY;// CONTENTS_SOLID;
+		//G_Printf("misc_object_spawn: animated damagable\n");
+		ent->r.contents = CONTENTS_BODY;
 		ent->health = owner->health;
-		//if (ent->health) {
 			ent->takedamage = qtrue;
-		//}
 		ent->die = misc_object_die;
 		ent->pain = misc_object_pain;
 		ent->think = misc_object_think;
 		ent->nextthink = level.time + 1000;
-	}
-	else if ( ent->target ) {
+	} else if ( ent->target ) {
+		//G_Printf("misc_object_spawn: animated touchable\n");
 		ent->r.contents = CONTENTS_TRIGGER;
 		ent->touch = misc_object_touch;
+	} else {
+		//G_Printf("misc_object_spawn: animated scenery\n");
 	}
 
 	if ( owner->spawnflags & MOBJF_SUSPENDED ) {
+		//G_Printf("misc_object_spawn: no gravity\n");
 		// suspended
 		G_SetOrigin( ent, ent->s.origin );
 	} else {
+		//G_Printf("misc_object_spawn: dropped to ground\n");
 		// mappers like to put them exactly on the floor, but being coplanar
 		// will sometimes show up as starting in solid, so lif it up one pixel
 		ent->s.origin[2] += 1;
@@ -848,6 +756,10 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 			ent->s.groundEntityNum = tr.entityNum;
 			G_SetOrigin( ent, tr.endpos );
 		}
+
+		// Turtle Man: TODO: Have gravity/pushable spawnflag?
+		//ent->s.pos.trType = TR_GRAVITY;
+		//ent->s.pos.trTime = level.time;
 	}
 
 	ent->activator = owner;
@@ -874,8 +786,17 @@ void G_SetFileExt(char *filename, char *ext)
 // Based on SP_misc_model and SP_team_redobelisk
 // The passed "ent" is the misc_object controler.
 void SP_misc_object( gentity_t *ent ) {
-	G_SpawnVector( "mins", "-16 -16 0", ent->r.mins );
-	G_SpawnVector( "maxs", "16 16 32", ent->r.maxs );
+	qboolean entHealth;
+	qboolean entWait;
+	qboolean entSpeed;
+	qboolean entMins, entMaxs;
+
+	entHealth = G_SpawnInt( "health", "0", &ent->health);
+	entWait = G_SpawnFloat( "wait", "0", &ent->wait);
+	entSpeed = G_SpawnFloat( "speed", "0", &ent->speed);
+
+	entMins = G_SpawnVector( "mins", "-16 -16 0", ent->r.mins );
+	entMaxs = G_SpawnVector( "maxs", "16 16 32", ent->r.maxs );
 
 	G_SetOrigin( ent, ent->s.origin );
 	VectorCopy( ent->s.angles, ent->s.apos.trBase );
@@ -883,7 +804,6 @@ void SP_misc_object( gentity_t *ent ) {
 	// Use a animation config file!
 	{
 		/*
-		#define MAX_MISC_OBJECT_ANIMATIONS 5
 		const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
 		{
 			"OBJECT_NORMAL",
@@ -899,33 +819,42 @@ void SP_misc_object( gentity_t *ent ) {
 		int health;
 		int wait;
 		float speed;
+		vec3_t mins, maxs;
 
-		// so we can check if they were changed.
-		health = wait = speed = -2;
+		health = wait = speed = 0;
+		VectorClear(mins);
+		VectorClear(maxs);
 
 		trap_GetConfigstring( CS_MODELS + ent->s.modelindex, filename, sizeof(filename));
 
 		G_SetFileExt(filename, ".cfg");
 
 		BG_ParseObjectCFGFile(filename, NULL, NULL, 0, // names, animations, max_anim
-			ent->r.mins, ent->r.maxs, &health, &wait, &speed);
+			&mins, &maxs, &health, &wait, &speed, NULL);
 
 		// The data in this entity over-rides the cfg file.
-		//  if loaded data from cfg and ent had default, use cfg data
-		if (health != -2 && ent->health == 0)
+		if (!entHealth)
 		{
 			// Use health from cfg.
 			ent->health = health;
 		}
-		if (wait != -2 && ent->wait == 0)
+		if (!entWait)
 		{
 			// Use wait from cfg.
 			ent->wait = wait;
 		}
-		if (speed != -2 && ent->speed == 0)
+		if (!entSpeed)
 		{
 			// Use speed from cfg.
 			ent->speed = speed;
+		}
+		if (!entMins)
+		{
+			//VectorCopy(mins, ent->r.mins);
+		}
+		if (!entMaxs)
+		{
+			//VectorCopy(maxs, ent->r.maxs);
 		}
 
 		if (ent->speed < 1.0f)
@@ -934,8 +863,8 @@ void SP_misc_object( gentity_t *ent ) {
 		}
 	}
 
-	misc_object_spawn(ent, ent->s.origin, ent->s.angles);
-
 	trap_LinkEntity (ent);
+
+	misc_object_spawn(ent, ent->s.origin, ent->s.angles);
 }
 #endif

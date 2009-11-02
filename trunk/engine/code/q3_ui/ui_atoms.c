@@ -1239,13 +1239,26 @@ void UI_Refresh( int realtime )
 	{
 		if (uis.activemenu->fullscreen)
 		{
+#ifdef IOQ3ZTM // IOQ3BUGFIX: In 16:9 fill whole screen not just 4:3 area.
+			// fill black, UI_FillRect
+			trap_R_SetColor( colorBlack );
+
+			trap_R_DrawStretchPic( 0, 0, uis.glconfig.vidWidth, uis.glconfig.vidHeight,
+					0, 0, 0, 0, uis.whiteShader );
+
+			trap_R_SetColor( NULL );
+#endif
 			// draw the background
+#ifdef TMNTDATASYS
+			UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackShader );
+#else
 			if( uis.activemenu->showlogo ) {
 				UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackShader );
 			}
 			else {
 				UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackNoLogoShader );
 			}
+#endif
 		}
 
 		if (uis.activemenu->draw)

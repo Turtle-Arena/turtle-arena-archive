@@ -24,8 +24,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // g_client.c -- client functions that don't happen every frame
 
+#ifndef TMNTPLAYERSYS
 static vec3_t	playerMins = {-15, -15, -24};
 static vec3_t	playerMaxs = {15, 15, 32};
+#endif
 
 /*QUAKED info_player_deathmatch (1 0 1) (-16 -16 -24) (16 16 32) initial
 potential spawning position for deathmatch games.
@@ -78,16 +80,33 @@ SpotWouldTelefrag
 
 ================
 */
-qboolean SpotWouldTelefrag( gentity_t *spot ) {
+qboolean SpotWouldTelefrag( gentity_t *spot
+#ifdef TMNTPLAYERSYS
+	, gentity_t *ent
+#endif
+	)
+{
 	int			i, num;
 	int			touch[MAX_GENTITIES];
 	gentity_t	*hit;
 	vec3_t		mins, maxs;
 
-#if 0 // #ifdef TMNTPLAYERSYS
-	// Turtle Man: FIXME: Use per-player bounding box for telefrag checking!
-	VectorAdd( spot->s.origin, something->playercfg.bbmins, mins );
-	VectorAdd( spot->s.origin, something->playercfg.bbmaxs, maxs );
+#ifdef TMNTPLAYERSYS
+	if (ent && ent->client)
+	{
+		// Turtle Man: Use per-player bounding box for telefrag checking!
+		VectorAdd( spot->s.origin, ent->client->pers.playercfg.bbmins, mins );
+		VectorAdd( spot->s.origin, ent->client->pers.playercfg.bbmaxs, maxs );
+	}
+	else
+	{
+		// Use default Q3 mins and maxs. (Set in BG_LoadPlayerCFGFile)
+		vec3_t	playerMins = {-15, -15, -24};
+		vec3_t	playerMaxs = { 15,  15,  32};
+
+		VectorAdd( spot->s.origin, playerMins, mins );
+		VectorAdd( spot->s.origin, playerMaxs, maxs );
+	}
 #else
 	VectorAdd( spot->s.origin, playerMins, mins );
 	VectorAdd( spot->s.origin, playerMaxs, maxs );
@@ -106,6 +125,7 @@ qboolean SpotWouldTelefrag( gentity_t *spot ) {
 	return qfalse;
 }
 
+#ifndef IOQ3ZTM // Turtle Man: unused
 /*
 ================
 SelectNearestDeathmatchSpawnPoint
@@ -170,6 +190,7 @@ gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 	selection = rand() % count;
 	return spots[ selection ];
 }
+#endif
 
 /*
 ===========
@@ -178,19 +199,41 @@ SelectRandomFurthestSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) {
+gentity_t *SelectRandomFurthestSpawnPoint (
+#ifdef TMNTPLAYERSYS
+	gentity_t *ent,
+#else
+	vec3_t avoidPoint,
+#endif
+	vec3_t origin, vec3_t angles ) {
 	gentity_t	*spot;
 	vec3_t		delta;
 	float		dist;
 	float		list_dist[64];
 	gentity_t	*list_spot[64];
 	int			numSpots, rnd, i, j;
+#ifdef TMNTPLAYERSYS
+	vec3_t avoidPoint;
+
+	if (ent && ent->client)
+	{
+		VectorCopy(ent->client->ps.origin, avoidPoint);
+	}
+	else
+	{
+		VectorCopy(vec3_origin, avoidPoint);
+	}
+#endif
 
 	numSpots = 0;
 	spot = NULL;
 
 	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		if ( SpotWouldTelefrag( spot ) ) {
+		if ( SpotWouldTelefrag( spot
+#ifdef TMNTPLAYERSYS
+			, ent
+#endif
+		) ) {
 			continue;
 		}
 		VectorSubtract( spot->s.origin, avoidPoint, delta );
@@ -244,8 +287,20 @@ SelectSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles ) {
-	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles );
+gentity_t *SelectSpawnPoint (
+#ifdef TMNTPLAYERSYS
+	gentity_t *ent,
+#else
+	vec3_t avoidPoint,
+#endif
+	vec3_t origin, vec3_t angles ) {
+	return SelectRandomFurthestSpawnPoint(
+#ifdef TMNTPLAYERSYS
+		ent,
+#else
+		avoidPoint,
+#endif
+		origin, angles );
 
 	/*
 	gentity_t	*spot;
@@ -288,7 +343,12 @@ if none uses 'initial' deathmatch spawn point,
 if none uses deathmatch spawn point.
 ============
 */
-gentity_t *SelectSinglePlayerSpawnPoint( int clientnum, vec3_t origin, vec3_t angles ) {
+gentity_t *SelectSinglePlayerSpawnPoint(
+#ifdef TMNTPLAYERSYS
+	gentity_t *ent,
+#endif
+	int clientnum, vec3_t origin, vec3_t angles )
+{
 	gentity_t	*spot = NULL;
 	gentity_t	*spot0 = NULL;
 	gentity_t	*spotlast = NULL;
@@ -322,8 +382,18 @@ gentity_t *SelectSinglePlayerSpawnPoint( int clientnum, vec3_t origin, vec3_t an
 		}
 	}
 
-	if ( !spot || SpotWouldTelefrag( spot ) ) {
-		return SelectSpawnPoint( vec3_origin, origin, angles );
+	if ( !spot || SpotWouldTelefrag( spot
+#ifdef TMNTPLAYERSYS
+		, ent
+#endif
+	) ) {
+		return SelectSpawnPoint(
+#ifdef TMNTPLAYERSYS
+		ent,
+#else
+		vec3_origin,
+#endif
+		origin, angles );
 	}
 
 	VectorCopy (spot->s.origin, origin);
@@ -342,7 +412,12 @@ Try to find a spawn point marked 'initial', otherwise
 use normal spawn selection.
 ============
 */
-gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles ) {
+gentity_t *SelectInitialSpawnPoint(
+#ifdef TMNTPLAYERSYS
+	gentity_t *ent,
+#endif
+	vec3_t origin, vec3_t angles )
+{
 	gentity_t	*spot;
 
 	spot = NULL;
@@ -353,8 +428,18 @@ gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles ) {
 		}
 	}
 
-	if ( !spot || SpotWouldTelefrag( spot ) ) {
-		return SelectSpawnPoint( vec3_origin, origin, angles );
+	if ( !spot || SpotWouldTelefrag( spot
+#ifdef TMNTPLAYERSYS
+		, ent
+#endif
+	) ) {
+		return SelectSpawnPoint(
+#ifdef TMNTPLAYERSYS
+		ent,
+#else
+		vec3_origin,
+#endif
+		origin, angles );
 	}
 
 	VectorCopy (spot->s.origin, origin);
@@ -771,17 +856,18 @@ G_LoadPlayer
 Load animation.cfg
 ============
 */
-void G_LoadPlayer(int clientNum, const char *inModelName)
+void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadModel)
 {
     char *p;
-    char model[MAX_QPATH];
+    char model[MAX_QPATH]; // model name without skin
+    char headModel[MAX_QPATH]; // head model name without skin
     gentity_t *ent;
     gclient_t *client;
     bg_playercfg_t *playercfg;
 #ifdef TMNTWEAPSYS
     weapon_t oldDefault;
 #endif
-#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+#ifdef TMNT_GAME_MODELS
     char filename[MAX_QPATH];
 #ifdef IOQ3ZTM // PLAYER_DIR
 	int i;
@@ -793,84 +879,84 @@ void G_LoadPlayer(int clientNum, const char *inModelName)
 	playercfg = &client->pers.playercfg;
 
     Q_strncpyz(model, inModelName, MAX_QPATH);
+	Q_strncpyz(headModel, inHeadModel, MAX_QPATH);
 
     // Remove skin
 	if ((p = Q_strrchr(model, '/')) != 0) {
 		*p = 0;
 	}
+	if ((p = Q_strrchr(headModel, '/')) != 0) {
+		*p = 0;
+	}
 
-#ifdef TMNTWEAPSYS_1 // GAME_TAGS
+#ifdef TMNT_GAME_MODELS
 	// Load model tags
 
-	// Currently uses models, so they are invalid after vid_restart / level change...?
-	client->pers.torsoTags = 0;
-	client->pers.legsTags = 0;
+	// Currently uses models, so they may be invalid after vid_restart / level change...?
+	client->pers.torsoModel = 0;
+	client->pers.legsModel = 0;
 
 #ifdef IOQ3ZTM // PLAYER_DIR
 	for (i = 0; bg_playerDirs[i] != NULL; i++)
 	{
-		if (i == 0 || !client->pers.torsoTags)
+		if (i == 0 || !client->pers.torsoModel)
 		{
 			Com_sprintf( filename, sizeof( filename ), "%s/%s/upper.md3", bg_playerDirs[i], model );
-			client->pers.torsoTags = trap_RegisterTags(filename);
+			client->pers.torsoModel = trap_RegisterModel(filename);
 		}
-		if (i == 0 || !client->pers.legsTags)
+		if (i == 0 || !client->pers.legsModel)
 		{
 			Com_sprintf( filename, sizeof( filename ), "%s/%s/lower.md3", bg_playerDirs[i], model );
-			client->pers.legsTags = trap_RegisterTags(filename);
+			client->pers.legsModel = trap_RegisterModel(filename);
 		}
-	}
-
-	// Server doesn't have the player,,, fall back to DEFAULT_MODEL
-	if (!client->pers.torsoTags)
-	{
-		Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", DEFAULT_MODEL );
-		client->pers.torsoTags = trap_RegisterTags(filename);
-	}
-	if (!client->pers.legsTags)
-	{
-		Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", DEFAULT_MODEL );
-		client->pers.legsTags = trap_RegisterTags(filename);
 	}
 #else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", model );
-	client->pers.torsoTags = trap_RegisterTags(filename);
-	if (!client->pers.torsoTags)
-	{
-		client->pers.torsoTags = trap_RegisterTags("models/players/raph/upper.md3");
-	}
+	client->pers.torsoModel = trap_RegisterModel(filename);
 
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", model );
-	client->pers.legsTags = trap_RegisterTags(filename);
-	if (!client->pers.legsTags)
-	{
-		client->pers.legsTags = trap_RegisterTags("models/players/raph/lower.md3");
-	}
+	client->pers.legsModel = trap_RegisterModel(filename);
 #endif
+	// Server doesn't have the player,,, fall back to DEFAULT_MODEL
+	if (!client->pers.torsoModel)
+	{
+		Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", DEFAULT_MODEL );
+		client->pers.torsoModel = trap_RegisterModel(filename);
+	}
+	if (!client->pers.legsModel)
+	{
+		Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", DEFAULT_MODEL );
+		client->pers.legsModel = trap_RegisterModel(filename);
+	}
 #endif
 
 	// Check if player has really changed!
-		if ( Q_stricmpn(model, playercfg->filename, MAX_QPATH) == 0 ) {
+	if ( Q_stricmpn(inModelName, playercfg->model, MAX_QPATH) == 0
+		&& Q_stricmpn(inHeadModel, playercfg->headModel, MAX_QPATH) == 0 ) {
 			// no change
 			return;
 		}
 
-	// Turtle Man: NOTE: This message was used to tell how many times a client get playercfg loaded.
-	//G_Printf("DEBUG: Changed player old=%s, new=%s\n", playercfg->filename, model);
+	// Turtle Man: NOTE: This message was used to tell when a client get playercfg loaded.
+	//G_Printf("DEBUG: Changed player old=%s, new=%s\n", playercfg->model, model);
 
 	// Load animation.cfg
-	if (!model[0] || !BG_LoadPlayerCFGFile(model, playercfg))
+	if (!model[0] || !BG_LoadPlayerCFGFile(playercfg, model, headModel))
 	{
 		G_Printf("G_LoadPlayer: Loading player failed (%s)\n", inModelName);
 		// Fall back to DEFAULT_MODEL
 		Q_strncpyz(model, DEFAULT_MODEL, MAX_QPATH);
-		if (!BG_LoadPlayerCFGFile(model, playercfg))
+		if (!BG_LoadPlayerCFGFile(playercfg, model, headModel))
 		{
 			G_Printf("G_LoadPlayer: Loading default player failed (%s)\n", inModelName);
 			// The defaults were loaded in BG_LoadPlayerCFGFile,
 			//   so we should be able to continue...
 		}
 	}
+
+	// Set model to "model[/skin]"
+	Q_strncpyz(playercfg->model, inModelName, MAX_QPATH);
+	Q_strncpyz(playercfg->headModel, inHeadModel, MAX_QPATH);
 
 	VectorCopy (client->pers.playercfg.bbmins, ent->r.mins);
 	VectorCopy (client->pers.playercfg.bbmaxs, ent->r.maxs);
@@ -881,37 +967,39 @@ void G_LoadPlayer(int clientNum, const char *inModelName)
 
 	g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON] = playercfg->default_weapon;
 
-	// Don't keep default weapon from the pervious player,
-	//  the weapon will not be spawned as we lie and say it has 0 ammo.
-
-	if (!BG_WeapUseAmmo(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]))
 	{
 		// Make sure melee weapons (and grapple) have unlimited "ammo"
-		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = -1;
-	}
-	else
+		int defaultAmmo = -1;
+
+		if (BG_WeapUseAmmo(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]))
 	{
 		// GUNS_AS_DEFAULT
-#if 1
-		// unlimited ammo so nobody can "cheat" the ammo system...
-		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = -1;
-#else
+#if 0 // Unlimited ammo so nobody can "cheat" the ammo system... Plus I don't have ammo pickups
 		// Guns are cheatable, for now anyway.
 		gitem_t *item = BG_FindItemForWeapon(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]);
-		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = item->quantity;
+			defaultAmmo = item->quantity;
 #endif
 	}
 
+		// Set the ammo value.
+#ifdef TMNTWEAPSYS2
+		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = defaultAmmo;
+#else
+		g_entities[clientNum].client->ps.ammo[playercfg->default_weapon] = defaultAmmo;
+#endif // TMNTWEAPSYS2
+	}
+
+#ifdef TMNTWEAPSYS2
 	// If not holding new default, change to it.
 	if (g_entities[clientNum].client->ps.weapon != g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON])
 	{
 		// Check if it is the old default weapon
 		if (g_entities[clientNum].client->ps.weapon == oldDefault)
 		{
-			// Don't allow the weapon to be picked up, as it is the players default.
+			// Don't allow the weapon to be picked up, as it is the player's default.
 			g_entities[clientNum].client->ps.stats[STAT_AMMO] = 0;
 
-			// Change to default
+			// Change to new default (The old one will just be goes as it has "0" ammo).
 			g_entities[clientNum].client->ps.stats[STAT_NEWWEAPON] = g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON];
 		}
 	}
@@ -920,7 +1008,8 @@ void G_LoadPlayer(int clientNum, const char *inModelName)
 		// Only update "ammo"
 		g_entities[clientNum].client->ps.stats[STAT_AMMO] = g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO];
 	}
-#endif
+#endif // TMNTWEAPSYS2
+#endif // TMNTWEAPSYS
 }
 #endif
 
@@ -1030,7 +1119,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	}
 
 #ifdef TMNTPLAYERSYS
-    G_LoadPlayer(clientNum, model);
+    G_LoadPlayer(clientNum, model, headModel);
 #endif
 
 	// bots set their team a few frames later
@@ -1278,9 +1367,19 @@ void ClientBegin( int clientNum ) {
 	flags = client->ps.eFlags;
 	memset( &client->ps, 0, sizeof( client->ps ) );
 	client->ps.eFlags = flags;
+#ifdef TMNTSP
+	if (g_gametype.integer == GT_SINGLE_PLAYER)
+	{
+		// Start with 3 lives and if not multiplayer 1 continue
+		client->ps.persistant[PERS_LIVES] = 3;
+		if (g_singlePlayer.integer) {
+			client->ps.persistant[PERS_CONTINUES] = 1;
+		}
+	}
+#endif
 
 #ifdef TMNTPLAYERSYS
-	G_LoadPlayer(clientNum, client->pers.playercfg.filename);
+	G_LoadPlayer(clientNum, client->pers.playercfg.model, client->pers.playercfg.headModel);
 #endif
 
 	// locate ent at a spawn point
@@ -1345,23 +1444,38 @@ void ClientSpawn(gentity_t *ent) {
 	} else if (g_gametype.integer >= GT_CTF ) {
 		// all base oriented team games use the CTF spawn points
 		spawnPoint = SelectCTFSpawnPoint ( 
+#ifdef TMNTPLAYERSYS
+						ent,
+#endif
 						client->sess.sessionTeam, 
 						client->pers.teamState.state, 
 						spawn_origin, spawn_angles);
 #ifdef TMNTSP
 	} else if (g_gametype.integer == GT_SINGLE_PLAYER) {
-		spawnPoint = SelectSinglePlayerSpawnPoint(index, spawn_origin, spawn_angles);
+		spawnPoint = SelectSinglePlayerSpawnPoint(
+#ifdef TMNTPLAYERSYS
+						ent,
+#endif
+						index, spawn_origin, spawn_angles);
 #endif
 	} else {
 		do {
 			// the first spawn should be at a good looking spot
 			if ( !client->pers.initialSpawn && client->pers.localClient ) {
 				client->pers.initialSpawn = qtrue;
-				spawnPoint = SelectInitialSpawnPoint( spawn_origin, spawn_angles );
+				spawnPoint = SelectInitialSpawnPoint(
+#ifdef TMNTPLAYERSYS
+						ent,
+#endif
+						spawn_origin, spawn_angles );
 			} else {
 				// don't spawn near existing origin if possible
 				spawnPoint = SelectSpawnPoint ( 
+#ifdef TMNTPLAYERSYS
+					ent,
+#else
 					client->ps.origin, 
+#endif
 					spawn_origin, spawn_angles);
 			}
 
@@ -1390,6 +1504,9 @@ void ClientSpawn(gentity_t *ent) {
 	// and never clear the voted flag
 	flags = ent->client->ps.eFlags & (EF_TELEPORT_BIT | EF_VOTED | EF_TEAMVOTED);
 	flags ^= EF_TELEPORT_BIT;
+#ifdef TMNT
+	flags |= EF_TELE_EFFECT;
+#endif
 
 	// clear everything but the persistant data
 
@@ -1469,7 +1586,12 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 
 #ifdef TMNTHOLDSYS
+#ifdef TMNTHOLDABLE // Start with 10 shurikens!
+	client->ps.holdable[HI_SHURIKEN] = 10;
+	client->ps.holdableIndex = HI_SHURIKEN;
+#else
 	client->ps.holdableIndex = HI_NONE;
+#endif
 #endif
 #ifdef TMNTWEAPSYS // Turtle Man: Respawn code. Start with default weapon. Set ammo values.
 	// Set default weapon
@@ -1479,9 +1601,9 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.stats[STAT_DEFAULTWEAPON] = DEFAULT_DEFAULT_WEAPON;
 #endif
 
+#ifdef TMNTWEAPSYS2
 	client->ps.stats[STAT_OLDWEAPON] = WP_NONE;
 
-#ifdef TMNTWEAPSYS2
 	// Set default ammo values.
 	client->ps.stats[STAT_SAVEDAMMO] = -1;
 	client->ps.stats[STAT_OLDAMMO] = -1;
@@ -1508,7 +1630,7 @@ void ClientSpawn(gentity_t *ent) {
 
 	{
 		// Turtle Man: Start with default weapon.
-		gitem_t *item;
+		gitem_t *item = NULL;
 		weapon_t weapon;
 
 		weapon = client->ps.stats[STAT_DEFAULTWEAPON];
@@ -1518,9 +1640,12 @@ void ClientSpawn(gentity_t *ent) {
 		client->ps.stats[STAT_WEAPONS] = ( 1 << weapon);
 #endif
 
+		if (weapon > 0)
+		{
 		item = BG_FindItemForWeapon( weapon );
+		}
 
-		if (item->quantity == 0)
+		if (!item || (item && item->quantity == 0))
 		{
 			// Weapon that doesn't use ammo.
 #ifdef TMNTWEAPSYS2
@@ -1753,7 +1878,6 @@ void ClientDisconnect( int clientNum ) {
 }
 
 #ifdef TMNTSP // save/load
-#if 1 // Use Cvars to store data instead of a file on FS_WRITE
 /* =============
 G_SavePersistant
 
@@ -1762,7 +1886,7 @@ after each level in SinglePlayer.
 
 Should allow 64 client single player games...
 
-Save the lives (todo), score, and holdable stuff.
+Save the lives, continues, score, and holdable stuff.
 ================*/
 void G_SavePersistant(char *nextmap)
 {
@@ -1804,12 +1928,14 @@ void G_SavePersistant(char *nextmap)
 		}
 
 #ifdef TMNTHOLDSYS
-		s = va("n\\%s\\livs\\%d\\scr\\%i\\hi\\%i",
-				client->pers.netname, /*lives*/3,
+		s = va("n\\%s\\livs\\%d\\ctns\\%d\\scr\\%i\\hi\\%i",
+				client->pers.netname, client->ps.persistant[PERS_LIVES],
+				client->ps.persistant[PERS_CONTINUES],
 				client->ps.persistant[PERS_SCORE], client->ps.holdableIndex);
 #else
-		s = va("n\\%s\\livs\\%d\\scr\\%i",
-				client->pers.netname, /*lives*/3,
+		s = va("n\\%s\\livs\\%d\\ctns\\%d\\scr\\%i",
+				client->pers.netname, client->ps.persistant[PERS_LIVES],
+				client->ps.persistant[PERS_CONTINUES],
 				client->ps.persistant[PERS_SCORE]);
 #endif
 		Q_strncpyz(savedata, s, sizeof(savedata));
@@ -1844,7 +1970,7 @@ void G_SavePersistant(char *nextmap)
 			if (g_singlePlayer.value)
 				G_Error("Saving SP client data failed\ntoo much data! (%i/%i)\n%s\n", strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
 			else // Don't error to network
-				G_Printf("Saving SP client data failed\ntoo much data! (%i/%i)\n%s\n", strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
+				G_Printf("Saving co-op client data failed\ntoo much data! (%i/%i)\n%s\n", strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
 
 			return;
 		}
@@ -1967,10 +2093,14 @@ void G_LoadPersistant(int clientnum)
 #endif
 		{
 #ifndef TMNTRELEASE
-			G_Printf("DEBUG: LOADING SP DATA FOR %s\n", s);
+			G_Printf("DEBUG: Loading SP data for %s\n", s);
 #endif
 			// Found client.
-			//s = Info_ValueForKey(config, "livs");
+			client->ps.persistant[PERS_LIVES] = atoi(Info_ValueForKey(config, "livs"));
+			if (!g_singlePlayer.integer && !client->ps.persistant[PERS_LIVES]) {
+				client->ps.persistant[PERS_LIVES] = 3;
+			}
+			client->ps.persistant[PERS_CONTINUES] = atoi(Info_ValueForKey(config, "ctns"));
 			client->ps.persistant[PERS_SCORE] = atoi(Info_ValueForKey(config, "scr"));
 #ifdef TMNTHOLDSYS
 			client->ps.holdableIndex = atoi(Info_ValueForKey(config, "hi"));
@@ -1996,29 +2126,4 @@ void G_LoadPersistant(int clientnum)
 	trap_Cvar_Set("g_spSaveData", "");
 #endif
 }
-#else
-/*
-	Write a savefile so the data can be reloaded next level...
-*/
-void G_SavePersistant(char *nextmap)
-{
-	trap_SendConsoleCommand( EXEC_APPEND, va("savegame autosave -minimum %s", nextmap) );
-}
-
-/*
-	Reloaded data from file...
-*/
-void G_LoadPersistant(int clientnum)
-{
-	(void)clientnum;
-
-	int save_loading = trap_Cvar_VariableIntegerValue("ui_spSaveLoading");
-	//G_Printf("ui_spSaveLoading = %d\n", save_loading);
-	if (save_loading == 2 || save_loading == 3) // level change or restart
-	{
-		trap_SendConsoleCommand( EXEC_APPEND, "loadgame autosave" );
-		trap_Cvar_Set("ui_spSaveLoading","0"); // set to no loading
-	}
-}
-#endif
 #endif
