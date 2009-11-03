@@ -159,29 +159,6 @@ char	*ConcatArgs( int start ) {
 
 /*
 ==================
-SanitizeString
-
-Remove case and control characters
-==================
-*/
-void SanitizeString( char *in, char *out ) {
-	while ( *in ) {
-		if ( *in == 27 ) {
-			in += 2;		// skip color code
-			continue;
-		}
-		if ( *in < 32 ) {
-			in++;
-			continue;
-		}
-		*out++ = tolower( *in++ );
-	}
-
-	*out = 0;
-}
-
-/*
-==================
 ClientNumberFromString
 
 Returns a player number for either a number or name string
@@ -191,8 +168,7 @@ Returns -1 if invalid
 int ClientNumberFromString( gentity_t *to, char *s ) {
 	gclient_t	*cl;
 	int			idnum;
-	char		s2[MAX_STRING_CHARS];
-	char		n2[MAX_STRING_CHARS];
+	char		cleanName[MAX_STRING_CHARS];
 
 	// numeric values are just slot numbers
 	if (s[0] >= '0' && s[0] <= '9') {
@@ -211,13 +187,13 @@ int ClientNumberFromString( gentity_t *to, char *s ) {
 	}
 
 	// check for a name match
-	SanitizeString( s, s2 );
 	for ( idnum=0,cl=level.clients ; idnum < level.maxclients ; idnum++,cl++ ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		SanitizeString( cl->pers.netname, n2 );
-		if ( !strcmp( n2, s2 ) ) {
+		Q_strncpyz(cleanName, cl->pers.netname, sizeof(cleanName));
+		Q_CleanStr(cleanName);
+		if ( !Q_stricmp( cleanName, s ) ) {
 			return idnum;
 		}
 	}
@@ -603,17 +579,17 @@ void SetTeam( gentity_t *ent, char *s ) {
 		if ( g_teamForceBalance.integer  ) {
 			int		counts[TEAM_NUM_TEAMS];
 
-			counts[TEAM_BLUE] = TeamCount( ent->client->ps.clientNum, TEAM_BLUE );
-			counts[TEAM_RED] = TeamCount( ent->client->ps.clientNum, TEAM_RED );
+			counts[TEAM_BLUE] = TeamCount( clientNum, TEAM_BLUE );
+			counts[TEAM_RED] = TeamCount( clientNum, TEAM_RED );
 
 			// We allow a spread of two
 			if ( team == TEAM_RED && counts[TEAM_RED] - counts[TEAM_BLUE] > 1 ) {
-				trap_SendServerCommand( ent->client->ps.clientNum, 
+				trap_SendServerCommand( clientNum, 
 					"cp \"Red team has too many players.\n\"" );
 				return; // ignore the request
 			}
 			if ( team == TEAM_BLUE && counts[TEAM_BLUE] - counts[TEAM_RED] > 1 ) {
-				trap_SendServerCommand( ent->client->ps.clientNum, 
+				trap_SendServerCommand( clientNum, 
 					"cp \"Blue team has too many players.\n\"" );
 				return; // ignore the request
 			}

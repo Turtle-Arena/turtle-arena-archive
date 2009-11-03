@@ -822,12 +822,10 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 	// Ok, let's do the player loop, hand out the bonuses
 	for (i = 0; i < g_maxclients.integer; i++) {
 		player = &g_entities[i];
-		if (!player->inuse)
-			continue;
-#ifdef IOQ3ZTM // Don't give bonus points to player who captured the flag.
-		if (player == other)
-			continue;
-#endif
+
+		// also make sure we don't award assist bonuses to the flag carrier himself.
+		if (!player->inuse || player == other)
+  			continue;
 
 		if (player->client->sess.sessionTeam !=
 			cl->sess.sessionTeam) {

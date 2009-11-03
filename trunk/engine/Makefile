@@ -280,6 +280,10 @@ else
 endif
 export CROSS_COMPILING
 
+ifndef COPYBINDIR
+COPYBINDIR=$(COPYDIR)
+endif
+
 ifndef MOUNT_DIR
 MOUNT_DIR=code
 endif
@@ -297,11 +301,7 @@ USE_OPENAL=1
 endif
 
 ifndef USE_OPENAL_DLOPEN
-  ifeq ($(PLATFORM),mingw32)
-    USE_OPENAL_DLOPEN=1
-  else
-    USE_OPENAL_DLOPEN=0
-  endif
+USE_OPENAL_DLOPEN=1
 endif
 
 ifndef USE_CURL
@@ -332,6 +332,10 @@ ifndef USE_INTERNAL_SPEEX
 USE_INTERNAL_SPEEX=1
 endif
 
+ifndef USE_INTERNAL_ZLIB
+USE_INTERNAL_ZLIB=1
+endif
+
 ifndef USE_LOCAL_HEADERS
 USE_LOCAL_HEADERS=1
 endif
@@ -355,6 +359,7 @@ UIDIR=$(MOUNT_DIR)/ui
 Q3UIDIR=$(MOUNT_DIR)/q3_ui
 JPDIR=$(MOUNT_DIR)/jpeg-6b
 SPEEXDIR=$(MOUNT_DIR)/libspeex
+ZDIR=$(MOUNT_DIR)/zlib
 Q3ASMDIR=$(MOUNT_DIR)/tools/asm
 LBURGDIR=$(MOUNT_DIR)/tools/lcc/lburg
 Q3CPPDIR=$(MOUNT_DIR)/tools/lcc/cpp
@@ -365,19 +370,29 @@ NSISDIR=misc/nsis
 SDLHDIR=$(MOUNT_DIR)/SDL12
 LIBSDIR=$(MOUNT_DIR)/libs
 TEMPDIR=/tmp
-#Turtle Man
-SPLNDIR=$(MOUNT_DIR)/splines
 
-# set PKG_CONFIG_PATH to influence this, e.g.
-# PKG_CONFIG_PATH=/opt/cross/i386-mingw32msvc/lib/pkgconfig
-ifeq ($(shell which pkg-config > /dev/null; echo $$?),0)
-  CURL_CFLAGS=$(shell pkg-config --cflags libcurl)
-  CURL_LIBS=$(shell pkg-config --libs libcurl)
-  OPENAL_CFLAGS=$(shell pkg-config --cflags openal)
-  OPENAL_LIBS=$(shell pkg-config --libs openal)
-  # FIXME: introduce CLIENT_CFLAGS
-  SDL_CFLAGS=$(shell pkg-config --cflags sdl|sed 's/-Dmain=SDL_main//')
-  SDL_LIBS=$(shell pkg-config --libs sdl)
+bin_path=$(shell which $(1) 2> /dev/null)
+
+# We won't need this if we only build the server
+ifneq ($(BUILD_CLIENT),0)
+  # set PKG_CONFIG_PATH to influence this, e.g.
+  # PKG_CONFIG_PATH=/opt/cross/i386-mingw32msvc/lib/pkgconfig
+  ifneq ($(call bin_path, pkg-config),)
+    CURL_CFLAGS=$(shell pkg-config --silence-errors --cflags libcurl)
+    CURL_LIBS=$(shell pkg-config --silence-errors --libs libcurl)
+    OPENAL_CFLAGS=$(shell pkg-config --silence-errors --cflags openal)
+    OPENAL_LIBS=$(shell pkg-config --silence-errors --libs openal)
+    # FIXME: introduce CLIENT_CFLAGS
+    SDL_CFLAGS=$(shell pkg-config --silence-errors --cflags sdl|sed 's/-Dmain=SDL_main//')
+    SDL_LIBS=$(shell pkg-config --silence-errors --libs sdl)
+  endif
+  # Use sdl-config if all else fails
+  ifeq ($(SDL_CFLAGS),)
+    ifneq ($(call bin_path, sdl-config),)
+      SDL_CFLAGS=$(shell sdl-config --cflags)
+      SDL_LIBS=$(shell sdl-config --libs)
+    endif
+  endif
 endif
 
 # version info
@@ -429,7 +444,7 @@ ifeq ($(PLATFORM),linux)
   endif
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
-    -pipe -DUSE_ICON $(shell sdl-config --cflags)
+    -pipe -DUSE_ICON $(SDL_CFLAGS)
 
   ifeq ($(USE_OPENAL),1)
     BASE_CFLAGS += -DUSE_OPENAL
@@ -455,7 +470,6 @@ ifeq ($(PLATFORM),linux)
     OPTIMIZE = -O3 -fomit-frame-pointer -ffast-math -funroll-loops \
       -falign-loops=2 -falign-jumps=2 -falign-functions=2 \
       -fstrength-reduce
-    # experimental x86_64 jit compiler! you need GNU as
     HAVE_VM_COMPILED = true
   else
   ifeq ($(ARCH),i386)
@@ -484,13 +498,13 @@ ifeq ($(PLATFORM),linux)
   endif
 
   SHLIBEXT=so
-  SHLIBCFLAGS=-fPIC
+  SHLIBCFLAGS=-fPIC -fvisibility=hidden
   SHLIBLDFLAGS=-shared $(LDFLAGS)
 
   THREAD_LIBS=-lpthread
   LIBS=-ldl -lm
 
-  CLIENT_LIBS=$(shell sdl-config --libs) -lGL
+  CLIENT_LIBS=$(SDL_LIBS) -lGL
 
   ifeq ($(USE_OPENAL),1)
     ifneq ($(USE_OPENAL_DLOPEN),1)
@@ -620,6 +634,12 @@ else # ifeq darwin
 
 ifeq ($(PLATFORM),mingw32)
 
+  # Some MinGW installations define CC to cc, but don't actually provide cc,
+  # so explicitly use gcc instead (which is the only option anyway)
+  ifeq ($(call bin_path, $(CC)),)
+    CC=gcc
+  endif
+
   ifndef WINDRES
     WINDRES=windres
   endif
@@ -726,7 +746,7 @@ ifeq ($(PLATFORM),freebsd)
 
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
-    -DUSE_ICON $(shell sdl-config --cflags)
+    -DUSE_ICON $(SDL_CFLAGS)
 
   ifeq ($(USE_OPENAL),1)
     BASE_CFLAGS += -DUSE_OPENAL
@@ -767,7 +787,7 @@ ifeq ($(PLATFORM),freebsd)
 
   CLIENT_LIBS =
 
-  CLIENT_LIBS += $(shell sdl-config --libs) -lGL
+  CLIENT_LIBS += $(SDL_LIBS) -lGL
 
   ifeq ($(USE_OPENAL),1)
     ifneq ($(USE_OPENAL_DLOPEN),1)
@@ -792,7 +812,7 @@ ifeq ($(PLATFORM),openbsd)
 
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
-    -DUSE_ICON $(shell sdl-config --cflags)
+    -DUSE_ICON $(SDL_CFLAGS)
 
   ifeq ($(USE_OPENAL),1)
     BASE_CFLAGS += -DUSE_OPENAL
@@ -805,25 +825,28 @@ ifeq ($(PLATFORM),openbsd)
     BASE_CFLAGS += -DUSE_CODEC_VORBIS
   endif
 
-  BASE_CFLAGS += -DNO_VM_COMPILED -I/usr/X11R6/include -I/usr/local/include
-  RELEASE_CFLAGS=$(BASE_CFLAGS) -DNDEBUG -O3 \
-    -march=pentium -fomit-frame-pointer -pipe -ffast-math \
-    -falign-loops=2 -falign-jumps=2 -falign-functions=2 \
-    -funroll-loops -fstrength-reduce
+  ifeq ($(USE_CURL),1)
+    BASE_CFLAGS += -DUSE_CURL $(CURL_CFLAGS)
+    USE_CURL_DLOPEN=0
+  endif
+
+  BASE_CFLAGS += -DNO_VM_COMPILED
+  RELEASE_CFLAGS=$(BASE_CFLAGS) -DNDEBUG
   HAVE_VM_COMPILED=false
 
   DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 
   SHLIBEXT=so
+  SHLIBNAME=.$(SHLIBEXT)
   SHLIBCFLAGS=-fPIC
   SHLIBLDFLAGS=-shared $(LDFLAGS)
 
-  THREAD_LIBS=-lpthread
+  THREAD_LIBS=-pthread
   LIBS=-lm
 
   CLIENT_LIBS =
 
-  CLIENT_LIBS += $(shell sdl-config --libs) -lGL
+  CLIENT_LIBS += $(SDL_LIBS) -lGL
 
   ifeq ($(USE_OPENAL),1)
     ifneq ($(USE_OPENAL_DLOPEN),1)
@@ -833,6 +856,12 @@ ifeq ($(PLATFORM),openbsd)
 
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
+  endif
+
+  ifeq ($(USE_CURL),1) 
+    ifneq ($(USE_CURL_DLOPEN),1)
+      CLIENT_LIBS += -lcurl
+    endif
   endif
 
 else # ifeq openbsd
@@ -878,7 +907,7 @@ ifeq ($(PLATFORM),irix64)
   MKDIR = mkdir -p
 
   BASE_CFLAGS=-Dstricmp=strcasecmp -Xcpluscomm -woff 1185 \
-    -I. $(shell sdl-config --cflags) -I$(ROOT)/usr/include -DNO_VM_COMPILED
+    -I. $(SDL_CFLAGS) -I$(ROOT)/usr/include -DNO_VM_COMPILED
   RELEASE_CFLAGS=$(BASE_CFLAGS) -O3
   DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 
@@ -888,7 +917,7 @@ ifeq ($(PLATFORM),irix64)
 
   LIBS=-ldl -lm -lgen
   # FIXME: The X libraries probably aren't necessary?
-  CLIENT_LIBS=-L/usr/X11/$(LIB) $(shell sdl-config --libs) -lGL \
+  CLIENT_LIBS=-L/usr/X11/$(LIB) $(SDL_LIBS) -lGL \
     -lX11 -lXext -lm
 
 else # ifeq IRIX
@@ -916,9 +945,8 @@ ifeq ($(PLATFORM),sunos)
     endif
   endif
 
-
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
-    -pipe -DUSE_ICON $(shell sdl-config --cflags)
+    -pipe -DUSE_ICON $(SDL_CFLAGS)
 
   OPTIMIZE = -O3 -ffast-math -funroll-loops
 
@@ -927,6 +955,7 @@ ifeq ($(PLATFORM),sunos)
       -fstrength-reduce -falign-functions=2 \
       -mtune=ultrasparc3 -mv8plus -mno-faster-structs \
       -funroll-loops #-mv8plus
+    HAVE_VM_COMPILED=true
   else
   ifeq ($(ARCH),i386)
     OPTIMIZE = -O3 -march=i586 -fomit-frame-pointer -ffast-math \
@@ -956,7 +985,7 @@ ifeq ($(PLATFORM),sunos)
 
   BOTCFLAGS=-O0
 
-  CLIENT_LIBS +=$(shell sdl-config --libs) -lGL
+  CLIENT_LIBS +=$(SDL_LIBS) -lGL -lX11 -lXext -liconv -lm
 
 else # ifeq sunos
 
@@ -982,6 +1011,14 @@ endif #SunOS
 
 TARGETS =
 
+ifndef FULLBINEXT
+  FULLBINEXT=.$(ARCH)$(BINEXT)
+endif
+
+ifndef SHLIBNAME
+  SHLIBNAME=$(ARCH).$(SHLIBEXT)
+endif
+
 #Turtle Man
 ifeq ($(BUILD_SPLINES),1)
   TARGETS += $(B)/splines/libsplines.a
@@ -990,28 +1027,28 @@ ifeq ($(BUILD_SPLINES),1)
 endif
 
 ifneq ($(BUILD_SERVER),0)
-  TARGETS += $(B)/$(SERVERBIN).$(ARCH)$(BINEXT)
+  TARGETS += $(B)/$(SERVERBIN)$(FULLBINEXT)
 endif
 
 ifneq ($(BUILD_CLIENT),0)
-  TARGETS += $(B)/$(CLIENTBIN).$(ARCH)$(BINEXT)
+  TARGETS += $(B)/$(CLIENTBIN)$(FULLBINEXT)
   ifneq ($(BUILD_CLIENT_SMP),0)
-    TARGETS += $(B)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT)
+    TARGETS += $(B)/$(CLIENTBIN)-smp$(FULLBINEXT)
   endif
 endif
 
 ifneq ($(BUILD_GAME_SO),0)
   ifneq ($(BUILD_BASEGAME),0)
   TARGETS += \
-	$(B)/$(BASEGAME)/cgame$(ARCH).$(SHLIBEXT) \
-	$(B)/$(BASEGAME)/qagame$(ARCH).$(SHLIBEXT) \
-	$(B)/$(BASEGAME)/ui$(ARCH).$(SHLIBEXT)
+	$(B)/$(BASEGAME)/cgame$(SHLIBNAME) \
+	$(B)/$(BASEGAME)/qagame$(SHLIBNAME) \
+	$(B)/$(BASEGAME)/ui$(SHLIBNAME)
   endif
   ifneq ($(BUILD_MISSIONPACK),0)
     TARGETS += \
-    $(B)/missionpack/cgame$(ARCH).$(SHLIBEXT) \
-    $(B)/missionpack/qagame$(ARCH).$(SHLIBEXT) \
-    $(B)/missionpack/ui$(ARCH).$(SHLIBEXT)
+    $(B)/missionpack/cgame$(SHLIBNAME) \
+    $(B)/missionpack/qagame$(SHLIBNAME) \
+    $(B)/missionpack/ui$(SHLIBNAME)
   endif
 endif
 
@@ -1041,8 +1078,17 @@ ifeq ($(USE_VOIP),1)
   ifeq ($(USE_INTERNAL_SPEEX),1)
     BASE_CFLAGS += -DFLOATING_POINT -DUSE_ALLOCA -I$(SPEEXDIR)/include
   else
-    CLIENT_LIBS += -lspeex
+    CLIENT_LIBS += -lspeex -lspeexdsp
   endif
+endif
+
+ifeq ($(USE_INTERNAL_ZLIB),1)
+  BASE_CFLAGS += -DNO_GZIP
+  ifneq ($(USE_LOCAL_HEADERS),1)
+    BASE_CFLAGS += -I$(ZDIR)
+  endif
+else
+  LIBS += -lz
 endif
 
 ifdef DEFAULT_BASEDIR
@@ -1061,6 +1107,12 @@ ifeq ($(GENERATE_DEPENDENCIES),1)
   DEPEND_CFLAGS = -MMD
 else
   DEPEND_CFLAGS =
+endif
+
+ifeq ($(NO_STRIP),1)
+  STRIP_FLAG =
+else
+  STRIP_FLAG = -s
 endif
 
 BASE_CFLAGS += -DPRODUCT_VERSION=\\\"$(VERSION)\\\"
@@ -1214,6 +1266,12 @@ endif
 		echo "    $$i"; \
 	done
 	@echo ""
+	@echo "  CLIENT_LIBS:"
+	-@for i in $(CLIENT_LIBS); \
+	do \
+		echo "    $$i"; \
+	done
+	@echo ""
 	@echo "  Output:"
 	-@for i in $(TARGETS); \
 	do \
@@ -1266,7 +1324,7 @@ endif
 #############################################################################
 
 TOOLS_OPTIMIZE = -g -O2 -Wall -fno-strict-aliasing
-TOOLS_CFLAGS = $(TOOLS_OPTIMIZE) \
+TOOLS_CFLAGS += $(TOOLS_OPTIMIZE) \
                -DTEMPDIR=\"$(TEMPDIR)\" -DSYSTEM=\"\" \
                -I$(Q3LCCSRCDIR) \
                -I$(LBURGDIR)
@@ -1543,6 +1601,7 @@ Q3OBJ = \
   $(B)/client/q_shared.o \
   \
   $(B)/client/unzip.o \
+  $(B)/client/ioapi.o \
   $(B)/client/puff.o \
   $(B)/client/vm.o \
   $(B)/client/vm_interpreted.o \
@@ -1711,6 +1770,15 @@ Q3OBJ += \
 endif
 endif
 
+ifeq ($(USE_INTERNAL_ZLIB),1)
+Q3OBJ += \
+  $(B)/client/adler32.o \
+  $(B)/client/crc32.o \
+  $(B)/client/inffast.o \
+  $(B)/client/inflate.o \
+  $(B)/client/inftrees.o \
+  $(B)/client/zutil.o
+endif
 
 ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),i386)
@@ -1742,6 +1810,11 @@ else
     $(B)/client/sys_unix.o
 endif
 
+ifeq ($(PLATFORM),darwin)
+  Q3OBJ += \
+    $(B)/client/sys_cocoa.o
+endif
+
 ifeq ($(USE_MUMBLE),1)
   Q3OBJ += \
     $(B)/client/libmumblelink.o
@@ -1758,25 +1831,25 @@ ifeq ($(BUILD_SPLINES),1)
 # TTimo: splines code requires C++ linking, but splines have
 # not been officially included in the codebase
 # Turtle Man: now it has, so use C++ linking.
-$(B)/$(CLIENTBIN).$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 
-$(B)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN)-smp$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
 		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 else
-$(B)/$(CLIENTBIN).$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 
-$(B)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN)-smp$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
@@ -1827,6 +1900,7 @@ Q3DOBJ = \
   $(B)/ded/q_shared.o \
   \
   $(B)/ded/unzip.o \
+  $(B)/ded/ioapi.o \
   $(B)/ded/vm.o \
   $(B)/ded/vm_interpreted.o \
   \
@@ -1884,6 +1958,15 @@ Q3DOBJ += \
       $(B)/ded/tr_model.o
 endif
 
+ifeq ($(USE_INTERNAL_ZLIB),1)
+Q3DOBJ += \
+  $(B)/ded/adler32.o \
+  $(B)/ded/crc32.o \
+  $(B)/ded/inffast.o \
+  $(B)/ded/inflate.o \
+  $(B)/ded/inftrees.o \
+  $(B)/ded/zutil.o
+endif
 
 ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),i386)
@@ -1917,7 +2000,13 @@ else
     $(B)/ded/con_tty.o
 endif
 
-$(B)/$(SERVERBIN).$(ARCH)$(BINEXT): $(Q3DOBJ)
+# Not currently referenced in the dedicated server.
+#ifeq ($(PLATFORM),darwin)
+#  Q3DOBJ += \
+#    $(B)/ded/sys_cocoa.o
+#endif
+
+$(B)/$(SERVERBIN)$(FULLBINEXT): $(Q3DOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3DOBJ) $(LIBS)
 
@@ -1963,7 +2052,7 @@ Q3CGOBJ_ += $(B)/$(BASEGAME)/cgame/cg_npcs.o
 Q3CGOBJ = $(Q3CGOBJ_) $(B)/$(BASEGAME)/cgame/cg_syscalls.o
 Q3CGVMOBJ = $(Q3CGOBJ_:%.o=%.asm)
 
-$(B)/$(BASEGAME)/cgame$(ARCH).$(SHLIBEXT): $(Q3CGOBJ)
+$(B)/$(BASEGAME)/cgame$(SHLIBNAME): $(Q3CGOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3CGOBJ)
 
@@ -2011,7 +2100,7 @@ MPCGOBJ_ += $(B)/missionpack/cgame/cg_npcs.o
 MPCGOBJ = $(MPCGOBJ_) $(B)/missionpack/cgame/cg_syscalls.o
 MPCGVMOBJ = $(MPCGOBJ_:%.o=%.asm)
 
-$(B)/missionpack/cgame$(ARCH).$(SHLIBEXT): $(MPCGOBJ)
+$(B)/missionpack/cgame$(SHLIBNAME): $(MPCGOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(MPCGOBJ)
 
@@ -2073,7 +2162,7 @@ Q3GOBJ_ += $(B)/$(BASEGAME)/game/g_save.o \
 Q3GOBJ = $(Q3GOBJ_) $(B)/$(BASEGAME)/game/g_syscalls.o
 Q3GVMOBJ = $(Q3GOBJ_:%.o=%.asm)
 
-$(B)/$(BASEGAME)/qagame$(ARCH).$(SHLIBEXT): $(Q3GOBJ)
+$(B)/$(BASEGAME)/qagame$(SHLIBNAME): $(Q3GOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3GOBJ)
 
@@ -2131,7 +2220,7 @@ MPGOBJ_ += $(B)/missionpack/game/g_npc.o \
 MPGOBJ = $(MPGOBJ_) $(B)/missionpack/game/g_syscalls.o
 MPGVMOBJ = $(MPGOBJ_:%.o=%.asm)
 
-$(B)/missionpack/qagame$(ARCH).$(SHLIBEXT): $(MPGOBJ)
+$(B)/missionpack/qagame$(SHLIBNAME): $(MPGOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(MPGOBJ)
 
@@ -2194,7 +2283,7 @@ Q3UIOBJ_ = \
 Q3UIOBJ = $(Q3UIOBJ_) $(B)/missionpack/ui/ui_syscalls.o
 Q3UIVMOBJ = $(Q3UIOBJ_:%.o=%.asm)
 
-$(B)/$(BASEGAME)/ui$(ARCH).$(SHLIBEXT): $(Q3UIOBJ)
+$(B)/$(BASEGAME)/ui$(SHLIBNAME): $(Q3UIOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3UIOBJ)
 
@@ -2222,7 +2311,7 @@ MPUIOBJ_ = \
 MPUIOBJ = $(MPUIOBJ_) $(B)/missionpack/ui/ui_syscalls.o
 MPUIVMOBJ = $(MPUIOBJ_:%.o=%.asm)
 
-$(B)/missionpack/ui$(ARCH).$(SHLIBEXT): $(MPUIOBJ)
+$(B)/missionpack/ui$(SHLIBNAME): $(MPUIOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(MPUIOBJ)
 
@@ -2257,6 +2346,9 @@ $(B)/client/%.o: $(JPDIR)/%.c
 $(B)/client/%.o: $(SPEEXDIR)/%.c
 	$(DO_CC)
 
+$(B)/client/%.o: $(ZDIR)/%.c
+	$(DO_CC)
+
 $(B)/client/%.o: $(RDIR)/%.c
 	$(DO_CC)
 
@@ -2267,6 +2359,9 @@ $(B)/clientsmp/%.o: $(SDLDIR)/%.c
 	$(DO_SMP_CC)
 
 $(B)/client/%.o: $(SYSDIR)/%.c
+	$(DO_CC)
+
+$(B)/client/%.o: $(SYSDIR)/%.m
 	$(DO_CC)
 
 $(B)/client/%.o: $(SYSDIR)/%.rc
@@ -2282,10 +2377,16 @@ $(B)/ded/%.o: $(SDIR)/%.c
 $(B)/ded/%.o: $(CMDIR)/%.c
 	$(DO_DED_CC)
 
+$(B)/ded/%.o: $(ZDIR)/%.c
+	$(DO_DED_CC)
+
 $(B)/ded/%.o: $(BLIBDIR)/%.c
 	$(DO_BOT_CC)
 
 $(B)/ded/%.o: $(SYSDIR)/%.c
+	$(DO_DED_CC)
+
+$(B)/ded/%.o: $(SYSDIR)/%.m
 	$(DO_DED_CC)
 
 $(B)/ded/%.o: $(SYSDIR)/%.rc
@@ -2413,31 +2514,31 @@ endif
 
 # Don't copy the SMP until it's working together with SDL.
 #ifneq ($(BUILD_CLIENT_SMP),0)
-#	$(INSTALL) -s -m 0755 $(BR)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT) $(COPYDIR)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT)
+#	$(INSTALL) -s -m 0755 $(BR)/$(CLIENTBIN)-smp$(FULLBINEXT) $(COPYDIR)/$(CLIENTBIN)-smp$(FULLBINEXT)
 #endif
 
 ifneq ($(BUILD_SERVER),0)
-	@if [ -f $(BR)/$(SERVERBIN).$(ARCH)$(BINEXT) ]; then \
-		$(INSTALL) -s -m 0755 $(BR)/$(SERVERBIN).$(ARCH)$(BINEXT) $(COPYDIR)/$(SERVERBIN).$(ARCH)$(BINEXT); \
+	@if [ -f $(BR)/$(SERVERBIN)$(FULLBINEXT) ]; then \
+		$(INSTALL) -s -m 0755 $(BR)/$(SERVERBIN)$(FULLBINEXT) $(COPYDIR)/$(SERVERBIN)$(FULLBINEXT); \
 	fi
 endif
 
 ifneq ($(BUILD_GAME_SO),0)
   ifneq ($(BUILD_BASEGAME),0)
-	$(INSTALL) -s -m 0755 $(BR)/$(BASEGAME)/cgame$(ARCH).$(SHLIBEXT) \
+	$(INSTALL) -s -m 0755 $(BR)/$(BASEGAME)/cgame$(FULLBINEXT) \
 					$(COPYDIR)/$(BASEGAME)/.
-	$(INSTALL) -s -m 0755 $(BR)/$(BASEGAME)/qagame$(ARCH).$(SHLIBEXT) \
+	$(INSTALL) -s -m 0755 $(BR)/$(BASEGAME)/qagame$(FULLBINEXT) \
 					$(COPYDIR)/$(BASEGAME)/.
-	$(INSTALL) -s -m 0755 $(BR)/$(BASEGAME)/ui$(ARCH).$(SHLIBEXT) \
+	$(INSTALL) -s -m 0755 $(BR)/$(BASEGAME)/ui$(FULLBINEXT) \
 					$(COPYDIR)/$(BASEGAME)/.
   endif
   ifneq ($(BUILD_MISSIONPACK),0)
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack
-	$(INSTALL) -s -m 0755 $(BR)/missionpack/cgame$(ARCH).$(SHLIBEXT) \
+	$(INSTALL) -s -m 0755 $(BR)/missionpack/cgame$(FULLBINEXT) \
 					$(COPYDIR)/missionpack/.
-	$(INSTALL) -s -m 0755 $(BR)/missionpack/qagame$(ARCH).$(SHLIBEXT) \
+	$(INSTALL) -s -m 0755 $(BR)/missionpack/qagame$(FULLBINEXT) \
 					$(COPYDIR)/missionpack/.
-	$(INSTALL) -s -m 0755 $(BR)/missionpack/ui$(ARCH).$(SHLIBEXT) \
+	$(INSTALL) -s -m 0755 $(BR)/missionpack/ui$(FULLBINEXT) \
 					$(COPYDIR)/missionpack/.
   endif
 endif
@@ -2495,11 +2596,14 @@ dist:
 # DEPENDENCIES
 #############################################################################
 
+ifneq ($(B),)
 OBJ_D_FILES=$(filter %.d,$(OBJ:%.o=%.d))
 TOOLSOBJ_D_FILES=$(filter %.d,$(TOOLSOBJ:%.o=%.d))
 -include $(OBJ_D_FILES) $(TOOLSOBJ_D_FILES)
+endif
 
 .PHONY: all clean clean2 clean-debug clean-release copyfiles \
 	debug default dist distclean installer makedirs \
 	release targets \
-	toolsclean toolsclean2 toolsclean-debug toolsclean-release
+	toolsclean toolsclean2 toolsclean-debug toolsclean-release \
+	$(OBJ_D_FILES) $(TOOLSOBJ_D_FILES)

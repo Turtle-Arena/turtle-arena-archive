@@ -159,6 +159,7 @@ New cvars
                                       ipv6 servers on the local network
   net_mcastiface                    - outgoing interface to use for scan
 
+  r_allowResize                     - make window resizable (SDL only)
   r_zProj                           - distance of observer camera to projection
                                       plane in quake3 standard units
   r_greyscale                       - render black and white images
@@ -179,8 +180,14 @@ New cvars
                                       See also
                                       http://wiki.ioquake3.org/Stereo_Rendering
                                       for more information
+  r_marksOnTriangleMeshes           - Support impact marks on md3 models, MOD
+                                      developers should increase the mark
+                                      triangle limits in cg_marks.c if they
+                                      intend to use this.
   r_sdlDriver                       - read only, indicates the SDL driver
                                       backend being used
+  sv_banFile                        - Name of the file that is used for storing
+                                      the server bans.
 
 New commands
   video [filename]        - start video capture (use with demo command)
@@ -192,11 +199,13 @@ New commands
                             server, valid <range> is either playernum or CIDR
                             notation address range.
   exceptaddr <range>      - exempt an ip address range from a ban.
-  bandel <num>            - delete ban <num>
-  exceptdel <num>         - delete exception <num>
+  bandel <range>          - delete ban (either range or ban number)
+  exceptdel <range>       - delete exception (either range or exception number)
   listbans                - list all currently active bans and exceptions
   rehashbans              - reload the banlist from serverbans.dat
   flushbans               - delete all bans
+
+  net_restart             - restart network subsystem to change latched settings
 
 ------------------------------------------------------------ Miscellaneous -----
 
@@ -415,26 +424,6 @@ SDL Keyboard Differences
   then be used for binding, nor will they generate characters when entering
   text. Also, in addition to the nominated console keys, Shift-ESC is hard
   coded to always toggle the console.
-
-Mouse Input On Windows
-  ioq3 uses SDL to abstract away as much as possible from platform specific
-  implementation details. Unfortunately, SDL 1.2 suffers from a number of bugs
-  and limitations with respect to mouse input on the Windows platform. We
-  provide a patch against the SDL subversion 1.2 branch which fixes the
-  following problems:
-
-    * DirectX (and thus DirectInput) driver not functional when using an
-      OpenGL SDL_Surface.
-
-    * DirectX (and thus DirectInput) driver not functional in windowed mode.
-
-    * Mouse buttons 4-7 unusable with the DirectX driver due to DirectInput 5
-      not exposing the required functionality. Use DirectInput 7 instead.
-
-    * Low quality mouse input data when using the windib driver due to use of
-      WM_MOUSEMOVE events. Use GetCursorPos API call instead.
-
-  The patch can be found in misc/sdl-win32-fixes.diff.
 
 PNG support
   ioquake3 supports the use of PNG (Portable Network Graphic) images as
