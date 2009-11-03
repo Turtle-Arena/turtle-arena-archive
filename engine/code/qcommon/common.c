@@ -45,8 +45,6 @@ int demo_protocols[] =
 #define MIN_COMHUNKMEGS		56
 #define DEF_COMHUNKMEGS		64
 #define DEF_COMZONEMEGS		24
-#define XSTRING(x)				STRING(x)
-#define STRING(x)					#x
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)
 
@@ -691,22 +689,6 @@ int Com_FilterPath(char *filter, char *name, int casesensitive)
 	}
 	new_name[i] = '\0';
 	return Com_Filter(new_filter, new_name, casesensitive);
-}
-
-/*
-============
-Com_HashKey
-============
-*/
-int Com_HashKey(char *string, int maxlen) {
-	int register hash, i;
-
-	hash = 0;
-	for (i = 0; i < maxlen && string[i] != '\0'; i++) {
-		hash += string[i] * (119 + i);
-	}
-	hash = (hash ^ (hash >> 10) ^ (hash >> 20));
-	return hash;
 }
 
 /*
@@ -1418,9 +1400,11 @@ void Com_InitSmallZoneMemory( void ) {
 void Com_InitZoneMemory( void ) {
 	cvar_t	*cv;
 
-	//FIXME: 05/01/06 com_zoneMegs is useless right now as neither q3config.cfg nor
-	// Com_StartupVariable have been executed by this point. The net result is that
-	// s_zoneTotal will always be set to the default value.
+	// Please note: com_zoneMegs can only be set on the command line, and
+	// not in q3config.cfg or Com_StartupVariable, as they haven't been
+	// executed by this point. It's a chicken and egg problem. We need the
+	// memory manager configured to handle those places where you would
+	// configure the memory manager.
 
 	// allocate the random block zone
 	cv = Cvar_Get( "com_zoneMegs", DEF_COMZONEMEGS_S, CVAR_LATCH | CVAR_ARCHIVE );
@@ -2381,6 +2365,43 @@ static void Com_Crash_f( void ) {
 	* ( int * ) 0 = 0x12345678;
 }
 
+/*
+==================
+Com_Setenv_f
+
+For controlling environment variables
+==================
+*/
+void Com_Setenv_f(void)
+{
+	int argc = Cmd_Argc();
+	char *arg1 = Cmd_Argv(1);
+
+	if(argc > 2)
+	{
+		char *arg2 = Cmd_ArgsFrom(2);
+		
+#ifdef _WIN32
+		// windows already removes env variable if value is an empty string
+		_putenv(va("%s=%s", arg1, arg2));
+#else
+		if(!*arg2)
+			unsetenv(arg1);
+		else
+			setenv(arg1, arg2, 1);
+#endif
+	}
+	else if(argc == 2)
+	{
+		char *env = getenv(arg1);
+		
+		if(env)
+			Com_Printf("%s=%s\n", arg1, env);
+		else
+			Com_Printf("%s undefined\n", arg1);
+        }
+}
+
 #ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 
@@ -2404,7 +2425,7 @@ void Com_ReadCDKey( const char *filename ) {
 	char			buffer[33];
 	char			fbuffer[MAX_OSPATH];
 
-	sprintf(fbuffer, "%s/q3key", filename);
+	Com_sprintf(fbuffer, sizeof(fbuffer), "%s/q3key", filename);
 
 	FS_SV_FOpenFileRead( fbuffer, &f );
 	if ( !f ) {
@@ -2434,7 +2455,7 @@ void Com_AppendCDKey( const char *filename ) {
 	char			buffer[33];
 	char			fbuffer[MAX_OSPATH];
 
-	sprintf(fbuffer, "%s/q3key", filename);
+	Com_sprintf(fbuffer, sizeof(fbuffer), "%s/q3key", filename);
 
 	FS_SV_FOpenFileRead( fbuffer, &f );
 	if (!f) {
@@ -2469,7 +2490,7 @@ static void Com_WriteCDKey( const char *filename, const char *ikey ) {
 #endif
 
 
-	sprintf(fbuffer, "%s/q3key", filename);
+	Com_sprintf(fbuffer, sizeof(fbuffer), "%s/q3key", filename);
 
 
 	Q_strncpyz( key, ikey, 17 );
@@ -2522,6 +2543,21 @@ static void Com_DetectAltivec(void)
 	}
 }
 
+/*
+=================
+Com_InitRand
+Seed the random number generator, if possible with an OS supplied random seed.
+=================
+*/
+static void Com_InitRand(void)
+{
+	unsigned int seed;
+
+	if(Sys_RandomBytes((byte *) &seed, sizeof(seed)))
+		srand(seed);
+	else
+		srand(time(NULL));
+}
 
 /*
 =================
@@ -2542,6 +2578,9 @@ void Com_Init( char *commandLine ) {
 	Com_Memset( &eventQueue[ 0 ], 0, MAX_QUEUED_EVENTS * sizeof( sysEvent_t ) );
 	Com_Memset( &sys_packetReceived[ 0 ], 0, MAX_MSGLEN * sizeof( byte ) );
 
+	// initialize the weak pseudo-random number generator for use later.
+	Com_InitRand();
+
   // do this before anything else decides to push events
   Com_InitPushEvent();
 
@@ -2555,11 +2594,11 @@ void Com_Init( char *commandLine ) {
 //	Swap_Init ();
 	Cbuf_Init ();
 
-	Com_InitZoneMemory();
-	Cmd_Init ();
-
 	// override anything from the config files with command line args
 	Com_StartupVariable( NULL );
+
+	Com_InitZoneMemory();
+	Cmd_Init ();
 
 	// get the developer cvar set as early as possible
 	Com_StartupVariable( "developer" );
@@ -2571,12 +2610,25 @@ void Com_Init( char *commandLine ) {
 
 	Com_InitJournaling();
 
+	// Add some commands here already so users can use them from config files
+	Cmd_AddCommand ("setenv", Com_Setenv_f);
+	if (com_developer && com_developer->integer)
+	{
+		Cmd_AddCommand ("error", Com_Error_f);
+		Cmd_AddCommand ("crash", Com_Crash_f);
+		Cmd_AddCommand ("freeze", Com_Freeze_f);
+	}
+	Cmd_AddCommand ("quit", Com_Quit_f);
+	Cmd_AddCommand ("changeVectors", MSG_ReportChangeVectors_f );
+	Cmd_AddCommand ("writeconfig", Com_WriteConfig_f );
+	Cmd_SetCommandCompletionFunc( "writeconfig", Cmd_CompleteCfgName );
+
+	// Make it execute the configuration files
 	Cbuf_AddText ("exec default.cfg\n");
 
 	// skip the q3config.cfg if "safe" is on the command line
-	if ( !Com_SafeMode() ) {
+	if (!Com_SafeMode())
 		Cbuf_AddText ("exec " Q3CONFIG_CFG "\n");
-	}
 
 	Cbuf_AddText ("exec autoexec.cfg\n");
 
@@ -2652,16 +2704,6 @@ void Com_Init( char *commandLine ) {
 	com_standalone = Cvar_Get( "com_standalone", "0", CVAR_INIT );
 
 	com_introPlayed = Cvar_Get( "com_introplayed", "0", CVAR_ARCHIVE);
-
-	if ( com_developer && com_developer->integer ) {
-		Cmd_AddCommand ("error", Com_Error_f);
-		Cmd_AddCommand ("crash", Com_Crash_f );
-		Cmd_AddCommand ("freeze", Com_Freeze_f);
-	}
-	Cmd_AddCommand ("quit", Com_Quit_f);
-	Cmd_AddCommand ("changeVectors", MSG_ReportChangeVectors_f );
-	Cmd_AddCommand ("writeconfig", Com_WriteConfig_f );
-	Cmd_SetCommandCompletionFunc( "writeconfig", Cmd_CompleteCfgName );
 
 	s = va("%s %s %s", Q3_VERSION, PLATFORM_STRING, __DATE__ );
 	com_version = Cvar_Get ("version", s, CVAR_ROM | CVAR_SERVERINFO );
@@ -3373,7 +3415,6 @@ void Com_RandomBytes( byte *string, int len )
 		return;
 
 	Com_Printf( "Com_RandomBytes: using weak randomization\n" );
-	srand( time( 0 ) );
 	for( i = 0; i < len; i++ )
 		string[i] = (unsigned char)( rand() % 255 );
 }

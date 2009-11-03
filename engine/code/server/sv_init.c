@@ -108,7 +108,7 @@ SV_SetConfigstring
 ===============
 */
 void SV_SetConfigstring (int index, const char *val) {
-	int		len, i;
+	int		i;
 	client_t	*client;
 
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
@@ -144,8 +144,6 @@ void SV_SetConfigstring (int index, const char *val) {
 				continue;
 			}
 		
-
-			len = strlen( val );
 			SV_SendConfigstring(client, index);
 		}
 	}
@@ -220,7 +218,7 @@ to the clients -- only the fields that differ from the
 baseline will be transmitted
 ================
 */
-void SV_CreateBaseline( void ) {
+static void SV_CreateBaseline( void ) {
 	sharedEntity_t *svent;
 	int				entnum;	
 
@@ -245,7 +243,7 @@ SV_BoundMaxClients
 
 ===============
 */
-void SV_BoundMaxClients( int minimum ) {
+static void SV_BoundMaxClients( int minimum ) {
 	// get the current maxclients value
 	Cvar_Get( "sv_maxclients", "8", 0 );
 
@@ -269,7 +267,7 @@ NOT cause this to be called, unless the game is exited to
 the menu system first.
 ===============
 */
-void SV_Startup( void ) {
+static void SV_Startup( void ) {
 	if ( svs.initialized ) {
 		Com_Error( ERR_FATAL, "SV_Startup: svs.initialized" );
 	}
@@ -367,7 +365,7 @@ void SV_ChangeMaxClients( void ) {
 SV_ClearServer
 ================
 */
-void SV_ClearServer(void) {
+static void SV_ClearServer(void) {
 	int i;
 
 	for ( i = 0 ; i < MAX_CONFIGSTRINGS ; i++ ) {
@@ -385,7 +383,7 @@ SV_TouchCGame
   touch the cgame.vm so that a pure client can load it if it's in a seperate pk3
 ================
 */
-void SV_TouchCGame(void) {
+static void SV_TouchCGame(void) {
 	fileHandle_t	f;
 	char filename[MAX_QPATH];
 
@@ -488,7 +486,6 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	Cvar_Set("cl_paused", "0");
 
 	// get a new checksum feed and restart the file system
-	srand(Com_Milliseconds());
 	sv.checksumFeed = ( ((int) rand() << 16) ^ rand() ) ^ Com_Milliseconds();
 	FS_Restart( sv.checksumFeed );
 
@@ -654,8 +651,6 @@ SV_Init
 Only called at main exe startup, not for each game
 ===============
 */
-void SV_BotInitBotLib(void);
-
 void SV_Init (void) {
 	SV_AddOperatorCommands ();
 
@@ -716,6 +711,7 @@ void SV_Init (void) {
 	sv_mapChecksum = Cvar_Get ("sv_mapChecksum", "", CVAR_ROM);
 	sv_lanForceRate = Cvar_Get ("sv_lanForceRate", "1", CVAR_ARCHIVE );
 	sv_strictAuth = Cvar_Get ("sv_strictAuth", "1", CVAR_ARCHIVE );
+	sv_banFile = Cvar_Get("sv_banFile", "serverbans.dat", CVAR_ARCHIVE);
 
 	// initialize bot cvars so they are listed and can be set before loading the botlib
 	SV_BotInitCvars();

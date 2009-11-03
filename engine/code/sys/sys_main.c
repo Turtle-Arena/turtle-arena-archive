@@ -381,9 +381,8 @@ static void* Sys_TryLibraryLoad(const char* base, const char* gamedir, const cha
 Sys_LoadDll
 
 Used to load a development dll instead of a virtual machine
-#1 look down current path
-#2 look in fs_homepath
-#3 look in fs_basepath
+#1 look in fs_homepath
+#2 look in fs_basepath
 =================
 */
 void *Sys_LoadDll( const char *name, char *fqpath ,
@@ -395,7 +394,6 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
 	char  fname[MAX_OSPATH];
 	char  *basepath;
 	char  *homepath;
-	char  *pwdpath;
 	char  *gamedir;
 
 	assert( name );
@@ -403,14 +401,10 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
 	Q_snprintf (fname, sizeof(fname), "%s" ARCH_STRING DLL_EXT, name);
 
 	// TODO: use fs_searchpaths from files.c
-	pwdpath = Sys_Cwd();
 	basepath = Cvar_VariableString( "fs_basepath" );
 	homepath = Cvar_VariableString( "fs_homepath" );
 	gamedir = Cvar_VariableString( "fs_game" );
 
-	libHandle = Sys_TryLibraryLoad(pwdpath, gamedir, fname, fqpath);
-
-	if(!libHandle && homepath)
 		libHandle = Sys_TryLibraryLoad(homepath, gamedir, fname, fqpath);
 
 	if(!libHandle && basepath)
@@ -517,8 +511,6 @@ int main( int argc, char **argv )
 	// Run time
 	const SDL_version *ver = SDL_Linked_Version( );
 
-#define STRING(s) #s
-#define XSTRING(s) STRING(s)
 #define MINSDL_VERSION \
 	XSTRING(MINSDL_MAJOR) "." \
 	XSTRING(MINSDL_MINOR) "." \
@@ -544,7 +536,15 @@ int main( int argc, char **argv )
 	// Concatenate the command line for passing to Com_Init
 	for( i = 1; i < argc; i++ )
 	{
+		const qboolean containsSpaces = strchr(argv[i], ' ') != NULL;
+		if (containsSpaces)
+			Q_strcat( commandLine, sizeof( commandLine ), "\"" );
+
 		Q_strcat( commandLine, sizeof( commandLine ), argv[ i ] );
+
+		if (containsSpaces)
+			Q_strcat( commandLine, sizeof( commandLine ), "\"" );
+
 		Q_strcat( commandLine, sizeof( commandLine ), " " );
 	}
 

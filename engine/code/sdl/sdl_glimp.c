@@ -26,13 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #	include <SDL.h>
 #endif
 
-#if !SDL_VERSION_ATLEAST(1, 2, 10)
-#define SDL_GL_ACCELERATED_VISUAL 15
-#define SDL_GL_SWAP_CONTROL 16
-#elif MINSDL_PATCH >= 10
-#error Code block no longer necessary, please remove
-#endif
-
 #ifdef SMP
 #	ifdef USE_LOCAL_HEADERS
 #		include "SDL_thread.h"
@@ -79,6 +72,7 @@ static SDL_Surface *screen = NULL;
 static const SDL_VideoInfo *videoInfo = NULL;
 
 cvar_t *r_allowSoftwareGL; // Don't abort out if a hardware visual can't be obtained
+cvar_t *r_allowResize; // make window resizable
 cvar_t *r_sdlDriver;
 
 void (APIENTRYP qglActiveTextureARB) (GLenum texture);
@@ -151,16 +145,8 @@ static void GLimp_DetectAvailableModes(void)
 	SDL_Rect **modes;
 	int numModes;
 	int i;
-	SDL_PixelFormat *format = NULL;
 
-#if SDL_VERSION_ATLEAST(1, 2, 10)
-	format = videoInfo->vfmt;
-#	if MINSDL_PATCH >= 10
-#		error Ifdeffery no longer necessary, please remove
-#	endif
-#endif
-
-	modes = SDL_ListModes( format, SDL_OPENGL | SDL_FULLSCREEN );
+	modes = SDL_ListModes( videoInfo->vfmt, SDL_OPENGL | SDL_FULLSCREEN );
 
 	if( !modes )
 	{
@@ -208,18 +194,16 @@ static int GLimp_SetMode( int mode, qboolean fullscreen )
 	int sdlcolorbits;
 	int colorbits, depthbits, stencilbits;
 	int tcolorbits, tdepthbits, tstencilbits;
+	int samples;
 	int i = 0;
 	SDL_Surface *vidscreen = NULL;
 	Uint32 flags = SDL_OPENGL;
 
 	ri.Printf( PRINT_ALL, "Initializing OpenGL display\n");
 
-#if !SDL_VERSION_ATLEAST(1, 2, 10)
-	// 1.2.10 is needed to get the desktop resolution
-	displayAspect = 4.0f / 3.0f;
-#elif MINSDL_PATCH >= 10
-#	error Ifdeffery no longer necessary, please remove
-#else
+	if ( r_allowResize->integer )
+		flags |= SDL_RESIZABLE;
+
 	if( videoInfo == NULL )
 	{
 		static SDL_VideoInfo sVideoInfo;
@@ -234,6 +218,8 @@ static int GLimp_SetMode( int mode, qboolean fullscreen )
 		sVideoInfo.vfmt = &sPixelFormat;
 		videoInfo = &sVideoInfo;
 
+		if( videoInfo->current_h > 0 )
+		{
 		// Guess the display aspect ratio through the desktop resolution
 		// by assuming (relatively safely) that it is set at or close to
 		// the display's native aspect ratio
@@ -241,7 +227,12 @@ static int GLimp_SetMode( int mode, qboolean fullscreen )
 
 		ri.Printf( PRINT_ALL, "Estimated display aspect: %.3f\n", displayAspect );
 	}
-#endif
+		else
+		{
+			ri.Printf( PRINT_ALL,
+					"Cannot estimate display aspect, assuming 1.333\n" );
+		}
+	}
 
 	ri.Printf (PRINT_ALL, "...setting mode %d:", mode );
 
@@ -260,16 +251,16 @@ static int GLimp_SetMode( int mode, qboolean fullscreen )
 	else
 		glConfig.isFullscreen = qfalse;
 
-	if (!r_colorbits->value)
-		colorbits = 24;
-	else
 		colorbits = r_colorbits->value;
+	if ((!colorbits) || (colorbits >= 32))
+		colorbits = 24;
 
 	if (!r_depthbits->value)
 		depthbits = 24;
 	else
 		depthbits = r_depthbits->value;
 	stencilbits = r_stencilbits->value;
+	samples = r_ext_multisample->value;
 
 	for (i = 0; i < 16; i++)
 	{
@@ -331,11 +322,22 @@ static int GLimp_SetMode( int mode, qboolean fullscreen )
 		if (tcolorbits == 24)
 			sdlcolorbits = 8;
 
+#ifdef __sgi /* Fix for SGIs grabbing too many bits of color */
+		if (sdlcolorbits == 4)
+			sdlcolorbits = 0; /* Use minimum size for 16-bit color */
+
+		/* Need alpha or else SGIs choose 36+ bit RGB mode */
+		SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 1);
+#endif
+
 		SDL_GL_SetAttribute( SDL_GL_RED_SIZE, sdlcolorbits );
 		SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, sdlcolorbits );
 		SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, sdlcolorbits );
 		SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, tdepthbits );
 		SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE, tstencilbits );
+
+		SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, samples ? 1 : 0 );
+		SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, samples );
 
 		if(r_stereoEnabled->integer)
 		{
@@ -660,34 +662,46 @@ of OpenGL
 */
 void GLimp_Init( void )
 {
-	qboolean success = qtrue;
-
 	r_allowSoftwareGL = ri.Cvar_Get( "r_allowSoftwareGL", "0", CVAR_LATCH );
 	r_sdlDriver = ri.Cvar_Get( "r_sdlDriver", "", CVAR_ROM );
+	r_allowResize = ri.Cvar_Get( "r_allowResize", "0", CVAR_ARCHIVE );
 
 	Sys_GLimpInit( );
 
-	// create the window and set up the context
-	if( !GLimp_StartDriverAndSetMode( r_mode->integer, r_fullscreen->integer ) )
-	{
+	// Create the window and set up the context
+	if( GLimp_StartDriverAndSetMode( r_mode->integer, r_fullscreen->integer ) )
+		goto success;
+
+	// Try again, this time in a platform specific "safe mode"
+	Sys_GLimpSafeInit( );
+
+	if( GLimp_StartDriverAndSetMode( r_mode->integer, r_fullscreen->integer ) )
+		goto success;
+
+	// Finally, try the default screen resolution
 		if( r_mode->integer != R_MODE_FALLBACK )
 		{
 			ri.Printf( PRINT_ALL, "Setting r_mode %d failed, falling back on r_mode %d\n",
 					r_mode->integer, R_MODE_FALLBACK );
-			if( !GLimp_StartDriverAndSetMode( R_MODE_FALLBACK, r_fullscreen->integer ) )
-				success = qfalse;
-		}
-		else
-			success = qfalse;
+
+		if( GLimp_StartDriverAndSetMode( R_MODE_FALLBACK, r_fullscreen->integer ) )
+			goto success;
 	}
 
-	if( !success )
+	// Nothing worked, give up
 		ri.Error( ERR_FATAL, "GLimp_Init() - could not load OpenGL subsystem\n" );
 
+success:
 	// This values force the UI to disable driver selection
 	glConfig.driverType = GLDRV_ICD;
 	glConfig.hardwareType = GLHW_GENERIC;
-	glConfig.deviceSupportsGamma = !!( SDL_SetGamma( 1.0f, 1.0f, 1.0f ) >= 0 );
+	glConfig.deviceSupportsGamma = SDL_SetGamma( 1.0f, 1.0f, 1.0f ) >= 0;
+
+	// Mysteriously, if you use an NVidia graphics card and multiple monitors,
+	// SDL_SetGamma will incorrectly return false... the first time; ask
+	// again and you get the correct answer. This is a suspected driver bug, see
+	// http://bugzilla.icculus.org/show_bug.cgi?id=4316
+	glConfig.deviceSupportsGamma = SDL_SetGamma( 1.0f, 1.0f, 1.0f ) >= 0;
 
 	// get our config strings
 	Q_strncpyz( glConfig.vendor_string, (char *) qglGetString (GL_VENDOR), sizeof( glConfig.vendor_string ) );

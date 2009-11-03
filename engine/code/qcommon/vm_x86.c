@@ -176,9 +176,14 @@ _asm {
 #else //!_MSC_VER
 
 #if defined(__MINGW32__) || defined(MACOS_X) // _ is prepended to compiled symbols
-#	define CMANG(sym) "_"#sym
+#define CMANGVAR(sym) "_"#sym
+#define CMANGFUNC(sym) "_"#sym
+#elif defined(__ICC) && (__ICC >= 1000)
+#define CMANGVAR(sym) #sym".0"
+#define CMANGFUNC(sym) #sym
 #else
-#	define CMANG(sym) #sym
+#define CMANGVAR(sym) #sym
+#define CMANGFUNC(sym) #sym
 #endif
 
 static void __attribute__((cdecl, used)) CallAsmCall(int const syscallNum,
@@ -199,32 +204,37 @@ __asm__(
 	".text\n\t"
 	".p2align 4,,15\n\t"
 #if defined __ELF__
-	".type " CMANG(AsmCall) ", @function\n"
+	".type " CMANGFUNC(AsmCall) ", @function\n"
 #endif
-	CMANG(AsmCall) ":\n\t"
+	CMANGFUNC(AsmCall) ":\n\t"
 	"movl  (%edi), %eax\n\t"
 	"subl  $4, %edi\n\t"
 	"testl %eax, %eax\n\t"
 	"jl    0f\n\t"
 	"shll  $2, %eax\n\t"
-	"addl  " CMANG(instructionPointers) ", %eax\n\t"
+	"addl  " CMANGVAR(instructionPointers) ", %eax\n\t"
 	"call  *(%eax)\n\t"
 	"movl  (%edi), %eax\n\t"
-	"andl  " CMANG(callMask) ", %eax\n\t"
+	"andl  " CMANGVAR(callMask) ", %eax\n\t"
 	"ret\n"
 	"0:\n\t" // system call
 	"notl  %eax\n\t"
+	"pushl %ebp\n\t"
+	"movl  %esp, %ebp\n\t"
+	"andl $-16, %esp\n\t" // align the stack so engine can use sse
 	"pushl %ecx\n\t"
 	"pushl %edi\n\t" // opStack
 	"pushl %esi\n\t" // programStack
 	"pushl %eax\n\t" // syscallNum
-	"call  " CMANG(CallAsmCall) "\n\t"
+	"call  " CMANGFUNC(CallAsmCall) "\n\t"
 	"addl  $12, %esp\n\t"
 	"popl  %ecx\n\t"
+	"movl  %ebp, %esp\n\t"
+	"popl  %ebp\n\t"
 	"addl  $4, %edi\n\t"
 	"ret\n\t"
 #if defined __ELF__
-	".size " CMANG(AsmCall)", .-" CMANG(AsmCall)
+	".size " CMANGFUNC(AsmCall)", .-" CMANGFUNC(AsmCall)
 #endif
 );
 
@@ -395,6 +405,15 @@ qboolean EmitMovEBXEDI(vm_t *vm, int andit) {
 	return qfalse;
 }
 
+#define JUSED(x) \
+	do { \
+		if (x < 0 || x >= jusedSize) { \
+			Com_Error( ERR_DROP, \
+					"VM_CompileX86: jump target out of range at offset %d", pc ); \
+		} \
+		jused[x] = 1; \
+	} while(0)
+
 /*
 =================
 VM_Compile
@@ -406,13 +425,14 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 	int		v;
 	int		i;
 	qboolean opt;
+	int jusedSize = header->instructionCount + 2;
 
 	// allocate a very large temp buffer, we will shrink it later
 	maxLength = header->codeLength * 8;
 	buf = Z_Malloc( maxLength );
-	jused = Z_Malloc(header->instructionCount + 2 );
+	jused = Z_Malloc(jusedSize);
 	
-	Com_Memset(jused, 0, header->instructionCount+2);
+	Com_Memset(jused, 0, jusedSize);
 
 	// ensure that the optimisation pass knows about all the jump
 	// table targets
@@ -553,7 +573,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			lastConst = Constant4();
 			Emit4( lastConst );
 			if (code[pc] == OP_JUMP) {
-				jused[lastConst] = 1;
+				JUSED(lastConst);
 			}
 			break;
 		case OP_LOCAL:
@@ -719,7 +739,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "75 06" );		// jne +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_NE:
@@ -729,7 +749,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "74 06" );		// je +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_LTI:
@@ -739,7 +759,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "7D 06" );		// jnl +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_LEI:
@@ -749,7 +769,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "7F 06" );		// jnle +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_GTI:
@@ -759,7 +779,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "7E 06" );		// jng +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_GEI:
@@ -769,7 +789,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "7C 06" );		// jnge +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_LTU:
@@ -779,7 +799,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "73 06" );		// jnb +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_LEU:
@@ -789,7 +809,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "77 06" );		// jnbe +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_GTU:
@@ -799,7 +819,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "76 06" );		// jna +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_GEU:
@@ -809,7 +829,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "72 06" );		// jnae +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;
 		case OP_EQF:
@@ -821,7 +841,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "74 06" );		// je +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;			
 		case OP_NEF:
@@ -833,7 +853,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "75 06" );		// jne +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;			
 		case OP_LTF:
@@ -845,7 +865,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "74 06" );		// je +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;			
 		case OP_LEF:
@@ -857,7 +877,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "74 06" );		// je +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;			
 		case OP_GTF:
@@ -869,7 +889,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "75 06" );		// jne +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;			
 		case OP_GEF:
@@ -881,7 +901,7 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 			EmitString( "75 06" );		// jne +6
 			EmitString( "FF 25" );		// jmp	[0x12345678]
 			v = Constant4();
-			jused[v] = 1;
+			JUSED(v);
 			Emit4( (int)vm->instructionPointers + v*4 );
 			break;			
 		case OP_NEGI:

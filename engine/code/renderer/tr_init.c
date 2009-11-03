@@ -102,6 +102,7 @@ cvar_t	*r_depthbits;
 cvar_t	*r_colorbits;
 cvar_t	*r_primitives;
 cvar_t	*r_texturebits;
+cvar_t  *r_ext_multisample;
 
 cvar_t	*r_drawBuffer;
 cvar_t	*r_lightmap;
@@ -157,6 +158,8 @@ cvar_t	*r_debugLight;
 cvar_t	*r_debugSort;
 cvar_t	*r_printShaders;
 cvar_t	*r_saveFontData;
+
+cvar_t	*r_marksOnTriangleMeshes;
 
 cvar_t	*r_maxpolys;
 int		max_polys;
@@ -546,9 +549,9 @@ void R_LevelShot( void ) {
 	int			xx, yy;
 
 #ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
-	sprintf( checkname, "levelshots/%s_small.tga", tr.world->baseName );
+	Com_sprintf(checkname, sizeof(checkname), "levelshots/%s_small.tga", tr.world->baseName);
 #else
-	sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
+	Com_sprintf(checkname, sizeof(checkname), "levelshots/%s.tga", tr.world->baseName);
 #endif
 
 	source = ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight * 3 );
@@ -999,6 +1002,8 @@ void R_Register( void )
 	r_colorbits = ri.Cvar_Get( "r_colorbits", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_stencilbits = ri.Cvar_Get( "r_stencilbits", "8", CVAR_ARCHIVE | CVAR_LATCH );
 	r_depthbits = ri.Cvar_Get( "r_depthbits", "0", CVAR_ARCHIVE | CVAR_LATCH );
+	r_ext_multisample = ri.Cvar_Get( "r_ext_multisample", "0", CVAR_ARCHIVE | CVAR_LATCH );
+	ri.Cvar_CheckRange( r_ext_multisample, 0, 4, qtrue );
 #ifdef TMNTMISC // Default "r_overBrightBits" to 0.
 	r_overBrightBits = ri.Cvar_Get ("r_overBrightBits", "0", CVAR_ARCHIVE | CVAR_LATCH );
 #else
@@ -1120,6 +1125,8 @@ void R_Register( void )
 	r_lockpvs = ri.Cvar_Get ("r_lockpvs", "0", CVAR_CHEAT);
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_CHEAT);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
+
+	r_marksOnTriangleMeshes = ri.Cvar_Get("r_marksOnTriangleMeshes", "0", CVAR_ARCHIVE);
 
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);
