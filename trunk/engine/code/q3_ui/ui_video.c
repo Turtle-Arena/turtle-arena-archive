@@ -886,7 +886,7 @@ static void GraphicsOptions_SetMenuItems( void )
 
 			for(i = 0; detectedResolutions[i]; ++i)
 			{
-				if(!strcmp(buf, detectedResolutions[i]))
+				if(!Q_stricmp(buf, detectedResolutions[i]))
 				{
 					s_graphicsoptions.mode.curvalue = i;
 					break;

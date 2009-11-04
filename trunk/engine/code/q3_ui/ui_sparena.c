@@ -657,12 +657,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_newgame.generic.y			= y;
 	spMenuInfo.sp_newgame.generic.id		= ID_SP_NEWGAME;
 	spMenuInfo.sp_newgame.generic.callback	= UI_SPMenu_Event;
-#ifdef TMNTRELEASE
-	spMenuInfo.sp_newgame.string			= "New Game (to do)";
-	spMenuInfo.sp_newgame.generic.flags |= QMF_GRAYED;
-#else
-	spMenuInfo.sp_newgame.string			= "New Game";
-#endif
+	spMenuInfo.sp_newgame.string			= "New Game (unfinished)";
 	spMenuInfo.sp_newgame.color				= color_red;
 	spMenuInfo.sp_newgame.style				= UI_CENTER;
 
@@ -673,12 +668,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.generic.y			= y;
 	spMenuInfo.sp_loadgame.generic.id			= ID_SP_LOADGAME;
 	spMenuInfo.sp_loadgame.generic.callback	= UI_SPMenu_Event;
-#ifdef TMNTRELEASE
-	spMenuInfo.sp_loadgame.string				= "Load Game (to do)";
-	spMenuInfo.sp_loadgame.generic.flags |= QMF_GRAYED;
-#else
-	spMenuInfo.sp_loadgame.string				= "Load Game";
-#endif
+	spMenuInfo.sp_loadgame.string				= "Load Game (unfinished)";
 	spMenuInfo.sp_loadgame.color				= color_red;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
 

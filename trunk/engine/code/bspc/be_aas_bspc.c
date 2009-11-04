@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#include "../qcommon/q_shared.h"
+#include "../qcommon/q_shared.h" // Turtle Man(IOQ3): game to qcommon
 #include "../bspc/l_log.h"
 #include "../bspc/l_qfiles.h"
 #include "../botlib/l_memory.h"
@@ -28,8 +28,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../botlib/l_precomp.h"
 #include "../botlib/l_struct.h"
 #include "../botlib/aasfile.h"
-#include "../botlib/botlib.h"
-#include "../botlib/be_aas.h"
+#include "../botlib/botlib.h" // Turtle Man(IOQ3): game to botlib
+#include "../botlib/be_aas.h" // Turtle Man(IOQ3): game to botlib
 #include "../botlib/be_aas_def.h"
 #include "../qcommon/cm_public.h"
 
@@ -157,7 +157,7 @@ void BotImport_Print(int type, char *fmt, ...)
 
 	va_start(argptr, fmt);
 	vsprintf(buf, fmt, argptr);
-	printf(buf);
+	printf("%s", buf);
 	if (buf[0] != '\r') Log_Write(buf);
 	va_end(argptr);
 } //end of the function BotImport_Print
@@ -204,7 +204,7 @@ void Com_DPrintf(char *fmt, ...)
 
 	va_start(argptr, fmt);
 	vsprintf(buf, fmt, argptr);
-	printf(buf);
+	printf("%s", buf);
 	if (buf[0] != '\r') Log_Write(buf);
 	va_end(argptr);
 } //end of the function Com_DPrintf
@@ -217,6 +217,7 @@ void Com_DPrintf(char *fmt, ...)
 int COM_Compress( char *data_p ) {
 	return strlen(data_p);
 }
+#if 0 // Turtle Man(IOQ3): Disabled
 //===========================================================================
 //
 // Parameter:			-
@@ -235,6 +236,7 @@ void Com_Memset (void* dest, const int val, const size_t count) {
 void Com_Memcpy (void* dest, const void* src, const size_t count) {
 	memcpy(dest, src, count);
 }
+#endif
 //===========================================================================
 //
 // Parameter:				-

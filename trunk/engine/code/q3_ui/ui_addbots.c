@@ -245,7 +245,7 @@ UI_AddBotsMenu_Init
 =================
 */
 static const char *skillNames[] = {
-#if defined TMNT || defined SONIC // rip off SRB2 skills...
+#ifdef TMNTMISC // rip off SRB2 skills...
 	"Easy",
 	"Normal",
 	"Hard",

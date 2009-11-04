@@ -123,7 +123,7 @@ void TossClientItems( gentity_t *self ) {
 	// weapon that isn't the mg or gauntlet.  Without this, a client
 	// can pick up a weapon, be killed, and not drop the weapon because
 	// their weapon change hasn't completed yet and they are still holding the MG.
-#ifdef TMNTWEAPONS
+#ifdef TMNTWEAPONS // Turtle Man: FIXME: It would change q3 gameplay?... so not TMNTWEAPSYS?
 	if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON] ) {
 #else
 	if ( weapon == WP_MACHINEGUN || weapon == WP_GRAPPLING_HOOK ) {
@@ -139,7 +139,13 @@ void TossClientItems( gentity_t *self ) {
 
 #ifdef TMNTWEAPSYS2
 	// Turtle Man: Drop valid selected weapon to drop
-	if (weapon > WP_NONE && weapon < WP_NUM_WEAPONS)
+	if (weapon > WP_NONE && weapon <
+#ifdef TMNTWEAPSYS_2
+		BG_NumWeaponGroups()
+#else
+		WP_NUM_WEAPONS
+#endif
+		)
 #elif defined TMNTWEAPSYS
 	// Turtle Man: Drop all weapons except default.
 	if ( weapon != self->client->ps.stats[STAT_DEFAULTWEAPON] )
@@ -156,7 +162,7 @@ void TossClientItems( gentity_t *self ) {
 		drop = Drop_Item( self, item, 0 );
 		if (drop) {
 			int ammo;
-#ifdef TMNTWEAPSYS2 // Turtle Man: FIXME: Is this right?
+#ifdef TMNTWEAPSYS2
 			if (statAmmo != -1)
 			{
 				ammo = self->client->ps.stats[statAmmo];
@@ -399,7 +405,7 @@ char	*modNames[] = {
 	"MOD_SWORD",
 	"MOD_BAT",
 	"MOD_BO",
-	"MOD_BAMBOOBO",
+	"MOD_BAMBOO",
 	"MOD_GUN",
 	"MOD_ELECTRIC",
 	"MOD_ELECTRIC_SPLASH",
@@ -657,6 +663,37 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	ent->s.eventParm = meansOfDeath;
 	ent->s.otherEntityNum = self->s.number;
 	ent->s.otherEntityNum2 = killer;
+#ifdef TMNTWEAPSYS_2
+	ent->s.weapon = 0; // unknown projectile/weapon
+	// projectile or weapon group number, for MOD_PROJECTILE or MOD_WEAPON_*
+	if (meansOfDeath == MOD_PROJECTILE)
+	{
+		if (inflictor && inflictor->s.eType == ET_MISSILE) {
+			ent->s.weapon = inflictor->s.weapon;
+		}
+		// Check for instant damage guns
+		else if (inflictor == attacker && (attacker->client
+#ifdef TMNTNPCSYS
+			|| attacker->s.eType == ET_NPC
+#endif
+			) && bg_weapongroupinfo[attacker->s.weapon].weapon[0]->proj->instantDamage)
+		{
+			ent->s.weapon = bg_weapongroupinfo[attacker->s.weapon].weapon[0]->projnum;
+		}
+	}
+	else if (meansOfDeath == MOD_WEAPON_PRIMARY
+		|| meansOfDeath == MOD_WEAPON_SECONDARY)
+	{
+		if (attacker && (attacker->client
+#ifdef TMNTNPCSYS
+			|| attacker->s.eType == ET_NPC
+#endif
+		))
+		{
+			ent->s.weapon = attacker->s.weapon;
+		}
+	}
+#endif
 	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
 
 	self->enemy = attacker;
@@ -676,7 +713,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		} else {
 			AddScore( attacker, self->r.currentOrigin, 1 );
 
-#ifndef TMNTWEAPONS // Use EF_AWARD_BITS here?...
+#ifndef TMNTWEAPONS
 			if( meansOfDeath == MOD_GAUNTLET ) {
 				
 				// play humiliation on player
@@ -800,12 +837,13 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	self->s.loopSound = 0;
 
+#if 0 //#ifdef TMNTPLAYERSYS // Turtle Man: FIXME: Use per-player bounding box!
+#else
 	self->r.maxs[2] = -8;
+#endif
 
 	// don't allow respawn until the death anim is done
 	// g_forcerespawn may force spawning at some later time
-#ifdef TMNTPLAYERSYS // Turtle Man: FIXME: Use real animation time here! This means we have to tell bg which animation to use...
-#endif
 	self->client->respawnTime = level.time + 1700;
 
 	// remove powerups
@@ -834,6 +872,11 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			anim = BOTH_DEATH3;
 			break;
 		}
+
+#ifdef TMNTPLAYERSYS
+		// Wait for death animation to end before respawning
+		self->client->respawnTime = level.time + BG_AnimationTime(&self->client->pers.playercfg.animations[anim]);
+#endif
 
 #ifndef NOTRATEDM // No gibs.
 		// for the no-blood option, we need to prevent the health
@@ -1104,6 +1147,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		if ( client->noclip ) {
 			return;
 		}
+#ifdef TMNT // POWERS
+		if ( client->ps.powerups[PW_FLASHING] ) {
+			return;
+		}
+#endif
 	}
 
 	if ( !dir ) {
@@ -1215,16 +1263,18 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 #ifdef TMNT // POWERS
 	// never take any damage.
 	if ( client && client->ps.powerups[PW_INVUL] ) {
-		G_AddEvent( targ, EV_POWERUP_BATTLESUIT, 0 );
+		G_AddEvent( targ, EV_POWERUP_INVUL, 0 );
 		return;
 	}
 #endif
 
-#ifndef SP_NPC
 	// add to the attacker's hit counter (if the target isn't a general entity like a prox mine)
 	if ( attacker->client && client
 			&& targ != attacker && targ->health > 0
 			&& targ->s.eType != ET_MISSILE
+#ifdef TMNTNPCSYS
+			&& targ->s.eType != ET_NPC
+#endif
 			&& targ->s.eType != ET_GENERAL) {
 		if ( OnSameTeam( targ, attacker ) ) {
 			attacker->client->ps.persistant[PERS_HITS]--;
@@ -1237,7 +1287,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		attacker->client->ps.persistant[PERS_ATTACKEE_ARMOR] = (targ->health<<8)|(client->ps.stats[STAT_ARMOR]);
 #endif
 	}
-#endif
 
 	// always give half damage if hurting self
 	// calculated after knockback, so rocket jumping works

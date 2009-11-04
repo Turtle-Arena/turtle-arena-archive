@@ -23,8 +23,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-/* Turtle Man: TODO: Finish new g_paths.c
-	New general path code, for trains, camera "scripts", NPCs, NiGHTS mode?, 2D mode?
+/* Turtle Man: TODO: Finish new general path code,
+		for trains, camera "scripts", NPCs, NiGHTS mode?, 2D mode?
 		and what not.
 
 	It is however unfinish and untested.
@@ -52,21 +52,31 @@ typedef struct
 // The first must have a non-NULL classname
 gpathinfo_t gpathinfo[] =
 {
-	// Quake 3 (and ect) compatibility
+	// Quake 3 (and etc) compatibility
 	{ "path_corner", PATHF_BEGIN | PATHF_POINT },
 
-	// TDC NPC compatiblity
+	// TDC_NPC compatiblity...
 	{ "npcpath", PATHF_BEGIN | PATHF_POINT | PATHF_CANFINISH },
 
 	// TMNT Path entities
 	{ "path_start", PATHF_BEGIN | PATHF_POINT }, // Is there a reason for "start"?
 	{ "path_point", PATHF_POINT },
 	{ "path_axis", PATHF_AXIS }, // Like SRB2's MT_AXIS, for NiGHTS mode. (entity is point to be rotated around)
-	{ "path_end", PATHF_FINISH }, // A end it not needed if circit path, just link "end" to path_start.
+	{ "path_end", PATHF_FINISH | PATHF_POINT }, // A end is not needed for circit paths, just link "end" to path_start.
+
+#ifdef NIGHTSMODE
+	// NiGHTS
+	{ "nights_target", PATHF_POINT },
+#endif
 
 	// end of list marker
 	{ NULL, 0 }
 };
+
+void SP_path_start( gentity_t *ent )
+{
+	// Setup path to avoid freeze in game?
+}
 
 /*
 ===========
@@ -254,34 +264,58 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean backward, qboolean check)
 		return qfalse;		// train just stops
 	}
 
+	// Turtle Man: Check if we have made it to the nextTrain/prevTrain
+	//               Doesn't work with PATHF_AXIS!
 	if (check)
 	{
-		// check if we have made it to the nextTrain/prevTrain
+		vec3_t targetPos;
+		vec_t dist;
+
+		if (backward)
+			VectorCopy(prev->s.origin/*s.pos*/, targetPos);
+		else
+			VectorCopy(next->s.origin/*s.pos*/, targetPos);
+
+		dist = Distance(ent->s.origin/*s.pos*/, targetPos);
+
+		// Turtle Man: Value is untested.
+		if (dist > 20.0f)
 		return qfalse;
+		else {
+			G_Printf("DEBUG: G_ReachedPath: Made it to path entity...\n");
+		}
 	}
 
 	// fire all other targets
 	if (backward)
-		G_UseTargets( prev, NULL );
+		G_UseTargets( prev, ent/*NULL*/ );
 	else
-		G_UseTargets( next, NULL );
+		G_UseTargets( next, ent/*NULL*/ );
 
 	// Setup next move
-
-	// set the new trajectory
 	if (backward)
 	{
 		ent->nextTrain = next->prevTrain;
 		ent->prevTrain = prev->prevTrain;
-		VectorCopy( next->s.origin, ent->pos1 );
-		VectorCopy( next->nextTrain->s.origin, ent->pos2 );
 	}
 	else
 	{
 		ent->nextTrain = next->nextTrain;
 		ent->prevTrain = prev->nextTrain;
+	}
+
+	if (ent->s.eType == ET_MOVER) {
+		// set the new trajectory
+		if (backward)
+		{
 		VectorCopy( next->s.origin, ent->pos1 );
 		VectorCopy( next->nextTrain->s.origin, ent->pos2 );
+	}
+		else
+		{
+			VectorCopy( next->s.origin, ent->pos1 );
+			VectorCopy( next->nextTrain->s.origin, ent->pos2 );
+		}
 	}
 
 	return qtrue;

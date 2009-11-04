@@ -88,7 +88,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CS_BOTINFO				25
 
 #define	CS_ITEMS				27		// string of 0's and 1's that tell which items are present
-#ifdef SP_NPC
+#ifdef TMNTNPCSYS
 #define	CS_NPCS					28
 #endif
 
@@ -193,6 +193,9 @@ typedef enum {
 typedef struct {
 	// state (in / out)
 	playerState_t	*ps;
+#ifdef TMNTNPCSYS
+	bg_npc_t		*npc;
+#endif
 
 	// command (in)
 	usercmd_t	cmd;
@@ -326,6 +329,9 @@ typedef enum {
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 #define	EF_KAMIKAZE			0x00000200
 #endif
+#ifdef NIGHTSMODE
+#define	EF_NIGHTSMODE		0x00000200 // EF_KAMIKAZE
+#endif
 #define	EF_MOVER_STOP		0x00000400		// will push otherwise
 #define EF_AWARD_CAP		0x00000800		// draw the capture sprite
 #define	EF_TALK				0x00001000		// draw a talk balloon
@@ -336,19 +342,13 @@ typedef enum {
 #endif
 #define	EF_AWARD_DEFEND		0x00010000		// draw a defend sprite
 #define	EF_AWARD_ASSIST		0x00020000		// draw a assist sprite
-#ifdef TMNT // EF_TELE_EFFECT
-#define	EF_TELE_EFFECT		0x00040000		// draw a shader on player when teleport
-#endif
 #ifndef IOQ3ZTM // unused
 #define EF_AWARD_DENIED		0x00040000		// denied
 #endif
-#define EF_TEAMVOTED		0x00080000		// already cast a team vote
 #ifdef TMNTWEAPSYS
-#define	EF_PRIMARY_HAND		0x00100000		// player flag for primary hand only
+#define	EF_PRIMARY_HAND		0x00040000		// player flag for primary hand only
 #endif
-#ifdef SP_NPC // entity
-#define	EF_FORCE_END_FRAME	0x00200000
-#endif
+#define EF_TEAMVOTED		0x00080000		// already cast a team vote
 
 #ifdef IOQ3ZTM
 #ifdef TMNTWEAPONS
@@ -368,8 +368,8 @@ typedef enum {
 
 	// Limited time powerups
 
-	PW_QUAD, // PW_STRENGTH: g_quadfactor * damge
-	PW_BATTLESUIT, // PW_DEFENSE: Half damage
+	PW_QUAD, // PW_STRENGTH: Do g_quadfactor * damge
+	PW_BATTLESUIT, // PW_DEFENSE: Take half damage
 	PW_HASTE, // PW_SPEED: More Speed
 	PW_INVIS, // Foot Tech powerup?
 
@@ -378,6 +378,8 @@ typedef enum {
 	PW_FLIGHT,		// Allow player to fly around the level.
 
 	PW_INVUL,		// New invulerrability
+	PW_FLASHING,	// Given on spawn/teleport/dead, take no damge and glow/flash blue.
+					// (Named after SRB2's pw_flashing.)
 
 	PW_REDFLAG,		// Player has red flag
 	PW_BLUEFLAG,	//     ...has blue...
@@ -482,8 +484,7 @@ typedef enum
 {
     WT_NONE, // Dummy type
 
-	// Turtle Man: TODO: Check if gauntlet code works.
-	//   (Compile as Quake3 with TMNTWEAPSYS?)
+	// Turtle Man: NOTE: Gauntlet code has been tested...
 	WT_GAUNTLET, // Uses primary hand only
 
     WT_GUN, // One gun, both hands.
@@ -533,7 +534,7 @@ typedef enum
 /*#ifdef TMNT_SUPPORTQ3
 // Quake 3 players don't have a "default_weapon" in there animation.cfg
 // GUNS_AS_DEFAULT  --Search Keyword
-// Turtle Man: FIXME: Should be WP_GAUNTLET for quake3 players,
+// Turtle Man: Should be WP_GAUNTLET for quake3 players,
 //     but I have no gauntlet... (and don't really want one.)
 //   Guns as default weapon is disabled.
 //   This is due to ammo for default weapons being problatic;
@@ -551,20 +552,13 @@ typedef enum
 #endif // TMNTWEAPSYS_2
 #else // !TMNT_SUPPORTQ3
 */
-// WP_FISTS would work for default?
 #ifdef TMNTWEAPSYS_2
-#define DEFAULT_DEFAULT_WEAPON "WP_SAIS"
+#define DEFAULT_DEFAULT_WEAPON "WP_FISTS"
 #else
-#define DEFAULT_DEFAULT_WEAPON WP_SAIS
+#define DEFAULT_DEFAULT_WEAPON WP_FISTS
 #endif // TMNTWEAPSYS_2
 //#endif // TMNT_SUPPORTQ3
 
-#elif defined SONICWEAPONS
-#ifdef TMNTWEAPSYS_2
-#define DEFAULT_DEFAULT_WEAPON "WP_RED_RING"
-#else
-#define DEFAULT_DEFAULT_WEAPON WP_RED_RING
-#endif // TMNTWEAPSYS_2
 #else
 #ifdef TMNTWEAPSYS_2
 #define DEFAULT_DEFAULT_WEAPON "WP_GAUNTLET" // "WP_MACHINEGUN"
@@ -574,17 +568,6 @@ typedef enum
 #endif
 #endif // TMNTWEAPSYS
 
-#ifdef SP_NPC
-#define WP_FIREBALL WP_ROCKET_LAUNCHER
-#ifndef TMNTWEAPONS
-#define WP_BAT WP_ROCKET_LAUNCHER // Uses the same name as my weapon.
-#endif
-#define WP_SEA1 WP_ROCKET_LAUNCHER
-#define WP_SEA2 WP_ROCKET_LAUNCHER
-#ifndef TMNTWEAPONS
-#define WP_GUN WP_ROCKET_LAUNCHER // Uses the same name as my weapon.
-#endif
-#endif
 typedef enum {
 #ifdef TMNTWEAPSYS
     WP_DEFAULT = -1, // This weapon will need to be remapped to the default weapon.
@@ -593,9 +576,9 @@ typedef enum {
 #ifdef TMNTWEAPONS
 	// Many of the weapons are based on weapons in TMNT: Mutant Melee
 
-	WP_NONE, // Replace "none" with fists?
-			// -- lot of code fixing would be needed "for (i = 1; i < numweapons; i++)", etc
+	WP_NONE,
 
+#ifndef TMNTWEAPSYS_2
 	// For players like Hun who don't have a default "weapon" but just use there fists.
 	WP_FISTS, // Invisible weapon, each hand, short range damage.
 
@@ -622,13 +605,13 @@ typedef enum {
 
     // \bos
     WP_BO, // One Bo, uses both hands
-	WP_BAMBOOBO, // Bamboo [bo type]
+	WP_BAMBOO, // Bamboo [bo type]
 
     // \guns
 	// Turtle Man: TODO: Finish WP_GUN. It was going to be a chaingun like in Mutant Melee,
-	//                   but I think I will make it a tri-blaster instead.
+	//                   but I think I will make it a tri-blaster instead~
 	WP_GUN,
-	WP_ELECTRIC_LAUNCHER, // Federation? or Tri? // Sort of like WP_PLASMAGUN.
+	WP_PLASMAGUN, //WP_ELECTRIC_LAUNCHER, // Federation? or Tri? // Currently just Q3 WP_PLASMAGUN.
 	WP_ROCKET_LAUNCHER, // Tri rocket launcher // AI Same as in Q3...
 	WP_HOMING_LAUNCHER, // Earth Protection Force homing rocket launcher // TMNT:MM Yellow homing-rocket launcher
 
@@ -636,22 +619,7 @@ typedef enum {
 	WP_GRAPPLING_HOOK, // Model will be modified tri-blaster
 
 	WP_NUM_WEAPONS
-#elif defined SONICWEAPONS
-	// Weapons based on SRB2 1.1 weapons.
-	WP_NONE,
-
-	WP_RED_RING,
-	WP_AUTOMATIC_RING,
-	WP_BOUNCE_RING,
-	WP_SCATTER_RING, // WP_SHOTGUN
-	WP_GRENADE_RING, // WP_GRENADE_LAUNCHER
-	WP_EXPLOSION_RING,
-	WP_RAIL_RING, // WP_RAILGUN
-
-	// Removed from SRB2 1.1 (Support anyway?...)
-	WP_HOMING_RING,
-
-	WP_NUM_WEAPONS
+#endif
 #else
 	WP_NONE,
 
@@ -696,9 +664,6 @@ typedef struct
 #endif
 
 #ifdef TMNTWEAPSYS_2
-//damage types
-#define DAMAGETYPE_IMPACT			1		//damage on impact
-#define DAMAGETYPE_RADIAL			2		//radial damage (Splash damage)
 //projectile trail types
 #define PT_NONE 0
 #define PT_PLASMA 1
@@ -709,6 +674,7 @@ typedef struct
 #define PT_LIGHTNING 6
 #define PT_RAIL 7
 #define PT_BULLET 8
+#define PT_SPARKS 9 // Laser Shuriken
 //projectile death types
 #define PD_NONE 0
 #define PD_PLASMA 1
@@ -722,8 +688,8 @@ typedef struct
 //projectile spin types
 #define PS_ROLL 0 // default
 #define PS_NONE 1
-#define PS_PITCH 2 // For shurikens
-#define PS_YAW 3 // Turtle Man: TODO: Option to spin yaw
+#define PS_PITCH 2 // ...Shurikens!
+#define PS_YAW 3
 //projectile bounce types
 #define PB_NONE 0
 #define PB_HALF 1
@@ -738,7 +704,8 @@ typedef struct
 {
 	char name[MAX_QPATH];
 	char model[MAX_QPATH];
-	int damagetype;
+	char modelBlue[MAX_QPATH];
+	char modelRed[MAX_QPATH];
 	int damage;
 	int splashDamage;
 	int splashRadius;
@@ -774,6 +741,7 @@ typedef struct
 
 	int grappling;
 	int instantDamage;
+	int maxHits; // Projectiles can go through players... currently instantDamage only
 
 } bg_projectileinfo_t;
 
@@ -791,13 +759,21 @@ typedef struct
 #define WIF_WALLMARK_FADE_ALPHA	1
 #define WIF_WALLMARK_COLORIZE	2
 // Melee only
-#define WIF_ALWAYS_DAMAGE		4
+#define WIF_ALWAYS_DAMAGE		4 // Do damage even while not attacking, like a lightsaber.
 // Guns only
 #define WIF_CONTINUOUS_FLASH	8
-//  Eject brass type shouldn't be flags?
+//  Eject "brass" functions
 #define WIF_EJECT_BRASS			16		// CG_MachineGunEjectBrass
 #define WIF_EJECT_BRASS2		32		// CG_ShotgunEjectBrass
 #define WIF_EJECT_SMOKE			64		// CG_NailgunEjectBrass
+#define WIF_EJECT_SMOKE2		128		// Shotgun smoke
+
+// Barrel Spin
+#define BS_PITCH PITCH // 0
+#define BS_YAW YAW // 1
+#define BS_ROLL ROLL // 2
+#define BS_NONE 3
+#define BS_MAX 4
 
 #define MAX_WEAPON_BLADES 4 // Katana use 1, Bo use 2, Sai use 3, etc
 typedef struct
@@ -810,9 +786,10 @@ typedef struct
 	int mod;			///< Means of Death (MOD_* enum)
 	int attackDelay;
 
-	// sounds (Do melee use these?)
+	// sounds
 	char readySoundName[MAX_QPATH];
 	char firingSoundName[MAX_QPATH];
+	char firingStoppedSoundName[MAX_QPATH];
 	char flashSoundName[4][MAX_QPATH];
 
 	// bit flags
@@ -821,9 +798,11 @@ typedef struct
 	// gun only
 	int splashMod;
 	vec3_t flashColor;
-	int proj; // bg_projectileinfo[proj]
+	bg_projectileinfo_t *proj;
+	int projnum; // bg_projectileinfo[projnum]
 	// aimOffset is the weapon aim offset for bots
 	vec3_t aimOffset;
+	int barrelSpin; // BS_*  (Turtle Man: TODO: May use for nunchuks?)
 
 	// melee only
 	char wallmarkName[MAX_QPATH];
@@ -833,11 +812,12 @@ typedef struct
 
 } bg_weaponinfo_t;
 
+#define MAX_WG_ATK_ANIMS 5 // Max Weapon Group attack animations
 typedef struct
 {
 	// todo string
 	int standAnim;
-	int attackAnim;
+	int attackAnim[MAX_WG_ATK_ANIMS];
 } bg_weapongroup_anims_t;
 
 ///< =============================
@@ -910,9 +890,15 @@ typedef struct
 
 } bg_weapongroupinfo_t;
 
+#ifdef TMNTWEAPSYS2
 #define MAX_BG_PROJ 64
 #define MAX_BG_WEAPONS 64
 #define MAX_BG_WEAPON_GROUPS 32
+#else
+#define MAX_BG_PROJ 32
+#define MAX_BG_WEAPONS 32
+#define MAX_BG_WEAPON_GROUPS 16 // Turtle Man: WONTFIX: Player's are limited to 16 weapons.
+#endif
 extern bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 extern bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 extern bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
@@ -923,8 +909,9 @@ int BG_NumProjectiles(void);
 int BG_NumWeapons(void);
 int BG_NumWeaponGroups(void);
 void BG_InitWeaponInfo(void);
+int BG_MaxAttackCombo(playerState_t *ps);
 #else
-// Turtle Man: TODO: Use info for guns too. Currently they don't use any (other then weapontype).
+// Turtle Man: TODO?: Use info for guns too. Currently they don't use any (other then weapontype).
 typedef struct
 {
 	//char name[MAX_QPATH];
@@ -932,13 +919,13 @@ typedef struct
 
 	weapontype_t weapontype;
 	int mod; // Means of death, MOD_* enum - Primary weapon
-	// Turtle Man: TODO: If WT_GUN, have mod2 be splash damage MOD?
+	// Turtle Man: TODO?: If WT_GUN, have mod2 be splash damage MOD?
 	//                   -or- support guns in both hands?...
 	int mod2; // Means of death, MOD_* enum - Secondary weapon
 
 	// Damage amounts
 	int damage; // Damage given by Primary weapon
-	// Turtle Man: TODO: If WT_GUN, have damge2 be splash damage?
+	// Turtle Man: TODO?: If WT_GUN, have damge2 be splash damage?
 	//                   -or- support guns in both hands?...
 	int damage2; // Damage given by Secondary weapon
 
@@ -1060,8 +1047,8 @@ typedef enum {
 	EV_PLAYER_TELEPORT_IN,
 	EV_PLAYER_TELEPORT_OUT,
 
-#ifdef TMNTHOLDABLE
-	EV_LASERSHURIKEN_BOUNCE,
+#ifdef TMNTWEAPSYS_2
+	EV_PROJECTILE_BOUNCE,
 #else
 	EV_GRENADE_BOUNCE,		// eventParm will be the soundindex
 #endif
@@ -1079,10 +1066,12 @@ typedef enum {
 	EV_MISSILE_MISS,
 	EV_MISSILE_MISS_METAL,
 	EV_RAILTRAIL,
-#if !defined TMNTWEAPONS && !defined TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS_2
 	EV_SHOTGUN,
 #endif
+#ifndef IOQ3ZTM_NO_COMPAT
 	EV_BULLET,				// otherEntity is the shooter
+#endif
 
 #ifdef TMNTWEAPSYS
 	EV_WEAPON_HIT,
@@ -1099,6 +1088,9 @@ typedef enum {
 	EV_POWERUP_QUAD,
 	EV_POWERUP_BATTLESUIT,
 	EV_POWERUP_REGEN,
+#ifdef TMNT // POWERS
+	EV_POWERUP_INVUL,
+#endif
 
 #ifndef NOTRATEDM // No gibs.
 	EV_GIB_PLAYER,			// gib a previously living player
@@ -1258,30 +1250,51 @@ typedef enum {
     //TORSO_ATTACK_GUN, // Would be the same as TORSO_ATTACK...
     TORSO_ATTACK_GUN_PRIMARY, // Can't reuse TORSO_ATTACK2 needs a new animation.
 
-    // Turtle Man: TODO: Attack animations, how many anims per type?...
-    //       Only one for WT_HAMMER and WT_GUN
-    TORSO_ATTACK_SWORD1_BOTH,
-    //TORSO_ATTACK_SWORD1_BOTH_2,
-    //TORSO_ATTACK_SWORD1_BOTH_3,
+	// Melee attacks
+	// * Standing? attacks A B A C
+	// * Running? attacks D E
 
-    TORSO_ATTACK_SWORD1_PRIMARY,
-    //TORSO_ATTACK_SWORD1_PRIMARY_2,
-    //TORSO_ATTACK_SWORD1_PRIMARY_3,
+    TORSO_ATTACK_SWORD1_BOTH_A,
+    TORSO_ATTACK_SWORD1_BOTH_B,
+    TORSO_ATTACK_SWORD1_BOTH_C,
 
-    TORSO_ATTACK_SWORD2,
-    TORSO_ATTACK_DAISHO,
+    TORSO_ATTACK_SWORD1_PRIMARY_A,
+    TORSO_ATTACK_SWORD1_PRIMARY_B,
+    TORSO_ATTACK_SWORD1_PRIMARY_C,
 
-    TORSO_ATTACK_SAI2,
-    TORSO_ATTACK_SAI1_PRIMARY,
+    TORSO_ATTACK_SWORD2_A,
+    TORSO_ATTACK_SWORD2_B,
+    TORSO_ATTACK_SWORD2_C,
 
-    TORSO_ATTACK_BO,
-    TORSO_ATTACK_BO_PRIMARY,
+    TORSO_ATTACK_DAISHO_A,
+    TORSO_ATTACK_DAISHO_B,
+    TORSO_ATTACK_DAISHO_C,
 
-    TORSO_ATTACK_HAMMER,
-    TORSO_ATTACK_HAMMER_PRIMARY,
+    TORSO_ATTACK_SAI2_A,
+    TORSO_ATTACK_SAI2_B,
+    TORSO_ATTACK_SAI2_C,
+    TORSO_ATTACK_SAI1_PRIMARY_A,
+    TORSO_ATTACK_SAI1_PRIMARY_B,
+    TORSO_ATTACK_SAI1_PRIMARY_C,
 
-    TORSO_ATTACK_NUNCHUKS,
-    TORSO_ATTACK_NUNCHUKS1_PRIMARY,
+    TORSO_ATTACK_BO_A,
+    TORSO_ATTACK_BO_B,
+    TORSO_ATTACK_BO_C,
+    TORSO_ATTACK_BO_PRIMARY_A,
+    TORSO_ATTACK_BO_PRIMARY_B,
+    TORSO_ATTACK_BO_PRIMARY_C,
+
+    // Hammer is special. ( If changed update BG_SetDefaultAnimation ! )
+    TORSO_ATTACK_HAMMER_A,
+    TORSO_ATTACK_HAMMER_PRIMARY_A,
+
+    TORSO_ATTACK_NUNCHUKS_A,
+    TORSO_ATTACK_NUNCHUKS_B,
+    TORSO_ATTACK_NUNCHUKS_C,
+    TORSO_ATTACK_NUNCHUKS1_PRIMARY_A,
+    TORSO_ATTACK_NUNCHUKS1_PRIMARY_B,
+    TORSO_ATTACK_NUNCHUKS1_PRIMARY_C,
+    // NOTE: If more animations are added update BG_PlayerAttackAnim
 #endif
 
 	MAX_ANIMATIONS,
@@ -1302,46 +1315,68 @@ typedef enum {
 } animNumber_t;
 
 #ifdef TMNTWEAPSYS
+// For bg/game/cgame
 animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps);
 animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps);
+// For ui/q3_ui
 animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum);
 animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
 #endif
 
-#ifdef SP_NPC
-// NPC animations
-typedef enum {
-	ANPC_DEATH1,
-	ANPC_DEATH2,
-	ANPC_DEATH3,
-	ANPC_TAUNT,
-	ANPC_ATTACK_FAR,
-	ANPC_ATTACK_MELEE,
-	ANPC_STANDING,
-	ANPC_STANDING_ACTIVE,
-	ANPC_WALK,
-	ANPC_RUN,
-	ANPC_BACKPEDAL,
-	ANPC_JUMP,
-	ANPC_LAND,
-	ANPC_PAIN,
-	MAX_ANIMATIONS_NPC
-} animNumberNPC_t;
-#endif
-
 #ifdef TMNTENTSYS // MISC_OBJECT
+// TMNTNPCSYS: Have Misc_Objects and NPCs use the same animations
 // Keep in sycn with CG's misc_object_anim_names
 typedef enum
 {
 	OBJECT_NONE = -1, // Just one frame, 0.
-	OBJECT_NORMAL,
-	OBJECT_DAMAGED1,
-	OBJECT_DAMAGED2,
-	OBJECT_DAMAGED3,
-	OBJECT_KILLED,
+
+	// Misc_object: Undamaged.
+	// NPC: Standing; Unaware of player(s)
+	OBJECT_IDLE,
+
+	// Misc_object: Damage levels and random dead animation
+	// NPC: Death and dead.
+	OBJECT_DEATH1,
+	OBJECT_DEATH2,
+	OBJECT_DEATH3,
+	OBJECT_DEAD1,
+	OBJECT_DEAD2,
+	OBJECT_DEAD3,
+
+	OBJECT_LAND, // Turtle Man: TODO: misc_object hit ground.
+	OBJECT_PAIN, // Turtle Man: TODO: "Pain" animation of misc_object with no health (Dead).
+
+#ifdef TMNTNPCSYS
+	// Animations only used by NPCs
+	OBJECT_TAUNT,
+	OBJECT_ATTACK_FAR,
+	OBJECT_ATTACK_MELEE,
+	OBJECT_STANDING_ACTIVE,
+	OBJECT_WALK,
+	OBJECT_RUN,
+	OBJECT_BACKPEDAL,
+	OBJECT_JUMP,
+#endif
 
 	MAX_MISC_OBJECT_ANIMATIONS
 } miscObjectAnim_t;
+
+// Turtle Man: TODO: Sounds like Jedi Knight 2's animsounds.cfg, see Sounds_Parse
+//   Only cgame and ui need this, game doesn't use sounds.
+#define MAX_RAND_SOUNDS 5
+typedef struct
+{
+	int anim; // Such as value of BOTH_DEATH1
+	int frame;
+	int numSounds; // play sounds[rand()%numSounds]
+	sfxHandle_t sounds[MAX_RAND_SOUNDS]; // Play random sound
+	int chance; // 0 = always, 100 = never { if (rand()%100 >= chance; play sound; }
+} bg_sound_t;
+
+// Currently not used by players...
+#define MAX_BG_SOUNDS MAX_ANIMATIONS
+//#define MAX_BG_SOUNDS MAX_MISC_OBJECT_ANIMATIONS*2
+typedef bg_sound_t bg_sounds_t[MAX_BG_SOUNDS];
 #endif
 
 
@@ -1473,10 +1508,29 @@ int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip);
 //qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg);
 qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, const char *headModel);
 
+#ifdef TMNTENTSYS
+typedef struct
+{
+	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
+
+	// Object's boundingbox
+	vec3_t bbmins;
+	vec3_t bbmaxs;
+	int health;
+	int wait;
+	float speed;
+	int lerpframes; // Use raw frames, don't interperate them.
+
+	// Turtle Man: TODO: For NPCs
+	// Speed control, some characters are faster then others.
+	//int   max_speed;
+	//float accelerate_speed; // Replaces pm_accelerate; default 10.0f
+
+} bg_objectcfg_t;
+
 // Use for loading misc_object animations
-qboolean BG_ParseObjectCFGFile(const char *filename, const char *anim_names[],
-	animation_t *animations, int num_anim, vec3_t *mins, vec3_t *maxs, int *health, int *wait,
-	float *speed, int *lerpframes);
+qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg);
+#endif
 #endif
 
 #ifdef TMNTPLAYERSYS // Moved below bg_playercfg_t
@@ -1515,6 +1569,79 @@ typedef enum {
 #endif
 } weaponstate_t;
 
+#ifdef TMNTNPCSYS
+// Turtle Man: Flags for general NPC effects.
+typedef enum
+{
+	NPCF_NODROPWEAPON	= 1, // Don't drop weapon when killed.
+	NPCF_ALLY			= 2, // Not a baddy, NPC on the same side don't attack each other.
+
+#if 1 //
+	NPCF_WALKANDFLY		= 4, // Can't run, but can fly
+	NPCF_FLYONLY		= 8, // Can't walk or run, only fly -fast and slow
+#endif
+
+	NPCF_LAST // dummy flag
+
+} npcflag_e;
+
+// Turtle Man: General death types.
+typedef enum
+{
+	NPCD_NONE, // Stays there doing nothing. Forever.
+	NPCD_SINK, // Sink into the ground and removes the ent.
+	NPCD_EXPLODE, // Starts explotion and removes the ent. For robots.
+	NPCD_SMOKE, // Starts smoke and removes the ent.
+
+	NPCD_MAX
+} npcDeath_e;
+
+#define MAX_NPCNAME 32
+typedef struct
+{
+	char classname[MAX_NPCNAME];
+	char model[MAX_QPATH];
+	int weaponGroup; // Turtle Man: weapon group to hold/use
+	int flags; // see npcflag_e
+	int deathType; // see npcDeath_e
+	int health;
+	int viewheight;
+	vec3_t mins, maxs;
+	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
+
+} bg_npcinfo_t;
+
+#define MAX_NPCS 64 // max npc infos
+extern bg_npcinfo_t bg_npcinfo[MAX_NPCS];
+int BG_NPCIndexForName(const char *name);
+int BG_NumNPCs(void);
+void BG_InitNPCInfo(void);
+
+typedef enum
+{
+	NACT_IDLE,
+	NACT_FOLLOW, // Follow friend or enimy
+	NACT_ATTACK,
+	NACT_GO_TO,
+	NACT_MAX
+
+	//NACT_WAIT,
+	//NACT_SEARCH,
+
+} npcAction_e;
+
+typedef struct
+{
+	bg_npcinfo_t *info;
+	playerState_t npc_ps;
+
+	npcAction_e action; // Current action
+	int			actionTime; // Time action started.
+	vec3_t		actionPos; // Position used by action
+
+} bg_npc_t;
+#endif
+
 // pmove->pm_flags
 #define	PMF_DUCKED			1
 #define	PMF_JUMP_HELD		2
@@ -1527,11 +1654,15 @@ typedef enum {
 #define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
 #define	PMF_TIME_WATERJUMP	256		// pm_time is waterjump
 #define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
+#ifndef TMNTHOLDABLE
 #define	PMF_USE_ITEM_HELD	1024
+#endif
 #define PMF_GRAPPLE_PULL	2048	// pull towards grapple location
 #define PMF_FOLLOW			4096	// spectate following another player
 #define PMF_SCOREBOARD		8192	// spectate as a scoreboard
+#ifndef TMNT // POWERS
 #define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
+#endif
 
 #define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
 
@@ -1541,6 +1672,9 @@ typedef struct {
 	playerState_t	*ps;
 #ifdef TMNTPLAYERSYS
 	bg_playercfg_t	*playercfg;
+#endif
+#ifdef TMNTNPCSYS
+	bg_npc_t		*npc;
 #endif
 
 	// command (in)
@@ -1623,7 +1757,7 @@ typedef enum {
 	MOD_BAT,
 	//MOD_SPIKEDCLUB,
 	MOD_BO,
-	MOD_BAMBOOBO,
+	MOD_BAMBOO,
 	MOD_GUN,
 	MOD_ELECTRIC,
 	MOD_ELECTRIC_SPLASH,
@@ -1681,105 +1815,12 @@ typedef enum {
 #endif
 	MOD_GRAPPLE
 #ifdef TMNTWEAPSYS_2
-	,MOD_MAX
+	,MOD_PROJECTILE,
+	MOD_WEAPON_PRIMARY,
+	MOD_WEAPON_SECONDARY,
+	MOD_MAX
 #endif
 } meansOfDeath_t;
-
-#ifdef SP_NPC
-typedef enum {
-	NPC_NONE,
-
-	// Badies
-	NPC_FLYBOT,
-	NPC_MOUSER,
-
-	// Earth Protection Force Soldiers, they work for Agent Bishop
-	NPC_EPFSOLDIER1,
-	NPC_EPFSOLDIER2,
-	NPC_EPFSOLDIER3,
-
-/*
-	NPC_PURPLEDRAGON1,
-	NPC_PURPLEDRAGON2,
-	NPC_PURPLEDRAGON3,
-	NPC_PURPLEDRAGON4,
-	NPC_PURPLEDRAGON5,
-	NPC_PURPLEDRAGON6,
-	NPC_PURPLEDRAGON7,
-	NPC_PURPLEDRAGON8,
-	NPC_PURPLEDRAGON9,
-*/
-
-	// TDC Badies, to be removed.
-	NPC_ANK,
-	NPC_BAT,
-	NPC_HULK,
-	NPC_METLAR,
-	NPC_PILOT,
-	NPC_SEALORD,
-	NPC_SOLDIER1,
-	NPC_SOLDIER2,
-
-	NPC_NUMNPCS,
-
-	NPC_MAX = NPC_NUMNPCS
-
-	// 25 free NPC slots.
-	//NPC_FREESLOT1 = NPC_NUMNPCS,
-	//NPC_FREESLOT25 = NPC_FREESLOT1 + 25,
-
-	//NPC_MAX
-} npcType_t;
-
-#define HULK_QUAKE_LEN	1700 // msec
-
-// Turtle Man: Flags for general NPC effects.
-typedef enum
-{
-	NPCF_NODROPWEAPON	= 1, // Don't drop weapon when killed.
-	NPCF_WALKANDFLY		= 2, // Can't run, but can fly
-	NPCF_FLYONLY		= 4, // Can't walk or run, only fly -fast and slow
-	NPCF_ALLY			= 8, // Not a baddy, NPC on the same side don't attack each other.
-
-	NPCF_LAST // dummy flag
-
-} npcflag_e;
-
-// Turtle Man: General death types.
-typedef enum
-{
-	NPCD_NONE, // Stays there doing nothing. Forever.
-	NPCD_SINK, // Sink into the ground and removes the ent.
-	NPCD_EXPLODE, // Starts explotion and removes the ent. For robots.
-	NPCD_SMOKE, // Starts smoke and removes the ent.
-
-	NPCD_MAX
-} npcDeath_e;
-
-#define MAX_NPCNAME 32
-typedef struct gnpc_s {
-	char *classname; // MAX_NPCNAME
-	npcType_t npcType;
-	weapon_t weapon; // Turtle Man: weapon to hold/use [tag_weapon]
-	int flags; // see npcflag_e
-	int deathType; // see npcDeath_e
-	int health;
-	float painFreq;
-	int	walkingSpeed;
-	int runningSpeed;
-	int fov;
-	int jumpHeight;
-	int walkingRotSpd;
-	int runningRotSpd;
-	int melee_dist;
-	int melee_damage;
-	int far_damage;
-	int animTimes[MAX_ANIMATIONS_NPC];
-	vec3_t mins, maxs, eye;
-} bgnpc_t;
-
-extern bgnpc_t bg_npclist[];
-#endif
 
 //---------------------------------------------------------
 
@@ -1860,7 +1901,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #define	MASK_DEADSOLID			(CONTENTS_SOLID|CONTENTS_PLAYERCLIP)
 #define	MASK_WATER				(CONTENTS_WATER|CONTENTS_LAVA|CONTENTS_SLIME)
 #define	MASK_OPAQUE				(CONTENTS_SOLID|CONTENTS_SLIME|CONTENTS_LAVA)
-#if defined TMNTWEAPONS || defined TMNTWEAPSYS_2 // XREAL
+#ifdef TMNTWEAPSYS_2 // XREAL
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE|CONTENTS_SHOOTABLE)
 #else
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE)
@@ -1888,11 +1929,11 @@ typedef enum {
 	ET_INVISIBLE,
 	ET_GRAPPLE,				// grapple hooked on wall
 	ET_TEAM,
-#ifdef SP_NPC
-	ET_NPC,
-#endif
 #ifdef TMNTENTSYS // MISC_OBJECT
 	ET_MISCOBJECT,
+#endif
+#ifdef TMNTNPCSYS
+	ET_NPC,
 #endif
 
 	ET_EVENTS				// any of the EV_* events can be added freestanding

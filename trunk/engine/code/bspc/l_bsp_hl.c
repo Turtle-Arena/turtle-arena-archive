@@ -246,19 +246,8 @@ int FastChecksum(void *buffer, int bytes)
 {
 	int	checksum = 0;
 
-#if 1 //#ifdef LINUX // Turtle Man: Added #if block
-	char *c_ptr;
-
 	while( bytes-- )
-	{
-		checksum = (checksum << 4) ^ *((char *)buffer);
-		c_ptr = (char *)buffer;
-		*c_ptr++;
-	}
-#else
-	while( bytes-- )
-		checksum = (checksum << 4) ^ *((char *)buffer)++;
-#endif
+		checksum = (checksum << 4) ^ *((char *)buffer++);
 
 	return checksum;
 }
@@ -538,7 +527,7 @@ void	HL_LoadBSPFile (char *filename, int offset, int length)
 	hl_fileLength = LoadFile (filename, (void **)&hl_header, offset, length);
 
 // swap the header
-	for (i=0 ; (size_t)i< sizeof(hl_dheader_t)/4 ; i++)
+	for (i=0 ; i< sizeof(hl_dheader_t)/4 ; i++)
 		((int *)hl_header)[i] = LittleLong ( ((int *)hl_header)[i]);
 
 	if (hl_header->version != HL_BSPVERSION)

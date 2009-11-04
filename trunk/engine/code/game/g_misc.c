@@ -103,9 +103,13 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	// toggle the teleport bit so the client knows to not lerp
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
-#ifdef TMNT
-	player->client->ps.eFlags |= EF_TELE_EFFECT;
-	player->client->teleEffectTime = level.time;
+#ifdef TMNT // POWERS
+	if (g_teleportFluxTime.integer)
+	{
+		player->client->ps.powerups[PW_FLASHING] = level.time + g_teleportFluxTime.integer * 1000;
+		// Become non-solid
+		player->r.contents &= ~CONTENTS_BODY;
+	}
 #endif
 
 	// set angles
@@ -113,6 +117,9 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	// kill anything at the destination
 	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+#ifdef TMNT // POWERS
+		if (!player->client->ps.powerups[PW_FLASHING])
+#endif
 		G_KillBox (player);
 	}
 
@@ -262,6 +269,19 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 		VectorCopy( ent->movedir, dir );
 	}
 
+#ifdef TMNT
+	if (ent->random == -1)
+	{
+#ifdef TMNTWEAPSYS_2
+		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
+				ent->s.origin, dir, right, up);
+#else
+		G_AutoAim(ent, 0, ent->s.origin, dir, right, up);
+#endif
+	}
+	else
+	{
+#endif
 	// randomize a bit
 	PerpendicularVector( up, dir );
 	CrossProduct( up, dir, right );
@@ -273,6 +293,9 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	VectorMA( dir, deg, right, dir );
 
 	VectorNormalize( dir );
+#ifdef TMNT
+	}
+#endif
 
 #ifdef TMNTWEAPSYS_2
 	if (!fire_weapon(ent, ent->s.origin, dir, right, up,
@@ -282,20 +305,6 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	}
 #else
 	switch ( ent->s.weapon ) {
-#ifdef TMNTWEAPONS
-	case WP_GUN:
-		fire_gun( ent, ent->s.origin, dir );
-		break;
-	case WP_ELECTRIC_LAUNCHER:
-		fire_plasma( ent, ent->s.origin, dir );
-		break;
-	case WP_ROCKET_LAUNCHER:
-		fire_rocket( ent, ent->s.origin, dir );
-		break;
-	case WP_HOMING_LAUNCHER:
-		fire_homingrocket( ent, ent->s.origin, dir );
-		break;
-#else
 	case WP_GRENADE_LAUNCHER:
 		fire_grenade( ent, ent->s.origin, dir );
 		break;
@@ -305,7 +314,6 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	case WP_PLASMAGUN:
 		fire_plasma( ent, ent->s.origin, dir );
 		break;
-#endif
 	}
 #endif
 
@@ -313,11 +321,7 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 }
 
 
-#ifdef TMNTSP // save/load
-void InitShooter_Finish( gentity_t *ent ) {
-#else
 static void InitShooter_Finish( gentity_t *ent ) {
-#endif
 	ent->enemy = G_PickTarget( ent->target );
 	ent->think = 0;
 	ent->nextthink = 0;
@@ -331,10 +335,17 @@ void InitShooter( gentity_t *ent, int weapon ) {
 
 	G_SetMovedir( ent->s.angles, ent->movedir );
 
+#ifdef TMNT // G_AutoAim
+	if (ent->random != -1)
+	{
+#endif
 	if ( !ent->random ) {
 		ent->random = 1.0;
 	}
 	ent->random = sin( M_PI * ent->random / 180 );
+#ifdef TMNT // G_AutoAim
+	}
+#endif
 	// target might be a moving object, so we can't set movedir for it
 	if ( ent->target ) {
 		ent->think = InitShooter_Finish;
@@ -343,13 +354,25 @@ void InitShooter( gentity_t *ent, int weapon ) {
 	trap_LinkEntity( ent );
 }
 
+#ifdef TMNTWEAPSYS_2
+/*QUAKED misc_shooter (1 0 0) (-16 -16 -16) (16 16 16)
+Fires at either the target or the current direction.
+"random" the number of degrees of deviance from the taget. (1.0 default)
+			if random is -1 uses autoaim to shoot a player.
+"message" name of weapon group, used to find projectile (See scripts/weaponinfo.txt)
+*/
+void SP_misc_shooter( gentity_t *ent ) {
+	InitShooter( ent, BG_WeaponGroupIndexForName(ent->message) );
+}
+#endif
+
 /*QUAKED shooter_rocket (1 0 0) (-16 -16 -16) (16 16 16)
 Fires at either the target or the current direction.
 "random" the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_rocket( gentity_t *ent ) {
 #ifdef TMNTWEAPSYS_2
-	InitShooter( ent, BG_WeaponIndexForName("wp_rocket_launcher") );
+	InitShooter( ent, BG_WeaponGroupIndexForName("wp_rocket_launcher") );
 #else
 	InitShooter( ent, WP_ROCKET_LAUNCHER );
 #endif
@@ -361,13 +384,18 @@ Fires at either the target or the current direction.
 */
 void SP_shooter_plasma( gentity_t *ent ) {
 #ifdef TMNTWEAPSYS_2
+	int weapon = 0;
+
 #ifdef TMNTWEAPONS
-	InitShooter( ent, BG_WeaponIndexForName("wp_electric_launcher") );
-#else
-	InitShooter( ent, BG_WeaponIndexForName("wp_plasmagun") );
+	weapon = BG_WeaponGroupIndexForName("wp_electric_launcher");
 #endif
-#elif defined TMNTWEAPONS
-	InitShooter( ent, WP_ELECTRIC_LAUNCHER);
+#if !defined TMNT || defined TMNT_SUPPORTQ3
+	if (!weapon) {
+		weapon = BG_WeaponGroupIndexForName("wp_plasmagun");
+	}
+#endif
+
+	InitShooter( ent, weapon);
 #else
 	InitShooter( ent, WP_PLASMAGUN);
 #endif
@@ -379,9 +407,18 @@ Fires at either the target or the current direction.
 */
 void SP_shooter_grenade( gentity_t *ent ) {
 #ifdef TMNTWEAPSYS_2
-	InitShooter( ent, BG_WeaponIndexForName("wp_homing_launcher") );
-#elif defined TMNTWEAPONS
-	InitShooter( ent, WP_HOMING_LAUNCHER);
+	int weapon = 0;
+
+#ifdef TMNTWEAPONS
+	weapon = BG_WeaponGroupIndexForName("wp_homing_launcher");
+#endif
+#if !defined TMNT || defined TMNT_SUPPORTQ3
+	if (!weapon) {
+		weapon = BG_WeaponGroupIndexForName("wp_grenade_launcher");
+	}
+#endif
+
+	InitShooter( ent, weapon);
 #else
 	InitShooter( ent, WP_GRENADE_LAUNCHER);
 #endif
@@ -454,6 +491,11 @@ static void PortalTouch( gentity_t *self, gentity_t *other, trace_t *trace) {
 //	if( other->client->ps.persistant[PERS_TEAM] != self->spawnflags ) {
 //		return;
 //	}
+#ifdef IOQ3ZTM // Check for teleport delay
+	if (self->pain_debounce_time && self->pain_debounce_time > level.time) {
+		return;
+	}
+#endif
 
 	if ( other->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
 		Drop_Item( other, BG_FindItemForPowerup( PW_NEUTRALFLAG ), 0 );
@@ -486,6 +528,9 @@ static void PortalTouch( gentity_t *self, gentity_t *other, trace_t *trace) {
 	}
 
 	TeleportPlayer( other, destination->s.pos.trBase, destination->s.angles );
+#ifdef IOQ3ZTM // Delay portaling 1/10th sec for bad dest and source in the same origin
+	self->pain_debounce_time = level.time+100;
+#endif
 }
 
 
@@ -570,35 +615,26 @@ void DropPortalSource( gentity_t *player ) {
 
 void misc_object_pain(gentity_t *self, gentity_t *attacker, int damage)
 {
-	int anim = OBJECT_NONE;
 	//G_Printf("misc_object_pain: damaging...\n");
+
 	// Change to damge animation at X health
 	if (self->health < (self->activator->health/5) * 2)
 	{
-		anim = OBJECT_DAMAGED3;
-		//G_Printf("    anim = OBJECT_DAMAGED3\n");
+		G_SetMiscAnim(self, OBJECT_DEATH3);
+		//G_Printf("    anim = OBJECT_DEATH3\n");
 	}
 	else if (self->health < (self->activator->health/5) * 3)
 	{
-		anim = OBJECT_DAMAGED2;
-		//G_Printf("    anim = OBJECT_DAMAGED2\n");
+		G_SetMiscAnim(self, OBJECT_DEATH2);
+		//G_Printf("    anim = OBJECT_DEATH2\n");
 	}
 	else if (self->health < (self->activator->health/5) * 4)
 	{
-		anim = OBJECT_DAMAGED1;
-		//G_Printf("    anim = OBJECT_DAMAGED1\n");
+		G_SetMiscAnim(self, OBJECT_DEATH1);
+		//G_Printf("    anim = OBJECT_DEATH1\n");
 	}
 
-	if (anim != OBJECT_NONE)
-	{
-		if (!(self->s.modelindex2 & ANIM_TOGGLEBIT))
-			self->s.modelindex2 = (anim|ANIM_TOGGLEBIT);
-		else
-			self->s.modelindex2 = anim;
-	}
-
-	// TODO: Limit how soon to call paintarget again?
-	// pain_debounce
+	// Turtle Man: TODO: Limit how soon to call paintarget again? Use pain_debounce?
 	if ( self->paintarget )
 	{
 		G_UseTargets2(self, attacker, self->paintarget);
@@ -628,15 +664,20 @@ void misc_object_respawn(gentity_t *self)
 
 void misc_object_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
 {
+	int anim;
+
 	if (!self->takedamage)
 		return;
 	self->takedamage = qfalse;
 
+	// Pick one of the 3 dead animations.
+	anim = OBJECT_DEAD1+rand()%3;
+
 	// Change to dead animation.
 	if (!(self->s.modelindex2 & ANIM_TOGGLEBIT))
-		self->s.modelindex2 = (OBJECT_KILLED|ANIM_TOGGLEBIT);
+		self->s.modelindex2 = (anim|ANIM_TOGGLEBIT);
 	else
-	self->s.modelindex2 = OBJECT_KILLED;
+		self->s.modelindex2 = anim;
 
 	//G_Printf("misc_object_die: killed object.\n");
 
@@ -710,9 +751,9 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 
 	// undamaged animation
 	if (!(ent->s.modelindex2 & ANIM_TOGGLEBIT))
-		ent->s.modelindex2 = (OBJECT_NORMAL|ANIM_TOGGLEBIT);
+		ent->s.modelindex2 = (OBJECT_IDLE|ANIM_TOGGLEBIT);
 	else
-	ent->s.modelindex2 = OBJECT_NORMAL;
+		ent->s.modelindex2 = OBJECT_IDLE;
 
 	if (owner->health > 0) {
 		//G_Printf("misc_object_spawn: animated damagable\n");
@@ -795,66 +836,61 @@ void SP_misc_object( gentity_t *ent ) {
 	entWait = G_SpawnFloat( "wait", "0", &ent->wait);
 	entSpeed = G_SpawnFloat( "speed", "0", &ent->speed);
 
+#if 1
+	entMins = entMaxs = qfalse;
+#else
 	entMins = G_SpawnVector( "mins", "-16 -16 0", ent->r.mins );
 	entMaxs = G_SpawnVector( "maxs", "16 16 32", ent->r.maxs );
+#endif
 
 	G_SetOrigin( ent, ent->s.origin );
 	VectorCopy( ent->s.angles, ent->s.apos.trBase );
 
 	// Use a animation config file!
 	{
-		/*
-		const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
-		{
-			"OBJECT_NORMAL",
-			"OBJECT_DAMAGED1",
-			"OBJECT_DAMAGED2",
-			"OBJECT_DAMAGED3",
-			"OBJECT_KILLED"
-		};
-
-		animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
-		*/
 		char filename[MAX_QPATH];
-		int health;
-		int wait;
-		float speed;
-		vec3_t mins, maxs;
+		bg_objectcfg_t objectcfg; // Turtle Man: TODO: Move to gentity_s ?
 
-		health = wait = speed = 0;
-		VectorClear(mins);
-		VectorClear(maxs);
+		Com_Memset(&objectcfg, 0, sizeof (objectcfg));
 
-		trap_GetConfigstring( CS_MODELS + ent->s.modelindex, filename, sizeof(filename));
+		// !! It took forever to find why bounding box wasn't loaded, there was
+		//    no config filename !!
+		trap_GetConfigstring( CS_MODELS + G_ModelIndex( ent->model ), filename, sizeof(filename));
 
+		if (filename[0] == '\0')
+		{
+			G_Printf("DEBUG: Missing filename for misc_object model!\n");
+		}
+		else
+		{
 		G_SetFileExt(filename, ".cfg");
+		}
 
-		BG_ParseObjectCFGFile(filename, NULL, NULL, 0, // names, animations, max_anim
-			&mins, &maxs, &health, &wait, &speed, NULL);
+		BG_ParseObjectCFGFile(filename, &objectcfg);
 
 		// The data in this entity over-rides the cfg file.
 		if (!entHealth)
 		{
 			// Use health from cfg.
-			ent->health = health;
+			ent->health = objectcfg.health;
 		}
 		if (!entWait)
 		{
 			// Use wait from cfg.
-			ent->wait = wait;
+			ent->wait = objectcfg.wait;
 		}
 		if (!entSpeed)
 		{
 			// Use speed from cfg.
-			ent->speed = speed;
+			ent->speed = objectcfg.speed;
 		}
 		if (!entMins)
 		{
-			//VectorCopy(mins, ent->r.mins);
+			VectorCopy(objectcfg.bbmins, ent->r.mins);
 		}
 		if (!entMaxs)
 		{
-			//VectorCopy(maxs, ent->r.maxs);
+			VectorCopy(objectcfg.bbmaxs, ent->r.maxs);
 		}
 
 		if (ent->speed < 1.0f)

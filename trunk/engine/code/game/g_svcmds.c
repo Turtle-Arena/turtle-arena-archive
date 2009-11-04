@@ -368,6 +368,11 @@ void	Svcmd_EntityList_f (void) {
 			G_Printf("ET_MISCOBJECT       ");
 			break;
 #endif
+#ifdef TMNTNPCSYS
+		case ET_NPC:
+			G_Printf("ET_NPC              ");
+			break;
+#endif
 		default:
 			G_Printf("%3i                 ", check->s.eType);
 			break;

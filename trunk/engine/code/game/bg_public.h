@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //                                      { "g_bg_data", "5 5 6 0 1 2 3 4 0 2 3 [etc]", CVAR_ROM } ?
 //                                        or as info-string "CS_WARMUP\5\PM_INTERMISSION\5\..." ?
 
-// 	sv_bg_data = Cvar_Get ("sv_bg_data", "5 5 6 0 1 2 3 4 0 2 3", CVAR_SYSTEMINFO | CVAR_ROM );
+// 	sv_bg_data = Cvar_Get ("g_bg_data", "5 5 6 0 1 2 3 4 0 2 3", CVAR_SYSTEMINFO | CVAR_ROM );
 
 // server only
 #define	CS_WARMUP				5		// server time when the match will be restarted

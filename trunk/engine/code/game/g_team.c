@@ -172,28 +172,52 @@ void AddTeamScore(vec3_t origin, int team, int score) {
 OnSameTeam
 ==============
 */
-qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 ) {
-#ifdef SP_NPC // Turtle Man: (i made this)
+#ifdef TMNT
+qboolean OnSameTeam( const gentity_t *ent1, const gentity_t *ent2 )
+#else
+qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 )
+#endif
+{
+#ifdef TMNTSP
+	// Co-op player are on the same "team"
+	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
 	int team1, team2;
 
 	if ( ent1->client)
 		team1 = ent1->client->sess.sessionTeam;
-	//else if (ent1->s.eType == ET_NPC)
-	//	team1 = 0;
+#ifdef TMNTNPCSYS
+		else if (ent1->s.eType == ET_NPC)
+		{
+			if (ent1->bgNPC.info->flags & NPCF_ALLY) {
+				team1 = TEAM_FREE;
+			} else {
+				team1 = TEAM_RED;
+			}
+		}
+#endif
 	else
 		return qfalse;
 
 	if ( ent2->client)
 		team2 = ent2->client->sess.sessionTeam;
-	//else if (ent1->s.eType == ET_NPC)
-	//	team2 = 0;
+#ifdef TMNTNPCSYS
+		else if (ent2->s.eType == ET_NPC) {
+			if (ent2->bgNPC.info->flags & NPCF_ALLY) {
+				team2 = TEAM_FREE;
+			} else {
+				team2 = TEAM_RED;
+			}
+		}
+#endif
 	else
 		return qfalse;
 
 	if ( team1 == team2 ) {
 		return qtrue;
 	}
-#else
+	}
+#endif
+
 	if ( !ent1->client || !ent2->client ) {
 		return qfalse;
 	}
@@ -205,7 +229,6 @@ qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 ) {
 	if ( ent1->client->sess.sessionTeam == ent2->client->sess.sessionTeam ) {
 		return qtrue;
 	}
-#endif
 
 	return qfalse;
 }
@@ -826,6 +849,10 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 		// also make sure we don't award assist bonuses to the flag carrier himself.
 		if (!player->inuse || player == other)
   			continue;
+#ifdef IOQ3ZTM // Don't give bonus points to player who captured the flag.
+		if (player == other)
+			continue;
+#endif
 
 		if (player->client->sess.sessionTeam !=
 			cl->sess.sessionTeam) {
@@ -1412,7 +1439,10 @@ static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 }
 #endif // #ifdef MISSIONPACK_HARVESTER
 
-static void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage ) {
+#ifndef TMNT
+static
+#endif
+void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage ) {
 	int actualDamage = damage / 10;
 	if (actualDamage <= 0) {
 		actualDamage = 1;
@@ -1443,7 +1473,11 @@ gentity_t *SpawnObelisk( vec3_t origin, int team, int spawnflags) {
 	ent->flags = FL_NO_KNOCKBACK;
 
 	if( g_gametype.integer == GT_OBELISK ) {
+#ifdef TMNT // POWERS PW_FLASHING
 		ent->r.contents = CONTENTS_SOLID;
+#else
+		ent->r.contents = CONTENTS_SOLID;
+#endif
 		ent->takedamage = qtrue;
 		ent->health = g_obeliskHealth.integer;
 		ent->die = ObeliskDie;

@@ -376,7 +376,9 @@ sfxHandle_t	S_Base_RegisterSound( const char *name, qboolean compressed ) {
   S_memoryLoad(sfx);
 
 	if ( sfx->defaultSound ) {
+#ifndef IOQ3ZTM // Turtle Man: Shut up, I know I need sounds.
 		Com_Printf( S_COLOR_YELLOW "WARNING: could not find %s - using default\n", sfx->soundName );
+#endif
 		return 0;
 	}
 
@@ -1341,9 +1343,11 @@ void S_Base_StartBackgroundTrack( const char *intro, const char *loop ){
 		return;
 	}
 
+#ifndef IOQ3ZTM // Turtle Man: FIXME?: It works so why the warning?
 	if(s_backgroundStream->info.channels != 2 || s_backgroundStream->info.rate != 22050) {
 		Com_Printf(S_COLOR_YELLOW "WARNING: music file %s is not 22k stereo\n", intro );
 	}
+#endif
 }
 
 /*

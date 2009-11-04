@@ -29,7 +29,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define UI_TIMER_GESTURE		2300
 #endif
 #define UI_TIMER_JUMP			1000
+#ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 #define UI_TIMER_LAND			130
+#endif
 #define UI_TIMER_WEAPON_SWITCH	300
 #ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 #define UI_TIMER_ATTACK			500
@@ -47,7 +49,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static int			dp_realtime;
 static float		jumpHeight;
+#ifndef TMNTWEAPSYS2
 sfxHandle_t weaponChangeSound;
+#endif
 
 
 /*
@@ -129,9 +133,7 @@ tryagain:
 		goto tryagain;
 	}
 
-#ifdef TMNTWEAPONS // Turtle Man: FIXME: How did I handled this in cgame?
-	if ( weaponNum == WP_GUN )
-#else
+#ifndef TMNTWEAPSYS_2
 	if ( weaponNum == WP_MACHINEGUN || weaponNum == WP_GAUNTLET || weaponNum == WP_BFG )
 #endif
 	{
@@ -166,40 +168,12 @@ tryagain:
 	pi->flashModel = trap_R_RegisterModel( path );
 
 #ifdef TMNTWEAPSYS_2
-	if (bg_weapongroupinfo[weaponNum].weapon[0])
-	{
 		MAKERGB( pi->flashDlightColor,
 				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[0],
 				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[1],
 				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[2] );
-	}
-	else
-	{
-		MAKERGB( pi->flashDlightColor, 1, 1, 1 );
-	}
 #else
 	switch( weaponNum ) {
-#ifdef TMNTWEAPONS
-	case WP_GUN:
-		MAKERGB( pi->flashDlightColor, 1, 0.75f, 0 );
-		break;
-
-	case WP_ELECTRIC_LAUNCHER:
-		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
-		break;
-
-	case WP_ROCKET_LAUNCHER:
-		MAKERGB( pi->flashDlightColor, 1, 0.75f, 0 );
-		break;
-
-	case WP_HOMING_LAUNCHER:
-		MAKERGB( pi->flashDlightColor, 1, 0.75f, 0 );
-		break;
-
-	case WP_GRAPPLING_HOOK:
-		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
-		break;
-#else
 	case WP_GAUNTLET:
 		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
 		break;
@@ -239,7 +213,6 @@ tryagain:
 	case WP_GRAPPLING_HOOK:
 		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
 		break;
-#endif
 
 	default:
 		MAKERGB( pi->flashDlightColor, 1, 1, 1 );
@@ -402,7 +375,11 @@ static void UI_LegsSequencing( playerInfo_t *pi ) {
 
 	if ( currentAnim == LEGS_JUMP ) {
 		UI_ForceLegsAnim( pi, LEGS_LAND );
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+		pi->legsAnimationTimer = BG_AnimationTime(&pi->playercfg.animations[LEGS_LAND]);
+#else
 		pi->legsAnimationTimer = UI_TIMER_LAND;
+#endif
 		jumpHeight = 0;
 		return;
 	}
@@ -939,9 +916,11 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		pi->lastWeapon = pi->pendingWeapon;
 		pi->pendingWeapon = -1;
 		pi->weaponTimer = 0;
+#ifndef TMNTWEAPSYS2
 		if( pi->currentWeapon != pi->weapon ) {
 			trap_S_StartLocalSound( weaponChangeSound, CHAN_LOCAL );
 		}
+#endif
 	}
 
 	UI_AdjustFrom640( &x, &y, &w, &h );
@@ -1085,8 +1064,8 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	//
 	// add the spinning barrel
 	//
-#ifdef TMNTWEAPONS // Turtle Man: FIXME: How did I handled this in cgame?
-	if ( pi->realWeapon == WP_GUN )
+#ifdef TMNTWEAPSYS_2
+	if ( pi->barrelModel )
 #else
 	if ( pi->realWeapon == WP_MACHINEGUN || pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG )
 #endif
@@ -1098,10 +1077,17 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		barrel.renderfx = renderfx;
 
 		barrel.hModel = pi->barrelModel;
+#ifdef TMNTWEAPSYS_2
+		VectorClear(angles);
+		if (bg_weapongroupinfo[pi->realWeapon].weapon[0]->barrelSpin != BS_NONE)
+		{
+			angles[bg_weapongroupinfo[pi->realWeapon].weapon[0]->barrelSpin]
+						= UI_MachinegunSpinAngle( pi );
+		}
+#else
 		angles[YAW] = 0;
 		angles[PITCH] = 0;
 		angles[ROLL] = UI_MachinegunSpinAngle( pi );
-#ifndef TMNTWEAPONS
 		if( pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG ) {
 			angles[PITCH] = angles[ROLL];
 			angles[ROLL] = 0;
@@ -1731,7 +1717,10 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	if (BG_PlayerAttackAnim(torsoAnim))
 	{
 		torsoAnim = BG_TorsoAttackForWeapon(weaponNum);
+		if (!BG_WeapTypeIsMelee(BG_WeaponTypeForNum(weaponNum)))
+		{
 		pi->muzzleFlashTime = dp_realtime + UI_TIMER_MUZZLE_FLASH;
+		}
 		//FIXME play firing sound here
 	}
 #else

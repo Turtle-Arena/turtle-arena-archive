@@ -864,7 +864,7 @@ netField_t	entityStateFields[] =
 { NETF(legsAnim), 8 },
 { NETF(groundEntityNum), GENTITYNUM_BITS },
 { NETF(pos.trType), 8 },
-#ifdef TMNT // IOQ3ZTM? Turtle Man: FIXME: Are all the flags (EF_*) being sent?!
+#ifdef IOQ3ZTM_NO_COMPAT // EFLAG_FIX; Turtle Man: Just send all 32 bits!
 { NETF(eFlags), 32 },
 #else
 { NETF(eFlags), 19 },
@@ -1189,7 +1189,11 @@ netField_t	playerStateFields[] =
 { PSF(pm_flags), 16 },
 { PSF(groundEntityNum), GENTITYNUM_BITS },
 { PSF(weaponstate), 4 },
+#ifdef IOQ3ZTM_NO_COMPAT // EFLAG_FIX; Turtle Man: Just send all 32 bits!
+{ PSF(eFlags), 32 },
+#else
 { PSF(eFlags), 16 },
+#endif
 { PSF(externalEvent), 10 },
 { PSF(gravity), 16 },
 { PSF(speed), 16 },
@@ -1222,11 +1226,16 @@ netField_t	playerStateFields[] =
 #ifdef TMNTHOLDSYS
 ,{ PSF(holdableIndex), 5 }
 #endif
+#ifdef TMNTHOLDABLE
+,{ PSF(holdableTime), -16 }
+#endif
 #ifdef TMNTWEAPSYS // MELEEATTACK
 ,{ PSF(meleeAttack), 8 },
 { PSF(meleeTime), 16 },
 { PSF(meleeDelay), 16 },
-{ PSF(comboTime), 16 },
+{ PSF(meleeLinkTime), 16 },
+{ PSF(chain), 16 },
+{ PSF(chainTime), 16 },
 { PSF(weaponHands), 4 },
 #endif
 };
@@ -1238,7 +1247,7 @@ MSG_WriteDeltaPlayerstate
 =============
 */
 #ifdef ARRAYMAX // IOQ3ZTM
-#define NUM_INTEGER_BITS 16 // In Quake 3 there are only 16 weapons, powerups, persistant ect...
+#define NUM_INTEGER_BITS 16 // In Quake 3 there are only 16 weapons, powerups, persistant etc...
 #endif
 void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct playerState_s *to ) {
 	int				i;

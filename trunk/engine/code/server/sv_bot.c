@@ -500,11 +500,12 @@ void SV_BotInitCvars(void) {
 	Cvar_Get("bot_nochat", "0", 0);						//disable chats
 	Cvar_Get("bot_pause", "0", CVAR_CHEAT);				//pause the bots thinking
 	Cvar_Get("bot_report", "0", CVAR_CHEAT);			//get a full report in ctf
+#ifndef TMNTWEAPONS
+	Cvar_Get("bot_rocketjump", "1", 0);					//enable rocket jumping
+#endif
 #ifdef TMNTMISC
-	Cvar_Get("bot_rocketjump", "0", 0);					//enable rocket jumping
 	Cvar_Get("bot_grapple", "1", 0);					//enable grapple
 #else
-	Cvar_Get("bot_rocketjump", "1", 0);					//enable rocket jumping
 	Cvar_Get("bot_grapple", "0", 0);					//enable grapple
 #endif
 	Cvar_Get("bot_challenge", "0", 0);					//challenging bot

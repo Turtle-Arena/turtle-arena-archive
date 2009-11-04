@@ -39,7 +39,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	RESPAWN_ARMOR		25
 #define	RESPAWN_HEALTH		35
 #define	RESPAWN_AMMO		40
+#ifdef TMNTHOLDABLE
+#define	RESPAWN_HOLDABLE	35
+#else
 #define	RESPAWN_HOLDABLE	60
+#endif
 #define	RESPAWN_MEGAHEALTH	35//120
 #define	RESPAWN_POWERUP		120
 
@@ -162,7 +166,16 @@ int Pickup_PersistantPowerup( gentity_t *ent, gentity_t *other ) {
 		if( handicap<=0.0f || handicap>100.0f) {
 			handicap = 100.0f;
 		}
+#ifdef TMNT // Only half as much health.
+		max = (int)(handicap / 2);
+
+		other->health = max;
+		other->client->ps.stats[STAT_HEALTH] = max;
+		other->client->ps.stats[STAT_MAX_HEALTH] = max;
+		other->client->pers.maxHealth = max;
+#else
 		other->client->pers.maxHealth = handicap;
+#endif
 #ifndef TMNT // NOARMOR
 		other->client->ps.stats[STAT_ARMOR] = 0;
 #endif
@@ -428,10 +441,6 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	int			max;
 	int			quantity;
 
-#ifdef TMNTMISC
-	// no health items go over max (unlike in Q3).
-	max = other->client->ps.stats[STAT_MAX_HEALTH];
-#else
 	// small and mega healths will go over the max
 #ifdef MISSIONPACK
 #ifdef TMNTWEAPSYS_2
@@ -444,12 +453,15 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	}
 	else
 #endif
+#ifndef TMNTMISC
 	if ( ent->item->quantity != 5 && ent->item->quantity != 100 ) {
 		max = other->client->ps.stats[STAT_MAX_HEALTH];
-	} else {
+	}
+	else
+#endif
+	{
 		max = other->client->ps.stats[STAT_MAX_HEALTH] * 2;
 	}
-#endif
 
 	if ( ent->count ) {
 		quantity = ent->count;
@@ -457,6 +469,28 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 		quantity = ent->item->quantity;
 	}
 
+#ifdef TMNT // Guards having health regen makes them pretty much unkillable.
+			// So get 2x health from pickups!
+#ifdef TMNTWEAPSYS_2
+	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
+#else
+	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
+#endif
+	{
+		other->health += quantity*2;
+	}
+	else
+	// And cut health that scout gets?
+#ifdef TMNTWEAPSYS_2
+	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
+#else
+	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
+#endif
+	{
+		other->health += (int)quantity/2;
+	}
+	else
+#endif
 	other->health += quantity;
 
 	if (other->health > max ) {
@@ -508,6 +542,10 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
 
 //======================================================================
 
+#ifdef TMNTWEAPSYS_2 // weapon_random
+gitem_t *G_RandomWeaponItem( gentity_t *ent );
+#endif
+
 /*
 ===============
 RespawnItem
@@ -534,6 +572,19 @@ void RespawnItem( gentity_t *ent ) {
 			;
 	}
 
+#ifdef TMNTWEAPSYS_2
+	// weapon_random: Change item!
+	if (ent->item->giType == IT_WEAPON && ent->s.eFlags & EF_VOTED)
+	{
+		gitem_t *item;
+
+		item = G_RandomWeaponItem(ent);
+		if (item) {
+			ent->item = item;
+			ent->s.modelindex = ITEM_INDEX(item);
+		}
+	}
+#endif
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->s.eFlags &= ~EF_NODRAW;
 	ent->r.svFlags &= ~SVF_NOCLIENT;
@@ -837,12 +888,19 @@ void FinishSpawningItem( gentity_t *ent ) {
 	ent->s.modelindex2 = 0; // zero indicates this isn't a dropped item
 
 #ifdef TMNT // CRATE : solid
-	if (ent->item->giType == IT_CRATE)
-		ent->r.contents = CONTENTS_SOLID | CONTENTS_TRIGGER;
+	if (ent->item->giType == IT_CRATE) {
+		ent->r.contents = CONTENTS_SOLID;
+		ent->takedamage = qtrue;
+		ent->health = 10;
+	}
 	else
+	{
 #endif
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->touch = Touch_Item;
+#ifdef TMNT
+	}
+#endif
 	// useing an item causes it to respawn
 	ent->use = Use_Item;
 
@@ -1015,17 +1073,8 @@ void ClearRegisteredItems( void ) {
 	RegisterItem( BG_FindItemForHoldable( HI_SHURIKEN ) );
 #endif
 #ifndef TMNTWEAPSYS_2
-#if !defined TMNTWEAPONS && !defined SONICWEAPONS // Turtle Man: We don't have any weapons that we can register here.
 	RegisterItem( BG_FindItemForWeapon( WP_MACHINEGUN ) );
 	RegisterItem( BG_FindItemForWeapon( WP_GAUNTLET ) );
-#endif
-#if 0 // #ifdef SP_NPC // Turtle Man: TODO: Do this somewhere else, for each used npc type.
-	RegisterItem( BG_FindItemForWeapon( WP_FIREBALL ) );
-	RegisterItem( BG_FindItemForWeapon( WP_BAT ) );
-	RegisterItem( BG_FindItemForWeapon( WP_SEA1 ) );
-	RegisterItem( BG_FindItemForWeapon( WP_SEA2 ) );
-	RegisterItem( BG_FindItemForWeapon( WP_GUN ) );
-#endif
 #endif
 #ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
@@ -1153,6 +1202,100 @@ void G_SpawnItem (gentity_t *ent, gitem_t *item) {
 #endif
 }
 
+#ifdef TMNTWEAPSYS_2
+gitem_t *G_RandomWeaponItem( gentity_t *ent ) {
+	int validWeapons[MAX_BG_WEAPON_GROUPS];
+	int numweapons;
+	int i;
+
+	numweapons = 0;
+
+	for (i = 1; i < BG_NumWeaponGroups(); i++)
+	{
+		if (!bg_weapongroupinfo[i].item.classname || !bg_weapongroupinfo[i].item.classname[0]) {
+			continue;
+		}
+		if (!(ent->spawnflags & 2)) // Don't spawn melee weapons
+		{
+			if (bg_weapongroupinfo[i].weapon[0]->weapontype == WT_MELEE
+				|| bg_weapongroupinfo[i].weapon[0]->weapontype == WT_GAUNTLET) {
+				continue;
+			}
+		}
+		if (!(ent->spawnflags & 4)) // Don't spawn guns
+		{
+			if (bg_weapongroupinfo[i].weapon[0]->weapontype == WT_GUN) {
+				continue;
+			}
+		}
+		if ( G_ItemDisabled(&bg_weapongroupinfo[i].item) ) {
+			continue;
+		}
+
+		validWeapons[numweapons++] = i;
+		// Hmm... I have to cache all of the weapons that it may spawn...
+		RegisterItem( &bg_weapongroupinfo[i].item );
+		//Com_Printf("DEBUG: G_RandomWeaponItem: %s\n", bg_weapongroupinfo[i].item.classname);
+	}
+
+	if (!numweapons) {
+		Com_Printf("G_RandomWeaponItem: NULL\n");
+		return NULL;
+	}
+
+	// Random weapon item
+	return &bg_weapongroupinfo[validWeapons[rand() % numweapons]].item;
+}
+
+/*QUAKED weapon_random (1 0 0) (-16 -16 -16) (16 16 16) SUPSPENDED MELEE GUNS CONSTANT
+Spawns a random weapon.
+"wait" Respawn Delay
+"random" Respawn Delay Variance
+*/
+void SP_weapon_random( gentity_t *ent ) {
+	gitem_t *item;
+
+	// Default to melee and guns
+	if (!(ent->spawnflags & 2) && !(ent->spawnflags & 4)) {
+		ent->spawnflags |= (2|4);
+	}
+
+	// No not constant random weapon...
+	if (!(ent->spawnflags & 8))
+	{
+		// Change weapons on respawn
+		ent->s.eFlags |= EF_VOTED;
+	}
+
+	G_SpawnFloat( "random", "0", &ent->random );
+	G_SpawnFloat( "wait", "0", &ent->wait );
+
+	item = G_RandomWeaponItem(ent);
+	if (!item) {
+		return;
+	}
+
+	ent->item = item;
+	// some movers spawn on the second frame, so delay item
+	// spawns until the third frame so they can ride trains
+	ent->nextthink = level.time + FRAMETIME * 2;
+	ent->think = FinishSpawningItem;
+
+	ent->physicsBounce = 0.50;		// items are bouncy
+
+/*
+	if ( item->giType == IT_POWERUP ) {
+		G_SoundIndex( "sound/items/poweruprespawn.wav" );
+		G_SpawnFloat( "noglobalsound", "0", &ent->speed);
+	}
+
+#ifdef MISSIONPACK
+	if ( item->giType == IT_PERSISTANT_POWERUP ) {
+		ent->s.generic1 = ent->spawnflags;
+	}
+#endif*/
+}
+#endif
 
 /*
 ================

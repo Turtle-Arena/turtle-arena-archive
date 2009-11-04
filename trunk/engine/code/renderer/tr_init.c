@@ -117,8 +117,8 @@ cvar_t	*r_roundImagesDown;
 cvar_t	*r_colorMipLevels;
 cvar_t	*r_picmip;
 #ifdef CELSHADING
-cvar_t	*r_celshadalgo; // Cell shading algorithm selection.
-cvar_t	*r_celoutline; // enable/disable cel bordering all together.
+cvar_t	*r_celshadalgo; // Cel shading algorithm selection.
+cvar_t	*r_celoutline; // Cel border width.
 #endif
 cvar_t	*r_showtris;
 cvar_t	*r_showsky;
@@ -1126,7 +1126,11 @@ void R_Register( void )
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_CHEAT);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
 
+#ifdef TMNTMISC // Enable marks on triangle meshes.
+	r_marksOnTriangleMeshes = ri.Cvar_Get("r_marksOnTriangleMeshes", "1", CVAR_ARCHIVE);
+#else
 	r_marksOnTriangleMeshes = ri.Cvar_Get("r_marksOnTriangleMeshes", "0", CVAR_ARCHIVE);
+#endif
 
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);
@@ -1172,6 +1176,10 @@ void R_Init( void ) {
 	}
 	Com_Memset( tess.constantColor255, 255, sizeof( tess.constantColor255 ) );
 
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+	R_NoiseInit();
+#endif
+
 	//
 	// init function tables
 	//
@@ -1181,6 +1189,9 @@ void R_Init( void ) {
 		tr.squareTable[i]	= ( i < FUNCTABLE_SIZE/2 ) ? 1.0f : -1.0f;
 		tr.sawToothTable[i] = (float)i / FUNCTABLE_SIZE;
 		tr.inverseSawToothTable[i] = 1.0f - tr.sawToothTable[i];
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+		tr.noiseTable[i] = R_NoiseGet4f(0, 0, 0, i);
+#endif
 
 		if ( i < FUNCTABLE_SIZE / 2 )
 		{
@@ -1201,7 +1212,9 @@ void R_Init( void ) {
 
 	R_InitFogTable();
 
+#ifndef IOQ3ZTM // IOSTVEF_NOISE
 	R_NoiseInit();
+#endif
 
 	R_Register();
 

@@ -103,7 +103,9 @@ Check for lava / slime contents and drowning
 =============
 */
 void P_WorldEffects( gentity_t *ent ) {
+#ifndef TMNT // POWERS
 	qboolean	envirosuit;
+#endif
 	int			waterlevel;
 
 	if ( ent->client->noclip ) {
@@ -113,9 +115,7 @@ void P_WorldEffects( gentity_t *ent ) {
 
 	waterlevel = ent->waterlevel;
 
-#ifdef TMNT // POWERS
-	envirosuit = ent->client->ps.powerups[PW_INVUL] > level.time;
-#else
+#ifndef TMNT // POWERS
 	envirosuit = ent->client->ps.powerups[PW_BATTLESUIT] > level.time;
 #endif
 
@@ -123,10 +123,12 @@ void P_WorldEffects( gentity_t *ent ) {
 	// check for drowning
 	//
 	if ( waterlevel == 3 ) {
+#ifndef TMNT // POWERS
 		// envirosuit give air
 		if ( envirosuit ) {
 			ent->client->airOutTime = level.time + 10000;
 		}
+#endif
 
 		// if out of air, start drowning
 		if ( ent->client->airOutTime < level.time) {
@@ -167,9 +169,16 @@ void P_WorldEffects( gentity_t *ent ) {
 		if (ent->health > 0
 			&& ent->pain_debounce_time <= level.time	) {
 
+#ifdef TMNT // POWERS
+			if ( ent->client->ps.powerups[PW_INVUL] > level.time ) {
+				G_AddEvent( ent, EV_POWERUP_INVUL, 0 );
+			} else
+#else
 			if ( envirosuit ) {
 				G_AddEvent( ent, EV_POWERUP_BATTLESUIT, 0 );
-			} else {
+			} else
+#endif
+			{
 				if (ent->watertype & CONTENTS_LAVA) {
 					G_Damage (ent, NULL, NULL, NULL, NULL, 
 						30*waterlevel, 0, MOD_LAVA);
@@ -432,13 +441,12 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	client->timeResidual += msec;
 
 #ifdef TMNTWEAPSYS // MELEEATTACK
-	// combo time
-	if (client->ps.comboTime > 0)
+	if (client->ps.meleeLinkTime > 0)
 	{
-		client->ps.comboTime -= msec;
-		if (client->ps.comboTime <= 0)
+		client->ps.meleeLinkTime -= msec;
+		if (client->ps.meleeLinkTime <= 0)
 		{
-			client->ps.comboTime = 0;
+			client->ps.meleeLinkTime = 0;
 			client->ps.meleeAttack = 0;
 		}
 	}
@@ -457,14 +465,13 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		client->ps.meleeTime -= msec;
 		if (client->ps.meleeTime <= 0)
 		{
-			int max_combo = 4;
-			int weap_delay = 1500; // 1.5 seconds...
+			int weap_delay;
+			int max_combo;
 #ifdef TMNTWEAPSYS_2
-			if (bg_weapongroupinfo[client->ps.weapon].weapon[0])
-			{
+			max_combo = BG_MaxAttackCombo(&client->ps);
+
 				weap_delay = bg_weapongroupinfo[client->ps.weapon].weapon[0]->attackDelay;
-			}
-#else // if defined TMNTWEAPONS
+#else
 			weapontype_t wt = BG_WeaponTypeForPlayerState(&client->ps);
 
 			// Per weapon max combo and weap_delay?
@@ -474,22 +481,48 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				max_combo = 1;
 				weap_delay = 2500; // Longer delay
 			}
+			else
+			{
+				max_combo = 4;
+				weap_delay = 1500; // 1.5 seconds...
+			}
 #endif
+
+			// Turtle Man: TEST; with the accel changes (xyspeed) weap_delay is way too long.
+			weap_delay /= 2;
+
+			// Turtle Man: if running "weap_delay = 0"; like in LoZ:TP
+			{
+				vec_t xyspeed = sqrt( client->ps.velocity[0] * client->ps.velocity[0] +
+					client->ps.velocity[1] * client->ps.velocity[1] );
+				if (xyspeed > 200)
+				{
+					weap_delay = 0;
+				}
+			}
+
 			client->ps.meleeTime = 0;
 
 			if (client->ps.meleeAttack == max_combo)
 			{
-#ifndef TMNTRELEASE
 				//G_Printf("DEBUG: client %i finished last combo (%i)\n", ent - g_entities, client->ps.meleeAttack);
-#endif
 
 				client->ps.meleeDelay = weap_delay;
 				client->ps.weaponTime = client->ps.meleeDelay; // Don't let them use a gun...
 
 				client->ps.meleeAttack = 0;
-				//client->ps.meleeTime = 0;
-				client->ps.comboTime = 0;
+				client->ps.meleeLinkTime = 0;
 			}
+			}
+		}
+
+	if (client->ps.chainTime > 0)
+	{
+		client->ps.chainTime -= msec;
+		if (client->ps.chainTime <= 0)
+		{
+			client->ps.chainTime = 0;
+			client->ps.chain = 0;
 		}
 	}
 #endif
@@ -499,6 +532,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 		// regenerate
 #ifdef MISSIONPACK
+#ifndef TMNT // Guards having health regen makes them pretty much unkillable.
 #ifdef TMNTWEAPSYS_2
 		if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
@@ -507,7 +541,9 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		{
 			maxHealth = client->ps.stats[STAT_MAX_HEALTH] / 2;
 		}
-		else if ( client->ps.powerups[PW_REGEN] ) {
+		else
+#endif
+		if ( client->ps.powerups[PW_REGEN] ) {
 			maxHealth = client->ps.stats[STAT_MAX_HEALTH];
 		}
 		else {
@@ -571,23 +607,92 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		w = client->ps.weapon;
 #else
 		int w, max, inc, t, i;
+#ifdef TMNTWEAPSYS_2
+		int weapList[MAX_BG_WEAPON_GROUPS] = { 0 };
+		int weapCount = 0;
+		max = BG_NumWeaponGroups();
+		for (i = 1; i < max; i++) {
+			if (BG_WeapUseAmmo(i))
+			{
+				weapList[weapCount] = i;
+				weapCount++;
+			}
+		}
+#else
     int weapList[]={WP_MACHINEGUN,WP_SHOTGUN,WP_GRENADE_LAUNCHER,WP_ROCKET_LAUNCHER,WP_LIGHTNING,WP_RAILGUN,WP_PLASMAGUN,WP_BFG,WP_NAILGUN,WP_PROX_LAUNCHER,WP_CHAINGUN};
     int weapCount = sizeof(weapList) / sizeof(int);
+#endif
 		//
     for (i = 0; i < weapCount; i++) {
 		  w = weapList[i];
 #endif
 
-		  switch(w) {
-#ifdef TMNTWEAPSYS_2 // Turtle Man: FIXME: Make ammo regen non-hardcoded.
-#endif
-#ifdef TMNTWEAPONS
-			 // Only weapons that use ammo.
-			 case WP_GUN: max = 50; inc = 4; t = 1000; break;
-			 case WP_ELECTRIC_LAUNCHER: max = 40; inc = 5; t = 1500; break;
-			 case WP_ROCKET_LAUNCHER: max = 10; inc = 1; t = 1750; break;
-			 case WP_HOMING_LAUNCHER: max = 5; inc = 1; t = 2000; break;
+#ifdef TMNTWEAPSYS_2 // Turtle Man: FIXME: Make ammo regen non-hardcoded. (AND make sense...)
+			// NOTE: max is wrong for WP_BFG: max should be 10 instead of 20
+			//                        WP_MACHINEGUN: max should be 50 instead of 40
+			//       inc is wrong for WP_MACHINEGUN: inc should be 4 instead of 5
+			//       t is only right for railgun...?
+			max = bg_weapongroupinfo[w].item.quantity;
+
+			if (max <= 25)
+				inc = 1;
+			else
+				inc = 5;
+
+#if 0 // #ifdef TMNTWEAPONS
+			if (inc > 1) {
+				t = (bg_weapongroupinfo[w].weapon[0]->attackDelay * inc) * 2;
+			} else {
+				t = bg_weapongroupinfo[w].weapon[0]->attackDelay;
+			}
+			if (t < 400)
+			{
+				t += t * 0.01f;
+			}
+
+			t += bg_weapongroupinfo[w].weapon[0]->proj->damage * 0.01f;
+
+			if (t < 1000)
+			{
+				t = 1000;
+			}
+			else if (t > 4000)
+			{
+				t = 4000;
+			}
 #else
+			// Ugly, but supports; machinegun, shotgun, lightning. railgun, plasma
+			// rocket is close to Q3, 50 msec longer
+			// grenade is 200 msec faster
+			// bfg is 1000 msec faster...
+			if (inc > 1) {
+				t = (bg_weapongroupinfo[w].weapon[0]->attackDelay * inc) * 2;
+			} else {
+				t = bg_weapongroupinfo[w].weapon[0]->attackDelay;
+				// hack for railgun
+				t *= 1.166666667f;
+			}
+
+			// shotgun/plasmagun hack, other wise would be 1000.
+			if (t == 1000
+				&& bg_weapongroupinfo[w].weapon[0]->proj->damage >= 10)
+			{
+				t = 1500;
+			}
+
+			if (t < 1000) {
+				if (bg_weapongroupinfo[w].weapon[0]->proj->instantDamage)
+					t += 1000;
+				else
+					t += bg_weapongroupinfo[w].weapon[0]->proj->speed;
+			}
+			// Just in case...
+			if (t > 4000) {
+				t = 4000;
+			}
+#endif
+#else
+			switch(w) {
 			  case WP_MACHINEGUN: max = 50; inc = 4; t = 1000; break;
 			  case WP_SHOTGUN: max = 10; inc = 1; t = 1500; break;
 			  case WP_GRENADE_LAUNCHER: max = 10; inc = 1; t = 2000; break;
@@ -599,10 +704,14 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			  case WP_NAILGUN: max = 10; inc = 1; t = 1250; break;
 			  case WP_PROX_LAUNCHER: max = 5; inc = 1; t = 2000; break;
 			  case WP_CHAINGUN: max = 100; inc = 5; t = 1000; break;
-#endif
 			  default: max = 0; inc = 0; t = 1000; break;
 		  }
+#endif
 #ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS
+			if (max > 0)
+			{
+#endif
 		  client->ammoTimes[w] += msec;
 		  if ( client->ps.stats[STAT_AMMO] >= max ) {
 			  client->ammoTimes[w] = 0;
@@ -615,7 +724,14 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				  client->ps.stats[STAT_AMMO] = max;
 			  }
 		  }
+#ifdef TMNTWEAPSYS
+			}
+#endif
 #else
+#ifdef TMNTWEAPSYS
+			if (max > 0)
+			{
+#endif
 		  client->ammoTimes[w] += msec;
 		  if ( client->ps.ammo[w] >= max ) {
 			  client->ammoTimes[w] = 0;
@@ -628,10 +744,13 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				  client->ps.ammo[w] = max;
 			  }
 		  }
+#ifdef TMNTWEAPSYS
+			}
+#endif
     }
 #endif
 #ifdef TMNTHOLDABLE // REGEN_SHURIKENS
-		// Team Arena Ammo Regen for Shurikens Regen
+		// Team Arena Ammo Regen for Shurikens
 		{
 			int h, /*max, inc, t,*/ i;
 			int holdableList[]={HI_SHURIKEN, HI_ELECTRICSHURIKEN, HI_FIRESHURIKEN, HI_LASERSHURIKEN};
@@ -964,14 +1083,18 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 }
 
-#ifndef TMNT // POWERS
-#ifdef MISSIONPACK
+#if defined MISSIONPACK || defined TMNT // POWERS
 /*
 ==============
 StuckInOtherClient
 ==============
 */
-static int StuckInOtherClient(gentity_t *ent) {
+#ifdef TMNT // POWERS
+static gentity_t *StuckInOtherClient(gentity_t *ent)
+#else
+static int StuckInOtherClient(gentity_t *ent)
+#endif
+{
 	int i;
 	gentity_t	*ent2;
 
@@ -989,6 +1112,11 @@ static int StuckInOtherClient(gentity_t *ent) {
 		if ( ent2->health <= 0 ) {
 			continue;
 		}
+#ifdef TMNT // POWERS
+		if ( !(ent2->r.contents & CONTENTS_BODY) ) {
+			continue;
+		}
+#endif
 		//
 		if (ent2->r.absmin[0] > ent->r.absmax[0])
 			continue;
@@ -1002,11 +1130,18 @@ static int StuckInOtherClient(gentity_t *ent) {
 			continue;
 		if (ent2->r.absmax[2] < ent->r.absmin[2])
 			continue;
+#ifdef TMNT // POWERS
+		return ent2;
+#else
 		return qtrue;
-	}
-	return qfalse;
-}
 #endif
+	}
+#ifdef TMNT // POWERS
+	return NULL;
+#else
+	return qfalse;
+#endif
+}
 #endif
 
 void BotTestSolid(vec3_t origin);
@@ -1049,8 +1184,8 @@ void SendPendingPredictableEvents( playerState_t *ps ) {
 
 
 #ifdef TMNTWEAPSYS_2
-// Switch to onhanded if true.
-//   Set a flag in the player/entity state so that cgame can know if by flag...
+// Switch to onhanded if by a CTF flag that can be picked up,
+//    so that its like the "player" is planning on picking up the flag.
 static qboolean G_ByEnemyFlag(int team, vec3_t origin)
 {
 	char *classname;
@@ -1087,7 +1222,12 @@ static qboolean G_ByEnemyFlag(int team, vec3_t origin)
 	return qfalse;
 }
 
-/*
+#if 1
+static qboolean BG_ByWeapon(vec3_t origin)
+{
+	return qfalse;
+}
+#else
 static qboolean BG_ByWeapon(vec3_t origin)
 {
 	gentity_t      *ent = NULL;
@@ -1105,7 +1245,7 @@ static qboolean BG_ByWeapon(vec3_t origin)
 	}
 	return qfalse;
 }
-*/
+#endif
 #endif
 
 #ifdef TMNTSP
@@ -1138,22 +1278,6 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 	// mark the time, so the connection sprite can be removed
 	ucmd = &ent->client->pers.cmd;
-
-#ifdef SP_NPC
-	// Turtle Man: Why was use holdable removed here? --It broke using holdables!
-	//ucmd->buttons &= ~BUTTON_USE_HOLDABLE;
-	if (ent->slow_event) {
-		if (ent->slow_event>level.time)
-		{
-			ucmd->forwardmove/=4;
-			ucmd->rightmove/=4;
-			ucmd->upmove/=4;
-		}
-		else
-			ent->slow_event=0;
-	}
-#endif
-
 
 	// sanity check the command time to prevent speedup cheating
 	if ( ucmd->serverTime > level.time + 200 ) {
@@ -1219,31 +1343,6 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 	}
 
-#ifdef TMNT // !! EF_TELE_EFFECT !!
-	// Disable/enable tele effect on player.
-	if (client->teleEffectTime > 0)
-	{
-		if ((level.time-client->teleEffectTime < 3000)
-			|| (client->teleEffectTime & 100))
-		{
-			//ent->s.eFlags |= EF_TELE_EFFECT;
-			client->ps.eFlags |= EF_TELE_EFFECT;
-		}
-		else
-		{
-			//ent->s.eFlags &= EF_TELE_EFFECT;
-			client->ps.eFlags &= EF_TELE_EFFECT;
-		}
-
-		if (level.time-client->teleEffectTime > 5000)
-		{
-			//ent->s.eFlags &= ~EF_TELE_EFFECT;
-			client->ps.eFlags &= ~EF_TELE_EFFECT;
-			client->teleEffectTime = 0;
-		}
-	}
-#endif
-
 	if ( client->noclip ) {
 		client->ps.pm_type = PM_NOCLIP;
 	} else if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
@@ -1278,9 +1377,8 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// Let go of the hook if we aren't firing
 	if (
-#ifdef TMNTWEAPSYS_2 // Turtle Man: FIXME: Shurikens may be grappling?
-		bg_weapongroupinfo[client->ps.weapon].weapon[0] &&
-		bg_projectileinfo[bg_weapongroupinfo[client->ps.weapon].weapon[0]->proj].grappling
+#ifdef TMNTWEAPSYS_2 // Turtle Man: FIXME: This doesn't allow shurikens to be grappling.
+		bg_weapongroupinfo[client->ps.weapon].weapon[0]->proj->grappling
 #else
 		client->ps.weapon == WP_GRAPPLING_HOOK
 #endif
@@ -1294,30 +1392,37 @@ void ClientThink_real( gentity_t *ent ) {
 	memset (&pm, 0, sizeof(pm));
 
 #ifdef TMNTWEAPSYS
+	// Switch to single handed when close to CTF flag
+	//    Turtle Man: TODO: Single handed when by weapons too?
+	// Turtle Man: TODO: Don't allow CTF flag to be picked up while melee attacking?
 	{
-		qboolean attacking = (client->ps.meleeDelay || client->ps.meleeTime
-								|| client->ps.weaponTime);
 		qboolean holdingFlag = (client->ps.powerups[PW_BLUEFLAG]
 								|| client->ps.powerups[PW_REDFLAG]
 								|| client->ps.powerups[PW_NEUTRALFLAG]);
-#if 1
-		qboolean byFlag = qfalse;
-#else
 		qboolean byFlag = G_ByEnemyFlag(client->ps.persistant[PERS_TEAM], client->ps.origin);
-#endif
-		qboolean byWeapon = qfalse; // todo?
+		qboolean byWeapon = BG_ByWeapon(client->ps.origin);
 		qboolean singleHanded = (holdingFlag || byFlag || byWeapon);
 
 		if (singleHanded)
 	{
-			//if (!attacking)
+			// The Good: When byFlag and attacking, use both hands to attack.
+			// The Bad: If standing by flag, secondary weapon is got out and
+			//    put away before/after each attack...
+			if (!holdingFlag && (client->ps.meleeTime || client->ps.weaponTime))
+			{
+				client->ps.eFlags &= ~EF_PRIMARY_HAND;
+			}
+			else
+			// Don't change while melee attacking?
+			//if (!client->ps.meleeTime)
 		{
 				client->ps.eFlags |= EF_PRIMARY_HAND;
 		}
 	}
 		else if (client->ps.eFlags & EF_PRIMARY_HAND)
 	{
-			//if (!attacking)
+			// Don't change while melee attacking?
+			//if (!client->ps.meleeTime)
 			{
 				client->ps.eFlags &= ~EF_PRIMARY_HAND;
 			}
@@ -1326,17 +1431,19 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 
 #ifdef TMNTWEAPSYS // MELEEATTACK
+	if (client->ps.pm_type != PM_DEAD)
+	{
 	if (BG_WeaponTypeForPlayerState(&client->ps) == WT_GAUNTLET)
 	{
 		if ((ucmd->buttons & BUTTON_ATTACK) && !(ucmd->buttons & BUTTON_TALK)
 			&& client->ps.weaponTime <= 0 )
 	{
-			pm.gauntletHit = G_MeleeAttack( ent, qtrue );
+				pm.gauntletHit = G_MeleeDamage( ent, qtrue );
 	}
 	else
 	{
 			// If always does damage, do damage anyway.
-		G_MeleeAttack( ent, qfalse );
+				G_MeleeDamage( ent, qfalse );
 	}
 	}
 	else
@@ -1348,9 +1455,10 @@ void ClientThink_real( gentity_t *ent ) {
 			G_StartMeleeAttack(ent);
 		}
 
-		G_MeleeAttack( ent, (client->ps.meleeTime > 0) );
+			G_MeleeDamage( ent, (client->ps.meleeTime > 0) );
+		}
 	}
-#else // Disable gauntlet attack
+#else
 	// check for the hit-scan gauntlet, don't let the action
 	// go through as an attack unless it actually hits something
 	if ( client->ps.weapon == WP_GAUNTLET && !( ucmd->buttons & BUTTON_TALK ) &&
@@ -1407,7 +1515,11 @@ void ClientThink_real( gentity_t *ent ) {
 	else {
 		pm.tracemask = MASK_PLAYERSOLID;
 	}
+#if 0 // #ifdef IOQ3ZTM // Turtle Man: TEST: Its shaky on slopes.
+	pm.trace = trap_TraceCapsule;
+#else
 	pm.trace = trap_Trace;
+#endif
 	pm.pointcontents = trap_PointContents;
 	pm.debugLevel = g_debugMove.integer;
 	pm.noFootsteps = ( g_dmflags.integer & DF_NO_FOOTSTEPS ) > 0;
@@ -1507,7 +1619,7 @@ void ClientThink_real( gentity_t *ent ) {
 					{
 						/*if (g_singlePlayer.integer && client->ps.pers[PERS_CONTINUES])
 						{
-							// Open "Contiue?" menu
+							// Open "Contiue?" menu/screen
 						}
 						else */if (client->ps.persistant[PERS_CONTINUES])
 						{
@@ -1596,7 +1708,7 @@ void ClientThink( int clientNum ) {
 ==================
 BG_SwingAngles
 
-Turtle Man: TODO: Move to bg_misc.c ? (or rename to G_SwingAngles...)
+Turtle Man: FIXME: Move to bg_misc.c ? (or rename to G_SwingAngles...)
 
 Based on CG_SwingAngles
 * frametime should be;
@@ -1903,6 +2015,34 @@ void ClientEndFrame( gentity_t *ent ) {
 	// turn off any expired powerups
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
 		if ( ent->client->ps.powerups[ i ] < level.time ) {
+#ifdef TMNT // POWERS
+			if (ent->client->ps.powerups[ i ] > 0
+				&& i == PW_FLASHING)
+			{
+				gentity_t *stuck;
+
+				ent->client->ps.powerups[ i ] = 0;
+
+				// Become solid again
+				ent->r.contents |= CONTENTS_BODY;
+				trap_LinkEntity(ent);
+#if 1
+				// if you would be solid in another player die.
+				stuck = StuckInOtherClient(ent);
+				if (stuck)
+				{
+					G_Damage ( ent, stuck, stuck, NULL, NULL,
+						100000, DAMAGE_NO_PROTECTION, MOD_TRIGGER_HURT);
+				}
+#else // Telefrag
+				// Must unlink so we don't kill our self.
+				trap_UnlinkEntity (ent);
+				G_KillBox( ent );
+				trap_LinkEntity (ent);
+#endif
+			}
+			else
+#endif
 			ent->client->ps.powerups[ i ] = 0;
 		}
 	}
@@ -1963,24 +2103,6 @@ void ClientEndFrame( gentity_t *ent ) {
 	if ( level.intermissiontime ) {
 		return;
 	}
-
-#if 0 // #ifdef TMNT // teleport effect
-	// Remove tele effect from player.
-	if (ent->client->teleEffectTime > 0)
-	{
-		if (ent->client->teleEffectTime + 5000 < level.time)
-		{
-			ent->s.eFlags &= ~EF_TELE_EFFECT;
-			//ent->client->ps.eFlags &= ~EF_TELE_EFFECT;
-			ent->client->teleEffectTime = 0;
-		}
-		else
-		{
-			ent->s.eFlags |= EF_TELE_EFFECT;
-			//ent->client->ps.eFlags |= EF_TELE_EFFECT;
-		}
-	}
-#endif
 
 	// burn from lava, etc
 	P_WorldEffects (ent);

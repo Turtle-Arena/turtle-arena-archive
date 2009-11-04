@@ -37,23 +37,34 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "l_log.h"
 #include "l_qfiles.h"
 
-// Turtle Man: May make changes for TMNT Arena?
-#define TMNT
+#define TMNT // Turtle Man: Minor changes for TMNT Arena
 
 #ifdef TMNT
+#define TMNTENTSYS
 #define TMNTWEAPSYS
-#define TMNTWEAPSYS2
-#define TMNTWEAPONS
+#define TMNTMISC
 
 #define BSPC_VERSION		"2.1h [TMNT Arena]"
 #else
 #define BSPC_VERSION		"2.1h"
 #endif
 
-#define ME			// Turtle Man: MrElusive?
+#define ME
 #define DEBUG
 #define NODELIST
 #define SIN
+
+#if 1 // Turtle Man(IOQ3): From ioquake3/code/qcommon/q_shared.c
+// vsnprintf is ISO/IEC 9899:1999
+// abstracting this to make it portable
+#ifdef _WIN32
+  #define Q_vsnprintf _vsnprintf
+  #define Q_snprintf _snprintf
+#else
+  #define Q_vsnprintf vsnprintf
+  #define Q_snprintf snprintf
+#endif
+#endif
 
 #define MAX_BRUSH_SIDES		128		//maximum number of sides per brush
 #define CLIP_EPSILON		0.1

@@ -379,8 +379,9 @@ typedef struct memhunk_s
 
 memhunk_t *memhunk_high;
 memhunk_t *memhunk_low;
-int memhunk_high_size = 16 * 1024 * 1024;
-int memhunk_low_size = 0;
+// Turtle Man: int to size_t
+size_t memhunk_high_size = 16 * 1024 * 1024;
+size_t memhunk_low_size = 0;
 
 //===========================================================================
 //

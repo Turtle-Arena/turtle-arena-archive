@@ -45,7 +45,7 @@ typedef vec_t vec4_t[4];
 
 #define	Q_PI	3.14159265358979323846
 
-//#define DEG2RAD( a ) ( a * M_PI ) / 180.0F
+#define DEG2RAD( a ) ( a * M_PI ) / 180.0F
 
 #ifndef M_PI
 #define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h

@@ -84,6 +84,10 @@ static struct {
 		int		width, height;
 	} work;
 	qboolean started;
+#ifdef IOQ3ZTM
+	qboolean fullscreen;
+	int		startWidth, startHeight;
+#endif
 } bloom;
 
 
@@ -122,6 +126,12 @@ R_Bloom_InitTextures
 static void R_Bloom_InitTextures( void )
 {
 	byte	*data;
+
+#ifdef IOQ3ZTM
+	bloom.fullscreen = r_fullscreen->integer;
+	bloom.startWidth = glConfig.vidWidth;
+	bloom.startHeight = glConfig.vidHeight;
+#endif
 
 	// find closer power of 2 to screen size 
 	for (bloom.screen.width = 1;bloom.screen.width< glConfig.vidWidth;bloom.screen.width *= 2);
@@ -171,6 +181,7 @@ static void R_Bloom_InitTextures( void )
 R_InitBloomTextures
 =================
 */
+/*
 void R_InitBloomTextures( void )
 {
 	if( !r_bloom->integer )
@@ -178,7 +189,7 @@ void R_InitBloomTextures( void )
 	memset( &bloom, 0, sizeof( bloom ));
 	R_Bloom_InitTextures ();
 }
-
+*/
 /*
 =================
 R_Bloom_DrawEffect
@@ -268,8 +279,13 @@ static void R_Bloom_WarsowEffect( void )
 			if( intensity < 0.01f )
 				continue;
 			qglColor4f( intensity, intensity, intensity, 1.0 );
+#ifdef IOQ3ZTM
+			x = (i - k) * ( 2 / (float)bloom.startWidth ) * bloom.effect.readW;
+			y = (j - k) * ( 2 / (float)bloom.startHeight ) * bloom.effect.readH;
+#else
 			x = (i - k) * ( 2 / 640.0f ) * bloom.effect.readW;
 			y = (j - k) * ( 2 / 480.0f ) * bloom.effect.readH;
+#endif
 
 			R_Bloom_Quad( bloom.work.width, bloom.work.height, x, y, bloom.effect.readW, bloom.effect.readH );
 		}
@@ -397,7 +413,16 @@ void R_BloomScreen( void )
 	if ( !backEnd.doneSurfaces )
 		return;
 	backEnd.doneBloom = qtrue;
-	if( !bloom.started ) {
+	if( !bloom.started
+#ifdef IOQ3ZTM // Check if we need to restart bloom
+		|| bloom.fullscreen != r_fullscreen->integer
+		|| bloom.startWidth != glConfig.vidWidth
+		|| bloom.startHeight != glConfig.vidHeight
+#endif
+	) {
+#ifdef IOQ3ZTM
+		bloom.started = qfalse;
+#endif
 		R_Bloom_InitTextures();
 		if( !bloom.started )
 			return;
@@ -437,12 +462,21 @@ void R_BloomInit( void ) {
 	memset( &bloom, 0, sizeof( bloom ));
 
 	r_bloom = ri.Cvar_Get( "r_bloom", "0", CVAR_ARCHIVE );
+#ifdef IOQ3ZTM // Turtle Man: AlienArena values
+	r_bloom_alpha = ri.Cvar_Get( "r_bloom_alpha", "0.2", CVAR_ARCHIVE );
+	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
+	r_bloom_intensity = ri.Cvar_Get( "r_bloom_intensity", "0.5", CVAR_ARCHIVE );
+	r_bloom_darken = ri.Cvar_Get( "r_bloom_darken", "8", CVAR_ARCHIVE );
+	r_bloom_sample_size = ri.Cvar_Get( "r_bloom_sample_size", "128", CVAR_ARCHIVE|CVAR_LATCH );
+	r_bloom_fast_sample = ri.Cvar_Get( "r_bloom_fast_sample", "0", CVAR_ARCHIVE|CVAR_LATCH );
+#else // OpenArena values
 	r_bloom_alpha = ri.Cvar_Get( "r_bloom_alpha", "0.3", CVAR_ARCHIVE );
 	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
 	r_bloom_intensity = ri.Cvar_Get( "r_bloom_intensity", "1.3", CVAR_ARCHIVE );
 	r_bloom_darken = ri.Cvar_Get( "r_bloom_darken", "4", CVAR_ARCHIVE );
 	r_bloom_sample_size = ri.Cvar_Get( "r_bloom_sample_size", "128", CVAR_ARCHIVE|CVAR_LATCH );
 	r_bloom_fast_sample = ri.Cvar_Get( "r_bloom_fast_sample", "0", CVAR_ARCHIVE|CVAR_LATCH );
+#endif
 }
 
 #endif // OA_BLOOM

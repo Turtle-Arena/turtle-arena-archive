@@ -200,9 +200,270 @@ static void R_DrawElements( int numIndexes, const glIndex_t *indexes ) {
 }
 
 #ifdef CELSHADING
+float EvalWaveForm( const waveForm_t *wf );
+float EvalWaveFormClamped( const waveForm_t *wf );
+
+// R_SetCelOutlineColors
+// modified version of static void ComputeColors( shaderStage_t *pStage )
+void R_SetCelOutlineColors(const celoutline_t *celoutline, byte *colors)
+{
+	int i;
+
+	if (!colors)
+		return;
+
+	colors[0] = colors[1] = colors[2] = 0; // Black RGB
+	colors[3] = 0xff; // Full alpha
+
+	if (!celoutline)
+		return;
+
+	//
+	// rgbGen
+	//
+	switch ( celoutline->rgbGen )
+	{
+		case CGEN_IDENTITY: // done
+			colors[0] = colors[1] = colors[2] = colors[3] = 0xff;
+			break;
+		default:
+		case CGEN_IDENTITY_LIGHTING: // TODO: identityLightByte is a 32 bit int, need to split into 4 bytes.
+			//colors[0] = colors[1] = colors[2] = colors[3] = tr.identityLightByte;
+			break;
+		case CGEN_LIGHTING_DIFFUSE: // TODO: ?
+			//RB_CalcDiffuseColor( ( unsigned char * ) colors );
+			break;
+		case CGEN_EXACT_VERTEX: // TODO: ?
+			//Com_Memcpy( tess.svars.colors, tess.vertexColors, tess.numVertexes * sizeof( tess.vertexColors[0] ) );
+			break;
+		case CGEN_CONST: // done
+			for (i = 0; i < 4; i++)
+			{
+				colors[i] = celoutline->constantColor[i];
+			}
+			break;
+		case CGEN_VERTEX:
+#if 0
+			if ( tr.identityLight == 1 )
+			{
+				Com_Memcpy( tess.svars.colors, tess.vertexColors, tess.numVertexes * sizeof( tess.vertexColors[0] ) );
+			}
+			else
+			{
+				for ( i = 0; i < tess.numVertexes; i++ )
+				{
+					tess.svars.colors[i][0] = tess.vertexColors[i][0] * tr.identityLight;
+					tess.svars.colors[i][1] = tess.vertexColors[i][1] * tr.identityLight;
+					tess.svars.colors[i][2] = tess.vertexColors[i][2] * tr.identityLight;
+					tess.svars.colors[i][3] = tess.vertexColors[i][3];
+				}
+			}
+#endif
+			break;
+		case CGEN_ONE_MINUS_VERTEX:
+#if 0
+			if ( tr.identityLight == 1 )
+			{
+				for ( i = 0; i < tess.numVertexes; i++ )
+				{
+					tess.svars.colors[i][0] = 255 - tess.vertexColors[i][0];
+					tess.svars.colors[i][1] = 255 - tess.vertexColors[i][1];
+					tess.svars.colors[i][2] = 255 - tess.vertexColors[i][2];
+				}
+			}
+			else
+			{
+				for ( i = 0; i < tess.numVertexes; i++ )
+				{
+					tess.svars.colors[i][0] = ( 255 - tess.vertexColors[i][0] ) * tr.identityLight;
+					tess.svars.colors[i][1] = ( 255 - tess.vertexColors[i][1] ) * tr.identityLight;
+					tess.svars.colors[i][2] = ( 255 - tess.vertexColors[i][2] ) * tr.identityLight;
+				}
+			}
+#endif
+			break;
+		case CGEN_FOG:
+#if 0
+			{
+				fog_t		*fog;
+
+				fog = tr.world->fogs + tess.fogNum;
+
+				for ( i = 0; i < tess.numVertexes; i++ ) {
+					* ( int * )&tess.svars.colors[i] = fog->colorInt;
+				}
+			}
+#endif
+			break;
+		case CGEN_WAVEFORM: // done?
+			//RB_CalcWaveColor( &pStage->rgbWave, ( unsigned char * ) tess.svars.colors );
+		{
+			float glow;
+			const waveForm_t *wf = &celoutline->rgbWave;
+
+			if ( wf->func == GF_NOISE ) {
+				glow = wf->base + R_NoiseGet4f( 0, 0, 0, ( tess.shaderTime + wf->phase ) * wf->frequency ) * wf->amplitude;
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+			} else if ( wf->func == GF_RANDOM ) {
+				glow = wf->base + R_RandomOn( (tess.shaderTime + wf->phase) * wf->frequency ) * wf->amplitude;
+#endif
+			} else {
+				glow = EvalWaveForm( wf ) * tr.identityLight;
+			}
+
+			if ( glow < 0 ) {
+				glow = 0;
+			}
+			else if ( glow > 1 ) {
+				glow = 1;
+			}
+
+			// It this right?...
+			colors[0] = colors[1] = colors[2] = 255 * glow;
+			colors[3] = 255;
+			break;
+		}
+		case CGEN_ENTITY: // done
+			if ( backEnd.currentEntity )
+			{
+				colors[0] = backEnd.currentEntity->e.shaderRGBA[0];
+				colors[1] = backEnd.currentEntity->e.shaderRGBA[1];
+				colors[2] = backEnd.currentEntity->e.shaderRGBA[2];
+			}
+			break;
+		case CGEN_ONE_MINUS_ENTITY: // done
+			if ( backEnd.currentEntity )
+			{
+				colors[0] = 255 - backEnd.currentEntity->e.shaderRGBA[0];
+				colors[1] = 255 - backEnd.currentEntity->e.shaderRGBA[1];
+				colors[2] = 255 - backEnd.currentEntity->e.shaderRGBA[2];
+			}
+			break;
+	}
+
+	//
+	// alphaGen
+	//
+	switch ( celoutline->alphaGen )
+	{
+	case AGEN_SKIP:
+		break;
+	case AGEN_IDENTITY: // done
+		if ( celoutline->rgbGen != CGEN_IDENTITY ) {
+			if ( ( celoutline->rgbGen == CGEN_VERTEX && tr.identityLight != 1 ) ||
+				 celoutline->rgbGen != CGEN_VERTEX ) {
+				colors[3] = 0xff;
+			}
+		}
+		break;
+	case AGEN_CONST: // done
+		if ( celoutline->rgbGen != CGEN_CONST ) {
+			colors[3] = celoutline->constantColor[3];
+		}
+		break;
+	case AGEN_WAVEFORM:
+		//RB_CalcWaveAlpha( &pStage->alphaWave, ( unsigned char * ) tess.svars.colors );
+	{
+		const waveForm_t *wf = &celoutline->alphaWave;
+		float glow;
+
+		glow = EvalWaveFormClamped( wf );
+		colors[3] = 255 * glow;
+		break;
+	}
+	case AGEN_LIGHTING_SPECULAR:
+		//RB_CalcSpecularAlpha( ( unsigned char * ) tess.svars.colors );
+		break;
+	case AGEN_ENTITY: // done
+		if ( backEnd.currentEntity )
+		{
+			colors[3] = backEnd.currentEntity->e.shaderRGBA[3];
+		}
+		break;
+	case AGEN_ONE_MINUS_ENTITY: // done
+		if ( backEnd.currentEntity )
+		{
+			colors[3] = 255 - backEnd.currentEntity->e.shaderRGBA[3];
+		}
+		break;
+    case AGEN_VERTEX:
+        break;
+    case AGEN_ONE_MINUS_VERTEX:
+        break;
+	case AGEN_PORTAL:
+#if 0
+		{
+			unsigned char alpha;
+
+			for ( i = 0; i < tess.numVertexes; i++ )
+			{
+				float len;
+				vec3_t v;
+
+				VectorSubtract( tess.xyz[i], backEnd.viewParms.or.origin, v );
+				len = VectorLength( v );
+
+				len /= celoutline->portalRange;
+
+				if ( len < 0 )
+				{
+					alpha = 0;
+				}
+				else if ( len > 1 )
+				{
+					alpha = 0xff;
+				}
+				else
+				{
+					alpha = len * 0xff;
+				}
+
+				tess.svars.colors[i][3] = alpha;
+			}
+		}
+#endif
+		break;
+	}
+
+#if 0
+	//
+	// fog adjustment for colors to fade out as fog increases
+	//
+	if ( tess.fogNum )
+	{
+		switch ( pStage->adjustColorsForFog )
+		{
+		case ACFF_MODULATE_RGB:
+			RB_CalcModulateColorsByFog( ( unsigned char * ) tess.svars.colors );
+			break;
+		case ACFF_MODULATE_ALPHA:
+			RB_CalcModulateAlphasByFog( ( unsigned char * ) tess.svars.colors );
+			break;
+		case ACFF_MODULATE_RGBA:
+			RB_CalcModulateRGBAsByFog( ( unsigned char * ) tess.svars.colors );
+			break;
+		case ACFF_NONE:
+			break;
+		}
+	}
+#endif
+
+	// if in greyscale rendering mode turn all color values into greyscale.
+	if(r_greyscale->integer)
+	{
+		byte scale;
+
+		scale = (colors[0] + colors[1] + colors[2]) / 3;
+		colors[0] = colors[1] = colors[2] = scale;
+	}
+}
+
 //R_DRAWCEL
-static void R_DrawCel( int numIndexes, const glIndex_t *indexes ) {
+static void R_DrawCel( int numIndexes, const glIndex_t *indexes, float lineWidth,
+		const celoutline_t *celoutline )
+{
 	int		primitives;
+	byte	colors[4];
 
 	if(
 		//. ignore the 2d projection. do i smell the HUD?
@@ -230,13 +491,21 @@ static void R_DrawCel( int numIndexes, const glIndex_t *indexes ) {
 	}
 
 	//. correction for mirrors. SEE NOTE #2.
-	if(backEnd.viewParms.isMirror == qtrue) { qglCullFace (GL_FRONT); }
-	else { qglCullFace (GL_BACK); }
+	if (backEnd.viewParms.isMirror == qtrue)
+	{
+		qglCullFace (GL_FRONT);
+	}
+	else
+	{
+		qglCullFace (GL_BACK);
+	}
 
 	qglEnable (GL_BLEND);
 	qglBlendFunc (GL_SRC_ALPHA ,GL_ONE_MINUS_SRC_ALPHA);
-	qglColor3f (0.0f,0.0f,0.0f);
-	qglLineWidth( (float) r_celoutline->integer );
+
+	R_SetCelOutlineColors(celoutline, colors);
+	qglColor4ub(colors[0], colors[1], colors[2], colors[3]);
+	qglLineWidth( lineWidth );
 
 	if(primitives == 2) {
 		qglDrawElements( GL_TRIANGLES, numIndexes, GL_INDEX_TYPE, indexes );
@@ -247,8 +516,14 @@ static void R_DrawCel( int numIndexes, const glIndex_t *indexes ) {
 	}
 
 	//. correction for mirrors. SEE NOTE #2.
-	if(backEnd.viewParms.isMirror == qtrue) { qglCullFace (GL_BACK); }
-	else { qglCullFace (GL_FRONT); }
+	if (backEnd.viewParms.isMirror == qtrue)
+	{
+		qglCullFace (GL_BACK);
+	}
+	else
+	{
+		qglCullFace (GL_FRONT);
+	}
 
 	qglDisable (GL_BLEND);
 
@@ -326,7 +601,7 @@ static void R_BindAnimatedImage( textureBundle_t *bundle ) {
 
 #ifdef CELSHADING
 //DRAWCEL
-static void DrawCel (shaderCommands_t *input) {
+static void DrawCel (shaderCommands_t *input, float lineWidth, const celoutline_t *celoutline) {
 
 	GL_Bind( tr.whiteImage );
 	qglColor3f (1,1,1);
@@ -343,7 +618,7 @@ static void DrawCel (shaderCommands_t *input) {
 		GLimp_LogComment( "glLockArraysEXT\n" );
 	}
 
-	R_DrawCel( input->numIndexes, input->indexes );
+	R_DrawCel( input->numIndexes, input->indexes, lineWidth, celoutline );
 
 	if (qglUnlockArraysEXT) {
 		qglUnlockArraysEXT();
@@ -1189,6 +1464,10 @@ static void ComputeTexCoords( shaderStage_t *pStage ) {
 static void RB_IterateStagesGeneric( shaderCommands_t *input )
 {
 	int stage;
+#ifdef IOQ3ZTM // IOSTVEF RENDERFLAGS
+	qboolean overridealpha;
+	int oldalphaGen = 0;
+#endif
 
 	for ( stage = 0; stage < MAX_SHADER_STAGES; stage++ )
 	{
@@ -1199,7 +1478,26 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			break;
 		}
 
+#ifdef IOQ3ZTM // IOSTVEF RENDERFLAGS
+		// Override the shader alpha channel if requested.
+		if (backEnd.currentEntity->e.renderfx & RF_FORCE_ENT_ALPHA)
+		{
+			overridealpha = qtrue;
+			oldalphaGen = pStage->alphaGen;
+			pStage->alphaGen = AGEN_ENTITY;
+		} else {
+			overridealpha = qfalse;
+		}
+#endif
+
 		ComputeColors( pStage );
+
+#ifdef IOQ3ZTM // IOSTVEF RENDERFLAGS
+		if (overridealpha) {
+			pStage->alphaGen = oldalphaGen;
+		}
+#endif
+
 		ComputeTexCoords( pStage );
 
 		if ( !setArraysOnce )
@@ -1232,6 +1530,19 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			else 
 				R_BindAnimatedImage( &pStage->bundle[0] );
 
+#ifdef IOQ3ZTM // IOSTVEF RENDERFLAGS
+			if (overridealpha && backEnd.currentEntity->e.shaderRGBA[3] < 0xFF
+					&& !(pStage->stateBits & GLS_ATEST_BITS))
+			{
+				GL_State(
+					// remove the shader set values.
+					(pStage->stateBits & ~(GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS | GLS_ATEST_BITS))
+					// Now add the default values.
+					| GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA | GLS_ATEST_GT_0
+					);
+			}
+			else
+#endif
 			GL_State( pStage->stateBits );
 
 			//
@@ -1282,10 +1593,14 @@ void RB_StageIteratorGeneric( void )
 	}
 
 #ifdef CELSHADING
-	// show me cel outlines.
-	// there has to be a better place to put this.
-	if (r_celoutline->integer > 0) {
-		DrawCel(&tess);
+	// Draw cel outlines. There has to be a better place to put this.
+	// Turtle Man: Set r_celoutline to -1 to disable per-shader celoutlines
+	if (r_celoutline->integer != -1) {
+		if (input->shader->celoutline.width > 0) {
+			DrawCel(&tess, input->shader->celoutline.width, &input->shader->celoutline);
+		} else if (r_celoutline->integer > 0) {
+			DrawCel(&tess, r_celoutline->integer, NULL);
+		}
 	}
 #endif
 

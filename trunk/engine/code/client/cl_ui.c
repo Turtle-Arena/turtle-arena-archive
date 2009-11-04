@@ -40,7 +40,6 @@ static void GetClientState( uiClientState_t *state ) {
 	Q_strncpyz( state->updateInfoString, cls.updateInfoString, sizeof( state->updateInfoString ) );
 	Q_strncpyz( state->messageString, clc.serverMessage, sizeof( state->messageString ) );
 #ifdef IOQ3ZTM // SPECTATOR_FIX // Correct clientNum
-	// Turtle Man: TODO: See if this works with Team Arena?
 	state->clientNum = clc.clientNum;
 #else
 	state->clientNum = cl.snap.ps.clientNum;
@@ -976,20 +975,24 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 	case UI_MEMORY_REMAINING:
 		return Hunk_MemoryRemaining();
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
-#ifndef STANDALONE
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
 	case UI_GET_CDKEY:
+#ifndef STANDALONE
 		CLUI_GetCDKey( VMA(1), args[2] );
+#endif
 		return 0;
 
 	case UI_SET_CDKEY:
+#ifndef STANDALONE
 		CLUI_SetCDKey( VMA(1) );
-		return 0;
 #endif
+		return 0;
 #endif // IOQUAKE3 // Turtle Man: CDKEY
 	
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: punkbuster
 	case UI_SET_PBCLSTATUS:
 		return 0;	
+#endif
 
 	case UI_R_REGISTERFONT:
 		re.RegisterFont( VMA(1), args[2], VMA(3));
@@ -1073,12 +1076,14 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		re.RemapShader( VMA(1), VMA(2), VMA(3) );
 		return 0;
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
-#ifndef STANDALONE
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
 	case UI_VERIFY_CDKEY:
+#ifndef STANDALONE
 		return CL_CDKeyValidate(VMA(1), VMA(2));
+#else
+		return 1;
 #endif
-#endif // IOQUAKE3 // Turtle Man: CDKEY
+#endif
 
 		
 	default:

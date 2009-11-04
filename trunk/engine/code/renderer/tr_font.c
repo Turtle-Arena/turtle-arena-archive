@@ -88,7 +88,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 FT_Library ftLibrary = NULL;  
 #endif
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+#define MAX_FONTS 12
+#else
 #define MAX_FONTS 6
+#endif
 static int registeredFontCount = 0;
 static fontInfo_t registeredFont[MAX_FONTS];
 
@@ -145,7 +149,12 @@ FT_Bitmap *R_RenderGlyph(FT_GlyphSlot glyph, glyphInfo_t* glyphOut) {
   return NULL;
 }
 
-void WriteTGA (char *filename, byte *data, int width, int height) {
+#ifdef IOQ3ZTM // USE_FREETYPE
+static void WriteTGA (char *filename, byte *data, int width, int height)
+#else
+void WriteTGA (char *filename, byte *data, int width, int height)
+#endif
+{
 	byte	*buffer;
 	int		i, c;
 
@@ -167,6 +176,27 @@ void WriteTGA (char *filename, byte *data, int width, int height) {
 		buffer[i+2] = data[i-18+0];		// red
 		buffer[i+3] = data[i-18+3];		// alpha
 	}
+
+#ifdef IOQ3ZTM // USE_FREETYPE
+	// Tr3B: flip upside down
+	{
+		int             row;
+		unsigned char  *flip;
+		unsigned char  *src, *dst;
+
+		flip = (unsigned char *)malloc(width * 4);
+		for(row = 0; row < height / 2; row++)
+		{
+			src = buffer + 18 + (row * 4 * width);
+			dst = buffer + 18 + ((height - row - 1) * 4 * width);
+
+			memcpy(flip, src, width * 4);
+			memcpy(src, dst, width * 4);
+			memcpy(dst, flip, width * 4);
+		}
+		free(flip);
+	}
+#endif
 
 	ri.FS_WriteFile(filename, buffer, c);
 
@@ -339,7 +369,12 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 #endif
   void *faceData;
 	int i, len;
+#ifdef IOQ3ZTM // USE_FREETYPE
+	char  name[MAX_QPATH];
+	char  strippedName[MAX_QPATH];
+#else
   char name[1024];
+#endif
 	float dpi = 72;											//
 	float glyphScale =  72.0f / dpi; 		// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
 
@@ -363,7 +398,20 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
     return;
   }
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+	COM_StripExtension(fontName, strippedName, sizeof(strippedName));
+	//Compatibility: If there is no extension, assume this is loading one of the legacy fonts
+	if(!Q_stricmpn(strippedName, fontName, strlen(fontName)))
+	{
+		Com_sprintf(name, sizeof(name), "fonts/fontImage_%i.dat",pointSize);
+	}
+	else
+	{
+		Com_sprintf(name, sizeof(name), "%s_%i.dat", strippedName, pointSize);
+	}
+#else
 	Com_sprintf(name, sizeof(name), "fonts/fontImage_%i.dat",pointSize);
+#endif
 	for (i = 0; i < registeredFontCount; i++) {
 		if (Q_stricmp(name, registeredFont[i].name) == 0) {
 			Com_Memcpy(font, &registeredFont[i], sizeof(fontInfo_t));
@@ -412,9 +460,17 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
     return;
   }
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+  Com_sprintf(name, sizeof(name), "%s", fontName);
+#endif
+
   len = ri.FS_ReadFile(fontName, &faceData);
   if (len <= 0) {
+#ifdef IOQ3ZTM // USE_FREETYPE
+    ri.Printf(PRINT_ALL, "RE_RegisterFont: Unable to read font file %s\n", name);
+#else
     ri.Printf(PRINT_ALL, "RE_RegisterFont: Unable to read font file\n");
+#endif
     return;
   }
 
@@ -487,11 +543,23 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
         imageBuff[left++] = ((float)out[k] * max);
       }
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+			Com_sprintf(name, sizeof(name), "%s_%i_%i.tga", strippedName, imageNumber++, pointSize);
+			if(!ri.FS_FileExists(name) && r_saveFontData->integer)
+#else
 			Com_sprintf (name, sizeof(name), "fonts/fontImage_%i_%i.tga", imageNumber++, pointSize);
-			if (r_saveFontData->integer) { 
+			if (r_saveFontData->integer)
+#endif
+			{
 			  WriteTGA(name, imageBuff, 256, 256);
 			}
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+			/*`image = R_CreateImage(name, imageBuff, 256, 256, IF_NOPICMIP, FT_LINEAR, WT_CLAMP);`*/
+            image = R_CreateImage(name, imageBuff, 256, 256, qfalse, qfalse, GL_CLAMP_TO_EDGE);
+            /*`h = RE_RegisterShaderFromImage(name, image, qfalse);`*/
+            h = RE_RegisterShaderFromImage(name, LIGHTMAP_2D, image, qfalse);
+#else
     	//Com_sprintf (name, sizeof(name), "fonts/fontImage_%i_%i", imageNumber++, pointSize);
       image = R_CreateImage(name, imageBuff, 256, 256, qfalse, qfalse, GL_CLAMP_TO_EDGE);
       h = RE_RegisterShaderFromImage(name, LIGHTMAP_2D, image, qfalse);
@@ -500,11 +568,33 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 				Q_strncpyz(font->glyphs[j].shaderName, name, sizeof(font->glyphs[j].shaderName));
       }
       lastStart = i;
+#endif
 		  Com_Memset(out, 0, 1024*1024);
       xOut = 0;
       yOut = 0;
       Z_Free(imageBuff);
+#ifdef IOQ3ZTM // USE_FREETYPE
+			if(i == GLYPH_END)
+			{
+				for(j = lastStart; j <= GLYPH_END; j++)
+				{
+					font->glyphs[j].glyph = h;
+					Q_strncpyz(font->glyphs[j].shaderName, name, sizeof(font->glyphs[j].shaderName));
+				}
+				break;
+			}
+			else
+			{
+				for(j = lastStart; j < i; j++)
+				{
+					font->glyphs[j].glyph = h;
+					Q_strncpyz(font->glyphs[j].shaderName, name, sizeof(font->glyphs[j].shaderName));
+				}
+				lastStart = i;
+			}
+#else
 			i++;
+#endif
     } else {
       Com_Memcpy(&font->glyphs[i], glyph, sizeof(glyphInfo_t));
       i++;
@@ -513,11 +603,22 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
 	registeredFont[registeredFontCount].glyphScale = glyphScale;
 	font->glyphScale = glyphScale;
+#ifdef IOQ3ZTM // USE_FREETYPE
+	Com_sprintf(name, sizeof(name), "%s_%i.dat", strippedName, pointSize);
+	Q_strncpyz(font->name, name, sizeof(font->name));
+	Com_Memcpy(&registeredFont[registeredFontCount++], font, sizeof(fontInfo_t));
+
+	if(!ri.FS_FileExists(name) && r_saveFontData->integer)
+	{
+        ri.FS_WriteFile(name, font, sizeof(fontInfo_t));
+ 	}
+#else
   Com_Memcpy(&registeredFont[registeredFontCount++], font, sizeof(fontInfo_t));
 
 	if (r_saveFontData->integer) { 
 		ri.FS_WriteFile(va("fonts/fontImage_%i.dat", pointSize), font, sizeof(fontInfo_t));
 	}
+#endif
 
   Z_Free(out);
   

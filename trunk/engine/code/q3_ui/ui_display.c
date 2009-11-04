@@ -43,6 +43,10 @@ DISPLAY OPTIONS MENU
 #define ID_BRIGHTNESS		14
 #define ID_SCREENSIZE		15
 #define ID_BACK				16
+#ifdef IOQ3ZTM
+#define ID_ANAGLYPH			17
+#define ID_GREYSCALE		18
+#endif
 
 
 typedef struct {
@@ -59,6 +63,10 @@ typedef struct {
 
 	menuslider_s	brightness;
 	menuslider_s	screensize;
+#ifdef IOQ3ZTM
+	menulist_s		anaglyph;
+	menulist_s		greyscale;
+#endif
 
 	menubitmap_s	back;
 } displayOptionsInfo_t;
@@ -103,6 +111,17 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 		trap_Cvar_SetValue( "cg_viewsize", displayOptionsInfo.screensize.curvalue * 10 );
 		break;
 
+#ifdef IOQ3ZTM
+	case ID_ANAGLYPH:
+		trap_Cvar_SetValue( "r_anaglyphMode", displayOptionsInfo.anaglyph.curvalue );
+		break;
+
+	case ID_GREYSCALE:
+		trap_Cvar_SetValue( "r_greyscale", displayOptionsInfo.greyscale.curvalue );
+		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
+		break;
+#endif
+
 	case ID_BACK:
 		UI_PopMenu();
 		break;
@@ -117,6 +136,27 @@ UI_DisplayOptionsMenu_Init
 */
 static void UI_DisplayOptionsMenu_Init( void ) {
 	int		y;
+
+#ifdef IOQ3ZTM
+	static const char *anaglyph_names[] =
+	{
+		"Off",
+		"red-cyan",
+		"red-blue",
+		"red-green",
+		"cyan-red",
+		"blue-red",
+		"green-red",
+		NULL
+	};
+
+	static const char *offOn_names[] =
+	{
+		"Off",
+		"On",
+		NULL
+	};
+#endif
 
 	memset( &displayOptionsInfo, 0, sizeof(displayOptionsInfo) );
 
@@ -213,6 +253,30 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.screensize.minvalue			= 3;
     displayOptionsInfo.screensize.maxvalue			= 10;
 
+#ifdef IOQ3ZTM
+	y += BIGCHAR_HEIGHT+2;
+	// references/modifies "r_anaglyphMode"
+	displayOptionsInfo.anaglyph.generic.type		= MTYPE_SPINCONTROL;
+	displayOptionsInfo.anaglyph.generic.name		= "Anaglyph:";
+	displayOptionsInfo.anaglyph.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	displayOptionsInfo.anaglyph.generic.callback	= UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.anaglyph.generic.id			= ID_ANAGLYPH;
+	displayOptionsInfo.anaglyph.generic.x			= 400;
+	displayOptionsInfo.anaglyph.generic.y			= y;
+	displayOptionsInfo.anaglyph.itemnames     		= anaglyph_names;
+
+	y += BIGCHAR_HEIGHT+2;
+	// references/modifies "r_greyscale"
+	displayOptionsInfo.greyscale.generic.type		= MTYPE_SPINCONTROL;
+	displayOptionsInfo.greyscale.generic.name		= "Grey Scale:";
+	displayOptionsInfo.greyscale.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	displayOptionsInfo.greyscale.generic.callback	= UI_DisplayOptionsMenu_Event;
+	displayOptionsInfo.greyscale.generic.id			= ID_GREYSCALE;
+	displayOptionsInfo.greyscale.generic.x			= 400;
+	displayOptionsInfo.greyscale.generic.y			= y;
+	displayOptionsInfo.greyscale.itemnames     		= offOn_names;
+#endif
+
 	displayOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	displayOptionsInfo.back.generic.name		= ART_BACK0;
 	displayOptionsInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -233,10 +297,22 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.network );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.brightness );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.screensize );
+#ifdef IOQ3ZTM
+	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.anaglyph );
+	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.greyscale );
+#endif
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.back );
 
 	displayOptionsInfo.brightness.curvalue  = trap_Cvar_VariableValue("r_gamma") * 10;
 	displayOptionsInfo.screensize.curvalue  = trap_Cvar_VariableValue( "cg_viewsize")/10;
+#ifdef IOQ3ZTM
+	displayOptionsInfo.anaglyph.curvalue    = trap_Cvar_VariableValue("r_anaglyphMode");
+	if (displayOptionsInfo.anaglyph.curvalue < 0)
+		displayOptionsInfo.anaglyph.curvalue = 0;
+	else if (displayOptionsInfo.anaglyph.curvalue > 6)
+		displayOptionsInfo.anaglyph.curvalue = 6;
+	displayOptionsInfo.greyscale.curvalue   = trap_Cvar_VariableValue( "r_greyscale") != 0;
+#endif
 }
 
 

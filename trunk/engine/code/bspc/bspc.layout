@@ -1,94 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Debug Win32" />
-	<File name="..\botlib\be_aas_bspq3.c" open="0" top="0" tabpos="0">
-		<Cursor position="1493" topLine="30" />
-	</File>
+	<ActiveTarget name="Release Win32" />
 	<File name="..\botlib\l_precomp.c" open="0" top="0" tabpos="0">
-		<Cursor position="4098" topLine="149" />
-	</File>
-	<File name="..\botlib\l_struct.c" open="0" top="0" tabpos="0">
-		<Cursor position="1694" topLine="36" />
-	</File>
-	<File name="aas_areamerging.c" open="0" top="0" tabpos="0">
-		<Cursor position="995" topLine="12" />
-	</File>
-	<File name="aas_cfg.c" open="0" top="0" tabpos="0">
-		<Cursor position="1471" topLine="33" />
-	</File>
-	<File name="aas_create.c" open="0" top="0" tabpos="0">
-		<Cursor position="11159" topLine="343" />
-	</File>
-	<File name="aas_file.c" open="0" top="0" tabpos="0">
-		<Cursor position="8512" topLine="211" />
-	</File>
-	<File name="aas_gsubdiv.c" open="0" top="0" tabpos="0">
-		<Cursor position="1036" topLine="15" />
-	</File>
-	<File name="aas_map.c" open="0" top="0" tabpos="0">
-		<Cursor position="1036" topLine="15" />
-	</File>
-	<File name="aas_store.c" open="0" top="0" tabpos="0">
-		<Cursor position="989" topLine="15" />
-	</File>
-	<File name="aas_store.h" open="0" top="0" tabpos="0">
-		<Cursor position="1582" topLine="30" />
-	</File>
-	<File name="be_aas_bspc.c" open="0" top="0" tabpos="0">
-		<Cursor position="7441" topLine="217" />
-	</File>
-	<File name="brushbsp.c" open="0" top="0" tabpos="0">
-		<Cursor position="18441" topLine="681" />
-	</File>
-	<File name="bspc.c" open="0" top="0" tabpos="0">
-		<Cursor position="13676" topLine="474" />
-	</File>
-	<File name="l_bsp_hl.c" open="0" top="0" tabpos="0">
-		<Cursor position="7496" topLine="247" />
-	</File>
-	<File name="l_bsp_q1.c" open="0" top="0" tabpos="0">
-		<Cursor position="11768" topLine="424" />
-	</File>
-	<File name="l_bsp_q2.c" open="0" top="0" tabpos="0">
-		<Cursor position="22635" topLine="861" />
-	</File>
-	<File name="l_bsp_q3.c" open="0" top="0" tabpos="0">
-		<Cursor position="1017" topLine="18" />
-	</File>
-	<File name="l_bsp_sin.c" open="0" top="0" tabpos="0">
-		<Cursor position="24188" topLine="833" />
-	</File>
-	<File name="l_cmd.h" open="0" top="0" tabpos="0">
-		<Cursor position="3244" topLine="102" />
-	</File>
-	<File name="l_math.c" open="0" top="0" tabpos="0">
-		<Cursor position="5926" topLine="259" />
+		<Cursor position="15807" topLine="543" />
 	</File>
 	<File name="l_math.h" open="0" top="0" tabpos="0">
-		<Cursor position="2762" topLine="72" />
+		<Cursor position="995" topLine="27" />
 	</File>
-	<File name="l_mem.c" open="0" top="0" tabpos="0">
-		<Cursor position="12080" topLine="401" />
+	<File name="..\game\q_shared.h" open="0" top="0" tabpos="0">
+		<Cursor position="12901" topLine="455" />
 	</File>
-	<File name="l_poly.c" open="0" top="0" tabpos="0">
-		<Cursor position="943" topLine="15" />
-	</File>
-	<File name="l_qfiles.c" open="0" top="0" tabpos="0">
-		<Cursor position="6814" topLine="258" />
-	</File>
-	<File name="l_threads.c" open="0" top="0" tabpos="0">
-		<Cursor position="8325" topLine="300" />
-	</File>
-	<File name="map.c" open="0" top="0" tabpos="0">
-		<Cursor position="1513" topLine="36" />
-	</File>
-	<File name="map_q1.c" open="0" top="0" tabpos="0">
-		<Cursor position="9703" topLine="376" />
-	</File>
-	<File name="map_q3.c" open="0" top="0" tabpos="0">
-		<Cursor position="1249" topLine="22" />
-	</File>
-	<File name="qbsp.h" open="0" top="0" tabpos="0">
-		<Cursor position="1104" topLine="21" />
+	<File name="..\qcommon\qfiles.h" open="0" top="0" tabpos="0">
+		<Cursor position="5821" topLine="22" />
 	</File>
 </CodeBlocks_layout_file>

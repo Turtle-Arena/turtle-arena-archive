@@ -43,8 +43,13 @@ SINGLE PLAYER LEVEL SELECT MENU
 #define ART_MAP_COMPLETE5			"menu/art/level_complete5"
 #define ART_BACK0					"menu/art/back_0"
 #define ART_BACK1					"menu/art/back_1"	
+#ifdef TMNTMISC // NO_MENU_FIGHT
+#define ART_FIGHT0					"menu/art/next_0"
+#define ART_FIGHT1					"menu/art/next_1"
+#else
 #define ART_FIGHT0					"menu/art/fight_0"
 #define ART_FIGHT1					"menu/art/fight_1"
+#endif
 #define ART_RESET0					"menu/art/reset_0"
 #define ART_RESET1					"menu/art/reset_1"	
 #define ART_CUSTOM0					"menu/art/skirmish_0"
@@ -70,11 +75,13 @@ SINGLE PLAYER LEVEL SELECT MENU
 
 #define PLAYER_Y			314
 #define AWARDS_Y			(PLAYER_Y + 26)
-#ifndef TMNTSP
+#if defined IOQ3ZTM && !defined TMNTSP
 #ifdef TMNTWEAPONS
 #define MAX_UI_AWARDS		3
-#endif
-#endif
+#else
+#define MAX_UI_AWARDS		6
+#endif // TMNTWEAPONS
+#endif // IOQ3ZTM
 
 
 typedef struct {
@@ -108,7 +115,7 @@ typedef struct {
 	char			playerModel[MAX_QPATH];
 	char			playerPicName[MAX_QPATH];
 #ifndef TMNTSP
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	int				awardLevels[MAX_UI_AWARDS];
 	sfxHandle_t		awardSounds[MAX_UI_AWARDS];
 #else
@@ -243,9 +250,9 @@ static void UI_SPLevelMenu_SetMenuArena( int n, int level, const char *arenaInfo
 	Q_strncpyz( map, Info_ValueForKey( arenaInfo, "map" ), sizeof(map) );
 
 	Q_strncpyz( levelMenuInfo.levelNames[n], map, sizeof(levelMenuInfo.levelNames[n]) );
-#ifndef IOQ3ZTM // Breaks on linux without pak files.
+//#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 	Q_strupr( levelMenuInfo.levelNames[n] );
-#endif
+//#endif
 
 	UI_GetBestScore( level, &levelMenuInfo.levelScores[n], &levelMenuInfo.levelScoresSkill[n] );
 	if( levelMenuInfo.levelScores[n] > 8 ) {
@@ -617,8 +624,8 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	// draw player award levels
 	y = AWARDS_Y;
 	i = 0;
-#ifdef TMNTWEAPONS
-	for( n = 0; n < 3; n++ )
+#ifdef IOQ3ZTM
+	for( n = 0; n < MAX_UI_AWARDS; n++ )
 #else
 	for( n = 0; n < 6; n++ )
 #endif
@@ -702,9 +709,9 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	// show map name and long name of selected level
 	y = 192;
 	Q_strncpyz( buf, Info_ValueForKey( levelMenuInfo.selectedArenaInfo, "map" ), 20 );
-#ifndef IOQ3ZTM // Breaks on linux without pak files.
+//#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 	Q_strupr( buf );
-#endif
+//#endif
 	Com_sprintf( string, sizeof(string), "%s: %s", buf, Info_ValueForKey( levelMenuInfo.selectedArenaInfo, "longname" ) );
 	UI_DrawProportionalString( 320, y, string, UI_CENTER|UI_SMALLFONT, color_orange );
 
@@ -758,7 +765,7 @@ void UI_SPLevelMenu_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_CUSTOM1 );
 
 #ifndef TMNTSP
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
 #else
 	for( n = 0; n < 6; n++ )
@@ -898,7 +905,7 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_player.height				= 64;
 
 #ifndef TMNTSP
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
 #else
 	for( n = 0; n < 6; n++ )
@@ -910,7 +917,7 @@ static void UI_SPLevelMenu_Init( void ) {
 
 	y = AWARDS_Y;
 	count = 0;
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
 #else
 	for( n = 0; n < 6; n++ )

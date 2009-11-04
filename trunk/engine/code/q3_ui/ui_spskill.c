@@ -34,8 +34,13 @@ SINGLE PLAYER SKILL MENU
 #define ART_FRAME					"menu/art/cut_frame"
 #define ART_BACK					"menu/art/back_0.tga"
 #define ART_BACK_FOCUS				"menu/art/back_1.tga"
+#ifdef TMNTMISC // NO_MENU_FIGHT
+#define ART_FIGHT					"menu/art/play_0"
+#define ART_FIGHT_FOCUS				"menu/art/play_1"
+#else
 #define ART_FIGHT					"menu/art/fight_0"
 #define ART_FIGHT_FOCUS				"menu/art/fight_1"
+#endif
 #define ART_MAP_COMPLETE1			"menu/art/level_complete1"
 #define ART_MAP_COMPLETE2			"menu/art/level_complete2"
 #define ART_MAP_COMPLETE3			"menu/art/level_complete3"
@@ -117,7 +122,11 @@ static void UI_SPSkillMenu_SkillEvent( void *ptr, int notification ) {
 	skill = id - ID_BABY + 1;
 	trap_Cvar_SetValue( "g_spSkill", skill );
 
+#ifdef TMNTMISC
+	SetSkillColor( skill, color_orange );
+#else
 	SetSkillColor( skill, color_white );
+#endif
 	skillMenuInfo.art_skillPic.shader = skillMenuInfo.skillpics[skill - 1];
 
 	if( id == ID_NIGHTMARE ) {
@@ -228,7 +237,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_baby.generic.y			= 170;
 	skillMenuInfo.item_baby.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_baby.generic.id			= ID_BABY;
-#if defined TMNT || defined SONIC // rip off SRB2 skills...
+#ifdef TMNTMISC // rip off SRB2 skills...
 	skillMenuInfo.item_baby.string				= "Easy";
 #else
 	skillMenuInfo.item_baby.string				= "I Can Win";
@@ -242,7 +251,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_easy.generic.y			= 198;
 	skillMenuInfo.item_easy.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_easy.generic.id			= ID_EASY;
-#if defined TMNT || defined SONIC // rip off SRB2 skills...
+#ifdef TMNTMISC // rip off SRB2 skills...
 	skillMenuInfo.item_easy.string				= "Normal";
 #else
 	skillMenuInfo.item_easy.string				= "Bring It On";
@@ -256,7 +265,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_medium.generic.y			= 227;
 	skillMenuInfo.item_medium.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_medium.generic.id		= ID_MEDIUM;
-#if defined TMNT || defined SONIC // rip off SRB2 skills...
+#ifdef TMNTMISC // rip off SRB2 skills...
 	skillMenuInfo.item_medium.string			= "Hard";
 #else
 	skillMenuInfo.item_medium.string			= "Hurt Me Plenty";
@@ -270,7 +279,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_hard.generic.y			= 255;
 	skillMenuInfo.item_hard.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_hard.generic.id			= ID_HARD;
-#if defined TMNT || defined SONIC // rip off SRB2 skills...
+#ifdef TMNTMISC // rip off SRB2 skills...
 	skillMenuInfo.item_hard.string				= "Very Hard";
 #else
 	skillMenuInfo.item_hard.string				= "Hardcore";
@@ -284,7 +293,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_nightmare.generic.y			= 283;
 	skillMenuInfo.item_nightmare.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_nightmare.generic.id			= ID_NIGHTMARE;
-#if defined TMNT || defined SONIC // rip off SRB2 skills...
+#ifdef TMNTMISC // rip off SRB2 skills...
 	skillMenuInfo.item_nightmare.string				= "Ultimate";
 #else
 	skillMenuInfo.item_nightmare.string				= "NIGHTMARE!";
@@ -333,7 +342,11 @@ static void UI_SPSkillMenu_Init( void ) {
 	Menu_AddItem( &skillMenuInfo.menu, ( void * )&skillMenuInfo.item_fight );
 
 	skill = (int)Com_Clamp( 1, 5, trap_Cvar_VariableValue( "g_spSkill" ) );
+#ifdef TMNTMISC
+	SetSkillColor( skill, color_orange );
+#else
 	SetSkillColor( skill, color_white );
+#endif
 	skillMenuInfo.art_skillPic.shader = skillMenuInfo.skillpics[skill - 1];
 	if( skill == 5 ) {
 		trap_S_StartLocalSound( skillMenuInfo.nightmareSound, CHAN_ANNOUNCER );

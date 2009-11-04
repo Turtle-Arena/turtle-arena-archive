@@ -357,11 +357,11 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 #endif
 		// only push items and players
 		if ( check->s.eType != ET_ITEM && check->s.eType != ET_PLAYER &&
-#ifdef SP_NPC
-			check->s.eType != ET_NPC &&
-#endif
 #ifdef TMNTENTSYS // MISC_OBJECT
 			check->s.eType != ET_MISCOBJECT &&
+#endif
+#ifdef TMNTNPCSYS
+			check->s.eType != ET_NPC &&
 #endif
 			!check->physicsObject ) {
 			continue;
@@ -789,8 +789,6 @@ void InitMover( gentity_t *ent ) {
 	}
 
 #ifdef TMNTENTSYS // BREAKABLE
-	//if (ent->health == 0)
-	//	G_SpawnInt( "health", "0", &ent->health );
 	if (ent->health > 0)
 	{
 		ent->takedamage = qtrue;
@@ -818,16 +816,16 @@ Blocked_Door
 */
 void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 	// remove anything other than a client
-	if ( !other->client ) {
+	if ( !other->client
+#ifdef TMNTNPCSYS
+		&& other->s.eType != ET_NPC
+#endif
+	) {
 		// except CTF flags!!!!
 		if( other->s.eType == ET_ITEM && other->item->giType == IT_TEAM ) {
 			Team_DroppedFlagThink( other );
 			return;
 		}
-#ifdef SP_NPC
-		if (other->s.eType == ET_NPC)
-			return;
-#endif
 		G_TempEntity( other->s.origin, EV_ITEM_POP );
 		G_FreeEntity( other );
 		return;

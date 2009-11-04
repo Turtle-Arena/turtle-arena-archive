@@ -205,7 +205,12 @@ typedef struct _tag_menuframework
 
 	qboolean	wrapAround;
 	qboolean	fullscreen;
+#ifndef TMNTDATASYS
 	qboolean	showlogo;
+#endif
+#ifdef IOQ3ZTM
+	qboolean	noEscape; // Don't run UI_PopMenu when Esc is pressed
+#endif
 } menuframework_s;
 
 typedef struct
@@ -319,7 +324,9 @@ extern sfxHandle_t	menu_move_sound;
 extern sfxHandle_t	menu_out_sound;
 extern sfxHandle_t	menu_buzz_sound;
 extern sfxHandle_t	menu_null_sound;
+#ifndef TMNTWEAPSYS2
 extern sfxHandle_t	weaponChangeSound;
+#endif
 extern vec4_t		menu_text_color;
 extern vec4_t		menu_grayed_color;
 extern vec4_t		menu_dark_color;
@@ -1036,7 +1043,9 @@ void			trap_R_RemapShader( const char *oldShader, const char *newShader, const c
 qboolean		trap_VerifyCDKey( const char *key, const char *chksum);
 #endif
 
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 void			trap_SetPbClStatus( int status );
+#endif
 
 //
 // ui_addbots.c

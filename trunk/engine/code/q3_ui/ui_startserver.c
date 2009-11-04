@@ -40,8 +40,13 @@ START SERVER MENU *****
 #define GAMESERVER_FRAMER		"menu/art/frame1_r"
 #define GAMESERVER_SELECT		"menu/art/maps_select"
 #define GAMESERVER_SELECTED		"menu/art/maps_selected"
+#ifdef TMNTMISC // NO_MENU_FIGHT
+#define GAMESERVER_FIGHT0		"menu/art/play_0"
+#define GAMESERVER_FIGHT1		"menu/art/play_1"
+#else
 #define GAMESERVER_FIGHT0		"menu/art/fight_0"
 #define GAMESERVER_FIGHT1		"menu/art/fight_1"
+#endif
 #define GAMESERVER_UNKNOWNMAP	"menu/art/unknownmap"
 #ifdef TMNTDATASYS
 #define GAMESERVER_ARROWS		"menu/art/arrows_horz_0"
@@ -100,11 +105,7 @@ static startserver_t s_startserver;
 // Gametype names
 static const char *gametype_items[] = {
 	"Free For All",
-#ifdef TMNTMISC // tornament to duel
-	"Duel",
-#else
-	"Tournament",
-#endif
+	"Duel", // tornament to duel // "Tournament",
 	"Cooperative",
 	"Team Deathmatch",
 	"Capture the Flag",
@@ -128,6 +129,7 @@ static int gametype_remap[] = {GT_FFA, GT_TOURNAMENT, GT_SINGLE_PLAYER, GT_TEAM,
 #endif
 };
 
+/*
 // Order of gametype_items, must
 // Turtle Man: NOTE: Why does this need to be seperate from gametype_remap?
 static int gametype_remap2[] = {
@@ -144,6 +146,7 @@ static int gametype_remap2[] = {
 #endif
 #endif
 };
+*/
 #else
 static const char *gametype_items[] = {
 	"Free For All",
@@ -275,7 +278,7 @@ static void StartServer_Update( void ) {
 
 		info = UI_GetArenaInfoByNumber( s_startserver.maplist[ top + i ]);
 		Q_strncpyz( mapname, Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
-#ifndef IOQ3ZTM // Breaks on linux without pak files.
+#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 		Q_strupr( mapname );
 #endif
 
@@ -330,9 +333,9 @@ static void StartServer_Update( void ) {
 		Q_strncpyz( s_startserver.mapname.string, Info_ValueForKey( info, "map" ), MAX_NAMELENGTH);
 	}
 	
-#ifndef IOQ3ZTM // Breaks on linux without pak files.
+//#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 	Q_strupr( s_startserver.mapname.string );
-#endif
+//#endif
 }
 
 
@@ -712,7 +715,7 @@ void StartServer_Cache( void )
 		for( i = 0; i < UI_GetNumArenas(); i++ ) {
 		info = UI_GetArenaInfoByNumber( i );
 			Q_strncpyz( mapname, Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
-#ifndef IOQ3ZTM // Breaks on linux without pak files.
+#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 			Q_strupr( mapname );
 #endif
 
@@ -820,7 +823,7 @@ static const char *playerTeam_list[] = {
 };
 
 static const char *botSkill_list[] = {
-#if defined TMNT || defined SONIC // rip off SRB2 skills...
+#ifdef TMNTMISC // rip off SRB2 skills...
 	"Easy",
 	"Normal",
 	"Hard",
@@ -926,7 +929,7 @@ static void ServerOptions_Start( void ) {
 		if (s_serveroptions.multiplayer)
 			trap_Cvar_SetValue( "ui_singlePlayerActive", 0 );
 		else
-			trap_Cvar_SetValue( "ui_singlePlayerActive", 1 );
+			trap_Cvar_SetValue( "ui_singlePlayerActive", 2 );
 		break;
 #endif
 
@@ -1011,9 +1014,11 @@ static void ServerOptions_Start( void ) {
 		if( s_serveroptions.playerNameBuffers[n][0] == 0 ) {
 			continue;
 		}
+#ifndef RANDOMBOT
 		if( s_serveroptions.playerNameBuffers[n][0] == '-' ) {
 			continue;
 		}
+#endif
 		if( s_serveroptions.gametype >= GT_TEAM ) {
 			Com_sprintf( buf, sizeof(buf), "addbot %s %i %s\n", s_serveroptions.playerNameBuffers[n], skill,
 				playerTeam_list[s_serveroptions.playerTeam[n].curvalue] );
@@ -1234,7 +1239,11 @@ static void ServerOptions_LevelshotDraw( void *self ) {
 	UI_DrawString( x, y, s_serveroptions.mapnamebuffer, UI_CENTER|UI_SMALLFONT, color_orange );
 
 	y += SMALLCHAR_HEIGHT;
+#ifdef TMNT
+	UI_DrawString( x, y, gametype_items[gametype_remap[s_serveroptions.gametype]], UI_CENTER|UI_SMALLFONT, color_orange );
+#else
 	UI_DrawString( x, y, gametype_items[gametype_remap2[s_serveroptions.gametype]], UI_CENTER|UI_SMALLFONT, color_orange );
+#endif
 }
 
 
@@ -1258,7 +1267,7 @@ static void ServerOptions_InitBotNames( void ) {
 #endif
 		}
 #endif
-#if defined TMNT || defined SONIC // DEFAULT_PLAYER
+#ifdef TMNTMISC // DEFAULT_PLAYER
 		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "Random", 16 ); // RaphBlue
 		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "Random", 16 ); // RaphBlue
 		if( s_serveroptions.gametype == GT_TEAM ) {
@@ -1277,7 +1286,7 @@ static void ServerOptions_InitBotNames( void ) {
 		s_serveroptions.playerType[4].curvalue = 2;
 		s_serveroptions.playerType[5].curvalue = 2;
 
-#if defined TMNT || defined SONIC // DEFAULT_PLAYER
+#ifdef TMNTMISC // DEFAULT_PLAYER
 		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "Random", 16 ); // RaphRed
@@ -1348,6 +1357,16 @@ static void ServerOptions_InitBotNames( void ) {
 		strcpy( s_serveroptions.playerNameBuffers[n], "--------" );
 #endif
 	}
+
+#ifdef RANDOMBOT
+	// If no bots, open 3 Random bots.
+	if (count == 1)
+	{
+		for( ;count < 4; count++ ) {
+			s_serveroptions.playerType[count].curvalue = 1;
+		}
+	}
+#endif
 
 	// pad up to #8 as open slots
 	for( ;count < 8; count++ ) {
@@ -1446,9 +1465,7 @@ static void ServerOptions_SetMenuItems( void ) {
 	// set the map pic
 	info = UI_GetArenaInfoByNumber( s_startserver.maplist[ s_startserver.currentmap ]);
 	Q_strncpyz( mapname, Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
-#ifndef IOQ3ZTM // Breaks on linux without pak files.
 	Q_strupr( mapname );
-#endif
 #ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
 	Com_sprintf( picname, 64, "levelshots/%s_small", mapname );
 #else
@@ -1458,9 +1475,9 @@ static void ServerOptions_SetMenuItems( void ) {
 
 	// set the map name
 	strcpy( s_serveroptions.mapnamebuffer, s_startserver.mapname.string );
-#ifndef IOQ3ZTM // Breaks on linux without pak files.
+//#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 	Q_strupr( s_serveroptions.mapnamebuffer );
-#endif
+//#endif
 
 	// get the player selections initialized
 	ServerOptions_InitPlayerItems();
@@ -1531,7 +1548,13 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 
 	memset( &s_serveroptions, 0 ,sizeof(serveroptions_t) );
 	s_serveroptions.multiplayer = multiplayer;
+#ifdef MISSIONPACK // Turtle Man: Allow all game types.
+	s_serveroptions.gametype = (int)Com_Clamp( 0, GT_MAX_GAME_TYPE-1, trap_Cvar_VariableValue( "g_gametype" ) );
+#elif defined IOQ3ZTM // IOQ3BUGFIX: Quake3 only had 4 gametypes
+	s_serveroptions.gametype = (int)Com_Clamp( 0, 4, trap_Cvar_VariableValue( "g_gametype" ) );
+#else
 	s_serveroptions.gametype = (int)Com_Clamp( 0, 5, trap_Cvar_VariableValue( "g_gameType" ) );
+#endif
 #ifdef IOQUAKE3 // Turtle Man: punkbuster
 	s_serveroptions.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_punkbuster" ) );
 #endif

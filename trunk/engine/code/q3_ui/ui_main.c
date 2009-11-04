@@ -240,7 +240,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE | CVAR_LATCH },
 
 #ifdef TMNTSP
-	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", 0},
+	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", /*CVAR_SERVERINFO|*/CVAR_ROM},
 	{ &ui_spStage, "ui_spStage", "0", CVAR_ROM },
 	{ &ui_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM },
 	{ &ui_saveTypes, "g_saveTypes", BG_SAVE_TYPES, CVAR_ROM },

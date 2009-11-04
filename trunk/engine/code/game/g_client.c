@@ -53,7 +53,9 @@ void SP_info_player_deathmatch( gentity_t *ent ) {
 equivelant to info_player_deathmatch
 */
 void SP_info_player_start(gentity_t *ent) {
+#ifndef TMNTSP
 	ent->classname = "info_player_deathmatch";
+#endif
 	SP_info_player_deathmatch( ent );
 }
 
@@ -505,7 +507,17 @@ void BodySink( gentity_t *ent ) {
 		return;	
 	}
 	ent->nextthink = level.time + 100;
+#ifdef TMNTDATA
+	ent->s.powerups |= (1 << PW_FLASHING);
+
+	// Set Alpha value
+	ent->s.otherEntityNum2 = (1.0f - (((float)level.time - (float)ent->timestamp)/6500.0f))*128;
+
+	if (ent->s.otherEntityNum2 < 1)
+		ent->s.otherEntityNum2 = 1;
+#else
 	ent->s.pos.trBase[2] -= 1;
+#endif
 }
 
 /*
@@ -601,7 +613,11 @@ void CopyToBodyQue( gentity_t *ent ) {
 	body->r.contents = CONTENTS_CORPSE;
 	body->r.ownerNum = ent->s.number;
 
+#ifdef TMNTDATA
+	body->nextthink = level.time + 200;
+#else
 	body->nextthink = level.time + 5000;
+#endif
 	body->think = BodySink;
 
 	body->die = body_die;
@@ -1077,7 +1093,7 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	// set model
 #ifdef TMNTSP // SPMODEL
-	if ( g_singlePlayer.integer /* && g_gametype.integer == GT_SINGLE_PLAYER*/ ) {
+	if ( g_singlePlayer.integer == 1 /* && g_gametype.integer == GT_SINGLE_PLAYER*/ ) {
 		Q_strncpyz( model, Info_ValueForKey (userinfo, "spmodel"), sizeof( model ) );
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "spheadmodel"), sizeof( headModel ) );
 	} else
@@ -1483,9 +1499,6 @@ void ClientSpawn(gentity_t *ent) {
 	// and never clear the voted flag
 	flags = ent->client->ps.eFlags & (EF_TELEPORT_BIT | EF_VOTED | EF_TEAMVOTED);
 	flags ^= EF_TELEPORT_BIT;
-#ifdef TMNT
-	flags |= EF_TELE_EFFECT;
-#endif
 
 	// clear everything but the persistant data
 
@@ -1518,8 +1531,13 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.persistant[PERS_SPAWN_COUNT]++;
 	client->ps.persistant[PERS_TEAM] = client->sess.sessionTeam;
 
-#ifdef TMNT // EF_TELE_EFFECT
-	client->teleEffectTime = level.time;
+#ifdef TMNT // POWERS
+	if (g_teleportFluxTime.integer)
+	{
+		client->ps.powerups[PW_FLASHING] = level.time + g_teleportFluxTime.integer * 1000;
+		// Become non-solid
+		ent->r.contents &= ~CONTENTS_BODY;
+	}
 #endif
 
 	client->airOutTime = level.time + 12000;
@@ -1560,10 +1578,6 @@ void ClientSpawn(gentity_t *ent) {
 	G_ClientCameraReset(client);
 #endif
 
-#ifdef SP_NPC
-	ent->slow_event = level.time + 1000;
-#endif
-
 #ifdef TMNTHOLDSYS
 #ifdef TMNTHOLDABLE // Start with 10 shurikens!
 	client->ps.holdable[HI_SHURIKEN] = 10;
@@ -1592,7 +1606,12 @@ void ClientSpawn(gentity_t *ent) {
 	// Set default ammo values.
 	{
 		int i;
-		for (i = 0; i < MAX_WEAPONS/*WP_NUM_WEAPONS*/; ++i)
+#ifdef TMNTWEAPSYS_2
+		int max = BG_NumWeaponGroups();
+		for (i = 0; i < max; i++)
+#else
+		for (i = 0; i < MAX_WEAPONS; i++)
+#endif
 		{
 			if (BG_WeapUseAmmo(i))
 			{
@@ -1684,8 +1703,9 @@ void ClientSpawn(gentity_t *ent) {
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 
 	} else {
-#ifdef TMNTSP
-		// Turtle Man: FIXME: Disable telefraging to Single Player?
+#ifdef TMNT // POWERS
+		// Only kill box if client is solid.
+		if (!client->ps.powerups[PW_FLASHING])
 #endif
 		G_KillBox( ent );
 		trap_LinkEntity (ent);
@@ -1724,8 +1744,15 @@ void ClientSpawn(gentity_t *ent) {
 #ifndef TMNTWEAPSYS2 // don't select any weapon after spawning
 		// select the highest weapon number available, after any
 		// spawn given items have fired
+#ifndef TMNTWEAPSYS
 		client->ps.weapon = 1;
-		for ( i = WP_NUM_WEAPONS - 1 ; i > 0 ; i-- ) {
+#endif
+#ifdef TMNTWEAPSYS_2
+		for ( i = BG_NumWeaponGroups() - 1 ; i > 0 ; i-- )
+#else
+		for ( i = WP_NUM_WEAPONS - 1 ; i > 0 ; i-- )
+#endif
+		{
 			if ( client->ps.stats[STAT_WEAPONS] & ( 1 << i ) ) {
 				client->ps.weapon = i;
 				break;
@@ -1857,7 +1884,9 @@ void ClientDisconnect( int clientNum ) {
 }
 
 #ifdef TMNTSP // save/load
-/* =============
+// Turtle Man: TODO: Merge with g_session.c ? ( G_WriteClientSessionData )
+/*
+===========
 G_SavePersistant
 
 Saves the data in a cvar so we don't have to write a file
@@ -1866,7 +1895,8 @@ after each level in SinglePlayer.
 Should allow 64 client single player games...
 
 Save the lives, continues, score, and holdable stuff.
-================*/
+============
+*/
 void G_SavePersistant(char *nextmap)
 {
 	char savedata[MAX_CVAR_VALUE_STRING*2];
@@ -1902,18 +1932,15 @@ void G_SavePersistant(char *nextmap)
 	for (i = 0; i < level.maxclients; i++)
 	{
 		client = &level.clients[i];
-		if (strlen(client->pers.netname) < 1) {
-			continue;
-		}
 
 #ifdef TMNTHOLDSYS
-		s = va("n\\%s\\livs\\%d\\ctns\\%d\\scr\\%i\\hi\\%i",
-				client->pers.netname, client->ps.persistant[PERS_LIVES],
+		s = va("livs\\%d\\ctns\\%d\\scr\\%i\\hi\\%i",
+				client->ps.persistant[PERS_LIVES],
 				client->ps.persistant[PERS_CONTINUES],
 				client->ps.persistant[PERS_SCORE], client->ps.holdableIndex);
 #else
 		s = va("n\\%s\\livs\\%d\\ctns\\%d\\scr\\%i",
-				client->pers.netname, client->ps.persistant[PERS_LIVES],
+				client->ps.persistant[PERS_LIVES],
 				client->ps.persistant[PERS_CONTINUES],
 				client->ps.persistant[PERS_SCORE]);
 #endif
@@ -1961,9 +1988,7 @@ void G_SavePersistant(char *nextmap)
 				savedata[i] = '/';
 		}
 
-#ifndef TMNTRELEASE
-		G_Printf("DEBUG: Savedata=%s\n", savedata);
-#endif
+		//G_Printf("DEBUG: Savedata=%s\n", savedata);
 		trap_Cvar_Set(va("g_spSaveData%i", i), savedata);
 		savedata[0] = '\0';
 	}
@@ -1973,7 +1998,7 @@ void G_LoadPersistant(int clientnum)
 {
 	char savedata[MAX_CVAR_VALUE_STRING+1];
 	gclient_t *client;
-	int h, i;
+	int i;
 	char *config;
 	char *s;
 #ifdef TMNTHOLDSYS
@@ -2006,9 +2031,7 @@ void G_LoadPersistant(int clientnum)
 		if (savedata[i] == '/')
 			savedata[i] = '\\';
 	}
-#ifndef TMNTRELEASE
-	G_Printf("DEBUG: Savedata=%s\n", savedata);
-#endif
+	//G_Printf("DEBUG: Savedata=%s\n", savedata);
 
 	s = Info_ValueForKey(config, "map");
 	trap_Cvar_VariableStringBuffer( "mapname", currentMap, sizeof(currentMap) );
@@ -2031,49 +2054,21 @@ void G_LoadPersistant(int clientnum)
 	{
 		trap_Cvar_Set("g_spSkill", va("%i", skill));
 		// Map needs to be reloaded!
-		G_Error("SP skill mismatch, is %i should be %i.\n", trap_Cvar_VariableValue( "g_spSkill" ), skill);
+		G_Printf(S_COLOR_YELLOW "Warning: SP skill mismatch, is %i should be %i.\n", trap_Cvar_VariableValue( "g_spSkill" ), skill);
 	}
 
-	for (h = 0; h < MAX_CLIENTS; h++)
-	{
 		memset(savedata, 0, sizeof(savedata));
-		trap_Cvar_VariableStringBuffer(va("g_spSaveData%i", h), savedata, sizeof(savedata));
+	trap_Cvar_VariableStringBuffer(va("g_spSaveData%i", clientnum), savedata, sizeof(savedata));
 		config = savedata;
 
 		if (strlen(savedata) < 1) {
-			continue; // nothing to load.
+		return; // nothing to load.
 		}
 
-		// name is used to restore playerdata
-		// Turtle Man: FIXME: what if player changes there name at intermission?
-		//                    Do the clients stay in the same indexes?
-		s = Info_ValueForKey(config, "n");
-		if (strlen(s) < 1)
-			continue;
-#if 1 // CLIENTNUM
-		// Check if clientnum
 		client = &level.clients[clientnum];
 
-		if (strlen(client->pers.netname) < 1)
-			return;
-		if (strcmp(client->pers.netname, s) != 0)
-			continue;
-#else
-		for (i = 0; i < level.maxclients; i++)
-		{
-			client = &level.clients[i];
-			if (strlen(client->pers.netname) < 1)
-				continue;
-			if (strcmp(client->pers.netname, s) == 0)
-				break;
-			}
+	//G_Printf("DEBUG: Loading SP data for %s\n", client->pers.netname);
 
-		if (i < level.maxclients)
-#endif
-		{
-#ifndef TMNTRELEASE
-			G_Printf("DEBUG: Loading SP data for %s\n", s);
-#endif
 			// Found client.
 			client->ps.persistant[PERS_LIVES] = atoi(Info_ValueForKey(config, "livs"));
 			if (!g_singlePlayer.integer && !client->ps.persistant[PERS_LIVES]) {
@@ -2095,14 +2090,95 @@ void G_LoadPersistant(int clientnum)
 				client->ps.holdable[j+1] = atoi(array_data);
 			}
 #endif
-		}
 
 		// Don't ever load this data again.
-		trap_Cvar_Set(va("g_spSaveData%i", h),"");
-	}
+	trap_Cvar_Set(va("g_spSaveData%i", clientnum),"");
 
 #if 0 // CLIENTNUM // Need it so can load all clients.
 	trap_Cvar_Set("g_spSaveData", "");
 #endif
+}
+#endif
+
+#ifdef NIGHTSMODE
+/*
+===========
+NiGHTS mode
+============
+*/
+
+// Go out of Nights mode, nights time ran out.
+void G_DeNiGHTSizePlayer( gentity_t *ent )
+{
+	if (!(ent->s.eFlags & EF_NIGHTSMODE)) {
+		return;
+	}
+
+	ent->s.eFlags &= ~EF_NIGHTSMODE;
+}
+
+// Go into Nights mode
+void G_NiGHTSizePlayer( gentity_t *ent )
+{
+	int mare;
+
+	// Turtle Man: TODO: Find lowest mare with a undead nights_target
+	//     find mare_start_1 thought mare_start_9 and look for nights_target,
+	//		if found and alive use path.
+	mare = 1;
+
+	G_SetupPath(ent, va("mare_start_%d", mare));
+
+	if (ent->s.eFlags & EF_NIGHTSMODE) {
+		return;
+	}
+
+	ent->s.eFlags |= EF_NIGHTSMODE;
+}
+
+void Drone_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
+{
+	G_NiGHTSizePlayer(other);
+}
+
+// Ideya Drone
+void SP_nights_start( gentity_t *ent )
+{
+	// Touch this to go into NiGHTS mode
+	//    and go to current mare.
+
+	VectorSet( ent->r.mins, -15, -15, -15 );
+	VectorSet( ent->r.maxs, 15, 15, 15 );
+
+	ent->s.eType = ET_GENERAL;
+	ent->flags = FL_NO_KNOCKBACK;
+	ent->r.contents = CONTENTS_TRIGGER;
+	ent->touch = Drone_Touch;
+
+	G_SetOrigin( ent, ent->s.origin );
+
+	trap_LinkEntity(ent);
+}
+
+void Capture_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
+{
+}
+
+// Ideya Capture
+// Touch go use collected Blue Chips to damage Ideya Capture
+void SP_nights_target( gentity_t *ent )
+{
+	ent->s.eType = ET_GENERAL;
+	ent->flags = FL_NO_KNOCKBACK;
+	ent->r.contents = CONTENTS_TRIGGER;
+	ent->touch = Capture_Touch;
+
+	if (!ent->health) {
+		ent->health = 20;
+	}
+
+	G_SetOrigin( ent, ent->s.origin );
+
+	trap_LinkEntity(ent);
 }
 #endif

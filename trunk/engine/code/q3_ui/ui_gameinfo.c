@@ -499,10 +499,19 @@ void UI_SetBestScore( int level, int score ) {
 	char	arenaKey[16];
 	char	scores[MAX_INFO_VALUE];
 
+#ifdef TMNTSP
+	score = ui_singlePlayerActive.integer;
+
+	// validate score
+	if( score < 1 || score > 2 ) {
+		return;
+	}
+#else
 	// validate score
 	if( score < 1 || score > 8 ) {
 		return;
 	}
+#endif
 
 	// validate skill
 	skill = (int)trap_Cvar_VariableValue( "g_spSkill" );

@@ -61,19 +61,15 @@ char *Sys_DefaultHomePath(void)
 			mkdir( homePath, 0750 );  /* just in case. */
 #ifdef TMNT
 			Q_strcat( homePath, sizeof( homePath ), "/TMNTArena" );
-#elif defined SONIC
-			Q_strcat( homePath, sizeof( homePath ), "/SonicBlastArena" );
 #else
 			Q_strcat( homePath, sizeof( homePath ), "/Quake3" );
-#endif
+#endif // !TMNT
 #else
 #ifdef TMNT
 			Q_strcat( homePath, sizeof( homePath ), "/.tmntarena" );
-#elif defined SONIC
-			Q_strcat( homePath, sizeof( homePath ), "/.sonicblastarena" );
 #else
 			Q_strcat( homePath, sizeof( homePath ), "/.q3a" );
-#endif
+#endif // !TMNT
 #endif
 			if( mkdir( homePath, 0750 ) )
 			{

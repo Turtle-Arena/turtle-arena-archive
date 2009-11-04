@@ -60,7 +60,11 @@ GAME OPTIONS MENU
 #endif
 #endif
 
+#ifdef TMNTMISC
+#define	NUM_CROSSHAIRS			4
+#else
 #define	NUM_CROSSHAIRS			10
+#endif
 
 
 typedef struct {

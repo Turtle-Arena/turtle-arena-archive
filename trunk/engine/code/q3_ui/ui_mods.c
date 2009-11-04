@@ -127,8 +127,6 @@ static void UI_Mods_LoadMods( void ) {
 	s_mods.list.numitems = 1;
 #ifdef TMNT
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "TMNT Arena";
-#elif defined SONIC
-	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Sonic Blast Arena";
 #else
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Quake III Arena";
 #endif

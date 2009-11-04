@@ -182,7 +182,12 @@ typedef struct _tag_menuframework
 
 	qboolean	wrapAround;
 	qboolean	fullscreen;
+#ifndef TMNTDATASYS
 	qboolean	showlogo;
+#endif
+#ifdef IOQ3ZTM
+	qboolean	noEscape; // Don't run UI_PopMenu when Esc is pressed
+#endif
 } menuframework_s;
 
 typedef struct
@@ -296,7 +301,9 @@ extern sfxHandle_t	menu_move_sound;
 extern sfxHandle_t	menu_out_sound;
 extern sfxHandle_t	menu_buzz_sound;
 extern sfxHandle_t	menu_null_sound;
+#ifndef TMNTWEAPSYS2
 extern sfxHandle_t	weaponChangeSound;
+#endif
 extern vec4_t		menu_text_color;
 extern vec4_t		menu_grayed_color;
 extern vec4_t		menu_dark_color;
@@ -405,6 +412,14 @@ extern void UI_CinematicsMenu_Cache( void );
 extern void UI_ModsMenu( void );
 extern void UI_ModsMenu_Cache( void );
 
+#ifdef TMNTMISC
+//
+// ui_multiplayer.c
+//
+extern void UI_MultiplayerMenu( void );
+extern void UI_Multiplayer_Cache( void );
+#endif
+
 #ifdef IOQUAKE3 // Turtle Man: CDKEY
 //
 // ui_cdkey.c
@@ -441,7 +456,11 @@ extern void SpecifyLeague_Cache( void );
 //
 // ui_specifyserver.c
 //
+#ifdef IOQ3ZTM
+extern void UI_SpecifyServerMenu( qboolean fav );
+#else
 extern void UI_SpecifyServerMenu( void );
+#endif
 extern void SpecifyServer_Cache( void );
 
 //
@@ -735,8 +754,14 @@ void			trap_SetCDKey( char *buf );
 
 qboolean               trap_VerifyCDKey( const char *key, const char *chksum);
 #endif
+#ifdef TMNTMISC
+void			trap_S_StopBackgroundTrack( void );
+void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
+#endif
 
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 void			trap_SetPbClStatus( int status );
+#endif
 
 //
 // ui_addbots.c

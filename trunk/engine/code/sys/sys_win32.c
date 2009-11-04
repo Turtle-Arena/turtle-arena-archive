@@ -75,11 +75,8 @@ char *Sys_DefaultHomePath( void )
 			return NULL;
 		}
 		Q_strncpyz( homePath, szPath, sizeof( homePath ) );
-#ifdef TMNT
-		// Turtle Man: Don't put it with Quake3 stuff.
+#ifdef TMNT // Turtle Man: Don't put it with Quake3 stuff.
 		Q_strcat( homePath, sizeof( homePath ), "\\TMNTArena" );
-#elif defined SONIC
-		Q_strcat( homePath, sizeof( homePath ), "\\SonicBlastArena" );
 #else
 		Q_strcat( homePath, sizeof( homePath ), "\\Quake3" );
 #endif

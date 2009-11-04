@@ -45,12 +45,6 @@ public:
 					mat3_t( idVec3_t const &x, idVec3_t const &y, idVec3_t const &z );
 					mat3_t( const float xx, const float xy, const float xz, const float yx, const float yy, const float yz, const float zx, const float zy, const float zz );
 
-#if 0 // Turtle Man: Disabled.
-	friend void		toMatrix( quat_t const &src, mat3_t &dst );
-	friend void		toMatrix( angles_t const &src, mat3_t &dst );
-	friend void		toMatrix( idVec3_t const &src, mat3_t &dst );
-#endif
-
 	idVec3_t			operator[]( int index ) const;
 	idVec3_t			&operator[]( int index );
 

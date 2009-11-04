@@ -387,30 +387,11 @@ double I_FloatTime (void)
 void Q_getwd (char *out)
 {
 #if defined(WIN32) || defined(_WIN32)
-	if (getcwd (out, 256) == out)
-	{
+   getcwd (out, 256);
 		strcat (out, "\\");
-	}
-	else
-	{
-		// getcwd failed.
-		out[0] = '\0';
-	}
 #else
-#if 1 // Turtle Man: gcc wants getcwd.
-	if (getcwd (out, 256) == out)
-	{
-		strcat (out, "\\");
-	}
-	else
-	{
-		// getcwd failed.
-		out[0] = '\0';
-	}
-#else
-	getwd(out);
+   getcwd(out, 256); // Turtle Man: Was getwd(out);
 	strcat(out, "/");
-#endif
 #endif
 }
 

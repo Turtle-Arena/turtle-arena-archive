@@ -258,7 +258,7 @@ quakefile_t *FindQuakeFilesInZip(char *zipfile, char *filter)
 
 	qfiles = NULL;
 	lastqf = NULL;
-	for (i = 0; (size_t)i < gi.number_entry; i++)
+	for (i = 0; i < gi.number_entry; i++)
 	{
 		err = unzGetCurrentFileInfo(uf, &file_info, filename_inzip, sizeof(filename_inzip), NULL,0,NULL,0);
 		if (err != UNZ_OK) break;
@@ -333,7 +333,7 @@ quakefile_t *FindQuakeFilesInPak(char *pakfile, char *filter)
 		idpackfiles = (dpackfile_t *) malloc(numpackdirs * sizeof(dpackfile_t));
 		if (!idpackfiles) Error("out of memory");
 		//read the dir entry
-		if (fread(idpackfiles, sizeof(dpackfile_t), numpackdirs, fp) != (size_t)numpackdirs)
+		if (fread(idpackfiles, sizeof(dpackfile_t), numpackdirs, fp) != numpackdirs)
 		{
 			fclose(fp);
 			free(idpackfiles);
@@ -359,7 +359,7 @@ quakefile_t *FindQuakeFilesInPak(char *pakfile, char *filter)
 		packfiles = (dsinpackfile_t *) malloc(numpackdirs * sizeof(dsinpackfile_t));
 		if (!packfiles) Error("out of memory");
 		//read the dir entry
-		if (fread(packfiles, sizeof(dsinpackfile_t), numpackdirs, fp) != (size_t)numpackdirs)
+		if (fread(packfiles, sizeof(dsinpackfile_t), numpackdirs, fp) != numpackdirs)
 		{
 			fclose(fp);
 			free(packfiles);
@@ -637,7 +637,7 @@ int ReadQuakeFile(quakefile_t *qf, void *buffer, int offset, int length)
 		while(offset > 0)
 		{
 			read = offset;
-			if ((size_t)read > sizeof(tmpbuf)) read = sizeof(tmpbuf);
+			if (read > sizeof(tmpbuf)) read = sizeof(tmpbuf);
 			unzReadCurrentFile(&qf->zipinfo, tmpbuf, read);
 			offset -= read;
 		} //end while

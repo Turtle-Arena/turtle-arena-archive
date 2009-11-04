@@ -978,6 +978,9 @@ void UI_Cache_f( void ) {
 	UI_CinematicsMenu_Cache();
 	Preferences_Cache();
 	ServerInfo_Cache();
+#ifdef TMNTMISC
+	UI_Multiplayer_Cache();
+#endif
 	SpecifyServer_Cache();
 	ArenaServers_Cache();
 	StartServer_Cache();

@@ -586,7 +586,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 		hcolor[1] = 0;
 		hcolor[2] = 1;
 	} else {
-#ifdef TMNTHUD // Turtle Man: TODO: Use player's effects color?
+#ifdef TMNTHUD // Turtle Man: TODO?: Use player's effects color?
 		hcolor[0] = 0;
 		hcolor[1] = 1;
 		hcolor[2] = 0;
@@ -824,16 +824,28 @@ static void CG_DrawStatusBar( void ) {
 
 #ifdef TMNTHOLDSYS
 		// draw value
-#ifdef TMNTWEAPSYS_2
-		if (BG_ItemForItemNum(value)->quantity > 0)
-#else
-		if (bg_itemlist[ value ].quantity > 0)
-#endif
+
 		{
+#ifdef TMNTWEAPSYS_2
+			int giveQuantity = BG_ItemForItemNum(value)->quantity;
+#else
+			int giveQuantity = bg_itemlist[ value ].quantity;
+#endif
 			int useCount = cg.snap->ps.holdable[cg.snap->ps.holdableIndex];
-			if (useCount > 0)
+
+			if ((giveQuantity > 0 && useCount > 0)
+				|| (giveQuantity == 0 && useCount > 1)) // Only happens with give command.
 			{
+				if ( cg.predictedPlayerState.holdableTime > 100 ) {
+					// draw as dark grey when reloading
+					color = 2;	// dark grey
+				} else {
+					color = 0;	// green
+				}
+				trap_R_SetColor( colors[color] );
+
 				CG_DrawFieldSmall(x, y, 2, useCount);
+				trap_R_SetColor( NULL );
 				x += (2 * (CHAR_WIDTH/2));
 			}
 		}
@@ -988,6 +1000,29 @@ static void CG_DrawStatusBar( void ) {
 #endif // TMNTHUD
 }
 #endif // MISSIONPACK_HUD
+
+#ifdef TMNTWEAPSYS_2
+// Left middle
+/*
+================
+CG_DrawMeleeChain
+================
+*/
+void CG_DrawMeleeChain(void)
+{
+	int y = SCREEN_HEIGHT/2;
+
+	if (cg.snap->ps.chain > 0) {
+		CG_DrawSmallString( SCREEN_WIDTH/32, y, va("Attack Chain %d", cg.snap->ps.chain), 1.0F );
+		y += SMALLCHAR_HEIGHT;
+	}
+
+	// Index of the attack animation, not how many things we've hit.
+	//if (cg.snap->ps.meleeAttack > 0) {
+	//	CG_DrawSmallString( SCREEN_WIDTH/32, y, va("meleeAttack %d", cg.snap->ps.meleeAttack), 1.0F );
+	//}
+}
+#endif
 
 /*
 ===========================================================================================
@@ -1778,7 +1813,11 @@ static void CG_DrawTeamInfo( void ) {
 		return; // disabled
 
 	if (cgs.teamLastChatPos != cgs.teamChatPos) {
-		if (cg.time - cgs.teamChatMsgTimes[cgs.teamLastChatPos % chatHeight] > cg_teamChatTime.integer) {
+		if (cg.time - cgs.teamChatMsgTimes[cgs.teamLastChatPos % chatHeight] > cg_teamChatTime.integer
+#ifdef IOQ3ZTM // TEAM_CHAT_CON
+			*1000
+#endif
+		) {
 			cgs.teamLastChatPos++;
 		}
 
@@ -2517,7 +2556,7 @@ static void CG_DrawSpectator(void) {
 	}
 	else if ( cgs.gametype >= GT_TEAM ) {
 #ifdef IOQ3ZTM
-		CG_DrawBigString(320 - 39 * 8, 460, "press ESC and use the START menu to play", 1.0F);
+		CG_DrawBigString(320 - 40 * 8, 460, "press ESC and use the START menu to play", 1.0F);
 #else
 		CG_DrawBigString(320 - 39 * 8, 460, "press ESC and use the JOIN menu to play", 1.0F);
 #endif
@@ -2716,7 +2755,8 @@ static qboolean CG_DrawFollow( void ) {
 }
 
 
-#ifndef TMNTWEAPSYS2 // AMMO_WARNINGS
+
+#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
 /*
 =================
 CG_DrawAmmoWarning
@@ -3012,7 +3052,11 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			CG_DrawStatusBar();
 #endif
       
-#ifndef TMNTWEAPSYS2 // AMMO_WARNINGS
+#ifdef TMNTWEAPSYS_2
+			CG_DrawMeleeChain();
+#endif
+
+#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
 			CG_DrawAmmoWarning();
 #endif
 
@@ -3192,7 +3236,17 @@ void CG_ToggleLetterbox(qboolean onscreen, qboolean instant)
 	cg.letterbox = onscreen;
 	cg.letterboxTime = cg.time;
 
-	// Turtle Man: TODO: Play sound like in LOZ:TP?
+	// Turtle Man: Play sounds like in LOZ:TP
+	if (cg.letterbox)
+	{
+		// move on screen
+		trap_S_StartLocalSound( cgs.media.letterBoxOnSound, CHAN_LOCAL_SOUND );
+	}
+	else
+	{
+		// move off screen
+		trap_S_StartLocalSound( cgs.media.letterBoxOffSound, CHAN_LOCAL_SOUND );
+	}
 }
 
 /*

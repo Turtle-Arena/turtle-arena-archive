@@ -26,8 +26,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 int g_console_field_width = 78;
 
-
+#ifdef IOQ3ZTM // Turtle Man: More chat lines
+#define	NUM_CON_TIMES 6
+#else
 #define	NUM_CON_TIMES 4
+#endif
 
 #define		CON_TEXTSIZE	32768
 typedef struct {
@@ -493,14 +496,25 @@ void Con_DrawInput (void) {
 		return;
 	}
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+	y = con.vislines - ( SCR_ConsoleFontCharHeight() * 2 );
+#else
 	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
+#endif
 
 	re.SetColor( con.color );
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+	SCR_DrawConsoleFontChar( con.xadjust + cl_conXOffset->integer, y, ']' );
+
+	Field_Draw( &g_consoleField, con.xadjust + cl_conXOffset->integer + SCR_ConsoleFontCharWidth(']'), y,
+		SCREEN_WIDTH - 3 * SCR_ConsoleFontCharWidth(' '), qtrue, qtrue );
+#else
 	SCR_DrawSmallChar( con.xadjust + 1 * SMALLCHAR_WIDTH, y, ']' );
 
 	Field_Draw( &g_consoleField, con.xadjust + 2 * SMALLCHAR_WIDTH, y,
 		SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, qtrue, qtrue );
+#endif
 }
 
 
@@ -544,18 +558,32 @@ void Con_DrawNotify (void)
 			continue;
 		}
 
+#ifdef IOQ3ZTM // USE_FREETYPE // Turtle Man: I added this...
+		float currentWidthLocation = cl_conXOffset->integer;
+#endif
 		for (x = 0 ; x < con.linewidth ; x++) {
+#ifndef IOQ3ZTM // USE_FREETYPE // Turtle Man: I added this...
 			if ( ( text[x] & 0xff ) == ' ' ) {
 				continue;
 			}
+#endif
 			if ( ( (text[x]>>8)&7 ) != currentColor ) {
 				currentColor = (text[x]>>8)&7;
 				re.SetColor( g_color_table[currentColor] );
 			}
+#ifdef IOQ3ZTM // USE_FREETYPE // Turtle Man: I added this...
+			SCR_DrawConsoleFontChar( con.xadjust + currentWidthLocation, v, text[x] & 0xff );
+			currentWidthLocation += SCR_ConsoleFontCharWidth( text[x] & 0xff );
+#else
 			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH, v, text[x] & 0xff );
+#endif
 		}
 
+#ifdef IOQ3ZTM // USE_FREETYPE // Turtle Man: I added this...
+		v += SCR_ConsoleFontCharHeight();
+#else
 		v += SMALLCHAR_HEIGHT;
+#endif
 	}
 
 	re.SetColor( NULL );
@@ -628,11 +656,6 @@ void Con_DrawSolidConsole( float frac ) {
 	color[1] = 1;
 	color[2] = 0;
 	color[3] = 1;
-#elif defined SONIC // Console
-	color[0] = 0;
-	color[1] = 0;
-	color[2] = 1;
-	color[3] = 1;
 #else
 	color[0] = 1;
 	color[1] = 0;
@@ -646,25 +669,39 @@ void Con_DrawSolidConsole( float frac ) {
 
 #ifdef TMNT // Console
 	re.SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
-#elif SONIC
-	re.SetColor( g_color_table[ColorIndex(COLOR_BLUE)] );
 #else
 	re.SetColor( g_color_table[ColorIndex(COLOR_RED)] );
 #endif
 
 	i = strlen( Q3_VERSION );
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+	float totalwidth = SCR_ConsoleFontStringWidth( Q3_VERSION, i ) + cl_conXOffset->integer;
+	float currentWidthLocation = 0;
+ 	for (x=0 ; x<i ; x++) {
+         SCR_DrawConsoleFontChar( cls.glconfig.vidWidth - totalwidth + currentWidthLocation,
+				lines - SCR_ConsoleFontCharHeight(), Q3_VERSION[x] );
+        currentWidthLocation += SCR_ConsoleFontCharWidth( Q3_VERSION[x] );
+ 	}
+#else
 	for (x=0 ; x<i ; x++) {
 		SCR_DrawSmallChar( cls.glconfig.vidWidth - ( i - x + 1 ) * SMALLCHAR_WIDTH,
 			lines - SMALLCHAR_HEIGHT, Q3_VERSION[x] );
 	}
+#endif
 
 
 	// draw the text
 	con.vislines = lines;
+#ifdef IOQ3ZTM // USE_FREETYPE
+	rows = (lines)/SCR_ConsoleFontCharHeight();		// rows of text to draw
+
+	y = lines - (SCR_ConsoleFontCharHeight()*3);
+#else
 	rows = (lines-SMALLCHAR_WIDTH)/SMALLCHAR_WIDTH;		// rows of text to draw
 
 	y = lines - (SMALLCHAR_HEIGHT*3);
+#endif
 
 	// draw from the bottom up
 	if (con.display != con.current)
@@ -672,8 +709,13 @@ void Con_DrawSolidConsole( float frac ) {
 	// draw arrows to show the buffer is backscrolled
 		re.SetColor( g_color_table[ColorIndex(COLOR_RED)] );
 		for (x=0 ; x<con.linewidth ; x+=4)
+#ifdef IOQ3ZTM // USE_FREETYPE
+			SCR_DrawConsoleFontChar( con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, '^' );
+		y -= SCR_ConsoleFontCharHeight();
+#else
 			SCR_DrawSmallChar( con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, '^' );
 		y -= SMALLCHAR_HEIGHT;
+#endif
 		rows--;
 	}
 	
@@ -686,7 +728,11 @@ void Con_DrawSolidConsole( float frac ) {
 	currentColor = 7;
 	re.SetColor( g_color_table[currentColor] );
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+	for (i=0 ; i<rows ; i++, y -= SCR_ConsoleFontCharHeight(), row--)
+#else
 	for (i=0 ; i<rows ; i++, y -= SMALLCHAR_HEIGHT, row--)
+#endif
 	{
 		if (row < 0)
 			break;
@@ -697,16 +743,26 @@ void Con_DrawSolidConsole( float frac ) {
 
 		text = con.text + (row % con.totallines)*con.linewidth;
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+		float currentWidthLocation = cl_conXOffset->integer;
+#endif
 		for (x=0 ; x<con.linewidth ; x++) {
+#ifndef IOQ3ZTM // USE_FREETYPE
 			if ( ( text[x] & 0xff ) == ' ' ) {
 				continue;
 			}
+#endif
 
 			if ( ( (text[x]>>8)&7 ) != currentColor ) {
 				currentColor = (text[x]>>8)&7;
 				re.SetColor( g_color_table[currentColor] );
 			}
+#ifdef IOQ3ZTM // USE_FREETYPE
+			SCR_DrawConsoleFontChar(  con.xadjust + currentWidthLocation, y, text[x] & 0xff );
+			currentWidthLocation += SCR_ConsoleFontCharWidth( text[x] & 0xff );
+#else
 			SCR_DrawSmallChar(  con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, text[x] & 0xff );
+#endif
 		}
 	}
 

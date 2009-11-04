@@ -56,7 +56,9 @@ typedef struct {
 	menutext_s		banner;
 	menubitmap_s	framel;
 	menubitmap_s	framer;
+#ifndef TMNTMISC
 	menutext_s		setupplayer;
+#endif
 	menutext_s		setupcontrols;
 	menutext_s		setupsystem;
 	menutext_s		game;
@@ -107,9 +109,11 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 	}
 
 	switch( ((menucommon_s*)ptr)->id ) {
+#ifndef TMNTMISC
 	case ID_CUSTOMIZEPLAYER:
 		UI_PlayerSettingsMenu();
 		break;
+#endif
 
 	case ID_CUSTOMIZECONTROLS:
 		UI_ControlsMenu();
@@ -190,6 +194,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.framer.height  					= 334;
 
 	y = 134;
+#ifndef TMNTMISC
 	setupMenuInfo.setupplayer.generic.type			= MTYPE_PTEXT;
 	setupMenuInfo.setupplayer.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	setupMenuInfo.setupplayer.generic.x				= 320;
@@ -199,6 +204,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.setupplayer.string				= "PLAYER";
 	setupMenuInfo.setupplayer.color					= color_red;
 	setupMenuInfo.setupplayer.style					= UI_CENTER;
+#endif
 
 	y += SETUP_MENU_VERTICAL_SPACING;
 	setupMenuInfo.setupcontrols.generic.type		= MTYPE_PTEXT;
@@ -297,7 +303,9 @@ static void UI_SetupMenu_Init( void ) {
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.banner );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.framel );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.framer );
+#ifndef TMNTMISC
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupplayer );
+#endif
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupcontrols );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupsystem );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.game );

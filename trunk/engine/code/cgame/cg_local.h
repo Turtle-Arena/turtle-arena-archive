@@ -78,7 +78,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	GIANT_WIDTH			32
 #define	GIANT_HEIGHT		48
 
+#ifdef TMNTMISC
+#define	NUM_CROSSHAIRS		4
+#else
 #define	NUM_CROSSHAIRS		10
+#endif
 
 #define TEAM_OVERLAY_MAXNAME_WIDTH	12
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
@@ -209,44 +213,36 @@ typedef struct {
 	float			barrelAngle;
 	int				barrelTime;
 	qboolean		barrelSpinning;
+
+#ifdef IOQ3ZTM
+	// Hook grapple chain to flash origin
+	vec3_t flashOrigin;
+#endif
 } playerEntity_t;
 
 //=================================================
 
-#ifdef SP_NPC
-#define MAX_SOUNDS_NPC 10
-
-typedef struct npcSounds_s {
-	int count;
-	int frame[MAX_SOUNDS_NPC];
-	sfxHandle_t	sound[MAX_SOUNDS_NPC];
-} npcSounds_t;
-
-typedef struct {
-	lerpFrame_t		body;
-	int				sound;
-} npcEntity_t;
-#endif
-
 #ifdef TMNTENTSYS // MISC_OBJECT
-// misc_object data
+// misc_object/NPC data
 enum
 {
 	MOF_ONLY_MIRROR = 1,
 	MOF_NOT_MIRROR = 2,
 	MOF_SETUP			= 4, // true if did one time setup.
-	MOF_NOLERP			= 8, // Use raw frames, don't interperate them.
 };
 
 typedef struct
 {
 	lerpFrame_t		lerp;
-	animation_t		animations[MAX_MISC_OBJECT_ANIMATIONS];
 	int				anim; // current animation ( may have ANIM_TOGGLEBIT )
 	float			speed; // Allow speeding up the animations?
 
+	// Sounds
+	int				lastSoundFrame;
+	bg_sounds_t		sounds;
+
 	int				flags; // Special flags.
-} cg_miscObject_t;
+} objectEntity_t;
 #endif
 
 // centity_t have a direct corespondence with gentity_t in the game, but
@@ -268,12 +264,9 @@ typedef struct centity_s {
 	int				snapShotTime;	// last time this entity was found in a snapshot
 
 	playerEntity_t	pe;
-#ifdef SP_NPC
-	npcEntity_t		ne;
-#endif
 #ifdef TMNTENTSYS // MISC_OBJECT
-	// Turtle Man: TODO: Reuse for NPCs.
-	cg_miscObject_t	miscObj; // misc_object data
+	bg_objectcfg_t	objectcfg;
+	objectEntity_t	oe; // misc_object/NPC data
 #endif
 
 	int				errorTime;		// decay the error from this time
@@ -307,21 +300,6 @@ typedef struct markPoly_s {
 	polyVert_t	verts[MAX_VERTS_ON_POLY];
 } markPoly_t;
 
-#ifdef TMNTWEAPSYS_2 // MELEE_MARKS
-typedef struct meleeMarkPoly_s {
-	struct meleeMarkPoly_s	*prevMark, *nextMark;
-	int			time;
-	qhandle_t	markShader;
-	qboolean	alphaFade;		// fade alpha instead of rgb
-	float		color[4];
-	poly_t		poly;
-	polyVert_t	verts[MAX_VERTS_ON_POLY];
-	//
-	int meleeNumber; // The chain of marks has a number.
-	int meleeChain; // number in the chain
-} meleeMarkPoly_t;
-#endif
-
 
 typedef enum {
 	LE_MARK,
@@ -333,6 +311,11 @@ typedef enum {
 	LE_FADE_RGB,
 	LE_SCALE_FADE,
 	LE_SCOREPLUM,
+#ifdef TMNTMISC
+	LE_BUBBLE,
+	//LE_SNOW,
+	//LE_RAIN,
+#endif
 #ifdef MISSIONPACK
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	LE_KAMIKAZE,
@@ -542,11 +525,15 @@ typedef struct projectileInfo_s {
 	float			trailRadius;
 	float			wiTrailTime;
 
-	//
+	// New stuff
+	qhandle_t		missileModelBlue;
+	qhandle_t		missileModelRed;
 	qhandle_t		spriteShader;
 	int				spriteRadius;
 	qhandle_t		wallmarkShader;
 	int				wallmarkRadius;
+
+	// Turtle Man: TODO: missileTrailShader (and missile vars 1 and 2 ?)
 
 } projectileInfo_t;
 
@@ -563,10 +550,14 @@ typedef struct weaponInfo_s {
 
 	void			(*ejectBrassFunc)( centity_t * );
 
+	// loopped sounds
 	sfxHandle_t		readySound;
 	sfxHandle_t		firingSound;
 
-	//
+	// sounds played once
+	sfxHandle_t		firingStoppedSound; // gun barrel stopped spining
+
+	// wall marks for melee weapons, gun have projectiles with wallmarks
 	qhandle_t		wallmarkShader;
 	int				wallmarkRadius;
 
@@ -643,18 +634,6 @@ typedef struct weaponInfo_s {
 } weaponInfo_t;
 #endif
 
-#ifdef SP_NPC
-//
-// Each NPC type has an associated npcInfo_t
-//
-typedef struct {
-	qboolean		registered;
-	qhandle_t		model;
-	animation_t		animations[MAX_TOTALANIMATIONS];
-	npcSounds_t		sounds[MAX_ANIMATIONS_NPC];
-} npcInfo_t;
-#endif
-
 // each IT_* item has an associated itemInfo_t
 // that constains media references necessary to present the
 // item and its effects
@@ -667,6 +646,14 @@ typedef struct {
 #endif
 } itemInfo_t;
 
+#ifdef TMNTNPCSYS
+typedef struct {
+	qboolean		registered;
+
+	qhandle_t		model;
+	qhandle_t		skin;
+} npcInfo_t;
+#endif
 
 typedef struct {
 	int				itemNum;
@@ -809,7 +796,7 @@ typedef struct {
 	char		centerPrint[1024];
 	int			centerPrintLines;
 
-#ifndef TMNTWEAPSYS2 // AMMO_WARNINGS
+#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
 	// low ammo warning state
 	int			lowAmmoWarning;		// 1 = low, 2 = empty
 #endif
@@ -1019,11 +1006,12 @@ typedef struct {
 	qhandle_t	railRingsShader;
 	qhandle_t	railCoreShader;
 
-#ifndef TMNTWEAPONS
 	qhandle_t	lightningShader;
-#endif
 #ifdef TMNTDATASYS
 	qhandle_t	grappleCableShader;
+#endif
+#ifdef TMNTWEAPSYS_2
+	qhandle_t	sparkTrailShader;
 #endif
 
 #ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
@@ -1054,9 +1042,11 @@ typedef struct {
 #ifndef NOTRATEDM // No gibs.
 	qhandle_t	bloodTrailShader;
 #endif
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#ifdef MISSIONPACK
 	qhandle_t	nailPuffShader;
+#ifndef TMNTWEAPSYS_2
 	qhandle_t	blueProxMine;
+#endif
 #endif
 
 	qhandle_t	numberShaders[11];
@@ -1092,7 +1082,7 @@ typedef struct {
 	qhandle_t	redKamikazeShader;
 	qhandle_t	blueKamikazeShader;
 #endif
-#ifdef TMNT // EF_TELE_EFFECT
+#ifdef TMNT // POWERS // PW_FLASHING
 	qhandle_t	playerTeleportShader;
 #endif
 
@@ -1189,7 +1179,9 @@ typedef struct {
 	sfxHandle_t	sfx_ric1;
 	sfxHandle_t	sfx_ric2;
 	sfxHandle_t	sfx_ric3;
+#ifndef IOQ3ZTM // UNUSED
 	sfxHandle_t	sfx_railg;
+#endif
 	sfxHandle_t	sfx_rockexp;
 	sfxHandle_t	sfx_plasmaexp;
 #ifdef MISSIONPACK
@@ -1238,6 +1230,11 @@ typedef struct {
 	sfxHandle_t landSound;
 	sfxHandle_t fallSound;
 	sfxHandle_t jumpPadSound;
+
+#ifdef TMNTMISC
+	sfxHandle_t letterBoxOnSound;
+	sfxHandle_t letterBoxOffSound;
+#endif
 
 	sfxHandle_t oneMinuteSound;
 	sfxHandle_t fiveMinuteSound;
@@ -1340,10 +1337,12 @@ typedef struct {
 	qhandle_t flagShaders[3];
 	sfxHandle_t	countPrepareTeamSound;
 
+#ifndef TMNT // POWERS
 	sfxHandle_t ammoregenSound;
 	sfxHandle_t doublerSound;
 	sfxHandle_t guardSound;
 	sfxHandle_t scoutSound;
+#endif
 #endif
 	qhandle_t cursor;
 	qhandle_t selectCursor;
@@ -1484,8 +1483,8 @@ extern	weaponInfo_t	cg_weapons[MAX_WEAPONS];
 #endif
 #endif
 extern	itemInfo_t		cg_items[MAX_ITEMS];
-#ifdef SP_NPC
-extern	npcInfo_t		cg_npcs[NPC_NUMNPCS];
+#ifdef TMNTNPCSYS
+extern	npcInfo_t		cg_npcs[MAX_NPCS];
 #endif
 extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
 
@@ -1505,7 +1504,7 @@ extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_draw3dIcons;
 extern	vmCvar_t		cg_drawIcons;
-#ifndef TMNTWEAPSYS2 // AMMO_WARNINGS
+#ifndef TMNTMISC // NO_AMMO_WARNINGS
 extern	vmCvar_t		cg_drawAmmoWarning;
 #endif
 extern	vmCvar_t		cg_drawCrosshair;
@@ -1519,13 +1518,13 @@ extern	vmCvar_t		cg_crosshairSize;
 extern	vmCvar_t		cg_crosshairHealth;
 extern	vmCvar_t		cg_drawStatus;
 extern	vmCvar_t		cg_draw2D;
+#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 extern	vmCvar_t		cg_animSpeed;
 extern	vmCvar_t		cg_debugAnim;
+#endif
 extern	vmCvar_t		cg_debugPosition;
 extern	vmCvar_t		cg_debugEvents;
-#ifndef TMNTWEAPONS
 extern	vmCvar_t		cg_railTrailTime;
-#endif
 extern	vmCvar_t		cg_errorDecay;
 extern	vmCvar_t		cg_nopredict;
 extern	vmCvar_t		cg_noPlayerAnims;
@@ -1588,9 +1587,7 @@ extern  vmCvar_t		cg_smallFont;
 extern  vmCvar_t		cg_bigFont;
 extern	vmCvar_t		cg_noTaunt;
 extern	vmCvar_t		cg_noProjectileTrail;
-#ifndef TMNTWEAPONS
 extern	vmCvar_t		cg_oldRail;
-#endif
 extern	vmCvar_t		cg_oldRocket;
 extern	vmCvar_t		cg_oldPlasma;
 extern	vmCvar_t		cg_trueLightning;
@@ -1745,11 +1742,7 @@ void CG_ResetPlayerEntity( centity_t *cent );
 void CG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
 					float speed, float *angle, qboolean *swinging );
 #endif
-#ifdef TMNT // EF_TELE_EFFECT
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, centity_t *cent, int team );
-#else
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team );
-#endif
 void CG_NewClientInfo( int clientNum );
 sfxHandle_t	CG_CustomSound( int clientNum, const char *soundName );
 
@@ -1836,9 +1829,7 @@ void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, 
 void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum);
 #endif
 
-#ifndef TMNTWEAPONS
 void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end );
-#endif
 #ifdef TMNTWEAPSYS_2
 void CG_GrappleTrail( centity_t *ent, const projectileInfo_t *wi );
 #else
@@ -1857,19 +1848,20 @@ void CG_OutOfAmmoChange( void );	// should this be in pmove?
 //
 void	CG_InitMarkPolys( void );
 void	CG_AddMarks( void );
-void	CG_ImpactMark( qhandle_t markShader, 
+#ifdef TMNTWEAPSYS_2
+qboolean	CG_ImpactMark( qhandle_t markShader,
 				    const vec3_t origin, const vec3_t dir, 
 					float orientation, 
 				    float r, float g, float b, float a, 
 					qboolean alphaFade, 
 					float radius, qboolean temporary );
-#ifdef TMNTWEAPSYS_2 // MELEE_MARKS
-qboolean CG_MeleeImpactMark( qhandle_t markShader,
+#else
+void	CG_ImpactMark( qhandle_t markShader,
 				    const vec3_t origin, const vec3_t dir,
 					float orientation,
 				    float r, float g, float b, float a,
 					qboolean alphaFade,
-					float radius, int clientNum );
+					float radius, qboolean temporary );
 #endif
 
 //
@@ -1902,7 +1894,7 @@ void CG_KamikazeEffect( vec3_t org );
 #endif
 void CG_ObeliskExplode( vec3_t org, int entityNum );
 void CG_ObeliskPain( vec3_t org );
-#ifndef TMNTWEAPONS
+#ifndef TMNT // POWERS
 void CG_InvulnerabilityImpact( vec3_t org, vec3_t angles );
 void CG_InvulnerabilityJuiced( vec3_t org );
 void CG_LightningBoltBeam( vec3_t start, vec3_t end );
@@ -1974,12 +1966,12 @@ void CG_Respawn( void );
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void CG_CheckChangedPredictableEvents( playerState_t *ps );
 
-#ifdef SP_NPC
+#ifdef TMNTNPCSYS
 //
 // cg_npcs.c
 //
 void CG_NPC( centity_t *cent );
-void CG_RegisterNPCVisuals( int itemNum );
+void CG_RegisterNPCVisuals( int npcNum );
 #endif
 
 //===============================================

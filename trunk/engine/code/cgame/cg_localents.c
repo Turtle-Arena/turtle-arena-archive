@@ -490,6 +490,7 @@ static void CG_AddExplosion( localEntity_t *ex ) {
 	// add the entity
 	trap_R_AddRefEntityToScene(ent);
 
+#ifndef IOQ3ZTM // Turtle Man: Anything glows!
 	// add the dlight
 	if ( ex->light ) {
 		float		light;
@@ -503,6 +504,7 @@ static void CG_AddExplosion( localEntity_t *ex ) {
 		light = ex->light * light;
 		trap_R_AddLightToScene(ent->origin, light, ex->lightColor[0], ex->lightColor[1], ex->lightColor[2] );
 	}
+#endif
 }
 
 /*
@@ -543,6 +545,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 
 	trap_R_AddRefEntityToScene( &re );
 
+#ifndef IOQ3ZTM // Turtle Man: Anything glows!
 	// add the dlight
 	if ( le->light ) {
 		float		light;
@@ -556,8 +559,36 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 		light = le->light * light;
 		trap_R_AddLightToScene(re.origin, light, le->lightColor[0], le->lightColor[1], le->lightColor[2] );
 	}
+#endif
 }
 
+#ifdef TMNTMISC
+/*
+====================
+CG_BubbleThink
+====================
+*/
+void CG_BubbleThink( localEntity_t *le ) {
+	int contents;
+	vec3_t	newOrigin;
+	trace_t	trace;
+
+	CG_AddMoveScaleFade(le);
+
+	// calculate new position
+	BG_EvaluateTrajectory( &le->pos, cg.time, newOrigin );
+
+	// trace a line from previous position to new position
+	CG_Trace( &trace, le->refEntity.origin, NULL, NULL, newOrigin, -1, CONTENTS_SOLID );
+
+	contents = trap_CM_PointContents( trace.endpos, 0 );
+	if ( !( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) ) {
+		// Bubble isn't in water (or slime/lava) anymore, remove it.
+		CG_FreeLocalEntity( le );
+		return;
+	}
+}
+#endif
 
 #ifdef MISSIONPACK
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
@@ -853,6 +884,21 @@ void CG_AddLocalEntities( void ) {
 			CG_FreeLocalEntity( le );
 			continue;
 		}
+#ifdef IOQ3ZTM // Turtle Man: Anything glows!
+		// add the dlight
+		if ( le->light ) {
+			float		light;
+
+			light = (float)( cg.time - le->startTime ) / ( le->endTime - le->startTime );
+			if ( light < 0.5 ) {
+				light = 1.0;
+			} else {
+				light = 1.0 - ( light - 0.5 ) * 2;
+			}
+			light = le->light * light;
+			trap_R_AddLightToScene(le->refEntity.origin, light, le->lightColor[0], le->lightColor[1], le->lightColor[2] );
+		}
+#endif
 		switch ( le->leType ) {
 		default:
 			CG_Error( "Bad leType: %i", le->leType );
@@ -892,6 +938,12 @@ void CG_AddLocalEntities( void ) {
 		case LE_SCOREPLUM:
 			CG_AddScorePlum( le );
 			break;
+
+#ifdef TMNTMISC
+		case LE_BUBBLE:
+			CG_BubbleThink( le );
+			break;
+#endif
 
 #ifdef MISSIONPACK
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM

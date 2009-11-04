@@ -1360,7 +1360,6 @@ int SP_LoadGame(fileHandle_t f, char *filename, char *loadmap)
 	return 0;
 }
 
-// Turtle Man: Added a Load cmd like the save one.
 static void SV_LoadGame_f(void) {
 	char loadmap[MAX_QPATH];
 	char savegame[MAX_TOKEN_CHARS];

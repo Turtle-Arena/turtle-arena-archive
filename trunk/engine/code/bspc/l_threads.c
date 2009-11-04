@@ -118,15 +118,15 @@ void RunThreadsOnIndividual (int workcnt, qboolean showpacifier, void(*func)(int
 typedef struct thread_s
 {
 	HANDLE handle;
-	int threadid;
-	int id;
+	DWORD threadid; // Turtle Man: int to DWORD
+	DWORD id; // Turtle Man: int to DWORD
 	struct thread_s *next;
 } thread_t;
 
 thread_t *firstthread;
 thread_t *lastthread;
 int currentnumthreads;
-int currentthreadid;
+DWORD currentthreadid; // Turtle Man: int to DWORD
 
 int numthreads = 1;
 CRITICAL_SECTION crit;
@@ -261,7 +261,8 @@ void ThreadSemaphoreIncrease(int count)
 //===========================================================================
 void RunThreadsOn(int workcnt, qboolean showpacifier, void(*func)(int))
 {
-	int		threadid[MAX_THREADS];
+	// Turtle Man: int to DWORD
+	DWORD	threadid[MAX_THREADS];
 	HANDLE	threadhandle[MAX_THREADS];
 	int		i;
 	int		start, end;
@@ -454,7 +455,7 @@ int GetNumThreads(void)
 typedef struct thread_s
 {
 	pthread_t thread;
-	int threadid;
+	size_t threadid; // Turtle Man: int to size_t
 	int id;
 	struct thread_s *next;
 } thread_t;
@@ -462,7 +463,7 @@ typedef struct thread_s
 thread_t *firstthread;
 thread_t *lastthread;
 int currentnumthreads;
-int currentthreadid;
+size_t currentthreadid; // Turtle Man: int to size_t
 
 int numthreads = 1;
 pthread_mutex_t my_mutex;
@@ -771,7 +772,7 @@ int GetNumThreads(void)
 typedef struct thread_s
 {
 	pthread_t thread;
-	int threadid;
+	size_t threadid; // Turtle Man: int to size_t
 	int id;
 	struct thread_s *next;
 } thread_t;
@@ -779,7 +780,7 @@ typedef struct thread_s
 thread_t *firstthread;
 thread_t *lastthread;
 int currentnumthreads;
-int currentthreadid;
+size_t currentthreadid; // Turtle Man: int to size_t
 
 int numthreads = 1;
 pthread_mutex_t my_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -918,7 +919,7 @@ void ThreadSemaphoreIncrease(int count)
 //===========================================================================
 void RunThreadsOn(int workcnt, qboolean showpacifier, void(*func)(int))
 {
-	int		i;
+	size_t		i; // Turtle Man: int to size_t
 	pthread_t	work_threads[MAX_THREADS];
 	void *pthread_return;
 	pthread_attr_t	attrib;
@@ -1097,7 +1098,7 @@ int GetNumThreads(void)
 
 typedef struct thread_s
 {
-	int threadid;
+	size_t threadid; // Turtle Man: int to size_t
 	int id;
 	struct thread_s *next;
 } thread_t;
@@ -1105,7 +1106,7 @@ typedef struct thread_s
 thread_t *firstthread;
 thread_t *lastthread;
 int currentnumthreads;
-int currentthreadid;
+size_t currentthreadid; // Turtle Man: int to size_t
 
 int numthreads = 1;
 static int enter;

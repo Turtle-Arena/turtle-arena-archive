@@ -473,7 +473,7 @@ void SP_target_location( gentity_t *self ){
 /*QUAKED target_level_end (1 0 0) (-16 -16 -24) (16 16 32)
 when triggered, the level ends
 "message"	use it to set the name of the next level without any extension
-targetname: To trigger the level end.
+"targetname" to trigger the level end.
 */
 
 void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
@@ -532,13 +532,12 @@ void SP_target_level_end( gentity_t *self ) {
 #endif
 
 #ifdef CAMERASCRIPT // Turtle Man: i made this
-
-/*QUAKED target_start_camera (1 0 0) (-16 -16 -24) (16 16 32) redteam blueteam private
+/*QUAKED target_start_camera (1 0 0) (-16 -16 -24) (16 16 32) redteam blueteam everyone
 when triggered, starts a camera script.
 "message"	use it to set the name of the camera script without any extension or "cameras/" dir
 targetname: To trigger the camera script.
 If "private", only the activator gets the camera.  If no checks, all clients get the camera.
-Turtle Man: TODO: Option for whether it can be skipped.
+Turtle Man: TODO?: Option for whether it can be skipped.
 */
 void target_start_camera_use(gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	if (ent->message == NULL || *ent->message == '\0') {
@@ -546,18 +545,25 @@ void target_start_camera_use(gentity_t *ent, gentity_t *other, gentity_t *activa
 		return;
 	}
 
-	if ( activator->client && ( ent->spawnflags & 4 ) ) {
+	if ( activator->client && !( ent->spawnflags & 4 ) ) {
+		// Team only camera?
+		if ( ((ent->spawnflags & 1) && activator->client->sess.sessionTeam != TEAM_RED)
+			|| ((ent->spawnflags & 2) && activator->client->sess.sessionTeam != TEAM_BLUE) )
+		{
+			return;
+		}
+
 		trap_SendServerCommand( activator-g_entities, va("camera \"%s\"", ent->message ));
 		return;
 	}
 
-	if ( ent->spawnflags & 3 ) {
+	// Team only camera?
 		if ( ent->spawnflags & 1 ) {
 			G_TeamCommand( TEAM_RED, va("camera \"%s\"", ent->message) );
+		return;
 		}
 		if ( ent->spawnflags & 2 ) {
 			G_TeamCommand( TEAM_BLUE, va("camera \"%s\"", ent->message) );
-		}
 		return;
 	}
 

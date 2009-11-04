@@ -860,7 +860,7 @@ void Q2_LoadBSPFile(char *filename, int offset, int length)
 	LoadFile (filename, (void **)&header, offset, length);
 
 // swap the header
-	for (i=0 ; (size_t)i< sizeof(dheader_t)/4 ; i++)
+	for (i=0 ; i< sizeof(dheader_t)/4 ; i++)
 		((int *)header)[i] = LittleLong ( ((int *)header)[i]);
 
 	if (header->ident != IDBSPHEADER)
@@ -920,7 +920,7 @@ void	Q2_LoadBSPFileTexinfo (char *filename)
 	fread (header, sizeof(dheader_t), 1, f);
 
 // swap the header
-	for (i=0 ; (size_t)i< sizeof(dheader_t)/4 ; i++)
+	for (i=0 ; i< sizeof(dheader_t)/4 ; i++)
 		((int *)header)[i] = LittleLong ( ((int *)header)[i]);
 
 	if (header->ident != IDBSPHEADER)

@@ -47,31 +47,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //#define DEBUG_AI_WEAP
 
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 //structure field offsets
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-#define WEAPONGROUP_OFS(x) (size_t)&(((weapongroupinfo_t *)0)->x)
-#else
 #define WEAPON_OFS(x) (size_t)&(((weaponinfo_t *)0)->x)
 #define PROJECTILE_OFS(x) (size_t)&(((projectileinfo_t *)0)->x)
-#endif
 
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-// If TMNTWEAPSYS_2_NOCOMPAT is defined we only need the
-//   number of weapons and there "pickupName"
-
-//weapon definition
-static fielddef_t weapongroupinfo_fields[] =
-{
-{"name", WEAPONGROUP_OFS(name), FT_STRING},	// "wp_sais"
-{"pickupName", WEAPONGROUP_OFS(pickupName), FT_STRING}, // "Sais"
-{NULL, 0, 0, 0}
-};
-
-static structdef_t weapongroupinfo_struct =
-{
-	sizeof(weapongroupinfo_t), weapongroupinfo_fields
-};
-#else
 //weapon definition
 static fielddef_t weaponinfo_fields[] =
 {
@@ -133,20 +113,14 @@ static structdef_t projectileinfo_struct =
 {
 	sizeof(projectileinfo_t), projectileinfo_fields
 };
-#endif
 
 //weapon configuration: set of weapons with projectiles
 typedef struct weaponconfig_s
 {
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	int numweapongroups;
-	weapongroupinfo_t *weapongroupinfo;
-#else
 	int numweapons;
 	int numprojectiles;
 	projectileinfo_t *projectileinfo;
 	weaponinfo_t *weaponinfo;
-#endif
 } weaponconfig_t;
 
 //the bot weapon state
@@ -159,7 +133,6 @@ typedef struct bot_weaponstate_s
 static bot_weaponstate_t *botweaponstates[MAX_CLIENTS+1];
 static weaponconfig_t *weaponconfig;
 
-#ifndef TMNTWEAPSYS_2_NOCOMPAT
 //========================================================================
 //
 // Parameter:				-
@@ -179,7 +152,6 @@ int BotValidWeaponNumber(int weaponnum)
 	} //end if
 	return qtrue;
 } //end of the function BotValidWeaponNumber
-#endif
 //========================================================================
 //
 // Parameter:				-
@@ -234,36 +206,14 @@ void DumpWeaponConfig(weaponconfig_t *wc)
 //===========================================================================
 weaponconfig_t *LoadWeaponConfig(char *filename)
 {
-#ifndef TMNTWEAPSYS_2_NOCOMPAT
 	int max_weaponinfo, max_projectileinfo;
-#endif
 	token_t token;
 	char path[MAX_PATH];
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	int i;
-#else
 	int i, j;
-#endif
 	source_t *source;
 	weaponconfig_t *wc;
-#ifndef TMNTWEAPSYS_2_NOCOMPAT
 	weaponinfo_t weaponinfo;
-#endif
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	int max_weapongroupinfo;
-	weapongroupinfo_t weapongroupinfo;
-	int index;
-#endif
 
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	max_weapongroupinfo = (int) LibVarValue("max_weapongroupinfo", "32");
-	if (max_weapongroupinfo < 0)
-	{
-		botimport.Print(PRT_ERROR, "max_weapongroupinfo = %d\n", max_weapongroupinfo);
-		max_weapongroupinfo = 32;
-		LibVarSet("max_weapongroupinfo", "32");
-	} //end if
-#else
 	max_weaponinfo = (int) LibVarValue("max_weaponinfo", "32");
 	if (max_weaponinfo < 0)
 	{
@@ -278,13 +228,8 @@ weaponconfig_t *LoadWeaponConfig(char *filename)
 		max_projectileinfo = 32;
 		LibVarSet("max_projectileinfo", "32");
 	} //end if
-#endif
 	strncpy(path, filename, MAX_PATH);
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	PC_SetBaseFolder("scripts");
-#else
 	PC_SetBaseFolder(BOTFILESBASEFOLDER);
-#endif
 	source = LoadSourceFile(path);
 	if (!source)
 	{
@@ -292,12 +237,6 @@ weaponconfig_t *LoadWeaponConfig(char *filename)
 		return NULL;
 	} //end if
 	//initialize weapon config
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	wc = (weaponconfig_t *) GetClearedHunkMemory(sizeof(weaponconfig_t) +
-										max_weapongroupinfo * sizeof(weapongroupinfo_t));
-	wc->weapongroupinfo = (weapongroupinfo_t *) ((char *) wc + sizeof(weaponconfig_t));
-	wc->numweapongroups = 0;
-#else
 	wc = (weaponconfig_t *) GetClearedHunkMemory(sizeof(weaponconfig_t) +
 										max_weaponinfo * sizeof(weaponinfo_t) +
 										max_projectileinfo * sizeof(projectileinfo_t));
@@ -306,75 +245,9 @@ weaponconfig_t *LoadWeaponConfig(char *filename)
 										max_weaponinfo * sizeof(weaponinfo_t));
 	wc->numweapons = max_weaponinfo;
 	wc->numprojectiles = 0;
-#endif
 	//parse the source file
 	while(PC_ReadToken(source, &token))
 	{
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-		if (!strcmp(token.string, "weapongroup"))
-		{
-			Com_Memset(&weapongroupinfo, 0, sizeof(weapongroupinfo_t));
-
-			if (PC_ExpectTokenType(source, TT_STRING, 0, &token))
-			{
-				StripDoubleQuotes(token.string);
-				strncpy(weapongroupinfo.name, token.string, sizeof(weapongroupinfo.name)-1);
-			} //end if
-			if (!ReadStructure(source, &weapongroupinfo_struct, (char *) &weapongroupinfo))
-			{
-				FreeMemory(wc);
-				FreeSource(source);
-				return NULL;
-			} //end if
-
-			index = 0;
-			if (weapongroupinfo.name[0] != '\0')
-			{
-				for (i = 1; i < wc->numweapongroups; i++)
-				{
-					if (strcmp(wc->weapongroupinfo[i].name, weapongroupinfo.name) == 0)
-					{
-						index = i;
-						break;
-					}
-				}
-			}
-
-			if (index > 0)
-			{
-				Com_Memcpy(&wc->weapongroupinfo[index], &weapongroupinfo, sizeof(weapongroupinfo_t));
-			}
-			else
-			{
-				if (wc->numweapongroups >= max_weapongroupinfo)
-				{
-					botimport.Print(PRT_ERROR, "more than %d weapon groups defined in %s\n", max_weapongroupinfo, path);
-					FreeMemory(wc);
-					FreeSource(source);
-					return NULL;
-				} //end if
-				Com_Memcpy(&wc->weapongroupinfo[wc->numweapongroups], &weapongroupinfo, sizeof(weapongroupinfo_t));
-				wc->numweapongroups++;
-			}
-		} //end if
-		// Skip weapon and projectile structs
-		else if (!strcmp(token.string, "weapon") || !strcmp(token.string, "projectile"))
-		{
-			Com_Memset(&weapongroupinfo, 0, sizeof(weapongroupinfo_t));
-
-			if (PC_ExpectTokenType(source, TT_STRING, 0, &token))
-			{
-				StripDoubleQuotes(token.string);
-				strncpy(weapongroupinfo.name, token.string, sizeof(weapongroupinfo.name)-1);
-			} //end if
-			if (!ReadStructure(source, &weapongroupinfo_struct, (char *) &weapongroupinfo))
-			{
-				FreeMemory(wc);
-				FreeSource(source);
-				return NULL;
-			} //end if
-		}
-#else
 		if (!strcmp(token.string, "weaponinfo"))
 		{
 			Com_Memset(&weaponinfo, 0, sizeof(weaponinfo_t));
@@ -412,7 +285,6 @@ weaponconfig_t *LoadWeaponConfig(char *filename)
 			} //end if
 			wc->numprojectiles++;
 		} //end if
-#endif
 		else
 		{
 			botimport.Print(PRT_ERROR, "unknown definition %s in %s\n", token.string, path);
@@ -423,18 +295,6 @@ weaponconfig_t *LoadWeaponConfig(char *filename)
 	} //end while
 	FreeSource(source);
 	//fix up weapons
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	for (i = 0; i < wc->numweapongroups; i++)
-	{
-		if (!wc->weapongroupinfo[i].pickupName[0])
-		{
-			botimport.Print(PRT_ERROR, "weapon %d has no pickupName in %s\n", i, path);
-			FreeMemory(wc);
-			return NULL;
-		} //end if
-	} //end for
-	if (!wc->numweapongroups) botimport.Print(PRT_WARNING, "no weapon group info loaded\n");
-#else
 	for (i = 0; i < wc->numweapons; i++)
 	{
 		if (!wc->weaponinfo[i].valid) continue;
@@ -467,7 +327,6 @@ weaponconfig_t *LoadWeaponConfig(char *filename)
 		} //end if
 	} //end for
 	if (!wc->numweapons) botimport.Print(PRT_WARNING, "no weapon info loaded\n");
-#endif
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
 	return wc;
 } //end of the function LoadWeaponConfig
@@ -482,21 +341,12 @@ int *WeaponWeightIndex(weightconfig_t *wwc, weaponconfig_t *wc)
 	int *index, i;
 
 	//initialize item weight index
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	index = (int *) GetClearedMemory(sizeof(int) * wc->numweapongroups);
-
-	for (i = 0; i < wc->numweapongroups; i++)
-	{
-		index[i] = FindFuzzyWeight(wwc, wc->weapongroupinfo[i].pickupName);
-	} //end for
-#else
 	index = (int *) GetClearedMemory(sizeof(int) * wc->numweapons);
 
 	for (i = 0; i < wc->numweapons; i++)
 	{
 		index[i] = FindFuzzyWeight(wwc, wc->weaponinfo[i].name);
 	} //end for
-#endif
 	return index;
 } //end of the function WeaponWeightIndex
 //===========================================================================
@@ -538,7 +388,6 @@ int BotLoadWeaponWeights(int weaponstate, char *filename)
 	ws->weaponweightindex = WeaponWeightIndex(ws->weaponweightconfig, weaponconfig);
 	return BLERR_NOERROR;
 } //end of the function BotLoadWeaponWeights
-#ifndef TMNTWEAPSYS_2_NOCOMPAT
 //===========================================================================
 //
 // Parameter:				-
@@ -555,7 +404,6 @@ void BotGetWeaponInfo(int weaponstate, int weapon, weaponinfo_t *weaponinfo)
 	if (!weaponconfig) return;
 	Com_Memcpy(weaponinfo, &weaponconfig->weaponinfo[weapon], sizeof(weaponinfo_t));
 } //end of the function BotGetWeaponInfo
-#endif
 //===========================================================================
 //
 // Parameter:				-
@@ -579,15 +427,9 @@ int BotChooseBestFightWeapon(int weaponstate, int *inventory)
 
 	bestweight = 0;
 	bestweapon = 0;
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	for (i = 0; i < wc->numweapongroups; i++)
-#else
 	for (i = 0; i < wc->numweapons; i++)
-#endif
 	{
-#ifndef TMNTWEAPSYS_2_NOCOMPAT
 		if (!wc->weaponinfo[i].valid) continue;
-#endif
 		index = ws->weaponweightindex[i];
 		if (index < 0) continue;
 		weight = FuzzyWeight(inventory, ws->weaponweightconfig, index);
@@ -672,11 +514,7 @@ int BotSetupWeaponAI(void)
 {
 	char *file;
 
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-	file = LibVarString("weaponconfig", "weaponinfo.txt");
-#else
 	file = LibVarString("weaponconfig", "weapons.c");
-#endif
 	weaponconfig = LoadWeaponConfig(file);
 	if (!weaponconfig)
 	{
@@ -711,4 +549,4 @@ void BotShutdownWeaponAI(void)
 		} //end if
 	} //end for
 } //end of the function BotShutdownWeaponAI
-
+#endif // !TMNTWEAPSYS_2_NOCOMPAT

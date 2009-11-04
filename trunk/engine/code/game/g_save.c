@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
+//#include "../qcommon/q_shared.h"
 #include "g_local.h"
-#include "../qcommon/q_shared.h"
 
 #ifdef TMNTSP // Save/load
 
@@ -38,7 +38,7 @@ typedef enum
 	//               (I don't remember why I made it this way)
 
     SAVE_MINIMUM = 0,	// Save data so that player can start level later.
-    SAVE_FULL = 128,	// TODO: Full save of the level, includes all entities.
+    SAVE_FULL = 128,	// Turtle Man: TODO?: Full save of the level, includes all entities.
     SAVE_UNKNOWN
 
 } save_type_e;

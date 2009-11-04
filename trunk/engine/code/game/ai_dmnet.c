@@ -1776,10 +1776,12 @@ int AINode_Seek_NBG(bot_state_t *bs) {
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
 	}
+#endif
 	//map specific code
 	BotMapScripts(bs);
 	//no enemy
@@ -1919,10 +1921,12 @@ int AINode_Seek_LTG(bot_state_t *bs)
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
 	}
+#endif
 	//map specific code
 	BotMapScripts(bs);
 	//no enemy
@@ -2196,10 +2200,12 @@ int AINode_Battle_Fight(bot_state_t *bs) {
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
 	}
+#endif
 	//choose the best weapon to fight with
 	BotChooseWeapon(bs);
 	//do attack movements
@@ -2289,10 +2295,12 @@ int AINode_Battle_Chase(bot_state_t *bs)
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
 	}
+#endif
 	//map specific code
 	BotMapScripts(bs);
 	//create the chase goal
@@ -2611,10 +2619,12 @@ int AINode_Battle_NBG(bot_state_t *bs) {
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
 	}
+#endif
 	//map specific code
 	BotMapScripts(bs);
 	//update the last time the enemy was visible

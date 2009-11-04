@@ -1,112 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="" />
+	<ActiveTarget name="Debug TA Win32" />
 	<File name="../../code/game/ai_chat.c" open="0" top="0" tabpos="0">
-		<Cursor position="20989" topLine="755" />
+		<Cursor position="32041" topLine="1130" />
 	</File>
-	<File name="../../code/game/ai_cmd.c" open="0" top="0" tabpos="26">
-		<Cursor position="40104" topLine="1585" />
+	<File name="../../code/game/g_items.c" open="0" top="0" tabpos="0">
+		<Cursor position="22948" topLine="887" />
 	</File>
-	<File name="../../code/game/ai_dmnet.c" open="0" top="0" tabpos="0">
-		<Cursor position="49165" topLine="1511" />
-	</File>
-	<File name="../../code/game/ai_dmq3.c" open="0" top="0" tabpos="15">
-		<Cursor position="68594" topLine="2422" />
-	</File>
-	<File name="../../code/game/ai_dmq3.h" open="0" top="0" tabpos="0">
-		<Cursor position="8299" topLine="197" />
-	</File>
-	<File name="../../code/game/ai_main.c" open="0" top="0" tabpos="19">
-		<Cursor position="45833" topLine="1688" />
-	</File>
-	<File name="../../code/game/ai_main.h" open="0" top="0" tabpos="0">
-		<Cursor position="1262" topLine="27" />
-	</File>
-	<File name="../../code/game/ai_team.c" open="0" top="0" tabpos="0">
-		<Cursor position="62835" topLine="1945" />
-	</File>
-	<File name="../../code/game/bg_misc.c" open="0" top="0" tabpos="0">
-		<Cursor position="133038" topLine="5528" />
-	</File>
-	<File name="../../code/game/chars.h" open="0" top="0" tabpos="0">
-		<Cursor position="10084" topLine="213" />
-	</File>
-	<File name="../../code/game/g_active.c" open="0" top="0" tabpos="14">
-		<Cursor position="40641" topLine="1593" />
-	</File>
-	<File name="../../code/game/g_arenas.c" open="0" top="0" tabpos="9">
-		<Cursor position="3469" topLine="106" />
-	</File>
-	<File name="../../code/game/g_bot.c" open="0" top="0" tabpos="0">
-		<Cursor position="24036" topLine="1084" />
-	</File>
-	<File name="../../code/game/g_client.c" open="0" top="0" tabpos="21">
-		<Cursor position="51704" topLine="1993" />
-	</File>
-	<File name="../../code/game/g_cmds.c" open="0" top="0" tabpos="25">
-		<Cursor position="2268" topLine="69" />
-	</File>
-	<File name="../../code/game/g_combat.c" open="0" top="0" tabpos="7">
-		<Cursor position="16862" topLine="699" />
-	</File>
-	<File name="../../code/game/g_items.c" open="0" top="0" tabpos="20">
-		<Cursor position="19657" topLine="753" />
-	</File>
-	<File name="../../code/game/g_local.h" open="0" top="0" tabpos="16">
-		<Cursor position="9834" topLine="358" />
-	</File>
-	<File name="../../code/game/g_main.c" open="0" top="0" tabpos="8">
-		<Cursor position="9748" topLine="276" />
-	</File>
-	<File name="../../code/game/g_misc.c" open="0" top="0" tabpos="17">
-		<Cursor position="10408" topLine="376" />
-	</File>
-	<File name="../../code/game/g_missile.c" open="0" top="0" tabpos="13">
-		<Cursor position="30660" topLine="1150" />
-	</File>
-	<File name="../../code/game/g_mover.c" open="0" top="0" tabpos="2">
-		<Cursor position="8730" topLine="315" />
-	</File>
-	<File name="../../code/game/g_npc.c" open="0" top="0" tabpos="2">
-		<Cursor position="75" topLine="0" />
-	</File>
-	<File name="../../code/game/g_npcmove.c" open="0" top="0" tabpos="0">
-		<Cursor position="38862" topLine="1696" />
-	</File>
-	<File name="../../code/game/g_public.h" open="0" top="0" tabpos="24">
-		<Cursor position="9186" topLine="224" />
-	</File>
-	<File name="../../code/game/g_save.c" open="0" top="0" tabpos="7">
-		<Cursor position="5589" topLine="200" />
-	</File>
-	<File name="../../code/game/g_session.c" open="0" top="0" tabpos="0">
-		<Cursor position="1441" topLine="41" />
-	</File>
-	<File name="../../code/game/g_spawn.c" open="0" top="0" tabpos="4">
-		<Cursor position="8995" topLine="283" />
-	</File>
-	<File name="../../code/game/g_syscalls.c" open="0" top="0" tabpos="0">
-		<Cursor position="6981" topLine="228" />
-	</File>
-	<File name="../../code/game/g_target.c" open="0" top="0" tabpos="22">
-		<Cursor position="13830" topLine="506" />
-	</File>
-	<File name="../../code/game/g_team.c" open="0" top="0" tabpos="11">
-		<Cursor position="24607" topLine="898" />
-	</File>
-	<File name="../../code/game/g_team.h" open="0" top="0" tabpos="17">
-		<Cursor position="2031" topLine="31" />
-	</File>
-	<File name="../../code/game/g_trigger.c" open="0" top="0" tabpos="3">
-		<Cursor position="9496" topLine="348" />
-	</File>
-	<File name="../../code/game/g_utils.c" open="0" top="0" tabpos="0">
-		<Cursor position="15867" topLine="714" />
-	</File>
-	<File name="../../code/game/g_weapon.c" open="0" top="0" tabpos="12">
-		<Cursor position="3519" topLine="117" />
+	<File name="../../code/game/g_spawn.c" open="0" top="0" tabpos="0">
+		<Cursor position="2590" topLine="89" />
 	</File>
 	<File name="../../code/game/inv.h" open="0" top="0" tabpos="0">
-		<Cursor position="9678" topLine="315" />
+		<Cursor position="5980" topLine="183" />
+	</File>
+	<File name="../../code/qcommon/q_shared.c" open="0" top="0" tabpos="0">
+		<Cursor position="11298" topLine="610" />
 	</File>
 </CodeBlocks_layout_file>

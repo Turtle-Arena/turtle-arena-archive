@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
-#ifndef TMNTWEAPSYS2 // AMMO_WARNINGS
+#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
 /*
 ==============
 CG_CheckAmmo
@@ -39,15 +39,43 @@ void CG_CheckAmmo( void ) {
 	int		i;
 	int		total;
 	int		previous;
+#ifndef TMNTWEAPSYS2
 	int		weapons;
+#endif
 
 	// see about how many seconds of ammo we have remaining
+#ifndef TMNTWEAPSYS2
 	weapons = cg.snap->ps.stats[ STAT_WEAPONS ];
+#endif
 	total = 0;
-	for ( i = WP_MACHINEGUN ; i < WP_NUM_WEAPONS ; i++ ) {
+#ifdef TMNTWEAPSYS2
+	i = cg.snap->ps.weapon;
+#else
+#ifdef TMNTWEAPSYS_2
+	for ( i = 1 ; i < BG_NumWeaponGroups() ; i++ )
+#else
+	for ( i = WP_MACHINEGUN ; i < WP_NUM_WEAPONS ; i++ )
+#endif
+#endif
+	{
+#ifdef TMNTWEAPSYS
+		if (!BG_WeapUseAmmo(i)) {
+#ifndef TMNTWEAPSYS2
+			continue;
+#endif
+		}
+#ifdef TMNTWEAPSYS2
+		else
+#endif
+#endif
+#ifndef TMNTWEAPSYS2
 		if ( ! ( weapons & ( 1 << i ) ) ) {
 			continue;
 		}
+#endif
+#ifdef TMNTWEAPSYS_2
+		total += cg.snap->ps.ammo[i] * bg_weapongroupinfo[i].weapon[0]->attackDelay;
+#else
 		switch ( i ) {
 		case WP_ROCKET_LAUNCHER:
 		case WP_GRENADE_LAUNCHER:
@@ -62,6 +90,7 @@ void CG_CheckAmmo( void ) {
 			total += cg.snap->ps.ammo[i] * 200;
 			break;
 		}
+#endif
 		if ( total >= 5000 ) {
 			cg.lowAmmoWarning = 0;
 			return;

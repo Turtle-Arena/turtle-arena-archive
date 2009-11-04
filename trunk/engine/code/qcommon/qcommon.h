@@ -255,16 +255,12 @@ extern int demo_protocols[];
 
 #ifdef TMNT // Don't talk to quake3arena.com.
 #define	UPDATE_SERVER_NAME	""
-#elif defined SONIC
-#define	UPDATE_SERVER_NAME	""
 #else
 #define	UPDATE_SERVER_NAME	"update.quake3arena.com"
 #endif
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
 #ifdef TMNT // Don't talk to quake3arena.com.
-#define MASTER_SERVER_NAME	""
-#elif defined SONIC
 #define MASTER_SERVER_NAME	""
 #else
 #define MASTER_SERVER_NAME	"master.quake3arena.com"

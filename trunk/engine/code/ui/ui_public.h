@@ -88,7 +88,7 @@ typedef enum {
 	UI_CVAR_REGISTER,
 	UI_CVAR_UPDATE,
 	UI_MEMORY_REMAINING,
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
 	UI_GET_CDKEY,
 	UI_SET_CDKEY,
 #endif
@@ -118,7 +118,7 @@ typedef enum {
 	UI_CIN_DRAWCINEMATIC,
 	UI_CIN_SETEXTENTS,
 	UI_R_REMAP_SHADER,
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
 	UI_VERIFY_CDKEY,
 #endif
 	UI_LAN_SERVERSTATUS,
@@ -127,7 +127,9 @@ typedef enum {
 	UI_LAN_COMPARESERVERS,
 	// 1.32
 	UI_FS_SEEK,
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: punkbuster
 	UI_SET_PBCLSTATUS,
+#endif
 
 	UI_MEMSET = 100,
 	UI_MEMCPY,

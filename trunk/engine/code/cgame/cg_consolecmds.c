@@ -425,7 +425,9 @@ static void CG_StartOrbit_f( void ) {
 	}
 	if (cg_cameraOrbit.value != 0) {
 		trap_Cvar_Set ("cg_cameraOrbit", "0");
+#ifndef THIRD_PERSON
 		trap_Cvar_Set("cg_thirdPerson", "0");
+#endif
 	} else {
 		trap_Cvar_Set("cg_cameraOrbit", "5");
 		trap_Cvar_Set("cg_thirdPerson", "1");
@@ -568,7 +570,7 @@ static consoleCommand_t	commands[] = {
 #else
 	//{ "camera", CG_Camera_f },
 #endif
-#ifdef TMNTSP
+#ifdef TMNTMISC
 	{ "letterbox", CG_Letterbox },
 #endif
 	{ "loaddeferred", CG_LoadDeferredPlayers }	

@@ -45,14 +45,21 @@ MULTIPLAYER MENU (SERVER BROWSER)
 
 #define ART_BACK0				"menu/art/back_0"
 #define ART_BACK1				"menu/art/back_1"
+#ifndef TMNTMISC
 #define ART_CREATE0				"menu/art/create_0"
 #define ART_CREATE1				"menu/art/create_1"
+#endif
 #define ART_SPECIFY0			"menu/art/specify_0"
 #define ART_SPECIFY1			"menu/art/specify_1"
 #define ART_REFRESH0			"menu/art/refresh_0"
 #define ART_REFRESH1			"menu/art/refresh_1"
+#ifdef TMNTDATA // NO_MENU_FIGHT
+#define ART_CONNECT0			"menu/art/join_0"
+#define ART_CONNECT1			"menu/art/join_1"
+#else
 #define ART_CONNECT0			"menu/art/fight_0"
 #define ART_CONNECT1			"menu/art/fight_1"
+#endif
 #define ART_ARROWS0				"menu/art/arrows_vert_0"
 #define ART_ARROWS_UP			"menu/art/arrows_vert_top"
 #define ART_ARROWS_DOWN			"menu/art/arrows_vert_bot"
@@ -74,7 +81,9 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define ID_BACK				18
 #define ID_REFRESH			19
 #define ID_SPECIFY			20
+#ifndef TMNTMISC
 #define ID_CREATE			21
+#endif
 #define ID_CONNECT			22
 #define ID_REMOVE			23
 #ifdef IOQUAKE3 // Turtle Man: punkbuster
@@ -215,7 +224,7 @@ static char* netnames[] = {
 	NULL
 };
 
-#ifdef TMNT // Turtle Man: TODO: Add a url, ect?
+#ifdef TMNT // Turtle Man: TODO: Add a url, etc?
 static char quake3worldMessage[] = "";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
@@ -288,7 +297,9 @@ typedef struct {
 	menubitmap_s		back;
 	menubitmap_s		refresh;
 	menubitmap_s		specify;
+#ifndef TMNTMISC
 	menubitmap_s		create;
+#endif
 	menubitmap_s		go;
 
 	pinglist_t			pinglist[MAX_PINGREQUESTS];
@@ -782,7 +793,7 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 
 	Q_strncpyz( servernodeptr->mapname, Info_ValueForKey( info, "mapname"), MAX_MAPNAMELENGTH );
 	Q_CleanStr( servernodeptr->mapname );
-#ifndef IOQ3ZTM // Breaks on linux without pak files.
+#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 	Q_strupr( servernodeptr->mapname );
 #endif
 
@@ -1436,13 +1447,17 @@ static void ArenaServers_Event( void* ptr, int event ) {
 #ifdef IOQ3ZTM // SPECIFY_FAV
 		ArenaServers_StopRefresh();
 		ArenaServers_SaveChanges();
-#endif
+		UI_SpecifyServerMenu(qtrue);
+#else
 		UI_SpecifyServerMenu();
+#endif
 		break;
 
+#ifndef TMNTMISC
 	case ID_CREATE:
 		UI_StartServerMenu( qtrue );
 		break;
+#endif
 
 	case ID_CONNECT:
 		ArenaServers_Go();
@@ -1682,7 +1697,11 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.specify.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	g_arenaservers.specify.generic.callback = ArenaServers_Event;
 	g_arenaservers.specify.generic.id	    = ID_SPECIFY;
+#ifdef TMNTMISC
+	g_arenaservers.specify.generic.x		= 176;
+#else
 	g_arenaservers.specify.generic.x		= 128;
+#endif
 	g_arenaservers.specify.generic.y		= 480-64;
 	g_arenaservers.specify.width  		    = 128;
 	g_arenaservers.specify.height  		    = 64;
@@ -1693,12 +1712,17 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.refresh.generic.flags	= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	g_arenaservers.refresh.generic.callback	= ArenaServers_Event;
 	g_arenaservers.refresh.generic.id		= ID_REFRESH;
+#ifdef TMNTMISC
+	g_arenaservers.refresh.generic.x		= 352;
+#else
 	g_arenaservers.refresh.generic.x		= 256;
+#endif
 	g_arenaservers.refresh.generic.y		= 480-64;
 	g_arenaservers.refresh.width			= 128;
 	g_arenaservers.refresh.height			= 64;
 	g_arenaservers.refresh.focuspic			= ART_REFRESH1;
 
+#ifndef TMNTMISC
 	g_arenaservers.create.generic.type		= MTYPE_BITMAP;
 	g_arenaservers.create.generic.name		= ART_CREATE0;
 	g_arenaservers.create.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1709,6 +1733,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.create.width				= 128;
 	g_arenaservers.create.height			= 64;
 	g_arenaservers.create.focuspic			= ART_CREATE1;
+#endif
 
 	g_arenaservers.go.generic.type			= MTYPE_BITMAP;
 	g_arenaservers.go.generic.name			= ART_CONNECT0;
@@ -1761,7 +1786,9 @@ static void ArenaServers_MenuInit( void ) {
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.back );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.specify );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.refresh );
+#ifndef TMNTMISC
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.create );
+#endif
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.go );
 
 #ifdef IOQUAKE3 // Turtle Man: punkbuster
@@ -1809,8 +1836,10 @@ ArenaServers_Cache
 void ArenaServers_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_BACK0 );
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
+#ifndef TMNTMISC
 	trap_R_RegisterShaderNoMip( ART_CREATE0 );
 	trap_R_RegisterShaderNoMip( ART_CREATE1 );
+#endif
 	trap_R_RegisterShaderNoMip( ART_SPECIFY0 );
 	trap_R_RegisterShaderNoMip( ART_SPECIFY1 );
 	trap_R_RegisterShaderNoMip( ART_REFRESH0 );

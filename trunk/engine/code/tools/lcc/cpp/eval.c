@@ -107,8 +107,13 @@ eval(Tokenrow *trp, int kw)
 
 	trp->tp++;
 	if (kw==KIFDEF || kw==KIFNDEF) {
-		if (trp->lp - trp->bp != 4 || trp->tp->type!=NAME)
-		{
+		if (
+#if 1 // Turtle Man: FIXME: Only happens on 64 bit TMNT Arena
+		(trp->lp - trp->bp != 4 && trp->lp - trp->bp != 5) ||
+#else
+		trp->lp - trp->bp != 4 ||
+#endif
+		trp->tp->type!=NAME) {
 			error(ERROR, "Syntax error in #ifdef/#ifndef");
 			return 0;
 		}
