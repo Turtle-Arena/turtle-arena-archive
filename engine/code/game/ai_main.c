@@ -1081,7 +1081,7 @@ int BotAI(int client, float thinktime) {
         else if (bs->weaponnum != 0
 			&& bs->weaponnum != bs->cur_ps.stats[STAT_NEWWEAPON])
         {
-#ifndef TMNTRELEASE
+#if 0 // Turtle Man: Fixed bots wanting weapons they can't have, so this doesn't happen anymore.
 			if (bs->cur_ps.weapon == bs->cur_ps.stats[STAT_DEFAULTWEAPON])
 				Com_Printf("DEBUG: bot wants weapon %i, but can't have it only %i\n", bs->weaponnum, bs->cur_ps.weapon);
 			else
@@ -1236,6 +1236,7 @@ int BotAISetupClient(int client, struct bot_settings_s *settings, qboolean resta
 		trap_BotFreeGoalState(bs->gs);
 		return qfalse;
 	}
+#ifndef TMNTWEAPSYS_2 // BOT_WEAP_WEIGHTS
 	//allocate a weapon state
 	bs->ws = trap_BotAllocWeaponState();
 	//load the weapon weights
@@ -1246,6 +1247,7 @@ int BotAISetupClient(int client, struct bot_settings_s *settings, qboolean resta
 		trap_BotFreeWeaponState(bs->ws);
 		return qfalse;
 	}
+#endif
 	//allocate a chat state
 	bs->cs = trap_BotAllocChatState();
 	//load the chat file
@@ -1255,7 +1257,9 @@ int BotAISetupClient(int client, struct bot_settings_s *settings, qboolean resta
 	if (errnum != BLERR_NOERROR) {
 		trap_BotFreeChatState(bs->cs);
 		trap_BotFreeGoalState(bs->gs);
+#ifndef TMNTWEAPSYS_2 // BOT_WEAP_WEIGHTS
 		trap_BotFreeWeaponState(bs->ws);
+#endif
 		return qfalse;
 	}
 	//get the gender characteristic
@@ -1319,8 +1323,10 @@ int BotAIShutdownClient(int client, qboolean restart) {
 	trap_BotFreeGoalState(bs->gs);
 	//free the chat file
 	trap_BotFreeChatState(bs->cs);
+#ifndef TMNTWEAPSYS_2 // BOT_WEAP_WEIGHTS
 	//free the weapon weights
 	trap_BotFreeWeaponState(bs->ws);
+#endif
 	//free the bot character
 	trap_BotFreeCharacter(bs->character);
 	//
@@ -1386,7 +1392,9 @@ void BotResetState(bot_state_t *bs) {
 	//reset several states
 	if (bs->ms) trap_BotResetMoveState(bs->ms);
 	if (bs->gs) trap_BotResetGoalState(bs->gs);
+#ifndef TMNTWEAPSYS_2 // BOT_WEAP_WEIGHTS
 	if (bs->ws) trap_BotResetWeaponState(bs->ws);
+#endif
 	if (bs->gs) trap_BotResetAvoidGoals(bs->gs);
 	if (bs->ms) trap_BotResetAvoidReach(bs->ms);
 }
@@ -1401,8 +1409,32 @@ int BotAILoadMap( int restart ) {
 	vmCvar_t	mapname;
 
 	if (!restart) {
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+		static bot_shareditem_t itemInfos[MAX_BG_WEAPON_GROUPS];
+		int i;
+		int item;
+
+		Com_Memset(&itemInfos, 0, sizeof(itemInfos));
+
+		// Setup weapon item info.
+		for (i = 1, item = 0; i < BG_NumWeaponGroups(); i++)
+		{
+			if (!bg_weapongroupinfo[i].item.classname)
+				continue;
+
+			Q_strncpyz(itemInfos[item].classname, bg_weapongroupinfo[i].item.classname, 32);
+			Q_strncpyz(itemInfos[item].name, bg_weapongroupinfo[i].name, MAX_QPATH);
+			Q_strncpyz(itemInfos[item].model, bg_weapongroupinfo[i].pickupModel, MAX_QPATH);
+			itemInfos[item].modelindex = BG_ItemNumForItem(BG_FindItemForWeapon(i));
+			item++;
+		}
+
+		trap_Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
+		trap_BotLibLoadMap( mapname.string, (void*)itemInfos );
+#else
 		trap_Cvar_Register( &mapname, "mapname", "", CVAR_SERVERINFO | CVAR_ROM );
 		trap_BotLibLoadMap( mapname.string );
+#endif
 	}
 
 	for (i = 0; i < MAX_CLIENTS; i++) {
@@ -1439,7 +1471,9 @@ int BotAIStartFrame(int time) {
 
 	G_CheckBotSpawn();
 
+#ifndef TMNTWEAPONS
 	trap_Cvar_Update(&bot_rocketjump);
+#endif
 	trap_Cvar_Update(&bot_grapple);
 	trap_Cvar_Update(&bot_fastchat);
 	trap_Cvar_Update(&bot_nochat);
@@ -1690,26 +1724,18 @@ int BotInitLibrary(void) {
 	trap_Cvar_VariableStringBuffer("fs_homepath", buf, sizeof(buf));
 	if (strlen(buf)) trap_BotLibVarSet("homedir", buf);
 	//
-#ifdef IOQ3ZTM // Turtle Man: Always sure these are correct...
-#ifdef TMNTWEAPSYS_2 // Use index from file.
+#ifdef TMNTWEAPSYS_2 // Use correct index
 	trap_BotLibVarSet("weapindex_rocket", va("%i", BG_WeaponGroupIndexForName("wp_rocket_launcher")));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", BG_WeaponGroupIndexForName("wp_grappling_hook")));
-#else
+#elif defined IOQ3ZTM // Turtle Man: Always sure these are correct...
 	trap_BotLibVarSet("weapindex_rocket", va("%i", WP_ROCKET_LAUNCHER));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", WP_GRAPPLING_HOOK));
-#endif
 #endif
 #ifdef TMNT
 	trap_BotLibDefine("TMNT");
 #endif
 #ifdef TMNTWEAPONS
 	trap_BotLibDefine("TMNTWEAPONS");
-#endif
-#ifdef SONIC
-	trap_BotLibDefine("SONIC");
-#endif
-#ifdef SONICWEAPONS
-	trap_BotLibDefine("SONICWEAPONS");
 #endif
 #ifdef MISSIONPACK
 	trap_BotLibDefine("MISSIONPACK");

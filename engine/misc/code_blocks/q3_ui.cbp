@@ -61,14 +61,15 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-O2" />
+					<Add option="-W" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_USRDLL" />
 					<Add option="-DQ3_UI_EXPORTS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-W" />
-					<Add option="-O2" />
+					<Add option="-DMISSIONPACK" />
 				</Compiler>
 			</Target>
 			<Target title="Debug Win32">
@@ -79,15 +80,16 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_USRDLL" />
 					<Add option="-DUI_EXPORTS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-W" />
-					<Add option="-g" />
-					<Add option="-O0" />
+					<Add option="-DMISSIONPACK" />
 				</Compiler>
 				<Linker>
 					<Add library="odbc32" />
@@ -99,23 +101,36 @@
 			<Add option="-DSTANDALONE" />
 			<Add option="-DRANDOMBOT" />
 			<Add option="-DCELSHADING" />
+			<Add option="-DIOQ3ZTM" />
+			<Add option="-DIOQ3ZTM_NO_COMPAT" />
+			<Add option="-DIOQ3ZTM_NO_TEAM_MODEL" />
+			<Add option="-DNOTRATEDM" />
+			<Add option="-DNOBLOOD" />
+			<Add option="-DTHIRD_PERSON" />
+			<Add option="-DRAVENMD4" />
 			<Add option="-DTMNT" />
+			<Add option="-DTMNTMISC" />
 			<Add option="-DTMNTHUD" />
+			<Add option="-DTMNTSP" />
+			<Add option="-DTMNTHOLDSYS" />
 			<Add option="-DTMNTHOLDABLE" />
 			<Add option="-DTMNTWEAPSYS" />
 			<Add option="-DTMNTWEAPSYS2" />
 			<Add option="-DTMNTWEAPONS" />
-			<Add option="-DTMNTSP" />
+			<Add option="-DTMNTPLAYERSYS" />
 			<Add option="-DTMNTPLAYERS" />
-			<Add option="-DTMNTSKIN" />
 			<Add option="-DTMNT_SUPPORTQ3" />
-			<Add option="-DTMNTENTITIES" />
-			<Add option="-DTMNTPATHS" />
-			<Add option="-DSINGLEPLAYER" />
-			<Add option="-DSP_NPC" />
-			<Add option="-DTMNTHOLDABLE2" />
-			<Add option="-DRAVENMDR" />
+			<Add option="-DTMNTENTSYS" />
+			<Add option="-DTMNTPATHSYS" />
+			<Add option="-DTMNTNPCSYS" />
+			<Add option="-DTMNTDATASYS" />
+			<Add option="-DTMNTDATA" />
+			<Add option="-DTMNTWEAPSYS_2" />
+			<Add option="-DTMNTWEAPSYS_2_NOCOMPAT" />
+			<Add option="-DOA_BLOOM" />
+			<Add option="-DNIGHTSMODE" />
 			<Add option="-DCAMERASCRIPT" />
+			<Add option="-DTMNT_GAME_MODELS" />
 		</Compiler>
 		<Unit filename="..\..\code\game\bg_misc.c">
 			<Option compilerVar="CC" />
@@ -210,6 +225,11 @@
 			<Option target="Debug Win32" />
 		</Unit>
 		<Unit filename="..\..\code\q3_ui\ui_mods.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="..\..\code\q3_ui\ui_multiplayer.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
@@ -342,7 +362,10 @@
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\qcommon\q_shared.h" />
+		<Unit filename="..\..\code\qcommon\q_shared.h">
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
 		<Unit filename="..\..\code\ui\ui_syscalls.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />

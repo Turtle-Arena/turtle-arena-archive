@@ -224,6 +224,10 @@ static void CG_General( centity_t *cent ) {
 		ent.renderfx |= RF_THIRD_PERSON;	// only draw from mirrors
 	}
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Rotate Team Arena protals.
+	VectorCopy(cent->currentState.angles, cent->lerpAngles);
+#endif
+
 	// convert angles to axis
 	AnglesToAxis( cent->lerpAngles, ent.axis );
 
@@ -232,13 +236,14 @@ static void CG_General( centity_t *cent ) {
 }
 
 #ifdef TMNTENTSYS // MISC_OBJECT
-static void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *backlerp ) {
+void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *backlerp )
+{
 	entityState_t		*s1;
 
 	s1 = &cent->currentState;
 
 	// Unanimated misc_object
-	if (cent->miscObj.anim == OBJECT_NONE)
+	if (cent->oe.anim == OBJECT_NONE)
 	{
 		*frame = 0; //s1->frame; // ?
 		*oldframe = *frame;
@@ -249,10 +254,10 @@ static void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, fl
 		// Animated misc_object
 
 		// Check for animation change
-		if (s1->modelindex2 != cent->miscObj.anim)
+		if (s1->modelindex2 != cent->oe.anim)
 		{
-#if 0 // DEBUG: Debug misc_object
-			int from = (cent->miscObj.anim & ~ANIM_TOGGLEBIT);
+#if 0 // DEBUG: Debug misc_object/NPC
+			int from = (cent->oe.anim & ~ANIM_TOGGLEBIT);
 			int to = (s1->modelindex2 & ~ANIM_TOGGLEBIT);
 			if (to == from) // reset anim
 			{
@@ -263,27 +268,61 @@ static void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, fl
 				CG_Printf("Object animation changed to %d from %d\n", to, from);
 			}
 #endif
-			cent->miscObj.anim = s1->modelindex2;
+			cent->oe.anim = s1->modelindex2;
 
 #if 0
 			// Do we need to clear it?
-			BG_ClearLerpFrame( &cent->miscObj.lerp, cent->miscObj.animations, cent->miscObj.anim, cg.time);
+			BG_ClearLerpFrame( &cent->oe.lerp, cent->objectcfg.animations, cent->oe.anim, cg.time);
 #endif
 		}
 
-		BG_RunLerpFrame( &cent->miscObj.lerp, cent->miscObj.animations, cent->miscObj.anim,
-			cg.time, cent->miscObj.speed );
+		BG_RunLerpFrame( &cent->oe.lerp, cent->objectcfg.animations, cent->oe.anim,
+			cg.time, cent->oe.speed );
 
-		*frame = cent->miscObj.lerp.frame;
-		if (cent->miscObj.flags & MOF_NOLERP)
+		// If we didn't play a sound this frame
+		if (cent->oe.lastSoundFrame != cent->oe.lerp.frame)
+		{
+			int i, snd;
+
+			// Clear last played sound
+			cent->oe.lastSoundFrame = -1;
+
+			// Check if we need to play a sound.
+			for (i = 0; i < MAX_BG_SOUNDS; i++)
+			{
+				if (!cent->oe.sounds[i].numSounds)
+					continue;
+				if (cent->oe.sounds[i].anim != cent->oe.anim)
+					continue;
+				if ((cent->objectcfg.animations[cent->oe.anim].firstFrame +
+					cent->oe.sounds[i].frame) != cent->oe.lerp.frame)
+				{
+					continue;
+				}
+				//
+				if (rand()%100 < cent->oe.sounds[i].chance)
+				{
+					continue;
+				}
+
+				// Found sound to play
+				snd = rand() % cent->oe.sounds[i].numSounds;
+				trap_S_StartSound(NULL, cent->currentState.number, CHAN_BODY, cent->oe.sounds[i].sounds[snd]);
+				cent->oe.lastSoundFrame = cent->oe.lerp.frame;
+				break;
+			}
+		}
+
+		*frame = cent->oe.lerp.frame;
+		if (cent->objectcfg.lerpframes == 0)
 		{
 			*oldframe = *frame;
 			*backlerp = 0;
 		}
 		else
 		{
-		*oldframe = cent->miscObj.lerp.oldFrame;
-		*backlerp = cent->miscObj.lerp.backlerp;
+			*oldframe = cent->oe.lerp.oldFrame;
+			*backlerp = cent->oe.lerp.backlerp;
 	}
 }
 }
@@ -305,77 +344,124 @@ void CG_SetFileExt(char *filename, char *ext)
 static void CG_MiscObject( centity_t *cent ) {
 	refEntity_t			ent;
 	entityState_t		*s1;
+#ifdef TMNTNPCSYS
+	qboolean		isNPC;
+#endif
+	float			scale;
+
+	scale = 1.0f;
 
 	s1 = &cent->currentState;
 
+#ifdef TMNTNPCSYS
+	isNPC = (s1->eType == ET_NPC);
+	if (isNPC)
+	{
+		if ( s1->modelindex >= BG_NumNPCs() )
+		{
+			CG_Error( "Bad NPC index %i on entity", s1->modelindex );
+		}
+	}
+#endif
+
 	// if set to invisible, skip
-	if (!s1->modelindex) {
+	if ( !s1->modelindex || ( s1->eFlags & EF_NODRAW ) ) {
 		return;
 	}
 
 	// Check if config was loaded
-	if (!(cent->miscObj.flags & MOF_SETUP))
+	if (!(cent->oe.flags & MOF_SETUP))
 	{
-		int lerpframes = -2;
 		const char *modelName;
 		char filename[MAX_QPATH];
 
-		const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
-		{
-			"OBJECT_NORMAL",
-			"OBJECT_DAMAGED1",
-			"OBJECT_DAMAGED2",
-			"OBJECT_DAMAGED3",
-			"OBJECT_KILLED"
-		};
-
-		cent->miscObj.flags |= MOF_SETUP;
+		cent->oe.flags |= MOF_SETUP;
 
 		// Set defaults
-		cent->miscObj.speed = 1.0f;
+		cent->oe.speed = 1.0f;
 
+#ifdef TMNTNPCSYS
+		if (isNPC)
+		{
+			modelName = bg_npcinfo[s1->modelindex].model;
+		}
+		else
+#endif
+		{
 		modelName = CG_ConfigString( CS_MODELS + s1->modelindex );
+		}
 
 		Q_strncpyz(filename, modelName, MAX_QPATH);
 
 		CG_SetFileExt(filename, ".cfg");
 
-		if (BG_ParseObjectCFGFile(filename, misc_object_anim_names,
-			cent->miscObj.animations, MAX_MISC_OBJECT_ANIMATIONS,
-			NULL, NULL, NULL, NULL, &cent->miscObj.speed, &lerpframes))
+		if (BG_ParseObjectCFGFile(filename, &cent->objectcfg))
 		{
-			if (lerpframes == 0)
-				cent->miscObj.flags |= MOF_NOLERP;
-			else
-				cent->miscObj.flags &= ~MOF_NOLERP;
 			// Loaded file.
-			cent->miscObj.anim = 0;
-			BG_ClearLerpFrame( &cent->miscObj.lerp, cent->miscObj.animations, cent->miscObj.anim, cg.time);
+			cent->oe.anim = 0;
+			BG_ClearLerpFrame( &cent->oe.lerp, cent->objectcfg.animations, cent->oe.anim, cg.time);
 		}
 		else
 		{
 			// No config file or failed to load cfg file,
 			// so disable animation.
-			cent->miscObj.anim = -1;
+			cent->oe.anim = OBJECT_NONE;
 		}
 	}
+
+#if 0 // Sprite misc_objects and NPCs?
+	if ( isNPC && !cg_npcs[ s1->modelindex ].model )
+	{
+		memset( &ent, 0, sizeof( ent ) );
+		ent.reType = RT_SPRITE;
+		VectorCopy( cent->lerpOrigin, ent.origin );
+		ent.radius = 14;
+		ent.customShader = cg_npcs[ es->modelindex ].sprite;
+		ent.shaderRGBA[0] = 255;
+		ent.shaderRGBA[1] = 255;
+		ent.shaderRGBA[2] = 255;
+		ent.shaderRGBA[3] = 255;
+		trap_R_AddRefEntityToScene(&ent);
+		return;
+	}
+#endif
 
 	memset (&ent, 0, sizeof(ent));
 
 	// set frame
 	CG_MiscObjectAnimate(cent, &ent.oldframe, &ent.frame, &ent.backlerp);
 
+	ent.nonNormalizedAxes = qfalse;
+
+	// increase the size
+	if ( scale != 1.0f ) {
+		VectorScale( ent.axis[0], scale, ent.axis[0] );
+		VectorScale( ent.axis[1], scale, ent.axis[1] );
+		VectorScale( ent.axis[2], scale, ent.axis[2] );
+		ent.nonNormalizedAxes = qtrue;
+	}
+
 	VectorCopy( cent->lerpOrigin, ent.origin);
 	VectorCopy( cent->lerpOrigin, ent.oldorigin);
 
+#ifdef TMNTNPCSYS
+	if (isNPC)
+	{
+		ent.hModel = cg_npcs[ s1->modelindex ].model;
+		ent.customSkin = cg_npcs[ s1->modelindex ].skin;
+	}
+	else
+#endif
+	{
 	ent.hModel = cgs.gameModels[s1->modelindex];
+	}
 
 	// Flags for only drawing or not drawing a object in mirrors
-	if (cent->miscObj.flags & MOF_ONLY_MIRROR)
+	if (cent->oe.flags & MOF_ONLY_MIRROR)
 	{
 		ent.renderfx |= RF_ONLY_MIRROR;
 	}
-	else if (cent->miscObj.flags & MOF_NOT_MIRROR)
+	else if (cent->oe.flags & MOF_NOT_MIRROR)
 	{
 		ent.renderfx |= RF_NOT_MIRROR;
 	}
@@ -385,6 +471,98 @@ static void CG_MiscObject( centity_t *cent ) {
 
 	// add to refresh list
 	trap_R_AddRefEntityToScene (&ent);
+
+#ifdef TMNTNPCSYS
+	// Add NPC's weapon
+	// Turtle Man: TODO: Can I reuse the player weapon drawing code?
+	if (isNPC &&
+#ifdef TMNTWEAPSYS_2
+		s1->weapon > WP_NONE && s1->weapon < BG_NumWeaponGroups()
+#else
+		s1->weapon > WP_NONE && s1->weapon < WP_NUM_WEAPONS
+#endif
+		)
+	{
+		refEntity_t	weapon;
+
+		memset( &weapon, 0, sizeof( weapon ) );
+
+#ifdef TMNTWEAPSYS_2
+		weapon.hModel = cg_weapons[bg_weapongroupinfo[s1->weapon].weaponnum[0]].weaponModel;
+#else
+		weapon.hModel = cg_weapons[s1->weapon].weaponModel;
+#endif
+		weapon.customSkin = 0;
+
+		VectorCopy( ent.lightingOrigin, weapon.lightingOrigin );
+		weapon.shadowPlane = ent.shadowPlane;
+		weapon.renderfx = ent.renderfx;
+
+		CG_PositionRotatedEntityOnTag( &weapon, &ent, weapon.hModel, "tag_weapon" );
+
+		AxisCopy( ent.axis, weapon.axis );
+		weapon.nonNormalizedAxes = ent.nonNormalizedAxes;
+
+		trap_R_AddRefEntityToScene( &weapon );
+
+		// Add barrel
+#ifdef TMNTWEAPSYS_2
+		if (cg_weapons[bg_weapongroupinfo[s1->weapon].weaponnum[0]].barrelModel)
+#else
+		if (cg_weapons[s1->weapon].barrelModel)
+#endif
+		{
+			refEntity_t	barrel;
+
+			memset( &barrel, 0, sizeof( barrel ) );
+
+#ifdef TMNTWEAPSYS_2
+			barrel.hModel = cg_weapons[bg_weapongroupinfo[s1->weapon].weaponnum[0]].barrelModel;
+#else
+			barrel.hModel = cg_weapons[s1->weapon].barrelModel;
+#endif
+			barrel.customSkin = weapon.customSkin;
+
+			VectorCopy( weapon.lightingOrigin, barrel.lightingOrigin );
+			barrel.shadowPlane = weapon.shadowPlane;
+			barrel.renderfx = weapon.renderfx;
+
+			CG_PositionRotatedEntityOnTag( &barrel, &weapon, weapon.hModel, "tag_barrel" );
+
+			AxisCopy( weapon.axis, barrel.axis );
+			barrel.nonNormalizedAxes = weapon.nonNormalizedAxes;
+
+			trap_R_AddRefEntityToScene( &barrel );
+		}
+
+		// Turtle Man: TODO: Add weapon2 for melee weapons.
+	}
+#endif
+}
+#endif
+
+#ifdef TMNTNPCSYS
+/*
+=================
+CG_RegisterNPCVisuals
+=================
+*/
+void CG_RegisterNPCVisuals( int npcNum ) {
+	bg_npcinfo_t	*npc;
+	npcInfo_t		*npcInfo;
+
+	npcInfo = &cg_npcs[npcNum];
+	if ( npcInfo->registered ) {
+		return;
+	}
+
+	npc = &bg_npcinfo[npcNum];
+
+	memset( npcInfo, 0, sizeof( &npcInfo ) );
+	npcInfo->registered = qtrue;
+
+	npcInfo->model = trap_R_RegisterModel( npc->model );
+	npcInfo->skin = 0; //todo
 }
 #endif
 
@@ -492,10 +670,17 @@ static void CG_Item( centity_t *cent ) {
 
 	memset (&ent, 0, sizeof(ent));
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black.
+	ent.shaderRGBA[0] = 255;
+	ent.shaderRGBA[1] = 255;
+	ent.shaderRGBA[2] = 255;
+	ent.shaderRGBA[3] = 255;
+#endif
+
 #ifdef TMNT // CRATE
-	if (item->giType == IT_CRATE)
-		; // Don't rotate automaticly.
-	else
+	if (item->giType == IT_CRATE) {
+		// Don't rotate automaticly.
+	} else
 #endif
 	// autorotate at one of two speeds
 	if ( item->giType == IT_HEALTH ) {
@@ -560,6 +745,20 @@ static void CG_Item( centity_t *cent ) {
 
 	// if just respawned, slowly scale up
 	msec = cg.time - cent->miscTime;
+#ifdef IOQ3ZTM // Turtle Man: TEST
+	// Doesn't work well with poperup shaders as they use alphagen...
+	if ( msec >= 0 && msec < 3000 ) {
+		frac = (float)msec / 3000;
+		ent.shaderRGBA[3] = frac*255;
+		if (ent.shaderRGBA[3] < 1)
+			ent.shaderRGBA[3] = 1;
+		if (ent.shaderRGBA[3] >= 255)
+			ent.shaderRGBA[3] = 254;
+		ent.renderfx |= RF_FORCE_ENT_ALPHA;
+	} else {
+		frac = 1.0;
+	}
+#else
 	if ( msec >= 0 && msec < ITEM_SCALEUP_TIME ) {
 		frac = (float)msec / ITEM_SCALEUP_TIME;
 		VectorScale( ent.axis[0], frac, ent.axis[0] );
@@ -569,6 +768,7 @@ static void CG_Item( centity_t *cent ) {
 	} else {
 		frac = 1.0;
 	}
+#endif
 
 	// items without glow textures need to keep a minimum light value
 	// so they are always visible
@@ -604,7 +804,7 @@ static void CG_Item( centity_t *cent ) {
 	// add to refresh list
 	trap_R_AddRefEntityToScene(&ent);
 
-#ifdef MISSIONPACK
+#if defined MISSIONPACK || defined TMNTWEAPSYS_2
 	if ( item->giType == IT_WEAPON
 #ifdef TMNTWEAPSYS_2
 		&& (cg_weapons[bg_weapongroupinfo[item->giTag].weaponnum[0]].barrelModel ||
@@ -722,29 +922,6 @@ static void CG_Shuriken( centity_t *cent, holdable_t holdable ) {
 	refEntity_t			ent;
 	entityState_t		*s1;
 
-/*
-	// add trails
-	if ( weapon->missileTrailFunc )
-	{
-		weapon->missileTrailFunc( cent, weapon );
-	}
-
-	// add dynamic light
-	if ( weapon->missileDlight ) {
-		trap_R_AddLightToScene(cent->lerpOrigin, weapon->missileDlight,
-			weapon->missileDlightColor[0], weapon->missileDlightColor[1], weapon->missileDlightColor[2] );
-	}
-
-	// add missile sound
-	if ( weapon->missileSound ) {
-		vec3_t	velocity;
-
-		BG_EvaluateTrajectoryDelta( &cent->currentState.pos, cg.time, velocity );
-
-		trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, velocity, weapon->missileSound );
-	}
-*/
-
 	s1 = &cent->currentState;
 
 	// create the render entity
@@ -777,8 +954,6 @@ static void CG_Shuriken( centity_t *cent, holdable_t holdable ) {
 	ent.renderfx = RF_NOSHADOW;
 
 	// spin pitch and use fired yaw!
-	//if (qtrue)
-	{
 		if ( s1->pos.trType != TR_STATIONARY )
 		{
 			cent->lerpAngles[0] = cg.autoAngles[1]; // Spin pitch!
@@ -790,39 +965,9 @@ static void CG_Shuriken( centity_t *cent, holdable_t holdable ) {
 		cent->lerpAngles[1] = s1->angles[1];		// Angle it was shot at.
 		cent->lerpAngles[2] = 0;					// Don't roll.
 		AnglesToAxis( cent->lerpAngles, ent.axis );
-	}
-#if 0
-	// CG_Missile spin code.
-	else // spin roll and point pitch to dir of travel.
-	{
-	// convert direction of travel into axis
-	if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
-		ent.axis[0][2] = 1;
-	}
-
-	// spin as it moves
-	if ( s1->pos.trType != TR_STATIONARY ) {
-			RotateAroundDirection( ent.axis, cg.time / 4 );
-	} else {
-#if defined MISSIONPACK && !defined TMNTWEAPONS
-			if ( s1->weapon == WP_PROX_LAUNCHER ) {
-				AnglesToAxis( cent->lerpAngles, ent.axis );
-			}
-			else
-#endif
-			{
-				RotateAroundDirection( ent.axis, s1->time );
-			}
-		}
-	}
-#endif
 
 	// add to refresh list, possibly with quad glow
-#ifdef TMNT // EF_TELE_EFFECT
-	CG_AddRefEntityWithPowerups( &ent, cent, TEAM_FREE );
-#else
 	CG_AddRefEntityWithPowerups( &ent, s1, TEAM_FREE );
-#endif
 }
 #endif
 
@@ -861,7 +1006,7 @@ static void CG_Missile( centity_t *cent ) {
 #else
 	s1 = &cent->currentState;
 #ifdef TMNTWEAPSYS_2
-	if ( s1->weapon >= MAX_BG_PROJ )
+	if ( s1->weapon >= BG_NumProjectiles() )
 #elif defined IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
 	if ( s1->weapon >= WP_NUM_WEAPONS )
 #else
@@ -948,8 +1093,6 @@ static void CG_Missile( centity_t *cent ) {
 
 #ifdef TMNTWEAPSYS_2
 	if ( projectile->spriteShader )
-#elif defined TMNTWEAPONS
-	if ( cent->currentState.weapon == WP_ELECTRIC_LAUNCHER )
 #else
 	if ( cent->currentState.weapon == WP_PLASMAGUN )
 #endif
@@ -973,15 +1116,19 @@ static void CG_Missile( centity_t *cent ) {
 	// flicker between two skins
 	ent.skinNum = cg.clientFrame & 1;
 #ifdef TMNTWEAPSYS_2
+	if (s1->generic1 == TEAM_BLUE) {
+		ent.hModel = projectile->missileModelBlue;
+	} else if (s1->generic1 == TEAM_RED) {
+		ent.hModel = projectile->missileModelRed;
+	} else {
 	ent.hModel = projectile->missileModel;
+	}
 	ent.renderfx = projectile->missileRenderfx | RF_NOSHADOW;
 #else
 	ent.hModel = weapon->missileModel;
 	ent.renderfx = weapon->missileRenderfx | RF_NOSHADOW;
-#endif
 
-#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME: Support Team Arena?...
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#ifdef MISSIONPACK
 	if ( cent->currentState.weapon == WP_PROX_LAUNCHER ) {
 		if (s1->generic1 == TEAM_BLUE) {
 			ent.hModel = cgs.media.blueProxMine;
@@ -991,62 +1138,51 @@ static void CG_Missile( centity_t *cent ) {
 #endif
 
 #ifdef TMNTWEAPSYS_2
-	// spin as it moves
-	switch (bg_projectileinfo[s1->weapon].spinType)
+	if (s1->pos.trType == TR_STATIONARY &&
+		bg_projectileinfo[s1->weapon].stickOnImpact)
 	{
-		case PS_ROLL:
-		default:
+		//AnglesToAxis( s1->angles, ent.axis );
+		AnglesToAxis( cent->lerpAngles, ent.axis );
+	}
+	else
+	{
 			// convert direction of travel into axis
 			if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
 				ent.axis[0][2] = 1;
 			}
 
+		// Set the angles
+		vectoangles( ent.axis[0], cent->lerpAngles );
+
+		// spin as it moves
+		switch (bg_projectileinfo[s1->weapon].spinType)
+		{
+			case PS_ROLL:
+			default:
 			if ( s1->pos.trType != TR_STATIONARY ) {
 				RotateAroundDirection( ent.axis, cg.time / 4 );
 			} else {
-#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME: Support Team Arena?...
-#if defined MISSIONPACK && !defined TMNTWEAPONS
-				if ( s1->weapon == WP_PROX_LAUNCHER ) {
-					AnglesToAxis( cent->lerpAngles, ent.axis );
-				}
-				else
-#endif
-#endif
-				{
 					RotateAroundDirection( ent.axis, s1->time );
 				}
-			}
 			break;
 		case PS_NONE:
-			// convert direction of travel into axis
-			if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
-				ent.axis[0][2] = 1;
-			}
+				AnglesToAxis( cent->lerpAngles, ent.axis );
 			break;
-			// Turtle Man: TODO: Use the yaw/pitch that missile is moving
 		case PS_PITCH:
-			// spin pitch and use fired yaw!
-			if ( s1->pos.trType != TR_STATIONARY )
-			{
+				// spin pitch!
+				if ( s1->pos.trType != TR_STATIONARY ) {
 				cent->lerpAngles[0] = cg.autoAngles[1]; // Spin pitch!
 			}
-			else
-			{
-				// Does the "engine" change lerpAngles[0] or is it the last value it was?
-				AnglesToAxis( cent->lerpAngles, ent.axis );
-			}
-			// Turtle Man: TODO: Use vectoyaw?
-			cent->lerpAngles[1] = s1->angles[1];		// Angle it was shot at.
-			cent->lerpAngles[2] = 0;					// Don't roll.
 			AnglesToAxis( cent->lerpAngles, ent.axis );
 			break;
 		case PS_YAW:
-			// spin yaw and use fired pitch!
-			cent->lerpAngles[0] = s1->angles[0];		// Angle it was shot at.
+				// spin yaw!
+				if ( s1->pos.trType != TR_STATIONARY ) {
 			cent->lerpAngles[1] = cg.autoAngles[1];		// Spin yaw!
-			cent->lerpAngles[2] = 0;					// Don't roll.
+				}
 			AnglesToAxis( cent->lerpAngles, ent.axis );
 			break;
+	}
 	}
 #else
 	// convert direction of travel into axis
@@ -1058,7 +1194,7 @@ static void CG_Missile( centity_t *cent ) {
 	if ( s1->pos.trType != TR_STATIONARY ) {
 		RotateAroundDirection( ent.axis, cg.time / 4 );
 	} else {
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#ifdef MISSIONPACK
 		if ( s1->weapon == WP_PROX_LAUNCHER ) {
 			AnglesToAxis( cent->lerpAngles, ent.axis );
 		}
@@ -1071,8 +1207,8 @@ static void CG_Missile( centity_t *cent ) {
 #endif
 
 	// add to refresh list, possibly with quad glow
-#ifdef TMNT // EF_TELE_EFFECT
-	CG_AddRefEntityWithPowerups( &ent, cent, TEAM_FREE );
+#ifdef TMNTWEAPSYS_2
+	CG_AddRefEntityWithPowerups( &ent, s1, s1->generic1 );
 #else
 	CG_AddRefEntityWithPowerups( &ent, s1, TEAM_FREE );
 #endif
@@ -1096,7 +1232,7 @@ static void CG_Grapple( centity_t *cent ) {
 
 	s1 = &cent->currentState;
 #ifdef TMNTWEAPSYS_2
-	if ( s1->weapon >= MAX_BG_PROJ )
+	if ( s1->weapon >= BG_NumProjectiles() )
 #elif defined IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
 	if ( s1->weapon >= WP_NUM_WEAPONS )
 #else
@@ -1493,9 +1629,28 @@ static void CG_TeamBase( centity_t *cent ) {
 				model.hModel = cgs.media.overloadTargetModel;
 				trap_R_AddRefEntityToScene( &model );
 			}
+#ifdef IOQ3ZTM
+			if (c < 0.6f && (t & 100)) {
+				// Turtle Man: Smoke particles
+				localEntity_t	*smoke;
+				vec3_t			up = {0, 0, 1};
+				vec3_t			origin;
+
+				VectorCopy(cent->lerpOrigin, origin);
+				origin[2] += 56;
+
+				smoke = CG_SmokePuff( origin, up,
+						  32,
+						  1, 1, 1, 0.33f,
+						  100,
+						  cg.time, 0, 0,
+						  cgs.media.smokePuffShader );
+			}
+#else
 			else {
 				//FIXME: show animated smoke
 			}
+#endif
 		}
 		else {
 			cent->miscTime = 0;
@@ -1613,13 +1768,11 @@ static void CG_AddCEntity( centity_t *cent ) {
 	case ET_TEAM:
 		CG_TeamBase( cent );
 		break;
-#ifdef SP_NPC
-	case ET_NPC:
-		CG_NPC( cent );
-		break;
-#endif
 #ifdef TMNTENTSYS // MISC_OBJECT
 	case ET_MISCOBJECT:
+#ifdef TMNTNPCSYS
+	case ET_NPC:
+#endif
 		CG_MiscObject( cent );
 		break;
 #endif

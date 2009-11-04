@@ -65,7 +65,7 @@ typedef struct model_s {
 	int			index;				// model = tr.models[model->index]
 
 	int			dataSize;			// just for listing purposes
-	// Turtle Man: Not needed by ded
+	// Turtle Man: Not needed by ded server
 	//bmodel_t	*bmodel;			// only if type == MOD_BRUSH
 	md3Header_t	*md3[MD3_MAX_LODS];	// only if type == MOD_MESH
 	void	*md4;				// only if type == (MOD_MD4 | MOD_MDR)

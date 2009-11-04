@@ -154,7 +154,6 @@ static int QDECL LightmapNameCompare(const void *a, const void *b)
 		c1 = *s1++;
 		c2 = *s2++;
 
-		// Turtle Man: tolower()
 		if (c1 >= 'a' && c1 <= 'z')
 		{
 			c1 -= ('a' - 'A');
@@ -197,7 +196,7 @@ static void R_LoadLightmaps(lump_t * l/*, const char *bspName*/)
 	char            mapName[MAX_QPATH];
 	char          **lightmapFiles;
 	int             numLightmaps;
-	const char *bspName = s_worldData.name; // Turtle Man: Get map's .bsp name
+	const char *bspName = s_worldData.name; // Turtle Man: Get map .bsp filename
 
 	len = l->filelen;
 

@@ -44,7 +44,7 @@ static const char *MonthAbbrev[] = {
 
 
 static const char *skillLevels[] = {
-#if defined TMNT || defined SONIC // rip off SRB2 skills...
+#ifdef TMNTMISC // rip off SRB2 skills...
   "Easy",
   "Normal",
   "Hard",
@@ -74,10 +74,6 @@ static const serverFilter_t serverFilters[] = {
 	{"All", "" },
 #ifdef TMNT
 	{"TMNT Arena", "" },
-#elif defined SONIC
-	{"Sonic Blast Arena", "" },
-#endif
-#if defined TMNT || defined SONIC
 	{"Quake 3 Arena", "baseq3" },
 #else
 	{"Quake 3 Arena", "" },
@@ -145,7 +141,7 @@ static char* netnames[] = {
 };
 
 #ifndef MISSIONPACK
-#ifdef TMNTMISC // Turtle Man: TODO: Add a url, ect?
+#ifdef TMNTMISC // Turtle Man: TODO: Add a url, etc?
 static char quake3worldMessage[] = "";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
@@ -3055,7 +3051,11 @@ static void UI_StartSkirmish(qboolean next) {
 
 	k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
 
+#ifdef TMNTSP // Turtle Man: TODO: Custom Game (skirmish) uses 2 while Single Player uses 1.
+	trap_Cvar_Set("ui_singlePlayerActive", "2");
+#else
 	trap_Cvar_Set("ui_singlePlayerActive", "1");
+#endif
 
 	// set up sp overrides, will be replaced on postgame
 	temp = trap_Cvar_VariableValue( "capturelimit" );
@@ -3327,8 +3327,8 @@ static void UI_RunMenuScript(char **args) {
 			Controls_SetDefaults();
 			trap_Cvar_Set("com_introPlayed", "1" );
 			trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
-		} else if (Q_stricmp(name, "getCDKey") == 0) {
 #ifdef IOQUAKE3 // Turtle Man: CDKEY
+		} else if (Q_stricmp(name, "getCDKey") == 0) {
 			char out[17];
 			trap_GetCDKey(buff, 17);
 			trap_Cvar_Set("cdkey1", "");
@@ -3345,9 +3345,7 @@ static void UI_RunMenuScript(char **args) {
 				Q_strncpyz(out, buff + 12, 5);
 				trap_Cvar_Set("cdkey4", out);
 			}
-#endif
 		} else if (Q_stricmp(name, "verifyCDKey") == 0) {
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
 			buff[0] = '\0';
 			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey1")); 
 			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey2")); 
@@ -3632,10 +3630,12 @@ static void UI_RunMenuScript(char **args) {
 			if (String_Parse(args, &name2)) {
 				UI_Update(name2);
 			}
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 		} else if (Q_stricmp(name, "setPbClStatus") == 0) {
 			int stat;
 			if ( Int_Parse( args, &stat ) )
 				trap_SetPbClStatus( stat );
+#endif
 		}
 		else {
 			Com_Printf("unknown UI script %s\n", name);
@@ -4727,7 +4727,7 @@ static qboolean Character_Parse(char **p) {
 	  /* Turtle Man: NOTE: About characters block in teaminfo.txt ...
 	               In Team Arena they just list "male" and "female"
 	                   for the base model meaning James and Janet.
-	               I plan to just list the name (Casey/April), but it is left for compatiblity.
+	               I plan to just list the name (Casey/April/Raph/...), but it is left for compatiblity.
 	  */
 	  if (tempStr && (!Q_stricmp(tempStr, "female"))) {
         uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("Janet"));
@@ -5994,7 +5994,11 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_lastServerRefresh_1, "ui_lastServerRefresh_1", "", CVAR_ARCHIVE},
 	{ &ui_lastServerRefresh_2, "ui_lastServerRefresh_2", "", CVAR_ARCHIVE},
 	{ &ui_lastServerRefresh_3, "ui_lastServerRefresh_3", "", CVAR_ARCHIVE},
+#ifdef TMNTSP
+	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_ROM},
+#else
 	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", 0},
+#endif
 	{ &ui_scoreAccuracy, "ui_scoreAccuracy", "0", CVAR_ARCHIVE},
 	{ &ui_scoreImpressives, "ui_scoreImpressives", "0", CVAR_ARCHIVE},
 	{ &ui_scoreExcellents, "ui_scoreExcellents", "0", CVAR_ARCHIVE},
@@ -6018,8 +6022,6 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
 #ifdef TMNT // DEFAULT_PLAYER
 	{ &ui_findPlayer, "ui_findPlayer", "Raph", CVAR_ARCHIVE},
-#elif defined SONIC // DEFAULT_PLAYER
-	{ &ui_findPlayer, "ui_findPlayer", "Sonic", CVAR_ARCHIVE},
 #else
 	{ &ui_findPlayer, "ui_findPlayer", "Sarge", CVAR_ARCHIVE},
 #endif

@@ -291,7 +291,7 @@ char *BotWeaponNameForMeansOfDeath(int mod) {
 		case MOD_SWORD: return "Sword";
 		case MOD_BAT: return "Baseball Bat";
 		case MOD_BO: return "Bo";
-		case MOD_BAMBOOBO: return "Bamboo Bo";
+		case MOD_BAMBOO: return "Bamboo";
 		case MOD_GUN: return "Gun";
 		case MOD_ELECTRIC:
 		case MOD_ELECTRIC_SPLASH: return "Electric Launcher";
@@ -336,6 +336,12 @@ BotRandomWeaponName
 char *BotRandomWeaponName(void) {
 	int rnd;
 
+#ifdef TMNTWEAPSYS_2
+	rnd = random() * (float)(BG_NumWeaponGroups() + 0.9f);
+	if (rnd >= BG_NumWeaponGroups())
+		rnd = BG_NumWeaponGroups()-1;
+	return bg_weapongroupinfo[rnd].pickupName;
+#else
 #ifdef TMNTWEAPONS
 	rnd = random() * 14.9;
 #else
@@ -357,7 +363,7 @@ char *BotRandomWeaponName(void) {
 		case 7: return "Sword";
 		case 8: return "Baseball Bat";
 		case 9: return "Bo";
-		case 10: return "Bamboo Bo";
+		case 10: return "Bamboo";
 		case 11: return "Gun";
 		case 12: return "Electric Launcher";
 		case 13: return "Rocket Launcher";
@@ -379,6 +385,7 @@ char *BotRandomWeaponName(void) {
 		default: return "BFG10K";
 #endif
 	}
+#endif
 }
 
 /*
@@ -797,7 +804,11 @@ int BotChat_EnemySuicide(bot_state_t *bs) {
 	if (bs->lastchat_time > FloatTime() - TIME_BETWEENCHATTING) return qfalse;
 	if (BotNumActivePlayers() <= 1) return qfalse;
 	//
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use correct chat characteristic
+	rnd = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_ENEMYSUICIDE, 0, 1);
+#else
 	rnd = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_KILL, 0, 1);
+#endif
 	//don't chat in teamplay
 	if (TeamPlayIsOn()) return qfalse;
 	// don't chat in tournament mode
@@ -1013,11 +1024,15 @@ BotChatTime
 ==================
 */
 float BotChatTime(bot_state_t *bs) {
+#ifdef IOQ3ZTM // Turtle Man: cleanup
+	return 2.0;
+#else
 	int cpm;
 
 	cpm = trap_Characteristic_BInteger(bs->character, CHARACTERISTIC_CHAT_CPM, 1, 4000);
 
 	return 2.0;	//(float) trap_BotChatLength(bs->cs) * 30 / cpm;
+#endif
 }
 
 /*

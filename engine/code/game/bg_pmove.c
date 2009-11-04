@@ -24,7 +24,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
 #include "../qcommon/q_shared.h"
+#ifdef QAGAME // TMNTNPCSYS
+#include "g_local.h"
+#else // #include ../cgame/cg_local.h"
 #include "bg_misc.h"
+#endif
 #include "bg_local.h"
 
 pmove_t		*pm;
@@ -43,6 +47,9 @@ float	pm_flyaccelerate = 8.0f;
 
 float	pm_friction = 6.0f;
 float	pm_waterfriction = 1.0f;
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+float	pm_watergroundfriction = 7.0f;
+#endif
 float	pm_flightfriction = 3.0f;
 float	pm_spectatorfriction = 5.0f;
 
@@ -56,6 +63,11 @@ PM_AddEvent
 ===============
 */
 void PM_AddEvent( int newEvent ) {
+#ifdef TMNTNPCSYS // TDC_NPC
+	if (pm->npc) {
+		return;
+	}
+#endif
 	BG_AddPredictableEventToPlayerstate( newEvent, 0, pm->ps );
 }
 
@@ -186,6 +198,13 @@ static void PM_Friction( void ) {
 	if (speed < 1) {
 		vel[0] = 0;
 		vel[1] = 0;		// allow sinking underwater
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+		if (pm->waterlevel == 3 &&
+				(pml.groundPlane || pm->ps->groundEntityNum != ENTITYNUM_NONE))
+		{
+			vel[2] = 0;
+		}
+#endif
 		// FIXME: still have z friction underwater?
 		return;
 	}
@@ -203,8 +222,35 @@ static void PM_Friction( void ) {
 		}
 	}
 
+#ifdef TMNTNPCSYS // TDC_NPC
+	// JPL - bat flying has "ground" friction
+	if (pm->npc && pm->ps->powerups[PW_FLIGHT])
+	{
+		control = speed < pm_stopspeed ? pm_stopspeed : speed;
+		drop += control*pm_friction*pml.frametime;
+	}
+#endif
+
 	// apply water friction even if just wading
 	if ( pm->waterlevel ) {
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+		if (pm->waterlevel == 3 &&
+				(pml.groundPlane || pm->ps->groundEntityNum != ENTITYNUM_NONE))
+		{
+#if 1
+			if ( !(pml.groundTrace.surfaceFlags & SURF_SLICK) ) {
+				// if getting knocked back, no friction
+				if ( ! (pm->ps->pm_flags & PMF_TIME_KNOCKBACK) ) {
+					control = speed < pm_stopspeed ? pm_stopspeed : speed;
+					drop += control*pm_watergroundfriction*pml.frametime;
+				}
+			}
+#else
+			drop += speed*pm_watergroundfriction*pml.frametime;
+#endif
+		}
+		else
+#endif
 		drop += speed*pm_waterfriction*pm->waterlevel*pml.frametime;
 	}
 
@@ -238,7 +284,7 @@ Handles user intended acceleration
 ==============
 */
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
-#ifndef TMNTMISC
+#if 1 // #ifndef TMNTMISC // Turtle Man: TEST
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;
@@ -320,6 +366,13 @@ to the facing dir
 ================
 */
 static void PM_SetMovementDir( void ) {
+#ifdef TMNTNPCSYS // TDC_NPC
+	if (pm->npc)
+	{
+		pm->ps->movementDir = 0;
+		return;
+	}
+#endif
 	if ( pm->cmd.forwardmove || pm->cmd.rightmove ) {
 		if ( pm->cmd.rightmove == 0 && pm->cmd.forwardmove > 0 ) {
 			pm->ps->movementDir = 0;
@@ -378,13 +431,28 @@ static qboolean PM_CheckJump( void ) {
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
+#ifdef TMNTNPCSYS // TDC_NPC
+	if (pm->npc) {
+		pm->ps->velocity[2] = pm->cmd.upmove*8;
+	} else
+#endif
 	pm->ps->velocity[2] = JUMP_VELOCITY;
 	PM_AddEvent( EV_JUMP );
 
 	if ( pm->cmd.forwardmove >= 0 ) {
+#ifdef TMNTNPCSYS
+		if (pm->npc) {
+			PM_ForceLegsAnim( OBJECT_JUMP );
+		} else
+#endif
 		PM_ForceLegsAnim( LEGS_JUMP );
 		pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
 	} else {
+#ifdef TMNTNPCSYS
+		if (pm->npc) {
+			PM_ForceLegsAnim( OBJECT_JUMP );
+		} else
+#endif
 		PM_ForceLegsAnim( LEGS_JUMPB );
 		pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
 	}
@@ -552,6 +620,49 @@ static void PM_InvulnerabilityMove( void ) {
 #endif
 #endif
 
+#ifdef NIGHTSMODE
+// Nights Move style
+enum
+{
+	NM_SIDE, // normal
+	NM_TOP,
+	NM_BACK
+};
+
+static void PM_NightsMove( void ) {
+	int style;
+	vec3_t angles;
+
+	// default...
+	style = NM_SIDE;
+	VectorClear(angles);
+
+	// if on axis, instead of a line {
+	//   angle = angle between axis point and player point + 90;
+	//   if going "backward"
+	//      angles -= 180;
+	// } else
+	{
+		// angles = angle between point1 and point2
+	}
+
+	if (style == NM_TOP)
+	{
+		pm->cmd.upmove = 0;
+	}
+	else if (style == NM_BACK)
+	{
+		pm->cmd.forwardmove = 0;
+	}
+	else // NM_SIDE
+	{
+		// If 2D side view mode
+		pm->cmd.rightmove = 0;
+		pm->cmd.angles[YAW] = angles[YAW];
+	}
+}
+#endif
+
 /*
 ===================
 PM_FlyMove
@@ -591,6 +702,19 @@ static void PM_FlyMove( void ) {
 	PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
 
 	PM_StepSlideMove( qfalse );
+
+#ifdef TMNTNPCSYS
+	if (pm->npc) {
+		// Flying animation for flying NPCs
+		PM_ContinueLegsAnim( OBJECT_WALK );
+	}
+#ifdef TMNTMISC
+	else
+#endif
+#endif
+#ifdef TMNTMISC
+	PM_ContinueLegsAnim( LEGS_IDLE );
+#endif
 }
 
 
@@ -636,6 +760,11 @@ static void PM_AirMove( void ) {
 	wishspeed *= scale;
 
 	// not on ground, so little effect on velocity
+#ifdef TMNTNPCSYS // TDC_NPC
+	if (pm->npc && cmd.upmove > 0)
+		PM_Accelerate (wishdir, wishspeed, pm_accelerate); // just jumped, do normal acceleration
+	else
+#endif
 	PM_Accelerate (wishdir, wishspeed, pm_airaccelerate);
 
 	// we may have a ground plane that is very steep, even
@@ -774,6 +903,17 @@ static void PM_WalkMove( void ) {
 	if ( ( pml.groundTrace.surfaceFlags & SURF_SLICK ) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK ) {
 		accelerate = pm_airaccelerate;
 	} else {
+#ifdef TMNTWEAPSYS
+		pm->xyspeed = sqrt( pm->ps->velocity[0] * pm->ps->velocity[0]
+			+  pm->ps->velocity[1] * pm->ps->velocity[1] );
+
+		// if !running AND melee attacking; based on LoZ:TP
+		if (pm->xyspeed < 200 && (pm->ps->meleeTime || pm->ps->meleeDelay))
+		{
+			accelerate = pm_accelerate/5;
+		}
+		else
+#endif
 		accelerate = pm_accelerate;
 	}
 
@@ -930,14 +1070,47 @@ static void PM_CrashLand( void ) {
 	float		t;
 	float		a, b, c, den;
 
+#ifdef IOQ3ZTM
+	// Turtle Man: Don't land when swimming
+	if ( pm->waterlevel == 3
+#ifdef TMNTNPCSYS // NPCs can't swim?
+		&& !pm->npc
+#endif
+		)
+	{
+		return;
+	}
+#endif
+
 	// decide which landing animation to use
+#ifdef TMNTNPCSYS
+	if (pm->npc)
+	{
+		PM_ForceLegsAnim( OBJECT_LAND );
+#if 0
+		pm->ps->legsTimer = BG_AnimationTime(&pm->npc->info->animations[OBJECT_LAND]);
+#else
+		pm->ps->legsTimer = TIMER_LAND;
+#endif
+	} else {
+#endif
 	if ( pm->ps->pm_flags & PMF_BACKWARDS_JUMP ) {
 		PM_ForceLegsAnim( LEGS_LANDB );
+#if 0 // #ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
+		pm->ps->legsTimer = BG_AnimationTime(&pm->playercfg->animations[LEGS_LANDB]);
+#endif
 	} else {
 		PM_ForceLegsAnim( LEGS_LAND );
+#if 0 // #ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
+		pm->ps->legsTimer = BG_AnimationTime(&pm->playercfg->animations[LEGS_LAND]);
+#endif
 	}
-
+#if 1 // #ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
 	pm->ps->legsTimer = TIMER_LAND;
+#endif
+#ifdef TMNTNPCSYS
+	}
+#endif
 
 	// calculate the exact velocity on landing
 	dist = pm->ps->origin[2] - pml.previous_origin[2];
@@ -962,10 +1135,12 @@ static void PM_CrashLand( void ) {
 		delta *= 2;
 	}
 
+#ifndef IOQ3ZTM
 	// never take falling damage if completely underwater
 	if ( pm->waterlevel == 3 ) {
 		return;
 	}
+#endif
 
 	// reduce falling damage if there is standing water
 	if ( pm->waterlevel == 2 ) {
@@ -1086,9 +1261,19 @@ static void PM_GroundTraceMissed( void ) {
 		pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, point, pm->ps->clientNum, pm->tracemask);
 		if ( trace.fraction == 1.0 ) {
 			if ( pm->cmd.forwardmove >= 0 ) {
+#ifdef TMNTNPCSYS
+				if (pm->npc) {
+					PM_ForceLegsAnim( OBJECT_JUMP );
+				} else
+#endif
 				PM_ForceLegsAnim( LEGS_JUMP );
 				pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
 			} else {
+#ifdef TMNTNPCSYS
+				if (pm->npc) {
+					PM_ForceLegsAnim( OBJECT_JUMP );
+				} else
+#endif
 				PM_ForceLegsAnim( LEGS_JUMPB );
 				pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
 			}
@@ -1126,8 +1311,10 @@ static void PM_GroundTrace( void ) {
 	// if the trace didn't hit anything, we are in free fall
 	if ( trace.fraction == 1.0 ) {
 		PM_GroundTraceMissed();
+#ifndef IOQ3ZTM // The same thing is done in PM_GroundTraceMissed
 		pml.groundPlane = qfalse;
 		pml.walking = qfalse;
+#endif
 		return;
 	}
 
@@ -1138,9 +1325,19 @@ static void PM_GroundTrace( void ) {
 		}
 		// go into jump animation
 		if ( pm->cmd.forwardmove >= 0 ) {
+#ifdef TMNTNPCSYS
+			if (pm->npc) {
+				PM_ForceLegsAnim( OBJECT_JUMP );
+			} else
+#endif
 			PM_ForceLegsAnim( LEGS_JUMP );
 			pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
 		} else {
+#ifdef TMNTNPCSYS
+			if (pm->npc) {
+				PM_ForceLegsAnim( OBJECT_JUMP );
+			} else
+#endif
 			PM_ForceLegsAnim( LEGS_JUMPB );
 			pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
 		}
@@ -1180,6 +1377,10 @@ static void PM_GroundTrace( void ) {
 			Com_Printf("%i:Land\n", c_pmove);
 		}
 		
+#ifdef TMNTNPCSYS // TDC_NPC
+		// NPCs only land when jumping
+		if (!pm->npc || (pm->npc && (pm->ps->legsAnim & ~ANIM_TOGGLEBIT ) == OBJECT_JUMP))
+#endif
 		PM_CrashLand();
 
 		// don't do landing time if we were just going down a slope
@@ -1218,6 +1419,11 @@ static void PM_SetWaterLevel( void ) {
 
 	point[0] = pm->ps->origin[0];
 	point[1] = pm->ps->origin[1];
+#ifdef TMNTNPCSYS
+	if (pm->npc) {
+		point[2] = pm->ps->origin[2] + pm->npc->info->mins[2] + 1;
+	} else
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 		point[2] = pm->ps->origin[2] + pm->playercfg->bbmins[2] + 1;
 #else
@@ -1227,6 +1433,11 @@ static void PM_SetWaterLevel( void ) {
 	cont = pm->pointcontents( point, pm->ps->clientNum );
 
 	if ( cont & MASK_WATER ) {
+#ifdef TMNTNPCSYS
+		if (pm->npc) {
+			sample2 = pm->ps->viewheight - pm->npc->info->mins[2];
+		} else
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 			sample2 = pm->ps->viewheight - pm->playercfg->bbmins[2];
 #else
@@ -1236,6 +1447,11 @@ static void PM_SetWaterLevel( void ) {
 
 		pm->watertype = cont;
 		pm->waterlevel = 1;
+#ifdef TMNTNPCSYS
+		if (pm->npc) {
+			point[2] = pm->ps->origin[2] + pm->npc->info->mins[2] + sample1;
+		} else
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 			point[2] = pm->ps->origin[2] + pm->playercfg->bbmins[2] + sample1;
 #else
@@ -1244,6 +1460,11 @@ static void PM_SetWaterLevel( void ) {
 		cont = pm->pointcontents (point, pm->ps->clientNum );
 		if ( cont & MASK_WATER ) {
 			pm->waterlevel = 2;
+#ifdef TMNTNPCSYS
+			if (pm->npc) {
+				point[2] = pm->ps->origin[2] + pm->npc->info->mins[2] + sample2;
+			} else
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 				point[2] = pm->ps->origin[2] + pm->playercfg->bbmins[2] + sample2;
 #else
@@ -1269,6 +1490,13 @@ static void PM_CheckDuck (void)
 {
 	trace_t	trace;
 
+#ifdef TMNTNPCSYS // TDC_NPC
+	if (pm->npc)
+	{
+		return;
+	}
+#endif
+
 #ifndef TMNT // POWERS
 	if ( pm->ps->powerups[PW_INVULNERABILITY] ) {
 		if ( pm->ps->pm_flags & PMF_INVULEXPAND ) {
@@ -1277,12 +1505,21 @@ static void PM_CheckDuck (void)
 			VectorSet( pm->maxs, 42, 42, 42 );
 		}
 		else {
+#ifdef TMNTNPCSYS
+			if (pm->npc) {
+					VectorCopy( pm->npc->info->mins, pm->mins );
+					VectorCopy( pm->npc->info->maxs, pm->maxs );
+			} else {
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 				VectorCopy( pm->playercfg->bbmins, pm->mins );
 				VectorCopy( pm->playercfg->bbmaxs, pm->maxs );
 #else
 			VectorSet( pm->mins, -15, -15, MINS_Z );
 			VectorSet( pm->maxs, 15, 15, 16 );
+#endif
+#ifdef TMNTNPCSYS
+			}
 #endif
 		}
 		pm->ps->pm_flags |= PMF_DUCKED;
@@ -1292,6 +1529,13 @@ static void PM_CheckDuck (void)
 	pm->ps->pm_flags &= ~PMF_INVULEXPAND;
 #endif
 
+#ifdef TMNTNPCSYS
+	if (pm->npc) {
+		VectorCopy( pm->npc->info->mins, pm->mins );
+		pm->maxs[0] = pm->npc->info->maxs[0];
+		pm->maxs[1] = pm->npc->info->maxs[1];
+	} else {
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 		VectorCopy( pm->playercfg->bbmins, pm->mins );
 
@@ -1306,11 +1550,19 @@ static void PM_CheckDuck (void)
 
 	pm->mins[2] = MINS_Z;
 #endif
+#ifdef TMNTNPCSYS
+	}
+#endif
 
 	if (pm->ps->pm_type == PM_DEAD)
 	{
+#ifdef TMNTNPCSYS
+		if (pm->npc) {
+			pm->maxs[2] = (pm->npc->info->maxs[2] / 4) * -1;
+		} else
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
-			pm->maxs[2] = pm->playercfg->bbmaxs[2] - 40;
+		pm->maxs[2] = (pm->playercfg->bbmaxs[2] / 4) * -1;
 #else
 		pm->maxs[2] = -8;
 #endif
@@ -1320,6 +1572,9 @@ static void PM_CheckDuck (void)
 
 	if (pm->cmd.upmove < 0)
 	{	// duck
+#ifdef IOQ3ZTM // Turtle Man: Only set ducked if on the ground
+		if (pml.groundPlane)
+#endif
 		pm->ps->pm_flags |= PMF_DUCKED;
 	}
 	else
@@ -1327,6 +1582,11 @@ static void PM_CheckDuck (void)
 		if (pm->ps->pm_flags & PMF_DUCKED)
 		{
 			// try to stand up
+#ifdef TMNTNPCSYS
+			if (pm->npc) {
+				pm->maxs[2] = pm->npc->info->maxs[2];
+			} else
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 				pm->maxs[2] = pm->playercfg->bbmaxs[2];
 #else
@@ -1340,6 +1600,11 @@ static void PM_CheckDuck (void)
 
 	if (pm->ps->pm_flags & PMF_DUCKED)
 	{
+#ifdef TMNTNPCSYS
+		if (pm->npc) {
+			pm->maxs[2] = pm->npc->info->maxs[2] / 2;
+		} else
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 			pm->maxs[2] = pm->playercfg->bbmaxs[2] / 2;
 #else
@@ -1349,6 +1614,11 @@ static void PM_CheckDuck (void)
 	}
 	else
 	{
+#ifdef TMNTNPCSYS
+		if (pm->npc) {
+			pm->maxs[2] = pm->npc->info->maxs[2];
+		} else
+#endif
 #ifdef TMNTPLAYERSYS // BOUNDINGBOX
 			pm->maxs[2] = pm->playercfg->bbmaxs[2];
 #else
@@ -1380,7 +1650,11 @@ static void PM_Footsteps( void ) {
 	pm->xyspeed = sqrt( pm->ps->velocity[0] * pm->ps->velocity[0]
 		+  pm->ps->velocity[1] * pm->ps->velocity[1] );
 
-	if ( pm->ps->groundEntityNum == ENTITYNUM_NONE ) {
+	if ( pm->ps->groundEntityNum == ENTITYNUM_NONE
+#ifdef IOQ3ZTM // Swimming and flying animation fix?
+		&& !pml.groundPlane
+#endif
+	) {
 
 #ifndef TMNT // POWERS
 		if ( pm->ps->powerups[PW_INVULNERABILITY] ) {
@@ -1398,13 +1672,25 @@ static void PM_Footsteps( void ) {
 	if ( !pm->cmd.forwardmove && !pm->cmd.rightmove ) {
 		if (  pm->xyspeed < 5 ) {
 			pm->ps->bobCycle = 0;	// start at beginning of cycle again
+#ifdef TMNTNPCSYS
+			if ( pm->npc)
+			{
+				PM_ContinueLegsAnim( OBJECT_IDLE );
+			}
+			else
+#endif
 			if ( pm->ps->pm_flags & PMF_DUCKED ) {
 				PM_ContinueLegsAnim( LEGS_IDLECR );
 			} else {
 				PM_ContinueLegsAnim( LEGS_IDLE );
 			}
+#ifdef IOQ3ZTM // Turtle Man: TEST
+			return;
+#endif
 		}
+#ifndef IOQ3ZTM // Turtle Man: TEST
 		return;
+#endif
 	}
 	
 
@@ -1427,24 +1713,49 @@ static void PM_Footsteps( void ) {
 		} else {
 			bobmove = 0.3;
 		}
+#ifdef TMNTNPCSYS
+		if (pm->npc)
+			PM_ContinueLegsAnim( OBJECT_BACKPEDAL );
+		else
+#endif
 		PM_ContinueLegsAnim( LEGS_BACK );
 	*/
 	} else {
 		if ( !( pm->cmd.buttons & BUTTON_WALKING ) ) {
 			bobmove = 0.4f;	// faster speeds bob faster
 			if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
+#ifdef TMNTNPCSYS
+				if (pm->npc)
+					PM_ContinueLegsAnim( OBJECT_BACKPEDAL );
+				else
+#endif
 				PM_ContinueLegsAnim( LEGS_BACK );
 			}
 			else {
+#ifdef TMNTNPCSYS
+				if (pm->npc)
+					PM_ContinueLegsAnim( OBJECT_RUN );
+				else
+#endif
 				PM_ContinueLegsAnim( LEGS_RUN );
 			}
 			footstep = qtrue;
 		} else {
 			bobmove = 0.3f;	// walking bobs slow
 			if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
+#ifdef TMNTNPCSYS
+				if (pm->npc)
+					PM_ContinueLegsAnim( OBJECT_BACKPEDAL );
+				else
+#endif
 				PM_ContinueLegsAnim( LEGS_BACKWALK );
 			}
 			else {
+#ifdef TMNTNPCSYS
+				if (pm->npc)
+					PM_ContinueLegsAnim( OBJECT_WALK );
+				else
+#endif
 				PM_ContinueLegsAnim( LEGS_WALK );
 			}
 		}
@@ -1518,7 +1829,14 @@ PM_BeginWeaponChange
 ===============
 */
 static void PM_BeginWeaponChange( int weapon ) {
-	if ( weapon <= WP_NONE || weapon >= WP_NUM_WEAPONS ) {
+	if ( weapon <= WP_NONE ||
+#ifdef TMNTWEAPSYS_2
+		weapon >= BG_NumWeaponGroups()
+#else
+		weapon >= WP_NUM_WEAPONS
+#endif
+		)
+	{
 		return;
 	}
 
@@ -1577,7 +1895,14 @@ static void PM_FinishWeaponChange( void ) {
 #else
 	weapon = pm->cmd.weapon;
 #endif
-	if ( weapon < WP_NONE || weapon >= WP_NUM_WEAPONS ) {
+	if ( weapon < WP_NONE ||
+#ifdef TMNTWEAPSYS_2
+		weapon >= BG_NumWeaponGroups()
+#else
+		weapon >= WP_NUM_WEAPONS
+#endif
+		)
+	{
 		weapon = WP_NONE;
 	}
 
@@ -1650,7 +1975,7 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 		return;
 	}
 
-	PM_AddEvent( EV_CHANGE_WEAPON ); // Play change sound here?
+	//PM_AddEvent( EV_CHANGE_WEAPON ); // Play change sound here?
 	pm->ps->weaponstate = WEAPON_HAND_CHANGE;
 
 	last_hands = pm->ps->weaponHands;
@@ -1894,9 +2219,21 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
+#ifdef TMNTHOLDABLE
+	// make weapon function
+	if ( pm->ps->holdableTime > 0 ) {
+		pm->ps->holdableTime -= pml.msec;
+	}
+#endif
+
 	// check for item using
 	if ( pm->cmd.buttons & BUTTON_USE_HOLDABLE ) {
-		if ( ! ( pm->ps->pm_flags & PMF_USE_ITEM_HELD )
+		if (
+#ifdef TMNTHOLDABLE
+		pm->ps->holdableTime <= 0
+#else
+		! ( pm->ps->pm_flags & PMF_USE_ITEM_HELD )
+#endif
 #ifdef TMNTHOLDSYS
 			&& pm->ps->holdable[pm->ps->holdableIndex] != 0
 #endif
@@ -1912,7 +2249,11 @@ static void PM_Weapon( void ) {
 				&& pm->ps->stats[STAT_HEALTH] >= (pm->ps->stats[STAT_MAX_HEALTH] + 25) ) {
 				// don't use medkit if at max health
 			} else {
+#ifdef TMNTHOLDABLE
+				pm->ps->holdableTime = 500;
+#else
 				pm->ps->pm_flags |= PMF_USE_ITEM_HELD;
+#endif
 #ifdef TMNTHOLDSYS
 				PM_AddEvent( EV_USE_ITEM0 + pm->ps->holdableIndex );
 #elif defined TMNTWEAPSYS_2
@@ -1936,9 +2277,12 @@ static void PM_Weapon( void ) {
 			}
 			return;
 		}
-	} else {
+	}
+#ifndef TMNTHOLDABLE
+	else {
 		pm->ps->pm_flags &= ~PMF_USE_ITEM_HELD;
 	}
+#endif
 
 	// make weapon function
 	if ( pm->ps->weaponTime > 0 ) {
@@ -2004,7 +2348,13 @@ static void PM_Weapon( void ) {
 		// and its not the default weapon,
 		// then drop it.
 		if ( pm->ps->weapon != pm->ps->stats[STAT_NEWWEAPON]
-			&& (pm->ps->weapon > WP_NONE && pm->ps->weapon < WP_NUM_WEAPONS)
+			&& (pm->ps->weapon > WP_NONE && pm->ps->weapon <
+#ifdef TMNTWEAPSYS_2
+			BG_NumWeaponGroups()
+#else
+			WP_NUM_WEAPONS
+#endif
+			)
 			&& pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON] )
 		{
 			// drop weapon
@@ -2064,8 +2414,7 @@ static void PM_Weapon( void ) {
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
 	// Handle grapple
 #ifdef TMNTWEAPSYS_2
-	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0] &&
-		bg_projectileinfo[bg_weapongroupinfo[pm->ps->weapon].weapon[0]->proj].grappling)
+	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0]->proj->grappling)
 #else
 	if (pm->ps->weapon == WP_GRAPPLING_HOOK)
 #endif
@@ -2086,41 +2435,25 @@ static void PM_Weapon( void ) {
 		}
 	}
 #endif
-#ifdef TMNTWEAPSYS // Turtle Man: Weapon type code.
-	// MELEEATTACK
-	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) )
-		&& BG_WeaponTypeForPlayerState(pm->ps) != WT_GAUNTLET )
-	{
-		int anim;
 
-	// check for fire
-		if (!pm->ps->meleeTime && !pm->ps->meleeDelay)
+#ifdef TMNTWEAPSYS // Turtle Man: Weapon type code.
+	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) ))
 		{
-			// melee weapon not in use
+		// check for fire (Melee weapons can do damage while not holding attack)
+		if ( !pm->ps->meleeTime && !pm->ps->meleeDelay ) {
 			pm->ps->weaponTime = 0;
 			pm->ps->weaponstate = WEAPON_READY;
 			return;
 		}
-
-		anim = BG_TorsoAttackForPlayerState(pm->ps);
-
-		if ((pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) != anim)
-		{
-			PM_StartTorsoAnim( anim );
-		}
-		pm->ps->weaponTime = pm->ps->meleeDelay;
-		pm->ps->weaponstate = WEAPON_FIRING;
-
-		// fire weapon (Play sound, spawn brass, etc)
-		//PM_AddEvent( EV_FIRE_WEAPON );
-		return;
 	}
-
+	else
+	{
 	// check for fire
 	if ( ! (pm->cmd.buttons & BUTTON_ATTACK) ) {
 		pm->ps->weaponTime = 0;
 		pm->ps->weaponstate = WEAPON_READY;
 		return;
+	}
 	}
 
 	// Gauntlet-type
@@ -2176,12 +2509,6 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
-#ifdef TMNTWEAPSYS
-	// Make sure we have ammo before attacking.
-	PM_StartTorsoAnim( BG_TorsoAttackForPlayerState(pm->ps) );
-	pm->ps->weaponstate = WEAPON_FIRING;
-#endif
-
 	// take an ammo away if not infinite
 #ifdef TMNTWEAPSYS2
 	if (pm->ps->stats[STAT_AMMO] != -1) {
@@ -2193,34 +2520,50 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
+#ifdef TMNTWEAPSYS
+	// Make sure we have ammo before attacking.
+	pm->ps->weaponstate = WEAPON_FIRING;
+
+	// MELEEATTACK
+	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) ) )
+	{
+		int anim;
+
+		anim = BG_TorsoAttackForPlayerState(pm->ps);
+
+		if ((pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) != anim)
+		{
+			PM_StartTorsoAnim( anim );
+
 	// fire weapon
 	PM_AddEvent( EV_FIRE_WEAPON );
-
-#ifdef TMNTWEAPSYS_2
-	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0])
-	{
-		addTime = bg_weapongroupinfo[pm->ps->weapon].weapon[0]->attackDelay;
+		}
 	}
 	else
+	{
+		PM_StartTorsoAnim( BG_TorsoAttackForPlayerState(pm->ps) );
+
+		// fire weapon
+		PM_AddEvent( EV_FIRE_WEAPON );
+	}
+#else
+	// fire weapon
+	PM_AddEvent( EV_FIRE_WEAPON );
 #endif
+
+#ifdef TMNTWEAPSYS
+	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) )
+		&& BG_WeaponTypeForPlayerState(pm->ps) != WT_GAUNTLET)
+	{
+		pm->ps->weaponTime = pm->ps->meleeDelay;
+		return;
+	}
+#endif
+#ifdef TMNTWEAPSYS_2
+	addTime = bg_weapongroupinfo[pm->ps->weapon].weapon[0]->attackDelay;
+#else
 	switch( pm->ps->weapon ) {
 	default:
-#ifdef TMNTWEAPONS
-	case WP_GUN:
-		addTime = 400;
-	case WP_ELECTRIC_LAUNCHER:
-		addTime = 100;
-		break;
-	case WP_ROCKET_LAUNCHER:
-		addTime = 800;
-		break;
-	case WP_HOMING_LAUNCHER:
-		addTime = 900;
-		break;
-	case WP_GRAPPLING_HOOK:
-		addTime = 400;
-		break;
-#else
 	case WP_GAUNTLET:
 		addTime = 400;
 		break;
@@ -2262,8 +2605,8 @@ static void PM_Weapon( void ) {
 		addTime = 30;
 		break;
 #endif
-#endif // TMNTWEAPONS
 	}
+#endif
 
 #ifdef MISSIONPACK
 #ifdef TMNTWEAPSYS_2
@@ -2460,7 +2803,12 @@ void PmoveSingle (pmove_t *pmove) {
 	pm->watertype = 0;
 	pm->waterlevel = 0;
 
-	if ( pm->ps->stats[STAT_HEALTH] <= 0 ) {
+	if ( pm->ps->stats[STAT_HEALTH] <= 0
+#ifdef TMNT // POWERS
+		|| pm->ps->powerups[PW_FLASHING] > 0
+#endif
+		)
+	{
 		pm->tracemask &= ~CONTENTS_BODY;	// corpses can fly through bodies
 	}
 
@@ -2535,8 +2883,15 @@ void PmoveSingle (pmove_t *pmove) {
 
 	pml.frametime = pml.msec * 0.001;
 
+#ifdef TMNTNPCSYS // TDC_NPC
+	if (!pm->npc)
+	{
+#endif
 	// update the viewangles
 	PM_UpdateViewAngles( pm->ps, &pm->cmd );
+#ifdef TMNTNPCSYS
+	}
+#endif
 
 	AngleVectors (pm->ps->viewangles, pml.forward, pml.right, pml.up);
 
@@ -2559,6 +2914,10 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	if ( pm->ps->pm_type == PM_SPECTATOR ) {
+#ifdef IOQ3ZTM // set pml.groundPlane before PM_CheckDuck
+		// set pml.groundPlane
+		PM_GroundTrace();
+#endif
 		PM_CheckDuck ();
 		PM_FlyMove ();
 		PM_DropTimers ();
@@ -2589,6 +2948,10 @@ void PmoveSingle (pmove_t *pmove) {
 	// set groundentity
 	PM_GroundTrace();
 
+#ifdef IOQ3ZTM // Must set bbox before GroundTrace, and must call GroundTrace to duck
+	PM_CheckDuck ();
+#endif
+
 	if ( pm->ps->pm_type == PM_DEAD ) {
 		PM_DeadMove ();
 	}
@@ -2597,8 +2960,14 @@ void PmoveSingle (pmove_t *pmove) {
 
 #ifdef TMNTPLAYERSYS
     // Setup accelerates based on the per-player one.
+	if (pm->playercfg)
+	{
 		pm_accelerate = pm->playercfg->accelerate_speed;
-
+	}
+	else // NPCs
+	{
+		pm_accelerate = 10;
+	}
 	pm_airaccelerate = pm_accelerate * 0.1f;
 	pm_wateraccelerate = pm_accelerate * 0.4f;
 	pm_flyaccelerate = pm_accelerate * 0.8f;
@@ -2610,6 +2979,11 @@ void PmoveSingle (pmove_t *pmove) {
 		PM_InvulnerabilityMove();
 	} else
 #endif
+#endif
+#ifdef NIGHTSMODE
+	if ( pm->ps->eFlags & EF_NIGHTSMODE ) {
+		PM_NightsMove();
+	} else
 #endif
 	if ( pm->ps->powerups[PW_FLIGHT] ) {
 #ifdef IOQ3ZTM // Use grapple while flying
@@ -2626,6 +3000,15 @@ void PmoveSingle (pmove_t *pmove) {
 	} else if (pm->ps->pm_flags & PMF_TIME_WATERJUMP) {
 		PM_WaterJumpMove();
 	} else if ( pm->waterlevel > 1 ) {
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+		if (pm->waterlevel == 3 &&
+				(pml.groundPlane || pm->ps->groundEntityNum != ENTITYNUM_NONE))
+		{
+			// walking on ground
+			PM_WalkMove();
+		}
+		else
+#endif
 		// swimming
 		PM_WaterMove();
 	} else if ( pml.walking ) {
@@ -2636,17 +3019,31 @@ void PmoveSingle (pmove_t *pmove) {
 		PM_AirMove();
 	}
 
+#ifdef TMNTNPCSYS // TDC_NPC
+	if (!pm->npc)
+	{
+#endif
 	PM_Animate();
+#ifdef TMNTNPCSYS
+	}
+#endif
 
 	// set groundentity, watertype, and waterlevel
 	PM_GroundTrace();
 	PM_SetWaterLevel();
 
+#ifdef TMNTNPCSYS // TDC_NPC
+	if (!pm->npc)
+	{
+#endif
 	// weapons
 	PM_Weapon();
 
 	// torso animation
 	PM_TorsoAnimation();
+#ifdef TMNTNPCSYS
+	}
+#endif
 
 	// footstep events / legs animations
 	PM_Footsteps();

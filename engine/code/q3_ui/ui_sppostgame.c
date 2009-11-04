@@ -30,9 +30,11 @@ SINGLE PLAYER POSTGAME MENU
 
 #include "ui_local.h"
 
-#ifndef TMNTSP
+#if defined IOQ3ZTM && !defined TMNTSP
 #ifdef TMNTWEAPONS
 #define MAX_UI_AWARDS		3
+#else
+#define MAX_UI_AWARDS		6
 #endif
 #endif
 
@@ -74,7 +76,7 @@ typedef struct {
 	int				won;
 #ifndef TMNTSP
 	int				numAwards;
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	int				awardsEarned[MAX_UI_AWARDS];
 	int				awardsLevels[MAX_UI_AWARDS];
 	qboolean		playedSound[MAX_UI_AWARDS];
@@ -451,7 +453,7 @@ void UI_SPPostgameMenu_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_NEXT0 );
 	trap_R_RegisterShaderNoMip( ART_NEXT1 );
 #ifndef TMNTSP
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
 #else
 	for( n = 0; n < 6; n++ )
@@ -565,7 +567,7 @@ void UI_SPPostgameMenu_f( void ) {
 #endif
 	const char	*arena;
 #ifndef TMNTSP
-#ifdef TMNTWEAPONS
+#ifdef IOQ3ZTM
 	int			awardValues[MAX_UI_AWARDS];
 #else
 	int			awardValues[6];

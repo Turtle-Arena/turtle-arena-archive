@@ -92,8 +92,10 @@ int BotWantsToRetreat(bot_state_t *bs);
 int BotWantsToChase(bot_state_t *bs);
 //returns true if the bot wants to help
 int BotWantsToHelp(bot_state_t *bs);
+#ifndef TMNTWEAPONS
 //returns true if the bot can and wants to rocketjump
 int BotCanAndWantsToRocketJump(bot_state_t *bs);
+#endif
 // returns true if the bot has a persistant powerup and a weapon
 int BotHasPersistantPowerupAndWeapon(bot_state_t *bs);
 //returns true if the bot wants to and goes camping
@@ -194,7 +196,9 @@ extern int gametype;		//game type
 extern int maxclients;		//maximum number of clients
 
 extern vmCvar_t bot_grapple;
+#ifndef TMNTWEAPONS
 extern vmCvar_t bot_rocketjump;
+#endif
 extern vmCvar_t bot_fastchat;
 extern vmCvar_t bot_nochat;
 extern vmCvar_t bot_testrchat;

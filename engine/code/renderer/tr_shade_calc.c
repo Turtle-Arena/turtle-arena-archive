@@ -43,6 +43,10 @@ static float *TableForFunc( genFunc_t func )
 		return tr.sawToothTable;
 	case GF_INVERSE_SAWTOOTH:
 		return tr.inverseSawToothTable;
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+	case GF_NOISE:
+		return tr.noiseTable;
+#endif
 	case GF_NONE:
 	default:
 		break;
@@ -57,7 +61,10 @@ static float *TableForFunc( genFunc_t func )
 **
 ** Evaluates a given waveForm_t, referencing backEnd.refdef.time directly
 */
-static float EvalWaveForm( const waveForm_t *wf ) 
+#ifndef CELSHADING // Turtle Man
+static
+#endif
+float EvalWaveForm( const waveForm_t *wf )
 {
 	float	*table;
 
@@ -66,7 +73,10 @@ static float EvalWaveForm( const waveForm_t *wf )
 	return WAVEVALUE( table, wf->base, wf->amplitude, wf->phase, wf->frequency );
 }
 
-static float EvalWaveFormClamped( const waveForm_t *wf )
+#ifndef CELSHADING // Turtle Man
+static
+#endif
+float EvalWaveFormClamped( const waveForm_t *wf )
 {
 	float glow  = EvalWaveForm( wf );
 
@@ -358,12 +368,21 @@ static void AutospriteDeform( void ) {
 	vec3_t	left, up;
 	vec3_t	leftDir, upDir;
 
+#ifdef IOQ3ZTM // Turtle Man: slash n
+	if ( tess.numVertexes & 3 ) {
+		ri.Printf( PRINT_WARNING, "Autosprite shader %s had odd vertex count\n", tess.shader->name );
+	}
+	if ( tess.numIndexes != ( tess.numVertexes >> 2 ) * 6 ) {
+		ri.Printf( PRINT_WARNING, "Autosprite shader %s had odd index count\n", tess.shader->name );
+	}
+#else
 	if ( tess.numVertexes & 3 ) {
 		ri.Printf( PRINT_WARNING, "Autosprite shader %s had odd vertex count", tess.shader->name );
 	}
 	if ( tess.numIndexes != ( tess.numVertexes >> 2 ) * 6 ) {
 		ri.Printf( PRINT_WARNING, "Autosprite shader %s had odd index count", tess.shader->name );
 	}
+#endif
 
 	oldVerts = tess.numVertexes;
 	tess.numVertexes = 0;
@@ -688,6 +707,10 @@ void RB_CalcWaveColor( const waveForm_t *wf, unsigned char *dstColors )
 
   if ( wf->func == GF_NOISE ) {
 		glow = wf->base + R_NoiseGet4f( 0, 0, 0, ( tess.shaderTime + wf->phase ) * wf->frequency ) * wf->amplitude;
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+	} else if ( wf->func == GF_RANDOM ) {
+		glow = wf->base + R_RandomOn( (tess.shaderTime + wf->phase) * wf->frequency ) * wf->amplitude;
+#endif
 	} else {
 		glow = EvalWaveForm( wf ) * tr.identityLight;
 	}

@@ -294,6 +294,12 @@ static genFunc_t NameToGenFunc( const char *funcname )
 	{
 		return GF_NOISE;
 	}
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+	else if ( !Q_stricmp( funcname, "random" ) )
+	{
+		return GF_RANDOM;
+	}
+#endif
 
 	ri.Printf( PRINT_WARNING, "WARNING: invalid genfunc name '%s' in shader '%s'\n", funcname, shader.name );
 	return GF_SIN;
@@ -742,6 +748,12 @@ static qboolean ParseStage( shaderStage_t *stage, char **text )
 			{
 				depthFuncBits = 0;
 			}
+#ifdef IOQ3ZTM // IOSTVEF: Support EF keyword (it seems easier to understand.)
+			else if ( !Q_stricmp( token, "disable" ) )
+			{
+				depthFuncBits = 0;
+			}
+#endif
 			else if ( !Q_stricmp( token, "equal" ) )
 			{
 				depthFuncBits = GLS_DEPTHFUNC_EQUAL;
@@ -1608,19 +1620,167 @@ static qboolean ParseShader( char **text )
 			ParseSort( text );
 			continue;
 		}
-#ifdef IOQ3ZTM // Turtle Man: TODO: Clone a shader.
-		else if ( !Q_stricmp( token, "clone" ) )
+#ifdef CELSHADING // Turtle Man: Allow per-shader celoutline.
+		// celoutline
+		else if ( !Q_stricmp( token, "celoutline" ) )
 		{
 			token = COM_ParseExt( text, qfalse );
 			if ( token[0] == 0 )
 			{
-				ri.Printf( PRINT_WARNING, "WARNING: missing clone shader in shader '%s'\n", shader.name );
+				ri.Printf( PRINT_WARNING, "WARNING: missing celoutline parm in shader '%s'\n", shader.name );
 				continue;
 			}
 
-			// TODO: Copy shader "token" to this shader.
-			ri.Printf( PRINT_WARNING, "WARNING: \"clone\" keyword isn't finished, in shader '%s'\n", shader.name );
+			if (!shader.celoutline.rgbGen) {
+				shader.celoutline.rgbGen = CGEN_CONST;
+				shader.celoutline.constantColor[0] = 0;
+				shader.celoutline.constantColor[1] = 0;
+				shader.celoutline.constantColor[2] = 0;
+			}
+
+			if (!shader.celoutline.alphaGen) {
+				shader.celoutline.alphaGen = AGEN_CONST;
+				shader.celoutline.constantColor[3] = 0xff;
+			}
+
+			shader.celoutline.width = atof(token);
 			continue;
+		}
+		//
+		// celoutlineRgbGen
+		//
+		else if ( !Q_stricmp( token, "celoutlineRgbGen" ) )
+		{
+			token = COM_ParseExt( text, qfalse );
+			if ( token[0] == 0 )
+			{
+				ri.Printf( PRINT_WARNING, "WARNING: missing parameters for rgbGen in shader '%s'\n", shader.name );
+				continue;
+			}
+
+			if ( !Q_stricmp( token, "wave" ) )
+			{
+				ParseWaveForm( text, &shader.celoutline.rgbWave );
+				shader.celoutline.rgbGen = CGEN_WAVEFORM;
+			}
+			else if ( !Q_stricmp( token, "const" ) )
+			{
+				vec3_t	color;
+
+				ParseVector( text, 3, color );
+				shader.celoutline.constantColor[0] = 255 * color[0];
+				shader.celoutline.constantColor[1] = 255 * color[1];
+				shader.celoutline.constantColor[2] = 255 * color[2];
+
+				shader.celoutline.rgbGen = CGEN_CONST;
+			}
+			else if ( !Q_stricmp( token, "identity" ) )
+			{
+				shader.celoutline.rgbGen = CGEN_IDENTITY;
+			}
+			else if ( !Q_stricmp( token, "identityLighting" ) )
+			{
+				shader.celoutline.rgbGen = CGEN_IDENTITY_LIGHTING;
+			}
+			else if ( !Q_stricmp( token, "entity" ) )
+			{
+				shader.celoutline.rgbGen = CGEN_ENTITY;
+			}
+			else if ( !Q_stricmp( token, "oneMinusEntity" ) )
+			{
+				shader.celoutline.rgbGen = CGEN_ONE_MINUS_ENTITY;
+			}
+			else if ( !Q_stricmp( token, "vertex" ) )
+			{
+				shader.celoutline.rgbGen = CGEN_VERTEX;
+				if ( shader.celoutline.alphaGen == 0 ) {
+					shader.celoutline.alphaGen = AGEN_VERTEX;
+				}
+			}
+			else if ( !Q_stricmp( token, "exactVertex" ) )
+			{
+				shader.celoutline.rgbGen = CGEN_EXACT_VERTEX;
+			}
+			else if ( !Q_stricmp( token, "lightingDiffuse" ) )
+			{
+				shader.celoutline.rgbGen = CGEN_LIGHTING_DIFFUSE;
+			}
+			else if ( !Q_stricmp( token, "oneMinusVertex" ) )
+			{
+				shader.celoutline.rgbGen = CGEN_ONE_MINUS_VERTEX;
+			}
+			else
+			{
+				ri.Printf( PRINT_WARNING, "WARNING: unknown celoutlineRgbGen parameter '%s' in shader '%s'\n", token, shader.name );
+				continue;
+			}
+		}
+		//
+		// celoutlineAlphaGen
+		//
+		else if ( !Q_stricmp( token, "celoutlineAlphaGen" ) )
+		{
+			token = COM_ParseExt( text, qfalse );
+			if ( token[0] == 0 )
+			{
+				ri.Printf( PRINT_WARNING, "WARNING: missing parameters for alphaGen in shader '%s'\n", shader.name );
+				continue;
+			}
+
+			if ( !Q_stricmp( token, "wave" ) )
+			{
+				ParseWaveForm( text, &shader.celoutline.alphaWave );
+				shader.celoutline.alphaGen = AGEN_WAVEFORM;
+			}
+			else if ( !Q_stricmp( token, "const" ) )
+			{
+				token = COM_ParseExt( text, qfalse );
+				shader.celoutline.constantColor[3] = 255 * atof( token );
+				shader.celoutline.alphaGen = AGEN_CONST;
+			}
+			else if ( !Q_stricmp( token, "identity" ) )
+			{
+				shader.celoutline.alphaGen = AGEN_IDENTITY;
+			}
+			else if ( !Q_stricmp( token, "entity" ) )
+			{
+				shader.celoutline.alphaGen = AGEN_ENTITY;
+			}
+			else if ( !Q_stricmp( token, "oneMinusEntity" ) )
+			{
+				shader.celoutline.alphaGen = AGEN_ONE_MINUS_ENTITY;
+			}
+			else if ( !Q_stricmp( token, "vertex" ) )
+			{
+				shader.celoutline.alphaGen = AGEN_VERTEX;
+			}
+			else if ( !Q_stricmp( token, "lightingSpecular" ) )
+			{
+				shader.celoutline.alphaGen = AGEN_LIGHTING_SPECULAR;
+			}
+			else if ( !Q_stricmp( token, "oneMinusVertex" ) )
+			{
+				shader.celoutline.alphaGen = AGEN_ONE_MINUS_VERTEX;
+			}
+			else if ( !Q_stricmp( token, "portal" ) )
+			{
+				shader.celoutline.alphaGen = AGEN_PORTAL;
+				token = COM_ParseExt( text, qfalse );
+				if ( token[0] == 0 )
+				{
+					shader.celoutline.portalRange = 256;
+					ri.Printf( PRINT_WARNING, "WARNING: missing range parameter for alphaGen portal in shader '%s', defaulting to 256\n", shader.name );
+				}
+				else
+				{
+					shader.celoutline.portalRange = atof( token );
+				}
+			}
+			else
+			{
+				ri.Printf( PRINT_WARNING, "WARNING: unknown celoutlineAlphaGen parameter '%s' in shader '%s'\n", token, shader.name );
+			continue;
+		}
 		}
 #endif
 		else

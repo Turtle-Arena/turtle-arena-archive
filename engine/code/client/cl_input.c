@@ -347,7 +347,7 @@ void CL_AnalogMove(usercmd_t *cmd, vec3_t angles)
 		}
 	}
 
-	// Turtle Man: TODO: ANALOG: Change movement based on angles.
+	// Turtle Man: TODO?: ANALOG: Change movement based on angles.
 
 
 	// Use forward and side to set the yaw.
@@ -446,7 +446,7 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	up = 0;
 #if 0 //#ifdef ANALOG // Turtle Man: Analog
 	// Only use analog when chase cam is on.
-	// Turtle Man: TODO: I think the main analog code should go here!
+	// Turtle Man: TODO?: I think the main analog code should go here!
     if (cl_thirdPerson->integer && cl_thirdPersonAnalog->integer)
     {
 	if ( in_strafe.active ) {

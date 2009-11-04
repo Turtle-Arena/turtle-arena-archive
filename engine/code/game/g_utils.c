@@ -762,6 +762,161 @@ qboolean G_IsVisible(const gentity_t *self, const vec3_t goal)
 	else
   return qtrue;
 }
+
+// g_team.c
+void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage );
+
+qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
+		const vec3_t start, const vec3_t dir,
+		float range, float ang, int tests)
+{
+	if (!target->inuse)
+		return qfalse;
+
+	if (target == source)
+		return qfalse;
+
+	// Turtle Man: Target players, overload base, and NPCs.
+	if (!target->client// && !target->takedamage
+		&& !(source->client && target->pain == ObeliskPain
+			&& target->spawnflags != source->client->sess.sessionTeam)
+#ifdef TMNTNPCSYS
+		&& !(source->client && target->s.eType == ET_NPC)
+#endif
+	)
+		return qfalse;
+
+	if (target->health <= 0)
+		return qfalse;
+
+	if (target->client && target->client->sess.sessionTeam >= TEAM_SPECTATOR)
+		return qfalse;
+
+	if (g_gametype.integer >= GT_TEAM && OnSameTeam(target, source))
+		return qfalse;
+
+	// Unneeded for target trace test, the trace found it so it is visable
+	if (tests >= 1)
+	{
+		if (!G_IsVisible(source, target->r.currentOrigin))
+			return qfalse;
+	}
+	// G_FindTarget does its own dist/angle check, for best target.
+	if (tests >= 2)
+	{
+		vec3_t eorg;
+		int j;
+		vec3_t blipdir;
+		float angle;
+
+		for(j = 0; j < 3; j++) {
+			eorg[j] = source->s.origin[j] - (target->s.origin[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
+		}
+
+		if (VectorLength(eorg) > range)
+			return qfalse;
+
+		// Angle check
+		if (ang < 360)
+		{
+			VectorSubtract(target->r.currentOrigin, source->r.currentOrigin, blipdir);
+
+			if (source-g_entities < MAX_CLIENTS) {
+				angle = AngleBetweenVectors(source->s.apos.trBase, blipdir);
+			} else {
+				angle = AngleBetweenVectors(source->r.currentAngles, blipdir);
+			}
+			if (angle > ang) {
+				return qfalse;
+			}
+		}
+	}
+
+	return qtrue;
+}
+
+/*
+=================
+G_FindTarget
+
+Returns entities that have origins within a spherical area
+=================
+*/
+gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
+		float range, float ang)
+{
+	vec3_t			eorg;
+	int				j;
+	gentity_t		*target;
+	gentity_t		*besttarget;
+	float			bestdist, dist, angle;
+	vec3_t			blipdir, bestdir;
+
+	besttarget = NULL;
+	bestdist = range;
+	VectorClear(blipdir);
+	VectorClear(bestdir);
+
+	// First check if where we are aiming at something we can damage?
+	{
+		trace_t trace;
+		vec3_t goal;
+
+		// Use correct range.
+		VectorMA(start, range, dir, goal);
+
+		trap_Trace(&trace, source->r.currentOrigin, NULL, NULL, goal, source->s.number, MASK_SHOT);
+
+		target = &g_entities[ trace.entityNum ];
+
+		if (G_ValidTarget(source, target, start, dir, range, ang, 0))
+		{
+			return target;
+		}
+	}
+
+	for (target = g_entities; target < &g_entities[level.num_entities]; target++)
+	{
+		if (!G_ValidTarget(source, target, start, dir, range, ang, 1))
+		{
+			continue;
+		}
+
+		for(j = 0; j < 3; j++) {
+			eorg[j] = source->s.origin[j] - (target->s.origin[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
+		}
+
+		dist = VectorLength(eorg);
+		if (dist > bestdist)
+			continue;
+
+		// Angle check
+		if (ang < 360)
+		{
+			VectorSubtract(target->r.currentOrigin, source->r.currentOrigin, blipdir);
+
+			// Turtle Man: Disabled best angle (for now), allways shoot closest?
+			if (!besttarget/* || VectorLength(blipdir) < VectorLength(bestdir)*/)
+			{
+				if (source-g_entities < MAX_CLIENTS) {
+					angle = AngleBetweenVectors(source->s.apos.trBase, blipdir);
+				} else {
+					angle = AngleBetweenVectors(source->r.currentAngles, blipdir);
+				}
+				if (angle > ang) {
+					continue;
+				}
+				VectorCopy(blipdir, bestdir);
+			}
+		}
+
+		// We add it as our target
+		besttarget = target;
+		bestdist = dist;
+	}
+
+	return besttarget;
+}
 #endif
 
 /*

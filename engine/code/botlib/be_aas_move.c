@@ -367,7 +367,7 @@ float AAS_BFGJumpZVelocity(vec3_t origin)
 //===========================================================================
 void AAS_Accelerate(vec3_t velocity, float frametime, vec3_t wishdir, float wishspeed, float accel)
 {
-#ifndef TMNTMISC
+#if 1 // #ifndef TMNTMISC // Turtle Man: TEST
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;

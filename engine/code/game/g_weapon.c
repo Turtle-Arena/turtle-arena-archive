@@ -29,7 +29,9 @@ static	float	s_quadFactor;
 static	vec3_t	forward, right, up;
 static	vec3_t	muzzle;
 
+#ifndef TMNTWEAPSYS_2
 #define NUM_NAILSHOTS 15
+#endif
 
 /*
 ================
@@ -48,6 +50,86 @@ void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout 
 	VectorMA(impact, 8192, newv, endout);
 }
 
+
+#ifdef TMNT // if THIRD_PERSON?
+/*
+================
+G_AutoAim
+
+...Because in third person it is hard to aim.
+================
+*/
+void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t right, vec3_t up)
+{
+	gentity_t *target;
+	vec3_t targetOrigin;
+	vec3_t dir;
+	int i;
+	float maxRand;
+	float range;
+	float angle;
+
+#ifdef TMNTWEAPSYS_2
+	if (bg_projectileinfo[projnum].grappling) {
+		// Don't auto aim grapple.
+		//   Maybe at target_grapple entities to autoaim grapple at?...
+		return;
+	}
+#endif
+
+	// Currently no way to know if in first person.
+	// if (ent->client && ent->client is in firstPerson && !ent->bgNPC.info)
+	//   return;
+
+	angle = 30.0f;
+	range = 2000.0f;
+#ifdef TMNTWEAPSYS_2
+	if (bg_projectileinfo[projnum].instantDamage) {
+		range = bg_projectileinfo[projnum].speed;
+	}
+#endif
+
+	// Turtle Man: TODO: If locked on to a entity (Like in LoZ:TP), or is a NPC
+	target = ent->enemy;
+	if (target && (target == ent || !target->takedamage))
+	{
+		target = NULL;
+	}
+
+	if (!target || !G_ValidTarget(ent, target, start, forward, range, angle, 2)) // && !NPC?
+	{
+		// Search for a target
+		target = G_FindTarget(ent, start, forward, range, angle);
+		// ent->enemy = target; // Turtle Man: Update target?
+	}
+
+	if (!target) {
+		return;
+	}
+
+	//G_Printf("DEBUG: Targeting %d: %s...\n", target-g_entities, target->classname);
+	VectorCopy(target->r.currentOrigin, targetOrigin);
+
+	// Aim higher then origin
+	for (i = 0; i < 3; i++)
+	{
+		targetOrigin[i] += (target->r.mins[i] + target->r.maxs[i]) * 0.5;
+		// Move around a bit so that shurikens don't all stick in the same spot.
+		maxRand = target->r.maxs[i] * 0.5;
+		targetOrigin[i] += maxRand - (random() * (maxRand * 2));
+	}
+
+	// see if we have a target
+	VectorSubtract( targetOrigin, start, dir );
+	VectorNormalize( dir );
+
+	// Get up and right from dir (which is "forward")
+	VectorCopy( dir, forward );
+	PerpendicularVector( up, dir );
+	CrossProduct( up, dir, right );
+}
+#endif
+
 #ifdef TMNTHOLDABLE
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
 {
@@ -55,7 +137,7 @@ void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
 	gentity_t	*m;
 #endif
 
-	// Turtle Man: TODO: Player animation (Throw shuriken)
+	// Turtle Man: TODO: Player animation (Throw shuriken)?
 
 	switch (holdable)
 	{
@@ -63,8 +145,6 @@ void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
 		case HI_ELECTRICSHURIKEN:
 		case HI_FIRESHURIKEN:
 		case HI_LASERSHURIKEN:
-			//G_Printf("  Used a shuriken item! (holdable=%d)\n", holdable);
-
 			// Turtle Man: TODO: Throw from origin of tag_hand_* (primary or secondary?)
 
 			// set aiming directions
@@ -102,7 +182,7 @@ void G_StartMeleeAttack(gentity_t *ent)
 		return;
 	}
 
-	// Must press the button to attack...
+	// Must press the button each time to attack...
 	if (client->fireHeld) {
 		return;
 	}
@@ -110,7 +190,7 @@ void G_StartMeleeAttack(gentity_t *ent)
 
 	// Turtle Man: Use the animation time for the attack time!
 	client->ps.meleeTime = BG_AnimationTime(&ent->client->pers.playercfg.animations[BG_TorsoAttackForPlayerState(&ent->client->ps)]);
-	client->ps.comboTime = 3.75f * client->ps.meleeTime; // MELEE_CHAINTIME
+	client->ps.meleeLinkTime = 3.75f * client->ps.meleeTime; // MELEE_CHAINTIME
 
 	client->ps.meleeAttack++;
 
@@ -201,7 +281,8 @@ Sets up the orientation to use G_PositionEntityOnTag and G_PositionRotatedEntity
 */
 qboolean G_SetupPlayerTagOrientation(gentity_t *ent, orientation_t *legsOrientation, orientation_t *torsoOrientation, orientation_t *tagOrientation)
 {
-	// Debug messages (Should only print once... ded server is spammed...).
+#if 0
+	// Debug messages (Should only print once. Server is spammed...)
 	if (!ent->client->pers.legsModel && !ent->client->pers.torsoModel)
 	{
 		G_Printf("DEBUG: G_GetPlayerTagOrientation: Invalid tags for legs and torso model.\n");
@@ -217,6 +298,7 @@ qboolean G_SetupPlayerTagOrientation(gentity_t *ent, orientation_t *legsOrientat
 		G_Printf("DEBUG: G_GetPlayerTagOrientation: Invalid tags for torso model.\n");
 		return qfalse;
 	}
+#endif
 
 	if (tagOrientation != NULL)
 	{
@@ -314,7 +396,7 @@ qboolean G_GetPlayerTagOrientation(gentity_t *ent, char *tagName, qboolean onLeg
 #endif
 
 // Based on CheckGauntletHit
-qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype_t wt)
+qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapontype_t wt, qboolean checkTeamHit)
 {
 	trace_t		tr;
 	vec3_t		start;
@@ -338,13 +420,6 @@ qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype
 	orientation_t	legsOrientation;
 	orientation_t	torsoOrientation;
 
-#ifdef TMNTWEAPSYS_2
-	if (nodamage)
-	{
-		return qfalse;
-	}
-#endif
-
 	// Setup the orientations
 	if (!G_SetupPlayerTagOrientation(ent, &legsOrientation, &torsoOrientation, &weaponOrientation))
 	{
@@ -357,6 +432,11 @@ qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype
 	// Use hand to select the weapon tag.
 	if (hand == HAND_PRIMARY)
 	{
+		if (ent->client->melee_debounce &&
+			ent->client->melee_debounce > level.time)
+		{
+			return qfalse;
+		}
 #ifdef TMNT_GAME_MODELS // TMNTWEAPSYS
 		// put weapon on torso
 #ifdef TMNTPLAYERS
@@ -371,7 +451,7 @@ qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype
 			{
 				// Failed to put weapon on torso!
 				// Turtle Man: TODO: This should be moved to player tag loading or just removed.
-				G_Printf("DEBUG: G_DoMeleeDamage: Player missing primary weapon tag!\n");
+				//G_Printf("DEBUG: G_DoMeleeDamage: Player missing primary weapon tag!\n");
 				return qfalse;
 			}
 		}
@@ -388,6 +468,11 @@ qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype
 	}
 	else
 	{
+		if (ent->client->melee_debounce2 &&
+			ent->client->melee_debounce2 > level.time)
+		{
+			return qfalse;
+		}
 #ifdef TMNT_GAME_MODELS // TMNTWEAPSYS
 		// put weapon on torso
 #ifdef TMNTPLAYERS
@@ -404,7 +489,7 @@ qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype
 				// Turtle Man: NOTE: Disable message so quake3 players
 				//                   don't give lots of errors.
 				//                   tag_flag is only used by Team Arena players.
-				G_Printf("DEBUG: G_DoMeleeDamage: Player missing secondary weapon tag!\n");
+				//G_Printf("DEBUG: G_DoMeleeDamage: Player missing secondary weapon tag!\n");
 				return qfalse;
 			}
 		}
@@ -505,7 +590,7 @@ qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype
 	}
 #endif // TMNTWEAPSYS_2
 
-	if (nodamage)
+	if (!dodamage && !checkTeamHit)
 	{
 		return qtrue;
 	}
@@ -513,10 +598,32 @@ qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype
 	traceHit = qfalse;
 #ifdef TMNTWEAPSYS_2
 	if (hand == HAND_PRIMARY)
+	{
 		weapon = bg_weapongroupinfo[weaponnum].weapon[0];
+		mod = weapon->mod;
+		// Use default kill message
+		if (mod == MOD_UNKNOWN) {
+			mod = MOD_WEAPON_PRIMARY;
+		}
+	}
 	else
+	{
 		weapon = bg_weapongroupinfo[weaponnum].weapon[1];
+		mod = weapon->mod;
+		// Use default kill message
+		if (mod == MOD_UNKNOWN) {
+			mod = MOD_WEAPON_SECONDARY;
+		}
+	}
+#else
+	if (hand == HAND_SECONDARY) {
+		mod = bg_weaponinfo[weaponnum].mod2;
+	} else {
+		mod = bg_weaponinfo[weaponnum].mod;
+	}
+#endif
 
+#ifdef TMNTWEAPSYS_2
 	for (i = 0; i < MAX_WEAPON_BLADES; i++)
 #else
 	// Bo Staff does damage at both ends.
@@ -574,7 +681,79 @@ qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype
 			continue;
 	}
 
+
+		if (ent->client->ps.powerups[PW_QUAD] ) {
+			s_quadFactor = g_quadfactor.value;
+		} else {
+			s_quadFactor = 1;
+		}
+#ifdef MISSIONPACK // MP_TMNT_OK
+		if( ent->client->persistantPowerup && ent->client->persistantPowerup->item && ent->client->persistantPowerup->item->giTag == PW_DOUBLER ) {
+			s_quadFactor *= 2;
+		}
+#endif
+
+#ifdef TMNTWEAPSYS_2
+		damage = weapon->blades[i].damage;
+#else
+		if (hand == HAND_SECONDARY) {
+			damage = bg_weaponinfo[weaponnum].damage2;
+		} else {
+			damage = bg_weaponinfo[weaponnum].damage;
+		}
+#endif
+
+		damage *= s_quadFactor;
+
+		if ( tr.startsolid || (tr.contents & CONTENTS_SOLID) ) {
+			// Turtle Man: TODO: Push player away from trace dir!
+			// Copied from G_Damage
+			vec3_t	kvel;
+			float	mass;
+			int knockback;
+
+			// ...not from G_Damage
+			ent->client->ps.meleeTime /= 2;
+			if (ent->client->ps.meleeTime < 1)
+				ent->client->ps.meleeTime = 1;
+			knockback = 5+damage*1.5f;
+
+			mass = 200;
+
+			VectorScale (tr.plane.normal, g_knockback.value * (float)knockback / mass, kvel);
+			VectorAdd (ent->client->ps.velocity, kvel, ent->client->ps.velocity);
+
+			// set the timer so that the other client can't cancel
+			// out the movement immediately
+			if ( !ent->client->ps.pm_time ) {
+				int		t;
+
+				t = knockback * 2;
+				if ( t < 50 ) {
+					t = 50;
+				}
+				if ( t > 200 ) {
+					t = 200;
+				}
+
+				// ...not from G_Damage
+				ent->client->ps.meleeDelay = t;
+
+				ent->client->ps.pm_time = t;
+				ent->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
+			}
+		}
+
 	traceEnt = &g_entities[ tr.entityNum ];
+
+		if (checkTeamHit)
+		{
+			if (traceEnt->takedamage && OnSameTeam(ent, traceEnt))
+			{
+				return qtrue;
+			}
+			continue;
+		}
 
 		// If client hit another client
 		if (!traceEnt->client || !OnSameTeam(ent, traceEnt) || g_friendlyFire.integer != 0)
@@ -619,47 +798,32 @@ qboolean G_DoMeleeDamage(gentity_t *ent, qboolean nodamage, int hand, weapontype
 			if (!traceHit) {
 		G_AddEvent( ent, EV_POWERUP_QUAD, 0 );
 			}
-		s_quadFactor = g_quadfactor.value;
-	} else {
-		s_quadFactor = 1;
 	}
-#ifdef MISSIONPACK // MP_TMNT_OK
-	if( ent->client->persistantPowerup && ent->client->persistantPowerup->item && ent->client->persistantPowerup->item->giTag == PW_DOUBLER ) {
-		s_quadFactor *= 2;
-	}
-#endif
-
-#ifdef TMNTWEAPSYS_2
-		mod = weapon->mod;
-		damage = weapon->blades[i].damage;
-#else
-		if (hand == HAND_SECONDARY)
-	{
-			mod = bg_weaponinfo[weaponnum].mod2;
-			damage = bg_weaponinfo[weaponnum].damage2;
-	}
-	else
-	{
-			mod = bg_weaponinfo[weaponnum].mod;
-			damage = bg_weaponinfo[weaponnum].damage;
-	}
-#endif
-
-	damage *= s_quadFactor;
 
 		G_Damage( traceEnt, ent, ent, pushDir, tr.endpos,
 		damage, 0, mod );
 
-		// Extend combo,
-		//ent->client->ps.chain++;
-		//ent->client->ps.chainTime = MELEE_CHAINTIME;
-
 		traceHit = qtrue;
+	}
+	if (checkTeamHit)
+	{
+		return qfalse;
+	}
+	if (traceHit)
+	{
+		// Extend combo,
+		ent->client->ps.chain++;
+		ent->client->ps.chainTime = MELEE_CHAINTIME;
+
+		if (hand == HAND_PRIMARY)
+			ent->client->melee_debounce = level.time + 200;
+		else
+			ent->client->melee_debounce2 = level.time + 200;
 	}
 	return traceHit;
 }
 
-qboolean G_MeleeAttack(gentity_t *ent, qboolean forceDamage)
+qboolean G_MeleeDamage(gentity_t *ent, qboolean forceDamage)
 {
 	qboolean rtn, rtn2;
 	weapontype_t wt;
@@ -680,7 +844,7 @@ qboolean G_MeleeAttack(gentity_t *ent, qboolean forceDamage)
 		if (!damage) {
 			damage = (bg_weapongroupinfo[ent->client->ps.weapon].weapon[0]->flags & WIF_ALWAYS_DAMAGE);
 		}
-		rtn = G_DoMeleeDamage(ent, !damage, HAND_PRIMARY, wt);
+		rtn = G_MeleeDamageSingle(ent, damage, HAND_PRIMARY, wt, qfalse);
 	}
 	if (ent->client->ps.weaponHands & HAND_SECONDARY)
 	{
@@ -688,13 +852,13 @@ qboolean G_MeleeAttack(gentity_t *ent, qboolean forceDamage)
 		if (!damage) {
 			damage = (bg_weapongroupinfo[ent->client->ps.weapon].weapon[1]->flags & WIF_ALWAYS_DAMAGE);
 		}
-		rtn2 = G_DoMeleeDamage(ent, !damage, HAND_SECONDARY, wt);
+		rtn2 = G_MeleeDamageSingle(ent, damage, HAND_SECONDARY, wt, qfalse);
 	}
 
 	return (rtn || rtn2);
 }
 #endif // TMNTWEAPSYS
-#ifndef TMNTWEAPONS
+#ifndef TMNTWEAPSYS_2
 /*
 ======================================================================
 
@@ -798,7 +962,7 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 	}
 }
 
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS_2 // Turtle Man: I replaced all of these, see fire_weapon
 #ifdef MISSIONPACK
 #define CHAINGUN_SPREAD		600
 #endif
@@ -841,7 +1005,7 @@ void Bullet_Fire (gentity_t *ent, float spread, int damage ) {
 		SnapVectorTowards( tr.endpos, muzzle );
 
 		// send bullet impact
-#ifdef SP_NPC
+#ifdef TMNTNPCSYS
 		if ( traceEnt->takedamage && (traceEnt->client || traceEnt->s.eType == ET_NPC))
 #else
 		if ( traceEnt->takedamage && traceEnt->client )
@@ -889,10 +1053,7 @@ void Bullet_Fire (gentity_t *ent, float spread, int damage ) {
 		break;
 	}
 }
-#endif // #ifndef TMNTWEAPSYS_2
 
-#ifndef TMNTWEAPONS
-#ifndef TMNTWEAPSYS_2
 /*
 ======================================================================
 
@@ -1053,10 +1214,7 @@ void weapon_grenadelauncher_fire (gentity_t *ent) {
 
 //	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
 }
-#endif // #ifndef TMNTWEAPSYS_2
-#endif // TMNTWEAPONS
 
-#ifndef TMNTWEAPSYS_2
 /*
 ======================================================================
 
@@ -1075,44 +1233,6 @@ void Weapon_RocketLauncher_Fire (gentity_t *ent) {
 //	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
 }
 
-#ifdef TMNTWEAPONS
-/*
-======================================================================
-
-HOMING ROCKET
-
-======================================================================
-*/
-
-void Weapon_HomingLauncher_Fire (gentity_t *ent) {
-	gentity_t	*m;
-
-	m = fire_homingrocket (ent, muzzle, forward);
-	m->damage *= s_quadFactor;
-	m->splashDamage *= s_quadFactor;
-
-//	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
-}
-
-/*
-======================================================================
-
-GUN
-
-======================================================================
-*/
-
-void Weapon_Gun_Fire (gentity_t *ent) {
-	gentity_t	*m;
-
-	m = fire_gun (ent, muzzle, forward);
-	m->damage *= s_quadFactor;
-	m->splashDamage *= s_quadFactor;
-
-//	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
-}
-#endif
-
 /*
 ======================================================================
 
@@ -1130,9 +1250,7 @@ void Weapon_Plasmagun_Fire (gentity_t *ent) {
 
 //	VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
 }
-#endif // #ifndef TMNTWEAPSYS_2
 
-#ifndef TMNTWEAPONS
 /*
 ======================================================================
 
@@ -1273,7 +1391,7 @@ void weapon_railgun_fire (gentity_t *ent) {
 	}
 
 }
-#endif // TMNTWEAPONS
+#endif // #ifndef TMNTWEAPSYS_2
 
 /*
 ======================================================================
@@ -1479,7 +1597,7 @@ qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
 	}
 
 	if( !target->client
-#ifdef SP_NPC // Turtle Man: When hit NPCs too (i made this)
+#ifdef TMNTNPCSYS // Turtle Man: When hit NPCs too
 		&& target->s.eType != ET_NPC
 #endif
 	) {
@@ -1490,7 +1608,7 @@ qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
 		return qfalse;
 	}
 
-#ifdef SP_NPC // Turtle Man: When hit NPCs too (i made this)
+#ifdef TMNTNPCSYS // Turtle Man: When hit NPCs too
 	if (!target->client)
 	{
 		if( target->health <= 0 ) {
@@ -1520,6 +1638,13 @@ set muzzle location relative to pivoting eye
 */
 void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint ) {
 	VectorCopy( ent->s.pos.trBase, muzzlePoint );
+#ifdef TMNTNPCSYS
+	if (ent->bgNPC.info)
+	{
+		muzzlePoint[2] += ent->bgNPC.npc_ps.viewheight;
+	}
+	else
+#endif
 	muzzlePoint[2] += ent->client->ps.viewheight;
 	VectorMA( muzzlePoint, 14, forward, muzzlePoint );
 	// snap to integer coordinates for more efficient network bandwidth usage
@@ -1564,18 +1689,12 @@ void FireWeapon( gentity_t *ent ) {
 #ifdef TMNTWEAPSYS
 	if (BG_WeapUseAmmo(ent->s.weapon))
 #else
-	if( ent->s.weapon != WP_GRAPPLING_HOOK
-#ifndef TMNTWEAPONS
-	&& ent->s.weapon != WP_GAUNTLET
-#endif
-		)
+	if( ent->s.weapon != WP_GRAPPLING_HOOK && ent->s.weapon != WP_GAUNTLET )
 #endif
 	{
 #ifdef TMNTWEAPSYS_2
-		if (bg_weapongroupinfo[ent->s.weapon].weapon[0]) {
-			ent->client->accuracy_shots += bg_projectileinfo[bg_weapongroupinfo[ent->s.weapon].weapon[0]->proj].numProjectiles;
-		}
-#elif defined MISSIONPACK && !defined TMNTWEAPONS
+		ent->client->accuracy_shots += bg_weapongroupinfo[ent->s.weapon].weapon[0]->proj->numProjectiles;
+#elif defined MISSIONPACK
 		if( ent->s.weapon == WP_NAILGUN ) {
 			ent->client->accuracy_shots += NUM_NAILSHOTS;
 		} else {
@@ -1603,28 +1722,18 @@ void FireWeapon( gentity_t *ent ) {
 #endif
 
 #ifdef TMNTWEAPSYS_2
+#ifdef TMNT
+	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
+			muzzle, forward, right, up);
+#endif
 	fire_weapon(ent, muzzle, forward, right, up,
 			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor);
 #else
+#ifdef TMNT
+	G_AutoAim(ent, 0, muzzle, forward, right, up);
+#endif
 	// fire the specific weapon
 	switch( ent->s.weapon ) {
-#ifdef TMNTWEAPONS
-	case WP_GUN:
-		Weapon_Gun_Fire( ent );
-		break;
-	case WP_ELECTRIC_LAUNCHER:
-		Weapon_Plasmagun_Fire( ent );
-		break;
-	case WP_ROCKET_LAUNCHER:
-		Weapon_RocketLauncher_Fire( ent );
-		break;
-	case WP_HOMING_LAUNCHER:
-		Weapon_HomingLauncher_Fire( ent );
-		break;
-	case WP_GRAPPLING_HOOK:
-		Weapon_GrapplingHook_Fire( ent );
-		break;
-#else
 	case WP_GAUNTLET:
 		Weapon_Gauntlet( ent );
 		break;
@@ -1669,7 +1778,6 @@ void FireWeapon( gentity_t *ent ) {
 	case WP_CHAINGUN:
 		Bullet_Fire( ent, CHAINGUN_SPREAD, MACHINEGUN_DAMAGE );
 		break;
-#endif
 #endif
 	default:
 // FIXME		G_Error( "Bad ent->s.weapon" );
@@ -1909,10 +2017,8 @@ void G_StartKamikaze( gentity_t *ent ) {
 	if (ent->client) {
 		//
 		explosion->activator = ent;
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		//
 		ent->s.eFlags &= ~EF_KAMIKAZE;
-#endif
 		// nuke the guy that used it
 		G_Damage( ent, ent, ent, NULL, NULL, 100000, DAMAGE_NO_PROTECTION, MOD_KAMIKAZE );
 	}
@@ -1932,81 +2038,29 @@ void G_StartKamikaze( gentity_t *ent ) {
 }
 #endif
 
-#ifdef SP_NPC
-// NPC version of FireWeapon
-void NPC_FireWeapon(gentity_t *ent,vec3_t target_pos)
+#ifdef TMNTNPCSYS
+void NPC_FireWeapon(gentity_t *ent)
 {
-	vec3_t dir,ang;
-	vec3_t fire_org;
-	weapon_t weapon;
+	// set aiming directions
+	AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
 
-	// Turtle Man: Why not use ent->s.weapon?
-	weapon = ent->npc->weapon;
+	// Make sure ent->bgNPC.npc_ps.viewheight is set here.
+	CalcMuzzlePoint ( ent, forward, right, up, muzzle );
 
-	VectorCopy(ent->r.currentOrigin,fire_org);
-
-	if (ent->npc->npcType==NPC_SOLDIER1 || ent->npc->npcType==NPC_SOLDIER2
-		|| ent->npc->npcType==NPC_PILOT || ent->npc->npcType==NPC_ANK)
-	{
-		fire_org[2]+=15;
-	}
-	else if (ent->npc->npcType==NPC_BAT)
-	{
-		fire_org[2]+=33;
-	}
-	else if (ent->npc->npcType==NPC_SEALORD)
-	{
-		fire_org[2]+=30;
-		fire_org[1]-=120;
-	}
-	VectorSubtract (target_pos,fire_org, dir);
-	vectoangles(dir,ang);
-	//if (ent->npc->npcType!=NPC_SEALORD)
-	//{
-		ang[1]=ent->ns.ps.viewangles[1];
-	//}
-	//else if (ent->ns.fireTime > 0)
-	//{
-	//	ang[0]+=rand()%15-7;
-	//	ang[1]+=rand()%15-7;
-	//	ang[2]+=rand()%15-7;
-	//}
 	s_quadFactor=1;
-	AngleVectors (ang, forward, right, up);
-	VectorMA( fire_org, 1, forward, muzzle);
-	SnapVector( muzzle );
 
-#ifdef TMNTWEAPSYS
-    if (BG_WeaponTypeForNum(weapon) != WT_GUN
-#ifndef TMNTWEAPSYS_2
-		&& BG_WeaponTypeForNum(weapon) != WT_GUN_PRIMARY
+#ifdef TMNT
+	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
+			muzzle, forward, right, up);
+#else
+	// NPC just shoots forward, not at target...
 #endif
-		)
-    {
-        return;
-    }
-#endif
-
 #ifdef TMNTWEAPSYS_2
 	fire_weapon(ent, muzzle, forward, right, up,
-			bg_weapongroupinfo[weapon].weaponnum[0], s_quadFactor);
+			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor);
 #else
-#ifdef TMNTWEAPONS
-	if (ent->npc->weapon == WP_GUN)
-#else
-	if (ent->npc->weapon == WP_MACHINEGUN)
-#endif
-	{
-		Bullet_Fire(ent,50,20*(int)(1.0f+0.25f*(float)npc_skill));
-	}
-	//else if (ent->npc->npcType==NPC_MOUSER)
-	//{
-		//fire_mouser_shot(ent, muzzle, forward, ent->ns.enemy);
-	//}
-	//else if (ent->npc->npcType==NPC_FLYBOT)
-	//{
-		//fire_flybot_shot(ent, muzzle, forward);
-	//}
+#warning "TMNTWEAPSYS_2 must be defined for NPC_FireWeapon"
+	Com_Printf("Warning: TMNTWEAPSYS_2 must be defined for NPC_FireWeapon.\n");
 #endif
 }
 #endif

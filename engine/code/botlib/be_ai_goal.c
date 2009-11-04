@@ -551,7 +551,11 @@ void BotInitInfoEntities(void)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+void BotInitLevelItems(bot_shareditem_t *itemInfos)
+#else
 void BotInitLevelItems(void)
+#endif
 {
 	int i, spawnflags, value;
 	char classname[MAX_EPAIRKEY];
@@ -574,6 +578,57 @@ void BotInitLevelItems(void)
 
 	//if there's no AAS file loaded
 	if (!AAS_Loaded()) return;
+
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+	// Add the new items.
+	if (itemInfos != NULL)
+	{
+		//bot_goalstate_t *gs;
+		int j;//, k;
+		int max_iteminfo;
+
+		max_iteminfo = (int) LibVarValue("max_iteminfo", "256");
+
+		for (i = ic->numiteminfo, j = 0; i < max_iteminfo; i++, j++)
+		{
+			if (!itemInfos[j].classname)
+				break;
+
+			Q_strncpyz(ic->iteminfo[i].classname, itemInfos[j].classname, 32);
+			Q_strncpyz(ic->iteminfo[i].name, itemInfos[j].name, MAX_QPATH);
+			Q_strncpyz(ic->iteminfo[i].model, itemInfos[j].model, MAX_QPATH);
+			ic->iteminfo[i].modelindex = itemInfos[j].modelindex;
+
+			// set defaults
+			ic->iteminfo[i].type = 0;  // unused?
+			ic->iteminfo[i].index = 0; // unused?
+			ic->iteminfo[i].respawntime = 30;
+			VectorSet(ic->iteminfo[i].mins, -13, -13, -13);
+			VectorSet(ic->iteminfo[i].maxs, 13, 13, 13);
+
+			ic->iteminfo[i].number = ic->numiteminfo;
+
+#if 0
+			// Set weightnum
+			for (k = 0; k < MAX_CLIENTS; k++)
+			{
+				if (!botgoalstates[k])
+					continue; // Avoid unwated errors in BotGoalStateFromHandle
+
+				gs = BotGoalStateFromHandle(k);
+				if (!gs)
+					continue;
+				if (!gs->itemweightconfig)
+					continue;
+
+				// I wish I could just set the weight...
+				gs->itemweightindex[ic->iteminfo[i].number] = 0;
+			}
+#endif
+			ic->numiteminfo++;
+		}
+	}
+#endif
 
 	//update the modelindexes of the item info
 	for (i = 0; i < ic->numiteminfo; i++)

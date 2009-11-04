@@ -22,14 +22,25 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // tr_noise.c
 #include "tr_local.h"
 
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+#define NOISE_SIZE FUNCTABLE_SIZE
+#else
 #define NOISE_SIZE 256
+#endif
 #define NOISE_MASK ( NOISE_SIZE - 1 )
 
 #define VAL( a ) s_noise_perm[ ( a ) & ( NOISE_MASK )]
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+#define VALR( a ) s_random[ ( a ) & ( NOISE_MASK )]
+#endif
 #define INDEX( x, y, z, t ) VAL( x + VAL( y + VAL( z + VAL( t ) ) ) )
 
 static float s_noise_table[NOISE_SIZE];
 static int s_noise_perm[NOISE_SIZE];
+
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+static int s_random[NOISE_SIZE];
+#endif
 
 #define LERP( a, b, w ) ( a * ( 1.0f - w ) + b * w )
 
@@ -48,6 +59,9 @@ void R_NoiseInit( void )
 	{
 		s_noise_table[i] = ( float ) ( ( ( rand() / ( float ) RAND_MAX ) * 2.0 - 1.0 ) );
 		s_noise_perm[i] = ( unsigned char ) ( rand() / ( float ) RAND_MAX * 255 );
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+		s_random[i] = rand() & 0x01;
+#endif
 	}
 }
 
@@ -91,3 +105,11 @@ float R_NoiseGet4f( float x, float y, float z, float t )
 
 	return finalvalue;
 }
+
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+// used in the shader functions (GF_RANDOM) to implement a quasi random flickering.
+int R_RandomOn(float t)
+{
+	return VALR((unsigned int) floor(t));
+}
+#endif

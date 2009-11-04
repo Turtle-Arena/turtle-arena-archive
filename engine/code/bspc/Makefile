@@ -10,7 +10,7 @@
 #   specially for ../botlib and ../qcommon, the compilation flags on those might not be what you expect
 #
 # Turtle Man 2/25/2009
-# changed Makefile to be like ioquake3 Makefile, currently still only for linux
+# Changed Makefile to be like ioquake3 Makefile, currently still only for linux
 # but should change later.
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]')
@@ -168,7 +168,7 @@ ifeq ($(PLATFORM),mingw32)
     BASE_CFLAGS += -m32
   endif
 
-  LDFLAGS=-lws2_32 -lwinmm -lmingw32 -mwindows
+  LDFLAGS=-lws2_32 -lwinmm -mwindows
 
 else # ifeq mingw32
 
@@ -394,6 +394,9 @@ $(B)/bspc.$(ARCH)$(BINEXT) : $(GAME_OBJS)
 # MISC
 #############################################################################
 
+OBJ=$(GAME_OBJ)
+OBJ_D_FILES=$(filter %.d,$(OBJ:%.o=%.d))
+
 clean: clean-debug clean-release
 #ifeq ($(PLATFORM),mingw32)
 #	@$(MAKE) -C $(NSISDIR) clean
@@ -409,7 +412,8 @@ clean-release:
 
 clean2:
 	@echo "CLEAN $(B)"
-	@rm -f $(GAME_OBJ)
+	@rm -f $(OBJ)
+	@rm -f $(OBJ_D_FILES)
 	@rm -f $(TARGETS)
 
 depend:

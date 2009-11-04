@@ -363,6 +363,17 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 			return;		// off blink
 		}
 
+#ifdef IOQ3ZTM // USE_FREETYPE Turtle Man: i made this
+		if (!cls.useLegacyConsoleFont)
+		{
+			if ( key_overstrikeMode ) {
+				cursorChar = '_';
+			} else {
+				cursorChar = '|';
+			}
+		}
+		else
+#endif
 		if ( key_overstrikeMode ) {
 			cursorChar = 11;
 		} else {
@@ -372,7 +383,17 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 		i = drawLen - strlen( str );
 
 		if ( size == SMALLCHAR_WIDTH ) {
+#ifdef IOQ3ZTM // USE_FREETYPE Turtle Man: i made this
+			float strWidth = 0;
+			int id;
+			for (id = 0; id < (edit->cursor - prestep - i); i++)
+			{
+				strWidth += SCR_ConsoleFontCharWidth( str[i] );
+			}
+			SCR_DrawConsoleFontChar( x + strWidth, y, cursorChar );
+#else
 			SCR_DrawSmallChar( x + ( edit->cursor - prestep - i ) * size, y, cursorChar );
+#endif
 		} else {
 			str[0] = cursorChar;
 			str[1] = 0;

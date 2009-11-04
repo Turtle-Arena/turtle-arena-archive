@@ -424,7 +424,7 @@ void	Q1_LoadBSPFile(char *filename, int offset, int length)
 	q1_fileLength = LoadFile(filename, (void **)&q1_header, offset, length);
 
 // swap the header
-	for (i=0 ; (size_t)i< sizeof(q1_dheader_t)/4 ; i++)
+	for (i=0 ; i< sizeof(q1_dheader_t)/4 ; i++)
 		((int *)q1_header)[i] = LittleLong ( ((int *)q1_header)[i]);
 
 	if (q1_header->version != Q1_BSPVERSION)

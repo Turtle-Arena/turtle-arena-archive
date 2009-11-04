@@ -32,7 +32,9 @@ sfxHandle_t menu_move_sound;
 sfxHandle_t menu_out_sound;
 sfxHandle_t menu_buzz_sound;
 sfxHandle_t menu_null_sound;
+#ifndef TMNTWEAPSYS2
 sfxHandle_t weaponChangeSound;
+#endif
 
 static qhandle_t	sliderBar;
 static qhandle_t	sliderButton_0;
@@ -1629,8 +1631,19 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 		case K_MOUSE2:
 #endif
 		case K_ESCAPE:
+#ifdef IOQ3ZTM
+			if (uis.activemenu->noEscape)
+			{
+				return 0;
+			}
+			else
+			{
+#endif
 			UI_PopMenu();
 			return menu_out_sound;
+#ifdef IOQ3ZTM
+			}
+#endif
 	}
 
 	if (!m || !m->nitems)
@@ -1776,7 +1789,9 @@ void Menu_Cache( void )
 	menu_move_sound	= trap_S_RegisterSound( "sound/misc/menu2.wav", qfalse );
 	menu_out_sound	= trap_S_RegisterSound( "sound/misc/menu3.wav", qfalse );
 	menu_buzz_sound	= trap_S_RegisterSound( "sound/misc/menu4.wav", qfalse );
+#ifndef TMNTWEAPSYS2
 	weaponChangeSound	= trap_S_RegisterSound( "sound/weapons/change.wav", qfalse );
+#endif
 
 	// need a nonzero sound, make an empty sound for this
 	menu_null_sound = -1;

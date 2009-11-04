@@ -261,20 +261,27 @@ void Cmd_Give_f (gentity_t *ent)
 		if (w == WP_DEFAULT)
 			w = ent->client->ps.stats[STAT_DEFAULTWEAPON];
 		if (w < WP_NONE) w = WP_NONE;
+#ifdef TMNTWEAPSYS_2
+		if (w >= BG_NumWeaponGroups()) w = BG_NumWeaponGroups()-1;
+#else
 		if (w >= WP_NUM_WEAPONS) w = WP_NUM_WEAPONS-1;
+#endif
 
 		ent->client->ps.stats[STAT_NEWWEAPON] = w;
 	}
 #else
 	if (give_all || Q_stricmp(name, "weapons") == 0)
 	{
-#ifdef IOQ3ZTM // Give grapple too.
-		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 - 
-			( 1 << WP_NONE );
+		ent->client->ps.stats[STAT_WEAPONS] =
+#ifdef TMNTWEAPSYS_2
+		(1 << BG_NumWeaponGroups()) - 1
 #else
-		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 -
-			( 1 << WP_GRAPPLING_HOOK ) - ( 1 << WP_NONE );
+		(1 << WP_NUM_WEAPONS) - 1
 #endif
+#if !defined IOQ3ZTM && !defined TMNTWEAPSYS_2 // Give grapple too.
+			- ( 1 << WP_GRAPPLING_HOOK )
+#endif
+			- ( 1 << WP_NONE );
 		if (!give_all)
 			return;
 	}

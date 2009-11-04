@@ -98,6 +98,12 @@ cvar_t	*cl_guidServerUniq;
 
 cvar_t	*cl_consoleKeys;
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+cvar_t  *cl_consoleFont;
+cvar_t  *cl_consoleFontSize;
+cvar_t  *cl_consoleFontKerning;
+#endif
+
 clientActive_t		cl;
 clientConnection_t	clc;
 clientStatic_t		cls;
@@ -263,8 +269,7 @@ void CL_Voip_f( void )
 		Com_Printf("VoIP: unmuting incoming voice\n");
 		CL_AddReliableCommand("voip unmuteall", qfalse);
 		clc.voipMuteAll = qfalse;
-	}
-	else {
+	} else {
 		Com_Printf("usage: voip [un]ignore <playerID#>\n"
 				"       voip [un]muteall\n"
 				"       voip gain <playerID#> [value]\n");
@@ -1334,7 +1339,7 @@ void CL_RequestMotd( void ) {
 
 #ifdef IOQ3ZTM
 	// Turtle Man: Check if there is there a valid motd server
-	//             Because in TMNT/SONIC there isn't.
+	//             Because in TMNT Arena there isn't.
 	if (strlen(UPDATE_SERVER_NAME) < 1)
 	{
 		return;
@@ -2810,6 +2815,22 @@ void CL_InitRenderer( void ) {
 
 	// load character sets
 	cls.charSetShader = re.RegisterShader( "gfx/2d/bigchars" );
+#ifdef IOQ3ZTM // USE_FREETYPE
+    cls.useLegacyConsoleFont = qtrue;
+
+	// Register console font specified by cl_consoleFont, if any
+	if ( cl_consoleFont && strlen(cl_consoleFont->string) > 2 )
+	{
+		Com_Memset(&cls.consoleFont, 0, sizeof (cls.consoleFont));
+		re.RegisterFont( cl_consoleFont->string, cl_consoleFontSize->integer, &cls.consoleFont);
+		// Check if loaded font.
+		if (cls.consoleFont.name[0])
+		{
+			// Use loaded font.
+			cls.useLegacyConsoleFont = qfalse;
+		}
+	}
+#endif
 	cls.whiteShader = re.RegisterShader( "white" );
 	cls.consoleShader = re.RegisterShader( "console" );
 	g_console_field_width = cls.glconfig.vidWidth / SMALLCHAR_WIDTH - 2;
@@ -3134,7 +3155,11 @@ void CL_Init( void ) {
 	cl_cURLLib = Cvar_Get("cl_cURLLib", DEFAULT_CURL_LIB, CVAR_ARCHIVE);
 #endif
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+	cl_conXOffset = Cvar_Get ("cl_conXOffset", "10", 0);
+#else
 	cl_conXOffset = Cvar_Get ("cl_conXOffset", "0", 0);
+#endif
 #ifdef MACOS_X
 	// In game video is REALLY slow in Mac OS X right now due to driver slowness
 	cl_inGameVideo = Cvar_Get ("r_inGameVideo", "0", CVAR_ARCHIVE);
@@ -3171,6 +3196,11 @@ void CL_Init( void ) {
 
 	// ~ and `, as keys and characters
 	cl_consoleKeys = Cvar_Get( "cl_consoleKeys", "~ ` 0x7e 0x60", CVAR_ARCHIVE);
+#ifdef IOQ3ZTM // USE_FREETYPE
+	cl_consoleFont = Cvar_Get ("cl_consoleFont", "fonts/FreeSansBold.ttf", CVAR_ARCHIVE | CVAR_LATCH);
+	cl_consoleFontSize = Cvar_Get ("cl_consoleFontSize", "16", CVAR_ARCHIVE | CVAR_LATCH);
+	cl_consoleFontKerning = Cvar_Get ("cl_consoleFontKerning", "0", CVAR_ARCHIVE);
+#endif
 
 	// userinfo
 	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
@@ -3191,15 +3221,6 @@ void CL_Init( void ) {
 	// DEFAULT_TEAMS
 	Cvar_Get ("g_redTeam", "Sais", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("g_blueTeam", "Katanas", CVAR_SERVERINFO | CVAR_ARCHIVE);
-#elif defined SONIC
-	Cvar_Get ("model", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("headmodel", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("team_model", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("team_headmodel", "sonic", CVAR_USERINFO | CVAR_ARCHIVE );
-#endif
-	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #else
 	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("headmodel", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );

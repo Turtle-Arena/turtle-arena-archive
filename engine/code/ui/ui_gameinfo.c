@@ -329,8 +329,6 @@ char *UI_GetBotNameByNumber( int num ) {
 	}
 #ifdef TMNT // DEFAULT_PLAYER
 	return "Raph";
-#elif defined SONIC
-	return "Sonic";
 #else
 	return "Sarge";
 #endif

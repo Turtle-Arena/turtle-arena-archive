@@ -191,6 +191,9 @@ void SP_misc_object(gentity_t *ent);
 void SP_misc_portal_camera(gentity_t *ent);
 void SP_misc_portal_surface(gentity_t *ent);
 
+#ifdef TMNTWEAPSYS_2
+void SP_misc_shooter( gentity_t *ent );
+#endif
 void SP_shooter_rocket( gentity_t *ent );
 void SP_shooter_plasma( gentity_t *ent );
 void SP_shooter_grenade( gentity_t *ent );
@@ -207,9 +210,18 @@ void SP_team_redobelisk( gentity_t *ent );
 void SP_team_neutralobelisk( gentity_t *ent );
 #endif
 void SP_item_botroam( gentity_t *ent ) { }
-#ifdef SP_NPC
-void SP_npc( gentity_t *ent, bgnpc_t *npc );
+#ifdef TMNTNPCSYS
+void SP_path_start( gentity_t *ent );
+#ifndef TMNTPATHSYS
 void SP_npcpath( gentity_t *ent );
+#endif
+#endif
+#ifdef TMNTWEAPSYS_2
+void SP_weapon_random( gentity_t *ent );
+#endif
+#ifdef NIGHTSMODE
+void SP_nights_start( gentity_t *ent ); // Ideya Drone
+void SP_nights_target( gentity_t *ent ); // Ideya Capture
 #endif
 
 
@@ -273,8 +285,9 @@ spawn_t	spawns[] = {
 	{"light", SP_light},
 	{"path_corner", SP_path_corner},
 #ifdef TMNTPATHSYS
-	{"path_start", SP_path_corner},
-	{"path_center", SP_path_corner},
+	{"path_start", SP_path_start},
+	{"path_point", SP_path_corner},
+	{"path_axis", SP_path_corner},
 	{"path_end", SP_path_corner},
 #endif
 
@@ -286,14 +299,12 @@ spawn_t	spawns[] = {
 	{"misc_portal_surface", SP_misc_portal_surface},
 	{"misc_portal_camera", SP_misc_portal_camera},
 
+#ifdef TMNTWEAPSYS_2
+	{"misc_shooter", SP_misc_shooter},
+#endif
 	{"shooter_rocket", SP_shooter_rocket},
-#ifdef TMNTWEAPONS
-	{"shooter_homing", SP_shooter_grenade},
-	{"shooter_electric", SP_shooter_plasma},
-#else
 	{"shooter_grenade", SP_shooter_grenade},
 	{"shooter_plasma", SP_shooter_plasma},
-#endif
 
 	{"team_CTF_redplayer", SP_team_CTF_redplayer},
 	{"team_CTF_blueplayer", SP_team_CTF_blueplayer},
@@ -307,8 +318,16 @@ spawn_t	spawns[] = {
 	{"team_neutralobelisk", SP_team_neutralobelisk},
 #endif
 	{"item_botroam", SP_item_botroam},
-#ifdef SP_NPC
+
+#ifdef TMNTWEAPSYS_2
+	{"weapon_random", SP_weapon_random},
+#endif
+#if defined TMNTNPCSYS && !defined TMNTPATHSYS
 	{"npcpath", SP_npcpath},
+#endif
+#ifdef NIGHTSMODE
+	{"nights_start", SP_nights_start},
+	{"nights_target", SP_nights_target},
 #endif
 
 	{NULL, 0}
@@ -325,12 +344,8 @@ returning qfalse if not found
 qboolean G_CallSpawn( gentity_t *ent ) {
 	spawn_t	*s;
 	gitem_t	*item;
-#ifdef SP_NPC
-	bgnpc_t *npc;
-#endif
-#ifdef TMNTWEAPSYS_2
+#if defined TMNTWEAPSYS_2 || defined TMNTNPCSYS
 	int i;
-	int max;
 #endif
 
 	if ( !ent->classname ) {
@@ -342,10 +357,19 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	// Turtle Man: NOTE: Placed before items so if weapon is on both list
 	//                    uses external item.
 	// check weapon item spawn functions
-	max = BG_NumWeaponGroups();
-	for ( i = 0; i < max; i++ ) {
+	for ( i = 1; i < BG_NumWeaponGroups(); i++ ) {
 		if ( !strcmp(bg_weapongroupinfo[i].itemName, ent->classname) ) {
 			G_SpawnItem( ent, &bg_weapongroupinfo[i].item );
+			return qtrue;
+		}
+	}
+#endif
+
+#ifdef TMNTNPCSYS
+	// check NPC spawn functions
+	for ( i = 1; i < BG_NumNPCs(); i++ ) {
+		if ( !strcmp(bg_npcinfo[i].classname, ent->classname) ) {
+			G_SpawnNPC( ent, &bg_npcinfo[i] );
 			return qtrue;
 		}
 	}
@@ -358,16 +382,6 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
-
-#ifdef SP_NPC
-	// check npc spawn functions
-	for ( npc=bg_npclist ; npc->classname ; npc++ ) {
-		if ( !strcmp(npc->classname, ent->classname) ) {
-			SP_npc( ent, npc );
-			return qtrue;
-		}
-	}
-#endif
 
 	// check normal spawn functions
 	for ( s=spawns ; s->name ; s++ ) {
@@ -522,12 +536,6 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 
 #ifdef TMNT
 	G_SpawnInt( "nottmnt", "0", &i );
-	if ( i ) {
-		G_FreeEntity( ent );
-		return;
-	}
-#elif defined SONIC
-	G_SpawnInt( "notsonic", "0", &i );
 	if ( i ) {
 		G_FreeEntity( ent );
 		return;

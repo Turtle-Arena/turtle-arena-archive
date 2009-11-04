@@ -416,8 +416,15 @@ static void CG_AddToTeamChat( const char *str ) {
 	if (chatHeight <= 0 || cg_teamChatTime.integer <= 0) {
 		// team chat disabled, dump into normal chat
 		cgs.teamChatPos = cgs.teamLastChatPos = 0;
+#ifdef IOQ3ZTM // TEAM_CHAT_CON
+		CG_Printf( "%s\n", str );
+#endif
 		return;
 	}
+#ifdef IOQ3ZTM // TEAM_CHAT_CON
+	// Print in console, but don't "notify" (don't draw when console is closed)
+	CG_Printf( "[skipnotify]%s\n", str );
+#endif
 
 	len = 0;
 
@@ -690,7 +697,7 @@ void CG_LoadVoiceChats( void ) {
 	CG_HeadModelVoiceChats("scripts/default.vc");
 
 #ifdef TMNT
-	// Turtle Man: TODO: Pre-cache voice chats? ( currently have no voice chats )
+	// Turtle Man: TODO?: Pre-cache voice chats? ( currently have no voice chats )
 	//CG_HeadModelVoiceChats("scripts/raph.vc");
 #endif
 #else
@@ -1138,7 +1145,9 @@ static void CG_ServerCommand( void ) {
 		Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );
+#ifndef IOQ3ZTM // TEST_CHAT_CON
 		CG_Printf( "%s\n", text );
+#endif
 		return;
 	}
 	if ( !strcmp( cmd, "vchat" ) ) {

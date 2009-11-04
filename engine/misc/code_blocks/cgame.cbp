@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release TA Win32">
-				<Option output="../../build/cgame_release_ta/cgamex86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../../build/cgame_release_ta" />
+				<Option output="..\..\build\cgame_release_ta\cgamex86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\..\build\cgame_release_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -19,13 +19,14 @@
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
-					<Add option="-DMISSIONPACK" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add option="-DMISSIONPACK" />
+					<Add option="-DMISSIONPACK_HUD" />
 				</Compiler>
 			</Target>
 			<Target title="Debug Win32">
-				<Option output="../../build/cgame_debug/cgamex86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../../build/cgame_debug" />
+				<Option output="..\..\build\cgame_debug\cgamex86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\..\build\cgame_debug" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -38,11 +39,13 @@
 					<Add option="-D_DEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add option="-DMISSIONPACK" />
+					<Add option="-DTMNTHUD" />
 				</Compiler>
 			</Target>
 			<Target title="Release Win32">
-				<Option output="../../build/cgame_release/cgamex86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../../build/cgame_release" />
+				<Option output="..\..\build\cgame_release\cgamex86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\..\build\cgame_release" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -54,11 +57,13 @@
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add option="-DMISSIONPACK" />
+					<Add option="-DTMNTHUD" />
 				</Compiler>
 			</Target>
 			<Target title="Debug TA Win32">
-				<Option output="../../build/cgame_debug_ta/cgamex86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="../../build/cgame_debug_ta" />
+				<Option output="..\..\build\cgame_debug_ta\cgamex86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\..\build\cgame_debug_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -70,8 +75,9 @@
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_WINDOWS" />
-					<Add option="-DMISSIONPACK" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add option="-DMISSIONPACK" />
+					<Add option="-DMISSIONPACK_HUD" />
 				</Compiler>
 			</Target>
 		</Build>
@@ -79,122 +85,131 @@
 			<Add option="-DSTANDALONE" />
 			<Add option="-DRANDOMBOT" />
 			<Add option="-DCELSHADING" />
+			<Add option="-DIOQ3ZTM" />
+			<Add option="-DIOQ3ZTM_NO_COMPAT" />
+			<Add option="-DIOQ3ZTM_NO_TEAM_MODEL" />
+			<Add option="-DNOTRATEDM" />
+			<Add option="-DNOBLOOD" />
+			<Add option="-DTHIRD_PERSON" />
+			<Add option="-DRAVENMD4" />
 			<Add option="-DTMNT" />
-			<Add option="-DTMNTHUD" />
+			<Add option="-DTMNTMISC" />
+			<Add option="-DTMNTSP" />
+			<Add option="-DTMNTHOLDSYS" />
 			<Add option="-DTMNTHOLDABLE" />
 			<Add option="-DTMNTWEAPSYS" />
 			<Add option="-DTMNTWEAPSYS2" />
 			<Add option="-DTMNTWEAPONS" />
-			<Add option="-DTMNTSP" />
+			<Add option="-DTMNTPLAYERSYS" />
 			<Add option="-DTMNTPLAYERS" />
-			<Add option="-DTMNTSKIN" />
 			<Add option="-DTMNT_SUPPORTQ3" />
-			<Add option="-DTMNTENTITIES" />
-			<Add option="-DTMNTPATHS" />
-			<Add option="-DSINGLEPLAYER" />
-			<Add option="-DSP_NPC" />
-			<Add option="-DTMNTHOLDABLE2" />
-			<Add option="-DRAVENMDR" />
+			<Add option="-DTMNTENTSYS" />
+			<Add option="-DTMNTPATHSYS" />
+			<Add option="-DTMNTNPCSYS" />
+			<Add option="-DTMNTDATASYS" />
+			<Add option="-DTMNTDATA" />
+			<Add option="-DTMNTWEAPSYS_2" />
+			<Add option="-DTMNTWEAPSYS_2_NOCOMPAT" />
+			<Add option="-DOA_BLOOM" />
+			<Add option="-DNIGHTSMODE" />
 			<Add option="-DCAMERASCRIPT" />
+			<Add option="-DTMNT_GAME_MODELS" />
 		</Compiler>
 		<Linker>
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
 			<Add library="SDL" />
 		</Linker>
-		<Unit filename="../../code/cgame/cg_consolecmds.c">
+		<Unit filename="..\..\code\cgame\cg_consolecmds.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_draw.c">
+		<Unit filename="..\..\code\cgame\cg_draw.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_drawtools.c">
+		<Unit filename="..\..\code\cgame\cg_drawtools.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_effects.c">
+		<Unit filename="..\..\code\cgame\cg_effects.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_ents.c">
+		<Unit filename="..\..\code\cgame\cg_ents.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_event.c">
+		<Unit filename="..\..\code\cgame\cg_event.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_info.c">
+		<Unit filename="..\..\code\cgame\cg_info.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_local.h" />
-		<Unit filename="../../code/cgame/cg_localents.c">
+		<Unit filename="..\..\code\cgame\cg_local.h" />
+		<Unit filename="..\..\code\cgame\cg_localents.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_main.c">
+		<Unit filename="..\..\code\cgame\cg_main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_marks.c">
+		<Unit filename="..\..\code\cgame\cg_marks.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_newdraw.c">
+		<Unit filename="..\..\code\cgame\cg_newdraw.c">
 			<Option compilerVar="CC" />
 			<Option target="Release TA Win32" />
 			<Option target="Debug TA Win32" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_npcs.c">
+		<Unit filename="..\..\code\cgame\cg_particles.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_particles.c">
+		<Unit filename="..\..\code\cgame\cg_players.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_players.c">
+		<Unit filename="..\..\code\cgame\cg_playerstate.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_playerstate.c">
+		<Unit filename="..\..\code\cgame\cg_predict.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_predict.c">
+		<Unit filename="..\..\code\cgame\cg_public.h" />
+		<Unit filename="..\..\code\cgame\cg_scoreboard.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_public.h" />
-		<Unit filename="../../code/cgame/cg_scoreboard.c">
+		<Unit filename="..\..\code\cgame\cg_servercmds.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_servercmds.c">
+		<Unit filename="..\..\code\cgame\cg_snapshot.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_snapshot.c">
+		<Unit filename="..\..\code\cgame\cg_syscalls.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_syscalls.c">
+		<Unit filename="..\..\code\cgame\cg_view.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_view.c">
+		<Unit filename="..\..\code\cgame\cg_weapons.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_weapons.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../code/game/bg_lib.c">
+		<Unit filename="..\..\code\game\bg_lib.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="../../code/game/bg_misc.c">
+		<Unit filename="..\..\code\game\bg_misc.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/game/bg_misc.h" />
-		<Unit filename="../../code/game/bg_pmove.c">
+		<Unit filename="..\..\code\game\bg_misc.h" />
+		<Unit filename="..\..\code\game\bg_pmove.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/game/bg_slidemove.c">
+		<Unit filename="..\..\code\game\bg_slidemove.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/qcommon/q_math.c">
+		<Unit filename="..\..\code\qcommon\q_math.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/qcommon/q_shared.c">
+		<Unit filename="..\..\code\qcommon\q_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/qcommon/q_shared.h" />
-		<Unit filename="../../code/qcommon/surfaceflags.h" />
-		<Unit filename="../../code/ui/ui_shared.c">
+		<Unit filename="..\..\code\qcommon\q_shared.h" />
+		<Unit filename="..\..\code\qcommon\surfaceflags.h" />
+		<Unit filename="..\..\code\ui\ui_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

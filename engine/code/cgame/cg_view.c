@@ -217,7 +217,9 @@ CG_OffsetThirdPersonView
 
 ===============
 */
+#ifndef IOQ3ZTM // BETTER_THIRD_PERSON
 #define	FOCUS_DISTANCE	512
+#endif
 static void CG_OffsetThirdPersonView( void ) {
 	vec3_t		forward, right, up;
 	vec3_t		view;
@@ -227,7 +229,9 @@ static void CG_OffsetThirdPersonView( void ) {
 	static vec3_t	maxs = { 4, 4, 4 };
 	vec3_t		focusPoint;
 	float		focusDist;
+#ifndef IOQ3ZTM // BETTER_THIRD_PERSON
 	float		forwardScale, sideScale;
+#endif
 
 	cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
 
@@ -238,13 +242,26 @@ static void CG_OffsetThirdPersonView( void ) {
 		focusAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
 		cg.refdefViewAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
 	}
+#ifdef IOQ3ZTM // BETTER_THIRD_PERSON
+	else
+	{
+		focusAngles[YAW] -= cg_thirdPersonAngle.value;
+		cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle.value;
+	}
+#endif
 
 	if ( focusAngles[PITCH] > 45 ) {
 		focusAngles[PITCH] = 45;		// don't go too far overhead
 	}
+
 	AngleVectors( focusAngles, forward, NULL, NULL );
 
+#ifdef IOQ3ZTM // BETTER_THIRD_PERSON
+	// Focus on player
+	VectorMA( cg.refdef.vieworg, cg_thirdPersonRange.value, forward, focusPoint );
+#else
 	VectorMA( cg.refdef.vieworg, FOCUS_DISTANCE, forward, focusPoint );
+#endif
 
 	VectorCopy( cg.refdef.vieworg, view );
 
@@ -254,16 +271,21 @@ static void CG_OffsetThirdPersonView( void ) {
 
 	AngleVectors( cg.refdefViewAngles, forward, right, up );
 
+#ifdef IOQ3ZTM // BETTER_THIRD_PERSON
+	// Move camera behind player
+	VectorMA( view, -cg_thirdPersonRange.value, forward, view );
+#else
 	forwardScale = cos( cg_thirdPersonAngle.value / 180 * M_PI );
 	sideScale = sin( cg_thirdPersonAngle.value / 180 * M_PI );
 	VectorMA( view, -cg_thirdPersonRange.value * forwardScale, forward, view );
 	VectorMA( view, -cg_thirdPersonRange.value * sideScale, right, view );
+#endif
 
 	// trace a ray from the origin to the viewpoint to make sure the view isn't
 	// in a solid block.  Use an 8 by 8 block to prevent the view from near clipping anything
 
 	if (!cg_cameraMode.integer) {
-#ifdef IOQ3ZTM // Smooth steps.
+#ifdef IOQ3ZTM // BETTER_THIRD_PERSON
 		// add step offset
 		//CG_StepOffset();
 		{
@@ -300,12 +322,14 @@ static void CG_OffsetThirdPersonView( void ) {
 		focusDist = 1;	// should never happen
 	}
 	cg.refdefViewAngles[PITCH] = -180 / M_PI * atan2( focusPoint[2], focusDist );
+#ifndef IOQ3ZTM // BETTER_THIRD_PERSON
 	cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle.value;
+#endif
 }
 
-
 // this causes a compiler bug on mac MrC compiler
-static void CG_StepOffset( void ) {
+static void CG_StepOffset( void )
+{
 	int		timeDelta;
 	
 	// smooth out stair climbing
@@ -711,7 +735,7 @@ static int CG_CalcViewValues( void ) {
 			cg.refdef.rdflags |= RDF_NOWORLDMODEL | RDF_HYPERSPACE;
 		}
 
-		// Turtle Man: TODO: Perdiction.
+		// Turtle Man: TODO?: Perdiction.
 		VectorCopy(ps->camera.angles, cg.refdefViewAngles);
 		VectorCopy(ps->camera.pos, cg.refdef.vieworg);
 		AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
@@ -760,7 +784,7 @@ static int CG_CalcViewValues( void ) {
 		}
 	}
 
-#ifdef ANALOG // Turtle Man: TODO: Analog camera.
+#ifdef ANALOG // Turtle Man: TODO?: Analog camera.
 	if (cg_thirdPerson.integer && cg_thirdPersonAnalog.integer)
 	{
 		// Analog camera.
@@ -806,6 +830,12 @@ static void CG_PowerupTimerSounds( void ) {
 	// powerup timers going away
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
 		t = cg.snap->ps.powerups[i];
+#ifdef TMNT // POWERS
+		if (i == PW_FLASHING)
+		{
+			continue;
+		}
+#endif
 		if ( t <= cg.time ) {
 			continue;
 		}

@@ -29,9 +29,29 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
-#ifdef TMNT // Botlib is not compatible with (io)quake3 (or anyone else)
-// Turtle Man: FIXME: Should only be if TMNTWEAPSYS2 or TMNTHOLDSYS ?
-#define	BOTLIB_API_VERSION		3
+// Turtle Man: Botlib is not compatible with (io)quake3 (or anyone else)
+#if defined TMNTWEAPSYS_2 || defined TMNTWEAPSYS2 || defined TMNTHOLDSYS
+
+	// Turtle Man: FIXME: Are there other defines that are not compatible?
+	#ifdef TMNTWEAPSYS_2 // & 4
+		#define BOTLIB_API_BIT4 4
+	#else
+		#define BOTLIB_API_BIT4 0
+	#endif
+
+	#ifdef TMNTWEAPSYS2 // & 8
+		#define BOTLIB_API_BIT8 8
+	#else
+		#define BOTLIB_API_BIT8 0
+	#endif
+
+	#ifdef TMNTHOLDSYS // & 16
+		#define BOTLIB_API_BIT16 16
+	#else
+		#define BOTLIB_API_BIT16 0
+	#endif
+
+	#define	BOTLIB_API_VERSION		(2|BOTLIB_API_BIT4|BOTLIB_API_BIT8|BOTLIB_API_BIT16)
 #else
 #define	BOTLIB_API_VERSION		2
 #endif
@@ -177,6 +197,17 @@ typedef struct bot_entitystate_s
 	int		legsAnim;		// mask off ANIM_TOGGLEBIT
 	int		torsoAnim;		// mask off ANIM_TOGGLEBIT
 } bot_entitystate_t;
+
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+//game can send extra items not in "botfiles/items.c"
+typedef struct
+{
+	char classname[32];
+	char name[MAX_QPATH];
+	char model[MAX_QPATH];
+	int modelindex;
+} bot_shareditem_t;
+#endif
 
 //bot AI library exported functions
 typedef struct botlib_import_s
@@ -376,7 +407,11 @@ typedef struct ai_export_s
 	int		(*BotGetMapLocationGoal)(char *name, struct bot_goal_s *goal);
 	float	(*BotAvoidGoalTime)(int goalstate, int number);
 	void	(*BotSetAvoidGoalTime)(int goalstate, int number, float avoidtime);
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+	void	(*BotInitLevelItems)(bot_shareditem_t *itemInfos);
+#else
 	void	(*BotInitLevelItems)(void);
+#endif
 	void	(*BotUpdateEntityItems)(void);
 	int		(*BotLoadItemWeights)(int goalstate, char *filename);
 	void	(*BotFreeItemWeights)(int goalstate);
@@ -400,17 +435,17 @@ typedef struct ai_export_s
 	void	(*BotFreeMoveState)(int handle);
 	void	(*BotInitMoveState)(int handle, struct bot_initmove_s *initmove);
 	void	(*BotAddAvoidSpot)(int movestate, vec3_t origin, float radius, int type);
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 	//-----------------------------------
 	// be_ai_weap.h
 	//-----------------------------------
 	int		(*BotChooseBestFightWeapon)(int weaponstate, int *inventory);
-#ifndef TMNTWEAPSYS_2_NOCOMPAT
 	void	(*BotGetWeaponInfo)(int weaponstate, int weapon, struct weaponinfo_s *weaponinfo);
-#endif
 	int		(*BotLoadWeaponWeights)(int weaponstate, char *filename);
 	int		(*BotAllocWeaponState)(void);
 	void	(*BotFreeWeaponState)(int weaponstate);
 	void	(*BotResetWeaponState)(int weaponstate);
+#endif
 	//-----------------------------------
 	// be_ai_gen.h
 	//-----------------------------------
@@ -445,7 +480,11 @@ typedef struct botlib_export_s
 	//start a frame in the bot library
 	int (*BotLibStartFrame)(float time);
 	//load a new map in the bot library
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+	int (*BotLibLoadMap)(const char *mapname, bot_shareditem_t *itemInfos);
+#else
 	int (*BotLibLoadMap)(const char *mapname);
+#endif
 	//entity updates
 	int (*BotLibUpdateEntity)(int ent, bot_entitystate_t *state);
 	//just for testing

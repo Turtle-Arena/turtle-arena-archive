@@ -2149,6 +2149,11 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	char		*text_p;
 	char		*token;
 	char		surfName[MAX_QPATH];
+#ifdef IOQ3ZTM // $DIR_IN_SKIN
+	char		path[MAX_QPATH];
+	char		shaderName[MAX_QPATH];
+	int			i;
+#endif
 
 	if ( !name || !name[0] ) {
 		Com_Printf( "Empty name passed to RE_RegisterSkin\n" );
@@ -2200,6 +2205,22 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		return 0;
 	}
 
+#ifdef IOQ3ZTM // $DIR_IN_SKIN
+	Q_strncpyz(path, name, MAX_QPATH);
+	// remove filename
+	for (i = strlen(path)-1; i > 0; i--)
+	{
+		if (path[i] == '/' || path[i] == '\\') {
+			path[i] = '\0';
+			break;
+		}
+	}
+	if (i == 0)
+	{
+		path[i] = '\0';
+	}
+#endif
+
 	text_p = text.c;
 	while ( text_p && *text_p ) {
 		// get surface name
@@ -2225,7 +2246,22 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 
 		surf = skin->surfaces[ skin->numSurfaces ] = ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low );
 		Q_strncpyz( surf->name, surfName, sizeof( surf->name ) );
+#ifdef IOQ3ZTM // $DIR_IN_SKIN
+		// 6: "$(dir)" 1: '/' or '\\' 1+: path
+		//  $(dir)/torso.png
+		if (strlen(token) > 6 && Q_stricmpn("$(dir)", token, 6) == 0)
+		{
+			Q_strncpyz(shaderName, path, MAX_QPATH);
+			Q_strcat(shaderName, MAX_QPATH, &token[6]); // skip "$(dir)"
+
+			surf->shader = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
+		}
+		else {
+			surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+		}
+#else
 		surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+#endif
 		skin->numSurfaces++;
 	}
 

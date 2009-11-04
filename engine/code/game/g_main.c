@@ -111,6 +111,9 @@ vmCvar_t	g_spSaveData; // Used to save data between levels.
 vmCvar_t	g_saveVersions;
 vmCvar_t	g_saveTypes;
 #endif
+#ifdef TMNT // POWERS // PW_FLASHING
+vmCvar_t	g_teleportFluxTime;
+#endif
 
 static cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -190,9 +193,15 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
 
 #ifdef MISSIONPACK
+#ifdef TMNTMISC
+	{ &g_obeliskHealth, "g_obeliskHealth", "1000", 0, 0, qfalse },
+	{ &g_obeliskRegenPeriod, "g_obeliskRegenPeriod", "1", 0, 0, qfalse },
+	{ &g_obeliskRegenAmount, "g_obeliskRegenAmount", "3", 0, 0, qfalse },
+#else
 	{ &g_obeliskHealth, "g_obeliskHealth", "2500", 0, 0, qfalse },
 	{ &g_obeliskRegenPeriod, "g_obeliskRegenPeriod", "1", 0, 0, qfalse },
 	{ &g_obeliskRegenAmount, "g_obeliskRegenAmount", "15", 0, 0, qfalse },
+#endif
 	{ &g_obeliskRespawnDelay, "g_obeliskRespawnDelay", "10", CVAR_SERVERINFO, 0, qfalse },
 
 	{ &g_cubeTimeout, "g_cubeTimeout", "30", 0, 0, qfalse },
@@ -210,7 +219,7 @@ static cvarTable_t		gameCvarTable[] = {
 #endif
 #endif
 #ifdef TMNTSP
-	{ &g_singlePlayer, "ui_singlePlayerActive", "", 0, 0, qfalse, qfalse  },
+	{ &g_singlePlayer, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM, 0, qfalse, qfalse  },
 	{ &g_spSaveData, "g_spSaveData", "", CVAR_SYSTEMINFO, 0, qfalse, qfalse  },
 	{ &g_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM, 0, 0, qfalse },
 	{ &g_saveTypes, "g_saveTypes", BG_SAVE_TYPES, CVAR_ROM, 0, 0, qfalse },
@@ -223,6 +232,9 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_redteam, "g_redteam", "Stroggs", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
 	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #endif
+#endif
+#ifdef TMNT // POWERS // PW_FLASHING
+	{ &g_teleportFluxTime, "g_teleportFluxTime", "5", CVAR_SERVERINFO, 0, qfalse},
 #endif
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},
@@ -546,11 +558,14 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	InitBodyQue();
 
 	ClearRegisteredItems();
-#ifdef SP_NPC
+#ifdef TMNTNPCSYS
 	ClearRegisteredNPCs();
 #endif
 #ifdef TMNTWEAPSYS_2
 	BG_InitWeaponInfo();
+#endif
+#ifdef TMNTNPCSYS
+	BG_InitNPCInfo();
 #endif
 
 	// parse the key/value pairs and spawn gentities
@@ -565,7 +580,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	}
 
 	SaveRegisteredItems();
-#ifdef SP_NPC
+#ifdef TMNTNPCSYS
 	SaveRegisteredNPCs();
 #endif
 
@@ -1988,23 +2003,34 @@ int start, end;
 			continue;
 		}
 #endif
+#ifdef TMNTNPCSYS
+		if ( ent->s.eType == ET_NPC ) {
+			G_RunNPC( ent );
+			continue;
+		}
+#endif
 
 		if ( ent->s.eType == ET_ITEM || ent->physicsObject ) {
 			G_RunItem( ent );
 			continue;
 		}
 
-#ifdef SP_NPC
-		if (ent->s.eType == ET_NPC) {
-			G_RunNPC(ent);
-			continue;
-		}
-#endif
-
 		if ( ent->s.eType == ET_MOVER ) {
 			G_RunMover( ent );
 			continue;
 		}
+
+#ifdef IOQ3ZTM // GRAPPLE_FIX
+		if ( ent->s.eType == ET_GRAPPLE ) {
+			if (!ent->parent || !ent->parent->inuse || !ent->parent->client)
+			{
+				G_FreeEntity( ent );
+				continue;
+			}
+			G_RunThink( ent );
+			continue;
+		}
+#endif
 
 		if ( i < MAX_CLIENTS ) {
 			G_RunClient( ent );

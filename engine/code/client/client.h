@@ -357,6 +357,10 @@ typedef struct {
 	qhandle_t	charSetShader;
 	qhandle_t	whiteShader;
 	qhandle_t	consoleShader;
+#ifdef IOQ3ZTM // USE_FREETYPE
+	qboolean useLegacyConsoleFont;
+	fontInfo_t  consoleFont;
+#endif
 } clientStatic_t;
 
 extern	clientStatic_t		cls;
@@ -415,6 +419,12 @@ extern	cvar_t	*cl_lanForcePackets;
 extern	cvar_t	*cl_autoRecordDemo;
 
 extern	cvar_t	*cl_consoleKeys;
+
+#ifdef IOQ3ZTM // USE_FREETYPE
+extern	cvar_t  *cl_consoleFont;
+extern	cvar_t  *cl_consoleFontSize;
+extern	cvar_t  *cl_consoleFontKerning;
+#endif
 
 #ifdef USE_MUMBLE
 extern	cvar_t	*cl_useMumble;
@@ -573,6 +583,12 @@ void	SCR_DrawBigString( int x, int y, const char *s, float alpha, qboolean noCol
 void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, qboolean noColorEscape );	// ignores embedded color control characters
 void	SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qboolean forceColor, qboolean noColorEscape );
 void	SCR_DrawSmallChar( int x, int y, int ch );
+#ifdef IOQ3ZTM // USE_FREETYPE
+void    SCR_DrawConsoleFontChar( float x, float y, int ch );
+float   SCR_ConsoleFontCharWidth( int ch );
+float   SCR_ConsoleFontCharHeight ( void );
+float   SCR_ConsoleFontStringWidth( const char *s, int len );
+#endif
 
 
 //

@@ -44,7 +44,7 @@ MAIN MENU
 #define ID_EXIT					17
 
 #ifdef TMNT // BANNER_IMAGE
-#define ART_BANNER_IMAGE				"ui/assets/titlebanner"
+#define ART_BANNER_IMAGE				"menu/art/titlebanner"
 #else
 #define MAIN_BANNER_MODEL				"models/mapobjects/banner/banner5.md3"
 #endif
@@ -68,7 +68,9 @@ typedef struct {
 #endif
 	menutext_s		exit;
 
+#ifndef TMNT // BANNER_IMAGE
 	qhandle_t		bannerModel;
+#endif
 } mainmenu_t;
 
 
@@ -76,7 +78,14 @@ static mainmenu_t s_main;
 
 typedef struct {
 	menuframework_s menu;	
+#ifdef IOQ3ZTM
+	char errorMessage[256];
+#else
 	char errorMessage[4096];
+#endif
+#ifdef TMNT // BANNER_IMAGE
+	menubitmap_s	banner_image;
+#endif
 } errorMessage_t;
 
 static errorMessage_t s_errorMessage;
@@ -116,7 +125,11 @@ void Main_MenuEvent (void* ptr, int event) {
 		break;
 
 	case ID_MULTIPLAYER:
+#ifdef TMNTMISC
+		UI_MultiplayerMenu();
+#else
 		UI_ArenaServersMenu();
+#endif
 		break;
 
 	case ID_SETUP:
@@ -183,7 +196,7 @@ static void Main_MenuDraw( void ) {
 	float			adjust;
 	float			x, y, w, h;
 #endif
-#if !defined TMNT && !defined SONIC
+#ifndef TMNT
 	vec4_t			color = {0.5, 0, 0, 1};
 #endif
 
@@ -236,9 +249,26 @@ static void Main_MenuDraw( void ) {
 	trap_R_RenderScene( &refdef );
 #endif
 	
+#ifdef IOQ3ZTM // Turtle Man: FIXME: Why does error draw when there isn't a com_errorMessage?? note: ui.qvm only not ui.so
+	if (s_errorMessage.errorMessage[0] && strlen(s_errorMessage.errorMessage) == 1)
+	{
+		Com_Printf("com_errorMessage: %s, len: %lu\n", s_errorMessage.errorMessage, strlen(s_errorMessage.errorMessage));
+		s_errorMessage.errorMessage[0] ='\0';
+	}
+#endif
 	if (strlen(s_errorMessage.errorMessage))
 	{
+#ifdef TMNT // BANNER_IMAGE
+		// standard menu drawing
+		Menu_Draw( &s_errorMessage.menu );
+
+		UI_DrawProportionalString_AutoWrapped( 320, 224+SMALLCHAR_HEIGHT*2, 600, 20, s_errorMessage.errorMessage, UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, menu_text_color );
+#else
 		UI_DrawProportionalString_AutoWrapped( 320, 192, 600, 20, s_errorMessage.errorMessage, UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, menu_text_color );
+#endif
+#ifdef IOQ3ZTM
+		UI_DrawProportionalString( 320, 480-SMALLCHAR_HEIGHT*4, "Press any key", UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, menu_text_color );
+#endif
 	}
 	else
 	{
@@ -248,8 +278,6 @@ static void Main_MenuDraw( void ) {
 
 #ifdef TMNT // Legal stuff...
 	//UI_DrawString( 320, 450, "This is a fangame, TMNT is used without permission. TMNT(c) Mirage Studios.", UI_CENTER|UI_SMALLFONT, color );
-#elif defined SONIC
-	// nothing...
 #else
 	if (uis.demoversion) {
 		UI_DrawProportionalString( 320, 372, "DEMO      FOR MATURE AUDIENCES      DEMO", UI_CENTER|UI_SMALLFONT, color );
@@ -333,7 +361,24 @@ void UI_MainMenu( void ) {
 		s_errorMessage.menu.key = ErrorMessage_Key;
 		s_errorMessage.menu.fullscreen = qtrue;
 		s_errorMessage.menu.wrapAround = qtrue;
+#ifndef TMNTDATASYS
 		s_errorMessage.menu.showlogo = qtrue;		
+#endif
+#ifdef IOQ3ZTM
+		s_errorMessage.menu.noEscape = qtrue;
+#endif
+
+#ifdef TMNT // BANNER_IMAGE
+		s_errorMessage.banner_image.generic.type				= MTYPE_BITMAP;
+		s_errorMessage.banner_image.generic.name				= ART_BANNER_IMAGE;
+		s_errorMessage.banner_image.generic.flags				= QMF_CENTER_JUSTIFY|QMF_INACTIVE;
+		s_errorMessage.banner_image.generic.x					= 320;
+		s_errorMessage.banner_image.generic.y					= 96;
+		s_errorMessage.banner_image.width  						= 427;
+		s_errorMessage.banner_image.height  					= 128;
+
+		Menu_AddItem( &s_errorMessage.menu,	&s_errorMessage.banner_image );
+#endif
 
 		trap_Key_SetCatcher( KEYCATCH_UI );
 		uis.menusp = 0;
@@ -342,19 +387,29 @@ void UI_MainMenu( void ) {
 		return;
 	}
 
+#ifdef TMNTMISC
+	trap_S_StopBackgroundTrack();
+	trap_S_StartBackgroundTrack("music/menu.ogg", NULL);
+#endif
+
 	s_main.menu.draw = Main_MenuDraw;
 	s_main.menu.fullscreen = qtrue;
 	s_main.menu.wrapAround = qtrue;
+#ifndef TMNTDATASYS
 	s_main.menu.showlogo = qtrue;
+#endif
+#ifdef IOQ3ZTM
+	s_main.menu.noEscape = qtrue;
+#endif
 
 #ifdef TMNT // BANNER_IMAGE
 	s_main.banner_image.generic.type				= MTYPE_BITMAP;
 	s_main.banner_image.generic.name				= ART_BANNER_IMAGE;
-	s_main.banner_image.generic.flags				= QMF_INACTIVE;
-	s_main.banner_image.generic.x					= 90;
-	s_main.banner_image.generic.y					= 36;
-	s_main.banner_image.width  						= 460;
-	s_main.banner_image.height  					= 200;
+	s_main.banner_image.generic.flags				= QMF_CENTER_JUSTIFY|QMF_INACTIVE;
+	s_main.banner_image.generic.x					= 320;
+	s_main.banner_image.generic.y					= 96;
+	s_main.banner_image.width  						= 427;
+	s_main.banner_image.height  					= 128;
 #endif
 
 #ifdef TMNTSP

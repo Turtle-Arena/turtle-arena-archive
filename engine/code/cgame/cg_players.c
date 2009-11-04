@@ -509,7 +509,16 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 			else {
 				Com_sprintf( filename, length, "%s/%s/%s/%s_%s.%s", headsFolder, headModelName, headSkinName, base, team, ext );
 			}
-			if ( CG_FileExists( filename ) ) {
+			// SUPPORT_ALL_FORMAT_SKIN_ICONS
+			if (Q_stricmpn(ext, "*image", 6) == 0)
+			{
+				filename[strlen(filename)-strlen(ext)-1] = 0;
+				if (trap_R_RegisterShaderNoMip(filename))
+				{
+					return qtrue;
+				}
+			}
+			else if ( CG_FileExists( filename ) ) {
 				return qtrue;
 			}
 			if ( cgs.gametype >= GT_TEAM ) {
@@ -528,7 +537,16 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 					Com_sprintf( filename, length, "%s/%s/%s_%s.%s", headsFolder, headModelName, base, headSkinName, ext );
 				}
 			}
-			if ( CG_FileExists( filename ) ) {
+			// SUPPORT_ALL_FORMAT_SKIN_ICONS
+			if (Q_stricmpn(ext, "*image", 6) == 0)
+			{
+				filename[strlen(filename)-strlen(ext)-1] = 0;
+				if (trap_R_RegisterShaderNoMip(filename))
+				{
+					return qtrue;
+				}
+			}
+			else if ( CG_FileExists( filename ) ) {
 				return qtrue;
 			}
 			if ( !teamName || !*teamName ) {
@@ -545,8 +563,7 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 		headsFolder = "";
 	}
 
-	while(1)
-	{
+	while(1) {
 		for ( i = 0; i < 2; i++ ) {
 			if ( i == 0 && teamName && *teamName ) {
 				Com_sprintf( filename, length, "models/players/%s%s/%s/%s%s_%s.%s", headsFolder, headModelName, headSkinName, teamName, base, team, ext );
@@ -814,20 +831,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 #endif
 
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
-	// Support all image formats for player icons
-	if (
-#ifdef TMNTDATASYS // Load PNG first.
-		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "png" ) ||
-#endif
-		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "tga" ) ||
-		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "jpg" ) ||
-		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "jpeg" ) ||
-#ifndef TMNTDATASYS
-		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "png" ) ||
-#endif
-		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "pcx" ) ||
-		CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "bmp" ) )
-	{
+	if ( CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "*image" ) ) {
 		ci->modelIcon = trap_R_RegisterShaderNoMip( filename );
 	}
 #else
@@ -1289,7 +1293,7 @@ void CG_NewClientInfo( int clientNum ) {
 			Q_strncpyz( newInfo.skinName, "default", sizeof( newInfo.skinName ) );
 		} else {
 #ifdef TMNTSP // SPMODEL
-			if ( cg_singlePlayerActive.integer /* && cgs.gametype == GT_SINGLE_PLAYER*/ )
+			if ( cg_singlePlayerActive.integer == 1 )
 				trap_Cvar_VariableStringBuffer( "spmodel", modelStr, sizeof( modelStr ) );
 			else
 #endif
@@ -1460,8 +1464,6 @@ static void CG_SetLerpFrameAnimation( clientInfo_t *ci, lerpFrame_t *lf, int new
 	}
 
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-	// Turtle Man: TDC's NPC version used "anim = animations+newAnimation;"
-	//               shouldn't make a difference.
 	anim = &animations[ newAnimation ];
 #else
 #ifdef TMNTPLAYERSYS
@@ -1761,6 +1763,16 @@ static void CG_AddPainTwitch( centity_t *cent, vec3_t torsoAngles ) {
 
 	f = 1.0 - (float)t / PAIN_TWITCH_TIME;
 
+#if 0 // #ifdef TMNTMISC // Turtle Man: TEST
+	if (cent->currentState.clientNum == cg.predictedPlayerEntity.currentState.clientNum)
+	{
+		Com_Printf("DEBUG: damageYaw=%d\n", cg.predictedPlayerState.damageYaw);
+
+		//torsoAngles[PITCH] += cg.predictedPlayerState.damagePitch * f;
+		torsoAngles[YAW] -= cg.predictedPlayerState.damageYaw * f;
+	}
+	else
+#endif
 	if ( cent->pe.painDirection ) {
 		torsoAngles[ROLL] += 20 * f;
 	} else {
@@ -1948,6 +1960,78 @@ static void CG_HasteTrail( centity_t *cent ) {
 }
 
 #ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef TMNTMISC
+
+/*
+==================
+CG_BubbleTrail
+
+Bullets shot underwater
+==================
+*/
+void CG_SpawnBreathBubbles( vec3_t origin ) {
+	int			i;
+	int			numBubbles;
+	float		rnd;
+	qboolean	spawnedLarge; // Only one large bubble.
+
+	spawnedLarge = qfalse;
+	numBubbles = (int)(3 + random()*5);
+
+	for ( i = 0; i < numBubbles; i++ ) {
+		localEntity_t	*le;
+		refEntity_t		*re;
+
+		le = CG_AllocLocalEntity();
+		le->leFlags = LEF_PUFF_DONT_SCALE;
+		le->leType = LE_BUBBLE; // LE_MOVE_SCALE_FADE;
+		le->startTime = cg.time;
+
+		// Bubbles should make it to the surface
+		le->endTime = cg.time + 8000 + random() * 250;
+
+		le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+
+		re = &le->refEntity;
+		re->shaderTime = cg.time / 1000.0f;
+
+		re->reType = RT_SPRITE;
+		re->rotation = 0;
+
+		rnd = random();
+		if (rnd > 0.9f && !spawnedLarge)
+		{
+			spawnedLarge = qtrue;
+			re->radius = 6;
+		}
+		else
+		{
+			re->radius = 1 + rnd * 2;
+		}
+
+		re->customShader = cgs.media.waterBubbleShader;
+		re->shaderRGBA[0] = 0xff;
+		re->shaderRGBA[1] = 0xff;
+		re->shaderRGBA[2] = 0xff;
+		re->shaderRGBA[3] = 0xff;
+
+		le->color[3] = 1.0;
+
+		le->pos.trType = TR_LINEAR;
+		le->pos.trTime = cg.time;
+
+		VectorCopy( origin, le->pos.trBase );
+		le->pos.trBase[0] += crandom();
+		le->pos.trBase[1] += crandom();
+		le->pos.trBase[2] += crandom();
+
+		le->pos.trDelta[0] = crandom()*5;
+		le->pos.trDelta[1] = crandom()*5;
+		le->pos.trDelta[2] = 8 + random()*5;
+	}
+}
+#endif
+
 /*
 ===============
 CG_BreathPuffs
@@ -1960,9 +2044,11 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 
 	ci = &cgs.clientinfo[ cent->currentState.number ];
 
+#ifndef TMNTMISC
 	if (!cg_enableBreath.integer) {
 		return;
 	}
+#endif
 	if ( cent->currentState.number == cg.snap->ps.clientNum && !cg.renderingThirdPerson) {
 		return;
 	}
@@ -1970,9 +2056,11 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 		return;
 	}
 	contents = trap_CM_PointContents( head->origin, 0 );
+#ifndef TMNTMISC
 	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) {
 		return;
 	}
+#endif
 	if ( ci->breathPuffTime > cg.time ) {
 		return;
 	}
@@ -1980,7 +2068,19 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 	VectorSet( up, 0, 0, 8 );
 	VectorMA(head->origin, 8, head->axis[0], origin);
 	VectorMA(origin, -4, head->axis[2], origin);
+#ifdef TMNTMISC // Turtle Man: Bubbles under water! (and slime/lava?)
+	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) {
+		CG_SpawnBreathBubbles(origin);
+	}
+	else //if (player is cold...)
+	{
+		if (cg_enableBreath.integer) {
+#endif
 	CG_SmokePuff( origin, up, 16, 1, 1, 1, 0.66f, 1500, cg.time, cg.time + 400, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
+#ifdef TMNTMISC
+		}
+	}
+#endif
 	ci->breathPuffTime = cg.time + 2000;
 }
 
@@ -2109,12 +2209,26 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	float		angle, d;
 #ifdef TMNTDATASYS // FLAG_MODEL
 	qboolean trailItem;
+#endif
+#ifdef IOQ3ZTM // FLAG
 	gitem_t *item;
 	int itemIndex;
+#ifndef TMNTDATASYS // FLAG_MODEL
+	qhandle_t hSkin = 0;
 
-	trailItem = qtrue;
+	if (flagPower == PW_REDFLAG)
+		hSkin = cgs.media.redFlagFlapSkin;
+	else if (flagPower == PW_BLUEFLAG)
+		hSkin = cgs.media.blueFlagFlapSkin;
+	else
+		hSkin = cgs.media.neutralFlagFlapSkin;
+#endif
+
 	item = BG_FindItemForPowerup(flagPower);
 	itemIndex = ITEM_INDEX(item);
+#endif
+#ifdef TMNTDATASYS // FLAG_MODEL
+	trailItem = qtrue;
 #endif
 
 #ifdef TMNTWEAPSYS
@@ -2194,6 +2308,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 
 #if 0 // #ifdef IOQ3ZTM // FLAG // Don't draw CTF flag for the holder in third person, blocks view.
 						// Turtle Man: Could we make if transparent instead?
+						//     RF_FORCEENTALPHA
 		if (cent->currentState.clientNum == cg.predictedPlayerState.clientNum
 			&& cg_thirdPerson.integer)
 		{
@@ -2235,7 +2350,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	legsAnim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
 	if( legsAnim == LEGS_IDLE || legsAnim == LEGS_IDLECR ) {
 		flagAnim = FLAG_STAND;
-#ifdef IOQ3ZTM // Turtle Man: TEST: Always update flag angle...
+#ifdef IOQ3ZTM // Turtle Man: TEST: Always update flag angle.
 		updateangles = qtrue;
 #endif
 	} else if ( legsAnim == LEGS_WALK || legsAnim == LEGS_WALKCR ) {
@@ -2413,17 +2528,23 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 
 #ifdef TMNT // POWERS
 	// Add powerup dlights
-	if ( powerups & ( 1 << PW_QUAD ) ) {
-		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1, 0.2f, 0.2f );
-	}
-	if ( powerups & ( 1 << PW_BATTLESUIT ) ) {
-		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1, 1, 0.2f );
-	}
-	if ( powerups & ( 1 << PW_HASTE ) ) {
+	// If one or two powers use haste light
+	if ( (powerups & ( 1 << PW_HASTE )) &&
+		(( !(powerups & ( 1 << PW_INVUL )) && !(powerups & ( 1 << PW_BATTLESUIT )))
+		|| ( !(powerups & ( 1 << PW_INVUL )) && !(powerups & ( 1 << PW_QUAD )))
+		|| ( !(powerups & ( 1 << PW_BATTLESUIT )) && !(powerups & ( 1 << PW_QUAD )))) )
+	{
+		// blue
 		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1 );
-	}
-	if ( powerups & ( 1 << PW_INVUL ) ) {
+	} else if ( powerups & ( 1 << PW_QUAD ) ) {
+		// red
+		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1, 0.2f, 0.2f );
+	} else if ( powerups & ( 1 << PW_INVUL ) ) {
+		// white
 		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1, 1, 1 );
+	} else if ( powerups & ( 1 << PW_BATTLESUIT ) ) {
+		// yellow
+		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1, 1, 0.2f );
 	}
 #else
 	// quad gives a dlight
@@ -2841,27 +2962,26 @@ Adds a piece with modifications or duplications for powerups
 Also called by CG_Missile for quad rockets, but nobody can tell...
 ===============
 */
-#ifdef TMNT // EF_TELE_EFFECT
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, centity_t *cent, int team )
-#else
-void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team )
-#endif
-{
-#ifdef TMNT // EF_TELE_EFFECT
-	centity_t *nonPredictedCent;
-	entityState_t *state;
+void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
+#ifdef TMNT // POWERS
+	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
+		int alpha;
 
-	state = &cent->currentState;
+		if (state->otherEntityNum2 > 0) {
+			// Body fad-out alpha (When dead)
+			alpha = state->otherEntityNum2;
+		} else {
+			alpha = 64;
+		}
 
-	// make sure we aren't looking at cg.predictedPlayerEntity for LG
-	nonPredictedCent = &cg_entities[cent->currentState.clientNum];
+		ent->renderfx |= RF_FORCE_ENT_ALPHA;
+		ent->shaderRGBA[3] = alpha/2;
+		trap_R_AddRefEntityToScene( ent );
 
-	// if the index of the nonPredictedCent is not the same as the clientNum
-	// then this is a fake player (like on teh single player podiums), so
-	// go ahead and use the cent
-	if( ( nonPredictedCent - cg_entities ) != cent->currentState.clientNum ) {
-		nonPredictedCent = cent;
-	}
+		ent->shaderRGBA[3] = alpha;
+		ent->customShader = cgs.media.playerTeleportShader;
+		trap_R_AddRefEntityToScene( ent );
+	} else
 #endif
 	if ( state->powerups & ( 1 << PW_INVIS ) ) {
 		ent->customShader = cgs.media.invisShader;
@@ -2901,15 +3021,10 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 			trap_R_AddRefEntityToScene( ent );
 		}
 #endif
-#ifdef TMNT // EF_TELE_EFFECT
-		if ( nonPredictedCent->currentState.eFlags & EF_TELE_EFFECT ) {
-			ent->customShader = cgs.media.playerTeleportShader;
-			trap_R_AddRefEntityToScene( ent );
-		}
-#endif
 	}
 }
 
+#ifndef IOQ3ZTM // UNUSED
 /*
 =================
 CG_LightVerts
@@ -2956,6 +3071,7 @@ int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
 	}
 	return qtrue;
 }
+#endif
 
 /*
 ===============
@@ -3063,11 +3179,7 @@ void CG_Player( centity_t *cent ) {
 	legs.renderfx = renderfx;
 	VectorCopy (legs.origin, legs.oldorigin);	// don't positionally lerp at all
 
-#ifdef TMNT // EF_TELE_EFFECT
-	CG_AddRefEntityWithPowerups( &legs, cent, ci->team );
-#else
 	CG_AddRefEntityWithPowerups( &legs, &cent->currentState, ci->team );
-#endif
 
 	// if the model failed, allow the default nullmodel to be displayed
 	if (!legs.hModel) {
@@ -3091,47 +3203,7 @@ void CG_Player( centity_t *cent ) {
 	torso.shadowPlane = shadowPlane;
 	torso.renderfx = renderfx;
 
-#ifdef TMNT // EF_TELE_EFFECT
-	CG_AddRefEntityWithPowerups( &torso, cent, ci->team );
-#else
 	CG_AddRefEntityWithPowerups( &torso, &cent->currentState, ci->team );
-#endif
-
-#ifdef TMNT // POWERS
-	// Power rings
-	if ( cent->currentState.powerups & ( 1 << PW_QUAD ) ) {
-		memcpy(&powerup, &torso, sizeof(torso));
-		powerup.hModel = cgs.media.strengthPowerupModel;
-		powerup.frame = 0;
-		powerup.oldframe = 0;
-		powerup.customSkin = 0;
-		trap_R_AddRefEntityToScene( &powerup );
-	}
-	if ( cent->currentState.powerups & ( 1 << PW_BATTLESUIT ) ) {
-		memcpy(&powerup, &torso, sizeof(torso));
-		powerup.hModel = cgs.media.defensePowerupModel;
-		powerup.frame = 0;
-		powerup.oldframe = 0;
-		powerup.customSkin = 0;
-		trap_R_AddRefEntityToScene( &powerup );
-	}
-	if ( cent->currentState.powerups & ( 1 << PW_HASTE ) ) {
-		memcpy(&powerup, &torso, sizeof(torso));
-		powerup.hModel = cgs.media.speedPowerupModel;
-		powerup.frame = 0;
-		powerup.oldframe = 0;
-		powerup.customSkin = 0;
-		trap_R_AddRefEntityToScene( &powerup );
-	}
-	if ( cent->currentState.powerups & ( 1 << PW_INVUL ) ) {
-		memcpy(&powerup, &torso, sizeof(torso));
-		powerup.hModel = cgs.media.invulnerabilityPowerupModel;
-		powerup.frame = 0;
-		powerup.oldframe = 0;
-		powerup.customSkin = 0;
-		trap_R_AddRefEntityToScene( &powerup );
-	}
-#endif
 #ifdef MISSIONPACK
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	if ( cent->currentState.eFlags & EF_KAMIKAZE ) {
@@ -3345,6 +3417,45 @@ void CG_Player( centity_t *cent ) {
 		trap_R_AddRefEntityToScene( &powerup );
 	}
 #endif // MISSIONPACK
+#ifdef TMNT // POWERS
+	VectorClear(angles);
+	AnglesToAxis(angles, powerup.axis);
+	VectorCopy(cent->lerpOrigin, powerup.origin);
+
+	// Power rings
+	if ( cent->currentState.powerups & ( 1 << PW_INVUL ) ) {
+		memcpy(&powerup, &torso, sizeof(torso));
+		powerup.hModel = cgs.media.invulnerabilityPowerupModel;
+		powerup.frame = 0;
+		powerup.oldframe = 0;
+		powerup.customSkin = 0;
+		trap_R_AddRefEntityToScene( &powerup );
+	}
+	else if ( cent->currentState.powerups & ( 1 << PW_BATTLESUIT ) ) {
+		memcpy(&powerup, &torso, sizeof(torso));
+		powerup.hModel = cgs.media.defensePowerupModel;
+		powerup.frame = 0;
+		powerup.oldframe = 0;
+		powerup.customSkin = 0;
+		trap_R_AddRefEntityToScene( &powerup );
+	}
+	else if ( cent->currentState.powerups & ( 1 << PW_QUAD ) ) {
+		memcpy(&powerup, &torso, sizeof(torso));
+		powerup.hModel = cgs.media.strengthPowerupModel;
+		powerup.frame = 0;
+		powerup.oldframe = 0;
+		powerup.customSkin = 0;
+		trap_R_AddRefEntityToScene( &powerup );
+	}
+	else if ( cent->currentState.powerups & ( 1 << PW_HASTE ) ) {
+		memcpy(&powerup, &torso, sizeof(torso));
+		powerup.hModel = cgs.media.speedPowerupModel;
+		powerup.frame = 0;
+		powerup.oldframe = 0;
+		powerup.customSkin = 0;
+		trap_R_AddRefEntityToScene( &powerup );
+	}
+#endif
 
 	//
 	// add the head
@@ -3362,18 +3473,14 @@ void CG_Player( centity_t *cent ) {
 	head.shadowPlane = shadowPlane;
 	head.renderfx = renderfx;
 
-#ifdef TMNT // EF_TELE_EFFECT
-	CG_AddRefEntityWithPowerups( &head, cent, ci->team );
-#else
 	CG_AddRefEntityWithPowerups( &head, &cent->currentState, ci->team );
-#endif
 
 #ifdef IOQ3ZTM
 	// add the talk baloon or disconnect icon
 	CG_PlayerSprites( cent, &head );
 #endif
 
-#if defined MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK // OR TMNTMISC ? // MP_TMNT_OK
 	CG_BreathPuffs(cent, &head);
 
 	CG_DustTrail(cent);

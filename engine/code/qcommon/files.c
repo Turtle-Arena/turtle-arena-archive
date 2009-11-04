@@ -1104,6 +1104,10 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qboolean uniqueF
 						if ( Q_stricmp(filename + l - 7, ".shader") != 0 &&
 							Q_stricmp(filename + l - 4, ".txt") != 0 &&
 							Q_stricmp(filename + l - 4, ".cfg") != 0 &&
+#ifdef IOQ3ZTM // USE_FREETYPE
+							Q_stricmp( filename + l - 4, ".ttf" ) != 0 &&
+							Q_stricmp( filename + l - 4, ".otf" ) != 0 &&
+#endif
 							Q_stricmp(filename + l - 7, ".config") != 0 &&
 							strstr(filename, "levelshots") == NULL &&
 							Q_stricmp(filename + l - 4, ".bot") != 0 &&
@@ -1162,6 +1166,10 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qboolean uniqueF
 			if ( fs_numServerPaks ) {
 
 				if ( Q_stricmp( filename + l - 4, ".cfg" )		// for config files
+#ifdef IOQ3ZTM // USE_FREETYPE
+					&& Q_stricmp( filename + l - 4, ".ttf" )
+					&& Q_stricmp( filename + l - 4, ".otf" )
+#endif
 					&& Q_stricmp( filename + l - 5, ".menu" )	// menu files
 					&& Q_stricmp( filename + l - 5, ".game" )	// menu files
 					&& Q_stricmp( filename + l - strlen(demoExt), demoExt )	// menu files
@@ -2993,15 +3001,12 @@ static void FS_CheckPak0( void )
 FS_CheckPaks
 
 Checks that pak0.pk3 is present and its checksum is correct
-Note: If you're building a game that doesn't depend on the
-Q3 media pak0.pk3, you'll want to remove this function
 ===================
 */
 static void FS_CheckPaks( void )
 {
-#if 0 //#ifdef TMNTRELEASE // Only for release version.
-	// Turtle Man: Make sure all of the pk3 files are found and unmodified.
-	//             Like in SRB2...
+#ifdef TMNTRELEASE // Only for release version (That has a pk3 file).
+	// Turtle Man: Make sure all of the pk3 file(s) are found and unmodified, like in SRB2...
 	searchpath_t	*path;
 	unsigned foundPak = 0;
 	unsigned invalidPak = 0;

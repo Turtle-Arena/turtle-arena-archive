@@ -264,9 +264,15 @@ int trap_BotLibStartFrame(float time) {
 	return syscall( BOTLIB_START_FRAME, PASSFLOAT( time ) );
 }
 
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+int trap_BotLibLoadMap(const char *mapname, void /* bot_shareditem_t */ *itemInfos) {
+	return syscall( BOTLIB_LOAD_MAP, mapname, itemInfos );
+}
+#else
 int trap_BotLibLoadMap(const char *mapname) {
 	return syscall( BOTLIB_LOAD_MAP, mapname );
 }
+#endif
 
 int trap_BotLibUpdateEntity(int ent, void /* struct bot_updateentity_s */ *bue) {
 	return syscall( BOTLIB_UPDATENTITY, ent, bue );
@@ -684,9 +690,11 @@ void trap_BotSetAvoidGoalTime(int goalstate, int number, float avoidtime) {
 	syscall( BOTLIB_AI_SET_AVOID_GOAL_TIME, goalstate, number, PASSFLOAT(avoidtime));
 }
 
+#ifndef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
 void trap_BotInitLevelItems(void) {
 	syscall( BOTLIB_AI_INIT_LEVEL_ITEMS );
 }
+#endif
 
 void trap_BotUpdateEntityItems(void) {
 	syscall( BOTLIB_AI_UPDATE_ENTITY_ITEMS );
@@ -768,15 +776,14 @@ void trap_BotInitMoveState(int handle, void /* struct bot_initmove_s */ *initmov
 	syscall( BOTLIB_AI_INIT_MOVE_STATE, handle, initmove );
 }
 
+#ifndef TMNTWEAPSYS_2
 int trap_BotChooseBestFightWeapon(int weaponstate, int *inventory) {
 	return syscall( BOTLIB_AI_CHOOSE_BEST_FIGHT_WEAPON, weaponstate, inventory );
 }
 
-#ifndef TMNTWEAPSYS_2
 void trap_BotGetWeaponInfo(int weaponstate, int weapon, void /* struct weaponinfo_s */ *weaponinfo) {
 	syscall( BOTLIB_AI_GET_WEAPON_INFO, weaponstate, weapon, weaponinfo );
 }
-#endif
 
 int trap_BotLoadWeaponWeights(int weaponstate, char *filename) {
 	return syscall( BOTLIB_AI_LOAD_WEAPON_WEIGHTS, weaponstate, filename );
@@ -793,6 +800,7 @@ void trap_BotFreeWeaponState(int weaponstate) {
 void trap_BotResetWeaponState(int weaponstate) {
 	syscall( BOTLIB_AI_RESET_WEAPON_STATE, weaponstate );
 }
+#endif
 
 int trap_GeneticParentsAndChildSelection(int numranks, float *ranks, int *parent1, int *parent2, int *child) {
 	return syscall( BOTLIB_AI_GENETIC_PARENTS_AND_CHILD_SELECTION, numranks, ranks, parent1, parent2, child );

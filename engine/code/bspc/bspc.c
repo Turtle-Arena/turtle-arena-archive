@@ -77,6 +77,28 @@ qboolean	noliquids;			//no liquids when writing map file
 qboolean	forcesidesvisible;	//force all brush sides to be visible when loaded from bsp
 qboolean	capsule_collision = 0;
 
+
+#if 1 // Turtle Man(IOQ3): Moved here
+//===========================================================================
+//
+// Parameter:			-
+// Returns:				-
+// Changes Globals:		-
+//===========================================================================
+void Com_Memset (void* dest, const int val, const size_t count) {
+	memset(dest, val, count);
+}
+//===========================================================================
+//
+// Parameter:			-
+// Returns:				-
+// Changes Globals:		-
+//===========================================================================
+void Com_Memcpy (void* dest, const void* src, const size_t count) {
+	memcpy(dest, src, count);
+}
+#endif
+
 /*
 //===========================================================================
 //
@@ -474,9 +496,9 @@ quakefile_t *GetArgumentFiles(int argc, char *argv[], int *i, char *ext)
 	for (; (*i)+1 < argc && argv[(*i)+1][0] != '-'; (*i)++)
 	{
 		strcpy(buf, argv[(*i)+1]);
-		for (j = strlen(buf)-1; (size_t)j >= strlen(buf)-4; j--)
+		for (j = strlen(buf)-1; j >= strlen(buf)-4; j--)
 			if (buf[j] == '.') break;
-		if ((size_t)j >= strlen(buf)-4)
+		if (j >= strlen(buf)-4)
 			strcpy(&buf[j+1], ext);
 		qf = FindQuakeFiles(buf);
 		if (!qf) continue;
@@ -642,7 +664,7 @@ int main (int argc, char **argv)
 		else if (!stricmp(argv[i], "-nograpplereach"))
 		{
 			calcgrapplereach = false;
-			Log_Print("grapplereach = false\n");
+			Log_Print("nograpplereach = true\n");
 		} //end else if
 #else
 		else if (!stricmp(argv[i], "-grapplereach"))

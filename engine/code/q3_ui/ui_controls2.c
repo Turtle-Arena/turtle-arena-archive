@@ -290,7 +290,9 @@ typedef struct
 
 static controls_t s_controls;
 
+#ifndef IOQ3ZTM
 static vec4_t controls_binding_color  = {1.00f, 0.43f, 0.00f, 1.00f};
+#endif
 
 static bind_t g_bindings[] = 
 {
@@ -576,7 +578,7 @@ static void Controls_UpdateModel( int anim ) {
 		break;
 
 #ifndef TMNTWEAPSYS2
-#ifdef TMNTWEAPONS // Turtle Man: WONTFIX: Not in tended gameplay (and I have more then 10 weapons).
+#ifdef TMNTWEAPSYS
 	case ANIM_WEAPON1:
 	case ANIM_WEAPON2:
 	case ANIM_WEAPON3:
@@ -587,7 +589,8 @@ static void Controls_UpdateModel( int anim ) {
 	case ANIM_WEAPON8:
 	case ANIM_WEAPON9:
 	case ANIM_WEAPON10:
-		s_controls.playerWeapon = DEFAULT_DEFAULT_WEAPON;
+	// Turtle Man: TODO?: Support upto 16 weapons in menu?
+		s_controls.playerWeapon = anim - ANIM_WEAPON1 + 1;
 		break;
 #else
 	case ANIM_WEAPON1:
@@ -822,8 +825,13 @@ static void Controls_DrawKeyBinding( void *self )
 		}
 		else
 		{
+#ifdef IOQ3ZTM // Turtle Man: Use correct text_color_normal, in Q3 is was the same color.
+			UI_DrawString( x - SMALLCHAR_WIDTH, y, g_bindings[a->generic.id].label, UI_RIGHT|UI_SMALLFONT, text_color_normal );
+			UI_DrawString( x + SMALLCHAR_WIDTH, y, name, UI_LEFT|UI_SMALLFONT, text_color_normal );
+#else
 			UI_DrawString( x - SMALLCHAR_WIDTH, y, g_bindings[a->generic.id].label, UI_RIGHT|UI_SMALLFONT, controls_binding_color );
 			UI_DrawString( x + SMALLCHAR_WIDTH, y, name, UI_LEFT|UI_SMALLFONT, controls_binding_color );
+#endif
 		}
 	}
 }
@@ -1386,7 +1394,11 @@ static void Controls_MenuInit( void )
 	s_controls.weapons.generic.callback	= Controls_MenuEvent;
 	s_controls.weapons.generic.x	    = 152;
 	s_controls.weapons.generic.y	    = 240;
+#ifdef TMNT
+	s_controls.weapons.string			= "ATTACK";
+#else
 	s_controls.weapons.string			= "SHOOT";
+#endif
 	s_controls.weapons.style			= UI_RIGHT;
 	s_controls.weapons.color			= color_red;
 

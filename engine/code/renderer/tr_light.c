@@ -319,12 +319,25 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	}
 
 	// bonus items and view weapons have a fixed minimum add
-	if ( 1 /* ent->e.renderfx & RF_MINLIGHT */ ) {
+#ifdef TMNT // Turtle Man: TEST: Have players be darker, hide in shadows better.
+	if ( ent->e.renderfx & RF_MINLIGHT )
+#else
+	if ( 1 /* ent->e.renderfx & RF_MINLIGHT */ )
+#endif
+	{
 		// give everything a minimum light add
 		ent->ambientLight[0] += tr.identityLight * 32;
 		ent->ambientLight[1] += tr.identityLight * 32;
 		ent->ambientLight[2] += tr.identityLight * 32;
 	}
+#ifdef TMNT
+	else
+	{
+		ent->ambientLight[0] += tr.identityLight * 16;
+		ent->ambientLight[1] += tr.identityLight * 16;
+		ent->ambientLight[2] += tr.identityLight * 16;
+	}
+#endif
 
 	//
 	// modify the light by dynamic lights

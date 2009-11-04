@@ -150,6 +150,9 @@ typedef enum {
 	GF_INVERSE_SAWTOOTH, 
 
 	GF_NOISE
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+	,GF_RANDOM
+#endif
 
 } genFunc_t;
 
@@ -351,6 +354,23 @@ typedef struct {
 	float	depthForOpaque;
 } fogParms_t;
 
+#ifdef CELSHADING // Turtle Man
+typedef struct
+{
+	float			width;				// Width of cel outline.
+
+	float			portalRange;		// distance to fog out at
+
+	waveForm_t		rgbWave;
+	colorGen_t		rgbGen;
+
+	waveForm_t		alphaWave;
+	alphaGen_t		alphaGen;
+
+	byte			constantColor[4];	// for CGEN_CONST and AGEN_CONST
+} celoutline_t;
+#endif
+
 
 typedef struct shader_s {
 	char		name[MAX_QPATH];		// game path, including extension
@@ -381,6 +401,10 @@ typedef struct shader_s {
 	float		portalRange;			// distance to fog out at
 
 	int			multitextureEnv;		// 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
+
+#ifdef CELSHADING // Turtle Man
+	celoutline_t celoutline;
+#endif
 
 	cullType_t	cullType;				// CT_FRONT_SIDED, CT_BACK_SIDED, or CT_TWO_SIDED
 	qboolean	polygonOffset;			// set for decals and other items that must be offset 
@@ -546,7 +570,7 @@ typedef struct drawSurf_s {
 	surfaceType_t		*surface;		// any of surface*_t
 } drawSurf_t;
 
-#ifdef IOQ3ZTM // Turtle Man: I *think* this is the "max lightmapped surface verts" in q3map2
+#ifdef TMNTMISC // Turtle Man: I *think* this is the "max lightmapped surface verts" in q3map2
 #define	MAX_FACE_POINTS		999
 #else
 #define	MAX_FACE_POINTS		64
@@ -975,6 +999,9 @@ typedef struct {
 	float					triangleTable[FUNCTABLE_SIZE];
 	float					sawToothTable[FUNCTABLE_SIZE];
 	float					inverseSawToothTable[FUNCTABLE_SIZE];
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+	float					noiseTable[FUNCTABLE_SIZE];
+#endif
 	float					fogTable[FOG_TABLE_SIZE];
 } trGlobals_t;
 
@@ -1084,8 +1111,8 @@ extern	cvar_t	*r_uiFullScreen;				// ui is running fullscreen
 
 extern	cvar_t	*r_logFile;						// number of frames to emit GL logs
 #ifdef CELSHADING
-extern	cvar_t	*r_celshadalgo;					// Cell shading, chooses method: 0 = disabled, 1 = kuwahara, 2 = whiteTexture.
-extern	cvar_t	*r_celoutline;					// cel outline. 1 on, 0 off. (maybe other options later)
+extern	cvar_t	*r_celshadalgo;					// Cel shading, Chooses method: 0 = disabled, 1 = whiteTexture, 10 = kuwahara, 20 = snn.
+extern	cvar_t	*r_celoutline;					// Cel outline. The integer value is the width of the cel outline to draw.
 #endif
 extern	cvar_t	*r_showtris;					// enables wireframe rendering of the world
 extern	cvar_t	*r_showsky;						// forces sky in front of all surfaces
@@ -1133,6 +1160,9 @@ extern	cvar_t	*r_GLlibCoolDownMsec;
 //====================================================================
 
 float R_NoiseGet4f( float x, float y, float z, float t );
+#ifdef IOQ3ZTM // IOSTVEF_NOISE
+int R_RandomOn( float t );
+#endif
 void  R_NoiseInit( void );
 
 void R_SwapBuffers( int );

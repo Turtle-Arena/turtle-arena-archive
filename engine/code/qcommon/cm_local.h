@@ -25,8 +25,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "cm_polylib.h"
 
 #define	MAX_SUBMODELS			256
+#ifdef IOQ3ZTM
+#define	BOX_MODEL_HANDLE		MAX_SUBMODELS-1
+#define CAPSULE_MODEL_HANDLE	BOX_MODEL_HANDLE-1
+#else
 #define	BOX_MODEL_HANDLE		255
 #define CAPSULE_MODEL_HANDLE	254
+#endif
 
 
 typedef struct {

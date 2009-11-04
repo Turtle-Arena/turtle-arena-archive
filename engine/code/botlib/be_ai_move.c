@@ -130,32 +130,25 @@ bot_movestate_t *botmovestates[MAX_CLIENTS+1];
 // Returns:				-
 // Changes Globals:		-
 //========================================================================
-// Turtle Man: FIXME: Bots always want weapon 16 (Grappling Hook)
 qboolean BotValidWeapon(int client, int weaponnum)
 {
-#if 1
 #ifdef TMNTWEAPSYS2
-	// Turtle Man: FIXME: if (client current weapon == weaponnum) return qtrue;
-#endif
-	return (weaponnum != 16);
-#else // bot_state_t is defined in game, can't use here....
-	bot_state_t *bs = NULL;
+	// Turtle Man: if (client current weapon == weaponnum) return qtrue;
+	aas_entityinfo_t entinfo;
 
-	bs = botstates[client];
-	if (!bs || !bs->inuse) {
+	if (weaponnum <= 0) {
 		return qfalse;
-	}
+	} //end if
 
-#ifdef TMNTWEAPSYS2
-	if (bs && bs->inventory[weaponnum])
-#else
-	if (bs && bs->inventory[3+weaponnum])
-#endif
+	AAS_EntityInfo(client, &entinfo);
+	if (entinfo.weapon == weaponnum)
 	{
 		return qtrue;
-	}
-
+	} //end if
 	return qfalse;
+#else
+	// Turtle Man: FIXME?: Bots always want Grappling Hook.
+	return qtrue;
 #endif
 } // end of the function BotValidWeapon
 #endif
@@ -3628,17 +3621,13 @@ int BotSetupMoveAI(void)
 	sv_maxstep = LibVar("sv_step", "18");
 	sv_maxbarrier = LibVar("sv_maxbarrier", "32");
 	sv_gravity = LibVar("sv_gravity", "800");
-#ifdef TMNTWEAPONS
-	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "14");
-#ifndef TMNTWEAPSYS
-	weapindex_bfg10k = LibVar("weapindex_bfg10k", "0");
-#endif
-	weapindex_grapple = LibVar("weapindex_grapple", "16");
+#ifdef TMNTWEAPSYS
+	// Turtle Man: NOTE: We don't know the indexes ("game" should set them).
+	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "0");
+	weapindex_grapple = LibVar("weapindex_grapple", "0");
 #else
 	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "5");
-#ifndef TMNTWEAPSYS
 	weapindex_bfg10k = LibVar("weapindex_bfg10k", "9");
-#endif
 	weapindex_grapple = LibVar("weapindex_grapple", "10");
 #endif
 	entitytypemissile = LibVar("entitytypemissile", "3");

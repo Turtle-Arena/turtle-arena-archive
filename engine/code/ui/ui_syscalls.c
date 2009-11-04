@@ -400,6 +400,8 @@ qboolean trap_VerifyCDKey( const char *key, const char *chksum) {
 }
 #endif
 
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 void trap_SetPbClStatus( int status ) {
 	syscall( UI_SET_PBCLSTATUS, status );
 }
+#endif

@@ -59,9 +59,17 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 
 		le = CG_AllocLocalEntity();
 		le->leFlags = LEF_PUFF_DONT_SCALE;
+#ifdef TMNTMISC
+		le->leType = LE_BUBBLE;
+#else
 		le->leType = LE_MOVE_SCALE_FADE;
+#endif
 		le->startTime = cg.time;
+#ifdef TMNTMISC // Bubbles should make it to the surface
+		le->endTime = cg.time + 8000 + random() * 250;
+#else
 		le->endTime = cg.time + 1000 + random() * 250;
+#endif
 		le->lifeRate = 1.0 / ( le->endTime - le->startTime );
 
 		re = &le->refEntity;
@@ -69,7 +77,11 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 
 		re->reType = RT_SPRITE;
 		re->rotation = 0;
+#ifdef TMNTMISC
+		re->radius = 2 + random() * 2;
+#else
 		re->radius = 3;
+#endif
 		re->customShader = cgs.media.waterBubbleShader;
 		re->shaderRGBA[0] = 0xff;
 		re->shaderRGBA[1] = 0xff;
@@ -83,7 +95,11 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 		VectorCopy( move, le->pos.trBase );
 		le->pos.trDelta[0] = crandom()*5;
 		le->pos.trDelta[1] = crandom()*5;
+#ifdef TMNTMISC // Always move up.
+		le->pos.trDelta[2] = 8 + random()*5;
+#else
 		le->pos.trDelta[2] = crandom()*5 + 6;
+#endif
 
 		VectorAdd (move, vec, move);
 	}
@@ -248,7 +264,7 @@ void CG_SpawnEffect( vec3_t org ) {
 
 
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS
+#ifndef TMNT // POWERS
 /*
 ===============
 CG_LightningBoltBeam
@@ -426,8 +442,7 @@ void CG_InvulnerabilityJuiced( vec3_t org ) {
 
 	trap_S_StartSound (org, ENTITYNUM_NONE, CHAN_BODY, cgs.media.invulnerabilityJuicedSound );
 }
-
-#endif // TMNT // POWERS
+#endif
 #endif
 
 /*
@@ -632,6 +647,13 @@ void CG_GibPlayer( vec3_t playerOrigin ) {
 		return;
 	}
 
+#ifdef IOQ3ZTM // Turtle Man: Have cg_gibs disable ALL gibs.
+	// allow gibs to be turned off
+	if ( !cg_gibs.integer ) {
+		return;
+	}
+#endif
+
 	VectorCopy( playerOrigin, origin );
 	velocity[0] = crandom()*GIB_VELOCITY;
 	velocity[1] = crandom()*GIB_VELOCITY;
@@ -642,10 +664,12 @@ void CG_GibPlayer( vec3_t playerOrigin ) {
 		CG_LaunchGib( origin, velocity, cgs.media.gibBrain );
 	}
 
+#ifndef IOQ3ZTM
 	// allow gibs to be turned off for speed
 	if ( !cg_gibs.integer ) {
 		return;
 	}
+#endif
 
 	VectorCopy( playerOrigin, origin );
 	velocity[0] = crandom()*GIB_VELOCITY;

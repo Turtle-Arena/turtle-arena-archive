@@ -321,10 +321,11 @@ CopyWinding
 */
 winding_t *CopyWinding (winding_t *w)
 {
-	size_t		size;
+	int			size;
 	winding_t	*c;
 
 	c = AllocWinding (w->numpoints);
+	// Turtle Man: int to size_t
 	size = (size_t)((winding_t *)0)->p[w->numpoints];
 	memcpy (c, w, size);
 	return c;

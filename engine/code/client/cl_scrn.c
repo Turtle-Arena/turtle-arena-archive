@@ -153,6 +153,81 @@ static void SCR_DrawChar( int x, int y, float size, int ch ) {
 					   cls.charSetShader );
 }
 
+#ifdef IOQ3ZTM // USE_FREETYPE
+void SCR_DrawConsoleFontChar( float x, float y, int ch )
+{
+    if( cls.useLegacyConsoleFont )
+    {
+        SCR_DrawSmallChar( (int) x, (int) y, ch );
+        return;
+    }
+
+    if(ch==' ') return;
+
+	// Turtle Man
+	y += SCR_ConsoleFontCharHeight();
+
+    fontInfo_t *font = &cls.consoleFont;
+
+    glyphInfo_t *glyph = &font->glyphs[ch];
+
+    float yadj = glyph->top;
+    float xadj = (SCR_ConsoleFontCharWidth( ch ) - glyph->xSkip) / 2.0;
+
+    re.DrawStretchPic( x+xadj, y-yadj, glyph->imageWidth, glyph->imageHeight,
+					   glyph->s, glyph->t,
+					   glyph->s2, glyph->t2,
+					   glyph->glyph );
+}
+
+float SCR_ConsoleFontCharWidth( int ch )
+{
+    float width;
+
+    if (cls.useLegacyConsoleFont) {
+    	width = SMALLCHAR_WIDTH;
+    } else {
+    	width = cls.consoleFont.glyphs[ch & 0xff].xSkip + cl_consoleFontKerning->value;
+    }
+
+    return width;
+}
+
+float SCR_ConsoleFontCharHeight(void)
+{
+    float height;
+
+    if (cls.useLegacyConsoleFont) {
+		height = SMALLCHAR_HEIGHT;
+    } else {
+    	float vpadding = 0.3 * cl_consoleFontSize->value;
+
+    	height = (cls.consoleFont.glyphs['I' & 0xff].imageHeight + vpadding);
+    }
+
+    return height;
+}
+
+float SCR_ConsoleFontStringWidth( const char* s, int len )
+{
+    int i;
+    fontInfo_t *font = &cls.consoleFont;
+    float width = 0;
+
+    if( cls.useLegacyConsoleFont ) {
+		return len * SMALLCHAR_WIDTH;
+    }
+
+    for(i=0;i<len;i++)
+    {
+        int ch = s[i] & 0xff;
+        glyphInfo_t *glyph = &font->glyphs[ch];
+        width += glyph->xSkip + cl_consoleFontKerning->value;
+    }
+    return (width);
+}
+#endif
+
 /*
 ** SCR_DrawSmallChar
 ** small chars are drawn at native screen resolution
@@ -263,10 +338,15 @@ to a fixed color.
 ==================
 */
 void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qboolean forceColor,
-		qboolean noColorEscape ) {
+		qboolean noColorEscape )
+{
 	vec4_t		color;
 	const char	*s;
+#ifdef IOQ3ZTM // USE_FREETYPE
+	float		xx;
+#else
 	int			xx;
+#endif
 
 	// draw the colored text
 	s = string;
@@ -284,8 +364,13 @@ void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, 
 			continue;
 		}
 		}
+#ifdef IOQ3ZTM // USE_FREETYPE
+        SCR_DrawConsoleFontChar( xx, y, *s );
+        xx += SCR_ConsoleFontCharWidth( *s );
+#else
 		SCR_DrawSmallChar( xx, y, *s );
 		xx += SMALLCHAR_WIDTH;
+#endif
 		s++;
 	}
 	re.SetColor( NULL );

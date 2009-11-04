@@ -30,13 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
-#ifdef TMNTWEAPSYS_2_NOCOMPAT
-typedef struct weapongroupinfo_s
-{
-	char name[MAX_STRINGFIELD];
-	char pickupName[MAX_STRINGFIELD];
-} weapongroupinfo_t;
-#else
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 //projectile flags
 #define PFL_WINDOWDAMAGE			1		//projectile damages through window
 #define PFL_RETURN					2		//set when projectile returns to owner
@@ -92,7 +86,6 @@ typedef struct weaponinfo_s
 	float spindown;
 	projectileinfo_t proj;						//pointer to the used projectile
 } weaponinfo_t;
-#endif
 
 //setup the weapon AI
 int BotSetupWeaponAI(void);
@@ -100,10 +93,8 @@ int BotSetupWeaponAI(void);
 void BotShutdownWeaponAI(void);
 //returns the best weapon to fight with
 int BotChooseBestFightWeapon(int weaponstate, int *inventory);
-#ifndef TMNTWEAPSYS_2_NOCOMPAT
 //returns the information of the current weapon
 void BotGetWeaponInfo(int weaponstate, int weapon, weaponinfo_t *weaponinfo);
-#endif
 //loads the weapon weights
 int BotLoadWeaponWeights(int weaponstate, char *filename);
 //returns a handle to a newly allocated weapon state
@@ -112,3 +103,4 @@ int BotAllocWeaponState(void);
 void BotFreeWeaponState(int weaponstate);
 //resets the whole weapon state
 void BotResetWeaponState(int weaponstate);
+#endif

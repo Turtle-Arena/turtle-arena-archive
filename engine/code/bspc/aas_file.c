@@ -211,7 +211,7 @@ char *AAS_LoadAASLump(FILE *fp, int offset, int length, void *buf)
 	//allocate memory
 	if (!buf) buf = (void *) GetClearedMemory(length);
 	//read the data
-	if (fread((char *) buf, 1, length, fp) != (size_t)length)
+	if (fread((char *) buf, 1, length, fp) != length)
 	{
 		AAS_Error("can't read lump\n");
 		FreeMemory(buf);

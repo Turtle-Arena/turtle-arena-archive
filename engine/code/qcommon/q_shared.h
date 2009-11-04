@@ -33,12 +33,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     #define CLIENT_WINDOW_TITLE     	"TMNT Arena"
     #define CLIENT_WINDOW_MIN_TITLE 	"TMNT Arena"
     #define GAMENAME_FOR_MASTER		"TMNTArena"
-  #elif defined SONIC
-    #define PRODUCT_NAME			"Sonic Blast Arena"
-    #define BASEGAME			"sonic"
-    #define CLIENT_WINDOW_TITLE     	"Sonic Blast Arena"
-    #define CLIENT_WINDOW_MIN_TITLE 	"Sonic Blast Arena"
-    #define GAMENAME_FOR_MASTER		"SonicBlastArena"
   #else
   #define PRODUCT_NAME			"iofoo3"
   #define BASEGAME			"foobar"
@@ -632,7 +626,7 @@ void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
 float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
-#if defined TMNTWEAPONS || defined TMNTWEAPSYS_2 // XREAL
+#ifdef TMNTWEAPSYS_2 // XREAL
 float AngleBetweenVectors(const vec3_t a, const vec3_t b);
 #endif
 
@@ -1033,10 +1027,10 @@ typedef struct {
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16 // PW_* are still limited by bit fields.
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS2
 #define	MAX_WEAPONS				32
 #else
-#define	MAX_WEAPONS				16 // If not TMNTWEAPSYS_2 limited to 16
+#define	MAX_WEAPONS				16 // If not TMNTWEAPSYS2 limited to 16
 #endif
 #ifdef TMNTHOLDSYS
 #define	MAX_HOLDABLE			16
@@ -1140,6 +1134,9 @@ typedef struct playerState_s {
 #ifdef TMNTHOLDSYS
 	int			holdableIndex; // Index of holdable items, for shurikens.
 #endif
+#ifdef TMNTHOLDABLE
+	int			holdableTime;  // Like weaponTime, but for shurikens.
+#endif
 
 #ifdef TMNTCAMERA
 	camera_t	camera;
@@ -1178,7 +1175,12 @@ typedef struct playerState_s {
 						 //  doesn't count damage hits.
 	int		meleeTime; // Time left in the current attack.
 	int		meleeDelay; // Time before player can use a melee attack
-	int		comboTime; // Time left till the combo ends
+	int		meleeLinkTime; // Time left till will be unable to continue meleeAttack
+
+	// Melee damage hits, add more points for higher chain?
+	//    Turtle Man: TODO: Use for NiGHTS links count too?
+	int		chain;
+	int		chainTime;
 
 	int			weaponHands;	// HAND_NONE, HAND_PRIMARY, HAND_SECONDARY, or HAND_BOTH
 #endif
