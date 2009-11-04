@@ -196,7 +196,7 @@ else # END QUAKE3
 	USE_CODEC_VORBIS=1
 
 	# Turtle Man: TMNT Arena version
-	VERSION=0.1.0
+	VERSION=alpha
 
 	# TMNT Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"
