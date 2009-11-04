@@ -53,9 +53,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define SAVEGAMEDIR "saves"
 #endif
 
-//#ifdef _MSC_VER
-#ifndef PRODUCT_VERSION // Turtle Man: Added "#ifndef" and the below define.
-  #define PRODUCT_VERSION "1.36"
+#ifndef PRODUCT_VERSION
+  #ifdef TMNT
+    #define PRODUCT_VERSION "alpha_IOQ3v1.36"
+  #else
+    #define PRODUCT_VERSION "1.36"
+  #endif
 #endif
 
 #define Q3_VERSION PRODUCT_NAME " " PRODUCT_VERSION
