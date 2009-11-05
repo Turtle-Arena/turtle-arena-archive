@@ -1,0 +1,484 @@
+/*
+===========================================================================
+Copyright (C) 2009 ZTurtleMan
+
+This file is part of TMNT Arena source code.
+
+TMNT Arena source code is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
+
+TMNT Arena source code is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TMNT Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+===========================================================================
+*/
+
+// TODO: Remake Quake III: Team Arena weapon info
+
+// wallmarkName (Quake3 uses the following, but any shader can be used)
+// 	cgs.media.bulletMarkShader = trap_R_RegisterShader( "gfx/damage/bullet_mrk" );
+//	cgs.media.burnMarkShader = trap_R_RegisterShader( "gfx/damage/burn_med_mrk" );
+//	cgs.media.holeMarkShader = trap_R_RegisterShader( "gfx/damage/hole_lg_mrk" );
+//	cgs.media.energyMarkShader = trap_R_RegisterShader( "gfx/damage/plasma_mrk" );
+
+//
+// Gauntlet (Done; but need to check blade)
+//
+
+weapon "w_gauntlet"
+{
+	weapontype WT_GAUNTLET
+	model "models/weapons2/gauntlet/gauntlet.md3"
+	mod MOD_GAUNTLET
+	attackDelay 400
+	// In Q3 it didn't leave a wallmark
+	//wallmarkName "gfx/damage/hole_lg_mrk"
+	//wallmarkRadius 12
+	continuousFlash 1
+	flashColor 0.6 0.6 1.0
+	firingSound "sound/weapons/melee/fstrun.wav"
+	flashSound0 "sound/weapons/melee/fstatck.wav"
+	barrelSpin BS_PITCH
+
+	// Blade location has been tested.
+	blade 0
+	{
+		damage 50
+		origin 0 -5 0
+		tip 0 5 0
+		trailStyle none
+	}
+}
+
+weapongroup "wp_gauntlet"
+{
+	//itemName "weapon_gauntlet" // Don't want this in weapon_random entity...
+	pickupName "Gauntlet"
+	pickupModel "models/weapons2/gauntlet/gauntlet.md3"
+	iconName "icons/iconw_gauntlet"
+	weapon_primary "w_gauntlet"
+
+	normalAnims
+	{
+		standAnim "TORSO_STAND2"
+		attackAnim "TORSO_ATTACK2"
+	}
+	primaryAnims
+	{
+		standAnim "TORSO_STAND2"
+		attackAnim "TORSO_ATTACK2"
+	}
+}
+
+//
+// Machine Gun (Done)
+// FIXME: Machine Gun does 7 damage in all gametypes, but in Q3 Team DM it should only do 5 damage.
+//
+
+projectile "p_machinegun"
+{
+	instantDamage 1
+	damage 7
+	trailType PT_BULLET
+	deathType PD_BULLET
+	wallmarkName "gfx/damage/bullet_mrk"
+	wallmarkRadius 8
+	spread 200
+}
+
+weapon "w_machinegun"
+{
+	weapontype WT_GUN
+	model "models/weapons2/machinegun/machinegun.md3"
+	mod MOD_MACHINEGUN
+	attackDelay 100
+	ejectBrass 1
+	flashColor 1 1 0
+	flashSound0 "sound/weapons/machinegun/machgf1b.wav"
+	flashSound1 "sound/weapons/machinegun/machgf2b.wav"
+	flashSound2 "sound/weapons/machinegun/machgf3b.wav"
+	flashSound3 "sound/weapons/machinegun/machgf4b.wav"
+	barrelSpin BS_ROLL
+	projectile "p_machinegun"
+}
+
+weapongroup "wp_machinegun"
+{
+	itemName "weapon_machinegun"
+	pickupName "Machine Gun"
+	pickupModel "models/weapons2/machinegun/machinegun.md3"
+	iconName "icons/iconw_machinegun"
+	pickupAmmo 40
+	weapon_primary "w_machinegun"
+}
+
+//
+// Shotgun (Done)
+//
+
+projectile "p_shotgun"
+{
+	instantDamage 1
+	damage 10
+	deathType PD_BULLET
+	wallmarkName "gfx/damage/bullet_mrk"
+	wallmarkRadius 8
+	spread 700
+	numprojectiles 11
+}
+
+weapon "w_shotgun"
+{
+	weapontype WT_GUN
+	model "models/weapons2/shotgun/shotgun.md3"
+	mod MOD_SHOTGUN
+	attackDelay 1000
+	ejectBrass2 1
+	ejectSmoke2 1
+	splashMod MOD_SHOTGUN
+	flashColor 1 1 0
+	flashSound0 "sound/weapons/shotgun/sshotf1b.wav"
+	projectile "p_shotgun"
+}
+
+weapongroup "wp_shotgun"
+{
+	itemName "weapon_shotgun"
+	pickupName "Shotgun"
+	pickupModel "models/weapons2/shotgun/shotgun.md3"
+	iconName "icons/iconw_shotgun"
+	pickupAmmo 10
+	weapon_primary "w_shotgun"
+}
+
+//
+// Grenade Launcher (Done) (FIXME: It explodes each time it hits something)
+//
+
+projectile "p_grenade"
+{
+	model "models/ammo/grenade1.md3"
+	damage 100
+	splashDamage 100
+	splashRadius 150
+	speed 700
+	timetolive 2500
+	shootable 0
+	trailType PT_GRENADE
+	deathType PD_GRENADE
+	spinType PS_ROLL
+	wallmarkName "gfx/damage/burn_med_mrk"
+	wallmarkRadius 64
+	bounceType "PB_HALF"
+	useGravity 1
+}
+
+weapon "w_grenadel"
+{
+	weapontype WT_GUN
+	model "models/weapons2/grenadel/grenadel.md3"
+	mod MOD_GRENADE
+	attackDelay 800
+	splashMod MOD_GRENADE_SPLASH
+	flashColor 1 .7 0
+	flashSound0 "sound/weapons/grenade/grenlf1a.wav"
+	projectile "p_grenade"
+}
+
+weapongroup "wp_grenade_launcher"
+{
+	itemName "weapon_grenadelauncher"
+	pickupName "Grenade Launcher"
+	pickupModel "models/weapons2/grenadel/grenadel.md3"
+	iconName "icons/iconw_grenade"
+	pickupAmmo 10
+	weapon_primary "w_grenadel"
+}
+
+//
+// Rocket Launcher (Done)
+//
+
+projectile "p_rocket_launcher"
+{
+	model "models/ammo/rocket/rocket.md3"
+	damage 100
+	splashDamage 100
+	splashRadius 120
+	speed 900
+	timetolive 15000
+	trailType PT_ROCKET
+	deathType PD_ROCKET
+	missileSound "sound/weapons/rocket/rockfly.wav"
+	missileDlight 200
+	missileDlightColor 1 .75 0
+	wallmarkName "gfx/damage/burn_med_mrk"
+	wallmarkRadius 64
+}
+
+weapon "w_rocket_launcher"
+{
+	weapontype WT_GUN
+	model "models/weapons2/rocketl/rocketl.md3"
+	mod MOD_ROCKET
+	attackDelay 800
+	splashMod MOD_ROCKET_SPLASH
+	flashColor 1 0.75 0
+	flashSound0 "sound/weapons/rocket/rocklf1a.wav"
+	projectile "p_rocket_launcher"
+}
+
+weapongroup "wp_rocket_launcher"
+{
+	itemName "weapon_rocketlauncher"
+	pickupName "Rocket Launcher"
+	pickupModel "models/weapons2/rocketl/rocketl.md3"
+	iconName "icons/iconw_rocket"
+	pickupAmmo 10
+	weapon_primary "w_rocket_launcher"
+}
+
+//
+// Lightning (Not done, has no explosion [is that all?])
+//
+
+projectile "p_lightning"
+{
+	instantDamage 1
+	damage 8
+	trailType PT_LIGHTNING // not finished?
+	deathType PD_LIGHTNING // PT_LIGHTNING currently doesn't "die"
+	wallmarkName "gfx/damage/hole_lg_mrk"
+	wallmarkRadius 12
+	speed 768 // range of instantDamage
+}
+
+weapon "w_lightning"
+{
+	weapontype WT_GUN
+	model "models/weapons2/lightning/lightning.md3"
+	mod MOD_LIGHTNING
+	attackDelay 50
+	flashColor 0.6 0.6 1
+	continuousFlash 1
+	flashSound0 "sound/weapons/lightning/lg_fire.wav"
+	firingSound "sound/weapons/lightning/lg_hum.wav"
+	readySound "sound/weapons/melee/fsthum.wav"
+	projectile "p_lightning"
+}
+
+// done
+weapongroup "wp_lightning"
+{
+	itemName "weapon_lightning"
+	pickupName "Lightning Gun"
+	pickupModel "models/weapons2/lightning/lightning.md3"
+	iconName "icons/iconw_lightning"
+	pickupAmmo 100
+	weapon_primary "w_lightning"
+}
+
+//
+// Railgun (Done)
+//
+// Railgun explosions are not colorized?
+//
+
+projectile "p_rail"
+{
+	instantDamage 1
+	damage 100
+	trailType PT_RAIL
+	deathType PD_RAIL
+	wallmarkName "gfx/damage/plasma_mrk"
+	wallmarkRadius 24
+	wallmarkColorize 1
+	maxHits 4
+}
+
+weapon "w_railgun"
+{
+	weapontype WT_GUN
+	model "models/weapons2/railgun/railgun.md3"
+	mod MOD_RAILGUN
+	attackDelay 1500
+	flashColor 1 0.5 0
+	flashSound0 "sound/weapons/railgun/railgf1a.wav"
+	readySound "sound/weapons/railgun/rg_hum.wav"
+	projectile "p_rail"
+}
+
+weapongroup "wp_railgun"
+{
+	itemName "weapon_railgun"
+	pickupName "Railgun"
+	pickupModel "models/weapons2/railgun/railgun.md3"
+	iconName "icons/iconw_railgun"
+	pickupAmmo 10
+	weapon_primary "w_railgun"
+}
+
+//
+// Plasma Gun (Done)
+//
+
+projectile "p_plasma"
+{
+	sprite "sprites/plasma1"
+	spriteRadius 16
+	damage 20
+	splashDamage 15
+	splashRadius 20
+	speed 2000
+	timetolive 10000
+	trailType PT_PLASMA
+	deathType PD_PLASMA
+	missileSound "sound/weapons/plasma/lasfly.wav"
+	wallmarkName "gfx/damage/plasma_mrk"
+	wallmarkRadius 16
+	wallmarkFadeAlpha 1
+}
+
+weapon "w_plasmagun"
+{
+	weapontype WT_GUN
+	model "models/weapons2/plasma/plasma.md3"
+	mod MOD_PLASMA
+	attackDelay 100
+	splashMod MOD_PLASMA_SPLASH
+	flashColor 0.6 0.6 1.0
+	flashSound0 "sound/weapons/plasma/hyprbf1a.wav"
+	projectile "p_plasma"
+}
+
+weapongroup "wp_plasmagun"
+{
+	itemName "weapon_plasmagun"
+	pickupName "Plasma Gun"
+	pickupModel "models/weapons2/plasma/plasma.md3"
+	iconName "icons/iconw_plasma"
+	pickupAmmo 50
+	weapon_primary "w_plasmagun"
+}
+
+//
+// BFG (Done)
+//
+
+projectile "p_bfg"
+{
+	model "models/weaphits/bfg.md3"
+	damage 100
+	splashDamage 100
+	splashRadius 120
+	speed 2000
+	timetolive 10000
+	deathType PD_BFG
+	missileSound "sound/weapons/rocket/rockfly.wav"
+	wallmarkName "gfx/damage/burn_med_mrk"
+	wallmarkRadius 32
+}
+
+weapon "w_bfg"
+{
+	weapontype WT_GUN
+	model "models/weapons2/bfg/bfg.md3"
+	mod MOD_BFG
+	attackDelay 200
+	splashMod MOD_BFG_SPLASH
+	flashColor 1 0.7 1
+	flashSound0 "sound/weapons/bfg/bfg_fire.wav"
+	readySound "sound/weapons/bfg/bfg_hum.wav"
+	barrelSpin BS_PITCH
+	projectile "p_bfg"
+}
+
+weapongroup "wp_bfg"
+{
+	itemName "weapon_bfg"
+	pickupName "BFG10K"
+	pickupModel "models/weapons2/bfg/bfg.md3"
+	iconName "icons/iconw_bfg"
+	pickupAmmo 20
+	weapon_primary "w_bfg"
+}
+
+//
+// Grappling Hook (Done)
+//
+projectile "p_grappling_hook"
+{
+	model "models/ammo/rocket/rocket.md3"
+	damage 10
+	speed 800
+	timetolive 10000
+	trailType "PT_LIGHTNING"
+	missileDlight 200
+	missileDlightColor 1 .75 0
+	wallmarkName "gfx/damage/hole_lg_mrk"
+	wallmarkRadius 12
+	grappling 1
+}
+
+weapon "w_grappling_hook"
+{
+	weapontype WT_GUN
+	model "models/weapons2/grapple/grapple.md3"
+	mod MOD_GRAPPLE
+	attackDelay 400
+	continuousFlash 1
+	flashColor 0.6 0.6 1.0
+	readySound "sound/weapons/melee/fsthum.wav"
+	firingSound "sound/weapons/melee/fstrun.wav"
+	projectile "p_grappling_hook"
+}
+
+weapongroup "wp_grappling_hook"
+{
+	clone "wt_gun"
+	itemName "weapon_grapplinghook"
+	pickupName "Grappling Hook"
+	pickupModel "models/weapons2/grapple/grapple.md3"
+	iconName "icons/iconw_grapple"
+	// NOTE: grappling projectiles use no ammo.
+	weapon_primary "w_grappling_hook"
+}
+
+//
+// Team Arena Weapons
+//
+
+//
+// Nailgun (Can be remade)
+//
+
+//
+// Prox Mine Launcher (Can't be remade yet.)
+//               Need to be able to damage owner in G_RunMissile
+//               Need to generlize prox explosion stuff (when player is clost, etc).
+//               WONTFIX?: Stick mines to players (I don't like the idea of it...).
+//
+
+projectile "p_prox"
+{
+	model "models/weaphits/proxmine.md3"
+	modelBlue "models/weaphits/proxmineb.md3"
+	stickOnImpact 3
+}
+
+//
+// Chaingun (Can be remade)
+//
+
+weapon "w_chaingun"
+{
+	firingStoppedSound "sound/weapons/vulcan/wvulwind.wav"
+}
+

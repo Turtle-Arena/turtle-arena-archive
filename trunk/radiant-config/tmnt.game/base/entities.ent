@@ -54,6 +54,17 @@
 
       June 9, 2009:
         Enabled "team_neutralobelisk" it is used for the model under the "Neutral Flag".
+
+      August 29, 2009:
+		Added general shooter entity (misc_shooter)
+		Renamed/modified shooter_homing back to shooter_grenade
+		Renamed/modified shooter_electric back to shooter_plasma
+		Disabled shooter_* (Use misc_shooter instead)
+		TMNT Arena currently still supports shooter_* for Q3 map compatiblity.
+
+      TODO:
+		Add new WIP path_* entities, path_start path_point path_end
+		Add WIP Nights mode items, nights_start nights_target
 -->
 <classes>
 <!--
@@ -1228,6 +1239,27 @@ The entity must be no farther than 64 units away from the portal surface to lock
 =============================================================================
 -->
 
+<point name="misc_shooter" color="1 .5 .25" box="-8 -8 -8 8 8 8">
+This will shoot a porjectile each time it's triggered. Aiming is done by setting the "angles" key or by targeting an info_notnull or target_position entity. If "random" is -1 it will also "AutoAim" to try to hit clients.
+-------- KEYS --------
+<angles key="angles" name="Pitch Yaw Roll">this sets the pitch and yaw aiming angles of shooter (default 0 0). The roll angle does not apply.</angles>
+<targetname key="targetname" name="Target Name">activating trigger points to this.</targetname>
+<target key="target" name="Target">this points to a target_position entity for aiming the porjectiles.</target>
+<real key="random" name="Angle Variance">random aiming variance in degrees from the straight line to the targeted entity (default 0 - see Notes).</real>
+<string key="message" name="Weapon Group Name">name of the weapon group, see "scripts/weaponinfo.txt"</string>
+<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
+<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
+<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+-------- NOTES --------
+When the random key is set, its value is used to calculate a maximum angle deviation from the normal trajectory formed by a straight line between the shooter and the aiming entity it targets. The final trajectory will be a random value anywhere between no deviation at all (0) to maximum deviation (value of the random key).
+
+Both the setting "angles" key or "targeting a target_position" methods can be used to aim the shooter. However, the target_position method is simpler.
+</point>
+
+<!--
+=============================================================================
+-->
+
 <point name="misc_teleporter_dest" color="1 .5 .25" box="-32 -32 -24 32 32 -16">
 Teleport destination location point for trigger_teleporter entities.
 -------- KEYS --------
@@ -1347,31 +1379,26 @@ Setting the wait key to -1 will not make the train stop on the path corner, it w
 SHOOTER_* ENTITIES
 
 =============================================================================
--->
 
-<point name="shooter_homing" color="1 0 .5" box="-8 -8 -8 8 8 8">
-This will shoot a homing-rocket each time it's triggered. Aiming is done by setting the "angles" key or by targeting an info_notnull or target_position entity.
--------- KEYS --------
+<point name="shooter_grenade" color="1 0 .5" box="-8 -8 -8 8 8 8">
+This will shoot a grenade each time it's triggered. Aiming is done by setting the "angles" key or by targeting an info_notnull or target_position entity.
+======== KEYS ========
 <angles key="angles" name="Pitch Yaw Roll">this sets the pitch and yaw aiming angles of shooter (default 0 0). The roll angle does not apply.</angles>
 <targetname key="targetname" name="Target Name">activating trigger points to this.</targetname>
-<target key="target" name="Target">this points to a target_position entity for aiming the homing-rockets.</target>
+<target key="target" name="Target">this points to a target_position entity for aiming the grenades.</target>
 <real key="random" name="Angle Variance">random aiming variance in degrees from the straight line to the targeted entity (default 0 - see Notes).</real>
 <boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
 <boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
 <boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
--------- NOTES --------
+======== NOTES ========
 When the random key is set, its value is used to calculate a maximum angle deviation from the normal trajectory formed by a straight line between the shooter and the aiming entity it targets. The final trajectory will be a random value anywhere between no deviation at all (0) to maximum deviation (value of the random key).
 
 Both the setting "angles" key or "targeting a target_position" methods can be used to aim the shooter. However, the target_position method is simpler.
 </point>
 
-<!--
-=============================================================================
--->
-
-<point name="shooter_electric" color="1 0 .5" box="-8 -8 -8 8 8 8">
+<point name="shooter_plasma" color="1 0 .5" box="-8 -8 -8 8 8 8">
 This will shoot a electric-energy ball each time it's triggered. Aiming is done by setting the "angles" key or by targeting an info_notnull or target_position entity.
--------- KEYS --------
+======== KEYS ========
 <angles key="angles" name="Pitch Yaw Roll">this sets the pitch and yaw aiming angles of shooter (default 0 0). The roll angle does not apply.</angles>
 <targetname key="targetname" name="Target Name">activating trigger points to this.</targetname>
 <target key="target" name="Target">this points to a target_position entity for aiming the electric-energy balls.</target>
@@ -1379,19 +1406,15 @@ This will shoot a electric-energy ball each time it's triggered. Aiming is done 
 <boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
 <boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
 <boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
--------- NOTES --------
+======== NOTES ========
 When the random key is set, its value is used to calculate a maximum angle deviation from the normal trajectory formed by a straight line between the shooter and the aiming entity it targets. The final trajectory will be a random value anywhere between no deviation at all (0) to maximum deviation (value of the random key).
 
 Both the setting "angles" key or "targeting a target_position" methods can be used to aim the shooter. However, the target_position method is simpler.
 </point>
 
-<!--
-=============================================================================
--->
-
 <point name="shooter_rocket" color="1 0 .5" box="-8 -8 -8 8 8 8">
 This will shoot a rocket each time it's triggered. Aiming is done by setting the "angles" key or by targeting an info_notnull or target_position entity.
--------- KEYS --------
+======== KEYS ========
 <angles key="angles" name="Pitch Yaw Roll">this sets the pitch and yaw aiming angles of shooter (default 0 0). The roll angle does not apply.</angles>
 <targetname key="targetname" name="Target Name">activating trigger points to this.</targetname>
 <target key="target" name="Target">this points to a target_position entity for aiming the rockets.</target>
@@ -1399,11 +1422,12 @@ This will shoot a rocket each time it's triggered. Aiming is done by setting the
 <boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
 <boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
 <boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
--------- NOTES --------
+======== NOTES ========
 When the random key is set, its value is used to calculate a maximum angle deviation from the normal trajectory formed by a straight line between the shooter and the aiming entity it targets. The final trajectory will be a random value anywhere between no deviation at all (0) to maximum deviation (value of the random key).
 
 Both the setting "angles" key or "targeting a target_position" methods can be used to aim the shooter. However, the target_position method is simpler.
 </point>
+-->
 
 <!--
 =============================================================================
@@ -1747,6 +1771,7 @@ Neutral flag (One Flag CTF only).
 </point>
 
 <point name="team_redobelisk" color="1 .2 0" box="16 -16 0 16 16 88" model="models/powerups/overload_base.md3">
+Red Flag base in CTF and 1 Flag CTF game types.
 Red team Obelisk. Used for Overload and Harvester game types. Facing needs to be set.
 -------- KEYS --------
 <angle key="angle" name="Facing Angle">an angle facing needs to be set for this entity. This item has a specific facing.</angle>
@@ -1758,6 +1783,7 @@ Do not assign a gametype to this item unless the location of your CTF flags and 
 </point>
 
 <point name="team_blueobelisk" color="0 .2 1" box="16 -16 0 16 16 88" model="models/powerups/overload_base.md3">
+Blue Flag base in CTF and 1 Flag CTF game types.
 Blue team Obelisk. Used for Overload and Harvester game types. Facing needs to be set.
 -------- KEYS --------
 <angle key="angle" name="Facing Angle">an angle facing needs to be set for this entity. This item has a specific facing.</angle>
@@ -1888,8 +1914,8 @@ When the random key is set, its value is used to calculate a minimum and a maxim
 =============================================================================
 -->
 
-<point name="weapon_bamboobo" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/bamboobo/bamboobo.md3">
-Bamboo Bo.
+<point name="weapon_bamboo" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/bamboo/bamboo.md3">
+Bamboo Bo Staff.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
@@ -2135,7 +2161,7 @@ When the random key is set, its value is used to calculate a minimum and a maxim
 =============================================================================
 -->
 
-<point name="weapon_katanas" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/katanas/katanas.md3">
+<point name="weapon_katanas" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/katana_leo/katanas_pickup.md3">
 Katanas.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
@@ -2210,6 +2236,36 @@ When the random key is set, its value is used to calculate a minimum and a maxim
 =============================================================================
 -->
 
+
+<!--
+=============================================================================
+-->
+
+<point name="weapon_random" color="1 0 .5" box="-16 -16 -16 16 16 16">
+Random Weapon spawner.
+-------- KEYS --------
+<real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
+<real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
+<target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
+<targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
+<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
+<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
+<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+<boolean key="notbot" name="Invisible To Bots">used to make an item invisible for bot attraction.</boolean>
+-------- SPAWNFLAGS --------
+<flag key="SUSPENDED" name="No Drop To Floor" bit="0">item will spawn where it was placed in map and won't drop to the floor.</flag>
+<flag key="MELEE" name="Spawn Melee Weapons" bit="1">spawn melee weapons (Default on - see Notes).</flag>
+<flag key="GUNS" name="Spawn Guns" bit="2">spawn guns (Default on - see Notes).</flag>
+<flag key="CONSTANT" name="Select Weapon Once" bit="3">don't change weapon each respawn.</flag>
+-------- NOTES --------
+The amount of time it takes for an item in the team to respawn is determined by the "wait" value of the item that was picked up previously. So if one of the items in the team has it's "wait" key set to -1 (never respawn), the random respawning cycle of the teamed items will stop after that item is picked up.
+
+When the random key is set, its value is used to calculate a minimum and a maximum delay. The final time delay will be a random value anywhere between the minimum and maximum values: (min delay = wait - random) (max delay = wait + random).
+
+By default it spawn melee and gun weapons.
+</point>
+
 <point name="weapon_rocketlauncher" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/rocketl/rocketl.md3">
 Rocket Launcher.
 -------- KEYS --------
@@ -2235,7 +2291,7 @@ When the random key is set, its value is used to calculate a minimum and a maxim
 =============================================================================
 -->
 
-<point name="weapon_sais" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/sais/sais.md3">
+<point name="weapon_sais" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/sai/sais_pickup.md3">
 Sais.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>

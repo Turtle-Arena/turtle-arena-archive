@@ -1,9 +1,6 @@
 What MISSIONPACK adds to TMNT, the plan is to remove and intagrate all parts of the MP into base TMNT.
-It doesn't seem like it adds much.
 
-
-* Scriptable UI
-* Scriptable HUD
+* Scriptable UI/HUD
 * 3 more gametypes
 ** One Flag CTF --Supported (with data)
 *** Take the center flag to the other team's base.
@@ -13,13 +10,16 @@ It doesn't seem like it adds much.
 *** kill people, then a skull (of the attacker's team color) will spawn at the center object, then attacker's team must take the skull to the other team's base, if killee's team touch it [object that spawned at center], it is removed.)
 * Teams, 5 bots team-name and gfx, good for multiplayer with bots in Team Gametypes (and for clans online?). (Is that all?)
 * Persistant Powerups (For Team gametypes)
-** Scout (Incressed speed, and no armor? (armor is removed in TMNT anyway) ) (Is this the same speed of PW_HASTE?)
-** Guard (Incressed health)                             (2x health, PW_BATTLESUIT is .5 damage receive)
-** Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, I set it 2x damage)
-** Ammo Regen (Player ammo counts slowly increment, what of melee weapons?)
+** Scout (Incressed speed, and no armor? (armor is removed in TMNT Arena) ) (speed is 1.5, haste speed is 1.3)
+***  Turtle Man: NOTE: I cut start health and pickup health in half.
+
+** Guard (Incressed health, and Health regen)           (2x health, PW_BATTLESUIT is .5 damage receive)
+***  Turtle Man: NOTE: I disabled Health regen (Seems overpowered) and give 2x health from pickup items.
+
+** Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, as I set it 2x damage)
+** Ammo Regen (Player ammo/shuriken counts slowly increment)
 * Voice chats for bots and humans
 * Per-team skins for players
-
 
 * 3 New Weapons
 ** chain gun (Removed)
@@ -28,40 +28,5 @@ It doesn't seem like it adds much.
 * 3 New Holdable Items
 ** Kamikaze holdable item (Removed)
 ** Invul holdable item (Removed)
-** Portal (Not used in final game, still in code (I haven't disabled it))
-
-== Remove ==
-=== Kamikaze ===
-: Possibly reuse Kamikaze explotions? For Oil Barrels or something? --no
-
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
-#endif
-
-MOD_KAMIKAZE			-- removed
-
-HI_KAMIKAZE				-- removed
-EF_KAMIKAZE				-- removed
-BotUseKamikaze			-- removed
-BotCheckForKamikazeBody -- removed
-EntityHasKamikaze		-- removed
-
-LEF_SOUND1 and LEF_SOUND2	-- removed
-kamikazeFarSound	-- removed
-EV_KAMIKAZE			-- removed
-G_StartKamikaze		-- removed
-kamikazeTime		-- removed
-kamikazeShockTime	-- removed
-CG_KamikazeEffect	-- removed
-death_kamikaze		-- removed
-GTS_KAMIKAZE		-- removed
-
-	LE_KAMIKAZE,	-- removed
-	LE_INVULIMPACT,	-- removed
-	LE_INVULJUICED, -- removed
-
-CG_AddKamikaze -- removed
-CG_AddInvulnerabilityImpact -- removed
-CG_AddInvulnerabilityJuiced -- removed
-blueKamikazeShader -- removed
-redKamikazeShader -- removed
-
+** Portal (Not used in final version of Team Arena)
+*** I did some fixing to the code and added models and an icon, it is usable.

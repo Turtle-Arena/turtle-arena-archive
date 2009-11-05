@@ -1,6 +1,6 @@
 // Based on OpenArena's /scripts/decals.shader
 
-// Weapon Trail
+// Melee Weapon Trail
 weaponTrail
 {
 	cull disable
@@ -11,16 +11,78 @@ weaponTrail
 	}
 }
 
+// Plasm trail (\cg_oldPlasm 0) and q3 rail trail
+railDisc
+{
+	sort nearest
+	cull none
+	deformVertexes wave 100 sin 0 .5 0 2.4
+	{
+		//clampmap sprites/plasmaa.png
+		clampmap gfx/misc/raildisc_mono2
+		blendFunc GL_ONE GL_ONE
+		rgbGen vertex
+		tcMod rotate -30
+		// tcMod rotate 931 // Turtle Man
+	}
+}
+
+// q3 rail trail
+railCore
+{
+	sort nearest
+	cull none
+	{
+		map gfx/misc/railcorethin_mono
+		blendFunc GL_ONE GL_ONE
+		rgbGen vertex
+		tcMod scroll -1 0
+	}
+}
+
+// Lightning trail from Q3's pak6.pk3
+lightningBoltNew
+{
+	cull none
+	{
+		map gfx/misc/lightning3new
+		blendFunc GL_ONE GL_ONE
+		rgbgen wave sin 1 0.5 0 7.1
+		tcmod scale  2 1
+		tcMod scroll -5 0
+	}
+	{
+		map gfx/misc/lightning3new
+		blendFunc GL_ONE GL_ONE
+		rgbgen wave sin 1 0.8 0 8.1
+		tcmod scale  -1.3 -1
+		tcMod scroll -7.2 0
+	}
+}
+
 // Grappling Hook Cable, grapple trail shader --Turtle Man
 GrappleCable
 {
 	cull disable
 	{
-		map models/weapons2/grapple/trail.png
+		map models/weapons2/grapple/trail
 		//blendfunc blend
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen Vertex
 		alphaGen Vertex
+	}
+}
+
+sparkTrail
+{
+	sort nearest
+	cull none
+	//deformVertexes wave 100 sin 0 .5 0 2.4
+	{
+		clampmap sprites/lasertrail.png
+		blendFunc GL_ONE GL_ONE
+		rgbGen vertex
+		tcMod rotate 250
 	}
 }
 
@@ -86,6 +148,7 @@ projectionShadow
 		map $whiteimage
 		blendfunc filter
 		rgbGen wave square 0 0 0 0
+		alphaGen const 0.5
 	}
 }
 
@@ -253,75 +316,6 @@ gfx/2d/crosshaird
 	}
 }
 
-gfx/2d/crosshaire
-{
-	nopicmip
-	{
-		map gfx/2d/crosshaire.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshairf
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairf.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshairg
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairg.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshairh
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairh.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
-gfx/2d/crosshairi
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairi.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-
-}
-gfx/2d/crosshairj
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairj.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-gfx/2d/crosshairk
-{
-	nopicmip
-	{
-		map gfx/2d/crosshairk.tga
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
-	}
-}
-
 
 gfx/misc/tracer
 {
@@ -338,7 +332,7 @@ gfx/damage/bullet_mrk
 {
 	polygonoffset
 	{
-		map gfx/damage/bullet_mrk.tga
+		map gfx/damage/bullet_mrk
 		blendfunc gl_zero gl_one_minus_src_color
 		rgbGen Vertex
 	}
@@ -371,13 +365,23 @@ gfx/damage/plasma_mrk
 {
 	polygonoffset
 	{
-		map gfx/damage/plasma_mrk.png
+		map gfx/damage/plasma_mrk
 		blendfunc blend
 		rgbGen Vertex
 		alphaGen Vertex
 	}
 }
 
+// Turtle Man: Used by hammer melee weapon
+gfx/damage/hammer_mrk
+{
+	polygonoffset
+	{
+		map gfx/damage/hammer_mrk
+		blendfunc gl_zero gl_one_minus_src_color
+		rgbGen Vertex
+	}
+}
 
 //
 // Melee damage hit effects
@@ -395,8 +399,13 @@ meleeHit1
 meleeHit2
 {
 	cull disable
+//	{
+//		animmap 5 models/weaphits/meleehit2_1.png models/weaphits/meleehit2_2.png models/weaphits/meleehit2_3.png models/weaphits/meleehit2_4.png models/weaphits/meleehit2_5.png
+//		blendfunc blend
+//	}
+	// meleeHit1
 	{
-		animmap 5 models/weaphits/meleehit2_1.png models/weaphits/meleehit2_2.png models/weaphits/meleehit2_3.png models/weaphits/meleehit2_4.png models/weaphits/meleehit2_5.png
+		animmap 5 models/weaphits/meleehit1_1.png models/weaphits/meleehit1_2.png models/weaphits/meleehit1_3.png models/weaphits/meleehit1_4.png models/weaphits/meleehit1_5.png
 		blendfunc blend
 	}
 }
@@ -404,8 +413,13 @@ meleeHit2
 meleeHit3
 {
 	cull disable
+//	{
+//		animmap 5 models/weaphits/meleehit3_1.png models/weaphits/meleehit3_2.png models/weaphits/meleehit3_3.png models/weaphits/meleehit3_4.png models/weaphits/meleehit3_5.png
+//		blendfunc blend
+//	}
+	// meleeHit1
 	{
-		animmap 5 models/weaphits/meleehit3_1.png models/weaphits/meleehit3_2.png models/weaphits/meleehit3_3.png models/weaphits/meleehit3_4.png models/weaphits/meleehit3_5.png
+		animmap 5 models/weaphits/meleehit1_1.png models/weaphits/meleehit1_2.png models/weaphits/meleehit1_3.png models/weaphits/meleehit1_4.png models/weaphits/meleehit1_5.png
 		blendfunc blend
 	}
 }

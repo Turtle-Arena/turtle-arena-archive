@@ -47,13 +47,13 @@ if [ "${final}" = "true" ]; then
 	# LIGHT options for final compile
 	bspoptions="-samplesize 8"
 	# -scale 1.1
-	lightoptions="-lightmapsize 512 -lightmapdir \"lightmaps\" -fast -shade -dirty -patchshadows -samples 3 -bounce 6 -bouncegrid"
+	lightoptions="-lightmapsize 512 -fast -shade -dirty -patchshadows -samples 3 -bounce 6 -bouncegrid"
 else
 	echo "------- COMPILING WITH FAST SETTINGS ----"
 	# LIGHT options for test compile
 	bspoptions="-samplesize 16"
-	#lightoptions="-lightmapsize 512 -lightmapdir \"lightmaps\" -faster -samples 2 -patchshadows"
-	lightoptions="-light -lightmapsize 512 -lightmapdir \"lightmaps\" -fast -super 2 -filter -bounce 8"
+	#lightoptions="-lightmapsize 512 -faster -samples 2 -patchshadows"
+	lightoptions="-light -lightmapsize 512 -fast -super 2 -filter -bounce 8"
 fi
 
 echo "------- ${map}"

@@ -1,6 +1,6 @@
 Currently the easist way to compile TMNT Arena is GNU Make.
 
-1) Unzip "tmnt-src-*.zip" into the main TMNT Arena directory (There is a directory named "src" inside zip)
+1) Unzip "tmnt-src-*.zip" into the main TMNT Arena directory (There is a directory named "src" inside the zip)
 
 === GNU Make ===
 2) In a terminal change to the src/engine/ directory and run "make"

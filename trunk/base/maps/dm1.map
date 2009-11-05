@@ -18,7 +18,7 @@
 ( -184 200 0 ) ( 224 200 0 ) ( -184 496 0 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( -184 -120 -64 ) ( -184 -120 64 ) ( 224 -120 -64 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( -504 200 -64 ) ( -504 496 -64 ) ( -504 200 64 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( -184 496 8 ) ( 224 200 8 ) ( -184 200 8 ) base_floor/sewer_floor 0 0 0 0.5 0.5 0 0 0
+( -184 496 8 ) ( 224 200 8 ) ( -184 200 8 ) base_floor/sewer_dirt 0 0 0 0.5 0.5 0 0 0
 }
 // brush 2
 {
@@ -166,7 +166,7 @@
 }
 // brush 18
 {
-( -960 488 8 ) ( -528 488 8 ) ( -960 -624 8 ) base_floor/sewer_floor 0 0 0 0.5 0.5 0 0 0
+( -960 488 8 ) ( -528 488 8 ) ( -960 -624 8 ) base_floor/sewer_dirt 0 0 0 0.5 0.5 0 0 0
 ( -936 512 40 ) ( -936 512 32 ) ( -504 512 40 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( -528 -624 -152 ) ( -528 488 -152 ) ( -960 -624 -152 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( -504 -608 32 ) ( -504 -608 40 ) ( -504 504 32 ) common/caulk 0 0 0 0.5 0.5 0 0 0
@@ -555,7 +555,7 @@ base_floor/grass2
 // entity 11
 {
 "classname" "func_breakable"
-"mtype" "0"
+"health" "20"
 // brush 0
 {
 ( 600 -64 64 ) ( 600 -88 64 ) ( 576 -64 64 ) base_floor/metal2 0 0 0 0.5 0.5 0 0 0
@@ -578,4 +578,9 @@ base_floor/grass2
 "classname" "target_position"
 "origin" "1032.000000 304.000000 192.000000"
 "targetname" "target_intermission"
+}
+// entity 14
+{
+"classname" "item_health_mega"
+"origin" "-456.000000 -280.000000 400.000000"
 }

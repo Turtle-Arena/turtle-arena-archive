@@ -1,4 +1,4 @@
-TMNT Arena documentation
+TMNT Arena documentation (Out of date)
 
 == Planned Stuff ==
 === Demo 1 ===
@@ -6,7 +6,7 @@ It should have a working player, working melee weapon(s), working bots, and some
 
 * Raph player model <sup>Model mesh is "done", skin looks okay ("done"), animations need work.</sup>
 * Largely changed weapon system from ioquake3, players can hold only two weapons at a time (default and pickup) <sup>working</sup>
-* Melee weapons, as well as gun weapons <sup>Melee not finished, Gun working</sup>
+* Melee weapons, as well as gun weapons <sup>Melee is WIP, Gun working</sup>
 * Working bots, using OpenArena's botfiles as Quake3's were not released under the GPL. <sup>working</sup>
 * Shurikens <sup>Working</sup>
 * Hold multiple items at once, Pizza-to-Go and Shurikens. <sup>Working</sup>
@@ -16,7 +16,7 @@ It should have a working player, working melee weapon(s), working bots, and some
 
 === Later ===
 * True Single Player mode with NPCs and all that.
-* Remake UI/HUD using Quake III: Team Arena menu scripting
+* Remake UI/HUD using Quake III: Team Arena menu scripting?
 * New gametypes, Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
 * NiGHTS mode (Maybe instead NiGHTS use a dragon-form like in Season 5, Dragons are sort of like Nightmarens...)
 
@@ -33,12 +33,12 @@ Nothing has been written though there some ideas;
 * I'd like to have there be 13 "episodes" to "finish" the fifth season.
 * I'd like to have one of the stages take place in Usagi's world
 * I'd like to have one of the stages take place in Moo Mesa
-* The Purple Dragons will appear
-* The Earth Protection Force (Agent Bishop) may appear.
+* The Purple Dragons may appear
+* The Earth Protection Force (Agent Bishop) may appear
 * It is unknown if The Foot will appear.
 
 === Models<sup>need more</sup> ===
-Raph, who is most likely the most important model, is incomplete. The model (Mesh) is almost finished, the shapes and size still don't seem right. There is a basic skin for the head and legs, but the torso is not skined correctly.
+Raph, who is most likely the most important model, is incomplete. The model (Mesh) is almost finished, the shapes and size still don't seem right. There is a basic skin for model.
 
 There are models for the holdable pizza, instant pizza (health pickups), shurikens (pickup and thrown), CTF flags (pickup and held), and traffic cones.
 
@@ -73,3 +73,5 @@ It can hold the player's default weapon, bounding box, max speed, and accelerati
 Shurikens are separate from the normal weapons, they are holdable items with multiple uses.
 
 Currently they can be throw and they do damage, explode, bounce, etc. The electric shuriken does not yet stun players or electrify water. In the future the electric, fire, and laser shurikens will be more than just recolored models, by adding sparks, flames, and glowing effects.
+
+

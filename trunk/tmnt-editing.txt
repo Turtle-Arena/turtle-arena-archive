@@ -29,7 +29,7 @@ Copy the files inside of the "TMNTArena/tmnt-src-*.zip/src/radiant-cfg/" directo
 When you start NetRadiant select "TMNT Arena" in the drop-down list of games. You can also set "Show Global Preferences" to unchecked to always go into TMNT mapping, skipping the game select if you are not going to edit maps for other games (This can be changed later in the Edit -> Preferences -> Global -> Game).
 
 == Players ==
-There isn't a guide yet but if you open /base/pak0.pk3 and look in "/models/players/raph/" there is a full Raph player. It is mostly the same as a Quake3 player, so you should be able to find information on the Web.
+There isn't a guide yet but if you open /base/pak0.pk3 and look in "/models/players/raph/" there is a full Rapheal player. It is mostly the same as a Quake3 player, so you should be able to find information on the Web.
 
 Also see tmnt-editing-players.txt
 

@@ -41,9 +41,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define HLW				400
 #define GHW				90
 
-#define TELW				190
+//#define TELW				190
 #define MEDW				50
-#define KAMW				200
+//#define KAMW				200
 #define PORW				300
 #define SURW				150
 #define SUREW				160
@@ -62,9 +62,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define GUW					200
 #define DUBW				100
 #define AMRW				400
-
-#define REDCW				200
-#define BLCW				200
 
 #define FGW				400
 

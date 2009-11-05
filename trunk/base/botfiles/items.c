@@ -191,10 +191,11 @@ index		INVENTORY_HEALTH
 respawntime	30
 mins		{-13,-13,-13}
 maxs		{13,13,13}
-} 
+}
 
 //weapon_default?
 
+/* TMNTWEAPSYS_2 uses weaponinfo.txt to setup the weapon items. (Weapons could still be here however.)
 iteminfo "weapon_katanas"
 {
 name		"Katanas"
@@ -374,6 +375,7 @@ respawntime	30
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
+*/
 
 iteminfo "item_strength"
 {

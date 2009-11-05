@@ -1,5 +1,6 @@
 // Shaders for the new (missionpack based) UI
 
+// See menu/art/titlebanner (se_menu.shader)
 ui/assets/titlebanner
 {
 	nomipmaps
@@ -15,9 +16,33 @@ ui/assets/out_menuback
 	nomipmaps
 	{
 		map menu/art/menuback
-		//blendFunc GL_ONE GL_ZERO
 		tcMod scroll .04  .02
-		//tcMod scale 1.2 1.2
+	}
+}
+
+ui/assets/3_cursor3
+{
+	nomipmaps
+	{
+		map menu/art/3_cursor2
+	}
+}
+
+// Used by Team Arena scriptable UI HUD
+ui/assets/selectcursor
+{
+	nomipmaps
+	{
+		map menu/art/3_cursor2
+	}
+}
+
+ui/assets/sizecursor
+{
+	nomipmaps
+	{
+		// TODO: Add the correct image.
+		map menu/art/3_cursor2
 	}
 }
 

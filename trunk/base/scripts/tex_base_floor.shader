@@ -1,11 +1,11 @@
 // base_floor.shader
 
-textures/base_floor/sewer_floor
+textures/base_floor/sewer_dirt
 {
 	surfaceparm dust
 	surfaceparm dirt
 	{
-		map textures/base_floor/sewer_floor.png
+		map textures/base_floor/sewer_dirt.png
 		rgbGen identity
 	}
 	{
@@ -15,6 +15,23 @@ textures/base_floor/sewer_floor
 		depthFunc equal
 	}
 }
+
+textures/base_floor/sewer_dirt_tile
+{
+	surfaceparm dust
+	surfaceparm dirt
+	{
+		map textures/base_floor/sewer_dirt_tile.png
+		rgbGen identity
+	}
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+		depthFunc equal
+	}
+}
+
 
 // Taken from Q3A shader manual, textures/base_floor/pjgrate1
 textures/base_floor/grate_rust

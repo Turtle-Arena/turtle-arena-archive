@@ -25,6 +25,9 @@ There are three reason I moved shurikens to there own file.
 1. So that if I replace the weaponinfo.txt with Q3 weapons I can still use shurikens...
 2. weaponinfo.txt is used by botlib to find out how many weapons there are (shurikens don't count).
 3. I added support for ".weap" files so I might as well use it...
+
+NOTE: Shurikens currently can't use "grappling 1" the projectile is removed.
+			This is due to checking if attack is pressed...
 */
 
 //
@@ -36,24 +39,23 @@ There are three reason I moved shurikens to there own file.
 projectile "p_shuriken"
 {
 	model "models/shurikens/shuriken.md3"
-	damagetype 1
 	damage 10
 	speed 700
 	timetolive 15000
-	spinType PS_PITCH
+	spinType "PS_PITCH"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	stickOnImpact 1
 }
 
+// Currently the same as p_shuriken other then the model...
 projectile "p_electricshuriken"
 {
 	model "models/shurikens/shurikenelectric.md3"
-	damagetype 1
 	damage 10
 	speed 700
 	timetolive 15000
-	spinType PS_PITCH
+	spinType "PS_PITCH"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	stickOnImpact 1
@@ -62,37 +64,42 @@ projectile "p_electricshuriken"
 projectile "p_fireshuriken"
 {
 	model "models/shurikens/shurikenfire.md3"
-	damagetype 3
 	damage 15
 	splashDamage 10
 	splashRadius 60
 	speed 700
-	timetolive 15000
+	timetolive 3000
 	shootable 1
-	trailType PT_GRENADE
-	deathType PD_ROCKET_SMALL
-	spinType PS_PITCH
+	trailType "PT_GRENADE"
+	deathType "PD_ROCKET_SMALL"
+	spinType "PS_PITCH"
 	wallmarkName "gfx/damage/burn_med_mrk"
 	wallmarkRadius 32
 
-	// Grenade shuriken...
-	bounceType "PB_HALF"
-	useGravity 1
-	timetolive 2500
+	// Grenade Shuriken
+	//bounceType "PB_HALF"
+	//useGravity 1
+	//timetolive 2500
+
+	// Fire Shuriken
+	stickOnImpact 1
 }
 
 projectile "p_lasershuriken"
 {
 	model "models/shurikens/shurikenlaser.md3"
-	damagetype 1
 	damage 7
 	speed 700
 	timetolive 15000
-	spinType PS_PITCH
+	spinType "PS_PITCH"
 	bounceType "PB_FULL"
-	maxBounces 3
+	maxBounces 10
 	wallmarkName "gfx/damage/plasma_mrk"
 	wallmarkRadius 8
 	wallmarkFadeAlpha 1
+
+	trailType "PT_SPARKS"
+	missileDlight 100
+	missileDlightColor 0.8 0 1 // cc00ff
 }
 

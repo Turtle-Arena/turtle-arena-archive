@@ -1,8 +1,8 @@
 // Shaders that are not used by TMNT Arena,
 //  but we have them for "quake3 engine compatablity"... They may be removed leter.
 
-// Turtle Man: TMNT Arena uses shader name set in model, "models/misc/telep"
-//             While Q3 uses hardcoded name.
+// Turtle Man: TMNT Arena uses the shader name set in model, "models/misc/telep"
+//             While Q3 uses a hardcoded name.
 teleportEffect
 {
 	cull disable
@@ -20,21 +20,11 @@ teleportEffect
 // TMNT Arena no longer uses "no logo" version
 menubacknologo
 {
-	nopicmip
 	nomipmaps
 	{
 		map menu/art/menuback
-		//blendFunc GL_ONE GL_ZERO
-		tcMod scroll .04  .02
-		//tcMod scale 1.2 1.2
+		tcMod scroll 0.04 0.02
 	}
-	//{
-	//	map menu/art/menuback
-	//	blendFunc add
-	//	tcMod scroll .02  .01
-	//	tcMod scale .9 .9
-	//	tcMod turb 0 .1 0 .1
-	//}
 }
 
 // Turtle Man: Removed HI_TELEPORTER
@@ -73,7 +63,7 @@ icons/haste
 	}
 }
 
-// Medals not used by TMNT.
+// Medals that are not used by TMNT Arena.
 medal_excellent
 {
 	nopicmip
@@ -143,7 +133,7 @@ icons/iconh_red
 
 }
 
-// icons/iconh_mega -- same as in q3.
+// icons/iconh_mega -- same as in Q3.
 
 // Turtle Man: Renamed to sprites/talkBalloon ...
 sprites/balloon3
@@ -161,6 +151,76 @@ sprites/foe
 	{
 		map sprites/friend_r.png
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+// Turtle Man: Not used by TMNT Arena
+gfx/2d/crosshaire
+{
+	nopicmip
+	{
+		map gfx/2d/crosshaire.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen identity
+	}
+}
+
+gfx/2d/crosshairf
+{
+	nopicmip
+	{
+		map gfx/2d/crosshairf.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen identity
+	}
+}
+
+gfx/2d/crosshairg
+{
+	nopicmip
+	{
+		map gfx/2d/crosshairg.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen identity
+	}
+}
+
+gfx/2d/crosshairh
+{
+	nopicmip
+	{
+		map gfx/2d/crosshairh.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen identity
+	}
+}
+
+gfx/2d/crosshairi
+{
+	nopicmip
+	{
+		map gfx/2d/crosshairi.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen identity
+	}
+
+}
+gfx/2d/crosshairj
+{
+	nopicmip
+	{
+		map gfx/2d/crosshairj.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen identity
+	}
+}
+gfx/2d/crosshairk
+{
+	nopicmip
+	{
+		map gfx/2d/crosshairk.tga
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbGen identity
 	}
 }
 

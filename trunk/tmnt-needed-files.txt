@@ -1,5 +1,7 @@
 Needed files. List is incomplete.
 
+See ../base/sound/sounds.txt for list of needed sounds.
+
 General:
 
 Player Teleport:
@@ -10,7 +12,6 @@ MissionPack only: models/powerups/pop.md3
 
 Weapons:
 
-models/ammo/bullet/bullet.md3			--Added for WP_GUN, may not use.
 DONE: models/ammo/rocket/rocket.md3
 
 // Gun
@@ -22,8 +23,8 @@ models/weaphits/ring02.md3
 models/weaphits/plasmboom.png (plasmaExplosion shader)
 
 // Rocket and Homing Rocket Launcher (And Overload base (Obelisk))
-models/weaphits/boom01.md3			--Very simple model, it has two triangles and 4 vertexes... (Sprite)
-models/weaphits/rlboom/* (images) (rocketExplosion shader)
+DONE: models/weaphits/boom01.md3			--Very simple model, it has two triangles and 4 vertexes... (Sprite)
+DONE: models/weaphits/rlboom/* (images) (rocketExplosion shader)
 
 TEMP: models/weapons2/shells/m_shell.md3		--Used by WP_GUN.
 
@@ -38,11 +39,11 @@ DONE: shuriken.md3
 TEMP: shurikenelectric.md3
 TEMP: shurikenfire.md3
 TEMP: shurikenlaser.md3
-porter.md3
+DONE: porter.md3
 
 models/powerups/instant/*
 
-flight.md3
+TEMP: flight.md3
 TEMP: defense.md3
 TEMP: strength.md3
 TEMP: speed.md3
@@ -51,8 +52,8 @@ TEMP: invul.md3
 DONE: regen.md3
 
 Defense - Shield
-Strength - Arm showing stregth?
-Speed - Zippy Lad's Headgear thing
+Strength - Arm showing stregth? Or red glowing transparent sword?
+Speed - Zippy Lad's Headgear thing? A blue glowing transparent bunny?...
 Invisibility - Foot Tech belt, around waist over shoulder with foot logo on over-shoulder-part
 
 Health Regen - regen.md3 Red "+"?
@@ -61,12 +62,12 @@ Flight - flight.md3 Red Cape on blue man? (superman-ish)
 Invulnerability - White sphere?
 
 MISSIONPACK
-DONE: Scout - "S" with word "Scout" "floating" around it			[blue]
-DONE: Guard - "G" with word "Guard" ...						[yellow]
+DONE: Scout - "S" with word "Scout" "floating" around it		[blue]
+DONE: Guard - "G" with word "Guard" ...							[yellow]
 DONE: Doubler "D" with word "Doubler" ...						[red]
 DONE: AmmoRegen "A" with word "Ammo" ...						[green]
 
-CTF:
+== CTF ==
 
 DONE: icons/iconf_blu1
 DONE: icons/iconf_blu2
@@ -75,18 +76,19 @@ DONE: icons/iconf_red1
 DONE: icons/iconf_red2
 DONE: icons/iconf_red3
 
+// NOTE: Modified code so that these are not used, instead the two-part MP models are used.
+//         The models were moved to ioq3ztm.
 DONE: models/flags/r_flag.md3
 DONE: models/flags/b_flag.md3
+DONE: models/flags/n_flag.md3		(MISSIONPACK 1 Flag CTF)
 
-MISSIONPACK 1 Flag CTF
-DONE: models/flags/n_flag.md3
+== MISSIONPACK 1 Flag CTF ==
 DONE: icons/iconf_neutral1
 DONE: icons/iconf_neutral3
 
-MISSIONPACK CTF flags.
+== MISSIONPACK CTF flags ==
 
 DONE: models/flag2/flagpole.md3
-
 UNANIMATED: models/flag2/flagflap3.md3
 
 DONE: models/flag2/red.skin
@@ -97,52 +99,47 @@ DONE: models/mapobjects/flagbase/red_base.md3
 DONE: models/mapobjects/flagbase/blue_base.md3
 DONE: models/mapobjects/flagbase/ntrl_base.md3
 
-
-TEMP: menu/medals/medal_assist.png
+DONE: menu/medals/medal_assist.png
 DONE: menu/medals/medal_capture.png
-TEMP: menu/medals/medal_defend.png
-TEMP: menu/medals/medal_excellent.png
+DONE: menu/medals/medal_defend.png
 
-
+== Team Arena HUD ==
 Player status icons (for gametypes >= GT_CTF)
 
 DONE:	cgs.media.patrolShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/patrol.tga");
 DONE:	cgs.media.assaultShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/assault.tga");
-	cgs.media.campShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/camp.tga");
-	cgs.media.followShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/follow.tga");
+DONE:	cgs.media.campShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/camp.tga");
+DONE:	cgs.media.followShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/follow.tga");
 DONE:	cgs.media.defendShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/defend.tga");
 DONE:	cgs.media.teamLeaderShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/team_leader.tga");
 DONE:	cgs.media.retrieveShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/retrieve.tga");
-	cgs.media.escortShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/escort.tga");
+DONE:	cgs.media.escortShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/escort.tga");
 
+== Team Arena One Flag HUD ==
+DONE:	cgs.media.flagShaders[0] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_in_base.tga");
+DONE:	cgs.media.flagShaders[1] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_capture.tga");
+DONE:	cgs.media.flagShaders[2] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_missing.tga");
+
+== Team Arena UI ==
+: Only used the scriptable UI HUD. (Which currently isn't used.)
 	cgs.media.sizeCursor = trap_R_RegisterShaderNoMip( "ui/assets/sizecursor.tga" );
-	cgs.media.selectCursor = trap_R_RegisterShaderNoMip( "ui/assets/selectcursor.tga" );
-	cgs.media.flagShaders[0] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_in_base.tga");
-	cgs.media.flagShaders[1] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_capture.tga");
-	cgs.media.flagShaders[2] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_missing.tga");
+	NOTE: Currently I have ui/assets/sizecursor points to the normal q3 cursor.
+DONE:	cgs.media.selectCursor = trap_R_RegisterShaderNoMip( "ui/assets/selectcursor.tga" );
 
-Four medals don't have images, they are only used in sppostgame which needs rewrite anyway... The first two were used in cgame, but disable by defining TMNTWEAPONS
-
-menu/medals/medal_impressive.tga		--had to do with the railgun, I forget why the award was given.
-menu/medals/medal_gauntlet.tga
-menu/medals/medal_frags.tga
-menu/medals/medal_victory.tga
-
-
+== Demo Quake3's pak0.pk3 ==
 While replacing stuff I was deleting what I had replaced or was no longer used in the demoq3 pak0.pk3
-the following were not removed from the pak; (I have a list so I can delete the pak)
+the following were not removed from the pk3; (I have a list so I can delete the pk3)
 
-gfx/misc/lightning3.jpg				--unused by tmnt
-gfx/misc/railcorethin_mono.jpg		--unused by tmnt
-gfx/misc/raildisc_mono2.jpg			--unused by tmnt
-menu/art/frame1_l.tga				--When the file is missing you can't really tell.
-menu/medals/medal_accuracy.tga
+menu/medals/medal_impressive.tga	--unused by tmnt --Kill two (or more) players with one railgun shot.
+menu/medals/medal_excellent.tga		--unused by tmnt --Kill two players close together
+menu/medals/medal_accuracy.tga		--unused by tmnt
 menu/medals/medal_gauntlet.tga		--unused by tmnt
-menu/medals/medal_victory.tga
-models/ammo/rocket/*				--replaced by tmnt
-models/misc/telep.md3				--replaced by tmnt
-models/powerups/*
-models/powerups/holdable/teleporter.md3	--unused by tmnt
-models/weaphits/*
+menu/medals/medal_victory.tga		--unused by tmnt
+models/powerups/*					--replaced/unused by tmnt
 models/weapons2/*					--replaced/unused by tmnt
+models/weaphits/*
+
+== Demo TA pak0.pk3 ==
+// There is [or maybe] more, I didn't delete stuff as I replaced stuff.
+models/powerups/*					--replaced/unused by tmnt
 

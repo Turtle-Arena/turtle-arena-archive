@@ -1,4 +1,13 @@
-// shaders for the Q3 menu.
+// shaders for the q3_ui menus
+
+menu/art/titlebanner
+{
+	nomipmaps
+	{
+		map menu/art/titlebanner.png
+		blendfunc blend
+	}
+}
 
 gfx/2d/bigchars
 {
@@ -28,17 +37,16 @@ menuback
 	nomipmaps
 	{
 		map menu/art/menuback
-		//blendFunc GL_ONE GL_ZERO
-		tcMod scroll .04  .02
-		//tcMod scale 1.2 1.2
+		tcMod scroll 0.04 0.02
 	}
-	//{
-	//	map menu/art/menuback
-	//	blendFunc add
-	//	tcMod scroll .02  .01
-	//	tcMod scale .9 .9
-	//	tcMod turb 0 .1 0 .1
-	//}
+	{
+		map menu/art/menuback2
+		blendFunc blend
+		tcMod scale 0.5 0.5
+		tcMod scroll -0.02 -0.01
+		rgbGen const ( 0.35 0.35 0.35 )
+		alphaGen const 0.95
+	}
 }
 
 // menu background with out blending
@@ -47,9 +55,7 @@ menubackRagePro
 	nomipmaps
 	{
 		map menu/art/menuback
-		//blendFunc GL_ONE GL_ZERO
-		tcMod scroll .04  .02
-		//tcMod scale 1.2 1.2
+		tcMod scroll 0.04 0.02
 	}
 }
 

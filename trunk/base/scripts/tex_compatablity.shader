@@ -28,3 +28,57 @@ textures/common/botclip
 	surfaceparm noimpact
 	surfaceparm botclip
 }
+
+// Q3 CTF flags...
+textures/ctf/ctf_blueflag
+{
+	qer_editorimage textures/ctf2/blue_banner02.png
+	tessSize 64
+	deformVertexes wave 194 sin 0 3 0 .4
+	deformVertexes normal .5 .1
+	surfaceparm nomarks
+
+	surfaceparm alphashadow
+	cull none
+
+	{
+		map textures/ctf2/blue_banner02.png
+		alphaFunc GE128
+		depthWrite
+		rgbGen identity
+	}
+
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+		depthFunc equal
+	}
+}
+
+textures/ctf/ctf_redflag
+{
+	qer_editorimage textures/ctf2/red_banner02.png
+	tessSize 64
+	deformVertexes wave 194 sin 0 3 0 .4
+	deformVertexes normal .3 .2
+	surfaceparm nomarks
+
+	surfaceparm alphashadow
+	cull none
+
+	{
+		map textures/ctf2/red_banner02.png
+		alphaFunc GE128
+		depthWrite
+		rgbGen identity
+	}
+
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+		depthFunc equal
+	}
+}
+
