@@ -24,6 +24,7 @@ waterBubble
 	}
 }
 
+// Rocket trails and stuff.
 smokePuff
 {
 	cull none
@@ -76,9 +77,22 @@ shotgunSmokePuff
 	}
 }
 
+// From Team Arena's pak0.pk3/scripts/gfx2.shader
+nailtrail
+{
+	sort nearest
+	cull none
+	{
+		clampmap models/weaphits/nailtrail
+		blendFunc Add
+		rgbGen vertex
+		tcMod rotate -30
+	}
+}
+
 flareShader
 {
-	entityMergable // Turtle Man: Should be okay.
+	//entityMergable // Turtle Man: Should be okay?
 	cull none
 	{
 		map gfx/misc/flare.tga
@@ -89,7 +103,7 @@ flareShader
 
 sun
 {
-	entityMergable // Turtle Man: Should be okay.
+	//entityMergable // Turtle Man: Should be okay?
 	cull none
 	{
 		map gfx/misc/sun.tga
@@ -121,6 +135,7 @@ sprites/team_blue
 	}
 }
 
+// note: plasma trail uses railDisc
 // Can't use "entityMergable" each rotates seperate.
 sprites/plasma1
 {
@@ -139,13 +154,3 @@ sprites/plasma1
 	}
 }
 
-// Plasm trail (\cg_oldPlasm 0)
-railDisc
-{
-	cull disable
-	{
-		clampmap sprites/plasmaa.png
-		blendfunc GL_ONE GL_ONE
-		tcMod rotate 931
-	}
-}

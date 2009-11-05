@@ -23,7 +23,7 @@ models/players/raph/white
 models/players/raph/belt
 {
 	{
-		map models/players/raph/belt.png
+		map models/players/raph/belt
 		rgbGen lightingDiffuse
 	}
 }
@@ -31,7 +31,7 @@ models/players/raph/belt
 models/players/raph/body
 {
 	{
-		map models/players/raph/body.png
+		map models/players/raph/body
 		rgbGen lightingDiffuse
 	}
 }
@@ -39,7 +39,7 @@ models/players/raph/body
 models/players/raph/head
 {
 	{
-		map models/players/raph/head.png
+		map models/players/raph/head
 		rgbGen lightingDiffuse
 	}
 }
@@ -47,7 +47,7 @@ models/players/raph/head
 models/players/raph/legs
 {
 	{
-		map models/players/raph/legs.png
+		map models/players/raph/legs
 		rgbGen lightingDiffuse
 	}
 }
@@ -55,7 +55,7 @@ models/players/raph/legs
 models/players/raph/belt_blue
 {
 	{
-		map models/players/raph/belt_blue.png
+		map models/players/raph/belt_blue
 		rgbGen lightingDiffuse
 	}
 }
@@ -63,7 +63,7 @@ models/players/raph/belt_blue
 models/players/raph/body_blue
 {
 	{
-		map models/players/raph/body_blue.png
+		map models/players/raph/body_blue
 		rgbGen lightingDiffuse
 	}
 }
@@ -71,7 +71,7 @@ models/players/raph/body_blue
 models/players/raph/head_blue
 {
 	{
-		map models/players/raph/head_blue.png
+		map models/players/raph/head_blue
 		rgbGen lightingDiffuse
 	}
 }
@@ -79,7 +79,7 @@ models/players/raph/head_blue
 models/players/raph/belt_red
 {
 	{
-		map models/players/raph/belt_red.png
+		map models/players/raph/belt_red
 		rgbGen lightingDiffuse
 	}
 }
@@ -87,7 +87,7 @@ models/players/raph/belt_red
 models/players/raph/body_red
 {
 	{
-		map models/players/raph/body_red.png
+		map models/players/raph/body_red
 		rgbGen lightingDiffuse
 	}
 }
@@ -95,7 +95,7 @@ models/players/raph/body_red
 models/players/raph/head_red
 {
 	{
-		map models/players/raph/head_red.png
+		map models/players/raph/head_red
 		rgbGen lightingDiffuse
 	}
 }
@@ -124,11 +124,25 @@ models/players/raph/body_fugitoid
 	}
 }
 
+models/players/raph/body_fugitoid_lighter
+{
+	{
+		map $whiteimage
+		rgbGen const ( 0.4 0.4 0.4 )
+	}
+	{
+		map textures/effects/tinfx_lighter.png
+		tcGen environment
+		rgbGen lightingDiffuse
+		//alphaGen wave sin .6 .2 0 .6
+	}
+}
+
 //
 // TELEPORT
 //
 
-// Spawn effect
+// teleport model shader
 models/misc/telep
 {
 	cull disable
@@ -196,10 +210,24 @@ models/shurikens/shurikenelectric
 	}
 }
 
-models/shurikens/shurikenlaser
+models/shurikens/shurikenlaser_1
 {
 	{
 		map models/powerups/holdable/shurikenlaser_1.png
+	}
+}
+
+// sparkTrail
+models/shurikens/laserglow
+{
+	sort nearest
+	cull none
+	deformVertexes autosprite
+	{
+		clampmap sprites/laserglow.png
+		blendFunc GL_ONE GL_ONE
+		rgbGen vertex
+		tcMod rotate 500
 	}
 }
 
@@ -284,6 +312,59 @@ models/powerups/instant/strength
 	}
 }
 
+// Powerup rings
+//models/powerups/instant/defense
+models/powerups/shield/yellow
+{
+	{
+		map models/powerups/instant/defense.png
+		blendfunc GL_ONE GL_ONE
+		rgbGen lightingDiffuse
+		tcMod turb 0 0.15 0 0.25
+		tcGen environment
+		alphaGen wave sin .6 .2 0 .6
+	}
+}
+
+//models/powerups/instant/invul
+models/powerups/shield/white
+{
+	{
+		map models/powerups/instant/invul.png
+		blendfunc GL_ONE GL_ONE
+		rgbGen lightingDiffuse
+		tcMod turb 0 0.15 0 0.25
+		tcGen environment
+		alphaGen wave sin .6 .2 0 .6
+	}
+}
+
+//models/powerups/instant/speed
+models/powerups/shield/blue
+{
+	{
+		map models/powerups/instant/speed.png
+		blendfunc GL_ONE GL_ONE
+		rgbGen lightingDiffuse
+		tcMod turb 0 0.15 0 0.25
+		tcGen environment
+		alphaGen wave sin .6 .2 0 .6
+	}
+}
+
+//models/powerups/instant/strength
+models/powerups/shield/red
+{
+	{
+		map models/powerups/instant/strength.png
+		blendfunc GL_ONE GL_ONE
+		rgbGen lightingDiffuse
+		tcMod turb 0 0.15 0 0.25
+		tcGen environment
+		alphaGen wave sin .5 .4 0 .6
+	}
+}
+
 // Weapons
 models/weapons2/katana_leo/w_katana
 {
@@ -325,15 +406,30 @@ models/weapons2/sai/w_sai
 	//}
 }
 
+//
+// MATERIALS
+//
+models/materials/stone
+{
+	// It look better with a cel outline
+	celoutline 2
+
+	{
+		map models/materials/stone.png
+		blendFunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+
+
 // CTF FLAGS / MISSIONPACK CTF FLAGS
 // Below CTF flay shaders from MISSIONPACK demo pak0.pk3/scripts/models.shader
 models/flags/pole
 {
 	{
 		// Turtle Man: Changed image.
-		//map models/flags/skull.tga
-		//map textures/effects/tinfx.tga
-		map models/flags/pole.tga
+		map textures/effects/tinfx.png
+		//map models/flags/pole.png
 		tcGen environment
 		rgbGen lightingDiffuse
 	}
@@ -342,7 +438,9 @@ models/flags/pole
 models/flags/skull
 {
 	{
-		map models/flags/skull.tga
+		// Turtle Man: Changed image.
+		map textures/effects/envmapmach.png
+		//map models/flags/skull.png
 		tcGen environment
 		rgbGen lightingDiffuse
 	}
@@ -784,13 +882,13 @@ models/powerups/scout1
 
 models/powerups/scout2
 {
-    cull disable
-        {
-	        map models/powerups/scout2.tga
+	cull disable
+	{
+		map models/powerups/scout2.tga
 		blendfunc Add
-                tcmod Scroll .9 0
-                rgbGen identity
-        }
+		tcmod Scroll .9 0
+		rgbGen identity
+	}
 }
 
 // Note: Blue in Q3/TA
@@ -834,4 +932,21 @@ models/powerups/doubler2
 	}
 }
 
+// When player uses HI_MEDKIT
+models/powerups/regen1
+{
+	cull disable
+	{
+		clampmap models/powerups/regen1
+		tcmod rotate -420
+		blendfunc Add
+		rgbGen entity
+	}
+	{
+		clampmap models/powerups/regen2
+		tcmod rotate -640
+		blendfunc Add
+		rgbGen entity
+	}
+}
 

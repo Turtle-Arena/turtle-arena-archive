@@ -1,6 +1,0 @@
-Four medal don't have images, they are only used in sppostgame which needs rewrite anyway... The first two were used in cgame, but removed by TMNTWEAPONS
-
-"menu/medals/medal_impressive"
-"menu/medals/medal_gauntlet"
-"menu/medals/medal_frags"
-"menu/medals/medal_victory"

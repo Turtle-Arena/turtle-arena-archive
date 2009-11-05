@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// Based on Open Arena's "gargoyle_t.c", but of the chat text was rewritten.
+// Based on Open Arena's "gargoyle_t.c", but all of the chat text was rewritten.
 
 chat "raph"
 {
@@ -30,14 +30,14 @@ chat "raph"
 	type "game_enter"
 	{
 		"I am so going to enjoy this.";
-		"I'm here, how the game can really start!";
+		"I'm here, now the game can really begin!";
 		"Hey guys.";
 	}
 
 	type "game_exit"
 	{
 		"I need a break, I've been playing all day long.";
-		"Later guys, I've got some things to do in the 'real world.'";
+		"Later guys, I've got some stuff to do in the 'real world.'";
 		"Time to go.";
 		"There are better thing to do than beating up guys in video game you know. Like doing it in real life! Later.";
 	}
@@ -55,7 +55,7 @@ chat "raph"
 	{
 		"Geez, I though it never end.";
 		"Boy, smashing that guy was fun!";
-		//"Is this it? is it finally over?";
+		//"Is this it? Is it finally over?";
 		"Is this it, is it over already? It was just gettin' fun!";
 	}
 
@@ -63,37 +63,37 @@ chat "raph"
 	{
 		"Oh yeah, I win again!";
 		"Ha, you thought you can beat me?";
-		"I'd like to see you do this good! ...well not really.";
+		"Ha, I'd like to see you do this good! ...well not really.";
 	}
 
 	type "level_end_lose"
 	{
 		"How 'bout a rematch?";
 		"Next time you won't be so lucky.";
-		"No comment...";
-		"Guess I've got some training to do.";
+		//"No comment...";
+		//"Guess I've got some training to do.";
 	}
 
 	type "hit_talking"
 	{
-		"Excuse me, I was talking!";
+		"Well excuse me, I was talking!";
 		"You are so going to paid for that!";
-		"Bonehead.";
+		"Bonehead!";
 		//"Is there a sign over my head that reads 'shoot me'?";
 	}
 
 	type "hit_nodeath"
 	{
-		"You just don't die do you...";
-		"I guess I should've trained more.";
+		"You just don't die do you!";
+		//"I guess I should've trained more.";
 		"How could you live through that!?";
-		"I need a better weapon.";
+		//"I need a better weapon.";
 	}
 
 	type "hit_nokill"
 	{
 		"Maybe you should try using a real weapon!";
-		// TODO: 1 = weapon name (fist - sai - katana - bo - ect)
+		// TODO: Have 1 = weapon name (fist - sai - katana - bo - etc) ?
 		//"Do you even know how to use your ", 1, "?";
 		"Nice try!";
 		"Try again, I dear you!";
@@ -120,23 +120,26 @@ chat "raph"
 	{
 		"Man is it hot in here!";
 		"I guess swimming in lava isn't the smartist thing I've every done.";
-		"I need a new travial agent.";
+		"I need a new travel agent.";
 		"Grr... I hate burn marks on my shell!";
 	}
 
 	type "death_slime"
 	{
-		"I hope this slime doesn't cause a secondary mutation!"; // like what happened to donny!
-		"...and who forgot to label this toxic?!";
-		"How was I suppost to know it was toxic?";
+		"I hope this slime doesn't cause a secondary mutation!"; // Like what happened to Donny!
+		//"...and who forgot to label this toxic?!";
+		//"How was I suppost to know it was toxic?";
 		"Grr... who put this toxic waste here!";
+		"Man, it feels gross in here.";
+		"Yuck.";
 	}
 
 	type "death_drown"
 	{
-		"Sometimes I wish I was a amphibian...";
+		"Goodbye water world";
+		//"Sometimes I wish I was a amphibian...";
 		"I need to get me an air tank or somethin'...";
-		"I was just proving that turtles don't have gills.";
+		//"I was just proving that turtles don't have gills.";
 	}
 
 	type "death_suicide"
@@ -150,6 +153,7 @@ chat "raph"
 	type "death_gauntlet"
 	{
 		"Ow";
+		"What the...";
 	}
 
 	type "death_rail"
@@ -167,8 +171,10 @@ chat "raph"
 	{
 		"All you accomplished is to tick me off!";
 		"Well it sure took you long enough.";
-		"I've seen Mikey do better than that.";
-		curse;
+		//"I've seen Mikey do better than that.";
+		"Bonehead!";
+		//"What the...";
+		//curse;
 	}
 
 	type "death_praise"
@@ -196,9 +202,9 @@ chat "raph"
 	{
 		"Oh you were standing there?  I am now.";
 		"Why don't you stay down!";
-		"Got ya!";
-		TELEFRAGGED0;
-		TELEFRAGGED1;
+		"If ya can't beat'em, squash'em.";
+		//TELEFRAGGED0;
+		//TELEFRAGGED1;
 	}
 
 	type "kill_suicide"
@@ -209,34 +215,36 @@ chat "raph"
 
 	type "kill_insult"
 	{
-		"wimp"
-		"bonehead";
-		//"...";
-		//"...";
-		KILL_EXTREME_INSULT;
-		curse;
+		"Wimp!";
+		"Bonehead!";
+		"Oh yeah!";
+		"Now thats what I'm talkin' about.";
+		//KILL_EXTREME_INSULT;
+		//curse;
 	}
 
 	type "kill_praise"
 	{
 		"Not bad.";
-		"It seems you getting better.";
+		"It seems your getting better.";
 		"You know, your not bad for a wimp.";
-		D_PRAISE1;
+		//D_PRAISE1;
 	}
 
 	type "random_insult"
 	{
 		"Geez, your worse than Mikey.";
 		"You know, you are such a bonehead!";
-		"Bonehead.";
+		"Bonehead!";
+		"Wuss!";
 	}
 
 	type "random_misc"
 	{
 		"I need to work on the shell cycle.";
 		"Anyone seen a TV remote around here?";
-		"Anyone want to order some pizza?";
+		"Anyone want to order some takeout?";
 		"Was that a monkey?";
+		"Have you seen a monkey around here?";
 	}
 }

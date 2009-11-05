@@ -113,6 +113,7 @@ weight "weapon_default"
 	return 0;
 }
 
+// Turtle Man: TODO: TMNTWEAPSYS_2 should setup the weapon item weights.
 weight "weapon_katanas"
 {
 	switch(INVENTORY_KATANAS)
@@ -268,7 +269,7 @@ weight "holdable_medkit"
 	}
 }
 
-/*
+/* Removed from TMNT Arena
 weight "holdable_kamikaze"
 {
 	switch(INVENTORY_KAMIKAZE) // Turtle Man: BUGFIX?: Was INVENTORY_TELEPORTER
@@ -288,8 +289,7 @@ weight "holdable_portal"
 	}
 }
 
-// useless in TMNT, it doesn't do anything
-/*
+/* Removed from TMNT Arena
 weight "holdable_invulnerability"
 {
 	switch(INVENTORY_INVULNERABILITY) // Turtle Man: BUGFIX?: Was INVENTORY_TELEPORTER
@@ -445,23 +445,23 @@ weight "team_CTF_neutralflag"
 	return FGW;
 }
 
-weight "item_redcube"
-{
-	return REDCW;
-}
-
-weight "item_bluecube"
-{
-	return BLCW;
-}
-
 weight "item_botroam"
 {
 	return 1;
 }
 
-// Turtle Man: Not used by base Q3A, or base TMNT.
-/*
+// For Team Arena Harvester gametype (Disabled in TMNT Arena)
+weight "item_redcube"
+{
+	return 200;//REDCW;
+}
+
+weight "item_bluecube"
+{
+	return 200;//BLCW;
+}
+
+// For OpenArena dom gametype(s?)
 weight "team_dom_pointWhite"
 {
 	return 1000;
@@ -476,4 +476,4 @@ weight "team_dom_pointBlue"
 {
 	return 700;
 }
-*/
+

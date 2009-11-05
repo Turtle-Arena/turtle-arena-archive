@@ -1,11 +1,12 @@
-'''TMNT Arena''' (working title) is a TMNT Fangame being made by ZTurtleMan based on the ioquake3 engine.
+'''TMNT Arena''' (working title) is a Ninja Turtle Fangame being made by ZTurtleMan based on the ioquake3 engine.
 
 == Current Features ==
 Currently the game is multiplayer only, there are bots for offline play but no true single player mode.
 
 * Two playable characters (Raph and Casey)
 * 6 playable gametypes (Free For All, Dual, Team Deathmatch, CTF, 1 Flag CTF, Overload)
-* X# playable maps.
+** Single Player/Co-op is there but unfinished.
+* 1 playable map. (There are other junky/test maps)
 * [more...]
 
 == Credits ==
@@ -13,6 +14,7 @@ Currently the game is multiplayer only, there are bots for offline play but no t
 * ioquake3 devoplers (For improving, fixing, and cleaning up Quake 3's source code)
 * Open Arena (For botfiles and some images - readme.txt will include list of files)
 * Xreal project (For Homing rockets and shootable rockets)
+* Smokin' Guns (For a minor animation time fix)
 * GNU FreeFonts (For FreeSans.ttf)
 * ZTurtleMan
 

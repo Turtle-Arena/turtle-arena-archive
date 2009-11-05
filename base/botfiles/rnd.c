@@ -158,7 +158,7 @@ DEATH_SLIME0 = {
 
 DEATH_SLIME1 = {
 	"Where is Ralph Nader when you need him?";
-	"Someone call Sally Struthers!";
+	//"Someone call Sally Struthers!"; // Turtle Man: Who is that?
 	"This is NOT a safe working environment, I want to talk to my Union Rep!";
 	"This level needs an enema!";
 }
@@ -447,7 +447,7 @@ TAUNT1 = {
 
 TAUNT2 = {
 	"The more you know, the less you understand.";
-	"Have you had a coffin fitting yet?";
+	//"Have you had a coffin fitting yet?";
 	"If only ", 0, " was a challenge...";
 	"you ", fighter, ".";
 }
@@ -459,17 +459,17 @@ TAUNT_FEM0 = {
 }
 
 TELEFRAGGED0 = {
-	"LOL!";
-	"Aww man... I am so glad I don't have to clean that up.";
-	"Eewww!";
-	"Sorry but I had to practice my praetorian impression.";
+	//"LOL!";
+	//"Aww man... I am so glad I don't have to clean that up.";
+	//"Eewww!";
+	//"Sorry but I had to practice my praetorian impression.";
 	"Hi there, how's it going?";
 }
 
 TELEFRAGGED1 = {
-	"and I just had my suit dry cleaned... jerk!";
-	"Think of the cleaning bills this place must have...";
-	"Gross";
+	//"and I just had my suit dry cleaned... jerk!";
+	//"Think of the cleaning bills this place must have...";
+	//"Gross";
 }
 
 TELEFRAGGED2 = {
@@ -1019,8 +1019,8 @@ substance = {
 
 curse = {
 	// Turtle Man: Added
-    "curses!";
-	"bonehead";
+    //"curses!";
+	"Bonehead!";
 	// Turtle Man: REMOVED DISABLED TEXT
 }
 

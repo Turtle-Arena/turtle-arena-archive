@@ -40,10 +40,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ["SRB2JTE"] = 1
 {
 	"SRB to JTE!?!";
-	"I'm the bot from SRB2JTE!";
+	"I'm the bot from SRB2JTE. Now I must kill you.";
 }
 
-
+[("sing me a song ", 0) &name] = 5
+{
+	"No thanks, I don't sing.";
+}
 
 // Should bots yell at people who curse and use bad words and stuff?...
 

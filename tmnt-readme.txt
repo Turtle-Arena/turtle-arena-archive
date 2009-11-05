@@ -1,13 +1,18 @@
 TMNT Arena (working title) is a work in progress TMNT fangame based on the ioquake3 engine.
 
 == Version ==
-TMNT Arena Alpha 0.1.0 June 6, 2009
+TMNT Arena Alpha 0.1.0 September 30, 2009
 
 == Credits ==
-id software
-ioquake3
-GNU Freefonts
-Zack "ZTurtleMan" Middleton
+* id software			(For making and releasing Quake III Arena's source code)
+* ioquake3 devoplers	(For improving, fixing, and cleaning up Quake 3's source code)
+* ioSTVEF				(For "noise" and "random" waveform keywords, and RF_FORCE_ENT_ALPHA render flag)
+* Open Arena			(For botfiles, images, and a 3D model with 0 triangles [it has 2 tags...])
+* Xreal project			(For Homing rockets and shootable rockets)
+* Smokin' Guns			(For a minor animation time fix)
+* GNU FreeFonts			(For FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf)
+* Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)
+* Zack "ZTurtleMan" Middleton
 
 Also see "Code" section for full list.
 
@@ -26,8 +31,8 @@ Windows 95/98 singleuser: C:\Windows\Application Data\TMNTArena\
 Windows 95/98 multi-user: C:\WINNT\Profiles\%USERNAME%\Application Data\TMNTArena\
 Windows 2000/XP: C:\Documents and Settings\%USERNAME%\Application Data\TMNTArena\
 Windows Vista: C:\Users\%USERNAME%\Application Data\TMNTArena\
-Mac OS X: /Users/NAME/Library/Application Support/TMNTArena/
-Linux: /home/NAME/.tmntarena/
+Mac OS X: /Users/$USERNAME/Library/Application Support/TMNTArena/
+Linux: /home/$USERNAME/.tmntarena/
 
 == Compiling ==
 See tmnt-compiling.txt
@@ -38,10 +43,14 @@ TMNT Arena uses code directly or based on code from the following.
 === GPL ===
 * ioquake3 (Base engine): http://ioquake3.org/
 ** Jay "TT1" Weisskopf (ASPECT_RATIO): https://bugzilla.icculus.org/show_bug.cgi?id=3475
-** (VOIP_INFO): http://bugzilla.icculus.org/show_bug.cgi?id=4018
 
-* OpenArena (OPENARENA): http://openarena.ws --Changed default sound filename. Load Ogg sounds (when no wav).
-** OA_BLOOM OpenArena's bloom effect, disabled by default. (r_bloom 1 to enable)
+* ioSTVEF (IOSTVEF): http://thilo.kickchat.com/efport-progress/
+** (IOSTVEF_NOISE) Adds support for "noise" and "random" waveform keywords
+** RF_FORCE_ENT_ALPHA, it will be used so items/weapons fad out when dispearing.
+
+* OpenArena (OPENARENA): http://openarena.ws
+** Changed default sound filename. Load Ogg sounds (when no wav).
+** (OA_BLOOM) OpenArena's bloom effect, disabled by default. (r_bloom 1 to enable)
 
 * Xreal (XREAL): http://www.xreal-project.net/
 ** Homing rockets (Xreal svn r2785)
@@ -52,88 +61,32 @@ TMNT Arena uses code directly or based on code from the following.
 * Smokin' Guns (SMOKIN_GUNS): http://www.smokin-guns.net/
 ** Fixed animation timing based on PM_AnimLength from Smokin' Guns' bg_pmove.c
 
-=== Non-Free (Disabled) ===
-:''All of the non-free will be rewritten or removed.''
-
-The code is in the source but is disable, so none of it is in the binarys...
-
-* The Dark Conjunction (via rfactory) (SP_NPC): http://tdc.planetquake.gamespy.com/news.htm
+* Mercenaries Guild Client 1.011 for Tremulous: http://projects.mercenariesguild.net/projects/mgclient
+** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some part, ...)
 
 === Other ===
 : Code based on guides, etc.
-* rfactory: http://www.rfactory.org/
-* "inolan.com": http://www.quake3hut.co.uk/q3coding/Breakable%20Glass.htm
+* rfactory, lots of stuff: http://www.rfactory.org/
+** The Dark Conjunction (via rfactory): http://tdc.planetquake.gamespy.com/news.htm
+* "inolan.com", basic breakable brush code: http://www.quake3hut.co.uk/q3coding/Breakable%20Glass.htm
 
-== Data ==
-"Data" refers to the contants of "base/pak0.pk3".
+== License ==
+The TMNT Arena source code and data are licensed under the GNU General Public License version 2 or later.
 
-There are source files for some of the data in tmnt-src-*.zip/src/base-src/
+See COPYRIGHTS for data per-file copyrights.
 
-All data, unless otherwise noted, is Copyright(c) 2009 Zack "ZTurtleMan" Middleton
-	and is license under the GNU General Public License version 2 or later.
+== Software used ==
+Software used to create the TMNT Arena data files.
 
-The following are from OpenArena and are Copyright (C) 2006 Dmn_clown
-	and are license under the GNU General Public License version 2 or later.
-base/botfiles/bots/default_c.c
-base/botfiles/bots/default_i.c
-base/botfiles/bots/default_t.c
-base/botfiles/bots/default_w.c
-base/botfiles/fuzi.c
-base/botfiles/fuzw.c
-base/botfiles/items.c
-base/botfiles/match.c
-base/botfiles/rchat.c
-base/botfiles/rnd.c
-base/botfiles/syn.c
-base/botfiles/teamplay.h
-base/botfiles/weapons.h
+== Text ==
+* Code::Blocks
+* gedit (GNOME Text editor)
+* Microsoft Windows Notepad/Wordpad
 
-The following are from OpenArena,
-	and are license under the GNU General Public License version 2 or later
+=== 3D Models ===
+* Wings3D
+* Misfit Model 3D
 
-: Currently used by the Quake3 UI (That I plan to replace with a Team Arena scripted menu, sometime...)
-base/menu/art/font1_prop.tga
-base/menu/art/font2_prop.tga
-base/gfx/2d/bigchars.tga
+=== 2D Graphics ==
+* GIMP
 
-: Currently don't plan on replacing these.
-base/gfx/2d/crosshaira.tga
-base/gfx/2d/crosshairb.tga
-base/gfx/2d/crosshairc.tga
-base/gfx/2d/crosshaird.tga
-base/gfx/2d/crosshaire.tga
-base/gfx/2d/crosshairf.tga
-base/gfx/2d/crosshairg.tga
-base/gfx/2d/crosshairh.tga
-base/gfx/2d/crosshairi.tga
-base/gfx/2d/crosshairj.tga
-base/models/weaphits/boom01.md3 (Its two triangles. I deleted four of the six triangles from OpenArena.)
-
-: Currently plan to replace these.
-base/textures/base_light/baslt4_1.tga
-base/textures/base_light/baslt4_1.blend.tga
-base/textures/base_light/ceil1_4.tga
-base/textures/base_light/ceil1_4.blend.tga
-base/gfx/damage/bullet_mrk.jpg
-base/gfx/damage/burn_med_mrk.tga
-base/gfx/damage/hole_lg_mrk.tga
-base/gfx/damage/shadow.tga
-base/gfx/misc/flare.jpg
-base/sprites/bubble.tga
-base/sprites/splash.tga
-base/ui/assets/statusbar/camp.tga
-base/ui/assets/statusbar/escort.tga
-base/ui/assets/statusbar/follow.tga
-base/models/weapons2/gun/gun_hand.md3 (Copied from OA's base/models/weapons2/shotgun/shotgun_hand.md3)
-
-The following files were generated by q3font.exe using the font "FreeSans.ttf", which is part of GNU Freefonts,
-	and are license under the GNU General Public License version 3 or later.
-
-: ''I should have use a font that is license under "GPL v2 or later"...?''
-
-base/fonts/fontImage_0_12.tga
-base/fonts/fontImage_0_16.tga
-base/fonts/fontImage_0_20.tga
-base/fonts/fontImage_12.dat
-base/fonts/fontImage_16.dat
-base/fonts/fontImage_20.dat

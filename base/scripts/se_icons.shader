@@ -6,7 +6,16 @@ icons/medkit
 {
 	nopicmip
 	{
-		map icons/medkit.tga
+		map icons/medkit.png
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+icons/portal
+{
+	nopicmip
+	{
+		map icons/portal.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -16,7 +25,7 @@ icons/shuriken
 {
 	nopicmip
 	{
-		map icons/shuriken.tga
+		map icons/shuriken.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -25,7 +34,7 @@ icons/shurikenelectric
 {
 	nopicmip
 	{
-		map icons/shurikenelectric.tga
+		map icons/shurikenelectric.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -34,7 +43,7 @@ icons/shurikenfire
 {
 	nopicmip
 	{
-		map icons/shurikenfire.tga
+		map icons/shurikenfire.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -43,7 +52,7 @@ icons/shurikenlaser
 {
 	nopicmip
 	{
-		map icons/shurikenlaser.tga
+		map icons/shurikenlaser.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -53,7 +62,7 @@ icons/defense
 {
 	nopicmip
 	{
-		map icons/defense.tga
+		map icons/defense.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -61,7 +70,7 @@ icons/strength
 {
 	nopicmip
 	{
-		map icons/strength.tga
+		map icons/strength.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -69,7 +78,7 @@ icons/speed
 {
 	nopicmip
 	{
-		map icons/speed.tga
+		map icons/speed.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -77,7 +86,7 @@ icons/invis
 {
 	nopicmip
 	{
-		map icons/invis.tga
+		map icons/invis.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -85,7 +94,7 @@ icons/regen
 {
 	nopicmip
 	{
-		map icons/regen.tga
+		map icons/regen.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -93,7 +102,7 @@ icons/flight
 {
 	nopicmip
 	{
-		map icons/flight.tga
+		map icons/flight.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -102,7 +111,7 @@ icons/invul
 {
 	nopicmip
 	{
-		map icons/invul.tga
+		map icons/invul.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -112,7 +121,7 @@ medal_assist
 {
 	nopicmip
 	{
-		clampmap menu/medals/medal_assist.tga
+		clampmap menu/medals/medal_assist.png
 		blendFunc blend
 	}
 }
@@ -121,7 +130,7 @@ medal_defend
 {
 	nopicmip
 	{
-		clampmap menu/medals/medal_defend.tga
+		clampmap menu/medals/medal_defend.png
 		blendFunc blend
 	}
 }
@@ -130,7 +139,7 @@ medal_capture
 {
 	nopicmip
 	{
-		clampmap menu/medals/medal_capture.tga
+		clampmap menu/medals/medal_capture.png
 		blendFunc blend
 	}
 }
@@ -140,7 +149,7 @@ icons/iconw_default
 {
 	nopicmip
 	{
-		map icons/iconw_default.tga
+		map icons/iconw_default.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -149,7 +158,7 @@ icons/iconw_katanas
 {
 	nopicmip
 	{
-		map icons/iconw_katanas.tga
+		map icons/iconw_katanas.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -158,7 +167,7 @@ icons/iconw_daisho
 {
 	nopicmip
 	{
-		map icons/iconw_daisho.tga
+		map icons/iconw_daisho.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -167,7 +176,7 @@ icons/iconw_sais
 {
 	nopicmip
 	{
-		map icons/iconw_sais.tga
+		map icons/iconw_sais.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -176,7 +185,7 @@ icons/iconw_nunchuks
 {
 	nopicmip
 	{
-		map icons/iconw_nunchuks.tga
+		map icons/iconw_nunchuks.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -185,7 +194,7 @@ icons/iconw_hammer
 {
 	nopicmip
 	{
-		map icons/iconw_hammer.tga
+		map icons/iconw_hammer.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -194,7 +203,7 @@ icons/iconw_axe
 {
 	nopicmip
 	{
-		map icons/iconw_axe.tga
+		map icons/iconw_axe.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -203,7 +212,7 @@ icons/iconw_longsword
 {
 	nopicmip
 	{
-		map icons/iconw_longsword.tga
+		map icons/iconw_longsword.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -212,7 +221,7 @@ icons/iconw_bat
 {
 	nopicmip
 	{
-		map icons/iconw_bat.tga
+		map icons/iconw_bat.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -221,16 +230,16 @@ icons/iconw_bo
 {
 	nopicmip
 	{
-		map icons/iconw_bo.tga
+		map icons/iconw_bo.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
 
-icons/iconw_bamboobo
+icons/iconw_bamboo
 {
 	nopicmip
 	{
-		map icons/iconw_bamboobo.tga
+		map icons/iconw_bamboobo.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -239,7 +248,7 @@ icons/iconw_gun
 {
 	nopicmip
 	{
-		map icons/iconw_gun.tga
+		map icons/iconw_gun.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -248,7 +257,7 @@ icons/iconw_electric
 {
 	nopicmip
 	{
-		map icons/iconw_electric.tga
+		map icons/iconw_electric.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -257,7 +266,7 @@ icons/iconw_homing
 {
 	nopicmip
 	{
-		map icons/iconw_homing.tga
+		map icons/iconw_homing.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -266,7 +275,7 @@ icons/iconw_rocket
 {
 	nopicmip
 	{
-		map icons/iconw_rocket.tga
+		map icons/iconw_rocket.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -275,7 +284,7 @@ icons/iconw_grapple
 {
 	nopicmip
 	{
-		map icons/iconw_grapple.tga
+		map icons/iconw_grapple.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -285,7 +294,7 @@ icons/iconh_small
 {
 	nopicmip
 	{
-		map icons/iconh_small.tga
+		map icons/iconh_small.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -294,7 +303,7 @@ icons/iconh_medium
 {
 	nopicmip
 	{
-		map icons/iconh_medium.tga
+		map icons/iconh_medium.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -303,7 +312,7 @@ icons/iconh_large
 {
 	nopicmip
 	{
-		map icons/iconh_large.tga
+		map icons/iconh_large.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -312,7 +321,7 @@ icons/iconh_mega
 {
 	nopicmip
 	{
-		map icons/iconh_mega.tga
+		map icons/iconh_mega.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -324,7 +333,7 @@ icons/iconf_red1
 {
 	nopicmip
 	{
-		map icons/iconf_red1.tga
+		map icons/iconf_red1.png
 	}
 }
 
@@ -332,7 +341,7 @@ icons/iconf_red2
 {
 	nopicmip
 	{
-		map icons/iconf_red2.tga
+		map icons/iconf_red2.png
 	}
 }
 
@@ -340,7 +349,7 @@ icons/iconf_red3
 {
 	nopicmip
 	{
-		map icons/iconf_red3.tga
+		map icons/iconf_red3.png
 	}
 }
 
@@ -348,7 +357,7 @@ icons/iconf_blu1
 {
 	nopicmip
 	{
-		map icons/iconf_blu1.tga
+		map icons/iconf_blu1.png
 	}
 }
 
@@ -356,7 +365,7 @@ icons/iconf_blu2
 {
 	nopicmip
 	{
-		map icons/iconf_blu2.tga
+		map icons/iconf_blu2.png
 	}
 }
 
@@ -364,7 +373,7 @@ icons/iconf_blu3
 {
 	nopicmip
 	{
-		map icons/iconf_blu3.tga
+		map icons/iconf_blu3.png
 	}
 }
 
@@ -372,7 +381,7 @@ icons/iconf_neutral1
 {
 	nopicmip
 	{
-		map icons/iconf_neutral1.tga
+		map icons/iconf_neutral1.png
 	}
 }
 
@@ -380,7 +389,7 @@ icons/iconf_neutral3
 {
 	nopicmip
 	{
-		map icons/iconf_neutral3.tga
+		map icons/iconf_neutral3.png
 	}
 }
 
@@ -390,7 +399,7 @@ scoreboardName
 	nopicmip
 	nomipmaps
 	{
-		clampmap menu/tab/name.tga
+		clampmap menu/tab/name.png
 		blendfunc blend
 	}
 }
@@ -400,7 +409,7 @@ scoreboardScore
 	nopicmip
 	nomipmaps
 	{
-		clampmap menu/tab/score.tga
+		clampmap menu/tab/score.png
 		blendfunc blend
 	}
 }
@@ -410,7 +419,7 @@ scoreboardTime
 	nopicmip
 	nomipmaps
 	{
-		clampmap menu/tab/time.tga
+		clampmap menu/tab/time.png
 		blendfunc blend
 	}
 }
@@ -420,7 +429,7 @@ scoreboardPing
 	nopicmip
 	nomipmaps
 	{
-		clampmap menu/tab/ping.tga
+		clampmap menu/tab/ping.png
 		blendfunc blend
 	}
 }
@@ -432,7 +441,7 @@ icons/guard
 {
 	nopicmip
 	{
-		map icons/guard.tga
+		map icons/guard.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -441,7 +450,7 @@ icons/doubler
 {
 	nopicmip
 	{
-		map icons/doubler.tga
+		map icons/doubler.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -450,7 +459,7 @@ icons/ammo_regen
 {
 	nopicmip
 	{
-		map icons/ammo_regen.tga
+		map icons/ammo_regen.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -459,7 +468,7 @@ icons/scout
 {
 	nopicmip
 	{
-		map icons/scout.tga
+		map icons/scout.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }

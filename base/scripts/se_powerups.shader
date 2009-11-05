@@ -77,18 +77,22 @@ powerups/regen
 	}
 }
 
-// teleport effect
+// teleport effect; PW_FLASHING
 playerTeleportEffect
 {
-	//deformVertexes wave 100 sin 3 0 0 0
+	// Cel Outline
+	//celoutline 3
+	//celoutlineRgbGen const ( 0.4 0.65 0.8 )
+	//celoutlineAlphaGen const 0.9
+
 	{
-		//map textures/effects/regenmap2.tga
 		map models/misc/telep.png
 		blendfunc GL_ONE GL_ONE
+		rgbGen lightingDiffuse
+		tcMod turb 0 0.15 0 0.25
 		tcGen environment
-                //tcmod rotate 30
-		//tcMod turb 0 0.2 0 .2
-                //tcmod scroll 1 .1
+		//alphaGen wave sin .6 .2 0 .6
+		alphaGen entity
 	}
 }
 

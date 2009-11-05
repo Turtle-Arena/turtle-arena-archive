@@ -12,10 +12,12 @@ tex_base_floor
 tex_base_light
 tex_base_wall
 tex_common
-tex_ctf
 tex_ctf2
 tex_fog
 tex_liquid
+tex_plants
 tex_sfx
 tex_skies
 tex_teams
+tex_terrain
+

@@ -1,0 +1,110 @@
+The TMNT Arena data copyrights.
+
+All of the data is license under the GNU General Public License; either version 2 of the License, or
+	(at your option) any later version.
+
+== ZTM ==
+There are source files for some of the data in tmnt-src-*.zip/src/base-src/
+
+All data, unless otherwise noted, is Copyright (C) 2009 Zack "ZTurtleMan" Middleton
+	and are license under the GNU General Public License; either version 2 of the License, or
+	(at your option) any later version.
+
+However, some of my data is based on that of Quake III: Arena and OpenArena.
+	(For what is should look like and shapes, they're not modified graphics; I used some of them to create my data)
+
+== OpenArena ==
+The following are from OpenArena and are Copyright (C) 2006 Dmn_clown
+	and are license under the GNU General Public License; either version 2 of the License, or
+	(at your option) any later version.
+base/botfiles/bots/default_c.c
+base/botfiles/bots/default_i.c
+base/botfiles/bots/default_t.c
+base/botfiles/bots/default_w.c
+base/botfiles/fuzi.c
+base/botfiles/fuzw.c
+base/botfiles/items.c
+base/botfiles/match.c
+base/botfiles/rchat.c
+base/botfiles/rnd.c
+base/botfiles/syn.c
+base/botfiles/teamplay.h
+base/botfiles/weapons.h
+
+The following are from OpenArena,
+	and are license under the GNU General Public License; either version 2 of the License, or
+	(at your option) any later version.
+
+: I plan to replace with GNU FreeFonts.
+base/menu/art/font1_prop.tga
+base/gfx/2d/bigchars.png
+
+: Currently not in a big rush to replace this, as it is for the unsupported first-person camera mode.
+base/models/weapons2/gun/gun_hand.md3 (Copied from OA's base/models/weapons2/shotgun/shotgun_hand.md3)
+
+: Currently plan to replace these.
+base/gfx/damage/burn_med_mrk.tga
+base/gfx/damage/hole_lg_mrk.tga
+base/gfx/damage/shadow.tga
+base/gfx/misc/flare.jpg
+base/sprites/splash.tga
+
+== GNU FreeFonts ==
+The following files were created using the GNU Freefonts,
+	and are license under the GNU General Public License; either version 2 of the License, or
+	(at your option) any later version.
+
+The 60 images listed below were created with GIMP.
+base/menu/art/level_complete[1-5].png				FreeMono.ttf
+base/menu/art/skill[1-5].png						FreeMono.ttf
+base/menu/art/randombot_icon.png					FreeMono.ttf
+base/menu/art/unknownmap.png						FreeMono.ttf
+base/menu/art/*_0.png [15 images]					FreeSansBold.ttf
+base/menu/art/*_1.png [15 images]					FreeSansBold.ttf
+base/gfx/2d/numbers/*.png 0 - 9 and '-' [11 images]	FreeSansBold.ttf
+base/gfx/2d/crosshaira.png							FreeSans.ttf
+base/textures/common/alpha* [6 images]				FreeSans.ttf
+
+Below were created by TMNT Arena, using freetype2	FreeSans.ttf
+base/fonts/fontImage_0_12.tga
+base/fonts/fontImage_0_16.tga
+base/fonts/fontImage_0_20.tga
+base/fonts/fontImage_1_20.tga
+base/fonts/fontImage_12.dat
+base/fonts/fontImage_16.dat
+base/fonts/fontImage_20.dat
+
+Used by the console.									FreeSansBold.ttf
+base/fonts/FreeSansBold_0_16.tga
+base/fonts/FreeSansBold_16.dat
+
+FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf are part of GNU FreeFonts.
+
+These versions are from the 2008-09-12 GPLv2 release.
+
+Licensing
+---------
+
+Free UCS scalable fonts is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+The fonts are distributed in the hope that they will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+As a special exception, if you create a document which uses this font, and
+embed this font or unaltered portions of this font into the document, this
+font does not by itself cause the resulting document to be covered by the
+GNU General Public License. This exception does not however invalidate any
+other reasons why the document might be covered by the GNU General Public
+License. If you modify this font, you may extend this exception to your
+version of the font, but you are not obligated to do so.  If you do not
+wish to do so, delete this exception statement from your version.
+

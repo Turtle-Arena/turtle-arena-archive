@@ -1,0 +1,8 @@
+u_torso,$(dir)/body_red.png
+u_torso2,$(dir)/body_red.png
+u_torso3,$(dir)/body_red.png
+u_belt,$(dir)/belt_red.png
+tag_flag,
+tag_weapon,
+tag_head,
+tag_torso,
