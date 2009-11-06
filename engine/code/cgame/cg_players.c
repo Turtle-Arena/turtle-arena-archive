@@ -1437,7 +1437,7 @@ PLAYER ANIMATION
 =============================================================================
 */
 
-#ifndef IOQ3ZTM // Moved to BG and LERP_FRAME_CLIENT_LESS
+#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // Moved to bg_misc.c
 /*
 ===============
 CG_SetLerpFrameAnimation
@@ -1445,32 +1445,20 @@ CG_SetLerpFrameAnimation
 may include ANIM_TOGGLEBIT
 ===============
 */
-#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-void CG_SetLerpFrameAnimation( lerpFrame_t *lf, animation_t *animations, int newAnimation ) {
-#else
 static void CG_SetLerpFrameAnimation( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation ) {
-#endif
 	animation_t	*anim;
 
 	lf->animationNumber = newAnimation;
 	newAnimation &= ~ANIM_TOGGLEBIT;
 
-	if ( newAnimation < 0
-#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-	|| newAnimation >= MAX_TOTALANIMATIONS
-#endif
-	) {
+	if ( newAnimation < 0 ) {
 		CG_Error( "Bad animation number: %i", newAnimation );
 	}
 
-#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-	anim = &animations[ newAnimation ];
-#else
 #ifdef TMNTPLAYERSYS
 	anim = &ci->playercfg.animations[ newAnimation ];
 #else
 	anim = &ci->animations[ newAnimation ];
-#endif
 #endif
 
 	lf->animation = anim;
@@ -1489,11 +1477,7 @@ Sets cg.snap, cg.oldFrame, and cg.backlerp
 cg.time should be between oldFrameTime and frameTime after exit
 ===============
 */
-#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-void CG_RunLerpFrame( lerpFrame_t *lf, animation_t *animations, int newAnimation, float speedScale ) {
-#else
 static void CG_RunLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation, float speedScale ) {
-#endif
 	int			f, numFrames;
 	animation_t	*anim;
 
@@ -1505,11 +1489,7 @@ static void CG_RunLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation
 
 	// see if the animation sequence is switching
 	if ( newAnimation != lf->animationNumber || !lf->animation ) {
-#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-		CG_SetLerpFrameAnimation( lf, animations, newAnimation );
-#else
 		CG_SetLerpFrameAnimation( ci, lf, newAnimation );
-#endif
 	}
 
 	// if we have passed the current frame, move it to
@@ -1585,17 +1565,9 @@ static void CG_RunLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int newAnimation
 CG_ClearLerpFrame
 ===============
 */
-#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-void CG_ClearLerpFrame( lerpFrame_t *lf, animation_t *animations, int animationNumber ) {
-#else
 static void CG_ClearLerpFrame( clientInfo_t *ci, lerpFrame_t *lf, int animationNumber ) {
-#endif
 	lf->frameTime = lf->oldFrameTime = cg.time;
-#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-	CG_SetLerpFrameAnimation( lf, animations, animationNumber );
-#else
 	CG_SetLerpFrameAnimation( ci, lf, animationNumber );
-#endif
 	lf->oldFrame = lf->frame = lf->animation->firstFrame;
 }
 #endif // IOQ3ZTM // LERP_FRAME_CLIENT_LESS

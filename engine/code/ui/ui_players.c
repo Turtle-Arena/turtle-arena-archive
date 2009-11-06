@@ -480,7 +480,7 @@ static void UI_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_
 }
 
 
-#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
+#ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // Moved to bg_misc.c
 /*
 ===============
 UI_SetLerpFrameAnimation

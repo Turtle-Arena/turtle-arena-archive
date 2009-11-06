@@ -6,18 +6,16 @@ Bugs that have found that have not been fixed yet, and things that should to be 
 * Use GNU FreeFonts (the GPL v2 or later ones)
 ** [todo] Replace OpenArena's menu/art/font1_prop.tga with GNU FreeSans
 ** [todo] Replace OpenArena's gfx/2d/bigchars with GNU FreeSans
+* [bug] "non-free" model/skin, base/models/mapobjects/gfz_flower/fwr2.md3 (converted from md2) and frw2.png
+** Used as animation test model in the map "test"
+** From the Sonic Robo Blast 2 MD2 model pack, used with out permission. (And I can't find the forum post)
 
 == engine (server/client/game/cgame/ui, in more then one or I don't know where) ==
 
 [todo] Review the chages in Meld, checking for errors and undoing unneeded changes to syntax.
 
-[todo] Clean up IOQ3ZTM // LERP_FRAME_CLIENT_LESS remove the "dead" code,
-		code in ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS and ifdef IOQ3ZTM <> else <dead code> endif
-
 // Weapons! (and attacking)
-[todo] Allow using two guns at once and fix weapon hand offset stuff (like brass eject code) etc.
-* May help? (Not really related... at all)
-http://web.archive.org/web/20071219193415/http://code3arena.planetquake.gamespy.com/tutorials/tutorial26.shtml
+[todo] Allow using two guns at once and fix weapon hand offset stuff (like brass eject code and EV_RAILTRAIL) etc.
 
 [todo] Add code so that Nunchuk can spin when attacking (and standing?), and when not spining have gravity
 	(like CTF flag)
@@ -304,6 +302,8 @@ DONE: Have models for all items
 
 DONE: Change multiplayer menu; Don't automaticly go to server list, list Join (Search), Join (Specify), and Player
 
+DONE: Clean up IOQ3ZTM // LERP_FRAME_CLIENT_LESS remove the "dead" code,
+		code in ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS and ifdef IOQ3ZTM <> else <dead code> endif
 
 === EDITOR CONFIG ===
 DONE: Add a note about team_red/blueobelisk are red/blue CTF flag base models as well.
