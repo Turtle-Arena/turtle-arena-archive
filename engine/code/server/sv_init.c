@@ -594,6 +594,33 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	sv.time += 100;
 	svs.time += 100;
 
+#ifdef IOQ3ZTM
+	// the server sends these to the clients so they will only
+	// load pk3s also loaded at the server
+	if (sv_pure->integer && (p = FS_LoadedPakChecksums()) && (strlen(p) > 0))
+	{
+		Cvar_Set( "sv_paks", p );
+		p = FS_LoadedPakNames();
+		Cvar_Set( "sv_pakNames", p );
+
+		// if a dedicated pure server we need to touch the cgame because it could be in a
+		// seperate pk3 file and the client will need to load the latest cgame.qvm
+		if ( com_dedicated->integer ) {
+			SV_TouchCGame();
+		}
+	}
+	else
+	{
+		if (sv_pure->integer)
+		{
+			// Can't be pure with no pk3 files.
+			Com_Printf( S_COLOR_YELLOW "WARNING: sv_pure set but no PK3 files loaded, disabling...\n" );
+			Cvar_Set( "sv_pure", "0" );
+		}
+		Cvar_Set( "sv_paks", "" );
+		Cvar_Set( "sv_pakNames", "" );
+	}
+#else
 	if ( sv_pure->integer ) {
 		// the server sends these to the clients so they will only
 		// load pk3s also loaded at the server
@@ -615,6 +642,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 		Cvar_Set( "sv_paks", "" );
 		Cvar_Set( "sv_pakNames", "" );
 	}
+#endif
 	// the server sends these to the clients so they can figure
 	// out which pk3s should be auto-downloaded
 	p = FS_ReferencedPakChecksums();
