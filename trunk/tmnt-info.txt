@@ -1,4 +1,4 @@
-'''TMNT Arena''' (working title) is a Ninja Turtle Fangame being made by ZTurtleMan based on the ioquake3 engine.
+'''TMNT Arena''' is a Ninja Turtle Fangame being made by ZTurtleMan based on the ioquake3 engine.
 
 == Current Features ==
 Currently the game is multiplayer only, there are bots for offline play but no true single player mode.

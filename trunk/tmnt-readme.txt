@@ -1,7 +1,7 @@
-TMNT Arena (working title) is a work in progress TMNT fangame based on the ioquake3 engine.
+TMNT Arena is a work-in-progress TMNT fangame based on the ioquake3 engine.
 
 == Version ==
-TMNT Arena Alpha 0.1.0 September 30, 2009
+TMNT Arena Alpha (November 6th 2009)
 
 == Credits ==
 * id software			(For making and releasing Quake III Arena's source code)
@@ -72,6 +72,7 @@ TMNT Arena uses code directly or based on code from the following.
 
 == License ==
 The TMNT Arena source code and data are licensed under the GNU General Public License version 2 or later.
+	(See COPYING.txt for full license)
 
 See COPYRIGHTS for data per-file copyrights.
 
