@@ -36,7 +36,7 @@ textures/base_floor/sewer_dirt_tile
 // Taken from Q3A shader manual, textures/base_floor/pjgrate1
 textures/base_floor/grate_rust
 {
-	qer_editorimage textures/base_floor/grate_rust.tga
+	qer_editorimage textures/base_floor/grate_rust.png
 
 	surfaceparm trans
 	surfaceparm metalsteps
@@ -44,7 +44,7 @@ textures/base_floor/grate_rust
 
       // A GRATE OR GRILL THAT CAN BE SEEN FROM BOTH SIDES
       {
-            map textures/base_floor/grate_rust.tga
+            map textures/base_floor/grate_rust.png
             blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
             alphaFunc GT0
             depthWrite
@@ -60,7 +60,7 @@ textures/base_floor/grate_rust
 
 textures/base_floor/grate
 {
-	qer_editorimage textures/base_floor/grate.tga
+	qer_editorimage textures/base_floor/grate.png
 
 	surfaceparm trans
 	surfaceparm metalsteps
@@ -68,7 +68,7 @@ textures/base_floor/grate
 
       // A GRATE OR GRILL THAT CAN BE SEEN FROM BOTH SIDES
       {
-            map textures/base_floor/grate.tga
+            map textures/base_floor/grate.png
             blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
             alphaFunc GT0
             depthWrite

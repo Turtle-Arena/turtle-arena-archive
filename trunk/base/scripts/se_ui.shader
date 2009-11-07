@@ -15,8 +15,16 @@ ui/assets/out_menuback
 {
 	nomipmaps
 	{
-		map menu/art/menuback
+		map menu/art/menuback.png
 		tcMod scroll .04  .02
+	}
+}
+
+ui/assets/3_cursor2
+{
+	nomipmaps
+	{
+		map menu/art/3_cursor2.png
 	}
 }
 
@@ -24,7 +32,7 @@ ui/assets/3_cursor3
 {
 	nomipmaps
 	{
-		map menu/art/3_cursor2
+		map menu/art/3_cursor2.png
 	}
 }
 
@@ -33,7 +41,7 @@ ui/assets/selectcursor
 {
 	nomipmaps
 	{
-		map menu/art/3_cursor2
+		map menu/art/3_cursor2.png
 	}
 }
 
@@ -42,7 +50,7 @@ ui/assets/sizecursor
 	nomipmaps
 	{
 		// TODO: Add the correct image.
-		map menu/art/3_cursor2
+		map menu/art/3_cursor2.png
 	}
 }
 
@@ -51,7 +59,7 @@ ui/assets/statusbar/flag_in_base
 {
 	nomipmaps
 	{
-		map icons/iconf_neutral1
+		map icons/iconf_neutral1.png
 	}
 }
 
@@ -60,7 +68,7 @@ ui/assets/statusbar/flag_in_base
 //{
 	//nomipmaps
 	//{
-	//	map icons/iconf_neutral2
+	//	map icons/iconf_neutral2.png
 	//}
 //}
 
@@ -68,7 +76,7 @@ ui/assets/statusbar/flag_missing
 {
 	nomipmaps
 	{
-		map icons/iconf_neutral3
+		map icons/iconf_neutral3.png
 	}
 }
 

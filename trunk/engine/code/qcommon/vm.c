@@ -428,10 +428,6 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc ) {
 		header.h->bssLength;
 	for ( i = 0 ; dataLength > ( 1 << i ) ; i++ ) {
 	}
-#ifdef IOQ3ZTM // Turtle Man: Now the game is crashing when allocing the game or cgame VM...
-	Com_Printf(" DEBUG: loading VM %s (dataLength is %d, rounding to %d)...\n",
-				vm->name, dataLength, 1 << i);
-#endif
 	dataLength = 1 << i;
 
 	if( alloc ) {

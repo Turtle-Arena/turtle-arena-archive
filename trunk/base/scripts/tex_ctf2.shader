@@ -7,7 +7,7 @@ textures/ctf2/redteam02
 	surfaceparm alphashadow
 	surfaceparm nomarks
 	{
-		map textures/ctf2/redteam01.tga
+		map textures/ctf2/redteam01.png
 		alphaFunc GE128
 		depthWrite
 		rgbGen identity

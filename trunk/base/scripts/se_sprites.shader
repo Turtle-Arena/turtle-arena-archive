@@ -6,7 +6,7 @@ sprites/talkBalloon
 {
 	entityMergable // Turtle Man: Should be okay.
 	{
-		map sprites/talkBalloon.tga
+		map sprites/talkBalloon.png
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -17,7 +17,7 @@ waterBubble
 	cull none
 	entityMergable
 	{
-		map sprites/bubble.tga
+		map sprites/bubble.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen		vertex
 		alphaGen	vertex
@@ -30,7 +30,7 @@ smokePuff
 	cull none
 	entityMergable		// allow all the sprites to be merged together
 	{
-		map gfx/misc/smokepuff3.tga
+		map gfx/misc/smokepuff3.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen		vertex
 		alphaGen	vertex
@@ -43,7 +43,7 @@ hasteSmokePuff
 	cull none
 	entityMergable		// allow all the sprites to be merged together
 	{
-		map gfx/misc/smokepuff3.tga
+		map gfx/misc/smokepuff3.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
                 //blendfunc GL_ONE GL_ONE
 		rgbGen		vertex
@@ -57,7 +57,7 @@ smokePuffRagePro
 	cull none
 	entityMergable		// allow all the sprites to be merged together
 	{
-		map gfx/misc/smokepuffragepro.tga
+		map gfx/misc/smokepuffragepro.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -70,7 +70,7 @@ shotgunSmokePuff
 	entityMergable // Turtle Man: Should be okay.
 	cull none
 	{
-		map gfx/misc/smokepuff2b.tga
+		map gfx/misc/smokepuff2b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		alphaGen entity
 		rgbGen entity
@@ -83,7 +83,7 @@ nailtrail
 	sort nearest
 	cull none
 	{
-		clampmap models/weaphits/nailtrail
+		clampmap models/weaphits/nailtrail.png
 		blendFunc Add
 		rgbGen vertex
 		tcMod rotate -30
@@ -95,7 +95,7 @@ flareShader
 	//entityMergable // Turtle Man: Should be okay?
 	cull none
 	{
-		map gfx/misc/flare.tga
+		map gfx/misc/flare.jpg
 		blendFunc GL_ONE GL_ONE
 		rgbGen vertex
 	}
@@ -106,7 +106,7 @@ sun
 	//entityMergable // Turtle Man: Should be okay?
 	cull none
 	{
-		map gfx/misc/sun.tga
+		map gfx/misc/sun.jpg
 		blendFunc GL_ONE GL_ONE
 		rgbGen vertex
 	}
