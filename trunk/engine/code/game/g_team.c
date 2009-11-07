@@ -172,11 +172,7 @@ void AddTeamScore(vec3_t origin, int team, int score) {
 OnSameTeam
 ==============
 */
-#ifdef TMNT
-qboolean OnSameTeam( const gentity_t *ent1, const gentity_t *ent2 )
-#else
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 )
-#endif
 {
 #ifdef TMNTSP
 	// Co-op player are on the same "team"
@@ -1070,7 +1066,7 @@ qboolean Team_GetLocationMsg(gentity_t *ent, char *loc, int loclen)
 
 /*
 ================
-SelectRandomDeathmatchSpawnPoint
+SelectRandomTeamSpawnPoint
 
 go to a random point that doesn't telefrag
 ================
@@ -1135,25 +1131,25 @@ SelectCTFSpawnPoint
 
 ============
 */
-gentity_t *SelectCTFSpawnPoint (
 #ifdef TMNTPLAYERSYS
-	gentity_t *ent,
+gentity_t *SelectCTFSpawnPoint ( gentity_t *ent, team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot )
+#else
+gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot )
 #endif
-	team_t team, int teamstate, vec3_t origin, vec3_t angles )
 {
 	gentity_t	*spot;
 
-	spot = SelectRandomTeamSpawnPoint (
 #ifdef TMNTPLAYERSYS
-			ent,
+	spot = SelectRandomTeamSpawnPoint ( ent, teamstate, team );
+#else
+	spot = SelectRandomTeamSpawnPoint ( teamstate, team );
 #endif
-			teamstate, team );
 
 	if (!spot) {
 #ifdef TMNTPLAYERSYS
-		return SelectSpawnPoint( ent, origin, angles );
+		return SelectSpawnPoint( ent, origin, angles, isbot );
 #else
-		return SelectSpawnPoint( vec3_origin, origin, angles );
+		return SelectSpawnPoint( vec3_origin, origin, angles, isbot );
 #endif
 	}
 

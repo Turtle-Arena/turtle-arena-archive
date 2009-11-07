@@ -54,31 +54,21 @@ char *Sys_DefaultHomePath(void)
 		if( ( p = getenv( "HOME" ) ) != NULL )
 		{
 			Q_strncpyz( homePath, p, sizeof( homePath ) );
+#ifdef TMNT
 #ifdef MACOS_X
-			Q_strcat( homePath, sizeof( homePath ), "/Library" );
-			mkdir( homePath, 0750 );  /* just in case. */
-			Q_strcat( homePath, sizeof( homePath ), "/Application Support" );
-			mkdir( homePath, 0750 );  /* just in case. */
-#ifdef TMNT
-			Q_strcat( homePath, sizeof( homePath ), "/TMNTArena" );
+			Q_strcat( homePath, sizeof( homePath ),
+					"/Library/Application Support/TMNTArena" );
 #else
-			Q_strcat( homePath, sizeof( homePath ), "/Quake3" );
-#endif // !TMNT
-#else
-#ifdef TMNT
 			Q_strcat( homePath, sizeof( homePath ), "/.tmntarena" );
+#endif
+#else
+#ifdef MACOS_X
+			Q_strcat( homePath, sizeof( homePath ),
+					"/Library/Application Support/Quake3" );
 #else
 			Q_strcat( homePath, sizeof( homePath ), "/.q3a" );
-#endif // !TMNT
 #endif
-			if( mkdir( homePath, 0750 ) )
-			{
-				if( errno != EEXIST )
-				{
-					Sys_Error( "Unable to create directory \"%s\", error is %s(%d)\n",
-							homePath, strerror( errno ), errno );
-				}
-			}
+#endif
 		}
 	}
 
@@ -230,9 +220,14 @@ const char *Sys_Dirname( char *path )
 Sys_Mkdir
 ==================
 */
-void Sys_Mkdir( const char *path )
+qboolean Sys_Mkdir( const char *path )
 {
-	mkdir( path, 0777 );
+	int result = mkdir( path, 0750 );
+
+	if( result != 0 )
+		return errno == EEXIST;
+
+	return qtrue;
 }
 
 /*
@@ -590,4 +585,20 @@ void Sys_PlatformInit( void )
 	signal( SIGTRAP, Sys_SigHandler );
 	signal( SIGIOT, Sys_SigHandler );
 	signal( SIGBUS, Sys_SigHandler );
+}
+
+/*
+==============
+Sys_SetEnv
+
+set/unset environment variables (empty value removes it)
+==============
+*/
+
+void Sys_SetEnv(const char *name, const char *value)
+{
+	if(value && *value)
+		setenv(name, value, 1);
+	else
+		unsetenv(name);
 }

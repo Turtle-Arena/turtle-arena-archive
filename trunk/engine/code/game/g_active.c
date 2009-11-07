@@ -1003,9 +1003,9 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			}
 #endif
 #ifdef TMNTPLAYERSYS
-			SelectSpawnPoint( ent, origin, angles );
+			SelectSpawnPoint( ent, origin, angles, qfalse );
 #else
-			SelectSpawnPoint( ent->client->ps.origin, origin, angles );
+			SelectSpawnPoint( ent->client->ps.origin, origin, angles, qfalse );
 #endif
 			TeleportPlayer( ent, origin, angles );
 			break;

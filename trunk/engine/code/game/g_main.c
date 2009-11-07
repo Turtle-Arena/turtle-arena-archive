@@ -1046,9 +1046,9 @@ void FindIntermissionPoint( void ) {
 	ent = G_Find (NULL, FOFS(classname), "info_player_intermission");
 	if ( !ent ) {	// the map creator forgot to put in an intermission point...
 #ifdef TMNTPLAYERSYS
-		SelectSpawnPoint ( NULL, level.intermission_origin, level.intermission_angle );
+		SelectSpawnPoint ( NULL, level.intermission_origin, level.intermission_angle, qfalse );
 #else
-		SelectSpawnPoint ( vec3_origin, level.intermission_origin, level.intermission_angle );
+		SelectSpawnPoint ( vec3_origin, level.intermission_origin, level.intermission_angle, qfalse );
 #endif
 	} else {
 		VectorCopy (ent->s.origin, level.intermission_origin);
