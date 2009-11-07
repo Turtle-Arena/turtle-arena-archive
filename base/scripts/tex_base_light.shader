@@ -26,8 +26,8 @@ textures/base_light/subway_ceiling_light
 // From OA/Q3
 textures/base_light/baslt4_1_2k
 {
-	qer_editorimage textures/base_light/baslt4_1.jpg
-	q3map_lightimage textures/base_light/baslt4_1.blend.jpg
+	qer_editorimage textures/base_light/baslt4_1.png
+	q3map_lightimage textures/base_light/baslt4_1.blend.png
 	surfaceparm nomarks
 	q3map_surfacelight 2000
 	
@@ -37,20 +37,20 @@ textures/base_light/baslt4_1_2k
 		rgbGen identity
 	}
 	{
-		map textures/base_light/baslt4_1.jpg
+		map textures/base_light/baslt4_1.png
 		blendFunc filter
 		rgbGen identity
 	}
 	{
-		map textures/base_light/baslt4_1.blend.jpg
+		map textures/base_light/baslt4_1.blend.png
 		blendfunc add
 	}
 }
 
 textures/base_light/baslt4_1_4k
 {
-	qer_editorimage textures/base_light/baslt4_1.jpg
-	q3map_lightimage textures/base_light/baslt4_1.blend.jpg
+	qer_editorimage textures/base_light/baslt4_1.png
+	q3map_lightimage textures/base_light/baslt4_1.blend.png
 	surfaceparm nomarks
 	q3map_surfacelight 4000
 	
@@ -60,12 +60,12 @@ textures/base_light/baslt4_1_4k
 		rgbGen identity
 	}
 	{
-		map textures/base_light/baslt4_1.jpg
+		map textures/base_light/baslt4_1.png
 		blendFunc filter
 		rgbGen identity
 	}
 	{
-		map textures/base_light/baslt4_1.blend.jpg
+		map textures/base_light/baslt4_1.blend.png
 		blendfunc add
 	}
 }

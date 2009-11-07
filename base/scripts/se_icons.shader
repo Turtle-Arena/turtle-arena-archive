@@ -239,7 +239,7 @@ icons/iconw_bamboo
 {
 	nopicmip
 	{
-		map icons/iconw_bamboobo.png
+		map icons/iconw_bamboo.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }

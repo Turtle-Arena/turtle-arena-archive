@@ -16,7 +16,7 @@ textures/sfx/beam
 	surfaceparm nomipmaps
 
 	{
-		map textures/sfx/beam.tga
+		map textures/sfx/beam.jpg
 		tcMod Scroll .3 0
 		blendFunc add
 	}

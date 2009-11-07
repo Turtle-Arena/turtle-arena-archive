@@ -5,7 +5,7 @@
 // From shader manual "textures/skies/xtoxicsky_dm9"
 textures/skies/testsky_1
 {
-      qer_editorimage textures/skies/testsky.tga
+      qer_editorimage textures/skies/testsky.png
       surfaceparm noimpact
       surfaceparm nolightmap
       q3map_globaltexture
@@ -21,13 +21,13 @@ textures/skies/testsky_1
       q3map_sun1 1 0.5 15030 60
       skyparms full 512 -
       {
-            map textures/skies/testsky_clouds.tga
+            map textures/skies/testsky_clouds.png
             //tcMod scroll 0.1 0.1
 		tcMod scroll 0.01 0.01
             tcMod scale 3 2
       }
       {
-            map textures/skies/testsky.tga
+            map textures/skies/testsky.png
             blendFunc add
             //tcMod scroll 0.05 0.05
             //tcMod scale 3 3
@@ -39,7 +39,7 @@ textures/skies/testsky
 	//skyparms textures/shaderlab_terrain/env/sky 1024 -
 	skyparms - 512 -
 
-	q3map_lightImage textures/skies/testsky_clouds.tga
+	q3map_lightImage textures/skies/testsky_clouds.png
 
 	q3map_sunExt 1 1 1 140 -35 25 3 16
 	q3map_lightmapFilterRadius 0 8		//self other
@@ -53,22 +53,22 @@ textures/skies/testsky
 	nopicmip
 	nomipmaps
 
-	qer_editorimage textures/skies/testsky_clouds.tga
+	qer_editorimage textures/skies/testsky_clouds.png
 
       {
-            map textures/skies/testsky_clouds.tga
+            map textures/skies/testsky_clouds.png
             //tcMod scroll 0.1 0.1
 		tcMod scroll 0.01 0.01
             tcMod scale 3 2
       }
       {
-            map textures/skies/testsky.tga
+            map textures/skies/testsky.png
             blendFunc add
             //tcMod scroll 0.05 0.05
             //tcMod scale 3 3
       }
 	//{
-	//	map textures/skies/testsky_clouds.tga
+	//	map textures/skies/testsky_clouds.png
 	//	tcMod scale 3 3
 	//	//tcMod scroll 0.005 -0.0125
 	//	rgbGen identityLighting

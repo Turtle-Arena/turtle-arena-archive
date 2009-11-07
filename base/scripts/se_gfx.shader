@@ -91,13 +91,13 @@ console
 	nopicmip
 	nomipmaps
 	{
-		map gfx/misc/console01.tga
+		map gfx/misc/console01.png
 		blendFunc GL_ONE GL_ZERO
 		tcMod scroll .02  0
 		tcmod scale 2 1
 	}
 	{
-		map gfx/misc/console02.tga
+		map gfx/misc/console02.png
 		blendFunc add
 		tcMod turb 0 .1 0 .1
 		tcMod scale 2 1
@@ -118,7 +118,7 @@ lagometer
 {
 	nopicmip
 	{
-		map gfx/2d/lag.tga
+		map gfx/2d/lag.png
 	}
 }
 
@@ -126,7 +126,7 @@ disconnected
 {
 	nopicmip
 	{
-		map gfx/2d/net.tga
+		map gfx/2d/net.png
 	}
 }
 
@@ -179,7 +179,7 @@ gfx/2d/numbers/zero_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/zero_32b.tga
+		map gfx/2d/numbers/zero_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -188,7 +188,7 @@ gfx/2d/numbers/one_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/one_32b.tga
+		map gfx/2d/numbers/one_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -197,7 +197,7 @@ gfx/2d/numbers/two_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/two_32b.tga
+		map gfx/2d/numbers/two_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -206,7 +206,7 @@ gfx/2d/numbers/three_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/three_32b.tga
+		map gfx/2d/numbers/three_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -215,7 +215,7 @@ gfx/2d/numbers/four_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/four_32b.tga
+		map gfx/2d/numbers/four_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -224,7 +224,7 @@ gfx/2d/numbers/five_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/five_32b.tga
+		map gfx/2d/numbers/five_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -233,7 +233,7 @@ gfx/2d/numbers/six_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/six_32b.tga
+		map gfx/2d/numbers/six_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -242,7 +242,7 @@ gfx/2d/numbers/seven_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/seven_32b.tga
+		map gfx/2d/numbers/seven_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -251,7 +251,7 @@ gfx/2d/numbers/eight_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/eight_32b.tga
+		map gfx/2d/numbers/eight_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -260,7 +260,7 @@ gfx/2d/numbers/nine_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/nine_32b.tga
+		map gfx/2d/numbers/nine_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -269,7 +269,7 @@ gfx/2d/numbers/minus_32b
 {
 	nopicmip
 	{
-		map gfx/2d/numbers/minus_32b.tga
+		map gfx/2d/numbers/minus_32b.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbgen vertex
 	}
@@ -280,7 +280,7 @@ gfx/2d/crosshair
 {
 	nopicmip
 	{
-		map gfx/2d/crosshair.tga
+		map gfx/2d/crosshair.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
         rgbGen identity
 	}
@@ -290,7 +290,7 @@ gfx/2d/crosshairb
 {
 	nopicmip
 	{
-		map gfx/2d/crosshairb.tga
+		map gfx/2d/crosshairb.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identity
 	}
@@ -300,7 +300,7 @@ gfx/2d/crosshairc
 {
 	nopicmip
 	{
-		map gfx/2d/crosshairc.tga
+		map gfx/2d/crosshairc.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identity
 	}
@@ -310,7 +310,7 @@ gfx/2d/crosshaird
 {
 	nopicmip
 	{
-		map gfx/2d/crosshaird.tga
+		map gfx/2d/crosshaird.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identity
 	}
@@ -321,7 +321,7 @@ gfx/misc/tracer
 {
 	cull disable
 	{
-		map gfx/misc/tracer2.tga
+		map gfx/misc/tracer2.jpg
 		blendfunc add
 		//blendFunc GL_ONE GL_ONE
 	}
@@ -332,7 +332,7 @@ gfx/damage/bullet_mrk
 {
 	polygonoffset
 	{
-		map gfx/damage/bullet_mrk
+		map gfx/damage/bullet_mrk.png
 		blendfunc gl_zero gl_one_minus_src_color
 		rgbGen Vertex
 	}
@@ -354,7 +354,7 @@ gfx/damage/hole_lg_mrk
 {
 	polygonoffset
 	{
-		map gfx/damage/hole_lg_mrk.tga
+		map gfx/damage/hole_lg_mrk.png
 		blendfunc gl_zero gl_one_minus_src_color
 		rgbGen Vertex
 	}
@@ -365,7 +365,7 @@ gfx/damage/plasma_mrk
 {
 	polygonoffset
 	{
-		map gfx/damage/plasma_mrk
+		map gfx/damage/plasma_mrk.png
 		blendfunc blend
 		rgbGen Vertex
 		alphaGen Vertex
@@ -377,7 +377,7 @@ gfx/damage/hammer_mrk
 {
 	polygonoffset
 	{
-		map gfx/damage/hammer_mrk
+		map gfx/damage/hammer_mrk.png
 		blendfunc gl_zero gl_one_minus_src_color
 		rgbGen Vertex
 	}
@@ -429,6 +429,7 @@ meleeHit3
 // Explosions
 //
 
+/*
 plasmaExplosion
 {
 	cull disable
@@ -456,17 +457,18 @@ bulletExplosion
 		blendfunc add
 	}
 }
+*/
 
 rocketExplosion
 {
 	cull disable
 	{
-		animmap 8 models/weaphits/rlboom/rlboom_1.tga  models/weaphits/rlboom/rlboom_2.tga models/weaphits/rlboom/rlboom_3.tga models/weaphits/rlboom/rlboom_4.tga models/weaphits/rlboom/rlboom_5.tga models/weaphits/rlboom/rlboom_6.tga models/weaphits/rlboom/rlboom_7.tga models/weaphits/rlboom/rlboom_8.tga
+		animmap 8 models/weaphits/rlboom/rlboom_1.jpg  models/weaphits/rlboom/rlboom_2.jpg models/weaphits/rlboom/rlboom_3.jpg models/weaphits/rlboom/rlboom_4.jpg models/weaphits/rlboom/rlboom_5.jpg models/weaphits/rlboom/rlboom_6.jpg models/weaphits/rlboom/rlboom_7.jpg models/weaphits/rlboom/rlboom_8.jpg
 		rgbGen wave inversesawtooth 0 1 0 8
 		blendfunc add
 	}
 	{
-		animmap 8 models/weaphits/rlboom/rlboom_2.tga models/weaphits/rlboom/rlboom_3.tga models/weaphits/rlboom/rlboom_4.tga models/weaphits/rlboom/rlboom_5.tga models/weaphits/rlboom/rlboom_6.tga models/weaphits/rlboom/rlboom_7.tga models/weaphits/rlboom/rlboom_8.tga gfx/colors/black.tga
+		animmap 8 models/weaphits/rlboom/rlboom_2.jpg models/weaphits/rlboom/rlboom_3.jpg models/weaphits/rlboom/rlboom_4.jpg models/weaphits/rlboom/rlboom_5.jpg models/weaphits/rlboom/rlboom_6.jpg models/weaphits/rlboom/rlboom_7.jpg models/weaphits/rlboom/rlboom_8.jpg gfx/colors/black.png
 		rgbGen wave sawtooth 0 1 0 8
 		blendfunc add
 	}

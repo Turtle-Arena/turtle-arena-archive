@@ -23,7 +23,7 @@ models/players/raph/white
 models/players/raph/belt
 {
 	{
-		map models/players/raph/belt
+		map models/players/raph/belt.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -31,7 +31,7 @@ models/players/raph/belt
 models/players/raph/body
 {
 	{
-		map models/players/raph/body
+		map models/players/raph/body.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -39,7 +39,7 @@ models/players/raph/body
 models/players/raph/head
 {
 	{
-		map models/players/raph/head
+		map models/players/raph/head.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -47,7 +47,7 @@ models/players/raph/head
 models/players/raph/legs
 {
 	{
-		map models/players/raph/legs
+		map models/players/raph/legs.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -55,7 +55,7 @@ models/players/raph/legs
 models/players/raph/belt_blue
 {
 	{
-		map models/players/raph/belt_blue
+		map models/players/raph/belt_blue.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -63,7 +63,7 @@ models/players/raph/belt_blue
 models/players/raph/body_blue
 {
 	{
-		map models/players/raph/body_blue
+		map models/players/raph/body_blue.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -71,7 +71,7 @@ models/players/raph/body_blue
 models/players/raph/head_blue
 {
 	{
-		map models/players/raph/head_blue
+		map models/players/raph/head_blue.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -79,7 +79,7 @@ models/players/raph/head_blue
 models/players/raph/belt_red
 {
 	{
-		map models/players/raph/belt_red
+		map models/players/raph/belt_red.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -87,7 +87,7 @@ models/players/raph/belt_red
 models/players/raph/body_red
 {
 	{
-		map models/players/raph/body_red
+		map models/players/raph/body_red.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -95,7 +95,7 @@ models/players/raph/body_red
 models/players/raph/head_red
 {
 	{
-		map models/players/raph/head_red
+		map models/players/raph/head_red.png
 		rgbGen lightingDiffuse
 	}
 }
@@ -255,7 +255,7 @@ models/powerups/instant/invis
 {
 	{
 		//map models/powerups/instant/invis.png
-		map textures/effects/invismap.tga
+		map textures/effects/invismap.png
 		blendfunc GL_ONE GL_ONE
 		rgbGen lightingDiffuse
 		tcMod turb 0 0.15 0 0.25
@@ -474,11 +474,11 @@ models/flags/r_flag2
 	cull none
 
 	{
-		map models/flags/r_flag2.tga
+		map models/flags/r_flag2.png
 		rgbGen identity
 	}
 	{
-		map models/flags/red_fx.tga
+		map models/flags/red_fx.png
 		tcGen environment
 		//tcmod scale 9 3
 		//tcmod scroll .1 .7
@@ -487,12 +487,12 @@ models/flags/r_flag2
 		rgbGen identity
 	}
 	{
-		map models/flags/r_flag2.tga
+		map models/flags/r_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identity
 	}
 	{
-		map textures/sfx/shadow.tga
+		map textures/sfx/shadow.jpg
 		tcGen environment
 		//blendFunc GL_ONE GL_ONE
 		blendFunc GL_DST_COLOR GL_ZERO
@@ -508,11 +508,11 @@ models/flags/b_flag2
 	cull none
 
 	{
-		map models/flags/b_flag2.tga
+		map models/flags/b_flag2.png
 		rgbGen identity
 	}
 	{
-		map models/flags/blue_fx.tga
+		map models/flags/blue_fx.png
 		tcGen environment
 		//tcmod scale 9 3
 		//tcmod scroll .1 .7
@@ -520,12 +520,12 @@ models/flags/b_flag2
 		rgbGen identity
 	}
 	{
-		map models/flags/b_flag2.tga
+		map models/flags/b_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identity
 	}
 	{
-		map textures/sfx/shadow.tga
+		map textures/sfx/shadow.jpg
 		tcGen environment
 		//blendFunc GL_ONE GL_ONE
 		blendFunc GL_DST_COLOR GL_ZERO
@@ -543,22 +543,22 @@ models/flags/n_flag2
 	cull none
 
 	{
-		map models/flags/n_flag2.tga
+		map models/flags/n_flag2.png
 		rgbGen identity
 	}
 	{
-		map models/flags/neutral_fx.tga
+		map models/flags/neutral_fx.png
 		tcGen environment
 		blendFunc GL_ONE GL_ONE
 		rgbGen identity
 	}
 	{
-		map models/flags/n_flag2.tga
+		map models/flags/n_flag2.png
 		blendFunc blend
 		rgbGen identity
 	}
 	{
-		map textures/sfx/shadow.tga
+		map textures/sfx/shadow.jpg
 		tcGen environment
 		blendFunc GL_DST_COLOR GL_ZERO
 		rgbGen identity
@@ -573,11 +573,11 @@ models/flag2/r_flag2
 	cull none
 
 	{
-		map models/flag2/r_flag2.tga
+		map models/flag2/r_flag2.png
 		rgbGen identity
 	}
 	{
-		map models/flag2/red_fx.tga
+		map models/flag2/red_fx.png
 		tcGen environment
 		//tcmod scale 9 3
 		//tcmod scroll .1 .7
@@ -586,12 +586,12 @@ models/flag2/r_flag2
 		rgbGen identity
 	}
 	{
-		map models/flag2/r_flag2.tga
+		map models/flag2/r_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identity
 	}
 	{
-		map textures/sfx/shadow.tga
+		map textures/sfx/shadow.jpg
 		tcGen environment
 		//blendFunc GL_ONE GL_ONE
 		blendFunc GL_DST_COLOR GL_ZERO
@@ -607,11 +607,11 @@ models/flag2/b_flag2
 	cull none
 
 	{
-		map models/flag2/b_flag2.tga
+		map models/flag2/b_flag2.png
 		rgbGen identity
 	}
 	{
-		map models/flag2/blue_fx.tga
+		map models/flag2/blue_fx.png
 		tcGen environment
 		//tcmod scale 9 3
 		//tcmod scroll .1 .7
@@ -619,12 +619,12 @@ models/flag2/b_flag2
 		rgbGen identity
 	}
 	{
-		map models/flag2/b_flag2.tga
+		map models/flag2/b_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identity
 	}
 	{
-		map textures/sfx/shadow.tga
+		map textures/sfx/shadow.jpg
 		tcGen environment
 		//blendFunc GL_ONE GL_ONE
 		blendFunc GL_DST_COLOR GL_ZERO
@@ -640,11 +640,11 @@ models/flag2/w_flag2
 	cull none
 
 	{
-		map models/flag2/w_flag2.tga
+		map models/flag2/w_flag2.png
 		rgbGen identity
 	}
 	{
-		map models/flag2/neutral_fx.tga
+		map models/flag2/neutral_fx.png
 		tcGen environment
 		//tcmod scale 9 3
 		//tcmod scroll .1 .7
@@ -653,12 +653,12 @@ models/flag2/w_flag2
 		rgbGen identity
 	}
 	{
-		map models/flag2/w_flag2.tga
+		map models/flag2/w_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identity
 	}
 	{
-		map textures/sfx/shadow.tga
+		map textures/sfx/shadow.jpg
 		tcGen environment
 		//blendFunc GL_ONE GL_ONE
 		blendFunc GL_DST_COLOR GL_ZERO
@@ -678,7 +678,7 @@ models/powerups/ob2_1
 		//tcGen environment
 		//rgbGen identity
 
-		map models/powerups/overload_base.tga
+		map models/powerups/overload_base.png
 		//rgbGen lightingDiffuse
 	}
 }
@@ -708,7 +708,7 @@ models/powerups/ob2_2
 models/powerups/ob2_3
 {
 	{
-		map models/powerups/overload_lights.tga
+		map models/powerups/overload_lights.png
 		tcmod scroll 1 1
 		rgbGen entity
 	}
@@ -808,7 +808,7 @@ models/mapobjects/flagbase/beam_blue
 	nomipmaps
 	cull disable
 	{
-		map models/mapobjects/flagbase/beam_blue.tga
+		map models/mapobjects/flagbase/beam_blue.png
 		blendFunc add
 		tcmod scroll -.5 0
 		rgbGen wave sin .5 .5 0.5 0.09
@@ -820,7 +820,7 @@ models/mapobjects/flagbase/beam_ntrl
 	nomipmaps
 	cull disable
 	{
-		map models/mapobjects/flagbase/beam_ntrl.tga
+		map models/mapobjects/flagbase/beam_ntrl.png
 		blendFunc add
 		tcmod scroll -.5 0
 		rgbGen wave sin .5 .5 0.5 0.09
@@ -832,7 +832,7 @@ models/mapobjects/flagbase/beam_red
 	nomipmaps
 	cull disable
 	{
-		map models/mapobjects/flagbase/beam_red.tga
+		map models/mapobjects/flagbase/beam_red.png
 		blendFunc add
 		tcmod scroll -.5 0
 		rgbGen wave sin .5 .5 0.5 0.09
@@ -848,7 +848,7 @@ models/mapobjects/flagbase/beam_red
 models/powerups/ammo1
 {
 	{
-		map textures/effects/envmapgreen.tga
+		map textures/effects/envmapgreen.png
 		tcGen environment
 		blendfunc GL_ONE GL_ZERO
 		rgbGen lightingDiffuse
@@ -859,7 +859,7 @@ models/powerups/ammo2
 {
     cull disable
 	{
-		map models/powerups/ammo2.tga
+		map models/powerups/ammo2.png
 		blendfunc Add
 		// Turtle Man: Go the same speed as others.
 		//tcmod Scroll 1.3 0
@@ -873,7 +873,7 @@ models/powerups/ammo2
 models/powerups/scout1
 {
 	{
-		map textures/effects/envmapblue.tga
+		map textures/effects/envmapblue.png
 		tcGen environment
 		blendfunc GL_ONE GL_ZERO
 		rgbGen lightingDiffuse
@@ -884,7 +884,7 @@ models/powerups/scout2
 {
 	cull disable
 	{
-		map models/powerups/scout2.tga
+		map models/powerups/scout2.png
 		blendfunc Add
 		tcmod Scroll .9 0
 		rgbGen identity
@@ -895,7 +895,7 @@ models/powerups/scout2
 models/powerups/guard1
 {
 	{
-		map textures/effects/envmapmach.tga
+		map textures/effects/envmapmach.png
 		tcGen environment
 		blendfunc GL_ONE GL_ZERO
 		rgbGen lightingDiffuse
@@ -905,7 +905,7 @@ models/powerups/guard2
 {
 	cull disable
 	{
-		map models/powerups/guard2.tga
+		map models/powerups/guard2.png
 		blendfunc Add
 		tcmod Scroll .9 0
 		rgbGen identity
@@ -915,7 +915,7 @@ models/powerups/guard2
 models/powerups/doubler1
 {
 	{
-		map textures/effects/envmaproc.tga
+		map textures/effects/envmaproc.png
 		tcGen environment
 		blendfunc GL_ONE GL_ZERO
 		rgbGen lightingDiffuse
@@ -925,7 +925,7 @@ models/powerups/doubler2
 {
 	cull disable
 	{
-		map models/powerups/doubler2.tga
+		map models/powerups/doubler2.png
 		blendfunc Add
 		tcmod Scroll .9 0
 		rgbGen identity
@@ -937,13 +937,13 @@ models/powerups/regen1
 {
 	cull disable
 	{
-		clampmap models/powerups/regen1
+		clampmap models/powerups/regen1.png
 		tcmod rotate -420
 		blendfunc Add
 		rgbGen entity
 	}
 	{
-		clampmap models/powerups/regen2
+		clampmap models/powerups/regen2.png
 		tcmod rotate -640
 		blendfunc Add
 		rgbGen entity
