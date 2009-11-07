@@ -168,7 +168,7 @@ go to a random point that doesn't telefrag
 ================
 */
 #define	MAX_SPAWN_POINTS	128
-gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
+gentity_t *SelectRandomDeathmatchSpawnPoint(qboolean isbot) {
 	gentity_t	*spot;
 	int			count;
 	int			selection;
@@ -177,11 +177,19 @@ gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 	count = 0;
 	spot = NULL;
 
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		if ( SpotWouldTelefrag( spot ) ) {
+	while((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL && count < MAX_SPAWN_POINTS)
+	{
+		if(SpotWouldTelefrag(spot))
+			continue;
+
+		if(((spot->flags & FL_NO_BOTS) && isbot) ||
+		   ((spot->flags & FL_NO_HUMANS) && !isbot))
+		{
+			// spot is not for this human/bot player
 			continue;
 		}
-		spots[ count ] = spot;
+
+		spots[count] = spot;
 		count++;
 	}
 
@@ -192,6 +200,8 @@ gentity_t *SelectRandomDeathmatchSpawnPoint( void ) {
 	selection = rand() % count;
 	return spots[ selection ];
 }
+#else
+#define	MAX_SPAWN_POINTS	128
 #endif
 
 /*
@@ -201,18 +211,17 @@ SelectRandomFurthestSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectRandomFurthestSpawnPoint (
 #ifdef TMNTPLAYERSYS
-	gentity_t *ent,
+gentity_t *SelectRandomFurthestSpawnPoint ( gentity_t *ent, vec3_t origin, vec3_t angles, qboolean isbot )
 #else
-	vec3_t avoidPoint,
+gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot )
 #endif
-	vec3_t origin, vec3_t angles ) {
+{
 	gentity_t	*spot;
 	vec3_t		delta;
 	float		dist;
-	float		list_dist[64];
-	gentity_t	*list_spot[64];
+	float		list_dist[MAX_SPAWN_POINTS];
+	gentity_t	*list_spot[MAX_SPAWN_POINTS];
 	int			numSpots, rnd, i, j;
 #ifdef TMNTPLAYERSYS
 	vec3_t avoidPoint;
@@ -230,42 +239,61 @@ gentity_t *SelectRandomFurthestSpawnPoint (
 	numSpots = 0;
 	spot = NULL;
 
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		if ( SpotWouldTelefrag( spot
+	while((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
+	{
 #ifdef TMNTPLAYERSYS
-			, ent
+		if(SpotWouldTelefrag(spot, ent))
+#else
+		if(SpotWouldTelefrag(spot))
 #endif
-		) ) {
+			continue;
+
+		if(((spot->flags & FL_NO_BOTS) && isbot) ||
+		   ((spot->flags & FL_NO_HUMANS) && !isbot))
+		{
+			// spot is not for this human/bot player
 			continue;
 		}
+
 		VectorSubtract( spot->s.origin, avoidPoint, delta );
 		dist = VectorLength( delta );
-		for (i = 0; i < numSpots; i++) {
-			if ( dist > list_dist[i] ) {
-				if ( numSpots >= 64 )
-					numSpots = 64-1;
-				for (j = numSpots; j > i; j--) {
+
+		for (i = 0; i < numSpots; i++)
+		{
+			if(dist > list_dist[i])
+			{
+				if (numSpots >= MAX_SPAWN_POINTS)
+					numSpots = MAX_SPAWN_POINTS - 1;
+					
+				for(j = numSpots; j > i; j--)
+				{
 					list_dist[j] = list_dist[j-1];
 					list_spot[j] = list_spot[j-1];
 				}
+				
 				list_dist[i] = dist;
 				list_spot[i] = spot;
+				
 				numSpots++;
-				if (numSpots > 64)
-					numSpots = 64;
 				break;
 			}
 		}
-		if (i >= numSpots && numSpots < 64) {
+		
+		if(i >= numSpots && numSpots < MAX_SPAWN_POINTS)
+		{
 			list_dist[numSpots] = dist;
 			list_spot[numSpots] = spot;
 			numSpots++;
 		}
 	}
-	if (!numSpots) {
-		spot = G_Find( NULL, FOFS(classname), "info_player_deathmatch");
+
+	if (!numSpots)
+	{
+		spot = G_Find(NULL, FOFS(classname), "info_player_deathmatch");
+
 		if (!spot)
 			G_Error( "Couldn't find a spawn point" );
+
 		VectorCopy (spot->s.origin, origin);
 		origin[2] += 9;
 		VectorCopy (spot->s.angles, angles);
@@ -289,20 +317,17 @@ SelectSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-gentity_t *SelectSpawnPoint (
 #ifdef TMNTPLAYERSYS
-	gentity_t *ent,
+gentity_t *SelectSpawnPoint ( gentity_t *ent, vec3_t origin, vec3_t angles, qboolean isbot )
 #else
-	vec3_t avoidPoint,
+gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot )
 #endif
-	vec3_t origin, vec3_t angles ) {
-	return SelectRandomFurthestSpawnPoint(
+{
 #ifdef TMNTPLAYERSYS
-		ent,
+	return SelectRandomFurthestSpawnPoint( ent, origin, angles, isbot );
 #else
-		avoidPoint,
+	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, isbot );
 #endif
-		origin, angles );
 
 	/*
 	gentity_t	*spot;
@@ -349,7 +374,7 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 #ifdef TMNTPLAYERSYS
 	gentity_t *ent,
 #endif
-	int clientnum, vec3_t origin, vec3_t angles )
+	int clientnum, vec3_t origin, vec3_t angles, qboolean isbot )
 {
 	gentity_t	*spot = NULL;
 	gentity_t	*spot0 = NULL;
@@ -357,6 +382,7 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 
 	while ((spot = G_Find (spot, FOFS(classname), "info_player_start")) != NULL) {
 		spotlast = spot;
+#ifdef TMNTSP
 		// Save spot 0 as it will be the default there isn't one for this client.
 		if (spot->count == 0) {
 			spot0 = spot;
@@ -364,6 +390,7 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 		if ( clientnum < 0 || spot->count == clientnum ) {
 			break;
 		}
+#endif
 	}
 	if (!spot && spot0) {
 		spot = spot0;
@@ -384,19 +411,13 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 		}
 	}
 
-	if ( !spot || SpotWouldTelefrag( spot
 #ifdef TMNTPLAYERSYS
-		, ent
-#endif
-	) ) {
-		return SelectSpawnPoint(
-#ifdef TMNTPLAYERSYS
-		ent,
+	if ( !spot || SpotWouldTelefrag( spot, ent ) )
+		return SelectSpawnPoint( ent, origin, angles, isbot );
 #else
-		vec3_origin,
+	if ( !spot || SpotWouldTelefrag( spot ) )
+		return SelectSpawnPoint( vec3_origin, origin, angles, isbot );
 #endif
-		origin, angles );
-	}
 
 	VectorCopy (spot->s.origin, origin);
 	origin[2] += 9;
@@ -414,35 +435,35 @@ Try to find a spawn point marked 'initial', otherwise
 use normal spawn selection.
 ============
 */
-gentity_t *SelectInitialSpawnPoint(
 #ifdef TMNTPLAYERSYS
-	gentity_t *ent,
+gentity_t *SelectInitialSpawnPoint( gentity_t *ent, vec3_t origin, vec3_t angles, qboolean isbot )
+#else
+gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, qboolean isbot )
 #endif
-	vec3_t origin, vec3_t angles )
 {
 	gentity_t	*spot;
 
 	spot = NULL;
 
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
-		if ( spot->spawnflags & 1 ) {
-			break;
+	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
+	{
+		if(((spot->flags & FL_NO_BOTS) && isbot) ||
+		   ((spot->flags & FL_NO_HUMANS) && !isbot))
+		{
+			continue;
 		}
+		
+		if((spot->spawnflags & 0x01))
+			break;
 	}
 
-	if ( !spot || SpotWouldTelefrag( spot
 #ifdef TMNTPLAYERSYS
-		, ent
-#endif
-	) ) {
-		return SelectSpawnPoint(
-#ifdef TMNTPLAYERSYS
-		ent,
+	if (!spot || SpotWouldTelefrag(spot, ent))
+		return SelectSpawnPoint(ent, origin, angles, isbot);
 #else
-		vec3_origin,
+	if (!spot || SpotWouldTelefrag(spot))
+		return SelectSpawnPoint(vec3_origin, origin, angles, isbot);
 #endif
-		origin, angles );
-	}
 
 	VectorCopy (spot->s.origin, origin);
 	origin[2] += 9;
@@ -1430,6 +1451,8 @@ void ClientSpawn(gentity_t *ent) {
 	index = ent - g_entities;
 	client = ent->client;
 
+	VectorClear(spawn_origin);
+
 	// find a spawn point
 	// do it before setting health back up, so farthest
 	// ranging doesn't count this client
@@ -1444,49 +1467,42 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 						client->sess.sessionTeam, 
 						client->pers.teamState.state, 
-						spawn_origin, spawn_angles);
+						spawn_origin, spawn_angles,
+						!!(ent->r.svFlags & SVF_BOT));
 #ifdef TMNTSP
 	} else if (g_gametype.integer == GT_SINGLE_PLAYER) {
 		spawnPoint = SelectSinglePlayerSpawnPoint(
 #ifdef TMNTPLAYERSYS
 						ent,
 #endif
-						index, spawn_origin, spawn_angles);
+						index, spawn_origin, spawn_angles,
+						!!(ent->r.svFlags & SVF_BOT));
 #endif
-	} else {
-		do {
-			// the first spawn should be at a good looking spot
-			if ( !client->pers.initialSpawn && client->pers.localClient ) {
-				client->pers.initialSpawn = qtrue;
-				spawnPoint = SelectInitialSpawnPoint(
+	}
+	else
+	{
+		// the first spawn should be at a good looking spot
+		if ( !client->pers.initialSpawn && client->pers.localClient )
+		{
+			client->pers.initialSpawn = qtrue;
+			spawnPoint = SelectInitialSpawnPoint(
 #ifdef TMNTPLAYERSYS
-						ent,
+								ent,
 #endif
-						spawn_origin, spawn_angles );
-			} else {
-				// don't spawn near existing origin if possible
-				spawnPoint = SelectSpawnPoint ( 
+								spawn_origin, spawn_angles,
+							     !!(ent->r.svFlags & SVF_BOT));
+		}
+		else
+		{
+			// don't spawn near existing origin if possible
+			spawnPoint = SelectSpawnPoint ( 
 #ifdef TMNTPLAYERSYS
-					ent,
+				ent,
 #else
-					client->ps.origin, 
+				client->ps.origin, 
 #endif
-					spawn_origin, spawn_angles);
-			}
-
-			// Tim needs to prevent bots from spawning at the initial point
-			// on q3dm0...
-			if ( ( spawnPoint->flags & FL_NO_BOTS ) && ( ent->r.svFlags & SVF_BOT ) ) {
-				continue;	// try again
-			}
-			// just to be symetric, we have a nohumans option...
-			if ( ( spawnPoint->flags & FL_NO_HUMANS ) && !( ent->r.svFlags & SVF_BOT ) ) {
-				continue;	// try again
-			}
-
-			break;
-
-		} while ( 1 );
+				spawn_origin, spawn_angles, !!(ent->r.svFlags & SVF_BOT));
+		}
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
 

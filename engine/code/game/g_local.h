@@ -679,9 +679,9 @@ int TeamLeader( int team );
 team_t PickTeam( int ignoreClientNum );
 void SetClientViewAngle( gentity_t *ent, vec3_t angle );
 #ifdef TMNTPLAYERSYS
-gentity_t *SelectSpawnPoint ( gentity_t *ent, vec3_t origin, vec3_t angles );
+gentity_t *SelectSpawnPoint (gentity_t *ent, vec3_t origin, vec3_t angles, qboolean isbot);
 #else
-gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles );
+gentity_t *SelectSpawnPoint (vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot);
 #endif
 void CopyToBodyQue( gentity_t *ent );
 void respawn (gentity_t *ent);
@@ -776,11 +776,7 @@ void G_RunClient( gentity_t *ent );
 //
 // g_team.c
 //
-#ifdef TMNT
-qboolean OnSameTeam( const gentity_t *ent1, const gentity_t *ent2 );
-#else
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
-#endif
 void Team_CheckDroppedItem( gentity_t *dropped );
 qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
 
