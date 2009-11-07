@@ -104,7 +104,6 @@ DONE:	cgs.media.regenSound = trap_S_RegisterSound("sound/items/regen.wav", qfals
 
 if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
 
-	sound/teamplay/flagcapture_yourteam.wav
 	sound/feedback/redleads.wav
 	sound/feedback/blueleads.wav
 	sound/feedback/teamstied.wav
