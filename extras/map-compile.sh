@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# NOTE: This is currently NOT used to compile TMNT Arena maps.
+
 # Turtle Man: Based on trem-compile.sh
 #-lightmapsize 512 -lightmapdir "lightmaps" -fast -shade -dirty -patchshadows -samples 3 -bounce 6 -bouncegrid
 #-lightmapsize 512 -lightmapdir "lightmaps" -fast -super 2 -filter -bounce 8
