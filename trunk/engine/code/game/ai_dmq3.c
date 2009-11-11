@@ -4221,11 +4221,11 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	//set the ideal view angles
 	vectoangles(dir, bs->ideal_viewangles);
 	//take the weapon spread into account for lower skilled bots
-#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME: vspread. It was always 0, why fix?
+#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME?: vspread. It was always 0, why fix?
 	bs->ideal_viewangles[PITCH] += 6 * wi.vspread * crandom() * (1 - aim_accuracy);
 #endif
 	bs->ideal_viewangles[PITCH] = AngleMod(bs->ideal_viewangles[PITCH]);
-#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME: hspread. It was always 0, why fix?
+#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME?: hspread. It was always 0, why fix?
 	bs->ideal_viewangles[YAW] += 6 * wi.hspread * crandom() * (1 - aim_accuracy);
 #endif
 	bs->ideal_viewangles[YAW] = AngleMod(bs->ideal_viewangles[YAW]);
