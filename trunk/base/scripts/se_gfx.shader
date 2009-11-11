@@ -429,35 +429,33 @@ meleeHit3
 // Explosions
 //
 
-/*
-plasmaExplosion
-{
-	cull disable
-	{
-		clampmap models/weaphits/plasmaboom.tga
-		blendfunc add
+//plasmaExplosion
+//{
+//	cull disable
+//	{
+//		clampmap models/weaphits/plasmaboom.tga
+//		blendfunc add
+//
+//		tcMod stretch triangle .6 0.1 0 8
+//		tcmod rotate 999
+//		rgbGen wave inversesawtooth 0 1 0 1.5
+//	}
+//}
 
-		tcMod stretch triangle .6 0.1 0 8
-		tcmod rotate 999
-		rgbGen wave inversesawtooth 0 1 0 1.5
-	}
-}
-
-bulletExplosion
-{
-	cull disable
-	{
-		animmap 5 models/weaphits/bullet1.tga  models/weaphits/bullet2.tga  models/weaphits/bullet3.tga gfx/colors/black.tga
-		rgbGen wave inversesawtooth 0 1 0 5
-		blendfunc add
-	}
-	{
-		animmap 5 models/weaphits/bullet2.tga  models/weaphits/bullet3.tga  gfx/colors/black.tga gfx/colors/black.tga
-		rgbGen wave sawtooth 0 1 0 5
-		blendfunc add
-	}
-}
-*/
+//bulletExplosion
+//{
+//	cull disable
+//	{
+//		animmap 5 models/weaphits/bullet1.tga  models/weaphits/bullet2.tga  models/weaphits/bullet3.tga gfx/colors/black.tga
+//		rgbGen wave inversesawtooth 0 1 0 5
+//		blendfunc add
+//	}
+//	{
+//		animmap 5 models/weaphits/bullet2.tga  models/weaphits/bullet3.tga  gfx/colors/black.tga gfx/colors/black.tga
+//		rgbGen wave sawtooth 0 1 0 5
+//		blendfunc add
+//	}
+//}
 
 rocketExplosion
 {
