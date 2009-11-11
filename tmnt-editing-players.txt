@@ -1,9 +1,9 @@
 Below are a few guide that may help make player models.
 
-== OBJ to MD3 (Misfit Model 3D) ==
+== OBJ to MD3 (Using Misfit Model 3D) ==
 Here is a guide for converting one unanimated multi-mesh wavefront (.obj) model to three MD3 models to use for a player.
 
-Wavefront (.obj) models may be created with programs such as Wings3D and Blender. If you wish to follow the guide but have not made a model try using "TMNTArena/tmnt-src-*.zip/src/base-src/models/players/raph/raph.wings", you will however need to install Wings3D to export to OBJ.
+Wavefront (.obj) models may be created with programs such as Wings3D and Blender. If you wish to follow the guide but have not made a model try using "base-src/models/players/raph/raph.wings", you will however need to install Wings3D to export to OBJ.
 
 === Guide ===
 * If the model is not currently a wavefront (.obj) model, or another format that Misfit Model 3D can open, it must be converted. In Wings3D run "File -> Export -> Wavefront (.obj)", select a filename, and export.
@@ -12,7 +12,7 @@ Wavefront (.obj) models may be created with programs such as Wings3D and Blender
 
 * Now we may set the metadata (More on this later) and do animation (More on this later)
 
-NOTE: There was some complacated stuff but I modified the MM3D so that it doesn't need to be done. Also my old way didn't work with animations.
+NOTE: There was some complicated stuff but I modified the MM3D so that it doesn't need to be done. Also my old way didn't work with animations.
 
 * Now it should be ready for exporting. Make sure the model is saved as a mm3d. Run "File -> Save As... -> broswe to a directory "head.md3" 
 
@@ -25,25 +25,25 @@ NOTE: There was some complacated stuff but I modified the MM3D so that it doesn'
 ** Note: lower.md3 should not need its offsets changed (If the OBJ model was offset correctly, more on this later)
 
 
-== Mirror Skining ==
+== Mirror Skinning ==
 : I came up with this myself... Raph's legs and torso currently do this.
 
-Split into left and right and use the same half-of-object image, so easier to modifiy both sides.
-Eather use the same image for both sides or copy-edit one side from the other.
+Split into left and right and use the same half-of-object image, so easier to modify both sides.
+Either use the same image for both sides or copy-edit one side from the other.
 
 === How to in Wings3D ===
 :'''Cloning the UV'''
 * 1. Remove half of the object
 * 2. Merge any reminding faces to only one face
 * 3. Select the face where the objects will connect. In the object explorer? right click "_hole_" click apply to selected. 
-* 4. Select the object, deselect the face where the objects will connect. UV map the selcted faces of the object
+* 4. Select the object, deselect the face where the objects will connect. UV map the selected faces of the object
 * 5. Select the face where the objects will connect.
 * 6. Create a virtual mirror (Tools -> Virtual Mirror -> Freeze)
 
 Both sides now use the same texture and UV mapping. You may wish to split into 2 object.
 
-:'''Spliting the model'''
-* 7. "Freeze" the mirror (Tools -> Virtual Mirror -> Freeze) so it is no longer vitual
+:'''Splitting the model'''
+* 7. "Freeze" the mirror (Tools -> Virtual Mirror -> Freeze) so it is no longer virtual
 * 8. In line mode select all of the lines where the halfs connect
 * 9. Right click -> Loopcut
 
