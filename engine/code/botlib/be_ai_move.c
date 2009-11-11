@@ -2615,7 +2615,7 @@ bot_moveresult_t BotTravel_Grapple(bot_movestate_t *ms, aas_reachability_t *reac
 		ms->moveflags &= ~MFL_ACTIVEGRAPPLE;
 		return result;
 	} //end if
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Is this handled correctly?
+#ifdef TMNTWEAPSYS
 	// Check if bot has grapple.
 	if (!(int) offhandgrapple->value && !BotValidWeapon(ms->client, weapindex_grapple->value)) {
 #ifdef DEBUG_GRAPPLE
@@ -2766,7 +2766,7 @@ bot_moveresult_t BotTravel_RocketJump(bot_movestate_t *ms, aas_reachability_t *r
 	float dist, speed;
 	bot_moveresult_t_cleared( result );
 
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Is this handled correctly?
+#ifdef TMNTWEAPSYS
 	// Check if bot has rocketlauncher.
 	if (!BotValidWeapon(ms->client, weapindex_rocketlauncher->value)) {
 		//botimport.Print(PRT_ERROR, "doesn't own rocketlauncher\n");

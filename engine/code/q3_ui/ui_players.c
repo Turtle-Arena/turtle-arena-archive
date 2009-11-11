@@ -103,6 +103,7 @@ tryagain:
 		else {
 		pi->weaponModel = trap_R_RegisterModel( item->world_model[0] );
 	}
+
 		if (item->world_model[3]) {
 			pi->weaponModel2 = trap_R_RegisterModel( item->world_model[3] );
 		}

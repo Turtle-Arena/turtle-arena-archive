@@ -66,7 +66,9 @@ static void UI_PlayerInfo_SetWeapon( playerInfo_t *pi, weapon_t weaponNum ) {
 	char		path[MAX_QPATH];
 
 	pi->currentWeapon = weaponNum;
+#ifndef TMNTWEAPSYS_2
 tryagain:
+#endif
 	pi->realWeapon = weaponNum;
 	pi->weaponModel = 0;
 	pi->barrelModel = 0;
@@ -110,6 +112,7 @@ tryagain:
 	}
 #endif
 
+#ifndef TMNTWEAPSYS_2
 	if( pi->weaponModel == 0 ) {
 #if defined TMNTPLAYERSYS && defined TMNTWEAPSYS
 		if( weaponNum == pi->playercfg.default_weapon ) {
@@ -133,7 +136,6 @@ tryagain:
 		goto tryagain;
 	}
 
-#ifndef TMNTWEAPSYS_2
 	if ( weaponNum == WP_MACHINEGUN || weaponNum == WP_GAUNTLET || weaponNum == WP_BFG )
 #endif
 	{

@@ -188,8 +188,9 @@ void G_LoadGame(fileHandle_t f)
             for (j = 0; j < MAX_HOLDABLE; j++)
             {
             	trap_FS_Read(&integer, sizeof(integer), f);
-            	// Turtle Man: FIXME: Check 'bg_item' if item has multiple uses.
-            	if (j >= HI_SHURIKEN && j <= HI_LASERSHURIKEN)
+
+				// If has multiple uses, add to current.
+				if (BG_ItemForItemNum(BG_ItemNumForHoldableNum(j))->quantity > 0)
             	{
             		level.clients[client].ps.holdable[j] += integer;
             	}

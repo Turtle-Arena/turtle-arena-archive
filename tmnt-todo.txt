@@ -27,7 +27,7 @@ STARTED: [todo] Change TMNTWEAPONS stuff that is system to TMNTWEAPSYS[|2|_2]
 
 [todo] Merge TMNTWEAPSYS_2 into TMNTWEAPSYS (Then I can remove the code that TMNTWEAPSYS_2 disables, etc)
 
-[todo] Weapons Info System redesign; (Started, TMNTWEAPSYS_2 )
+STARTED ( TMNTWEAPSYS_2 ): [todo] Weapons Info System redesign.
 : Reduce weapontype_t enum to be (WT_NONE, WT_GAUNTLET (cross of gun and melee), WT_GUN, WT_MELEE). Have "weaponinfo" (weapontype, mod, (blade)damage, (blade)trail, sounds, bit-flags, "blades" (points of damage/trail), wallmark, wallhit sounds) and "weapongroup" (pointers to "weaponinfo"s, player animations, animations when holding CTF flag, combo/chain limits, ???). "weapon_t" enum would index "weapon groups".
 * It is working, still need to generalize all of the weapons so that there is no WP_* enum.
 : I disabled the WP_*s but some of the Team Arena weapon code had to be disabled as well.
