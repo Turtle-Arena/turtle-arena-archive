@@ -122,22 +122,26 @@ DONE:	cgs.media.flagShaders[2] = trap_R_RegisterShaderNoMip("ui/assets/statusbar
 
 == Team Arena UI ==
 : Only used the scriptable UI HUD. (Which currently isn't used.)
-	cgs.media.sizeCursor = trap_R_RegisterShaderNoMip( "ui/assets/sizecursor.tga" );
-	NOTE: Currently I have ui/assets/sizecursor points to the normal q3 cursor.
+: NOTE: Currently I have ui/assets/sizecursor point to the normal q3 cursor.
 DONE:	cgs.media.selectCursor = trap_R_RegisterShaderNoMip( "ui/assets/selectcursor.tga" );
+	cgs.media.sizeCursor = trap_R_RegisterShaderNoMip( "ui/assets/sizecursor.tga" );
 
 == Demo Quake3's pak0.pk3 ==
 While replacing stuff I was deleting what I had replaced or was no longer used in the demoq3 pak0.pk3
 the following were not removed from the pk3; (I have a list so I can delete the pk3)
+
+models/powerups/*					--replaced/unused by tmnt
+models/weapons2/*					--replaced/unused by tmnt
+models/weaphits/*
+
+=== base_ioq3ztm ===
+Replaced in base_ioq3ztm
 
 menu/medals/medal_impressive.tga	--unused by tmnt --Kill two (or more) players with one railgun shot.
 menu/medals/medal_excellent.tga		--unused by tmnt --Kill two players close together
 menu/medals/medal_accuracy.tga		--unused by tmnt
 menu/medals/medal_gauntlet.tga		--unused by tmnt
 menu/medals/medal_victory.tga		--unused by tmnt
-models/powerups/*					--replaced/unused by tmnt
-models/weapons2/*					--replaced/unused by tmnt
-models/weaphits/*
 
 == Demo TA pak0.pk3 ==
 // There is [or maybe] more, I didn't delete stuff as I replaced stuff.
