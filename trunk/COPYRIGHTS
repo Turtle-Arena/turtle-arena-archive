@@ -1,7 +1,14 @@
 The TMNT Arena data copyrights.
 
-All of the data is license under the GNU General Public License; either version 2 of the License, or
-	(at your option) any later version.
+All of the data (unless otherwised noted) is license under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
+
+== Non-GPL==
+Sonic Robo Blast 2 user made animated MD2 model. (I forgot who the author was, and there was no license given.)
+
+base/models/mapobjects/gfz_flower/fwr2.md3 (Converted from fwr2.md2)
+base/models/mapobjects/gfz_flower/fwr2.png
+
+Theses will be replaced/removed. I want to make a animated model to replace it in the test map.
 
 == ZTM ==
 There are source files for some of the data in tmnt-src-*.zip/src/base-src/
