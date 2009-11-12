@@ -849,6 +849,9 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 	int rate;
 	int blockspersnap;
 	int idPack = 0, missionPack = 0, unreferenced = 1;
+#ifdef STANDALONE // IOQ3ZTM
+	int basePack = 0;
+#endif
 	char errorMessage[1024];
 	char pakbuf[MAX_QPATH], *pakptr;
 	int numRefPaks;
@@ -885,8 +888,8 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 						// check whether it's legal to download it.
 						missionPack = FS_idPak(pakbuf, "missionpack");
 #ifdef STANDALONE // IOQ3ZTM
-						idPack = missionPack || FS_idPak(pakbuf, "baseq3")
-								|| FS_idPak(pakbuf, BASEGAME);
+						idPack = missionPack || FS_idPak(pakbuf, "baseq3");
+						basePack = FS_idPak(pakbuf, BASEGAME);
 #else
 						idPack = missionPack || FS_idPak(pakbuf, BASEGAME);
 #endif
@@ -920,6 +923,14 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 					Com_sprintf(errorMessage, sizeof(errorMessage), "Cannot autodownload id pk3 file \"%s\"", cl->downloadName);
 				}
 			}
+#ifdef STANDALONE // IOQ3ZTM
+			else if (basePack)
+			{
+				// Don't auto download assets0.pk3
+				Com_Printf("clientDownload: %d : \"%s\" cannot download \"" BASEGAME "/\" pk3 files\n", (int) (cl - svs.clients), cl->downloadName);
+				Com_sprintf(errorMessage, sizeof(errorMessage), "Cannot autodownload \"" BASEGAME "/\" pk3 file \"%s\"", cl->downloadName);
+			}
+#endif
 			else if ( !(sv_allowDownload->integer & DLF_ENABLE) ||
 				(sv_allowDownload->integer & DLF_NO_UDP) ) {
 

@@ -8,7 +8,7 @@
   enginepath_linux="/usr/local/games/tmntarena/"
   enginepath_macos="/Applications/TMNTArena/"
   engine_win32="TMNTArena.exe"
-  engine_linux="tmntarena"
+  engine_linux="tmntarena.sh"
   engine_macos="TMNTArena.app"
   prefix=".tmntarena"
   basegame="base"

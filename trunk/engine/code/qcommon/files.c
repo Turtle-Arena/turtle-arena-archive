@@ -174,8 +174,8 @@ or configs will never get loaded from disk!
 
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
-#ifdef TMNTMISC
-#define NUM_DEFAULT_PAKS 1 // allows for pak0 through pak8
+#ifdef TMNT
+#define NUM_DEFAULT_PAKS 1 // Allows for assets0.pk3 through assets9.pk3
 static const unsigned pak_checksums[NUM_DEFAULT_PAKS] = {
 	2192442826u
 };
@@ -2568,6 +2568,12 @@ qboolean FS_idPak( char *pak, char *base ) {
 		if ( !FS_FilenameCompare(pak, va("%s/pak%d", base, i)) ) {
 			break;
 		}
+#ifdef TMNT
+		// Don't auto download assets either. (TMNT Arena uses assets0.pk3 instead of pak0.pk3)
+		if ( !FS_FilenameCompare(pak, va("%s/assets%d", base, i)) ) {
+			break;
+		}
+#endif
 	}
 	if (i < NUM_ID_PAKS) {
 		return qtrue;
@@ -3018,18 +3024,18 @@ static void FS_CheckPak0( void )
 }
 #endif
 
-#ifdef TMNTMISC
+#ifdef TMNT
 /*
 ===================
 FS_CheckPaks
 
-Checks that pak0.pk3 is present and its checksum is correct
+Checks that assets0.pk3 is present and its checksum is correct
 ===================
 */
 static void FS_CheckPaks( void )
 {
-#ifdef TMNTRELEASE // Only for release version (That has a pk3 file).
-	// Turtle Man: Make sure all of the pk3 file(s) are found and unmodified, like in SRB2...
+#ifdef TMNTRELEASE // Only for release version (That has pk3 files).
+	// Turtle Man: Make sure all of the default pk3 file(s) are found and unmodified, like in SRB2...
 	searchpath_t	*path;
 	unsigned foundPak = 0;
 	unsigned invalidPak = 0;
@@ -3042,14 +3048,14 @@ static void FS_CheckPaks( void )
 			continue;
 
 		if(!Q_stricmpn( path->pack->pakGamename, BASEGAME, MAX_OSPATH )
-			&& strlen(pakBasename) == 4 && !Q_stricmpn( pakBasename, "pak", 3 )
+			&& strlen(pakBasename) == 4 && !Q_stricmpn( pakBasename, "assets", 3 )
 			&& pakBasename[3] >= '0' && pakBasename[3] < '0'+NUM_DEFAULT_PAKS)
 		{
 			if( path->pack->checksum != pak_checksums[pakBasename[3]-'0'] )
 			{
 				Com_Printf("\n\n"
 					"**************************************************\n"
-					"WARNING: pak%d.pk3 is present but its checksum (%u)\n"
+					"WARNING: assets%d.pk3 is present but its checksum (%u)\n"
 					"is not correct. Please re-install the point release\n"
 					"**************************************************\n\n\n",
 					pakBasename[3]-'0', path->pack->checksum );
@@ -3073,11 +3079,11 @@ static void FS_CheckPaks( void )
 
 		if (invalidPak)
 		{
-			Com_Error(ERR_FATAL, "Default Pk3 files are missing, corrupt, or modified.\nYou need to reinstall TMNT Arena in order to play");
+			Com_Error(ERR_FATAL, "Default Pk3 file(s) are missing, corrupt, or modified.\nYou need to reinstall TMNT Arena in order to play");
 		}
 		else
 		{
-			Com_Error(ERR_FATAL, "Missing default Pk3 files.\nYou need to reinstall TMNT Arena in order to play");
+			Com_Error(ERR_FATAL, "Missing default Pk3 file(s).\nYou need to reinstall TMNT Arena in order to play");
 		}
 	}
 #endif
@@ -3450,7 +3456,7 @@ void FS_InitFilesystem( void ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-#ifdef TMNTMISC
+#ifdef TMNT
 	FS_CheckPaks();
 #endif
 #ifndef STANDALONE
@@ -3488,7 +3494,7 @@ void FS_Restart( int checksumFeed ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-#ifdef TMNTMISC
+#ifdef TMNT
 	FS_CheckPaks();
 #endif
 #ifndef STANDALONE
