@@ -570,7 +570,7 @@ typedef struct drawSurf_s {
 	surfaceType_t		*surface;		// any of surface*_t
 } drawSurf_t;
 
-#ifdef TMNTMISC // Turtle Man: I *think* this is the "max lightmapped surface verts" in q3map2
+#if 0 // #ifdef TMNTMISC // Turtle Man: TODO: I *think* this is the "max lightmapped surface verts" in q3map2
 #define	MAX_FACE_POINTS		999
 #else
 #define	MAX_FACE_POINTS		64
