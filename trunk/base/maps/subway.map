@@ -3,6 +3,7 @@
 {
 "classname" "worldspawn"
 "enableDust" "1"
+"message" "Subway"
 // brush 0
 {
 ( 2040 -256 128 ) ( 2048 -256 128 ) ( 2040 -256 0 ) common/caulk 0 0 0 0.5 0.5 0 0 0
@@ -3144,7 +3145,7 @@ sfx/beam
 // entity 44
 {
 "classname" "info_player_deathmatch"
-"origin" "664.000000 -344.000000 -32.000000"
+"origin" "688.000000 -344.000000 -32.000000"
 "angle" "90.000000"
 }
 // entity 45
@@ -3156,7 +3157,7 @@ sfx/beam
 // entity 46
 {
 "classname" "info_player_deathmatch"
-"origin" "872.000000 336.000000 -32.000000"
+"origin" "848.000000 336.000000 -32.000000"
 "angle" "-90.000000"
 }
 // entity 47
