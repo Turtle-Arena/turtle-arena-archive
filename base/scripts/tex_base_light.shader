@@ -22,6 +22,28 @@ textures/base_light/subway_ceiling_light
 	}
 }
 
+textures/base_light/subway_ceiling_light_4k
+{
+	qer_editorimage textures/base_light/subway_ceiling_light.png
+	q3map_lightimage textures/base_light/subway_ceiling_light.blend.png
+	q3map_surfacelight 4000
+	q3map_flare flareShader-wide
+	{
+		map textures/base_light/subway_ceiling_light.png
+		rgbGen identity
+	}
+	{
+		map $lightmap 
+		blendfunc filter
+		tcGen lightmap 
+	}
+	{
+		map textures/base_light/subway_ceiling_light.blend.png
+		blendfunc add
+		rgbGen wave noise 0.8 0.2 0 1
+	}
+}
+
 
 // From OA/Q3
 textures/base_light/baslt4_1_2k

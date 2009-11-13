@@ -69,21 +69,14 @@ type		"single"
 // Free For All (Some also support Dual and Team Deathmatch)
 {
 map			"dm1"
-longname	"Deathmatch Test"
+longname	"Leaks"
 type		"ffa tourney team"
-}
-
-// Duel
-{
-map			"duel1"
-longname	"Sky Duel"
-type		"tourney"
 }
 
 // Team (Support all team gametypes)
 {
 map			"team1"
-longname	"Teamplay Test"
+longname	"Narrows"
 type		"ctf oneflag overload harvester"
 }
 
