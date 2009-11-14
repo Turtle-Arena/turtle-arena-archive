@@ -37,18 +37,27 @@ INGAME MENU
 #define INGAME_MENU_VERTICAL_SPACING	28
 
 #define ID_TEAM					10
+#ifdef TMNTMISC // INGAME_SERVER_MENU
+#define ID_SERVER				11
+#else
 #define ID_ADDBOTS				11
 #define ID_REMOVEBOTS			12
+#endif
 #define ID_SETUP				13
 #define ID_SERVERINFO			14
 #define ID_LEAVEARENA			15
+#ifndef TMNTMISC // INGAME_SERVER_MENU
 #define ID_RESTART				16
+#endif
 #define ID_QUIT					17
 #define ID_RESUME				18
 #define ID_TEAMORDERS			19
 #ifdef TMNTMISC // SMART_JOIN_MENU
 #define ID_JOINGAME				20
 #define ID_SPECTATE				21
+#endif
+#ifdef TMNTMISC
+#define ID_CUSTOMIZEPLAYER		22
 #endif
 
 
@@ -60,9 +69,16 @@ typedef struct {
 	menutext_s		setup;
 	menutext_s		server;
 	menutext_s		leave;
+#ifdef TMNTMISC // INGAME_SERVER_MENU
+	menutext_s		inserver;
+#else
 	menutext_s		restart;
 	menutext_s		addbots;
 	menutext_s		removebots;
+#endif
+#ifdef TMNTMISC
+	menutext_s		setupplayer;
+#endif
 	menutext_s		teamorders;
 	menutext_s		quit;
 	menutext_s		resume;
@@ -71,6 +87,7 @@ typedef struct {
 static ingamemenu_t	s_ingame;
 
 
+#ifndef TMNTMISC // INGAME_SERVER_MENU
 /*
 =================
 InGame_RestartAction
@@ -84,6 +101,7 @@ static void InGame_RestartAction( qboolean result ) {
 	UI_PopMenu();
 	trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 }
+#endif
 
 
 /*
@@ -135,9 +153,11 @@ void InGame_Event( void *ptr, int notification ) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect\n" );
 		break;
 
+#ifndef TMNTMISC // INGAME_SERVER_MENU
 	case ID_RESTART:
 		UI_ConfirmMenu( "RESTART ARENA?", 0, InGame_RestartAction );
 		break;
+#endif
 
 	case ID_QUIT:
 		UI_ConfirmMenu( "EXIT GAME?",  0, InGame_QuitAction );
@@ -147,6 +167,11 @@ void InGame_Event( void *ptr, int notification ) {
 		UI_ServerInfoMenu();
 		break;
 
+#ifdef TMNTMISC // INGAME_SERVER_MENU
+	case ID_SERVER:
+		UI_InServerMenu();
+		break;
+#else
 	case ID_ADDBOTS:
 		UI_AddBotsMenu();
 		break;
@@ -154,6 +179,13 @@ void InGame_Event( void *ptr, int notification ) {
 	case ID_REMOVEBOTS:
 		UI_RemoveBotsMenu();
 		break;
+#endif
+
+#ifdef TMNTMISC
+	case ID_CUSTOMIZEPLAYER:
+		UI_PlayerSettingsMenu();
+		break;
+#endif
 
 	case ID_TEAMORDERS:
 		UI_TeamOrdersMenu();
@@ -192,8 +224,12 @@ void InGame_MenuInit( void ) {
 	s_ingame.frame.width				= 466;//359;
 	s_ingame.frame.height				= 332;//256;
 
+#ifdef TMNTMISC // INGAME_SERVER_MENU
+	y = 88+INGAME_MENU_VERTICAL_SPACING;
+#else
 	//y = 96;
 	y = 88;
+#endif
 #ifdef TMNTMISC // SMART_JOIN_MENU
 	if( (trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
 		s_ingame.team.generic.type			= MTYPE_PTEXT;
@@ -246,6 +282,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 #endif
 
+#ifndef TMNTMISC // INGAME_SERVER_MENU
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.addbots.generic.type		= MTYPE_PTEXT;
 	s_ingame.addbots.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -285,6 +322,7 @@ void InGame_MenuInit( void ) {
 	) {
 		s_ingame.removebots.generic.flags |= QMF_GRAYED;
 	}
+#endif
 
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.teamorders.generic.type		= MTYPE_PTEXT;
@@ -323,6 +361,35 @@ void InGame_MenuInit( void ) {
 	s_ingame.setup.color				= color_red;
 	s_ingame.setup.style				= UI_CENTER|UI_SMALLFONT;
 
+#ifdef TMNTMISC
+	y += INGAME_MENU_VERTICAL_SPACING;
+	s_ingame.setupplayer.generic.type		= MTYPE_PTEXT;
+	s_ingame.setupplayer.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_ingame.setupplayer.generic.x			= 320;
+	s_ingame.setupplayer.generic.y			= y;
+	s_ingame.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
+	s_ingame.setupplayer.generic.callback	= InGame_Event; 
+	s_ingame.setupplayer.string				= "PLAYER";
+	s_ingame.setupplayer.color				= color_red;
+	s_ingame.setupplayer.style				= UI_CENTER|UI_SMALLFONT;
+#endif
+
+#ifdef TMNTMISC // INGAME_SERVER_MENU
+	y += INGAME_MENU_VERTICAL_SPACING;
+	s_ingame.inserver.generic.type		= MTYPE_PTEXT;
+	s_ingame.inserver.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_ingame.inserver.generic.x			= 320;
+	s_ingame.inserver.generic.y			= y;
+	s_ingame.inserver.generic.id		= ID_SERVER;
+	s_ingame.inserver.generic.callback	= InGame_Event; 
+	s_ingame.inserver.string			= "SERVER";
+	s_ingame.inserver.color				= color_red;
+	s_ingame.inserver.style				= UI_CENTER|UI_SMALLFONT;
+	if( !trap_Cvar_VariableValue( "sv_running" ) ) {
+		s_ingame.inserver.generic.flags |= QMF_GRAYED;
+	}
+#endif
+
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.server.generic.type		= MTYPE_PTEXT;
 	s_ingame.server.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -334,6 +401,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.server.color				= color_red;
 	s_ingame.server.style				= UI_CENTER|UI_SMALLFONT;
 
+#ifndef TMNTMISC // INGAME_SERVER_MENU
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.restart.generic.type		= MTYPE_PTEXT;
 	s_ingame.restart.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -347,6 +415,7 @@ void InGame_MenuInit( void ) {
 	if( !trap_Cvar_VariableValue( "sv_running" ) ) {
 		s_ingame.restart.generic.flags |= QMF_GRAYED;
 	}
+#endif
 
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.resume.generic.type			= MTYPE_PTEXT;
@@ -383,12 +452,21 @@ void InGame_MenuInit( void ) {
 
 	Menu_AddItem( &s_ingame.menu, &s_ingame.frame );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.team );
+#ifdef TMNTMISC
+	Menu_AddItem( &s_ingame.menu, &s_ingame.setupplayer );
+#endif
+#ifdef TMNTMISC // INGAME_SERVER_MENU
+	Menu_AddItem( &s_ingame.menu, &s_ingame.inserver );
+#else
 	Menu_AddItem( &s_ingame.menu, &s_ingame.addbots );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.removebots );
+#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.teamorders );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setup );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.server );
+#ifndef TMNTMISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.restart );
+#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.resume );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.leave );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.quit );

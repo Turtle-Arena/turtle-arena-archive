@@ -362,6 +362,14 @@ extern void UI_CreditMenu( void );
 extern void InGame_Cache( void );
 extern void UI_InGameMenu(void);
 
+#ifdef TMNTMISC // INGAME_SERVER_MENU
+//
+// ui_ingame_server.c
+//
+extern void InServer_Cache( void );
+extern void UI_InServerMenu(void);
+#endif
+
 //
 // ui_confirm.c
 //
