@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug TA Win32">
-				<Option output="..\..\build\q3_ui_debug_ta\uix86_old" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\q3_ui_debug_ta" />
+				<Option output="../../build/q3_ui_debug_ta/uix86_old" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/q3_ui_debug_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -31,8 +31,8 @@
 				</Linker>
 			</Target>
 			<Target title="Release TA Win32">
-				<Option output="..\..\build\q3_ui_release_ta\uix86_old" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\q3_ui_release_ta" />
+				<Option output="../../build/q3_ui_release_ta/uix86_old" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/q3_ui_release_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -54,8 +54,8 @@
 				</Linker>
 			</Target>
 			<Target title="Release Win32">
-				<Option output="..\..\build\q3_ui_release\uix86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\q3_ui_release" />
+				<Option output="../../build/q3_ui_release/uix86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/q3_ui_release" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -73,8 +73,8 @@
 				</Compiler>
 			</Target>
 			<Target title="Debug Win32">
-				<Option output="..\..\build\q3_ui_debug\uix86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\q3_ui_debug" />
+				<Option output="../../build/q3_ui_debug/uix86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/q3_ui_debug" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -132,241 +132,244 @@
 			<Add option="-DCAMERASCRIPT" />
 			<Add option="-DTMNT_GAME_MODELS" />
 		</Compiler>
-		<Unit filename="..\..\code\game\bg_misc.c">
+		<Unit filename="../../code/game/bg_misc.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\keycodes.h">
+		<Unit filename="../../code/q3_ui/keycodes.h">
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_addbots.c">
+		<Unit filename="../../code/q3_ui/ui_addbots.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_atoms.c">
+		<Unit filename="../../code/q3_ui/ui_atoms.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_cdkey.c">
+		<Unit filename="../../code/q3_ui/ui_cdkey.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_cinematics.c">
+		<Unit filename="../../code/q3_ui/ui_cinematics.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_confirm.c">
+		<Unit filename="../../code/q3_ui/ui_confirm.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_connect.c">
+		<Unit filename="../../code/q3_ui/ui_connect.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_controls2.c">
+		<Unit filename="../../code/q3_ui/ui_controls2.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_credits.c">
+		<Unit filename="../../code/q3_ui/ui_credits.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_demo2.c">
+		<Unit filename="../../code/q3_ui/ui_demo2.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_display.c">
+		<Unit filename="../../code/q3_ui/ui_display.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_gameinfo.c">
+		<Unit filename="../../code/q3_ui/ui_gameinfo.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_ingame.c">
+		<Unit filename="../../code/q3_ui/ui_ingame.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_loadconfig.c">
+		<Unit filename="../../code/q3_ui/ui_ingame_server.c">
 			<Option compilerVar="CC" />
-			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_local.h">
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_main.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_menu.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_mfield.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_mods.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_multiplayer.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_network.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_options.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_playermodel.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_players.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_playersettings.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_preferences.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_public.h">
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_qmenu.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_removebots.c">
-			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_saveconfig.c">
+		<Unit filename="../../code/q3_ui/ui_loadconfig.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_serverinfo.c">
+		<Unit filename="../../code/q3_ui/ui_local.h">
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_main.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_servers2.c">
+		<Unit filename="../../code/q3_ui/ui_menu.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_setup.c">
+		<Unit filename="../../code/q3_ui/ui_mfield.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_sound.c">
+		<Unit filename="../../code/q3_ui/ui_mods.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_sparena.c">
+		<Unit filename="../../code/q3_ui/ui_multiplayer.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_specifyserver.c">
+		<Unit filename="../../code/q3_ui/ui_network.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_splevel.c">
+		<Unit filename="../../code/q3_ui/ui_options.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_sppostgame.c">
+		<Unit filename="../../code/q3_ui/ui_playermodel.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_spreset.c">
+		<Unit filename="../../code/q3_ui/ui_players.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_spskill.c">
+		<Unit filename="../../code/q3_ui/ui_playersettings.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_startserver.c">
+		<Unit filename="../../code/q3_ui/ui_preferences.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_team.c">
+		<Unit filename="../../code/q3_ui/ui_public.h">
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_qmenu.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_teamorders.c">
+		<Unit filename="../../code/q3_ui/ui_removebots.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\q3_ui\ui_video.c">
+		<Unit filename="../../code/q3_ui/ui_saveconfig.c">
+			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_serverinfo.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\qcommon\q_math.c">
+		<Unit filename="../../code/q3_ui/ui_servers2.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\qcommon\q_shared.c">
+		<Unit filename="../../code/q3_ui/ui_setup.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\qcommon\q_shared.h">
+		<Unit filename="../../code/q3_ui/ui_sound.c">
+			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
 		</Unit>
-		<Unit filename="..\..\code\ui\ui_syscalls.c">
+		<Unit filename="../../code/q3_ui/ui_sparena.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_specifyserver.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_splevel.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_sppostgame.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_spreset.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_spskill.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_startserver.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_team.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_teamorders.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_video.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/qcommon/q_math.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/qcommon/q_shared.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/qcommon/q_shared.h">
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+		</Unit>
+		<Unit filename="../../code/ui/ui_syscalls.c">
 			<Option compilerVar="CC" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
