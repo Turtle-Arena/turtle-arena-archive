@@ -21,15 +21,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
+// NOTE: TMNT Arena no longer uses fuzw.c. Weapon selection was moved to game from botlib
+//         as the weapons are loaded from external text files.
+
 // Changed for TMNT weapons, based on Open Arena's fuzw.c
 
 // if (BG_WeapUseAmmo(wp)) {
-//     return value;
+//     return weightvalue;
 // } else {
-//     if (have wp)
+//     if (bot_has_weapon(wp))
 //         return 0;
 //     else
-//         return value;
+//         return weightvalue;
 // }
 
 weight "Default Weapon"

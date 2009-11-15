@@ -200,12 +200,14 @@ typedef struct bot_entitystate_s
 
 #ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
 //game can send extra items not in "botfiles/items.c"
+//note: the items can be any type, not just weapons.
 typedef struct
 {
 	char classname[32];
 	char name[MAX_QPATH];
 	char model[MAX_QPATH];
 	int modelindex;
+	int respawntime;
 } bot_shareditem_t;
 #endif
 

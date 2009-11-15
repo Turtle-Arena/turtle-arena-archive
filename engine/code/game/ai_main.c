@@ -1426,6 +1426,16 @@ int BotAILoadMap( int restart ) {
 			Q_strncpyz(itemInfos[item].name, bg_weapongroupinfo[i].name, MAX_QPATH);
 			Q_strncpyz(itemInfos[item].model, bg_weapongroupinfo[i].pickupModel, MAX_QPATH);
 			itemInfos[item].modelindex = BG_ItemNumForItem(BG_FindItemForWeapon(i));
+
+			if ( gametype == GT_TEAM  )
+			{
+				itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponTeamRespawn");
+			}
+			else
+			{
+				itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponrespawn");
+			}
+
 			item++;
 		}
 

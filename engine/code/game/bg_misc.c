@@ -236,7 +236,7 @@ gitem_t	bg_itemlist[] =
 #endif
 /* icon */		"icons/iconh_mega",
 #ifdef TMNTDATA
-/* pickup */	"Full Health",
+/* pickup */	"100% Health",
 #else
 /* pickup */	"Mega Health",
 #endif

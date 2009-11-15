@@ -65,12 +65,16 @@ STARTED ( TMNTWEAPSYS_2 ): [todo] Weapons Info System redesign.
 :   so shell takes less damage, banndana takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
 
 // weapon-weights
-[todo] Remove the need for fuzw.c (Use const weights in weaponinfo.txt?) remove the weapons from fuzi.c
+DONE: [todo] Remove the need for fuzw.c
+[todo-after-above] Fix up new weapon weight system.
+: (TMNTWEAPSYS_2 removes weight system from botlib for selecting held weapon)
+: Remove CHARACTERISTIC_WEAPONWEIGHTS from botfiles/[botname]_c.c and delete [botname]_w.c files
 
-[todo] Fix up new weapon weight system (TMNTWEAPSYS_2 removes weight system from botlib for selecting held weapon)
-[todo-after-above] Remove CHARACTERISTIC_WEAPONWEIGHTS from botfiles/[botname]_c.c and delete [botname]_w.c
-: WONTDO?: [todo] Allow setting the names of the bots favorite weapons? Casey likes bat/hockey stick/etc? Leo likes swords?
-[todo] Load weapon item weights from weaponinfo.txt and .weap files.
+[todo] Remove the need for weapons in fuzi.c
+: Load weapon item weights from weaponinfo.txt and .weap files or create weight from loaded info.
+
+WONTDO?: [todo] Allow setting the names of the bots favorite weapons? Casey likes bat/hockey stick/etc? Leo likes swords?
+
 
 // non-weapon or attacking...
 
@@ -127,8 +131,6 @@ BETTER(not done?): When moving the camera around the player, focus on the player
 === Testing! ===
 DONE(untested)?: Melee combo system, with different animations for each attack? (TMNTWEAPSYS_2)
 
-DONE(untested): [todo] Add nailtrail.tga and support nailtrail, etc
-
 [todo] Test/use the "noise" and "random" waveforms that I copied from IOSTVEF
 
 === Don't do? (Dead Ideas?) ===
@@ -153,6 +155,8 @@ DONE(untested): [todo] Add nailtrail.tga and support nailtrail, etc
 WONTFIX?: [bug] Raph's legs go through his shell when crouching and looking at the floor.
 INVALID?: [bug] Bots [skill 5?] know where you are when they shouldn't be able to see you?
 
+WONTFIX?: [bug/todo] First Person weapon doesn't draw correctly (It draws too near to the screen)
+			This happens due to changing the field of view to 70 (Q3 uses 90)
 
 === cgame ===
 [todo] Have the HUD have a left side and a right side, so they can be drawn aspect-correct for 16:9 displays
@@ -162,15 +166,10 @@ INVALID?: [bug] Bots [skill 5?] know where you are when they shouldn't be able t
 [todo] Have dropped ET_ITEMs (weapons, holdables, powerups, etc) blink/flash before disaparing
 : Using newly added RF_FORCE_ENT_ALPHA!
 
-[bug/todo] First Person weapon doesn't draw correctly (It draws too near to the screen)
-			This happens due to changing the field of view to 70 (Q3 uses 90)
-
-=== botlib ===
-[todo] Load weapon items from "scripts/weaponinfo.txt" instead of from "botfiles/items.c"
-
 
 == BSPC ==
 // BSPC is the BSP map to .aas (Arena Awareness System) compiler. The aas file is used by bots.
+[todo] Fix compiling. After ioq3 updated zlib, compiling fails.
 [todo] Fix "make clean". It doesn't remove the .o files, only the bspc binary
 
 
@@ -304,6 +303,8 @@ DONE: Change multiplayer menu; Don't automaticly go to server list, list Join (S
 
 DONE: Clean up IOQ3ZTM // LERP_FRAME_CLIENT_LESS remove the "dead" code,
 		code in ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS and ifdef IOQ3ZTM <> else <dead code> endif
+
+DONE: Load weapon items from "scripts/weaponinfo.txt" instead of from "botfiles/items.c"
 
 === EDITOR CONFIG ===
 DONE: Add a note about team_red/blueobelisk are red/blue CTF flag base models as well.
