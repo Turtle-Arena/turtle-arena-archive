@@ -598,18 +598,20 @@ void BotInitLevelItems(void)
 			Q_strncpyz(ic->iteminfo[i].name, itemInfos[j].name, MAX_QPATH);
 			Q_strncpyz(ic->iteminfo[i].model, itemInfos[j].model, MAX_QPATH);
 			ic->iteminfo[i].modelindex = itemInfos[j].modelindex;
+			ic->iteminfo[i].respawntime = itemInfos[j].respawntime;
 
-			// set defaults
-			ic->iteminfo[i].type = 0;  // unused?
-			ic->iteminfo[i].index = 0; // unused?
-			ic->iteminfo[i].respawntime = 30;
+			// Unused
+			//ic->iteminfo[i].type = 0;
+			//ic->iteminfo[i].index = 0;
+
+			// Set default mins/maxs, its currently the same for all of the items in botfiles/items.c
 			VectorSet(ic->iteminfo[i].mins, -13, -13, -13);
 			VectorSet(ic->iteminfo[i].maxs, 13, 13, 13);
 
 			ic->iteminfo[i].number = ic->numiteminfo;
 
+			// Turtle Man: FIXME: Setup weight
 #if 0
-			// Set weightnum
 			for (k = 0; k < MAX_CLIENTS; k++)
 			{
 				if (!botgoalstates[k])
@@ -621,7 +623,7 @@ void BotInitLevelItems(void)
 				if (!gs->itemweightconfig)
 					continue;
 
-				// I wish I could just set the weight...
+				// Turtle Man: I wish I could just set the weight...
 				gs->itemweightindex[ic->iteminfo[i].number] = 0;
 			}
 #endif

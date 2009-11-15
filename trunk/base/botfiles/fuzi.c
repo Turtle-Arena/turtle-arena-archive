@@ -461,19 +461,3 @@ weight "item_bluecube"
 	return 200;//BLCW;
 }
 
-// For OpenArena dom gametype(s?)
-weight "team_dom_pointWhite"
-{
-	return 1000;
-}
-
-weight "team_dom_pointRed"
-{
-	return 700;
-}
-
-weight "team_dom_pointBlue"
-{
-	return 700;
-}
-

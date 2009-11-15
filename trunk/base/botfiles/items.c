@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "inv.h"
 
+// Turtle Man: NOTE: type and index seem to be unused.
+
 #define NOITEM		0
 #define AMMOI		1
 #define WEAPONI		2
@@ -32,6 +34,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define FLAGI		6
 #define ROAMI		7
 
+// respawntime
+#define	RESPAWN_ARMOR		25
+#define	RESPAWN_HEALTH		35
+#define	RESPAWN_AMMO		40
+//#ifdef TMNTHOLDABLE
+#define RESPAWN_HOLDABLE	35
+//#else
+//#define RESPAWN_HOLDABLE	60
+//#endif
+#define	RESPAWN_MEGAHEALTH	35//120
+#define	RESPAWN_POWERUP		120
+
 /*
 iteminfo "holdable_teleporter"
 {
@@ -40,7 +54,7 @@ model		"models/powerups/holdable/teleporter.md3"
 modelindex	MODELINDEX_TELEPORTER
 type		POWERI
 index		INVENTORY_TELEPORTER
-respawntime	60
+respawntime	RESPAWN_HOLDABLE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
@@ -53,7 +67,7 @@ model		"models/powerups/holdable/medkit.md3"
 modelindex	MODELINDEX_MEDKIT
 type		HEALTHI
 index		INVENTORY_MEDKIT
-respawntime	30
+respawntime	RESPAWN_HOLDABLE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
@@ -66,12 +80,11 @@ model		"models/powerups/kamikazi.md3"
 modelindex	MODELINDEX_KAMIKAZE
 type		POWERI
 index		INVENTORY_KAMIKAZE
-respawntime	30
+respawntime	RESPAWN_HOLDABLE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
-}*/
+}
 
-/*
 iteminfo "holdable_invulnerability"
 {
 name		"Invulnerability"
@@ -79,7 +92,7 @@ model		"models/powerups/holdable/invulnerability.md3"
 modelindex	MODELINDEX_INVULNERABILITY
 type		POWERI
 index		INVENTORY_PORTAL
-respawntime	30
+respawntime	RESPAWN_HOLDABLE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
@@ -92,7 +105,7 @@ model		"models/powerups/holdable/teleporter.md3"
 modelindex	MODELINDEX_PORTAL
 type		POWERI
 index		INVENTORY_PORTAL
-respawntime	30
+respawntime	RESPAWN_HOLDABLE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -104,7 +117,7 @@ model		"models/powerups/holdable/shuriken.md3"
 modelindex	MODELINDEX_SHURIKEN
 type		POWERI
 index		INVENTORY_SHURIKEN
-respawntime	60
+respawntime	RESPAWN_HOLDABLE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
@@ -116,7 +129,7 @@ model		"models/powerups/holdable/shurikenelectric.md3"
 modelindex	MODELINDEX_ELECTRICSHURIKEN
 type		POWERI
 index		INVENTORY_ELECTRICSHURIKEN
-respawntime	60
+respawntime	RESPAWN_HOLDABLE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
@@ -128,7 +141,7 @@ model		"models/powerups/holdable/shurikenfire.md3"
 modelindex	MODELINDEX_FIRESHURIKEN
 type		POWERI
 index		INVENTORY_FIRESHURIKEN
-respawntime	60
+respawntime	RESPAWN_HOLDABLE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
@@ -140,62 +153,64 @@ model		"models/powerups/holdable/shurikenlaser.md3"
 modelindex	MODELINDEX_LASERSHURIKEN
 type		POWERI
 index		INVENTORY_LASERSHURIKEN
-respawntime	60
+respawntime	RESPAWN_HOLDABLE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
 iteminfo "item_health_small"
 {
-name		"5 Health"
-model		"models/powerups/health/small_cross.md3"
+name		"5% Health"
+model		"models/powerups/health/small.md3"
 modelindex	MODELINDEX_HEALTHSMALL
 type		HEALTHI
 index		INVENTORY_HEALTH
-respawntime	30
+respawntime	RESPAWN_HEALTH
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
 iteminfo "item_health"
 {
-name		"25 Health"
-model		"models/powerups/health/medium_cross.md3"
+name		"25% Health"
+model		"models/powerups/health/medium.md3"
 modelindex	MODELINDEX_HEALTH
 type		HEALTHI
 index		INVENTORY_HEALTH
-respawntime	30
+respawntime	RESPAWN_HEALTH
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
 
 iteminfo "item_health_large"
 {
-name		"50 Health"
-model		"models/powerups/health/large_cross.md3"
+name		"50% Health"
+model		"models/powerups/health/large.md3"
 modelindex	MODELINDEX_HEALTHLARGE
 type		HEALTHI
 index		INVENTORY_HEALTH
-respawntime	30
+respawntime	RESPAWN_HEALTH
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
 iteminfo "item_health_mega"
 {
-name		"100 Health"
-model		"models/powerups/health/mega_cross.md3"
+name		"100% Health"
+model		"models/powerups/health/mega.md3"
 modelindex	MODELINDEX_HEALTHMEGA
 type		HEALTHI
 index		INVENTORY_HEALTH
-respawntime	30
+respawntime	RESPAWN_MEGAHEALTH
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
+// TMNTWEAPSYS_2 uses weaponinfo.txt to setup the weapon items.
+// (Weapons could still be here, but they would over-ride weaponinfo.txt items)
+/*
 //weapon_default?
 
-/* TMNTWEAPSYS_2 uses weaponinfo.txt to setup the weapon items. (Weapons could still be here however.)
 iteminfo "weapon_katanas"
 {
 name		"Katanas"
@@ -374,7 +389,7 @@ index		INVENTORY_GRAPPLING_HOOK
 respawntime	30
 mins		{-13,-13,-13}
 maxs		{13,13,13}
-} 
+}
 */
 
 iteminfo "item_strength"
@@ -384,7 +399,7 @@ model		"models/powerups/instant/strength.md3"
 modelindex	MODELINDEX_QUAD
 type		POWERI
 index		INVENTORY_QUAD
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -392,11 +407,11 @@ maxs		{13,13,13}
 iteminfo "item_defense"
 {
 name		"Increased Defense"
-model		"models/powerups/instant/enviro.md3"
+model		"models/powerups/instant/defense.md3"
 modelindex	MODELINDEX_ENVIRONMENTSUIT
 type		POWERI
 index		INVENTORY_ENVIRONMENTSUIT
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -408,7 +423,7 @@ model		"models/powerups/instant/speed.md3"
 modelindex	MODELINDEX_HASTE
 type		POWERI
 index		INVENTORY_HASTE
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -420,7 +435,7 @@ model		"models/powerups/instant/invis.md3"
 modelindex	MODELINDEX_INVISIBILITY
 type		POWERI
 index		INVENTORY_INVISIBILITY
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -428,11 +443,11 @@ maxs		{13,13,13}
 iteminfo "item_regen"
 {
 name		"Regeneration"
-model		"models/powerups/instant/regen_ring.md3"
+model		"models/powerups/instant/regen.md3"
 modelindex	MODELINDEX_REGEN
 type		POWERI
 index		INVENTORY_REGEN
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -440,11 +455,11 @@ maxs		{13,13,13}
 iteminfo "item_flight"
 {
 name		"Flight"
-model		"models/powerups/instant/flight_ring.md3"
+model		"models/powerups/instant/flight.md3"
 modelindex	MODELINDEX_FLIGHT
 type		POWERI
 index		INVENTORY_FLIGHT
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
@@ -456,7 +471,7 @@ model		"models/powerups/instant/invul.md3"
 modelindex	MODELINDEX_INVUL
 type		POWERI
 index		INVENTORY_INVUL
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
@@ -468,7 +483,7 @@ model		"models/powerups/scout.md3"
 modelindex	MODELINDEX_SCOUT
 type		POWERI
 index		INVENTORY_SCOUT
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -480,7 +495,7 @@ model		"models/powerups/guard.md3"
 modelindex	MODELINDEX_GUARD
 type		POWERI
 index		INVENTORY_GUARD
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -492,7 +507,7 @@ model		"models/powerups/doubler.md3"
 modelindex	MODELINDEX_DOUBLER
 type		POWERI
 index		INVENTORY_DOUBLER
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -504,7 +519,7 @@ model		"models/powerups/ammo.md3"
 modelindex	MODELINDEX_AMMOREGEN
 type		POWERI
 index		INVENTORY_AMMOREGEN
-respawntime	60
+respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
@@ -576,6 +591,7 @@ maxs		{14, 14, 87}
 } 
 
 /*
+// For MISSIONPACK Harvester gametype (Turtle Man: Removed from TMNT Arena. #ifdef MISSIONPACK_HARVESTER)
 iteminfo "item_redcube"
 {
 name		"Red Cube"
@@ -585,7 +601,7 @@ type		FLAGI
 index		INVENTORY_REDCUBE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
-} 
+}
 
 iteminfo "item_bluecube"
 {
@@ -596,7 +612,7 @@ type		FLAGI
 index		INVENTORY_BLUECUBE
 mins		{-13,-13,-13}
 maxs		{13,13,13}
-} 
+}
 */
 
 iteminfo "item_botroam"
@@ -610,39 +626,3 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
-// Turtle Man: Not used by Q3... It is also not supported by TMNT, disabled as the botlib wasn't loading.
-//Domination points:
-/*
-iteminfo "team_dom_pointWhite"
-{
-name		"Neutral domination point"
-model		"models/dpoints/a_white.md3"
-modelindex	MODELINDEX_POINTWHITE
-type		FLAGI
-index		INVENTORY_POINTWHITE
-mins		{-13,-13,-13}
-maxs		{13,13,13}
-}
-
-iteminfo "team_dom_pointBlue"
-{
-name		"Blue domination point"
-model		"models/dpoints/a_blue.md3"
-modelindex	MODELINDEX_POINTBLUE
-type		FLAGI
-index		INVENTORY_POINTBLUE
-mins		{-13,-13,-13}
-maxs		{13,13,13}
-}
-
-iteminfo "team_dom_pointRed"
-{
-name		"Red domination point"
-model		"models/dpoints/a_red.md3"
-modelindex	MODELINDEX_POINTRED
-type		FLAGI
-index		INVENTORY_POINTRED
-mins		{-13,-13,-13}
-maxs		{13,13,13}
-}
-*/
