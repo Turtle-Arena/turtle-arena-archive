@@ -526,14 +526,13 @@ void UI_SpecifySaveMenu( void )
 
 #define VERTICAL_SPACING	30
 
-#define ID_BACK			10
-#define ID_SP_NEWGAME	11
-#define ID_SP_LOADGAME	12
-//#define ID_SP_SAVEGAME	13
-#define ID_SP_CUSTOM	14
-#define ID_SP_DEMOS		15
-#define ID_SP_CINEMATICS	16
-#define ID_SP_MODS		17
+#define ID_BACK				10
+#define ID_SP_NEWGAME		11
+#define ID_SP_LOADGAME		12
+#define ID_SP_CUSTOM		13
+#define ID_SP_DEMOS			14
+#define ID_SP_CINEMATICS	15
+#define ID_SP_MODS			16
 
 typedef struct {
 	menuframework_s	menu;
@@ -542,7 +541,6 @@ typedef struct {
 	menubitmap_s	framer;
 	menutext_s		sp_newgame;
 	menutext_s		sp_loadgame;
-	//menutext_s		sp_savegame;
 	menutext_s		sp_custom; // skirmish
 	menutext_s		sp_demos;
 	menutext_s		sp_cinematics;
@@ -626,6 +624,7 @@ static void UI_SPMenu_Init( void ) {
 
 	memset( &spMenuInfo, 0, sizeof(spMenuInfo) );
 	spMenuInfo.menu.fullscreen = qtrue;
+	spMenuInfo.menu.wrapAround = qtrue;
 
 	spMenuInfo.banner.generic.type		= MTYPE_BTEXT;
 	spMenuInfo.banner.generic.x			= 320;
@@ -662,24 +661,24 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_newgame.style				= UI_CENTER;
 
 	y += VERTICAL_SPACING;
-	spMenuInfo.sp_loadgame.generic.type		= MTYPE_PTEXT;
+	spMenuInfo.sp_loadgame.generic.type			= MTYPE_PTEXT;
 	spMenuInfo.sp_loadgame.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	spMenuInfo.sp_loadgame.generic.x			= 320;
 	spMenuInfo.sp_loadgame.generic.y			= y;
 	spMenuInfo.sp_loadgame.generic.id			= ID_SP_LOADGAME;
-	spMenuInfo.sp_loadgame.generic.callback	= UI_SPMenu_Event;
+	spMenuInfo.sp_loadgame.generic.callback		= UI_SPMenu_Event;
 	spMenuInfo.sp_loadgame.string				= "Load Game (unfinished)";
 	spMenuInfo.sp_loadgame.color				= color_red;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
 
 #if 0
 	y += VERTICAL_SPACING;
-	spMenuInfo.sp_savegame.generic.type		= MTYPE_PTEXT;
+	spMenuInfo.sp_savegame.generic.type			= MTYPE_PTEXT;
 	spMenuInfo.sp_savegame.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	spMenuInfo.sp_savegame.generic.x			= 320;
 	spMenuInfo.sp_savegame.generic.y			= y;
 	spMenuInfo.sp_savegame.generic.id			= ID_SP_SAVEGAME;
-	spMenuInfo.sp_savegame.generic.callback	= UI_SPMenu_Event;
+	spMenuInfo.sp_savegame.generic.callback		= UI_SPMenu_Event;
 	spMenuInfo.sp_savegame.string				= "Save Game";
 	spMenuInfo.sp_savegame.color				= color_red;
 	spMenuInfo.sp_savegame.style				= UI_CENTER;
@@ -748,15 +747,15 @@ static void UI_SPMenu_Init( void ) {
 */
 
 	y += VERTICAL_SPACING;
-	spMenuInfo.sp_mods.generic.type			= MTYPE_PTEXT;
-	spMenuInfo.sp_mods.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	spMenuInfo.sp_mods.generic.x				= 320;
-	spMenuInfo.sp_mods.generic.y				= y;
-	spMenuInfo.sp_mods.generic.id				= ID_SP_MODS;
-	spMenuInfo.sp_mods.generic.callback		= UI_SPMenu_Event;
-	spMenuInfo.sp_mods.string					= "Mods";
-	spMenuInfo.sp_mods.color					= color_red;
-	spMenuInfo.sp_mods.style					= UI_CENTER;
+	spMenuInfo.sp_mods.generic.type		= MTYPE_PTEXT;
+	spMenuInfo.sp_mods.generic.flags	= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	spMenuInfo.sp_mods.generic.x		= 320;
+	spMenuInfo.sp_mods.generic.y		= y;
+	spMenuInfo.sp_mods.generic.id		= ID_SP_MODS;
+	spMenuInfo.sp_mods.generic.callback	= UI_SPMenu_Event;
+	spMenuInfo.sp_mods.string			= "Mods";
+	spMenuInfo.sp_mods.color			= color_red;
+	spMenuInfo.sp_mods.style			= UI_CENTER;
 
 	spMenuInfo.back.generic.type		= MTYPE_BITMAP;
 	spMenuInfo.back.generic.name		= ART_BACK0;
@@ -774,7 +773,6 @@ static void UI_SPMenu_Init( void ) {
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.framer );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_newgame );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_loadgame );
-	//Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_savegame );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_custom );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_demos );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_cinematics );
