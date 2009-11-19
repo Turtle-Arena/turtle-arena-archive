@@ -16,6 +16,7 @@ Bugs that have found that have not been fixed yet, and things that should to be 
 
 // Weapons! (and attacking)
 [todo] Allow using two guns at once and fix weapon hand offset stuff (like brass eject code and EV_RAILTRAIL) etc.
+: Fire both at the same time or switch be tween them?
 
 [todo] Add code so that Nunchuk can spin when attacking (and standing?), and when not spining have gravity
 	(like CTF flag)
@@ -115,6 +116,8 @@ BETTER(not done?): When moving the camera around the player, focus on the player
 
 [todo] Rewrite player Upper, Lower, and Both animations ( TMNTPLAYERSYS_2 )
 : Allow all animations to be anytype (Upper, lower, or both), when changing to a animations use "STAND" (instead of "TORSO_STAND") and check for BOTH_STAND if not found try TORSO_STAND AND LEGS_STAND.
+: OR add MD5 model support (MD5 use single model and skeleton, the animations can move any part of the model, and multiple animations can 'run' at the same time.)
+:      Downside to MD5, no head model to cheage to and fro and HUD head, etc?
 
 [todo] Finish misc_object, with animation, triggering, taking-damage, and dieing.
 : Maybe with spawning a item on death, respawning, and pushable options.
