@@ -446,29 +446,9 @@ models/flags/skull
 	}
 }
 
-//models/flags/r_flag
-//{
-//	cull disable
-//	deformVertexes wave 100 sin 0 3 0 .7
-//
-//	{
-//		map models/flags/r_flag.tga
-//	}
-//}
-
-//models/flags/b_flag
-//{
-//	cull disable
-//	deformVertexes wave 100 sin 0 3 0 .7
-//
-//	{
-//		map models/flags/b_flag.tga
-//	}
-//}
-
 models/flags/r_flag2
 {
-	deformVertexes wave 100 sin 4 3 0 0.3
+	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -502,7 +482,7 @@ models/flags/r_flag2
 
 models/flags/b_flag2
 {
-	deformVertexes wave 100 sin 4 3 0 0.3
+	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -537,7 +517,7 @@ models/flags/b_flag2
 // Below CTF flag shaders from MISSIONPACK demo pak0.pk3/scripts/models2.shader
 models/flags/n_flag2
 {
-	deformVertexes wave 100 sin 4 3 0 0.3
+	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -567,7 +547,7 @@ models/flags/n_flag2
 
 models/flag2/r_flag2
 {
-	deformVertexes wave 100 sin 4 3 0 0.3
+	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -601,7 +581,7 @@ models/flag2/r_flag2
 
 models/flag2/b_flag2
 {
-	deformVertexes wave 100 sin 4 3 0 0.3
+	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -634,7 +614,7 @@ models/flag2/b_flag2
 
 models/flag2/w_flag2
 {
-	deformVertexes wave 100 sin 4 3 0 0.3
+	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -665,6 +645,7 @@ models/flag2/w_flag2
 		rgbGen identity
 	}
 }
+
 //
 // Below are from missionpack's models2.shader
 //

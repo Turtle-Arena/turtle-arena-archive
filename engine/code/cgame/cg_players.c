@@ -920,7 +920,7 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 		}
 		else
 		{
-		// in teamplay, try loading with no teamname, for Q3 players.
+			// in teamplay, try loading with no teamname, for Q3 players.
 			teamname[0] = 0;
 		}
 		if (!CG_RegisterClientModelname( ci, ci->modelName, ci->skinName, ci->headModelName, ci->headSkinName, teamname ) )
@@ -2244,7 +2244,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #ifdef TMNTDATASYS // FLAG_MODEL
 			trailItem = qfalse;
 #endif
-	}
+		}
 	}
 	else if (ci->tagInfo & TI_TAG_FLAG)
 	{
