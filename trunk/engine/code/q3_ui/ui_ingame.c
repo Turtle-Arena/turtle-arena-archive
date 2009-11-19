@@ -452,17 +452,18 @@ void InGame_MenuInit( void ) {
 
 	Menu_AddItem( &s_ingame.menu, &s_ingame.frame );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.team );
-#ifdef TMNTMISC
-	Menu_AddItem( &s_ingame.menu, &s_ingame.setupplayer );
-#endif
-#ifdef TMNTMISC // INGAME_SERVER_MENU
-	Menu_AddItem( &s_ingame.menu, &s_ingame.inserver );
-#else
+#ifndef TMNTMISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.addbots );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.removebots );
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.teamorders );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setup );
+#ifdef TMNTMISC
+	Menu_AddItem( &s_ingame.menu, &s_ingame.setupplayer );
+#endif
+#ifdef TMNTMISC // INGAME_SERVER_MENU
+	Menu_AddItem( &s_ingame.menu, &s_ingame.inserver );
+#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.server );
 #ifndef TMNTMISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.restart );
