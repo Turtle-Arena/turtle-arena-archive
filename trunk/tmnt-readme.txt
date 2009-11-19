@@ -1,4 +1,4 @@
-TMNT Arena is a work-in-progress TMNT fangame based on the ioquake3 engine.
+TMNT Arena is a work-in-progress Ninja Turtle fangame based on the ioquake3 engine.
 
 == Version ==
 TMNT Arena Alpha (November 6th 2009)
@@ -7,7 +7,7 @@ TMNT Arena Alpha (November 6th 2009)
 * id software			(For making and releasing Quake III Arena's source code)
 * ioquake3 devoplers	(For improving, fixing, and cleaning up Quake 3's source code)
 * ioSTVEF				(For "noise" and "random" waveform keywords, and RF_FORCE_ENT_ALPHA render flag)
-* Open Arena			(For botfiles, images, and a 3D model with 0 triangles [it has 2 tags...])
+* Open Arena			(For botfiles, images, ...)
 * Xreal project			(For Homing rockets and shootable rockets)
 * Smokin' Guns			(For a minor animation time fix)
 * GNU FreeFonts			(For FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf)
@@ -17,7 +17,8 @@ TMNT Arena Alpha (November 6th 2009)
 Also see "Code" section for full list.
 
 == Installing ==
-Extract TMNT Arena into a directory, such as
+Extract TMNT Arena into a directory. It can be placed anywhere, but suggestions below
+
 Windows:  C:\Program Files\TMNTArena\
 Mac OS X: /Applications/TMNTArena/
 Linux:    /usr/local/games/tmntarena/
@@ -38,11 +39,10 @@ Linux: /home/$USERNAME/.tmntarena/
 See tmnt-compiling.txt
 
 == Code ==
-TMNT Arena uses code directly or based on code from the following.
+TMNT Arena uses code directly or based on the following.
 
 === GPL ===
 * ioquake3 (Base engine): http://ioquake3.org/
-** Jay "TT1" Weisskopf (ASPECT_RATIO): https://bugzilla.icculus.org/show_bug.cgi?id=3475
 
 * ioSTVEF (IOSTVEF): http://thilo.kickchat.com/efport-progress/
 ** (IOSTVEF_NOISE) Adds support for "noise" and "random" waveform keywords
@@ -62,11 +62,12 @@ TMNT Arena uses code directly or based on code from the following.
 ** Fixed animation timing based on PM_AnimLength from Smokin' Guns' bg_pmove.c
 
 * Mercenaries Guild Client 1.011 for Tremulous: http://projects.mercenariesguild.net/projects/mgclient
-** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some part, ...)
+** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some parts, ...)
 
 === Other ===
 : Code based on guides, etc.
-* rfactory, lots of stuff: http://www.rfactory.org/
+
+* rfactory: http://www.rfactory.org/
 ** The Dark Conjunction (via rfactory): http://tdc.planetquake.gamespy.com/news.htm
 * "inolan.com", basic breakable brush code: http://www.quake3hut.co.uk/q3coding/Breakable%20Glass.htm
 

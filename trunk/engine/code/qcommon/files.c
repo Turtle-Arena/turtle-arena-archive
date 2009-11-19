@@ -255,7 +255,7 @@ static	searchpath_t	*fs_searchpaths;
 static	int			fs_readCount;			// total bytes read
 static	int			fs_loadCount;			// total files read
 static	int			fs_loadStack;			// total files in memory
-static	int			fs_packFiles;			// total number of files in packs
+static	int			fs_packFiles = 0;		// total number of files in packs
 
 static int fs_checksumFeed;
 
@@ -287,7 +287,7 @@ static fileHandleData_t	fsh[MAX_FILE_HANDLES];
 static qboolean fs_reordered;
 
 // never load anything from pk3 files that are not present at the server when pure
-static int		fs_numServerPaks;
+static int		fs_numServerPaks = 0;
 static int		fs_serverPaks[MAX_SEARCH_PATHS];				// checksums
 static char		*fs_serverPakNames[MAX_SEARCH_PATHS];			// pk3 names
 
@@ -2829,6 +2829,8 @@ static void FS_Startup( const char *gameName )
 
 	Com_Printf( "----- FS_Startup -----\n" );
 
+	fs_packFiles = 0;
+
 	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
 	fs_basepath = Cvar_Get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT );
 	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
@@ -2859,7 +2861,7 @@ static void FS_Startup( const char *gameName )
 	}
 
 	// check for additional base game so mods can be based upon other mods
-	if ( fs_basegame->string[0] && !Q_stricmp( gameName, BASEGAME ) && Q_stricmp( fs_basegame->string, gameName ) ) {
+	if ( fs_basegame->string[0] && Q_stricmp( fs_basegame->string, gameName ) ) {
 		if (fs_basepath->string[0]) {
 			FS_AddGameDirectory(fs_basepath->string, fs_basegame->string);
 		}
@@ -2869,7 +2871,7 @@ static void FS_Startup( const char *gameName )
 	}
 
 	// check for additional game folder for mods
-	if ( fs_gamedirvar->string[0] && !Q_stricmp( gameName, BASEGAME ) && Q_stricmp( fs_gamedirvar->string, gameName ) ) {
+	if ( fs_gamedirvar->string[0] && Q_stricmp( fs_gamedirvar->string, gameName ) ) {
 		if (fs_basepath->string[0]) {
 			FS_AddGameDirectory(fs_basepath->string, fs_gamedirvar->string);
 		}
@@ -3538,11 +3540,20 @@ FS_ConditionalRestart
 restart if necessary
 =================
 */
-qboolean FS_ConditionalRestart( int checksumFeed ) {
-	if( fs_gamedirvar->modified || checksumFeed != fs_checksumFeed ) {
-		FS_Restart( checksumFeed );
+qboolean FS_ConditionalRestart(int checksumFeed)
+{
+	if(fs_gamedirvar->modified)
+	{
+		Com_GameRestart(checksumFeed, qfalse);
 		return qtrue;
 	}
+
+	else if(checksumFeed != fs_checksumFeed)
+	{
+		FS_Restart(checksumFeed);
+		return qtrue;
+	}
+	
 	return qfalse;
 }
 
