@@ -870,6 +870,14 @@ static void CG_Item( centity_t *cent ) {
 
 		CG_PositionRotatedEntityOnTag( &flap, &ent, cg_items[es->modelindex].models[0], "tag_flag" );
 
+#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // FLAG_ANIMATIONS
+		// lerp the flag animation frames
+		BG_RunLerpFrame( &cent->pe.flag, cgs.media.flag_animations, FLAG_STAND, cg.time, 1 );
+		flap.oldframe = cent->pe.flag.oldFrame;
+		flap.frame = cent->pe.flag.frame;
+		flap.backlerp = cent->pe.flag.backlerp;
+#endif
+
 		AxisCopy( ent.axis, flap.axis );
 		flap.nonNormalizedAxes = ent.nonNormalizedAxes;
 
