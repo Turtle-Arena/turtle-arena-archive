@@ -676,7 +676,7 @@ int CG_ParseVoiceChats( const char *filename, voiceChatList_t *voiceChatList, in
 	return qtrue;
 }
 
-#ifdef TMNTDATASYS // LOAD_VOICE_FILES
+#ifdef TMNTDATA // LOAD_VOICE_FILES
 int CG_HeadModelVoiceChats( char *filename );
 #endif
 
@@ -689,17 +689,15 @@ void CG_LoadVoiceChats( void ) {
 	int size;
 
 	size = trap_MemoryRemaining();
-#if defined TMNTDATASYS && defined IOQ3ZTM // LOAD_VOICE_FILES
+#if defined TMNTDATA && defined IOQ3ZTM // LOAD_VOICE_FILES
 #ifdef IOQ3ZTM // LOAD_VOICE_FILES
 	numVoiceChats = 0;
 #endif
 	// First loaded voice chat is default
 	CG_HeadModelVoiceChats("scripts/default.vc");
 
-#ifdef TMNT
 	// Turtle Man: TODO?: Pre-cache voice chats? ( currently have no voice chats )
 	//CG_HeadModelVoiceChats("scripts/raph.vc");
-#endif
 #else
 	CG_ParseVoiceChats( "scripts/female1.voice", &voiceChatLists[0], MAX_VOICECHATS );
 	CG_ParseVoiceChats( "scripts/female2.voice", &voiceChatLists[1], MAX_VOICECHATS );

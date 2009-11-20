@@ -2111,7 +2111,7 @@ static void CG_DustTrail( centity_t *cent ) {
 
 #endif
 
-#ifndef TMNTDATASYS // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 /*
 ===============
 CG_TrailItem
@@ -2179,13 +2179,13 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	vec3_t		angles, dir;
 	int			legsAnim, flagAnim, updateangles;
 	float		angle, d;
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	qboolean trailItem;
 #endif
 #ifdef IOQ3ZTM // FLAG
 	gitem_t *item;
 	int itemIndex;
-#ifndef TMNTDATASYS // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 	qhandle_t hSkin = 0;
 
 	if (flagPower == PW_REDFLAG)
@@ -2199,7 +2199,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	item = BG_FindItemForPowerup(flagPower);
 	itemIndex = ITEM_INDEX(item);
 #endif
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	trailItem = qtrue;
 #endif
 
@@ -2207,7 +2207,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #endif
 
-#ifndef TMNTDATASYS // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 #ifdef IOQ3ZTM // FLAG
 #ifdef TMNTWEAPSYS
 	if (!(ci->tagInfo & TI_TAG_HAND_SECONDARY)
@@ -2227,7 +2227,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 
 	// show the flag pole model
 	memset( &pole, 0, sizeof(pole) );
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	pole.hModel = cg_items[itemIndex].models[0]; // cgs.media.flagPoleModel;
 	pole.customSkin = cg_items[itemIndex].skin;
 #else
@@ -2241,7 +2241,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	{
 		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_hand_secondary" ))
 		{
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 			trailItem = qfalse;
 #endif
 		}
@@ -2250,7 +2250,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	{
 		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" ))
 		{
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 			trailItem = qfalse;
 #endif
 		}
@@ -2258,21 +2258,21 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #elif defined TMNTPLAYERS
 	if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_hand_secondary" ))
 	{
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 		trailItem = qfalse;
 #endif
 	}
 #elif defined IOQ3ZTM
 	if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" ))
 	{
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 		trailItem = qfalse;
 #endif
 	}
 #else
 	CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" );
 #endif
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	if (trailItem)
 	{
 		vec3_t			angles;
@@ -2305,7 +2305,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 
 	// show the flag model
 	memset( &flag, 0, sizeof(flag) );
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	flag.hModel = cg_items[itemIndex].models[1]; // cgs.media.flagFlapModel;
 	flag.customSkin = cg_items[itemIndex].skin;
 #else

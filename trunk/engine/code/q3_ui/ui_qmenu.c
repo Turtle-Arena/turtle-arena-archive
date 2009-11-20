@@ -1781,7 +1781,7 @@ void Menu_Cache( void )
 	} else {
 		uis.menuBackShader	= trap_R_RegisterShaderNoMip( "menuback" );
 	}
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 	uis.menuBackNoLogoShader = trap_R_RegisterShaderNoMip( "menubacknologo" );
 #endif
 

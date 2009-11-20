@@ -970,6 +970,9 @@ UI_Cache
 void UI_Cache_f( void ) {
 	MainMenu_Cache();
 	InGame_Cache();
+#ifdef TMNTMISC // INGAME_SERVER_MENU
+	InServer_Cache();
+#endif
 	ConfirmMenu_Cache();
 	PlayerModel_Cache();
 	PlayerSettings_Cache();
@@ -1252,7 +1255,7 @@ void UI_Refresh( int realtime )
 			trap_R_SetColor( NULL );
 #endif
 			// draw the background
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 			UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackShader );
 #else
 			if( uis.activemenu->showlogo ) {

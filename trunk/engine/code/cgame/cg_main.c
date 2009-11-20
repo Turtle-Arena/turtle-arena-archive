@@ -922,7 +922,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.hgrenb2aSound = trap_S_RegisterSound("sound/weapons/grenade/hgrenb2a.wav", qfalse);
 #endif
 
-#if defined MISSIONPACK && !defined TMNTDATASYS // Don't percache sounds we don't have.
+#if defined MISSIONPACK && !defined TMNTMISC // Don't percache sounds we don't have.
 	trap_S_RegisterSound("sound/player/james/death1.wav", qfalse );
 	trap_S_RegisterSound("sound/player/james/death2.wav", qfalse );
 	trap_S_RegisterSound("sound/player/james/death3.wav", qfalse );
@@ -1104,7 +1104,7 @@ static void CG_RegisterGraphics( void ) {
 #else
 	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
 #endif
-#ifndef TMNTDATASYS // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 		cgs.media.redFlagModel = trap_R_RegisterModel( "models/flags/r_flag.md3" );
 		cgs.media.blueFlagModel = trap_R_RegisterModel( "models/flags/b_flag.md3" );
 #endif
@@ -1114,31 +1114,21 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.blueFlagShader[0] = trap_R_RegisterShaderNoMip( "icons/iconf_blu1" );
 		cgs.media.blueFlagShader[1] = trap_R_RegisterShaderNoMip( "icons/iconf_blu2" );
 		cgs.media.blueFlagShader[2] = trap_R_RegisterShaderNoMip( "icons/iconf_blu3" );
-#ifdef TMNTDATASYS // TMNT supports MISSIONPACK CTF flags
-#if 0 // FLAG_MODEL, no longer used
-		cgs.media.flagPoleModel = trap_R_RegisterModel( "models/flag2/flagpole.md3" );
-		cgs.media.flagFlapModel = trap_R_RegisterModel( "models/flag2/flagflap3.md3" );
-
-		cgs.media.redFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/red.skin" );
-		cgs.media.blueFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/blue.skin" );
-#endif
-
+#ifdef TMNTDATA
 		cgs.media.redFlagBaseModel = trap_R_RegisterModel( "models/mapobjects/flagbase/red_base.md3" );
 		cgs.media.blueFlagBaseModel = trap_R_RegisterModel( "models/mapobjects/flagbase/blue_base.md3" );
-#endif // TMNTDATASYS
+#endif
 #ifdef MISSIONPACK
-#ifndef TMNTDATASYS // TMNT supports MISSIONPACK CTF flags // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 		cgs.media.flagPoleModel = trap_R_RegisterModel( "models/flag2/flagpole.md3" );
 		cgs.media.flagFlapModel = trap_R_RegisterModel( "models/flag2/flagflap3.md3" );
 
 		cgs.media.redFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/red.skin" );
 		cgs.media.blueFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/blue.skin" );
-#endif
-#ifndef TMNTDATASYS // FLAG_MODEL
 		cgs.media.neutralFlagFlapSkin = trap_R_RegisterSkin( "models/flag2/white.skin" );
 #endif
 
-#ifndef TMNTDATASYS // TMNT supports MISSIONPACK CTF flags
+#ifndef TMNTDATA
 		cgs.media.redFlagBaseModel = trap_R_RegisterModel( "models/mapobjects/flagbase/red_base.md3" );
 		cgs.media.blueFlagBaseModel = trap_R_RegisterModel( "models/mapobjects/flagbase/blue_base.md3" );
 #endif
@@ -1176,7 +1166,7 @@ static void CG_RegisterGraphics( void ) {
 
 #ifdef MISSIONPACK
 	if ( cgs.gametype == GT_1FCTF || cg_buildScript.integer ) {
-#ifndef TMNTDATASYS // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 		cgs.media.neutralFlagModel = trap_R_RegisterModel( "models/flags/n_flag.md3" );
 #endif
 		cgs.media.flagShader[0] = trap_R_RegisterShaderNoMip( "icons/iconf_neutral1" );
@@ -1216,8 +1206,8 @@ static void CG_RegisterGraphics( void ) {
 #endif
 
 	if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
-#ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
-		// Elite Force uses this.
+#ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS // TMNT_SUPPORTEF
+		// Sprites used by Elite Force
 		cgs.media.blueFriendShader = trap_R_RegisterShader( "sprites/team_blue" );
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/team_red" );
 #if !defined TMNT || defined TMNT_SUPPORTQ3 // Fall back to Q3 friend shader
@@ -1269,7 +1259,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.smoke2 = trap_R_RegisterModel( "models/weapons2/shells/s_shell.md3" );
 #endif
 
-#ifdef TMNTDATASYS // shaders
+#ifdef TMNTDATA // shaders
 	cgs.media.balloonShader = trap_R_RegisterShader( "sprites/talkBalloon" );
 #else
 	cgs.media.balloonShader = trap_R_RegisterShader( "sprites/balloon3" );
@@ -1480,7 +1470,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.flagShaders[2] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_missing.tga");
 #endif
 
-#ifndef TMNTDATASYS // Don't percache models we don't have.
+#ifndef TMNTMISC // Don't percache models we don't have.
 	trap_R_RegisterModel( "models/players/james/lower.md3" );
 	trap_R_RegisterModel( "models/players/james/upper.md3" );
 	trap_R_RegisterModel( "models/players/heads/james/james.md3" );

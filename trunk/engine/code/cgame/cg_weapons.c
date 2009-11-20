@@ -793,7 +793,7 @@ void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi )
 #endif
 
 	beam.reType = RT_LIGHTNING;
-#ifdef TMNTDATASYS
+#ifdef TMNTWEAPSYS
 #ifdef TMNTWEAPSYS_2
 	if (bg_projectileinfo[wi-cg_projectiles].trailType == PT_LIGHTNING)
 	{
@@ -802,7 +802,7 @@ void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi )
 	else
 #endif
 	{
-	beam.customShader = cgs.media.grappleCableShader;
+		beam.customShader = cgs.media.grappleCableShader;
 	}
 #else
 	beam.customShader = cgs.media.lightningShader;
@@ -1012,10 +1012,10 @@ void CG_RegisterProjectile( int projectileNum )
 			break;
 		case PT_GRAPPLE:
 			projectileInfo->missileTrailFunc = CG_GrappleTrail;
-#ifdef TMNTDATASYS
 			cgs.media.grappleCableShader = trap_R_RegisterShader( "GrappleCable");
-#else
-			cgs.media.lightningShader = trap_R_RegisterShader( "lightningBoltNew");
+#if !defined TMNT || defined TMNT_SUPPORTQ3
+			if (!cgs.media.grappleCableShader)
+				cgs.media.grappleCableShader = trap_R_RegisterShader( "lightningBoltNew");
 #endif
 			break;
 		case PT_NAIL:
@@ -1383,25 +1383,27 @@ void CG_RegisterWeapon( int weaponNum )
 		break;
 
 	case WP_GRAPPLING_HOOK:
-#ifdef TMNTDATASYS
+#ifdef TMNTWEAPSYS
 		// Load grapple trail shader.
 		cgs.media.grappleCableShader = trap_R_RegisterShader( "GrappleCable");
+		if (!cgs.media.grappleCableShader)
+			cgs.media.grappleCableShader = trap_R_RegisterShader( "lightningBoltNew");
 #endif
 		MAKERGB( weaponInfo->flashDlightColor, 0.6f, 0.6f, 1.0f );
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/weapons2/grapple/claw.md3" );
 #else
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/ammo/rocket/rocket.md3" );
 #endif
 		weaponInfo->missileTrailFunc = CG_GrappleTrail;
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 		weaponInfo->missileDlight = 200;
 #endif
 #ifndef IOQ3ZTM // unused
 		weaponInfo->wiTrailTime = 2000;
 		weaponInfo->trailRadius = 64;
 #endif
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 		MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 #endif
 		weaponInfo->readySound = trap_S_RegisterSound( "sound/weapons/melee/fsthum.wav", qfalse );
@@ -1593,7 +1595,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	}
 #endif
 
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	if ( item->giType == IT_TEAM )
 	{
 		if ( item->world_model[1] ) {

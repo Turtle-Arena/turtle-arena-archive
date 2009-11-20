@@ -250,16 +250,16 @@ static void UI_SPLevelMenu_SetMenuArena( int n, int level, const char *arenaInfo
 	Q_strncpyz( map, Info_ValueForKey( arenaInfo, "map" ), sizeof(map) );
 
 	Q_strncpyz( levelMenuInfo.levelNames[n], map, sizeof(levelMenuInfo.levelNames[n]) );
-//#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
+#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK // Turtle Man: Disabled to be constant.
 	Q_strupr( levelMenuInfo.levelNames[n] );
-//#endif
+#endif
 
 	UI_GetBestScore( level, &levelMenuInfo.levelScores[n], &levelMenuInfo.levelScoresSkill[n] );
 	if( levelMenuInfo.levelScores[n] > 8 ) {
 		levelMenuInfo.levelScores[n] = 8;
 	}
 
-#ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
+#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 	strcpy( levelMenuInfo.levelPicNames[n], va( "levelshots/%s_small", map ) );
 #else
 	strcpy( levelMenuInfo.levelPicNames[n], va( "levelshots/%s.tga", map ) );
@@ -691,7 +691,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 
 		if ( n == selectedArena ) {
 			if( Menu_ItemAtCursor( &levelMenuInfo.menu ) == &levelMenuInfo.item_maps[n] ) {
-#ifdef TMNTDATASYS // MENU
+#ifdef TMNTDATA // MENU
 				UI_DrawHandlePic( x-31, y-30, 256, 256-27, levelMenuInfo.levelFocusPic);
 #endif
 				trap_R_SetColor( color );

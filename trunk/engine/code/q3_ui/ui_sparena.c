@@ -77,7 +77,7 @@ void UI_SPArena_Start( const char *arenaInfo ) {
 #define ID_LEFT				14
 
 #define ARROWS_WIDTH		128
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 #define ARROWS_HEIGHT		64
 #else
 #define ARROWS_HEIGHT		48

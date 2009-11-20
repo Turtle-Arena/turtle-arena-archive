@@ -368,7 +368,7 @@ static void AutospriteDeform( void ) {
 	vec3_t	left, up;
 	vec3_t	leftDir, upDir;
 
-#ifdef IOQ3ZTM // Turtle Man: slash n
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Add '\n'
 	if ( tess.numVertexes & 3 ) {
 		ri.Printf( PRINT_WARNING, "Autosprite shader %s had odd vertex count\n", tess.shader->name );
 	}

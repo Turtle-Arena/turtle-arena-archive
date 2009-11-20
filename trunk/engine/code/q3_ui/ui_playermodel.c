@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODEL_FRAMEL		"menu/art/frame1_l"
 #define MODEL_FRAMER		"menu/art/frame1_r"
 #define MODEL_PORTS			"menu/art/player_models_ports"
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 #define MODEL_ARROWS		"menu/art/arrows_horz_0"
 #define MODEL_ARROWSL		"menu/art/arrows_horz_left"
 #define MODEL_ARROWSR		"menu/art/arrows_horz_right"
@@ -630,7 +630,7 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.pics[k].width  		   = 64;
 			s_playermodel.pics[k].height  		   = 64;
 			s_playermodel.pics[k].focuspic         = MODEL_SELECTED;
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 			s_playermodel.pics[k].focuscolor       = colorRed;
 #endif
 
@@ -647,7 +647,7 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.picbuttons[k].width  		     = 128;
 			s_playermodel.picbuttons[k].height  		 = 128;
 			s_playermodel.picbuttons[k].focuspic  		 = MODEL_SELECT;
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 			s_playermodel.picbuttons[k].focuscolor  	 = colorRed;
 #endif
 
@@ -693,7 +693,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.arrows.generic.flags		= QMF_INACTIVE;
 	s_playermodel.arrows.generic.x			= 125;
 	s_playermodel.arrows.generic.y			= 340;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	s_playermodel.arrows.width				= MODEL_ARROWS_WIDTH;
 	s_playermodel.arrows.height				= MODEL_ARROWS_HEIGHT;
 #else
@@ -707,7 +707,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.left.generic.id			= ID_PREVPAGE;
 	s_playermodel.left.generic.x			= 125;
 	s_playermodel.left.generic.y			= 340;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	s_playermodel.left.width  				= MODEL_ARROWS_WIDTH/2;
 	s_playermodel.left.height  				= MODEL_ARROWS_HEIGHT;
 #else
@@ -720,13 +720,13 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_playermodel.right.generic.callback	= PlayerModel_MenuEvent;
 	s_playermodel.right.generic.id			= ID_NEXTPAGE;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	s_playermodel.right.generic.x			= 125+MODEL_ARROWS_WIDTH/2;
 #else
 	s_playermodel.right.generic.x			= 125+61;
 #endif
 	s_playermodel.right.generic.y			= 340;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	s_playermodel.right.width  				= MODEL_ARROWS_WIDTH/2;
 	s_playermodel.right.height  			= MODEL_ARROWS_HEIGHT;
 #else

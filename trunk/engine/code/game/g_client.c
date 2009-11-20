@@ -528,7 +528,7 @@ void BodySink( gentity_t *ent ) {
 		return;	
 	}
 	ent->nextthink = level.time + 100;
-#ifdef TMNTDATA
+#ifdef TMNT // POWERS
 	ent->s.powerups |= (1 << PW_FLASHING);
 
 	// Set Alpha value
@@ -634,7 +634,7 @@ void CopyToBodyQue( gentity_t *ent ) {
 	body->r.contents = CONTENTS_CORPSE;
 	body->r.ownerNum = ent->s.number;
 
-#ifdef TMNTDATA
+#ifdef TMNT // POWERS
 	body->nextthink = level.time + 200;
 #else
 	body->nextthink = level.time + 5000;

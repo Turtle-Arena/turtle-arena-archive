@@ -48,7 +48,7 @@ START SERVER MENU *****
 #define GAMESERVER_FIGHT1		"menu/art/fight_1"
 #endif
 #define GAMESERVER_UNKNOWNMAP	"menu/art/unknownmap"
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 #define GAMESERVER_ARROWS		"menu/art/arrows_horz_0"
 #define GAMESERVER_ARROWSL		"menu/art/arrows_horz_left"
 #define GAMESERVER_ARROWSR		"menu/art/arrows_horz_right"
@@ -282,7 +282,7 @@ static void StartServer_Update( void ) {
 		Q_strupr( mapname );
 #endif
 
-#ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
+#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s_small", mapname );
 #else
  		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s", mapname );
@@ -323,7 +323,7 @@ static void StartServer_Update( void ) {
 		if ( i >=0 && i < MAX_MAPSPERPAGE ) 
 		{
 			s_startserver.mappics[i].generic.flags    |= QMF_HIGHLIGHT;
-#ifndef TMNTDATASYS // MENU
+#ifndef TMNTDATA // MENU
 			s_startserver.mapbuttons[i].generic.flags &= ~QMF_PULSEIFFOCUS;
 #endif
 		}
@@ -581,7 +581,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.arrows.generic.flags = QMF_INACTIVE;
 	s_startserver.arrows.generic.x	   = 260;
 	s_startserver.arrows.generic.y	   = 400;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	s_startserver.arrows.width  	   = GAMESERVER_ARROWS_WIDTH;
 	s_startserver.arrows.height  	   = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -595,7 +595,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.prevpage.generic.id	    = ID_PREVPAGE;
 	s_startserver.prevpage.generic.x		= 260;
 	s_startserver.prevpage.generic.y		= 400;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	s_startserver.prevpage.width  		    = GAMESERVER_ARROWS_WIDTH/2;
 	s_startserver.prevpage.height  		    = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -608,13 +608,13 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.nextpage.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_startserver.nextpage.generic.callback = StartServer_MenuEvent;
 	s_startserver.nextpage.generic.id	    = ID_NEXTPAGE;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	s_startserver.nextpage.generic.x		= 260+GAMESERVER_ARROWS_WIDTH/2;
 #else
 	s_startserver.nextpage.generic.x		= 321;
 #endif
 	s_startserver.nextpage.generic.y		= 400;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	s_startserver.nextpage.width  		    = GAMESERVER_ARROWS_WIDTH/2;
 	s_startserver.nextpage.height  		    = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -719,7 +719,7 @@ void StartServer_Cache( void )
 			Q_strupr( mapname );
 #endif
 
-#ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
+#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 			Com_sprintf( picname, sizeof(picname), "levelshots/%s_small", mapname );
 #else
 			Com_sprintf( picname, sizeof(picname), "levelshots/%s", mapname );
@@ -1466,7 +1466,7 @@ static void ServerOptions_SetMenuItems( void ) {
 	info = UI_GetArenaInfoByNumber( s_startserver.maplist[ s_startserver.currentmap ]);
 	Q_strncpyz( mapname, Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
 	Q_strupr( mapname );
-#ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
+#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 	Com_sprintf( picname, 64, "levelshots/%s_small", mapname );
 #else
 	Com_sprintf( picname, 64, "levelshots/%s", mapname );
@@ -1871,7 +1871,7 @@ BOT SELECT MENU *****
 #define BOTSELECT_ACCEPT1		"menu/art/accept_1"
 #define BOTSELECT_SELECT		"menu/art/opponents_select"
 #define BOTSELECT_SELECTED		"menu/art/opponents_selected"
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 #define BOTSELECT_ARROWS		"menu/art/arrows_horz_0"
 #define BOTSELECT_ARROWSL		"menu/art/arrows_horz_left"
 #define BOTSELECT_ARROWSR		"menu/art/arrows_horz_right"
@@ -2248,7 +2248,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 			botSelectInfo.pics[k].width						= 64;
 			botSelectInfo.pics[k].height					= 64;
 			botSelectInfo.pics[k].focuspic					= BOTSELECT_SELECTED;
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 			botSelectInfo.pics[k].focuscolor				= colorRed;
 #endif
 
@@ -2265,7 +2265,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 			botSelectInfo.picbuttons[k].width				= 128;
 			botSelectInfo.picbuttons[k].height				= 128;
 			botSelectInfo.picbuttons[k].focuspic			= BOTSELECT_SELECT;
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 			botSelectInfo.picbuttons[k].focuscolor			= colorRed;
 #endif
 
@@ -2286,7 +2286,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.arrows.generic.name		= BOTSELECT_ARROWS;
 	botSelectInfo.arrows.generic.flags		= QMF_INACTIVE;
 	botSelectInfo.arrows.generic.x			= 260;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	botSelectInfo.arrows.generic.y			= 400;
 	botSelectInfo.arrows.width				= BOTSELECT_ARROWS_WIDTH;
 	botSelectInfo.arrows.height				= BOTSELECT_ARROWS_HEIGHT;
@@ -2300,7 +2300,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.left.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	botSelectInfo.left.generic.callback		= UI_BotSelectMenu_LeftEvent;
 	botSelectInfo.left.generic.x			= 260;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	botSelectInfo.left.generic.y			= 400;
 	botSelectInfo.left.width  				= BOTSELECT_ARROWS_WIDTH/2;
 	botSelectInfo.left.height  				= BOTSELECT_ARROWS_HEIGHT;
@@ -2314,7 +2314,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.right.generic.type	    = MTYPE_BITMAP;
 	botSelectInfo.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	botSelectInfo.right.generic.callback	= UI_BotSelectMenu_RightEvent;
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA
 	botSelectInfo.right.generic.x			= 260+BOTSELECT_ARROWS_WIDTH/2;
 	botSelectInfo.right.generic.y			= 400;
 	botSelectInfo.right.width  				= BOTSELECT_ARROWS_WIDTH/2;
