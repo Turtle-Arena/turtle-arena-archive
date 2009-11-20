@@ -932,7 +932,7 @@ typedef struct {
 	qhandle_t	redCubeIcon;
 	qhandle_t	blueCubeIcon;
 #endif
-#ifndef TMNTDATASYS // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 	qhandle_t	redFlagModel;
 	qhandle_t	blueFlagModel;
 	qhandle_t	neutralFlagModel;
@@ -941,7 +941,7 @@ typedef struct {
 	qhandle_t	blueFlagShader[3];
 	qhandle_t	flagShader[4];
 
-#ifndef TMNTDATASYS // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 	qhandle_t	flagPoleModel;
 	qhandle_t	flagFlapModel;
 
@@ -957,7 +957,7 @@ typedef struct {
 	qhandle_t	neutralFlagBaseModel;
 
 #ifdef IOQ3ZTM // FLAG_ANIMATIONS
-	// Flag animations when flag is held by player.
+	// CTF Flag Animations
 	animation_t flag_animations[MAX_FLAG_ANIMATIONS];
 #endif
 
@@ -1007,7 +1007,7 @@ typedef struct {
 	qhandle_t	railCoreShader;
 
 	qhandle_t	lightningShader;
-#ifdef TMNTDATASYS
+#ifdef TMNTWEAPSYS
 	qhandle_t	grappleCableShader;
 #endif
 #ifdef TMNTWEAPSYS_2

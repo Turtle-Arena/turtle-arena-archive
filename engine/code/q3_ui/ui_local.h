@@ -182,7 +182,7 @@ typedef struct _tag_menuframework
 
 	qboolean	wrapAround;
 	qboolean	fullscreen;
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 	qboolean	showlogo;
 #endif
 #ifdef IOQ3ZTM
@@ -603,7 +603,7 @@ typedef struct {
 	qboolean			debug;
 	qhandle_t			whiteShader;
 	qhandle_t			menuBackShader;
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 	qhandle_t			menuBackNoLogoShader;
 #endif
 	qhandle_t			charset;

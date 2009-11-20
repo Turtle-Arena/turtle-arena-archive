@@ -375,7 +375,7 @@ Used for both the status bar and the scoreboard
 ================
 */
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D ) {
-#ifdef TMNTDATASYS
+#ifdef TMNTDATA // FLAG_MODEL
 	gitem_t *item;
 	int itemIndex;
 

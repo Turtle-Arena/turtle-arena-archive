@@ -414,7 +414,7 @@ qboolean S_AL_BufferInit( void )
 	numSfx = 0;
 
 	// Load the default sound, and lock it
-#ifdef TMNTDATASYS // OPENARENA
+#ifdef TMNTDATA // OPENARENA
 	default_sfx = S_AL_BufferFind("sound/misc/silence.wav");
 #else
 	default_sfx = S_AL_BufferFind("sound/feedback/hit.wav");

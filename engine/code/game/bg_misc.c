@@ -1119,7 +1119,7 @@ Only in CTF games
 	{
 		"team_CTF_redflag",
 		NULL,
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
         { "models/flag2/flagpole.md3",
 		"models/flag2/flagflap3.md3", NULL, NULL },
 #else
@@ -1131,7 +1131,7 @@ Only in CTF games
 		0,
 		IT_TEAM,
 		PW_REDFLAG,
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 		"models/flag2/red.skin",
 #else
 /* precache */ "",
@@ -1145,7 +1145,7 @@ Only in CTF games
 	{
 		"team_CTF_blueflag",
 		NULL,
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
         { "models/flag2/flagpole.md3",
 		"models/flag2/flagflap3.md3", NULL, NULL },
 #else
@@ -1157,7 +1157,7 @@ Only in CTF games
 		0,
 		IT_TEAM,
 		PW_BLUEFLAG,
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 		"models/flag2/blue.skin",
 #else
 /* precache */ "",
@@ -1369,7 +1369,7 @@ Only in One Flag CTF games
 	{
 		"team_CTF_neutralflag",
 		NULL,
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
         { "models/flag2/flagpole.md3",
 		"models/flag2/flagflap3.md3", NULL, NULL },
 #else
@@ -1381,7 +1381,7 @@ Only in One Flag CTF games
 		0,
 		IT_TEAM,
 		PW_NEUTRALFLAG,
-#ifdef TMNTDATASYS // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 		"models/flag2/white.skin",
 #else
 /* precache */ "",

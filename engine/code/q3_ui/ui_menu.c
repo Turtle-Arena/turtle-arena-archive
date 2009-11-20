@@ -361,7 +361,7 @@ void UI_MainMenu( void ) {
 		s_errorMessage.menu.key = ErrorMessage_Key;
 		s_errorMessage.menu.fullscreen = qtrue;
 		s_errorMessage.menu.wrapAround = qtrue;
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 		s_errorMessage.menu.showlogo = qtrue;		
 #endif
 #ifdef IOQ3ZTM
@@ -395,7 +395,7 @@ void UI_MainMenu( void ) {
 	s_main.menu.draw = Main_MenuDraw;
 	s_main.menu.fullscreen = qtrue;
 	s_main.menu.wrapAround = qtrue;
-#ifndef TMNTDATASYS
+#ifndef TMNTDATA
 	s_main.menu.showlogo = qtrue;
 #endif
 #ifdef IOQ3ZTM

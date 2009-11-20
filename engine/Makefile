@@ -159,7 +159,7 @@ else # END QUAKE3
 	###################################################################
 
 	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
-	# -DANALOG		 # TODO: Finish analog input.
+	# -DANALOG		 # TODO: Finish analog control.
 	# -DARRAYMAX     # TODO: This ''was'' going to remove the bit max problem with Q3 network (ie more then 16 weapons).
 	# -DTMNTWEAPSYS is (or was...) the core changes to the weapon system
 	# -DTMNTWEAPSYS2 changes from holding multiple weapons to only one default and one pickup.
@@ -180,9 +180,9 @@ else # END QUAKE3
 	BUILD_DEFINES = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DNOTRATEDM -DNOBLOOD -DTHIRD_PERSON -DRAVENMD4 \
 					-DTMNT -DTMNTMISC -DTMNTSP -DTMNTHOLDSYS -DTMNTHOLDABLE \
-						-DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS -DTMNTPLAYERSYS -DTMNTPLAYERS\
+						-DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS -DTMNTPLAYERSYS -DTMNTPLAYERS \
 						-DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTPATHSYS -DTMNTNPCSYS \
-						-DTMNTDATASYS -DTMNTDATA -DTMNTWEAPSYS_2 -DTMNTWEAPSYS_2_NOCOMPAT -DOA_BLOOM \
+						-DTMNTDATA -DTMNTWEAPSYS_2 -DTMNTWEAPSYS_2_NOCOMPAT -DOA_BLOOM \
 						 -DNIGHTSMODE
 
 	# Currently TMNT Arena doesn't use camera scripts.

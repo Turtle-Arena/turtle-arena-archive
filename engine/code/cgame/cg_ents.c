@@ -772,11 +772,15 @@ static void CG_Item( centity_t *cent ) {
 
 	// items without glow textures need to keep a minimum light value
 	// so they are always visible
-#ifdef TMNT // TMNTDATASYS // NOARMOR
+#ifdef TMNTDATA
 	ent.renderfx |= RF_MINLIGHT;
 #else
-	if ( ( item->giType == IT_WEAPON ) ||
-		 ( item->giType == IT_ARMOR ) ) {
+	if ( ( item->giType == IT_WEAPON )
+#ifndef TMNT // NOARMOR
+		 || ( item->giType == IT_ARMOR )
+#endif
+		 )
+	{
 		ent.renderfx |= RF_MINLIGHT;
 	}
 #endif
@@ -854,7 +858,8 @@ static void CG_Item( centity_t *cent ) {
 	}
 #endif
 
-#ifdef TMNTDATASYS // FLAG_MODEL // Add flag flap
+#ifdef TMNTDATA // FLAG_MODEL
+	// Add flag flap
 	if (item->giType == IT_TEAM && cg_items[es->modelindex].models[1])
 	{
 		refEntity_t flap;

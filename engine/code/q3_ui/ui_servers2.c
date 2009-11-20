@@ -446,7 +446,7 @@ static void ArenaServers_UpdatePicture( void ) {
 	}
 	else {
 		servernodeptr = g_arenaservers.table[g_arenaservers.list.curvalue].servernode;
-#ifdef TMNTDATASYS // TEAMARENA_LEVELSHOTS
+#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 		Com_sprintf( picname, sizeof(picname), "levelshots/%s_small", servernodeptr->mapname );
 #else
 		Com_sprintf( picname, sizeof(picname), "levelshots/%s.tga", servernodeptr->mapname );
