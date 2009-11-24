@@ -6,17 +6,14 @@ Bugs that have found that have not been fixed yet, and things that should to be 
 * Use GNU FreeFonts (the GPL v2 or later ones)
 ** [todo] Replace OpenArena's menu/art/font1_prop.tga with GNU FreeSans
 ** [todo] Replace OpenArena's gfx/2d/bigchars with GNU FreeSans
-* [bug] "non-free" model/skin, base/models/mapobjects/gfz_flower/fwr2.md3 (converted from md2) and frw2.png
-** Used as animation test model in the map "test"
-** From the Sonic Robo Blast 2 MD2 model pack, used with out permission. (And I can't find the forum post)
 
 == engine (server/client/game/cgame/ui, in more then one or I don't know where) ==
 
-[todo] Review the chages in Meld, checking for errors and undoing unneeded changes to syntax.
+[todo] Review the changes from ioquake3, checking for errors and undoing unneeded changes to syntax.
 
 // Weapons! (and attacking)
 [todo] Allow using two guns at once and fix weapon hand offset stuff (like brass eject code and EV_RAILTRAIL) etc.
-: Fire both at the same time or switch be tween them?
+: Fire both at the same time or switch between them?
 
 [todo] Add code so that Nunchuk can spin when attacking (and standing?), and when not spining have gravity
 	(like CTF flag)
@@ -27,6 +24,7 @@ STARTED: [todo] Change TMNTWEAPONS stuff that is system to TMNTWEAPSYS[|2|_2]
 :  Could use more cleaning?
 
 [todo] Merge TMNTWEAPSYS_2 into TMNTWEAPSYS (Then I can remove the code that TMNTWEAPSYS_2 disables, etc)
+: Remake all of the Q3/Team Arena weapons using the script code first?
 
 STARTED ( TMNTWEAPSYS_2 ): [todo] Weapons Info System redesign.
 : Reduce weapontype_t enum to be (WT_NONE, WT_GAUNTLET (cross of gun and melee), WT_GUN, WT_MELEE). Have "weaponinfo" (weapontype, mod, (blade)damage, (blade)trail, sounds, bit-flags, "blades" (points of damage/trail), wallmark, wallhit sounds) and "weapongroup" (pointers to "weaponinfo"s, player animations, animations when holding CTF flag, combo/chain limits, ???). "weapon_t" enum would index "weapon groups".
@@ -89,7 +87,7 @@ WONTDO?: [todo] Allow setting the names of the bots favorite weapons? Casey like
 
 [todo] Savegames for single player
 
-[todo] cg_shadows 2 doesn't work if config is changed from default config?
+[bug] cg_shadows 2 doesn't work if config is changed from default config?
 : Which cvar is the problem?
 
 [todo] Pull grapple back to player before removing entity, like LoZ: TP?
@@ -137,8 +135,6 @@ DONE(untested)?: Melee combo system, with different animations for each attack? 
 [todo] Test/use the "noise" and "random" waveforms that I copied from IOSTVEF
 
 === Don't do? (Dead Ideas?) ===
-[todo] Rename qkey? (To key, guid_key, or guidkey?)
-
 [todo] Feet tags, for attack checking? And/or for attaching hoverboard to player?
 
 [todo] Get code/ogg and code/vobis from XReal? (Ogg vorbis works but should the code for it be in our source? Lke jpeg/speex/etc)
@@ -149,17 +145,13 @@ DONE(untested)?: Melee combo system, with different animations for each attack? 
 :   OR Just use misc_object as they use vertex lighting.
 :        Misc_model is a way to insert a *static* model, so lightmap like the level.
 
-[todo] Third person crosshair (like JK2/JKA) for shurikens/guns,
-	do trace and draw sprite (must scale so it doesn't get really small)?
-: Plus do I want there to always be a crosshair?
-: Plus I added autoaim to sort of remove the need for a crosshair,
-:     it *should* shoot the player/Overload-base in front of you. (It still needs work though.)
-
 WONTFIX?: [bug] Raph's legs go through his shell when crouching and looking at the floor.
-INVALID?: [bug] Bots [skill 5?] know where you are when they shouldn't be able to see you?
 
 WONTFIX?: [bug/todo] First Person weapon doesn't draw correctly (It draws too near to the screen)
 			This happens due to changing the field of view to 70 (Q3 uses 90)
+
+[todo] Have Announcer use "voice chats" so that the text is printed as well as playing a sound.
+[todo] Allow multiple Announcers? Have a cg_announcer cvar { "none", "male", "female", etc } to control voice chat file.
 
 === cgame ===
 [todo] Have the HUD have a left side and a right side, so they can be drawn aspect-correct for 16:9 displays
@@ -168,11 +160,12 @@ WONTFIX?: [bug/todo] First Person weapon doesn't draw correctly (It draws too ne
 
 [todo] Have dropped ET_ITEMs (weapons, holdables, powerups, etc) blink/flash before disaparing
 : Using newly added RF_FORCE_ENT_ALPHA!
+: Does cgame have any idea of when items are going to be removed?
 
 
 == BSPC ==
 // BSPC is the BSP map to .aas (Arena Awareness System) compiler. The aas file is used by bots.
-[todo] Fix compiling. After ioq3 updated zlib, compiling fails.
+[bug] Fix compiling. After ioq3 updated zlib, compiling fails.
 [todo] Fix "make clean". It doesn't remove the .o files, only the bspc binary
 
 
@@ -186,8 +179,6 @@ DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
 			just players, maps, and textures, (etc?))
 
 [todo] Add announcer sound files (That sound like the Gyoji of the Battle Nexus?)
-[todo] Have Announcer use "voice chats" so that the text is printed as well as playing a sound.
-[todo] Allow multiple Announcers? Have a cg_announcer cvar { "none", "male", "female", etc } to control voice chat file.
 
 [todo] Have weapon models for all weapons;
 * Missing Katana (Daisho), Wakizashi (Daisho), Daisho pickup, Bamboo, and Nunchuk
@@ -219,6 +210,8 @@ DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
 : Stuff I'd like to do to the MD3 part of MM3D...
 
 [todo] Replace hardcode loopframe list with ' "MD3_LOOPFRAMES" "00010101010" ' (use real list...) in the metadata
+: Or have the "Loop" in the animation view set the loop for the animation,
+:  currently "Loop" isn't per animation how ever.
 
 [todo] Metadata to set type of loop frames (Quake3 or Elite Force) or have "2" in MD3_LOOPFRAMES be Elite style?
 
@@ -229,7 +222,7 @@ DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
 [todo] Make sure the MD3_PATH? is set when exporting a player, because I have to open and save the model
 	(with no change) to fix lighting?
 
-[todo] Finish writing (and porting my work from old verion to svn head) MDR plugin for Misfit Model 3D
+[todo] Finish writing (and porting my work from old verion to svn head) MDR plugin for Misfit Model 3D.
 
 
 
@@ -257,59 +250,4 @@ DONE: Have shurikens do damage while they are in the wall/ground?
 
 DONE: Have player fade out when dead instead of BodySink
 : Does it look good?
-
-=== Done ===
-DONE: Learn how to enable coronas (light flares). (r_flares cvar, base/gfx/misc/flare.jpg, and q3map2 -meta -flares)
-
-DONE: Add modelRed and modelBlue to allow different models (for q3/ta prox).
-: If model* isn't found fallback to model (So only model/modelBlue would be needed for q3/ta prox)
-
-FIXED: Misc_Object mins/maxs don't get set in SP_misc_object I get the correct values in bg_misc.c from the cfg file,
-		but can't for the life of me get the values into game
-		(They are compiled together, right? SO THEN WHY DOESN'T IT WORK! *screams*)
-	: Ug... there was no filename, so it couldn't open the config file...
-
-FIXED: playerState_t only sends 16bits of eflags, while entity sends 19 (snap/local player bug).
-: I didn't understand bug till seeing; http://wop-gamecode.svn.sourceforge.net/viewvc/wop-gamecode?view=rev&revision=53
-: Fixed by sending 32 bits for playerState and entity. (Caused me bugs two times)
-
-DONE: Default cg_teamchat LERP_FRAME_CLIENT_LESSto on (And don't show team chat in normal hud lines)
-
-DONE: Have "Fire Shurikens" stick in wall and explosion, instead of rocket clone or grenade-like. ?
-: I liked the grenade...
-
-DONE(Used IOSTVEF): RF_FORCE_ENT_ALPHA (Force Entity Alpha) used by iostvef. (Similar RF_FORCEENTALPHA in World of Padman).
-: IOSTVEF: http://thilo.kickchat.com/efport-progress/
-: WoP: http://wop-engine.svn.sourceforge.net/viewvc/wop-engine?view=rev&revision=12
-
-FIXED: Player can do melee damage while dead.
-FIXED: Grappling hook always comes from player 0.
-
-DONE: Disable crouch while flying and swimming.
-DONE: Change Raph to not say curses!.
-DONE: Can Raph says "Well it sure took you long enough." alot... say something else as well.
-DONE: Have "cg_thirdPerson" be a cheat? (So players can't use first person?)
-DONE: Add power ring models for defense, speed, strength.
-DONE: Change death messages "sank like a rock" should just be "drown"
-DONE: Add a model for when using HI_MEDKIT.
-
-DONE: Have models for all items
-
-* FIXED: New Hunk_Alloc failed message when using my game VM (not when using .so as memory isn't Hunk_Alloc isn't called?)
-** Make the hunk be bigger? (but what is causing it to be to big?)
-: http://openmohaa.svn.sourceforge.net/viewvc/openmohaa?view=rev&revision=39
-: The cause of being to big was I allowed for WAY to many loadable sounds(MAX_ENTITIES * MAX_ANIMATIONS*4 * 10/* rnd sounds */)
-:   for misc_object/npcs ...and the loading code isn't finished so none of the sound stuff was even used.
-: I didn't see it as it works fine as a .so file...
-
-DONE: Change multiplayer menu; Don't automaticly go to server list, list Join (Search), Join (Specify), and Player
-
-DONE: Clean up IOQ3ZTM // LERP_FRAME_CLIENT_LESS remove the "dead" code,
-		code in ifndef IOQ3ZTM // LERP_FRAME_CLIENT_LESS and ifdef IOQ3ZTM <> else <dead code> endif
-
-DONE: Load weapon items from "scripts/weaponinfo.txt" instead of from "botfiles/items.c"
-
-=== EDITOR CONFIG ===
-DONE: Add a note about team_red/blueobelisk are red/blue CTF flag base models as well.
-
 

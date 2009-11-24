@@ -399,42 +399,34 @@
 }
 // entity 43
 {
-"classname" "misc_object"
-"origin" "-656.000000 432.000000 -32.000000"
-"model" "models/mapobjects/gfz_flower/fwr2.md3"
-"spawnflags" "5"
-"health" "10"
-}
-// entity 44
-{
 "classname" "info_player_intermission"
 "origin" "928.000000 -552.000000 192.000000"
 "angle" "134.052200"
 "target" "target_intermission"
 }
-// entity 45
+// entity 44
 {
 "classname" "target_position"
 "origin" "816.000000 -464.000000 184.000000"
 "targetname" "target_intermission"
 }
-// entity 46
+// entity 45
 {
 "classname" "misc_object"
 "origin" "-400.000000 560.000000 -192.000000"
-"model" "models/mapobjects/gfz_flower/fwr2.md3"
+"model" "models/animobjects/flower_pinwheel/flower_pinwheel.md3"
 }
-// entity 47
+// entity 46
 {
 "classname" "path_corner"
 "origin" "-760.000000 -240.000000 0.000000"
 }
-// entity 48
+// entity 47
 {
 "classname" "weapon_bamboo"
 "origin" "200.000000 -16.000000 -176.000000"
 }
-// entity 49
+// entity 48
 {
 "classname" "info_player_deathmatch"
 "origin" "-35.555557 411.600006 -179.199997"
