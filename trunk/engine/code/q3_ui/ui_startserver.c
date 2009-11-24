@@ -424,6 +424,16 @@ static void StartServer_MenuEvent( void* ptr, int event ) {
 
 	case ID_STARTSERVERNEXT:
 		trap_Cvar_SetValue( "g_gameType", gametype_remap[s_startserver.gametype.curvalue] );
+#ifdef TMNTMISC
+		// If ingame, don't go to server options
+		if (trap_Cvar_VariableValue("sv_running"))
+		{
+			// the wait commands will allow the dedicated to take effect
+			const char *info = UI_GetArenaInfoByNumber( s_startserver.maplist[ s_startserver.currentmap ]);
+			trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", Info_ValueForKey( info, "map" )));
+		}
+		else
+#endif
 		UI_ServerOptionsMenu( s_startserver.multiplayer );
 		break;
 
@@ -504,6 +514,9 @@ static void StartServer_MenuInit( void ) {
 	int	x;
 	int	y;
 	static char mapnamebuffer[64];
+#ifdef TMNTMISC
+	int inGame = trap_Cvar_VariableValue("sv_running");
+#endif
 
 	// zero set all our globals
 	memset( &s_startserver, 0 ,sizeof(startserver_t) );
@@ -511,11 +524,19 @@ static void StartServer_MenuInit( void ) {
 	StartServer_Cache();
 
 	s_startserver.menu.wrapAround = qtrue;
+#ifdef TMNTMISC
+	if (!inGame)
+#endif
 	s_startserver.menu.fullscreen = qtrue;
 
 	s_startserver.banner.generic.type  = MTYPE_BTEXT;
 	s_startserver.banner.generic.x	   = 320;
 	s_startserver.banner.generic.y	   = 16;
+#ifdef TMNTMISC
+	if (inGame)
+		s_startserver.banner.string    = "CHANGE MAP";
+	else
+#endif
 	s_startserver.banner.string        = "GAME SERVER";
 	s_startserver.banner.color         = color_white;
 	s_startserver.banner.style         = UI_CENTER;
@@ -544,6 +565,10 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.gametype.generic.x		= 320 - 24;
 	s_startserver.gametype.generic.y		= 368;
 	s_startserver.gametype.itemnames		= gametype_items;
+#ifdef TMNTMISC
+	if (inGame)
+		s_startserver.gametype.curvalue		= trap_Cvar_VariableValue("g_gameType");
+#endif
 
 	for (i=0; i<MAX_MAPSPERPAGE; i++)
 	{

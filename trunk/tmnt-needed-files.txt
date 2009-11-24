@@ -1,6 +1,6 @@
 Needed files. List is incomplete.
 
-See ../base/sound/sounds.txt for list of needed sounds.
+See base/sound/sounds.txt for list of needed sounds.
 
 General:
 
@@ -89,7 +89,7 @@ DONE: icons/iconf_neutral3
 == MISSIONPACK CTF flags ==
 
 DONE: models/flag2/flagpole.md3
-UNANIMATED: models/flag2/flagflap3.md3
+Animations Need Work: models/flag2/flagflap3.md3
 
 DONE: models/flag2/red.skin
 DONE: models/flag2/blue.skin
