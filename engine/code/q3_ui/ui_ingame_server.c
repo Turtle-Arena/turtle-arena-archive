@@ -39,7 +39,7 @@ Server only controls
 #define INGAME_FRAME					"menu/art/cut_frame"
 #define INGAME_MENU_VERTICAL_SPACING	28
 
-#define ID_MAP					10
+#define ID_CHANGEMAP					10
 #define ID_ADDBOTS				11
 #define ID_REMOVEBOTS			12
 #define ID_RESTART				13
@@ -91,8 +91,8 @@ void InServer_Event( void *ptr, int notification ) {
 	}
 
 	switch( ((menucommon_s*)ptr)->id ) {
-	case ID_MAP:
-		// Turtle Man: TODO: Open 'change map/gametype' menu
+	case ID_CHANGEMAP:
+		UI_StartServerMenu( trap_Cvar_VariableValue("ui_singlePlayerActive") == 0 );
 		break;
 
 	case ID_RESTART:
@@ -147,9 +147,9 @@ void InServer_MenuInit( void ) {
 	s_inserver.map.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_inserver.map.generic.x			= 320;
 	s_inserver.map.generic.y			= y;
-	s_inserver.map.generic.id			= ID_MAP;
+	s_inserver.map.generic.id			= ID_CHANGEMAP;
 	s_inserver.map.generic.callback		= InServer_Event;
-	s_inserver.map.string				= "MAP (TODO)";
+	s_inserver.map.string				= "CHANGE MAP";
 	s_inserver.map.color				= color_red;
 	s_inserver.map.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) ) {

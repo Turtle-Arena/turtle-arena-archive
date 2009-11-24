@@ -1,6 +1,8 @@
 TMNT Arena's new WIP menu idea, for when I make the menu using Team Arena menu scripting.
 		...or if stick with quake3's ui.
 
+TODO: Finished doing this to the q3 ui so I can remove this file.
+
 :MAIN
 PLAY
 MULTIPLAYER - or NETWORK GAME?

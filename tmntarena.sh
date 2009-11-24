@@ -1,5 +1,7 @@
 # TMNT Arena Linux Launcher
 # Automaticly selects 32/64 bit version of TMNT Arena.
+#
+# Based on xreal ( http://www.xreal-project.net ) script
 
 # Select binary
 case `uname -m` in
