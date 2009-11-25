@@ -22,11 +22,32 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // TODO: Remake Quake III: Team Arena weapon info
 
-// wallmarkName (Quake3 uses the following, but any shader can be used)
-// 	cgs.media.bulletMarkShader = trap_R_RegisterShader( "gfx/damage/bullet_mrk" );
-//	cgs.media.burnMarkShader = trap_R_RegisterShader( "gfx/damage/burn_med_mrk" );
-//	cgs.media.holeMarkShader = trap_R_RegisterShader( "gfx/damage/hole_lg_mrk" );
-//	cgs.media.energyMarkShader = trap_R_RegisterShader( "gfx/damage/plasma_mrk" );
+// Turtle Man: FIXME: Use correct hit sounds for all weapons, see CG_MissileHitWall!
+// For Each BG Projectile Info
+//   hit1Sound
+//   hit2Sound
+//   hit3Sound
+//   hitPlayerSound (hitFleshSound)
+//   hitMetalSound
+//
+// Example: *Sfx are cached indexes for the sounds.
+//
+//		if( soundType == IMPACTSOUND_FLESH && hitPlayerSfx) {
+//			sfx = hitPlayerSfx;
+//		} else if( soundType == IMPACTSOUND_METAL && hitMetalSfx) {
+//			sfx = hitMetalSfx;
+//		} else {
+//			r = rand() & 3;
+//			if ( r < 2 ) {
+//				sfx = hit1Sfx;
+//			} else if ( r == 2 ) {
+//				sfx = hit2Sfx;
+//			} else {
+//				sfx = hit3Sfx;
+//			}
+//		}
+//
+// hitBounce for Grenade and Laser Shuriken would be nice too.
 
 //
 // Gauntlet (Done; but need to check blade)
@@ -47,7 +68,7 @@ weapon "w_gauntlet"
 	flashSound0 "sound/weapons/melee/fstatck.wav"
 	barrelSpin BS_PITCH
 
-	// Blade location has been tested.
+	// Blade location hasn't been tested.
 	blade 0
 	{
 		damage 50
@@ -59,7 +80,8 @@ weapon "w_gauntlet"
 
 weapongroup "wp_gauntlet"
 {
-	//itemName "weapon_gauntlet" // Don't want this in weapon_random entity...
+	randomSpawn 0 // Don't want this in weapon_random entity...
+	itemName "weapon_gauntlet"
 	pickupName "Gauntlet"
 	pickupModel "models/weapons2/gauntlet/gauntlet.md3"
 	iconName "icons/iconw_gauntlet"
@@ -451,13 +473,50 @@ weapongroup "wp_grappling_hook"
 	weapon_primary "w_grappling_hook"
 }
 
+
 //
 // Team Arena Weapons
 //
 
 //
-// Nailgun (Can be remade)
+// Nailgun (Done)
 //
+
+projectile "p_nail"
+{
+	model "models/weaphits/nail.md3"
+	damage 20
+	speed 555
+	spdRndAdd 1800
+	timetolive 10000
+	trailType "PT_NAIL"
+	wallmarkName "gfx/damage/hole_lg_mrk"
+	wallmarkRadius 12
+	spread 500
+	numProjectiles 15
+}
+
+weapon "w_nailgun"
+{
+	weapontype WT_GUN
+	model "models/weapons/nailgun/nailgun.md3"
+	mod MOD_NAIL
+	attackDelay 1000
+	ejectSmoke 1
+	flashColor 1 0.75 0
+	flashSound0 "sound/weapons/nailgun/wnalfire.wav"
+	projectile "p_nail"
+}
+
+weapongroup "wp_nailgun"
+{
+	itemName "weapon_nailgun"
+	pickupName "Nailgun"
+	pickupModel "models/weapons/nailgun/nailgun.md3"
+	iconName "icons/iconw_nailgun"
+	pickupAmmo 10
+	weapon_primary "w_nailgun"
+}
 
 //
 // Prox Mine Launcher (Can't be remade yet.)
@@ -466,19 +525,81 @@ weapongroup "wp_grappling_hook"
 //               WONTFIX?: Stick mines to players (I don't like the idea of it...).
 //
 
-projectile "p_prox"
+projectile "p_prox_mine"
 {
 	model "models/weaphits/proxmine.md3"
 	modelBlue "models/weaphits/proxmineb.md3"
+	damage 0
+	splashDamage 100
+	splashRadius 150
+	speed 700
+	timetolive 3000
+	trailType "PT_GRENADE"
+	deathType "PD_GRENADE"
+	useGravity 1
 	stickOnImpact 3
 }
 
+weapon "w_prox_launcher"
+{
+	weapontype WT_GUN
+	model "models/weapons/proxmine/proxmine.md3"
+	mod MOD_PROXIMITY_MINE
+	attackDelay 800
+	flashColor 1 0.7 0
+	flashSound0 "sound/weapons/proxmine/wstbfire.wav"
+	projectile "p_prox_mine"
+}
+
+// done
+weapongroup "wp_prox_launcher"
+{
+	itemName "weapon_prox_launcher"
+	pickupName "Prox Launcher"
+	pickupModel "models/weapons/proxmine/proxmine.md3"
+	iconName "icons/iconw_proxlauncher"
+	pickupAmmo 5
+	weapon_primary "w_prox_launcher"
+}
+
 //
-// Chaingun (Can be remade)
+// Chaingun (Done)
 //
+
+projectile "p_chaingun"
+{
+	instantDamage 1
+	damage 7
+	trailType "PT_BULLET"
+	deathType "PD_BULLET"
+	wallmarkName "gfx/damage/bullet_mrk"
+	wallmarkRadius 8
+	spread 600
+}
 
 weapon "w_chaingun"
 {
+	weapontype WT_GUN
+	model "models/weapons/vulcan/vulcan.md3"
+	mod MOD_CHAINGUN
+	attackDelay 30
+	ejectBrass 1
+	flashColor 1 1 0
+	flashSound0 "sound/weapons/vulcan/vulcanf1b.wav"
+	flashSound1 "sound/weapons/vulcan/vulcanf2b.wav"
+	flashSound2 "sound/weapons/vulcan/vulcanf3b.wav"
+	flashSound3 "sound/weapons/vulcan/vulcanf4b.wav"
 	firingStoppedSound "sound/weapons/vulcan/wvulwind.wav"
+	projectile "p_chaingun"
+}
+
+weapongroup "wp_chaingun"
+{
+	itemName "weapon_chaingun"
+	pickupName "Chaingun"
+	pickupModel "models/weapons/vulcan/vulcan.md3"
+	iconName "icons/iconw_chaingun"
+	pickupAmmo 80
+	weapon_primary "w_chaingun"
 }
 
