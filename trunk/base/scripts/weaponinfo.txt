@@ -66,7 +66,8 @@ weapon "w_fist"
 
 weapongroup "wp_fists"
 {
-	itemName "weapon_fists" // Don't want this in weapon_random entity...
+	randomSpawn 0 // Don't want this in weapon_random entity...
+	itemName "weapon_fists"
 	pickupName "Fists"
 	pickupModel "models/weapons2/fists/fists.md3"
 	iconName "icons/iconw_fists"
@@ -191,6 +192,7 @@ weapon "w_katana"
 
 weapongroup "wp_daisho"
 {
+	randomSpawn 0 // FIXME: Missing models
 	itemName "weapon_daisho"
 	pickupName "Daisho"
 	pickupModel "models/weapons2/daisho/daisho_pickup.md3"
@@ -352,6 +354,7 @@ weapon "w_nunchuk"
 weapongroup "wp_nunchuks"
 {
 	clone "wt_nunchuks"
+	randomSpawn 0 // FIXME: Missing models
 	itemName "weapon_nunchuks"
 	pickupName "Nunchuks"
 	pickupModel "models/weapons2/nunchuk/nunchuks_pickup.md3"
@@ -705,6 +708,7 @@ weapon "w_bamboo"
 weapongroup "wp_bamboo"
 {
 	clone "wt_bo"
+	randomSpawn 0 // FIXME: Missing models
 	itemName "weapon_bamboo"
 	pickupName "Bamboo"
 	pickupModel "models/weapons2/bamboo/bamboo.md3"
