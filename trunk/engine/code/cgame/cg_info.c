@@ -200,7 +200,11 @@ void CG_DrawInformation( void ) {
 	sysInfo = CG_ConfigString( CS_SYSTEMINFO );
 
 	s = Info_ValueForKey( info, "mapname" );
+#ifdef IOQ3ZTM
+	levelshot = trap_R_RegisterShaderNoMip( va( "levelshots/%s", s ) );
+#else
 	levelshot = trap_R_RegisterShaderNoMip( va( "levelshots/%s.tga", s ) );
+#endif
 	if ( !levelshot ) {
 		levelshot = trap_R_RegisterShaderNoMip( "menu/art/unknownmap" );
 	}
@@ -281,7 +285,7 @@ void CG_DrawInformation( void ) {
 		break;
 	case GT_SINGLE_PLAYER:
 #ifdef TMNTSP
-		if (!cg_singlePlayerActive.integer)
+		if (cg_singlePlayerActive.integer != 1)
 			s = "Cooperative";
 		else
 #endif

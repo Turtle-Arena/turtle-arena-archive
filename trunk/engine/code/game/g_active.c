@@ -1606,8 +1606,8 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
 #ifdef TMNTSP // Turtle Man: Single player death think
 		// wait for the attack button to be pressed
-			if (g_gametype.integer == GT_SINGLE_PLAYER)
-			{
+		if (g_gametype.integer == GT_SINGLE_PLAYER)
+		{
 			if ( client->respawnTime > 0 && level.time > client->respawnTime )
 			{
 				// Auto respawn in 3 seconds, or if client pressed attack, use, or jump.
@@ -1654,12 +1654,12 @@ void ClientThink_real( gentity_t *ent ) {
 					}
 					else
 					{
-					respawn( ent );
-				}
+						respawn( ent );
+					}
 				}
 			}
-				return;
-			}
+			return;
+		}
 #endif
 		// wait for the attack button to be pressed
 		if ( level.time > client->respawnTime ) {
