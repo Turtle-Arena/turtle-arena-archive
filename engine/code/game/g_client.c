@@ -1781,9 +1781,7 @@ void ClientSpawn(gentity_t *ent) {
 	//
 	// Load persistant data
 	//
-	// Turtle Man: TODO: Load after all clients have spawned?
-	//
-	G_LoadPersistant(index); // get data
+	G_LoadPersistant(client->ps.clientNum);
 #endif
 
 	// run a client frame to drop exactly to the floor,

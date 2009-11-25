@@ -106,7 +106,9 @@ WONTDO?: [todo] Allow setting the names of the bots favorite weapons? Casey like
 
 [todo] Have shurikens do damage while they are in the wall/ground?
 
-[todo] Add bubble spawner entity.
+[todo] Add misc_bubbles entity.
+
+[todo] Add misc_dripper entity.
 
 // The below are somewhat long...
 

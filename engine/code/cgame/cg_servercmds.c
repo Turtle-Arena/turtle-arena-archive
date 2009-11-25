@@ -515,9 +515,10 @@ static void CG_MapRestart( void ) {
 	// play the "fight" sound if this is a restart without warmup
 	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */
 #ifdef TMNTSP // Not in single player
-    && !cg_singlePlayerActive.integer
+		&& cg_singlePlayerActive.integer != 1
 #endif
-	) {
+		)
+	{
 		trap_S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
 		CG_CenterPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
 	}
@@ -1197,7 +1198,12 @@ static void CG_ServerCommand( void ) {
 	}
 
 	// loaddeferred can be both a servercmd and a consolecmd
-	if ( !strcmp( cmd, "loaddefered" ) ) {	// FIXME: spelled wrong, but not changing for demo
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Why hasn't this been corrected?
+	if ( !strcmp( cmd, "loaddeferred" ) )
+#else
+	if ( !strcmp( cmd, "loaddefered" ) ) 	// FIXME: spelled wrong, but not changing for demo
+#endif
+	{
 		CG_LoadDeferredPlayers();
 		return;
 	}

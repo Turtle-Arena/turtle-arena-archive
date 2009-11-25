@@ -3160,7 +3160,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	// draw status bar and other floating elements
  	CG_Draw2D(stereoView);
 
-#ifdef TMNTSP
+#ifdef TMNTMISC
 	// Draw black bars if needed.
 	CG_DrawLetterbox();
 #endif
@@ -3296,3 +3296,4 @@ void CG_DrawLetterbox(void)
 	CG_FillRectFit(0, 480-pixels, 640, pixels, color);
 }
 #endif
+
