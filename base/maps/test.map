@@ -412,23 +412,35 @@
 }
 // entity 45
 {
-"classname" "misc_object"
-"origin" "-400.000000 560.000000 -192.000000"
-"model" "models/animobjects/flower_pinwheel/flower_pinwheel.md3"
-}
-// entity 46
-{
 "classname" "path_corner"
 "origin" "-760.000000 -240.000000 0.000000"
 }
-// entity 47
+// entity 46
 {
 "classname" "weapon_bamboo"
 "origin" "200.000000 -16.000000 -176.000000"
 }
-// entity 48
+// entity 47
 {
 "classname" "info_player_deathmatch"
 "origin" "-35.555557 411.600006 -179.199997"
 "angle" "-90"
+}
+// entity 48
+{
+"classname" "misc_object"
+"origin" "-400.000000 560.000000 -192.000000"
+"model" "models/animobjects/flower_pinwheel/flower_pinwheel.md3"
+}
+// entity 49
+{
+"classname" "misc_model"
+"origin" "-400.000000 496.000000 -206.250000"
+"model" "models/mapobjects/fern1/fern1.md3"
+}
+// entity 50
+{
+"classname" "misc_model"
+"origin" "-280.000000 608.000000 -206.250000"
+"model" "models/mapobjects/fern1/fern1.md3"
 }
