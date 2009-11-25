@@ -1203,6 +1203,11 @@ void G_SpawnItem (gentity_t *ent, gitem_t *item) {
 }
 
 #ifdef TMNTWEAPSYS_2
+/*
+============
+G_RandomWeaponItem
+============
+*/
 gitem_t *G_RandomWeaponItem( gentity_t *ent ) {
 	int validWeapons[MAX_BG_WEAPON_GROUPS];
 	int numweapons;
@@ -1213,6 +1218,9 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent ) {
 	for (i = 1; i < BG_NumWeaponGroups(); i++)
 	{
 		if (!bg_weapongroupinfo[i].item.classname || !bg_weapongroupinfo[i].item.classname[0]) {
+			continue;
+		}
+		if (!bg_weapongroupinfo[i].randomSpawn) {
 			continue;
 		}
 		if (!(ent->spawnflags & 2)) // Don't spawn melee weapons

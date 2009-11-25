@@ -1724,9 +1724,9 @@ int BG_NumProjectiles(void)
 	else
 	{
 		// BG_GetFreeProjectileNum
-	int i;
-	for (i = 0; i < MAX_BG_PROJ; i++)
-	{
+		int i;
+		for (i = 0; i < MAX_BG_PROJ; i++)
+		{
 			if ( bg_projectileinfo[i].name[0] != '\0' )
 				continue;
 			break;
@@ -1746,9 +1746,9 @@ int BG_NumWeapons(void)
 	else
 	{
 		// BG_GetFreeWeaponNum
-	int i;
-	for (i = 0; i < MAX_BG_WEAPONS; i++)
-	{
+		int i;
+		for (i = 0; i < MAX_BG_WEAPONS; i++)
+		{
 			if ( bg_weaponinfo[i].name[0] != '\0' )
 				continue;
 			break;
@@ -1767,9 +1767,9 @@ int BG_NumWeaponGroups(void)
 	else
 	{
 		// BG_GetFreeWeaponGroupNum
-	int i;
-	for (i = 0; i < MAX_BG_WEAPON_GROUPS; i++)
-	{
+		int i;
+		for (i = 0; i < MAX_BG_WEAPON_GROUPS; i++)
+		{
 			if ( bg_weapongroupinfo[i].name[0] != '\0' )
 				continue;
 			break;
@@ -1851,7 +1851,7 @@ static qboolean Projectile_Parse(char **p) {
 
 	if (token[0] != '{') {
 	return qfalse;
-}
+	}
 
 	while ( 1 ) {
 		token = COM_ParseExt(p, qtrue);
@@ -1859,19 +1859,19 @@ static qboolean Projectile_Parse(char **p) {
 		if (Q_stricmp(token, "}") == 0) {
 			int num = BG_ProjectileIndexForName(projectile.name);
 			if (!num)
-	{
+			{
 				// Use free slot
 				num = BG_NumProjectiles();
 			}
 
 			Com_Memcpy(&bg_projectileinfo[num], &projectile, sizeof (projectile));
 			//Com_Printf("Loaded projectile [%s]\n", projectile.name);
-		return qtrue;
-	}
+			return qtrue;
+		}
 
 		if ( !token || token[0] == 0 ) {
-	return qfalse;
-}
+			return qfalse;
+		}
 
 		if ( !Q_stricmp( token, "clone" ) ) {
 			char name[MAX_QPATH]; // Save name
@@ -2793,6 +2793,9 @@ static void BG_SetupWeaponGroup(bg_weapongroupinfo_t *weaponGroup, const char *n
 	// Set name
 	Com_sprintf(weaponGroup->name, sizeof (weaponGroup->name), "%s", name);
 
+	// Set randomSpawn
+	weaponGroup->randomSpawn = qtrue;
+
 	// Set default sound names
 	Com_sprintf(weaponGroup->pickupSound, sizeof (weaponGroup->pickupSound), "sound/misc/w_pkup.wav");
 
@@ -2892,6 +2895,13 @@ static qboolean WeaponGroup_Parse(char **p) {
 				memcpy(&weaponGroup, &bg_weapongroupinfo[num], sizeof (weaponGroup));
 				Q_strncpyz(weaponGroup.name, name, MAX_QPATH); // use backed up name
 			}
+			continue;
+		} else if ( !Q_stricmp( token, "randomSpawn" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			weaponGroup.randomSpawn = atoi( token );
 			continue;
 		} else if ( !Q_stricmp( token, "itemName" ) ) {
 			token = COM_Parse( p );
@@ -3147,6 +3157,7 @@ void BG_DumpWeaponInfo(void)
 			break;
 		FS_Printf2("weapongroup \"%s\"\r\n", weaponGroup->name);
 		FS_Printf1("{\r\n");
+		FS_Printf2("\trandomSpawn %d\r\n", weaponGroup->randomSpawn);
 		FS_Printf2("\titemName \"%s\"\r\n", weaponGroup->itemName);
 		FS_Printf2("\tpickupSound \"%s\"\r\n", weaponGroup->pickupSound);
 		FS_Printf2("\tpickupModel \"%s\"\r\n", weaponGroup->pickupModel);

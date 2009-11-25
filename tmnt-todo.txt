@@ -6,8 +6,6 @@ Bugs that have found that have not been fixed yet, and things that should to be 
 * Use GNU FreeFonts (the GPL v2 or later ones)
 ** [todo] Replace OpenArena's menu/art/font1_prop.tga with GNU FreeSans
 ** [todo] Replace OpenArena's gfx/2d/bigchars with GNU FreeSans
-* [todo] Add option for weapon groups to not spawn in weapon_random items.
-** There are unfinished weapons that shouldn't be used yet.
 
 == engine (server/client/game/cgame/ui, in more then one or I don't know where) ==
 

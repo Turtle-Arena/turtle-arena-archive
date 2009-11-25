@@ -870,6 +870,8 @@ typedef struct
 {
 	char name[MAX_QPATH]; // Example; "wp_none"
 
+	qboolean randomSpawn; // If qtrue (default) spawn in weapon_random
+
 	// Item info
 	gitem_t item;
 	char itemName[MAX_QPATH]; // Example; "weapon_sais"
