@@ -104,6 +104,10 @@ WONTDO?: [todo] Allow setting the names of the bots favorite weapons? Casey like
 : Using newly added RF_FORCE_ENT_ALPHA!
 : Does cgame have any idea of when items are going to be removed?
 
+[todo] Have shurikens do damage while they are in the wall/ground?
+
+[todo] Add bubble spawner entity.
+
 // The below are somewhat long...
 
 [todo] Update camera system. Q3 third person camera is great and all for a first person game, but not a third person one...
@@ -179,9 +183,6 @@ DONE-ish?: Use freetype for TTF rendering, instead of q3font.exe's output files 
 :   But most in game text does not support TTF.
 
 WORKING(NotDone?): Have bots use shurikens. (They are used *to much* now.)
-
-DONE: Have shurikens do damage while they are in the wall/ground?
-: Does it work??
 
 DONE: Have player fade out when dead instead of BodySink
 : Does it look good?

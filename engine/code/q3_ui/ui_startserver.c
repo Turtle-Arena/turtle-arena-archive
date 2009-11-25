@@ -928,6 +928,14 @@ static void ServerOptions_Start( void ) {
 		maxclients++;
 	}
 
+#ifdef TMNTSP
+	// Don't allow clients to join in non-multiplayer.
+	if (!s_serveroptions.multiplayer)
+		trap_Cvar_SetValue( "ui_singlePlayerActive", 2 );
+	else
+		trap_Cvar_SetValue( "ui_singlePlayerActive", 0 );
+#endif
+
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
@@ -950,11 +958,7 @@ static void ServerOptions_Start( void ) {
 
 #ifdef TMNTSP
 	case GT_SINGLE_PLAYER:
-		// Is this needed here?
-		if (s_serveroptions.multiplayer)
-			trap_Cvar_SetValue( "ui_singlePlayerActive", 0 );
-		else
-			trap_Cvar_SetValue( "ui_singlePlayerActive", 2 );
+		// Co-op settings
 		break;
 #endif
 
