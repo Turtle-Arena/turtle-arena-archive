@@ -3029,6 +3029,8 @@ qboolean BG_ParseWeaponInfoFile( const char *filename ) {
 	return qtrue;
 }
 
+#if 0
+// Turtle Man: Weapon info debuging tool
 void BG_DumpWeaponInfo(void)
 {
 	int i, j;
@@ -3201,6 +3203,7 @@ void BG_DumpWeaponInfo(void)
 
 	trap_FS_FCloseFile(f);
 }
+#endif
 
 /*
 =========
@@ -3295,8 +3298,10 @@ void BG_InitWeaponInfo(void)
 		bg_numweapongroups++;
 	}
 
+#if 0
 	// So I can see if it is loading correctly.
-	//BG_DumpWeaponInfo();
+	BG_DumpWeaponInfo();
+#endif
 }
 
 
