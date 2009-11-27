@@ -191,3 +191,16 @@ textures/base_floor/grass2
 		blendFunc GL_DST_COLOR GL_ZERO
 	}
 }
+textures/base_floor/grass2-old
+{
+	surfaceparm grass
+	{
+		map textures/base_floor/grass2-old
+		rgbGen identity
+	}
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+	}
+}

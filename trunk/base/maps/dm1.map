@@ -984,3 +984,75 @@ base_wall/pipe
 "classname" "item_health_mega"
 "origin" "544.000000 -160.000000 176.000000"
 }
+// entity 29
+{
+"classname" "misc_model"
+"origin" "-73.000015 393.125000 8.125000"
+"model" "models/mapobjects/fern1/fern1.md3"
+"modelscale" "1.5"
+"angles" "0.000010 38.620270 0.000010"
+}
+// entity 30
+{
+"classname" "misc_model"
+"origin" "70.693062 -276.119629 8.125001"
+"model" "models/mapobjects/fern1/fern1.md3"
+"angle" "-22.916456"
+}
+// entity 31
+{
+"classname" "misc_model"
+"origin" "832.000000 447.999939 8.125000"
+"model" "models/mapobjects/fern1/fern1.md3"
+"angle" "-27.189169"
+}
+// entity 32
+{
+"classname" "misc_model"
+"origin" "-363.912750 -654.793396 8.125001"
+"model" "models/mapobjects/fern1/fern1.md3"
+"angle" "31.330765"
+"modelscale" "0.700000"
+}
+// entity 33
+{
+"classname" "misc_model"
+"origin" "444.877075 -557.351868 8.125001"
+"model" "models/mapobjects/fern1/fern1.md3"
+"angle" "8.172738"
+}
+// entity 34
+{
+"classname" "misc_model"
+"origin" "-160.000000 448.000000 8.125000"
+"model" "models/mapobjects/fern1/fern1.md3"
+"angle" "-10.266548"
+}
+// entity 35
+{
+"classname" "misc_object"
+"origin" "-328.000000 -680.000000 24.000000"
+"model" "models/animobjects/flower_pinwheel/flower_pinwheel.md3"
+"angle" "76.796303"
+}
+// entity 36
+{
+"classname" "misc_object"
+"origin" "-264.000000 448.000000 24.000000"
+"model" "models/animobjects/flower_pinwheel/flower_pinwheel.md3"
+"angle" "-63.539120"
+}
+// entity 37
+{
+"classname" "misc_object"
+"origin" "-328.000000 -56.000000 24.000000"
+"model" "models/animobjects/flower_pinwheel/flower_pinwheel.md3"
+"angle" "42.863926"
+}
+// entity 38
+{
+"classname" "misc_model"
+"origin" "-403.912750 -54.793388 8.125001"
+"model" "models/mapobjects/fern1/fern1.md3"
+"angle" "31.330765"
+}
