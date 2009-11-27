@@ -1,0 +1,54 @@
+#summary How to run the game from the SVN
+#labels Featured,Phase-Deploy
+
+= Introduction =
+
+*Runing the game* is broken in to three parts.
+
+* Getting the source
+* Compiling the source
+* Final setup and execution
+
+= Getting the source =
+
+You will need to do a Source Checkout, see http://code.google.com/p/turtlearena/source/checkout
+
+= Compiling the source =
+
+For the time being, see http://code.google.com/p/turtlearena/source/browse/trunk/tmnt-compiling.txt
+
+= Final setup and execution =
+
+== Windows (Mingw) ==
+1. Copy the qvms files from engine/build/release-*/base/vm/ to base/vm/
+
+2. In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TMNTArena\svn\"
+
+3. Run in the command prompt: engine\build\release-mingw32-x86\tmntarena.x86 +set fs_basepath "."
+
+== Windows (Other) ==
+Other being Code::Blocks or Microsoft Visual C++.
+
+1. Copy the qvms files from
+
+ * engine/build/iforget/*.qvm
+ * engine/build/iforget/*.qvm
+ * engine/build/iforget/*.qvm
+
+to base/vm/
+
+2. In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TMNTArena\svn\"
+
+3. Run in the command prompt: engine\build\release-mingw32-x86\tmntarena.x86 +set fs_basepath "."
+
+== Linux ==
+1. Create a link to each of the 3 qvm files in engine/build/release-*/base/vm/*.qvm in base/vm/
+This way you don't have to copy the qvms after each compile.
+
+OR Copy the qvms files instead, to allow running in Windows as well.
+
+2. In the terminal change to the directory where you did the checkout. Example: cd /home/$USER/TMNTArena/svn/
+
+3. Run the game from *this* directory by passing the base directory on the command line
+
+Example: From *this* directory run; ./engine/build/release-linux-x86/tmntarena.x86 +set fs_basepath "."
