@@ -94,3 +94,16 @@ textures/skies/nightsky01
 	skyparms textures/skies/env/nightsky01 - -
 }
 
+textures/skies/daysky01
+{
+	qer_editorimage textures/skies/daysky01.png
+	surfaceparm noimpact
+	surfaceparm nolightmap
+	surfaceparm sky
+	q3map_lightimage textures/common/invisible.tga
+	q3map_sun	1 1 1 100 180 90
+	q3map_surfacelight 400
+
+	skyparms textures/skies/env/daysky01 - -
+}
+
