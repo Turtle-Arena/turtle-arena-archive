@@ -221,8 +221,8 @@ static void InitOpenGL( void )
 	{
 		first_time = qfalse;
 
-	// print info
-	GfxInfo_f();
+		// print info
+		GfxInfo_f();
 	}
 #else
 	// print info
