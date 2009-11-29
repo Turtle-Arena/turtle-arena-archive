@@ -17,6 +17,8 @@ You will need to do a Source Checkout, see http://code.google.com/p/turtlearena/
 
 For the time being, see http://code.google.com/p/turtlearena/source/browse/trunk/tmnt-compiling.txt
 
+Also see http://wiki.ioquake3.org/Building_ioquake3
+
 = Final setup and execution =
 
 == Windows (Mingw) ==
