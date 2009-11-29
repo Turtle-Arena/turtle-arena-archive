@@ -3,7 +3,7 @@
 
 = Introduction =
 
-*Runing the game* is broken in to three parts.
+*Runing the game* is split into three parts.
 
  * Getting the source
  * Compiling the source
