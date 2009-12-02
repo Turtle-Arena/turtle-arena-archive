@@ -988,6 +988,7 @@ weapon "w_grappling_hook"
 weapongroup "wp_grappling_hook"
 {
 	clone "wt_gun"
+	randomSpawn 0
 	itemName "weapon_grapplinghook"
 	pickupName "Grappling Hook"
 	pickupModel "models/weapons2/grapple/grapple.md3"
