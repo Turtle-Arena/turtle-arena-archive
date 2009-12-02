@@ -281,27 +281,27 @@
 // entity 20
 {
 "classname" "holdable_medkit"
-"origin" "992.000000 496.000000 -168.000000"
+"origin" "896.000000 512.000000 -168.000000"
 }
 // entity 21
 {
 "classname" "holdable_shuriken"
-"origin" "840.000000 504.000000 -168.000000"
+"origin" "768.000000 504.000000 -168.000000"
 }
 // entity 22
 {
 "classname" "holdable_shurikenelectric"
-"origin" "728.000000 496.000000 -168.000000"
+"origin" "704.000000 504.000000 -168.000000"
 }
 // entity 23
 {
 "classname" "holdable_shurikenfire"
-"origin" "656.000000 504.000000 -168.000000"
+"origin" "640.000000 504.000000 -168.000000"
 }
 // entity 24
 {
 "classname" "holdable_shurikenlaser"
-"origin" "568.000000 504.000000 -168.000000"
+"origin" "576.000000 504.000000 -168.000000"
 }
 // entity 25
 {
@@ -443,4 +443,9 @@
 "classname" "misc_model"
 "origin" "-280.000000 608.000000 -206.250000"
 "model" "models/mapobjects/fern1/fern1.md3"
+}
+// entity 51
+{
+"classname" "holdable_portal"
+"origin" "832.000000 512.000000 -168.000000"
 }
