@@ -6,11 +6,12 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Release TA Win32">
-				<Option output="..\..\build\quake3_release_ta\ioquake3" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\quake3_release_ta" />
+			<Target title="Release Win32">
+				<Option output="..\..\build\quake3_release\ioquake3" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\..\build\quake3_release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
+				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -27,7 +28,6 @@
 					<Add option="-DUSE_CODEC_VORBIS" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
-					<Add option="-DMISSIONPACK" />
 				</Compiler>
 				<Linker>
 					<Add library="..\..\build\splines_release\libsplines.a" />
@@ -60,12 +60,11 @@
 					<Add library="..\..\build\splines_debug\libsplines.a" />
 				</Linker>
 			</Target>
-			<Target title="Release Win32">
-				<Option output="..\..\build\quake3_release\ioquake3" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\quake3_release" />
+			<Target title="Release TA_UI Win32">
+				<Option output="..\..\build\quake3_release_ta\ioquake3" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\..\build\quake3_release_ta" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -87,7 +86,7 @@
 					<Add library="..\..\build\splines_release\libsplines.a" />
 				</Linker>
 			</Target>
-			<Target title="Debug TA Win32">
+			<Target title="Debug TA_UI Win32">
 				<Option output="..\..\build\quake3_debug_ta\ioquake3" prefix_auto="1" extension_auto="1" />
 				<Option object_output="..\..\build\quake3_debug_ta" />
 				<Option type="0" />
@@ -109,7 +108,6 @@
 					<Add option="-DUSE_CODEC_VORBIS" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
-					<Add option="-DMISSIONPACK" />
 				</Compiler>
 				<Linker>
 					<Add library="..\..\build\splines_debug\libsplines.a" />
@@ -280,7 +278,7 @@
 		</Unit>
 		<Unit filename="..\..\code\botlib\be_interface.h" />
 		<Unit filename="..\..\code\botlib\botlib.h">
-			<Option target="Release TA Win32" />
+			<Option target="Release TA_UI Win32" />
 			<Option target="Debug Win32" />
 			<Option target="Release Win32" />
 		</Unit>

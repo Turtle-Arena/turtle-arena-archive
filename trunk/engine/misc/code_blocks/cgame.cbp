@@ -153,8 +153,6 @@
 		</Unit>
 		<Unit filename="..\..\code\cgame\cg_newdraw.c">
 			<Option compilerVar="CC" />
-			<Option target="Release TA Win32" />
-			<Option target="Debug TA Win32" />
 		</Unit>
 		<Unit filename="..\..\code\cgame\cg_particles.c">
 			<Option compilerVar="CC" />

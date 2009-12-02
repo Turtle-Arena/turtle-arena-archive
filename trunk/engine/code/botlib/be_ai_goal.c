@@ -89,7 +89,7 @@ typedef struct campspot_s
 	struct campspot_s *next;
 } campspot_t;
 
-#if 0 // FIXED (somewhat): bg_misc.h
+#if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h
 //FIXME: these are game specific
 typedef enum {
 	GT_FFA,				// free for all
