@@ -21,17 +21,24 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 // bg_public.h -- Included by server, client, and botlib (not by VMs)
+//    Instead of scattering defines/enums all over that must be the same
+//        in the server, client, and botlib as in the VMs, keep all in one place.
+
+// Code that was moved here was disabled with ' #if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h '
 
 // Turtle Man: The server/client/botlib doesn't need most of bg_misc.h
 // There is only like 10-12 bytes of data here. Could we get it from "game"?
 //                                      Add a VM_Call? or a cvar? (By adding a cvar we could support unmoded Q3 and games with the Cvar!)
-//                                      { "g_bg_data", "5 5 6 0 1 2 3 4 0 2 3 [etc]", CVAR_ROM } ?
+//                                      { "g_bg_data", "5 0 5 6 0 1 2 3 4 0 2 3 [etc]", CVAR_ROM } ?
 //                                        or as info-string "CS_WARMUP\5\PM_INTERMISSION\5\..." ?
 
 // 	sv_bg_data = Cvar_Get ("g_bg_data", "5 5 6 0 1 2 3 4 0 2 3", CVAR_SYSTEMINFO | CVAR_ROM );
 
 // server only
 #define	CS_WARMUP				5		// server time when the match will be restarted
+
+#define	PERS_SCORE				0		// !!! MUST NOT CHANGE, SERVER AND
+										// GAME BOTH REFERENCE !!!
 
 // client only
 #define PM_INTERMISSION 5 // bg_misc.h enum pmtype_t
@@ -55,37 +62,14 @@ enum {
 //               Server also needs GT_FFA
 
 //FIXME: these are game specific
-typedef enum {
+
 #ifdef TMNTSP
-	GT_FFA__,				// free for all
+//GT_FFA 0						// free for all
 #else
-	GT_FFA,				// free for all
+#define GT_FFA 0				// free for all
 #endif
-	GT_TOURNAMENT__,		// one on one tournament
-	GT_SINGLE_PLAYER,	// single player tournament
+//GT_TOURNAMENT 1				// one on one tournament
+#define GT_SINGLE_PLAYER 2		// single player tournament
+#define GT_TEAM 3				// team deathmatch
+//GT_CTF 4						// capture the flag
 
-#if 0 // #ifdef TMNT
-	GT_LMS__,				// Last Man Standing
-	GT_KOTH__,			// King Of The Hill
-	GT_KEEPAWAY__,		// Keep Away
-#endif
-
-	//-- team games go after this --
-
-	GT_TEAM,			// team deathmatch
-#if 0 // #ifdef TMNT
-	GT_LTEAMS__,			// last team standing
-#endif
-	GT_CTF__,				// capture the flag
-#ifdef MISSIONPACK
-	GT_1FCTF__,
-	GT_OBELISK__,
-#ifdef MISSIONPACK_HARVESTER
-	GT_HARVESTER__,
-#endif
-#if 0 // Turtle Man: In the gametype name arrays there is a Team Tournament.
-	GT_TEAMTOURNAMENT__,
-#endif
-#endif
-	GT_MAX_GAME_TYPE
-} gametype_t;
