@@ -57,6 +57,11 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 	if ( level.warmupTime ) {
 		return;
 	}
+#ifdef IOQ3ZTM // TMNT // CTF_FRAG_CARRIER_BONUS is 0, so don't show they got 0 points.
+	if (!score) {
+		return;
+	}
+#endif
 	// show score plum
 	ScorePlum(ent, origin, score);
 	//
@@ -708,10 +713,28 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (attacker && attacker->client) {
 		attacker->client->lastkilled_client = self->s.number;
 
+#ifdef TMNT
+		if ( attacker == self )
+		{
+			// Suicide penalty
+			AddScore( attacker, self->r.currentOrigin, -50 );
+		}
+		else if (OnSameTeam (self, attacker))
+		{
+			// Don't loss or gain points for killing team mate.
+		}
+#else
 		if ( attacker == self || OnSameTeam (self, attacker ) ) {
 			AddScore( attacker, self->r.currentOrigin, -1 );
-		} else {
+		}
+#endif
+		else
+		{
+#ifdef TMNT
+			AddScore( attacker, self->r.currentOrigin, 50 );
+#else
 			AddScore( attacker, self->r.currentOrigin, 1 );
+#endif
 
 #ifndef TMNTWEAPONS
 			if( meansOfDeath == MOD_GAUNTLET ) {
@@ -751,7 +774,12 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 #endif
 		}
 	} else {
+#ifdef TMNT
+		// Suicide penalty
+		AddScore( self, self->r.currentOrigin, -50 );
+#else
 		AddScore( self, self->r.currentOrigin, -1 );
+#endif
 	}
 
 	// Add team bonuses
