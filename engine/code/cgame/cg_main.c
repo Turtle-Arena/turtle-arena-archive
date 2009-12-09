@@ -246,7 +246,11 @@ static cvarTable_t cvarTable[] = {
 #ifndef TMNTWEAPSYS2
 	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
 #endif
+#ifdef TMNT // First person weapons are currently unsupported.
+	{ &cg_drawGun, "cg_drawGun", "0", CVAR_ARCHIVE },
+#else
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
+#endif
 	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
 #ifdef TMNTMISC // FOV
 	{ &cg_fov, "cg_fov", "70", CVAR_ARCHIVE },
@@ -320,7 +324,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 #endif
 #ifdef THIRD_PERSON
-	{ &cg_thirdPerson, "cg_thirdPerson", "1", CVAR_CHEAT },
+	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },
 #else
 	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
 #endif

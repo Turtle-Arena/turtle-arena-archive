@@ -21,20 +21,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 
-#ifdef TMNT // Turtle Man: Scores inbetween Q3 and MP...
+#ifdef TMNT
 
-#define CTF_CAPTURE_BONUS		50		// what you get for capture
-#define CTF_TEAM_BONUS			10		// what your team gets for capture
-#define CTF_RECOVERY_BONUS		2		// what you get for recovery
+#define CTF_CAPTURE_BONUS		250		// what you get for capture
+#define CTF_TEAM_BONUS			50		// what your team gets for capture
+#define CTF_RECOVERY_BONUS		0		// what you get for recovery
 #define CTF_FLAG_BONUS			0		// what you get for picking up enemy flag
-#define CTF_FRAG_CARRIER_BONUS	3		// what you get for fragging enemy flag carrier
+#define CTF_FRAG_CARRIER_BONUS	0		// what you get for fragging enemy flag carrier
 #define CTF_FLAG_RETURN_TIME	40000	// seconds until auto return
 
-#define CTF_CARRIER_DANGER_PROTECT_BONUS	1	// bonus for fraggin someone who has recently hurt your flag carrier
-#define CTF_CARRIER_PROTECT_BONUS			1	// bonus for fraggin someone while either you or your target are near your flag carrier
-#define CTF_FLAG_DEFENSE_BONUS				1	// bonus for fraggin someone while either you or your target are near your flag
-#define CTF_RETURN_FLAG_ASSIST_BONUS		5	// awarded for returning a flag that causes a capture to happen almost immediately
-#define CTF_FRAG_CARRIER_ASSIST_BONUS		5	// award for fragging a flag carrier if a capture happens almost immediately
+#define CTF_CARRIER_DANGER_PROTECT_BONUS	0	// bonus for fraggin someone who has recently hurt your flag carrier
+#define CTF_CARRIER_PROTECT_BONUS			0	// bonus for fraggin someone while either you or your target are near your flag carrier
+#define CTF_FLAG_DEFENSE_BONUS				0	// bonus for fraggin someone while either you or your target are near your flag
+#define CTF_RETURN_FLAG_ASSIST_BONUS		25	// awarded for returning a flag that causes a capture to happen almost immediately
+#define CTF_FRAG_CARRIER_ASSIST_BONUS		25	// award for fragging a flag carrier if a capture happens almost immediately
 
 #elif defined MISSIONPACK
 
