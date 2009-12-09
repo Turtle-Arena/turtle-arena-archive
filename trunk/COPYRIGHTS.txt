@@ -12,6 +12,10 @@ All data, unless otherwise noted, is Copyright (C) 2009 Zack "ZTurtleMan" Middle
 However, some of my data is based on that of Quake III: Arena and OpenArena.
 	(For what is should look like and shapes, they're not modified graphics; I used some of them to create my data)
 
+	Some examples:
+	base/gfx/damage/bullet_mrk.png was drawn over OA's gfx/damage/bullet_mrk
+	base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
+
 == OpenArena ==
 The following are from OpenArena and are Copyright (C) 2006 Dmn_clown
 	and are license under the GNU General Public License; either version 2 of the License, or
@@ -46,7 +50,6 @@ base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
 base/gfx/damage/shadow.tga
 base/gfx/misc/flare.jpg
-base/sprites/splash.tga
 
 == GNU FreeFonts ==
 The following files were created using the GNU Freefonts,

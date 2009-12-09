@@ -11,7 +11,7 @@ weaponTrail
 	}
 }
 
-// Plasm trail (\cg_oldPlasm 0) and q3 rail trail
+// Used by Plasm trail (when cg_oldPlasm is 0) and Rail trail
 railDisc
 {
 	sort nearest
@@ -27,7 +27,7 @@ railDisc
 	}
 }
 
-// q3 rail trail
+// Rail trail
 railCore
 {
 	sort nearest
@@ -65,8 +65,7 @@ GrappleCable
 {
 	cull disable
 	{
-		map models/weapons2/grapple/trail
-		//blendfunc blend
+		map models/weapons2/grapple/trail.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen Vertex
 		alphaGen Vertex
@@ -152,18 +151,18 @@ projectionShadow
 	}
 }
 
-// Turtle Man: In OpenArena this is called "oldwake" ...
+// Turtle Man: In OpenArena this is called "oldwake", see OA for their new wake.
 wake
 {
 	{
-		clampmap sprites/splash.tga
+		clampmap sprites/splash.png
 		blendfunc add
 		rgbGen wave sin 0.7 0.3 0.25 0.5
 		tcMod rotate 250
 		tcMod stretch sin 0.9 0.1 0 0.7
 	}
 	{
-		clampmap sprites/splash.tga
+		clampmap sprites/splash.png
 		blendfunc add
 		rgbGen wave sin 0.7 0.3 0.25 0.4
 		tcMod rotate -230
@@ -492,7 +491,7 @@ viewBloodBlend
 	sort	nearest
 	{
 		//map models/weaphits/blood201.tga
-                map gfx/damage/blood_screen.tga
+		map gfx/damage/blood_screen.tga
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identityLighting
 		alphaGen vertex
@@ -519,59 +518,10 @@ bloodTrail
 	entityMergable
 	{
 		//clampmap gfx/misc/blood.tga
-                clampmap gfx/damage/blood_spurt.tga
+		clampmap gfx/damage/blood_spurt.tga
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen		vertex
 		alphaGen	vertex
 	}
 }
-
-//
-// Unused shaders from OpenArena
-//
-
-Grareflaader
-{
-	cull none
-	{
-		map gfx/misc/flare.tga
-		blendFunc GL_ONE GL_ONE
-		rgbGen vertex
-	}
-}
-
-boens
-{
-	cull none
-	{
-		map gfx/misc/sun.tga
-		blendFunc GL_ONE GL_ONE
-		rgbGen vertex
-	}
-}
-
-// Turtle Man: In OpenArena this is "wake"
-newwake
-{
-	cull disable
-	{
-		animmap 30 sprites/multwake1.tga sprites/multwake2.tga sprites/multwake3.tga sprites/multwake4.tga sprites/multwake5.tga sprites/multwake6.tga sprites/multwake7.tga sprites/multwake8.tga
-		blendfunc gl_dst_color gl_src_color
-	}
-}
-
-newishwake
-{
-	{
-		animmap 8 sprites/splash6.tga sprites/splash5.tga sprites/splash4.tga sprites/splash3.tga sprites/splash2.tga
-		blendfunc gl_src_alpha gl_one
-		alphaGen wave inversesawtooth 0 1 0 8
-	}
-	{
-		animmap 8 sprites/splash5.tga sprites/splash4.tga sprites/splash3.tga sprites/splash2.tga sprites/splash6.tga
-		blendfunc gl_src_alpha gl_one
-		alphaGen wave sawtooth 0 1 0 8
-	}
-}
-
 

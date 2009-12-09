@@ -48,17 +48,24 @@ projectile "p_shuriken"
 	stickOnImpact 1
 }
 
-// Currently the same as p_shuriken other then the model...
+// Still work-in-progress...
 projectile "p_electricshuriken"
 {
 	model "models/shurikens/shurikenelectric.md3"
 	damage 10
 	speed 700
-	timetolive 15000
+	//timetolive 15000
 	spinType "PS_PITCH"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
-	stickOnImpact 1
+	//stickOnImpact 1
+
+	bounceType "PB_HALF"
+	useGravity 1
+	timetolive 2500
+	splashDamage 10
+	splashRadius 60
+	deathType "PD_ROCKET_SMALL"
 }
 
 projectile "p_fireshuriken"
@@ -75,13 +82,6 @@ projectile "p_fireshuriken"
 	spinType "PS_PITCH"
 	wallmarkName "gfx/damage/burn_med_mrk"
 	wallmarkRadius 32
-
-	// Grenade Shuriken
-	//bounceType "PB_HALF"
-	//useGravity 1
-	//timetolive 2500
-
-	// Fire Shuriken
 	stickOnImpact 1
 }
 
