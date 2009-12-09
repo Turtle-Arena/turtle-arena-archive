@@ -1142,11 +1142,15 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		/*if (es->eventParm == 255) {
 			CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 		} else*/ {
-#ifdef TMNTHOLDABLE
+#ifdef TMNTHOLDABLE // Turtle Man: TODO: Add bounce1Sound and bounce2Sound to projectile info
+					//                    to support Q3 Grenades.
 			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.laserShurikenSound );
 #endif
-			ByteToDir( es->eventParm, dir );
-			CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
+			// For Laser Shuriken, not Grenade.
+			if (bg_projectileinfo[es->weapon].bounceType == PB_FULL) {
+				ByteToDir( es->eventParm, dir );
+				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
+			}
 		}
 		break;
 #else
