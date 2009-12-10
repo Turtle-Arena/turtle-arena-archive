@@ -118,7 +118,11 @@ static void Preferences_SetMenuItems( void ) {
 	s_preferences.dynamiclights.curvalue	= trap_Cvar_VariableValue( "r_dynamiclight" ) != 0;
 	s_preferences.highqualitysky.curvalue	= trap_Cvar_VariableValue ( "r_fastsky" ) == 0;
 	s_preferences.synceveryframe.curvalue	= trap_Cvar_VariableValue( "r_finish" ) != 0;
+#ifdef TMNT // NO_CGFORCEMODLE
+	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_deferPlayers" ) != 0;
+#else
 	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_forcemodel" ) != 0;
+#endif
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
 #ifdef IOQ3ZTM // CONTANT_FILTERING
@@ -180,7 +184,11 @@ static void Preferences_Event( void* ptr, int notification ) {
 		break;
 
 	case ID_FORCEMODEL:
+#ifdef TMNT // NO_CGFORCEMODLE
+		trap_Cvar_SetValue( "cg_deferPlayers", s_preferences.forcemodel.curvalue );
+#else
 		trap_Cvar_SetValue( "cg_forcemodel", s_preferences.forcemodel.curvalue );
+#endif
 		break;
 
 	case ID_DRAWTEAMOVERLAY:
@@ -380,7 +388,11 @@ static void Preferences_MenuInit( void ) {
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.forcemodel.generic.type     = MTYPE_RADIOBUTTON;
+#ifdef TMNT // NO_CGFORCEMODLE
+	s_preferences.forcemodel.generic.name	  = "Defer Player Loading:";
+#else
 	s_preferences.forcemodel.generic.name	  = "Force Player Models:";
+#endif
 	s_preferences.forcemodel.generic.flags	  = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences.forcemodel.generic.callback = Preferences_Event;
 	s_preferences.forcemodel.generic.id       = ID_FORCEMODEL;

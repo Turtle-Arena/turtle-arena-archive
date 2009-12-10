@@ -1560,7 +1560,9 @@ extern	vmCvar_t		cg_synchronousClients;
 extern	vmCvar_t		cg_teamChatTime;
 extern	vmCvar_t		cg_teamChatHeight;
 extern	vmCvar_t		cg_stats;
+#ifndef TMNT // NO_CGFORCEMODLE
 extern	vmCvar_t 		cg_forceModel;
+#endif
 extern	vmCvar_t 		cg_buildScript;
 extern	vmCvar_t		cg_paused;
 #ifndef NOBLOOD

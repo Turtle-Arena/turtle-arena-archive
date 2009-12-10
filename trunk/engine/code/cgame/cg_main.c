@@ -29,7 +29,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 displayContextDef_t cgDC;
 #endif
 
+#ifndef TMNT // NO_CGFORCEMODLE
 int forceModelModificationCount = -1;
+#endif
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
@@ -179,7 +181,9 @@ vmCvar_t 	cg_teamChatTime;
 vmCvar_t 	cg_teamChatHeight;
 vmCvar_t 	cg_stats;
 vmCvar_t 	cg_buildScript;
+#ifndef TMNT // NO_CGFORCEMODLE
 vmCvar_t 	cg_forceModel;
+#endif
 vmCvar_t	cg_paused;
 #ifndef NOBLOOD
 vmCvar_t	cg_blood;
@@ -346,7 +350,9 @@ static cvarTable_t cvarTable[] = {
 #else
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
 #endif
+#ifndef TMNT // NO_CGFORCEMODLE
 	{ &cg_forceModel, "cg_forceModel", "0", CVAR_ARCHIVE  },
+#endif
 	{ &cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE },
 #if defined MISSIONPACK || defined IOQ3ZTM
 	{ &cg_deferPlayers, "cg_deferPlayers", "0", CVAR_ARCHIVE },
@@ -451,7 +457,9 @@ void CG_RegisterCvars( void ) {
 	trap_Cvar_VariableStringBuffer( "sv_running", var, sizeof( var ) );
 	cgs.localServer = atoi( var );
 
+#ifndef TMNT // NO_CGFORCEMODLE
 	forceModelModificationCount = cg_forceModel.modificationCount;
+#endif
 
 #ifdef TMNTSP // SPMODEL
 	trap_Cvar_Register(NULL, "spmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
@@ -465,6 +473,7 @@ void CG_RegisterCvars( void ) {
 #endif
 }
 
+#ifndef TMNT // NO_CGFORCEMODLE
 /*																																			
 ===================
 CG_ForceModelChange
@@ -483,6 +492,7 @@ static void CG_ForceModelChange( void ) {
 		CG_NewClientInfo( i );
 	}
 }
+#endif
 
 /*
 =================
@@ -511,11 +521,13 @@ void CG_UpdateCvars( void ) {
 		}
 	}
 
+#ifndef TMNT // NO_CGFORCEMODLE
 	// if force model changed
 	if ( forceModelModificationCount != cg_forceModel.modificationCount ) {
 		forceModelModificationCount = cg_forceModel.modificationCount;
 		CG_ForceModelChange();
 	}
+#endif
 }
 
 int CG_CrosshairPlayer( void ) {

@@ -1282,6 +1282,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// model
 	v = Info_ValueForKey( configstring, "model" );
+#ifndef TMNT // NO_CGFORCEMODLE
 	if ( cg_forceModel.integer ) {
 		// forcemodel makes everyone use a single model
 		// to prevent load hitches
@@ -1315,7 +1316,10 @@ void CG_NewClientInfo( int clientNum ) {
 				Q_strncpyz( newInfo.skinName, slash + 1, sizeof( newInfo.skinName ) );
 			}
 		}
-	} else {
+	}
+	else
+#endif
+	{
 		Q_strncpyz( newInfo.modelName, v, sizeof( newInfo.modelName ) );
 
 		slash = strchr( newInfo.modelName, '/' );
@@ -1331,6 +1335,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// head model
 	v = Info_ValueForKey( configstring, "hmodel" );
+#ifndef TMNT // NO_CGFORCEMODLE
 	if ( cg_forceModel.integer ) {
 		// forcemodel makes everyone use a single model
 		// to prevent load hitches
@@ -1359,7 +1364,10 @@ void CG_NewClientInfo( int clientNum ) {
 				Q_strncpyz( newInfo.headSkinName, slash + 1, sizeof( newInfo.headSkinName ) );
 			}
 		}
-	} else {
+	}
+	else
+#endif
+	{
 		Q_strncpyz( newInfo.headModelName, v, sizeof( newInfo.headModelName ) );
 
 		slash = strchr( newInfo.headModelName, '/' );
