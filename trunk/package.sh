@@ -97,7 +97,7 @@ then
 		cp engine/build/release-mingw32-x86/tmntarena.x86.exe $INSTALLDIR
 		cp engine/build/release-mingw32-x86/tmntarena-ded.x86.exe $INSTALLDIR
 
-		# TODO: Copy SDL.dll for mingw32 EXEs.
+		# TODO: Copy SDL.dll 1.2.14 for the mingw32 EXEs.
 	fi
 
 	# Copy linux launcher too
