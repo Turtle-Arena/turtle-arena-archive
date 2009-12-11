@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes"?>
+<!-- modify at your own risks -->
+<game
+  type="tmnt"
+  index="1"
+  name="TMNT Arena"
+  enginepath_win32="C:/Program Files/TMNTArena/"
+  enginepath_linux="/usr/local/games/tmntarena/"
+  enginepath_macos="/Applications/TMNTArena/"
+  engine_win32="TMNTArena.exe"
+  engine_linux="tmntarena.sh"
+  engine_macos="TMNTArena.app"
+  prefix=".tmntarena"
+  basegame="base"
+  basegamename="TMNT Arena"
+  unknowngamename="Custom TMNT Arena modification"
+  shaderpath="scripts"
+  archivetypes="pk3"
+  texturetypes="tga jpg png"
+  modeltypes="md3 ase lwo obj 3ds picoterrain"
+  maptypes="mapq3"
+  shaders="quake3"
+  entityclass="quake3"
+  entityclasstype="def xml"
+  entities="quake3"
+  brushtypes="quake3"
+  patchtypes="quake3"
+/>
