@@ -3,17 +3,16 @@ The TMNT Arena data copyrights.
 All of the data (unless otherwised noted) is license under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
 
 == ZTM ==
-There are source files for some of the data in base-src/
-
 All data, unless otherwise noted, is Copyright (C) 2009 Zack "ZTurtleMan" Middleton
 	and are license under the GNU General Public License; either version 2 of the License, or
 	(at your option) any later version.
 
-However, some of my data is based on that of Quake III: Arena and OpenArena.
-	(For what is should look like and shapes, they're not modified graphics; I used some of them to create my data)
+The data files that have other source files are included in base-src/
 
-	Some examples:
-	base/gfx/damage/bullet_mrk.png was drawn over OA's gfx/damage/bullet_mrk
+Some of my data is based Quake III: Arena and OpenArena data.
+	There are no Quake III: Arena graphics included.
+
+	base/gfx/damage/bullet_mrk.png was drawn over OpenArena's gfx/damage/bullet_mrk
 	base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
 
 == OpenArena ==
@@ -82,7 +81,7 @@ base/fonts/FreeSansBold_16.dat
 
 FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf are part of GNU FreeFonts.
 
-These versions are from the 2008-09-12 GPLv2 release.
+These versions are from the 2008-09-12 GPL version 2 (or later) release.
 
 Licensing
 ---------

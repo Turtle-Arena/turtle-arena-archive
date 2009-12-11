@@ -5,17 +5,20 @@
 #  Supports x86 and x86_64 GNU/Linux.
 #
 
-#
+# Directory to put the files for release
 INSTALLDIR=install
 
 # Make and copy linux x86 and if possible x86_64
 LINUX=1
 
 # Cross-make and copy mingw32 client and dedicated server
-MINGW32=1
+WIN32=1
 
 # Copy and zip the data
 DATAFILES=1
+
+# Readme, COPYING, etc
+DOCFILES=1
 
 
 
@@ -34,7 +37,7 @@ PLATFORM=linux-$ARCH
 # Make sure everything is built
 #
 
-if [ $EXECFILES -eq 1 ]
+if [ $LINUX -eq 1 ] || [ $WIN32 -eq 1 ]
 then
 
 	cd engine
@@ -75,7 +78,7 @@ fi
 # Copy client and server binarys
 #
 
-if [ $EXECFILES -eq 1 ]
+if [ $LINUX -eq 1 ] || [ $WIN32 -eq 1 ]
 then
 
 	echo "Coping binarys..."
@@ -97,13 +100,30 @@ then
 		cp engine/build/release-mingw32-x86/tmntarena.x86.exe $INSTALLDIR
 		cp engine/build/release-mingw32-x86/tmntarena-ded.x86.exe $INSTALLDIR
 
-		# TODO: Copy SDL.dll 1.2.14 for the mingw32 EXEs.
+		echo "  Warning: You need to manually copy SDL.dll vserion 1.2.14 into $INSTALLDIR !"
 	fi
 
 	# Copy linux launcher too
 	cp tmntarena.sh $INSTALLDIR
 
 fi
+
+
+#
+# Copy readme, COPYING, etc
+#
+
+if [ $DOCFILES -eq 1 ]
+then
+	echo "Copying docs..."
+
+	cp tmnt-readme.txt $INSTALLDIR/readme.txt
+	cp COPYING.txt $INSTALLDIR
+	cp COPYRIGHTS.txt $INSTALLDIR
+	echo "TMNT Arena Alpha `date +%Y%m%d`" > $INSTALLDIR/version.txt
+
+fi
+
 
 #
 # Copy base to install/base_svn
@@ -140,7 +160,7 @@ then
 	rm $INSTALLDIR/base/assests0.pk3
 
 	cd $INSTALLDIR/base_svn/
-	zip -r ../../$INSTALLDIR/base/assests0.pk3 * 2>/dev/null
+	zip -r ../../$INSTALLDIR/base/assests0.pk3 * | grep -v "adding"
 	cd ../../
 
 	# Remove base_svn
