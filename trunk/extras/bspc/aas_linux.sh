@@ -1,19 +1,22 @@
 #!/bin/sh
-# TMNT Arena Linux Launcher
-# Automaticly selects 32/64 bit version of TMNT Arena.
+# BSPC Linux Launcher
+# Automaticly selects 32/64 bit version of BSPC.
 #
 # Based on xreal ( http://www.xreal-project.net ) script
+
+# -nograpplereach
+ARGS=-forcesidesvisible -bsp2aas "../../base/maps/*.bsp"
 
 # Select binary
 case `uname -m` in
 	x86_64)
-		BIN='tmntarena.x86_64'
+		BIN='bspc.x86_64'
 		;;
 	i386|i486|i586|i686)
-		BIN='tmntarena.x86'
+		BIN='bspc.x86'
 		;;
 #	powerpc|powerpc64)
-#		BIN='tmntarena.ppc'
+#		BIN='bspc.ppc'
 #		;;
 	*)
 		echo "You are not running a supported platform, if you would like to play TMNT Arena on your platform, please visit http://code.google.com/p/turtlearena/ for contact information."
@@ -22,9 +25,9 @@ case `uname -m` in
 esac
 
 if [ ! -f $BIN ]; then
-	echo "Game binary '$BIN' not found!"
+	echo "BSPC binary '$BIN' not found!"
 	exit 1
 fi
 
 # Run
-./$BIN $@
+./$BIN $ARGS
