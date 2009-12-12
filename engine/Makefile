@@ -195,8 +195,8 @@ else # END QUAKE3
 	# TMNT Arena's sounds are ogg vorbis, if there was music is would be ogg vorbis too...
 	USE_CODEC_VORBIS=1
 
-	# Turtle Man: TMNT Arena version
-	VERSION=alpha
+	# Turtle Man: TMNT Arena version (YYYYMMDD)
+	VERSION=$(shell date +%Y%m%d)
 
 	# TMNT Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"

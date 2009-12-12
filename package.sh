@@ -169,6 +169,9 @@ then
 
 fi
 
+# Copy all of the files other then base/ into tmntarena-src/ and zip it.
+echo "Warning: You need to manually copy the source into $INSTALLDIR !"
+
 # zip install?
 
 echo "Done!"
