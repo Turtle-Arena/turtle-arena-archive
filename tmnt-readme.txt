@@ -84,6 +84,11 @@ Software used to create the TMNT Arena data files.
 * GIMP
 * Inkscape
 
+== Maps ==
+* GtkRadiant
+* NetRadiant
+* GenSurf
+
 == External Links ==
 * [http://code.google.com/p/turtlearena/ Project page at Google code]
 
