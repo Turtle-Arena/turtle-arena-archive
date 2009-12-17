@@ -3,11 +3,11 @@
 
 = Introduction =
 
-*Runing the game* is split into three parts.
+*Runing the game* from the SVN (Subversion repository) is split into three parts.
 
- * Getting the source
- * Compiling the source
- * Final setup and execution
+  * Getting the source
+  * Compiling the source
+  * Final setup and execution
 
 = Getting the source =
 
@@ -36,9 +36,9 @@ The DLLs are used for testing/debuging, while QVMs are used for release. Mingw a
 
 1. Copy the DLLs files from
 
- * engine/build/cgame_release/cgamex86.dll
- * engine/build/game_release/qagamex86.dll
- * engine/build/q3_ui_release/uix86.dll
+  * engine/build/cgame_release/cgamex86.dll
+  * engine/build/game_release/qagamex86.dll
+  * engine/build/q3_ui_release/uix86.dll
 
 to base/
 
