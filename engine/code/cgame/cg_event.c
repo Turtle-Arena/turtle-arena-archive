@@ -1139,15 +1139,17 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifdef TMNTWEAPSYS_2
 	case EV_PROJECTILE_BOUNCE:
 		DEBUGNAME("EV_PROJECTILE_BOUNCE");
-		/*if (es->eventParm == 255) {
-			CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
-		} else*/ {
-#ifdef TMNTHOLDABLE // Turtle Man: TODO: Add bounce1Sound and bounce2Sound to projectile info
-					//                    to support Q3 Grenades.
-			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.laserShurikenSound );
-#endif
-			// For Laser Shuriken, not Grenade.
-			if (bg_projectileinfo[es->weapon].bounceType == PB_FULL) {
+		if ((rand() & 1) && cg_projectiles[es->weapon].bounceSound[1]) {
+			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].bounceSound[1] );
+		} else {
+			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].bounceSound[0] );
+		}
+
+		// For Laser Shuriken, not Grenade.
+		if (bg_projectileinfo[es->weapon].bounceType == PB_FULL) {
+			if (es->eventParm == 255) {
+				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
+			} else {
 				ByteToDir( es->eventParm, dir );
 				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 			}
@@ -1157,20 +1159,22 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_GRENADE_BOUNCE:
 		DEBUGNAME("EV_GRENADE_BOUNCE");
 #ifdef TMNTHOLDABLE
-		/*if (es->eventParm == 255) {
-			CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
-		} else*/ {
-			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.laserShurikenSound );
-			ByteToDir( es->eventParm, dir );
-			CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
+		if (bg_projectileinfo[es->weapon].bounceType == PB_FULL) {
+			/*if (es->eventParm == 255) {
+				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
+			} else*/ {
+				trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.laserShurikenSound );
+				ByteToDir( es->eventParm, dir );
+				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
+			}
 		}
-#else
+		else
+#endif
 		if ( rand() & 1 ) {
 			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.hgrenb1aSound );
 		} else {
 			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.hgrenb2aSound );
 		}
-#endif
 		break;
 #endif
 

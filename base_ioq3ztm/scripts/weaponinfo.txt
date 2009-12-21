@@ -20,34 +20,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// TODO: Remake Quake III: Team Arena weapon info
+// TODO: Remake Quake III: Team Arena weapon info.
 
-// Turtle Man: FIXME: Use correct hit sounds for all weapons, see CG_MissileHitWall!
-// For Each BG Projectile Info
-//   hit1Sound
-//   hit2Sound
-//   hit3Sound
-//   hitPlayerSound (hitFleshSound)
-//   hitMetalSound
-//
-// Example: *Sfx are cached indexes for the sounds.
-//
-//		if( soundType == IMPACTSOUND_FLESH && hitPlayerSfx) {
-//			sfx = hitPlayerSfx;
-//		} else if( soundType == IMPACTSOUND_METAL && hitMetalSfx) {
-//			sfx = hitMetalSfx;
-//		} else {
-//			r = rand() & 3;
-//			if ( r < 2 ) {
-//				sfx = hit1Sfx;
-//			} else if ( r == 2 ) {
-//				sfx = hit2Sfx;
-//			} else {
-//				sfx = hit3Sfx;
-//			}
-//		}
-//
-// hitBounce for Grenade and Laser Shuriken would be nice too.
+// Turtle Man: TODO: Add correct hit sounds for all weapons, see CG_MissileHitWall!
+// hitSound0
+// hitSound1
+// hitSound2
+// hitPlayerSound
+// hitMetalSound
+// bounceSound
 
 //
 // Gauntlet (Done; but need to check blade)
@@ -181,7 +162,7 @@ weapongroup "wp_shotgun"
 }
 
 //
-// Grenade Launcher (Done) (FIXME: It explodes each time it hits something)
+// Grenade Launcher (Done)
 //
 
 projectile "p_grenade"

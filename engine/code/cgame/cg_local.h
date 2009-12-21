@@ -525,13 +525,19 @@ typedef struct projectileInfo_s {
 	float			trailRadius;
 	float			wiTrailTime;
 
-	// New stuff
+	//
 	qhandle_t		missileModelBlue;
 	qhandle_t		missileModelRed;
 	qhandle_t		spriteShader;
 	int				spriteRadius;
 	qhandle_t		wallmarkShader;
 	int				wallmarkRadius;
+
+	// Sounds
+	sfxHandle_t		hitSound[3]; // Normal hit sounds, random select
+	sfxHandle_t		hitPlayerSound;
+	sfxHandle_t		hitMetalSound;
+	sfxHandle_t		bounceSound[2]; // Bounce sounds, random select
 
 	// Turtle Man: TODO: missileTrailShader (and missile vars 1 and 2 ?)
 

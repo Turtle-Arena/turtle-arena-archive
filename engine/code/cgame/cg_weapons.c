@@ -953,6 +953,7 @@ void CG_RegisterProjectile( int projectileNum )
 {
 	projectileInfo_t *projectileInfo;
 	bg_projectileinfo_t *bgProj;
+	int i;
 
 	projectileInfo = &cg_projectiles[projectileNum];
 	bgProj = &bg_projectileinfo[projectileNum];
@@ -968,6 +969,20 @@ void CG_RegisterProjectile( int projectileNum )
 
 	if (bgProj->missileSoundName[0] != '\0')
 		projectileInfo->missileSound = trap_S_RegisterSound( bgProj->missileSoundName, qfalse );
+	for (i = 0; i< 3; i++)
+	{
+		if (bgProj->hitSoundName[i][0] != '\0')
+			projectileInfo->hitSound[i] = trap_S_RegisterSound( bgProj->hitSoundName[i], qfalse );
+	}
+	if (bgProj->hitPlayerSoundName[0] != '\0')
+		projectileInfo->hitPlayerSound = trap_S_RegisterSound( bgProj->hitPlayerSoundName, qfalse );
+	if (bgProj->hitMetalSoundName[0] != '\0')
+		projectileInfo->hitMetalSound = trap_S_RegisterSound( bgProj->hitMetalSoundName, qfalse );
+	for (i = 0; i< 2; i++)
+	{
+		if (bgProj->bounceSoundName[i][0] != '\0')
+			projectileInfo->bounceSound[i] = trap_S_RegisterSound( bgProj->bounceSoundName[i], qfalse );
+	}
 
 	if (bgProj->model[0] != '\0')
 	{
@@ -4195,7 +4210,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	float			light;
 	vec3_t			lightColor;
 	localEntity_t	*le;
-	//int				r;
+	int				r;
 	qboolean		alphaFade;
 	qboolean		isSprite;
 	int				duration;
@@ -4224,9 +4239,9 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	exp_add = 42;
 
 	if (bg_projectileinfo[weapon].trailType != PT_LIGHTNING)
-		{
-		switch (bg_projectileinfo[weapon].deathType)
 	{
+		switch (bg_projectileinfo[weapon].deathType)
+		{
 			default:
 			case PD_NONE:
 				break;
@@ -4277,7 +4292,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 					VectorScale( dir, 64, sprVel );
 
 					CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
-	}
+				}
 				*/
 				break;
 			case PD_GRENADE:
@@ -4292,9 +4307,9 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 				isSprite = qtrue;
 				break;
 			case PD_BULLET:
-		mod = cgs.media.bulletFlashModel;
-		shader = cgs.media.bulletExplosionShader;
-		break;
+				mod = cgs.media.bulletFlashModel;
+				shader = cgs.media.bulletExplosionShader;
+				break;
 			case PD_RAIL:
 				mod = cgs.media.ringFlashModel;
 #ifdef TMNTWEAPONS
@@ -4302,7 +4317,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #else
 				shader = cgs.media.railExplosionShader;
 #endif
-		break;
+				break;
 			case PD_BFG:
 				mod = cgs.media.dishFlashModel;
 #ifdef TMNTWEAPONS
@@ -4314,6 +4329,24 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			case PD_LIGHTNING:
 				//
 				break;
+		}
+	}
+
+	// play sound
+	if( soundType == IMPACTSOUND_FLESH && cg_projectiles[weapon].hitPlayerSound ) {
+		sfx = cg_projectiles[weapon].hitPlayerSound;
+	} else if( soundType == IMPACTSOUND_METAL && cg_projectiles[weapon].hitMetalSound ) {
+		sfx = cg_projectiles[weapon].hitMetalSound;
+	} else {
+		for ( r = 0 ; r < 3 ; r++ ) {
+			if ( !cg_projectiles[weapon].hitSound[r] )
+			{
+				break;
+			}
+		}
+		if ( r > 0 ) {
+			r = rand() % r;
+			sfx = cg_projectiles[weapon].hitSound[r];
 		}
 	}
 
