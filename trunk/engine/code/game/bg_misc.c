@@ -2001,6 +2001,10 @@ static qboolean Projectile_Parse(char **p) {
 			{
 				Com_sprintf(projectile.missileSoundName, sizeof (projectile.missileSoundName), "%s", token);
 			}
+			else
+			{
+				projectile.missileSoundName[0] = '\0';
+			}
 			continue;
 		} else if ( !Q_stricmp( token, "missileDlightColor" ) ) {
 			for ( i = 0 ; i < 3 ; i++ ) {
@@ -2183,6 +2187,80 @@ static qboolean Projectile_Parse(char **p) {
 			}
 			projectile.maxHits = atoi(token);
 			continue;
+		} else if ( !Q_stricmp( token, "hitSound" ) ) {
+			int index = -1;
+
+			// hitSound0 hitSound1 hitSound2
+			if ( token[8]-'0' < 3 ) {
+				index = token[8]-'0';
+			}
+			else if (token[8] == '\0')
+			{
+				// Default to '0'
+				index = 0;
+			}
+
+			if (index >= 0)
+			{
+				token = COM_Parse( p );
+				if ( *token )
+				{
+					Com_sprintf(projectile.hitSoundName[index], sizeof (projectile.hitSoundName[index]), "%s", token);
+				}
+				else
+				{
+					projectile.hitSoundName[index][0] = '\0';
+				}
+				continue;
+			}
+		} else if ( !Q_stricmp( token, "hitPlayerSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token )
+			{
+				Com_sprintf(projectile.hitPlayerSoundName, sizeof (projectile.hitPlayerSoundName), "%s", token);
+			}
+			else
+			{
+				projectile.hitPlayerSoundName[0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "hitMetalSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token )
+			{
+				Com_sprintf(projectile.hitMetalSoundName, sizeof (projectile.hitMetalSoundName), "%s", token);
+			}
+			else
+			{
+				projectile.hitMetalSoundName[0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "bounceSound" ) ) {
+			int index = -1;
+
+			// hitSound0 hitSound1 hitSound2
+			if ( token[12]-'0' < 2 ) {
+				index = token[12]-'0';
+			}
+			else if (token[12] == '\0')
+			{
+				// Default to '0'
+				index = 0;
+			}
+
+			if (index >= 0)
+			{
+				token = COM_Parse( p );
+				if ( *token )
+				{
+					Com_sprintf(projectile.bounceSoundName[index], sizeof (projectile.bounceSoundName[index]), "%s", token);
+				}
+				else
+				{
+					projectile.bounceSoundName[index][0] = '\0';
+				}
+				continue;
+			}
 		}
 
 		Com_Printf( "unknown token '%s' in projectile %s\n", token, projectile.name );
@@ -3096,6 +3174,14 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tgrappling %d\r\n", projectile->grappling);
 		FS_Printf2("\tinstantDamage %d\r\n", projectile->instantDamage);
 		FS_Printf2("\tmaxHits %d\r\n", projectile->maxHits);
+
+		FS_Printf2("\thitSound0 \"%s\"\r\n", projectile->hitSoundName[0]);
+		FS_Printf2("\thitSound1 \"%s\"\r\n", projectile->hitSoundName[1]);
+		FS_Printf2("\thitSound2 \"%s\"\r\n", projectile->hitSoundName[2]);
+		FS_Printf2("\thitPlayerSound \"%s\"\r\n", projectile->hitPlayerSoundName);
+		FS_Printf2("\thitMetalSound \"%s\"\r\n", projectile->hitMetalSoundName);
+		FS_Printf2("\tbounceSound0 \"%s\"\r\n", projectile->bounceSoundName[0]);
+		FS_Printf2("\tbounceSound1 \"%s\"\r\n", projectile->bounceSoundName[1]);
 
 		FS_Printf1("}\r\n\r\n");
 	}

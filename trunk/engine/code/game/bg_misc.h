@@ -736,12 +736,18 @@ typedef struct
 	int numProjectiles;
 
 	int homing;
-	// if more then 0 projectile is a homing missile,
-	//   homing is used as delay (in msec) before homing in on a player
+	// if "homing" > 0 then projectile is a homing missile,
+	//   homing is also used as the delay (in msec) before homing in on a player.
 
 	int grappling;
 	int instantDamage;
 	int maxHits; // Projectiles can go through players... currently instantDamage only
+
+	// Hit sounds
+	char hitSoundName[3][MAX_QPATH];
+	char hitPlayerSoundName[MAX_QPATH];
+	char hitMetalSoundName[MAX_QPATH];
+	char bounceSoundName[2][MAX_QPATH];
 
 } bg_projectileinfo_t;
 
