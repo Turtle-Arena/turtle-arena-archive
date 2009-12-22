@@ -329,7 +329,12 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 	// current rank
 	if ( cgs.gametype < GT_TEAM) {
-		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
+		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR
+#ifdef TMNTSP
+			&& cgs.gametype != GT_SINGLE_PLAYER
+#endif
+			)
+		{
 			s = va("%s place with %i",
 				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
 				cg.snap->ps.persistant[PERS_SCORE] );

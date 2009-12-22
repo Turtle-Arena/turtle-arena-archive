@@ -1530,7 +1530,6 @@ All movers (less func_door and func_button) can be killed,
 "paintarget" Trigers target ent on pain.
 * /
 
-Turtle Man: TODO: Support STY:EF func_breakable entity?
 ===============================================================================
 */
 
