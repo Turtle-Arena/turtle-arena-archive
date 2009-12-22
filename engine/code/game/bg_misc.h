@@ -349,6 +349,9 @@ typedef enum {
 #define	EF_PRIMARY_HAND		0x00040000		// player flag for primary hand only
 #endif
 #define EF_TEAMVOTED		0x00080000		// already cast a team vote
+#ifdef TMNTSP
+#define EF_FINISHED			0x00100000		// Finished level
+#endif
 
 #ifdef IOQ3ZTM
 #ifdef TMNTWEAPONS

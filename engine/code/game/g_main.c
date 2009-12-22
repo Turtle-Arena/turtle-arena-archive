@@ -997,8 +997,8 @@ void MoveClientToIntermission( gentity_t *ent ) {
 	{
 		// Don't move clients in single player.
 		ent->client->ps.pm_type = PM_SPINTERMISSION;
-		ent->client->ps.eFlags = 0;
-		ent->s.eFlags = 0;
+		ent->client->ps.eFlags = EF_FINISHED;
+		ent->s.eFlags = EF_FINISHED;
 		ent->s.eType = ET_GENERAL;
 		ent->s.modelindex = 0;
 		ent->s.loopSound = 0;

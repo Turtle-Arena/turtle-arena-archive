@@ -499,7 +499,10 @@ void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activat
 	{
 		// Set finish time.
 		activator->client->finishTime = level.time;
-		// Print message,
+		activator->client->ps.eFlags = EF_FINISHED;
+		activator->s.eFlags |= EF_FINISHED;
+
+		// Print message
 		if (!g_singlePlayer.integer)
 		{
 			G_Printf("%s finished the level.\n", activator->client->pers.netname );

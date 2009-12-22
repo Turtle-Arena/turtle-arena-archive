@@ -2756,7 +2756,12 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 	short		temp;
 	int		i;
 
-	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPINTERMISSION) {
+	if ( ps->pm_type == PM_INTERMISSION
+#ifndef TMNTSP
+		|| ps->pm_type == PM_SPINTERMISSION
+#endif
+		)
+	{
 		return;		// no view changes at all
 	}
 
@@ -2862,6 +2867,15 @@ void PmoveSingle (pmove_t *pmove) {
 		pmove->cmd.rightmove = 0;
 		pmove->cmd.upmove = 0;
 	}
+#ifdef TMNTSP
+	// Don't move after you have finished the level
+	else if ( pm->ps->eFlags & EF_FINISHED ) {
+		pmove->cmd.buttons = 0;
+		pmove->cmd.forwardmove = 0;
+		pmove->cmd.rightmove = 0;
+		pmove->cmd.upmove = 0;
+	}
+#endif
 
 	// clear all pmove local vars
 	memset (&pml, 0, sizeof(pml));
@@ -2934,7 +2948,12 @@ void PmoveSingle (pmove_t *pmove) {
 		return;		// no movement at all
 	}
 
-	if ( pm->ps->pm_type == PM_INTERMISSION || pm->ps->pm_type == PM_SPINTERMISSION) {
+	if ( pm->ps->pm_type == PM_INTERMISSION
+#ifndef TMNTSP
+		|| pm->ps->pm_type == PM_SPINTERMISSION
+#endif
+		)
+	{
 		return;		// no movement at all
 	}
 
