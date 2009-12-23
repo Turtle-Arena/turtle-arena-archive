@@ -1168,7 +1168,7 @@
 "classname" "team_redobelisk"
 "origin" "0.000000 1608.000000 144.000000"
 "angle" "-90.000000"
-"gametype" "obelisk,harvester"
+"gametype" "overload,harvester"
 }
 // entity 69
 {
@@ -1260,7 +1260,7 @@
 "classname" "team_blueobelisk"
 "origin" "-16.000000 -1608.000000 144.000000"
 "angle" "90.000000"
-"gametype" "obelisk,harvester"
+"gametype" "overload,harvester"
 }
 // entity 84
 {
@@ -1369,5 +1369,5 @@
 {
 "classname" "item_health_mega"
 "origin" "0.000000 0.000000 56.000000"
-"gametypes" "ffa,duel,single,team,ctf,obelisk,harvester"
+"gametypes" "ffa,duel,single,team,ctf,overload,harvester"
 }
