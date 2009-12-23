@@ -168,7 +168,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.addbots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
 #ifdef TMNTSP
-	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
+	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
@@ -188,7 +188,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.removebots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
 #ifdef TMNTSP
-	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
+	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
