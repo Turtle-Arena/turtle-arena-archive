@@ -930,7 +930,9 @@ void CG_PlayVoiceChat( bufferedVoiceChat_t *vchat ) {
 	}
 	if (!vchat->voiceOnly && !cg_noVoiceText.integer) {
 		CG_AddToTeamChat( vchat->message );
+#ifndef IOQ3ZTM // TEAM_CHAT_CON
 		CG_Printf( "%s\n", vchat->message );
+#endif
 	}
 	voiceChatBuffer[cg.voiceChatBufferOut].snd = 0;
 #endif
@@ -1144,7 +1146,7 @@ static void CG_ServerCommand( void ) {
 		Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );
-#ifndef IOQ3ZTM // TEST_CHAT_CON
+#ifndef IOQ3ZTM // TEAM_CHAT_CON
 		CG_Printf( "%s\n", text );
 #endif
 		return;
