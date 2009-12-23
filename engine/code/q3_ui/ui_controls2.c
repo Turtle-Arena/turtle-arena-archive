@@ -77,103 +77,69 @@ typedef struct
 #define ID_EXIT			107
 
 // bindable actions
-#define ID_SHOWSCORES	0
-#define ID_USEITEM		1	
-#define ID_SPEED		2	
-#define ID_FORWARD		3	
-#define ID_BACKPEDAL	4
-#define ID_MOVELEFT		5
-#define ID_MOVERIGHT	6
-#define ID_MOVEUP		7	
-#define ID_MOVEDOWN		8
-#define ID_LEFT			9	
-#define ID_RIGHT		10	
-#define ID_STRAFE		11	
-#define ID_LOOKUP		12	
-#define ID_LOOKDOWN		13
-#define ID_MOUSELOOK	14
-#define ID_CENTERVIEW	15
-#define ID_ZOOMVIEW		16
-
+enum {
+	ID_SHOWSCORES,
+	ID_USEITEM,
+#ifndef TMNT // NO_SPEED_KEY
+	ID_SPEED,
+#endif
+	ID_FORWARD,
+	ID_BACKPEDAL,
+	ID_MOVELEFT,
+	ID_MOVERIGHT,
+	ID_MOVEUP,
+	ID_MOVEDOWN,
+	ID_LEFT,
+	ID_RIGHT,
+	ID_STRAFE,
+	ID_LOOKUP,
+	ID_LOOKDOWN,
+	ID_MOUSELOOK,
+	ID_CENTERVIEW,
+#ifdef TMNT // LOCKON
+	ID_LOCKON,
+#endif
+#ifndef TMNT // NOZOOM
+	ID_ZOOMVIEW,
+#endif
+#ifndef TMNTWEAPSYS2
+	ID_WEAPON1,
+	ID_WEAPON2,
+	ID_WEAPON3,
+	ID_WEAPON4,
+	ID_WEAPON5,
+	ID_WEAPON6,
+	ID_WEAPON7,
+	ID_WEAPON8,
+	ID_WEAPON9,
+#endif
+	ID_ATTACK,
 #ifdef TMNTWEAPSYS2
-#define ID_ATTACK		17
-#define ID_WEAPDROP		18
-#define ID_GESTURE		19
-#define ID_CHAT			20
-#define ID_CHAT2		21
-#define ID_CHAT3		22
-#define ID_CHAT4		23
-
-#ifdef TMNTHOLDSYS // Why isn't this a enum?...
-#define ID_NEXTITEM		24
-#define ID_PREVITEM		25
-
-// all others
-#define ID_FREELOOK		26
-#define ID_INVERTMOUSE	27
-#define ID_ALWAYSRUN	28
-#define ID_MOUSESPEED	29
-#define ID_JOYENABLE	30
-#define ID_JOYTHRESHOLD	31
-#define ID_SMOOTHMOUSE	32
-
+	ID_WEAPDROP,
 #else
-
-// all others
-#define ID_FREELOOK		24
-#define ID_INVERTMOUSE	25
-#define ID_ALWAYSRUN	26
-#define ID_MOUSESPEED	27
-#define ID_JOYENABLE	28
-#define ID_JOYTHRESHOLD	29
-#define ID_SMOOTHMOUSE	30
-#endif // TMNTHOLDSYS
-
-#else
-#define ID_WEAPON1		17	
-#define ID_WEAPON2		18	
-#define ID_WEAPON3		19	
-#define ID_WEAPON4		20	
-#define ID_WEAPON5		21	
-#define ID_WEAPON6		22	
-#define ID_WEAPON7		23	
-#define ID_WEAPON8		24	
-#define ID_WEAPON9		25	
-#define ID_ATTACK		26
-#define ID_WEAPPREV		27
-#define ID_WEAPNEXT		28
-#define ID_GESTURE		29
-#define ID_CHAT			30
-#define ID_CHAT2		31
-#define ID_CHAT3		32
-#define ID_CHAT4		33
-
-#ifdef TMNTHOLDSYS // Why isn't this a enum?...
-#define ID_NEXTITEM		34
-#define ID_PREVITEM		35
-
-// all others
-#define ID_FREELOOK		36
-#define ID_INVERTMOUSE	37
-#define ID_ALWAYSRUN	38
-#define ID_AUTOSWITCH	39
-#define ID_MOUSESPEED	40
-#define ID_JOYENABLE	41
-#define ID_JOYTHRESHOLD	42
-#define ID_SMOOTHMOUSE	43
-#else
-// all others
-#define ID_FREELOOK		34
-#define ID_INVERTMOUSE	35
-#define ID_ALWAYSRUN	36
-#define ID_AUTOSWITCH	37
-#define ID_MOUSESPEED	38
-#define ID_JOYENABLE	39
-#define ID_JOYTHRESHOLD	40
-#define ID_SMOOTHMOUSE	41
-#endif // TMNTHOLDSYS
-
-#endif // TMNTWEAPSYS2
+	ID_WEAPPREV,
+	ID_WEAPNEXT,
+#endif
+	ID_GESTURE,
+	ID_CHAT,
+	ID_CHAT2,
+	ID_CHAT3,
+	ID_CHAT4,
+#ifdef TMNTHOLDSYS
+	ID_NEXTITEM,
+	ID_PREVITEM,
+#endif
+	ID_FREELOOK,
+	ID_INVERTMOUSE,
+#ifndef TMNT // ALWAYS_RUN
+	ID_ALWAYSRUN,
+#endif
+	ID_AUTOSWITCH,
+	ID_MOUSESPEED,
+	ID_JOYENABLE,
+	ID_JOYTHRESHOLD,
+	ID_SMOOTHMOUSE
+};
 
 #define ANIM_IDLE		0
 #define ANIM_RUN		1
@@ -227,7 +193,9 @@ typedef struct
 	menuaction_s		turnleft;
 	menuaction_s		turnright;
 	menuaction_s		sidestep;
+#ifndef TMNT // NO_SPEED_KEY
 	menuaction_s		run;
+#endif
 #ifndef TMNTWEAPSYS2
 	menuaction_s		machinegun;
 	menuaction_s		chainsaw;
@@ -251,12 +219,19 @@ typedef struct
 	menuaction_s		mouselook;
 	menuradiobutton_s	freelook;
 	menuaction_s		centerview;
+#ifdef TMNT // LOCKON
+	menuaction_s		lockon;
+#endif
+#ifndef TMNT // NOZOOM
 	menuaction_s		zoomview;
+#endif
 	menuaction_s		gesture;
 	menuradiobutton_s	invertmouse;
 	menuslider_s		sensitivity;
 	menuradiobutton_s	smoothmouse;
+#ifndef TMNT // ALWAYS_RUN
 	menuradiobutton_s	alwaysrun;
+#endif
 	menuaction_s		showscores;
 #ifndef TMNTWEAPSYS2
 	menuradiobutton_s	autoswitch;
@@ -298,8 +273,12 @@ static bind_t g_bindings[] =
 {
 	{"+scores",			"show scores",		ID_SHOWSCORES,	ANIM_IDLE,		K_TAB,			-1,		-1, -1},
 	{"+button2",		"use item",			ID_USEITEM,		ANIM_IDLE,		K_ENTER,		-1,		-1, -1},
+#ifdef TMNT // ALWAYS_RUN // NO_SPEED_KEY
+	{"+forward", 		"forward",			ID_FORWARD,		ANIM_RUN,		K_UPARROW,		-1,		-1, -1},
+#else
 	{"+speed", 			"run / walk",		ID_SPEED,		ANIM_RUN,		K_SHIFT,		-1,		-1,	-1},
 	{"+forward", 		"walk forward",		ID_FORWARD,		ANIM_WALK,		K_UPARROW,		-1,		-1, -1},
+#endif
 	{"+back", 			"backpedal",		ID_BACKPEDAL,	ANIM_BACK,		K_DOWNARROW,	-1,		-1, -1},
 	{"+moveleft", 		"step left",		ID_MOVELEFT,	ANIM_STEPLEFT,	',',			-1,		-1, -1},
 	{"+moveright", 		"step right",		ID_MOVERIGHT,	ANIM_STEPRIGHT,	'.',			-1,		-1, -1},
@@ -312,7 +291,12 @@ static bind_t g_bindings[] =
 	{"+lookdown", 		"look down",		ID_LOOKDOWN,	ANIM_LOOKDOWN,	K_DEL,			-1,		-1, -1},
 	{"+mlook", 			"mouse look",		ID_MOUSELOOK,	ANIM_IDLE,		'/',			-1,		-1, -1},
 	{"centerview", 		"center view",		ID_CENTERVIEW,	ANIM_IDLE,		K_END,			-1,		-1, -1},
+#ifdef TMNT // LOCKON
+	{"+lockon", 		"lock-on",			ID_LOCKON,		ANIM_IDLE,		K_MOUSE3,		'l',	-1, -1},
+#endif
+#ifndef TMNT // NOZOOM
 	{"+zoom", 			"zoom view",		ID_ZOOMVIEW,	ANIM_IDLE,		-1,				-1,		-1, -1},
+#endif
 #ifndef TMNTWEAPSYS2
 	{"weapon 1",		"gauntlet",			ID_WEAPON1,		ANIM_WEAPON1,	'1',			-1,		-1, -1},
 	{"weapon 2",		"machinegun",		ID_WEAPON2,		ANIM_WEAPON2,	'2',			-1,		-1, -1},
@@ -349,7 +333,9 @@ static bind_t g_bindings[] =
 
 static configcvar_t g_configcvars[] =
 {
+#ifndef TMNT // ALWAYS_RUN
 	{"cl_run",			0,					0},
+#endif
 	{"m_pitch",			0,					0},
 #ifndef TMNTWEAPSYS2
 	{"cg_autoswitch",	0,					0},
@@ -364,8 +350,15 @@ static configcvar_t g_configcvars[] =
 
 static menucommon_s *g_movement_controls[] =
 {
+#ifdef TMNT // LOCKON
+	(menucommon_s *)&s_controls.lockon,
+#endif
+#ifndef TMNT // ALWAYS_RUN
 	(menucommon_s *)&s_controls.alwaysrun,     
-	(menucommon_s *)&s_controls.run,            
+#endif
+#ifndef TMNT // NO_SPEED_KEY
+	(menucommon_s *)&s_controls.run,    
+#endif        
 	(menucommon_s *)&s_controls.walkforward,
 	(menucommon_s *)&s_controls.backpedal,
 	(menucommon_s *)&s_controls.stepleft,      
@@ -408,7 +401,9 @@ static menucommon_s *g_looking_controls[] = {
 	(menucommon_s *)&s_controls.mouselook,
 	(menucommon_s *)&s_controls.freelook,
 	(menucommon_s *)&s_controls.centerview,
+#ifndef TMNT // NOZOOM
 	(menucommon_s *)&s_controls.zoomview,
+#endif
 	(menucommon_s *)&s_controls.joyenable,
 	(menucommon_s *)&s_controls.joythreshold,
 	NULL,
@@ -925,7 +920,9 @@ static void Controls_GetConfig( void )
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarValue( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "m_filter" ) );
+#ifndef TMNT // ALWAYS_RUN
 	s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_run" ) );
+#endif
 #ifndef TMNTWEAPSYS2
 	s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cg_autoswitch" ) );
 #endif
@@ -969,7 +966,9 @@ static void Controls_SetConfig( void )
 		trap_Cvar_SetValue( "m_pitch", fabs( trap_Cvar_VariableValue( "m_pitch" ) ) );
 
 	trap_Cvar_SetValue( "m_filter", s_controls.smoothmouse.curvalue );
+#ifndef TMNT // ALWAYS_RUN
 	trap_Cvar_SetValue( "cl_run", s_controls.alwaysrun.curvalue );
+#endif
 #ifndef TMNTWEAPSYS2
 	trap_Cvar_SetValue( "cg_autoswitch", s_controls.autoswitch.curvalue );
 #endif
@@ -1005,7 +1004,9 @@ static void Controls_SetDefaults( void )
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarDefault( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = Controls_GetCvarDefault( "m_filter" );
+#ifndef TMNT // ALWAYS_RUN
 	s_controls.alwaysrun.curvalue    = Controls_GetCvarDefault( "cl_run" );
+#endif
 #ifndef TMNTWEAPSYS2
 	s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( "cg_autoswitch" );
 #endif
@@ -1239,7 +1240,9 @@ static void Controls_MenuEvent( void* ptr, int event )
 		case ID_MOUSESPEED:
 		case ID_INVERTMOUSE:
 		case ID_SMOOTHMOUSE:
+#ifndef TMNT // ALWAYS_RUN
 		case ID_ALWAYSRUN:
+#endif
 #ifndef TMNTWEAPSYS2
 		case ID_AUTOSWITCH:
 #endif
@@ -1485,11 +1488,13 @@ static void Controls_MenuInit( void )
 	s_controls.sidestep.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.sidestep.generic.id        = ID_STRAFE;
 
+#ifndef TMNT // NO_SPEED_KEY
 	s_controls.run.generic.type	     = MTYPE_ACTION;
 	s_controls.run.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.run.generic.callback  = Controls_ActionEvent;
 	s_controls.run.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.run.generic.id        = ID_SPEED;
+#endif
 
 #ifndef TMNTWEAPSYS2
 	s_controls.chainsaw.generic.type	  = MTYPE_ACTION;
@@ -1605,11 +1610,21 @@ static void Controls_MenuInit( void )
 	s_controls.centerview.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.centerview.generic.id        = ID_CENTERVIEW;
 
+#ifdef TMNT // LOCKON
+	s_controls.lockon.generic.type	  = MTYPE_ACTION;
+	s_controls.lockon.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.lockon.generic.callback  = Controls_ActionEvent;
+	s_controls.lockon.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.lockon.generic.id        = ID_LOCKON;
+#endif
+
+#ifndef TMNT // NOZOOM
 	s_controls.zoomview.generic.type	  = MTYPE_ACTION;
 	s_controls.zoomview.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.zoomview.generic.callback  = Controls_ActionEvent;
 	s_controls.zoomview.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.zoomview.generic.id        = ID_ZOOMVIEW;
+#endif
 
 	s_controls.useitem.generic.type	     = MTYPE_ACTION;
 	s_controls.useitem.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
@@ -1653,6 +1668,7 @@ static void Controls_MenuInit( void )
 	s_controls.smoothmouse.generic.callback  = Controls_MenuEvent;
 	s_controls.smoothmouse.generic.statusbar = Controls_StatusBar;
 
+#ifndef TMNT // ALWAYS_RUN
 	s_controls.alwaysrun.generic.type      = MTYPE_RADIOBUTTON;
 	s_controls.alwaysrun.generic.flags	   = QMF_SMALLFONT;
 	s_controls.alwaysrun.generic.x	       = SCREEN_WIDTH/2;
@@ -1660,6 +1676,7 @@ static void Controls_MenuInit( void )
 	s_controls.alwaysrun.generic.id        = ID_ALWAYSRUN;
 	s_controls.alwaysrun.generic.callback  = Controls_MenuEvent;
 	s_controls.alwaysrun.generic.statusbar = Controls_StatusBar;
+#endif
 
 #ifndef TMNTWEAPSYS2
 	s_controls.autoswitch.generic.type      = MTYPE_RADIOBUTTON;
@@ -1756,12 +1773,21 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.mouselook );
 	Menu_AddItem( &s_controls.menu, &s_controls.freelook );
 	Menu_AddItem( &s_controls.menu, &s_controls.centerview );
+#ifdef TMNT // LOCKON
+	Menu_AddItem( &s_controls.menu, &s_controls.lockon );
+#endif
+#ifndef TMNT // NOZOOM
 	Menu_AddItem( &s_controls.menu, &s_controls.zoomview );
+#endif
 	Menu_AddItem( &s_controls.menu, &s_controls.joyenable );
 	Menu_AddItem( &s_controls.menu, &s_controls.joythreshold );
 
+#ifndef TMNT // ALWAYS_RUN
 	Menu_AddItem( &s_controls.menu, &s_controls.alwaysrun );
+#endif
+#ifndef TMNT // NO_SPEED_KEY
 	Menu_AddItem( &s_controls.menu, &s_controls.run );
+#endif
 	Menu_AddItem( &s_controls.menu, &s_controls.walkforward );
 	Menu_AddItem( &s_controls.menu, &s_controls.backpedal );
 	Menu_AddItem( &s_controls.menu, &s_controls.stepleft );

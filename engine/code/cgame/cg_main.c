@@ -167,7 +167,9 @@ vmCvar_t	cg_autoswitch;
 vmCvar_t	cg_ignore;
 vmCvar_t	cg_simpleItems;
 vmCvar_t	cg_fov;
+#ifndef TMNT // NOZOOM
 vmCvar_t	cg_zoomFov;
+#endif
 vmCvar_t	cg_thirdPerson;
 vmCvar_t	cg_thirdPersonRange;
 vmCvar_t	cg_thirdPersonAngle;
@@ -255,7 +257,9 @@ static cvarTable_t cvarTable[] = {
 #else
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 #endif
+#ifndef TMNT // NOZOOM
 	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
+#endif
 #ifdef TMNTMISC // FOV
 	{ &cg_fov, "cg_fov", "70", CVAR_ARCHIVE },
 #else

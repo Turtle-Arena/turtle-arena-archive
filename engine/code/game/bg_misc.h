@@ -352,6 +352,9 @@ typedef enum {
 #ifdef TMNTSP
 #define EF_FINISHED			0x00100000		// Finished level
 #endif
+#ifdef TMNT // LOCKON
+#define EF_LOCKON			0x00200000
+#endif
 
 #ifdef IOQ3ZTM
 #ifdef TMNTWEAPONS

@@ -1519,12 +1519,14 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_OBITUARY:
 		DEBUGNAME("EV_OBITUARY");
+#ifndef TMNT // NOZOOM
 #ifdef IOQ3ZTM
 		// check for death of the current clientNum
 		if ( es->otherEntityNum == cg.snap->ps.clientNum ) {
 			// if zoomed in, zoom out
 			CG_ZoomUp_f();
 		}
+#endif
 #endif
 		CG_Obituary( es );
 		break;

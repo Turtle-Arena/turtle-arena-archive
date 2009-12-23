@@ -3153,7 +3153,9 @@ static bind_t g_bindings[] =
 	{"holdnext",		 K_MWHEELUP,		'\'',	-1, -1},
 	{"holdprev",		 K_MWHEELDOWN,		-1,		-1, -1},
 #endif
+#ifndef TMNT // NO_SPEED_KEY
 	{"+speed", 			 K_SHIFT,			-1,		-1,	-1},
+#endif
 	{"+forward", 		 K_UPARROW,		-1,		-1, -1},
 	{"+back", 			 K_DOWNARROW,	-1,		-1, -1},
 	{"+moveleft", 	 ',',					-1,		-1, -1},
@@ -3167,7 +3169,9 @@ static bind_t g_bindings[] =
 	{"+lookdown", 	 K_DEL,				-1,		-1, -1},
 	{"+mlook", 			 '/',					-1,		-1, -1},
 	{"centerview", 	 K_END,				-1,		-1, -1},
+#ifndef TMNT // NOZOOM
 	{"+zoom", 			 -1,						-1,		-1, -1},
+#endif
 	{"weapon 1",		 '1',					-1,		-1, -1},
 	{"weapon 2",		 '2',					-1,		-1, -1},
 	{"weapon 3",		 '3',					-1,		-1, -1},
@@ -3223,9 +3227,13 @@ static const int g_bindCount = sizeof(g_bindings) / sizeof(bind_t);
 #ifndef MISSIONPACK
 static configcvar_t g_configcvars[] =
 {
+#ifndef TMNT // ALWAYS_RUN
 	{"cl_run",			0,					0},
+#endif
 	{"m_pitch",			0,					0},
+#ifndef TMNTWEAPSYS2
 	{"cg_autoswitch",	0,					0},
+#endif
 	{"sensitivity",		0,					0},
 	{"in_joystick",		0,					0},
 	{"joy_threshold",	0,					0},
