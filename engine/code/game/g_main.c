@@ -477,6 +477,157 @@ void G_UpdateCvars( void ) {
 	}
 }
 
+#ifdef IOQ3ZTM // MAP_ROTATION
+#define MAX_MAPS_PER_ROTATION	32
+#define MAX_MAPROTATIONS		16 // MAX_ARENAS // 1024
+#define	MAX_MAPROTATIONS_TEXT	4096 // MAX_ARENAS_TEXT // 8192
+
+int				g_numMapRotations;
+static char		*g_mapRotationInfos[MAX_MAPROTATIONS];
+
+int G_ParseInfos( char *buf, int max, char *infos[] );
+
+/*
+===============
+G_LoadMapRotationsFromFile
+===============
+*/
+static void G_LoadMapRotationsFromFile( char *filename ) {
+	int				len;
+	fileHandle_t	f;
+	char			buf[MAX_MAPROTATIONS_TEXT];
+
+	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+	if ( !f ) {
+		trap_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		return;
+	}
+	if ( len >= MAX_ARENAS_TEXT ) {
+		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MAPROTATIONS_TEXT ) );
+		trap_FS_FCloseFile( f );
+		return;
+	}
+
+	trap_FS_Read( buf, len, f );
+	buf[len] = 0;
+	trap_FS_FCloseFile( f );
+
+	g_numMapRotations += G_ParseInfos( buf, MAX_MAPROTATIONS - g_numMapRotations, &g_mapRotationInfos[g_numMapRotations] );
+}
+
+/*
+===============
+G_GetMapRotationInfoByGametype
+===============
+*/
+const char *G_GetMapRotationInfoByGametype( int gametype ) {
+	int			n;
+	// TMNTMISC gametypeNames from G_SpawnGEntityFromSpawnVars
+	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "overload", "harvester", "teamtournament"};
+
+	// Find rotation for the current gametype
+	for( n = 0; n < g_numMapRotations; n++ ) {
+		if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[gametype] ) == 0 ) {
+			G_Printf("DEBUG: Found rotation info %d\n", n);
+			return g_mapRotationInfos[n];
+		}
+	}
+
+	// oneflag, overload, and harvester default to CTF
+	if (gametype > GT_CTF)
+	{
+		for( n = 0; n < g_numMapRotations; n++ ) {
+			if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[GT_CTF] ) == 0 ) {
+			G_Printf("DEBUG: Found CTF rotation info %d\n", n);
+				return g_mapRotationInfos[n];
+			}
+		}
+	}
+
+	// Default to ffa
+	for( n = 0; n < g_numMapRotations; n++ ) {
+		if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[GT_FFA] ) == 0 ) {
+			G_Printf("DEBUG: Found FFA rotation info %d\n", n);
+			return g_mapRotationInfos[n];
+		}
+	}
+
+	return NULL;
+}
+
+void G_InitMapRotation(void)
+{
+	g_numMapRotations = 0;
+
+	G_LoadMapRotationsFromFile("map_rotations.cfg");
+}
+
+void G_AdvanceMapRotation(void)
+{
+	char		map[MAX_QPATH];
+	char		serverinfo[MAX_INFO_STRING];
+	const char	*info;
+	char		*str;
+	int			i;
+	qboolean	foundMap;
+
+	foundMap = qfalse;
+
+#ifdef TMNTSP
+	// Single player doesn't rotate maps like the other gametypes.
+	if (g_gametype.integer == GT_SINGLE_PLAYER
+		|| trap_Cvar_VariableValue( "ui_singlePlayerActive" ))
+	{
+		return;
+	}
+#endif
+
+	// Get map rotation info
+	info = G_GetMapRotationInfoByGametype(g_gametype.integer);
+	if (info)
+	{
+		trap_GetServerinfo( serverinfo, sizeof(serverinfo) );
+		Q_strncpyz( map, Info_ValueForKey( serverinfo, "mapname" ), sizeof(map) );
+
+		// Find current map
+		for (i = 1; i < MAX_MAPS_PER_ROTATION+1; i++)
+		{
+			str = Info_ValueForKey(info, va("m%d", i));
+
+			// if str is blank
+			if (!str || !strlen(str))
+				continue;
+
+			if (foundMap) {
+				trap_Cvar_Set("nextmap", va("map %s", str));
+				return;
+			}
+			if( !Q_stricmp( str, map ) ) {
+				foundMap = qtrue;
+			}
+		}
+		// Found currently but didn't find next map
+		if (foundMap)
+		{
+			// Set nextmap to the first map in the rotation
+			str = Info_ValueForKey(info, "m1");
+
+			if (!str || !strlen(str))
+				return;
+
+			if (!Q_stricmp( str, map ))
+			{
+				// First and last map are the same, just restart.
+				return;
+			}
+
+			trap_Cvar_Set("nextmap", va("map %s", str));
+			return;
+		}
+	}
+}
+#endif
+
 /*
 ============
 G_InitGame
@@ -567,6 +718,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 #ifdef TMNTNPCSYS
 	BG_InitNPCInfo();
 #endif
+#ifdef IOQ3ZTM // MAP_ROTATION
+	G_InitMapRotation();
+#endif
 
 	// parse the key/value pairs and spawn gentities
 	G_SpawnEntitiesFromString();
@@ -587,7 +741,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_Printf ("-----------------------------------\n");
 
 	if( g_gametype.integer == GT_SINGLE_PLAYER || trap_Cvar_VariableIntegerValue( "com_buildScript" ) ) {
+#ifndef TMNTSP
 		G_ModelIndex( SP_PODIUM_MODEL );
+#endif
 		G_SoundIndex( "sound/player/gurp1.wav" );
 		G_SoundIndex( "sound/player/gurp2.wav" );
 	}
@@ -1149,6 +1305,10 @@ void ExitLevel (void) {
 		}
 		return;	
 	}
+
+#ifdef IOQ3ZTM // MAP_ROTATION
+	G_AdvanceMapRotation();
+#endif
 
 	trap_Cvar_VariableStringBuffer( "nextmap", nextmap, sizeof(nextmap) );
 	trap_Cvar_VariableStringBuffer( "d1", d1, sizeof(d1) );

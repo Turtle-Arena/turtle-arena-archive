@@ -60,7 +60,9 @@ typedef enum {
 	MOVER_2TO1
 } moverState_t;
 
+#ifndef TMNTSP
 #define SP_PODIUM_MODEL		"models/mapobjects/podium/podium4.md3"
+#endif
 
 //============================================================================
 

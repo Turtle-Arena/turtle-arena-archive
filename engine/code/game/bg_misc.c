@@ -1889,34 +1889,25 @@ static qboolean Projectile_Parse(char **p) {
 			continue;
 		} else if ( !Q_stricmp( token, "model" ) ) {
 			token = COM_Parse( p );
-			if ( *token )
-			{
+			if ( *token ) {
 				Com_sprintf(projectile.model, sizeof (projectile.model), "%s", token);
-			}
-			else
-			{
+			} else {
 				projectile.model[0] = '\0';
 			}
 			continue;
 		} else if ( !Q_stricmp( token, "modelBlue" ) ) {
 			token = COM_Parse( p );
-			if ( *token )
-			{
+			if ( *token ) {
 				Com_sprintf(projectile.modelBlue, sizeof (projectile.modelBlue), "%s", token);
-			}
-			else
-			{
+			} else {
 				projectile.modelBlue[0] = '\0';
 			}
 			continue;
 		} else if ( !Q_stricmp( token, "modelRed" ) ) {
 			token = COM_Parse( p );
-			if ( *token )
-			{
+			if ( *token ) {
 				Com_sprintf(projectile.modelRed, sizeof (projectile.modelRed), "%s", token);
-			}
-			else
-			{
+			} else {
 				projectile.modelRed[0] = '\0';
 			}
 			continue;
@@ -1997,12 +1988,9 @@ static qboolean Projectile_Parse(char **p) {
 			continue;
 		} else if ( !Q_stricmp( token, "missileSound" ) ) {
 			token = COM_Parse( p );
-			if ( *token )
-			{
+			if ( *token ) {
 				Com_sprintf(projectile.missileSoundName, sizeof (projectile.missileSoundName), "%s", token);
-			}
-			else
-			{
+			} else {
 				projectile.missileSoundName[0] = '\0';
 			}
 			continue;
@@ -2017,12 +2005,9 @@ static qboolean Projectile_Parse(char **p) {
 			continue;
 		} else if ( !Q_stricmp( token, "sprite" ) ) {
 			token = COM_Parse( p );
-			if ( *token )
-			{
+			if ( *token ) {
 				Com_sprintf(projectile.sprite, sizeof (projectile.sprite), "%s", token);
-			}
-			else
-			{
+			} else {
 				projectile.sprite[0] = '\0';
 			}
 			continue;
@@ -2068,12 +2053,9 @@ static qboolean Projectile_Parse(char **p) {
 			continue;
 		} else if ( !Q_stricmp( token, "wallmarkName" ) ) {
 			token = COM_Parse( p );
-			if ( *token )
-			{
+			if ( *token ) {
 				Com_sprintf(projectile.wallmarkName, sizeof (projectile.wallmarkName), "%s", token);
-			}
-			else
-			{
+			} else {
 				projectile.wallmarkName[0] = '\0';
 			}
 			continue;
@@ -2187,80 +2169,62 @@ static qboolean Projectile_Parse(char **p) {
 			}
 			projectile.maxHits = atoi(token);
 			continue;
-		} else if ( !Q_stricmp( token, "hitSound" ) ) {
-			int index = -1;
-
-			// hitSound0 hitSound1 hitSound2
-			if ( token[8]-'0' < 3 ) {
-				index = token[8]-'0';
+		} else if ( !Q_stricmp( token, "hitSound0" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.hitSoundName[0], sizeof (projectile.hitSoundName[0]), "%s", token);
+			} else {
+				projectile.hitSoundName[0][0] = '\0';
 			}
-			else if (token[8] == '\0')
-			{
-				// Default to '0'
-				index = 0;
+			continue;
+		} else if ( !Q_stricmp( token, "hitSound1" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.hitSoundName[1], sizeof (projectile.hitSoundName[1]), "%s", token);
+			} else {
+				projectile.hitSoundName[1][0] = '\0';
 			}
-
-			if (index >= 0)
-			{
-				token = COM_Parse( p );
-				if ( *token )
-				{
-					Com_sprintf(projectile.hitSoundName[index], sizeof (projectile.hitSoundName[index]), "%s", token);
-				}
-				else
-				{
-					projectile.hitSoundName[index][0] = '\0';
-				}
-				continue;
+			continue;
+		} else if ( !Q_stricmp( token, "hitSound2" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.hitSoundName[2], sizeof (projectile.hitSoundName[2]), "%s", token);
+			} else {
+				projectile.hitSoundName[2][0] = '\0';
 			}
+			continue;
 		} else if ( !Q_stricmp( token, "hitPlayerSound" ) ) {
 			token = COM_Parse( p );
-			if ( *token )
-			{
+			if ( *token ) {
 				Com_sprintf(projectile.hitPlayerSoundName, sizeof (projectile.hitPlayerSoundName), "%s", token);
-			}
-			else
-			{
+			} else {
 				projectile.hitPlayerSoundName[0] = '\0';
 			}
 			continue;
 		} else if ( !Q_stricmp( token, "hitMetalSound" ) ) {
 			token = COM_Parse( p );
-			if ( *token )
-			{
+			if ( *token ) {
 				Com_sprintf(projectile.hitMetalSoundName, sizeof (projectile.hitMetalSoundName), "%s", token);
-			}
-			else
-			{
+			} else {
 				projectile.hitMetalSoundName[0] = '\0';
 			}
 			continue;
-		} else if ( !Q_stricmp( token, "bounceSound" ) ) {
-			int index = -1;
-
-			// hitSound0 hitSound1 hitSound2
-			if ( token[12]-'0' < 2 ) {
-				index = token[12]-'0';
+		} else if ( !Q_stricmp( token, "bounceSound0" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.bounceSoundName[0], sizeof (projectile.bounceSoundName[0]), "%s", token);
+			} else {
+				projectile.bounceSoundName[0][0] = '\0';
 			}
-			else if (token[12] == '\0')
-			{
-				// Default to '0'
-				index = 0;
+			continue;
+		} else if ( !Q_stricmp( token, "bounceSound1" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.bounceSoundName[1], sizeof (projectile.bounceSoundName[1]), "%s", token);
+			} else {
+				projectile.bounceSoundName[1][0] = '\0';
 			}
-
-			if (index >= 0)
-			{
-				token = COM_Parse( p );
-				if ( *token )
-				{
-					Com_sprintf(projectile.bounceSoundName[index], sizeof (projectile.bounceSoundName[index]), "%s", token);
-				}
-				else
-				{
-					projectile.bounceSoundName[index][0] = '\0';
-				}
-				continue;
-			}
+			continue;
 		}
 
 		Com_Printf( "unknown token '%s' in projectile %s\n", token, projectile.name );
