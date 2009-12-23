@@ -49,11 +49,19 @@ at the same time.
 
 kbutton_t	in_left, in_right, in_forward, in_back;
 kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
+#ifdef TMNT // NO_SPEED_KEY
+kbutton_t	in_strafe;
+#else
 kbutton_t	in_strafe, in_speed;
+#endif
 kbutton_t	in_up, in_down;
 
 #ifdef USE_VOIP
 kbutton_t	in_voiprecord;
+#endif
+
+#ifdef TMNT // LOCKON
+kbutton_t	in_lockon;
 #endif
 
 kbutton_t	in_buttons[16];
@@ -215,10 +223,17 @@ void IN_MoveleftUp(void) {IN_KeyUp(&in_moveleft);}
 void IN_MoverightDown(void) {IN_KeyDown(&in_moveright);}
 void IN_MoverightUp(void) {IN_KeyUp(&in_moveright);}
 
+#ifndef TMNT // NO_SPEED_KEY
 void IN_SpeedDown(void) {IN_KeyDown(&in_speed);}
 void IN_SpeedUp(void) {IN_KeyUp(&in_speed);}
+#endif
 void IN_StrafeDown(void) {IN_KeyDown(&in_strafe);}
 void IN_StrafeUp(void) {IN_KeyUp(&in_strafe);}
+
+#ifdef TMNT // LOCKON
+void IN_LockonDown(void) {IN_KeyDown(&in_lockon);IN_KeyDown(&in_strafe);}
+void IN_LockonUp(void) {IN_KeyUp(&in_lockon);IN_KeyUp(&in_strafe);}
+#endif
 
 #ifdef USE_VOIP
 void IN_VoipRecordDown(void)
@@ -286,7 +301,9 @@ cvar_t	*cl_sidespeed;
 cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 
+#ifndef TMNT // ALWAYS_RUN
 cvar_t	*cl_run;
+#endif
 
 cvar_t	*cl_anglespeedkey;
 
@@ -301,7 +318,12 @@ Moves the local angle positions
 void CL_AdjustAngles( void ) {
 	float	speed;
 	
-	if ( in_speed.active ) {
+#ifdef TMNT // LOCKON // NO_SPEED_KEY
+	if ( !in_lockon.active )
+#else
+	if ( in_speed.active )
+#endif
+	{
 		speed = 0.001 * cls.frametime * cl_anglespeedkey->value;
 	} else {
 		speed = 0.001 * cls.frametime;
@@ -433,7 +455,12 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	// the walking flag is to keep animations consistant
 	// even during acceleration and develeration
 	//
-	if ( in_speed.active ^ cl_run->integer ) {
+#ifdef TMNT // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
+	if (!in_lockon.active)
+#else
+	if ( in_speed.active ^ cl_run->integer )
+#endif
+	{
 		movespeed = 127;
 		cmd->buttons &= ~BUTTON_WALKING;
 	} else {
@@ -530,14 +557,24 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 	int		movespeed;
 	float	anglespeed;
 
-	if ( in_speed.active ^ cl_run->integer ) {
+#ifdef TMNT // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
+	if (!in_lockon.active)
+#else
+	if ( in_speed.active ^ cl_run->integer )
+#endif
+	{
 		movespeed = 2;
 	} else {
 		movespeed = 1;
 		cmd->buttons |= BUTTON_WALKING;
 	}
 
-	if ( in_speed.active ) {
+#ifdef TMNT // LOCKON // NO_SPEED_KEY
+	if ( !in_lockon.active )
+#else
+	if ( in_speed.active )
+#endif
+	{
 		anglespeed = 0.001 * cls.frametime * cl_anglespeedkey->value;
 	} else {
 		anglespeed = 0.001 * cls.frametime;
@@ -652,12 +689,29 @@ void CL_MouseMove(usercmd_t *cmd)
 	my *= cl.cgameSensitivity;
 
 	// add mouse X/Y movement to cmd
-	if(in_strafe.active)
+	if(in_strafe.active) {
 		cmd->rightmove = ClampChar(cmd->rightmove + m_side->value * mx);
+#ifdef TMNT // LOCKON
+		// if walking, don't go over 64 side move
+		if (in_lockon.active)
+		{
+			if (cmd->rightmove > 64)
+				cmd->rightmove = 64;
+			else if (cmd->rightmove < -64)
+				cmd->rightmove = -64;
+		}
+#endif
+	}
 	else
 		cl.viewangles[YAW] -= m_yaw->value * mx;
 
-	if ((in_mlooking || cl_freelook->integer) && !in_strafe.active)
+	if ((in_mlooking || cl_freelook->integer)
+#ifdef TMNT // LOCKON
+		&& (in_lockon.active || !in_strafe.active)
+#else
+		&& !in_strafe.active
+#endif
+		)
 		cl.viewangles[PITCH] += m_pitch->value * my;
 	else
 		cmd->forwardmove = ClampChar(cmd->forwardmove - m_forward->value * my);
@@ -1168,8 +1222,14 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-moveleft", IN_MoveleftUp);
 	Cmd_AddCommand ("+moveright", IN_MoverightDown);
 	Cmd_AddCommand ("-moveright", IN_MoverightUp);
+#ifndef TMNT // NO_SPEED_KEY
 	Cmd_AddCommand ("+speed", IN_SpeedDown);
 	Cmd_AddCommand ("-speed", IN_SpeedUp);
+#endif
+#ifdef TMNT // LOCKON
+	Cmd_AddCommand ("+lockon", IN_LockonDown);
+	Cmd_AddCommand ("-lockon", IN_LockonUp);
+#endif
 	Cmd_AddCommand ("+attack", IN_Button0Down);
 	Cmd_AddCommand ("-attack", IN_Button0Up);
 	Cmd_AddCommand ("+button0", IN_Button0Down);
@@ -1202,16 +1262,6 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-button13", IN_Button13Up);
 	Cmd_AddCommand ("+button14", IN_Button14Down);
 	Cmd_AddCommand ("-button14", IN_Button14Up);
-#if 0 //#ifdef TMNTHOLDSYS // NEXTHOLDABLE
-	// Turtle Man: I think BUTTON_NEXT_HOLDABLE is 12, and "should" be used when Button12* happens.
-	Cmd_AddCommand ("+nextholdable", IN_Button12Down);
-	Cmd_AddCommand ("-nextholdable", IN_Button12Up);
-#endif
-#if 0 //#ifdef TMNTWEAPSYS2
-	// Turtle Man: I think BUTTON_DROP_WEAPON is 13, and "should" be used when Button13* happens.
-	Cmd_AddCommand ("+dropweapon", IN_Button13Down);
-	Cmd_AddCommand ("-dropweapon", IN_Button13Up);
-#endif
 	Cmd_AddCommand ("+mlook", IN_MLookDown);
 	Cmd_AddCommand ("-mlook", IN_MLookUp);
 

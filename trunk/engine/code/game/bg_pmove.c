@@ -2823,6 +2823,15 @@ void PmoveSingle (pmove_t *pmove) {
 		pm->cmd.buttons &= ~BUTTON_WALKING;
 	}
 
+#ifdef TMNT // LOCKON
+	// set the lock-on flag
+	if ( pm->ps->stats[STAT_HEALTH] > 0 && (pm->cmd.buttons & BUTTON_WALKING) ) {
+		pm->ps->eFlags |= EF_LOCKON;
+	} else {
+		pm->ps->eFlags &= ~EF_LOCKON;
+	}
+#endif
+
 	// set the talk balloon flag
 	if ( pm->cmd.buttons & BUTTON_TALK ) {
 		pm->ps->eFlags |= EF_TALK;

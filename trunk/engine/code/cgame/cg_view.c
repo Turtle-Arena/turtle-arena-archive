@@ -480,15 +480,13 @@ static void CG_OffsetFirstPersonView( void ) {
 
 //======================================================================
 
+#ifndef TMNT // NOZOOM
 void CG_ZoomDown_f( void ) { 
 	if ( cg.zoomed ) {
 		return;
 	}
 	cg.zoomed = qtrue;
 	cg.zoomTime = cg.time;
-#ifdef TMNTMISC
-	CG_ToggleLetterbox(qtrue, qfalse);
-#endif
 }
 
 void CG_ZoomUp_f( void ) { 
@@ -497,10 +495,8 @@ void CG_ZoomUp_f( void ) {
 	}
 	cg.zoomed = qfalse;
 	cg.zoomTime = cg.time;
-#ifdef TMNTMISC
-	CG_ToggleLetterbox(qfalse, qfalse);
-#endif
 }
+#endif
 
 
 /*
@@ -519,8 +515,10 @@ static int CG_CalcFov( void ) {
 	float	v;
 	int		contents;
 	float	fov_x, fov_y;
+#ifndef TMNT // NOZOOM
 	float	zoomFov;
 	float	f;
+#endif
 	int		inwater;
 
 	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
@@ -548,6 +546,7 @@ static int CG_CalcFov( void ) {
 			}
 		}
 
+#ifndef TMNT // NOZOOM
 		// account for zooms
 		zoomFov = cg_zoomFov.value;
 		if ( zoomFov < 1 ) {
@@ -571,6 +570,7 @@ static int CG_CalcFov( void ) {
 				fov_x = zoomFov + f * ( fov_x - zoomFov );
 			}
 		}
+#endif
 	}
 
 	x = cg.refdef.width / tan( fov_x / 360 * M_PI );
@@ -595,11 +595,13 @@ static int CG_CalcFov( void ) {
 	cg.refdef.fov_x = fov_x;
 	cg.refdef.fov_y = fov_y;
 
+#ifndef TMNT // NOZOOM
 	if ( !cg.zoomed ) {
 		cg.zoomSensitivity = 1;
 	} else {
 		cg.zoomSensitivity = cg.refdef.fov_y / 75.0;
 	}
+#endif
 
 	return inwater;
 }
@@ -890,6 +892,7 @@ Generates and draws a game scene and status information at the given time.
 */
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback ) {
 	int		inwater;
+	float	mouseSensitivity;
 
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
@@ -922,17 +925,22 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	}
 
 	// let the client system know what our weapon and zoom settings are
+#ifdef TMNT // NOZOOM
+	mouseSensitivity = 1;
+#else
+	mouseSensitivity = cg.zoomSensitivity;
+#endif
 #ifdef TMNTWEAPSYS2
 #ifdef TMNTHOLDSYS/*2*/
-	trap_SetUserCmdValue( cg.holdableSelect, cg.zoomSensitivity );
+	trap_SetUserCmdValue( cg.holdableSelect, mouseSensitivity );
 #else
-	trap_SetUserCmdValue( 0, cg.zoomSensitivity );
+	trap_SetUserCmdValue( 0, mouseSensitivity );
 #endif
 #else
 #ifdef TMNTHOLDSYS/*2*/
-	trap_SetUserCmdValue( cg.weaponSelect, cg.holdableSelect, cg.zoomSensitivity );
+	trap_SetUserCmdValue( cg.weaponSelect, cg.holdableSelect, mouseSensitivity );
 #else
-	trap_SetUserCmdValue( cg.weaponSelect, cg.zoomSensitivity );
+	trap_SetUserCmdValue( cg.weaponSelect, mouseSensitivity );
 #endif
 #endif
 
@@ -941,6 +949,23 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// update cg.predictedPlayerState
 	CG_PredictPlayerState();
+
+#ifdef TMNT // LOCKON
+	if (!cg.lockedOn && (cg.predictedPlayerState.eFlags & EF_LOCKON))
+	{
+		cg.lockedOn = qtrue;
+#ifdef TMNTMISC
+		CG_ToggleLetterbox(qtrue, qfalse);
+#endif
+	}
+	else if (cg.lockedOn && !(cg.predictedPlayerState.eFlags & EF_LOCKON))
+	{
+		cg.lockedOn = qfalse;
+#ifdef TMNTMISC
+		CG_ToggleLetterbox(qfalse, qfalse);
+#endif
+	}
+#endif
 
 	// decide on third person view
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, if spectator always be in first person.

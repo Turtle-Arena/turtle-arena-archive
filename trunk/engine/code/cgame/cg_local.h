@@ -50,7 +50,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	PAIN_TWITCH_TIME	200
 #define	WEAPON_SELECT_TIME	1400
 #define	ITEM_SCALEUP_TIME	1000
+#ifndef TMNT // NOZOOM
 #define	ZOOM_TIME			150
+#endif
 #define	ITEM_BLOB_TIME		200
 #define	MUZZLE_FLASH_TIME	20
 #define	SINK_TIME			1000		// time for fragments to sink into ground before going away
@@ -763,10 +765,17 @@ typedef struct {
 	refdef_t	refdef;
 	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
 
+#ifdef TMNT // LOCKON
+	// lockon key
+	qboolean	lockedOn;
+#endif
+
+#ifndef TMNT // NOZOOM
 	// zoom key
 	qboolean	zoomed;
 	int			zoomTime;
 	float		zoomSensitivity;
+#endif
 
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
@@ -1553,7 +1562,9 @@ extern	vmCvar_t		cg_autoswitch;
 extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;
 extern	vmCvar_t		cg_fov;
+#ifndef TMNT // NOZOOM
 extern	vmCvar_t		cg_zoomFov;
+#endif
 extern	vmCvar_t		cg_thirdPersonRange;
 extern	vmCvar_t		cg_thirdPersonAngle;
 extern	vmCvar_t		cg_thirdPerson;
@@ -1653,8 +1664,10 @@ void CG_TestModelNextFrame_f (void);
 void CG_TestModelPrevFrame_f (void);
 void CG_TestModelNextSkin_f (void);
 void CG_TestModelPrevSkin_f (void);
+#ifndef TMNT // NOZOOM
 void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
+#endif
 void CG_AddBufferedSound( sfxHandle_t sfx);
 
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
