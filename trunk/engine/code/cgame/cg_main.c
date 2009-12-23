@@ -345,7 +345,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE  },
 #endif // TMNTMISC
 #endif // IOQ3ZTM
-#ifdef TMNTMISC // Enable TEST_CHAT_CON sole
+#ifdef TMNTMISC // TEAM_CHAT_CON
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "8", CVAR_ARCHIVE  },
 #else
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
