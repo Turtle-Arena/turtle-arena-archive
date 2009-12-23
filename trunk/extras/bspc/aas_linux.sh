@@ -4,9 +4,6 @@
 #
 # Based on xreal ( http://www.xreal-project.net ) script
 
-# -nograpplereach
-ARGS=-forcesidesvisible -bsp2aas "../../base/maps/*.bsp"
-
 # Select binary
 case `uname -m` in
 	x86_64)
@@ -29,5 +26,5 @@ if [ ! -f $BIN ]; then
 	exit 1
 fi
 
-# Run
-./$BIN $ARGS
+# Run # -nograpplereach
+./$BIN -forcesidesvisible -bsp2aas "../../base/maps/*.bsp"
