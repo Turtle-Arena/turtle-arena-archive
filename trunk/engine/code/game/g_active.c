@@ -1386,6 +1386,59 @@ void ClientThink_real( gentity_t *ent ) {
 		Weapon_HookFree(client->hook);
 	}
 
+#ifdef TMNT // LOCKON
+	if (ent->enemy && (ent->enemy == ent || !ent->enemy->takedamage))
+	{
+		ent->enemy = NULL;
+	}
+
+	// 2000.0f, 30.0f
+	if (!ent->enemy || !G_ValidTarget(ent, ent->enemy, client->ps.origin, client->ps.viewangles, 10000.0f, 90.0f, 2))
+	{
+		// Search for a target
+		ent->enemy = G_FindTarget(ent, client->ps.origin, client->ps.viewangles, 10000.0f, 90.0f);
+	}
+
+	// Set origin of target
+	if (ent->enemy)
+	{
+		if (ent->enemy->client) {
+			VectorCopy(ent->enemy->client->ps.origin, ent->s.origin2);
+			ent->s.origin2[2] += ent->enemy->client->ps.viewheight + 16;
+		} else {
+			VectorCopy(ent->enemy->s.origin, ent->s.origin2);
+			ent->s.origin2[2] += (ent->enemy->r.mins[2] + ent->enemy->r.maxs[2])/2 + 40;
+		}
+
+		// TEST
+		VectorCopy(ent->s.origin2, client->ps.grapplePoint);
+		client->ps.generic1 = ent->enemy-g_entities;
+	}
+	else
+	{
+		VectorClear(ent->s.origin2);
+
+		// TEST
+		VectorClear(client->ps.grapplePoint);
+		client->ps.generic1 = ent-g_entities;
+	}
+
+	if ((client->ps.eFlags & EF_LOCKON) && ent->enemy) {
+		vec3_t dir;
+		vec3_t angles;
+
+		if (ent->enemy->client) {
+			VectorSubtract( ent->enemy->client->ps.origin, client->ps.origin, dir );
+			vectoangles( dir, angles );
+		} else {
+			VectorSubtract( ent->enemy->s.origin, client->ps.origin, dir );
+			vectoangles( dir, angles );
+		}
+
+		SetClientViewAngle(ent, angles);
+	}
+#endif
+
 	// set up for pmove
 	oldEventSequence = client->ps.eventSequence;
 
@@ -1404,7 +1457,7 @@ void ClientThink_real( gentity_t *ent ) {
 		qboolean singleHanded = (holdingFlag || byFlag || byWeapon);
 
 		if (singleHanded)
-	{
+		{
 			// The Good: When byFlag and attacking, use both hands to attack.
 			// The Bad: If standing by flag, secondary weapon is got out and
 			//    put away before/after each attack...
@@ -1415,45 +1468,45 @@ void ClientThink_real( gentity_t *ent ) {
 			else
 			// Don't change while melee attacking?
 			//if (!client->ps.meleeTime)
-		{
+			{
 				client->ps.eFlags |= EF_PRIMARY_HAND;
+			}
 		}
-	}
 		else if (client->ps.eFlags & EF_PRIMARY_HAND)
-	{
+		{
 			// Don't change while melee attacking?
 			//if (!client->ps.meleeTime)
 			{
 				client->ps.eFlags &= ~EF_PRIMARY_HAND;
 			}
-	}
+		}
 	}
 #endif
 
 #ifdef TMNTWEAPSYS // MELEEATTACK
 	if (client->ps.pm_type != PM_DEAD)
 	{
-	if (BG_WeaponTypeForPlayerState(&client->ps) == WT_GAUNTLET)
-	{
-		if ((ucmd->buttons & BUTTON_ATTACK) && !(ucmd->buttons & BUTTON_TALK)
-			&& client->ps.weaponTime <= 0 )
-	{
-				pm.gauntletHit = G_MeleeDamage( ent, qtrue );
-	}
-	else
-	{
-			// If always does damage, do damage anyway.
-				G_MeleeDamage( ent, qfalse );
-	}
-	}
-	else
-	{
-		if ((ucmd->buttons & BUTTON_ATTACK) && !( ucmd->buttons & BUTTON_TALK )
-			&& !client->ps.meleeDelay && !client->ps.meleeTime
-			&& !client->ps.weaponTime)
+		if (BG_WeaponTypeForPlayerState(&client->ps) == WT_GAUNTLET)
 		{
-			G_StartMeleeAttack(ent);
+			if ((ucmd->buttons & BUTTON_ATTACK) && !(ucmd->buttons & BUTTON_TALK)
+				&& client->ps.weaponTime <= 0 )
+			{
+					pm.gauntletHit = G_MeleeDamage( ent, qtrue );
+			}
+			else
+			{
+				// If always does damage, do damage anyway.
+				G_MeleeDamage( ent, qfalse );
+			}
 		}
+		else
+		{
+			if ((ucmd->buttons & BUTTON_ATTACK) && !( ucmd->buttons & BUTTON_TALK )
+				&& !client->ps.meleeDelay && !client->ps.meleeTime
+				&& !client->ps.weaponTime)
+			{
+				G_StartMeleeAttack(ent);
+			}
 
 			G_MeleeDamage( ent, (client->ps.meleeTime > 0) );
 		}

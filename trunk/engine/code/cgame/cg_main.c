@@ -1225,6 +1225,10 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.dustPuffShader = trap_R_RegisterShader("hasteSmokePuff" );
 #endif
 
+#ifdef TMNT // LOCKON
+	cgs.media.targetShader = trap_R_RegisterShader( "sprites/target" );
+#endif
+
 	if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
 #ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS // TMNT_SUPPORTEF
 		// Sprites used by Elite Force

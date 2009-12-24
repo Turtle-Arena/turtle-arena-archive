@@ -2760,6 +2760,21 @@ static void CG_PlayerSprites( centity_t *cent
 	}
 #endif
 
+#ifdef TMNT // LOCKON
+	// Show target
+#ifdef IOQ3ZTM
+	if (cg.snap->ps.clientNum != cent->currentState.number &&
+		cg_entities[cg.snap->ps.clientNum].currentState.generic1 == cent->currentState.number)
+	{
+#ifdef IOQ3ZTM
+		CG_PlayerFloatSprite( origin, 0, cgs.media.targetShader );
+#else
+		CG_PlayerFloatSprite( cent, cgs.media.targetShader );
+#endif
+	}
+#endif
+#endif
+
 	team = cgs.clientinfo[ cent->currentState.clientNum ].team;
 	if ( !(cent->currentState.eFlags & EF_DEAD) && 
 #ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
@@ -3112,6 +3127,17 @@ void CG_Player( centity_t *cent ) {
 				return;
 			}
 		}
+#ifdef TMNT // LOCKON
+		// Show target
+#ifdef IOQ3ZTM
+		if (cent->currentState.generic1 >= MAX_CLIENTS && (cg.snap->ps.grapplePoint[0]
+			|| cg.snap->ps.grapplePoint[1] || cg.snap->ps.grapplePoint[2]))
+		{
+			//CG_Printf("DEBUG: Lock-on Marker!\n");
+			CG_PlayerFloatSprite( cg.snap->ps.grapplePoint, 0, cgs.media.targetShader );
+		}
+#endif
+#endif
 	}
 
 
