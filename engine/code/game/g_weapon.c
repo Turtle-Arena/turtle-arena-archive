@@ -89,19 +89,21 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 	}
 #endif
 
-	// Turtle Man: TODO: If locked on to a entity (Like in LoZ:TP), or is a NPC
+	// If locked on to a entity (Like in LoZ:TP), or is a NPC
 	target = ent->enemy;
 	if (target && (target == ent || !target->takedamage))
 	{
 		target = NULL;
 	}
 
+#ifndef TMNT // LOCKON
 	if (!target || !G_ValidTarget(ent, target, start, forward, range, angle, 2)) // && !NPC?
 	{
 		// Search for a target
 		target = G_FindTarget(ent, start, forward, range, angle);
 		// ent->enemy = target; // Turtle Man: Update target?
 	}
+#endif
 
 	if (!target) {
 		return;

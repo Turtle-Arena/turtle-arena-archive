@@ -770,6 +770,13 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 		const vec3_t start, const vec3_t dir,
 		float range, float ang, int tests)
 {
+	vec3_t eorg;
+	int j;
+	vec3_t blipdir;
+	float angle;
+	vec3_t targetOrg;
+	vec3_t sourceOrg;
+
 	if (!target->inuse)
 		return qfalse;
 
@@ -798,17 +805,17 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 	// Unneeded for target trace test, the trace found it so it is visable
 	if (tests >= 1)
 	{
-		if (!G_IsVisible(source, target->r.currentOrigin))
+		if (target-g_entities < MAX_CLIENTS)
+		{
+			if (!G_IsVisible(source, target->client->ps.origin))
+				return qfalse;
+		}
+		else if (!G_IsVisible(source, target->r.currentOrigin))
 			return qfalse;
 	}
 	// G_FindTarget does its own dist/angle check, for best target.
 	if (tests >= 2)
 	{
-		vec3_t eorg;
-		int j;
-		vec3_t blipdir;
-		float angle;
-
 		for(j = 0; j < 3; j++) {
 			eorg[j] = source->s.origin[j] - (target->s.origin[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
 		}
@@ -819,10 +826,20 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 		// Angle check
 		if (ang < 360)
 		{
-			VectorSubtract(target->r.currentOrigin, source->r.currentOrigin, blipdir);
+			if (target-g_entities < MAX_CLIENTS)
+				VectorCopy(target->client->ps.origin, targetOrg);
+			else
+				VectorCopy(target->r.currentOrigin, targetOrg);
+
+			if (source-g_entities < MAX_CLIENTS)
+				VectorCopy(source->client->ps.origin, sourceOrg);
+			else
+				VectorCopy(source->r.currentOrigin, sourceOrg);
+
+			VectorSubtract(targetOrg, sourceOrg, blipdir);
 
 			if (source-g_entities < MAX_CLIENTS) {
-				angle = AngleBetweenVectors(source->s.apos.trBase, blipdir);
+				angle = AngleBetweenVectors(source->client->ps.viewangles, blipdir);
 			} else {
 				angle = AngleBetweenVectors(source->r.currentAngles, blipdir);
 			}
@@ -851,6 +868,8 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 	gentity_t		*besttarget;
 	float			bestdist, dist, angle;
 	vec3_t			blipdir, bestdir;
+	vec3_t			targetOrg;
+	vec3_t			sourceOrg;
 
 	besttarget = NULL;
 	bestdist = range;
@@ -893,13 +912,23 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 		// Angle check
 		if (ang < 360)
 		{
-			VectorSubtract(target->r.currentOrigin, source->r.currentOrigin, blipdir);
+			if (target-g_entities < MAX_CLIENTS)
+				VectorCopy(target->client->ps.origin, targetOrg);
+			else
+				VectorCopy(target->r.currentOrigin, targetOrg);
+
+			if (source-g_entities < MAX_CLIENTS)
+				VectorCopy(source->client->ps.origin, sourceOrg);
+			else
+				VectorCopy(source->r.currentOrigin, sourceOrg);
+
+			VectorSubtract(targetOrg, sourceOrg, blipdir);
 
 			// Turtle Man: Disabled best angle (for now), allways shoot closest?
 			if (!besttarget/* || VectorLength(blipdir) < VectorLength(bestdir)*/)
 			{
 				if (source-g_entities < MAX_CLIENTS) {
-					angle = AngleBetweenVectors(source->s.apos.trBase, blipdir);
+					angle = AngleBetweenVectors(source->client->ps.viewangles, blipdir);
 				} else {
 					angle = AngleBetweenVectors(source->r.currentAngles, blipdir);
 				}

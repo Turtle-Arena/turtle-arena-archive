@@ -1033,6 +1033,9 @@ typedef struct {
 	qhandle_t	blueFriendShader;
 #endif
 	qhandle_t	friendShader;
+#ifdef TMNT // LOCKON
+	qhandle_t	targetShader;
+#endif
 
 	qhandle_t	balloonShader;
 	qhandle_t	connectionShader;

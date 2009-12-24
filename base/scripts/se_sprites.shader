@@ -115,7 +115,7 @@ sun
 // Turtle Man: Used in Team modes, it is above your teammate's head.
 sprites/team_red
 {
-	entityMergable // Turtle Man: Should be okay.
+	entityMergable
 	nomipmaps
 	nopicmip
 	{
@@ -126,11 +126,22 @@ sprites/team_red
 
 sprites/team_blue
 {
-	entityMergable // Turtle Man: Should be okay.
+	entityMergable
 	nomipmaps
 	nopicmip
 	{
 		map sprites/friend_b.png
+		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+// Shows over the target entity
+sprites/target
+{
+	nomipmaps
+	nopicmip
+	{
+		map sprites/target.png
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
