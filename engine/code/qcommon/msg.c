@@ -1221,13 +1221,19 @@ netField_t	playerStateFields[] =
 { PSF(grapplePoint[0]), 0 },
 { PSF(grapplePoint[1]), 0 },
 { PSF(grapplePoint[2]), 0 },
-{ PSF(jumppad_ent), 10 },
+{ PSF(jumppad_ent), GENTITYNUM_BITS },
 { PSF(loopSound), 16 }
 #ifdef TMNTHOLDSYS
 ,{ PSF(holdableIndex), 5 }
 #endif
 #ifdef TMNTHOLDABLE
 ,{ PSF(holdableTime), -16 }
+#endif
+#ifdef TMNT // LOCKON
+,{ PSF(enemyEnt), GENTITYNUM_BITS },
+{ PSF(enemyMarker[0]), 0 },
+{ PSF(enemyMarker[1]), 0 },
+{ PSF(enemyMarker[2]), 0 }
 #endif
 #ifdef TMNTWEAPSYS // MELEEATTACK
 ,{ PSF(meleeAttack), 8 },

@@ -724,43 +724,52 @@ G_FindRadius (origin, radius)
 */
 gentity_t *G_FindRadius(gentity_t *from, const vec3_t org, float rad)
 {
-  vec3_t  eorg;
-  int j;
+	vec3_t	eorg;
+	vec3_t	targetOrg;
+	int		j;
 
-	if(!from)
-    from = g_entities;
-  else
-    from++;
+	if (!from)
+		from = g_entities;
+	else
+		from++;
 
 	for(; from < &g_entities[level.num_entities]; from++)
-  {
+	{
 		if(!from->inuse)
-      continue;
+			continue;
+
+		if (from-g_entities < MAX_CLIENTS) {
+			VectorCopy(from->client->ps.origin, targetOrg);
+			targetOrg[2] += from->client->ps.viewheight;
+		} else {
+			VectorCopy(from->r.currentOrigin, targetOrg);
+			targetOrg[2] += 40;
+		}
 
 		for(j = 0; j < 3; j++)
-			eorg[j] = org[j] - (from->s.origin[j] + (from->r.mins[j] + from->r.maxs[j]) * 0.5);
+			eorg[j] = org[j] - (targetOrg[j] + (from->r.mins[j] + from->r.maxs[j]) * 0.5);
 
-		if(VectorLength(eorg) > rad)
-      continue;
+		if (VectorLength(eorg) > rad)
+			continue;
 
-    return from;
-  }
+		return from;
+	}
 
-  return NULL;
+	return NULL;
 }
 
 // Visiblilty check
-qboolean G_IsVisible(const gentity_t *self, const vec3_t goal)
+qboolean G_IsVisible(int skipEnt, const vec3_t start, const vec3_t goal)
 {
-  trace_t trace;
+	trace_t trace;
 
-	trap_Trace(&trace, self->r.currentOrigin, NULL, NULL, goal, self->s.number, MASK_SHOT);
+	trap_Trace(&trace, start, NULL, NULL, goal, skipEnt, MASK_SHOT);
 
 	// Yes we can see it
-	if(trace.contents & CONTENTS_SOLID)
-    return qfalse;
+	if (trace.contents & CONTENTS_SOLID)
+		return qfalse;
 	else
-  return qtrue;
+		return qtrue;
 }
 
 // g_team.c
@@ -774,8 +783,11 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 	int j;
 	vec3_t blipdir;
 	float angle;
+	float dist;
 	vec3_t targetOrg;
-	vec3_t sourceOrg;
+
+	if (!target)
+		return qfalse;
 
 	if (!target->inuse)
 		return qfalse;
@@ -799,50 +811,40 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 	if (target->client && target->client->sess.sessionTeam >= TEAM_SPECTATOR)
 		return qfalse;
 
-	if (g_gametype.integer >= GT_TEAM && OnSameTeam(target, source))
+	if (OnSameTeam(target, source))
 		return qfalse;
+
+	if (target-g_entities < MAX_CLIENTS) {
+		VectorCopy(target->client->ps.origin, targetOrg);
+		targetOrg[2] += target->client->ps.viewheight;
+	} else {
+		VectorCopy(target->r.currentOrigin, targetOrg);
+		targetOrg[2] += 40;
+	}
 
 	// Unneeded for target trace test, the trace found it so it is visable
 	if (tests >= 1)
 	{
-		if (target-g_entities < MAX_CLIENTS)
-		{
-			if (!G_IsVisible(source, target->client->ps.origin))
-				return qfalse;
-		}
-		else if (!G_IsVisible(source, target->r.currentOrigin))
+		if (!G_IsVisible(source->s.number, start, targetOrg))
 			return qfalse;
 	}
 	// G_FindTarget does its own dist/angle check, for best target.
 	if (tests >= 2)
 	{
 		for(j = 0; j < 3; j++) {
-			eorg[j] = source->s.origin[j] - (target->s.origin[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
+			eorg[j] = start[j] - (targetOrg[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
 		}
 
-		if (VectorLength(eorg) > range)
+		dist = VectorLength(eorg);
+		if (dist > range)
 			return qfalse;
 
 		// Angle check
-		if (ang < 360)
+		if (dist > 128.0f && ang < 360)
 		{
-			if (target-g_entities < MAX_CLIENTS)
-				VectorCopy(target->client->ps.origin, targetOrg);
-			else
-				VectorCopy(target->r.currentOrigin, targetOrg);
+			VectorSubtract(targetOrg, start, blipdir);
 
-			if (source-g_entities < MAX_CLIENTS)
-				VectorCopy(source->client->ps.origin, sourceOrg);
-			else
-				VectorCopy(source->r.currentOrigin, sourceOrg);
-
-			VectorSubtract(targetOrg, sourceOrg, blipdir);
-
-			if (source-g_entities < MAX_CLIENTS) {
-				angle = AngleBetweenVectors(source->client->ps.viewangles, blipdir);
-			} else {
-				angle = AngleBetweenVectors(source->r.currentAngles, blipdir);
-			}
+			angle = AngleBetweenVectors(dir, blipdir);
 			if (angle > ang) {
 				return qfalse;
 			}
@@ -867,24 +869,24 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 	gentity_t		*target;
 	gentity_t		*besttarget;
 	float			bestdist, dist, angle;
-	vec3_t			blipdir, bestdir;
+	vec3_t			blipdir;
+	//vec3_t			bestdir;
 	vec3_t			targetOrg;
-	vec3_t			sourceOrg;
 
 	besttarget = NULL;
 	bestdist = range;
 	VectorClear(blipdir);
-	VectorClear(bestdir);
+	//VectorClear(bestdir);
 
 	// First check if where we are aiming at something we can damage?
-	{
+	/*{
 		trace_t trace;
 		vec3_t goal;
 
 		// Use correct range.
 		VectorMA(start, range, dir, goal);
 
-		trap_Trace(&trace, source->r.currentOrigin, NULL, NULL, goal, source->s.number, MASK_SHOT);
+		trap_Trace(&trace, start, NULL, NULL, goal, source->s.number, MASK_SHOT);
 
 		target = &g_entities[ trace.entityNum ];
 
@@ -892,7 +894,7 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 		{
 			return target;
 		}
-	}
+	}*/
 
 	for (target = g_entities; target < &g_entities[level.num_entities]; target++)
 	{
@@ -901,8 +903,16 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 			continue;
 		}
 
+		if (target-g_entities < MAX_CLIENTS) {
+			VectorCopy(target->client->ps.origin, targetOrg);
+			targetOrg[2] += target->client->ps.viewheight;
+		} else {
+			VectorCopy(target->r.currentOrigin, targetOrg);
+			targetOrg[2] += 40;
+		}
+
 		for(j = 0; j < 3; j++) {
-			eorg[j] = source->s.origin[j] - (target->s.origin[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
+			eorg[j] = start[j] - (targetOrg[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
 		}
 
 		dist = VectorLength(eorg);
@@ -910,32 +920,18 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 			continue;
 
 		// Angle check
-		if (ang < 360)
+		if (dist > 128.0f && ang < 360)
 		{
-			if (target-g_entities < MAX_CLIENTS)
-				VectorCopy(target->client->ps.origin, targetOrg);
-			else
-				VectorCopy(target->r.currentOrigin, targetOrg);
+			VectorSubtract(targetOrg, start, blipdir);
 
-			if (source-g_entities < MAX_CLIENTS)
-				VectorCopy(source->client->ps.origin, sourceOrg);
-			else
-				VectorCopy(source->r.currentOrigin, sourceOrg);
-
-			VectorSubtract(targetOrg, sourceOrg, blipdir);
-
-			// Turtle Man: Disabled best angle (for now), allways shoot closest?
-			if (!besttarget/* || VectorLength(blipdir) < VectorLength(bestdir)*/)
+			// Turtle Man: Disabled best angle (for now), always shoot closest?
+			/* if (!besttarget || VectorLength(blipdir) < VectorLength(bestdir)) */
 			{
-				if (source-g_entities < MAX_CLIENTS) {
-					angle = AngleBetweenVectors(source->client->ps.viewangles, blipdir);
-				} else {
-					angle = AngleBetweenVectors(source->r.currentAngles, blipdir);
-				}
+				angle = AngleBetweenVectors(dir, blipdir);
 				if (angle > ang) {
 					continue;
 				}
-				VectorCopy(blipdir, bestdir);
+				//VectorCopy(blipdir, bestdir);
 			}
 		}
 

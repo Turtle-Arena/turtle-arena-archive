@@ -198,10 +198,10 @@ void G_HomingMissile(gentity_t * ent)
 		if(blip->client->sess.sessionTeam >= TEAM_SPECTATOR)
 			continue;
 
-		if(g_gametype.integer >= GT_TEAM && OnSameTeam(blip, ent->parent))
+		if(OnSameTeam(blip, ent->parent))
 			continue;
 
-		if(!G_IsVisible(ent, blip->r.currentOrigin))
+		if(!G_IsVisible(ent->s.number, ent->r.currentOrigin, blip->r.currentOrigin))
 			continue;
 
 		VectorSubtract(blip->r.currentOrigin, ent->r.currentOrigin, blipdir);

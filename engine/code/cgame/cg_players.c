@@ -2761,10 +2761,9 @@ static void CG_PlayerSprites( centity_t *cent
 #endif
 
 #ifdef TMNT // LOCKON
-	// Show target
+	// Show local client's target marker over this client
 #ifdef IOQ3ZTM
-	if (cg.snap->ps.clientNum != cent->currentState.number &&
-		cg_entities[cg.snap->ps.clientNum].currentState.generic1 == cent->currentState.number)
+	if (cg.snap->ps.enemyEnt == cent->currentState.number)
 	{
 #ifdef IOQ3ZTM
 		CG_PlayerFloatSprite( origin, 0, cgs.media.targetShader );
@@ -3128,13 +3127,11 @@ void CG_Player( centity_t *cent ) {
 			}
 		}
 #ifdef TMNT // LOCKON
-		// Show target
+		// Show target marker for non-client entities.
 #ifdef IOQ3ZTM
-		if (cent->currentState.generic1 >= MAX_CLIENTS && (cg.snap->ps.grapplePoint[0]
-			|| cg.snap->ps.grapplePoint[1] || cg.snap->ps.grapplePoint[2]))
+		if (cg.snap->ps.enemyEnt >= MAX_CLIENTS && cg.snap->ps.enemyEnt != ENTITYNUM_NONE)
 		{
-			//CG_Printf("DEBUG: Lock-on Marker!\n");
-			CG_PlayerFloatSprite( cg.snap->ps.grapplePoint, 0, cgs.media.targetShader );
+			CG_PlayerFloatSprite( cg.snap->ps.enemyMarker, 0, cgs.media.targetShader );
 		}
 #endif
 #endif

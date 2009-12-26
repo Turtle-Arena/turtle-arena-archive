@@ -470,7 +470,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #ifdef TMNTWEAPSYS_2
 			max_combo = BG_MaxAttackCombo(&client->ps);
 
-				weap_delay = bg_weapongroupinfo[client->ps.weapon].weapon[0]->attackDelay;
+			weap_delay = bg_weapongroupinfo[client->ps.weapon].weapon[0]->attackDelay;
 #else
 			weapontype_t wt = BG_WeaponTypeForPlayerState(&client->ps);
 
@@ -608,7 +608,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #else
 		int w, max, inc, t, i;
 #ifdef TMNTWEAPSYS_2
-		int weapList[MAX_BG_WEAPON_GROUPS] = { 0 };
+		int weapList[MAX_BG_WEAPON_GROUPS];
 		int weapCount = 0;
 		max = BG_NumWeaponGroups();
 		for (i = 1; i < max; i++) {
@@ -1269,6 +1269,9 @@ void ClientThink_real( gentity_t *ent ) {
 	int			oldEventSequence;
 	int			msec;
 	usercmd_t	*ucmd;
+#ifdef TMNT // LOCKON
+	vec3_t vieworigin;
+#endif
 
 	client = ent->client;
 
@@ -1392,35 +1395,34 @@ void ClientThink_real( gentity_t *ent ) {
 		ent->enemy = NULL;
 	}
 
-	// 2000.0f, 30.0f
-	if (!ent->enemy || !G_ValidTarget(ent, ent->enemy, client->ps.origin, client->ps.viewangles, 10000.0f, 90.0f, 2))
+	// Set Vieworigin
+	VectorCopy(client->ps.origin, vieworigin);
+	vieworigin[2] += client->ps.viewheight;
+
+	// Check if current target is valid.
+	if (!(client->ps.eFlags & EF_LOCKON)
+		|| !G_ValidTarget(ent, ent->enemy, vieworigin, client->ps.viewangles, 768.0f, 90.0f, 2))
 	{
-		// Search for a target
-		ent->enemy = G_FindTarget(ent, client->ps.origin, client->ps.viewangles, 10000.0f, 90.0f);
+		// Search for a new target
+		ent->enemy = G_FindTarget(ent, vieworigin, client->ps.viewangles, 768.0f, 90.0f);
 	}
 
-	// Set origin of target
+	// Set origin of target marker
 	if (ent->enemy)
 	{
 		if (ent->enemy->client) {
-			VectorCopy(ent->enemy->client->ps.origin, ent->s.origin2);
-			ent->s.origin2[2] += ent->enemy->client->ps.viewheight + 16;
+			VectorCopy(ent->enemy->client->ps.origin, client->ps.enemyMarker);
+			client->ps.enemyMarker[2] += ent->enemy->client->ps.viewheight + 16;
 		} else {
-			VectorCopy(ent->enemy->s.origin, ent->s.origin2);
-			ent->s.origin2[2] += (ent->enemy->r.mins[2] + ent->enemy->r.maxs[2])/2 + 40;
+			VectorCopy(ent->enemy->s.origin, client->ps.enemyMarker);
+			client->ps.enemyMarker[2] += (ent->enemy->r.mins[2] + ent->enemy->r.maxs[2])/2 + 40;
 		}
-
-		// TEST
-		VectorCopy(ent->s.origin2, client->ps.grapplePoint);
-		client->ps.generic1 = ent->enemy-g_entities;
+		client->ps.enemyEnt = ent->enemy-g_entities;
 	}
 	else
 	{
-		VectorClear(ent->s.origin2);
-
-		// TEST
-		VectorClear(client->ps.grapplePoint);
-		client->ps.generic1 = ent-g_entities;
+		VectorClear(client->ps.enemyMarker);
+		client->ps.enemyEnt = ENTITYNUM_NONE;
 	}
 
 	if ((client->ps.eFlags & EF_LOCKON) && ent->enemy) {
@@ -1429,12 +1431,11 @@ void ClientThink_real( gentity_t *ent ) {
 
 		if (ent->enemy->client) {
 			VectorSubtract( ent->enemy->client->ps.origin, client->ps.origin, dir );
-			vectoangles( dir, angles );
 		} else {
 			VectorSubtract( ent->enemy->s.origin, client->ps.origin, dir );
-			vectoangles( dir, angles );
 		}
 
+		vectoangles( dir, angles );
 		SetClientViewAngle(ent, angles);
 	}
 #endif
