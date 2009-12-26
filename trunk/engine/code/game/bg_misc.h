@@ -285,12 +285,14 @@ typedef enum {
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 #endif
 	PERS_ATTACKER,					// clientnum of last damage inflicter
-#ifdef TMNT // NOARMOR
-	PERS_ATTACKEE_HEALTH,			// health of last person we attacked
-#else
+#ifndef TMNT // NOARMOR
 	PERS_ATTACKEE_ARMOR,			// health/armor of last person we attacked
 #endif
 	PERS_KILLED,					// count of the number of times you died
+#ifdef TMNTSP
+	PERS_LIVES,
+	PERS_CONTINUES,
+#endif
 	// player awards tracking
 #ifndef TMNTWEAPONS
 	PERS_IMPRESSIVE_COUNT,			// two railgun hits in a row
@@ -300,10 +302,6 @@ typedef enum {
 	PERS_ASSIST_COUNT,				// assist awards
 #ifndef TMNTWEAPONS
 	PERS_GAUNTLET_FRAG_COUNT,		// kills with the guantlet
-#endif
-#ifdef TMNTSP
-	PERS_LIVES,
-	PERS_CONTINUES,
 #endif
 	PERS_CAPTURES					// captures
 } persEnum_t;

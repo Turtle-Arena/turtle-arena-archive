@@ -56,7 +56,7 @@ void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout 
 ================
 G_AutoAim
 
-...Because in third person it is hard to aim.
+In third person it's hard to aim, so give them some help.
 ================
 */
 void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t right, vec3_t up)
@@ -77,42 +77,44 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 	}
 #endif
 
-	// Currently no way to know if in first person.
-	// if (ent->client && ent->client is in firstPerson && !ent->bgNPC.info)
-	//   return;
-
-	angle = 30.0f;
-	range = 2000.0f;
+	angle = 120.0f;
+	range = 768.0f;
 #ifdef TMNTWEAPSYS_2
 	if (bg_projectileinfo[projnum].instantDamage) {
 		range = bg_projectileinfo[projnum].speed;
 	}
 #endif
 
-	// If locked on to a entity (Like in LoZ:TP), or is a NPC
-	target = ent->enemy;
+	// Clients only use auto aim if locked on to a entity
+	if (ent->client && !(ent->client->ps.eFlags & EF_LOCKON)) {
+		target = NULL;
+	} else {
+		// Client locked-on, NPC, misc_shooter, ...
+		target = ent->enemy;
+	}
+
 	if (target && (target == ent || !target->takedamage))
 	{
 		target = NULL;
 	}
 
-#ifndef TMNT // LOCKON
-	if (!target || !G_ValidTarget(ent, target, start, forward, range, angle, 2)) // && !NPC?
+	// Clients update target (ent->enemy) each frame.
+	if (
+#ifdef TMNT // LOCKON
+		!ent->client &&
+#endif
+		!G_ValidTarget(ent, target, start, forward, range, angle, 2)) // && !NPC?
 	{
 		// Search for a target
 		target = G_FindTarget(ent, start, forward, range, angle);
-		// ent->enemy = target; // Turtle Man: Update target?
 	}
-#endif
 
 	if (!target) {
 		return;
 	}
 
-	//G_Printf("DEBUG: Targeting %d: %s...\n", target-g_entities, target->classname);
-	VectorCopy(target->r.currentOrigin, targetOrigin);
-
 	// Aim higher then origin
+	VectorCopy(target->r.currentOrigin, targetOrigin);
 	for (i = 0; i < 3; i++)
 	{
 		targetOrigin[i] += (target->r.mins[i] + target->r.maxs[i]) * 0.5;
@@ -121,7 +123,7 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 		targetOrigin[i] += maxRand - (random() * (maxRand * 2));
 	}
 
-	// see if we have a target
+	// Get direction to aim
 	VectorSubtract( targetOrigin, start, dir );
 	VectorNormalize( dir );
 

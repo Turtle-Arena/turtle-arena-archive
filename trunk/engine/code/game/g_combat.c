@@ -1309,9 +1309,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		} else {
 			attacker->client->ps.persistant[PERS_HITS]++;
 		}
-#ifdef TMNT // NOARMOR
-		attacker->client->ps.persistant[PERS_ATTACKEE_HEALTH] = targ->health;
-#else
+#ifndef TMNT // NOARMOR
 		attacker->client->ps.persistant[PERS_ATTACKEE_ARMOR] = (targ->health<<8)|(client->ps.stats[STAT_ARMOR]);
 #endif
 	}

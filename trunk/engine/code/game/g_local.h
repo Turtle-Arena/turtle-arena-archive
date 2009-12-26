@@ -554,7 +554,7 @@ const char *BuildShaderStateConfig( void );
 
 #ifdef TMNTWEAPSYS // XREAL r2785
 gentity_t *G_FindRadius(gentity_t *from, const vec3_t org, float rad);
-qboolean G_IsVisible(const gentity_t *self, const vec3_t goal);
+qboolean G_IsVisible(int skipEnt, const vec3_t start, const vec3_t goal);
 qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 		const vec3_t start, const vec3_t dir,
 		float rad, float ang, int tests);

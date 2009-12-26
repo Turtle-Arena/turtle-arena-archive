@@ -1175,6 +1175,12 @@ typedef struct playerState_s {
 	int			loopSound;
 	int			jumppad_ent;	// jumppad entity hit this frame
 
+#ifdef TMNT // LOCKON
+	// Target for lockon
+	int			enemyEnt;
+	vec3_t		enemyMarker;
+#endif
+
 #ifdef TMNTWEAPSYS // MELEEATTACK
 	//
 	// Melee weapons

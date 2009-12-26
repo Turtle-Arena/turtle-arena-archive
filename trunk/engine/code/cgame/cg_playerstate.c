@@ -332,7 +332,7 @@ CG_CheckLocalSounds
 */
 void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 #ifdef TMNT // NOARMOR
-	int			highScore, health, reward;
+	int			highScore, reward;
 #else
 	int			highScore, health, armor, reward;
 #endif
@@ -347,10 +347,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 
 	// hit changes
 	if ( ps->persistant[PERS_HITS] > ops->persistant[PERS_HITS] ) {
-#ifdef TMNT // NOARMOR
-		//armor  = 0;
-		health = ps->persistant[PERS_ATTACKEE_HEALTH];
-#else
+#ifndef TMNT // NOARMOR
 		armor  = ps->persistant[PERS_ATTACKEE_ARMOR] & 0xff;
 		health = ps->persistant[PERS_ATTACKEE_ARMOR] >> 8;
 #endif

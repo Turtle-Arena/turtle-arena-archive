@@ -683,6 +683,9 @@ to free floating spectator mode
 =================
 */
 void StopFollowing( gentity_t *ent ) {
+#ifdef IOQ3ZTM // SPECTATOR
+	SetClientViewAngle(ent, ent->client->ps.viewangles);
+#endif
 	ent->client->ps.persistant[ PERS_TEAM ] = TEAM_SPECTATOR;	
 	ent->client->sess.sessionTeam = TEAM_SPECTATOR;	
 	ent->client->sess.spectatorState = SPECTATOR_FREE;
