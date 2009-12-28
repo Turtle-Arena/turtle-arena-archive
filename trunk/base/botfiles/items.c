@@ -206,7 +206,7 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
-// TMNTWEAPSYS_2 uses weaponinfo.txt to setup the weapon items.
+// TMNTWEAPSYS uses weaponinfo.txt to setup the weapon items.
 // (Weapons could still be here, but they would over-ride weaponinfo.txt items)
 /*
 //weapon_default?
