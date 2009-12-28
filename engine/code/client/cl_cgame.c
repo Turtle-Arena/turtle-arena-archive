@@ -174,7 +174,7 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 CL_SetUserCmdValue
 =====================
 */
-#if defined TMNTHOLDSYS/*2*/ && !defined TMNTWEAPSYS2
+#if defined TMNTHOLDSYS/*2*/ && !defined TMNTWEAPSYS_EX
 void CL_SetUserCmdValue( int userCmdValue, int holdableValue, float sensitivityScale ) {
 	cl.cgameUserCmdValue = userCmdValue;
 	cl.cgameHoldableValue = holdableValue;
@@ -182,7 +182,7 @@ void CL_SetUserCmdValue( int userCmdValue, int holdableValue, float sensitivityS
 }
 #else
 void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) {
-#if !defined TMNTWEAPSYS2 || (defined TMNTWEAPSYS2 && defined TMNTHOLDSYS/*2*/)
+#if !defined TMNTWEAPSYS_EX || (defined TMNTWEAPSYS_EX && defined TMNTHOLDSYS/*2*/)
 	cl.cgameUserCmdValue = userCmdValue;
 #endif
 	cl.cgameSensitivity = sensitivityScale;
@@ -469,7 +469,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_FS_FCLOSEFILE:
 		FS_FCloseFile( args[1] );
 		return 0;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	case CG_FS_GETFILELIST:
 		return FS_GetFileList( VMA(1), VMA(2), VMA(3), args[4] );
 #endif
@@ -618,7 +618,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_GETUSERCMD:
 		return CL_GetUserCmd( args[1], VMA(2) );
 	case CG_SETUSERCMDVALUE:
-#if defined TMNTHOLDSYS/*2*/ && !defined TMNTWEAPSYS2
+#if defined TMNTHOLDSYS/*2*/ && !defined TMNTWEAPSYS_EX
 		CL_SetUserCmdValue( args[1], args[2], VMF(3) );
 #else
 		CL_SetUserCmdValue( args[1], VMF(2) );

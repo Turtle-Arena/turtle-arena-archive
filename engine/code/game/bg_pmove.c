@@ -910,7 +910,7 @@ static void PM_WalkMove( void ) {
 		// if !running AND melee attacking; based on LoZ:TP
 		if (pm->xyspeed < 200 && (pm->ps->meleeTime || pm->ps->meleeDelay))
 		{
-			accelerate = pm_accelerate/5;
+			accelerate = pm_accelerate/4;
 		}
 		else
 #endif
@@ -1830,7 +1830,7 @@ PM_BeginWeaponChange
 */
 static void PM_BeginWeaponChange( int weapon ) {
 	if ( weapon <= WP_NONE ||
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		weapon >= BG_NumWeaponGroups()
 #else
 		weapon >= WP_NUM_WEAPONS
@@ -1840,7 +1840,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 		return;
 	}
 
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	if ( !( pm->ps->stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
 		return;
 	}
@@ -1890,13 +1890,13 @@ PM_FinishWeaponChange
 static void PM_FinishWeaponChange( void ) {
 	int		weapon;
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	weapon = pm->ps->stats[STAT_NEWWEAPON];
 #else
 	weapon = pm->cmd.weapon;
 #endif
 	if ( weapon < WP_NONE ||
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		weapon >= BG_NumWeaponGroups()
 #else
 		weapon >= WP_NUM_WEAPONS
@@ -1906,7 +1906,7 @@ static void PM_FinishWeaponChange( void ) {
 		weapon = WP_NONE;
 	}
 
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	if ( !( pm->ps->stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
 		weapon = WP_NONE;
 	}
@@ -2241,7 +2241,7 @@ static void PM_Weapon( void ) {
 			if (
 #ifdef TMNTHOLDSYS
 			pm->ps->holdableIndex == HI_MEDKIT
-#elif defined TMNTWEAPSYS_2
+#elif defined TMNTWEAPSYS
 			BG_ItemForItemNum(pm->ps->stats[STAT_HOLDABLE_ITEM])->giTag == HI_MEDKIT
 #else
 			bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag == HI_MEDKIT
@@ -2256,7 +2256,7 @@ static void PM_Weapon( void ) {
 #endif
 #ifdef TMNTHOLDSYS
 				PM_AddEvent( EV_USE_ITEM0 + pm->ps->holdableIndex );
-#elif defined TMNTWEAPSYS_2
+#elif defined TMNTWEAPSYS
 				PM_AddEvent( EV_USE_ITEM0 + BG_ItemForItemNum(pm->ps->stats[STAT_HOLDABLE_ITEM])->giTag );
 #else
 				PM_AddEvent( EV_USE_ITEM0 + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag );
@@ -2289,14 +2289,14 @@ static void PM_Weapon( void ) {
 		pm->ps->weaponTime -= pml.msec;
 	}
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	// Drop pickup weapon (User pressed key)
 	// and check for out of ammo for pickup weapons
 	if ( pm->ps->weaponTime <= 0 && pm->ps->weaponstate != WEAPON_FIRING
 		&& ((pm->cmd.buttons & BUTTON_DROP_WEAPON)
 		|| (pm->ps->stats[STAT_AMMO] == 0
 #ifdef MISSIONPACK // TMNT only // Turtle Man: Don't auto drop if have ammo regen!
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		&& BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag != PW_AMMOREGEN
 #else
 		&& bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag != PW_AMMOREGEN
@@ -2313,7 +2313,7 @@ static void PM_Weapon( void ) {
 	// can't change if weapon is firing, but can change
 	// again if lowering or raising
 	if ( pm->ps->weaponTime <= 0 || pm->ps->weaponstate != WEAPON_FIRING ) {
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		if ( pm->ps->weapon != pm->ps->stats[STAT_NEWWEAPON] ) {
 			PM_BeginWeaponChange( pm->ps->stats[STAT_NEWWEAPON] );
 		}
@@ -2342,19 +2342,13 @@ static void PM_Weapon( void ) {
 
 	// change weapon if time
 	if ( pm->ps->weaponstate == WEAPON_DROPPING ) {
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		// If the weapon that were changing to is a different weapon,
 		// and the current weapon is valid,
 		// and its not the default weapon,
 		// then drop it.
 		if ( pm->ps->weapon != pm->ps->stats[STAT_NEWWEAPON]
-			&& (pm->ps->weapon > WP_NONE && pm->ps->weapon <
-#ifdef TMNTWEAPSYS_2
-			BG_NumWeaponGroups()
-#else
-			WP_NUM_WEAPONS
-#endif
-			)
+			&& (pm->ps->weapon > WP_NONE && pm->ps->weapon < BG_NumWeaponGroups())
 			&& pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON] )
 		{
 			// drop weapon
@@ -2413,7 +2407,7 @@ static void PM_Weapon( void ) {
 
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
 	// Handle grapple
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0]->proj->grappling)
 #else
 	if (pm->ps->weapon == WP_GRAPPLING_HOOK)
@@ -2438,7 +2432,7 @@ static void PM_Weapon( void ) {
 
 #ifdef TMNTWEAPSYS // Turtle Man: Weapon type code.
 	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) ))
-		{
+	{
 		// check for fire (Melee weapons can do damage while not holding attack)
 		if ( !pm->ps->meleeTime && !pm->ps->meleeDelay ) {
 			pm->ps->weaponTime = 0;
@@ -2448,12 +2442,12 @@ static void PM_Weapon( void ) {
 	}
 	else
 	{
-	// check for fire
-	if ( ! (pm->cmd.buttons & BUTTON_ATTACK) ) {
-		pm->ps->weaponTime = 0;
-		pm->ps->weaponstate = WEAPON_READY;
-		return;
-	}
+		// check for fire
+		if ( ! (pm->cmd.buttons & BUTTON_ATTACK) ) {
+			pm->ps->weaponTime = 0;
+			pm->ps->weaponstate = WEAPON_READY;
+			return;
+		}
 	}
 
 	// Gauntlet-type
@@ -2491,7 +2485,7 @@ static void PM_Weapon( void ) {
 	pm->ps->weaponstate = WEAPON_FIRING;
 #endif
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	// check for out of ammo,
 	//  only happens for default weapon.
 	//  pickup weapons have already been handled.
@@ -2510,7 +2504,7 @@ static void PM_Weapon( void ) {
 #endif
 
 	// take an ammo away if not infinite
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	if (pm->ps->stats[STAT_AMMO] != -1) {
 		pm->ps->stats[STAT_AMMO]--;
 	}
@@ -2535,8 +2529,8 @@ static void PM_Weapon( void ) {
 		{
 			PM_StartTorsoAnim( anim );
 
-	// fire weapon
-	PM_AddEvent( EV_FIRE_WEAPON );
+			// fire weapon
+			PM_AddEvent( EV_FIRE_WEAPON );
 		}
 	}
 	else
@@ -2558,8 +2552,7 @@ static void PM_Weapon( void ) {
 		pm->ps->weaponTime = pm->ps->meleeDelay;
 		return;
 	}
-#endif
-#ifdef TMNTWEAPSYS_2
+
 	addTime = bg_weapongroupinfo[pm->ps->weapon].weapon[0]->attackDelay;
 #else
 	switch( pm->ps->weapon ) {
@@ -2609,7 +2602,7 @@ static void PM_Weapon( void ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if( BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -2618,7 +2611,7 @@ static void PM_Weapon( void ) {
 		addTime /= 1.5;
 	}
 	else
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if( BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
 #else
 	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )
@@ -2844,7 +2837,7 @@ void PmoveSingle (pmove_t *pmove) {
 #ifdef TMNTWEAPSYS
 		&& ( pm->ps->meleeTime ||
 			(( pm->cmd.buttons & BUTTON_ATTACK )
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 			&& pm->ps->stats[STAT_AMMO] != 0
 #else
 			&& pm->ps->ammo[ pm->ps->weapon ] != 0

@@ -130,7 +130,7 @@ passed to the renderer.
 #define	MAX_MARK_FRAGMENTS	128
 #define	MAX_MARK_POINTS		384
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 qboolean CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 				   float orientation, float red, float green, float blue, float alpha,
 				   qboolean alphaFade, float radius, qboolean temporary )
@@ -149,12 +149,12 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 	markFragment_t	markFragments[MAX_MARK_FRAGMENTS], *mf;
 	vec3_t			markPoints[MAX_MARK_POINTS];
 	vec3_t			projection;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	qboolean addedMark = qfalse;
 #endif
 
 	if ( !cg_addMarks.integer ) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		return qfalse;
 #else
 		return;
@@ -239,11 +239,11 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 #ifndef IOQ3ZTM
 		markTotal++;
 #endif
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		addedMark = qtrue;
 #endif
 	}
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	return addedMark;
 #endif
 }

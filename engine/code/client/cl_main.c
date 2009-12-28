@@ -3198,7 +3198,7 @@ void CL_Init( void ) {
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
 
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	// init autoswitch so the ui will have it correctly even
 	// if the cgame hasn't been started
 	Cvar_Get ("cg_autoswitch", "1", CVAR_ARCHIVE);

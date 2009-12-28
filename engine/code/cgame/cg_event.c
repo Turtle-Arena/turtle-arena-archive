@@ -301,7 +301,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	}
 
 	if ( attacker != ENTITYNUM_WORLD ) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		// Turtle Man: TODO: Stop this &name[2] stuff, add a MOD name or use the whole name.
 		//                      Both require changing weaponinfo.txt.
 		if (mod == MOD_PROJECTILE)
@@ -544,10 +544,10 @@ A new item was picked up this frame
 ================
 */
 static void CG_ItemPickup( int itemNum ) {
-#if defined TMNTWEAPSYS_2 || defined TMNTHOLDSYS
+#if defined TMNTWEAPSYS || defined TMNTHOLDSYS
 	gitem_t *item;
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[itemNum];
@@ -576,30 +576,30 @@ static void CG_ItemPickup( int itemNum ) {
 	}
 #endif
 	// see if it should be the grabbed weapon
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if ( item->giType == IT_WEAPON )
 #else
 	if ( bg_itemlist[itemNum].giType == IT_WEAPON )
 #endif
 	{
 		// select it immediately
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		// always switch
-#elif defined TMNTWEAPSYS_2 || defined IOQ3ZTM
+#elif defined TMNTWEAPSYS || defined IOQ3ZTM
 		if ( cg_autoswitch.integer )
 #else
 		if ( cg_autoswitch.integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN )
 #endif
 		{
-#ifdef TMNTWEAPSYS2 // The weapon "should" be selected in game and sent in the next snap too
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS_EX // The weapon "should" be selected in game and sent in the next snap too
+#ifdef TMNTWEAPSYS
 			cg.predictedPlayerState.stats[STAT_NEWWEAPON] = item->giTag;
 #else
 			cg.predictedPlayerState.stats[STAT_NEWWEAPON] = bg_itemlist[itemNum].giTag;
 #endif
 #else
 			cg.weaponSelectTime = cg.time;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			cg.weaponSelect = item->giTag;
 #else
 			cg.weaponSelect = bg_itemlist[itemNum].giTag;
@@ -933,7 +933,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			if ( index < 1 || index >= NUM_BG_ITEMS )
 #else
 			if ( index < 1 || index >= bg_numItems )
@@ -941,7 +941,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			{
 				break;
 			}
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			item = BG_ItemForItemNum(index);
 #else
 			item = &bg_itemlist[ index ];
@@ -991,7 +991,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			if ( index < 1 || index >= NUM_BG_ITEMS )
 #else
 			if ( index < 1 || index >= bg_numItems )
@@ -999,7 +999,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			{
 				break;
 			}
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			item = BG_ItemForItemNum(index);
 #else
 			item = &bg_itemlist[ index ];
@@ -1019,7 +1019,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	//
 	// weapon events
 	//
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	case EV_DROP_WEAPON:
 		DEBUGNAME("EV_DROP_WEAPON");
 		// Start a sound when a weapon is dropped?
@@ -1136,7 +1136,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.respawnSound );
 		break;
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	case EV_PROJECTILE_BOUNCE:
 		DEBUGNAME("EV_PROJECTILE_BOUNCE");
 		if ((rand() & 1) && cg_projectiles[es->weapon].bounceSound[1]) {
@@ -1236,7 +1236,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_MISSILE_HIT:
 		DEBUGNAME("EV_MISSILE_HIT");
 		ByteToDir( es->eventParm, dir );
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if (bg_projectileinfo[es->weapon].trailType == PT_BULLET)
 		{
 			CG_Bullet( es->pos.trBase, es->clientNum, dir, qtrue, es->otherEntityNum, es->weapon );
@@ -1249,7 +1249,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_MISSILE_MISS:
 		DEBUGNAME("EV_MISSILE_MISS");
 		ByteToDir( es->eventParm, dir );
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if (bg_projectileinfo[es->weapon].trailType == PT_BULLET)
 		{
 			CG_Bullet( es->pos.trBase, es->clientNum, dir, qfalse, es->otherEntityNum, es->weapon );
@@ -1264,7 +1264,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_MISSILE_MISS_METAL:
 		DEBUGNAME("EV_MISSILE_MISS_METAL");
 		ByteToDir( es->eventParm, dir );
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if (bg_projectileinfo[es->weapon].trailType == PT_BULLET)
 		{
 			CG_Bullet( es->pos.trBase, es->clientNum, dir, qfalse, es->otherEntityNum, es->weapon );
@@ -1278,7 +1278,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_RAILTRAIL:
 		DEBUGNAME("EV_RAILTRAIL");
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 		cent->currentState.weapon = WP_RAILGUN;
 		
 		if(es->clientNum == cg.snap->ps.clientNum && !cg.renderingThirdPerson)
@@ -1299,28 +1299,20 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 		break;
 
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 	case EV_BULLET_HIT_WALL:
 		DEBUGNAME("EV_BULLET_HIT_WALL");
 		ByteToDir( es->eventParm, dir );
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD
-#ifdef TMNTWEAPSYS_2
-				, es->weapon
-#endif
-				);
+		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qfalse, ENTITYNUM_WORLD );
 		break;
 
 	case EV_BULLET_HIT_FLESH:
 		DEBUGNAME("EV_BULLET_HIT_FLESH");
-		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qtrue, es->eventParm
-#ifdef TMNTWEAPSYS_2
-				, es->weapon
-#endif
-				);
+		CG_Bullet( es->pos.trBase, es->otherEntityNum, dir, qtrue, es->eventParm );
 		break;
 #endif
 
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 	case EV_SHOTGUN:
 		DEBUGNAME("EV_SHOTGUN");
 		CG_ShotgunFire( es );
@@ -1335,31 +1327,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_WEAPON_HIT:
 		DEBUGNAME("EV_WEAPON_HIT");
 		ByteToDir( es->eventParm, dir );
-#ifdef TMNTWEAPSYS_2
 		CG_WeaponHitPlayer( es->weapon, position, dir, es->otherEntityNum );
-#else
-		CG_MissileHitPlayer( es->weapon, position, dir, es->otherEntityNum );
-#endif
 		break;
 
 	case EV_WEAPON_MISS:
 		DEBUGNAME("EV_WEAPON_MISS");
 		ByteToDir( es->eventParm, dir );
-#ifdef TMNTWEAPSYS_2
 		CG_WeaponHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
-#else
-		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
-#endif
 		break;
 
 	case EV_WEAPON_MISS_METAL:
 		DEBUGNAME("EV_WEAPON_MISS_METAL");
 		ByteToDir( es->eventParm, dir );
-#ifdef TMNTWEAPSYS_2
 		CG_WeaponHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_METAL );
-#else
-		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_METAL );
-#endif
 		break;
 #endif
 

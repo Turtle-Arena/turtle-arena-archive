@@ -301,7 +301,7 @@ extern sfxHandle_t	menu_move_sound;
 extern sfxHandle_t	menu_out_sound;
 extern sfxHandle_t	menu_buzz_sound;
 extern sfxHandle_t	menu_null_sound;
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 extern sfxHandle_t	weaponChangeSound;
 #endif
 extern vec4_t		menu_text_color;

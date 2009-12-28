@@ -105,7 +105,7 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 	}
 }
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 /*
 ==================
 CG_BulletBubbleTrail

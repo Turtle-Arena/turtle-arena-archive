@@ -930,7 +930,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #else
 	mouseSensitivity = cg.zoomSensitivity;
 #endif
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 #ifdef TMNTHOLDSYS/*2*/
 	trap_SetUserCmdValue( cg.holdableSelect, mouseSensitivity );
 #else

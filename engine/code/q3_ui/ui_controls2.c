@@ -102,7 +102,7 @@ enum {
 #ifndef TMNT // NOZOOM
 	ID_ZOOMVIEW,
 #endif
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	ID_WEAPON1,
 	ID_WEAPON2,
 	ID_WEAPON3,
@@ -114,7 +114,7 @@ enum {
 	ID_WEAPON9,
 #endif
 	ID_ATTACK,
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	ID_WEAPDROP,
 #else
 	ID_WEAPPREV,
@@ -153,7 +153,7 @@ enum {
 #define ANIM_TURNRIGHT	9
 #define ANIM_LOOKUP		10
 #define ANIM_LOOKDOWN	11
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 #define ANIM_WEAPON1	12
 #define ANIM_WEAPON2	13
 #define ANIM_WEAPON3	14
@@ -164,7 +164,7 @@ enum {
 #define ANIM_WEAPON8	19
 #define ANIM_WEAPON9	20
 #define ANIM_WEAPON10	21
-#endif // TMNTWEAPSYS2
+#endif // TMNTWEAPSYS_EX
 #define ANIM_ATTACK		22
 #define ANIM_GESTURE	23
 #define ANIM_DIE		24
@@ -196,7 +196,7 @@ typedef struct
 #ifndef TMNT // NO_SPEED_KEY
 	menuaction_s		run;
 #endif
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	menuaction_s		machinegun;
 	menuaction_s		chainsaw;
 	menuaction_s		shotgun;
@@ -208,7 +208,7 @@ typedef struct
 	menuaction_s		bfg;
 #endif
 	menuaction_s		attack;
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	menuaction_s		dropweapon;
 #else
 	menuaction_s		prevweapon;
@@ -233,7 +233,7 @@ typedef struct
 	menuradiobutton_s	alwaysrun;
 #endif
 	menuaction_s		showscores;
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	menuradiobutton_s	autoswitch;
 #endif
 	menuaction_s		useitem;
@@ -297,7 +297,7 @@ static bind_t g_bindings[] =
 #ifndef TMNT // NOZOOM
 	{"+zoom", 			"zoom view",		ID_ZOOMVIEW,	ANIM_IDLE,		-1,				-1,		-1, -1},
 #endif
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	{"weapon 1",		"gauntlet",			ID_WEAPON1,		ANIM_WEAPON1,	'1',			-1,		-1, -1},
 	{"weapon 2",		"machinegun",		ID_WEAPON2,		ANIM_WEAPON2,	'2',			-1,		-1, -1},
 	{"weapon 3",		"shotgun",			ID_WEAPON3,		ANIM_WEAPON3,	'3',			-1,		-1, -1},
@@ -309,7 +309,7 @@ static bind_t g_bindings[] =
 	{"weapon 9",		"BFG",				ID_WEAPON9,		ANIM_WEAPON9,	'9',			-1,		-1, -1},
 #endif
 	{"+attack", 		"attack",			ID_ATTACK,		ANIM_ATTACK,	K_CTRL,			-1,		-1, -1},
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	{"+button13",		"drop weapon",		ID_WEAPDROP,	ANIM_IDLE,		';',			-1,		-1, -1},
 #else
 	{"weapprev",		"prev weapon",		ID_WEAPPREV,	ANIM_IDLE,		'[',			-1,		-1, -1},
@@ -337,7 +337,7 @@ static configcvar_t g_configcvars[] =
 	{"cl_run",			0,					0},
 #endif
 	{"m_pitch",			0,					0},
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	{"cg_autoswitch",	0,					0},
 #endif
 	{"sensitivity",		0,					0},
@@ -373,7 +373,7 @@ static menucommon_s *g_movement_controls[] =
 
 static menucommon_s *g_weapons_controls[] = {
 	(menucommon_s *)&s_controls.attack,           
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	(menucommon_s *)&s_controls.dropweapon,
 #else
 	(menucommon_s *)&s_controls.nextweapon,
@@ -572,7 +572,7 @@ static void Controls_UpdateModel( int anim ) {
 		s_controls.playerViewangles[PITCH] = 45;
 		break;
 
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 #ifdef TMNTWEAPSYS
 	case ANIM_WEAPON1:
 	case ANIM_WEAPON2:
@@ -923,7 +923,7 @@ static void Controls_GetConfig( void )
 #ifndef TMNT // ALWAYS_RUN
 	s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_run" ) );
 #endif
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cg_autoswitch" ) );
 #endif
 	s_controls.sensitivity.curvalue  = UI_ClampCvar( 2, 30, Controls_GetCvarValue( "sensitivity" ) );
@@ -969,7 +969,7 @@ static void Controls_SetConfig( void )
 #ifndef TMNT // ALWAYS_RUN
 	trap_Cvar_SetValue( "cl_run", s_controls.alwaysrun.curvalue );
 #endif
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	trap_Cvar_SetValue( "cg_autoswitch", s_controls.autoswitch.curvalue );
 #endif
 	trap_Cvar_SetValue( "sensitivity", s_controls.sensitivity.curvalue );
@@ -1007,7 +1007,7 @@ static void Controls_SetDefaults( void )
 #ifndef TMNT // ALWAYS_RUN
 	s_controls.alwaysrun.curvalue    = Controls_GetCvarDefault( "cl_run" );
 #endif
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( "cg_autoswitch" );
 #endif
 	s_controls.sensitivity.curvalue  = Controls_GetCvarDefault( "sensitivity" );
@@ -1243,7 +1243,7 @@ static void Controls_MenuEvent( void* ptr, int event )
 #ifndef TMNT // ALWAYS_RUN
 		case ID_ALWAYSRUN:
 #endif
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 		case ID_AUTOSWITCH:
 #endif
 		case ID_JOYENABLE:
@@ -1298,7 +1298,7 @@ Controls_InitWeapons
 =================
 */
 static void Controls_InitWeapons( void ) {
-#ifndef TMNTWEAPSYS2 // We don't change weapons in controls menu...
+#ifndef TMNTWEAPSYS_EX // We don't change weapons in controls menu...
 	gitem_t *	item;
 
 	for ( item = bg_itemlist + 1 ; item->classname ; item++ )
@@ -1312,8 +1312,8 @@ static void Controls_InitWeapons( void ) {
 			trap_R_RegisterModel( item->world_model[2] );
 		}
 		else if (item->world_model[0]) {
-		trap_R_RegisterModel( item->world_model[0] );
-	}
+			trap_R_RegisterModel( item->world_model[0] );
+		}
 
 		// weap2
 		if (item->world_model[3]) {
@@ -1496,7 +1496,7 @@ static void Controls_MenuInit( void )
 	s_controls.run.generic.id        = ID_SPEED;
 #endif
 
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	s_controls.chainsaw.generic.type	  = MTYPE_ACTION;
 	s_controls.chainsaw.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.chainsaw.generic.callback  = Controls_ActionEvent;
@@ -1558,7 +1558,7 @@ static void Controls_MenuInit( void )
 	s_controls.attack.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.attack.generic.id        = ID_ATTACK;
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	s_controls.dropweapon.generic.type	    = MTYPE_ACTION;
 	s_controls.dropweapon.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.dropweapon.generic.callback  = Controls_ActionEvent;
@@ -1678,7 +1678,7 @@ static void Controls_MenuInit( void )
 	s_controls.alwaysrun.generic.statusbar = Controls_StatusBar;
 #endif
 
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	s_controls.autoswitch.generic.type      = MTYPE_RADIOBUTTON;
 	s_controls.autoswitch.generic.flags	    = QMF_SMALLFONT;
 	s_controls.autoswitch.generic.x	        = SCREEN_WIDTH/2;
@@ -1799,7 +1799,7 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.sidestep );
 
 	Menu_AddItem( &s_controls.menu, &s_controls.attack );
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	Menu_AddItem( &s_controls.menu, &s_controls.dropweapon );
 #else
 	Menu_AddItem( &s_controls.menu, &s_controls.nextweapon );

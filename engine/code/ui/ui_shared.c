@@ -3186,7 +3186,7 @@ static bind_t g_bindings[] =
 	{"weapon 12",		 -1,					-1,		-1, -1},
 	{"weapon 13",		 -1,					-1,		-1, -1},
 	{"+attack", 		 K_CTRL,				-1,		-1, -1},
-#ifdef TMNTWEAPSYS2 // +dropweapon
+#ifdef TMNTWEAPSYS_EX // +dropweapon
 	{"+button13",		 ';',					-1,		-1, -1},
 #else
 	{"weapprev",		 '[',					-1,		-1, -1},
@@ -3231,7 +3231,7 @@ static configcvar_t g_configcvars[] =
 	{"cl_run",			0,					0},
 #endif
 	{"m_pitch",			0,					0},
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	{"cg_autoswitch",	0,					0},
 #endif
 	{"sensitivity",		0,					0},

@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *****************************************************************************/
 
-#ifndef TMNTWEAPSYS_2_NOCOMPAT
+#ifndef TMNTWEAPSYS_NOCOMPAT
 //projectile flags
 #define PFL_WINDOWDAMAGE			1		//projectile damages through window
 #define PFL_RETURN					2		//set when projectile returns to owner

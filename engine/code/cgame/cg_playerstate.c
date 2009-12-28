@@ -39,19 +39,19 @@ void CG_CheckAmmo( void ) {
 	int		i;
 	int		total;
 	int		previous;
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	int		weapons;
 #endif
 
 	// see about how many seconds of ammo we have remaining
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	weapons = cg.snap->ps.stats[ STAT_WEAPONS ];
 #endif
 	total = 0;
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	i = cg.snap->ps.weapon;
 #else
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	for ( i = 1 ; i < BG_NumWeaponGroups() ; i++ )
 #else
 	for ( i = WP_MACHINEGUN ; i < WP_NUM_WEAPONS ; i++ )
@@ -60,20 +60,20 @@ void CG_CheckAmmo( void ) {
 	{
 #ifdef TMNTWEAPSYS
 		if (!BG_WeapUseAmmo(i)) {
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 			continue;
 #endif
 		}
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		else
 #endif
 #endif
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 		if ( ! ( weapons & ( 1 << i ) ) ) {
 			continue;
 		}
 #endif
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		total += cg.snap->ps.ammo[i] * bg_weapongroupinfo[i].weapon[0]->attackDelay;
 #else
 		switch ( i ) {
@@ -223,7 +223,7 @@ void CG_Respawn( void ) {
 	// no error decay on player movement
 	cg.thisFrameTeleport = qtrue;
 
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	// display weapons available
 	cg.weaponSelectTime = cg.time;
 

@@ -5197,7 +5197,7 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	UI_RegisterCvars();
 	UI_InitMemory();
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	BG_InitWeaponInfo();
 #endif
 

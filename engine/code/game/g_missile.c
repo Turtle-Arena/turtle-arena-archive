@@ -77,7 +77,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 
 	ent->s.eType = ET_GENERAL;
 	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ) );
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if (ent->parent)
 		ent->s.clientNum = ent->parent->s.number;
 	else
@@ -97,7 +97,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	trap_LinkEntity( ent );
 }
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 /*
 ================
 G_Missile_Die
@@ -143,7 +143,7 @@ void G_SetMissileVelocity(gentity_t *bolt, vec3_t dir, int projnum)
 	}
 
 	if (bolt->parent && bolt->parent->client) {
-	// "real" physics
+		// "real" physics
 		VectorAdd( bolt->s.pos.trDelta, bolt->parent->client->ps.velocity, bolt->s.pos.trDelta );
 	}
 
@@ -723,7 +723,7 @@ qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir, int weaponnum
 fire_shuriken
 =================
 */
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable)
 {
 	int projnum = 0;
@@ -767,7 +767,7 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 	return qfalse;
 }
 
-#ifdef TMNT
+#ifdef TMNT // LOCKON
 	G_AutoAim(self, projnum, start, forward, right, up);
 #endif
 
@@ -1071,20 +1071,19 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	if ( !other->takedamage &&
 		( ent->s.eFlags & ( EF_BOUNCE | EF_BOUNCE_HALF ) ) ) {
 		G_BounceMissile( ent, trace );
-#ifdef TMNTWEAPSYS_2 // Bounce missiles
-		G_AddEvent( ent, EV_PROJECTILE_BOUNCE, DirToByte( trace->plane.normal ) );
+#ifdef TMNTWEAPSYS // Bounce missiles
 		// Die on Nth bounce
 		if (ent->s.modelindex2 > 0)
 		{
 			ent->s.modelindex2--;
 			if (ent->s.modelindex2 == 0)
 			{
-				// Flag as dead to not play bounce sound? (EV_PROJECTILE_BOUNCE)
 				// Kill missile
 				G_ExplodeMissile( ent );
 				return;
 			}
 		}
+		G_AddEvent( ent, EV_PROJECTILE_BOUNCE, DirToByte( trace->plane.normal ) );
 #else
 		G_AddEvent( ent, EV_GRENADE_BOUNCE, 0 );
 #endif
@@ -1137,7 +1136,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	}
 
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if (bg_projectileinfo[ent->s.weapon].stickOnImpact) {
 		vec3_t dir;
 
@@ -1248,7 +1247,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	}
 #endif
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if (bg_projectileinfo[ent->s.weapon].grappling)
 #else
 	if (!strcmp(ent->classname, "hook"))
@@ -1262,7 +1261,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 			G_AddEvent( nent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ) );
 			nent->s.otherEntityNum = other->s.number;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			nent->s.clientNum = ent->s.number;
 #endif
 
@@ -1312,7 +1311,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	} else {
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
 	}
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	ent->s.clientNum = ent->s.number;
 #endif
 
@@ -1355,7 +1354,7 @@ void G_RunMissile( gentity_t *ent ) {
 	if ( ent->target_ent ) {
 		passent = ent->target_ent->s.number;
 	}
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	// missiles that left the owner bbox will attack anything, even the owner
 	else if (ent->count & 1)
 	{
@@ -1405,9 +1404,9 @@ void G_RunMissile( gentity_t *ent ) {
 			return;		// exploded
 		}
 	}
-#if defined MISSIONPACK || defined TMNTWEAPSYS_2
+#if defined MISSIONPACK || defined TMNTWEAPSYS
 	// if the prox mine wasn't yet outside the player body
-#ifdef TMNTWEAPSYS_2 // Turtle Man: TODO: Add a option to/not-to damage owner?
+#ifdef TMNTWEAPSYS // Turtle Man: TODO: Add a option to/not-to damage owner?
 	if (qfalse && !(ent->count & 1))
 #else
 	if (ent->s.weapon == WP_PROX_LAUNCHER && !ent->count)
@@ -1416,7 +1415,7 @@ void G_RunMissile( gentity_t *ent ) {
 		// check if the prox mine is outside the owner bbox
 		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, ENTITYNUM_NONE, ent->clipmask );
 		if (!tr.startsolid || tr.entityNum != ent->r.ownerNum) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			ent->count |= 1;
 #else
 			ent->count = 1;
@@ -1428,7 +1427,7 @@ void G_RunMissile( gentity_t *ent ) {
 	G_RunThink( ent );
 }
 
-#ifndef TMNTWEAPSYS_2 // There is now a fire_projectile that replaces all of these.
+#ifndef TMNTWEAPSYS // There is now a fire_projectile that replaces all of these.
 //=============================================================================
 
 /*
@@ -1726,4 +1725,4 @@ gentity_t *fire_prox( gentity_t *self, vec3_t start, vec3_t dir ) {
 }
 #endif
 
-#endif // !TMNTWEAPSYS_2
+#endif // #ifndef TMNTWEAPSYS

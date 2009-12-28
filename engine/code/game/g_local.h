@@ -355,7 +355,7 @@ struct gclient_s {
 #ifdef MISSIONPACK
 	gentity_t	*persistantPowerup;
 	int			portalID;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	int			ammoTimes[MAX_BG_WEAPON_GROUPS];
 #else
 	int			ammoTimes[WP_NUM_WEAPONS];
@@ -590,7 +590,7 @@ void TossClientCubes( gentity_t *self );
 //
 void G_RunMissile( gentity_t *ent );
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 #ifdef TMNTHOLDABLE
 qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward,
 		vec3_t right, vec3_t up, holdable_t holdable);
@@ -653,7 +653,7 @@ void DropPortalDestination( gentity_t *ent );
 qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker );
 void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint );
 void SnapVectorTowards( vec3_t v, vec3_t to );
-#ifdef TMNT
+#ifdef TMNT // LOCKON
 void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t right, vec3_t up);
 #endif
 #ifdef TMNTHOLDABLE
@@ -1009,7 +1009,7 @@ int		trap_BotLibVarSet(char *var_name, char *value);
 int		trap_BotLibVarGet(char *var_name, char *value, int size);
 int		trap_BotLibDefine(char *string);
 int		trap_BotLibStartFrame(float time);
-#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
 int		trap_BotLibLoadMap(const char *mapname, void /* bot_shareditem_t */ *itemInfos);
 #else
 int		trap_BotLibLoadMap(const char *mapname);
@@ -1076,7 +1076,7 @@ void	trap_EA_MoveForward(int client);
 void	trap_EA_MoveBack(int client);
 void	trap_EA_MoveLeft(int client);
 void	trap_EA_MoveRight(int client);
-#ifdef TMNTWEAPSYS2 // BOTLIB
+#ifdef TMNTWEAPSYS_EX // BOTLIB
 void	trap_EA_DropWeapon(int client);
 #else
 void	trap_EA_SelectWeapon(int client, int weapon);
@@ -1139,7 +1139,7 @@ int		trap_BotGetMapLocationGoal(char *name, void /* struct bot_goal_s */ *goal);
 int		trap_BotGetLevelItemGoal(int index, char *classname, void /* struct bot_goal_s */ *goal);
 float	trap_BotAvoidGoalTime(int goalstate, int number);
 void	trap_BotSetAvoidGoalTime(int goalstate, int number, float avoidtime);
-#ifndef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+#ifndef TMNTWEAPSYS // BOT_ITEM_INFOS
 void	trap_BotInitLevelItems(void);
 #endif
 void	trap_BotUpdateEntityItems(void);
@@ -1164,7 +1164,7 @@ void	trap_BotFreeMoveState(int handle);
 void	trap_BotInitMoveState(int handle, void /* struct bot_initmove_s */ *initmove);
 void	trap_BotAddAvoidSpot(int movestate, vec3_t origin, float radius, int type);
 
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 int		trap_BotChooseBestFightWeapon(int weaponstate, int *inventory);
 void	trap_BotGetWeaponInfo(int weaponstate, int weapon, void /* struct weaponinfo_s */ *weaponinfo);
 int		trap_BotLoadWeaponWeights(int weaponstate, char *filename);

@@ -1663,14 +1663,12 @@ PLAYER ANGLES
 =============================================================================
 */
 
+#ifndef IOQ3ZTM // BG_SWING_ANGLES
 /*
 ==================
 CG_SwingAngles
 ==================
 */
-#ifndef TMNTWEAPSYS
-static
-#endif
 void CG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
 					float speed, float *angle, qboolean *swinging ) {
 	float	swing;
@@ -1726,6 +1724,7 @@ void CG_SwingAngles( float destination, float swingTolerance, float clampToleran
 		*angle = AngleMod( destination + (clampTolerance - 1) );
 	}
 }
+#endif
 
 /*
 =================
@@ -1814,8 +1813,13 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	torsoAngles[YAW] = headAngles[YAW] + 0.25 * movementOffsets[ dir ];
 
 	// torso
+#ifdef IOQ3ZTM // BG_SWING_ANGLES
+	BG_SwingAngles( torsoAngles[YAW], 25, 90, cg_swingSpeed.value, &cent->pe.torso.yawAngle, &cent->pe.torso.yawing, cg.frametime );
+	BG_SwingAngles( legsAngles[YAW], 40, 90, cg_swingSpeed.value, &cent->pe.legs.yawAngle, &cent->pe.legs.yawing, cg.frametime );
+#else
 	CG_SwingAngles( torsoAngles[YAW], 25, 90, cg_swingSpeed.value, &cent->pe.torso.yawAngle, &cent->pe.torso.yawing );
 	CG_SwingAngles( legsAngles[YAW], 40, 90, cg_swingSpeed.value, &cent->pe.legs.yawAngle, &cent->pe.legs.yawing );
+#endif
 
 	torsoAngles[YAW] = cent->pe.torso.yawAngle;
 	legsAngles[YAW] = cent->pe.legs.yawAngle;
@@ -1829,7 +1833,11 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	} else {
 		dest = headAngles[PITCH] * 0.75f;
 	}
+#ifdef IOQ3ZTM // BG_SWING_ANGLES
+	BG_SwingAngles( dest, 15, 30, 0.1f, &cent->pe.torso.pitchAngle, &cent->pe.torso.pitching, cg.frametime );
+#else
 	CG_SwingAngles( dest, 15, 30, 0.1f, &cent->pe.torso.pitchAngle, &cent->pe.torso.pitching );
+#endif
 	torsoAngles[PITCH] = cent->pe.torso.pitchAngle;
 
 	//
@@ -2244,7 +2252,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	VectorCopy( torso->lightingOrigin, pole.lightingOrigin );
 	pole.shadowPlane = torso->shadowPlane;
 	pole.renderfx = torso->renderfx;
-#ifdef TMNTWEAPSYS
+#ifdef TMNT_SUPPORTQ3
 	if (ci->tagInfo & TI_TAG_HAND_SECONDARY)
 	{
 		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_hand_secondary" ))
@@ -2379,7 +2387,11 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 			//vectoangles( cent->currentState.pos.trDelta, tmpangles );
 			//angles[YAW] = tmpangles[YAW] + 45 - cent->pe.torso.yawAngle;
 			// change the yaw angle
+#ifdef IOQ3ZTM // BG_SWING_ANGLES
+			BG_SwingAngles( angles[YAW], 25, 90, 0.15f, &cent->pe.flag.yawAngle, &cent->pe.flag.yawing, cg.frametime );
+#else
 			CG_SwingAngles( angles[YAW], 25, 90, 0.15f, &cent->pe.flag.yawAngle, &cent->pe.flag.yawing );
+#endif
 		}
 
 		/*

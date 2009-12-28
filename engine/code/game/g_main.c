@@ -165,7 +165,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_speed, "g_speed", "320", 0, 0, qtrue  },
 	{ &g_gravity, "g_gravity", "800", 0, 0, qtrue  },
 	{ &g_knockback, "g_knockback", "1000", 0, 0, qtrue  },
-#ifdef TMNT // POWERS // was TMNTWEAPSYS
+#ifdef TMNT // POWERS
 	{ &g_quadfactor, "g_quadfactor", "2", 0, 0, qtrue  },
 #else
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue  },
@@ -712,7 +712,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 #ifdef TMNTNPCSYS
 	ClearRegisteredNPCs();
 #endif
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	BG_InitWeaponInfo();
 #endif
 #ifdef TMNTNPCSYS

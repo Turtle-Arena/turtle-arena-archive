@@ -79,7 +79,7 @@ CG_LoadingItem
 void CG_LoadingItem( int itemNum ) {
 	gitem_t		*item;
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[itemNum];

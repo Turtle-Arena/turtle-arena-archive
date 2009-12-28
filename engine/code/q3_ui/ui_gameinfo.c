@@ -832,7 +832,7 @@ void UI_InitGameinfo( void ) {
 
 	UI_InitMemory();
 	UI_LoadArenas();
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	BG_InitWeaponInfo();
 #endif
 	UI_LoadBots();

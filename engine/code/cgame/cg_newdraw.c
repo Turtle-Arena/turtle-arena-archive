@@ -237,20 +237,20 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 
 	if ( draw2D || (!cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 	  qhandle_t	icon;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].ammoIcon;
 #else
-    icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
+		icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
 #endif
 		if ( icon ) {
 		  CG_DrawPic( rect->x, rect->y, rect->w, rect->h, icon );
 		}
   } else if (cg_draw3dIcons.integer) {
   	if ( cent->currentState.weapon &&
-#ifdef TMNTWEAPSYS_2
-  	cg_weapongroups[ cent->currentState.weapon ].ammoModel
+#ifdef TMNTWEAPSYS
+		cg_weapongroups[ cent->currentState.weapon ].ammoModel
 #else
-  	cg_weapons[ cent->currentState.weapon ].ammoModel
+		cg_weapons[ cent->currentState.weapon ].ammoModel
 #endif
   	) {
 	    VectorClear( angles );
@@ -259,7 +259,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
   		origin[2] = 0;
   		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
   		CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h,
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			cg_weapongroups[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
 #else
 			cg_weapons[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
@@ -279,7 +279,7 @@ static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, q
 	ps = &cg.snap->ps;
 
 	if ( cent->currentState.weapon ) {
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		value = ps->stats[STAT_AMMO];
 #else
 		value = ps->ammo[cent->currentState.weapon];
@@ -488,7 +488,7 @@ static void CG_DrawSelectedPlayerWeapon( rectDef_t *rect ) {
 
   ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
   if (ci) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
 			CG_DrawPic( rect->x, rect->y, rect->w, rect->h, cg_weapongroups[ci->curWeapon].weaponIcon );
 		}
@@ -984,7 +984,7 @@ float CG_GetValue(int ownerDraw) {
 #endif
   case CG_PLAYER_AMMO_VALUE:
 		if ( cent->currentState.weapon ) {
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		  return ps->stats[STAT_AMMO];
 #else
 		  return ps->ammo[cent->currentState.weapon];
@@ -1410,7 +1410,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 
 // weapon used is not that useful, use the space for task
 #if 0
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
 				CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, cg_weapongroups[ci->curWeapon].weaponIcon );
 			}

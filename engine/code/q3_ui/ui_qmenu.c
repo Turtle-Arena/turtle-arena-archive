@@ -32,7 +32,7 @@ sfxHandle_t menu_move_sound;
 sfxHandle_t menu_out_sound;
 sfxHandle_t menu_buzz_sound;
 sfxHandle_t menu_null_sound;
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 sfxHandle_t weaponChangeSound;
 #endif
 
@@ -1789,7 +1789,7 @@ void Menu_Cache( void )
 	menu_move_sound	= trap_S_RegisterSound( "sound/misc/menu2.wav", qfalse );
 	menu_out_sound	= trap_S_RegisterSound( "sound/misc/menu3.wav", qfalse );
 	menu_buzz_sound	= trap_S_RegisterSound( "sound/misc/menu4.wav", qfalse );
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	weaponChangeSound	= trap_S_RegisterSound( "sound/weapons/change.wav", qfalse );
 #endif
 

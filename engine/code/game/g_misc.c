@@ -269,10 +269,10 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 		VectorCopy( ent->movedir, dir );
 	}
 
-#ifdef TMNT
+#ifdef TMNT // LOCKON
 	if (ent->random == -1)
 	{
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
 				ent->s.origin, dir, right, up);
 #else
@@ -297,7 +297,7 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	}
 #endif
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if (!fire_weapon(ent, ent->s.origin, dir, right, up,
 				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], 1))
 	{
@@ -335,7 +335,7 @@ void InitShooter( gentity_t *ent, int weapon ) {
 
 	G_SetMovedir( ent->s.angles, ent->movedir );
 
-#ifdef TMNT // G_AutoAim
+#ifdef TMNT // LOCKON
 	if (ent->random != -1)
 	{
 #endif
@@ -343,7 +343,7 @@ void InitShooter( gentity_t *ent, int weapon ) {
 		ent->random = 1.0;
 	}
 	ent->random = sin( M_PI * ent->random / 180 );
-#ifdef TMNT // G_AutoAim
+#ifdef TMNT // LOCKON
 	}
 #endif
 	// target might be a moving object, so we can't set movedir for it
@@ -354,7 +354,7 @@ void InitShooter( gentity_t *ent, int weapon ) {
 	trap_LinkEntity( ent );
 }
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 /*QUAKED misc_shooter (1 0 0) (-16 -16 -16) (16 16 16)
 Fires at either the target or the current direction.
 "random" the number of degrees of deviance from the taget. (1.0 default)
@@ -371,7 +371,7 @@ Fires at either the target or the current direction.
 "random" the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_rocket( gentity_t *ent ) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	InitShooter( ent, BG_WeaponGroupIndexForName("wp_rocket_launcher") );
 #else
 	InitShooter( ent, WP_ROCKET_LAUNCHER );
@@ -383,15 +383,13 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_plasma( gentity_t *ent ) {
-#ifdef TMNTWEAPSYS_2
-	int weapon = 0;
+#ifdef TMNTWEAPSYS
+	int weapon;
 
+	weapon = BG_WeaponGroupIndexForName("wp_plasmagun");
 #ifdef TMNTWEAPONS
-	weapon = BG_WeaponGroupIndexForName("wp_electric_launcher");
-#endif
-#if !defined TMNT || defined TMNT_SUPPORTQ3
 	if (!weapon) {
-		weapon = BG_WeaponGroupIndexForName("wp_plasmagun");
+		weapon = BG_WeaponGroupIndexForName("wp_electric_launcher");
 	}
 #endif
 
@@ -406,15 +404,13 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_grenade( gentity_t *ent ) {
-#ifdef TMNTWEAPSYS_2
-	int weapon = 0;
+#ifdef TMNTWEAPSYS
+	int weapon;
 
+	weapon = BG_WeaponGroupIndexForName("wp_grenade_launcher");
 #ifdef TMNTWEAPONS
-	weapon = BG_WeaponGroupIndexForName("wp_homing_launcher");
-#endif
-#if !defined TMNT || defined TMNT_SUPPORTQ3
 	if (!weapon) {
-		weapon = BG_WeaponGroupIndexForName("wp_grenade_launcher");
+		weapon = BG_WeaponGroupIndexForName("wp_homing_launcher");
 	}
 #endif
 
