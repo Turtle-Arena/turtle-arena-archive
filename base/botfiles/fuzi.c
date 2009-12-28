@@ -113,7 +113,7 @@ weight "weapon_default"
 	return 0;
 }
 
-// Turtle Man: TODO: TMNTWEAPSYS_2 should setup the weapon item weights.
+// Turtle Man: TODO: TMNTWEAPSYS should setup the weapon item weights.
 weight "weapon_katanas"
 {
 	switch(INVENTORY_KATANAS)

@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // Turtle Man: Changed for TMNT weapons.
-// NOTE: If TMNTWEAPSYS_2_BOT is defined this file is not used.
-//         Instead the need data is loaded from "scripts/weaponinfo.txt"
+// NOTE: If TMNTWEAPSYS is defined this file is not used.
+//         Instead game uses data from "scripts/weaponinfo.txt" (and *.weap files)
 
 #include "inv.h"
 
