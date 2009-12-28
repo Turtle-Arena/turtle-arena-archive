@@ -1856,21 +1856,21 @@ static void PM_BeginWeaponChange( int weapon ) {
 	{
 		int anim = TORSO_DROP;
 
-	if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
-	{
-		if (pm->ps->weaponHands == HAND_PRIMARY)
+		if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
 		{
+			if (pm->ps->weaponHands == HAND_PRIMARY)
+			{
 				anim = TORSO_PUTDEFAULT_PRIMARY;
-		}
-		else if (pm->ps->weaponHands == HAND_SECONDARY)
-		{
+			}
+			else if (pm->ps->weaponHands == HAND_SECONDARY)
+			{
 				anim = TORSO_PUTDEFAULT_SECONDARY;
-		}
-		else if (pm->ps->weaponHands == HAND_BOTH)
-		{
+			}
+			else if (pm->ps->weaponHands == HAND_BOTH)
+			{
 				anim = TORSO_PUTDEFAULT_BOTH;
+			}
 		}
-	}
 
 		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
 		PM_StartTorsoAnim( anim );
@@ -1889,9 +1889,14 @@ PM_FinishWeaponChange
 */
 static void PM_FinishWeaponChange( void ) {
 	int		weapon;
+#ifdef TMNTWEAPSYS_EX
+	int oldWeapon;
+
+	oldWeapon = pm->ps->weapon;
+#endif
 
 #ifdef TMNTWEAPSYS_EX
-	weapon = pm->ps->stats[STAT_NEWWEAPON];
+	weapon = pm->ps->stats[STAT_PENDING_WEAPON];
 #else
 	weapon = pm->cmd.weapon;
 #endif
@@ -1921,21 +1926,21 @@ static void PM_FinishWeaponChange( void ) {
 	{
 		int anim = TORSO_RAISE;
 
-	if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
-	{
-		if (pm->ps->weaponHands == HAND_PRIMARY)
+		if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
 		{
-				anim = TORSO_GETDEFAULT_PRIMARY;
+			if (pm->ps->weaponHands == HAND_PRIMARY)
+			{
+					anim = TORSO_GETDEFAULT_PRIMARY;
+			}
+			else if (pm->ps->weaponHands == HAND_SECONDARY)
+			{
+					anim = TORSO_GETDEFAULT_SECONDARY;
+			}
+			else if (pm->ps->weaponHands == HAND_BOTH)
+			{
+					anim = TORSO_GETDEFAULT_BOTH;
+			}
 		}
-		else if (pm->ps->weaponHands == HAND_SECONDARY)
-		{
-				anim = TORSO_GETDEFAULT_SECONDARY;
-		}
-		else if (pm->ps->weaponHands == HAND_BOTH)
-		{
-				anim = TORSO_GETDEFAULT_BOTH;
-		}
-	}
 
 		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
 		PM_StartTorsoAnim( anim );
@@ -1943,6 +1948,25 @@ static void PM_FinishWeaponChange( void ) {
 #else
 	pm->ps->weaponTime += 250;
 	PM_StartTorsoAnim( TORSO_RAISE );
+#endif
+#ifdef TMNTWEAPSYS_EX
+	// Drop weapon and setup ammo
+	if (pm->ps->stats[STAT_PENDING_WEAPON] == pm->ps->stats[STAT_DEFAULTWEAPON])
+	{
+		// drop weapon
+		pm->ps->stats[STAT_DROP_WEAPON] = oldWeapon;
+		pm->ps->stats[STAT_DROP_AMMO] = pm->ps->stats[STAT_AMMO];
+		PM_AddEvent( EV_DROP_WEAPON );
+
+		// Default weapons don't use ammo.
+		pm->ps->stats[STAT_AMMO] = -1;
+	}
+	else
+	{
+		// Set ammo for new weapon.
+		pm->ps->stats[STAT_AMMO] = pm->ps->stats[STAT_PENDING_AMMO];
+		pm->ps->stats[STAT_PENDING_AMMO] = -1;
+	}
 #endif
 }
 
@@ -2305,7 +2329,7 @@ static void PM_Weapon( void ) {
 		))
 		&& pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON])
 	{
-		pm->ps->stats[STAT_NEWWEAPON] = pm->ps->stats[STAT_DEFAULTWEAPON];
+		pm->ps->stats[STAT_PENDING_WEAPON] = pm->ps->stats[STAT_DEFAULTWEAPON];
 	}
 #endif
 
@@ -2314,8 +2338,8 @@ static void PM_Weapon( void ) {
 	// again if lowering or raising
 	if ( pm->ps->weaponTime <= 0 || pm->ps->weaponstate != WEAPON_FIRING ) {
 #ifdef TMNTWEAPSYS_EX
-		if ( pm->ps->weapon != pm->ps->stats[STAT_NEWWEAPON] ) {
-			PM_BeginWeaponChange( pm->ps->stats[STAT_NEWWEAPON] );
+		if ( pm->ps->weapon != pm->ps->stats[STAT_PENDING_WEAPON] ) {
+			PM_BeginWeaponChange( pm->ps->stats[STAT_PENDING_WEAPON] );
 		}
 #else
 		if ( pm->ps->weapon != pm->cmd.weapon ) {
@@ -2342,42 +2366,6 @@ static void PM_Weapon( void ) {
 
 	// change weapon if time
 	if ( pm->ps->weaponstate == WEAPON_DROPPING ) {
-#ifdef TMNTWEAPSYS_EX
-		// If the weapon that were changing to is a different weapon,
-		// and the current weapon is valid,
-		// and its not the default weapon,
-		// then drop it.
-		if ( pm->ps->weapon != pm->ps->stats[STAT_NEWWEAPON]
-			&& (pm->ps->weapon > WP_NONE && pm->ps->weapon < BG_NumWeaponGroups())
-			&& pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON] )
-		{
-			// drop weapon
-			pm->ps->stats[STAT_OLDWEAPON] = pm->ps->weapon;
-			pm->ps->stats[STAT_OLDAMMO] = pm->ps->stats[STAT_AMMO];
-			PM_AddEvent( EV_DROP_WEAPON );
-		}
-
-		// Save/load default weapon's ammo.
-		if (pm->ps->stats[STAT_NEWWEAPON] == pm->ps->stats[STAT_DEFAULTWEAPON])
-		{
-			pm->ps->stats[STAT_AMMO] = pm->ps->stats[STAT_SAVEDAMMO];
-			pm->ps->stats[STAT_SAVEDAMMO] = 0;
-			if (pm->ps->stats[STAT_NEWAMMO] > 0) {
-				pm->ps->stats[STAT_AMMO] += pm->ps->stats[STAT_NEWAMMO];
-			}
-		}
-		else if (pm->ps->weapon == pm->ps->stats[STAT_DEFAULTWEAPON])
-		{
-			pm->ps->stats[STAT_SAVEDAMMO] = pm->ps->stats[STAT_AMMO];
-			pm->ps->stats[STAT_AMMO] = pm->ps->stats[STAT_NEWAMMO];
-		}
-		else
-		{
-			// Set ammo for new weapon.
-			pm->ps->stats[STAT_AMMO] = pm->ps->stats[STAT_NEWAMMO];
-		}
-		pm->ps->stats[STAT_NEWAMMO] = -1;
-#endif
 		PM_FinishWeaponChange();
 		return;
 	}

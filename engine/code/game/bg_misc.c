@@ -4262,8 +4262,15 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	switch( item->giType ) {
 	case IT_WEAPON:
 #ifdef TMNTWEAPSYS_EX
-		// Turtle Man: TODO: Must drop weapon first
-		//if (ps->weapon != ps->stats[STAT_DEFAULTWEAPON]) {
+		if (ps->weapon != ps->stats[STAT_PENDING_WEAPON])
+		{
+			return qfalse;
+		}
+
+		// AUTO_DROP_WEAPON
+		//if (ps->weapon != ps->stats[STAT_DEFAULTWEAPON]
+		//	&& ps->weapon != item->giTag
+		//	&& !(ps->pm_flags & PMF_GRAPPLE_PULL)) {
 		//	return qfalse;
 		//}
 
@@ -4298,19 +4305,18 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	case IT_AMMO:
 #ifdef TMNTWEAPSYS_EX
 		{
-			int stat = STAT_AMMO;
-			if (item->giTag != ps->weapon)
-			{
-				if (item->giTag == ps->stats[STAT_NEWWEAPON])
-					stat = STAT_NEWAMMO;
-				else if (item->giTag == ps->stats[STAT_OLDWEAPON])
-					stat = STAT_OLDAMMO;
-				else if (item->giTag == ps->stats[STAT_DEFAULTWEAPON])
-					stat = STAT_SAVEDAMMO;
-				else
-					return qfalse; // no where to put ammo.
-			}
-			if ( ps->stats[ stat ] >= 200 ) {
+			int stat = -1;
+
+			if (item->giTag == ps->weapon)
+				stat = STAT_AMMO;
+			else if (item->giTag == ps->stats[STAT_PENDING_WEAPON])
+				stat = STAT_PENDING_AMMO;
+			else if (item->giTag == ps->stats[STAT_DROP_WEAPON])
+				stat = STAT_DROP_AMMO;
+			else
+				return qfalse; // no where to put ammo.
+
+			if ( stat && ps->stats[ stat ] >= 200 ) {
 				return qfalse;		// can't hold any more
 			}
 		}
@@ -5832,20 +5838,9 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 				break;
 			}
 			j = BG_WeaponGroupIndexForName(token);
-			if (j)
-			{
-				// GUNS_AS_DEFAULT
-				if (bg_weapongroupinfo[j].weapon[0]->weapontype == WT_GUN
-					|| bg_weapongroupinfo[j].weapon[1]->weapontype == WT_GUN)
-				{
-					Com_Printf( "Bad default_weapon parm, guns not allowed, in %s\n", filename );
-				}
-				else
-				{
-					playercfg->default_weapon = j;
-				}
-			}
-			else {
+			if (j) {
+				playercfg->default_weapon = j;
+			} else {
 				Com_Printf( "Bad default_weapon parm in %s: %s\n", filename, token );
 			}
 			continue;

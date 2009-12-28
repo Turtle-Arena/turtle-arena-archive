@@ -2320,7 +2320,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// Select our default weapon.
 	cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
 #ifdef TMNTWEAPSYS_EX
-	cg.predictedPlayerState.stats[STAT_NEWWEAPON] = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+	cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #else
 	cg.weaponSelect = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #endif

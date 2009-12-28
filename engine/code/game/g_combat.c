@@ -85,28 +85,23 @@ void TossClientItems( gentity_t *self ) {
 	int			i;
 	gentity_t	*drop;
 
-#ifdef TMNTWEAPSYS_EX // Turtle Man: FIXME: Drop upto three weapons?
-					//  (self->s.weapon, STAT_NEWWEAPON, and STAT_OLDWEAPON)
+#ifdef TMNTWEAPSYS_EX
 	int statAmmo = -1;
 
 	if (self->client)
 	{
 		// Clients can have two weapon, pickup and default,
-		//  pickup will be in s.weapon if s.weapon != STAT_DEFAULTWEAPON
+		//   only the pickup weapon will be dropped.
 
 		weapon = WP_NONE;
 
-		// check if dropping weapon
-		if (self->client->ps.weaponstate == WEAPON_DROPPING)
-		{
 		// don't drop default weapon
-			if (self->client->ps.stats[STAT_NEWWEAPON]
-				!= self->client->ps.stats[STAT_DEFAULTWEAPON])
-			{
-				weapon = self->client->ps.stats[STAT_NEWWEAPON];
-				self->client->ps.stats[STAT_NEWWEAPON] = WP_NONE;
-				statAmmo = STAT_NEWAMMO;
-			}
+		if (self->client->ps.stats[STAT_PENDING_WEAPON]
+			!= self->client->ps.stats[STAT_DEFAULTWEAPON])
+		{
+			weapon = self->client->ps.stats[STAT_PENDING_WEAPON];
+			self->client->ps.stats[STAT_PENDING_WEAPON] = WP_NONE;
+			statAmmo = STAT_PENDING_AMMO;
 		}
 		// else if has pickup weapon
 		else if (self->s.weapon != self->client->ps.stats[STAT_DEFAULTWEAPON])

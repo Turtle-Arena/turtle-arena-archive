@@ -319,9 +319,9 @@ static void CG_TouchItem( centity_t *cent ) {
 	// if its a weapon, give them some predicted ammo so the autoswitch will work
 	if ( item->giType == IT_WEAPON ) {
 #ifdef TMNTWEAPSYS_EX
-		cg.predictedPlayerState.stats[STAT_NEWWEAPON] = item->giTag;
-		if ( !cg.predictedPlayerState.stats[STAT_AMMO] ) {
-			cg.predictedPlayerState.stats[STAT_AMMO] = 1;
+		cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
+		if ( !cg.predictedPlayerState.stats[STAT_PENDING_AMMO] ) {
+			cg.predictedPlayerState.stats[STAT_PENDING_AMMO] = 1;
 		}
 #else
 		cg.predictedPlayerState.stats[ STAT_WEAPONS ] |= 1 << item->giTag;

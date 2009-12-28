@@ -33,7 +33,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // Weapon the player is using
 #define INVENTORY_WEAPON			57
 
-#define INVENTORY_DEFAULTAMMO 58 // Ammo for default weapon.
 #define INVENTORY_AMMO 		59 // Ammo for current weapon,
 //#endif
 

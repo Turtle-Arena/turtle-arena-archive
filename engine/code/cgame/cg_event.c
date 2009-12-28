@@ -593,9 +593,9 @@ static void CG_ItemPickup( int itemNum ) {
 		{
 #ifdef TMNTWEAPSYS_EX // The weapon "should" be selected in game and sent in the next snap too
 #ifdef TMNTWEAPSYS
-			cg.predictedPlayerState.stats[STAT_NEWWEAPON] = item->giTag;
+			cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
 #else
-			cg.predictedPlayerState.stats[STAT_NEWWEAPON] = bg_itemlist[itemNum].giTag;
+			cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = bg_itemlist[itemNum].giTag;
 #endif
 #else
 			cg.weaponSelectTime = cg.time;
@@ -934,7 +934,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			index = es->eventParm;		// player predicted
 
 #ifdef TMNTWEAPSYS
-			if ( index < 1 || index >= NUM_BG_ITEMS )
+			if ( index < 1 || index >= BG_NumItems() )
 #else
 			if ( index < 1 || index >= bg_numItems )
 #endif
@@ -992,7 +992,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			index = es->eventParm;		// player predicted
 
 #ifdef TMNTWEAPSYS
-			if ( index < 1 || index >= NUM_BG_ITEMS )
+			if ( index < 1 || index >= BG_NumItems() )
 #else
 			if ( index < 1 || index >= bg_numItems )
 #endif

@@ -597,7 +597,7 @@ static void CG_Item( centity_t *cent ) {
 #endif
 	{
 #ifdef TMNTWEAPSYS
-		CG_Error( "Bad item index %i on entity (max is %i)", es->modelindex, NUM_BG_ITEMS );
+		CG_Error( "Bad item index %i on entity (max is %i)", es->modelindex, BG_NumItems() );
 #else
 		CG_Error( "Bad item index %i on entity", es->modelindex );
 #endif

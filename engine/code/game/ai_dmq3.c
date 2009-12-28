@@ -1870,7 +1870,6 @@ void BotUpdateInventory(bot_state_t *bs) {
 #ifdef TMNTWEAPSYS_EX
 	bs->inventory[INVENTORY_DEFAULTWEAPON] = bs->cur_ps.stats[STAT_DEFAULTWEAPON];
 	bs->inventory[INVENTORY_WEAPON] = bs->cur_ps.weapon;
-	bs->inventory[INVENTORY_DEFAULTAMMO] = bs->cur_ps.stats[STAT_SAVEDAMMO];
 	bs->inventory[INVENTORY_AMMO] = bs->cur_ps.stats[STAT_AMMO];
 #endif
 #ifdef TMNTWEAPSYS // Turtle Man: FIXME: Is there a better way?
@@ -1919,7 +1918,7 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_GRAPPLING_HOOK] = BOT_HAS_WEAP(WP_GRAPPLING_HOOK);
 #undef BOT_HAS_WEAP
 #ifdef TMNTWEAPSYS_EX
-#define BOT_HAS_AMMO(_wp) (bs->cur_ps.weapon == _wp ? bs->cur_ps.stats[STAT_AMMO] : (bs->cur_ps.stats[STAT_DEFAULTWEAPON] == _wp ? bs->cur_ps.stats[STAT_SAVEDAMMO] : 0))
+#define BOT_HAS_AMMO(_wp) (bs->cur_ps.weapon == _wp ? bs->cur_ps.stats[STAT_AMMO] : 0))
 #else
 #define BOT_HAS_AMMO(_wp) bs->cur_ps.ammo[_wp]
 #endif
@@ -1950,7 +1949,7 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_CHAINGUN] = BOT_HAS_WEAP(WP_CHAINGUN);
 #endif
 #undef BOT_HAS_WEAP
-#define BOT_HAS_AMMO(_wp) (bs->cur_ps.weapon == _wp ? bs->cur_ps.stats[STAT_AMMO] : (bs->cur_ps.stats[STAT_DEFAULTWEAPON] == _wp ? bs->cur_ps.stats[STAT_SAVEDAMMO] : 0))
+#define BOT_HAS_AMMO(_wp) (bs->cur_ps.weapon == _wp ? bs->cur_ps.stats[STAT_AMMO] : 0))
 	//ammo
 	bs->inventory[INVENTORY_SHELLS] = BOT_HAS_AMMO(WP_SHOTGUN);
 	bs->inventory[INVENTORY_BULLETS] = BOT_HAS_AMMO(WP_MACHINEGUN);
@@ -2509,7 +2508,7 @@ TeamPlayIsOn
 ==================
 */
 int TeamPlayIsOn(void) {
-#ifdef TMNTSP // Turtle Man: TEST: Co-op is "teamplay"
+#ifdef TMNTSP // Turtle Man: Co-op is "teamplay"
 	return ( gametype >= GT_TEAM || gametype == GT_SINGLE_PLAYER );
 #else
 	return ( gametype >= GT_TEAM );
@@ -2521,7 +2520,7 @@ qboolean BotCanUseShurikens(bot_state_t *bs)
 {
 #ifdef TMNTHOLDABLE
 	if (bs->inventory[ENEMY_HORIZONTAL_DIST] >= 256
-		&& bs->inventory[ENEMY_HORIZONTAL_DIST] <= 1024
+		&& bs->inventory[ENEMY_HORIZONTAL_DIST] <= 768 // LOCKON range
 	&& (bs->cur_ps.holdableIndex >= HI_SHURIKEN &&
 		bs->cur_ps.holdableIndex <= HI_LASERSHURIKEN)
 		&& bs->cur_ps.holdable[bs->cur_ps.holdableIndex] > 0)

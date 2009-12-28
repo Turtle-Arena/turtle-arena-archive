@@ -249,16 +249,13 @@ typedef enum {
 	STAT_DEFAULTWEAPON, // default weapon
 #endif
 #ifdef TMNTWEAPSYS_EX
-	// Players can have 3 weapons at once, there is a extra one when switching from pickup to pickup
-	STAT_NEWWEAPON, // weapon that the player touched, they will change to it ASAP.
-	STAT_OLDWEAPON, // weapon that the player just changed from
-	//STAT_CURRENTWEAPON, // ps.weapon is the current weapon!
-
-	// Replacement for the ammo array in playerState_t
-	STAT_SAVEDAMMO, // Saved ammo for default weapon
-	STAT_OLDAMMO, // ammo for STAT_OLDWEAPON
-	STAT_NEWAMMO, // ammo for STAT_NEWWEAPON
 	STAT_AMMO, // Ammo for current weapon
+
+	STAT_PENDING_WEAPON, // Weapon to change to.
+	STAT_PENDING_AMMO, // Ammo for pending weapon
+
+	STAT_DROP_WEAPON, // Weapon to drop.
+	STAT_DROP_AMMO, // Ammo for weapon to drop
 #else
 	STAT_WEAPONS,					// 16 bit fields
 #endif
@@ -496,48 +493,18 @@ typedef enum
 
 // Default weapon if animation.cfg doesn't set one.
 #ifdef TMNTWEAPONS
-/*#ifdef TMNT_SUPPORTQ3
-// Quake 3 players don't have a "default_weapon" in there animation.cfg
-// GUNS_AS_DEFAULT  --Search Keyword
-// Turtle Man: Should be WP_GAUNTLET for quake3 players,
-//     but I have no gauntlet... (and don't really want one.)
-//   Guns as default weapon is disabled.
-//   This is due to ammo for default weapons being problatic;
-//   Guns will be one of three things, unlimited ammo or cheatable
-//    (swap to other player and back to get ammo)
-//    or unable to be used...
-//   Not sure if I want to try and fix this, and currently
-//   FIXED?:  modifying any part of the player's info string will reload the player,
-//   FIXED?:  causing ammo to reset.
-
-#ifdef TMNTWEAPSYS
-#define DEFAULT_DEFAULT_WEAPON "WP_GUN" // "WP_GAUNTLET"
-#else
-#define DEFAULT_DEFAULT_WEAPON WP_GUN // WP_GAUNTLET
-#endif
-#else // !TMNT_SUPPORTQ3
-*/
-#ifdef TMNTWEAPSYS
 #define DEFAULT_DEFAULT_WEAPON "WP_FISTS"
 #else
-#define DEFAULT_DEFAULT_WEAPON WP_FISTS
-#endif
-//#endif // TMNT_SUPPORTQ3
-
-#else // !TMNTWEAPONS
-#ifdef TMNTWEAPSYS
 #define DEFAULT_DEFAULT_WEAPON "WP_GAUNTLET" // "WP_MACHINEGUN"
-#else
-#define DEFAULT_DEFAULT_WEAPON WP_GAUNTLET // WP_MACHINEGUN
 #endif
-#endif // TMNTWEAPONS
-#endif // TMNTWEAPSYS
 
+// WP_DEFAULT will need to be remapped to the default weapon.
+#define WP_DEFAULT	-1
+#define WP_NONE		0
+#else
 typedef enum {
-    WP_DEFAULT = -1, // This weapon will need to be remapped to the default weapon.
 	WP_NONE,
 
-#ifndef TMNTWEAPSYS
 #ifdef TMNTWEAPONS
 	// Many of the weapons are based on weapons in TMNT: Mutant Melee
 	// For players like Hun who don't have a default "weapon" but just use there fists.
@@ -599,8 +566,8 @@ typedef enum {
 
 	WP_NUM_WEAPONS
 #endif // TMNTWEAPONS
-#endif
 } weapon_t;
+#endif
 
 #ifdef TMNTWEAPSYS
 #define HAND_NONE 0
@@ -1805,7 +1772,6 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw );
 int BG_ItemNumForItem( gitem_t *item );
 gitem_t	*BG_ItemForItemNum( int itemNum );
 int BG_NumItems(void);
-#define NUM_BG_ITEMS BG_NumItems()
 #define	ITEM_INDEX(x) (BG_ItemNumForItem(x))
 #else
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)

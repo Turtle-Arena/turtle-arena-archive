@@ -1230,7 +1230,7 @@ void CG_RegisterWeapon( int weaponNum )
 
 #ifdef TMNTWEAPSYS
 	item = BG_ItemForItemNum(0);
-	for (i = NUM_BG_ITEMS-1; i > 0; i--)
+	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		item = BG_ItemForItemNum(i);
 		if (!item->classname)
@@ -1287,7 +1287,7 @@ void CG_RegisterWeapon( int weaponNum )
 
 #ifdef TMNTWEAPSYS
 	ammo = NULL; // stop warning
-	for (i = NUM_BG_ITEMS-1; i > 0; i--)
+	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		ammo = BG_ItemForItemNum(i);
 		if (!ammo->classname)
@@ -1516,7 +1516,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 
 #ifdef TMNTWEAPSYS
 	if ( itemNum < 0 || itemNum >= BG_NumItems() ) {
-		CG_Error( "CG_RegisterItemVisuals: itemNum %d out of range [0-%d]", itemNum, NUM_BG_ITEMS-1 );
+		CG_Error( "CG_RegisterItemVisuals: itemNum %d out of range [0-%d]", itemNum, BG_NumItems()-1 );
 	}
 #else
 	if ( itemNum < 0 || itemNum >= bg_numItems ) {
@@ -2348,6 +2348,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	refEntity_t	gun;
 	refEntity_t	barrel;
 	refEntity_t	flash;
+	int flashDLight;
 	vec3_t		angles;
 	weapon_t	weaponNum;
 #ifdef TMNTWEAPSYS
@@ -2716,24 +2717,24 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		// add rail trail
 		CG_SpawnRailTrail( cent, flash.origin );
 
+#ifdef IOQ3ZTM // SMOOTH_FLASH
+		flashDLight = 300 + (cg.time&31);
+#else
+		flashDLight = 300 + (rand()&31);
+#endif
 #ifdef TMNTWEAPSYS
 		if (cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[0]
 			|| cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[1]
 			|| cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[2])
 		{
-			trap_R_AddLightToScene( flash.origin,
-#if 1 // Turtle Man: TEST: Smooth light flash?
-				300 + (cg.time % 62) - 31,
-#else
-				300 + (rand()&31),
-#endif
+			trap_R_AddLightToScene( flash.origin, flashDLight,
 				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[0],
 				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[1],
 				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[2] );
 		}
 #else
 		if ( weapon->flashDlightColor[0] || weapon->flashDlightColor[1] || weapon->flashDlightColor[2] ) {
-			trap_R_AddLightToScene( flash.origin, 300 + (rand()&31), weapon->flashDlightColor[0],
+			trap_R_AddLightToScene( flash.origin, flashDLight, weapon->flashDlightColor[0],
 				weapon->flashDlightColor[1], weapon->flashDlightColor[2] );
 		}
 #endif

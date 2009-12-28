@@ -850,9 +850,16 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			if (ent->client)
 			{
 				int weapon;
+				int ammo;
 				int contents;
 
-				weapon = ent->client->ps.stats[STAT_OLDWEAPON];
+				// Get drop info
+				weapon = ent->client->ps.stats[STAT_DROP_WEAPON];
+				ammo = ent->client->ps.stats[STAT_DROP_AMMO];
+
+				// Clear drop info
+				ent->client->ps.stats[STAT_DROP_WEAPON] = WP_NONE;
+				ent->client->ps.stats[STAT_DROP_AMMO] = 0;
 
 				if (weapon == WP_NONE) {
 					break;
@@ -861,19 +868,13 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				// Don't drop weapon in no drop areas.
 				contents = trap_PointContents( ent->r.currentOrigin, -1 );
 				if ( ( contents & CONTENTS_NODROP )) {
-					// Clear old weapon info
-					ent->client->ps.stats[STAT_OLDWEAPON] = WP_NONE;
-					ent->client->ps.stats[STAT_OLDAMMO] = -1;
 					break;
 				}
 
-				if (ent->client->ps.stats[STAT_OLDAMMO] == 0)
+				if (ammo == 0)
 				{
-					// Weapon is invalid, gun with no ammo.
-					// If someone picks it up, they will get default ammo.
-
-					// We should do something here...
-					// Like throw the weapon and have it fade alpha? (and can't pickup)
+					// Gun with no ammo. if someone picks it up, they will get default ammo.
+					// Turtle Man: TODO: Throw the weapon and have it fade alpha? (and can't pickup)
 					break;
 				}
 
@@ -881,8 +882,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				item = BG_FindItemForWeapon(weapon);
 
 				drop = Drop_Item(ent, item, 0);
-				// Save the ammo num
-				drop->count = ent->client->ps.stats[STAT_OLDAMMO];
+				drop->count = ammo;
 
 				/// DROP_WEAPON_FIX
 				// Save the player who drop the weapon, so we can wait till the
@@ -893,9 +893,6 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 				// Override weapon removal time.
 				drop->nextthink = level.time + 15000;
-
-				ent->client->ps.stats[STAT_OLDWEAPON] = WP_NONE;
-				ent->client->ps.stats[STAT_OLDAMMO] = -1;
 			}
 			break;
 #endif
