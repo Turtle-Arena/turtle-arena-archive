@@ -978,27 +978,10 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 
 	g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON] = playercfg->default_weapon;
 
-	{
-		// Make sure melee weapons (and grapple) have unlimited "ammo"
-		int defaultAmmo = -1;
-
-		if (BG_WeapUseAmmo(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]))
-		{
-			// GUNS_AS_DEFAULT
-#if 0 // Unlimited ammo so nobody can "cheat" the ammo system... Plus I don't have ammo pickups
-			// Guns are cheatable, for now anyway.
-			gitem_t *item = BG_FindItemForWeapon(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]);
-			defaultAmmo = item->quantity;
+#ifndef TMNTWEAPSYS_EX
+	// Set the ammo value.
+	g_entities[clientNum].client->ps.ammo[playercfg->default_weapon] = -1;
 #endif
-		}
-
-		// Set the ammo value.
-#ifdef TMNTWEAPSYS_EX
-		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = defaultAmmo;
-#else
-		g_entities[clientNum].client->ps.ammo[playercfg->default_weapon] = defaultAmmo;
-#endif // TMNTWEAPSYS_EX
-	}
 
 #ifdef TMNTWEAPSYS_EX
 	// If not holding new default, change to it.
@@ -1007,17 +990,17 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 		// Check if it is the old default weapon
 		if (g_entities[clientNum].client->ps.weapon == oldDefault)
 		{
-			// Don't allow the weapon to be picked up, as it is the player's default.
-			g_entities[clientNum].client->ps.stats[STAT_AMMO] = 0;
+			// Change to new default
+			g_entities[clientNum].client->ps.stats[STAT_PENDING_WEAPON] = g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON];
 
-			// Change to new default (The old one will just be goes as it has "0" ammo).
-			g_entities[clientNum].client->ps.stats[STAT_NEWWEAPON] = g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON];
+			// Don't allow the current weapon to be picked up, as it is the player's default.
+			g_entities[clientNum].client->ps.stats[STAT_AMMO] = 0;
 		}
 	}
 	else
 	{
 		// Only update "ammo"
-		g_entities[clientNum].client->ps.stats[STAT_AMMO] = g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO];
+		g_entities[clientNum].client->ps.stats[STAT_AMMO] = -1;
 	}
 #endif // TMNTWEAPSYS_EX
 #endif // TMNTWEAPSYS
@@ -1611,13 +1594,10 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 
 #ifdef TMNTWEAPSYS_EX
-	client->ps.stats[STAT_OLDWEAPON] = WP_NONE;
-
 	// Set default ammo values.
-	client->ps.stats[STAT_SAVEDAMMO] = -1;
-	client->ps.stats[STAT_OLDAMMO] = -1;
-	client->ps.stats[STAT_NEWAMMO] = -1;
 	client->ps.stats[STAT_AMMO] = -1;
+	client->ps.stats[STAT_PENDING_AMMO] = -1;
+	client->ps.stats[STAT_DROP_AMMO] = 0;
 #else
 	// Set default ammo values.
 	{
@@ -1649,14 +1629,14 @@ void ClientSpawn(gentity_t *ent) {
 
 		weapon = client->ps.stats[STAT_DEFAULTWEAPON];
 #ifdef TMNTWEAPSYS_EX
-		client->ps.stats[STAT_NEWWEAPON] = weapon;
+		client->ps.stats[STAT_PENDING_WEAPON] = weapon;
 #else
 		client->ps.stats[STAT_WEAPONS] = ( 1 << weapon);
 #endif
 
 		if (weapon > 0)
 		{
-		item = BG_FindItemForWeapon( weapon );
+			item = BG_FindItemForWeapon( weapon );
 		}
 
 		if (!item || (item && item->quantity == 0))

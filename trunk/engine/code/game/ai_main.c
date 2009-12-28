@@ -1079,7 +1079,7 @@ int BotAI(int client, float thinktime) {
         // At the begining of the intermission bots want 0
         // If they want the new pickup weapon, they have to wait
         else if (bs->weaponnum != 0
-			&& bs->weaponnum != bs->cur_ps.stats[STAT_NEWWEAPON])
+			&& bs->weaponnum != bs->cur_ps.stats[STAT_PENDING_WEAPON])
         {
 #if 0 // Turtle Man: Fixed bots wanting weapons they can't have, so this doesn't happen anymore.
 			if (bs->cur_ps.weapon == bs->cur_ps.stats[STAT_DEFAULTWEAPON])

@@ -267,7 +267,7 @@ void Cmd_Give_f (gentity_t *ent)
 #endif
 			return;
 
-		ent->client->ps.stats[STAT_NEWWEAPON] = w;
+		ent->client->ps.stats[STAT_PENDING_WEAPON] = w;
 	}
 #else
 	if (give_all || Q_stricmp(name, "weapons") == 0)
@@ -290,10 +290,9 @@ void Cmd_Give_f (gentity_t *ent)
 	if (give_all || Q_stricmp(name, "ammo") == 0)
 	{
 #ifdef TMNTWEAPSYS_EX
-		if (BG_WeapUseAmmo(ent->client->ps.stats[STAT_DEFAULTWEAPON]))
-			ent->client->ps.stats[STAT_SAVEDAMMO] = 999;
-		if (BG_WeapUseAmmo(ent->client->ps.weapon))
+		if (BG_WeapUseAmmo(ent->client->ps.weapon)) {
 			ent->client->ps.stats[STAT_AMMO] = 999;
+		}
 #else
 		for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
 #ifdef TMNTWEAPSYS

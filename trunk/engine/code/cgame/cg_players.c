@@ -2252,7 +2252,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	VectorCopy( torso->lightingOrigin, pole.lightingOrigin );
 	pole.shadowPlane = torso->shadowPlane;
 	pole.renderfx = torso->renderfx;
-#ifdef TMNT_SUPPORTQ3
+#ifdef TMNTWEAPSYS
 	if (ci->tagInfo & TI_TAG_HAND_SECONDARY)
 	{
 		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_hand_secondary" ))
@@ -2262,6 +2262,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #endif
 		}
 	}
+#ifdef TMNT_SUPPORTQ3
 	else if (ci->tagInfo & TI_TAG_FLAG)
 	{
 		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" ))
@@ -2271,6 +2272,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #endif
 		}
 	}
+#endif
 #elif defined TMNTPLAYERS
 	if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_hand_secondary" ))
 	{

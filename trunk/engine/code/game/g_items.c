@@ -262,17 +262,13 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 	if (weapon != ent->client->ps.weapon)
 	{
 		// When picking up a new weapon we haven't change weapons yet when we get the ammo.
-		if (weapon == ent->client->ps.stats[STAT_NEWWEAPON]) {
-			stat = STAT_NEWAMMO;
+		if (weapon == ent->client->ps.stats[STAT_PENDING_WEAPON]) {
+			stat = STAT_PENDING_AMMO;
 		}
 		// Got ammo for weapon we are about to drop?
 		//  I haven't had this happen but it could if there was ammo items.
-		else if (weapon == ent->client->ps.stats[STAT_OLDWEAPON]) {
-			stat = STAT_OLDAMMO;
-		}
-		// Picked up ammo item when using a pickup weapon...
-		else if (weapon == ent->client->ps.stats[STAT_DEFAULTWEAPON]) {
-			stat = STAT_SAVEDAMMO;
+		else if (weapon == ent->client->ps.stats[STAT_DROP_WEAPON]) {
+			stat = STAT_DROP_AMMO;
 		}
 		else {
 			G_Printf("DEBUG: Add_Ammo: Player got ammo for a weapon they don't own! weaponNum=%1, ammo_count=%i\n", weapon, count);
@@ -372,7 +368,7 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 			if (weaponNum != other->client->ps.weapon)
 			{
 				// When picking up a new weapon we haven't change weapons yet when we get the ammo.
-				stat = STAT_NEWAMMO;
+				stat = STAT_PENDING_AMMO;
 			}
 
 			if ( other->client->ps.stats[stat] < quantity) {
@@ -405,7 +401,7 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 
 #ifdef TMNTWEAPSYS_EX
 	// change to weapon
-	other->client->ps.stats[STAT_NEWWEAPON] = weaponNum;
+	other->client->ps.stats[STAT_PENDING_WEAPON] = weaponNum;
 #else
 	// add the weapon
 #ifdef TMNTWEAPSYS
@@ -642,6 +638,18 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		return;
 	if (other->health < 1)
 		return;		// dead people can't pickup
+
+#if 0 //#ifdef TMNTWEAPSYS // AUTO_DROP_WEAPON
+	if (ent->item->giType == IT_WEAPON
+		&& other->client->ps.weapon != other->client->ps.stats[STAT_DEFAULTWEAPON]
+		&& other->client->ps.weapon != ent->item->giTag
+		&& !(other->client->ps.pm_flags & PMF_GRAPPLE_PULL))
+	{
+		// Start drop!
+		other->client->ps.stats[STAT_PENDING_WEAPON] = other->client->ps.stats[STAT_DEFAULTWEAPON];
+		return;
+	}
+#endif
 
 	// the same pickup rules are used for client side and server side
 	if ( !BG_CanItemBeGrabbed( g_gametype.integer, &ent->s, &other->client->ps ) ) {
