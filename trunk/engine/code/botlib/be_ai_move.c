@@ -92,8 +92,8 @@ typedef struct bot_movestate_s
 //prediction times
 #define PREDICTIONTIME_JUMP	3		//in seconds
 #define PREDICTIONTIME_MOVE	2		//in seconds
+#ifndef IOQ3ZTM // These defines are not used
 //weapon indexes for weapon jumping
-#ifndef TMNTWEAPSYS // These defines are not used
 #define WEAPONINDEX_ROCKET_LAUNCHER		5
 #define WEAPONINDEX_BFG					9
 #endif
@@ -132,11 +132,11 @@ bot_movestate_t *botmovestates[MAX_CLIENTS+1];
 //========================================================================
 qboolean BotValidWeapon(int client, int weaponnum)
 {
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	// Turtle Man: if (client current weapon == weaponnum) return qtrue;
 	aas_entityinfo_t entinfo;
 
-	if (weaponnum <= 0) {
+	if (weaponnum < 0) {
 		return qfalse;
 	} //end if
 
@@ -147,6 +147,10 @@ qboolean BotValidWeapon(int client, int weaponnum)
 	} //end if
 	return qfalse;
 #else
+	if (weaponnum < 0) {
+		return qfalse;
+	} //end if
+
 	// Turtle Man: FIXME?: Bots always want Grappling Hook.
 	return qtrue;
 #endif
@@ -2817,7 +2821,7 @@ bot_moveresult_t BotTravel_RocketJump(bot_movestate_t *ms, aas_reachability_t *r
 	EA_View(ms->client, result.ideal_viewangles);
 	//view is important for the movment
 	result.flags |= MOVERESULT_MOVEMENTVIEWSET;
-#ifndef TMNTWEAPSYS2 // BOTLIB
+#ifndef TMNTWEAPSYS_EX // BOTLIB
 	//select the rocket launcher
 	EA_SelectWeapon(ms->client, (int) weapindex_rocketlauncher->value);
 #endif
@@ -3622,9 +3626,9 @@ int BotSetupMoveAI(void)
 	sv_maxbarrier = LibVar("sv_maxbarrier", "32");
 	sv_gravity = LibVar("sv_gravity", "800");
 #ifdef TMNTWEAPSYS
-	// Turtle Man: NOTE: We don't know the indexes ("game" should set them).
-	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "0");
-	weapindex_grapple = LibVar("weapindex_grapple", "0");
+	// Turtle Man: NOTE: We don't know the indexes (game should set them).
+	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "-1");
+	weapindex_grapple = LibVar("weapindex_grapple", "-1");
 #else
 	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "5");
 	weapindex_bfg10k = LibVar("weapindex_bfg10k", "9");

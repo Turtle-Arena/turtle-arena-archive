@@ -983,24 +983,24 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 		int defaultAmmo = -1;
 
 		if (BG_WeapUseAmmo(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]))
-	{
-		// GUNS_AS_DEFAULT
+		{
+			// GUNS_AS_DEFAULT
 #if 0 // Unlimited ammo so nobody can "cheat" the ammo system... Plus I don't have ammo pickups
-		// Guns are cheatable, for now anyway.
-		gitem_t *item = BG_FindItemForWeapon(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]);
+			// Guns are cheatable, for now anyway.
+			gitem_t *item = BG_FindItemForWeapon(g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON]);
 			defaultAmmo = item->quantity;
 #endif
-	}
+		}
 
 		// Set the ammo value.
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO] = defaultAmmo;
 #else
 		g_entities[clientNum].client->ps.ammo[playercfg->default_weapon] = defaultAmmo;
-#endif // TMNTWEAPSYS2
+#endif // TMNTWEAPSYS_EX
 	}
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	// If not holding new default, change to it.
 	if (g_entities[clientNum].client->ps.weapon != g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON])
 	{
@@ -1019,7 +1019,7 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 		// Only update "ammo"
 		g_entities[clientNum].client->ps.stats[STAT_AMMO] = g_entities[clientNum].client->ps.stats[STAT_SAVEDAMMO];
 	}
-#endif // TMNTWEAPSYS2
+#endif // TMNTWEAPSYS_EX
 #endif // TMNTWEAPSYS
 }
 #endif
@@ -1604,13 +1604,13 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 #ifdef TMNTWEAPSYS // Turtle Man: Respawn code. Start with default weapon. Set ammo values.
 	// Set default weapon
-#if defined TMNTPLAYERSYS// && defined TMNTWEAPSYS
+#if defined TMNTPLAYERSYS
 	client->ps.stats[STAT_DEFAULTWEAPON] = client->pers.playercfg.default_weapon;
 #else
 	client->ps.stats[STAT_DEFAULTWEAPON] = DEFAULT_DEFAULT_WEAPON;
 #endif
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	client->ps.stats[STAT_OLDWEAPON] = WP_NONE;
 
 	// Set default ammo values.
@@ -1622,7 +1622,7 @@ void ClientSpawn(gentity_t *ent) {
 	// Set default ammo values.
 	{
 		int i;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		int max = BG_NumWeaponGroups();
 		for (i = 0; i < max; i++)
 #else
@@ -1648,7 +1648,7 @@ void ClientSpawn(gentity_t *ent) {
 		weapon_t weapon;
 
 		weapon = client->ps.stats[STAT_DEFAULTWEAPON];
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		client->ps.stats[STAT_NEWWEAPON] = weapon;
 #else
 		client->ps.stats[STAT_WEAPONS] = ( 1 << weapon);
@@ -1662,7 +1662,7 @@ void ClientSpawn(gentity_t *ent) {
 		if (!item || (item && item->quantity == 0))
 		{
 			// Weapon that doesn't use ammo.
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 			client->ps.stats[STAT_AMMO] = -1;
 #else
 			client->ps.ammo[weapon] = -1;
@@ -1670,7 +1670,7 @@ void ClientSpawn(gentity_t *ent) {
 		}
 		else
 		{
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 			client->ps.stats[STAT_AMMO] = item->quantity;
 
 			if ( g_gametype.integer == GT_TEAM )
@@ -1757,15 +1757,13 @@ void ClientSpawn(gentity_t *ent) {
 		// fire the targets of the spawn point
 		G_UseTargets( spawnPoint, ent );
 
-#ifndef TMNTWEAPSYS2 // don't select any weapon after spawning
+#ifndef TMNTWEAPSYS_EX // don't select any weapon after spawning
 		// select the highest weapon number available, after any
 		// spawn given items have fired
-#ifndef TMNTWEAPSYS
-		client->ps.weapon = 1;
-#endif
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		for ( i = BG_NumWeaponGroups() - 1 ; i > 0 ; i-- )
 #else
+		client->ps.weapon = 1;
 		for ( i = WP_NUM_WEAPONS - 1 ; i > 0 ; i-- )
 #endif
 		{

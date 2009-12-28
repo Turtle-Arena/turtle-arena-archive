@@ -467,26 +467,9 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		{
 			int weap_delay;
 			int max_combo;
-#ifdef TMNTWEAPSYS_2
+
 			max_combo = BG_MaxAttackCombo(&client->ps);
-
 			weap_delay = bg_weapongroupinfo[client->ps.weapon].weapon[0]->attackDelay;
-#else
-			weapontype_t wt = BG_WeaponTypeForPlayerState(&client->ps);
-
-			// Per weapon max combo and weap_delay?
-			// Hammers and axes only have one attack.
-			if (wt == WT_HAMMER || wt == WT_HAMMER_PRIMARY)
-			{
-				max_combo = 1;
-				weap_delay = 2500; // Longer delay
-			}
-			else
-			{
-				max_combo = 4;
-				weap_delay = 1500; // 1.5 seconds...
-			}
-#endif
 
 			// Turtle Man: TEST; with the accel changes (xyspeed) weap_delay is way too long.
 			weap_delay /= 2;
@@ -533,7 +516,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		// regenerate
 #ifdef MISSIONPACK
 #ifndef TMNT // Guards having health regen makes them pretty much unkillable.
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -594,20 +577,20 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #endif
 	}
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
 #else
 	if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )
 #endif
 	{
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		int w, max, inc, t;
 
 		// Ony gives ammo for current weapon
 		w = client->ps.weapon;
 #else
 		int w, max, inc, t, i;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		int weapList[MAX_BG_WEAPON_GROUPS];
 		int weapCount = 0;
 		max = BG_NumWeaponGroups();
@@ -619,15 +602,15 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			}
 		}
 #else
-    int weapList[]={WP_MACHINEGUN,WP_SHOTGUN,WP_GRENADE_LAUNCHER,WP_ROCKET_LAUNCHER,WP_LIGHTNING,WP_RAILGUN,WP_PLASMAGUN,WP_BFG,WP_NAILGUN,WP_PROX_LAUNCHER,WP_CHAINGUN};
-    int weapCount = sizeof(weapList) / sizeof(int);
+		int weapList[]={WP_MACHINEGUN,WP_SHOTGUN,WP_GRENADE_LAUNCHER,WP_ROCKET_LAUNCHER,WP_LIGHTNING,WP_RAILGUN,WP_PLASMAGUN,WP_BFG,WP_NAILGUN,WP_PROX_LAUNCHER,WP_CHAINGUN};
+		int weapCount = sizeof(weapList) / sizeof(int);
 #endif
 		//
-    for (i = 0; i < weapCount; i++) {
-		  w = weapList[i];
+		for (i = 0; i < weapCount; i++) {
+			w = weapList[i];
 #endif
 
-#ifdef TMNTWEAPSYS_2 // Turtle Man: FIXME: Make ammo regen non-hardcoded. (AND make sense...)
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Make ammo regen non-hardcoded. (AND make sense...)
 			// NOTE: max is wrong for WP_BFG: max should be 10 instead of 20
 			//                        WP_MACHINEGUN: max should be 50 instead of 40
 			//       inc is wrong for WP_MACHINEGUN: inc should be 4 instead of 5
@@ -693,57 +676,53 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #endif
 #else
 			switch(w) {
-			  case WP_MACHINEGUN: max = 50; inc = 4; t = 1000; break;
-			  case WP_SHOTGUN: max = 10; inc = 1; t = 1500; break;
-			  case WP_GRENADE_LAUNCHER: max = 10; inc = 1; t = 2000; break;
-			  case WP_ROCKET_LAUNCHER: max = 10; inc = 1; t = 1750; break;
-			  case WP_LIGHTNING: max = 50; inc = 5; t = 1500; break;
-			  case WP_RAILGUN: max = 10; inc = 1; t = 1750; break;
-			  case WP_PLASMAGUN: max = 50; inc = 5; t = 1500; break;
-			  case WP_BFG: max = 10; inc = 1; t = 4000; break;
-			  case WP_NAILGUN: max = 10; inc = 1; t = 1250; break;
-			  case WP_PROX_LAUNCHER: max = 5; inc = 1; t = 2000; break;
-			  case WP_CHAINGUN: max = 100; inc = 5; t = 1000; break;
-			  default: max = 0; inc = 0; t = 1000; break;
-		  }
-#endif
-#ifdef TMNTWEAPSYS2
-#ifdef TMNTWEAPSYS
-			if (max > 0)
-			{
-#endif
-		  client->ammoTimes[w] += msec;
-		  if ( client->ps.stats[STAT_AMMO] >= max ) {
-			  client->ammoTimes[w] = 0;
-		  }
-		  if ( client->ammoTimes[w] >= t ) {
-			  while ( client->ammoTimes[w] >= t )
-				  client->ammoTimes[w] -= t;
-			  client->ps.stats[STAT_AMMO] += inc;
-			  if ( client->ps.stats[STAT_AMMO] > max ) {
-				  client->ps.stats[STAT_AMMO] = max;
-			  }
-		  }
-#ifdef TMNTWEAPSYS
+				case WP_MACHINEGUN: max = 50; inc = 4; t = 1000; break;
+				case WP_SHOTGUN: max = 10; inc = 1; t = 1500; break;
+				case WP_GRENADE_LAUNCHER: max = 10; inc = 1; t = 2000; break;
+				case WP_ROCKET_LAUNCHER: max = 10; inc = 1; t = 1750; break;
+				case WP_LIGHTNING: max = 50; inc = 5; t = 1500; break;
+				case WP_RAILGUN: max = 10; inc = 1; t = 1750; break;
+				case WP_PLASMAGUN: max = 50; inc = 5; t = 1500; break;
+				case WP_BFG: max = 10; inc = 1; t = 4000; break;
+				case WP_NAILGUN: max = 10; inc = 1; t = 1250; break;
+				case WP_PROX_LAUNCHER: max = 5; inc = 1; t = 2000; break;
+				case WP_CHAINGUN: max = 100; inc = 5; t = 1000; break;
+				default: max = 0; inc = 0; t = 1000; break;
 			}
 #endif
+#ifdef TMNTWEAPSYS_EX
+			if (max > 0)
+			{
+				client->ammoTimes[w] += msec;
+				if ( client->ps.stats[STAT_AMMO] >= max ) {
+					client->ammoTimes[w] = 0;
+				}
+				if ( client->ammoTimes[w] >= t ) {
+					while ( client->ammoTimes[w] >= t )
+						client->ammoTimes[w] -= t;
+					client->ps.stats[STAT_AMMO] += inc;
+					if ( client->ps.stats[STAT_AMMO] > max ) {
+						client->ps.stats[STAT_AMMO] = max;
+					}
+				}
+			}
 #else
 #ifdef TMNTWEAPSYS
 			if (max > 0)
 			{
 #endif
-		  client->ammoTimes[w] += msec;
-		  if ( client->ps.ammo[w] >= max ) {
-			  client->ammoTimes[w] = 0;
-		  }
-		  if ( client->ammoTimes[w] >= t ) {
-			  while ( client->ammoTimes[w] >= t )
-				  client->ammoTimes[w] -= t;
-			  client->ps.ammo[w] += inc;
-			  if ( client->ps.ammo[w] > max ) {
-				  client->ps.ammo[w] = max;
-			  }
-		  }
+				client->ammoTimes[w] += msec;
+				if ( client->ps.stats[STAT_AMMO] >= max ) {
+					client->ammoTimes[w] = 0;
+				}
+				if ( client->ammoTimes[w] >= t ) {
+					while ( client->ammoTimes[w] >= t )
+						client->ammoTimes[w] -= t;
+					client->ps.stats[STAT_AMMO] += inc;
+					if ( client->ps.stats[STAT_AMMO] > max ) {
+						client->ps.stats[STAT_AMMO] = max;
+					}
+				}
 #ifdef TMNTWEAPSYS
 			}
 #endif
@@ -866,7 +845,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			G_Damage (ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
 			break;
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		case EV_DROP_WEAPON:
 			if (ent->client)
 			{
@@ -1183,7 +1162,7 @@ void SendPendingPredictableEvents( playerState_t *ps ) {
 
 
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 // Switch to onhanded if by a CTF flag that can be picked up,
 //    so that its like the "player" is planning on picking up the flag.
 static qboolean G_ByEnemyFlag(int team, vec3_t origin)
@@ -1222,14 +1201,9 @@ static qboolean G_ByEnemyFlag(int team, vec3_t origin)
 	return qfalse;
 }
 
-#if 1
 static qboolean BG_ByWeapon(vec3_t origin)
 {
-	return qfalse;
-}
-#else
-static qboolean BG_ByWeapon(vec3_t origin)
-{
+#if 0
 	gentity_t      *ent = NULL;
 	int radius;
 
@@ -1243,9 +1217,9 @@ static qboolean BG_ByWeapon(vec3_t origin)
 			return qtrue;
 		}
 	}
+#endif
 	return qfalse;
 }
-#endif
 #endif
 
 #ifdef TMNTSP
@@ -1364,7 +1338,7 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -1380,7 +1354,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// Let go of the hook if we aren't firing
 	if (
-#ifdef TMNTWEAPSYS_2 // Turtle Man: FIXME: This doesn't allow shurikens to be grappling.
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: This doesn't allow shurikens to be grappling.
 		bg_weapongroupinfo[client->ps.weapon].weapon[0]->proj->grappling
 #else
 		client->ps.weapon == WP_GRAPPLING_HOOK
@@ -1436,6 +1410,11 @@ void ClientThink_real( gentity_t *ent ) {
 		}
 
 		vectoangles( dir, angles );
+
+		// Turtle Man: TEST
+		BG_SwingAngles( angles[YAW], 40, 90, BG_SWINGSPEED, &ent->client->pers.legs.yawAngle, &ent->client->pers.legs.yawing, (level.time - level.previousTime) );
+		angles[YAW] = ent->client->pers.legs.yawAngle;
+
 		SetClientViewAngle(ent, angles);
 	}
 #endif
@@ -1759,78 +1738,6 @@ void ClientThink( int clientNum ) {
 
 #ifdef TMNT_GAME_MODELS
 /*
-==================
-BG_SwingAngles
-
-Turtle Man: FIXME: Move to bg_misc.c ? (or rename to G_SwingAngles...)
-
-Based on CG_SwingAngles
-* frametime should be;
-** game - (level.time - level.previousTime)
-** q3_ui - uis.frametime
-** ui - uiInfo.uiDC.frameTime
-** cgame - cg.frametime
-==================
-*/
-void BG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
-					float speed, float *angle, qboolean *swinging, int frametime ) {
-	float	swing;
-	float	move;
-	float	scale;
-
-	if ( !*swinging ) {
-		// see if a swing should be started
-		swing = AngleSubtract( *angle, destination );
-		if ( swing > swingTolerance || swing < -swingTolerance ) {
-			*swinging = qtrue;
-		}
-	}
-
-	if ( !*swinging ) {
-		return;
-	}
-
-	// modify the speed depending on the delta
-	// so it doesn't seem so linear
-	swing = AngleSubtract( destination, *angle );
-	scale = fabs( swing );
-	if ( scale < swingTolerance * 0.5 ) {
-		scale = 0.5;
-	} else if ( scale < swingTolerance ) {
-		scale = 1.0;
-	} else {
-		scale = 2.0;
-	}
-
-	// swing towards the destination angle
-	if ( swing >= 0 ) {
-		move = frametime * scale * speed;
-		if ( move >= swing ) {
-			move = swing;
-			*swinging = qfalse;
-		}
-		*angle = AngleMod( *angle + move );
-	} else if ( swing < 0 ) {
-		move = frametime * scale * -speed;
-		if ( move <= swing ) {
-			move = swing;
-			*swinging = qfalse;
-		}
-		*angle = AngleMod( *angle + move );
-	}
-
-	// clamp to no more than tolerance
-	swing = AngleSubtract( destination, *angle );
-	if ( swing > clampTolerance ) {
-		*angle = AngleMod( destination - (clampTolerance - 1) );
-	} else if ( swing < -clampTolerance ) {
-		*angle = AngleMod( destination + (clampTolerance - 1) );
-	}
-}
-
-
-#define SWING_SPEED 0.3 // cg_swingSpeed.value
-/*
 ===============
 CG_PlayerAngles
 
@@ -1885,8 +1792,8 @@ void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t hea
 	torsoAngles[YAW] = headAngles[YAW] + 0.25 * movementOffsets[ dir ];
 
 	// torso
-	BG_SwingAngles( torsoAngles[YAW], 25, 90, SWING_SPEED, &ent->client->pers.torso.yawAngle, &ent->client->pers.torso.yawing, frametime );
-	BG_SwingAngles( legsAngles[YAW], 40, 90, SWING_SPEED, &ent->client->pers.legs.yawAngle, &ent->client->pers.legs.yawing, frametime );
+	BG_SwingAngles( torsoAngles[YAW], 25, 90, BG_SWINGSPEED, &ent->client->pers.torso.yawAngle, &ent->client->pers.torso.yawing, frametime );
+	BG_SwingAngles( legsAngles[YAW], 40, 90, BG_SWINGSPEED, &ent->client->pers.legs.yawAngle, &ent->client->pers.legs.yawing, frametime );
 
 	torsoAngles[YAW] = ent->client->pers.torso.yawAngle;
 	legsAngles[YAW] = ent->client->pers.legs.yawAngle;
@@ -2103,7 +2010,7 @@ void ClientEndFrame( gentity_t *ent ) {
 
 #ifdef MISSIONPACK
 	// set powerup for player animation
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -2111,7 +2018,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_GUARD] = level.time;
 	}
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -2119,7 +2026,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_SCOUT] = level.time;
 	}
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_DOUBLER )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_DOUBLER )
@@ -2127,7 +2034,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_DOUBLER] = level.time;
 	}
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )

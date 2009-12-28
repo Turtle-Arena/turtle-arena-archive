@@ -251,7 +251,7 @@ void Cmd_Give_f (gentity_t *ent)
 			return;
 	}
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	// \give weapon1
 	// The above will give WP_KATANAS
 	if (Q_strncmp(name, "weapon", 6) == 0)
@@ -260,12 +260,12 @@ void Cmd_Give_f (gentity_t *ent)
 		w = atoi(&name[6]);
 		if (w == WP_DEFAULT)
 			w = ent->client->ps.stats[STAT_DEFAULTWEAPON];
-		if (w < WP_NONE) w = WP_NONE;
-#ifdef TMNTWEAPSYS_2
-		if (w >= BG_NumWeaponGroups()) w = BG_NumWeaponGroups()-1;
+#ifdef TMNTWEAPSYS
+		if (w < WP_NONE || w >= BG_NumWeaponGroups())
 #else
-		if (w >= WP_NUM_WEAPONS) w = WP_NUM_WEAPONS-1;
+		if (w < WP_NONE || w >= WP_NUM_WEAPONS)
 #endif
+			return;
 
 		ent->client->ps.stats[STAT_NEWWEAPON] = w;
 	}
@@ -273,12 +273,12 @@ void Cmd_Give_f (gentity_t *ent)
 	if (give_all || Q_stricmp(name, "weapons") == 0)
 	{
 		ent->client->ps.stats[STAT_WEAPONS] =
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		(1 << BG_NumWeaponGroups()) - 1
 #else
 		(1 << WP_NUM_WEAPONS) - 1
 #endif
-#if !defined IOQ3ZTM && !defined TMNTWEAPSYS_2 // Give grapple too.
+#if !defined IOQ3ZTM && !defined TMNTWEAPSYS // Give grapple too.
 			- ( 1 << WP_GRAPPLING_HOOK )
 #endif
 			- ( 1 << WP_NONE );
@@ -289,11 +289,11 @@ void Cmd_Give_f (gentity_t *ent)
 
 	if (give_all || Q_stricmp(name, "ammo") == 0)
 	{
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		if (BG_WeapUseAmmo(ent->client->ps.stats[STAT_DEFAULTWEAPON]))
-		ent->client->ps.stats[STAT_SAVEDAMMO] = 999;
+			ent->client->ps.stats[STAT_SAVEDAMMO] = 999;
 		if (BG_WeapUseAmmo(ent->client->ps.weapon))
-		ent->client->ps.stats[STAT_AMMO] = 999;
+			ent->client->ps.stats[STAT_AMMO] = 999;
 #else
 		for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
 #ifdef TMNTWEAPSYS

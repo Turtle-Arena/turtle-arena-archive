@@ -191,7 +191,7 @@ void SP_misc_object(gentity_t *ent);
 void SP_misc_portal_camera(gentity_t *ent);
 void SP_misc_portal_surface(gentity_t *ent);
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 void SP_misc_shooter( gentity_t *ent );
 #endif
 void SP_shooter_rocket( gentity_t *ent );
@@ -216,7 +216,7 @@ void SP_path_start( gentity_t *ent );
 void SP_npcpath( gentity_t *ent );
 #endif
 #endif
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 void SP_weapon_random( gentity_t *ent );
 #endif
 #ifdef NIGHTSMODE
@@ -299,7 +299,7 @@ spawn_t	spawns[] = {
 	{"misc_portal_surface", SP_misc_portal_surface},
 	{"misc_portal_camera", SP_misc_portal_camera},
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	{"misc_shooter", SP_misc_shooter},
 #endif
 	{"shooter_rocket", SP_shooter_rocket},
@@ -319,7 +319,7 @@ spawn_t	spawns[] = {
 #endif
 	{"item_botroam", SP_item_botroam},
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	{"weapon_random", SP_weapon_random},
 #endif
 #if defined TMNTNPCSYS && !defined TMNTPATHSYS
@@ -344,7 +344,7 @@ returning qfalse if not found
 qboolean G_CallSpawn( gentity_t *ent ) {
 	spawn_t	*s;
 	gitem_t	*item;
-#if defined TMNTWEAPSYS_2 || defined TMNTNPCSYS
+#if defined TMNTWEAPSYS || defined TMNTNPCSYS
 	int i;
 #endif
 
@@ -353,7 +353,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 		return qfalse;
 	}
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	// Turtle Man: NOTE: Placed before items so if weapon is on both list
 	//                    uses external item.
 	// check weapon item spawn functions

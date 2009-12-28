@@ -336,39 +336,18 @@ BotRandomWeaponName
 char *BotRandomWeaponName(void) {
 	int rnd;
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	rnd = random() * (float)(BG_NumWeaponGroups() + 0.9f);
 	if (rnd >= BG_NumWeaponGroups())
 		rnd = BG_NumWeaponGroups()-1;
 	return bg_weapongroupinfo[rnd].pickupName;
-#else
-#ifdef TMNTWEAPONS
-	rnd = random() * 14.9;
 #else
 #ifdef MISSIONPACK
 	rnd = random() * 11.9;
 #else
 	rnd = random() * 8.9;
 #endif
-#endif
 	switch(rnd) {
-#ifdef TMNTWEAPONS // weapon names
-		case 0: return "Fist";
-		case 1: return "Katana";
-		case 2: return "Daisho";
-		case 3: return "Sai";
-		case 4: return "Nunchuk";
-		case 5: return "Hammer";
-		case 6: return "Battle Axe";
-		case 7: return "Sword";
-		case 8: return "Baseball Bat";
-		case 9: return "Bo";
-		case 10: return "Bamboo";
-		case 11: return "Gun";
-		case 12: return "Electric Launcher";
-		case 13: return "Rocket Launcher";
-		default: return "Homing-Rocket Launcher";
-#else
 		case 0: return "Gauntlet";
 		case 1: return "Shotgun";
 		case 2: return "Machinegun";
@@ -383,7 +362,6 @@ char *BotRandomWeaponName(void) {
 		case 10: return "Proximity Launcher";
 #endif
 		default: return "BFG10K";
-#endif
 	}
 #endif
 }

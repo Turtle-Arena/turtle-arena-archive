@@ -138,7 +138,7 @@ void EA_Command(int client, char *command)
 {
 	botimport.BotClientCommand(client, command);
 } //end of the function EA_Command
-#ifdef TMNTWEAPSYS2 // BOTLIB
+#ifdef TMNTWEAPSYS_EX // BOTLIB
 //===========================================================================
 //
 // Parameter:			-

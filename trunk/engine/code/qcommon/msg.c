@@ -685,7 +685,7 @@ void MSG_WriteDeltaUsercmd( msg_t *msg, usercmd_t *from, usercmd_t *to ) {
 	MSG_WriteDelta( msg, from->rightmove, to->rightmove, 8 );
 	MSG_WriteDelta( msg, from->upmove, to->upmove, 8 );
 	MSG_WriteDelta( msg, from->buttons, to->buttons, 16 );
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	MSG_WriteDelta( msg, from->weapon, to->weapon, 8 );
 #endif
 #ifdef TMNTHOLDSYS/*2*/
@@ -712,7 +712,7 @@ void MSG_ReadDeltaUsercmd( msg_t *msg, usercmd_t *from, usercmd_t *to ) {
 	to->rightmove = MSG_ReadDelta( msg, from->rightmove, 8);
 	to->upmove = MSG_ReadDelta( msg, from->upmove, 8);
 	to->buttons = MSG_ReadDelta( msg, from->buttons, 16);
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	to->weapon = MSG_ReadDelta( msg, from->weapon, 8);
 #endif
 #ifdef TMNTHOLDSYS/*2*/
@@ -740,7 +740,7 @@ void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *
 		from->rightmove == to->rightmove &&
 		from->upmove == to->upmove &&
 		from->buttons == to->buttons
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 		&& from->weapon == to->weapon
 #endif
 #ifdef TMNTHOLDSYS/*2*/
@@ -760,7 +760,7 @@ void MSG_WriteDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *
 	MSG_WriteDeltaKey( msg, key, from->rightmove, to->rightmove, 8 );
 	MSG_WriteDeltaKey( msg, key, from->upmove, to->upmove, 8 );
 	MSG_WriteDeltaKey( msg, key, from->buttons, to->buttons, 16 );
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	MSG_WriteDeltaKey( msg, key, from->weapon, to->weapon, 8 );
 #endif
 #ifdef TMNTHOLDSYS/*2*/
@@ -789,7 +789,7 @@ void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *t
 		to->rightmove = MSG_ReadDeltaKey( msg, key, from->rightmove, 8);
 		to->upmove = MSG_ReadDeltaKey( msg, key, from->upmove, 8);
 		to->buttons = MSG_ReadDeltaKey( msg, key, from->buttons, 16);
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 		to->weapon = MSG_ReadDeltaKey( msg, key, from->weapon, 8);
 #endif
 #ifdef TMNTHOLDSYS/*2*/
@@ -803,7 +803,7 @@ void MSG_ReadDeltaUsercmdKey( msg_t *msg, int key, usercmd_t *from, usercmd_t *t
 		to->rightmove = from->rightmove;
 		to->upmove = from->upmove;
 		to->buttons = from->buttons;
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 		to->weapon = from->weapon;
 #endif
 #ifdef TMNTHOLDSYS/*2*/
@@ -1212,7 +1212,7 @@ netField_t	playerStateFields[] =
 { PSF(eventParms[0]), 8 },
 { PSF(eventParms[1]), 8 },
 { PSF(clientNum), 8 },
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 { PSF(weapon), 8 },
 #else
 { PSF(weapon), 5 },
@@ -1358,7 +1358,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 		}
 	}
 	ammobits = 0;
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	for (i=0 ; i<MAX_WEAPONS ; i++) {
 		if (to->ammo[i] != from->ammo[i]) {
 #if defined ARRAYMAX && (MAX_WEAPONS > 16) // IOQ3ZTM
@@ -1463,7 +1463,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 		MSG_WriteBits( msg, 0, 1 );	// no change
 	}
 
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	if ( ammobits ) {
 		MSG_WriteBits( msg, 1, 1 );	// changed
 #if defined ARRAYMAX && (MAX_WEAPONS > 16) // IOQ3ZTM
@@ -1695,7 +1695,7 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 #endif
 		}
 
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 		// parse ammo
 		if ( MSG_ReadBits( msg, 1 ) ) {
 			LOG("PS_AMMO");

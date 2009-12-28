@@ -41,7 +41,7 @@ An item fires all of its targets when it is picked up.  If the toucher can't car
 "count" override quantity or duration on most items.
 */
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 #define EMPTY_GITEM "item_health_small", \
 		"sound/items/s_health.wav", \
         { "models/powerups/health/small.md3", \
@@ -250,25 +250,7 @@ gitem_t	bg_itemlist[] =
 	//
 	// WEAPONS 
 	//
-#if defined TMNTWEAPSYS && defined TMNT // Turtle Man: FIXME: Breaks q3 bots' MODELINDEX_*s
-/*QUAKED weapon_default (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_default",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/default/default.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_default",
-/* pickup */	"Default Weapon",
-		0,
-		IT_WEAPON,
-		WP_DEFAULT,
-/* precache */ "",
-/* sounds */ ""
-	},
-#endif
-
-#ifdef TMNTWEAPSYS_2 // Keep the model index correct for items after weapons...
+#ifdef TMNTWEAPSYS // Keep the model index correct for items after weapons...
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
 #ifdef TMNTWEAPONS
@@ -1419,7 +1401,7 @@ Only in One Flag CTF games
 	},
 #endif
 #ifndef TMNTWEAPONS
-#ifdef TMNTWEAPSYS_2 // Keep the model index correct for items after weapons...
+#ifdef TMNTWEAPSYS // Keep the model index correct for items after weapons...
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
 #else
 /*QUAKED weapon_nailgun (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
@@ -1474,8 +1456,26 @@ Only in One Flag CTF games
 /* precache */ "",
 /* sounds */ "sound/weapons/vulcan/wvulwind.wav"
 	},
-#endif // TMNTWEAPSYS_2
+#endif // TMNTWEAPSYS
 #endif // TMNTWEAPONS
+#endif
+
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Breaks q3 bots' MODELINDEX_*s
+/*QUAKED weapon_default (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"weapon_default",
+		"sound/misc/w_pkup.wav",
+        { "models/weapons2/default/default.md3",
+		NULL, NULL, NULL},
+/* icon */		"icons/iconw_default",
+/* pickup */	"Default Weapon",
+		0,
+		IT_WEAPON,
+		WP_DEFAULT,
+/* precache */ "",
+/* sounds */ ""
+	},
 #endif
 
 #ifdef TMNT // CRATE
@@ -1500,8 +1500,7 @@ Only in One Flag CTF games
 
 int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
 
-#if defined TMNTWEAPSYS_2 || defined TMNTPLAYERSYS
-
+#if defined TMNTWEAPSYS || defined TMNTPLAYERSYS
 typedef struct
 {
 	int num;
@@ -1654,8 +1653,82 @@ playerAnimationDef_t playerAnimationDefs[] = {
 };
 #endif
 
+char	*modNames[] = {
+	"MOD_UNKNOWN",
+#ifdef TMNTWEAPONS // MOD
+	"MOD_FIST",
+	"MOD_KATANA",
+	"MOD_WAKIZASHI",
+	"MOD_SAI",
+	"MOD_NUNCHUK",
+	"MOD_HAMMER",
+	"MOD_AXE",
+	"MOD_SWORD",
+	"MOD_BAT",
+	"MOD_BO",
+	"MOD_BAMBOO",
+	"MOD_GUN",
+	"MOD_ELECTRIC",
+	"MOD_ELECTRIC_SPLASH",
+	"MOD_ROCKET",
+	"MOD_ROCKET_SPLASH",
+	"MOD_HOMING",
+	"MOD_HOMING_SPLASH",
+#else
+	"MOD_SHOTGUN",
+	"MOD_GAUNTLET",
+	"MOD_MACHINEGUN",
+	"MOD_GRENADE",
+	"MOD_GRENADE_SPLASH",
+	"MOD_ROCKET",
+	"MOD_ROCKET_SPLASH",
+	"MOD_PLASMA",
+	"MOD_PLASMA_SPLASH",
+	"MOD_RAILGUN",
+	"MOD_LIGHTNING",
+	"MOD_BFG",
+	"MOD_BFG_SPLASH",
+#endif
+#ifdef TMNTHOLDABLE
+	"MOD_SHURIKEN",
+	"MOD_FIRESHURIKEN",
+	"MOD_FIRESHURIKEN_EXPLOSION",
+	"MOD_ELECTRICSHURIKEN",
+	"MOD_LASERSHURIKEN",
+#endif
+	"MOD_WATER",
+	"MOD_SLIME",
+	"MOD_LAVA",
+	"MOD_CRUSH",
+	"MOD_TELEFRAG",
+	"MOD_FALLING",
+	"MOD_SUICIDE",
+	"MOD_TARGET_LASER",
+	"MOD_TRIGGER_HURT",
+#ifdef TMNTENTSYS
+	"MOD_EXPLOSION",
+#endif
+#ifdef MISSIONPACK
+#ifndef TMNTWEAPONS // MOD
+	"MOD_NAIL",
+	"MOD_CHAINGUN",
+	"MOD_PROXIMITY_MINE",
+#endif
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+	"MOD_KAMIKAZE",
+#endif
+#ifndef TMNTWEAPONS // MOD
+	"MOD_JUICED",
+#endif
+#endif
+	"MOD_GRAPPLE",
+	"MOD_PROJECTILE",
+	"MOD_WEAPON_PRIMARY",
+	"MOD_WEAPON_SECONDARY",
+};
+int modNamesSize = sizeof( modNames ) / sizeof( modNames[0] );
+
 #ifdef TMNTWEAPSYS
-#ifdef TMNTWEAPSYS_2
 bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
@@ -2335,82 +2408,6 @@ static qboolean WeaponBlade_Parse(char **p, bg_weaponinfo_t *weapon) {
 	}
 	return qfalse;
 }
-
-// Copied from g_combat.c
-char	*modNames[] = {
-	"MOD_UNKNOWN",
-#ifdef TMNTWEAPONS // MOD
-	"MOD_FIST",
-	"MOD_KATANA",
-	"MOD_WAKIZASHI",
-	"MOD_SAI",
-	"MOD_NUNCHUK",
-	"MOD_HAMMER",
-	"MOD_AXE",
-	"MOD_SWORD",
-	"MOD_BAT",
-	"MOD_BO",
-	"MOD_BAMBOO",
-	"MOD_GUN",
-	"MOD_ELECTRIC",
-	"MOD_ELECTRIC_SPLASH",
-	"MOD_ROCKET",
-	"MOD_ROCKET_SPLASH",
-	"MOD_HOMING",
-	"MOD_HOMING_SPLASH",
-#else
-	"MOD_SHOTGUN",
-	"MOD_GAUNTLET",
-	"MOD_MACHINEGUN",
-	"MOD_GRENADE",
-	"MOD_GRENADE_SPLASH",
-	"MOD_ROCKET",
-	"MOD_ROCKET_SPLASH",
-	"MOD_PLASMA",
-	"MOD_PLASMA_SPLASH",
-	"MOD_RAILGUN",
-	"MOD_LIGHTNING",
-	"MOD_BFG",
-	"MOD_BFG_SPLASH",
-#endif
-#ifdef TMNTHOLDABLE
-	"MOD_SHURIKEN",
-	"MOD_FIRESHURIKEN",
-	"MOD_FIRESHURIKEN_EXPLOSION",
-	"MOD_ELECTRICSHURIKEN",
-	"MOD_LASERSHURIKEN",
-#endif
-	"MOD_WATER",
-	"MOD_SLIME",
-	"MOD_LAVA",
-	"MOD_CRUSH",
-	"MOD_TELEFRAG",
-	"MOD_FALLING",
-	"MOD_SUICIDE",
-	"MOD_TARGET_LASER",
-	"MOD_TRIGGER_HURT",
-#ifdef TMNTENTSYS
-	"MOD_EXPLOSION",
-#endif
-#ifdef MISSIONPACK
-#ifndef TMNTWEAPONS // MOD
-	"MOD_NAIL",
-	"MOD_CHAINGUN",
-	"MOD_PROXIMITY_MINE",
-#endif
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
-	"MOD_KAMIKAZE",
-#endif
-#ifndef TMNTWEAPONS // MOD
-	"MOD_JUICED",
-#endif
-#endif
-	"MOD_GRAPPLE",
-	"MOD_PROJECTILE",
-	"MOD_WEAPON_PRIMARY",
-	"MOD_WEAPON_SECONDARY",
-};
-int modNamesSize = sizeof( modNames ) / sizeof( modNames[0] );
 
 const char *weapontypeNames[WT_MAX] = {
 	"WT_NONE",
@@ -3395,104 +3392,6 @@ int BG_MaxAttackCombo(playerState_t *ps)
 
 	return max_combo;
 }
-#else
-// Weapons that use both hands to hold the same weapon really only use the primary.
-#define HAND_SHARE (HAND_PRIMARY)
-
-bg_weapontypeinfo_t bg_weapontypeinfo[WT_MAX] =
-{
-	// hands			one handed type				standing animation					attacking animation
-	{ HAND_PRIMARY,		WT_NONE,					TORSO_STAND2,						TORSO_ATTACK2 }, // WT_NONE
-#ifdef TMNTPLAYERS
-	{ HAND_PRIMARY,		WT_GAUNTLET,				TORSO_STAND2,						TORSO_ATTACK2  }, // WT_GAUNTLET
-	{ HAND_SHARE,		WT_GUN_PRIMARY,				TORSO_STAND,						TORSO_ATTACK  }, // WT_GUN
-	{ HAND_PRIMARY,		WT_GUN_PRIMARY,				TORSO_STAND_GUN_PRIMARY,			TORSO_ATTACK_GUN_PRIMARY }, // WT_GUN_PRIMARY
-#ifdef TMNTWEAPONS
-	{ HAND_SHARE,		WT_SWORD1_PRIMARY,			TORSO_STAND_SWORD1_BOTH,			TORSO_ATTACK_SWORD1_BOTH_A }, // WT_SWORD1_BOTH
-	{ HAND_PRIMARY,		WT_SWORD1_PRIMARY,			TORSO_STAND_SWORD1_PRIMARY,			TORSO_ATTACK_SWORD1_PRIMARY_A }, // WT_SWORD1_PRIMARY
-	{ HAND_BOTH,		WT_SWORD1_PRIMARY,			TORSO_STAND_SWORD2,					TORSO_ATTACK_SWORD2_A }, // WT_SWORD2
-	{ HAND_BOTH,		WT_SWORD1_PRIMARY,			TORSO_STAND_DAISHO,					TORSO_ATTACK_DAISHO_A }, // WT_DAISHO
-	{ HAND_BOTH,		WT_SAI1_PRIMARY,			TORSO_STAND_SAI2,					TORSO_ATTACK_SAI2_A }, // WT_SAI2
-	{ HAND_PRIMARY,		WT_SAI1_PRIMARY,			TORSO_STAND_SHORT_SWORD1_PRIMARY,	TORSO_ATTACK_SHORT_SWORD1_PRIMARY_A }, // WT_SAI1_PRIMARY
-	{ HAND_SHARE,		WT_BO_PRIMARY,				TORSO_STAND_BO,						TORSO_ATTACK_BO_A }, // WT_BO
-	{ HAND_PRIMARY,		WT_BO_PRIMARY,				TORSO_STAND_BO_PRIMARY,				TORSO_ATTACK_BO_PRIMARY_A }, // WT_BO_PRIMARY
-	{ HAND_SHARE,		WT_HAMMER_PRIMARY,			TORSO_STAND_HAMMER,					TORSO_ATTACK_HAMMER_A }, // WT_HAMMER
-	{ HAND_PRIMARY,		WT_HAMMER_PRIMARY,			TORSO_STAND_HAMMER_PRIMARY,			TORSO_ATTACK_HAMMER_PRIMARY_A }, // WT_HAMMER_PRIMARY
-	{ HAND_BOTH,		WT_NUNCHUKS1_PRIMARY,		TORSO_STAND_NUNCHUKS,				TORSO_ATTACK_NUNCHUKS_A }, // WT_NUNCHUKS
-	{ HAND_PRIMARY,		WT_NUNCHUKS1_PRIMARY,		TORSO_STAND_NUNCHUKS1_PRIMARY,		TORSO_ATTACK_NUNCHUKS1_PRIMARY_A }, // WT_NUNCHUKS1_PRIMARY
-#endif
-#else
-	// hands			one handed type			standing animation					attacking animation
-	{ HAND_PRIMARY,		WT_GAUNTLET,				TORSO_STAND2,	TORSO_ATTACK2 }, // WT_GAUNTLET
-	{ HAND_SHARE,		WT_GUN_PRIMARY,				TORSO_STAND,	TORSO_ATTACK  }, // WT_GUN
-	{ HAND_PRIMARY,		WT_GUN_PRIMARY,				TORSO_STAND2,	TORSO_ATTACK2 }, // WT_GUN_PRIMARY
-#ifdef TMNTWEAPONS
-	{ HAND_SHARE,		WT_SWORD1_PRIMARY,			TORSO_STAND2,	TORSO_ATTACK2 }, // WT_SWORD1_BOTH
-	{ HAND_PRIMARY,		WT_SWORD1_PRIMARY,			TORSO_STAND2,	TORSO_ATTACK2 }, // WT_SWORD1_PRIMARY
-	{ HAND_BOTH,		WT_SWORD1_PRIMARY,			TORSO_STAND2,	TORSO_ATTACK2 }, // WT_SWORD2
-	{ HAND_BOTH,		WT_SWORD1_PRIMARY,			TORSO_STAND2,	TORSO_ATTACK2 }, // WT_DAISHO
-	{ HAND_BOTH,		WT_SAI1_PRIMARY,			TORSO_STAND2,	TORSO_ATTACK2 }, // WT_SAI2
-	{ HAND_PRIMARY,		WT_SAI1_PRIMARY,			TORSO_STAND2,	TORSO_ATTACK2 }, // WT_SAI1_PRIMARY
-	{ HAND_SHARE,		WT_BO_PRIMARY,				TORSO_STAND2,	TORSO_ATTACK2 }, // WT_BO
-	{ HAND_PRIMARY,		WT_BO_PRIMARY,				TORSO_STAND2,	TORSO_ATTACK2 }, // WT_BO_PRIMARY
-	{ HAND_SHARE,		WT_HAMMER_PRIMARY,			TORSO_STAND2,	TORSO_ATTACK2 }, // WT_HAMMER
-	{ HAND_PRIMARY,		WT_HAMMER_PRIMARY,			TORSO_STAND2,	TORSO_ATTACK2 }, // WT_HAMMER_PRIMARY
-	{ HAND_BOTH,		WT_NUNCHUKS1_PRIMARY,		TORSO_STAND2,	TORSO_ATTACK2 }, // WT_NUNCHUKS
-	{ HAND_PRIMARY,		WT_NUNCHUKS1_PRIMARY,		TORSO_STAND2,	TORSO_ATTACK2 }, // WT_NUNCHUKS1_PRIMARY
-#endif
-#endif
-};
-#undef HAND_SHARE
-
-bg_weaponinfo_t bg_weaponinfo[WP_NUM_WEAPONS] =
-{
-	// weapontype				mod			mod2	damage damage2 (/mins maxs/) start end  start2 end2
-#ifdef TMNTWEAPONS
-	{ WT_NONE,					MOD_UNKNOWN, MOD_UNKNOWN, 0,0, /* {0,0,0}, {0,0,0},*/ 0, 0, /* */ 0, 0 }, // WP_NONE
-
-	{ WT_SAI2,					MOD_FIST, MOD_FIST, 	10, 10, -5, 5, -5, 5 }, // WP_FISTS
-
-	{ WT_SWORD2,				MOD_KATANA, MOD_KATANA, 10, 10, 0, 40, 0, 40 }, // WP_KATANAS
-	{ WT_DAISHO,				MOD_KATANA, MOD_WAKIZASHI, 10, 8, 0, 40, 0, 20 }, // WP_DAISHO
-
-	{ WT_SAI2, 					MOD_SAI,	MOD_SAI, 	10, 10, 0, 16, 0, 16 }, // WP_SAIS
-
-	{ WT_NUNCHUKS, 				MOD_NUNCHUK,MOD_NUNCHUK, 10, 10, 0, 16, 0, 16 }, // WP_NUNCHUKS
-
-	{ WT_HAMMER,				MOD_HAMMER, MOD_UNKNOWN, 20, 0, 0/*12*/, 20, 0, 0 }, // WP_HAMMER
-	{ WT_HAMMER, 				MOD_AXE,	MOD_UNKNOWN, 20, 0, 0/*12*/, 20, 0, 0 }, // WP_AXE
-
-	{ WT_SWORD1_BOTH, 			MOD_SWORD,	MOD_UNKNOWN, 10, 0, 0, 32, 0, 0 }, // WP_LONGSWORD
-	{ WT_SWORD1_BOTH, 			MOD_BAT,	MOD_UNKNOWN, 10, 0, 0, 21, 0, 0 }, // WP_BAT
-
-	{ WT_BO, 					MOD_BO,		MOD_UNKNOWN, 10, 0, -48, 48, 0, 0 }, // WP_BO
-	{ WT_BO, 					MOD_BAMBOO,	MOD_UNKNOWN,10, 0, -48, 48, 0, 0 }, // WP_BAMBOO
-
-	{ WT_GUN,					MOD_GUN,	MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_GUN
-	{ WT_GUN,					MOD_ELECTRIC,MOD_UNKNOWN,0, 0, 0, 0, 0, 0 }, // WP_PLASMAGUN // WP_ELECTRIC_LAUNCHER
-	{ WT_GUN,					MOD_ROCKET, MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_ROCKET_LAUNCHER
-	{ WT_GUN,					MOD_HOMING, MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_HOMING_LAUNCHER
-	{ WT_GUN, 					MOD_GRAPPLE,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_GRAPPLING_HOOK
-#else
-	{ WT_NONE,MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_NONE
-	{ WT_GAUNTLET, MOD_GAUNTLET, MOD_UNKNOWN, 50, 0, 0, 32, 0, 0 }, // WP_GAUNTLET
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_MACHINEGUN
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_SHOTGUN
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_GRENADE_LAUNCHER
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_ROCKET_LAUNCHER
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_LIGHTNING
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_RAILGUN
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_PLASMAGUN
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_BFG
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_GRAPPLING_HOOK
-#ifdef MISSIONPACK
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_NAILGUN
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_PROX_LAUNCHER
-	{ WT_GUN, MOD_UNKNOWN,MOD_UNKNOWN, 0, 0, 0, 0, 0, 0 }, // WP_CHAINGUN
-#endif
-#endif
-};
-#endif
 
 #ifdef TMNTNPCSYS // Turtle Man: NPC info loading based on weapon info loading.
 bg_npcinfo_t bg_npcinfo[MAX_NPCS];
@@ -3851,38 +3750,16 @@ BG_TorsoStandForPlayerState
 */
 animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps)
 {
-#ifndef TMNTWEAPSYS_2
-	weapontype_t wt;
-#endif
-
-#ifdef TMNTWEAPSYS_2
 	if (ps == NULL || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
-#else
-	if (ps == NULL || ps->weapon < 0 || ps->weapon >= WP_NUM_WEAPONS)
-#endif
 	{
 		return TORSO_STAND;
 	}
 
-#ifdef TMNTWEAPSYS_2
 	if (ps->eFlags & EF_PRIMARY_HAND)
 	{
 		return (animNumber_t)bg_weapongroupinfo[ps->weapon].primaryAnims.standAnim;
 	}
 	return (animNumber_t)bg_weapongroupinfo[ps->weapon].normalAnims.standAnim;
-#else
-	wt = bg_weaponinfo[ps->weapon].weapontype;
-
-	if (wt != bg_weapontypeinfo[wt].primaryOnly)
-	{
-		if (ps->eFlags & EF_PRIMARY_HAND)
-		{
-			wt = bg_weapontypeinfo[wt].primaryOnly;
-		}
-	}
-
-	return (animNumber_t)bg_weapontypeinfo[wt].standAnim;
-#endif
 }
 
 /*
@@ -3892,22 +3769,13 @@ BG_TorsoAttackForPlayerState
 */
 animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps)
 {
-#ifdef TMNTWEAPSYS_2
 	int atkIndex = 0;
-#else
-	weapontype_t wt;
-#endif
 
-#ifdef TMNTWEAPSYS_2
 	if (ps == NULL || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
-#else
-	if (ps == NULL || ps->weapon < 0 || ps->weapon >= WP_NUM_WEAPONS)
-#endif
 	{
 		return TORSO_ATTACK;
 	}
 
-#ifdef TMNTWEAPSYS_2
 	atkIndex = ps->meleeAttack % BG_MaxAttackCombo(ps);
 
 	if (ps->eFlags & EF_PRIMARY_HAND)
@@ -3915,19 +3783,6 @@ animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps)
 		return (animNumber_t)bg_weapongroupinfo[ps->weapon].primaryAnims.attackAnim[atkIndex];
 	}
 	return (animNumber_t)bg_weapongroupinfo[ps->weapon].normalAnims.attackAnim[atkIndex];
-#else
-	wt = bg_weaponinfo[ps->weapon].weapontype;
-
-	if (wt != bg_weapontypeinfo[wt].primaryOnly)
-	{
-		if (ps->eFlags & EF_PRIMARY_HAND)
-		{
-			wt = bg_weapontypeinfo[wt].primaryOnly;
-		}
-	}
-
-	return (animNumber_t)bg_weapontypeinfo[wt].attackAnim;
-#endif
 }
 
 /*
@@ -3939,11 +3794,7 @@ For ui/q3_ui
 */
 animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum)
 {
-#ifdef TMNTWEAPSYS_2
 	return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.standAnim;
-#else
-	return (animNumber_t)bg_weapontypeinfo[BG_WeaponTypeForNum(weaponnum)].standAnim;
-#endif
 }
 
 /*
@@ -3951,50 +3802,33 @@ animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum)
 BG_TorsoAttackForWeapon
 
 For ui/q3_ui
+
+Turtle Man: TODO: Remove BG_TorsoAttackForWeapon??
 ==============
 */
 animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum)
 {
-#ifdef TMNTWEAPSYS_2
 	return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[0];
-#else
-	return (animNumber_t)bg_weapontypeinfo[BG_WeaponTypeForNum(weaponnum)].attackAnim;
-#endif
 }
 
 /*
 ==============
 BG_WeaponTypeForPlayerState
+
+Turtle Man: TODO: Remove BG_WeaponTypeForPlayerState!!
 ==============
 */
 weapontype_t BG_WeaponTypeForPlayerState(playerState_t *ps)
 {
 	weapontype_t wt;
 
-#ifdef TMNTWEAPSYS_2
 	if (ps == NULL || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
-#else
-	if (ps == NULL || ps->weapon < 0 || ps->weapon >= WP_NUM_WEAPONS)
-#endif
 	{
 		return WT_NONE;
 	}
 
-#ifdef TMNTWEAPSYS_2
-		wt = bg_weapongroupinfo[ps->weapon].weapon[0]->weapontype;
-		// What of bg_weapongroupinfo[ps->weapon].weapon[1] ?
-#else
-	wt = bg_weaponinfo[ps->weapon].weapontype;
-
-	if (wt != bg_weapontypeinfo[wt].primaryOnly)
-	{
-		if (ps->eFlags & EF_PRIMARY_HAND)
-		{
-			// Not using secondary hand, holding flag or something.
-			wt = bg_weapontypeinfo[wt].primaryOnly;
-		}
-	}
-#endif
+	wt = bg_weapongroupinfo[ps->weapon].weapon[0]->weapontype;
+	// What of bg_weapongroupinfo[ps->weapon].weapon[1] ?
 
 	return wt;
 }
@@ -4002,36 +3836,21 @@ weapontype_t BG_WeaponTypeForPlayerState(playerState_t *ps)
 /*
 ==============
 BG_WeaponTypeForEntityState
+
+Turtle Man: TODO: Remove BG_WeaponTypeForEntityState!!
 ==============
 */
 weapontype_t BG_WeaponTypeForEntityState(entityState_t *es)
 {
 	weapontype_t wt;
 
-#ifdef TMNTWEAPSYS_2
 	if (es == NULL || es->weapon < 0 || es->weapon >= BG_NumWeaponGroups())
-#else
-	if (es == NULL || es->weapon < 0 || es->weapon >= WP_NUM_WEAPONS)
-#endif
 	{
 		return WT_NONE;
 	}
 
-#ifdef TMNTWEAPSYS_2
-		wt = bg_weapongroupinfo[es->weapon].weapon[0]->weapontype;
-		// What of bg_weapongroupinfo[es->weapon].weapon[1] ?
-#else
-	wt = bg_weaponinfo[es->weapon].weapontype;
-
-	if (wt != bg_weapontypeinfo[wt].primaryOnly)
-	{
-		if (es->eFlags & EF_PRIMARY_HAND)
-		{
-			// Not using secondary hand, holding flag or something.
-			wt = bg_weapontypeinfo[wt].primaryOnly;
-		}
-	}
-#endif
+	wt = bg_weapongroupinfo[es->weapon].weapon[0]->weapontype;
+	// What of bg_weapongroupinfo[es->weapon].weapon[1] ?
 
 	return wt;
 }
@@ -4039,32 +3858,20 @@ weapontype_t BG_WeaponTypeForEntityState(entityState_t *es)
 /*
 ==============
 BG_WeaponTypeForNum
+
+Turtle Man: TODO: Remove BG_WeaponTypeForNum??
 ==============
 */
 weapontype_t BG_WeaponTypeForNum(weapon_t weaponnum)
 {
-	//qboolean primaryOnly = qfalse; // Player has the flag so only use one hand.
 	weapontype_t wt;
 
-#ifdef TMNTWEAPSYS_2
 	if (weaponnum <= 0 || weaponnum >= BG_NumWeaponGroups())
-#else
-	if (weaponnum <= 0 || weaponnum >= WP_NUM_WEAPONS)
-#endif
 	{
 		return WT_NONE;
 	}
 
-#ifdef TMNTWEAPSYS_2
-		wt = bg_weapongroupinfo[weaponnum].weapon[0]->weapontype;
-#else
-	wt = bg_weaponinfo[weaponnum].weapontype;
-#endif
-
-	/*if (primaryOnly == qtrue)
-	{
-		wt = bg_weapontypeinfo[wt].primaryOnly;
-	}*/
+	wt = bg_weapongroupinfo[weaponnum].weapon[0]->weapontype;
 
 	return wt;
 }
@@ -4076,7 +3883,6 @@ BG_WeaponHandsForPlayerState
 */
 int BG_WeaponHandsForPlayerState(playerState_t *ps)
 {
-#ifdef TMNTWEAPSYS_2
 	if (ps->eFlags & EF_PRIMARY_HAND)
 	{
 		return HAND_PRIMARY;
@@ -4091,9 +3897,6 @@ int BG_WeaponHandsForPlayerState(playerState_t *ps)
 	{
 		return HAND_PRIMARY;
 	}
-#else
-	return bg_weapontypeinfo[BG_WeaponTypeForPlayerState(ps)].hands;
-#endif
 }
 
 /*
@@ -4103,39 +3906,28 @@ BG_WeaponHandsForWeaponNum
 */
 int BG_WeaponHandsForWeaponNum(weapon_t weaponnum)
 {
-#ifdef TMNTWEAPSYS_2
-	int rtn = 0;
+	int hands = 0;
 
 	if (bg_weapongroupinfo[weaponnum].weaponnum[0])
-		rtn |= HAND_PRIMARY;
+		hands |= HAND_PRIMARY;
 	if (bg_weapongroupinfo[weaponnum].weaponnum[1])
-		rtn |= HAND_SECONDARY;
+		hands |= HAND_SECONDARY;
 
-	return rtn;
-#else
-	return bg_weapontypeinfo[BG_WeaponTypeForNum(weaponnum)].hands;
-#endif
+	return hands;
 }
 
 
 qboolean BG_WeapTypeIsMelee(weapontype_t wt)
 {
-#ifdef TMNTWEAPSYS_2
 	return (wt == WT_MELEE || wt == WT_GAUNTLET);
-#else
-	return (wt != WT_NONE && wt != WT_GUN && wt != WT_GUN_PRIMARY);
-#endif
 }
 
 qboolean BG_WeapUseAmmo(weapon_t w)
 {
 	weapontype_t wt = BG_WeaponTypeForNum(w);
-#ifdef TMNTWEAPSYS_2
+
 	// Guns use ammo, but grappling hook gun does not.
 	return (wt == WT_GUN && !bg_weapongroupinfo[w].weapon[0]->proj->grappling);
-#else
-	return (w != WP_GRAPPLING_HOOK && (wt == WT_GUN || wt == WT_GUN_PRIMARY));
-#endif
 }
 
 qboolean BG_PlayerAttackAnim(int a)
@@ -4179,7 +3971,7 @@ qboolean BG_PlayerStandAnim(int a)
 	);
 #endif
 }
-#endif
+#endif // TMNTWEAPSYS
 
 #ifdef TMNTHOLDSYS
 /*
@@ -4192,11 +3984,11 @@ Returns 0 if not found.
 */
 int BG_ItemNumForHoldableNum(holdable_t holdablenum)
 {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	gitem_t	*it;
 	int i;
 
-	for (i = NUM_BG_ITEMS-1; i > 0; i--)
+	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
 		if (!it->classname)
@@ -4228,11 +4020,11 @@ BG_FindItemForPowerup
 ==============
 */
 gitem_t	*BG_FindItemForPowerup( powerup_t pw ) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	gitem_t	*it;
 	int i;
 
-	for (i = NUM_BG_ITEMS-1; i > 0; i--)
+	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
 		if (!it->classname)
@@ -4268,11 +4060,11 @@ BG_FindItemForHoldable
 ==============
 */
 gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	gitem_t	*it;
 	int i;
 
-	for (i = NUM_BG_ITEMS-1; i > 0; i--)
+	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
 		if (!it->classname)
@@ -4304,11 +4096,11 @@ BG_FindItemForWeapon
 ===============
 */
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	gitem_t	*it;
 	int i;
 
-	for (i = NUM_BG_ITEMS-1; i > 0; i--)
+	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
 		if (!it->classname)
@@ -4334,11 +4126,11 @@ BG_FindItem
 ===============
 */
 gitem_t	*BG_FindItem( const char *pickupName ) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	gitem_t	*it;
 	int i;
 
-	for (i = NUM_BG_ITEMS-1; i > 0; i--)
+	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
 		if (!it->classname)
@@ -4355,7 +4147,7 @@ gitem_t	*BG_FindItem( const char *pickupName ) {
 	return NULL;
 }
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 int BG_ItemNumForItem( gitem_t *item )
 {
 	if (!item)
@@ -4368,7 +4160,7 @@ int BG_ItemNumForItem( gitem_t *item )
 	{
 		int weaponNum;
 
-			weaponNum = item->giTag;
+		weaponNum = item->giTag;
 
 		// Turtle Man: Check weapon item address
 		if (weaponNum >= 0 && weaponNum < BG_NumWeaponGroups()
@@ -4402,6 +4194,11 @@ gitem_t *BG_ItemForItemNum( int itemnum )
 		return &bg_weapongroupinfo[(itemnum-bg_numItems)].item;
 
 	return &bg_itemlist[0]; // Can't return NULL.
+}
+
+int BG_NumItems(void)
+{
+	return (bg_numItems+BG_NumWeaponGroups());
 }
 #endif
 
@@ -4447,8 +4244,8 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	int		upperBound;
 #endif
 
-#ifdef TMNTWEAPSYS_2
-	if ( ent->modelindex < 1 || ent->modelindex >= NUM_BG_ITEMS )
+#ifdef TMNTWEAPSYS
+	if ( ent->modelindex < 1 || ent->modelindex >= BG_NumItems() )
 #else
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems )
 #endif
@@ -4456,7 +4253,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: index out of range" );
 	}
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	item = BG_ItemForItemNum(ent->modelindex);
 #else
 	item = &bg_itemlist[ent->modelindex];
@@ -4464,7 +4261,13 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 	switch( item->giType ) {
 	case IT_WEAPON:
-#ifdef TMNTWEAPSYS2 // DROP_WEAPON_FIX
+#ifdef TMNTWEAPSYS_EX
+		// Turtle Man: TODO: Must drop weapon first
+		//if (ps->weapon != ps->stats[STAT_DEFAULTWEAPON]) {
+		//	return qfalse;
+		//}
+
+		// DROP_WEAPON_FIX
 		// If using/dropping/picking up a weapon
 		// or it was dropped by this player and is still in there Bounding Box
 		if (ps->weaponTime || ps->meleeTime ||
@@ -4474,8 +4277,8 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		}
 #endif
 #ifdef TMNTWEAPSYS
-		// It the weapon is the same one as the current weapon and its not a gun,
-		//  don't pick it up because theres no reason too.
+		// Don't pick up a melee weapon (or another weapon that doesn't use ammo)
+		//   if your holding one of the same type.
 		if (item->giTag == WP_DEFAULT)
 		{
 			if (ps->weapon == ps->stats[STAT_DEFAULTWEAPON]
@@ -4489,10 +4292,11 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 			return qfalse;
 		}
 #endif
+
 		return qtrue;	// weapons are always picked up
 
 	case IT_AMMO:
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		{
 			int stat = STAT_AMMO;
 			if (item->giTag != ps->weapon)
@@ -4520,7 +4324,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #ifndef TMNT // NOARMOR
 	case IT_ARMOR:
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if( BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -4530,7 +4334,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		}
 
 		// we also clamp armor to the maxhealth for handicapping
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if( BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -4562,7 +4366,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		// small and mega healths will go over the max, otherwise
 		// don't pick up if already at max
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if( BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -4816,7 +4620,7 @@ char *eventnames[] = {
 	"EV_ITEM_PICKUP",			// normal item pickups are predictable
 	"EV_GLOBAL_ITEM_PICKUP",	// powerup / team sounds are broadcast to everyone
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	"EV_DROP_WEAPON",
 #else
 	"EV_NOAMMO",
@@ -4846,7 +4650,7 @@ char *eventnames[] = {
 	"EV_PLAYER_TELEPORT_IN",
 	"EV_PLAYER_TELEPORT_OUT",
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	"EV_PROJECTILE_BOUNCE",
 #else
 	"EV_GRENADE_BOUNCE",		// eventParm will be the soundindex
@@ -4856,7 +4660,7 @@ char *eventnames[] = {
 	"EV_GLOBAL_SOUND",		// no attenuation
 	"EV_GLOBAL_TEAM_SOUND",
 
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 	"EV_BULLET_HIT_FLESH",
 	"EV_BULLET_HIT_WALL",
 #endif
@@ -4865,7 +4669,7 @@ char *eventnames[] = {
 	"EV_MISSILE_MISS",
 	"EV_MISSILE_MISS_METAL",
 	"EV_RAILTRAIL",
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 	"EV_SHOTGUN",
 #endif
 #ifndef IOQ3ZTM_NO_COMPAT
@@ -5299,6 +5103,77 @@ void BG_ClearLerpFrame( lerpFrame_t *lf, animation_t *animations, int animationN
 }
 #endif
 
+#ifdef IOQ3ZTM // BG_SWING_ANGLES
+/*
+==================
+BG_SwingAngles
+
+Based on Q3's CG_SwingAngles
+
+* frametime should be;
+** game - (level.time - level.previousTime)
+** q3_ui - uis.frametime
+** ui - uiInfo.uiDC.frameTime
+** cgame - cg.frametime
+==================
+*/
+void BG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
+					float speed, float *angle, qboolean *swinging, int frametime ) {
+	float	swing;
+	float	move;
+	float	scale;
+
+	if ( !*swinging ) {
+		// see if a swing should be started
+		swing = AngleSubtract( *angle, destination );
+		if ( swing > swingTolerance || swing < -swingTolerance ) {
+			*swinging = qtrue;
+		}
+	}
+
+	if ( !*swinging ) {
+		return;
+	}
+
+	// modify the speed depending on the delta
+	// so it doesn't seem so linear
+	swing = AngleSubtract( destination, *angle );
+	scale = fabs( swing );
+	if ( scale < swingTolerance * 0.5 ) {
+		scale = 0.5;
+	} else if ( scale < swingTolerance ) {
+		scale = 1.0;
+	} else {
+		scale = 2.0;
+	}
+
+	// swing towards the destination angle
+	if ( swing >= 0 ) {
+		move = frametime * scale * speed;
+		if ( move >= swing ) {
+			move = swing;
+			*swinging = qfalse;
+		}
+		*angle = AngleMod( *angle + move );
+	} else if ( swing < 0 ) {
+		move = frametime * scale * -speed;
+		if ( move <= swing ) {
+			move = swing;
+			*swinging = qfalse;
+		}
+		*angle = AngleMod( *angle + move );
+	}
+
+	// clamp to no more than tolerance
+	swing = AngleSubtract( destination, *angle );
+	if ( swing > clampTolerance ) {
+		*angle = AngleMod( destination - (clampTolerance - 1) );
+	} else if ( swing < -clampTolerance ) {
+		*angle = AngleMod( destination + (clampTolerance - 1) );
+	}
+}
+#endif
+
 #ifdef TMNTPLAYERSYS
 /*
 ===============
@@ -5324,7 +5199,7 @@ int BG_AnimationTime(animation_t *anim)
 	return time;
 }
 
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 // These are in game, cgame, and ui, but not in bg - so its okay to use here...
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
@@ -5951,14 +5826,11 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 
 #ifdef TMNTWEAPSYS // Turtle Man: DEFAULT_WEAPON
 		else if ( !Q_stricmp( token, "default_weapon" ) ) {
-#ifdef TMNTWEAPSYS_2
 			int j;
-#endif
 			token = COM_Parse( &text_p );
 			if ( !*token ) {
 				break;
 			}
-#ifdef TMNTWEAPSYS_2
 			j = BG_WeaponGroupIndexForName(token);
 			if (j)
 			{
@@ -5976,103 +5848,10 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			else {
 				Com_Printf( "Bad default_weapon parm in %s: %s\n", filename, token );
 			}
-#else
-			if ( !Q_stricmp( token, "WP_NONE" ) ) {
-				playercfg->default_weapon = WP_NONE;
-			}
-#ifdef TMNTWEAPONS
-			else if ( !Q_stricmp( token, "WP_FISTS" ) ) {
-				playercfg->default_weapon = WP_FISTS;
-			} else if ( !Q_stricmp( token, "WP_KATANAS" ) ) {
-				playercfg->default_weapon = WP_KATANAS;
-			} else if ( !Q_stricmp( token, "WP_DAISHO" ) ) {
-				playercfg->default_weapon = WP_DAISHO;
-			} else if ( !Q_stricmp( token, "WP_SAIS" ) ) {
-				playercfg->default_weapon = WP_SAIS;
-			} else if ( !Q_stricmp( token, "WP_NUNCHUKS" ) ) {
-				playercfg->default_weapon = WP_NUNCHUKS;
-			} else if ( !Q_stricmp( token, "WP_HAMMER" ) ) {
-				playercfg->default_weapon = WP_HAMMER;
-			} else if ( !Q_stricmp( token, "WP_AXE" ) ) {
-				playercfg->default_weapon = WP_AXE;
-			} else if ( !Q_stricmp( token, "WP_LONGSWORD" ) ) {
-				playercfg->default_weapon = WP_LONGSWORD;
-			} else if ( !Q_stricmp( token, "WP_BAT" ) ) {
-				playercfg->default_weapon = WP_BAT;
-			} else if ( !Q_stricmp( token, "WP_BO" ) ) {
-				playercfg->default_weapon = WP_BO;
-			} else if ( !Q_stricmp( token, "WP_BAMBOO" ) ) {
-				playercfg->default_weapon = WP_BAMBOO;
-			}
-			// GUNS_AS_DEFAULT
-#if 1 // Turtle Man: Guns are not allowed as default weapons.
-			else if ( !Q_stricmp( token, "WP_GUN" )
-				|| !Q_stricmp( token, "WP_ELECTRIC_LAUNCHER" )
-				|| !Q_stricmp( token, "WP_ROCKET_LAUNCHER" )
-				|| !Q_stricmp( token, "WP_HOMING_LAUNCHER" ) ) {
-				Com_Printf( "Bad default_weapon parm, guns not allowed, in %s\n", filename );
-			}
-#else
-			else if ( !Q_stricmp( token, "WP_GUN" ) ) {
-				playercfg->default_weapon = WP_GUN;
-			} else if ( !Q_stricmp( token, "WP_ELECTRIC_LAUNCHER" ) ) {
-				playercfg->default_weapon = WP_PLASMAGUN;
-			} else if ( !Q_stricmp( token, "WP_ROCKET_LAUNCHER" ) ) {
-				playercfg->default_weapon = WP_ROCKET_LAUNCHER;
-			} else if ( !Q_stricmp( token, "WP_HOMING_LAUNCHER" ) ) {
-				playercfg->default_weapon = WP_HOMING_LAUNCHER;
-			}
-#endif
-			else if ( !Q_stricmp( token, "WP_GRAPPLING_HOOK" ) ) {
-				playercfg->default_weapon = WP_GRAPPLING_HOOK;
-			}
-#else
-			// Quake 3 players don't have a "default_weapon" field in there config
-			//  so there is no point in adding the Q3 weapons here...
-			//  But I did it anyway... Turtle Man
-			else if ( !Q_stricmp( token, "WP_GAUNTLET" ) ) {
-				playercfg->default_weapon = WP_GAUNTLET;
-			} else if ( !Q_stricmp( token, "WP_MACHINEGUN" ) ) {
-				playercfg->default_weapon = WP_MACHINEGUN;
-			} else if ( !Q_stricmp( token, "WP_SHOTGUN" ) ) {
-				playercfg->default_weapon = WP_SHOTGUN;
-			} else if ( !Q_stricmp( token, "WP_GRENADE_LAUNCHER" ) ) {
-				playercfg->default_weapon = WP_GRENADE_LAUNCHER;
-			} else if ( !Q_stricmp( token, "WP_ROCKET_LAUNCHER" ) ) {
-				playercfg->default_weapon = WP_ROCKET_LAUNCHER;
-			} else if ( !Q_stricmp( token, "WP_LIGHTNING" ) ) {
-				playercfg->default_weapon = WP_LIGHTNING;
-			} else if ( !Q_stricmp( token, "WP_RAILGUN" ) ) {
-				playercfg->default_weapon = WP_RAILGUN;
-			} else if ( !Q_stricmp( token, "WP_PLASMAGUN" ) ) {
-				playercfg->default_weapon = WP_PLASMAGUN;
-			} else if ( !Q_stricmp( token, "WP_BFG" ) ) {
-				playercfg->default_weapon = WP_BFG;
-			} else if ( !Q_stricmp( token, "WP_GRAPPLING_HOOK" ) ) {
-				playercfg->default_weapon = WP_GRAPPLING_HOOK;
-			}
-			// Don't allow MISSIONPACK weapons as default...
-#endif
-			else {
-				Com_Printf( "Bad default_weapon parm in %s: %s\n", filename, token );
-			}
-#endif
 			continue;
 		}
 #endif
 
-#if 0 //#ifdef TMNTPLAYERSYS_2
-		// Load as any type of animation?
-		else if ( !Q_strncasecmp( token, "BOTH_", 5 ) ) {
-			//
-		}
-		else if ( !Q_strncasecmp( token, "TORSO_", 6 ) ) {
-			//
-		}
-		else if ( !Q_strncasecmp( token, "LEGS_", 5 ) ) {
-			//
-		}
-#endif
 		// Turtle Man: New animation loading.
 		for (i = 0; playerAnimationDefs[i].name != NULL; i++)
 		{
@@ -6203,7 +5982,7 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	// Use the head model name for the default soundpath.
 	Q_strncpyz(playercfg->soundpath, headModel, sizeof (playercfg->soundpath));
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	playercfg->default_weapon = BG_WeaponGroupIndexForName(DEFAULT_DEFAULT_WEAPON);
 
 	// If the default weapon wasn't found.
@@ -6228,8 +6007,6 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 			playercfg->default_weapon = 1;
 		}
 	}
-#elif defined TMNTWEAPSYS
-	playercfg->default_weapon = DEFAULT_DEFAULT_WEAPON;
 #endif
 
 	// Default to Q3 bounding box (If changed update game's SpotWouldTelefrag)

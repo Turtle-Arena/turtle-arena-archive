@@ -531,14 +531,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 	re.reType = RT_SPRITE;
 #ifdef TMNTWEAPSYS // SPR_EXP_SCALE
 	// CG_MakeExplosion
-	//if (le->radius > 0 && le->refEntity.radius > 0)
-	//{
-		re.radius = le->refEntity.radius * ( 1.0 - c ) + le->radius;
-	//}
-	//else
-	//{
-	//	re.radius = 42 * ( 1.0 - c ) + 30;
-	//}
+	re.radius = le->refEntity.radius * ( 1.0 - c ) + le->radius;
 #else
 	re.radius = 42 * ( 1.0 - c ) + 30;
 #endif

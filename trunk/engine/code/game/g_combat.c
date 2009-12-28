@@ -85,7 +85,7 @@ void TossClientItems( gentity_t *self ) {
 	int			i;
 	gentity_t	*drop;
 
-#ifdef TMNTWEAPSYS2 // Turtle Man: FIXME: Drop upto three weapons?
+#ifdef TMNTWEAPSYS_EX // Turtle Man: FIXME: Drop upto three weapons?
 					//  (self->s.weapon, STAT_NEWWEAPON, and STAT_OLDWEAPON)
 	int statAmmo = -1;
 
@@ -129,7 +129,7 @@ void TossClientItems( gentity_t *self ) {
 	// can pick up a weapon, be killed, and not drop the weapon because
 	// their weapon change hasn't completed yet and they are still holding the MG.
 #ifdef TMNTWEAPONS // Turtle Man: NOTE: It would change q3 gameplay, so not TMNTWEAPSYS?
-	if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON] ) {
+	if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON]) {
 #else
 	if ( weapon == WP_MACHINEGUN || weapon == WP_GRAPPLING_HOOK ) {
 #endif
@@ -142,15 +142,9 @@ void TossClientItems( gentity_t *self ) {
 	}
 #endif // TMNTWEWAPONS3
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	// Turtle Man: Drop valid selected weapon to drop
-	if (weapon > WP_NONE && weapon <
-#ifdef TMNTWEAPSYS_2
-		BG_NumWeaponGroups()
-#else
-		WP_NUM_WEAPONS
-#endif
-		)
+	if (weapon > WP_NONE && weapon < BG_NumWeaponGroups())
 #elif defined TMNTWEAPSYS
 	// Turtle Man: Drop all weapons except default.
 	if ( weapon != self->client->ps.stats[STAT_DEFAULTWEAPON] )
@@ -167,7 +161,7 @@ void TossClientItems( gentity_t *self ) {
 		drop = Drop_Item( self, item, 0 );
 		if (drop) {
 			int ammo;
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 			if (statAmmo != -1)
 			{
 				ammo = self->client->ps.stats[statAmmo];
@@ -392,83 +386,6 @@ void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 }
 
 
-// these are just for logging, the client prints its own messages
-#ifdef TMNTWEAPSYS_2 // Moved to bg_misc.c
-extern char	*modNames[];
-extern int modNamesSize;
-#else
-char	*modNames[] = {
-	"MOD_UNKNOWN",
-#ifdef TMNTWEAPONS // MOD
-	"MOD_FIST",
-	"MOD_KATANA",
-	"MOD_WAKIZASHI",
-	"MOD_SAI",
-	"MOD_NUNCHUK",
-	"MOD_HAMMER",
-	"MOD_AXE",
-	"MOD_SWORD",
-	"MOD_BAT",
-	"MOD_BO",
-	"MOD_BAMBOO",
-	"MOD_GUN",
-	"MOD_ELECTRIC",
-	"MOD_ELECTRIC_SPLASH",
-	"MOD_ROCKET",
-	"MOD_ROCKET_SPLASH",
-	"MOD_HOMING",
-	"MOD_HOMING_SPLASH",
-#else
-	"MOD_SHOTGUN",
-	"MOD_GAUNTLET",
-	"MOD_MACHINEGUN",
-	"MOD_GRENADE",
-	"MOD_GRENADE_SPLASH",
-	"MOD_ROCKET",
-	"MOD_ROCKET_SPLASH",
-	"MOD_PLASMA",
-	"MOD_PLASMA_SPLASH",
-	"MOD_RAILGUN",
-	"MOD_LIGHTNING",
-	"MOD_BFG",
-	"MOD_BFG_SPLASH",
-#endif
-#ifdef TMNTHOLDABLE
-	"MOD_SHURIKEN",
-	"MOD_FIRESHURIKEN",
-	"MOD_FIRESHURIKEN_EXPLOSION",
-	"MOD_ELECTRICSHURIKEN",
-	"MOD_LASERSHURIKEN",
-#endif
-	"MOD_WATER",
-	"MOD_SLIME",
-	"MOD_LAVA",
-	"MOD_CRUSH",
-	"MOD_TELEFRAG",
-	"MOD_FALLING",
-	"MOD_SUICIDE",
-	"MOD_TARGET_LASER",
-	"MOD_TRIGGER_HURT",
-#ifdef TMNTENTSYS
-	"MOD_EXPLOSION",
-#endif
-#ifdef MISSIONPACK
-#ifndef TMNTWEAPONS // MOD
-	"MOD_NAIL",
-	"MOD_CHAINGUN",
-	"MOD_PROXIMITY_MINE",
-#endif
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
-	"MOD_KAMIKAZE",
-#endif
-#ifndef TMNTWEAPONS // MOD
-	"MOD_JUICED",
-#endif
-#endif
-	"MOD_GRAPPLE"
-};
-#endif
-
 #if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
@@ -648,7 +565,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		killerName = "<world>";
 	}
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if ( meansOfDeath < 0 || meansOfDeath >= modNamesSize )
 #else
 	if ( meansOfDeath < 0 || meansOfDeath >= sizeof( modNames ) / sizeof( modNames[0] ) )
@@ -668,7 +585,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	ent->s.eventParm = meansOfDeath;
 	ent->s.otherEntityNum = self->s.number;
 	ent->s.otherEntityNum2 = killer;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	ent->s.weapon = 0; // unknown projectile/weapon
 	// projectile or weapon group number, for MOD_PROJECTILE or MOD_WEAPON_*
 	if (meansOfDeath == MOD_PROJECTILE)
@@ -1157,7 +1074,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( attacker->client && attacker != targ ) {
 		max = attacker->client->ps.stats[STAT_MAX_HEALTH];
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if( BG_ItemForItemNum(attacker->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[attacker->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )

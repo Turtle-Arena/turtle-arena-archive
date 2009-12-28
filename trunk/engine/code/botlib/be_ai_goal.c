@@ -551,7 +551,7 @@ void BotInitInfoEntities(void)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
 void BotInitLevelItems(bot_shareditem_t *itemInfos)
 #else
 void BotInitLevelItems(void)
@@ -579,7 +579,7 @@ void BotInitLevelItems(void)
 	//if there's no AAS file loaded
 	if (!AAS_Loaded()) return;
 
-#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
 	// Add the new items.
 	if (itemInfos != NULL)
 	{

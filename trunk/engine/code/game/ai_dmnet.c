@@ -1294,7 +1294,7 @@ BotSelectActivateWeapon
 */
 int BotSelectActivateWeapon(bot_state_t *bs) {
 	//
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
     // Decide if the pickup waepon is better then default weapon.
 
     //weapontype_t wt;
@@ -1434,7 +1434,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			VectorSubtract(target, bs->eye, dir);
 			vectoangles(dir, moveresult->ideal_viewangles);
 			// if the bot has a weapon that does splash damage
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
             moveresult->weapon = 0;
             if (bs->inventory[INVENTORY_AMMO] > 0)
             {

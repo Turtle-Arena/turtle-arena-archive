@@ -248,7 +248,7 @@ typedef enum {
 	STAT_NEW_WEAPON_HANDS, // Set in PM_BeginWeaponHandsChange
 	STAT_DEFAULTWEAPON, // default weapon
 #endif
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	// Players can have 3 weapons at once, there is a extra one when switching from pickup to pickup
 	STAT_NEWWEAPON, // weapon that the player touched, they will change to it ASAP.
 	STAT_OLDWEAPON, // weapon that the player just changed from
@@ -482,53 +482,14 @@ typedef enum {
 
 #ifdef TMNTWEAPSYS
 // Weapon type
-// The "Primary" weapon hand is choosen by the modeler, the "normal" is right hand.
-// \note if any weapon types are added/removed, update bg_weapontypeinfo
 typedef enum
 {
     WT_NONE, // Dummy type
 
-	// Turtle Man: NOTE: Gauntlet code has been tested...
+	// Turtle Man: NOTE: Gauntlet code hasn't been tested...
 	WT_GAUNTLET, // Uses primary hand only
-
     WT_GUN, // One gun, both hands.
-#ifdef TMNTWEAPSYS_2
 	WT_MELEE,
-#else
-    WT_GUN_PRIMARY, // One gun, left hand
-
-#ifdef TMNTWEAPONS
-	// Sword1 types.
-    WT_SWORD1_BOTH, // One sword, uses both hands
-	WT_SWORD1_PRIMARY, // One sword, uses left hand only
-
-	// Sword2 types.
-	// The one handed version is WT_SWORD1_PRIMARY
-	WT_SWORD2, // Two swords, one in each hand.
-	WT_DAISHO, // Daisho for Usagi ...secondary (left) is wakizashi (short), primary (right) is katana (long)
-
-	WT_SAI2, // Two Sais, one in each hand.
-	WT_SAI1_PRIMARY, // One Sai, uses left hand only
-
-    WT_BO, // One Bo, uses both hands
-    WT_BO_PRIMARY, // One Bo, left hand.
-
-    WT_HAMMER, // One hammer, uses both hands
-    WT_HAMMER_PRIMARY, // One hammer, left hand.
-
-	// Nunchuks are going take more work then the other weapons.
-	// Have three models, handle, chain, handle2
-	//   connect the three models using tags and swing the chain and handle2 using the
-	//   flag swing code.
-	// OR: Have one model that is animated. Better/easier thing to do?
-	//   but it needs more thinking...
-	//
-	// Ooh! Maybe I can use Q3 "_barrel.md3" the code!
-    WT_NUNCHUKS, // Two nunchuk, one in each hand.
-    WT_NUNCHUKS1_PRIMARY, // One nunchuk, left hand.
-#endif
-#endif
-
     WT_MAX
 
 } weapontype_t;
@@ -549,40 +510,36 @@ typedef enum
 //   FIXED?:  modifying any part of the player's info string will reload the player,
 //   FIXED?:  causing ammo to reset.
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 #define DEFAULT_DEFAULT_WEAPON "WP_GUN" // "WP_GAUNTLET"
 #else
 #define DEFAULT_DEFAULT_WEAPON WP_GUN // WP_GAUNTLET
-#endif // TMNTWEAPSYS_2
+#endif
 #else // !TMNT_SUPPORTQ3
 */
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 #define DEFAULT_DEFAULT_WEAPON "WP_FISTS"
 #else
 #define DEFAULT_DEFAULT_WEAPON WP_FISTS
-#endif // TMNTWEAPSYS_2
+#endif
 //#endif // TMNT_SUPPORTQ3
 
-#else
-#ifdef TMNTWEAPSYS_2
+#else // !TMNTWEAPONS
+#ifdef TMNTWEAPSYS
 #define DEFAULT_DEFAULT_WEAPON "WP_GAUNTLET" // "WP_MACHINEGUN"
 #else
 #define DEFAULT_DEFAULT_WEAPON WP_GAUNTLET // WP_MACHINEGUN
-#endif // TMNTWEAPSYS_2
 #endif
+#endif // TMNTWEAPONS
 #endif // TMNTWEAPSYS
 
 typedef enum {
-#ifdef TMNTWEAPSYS
     WP_DEFAULT = -1, // This weapon will need to be remapped to the default weapon.
-#endif
-
-#ifdef TMNTWEAPONS
-	// Many of the weapons are based on weapons in TMNT: Mutant Melee
-
 	WP_NONE,
 
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
+#ifdef TMNTWEAPONS
+	// Many of the weapons are based on weapons in TMNT: Mutant Melee
 	// For players like Hun who don't have a default "weapon" but just use there fists.
 	WP_FISTS, // Invisible weapon, each hand, short range damage.
 
@@ -623,10 +580,7 @@ typedef enum {
 	WP_GRAPPLING_HOOK, // Model will be modified tri-blaster
 
 	WP_NUM_WEAPONS
-#endif
 #else
-	WP_NONE,
-
 	WP_GAUNTLET,
 	WP_MACHINEGUN,
 	WP_SHOTGUN,
@@ -645,6 +599,7 @@ typedef enum {
 
 	WP_NUM_WEAPONS
 #endif // TMNTWEAPONS
+#endif
 } weapon_t;
 
 #ifdef TMNTWEAPSYS
@@ -652,22 +607,8 @@ typedef enum {
 #define HAND_PRIMARY 1
 #define HAND_SECONDARY 2
 #define HAND_BOTH (HAND_PRIMARY|HAND_SECONDARY)
-#define MAX_HANDS 2 // Currently players can only have 2 hands...
-#ifndef TMNTWEAPSYS_2
-typedef struct
-{
-	int hands; // bitfield, see HAND_* defines
-	weapontype_t primaryOnly;	// Use this type when holding a CTF flag.
-	int standAnim;
-	int attackAnim;
-	// Melee weapons should have more than one attack
-	//int attackAnim2;
-	//int attackAnim3;
+#define MAX_HANDS 2 // Only support two hands for fighting.
 
-} bg_weapontypeinfo_t;
-#endif
-
-#ifdef TMNTWEAPSYS_2
 //projectile trail types
 #define PT_NONE 0
 #define PT_PLASMA 1
@@ -902,7 +843,7 @@ typedef struct
 
 } bg_weapongroupinfo_t;
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 #define MAX_BG_PROJ 64
 #define MAX_BG_WEAPONS 64
 #define MAX_BG_WEAPON_GROUPS 32
@@ -922,43 +863,6 @@ int BG_NumWeapons(void);
 int BG_NumWeaponGroups(void);
 void BG_InitWeaponInfo(void);
 int BG_MaxAttackCombo(playerState_t *ps);
-#else
-// Turtle Man: TODO?: Use info for guns too. Currently they don't use any (other then weapontype).
-typedef struct
-{
-	//char name[MAX_QPATH];
-	//gitem_t *item;
-
-	weapontype_t weapontype;
-	int mod; // Means of death, MOD_* enum - Primary weapon
-	// Turtle Man: TODO?: If WT_GUN, have mod2 be splash damage MOD?
-	//                   -or- support guns in both hands?...
-	int mod2; // Means of death, MOD_* enum - Secondary weapon
-
-	// Damage amounts
-	int damage; // Damage given by Primary weapon
-	// Turtle Man: TODO?: If WT_GUN, have damge2 be splash damage?
-	//                   -or- support guns in both hands?...
-	int damage2; // Damage given by Secondary weapon
-
-	// Melee weapons
-	// Primary weapon
-	//vec3_t mins;
-	//vec3_t maxs;
-	int start_range;			// can be neg to have the weapon do damge below tag
-	int end_range;				// Dist to attack
-
-	// Secondary weapon
-	//vec3_t mins2;
-	//vec3_t maxs2;
-	int start_range2;
-	int end_range2;
-
-} bg_weaponinfo_t;
-
-extern bg_weapontypeinfo_t bg_weapontypeinfo[WT_MAX];
-extern bg_weaponinfo_t bg_weaponinfo[WP_NUM_WEAPONS];
-#endif
 
 weapontype_t BG_WeaponTypeForPlayerState(playerState_t *ps);
 weapontype_t BG_WeaponTypeForEntityState(entityState_t *es);
@@ -1029,7 +933,7 @@ typedef enum {
 	EV_ITEM_PICKUP,			// normal item pickups are predictable
 	EV_GLOBAL_ITEM_PICKUP,	// powerup / team sounds are broadcast to everyone
 
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 	EV_DROP_WEAPON,
 #else
 	EV_NOAMMO,
@@ -1059,7 +963,7 @@ typedef enum {
 	EV_PLAYER_TELEPORT_IN,
 	EV_PLAYER_TELEPORT_OUT,
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	EV_PROJECTILE_BOUNCE,
 #else
 	EV_GRENADE_BOUNCE,		// eventParm will be the soundindex
@@ -1069,7 +973,7 @@ typedef enum {
 	EV_GLOBAL_SOUND,		// no attenuation
 	EV_GLOBAL_TEAM_SOUND,
 
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 	EV_BULLET_HIT_FLESH,
 	EV_BULLET_HIT_WALL,
 #endif
@@ -1078,7 +982,7 @@ typedef enum {
 	EV_MISSILE_MISS,
 	EV_MISSILE_MISS_METAL,
 	EV_RAILTRAIL,
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 	EV_SHOTGUN,
 #endif
 #ifndef IOQ3ZTM_NO_COMPAT
@@ -1430,13 +1334,18 @@ typedef struct {
 	int			animationTime;		// time when the first frame of the animation will be exact
 } lerpFrame_t;
 
-// Turtle man: for time use;
+// Turtle Man: for time use;
 // * cgame - cg.time
 // * ui - dp_realtime
 // * game - level.time
 void BG_ClearLerpFrame(lerpFrame_t * lf, animation_t *animations, int animationNumber, int time );
 void BG_SetLerpFrameAnimation( lerpFrame_t *lf, animation_t *animations, int newAnimation );
 void BG_RunLerpFrame( lerpFrame_t *lf, animation_t *animations, int newAnimation, int time, float speedScale );
+#endif
+#ifdef IOQ3ZTM // BG_SWING_ANGLES
+#define BG_SWINGSPEED 0.3f // default swing speed // cg_swingSpeed.value
+void BG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
+					float speed, float *angle, qboolean *swinging, int frametime );
 #endif
 
 #ifdef IOQ3ZTM // PLAYER_DIR
@@ -1826,7 +1735,7 @@ typedef enum {
 #endif
 #endif
 	MOD_GRAPPLE
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	,MOD_PROJECTILE,
 	MOD_WEAPON_PRIMARY,
 	MOD_WEAPON_SECONDARY,
@@ -1834,9 +1743,12 @@ typedef enum {
 #endif
 } meansOfDeath_t;
 
+extern char	*modNames[];
+extern int modNamesSize;
+
 //---------------------------------------------------------
 
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 // gitem_t->type
 typedef enum {
 	IT_BAD,
@@ -1889,10 +1801,11 @@ gitem_t	*BG_FindItem( const char *pickupName );
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon );
 gitem_t	*BG_FindItemForPowerup( powerup_t pw );
 gitem_t	*BG_FindItemForHoldable( holdable_t pw );
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 int BG_ItemNumForItem( gitem_t *item );
 gitem_t	*BG_ItemForItemNum( int itemNum );
-#define NUM_BG_ITEMS (bg_numItems+BG_NumWeaponGroups())
+int BG_NumItems(void);
+#define NUM_BG_ITEMS BG_NumItems()
 #define	ITEM_INDEX(x) (BG_ItemNumForItem(x))
 #else
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
@@ -1913,7 +1826,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #define	MASK_DEADSOLID			(CONTENTS_SOLID|CONTENTS_PLAYERCLIP)
 #define	MASK_WATER				(CONTENTS_WATER|CONTENTS_LAVA|CONTENTS_SLIME)
 #define	MASK_OPAQUE				(CONTENTS_SOLID|CONTENTS_SLIME|CONTENTS_LAVA)
-#ifdef TMNTWEAPSYS_2 // XREAL
+#ifdef TMNTWEAPSYS // XREAL
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE|CONTENTS_SHOOTABLE)
 #else
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE)

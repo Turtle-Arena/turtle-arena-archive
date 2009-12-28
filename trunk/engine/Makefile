@@ -112,21 +112,25 @@ ifeq ($(QUAKE3),1)
 		# Build modified ioquake3; should be compatible with quake3 mods.
 		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
 							-DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
-							-DTMNTWEAPSYS -DTMNTWEAPSYS_2 -DRAVENMD4 -DOA_BLOOM
+							-DTMNTWEAPSYS -DRAVENMD4 -DOA_BLOOM
 
-		# Use model tags for "true" melee attacking (Used for gauntlet)
+		# Use model tags for "true" melee attacking (Gauntlet)
 		# (Can't be used as a quake3 mod, as it uses new VM-to-server calls.
-		#    It doesn't break compatiblity with other q3 mods however -untested)
+		#    It shouldn't break compatiblity with other q3 mods however -untested)
 		DED_USE_MODELS=1
 		BUILD_DEFINES += -DTMNT_GAME_MODELS
 
 		#
-		# Break compatibility because I don't play q3 nor its mods...
+		# These are known to break compatibility with q3 mods
 		#
-		BUILD_DEFINES += -DIOQ3ZTM_NO_COMPAT -DTMNTWEAPSYS_2_NOCOMPAT
+		#BUILD_DEFINES += -DIOQ3ZTM_NO_COMPAT -DTMNTWEAPSYS_NOCOMPAT
 
 		SERVERBIN=ioq3ztmded
 		CLIENTBIN=ioq3ztm
+
+		ifndef BUILD_DIR
+			BUILD_DIR=build-ioq3ztm
+		endif
 
 	else
 
@@ -135,6 +139,10 @@ ifeq ($(QUAKE3),1)
 
 		SERVERBIN=ioq3ded
 		CLIENTBIN=ioquake3
+
+		ifndef BUILD_DIR
+			BUILD_DIR=build-ioq3
+		endif
 
 	endif
 
@@ -147,9 +155,7 @@ ifeq ($(QUAKE3),1)
 	ifndef COPYDIR
 	COPYDIR="/usr/local/games/quake3"
 	endif
-	ifndef BUILD_DIR
-	BUILD_DIR=build-q3
-	endif
+
 
 else # END QUAKE3
 
@@ -158,31 +164,27 @@ else # END QUAKE3
 	#  - All of this can be overriden by makefile.local
 	###################################################################
 
+	# Please note: TMNT*SYS defines are general system changes, not specifiy for TMNT
 	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
 	# -DANALOG		 # TODO: Finish analog control.
 	# -DARRAYMAX     # TODO: This ''was'' going to remove the bit max problem with Q3 network (ie more then 16 weapons).
-	# -DTMNTWEAPSYS is (or was...) the core changes to the weapon system
-	# -DTMNTWEAPSYS2 changes from holding multiple weapons to only one default and one pickup.
+	# -DTMNTWEAPSYS is the core changes to the weapon system
+	#					loads the weapons from a text file, allowing for easy modifing,
+	#						and new custom default weapons for players.
+	# -DTMNTWEAPSYS_NOCOMPAT removes botlib weapon weight code because when WEAP_SCRIPT is define
+	#  							"game" does its own weapon weight stuff.
+	# -DTMNTWEAPSYS_EX changes from holding multiple weapons to only one default and one pickup.
 	# -DTMNTHOLDSYS Allow players to hold multiple holdable items and change to any holdable.
 	#					(Based on Q3's weapon changing)
-	# -DTMNTNPCSYS   # WIP: NPC system, based on TDC_NPC system and code in Quake3
+	# -DTMNTNPCSYS   WIP NPC system, based on TDC_NPC system and code in Quake3
 
-	# -DTMNTWEAPSYS_2 loads the weapons from a text file, allowing for easy modifing,
-	#						and new custom default weapons for players.
-	# 				  This should be merged with TMNTWEAPSYS.
-
-	# TMNTWEAPSYS_2_NOCOMPAT removes botlib weapon weight code because when TMNTWEAPSYS_2 is define
-	#  							"game" does its own weapon weight stuff.
-	# 				  After TMNTWEAPSYS_2 is merged with TMNTWEAPSYS
-	#					this should be renamed to TMNTWEAPSYS_NOCOMPAT.
-
-	# Some of these aren't as independent as they should be, TMNTWEAPSYS requires TMNTPLAYERSYS etc
+	# Some of these aren't as independent as they should be, TMNTWEAPSYS requires TMNTPLAYERSYS,  etc
 	BUILD_DEFINES = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DNOTRATEDM -DNOBLOOD -DTHIRD_PERSON -DRAVENMD4 \
 					-DTMNT -DTMNTMISC -DTMNTSP -DTMNTHOLDSYS -DTMNTHOLDABLE \
-						-DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS -DTMNTPLAYERSYS -DTMNTPLAYERS \
-						-DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTPATHSYS -DTMNTNPCSYS \
-						-DTMNTDATA -DTMNTWEAPSYS_2 -DTMNTWEAPSYS_2_NOCOMPAT -DOA_BLOOM \
+						-DTMNTWEAPSYS -DTMNTWEAPSYS_NOCOMPAT -DTMNTWEAPSYS_EX -DTMNTWEAPONS -DTMNTPLAYERSYS \
+						-DTMNTPLAYERS -DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTPATHSYS -DTMNTNPCSYS \
+						-DTMNTDATA  -DOA_BLOOM \
 						 -DNIGHTSMODE
 
 	# Currently TMNT Arena doesn't use camera scripts.
@@ -192,7 +194,7 @@ else # END QUAKE3
 	DED_USE_MODELS=1
 	BUILD_DEFINES += -DTMNT_GAME_MODELS
 
-	# TMNT Arena's sounds are ogg vorbis, if there was music is would be ogg vorbis too...
+	# TMNT Arena's sounds are ogg vorbis
 	USE_CODEC_VORBIS=1
 
 	# Turtle Man: TMNT Arena version (YYYYMMDD)

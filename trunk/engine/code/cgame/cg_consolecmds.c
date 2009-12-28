@@ -519,7 +519,7 @@ static consoleCommand_t	commands[] = {
 #endif
 	{ "sizeup", CG_SizeUp_f },
 	{ "sizedown", CG_SizeDown_f },
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	{ "weapnext", CG_NextWeapon_f },
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },

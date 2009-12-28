@@ -629,7 +629,7 @@ void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
 float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
-#ifdef TMNTWEAPSYS_2 // XREAL
+#ifdef TMNTWEAPSYS // XREAL
 float AngleBetweenVectors(const vec3_t a, const vec3_t b);
 #endif
 
@@ -1037,10 +1037,10 @@ typedef struct {
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16 // PW_* are still limited by bit fields.
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 #define	MAX_WEAPONS				32
 #else
-#define	MAX_WEAPONS				16 // If not TMNTWEAPSYS2 limited to 16
+#define	MAX_WEAPONS				16 // If not TMNTWEAPSYS_EX limited to 16
 #endif
 #ifdef TMNTHOLDSYS
 #define	MAX_HOLDABLE			16
@@ -1164,7 +1164,7 @@ typedef struct playerState_s {
 	int			stats[MAX_STATS];
 	int			persistant[MAX_PERSISTANT];	// stats that aren't cleared on death
 	int			powerups[MAX_POWERUPS];	// level.time that the powerup runs out
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	int			ammo[MAX_WEAPONS];
 #endif
 #ifdef TMNTHOLDSYS
@@ -1238,7 +1238,7 @@ typedef struct playerState_s {
 #ifdef TMNTHOLDSYS // NEXTHOLDABLE
 #define	BUTTON_NEXT_HOLDABLE			4096
 #endif
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 #define BUTTON_DROP_WEAPON			8192
 #endif
 
@@ -1250,7 +1250,7 @@ typedef struct usercmd_s {
 	int				serverTime;
 	int				angles[3];
 	int 			buttons;
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	byte			weapon;           // weapon 
 #endif
 #ifdef TMNTHOLDSYS/*2*/

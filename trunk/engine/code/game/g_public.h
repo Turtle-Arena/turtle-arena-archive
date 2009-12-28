@@ -292,7 +292,7 @@ typedef enum {
 	BOTLIB_EA_MOVE_LEFT,
 	BOTLIB_EA_MOVE_RIGHT,
 
-#ifdef TMNTWEAPSYS2 // BOTLIB
+#ifdef TMNTWEAPSYS_EX // BOTLIB
 	BOTLIB_EA_DROP_WEAPON,
 #else
 	BOTLIB_EA_SELECT_WEAPON,
@@ -369,7 +369,7 @@ typedef enum {
 	BOTLIB_AI_FREE_MOVE_STATE,
 	BOTLIB_AI_INIT_MOVE_STATE,
 
-//#ifndef TMNTWEAPSYS_2 // Turtle Man: NOTE: Can't disable unless I modified the g_syscall.asm file.
+//#ifndef TMNTWEAPSYS // Turtle Man: NOTE: Can't disable unless I modified the g_syscall.asm file.
 	BOTLIB_AI_CHOOSE_BEST_FIGHT_WEAPON,
 	BOTLIB_AI_GET_WEAPON_INFO,
 	BOTLIB_AI_LOAD_WEAPON_WEIGHTS,

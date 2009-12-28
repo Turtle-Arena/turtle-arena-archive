@@ -475,23 +475,13 @@ static void CG_MiscObject( centity_t *cent ) {
 #ifdef TMNTNPCSYS
 	// Add NPC's weapon
 	// Turtle Man: TODO: Can I reuse the player weapon drawing code?
-	if (isNPC &&
-#ifdef TMNTWEAPSYS_2
-		s1->weapon > WP_NONE && s1->weapon < BG_NumWeaponGroups()
-#else
-		s1->weapon > WP_NONE && s1->weapon < WP_NUM_WEAPONS
-#endif
-		)
+	if (isNPC && s1->weapon > WP_NONE && s1->weapon < BG_NumWeaponGroups())
 	{
 		refEntity_t	weapon;
 
 		memset( &weapon, 0, sizeof( weapon ) );
 
-#ifdef TMNTWEAPSYS_2
 		weapon.hModel = cg_weapons[bg_weapongroupinfo[s1->weapon].weaponnum[0]].weaponModel;
-#else
-		weapon.hModel = cg_weapons[s1->weapon].weaponModel;
-#endif
 		weapon.customSkin = 0;
 
 		VectorCopy( ent.lightingOrigin, weapon.lightingOrigin );
@@ -506,21 +496,13 @@ static void CG_MiscObject( centity_t *cent ) {
 		trap_R_AddRefEntityToScene( &weapon );
 
 		// Add barrel
-#ifdef TMNTWEAPSYS_2
 		if (cg_weapons[bg_weapongroupinfo[s1->weapon].weaponnum[0]].barrelModel)
-#else
-		if (cg_weapons[s1->weapon].barrelModel)
-#endif
 		{
 			refEntity_t	barrel;
 
 			memset( &barrel, 0, sizeof( barrel ) );
 
-#ifdef TMNTWEAPSYS_2
 			barrel.hModel = cg_weapons[bg_weapongroupinfo[s1->weapon].weaponnum[0]].barrelModel;
-#else
-			barrel.hModel = cg_weapons[s1->weapon].barrelModel;
-#endif
 			barrel.customSkin = weapon.customSkin;
 
 			VectorCopy( weapon.lightingOrigin, barrel.lightingOrigin );
@@ -601,21 +583,21 @@ static void CG_Item( centity_t *cent ) {
 	int				msec;
 	float			frac;
 	float			scale;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	weaponGroupInfo_t *wgi;
 #else
 	weaponInfo_t	*wi;
 #endif
 
 	es = &cent->currentState;
-#ifdef TMNTWEAPSYS_2
-	if ( es->modelindex >= NUM_BG_ITEMS )
+#ifdef TMNTWEAPSYS
+	if ( es->modelindex >= BG_NumItems() )
 #else
 	if ( es->modelindex >= bg_numItems )
 #endif
 	{
-#ifdef TMNTWEAPSYS_2
-		CG_Error( "Bad item index %i on entity (max=%i)", es->modelindex, NUM_BG_ITEMS );
+#ifdef TMNTWEAPSYS
+		CG_Error( "Bad item index %i on entity (max is %i)", es->modelindex, NUM_BG_ITEMS );
 #else
 		CG_Error( "Bad item index %i on entity", es->modelindex );
 #endif
@@ -626,7 +608,7 @@ static void CG_Item( centity_t *cent ) {
 		return;
 	}
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	item = BG_ItemForItemNum(es->modelindex);
 #else
 	item = &bg_itemlist[ es->modelindex ];
@@ -691,7 +673,7 @@ static void CG_Item( centity_t *cent ) {
 		AxisCopy( cg.autoAxis, ent.axis );
 	}
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	wgi = NULL;
 #else
 	wi = NULL;
@@ -700,7 +682,7 @@ static void CG_Item( centity_t *cent ) {
 	// models, so we need to offset them or they will rotate
 	// eccentricly
 	if ( item->giType == IT_WEAPON ) {
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		wgi = &cg_weapongroups[item->giTag];
 		cent->lerpOrigin[0] -=
 			wgi->weaponMidpoint[0] * ent.axis[0][0] +
@@ -808,9 +790,9 @@ static void CG_Item( centity_t *cent ) {
 	// add to refresh list
 	trap_R_AddRefEntityToScene(&ent);
 
-#if defined MISSIONPACK || defined TMNTWEAPSYS_2
+#if defined MISSIONPACK || defined TMNTWEAPSYS
 	if ( item->giType == IT_WEAPON
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		&& (cg_weapons[bg_weapongroupinfo[item->giTag].weaponnum[0]].barrelModel ||
 			cg_weapons[bg_weapongroupinfo[item->giTag].weaponnum[1]].barrelModel)
 #else
@@ -821,7 +803,7 @@ static void CG_Item( centity_t *cent ) {
 
 		memset( &barrel, 0, sizeof( barrel ) );
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		barrel.hModel = cg_weapons[bg_weapongroupinfo[item->giTag].weaponnum[0]].barrelModel;
 #else
 		barrel.hModel = wi->barrelModel;
@@ -834,7 +816,7 @@ static void CG_Item( centity_t *cent ) {
 		barrel.shadowPlane = ent.shadowPlane;
 		barrel.renderfx = ent.renderfx;
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], "tag_barrel" );
 #else
 		CG_PositionRotatedEntityOnTag( &barrel, &ent, wi->weaponModel, "tag_barrel" );
@@ -845,7 +827,7 @@ static void CG_Item( centity_t *cent ) {
 
 		trap_R_AddRefEntityToScene( &barrel );
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		barrel.hModel = cg_weapons[bg_weapongroupinfo[item->giTag].weaponnum[1]].barrelModel;
 
 		CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], "tag_barrel2" );
@@ -924,7 +906,7 @@ static void CG_Item( centity_t *cent ) {
 
 //============================================================================
 
-#if defined TMNTHOLDABLE && !defined TMNTWEAPSYS_2
+#if defined TMNTHOLDABLE && !defined TMNTWEAPSYS
 /*
 ===============
 CG_Shuriken
@@ -992,13 +974,13 @@ CG_Missile
 static void CG_Missile( centity_t *cent ) {
 	refEntity_t			ent;
 	entityState_t		*s1;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	const projectileInfo_t		*projectile;
 #else
 	const weaponInfo_t		*weapon;
 #endif
 //	int	col;
-#if defined TMNTHOLDABLE && !defined TMNTWEAPSYS_2
+#if defined TMNTHOLDABLE && !defined TMNTWEAPSYS
 	int holdable;
 
 	s1 = &cent->currentState;
@@ -1018,7 +1000,7 @@ static void CG_Missile( centity_t *cent ) {
 	}
 #else
 	s1 = &cent->currentState;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if ( s1->weapon >= BG_NumProjectiles() )
 #elif defined IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
 	if ( s1->weapon >= WP_NUM_WEAPONS )
@@ -1029,7 +1011,7 @@ static void CG_Missile( centity_t *cent ) {
 		s1->weapon = 0;
 	}
 #endif
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	projectile = &cg_projectiles[s1->weapon];
 #else
 	weapon = &cg_weapons[s1->weapon];
@@ -1039,7 +1021,7 @@ static void CG_Missile( centity_t *cent ) {
 	VectorCopy( s1->angles, cent->lerpAngles);
 
 	// add trails
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if ( projectile->missileTrailFunc )
 	{
 		projectile->missileTrailFunc( cent, projectile );
@@ -1067,7 +1049,7 @@ static void CG_Missile( centity_t *cent ) {
 			weapon->missileDlightColor[col][0], weapon->missileDlightColor[col][1], weapon->missileDlightColor[col][2] );
 	}
 */
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	// add dynamic light
 	if ( projectile->missileDlight ) {
 		trap_R_AddLightToScene(cent->lerpOrigin, projectile->missileDlight,
@@ -1104,20 +1086,20 @@ static void CG_Missile( centity_t *cent ) {
 	VectorCopy( cent->lerpOrigin, ent.origin);
 	VectorCopy( cent->lerpOrigin, ent.oldorigin);
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if ( projectile->spriteShader )
 #else
 	if ( cent->currentState.weapon == WP_PLASMAGUN )
 #endif
 	{
 		ent.reType = RT_SPRITE;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		ent.radius = projectile->spriteRadius;
 #else
 		ent.radius = 16;
 #endif
 		ent.rotation = 0;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		ent.customShader = projectile->spriteShader;
 #else
 		ent.customShader = cgs.media.plasmaBallShader;
@@ -1128,7 +1110,7 @@ static void CG_Missile( centity_t *cent ) {
 
 	// flicker between two skins
 	ent.skinNum = cg.clientFrame & 1;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if (s1->generic1 == TEAM_BLUE) {
 		ent.hModel = projectile->missileModelBlue;
 	} else if (s1->generic1 == TEAM_RED) {
@@ -1150,7 +1132,7 @@ static void CG_Missile( centity_t *cent ) {
 #endif
 #endif
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if (s1->pos.trType == TR_STATIONARY &&
 		bg_projectileinfo[s1->weapon].stickOnImpact)
 	{
@@ -1159,10 +1141,10 @@ static void CG_Missile( centity_t *cent ) {
 	}
 	else
 	{
-			// convert direction of travel into axis
-			if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
-				ent.axis[0][2] = 1;
-			}
+		// convert direction of travel into axis
+		if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
+			ent.axis[0][2] = 1;
+		}
 
 		// Set the angles
 		vectoangles( ent.axis[0], cent->lerpAngles );
@@ -1172,30 +1154,30 @@ static void CG_Missile( centity_t *cent ) {
 		{
 			case PS_ROLL:
 			default:
-			if ( s1->pos.trType != TR_STATIONARY ) {
-				RotateAroundDirection( ent.axis, cg.time / 4 );
-			} else {
+				if ( s1->pos.trType != TR_STATIONARY ) {
+					RotateAroundDirection( ent.axis, cg.time / 4 );
+				} else {
 					RotateAroundDirection( ent.axis, s1->time );
 				}
-			break;
-		case PS_NONE:
+				break;
+			case PS_NONE:
 				AnglesToAxis( cent->lerpAngles, ent.axis );
-			break;
-		case PS_PITCH:
+				break;
+			case PS_PITCH:
 				// spin pitch!
 				if ( s1->pos.trType != TR_STATIONARY ) {
 				cent->lerpAngles[0] = cg.autoAngles[1]; // Spin pitch!
-			}
-			AnglesToAxis( cent->lerpAngles, ent.axis );
-			break;
-		case PS_YAW:
+				}
+				AnglesToAxis( cent->lerpAngles, ent.axis );
+				break;
+			case PS_YAW:
 				// spin yaw!
 				if ( s1->pos.trType != TR_STATIONARY ) {
-			cent->lerpAngles[1] = cg.autoAngles[1];		// Spin yaw!
+					cent->lerpAngles[1] = cg.autoAngles[1];		// Spin yaw!
 				}
-			AnglesToAxis( cent->lerpAngles, ent.axis );
-			break;
-	}
+				AnglesToAxis( cent->lerpAngles, ent.axis );
+				break;
+		}
 	}
 #else
 	// convert direction of travel into axis
@@ -1220,7 +1202,7 @@ static void CG_Missile( centity_t *cent ) {
 #endif
 
 	// add to refresh list, possibly with quad glow
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	CG_AddRefEntityWithPowerups( &ent, s1, s1->generic1 );
 #else
 	CG_AddRefEntityWithPowerups( &ent, s1, TEAM_FREE );
@@ -1237,14 +1219,14 @@ This is called when the grapple is sitting up against the wall
 static void CG_Grapple( centity_t *cent ) {
 	refEntity_t			ent;
 	entityState_t		*s1;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	const projectileInfo_t		*projectile;
 #else
 	const weaponInfo_t		*weapon;
 #endif
 
 	s1 = &cent->currentState;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if ( s1->weapon >= BG_NumProjectiles() )
 #elif defined IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
 	if ( s1->weapon >= WP_NUM_WEAPONS )
@@ -1254,7 +1236,7 @@ static void CG_Grapple( centity_t *cent ) {
 	{
 		s1->weapon = 0;
 	}
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	projectile = &cg_projectiles[s1->weapon];
 #else
 	weapon = &cg_weapons[s1->weapon];
@@ -1271,7 +1253,7 @@ static void CG_Grapple( centity_t *cent ) {
 #endif
 
 	// Will draw cable if needed
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if ( projectile->missileTrailFunc )
 	{
 		projectile->missileTrailFunc( cent, projectile );
@@ -1287,7 +1269,7 @@ static void CG_Grapple( centity_t *cent ) {
 
 	// flicker between two skins
 	ent.skinNum = cg.clientFrame & 1;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	ent.hModel = projectile->missileModel;
 	ent.renderfx = projectile->missileRenderfx | RF_NOSHADOW;
 #else

@@ -116,7 +116,7 @@ typedef struct {
 	int			joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
 
 	// cgame communicates a few values to the client system
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 #ifdef TMNTHOLDSYS/*2*/
 	int			cgameUserCmdValue;	// current holdable to add to usercmd_t
 #endif

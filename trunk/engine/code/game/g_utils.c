@@ -335,7 +335,7 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
             if (ent->client)
             {
                 ent->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
-	}
+			}
             else
             {
                 ent->s.weapon = WP_NONE;

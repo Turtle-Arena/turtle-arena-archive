@@ -41,7 +41,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define JUMP_HEIGHT				56
 
+#ifndef IOQ3ZTM // BG_SWING_ANGLES
 #define SWINGSPEED				0.3f
+#endif
 
 #define SPIN_SPEED				0.9f
 #define COAST_TIME				1000
@@ -57,13 +59,15 @@ UI_PlayerInfo_SetWeapon
 ===============
 */
 static void UI_PlayerInfo_SetWeapon( playerInfo_t *pi, weapon_t weaponNum ) {
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 	gitem_t *	item;
 #endif
 	char		path[MAX_QPATH];
 
 	pi->currentWeapon = weaponNum;
+#ifndef TMNTWEAPSYS
 tryagain:
+#endif
 	pi->realWeapon = weaponNum;
 	pi->weaponModel = 0;
 	pi->barrelModel = 0;
@@ -73,20 +77,11 @@ tryagain:
 		return;
 	}
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	pi->weaponModel = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[0]->model);
 	pi->weaponModel2 = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[1]->model);
 #else
-#ifdef TMNTWEAPSYS_2
-	item = BG_ItemForItemNum(0);
-	for (i = NUM_BG_ITEMS-1; i > 0; i--)
-	{
-		item = BG_ItemForItemNum(i);
-		if (!item->classname)
-			continue;
-#else
 	for ( item = bg_itemlist + 1; item->classname ; item++ ) {
-#endif
 		if ( item->giType != IT_WEAPON ) {
 			continue;
 		}
@@ -96,61 +91,24 @@ tryagain:
 	}
 
 	if ( item->classname ) {
-#ifdef TMNTWEAPSYS
-		if (item->world_model[2]) {
-			pi->weaponModel = trap_R_RegisterModel( item->world_model[2] );
-		}
-		else {
 		pi->weaponModel = trap_R_RegisterModel( item->world_model[0] );
 	}
-
-		if (item->world_model[3]) {
-			pi->weaponModel2 = trap_R_RegisterModel( item->world_model[3] );
-		}
-		else {
-			pi->weaponModel2 = pi->weaponModel;
-		}
-#else
-		pi->weaponModel = trap_R_RegisterModel( item->world_model[0] );
-#endif
-	}
-#endif
 
 	if( pi->weaponModel == 0 ) {
-#if defined TMNTPLAYERSYS && defined TMNTWEAPSYS
-		if( weaponNum == pi->playercfg.default_weapon ) {
-			weaponNum = WP_NONE;
-			goto tryagain;
-		}
-		weaponNum = pi->playercfg.default_weapon;
-#elif defined TMNTWEAPONS
-		if( weaponNum == WP_GUN ) {
-			weaponNum = WP_NONE;
-			goto tryagain;
-		}
-		weaponNum = WP_GUN;
-#else
 		if( weaponNum == WP_MACHINEGUN ) {
 			weaponNum = WP_NONE;
 			goto tryagain;
 		}
 		weaponNum = WP_MACHINEGUN;
-#endif
 		goto tryagain;
 	}
 
-#ifndef TMNTWEAPSYS_2
 	if ( weaponNum == WP_MACHINEGUN || weaponNum == WP_GAUNTLET || weaponNum == WP_BFG )
 #endif
 	{
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[0]->model );
 #else
-#ifdef TMNTWEAPSYS
-		if (item->world_model[2])
-			strcpy( path, item->world_model[2] );
-		else
-#endif
 		strcpy( path, item->world_model[0] );
 #endif
 		COM_StripExtension( path, path, sizeof(path) );
@@ -158,26 +116,20 @@ tryagain:
 		pi->barrelModel = trap_R_RegisterModel( path );
 	}
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	strcpy( path, bg_weapongroupinfo[weaponNum].weapon[0]->model );
 #else
-#ifdef TMNTWEAPSYS
-	if (item->world_model[2]) {
-		strcpy( path, item->world_model[2] );
-	}
-	else
-#endif
 	strcpy( path, item->world_model[0] );
 #endif
 	COM_StripExtension( path, path, sizeof(path) );
 	strcat( path, "_flash.md3" );
 	pi->flashModel = trap_R_RegisterModel( path );
 
-#ifdef TMNTWEAPSYS_2
-		MAKERGB( pi->flashDlightColor,
-				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[0],
-				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[1],
-				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[2] );
+#ifdef TMNTWEAPSYS
+	MAKERGB( pi->flashDlightColor,
+			bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[0],
+			bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[1],
+			bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[2] );
 #else
 	switch( weaponNum ) {
 	case WP_GAUNTLET:
@@ -646,6 +598,7 @@ static void UI_PlayerAnimation( playerInfo_t *pi, int *legsOld, int *legs, float
 }
 
 
+#ifndef IOQ3ZTM // BG_SWING_ANGLES
 /*
 ==================
 UI_SwingAngles
@@ -706,6 +659,7 @@ static void UI_SwingAngles( float destination, float swingTolerance, float clamp
 		*angle = AngleMod( destination + (clampTolerance - 1) );
 	}
 }
+#endif
 
 
 /*
@@ -777,7 +731,8 @@ static void UI_PlayerAngles( playerInfo_t *pi, vec3_t legs[3], vec3_t torso[3], 
 #else
 		TORSO_STAND
 #endif
-		  ) {
+		)
+	{
 		// if not standing still, always point all in the same direction
 		pi->torso.yawing = qtrue;	// always center
 		pi->torso.pitching = qtrue;	// always center
@@ -791,8 +746,13 @@ static void UI_PlayerAngles( playerInfo_t *pi, vec3_t legs[3], vec3_t torso[3], 
 
 
 	// torso
+#ifdef IOQ3ZTM // BG_SWING_ANGLES
+	BG_SwingAngles( torsoAngles[YAW], 25, 90, BG_SWINGSPEED, &pi->torso.yawAngle, &pi->torso.yawing, uis.frametime );
+	BG_SwingAngles( legsAngles[YAW], 40, 90, BG_SWINGSPEED, &pi->legs.yawAngle, &pi->legs.yawing, uis.frametime );
+#else
 	UI_SwingAngles( torsoAngles[YAW], 25, 90, SWINGSPEED, &pi->torso.yawAngle, &pi->torso.yawing );
 	UI_SwingAngles( legsAngles[YAW], 40, 90, SWINGSPEED, &pi->legs.yawAngle, &pi->legs.yawing );
+#endif
 
 	torsoAngles[YAW] = pi->torso.yawAngle;
 	legsAngles[YAW] = pi->legs.yawAngle;
@@ -805,7 +765,11 @@ static void UI_PlayerAngles( playerInfo_t *pi, vec3_t legs[3], vec3_t torso[3], 
 	} else {
 		dest = headAngles[PITCH] * 0.75;
 	}
+#ifdef IOQ3ZTM // BG_SWING_ANGLES
+	BG_SwingAngles( dest, 15, 30, 0.1f, &pi->torso.pitchAngle, &pi->torso.pitching, uis.frametime );
+#else
 	UI_SwingAngles( dest, 15, 30, 0.1f, &pi->torso.pitchAngle, &pi->torso.pitching );
+#endif
 	torsoAngles[PITCH] = pi->torso.pitchAngle;
 
 	// pull the angles back out of the hierarchial chain
@@ -917,7 +881,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		pi->lastWeapon = pi->pendingWeapon;
 		pi->pendingWeapon = -1;
 		pi->weaponTimer = 0;
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 		if( pi->currentWeapon != pi->weapon ) {
 			trap_S_StartLocalSound( weaponChangeSound, CHAN_LOCAL );
 		}
@@ -1065,7 +1029,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	//
 	// add the spinning barrel
 	//
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if ( pi->barrelModel ) {
 #else
 	if ( pi->realWeapon == WP_MACHINEGUN || pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG ) {
@@ -1077,7 +1041,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		barrel.renderfx = renderfx;
 
 		barrel.hModel = pi->barrelModel;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		VectorClear(angles);
 		if (bg_weapongroupinfo[pi->realWeapon].weapon[0]->barrelSpin != BS_NONE)
 		{
@@ -1473,8 +1437,6 @@ void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model ) {
 	UI_RegisterClientModelname( pi, model );
 #if defined TMNTPLAYERSYS && defined TMNTWEAPSYS
 	pi->weapon = pi->playercfg.default_weapon;
-#elif defined TMNTWEAPONS
-	pi->weapon = WP_GUN;
 #else
 	pi->weapon = WP_MACHINEGUN;
 #endif
@@ -1592,7 +1554,7 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 		torsoAnim = BG_TorsoAttackForWeapon(weaponNum);
 		if (!BG_WeapTypeIsMelee(BG_WeaponTypeForNum(weaponNum)))
 		{
-		pi->muzzleFlashTime = dp_realtime + UI_TIMER_MUZZLE_FLASH;
+			pi->muzzleFlashTime = dp_realtime + UI_TIMER_MUZZLE_FLASH;
 		}
 		//FIXME play firing sound here
 	}

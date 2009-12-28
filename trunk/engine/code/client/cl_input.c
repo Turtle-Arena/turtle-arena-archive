@@ -759,7 +759,7 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	int		i;
 
 	// copy the state that the cgame is currently sending
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 #ifdef TMNTHOLDSYS/*2*/
 	cmd->holdable = cl.cgameUserCmdValue;
 #endif

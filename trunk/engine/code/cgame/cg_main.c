@@ -94,16 +94,12 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 cg_t				cg;
 cgs_t				cgs;
 centity_t			cg_entities[MAX_GENTITIES];
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 projectileInfo_t	cg_projectiles[MAX_BG_PROJ];
 weaponInfo_t		cg_weapons[MAX_BG_WEAPONS];
 weaponGroupInfo_t	cg_weapongroups[MAX_BG_WEAPON_GROUPS];
 #else
-#ifdef TMNTWEAPSYS
-weaponInfo_t		cg_weapons[WP_NUM_WEAPONS];
-#else
 weaponInfo_t		cg_weapons[MAX_WEAPONS];
-#endif
 #endif
 itemInfo_t			cg_items[MAX_ITEMS];
 #ifdef TMNTNPCSYS
@@ -161,7 +157,7 @@ vmCvar_t	cg_gun_z;
 vmCvar_t	cg_tracerChance;
 vmCvar_t	cg_tracerWidth;
 vmCvar_t	cg_tracerLength;
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 vmCvar_t	cg_autoswitch;
 #endif
 vmCvar_t	cg_ignore;
@@ -249,7 +245,7 @@ typedef struct {
 
 static cvarTable_t cvarTable[] = {
 	{ &cg_ignore, "cg_ignore", "0", 0 },	// used for debugging
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
 #endif
 #ifdef TMNT // First person weapons are currently unsupported.
@@ -621,7 +617,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 	char			*s, *start;
 	int				len;
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[ itemNum ];
@@ -864,8 +860,8 @@ static void CG_RegisterSounds( void ) {
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
 
-#ifdef TMNTWEAPSYS_2
-	for ( i = 1 ; i < NUM_BG_ITEMS ; i++ )
+#ifdef TMNTWEAPSYS
+	for ( i = 1 ; i < BG_NumItems() ; i++ )
 #else
 	for ( i = 1 ; i < bg_numItems ; i++ )
 #endif
@@ -894,7 +890,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.laserShurikenSound = trap_S_RegisterSound ("sound/items/use_lasershuriken.wav", qfalse);
 #endif
 	cgs.media.quadSound = trap_S_RegisterSound("sound/items/damage3.wav", qfalse);
-#ifndef TMNTWEAPSYS_2
+#ifndef TMNTWEAPSYS
 	cgs.media.sfx_ric1 = trap_S_RegisterSound ("sound/weapons/machinegun/ric1.wav", qfalse);
 	cgs.media.sfx_ric2 = trap_S_RegisterSound ("sound/weapons/machinegun/ric2.wav", qfalse);
 	cgs.media.sfx_ric3 = trap_S_RegisterSound ("sound/weapons/machinegun/ric3.wav", qfalse);
@@ -1057,15 +1053,11 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.smokePuffShader = trap_R_RegisterShader( "smokePuff" );
 	cgs.media.smokePuffRageProShader = trap_R_RegisterShader( "smokePuffRagePro" );
 	cgs.media.shotgunSmokePuffShader = trap_R_RegisterShader( "shotgunSmokePuff" );
+#ifndef TMNTWEAPSYS
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPSYS_2
 	cgs.media.nailPuffShader = trap_R_RegisterShader( "nailtrail" );
-#ifndef TMNTWEAPSYS_2
 	cgs.media.blueProxMine = trap_R_RegisterModel( "models/weaphits/proxmineb.md3" );
 #endif
-#endif
-#endif
-#ifndef TMNTWEAPSYS_2
 	cgs.media.plasmaBallShader = trap_R_RegisterShader( "sprites/plasma1" );
 #endif
 #ifndef NOTRATEDM // No gibs.
@@ -1298,7 +1290,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.meleeHit3Shader = trap_R_RegisterShader( "meleeHit3" );
 #endif
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 #ifdef MISSIONPACK
 	// Load explosion model and shader for Obelisk death.
 	if ( cgs.gametype == GT_OBELISK || cg_buildScript.integer ) {
@@ -1387,7 +1379,7 @@ static void CG_RegisterGraphics( void ) {
 
 
 	memset( cg_items, 0, sizeof( cg_items ) );
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	memset( cg_projectiles, 0, sizeof( cg_projectiles ) );
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );
 	memset( cg_weapongroups, 0, sizeof( cg_weapongroups ) );
@@ -1398,8 +1390,8 @@ static void CG_RegisterGraphics( void ) {
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
 
-#ifdef TMNTWEAPSYS_2
-	for ( i = 1 ; i < NUM_BG_ITEMS ; i++ )
+#ifdef TMNTWEAPSYS
+	for ( i = 1 ; i < BG_NumItems() ; i++ )
 #else
 	for ( i = 1 ; i < bg_numItems ; i++ )
 #endif
@@ -2291,7 +2283,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( &cgs, 0, sizeof( cgs ) );
 	memset( &cg, 0, sizeof( cg ) );
 	memset( cg_entities, 0, sizeof(cg_entities) );
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	memset( cg_projectiles, 0, sizeof( cg_projectiles ) );
 	memset( cg_weapons, 0, sizeof( cg_weapons ) );
 	memset( cg_weapongroups, 0, sizeof( cg_weapongroups ) );
@@ -2324,12 +2316,11 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 #ifdef TMNTHOLDSYS/*2*/
 	cg.holdableSelect = HI_NO_SELECT;
 #endif
-#ifdef TMNTWEAPSYS
-	// Turtle Man: Select our default weapon.
-	// DEFAULT_DEFAULT_WEAPON
+#if defined TMNTPLAYERSYS && defined TMNTWEAPSYS // DEFAULT_DEFAULT_WEAPON
+	// Select our default weapon.
 	cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
-#ifdef TMNTWEAPSYS2
-	cg.predictedPlayerState.stats[STAT_NEWWEAPON] = cg.predictedPlayerState.stats[ STAT_DEFAULTWEAPON ];
+#ifdef TMNTWEAPSYS_EX
+	cg.predictedPlayerState.stats[STAT_NEWWEAPON] = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #else
 	cg.weaponSelect = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #endif
@@ -2390,7 +2381,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	cg.loading = qtrue;		// force players to load instead of defer
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	CG_LoadingString( "weapons" );
 
 	BG_InitWeaponInfo();

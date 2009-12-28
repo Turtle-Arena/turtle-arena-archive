@@ -474,7 +474,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case BOTLIB_START_FRAME:
 		return botlib_export->BotLibStartFrame( VMF(1) );
 	case BOTLIB_LOAD_MAP:
-#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
 		return botlib_export->BotLibLoadMap( VMA(1), /*(bot_shareditem_t *)*/VMA(2) );
 #else
 		return botlib_export->BotLibLoadMap( VMA(1) );
@@ -600,7 +600,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		botlib_export->ea.EA_MoveRight( args[1] );
 		return 0;
 
-#ifdef TMNTWEAPSYS2 // BOTLIB
+#ifdef TMNTWEAPSYS_EX // BOTLIB
 	case BOTLIB_EA_DROP_WEAPON:
 		botlib_export->ea.EA_DropWeapon( args[1] );
 		return 0;
@@ -752,7 +752,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		botlib_export->ai.BotSetAvoidGoalTime( args[1], args[2], VMF(3));
 		return 0;
 	case BOTLIB_AI_INIT_LEVEL_ITEMS:
-#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
 		Com_Printf("BOTLIB_AI_INIT_LEVEL_ITEMS is unsupported!\n");
 #else
 		botlib_export->ai.BotInitLevelItems();
@@ -813,7 +813,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		botlib_export->ai.BotInitMoveState( args[1], VMA(2) );
 		return 0;
 
-#ifndef TMNTWEAPSYS_2_NOCOMPAT
+#ifndef TMNTWEAPSYS_NOCOMPAT
 	case BOTLIB_AI_CHOOSE_BEST_FIGHT_WEAPON:
 		return botlib_export->ai.BotChooseBestFightWeapon( args[1], VMA(2) );
 	case BOTLIB_AI_GET_WEAPON_INFO:

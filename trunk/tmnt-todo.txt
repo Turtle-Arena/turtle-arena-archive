@@ -23,15 +23,18 @@ STARTED: [todo] Change TMNTWEAPONS stuff that is system to TMNTWEAPSYS[|2|_2]
 : Cleaned up TMNTWEAPONS, it no longer adds weapon code that isn't used when TMNTWEAPSYS_2 is defined.
 :  Could use more cleaning?
 
-[todo] Merge TMNTWEAPSYS_2 into TMNTWEAPSYS (Then I can remove the code that TMNTWEAPSYS_2 disables, etc)
-: Remake all of the Q3/Team Arena weapons using the script code first?
+STARTED [todo] Merge TMNTWEAPSYS_2 with TMNTWEAPSYS
+: (Then I can remove the code that TMNTWEAPSYS_2 disables, etc)
 
 STARTED ( TMNTWEAPSYS_2 ): [todo] Weapons Info System redesign.
-: Reduce weapontype_t enum to be (WT_NONE, WT_GAUNTLET (cross of gun and melee), WT_GUN, WT_MELEE). Have "weaponinfo" (weapontype, mod, (blade)damage, (blade)trail, sounds, bit-flags, "blades" (points of damage/trail), wallmark, wallhit sounds) and "weapongroup" (pointers to "weaponinfo"s, player animations, animations when holding CTF flag, combo/chain limits, ???). "weapon_t" enum would index "weapon groups".
-* It is working, still need to generalize all of the weapons so that there is no WP_* enum.
-: I disabled the WP_*s but some of the Team Arena weapon code had to be disabled as well.
-** DONE: Spawn weapon items from weaponinfo.txt, instead of hardcoded weapon items.
-* Spawn Ammo items from weaponinfo.txt, instead of hardcoded ammo items.
+: Reduce weapontype_t enum.
+: "weaponinfo" (weapontype, sounds, blades" (points of damage/trail), wallmark, wallhit sounds)
+: "weapongroup" (pointers to "weaponinfo"s, player animations, ...).
+: "weapon_t" enum would index "weapon groups".
+* DONE: Spawn weapon items from weaponinfo.txt, instead of hardcoded weapon items.
+* The Team Arena weapons aren't fully supported.
+
+[todo] Spawn Ammo items from weaponinfo.txt, instead of hardcoded ammo items.
 : If I make it so weapon/ammo items are in text files, should I have all items in iteminfo.txt (and *.item) too?...
 
 [todo] Have weapons be seperate entities (ET_WEAPON) from the player,
@@ -63,6 +66,9 @@ STARTED ( TMNTWEAPSYS_2 ): [todo] Weapons Info System redesign.
 : Using a special model for collision we could use group names to set what part of player is hit,
 :   so shell takes less damage, banndana takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
 
+[todo] Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
+: Logic-wise tag_hand_* make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
+
 // weapon-weights
 DONE: [todo] Remove the need for fuzw.c
 [todo-after-above] Fix up new weapon weight system.
@@ -72,8 +78,7 @@ DONE: [todo] Remove the need for fuzw.c
 [todo] Remove the need for weapons in fuzi.c
 : Load weapon item weights from weaponinfo.txt and .weap files or create weight from loaded info.
 
-WONTDO?: [todo] Allow setting the names of the bots favorite weapons? Casey likes bat/hockey stick/etc? Leo likes swords?
-
+[todo] Check if "TMNTWEAPSYS // BOT_ITEM_INFOS" breaks compatibility with q3 mods.
 
 // non-weapon or attacking...
 
@@ -127,10 +132,8 @@ BETTER(not done?): When moving the camera around the player, focus on the player
 ** Set voicechat filename and soundpath in "head.cfg" in player head directory. Head animations would go in it as well.
 *** Or Load it from animation.cfg and allow loading 2 animation.cfg files for each player, one for body and one for head.
 
-[todo] Rewrite player Upper, Lower, and Both animations ( TMNTPLAYERSYS_2 )
-: Allow all animations to be anytype (Upper, lower, or both), when changing to a animations use "STAND" (instead of "TORSO_STAND") and check for BOTH_STAND if not found try TORSO_STAND AND LEGS_STAND.
-: OR add MD5 model support (MD5 use single model and skeleton, the animations can move any part of the model, and multiple animations can 'run' at the same time.)
-:      Downside to MD5, no head model to change to and fro and HUD head, etc?
+[todo] Add MD5 model support (MD5 use single model and skeleton, the animations can move any part of the model, and multiple animations can 'run' at the same time.)
+:      Downside to MD5, no head model to change to and fro and HUD head, etc? (I could have it seperate I want).
 
 [todo] Finish misc_object, with animation, triggering, taking-damage, and dieing.
 : Maybe with spawning a item on death, respawning, and pushable options.

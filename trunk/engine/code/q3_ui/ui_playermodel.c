@@ -191,9 +191,7 @@ static void PlayerModel_UpdateModel( void )
 
 	UI_PlayerInfo_SetModel( &s_playermodel.playerinfo, s_playermodel.modelskin );
 #ifdef TMNTWEAPSYS
-	//Com_Printf("PlayerModel_UpdateModel: pre-weapon=%i\n", s_playermodel.playerinfo.weapon);
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playermodel.playerinfo.weapon), viewangles, moveangles, s_playermodel.playerinfo.weapon, qfalse );
-	//Com_Printf("PlayerModel_UpdateModel: after-weapon=%i\n", s_playermodel.playerinfo.weapon);
 #else
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, WP_MACHINEGUN, qfalse );
 #endif

@@ -179,13 +179,8 @@ static void G_NPC_Die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 	}
 
 	// Drop weapon
-	if ((self->s.weapon > WP_NONE && self->s.weapon <
-#ifdef TMNTWEAPSYS_2
-		BG_NumWeaponGroups()
-#else
-		WP_NUM_WEAPONS
-#endif
-		) && !(self->bgNPC.info->flags & NPCF_NODROPWEAPON))
+	if ((self->s.weapon > WP_NONE && self->s.weapon < BG_NumWeaponGroups())
+		&& !(self->bgNPC.info->flags & NPCF_NODROPWEAPON))
 	{
 		gitem_t *item = BG_FindItemForWeapon( self->s.weapon );
 		Drop_Item(self, item, 0);

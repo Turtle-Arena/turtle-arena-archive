@@ -764,13 +764,13 @@ static void CG_DrawStatusBar( void ) {
 
 	// LINE3: Weapon
 	if ( cent->currentState.weapon ) {
-#ifdef TMNTWEAPSYS2
+#ifdef TMNTWEAPSYS_EX
 		value = ps->stats[STAT_AMMO];
 #else
 		value = ps->ammo[cent->currentState.weapon];
 #endif
 		// Draw weapon icon
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 		if ( cg_weapongroups[cent->currentState.weapon].weaponIcon ) {
 			CG_DrawPic( x, y, ICON_SIZE, ICON_SIZE,
 				cg_weapongroups[cent->currentState.weapon].weaponIcon );
@@ -826,7 +826,7 @@ static void CG_DrawStatusBar( void ) {
 		// draw value
 
 		{
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			int giveQuantity = BG_ItemForItemNum(value)->quantity;
 #else
 			int giveQuantity = bg_itemlist[ value ].quantity;
@@ -884,7 +884,7 @@ static void CG_DrawStatusBar( void ) {
 	VectorClear( angles );
 
 	// draw any 3D icons first, so the changes back to 2D are minimized
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	if ( cent->currentState.weapon && cg_weapongroups[ cent->currentState.weapon ].ammoModel )
 #else
 	if ( cent->currentState.weapon && cg_weapons[ cent->currentState.weapon ].ammoModel )
@@ -895,7 +895,7 @@ static void CG_DrawStatusBar( void ) {
 		origin[2] = 0;
 		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
 		CG_Draw3DModel( CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE,
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 					   cg_weapongroups[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
 #else
 					   cg_weapons[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
@@ -948,7 +948,7 @@ static void CG_DrawStatusBar( void ) {
 			if ( !cg_draw3dIcons.integer && cg_drawIcons.integer ) {
 				qhandle_t	icon;
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 				icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].ammoIcon;
 #else
 				icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
@@ -1001,7 +1001,7 @@ static void CG_DrawStatusBar( void ) {
 }
 #endif // MISSIONPACK_HUD
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 // Left middle
 /*
 ================
@@ -1310,7 +1310,7 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 			// draw weapon icon
 			xx += TINYCHAR_WIDTH * 3;
 
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
 				CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
 					cg_weapongroups[ci->curWeapon].weaponIcon );
@@ -1721,7 +1721,7 @@ CG_DrawPickupItem
 static int CG_DrawPickupItem( int y ) {
 	int		value;
 	float	*fadeColor;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	gitem_t *item;
 #endif
 
@@ -1732,19 +1732,13 @@ static int CG_DrawPickupItem( int y ) {
 	y -= ICON_SIZE;
 
 	value = cg.itemPickup;
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 	item = BG_ItemForItemNum(value);
 	if (item && item->giType == IT_WEAPON
 		&& item->giTag == WP_DEFAULT)
 	{
 		item = BG_FindItemForWeapon(cgs.clientinfo[cg.snap->ps.clientNum].playercfg.default_weapon);
 		value = ITEM_INDEX(item);
-	}
-#elif defined TMNTWEAPSYS // When pickup default weapon remap to correct weapon.
-	if (value && bg_itemlist[ value ].giType == IT_WEAPON
-		&& bg_itemlist[ value ].giTag == WP_DEFAULT)
-	{
-		value = ITEM_INDEX(BG_FindItemForWeapon(cgs.clientinfo[cg.snap->ps.clientNum].playercfg.default_weapon));
 	}
 #endif
 	if ( value ) {
@@ -1753,7 +1747,7 @@ static int CG_DrawPickupItem( int y ) {
 			CG_RegisterItemVisuals( value );
 			trap_R_SetColor( fadeColor );
 			CG_DrawPic( 8, y, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			CG_DrawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), item->pickup_name, fadeColor[0] );
 #else
 			CG_DrawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), bg_itemlist[ value ].pickup_name, fadeColor[0] );
@@ -3052,7 +3046,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			CG_DrawStatusBar();
 #endif
       
-#ifdef TMNTWEAPSYS_2
+#ifdef TMNTWEAPSYS
 			CG_DrawMeleeChain();
 #endif
 
@@ -3066,7 +3060,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			if(stereoFrame == STEREO_CENTER)
 				CG_DrawCrosshair();
 			CG_DrawCrosshairNames();
-#ifndef TMNTWEAPSYS2
+#ifndef TMNTWEAPSYS_EX
 			CG_DrawWeaponSelect();
 #endif
 
