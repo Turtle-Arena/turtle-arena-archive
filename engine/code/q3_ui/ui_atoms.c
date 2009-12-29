@@ -1040,6 +1040,11 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		UI_StageMenu_f();
 		return qtrue;
 	}
+
+	if ( Q_stricmp (cmd, "customgame") == 0 ) {
+		UI_StartServerMenu( qfalse );
+		return qtrue;
+	}
 #endif
 
 	if ( Q_stricmp (cmd, "levelselect") == 0 ) {
