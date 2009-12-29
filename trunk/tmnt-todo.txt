@@ -19,8 +19,7 @@ Bugs that have found that have not been fixed yet, and things that should to be 
 	(like CTF flag)
 * Base on weapon barrel code.
 
-STARTED: [todo] Change TMNTWEAPONS stuff that is system to TMNTWEAPSYS[|2|_2]
-: Cleaned up TMNTWEAPONS, it no longer adds weapon code that isn't used when TMNTWEAPSYS_2 is defined.
+STARTED: [todo] Change TMNTWEAPONS stuff that is system to TMNTWEAPSYS[|_EX]
 :  Could use more cleaning?
 
 STARTED [todo] Merge TMNTWEAPSYS_2 with TMNTWEAPSYS
@@ -68,6 +67,8 @@ STARTED ( TMNTWEAPSYS_2 ): [todo] Weapons Info System redesign.
 
 [todo] Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
 : Logic-wise tag_hand_* make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
+
+[bug] Ejects smoke underwater
 
 // weapon-weights
 DONE: [todo] Remove the need for fuzw.c

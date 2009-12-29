@@ -142,17 +142,26 @@ UI_SPPostgameMenu_NextEvent
 =================
 */
 static void UI_SPPostgameMenu_NextEvent( void* ptr, int event ) {
+#ifndef TMNTSP
 	int			currentSet;
 	int			levelSet;
 	int			level;
 	int			currentLevel;
 	const char	*arenaInfo;
+#endif
 
 	if (event != QM_ACTIVATED) {
 		return;
 	}
 	UI_PopMenu();
 
+#ifdef TMNTSP
+	if (trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER) {
+		trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
+		return;
+	}
+	trap_Cmd_ExecuteText( EXEC_APPEND, "vstr nextmap\n" );
+#else
 	// handle specially if we just won the training map
 	if( postgameMenuInfo.won == 0 ) {
 		level = 0;
@@ -178,6 +187,7 @@ static void UI_SPPostgameMenu_NextEvent( void* ptr, int event ) {
 	}
 
 	UI_SPArena_Start( arenaInfo );
+#endif
 }
 
 
@@ -192,6 +202,14 @@ static void UI_SPPostgameMenu_MenuEvent( void* ptr, int event )
 		return;
 	}
 	UI_PopMenu();
+#ifdef TMNTSP
+	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 2) {
+		trap_Cvar_Set("ui_singlePlayerActive", "0");
+		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; customgame\n" );
+		return;
+	}
+	trap_Cvar_Set("ui_singlePlayerActive", "0");
+#endif
 	trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; levelselect\n" );
 }
 
@@ -523,6 +541,13 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_next.width				= 128;
 	postgameMenuInfo.item_next.height				= 64;
 	postgameMenuInfo.item_next.focuspic				= ART_NEXT1;
+
+#ifdef TMNTSP
+	if (trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER) {
+		postgameMenuInfo.item_next.generic.name			= ART_REPLAY0;
+		postgameMenuInfo.item_next.focuspic				= ART_REPLAY1;
+	}
+#endif
 
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_menu );
 #ifndef TMNTSP

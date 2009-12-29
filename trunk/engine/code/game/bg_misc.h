@@ -501,6 +501,7 @@ typedef enum
 // WP_DEFAULT will need to be remapped to the default weapon.
 #define WP_DEFAULT	-1
 #define WP_NONE		0
+#define weapon_t	int
 #else
 typedef enum {
 	WP_NONE,

@@ -43,7 +43,11 @@ int demo_protocols[] =
 
 #define MIN_DEDICATED_COMHUNKMEGS 1
 #define MIN_COMHUNKMEGS		56
+#ifdef TMNT // Turtle Man: Some maps need more then 64 Megs of RAM to load.
+#define DEF_COMHUNKMEGS		76
+#else
 #define DEF_COMHUNKMEGS		64
+#endif
 #define DEF_COMZONEMEGS		24
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)

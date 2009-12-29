@@ -1244,7 +1244,9 @@ void BeginIntermission( void ) {
 
 #ifdef MISSIONPACK
 	if (g_singlePlayer.integer) {
+#ifndef TMNTSP
 		trap_Cvar_Set("ui_singlePlayerActive", "0");
+#endif
 		UpdateTournamentInfo();
 	}
 #else
