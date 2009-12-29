@@ -45,8 +45,6 @@ cvar_t	*r_ignoreFastPath;
 cvar_t	*r_verbose;
 cvar_t	*r_ignore;
 
-cvar_t	*r_displayRefresh;
-
 cvar_t	*r_detailTextures;
 
 cvar_t	*r_znear;
@@ -1029,8 +1027,6 @@ void R_Register( void )
 	//
 	// temporary latched variables that can only change over a restart
 	//
-	r_displayRefresh = ri.Cvar_Get( "r_displayRefresh", "0", CVAR_LATCH );
-	ri.Cvar_CheckRange( r_displayRefresh, 0, 200, qtrue );
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", CVAR_LATCH|CVAR_CHEAT );
 #ifdef TMNTMISC // Default "r_mapOverBrightBits" to 1.
 	r_mapOverBrightBits = ri.Cvar_Get ("r_mapOverBrightBits", "1", CVAR_LATCH );
