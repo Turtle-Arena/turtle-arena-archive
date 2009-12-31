@@ -809,7 +809,7 @@ Index: src/libmm3d/md3filter.cc
        {
           if (  m_model->getPointByName( "tag_torso" )  < 0
 +#ifdef TMNT // TMNT supports using tag_hand_primary as well as tag_weapon ...
-+            || (m_model->getPointByName( "tag_weapon" ) < 0 || m_model->getPointByName( "tag_hand_primary" ) < 0)
++            || (m_model->getPointByName( "tag_weapon" ) < 0 && m_model->getPointByName( "tag_hand_primary" ) < 0)
 +#else
              || m_model->getPointByName( "tag_weapon" ) < 0
 +#endif

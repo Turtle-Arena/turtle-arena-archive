@@ -9,8 +9,6 @@ Bugs that have found that have not been fixed yet, and things that should to be 
 
 == engine ==
 
-[todo] Review the changes from ioquake3, checking for errors and undoing unneeded changes to syntax.
-
 // Weapons! (and attacking)
 [todo] Allow using two guns at once and fix weapon hand offset stuff (like brass eject code and EV_RAILTRAIL) etc.
 : Fire both at the same time or switch between them?
@@ -41,6 +39,9 @@ STARTED ( TMNTWEAPSYS_2 ): [todo] Weapons Info System redesign.
 		and do collision so that weapons don't go into the wall. (And bounce back if you hit the wall?)
 [todo-after-above] Add a option to weapon group info to hold a weapon upside-down.
 
+[todo after ET_WEAPON] "Weapon Surface flags" so metal rubbing on metal makes sparks and stuff?
+: Guns too? (Running next to a wall and gun is touching wall make sparks and wall marks O.O; )
+
 [todo] Weapon trails; Every-so-often while attacking send EV_TRAIL_POS with the clientnum, trailnum,
 	and trail base and top origins.
 		When the trail end send EV_TRAIL_END clientnum and trailnum, so the next trail doesn't connect to last trail.
@@ -49,11 +50,8 @@ STARTED ( TMNTWEAPSYS_2 ): [todo] Weapons Info System redesign.
 
 [todo] Attack movement flags. Stop, cut speed in half, double speed, turn right?, etc.
 
-[todo] Sword melee weapon bitflag, allow swords to cut things no one else can. (WIF_CUT?)
-: So Leo can get places no one else can.
-
-[todo] "Weapon Surface flags" so metal rubbing on metal makes sparks and stuff?
-: Guns too? (Running next to a wall and gun is touching wall make sparks and wall marks O.O; )
+STARTED: [todo] Sword melee weapon bitflag, allow swords to cut things no one else can. (WIF_CUTS)
+: So Leo (and other players with swords) can get places no one else can.
 
 [bug] When kicking a player out of the game (that is using a grapple) their grapple chain is left behind!
 
@@ -68,7 +66,6 @@ STARTED ( TMNTWEAPSYS_2 ): [todo] Weapons Info System redesign.
 [todo] Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
 : Logic-wise tag_hand_* make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
 
-[bug] Ejects smoke underwater
 
 // weapon-weights
 DONE: [todo] Remove the need for fuzw.c
@@ -83,7 +80,7 @@ DONE: [todo] Remove the need for fuzw.c
 
 // non-weapon or attacking...
 
-[todo] Add optional run animations for torso?
+[todo] Add optional run animations for torso
 
 [todo] Finish new path system "g_paths.c" for movers (trains), NPCs?, (and hopefully players; cutscenes?, NiGHTS mode!)
 
@@ -96,7 +93,7 @@ DONE: [todo] Remove the need for fuzw.c
 [bug] cg_shadows 2 doesn't work if config is changed from default config?
 : Which cvar is the problem?
 
-[todo] Pull grapple back to player before removing entity, like LoZ: TP?
+[todo] Pull grapple back to player before removing entity like LoZ: TP?
 
 [bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects
 		and if PW_FLASHING wheres off they get stuck in the object.
@@ -134,7 +131,6 @@ BETTER(not done?): When moving the camera around the player, focus on the player
 *** Or Load it from animation.cfg and allow loading 2 animation.cfg files for each player, one for body and one for head.
 
 [todo] Add MD5 model support (MD5 use single model and skeleton, the animations can move any part of the model, and multiple animations can 'run' at the same time.)
-:      Downside to MD5, no head model to change to and fro and HUD head, etc? (I could have it seperate I want).
 
 [todo] Finish misc_object, with animation, triggering, taking-damage, and dieing.
 : Maybe with spawning a item on death, respawning, and pushable options.
@@ -149,15 +145,12 @@ BETTER(not done?): When moving the camera around the player, focus on the player
 ** http://wop-engine.svn.sourceforge.net/viewvc/wop-engine?view=rev&revision=82
 
 === Testing! ===
-DONE(untested)?: Melee combo system, with different animations for each attack? (TMNTWEAPSYS_2)
+DONE(untested)?: Melee combo system, with different animations for each attack? (TMNTWEAPSYS)
 
 [todo] Test/use the "noise" and "random" waveforms that I copied from IOSTVEF
 
 === Don't do? (Dead Ideas?) ===
 [todo] Feet tags, for attack checking? And/or for attaching hoverboard to player?
-
-[todo] Get code/ogg and code/vobis from XReal? (Ogg vorbis works but should the code for it be in our source? Lke jpeg/speex/etc)
-: It works fine the way it is, but may not be "correct"?
 
 [todo] Use vertex lighting on misc_model entities? http://xreal.svn.sourceforge.net/viewvc/xreal?view=rev&revision=3049
 : Turtle Man: I could add a option so use vertex lighting, but normally use lightmapping?
@@ -173,16 +166,12 @@ WONTFIX?: [bug/todo] First Person weapon doesn't draw correctly (It draws too ne
 [todo] Allow multiple Announcers? Have a cg_announcer cvar { "none", "male", "female", etc } to control voice chat file.
 
 === Done? ===
-DONE?: TMNTWEAPSYS_2 weapon_random entity that spawns a random weapon each time the weapon respawns
+DONE?: TMNTWEAPSYS weapon_random entity that spawns a random weapon each time the weapon respawns
 		: Only spawn weapons with a classname, have flags for melee and gun weapon spawning.
 [todo] ...also allow list of weapons in message field?
 
-DONE (misc_shooter): TMNTWEAPSYS_2: Have only one shooter_* and use "message" field for weapon [group?] name.
-[todo] Currently it would be hard, but have misc_shooter use projectile name instead of weapopn group
-* It reuses player firing code (CG_FireWeapon) which needs weapon group, and firing sounds are part of weapon group.
-
 DONE: Allow mover entites to be killed (set health in entity)
-[todo] ...and spawn glass and/or other materials on death.
+[todo] Spawn glass and/or other materials on death of mover entities.
 
 DONE-ish?: Use freetype for TTF rendering, instead of q3font.exe's output files of a TTF. (Almost completed in Xreal)
 : Well I no longer need q3font.exe, as copied/fixed the freetype code (Also support in console and hud consoles lines)
@@ -223,12 +212,7 @@ DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
 : Casey's swinging isn't that bad, but Raph's swinging sure is.
 
 ==== Raph =====
-[todo] I *need* to finish (make look nice) Raph's mesh and skin, so I can begin re-rigging and re-animating.
-
-[todo] Rerigging Raph's model.
-[bug -fix by above] Raph's torso_attack_gun only the head moves (Need to remake the skeleton...)
-
-[todo] Reanimate Raph.
+[todo] Animate raph_v9.mm3d
 
 ==== Casey =====
 [todo] Finish Casey Jones model mesh

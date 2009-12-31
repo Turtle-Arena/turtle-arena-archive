@@ -1,9 +1,7 @@
-May 14, 2009 ~ZTurtleMan
-DONE: I need to reskin the head model
-DONE: Have eyes on image, but have them as there own mesh for $whitemap and not lightmap?
-DONE (Well its skinned...): Finish carapace (shell back) mesh and skin it.
-DONE: I would like to have the torso use "mirror skining" see tmnt-editing-players.txt.
-DONE: Had to split hands into there own meshes (In .mmd3 and .md3), now its done in the Wings3D raph_v9 file too.
-
 raph_v8 is the current model in base. raph_v9 is the work-in-progress to fix and improve the model.
 
+raph_v9.mm3d bone joint nots:
+u_torso_control Torso can rotate just the torso
+joint_torso     Legs can rotate the torso
+root			Legs can rotate the whole model
+l_legs_control	Legs can rotate just the legs

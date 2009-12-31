@@ -1044,12 +1044,18 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	// Allow breakable movers
 	if ( targ->s.eType == ET_MOVER && targ->health > 0 )
 	{
+		//if (targ->spawnflags & 128)
+		//{
+		//	// Turtle Man: TODO: Have a effect to user knows it is can only be broke by WIF_CUTS?
+		//	return;
+		//}
+
 		targ->health -= damage;
 		if (targ->health < 0)
 			targ->health = 0;
 
 		// Turtle Man: TODO: Spawn particles (model materials and smoke sprites)
-		// G_BreakGlass( targ, point, mod );
+		//G_BreakBrush(targ, inflictor, attacker, dir, point, mod);
 
 		if (targ->health <= 0)
 		{

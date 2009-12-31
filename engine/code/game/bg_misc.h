@@ -674,18 +674,19 @@ typedef struct
 	int trailStyle;		///< TRAIL_* defines
 } bg_bladeinfo_t;
 
-// Melee and guns
+// Non-specific
 #define WIF_WALLMARK_FADE_ALPHA	1
 #define WIF_WALLMARK_COLORIZE	2
-// Melee only
+// Melee-specific
 #define WIF_ALWAYS_DAMAGE		4 // Do damage even while not attacking, like a lightsaber.
-// Guns only
-#define WIF_CONTINUOUS_FLASH	8
-//  Eject "brass" functions
-#define WIF_EJECT_BRASS			16		// CG_MachineGunEjectBrass
-#define WIF_EJECT_BRASS2		32		// CG_ShotgunEjectBrass
-#define WIF_EJECT_SMOKE			64		// CG_NailgunEjectBrass
-#define WIF_EJECT_SMOKE2		128		// Shotgun smoke
+#define WIF_CUTS				8 // Swords can cuts things that a bo, nunchunk, and sai can not.
+// Guns-specific
+#define WIF_CONTINUOUS_FLASH	16
+// Non-specific, Eject "brass" functions
+#define WIF_EJECT_BRASS			32		// CG_MachineGunEjectBrass
+#define WIF_EJECT_BRASS2		64		// CG_ShotgunEjectBrass
+#define WIF_EJECT_SMOKE			128		// CG_NailgunEjectBrass
+#define WIF_EJECT_SMOKE2		256		// Shotgun smoke
 
 // Barrel Spin
 #define BS_PITCH PITCH // 0

@@ -2576,6 +2576,16 @@ static qboolean Weapon_Parse(char **p) {
 			else
 				weapon.flags &= ~WIF_ALWAYS_DAMAGE;
 			continue;
+		} else if ( !Q_stricmp( token, "cuts" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			if (atoi(token) == 1)
+				weapon.flags |= WIF_CUTS;
+			else
+				weapon.flags &= ~WIF_CUTS;
+			continue;
 		} else if ( !Q_stricmp( token, "continuousFlash" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
@@ -3166,6 +3176,7 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\twallmarkFadeAlpha %d\r\n", (weapon->flags & WIF_WALLMARK_FADE_ALPHA));
 		FS_Printf2("\twallmarkColorize %d\r\n", (weapon->flags & WIF_WALLMARK_COLORIZE));
 		FS_Printf2("\talwaysDamage %d\r\n", (weapon->flags & WIF_ALWAYS_DAMAGE));
+		FS_Printf2("\tcuts %d\r\n", (weapon->flags & WIF_CUTS));
 		FS_Printf2("\tcontinuousFlash %d\r\n", (weapon->flags & WIF_CONTINUOUS_FLASH));
 		FS_Printf2("\tejectBrass %d\r\n", (weapon->flags & WIF_EJECT_BRASS));
 		FS_Printf2("\tejectBrass2 %d\r\n", (weapon->flags & WIF_EJECT_BRASS2));
