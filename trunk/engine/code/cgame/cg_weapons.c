@@ -3119,23 +3119,25 @@ WEAPON EVENTS
 */
 
 #ifdef TMNTWEAPSYS
+/*
+================
+CG_WeaponUseEffect
+
+Weapons can eject brass/smoke
+================
+*/
 void CG_WeaponUseEffect( centity_t *cent, int hand, int weaponNum )
 {
 	bg_weaponinfo_t *weap;
+	int		contents;
 
-	if (weaponNum == 0)
+	if (weaponNum <= 0 || weaponNum > BG_NumWeapons())
 	{
 		return;
 	}
 
 	weap = &bg_weaponinfo[weaponNum];
 
-	if ( !(cg_brassTime.integer > 0) )
-	{
-		return;
-	}
-
-	// Guns can eject brass/smoke
 	if (weap->flags & WIF_EJECT_BRASS)
 	{
 		CG_MachineGunEjectBrass( cent, hand );
@@ -3144,24 +3146,25 @@ void CG_WeaponUseEffect( centity_t *cent, int hand, int weaponNum )
 	{
 		CG_ShotgunEjectBrass( cent );
 	}
-	if (weap->flags & WIF_EJECT_SMOKE)
+
+	contents = trap_CM_PointContents( cent->currentState.pos.trBase, 0 );
+
+	// ragepro can't alpha fade, so don't even bother with smoke
+	if ( !( contents & CONTENTS_WATER ) && cgs.glconfig.hardwareType != GLHW_RAGEPRO)
 	{
-		CG_NailgunEjectBrass( cent, hand );
-	}
-	// Turtle Man: Shotgun smoke (From CG_ShotgunFire)
-	if (weap->flags & WIF_EJECT_SMOKE2)
-	{
-		if ( cgs.glconfig.hardwareType != GLHW_RAGEPRO ) {
-			// ragepro can't alpha fade, so don't even bother with smoke
+		if (weap->flags & WIF_EJECT_SMOKE)
+		{
+			CG_NailgunEjectBrass( cent, hand );
+		}
+
+		// Shotgun smoke (From Q3's CG_ShotgunFire)
+		if (weap->flags & WIF_EJECT_SMOKE2)
+		{
 			vec3_t			up;
 			vec3_t			v;
-			int		contents;
 
-			contents = trap_CM_PointContents( cent->currentState.pos.trBase, 0 );
-			if ( !( contents & CONTENTS_WATER ) ) {
-				VectorSet( up, 0, 0, 8 );
-				CG_SmokePuff( v, up, 32, 1, 1, 1, 0.33f, 900, cg.time, 0, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
-			}
+			VectorSet( up, 0, 0, 8 );
+			CG_SmokePuff( v, up, 32, 1, 1, 1, 0.33f, 900, cg.time, 0, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
 		}
 	}
 
@@ -3298,9 +3301,7 @@ void CG_FireWeapon( centity_t *cent ) {
 =================
 CG_MeleeHit
 
-Spawn "hit marker", do in CG_Bleed if no blood?
-
-Based on CG_Bleed
+Spawn "hit marker", based on CG_Bleed
 =================
 */
 void CG_MeleeHit( vec3_t origin/*, int entityNum */) {
@@ -4349,7 +4350,7 @@ void CG_WeaponHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum ) 
 	if (BG_WeapTypeIsMelee(BG_WeaponTypeForNum(weapon)))
 	{
 #ifndef NOBLOOD
-		/*if (weapon cuts (Katana) or random chance)*/
+		if ((bg_weaponinfo[weapon].flags & WIF_CUTS) || (rand()&20 > 15))
 			CG_Bleed( origin, entityNum );
 #endif
 #ifdef TMNTWEAPONS
