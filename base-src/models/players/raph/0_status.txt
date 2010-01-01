@@ -1,6 +1,6 @@
 raph_v8 is the current model in base. raph_v9 is the work-in-progress to fix and improve the model.
 
-raph_v9.mm3d bone joint nots:
+raph_v9.mm3d bone joint notes:
 u_torso_control Torso can rotate just the torso
 joint_torso     Legs can rotate the torso
 root			Legs can rotate the whole model
