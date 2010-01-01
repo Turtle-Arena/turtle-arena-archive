@@ -75,6 +75,11 @@ static	unsigned short		vq2[256*16*4];
 static	unsigned short		vq4[256*64*4];
 static	unsigned short		vq8[256*256*4];
 
+typedef enum
+{
+	FT_ROQ = 0,				// normal roq (vq3 stuff)
+	FT_OGM					// ogm(ogg wrapper, vorbis audio, xvid/theora video) for WoP
+} filetype_t;
 
 typedef struct {
 	byte				linbuf[DEFAULT_CIN_WIDTH*DEFAULT_CIN_HEIGHT*4*2];
@@ -127,6 +132,7 @@ typedef struct {
 	int					playonwalls;
 	byte*				buf;
 	long				drawX, drawY;
+	filetype_t			fileType;
 } cin_cache;
 
 static cinematics_t		cin;
@@ -507,7 +513,7 @@ int		spl;
 *
 ******************************************************************************/
 
-static void ROQ_GenYUVTables( void )
+void ROQ_GenYUVTables( void )
 {
 	float t_ub,t_vr,t_ug,t_vg;
 	long i;
@@ -604,6 +610,51 @@ static unsigned int yuv_to_rgb24( long y, long u, long v )
 	if (r > 255) r = 255; if (g > 255) g = 255; if (b > 255) b = 255;
 	
 	return LittleLong ((r)|(g<<8)|(b<<16)|(255<<24));
+}
+
+/******************************************************************************
+*
+* Function:	Frame_yuv_to_rgb24
+*
+* Description: Used by the Theora(ogm) code
+*		moved the convertion into one function, to reduce the number of function-calls
+*
+******************************************************************************/
+void Frame_yuv_to_rgb24(const unsigned char *y, const unsigned char *u, const unsigned char *v,
+		int width, int height, int y_stride, int uv_stride,
+		int yWShift, int uvWShift, int yHShift, int uvHShift, unsigned int *output)
+{
+	int		i, j, uvI;
+	long	r, g, b, YY;
+
+	for(j = 0; j < height; ++j)
+	{
+		for(i = 0; i < width; ++i)
+		{
+			YY = (long)(ROQ_YY_tab[(y[(i >> yWShift) + (j >> yHShift) * y_stride])]);
+			uvI = (i >> uvWShift) + (j >> uvHShift) * uv_stride;
+
+			r = (YY + ROQ_VR_tab[v[uvI]]) >> 6;
+			g = (YY + ROQ_UG_tab[u[uvI]] + ROQ_VG_tab[v[uvI]]) >> 6;
+			b = (YY + ROQ_UB_tab[u[uvI]]) >> 6;
+
+			if(r < 0)
+				r = 0;
+			if(g < 0)
+				g = 0;
+			if(b < 0)
+				b = 0;
+			if(r > 255)
+				r = 255;
+			if(g > 255)
+				g = 255;
+			if(b > 255)
+				b = 255;
+
+			*output = LittleLong((r) | (g << 8) | (b << 16) | (255 << 24));
+			++output;
+		}
+	}
 }
 
 /******************************************************************************
@@ -1262,10 +1313,12 @@ static void RoQ_init( void )
 *
 ******************************************************************************/
 
+//FIXME: this isn't realy a "roq-shutdown" (it's more a CIN-shutdown, beside the file-closing)
 static void RoQShutdown( void ) {
 	const char *s;
 
 	if (!cinTable[currentHandle].buf) {
+		//FIXME: there could be something that should be "shutdowned" even if we don't have a output frame (at least in the ogm code)
 		return;
 	}
 
@@ -1294,12 +1347,17 @@ static void RoQShutdown( void ) {
 		CL_handle = -1;
 	}
 	cinTable[currentHandle].fileName[0] = 0;
+	if (cinTable[currentHandle].fileType == FT_OGM)
+	{
+		Cin_OGM_Shutdown();
+		cinTable[currentHandle].buf = NULL;
+	}
 	currentHandle = -1;
 }
 
 /*
 ==================
-SCR_StopCinematic
+CIN_StopCinematic
 ==================
 */
 e_status CIN_StopCinematic(int handle) {
@@ -1326,7 +1384,7 @@ e_status CIN_StopCinematic(int handle) {
 
 /*
 ==================
-SCR_RunCinematic
+CIN_RunCinematic
 
 Fetch and decompress the pending frame
 ==================
@@ -1364,6 +1422,66 @@ e_status CIN_RunCinematic (int handle)
 		return cinTable[currentHandle].status;
 	}
 
+	if (cinTable[currentHandle].fileType == FT_OGM)
+	{
+		if (Cin_OGM_Run(cinTable[currentHandle].startTime == 0 ? 0 : CL_ScaledMilliseconds() - cinTable[currentHandle].startTime))
+			cinTable[currentHandle].status = FMV_EOF;
+		else
+		{
+			int			newW, newH;
+			qboolean	resolutionChange = qfalse;
+
+			cinTable[currentHandle].buf = Cin_OGM_GetOutput(&newW, &newH);
+
+			if (newW != cinTable[currentHandle].CIN_WIDTH)
+			{
+				cinTable[currentHandle].CIN_WIDTH = newW;
+				resolutionChange = qtrue;
+			}
+			if (newH != cinTable[currentHandle].CIN_HEIGHT)
+			{
+				cinTable[currentHandle].CIN_HEIGHT = newH;
+				resolutionChange = qtrue;
+			}
+
+			if (resolutionChange)
+			{
+				cinTable[currentHandle].drawX = cinTable[currentHandle].CIN_WIDTH;
+				cinTable[currentHandle].drawY = cinTable[currentHandle].CIN_HEIGHT;
+			}
+
+			cinTable[currentHandle].status = FMV_PLAY;
+			cinTable[currentHandle].dirty = qtrue;
+		}
+
+		if (!cinTable[currentHandle].startTime)
+			cinTable[currentHandle].startTime = CL_ScaledMilliseconds();
+
+		if (cinTable[currentHandle].status == FMV_EOF)
+		{
+			if (cinTable[currentHandle].holdAtEnd)
+			{
+				cinTable[currentHandle].status = FMV_IDLE;
+			}
+			else if (cinTable[currentHandle].looping)
+			{
+				Cin_OGM_Shutdown();
+				Cin_OGM_Init(cinTable[currentHandle].fileName);
+				cinTable[currentHandle].buf = NULL;
+				cinTable[currentHandle].startTime = 0;
+				cinTable[currentHandle].status = FMV_PLAY;
+			}
+			else
+			{
+				RoQShutdown();
+//              Cin_OGM_Shutdown();
+			}
+		}
+
+		return cinTable[currentHandle].status;
+	}
+
+	//FIXME? CL_ScaledMilliseconds already uses com_timescale (so I can't see that the com_timescale in here makes any sense at all O_o)
 	// we need to use CL_ScaledMilliseconds because of the smp mode calls from the renderer
 	thisTime = CL_ScaledMilliseconds()*com_timescale->value;
 	if (cinTable[currentHandle].shader && (abs(thisTime - cinTable[currentHandle].lastTime))>100) {
@@ -1402,15 +1520,17 @@ e_status CIN_RunCinematic (int handle)
 	return cinTable[currentHandle].status;
 }
 
+char *S_FileExtension(const char *fni);
+
 /*
 ==================
-CL_PlayCinematic
-
+CIN_PlayCinematic
 ==================
 */
 int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBits ) {
 	unsigned short RoQID;
 	char	name[MAX_OSPATH];
+	char	*fileextPtr;
 	int		i;
 
 	if (strstr(arg, "/") == NULL && strstr(arg, "\\") == NULL) {
@@ -1432,9 +1552,61 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	Com_Memset(&cin, 0, sizeof(cinematics_t) );
 	currentHandle = CIN_HandleForVideo();
 
+	Com_Memset(&cinTable[currentHandle], 0, sizeof(cin_cache));
+
 	cin.currentHandle = currentHandle;
 
 	strcpy(cinTable[currentHandle].fileName, name);
+
+	fileextPtr = S_FileExtension(name);
+	if (!Q_stricmp(fileextPtr, ".ogm") || !Q_stricmp(fileextPtr, ".ogv"))
+	{
+		if (Cin_OGM_Init(name))
+		{
+			Com_DPrintf("starting ogm-playback failed(%s)\n", arg);
+			cinTable[currentHandle].fileName[0] = 0;
+			Cin_OGM_Shutdown();
+			return -1;
+		}
+
+		cinTable[currentHandle].fileType = FT_OGM;
+
+		CIN_SetExtents(currentHandle, x, y, w, h);
+		CIN_SetLooping(currentHandle, (systemBits & CIN_loop) != 0);
+
+		cinTable[currentHandle].holdAtEnd = (systemBits & CIN_hold) != 0;
+		cinTable[currentHandle].alterGameState = (systemBits & CIN_system) != 0;
+		cinTable[currentHandle].playonwalls = 1;
+		cinTable[currentHandle].silent = (systemBits & CIN_silent) != 0;
+		cinTable[currentHandle].shader = (systemBits & CIN_shader) != 0;
+
+/* we will set this info after the first xvid-frame
+		cinTable[currentHandle].CIN_HEIGHT = DEFAULT_CIN_HEIGHT;
+		cinTable[currentHandle].CIN_WIDTH  =  DEFAULT_CIN_WIDTH;
+*/
+
+		if (cinTable[currentHandle].alterGameState)
+		{
+			// close the menu
+			if (uivm)
+			{
+				VM_Call(uivm, UI_SET_ACTIVE_MENU, UIMENU_NONE);
+			}
+		}
+		else
+		{
+			cinTable[currentHandle].playonwalls = cl_inGameVideo->integer;
+		}
+
+		if (cinTable[currentHandle].alterGameState)
+		{
+			cls.state = CA_CINEMATIC;
+		}
+
+		cinTable[currentHandle].status = FMV_PLAY;
+
+		return currentHandle;
+	}
 
 	cinTable[currentHandle].ROQSize = 0;
 	cinTable[currentHandle].ROQSize = FS_FOpenFileRead (cinTable[currentHandle].fileName, &cinTable[currentHandle].iFile, qtrue);
@@ -1510,8 +1682,7 @@ void CIN_SetLooping(int handle, qboolean loop) {
 
 /*
 ==================
-SCR_DrawCinematic
-
+CIN_DrawCinematic
 ==================
 */
 void CIN_DrawCinematic (int handle) {

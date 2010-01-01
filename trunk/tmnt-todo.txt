@@ -113,14 +113,17 @@ DONE: [todo] Remove the need for fuzw.c
 
 [todo] Add misc_dripper entity.
 
+[bug] Single Player scores are not saved. ( http://bugzilla.icculus.org/show_bug.cgi?id=4357 )
+
 // The below are somewhat long...
 
-[todo] Update camera system. Q3 third person camera is great and all for a first person game, but not a third person one...
+[todo] Update camera system.
 : Controls for moving chase cam (left, right, up, down) ~Currently use a long script from Team Arena...
 ::(Nights - Move camera if holding 'z' and move analog stick ~can't look around while moving)
 : When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
 BETTER(not done?): When moving the camera around the player, focus on the player. (Like in NiGHTS: Journey of Dreams)
-[todo-after-above] Analog Control
+
+[todo] Optional Analog Control input
 
 [todo] Merge Quake3 and Team Arena bot chat systems; One chat system to rule them all!
 * Problem: Team Arena adds voice chats, which are only used in gametypes >= GT_TEAM. There was also players that could only be used in gametypes >= GT_TEAM that did not have q3 chats. Leaving q3 players for FFA and Duel (with there normal q3 chats) (The TA players have no q3 chats and the players can't be used in q3, q3 players can't be used in gametypes >= GT_TEAM and have no voice chats.) So Team Arena had two seperate chat systems. TMNT Arena supports Q3 and Team Arena players in all gametypes and allows merged Q3/TA players. But in the gametypes >= GT_TEAM ONLY the TA voice chats are used. And like wise in non-team gametypes only "Q3 chats" are used.
@@ -136,13 +139,7 @@ BETTER(not done?): When moving the camera around the player, focus on the player
 : Maybe with spawning a item on death, respawning, and pushable options.
 : I will need some test models (with animations)
 
-[todo] Add support for .ogm video playback (Xreal copied from World of Padman engine)
-	(It should be in ioq3, so that each standalone mod doesn't add support for it...)
-** http://apps.sourceforge.net/trac/xreal/changeset/3297
-** http://apps.sourceforge.net/trac/xreal/changeset/3300
-** http://wop-engine.svn.sourceforge.net/viewvc/wop-engine?view=rev&revision=71
-** http://wop-engine.svn.sourceforge.net/viewvc/wop-engine?view=rev&revision=73
-** http://wop-engine.svn.sourceforge.net/viewvc/wop-engine?view=rev&revision=82
+[todo] Add engine/code/libs/win32/libtheora.a for win32 mingw
 
 === Testing! ===
 DONE(untested)?: Melee combo system, with different animations for each attack? (TMNTWEAPSYS)

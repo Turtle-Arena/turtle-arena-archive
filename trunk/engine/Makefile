@@ -114,6 +114,9 @@ ifeq ($(QUAKE3),1)
 							-DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
 							-DTMNTWEAPSYS -DRAVENMD4 -DOA_BLOOM
 
+		USE_CODEC_VORBIS=1
+		USE_CODEC_THEORA=1
+
 		# Use model tags for "true" melee attacking (Gauntlet)
 		# (Can't be used as a quake3 mod, as it uses new VM-to-server calls.
 		#    It shouldn't break compatiblity with other q3 mods however -untested)
@@ -196,6 +199,9 @@ else # END QUAKE3
 
 	# TMNT Arena's sounds are ogg vorbis
 	USE_CODEC_VORBIS=1
+
+	# TMNT Arena's intro video will be ogg theora
+	USE_CODEC_THEORA=1
 
 	# Turtle Man: TMNT Arena version (YYYYMMDD)
 	VERSION=$(shell date +%Y%m%d)
@@ -295,6 +301,10 @@ endif
 
 ifndef USE_CODEC_VORBIS
 USE_CODEC_VORBIS=0
+endif
+
+ifndef USE_CODEC_THEORA
+USE_CODEC_THEORA=0
 endif
 
 ifndef USE_MUMBLE
@@ -451,6 +461,9 @@ ifeq ($(PLATFORM),linux)
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
   endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_CFLAGS += -DUSE_CIN_THEORA
+  endif
 
   OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer
   OPTIMIZE = $(OPTIMIZEVM) -ffast-math
@@ -512,6 +525,9 @@ ifeq ($(PLATFORM),linux)
 
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
+  endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_LIBS += -ltheora
   endif
 
   ifeq ($(USE_MUMBLE),1)
@@ -596,6 +612,10 @@ ifeq ($(PLATFORM),darwin)
     CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
   endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_CFLAGS += -DUSE_CIN_THEORA
+    CLIENT_LIBS += -ltheora
+  endif
 
   BASE_CFLAGS += -D_THREAD_SAFE=1
 
@@ -669,6 +689,9 @@ ifeq ($(PLATFORM),mingw32)
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
   endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_CFLAGS += -DUSE_CIN_THEORA
+  endif
 
   OPTIMIZEVM = -O3 -march=i586 -fno-omit-frame-pointer \
     -falign-loops=2 -funroll-loops -falign-jumps=2 -falign-functions=2 \
@@ -728,12 +751,18 @@ ifeq ($(PLATFORM),mingw32)
                         $(LIBSDIR)/win32/libvorbis.a\
 						$(LIBSDIR)/win32/libogg.a
     endif
+    ifeq ($(USE_CODEC_THEORA),1)
+      CLIENT_LIBS += $(LIBSDIR)/win32/libtheora.a
+    endif
   else
     CLIENT_CFLAGS += $(SDL_CFLAGS)
     CLIENT_LIBS += $(SDL_LIBS)
     ifeq ($(USE_CODEC_VORBIS),1)
       CLIENT_LIBS += -lvorbisfile -lvorbis -logg
-  endif
+    endif
+    ifeq ($(USE_CODEC_THEORA),1)
+      CLIENT_LIBS += -ltheora
+    endif
   endif
 
 
@@ -768,6 +797,9 @@ ifeq ($(PLATFORM),freebsd)
 
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
+  endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_CFLAGS += -DUSE_CIN_THEORA
   endif
 
   OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer
@@ -809,6 +841,9 @@ ifeq ($(PLATFORM),freebsd)
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
   endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_LIBS += -ltheora
+  endif
 
 else # ifeq freebsd
 
@@ -835,6 +870,9 @@ ifeq ($(PLATFORM),openbsd)
 
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
+  endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_CFLAGS += -DUSE_CIN_THEORA
   endif
 
   ifeq ($(USE_CURL),1)
@@ -865,6 +903,9 @@ ifeq ($(PLATFORM),openbsd)
 
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
+  endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_LIBS += -ltheora
   endif
 
   ifeq ($(USE_CURL),1) 
@@ -1572,6 +1613,7 @@ endif
 Q3OBJ = \
   $(B)/client/cl_cgame.o \
   $(B)/client/cl_cin.o \
+  $(B)/client/cl_cin_ogm.o \
   $(B)/client/cl_console.o \
   $(B)/client/cl_input.o \
   $(B)/client/cl_keys.o \
