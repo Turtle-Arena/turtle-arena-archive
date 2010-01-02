@@ -44,11 +44,14 @@ base/gfx/2d/bigchars.png
 : Currently not in a big rush to replace this, as it is for the unsupported first-person camera mode.
 base/models/weapons2/gun/gun_hand.md3 (Copied from OA's base/models/weapons2/shotgun/shotgun_hand.md3)
 
-: Currently plan to replace these.
 base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
 base/gfx/damage/shadow.tga
-base/gfx/misc/flare.jpg
+base/gfx/misc/flare.tga
+
+base/sound/player/watr_in.wav
+base/sound/player/watr_out.wav
+base/sound/player/watr_un.wav
 
 == GNU FreeFonts ==
 The following files were created using the GNU Freefonts,

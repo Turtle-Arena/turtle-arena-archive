@@ -1290,7 +1290,6 @@ typedef struct {
 	sfxHandle_t medkitSound;
 #ifdef TMNTHOLDABLE
 	sfxHandle_t shurikenSound;
-	sfxHandle_t laserShurikenSound;
 #endif
 
 	sfxHandle_t weaponHoverSound;
@@ -1356,8 +1355,10 @@ typedef struct {
 
 	sfxHandle_t	regenSound;
 	sfxHandle_t	protectSound;
+#ifndef TMNT // POWERS
 	sfxHandle_t	n_healthSound;
-#ifndef TMNTHOLDABLE
+#endif
+#ifndef TMNTWEAPSYS
 	sfxHandle_t	hgrenb1aSound;
 	sfxHandle_t	hgrenb2aSound;
 #endif

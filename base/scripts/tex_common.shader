@@ -289,9 +289,8 @@ textures/common/mirror2
 		depthWrite
 	}
 	{
-		//map textures/sfx/mirror.tga
-		map textures/skies/testsky_clouds.png
-		tcMod turb 0 0.25 0 0.05
+		map textures/sfx/mirror.png
+		//tcMod turb 0 0.25 0 0.05
 		blendFunc GL_ZERO GL_ONE_MINUS_SRC_COLOR
 	}
 }

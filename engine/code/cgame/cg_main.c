@@ -887,7 +887,6 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.medkitSound = trap_S_RegisterSound ("sound/items/use_medkit.wav", qfalse);
 #ifdef TMNTHOLDABLE
 	cgs.media.shurikenSound = trap_S_RegisterSound ("sound/items/use_shuriken.wav", qfalse);
-	cgs.media.laserShurikenSound = trap_S_RegisterSound ("sound/items/use_lasershuriken.wav", qfalse);
 #endif
 	cgs.media.quadSound = trap_S_RegisterSound("sound/items/damage3.wav", qfalse);
 #ifndef TMNTWEAPSYS
@@ -932,13 +931,15 @@ static void CG_RegisterSounds( void ) {
 
 	cgs.media.regenSound = trap_S_RegisterSound("sound/items/regen.wav", qfalse);
 	cgs.media.protectSound = trap_S_RegisterSound("sound/items/protect3.wav", qfalse);
+#ifndef TMNT // POWERS
 	cgs.media.n_healthSound = trap_S_RegisterSound("sound/items/n_health.wav", qfalse );
-#ifndef TMNTHOLDABLE
+#endif
+#ifndef TMNTWEAPSYS
 	cgs.media.hgrenb1aSound = trap_S_RegisterSound("sound/weapons/grenade/hgrenb1a.wav", qfalse);
 	cgs.media.hgrenb2aSound = trap_S_RegisterSound("sound/weapons/grenade/hgrenb2a.wav", qfalse);
 #endif
 
-#if defined MISSIONPACK && !defined TMNTMISC // Don't percache sounds we don't have.
+#if defined MISSIONPACK && !defined TMNTMISC // Don't percache sounds we don't use.
 	trap_S_RegisterSound("sound/player/james/death1.wav", qfalse );
 	trap_S_RegisterSound("sound/player/james/death2.wav", qfalse );
 	trap_S_RegisterSound("sound/player/james/death3.wav", qfalse );

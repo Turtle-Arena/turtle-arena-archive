@@ -526,10 +526,8 @@ static void CG_UseItem( centity_t *cent ) {
 	case HI_SHURIKEN:
 	case HI_FIRESHURIKEN:
 	case HI_ELECTRICSHURIKEN:
-		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.shurikenSound );
-		break;
 	case HI_LASERSHURIKEN:
-		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.laserShurikenSound );
+		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.shurikenSound );
 		break;
 #endif
 	}
@@ -947,12 +945,14 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			item = &bg_itemlist[ index ];
 #endif
 
+#ifdef TMNT // POWERS
+			trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( item->pickup_sound, qfalse ) );
+#else
 			// powerups and team items will have a separate global sound, this one
 			// will be played at prediction time
 			if ( item->giType == IT_POWERUP || item->giType == IT_TEAM) {
 				trap_S_StartSound (NULL, es->number, CHAN_AUTO,	cgs.media.n_healthSound );
 			}
-#ifndef TMNT // POWERS
 			else if (item->giType == IT_PERSISTANT_POWERUP) {
 #ifdef MISSIONPACK
 				switch (item->giTag ) {
@@ -970,11 +970,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					break;
 				}
 #endif
-			}
-#endif
-			else {
+			} else {
 				trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( item->pickup_sound, qfalse ) );
 			}
+#endif
 
 			// show icon and name on status bar
 			if ( es->number == cg.snap->ps.clientNum ) {
@@ -1163,7 +1162,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			/*if (es->eventParm == 255) {
 				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 			} else*/ {
-				trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.laserShurikenSound );
+				trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.shurikenSound );
 				ByteToDir( es->eventParm, dir );
 				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 			}
