@@ -11,7 +11,7 @@
 #
 # Turtle Man 2/25/2009
 # Changed Makefile to be like ioquake3 Makefile, currently still only for linux
-# but should change later.
+#   but should change later.
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]')
 
@@ -76,17 +76,26 @@ MOUNT_DIR=..
 endif
 
 ifndef BUILD_DIR
-BUILD_DIR=../../build
+BUILD_DIR=../../build-bspc
+endif
+
+ifndef USE_INTERNAL_ZLIB
+USE_INTERNAL_ZLIB=1
+endif
+
+ifndef USE_LOCAL_HEADERS
+USE_LOCAL_HEADERS=1
 endif
 
 #############################################################################
 
-BD=$(BUILD_DIR)/bspc-debug-$(PLATFORM)-$(ARCH)
-BR=$(BUILD_DIR)/bspc-release-$(PLATFORM)-$(ARCH)
+BD=$(BUILD_DIR)/debug-$(PLATFORM)-$(ARCH)
+BR=$(BUILD_DIR)/release-$(PLATFORM)-$(ARCH)
 
 BLIBDIR=$(MOUNT_DIR)/botlib
 BSPCDIR=$(MOUNT_DIR)/bspc
 CMDIR=$(MOUNT_DIR)/qcommon
+ZDIR=$(MOUNT_DIR)/zlib
 
 ifeq ($(V),1)
 echo_cmd=@:
@@ -100,6 +109,15 @@ define DO_CC
 $(echo_cmd) "CC $<"
 $(Q)$(CC) $(CFLAGS) -o $@ -c $<
 endef
+
+ifeq ($(USE_INTERNAL_ZLIB),1)
+  BASE_CFLAGS += -DNO_GZIP
+  ifneq ($(USE_LOCAL_HEADERS),1)
+    BASE_CFLAGS += -I$(ZDIR)
+  endif
+else
+  LIBS += -lz
+endif
 
 TARGETS=$(B)/bspc.$(ARCH)$(BINEXT)
 
@@ -291,12 +309,12 @@ targets: makedirs
 	do \
 		echo "    $$i"; \
 	done
-#	@echo ""
-#	@echo "  LIBS:"
-#	-@for i in $(LIBS); \
-#	do \
-#		echo "    $$i"; \
-#	done
+	@echo ""
+	@echo "  LIBS:"
+	-@for i in $(LIBS); \
+	do \
+		echo "    $$i"; \
+	done
 	@echo ""
 	@echo "  Output:"
 	-@for i in $(TARGETS); \
@@ -314,6 +332,7 @@ makedirs:
 	@if [ ! -d $(B)/bspc ];then $(MKDIR) $(B)/bspc;fi
 	@if [ ! -d $(B)/botlib ];then $(MKDIR) $(B)/botlib;fi
 	@if [ ! -d $(B)/qcommon ];then $(MKDIR) $(B)/qcommon;fi
+	@if [ ! -d $(B)/zlib ];then $(MKDIR) $(B)/zlib;fi
 
 #############################################################################
 # BUILD BSPC
@@ -325,8 +344,10 @@ $(B)/bspc/%.o: $(BSPCDIR)/%.c
 	$(DO_CC)
 $(B)/qcommon/%.o: $(CMDIR)/%.c
 	$(DO_CC)
+$(B)/zlib/%.o: $(ZDIR)/%.c
+	$(DO_CC)
 
-GAME_OBJS = \
+BSPC_OBJS = \
 	$(B)/bspc/aas_areamerging.o\
 	$(B)/bspc/aas_cfg.o\
 	$(B)/bspc/aas_create.o\
@@ -382,19 +403,30 @@ GAME_OBJS = \
 	$(B)/bspc/portals.o\
 	$(B)/bspc/textures.o\
 	$(B)/bspc/tree.o\
+	$(B)/qcommon/ioapi.o\
 	$(B)/qcommon/unzip.o
 
         #tetrahedron.o
 
-$(B)/bspc.$(ARCH)$(BINEXT) : $(GAME_OBJS)
+ifeq ($(USE_INTERNAL_ZLIB),1)
+BSPC_OBJS += \
+  $(B)/zlib/adler32.o \
+  $(B)/zlib/crc32.o \
+  $(B)/zlib/inffast.o \
+  $(B)/zlib/inflate.o \
+  $(B)/zlib/inftrees.o \
+  $(B)/zlib/zutil.o
+endif
+
+$(B)/bspc.$(ARCH)$(BINEXT) : $(BSPC_OBJS)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(GAME_OBJS)
+	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(BSPC_OBJS)
 
 #############################################################################
 # MISC
 #############################################################################
 
-OBJ=$(GAME_OBJ)
+OBJ=$(BSPC_OBJS)
 OBJ_D_FILES=$(filter %.d,$(OBJ:%.o=%.d))
 
 clean: clean-debug clean-release
@@ -418,7 +450,7 @@ clean2:
 
 depend:
 	$(echo_cmd) "DEPEND $(B)"
-	$(Q)$(CC) -MM $(GAME_OBJS:.o=.c)
+	$(Q)$(CC) -MM $(BSPC_OBJS:.o=.c)
 
 #install:
 #	cp bspci386 ..
