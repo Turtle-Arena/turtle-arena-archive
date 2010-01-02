@@ -4,7 +4,7 @@
 // Turtle Man: Drawn over player's head when in console or chat mode.
 sprites/talkBalloon
 {
-	entityMergable // Turtle Man: Should be okay.
+	entityMergable
 	{
 		map sprites/talkBalloon.png
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
@@ -95,7 +95,7 @@ flareShader
 	//entityMergable // Turtle Man: Should be okay?
 	cull none
 	{
-		map gfx/misc/flare.jpg
+		map gfx/misc/flare.tga
 		blendFunc GL_ONE GL_ONE
 		rgbGen vertex
 	}
@@ -138,6 +138,7 @@ sprites/team_blue
 // Shows over the target entity
 sprites/target
 {
+	entityMergable
 	nomipmaps
 	nopicmip
 	{
