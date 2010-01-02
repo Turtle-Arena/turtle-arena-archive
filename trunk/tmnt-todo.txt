@@ -182,8 +182,7 @@ DONE: Have player fade out when dead instead of BodySink
 
 == BSPC ==
 // BSPC is the BSP map to .aas (Arena Awareness System) compiler. The aas file is used by bots.
-[bug] Fix compiling. After ioq3 updated zlib, compiling fails.
-[todo] Fix "make clean". It doesn't remove the .o files, only the bspc binary
+[bug] Fix compiling with (cross-make-)mingw.
 
 
 == Master Server ==
