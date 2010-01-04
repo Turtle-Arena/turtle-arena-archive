@@ -5,6 +5,7 @@ se_menu
 se_models
 se_powerups
 se_sprites
+se_teams
 se_ui
 
 // Texture shaders
@@ -17,7 +18,7 @@ tex_fog
 tex_liquid
 tex_plants
 tex_sfx
+tex_singleplayer
 tex_skies
-tex_teams
 tex_terrain
 
