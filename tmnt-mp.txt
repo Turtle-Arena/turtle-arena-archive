@@ -1,4 +1,4 @@
-What MISSIONPACK adds to TMNT, the plan is to remove and intagrate all parts of the MP into base TMNT.
+Additions from Team Arena, the plan is to remove and intagrate all parts of the MISSIONPACK define into base TMNT Arena.
 
 == Supported/used ==
 
@@ -15,9 +15,9 @@ What MISSIONPACK adds to TMNT, the plan is to remove and intagrate all parts of 
 ** Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, as I set it 2x damage)
 ** Ammo Regen (Player ammo/shuriken counts slowly increment)
 
-* Chaingun --Supported by TMNTWEAPSYS_2 (Weapon scripting)
-* Nailgun --Supported by TMNTWEAPSYS_2 (Weapon scripting)
-* Prox Launcher --Partly supported, will never fully support, by TMNTWEAPSYS_2 (Weapon scripting)
+* Chaingun --Supported by TMNTWEAPSYS
+* Nailgun --Supported by TMNTWEAPSYS
+* Prox Launcher --Partly supported, will never fully support by TMNTWEAPSYS
 
 * Voice chats for bots and humans
 * Per-team skins for players

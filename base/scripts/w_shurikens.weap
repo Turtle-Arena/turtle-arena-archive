@@ -94,7 +94,7 @@ projectile "p_lasershuriken"
 	spinType "PS_PITCH"
 	bounceType "PB_FULL"
 	maxBounces 10
-	bounceSound0 "sound/items/use_lasershuriken.wav"
+	bounceSound0 "sound/items/lasershuriken_bounce.ogg"
 	wallmarkName "gfx/damage/plasma_mrk"
 	wallmarkRadius 8
 	wallmarkFadeAlpha 1
