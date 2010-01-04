@@ -7,12 +7,32 @@ items/use_nothing.ogg is a copy of misc/menu4.ogg  (items/use_nothing is unused 
 
 weapons/melee_swing.ogg is a louder-version of weapons/change.ogg (For testing...)
 
+player/raph/death2 and death3 are copies of death1
+
 
 == Needed Sounds ==
 // New sounds
 :Like in LOZ:TP
-sound/misc/letterboxon
-sound/misc/letterboxoff
+TEMP: sound/misc/letterboxon
+TEMP: sound/misc/letterboxoff
+
+// player sounds
+TEMP: base/sound/player/raph/*
+base/sound/player/casey/*
+
+death1.wav
+death2.wav
+death3.wav
+drown.wav
+fall1.wav - hit ground
+falling1.wav - bottom-less pit
+gasp.wav
+jump1.wav
+pain100_1.wav
+pain75_1.wav
+pain50_1.wav
+pain25_1.wav
+taunt.wav
 
 // Needed sounds from CG_RegisterSounds.
 
@@ -31,12 +51,17 @@ TEMP: sound/feedback/prepare_team.wav - Gyoji: "Prepare Your Team"
 
 TEMP: sound/feedback/vote_now.wav - Gyoji: "Voting has begun."
 
-sound/feedback/vote_passed.wav - Gyoji: "Vote passed."
-sound/feedback/vote_failed.wav - Gyoji: "Vote failed."
+TEMP: sound/feedback/vote_passed.wav - Gyoji: "Vote passed."
+TEMP: sound/feedback/vote_failed.wav - Gyoji: "Vote failed."
 
 TEMP: sound/feedback/takenlead.wav - Gyoji: "You have taken the lead."
 TEMP: sound/feedback/tiedlead.wav - Gyoji: "Your tied for the lead."
 TEMP: sound/feedback/lostlead.wav - Gyoji: "You lost the lead."
+
+TEMP: sound/feedback/assist.wav - Gyoji: "Assist."
+TEMP: sound/feedback/defense.wav - Gyoji: "Defense."
+
+
 
 TEMP:	cgs.media.tracerSound = trap_S_RegisterSound( "sound/weapons/machinegun/buletby1.wav", qfalse );
 DONE:	cgs.media.selectSound = trap_S_RegisterSound( "sound/weapons/change.wav", qfalse );
@@ -50,22 +75,20 @@ DONE:	cgs.media.obeliskRespawnSound = trap_S_RegisterSound( "sound/items/obelisk
 
 TEMP:	cgs.media.teleInSound = trap_S_RegisterSound( "sound/world/telein.wav", qfalse );
 TEMP:	cgs.media.teleOutSound = trap_S_RegisterSound( "sound/world/teleout.wav", qfalse );
-	cgs.media.respawnSound = trap_S_RegisterSound( "sound/items/respawn1.wav", qfalse );
 
-	cgs.media.noAmmoSound = trap_S_RegisterSound( "sound/weapons/noammo.wav", qfalse );
+TEMP:	cgs.media.noAmmoSound = trap_S_RegisterSound( "sound/weapons/noammo.wav", qfalse );
 
-	cgs.media.talkSound = trap_S_RegisterSound( "sound/player/talk.wav", qfalse );
+TEMP:	cgs.media.talkSound = trap_S_RegisterSound( "sound/player/talk.wav", qfalse );
 TEMP:	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav", qfalse);
 
-	cgs.media.hitSound = trap_S_RegisterSound( "sound/feedback/hit.wav", qfalse );
-
-	cgs.media.assistSound = trap_S_RegisterSound( "sound/feedback/assist.wav", qtrue );
-	cgs.media.defendSound = trap_S_RegisterSound( "sound/feedback/defense.wav", qtrue );
-
+//Used sounds from OpenArena for watr* sounds
 	cgs.media.watrInSound = trap_S_RegisterSound( "sound/player/watr_in.wav", qfalse);
 	cgs.media.watrOutSound = trap_S_RegisterSound( "sound/player/watr_out.wav", qfalse);
 	cgs.media.watrUnSound = trap_S_RegisterSound( "sound/player/watr_un.wav", qfalse);
 
+
+	cgs.media.respawnSound = trap_S_RegisterSound( "sound/items/respawn1.wav", qfalse );
+	cgs.media.hitSound = trap_S_RegisterSound( "sound/feedback/hit.wav", qfalse );
 	cgs.media.jumpPadSound = trap_S_RegisterSound ("sound/world/jumppad.wav", qfalse );
 
 	Footstep sounds;
@@ -78,7 +101,7 @@ TEMP:	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav", qfal
 	cgs.media.flightSound = trap_S_RegisterSound( "sound/items/flight.wav", qfalse );
 	cgs.media.medkitSound = trap_S_RegisterSound ("sound/items/use_medkit.wav", qfalse);
 #ifdef TMNTHOLDABLE
-	cgs.media.shurikenSound = trap_S_RegisterSound ("sound/items/use_shuriken.wav", qfalse);
+TEMP:	cgs.media.shurikenSound = trap_S_RegisterSound ("sound/items/use_shuriken.wav", qfalse);
 #endif
 	cgs.media.quadSound = trap_S_RegisterSound("sound/items/damage3.wav", qfalse);
 	cgs.media.sfx_ric1 = trap_S_RegisterSound ("sound/weapons/machinegun/ric1.wav", qfalse);
@@ -97,10 +120,10 @@ DONE:	cgs.media.regenSound = trap_S_RegisterSound("sound/items/regen.wav", qfals
 
 if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
 
-	sound/feedback/redleads.wav
-	sound/feedback/blueleads.wav
-	sound/feedback/teamstied.wav
-	sound/feedback/hit_teammate.wav
+	sound/feedback/redleads.wav - "Red leads"
+	sound/feedback/blueleads.wav - "Blue leads"
+	sound/feedback/teamstied.wav - "Teams are tied"
+	sound/feedback/hit_teammate.wav - sfx
 
 	sound/teamplay/voc_red_scores.wav
 	sound/teamplay/voc_blue_scores.wav
@@ -129,11 +152,11 @@ if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
 	}
 
 	if ( cgs.gametype == GT_1FCTF || cgs.gametype == GT_CTF || cg_buildScript.integer ) {
-		sound/teamplay/voc_you_flag.wav
+		sound/teamplay/voc_you_flag.wav - "You have the flag!"
 	}
 
 	if ( cgs.gametype == GT_OBELISK || cg_buildScript.integer ) {
-		sound/teamplay/voc_base_attack.wav
+		sound/teamplay/voc_base_attack.wav - "Your base is under attack!"
 	}
 }
 
