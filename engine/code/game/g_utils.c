@@ -819,7 +819,7 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 		targetOrg[2] += target->client->ps.viewheight;
 	} else {
 		VectorCopy(target->r.currentOrigin, targetOrg);
-		targetOrg[2] += 40;
+		targetOrg[2] += (target->r.mins[2] + target->r.maxs[2])/2;
 	}
 
 	// Unneeded for target trace test, the trace found it so it is visable
@@ -908,7 +908,7 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 			targetOrg[2] += target->client->ps.viewheight;
 		} else {
 			VectorCopy(target->r.currentOrigin, targetOrg);
-			targetOrg[2] += 40;
+			targetOrg[2] += (target->r.mins[2] + target->r.maxs[2])/2;
 		}
 
 		for(j = 0; j < 3; j++) {

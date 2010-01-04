@@ -3145,7 +3145,11 @@ void CG_Player( centity_t *cent ) {
 #ifdef IOQ3ZTM
 		if (cg.snap->ps.enemyEnt >= MAX_CLIENTS && cg.snap->ps.enemyEnt != ENTITYNUM_NONE)
 		{
-			CG_PlayerFloatSprite( cg.snap->ps.enemyMarker, 0, cgs.media.targetShader );
+			vec3_t marker;
+			
+			VectorCopy(cg.snap->ps.enemyOrigin, marker);
+			marker[2] += 40;
+			CG_PlayerFloatSprite( marker, 0, cgs.media.targetShader );
 		}
 #endif
 #endif

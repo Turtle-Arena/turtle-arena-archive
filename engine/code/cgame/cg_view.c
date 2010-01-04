@@ -235,6 +235,43 @@ static void CG_OffsetThirdPersonView( void ) {
 
 	cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
 
+#ifdef TMNT // LOCKON
+	if (cg.snap && cg.snap->ps.enemyEnt != ENTITYNUM_NONE) {
+		vec3_t dir;
+		vec3_t targetAngles;
+		vec3_t angDiff;
+		float f;
+
+		// Get view angles to look at target
+		VectorSubtract( cg.snap->ps.enemyOrigin, cg.snap->ps.origin, dir );
+		vectoangles( dir, targetAngles );
+
+		// get diff of normal and target view angles.
+		if ( cg.lockedOn ) {
+			VectorSubtract(targetAngles, cg.refdefViewAngles, dir);
+		} else {
+			VectorSubtract(cg.refdefViewAngles, targetAngles, dir);
+		}
+
+		// Scale the difference of the angles
+		f = ( cg.time - cg.lockonTime ) / (float)LOCKON_TIME;
+		VectorScale(dir, f, angDiff);
+
+		if ( cg.lockedOn ) {
+			if ( f > 1.0 ) {
+				VectorCopy(targetAngles, cg.refdefViewAngles);
+			} else {
+				VectorAdd(cg.refdefViewAngles, angDiff, cg.refdefViewAngles);
+			}
+		} else {
+			if ( f > 1.0 ) {
+				//VectorCopy( cg.refdefViewAngles, cg.refdefViewAngles);
+			} else {
+				VectorAdd(targetAngles, angDiff, cg.refdefViewAngles);
+			}
+		}
+	}
+#endif
 	VectorCopy( cg.refdefViewAngles, focusAngles );
 
 	// if dead, look at killer
@@ -954,6 +991,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	if (!cg.lockedOn && (cg.predictedPlayerState.eFlags & EF_LOCKON))
 	{
 		cg.lockedOn = qtrue;
+		cg.lockonTime = cg.time;
 #ifdef TMNTMISC
 		CG_ToggleLetterbox(qtrue, qfalse);
 #endif
@@ -961,6 +999,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	else if (cg.lockedOn && !(cg.predictedPlayerState.eFlags & EF_LOCKON))
 	{
 		cg.lockedOn = qfalse;
+		cg.lockonTime = cg.time;
 #ifdef TMNTMISC
 		CG_ToggleLetterbox(qfalse, qfalse);
 #endif

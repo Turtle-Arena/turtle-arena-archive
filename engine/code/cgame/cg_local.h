@@ -758,6 +758,7 @@ typedef struct {
 #ifdef TMNT // LOCKON
 	// lockon key
 	qboolean	lockedOn;
+	int			lockonTime;
 #endif
 
 #ifndef TMNT // NOZOOM

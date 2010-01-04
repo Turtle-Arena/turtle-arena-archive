@@ -1231,9 +1231,9 @@ netField_t	playerStateFields[] =
 #endif
 #ifdef TMNT // LOCKON
 ,{ PSF(enemyEnt), GENTITYNUM_BITS },
-{ PSF(enemyMarker[0]), 0 },
-{ PSF(enemyMarker[1]), 0 },
-{ PSF(enemyMarker[2]), 0 }
+{ PSF(enemyOrigin[0]), 0 },
+{ PSF(enemyOrigin[1]), 0 },
+{ PSF(enemyOrigin[2]), 0 }
 #endif
 #ifdef TMNTWEAPSYS // MELEEATTACK
 ,{ PSF(meleeAttack), 8 },

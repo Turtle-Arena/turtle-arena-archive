@@ -55,6 +55,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CROUCH_VIEWHEIGHT	12
 #define	DEAD_VIEWHEIGHT		-16
 
+#ifdef TMNT // LOCKON
+#define LOCKON_TIME 200 // Time it take to be fully facing target
+#endif
+
 //
 // config strings are a general means of communicating variable length strings
 // from the server to all connected clients.

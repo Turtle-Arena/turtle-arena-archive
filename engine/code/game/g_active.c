@@ -1378,41 +1378,49 @@ void ClientThink_real( gentity_t *ent ) {
 		ent->enemy = G_FindTarget(ent, vieworigin, client->ps.viewangles, 768.0f, 90.0f);
 	}
 
-	// Set origin of target marker
+	// Set origin of target origin
 	if (ent->enemy)
 	{
 		if (ent->enemy->client) {
-			VectorCopy(ent->enemy->client->ps.origin, client->ps.enemyMarker);
-			client->ps.enemyMarker[2] += ent->enemy->client->ps.viewheight + 16;
+			VectorCopy(ent->enemy->client->ps.origin, client->ps.enemyOrigin);
+			client->ps.enemyOrigin[2] += ent->enemy->client->ps.viewheight;
 		} else {
-			VectorCopy(ent->enemy->s.origin, client->ps.enemyMarker);
-			client->ps.enemyMarker[2] += (ent->enemy->r.mins[2] + ent->enemy->r.maxs[2])/2 + 40;
+			VectorCopy(ent->enemy->r.currentOrigin, client->ps.enemyOrigin);
+			client->ps.enemyOrigin[2] += (ent->enemy->r.mins[2] + ent->enemy->r.maxs[2])/2;
 		}
 		client->ps.enemyEnt = ent->enemy-g_entities;
 	}
 	else
 	{
-		VectorClear(client->ps.enemyMarker);
+		VectorClear(client->ps.enemyOrigin);
 		client->ps.enemyEnt = ENTITYNUM_NONE;
 	}
 
-	if ((client->ps.eFlags & EF_LOCKON) && ent->enemy) {
+	if (client->hadLockon != (client->ps.eFlags & EF_LOCKON))
+	{
+		client->hadLockon = (client->ps.eFlags & EF_LOCKON);
+		client->lockonTime = level.time;
+	}
+
+	// A_FaceTarget!
+	if ((client->ps.eFlags & EF_LOCKON) && ent->enemy
+		&& ( level.time - client->lockonTime ) > LOCKON_TIME/2)
+	{
 		vec3_t dir;
-		vec3_t angles;
+		vec3_t viewAngles;
 
 		if (ent->enemy->client) {
 			VectorSubtract( ent->enemy->client->ps.origin, client->ps.origin, dir );
 		} else {
-			VectorSubtract( ent->enemy->s.origin, client->ps.origin, dir );
+			VectorSubtract( ent->enemy->r.currentOrigin, client->ps.origin, dir );
 		}
 
-		vectoangles( dir, angles );
+		vectoangles( dir, viewAngles );
 
-		// Turtle Man: TEST
-		BG_SwingAngles( angles[YAW], 40, 90, BG_SWINGSPEED, &ent->client->pers.legs.yawAngle, &ent->client->pers.legs.yawing, (level.time - level.previousTime) );
-		angles[YAW] = ent->client->pers.legs.yawAngle;
+		BG_SwingAngles( viewAngles[YAW], 40, 90, BG_SWINGSPEED, &ent->client->pers.legs.yawAngle, &ent->client->pers.legs.yawing, (level.time - level.previousTime) );
+		viewAngles[YAW] = ent->client->pers.legs.yawAngle;
 
-		SetClientViewAngle(ent, angles);
+		SetClientViewAngle(ent, viewAngles);
 	}
 #endif
 
