@@ -371,6 +371,10 @@ struct gclient_s {
 	int melee_debounce; // Delay doing damage for primary weapon
 	int melee_debounce2; // delay doing damage for secondary weapon
 #endif
+#ifdef TMNT // LOCKON
+	int lockonTime;
+	qboolean hadLockon;
+#endif
 
 	char		*areabits;
 };

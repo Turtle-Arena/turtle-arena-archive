@@ -1178,7 +1178,7 @@ typedef struct playerState_s {
 #ifdef TMNT // LOCKON
 	// Target for lockon
 	int			enemyEnt;
-	vec3_t		enemyMarker;
+	vec3_t		enemyOrigin;
 #endif
 
 #ifdef TMNTWEAPSYS // MELEEATTACK
