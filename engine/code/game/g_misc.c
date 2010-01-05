@@ -299,7 +299,7 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 
 #ifdef TMNTWEAPSYS
 	if (!fire_weapon(ent, ent->s.origin, dir, right, up,
-				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], 1))
+				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], 1, HAND_NONE))
 	{
 		return;
 	}

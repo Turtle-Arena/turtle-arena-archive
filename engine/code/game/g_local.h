@@ -597,18 +597,18 @@ void G_RunMissile( gentity_t *ent );
 #ifdef TMNTWEAPSYS
 #ifdef TMNTHOLDABLE
 qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward,
-		vec3_t right, vec3_t up, holdable_t holdable);
+		vec3_t right, vec3_t up, holdable_t holdable, int handSide);
 #endif
 
 qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		vec3_t right, vec3_t up, int projnum, float quadFactor,
-		int mod, int splashMod);
+		int mod, int splashMod, int handSide);
 
 qboolean fire_weapon(gentity_t *self, vec3_t start, vec3_t forward,
-		vec3_t right, vec3_t up, int weaponnum, float quadFactor);
+		vec3_t right, vec3_t up, int weaponnum, float quadFactor, int handSide);
 
 qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir,
-		int weaponnum, float quadFactor);
+		int weaponnum, float quadFactor, int handSide);
 #else
 #ifdef TMNTHOLDABLE
 gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward,

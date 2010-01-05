@@ -141,7 +141,7 @@ void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
 			AngleVectors (ent->client->ps.viewangles, forward, right, up);
 			CalcMuzzlePoint ( ent, forward, right, up, muzzle );
 
-			fire_shuriken (ent, muzzle, forward, right, up, holdable);
+			fire_shuriken (ent, muzzle, forward, right, up, holdable, HAND_NONE);
 			break;
 		default:
 			G_Error("Unknown shuriken type (holdable=%d)\n", holdable);
@@ -465,7 +465,6 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 			}
 		}
 #else
-		// Turtle Man: Secondary weapon currently does the damage.
 		return qfalse;
 #endif
 	}
@@ -1557,26 +1556,52 @@ void FireWeapon( gentity_t *ent ) {
 #endif
 	}
 
-	// set aiming directions
-	AngleVectors (ent->client->ps.viewangles, forward, right, up);
-
-	CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
-
 #ifdef TMNTWEAPSYS
-    if (BG_WeaponTypeForNum(ent->s.weapon) != WT_GUN)
+    if (bg_weapongroupinfo[ent->s.weapon].weapon[0]->weapontype != WT_GUN)
     {
         return;
     }
-#endif
 
-#ifdef TMNTWEAPSYS
+	// set aiming directions
+	AngleVectors (ent->client->ps.viewangles, forward, right, up);
+	CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
+	if (ent->client->pers.playercfg.primaryHandSide == HAND_RIGHT)
+		VectorMA (muzzle, 4, right, muzzle);
+	else if (ent->client->pers.playercfg.primaryHandSide == HAND_LEFT)
+		VectorMA (muzzle, -4, right, muzzle);
+
 #ifdef TMNT // LOCKON
 	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
 			muzzle, forward, right, up);
 #endif
 	fire_weapon(ent, muzzle, forward, right, up,
-			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor);
+			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, ent->client->pers.playercfg.primaryHandSide);
+
+    if (bg_weapongroupinfo[ent->s.weapon].weapon[1]->weapontype != WT_GUN)
+    {
+        return;
+    }
+
+	// set aiming directions
+	AngleVectors (ent->client->ps.viewangles, forward, right, up);
+	CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
+	if (ent->client->pers.playercfg.secondaryHandSide == HAND_RIGHT)
+		VectorMA (muzzle, 4, right, muzzle);
+	else if (ent->client->pers.playercfg.secondaryHandSide == HAND_LEFT)
+		VectorMA (muzzle, -4, right, muzzle);
+
+#ifdef TMNT // LOCKON
+	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
+			muzzle, forward, right, up);
+#endif
+	fire_weapon(ent, muzzle, forward, right, up,
+			bg_weapongroupinfo[ent->s.weapon].weaponnum[1], s_quadFactor, ent->client->pers.playercfg.secondaryHandSide);
 #else
+	// set aiming directions
+	AngleVectors (ent->client->ps.viewangles, forward, right, up);
+
+	CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
+
 #ifdef TMNT // LOCKON
 	G_AutoAim(ent, 0, muzzle, forward, right, up);
 #endif
@@ -1905,7 +1930,7 @@ void NPC_FireWeapon(gentity_t *ent)
 #endif
 #ifdef TMNTWEAPSYS
 	fire_weapon(ent, muzzle, forward, right, up,
-			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor);
+			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, HAND_RIGHT);
 #else
 #warning "TMNTWEAPSYS must be defined for NPC_FireWeapon"
 	Com_Printf("Warning: TMNTWEAPSYS must be defined for NPC_FireWeapon.\n");

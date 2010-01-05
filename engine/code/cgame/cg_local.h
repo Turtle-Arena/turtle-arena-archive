@@ -193,7 +193,7 @@ typedef struct
 
 // Currently limited to one trail per-weapon
 //   It would be nice for Sais to have three.
-#define MAX_WEAPON_TRAILS 2
+#define MAX_WEAPON_TRAILS MAX_HANDS
 #endif
 
 typedef struct {
