@@ -5748,6 +5748,21 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		} else if ( !Q_stricmp( token, "fixedtorso" ) ) {
 			playercfg->fixedtorso = qtrue;
 			continue;
+		} else if ( !Q_stricmp( token, "primaryHand" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			if ( !Q_stricmp( token, "left" ) ) {
+				playercfg->primaryHandSide = HAND_LEFT;
+				playercfg->secondaryHandSide = HAND_RIGHT;
+			} else if ( !Q_stricmp( token, "right" ) ) {
+				playercfg->primaryHandSide = HAND_RIGHT;
+				playercfg->secondaryHandSide = HAND_LEFT;
+			} else {
+				Com_Printf( "Bad primaryHand parm in %s: %s\n", filename, token );
+			}
+			continue;
 		}
 
 		// TMNT_SUPPORTEF
@@ -5989,6 +6004,8 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	Q_strncpyz(playercfg->soundpath, headModel, sizeof (playercfg->soundpath));
 
 #ifdef TMNTWEAPSYS
+	playercfg->primaryHandSide = HAND_RIGHT;
+	playercfg->secondaryHandSide = HAND_LEFT;
 	playercfg->default_weapon = BG_WeaponGroupIndexForName(DEFAULT_DEFAULT_WEAPON);
 
 	// If the default weapon wasn't found.

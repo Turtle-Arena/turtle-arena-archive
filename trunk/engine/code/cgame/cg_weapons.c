@@ -169,7 +169,7 @@ CG_MachineGunEjectBrass
 */
 static void CG_MachineGunEjectBrass( centity_t *cent
 #ifdef TMNTWEAPSYS
-	, int hand
+	, int handSide
 #endif
 ) {
 	localEntity_t	*le;
@@ -200,14 +200,16 @@ static void CG_MachineGunEjectBrass( centity_t *cent
 	AnglesToAxis( cent->lerpAngles, v );
 
 	offset[0] = 8;
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Should use tag_* here as hands may be on other sides.
-	if (hand == HAND_SECONDARY)
-	{
+#ifdef TMNTWEAPSYS
+	if (handSide == HAND_RIGHT)
+		offset[1] = -4;
+	else if (handSide == HAND_LEFT)
 		offset[1] = 4;
-	}
 	else
-#endif
+		offset[1] = 0;
+#else
 	offset[1] = -4;
+#endif
 	offset[2] = 24;
 
 	xoffset[0] = offset[0] * v[0][0] + offset[1] * v[1][0] + offset[2] * v[2][0];
@@ -250,7 +252,12 @@ static void CG_MachineGunEjectBrass( centity_t *cent
 CG_ShotgunEjectBrass
 ==========================
 */
-static void CG_ShotgunEjectBrass( centity_t *cent ) {
+static void CG_ShotgunEjectBrass( centity_t *cent
+#ifdef TMNTWEAPSYS
+	, int handSide
+#endif
+	)
+{
 	localEntity_t	*le;
 	refEntity_t		*re;
 	vec3_t			velocity, xvelocity;
@@ -286,7 +293,16 @@ static void CG_ShotgunEjectBrass( centity_t *cent ) {
 		AnglesToAxis( cent->lerpAngles, v );
 
 		offset[0] = 8;
+#ifdef TMNTWEAPSYS
+		if (handSide == HAND_RIGHT)
+			offset[1] = -4;
+		else if (handSide == HAND_LEFT)
+			offset[1] = 4;
+		else
+			offset[1] = 0;
+#else
 		offset[1] = 0;
+#endif
 		offset[2] = 24;
 
 		xoffset[0] = offset[0] * v[0][0] + offset[1] * v[1][0] + offset[2] * v[2][0];
@@ -304,7 +320,7 @@ static void CG_ShotgunEjectBrass( centity_t *cent ) {
 		VectorScale( xvelocity, waterScale, le->pos.trDelta );
 
 		AxisCopy( axisDefault, re->axis );
-#ifdef TMNTWEAPONS
+#ifdef TMNTDATA
 		re->hModel = cgs.media.machinegunBrassModel;
 #else
 		re->hModel = cgs.media.shotgunBrassModel;
@@ -335,7 +351,7 @@ CG_NailgunEjectBrass
 */
 static void CG_NailgunEjectBrass( centity_t *cent
 #ifdef TMNTWEAPSYS
-	, int hand
+	, int handSide
 #endif
 ) {
 	localEntity_t	*smoke;
@@ -348,14 +364,16 @@ static void CG_NailgunEjectBrass( centity_t *cent
 	AnglesToAxis( cent->lerpAngles, v );
 
 	offset[0] = 0;
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Should use tag_* here as hands may be on other sides.
-	if (hand == HAND_SECONDARY)
-	{
+#ifdef TMNTWEAPSYS
+	if (handSide == HAND_RIGHT)
+		offset[1] = -12;
+	else if (handSide == HAND_LEFT)
 		offset[1] = 12;
-	}
 	else
-#endif
+		offset[1] = 0;
+#else
 	offset[1] = -12;
+#endif
 	offset[2] = 24;
 
 	xoffset[0] = offset[0] * v[0][0] + offset[1] * v[1][0] + offset[2] * v[2][0];
@@ -2044,16 +2062,8 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 		return;
 	}
 
-	if (weaponHand == HAND_PRIMARY)
-	{
-		yawAngle = &cent->pe.weaponTrails[0].yawAngle;
-		yawing = &cent->pe.weaponTrails[0].yawing;
-	}
-	else // HAND_SECONDARY
-	{
-		yawAngle = &cent->pe.weaponTrails[1].yawAngle;
-		yawing = &cent->pe.weaponTrails[1].yawing;
-	}
+	yawAngle = &cent->pe.weaponTrails[weaponHand].yawAngle;
+	yawing = &cent->pe.weaponTrails[weaponHand].yawing;
 
 	weaponNum = cent->currentState.weapon;
 
@@ -3126,7 +3136,7 @@ CG_WeaponUseEffect
 Weapons can eject brass/smoke
 ================
 */
-void CG_WeaponUseEffect( centity_t *cent, int hand, int weaponNum )
+void CG_WeaponUseEffect( centity_t *cent, int handSide, int weaponNum )
 {
 	bg_weaponinfo_t *weap;
 	int		contents;
@@ -3140,11 +3150,11 @@ void CG_WeaponUseEffect( centity_t *cent, int hand, int weaponNum )
 
 	if (weap->flags & WIF_EJECT_BRASS)
 	{
-		CG_MachineGunEjectBrass( cent, hand );
+		CG_MachineGunEjectBrass( cent, handSide );
 	}
 	if (weap->flags & WIF_EJECT_BRASS2)
 	{
-		CG_ShotgunEjectBrass( cent );
+		CG_ShotgunEjectBrass( cent, handSide );
 	}
 
 	contents = trap_CM_PointContents( cent->currentState.pos.trBase, 0 );
@@ -3154,7 +3164,7 @@ void CG_WeaponUseEffect( centity_t *cent, int hand, int weaponNum )
 	{
 		if (weap->flags & WIF_EJECT_SMOKE)
 		{
-			CG_NailgunEjectBrass( cent, hand );
+			CG_NailgunEjectBrass( cent, handSide );
 		}
 
 		// Shotgun smoke (From Q3's CG_ShotgunFire)
@@ -3286,8 +3296,8 @@ void CG_FireWeapon( centity_t *cent ) {
 	}
 	else*/
 	{
-		CG_WeaponUseEffect(cent, HAND_PRIMARY, bg_weapongroupinfo[ent->weapon].weaponnum[0]);
-		CG_WeaponUseEffect(cent, HAND_SECONDARY, bg_weapongroupinfo[ent->weapon].weaponnum[1]);
+		CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.primaryHandSide, bg_weapongroupinfo[ent->weapon].weaponnum[0]);
+		CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.secondaryHandSide, bg_weapongroupinfo[ent->weapon].weaponnum[1]);
 	}
 #else
 	if ( weap->ejectBrassFunc && cg_brassTime.integer > 0 ) {

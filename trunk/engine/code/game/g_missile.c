@@ -278,7 +278,7 @@ void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout 
 // self is the "parent", the entity that owns the missile (like a player or shooter_*)
 qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		vec3_t right, vec3_t up, int projnum, float quadFactor,
-		int mod, int splashMod)
+		int mod, int splashMod, int handSide)
 {
 	vec3_t		mins = { -8, -8, -8 };
 	vec3_t		maxs = {  8,  8,  8 };
@@ -569,7 +569,10 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 
 				VectorCopy( start, tent->s.origin2 );
 				// move origin a bit to come closer to the drawn gun muzzle
-				VectorMA( tent->s.origin2, 4, right, tent->s.origin2 );
+				if (handSide == HAND_RIGHT)
+					VectorMA( tent->s.origin2, 4, right, tent->s.origin2 );
+				else if (handSide == HAND_LEFT)
+					VectorMA( tent->s.origin2, -4, right, tent->s.origin2 );
 				VectorMA( tent->s.origin2, -1, up, tent->s.origin2 );
 
 				// no explosion at end if SURF_NOIMPACT, but still make the trail
@@ -690,17 +693,17 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 }
 
 // NOTE: weaponnum is *not* weapon group
-qboolean fire_weapon(gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, int weaponnum, float quadFactor)
+qboolean fire_weapon(gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, int weaponnum, float quadFactor, int handSide)
 {
 	if (weaponnum <= 0 || weaponnum >= BG_NumWeapons()) {
 		return qfalse;
 	}
 
 	return fire_projectile(self, start, forward, right, up, bg_weaponinfo[weaponnum].projnum,
-		quadFactor, bg_weaponinfo[weaponnum].mod, bg_weaponinfo[weaponnum].splashMod);
+		quadFactor, bg_weaponinfo[weaponnum].mod, bg_weaponinfo[weaponnum].splashMod, handSide);
 }
 
-qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir, int weaponnum, float quadFactor)
+qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir, int weaponnum, float quadFactor, int handSide)
 {
 	vec3_t right, up;
 
@@ -713,7 +716,7 @@ qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir, int weaponnum
 	CrossProduct( up, dir, right );
 
 	return fire_projectile(self, start, dir, right, up, bg_weaponinfo[weaponnum].projnum,
-		quadFactor, bg_weaponinfo[weaponnum].mod, bg_weaponinfo[weaponnum].splashMod);
+		quadFactor, bg_weaponinfo[weaponnum].mod, bg_weaponinfo[weaponnum].splashMod, handSide);
 }
 #endif
 
@@ -724,7 +727,7 @@ fire_shuriken
 =================
 */
 #ifdef TMNTWEAPSYS
-qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable)
+qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable, int handSide)
 {
 	int projnum = 0;
 	float s_quadFactor;
@@ -772,7 +775,7 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 #endif
 
 	return fire_projectile(self, start, forward, right, up, projnum,
-				s_quadFactor, mod, splashMod);
+				s_quadFactor, mod, splashMod, handSide);
 }
 #else
 gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable)

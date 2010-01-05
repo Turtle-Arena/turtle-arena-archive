@@ -581,6 +581,11 @@ typedef enum {
 #define HAND_BOTH (HAND_PRIMARY|HAND_SECONDARY)
 #define MAX_HANDS 2 // Only support two hands for fighting.
 
+// handSide
+#define HAND_CENTER 0
+#define HAND_RIGHT 1
+#define HAND_LEFT 2
+
 //projectile trail types
 #define PT_NONE 0
 #define PT_PLASMA 1
@@ -1385,6 +1390,8 @@ typedef struct bg_playercfg_s
 	//  what happens in game.
 #ifdef TMNTWEAPSYS
     weapon_t default_weapon;
+	int primaryHandSide;
+	int secondaryHandSide;
 #endif
 
 	// Player's boundingbox

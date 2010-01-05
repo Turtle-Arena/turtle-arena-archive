@@ -2,16 +2,10 @@ TMNT Arena TODO/BUGS file
 
 Bugs that have found that have not been fixed yet, and things that should to be done (or that I'd like to be done...).
 
-== House Keeping For Public Release! ==
-* Use GNU FreeFonts (the GPL v2 or later ones)
-** [todo] Replace OpenArena's menu/art/font1_prop.tga with GNU FreeSans
-** [todo] Replace OpenArena's gfx/2d/bigchars with GNU FreeSans
-
 == engine ==
 
 // Weapons! (and attacking)
-[todo] Allow using two guns at once and fix weapon hand offset stuff (like brass eject code and EV_RAILTRAIL) etc.
-: Fire both at the same time or switch between them?
+[todo] Support setting handSide in NPC config
 
 [todo] Add code so that Nunchuk can spin when attacking (and standing?), and when not spining have gravity
 	(like CTF flag)
@@ -112,8 +106,6 @@ DONE: [todo] Remove the need for fuzw.c
 [todo] Add misc_bubbles entity.
 
 [todo] Add misc_dripper entity.
-
-[bug] Single Player scores are not saved. ( http://bugzilla.icculus.org/show_bug.cgi?id=4357 )
 
 [todo] NiGHTS [into Dreams...] mode (Maybe instead NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...)
 
