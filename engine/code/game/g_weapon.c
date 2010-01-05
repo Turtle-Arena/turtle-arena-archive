@@ -548,7 +548,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 
 		damage = weapon->blades[i].damage * s_quadFactor;
 
-		if ( tr.startsolid || (tr.contents & CONTENTS_SOLID) ) {
+		if ( dodamage && (tr.startsolid || (tr.contents & CONTENTS_SOLID)) ) {
 			// Turtle Man: TODO: Push player away from trace dir!
 			// Copied from G_Damage
 			vec3_t	kvel;
@@ -588,6 +588,13 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 		}
 
 		traceEnt = &g_entities[ tr.entityNum ];
+		
+		// Can't damage your own obelisk
+		if (traceEnt->pain == ObeliskPain
+			&& traceEnt->spawnflags == ent->client->sess.sessionTeam)
+		{
+			continue;
+		}
 
 		if (checkTeamHit)
 		{
@@ -595,6 +602,11 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 			{
 				return qtrue;
 			}
+			continue;
+		}
+
+		if (!dodamage)
+		{
 			continue;
 		}
 
@@ -620,8 +632,8 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 				tent = G_TempEntity( tr.endpos, EV_WEAPON_MISS );
 			}
 			else {
-			// hit nothing.
-			tent = NULL;
+				// hit nothing.
+				tent = NULL;
 			}
 
 			if (tent)

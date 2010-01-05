@@ -772,9 +772,6 @@ qboolean G_IsVisible(int skipEnt, const vec3_t start, const vec3_t goal)
 		return qtrue;
 }
 
-// g_team.c
-void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage );
-
 qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 		const vec3_t start, const vec3_t dir,
 		float range, float ang, int tests)

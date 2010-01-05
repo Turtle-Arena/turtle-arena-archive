@@ -14,16 +14,24 @@ Do "play testing" to find bugs and to find things to change, improve, and add.
 * New teleport effect;
 : After teleporting have player "glow" blueish (using a shader, and Dlight?) and have player be non-solid (move though other players) and don't take damage (or low damage with random miss/hit). Time for the effect should be like 3 seconds and then flash and be normal (solid, no tele effect shader).
 
-* Have scripted movements for attacks, so that player don't just swing there arms? They stop and swing there arms, etc.
-
 === Future ===
 : Ideas for things to maybe do in the future, shouldn't try to do for demo 1.
 
 * NPCs (Sort of started, I replaced the TDC NPC stuff -totally removed the thinking code, however)
 * New camera system
 * NPRQuake has some awesome rendering options... (If I wanted it to look like a comic book it might help.)
-* Word filter http://smokinguns.svn.sourceforge.net/viewvc/smokinguns?view=rev&revision=189
-** Not really needed till there is a master server... and players.
+* Word filter http://code.google.com/p/sgfork/source/detail?r=5
+
+=== Single Player Design/"Story" ===
+Ideas;
+* Try to fit into the 2003 TV series or just be standalone?
+* Have there be episodes/stages containing multiple levels.
+* Have one of the stages take place in Usagi's world
+* Have one of the stages take place in Moo Mesa?
+* The Purple Dragons may appear
+* The Earth Protection Force (Agent Bishop) may appear
+* It is unknown if The Foot will appear.
+* Mousers may appear
 
 == Player Models ==
 List of tags by models.

@@ -115,6 +115,15 @@ DONE: [todo] Remove the need for fuzw.c
 
 [bug] Single Player scores are not saved. ( http://bugzilla.icculus.org/show_bug.cgi?id=4357 )
 
+[todo] NiGHTS [into Dreams...] mode (Maybe instead NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...)
+
+[todo] 'New' gametypes; Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
+
+[todo] Remake UI/HUD using Quake III: Team Arena menu scripting?
+
+[todo] True Single Player mode with NPCs and all that.
+
+
 // The below are somewhat long...
 
 [todo] Update camera system.
