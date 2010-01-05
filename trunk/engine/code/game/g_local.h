@@ -785,6 +785,9 @@ void G_RunClient( gentity_t *ent );
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
 void Team_CheckDroppedItem( gentity_t *dropped );
 qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
+#if defined TMNT || defined TMNTWEAPSYS // LOCKON
+void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage );
+#endif
 
 //
 // g_mem.c
