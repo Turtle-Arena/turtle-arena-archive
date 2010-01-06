@@ -27,7 +27,7 @@
  *  Functions to provide thread synchronization primitives
  *
  *  @note These are independent of the other SDL routines.
-*/
+ */
 
 #include "SDL_stdinc.h"
 #include "SDL_error.h"
@@ -40,7 +40,7 @@ extern "C" {
 
 /** Synchronization functions which can time out return this value
  *  if they time out.
-*/
+ */
 #define SDL_MUTEX_TIMEDOUT	1
 
 /** This is the timeout value which corresponds to never time out */
@@ -102,7 +102,7 @@ extern DECLSPEC int SDLCALL SDL_SemWait(SDL_sem *sem);
 /** Non-blocking variant of SDL_SemWait().
  *  @return 0 if the wait succeeds,
  *  SDL_MUTEX_TIMEDOUT if the wait would block, and -1 on error.
-*/
+ */
 extern DECLSPEC int SDLCALL SDL_SemTryWait(SDL_sem *sem);
 
 /** Variant of SDL_SemWait() with a timeout in milliseconds, returns 0 if
@@ -111,7 +111,7 @@ extern DECLSPEC int SDLCALL SDL_SemTryWait(SDL_sem *sem);
  *
  *  On some platforms this function is implemented by looping with a delay
  *  of 1 ms, and so should be avoided if possible.
-*/
+ */
 extern DECLSPEC int SDLCALL SDL_SemWaitTimeout(SDL_sem *sem, Uint32 ms);
 
 /** Atomically increases the semaphore's count (not blocking).
@@ -162,7 +162,7 @@ extern DECLSPEC int SDLCALL SDL_CondWait(SDL_cond *cond, SDL_mutex *mut);
  *  signaled in the allotted time, and -1 on error.
  *  On some platforms this function is implemented by looping with a delay
  *  of 1 ms, and so should be avoided if possible.
-*/
+ */
 extern DECLSPEC int SDLCALL SDL_CondWaitTimeout(SDL_cond *cond, SDL_mutex *mutex, Uint32 ms);
 
 /*@}*/

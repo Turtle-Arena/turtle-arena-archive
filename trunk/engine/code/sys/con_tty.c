@@ -174,7 +174,7 @@ void CON_Shutdown( void )
 		tcsetattr (STDIN_FILENO, TCSADRAIN, &TTY_tc);
 	}
 
-  // Restore blocking to stdin reads
+	// Restore blocking to stdin reads
 	fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL, 0) & ~O_NONBLOCK);
 }
 
@@ -331,7 +331,7 @@ char *CON_Input( void )
 	field_t *history;
 	size_t size;
 
-	if( ttycon_on )
+	if(ttycon_on)
 	{
 		avail = read(STDIN_FILENO, &key, 1);
 		if (avail != -1)

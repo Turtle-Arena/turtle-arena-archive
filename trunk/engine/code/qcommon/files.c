@@ -2543,7 +2543,7 @@ void FS_AddGameDirectory( const char *path, const char *dir ) {
 			continue;
 		// store the game name for downloading
 		strcpy(pak->pakGamename, dir);
-
+		
 		fs_packFiles += pak->numfiles;
 
 		search = Z_Malloc (sizeof(searchpath_t));
@@ -2751,9 +2751,9 @@ void FS_Shutdown( qboolean closemfp ) {
 		if(p->pack)
 			FS_FreePak(p->pack);
 		if (p->dir)
-			Z_Free( p->dir );
+			Z_Free(p->dir);
 
-		Z_Free( p );
+		Z_Free(p);
 	}
 
 	// any FS_ calls will now be an error until reinitialized

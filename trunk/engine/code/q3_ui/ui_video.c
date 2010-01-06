@@ -445,21 +445,21 @@ GraphicsOptions_GetAspectRatios
 static void GraphicsOptions_GetAspectRatios( void )
 {
 	int i, r;
-
+	
 	// build ratio list from resolutions
 	for( r = 0; resolutions[r]; r++ )
 	{
 		int w, h;
 		char *x;
 		char str[ sizeof(ratioBuf[0]) ];
-
+		
 		// calculate resolution's aspect ratio
 		x = strchr( resolutions[r], 'x' ) + 1;
 		Q_strncpyz( str, resolutions[r], x-resolutions[r] );
 		w = atoi( str );
 		h = atoi( x );
 		Com_sprintf( str, sizeof(str), "%.2f:1", (float)w / (float)h );
-
+		
 		// add ratio to list if it is new
 		// establish res/ratio relationship
 		for( i = 0; ratioBuf[i][0]; i++ )
@@ -474,7 +474,7 @@ static void GraphicsOptions_GetAspectRatios( void )
 		}
 		resToRatio[r] = i;
 	}
-
+	
 	// prepare itemlist pointer array
 	// rename common ratios ("1.33:1" -> "4:3")
 	for( r = 0; ratioBuf[r][0]; r++ )
@@ -776,7 +776,7 @@ static void GraphicsOptions_Event( void* ptr, int event ) {
 		s_graphicsoptions.mode.curvalue =
 			ratioToRes[ s_graphicsoptions.ratio.curvalue ];
 		// fall through to apply mode constraints
-
+		
 	case ID_MODE:
 		// clamp 3dfx video modes
 		if ( s_graphicsoptions.driver.curvalue == 1 )
@@ -1061,7 +1061,7 @@ void GraphicsOptions_MenuInit( void )
 
 	GraphicsOptions_GetResolutions();
 	GraphicsOptions_GetAspectRatios();
-
+	
 	GraphicsOptions_Cache();
 
 	s_graphicsoptions.menu.wrapAround = qtrue;

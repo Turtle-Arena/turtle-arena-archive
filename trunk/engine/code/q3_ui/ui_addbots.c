@@ -98,7 +98,6 @@ static void UI_AddBotsMenu_FightEvent( void* ptr, int event ) {
 	trap_Cmd_ExecuteText( EXEC_APPEND, va("addbot %s %i %s %i\n",
 		addBotsMenuInfo.botnames[addBotsMenuInfo.selectedBotNum], skill, team, addBotsMenuInfo.delay) );
 
-
 	addBotsMenuInfo.delay += 1500;
 }
 

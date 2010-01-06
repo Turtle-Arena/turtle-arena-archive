@@ -56,7 +56,7 @@ extern "C" {
 /** @name SDL_INIT Flags
  *  These are the flags which may be passed to SDL_Init() -- you should
  *  specify the subsystems which you will be using in your application.
-*/
+ */
 /*@{*/
 #define	SDL_INIT_TIMER		0x00000001
 #define SDL_INIT_AUDIO		0x00000010
@@ -69,9 +69,9 @@ extern "C" {
 /*@}*/
 
 /** This function loads the SDL dynamically linked library and initializes 
- * the subsystems specified by 'flags' (and those satisfying dependencies)
- * Unless the SDL_INIT_NOPARACHUTE flag is set, it will install cleanup
- * signal handlers for some commonly ignored fatal signals (like SIGSEGV)
+ *  the subsystems specified by 'flags' (and those satisfying dependencies)
+ *  Unless the SDL_INIT_NOPARACHUTE flag is set, it will install cleanup
+ *  signal handlers for some commonly ignored fatal signals (like SIGSEGV)
  */
 extern DECLSPEC int SDLCALL SDL_Init(Uint32 flags);
 
@@ -84,11 +84,11 @@ extern DECLSPEC void SDLCALL SDL_QuitSubSystem(Uint32 flags);
 /** This function returns mask of the specified subsystems which have
  *  been initialized.
  *  If 'flags' is 0, it returns a mask of all initialized subsystems.
-*/
+ */
 extern DECLSPEC Uint32 SDLCALL SDL_WasInit(Uint32 flags);
 
 /** This function cleans up all initialized subsystems and unloads the
- * dynamically linked library.  You should call it upon all exit conditions.
+ *  dynamically linked library.  You should call it upon all exit conditions.
  */
 extern DECLSPEC void SDLCALL SDL_Quit(void);
 

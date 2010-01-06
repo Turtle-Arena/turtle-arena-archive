@@ -309,9 +309,9 @@ cvar_t *Cvar_Get( const char *var_name, const char *var_value, int flags ) {
 	long	hash;
 	int	index;
 
-  if ( !var_name || ! var_value ) {
+	if ( !var_name || ! var_value ) {
 		Com_Error( ERR_FATAL, "Cvar_Get: NULL parameter" );
-  }
+	}
 
 	if ( !Cvar_ValidateString( var_name ) ) {
 		Com_Printf("invalid cvar name string: %s\n", var_name );
@@ -662,14 +662,14 @@ Cvar_SetCheatState
 Any testing variables will be reset to the safe values
 ============
 */
-void Cvar_SetCheatState( void )
+void Cvar_SetCheatState(void)
 {
 	cvar_t	*var;
 
 	// set all default vars to the safe value
-	for ( var = cvar_vars ; var ; var = var->next )
+	for(var = cvar_vars; var ; var = var->next)
 	{
-		if ( var->flags & CVAR_CHEAT )
+		if(var->flags & CVAR_CHEAT)
 		{
 			// the CVAR_LATCHED|CVAR_CHEAT vars might escape the reset here 
 			// because of a different var->latchedString
@@ -796,7 +796,7 @@ weren't declared in C code.
 void Cvar_Set_f( void ) {
 	int		c;
 	char	*cmd;
-	cvar_t *v;
+	cvar_t	*v;
 
 	c = Cmd_Argc();
 	cmd = Cmd_Argv(0);
@@ -823,13 +823,13 @@ void Cvar_Set_f( void ) {
 			break;
 		case 'u':
 			if( !( v->flags & CVAR_USERINFO ) ) {
-			v->flags |= CVAR_USERINFO;
+				v->flags |= CVAR_USERINFO;
 				cvar_modifiedFlags |= CVAR_USERINFO;
 			}
 			break;
 		case 's':
 			if( !( v->flags & CVAR_SERVERINFO ) ) {
-			v->flags |= CVAR_SERVERINFO;
+				v->flags |= CVAR_SERVERINFO;
 				cvar_modifiedFlags |= CVAR_SERVERINFO;
 			}
 			break;
@@ -857,12 +857,12 @@ Appends lines containing "set variable value" for all variables
 with the archive flag set to qtrue.
 ============
 */
-void Cvar_WriteVariables( fileHandle_t f )
+void Cvar_WriteVariables(fileHandle_t f)
 {
 	cvar_t	*var;
 	char	buffer[1024];
 
-	for (var = cvar_vars ; var ; var = var->next)
+	for (var = cvar_vars; var; var = var->next)
 	{
 #ifdef IOQUAKE3 // Turtle Man: CDKEY
 		if(!var->name || Q_stricmp( var->name, "cl_cdkey" ) == 0)

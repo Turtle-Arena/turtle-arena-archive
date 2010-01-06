@@ -290,8 +290,8 @@ static qboolean Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int s
 			if(net_enabled->integer & NET_PRIOV6)
 			{
 				if(net_enabled->integer & NET_ENABLEV6)
-				search = SearchAddrInfo(res, AF_INET6);
-			
+					search = SearchAddrInfo(res, AF_INET6);
+				
 				if(!search && (net_enabled->integer & NET_ENABLEV4))
 					search = SearchAddrInfo(res, AF_INET);
 			}
@@ -395,7 +395,7 @@ qboolean NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 	if (a.type == NA_LOOPBACK)
 		return qtrue;
 
-	if (a.type == NA_IP)
+	if(a.type == NA_IP)
 	{
 		addra = (byte *) &a.ip;
 		addrb = (byte *) &b.ip;
@@ -416,7 +416,7 @@ qboolean NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 		Com_Printf ("NET_CompareBaseAdr: bad address type\n");
 		return qfalse;
 	}
-	
+
 	differed = qfalse;
 	curbyte = 0;
 
@@ -427,7 +427,7 @@ qboolean NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 			differed = qtrue;
 			break;
 		}
-		
+
 		curbyte++;
 		netmask -= 8;
 	}
@@ -445,7 +445,7 @@ qboolean NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 	}
 	else
 		return qtrue;
-
+	
 	return qfalse;
 }
 
@@ -491,9 +491,9 @@ const char	*NET_AdrToStringwPort (netadr_t a)
 	else if (a.type == NA_BOT)
 		Com_sprintf (s, sizeof(s), "bot");
 	else if(a.type == NA_IP)
-			Com_sprintf(s, sizeof(s), "%s:%hu", NET_AdrToString(a), ntohs(a.port));
-		else if(a.type == NA_IP6)
-			Com_sprintf(s, sizeof(s), "[%s]:%hu", NET_AdrToString(a), ntohs(a.port));
+		Com_sprintf(s, sizeof(s), "%s:%hu", NET_AdrToString(a), ntohs(a.port));
+	else if(a.type == NA_IP6)
+		Com_sprintf(s, sizeof(s), "[%s]:%hu", NET_AdrToString(a), ntohs(a.port));
 
 	return s;
 }
@@ -1338,28 +1338,28 @@ void NET_GetLocalAddress( void ) {
 		struct sockaddr_in mask4;
 		struct sockaddr_in6 mask6;
 		struct addrinfo 	*search;
-
-	/* On operating systems where it's more difficult to find out the configured interfaces, we'll just assume a
-	 * netmask with all bits set. */
 	
-	memset(&mask4, 0, sizeof(mask4));
-	memset(&mask6, 0, sizeof(mask6));
-	mask4.sin_family = AF_INET;
-	memset(&mask4.sin_addr.s_addr, 0xFF, sizeof(mask4.sin_addr.s_addr));
-	mask6.sin6_family = AF_INET6;
-	memset(&mask6.sin6_addr, 0xFF, sizeof(mask6.sin6_addr));
+		/* On operating systems where it's more difficult to find out the configured interfaces, we'll just assume a
+		 * netmask with all bits set. */
+	
+		memset(&mask4, 0, sizeof(mask4));
+		memset(&mask6, 0, sizeof(mask6));
+		mask4.sin_family = AF_INET;
+		memset(&mask4.sin_addr.s_addr, 0xFF, sizeof(mask4.sin_addr.s_addr));
+		mask6.sin6_family = AF_INET6;
+		memset(&mask6.sin6_addr, 0xFF, sizeof(mask6.sin6_addr));
 
-	// add all IPs from returned list.
-	for(search = res; search; search = search->ai_next)
-	{
-		if(search->ai_family == AF_INET)
-			NET_AddLocalAddress("", search->ai_addr, (struct sockaddr *) &mask4);
-		else if(search->ai_family == AF_INET6)
-			NET_AddLocalAddress("", search->ai_addr, (struct sockaddr *) &mask6);
+		// add all IPs from returned list.
+		for(search = res; search; search = search->ai_next)
+		{
+			if(search->ai_family == AF_INET)
+				NET_AddLocalAddress("", search->ai_addr, (struct sockaddr *) &mask4);
+			else if(search->ai_family == AF_INET6)
+				NET_AddLocalAddress("", search->ai_addr, (struct sockaddr *) &mask6);
+		}
+	
+		Sys_ShowIP();
 	}
-	
-	Sys_ShowIP();
-}
 	
 	if(res)
 		freeaddrinfo(res);
@@ -1441,7 +1441,7 @@ NET_GetCvars
 */
 static qboolean NET_GetCvars( void ) {
 	int modified;
-	
+
 #ifdef DEDICATED
 	// I want server owners to explicitly turn on ipv6 support.
 	net_enabled = Cvar_Get( "net_enabled", "1", CVAR_LATCH | CVAR_ARCHIVE );
@@ -1658,7 +1658,7 @@ void NET_Sleep( int msec ) {
 	{
 		FD_SET(ip_socket, &fdset);
 
-			highestfd = ip_socket;
+		highestfd = ip_socket;
 	}
 	if(ip6_socket != INVALID_SOCKET)
 	{

@@ -830,7 +830,7 @@ static void SV_AddBanToList(qboolean isexception)
 					   NET_AdrToString(curban->ip), curban->subnet,
 					   isexception ? "exception" : "ban", addy2, mask);
 				return;
-		}
+			}
 		}
 		if(curban->subnet >= mask)
 		{
@@ -842,8 +842,8 @@ static void SV_AddBanToList(qboolean isexception)
 					   NET_AdrToString(ip), mask,
 					   curban->isexception ? "exception" : "ban", addy2, curban->subnet);
 				return;
+			}
 		}
-	}
 	}
 
 	// now delete bans that are superseded by the new one
@@ -854,22 +854,22 @@ static void SV_AddBanToList(qboolean isexception)
 		
 		if(curban->subnet > mask && (!curban->isexception || isexception) && NET_CompareBaseAdrMask(curban->ip, ip, mask))
 			SV_DelBanEntryFromList(index);
-	else
+		else
 			index++;
 	}
-	
+
 	serverBans[serverBansCount].ip = ip;
 	serverBans[serverBansCount].subnet = mask;
 	serverBans[serverBansCount].isexception = isexception;
 	
 	serverBansCount++;
-
+	
 	SV_WriteBans();
-		
+
 	Com_Printf("Added %s: %s/%d\n", isexception ? "ban exception" : "ban",
 		   NET_AdrToString(ip), mask);
-	}
-	
+}
+
 /*
 ==================
 SV_DelBanFromList
@@ -891,13 +891,13 @@ static void SV_DelBanFromList(qboolean isexception)
 	}
 
 	banstring = Cmd_Argv(1);
-
+	
 	if(strchr(banstring, '.') || strchr(banstring, ':'))
 	{
 		serverBan_t *curban;
-	
+		
 		if(SV_ParseCIDRNotation(&ip, &mask, banstring))
-	{
+		{
 			Com_Printf("Error: Invalid address %s\n", banstring);
 			return;
 		}
@@ -917,10 +917,10 @@ static void SV_DelBanFromList(qboolean isexception)
 					   NET_AdrToString(curban->ip), curban->subnet);
 					   
 				SV_DelBanEntryFromList(index);
-		}
+			}
 			else
 				index++;
-	}
+		}
 	}
 	else
 	{
@@ -929,26 +929,26 @@ static void SV_DelBanFromList(qboolean isexception)
 		if(todel < 1 || todel > serverBansCount)
 		{
 			Com_Printf("Error: Invalid ban number given\n");
-		return;
-	}
+			return;
+		}
 	
 		for(index = 0; index < serverBansCount; index++)
-	{
+		{
 			if(serverBans[index].isexception == isexception)
 			{
 				count++;
-		
+			
 				if(count == todel)
-		{
+				{
 					Com_Printf("Deleting %s %s/%d\n",
 					   isexception ? "exception" : "ban",
 					   NET_AdrToString(serverBans[index].ip), serverBans[index].subnet);
-			
+
 					SV_DelBanEntryFromList(index);
 
 					break;
-	}
-}
+				}
+			}
 		}
 	}
 	

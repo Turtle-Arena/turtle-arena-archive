@@ -87,7 +87,7 @@ typedef struct SDL_AudioSpec {
 	 *
 	 *  Once the callback returns, the buffer will no longer be valid.
 	 *  Stereo samples are stored in a LRLRLR ordering.
-	*/
+	 */
 	void (SDLCALL *callback)(void *userdata, Uint8 *stream, int len);
 	void  *userdata;
 } SDL_AudioSpec;

@@ -97,7 +97,7 @@ static const char *teamArenaGameTypes[] = {
 	"CTF",
 	"1FCTF",
 	"OVERLOAD",
-	"HARVESTER"
+	"HARVESTER",
 	"TEAMTOURNAMENT"
 };
 
@@ -141,8 +141,8 @@ static char* netnames[] = {
 };
 
 #ifndef MISSIONPACK
-#ifdef TMNTMISC // Turtle Man: TODO: Add a url, etc?
-static char quake3worldMessage[] = "";
+#ifdef TMNTMISC
+static char quake3worldMessage[] = "Visit turtlearena.googlecode.com - News, Updates";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
 #endif
@@ -3345,6 +3345,7 @@ static void UI_RunMenuScript(char **args) {
 				Q_strncpyz(out, buff + 12, 5);
 				trap_Cvar_Set("cdkey4", out);
 			}
+
 		} else if (Q_stricmp(name, "verifyCDKey") == 0) {
 			buff[0] = '\0';
 			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey1")); 

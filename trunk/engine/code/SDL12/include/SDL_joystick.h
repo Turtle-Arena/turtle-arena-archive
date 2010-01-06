@@ -40,7 +40,7 @@ extern "C" {
  *  @note In order to use these functions, SDL_Init() must have been called
  *        with the SDL_INIT_JOYSTICK flag.  This causes SDL to scan the system
  *        for joysticks, and load appropriate drivers.
-*/
+ */
 
 /** The joystick structure used to identify an SDL joystick */
 struct _SDL_Joystick;

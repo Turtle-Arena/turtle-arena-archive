@@ -920,7 +920,7 @@ emit_do_syscall:
 		Com_Error(ERR_DROP, "VM_CompileX86: mprotect failed");
 
 	vm->destroy = VM_Destroy_Compiled;
-	
+
 #ifdef DEBUG_VM
 	fflush(qdasmout);
 	fclose(qdasmout);
@@ -934,7 +934,7 @@ emit_do_syscall:
 	fclose(qdasmout);
 #endif
 #endif
-
+	
 	if(vm->compiled)
 	{
 		struct timeval tvdone =  {0, 0};

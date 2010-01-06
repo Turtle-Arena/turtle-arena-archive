@@ -405,7 +405,7 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
 	homepath = Cvar_VariableString( "fs_homepath" );
 	gamedir = Cvar_VariableString( "fs_game" );
 
-		libHandle = Sys_TryLibraryLoad(homepath, gamedir, fname, fqpath);
+	libHandle = Sys_TryLibraryLoad(homepath, gamedir, fname, fqpath);
 
 	if(!libHandle && basepath)
 		libHandle = Sys_TryLibraryLoad(basepath, gamedir, fname, fqpath);

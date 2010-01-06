@@ -41,6 +41,7 @@ typedef struct {
 
 static creditsmenu_t	s_credits;
 
+
 #ifndef TMNT
 /*
 ===============
@@ -81,6 +82,7 @@ static void UI_CreditMenu_Draw_ioq3( void ) {
 	UI_DrawString( 320, 459, "http://www.ioquake3.org/", UI_CENTER|UI_SMALLFONT, color_red );
 }
 #endif
+
 
 /*
 =================

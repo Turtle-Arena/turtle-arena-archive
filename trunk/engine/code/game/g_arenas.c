@@ -257,6 +257,7 @@ static void CelebrateStart( gentity_t *player ) {
 	G_AddEvent(player, EV_TAUNT, 0);
 }
 
+
 static vec3_t	offsetFirst  = {0, 0, 74};
 static vec3_t	offsetSecond = {-10, 60, 54};
 static vec3_t	offsetThird  = {-19, -60, 45};
@@ -316,6 +317,7 @@ static void PodiumPlacementThink( gentity_t *podium ) {
 	}
 }
 
+
 static gentity_t *SpawnPodium( void ) {
 	gentity_t	*podium;
 	vec3_t		vec;
@@ -347,6 +349,7 @@ static gentity_t *SpawnPodium( void ) {
 	return podium;
 }
 
+
 /*
 ==================
 SpawnModelsOnVictoryPads
@@ -359,7 +362,6 @@ void SpawnModelsOnVictoryPads( void ) {
 	podium1 = NULL;
 	podium2 = NULL;
 	podium3 = NULL;
-
 
 	podium = SpawnPodium();
 
@@ -385,6 +387,7 @@ void SpawnModelsOnVictoryPads( void ) {
 		}
 	}
 }
+
 
 /*
 ===============

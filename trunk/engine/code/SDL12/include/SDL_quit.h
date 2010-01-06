@@ -47,7 +47,7 @@
 
 /** @file SDL_quit.h
  *  There are no functions directly affecting the quit event 
-*/
+ */
 
 #define SDL_QuitRequested() \
         (SDL_PumpEvents(), SDL_PeepEvents(NULL,0,SDL_PEEKEVENT,SDL_QUITMASK))
