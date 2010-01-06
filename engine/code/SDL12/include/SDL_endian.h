@@ -63,7 +63,7 @@ extern "C" {
  *  functions for those that do not.  Because these functions become
  *  static for compilers that do not support inline functions, this
  *  header should only be included in files that actually use them.
-*/
+ */
 /*@{*/
 #if defined(__GNUC__) && defined(__i386__) && \
    !(__GNUC__ == 2 && __GNUC_MINOR__ <= 95 /* broken gcc version */)
@@ -173,7 +173,7 @@ static __inline__ Uint64 SDL_Swap64(Uint64 x)
 /* This is mainly to keep compilers from complaining in SDL code.
  * If there is no real 64-bit datatype, then compilers will complain about
  * the fake 64-bit datatype that SDL provides when it compiles user code.
-*/
+ */
 #define SDL_Swap64(X)	(X)
 #endif /* SDL_HAS_64BIT_TYPE */
 /*@}*/

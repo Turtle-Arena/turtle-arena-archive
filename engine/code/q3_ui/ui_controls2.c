@@ -1301,8 +1301,7 @@ static void Controls_InitWeapons( void ) {
 #ifndef TMNTWEAPSYS_EX // We don't change weapons in controls menu...
 	gitem_t *	item;
 
-	for ( item = bg_itemlist + 1 ; item->classname ; item++ )
-	{
+	for ( item = bg_itemlist + 1 ; item->classname ; item++ ) {
 		if ( item->giType != IT_WEAPON ) {
 			continue;
 		}

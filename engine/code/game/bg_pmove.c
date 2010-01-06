@@ -26,7 +26,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #ifdef QAGAME // TMNTNPCSYS
 #include "g_local.h"
-#else // #include ../cgame/cg_local.h"
+#else
+//#include ../cgame/cg_local.h"
 #include "bg_misc.h"
 #endif
 #include "bg_local.h"

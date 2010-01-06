@@ -380,7 +380,7 @@ static void StartServer_GametypeEvent( void* ptr, int event ) {
 #endif
 	for( i = 0; i < count; i++ ) {
 		info = UI_GetArenaInfoByNumber( i );
-
+	
 		gamebits = GametypeBits( Info_ValueForKey( info, "type") );
 		if( !( gamebits & matchbits ) ) {
 			continue;
@@ -738,12 +738,12 @@ void StartServer_Cache( void )
 
 	if( precache ) {
 		for( i = 0; i < UI_GetNumArenas(); i++ ) {
-		info = UI_GetArenaInfoByNumber( i );
+			info = UI_GetArenaInfoByNumber( i );
 			Q_strncpyz( mapname, Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
 #ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 			Q_strupr( mapname );
 #endif
-
+	
 #ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 			Com_sprintf( picname, sizeof(picname), "levelshots/%s_small", mapname );
 #else
@@ -2050,7 +2050,6 @@ static void UI_BotSelectMenu_UpdateGrid( void ) {
 
 	j = botSelectInfo.modelpage * MAX_MODELSPERPAGE;
 	for( i = 0; i < (PLAYERGRID_ROWS * PLAYERGRID_COLS); i++, j++) {
-
 		if( j < botSelectInfo.numBots ) { 
 			info = UI_GetBotInfoByNumber( botSelectInfo.sortedBotNums[j] );
 			ServerPlayerIcon( Info_ValueForKey( info, "model" ), botSelectInfo.boticons[i], MAX_QPATH );

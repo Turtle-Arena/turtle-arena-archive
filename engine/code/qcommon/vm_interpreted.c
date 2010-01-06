@@ -239,7 +239,7 @@ void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header ) {
 	int_pc = 0;
 	instruction = 0;
 	code = (byte *)header + header->codeOffset;
-
+	
 	// Now that the code has been expanded to int-sized opcodes, we'll translate instruction index
 	//into an index into codeBase[], which contains opcodes and operands.
 	while ( instruction < header->instructionCount ) {
@@ -247,24 +247,24 @@ void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header ) {
 		instruction++;
 		int_pc++;
 		
-			switch(op) {
+		switch ( op ) {
 		// These ops need to translate addresses in jumps from instruction index to int index
-				case OP_EQ:
-				case OP_NE:
-				case OP_LTI:
-				case OP_LEI:
-				case OP_GTI:
-				case OP_GEI:
-				case OP_LTU:
-				case OP_LEU:
-				case OP_GTU:
-				case OP_GEU:
-				case OP_EQF:
-				case OP_NEF:
-				case OP_LTF:
-				case OP_LEF:
-				case OP_GTF:
-				case OP_GEF:
+		case OP_EQ:
+		case OP_NE:
+		case OP_LTI:
+		case OP_LEI:
+		case OP_GTI:
+		case OP_GEI:
+		case OP_LTU:
+		case OP_LEU:
+		case OP_GTU:
+		case OP_GEU:
+		case OP_EQF:
+		case OP_NEF:
+		case OP_LTF:
+		case OP_LEF:
+		case OP_GTF:
+		case OP_GEF:
 			// codeBase[pc] is the instruction index. Convert that into an offset into
 			//the int-aligned codeBase[] by the lookup table.
 			codeBase[int_pc] = vm->instructionPointers[codeBase[int_pc]];

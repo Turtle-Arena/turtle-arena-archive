@@ -28,10 +28,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //=============================================================================
 
-#if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h
-#define	PERS_SCORE				0		// !!! MUST NOT CHANGE, SERVER AND
-										// GAME BOTH REFERENCE !!!
-#endif
 
 #define	MAX_ENT_CLUSTERS	16
 

@@ -2122,7 +2122,7 @@ int sscanf( const char *buffer, const char *fmt, ... ) {
 				*s++ = *buffer++;
 			*s++ = '\0';
 			break;
-		}
+			}
 		}
 	}
 

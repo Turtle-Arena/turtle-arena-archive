@@ -45,10 +45,10 @@ typedef char *  va_list;
 #define va_arg(ap,t)    ( *(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)) )
 #define va_end(ap)      ( ap = (va_list)0 )
 
-#define CHAR_BIT      8         /* number of bits in a char */
+#define CHAR_BIT      8             /* number of bits in a char */
 #define SCHAR_MAX     0x7f          /* maximum signed char value */
 #define SCHAR_MIN   (-SCHAR_MAX - 1) /* minimum signed char value */
-#define UCHAR_MAX     0xff      /* maximum unsigned char value */
+#define UCHAR_MAX     0xff          /* maximum unsigned char value */
 
 #define SHRT_MAX      0x7fff        /* maximum (signed) short value */
 #define SHRT_MIN    (-SHRT_MAX - 1) /* minimum (signed) short value */

@@ -27,7 +27,7 @@
  *  Header for the SDL thread management routines 
  *
  *  @note These are independent of the other SDL routines.
-*/
+ */
 
 #include "SDL_stdinc.h"
 #include "SDL_error.h"
@@ -59,7 +59,7 @@ typedef struct SDL_Thread SDL_Thread;
  *  the application, then the RTL of the application will be used.
  *  So, in short:
  *  Always use the _beginthread() and _endthread() of the calling runtime library!
-*/
+ */
 #define SDL_PASSED_BEGINTHREAD_ENDTHREAD
 #ifndef _WIN32_WCE
 #include <process.h> /* This has _beginthread() and _endthread() defined! */

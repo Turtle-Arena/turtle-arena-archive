@@ -42,7 +42,7 @@ extern "C" {
  *  which contains window-manager specific information and arrives whenever
  *  an unhandled window event occurs.  This event is ignored by default, but
  *  you can enable it with SDL_EventState()
-*/
+ */
 #ifdef SDL_PROTOTYPES_ONLY
 struct SDL_SysWMinfo;
 typedef struct SDL_SysWMinfo SDL_SysWMinfo;

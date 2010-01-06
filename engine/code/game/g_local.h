@@ -284,6 +284,7 @@ typedef struct {
 #endif
 } clientPersistant_t;
 
+
 // this structure is cleared on each ClientSpawn(),
 // except for 'client->pers' and 'client->sess'
 struct gclient_s {

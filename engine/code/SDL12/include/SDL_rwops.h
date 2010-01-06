@@ -23,7 +23,7 @@
 /** @file SDL_rwops.h
  *  This file provides a general interface for SDL to read and write
  *  data sources.  It can easily be extended to files, memory, etc.
-*/
+ */
 
 #ifndef _SDL_rwops_h
 #define _SDL_rwops_h
@@ -65,8 +65,8 @@ typedef struct SDL_RWops {
 	union {
 #if defined(__WIN32__) && !defined(__SYMBIAN32__)
 	    struct {
-		int    append;
-		void*  h;
+		int   append;
+		void *h;
 		struct {
 		    void *data;
 		    int size;

@@ -622,7 +622,7 @@ void CM_LoadMap( const char *name, qboolean clientload, int *checksum ) {
 	*checksum = last_checksum;
 
 	header = *(dheader_t *)buf.i;
-	for (i=0 ; (size_t)i<sizeof(dheader_t)/4 ; i++) {
+	for (i=0 ; i<sizeof(dheader_t)/4 ; i++) {
 		((int *)&header)[i] = LittleLong ( ((int *)&header)[i]);
 	}
 

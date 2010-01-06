@@ -73,7 +73,7 @@ void SV_GetChallenge(netadr_t from)
 	// see if we already have a challenge for this ip
 	challenge = &svs.challenges[0];
 	for (i = 0 ; i < MAX_CHALLENGES ; i++, challenge++) {
-		if ( !challenge->connected && NET_CompareAdr( from, challenge->adr ) ) {
+		if (!challenge->connected && NET_CompareAdr( from, challenge->adr ) ) {
 			break;
 		}
 		if ( challenge->time < oldestTime ) {
@@ -110,12 +110,12 @@ void SV_GetChallenge(netadr_t from)
 			
 			if (NET_StringToAdr(AUTHORIZE_SERVER_NAME, &svs.authorizeAddress, NA_IP))
 			{
-			svs.authorizeAddress.port = BigShort( PORT_AUTHORIZE );
-			Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
-				svs.authorizeAddress.ip[0], svs.authorizeAddress.ip[1],
-				svs.authorizeAddress.ip[2], svs.authorizeAddress.ip[3],
-				BigShort( svs.authorizeAddress.port ) );
-		}
+				svs.authorizeAddress.port = BigShort( PORT_AUTHORIZE );
+				Com_Printf( "%s resolved to %i.%i.%i.%i:%i\n", AUTHORIZE_SERVER_NAME,
+					svs.authorizeAddress.ip[0], svs.authorizeAddress.ip[1],
+					svs.authorizeAddress.ip[2], svs.authorizeAddress.ip[3],
+					BigShort( svs.authorizeAddress.port ) );
+			}
 		}
 
 		// we couldn't contact the auth server, let them in.
@@ -129,7 +129,7 @@ void SV_GetChallenge(netadr_t from)
 			Com_DPrintf( "authorize server timed out\n" );
 		else
 		{
-		// otherwise send their ip to the authorize server
+			// otherwise send their ip to the authorize server
 			cvar_t	*fs;
 			char	game[1024];
 
@@ -144,13 +144,13 @@ void SV_GetChallenge(netadr_t from)
 			if (fs && fs->string[0] != 0) {
 				strcpy(game, fs->string);
 			}
-		
+			
 			// the 0 is for backwards compatibility with obsolete sv_allowanonymous flags
 			// getIpAuthorize <challenge> <IP> <game> 0 <auth-flag>
 			NET_OutOfBandPrint( NS_SERVER, svs.authorizeAddress,
 				"getIpAuthorize %i %i.%i.%i.%i %s 0 %s",  challenge->challenge,
 				from.ip[0], from.ip[1], from.ip[2], from.ip[3], game, sv_strictAuth->string );
-		
+			
 			return;
 		}
 	}
@@ -193,7 +193,7 @@ void SV_AuthorizeIpPacket( netadr_t from ) {
 		Com_Printf( "SV_AuthorizeIpPacket: challenge not found\n" );
 		return;
 	}
-
+	
 	challengeptr = &svs.challenges[i];
 
 	// send a packet back to the original client
@@ -248,7 +248,7 @@ static qboolean SV_IsBanned(netadr_t *from, qboolean isexception)
 {
 	int index;
 	serverBan_t *curban;
-
+	
 	if(!isexception)
 	{
 		// If this is a query for a ban, first check whether the client is excepted
@@ -261,10 +261,10 @@ static qboolean SV_IsBanned(netadr_t *from, qboolean isexception)
 		curban = &serverBans[index];
 		
 		if(curban->isexception == isexception)
-			{
+		{
 			if(NET_CompareBaseAdrMask(curban->ip, *from, curban->subnet))
-					return qtrue;
-			}
+				return qtrue;
+		}
 	}
 	
 	return qfalse;
@@ -348,14 +348,14 @@ void SV_DirectConnect( netadr_t from ) {
 	// see if the challenge is valid (LAN clients don't need to challenge)
 	if (!NET_IsLocalAddress(from))
 	{
-		int		ping;
+		int ping;
 		challenge_t *challengeptr;
 
 		for (i=0; i<MAX_CHALLENGES; i++)
 		{
 			if (NET_CompareAdr(from, svs.challenges[i].adr))
 			{
-				if ( challenge == svs.challenges[i].challenge )
+				if(challenge == svs.challenges[i].challenge)
 					break;
 			}
 		}
@@ -365,7 +365,7 @@ void SV_DirectConnect( netadr_t from ) {
 			NET_OutOfBandPrint( NS_SERVER, from, "print\nNo or bad challenge for your address.\n" );
 			return;
 		}
-
+	
 		challengeptr = &svs.challenges[i];
 		
 		if(challengeptr->wasrefused)
@@ -578,7 +578,6 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	// tell everyone why they got dropped
 	SV_SendServerCommand( NULL, "print \"%s" S_COLOR_WHITE " %s\n\"", drop->name, reason );
 
-
 	if (drop->download)	{
 		FS_FCloseFile( drop->download );
 		drop->download = 0;
@@ -602,8 +601,8 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 		// bots shouldn't go zombie, as there's no real net connection.
 		drop->state = CS_FREE;
 	} else {
-	Com_DPrintf( "Going to CS_ZOMBIE for %s\n", drop->name );
-	drop->state = CS_ZOMBIE;		// become free in a few seconds
+		Com_DPrintf( "Going to CS_ZOMBIE for %s\n", drop->name );
+		drop->state = CS_ZOMBIE;		// become free in a few seconds
 	}
 
 	// if this was the last client on the server, send a heartbeat

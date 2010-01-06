@@ -1430,6 +1430,7 @@ void G_RunMissile( gentity_t *ent ) {
 	G_RunThink( ent );
 }
 
+
 #ifndef TMNTWEAPSYS // There is now a fire_projectile that replaces all of these.
 //=============================================================================
 
@@ -1474,6 +1475,7 @@ gentity_t *fire_plasma (gentity_t *self, vec3_t start, vec3_t dir) {
 
 //=============================================================================
 
+
 /*
 =================
 fire_grenade
@@ -1515,6 +1517,7 @@ gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t dir) {
 
 //=============================================================================
 
+
 /*
 =================
 fire_bfg
@@ -1553,6 +1556,7 @@ gentity_t *fire_bfg (gentity_t *self, vec3_t start, vec3_t dir) {
 }
 
 //=============================================================================
+
 
 /*
 =================

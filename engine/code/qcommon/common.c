@@ -2668,8 +2668,8 @@ void Com_Init( char *commandLine ) {
 	// initialize the weak pseudo-random number generator for use later.
 	Com_InitRand();
 
-  // do this before anything else decides to push events
-  Com_InitPushEvent();
+	// do this before anything else decides to push events
+	Com_InitPushEvent();
 
 	Com_InitSmallZoneMemory();
 	Cvar_Init ();

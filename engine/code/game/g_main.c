@@ -212,6 +212,7 @@ static cvarTable_t		gameCvarTable[] = {
 #ifndef TMNTSP
 	{ &g_singlePlayer, "ui_singlePlayerActive", "", 0, 0, qfalse, qfalse  },
 #endif
+
 	{ &g_enableDust, "g_enableDust", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
 	{ &g_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
 #ifndef TMNTWEAPONS // missionpack
