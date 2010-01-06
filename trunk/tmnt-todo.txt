@@ -115,6 +115,7 @@ DONE: [todo] Remove the need for fuzw.c
 
 [todo] True Single Player mode with NPCs and all that.
 
+[bug] One Flag CTF crashes (I think it is when a bot uses tell)
 
 // The below are somewhat long...
 

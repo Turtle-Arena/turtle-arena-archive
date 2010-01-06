@@ -69,7 +69,7 @@ ifndef BUILD_REALIOQUAKE3
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 1759
+IOQ3_REVISION = 1769
 
 #
 # Start build type

@@ -327,7 +327,7 @@ if [ "$SAVE_LOG" -eq 1 ]
 then
 	LOG="$OUTPREFIX${CURRENT_REV}to$RESYNC_REV.log"
 
-	echo "$MAINNAME resync to revision $RESYNC_REV.\n" > $LOG
+	echo "$MAINNAME resync to revision $RESYNC_REV from $CURRENT_REV.\n" > $LOG
 	svn log $SVN_PATH -r "`expr $CURRENT_REV + 1`:$RESYNC_REV" | grep -v "^$" \
 		| grep -v "^------*$" | grep -v "| [0-9]* lines$" \
 		| grep -v "| 1 line$" >> $LOG
