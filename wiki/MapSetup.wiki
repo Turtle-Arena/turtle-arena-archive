@@ -1,4 +1,5 @@
 #summary Setting up the map editor
+#labels Phase-Implementation
 
 *Maps* can be created using a Quake III map editor, such as GtkRadiant 1.5.0 or NetRadiant.
 
