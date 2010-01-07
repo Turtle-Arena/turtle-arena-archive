@@ -685,7 +685,7 @@ void SV_Init (void) {
 	// serverinfo vars
 	Cvar_Get ("dmflags", "0", CVAR_SERVERINFO);
 #ifdef TMNTMISC // frag to score
-	Cvar_Get ("scorelimit", "20", CVAR_SERVERINFO);
+	Cvar_Get ("scorelimit", "1000", CVAR_SERVERINFO);
 #else
 	Cvar_Get ("fraglimit", "20", CVAR_SERVERINFO);
 #endif

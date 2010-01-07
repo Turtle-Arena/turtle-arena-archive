@@ -183,14 +183,14 @@ vmCvar_t	ui_ioq3;
 
 static cvarTable_t		cvarTable[] = {
 #ifdef TMNTMISC // frag to score
-	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "20", CVAR_ARCHIVE },
+	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "1000", CVAR_ARCHIVE },
 #else
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 #endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
 #ifdef TMNTMISC // frag to score and changed KO limit to 3
-	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "3", CVAR_ARCHIVE },
+	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
 #endif
