@@ -1,0 +1,41 @@
+#summary List of Console Variables
+#labels Featured,Phase-Support
+
+List of *Console variables* (also called Cvars) that have been added and removed from ioquake3 Team Arena. The list is incomplete.
+
+= Added =
+
+  * scorelimit (Renamed from fraglimit)
+
+  * ui_ffa_scorelimit (Renamed from ui_ffa_fraglimit)
+  * ui_tourney_scorelimit (Renamed from ui_tourney_fraglimit)
+  * ui_team_scorelimit (Renamed from ui_team_fraglimit)
+  * ui_1flag_capturelimit
+  * ui_1flag_timelimit
+  * ui_1flag_friendly
+  * ui_obelisk_capturelimit
+  * ui_obelisk_timelimit
+  * ui_obelisk_friendly
+  * ui_harvester_capturelimit
+  * ui_harvester_timelimit
+  * ui_harvester_friendly
+  * ui_spStage
+
+  * g_spSaveData
+  * g_saveVersions
+  * g_saveTypes
+  * g_teleportFluxTime - Time in seconds to be non-solid after teleporting
+
+= Removed =
+
+  * com_blood
+
+  * ui_cdkeychecked
+
+  * cg_autoswitch
+  * cg_zoomfov
+  * cg_gibs
+  * cg_drawAmmoWarning
+  * cg_animSpeed
+  * cg_debuganim
+  * cg_forceModel
