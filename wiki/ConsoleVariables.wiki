@@ -1,5 +1,5 @@
 #summary List of Console Variables
-#labels Featured,Phase-Support
+#labels Phase-Implementation
 
 List of *Console variables* (also called Cvars) that have been added and removed from ioquake3 Team Arena. The list is incomplete.
 
