@@ -7,10 +7,9 @@
 
 = Players =
 
-  * PlayerSetup
+  * PlayerStructure
 
 = Maps =
 
   * MapSetup
-  * MapCompiling
   * MapRotation
