@@ -157,7 +157,10 @@ then
 	then
 		mkdir $INSTALLDIR/base
 	fi
-	rm $INSTALLDIR/base/assests0.pk3
+	if [ -f $INSTALLDIR/base/assests0.pk3 ]
+	then
+		rm $INSTALLDIR/base/assests0.pk3
+	fi
 
 	cd $INSTALLDIR/base_svn/
 	zip -r ../../$INSTALLDIR/base/assests0.pk3 * | grep -v "adding"

@@ -320,6 +320,9 @@
 		<Unit filename="../../code/client/cl_cin.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/client/cl_cin_ogm.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/client/cl_console.c">
 			<Option compilerVar="CC" />
 		</Unit>

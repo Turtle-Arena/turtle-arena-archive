@@ -1127,7 +1127,7 @@ void G_InitBots( qboolean restart ) {
 
 		if ( !fragLimit && !timeLimit ) {
 #ifdef TMNTMISC // frag to score
-			trap_Cvar_Set( "scorelimit", "10" );
+			trap_Cvar_Set( "scorelimit", "500" );
 #else
 			trap_Cvar_Set( "fraglimit", "10" );
 #endif
