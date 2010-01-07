@@ -1,13 +1,16 @@
 #summary Map rotation system
+#labels Phase-Implementation
 
 TMNT Arena's multiplayer *map rotations* are stored in "[http://code.google.com/p/turtlearena/source/browse/trunk/base/map_rotations.cfg# base/map_rotations.cfg]".
 
 = Format =
-Each rotation set has a starting '{' and ending '}' braket. The type key set which gametype the rotation set is for. Only the first set with the correst type is used.
+Each rotation set has a starting '{' and ending '}' braket. The type key set which gametype the rotation set is for. Only the first set with the correct type is used.
 
-Each rotation set supports upto 32 maps (m1, m2, ..., m31, m32)
+Each rotation set supports upto 32 maps (m1, m2, ..., m31, m32).  If a map is not in the rotation set for the currect gametype, it stays on the same map.
 
 == Type ==
+If there is no rotation set for duel or team, ffa rotation set is used. Like wise if there is no rotation set for oneflag or overload, ctf rotation set is used.
+
   * ffa - Free for All (Default rotation set for duel and team)
   * duel - Duel
   * team - Team Deathmatch
@@ -15,6 +18,7 @@ Each rotation set supports upto 32 maps (m1, m2, ..., m31, m32)
   * oneflag - One Flag CTF
   * overload - Overload
 
+= Example =
 {{{
 {
 	type "ffa"
@@ -26,10 +30,4 @@ Each rotation set supports upto 32 maps (m1, m2, ..., m31, m32)
 	m1 "team1"
 	m2 "subway"
 }
-}}}
-
-{{{
-// Supports upto 32 maps per rotation set (m1, m2, ..., m31, m32)
-//   and is limited to one set per gametype.
-// If a map is not in the rotation it is just restarted.
 }}}
