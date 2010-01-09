@@ -8,11 +8,14 @@ Each rotation set has a starting '{' and ending '}' braket. The type key set whi
 
 Each rotation set supports upto 32 maps (m1, m2, ..., m31, m32).  If a map is not in the rotation set for the currect gametype, it stays on the same map.
 
+Single Player only uses m1, which is used for resetting the game in multiplayer when all human players Game Over)
+
 == Type ==
 If there is no rotation set for duel or team, ffa rotation set is used. Like wise if there is no rotation set for oneflag or overload, ctf rotation set is used.
 
   * ffa - Free for All (Default rotation set for duel and team)
   * duel - Duel
+  * single - Single Player
   * team - Team Deathmatch
   * ctf - Capture the Flag (Default rotation set for oneflag and obelisk)
   * oneflag - One Flag CTF
@@ -20,6 +23,11 @@ If there is no rotation set for duel or team, ffa rotation set is used. Like wis
 
 = Example =
 {{{
+{
+	type "single"
+	m1 "sp1a1"
+}
+
 {
 	type "ffa"
 	m1 "dm1"
