@@ -529,7 +529,6 @@ const char *G_GetMapRotationInfoByGametype( int gametype ) {
 	// Find rotation for the current gametype
 	for( n = 0; n < g_numMapRotations; n++ ) {
 		if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[gametype] ) == 0 ) {
-			G_Printf("DEBUG: Found rotation info %d\n", n);
 			return g_mapRotationInfos[n];
 		}
 	}
@@ -539,7 +538,6 @@ const char *G_GetMapRotationInfoByGametype( int gametype ) {
 	{
 		for( n = 0; n < g_numMapRotations; n++ ) {
 			if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[GT_CTF] ) == 0 ) {
-			G_Printf("DEBUG: Found CTF rotation info %d\n", n);
 				return g_mapRotationInfos[n];
 			}
 		}
@@ -548,7 +546,6 @@ const char *G_GetMapRotationInfoByGametype( int gametype ) {
 	// Default to ffa
 	for( n = 0; n < g_numMapRotations; n++ ) {
 		if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[GT_FFA] ) == 0 ) {
-			G_Printf("DEBUG: Found FFA rotation info %d\n", n);
 			return g_mapRotationInfos[n];
 		}
 	}
@@ -1620,8 +1617,7 @@ void CheckExitRules( void ) {
 
 #ifdef TMNTSP // exiting
 	// If single player, and not exiting.
-	if ( g_gametype.integer == GT_SINGLE_PLAYER
-		&& !level.intermissionQueued )
+	if (g_gametype.integer == GT_SINGLE_PLAYER && !level.intermissionQueued)
 	{
 		int numClients = 0; // Number of clients in the game.
 		int deadClients = 0; // No lives or continues.
@@ -1629,6 +1625,10 @@ void CheckExitRules( void ) {
 		for ( i=0 ; i< g_maxclients.integer ; i++ ) {
 			cl = level.clients + i;
 			if ( cl->pers.connected != CON_CONNECTED ) {
+				continue;
+			}
+			// Skip bots
+			if (g_entities[i].r.svFlags & SVF_BOT) {
 				continue;
 			}
 
@@ -1656,20 +1656,39 @@ void CheckExitRules( void ) {
 				}
 			}
 		}
+
 		// Check for Game Over
 		if (numClients > 0 && numClients == deadClients)
 		{
-			if (g_singlePlayer.integer)
+			if (g_singlePlayer.integer == 1)
 			{
 				// Return to the title screen.
 				trap_DropClient( 0, "Game Over" );
 			}
 			else
 			{
-				// Restart at map sp1a1?
+				// Restart on the first single player map.
 				char buf[MAX_QPATH];
+				const char *info;
+				const char *str;
 
-				Com_sprintf(buf, sizeof(buf), "spmap sp1a1");
+				str = NULL;
+
+#ifdef IOQ3ZTM // MAP_ROTATION
+				info = G_GetMapRotationInfoByGametype(GT_SINGLE_PLAYER);
+				if (info) {
+					str = Info_ValueForKey(info, "m1");
+				}
+#endif
+
+				if (!str || !strlen(str))
+				{
+					// Default to sp1a1
+					str = "sp1a1";
+				}
+
+				// wait before restarting
+				Com_sprintf(buf, sizeof(buf), "wait 1500; map %s", str);
 				trap_Cvar_Set("nextmap", buf);
 
 				ExitLevel();

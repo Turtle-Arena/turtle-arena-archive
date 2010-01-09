@@ -291,6 +291,10 @@ struct gclient_s {
 	// ps MUST be the first element, because the server expects it
 	playerState_t	ps;				// communicated by server to clients
 
+#ifdef IOQ3ZTM // PEAKING
+	playerState_t savedPS; // Saved ps when following other clients when not a spectator
+#endif
+
 	// the rest of the structure is private to game
 	clientPersistant_t	pers;
 	clientSession_t		sess;
@@ -307,6 +311,9 @@ struct gclient_s {
 	int			latched_buttons;
 
 	vec3_t		oldOrigin;
+#if 0 //#ifdef TMNTMISC // TEST: push players
+	float		oldYaw;
+#endif
 
 	// sum up damage over an entire frame, so
 	// shotgun blasts give a single big kick
@@ -494,6 +501,9 @@ void StopFollowing( gentity_t *ent );
 void BroadcastTeamChange( gclient_t *client, int oldTeam );
 void SetTeam( gentity_t *ent, char *s );
 void Cmd_FollowCycle_f( gentity_t *ent, int dir );
+#ifdef IOQ3ZTM // PEAKING
+qboolean G_AllowPeaking(void);
+#endif
 
 //
 // g_items.c
@@ -763,6 +773,9 @@ void QDECL G_LogPrintf( const char *fmt, ... );
 void SendScoreboardMessageToAllClients( void );
 void QDECL G_Printf( const char *fmt, ... );
 void QDECL G_Error( const char *fmt, ... );
+#ifdef IOQ3ZTM // MAP_ROTATION
+const char *G_GetMapRotationInfoByGametype( int gametype );
+#endif
 
 //
 // g_client.c

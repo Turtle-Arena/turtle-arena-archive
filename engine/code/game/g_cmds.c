@@ -530,6 +530,12 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the spectators.\n\"",
 		client->pers.netname));
 	} else if ( client->sess.sessionTeam == TEAM_FREE ) {
+#ifdef TMNTSP
+		if (g_gametype.integer == GT_SINGLE_PLAYER)
+			trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the game.\n\"",
+			client->pers.netname));
+		else
+#endif
 		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the battle.\n\"",
 		client->pers.netname));
 	}
@@ -682,6 +688,23 @@ to free floating spectator mode
 =================
 */
 void StopFollowing( gentity_t *ent ) {
+#ifdef IOQ3ZTM // PEAKING
+	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+	{
+		int flags;
+
+		flags = (ent->client->savedPS.eFlags & ~(EF_VOTED | EF_TEAMVOTED)) | (ent->client->ps.eFlags & (EF_VOTED | EF_TEAMVOTED));
+		ent->client->ps = ent->client->savedPS;
+		ent->client->ps.pm_flags &= ~PMF_FOLLOW;
+		ent->client->ps.eFlags = flags;
+
+		ent->client->ps.clientNum = ent - g_entities;
+		ent->client->sess.spectatorState = SPECTATOR_NOT;
+		ent->client->sess.spectatorClient = ent->client->ps.clientNum;
+		ent->r.svFlags &= ~SVF_BOT;
+		return;
+	}
+#endif
 #ifdef IOQ3ZTM // SPECTATOR
 	SetClientViewAngle(ent, ent->client->ps.viewangles);
 #endif
@@ -740,6 +763,22 @@ void Cmd_Team_f( gentity_t *ent ) {
 }
 
 
+#ifdef IOQ3ZTM // PEAKING
+/*
+=================
+G_AllowPeaking
+=================
+*/
+qboolean G_AllowPeaking(void)
+{
+#ifdef TMNTSP
+	if (g_gametype.integer == GT_SINGLE_PLAYER)
+		return qtrue;
+#endif
+	return (g_gametype.integer >= GT_TEAM);
+}
+#endif
+
 /*
 =================
 Cmd_Follow_f
@@ -772,14 +811,33 @@ void Cmd_Follow_f( gentity_t *ent ) {
 		return;
 	}
 
+#ifdef IOQ3ZTM // PEAKING
+	// Only view player on your team
+	if (G_AllowPeaking() && ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
+		if ( level.clients[ i ].sess.sessionTeam != ent->client->sess.sessionTeam ) {
+			return;
+		}
+	}
+#endif
+
 	// if they are playing a tournement game, count as a loss
 	if ( (g_gametype.integer == GT_TOURNAMENT )
 		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
 		ent->client->sess.losses++;
 	}
 
+#ifdef IOQ3ZTM // PEAKING
+	if (ent->client->sess.spectatorState == SPECTATOR_NOT) {
+		ent->client->savedPS = ent->client->ps;
+	}
+#endif
+
 	// first set them to spectator
-	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+	if (
+#ifdef IOQ3ZTM // PEAKING
+	!G_AllowPeaking() &&
+#endif
+	ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		SetTeam( ent, "spectator" );
 	}
 
@@ -801,8 +859,20 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
 		ent->client->sess.losses++;
 	}
+
+#ifdef IOQ3ZTM // PEAKING
+	if (ent->client->sess.spectatorState == SPECTATOR_NOT) {
+		ent->client->savedPS = ent->client->ps;
+	}
+#endif
+
 	// first set them to spectator
-	if ( ent->client->sess.spectatorState == SPECTATOR_NOT ) {
+#ifdef IOQ3ZTM // PEAKING
+	if (!G_AllowPeaking() && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+#else
+	if ( ent->client->sess.spectatorState == SPECTATOR_NOT )
+#endif
+	{
 		SetTeam( ent, "spectator" );
 	}
 
@@ -821,11 +891,12 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 			clientnum = level.maxclients - 1;
 		}
 
-#if 0 // #ifdef IOQ3ZTM // Turtle Man: Switch to free as well.
+#ifdef IOQ3ZTM // PEAKING
 		if (clientnum == ent->client - level.clients )
 		{
-			if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
-				ent->client->sess.spectatorClient = clientnum;
+			if (G_AllowPeaking() && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
+			{
+				// Switch to yourself
 				StopFollowing(ent);
 				return;
 			} else {
@@ -843,6 +914,15 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 		if ( level.clients[ clientnum ].sess.sessionTeam == TEAM_SPECTATOR ) {
 			continue;
 		}
+
+#ifdef IOQ3ZTM // PEAKING
+		// Only view players on your team
+		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
+			if ( level.clients[ clientnum ].sess.sessionTeam != ent->client->sess.sessionTeam ) {
+				continue;
+			}
+		}
+#endif
 
 		// this is good, we can use it
 		ent->client->sess.spectatorClient = clientnum;

@@ -1295,7 +1295,12 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	// spectators don't do much
-	if ( client->sess.sessionTeam == TEAM_SPECTATOR ) {
+	if ( client->sess.sessionTeam == TEAM_SPECTATOR
+#ifdef IOQ3ZTM // PEAKING
+		|| ( G_AllowPeaking() && client->sess.spectatorState == SPECTATOR_FOLLOW )
+#endif
+		)
+	{
 		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
 			return;
 		}
@@ -1565,6 +1570,37 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.pmove_fixed = pmove_fixed.integer | client->pers.pmoveFixed;
 	pm.pmove_msec = pmove_msec.integer;
 
+#if 0 // #ifdef TMNTMISC // TEST: push players
+	if ( !client->noclip )
+	{
+		// XXX
+		extern qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obstacle );
+		gentity_t *obstacle;
+		vec3_t move;
+		vec3_t amove;
+
+		obstacle = NULL;
+
+		VectorSubtract( client->ps.origin, client->oldOrigin, move );
+		VectorClear( amove );
+		amove[YAW] = client->ps.viewangles[YAW]-client->oldYaw;
+
+		VectorCopy( client->oldOrigin, ent->r.currentOrigin );
+		VectorCopy( client->ps.viewangles, ent->r.currentAngles );
+		ent->r.currentAngles[YAW] -= amove[YAW];
+
+		if (!G_MoverPush(ent, move, amove, &obstacle))
+		{
+			// blocked, do nothing
+		}
+		else if ( !client->ps.powerups[PW_FLASHING] ) {
+			client->ps.powerups[PW_FLASHING] = 1;
+		}
+	}
+	client->oldYaw = client->ps.viewangles[YAW];
+#endif
+
+
 	VectorCopy( client->ps.origin, client->oldOrigin );
 
 #ifdef MISSIONPACK
@@ -1646,54 +1682,34 @@ void ClientThink_real( gentity_t *ent ) {
 		// wait for the attack button to be pressed
 		if (g_gametype.integer == GT_SINGLE_PLAYER)
 		{
-			if ( client->respawnTime > 0 && level.time > client->respawnTime )
+			if (!client->ps.persistant[PERS_LIVES] && !client->ps.persistant[PERS_CONTINUES])
 			{
-				// Auto respawn in 3 seconds, or if client pressed attack, use, or jump.
-				if ( ( level.time - client->respawnTime ) > 3000
-					|| ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) )
-					|| ucmd->upmove > 0 )
+				// Game Over, don't respawn. In multiplayer you get three lives on the next level.
+				client->respawnTime = -1;
+			}
+
+			// If not haven't Game Overed,
+			//   auto respawn in 3 seconds, or if client pressed attack, use, or jump.
+			if ( client->respawnTime > 0 && level.time > client->respawnTime &&
+				((level.time - client->respawnTime > 3000)
+					|| (ucmd->buttons & (BUTTON_ATTACK|BUTTON_USE_HOLDABLE)) || (ucmd->upmove > 0)) )
+			{
+				if (!client->ps.persistant[PERS_LIVES])
 				{
-					if (!client->ps.persistant[PERS_LIVES])
+					/*if (g_singlePlayer.integer && client->ps.pers[PERS_CONTINUES])
 					{
-						/*if (g_singlePlayer.integer && client->ps.pers[PERS_CONTINUES])
-						{
-							// Open "Contiue?" menu/screen
-						}
-						else */if (client->ps.persistant[PERS_CONTINUES])
-						{
-							client->ps.persistant[PERS_CONTINUES]--;
-							client->ps.persistant[PERS_LIVES] += 3;
-							respawn( ent );
-						}
-						else
-						{
-							// Game Over, don't respawn.
-							client->respawnTime = -1;
-						}
+						// Turtle Man: TODO: Open "Contiue?" menu/screen
 					}
-					// Turtle Man: FIXME: Doesn't ExitLevel/reload
-					else if (g_singlePlayer.integer && !(ent->r.svFlags & SVF_BOT)
-						// && !(level no reload)
-						&& 0
-						)
+					else */if (client->ps.persistant[PERS_CONTINUES])
 					{
-						// Tell server to reload the map
-						char stmap[MAX_QPATH];
-						char buf[MAX_QPATH];
-
-						trap_Cvar_VariableStringBuffer( "mapname", stmap, sizeof(stmap) );
-						Com_sprintf(buf, sizeof(buf), "spmap %s", stmap);
-						trap_Cvar_Set( "nextmap", buf );
-
-						// Save client data for next level?
-						G_SavePersistant(stmap);
-
-						ExitLevel();
-					}
-					else
-					{
+						client->ps.persistant[PERS_CONTINUES]--;
+						client->ps.persistant[PERS_LIVES] += 3;
 						respawn( ent );
 					}
+				}
+				else
+				{
+					respawn( ent );
 				}
 			}
 			return;
@@ -1971,7 +1987,12 @@ void ClientEndFrame( gentity_t *ent ) {
 	int			i;
 	clientPersistant_t	*pers;
 
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR
+#ifdef IOQ3ZTM // PEAKING
+		|| ( G_AllowPeaking() && ent->client->sess.spectatorState == SPECTATOR_FOLLOW )
+#endif
+		)
+	{
 		SpectatorClientEndFrame( ent );
 		return;
 	}
