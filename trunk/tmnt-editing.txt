@@ -1,32 +1,13 @@
 This file may help with creating addons for TMNT Arena. Currently it won't help much.
 
+NOTE: Redoing and moving to the Google Code Wiki.
+
 == Overview ==
 :''If you have editing knowlegde of Quake III Arena or any other id tech 3 game you can skip this.''
 In TMNT Arena all of the data is stored in a .pk3 files, which are simply renamed .zip files.
 Pk3 files can be extracted with any zip program.
 
 TODO: More on this later.
-
-== Maps ==
-Map can be created using a Quake III map editor, such as GtkRadiant 1.5.0 or NetRadiant.
-
-Currently there just information on setting up NetRadiant and adding the TMNT Arean config, but no information on mapping it self.
-After setting up Radiant check out http://en.wikibooks.org/wiki/GtkRadiant for how to use Radiant
-
-=== NetRadiant ===
-NetRadiant is a map editor which is a fork of GtkRadiant that fixes bug and adds new features.
-For information on installing and compiling see http://www.icculus.org/netradiant/ or use the setup below.
-
-==== NetRadiant Setup ====
-First you need to install a map editor, such as NetRadiant.
-Go to http://www.icculus.org/netradiant/ and download NetRadiant for your operating system, or build it from source.
-
-:''If building from source, skip this step.''
-After downloading extract NetRadiant to a directory such as "C:\Program Files\NetRadiant\" on windows or "/usr/share/netradiant/"? on linux.
-
-Copy the files inside of the "radiant-cfg/" directory into the directory were you install NetRadiant (ie "C:\Program Files\NetRadiant")
-
-When you start NetRadiant select "TMNT Arena" in the drop-down list of games. You can also set "Show Global Preferences" to unchecked to always go into TMNT mapping, skipping the game select if you are not going to edit maps for other games (This can be changed later in the Edit -> Preferences -> Global -> Game).
 
 == Players ==
 There isn't a guide yet but if you open base/pak0.pk3 and look in "models/players/raph/" there is a full Raphael player. It is mostly the same as a Quake3 player, so you should be able to find information on the Web.

@@ -1,13 +1,14 @@
 #summary Player structure
 
-*Player* (playable character) structure. Players have three models that are attached to multiple animations are play at once and the seperate models can turn. There are required skins default, red, and blue.
+*Player* (playable character) structure. Players have three models that are attached using "tags". Weapons are also attached using tags.
 
+<wiki:toc />
 
 = Files =
 Players are stored in "base/models/players/PLAYERNAME/"
 
-  * head.md3 - Head model, attached to torso.md3
-  * torso.md3 - Upper model, attached to legs.md3
+  * head.md3 - Head model, it will be attached to torso.md3
+  * torso.md3 - Upper model, it will be attached to legs.md3
   * legs.md3 - Lower model
   * animation.cfg - Contains animations and other settings for the player
   * icon_default.png - Icon for the default skin
@@ -27,7 +28,7 @@ Players are stored in "base/models/players/PLAYERNAME/"
 
 
 = Skins =
-Skins are made up of three ".skin" files and a icon image (.png/.tga/.jpg). Extra skins can be include, for example Raph has a "fugitoid" skin.
+Skins are made up of three ".skin" files and a icon image (.png/.tga/.jpg). The skins default, red, and blue should be include to support all gametypes. Extra skins can be include, for example Raph has a "fugitoid" skin.
 
   * icon_SKINNAME.png - Icon for the skin
   * head_SKINNAME.skin - Shaders for head
@@ -36,7 +37,7 @@ Skins are made up of three ".skin" files and a icon image (.png/.tga/.jpg). Extr
 
 
 == .skin Format ==
-*.skin* files set the shaders used by the model. Model's contain "meshes" (Groups of triangles), each must have a shader listed. The "tags" (points where other models are attached) are also listed.
+*.skin* files set the shaders used by the model. MD3 models contain "meshes" (Groups of triangles), each must have a shader listed. The "tags" (points where other models are attached) are also listed.
 
 Example: Raph's head_default.skin
 {{{
@@ -53,5 +54,6 @@ TMNT Arena also supports using *$(dir)* instead of the directory where the playe
 Example: "$(dir)/head" instead of "models/players/raph/head".
 
 = animation.cfg =
+animation.cfg contains the animations and other settings. The animations are normally created when exporting a player model to MD3.
 
-todo
+

@@ -264,6 +264,7 @@ void FinishSpawningNPC( gentity_t *ent ) {
 	ent->s.modelindex2 = 0; // zero indicates this isn't a dropped item
 
 	ent->r.contents = CONTENTS_BODY;
+	ent->clipmask = MASK_PLAYERSOLID;
 	//ent->touch = Touch_Item;
 
 	if ( ent->spawnflags & 1 ) {

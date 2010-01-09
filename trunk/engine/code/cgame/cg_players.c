@@ -2341,6 +2341,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	if( legsAnim == LEGS_IDLE || legsAnim == LEGS_IDLECR ) {
 		flagAnim = FLAG_STAND;
 #ifdef IOQ3ZTM // Turtle Man: TEST: Always update flag angle.
+		// Turtle Man: TODO: Have a idle timer to know if its been awile since they moved to NOT updateangles?
 		updateangles = qtrue;
 #endif
 	} else if ( legsAnim == LEGS_WALK || legsAnim == LEGS_WALKCR ) {

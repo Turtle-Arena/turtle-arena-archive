@@ -2981,6 +2981,52 @@ void CG_DrawTimedMenus( void ) {
 	}
 }
 #endif
+#ifdef TMNTSP
+/*
+=================
+CG_DrawGameOver
+=================
+*/
+void CG_DrawGameOver(void)
+{
+	playerState_t	*ps;
+
+	if (cgs.gametype != GT_SINGLE_PLAYER) {
+		return;
+	}
+
+	ps = &cg.snap->ps;
+
+	// Show "Game Over"!
+	if (!ps->persistant[PERS_LIVES] && !ps->persistant[PERS_CONTINUES])
+	{
+		int		x, y, w;
+#ifdef MISSIONPACK_HUD
+		int h;
+#endif
+		int charWidth;
+		vec4_t color = {1,1,1,1};
+		const char *str = "Game Over";
+
+		y = 120 - BIGCHAR_HEIGHT / 2;
+		charWidth = GIANTCHAR_WIDTH*2;
+
+#ifdef MISSIONPACK_HUD
+		w = CG_Text_Width(str, 0.5, 0);
+		h = CG_Text_Height(str, 0.5, 0);
+		x = (SCREEN_WIDTH - w) / 2;
+		CG_Text_Paint(x, y + h, 0.5, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
+#else
+		w = charWidth * CG_DrawStrlen( str );
+
+		x = ( SCREEN_WIDTH - w ) / 2;
+
+		CG_DrawStringExt( x, y, str, color, qfalse, qtrue,
+			charWidth, (int)(charWidth * 1.5), 0 );
+#endif
+	}
+}
+#endif
 /*
 =================
 CG_Draw2D
@@ -3106,6 +3152,9 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 	// don't draw center string if scoreboard is up
 	cg.scoreBoardShowing = CG_DrawScoreboard();
 	if ( !cg.scoreBoardShowing) {
+#ifdef TMNTSP
+		CG_DrawGameOver();
+#endif
 		CG_DrawCenterString();
 	}
 #ifdef CAMERASCRIPT
