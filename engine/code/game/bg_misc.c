@@ -3466,6 +3466,8 @@ static qboolean NPC_Parse(char **p) {
 
 	// Defaults
 	npc.deathType = NPCD_SINK;
+	npc.primaryHandSide = HAND_RIGHT;
+	npc.secondaryHandSide = HAND_LEFT;
 
 	// Default boundingbox
 	npc.mins[0] = npc.mins[1] = -5.0f;
@@ -3629,6 +3631,21 @@ static qboolean NPC_Parse(char **p) {
 					}
 					npc.maxs[i] = atof( token );
 				}
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "primaryHand" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			if ( !Q_stricmp( token, "left" ) ) {
+				npc.primaryHandSide = HAND_LEFT;
+				npc.secondaryHandSide = HAND_RIGHT;
+			} else if ( !Q_stricmp( token, "right" ) ) {
+				npc.primaryHandSide = HAND_RIGHT;
+				npc.secondaryHandSide = HAND_LEFT;
+			} else {
+				Com_Printf( "Bad primaryHand parm [%s] for [%s]\n", token, npc.classname);
 			}
 			continue;
 		}
