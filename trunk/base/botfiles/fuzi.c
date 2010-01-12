@@ -250,6 +250,8 @@ weight "weapon_grapplinghook"
 }
 
 /* Removed from TMNT Arena
+//teleport
+#define TELW				190
 weight "holdable_teleporter"
 {
 	switch(INVENTORY_TELEPORTER)
@@ -270,6 +272,8 @@ weight "holdable_medkit"
 }
 
 /* Removed from TMNT Arena
+//kamikaze
+#define KAMW				200
 weight "holdable_kamikaze"
 {
 	switch(INVENTORY_KAMIKAZE) // Turtle Man: BUGFIX?: Was INVENTORY_TELEPORTER

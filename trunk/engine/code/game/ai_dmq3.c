@@ -1677,7 +1677,7 @@ void BotChooseWeapon(bot_state_t *bs) {
 		bs->weaponnum = bs->cur_ps.weapon;
 	}
 	else {
-#ifdef TMNTWEAPSYS
+#ifdef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
 		newweaponnum = BotChooseBestWeapon(bs);
 #else
 		newweaponnum = trap_BotChooseBestFightWeapon(bs->ws, bs->inventory);
@@ -1694,7 +1694,7 @@ void BotChooseWeapon(bot_state_t *bs) {
 		trap_EA_SelectWeapon(bs->client, bs->weaponnum);
 	}
 	else {
-#ifdef TMNTWEAPSYS
+#ifdef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
 		newweaponnum = BotChooseBestWeapon(bs);
 #else
 		newweaponnum = trap_BotChooseBestFightWeapon(bs->ws, bs->inventory);

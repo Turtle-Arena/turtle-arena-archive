@@ -214,6 +214,7 @@ typedef struct
 	char model[MAX_QPATH];
 	int modelindex;
 	int respawntime;
+	int defaultWeight; // If item isn't in character item weight file use this weight.
 } bot_shareditem_t;
 #endif
 
@@ -443,7 +444,7 @@ typedef struct ai_export_s
 	void	(*BotFreeMoveState)(int handle);
 	void	(*BotInitMoveState)(int handle, struct bot_initmove_s *initmove);
 	void	(*BotAddAvoidSpot)(int movestate, vec3_t origin, float radius, int type);
-#ifndef TMNTWEAPSYS_NOCOMPAT
+#ifndef TMNTWEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 	//-----------------------------------
 	// be_ai_weap.h
 	//-----------------------------------
@@ -573,14 +574,18 @@ name:						default:			module(s):			description:
 "cmd_grappleon"				"grappleon"			be_ai_move.c		command to activate off hand grapple
 "cmd_grappleoff"			"grappleoff"		be_ai_move.c		command to deactivate off hand grapple
 "itemconfig"				"items.c"			be_ai_goal.c		item configuration file
+#ifndef TMNTWEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 "weaponconfig"				"weapons.c"			be_ai_weap.c		weapon configuration file
+#endif
 "synfile"					"syn.c"				be_ai_chat.c		file with synonyms
 "rndfile"					"rnd.c"				be_ai_chat.c		file with random strings
 "matchfile"					"match.c"			be_ai_chat.c		file with match strings
 "nochat"					"0"					be_ai_chat.c		disable chats
 "max_messages"				"1024"				be_ai_chat.c		console message heap size
+#ifndef TMNTWEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 "max_weaponinfo"			"32"				be_ai_weap.c		maximum number of weapon info
 "max_projectileinfo"		"32"				be_ai_weap.c		maximum number of projectile info
+#endif
 "max_iteminfo"				"256"				be_ai_goal.c		maximum number of item info
 "max_levelitems"			"256"				be_ai_goal.c		maximum number of level items
 

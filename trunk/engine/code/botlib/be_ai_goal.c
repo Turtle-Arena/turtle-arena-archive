@@ -149,6 +149,9 @@ typedef struct iteminfo_s
 	vec3_t mins;						//mins of the item
 	vec3_t maxs;						//maxs of the item
 	int number;							//number of the item info
+#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+	int defaultWeight;					//inline weight, for if only a constant value is needed.
+#endif
 } iteminfo_t;
 
 #define ITEMINFO_OFS(x)	(size_t)&(((iteminfo_t *)0)->x)
@@ -163,6 +166,9 @@ fielddef_t iteminfo_fields[] =
 {"respawntime", ITEMINFO_OFS(respawntime), FT_FLOAT},
 {"mins", ITEMINFO_OFS(mins), FT_FLOAT|FT_ARRAY, 3},
 {"maxs", ITEMINFO_OFS(maxs), FT_FLOAT|FT_ARRAY, 3},
+#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+{"defaultweight", ITEMINFO_OFS(defaultWeight), FT_INT},
+#endif
 {NULL, 0, 0}
 };
 
@@ -355,6 +361,56 @@ itemconfig_t *LoadItemConfig(char *filename)
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
 	return ic;
 } //end of the function LoadItemConfig
+#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#define MAX_INVENTORYVALUE			999999 // be_ai_weight.c
+//===========================================================================
+// atemps to create a fuzzy weight for item
+//
+// Parameter:				-
+// Returns:					-
+// Changes Globals:		-
+//===========================================================================
+int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
+{
+	fuzzyseperator_t *fs;
+	int index;
+
+	if (iwc->numweights >= MAX_WEIGHTS || !item->defaultWeight) {
+		return -1;
+	}
+
+	index = iwc->numweights;
+
+	iwc->weights[index].name = (char *) GetClearedMemory(strlen(item->classname) + 1);
+	strcpy(iwc->weights[index].name, item->classname);
+
+	// Setup fuzzyseperator
+	fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
+	fs->index = 0;
+	fs->value = MAX_INVENTORYVALUE;
+	fs->next = NULL;
+	fs->child = NULL;
+#if 0
+	// Setup balance
+	fs->type = WT_BALANCE;
+	fs->weight = item->defaultWeight;
+	fs->minweight = max(1, fs->weight/20.0f);
+	fs->maxweight = max(1, fs->weight*20.0f);
+#else
+	// Setup a simple "return weight;"
+	fs->type = 0;
+	fs->weight = item->defaultWeight;
+	fs->minweight = fs->weight;
+	fs->maxweight = fs->weight;
+#endif
+
+	iwc->weights[index].firstseperator = fs;
+
+	iwc->numweights++;
+
+	return index;
+} //end of the function CreateFuzzyWeight
+#endif
 //===========================================================================
 // index to find the weight function of an iteminfo
 //
@@ -372,6 +428,12 @@ int *ItemWeightIndex(weightconfig_t *iwc, itemconfig_t *ic)
 	for (i = 0; i < ic->numiteminfo; i++)
 	{
 		index[i] = FindFuzzyWeight(iwc, ic->iteminfo[i].classname);
+#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+		if (index[i] < 0)
+		{
+			index[i] = CreateFuzzyWeight(iwc, &ic->iteminfo[i]);
+		}
+#endif
 		if (index[i] < 0)
 		{
 			Log_Write("item info %d \"%s\" has no fuzzy weight\r\n", i, ic->iteminfo[i].classname);
@@ -610,23 +672,6 @@ void BotInitLevelItems(void)
 
 			ic->iteminfo[i].number = ic->numiteminfo;
 
-			// Turtle Man: FIXME: Setup weight
-#if 0
-			for (k = 0; k < MAX_CLIENTS; k++)
-			{
-				if (!botgoalstates[k])
-					continue; // Avoid unwated errors in BotGoalStateFromHandle
-
-				gs = BotGoalStateFromHandle(k);
-				if (!gs)
-					continue;
-				if (!gs->itemweightconfig)
-					continue;
-
-				// Turtle Man: I wish I could just set the weight...
-				gs->itemweightindex[ic->iteminfo[i].number] = 0;
-			}
-#endif
 			ic->numiteminfo++;
 		}
 	}

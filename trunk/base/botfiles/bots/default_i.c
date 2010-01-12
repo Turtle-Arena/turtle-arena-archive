@@ -62,12 +62,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define GHW				90
 
 //holdable items
-//teleport
-#define TELW				190
 //medkit
 #define MEDW				50
-//kamikaze
-#define KAMW				200
 //portal
 #define PORW				300
 //shuriken pack
@@ -103,11 +99,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define DUBW				100
 //ammo-regen
 #define AMRW				400
-
-//red-cube
-#define REDCW				200
-//blue-cube
-#define BLCW				200
 
 //ctf flag weight
 #define FGW				400

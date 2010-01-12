@@ -1354,7 +1354,11 @@ when the level is changed
 */
 void BotResetState(bot_state_t *bs) {
 	int client, entitynum, inuse;
+#ifdef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
+	int movestate, goalstate, chatstate;
+#else
 	int movestate, goalstate, chatstate, weaponstate;
+#endif
 	bot_settings_t settings;
 	int character;
 	playerState_t ps;							//current player state
@@ -1370,7 +1374,9 @@ void BotResetState(bot_state_t *bs) {
 	movestate = bs->ms;
 	goalstate = bs->gs;
 	chatstate = bs->cs;
+#ifndef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
 	weaponstate = bs->ws;
+#endif
 	entergame_time = bs->entergame_time;
 	//free checkpoints and patrol points
 	BotFreeWaypoints(bs->checkpoints);
@@ -1381,7 +1387,9 @@ void BotResetState(bot_state_t *bs) {
 	bs->ms = movestate;
 	bs->gs = goalstate;
 	bs->cs = chatstate;
+#ifndef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
 	bs->ws = weaponstate;
+#endif
 	memcpy(&bs->cur_ps, &ps, sizeof(playerState_t));
 	memcpy(&bs->settings, &settings, sizeof(bot_settings_t));
 	bs->inuse = inuse;
@@ -1435,6 +1443,8 @@ int BotAILoadMap( int restart ) {
 			{
 				itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponrespawn");
 			}
+
+			itemInfos[item].defaultWeight = BotWeaponWeight(i);
 
 			item++;
 		}
