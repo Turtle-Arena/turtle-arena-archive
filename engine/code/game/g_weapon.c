@@ -385,6 +385,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 	gentity_t	*tent;
 	gentity_t	*traceEnt;
 	int			damage;
+	int			dflags;
 	weapon_t weaponnum;
 	int mod; // Means of death
 	bg_weaponinfo_t *weapon;
@@ -402,6 +403,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 	}
 #endif
 
+	dflags = 0;
 	weaponnum = ent->client->ps.weapon;
 
 	// Use hand to select the weapon tag.
@@ -513,6 +515,11 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 		}
 	}
 
+	if (weapon->flags & WIF_CUTS)
+	{
+		dflags |= DAMAGE_CUTS;
+	}
+
 	for (i = 0; i < MAX_WEAPON_BLADES; i++)
 	{
 		if (weapon->blades[i].damage == 0)
@@ -595,6 +602,11 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 			continue;
 		}
 
+		if (traceEnt->mustcut && !(dflags & DAMAGE_CUTS))
+		{
+			continue;
+		}
+
 		if (checkTeamHit)
 		{
 			if (traceEnt->takedamage && OnSameTeam(ent, traceEnt))
@@ -654,8 +666,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 			}
 		}
 
-		G_Damage( traceEnt, ent, ent, pushDir, tr.endpos,
-				damage, 0, mod );
+		G_Damage( traceEnt, ent, ent, pushDir, tr.endpos, damage, dflags, mod );
 
 		traceHit = qtrue;
 	}

@@ -189,7 +189,10 @@ struct gentity_s {
 	gitem_t		*item;			// for bonus items
 
 #ifdef TMNTNPCSYS
-	bg_npc_t		bgNPC;
+	bg_npc_t	bgNPC;
+#endif
+#ifdef TMNTWEAPSYS
+	int			mustcut; // Only takes damage from WIF_CUTS weapons
 #endif
 };
 
@@ -598,6 +601,9 @@ void TossClientCubes( gentity_t *self );
 #define DAMAGE_NO_PROTECTION		0x00000008  // armor, shields, invulnerability, and godmode have no effect
 #ifdef MISSIONPACK
 #define DAMAGE_NO_TEAM_PROTECTION	0x00000010  // armor, shields, invulnerability, and godmode have no effect
+#endif
+#ifdef TMNTWEAPSYS // WIF_CUTS
+#define DAMAGE_CUTS					0x00000020	// damage mustcut entities
 #endif
 
 //

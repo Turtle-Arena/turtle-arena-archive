@@ -1022,6 +1022,14 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		}
 	}
 #endif
+#ifdef TMNTWEAPSYS
+	if (targ->mustcut && !(dflags & DAMAGE_CUTS))
+	{
+		// Turtle Man: TODO: Have a effect to user knows it is can only be broke by WIF_CUTS?
+		//                       or have textures that users know can only be broke by WIF_CUTS?
+		return;
+	}
+#endif
 	if ( !inflictor ) {
 		inflictor = &g_entities[ENTITYNUM_WORLD];
 	}
@@ -1044,12 +1052,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	// Allow breakable movers
 	if ( targ->s.eType == ET_MOVER && targ->health > 0 )
 	{
-		//if (targ->spawnflags & 128)
-		//{
-		//	// Turtle Man: TODO: Have a effect to user knows it is can only be broke by WIF_CUTS?
-		//	return;
-		//}
-
 		targ->health -= damage;
 		if (targ->health < 0)
 			targ->health = 0;
