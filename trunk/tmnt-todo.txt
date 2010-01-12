@@ -30,9 +30,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Attack movement flags. Stop, cut speed in half, double speed, turn right?, etc.
 
-STARTED: [todo] Sword melee weapon bitflag, allow swords to cut things no one else can. (WIF_CUTS)
-: So Leo (and other players with swords) can get places no one else can.
-
 [bug] When kicking a player out of the game (that is using a grapple) their grapple chain is left behind!
 
 [todo] Per-triangle collision for player damage, use lowest LOD model or have a model special for collision?

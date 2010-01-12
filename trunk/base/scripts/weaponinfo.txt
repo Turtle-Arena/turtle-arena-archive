@@ -108,6 +108,7 @@ weapon "w_straight katana"
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 4
+	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -159,6 +160,7 @@ weapon "w_wakizashi"
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 2
+	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -180,6 +182,7 @@ weapon "w_katana"
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 4
+	cuts 1
 
 	blade 0
 	{
@@ -448,6 +451,7 @@ weapon "w_axe"
 	attackDelay 2500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 12
+	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -514,6 +518,7 @@ weapon "w_long_sword"
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 4
+	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 

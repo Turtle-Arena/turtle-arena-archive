@@ -119,6 +119,9 @@ field_t fields[] = {
 	{"angle", FOFS(s.angles), F_ANGLEHACK},
 	{"targetShaderName", FOFS(targetShaderName), F_LSTRING},
 	{"targetShaderNewName", FOFS(targetShaderNewName), F_LSTRING},
+#ifdef TMNTWEAPSYS // WIF_CUTS
+	{"mustcut", FOFS(mustcut), F_INT},
+#endif
 
 	{NULL}
 };

@@ -62,6 +62,9 @@
 		Disabled shooter_* (Use misc_shooter instead)
 		TMNT Arena currently still supports shooter_* for Q3 map compatiblity.
 
+	January 12, 2010:
+		Add mustcut to func_breakable
+
       TODO:
 		Add new WIP path_* entities, path_start path_point path_end
 		Add WIP Nights mode items, nights_start nights_target
@@ -141,12 +144,13 @@ Target this entity with a misc_model to have the model attached to the entity (s
 -->
 
 <group name="func_breakable" color="0 .5 .8">
-When destroyed, it triggers all its targets and explodes.
+When destroyed, it triggers all its targets and disapears.
 -------- KEYS --------
 <target key="target" name="Target">all entities with a matching targetname will be triggered.</target>
 <real key="wait" name="Respawn Delay">TODO: number of seconds before the brush respawns (default -1, -1 = never return).</real>
 <targetname key="targetname" name="Target Name">if set a trigger can be used to break the brush</targetname>
 <real key="health" name="Health">(default 10) ammount of damage the brush must recive to break</real>
+<integer key="mustcut" name="Must Cut">(default 0) if 1 only weapons with "cuts 1" can damage it</integer>
 <real key="light" name="Model Light Intensity">constantLight radius of .md3 model included with entity. Has no effect on the entity's brushes (default 0).</real>
 <color key="color" name="Model Light Color">constantLight color of .md3 model included with entity. Has no effect on the entity's brushes (default 1 1 1).</color>
 <model key="model2" name="Model File">path/name of model to include (eg: models/mapobjects/pipe/pipe02.md3).</model>
