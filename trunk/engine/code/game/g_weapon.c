@@ -1924,18 +1924,48 @@ void NPC_FireWeapon(gentity_t *ent)
 
 	s_quadFactor=1;
 
+    if (bg_weapongroupinfo[ent->s.weapon].weapon[0]->weapontype != WT_GUN)
+    {
+        return;
+    }
+
+	// set aiming directions
+	AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
+	CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+	if (ent->bgNPC.info->primaryHandSide == HAND_RIGHT)
+		VectorMA (muzzle, 4, right, muzzle);
+	else if (ent->bgNPC.info->primaryHandSide == HAND_LEFT)
+		VectorMA (muzzle, -4, right, muzzle);
+
 #ifdef TMNT // LOCKON
 	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
 			muzzle, forward, right, up);
 #else
 	// NPC just shoots forward, not at target...
 #endif
-#ifdef TMNTWEAPSYS
 	fire_weapon(ent, muzzle, forward, right, up,
-			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, HAND_RIGHT);
+			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, ent->bgNPC.info->primaryHandSide);
+
+    if (bg_weapongroupinfo[ent->s.weapon].weapon[1]->weapontype != WT_GUN)
+    {
+        return;
+    }
+
+	// set aiming directions
+	AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
+	CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+	if (ent->bgNPC.info->secondaryHandSide == HAND_RIGHT)
+		VectorMA (muzzle, 4, right, muzzle);
+	else if (ent->bgNPC.info->secondaryHandSide == HAND_LEFT)
+		VectorMA (muzzle, -4, right, muzzle);
+
+#ifdef TMNT // LOCKON
+	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
+			muzzle, forward, right, up);
 #else
-#warning "TMNTWEAPSYS must be defined for NPC_FireWeapon"
-	Com_Printf("Warning: TMNTWEAPSYS must be defined for NPC_FireWeapon.\n");
+	// NPC just shoots forward, not at target...
 #endif
+	fire_weapon(ent, muzzle, forward, right, up,
+			bg_weapongroupinfo[ent->s.weapon].weaponnum[1], s_quadFactor, ent->bgNPC.info->secondaryHandSide);
 }
 #endif

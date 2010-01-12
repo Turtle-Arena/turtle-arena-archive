@@ -1509,6 +1509,8 @@ typedef struct
 	int viewheight;
 	vec3_t mins, maxs;
 	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
+	int primaryHandSide;
+	int secondaryHandSide;
 
 } bg_npcinfo_t;
 
