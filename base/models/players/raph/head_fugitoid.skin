@@ -1,7 +1,8 @@
-h_head,models/players/raph/body_fugitoid
-h_head2,models/players/raph/body_fugitoid
-h_eye_left,models/players/raph/green
-h_eye_right,models/players/raph/green
-h_mouth_left,models/players/raph/green
-h_mouth_right,models/players/raph/green
+h_head_left,models/players/raph/body_fugitoid
+h_head_right,models/players/raph/body_fugitoid
+h_eye_left,models/players/raph/white
+h_eye_right,models/players/raph/white
+h_mouth_left,models/players/raph/white
+h_mouth_right,models/players/raph/white
+h_bandana,models/players/raph/body_fugitoid
 tag_head,

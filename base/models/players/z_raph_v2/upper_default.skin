@@ -1,9 +1,0 @@
-u_torso,$(dir)/body.png
-u_torso2,$(dir)/body.png
-u_torso3,$(dir)/body.png
-u_plastron,$(dir)/plastron.png
-u_belt,$(dir)/belt.png
-tag_flag,
-tag_weapon,
-tag_head,
-tag_torso,
