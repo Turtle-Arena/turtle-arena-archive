@@ -51,6 +51,8 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 : Started see bg_sound_t and Sounds_Parse; it is similar to animsounds, but different.
 :    If currently doesn't load sounds and is for NPC and misc objects only.
 
+[todo] True Single Player mode with NPCs and all that.
+
 [todo] Savegames for single player
 
 [bug] cg_shadows 2 doesn't work if config is changed from default config?
@@ -61,12 +63,10 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 [bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects
 		and if PW_FLASHING wheres off they get stuck in the object.
 
-[todo] Have the HUD have a left side and a right side, so they can be drawn aspect-correct for 16:9 displays
-	(and others).
-: Have center too?
+[todo] Have the HUD have a left, center, right sides so they can be drawn aspect-correct for 16:9 displays (and others).
 : Currently the HUD is aspect-correct but only uses the 4:3 center part of the screen.
 
-[todo] Have dropped ET_ITEMs (weapons, holdables, powerups, etc) blink/flash before disaparing
+[todo] Have dropped ET_ITEMs (weapons, holdables, powerups, etc) blink/flash before disappearing
 : Using newly added RF_FORCE_ENT_ALPHA!
 : Does cgame have any idea of when items are going to be removed?
 
@@ -82,7 +82,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Remake UI/HUD using Quake III: Team Arena menu scripting?
 
-[todo] True Single Player mode with NPCs and all that.
 
 // The below are somewhat long...
 
@@ -102,7 +101,7 @@ BETTER(not done?): When moving the camera around the player, focus on the player
 ** Set voicechat filename and soundpath in "head.cfg" in player head directory. Head animations would go in it as well.
 *** Or Load it from animation.cfg and allow loading 2 animation.cfg files for each player, one for body and one for head.
 
-[todo] Add MD5 model support (MD5 use single model and skeleton, the animations can move any part of the model, and multiple animations can 'run' at the same time.)
+[todo] Add MD5 model support (MD5 use single model and skeleton, the animations can move any part of the model, and multiple animations can animate at the same time.)
 
 [todo] Finish misc_object, with animation, triggering, taking-damage, and dieing.
 : Maybe with spawning a item on death, respawning, and pushable options.

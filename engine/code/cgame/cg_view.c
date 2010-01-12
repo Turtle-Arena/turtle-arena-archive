@@ -809,6 +809,13 @@ static int CG_CalcViewValues( void ) {
 			cg_thirdPersonAngle.value += cg_cameraOrbit.value;
 		}
 	}
+#ifdef TMNTMISC
+	else
+	{
+		extern void CG_CamUpdate(void);
+		CG_CamUpdate();
+	}
+#endif
 	// add error decay
 	if ( cg_errorDecay.value > 0 ) {
 		int		t;
