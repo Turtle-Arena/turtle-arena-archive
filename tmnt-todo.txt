@@ -42,15 +42,7 @@ STARTED: [todo] Sword melee weapon bitflag, allow swords to cut things no one el
 [todo] Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
 : Logic-wise tag_hand_* make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
 
-
-// weapon-weights
-DONE: [todo] Remove the need for fuzw.c
-[todo-after-above] Fix up new weapon weight system.
-: (TMNTWEAPSYS_2 removes weight system from botlib for selecting held weapon)
-: Remove CHARACTERISTIC_WEAPONWEIGHTS from botfiles/[botname]_c.c and delete [botname]_w.c files
-
-[todo] Remove the need for weapons in fuzi.c
-: Load weapon item weights from weaponinfo.txt and .weap files or create weight from loaded info.
+[todo] Improve bot_shareditem_t weight code (Currently only supports constant weights, add support to be weight 0 if INVENTORY_X >= 1)
 
 // non-weapon or attacking...
 

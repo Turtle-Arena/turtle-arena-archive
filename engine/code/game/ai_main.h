@@ -222,7 +222,9 @@ typedef struct bot_state_s
 	int ms;											//move state of the bot
 	int gs;											//goal state of the bot
 	int cs;											//chat state of the bot
+#ifndef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
 	int ws;											//weapon state of the bot
+#endif
 	//
 	int enemy;										//enemy entity number
 	int lastenemyareanum;							//last reachability area the enemy was in

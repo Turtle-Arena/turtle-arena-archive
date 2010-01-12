@@ -35,8 +35,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // >= 0.4 && <  1.0 = circle strafing
 // >  0.7 && <  1.0 = random strafe direction change
 #define CHARACTERISTIC_ATTACK_SKILL					2	//float [0, 1]
-//weapon weight file
-#define CHARACTERISTIC_WEAPONWEIGHTS				3	//string
 //view angle difference to angle change factor
 #define CHARACTERISTIC_VIEW_FACTOR					4	//float <0, 1]
 //maximum view angle change

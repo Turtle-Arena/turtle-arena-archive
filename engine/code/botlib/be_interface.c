@@ -868,7 +868,7 @@ static void Init_AI_Export( ai_export_t *ai ) {
 	ai->BotFreeMoveState = BotFreeMoveState;
 	ai->BotInitMoveState = BotInitMoveState;
 	ai->BotAddAvoidSpot = BotAddAvoidSpot;
-#ifndef TMNTWEAPSYS_NOCOMPAT
+#ifndef TMNTWEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 	//-----------------------------------
 	// be_ai_weap.h
 	//-----------------------------------

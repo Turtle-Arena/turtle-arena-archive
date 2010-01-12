@@ -21,8 +21,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// Based on Open Arena's "gargoyle_t.c", but all of the chat text was rewritten.
-
 chat "raph"
 {
 	#include "teamplay.h"

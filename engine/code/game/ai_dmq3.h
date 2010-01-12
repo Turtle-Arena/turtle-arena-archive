@@ -38,6 +38,10 @@ void BotShutdownDeathmatchAI(void);
 void BotDeathmatchAI(bot_state_t *bs, float thinktime);
 //free waypoints
 void BotFreeWaypoints(bot_waypoint_t *wp);
+#ifdef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
+//bot weight for weapon
+int BotWeaponWeight(weapon_t w);
+#endif
 //choose a weapon
 void BotChooseWeapon(bot_state_t *bs);
 //setup movement stuff
