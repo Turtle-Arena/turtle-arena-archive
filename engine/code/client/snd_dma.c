@@ -352,8 +352,19 @@ sfxHandle_t	S_Base_RegisterSound( const char *name, qboolean compressed ) {
 		return 0;
 	}
 
+#ifdef IOQ3ZTM
+	if (!name) {
+		Com_Printf( S_COLOR_YELLOW "WARNING: Sound name is NULL\n" );
+		return 0;
+	}
+#endif
+
 	if ( strlen( name ) >= MAX_QPATH ) {
+#ifdef IOQ3ZTM
+		Com_Printf( S_COLOR_YELLOW "WARNING: Sound name exceeds MAX_QPATH\n" );
+#else
 		Com_Printf( "Sound name exceeds MAX_QPATH\n" );
+#endif
 		return 0;
 	}
 
