@@ -498,6 +498,101 @@ void CG_Letterbox(void)
 }
 #endif
 
+#ifdef TMNTMISC
+float camRotDir = 0;
+qboolean camleft = qfalse;
+qboolean camright = qfalse;
+qboolean camreseting = qfalse;
+void CG_CamMoveLeft(qboolean down)
+{
+	camleft = down;
+	if (down) {
+		camRotDir += 1.0f;
+		camreseting = qfalse;
+	}
+}
+
+void CG_CamMoveRight(qboolean down)
+{
+	camright = down;
+	if (down) {
+		camRotDir -= 1.0f;
+		camreseting = qfalse;
+	}
+}
+
+void CG_CamLeftDown_f(void)
+{
+	CG_CamMoveLeft(qtrue);
+}
+
+void CG_CamLeftUp_f(void)
+{
+	CG_CamMoveLeft(qfalse);
+}
+
+void CG_CamRightDown_f(void)
+{
+	CG_CamMoveRight(qtrue);
+}
+
+void CG_CamRightUp_f(void)
+{
+	CG_CamMoveRight(qfalse);
+}
+
+void CG_CamUpdate(void)
+{
+	if (camreseting)
+	{
+		float speed = 5.0f;
+		if (cg_thirdPersonAngle.value >= 360-speed || cg_thirdPersonAngle.value <= speed)
+		{
+			cg_thirdPersonAngle.value = 0;
+			camRotDir = 0;
+			camreseting = qfalse;
+		}
+		else if (cg_thirdPersonAngle.value > 180)
+			cg_thirdPersonAngle.value += speed;
+		else if (cg_thirdPersonAngle.value > speed)
+			cg_thirdPersonAngle.value -= speed;
+	}
+	else
+	{
+		if (camleft)
+			camRotDir += 0.2f;
+		else if (camRotDir >= 0.1f)
+			camRotDir -= 0.1f;
+
+		if (camright)
+			camRotDir -= 0.2f;
+		else if (camRotDir <= -0.1f)
+			camRotDir += 0.1f;
+
+		if (!camleft && !camright && camRotDir >= -0.2f && camRotDir <= 0.2f)
+			camRotDir = 0;
+
+		if (camRotDir > 3)
+			camRotDir = 3;
+		else if (camRotDir < -3)
+			camRotDir = -3;
+
+		cg_thirdPersonAngle.value = cg_thirdPersonAngle.value+camRotDir;
+	}
+
+	if (cg_thirdPersonAngle.value > 360)
+		cg_thirdPersonAngle.value -= 360;
+	if (cg_thirdPersonAngle.value < 0)
+		cg_thirdPersonAngle.value += 360;
+}
+
+void CG_CamReset_f(void)
+{
+	camreseting = qtrue;
+	camRotDir = 0;
+}
+#endif
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -516,6 +611,13 @@ static consoleCommand_t	commands[] = {
 #ifndef TMNT // NOZOOM
 	{ "+zoom", CG_ZoomDown_f },
 	{ "-zoom", CG_ZoomUp_f },
+#endif
+#ifdef TMNTMISC
+	{ "camreset", CG_CamReset_f },
+	{ "+camleft", CG_CamLeftDown_f },
+	{ "-camleft", CG_CamLeftUp_f },
+	{ "+camright", CG_CamRightDown_f },
+	{ "-camright", CG_CamRightUp_f },
 #endif
 	{ "sizeup", CG_SizeUp_f },
 	{ "sizedown", CG_SizeDown_f },
