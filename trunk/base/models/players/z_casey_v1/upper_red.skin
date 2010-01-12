@@ -1,6 +1,0 @@
-u_torso_right,$(dir)/torso
-u_torso_left,$(dir)/torso
-tag_flag,
-tag_weapon,
-tag_head,
-tag_torso,

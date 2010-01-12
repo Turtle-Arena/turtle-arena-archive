@@ -1,4 +1,0 @@
-h_head,$(dir)/head
-h_neck,$(dir)/head
-h_hair,$(dir)/hair
-tag_head,

@@ -68,6 +68,14 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 	ent->client->ps.persistant[PERS_SCORE] += score;
 	if ( g_gametype.integer == GT_TEAM )
 		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
+#ifdef TMNT // No negative scores
+	if (ent->client->ps.persistant[PERS_SCORE] < 0) {
+		ent->client->ps.persistant[PERS_SCORE] = 0;
+	}
+	if ( g_gametype.integer == GT_TEAM && level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] < 0) {
+		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] = 0;
+	}
+#endif
 	CalculateRanks();
 }
 
