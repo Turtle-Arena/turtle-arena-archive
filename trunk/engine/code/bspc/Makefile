@@ -76,7 +76,7 @@ MOUNT_DIR=..
 endif
 
 ifndef BUILD_DIR
-BUILD_DIR=../../build-bspc
+BUILD_DIR=../../build
 endif
 
 ifndef USE_INTERNAL_ZLIB
@@ -89,8 +89,8 @@ endif
 
 #############################################################################
 
-BD=$(BUILD_DIR)/debug-$(PLATFORM)-$(ARCH)
-BR=$(BUILD_DIR)/release-$(PLATFORM)-$(ARCH)
+BD=$(BUILD_DIR)/bspc-debug-$(PLATFORM)-$(ARCH)
+BR=$(BUILD_DIR)/bspc-release-$(PLATFORM)-$(ARCH)
 
 BLIBDIR=$(MOUNT_DIR)/botlib
 BSPCDIR=$(MOUNT_DIR)/bspc
@@ -174,6 +174,12 @@ else # ifeq darwin
 #############################################################################
 
 ifeq ($(PLATFORM),mingw32)
+
+  # Some MinGW installations define CC to cc, but don't actually provide cc,
+  # so explicitly use gcc instead (which is the only option anyway)
+  ifeq ($(call bin_path, $(CC)),)
+    CC=gcc
+  endif
 
   ARCH=x86
   BINEXT=.exe
