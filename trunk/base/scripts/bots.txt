@@ -1,13 +1,15 @@
-// TMNT bots - Turtle Man December 12, 2008
+// Bots
+//
 // Normal fields;
-// name - Name of the bot.
-// model - Player model dir [/ skin] (Example: "dir/skin" or just "dir" to use "default" skin)
-// aifile - Path in botfiles directory to the bot's main AI file.
+//   name - Name of the bot.
+//   model - Player model dir [/ skin] (Example: "dir/skin" or just "dir" to use "default" skin)
+//   aifile - Path in botfiles directory to the bot's main AI file.
+//
 // Other fields;
-// headmodel (default: uses value from model field)
-// gender (default:male) - May be "male", "female", or "it".
-// color1 (default:4)		--unused
-// color2 (default:5)		--unused
+//   headmodel (default: uses value from model field)
+//   gender (default:male) - May be "male", "female", or "it".
+//   color1 (default:4)		--unused
+//   color2 (default:5)		--unused
 
 {
 name		Raph
@@ -18,6 +20,12 @@ aifile	bots/raph_c.c
 {
 name		Casey
 model		casey/default
+aifile	bots/raph_c.c
+}
+
+{
+name		Don
+model		don/default
 aifile	bots/raph_c.c
 }
 
