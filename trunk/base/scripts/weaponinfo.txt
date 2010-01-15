@@ -342,14 +342,48 @@ weapon "w_nunchuck"
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 4
+	barrelSpin BS_YAW
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
+	// up
 	blade 0
 	{
 		damage 10
 		origin 0 0 0
-		tip 0 0 16
+		tip 0 0 8
+		trailStyle none
+	}
+	// forward
+	blade 1
+	{
+		damage 10
+		origin 0 0 8
+		tip 0 12 8
+		trailStyle default
+	}
+	// left
+	blade 2
+	{
+		damage 10
+		origin 0 0 8
+		tip 12 0 8
+		trailStyle default
+	}
+	// right
+	blade 3
+	{
+		damage 10
+		origin 0 0 8
+		tip -12 0 8
+		trailStyle default
+	}
+	// back
+	blade 4
+	{
+		damage 10
+		origin 0 0 8
+		tip 0 -12 8
 		trailStyle default
 	}
 }
@@ -357,7 +391,6 @@ weapon "w_nunchuck"
 weapongroup "wp_nunchucks"
 {
 	clone "wt_nunchucks"
-	randomSpawn 0 // FIXME: Missing models
 	itemName "weapon_nunchucks"
 	pickupName "Nunchucks"
 	pickupModel "models/weapons2/nunchuck/nunchucks_pickup.md3"
