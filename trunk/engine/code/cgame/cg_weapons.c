@@ -794,8 +794,7 @@ void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi )
 	memset( &beam, 0, sizeof( beam ) );
 
 #ifdef IOQ3ZTM
-	VectorCopy(cg_entities[ ent->currentState.otherEntityNum ].pe.flashOrigin,
-		beam.origin);
+	VectorCopy(cg_entities[ ent->currentState.otherEntityNum ].pe.flashOrigin, beam.origin);
 #else
 	//FIXME adjust for muzzle position
 	VectorCopy ( cg_entities[ ent->currentState.otherEntityNum ].lerpOrigin, beam.origin );
@@ -1735,7 +1734,12 @@ so the endpoint will reflect the simulated strike (lagging the predicted
 angle)
 ===============
 */
-static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
+static void CG_LightningBolt( centity_t *cent, vec3_t origin
+#ifdef TMNTWEAPSYS
+	, int range
+#endif
+	)
+{
 	trace_t  trace;
 	refEntity_t  beam;
 	vec3_t   forward;
@@ -1744,12 +1748,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 	int anim;
 #endif
 
-#ifdef TMNTWEAPSYS
-	if (bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->trailType != PT_LIGHTNING
-		|| !bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->instantDamage) {
-		return;
-	}
-#else
+#ifndef TMNTWEAPSYS
 	if (cent->currentState.weapon != WP_LIGHTNING) {
 		return;
 	}
@@ -1789,7 +1788,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 		VectorCopy(cent->lerpOrigin, muzzlePoint );
 	}
 
-#ifdef IOQ3ZTM // Turtle Man: Copied from CG_CalcMuzzlePoint
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Copied from CG_CalcMuzzlePoint
 	anim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
 	if ( anim == LEGS_WALKCR || anim == LEGS_IDLECR ) {
 		muzzlePoint[2] += CROUCH_VIEWHEIGHT;
@@ -1805,8 +1804,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 
 	// project forward by the lightning range
 #ifdef TMNTWEAPSYS
-	VectorMA( muzzlePoint, bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->speed,
-		forward, endPoint );
+	VectorMA( muzzlePoint, range, forward, endPoint );
 #else
 	VectorMA( muzzlePoint, LIGHTNING_RANGE, forward, endPoint );
 #endif
@@ -1928,11 +1926,7 @@ different than the muzzle point used for determining hits.
 static void CG_SpawnRailTrail( centity_t *cent, vec3_t origin ) {
 	clientInfo_t	*ci;
 
-#ifdef TMNTWEAPSYS
-	if ( bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->trailType != PT_RAIL) {
-		return;
-	}
-#else
+#ifndef TMNTWEAPSYS
 	if ( cent->currentState.weapon != WP_RAILGUN ) {
 		return;
 	}
@@ -2677,102 +2671,133 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	}
 
 	// add the flash
-	if (
 #ifdef TMNTWEAPSYS
-		( bg_weapongroupinfo[weaponNum].weapon[0]->flags & WIF_CONTINUOUS_FLASH )
-#else
-		( weaponNum == WP_LIGHTNING || weaponNum == WP_GAUNTLET || weaponNum == WP_GRAPPLING_HOOK )
+	for (i = 0; i < 2; i++)
 #endif
-		&& ( nonPredictedCent->currentState.eFlags & EF_FIRING ) ) 
 	{
-		// continuous flash
-	} else {
-		// impulse flash
-		if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME && !cent->pe.railgunFlash ) {
+		if (
+#ifdef TMNTWEAPSYS
+			( bg_weapongroupinfo[weaponNum].weapon[i]->flags & WIF_CONTINUOUS_FLASH )
+#else
+			( weaponNum == WP_LIGHTNING || weaponNum == WP_GAUNTLET || weaponNum == WP_GRAPPLING_HOOK )
+#endif
+			&& ( nonPredictedCent->currentState.eFlags & EF_FIRING ) ) 
+		{
+			// continuous flash
+		} else {
+			// impulse flash
+			if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME && !cent->pe.railgunFlash ) {
+				return;
+			}
+		}
+
+		memset( &flash, 0, sizeof( flash ) );
+		VectorCopy( parent->lightingOrigin, flash.lightingOrigin );
+		flash.shadowPlane = parent->shadowPlane;
+		flash.renderfx = parent->renderfx;
+
+#ifdef TMNTWEAPSYS
+		flash.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashModel;
+#else
+		flash.hModel = weapon->flashModel;
+#endif
+		if (!flash.hModel) {
+#ifdef IOQ3ZTM
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Support secondary weapon!
+			if (i == 0)
+#endif
+			{
+				// Use default flashOrigin when no flash model.
+				VectorCopy(nonPredictedCent->lerpOrigin, nonPredictedCent->pe.flashOrigin);
+				nonPredictedCent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
+			}
+#endif
 			return;
 		}
-	}
-
-	memset( &flash, 0, sizeof( flash ) );
-	VectorCopy( parent->lightingOrigin, flash.lightingOrigin );
-	flash.shadowPlane = parent->shadowPlane;
-	flash.renderfx = parent->renderfx;
-
-#ifdef TMNTWEAPSYS
-	flash.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashModel;
-#else
-	flash.hModel = weapon->flashModel;
-#endif
-	if (!flash.hModel) {
-#ifdef IOQ3ZTM
-		// Use default flashOrigin when no flash model.
-		VectorCopy(nonPredictedCent->lerpOrigin, nonPredictedCent->pe.flashOrigin);
-		nonPredictedCent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
-#endif
-		return;
-	}
-	angles[YAW] = 0;
-	angles[PITCH] = 0;
-	angles[ROLL] = crandom() * 10;
-	AnglesToAxis( angles, flash.axis );
+		angles[YAW] = 0;
+		angles[PITCH] = 0;
+		angles[ROLL] = crandom() * 10;
+		AnglesToAxis( angles, flash.axis );
 
 #ifdef TMNTWEAPSYS // Turtle Man: Do it for all weapons...
-	// colorize the flash
+		// colorize the flash
 #else
-	// colorize the railgun blast
-	if ( weaponNum == WP_RAILGUN )
+		// colorize the railgun blast
+		if ( weaponNum == WP_RAILGUN )
 #endif
-	{
-		clientInfo_t	*ci;
+		{
+			clientInfo_t	*ci;
 
-		ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-		flash.shaderRGBA[0] = 255 * ci->color1[0];
-		flash.shaderRGBA[1] = 255 * ci->color1[1];
-		flash.shaderRGBA[2] = 255 * ci->color1[2];
-	}
+			ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+			flash.shaderRGBA[0] = 255 * ci->color1[0];
+			flash.shaderRGBA[1] = 255 * ci->color1[1];
+			flash.shaderRGBA[2] = 255 * ci->color1[2];
+		}
 
 
-	CG_PositionRotatedEntityOnTag( &flash, &gun,
 #ifdef TMNTWEAPSYS
-			cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].weaponModel,
+		if (i == 1)
+			CG_PositionRotatedEntityOnTag( &flash, &gun_left,
+				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel, "tag_flash");
+		else
+			CG_PositionRotatedEntityOnTag( &flash, &gun,
+				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel, "tag_flash");
 #else
-			weapon->weaponModel,
+		CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, "tag_flash");
 #endif
-			"tag_flash");
-	trap_R_AddRefEntityToScene( &flash );
+		trap_R_AddRefEntityToScene( &flash );
 
-	if ( ps || cg.renderingThirdPerson ||
-		cent->currentState.number != cg.predictedPlayerState.clientNum ) {
+		if ( ps || cg.renderingThirdPerson ||
+			cent->currentState.number != cg.predictedPlayerState.clientNum ) {
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Support secondary weapon!
+			if (i == 0)
+#endif
+			{
 #ifdef IOQ3ZTM
-		VectorCopy(flash.origin, nonPredictedCent->pe.flashOrigin);
+				VectorCopy(flash.origin, nonPredictedCent->pe.flashOrigin);
 #endif
-		// add lightning bolt
-		CG_LightningBolt( nonPredictedCent, flash.origin );
+			}
 
-		// add rail trail
-		CG_SpawnRailTrail( cent, flash.origin );
+#ifdef TMNTWEAPSYS
+			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->trailType == PT_LIGHTNING
+				&& bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->instantDamage)
+#endif
+			{
+				// add lightning bolt
+				CG_LightningBolt( nonPredictedCent, flash.origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->speed );
+			}
+
+#ifdef TMNTWEAPSYS
+			if ( bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->trailType == PT_RAIL)
+#endif
+			{
+				// add rail trail
+				CG_SpawnRailTrail( cent, flash.origin );
+			}
+
 
 #ifdef IOQ3ZTM // SMOOTH_FLASH
-		flashDLight = 300 + (cg.time&31);
+			flashDLight = 300 + (cg.time&31);
 #else
-		flashDLight = 300 + (rand()&31);
+			flashDLight = 300 + (rand()&31);
 #endif
 #ifdef TMNTWEAPSYS
-		if (cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[0]
-			|| cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[1]
-			|| cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[2])
-		{
-			trap_R_AddLightToScene( flash.origin, flashDLight,
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[0],
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[1],
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].flashDlightColor[2] );
-		}
+			if (cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[0]
+				|| cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[1]
+				|| cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[2])
+			{
+				trap_R_AddLightToScene( flash.origin, flashDLight,
+					cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[0],
+					cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[1],
+					cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[2] );
+			}
 #else
-		if ( weapon->flashDlightColor[0] || weapon->flashDlightColor[1] || weapon->flashDlightColor[2] ) {
-			trap_R_AddLightToScene( flash.origin, flashDLight, weapon->flashDlightColor[0],
-				weapon->flashDlightColor[1], weapon->flashDlightColor[2] );
-		}
+			if ( weapon->flashDlightColor[0] || weapon->flashDlightColor[1] || weapon->flashDlightColor[2] ) {
+				trap_R_AddLightToScene( flash.origin, flashDLight, weapon->flashDlightColor[0],
+					weapon->flashDlightColor[1], weapon->flashDlightColor[2] );
+			}
 #endif
+		}
 	}
 }
 
@@ -2816,16 +2841,45 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 
 	// allow the gun to be completely removed
 	if ( !cg_drawGun.integer ) {
-#ifndef TMNTWEAPONS
 		vec3_t		origin;
 
 		if ( cg.predictedPlayerState.eFlags & EF_FIRING ) {
 			// special hack for lightning gun...
+#ifdef TMNTWEAPSYS
+			int handSide;
+
+			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->trailType == PT_LIGHTNING
+				&& bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->instantDamage)
+			{
+				VectorCopy( cg.refdef.vieworg, origin );
+
+				handSide = cgs.clientinfo[cent->currentState.number].playercfg.primaryHandSide;
+				if (handSide == HAND_RIGHT)
+					VectorMA( origin, -8, cg.refdef.viewaxis[2], origin );
+				else if (handSide == HAND_LEFT)
+					VectorMA( origin, 8, cg.refdef.viewaxis[2], origin );
+
+				CG_LightningBolt( &cg_entities[ps->clientNum], origin, LIGHTNING_RANGE);
+			}
+
+			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[1]->proj->trailType == PT_LIGHTNING
+				&& bg_weapongroupinfo[cent->currentState.weapon].weapon[1]->proj->instantDamage)
+			{
+				VectorCopy( cg.refdef.vieworg, origin );
+
+				handSide = cgs.clientinfo[cent->currentState.number].playercfg.secondaryHandSide;
+				if (handSide == HAND_RIGHT)
+					VectorMA( origin, -8, cg.refdef.viewaxis[2], origin );
+				else if (handSide == HAND_LEFT)
+					VectorMA( origin, 8, cg.refdef.viewaxis[2], origin );
+				CG_LightningBolt( &cg_entities[ps->clientNum], origin, LIGHTNING_RANGE);
+			}
+#else
 			VectorCopy( cg.refdef.vieworg, origin );
 			VectorMA( origin, -8, cg.refdef.viewaxis[2], origin );
 			CG_LightningBolt( &cg_entities[ps->clientNum], origin );
-		}
 #endif
+		}
 		return;
 	}
 
