@@ -2435,7 +2435,7 @@ static qboolean Weapon_Parse(char **p) {
 	weapon.flashColor[1] = 1.0f;
 	weapon.flashColor[2] = 1.0f;
 	weapon.wallmarkRadius = 16;
-	weapon.barrelSpin = BS_NONE;
+	weapon.barrelSpin = BS_ROLL;
 	// fire_projectile and G_MeleeDamageSingle will use the
 	//     correct default mod (MOD_PORJECTILE or MOD_WEAPON_*)
 	weapon.mod = MOD_UNKNOWN;

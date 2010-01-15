@@ -547,12 +547,15 @@ typedef struct {
 #endif
 
 	qhandle_t		weaponModel;
-#ifdef TMNTWEAPSYS
-	qhandle_t		weaponModel2;
-#endif
 	qhandle_t		barrelModel;
 	qhandle_t		flashModel;
 	vec3_t			flashDlightColor;
+#ifdef TMNTWEAPSYS
+	qhandle_t		weaponModel2;
+	qhandle_t		barrelModel2;
+	qhandle_t		flashModel2;
+	vec3_t			flashDlightColor2;
+#endif
 	int				muzzleFlashTime;
 
 	// currently in use drawing parms

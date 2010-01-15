@@ -817,25 +817,27 @@ static void CG_Item( centity_t *cent ) {
 		barrel.renderfx = ent.renderfx;
 
 #ifdef TMNTWEAPSYS
-		CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], "tag_barrel" );
+		if (CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], "tag_barrel" ))
 #else
 		CG_PositionRotatedEntityOnTag( &barrel, &ent, wi->weaponModel, "tag_barrel" );
 #endif
+		{
+			AxisCopy( ent.axis, barrel.axis );
+			barrel.nonNormalizedAxes = ent.nonNormalizedAxes;
 
-		AxisCopy( ent.axis, barrel.axis );
-		barrel.nonNormalizedAxes = ent.nonNormalizedAxes;
-
-		trap_R_AddRefEntityToScene( &barrel );
+			trap_R_AddRefEntityToScene( &barrel );
+		}
 
 #ifdef TMNTWEAPSYS
 		barrel.hModel = cg_weapons[bg_weapongroupinfo[item->giTag].weaponnum[1]].barrelModel;
 
-		CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], "tag_barrel2" );
+		if (CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], "tag_barrel2" ))
+		{
+			AxisCopy( ent.axis, barrel.axis );
+			barrel.nonNormalizedAxes = ent.nonNormalizedAxes;
 
-		AxisCopy( ent.axis, barrel.axis );
-		barrel.nonNormalizedAxes = ent.nonNormalizedAxes;
-
-		trap_R_AddRefEntityToScene( &barrel );
+			trap_R_AddRefEntityToScene( &barrel );
+		}
 #endif
 	}
 #endif

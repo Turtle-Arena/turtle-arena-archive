@@ -70,11 +70,13 @@ tryagain:
 #endif
 	pi->realWeapon = weaponNum;
 	pi->weaponModel = 0;
-#ifdef TMNTWEAPSYS
-	pi->weaponModel2 = 0;
-#endif
 	pi->barrelModel = 0;
 	pi->flashModel = 0;
+#ifdef TMNTWEAPSYS
+	pi->weaponModel2 = 0;
+	pi->barrelModel2 = 0;
+	pi->flashModel2 = 0;
+#endif
 
 	if ( weaponNum == WP_NONE ) {
 		return;
@@ -82,9 +84,44 @@ tryagain:
 
 #ifdef TMNTWEAPSYS
 	if (bg_weapongroupinfo[weaponNum].weapon[0]->model[0] != '\0')
+	{
 		pi->weaponModel = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[0]->model);
+
+		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[0]->model );
+		COM_StripExtension(path, path, sizeof(path));
+		strcat( path, "_barrel.md3" );
+		pi->barrelModel = trap_R_RegisterModel( path );
+
+		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[0]->model );
+		COM_StripExtension(path, path, sizeof(path));
+		strcat( path, "_flash.md3" );
+		pi->flashModel = trap_R_RegisterModel( path );
+
+		MAKERGB( pi->flashDlightColor,
+				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[0],
+				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[1],
+				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[2] );
+	}
+
 	if (bg_weapongroupinfo[weaponNum].weapon[1]->model[0] != '\0')
+	{
 		pi->weaponModel2 = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[1]->model);
+
+		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[1]->model );
+		COM_StripExtension(path, path, sizeof(path));
+		strcat( path, "_barrel.md3" );
+		pi->barrelModel2 = trap_R_RegisterModel( path );
+
+		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[1]->model );
+		COM_StripExtension(path, path, sizeof(path));
+		strcat( path, "_flash.md3" );
+		pi->flashModel2 = trap_R_RegisterModel( path );
+
+		MAKERGB( pi->flashDlightColor2,
+				bg_weapongroupinfo[weaponNum].weapon[1]->flashColor[0],
+				bg_weapongroupinfo[weaponNum].weapon[1]->flashColor[1],
+				bg_weapongroupinfo[weaponNum].weapon[1]->flashColor[2] );
+	}
 #else
 	for ( item = bg_itemlist + 1; item->classname ; item++ ) {
 		if ( item->giType != IT_WEAPON ) {
@@ -109,33 +146,18 @@ tryagain:
 	}
 
 	if ( weaponNum == WP_MACHINEGUN || weaponNum == WP_GAUNTLET || weaponNum == WP_BFG )
-#endif
 	{
-#ifdef TMNTWEAPSYS
-		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[0]->model );
-#else
 		strcpy( path, item->world_model[0] );
-#endif
 		COM_StripExtension( path, path, sizeof(path) );
 		strcat( path, "_barrel.md3" );
 		pi->barrelModel = trap_R_RegisterModel( path );
 	}
 
-#ifdef TMNTWEAPSYS
-	strcpy( path, bg_weapongroupinfo[weaponNum].weapon[0]->model );
-#else
 	strcpy( path, item->world_model[0] );
-#endif
 	COM_StripExtension( path, path, sizeof(path) );
 	strcat( path, "_flash.md3" );
 	pi->flashModel = trap_R_RegisterModel( path );
 
-#ifdef TMNTWEAPSYS
-	MAKERGB( pi->flashDlightColor,
-			bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[0],
-			bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[1],
-			bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[2] );
-#else
 	switch( weaponNum ) {
 	case WP_GAUNTLET:
 		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
@@ -869,6 +891,11 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	vec3_t			maxs = {16, 16, 32};
 	float			len;
 	float			xx;
+#ifdef TMNTWEAPSYS
+	int				i;
+	qhandle_t		barrelModel;
+	vec3_t			angles;
+#endif
 
 	if ( !pi->legsModel || !pi->torsoModel || !pi->headModel
 #ifdef TMNTPLAYERSYS
@@ -1035,25 +1062,41 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	// add the spinning barrel
 	//
 #ifdef TMNTWEAPSYS
-	if ( pi->barrelModel ) {
+	for (i = 0; i < 2; i++)
 #else
-	if ( pi->realWeapon == WP_MACHINEGUN || pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG ) {
+	if ( pi->realWeapon == WP_MACHINEGUN || pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG )
 #endif
+	{
+#ifdef TMNTWEAPSYS
+		if (i == 1)
+			barrelModel = pi->barrelModel2;
+		else
+			barrelModel = pi->barrelModel;
+
+		if (!barrelModel)
+			continue;
+#else
 		vec3_t	angles;
+#endif
 
 		memset( &barrel, 0, sizeof(barrel) );
 		VectorCopy( origin, barrel.lightingOrigin );
 		barrel.renderfx = renderfx;
 
-		barrel.hModel = pi->barrelModel;
 #ifdef TMNTWEAPSYS
+		barrel.hModel = barrelModel;
 		VectorClear(angles);
-		if (bg_weapongroupinfo[pi->realWeapon].weapon[0]->barrelSpin != BS_NONE)
+		if (bg_weapongroupinfo[pi->realWeapon].weapon[i]->barrelSpin != BS_NONE)
 		{
-			angles[bg_weapongroupinfo[pi->realWeapon].weapon[0]->barrelSpin]
+			if (i == 1)
+				angles[bg_weapongroupinfo[pi->realWeapon].weapon[i]->barrelSpin]
+						= 360-UI_MachinegunSpinAngle( pi );
+			else
+				angles[bg_weapongroupinfo[pi->realWeapon].weapon[i]->barrelSpin]
 						= UI_MachinegunSpinAngle( pi );
 		}
 #else
+		barrel.hModel = pi->barrelModel;
 		angles[YAW] = 0;
 		angles[PITCH] = 0;
 		angles[ROLL] = UI_MachinegunSpinAngle( pi );
@@ -1064,6 +1107,11 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #endif
 		AnglesToAxis( angles, barrel.axis );
 
+#ifdef TMNTWEAPSYS
+		if (i == 1)
+			UI_PositionRotatedEntityOnTag( &barrel, &gun_left, pi->weaponModel2, "tag_barrel");
+		else
+#endif
 		UI_PositionRotatedEntityOnTag( &barrel, &gun, pi->weaponModel, "tag_barrel");
 
 		trap_R_AddRefEntityToScene( &barrel );
@@ -1073,6 +1121,38 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	// add muzzle flash
 	//
 	if ( dp_realtime <= pi->muzzleFlashTime ) {
+#ifdef TMNTWEAPSYS
+		vec3_t *flashDlightColor;
+		
+		for (i = 0; i < 2; i++)
+		{
+			memset( &flash, 0, sizeof(flash) );
+			if (i == 1) {
+				flash.hModel = pi->flashModel2;
+				flashDlightColor = &pi->flashDlightColor2;
+			} else {
+				flash.hModel = pi->flashModel;
+				flashDlightColor = &pi->flashDlightColor;
+			}
+
+			if (!flash.hModel)
+				continue;
+
+			VectorCopy( origin, flash.lightingOrigin );
+			if (i == 1)
+				UI_PositionEntityOnTag( &flash, &gun_left, pi->weaponModel2, "tag_flash");
+			else
+				UI_PositionEntityOnTag( &flash, &gun, pi->weaponModel, "tag_flash");
+			flash.renderfx = renderfx;
+			trap_R_AddRefEntityToScene( &flash );
+
+			// make a dlight for the flash
+			if ( *flashDlightColor[0] || *flashDlightColor[1] || *flashDlightColor[2] ) {
+				trap_R_AddLightToScene( flash.origin, 200 + (rand()&31), *flashDlightColor[0],
+					*flashDlightColor[1], *flashDlightColor[2] );
+			}
+		}
+#else
 		if ( pi->flashModel ) {
 			memset( &flash, 0, sizeof(flash) );
 			flash.hModel = pi->flashModel;
@@ -1087,6 +1167,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 			trap_R_AddLightToScene( flash.origin, 200 + (rand()&31), pi->flashDlightColor[0],
 				pi->flashDlightColor[1], pi->flashDlightColor[2] );
 		}
+#endif
 	}
 
 	//

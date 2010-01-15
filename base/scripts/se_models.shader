@@ -312,7 +312,9 @@ models/powerups/instant/strength
 	}
 }
 
+//
 // Powerup rings
+//
 //models/powerups/instant/defense
 models/powerups/shield/yellow
 {
@@ -365,7 +367,10 @@ models/powerups/shield/red
 	}
 }
 
+//
 // Weapons
+//
+
 models/weapons2/katana_leo/w_katana
 {
 	{
@@ -404,6 +409,29 @@ models/weapons2/sai/w_sai
 	//	blendFunc GL_DST_COLOR GL_SRC_COLOR
 	//	tcGen environment
 	//}
+}
+
+models/weapons2/nunchuck/w_nunchuck
+{
+	{
+		map models/weapons2/nunchuck/w_nunchuck.png
+		blendFunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+
+models/weapons2/nunchuck/chain
+{
+	{
+		map $whiteimage
+		rgbGen const ( 0.4 0.4 0.4 )
+	}
+	{
+		map textures/effects/tinfx_lighter.png
+		tcGen environment
+		rgbGen lightingDiffuse
+		//alphaGen wave sin .6 .2 0 .6
+	}
 }
 
 //

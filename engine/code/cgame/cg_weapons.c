@@ -2596,11 +2596,24 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	// add the spinning barrel
 #ifdef TMNTWEAPSYS
 	for (i = 0; i < 2; i++)
+#else
+	if ( weapon->barrelModel )
+#endif
 	{
+#ifdef TMNTWEAPSYS
+		if (i == 1)
+		{
+			if (!draw_secondary)
+				continue;
+		}
+		else
+		{
+			if (!draw_primary)
+				continue;
+		}
+
 		if (!cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].barrelModel)
 			continue;
-#else
-	if ( weapon->barrelModel ) {
 #endif
 		memset( &barrel, 0, sizeof( barrel ) );
 		VectorCopy( parent->lightingOrigin, barrel.lightingOrigin );
@@ -2619,7 +2632,10 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		VectorClear(angles);
 		if (bg_weapongroupinfo[weaponNum].weapon[i]->barrelSpin != BS_NONE)
 		{
-			angles[bg_weapongroupinfo[weaponNum].weapon[i]->barrelSpin] = barrelSpinAngle;
+			if (i == 1) // Spin other direction
+				angles[bg_weapongroupinfo[weaponNum].weapon[i]->barrelSpin] = 360-barrelSpinAngle;
+			else
+				angles[bg_weapongroupinfo[weaponNum].weapon[i]->barrelSpin] = barrelSpinAngle;
 		}
 #else
 		barrel.hModel = weapon->barrelModel;
@@ -2630,13 +2646,22 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 		AnglesToAxis( angles, barrel.axis );
 
-		CG_PositionRotatedEntityOnTag( &barrel, &gun,
 #ifdef TMNTWEAPSYS
-			cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
+		if (i == 1)
+		{
+			CG_PositionRotatedEntityOnTag( &barrel, &gun_left,
+				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
+				"tag_barrel" );
+		}
+		else
+		{
+			CG_PositionRotatedEntityOnTag( &barrel, &gun,
+				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
+				"tag_barrel" );
+		}
 #else
-			weapon->weaponModel,
+		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, "tag_barrel" );
 #endif
-			"tag_barrel" );
 
 		CG_AddWeaponWithPowerups( &barrel, cent->currentState.powerups );
 	}
