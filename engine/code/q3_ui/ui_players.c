@@ -70,6 +70,9 @@ tryagain:
 #endif
 	pi->realWeapon = weaponNum;
 	pi->weaponModel = 0;
+#ifdef TMNTWEAPSYS
+	pi->weaponModel2 = 0;
+#endif
 	pi->barrelModel = 0;
 	pi->flashModel = 0;
 
@@ -78,8 +81,10 @@ tryagain:
 	}
 
 #ifdef TMNTWEAPSYS
-	pi->weaponModel = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[0]->model);
-	pi->weaponModel2 = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[1]->model);
+	if (bg_weapongroupinfo[weaponNum].weapon[0]->model[0] != '\0')
+		pi->weaponModel = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[0]->model);
+	if (bg_weapongroupinfo[weaponNum].weapon[1]->model[0] != '\0')
+		pi->weaponModel2 = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[1]->model);
 #else
 	for ( item = bg_itemlist + 1; item->classname ; item++ ) {
 		if ( item->giType != IT_WEAPON ) {
