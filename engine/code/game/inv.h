@@ -43,7 +43,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_KATANAS			2
 #define INVENTORY_DAISHO			3 // Usagi's weapons
 #define INVENTORY_SAIS				4
-#define INVENTORY_NUNCHUKS			5
+#define INVENTORY_NUNCHUCKS			5
 #define INVENTORY_HAMMER			6
 #define INVENTORY_AXE				7
 #define INVENTORY_LONGSWORD			8
@@ -133,7 +133,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODELINDEX_KATANAS			6
 #define MODELINDEX_DAISHO			7
 #define MODELINDEX_SAIS				8
-#define MODELINDEX_NUNCHUKS			9
+#define MODELINDEX_NUNCHUCKS		9
 #define MODELINDEX_HAMMER			10
 #define MODELINDEX_AXE				11
 #define MODELINDEX_LONGSWORD		12
@@ -200,7 +200,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define WEAPONINDEX_KATANAS				2
 #define WEAPONINDEX_DAISHO				3
 #define WEAPONINDEX_SAIS				4
-#define WEAPONINDEX_NUNCHUKS			5
+#define WEAPONINDEX_NUNCHUCKS			5
 #define WEAPONINDEX_HAMMER				6
 #define WEAPONINDEX_AXE					7
 #define WEAPONINDEX_LONGSWORD			8

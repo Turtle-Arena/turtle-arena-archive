@@ -9,7 +9,7 @@
 	Added target_level_end and target_start_camera
 
 	Removed all of Quake3's weapons and ammo. Added the below weapons.
-	weapon_default, weapon_katanas, weapon_sais, weapon_nunchuks, weapon_hammer, weapon_axe,
+	weapon_default, weapon_katanas, weapon_sais, weapon_nunchucks, weapon_hammer, weapon_axe,
 	weapon_longsword, weapon_bat, weapon_bo, weapon_bamboobo, weapon_gun, weapon_electriclauncher,
 	weapon_rocketlauncher, weapon_hominglauncher, weapon_grapplinghook
 
@@ -2239,8 +2239,8 @@ When the random key is set, its value is used to calculate a minimum and a maxim
 =============================================================================
 -->
 
-<point name="weapon_nunchuks" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/nunchuks/nunchuks.md3">
-Nunchuks.
+<point name="weapon_nunchucks" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/nunchuck/nunchucks_pickup.md3">
+Nunchucks.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>

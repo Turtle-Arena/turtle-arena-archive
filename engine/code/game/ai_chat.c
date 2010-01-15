@@ -285,7 +285,7 @@ char *BotWeaponNameForMeansOfDeath(int mod) {
 		case MOD_KATANA: return "Katana";
 		case MOD_WAKIZASHI: return "Wakizashi";
 		case MOD_SAI: return "Sai";
-		case MOD_NUNCHUK: return "Nunchuk";
+		case MOD_NUNCHUCK: return "Nunchuck";
 		case MOD_HAMMER: return "Hammer";
 		case MOD_AXE: return "Axe";
 		case MOD_SWORD: return "Sword";

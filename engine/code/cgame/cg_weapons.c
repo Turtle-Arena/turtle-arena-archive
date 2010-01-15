@@ -2589,7 +2589,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #ifdef TMNTWEAPSYS
 	// Even if no barrel check for firingStoppedSound
 	// Turtle Man: FIXME: Both weapons share the same barrelSpinAngle/firingStoppedSound
-	//                      (Bad for nunchuks?)
+	//                      (Bad for nunchucks?)
 	barrelSpinAngle = CG_MachinegunSpinAngle( cent );
 #endif
 

@@ -181,11 +181,11 @@ icons/iconw_sais
 	}
 }
 
-icons/iconw_nunchuks
+icons/iconw_nunchucks
 {
 	nopicmip
 	{
-		map icons/iconw_nunchuks.png
+		map icons/iconw_nunchucks.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }

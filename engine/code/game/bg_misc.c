@@ -322,18 +322,18 @@ gitem_t	bg_itemlist[] =
 /* sounds */ ""
 	},
 
-/*QUAKED weapon_nunchuks (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+/*QUAKED weapon_nunchucks (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
-		"weapon_nunchuks",
+		"weapon_nunchucks",
 		"sound/misc/w_pkup.wav",
-        { "models/weapons2/nunchuk/nunchuks_pickup.md3",
-		NULL, "models/weapons2/nunchuk/nunchuk.md3", "models/weapons2/nunchuk/nunchuk.md3"},
-/* icon */		"icons/iconw_nunchuks",
-/* pickup */	"Nunchuks",
+        { "models/weapons2/nunchuck/nunchucks_pickup.md3",
+		NULL, "models/weapons2/nunchuck/nunchuck.md3", "models/weapons2/nunchuck/nunchuck.md3"},
+/* icon */		"icons/iconw_nunchucks",
+/* pickup */	"Nunchucks",
 		0,
 		IT_WEAPON,
-		WP_NUNCHUKS,
+		WP_NUNCHUCKS,
 /* precache */ "",
 /* sounds */ ""
 	},
@@ -1582,8 +1582,8 @@ playerAnimationDef_t playerAnimationDefs[] = {
     ANIMDEF(TORSO_STAND_HAMMER),
     ANIMDEF(TORSO_STAND_HAMMER_PRIMARY),
 
-    ANIMDEF(TORSO_STAND_NUNCHUKS),
-    ANIMDEF(TORSO_STAND_NUNCHUKS1_PRIMARY),
+    ANIMDEF(TORSO_STAND_NUNCHUCKS),
+    ANIMDEF(TORSO_STAND_NUNCHUCKS1_PRIMARY),
 
 	// Gun attacks
     ANIMDEF(TORSO_ATTACK_GUN_PRIMARY),
@@ -1625,12 +1625,12 @@ playerAnimationDef_t playerAnimationDefs[] = {
 
     ANIMDEF(TORSO_ATTACK_HAMMER_PRIMARY_A),
 
-    ANIMDEF(TORSO_ATTACK_NUNCHUKS_A),
-    ANIMDEF(TORSO_ATTACK_NUNCHUKS_B),
-    ANIMDEF(TORSO_ATTACK_NUNCHUKS_C),
-    ANIMDEF(TORSO_ATTACK_NUNCHUKS1_PRIMARY_A),
-    ANIMDEF(TORSO_ATTACK_NUNCHUKS1_PRIMARY_B),
-    ANIMDEF(TORSO_ATTACK_NUNCHUKS1_PRIMARY_C),
+    ANIMDEF(TORSO_ATTACK_NUNCHUCKS_A),
+    ANIMDEF(TORSO_ATTACK_NUNCHUCKS_B),
+    ANIMDEF(TORSO_ATTACK_NUNCHUCKS_C),
+    ANIMDEF(TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A),
+    ANIMDEF(TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B),
+    ANIMDEF(TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C),
 #endif
 
 	// Quake3, not loaded from file
@@ -1660,7 +1660,7 @@ char	*modNames[] = {
 	"MOD_KATANA",
 	"MOD_WAKIZASHI",
 	"MOD_SAI",
-	"MOD_NUNCHUK",
+	"MOD_NUNCHUCK",
 	"MOD_HAMMER",
 	"MOD_AXE",
 	"MOD_SWORD",
@@ -3973,7 +3973,7 @@ qboolean BG_PlayerAttackAnim(int a)
 #else
 	return (a == TORSO_ATTACK || a == TORSO_ATTACK2
 #ifdef TMNTPLAYERS
-	|| (a >= TORSO_ATTACK_GUN_PRIMARY && a <= TORSO_ATTACK_NUNCHUKS1_PRIMARY_C)
+	|| (a >= TORSO_ATTACK_GUN_PRIMARY && a <= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C)
 #endif
 	);
 #endif
@@ -3994,7 +3994,7 @@ qboolean BG_PlayerStandAnim(int a)
 #else
 	return (a == TORSO_STAND || a == TORSO_STAND2
 #ifdef TMNTPLAYERS
-	|| (a >= TORSO_STAND_GUN_PRIMARY && a <= TORSO_STAND_NUNCHUKS1_PRIMARY)
+	|| (a >= TORSO_STAND_GUN_PRIMARY && a <= TORSO_STAND_NUNCHUCKS1_PRIMARY)
 #endif
 	);
 #endif
@@ -5409,7 +5409,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 		}
 
 		// standing defaults
-	if (index >= TORSO_STAND_GUN_PRIMARY && index <= TORSO_STAND_NUNCHUKS1_PRIMARY)
+	if (index >= TORSO_STAND_GUN_PRIMARY && index <= TORSO_STAND_NUNCHUCKS1_PRIMARY)
 		{
 		anim[0] = TORSO_STAND2;
 		anim[1] = TORSO_STAND;
@@ -5436,8 +5436,8 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 		|| (index > TORSO_ATTACK_BO_A &&
 			index <= TORSO_ATTACK_BO_C)
 		|| (index == TORSO_ATTACK_HAMMER_PRIMARY_A)
-		|| (index > TORSO_ATTACK_NUNCHUKS_A &&
-			index <= TORSO_ATTACK_NUNCHUKS_C) )
+		|| (index > TORSO_ATTACK_NUNCHUCKS_A &&
+			index <= TORSO_ATTACK_NUNCHUCKS_C) )
 	{
 		anim[0] = index-1;
 		anim[1] = TORSO_ATTACK2;
@@ -5450,8 +5450,8 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 			index <= TORSO_ATTACK_SAI1_PRIMARY_C)
 		|| (index >= TORSO_ATTACK_BO_PRIMARY_A &&
 			index <= TORSO_ATTACK_BO_PRIMARY_C)
-		|| (index >= TORSO_ATTACK_NUNCHUKS1_PRIMARY_A &&
-			index <= TORSO_ATTACK_NUNCHUKS1_PRIMARY_C)
+		|| (index >= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A &&
+			index <= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C)
 		// Daisho defaults to SWORD2
 		|| (index >= TORSO_ATTACK_DAISHO_A &&
 			index <= TORSO_ATTACK_DAISHO_C)

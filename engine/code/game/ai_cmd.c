@@ -1535,7 +1535,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 		"Katanas",
 		"Daisho",
 		"Sais",
-		"Nunchuks",
+		"Nunchucks",
 		"Hammer",
 		"Battle Axe",
 		"Long Sword",

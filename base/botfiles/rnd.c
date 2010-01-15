@@ -633,7 +633,7 @@ weapon = {
 	// Turtle Man: Rewrote.
 	"katana";
 	"sai";
-	"nunchuk";
+	"nunchuck";
 	"hammer";
 	"axe";
 	"long sword";

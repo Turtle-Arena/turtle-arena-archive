@@ -247,13 +247,13 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
-iteminfo "weapon_nunchuks"
+iteminfo "weapon_nunchucks"
 {
-name		"Nunchuks"
-model		"models/weapons2/nunchuk/nunchuk_pickup.md3"
-modelindex	MODELINDEX_NUNCHUKS
+name		"Nunchucks"
+model		"models/weapons2/nunchuck/nunchuck_pickup.md3"
+modelindex	MODELINDEX_NUNCHUCKS
 type		WEAPONI
-index		INVENTORY_NUNCHUKS
+index		INVENTORY_NUNCHUCKS
 respawntime	30
 mins		{-13,-13,-13}
 maxs		{13,13,13}
