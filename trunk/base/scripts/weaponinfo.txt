@@ -311,34 +311,34 @@ weapongroup "wp_sais"
 
 
 //
-// Nunchuk-type weapons
+// Nunchuck-type weapons
 //
 
-//weapongroup "wt_nunchuks"
+//weapongroup "wt_nunchucks"
 //{
 //	normalAnims
 //	{
-//		standAnim "TORSO_STAND_NUNCHUKS"
-//		attackAnim1 "TORSO_ATTACK_NUNCHUKS_A"
-//		attackAnim2 "TORSO_ATTACK_NUNCHUKS_B"
-//		attackAnim3 "TORSO_ATTACK_NUNCHUKS_A"
-//		attackAnim4 "TORSO_ATTACK_NUNCHUKS_C"
+//		standAnim "TORSO_STAND_NUNCHUCKS"
+//		attackAnim1 "TORSO_ATTACK_NUNCHUCKS_A"
+//		attackAnim2 "TORSO_ATTACK_NUNCHUCKS_B"
+//		attackAnim3 "TORSO_ATTACK_NUNCHUCKS_A"
+//		attackAnim4 "TORSO_ATTACK_NUNCHUCKS_C"
 //	}
 //	primaryAnims
 //	{
-//		standAnim "TORSO_STAND_NUNCHUKS1_PRIMARY"
-//		attackAnim1 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_A"
-//		attackAnim2 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_B"
-//		attackAnim3 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_A"
-//		attackAnim4 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_C"
+//		standAnim "TORSO_STAND_NUNCHUCKS1_PRIMARY"
+//		attackAnim1 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A"
+//		attackAnim2 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B"
+//		attackAnim3 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A"
+//		attackAnim4 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C"
 //	}
 //}
 
-weapon "w_nunchuk"
+weapon "w_nunchuck"
 {
 	weapontype WT_MELEE
-	model "models/weapons2/nunchuk/nunchuk.md3"
-	//mod MOD_NUNCHUK
+	model "models/weapons2/nunchuck/nunchuck.md3"
+	//mod MOD_NUNCHUCK
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 4
@@ -354,32 +354,32 @@ weapon "w_nunchuk"
 	}
 }
 
-weapongroup "wp_nunchuks"
+weapongroup "wp_nunchucks"
 {
-	clone "wt_nunchuks"
+	clone "wt_nunchucks"
 	randomSpawn 0 // FIXME: Missing models
-	itemName "weapon_nunchuks"
-	pickupName "Nunchuks"
-	pickupModel "models/weapons2/nunchuk/nunchuks_pickup.md3"
-	iconName "icons/iconw_nunchuks"
-	weapon_primary "w_nunchuk"
-	weapon_secondary "w_nunchuk"
+	itemName "weapon_nunchucks"
+	pickupName "Nunchucks"
+	pickupModel "models/weapons2/nunchuck/nunchucks_pickup.md3"
+	iconName "icons/iconw_nunchucks"
+	weapon_primary "w_nunchuck"
+	weapon_secondary "w_nunchuck"
 
 	normalAnims
 	{
-		standAnim "TORSO_STAND_NUNCHUKS"
-		attackAnim1 "TORSO_ATTACK_NUNCHUKS_A"
-		attackAnim2 "TORSO_ATTACK_NUNCHUKS_B"
-		attackAnim3 "TORSO_ATTACK_NUNCHUKS_A"
-		attackAnim4 "TORSO_ATTACK_NUNCHUKS_C"
+		standAnim "TORSO_STAND_NUNCHUCKS"
+		attackAnim1 "TORSO_ATTACK_NUNCHUCKS_A"
+		attackAnim2 "TORSO_ATTACK_NUNCHUCKS_B"
+		attackAnim3 "TORSO_ATTACK_NUNCHUCKS_A"
+		attackAnim4 "TORSO_ATTACK_NUNCHUCKS_C"
 	}
 	primaryAnims
 	{
-		standAnim "TORSO_STAND_NUNCHUKS1_PRIMARY"
-		attackAnim1 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_A"
-		attackAnim2 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_B"
-		attackAnim3 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_A"
-		attackAnim4 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_C"
+		standAnim "TORSO_STAND_NUNCHUCKS1_PRIMARY"
+		attackAnim1 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A"
+		attackAnim2 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B"
+		attackAnim3 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A"
+		attackAnim4 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C"
 	}
 }
 

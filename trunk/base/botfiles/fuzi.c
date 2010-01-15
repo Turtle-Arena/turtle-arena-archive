@@ -141,9 +141,9 @@ weight "weapon_sais"
 	}
 }
 
-weight "weapon_nunchuks"
+weight "weapon_nunchucks"
 {
-	switch(INVENTORY_HAMMER)
+	switch(INVENTORY_NUNCHUCKS)
 	{
 	case 1: return WS(NKW);
 	default: return 0;

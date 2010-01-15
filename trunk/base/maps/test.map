@@ -432,91 +432,86 @@
 }
 // entity 36
 {
-"classname" "weapon_nunchuks"
-"origin" "-576.000000 -16.000000 -176.000000"
-}
-// entity 37
-{
 "classname" "weapon_rocketlauncher"
 "origin" "-640.000000 -16.000000 -176.000000"
 }
-// entity 38
+// entity 37
 {
 "classname" "weapon_sais"
 "origin" "-704.000000 -16.000000 -176.000000"
 }
-// entity 39
+// entity 38
 {
 "classname" "misc_object"
 "origin" "400.000000 656.000000 -192.000000"
 "model" "models/mapobjects/traffic_cone/tmnt_traffic_cone.md3"
 "angle" "45.000000"
 }
-// entity 40
+// entity 39
 {
 "classname" "item_invul"
 "origin" "-696.000000 -512.000000 -168.000000"
 }
-// entity 41
+// entity 40
 {
 "classname" "weapon_daisho"
 "origin" "424.000000 -16.000000 -176.000000"
 }
-// entity 42
+// entity 41
 {
 "classname" "misc_object"
 "origin" "432.000000 728.000000 -192.000000"
 "model" "models/mapobjects/pots/pot1.md3"
 "spawnflags" "4"
 }
-// entity 43
+// entity 42
 {
 "classname" "info_player_intermission"
 "origin" "928.000000 -552.000000 192.000000"
 "angle" "134.052200"
 "target" "target_intermission"
 }
-// entity 44
+// entity 43
 {
 "classname" "target_position"
 "origin" "816.000000 -464.000000 184.000000"
 "targetname" "target_intermission"
 }
-// entity 45
+// entity 44
 {
 "classname" "weapon_bamboo"
 "origin" "200.000000 -16.000000 -176.000000"
 }
-// entity 46
+// entity 45
 {
 "classname" "info_player_deathmatch"
 "origin" "196.444443 411.600006 -179.199997"
 "angle" "-90.000000"
 }
-// entity 47
+// entity 46
 {
 "classname" "misc_object"
 "origin" "568.000000 728.000000 -192.000000"
 "model" "models/animobjects/flower_pinwheel/flower_pinwheel.md3"
 }
-// entity 48
+// entity 47
 {
 "classname" "misc_model"
 "origin" "568.000000 664.000000 -206.250000"
 "model" "models/mapobjects/fern1/fern1.md3"
 }
-// entity 49
+// entity 48
 {
 "classname" "misc_model"
 "origin" "688.000000 776.000000 -206.250000"
 "model" "models/mapobjects/fern1/fern1.md3"
 }
-// entity 50
+// entity 49
 {
 "classname" "holdable_portal"
 "origin" "832.000000 512.000000 -168.000000"
 }
-// entity 51
+// entity 50
 {
 "classname" "func_breakable"
 "health" "100"
@@ -530,7 +525,7 @@
 ( 1152 536 -192 ) ( 1152 792 -192 ) ( 1152 536 -128 ) base_wall/tac_board 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 52
+// entity 51
 {
 "classname" "func_breakable"
 "health" "100"
@@ -544,7 +539,7 @@
 ( 1216 640 -192 ) ( 1216 896 -192 ) ( 1216 640 -128 ) base_wall/tac_board 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 53
+// entity 52
 {
 "classname" "func_breakable"
 "health" "100"
@@ -558,13 +553,13 @@
 ( 1007.1998291016 743.063659668 -192 ) ( 1190.2967529297 921.981262207 -192 ) ( 1007.1998291016 743.063659668 -128 ) base_wall/tac_board 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 54
+// entity 53
 {
 "classname" "misc_portal_surface"
 "origin" "856.000000 824.000000 -96.000000"
 "angle" "90.000000"
 }
-// entity 55
+// entity 54
 {
 "classname" "func_group"
 // brush 0
@@ -1864,7 +1859,7 @@
 ( -456 910 -174 ) ( -342 1024 -208 ) ( -342 910 -132 ) terrain/dirt1 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 56
+// entity 55
 {
 "classname" "func_breakable"
 "mustcut" "1"
@@ -1878,4 +1873,9 @@
 ( 1284.0544433594 644.3502807617 -200 ) ( 1284.0544433594 644.3502807617 -136 ) ( 1339.6497802734 676.0545654297 -200 ) base_floor/metal 231.3178710938 -0 0 0.2171695232 0.25 0 0 0
 ( 1347.4630126953 533.1596069336 -192 ) ( 1220.6459960938 755.5408935547 -192 ) ( 1347.4630126953 533.1596069336 -128 ) base_floor/metal 104.9567871094 -0 0 0.2171691656 0.25 0 0 0
 }
+}
+// entity 56
+{
+"classname" "weapon_nunchucks"
+"origin" "-576.000000 -16.000000 -176.000000"
 }

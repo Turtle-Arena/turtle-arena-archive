@@ -522,9 +522,9 @@ typedef enum {
 	// \sais --short swords?
     WP_SAIS, // Two sais
 
-	// \nunchuks
-    WP_NUNCHUKS, // Two nunchuks
-    // WP_CHAINS, // Two metal chains, one in each hand, used like Nunchuks
+	// \nunchucks
+    WP_NUNCHUCKS, // Two nunchucks
+    // WP_CHAINS, // Two metal chains, one in each hand, used like Nunchucks
 
 	// \hammers
 	WP_HAMMER,
@@ -731,7 +731,7 @@ typedef struct
 	int projnum; // bg_projectileinfo[projnum]
 	// aimOffset is the weapon aim offset for bots
 	vec3_t aimOffset;
-	int barrelSpin; // BS_*  (Turtle Man: TODO: May use for nunchuks?)
+	int barrelSpin; // BS_*  (Turtle Man: TODO: May use for nunchucks?)
 
 	// melee only
 	char wallmarkName[MAX_QPATH];
@@ -1136,8 +1136,8 @@ typedef enum {
     TORSO_STAND_HAMMER,
     TORSO_STAND_HAMMER_PRIMARY,
 
-    TORSO_STAND_NUNCHUKS,
-    TORSO_STAND_NUNCHUKS1_PRIMARY,
+    TORSO_STAND_NUNCHUCKS,
+    TORSO_STAND_NUNCHUCKS1_PRIMARY,
 
 	// Gun attacks
     //TORSO_ATTACK_GUNTLET, // Would be the same as TORSO_ATTACK2...
@@ -1182,12 +1182,12 @@ typedef enum {
     TORSO_ATTACK_HAMMER_A,
     TORSO_ATTACK_HAMMER_PRIMARY_A,
 
-    TORSO_ATTACK_NUNCHUKS_A,
-    TORSO_ATTACK_NUNCHUKS_B,
-    TORSO_ATTACK_NUNCHUKS_C,
-    TORSO_ATTACK_NUNCHUKS1_PRIMARY_A,
-    TORSO_ATTACK_NUNCHUKS1_PRIMARY_B,
-    TORSO_ATTACK_NUNCHUKS1_PRIMARY_C,
+    TORSO_ATTACK_NUNCHUCKS_A,
+    TORSO_ATTACK_NUNCHUCKS_B,
+    TORSO_ATTACK_NUNCHUCKS_C,
+    TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A,
+    TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B,
+    TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C,
     // NOTE: If more animations are added update BG_PlayerAttackAnim
 #endif
 
@@ -1652,7 +1652,7 @@ typedef enum {
 	MOD_KATANA, // _KATANAS
 	MOD_WAKIZASHI, // Usagi's shorter sword
 	MOD_SAI,	// _SAIS
-	MOD_NUNCHUK, // _NUNCHUKS
+	MOD_NUNCHUCK, // _NUNCHUCKS
 	MOD_HAMMER,
 	MOD_AXE,
 	//MOD_BAMBOOHAMMER,
