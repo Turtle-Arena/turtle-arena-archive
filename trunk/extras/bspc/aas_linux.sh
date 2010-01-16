@@ -10,7 +10,7 @@ case `uname -m` in
 		BIN='bspc.x86_64'
 		;;
 	i386|i486|i586|i686)
-		BIN='bspc.x86'
+		BIN='bspc.i386'
 		;;
 #	powerpc|powerpc64)
 #		BIN='bspc.ppc'
