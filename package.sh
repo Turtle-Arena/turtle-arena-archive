@@ -50,7 +50,7 @@ if [ `uname -m` = "x86_64" ]
 then
 	ARCH=x86_64
 else
-	ARCH=x86
+	ARCH=i386
 fi
 
 # Platform as in 'engine/build/release-linux-x86_64/base/vm'
@@ -66,10 +66,10 @@ if [ $LINUX -eq 1 ]
 then
 	make BUILD_GAME_SO=0 BUILD_GAME_QVM=1
 
-	# If running x86_64, compile x86 too.
+	# If running x86_64, compile i386 too.
 	if [ $ARCH = "x86_64" ]
 	then
-		make ARCH=x86 BUILD_GAME_SO=0
+		make ARCH=i386
 	fi
 else
 	# We need to at least build the QVMs!
@@ -105,8 +105,8 @@ then
 
 		if [ $ARCH = "x86_64" ]
 		then
-			cp engine/build/release-linux-x86/tmntarena.x86 $INSTALLDIR
-			cp engine/build/release-linux-x86/tmntarena-ded.x86 $INSTALLDIR
+			cp engine/build/release-linux-i386/tmntarena.i386 $INSTALLDIR
+			cp engine/build/release-linux-i386/tmntarena-ded.i386 $INSTALLDIR
 		fi
 	fi
 
@@ -207,7 +207,7 @@ function make_client_deb() {
 	then
 		EXENAME="$GAMENAME.x86_64"
 	else
-		EXENAME="$GAMENAME.x86"
+		EXENAME="$GAMENAME.i386"
 	fi
 	cp $INSTALLDIR/$EXENAME $INSTALLDIR/deb-client/usr/games/$GAMENAME
 

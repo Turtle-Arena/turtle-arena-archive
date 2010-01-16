@@ -53,7 +53,7 @@ ifneq ($(PLATFORM),darwin)
 endif
 
 ifndef USE_FREETYPE
-USE_FREETYPE=0
+  USE_FREETYPE=0
 endif
 ifndef BUILD_SPLINES
   BUILD_SPLINES=
@@ -216,7 +216,7 @@ else # END QUAKE3
 
 	# Disable building scriptable hud and scriptable ui versions of cgame/ui
 	#    game is unchanged.
-	ifneq ($BUILD_MISSIONPACK),1)
+	ifneq ($(BUILD_MISSIONPACK),1)
 		BUILD_MISSIONPACK=0
 	endif
 

@@ -10,7 +10,7 @@ case `uname -m` in
 		BIN='tmntarena.x86_64'
 		;;
 	i386|i486|i586|i686)
-		BIN='tmntarena.x86'
+		BIN='tmntarena.i386'
 		;;
 #	powerpc|powerpc64)
 #		BIN='tmntarena.ppc'
