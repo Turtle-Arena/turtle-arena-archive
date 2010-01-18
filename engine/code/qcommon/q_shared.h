@@ -1107,6 +1107,9 @@ typedef struct playerState_s {
 
 	vec3_t		origin;
 	vec3_t		velocity;
+#ifdef TMNTPLAYERSYS
+	float		accel;
+#endif
 	int			weaponTime;
 	int			gravity;
 	int			speed;

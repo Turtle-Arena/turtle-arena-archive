@@ -1002,20 +1002,25 @@ static void CG_DrawStatusBar( void ) {
 }
 #endif // MISSIONPACK_HUD
 
-#ifdef TMNTWEAPSYS
-// Left middle
+#if defined TMNTWEAPSYS || defined TMNTPLAYERSYS
 /*
 ================
-CG_DrawMeleeChain
+CG_DrawMiddleLeft
 ================
 */
-void CG_DrawMeleeChain(void)
+void CG_DrawMiddleLeft(void)
 {
 	int y;
 
 	CG_HudPlacement(HUD_LEFT);
-	
+
 	y = SCREEN_HEIGHT/2;
+
+	CG_DrawSmallString( SCREEN_WIDTH/32, y, va("Speed %f", VectorLength(cg.snap->ps.velocity)), 1.0F );
+	y += SMALLCHAR_HEIGHT;
+
+	CG_DrawSmallString( SCREEN_WIDTH/32, y, va("Accel %f", cg.snap->ps.accel), 1.0F );
+	y += SMALLCHAR_HEIGHT;
 
 	if (cg.snap->ps.chain > 0) {
 		CG_DrawSmallString( SCREEN_WIDTH/32, y, va("Attack Chain %d", cg.snap->ps.chain), 1.0F );
@@ -3135,8 +3140,8 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			CG_DrawStatusBar();
 #endif
       
-#ifdef TMNTWEAPSYS
-			CG_DrawMeleeChain();
+#if defined TMNTWEAPSYS || defined TMNTPLAYERSYS
+			CG_DrawMiddleLeft();
 #endif
 
 #ifndef TMNTWEAPONS // NO_AMMO_WARNINGS

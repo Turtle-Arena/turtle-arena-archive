@@ -1244,6 +1244,9 @@ netField_t	playerStateFields[] =
 { PSF(chainTime), 16 },
 { PSF(weaponHands), 4 },
 #endif
+#ifdef TMNTPLAYERSYS
+{ PSF(accel), 0 },
+#endif
 };
 
 /*

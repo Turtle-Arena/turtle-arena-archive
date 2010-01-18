@@ -1368,6 +1368,16 @@ typedef enum {
 	FOOTSTEP_TOTAL
 } footstep_t;
 
+/*
+// see tmnt-abilities.txt
+typedef enum {
+	ABILITY_NONE,
+	ABILITY_TECH,
+	ABILITY_STRENGTH,
+	ABILITY_MAX
+} ablitiy_t;
+*/
+
 typedef struct bg_playercfg_s
 {
     char model[MAX_QPATH]; // "model[/skin]"  NOTE: In cgame/ui it is only model, in game has skin
@@ -1401,6 +1411,9 @@ typedef struct bg_playercfg_s
 	// Speed control, some characters are faster then others.
 	int   max_speed;
 	float accelerate_speed; // Replaces pm_accelerate; default 10.0f
+	float accelstart;
+
+	//ablitiy_t ability;
 
 } bg_playercfg_t;
 
@@ -1426,6 +1439,7 @@ typedef struct
 	// Speed control, some characters are faster then others.
 	//int   max_speed;
 	//float accelerate_speed; // Replaces pm_accelerate; default 10.0f
+	//float accelstart;
 
 } bg_objectcfg_t;
 
