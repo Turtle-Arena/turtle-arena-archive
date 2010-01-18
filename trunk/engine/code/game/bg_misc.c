@@ -5834,15 +5834,6 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		//	// Like color2
 		//}
 		else if ( !Q_stricmp( token, "ability" ) ) {
-			// Leo: Blade (Cut metal and wood, etc)
-			///     --This should be weapon flag, not player flag
-			///        there should be something else leo can do with "any" weapon held.
-			// Don: Tech (Operate computers to open doors and stuff)
-			// Raph: Strength (Break rocks, lift/push heavy objects)
-			//     -- Use Sais to climb walls?
-			// Mike: Speed (run faster)
-			///     --This shouldn't be ability...
-			///       Don't really have a clue what it should be... not be flying.
 		}
 		// "speed" is the max speed that the
 		// player runs without powerups.
@@ -5860,6 +5851,12 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		}
 		// Accel when move starts.
 		else if ( !Q_stricmp( token, "accelstart" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			playercfg->accelstart = atof( token );
+			continue;
 		}
 		else if ( !Q_stricmp( token, "acceleration" ) ) {
 			token = COM_Parse( &text_p );
@@ -6055,6 +6052,7 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 
 	playercfg->max_speed = 320;
 	playercfg->accelerate_speed = 10.0f;
+	playercfg->accelstart = 50.0f;
 
 	// Use first frame for all animations.
 	for (i = 0; i < MAX_TOTALANIMATIONS; i++)
