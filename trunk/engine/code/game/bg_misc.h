@@ -704,7 +704,7 @@ typedef struct
 #define BS_NONE 3
 #define BS_MAX 4
 
-#define MAX_WEAPON_BLADES 4 // Katana use 1, Bo use 2, Sai use 3, etc
+#define MAX_WEAPON_BLADES 5 // Katana use 1, Bo use 2, Sai use 3, etc
 typedef struct
 {
 	char name[MAX_QPATH];

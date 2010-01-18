@@ -213,11 +213,10 @@ void SP_team_redobelisk( gentity_t *ent );
 void SP_team_neutralobelisk( gentity_t *ent );
 #endif
 void SP_item_botroam( gentity_t *ent ) { }
-#ifdef TMNTNPCSYS
+#ifdef TMNTPATHSYS
 void SP_path_start( gentity_t *ent );
-#ifndef TMNTPATHSYS
+#elif !defined TMNTPATHSYS
 void SP_npcpath( gentity_t *ent );
-#endif
 #endif
 #ifdef TMNTWEAPSYS
 void SP_weapon_random( gentity_t *ent );
