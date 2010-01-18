@@ -42,6 +42,24 @@ void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
 
 /*
 ================
+CG_HudPlacement
+================
+*/
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+int cg_hudPlacement = HUD_CENTER;
+void CG_HudPlacement(int pos)
+{
+	cg_hudPlacement = pos;
+}
+#else
+void CG_HudPlacement(int pos)
+{
+	(void)pos;
+}
+#endif
+
+/*
+================
 CG_AdjustFrom640
 
 Adjusted for resolution and screen aspect ratio
@@ -49,7 +67,12 @@ Adjusted for resolution and screen aspect ratio
 */
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	*x = *x * cgs.screenXScale + cgs.screenXBias;
+	if (cg_hudPlacement == HUD_LEFT)
+		*x = *x * cgs.screenXScale;
+	else if (cg_hudPlacement == HUD_RIGHT)
+		*x = *x * cgs.screenXScale + cgs.screenXBias*2;
+	else // HUD_CENTER
+		*x = *x * cgs.screenXScale + cgs.screenXBias;
 #else
 #if 0
 	// adjust for wide screens
@@ -156,6 +179,18 @@ void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader 
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
+
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+/*
+================
+CG_DrawPicFit
+=================
+*/
+void CG_DrawPicFit( float x, float y, float width, float height, qhandle_t hShader ) {
+	CG_AdjustFrom640Fit( &x, &y, &width, &height );
+	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
+}
+#endif
 
 
 

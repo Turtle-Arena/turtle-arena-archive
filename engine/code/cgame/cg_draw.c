@@ -595,6 +595,14 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 #endif
 	}
 	trap_R_SetColor( hcolor );
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	// Turtle Man: Hacky (Don't have TMNT status fit screen)
+	if (w == SCREEN_WIDTH)
+	{
+		CG_DrawPicFit( x, y, w, h, cgs.media.teamStatusBar );
+	}
+	else
+#endif
 	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
 	trap_R_SetColor( NULL );
 }
@@ -664,17 +672,6 @@ CG_DrawStatusBar
 
 ================
 */
-#ifdef TMNTHUD // TMNT
-/*
-Draw "team" background
-Draw head (model or icon)
-Draw "Score" and value
-Draw "Health" and value
-Draw weapon icon and ammo
-Draw holdable icon and uses
-Draw "Lives" and value (In sp/coop only)
-*/
-#endif
 #ifndef MISSIONPACK_HUD
 static void CG_DrawStatusBar( void ) {
 	int			color;
@@ -705,6 +702,8 @@ static void CG_DrawStatusBar( void ) {
 	}
 
 #ifdef TMNTHUD
+	CG_HudPlacement(HUD_LEFT);
+
 	start_x = x = HUD_X;
 	y = HUD_Y;
 
@@ -875,6 +874,8 @@ static void CG_DrawStatusBar( void ) {
 	}
 #endif
 #else
+	CG_HudPlacement(HUD_CENTER);
+
 	// draw the team background
 	CG_DrawTeamBackground( 0, 420, 640, 60, 0.33f, cg.snap->ps.persistant[PERS_TEAM] );
 
@@ -1010,7 +1011,11 @@ CG_DrawMeleeChain
 */
 void CG_DrawMeleeChain(void)
 {
-	int y = SCREEN_HEIGHT/2;
+	int y;
+
+	CG_HudPlacement(HUD_LEFT);
+	
+	y = SCREEN_HEIGHT/2;
 
 	if (cg.snap->ps.chain > 0) {
 		CG_DrawSmallString( SCREEN_WIDTH/32, y, va("Attack Chain %d", cg.snap->ps.chain), 1.0F );
@@ -1370,6 +1375,8 @@ static void CG_DrawUpperRight(stereoFrame_t stereoFrame)
 
 	y = 0;
 
+	CG_HudPlacement(HUD_RIGHT);
+
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 1 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qtrue );
 	} 
@@ -1703,6 +1710,8 @@ static void CG_DrawLowerRight( void ) {
 
 	y = 480 - ICON_SIZE;
 
+	CG_HudPlacement(HUD_RIGHT);
+
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 2 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qfalse );
 	} 
@@ -1769,6 +1778,8 @@ CG_DrawLowerLeft
 #ifndef MISSIONPACK_HUD
 static void CG_DrawLowerLeft( void ) {
 	float	y;
+
+	CG_HudPlacement(HUD_LEFT);
 
 	y = 480 - ICON_SIZE;
 
@@ -1896,6 +1907,8 @@ CG_DrawPersistantPowerup
 static void CG_DrawPersistantPowerup( void ) { 
 	int		value;
 
+	CG_HudPlacement(HUD_LEFT);
+
 	value = cg.snap->ps.stats[STAT_PERSISTANT_POWERUP];
 	if ( value ) {
 		CG_RegisterItemVisuals( value );
@@ -1920,6 +1933,8 @@ static void CG_DrawReward( void ) {
 	int		i, count;
 	float	x, y;
 	char	buf[32];
+
+	CG_HudPlacement(HUD_CENTER);
 
 	if ( !cg_drawRewards.integer ) {
 		return;
@@ -2057,6 +2072,8 @@ static void CG_DrawDisconnect( void ) {
 	const char		*s;
 	int			w;
 
+	CG_HudPlacement(HUD_CENTER);
+
 	// draw the phone jack if we are completely past our buffers
 	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
 	trap_GetUserCmd( cmdNum, &cmd );
@@ -2074,6 +2091,8 @@ static void CG_DrawDisconnect( void ) {
 	if ( ( cg.time >> 9 ) & 1 ) {
 		return;
 	}
+
+	CG_HudPlacement(HUD_RIGHT);
 
 	x = 640 - 48;
 	y = 480 - 48;
@@ -2101,6 +2120,8 @@ static void CG_DrawLagometer( void ) {
 		CG_DrawDisconnect();
 		return;
 	}
+
+	CG_HudPlacement(HUD_RIGHT);
 
 	//
 	// draw the graph
@@ -2259,6 +2280,8 @@ static void CG_DrawCenterString( void ) {
 		return;
 	}
 
+	CG_HudPlacement(HUD_CENTER);
+
 	trap_R_SetColor( color );
 
 	start = cg.centerPrint;
@@ -2340,6 +2363,8 @@ static void CG_DrawCrosshair(void)
 		return;
 	}
 
+	CG_HudPlacement(HUD_CENTER);
+
 	// set color based on health
 	if ( cg_crosshairHealth.integer ) {
 		vec4_t		hcolor;
@@ -2408,6 +2433,8 @@ static void CG_DrawCrosshair3D(void)
 	if ( cg.renderingThirdPerson ) {
 		return;
 	}
+
+	CG_HudPlacement(HUD_CENTER);
 
 	w = h = cg_crosshairSize.value;
 
@@ -2544,6 +2571,7 @@ CG_DrawSpectator
 =================
 */
 static void CG_DrawSpectator(void) {
+	CG_HudPlacement(HUD_CENTER);
 	CG_DrawBigString(320 - 9 * 8, 440, "SPECTATOR", 1.0F);
 	if ( cgs.gametype == GT_TOURNAMENT ) {
 		CG_DrawBigString(320 - 15 * 8, 460, "waiting to play", 1.0F);
@@ -2569,6 +2597,8 @@ static void CG_DrawVote(void) {
 	if ( !cgs.voteTime ) {
 		return;
 	}
+
+	CG_HudPlacement(HUD_LEFT);
 
 	// play a talk beep whenever it is modified
 	if ( cgs.voteModified ) {
@@ -2611,6 +2641,8 @@ static void CG_DrawTeamVote(void) {
 		return;
 	}
 
+	CG_HudPlacement(HUD_LEFT);
+
 	// play a talk beep whenever it is modified
 	if ( cgs.teamVoteModified[cs_offset] ) {
 		cgs.teamVoteModified[cs_offset] = qfalse;
@@ -2631,6 +2663,8 @@ static qboolean CG_DrawScoreboard( void ) {
 #ifdef MISSIONPACK_HUD
 	static qboolean firstTime = qtrue;
 	float fade, *fadeColor;
+
+	CG_HudPlacement(HUD_CENTER);
 
 	if (menuScoreboard) {
 		menuScoreboard->window.flags &= ~WINDOW_FORCED;
@@ -2736,6 +2770,7 @@ static qboolean CG_DrawFollow( void ) {
 	color[2] = 1;
 	color[3] = 1;
 
+	CG_HudPlacement(HUD_CENTER);
 
 	CG_DrawBigString( 320 - 9 * 8, 24, "following", 1.0F );
 
@@ -2768,6 +2803,8 @@ static void CG_DrawAmmoWarning( void ) {
 		return;
 	}
 
+	CG_HudPlacement(HUD_CENTER);
+
 	if ( cg.lowAmmoWarning == 2 ) {
 		s = "OUT OF AMMO";
 	} else {
@@ -2795,6 +2832,8 @@ static void CG_DrawProxWarning( void ) {
     proxTime = 0;
 		return;
 	}
+
+	CG_HudPlacement(HUD_CENTER);
 
   if (proxTime == 0) {
     proxTime = cg.time + 5000;
@@ -2837,6 +2876,8 @@ static void CG_DrawWarmup( void ) {
 	if ( !sec ) {
 		return;
 	}
+
+	CG_HudPlacement(HUD_CENTER);
 
 	if ( sec < 0 ) {
 		s = "Waiting for players";		
@@ -2995,6 +3036,8 @@ void CG_DrawGameOver(void)
 		return;
 	}
 
+	CG_HudPlacement(HUD_CENTER);
+
 	ps = &cg.snap->ps;
 
 	// Show "Game Over"!
@@ -3120,7 +3163,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			CG_DrawReward();
 		}
     
-#ifndef MISSIONPACK_HUD // Turtle Man: Moved around if-block
+#ifndef MISSIONPACK_HUD
 		if ( cgs.gametype >= GT_TEAM ) {
 			CG_DrawTeamInfo();
 		}
