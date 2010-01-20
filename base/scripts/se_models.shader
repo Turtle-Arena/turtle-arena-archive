@@ -113,28 +113,18 @@ models/players/raph/green
 models/players/raph/body_fugitoid
 {
 	{
-		map $whiteimage
-		rgbGen const ( 0.4 0.4 0.4 )
-	}
-	{
 		map textures/effects/tinfx.png
 		tcGen environment
 		rgbGen lightingDiffuse
-		//alphaGen wave sin .6 .2 0 .6
 	}
 }
 
 models/players/raph/body_fugitoid_lighter
 {
 	{
-		map $whiteimage
-		rgbGen const ( 0.4 0.4 0.4 )
-	}
-	{
 		map textures/effects/tinfx_lighter.png
 		tcGen environment
 		rgbGen lightingDiffuse
-		//alphaGen wave sin .6 .2 0 .6
 	}
 }
 
