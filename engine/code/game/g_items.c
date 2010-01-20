@@ -1181,8 +1181,20 @@ be on an entity that hasn't spawned yet.
 ============
 */
 void G_SpawnItem (gentity_t *ent, gitem_t *item) {
+#ifdef IOQ3ZTM // RENDERFLAGS
+	int mirrorType;
+#endif
+
 	G_SpawnFloat( "random", "0", &ent->random );
 	G_SpawnFloat( "wait", "0", &ent->wait );
+#ifdef IOQ3ZTM // RENDERFLAGS
+	G_SpawnInt("mirrorType", "0", &mirrorType );
+
+	if (mirrorType == 1)
+		ent->s.eFlags |= EF_ONLY_MIRROR;
+	else if (mirrorType == 2)
+		ent->s.eFlags |= EF_NOT_MIRROR;
+#endif
 
 	RegisterItem( item );
 	if ( G_ItemDisabled(item) )
@@ -1268,6 +1280,9 @@ Spawns a random weapon.
 */
 void SP_weapon_random( gentity_t *ent ) {
 	gitem_t *item;
+#ifdef IOQ3ZTM // RENDERFLAGS
+	int mirrorType;
+#endif
 
 	// Default to melee and guns
 	if (!(ent->spawnflags & 2) && !(ent->spawnflags & 4)) {
@@ -1281,8 +1296,17 @@ void SP_weapon_random( gentity_t *ent ) {
 		ent->s.eFlags |= EF_VOTED;
 	}
 
+
 	G_SpawnFloat( "random", "0", &ent->random );
 	G_SpawnFloat( "wait", "0", &ent->wait );
+#ifdef IOQ3ZTM // RENDERFLAGS
+	G_SpawnInt("mirrorType", "0", &mirrorType );
+
+	if (mirrorType == 1)
+		ent->s.eFlags |= EF_ONLY_MIRROR;
+	else if (mirrorType == 2)
+		ent->s.eFlags |= EF_NOT_MIRROR;
+#endif
 
 	item = G_RandomWeaponItem(ent);
 	if (!item) {

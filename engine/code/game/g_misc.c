@@ -827,10 +827,21 @@ void SP_misc_object( gentity_t *ent ) {
 	qboolean entWait;
 	qboolean entSpeed;
 	qboolean entMins, entMaxs;
+#ifdef IOQ3ZTM // RENDERFLAGS
+	int mirrorType;
+#endif
 
 	entHealth = G_SpawnInt( "health", "0", &ent->health);
 	entWait = G_SpawnFloat( "wait", "0", &ent->wait);
 	entSpeed = G_SpawnFloat( "speed", "0", &ent->speed);
+#ifdef IOQ3ZTM // RENDERFLAGS
+	G_SpawnInt("mirrorType", "0", &mirrorType );
+
+	if (mirrorType == 1)
+		ent->s.eFlags |= EF_ONLY_MIRROR;
+	else if (mirrorType == 2)
+		ent->s.eFlags |= EF_NOT_MIRROR;
+#endif
 
 #if 1
 	entMins = entMaxs = qfalse;

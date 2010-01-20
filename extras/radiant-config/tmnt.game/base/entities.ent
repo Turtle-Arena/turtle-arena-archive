@@ -65,11 +65,22 @@
 	January 12, 2010:
 		Add mustcut to func_breakable
 
+	January 20, 2010:
+		Added mirrorType to item_*/holdable_*/weapon_*, misc_object, and team_CTF_*flag
+		Added "No Drop" spawnflag to team_CTF_*flag
+
       TODO:
 		Add new WIP path_* entities, path_start path_point path_end
 		Add WIP Nights mode items, nights_start nights_target
 -->
 <classes>
+<!-- Use by many entities -->
+<list name="mirrorType">
+  <item name="normal" value="0"/>
+  <item name="only render in mirrors" value="1"/>
+  <item name="do not render in mirrors" value="2"/>
+</list>
+
 <!--
 =============================================================================
 
@@ -484,6 +495,7 @@ Medkit that can be picked up and used later. Brings the player's health back to 
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 35, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -508,6 +520,7 @@ Portal that can be picked up and used later. When used places the destination an
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 35, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -532,6 +545,7 @@ Shuriken item that can be picked up and used later. Throws a shuriken when used.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 35, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -556,6 +570,7 @@ Electric Shuriken item that can be picked up and used later. Throws a shuriken w
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 35, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -580,6 +595,7 @@ Fire Shuriken item that can be picked up and used later. Throws a shuriken when 
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 35, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -604,6 +620,7 @@ Laser Shuriken item that can be picked up and used later. Throws a shuriken when
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 35, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -749,6 +766,7 @@ Defense power-up - Cuts damage in half. Lasts 30 seconds.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 120, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -774,6 +792,7 @@ Flight power-up. Lasts 60 seconds.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 120, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 60).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -799,6 +818,7 @@ Speed power-up. Makes player run at double speed for 30 seconds.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 120, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -824,6 +844,7 @@ Yellow cross bubble - 25 Health. Cannot be picked up over 100 health.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 35, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Health Given">sets the amount of health points given to the player when item is picked up (default 25).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -848,6 +869,7 @@ Gold cross bubble - 50 Health. Cannot be picked up over 100 health.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 35, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Health Given">sets the amount of health points given to the player when item is picked up (default 50).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -872,6 +894,7 @@ Blue M bubble - 100 Health. Adds 100 health points to current health up to a max
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 40, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Health Given">sets the amount of health points given to the player when item is picked up (default 100).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -897,6 +920,7 @@ Green cross bubble - 5 Health. Can be picked up over 100 health but slowly wears
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 35, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Health Given">sets the amount of health points given to the player when item is picked up (default 5).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -922,6 +946,7 @@ Invisibility power-up. Lasts 30 seconds.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 120, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -947,6 +972,7 @@ Invulnerability power-up. Lasts 30 seconds.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 120, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -972,6 +998,7 @@ Strength power-up. Lasts 30 seconds.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 120, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -997,6 +1024,7 @@ Health Regeneration power-up. This will boost your current health by 5 points ev
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 120, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -1026,6 +1054,7 @@ Scout power-up.  Player moves at 2/3 haste speed.  Increases rate of fire. Lasts
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before the item respawns after being picked up (default 0, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -1053,6 +1082,7 @@ Guard power-up.  Gives player 200 regenerating health and 200 armor (without dec
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before the item respawns after being picked up (default 0, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -1077,6 +1107,7 @@ Doubler power-up.  Doubles the damage of player's weapons.  Lasts until death.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before the item respawns after being picked up (default 0, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -1102,6 +1133,7 @@ Ammo Regen power-up. Slowly regenerates ammo count for all weapons currently pos
 <string key="gametype" name="Game Type">the valid values are ffa, tournament, single, team, ctf, oneflag, obelisk, harvester. Once a value for this key is set, it will ONLY appear in the listed gametype(s). Separate gametypes by commas.</string>
 <real key="wait" name="Respawn Delay">time in seconds before the item respawns after being picked up (default 0, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -1193,28 +1225,12 @@ Generic placeholder for inserting MD3 models in game. Requires compilation of ma
 =============================================================================
 -->
 
-<point name="misc_model_anim" color="1 .5 .25" box="-16 -16 -16 16 16 16">
-Generic placeholder for inserting animated MD3/MDR models in game. Use "misc_object" instead.
--------- KEYS --------
-<angle key="angle" name="Yaw Angle">direction in which model will be oriented.</angle>
-<model key="model" name="Model File">path/name of model to use (eg: models/mapobjects/teleporter/teleporter.md3).</model>
-<targetname key="targetname" name="Target Name">a misc_portal_surface portal surface indicator must point to this.</targetname>
-<boolean key="wait" name="Start Invisible">model is spawned invisible, can be targeted to become visible and animate</boolean>
--------- SPAWNFLAGS --------
-<flag key="HIDDEN_START" name="Start Hidden" bit="0">model will be invisible till trigered</flag>
-<flag key="HIDDEN_END" name="Disapear" bit="1">makes the portal camera rotate faster along the roll axis.</flag>
-<flag key="NOTSUSPENDED" name="Drop to Floor" bit="2">model will fall to ground</flag>
-</point>
-
-<!--
-=============================================================================
--->
-
 <point name="misc_object" color="1 .5 .25" box="-16 -16 -16 16 16 16">
 Generic placeholder for inserting animated MD3/MDR models in game.
 -------- KEYS --------
 <angle key="angle" name="Yaw Angle">direction in which model will be oriented.</angle>
 <model key="model" name="Model File">path/name of model to use (eg: models/mapobjects/teleporter/teleporter.md3).</model>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <targetname key="targetname" name="Target Name">TODO: Kill or damage the object?</targetname>
 <integer key="health" name="Health">object's health, if 0 can't be damaged or killed. (default 0)</integer>
 <target key="target" name="Target">killing (or touching if spawn health is 0) the object will trigger the entity this points to.</target>
@@ -1732,6 +1748,10 @@ TEAM_* ENTITIES
 
 <point name="team_CTF_blueflag" color="0 .2 1" box="-16 -16 -16 16 16 16" model="models/flags/b_flag.md3">
 Blue team flag for CTF games.
+-------- KEYS --------
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
+-------- SPAWNFLAGS --------
+<flag key="SUSPENDED" name="No Drop To Floor" bit="0">item will spawn where it was placed in map and won't drop to the floor.</flag>
 </point>
 
 <!--
@@ -1760,6 +1780,10 @@ Blue team respawning position for CTF games. This is where Blue team players res
 
 <point name="team_CTF_redflag" color="1 .2 0" box="-16 -16 -16 16 16 16" model="models/flags/r_flag.md3">
 Red team flag for CTF games.
+-------- KEYS --------
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
+-------- SPAWNFLAGS --------
+<flag key="SUSPENDED" name="No Drop To Floor" bit="0">item will spawn where it was placed in map and won't drop to the floor.</flag>
 </point>
 
 <!--
@@ -1792,7 +1816,6 @@ TEAM ARENA TEAMPLAY ENTITIES [NEW]
 <point name="team_CTF_neutralflag" color="1 .2 1" box="16 -16 -24 16 16 32" model="models/flags/n_flag.md3">
 Neutral flag (One Flag CTF only).
 -------- KEYS --------
-<angle key="angle" name="Facing Angle">an angle facing needs to be set for this entity. This item has a specific facing.</angle>
 <string key="gametype" name="Game Type">the valid values are ffa, tournament, single, team, ctf, oneflag, obelisk, harvester. Once a value for this key is set, it will ONLY appear in the listed gametype(s). Separate gametypes by commas.</string>
 -------- SPAWNFLAGS --------
 <flag key="SUSPENDED" name="No Drop To Floor" bit="0">item will spawn where it was placed in map and won't drop to the floor.</flag>
@@ -1823,6 +1846,7 @@ Do not assign a gametype to this item. It is used in all four team game types. t
 <point name="team_neutralobelisk" color="1 .2 1" box="16 -16 0 16 16 88" model="models/powerups/obelisk/obelisk.md3">
 Neutral Flag base in 1 flag CTF. In Quake III: Team Arena is was also the "Neutral Obelisk" in the Harvester gametype.
 -------- KEYS --------
+<angle key="angle" name="Facing Angle">an angle facing needs to be set for this entity. This item has a specific facing.</angle>
 <string key="gametype" name="Game Type">the valid values are ffa, tournament, single, team, ctf, oneflag, obelisk, harvester. Once a value for this key is set, it will ONLY appear in the listed gametype(s). Separate gametypes by commas.</string>
 </point>
 
@@ -1922,6 +1946,7 @@ Axe.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 20).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -1947,6 +1972,7 @@ Bamboo Bo Staff.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -1971,6 +1997,7 @@ Baseball bat.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -1995,6 +2022,7 @@ Bo.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -2020,6 +2048,7 @@ Katana (primary) and Wakizashi (secondary).
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 10).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2045,6 +2074,7 @@ Default.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 10).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2070,6 +2100,7 @@ Electric Launcher.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 10).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2095,6 +2126,7 @@ Grappling Hook.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -2119,6 +2151,7 @@ Gun.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 100).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2144,6 +2177,7 @@ Hammer.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 100).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2169,6 +2203,7 @@ Homing rocket launcher.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 50).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2194,6 +2229,7 @@ Katanas.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 10).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2219,6 +2255,7 @@ Long sword.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 10).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2244,6 +2281,7 @@ Nunchucks.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 10).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2264,16 +2302,12 @@ When the random key is set, its value is used to calculate a minimum and a maxim
 =============================================================================
 -->
 
-
-<!--
-=============================================================================
--->
-
 <point name="weapon_random" color="1 0 .5" box="-16 -16 -16 16 16 16">
 Random Weapon spawner.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
@@ -2294,11 +2328,16 @@ When the random key is set, its value is used to calculate a minimum and a maxim
 By default it spawn melee and gun weapons.
 </point>
 
+<!--
+=============================================================================
+-->
+
 <point name="weapon_rocketlauncher" color="1 0 .5" box="-16 -16 -16 16 16 16" model="models/weapons2/rocketl/rocketl.md3">
 Rocket Launcher.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 10).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
@@ -2324,6 +2363,7 @@ Sais.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 5, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
+<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <integer key="count" name="Ammo Given">sets the amount of ammo given to the player when weapon is picked up (default 10).</integer>
 <string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
 <target key="target" name="Target">picking up the item will trigger the entity this points to.</target>

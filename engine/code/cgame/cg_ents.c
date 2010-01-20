@@ -388,7 +388,7 @@ static void CG_MiscObject( centity_t *cent ) {
 		else
 #endif
 		{
-		modelName = CG_ConfigString( CS_MODELS + s1->modelindex );
+			modelName = CG_ConfigString( CS_MODELS + s1->modelindex );
 		}
 
 		Q_strncpyz(filename, modelName, MAX_QPATH);
@@ -453,15 +453,15 @@ static void CG_MiscObject( centity_t *cent ) {
 	else
 #endif
 	{
-	ent.hModel = cgs.gameModels[s1->modelindex];
+		ent.hModel = cgs.gameModels[s1->modelindex];
 	}
 
 	// Flags for only drawing or not drawing a object in mirrors
-	if (cent->oe.flags & MOF_ONLY_MIRROR)
+	if (cent->currentState.eFlags & EF_ONLY_MIRROR)
 	{
 		ent.renderfx |= RF_ONLY_MIRROR;
 	}
-	else if (cent->oe.flags & MOF_NOT_MIRROR)
+	else if (cent->currentState.eFlags & EF_NOT_MIRROR)
 	{
 		ent.renderfx |= RF_NOT_MIRROR;
 	}
@@ -766,6 +766,16 @@ static void CG_Item( centity_t *cent ) {
 		ent.renderfx |= RF_MINLIGHT;
 	}
 #endif
+
+	// Flags for only drawing or not drawing a object in mirrors
+	if (cent->currentState.eFlags & EF_ONLY_MIRROR)
+	{
+		ent.renderfx |= RF_ONLY_MIRROR;
+	}
+	else if (cent->currentState.eFlags & EF_NOT_MIRROR)
+	{
+		ent.renderfx |= RF_NOT_MIRROR;
+	}
 
 	// increase the size of the weapons when they are presented as items
 	if ( item->giType == IT_WEAPON ) {
