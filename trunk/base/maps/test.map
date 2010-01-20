@@ -328,7 +328,8 @@
 // entity 15
 {
 "classname" "item_health_small"
-"origin" "40.000000 744.000000 -168.000000"
+"origin" "856.000000 792.000000 -168.000000"
+"mirrorType" "1"
 }
 // entity 16
 {
@@ -1878,4 +1879,9 @@
 {
 "classname" "weapon_nunchucks"
 "origin" "-576.000000 -16.000000 -176.000000"
+}
+// entity 57
+{
+"classname" "item_health_small"
+"origin" "40.000000 744.000000 -168.000000"
 }

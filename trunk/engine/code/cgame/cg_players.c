@@ -2675,7 +2675,7 @@ static void CG_PlayerSprites( centity_t *cent
 	// Place 16 units above top of head.
 	origin[2] += 16;
 
-	// Only show current clients team sprite in mirrors.
+	// Current client's team sprite should only be shown in mirrors.
 	if ( cent->currentState.number == cg.snap->ps.clientNum )
 	{
 		// IOQ3ZTM // RENDER_FLAGS

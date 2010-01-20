@@ -49,10 +49,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	RF_WRAP_FRAMES		0x0200		// mod the model frames by the maxframes to allow continuous
 
 #ifdef IOQ3ZTM // RENDERFLAGS
-#undef	RF_MINLIGHT
-#define	RF_MINLIGHT 0x0400
-
-#define RF_FORCE_ENT_ALPHA	0x0001		// IOSTVEF: override shader alpha value and take the one from the entity.
+#define RF_FORCE_ENT_ALPHA	0x0400		// IOSTVEF: override shader alpha value and take the one from the entity.
 
 // Turtle Man: FIXME: I don't like RF_THIRD_PERSON or RF_FIRST_PERSON (so fix me?)...
 #define	RF_ONLY_MIRROR		0x0800		// only draw in mirrors

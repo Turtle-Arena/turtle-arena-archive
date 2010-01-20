@@ -354,6 +354,10 @@ typedef enum {
 #ifdef TMNT // LOCKON
 #define EF_LOCKON			0x00200000
 #endif
+#ifdef IOQ3ZTM // RENDERFLAGS
+#define EF_ONLY_MIRROR		0x00400000 // Only render in mirrors
+#define EF_NOT_MIRROR		0x00800000 // Do not render in mirrors
+#endif
 
 #ifdef IOQ3ZTM
 #ifdef TMNTWEAPONS

@@ -228,9 +228,7 @@ typedef struct {
 // misc_object/NPC data
 enum
 {
-	MOF_ONLY_MIRROR = 1,
-	MOF_NOT_MIRROR = 2,
-	MOF_SETUP			= 4, // true if did one time setup.
+	MOF_SETUP			= 1, // true if did one time setup.
 };
 
 typedef struct
