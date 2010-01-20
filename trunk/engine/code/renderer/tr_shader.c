@@ -1413,6 +1413,85 @@ static void ParseSurfaceParm( char **text ) {
 	}
 }
 
+#ifdef IOQ3ZTM // EF2_SHADERS
+/*
+===============
+ParseIf
+
+Based on Elite Force 2
+
+shader/name/etc
+{
+  mipmaps // etc
+if novertexlight
+  ... shader stages
+endif
+if vertexlight
+  ... shader stages
+endif
+}
+===============
+*/
+static qboolean ParseIf( char **text, int *ifIndent ) {
+	char	*token;
+	int		indent;
+
+	indent = 1;
+
+	*ifIndent = *ifIndent + 1;
+
+	token = COM_ParseExt( text, qfalse );
+	if ( !token[0] )
+	{
+		ri.Printf( PRINT_WARNING, "WARNING: missing parm for 'if' keyword in shader '%s'\n", shader.name );
+		return qtrue;
+	}
+
+	if ( !Q_stricmp( token, "novertexlight" ) ) {
+		if (!r_vertexLight->integer) {
+			return qtrue;
+		}
+		// else skip if-block
+	} else if ( !Q_stricmp( token, "vertexlight" ) ) {
+		if (r_vertexLight->integer) {
+			return qtrue;
+		}
+		// else skip if-block
+	} else {
+		ri.Printf( PRINT_WARNING, "WARNING: unknown parm '%s' for 'if' keyword in shader '%s'\n", token, shader.name );
+		// skip if-block
+	}
+
+	// Skip tokens inside of if-block
+	while ( 1 )
+	{
+		token = COM_ParseExt( text, qtrue );
+		if ( !token[0] )
+		{
+			ri.Printf( PRINT_WARNING, "WARNING: no concluding '}' in shader %s\n", shader.name );
+			return qfalse;
+		}
+
+		if ( token[0] == '}' && indent == 1)
+		{
+			ri.Printf( PRINT_WARNING, "WARNING: no concluding 'endif' in shader %s\n", shader.name );
+			break;
+		}
+
+		if ( token[0] == '}' )
+			indent--;
+		else if ( token[0] == '{' )
+			indent++;
+		else if ( !Q_stricmp( token, "endif" ) )
+		{
+			*ifIndent = *ifIndent - 1;
+			break;
+		}
+	}
+	return qtrue;
+}
+#endif
+
 /*
 =================
 ParseShader
@@ -1426,6 +1505,9 @@ static qboolean ParseShader( char **text )
 {
 	char *token;
 	int s;
+#ifdef IOQ3ZTM // EF2_SHADERS
+	int ifIndent = 0;
+#endif
 
 	s = 0;
 
@@ -1450,6 +1532,25 @@ static qboolean ParseShader( char **text )
 		{
 			break;
 		}
+#ifdef IOQ3ZTM // EF2_SHADERS
+		else if ( !Q_stricmp( token, "if" ) )
+		{
+			if ( !ParseIf( text, &ifIndent ) )
+			{
+				return qfalse;
+			}
+			continue;
+		}
+		else if ( !Q_stricmp( token, "endif" ) )
+		{
+			ifIndent--;
+			if ( ifIndent < 0 ) {
+				ifIndent = 0;
+				ri.Printf( PRINT_WARNING, "WARNING: 'endif' with no 'if' in shader %s\n", shader.name );
+			}
+			continue;
+		}
+#endif
 		// stage definition
 		else if ( token[0] == '{' )
 		{
