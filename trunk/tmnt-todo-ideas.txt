@@ -121,13 +121,11 @@ TMNTWEAPSYS is the main changes to Q3's weapon system.
 * Adds default weapon (Clients get one default weapon that is set per-player in animation.cfg)
 ** Pointless in stock Q3... as it is limited to one default weapon, Guntlet. (Guns as default aren't supported).
 * It may do other things to Q3 weapon system, but I don't remember what they are.
-
-TMNTWEAPSYS_2 rewrites lots of TMNTWEAPSYS... (I need to merge them)
 * There are weapon "groups", weapons, and projectiles.
 * The weap group, weap, and proj info is loaded from external text files.
 ** This allows for custom weapons (Custom weapons in custom maps, and custom default weapons for players)
 
-TMNTWEAPSYS2 is weapon code that adds on to TMNTWEAPSYS, making it more "complete" for a "TMNT game" (Like Mutant Melee)
+TMNTWEAPSYS_EX is weapon code that adds on to TMNTWEAPSYS, making it more complete for a hand-to-hand game (Like Mutant Melee)
 * Each client can hold only 2 weapons (instead of upto 16), one is the default and the other is a pickup weapon, if holding a pickup weapon the default weapon can't be used.
 ** The player will have three weapons when switching to a new pickup weapon, while holding a pickup weapon.
 * Removes 16 total weapons limit.
@@ -137,7 +135,7 @@ TMNTWEAPSYS2 is weapon code that adds on to TMNTWEAPSYS, making it more "complet
 
 TMNTWEAPONS Replace/remove Q3/TA's weapons with TMNT weapons. (Currently it has some of the SYS stuff, need to fix)
 * Q3's weapons have "_hand.md3" models for each gun, I currently use one of OpenArena for all weapons.
-** Due to the fact that _hand.md3 is only for first person, which I don't support currently.
+: Due to the fact that _hand.md3 is only for first person, which I don't support currently.
 
 TMNTHOLDSYS Allow up to 16 holdable items to be held at once (Like Q3 weapon sys, players can change to any holdable)
 
@@ -146,12 +144,8 @@ TMNTHOLDABLE Adds shurikens (Which are holdable items) and disables some Q3/TA h
 TMNT_GAME_MODELS Game is able to load models and get tag pos and angles (Allowing for better melee attacking)
 : Note the polygons (etc) are loaded as well, but currently unused. (tmnt ded server uses more RAM then q3 ded server.)
 
-Weapon Types;  (This is from when types weren't general [TMNTWEAPSYS_2])
-Add more stock weapons/types?
-* Ultimate Ninja's claw (and Shredder's hand blades)?
-** Just offset the model in the MD3 so it looks like its on his wrist? Or don't even use a seperate model...
-* Bow and Arrow? (Like LoZ:TP) { Camera looks over players shoulder }
-** ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
+Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder }
+* ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
 
 == Stages ==
 Idea: Have a "stages.txt" that contains.

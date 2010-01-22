@@ -6004,7 +6004,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_lastServerRefresh_2, "ui_lastServerRefresh_2", "", CVAR_ARCHIVE},
 	{ &ui_lastServerRefresh_3, "ui_lastServerRefresh_3", "", CVAR_ARCHIVE},
 #ifdef TMNTSP
-	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_ROM},
+	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
 #else
 	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", 0},
 #endif

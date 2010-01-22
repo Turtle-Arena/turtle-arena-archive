@@ -491,10 +491,10 @@ void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activat
 		return;
 	}
 
-	// If trigered by a client, that isn't a spectator,
+	// If trigered by a client, that isn't a spectator or boss,
 	//  and that hasn't finished the level.
 	if (activator && activator->client
-		&& activator->client->sess.sessionTeam != TEAM_SPECTATOR
+		&& activator->client->sess.sessionTeam == TEAM_FREE
 		&& !activator->client->finishTime)
 	{
 		// Set finish time.
@@ -517,8 +517,39 @@ void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activat
 	// Save client data for next level.
 	G_SavePersistant(nextMap);
 
+	// Reached the end of the single player levels
+	if (Q_stricmp(nextMap, "sp_end") == 0)
+	{
+		if (g_singlePlayer.integer == 1)
+		{
+			// Return to the title screen.
+			trap_Cvar_Set( "sv_killserver", "1" );
+			//trap_DropClient( 0, "You Won!" );
+			return;
+		}
+		else
+		{
+			const char *info;
+
+			nextMap = NULL;
+
+#ifdef IOQ3ZTM // MAP_ROTATION
+			info = G_GetMapRotationInfoByGametype(GT_SINGLE_PLAYER);
+			if (info) {
+				nextMap = Info_ValueForKey(info, "m1");
+			}
+#endif
+
+			if (!nextMap || !strlen(nextMap))
+			{
+				// Default to sp1a1
+				nextMap = "sp1a1";
+			}
+		}
+	}
+
 	// Set cvar for level change.
-	Com_sprintf(buf, MAX_QPATH, "map %s", nextMap);
+	Com_sprintf(buf, MAX_QPATH, "spmap %s", nextMap);
 	trap_Cvar_Set("nextmap", buf);
 }
 

@@ -8,23 +8,12 @@ type		"single"
 }
 
 {
-map			"sp1a2"
-longname	"Stage 1: Area 2"
+map			"sp1boss"
+longname	"Stage 1: Boss"
 type		"single"
+bots		"RaphFugitoid"
+//allies		"leo don mike"
 }
-
-{
-map			"sp1a3"
-longname	"Stage 1: Area 3"
-type		"single"
-}
-
-{
-map			"sp1a4"
-longname	"Stage 1: Area 4"
-type		"single"
-}
-
 
 // Stage 2
 {
@@ -34,21 +23,10 @@ type		"single"
 }
 
 {
-map			"sp2a2"
-longname	"Stage 2: Area 2"
+map			"sp2boss"
+longname	"Stage 2: Boss"
 type		"single"
-}
-
-{
-map			"sp2a3"
-longname	"Stage 2: Area 3"
-type		"single"
-}
-
-{
-map			"sp2a4"
-longname	"Stage 2: Area 4"
-type		"single"
+bots		"RaphFugitoid"
 }
 
 // Special Stage keywords

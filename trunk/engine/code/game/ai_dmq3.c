@@ -3402,17 +3402,17 @@ int BotSameTeam(bot_state_t *bs, int entnum) {
 		//BotAI_Print(PRT_ERROR, "BotSameTeam: client out of range\n");
 		return qfalse;
 	}
-	if ( gametype >= GT_TEAM ) {
+	if ( gametype >= GT_TEAM
+#ifdef TMNTSP // SP_BOSS
+		|| gametype == GT_SINGLE_PLAYER
+#endif
+		)
+	{
 		trap_GetConfigstring(CS_PLAYERS+bs->client, info1, sizeof(info1));
 		trap_GetConfigstring(CS_PLAYERS+entnum, info2, sizeof(info2));
 		//
 		if (atoi(Info_ValueForKey(info1, "t")) == atoi(Info_ValueForKey(info2, "t"))) return qtrue;
 	}
-#ifdef TMNTSP // Co-op
-	else if (gametype == GT_SINGLE_PLAYER) {
-		return qtrue;
-	}
-#endif
 	return qfalse;
 }
 

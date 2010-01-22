@@ -1621,6 +1621,8 @@ void CheckExitRules( void ) {
 	{
 		int numClients = 0; // Number of clients in the game.
 		int deadClients = 0; // No lives or continues.
+		int numBossClients = 0;
+		int deadBossClients = 0;
 
 		for ( i=0 ; i< g_maxclients.integer ; i++ ) {
 			cl = level.clients + i;
@@ -1629,6 +1631,17 @@ void CheckExitRules( void ) {
 			}
 			// Skip bots
 			if (g_entities[i].r.svFlags & SVF_BOT) {
+				if (cl->sess.sessionTeam == TEAM_RED)
+				{
+					numBossClients++;
+					if (!cl->ps.persistant[PERS_LIVES] && !cl->ps.persistant[PERS_CONTINUES])
+					{
+						// Client has tried to respawn (or waited 3 seconds) with no lives or continues.
+						if (cl->respawnTime == -1) {
+							deadBossClients++;
+						}
+					}
+				}
 				continue;
 			}
 
@@ -1663,7 +1676,9 @@ void CheckExitRules( void ) {
 			if (g_singlePlayer.integer == 1)
 			{
 				// Return to the title screen.
-				trap_DropClient( 0, "Game Over" );
+				trap_Cvar_Set( "sv_killserver", "1" );
+				//trap_DropClient( 0, "Game Over" );
+				return;
 			}
 			else
 			{
@@ -1692,6 +1707,20 @@ void CheckExitRules( void ) {
 				trap_Cvar_Set("nextmap", buf);
 
 				ExitLevel();
+			}
+		}
+		if (numBossClients > 0 && numBossClients == deadBossClients)
+		{
+			for ( i=0 ; i < g_maxclients.integer ; i++ ) {
+				cl = level.clients + i;
+				if ( cl->pers.connected != CON_CONNECTED )
+					continue;
+				if (g_entities[i].r.svFlags & SVF_BOT)
+					continue;
+				if (cl->sess.sessionTeam == TEAM_SPECTATOR)
+					continue;
+
+				G_UseTargets2(&g_entities[i], &g_entities[i], "boss_death");
 			}
 		}
 		return;

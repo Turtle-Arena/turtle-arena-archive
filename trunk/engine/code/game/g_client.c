@@ -763,6 +763,11 @@ PickTeam
 team_t PickTeam( int ignoreClientNum ) {
 	int		counts[TEAM_NUM_TEAMS];
 
+#ifdef TMNTSP // SP_BOSS
+	if (g_gametype.integer == GT_SINGLE_PLAYER)
+		return TEAM_FREE;
+#endif
+
 	counts[TEAM_BLUE] = TeamCount( ignoreClientNum, TEAM_BLUE );
 	counts[TEAM_RED] = TeamCount( ignoreClientNum, TEAM_RED );
 
@@ -1118,7 +1123,13 @@ void ClientUserinfoChanged( int clientNum ) {
 #endif
 
 	// bots set their team a few frames later
-	if (g_gametype.integer >= GT_TEAM && g_entities[clientNum].r.svFlags & SVF_BOT) {
+#ifdef TMNTSP
+	if ((g_gametype.integer == GT_SINGLE_PLAYER || g_gametype.integer >= GT_TEAM)
+		&& g_entities[clientNum].r.svFlags & SVF_BOT)
+#else
+	if (g_gametype.integer >= GT_TEAM && g_entities[clientNum].r.svFlags & SVF_BOT)
+#endif
+	{
 		s = Info_ValueForKey( userinfo, "team" );
 		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) ) {
 			team = TEAM_RED;
@@ -1369,10 +1380,19 @@ void ClientBegin( int clientNum ) {
 #ifdef TMNTSP
 	if (g_gametype.integer == GT_SINGLE_PLAYER)
 	{
-		// Start with 3 lives and if not multiplayer 1 continue
-		client->ps.persistant[PERS_LIVES] = 3;
-		if (g_singlePlayer.integer) {
-			client->ps.persistant[PERS_CONTINUES] = 1;
+		if (client->sess.sessionTeam != TEAM_FREE)
+		{
+			// Enemies only have 1 life
+			client->ps.persistant[PERS_LIVES] = 1;
+		}
+		else
+		{
+			// Start with 3 lives and if not multiplayer 1 continue
+			client->ps.persistant[PERS_LIVES] = 3;
+
+			if (g_singlePlayer.integer) {
+				client->ps.persistant[PERS_CONTINUES] = 1;
+			}
 		}
 	}
 #endif
@@ -1442,7 +1462,11 @@ void ClientSpawn(gentity_t *ent) {
 	if ( client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		spawnPoint = SelectSpectatorSpawnPoint ( 
 						spawn_origin, spawn_angles);
-	} else if (g_gametype.integer >= GT_CTF ) {
+	} else if (g_gametype.integer >= GT_CTF
+#ifdef TMNTSP // SP_BOSS
+	|| (g_gametype.integer == GT_SINGLE_PLAYER && client->sess.sessionTeam != TEAM_FREE)
+#endif
+	) {
 		// all base oriented team games use the CTF spawn points
 		spawnPoint = SelectCTFSpawnPoint ( 
 #ifdef TMNTPLAYERSYS
