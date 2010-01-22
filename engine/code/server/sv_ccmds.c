@@ -184,7 +184,7 @@ static void SV_Map_f( void ) {
 		if (!Q_stricmp( cmd, "devmap" ) ) {
 			cheat = qtrue;
 		} else {
-		cheat = qfalse;
+			cheat = qfalse;
 		}
 		killBots = qtrue;
 #else

@@ -903,7 +903,12 @@ void Svcmd_BotList_f( void ) {
 G_SpawnBots
 ===============
 */
-static void G_SpawnBots( char *botList, int baseDelay ) {
+#ifdef TMNTSP // SP_BOSS
+static void G_SpawnBots( char *botList, int baseDelay, char *team )
+#else
+static void G_SpawnBots( char *botList, int baseDelay )
+#endif
+{
 	char		*bot;
 	char		*p;
 	float		skill;
@@ -951,7 +956,11 @@ static void G_SpawnBots( char *botList, int baseDelay ) {
 
 		// we must add the bot this way, calling G_AddBot directly at this stage
 		// does "Bad Things"
+#ifdef TMNTSP // SP_BOSS
+		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", bot, skill, team, delay) );
+#else
 		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f free %i\n", bot, skill, delay) );
+#endif
 
 		delay += BOT_BEGIN_DELAY_INCREMENT;
 	}
@@ -1141,7 +1150,12 @@ void G_InitBots( qboolean restart ) {
 		}
 
 		if( !restart ) {
+#ifdef TMNTSP // SP_BOSS
+			G_SpawnBots( Info_ValueForKey( arenainfo, "allies" ), basedelay, "free" );
+			G_SpawnBots( Info_ValueForKey( arenainfo, "bots" ), basedelay, "red" );
+#else
 			G_SpawnBots( Info_ValueForKey( arenainfo, "bots" ), basedelay );
+#endif
 		}
 	}
 }

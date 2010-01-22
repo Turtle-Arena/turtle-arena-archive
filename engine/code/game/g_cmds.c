@@ -576,7 +576,12 @@ void SetTeam( gentity_t *ent, char *s ) {
 	} else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) ) {
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FREE;
-	} else if ( g_gametype.integer >= GT_TEAM ) {
+	} else if ( g_gametype.integer >= GT_TEAM
+#ifdef TMNTSP // SP_BOSS
+			|| (g_gametype.integer == GT_SINGLE_PLAYER && (ent->r.svFlags & SVF_BOT))
+#endif
+		)
+	{
 		// if running a team game, assign player to one of the teams
 		specState = SPECTATOR_NOT;
 		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) ) {

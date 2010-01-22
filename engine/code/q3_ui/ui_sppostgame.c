@@ -55,7 +55,9 @@ SINGLE PLAYER POSTGAME MENU
 
 typedef struct {
 	menuframework_s	menu;
+#ifndef TMNTSP
 	menubitmap_s	item_again;
+#endif
 	menubitmap_s	item_next;
 	menubitmap_s	item_menu;
 
@@ -69,7 +71,9 @@ typedef struct {
 	int				ranks[MAX_SCOREBOARD_CLIENTS];
 	int				scores[MAX_SCOREBOARD_CLIENTS];
 
+#ifndef TMNTSP
 	char			placeNames[3][64];
+#endif
 
 	int				level;
 	int				numClients;
@@ -205,11 +209,9 @@ static void UI_SPPostgameMenu_MenuEvent( void* ptr, int event )
 	UI_PopMenu();
 #ifdef TMNTSP
 	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 2) {
-		trap_Cvar_Set("ui_singlePlayerActive", "0");
 		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; customgame\n" );
 		return;
 	}
-	trap_Cvar_Set("ui_singlePlayerActive", "0");
 #endif
 	trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; levelselect\n" );
 }
@@ -359,11 +361,13 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 	}
 
 	// phase 1
+#ifndef TMNTSP
 	if ( postgameMenuInfo.numClients > 2 ) {
 		UI_DrawProportionalString( 510, 480 - 64 - PROP_HEIGHT, postgameMenuInfo.placeNames[2], UI_CENTER, color_white );
 	}
 	UI_DrawProportionalString( 130, 480 - 64 - PROP_HEIGHT, postgameMenuInfo.placeNames[1], UI_CENTER, color_white );
 	UI_DrawProportionalString( 320, 480 - 64 - 2 * PROP_HEIGHT, postgameMenuInfo.placeNames[0], UI_CENTER, color_white );
+#endif
 
 	if( postgameMenuInfo.phase == 1 ) {
 		timer = uis.realtime - postgameMenuInfo.starttime;
@@ -382,10 +386,9 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 
 	// phase 2
 	if( postgameMenuInfo.phase == 2 ) {
-		timer = uis.realtime - postgameMenuInfo.starttime;
 #ifndef TMNTSP
+		timer = uis.realtime - postgameMenuInfo.starttime;
 		if( timer >= ( postgameMenuInfo.numAwards * AWARD_PRESENTATION_TIME ) ) {
-#endif
 
 			if( timer < 5000 ) {
 				return;
@@ -393,16 +396,15 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 
 			postgameMenuInfo.phase = 3;
 			postgameMenuInfo.starttime = uis.realtime;
-#ifndef TMNTSP
 		}
 		else {
 			UI_SPPostgameMenu_DrawAwardsPresentation( timer );
 		}
-#endif
 	}
 
 	// phase 3
 	if( postgameMenuInfo.phase == 3 ) {
+#endif
 		if( uis.demoversion ) {
 			if( postgameMenuInfo.won == 1 && UI_ShowTierVideo( 8 )) {
 				trap_Cvar_Set( "nextmap", "" );
@@ -423,7 +425,9 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 			return;
 		}
 
+#ifndef TMNTSP
 		postgameMenuInfo.item_again.generic.flags &= ~QMF_INACTIVE;
+#endif
 		postgameMenuInfo.item_next.generic.flags &= ~QMF_INACTIVE;
 		postgameMenuInfo.item_menu.generic.flags &= ~QMF_INACTIVE;
 

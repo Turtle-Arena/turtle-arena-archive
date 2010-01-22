@@ -88,7 +88,7 @@ typedef struct {
 	menuframework_s	menu;
 	menutext_s		item_banner;
 	menubitmap_s	item_leftarrow;
-	menubitmap_s	item_maps[4];
+	menubitmap_s	item_maps[ARENAS_PER_TIER];
 	menubitmap_s	item_rightarrow;
 	menubitmap_s	item_player;
 	menubitmap_s	item_awards[6];
@@ -104,10 +104,10 @@ typedef struct {
 
 	const char *	selectedArenaInfo;
 	int				numMaps;
-	char			levelPicNames[4][MAX_QPATH];
-	char			levelNames[4][16];
-	int				levelScores[4];
-	int				levelScoresSkill[4];
+	char			levelPicNames[ARENAS_PER_TIER][MAX_QPATH];
+	char			levelNames[ARENAS_PER_TIER][16];
+	int				levelScores[ARENAS_PER_TIER];
+	int				levelScoresSkill[ARENAS_PER_TIER];
 	qhandle_t		levelSelectedPic;
 	qhandle_t		levelFocusPic;
 	qhandle_t		levelCompletePic[5];
@@ -309,15 +309,11 @@ static void UI_SPLevelMenu_SetMenuItems( void ) {
 		levelMenuInfo.item_maps[0].generic.bottom += 32;
 		levelMenuInfo.numMaps = 1;
 
-		levelMenuInfo.item_maps[1].generic.flags |= QMF_INACTIVE;
-		levelMenuInfo.item_maps[2].generic.flags |= QMF_INACTIVE;
-		levelMenuInfo.item_maps[3].generic.flags |= QMF_INACTIVE;
-		levelMenuInfo.levelPicNames[1][0] = 0;
-		levelMenuInfo.levelPicNames[2][0] = 0;
-		levelMenuInfo.levelPicNames[3][0] = 0;
-		levelMenuInfo.item_maps[1].shader = 0;
-		levelMenuInfo.item_maps[2].shader = 0;
-		levelMenuInfo.item_maps[3].shader = 0;
+		for ( n = 1; n < ARENAS_PER_TIER; n++ ) {
+			levelMenuInfo.item_maps[n].generic.flags |= QMF_INACTIVE;
+			levelMenuInfo.levelPicNames[n][0] = 0;
+			levelMenuInfo.item_maps[n].shader = 0;
+		}
 	}
 	else if( selectedArenaSet == finalTier ) {
 		arenaInfo = UI_GetSpecialArenaInfo( "final" );
@@ -330,23 +326,19 @@ static void UI_SPLevelMenu_SetMenuItems( void ) {
 		levelMenuInfo.item_maps[0].generic.bottom += 32;
 		levelMenuInfo.numMaps = 1;
 
-		levelMenuInfo.item_maps[1].generic.flags |= QMF_INACTIVE;
-		levelMenuInfo.item_maps[2].generic.flags |= QMF_INACTIVE;
-		levelMenuInfo.item_maps[3].generic.flags |= QMF_INACTIVE;
-		levelMenuInfo.levelPicNames[1][0] = 0;
-		levelMenuInfo.levelPicNames[2][0] = 0;
-		levelMenuInfo.levelPicNames[3][0] = 0;
-		levelMenuInfo.item_maps[1].shader = 0;
-		levelMenuInfo.item_maps[2].shader = 0;
-		levelMenuInfo.item_maps[3].shader = 0;
+		for ( n = 1; n < ARENAS_PER_TIER; n++ ) {
+			levelMenuInfo.item_maps[n].generic.flags |= QMF_INACTIVE;
+			levelMenuInfo.levelPicNames[n][0] = 0;
+			levelMenuInfo.item_maps[n].shader = 0;
+		}
 	}
 	else {
 		levelMenuInfo.item_maps[0].generic.x = 46;
 		Bitmap_Init( &levelMenuInfo.item_maps[0] );
 		levelMenuInfo.item_maps[0].generic.bottom += 18;
-		levelMenuInfo.numMaps = 4;
+		levelMenuInfo.numMaps = ARENAS_PER_TIER;
 
-		for ( n = 0; n < 4; n++ ) {
+		for ( n = 0; n < ARENAS_PER_TIER; n++ ) {
 			level = selectedArenaSet * ARENAS_PER_TIER + n;
 			arenaInfo = UI_GetArenaInfoByNumber( level );
 			UI_SPLevelMenu_SetMenuArena( n, level, arenaInfo );
@@ -845,6 +837,7 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_maps[0].width				= 128;
 	levelMenuInfo.item_maps[0].height				= 96;
 
+#if ARENAS_PER_TIER > 1
 	levelMenuInfo.item_maps[1].generic.type			= MTYPE_BITMAP;
 	levelMenuInfo.item_maps[1].generic.name			= levelMenuInfo.levelPicNames[1];
 	levelMenuInfo.item_maps[1].generic.flags		= QMF_LEFT_JUSTIFY;
@@ -854,7 +847,9 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_maps[1].generic.callback		= UI_SPLevelMenu_LevelEvent;
 	levelMenuInfo.item_maps[1].width				= 128;
 	levelMenuInfo.item_maps[1].height				= 96;
+#endif
 
+#if ARENAS_PER_TIER > 2
 	levelMenuInfo.item_maps[2].generic.type			= MTYPE_BITMAP;
 	levelMenuInfo.item_maps[2].generic.name			= levelMenuInfo.levelPicNames[2];
 	levelMenuInfo.item_maps[2].generic.flags		= QMF_LEFT_JUSTIFY;
@@ -864,7 +859,9 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_maps[2].generic.callback		= UI_SPLevelMenu_LevelEvent;
 	levelMenuInfo.item_maps[2].width				= 128;
 	levelMenuInfo.item_maps[2].height				= 96;
+#endif
 
+#if ARENAS_PER_TIER > 3
 	levelMenuInfo.item_maps[3].generic.type			= MTYPE_BITMAP;
 	levelMenuInfo.item_maps[3].generic.name			= levelMenuInfo.levelPicNames[3];
 	levelMenuInfo.item_maps[3].generic.flags		= QMF_LEFT_JUSTIFY;
@@ -874,6 +871,7 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_maps[3].generic.callback		= UI_SPLevelMenu_LevelEvent;
 	levelMenuInfo.item_maps[3].width				= 128;
 	levelMenuInfo.item_maps[3].height				= 96;
+#endif
 
 	levelMenuInfo.item_rightarrow.generic.type		= MTYPE_BITMAP;
 	levelMenuInfo.item_rightarrow.generic.name		= ART_ARROW;
@@ -1006,13 +1004,25 @@ static void UI_SPLevelMenu_Init( void ) {
 
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_leftarrow );
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_maps[0] );
+#if ARENAS_PER_TIER > 1
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_maps[1] );
+#endif
+#if ARENAS_PER_TIER > 2
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_maps[2] );
+#endif
+#if ARENAS_PER_TIER > 3
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_maps[3] );
+#endif
 	levelMenuInfo.item_maps[0].generic.bottom += 18;
+#if ARENAS_PER_TIER > 1
 	levelMenuInfo.item_maps[1].generic.bottom += 18;
+#endif
+#if ARENAS_PER_TIER > 2
 	levelMenuInfo.item_maps[2].generic.bottom += 18;
+#endif
+#if ARENAS_PER_TIER > 3
 	levelMenuInfo.item_maps[3].generic.bottom += 18;
+#endif
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_rightarrow );
 
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_player );

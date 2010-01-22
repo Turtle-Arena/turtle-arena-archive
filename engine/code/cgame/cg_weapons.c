@@ -2848,6 +2848,8 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 #ifdef TMNTWEAPSYS
 			int handSide;
 
+			cent = &cg_entities[ps->clientNum];
+
 			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->trailType == PT_LIGHTNING
 				&& bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->instantDamage)
 			{
@@ -2859,7 +2861,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 				else if (handSide == HAND_LEFT)
 					VectorMA( origin, 8, cg.refdef.viewaxis[2], origin );
 
-				CG_LightningBolt( &cg_entities[ps->clientNum], origin, LIGHTNING_RANGE);
+				CG_LightningBolt( cent, origin, LIGHTNING_RANGE);
 			}
 
 			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[1]->proj->trailType == PT_LIGHTNING
@@ -2872,7 +2874,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 					VectorMA( origin, -8, cg.refdef.viewaxis[2], origin );
 				else if (handSide == HAND_LEFT)
 					VectorMA( origin, 8, cg.refdef.viewaxis[2], origin );
-				CG_LightningBolt( &cg_entities[ps->clientNum], origin, LIGHTNING_RANGE);
+				CG_LightningBolt( cent, origin, LIGHTNING_RANGE);
 			}
 #else
 			VectorCopy( cg.refdef.vieworg, origin );
