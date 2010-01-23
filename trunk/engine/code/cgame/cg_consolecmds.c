@@ -162,10 +162,16 @@ static void CG_spWin_f( void) {
 	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
+#ifndef THIRD_PERSON
 	trap_Cvar_Set("cg_thirdPersonRange", "100");
+#endif
 	CG_AddBufferedSound(cgs.media.winnerSound);
 	//trap_S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
+#ifndef MISSIONPACK_HUD
+	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
+#else
 	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, 0);
+#endif
 }
 
 static void CG_spLose_f( void) {
@@ -173,10 +179,19 @@ static void CG_spLose_f( void) {
 	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
+#ifndef THIRD_PERSON
 	trap_Cvar_Set("cg_thirdPersonRange", "100");
+#endif
 	CG_AddBufferedSound(cgs.media.loserSound);
 	//trap_S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
+#ifdef TMNTSP
+	if (cgs.gametype != GT_SINGLE_PLAYER)
+#endif
+#ifndef MISSIONPACK_HUD
+	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
+#else
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, 0);
+#endif
 }
 
 #endif
@@ -432,7 +447,9 @@ static void CG_StartOrbit_f( void ) {
 		trap_Cvar_Set("cg_cameraOrbit", "5");
 		trap_Cvar_Set("cg_thirdPerson", "1");
 		trap_Cvar_Set("cg_thirdPersonAngle", "0");
+#ifndef THIRD_PERSON
 		trap_Cvar_Set("cg_thirdPersonRange", "100");
+#endif
 	}
 }
 

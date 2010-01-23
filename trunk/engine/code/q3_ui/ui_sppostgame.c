@@ -55,10 +55,11 @@ SINGLE PLAYER POSTGAME MENU
 
 typedef struct {
 	menuframework_s	menu;
-#ifndef TMNTSP
+
 	menubitmap_s	item_again;
-#endif
+#ifndef TMNTSP
 	menubitmap_s	item_next;
+#endif
 	menubitmap_s	item_menu;
 
 	int				phase;
@@ -123,7 +124,7 @@ char	*ui_medalSounds[] = {
 	"sound/feedback/frags.wav",
 	"sound/feedback/perfect.wav"
 };
-
+#endif
 
 /*
 =================
@@ -138,35 +139,26 @@ static void UI_SPPostgameMenu_AgainEvent( void* ptr, int event )
 	UI_PopMenu();
 	trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 }
-#endif
 
 
+#ifndef TMNTSP
 /*
 =================
 UI_SPPostgameMenu_NextEvent
 =================
 */
 static void UI_SPPostgameMenu_NextEvent( void* ptr, int event ) {
-#ifndef TMNTSP
 	int			currentSet;
 	int			levelSet;
 	int			level;
 	int			currentLevel;
 	const char	*arenaInfo;
-#endif
 
 	if (event != QM_ACTIVATED) {
 		return;
 	}
 	UI_PopMenu();
 
-#ifdef TMNTSP
-	if (trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER) {
-		trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
-		return;
-	}
-	trap_Cmd_ExecuteText( EXEC_APPEND, "vstr nextmap\n" );
-#else
 	// handle specially if we just won the training map
 	if( postgameMenuInfo.won == 0 ) {
 		level = 0;
@@ -192,8 +184,8 @@ static void UI_SPPostgameMenu_NextEvent( void* ptr, int event ) {
 	}
 
 	UI_SPArena_Start( arenaInfo );
-#endif
 }
+#endif
 
 
 /*
@@ -208,12 +200,10 @@ static void UI_SPPostgameMenu_MenuEvent( void* ptr, int event )
 	}
 	UI_PopMenu();
 #ifdef TMNTSP
-	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 2) {
-		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; customgame\n" );
-		return;
-	}
-#endif
+	trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; customgame\n" );
+#else
 	trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; levelselect\n" );
+#endif
 }
 
 
@@ -237,14 +227,21 @@ static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
 		return 0;
 	}
 
+#ifndef TMNTSP
 	if( postgameMenuInfo.phase == 2 ) {
 		postgameMenuInfo.phase = 3;
 		postgameMenuInfo.starttime = uis.realtime;
 		postgameMenuInfo.ignoreKeysTime	= uis.realtime + 250;
 		return 0;
 	}
+#endif
 
-	if( key == K_ESCAPE || key == K_MOUSE2 ) {
+	if( key == K_ESCAPE
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+		|| key == K_MOUSE2
+#endif
+		)
+	{
 		return 0;
 	}
 
@@ -425,10 +422,10 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 			return;
 		}
 
-#ifndef TMNTSP
 		postgameMenuInfo.item_again.generic.flags &= ~QMF_INACTIVE;
-#endif
+#ifndef TMNTSP
 		postgameMenuInfo.item_next.generic.flags &= ~QMF_INACTIVE;
+#endif
 		postgameMenuInfo.item_menu.generic.flags &= ~QMF_INACTIVE;
 
 #ifndef TMNTSP
@@ -523,19 +520,23 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_menu.height				= 64;
 	postgameMenuInfo.item_menu.focuspic				= ART_MENU1;
 
-#ifndef TMNTSP
 	postgameMenuInfo.item_again.generic.type		= MTYPE_BITMAP;
 	postgameMenuInfo.item_again.generic.name		= ART_REPLAY0;
+#ifdef TMNTSP
+	postgameMenuInfo.item_again.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
+	postgameMenuInfo.item_again.generic.x			= 640;
+#else
 	postgameMenuInfo.item_again.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
 	postgameMenuInfo.item_again.generic.x			= 320;
+#endif
 	postgameMenuInfo.item_again.generic.y			= 480-64;
 	postgameMenuInfo.item_again.generic.callback	= UI_SPPostgameMenu_AgainEvent;
 	postgameMenuInfo.item_again.generic.id			= ID_AGAIN;
 	postgameMenuInfo.item_again.width				= 128;
 	postgameMenuInfo.item_again.height				= 64;
 	postgameMenuInfo.item_again.focuspic			= ART_REPLAY1;
-#endif
 
+#ifndef TMNTSP
 	postgameMenuInfo.item_next.generic.type			= MTYPE_BITMAP;
 	postgameMenuInfo.item_next.generic.name			= ART_NEXT0;
 	postgameMenuInfo.item_next.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
@@ -546,19 +547,13 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_next.width				= 128;
 	postgameMenuInfo.item_next.height				= 64;
 	postgameMenuInfo.item_next.focuspic				= ART_NEXT1;
-
-#ifdef TMNTSP
-	if (trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER) {
-		postgameMenuInfo.item_next.generic.name			= ART_REPLAY0;
-		postgameMenuInfo.item_next.focuspic				= ART_REPLAY1;
-	}
 #endif
 
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_menu );
-#ifndef TMNTSP
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_again );
-#endif
+#ifndef TMNTSP
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_next );
+#endif
 }
 
 
@@ -720,7 +715,7 @@ void UI_SPPostgameMenu_f( void ) {
 	UI_PushMenu( &postgameMenuInfo.menu );
 
 #ifdef TMNTSP
-	Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_next );
+	Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_again );
 
 	postgameMenuInfo.winnerSound = trap_S_RegisterSound( "sound/player/announce/youwin.wav", qfalse );
 	trap_Cmd_ExecuteText( EXEC_APPEND, "music music/win\n" );

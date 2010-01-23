@@ -535,6 +535,9 @@ static void CG_MapRestart( void ) {
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
 #endif
+#ifdef TMNTMISC
+	cg_thirdPersonAngle.value = 0;
+#endif
 }
 
 #define MAX_VOICEFILESIZE	16384

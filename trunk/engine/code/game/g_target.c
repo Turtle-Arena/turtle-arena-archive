@@ -523,8 +523,7 @@ void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activat
 		if (g_singlePlayer.integer == 1)
 		{
 			// Return to the title screen.
-			trap_Cvar_Set( "sv_killserver", "1" );
-			//trap_DropClient( 0, "You Won!" );
+			trap_Cvar_Set("nextmap", "disconnect");
 			return;
 		}
 		else
