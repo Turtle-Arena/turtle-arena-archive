@@ -1250,7 +1250,6 @@ static void SV_SaveGame_f(void) {
 	char filename[MAX_QPATH];
 	fileHandle_t f;
 	char *curpos;
-	int i;
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -1267,15 +1266,6 @@ static void SV_SaveGame_f(void) {
 		Cmd_ArgvBuffer( 1, savegame, sizeof( savegame ) );
 	}
 
-	// validate the filename
-	for (i = 0; i < strlen(savegame); i++) {
-		if (!isalnum(savegame[i]) && savegame[i] != '_' && savegame[i] != '-')
-		{
-			Com_Printf( "savegame: '%s'.  Invalid character (%c) in filename.\n", savegame, savegame[i]);
-			return;
-		}
-	}
-
 	if(!(curpos = Cvar_VariableString("fs_game")) || !*curpos)
 		curpos = BASEGAME;
 
@@ -1285,89 +1275,82 @@ static void SV_SaveGame_f(void) {
     // Open file
 	f = FS_SV_FOpenFileWrite(filename);
 
-	//Com_Printf( "savegame: (%s)\n", filegame );
 	VM_Call( gvm, GAME_SAVEGAME, f );
 
 	// Close file
 	FS_FCloseFile( f );
 }
 
-typedef enum
-{
-	// NOTE: In Engine if save type is < 128 doesn't reload the map if it is loaded,
-	//          if >= 128 always reloads the map (Even if it is loaded).
-	// Turtle Man: Shouldn't the map always be reloaded?
-	//               (I don't remember why I made it this way)
-
-    SAVE_MINIMUM = 0,	// Save data so that player can start level later.
-    SAVE_FULL = 128,	// TODO: Full save of the level, includes all entities.
-    SAVE_UNKNOWN
-
-} save_type_e;
 /*
 ==================
 SP_LoadGame
-See save_header_t in g_savestate.c for more info.
+See save_t in g_save.c for more info.
 
 Return value
+-1 -invalid savefile version
 0 - no map changing needed.
-1 - file type requires map reload
 2 - no map loaded or wrong map loaded.
 ==================
 */
-int SP_LoadGame(fileHandle_t f, char *filename, char *loadmap)
+int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *skill, byte *maxclients)
 {
 	char buffer[MAX_QPATH];
-	char s[MAX_QPATH];
+	//char s[MAX_QPATH];
 	byte version;
-	byte saveType;
 
 	FS_Read2 (&version, 1, f); // version
-	Cvar_VariableStringBuffer( "g_saveVersions", buffer, sizeof(buffer) );
-	sprintf(s, "%d", version);
-	if (!strstr(buffer, s))
-	{
+	//Cvar_VariableStringBuffer( "g_saveVersions", buffer, sizeof(buffer) );
+	//sprintf(s, "%d", version);
+	//if (!strstr(s, buffer))
+	//{
 		// Didn't find version
-		return -1;
-	}
-
-	FS_Read2 (&saveType, 1, f); // save type
-	Cvar_VariableStringBuffer( "g_saveTypes", buffer, sizeof(buffer) );
-	sprintf(s, "%d", saveType);
-	if (!strstr(buffer, s))
-	{
-		// Didn't find saveType
-		return -1;
-	}
+		//return -1;
+	//}
 
 	FS_Read2 (loadmap, MAX_QPATH, f); // map name
+
+	if (skill)
+	{
+		FS_Read2 (skill, 1, f); // skill
+	}
+	
+	if (maxclients)
+	{
+		FS_Read2 (maxclients, 1, f); // maxclients
+	}
+
+	if (skill && maxclients) {
+		Com_Printf("DEBUG: map=%s, skill=%d, maxclients=%d\n", loadmap, *skill, *maxclients);
+	}
+
 	Cvar_VariableStringBuffer( "mapname", buffer, sizeof(buffer) );
 
 	// If different map is loaded,
 	//   or no map is loaded.
 	if ((Q_stricmp(buffer, loadmap) != 0)
-		|| buffer[0] == '\0' || (gvm == NULL))
+		|| buffer[0] == '\0')
 	{
 		// Load the map from the savegame.
-		return 2;
-	}
-
-	// This is a full save, must reload map.
-	if (saveType >= SAVE_FULL)
-	{
 		return 1;
 	}
+
 	return 0;
 }
 
 static void SV_LoadGame_f(void) {
 	char loadmap[MAX_QPATH];
+	byte skill, maxclients;
 	char savegame[MAX_TOKEN_CHARS];
 	char filename[MAX_QPATH];
 	fileHandle_t f;
 	int len;
 	char *curpos;
-	static short load_atemp = 0;
+	short load_atemp = 0;
+
+	if (Cmd_Argc() >= 3)
+	{
+		load_atemp = 1;
+	}
 
 	// Set savefile name.
 	if ( Cmd_Argc() < 2 ) {
@@ -1398,32 +1381,31 @@ static void SV_LoadGame_f(void) {
 
 	if (load_atemp == 0)
 	{
-		int load = SP_LoadGame(f, filename, loadmap);
-		if (load >= SAVE_FULL)
+		int load = SP_LoadGame(f, filename, loadmap, &skill, &maxclients);
+		Com_Printf("DEBUG: load=%d\n", load);
+		if (load == -1)
 		{
 			FS_FCloseFile( f );
-			load_atemp = 1;
-			Cbuf_ExecuteText(EXEC_APPEND, va("spmap %s\n", loadmap));
-			// Moved calling "loadgame" to SV_SpawnServer
-			//Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s\n", savegame));
-			Q_strncpyz(svs.loadgame, savegame, sizeof (svs.loadgame));
-			return;
-		}
-		else if (load == -1)
-		{
 			Com_Printf("Warning: Unsupported savefile (%s)\n", savegame);
 			return;
 		}
-		else
-		{
-			// Don't need to load a map.
-			// so just continue to load savegame.
+
+		Cvar_SetValue("g_gametype", GT_SINGLE_PLAYER);
+		Cvar_SetValue("ui_singlePlayerActive", 1);
+		Cvar_SetValue("g_spSkill", skill);
+		Cvar_SetValue("sv_maxclients", maxclients);
+
+		if (load == 1 || !gvm) {
+			FS_FCloseFile( f );
+			// "loadgame" is called in SV_SpawnServer
+			Q_strncpyz(svs.loadgame, savegame, sizeof (svs.loadgame));
+			Cbuf_ExecuteText(EXEC_APPEND, va("spmap %s\n", loadmap));
+			return;
 		}
 	}
 	else
 	{
-		load_atemp = 0;
-		if (SP_LoadGame(f, filename, loadmap) > 1)
+		if (SP_LoadGame(f, filename, loadmap, NULL, NULL) == 1 || !gvm)
 		{
 			FS_FCloseFile( f );
 			// We still need to load the map, so quit.
@@ -1432,8 +1414,6 @@ static void SV_LoadGame_f(void) {
 			return;
 		}
 	}
-
-	//Com_Printf( "loadgame: (%s, %s)\n", filename, loadmap );
 
 	// Reset file reading.
 	FS_Seek(f, 0, FS_SEEK_SET);

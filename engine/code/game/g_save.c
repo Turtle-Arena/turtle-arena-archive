@@ -28,49 +28,34 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // NOTE: Make sure BG_SAVE_VERSIONS and BG_SAVE_TYPES stay up to date
 //         with current save code.
 
-#define	SAVE_VERSION 2 // current version of save/load routines
+#define	SAVE_VERSION 3 // current version of save/load routines
 
-typedef enum
-{
-	// NOTE: In Engine if save type is < 128 doesn't reload the map if it is loaded,
-	//          if >= 128 always reloads the map (Even if it is loaded).
-	// Turtle Man: Shouldn't the map always be reloaded?
-	//               (I don't remember why I made it this way)
+#define MAX_SAVE_CLIENTS 8
 
-    SAVE_MINIMUM = 0,	// Save data so that player can start level later.
-    SAVE_FULL = 128,	// Turtle Man: TODO?: Full save of the level, includes all entities.
-    SAVE_UNKNOWN
-
-} save_type_e;
-
-#define HEADER_SIZE (1+1+MAX_QPATH+1)
 typedef struct
 {
-	// server exspects these in this order...
+	byte connected;
+	char model[MAX_QPATH];
+	char headModel[MAX_QPATH];
+	byte holdable[MAX_HOLDABLE];
+	byte lives;
+	byte continues;
+} save_client_t;
+
+typedef struct
+{
+	// server exspects these in this order!
 	//
     byte version; // Save file version.
-    byte save_type; // Type of save file.
     char mapname[MAX_QPATH];
+    byte skill;
+    byte maxclients;
 
 	// game only, server doesn't read these.
 	//
-    byte skill;
+    save_client_t clients[MAX_SAVE_CLIENTS];
 
-} save_header_t;
-
-/*
-// (SAVE_FULL only)
-typedef struct
-{
-    int level_time;
-
-    // Safety checks
-    int entity_size[4];
-    int client_size[4];
-
-    // The header is followed by entity and client data.
-} save_full_data_t;
-*/
+} save_t;
 
 /*
 ============
@@ -79,61 +64,49 @@ G_SaveGame
 */
 qboolean G_SaveGame(fileHandle_t f)
 {
-	save_header_t header;
+	save_t saveData;
 	int client;
 	int j;
-	int integer;
 
-	if (!g_singlePlayer.integer/* || !g_gametype.integer == GT_SINGLE_PLAYER*/) {
+	if (!g_singlePlayer.integer || !g_gametype.integer == GT_SINGLE_PLAYER) {
 		G_Printf("Can't savegame, saving is for single player only!\n");
 		return qfalse;
 	}
 
 	// Setup header
-    memset(&header, 0, HEADER_SIZE);
-	header.version = SAVE_VERSION;
-	header.save_type = SAVE_MINIMUM;
-	// Turtle Man: FIXME: If minimum save use next_map? So we can save before loading map?
-	trap_Cvar_VariableStringBuffer( "mapname", header.mapname, MAX_QPATH );
-	header.skill = trap_Cvar_VariableIntegerValue("g_spSkill");
+    memset(&saveData, 0, sizeof (save_t));
+	saveData.version = SAVE_VERSION;
+	// Turtle Man: FIXME: Use next_map? So we can save before loading map?
+	trap_Cvar_VariableStringBuffer( "mapname", saveData.mapname, MAX_QPATH );
+	saveData.skill = trap_Cvar_VariableIntegerValue("g_spSkill");
+	saveData.maxclients = level.maxclients;
+	if (saveData.maxclients > MAX_SAVE_CLIENTS)
+		saveData.maxclients = MAX_SAVE_CLIENTS;
 
-	// write header.
-	trap_FS_Write(&header, HEADER_SIZE, f);
-
-	// Write clients.
-	if (header.save_type == SAVE_MINIMUM)
+	for (client = 0; client < saveData.maxclients; client++)
 	{
-		for (client = 0; client < level.maxclients; client++)
+		if (g_entities[client].r.svFlags & SVF_BOT)
+			continue;
+		saveData.clients[client].connected = level.clients[client].pers.connected;
+		if (level.clients[client].pers.connected != CON_CONNECTED)
+			continue;
+
+		// model/skin
+		Q_strncpyz(saveData.clients[client].model, level.clients[client].pers.playercfg.model, MAX_QPATH);
+		// headmodel/skin
+		Q_strncpyz(saveData.clients[client].model, level.clients[client].pers.playercfg.headModel, MAX_QPATH);
+
+		// holdable items
+		for (j = 0; j < MAX_HOLDABLE; j++)
 		{
-			if (level.clients[client].pers.connected != CON_CONNECTED)
-				continue;
-			integer = client;
-			trap_FS_Write(&integer, sizeof(integer), f);
-
-			// Write clients data.
-			// TODO: client name?
-
-			// model/skin
-			trap_FS_Write(&level.clients[client].pers.playercfg.model, MAX_QPATH, f);
-			// headmodel/skin
-			trap_FS_Write(&level.clients[client].pers.playercfg.headModel, MAX_QPATH, f);
-
-			// holdable items
-			for (j = 0; j < MAX_HOLDABLE; j++)
-			{
-				integer = level.clients[client].ps.holdable[j];
-				trap_FS_Write(&integer, sizeof(integer), f);
-			}
+			saveData.clients[client].holdable[j] = level.clients[client].ps.holdable[j];
 		}
-	}
-	else if (header.save_type == SAVE_FULL)
-	{
-		// ...
+		saveData.clients[client].lives = level.clients[client].ps.persistant[PERS_LIVES];
+		saveData.clients[client].continues = level.clients[client].ps.persistant[PERS_CONTINUES];
 	}
 
-	// End of file
-	integer = -1;
-	trap_FS_Write(&integer, sizeof(integer), f);
+	// Write saveData
+	trap_FS_Write(&saveData, sizeof (save_t), f);
 
 	return qtrue;
 }
@@ -141,76 +114,40 @@ qboolean G_SaveGame(fileHandle_t f)
 // Called after level is loaded.
 void G_LoadGame(fileHandle_t f)
 {
-	save_header_t header;
+	save_t saveData;
+	int j;
+	int client;
 
-	// Read header
-    memset(&header, 0, HEADER_SIZE);
-	trap_FS_Read(&header, HEADER_SIZE, f);
+	// Read saveData
+	trap_FS_Read(&saveData, sizeof (save_t), f);
 
 	// The server should check but just in case...
-	if (header.version != SAVE_VERSION)
+	if (saveData.version != SAVE_VERSION)
 	{
-	    G_Printf( "Error: Unsupported savegame version is %i\n", header.version);
+	    G_Printf( "Error: Unsupported savegame version, %i\n", saveData.version);
         return;
 	}
 
-    // set the skill level (after every thing is okay).
-	trap_Cvar_Set( "g_spSkill", va("%i",header.skill) );
+    // Server sets skill and maxclients before loading the level.
 
-	if (header.save_type == SAVE_MINIMUM)
+	for (client = 0; client < saveData.maxclients; client++)
 	{
-		int i, j;
-		int client;
-		int integer;
-		char s[2][MAX_QPATH];
+		if (saveData.clients[client].connected != CON_CONNECTED)
+			continue;
+		if (g_entities[client].r.svFlags & SVF_BOT)
+			continue;
+		//if (level.clients[client].pers.connected != CON_CONNECTED)
+			//continue;
 
-		for (i = 0; i < MAX_CLIENTS+1; i++)
+		//trap_SendServerCommand( client, va("spmodel %s; spheadmodel %s\n", saveData.clients[client].model, saveData.clients[client].headModel) );
+		//trap_SendServerCommand( client, va("model %s; headmodel %s\n", saveData.clients[client].model, saveData.clients[client].headModel) );
+
+		for (j = 0; j < MAX_HOLDABLE; j++)
 		{
-			trap_FS_Read(&client, sizeof(client), f);
-			if (client == -1)
-			{
-				break;
-			}
-
-			if (level.clients[client].pers.connected != CON_CONNECTED)
-				continue;
-
-			// Read model and headModel
-			for (j = 0; j < 2; j++)
-			{
-				trap_FS_Read(s[j], MAX_QPATH, f);
-				if (s[j][0] == '\0') {
-					strncpy(s[j], DEFAULT_MODEL, MAX_QPATH);
-				}
-			}
-			trap_SendServerCommand( client, va("spmodel %s; spheadmodel %s\n", s[0], s[1]) );
-
-            for (j = 0; j < MAX_HOLDABLE; j++)
-            {
-            	trap_FS_Read(&integer, sizeof(integer), f);
-
-				// If has multiple uses, add to current.
-				if (BG_ItemForItemNum(BG_ItemNumForHoldableNum(j))->quantity > 0)
-            	{
-            		level.clients[client].ps.holdable[j] += integer;
-            	}
-            	else
-            	{
-					level.clients[client].ps.holdable[j] = integer;
-            	}
-            }
+			level.clients[client].ps.holdable[j] = saveData.clients[client].holdable[j];
 		}
+		level.clients[client].ps.persistant[PERS_LIVES] = saveData.clients[client].lives;
+		level.clients[client].ps.persistant[PERS_CONTINUES] = saveData.clients[client].continues;
 	}
-
-	//else if (header.save_type == SAVE_FULL)
-	//{
-	//}
-
-	//else
-	//{
-	//    G_Printf( "Error: Unknown savegame type %i\n", header.save_type);
-    //    return;
-	//}
 }
-
 #endif // TMNTSP

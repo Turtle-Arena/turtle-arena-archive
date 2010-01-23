@@ -575,25 +575,21 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 		}
 	}	
 
-#ifdef TMNTSP
-	// GAME_LOADGAME
-	if (svs.loadgame[0])
-	{
-		// We were loading a savegame...
-		Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s\n", svs.loadgame));
-		svs.loadgame[0] = '\0';
-	}
-	else
-	{
-		// Turtle Man: TODO: Call G_LoadPersistant here?
-	}
-#endif
-
 	// run another frame to allow things to look at all the players
 	VM_Call (gvm, GAME_RUN_FRAME, sv.time);
 	SV_BotFrame (sv.time);
 	sv.time += 100;
 	svs.time += 100;
+
+#ifdef TMNTSP
+	// GAME_LOADGAME
+	if (svs.loadgame[0])
+	{
+		// We were loading a savegame...
+		Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s 1\n", svs.loadgame));
+		svs.loadgame[0] = '\0';
+	}
+#endif
 
 #ifdef IOQ3ZTM
 	// the server sends these to the clients so they will only
