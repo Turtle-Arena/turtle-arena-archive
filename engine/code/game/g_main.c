@@ -1151,13 +1151,6 @@ void MoveClientToIntermission( gentity_t *ent ) {
 	{
 		// Don't move clients in single player.
 		ent->client->ps.pm_type = PM_SPINTERMISSION;
-		ent->client->ps.eFlags = EF_FINISHED;
-		ent->s.eFlags = EF_FINISHED;
-		ent->s.eType = ET_GENERAL;
-		ent->s.modelindex = 0;
-		ent->s.loopSound = 0;
-		ent->s.event = 0;
-		ent->r.contents = 0;
 		return;
 	}
 #endif
@@ -1240,30 +1233,38 @@ void BeginIntermission( void ) {
 	level.intermissiontime = level.time;
 	FindIntermissionPoint();
 
-#ifdef MISSIONPACK
+#ifdef TMNTSP
+	// if custom game and not co-op
+	if (g_singlePlayer.integer == 2 && g_gametype.integer != GT_SINGLE_PLAYER) {
+		UpdateTournamentInfo();
+	}
+#elif defined MISSIONPACK
 	if (g_singlePlayer.integer) {
-#ifndef TMNTSP
 		trap_Cvar_Set("ui_singlePlayerActive", "0");
-#endif
 		UpdateTournamentInfo();
 	}
 #else
 	// if single player game
 	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
 		UpdateTournamentInfo();
-#ifndef TMNTSP
 		SpawnModelsOnVictoryPads();
-#endif
 	}
 #endif
+
 
 	// move all clients to the intermission point
 	for (i=0 ; i< level.maxclients ; i++) {
 		client = g_entities + i;
 		if (!client->inuse)
 			continue;
+
 		// respawn if dead
-		if (client->health <= 0) {
+		if (client->health <= 0
+#ifdef TMNTSP
+			&& g_gametype.integer != GT_SINGLE_PLAYER
+#endif
+			)
+		{
 			respawn(client);
 		}
 		MoveClientToIntermission( client );
@@ -1395,6 +1396,7 @@ void LogExit( const char *string ) {
 	gclient_t		*cl;
 #ifdef MISSIONPACK
 	qboolean won = qtrue;
+	team_t team = TEAM_RED; // Default team is red in Team Arena and blue in Quake3
 #endif
 	G_LogPrintf( "Exit: %s\n", string );
 
@@ -1431,11 +1433,21 @@ void LogExit( const char *string ) {
 
 		G_LogPrintf( "score: %i  ping: %i  client: %i %s\n", cl->ps.persistant[PERS_SCORE], ping, level.sortedClients[i],	cl->pers.netname );
 #ifdef MISSIONPACK
+		if (g_singlePlayer.integer && !(g_entities[cl - level.clients].r.svFlags & SVF_BOT)) {
+			team = cl->sess.sessionTeam;
+		}
 		if (g_singlePlayer.integer && g_gametype.integer == GT_TOURNAMENT) {
 			if (g_entities[cl - level.clients].r.svFlags & SVF_BOT && cl->ps.persistant[PERS_RANK] == 0) {
 				won = qfalse;
 			}
 		}
+#ifdef TMNTSP
+		if (g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER) {
+			if (!cl->ps.persistant[PERS_LIVES] && !cl->ps.persistant[PERS_CONTINUES]) {
+				won = qfalse;
+			}
+		}
+#endif
 #endif
 
 	}
@@ -1443,7 +1455,10 @@ void LogExit( const char *string ) {
 #ifdef MISSIONPACK
 	if (g_singlePlayer.integer) {
 		if (g_gametype.integer >= GT_CTF) {
-			won = level.teamScores[TEAM_RED] > level.teamScores[TEAM_BLUE];
+			if (team == TEAM_BLUE)
+				won = level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED];
+			else
+				won = level.teamScores[TEAM_RED] > level.teamScores[TEAM_BLUE];
 		}
 		trap_SendConsoleCommand( EXEC_APPEND, (won) ? "spWin\n" : "spLose\n" );
 	}
@@ -1470,7 +1485,7 @@ void CheckIntermissionExit( void ) {
 	int			readyMask;
 
 #ifdef TMNTSP
-	if ( g_singlePlayer.integer ) {
+	if ( g_singlePlayer.integer == 2 && g_gametype.integer != GT_SINGLE_PLAYER ) {
 		return;
 	}
 #else
@@ -1676,8 +1691,8 @@ void CheckExitRules( void ) {
 			if (g_singlePlayer.integer == 1)
 			{
 				// Return to the title screen.
-				trap_Cvar_Set( "sv_killserver", "1" );
-				//trap_DropClient( 0, "Game Over" );
+				trap_Cvar_Set("nextmap", "disconnect");
+				LogExit( "Game Over" );
 				return;
 			}
 			else

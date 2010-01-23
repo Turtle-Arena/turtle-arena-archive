@@ -172,7 +172,11 @@ UI_SPSkillMenu_Key
 =================
 */
 static sfxHandle_t UI_SPSkillMenu_Key( int key ) {
-	if( key == K_MOUSE2 || key == K_ESCAPE ) {
+	if(
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+	key == K_MOUSE2 ||
+#endif
+	key == K_ESCAPE ) {
 		trap_S_StartLocalSound( skillMenuInfo.silenceSound, CHAN_ANNOUNCER );
 	}
 	return Menu_DefaultKey( &skillMenuInfo.menu, key );

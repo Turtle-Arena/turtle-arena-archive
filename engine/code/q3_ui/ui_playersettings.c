@@ -290,7 +290,11 @@ PlayerSettings_MenuKey
 =================
 */
 static sfxHandle_t PlayerSettings_MenuKey( int key ) {
-	if( key == K_MOUSE2 || key == K_ESCAPE ) {
+	if(
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+		key == K_MOUSE2 ||
+#endif
+		key == K_ESCAPE ) {
 		PlayerSettings_SaveChanges();
 	}
 	return Menu_DefaultKey( &s_playersettings.menu, key );
