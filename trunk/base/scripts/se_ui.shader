@@ -5,7 +5,7 @@ ui/assets/titlebanner
 {
 	nomipmaps
 	{
-		map ui/assets/titlebanner.png
+		map menu/art/titlebanner.png
 		blendfunc blend
 	}
 }
