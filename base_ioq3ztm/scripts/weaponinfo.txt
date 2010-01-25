@@ -20,15 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// TODO: Remake Quake III: Team Arena weapon info.
-
-// Turtle Man: TODO: Add correct hit sounds for all weapons, see CG_MissileHitWall!
-// hitSound0
-// hitSound1
-// hitSound2
-// hitPlayerSound
-// hitMetalSound
-// bounceSound
+// TODO: Finish remaking Prox Mine Launcher weapon info.
 
 //
 // Gauntlet (Done; but need to check blade)
@@ -181,6 +173,8 @@ projectile "p_grenade"
 	wallmarkRadius 64
 	bounceType "PB_HALF"
 	useGravity 1
+	bounceSound0 "sound/weapons/grenade/hgrenb1a.wav"
+	bounceSound1 "sound/weapons/grenade/hgrenb2a.wav"
 }
 
 weapon "w_grenadel"
@@ -261,6 +255,9 @@ projectile "p_lightning"
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 12
 	speed 768 // range of instantDamage
+	hitSound0 "sound/weapons/lightning/lg_hit.wav"
+	hitSound1 "sound/weapons/lightning/lg_hit2.wav"
+	hitSound2 "sound/weapons/lightning/lg_hit3.wav"
 }
 
 weapon "w_lightning"
@@ -475,6 +472,9 @@ projectile "p_nail"
 	wallmarkRadius 12
 	spread 500
 	numProjectiles 15
+	hitPlayerSound "sound/weapons/nailgun/wnalimpl.wav"
+	hitMetalSound "sound/weapons/nailgun/wnalimpm.wav"
+	hitSound0 "sound/weapons/nailgun/wnalimpd.wav"
 }
 
 weapon "w_nailgun"
@@ -519,6 +519,7 @@ projectile "p_prox_mine"
 	deathType "PD_GRENADE"
 	useGravity 1
 	stickOnImpact 3
+	hitSound0 "sound/weapons/proxmine/wstbexpl.wav"
 }
 
 weapon "w_prox_launcher"
@@ -556,6 +557,11 @@ projectile "p_chaingun"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	spread 600
+
+	// In vanilla Quake III: Team Arena, Chaingun sounds were overriden with normal bullet sounds.
+	//hitPlayerSound "sound/weapons/vulcan/wvulimpl.wav"
+	//hitMetalSound "sound/weapons/vulcan/wvulimpm.wav"
+	//hitSound0 "sound/weapons/vulcan/wvulimpd.wav"
 }
 
 weapon "w_chaingun"
