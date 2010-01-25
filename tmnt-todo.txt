@@ -83,6 +83,8 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Remake UI/HUD using Quake III: Team Arena menu scripting?
 
+[bug] MISSIONPACK UI fails to start from .QVM, .SO works however... (Doesn't load id's QVM or mine)
+: recursive error after: ^3menu file not found: ui/menus.txt, using default
 
 // The below are somewhat long...
 
@@ -103,6 +105,7 @@ BETTER(not done?): When moving the camera around the player, focus on the player
 *** Or Load it from animation.cfg and allow loading 2 animation.cfg files for each player, one for body and one for head.
 
 [todo] Add MD5 model support (MD5 use single model and skeleton, the animations can move any part of the model, and multiple animations can animate at the same time.)
+[todo-after-above] Rerig and reanimate players in Blender for MD5
 
 [todo] Finish misc_object, with animation, triggering, taking-damage, and dieing.
 : Maybe with spawning a item on death, respawning, and pushable options.
