@@ -8,6 +8,7 @@ items/use_nothing.ogg is a copy of misc/menu4.ogg  (items/use_nothing is unused 
 weapons/melee_swing.ogg is a louder-version of weapons/change.ogg (For testing...)
 
 player/raph/death2 and death3 are copies of death1
+player/casey/death2 and death3 are copies of death1
 
 
 == Needed Sounds ==
@@ -17,8 +18,11 @@ TEMP: sound/misc/letterboxon
 TEMP: sound/misc/letterboxoff
 
 // player sounds
+base/sound/player/leo/*
+base/sound/player/don/*
 TEMP: base/sound/player/raph/*
-base/sound/player/casey/*
+base/sound/player/mike/*
+TEMP: base/sound/player/casey/*
 
 death1.wav
 death2.wav
@@ -81,10 +85,10 @@ TEMP:	cgs.media.noAmmoSound = trap_S_RegisterSound( "sound/weapons/noammo.wav", 
 TEMP:	cgs.media.talkSound = trap_S_RegisterSound( "sound/player/talk.wav", qfalse );
 TEMP:	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav", qfalse);
 
-//Used sounds from OpenArena for watr* sounds
-	cgs.media.watrInSound = trap_S_RegisterSound( "sound/player/watr_in.wav", qfalse);
-	cgs.media.watrOutSound = trap_S_RegisterSound( "sound/player/watr_out.wav", qfalse);
-	cgs.media.watrUnSound = trap_S_RegisterSound( "sound/player/watr_un.wav", qfalse);
+// I used the sounds from OpenArena
+OA:	cgs.media.watrInSound = trap_S_RegisterSound( "sound/player/watr_in.wav", qfalse);
+OA:	cgs.media.watrOutSound = trap_S_RegisterSound( "sound/player/watr_out.wav", qfalse);
+OA:	cgs.media.watrUnSound = trap_S_RegisterSound( "sound/player/watr_un.wav", qfalse);
 
 
 	cgs.media.respawnSound = trap_S_RegisterSound( "sound/items/respawn1.wav", qfalse );
@@ -92,7 +96,7 @@ TEMP:	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav", qfal
 	cgs.media.jumpPadSound = trap_S_RegisterSound ("sound/world/jumppad.wav", qfalse );
 
 	Footstep sounds;
-		step%d
+		step%d (default)
 		boot%d
 		DONE: clank%d
 
@@ -108,7 +112,7 @@ TEMP:	cgs.media.shurikenSound = trap_S_RegisterSound ("sound/items/use_shuriken.
 	cgs.media.sfx_ric2 = trap_S_RegisterSound ("sound/weapons/machinegun/ric2.wav", qfalse);
 	cgs.media.sfx_ric3 = trap_S_RegisterSound ("sound/weapons/machinegun/ric3.wav", qfalse);
 TEMP:	cgs.media.sfx_rockexp = trap_S_RegisterSound ("sound/weapons/rocket/rocklx1a.wav", qfalse);
-	cgs.media.sfx_plasmaexp = trap_S_RegisterSound ("sound/weapons/plasma/plasmx1a.wav", qfalse);
+DONE:	cgs.media.sfx_plasmaexp = trap_S_RegisterSound ("sound/weapons/plasma/plasmx1a.wav", qfalse);
 #ifdef MISSIONPACK
 	cgs.media.weaponHoverSound = trap_S_RegisterSound( "sound/weapons/weapon_hover.wav", qfalse );
 	cgs.media.winnerSound = trap_S_RegisterSound( "sound/feedback/voc_youwin.wav", qfalse );
@@ -120,9 +124,9 @@ DONE:	cgs.media.regenSound = trap_S_RegisterSound("sound/items/regen.wav", qfals
 
 if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
 
-	sound/feedback/redleads.wav - "Red leads"
-	sound/feedback/blueleads.wav - "Blue leads"
-	sound/feedback/teamstied.wav - "Teams are tied"
+TEMP:	sound/feedback/redleads.wav - "Red leads"
+TEMP:	sound/feedback/blueleads.wav - "Blue leads"
+TEMP:	sound/feedback/teamstied.wav - "Teams are tied"
 	sound/feedback/hit_teammate.wav - sfx
 
 	sound/teamplay/voc_red_scores.wav
@@ -156,7 +160,7 @@ if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
 	}
 
 	if ( cgs.gametype == GT_OBELISK || cg_buildScript.integer ) {
-		sound/teamplay/voc_base_attack.wav - "Your base is under attack!"
+TEMP:		sound/teamplay/voc_base_attack.wav - "Your base is under attack!"
 	}
 }
 

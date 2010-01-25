@@ -4176,6 +4176,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			case PD_PLASMA:
 				mod = cgs.media.ringFlashModel;
 				shader = cgs.media.plasmaExplosionShader;
+				sfx = cgs.media.sfx_plasmaexp;
 				break;
 			case PD_ROCKET:
 				mod = cgs.media.dishFlashModel;
@@ -4237,6 +4238,14 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			case PD_BULLET:
 				mod = cgs.media.bulletFlashModel;
 				shader = cgs.media.bulletExplosionShader;
+				r = rand() & 3;
+				if ( r == 0 ) {
+					sfx = cgs.media.sfx_ric1;
+				} else if ( r == 1 ) {
+					sfx = cgs.media.sfx_ric2;
+				} else {
+					sfx = cgs.media.sfx_ric3;
+				}
 				break;
 			case PD_RAIL:
 				mod = cgs.media.ringFlashModel;
@@ -4245,6 +4254,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #else
 				shader = cgs.media.railExplosionShader;
 #endif
+				sfx = cgs.media.sfx_plasmaexp;
 				break;
 			case PD_BFG:
 				mod = cgs.media.dishFlashModel;
@@ -4253,6 +4263,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #else
 				shader = cgs.media.bfgExplosionShader;
 #endif
+				sfx = cgs.media.sfx_rockexp;
 				break;
 			case PD_LIGHTNING:
 				//
@@ -4273,99 +4284,26 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			}
 		}
 		if ( r > 0 ) {
-			r = rand() % r;
-			sfx = cg_projectiles[weapon].hitSound[r];
+			r = rand() & 3;
+			if ( r < 2 ) {
+				sfx = cg_projectiles[weapon].hitSound[1];
+			} else if ( r == 2 ) {
+				sfx = cg_projectiles[weapon].hitSound[0];
+			} else {
+				sfx = cg_projectiles[weapon].hitSound[2];
+			}
 		}
 	}
 
 /* SOUNDS
 	switch ( weapon ) {
 	default:
-#ifdef MISSIONPACK
-	case WP_NAILGUN:
-		if( soundType == IMPACTSOUND_FLESH ) {
-			sfx = cgs.media.sfx_nghitflesh;
-		} else if( soundType == IMPACTSOUND_METAL ) {
-			sfx = cgs.media.sfx_nghitmetal;
-		} else {
-			sfx = cgs.media.sfx_nghit;
-		}
-		break;
-#endif
 	case WP_LIGHTNING:
 		// no explosion at LG impact, it is added with the beam
-		r = rand() & 3;
-		if ( r < 2 ) {
-			sfx = cgs.media.sfx_lghit2;
-		} else if ( r == 2 ) {
-			sfx = cgs.media.sfx_lghit1;
-		} else {
-			sfx = cgs.media.sfx_lghit3;
-		}
-		break;
-#ifdef MISSIONPACK
-	case WP_PROX_LAUNCHER:
-		sfx = cgs.media.sfx_proxexp;
-		break;
-#endif
-	case WP_GRENADE_LAUNCHER:
-		sfx = cgs.media.sfx_rockexp;
-		break;
-#endif
-	case WP_ROCKET_LAUNCHER:
-		sfx = cgs.media.sfx_rockexp;
-		break;
-#ifdef TMNTWEAPONS
-	case WP_HOMING_LAUNCHER:
-		sfx = cgs.media.sfx_rockexp;
-		break;
-#endif
-#ifndef TMNTWEAPONS
-	case WP_RAILGUN:
-		sfx = cgs.media.sfx_plasmaexp;
-		break;
-#endif
-	case WP_PLASMAGUN:
-		sfx = cgs.media.sfx_plasmaexp;
 		break;
 #ifndef TMNTWEAPONS
-	case WP_BFG:
-		sfx = cgs.media.sfx_rockexp;
-		break;
 	case WP_SHOTGUN:
 		sfx = 0;
-		break;
-
-#ifdef MISSIONPACK
-	case WP_CHAINGUN:
-		if( soundType == IMPACTSOUND_FLESH ) {
-			sfx = cgs.media.sfx_chghitflesh;
-		} else if( soundType == IMPACTSOUND_METAL ) {
-			sfx = cgs.media.sfx_chghitmetal;
-		} else {
-			sfx = cgs.media.sfx_chghit;
-		}
-
-		r = rand() & 3;
-		if ( r < 2 ) {
-			sfx = cgs.media.sfx_ric1;
-		} else if ( r == 2 ) {
-			sfx = cgs.media.sfx_ric2;
-		} else {
-			sfx = cgs.media.sfx_ric3;
-		}
-		break;
-#endif
-
-	case WP_MACHINEGUN:
-		r = rand() & 3;
-		if ( r == 0 ) {
-			sfx = cgs.media.sfx_ric1;
-		} else if ( r == 1 ) {
-			sfx = cgs.media.sfx_ric2;
-		} else {
-			sfx = cgs.media.sfx_ric3;
-		}
 		break;
 #endif
 	}
