@@ -138,7 +138,7 @@ void EA_Command(int client, char *command)
 {
 	botimport.BotClientCommand(client, command);
 } //end of the function EA_Command
-#ifdef TMNTWEAPSYS_EX // BOTLIB
+#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
 //===========================================================================
 //
 // Parameter:			-
@@ -167,6 +167,11 @@ void EA_SelectWeapon(int client, int weapon)
 
 	bi = &botinputs[client];
 
+#ifdef TMNTWEAPSYS_EX // TMNTWEAPSYS_EX_COMPAT
+	if (!weapon)
+		bi->actionflags |= ACTION_DROP_WEAPON;
+	else
+#endif
 	bi->weapon = weapon;
 } //end of the function EA_SelectWeapon
 #endif

@@ -446,7 +446,7 @@ float vectoyaw( const vec3_t vec ) {
 
 void G_InitGentity( gentity_t *e ) {
 	e->inuse = qtrue;
-#ifdef TMNTMISC // XREAL
+#ifdef TMNTWEAPSYS // XREAL
 	e->spawnTime = level.time;
 #endif
 	e->classname = "noclass";
@@ -794,8 +794,10 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 
 	// Turtle Man: Target players, overload base, and NPCs.
 	if (!target->client// && !target->takedamage
+#ifdef MISSIONPACK
 		&& !(source->client && target->pain == ObeliskPain
 			&& target->spawnflags != source->client->sess.sessionTeam)
+#endif
 #ifdef TMNTNPCSYS
 		&& !(source->client && target->s.eType == ET_NPC)
 #endif

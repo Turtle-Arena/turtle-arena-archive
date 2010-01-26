@@ -594,13 +594,15 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 		}
 
 		traceEnt = &g_entities[ tr.entityNum ];
-		
+
+#ifdef MISSIONPACK
 		// Can't damage your own obelisk
 		if (traceEnt->pain == ObeliskPain
 			&& traceEnt->spawnflags == ent->client->sess.sessionTeam)
 		{
 			continue;
 		}
+#endif
 
 		if (traceEnt->mustcut && !(dflags & DAMAGE_CUTS))
 		{

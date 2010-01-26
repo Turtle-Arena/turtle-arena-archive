@@ -759,18 +759,11 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	int		i;
 
 	// copy the state that the cgame is currently sending
-#ifdef TMNTWEAPSYS_EX
-#ifdef TMNTHOLDSYS/*2*/
-	cmd->holdable = cl.cgameUserCmdValue;
-#endif
-#else
+#if !defined TMNTWEAPSYS_EX || defined TMNTWEAPSYS_EX_COMPAT
 	cmd->weapon = cl.cgameUserCmdValue;
+#endif
 #ifdef TMNTHOLDSYS/*2*/
 	cmd->holdable = cl.cgameHoldableValue;
-#endif
-#endif
-#if !defined TMNTHOLDSYS/*2*/ && defined TMNTHOLDSYS2BOT
-	cmd->holdable = 0;
 #endif
 
 	// send the current server time so the amount of movement

@@ -767,7 +767,7 @@ static void Init_EA_Export( ea_export_t *ea ) {
 	ea->EA_MoveLeft = EA_MoveLeft;
 	ea->EA_MoveRight = EA_MoveRight;
 
-#ifdef TMNTWEAPSYS_EX // BOTLIB
+#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
 	ea->EA_DropWeapon = EA_DropWeapon;
 #else
 	ea->EA_SelectWeapon = EA_SelectWeapon;

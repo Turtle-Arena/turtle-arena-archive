@@ -622,7 +622,7 @@ void CG_PredictPlayerState( void ) {
 	}
 
 #ifdef TMNTHOLDSYS/*2*/ // Turtle Man: Fix for auto changing in PMove!
-		cg.holdableSelect = HI_NO_SELECT;
+	cg.holdableSelect = HI_NO_SELECT;
 #endif
 
 	if ( cg_showmiss.integer > 1 ) {

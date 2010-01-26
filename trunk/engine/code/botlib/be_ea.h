@@ -55,7 +55,7 @@ void EA_Use(int client);
 #endif
 
 //regular elementary actions
-#ifdef TMNTWEAPSYS_EX
+#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT
 void EA_DropWeapon(int client);
 #else
 void EA_SelectWeapon(int client, int weapon);

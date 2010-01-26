@@ -335,9 +335,9 @@ qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return syscall( CG_GETUSERCMD, cmdNumber, ucmd );
 }
 
-#if defined TMNTHOLDSYS/*2*/ && !defined TMNTWEAPSYS_EX
-void		trap_SetUserCmdValue( int stateValue, int holdableStateValue, float sensitivityScale ) {
-	syscall( CG_SETUSERCMDVALUE, stateValue, holdableStateValue, PASSFLOAT(sensitivityScale) );
+#if defined TMNTHOLDSYS/*2*/
+void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue ) {
+	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale), holdableValue );
 }
 #else
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale ) {

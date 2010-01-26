@@ -123,7 +123,7 @@ vmCvar_t	cg_drawFPS;
 vmCvar_t	cg_drawSnapshot;
 vmCvar_t	cg_draw3dIcons;
 vmCvar_t	cg_drawIcons;
-#ifndef TMNTMISC // NO_AMMO_WARNINGS
+#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
 vmCvar_t	cg_drawAmmoWarning;
 #endif
 vmCvar_t	cg_drawCrosshair;
@@ -277,7 +277,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
-#ifndef TMNTMISC // NO_AMMO_WARNINGS
+#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
 #endif
 	{ &cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE  },
