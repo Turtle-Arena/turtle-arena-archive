@@ -1501,6 +1501,9 @@ extern	vmCvar_t		cg_shadows;
 #ifndef NOTRATEDM // No gibs.
 extern	vmCvar_t		cg_gibs;
 #endif
+#ifdef IOQ3ZTM // DRAW_SPEED
+extern	vmCvar_t		cg_drawSpeed;
+#endif
 extern	vmCvar_t		cg_drawTimer;
 extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
