@@ -118,6 +118,9 @@ vmCvar_t	cg_shadows;
 #ifndef NOTRATEDM // No gibs.
 vmCvar_t	cg_gibs;
 #endif
+#ifdef IOQ3ZTM // DRAW_SPEED
+vmCvar_t	cg_drawSpeed;
+#endif
 vmCvar_t	cg_drawTimer;
 vmCvar_t	cg_drawFPS;
 vmCvar_t	cg_drawSnapshot;
@@ -268,6 +271,9 @@ static cvarTable_t cvarTable[] = {
 #endif
 	{ &cg_draw2D, "cg_draw2D", "1", CVAR_ARCHIVE  },
 	{ &cg_drawStatus, "cg_drawStatus", "1", CVAR_ARCHIVE  },
+#ifdef IOQ3ZTM // DRAW_SPEED
+	{ &cg_drawSpeed, "cg_drawSpeed", "0", CVAR_ARCHIVE  },
+#endif
 #ifdef TMNTMISC // Show the time on the HUD.
 	{ &cg_drawTimer, "cg_drawTimer", "1", CVAR_ARCHIVE  },
 #else

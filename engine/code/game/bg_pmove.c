@@ -41,9 +41,6 @@ float	pm_duckScale = 0.25f;
 float	pm_swimScale = 0.50f;
 float	pm_wadeScale = 0.70f;
 
-#ifdef TMNTPLAYERSYS
-float	pm_accelstart = 50.0f;
-#endif
 float	pm_accelerate = 10.0f;
 float	pm_airaccelerate = 1.0f;
 float	pm_wateraccelerate = 4.0f;
@@ -288,7 +285,7 @@ Handles user intended acceleration
 ==============
 */
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
-#if 1 // #ifndef TMNTMISC // Turtle Man: TEST
+#ifndef TMNTMISC // Turtle Man: TEST
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;
@@ -298,9 +295,6 @@ static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
 	if (addspeed <= 0) {
 		return;
 	}
-#ifdef TMNTPLAYERSYS
-	accel = pm->ps->accel / accel;
-#endif
 	accelspeed = accel*pml.frametime*wishspeed;
 	if (accelspeed > addspeed) {
 		accelspeed = addspeed;
@@ -320,9 +314,6 @@ static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
 	VectorSubtract( wishVelocity, pm->ps->velocity, pushDir );
 	pushLen = VectorNormalize( pushDir );
 
-#ifdef TMNTPLAYERSYS
-	accel = pm->ps->accel / accel;
-#endif
 	canPush = accel*pml.frametime*wishspeed;
 	if (canPush > pushLen) {
 		canPush = pushLen;
@@ -2981,41 +2972,15 @@ void PmoveSingle (pmove_t *pmove) {
     // Setup accelerates based on the per-player one.
 	if (pm->playercfg)
 	{
-		pm_accelstart = pm->playercfg->accelstart;
+		pm_accelerate = pm->playercfg->accelerate_speed;
 	}
 	else // NPCs
 	{
-		pm_accelstart = 50.0f;
+		pm_accelerate = 10;
 	}
-
-	if (pm->cmd.forwardmove || pm->cmd.rightmove)
-	{
-		if (pm->ps->accel < pm_accelstart)
-			pm->ps->accel = pm_accelstart;
-		else if ( pml.walking )
-			pm->ps->accel += pm->playercfg->accelerate_speed*pml.frametime;
-
-		if (pm->ps->accel > 100)
-			pm->ps->accel = 100;
-	}
-	else if (pm->ps->accel > 0)
-	{
-		pm->ps->accel -= pm->playercfg->accelerate_speed*pml.frametime*100;
-		if (pm->ps->accel <= 0)
-			pm->ps->accel = 0;
-		/*else
-		{
-			float accelspeed = pm->ps->accel / pm_accelerate;
-			int i;
-
-			for (i=0 ; i<3 ; i++) {
-				if (pm->ps->velocity[i] < 0)
-					pm->ps->velocity[i] += accelspeed;
-				else if (pm->ps->velocity[i] > 0)
-					pm->ps->velocity[i] -= accelspeed;
-			}
-		}*/
-	}
+	pm_airaccelerate = pm_accelerate * 0.1f;
+	pm_wateraccelerate = pm_accelerate * 0.4f;
+	pm_flyaccelerate = pm_accelerate * 0.8f;
 #endif
 
 #ifndef TMNT // POWERS
