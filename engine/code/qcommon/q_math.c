@@ -670,8 +670,11 @@ float AngleBetweenVectors(const vec3_t a, const vec3_t b)
 	// this results in:
 	//
 	// angle = acos( (a * b) / (|a| * |b|) )
-	// Turtle Man: NOTE: Must have IOQ3ZTM3 defined here
+#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 	return RAD2DEG(Q_acos(DotProduct(a, b) / (alen * blen)));
+#else
+	return RAD2DEG(acos(DotProduct(a, b) / (alen * blen)));
+#endif
 }
 #endif
 

@@ -600,7 +600,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		botlib_export->ea.EA_MoveRight( args[1] );
 		return 0;
 
-#ifdef TMNTWEAPSYS_EX // BOTLIB
+#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
 	case BOTLIB_EA_DROP_WEAPON:
 		botlib_export->ea.EA_DropWeapon( args[1] );
 		return 0;

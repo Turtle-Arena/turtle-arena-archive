@@ -2850,6 +2850,11 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 
 			cent = &cg_entities[ps->clientNum];
 
+			// Turtle Man: FIXME: Support secondary weapon!
+			// Use default flashOrigin when no flash model.
+			VectorCopy(cent->lerpOrigin, cent->pe.flashOrigin);
+			cent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
+
 			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->trailType == PT_LIGHTNING
 				&& bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->instantDamage)
 			{
@@ -3083,9 +3088,15 @@ void CG_NextWeapon_f( void ) {
 			cg.weaponSelect = 0;
 		}
 #ifndef TMNTWEAPONS
+#ifdef TMNTWEAPSYS
+		if ( cg.weaponSelect == cg.snap->ps.stats[STAT_DEFAULTWEAPON] ) {
+			continue;		// never cycle to gauntlet
+		}
+#else
 		if ( cg.weaponSelect == WP_GAUNTLET ) {
 			continue;		// never cycle to gauntlet
 		}
+#endif
 #endif
 		if ( CG_WeaponSelectable( cg.weaponSelect ) ) {
 			break;
@@ -3121,9 +3132,15 @@ void CG_PrevWeapon_f( void ) {
 			cg.weaponSelect = MAX_WEAPONS - 1;
 		}
 #ifndef TMNTWEAPONS
+#ifdef TMNTWEAPSYS
+		if ( cg.weaponSelect == cg.snap->ps.stats[STAT_DEFAULTWEAPON] ) {
+			continue;		// never cycle to gauntlet
+		}
+#else
 		if ( cg.weaponSelect == WP_GAUNTLET ) {
 			continue;		// never cycle to gauntlet
 		}
+#endif
 #endif
 		if ( CG_WeaponSelectable( cg.weaponSelect ) ) {
 			break;
@@ -4078,12 +4095,15 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 							   duration, isSprite );
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
-#ifndef TMNTWEAPONS
-		if ( weapon == WP_RAILGUN ) {
+#ifdef TMNTWEAPSYS
+		if (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_COLORIZE)
+#else
+		if ( weapon == WP_RAILGUN )
+#endif
+		{
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
 		}
-#endif
 #ifdef TMNTWEAPSYS // SPR_EXP_SCALE
 		le->radius = exp_base;
 		le->refEntity.radius = exp_add;

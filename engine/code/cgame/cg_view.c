@@ -937,6 +937,7 @@ Generates and draws a game scene and status information at the given time.
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback ) {
 	int		inwater;
 	float	mouseSensitivity;
+	int		weaponSelect;
 
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
@@ -975,17 +976,14 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	mouseSensitivity = cg.zoomSensitivity;
 #endif
 #ifdef TMNTWEAPSYS_EX
-#ifdef TMNTHOLDSYS/*2*/
-	trap_SetUserCmdValue( cg.holdableSelect, mouseSensitivity );
+	weaponSelect = 0;
 #else
-	trap_SetUserCmdValue( 0, mouseSensitivity );
+	weaponSelect = cg.weaponSelect;
 #endif
-#else
 #ifdef TMNTHOLDSYS/*2*/
-	trap_SetUserCmdValue( cg.weaponSelect, cg.holdableSelect, mouseSensitivity );
+	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.holdableSelect );
 #else
-	trap_SetUserCmdValue( cg.weaponSelect, mouseSensitivity );
-#endif
+	trap_SetUserCmdValue( weaponSelect, mouseSensitivity );
 #endif
 
 	// this counter will be bumped for every valid scene we generate

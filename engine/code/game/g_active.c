@@ -712,15 +712,15 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			{
 #endif
 				client->ammoTimes[w] += msec;
-				if ( client->ps.stats[STAT_AMMO] >= max ) {
+				if ( client->ps.ammo[w] >= max ) {
 					client->ammoTimes[w] = 0;
 				}
 				if ( client->ammoTimes[w] >= t ) {
 					while ( client->ammoTimes[w] >= t )
 						client->ammoTimes[w] -= t;
-					client->ps.stats[STAT_AMMO] += inc;
-					if ( client->ps.stats[STAT_AMMO] > max ) {
-						client->ps.stats[STAT_AMMO] = max;
+					client->ps.ammo[w] += inc;
+					if ( client->ps.ammo[w] > max ) {
+						client->ps.ammo[w] = max;
 					}
 				}
 #ifdef TMNTWEAPSYS
@@ -1038,12 +1038,14 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 #endif // MISSIONPACK
 
 #ifdef TMNTHOLDSYS
+#ifdef TMNTHOLDABLE
 				case HI_SHURIKEN:
 				case HI_ELECTRICSHURIKEN:
 				case HI_FIRESHURIKEN:
 				case HI_LASERSHURIKEN:
 					G_ThrowShuriken(ent, (holdable_t)event-EV_USE_ITEM0);
 					break;
+#endif
 
 				default:
 					G_Printf("  EV_USE_ITEM: No code for holdable %d.\n", event-EV_USE_ITEM0);

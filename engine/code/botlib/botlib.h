@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // Turtle Man: Botlib is not compatible with (io)quake3 (or anyone else)
 // Turtle Man: FIXME: Are there other defines that are not compatible?
-#if defined TMNTWEAPSYS || defined TMNTWEAPSYS_NOCOMPAT || defined TMNTWEAPSYS_EX || defined TMNTHOLDSYS
+#if defined TMNTWEAPSYS || defined TMNTWEAPSYS_NOCOMPAT || (defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT) || defined TMNTHOLDSYS
 	
 	#ifdef TMNTWEAPSYS // & 4
 		#define BOTLIB_API_BIT4 4
@@ -45,7 +45,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		#define BOTLIB_API_BIT32 0
 	#endif
 
-	#ifdef TMNTWEAPSYS_EX // & 8
+	#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // & 8
 		#define BOTLIB_API_BIT8 8
 	#else
 		#define BOTLIB_API_BIT8 0
@@ -143,7 +143,7 @@ typedef struct bot_input_s
 	float speed;			//speed in the range [0, 400]
 	vec3_t viewangles;		//the view angles
 	int actionflags;		//one of the ACTION_? flags
-#ifndef TMNTWEAPSYS_EX // BOTLIB
+#if !defined TMNTWEAPSYS_EX || defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
 	int weapon;				//weapon to use
 #endif
 #ifdef TMNTHOLDSYS
@@ -342,7 +342,7 @@ typedef struct ea_export_s
 	void	(*EA_MoveRight)(int client);
 	void	(*EA_Crouch)(int client);
 
-#ifdef TMNTWEAPSYS_EX // BOTLIB
+#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
 	void	(*EA_DropWeapon)(int client);
 #else
 	void	(*EA_SelectWeapon)(int client, int weapon);

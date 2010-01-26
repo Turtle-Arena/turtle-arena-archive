@@ -92,7 +92,7 @@ struct gentity_s {
 	char		*model;
 	char		*model2;
 
-#ifdef TMNTMISC // XREAL
+#ifdef TMNTWEAPSYS // XREAL
 	int			spawnTime;			// level.time when the object was spawned
 #endif
 	int			freetime;			// level.time when the object was freed

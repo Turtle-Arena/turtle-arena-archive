@@ -61,11 +61,11 @@ endif
 ifndef BUILD_DEFINES
   BUILD_DEFINES=
 endif
-ifndef QUAKE3
-  QUAKE3=
+ifndef BUILD_IOQ3
+  BUILD_IOQ3=
 endif
-ifndef BUILD_REALIOQUAKE3
-  BUILD_REALIOQUAKE3=
+ifndef BUILD_IOQ3ZTM
+  BUILD_IOQ3ZTM=
 endif
 
 # ioquake3 svn version that this is based on
@@ -109,24 +109,69 @@ ifeq ($(QUAKE3),1)
 
 	ifeq ($(BUILD_IOQ3ZTM),1)
 
-		# Build modified ioquake3; should be compatible with quake3 mods.
-		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
-							-DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
-							-DTMNTWEAPSYS -DRAVENMD4 -DOA_BLOOM
+		# Build ioq3ztm for running in TMNT Arena
+		IOQ3TMNT=0
 
+		ifeq ($(IOQ3TMNT),1)
+			ifneq ($(BUILD_CLIENT),1)
+			  BUILD_CLIENT     =0
+			endif
+			ifneq ($(BUILD_CLIENT_SMP),1)
+			  BUILD_CLIENT_SMP =0
+			endif
+			ifneq ($(BUILD_SERVER),1)
+			  BUILD_SERVER     =0
+			endif
+			ifneq ($(BUILD_GAME_SO),1)
+			  BUILD_GAME_SO    =0
+			endif
+
+			# Copied from TMNT Arena BUILD_DEFINES
+			ENGINE_CFLAGS = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
+						-DNOTRATEDM -DNOBLOOD -DRAVENMD4 \
+						-DTMNTHOLDSYS -DTMNTWEAPSYS_NOCOMPAT \
+						-DTMNTWEAPSYS -DTMNTPLAYERSYS \
+						-DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
+						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT
+
+			QUAKE3_CFLAGS =
+
+			# Use model tags for "true" melee attacking (Gauntlet)
+			#  Can't be used as a quake3 mod, as it uses new VM-to-server calls.
+			DED_USE_MODELS=1
+			ENGINE_CFLAGS += -DTMNT_GAME_MODELS
+			QUAKE3_CFLAGS += -DTMNT_GAME_MODELS
+
+			VERSION=1.36tmnt
+			BASEGAME=baseq3
+			BASEGAME_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS)
+			MISSIONPACK_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) \
+						-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+			ifndef COPYDIR
+				COPYDIR="/usr/local/games/tmntarena"
+			endif
+		else
+			# Build modified ioquake3, it only runs using its own sever/client binaries
+			#   and currently doesn't support Q3 mods.
+			BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
+								-DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
+								-DTMNTWEAPSYS -DOA_BLOOM
+
+			VERSION=1.36ztm
+
+			BASEGAME=baseq3
+			BASEGAME_FLAGS =
+			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+			ifndef COPYDIR
+				COPYDIR="/usr/local/games/quake3"
+			endif
+		endif
+
+		#
+		# Server-Only
+		#
 		USE_CODEC_VORBIS=1
 		USE_CODEC_THEORA=1
-
-		# Use model tags for "true" melee attacking (Gauntlet)
-		# (Can't be used as a quake3 mod, as it uses new VM-to-server calls.
-		#    It shouldn't break compatiblity with other q3 mods however -untested)
-		DED_USE_MODELS=1
-		BUILD_DEFINES += -DTMNT_GAME_MODELS
-
-		#
-		# These are known to break compatibility with q3 mods
-		#
-		#BUILD_DEFINES += -DIOQ3ZTM_NO_COMPAT -DTMNTWEAPSYS_NOCOMPAT
 
 		SERVERBIN=ioq3ztmded
 		CLIENTBIN=ioq3ztm
@@ -147,18 +192,17 @@ ifeq ($(QUAKE3),1)
 			BUILD_DIR=build-ioq3
 		endif
 
+		VERSION=1.36
+
+		BASEGAME=baseq3
+		BASEGAME_FLAGS =
+		MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+
+		ifndef COPYDIR
+			COPYDIR="/usr/local/games/quake3"
+		endif
+
 	endif
-
-	VERSION=1.36
-
-	BASEGAME=baseq3
-	BASEGAME_FLAGS =
-	MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
-
-	ifndef COPYDIR
-	COPYDIR="/usr/local/games/quake3"
-	endif
-
 
 else # END QUAKE3
 
@@ -167,7 +211,7 @@ else # END QUAKE3
 	#  - All of this can be overriden by makefile.local
 	###################################################################
 
-	# Please note: TMNT*SYS defines are general system changes, not specifiy for TMNT
+	# Please note: TMNT*SYS defines are general system changes, not total specifiy for TMNT Arena
 	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
 	# -DANALOG		 # TODO: Finish analog control.
 	# -DARRAYMAX     # TODO: This ''was'' going to remove the bit max problem with Q3 network (ie more then 16 weapons).
@@ -177,18 +221,24 @@ else # END QUAKE3
 	# -DTMNTWEAPSYS_NOCOMPAT removes botlib weapon weight code because when WEAP_SCRIPT is define
 	#  							"game" does its own weapon weight stuff.
 	# -DTMNTWEAPSYS_EX changes from holding multiple weapons to only one default and one pickup.
+	# -DTMNTWEAPSYS_EX_COMPAT keeps compatiblity with mods not using TMNTWEAPSYS_EX
 	# -DTMNTHOLDSYS Allow players to hold multiple holdable items and change to any holdable.
 	#					(Based on Q3's weapon changing)
 	# -DTMNTNPCSYS   WIP NPC system, based on TDC_NPC system and code in Quake3
 
 	# Some of these aren't as independent as they should be, TMNTWEAPSYS requires TMNTPLAYERSYS,  etc
 	BUILD_DEFINES = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-						-DNOTRATEDM -DNOBLOOD -DTHIRD_PERSON -DRAVENMD4 \
-					-DTMNT -DTMNTMISC -DTMNTSP -DTMNTHOLDSYS -DTMNTHOLDABLE \
-						-DTMNTWEAPSYS -DTMNTWEAPSYS_NOCOMPAT -DTMNTWEAPSYS_EX -DTMNTWEAPONS -DTMNTPLAYERSYS \
-						-DTMNTPLAYERS -DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTPATHSYS -DTMNTNPCSYS \
-						-DTMNTDATA  -DOA_BLOOM \
-						 -DNIGHTSMODE
+						-DNOTRATEDM -DNOBLOOD -DRAVENMD4 \
+						-DTMNTHOLDSYS -DTMNTWEAPSYS_NOCOMPAT \
+						-DTMNTWEAPSYS -DTMNTPLAYERSYS \
+						-DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
+						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT
+
+	BUILD_DEFINES += -DTHIRD_PERSON -DTMNT -DTMNTMISC -DTMNTSP -DTMNTHOLDABLE \
+						-DTMNTWEAPSYS_EX -DTMNTWEAPONS \
+						-DTMNTPLAYERS \
+						-DTMNTDATA \
+						-DNIGHTSMODE
 
 	# Currently TMNT Arena doesn't use camera scripts.
 	BUILD_SPLINES=1 # Adds -DCAMERASCRIPT automaticly
@@ -1059,6 +1109,11 @@ endif #SunOS
 
 TARGETS =
 
+ifeq ($(IOQ3TMNT),1)
+  CLIENT_CFLAGS+=$(ENGINE_CFLAGS)
+  SERVER_CFLAGS+=$(ENGINE_CFLAGS)
+endif
+
 ifeq ($(BUILD_SPLINES),1)
   TARGETS += $(B)/splines/libsplines.a
   BUILD_DEFINES += -DCAMERASCRIPT
@@ -1168,11 +1223,7 @@ else
 endif
 
 BASE_CFLAGS += -DPRODUCT_VERSION=\\\"$(VERSION)\\\"
-# Turtle Man
 BASE_CFLAGS += $(BUILD_DEFINES)
-NOTSHLIBCFLAGS += $(BUILD_DEFINES)
-SHLIBCFLAGS += $(BUILD_DEFINES)
-#TOOLS_CFLAGS += $(BUILD_DEFINES)
 
 ifeq ($(V),1)
 echo_cmd=@:
@@ -1251,12 +1302,12 @@ endef
 
 define DO_AS
 $(echo_cmd) "AS $<"
-$(Q)$(CC) $(CFLAGS) -x assembler-with-cpp -o $@ -c $<
+$(Q)$(CC) $(CFLAGS) $(OPTIMIZE) -x assembler-with-cpp -o $@ -c $<
 endef
 
 define DO_DED_CC
 $(echo_cmd) "DED_CC $<"
-$(Q)$(CC) $(NOTSHLIBCFLAGS) -DDEDICATED $(CFLAGS) -o $@ -c $<
+$(Q)$(CC) $(NOTSHLIBCFLAGS) -DDEDICATED $(CFLAGS) $(SERVER_CFLAGS) $(OPTIMIZE) -o $@ -c $<
 endef
 
 define DO_WINDRES

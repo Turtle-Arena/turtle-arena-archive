@@ -675,7 +675,10 @@ gitem_t	bg_itemlist[] =
 	},
 #endif // TMNTWEAPONS
 
-#ifndef TMNTWEAPONS
+#ifdef TMNTWEAPSYS
+	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
+	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
+#elif !defined TMNTWEAPONS
 	//
 	// AMMO ITEMS
 	//
@@ -1212,7 +1215,9 @@ Only in CTF games
 	},
 #endif
 
-#ifndef TMNTWEAPONS
+#ifdef TMNTWEAPSYS
+	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
+#elif !defined TMNTWEAPONS
 /*QUAKED ammo_nails (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -4725,7 +4730,7 @@ char *eventnames[] = {
 	"EV_POWERUP_QUAD",
 	"EV_POWERUP_BATTLESUIT",
 	"EV_POWERUP_REGEN",
-#ifdef TMNT // POWERS
+#if !defined TMNT || defined NET_COMPAT  // POWERS
 	"EV_POWERUP_INVUL",
 #endif
 
@@ -4735,18 +4740,18 @@ char *eventnames[] = {
 	"EV_SCOREPLUM",			// score plum
 
 //#ifdef MISSIONPACK
-#ifndef TMNTWEAPONS
+#if !defined TMNTWEAPONS || defined NET_COMPAT
 	"EV_PROXIMITY_MINE_STICK",
 	"EV_PROXIMITY_MINE_TRIGGER",
 #endif
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if !defined TMNTHOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
 	"EV_KAMIKAZE",			// kamikaze explodes
 #endif
 	"EV_OBELISKEXPLODE",		// obelisk explodes
 #ifdef IOQ3ZTM // IOQ3BUGFIX: EV_OBELISKPAIN was missing here!
 	"EV_OBELISKPAIN",		// obelisk pain
 #endif
-#ifndef TMNT // POWERS
+#if !defined TMNT || defined NET_COMPAT  // POWERS
 	"EV_INVUL_IMPACT",		// invulnerability sphere impact
 	"EV_JUICED",				// invulnerability juiced effect
 	"EV_LIGHTNINGBOLT",		// lightning bolt bounced of invulnerability sphere
@@ -4754,7 +4759,7 @@ char *eventnames[] = {
 //#endif
 
 	"EV_DEBUG_LINE",
-#ifdef TMNTMISC // DEBUG_ORIGIN
+#if defined TMNTMISC || defined NET_COMPAT // DEBUG_ORIGIN
 	"EV_DEBUG_ORIGIN",
 #endif
 	"EV_STOPLOOPINGSOUND",

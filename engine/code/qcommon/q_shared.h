@@ -33,12 +33,19 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     #define CLIENT_WINDOW_TITLE     	"TMNT Arena"
     #define CLIENT_WINDOW_MIN_TITLE 	"TMNT Arena"
     #define GAMENAME_FOR_MASTER		"TMNTArena"
+  #elif defined IOQ3ZTM
+	// Standalone IOQ3ZTM is a mod for TMNT Arena
+    #define PRODUCT_NAME			"ioq3tmnt"
+    #define BASEGAME				"base"
+    #define CLIENT_WINDOW_TITLE     "ioquake3tmnt"
+    #define CLIENT_WINDOW_MIN_TITLE "ioq3tmnt"
+    #define GAMENAME_FOR_MASTER		"TMNTArena"
   #else
-  #define PRODUCT_NAME			"iofoo3"
-  #define BASEGAME			"foobar"
-  #define CLIENT_WINDOW_TITLE     	"changeme"
-  #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
-  #define GAMENAME_FOR_MASTER		"iofoo3"	// must NOT contain whitespaces
+    #define PRODUCT_NAME			"iofoo3"
+    #define BASEGAME			"foobar"
+    #define CLIENT_WINDOW_TITLE     	"changeme"
+    #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
+    #define GAMENAME_FOR_MASTER		"iofoo3"	// must NOT contain whitespaces
   #endif
 #else
   #define PRODUCT_NAME			"ioq3"
@@ -1147,7 +1154,7 @@ typedef struct playerState_s {
 #ifdef TMNTHOLDSYS
 	int			holdableIndex; // Index of holdable items, for shurikens.
 #endif
-#ifdef TMNTHOLDABLE
+#if defined TMNTHOLDABLE || defined NET_COMPAT
 	int			holdableTime;  // Like weaponTime, but for shurikens.
 #endif
 
@@ -1167,7 +1174,7 @@ typedef struct playerState_s {
 	int			stats[MAX_STATS];
 	int			persistant[MAX_PERSISTANT];	// stats that aren't cleared on death
 	int			powerups[MAX_POWERUPS];	// level.time that the powerup runs out
-#ifndef TMNTWEAPSYS_EX
+#if !defined TMNTWEAPSYS_EX || defined TMNTWEAPSYS_EX_COMPAT
 	int			ammo[MAX_WEAPONS];
 #endif
 #ifdef TMNTHOLDSYS
@@ -1178,7 +1185,7 @@ typedef struct playerState_s {
 	int			loopSound;
 	int			jumppad_ent;	// jumppad entity hit this frame
 
-#ifdef TMNT // LOCKON
+#if defined TMNT || defined NET_COMPAT // LOCKON
 	// Target for lockon
 	int			enemyEnt;
 	vec3_t		enemyOrigin;
@@ -1253,7 +1260,7 @@ typedef struct usercmd_s {
 	int				serverTime;
 	int				angles[3];
 	int 			buttons;
-#ifndef TMNTWEAPSYS_EX
+#if !defined TMNTWEAPSYS_EX || defined TMNTWEAPSYS_EX_COMPAT
 	byte			weapon;           // weapon 
 #endif
 #ifdef TMNTHOLDSYS/*2*/

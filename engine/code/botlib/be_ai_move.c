@@ -2821,7 +2821,7 @@ bot_moveresult_t BotTravel_RocketJump(bot_movestate_t *ms, aas_reachability_t *r
 	EA_View(ms->client, result.ideal_viewangles);
 	//view is important for the movment
 	result.flags |= MOVERESULT_MOVEMENTVIEWSET;
-#ifndef TMNTWEAPSYS_EX // BOTLIB
+#if !defined TMNTWEAPSYS_EX || defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
 	//select the rocket launcher
 	EA_SelectWeapon(ms->client, (int) weapindex_rocketlauncher->value);
 #endif

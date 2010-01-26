@@ -986,7 +986,7 @@ typedef enum {
 	EV_POWERUP_QUAD,
 	EV_POWERUP_BATTLESUIT,
 	EV_POWERUP_REGEN,
-#ifdef TMNT // POWERS
+#if !defined TMNT || defined NET_COMPAT  // POWERS
 	EV_POWERUP_INVUL,
 #endif
 
@@ -996,16 +996,16 @@ typedef enum {
 	EV_SCOREPLUM,			// score plum
 
 //#ifdef MISSIONPACK
-#ifndef TMNTWEAPONS
+#if !defined TMNTWEAPONS || defined NET_COMPAT
 	EV_PROXIMITY_MINE_STICK,
 	EV_PROXIMITY_MINE_TRIGGER,
 #endif
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if !defined TMNTHOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
 	EV_KAMIKAZE,			// kamikaze explodes
 #endif
 	EV_OBELISKEXPLODE,		// obelisk explodes
 	EV_OBELISKPAIN,			// obelisk is in pain
-#ifndef TMNT // POWERS
+#if !defined TMNT || defined NET_COMPAT  // POWERS
 	EV_INVUL_IMPACT,		// invulnerability sphere impact
 	EV_JUICED,				// invulnerability juiced effect
 	EV_LIGHTNINGBOLT,		// lightning bolt bounced of invulnerability sphere
@@ -1013,7 +1013,7 @@ typedef enum {
 //#endif
 
 	EV_DEBUG_LINE,
-#ifdef TMNTMISC // DEBUG_ORIGIN
+#if defined TMNTMISC || defined NET_COMPAT // DEBUG_ORIGIN
 	EV_DEBUG_ORIGIN,
 #endif
 	EV_STOPLOOPINGSOUND,

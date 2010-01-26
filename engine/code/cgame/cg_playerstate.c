@@ -447,10 +447,10 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD)) {
 			trap_S_StartLocalSound( cgs.media.deniedSound, CHAN_ANNOUNCER );
-		}
+		} else
 #endif
 #ifndef TMNTWEAPONS
-		else if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) !=
+		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD)) {
 			trap_S_StartLocalSound( cgs.media.humiliationSound, CHAN_ANNOUNCER );
 		}

@@ -20,13 +20,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
+#include "cg_local.h"
+#include "../ui/ui_shared.h"
+
 //#ifndef MISSIONPACK
 //#error This file not be used for classic Q3A.
 //#endif
 #ifdef MISSIONPACK
-
-#include "cg_local.h"
-#include "../ui/ui_shared.h"
 
 #ifdef MISSIONPACK_HUD
 extern displayContextDef_t cgDC;

@@ -165,7 +165,7 @@ void G_HomingMissile(gentity_t * ent)
 	vec_t           angle;
 	const int		HOMING_THINK_TIME = 60;
 
-#ifdef TMNTMISC // XREAL: spawnTime
+#ifdef TMNTWEAPSYS // XREAL: spawnTime
 	// explode after 15 seconds without a hit
 	if (bg_projectileinfo[ent->s.weapon].timetolive != -1
 		&& ent->spawnTime + bg_projectileinfo[ent->s.weapon].timetolive <= level.time)
@@ -1095,7 +1095,11 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 #if defined MISSIONPACK && !defined TMNT // POWERS
 	if ( other->takedamage ) {
+#ifdef TMNTWEAPSYS
+		if ( !bg_projectileinfo[ent->s.weapon].stickOnImpact )
+#else
 		if ( ent->s.weapon != WP_PROX_LAUNCHER )
+#endif
 		{
 			if ( other->client && other->client->invulnerabilityTime > level.time ) {
 				//

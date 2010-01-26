@@ -1243,8 +1243,7 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent ) {
 		}
 		if (!(ent->spawnflags & 2)) // Don't spawn melee weapons
 		{
-			if (bg_weapongroupinfo[i].weapon[0]->weapontype == WT_MELEE
-				|| bg_weapongroupinfo[i].weapon[0]->weapontype == WT_GAUNTLET) {
+			if (BG_WeapTypeIsMelee(bg_weapongroupinfo[i].weapon[0]->weapontype)) {
 				continue;
 			}
 		}

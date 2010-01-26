@@ -125,7 +125,7 @@ static void UI_Mods_LoadMods( void ) {
 
 	// always start off with baseq3
 	s_mods.list.numitems = 1;
-#ifdef TMNT
+#if defined TMNT || (defined STANDALONE && defined IOQ3ZTM)
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "TMNT Arena";
 #else
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Quake III Arena";

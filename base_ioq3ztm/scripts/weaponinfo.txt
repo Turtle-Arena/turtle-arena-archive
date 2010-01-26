@@ -39,7 +39,7 @@ weapon "w_gauntlet"
 	flashColor 0.6 0.6 1.0
 	firingSound "sound/weapons/melee/fstrun.wav"
 	flashSound0 "sound/weapons/melee/fstatck.wav"
-	barrelSpin BS_PITCH
+	//barrelSpin BS_PITCH
 
 	// Blade location hasn't been tested.
 	blade 0
@@ -100,7 +100,7 @@ weapon "w_machinegun"
 	flashSound1 "sound/weapons/machinegun/machgf2b.wav"
 	flashSound2 "sound/weapons/machinegun/machgf3b.wav"
 	flashSound3 "sound/weapons/machinegun/machgf4b.wav"
-	barrelSpin BS_ROLL
+	//barrelSpin BS_ROLL
 	projectile "p_machinegun"
 }
 
@@ -396,7 +396,7 @@ weapon "w_bfg"
 	flashColor 1 0.7 1
 	flashSound0 "sound/weapons/bfg/bfg_fire.wav"
 	readySound "sound/weapons/bfg/bfg_hum.wav"
-	barrelSpin BS_PITCH
+	//barrelSpin BS_PITCH
 	projectile "p_bfg"
 }
 

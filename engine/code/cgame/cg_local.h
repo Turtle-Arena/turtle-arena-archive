@@ -1506,7 +1506,7 @@ extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_draw3dIcons;
 extern	vmCvar_t		cg_drawIcons;
-#ifndef TMNTMISC // NO_AMMO_WARNINGS
+#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
 extern	vmCvar_t		cg_drawAmmoWarning;
 #endif
 extern	vmCvar_t		cg_drawCrosshair;
@@ -2140,9 +2140,9 @@ int			trap_GetCurrentCmdNumber( void );
 
 qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
 
-#if defined TMNTHOLDSYS/*2*/ && !defined TMNTWEAPSYS_EX
+#if defined TMNTHOLDSYS/*2*/
 // used for the weapon select, holdable select, and zoom
-void		trap_SetUserCmdValue( int stateValue, int holdableStateValue, float sensitivityScale );
+void		trap_SetUserCmdValue( int holdableValue, float sensitivityScale, int weaponValue );
 #else
 // used for the weapon select and zoom
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale );

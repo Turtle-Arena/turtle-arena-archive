@@ -2249,7 +2249,11 @@ void BotUseInvulnerability(bot_state_t *bs) {
 		if (VectorLengthSquared(dir) < Square(200)) {
 			BotAI_Trace(&trace, bs->eye, NULL, NULL, target, bs->client, CONTENTS_SOLID);
 			if (trace.fraction >= 1 || trace.ent == goal->entitynum) {
-				trap_EA_Use(bs->client);
+				trap_EA_Use(bs->client
+#ifdef TMNTHOLDSYS
+				, HI_INVULNERABILITY
+#endif
+				);
 				return;
 			}
 		}
@@ -2273,7 +2277,11 @@ void BotUseInvulnerability(bot_state_t *bs) {
 		if (VectorLengthSquared(dir) < Square(200)) {
 			BotAI_Trace(&trace, bs->eye, NULL, NULL, target, bs->client, CONTENTS_SOLID);
 			if (trace.fraction >= 1 || trace.ent == goal->entitynum) {
-				trap_EA_Use(bs->client);
+				trap_EA_Use(bs->client
+#ifdef TMNTHOLDSYS
+				, HI_INVULNERABILITY
+#endif
+				);
 				return;
 			}
 		}
@@ -2290,7 +2298,11 @@ void BotUseInvulnerability(bot_state_t *bs) {
 		if (VectorLengthSquared(dir) < Square(300)) {
 			BotAI_Trace(&trace, bs->eye, NULL, NULL, target, bs->client, CONTENTS_SOLID);
 			if (trace.fraction >= 1 || trace.ent == goal->entitynum) {
-				trap_EA_Use(bs->client);
+				trap_EA_Use(bs->client
+#ifdef TMNTHOLDSYS
+				, HI_INVULNERABILITY
+#endif
+				);
 				return;
 			}
 		}
@@ -2315,7 +2327,11 @@ void BotUseInvulnerability(bot_state_t *bs) {
 		if (VectorLengthSquared(dir) < Square(200)) {
 			BotAI_Trace(&trace, bs->eye, NULL, NULL, target, bs->client, CONTENTS_SOLID);
 			if (trace.fraction >= 1 || trace.ent == goal->entitynum) {
-				trap_EA_Use(bs->client);
+				trap_EA_Use(bs->client
+#ifdef TMNTHOLDSYS
+				, HI_INVULNERABILITY
+#endif
+				);
 				return;
 			}
 		}
@@ -2726,14 +2742,20 @@ BotFeelingBad
 */
 float BotFeelingBad(bot_state_t *bs) {
 #ifndef TMNTWEAPONS
+#ifdef TMNTWEAPSYS
+	if (bs->weaponnum == bs->cur_ps.stats[STAT_DEFAULTWEAPON]) {
+		return 100;
+	}
+#else
 	if (bs->weaponnum == WP_GAUNTLET) {
 		return 100;
 	}
 #endif
+#endif
 	if (bs->inventory[INVENTORY_HEALTH] < 40) {
 		return 100;
 	}
-#ifndef TMNTWEAPONS
+#ifndef TMNTWEAPSYS
 	if (bs->weaponnum == WP_MACHINEGUN) {
 		return 90;
 	}
@@ -5531,7 +5553,6 @@ void BotCheckForGrenades(bot_state_t *bs, entityState_t *state) {
 }
 
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS // missionpack
 /*
 ==================
 BotCheckForProxMines
@@ -5539,17 +5560,29 @@ BotCheckForProxMines
 */
 void BotCheckForProxMines(bot_state_t *bs, entityState_t *state) {
 	// if this is not a prox mine
-	if (state->eType != ET_MISSILE || state->weapon != WP_PROX_LAUNCHER)
+	if (state->eType != ET_MISSILE
+#ifdef TMNTWEAPSYS
+		|| !bg_projectileinfo[state->weapon].stickOnImpact
+#else
+		|| state->weapon != WP_PROX_LAUNCHER
+#endif
+		)
 		return;
 	// if this prox mine is from someone on our own team
 	if (state->generic1 == BotTeam(bs))
 		return;
+#ifdef TMNTWEAPSYS_EX
+	if (!G_CanShootProx(bs->cur_ps.weapon) && !G_CanShootProx(bs->cur_ps.stats[STAT_DEFAULTWEAPON])) {
+		return;
+	}
+#else
 	// if the bot doesn't have a weapon to deactivate the mine
 	if (!(bs->inventory[INVENTORY_PLASMAGUN] > 0 && bs->inventory[INVENTORY_CELLS] > 0) &&
 		!(bs->inventory[INVENTORY_ROCKETLAUNCHER] > 0 && bs->inventory[INVENTORY_ROCKETS] > 0) &&
 		!(bs->inventory[INVENTORY_BFG10K] > 0 && bs->inventory[INVENTORY_BFGAMMO] > 0) ) {
 		return;
 	}
+#endif
 	// try to avoid the prox mine
 	trap_BotAddAvoidSpot(bs->ms, state->pos.trBase, 160, AVOID_ALWAYS);
 	//
@@ -5558,7 +5591,6 @@ void BotCheckForProxMines(bot_state_t *bs, entityState_t *state) {
 	bs->proxmines[bs->numproxmines] = state->number;
 	bs->numproxmines++;
 }
-#endif
 
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
@@ -5852,10 +5884,8 @@ void BotCheckSnapshot(bot_state_t *bs) {
 	trap_BotAddAvoidSpot(bs->ms, vec3_origin, 0, AVOID_CLEAR);
 	//reset kamikaze body
 	bs->kamikazebody = 0;
-#ifndef TMNTWEAPONS
 	//reset number of proxmines
 	bs->numproxmines = 0;
-#endif
 	//
 	ent = 0;
 	while( ( ent = BotAI_GetSnapshotEntity( bs->client, ent, &state ) ) != -1 ) {

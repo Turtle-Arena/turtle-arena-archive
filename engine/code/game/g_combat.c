@@ -131,7 +131,7 @@ void TossClientItems( gentity_t *self ) {
 	// weapon that isn't the mg or gauntlet.  Without this, a client
 	// can pick up a weapon, be killed, and not drop the weapon because
 	// their weapon change hasn't completed yet and they are still holding the MG.
-#ifdef TMNTWEAPONS // Turtle Man: NOTE: It would change q3 gameplay, so not TMNTWEAPSYS?
+#ifdef TMNTWEAPSYS
 	if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON]) {
 #else
 	if ( weapon == WP_MACHINEGUN || weapon == WP_GRAPPLING_HOOK ) {

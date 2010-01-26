@@ -30,6 +30,7 @@ MULTIPLAYER MENU
 
 #include "ui_local.h"
 
+#ifdef TMNTMISC
 
 #define SETUP_MENU_VERTICAL_SPACING		34
 
@@ -226,3 +227,5 @@ void UI_MultiplayerMenu( void )
 	UI_Multiplayer_MenuInit();
 	UI_PushMenu( &multiplayerMenu.menu );
 }
+
+#endif // TMNTMISC

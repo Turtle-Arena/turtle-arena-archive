@@ -1353,6 +1353,38 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 #endif
 }
 
+#ifdef TMNTWEAPSYS_EX
+/*
+==================
+G_CanShootProx
+
+ return qtrue if w can be used to kill a proximity mine
+==================
+*/
+qboolean G_CanShootProx(weapon_t w)
+{
+	int i;
+
+	for (i = 0; i < MAX_HANDS; i++)
+	{
+		if (bg_weapongroupinfo[w].weapon[i]->weapontype != WT_GUN)
+			continue;
+		if (bg_weapongroupinfo[w].weapon[i]->proj->instantDamage)
+			continue;
+		if (bg_weapongroupinfo[w].weapon[i]->proj->splashDamage <= 0)
+			continue;
+		if (bg_weapongroupinfo[w].weapon[i]->proj->splashRadius <= 0)
+			continue;
+		if (bg_weapongroupinfo[w].weapon[i]->proj->flags & PF_USE_GRAVITY)
+			continue;
+
+		return qtrue;
+	}
+
+	return qfalse;
+}
+#endif
+
 /*
 ==================
 BotClearPath
@@ -1361,10 +1393,8 @@ BotClearPath
 ==================
 */
 void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
-#ifndef TMNTWEAPONS
 	int i, bestmine;
 	float dist, bestdist;
-#endif
 	vec3_t target, dir;
 	bsp_trace_t bsptrace;
 	entityState_t state;
@@ -1407,7 +1437,6 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 	if (moveresult->flags & MOVERESULT_BLOCKEDBYAVOIDSPOT) {
 		bs->blockedbyavoidspot_time = FloatTime() + 5;
 	}
-#ifndef TMNTWEAPONS
 	// if blocked by an avoid spot and the view angles and weapon are used for movement
 	if (bs->blockedbyavoidspot_time > FloatTime() &&
 		!(moveresult->flags & (MOVERESULT_MOVEMENTVIEW | MOVERESULT_MOVEMENTWEAPON)) ) {
@@ -1435,45 +1464,12 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			vectoangles(dir, moveresult->ideal_viewangles);
 			// if the bot has a weapon that does splash damage
 #ifdef TMNTWEAPSYS_EX
-            moveresult->weapon = 0;
-            if (bs->inventory[INVENTORY_AMMO] > 0)
-            {
-                switch (bs->inventory[INVENTORY_WEAPON])
-                {
-#ifdef TMNTWEAPONS
-                    case WEAPONINDEX_ELECTRIC_LAUNCHER:
-                    case WEAPONINDEX_ROCKET_LAUNCHER:
-                    case WEAPONINDEX_HOMING_LAUNCHER:
-#else
-					case WEAPONINDEX_PLASMAGUN:
-                    case WEAPONINDEX_ROCKET_LAUNCHER:
-                    case WEAPONINDEX_BFG:
-#endif
-                        moveresult->weapon = bs->inventory[INVENTORY_WEAPON];
-                    default:
-                        break;
-                }
-            }
-            if (!moveresult->weapon)
-            {
-                if (bs->inventory[INVENTORY_DEFAULTAMMO] > 0)
-                {
-                    switch (bs->inventory[INVENTORY_DEFAULTWEAPON])
-                    {
-#ifdef TMNTWEAPONS
-						case WEAPONINDEX_ELECTRIC_LAUNCHER:
-						case WEAPONINDEX_ROCKET_LAUNCHER:
-						case WEAPONINDEX_HOMING_LAUNCHER:
-#else
-						case WEAPONINDEX_PLASMAGUN:
-						case WEAPONINDEX_ROCKET_LAUNCHER:
-						case WEAPONINDEX_BFG:
-#endif
-                            moveresult->weapon = bs->inventory[INVENTORY_DEFAULTWEAPON];
-                        default:
-                            break;
-                    }
-                }
+            if (G_CanShootProx(bs->cur_ps.weapon))
+				moveresult->weapon = bs->cur_ps.weapon;
+            else if (G_CanShootProx(bs->cur_ps.stats[STAT_DEFAULTWEAPON]))
+            	moveresult->weapon = bs->cur_ps.stats[STAT_DEFAULTWEAPON];
+            else {
+            	moveresult->weapon = 0;
             }
 #elif defined TMNTWEAPONS // BETA
 			if (bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOELECTRIC] > 0)
@@ -1515,7 +1511,6 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			}
 		}
 	}
-#endif // !TMNTWEAPONS
 }
 
 /*

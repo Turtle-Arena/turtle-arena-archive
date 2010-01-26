@@ -1435,7 +1435,7 @@ static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 }
 #endif // #ifdef MISSIONPACK_HARVESTER
 
-#ifndef TMNT
+#if !defined TMNT && !defined TMNTWEAPSYS // LOCKON
 static
 #endif
 void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage ) {

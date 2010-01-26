@@ -977,14 +977,18 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 
 #if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
 	case UI_GET_CDKEY:
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 		CLUI_GetCDKey( VMA(1), args[2] );
+#endif
 #endif
 		return 0;
 
 	case UI_SET_CDKEY:
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 		CLUI_SetCDKey( VMA(1) );
+#endif
 #endif
 		return 0;
 #endif // IOQUAKE3 // Turtle Man: CDKEY
