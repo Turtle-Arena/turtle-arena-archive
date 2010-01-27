@@ -15,9 +15,48 @@ You will need to do a Source Checkout, see http://code.google.com/p/turtlearena/
 
 = Compiling the source =
 
-For the time being, see http://code.google.com/p/turtlearena/source/browse/trunk/tmnt-compiling.txt
+Currently the easist way to compile TMNT Arena is GNU Make.
 
-Also see http://wiki.ioquake3.org/Building_ioquake3
+== GNU Make ==
+  # In a terminal change to the engine/ directory and run "make"
+  # Output will be in engine/build/*dir*/ (Where *dir* is something like "release-linux-x86")
+
+== Code::Blocks ==
+NOTE: Compiling only works on Windows. However it can be used to view and edit the source on GNU/Linux.
+  # Open engine/misc/code_blocks/ioq3.workspace
+  # Rebuild workspace
+  # Output will be in engine/build/
+
+Defines maybe out of date... so copy the defines from the TMNT config section of the Makefile into all projects (Except Splines and BSPC).
+
+== Others ==
+See http://wiki.ioquake3.org/Building_ioquake3 for other platforms.
+
+=== Microsoft Visual C++ ===
+Currently unsupported. There are project files for ioquake3 in engine/misc/msvc/.
+
+Below are changes that ''should'' make the ioquake3 projects compile TMNT Arena. This is untested.
+
+Workspace:
+Add below to workspace
+engine/code/splines/Splines.vcproj
+
+Quake3 project:
+Link to the output library of Splines project.
+
+Cgame project:
+Add below to project
+  * engine/code/cgame/cg_npcs.c
+
+Game project:
+Add below to project
+  * engine/code/game/g_npc.c
+  * engine/code/game/g_npcmove.c
+  * engine/code/game/g_npcthink.c
+  * engine/code/game/g_save.c
+  * engine/code/game/g_paths.c
+
+Copy the defines from the TMNT config section of the Makefile into all projects (Except Splines).
 
 = Final setup and execution =
 
