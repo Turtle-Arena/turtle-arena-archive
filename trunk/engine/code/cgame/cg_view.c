@@ -830,20 +830,6 @@ static int CG_CalcViewValues( void ) {
 		}
 	}
 
-#ifdef ANALOG // Turtle Man: TODO?: Analog camera.
-	if (cg_thirdPerson.integer && cg_thirdPersonAnalog.integer)
-	{
-		// Analog camera.
-		cg.refdef.vieworg[0] = 0;
-		cg.refdef.vieworg[1] = 0;
-		cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight*2;
-
-		cg.refdefViewAngles[ROLL] = 0;
-		cg.refdefViewAngles[PITCH] = 0;
-		cg.refdefViewAngles[YAW] = 0;
-	}
-	else
-#endif
 	if ( cg.renderingThirdPerson ) {
 		// back away from character
 		CG_OffsetThirdPersonView();

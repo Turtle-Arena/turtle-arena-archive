@@ -132,7 +132,7 @@ ifeq ($(QUAKE3),1)
 						-DTMNTHOLDSYS -DTMNTWEAPSYS_NOCOMPAT \
 						-DTMNTWEAPSYS -DTMNTPLAYERSYS \
 						-DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
-						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT
+						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
 
 			QUAKE3_CFLAGS =
 
@@ -213,7 +213,7 @@ else # END QUAKE3
 
 	# Please note: TMNT*SYS defines are general system changes, not total specifiy for TMNT Arena
 	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
-	# -DANALOG		 # TODO: Finish analog control.
+	# -DANALOG		 # Allows players to rotate the camera and move based on the camera angles
 	# -DARRAYMAX     # TODO: This ''was'' going to remove the bit max problem with Q3 network (ie more then 16 weapons).
 	# -DTMNTWEAPSYS is the core changes to the weapon system
 	#					loads the weapons from a text file, allowing for easy modifing,
@@ -232,7 +232,7 @@ else # END QUAKE3
 						-DTMNTHOLDSYS -DTMNTWEAPSYS_NOCOMPAT \
 						-DTMNTWEAPSYS -DTMNTPLAYERSYS \
 						-DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
-						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT
+						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
 
 	BUILD_DEFINES += -DTHIRD_PERSON -DTMNT -DTMNTMISC -DTMNTSP -DTMNTHOLDABLE \
 						-DTMNTWEAPSYS_EX -DTMNTWEAPONS \

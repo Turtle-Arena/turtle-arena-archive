@@ -18,7 +18,7 @@ STARTED: [todo] Change TMNTWEAPONS stuff that is system to TMNTWEAPSYS[|_EX]
 
 STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features via weapon scripting
 
-[todo] Spawn Ammo items from weaponinfo.txt, instead of hardcoded ammo items.
+[todo] Spawn Ammo items from weaponinfo.txt
 : If I make it so weapon/ammo items are in text files, should I have all items in iteminfo.txt (and *.item) too?...
 
 [todo] Have weapons be seperate entities (ET_WEAPON) from the player,
@@ -89,12 +89,14 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 // The below are somewhat long...
 
 [todo] Update camera system.
-: Controls for moving chase cam (left, right, up, down) ~Currently use a long script from Team Arena...
-::(Nights - Move camera if holding 'z' and move analog stick ~can't look around while moving)
-: When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
+: DONE: Controls for moving chase cam (left, right, up, down)
+: (NiGHTS: Journey of Dreams) Move camera if holding 'z' and move analog stick, can't look around while moving
 BETTER(not done?): When moving the camera around the player, focus on the player. (Like in NiGHTS: Journey of Dreams)
 
-[todo] Optional Analog Control input
+STARTED(TMNT // LOCKON): [todo] When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
+
+DONE: Optional Analog-ish Control input
+: Start moving from angles of camera not player
 
 [todo] Merge Quake3 and Team Arena bot chat systems; One chat system to rule them all!
 * Problem: Team Arena adds voice chats, which are only used in gametypes >= GT_TEAM. There was also players that could only be used in gametypes >= GT_TEAM that did not have q3 chats. Leaving q3 players for FFA and Duel (with there normal q3 chats) (The TA players have no q3 chats and the players can't be used in q3, q3 players can't be used in gametypes >= GT_TEAM and have no voice chats.) So Team Arena had two seperate chat systems. TMNT Arena supports Q3 and Team Arena players in all gametypes and allows merged Q3/TA players. But in the gametypes >= GT_TEAM ONLY the TA voice chats are used. And like wise in non-team gametypes only "Q3 chats" are used.

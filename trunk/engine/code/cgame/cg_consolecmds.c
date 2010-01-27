@@ -601,6 +601,10 @@ void CG_CamUpdate(void)
 		cg_thirdPersonAngle.value -= 360;
 	if (cg_thirdPersonAngle.value < 0)
 		cg_thirdPersonAngle.value += 360;
+
+	// Update the cvar...
+	if (cg_thirdPersonAngle.integer != (int)cg_thirdPersonAngle.value)
+		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", cg_thirdPersonAngle.value));
 }
 
 void CG_CamReset_f(void)

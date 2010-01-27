@@ -11,21 +11,17 @@ Do "play testing" to find bugs and to find things to change, improve, and add.
 * Rewrite single player post-game data saving. Have it be more like in Team Arena then Q3, using ".game" files instead of cvars in config.
 : Or one single data file with all of the sp data (Or SP data files -like SRB2 2.0)
 
-* New teleport effect;
-: After teleporting have player "glow" blueish (using a shader, and Dlight?) and have player be non-solid (move though other players) and don't take damage (or low damage with random miss/hit). Time for the effect should be like 3 seconds and then flash and be normal (solid, no tele effect shader).
-
 === Future ===
 : Ideas for things to maybe do in the future, shouldn't try to do for demo 1.
 
 * NPCs (Sort of started, I replaced the TDC NPC stuff -totally removed the thinking code, however)
-* New camera system
 * NPRQuake has some awesome rendering options... (If I wanted it to look like a comic book it might help.)
 * Word filter http://code.google.com/p/sgfork/source/detail?r=5
 
 === Single Player Design/"Story" ===
 Ideas;
 * Try to fit into the 2003 TV series or just be standalone?
-* Have there be episodes/stages containing multiple levels.
+* Have there be stages containing multiple levels.
 * Have one of the stages take place in Usagi's world
 * Have one of the stages take place in Moo Mesa?
 * The Purple Dragons may appear
@@ -48,49 +44,22 @@ upper.md3
 // Hold default weapon of the player when not in use.
 + tag_wp_away_primary
 + tag_wp_away_secondary
-// Currently I just use tag_weapon / tag_flag so that TMNT skins can be used in Quake 3 and Team arena...
+// Currently I just use tag_weapon / tag_flag so that TMNT skins can be used in Quake III/Team Arena...
 + tag_weapon (for Quake 3/STV:EF? capatibility) -- Use like tag_hand_primary
 + tag_flag   (for Team Arena capatibility) -- Use like tag_hand_secondary
 // What tag(s) does Elite Force use?
-//+ tag_lhand  ?? (for Elite Force capatibility??) -- Use like tag_hand_secondary??
 
 lower.md3
 + tag_torso
-//+ tag_foot_primary
-//+ tag_foot_secondary
 
 Melee Weapon attack animations.
       TMNT Mutant Melee: sword type, axe/hammer type, gun type (Already in Q3...)
       TMNT Arena: TMNT:MM types plus Bo, Nunchuk, and more sword types
 
 == Camera ==
-The Q3 camera system needs to be rewritten, third person with be the default camera so it needs to work better.
-The new camera system should be desined to;
-* work with Analog Control in online/offline play.
-* run "scripts", I hope to remove the need for external textfiles from the map.
-* Possible "base" on ZCam? (--Non-GPL...) It is a enhanced spectator camera.
+Modify the camera system to;
+* work with Analog Control in online/offline play. (cg_thirdPersonAnalog)
 * Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
-* more...
-
-=== Analog Control ===
-TODO Analog mode:
-Analog should work in Netplay as well as offline. Should analog be client side or server side?,
-	clients can predicted it as well (if on server side)?
-
-cg_thirdPersonAnalog
-cg_thirdPersonAngle - Modify while cg_thirdPersonAnalog is 1.
-cg_thirdPersonRange
-cg.predictedPlayerState.viewheight?
-See also: CL_CreateCmd
-
-== MISSIONPACK ==
-Use parts of the MISSIONPACK
-ui scripting, and better team play stuff?
-
-DONE: Support 1 Flag CTF and Overload gametypes
-DONE: Use redFlagBaseModel and blueFlagBaseModel
-DONE: Use MISSIONPACK's new CTF flag code, flagPoleModel, flagFlapModel, and redFlagFlapSkin
-DONE (Code is done, Raph has no skins for it): Per-Team skins in team play.
 
 === Menu ===
 Use MISSIONPACK scripted menus.
@@ -133,13 +102,11 @@ TMNTWEAPSYS_EX is weapon code that adds on to TMNTWEAPSYS, making it more comple
 ** Backport to TMNTWEAPSYS? so players can drop a single weapon?
 * Auto drops guns when out of ammo (When player doesn't have PW_AMMOREGEN)
 
-TMNTWEAPONS Replace/remove Q3/TA's weapons with TMNT weapons. (Currently it has some of the SYS stuff, need to fix)
-* Q3's weapons have "_hand.md3" models for each gun, I currently use one of OpenArena for all weapons.
-: Due to the fact that _hand.md3 is only for first person, which I don't support currently.
+TMNTWEAPONS Replace/remove Q3/TA's weapons with TMNT weapons.
 
 TMNTHOLDSYS Allow up to 16 holdable items to be held at once (Like Q3 weapon sys, players can change to any holdable)
 
-TMNTHOLDABLE Adds shurikens (Which are holdable items) and disables some Q3/TA holdables.
+TMNTHOLDABLE Adds shurikens and disables some Q3/TA holdables.
 
 TMNT_GAME_MODELS Game is able to load models and get tag pos and angles (Allowing for better melee attacking)
 : Note the polygons (etc) are loaded as well, but currently unused. (tmnt ded server uses more RAM then q3 ded server.)
@@ -182,56 +149,4 @@ map1 = sp3a1
 
 == Links ==
 * http://patches.mercenariesguild.net/index.php?do=details&task_id=81
-
-
-== Dead ==
-Stuff that I should delete... [from this text file]
-
-=== Real Melee Attacking (Done) ===
-If we move LerpFrame stuff from cg/ui to bg, we would have the animations correct
-	but we would still need the model to find the tag locations,
-	(FIXED: Now ded can load models)
-	so we would need to load the tags from the models, without using the render.
-
-Move lerpFrame_t to bg_public.h
-Copy CG_RunLerpFrame CG_SetLerpFrameAnimation and CG_ClearLerpFrame to bg as BG_*
-Disable CG_RunLerpFrame CG_SetLerpFrameAnimation and CG_ClearLerpFrame
-Disable UI_RunLerpFrame UI_SetLerpFrameAnimation
-Add "lerpFrame_t legs, torso;" to gclient_s
-Run the gclient_s legs/torso lerp in game
-
-Side Effects:
-* Use more net bandwith; If lerpFrame was move to bg, the torso and legs would have to be sent across
-	the network as only the "local player" is run though Pmove().
-** fix -- Leave legs/torso/flag to playerEntity_t, but use BG_* lerp funtions.
-
-LerpFrame stuff:
-lerpFrame_t
-CG_RunLerpFrame CG_SetLerpFrameAnimation and CG_ClearLerpFrame
-UI_RunLerpFrame UI_SetLerpFrameAnimation
-== Players ==
-This was said about the 2003 series first console game.
-    Leonardo
-    Strength: Best attack accuracy.
-    Weakness: Cannot dodge attacks as well as everyone else.
-
-    Donatello
-    Strength: Longest attack reach.
-    Weakness: Slowest.
-
-    Michaelangelo
-    Strength: Fastest
-    Weakness: Lowest attack accuracy
-
-    Raphael
-    Strength: Most powerful of all the turtles.
-    Weakness: Shortest attack reach.
-
-== What is wanted ==
-I was reading some reviews of the 2003 series games and I decide to make a list of what people said is missing or needs in the games. Its very incomplete.
-
-* 4-player support (lacked in the first game) --Will 64 players on LAN/internet do?...
-* Good stages
-* Mutant Melee had small stages
-* Better attack controls
 
