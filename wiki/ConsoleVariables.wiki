@@ -1,7 +1,7 @@
 #summary List of Console Variables
 #labels Phase-Implementation
 
-List of *Console variables* (also called Cvars) that have been added and removed from ioquake3 Team Arena. The list is incomplete.
+List of *Console variables* (also called Cvars) that have been added and removed from ioquake3 Team Arena. The list is incomplete and based on the SVN changes.
 
 = Added =
 
@@ -25,6 +25,8 @@ List of *Console variables* (also called Cvars) that have been added and removed
   * g_saveVersions
   * g_saveTypes
   * g_teleportFluxTime - Time in seconds to be non-solid after teleporting
+
+  * cg_drawSpeed - Draw player's speed on the HUD
 
 = Removed =
 
