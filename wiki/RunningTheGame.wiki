@@ -15,14 +15,17 @@ You will need to do a Source Checkout, see http://code.google.com/p/turtlearena/
 
 = Compiling the source =
 
-Currently the easist way to compile TMNT Arena is GNU Make.
+Currently the easist way to compile TMNT Arena is Make.
 
-== GNU Make ==
+== Linux - Make ==
   # In a terminal change to the engine/ directory and run "make"
   # Output will be in engine/build/*dir*/ (Where *dir* is something like "release-linux-x86")
 
-== Code::Blocks ==
-NOTE: Compiling only works on Windows. However it can be used to view and edit the source on GNU/Linux.
+== Windows - Make ==
+See http://wiki.ioquake3.org/Building_ioquake3_on_Windows_-_mingw_and_msys
+
+== Windows - Code::Blocks ==
+NOTE: Compiling only works on Windows. However it can be used to view and edit the source on other platforms.
   # Open engine/misc/code_blocks/ioq3.workspace
   # Rebuild workspace
   # Output will be in engine/build/
@@ -30,7 +33,7 @@ NOTE: Compiling only works on Windows. However it can be used to view and edit t
 Defines maybe out of date... so copy the defines from the TMNT config section of the Makefile into all projects (Except Splines and BSPC).
 
 == Others ==
-See http://wiki.ioquake3.org/Building_ioquake3 for other platforms.
+See http://wiki.ioquake3.org/Building_ioquake3 for other platforms and methods of building.
 
 === Microsoft Visual C++ ===
 Currently unsupported. There are project files for ioquake3 in engine/misc/msvc/.
