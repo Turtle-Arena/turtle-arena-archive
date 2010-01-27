@@ -846,12 +846,11 @@ int BG_NumWeaponGroups(void);
 void BG_InitWeaponInfo(void);
 int BG_MaxAttackCombo(playerState_t *ps);
 
-weapontype_t BG_WeaponTypeForPlayerState(playerState_t *ps);
-weapontype_t BG_WeaponTypeForEntityState(entityState_t *es);
-weapontype_t BG_WeaponTypeForNum(weapon_t weaponnum);
 int BG_WeaponHandsForPlayerState(playerState_t *ps);
 int BG_WeaponHandsForWeaponNum(weapon_t weaponnum);
 qboolean BG_WeapTypeIsMelee(weapontype_t wt);
+qboolean BG_WeaponHasMelee(weapon_t weaponnum);
+qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt);
 qboolean BG_WeapUseAmmo(weapon_t w);
 qboolean BG_PlayerAttackAnim(int a);
 qboolean BG_PlayerStandAnim(int a);

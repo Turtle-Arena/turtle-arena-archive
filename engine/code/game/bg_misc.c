@@ -3835,78 +3835,11 @@ animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum)
 BG_TorsoAttackForWeapon
 
 For ui/q3_ui
-
-Turtle Man: TODO: Remove BG_TorsoAttackForWeapon??
 ==============
 */
 animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum)
 {
 	return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[0];
-}
-
-/*
-==============
-BG_WeaponTypeForPlayerState
-
-Turtle Man: TODO: Remove BG_WeaponTypeForPlayerState!!
-==============
-*/
-weapontype_t BG_WeaponTypeForPlayerState(playerState_t *ps)
-{
-	weapontype_t wt;
-
-	if (ps == NULL || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
-	{
-		return WT_NONE;
-	}
-
-	wt = bg_weapongroupinfo[ps->weapon].weapon[0]->weapontype;
-	// What of bg_weapongroupinfo[ps->weapon].weapon[1] ?
-
-	return wt;
-}
-
-/*
-==============
-BG_WeaponTypeForEntityState
-
-Turtle Man: TODO: Remove BG_WeaponTypeForEntityState!!
-==============
-*/
-weapontype_t BG_WeaponTypeForEntityState(entityState_t *es)
-{
-	weapontype_t wt;
-
-	if (es == NULL || es->weapon < 0 || es->weapon >= BG_NumWeaponGroups())
-	{
-		return WT_NONE;
-	}
-
-	wt = bg_weapongroupinfo[es->weapon].weapon[0]->weapontype;
-	// What of bg_weapongroupinfo[es->weapon].weapon[1] ?
-
-	return wt;
-}
-
-/*
-==============
-BG_WeaponTypeForNum
-
-Turtle Man: TODO: Remove BG_WeaponTypeForNum??
-==============
-*/
-weapontype_t BG_WeaponTypeForNum(weapon_t weaponnum)
-{
-	weapontype_t wt;
-
-	if (weaponnum <= 0 || weaponnum >= BG_NumWeaponGroups())
-	{
-		return WT_NONE;
-	}
-
-	wt = bg_weapongroupinfo[weaponnum].weapon[0]->weapontype;
-
-	return wt;
 }
 
 /*
@@ -3955,12 +3888,28 @@ qboolean BG_WeapTypeIsMelee(weapontype_t wt)
 	return (wt == WT_MELEE || wt == WT_GAUNTLET);
 }
 
+qboolean BG_WeaponHasMelee(weapon_t weaponnum)
+{
+	if (weaponnum <= 0 || weaponnum >= BG_NumWeaponGroups())
+		return qfalse;
+
+	return (BG_WeapTypeIsMelee(bg_weapongroupinfo[weaponnum].weapon[0]->weapontype) ||
+		BG_WeapTypeIsMelee(bg_weapongroupinfo[weaponnum].weapon[1]->weapontype));
+}
+
+qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt)
+{
+	if (weaponnum <= 0 || weaponnum >= BG_NumWeaponGroups())
+		return qfalse;
+
+	return (bg_weapongroupinfo[weaponnum].weapon[0]->weapontype == wt ||
+		bg_weapongroupinfo[weaponnum].weapon[1]->weapontype == wt);
+}
+
 qboolean BG_WeapUseAmmo(weapon_t w)
 {
-	weapontype_t wt = BG_WeaponTypeForNum(w);
-
 	// Guns use ammo, but grappling hook gun does not.
-	return (wt == WT_GUN && !bg_weapongroupinfo[w].weapon[0]->proj->grappling);
+	return (BG_WeaponHasType(w, WT_GUN) && !bg_weapongroupinfo[w].weapon[0]->proj->grappling);
 }
 
 qboolean BG_PlayerAttackAnim(int a)
@@ -6035,8 +5984,7 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 		// Look for a melee weapon, like Q3 gauntlet.
 		for (i = 1; i < max; i++)
 		{
-			if (bg_weapongroupinfo[i].weapon[0]->weapontype == WT_GUN
-				|| bg_weapongroupinfo[i].weapon[1]->weapontype == WT_GUN)
+			if (BG_WeaponHasType(i, WT_GUN))
 			{
 				continue;
 			}

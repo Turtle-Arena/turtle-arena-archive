@@ -2420,7 +2420,7 @@ static void PM_Weapon( void ) {
 #endif
 
 #ifdef TMNTWEAPSYS // Turtle Man: Weapon type code.
-	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) ))
+	if ( BG_WeaponHasMelee(pm->ps->weapon) )
 	{
 		// check for fire (Melee weapons can do damage while not holding attack)
 		if ( !pm->ps->meleeTime && !pm->ps->meleeDelay ) {
@@ -2440,7 +2440,7 @@ static void PM_Weapon( void ) {
 	}
 
 	// Gauntlet-type
-	if ( BG_WeaponTypeForPlayerState(pm->ps) == WT_GAUNTLET ) {
+	if ( BG_WeaponHasType(pm->ps->weapon, WT_GAUNTLET) ) {
 		// the guantlet only "fires" when it actually hits something
 		if ( !pm->gauntletHit ) {
 			pm->ps->weaponTime = 0;
@@ -2508,7 +2508,7 @@ static void PM_Weapon( void ) {
 	pm->ps->weaponstate = WEAPON_FIRING;
 
 	// MELEEATTACK
-	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) ) )
+	if ( BG_WeaponHasMelee(pm->ps->weapon) )
 	{
 		int anim;
 
@@ -2535,8 +2535,7 @@ static void PM_Weapon( void ) {
 #endif
 
 #ifdef TMNTWEAPSYS
-	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) )
-		&& BG_WeaponTypeForPlayerState(pm->ps) != WT_GAUNTLET)
+	if (BG_WeaponHasType(pm->ps->weapon, WT_MELEE))
 	{
 		pm->ps->weaponTime = pm->ps->meleeDelay;
 		return;

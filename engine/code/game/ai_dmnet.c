@@ -1297,17 +1297,11 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 #ifdef TMNTWEAPSYS_EX
     // Decide if the pickup waepon is better then default weapon.
 
-    //weapontype_t wt;
-    //weapontype_t dwt;
-
 	if ((bs->inventory[INVENTORY_WEAPON] == bs->inventory[INVENTORY_DEFAULTWEAPON])
         || bs->inventory[INVENTORY_WEAPON] <= 0)
     {
 		return bs->inventory[INVENTORY_DEFAULTWEAPON];
     }
-
-	//wt = BG_WeaponTypeForNum(bs->inventory[INVENTORY_WEAPON]);
-	//dwt = BG_WeaponTypeForNum(bs->inventory[INVENTORY_DEFAULTWEAPON]);
 
     // Gun with no ammo.
     if (BG_WeapUseAmmo(bs->inventory[INVENTORY_WEAPON]) && !bs->inventory[INVENTORY_AMMO])
