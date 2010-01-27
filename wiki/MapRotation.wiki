@@ -8,7 +8,7 @@ Each rotation set has a starting '{' and ending '}' braket. The type key set whi
 
 Each rotation set supports upto 32 maps (m1, m2, ..., m31, m32).  If a map is not in the rotation set for the currect gametype, it stays on the same map.
 
-Single Player only uses m1, which is used for resetting the game in multiplayer when all human players Game Over)
+Single Player only uses m1, which is used for resetting the game in multiplayer when all human players Game Over.
 
 == Type ==
 If there is no rotation set for duel or team, ffa rotation set is used. Like wise if there is no rotation set for oneflag or overload, ctf rotation set is used.
