@@ -155,10 +155,9 @@ void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
 void G_StartMeleeAttack(gentity_t *ent)
 {
 	gclient_t *client = ent->client;
-	weapontype_t wt = BG_WeaponTypeForPlayerState(&ent->client->ps);
 
 	// Make sure it is a melee weapon.
-	if ( !BG_WeapTypeIsMelee( wt ) ) {
+	if ( !BG_WeaponHasMelee(ent->client->ps.weapon) ) {
 		return;
 	}
 
@@ -402,6 +401,10 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 		return qfalse;
 	}
 #endif
+
+	if (!BG_WeapTypeIsMelee(wt)) {
+		return qfalse;
+	}
 
 	dflags = 0;
 	weaponnum = ent->client->ps.weapon;
@@ -694,15 +697,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 qboolean G_MeleeDamage(gentity_t *ent, qboolean forceDamage)
 {
 	qboolean rtn, rtn2;
-	weapontype_t wt;
 	qboolean damage;
-
-	wt = BG_WeaponTypeForPlayerState(&ent->client->ps);
-
-	// Make sure it is a melee weapon.
-	if ( !BG_WeapTypeIsMelee( wt ) ) {
-		return qfalse;
-	}
 
 	rtn = rtn2 = qfalse;
 
@@ -712,7 +707,7 @@ qboolean G_MeleeDamage(gentity_t *ent, qboolean forceDamage)
 		if (!damage) {
 			damage = (bg_weapongroupinfo[ent->client->ps.weapon].weapon[0]->flags & WIF_ALWAYS_DAMAGE);
 		}
-		rtn = G_MeleeDamageSingle(ent, damage, HAND_PRIMARY, wt, qfalse);
+		rtn = G_MeleeDamageSingle(ent, damage, HAND_PRIMARY, bg_weapongroupinfo[ent->client->ps.weapon].weapon[0]->weapontype, qfalse);
 	}
 	if (ent->client->ps.weaponHands & HAND_SECONDARY)
 	{
@@ -720,7 +715,7 @@ qboolean G_MeleeDamage(gentity_t *ent, qboolean forceDamage)
 		if (!damage) {
 			damage = (bg_weapongroupinfo[ent->client->ps.weapon].weapon[1]->flags & WIF_ALWAYS_DAMAGE);
 		}
-		rtn2 = G_MeleeDamageSingle(ent, damage, HAND_SECONDARY, wt, qfalse);
+		rtn2 = G_MeleeDamageSingle(ent, damage, HAND_SECONDARY, bg_weapongroupinfo[ent->client->ps.weapon].weapon[1]->weapontype, qfalse);
 	}
 
 	return (rtn || rtn2);
@@ -1572,45 +1567,41 @@ void FireWeapon( gentity_t *ent ) {
 	}
 
 #ifdef TMNTWEAPSYS
-    if (bg_weapongroupinfo[ent->s.weapon].weapon[0]->weapontype != WT_GUN)
+    if (bg_weapongroupinfo[ent->s.weapon].weapon[0]->weapontype == WT_GUN)
     {
-        return;
-    }
-
-	// set aiming directions
-	AngleVectors (ent->client->ps.viewangles, forward, right, up);
-	CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
-	if (ent->client->pers.playercfg.primaryHandSide == HAND_RIGHT)
-		VectorMA (muzzle, 4, right, muzzle);
-	else if (ent->client->pers.playercfg.primaryHandSide == HAND_LEFT)
-		VectorMA (muzzle, -4, right, muzzle);
+		// set aiming directions
+		AngleVectors (ent->client->ps.viewangles, forward, right, up);
+		CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
+		if (ent->client->pers.playercfg.primaryHandSide == HAND_RIGHT)
+			VectorMA (muzzle, 4, right, muzzle);
+		else if (ent->client->pers.playercfg.primaryHandSide == HAND_LEFT)
+			VectorMA (muzzle, -4, right, muzzle);
 
 #ifdef TMNT // LOCKON
-	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
-			muzzle, forward, right, up);
+		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
+				muzzle, forward, right, up);
 #endif
-	fire_weapon(ent, muzzle, forward, right, up,
-			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, ent->client->pers.playercfg.primaryHandSide);
-
-    if (bg_weapongroupinfo[ent->s.weapon].weapon[1]->weapontype != WT_GUN)
-    {
-        return;
+		fire_weapon(ent, muzzle, forward, right, up,
+				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, ent->client->pers.playercfg.primaryHandSide);
     }
 
-	// set aiming directions
-	AngleVectors (ent->client->ps.viewangles, forward, right, up);
-	CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
-	if (ent->client->pers.playercfg.secondaryHandSide == HAND_RIGHT)
-		VectorMA (muzzle, 4, right, muzzle);
-	else if (ent->client->pers.playercfg.secondaryHandSide == HAND_LEFT)
-		VectorMA (muzzle, -4, right, muzzle);
+    if (bg_weapongroupinfo[ent->s.weapon].weapon[1]->weapontype == WT_GUN)
+    {
+		// set aiming directions
+		AngleVectors (ent->client->ps.viewangles, forward, right, up);
+		CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
+		if (ent->client->pers.playercfg.secondaryHandSide == HAND_RIGHT)
+			VectorMA (muzzle, 4, right, muzzle);
+		else if (ent->client->pers.playercfg.secondaryHandSide == HAND_LEFT)
+			VectorMA (muzzle, -4, right, muzzle);
 
 #ifdef TMNT // LOCKON
-	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
-			muzzle, forward, right, up);
+		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
+				muzzle, forward, right, up);
 #endif
-	fire_weapon(ent, muzzle, forward, right, up,
-			bg_weapongroupinfo[ent->s.weapon].weaponnum[1], s_quadFactor, ent->client->pers.playercfg.secondaryHandSide);
+		fire_weapon(ent, muzzle, forward, right, up,
+				bg_weapongroupinfo[ent->s.weapon].weaponnum[1], s_quadFactor, ent->client->pers.playercfg.secondaryHandSide);
+    }
 #else
 	// set aiming directions
 	AngleVectors (ent->client->ps.viewangles, forward, right, up);
@@ -1937,48 +1928,44 @@ void NPC_FireWeapon(gentity_t *ent)
 
 	s_quadFactor=1;
 
-    if (bg_weapongroupinfo[ent->s.weapon].weapon[0]->weapontype != WT_GUN)
+    if (bg_weapongroupinfo[ent->s.weapon].weapon[0]->weapontype == WT_GUN)
     {
-        return;
+		// set aiming directions
+		AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
+		CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+		if (ent->bgNPC.info->primaryHandSide == HAND_RIGHT)
+			VectorMA (muzzle, 4, right, muzzle);
+		else if (ent->bgNPC.info->primaryHandSide == HAND_LEFT)
+			VectorMA (muzzle, -4, right, muzzle);
+
+	#ifdef TMNT // LOCKON
+		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
+				muzzle, forward, right, up);
+	#else
+		// NPC just shoots forward, not at target...
+	#endif
+		fire_weapon(ent, muzzle, forward, right, up,
+				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, ent->bgNPC.info->primaryHandSide);
     }
 
-	// set aiming directions
-	AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
-	CalcMuzzlePoint ( ent, forward, right, up, muzzle );
-	if (ent->bgNPC.info->primaryHandSide == HAND_RIGHT)
-		VectorMA (muzzle, 4, right, muzzle);
-	else if (ent->bgNPC.info->primaryHandSide == HAND_LEFT)
-		VectorMA (muzzle, -4, right, muzzle);
-
-#ifdef TMNT // LOCKON
-	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
-			muzzle, forward, right, up);
-#else
-	// NPC just shoots forward, not at target...
-#endif
-	fire_weapon(ent, muzzle, forward, right, up,
-			bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, ent->bgNPC.info->primaryHandSide);
-
-    if (bg_weapongroupinfo[ent->s.weapon].weapon[1]->weapontype != WT_GUN)
+    if (bg_weapongroupinfo[ent->s.weapon].weapon[1]->weapontype == WT_GUN)
     {
-        return;
-    }
-
-	// set aiming directions
-	AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
-	CalcMuzzlePoint ( ent, forward, right, up, muzzle );
-	if (ent->bgNPC.info->secondaryHandSide == HAND_RIGHT)
-		VectorMA (muzzle, 4, right, muzzle);
-	else if (ent->bgNPC.info->secondaryHandSide == HAND_LEFT)
-		VectorMA (muzzle, -4, right, muzzle);
+		// set aiming directions
+		AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
+		CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+		if (ent->bgNPC.info->secondaryHandSide == HAND_RIGHT)
+			VectorMA (muzzle, 4, right, muzzle);
+		else if (ent->bgNPC.info->secondaryHandSide == HAND_LEFT)
+			VectorMA (muzzle, -4, right, muzzle);
 
 #ifdef TMNT // LOCKON
-	G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
-			muzzle, forward, right, up);
+		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
+				muzzle, forward, right, up);
 #else
-	// NPC just shoots forward, not at target...
+		// NPC just shoots forward, not at target...
 #endif
-	fire_weapon(ent, muzzle, forward, right, up,
-			bg_weapongroupinfo[ent->s.weapon].weaponnum[1], s_quadFactor, ent->bgNPC.info->secondaryHandSide);
+		fire_weapon(ent, muzzle, forward, right, up,
+				bg_weapongroupinfo[ent->s.weapon].weaponnum[1], s_quadFactor, ent->bgNPC.info->secondaryHandSide);
+    }
 }
 #endif

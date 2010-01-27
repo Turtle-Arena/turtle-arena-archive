@@ -2041,16 +2041,13 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 {
 #if 0 // Turtle Man: Disabled
 	weapon_t weaponNum;
-	weapontype_t weaponType;
 	refEntity_t trail;
 	vec3_t		angles, dir;
 	float		angle, d;
 	float *yawAngle;
 	qboolean *yawing;
 
-	weaponType = BG_WeaponTypeForEntityState(&cent->currentState);
-
-	if (!BG_WeapTypeIsMelee(weaponType))
+	if (!BG_WeaponHasMelee(cent->currentState.weapon))
 	{
 		// Only melee weapons have trails.
 		return;
@@ -2364,7 +2361,6 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	centity_t	*nonPredictedCent;
 #ifdef TMNTWEAPSYS
 	float		barrelSpinAngle;
-	weapontype_t weaponType;
 	refEntity_t	gun_left; // Left (secondary) hand weapon.
 	//refEntity_t	gun; // Right (primary) hand weapon.
 	// When "both hand" share the weapon, primary hand tag is used.
@@ -2393,9 +2389,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		CG_AddPlayerDefaultWeapon(parent, cent, team);
 	}
 
-	weaponType = BG_WeaponTypeForEntityState(&cent->currentState);
-
-	if (weaponType == WT_NONE)
+	if (cent->currentState.weapon <= 0 || cent->currentState.weapon >= BG_NumWeaponGroups())
 	{
 		return;
 	}
@@ -3386,17 +3380,8 @@ void CG_FireWeapon( centity_t *cent ) {
 
 	// do brass ejection
 #ifdef TMNTWEAPSYS
-	// Turtle Man: TODO: If holding two gun switch firing between them,
-	//                     have a weapon group flag?
-	/*if (bg_weapongroupinfo[ent->weapon].weapon[0]->wt == WT_GUN
-		&& bg_weapongroupinfo[ent->weapon].weapon[1]->wt == WT_GUN)
-	{
-	}
-	else*/
-	{
-		CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.primaryHandSide, bg_weapongroupinfo[ent->weapon].weaponnum[0]);
-		CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.secondaryHandSide, bg_weapongroupinfo[ent->weapon].weaponnum[1]);
-	}
+	CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.primaryHandSide, bg_weapongroupinfo[ent->weapon].weaponnum[0]);
+	CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.secondaryHandSide, bg_weapongroupinfo[ent->weapon].weaponnum[1]);
 #else
 	if ( weap->ejectBrassFunc && cg_brassTime.integer > 0 ) {
 		weap->ejectBrassFunc( cent );
@@ -3647,7 +3632,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 
 #ifdef TMNTWEAPSYS
 	// Melee Weapon hit wall.
-	if (BG_WeapTypeIsMelee(BG_WeaponTypeForNum(weapon)))
+	if (BG_WeaponHasMelee(weapon)))
 	{
 		/*if( soundType == IMPACTSOUND_FLESH ) {
 			sfx = cgs.media.sfx_meleehit;//sfx_meleehitflesh;
@@ -4041,7 +4026,7 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 
 #ifdef TMNTWEAPSYS
 	// Melee Weapon hit wall.
-	if (BG_WeapTypeIsMelee(BG_WeaponTypeForNum(weapon)))
+	if (BG_WeaponHasMelee(weapon))
 	{
 		//CG_MeleeHit(origin);
 
@@ -4396,7 +4381,7 @@ This is called then there is a attack trace without a missile (melee weapons, li
 */
 void CG_WeaponHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum ) {
 
-	if (BG_WeapTypeIsMelee(BG_WeaponTypeForNum(weapon)))
+	if (BG_WeaponHasMelee(weapon))
 	{
 #ifndef NOBLOOD
 		if ((bg_weaponinfo[weapon].flags & WIF_CUTS) || (rand()&20 > 15))

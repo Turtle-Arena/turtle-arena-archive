@@ -1638,7 +1638,7 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	if (BG_PlayerAttackAnim(torsoAnim))
 	{
 		torsoAnim = BG_TorsoAttackForWeapon(weaponNum);
-		if (!BG_WeapTypeIsMelee(BG_WeaponTypeForNum(weaponNum)))
+		if (!BG_WeaponHasMelee(weaponNum))
 		{
 			pi->muzzleFlashTime = dp_realtime + UI_TIMER_MUZZLE_FLASH;
 		}

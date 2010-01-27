@@ -2559,7 +2559,7 @@ float BotAggression(bot_state_t *bs) {
 	if (bs->inventory[INVENTORY_QUAD]) {
 		//if the bot is not holding the gauntlet or the enemy is really nearby
 #ifdef TMNTWEAPSYS
-        if (!BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(&bs->cur_ps) )
+        if (!BG_WeaponHasMelee(bs->cur_ps.weapon)
 			|| BotCanUseShurikens(bs)
             || bs->inventory[ENEMY_HORIZONTAL_DIST] < 80)
 #else
@@ -3335,8 +3335,7 @@ bot_moveresult_t BotAttackMove(bot_state_t *bs, int tfl) {
 		}
 	}
 #ifdef TMNTWEAPSYS
-	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))
-		&& !BotCanUseShurikens(bs))
+	if (BG_WeaponHasMelee(bs->cur_ps.weapon) && !BotCanUseShurikens(bs))
 #else
 	if (bs->cur_ps.weapon == WP_GAUNTLET)
 #endif
@@ -4318,8 +4317,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	VectorSubtract(bs->aimtarget, bs->eye, dir);
 	//
 #ifdef TMNTWEAPSYS
-	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))
-		&& !BotCanUseShurikens(bs))
+	if (BG_WeaponHasMelee(bs->cur_ps.weapon) && !BotCanUseShurikens(bs))
 #else
 	if (bs->weaponnum == WP_GAUNTLET)
 #endif
@@ -4374,7 +4372,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	}
 	else
 #endif
-	if (!BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps)))
+	if (!BG_WeaponHasMelee(bs->cur_ps.weapon))
 	{
 		bgProj = bg_weapongroupinfo[bs->weaponnum].weapon[0]->proj;
 	}
@@ -4389,21 +4387,18 @@ void BotCheckAttack(bot_state_t *bs) {
 	{
 		// Turtle Man: FIXME: Is it bad to use g_entities in bot code?
 		// G_MeleeDamage
-		weapontype_t wt;
 		gentity_t *ent = &g_entities[bs->entitynum];
-
-		wt = BG_WeaponTypeForPlayerState(&bs->cur_ps);
 
 		if (bs->cur_ps.weaponHands & HAND_PRIMARY)
 		{
-			if (G_MeleeDamageSingle(ent, qfalse, HAND_PRIMARY, wt, qtrue))
+			if (G_MeleeDamageSingle(ent, qfalse, HAND_PRIMARY, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[0]->weapontype, qtrue))
 			{
 				return;
 			}
 		}
 		if (bs->cur_ps.weaponHands & HAND_SECONDARY)
 		{
-			if (G_MeleeDamageSingle(ent, qfalse, HAND_SECONDARY, wt, qtrue))
+			if (G_MeleeDamageSingle(ent, qfalse, HAND_SECONDARY, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[1]->weapontype, qtrue))
 			{
 				return;
 			}

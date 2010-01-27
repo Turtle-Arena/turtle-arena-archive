@@ -1478,7 +1478,7 @@ void ClientThink_real( gentity_t *ent ) {
 #ifdef TMNTWEAPSYS // MELEEATTACK
 	if (client->ps.pm_type != PM_DEAD)
 	{
-		if (BG_WeaponTypeForPlayerState(&client->ps) == WT_GAUNTLET)
+		if (BG_WeaponHasType(client->ps.weapon, WT_GAUNTLET))
 		{
 			if ((ucmd->buttons & BUTTON_ATTACK) && !(ucmd->buttons & BUTTON_TALK)
 				&& client->ps.weaponTime <= 0 )
