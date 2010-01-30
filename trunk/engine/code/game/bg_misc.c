@@ -5346,41 +5346,42 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 
 #ifdef TMNTPLAYERS
 	// Set defaults for TMNT animations
-		// default weapon, put away
+	// default weapon, put away
 	if (index >= TORSO_PUTDEFAULT_BOTH && index <= TORSO_PUTDEFAULT_SECONDARY)
-		{
+	{
 		anim[0] = TORSO_DROP;
 		anim[1] = TORSO_STAND2;
 		anim[2] = TORSO_STAND;
-		}
+	}
 
-		// default weapon, get out
+	// default weapon, get out
 	if (index >= TORSO_GETDEFAULT_BOTH && index <= TORSO_GETDEFAULT_SECONDARY)
-		{
+	{
 		anim[0] = TORSO_RAISE;
 		anim[1] = TORSO_STAND2;
 		anim[2] = TORSO_STAND;
-		}
+	}
 
-		// standing defaults
+	// standing defaults
 	if (index >= TORSO_STAND_GUN_PRIMARY && index <= TORSO_STAND_NUNCHUCKS1_PRIMARY)
-		{
+	{
 		anim[0] = TORSO_STAND2;
 		anim[1] = TORSO_STAND;
-		}
+	}
 
-		// attacking defaults
+	// attacking defaults
 	if (index == TORSO_ATTACK_GUN_PRIMARY
 		|| index == TORSO_ATTACK_SWORD1_BOTH_A
 		|| index == TORSO_ATTACK_SWORD2_A
 		|| index == TORSO_ATTACK_SAI2_A
 		|| index == TORSO_ATTACK_BO_A
 		|| index == TORSO_ATTACK_HAMMER_A
+		|| index == TORSO_ATTACK_NUNCHUCKS_A
 		)
-		{
+	{
 		anim[0] = TORSO_ATTACK2;
 		anim[1] = TORSO_ATTACK;
-		}
+	}
 	if ((index > TORSO_ATTACK_SWORD1_BOTH_A &&
 		index <= TORSO_ATTACK_SWORD1_BOTH_C)
 		|| (index > TORSO_ATTACK_SWORD2_A &&
