@@ -1,4 +1,5 @@
-raph_v8 is the current model in base. raph_v9 is the work-in-progress to fix and improve the model.
+The current player, raph_v8.mm3d, is a mix of raph_v8.wings and raph_v9.wings.
+Raph_v9 is the work-in-progress to fix and improve the model, some of which has been backported to raph_v8.mm3d.
 
 raph_v9.mm3d bone joint notes:
 u_torso_control Torso can rotate just the torso

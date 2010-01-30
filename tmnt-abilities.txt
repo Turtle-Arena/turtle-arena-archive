@@ -1,4 +1,4 @@
-Character abilities
+Character abilities ideas
 
 == Player Ideas ==
 Leo: ???
@@ -25,7 +25,7 @@ Player Ability: Tech
 Weapon Ability: Bo (Longer ranged, and usable to jump higher)
 Stats
 	Speed: Slow (300)
-	Accel: Fast (15)
+	Accel: Fast (12)
 SRB2-ish: Tails
 
 == Raph ==
@@ -33,7 +33,7 @@ Player Ability: Strength
 Weapon Ability: Sais (Climb and/or stick to walls)
 Stats
 	Speed: Normal (320)
-	Accel: Slow (5)
+	Accel: Normal (10)
 SRB2-ish: Knuckles
 
 == Mike ==
@@ -42,6 +42,5 @@ Weapon Ability: Nunchucks (???)
 Stats:
 	Speed: Fast (340)
 	Accel: Normal (10)
-	Accel: 
 SRB2-ish: Sonic
 
