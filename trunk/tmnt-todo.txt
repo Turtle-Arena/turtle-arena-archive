@@ -3,8 +3,7 @@ TMNT Arena TODO/BUGS file
 Bugs that have found that have not been fixed yet, and things that should to be done (or that I'd like to be done...).
 
 == Beta ==
-* Fix Leo/Don/Mike's tag_wp_away_* tags
-* Add player sounds for Leo/Don/Mike/Casey
+* Add player sounds for Leo/Don/Mike
 * New Melee swing sound effects
 * Finish animating raph_v9.mm3d
 
