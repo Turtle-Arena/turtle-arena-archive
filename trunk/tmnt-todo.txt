@@ -86,6 +86,8 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 [bug] MISSIONPACK UI fails to start from .QVM, .SO works however... (Doesn't load id's QVM or mine)
 : recursive error after: ^3menu file not found: ui/menus.txt, using default
 
+[todo] http://code.google.com/p/oax/wiki/Dynamic_QVM_Memory_Allocation
+
 // The below are somewhat long...
 
 [todo] Update camera system.
