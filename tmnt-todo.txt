@@ -87,6 +87,8 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] http://code.google.com/p/oax/wiki/Dynamic_QVM_Memory_Allocation
 
+[todo] Word filter http://code.google.com/p/sgfork/source/detail?r=5
+
 // The below are somewhat long...
 
 [todo] Update camera system.

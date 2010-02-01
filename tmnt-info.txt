@@ -1,12 +1,10 @@
 '''TMNT Arena''' is a Teenage Mutant Ninja Turtle fangame being made by ZTurtleMan based on the ioquake3 engine.
 
 == Current Features ==
-Currently the game does not a have a true single player mode, instead players play versus bots in different game types.
-
-* Two playable characters (Raph and Casey)
-* 6 playable gametypes (Free For All, Dual, Team Deathmatch, Capture the Flag (CTF), 1 Flag CTF, Overload)
-** Single Player/Co-op is there but unfinished.
-* 3 playable maps and a item test map.
+* Five playable characters (Leo, Don, Raph, Mike and Casey)
+* 7 playable gametypes (Single Player/Co-op, Free For All, Dual, Team Deathmatch, Capture the Flag (CTF), 1 Flag CTF, Overload)
+* Play versus bots in different game types.
+* 2 Single Player/Co-op maps and 3 playable multiplayer maps
 * Internet (and local network) multiplayer
 
 == Credits ==

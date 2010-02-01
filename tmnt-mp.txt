@@ -15,9 +15,9 @@ Additions from Team Arena, the plan is to remove and intagrate all parts of the 
 ** Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, as I set it 2x damage)
 ** Ammo Regen (Player ammo/shuriken counts slowly increment)
 
-* Chaingun --Supported by TMNTWEAPSYS
-* Nailgun --Supported by TMNTWEAPSYS
-* Prox Launcher --Partly supported, will never fully support by TMNTWEAPSYS
+* Chaingun --Supported
+* Nailgun --Supported
+* Prox Launcher --Partly supported
 
 * Voice chats for bots and humans
 * Per-team skins for players

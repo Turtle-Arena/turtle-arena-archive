@@ -14,11 +14,9 @@ Do "play testing" to find bugs and to find things to change, improve, and add.
 === Future ===
 : Ideas for things to maybe do in the future, shouldn't try to do for demo 1.
 
-* NPCs (Sort of started, I replaced the TDC NPC stuff -totally removed the thinking code, however)
 * NPRQuake has some awesome rendering options... (If I wanted it to look like a comic book it might help.)
-* Word filter http://code.google.com/p/sgfork/source/detail?r=5
 
-=== Single Player Design/"Story" ===
+== Single Player Design/"Story" ==
 Ideas;
 * Try to fit into the 2003 TV series or just be standalone?
 * Have there be stages containing multiple levels.
@@ -57,16 +55,7 @@ Melee Weapon attack animations.
       TMNT Arena: TMNT:MM types plus Bo, Nunchuk, and more sword types
 
 == Camera ==
-Modify the camera system to;
-* work with Analog Control in online/offline play. (cg_thirdPersonAnalog)
 * Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
-
-=== Menu ===
-Use MISSIONPACK scripted menus.
-See tmnt-menus.txt
-
-=== HUD ===
-Use MISSIONPACK scripted hud.
 
 == Objects ==
 : Objects and NPCs share lots of code...

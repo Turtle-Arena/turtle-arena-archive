@@ -1,35 +1,12 @@
-This file may help with creating addons for TMNT Arena. Currently it won't help much.
+TMNT Arena player skin search order.
 
-NOTE: Redoing and moving to the Google Code Wiki.
-
-== Overview ==
-:''If you have editing knowlegde of Quake III Arena or any other id tech 3 game you can skip this.''
-In TMNT Arena all of the data is stored in a .pk3 files, which are simply renamed .zip files.
-Pk3 files can be extracted with any zip program.
-
-TODO: More on this later.
-
-== Players ==
-There isn't a guide yet but if you open base/pak0.pk3 and look in "models/players/raph/" there is a full Raphael player. It is mostly the same as a Quake3 player, so you should be able to find information on the Web.
-
-Also see tmnt-editing-players.txt
-
-=== Animation.cfg ===
-TMNT Arena addes new keywords to animation.cfg
-
-TODO: More on this later.
-
-==== SoundPath ====
-By placing "soundpath dir" in animation.cfg the player will use sounds from "sound/dir/*" instead of "sound/PLAYERDIR/*"
-
-
-=== Skins ===
+= Skins =
 Below is the seach order for ".skin" files in TMNT Arena. It uses code from Quake III: Team Arena to allow per-team skins. So Team Arena Players work in Team gametypes as well as Quake 3 players.
 
 Note: "raph/mirage" is a example; raph is the model, mirage is the skin.
 
-==== Head ====
-:Team play
+== Head ==
+=== Team play ===
 headmodel = raph/mirage
 team = red
 
@@ -38,7 +15,7 @@ models/players/raph/head_red.skin
 models/players/heads/raph/mirage/head_red.skin
 models/players/heads/raph/head_red.skin
 
-:Non-Team play
+=== Non-Team play ===
 headmodel = raph/mirage
 
 models/players/raph/head_mirage.skin
@@ -46,8 +23,8 @@ models/players/heads/raph/head_mirage.skin
 
 Note: If headmodel starts with '*' ("*raph/mirage") the "heads" directory is checked then "players" directory is check.
 
-==== Body (lower/upper) ====
-:Team play
+== Body (lower/upper) ==
+=== Team play ===
 model = raph/mirage
 team = red
 g_redTeam = Sais
@@ -61,7 +38,7 @@ models/players/characters/raph/Sais/lower_red.skin
 models/players/characters/raph/lower_mirage_red.skin
 models/players/characters/raph/lower_red.skin
 
-:Non-Team play
+=== Non-Team play ===
 model = raph/mirage
 
 models/players/raph/lower_mirage.skin
