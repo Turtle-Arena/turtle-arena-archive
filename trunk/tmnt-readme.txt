@@ -45,7 +45,7 @@ TMNT Arena uses code directly or based on the following.
 ** RF_FORCE_ENT_ALPHA, it will be used so items/weapons fad out when dispearing.
 
 * OpenArena (OPENARENA): http://openarena.ws
-** Changed default sound filename. Load Ogg sounds (when no wav).
+** Changed default sound filename. Load Ogg Vorbis sounds (when no wav is found).
 ** (OA_BLOOM) OpenArena's bloom effect, disabled by default. (r_bloom 1 to enable)
 
 * Xreal (XREAL): http://www.xreal-project.net/

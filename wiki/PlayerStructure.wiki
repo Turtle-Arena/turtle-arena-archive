@@ -4,27 +4,32 @@
 
 <wiki:toc />
 
+= Locating the data =
+All of the data files are stored in base/assets0.pk3, which is simply a renamed .zip file.
+Pk3 files can be extracted with any zip program.
+
 = Files =
-Players are stored in "base/models/players/PLAYERNAME/"
+Players are stored in "base/models/players/PLAYERNAME/", in the release the data is zipped into base/assets0.pk3 (which is simply a renamed .zip)
 
   * head.md3 - Head model, it will be attached to torso.md3
   * torso.md3 - Upper model, it will be attached to legs.md3
   * legs.md3 - Lower model
   * animation.cfg - Contains animations and other settings for the player
-  * icon_default.png - Icon for the default skin
-  * head_default.skin - Shaders for head default skin
-  * torso_default.skin - Shaders for torso default skin
-  * legs_default.skin - Shaders for legs default skin
-
-  * icon_red.png
-  * head_red.skin
-  * torso_red.skin
-  * legs_red.skin
-
-  * icon_blue.png
-  * head_blue.skin
-  * torso_blue.skin
-  * legs_blue.skin
+  * Default skin
+  ** icon_default.png - Icon for the default skin
+  ** head_default.skin - Shaders for head default skin
+  ** torso_default.skin - Shaders for torso default skin
+  ** legs_default.skin - Shaders for legs default skin
+  * Red teamplay skin
+  ** icon_red.png
+  ** head_red.skin
+  ** torso_red.skin
+  ** legs_red.skin
+  * Blue teamplay skin
+  ** icon_blue.png
+  ** head_blue.skin
+  ** torso_blue.skin
+  ** legs_blue.skin
 
 
 = Skins =
@@ -35,6 +40,8 @@ Skins are made up of three ".skin" files and a icon image (.png/.tga/.jpg). The 
   * torso_SKINNAME.skin - Shaders for torso
   * legs_SKINNAME.skin - Shaders for legs
 
+== Teamplay skins ==
+In teamplay gametypes, there can be per-team skins stored in "models/players/PLAYERNAME/TEAMNAME/". TEAMNAME is set to g_blueTeam (default:Katanas) or g_redTeam (default:Sais).
 
 == .skin Format ==
 *.skin* files set the shaders used by the model. MD3 models contain "meshes" (Groups of triangles), each must have a shader listed. The "tags" (points where other models are attached) are also listed.
@@ -54,6 +61,8 @@ TMNT Arena also supports using *$(dir)* instead of the directory where the playe
 Example: "$(dir)/head" instead of "models/players/raph/head".
 
 = animation.cfg =
-animation.cfg contains the animations and other settings. The animations are normally created when exporting a player model to MD3.
+animation.cfg contains the animations and other settings. The animation.cfg is normally created when exporting a player model to MD3.
 
+== soundpath ==
+By placing "soundpath NAME" in animation.cfg the player will use sounds from "sound/NAME/" instead of "sound/PLAYERNAME/". Soundpath defaults to the player's directory name.
 
