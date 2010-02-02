@@ -994,10 +994,8 @@ void UI_Cache_f( void ) {
 	UI_NetworkOptionsMenu_Cache();
 #ifdef TMNTSP
 	UI_SPMenu_Cache();
-	UI_StageMenu_Cache();
-	LoadGame_Cache();
-	SpecifySave_Cache();
 	UI_SPPlayerMenu_Cache();
+	LoadGame_Cache();
 #endif
 	UI_SPLevelMenu_Cache();
 	UI_SPSkillMenu_Cache();
@@ -1033,11 +1031,6 @@ qboolean UI_ConsoleCommand( int realTime ) {
 #ifdef TMNTSP
 	if ( Q_stricmp (cmd, "singleplayermenu") == 0 ) {
 		UI_SPMenu_f();
-		return qtrue;
-	}
-
-	if ( Q_stricmp (cmd, "stageselect") == 0 ) {
-		UI_StageMenu_f();
 		return qtrue;
 	}
 

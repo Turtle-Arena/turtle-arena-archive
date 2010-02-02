@@ -144,7 +144,6 @@ vmCvar_t	ui_spSkill;
 
 #ifdef TMNTSP
 vmCvar_t	ui_singlePlayerActive;
-vmCvar_t	ui_spStage;
 vmCvar_t	ui_saveVersions;
 vmCvar_t	ui_saveTypes;
 #endif
@@ -241,7 +240,6 @@ static cvarTable_t		cvarTable[] = {
 
 #ifdef TMNTSP
 	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
-	{ &ui_spStage, "ui_spStage", "0", CVAR_ROM },
 	{ &ui_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM },
 	{ &ui_saveTypes, "g_saveTypes", BG_SAVE_TYPES, CVAR_ROM },
 #endif
