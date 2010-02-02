@@ -57,9 +57,6 @@ extern vmCvar_t	ui_spAwards;
 extern vmCvar_t	ui_spVideos;
 extern vmCvar_t	ui_spSkill;
 
-#ifdef TMNTSP
-extern vmCvar_t ui_spStage;
-#endif
 extern vmCvar_t	ui_spSelection;
 
 extern vmCvar_t	ui_browserMaster;
@@ -940,9 +937,6 @@ void UI_SPArena_Start( const char *arenaInfo );
 void UI_SPMenu( void );
 void UI_SPMenu_f( void );
 void UI_SPMenu_Cache( void );
-void UI_StageMenu( void );
-void UI_StageMenu_f( void );
-void UI_StageMenu_Cache( void );
 #endif
 
 //

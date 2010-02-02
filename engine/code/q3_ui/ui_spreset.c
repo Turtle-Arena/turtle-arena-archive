@@ -64,16 +64,9 @@ void Reset_MenuEvent(void* ptr, int event) {
 
 	// reset the game, pop the level menu and restart it so it updates
 	UI_NewGame();
-#ifdef TMNTSP
-	trap_Cvar_SetValue( "ui_spStage", 0 );
-	trap_Cvar_SetValue( "ui_spSelection", 0 );
-	UI_PopMenu();
-	UI_StageMenu();
-#else
 	trap_Cvar_SetValue( "ui_spSelection", 0 );
 	UI_PopMenu();
 	UI_SPLevelMenu();
-#endif
 }
 
 

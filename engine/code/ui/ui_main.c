@@ -5780,9 +5780,6 @@ vmCvar_t	ui_spAwards;
 vmCvar_t	ui_spVideos;
 vmCvar_t	ui_spSkill;
 
-#ifdef TMNTSP
-vmCvar_t	ui_spStage;
-#endif
 vmCvar_t	ui_spSelection;
 
 vmCvar_t	ui_browserMaster;
@@ -5922,9 +5919,6 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE },
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE },
 
-#ifdef TMNTSP
-	{ &ui_spStage, "ui_spStage", "0", CVAR_ROM },
-#endif
 	{ &ui_spSelection, "ui_spSelection", "", CVAR_ROM },
 
 	{ &ui_browserMaster, "ui_browserMaster", "0", CVAR_ARCHIVE },

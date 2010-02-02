@@ -78,7 +78,6 @@ extern vmCvar_t	ui_spSkill;
 
 #ifdef TMNTSP
 extern vmCvar_t	ui_singlePlayerActive;
-extern vmCvar_t ui_spStage;
 #endif
 extern vmCvar_t	ui_spSelection;
 
@@ -676,15 +675,9 @@ void UI_SPArena_Start( const char *arenaInfo );
 #ifdef TMNTSP
 void UI_LoadGameMenu( void );
 void LoadGame_Cache( void );
-void UI_SpecifySaveMenu( void );
-void SpecifySave_Cache( void );
-
 void UI_SPMenu( void );
 void UI_SPMenu_f( void );
 void UI_SPMenu_Cache( void );
-void UI_StageMenu( void );
-void UI_StageMenu_f( void );
-void UI_StageMenu_Cache( void );
 #endif
 
 //
