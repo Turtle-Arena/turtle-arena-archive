@@ -332,10 +332,11 @@ void UI_LoadGameMenu( void ) {
 #define ID_BACK				10
 #define ID_SP_NEWGAME		11
 #define ID_SP_LOADGAME		12
-#define ID_SP_CUSTOM		13
-#define ID_SP_DEMOS			14
-#define ID_SP_CINEMATICS	15
-#define ID_SP_MODS			16
+#define ID_SP_LEVELSELECT	13
+#define ID_SP_CUSTOM		14
+#define ID_SP_DEMOS			15
+#define ID_SP_CINEMATICS	16
+#define ID_SP_MODS			17
 
 typedef struct {
 	menuframework_s	menu;
@@ -344,6 +345,7 @@ typedef struct {
 	menubitmap_s	framer;
 	menutext_s		sp_newgame;
 	menutext_s		sp_loadgame;
+	menutext_s		sp_levelselect;
 	menutext_s		sp_custom; // skirmish
 	menutext_s		sp_demos;
 	menutext_s		sp_cinematics;
@@ -379,11 +381,15 @@ static void UI_SPMenu_Event( void *ptr, int event ) {
 	{
 		default:
 		case ID_SP_NEWGAME:
-			UI_SPLevelMenu();
+			UI_SPSkillMenu(UI_GetArenaInfoByNumber(0));
 			break;
 
 		case ID_SP_LOADGAME:
 			UI_LoadGameMenu();
+			break;
+
+		case ID_SP_LEVELSELECT:
+			UI_SPLevelMenu();
 			break;
 
 		case ID_SP_CUSTOM: // skirmish
@@ -449,7 +455,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_newgame.generic.y			= y;
 	spMenuInfo.sp_newgame.generic.id		= ID_SP_NEWGAME;
 	spMenuInfo.sp_newgame.generic.callback	= UI_SPMenu_Event;
-	spMenuInfo.sp_newgame.string			= "New Game (unfinished)";
+	spMenuInfo.sp_newgame.string			= "New Game";
 	spMenuInfo.sp_newgame.color				= color_red;
 	spMenuInfo.sp_newgame.style				= UI_CENTER;
 
@@ -460,31 +466,23 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.generic.y			= y;
 	spMenuInfo.sp_loadgame.generic.id			= ID_SP_LOADGAME;
 	spMenuInfo.sp_loadgame.generic.callback		= UI_SPMenu_Event;
-	spMenuInfo.sp_loadgame.string				= "Load Game (unfinished)";
+	spMenuInfo.sp_loadgame.string				= "Load Game";
 	spMenuInfo.sp_loadgame.color				= color_red;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
 
-#if 0
+	// Extra space between, "single player" and the others
 	y += VERTICAL_SPACING;
-	spMenuInfo.sp_savegame.generic.type			= MTYPE_PTEXT;
-	spMenuInfo.sp_savegame.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	spMenuInfo.sp_savegame.generic.x			= 320;
-	spMenuInfo.sp_savegame.generic.y			= y;
-	spMenuInfo.sp_savegame.generic.id			= ID_SP_SAVEGAME;
-	spMenuInfo.sp_savegame.generic.callback		= UI_SPMenu_Event;
-	spMenuInfo.sp_savegame.string				= "Save Game";
-	spMenuInfo.sp_savegame.color				= color_red;
-	spMenuInfo.sp_savegame.style				= UI_CENTER;
 
-	// If not in a single player game, set grayed.
-	// NOTE: This is ALWAYS grayed out. because its in the main menu, which can only be gotten to when not in a game.
-	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "ui_singlePlayerActive" ) ) {
-		spMenuInfo.sp_savegame.generic.flags |= QMF_GRAYED;
-	}
-#endif
-
-	// Extra space.
 	y += VERTICAL_SPACING;
+	spMenuInfo.sp_levelselect.generic.type		= MTYPE_PTEXT;
+	spMenuInfo.sp_levelselect.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	spMenuInfo.sp_levelselect.generic.x			= 320;
+	spMenuInfo.sp_levelselect.generic.y			= y;
+	spMenuInfo.sp_levelselect.generic.id		= ID_SP_LEVELSELECT;
+	spMenuInfo.sp_levelselect.generic.callback	= UI_SPMenu_Event;
+	spMenuInfo.sp_levelselect.string			= "Level Select (WIP)";
+	spMenuInfo.sp_levelselect.color				= color_red;
+	spMenuInfo.sp_levelselect.style				= UI_CENTER;
 
 	// Moved here from SP arena select
 	y += VERTICAL_SPACING;
@@ -566,6 +564,7 @@ static void UI_SPMenu_Init( void ) {
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.framer );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_newgame );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_loadgame );
+	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_levelselect );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_custom );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_demos );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_cinematics );
