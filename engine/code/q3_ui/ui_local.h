@@ -699,6 +699,14 @@ void UI_SPPostgameMenu_f( void );
 void UI_SPSkillMenu( const char *arenaInfo );
 void UI_SPSkillMenu_Cache( void );
 
+#ifdef TMNTSP
+//
+// ui_spPlayer.c
+//
+void UI_SPPlayerMenu( const char *arenaInfo );
+void UI_SPPlayerMenu_Cache( void );
+#endif
+
 //
 // ui_syscalls.c
 //

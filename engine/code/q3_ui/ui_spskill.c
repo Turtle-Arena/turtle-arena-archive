@@ -34,7 +34,10 @@ SINGLE PLAYER SKILL MENU
 #define ART_FRAME					"menu/art/cut_frame"
 #define ART_BACK					"menu/art/back_0.tga"
 #define ART_BACK_FOCUS				"menu/art/back_1.tga"
-#ifdef TMNTMISC // NO_MENU_FIGHT
+#ifdef TMNTSP // SPMODEL
+#define ART_FIGHT					"menu/art/next_0"
+#define ART_FIGHT_FOCUS				"menu/art/next_1"
+#elif defined TMNTMISC // NO_MENU_FIGHT
 #define ART_FIGHT					"menu/art/play_0"
 #define ART_FIGHT_FOCUS				"menu/art/play_1"
 #else
@@ -147,7 +150,11 @@ static void UI_SPSkillMenu_FightEvent( void *ptr, int notification ) {
 	if (notification != QM_ACTIVATED)
 		return;
 
+#ifdef TMNTSP // SPMODEL
+	UI_SPPlayerMenu( skillMenuInfo.arenaInfo );
+#else
 	UI_SPArena_Start( skillMenuInfo.arenaInfo );
+#endif
 }
 
 
@@ -200,7 +207,11 @@ void UI_SPSkillMenu_Cache( void ) {
 	skillMenuInfo.skillpics[3] = trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE4 );
 	skillMenuInfo.skillpics[4] = trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE5 );
 
+#ifdef TMNTMISC // rip off SRB2 skills...
+	skillMenuInfo.nightmareSound = trap_S_RegisterSound( "sound/misc/ultimate.wav", qfalse );
+#else
 	skillMenuInfo.nightmareSound = trap_S_RegisterSound( "sound/misc/nightmare.wav", qfalse );
+#endif
 	skillMenuInfo.silenceSound = trap_S_RegisterSound( "sound/misc/silence.wav", qfalse );
 }
 

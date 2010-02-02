@@ -90,7 +90,9 @@ typedef struct {
 	menubitmap_s	item_leftarrow;
 	menubitmap_s	item_maps[ARENAS_PER_TIER];
 	menubitmap_s	item_rightarrow;
+#ifndef TMNTSP // SPMODEL
 	menubitmap_s	item_player;
+#endif
 	menubitmap_s	item_awards[6];
 	menubitmap_s	item_back;
 	menubitmap_s	item_reset;
@@ -589,25 +591,19 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	}
 
 	// draw player name
-#ifdef TMNTSP // SPMODEL
-	trap_Cvar_VariableStringBuffer( "spmodel", string, sizeof (string) );
-#else
+#ifndef TMNTSP // SPMODEL
 	trap_Cvar_VariableStringBuffer( "name", string, 32 );
-#endif
 	Q_CleanStr( string );
 	UI_DrawProportionalString( 320, PLAYER_Y, string, UI_CENTER|UI_SMALLFONT, color_orange );
 
 	// check for model changes
-#ifdef TMNTSP // SPMODEL
-	trap_Cvar_VariableStringBuffer( "spmodel", buf, sizeof(buf) );
-#else
 	trap_Cvar_VariableStringBuffer( "model", buf, sizeof(buf) );
-#endif
 	if( Q_stricmp( buf, levelMenuInfo.playerModel ) != 0 ) {
 		Q_strncpyz( levelMenuInfo.playerModel, buf, sizeof(levelMenuInfo.playerModel) );
 		PlayerIcon( levelMenuInfo.playerModel, levelMenuInfo.playerPicName, sizeof(levelMenuInfo.playerPicName) );
 		levelMenuInfo.item_player.shader = 0;
 	}
+#endif
 
 	// standard menu drawing
 	Menu_Draw( &levelMenuInfo.menu );
@@ -884,11 +880,8 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_rightarrow.height			= 114;
 	levelMenuInfo.item_rightarrow.focuspic			= ART_ARROW_FOCUS;
 
-#ifdef TMNTSP // SPMODEL
-	trap_Cvar_VariableStringBuffer( "spmodel", levelMenuInfo.playerModel, sizeof(levelMenuInfo.playerModel) );
-#else
+#ifndef TMNTSP // SPMODEL
 	trap_Cvar_VariableStringBuffer( "model", levelMenuInfo.playerModel, sizeof(levelMenuInfo.playerModel) );
-#endif
 	PlayerIcon( levelMenuInfo.playerModel, levelMenuInfo.playerPicName, sizeof(levelMenuInfo.playerPicName) );
 	levelMenuInfo.item_player.generic.type			= MTYPE_BITMAP;
 	levelMenuInfo.item_player.generic.name			= levelMenuInfo.playerPicName;
@@ -896,11 +889,10 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_player.generic.x				= 288;
 	levelMenuInfo.item_player.generic.y				= AWARDS_Y;
 	levelMenuInfo.item_player.generic.id			= ID_PLAYERPIC;
-#ifndef TMNTSP // SPMODEL
 	levelMenuInfo.item_player.generic.callback		= UI_SPLevelMenu_PlayerEvent;
-#endif
 	levelMenuInfo.item_player.width					= 64;
 	levelMenuInfo.item_player.height				= 64;
+#endif
 
 #ifndef TMNTSP
 #ifdef IOQ3ZTM
@@ -1025,7 +1017,9 @@ static void UI_SPLevelMenu_Init( void ) {
 #endif
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_rightarrow );
 
+#ifndef TMNTSP // SPMODEL
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_player );
+#endif
 
 #ifndef TMNTSP
 	for( n = 0; n < count; n++ ) {
