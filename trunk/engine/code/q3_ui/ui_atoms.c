@@ -997,6 +997,7 @@ void UI_Cache_f( void ) {
 	UI_StageMenu_Cache();
 	LoadGame_Cache();
 	SpecifySave_Cache();
+	UI_SPPlayerMenu_Cache();
 #endif
 	UI_SPLevelMenu_Cache();
 	UI_SPSkillMenu_Cache();

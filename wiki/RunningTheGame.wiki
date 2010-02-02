@@ -59,6 +59,10 @@ Add below to project
   * engine/code/game/g_save.c
   * engine/code/game/g_paths.c
 
+Q3_UI project:
+Add below to project
+  * engine/code/q3_ui/ui_spplayer.c
+
 Copy the defines from the TMNT config section of the Makefile into all projects (Except Splines).
 
 = Final setup and execution =
