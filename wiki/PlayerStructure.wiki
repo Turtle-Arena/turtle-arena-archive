@@ -68,3 +68,72 @@ animation.cfg contains the animations and other settings. The animation.cfg is n
 
 == soundpath ==
 By placing "soundpath NAME" in animation.cfg the player will use sounds from "sound/NAME/" instead of "sound/PLAYERNAME/". Soundpath defaults to the player's directory name.
+
+= Documentation =
+== Tags ==
+List of player tags by models.
+
+=== head.md3 ===
+  * tag_head
+
+=== upper.md3 ===
+  * tag_torso
+  * tag_head
+  * tag_hand_primary   -- Player's right hand. Used for holding guns/melee weapons.
+  * tag_hand_secondary -- Player's left hand. Used for holding CTF flags/melee weapons.
+  * // Hold default weapon of the player when not in use.
+  * tag_wp_away_primary
+  * tag_wp_away_secondary
+  * // Currently I just use tag_weapon / tag_flag for capatibility to and fro quake3 and MD3 model exporters...
+  * tag_weapon (for Quake 3 capatibility) -- Use like tag_hand_primary
+  * tag_flag   (for Team Arena capatibility) -- Use like tag_hand_secondary
+  * // What tag(s) does Elite Force use?
+
+=== lower.md3 ===
+  * tag_torso
+
+== Full skin search info ==
+Below is the seach order for ".skin" files in TMNT Arena. It uses code from Quake III: Team Arena to allow per-team skins. So Team Arena Players work in Team gametypes as well as Quake 3 players.
+
+Based on http://rfactory.org/idteam.html#appendh with the changes I've made to ioquake3.
+
+Note: "raph/fugitoid" is a example; raph is the model, fugitoid is the skin.
+
+=== Head ===
+==== Team play ====
+  * headmodel = raph/fugitoid
+  * team = red
+
+  # models/players/raph/fugitoid/head_red.skin
+  # models/players/raph/head_red.skin
+  # models/players/heads/raph/fugitoid/head_red.skin
+  # models/players/heads/raph/head_red.skin
+
+==== Non-Team play ====
+  * headmodel = raph/fugitoid
+
+  # models/players/raph/head_fugitoid.skin
+  # models/players/heads/raph/head_fugitoid.skin
+
+Note: If headmodel starts with `*` ("`*`raph/fugitoid") the "heads" directory is checked before the "players" directory is checked.
+
+=== Body (lower/upper) ===
+==== Team play ====
+  * model = raph/fugitoid
+  * team = red
+  * g_redTeam = Sais
+
+  # models/players/raph/Sais/lower_fugitoid_red.skin
+  # models/players/raph/Sais/lower_red.skin
+  # models/players/raph/lower_fugitoid_red.skin
+  # models/players/raph/lower_red.skin
+  # models/players/characters/raph/Sais/lower_fugitoid_red.skin
+  # models/players/characters/raph/Sais/lower_red.skin
+  # models/players/characters/raph/lower_fugitoid_red.skin
+  # models/players/characters/raph/lower_red.skin
+
+==== Non-Team play ====
+  * model = raph/fugitoid
+
+  # models/players/raph/lower_fugitoid.skin
+  # models/players/characters/raph/lower_fugitoid.skin
