@@ -1,20 +1,6 @@
 TMNT Arena Ideas file (Formarly "todo" file)
 
-TODO: Clean up this file...
-
-Do "play testing" to find bugs and to find things to change, improve, and add.
-	I need to remind myself as I end up doing alot of code/data changes with no or little testing.
-
-== General ==
-
-=== Demo 1 or later ===
-* Rewrite single player post-game data saving. Have it be more like in Team Arena then Q3, using ".game" files instead of cvars in config.
-: Or one single data file with all of the sp data (Or SP data files -like SRB2 2.0)
-
-=== Future ===
-: Ideas for things to maybe do in the future, shouldn't try to do for demo 1.
-
-* NPRQuake has some awesome rendering options... (If I wanted it to look like a comic book it might help.)
+TODO: Move this stuff somewhere else and remove this file.
 
 == Single Player Design/"Story" ==
 Ideas;
@@ -26,36 +12,6 @@ Ideas;
 * The Earth Protection Force (Agent Bishop) may appear
 * It is unknown if The Foot will appear.
 * Mousers may appear
-
-== Player Models ==
-List of tags by models.
-
-head.md3
-+ tag_head
-//+tag_bandana -- TODO: Bandanas, how hard can it be right?... Yeah. Right...
-
-upper.md3
-+ tag_torso
-+ tag_head
-+ tag_hand_primary   -- Player's right hand. Used for holding guns/melee weapons.
-+ tag_hand_secondary -- Player's left hand. Used for holding CTF flags/melee weapons.
-// Hold default weapon of the player when not in use.
-+ tag_wp_away_primary
-+ tag_wp_away_secondary
-// Currently I just use tag_weapon / tag_flag so that TMNT skins can be used in Quake III/Team Arena...
-+ tag_weapon (for Quake 3/STV:EF? capatibility) -- Use like tag_hand_primary
-+ tag_flag   (for Team Arena capatibility) -- Use like tag_hand_secondary
-// What tag(s) does Elite Force use?
-
-lower.md3
-+ tag_torso
-
-Melee Weapon attack animations.
-      TMNT Mutant Melee: sword type, axe/hammer type, gun type (Already in Q3...)
-      TMNT Arena: TMNT:MM types plus Bo, Nunchuk, and more sword types
-
-== Camera ==
-* Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
 
 == Objects ==
 : Objects and NPCs share lots of code...
@@ -72,70 +28,4 @@ misc_object
 Style 1: Option to animate and trigger "target" on touch,
 Style 2: Damageable and have a "paintarget" and trigger "target" on death.
 			TODO: Also option to spawn item on death, and option to respawn.
-
-== Weapons ==
-TMNTWEAPSYS is the main changes to Q3's weapon system.
-* Adds melee weapon system
-* Adds default weapon (Clients get one default weapon that is set per-player in animation.cfg)
-** Pointless in stock Q3... as it is limited to one default weapon, Guntlet. (Guns as default aren't supported).
-* It may do other things to Q3 weapon system, but I don't remember what they are.
-* There are weapon "groups", weapons, and projectiles.
-* The weap group, weap, and proj info is loaded from external text files.
-** This allows for custom weapons (Custom weapons in custom maps, and custom default weapons for players)
-
-TMNTWEAPSYS_EX is weapon code that adds on to TMNTWEAPSYS, making it more complete for a hand-to-hand game (Like Mutant Melee)
-* Each client can hold only 2 weapons (instead of upto 16), one is the default and the other is a pickup weapon, if holding a pickup weapon the default weapon can't be used.
-** The player will have three weapons when switching to a new pickup weapon, while holding a pickup weapon.
-* Removes 16 total weapons limit.
-* Picked up weapons can be dropped via a button to use the default weapon again.
-** Backport to TMNTWEAPSYS? so players can drop a single weapon?
-* Auto drops guns when out of ammo (When player doesn't have PW_AMMOREGEN)
-
-TMNTWEAPONS Replace/remove Q3/TA's weapons with TMNT weapons.
-
-TMNTHOLDSYS Allow up to 16 holdable items to be held at once (Like Q3 weapon sys, players can change to any holdable)
-
-TMNTHOLDABLE Adds shurikens and disables some Q3/TA holdables.
-
-TMNT_GAME_MODELS Game is able to load models and get tag pos and angles (Allowing for better melee attacking)
-: Note the polygons (etc) are loaded as well, but currently unused. (tmnt ded server uses more RAM then q3 ded server.)
-
-Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder }
-* ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
-
-== Stages ==
-Idea: Have a "stages.txt" that contains.
-Support up to 9 maps.
-
-{
-name = "Stage 1"
-image = levelshots/stage1.png
-caption = ??? // Support caption/desction about the Stage?
-showareaselect = 0 // Don't show even if beat the first area.
-showareaselect = 1 // default --if more then one area, and the first is beat, show area select
-showareaselect = 2 // Show even if only one area or the first hasn't been beat.
-map1 = sp1a1
-map2 = sp1a2
-map3 = sp1a3
-map4 = sp1a4
-}
-
-{
-name = "Stage 2"
-image = levelshots/stage2.png
-map1 = sp2a1
-map2 = sp2a2
-map3 = sp2a3
-map4 = sp2a4
-map5 = sp2a5
-}
-
-{
-name = "Stage 3 (Beta)"
-//no "image"
-map1 = sp3a1
-}
-
-== Links ==
-* http://patches.mercenariesguild.net/index.php?do=details&task_id=81
 

@@ -2,6 +2,9 @@ TMNT Arena TODO/BUGS file
 
 Bugs that have found that have not been fixed yet, and things that should to be done (or that I'd like to be done...).
 
+Do "play testing" to find bugs and to find things to change, improve, and add.
+	I need to remind myself as I end up doing alot of code/data changes with no or little testing.
+
 == Beta ==
 * Add player sounds for Leo/Don/Mike
 * New Melee swing sound effects
@@ -43,6 +46,11 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 : Logic-wise tag_hand_* make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
 
 [todo] Improve bot_shareditem_t weight code (Currently only supports constant weights, add support to be weight 0 if INVENTORY_X >= 1)
+
+[todo] Backport TMNTWEAPSYS_EX's weapon dropping to TMNTWEAPSYS?
+
+[todo] Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder }
+: ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
 
 // non-weapon or attacking...
 
@@ -88,6 +96,14 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 [todo] http://code.google.com/p/oax/wiki/Dynamic_QVM_Memory_Allocation
 
 [todo] Word filter http://code.google.com/p/sgfork/source/detail?r=5
+
+[todo] Rewrite single player post-game data saving.
+: Have it be more like in Team Arena then Q3, using ".game" files instead of cvars in config.
+: Or one single data file with all of the sp data (Or SP data files -like SRB2 2.0)
+
+[todo] NPRQuake has some awesome rendering options... (If I wanted it to look like a comic book it might help.)
+
+[todo] Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
 
 // The below are somewhat long...
 

@@ -432,7 +432,7 @@ static void PlayerModel_BuildList( void )
 	s_playermodel.nummodels = 0;
 
 #ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
-  for (h = 0; h < 2 && bg_playerDirs[h] != NULL; h++)
+  for (h = 0; h < MAX_UI_PLAYERDIRS && bg_playerDirs[h] != NULL; h++)
   {
 	// iterate directory of all player models
 	numdirs = trap_FS_GetFileList(bg_playerDirs[h], "/", dirlist, 2048 );
