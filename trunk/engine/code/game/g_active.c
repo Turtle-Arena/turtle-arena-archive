@@ -2019,10 +2019,13 @@ void ClientEndFrame( gentity_t *ent ) {
 
 				ent->client->ps.powerups[ i ] = 0;
 
-				// Become solid again
+				// Become solid again after trap_LinkEntity
 				ent->r.contents |= CONTENTS_BODY;
-				trap_LinkEntity(ent);
-#if 1
+
+				// Must unlink so we don't kill our self.
+				trap_UnlinkEntity (ent);
+
+#if 1 // Instead of telefragging, be killed
 				// if you would be solid in another player die.
 				stuck = StuckInOtherClient(ent);
 				if (stuck)
@@ -2030,12 +2033,41 @@ void ClientEndFrame( gentity_t *ent ) {
 					G_Damage ( ent, stuck, stuck, NULL, NULL,
 						100000, DAMAGE_NO_PROTECTION, MOD_TRIGGER_HURT);
 				}
-#else // Telefrag
-				// Must unlink so we don't kill our self.
-				trap_UnlinkEntity (ent);
-				G_KillBox( ent );
-				trap_LinkEntity (ent);
+				else
+				{
+					int			i, num;
+					int			touch[MAX_GENTITIES];
+					gentity_t	*hit;
+					vec3_t		mins, maxs;
+
+					VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
+					VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
+					num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
+
+					for (i=0 ; i<num ; i++) {
+						hit = &g_entities[touch[i]];
+						if ( !hit->client && hit->s.eType != ET_MISCOBJECT
+#ifdef TMNTNPCSYS
+							&& hit->s.eType != ET_NPC
 #endif
+#ifdef MISSIONPACK
+							&& hit->pain != ObeliskPain
+#endif
+						) {
+							continue;
+						}
+
+						// nail it
+						G_Damage ( ent, hit, hit, NULL, NULL,
+							100000, DAMAGE_NO_PROTECTION, MOD_TRIGGER_HURT);
+						break;
+					}
+				}
+
+#else // Telefrag
+				G_KillBox( ent );
+#endif
+				trap_LinkEntity(ent);
 			}
 			else
 #endif
