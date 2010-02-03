@@ -2734,6 +2734,52 @@ static qboolean CG_DrawScoreboard( void ) {
 #endif
 }
 
+#ifdef TMNTSP
+/*
+=================
+CG_DrawIntermission
+=================
+*/
+static void CG_DrawSPIntermission( void ) {
+	char		str[1024];
+	char		*name;
+	vec4_t		color;
+	int			w;
+
+	if (!cg.snap->ps.persistant[PERS_LIVES] && !cg.snap->ps.persistant[PERS_CONTINUES])
+	{
+		return;
+	}
+
+	color[0] = 1;
+	color[1] = 1;
+	color[2] = 1;
+	color[3] = 1;
+
+	CG_HudPlacement(HUD_CENTER);
+
+	if (cg_singlePlayerActive.integer) {
+		name = cgs.clientinfo[ cg.snap->ps.clientNum ].headModelName;
+		if (name[0] == '*') {
+			name++;
+		}
+	} else {
+		name = cgs.clientinfo[ cg.snap->ps.clientNum ].name;
+	}
+
+	Q_snprintf(str, sizeof (str), "%s got though the level", name);
+
+#ifdef MISSIONPACK_HUD
+	w = CG_Text_Width(str, 0.3f, 0);
+	CG_Text_Paint( 320 - w / 2, 190, 0.3f, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
+#else
+	w = CG_DrawStrlen( str ) * BIGCHAR_WIDTH;
+	CG_DrawBigString( 320 - w / 2, 170, str, color[3] );
+#endif
+	trap_R_SetColor( NULL );
+}
+#endif
+
 /*
 =================
 CG_DrawIntermission
@@ -2741,13 +2787,16 @@ CG_DrawIntermission
 */
 static void CG_DrawIntermission( void ) {
 //	int key;
-#ifdef MISSIONPACK_HUD
+#if defined MISSIONPACK_HUD && !defined TMNTSP
 	//if (cg_singlePlayer.integer) {
 	//	CG_DrawCenterString();
 	//	return;
 	//}
 #else
 	if ( cgs.gametype == GT_SINGLE_PLAYER ) {
+#ifdef TMNTSP
+		CG_DrawSPIntermission();
+#endif
 		CG_DrawCenterString();
 		return;
 	}
