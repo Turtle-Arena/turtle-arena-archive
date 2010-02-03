@@ -13,10 +13,7 @@ Do "play testing" to find bugs and to find things to change, improve, and add.
 == engine ==
 
 // Weapons! (and attacking)
-[todo] Add code so that Nunchuk can spin when attacking (and standing?), and when not spining have gravity (like CTF flag)
-
-STARTED: [todo] Change TMNTWEAPONS stuff that is system to TMNTWEAPSYS[|_EX]
-:  Could use more cleaning?
+[todo] Add code so that Nunchuk can spin when standing? When not spining have gravity, like MP held CTF flag?
 
 STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features via weapon scripting
 
@@ -35,8 +32,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 		Each client think move the base of the trail up, and if (base[Z] >= top[Z]) remove this trail base/top
 
 [todo] Attack movement flags. Stop, cut speed in half, double speed, turn right?, etc.
-
-[bug] When kicking a player out of the game (that is using a grapple) their grapple chain is left behind!
 
 [todo] Per-triangle collision for player damage, use lowest LOD model or have a model special for collision?
 : Using a special model for collision we could use group names to set what part of player is hit,
@@ -71,8 +66,7 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Pull grapple back to player before removing entity like LoZ: TP?
 
-[bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects
-		and if PW_FLASHING wheres off they get stuck in the object.
+[bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects.
 
 [todo] Have dropped ET_ITEMs (weapons, holdables, powerups, etc) blink/flash before disappearing
 : Using newly added RF_FORCE_ENT_ALPHA!
