@@ -1,4 +1,5 @@
 #summary External weapon info system
+#labels Phase-Implementation
 
 = Introduction =
 The weapon system used in TMNT Arena;
