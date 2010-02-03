@@ -15,21 +15,24 @@ Players are stored in "base/models/players/PLAYERNAME/", in the release the data
   * torso.md3 - Upper model, it will be attached to legs.md3
   * legs.md3 - Lower model
   * animation.cfg - Contains animations and other settings for the player
-  * Default skin
-  ** icon_default.png - Icon for the default skin
-  ** head_default.skin - Shaders for head default skin
-  ** torso_default.skin - Shaders for torso default skin
-  ** legs_default.skin - Shaders for legs default skin
-  * Red teamplay skin
-  ** icon_red.png
-  ** head_red.skin
-  ** torso_red.skin
-  ** legs_red.skin
-  * Blue teamplay skin
-  ** icon_blue.png
-  ** head_blue.skin
-  ** torso_blue.skin
-  ** legs_blue.skin
+
+  * *Default skin*
+  * icon_default.png - Icon for the default skin
+  * head_default.skin - Shaders for head default skin
+  * torso_default.skin - Shaders for torso default skin
+  * legs_default.skin - Shaders for legs default skin
+
+  * *Red teamplay skin*
+  * icon_red.png
+  * head_red.skin
+  * torso_red.skin
+  * legs_red.skin
+
+  * *Blue teamplay skin*
+  * icon_blue.png
+  * head_blue.skin
+  * torso_blue.skin
+  * legs_blue.skin
 
 
 = Skins =
@@ -65,4 +68,3 @@ animation.cfg contains the animations and other settings. The animation.cfg is n
 
 == soundpath ==
 By placing "soundpath NAME" in animation.cfg the player will use sounds from "sound/NAME/" instead of "sound/PLAYERNAME/". Soundpath defaults to the player's directory name.
-
