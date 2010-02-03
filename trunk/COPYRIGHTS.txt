@@ -9,9 +9,6 @@ All data, unless otherwise noted, is Copyright (C) 2009 Zack "ZTurtleMan" Middle
 
 The data files that have other source files are included in base-src/
 
-Some of my data is based Quake III: Arena and OpenArena data.
-	There are no Quake III: Arena graphics included.
-
 	base/gfx/damage/bullet_mrk.png was drawn over OpenArena's gfx/damage/bullet_mrk
 	base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
 
@@ -52,6 +49,14 @@ base/gfx/misc/flare.tga
 base/sound/player/watr_in.wav
 base/sound/player/watr_out.wav
 base/sound/player/watr_un.wav
+base/sound/player/footsteps/splash1.wav
+base/sound/player/footsteps/splash2.wav
+base/sound/player/footsteps/splash3.wav
+base/sound/player/footsteps/splash4.wav
+base/sound/player/footsteps/step1.wav
+base/sound/player/footsteps/step2.wav
+base/sound/player/footsteps/step3.wav
+base/sound/player/footsteps/step4.wav
 
 == GNU FreeFonts ==
 The following files were created using the GNU Freefonts,
@@ -78,7 +83,7 @@ base/fonts/fontImage_12.dat
 base/fonts/fontImage_16.dat
 base/fonts/fontImage_20.dat
 
-Used by the console.									FreeSansBold.ttf
+Used by the console.								FreeSansBold.ttf
 base/fonts/FreeSansBold_0_16.tga
 base/fonts/FreeSansBold_16.dat
 
