@@ -6317,7 +6317,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 //   so I generlized the player dir code.
 //
 // Last pointer is NULL
-// NOTE: Only the first two are listed in the player select menus
+// NOTE: Only models/players and models/players2 are listed in the player select menus
 //  q3_ui: PlayerModel_BuildList    ui: UI_BuildQ3Model_List
 const char *bg_playerDirs[MAX_PLAYER_DIRS] =
 {
