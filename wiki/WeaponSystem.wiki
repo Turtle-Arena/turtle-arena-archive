@@ -1,0 +1,32 @@
+#summary External weapon info system
+
+= Introduction =
+The weapon system used in TMNT Arena;
+
+  * *TMNTWEAPSYS define*
+  * Loads weapons from external text files (scripts/weaponinfo.txt and /scripts/?.weap files)
+  * Supports melee and projectile weapons
+  * Per-player default weapon (Set in player's animation.cfg)
+  * Allows for easy modification and custom default weapons, or new weapons for custom maps.
+
+  * *TMNTWEAPSYS_EX define*
+  * Removes (works around) ioquake3 16 weapon group limit.
+  * Each client is limited to holding 2 weapons (default and pickup), unlike 16 in ioquake3
+  * If holding a pickup weapon the default weapon can't be used
+  * Pickup weapon can be drop via a button to use default weapon
+  * Automaticly drops picked up guns when they run out of ammo (When player doesn't have PW_AMMOREGEN)
+
+  * *TMNTWEAPONS define*
+  * Removes code that is only for Quake3's weapon system
+  * Add code for TMNT weapons.
+
+  * *TMNT_GAME_MODELS*
+  * Game QVM loads player models to get tag origin and angles (Allowing for better melee attacking)
+  * Note: The polygons (etc) are loaded as well, but currently unused. (TMNT dedicated server will use more RAM then ioquake3 dedicated server.)
+
+= Definitions =
+There are weapon groups, weapons, and projectiles.
+
+  * *Weapon Groups* contain the item, ammo, and player animation info and points to 1 or 2 weapon infos (for the primary and secodary hands).
+  * *Weapons* contain the weapon type, model, wall mark, blades or projectile, and other settings.
+  * *Projectiles* contain damage, trail type, wall mark, and other settings. Projectiles are only used by guns.
