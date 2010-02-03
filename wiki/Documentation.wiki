@@ -4,6 +4,7 @@
 = Engine =
 
   * ConsoleVariables
+  * WeaponSystem
 
 = Players =
 
