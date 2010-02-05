@@ -68,6 +68,8 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects.
 
+[bug] When PW_FLASHING wears off and player is in a non-solid misc_object they are needlessly killed.
+
 [todo] Have dropped ET_ITEMs (weapons, holdables, powerups, etc) blink/flash before disappearing
 : Using newly added RF_FORCE_ENT_ALPHA!
 : Does cgame have any idea of when items are going to be removed?

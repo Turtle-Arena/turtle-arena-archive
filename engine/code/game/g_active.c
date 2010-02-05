@@ -2053,7 +2053,8 @@ void ClientEndFrame( gentity_t *ent ) {
 #ifdef MISSIONPACK
 							&& hit->pain != ObeliskPain
 #endif
-						) {
+							)
+						{
 							continue;
 						}
 
@@ -2063,7 +2064,6 @@ void ClientEndFrame( gentity_t *ent ) {
 						break;
 					}
 				}
-
 #else // Telefrag
 				G_KillBox( ent );
 #endif
