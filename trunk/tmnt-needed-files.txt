@@ -5,12 +5,12 @@ See base/sound/sounds.txt for list of needed sounds.
 == Weapons ==
 
 // Gun
-models/weaphits/bullet.md3
-models/weaphits/bullet*.png (bulletExplosion shader)
+DONE: models/weaphits/bullet.md3
+DONE: models/weaphits/bullet*.png (bulletExplosion shader)
 
 // Electric Launcher (Plasmgun)
-models/weaphits/ring02.md3
-models/weaphits/plasmboom.png (plasmaExplosion shader)
+DONE: models/weaphits/ring02.md3
+DONE: models/weaphits/plasmboom.png (plasmaExplosion shader)
 
 models/weapons2/*
 
@@ -66,7 +66,7 @@ models/weaphits/bfg.md3				--unused by tmnt
 models/weaphits/crackle.md3			--unused by tmnt
 models/weaphits/boom01.md3			--replaced by tmnt
 models/weaphits/ring02.md3			--replaced by tmnt
-models/weaphits/bullet.md3
+models/weaphits/bullet.md3			--replaced by tmnt
 
 
 Replaced in base_ioq3ztm
