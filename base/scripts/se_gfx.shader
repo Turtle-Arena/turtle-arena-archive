@@ -428,18 +428,18 @@ meleeHit3
 // Explosions
 //
 
-//plasmaExplosion
-//{
-//	cull disable
-//	{
-//		clampmap models/weaphits/plasmaboom.tga
-//		blendfunc add
-//
-//		tcMod stretch triangle .6 0.1 0 8
-//		tcmod rotate 999
-//		rgbGen wave inversesawtooth 0 1 0 1.5
-//	}
-//}
+plasmaExplosion
+{
+	cull disable
+	{
+		clampmap models/weaphits/plasmaboom.png
+		blendfunc add
+
+		tcMod stretch triangle .6 0.1 0 8
+		tcmod rotate 999
+		rgbGen wave inversesawtooth 0 1 0 1.5
+	}
+}
 
 //bulletExplosion
 //{
