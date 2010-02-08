@@ -746,10 +746,9 @@ weapon "w_bamboo"
 weapongroup "wp_bamboo"
 {
 	clone "wt_bo"
-	randomSpawn 0 // FIXME: Missing models
 	itemName "weapon_bamboo"
 	pickupName "Bamboo"
-	pickupModel "models/weapons2/bamboo/bamboo.md3"
+	pickupModel "models/weapons2/bamboo/bamboo_pickup.md3"
 	iconName "icons/iconw_bamboo"
 	weapon_primary "w_bamboo"
 
