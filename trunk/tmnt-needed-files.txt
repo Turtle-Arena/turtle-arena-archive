@@ -62,6 +62,12 @@ the following were not removed from the pk3; (I have a list so I can delete the 
 models/powerups/*					--replaced/unused by tmnt
 models/weapons2/*					--replaced/unused by tmnt
 models/weaphits/*
+models/weaphits/bfg.md3				--unused by tmnt
+models/weaphits/crackle.md3			--unused by tmnt
+models/weaphits/boom01.md3			--replaced by tmnt
+models/weaphits/ring02.md3			--replaced by tmnt
+models/weaphits/bullet.md3
+
 
 Replaced in base_ioq3ztm
 

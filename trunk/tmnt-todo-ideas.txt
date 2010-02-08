@@ -17,7 +17,10 @@ Ideas;
 : Objects and NPCs share lots of code...
 
 TODO: Make more mapobjects;
-Most of the mapobjects should be breakable.
+Most of the mapobjects should be damageable.
+
+  * Clump of tall grass (Like in TMNT2 NGC level 2 and LoZ:TP)
+  * Animated flower bud
 
 Trees, bushes, flowers, tall-grasses,
 Traffic barrel-thingy? Traffic "saw-horse"-thingy
