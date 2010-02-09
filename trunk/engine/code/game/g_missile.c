@@ -1268,9 +1268,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 			G_AddEvent( nent, EV_MISSILE_HIT, DirToByte( trace->plane.normal ) );
 			nent->s.otherEntityNum = other->s.number;
-#ifdef TMNTWEAPSYS
-			nent->s.clientNum = ent->s.number;
-#endif
 
 			ent->enemy = other;
 
@@ -1284,6 +1281,15 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			G_AddEvent( nent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
 			ent->enemy = NULL;
 		}
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix grapple wallmark/death-effect/debris (only tested with TMNTWEAPSYS...)
+		nent->s.weapon = ent->s.weapon;
+#endif
+#ifdef TMNTWEAPSYS
+		if (ent->parent)
+			nent->s.clientNum = ent->parent->s.number;
+		else
+			nent->s.clientNum = ENTITYNUM_NONE;
+#endif
 
 		SnapVectorTowards( v, ent->s.pos.trBase );	// save net bandwidth
 
@@ -1319,7 +1325,10 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
 	}
 #ifdef TMNTWEAPSYS
-	ent->s.clientNum = ent->s.number;
+	if (ent->parent)
+		ent->s.clientNum = ent->parent->s.number;
+	else
+		ent->s.clientNum = ENTITYNUM_NONE;
 #endif
 
 	ent->freeAfterEvent = qtrue;

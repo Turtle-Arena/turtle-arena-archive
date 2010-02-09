@@ -1279,22 +1279,48 @@ static void CG_Grapple( centity_t *cent ) {
 	VectorCopy( cent->lerpOrigin, ent.origin);
 	VectorCopy( cent->lerpOrigin, ent.oldorigin);
 
+#ifdef TMNTWEAPSYS
+	if ( projectile->spriteShader )
+	{
+		ent.reType = RT_SPRITE;
+		ent.radius = projectile->spriteRadius;
+		ent.rotation = 0;
+		ent.customShader = projectile->spriteShader;
+		trap_R_AddRefEntityToScene( &ent );
+		return;
+	}
+#endif
+
 	// flicker between two skins
 	ent.skinNum = cg.clientFrame & 1;
 #ifdef TMNTWEAPSYS
-	ent.hModel = projectile->missileModel;
+	if (s1->generic1 == TEAM_BLUE) {
+		ent.hModel = projectile->missileModelBlue;
+	} else if (s1->generic1 == TEAM_RED) {
+		ent.hModel = projectile->missileModelRed;
+	} else {
+		ent.hModel = projectile->missileModel;
+	}
 	ent.renderfx = projectile->missileRenderfx | RF_NOSHADOW;
 #else
 	ent.hModel = weapon->missileModel;
 	ent.renderfx = weapon->missileRenderfx | RF_NOSHADOW;
 #endif
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix showing model (only tested with TMNTWEAPSYS...)
+	AnglesToAxis( cent->lerpAngles, ent.axis );
+#else
 	// convert direction of travel into axis
 	if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
 		ent.axis[0][2] = 1;
 	}
+#endif
 
+#ifdef TMNTWEAPSYS
+	CG_AddRefEntityWithPowerups( &ent, s1, s1->generic1 );
+#else
 	trap_R_AddRefEntityToScene( &ent );
+#endif
 }
 
 /*
