@@ -1001,10 +1001,11 @@ projectile "p_grappling hook"
 	speed 800
 	timetolive 10000
 	trailType "PT_GRAPPLE"
+	deathType "PD_BULLET"
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 12
 	grappling 1
-	//spinType "PS_NONE"
+	spinType "PS_NONE"
 }
 
 weapon "w_grappling_hook"
@@ -1013,9 +1014,9 @@ weapon "w_grappling_hook"
 	model "models/weapons2/grapple/grapple.md3"
 	//mod MOD_GRAPPLE
 	attackDelay 400
-	continuousFlash 1
+	continuousFlash 1 // update chain position
 	ejectSmoke 1
-	flashColor 0.6 0.6 1.0
+	flashColor 0 0 0 // no flash
 	//readySound "sound/weapons/melee/fsthum.wav"
 	//firingSound "sound/weapons/melee/fstrun.wav"
 	flashSound0 "sound/weapons/grapple/grapplef1a.wav"
