@@ -13,7 +13,7 @@ Do "play testing" to find bugs and to find things to change, improve, and add.
 == engine ==
 
 // Weapons! (and attacking)
-[todo] Add code so that Nunchuk can spin when standing? When not spining have gravity, like MP held CTF flag?
+[todo] Add code so that Nunchuk can spin when standing? When not spining have gravity, like MISSIONPACK held CTF flag?
 
 STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features via weapon scripting
 
@@ -33,10 +33,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Attack movement flags. Stop, cut speed in half, double speed, turn right?, etc.
 
-[todo] Per-triangle collision for player damage, use lowest LOD model or have a model special for collision?
-: Using a special model for collision we could use group names to set what part of player is hit,
-:   so shell takes less damage, banndana takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
-
 [todo] Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
 : Logic-wise tag_hand_* make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
 
@@ -53,7 +49,7 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Finish new path system "g_paths.c" for movers (trains), NPCs?, (and hopefully players; cutscenes?, NiGHTS mode!)
 
-[todo] Support models/players/NAME/animsounds.cfg used in STV:EF (SP?) (Also used in JK2) ?
+[todo] Support models/players/NAME/animsounds.cfg used in STV:Elite Force (SP?) (Also used in Jedi Knight 2) ?
 : Started see bg_sound_t and Sounds_Parse; it is similar to animsounds, but different.
 :    If currently doesn't load sounds and is for NPC and misc objects only.
 
@@ -69,10 +65,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 [bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects.
 
 [bug] When PW_FLASHING wears off and player is in a non-solid misc_object they are needlessly killed.
-
-[todo] Have dropped ET_ITEMs (weapons, holdables, powerups, etc) blink/flash before disappearing
-: Using newly added RF_FORCE_ENT_ALPHA!
-: Does cgame have any idea of when items are going to be removed?
 
 [todo] Have shurikens do damage while they are in the wall/ground?
 
@@ -109,9 +101,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 BETTER(not done?): When moving the camera around the player, focus on the player. (Like in NiGHTS: Journey of Dreams)
 
 STARTED(TMNT // LOCKON): [todo] When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
-
-DONE: Optional Analog-ish Control input
-: Start moving from angles of camera not player
 
 [todo] Merge Quake3 and Team Arena bot chat systems; One chat system to rule them all!
 * Problem: Team Arena adds voice chats, which are only used in gametypes >= GT_TEAM. There was also players that could only be used in gametypes >= GT_TEAM that did not have q3 chats. Leaving q3 players for FFA and Duel (with there normal q3 chats) (The TA players have no q3 chats and the players can't be used in q3, q3 players can't be used in gametypes >= GT_TEAM and have no voice chats.) So Team Arena had two seperate chat systems. TMNT Arena supports Q3 and Team Arena players in all gametypes and allows merged Q3/TA players. But in the gametypes >= GT_TEAM ONLY the TA voice chats are used. And like wise in non-team gametypes only "Q3 chats" are used.
@@ -158,6 +147,10 @@ WONTFIX?: [bug/todo] First Person weapon doesn't draw correctly (It draws too ne
 [todo] Throw shurikens with secondary hand, so can't with CTF flag? Have only one attack animation.
 [todo if above is done] Must put secondary weapon away to throw shuriken, then get it back put?
 : So Don can throw shurikens sooner than Leo/Raph/Mike?
+
+[todo] Per-triangle collision for player damage, use lowest LOD model or have a model special for collision?
+: Using a special model for collision we could use group names to set what part of player is hit,
+:   so shell takes less damage, banndana takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
 
 === Done? ===
 DONE?: TMNTWEAPSYS weapon_random entity that spawns a random weapon each time the weapon respawns

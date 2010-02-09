@@ -89,40 +89,6 @@ typedef struct campspot_s
 	struct campspot_s *next;
 } campspot_t;
 
-#if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h
-//FIXME: these are game specific
-typedef enum {
-	GT_FFA,				// free for all
-	GT_TOURNAMENT,		// one on one tournament
-	GT_SINGLE_PLAYER,	// single player tournament
-
-#if 0 // #ifdef TMNT
-	GT_LMS,				// Last Man Standing
-	GT_KOTH,			// King Of The Hill
-	GT_KEEPAWAY,		// Keep Away
-#endif
-
-	//-- team games go after this --
-
-	GT_TEAM,			// team deathmatch
-#if 0 // #ifdef TMNT
-	GT_LTEAMS,			// last team standing
-#endif
-	GT_CTF,				// capture the flag
-#ifdef MISSIONPACK
-	GT_1FCTF,
-	GT_OBELISK,
-#ifdef MISSIONPACK_HARVESTER
-	GT_HARVESTER,
-#endif
-#if 0 // Turtle Man: In the gametype name arrays there is a Team Tournament.
-	GT_TEAMTOURNAMENT,
-#endif
-#endif
-	GT_MAX_GAME_TYPE
-} gametype_t;
-#endif
-
 typedef struct levelitem_s
 {
 	int number;							//number of the level item
@@ -1121,12 +1087,6 @@ void BotFindEntityForLevelItem(levelitem_t *li)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-
-#if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h
-//NOTE: enum entityType_t in bg_public.h
-#define ET_ITEM			2
-#endif
-
 void BotUpdateEntityItems(void)
 {
 	int ent, i, modelindex;

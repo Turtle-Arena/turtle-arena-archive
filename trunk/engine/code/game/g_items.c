@@ -833,6 +833,11 @@ gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity ) {
 
 	trap_LinkEntity (dropped);
 
+#ifdef IOQ3ZTM // ITEMS_DISAPPEAR
+	// Update cent->miscTime
+	G_AddEvent( dropped, EV_ITEM_RESPAWN, 1 );
+#endif
+
 	return dropped;
 }
 
