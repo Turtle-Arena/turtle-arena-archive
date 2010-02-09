@@ -726,8 +726,18 @@ static void CG_Item( centity_t *cent ) {
 	ent.nonNormalizedAxes = qfalse;
 
 	// if just respawned, slowly scale up
+#ifdef IOQ3ZTM // ITEMS_DISAPPEAR
+	if (cent->currentState.modelindex2 != 0) // This is non-zero is it's a dropped item
+	{
+		if (cent->currentState.time2 > 0) // Dropped weapon by keypress
+			msec = (cg.time - cent->miscTime - 15000) * -1;
+		else
+			msec = (cg.time - cent->miscTime - 30000) * -1;
+	}
+	else
+#endif
 	msec = cg.time - cent->miscTime;
-#ifdef IOQ3ZTM // Turtle Man: TEST
+#ifdef TMNTMISC // Have items fade in
 	// Doesn't work well with poperup shaders as they use alphagen...
 	if ( msec >= 0 && msec < 3000 ) {
 		frac = (float)msec / 3000;

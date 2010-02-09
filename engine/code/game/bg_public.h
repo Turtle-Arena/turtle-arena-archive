@@ -24,8 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //    Instead of scattering defines/enums all over that must be the same
 //        in the server, client, and botlib as in the VMs, keep all in one place.
 
-// Code that was moved here was disabled with ' #if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h '
-
 // Turtle Man: The server/client/botlib doesn't need most of bg_misc.h
 // There is only like 10-12 bytes of data here. Could we get it from "game"?
 //                                      Add a VM_Call? or a cvar? (By adding a cvar we could support unmoded Q3 and games with the Cvar!)
