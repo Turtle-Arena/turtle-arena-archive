@@ -4687,6 +4687,9 @@ char *eventnames[] = {
 	"EV_GIB_PLAYER",			// gib a previously living player
 #endif
 	"EV_SCOREPLUM",			// score plum
+#ifdef TMNTENTSYS // BREAKABLE
+	"EV_SPAWN_DEBRIS",
+#endif
 
 //#ifdef MISSIONPACK
 #if !defined TMNTWEAPONS || defined NET_COMPAT
