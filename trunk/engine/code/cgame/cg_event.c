@@ -1234,6 +1234,29 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_ScorePlum( cent->currentState.otherEntityNum, cent->lerpOrigin, cent->currentState.time );
 		break;
 
+#ifdef TMNTENTSYS // BREAKABLE
+	case EV_SPAWN_DEBRIS:
+		DEBUGNAME("EV_SPAWN_DEBRIS");
+		if ( es->eventParm != 255 ) {
+			ByteToDir( es->eventParm, dir );
+		} else {
+			localEntity_t	*smoke;
+			vec3_t			up;
+
+			VectorSet( up, 0, 0, 64 );
+
+			smoke = CG_SmokePuff( position, up, es->otherEntityNum*2, 1, 1, 1, 1, 700, cg.time, 0, 0, cgs.media.smokePuffShader );
+			// use the optimized local entity add
+			smoke->leType = LE_SCALE_FADE;
+
+			VectorSet(dir, 0, 0, 1);
+		}
+#ifdef TMNTMISC // MATERIALS
+		CG_ImpactParticles(position, dir, es->otherEntityNum, -1);
+#endif
+		break;
+#endif
+
 	//
 	// missile impacts
 	//

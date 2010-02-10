@@ -3427,7 +3427,7 @@ void CG_MeleeHit( vec3_t origin/*, int entityNum */) {
 CG_LaunchModel
 ==================
 */
-localEntity_t *CG_LaunchModel( vec3_t origin, vec3_t velocity, qhandle_t hModel ) {
+localEntity_t *CG_LaunchModel( vec3_t origin, vec3_t velocity, qhandle_t hModel, float maxSize ) {
 	localEntity_t	*le;
 	refEntity_t		*re;
 	vec3_t angles;
@@ -3449,9 +3449,12 @@ localEntity_t *CG_LaunchModel( vec3_t origin, vec3_t velocity, qhandle_t hModel 
 	AnglesToAxis( angles, re->axis );
 
 	// random size
-	frac = (float)(random() * 2.0f);
-	if (frac < 0.1f) {
-		frac = 0.1f;
+	if (maxSize < 2.0f) {
+		maxSize = 2.0f;
+	}
+	frac = (float)(random() * maxSize);
+	if (frac < 1.0f) {
+		frac = 1.0f;
 	}
 	VectorScale( re->axis[0], frac, re->axis[0] );
 	VectorScale( re->axis[1], frac, re->axis[1] );
@@ -3485,7 +3488,8 @@ Cool wall hit effects, note that the "particles" are models not sprites.
 void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFlags )
 {
 	localEntity_t	*le;
-	int i, j, k;
+	int i, j;
+	//int k;
 	int numParticles;
 	qhandle_t model;
 	int numModels;
@@ -3496,6 +3500,7 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 			SURF_METALSTEPS, SURF_SPARKS, SURF_GLASS, 0 };
 
 	// Move out of wall.
+	VectorCopy(origin, newOrigin);
 	VectorMA( origin, 10, dir, origin );
 
 	// This doesn't seem to work...
@@ -3503,9 +3508,6 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 	{
 		// Do a trace to get the flags.
 		trace_t trace;
-		vec3_t newOrigin;
-
-		VectorMA( origin, -10, dir, newOrigin );
 
 		CG_Trace( &trace, origin, NULL, NULL, newOrigin, -1, CONTENTS_SOLID );
 		surfaceFlags = trace.surfaceFlags;
@@ -3515,7 +3517,7 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 	//	Com_Printf("CG_ImpactParticles: surfaceFlags=%d\n", surfaceFlags);
 	//}
 
-	VectorNormalize(dir);
+	//VectorNormalize(dir);
 
 	for (i = 0; surfaceTypes[i] != 0; i++)
 	{
@@ -3545,9 +3547,9 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 			else if (radius <= 18)
 				numParticles = 6;
 			else if (radius <= 26)
-				numParticles = 9;
-			else
 				numParticles = 12;
+			else
+				numParticles = 24;
 
 			for (j = 0; j < numParticles; j++)
 			{
@@ -3557,17 +3559,17 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 				newOrigin[1] += random()*(radius*1.2f)/2 - random()*(radius*1.2f)/2;
 				newOrigin[2] += random()*(radius*1.2f)/2 - random()*(radius*1.2f)/2;
 
-				velocity[0] = crandom()*EXP_VELOCITY*(0.5f*(i+1));
-				velocity[1] = crandom()*EXP_VELOCITY*(0.5f*(i+1));
+				velocity[0] = crandom()*EXP_VELOCITY;
+				velocity[1] = crandom()*EXP_VELOCITY;
 				velocity[2] = EXP_JUMP + crandom()*EXP_VELOCITY;
 
-				for (k = 0; k < 3; k++)
-				{
-					velocity[k] *= dir[k];
-				}
+				//for (k = 0; k < 3; k++)
+				//{
+				//	velocity[k] *= dir[k];
+				//}
 
 				model = cgs.media.matModels[i][rand()%numModels];
-				le = CG_LaunchModel(newOrigin, velocity, model);
+				le = CG_LaunchModel(newOrigin, velocity, model, radius/4);
 			}
 
 			// smoke particles?

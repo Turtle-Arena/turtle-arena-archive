@@ -973,6 +973,55 @@ int G_InvulnerabilityEffect( gentity_t *targ, vec3_t dir, vec3_t point, vec3_t i
 	}
 }
 #endif
+
+#ifdef TMNTENTSYS // BREAKABLE
+/*
+=================
+G_BreakableDebris
+
+Spawn debris from breakable, the debris itself is not beakable.
+=================
+*/
+void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point)
+{
+	gentity_t   *tent;
+	vec3_t      size;
+ 
+ 	VectorSubtract(targ->r.maxs, targ->r.mins, size);
+ 	VectorScale(size, 0.5, size);
+ 
+	// point doesn't work with splash damage weapons?
+	if (targ->health <= 0 || !dir || VectorLength(dir) == 0)
+	{
+		vec3_t      center;
+
+		// Find the center of the brush
+		VectorAdd(targ->r.mins, size, center);
+
+		tent = G_TempEntity( center, EV_SPAWN_DEBRIS );
+		tent->s.eventParm = 255;
+	}
+	else
+	{
+		tent = G_TempEntity( point, EV_SPAWN_DEBRIS );
+		VectorInverse(dir);
+		tent->s.eventParm = DirToByte(dir);
+	}
+
+	// only use small size debris if not exploding
+	if (targ->health > 0 && inflictor->s.weapon != WP_NONE)
+	{
+		if (inflictor == attacker)
+			tent->s.otherEntityNum = bg_weapongroupinfo[attacker->s.weapon].weapon[0]->wallmarkRadius;
+		else if (inflictor->s.eType == ET_MISSILE)
+			tent->s.otherEntityNum = bg_projectileinfo[inflictor->s.weapon].wallmarkRadius;
+	}
+
+	if (!tent->s.otherEntityNum)
+		tent->s.otherEntityNum = VectorLength(size);
+}
+#endif
+
 /*
 ============
 T_Damage
@@ -1064,8 +1113,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		if (targ->health < 0)
 			targ->health = 0;
 
-		// Turtle Man: TODO: Spawn particles (model materials and smoke sprites)
-		//G_BreakBrush(targ, inflictor, attacker, dir, point, mod);
+		G_BreakableDebris(targ, inflictor, attacker, dir, point);
 
 		if (targ->health <= 0)
 		{
