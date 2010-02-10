@@ -88,7 +88,6 @@ UI_SPSkillMenu_SkillEvent
 static void UI_SPPlayerMenu_PlayerEvent( void *ptr, int notification ) {
 	int		id;
 	int		player;
-	char	*pic;
 
 	if (notification != QM_ACTIVATED)
 		return;

@@ -170,6 +170,9 @@ int BotTeamCubeCarrierVisible(bot_state_t *bs);
 int BotEnemyCubeCarrierVisible(bot_state_t *bs);
 #endif
 #endif
+#ifdef TMNTWEAPSYS_EX
+qboolean G_CanShootProx(weapon_t w);
+#endif
 //get a random alternate route goal towards the given base
 int BotGetAlternateRouteGoal(bot_state_t *bs, int base);
 //returns either the alternate route goal or the given goal
