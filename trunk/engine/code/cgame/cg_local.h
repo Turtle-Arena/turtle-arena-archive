@@ -133,21 +133,6 @@ typedef enum {
 } impactSound_t;
 
 #ifdef TMNTMISC // MATERIALS
-typedef enum
-{
-	MT_NONE,
-	MT_DIRT,
-	MT_GRASS,
-	MT_WOOD,
-	MT_STONE,
-	MT_METAL,
-	MT_SPARKS,
-	MT_GLASS,
-
-	NUM_MATERIAL_TYPES
-
-} materialType_t;
-
 // Models Per Material type
 #define NUM_MATERIAL_MODELS		5
 #endif
@@ -1828,7 +1813,7 @@ void CG_RegisterItemVisuals( int itemNum );
 
 void CG_FireWeapon( centity_t *cent );
 #ifdef TMNTMISC // MATERIALS
-void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFlags );
+void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFlags, int skipNum );
 #endif
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );

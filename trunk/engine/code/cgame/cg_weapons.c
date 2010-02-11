@@ -3485,7 +3485,7 @@ Cool wall hit effects, note that the "particles" are models not sprites.
 */
 #define	EXP_VELOCITY	100
 #define	EXP_JUMP		150
-void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFlags )
+void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFlags, int skipNum )
 {
 	localEntity_t	*le;
 	int i, j;
@@ -3495,42 +3495,53 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 	int numModels;
 	vec3_t velocity;
 	vec3_t newOrigin;
-	// MT_* to SURF_*
-	const int surfaceTypes[] = { SURF_DIRT, SURF_GRASS, SURF_WOOD, SURF_STONE,
-			SURF_METALSTEPS, SURF_SPARKS, SURF_GLASS, 0 };
+	trace_t trace;
 
-	// Move out of wall.
-	VectorCopy(origin, newOrigin);
-	VectorMA( origin, 10, dir, origin );
-
-	// This doesn't seem to work...
-	if (surfaceFlags == -1)
+	if (dir && VectorLength(dir))
 	{
+		// Move away from surface
+		VectorMA( origin, 10, dir, origin );
+
 		// Do a trace to get the flags.
-		trace_t trace;
+		if (surfaceFlags == -1)
+		{
+			// Move into surface (- 10 [return to origin] - 20 [into surface])
+			VectorMA( origin, -30, dir, newOrigin );
 
-		CG_Trace( &trace, origin, NULL, NULL, newOrigin, -1, CONTENTS_SOLID );
-		surfaceFlags = trace.surfaceFlags;
+			CG_Trace( &trace, origin, NULL, NULL, newOrigin, skipNum, MASK_PLAYERSOLID );
+			surfaceFlags = trace.surfaceFlags;
+		}
 	}
-	// DEBUG: MATERIALS
-	//if (surfaceFlags != 0) {
-	//	Com_Printf("CG_ImpactParticles: surfaceFlags=%d\n", surfaceFlags);
-	//}
-
-	//VectorNormalize(dir);
-
-	for (i = 0; surfaceTypes[i] != 0; i++)
+	else
 	{
-		if ((surfaceFlags & surfaceTypes[i])
-			|| (surfaceFlags == 0 && surfaceTypes[i] == SURF_METALSTEPS))
+		CG_Trace( &trace, origin, NULL, NULL, origin, skipNum, MASK_PLAYERSOLID );
+
+		VectorMA( origin, 10, trace.plane.normal, origin );
+
+		if (surfaceFlags == -1) {
+			surfaceFlags = trace.surfaceFlags;
+		}
+	}
+
+	if (radius <= 10)
+		numParticles = 3;
+	else if (radius <= 18)
+		numParticles = 6;
+	else if (radius <= 26)
+		numParticles = 12;
+	else
+		numParticles = 24;
+
+	for (i = 1; i < NUM_MATERIAL_TYPES; i++)
+	{
+		if ((surfaceFlags & materialInfo[i].surfaceFlag)
+			// default to stone debris if their is no set debris
+			/*|| (surfaceFlags == 0 && materialInfo[i].surfaceFlag == SURF_STONE)*/)
 		{
 			// Impact sounds?
+			// Smoke particles?
 
-			// DEBUG: MATERIALS
-			//if (surfaceFlags != 0) {
-			//	Com_Printf("CG_ImpactParticles: Has surf %d\n", i);
-			//}
-
+			// Turtle Man: TODO: Move to model loading, so it only has to be done once?
 			numModels = 0;
 			for (j = 0; j < NUM_MATERIAL_MODELS; j++)
 			{
@@ -3540,16 +3551,6 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 			}
 			if (!numModels)
 				continue;
-
-			// Change number based on weapon or surfaceType?
-			if (radius <= 10)
-				numParticles = 3;
-			else if (radius <= 18)
-				numParticles = 6;
-			else if (radius <= 26)
-				numParticles = 12;
-			else
-				numParticles = 24;
 
 			for (j = 0; j < numParticles; j++)
 			{
@@ -3571,11 +3572,6 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 				model = cgs.media.matModels[i][rand()%numModels];
 				le = CG_LaunchModel(newOrigin, velocity, model, radius/4);
 			}
-
-			// smoke particles?
-
-			if (surfaceFlags == 0)
-				break;
 		}
 	}
 }
@@ -3936,9 +3932,9 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 
 #ifdef TMNTMISC // MATERIALS
 	if (soundType == IMPACTSOUND_METAL)
-		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS);
+		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS, clientNum);
 	else
-		CG_ImpactParticles(origin, dir, radius, -1);
+		CG_ImpactParticles(origin, dir, radius, -1, clientNum);
 #endif
 }
 #endif // !TMNTWEAPSYS
@@ -4122,9 +4118,9 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 	}
 #ifdef TMNTMISC // MATERIALS
 	if (soundType == IMPACTSOUND_METAL)
-		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS);
+		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS, clientNum);
 	else
-		CG_ImpactParticles(origin, dir, radius, -1);
+		CG_ImpactParticles(origin, dir, radius, -1, clientNum);
 #endif
 }
 
@@ -4366,9 +4362,9 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	}
 #ifdef TMNTMISC // MATERIALS
 	if (soundType == IMPACTSOUND_METAL)
-		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS);
+		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS, clientNum);
 	else
-		CG_ImpactParticles(origin, dir, radius, -1);
+		CG_ImpactParticles(origin, dir, radius, -1, clientNum);
 #endif
 }
 

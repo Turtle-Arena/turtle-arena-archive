@@ -1733,6 +1733,19 @@ char	*modNames[] = {
 };
 int modNamesSize = sizeof( modNames ) / sizeof( modNames[0] );
 
+#ifdef TMNTMISC // MATERIALS
+materialInfo_t materialInfo[NUM_MATERIAL_TYPES] = {
+	{"none",	0 },
+	{"dirt",	SURF_DIRT },
+	{"grass",	SURF_GRASS },
+	{"wood",	SURF_WOOD },
+	{"stone",	SURF_STONE },
+	{"metal",	SURF_METALSTEPS },
+	{"sparks",	SURF_SPARKS },
+	{"glass",	SURF_GLASS }
+};
+#endif
+
 #ifdef TMNTWEAPSYS
 bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];

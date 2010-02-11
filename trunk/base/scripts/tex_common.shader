@@ -269,6 +269,7 @@ textures/common/mirror1
 {
 	qer_editorimage textures/common/mirror1.jpg
 	surfaceparm nolightmap
+	surfaceparm glass
 	portal
   	{
 		map textures/common/invisible.tga
@@ -282,6 +283,7 @@ textures/common/mirror2
 {
 	qer_editorimage textures/common/mirror1.jpg
 	surfaceparm nolightmap
+	surfaceparm glass
 	portal
 	{
 		map textures/common/invisible.tga

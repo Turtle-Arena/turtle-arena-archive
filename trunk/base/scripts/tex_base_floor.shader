@@ -204,3 +204,30 @@ textures/base_floor/grass2-old
 		blendFunc GL_DST_COLOR GL_ZERO
 	}
 }
+
+textures/base_floor/subway_tile
+{
+	surfaceparm stone
+	{
+		map textures/base_floor/subway_tile
+		rgbGen identity
+	}
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+	}
+}
+textures/base_floor/subway_ceiling
+{
+	surfaceparm stone
+	{
+		map textures/base_floor/subway_ceiling
+		rgbGen identity
+	}
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+	}
+}

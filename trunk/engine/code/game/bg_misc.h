@@ -1223,6 +1223,32 @@ animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum);
 animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
 #endif
 
+
+#ifdef TMNTMISC // MATERIALS
+typedef enum
+{
+	MT_NONE,
+	MT_DIRT,
+	MT_GRASS,
+	MT_WOOD,
+	MT_STONE,
+	MT_METAL,
+	MT_SPARKS,
+	MT_GLASS,
+
+	NUM_MATERIAL_TYPES
+
+} materialType_t;
+
+typedef struct
+{
+	char	*name;
+	int		surfaceFlag;
+} materialInfo_t;
+
+extern materialInfo_t materialInfo[NUM_MATERIAL_TYPES];
+#endif
+
 #ifdef TMNTENTSYS // MISC_OBJECT
 // TMNTNPCSYS: Have Misc_Objects and NPCs use the same animations
 // Keep in sycn with CG's misc_object_anim_names
