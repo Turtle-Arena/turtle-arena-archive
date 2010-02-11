@@ -427,15 +427,75 @@ models/weapons2/nunchuck/chain
 //
 // MATERIALS
 //
+models/materials/dirt
+{
+	celoutline 2
+
+	{
+		map models/materials/dirt.png
+		blendFunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+
+models/materials/grass
+{
+	celoutline 2
+
+	{
+		map models/materials/grass.png
+		blendFunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+
+models/materials/wood
+{
+	celoutline 2
+
+	{
+		map models/materials/wood.png
+		blendFunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+
 models/materials/stone
 {
-	// It look better with a cel outline
 	celoutline 2
 
 	{
 		map models/materials/stone.png
 		blendFunc GL_ONE GL_ZERO
 		rgbGen lightingDiffuse
+	}
+}
+
+models/materials/metal
+{
+	celoutline 2
+
+	{
+		map models/materials/metal.png
+		blendFunc GL_ONE GL_ZERO
+		rgbGen lightingDiffuse
+	}
+}
+
+//models/materials/sparks
+
+//Based on textures/base_wall/glass01
+models/materials/glass
+{
+	surfaceparm trans
+	cull none
+	celoutline 2
+
+	{
+		map textures/effects/tinfx.png
+		tcgen environment
+		blendFunc GL_ONE GL_ONE
+		rgbGen identity
 	}
 }
 

@@ -6,6 +6,7 @@ textures/base_light/subway_ceiling_light
 	q3map_lightimage textures/base_light/subway_ceiling_light.blend.png
 	q3map_surfacelight 2000
 	q3map_flare flareShader-wide
+	surfaceparm sparks
 	{
 		map textures/base_light/subway_ceiling_light.png
 		rgbGen identity
@@ -28,6 +29,7 @@ textures/base_light/subway_ceiling_light_4k
 	q3map_lightimage textures/base_light/subway_ceiling_light.blend.png
 	q3map_surfacelight 4000
 	q3map_flare flareShader-wide
+	surfaceparm sparks
 	{
 		map textures/base_light/subway_ceiling_light.png
 		rgbGen identity
@@ -52,7 +54,7 @@ textures/base_light/baslt4_1_2k
 	q3map_lightimage textures/base_light/baslt4_1.blend.png
 	surfaceparm nomarks
 	q3map_surfacelight 2000
-	
+	surfaceparm sparks
 	
 	{
 		map $lightmap
@@ -75,7 +77,7 @@ textures/base_light/baslt4_1_4k
 	q3map_lightimage textures/base_light/baslt4_1.blend.png
 	surfaceparm nomarks
 	q3map_surfacelight 4000
-	
+	surfaceparm sparks
 	
 	{
 		map $lightmap

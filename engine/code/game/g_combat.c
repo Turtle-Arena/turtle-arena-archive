@@ -1000,21 +1000,26 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 
 		tent = G_TempEntity( center, EV_SPAWN_DEBRIS );
 		tent->s.eventParm = 255;
+
+		tent->s.time2 = targ->s.time2; // surfaceFlags
 	}
 	else
 	{
 		tent = G_TempEntity( point, EV_SPAWN_DEBRIS );
 		VectorInverse(dir);
 		tent->s.eventParm = DirToByte(dir);
+		tent->s.time2 = -1; // surfaceFlags
 	}
+
+	tent->s.number = inflictor->s.number;
 
 	// only use small size debris if not exploding
 	if (targ->health > 0 && inflictor->s.weapon != WP_NONE)
 	{
-		if (inflictor == attacker)
-			tent->s.otherEntityNum = bg_weapongroupinfo[attacker->s.weapon].weapon[0]->wallmarkRadius;
-		else if (inflictor->s.eType == ET_MISSILE)
+		if (inflictor->s.eType == ET_MISSILE)
 			tent->s.otherEntityNum = bg_projectileinfo[inflictor->s.weapon].wallmarkRadius;
+		else if (inflictor == attacker && inflictor->client) // Melee damage
+			tent->s.otherEntityNum = bg_weapongroupinfo[inflictor->s.weapon].weapon[0]->wallmarkRadius;
 	}
 
 	if (!tent->s.otherEntityNum)

@@ -1,9 +1,10 @@
 //custom surfaceParms file (for 'q3map2 -custinfoparms')
-//  Turtle Man: Haven't finished writing the material code yet, so these aren't very useful.
 
 //custom CONTENTS_ flags
 {
-
+  freeSlot1  0x1000
+  freeSlot2  0x2000
+  freeSlot3  0x4000
 }
 
 //custom SURF_ flags

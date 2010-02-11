@@ -791,8 +791,23 @@ void InitMover( gentity_t *ent ) {
 #ifdef TMNTENTSYS // BREAKABLE
 	if (ent->health > 0)
 	{
+		char *mat;
+		int i;
+
 		ent->takedamage = qtrue;
 		// TODO: Set damage and pain?
+
+		ent->s.time2 = -1; // surfaceFlags
+
+		if( G_SpawnString( "material", NULL, &mat ) && mat && strlen(mat)) {
+			ent->s.time2 = 0;
+			for ( i = 1; i < NUM_MATERIAL_TYPES; i++)
+			{
+				if ( strstr( mat, materialInfo[i].name ) != NULL ) {
+					ent->s.time2 |= materialInfo[i].surfaceFlag;
+				}
+			}
+		}
 	}
 #endif
 }

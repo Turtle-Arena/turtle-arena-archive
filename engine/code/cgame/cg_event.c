@@ -1252,7 +1252,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			VectorSet(dir, 0, 0, 1);
 		}
 #ifdef TMNTMISC // MATERIALS
-		CG_ImpactParticles(position, dir, es->otherEntityNum, -1);
+		CG_ImpactParticles(position, dir, es->otherEntityNum, es->time2, es->number);
 #endif
 		break;
 #endif
