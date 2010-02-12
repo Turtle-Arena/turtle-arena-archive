@@ -83,30 +83,25 @@ textures/liquid/wateranim_sewer
 	}
 }
 
+// Based on textures/liquid/water_old
 textures/liquid/lavaanim
 {
 	qer_editorimage textures/liquid/lava.png
-	qer_trans .5
-	q3map_globaltexture
-	surfaceparm trans
-	surfaceparm nonsolid
+	qer_nocarve
+	q3map_surfaceLight 128
+
+	surfaceparm noimpact
 	surfaceparm lava
-    surfaceparm nodrop
+	tessSize 256
+	cull disable
+
+	deformVertexes wave 100 sin 3 2 .1 0.1
 
 	//fogparms 0.8519142 0.309723 0.0 128 128
-
-	cull disable
-	tessSize 32
-	deformVertexes normal .15 2 
-	deformVertexes bulge 128 5 2
-	{	
-		map $lightmap
-		blendfunc filter
-	}
-		
 	{
 		map textures/liquid/lava.png
-		blendfunc add
-		tcgen environment
+		tcMod turb .25 0.2 1 0.02
+		tcMod scroll 0.1 0.1
 	}
 }
+
