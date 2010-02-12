@@ -9,7 +9,6 @@ Do "play testing" to find bugs and to find things to change, improve, and add.
 * Add missing sounds
 * New Melee swing sound effects?
 * Finish animating raph_v9.mm3d
-* Fix subway lightgrid? (someparts of the main room the players/items are black)
 * Fix bots to damage players with melee weapons
 
 == engine ==
