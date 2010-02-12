@@ -1065,6 +1065,7 @@ weapon "w_dartgun"
 	model "models/weapons2/gun/gun.md3"
 	//mod MOD_GUN
 	attackDelay 400
+	flashColor 0 0 0 // no flash
 	projectile "p_dart"
 }
 
