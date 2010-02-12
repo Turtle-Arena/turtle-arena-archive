@@ -991,6 +991,9 @@ This function may execute for a couple of minutes with a slow disk.
 */
 static void CG_RegisterGraphics( void ) {
 	int			i;
+#ifdef TMNTMISC // MATERIALS
+	int			j;
+#endif
 	char		items[MAX_ITEMS+1];
 #ifdef TMNTNPCSYS
 	char		npcs[MAX_NPCS+1];
@@ -1364,27 +1367,17 @@ static void CG_RegisterGraphics( void ) {
 
 #ifdef TMNTMISC // MATERIALS
 	// Load models for materials
-	for (i=0 ; i<NUM_MATERIAL_MODELS ; i++) {
-		Com_sprintf (name, sizeof(name), "models/materials/dirt%i.md3", i+1);
-		cgs.media.matModels[MT_DIRT][i] = trap_R_RegisterModel(name);
+	for (i = 0 ; i < NUM_MATERIAL_MODELS; i++)
+	{
+		for (j = 1; j < NUM_MATERIAL_TYPES; j++)
+		{
+			Com_sprintf (name, sizeof(name), "models/materials/%s%i.md3", materialInfo[j].name, i+1);
+			cgs.media.matModels[j][i] = trap_R_RegisterModel(name);
 
-		Com_sprintf (name, sizeof(name), "models/materials/grass%i.md3", i+1);
-		cgs.media.matModels[MT_GRASS][i] = trap_R_RegisterModel(name);
-
-		Com_sprintf (name, sizeof(name), "models/materials/wood%i.md3", i+1);
-		cgs.media.matModels[MT_WOOD][i] = trap_R_RegisterModel(name);
-
-		Com_sprintf (name, sizeof(name), "models/materials/stone%i.md3", i+1);
-		cgs.media.matModels[MT_STONE][i] = trap_R_RegisterModel(name);
-
-		Com_sprintf (name, sizeof(name), "models/materials/metal%i.md3", i+1);
-		cgs.media.matModels[MT_METAL][i] = trap_R_RegisterModel(name);
-
-		Com_sprintf (name, sizeof(name), "models/materials/sparks%i.md3", i+1);
-		cgs.media.matModels[MT_SPARKS][i] = trap_R_RegisterModel(name);
-
-		Com_sprintf (name, sizeof(name), "models/materials/glass%i.md3", i+1);
-		cgs.media.matModels[MT_GLASS][i] = trap_R_RegisterModel(name);
+			if (cgs.media.matModels[j][i]) {
+				cgs.media.matNumModels[j]++;
+			}
+		}
 	}
 #endif
 

@@ -3969,7 +3969,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	trap_BotGetWeaponInfo(bs->ws, bs->weaponnum, &wi);
 #endif
 #ifndef TMNTWEAPONS // Turtle Man: Removed per-gun accuracy/skill.
-#ifndef TMNTWEAPSYS // Turtle Man: FIXME: Fix support for per-weapon aim_accuracy/aim_skill?
+#ifndef TMNTWEAPSYS // Turtle Man: WONTFIX: Fix support for per-weapon aim_accuracy/aim_skill?
 	//get the weapon specific aim accuracy and or aim skill
 	if (wi.number == WP_MACHINEGUN) {
 		aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_MACHINEGUN, 0, 1);
@@ -4385,7 +4385,6 @@ void BotCheckAttack(bot_state_t *bs) {
 #ifdef TMNTWEAPSYS
 	if (!bgProj) // Melee attacking
 	{
-		// Turtle Man: FIXME: Is it bad to use g_entities in bot code?
 		// G_MeleeDamage
 		gentity_t *ent = &g_entities[bs->entitynum];
 

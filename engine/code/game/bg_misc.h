@@ -735,7 +735,7 @@ typedef struct
 	int projnum; // bg_projectileinfo[projnum]
 	// aimOffset is the weapon aim offset for bots
 	vec3_t aimOffset;
-	int barrelSpin; // BS_*  (Turtle Man: TODO: May use for nunchucks?)
+	int barrelSpin; // BS_*
 
 	// melee only
 	char wallmarkName[MAX_QPATH];
@@ -761,9 +761,6 @@ typedef enum {
 	IT_AMMO,				// EFX: rotate
 #ifndef TMNT // NOARMOR
 	IT_ARMOR,				// EFX: rotate + minlight
-#endif
-#ifdef TMNT // CRATE
-	IT_CRATE,				// EFX: Turtle Man: TODO: solid + minlight
 #endif
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
 	IT_POWERUP,				// instant on, timer based
@@ -1789,9 +1786,6 @@ typedef enum {
 	IT_AMMO,				// EFX: rotate
 #ifndef TMNT // NOARMOR
 	IT_ARMOR,				// EFX: rotate + minlight
-#endif
-#ifdef TMNT // CRATE
-	IT_CRATE,				// EFX: Turtle Man: TODO: solid + minlight
 #endif
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
 	IT_POWERUP,				// instant on, timer based

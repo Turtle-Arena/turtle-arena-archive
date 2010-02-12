@@ -307,7 +307,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 	}
 
 	spread = bg_projectileinfo[projnum].spread;
-#if 0 // Turtle Man: FIXME: Only for machinegun
+#if 0 // Turtle Man: WONTFIX: Only for machinegun
 	if (g_gametype.integer == GT_TEAM)
 	{
 		damage = bg_projectileinfo[projnum].damage * 0.7;
@@ -680,7 +680,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		//id: FIXME: we prolly wanna abuse another field
 		bolt->s.generic1 = self->client->sess.sessionTeam;
 
-		// Turtle Man: FIXME: Needed for stickOnImpact projectiles?
+		// Needed for stickOnImpact projectiles
 		if (self && self->client)
 		{
 			bolt->s.angles[0] = self->client->ps.viewangles[0];

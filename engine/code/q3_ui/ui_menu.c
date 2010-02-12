@@ -277,7 +277,7 @@ static void Main_MenuDraw( void ) {
 	}
 
 #ifdef TMNT // Legal stuff...
-	//UI_DrawString( 320, 450, "This is a fangame, TMNT is used without permission. TMNT(c) Mirage Studios.", UI_CENTER|UI_SMALLFONT, color );
+	//UI_DrawString( 320, 450, "This is a fangame, TMNT is used without permission. TMNT(c) Viacom.", UI_CENTER|UI_SMALLFONT, color );
 #else
 	if (uis.demoversion) {
 		UI_DrawProportionalString( 320, 372, "DEMO      FOR MATURE AUDIENCES      DEMO", UI_CENTER|UI_SMALLFONT, color );

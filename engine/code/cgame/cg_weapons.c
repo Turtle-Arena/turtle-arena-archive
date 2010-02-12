@@ -2233,7 +2233,6 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team) 
 		}
 	}
 
-	// Turtle Man: TODO: Add a check like this in draw weapon?
 	// Check if we have some where to put it.
 	if (draw_primary && draw_secondary
 		&& !(ci->tagInfo & TI_TAG_WP_AWAY_PRIMARY) && !(ci->tagInfo & TI_TAG_WP_AWAY_SECONDARY))
@@ -3541,17 +3540,6 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 			// Impact sounds?
 			// Smoke particles?
 
-			// Turtle Man: TODO: Move to model loading, so it only has to be done once?
-			numModels = 0;
-			for (j = 0; j < NUM_MATERIAL_MODELS; j++)
-			{
-				if (!cgs.media.matModels[i][j])
-					break;
-				numModels++;
-			}
-			if (!numModels)
-				continue;
-
 			for (j = 0; j < numParticles; j++)
 			{
 				VectorCopy(origin, newOrigin);
@@ -3569,7 +3557,7 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 				//	velocity[k] *= dir[k];
 				//}
 
-				model = cgs.media.matModels[i][rand()%numModels];
+				model = cgs.media.matModels[i][rand()%cgs.media.matNumModels[i]];
 				le = CG_LaunchModel(newOrigin, velocity, model, radius/4);
 			}
 		}

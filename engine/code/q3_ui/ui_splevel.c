@@ -95,8 +95,8 @@ typedef struct {
 #endif
 	menubitmap_s	item_awards[6];
 	menubitmap_s	item_back;
-	menubitmap_s	item_reset;
 #ifndef TMNTSP
+	menubitmap_s	item_reset;
 	menubitmap_s	item_custom;
 #endif
 	menubitmap_s	item_next;
@@ -370,6 +370,7 @@ static void UI_SPLevelMenu_SetMenuItems( void ) {
 }
 
 
+#ifndef TMNTSP
 /*
 =================
 UI_SPLevelMenu_ResetEvent
@@ -408,6 +409,7 @@ static void UI_SPLevelMenu_ResetEvent( void* ptr, int event )
 
 	UI_ConfirmMenu( "RESET GAME?", UI_SPLevelMenu_ResetDraw, UI_SPLevelMenu_ResetAction );
 }
+#endif
 
 
 /*
@@ -946,14 +948,11 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_back.height					= 64;
 	levelMenuInfo.item_back.focuspic				= ART_BACK1;
 
+#ifndef TMNTSP // SP data is no longer saved like in Q3 // Custom moved to PLAY menu 
 	levelMenuInfo.item_reset.generic.type			= MTYPE_BITMAP;
 	levelMenuInfo.item_reset.generic.name			= ART_RESET0;
 	levelMenuInfo.item_reset.generic.flags			= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
-#ifdef TMNTSP // Turtle Man: TODO: Move reset somewhere else.
-	levelMenuInfo.item_reset.generic.x				= (640 - 128) / 2;
-#else
 	levelMenuInfo.item_reset.generic.x				= 170;
-#endif
 	levelMenuInfo.item_reset.generic.y				= 480-64;
 	levelMenuInfo.item_reset.generic.callback		= UI_SPLevelMenu_ResetEvent;
 	levelMenuInfo.item_reset.generic.id				= ID_RESET;
@@ -961,7 +960,6 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_reset.height					= 64;
 	levelMenuInfo.item_reset.focuspic				= ART_RESET1;
 
-#ifndef TMNTSP // Moved to PLAY menu
 	levelMenuInfo.item_custom.generic.type			= MTYPE_BITMAP;
 	levelMenuInfo.item_custom.generic.name			= ART_CUSTOM0;
 	levelMenuInfo.item_custom.generic.flags			= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1027,8 +1025,8 @@ static void UI_SPLevelMenu_Init( void ) {
 	}
 #endif
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_back );
-	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_reset );
 #ifndef TMNTSP
+	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_reset );
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_custom );
 #endif
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_next );

@@ -125,18 +125,23 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 #endif
 
 #ifdef TMNTHOLDABLE
+/*
+================
+G_ThrowShuriken
+
+Spawns shuriken missile based on holdable number.
+
+Turtle Man: TODO: Player animation for throw shuriken and use origin of tag_hand_* (primary or secondary)?
+================
+*/
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
 {
-	// Turtle Man: TODO: Player animation (Throw shuriken)?
-
 	switch (holdable)
 	{
 		case HI_SHURIKEN:
 		case HI_ELECTRICSHURIKEN:
 		case HI_FIRESHURIKEN:
 		case HI_LASERSHURIKEN:
-			// Turtle Man: TODO: Throw from origin of tag_hand_* (primary or secondary?)
-
 			// set aiming directions
 			AngleVectors (ent->client->ps.viewangles, forward, right, up);
 			CalcMuzzlePoint ( ent, forward, right, up, muzzle );
@@ -430,8 +435,6 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 #endif
 			{
 				// Failed to put weapon on torso!
-				// Turtle Man: TODO: This should be moved to player tag loading or just removed.
-				//G_Printf("DEBUG: G_DoMeleeDamage: Player missing primary weapon tag!\n");
 				return qfalse;
 			}
 		}
@@ -462,10 +465,6 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 #endif
 			{
 				// Failed to put weapon on torso!
-				// Turtle Man: NOTE: Disable message so quake3 players
-				//                   don't give lots of errors.
-				//                   tag_flag is only used by Team Arena players.
-				//G_Printf("DEBUG: G_DoMeleeDamage: Player missing secondary weapon tag!\n");
 				return qfalse;
 			}
 		}
@@ -558,13 +557,12 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 		damage = weapon->blades[i].damage * s_quadFactor;
 
 		if ( dodamage && (tr.startsolid || (tr.contents & CONTENTS_SOLID)) ) {
-			// Turtle Man: TODO: Push player away from trace dir!
-			// Copied from G_Damage
+			// Push player away from trace dir!
+			// Based on code in G_Damage
 			vec3_t	kvel;
 			float	mass;
 			int knockback;
 
-			// ...not from G_Damage
 			ent->client->ps.meleeTime /= 2;
 			if (ent->client->ps.meleeTime < 1)
 				ent->client->ps.meleeTime = 1;
@@ -588,7 +586,6 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 					t = 200;
 				}
 
-				// ...not from G_Damage
 				ent->client->ps.meleeDelay = t;
 
 				ent->client->ps.pm_time = t;
