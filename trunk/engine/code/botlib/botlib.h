@@ -30,7 +30,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 // Turtle Man: Botlib is not compatible with (io)quake3 (or anyone else)
-// Turtle Man: FIXME: Are there other defines that are not compatible?
 #if defined TMNTWEAPSYS || defined TMNTWEAPSYS_NOCOMPAT || (defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT) || defined TMNTHOLDSYS
 	
 	#ifdef TMNTWEAPSYS // & 4

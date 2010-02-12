@@ -1154,6 +1154,7 @@ typedef struct {
 
 #ifdef TMNTMISC // MATERIALS
 	qhandle_t	matModels[NUM_MATERIAL_TYPES][NUM_MATERIAL_MODELS];
+	int			matNumModels[NUM_MATERIAL_TYPES];
 #endif
 
 	// sounds

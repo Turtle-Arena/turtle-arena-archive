@@ -475,6 +475,7 @@ static void CG_MiscObject( centity_t *cent ) {
 #ifdef TMNTNPCSYS
 	// Add NPC's weapon
 	// Turtle Man: TODO: Can I reuse the player weapon drawing code?
+	// Turtle Man: TODO: Support secondary weapon model.
 	if (isNPC && s1->weapon > WP_NONE && s1->weapon < BG_NumWeaponGroups())
 	{
 		refEntity_t	weapon;
@@ -516,8 +517,6 @@ static void CG_MiscObject( centity_t *cent ) {
 
 			trap_R_AddRefEntityToScene( &barrel );
 		}
-
-		// Turtle Man: TODO: Add weapon2 for melee weapons.
 	}
 #endif
 }
@@ -616,9 +615,6 @@ static void CG_Item( centity_t *cent ) {
 #ifdef IOQ3ZTM // move icons as well as models.
 	// items bob up and down continuously
 	scale = 0.005 + cent->currentState.number * 0.00001;
-#ifdef TMNT // CRATE
-	if (item->giType != IT_CRATE)
-#endif
 	cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
 #endif
 #ifdef IOQ3ZTM // If missing item model, use item sprite.
@@ -644,9 +640,6 @@ static void CG_Item( centity_t *cent ) {
 #ifndef IOQ3ZTM // move icons as well as models.
 	// items bob up and down continuously
 	scale = 0.005 + cent->currentState.number * 0.00001;
-#ifdef TMNT // CRATE
-	if (item->giType != IT_CRATE)
-#endif
 	cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
 #endif
 
@@ -659,11 +652,6 @@ static void CG_Item( centity_t *cent ) {
 	ent.shaderRGBA[3] = 255;
 #endif
 
-#ifdef TMNT // CRATE
-	if (item->giType == IT_CRATE) {
-		// Don't rotate automaticly.
-	} else
-#endif
 	// autorotate at one of two speeds
 	if ( item->giType == IT_HEALTH ) {
 		VectorCopy( cg.autoAnglesFast, cent->lerpAngles );

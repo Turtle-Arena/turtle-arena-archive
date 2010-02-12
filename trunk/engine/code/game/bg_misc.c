@@ -1465,7 +1465,7 @@ Only in One Flag CTF games
 #endif // TMNTWEAPONS
 #endif
 
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Breaks q3 bots' MODELINDEX_*s
+#ifdef TMNTWEAPSYS
 /*QUAKED weapon_default (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -1480,22 +1480,6 @@ Only in One Flag CTF games
 		WP_DEFAULT,
 /* precache */ "",
 /* sounds */ ""
-	},
-#endif
-
-#ifdef TMNT // CRATE
-	{
-		"item_crate",
-		NULL,
-        { "models/crates/normal/normal.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/crate",
-/* pickup */	"Crate",
-		80,
-		IT_CRATE,
-		0,
-/* precache */ "",
-/* sounds */ ""  // Crate break sound?
 	},
 #endif
 
@@ -3335,9 +3319,6 @@ void BG_InitWeaponInfo(void)
 		BG_ParseWeaponInfoFile(filename);
 	}
 
-	// Done setting up the weapon system.
-	bg_weaponsys_init = qtrue;
-
 	// Turtle Man: TODO: Missing weapon info, try to avoid crash!
 	if (!bg_projectileinfo[1].name[0])
 	{
@@ -3373,6 +3354,9 @@ void BG_InitWeaponInfo(void)
 		bg_weapongroupinfo[1].weapon[0] = &bg_weaponinfo[1];
 		bg_numweapongroups++;
 	}
+
+	// Done setting up the weapon system.
+	bg_weaponsys_init = qtrue;
 
 #if 0
 	// So I can see if it is loading correctly.
@@ -4356,11 +4340,6 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		}
 #endif
 		return qtrue;
-#endif
-
-#ifdef TMNT // CRATE
-	case IT_CRATE:
-		return qfalse;
 #endif
 
 	case IT_HEALTH:
@@ -5790,8 +5769,6 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			}
 			continue;
 		}
-
-		// Turtle Man: TODO: Add more per-player stuff.
 
 		// Turtle Man: TODO: Jump Percent 1-100 ?
 		else if ( !Q_stricmp( token, "jumpheight" ) ) {

@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#ifdef TMNT // Turtle Man: TODO: FINISH THIS (Is it done yet?)
+#ifdef TMNT
 #define INVENTORY_NONE				0
 #define INVENTORY_HEALTH			55
 
@@ -188,9 +188,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //#define MODELINDEX_CHAINGUN			0
 
 #define MODELINDEX_DEFAULTWEAPON	41 // weapon index -1
-
-// TMNT item
-#define MODELINDEX_CRATE			42
 
 // WEAPONINDEX_*
 #ifdef TMNTWEAPONS

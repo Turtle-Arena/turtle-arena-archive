@@ -900,20 +900,8 @@ void FinishSpawningItem( gentity_t *ent ) {
 #endif
 	ent->s.modelindex2 = 0; // zero indicates this isn't a dropped item
 
-#ifdef TMNT // CRATE : solid
-	if (ent->item->giType == IT_CRATE) {
-		ent->r.contents = CONTENTS_SOLID;
-		ent->takedamage = qtrue;
-		ent->health = 10;
-	}
-	else
-	{
-#endif
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->touch = Touch_Item;
-#ifdef TMNT
-	}
-#endif
 	// useing an item causes it to respawn
 	ent->use = Use_Item;
 
