@@ -253,8 +253,8 @@ else # END QUAKE3
 	# TMNT Arena's intro video will be ogg theora
 	USE_CODEC_THEORA=1
 
-	# Turtle Man: TMNT Arena version (YYYYMMDD)
-	VERSION=$(shell date +%Y%m%d)
+	# TMNT Arena version
+	VERSION=0.1
 
 	# TMNT Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"

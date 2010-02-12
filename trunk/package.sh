@@ -11,8 +11,8 @@ STARTDIR=`pwd`
 # Directory to put the files for release
 INSTALLDIR=install
 
-# Version (Cuurently YYYYMMDD)
-VERSION=`date +%Y%m%d`
+# Version (Current TMNT Arena version)
+VERSION=0.1
 
 
 # Package Linux binaries
@@ -42,7 +42,7 @@ MAKEDEB=1
 
 	# Packager's name and email
 	# Example: "John Smith <address@example.com>"
-	NAME_AND_EMAIL="Zack Middleton <ZTurtleMan@gmail.com>"
+	NAME_AND_EMAIL=""
 
 
 # Check for x86_64
@@ -269,10 +269,10 @@ function make_client_deb() {
 	echo "if [ -x "`which update-menus 2>/dev/null`" ]; then update-menus ; fi" >> postrm
 	echo "# End automatically added section" >> postrm
 
-	tar czf data.tar.gz usr/*
+	fakeroot tar czf data.tar.gz ./usr/*
 
 	# md5sums?
-	tar czf control.tar.gz control postinst postrm
+	fakeroot tar czf control.tar.gz ./control ./postinst ./postrm
 
 	# write the debian-binary file
 	echo "2.0" > debian-binary
@@ -282,7 +282,7 @@ function make_client_deb() {
 		rm ${GAMENAME}_$VERSION-1_$DEBARCH.deb
 	fi
 
-	ar -r ${GAMENAME}_$VERSION-1_$DEBARCH.deb debian-binary control.tar.gz data.tar.gz
+	fakeroot ar -r ${GAMENAME}_$VERSION-1_$DEBARCH.deb debian-binary control.tar.gz data.tar.gz
 
 	mv ${GAMENAME}_$VERSION-1_$DEBARCH.deb ..
 
@@ -332,9 +332,9 @@ then
 		echo "Description: TMNT Arena data files" >> control
 		echo " TMNT Arena requires this in order to run." >> control
 
-		tar czf data.tar.gz usr/*
+		fakeroot tar czf data.tar.gz ./usr/*
 
-		tar czf control.tar.gz control
+		fakeroot tar czf control.tar.gz ./control
 
 		# write the debian-binary file
 		echo "2.0" > debian-binary

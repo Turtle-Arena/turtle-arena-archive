@@ -243,7 +243,7 @@ PROTOCOL
 */
 
 #ifdef TMNT
-#define	PROTOCOL_VERSION	1
+#define	PROTOCOL_VERSION	2
 #else
 #define	PROTOCOL_VERSION	68
 // 1.31 - 67
