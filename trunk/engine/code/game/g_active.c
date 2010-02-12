@@ -2046,17 +2046,10 @@ void ClientEndFrame( gentity_t *ent ) {
 
 					for (i=0 ; i<num ; i++) {
 						hit = &g_entities[touch[i]];
-						if ( !hit->client && hit->s.eType != ET_MISCOBJECT
-#ifdef TMNTNPCSYS
-							&& hit->s.eType != ET_NPC
-#endif
-#ifdef MISSIONPACK
-							&& hit->pain != ObeliskPain
-#endif
-							)
-						{
+
+						// Skip non-solid misc_objects
+						if ( !hit->client && !hit->s.solid)
 							continue;
-						}
 
 						// nail it
 						G_Damage ( ent, hit, hit, NULL, NULL,

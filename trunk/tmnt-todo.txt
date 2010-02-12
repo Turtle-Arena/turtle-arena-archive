@@ -5,10 +5,12 @@ Bugs that have found that have not been fixed yet, and things that should to be 
 Do "play testing" to find bugs and to find things to change, improve, and add.
 	I need to remind myself as I end up doing alot of code/data changes with no or little testing.
 
-== Beta ==
-* Add player sounds for Leo/Don/Mike
-* New Melee swing sound effects
+== 0.2 (Beta) ==
+* Add missing sounds
+* New Melee swing sound effects?
 * Finish animating raph_v9.mm3d
+* Fix subway lightgrid? (someparts of the main room the players/items are black)
+* Fix bots to damage players with melee weapons
 
 == engine ==
 
@@ -63,8 +65,7 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 [todo] Pull grapple back to player before removing entity like LoZ: TP?
 
 [bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects.
-
-[bug] When PW_FLASHING wears off and player is in a non-solid misc_object they are needlessly killed.
+: When PW_FLASHING wears off while in a solid, they are killed. Otherwise they would be stuck.
 
 [todo] Have shurikens do damage while they are in the wall/ground?
 

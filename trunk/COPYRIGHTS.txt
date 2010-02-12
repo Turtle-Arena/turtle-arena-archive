@@ -3,7 +3,7 @@ The TMNT Arena data copyrights.
 All of the data (unless otherwised noted) is license under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
 
 == ZTM ==
-All data, unless otherwise noted, is Copyright (C) 2009 Zack "ZTurtleMan" Middleton
+All data, unless otherwise noted, is Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 	and are license under the GNU General Public License; either version 2 of the License, or
 	(at your option) any later version.
 
