@@ -78,9 +78,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Remake UI/HUD using Quake III: Team Arena menu scripting?
 
-[bug] MISSIONPACK UI fails to start from .QVM, .SO works however... (Doesn't load id's QVM or mine)
-: recursive error after: ^3menu file not found: ui/menus.txt, using default
-
 [todo] http://code.google.com/p/oax/wiki/Dynamic_QVM_Memory_Allocation
 
 [todo] Word filter http://code.google.com/p/sgfork/source/detail?r=5

@@ -3491,7 +3491,6 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 	//int k;
 	int numParticles;
 	qhandle_t model;
-	int numModels;
 	vec3_t velocity;
 	vec3_t newOrigin;
 	trace_t trace;
