@@ -75,10 +75,15 @@ base/gfx/2d/crosshaira.png							FreeSans.ttf
 base/textures/common/alpha* [6 images]				FreeSans.ttf
 
 Below were created by TMNT Arena, using freetype2	FreeSans.ttf
-base/fonts/fontImage_0_12.tga
-base/fonts/fontImage_0_16.tga
-base/fonts/fontImage_0_20.tga
-base/fonts/fontImage_1_20.tga
+base/fonts/FreeSans_0_12.tga
+base/fonts/FreeSans_0_16.tga
+base/fonts/FreeSans_0_20.tga
+base/fonts/FreeSans_1_20.tga
+base/fonts/FreeSans_12.dat
+base/fonts/FreeSans_16.dat
+base/fonts/FreeSans_20.dat
+
+Copies of FreeSans_*.dat for compatability with Quake III: Team Arena
 base/fonts/fontImage_12.dat
 base/fonts/fontImage_16.dat
 base/fonts/fontImage_20.dat
