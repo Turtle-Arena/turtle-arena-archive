@@ -13,7 +13,9 @@ INSTALLDIR=install
 
 # Version (Current TMNT Arena version)
 VERSION=0.1
-
+# For deb only fixes update DEB_VERSION "tmntarena_$VERSION-$*DEB_VERSION"
+CLIENT_DEB_VERSION=1
+DATA_DEB_VERSION=1
 
 # Package Linux binaries
 LINUX=1
@@ -69,7 +71,7 @@ then
 	# If running x86_64, compile i386 too.
 	if [ $ARCH = "x86_64" ]
 	then
-		make ARCH=i386
+		make ARCH=i386 BUILD_GAME_SO=0
 	fi
 else
 	# We need to at least build the QVMs!
@@ -222,12 +224,12 @@ function make_client_deb() {
 
 	# write the tmntarena menu file
 	echo "?package($GAMENAME): \\" > usr/share/menu/$GAMENAME
-	echo "\tneeds=\"X11\" \\" >> usr/share/menu/$GAMENAME
-	echo "\tsection=\"Games/Action\" \\" >> usr/share/menu/$GAMENAME
-	echo "\ttitle=\"TMNT Arena\" \\" >> usr/share/menu/$GAMENAME
-	echo "\tlongtitle=\"$LONGTITLE\" \\" >> usr/share/menu/$GAMENAME
-	echo "\ticon=\"/usr/share/pixmaps/${GAMENAME}32.png\" \\" >> usr/share/menu/$GAMENAME
-	echo "\tcommand=\"/usr/games/tmntarena\"" >> usr/share/menu/$GAMENAME
+	echo -e "\tneeds=\"X11\" \\" >> usr/share/menu/$GAMENAME
+	echo -e "\tsection=\"Games/Action\" \\" >> usr/share/menu/$GAMENAME
+	echo -e "\ttitle=\"TMNT Arena\" \\" >> usr/share/menu/$GAMENAME
+	echo -e "\tlongtitle=\"$LONGTITLE\" \\" >> usr/share/menu/$GAMENAME
+	echo -e "\ticon=\"/usr/share/pixmaps/${GAMENAME}32.png\" \\" >> usr/share/menu/$GAMENAME
+	echo -e "\tcommand=\"/usr/games/tmntarena\"" >> usr/share/menu/$GAMENAME
 
 	# write the tmntarena.desktop file
 	echo "[Desktop Entry]" > usr/share/applications/$GAMENAME.desktop
@@ -247,7 +249,7 @@ function make_client_deb() {
 	echo "Architecture: $DEBARCH" >> control
 	echo "Installed-Size: `du -ks usr|cut -f 1`" >> control
 	# Depends taken from openarena_0.8.1-4_amd64.deb
-	echo "Depends: libc6 (>= 2.4), libcurl3-gnutls (>= 7.16.2-1), libgl1-mesa-glx | libgl1, libogg0 (>= 1.0rc3), libopenal1, libsdl1.2debian (>= 1.2.10-1), libspeex1 (>= 1.2~beta3-1), libspeexdsp1 (>= 1.2~beta3.2-1), libvorbis0a (>= 1.1.2), libvorbisfile3 (>= 1.1.2), tmntarena-data (>= $VERSION)" >> control
+	echo "Depends: libc6 (>= 2.4), libcurl3-gnutls (>= 7.16.2-1), libgl1-mesa-glx | libgl1, libogg0 (>= 1.0rc3), libopenal1, libsdl1.2debian (>= 1.2.10-1), libspeex1 (>= 1.2~beta3-1), libspeexdsp1 (>= 1.2~beta3.2-1), libvorbis0a (>= 1.1.2), libvorbisfile3 (>= 1.1.2), tmntarena-data (>= $VERSION-1)" >> control
 	echo "Maintainer: $NAME_AND_EMAIL" >> control
 	echo "Homepage: http://turtlearena.googlecode.com/" >> control
 	echo "Description: $LONGTITLE" >> control
@@ -258,7 +260,7 @@ function make_client_deb() {
 	echo "set -e" >> postinst
 	echo "# Automatically added by dh_installmenu" >> postinst
 	echo "if [ "$1" = "configure" ] && [ -x "`which update-menus 2>/dev/null`" ]; then" >> postinst
-	echo "	update-menus" >> postinst
+	echo -e "\tupdate-menus" >> postinst
 	echo "fi" >> postinst
 	echo "# End automatically added section" >> postinst
 
@@ -277,14 +279,14 @@ function make_client_deb() {
 	# write the debian-binary file
 	echo "2.0" > debian-binary
 
-	if [ -f ${GAMENAME}_$VERSION-1_$DEBARCH.deb ]
+	if [ -f ${GAMENAME}_$VERSION-$CLIENT_DEB_VERSION_$DEBARCH.deb ]
 	then
-		rm ${GAMENAME}_$VERSION-1_$DEBARCH.deb
+		rm ${GAMENAME}_$VERSION-$CLIENT_DEB_VERSION_$DEBARCH.deb
 	fi
 
-	fakeroot ar -r ${GAMENAME}_$VERSION-1_$DEBARCH.deb debian-binary control.tar.gz data.tar.gz
+	fakeroot ar -r ${GAMENAME}_$VERSION-$CLIENT_DEB_VERSION_$DEBARCH.deb debian-binary control.tar.gz data.tar.gz
 
-	mv ${GAMENAME}_$VERSION-1_$DEBARCH.deb ..
+	mv ${GAMENAME}_$VERSION-$CLIENT_DEB_VERSION_$DEBARCH.deb ..
 
 	cd $STARTDIR
 
@@ -339,14 +341,14 @@ then
 		# write the debian-binary file
 		echo "2.0" > debian-binary
 
-		if [ -f ${GAMENAME}-data_$VERSION-1_all.deb ]
+		if [ -f ${GAMENAME}-data_$VERSION-$DATA_DEB_VERSION_all.deb ]
 		then
-			rm ${GAMENAME}-data_$VERSION-1_all.deb
+			rm ${GAMENAME}-data_$VERSION-$DATA_DEB_VERSION_all.deb
 		fi
 
-		ar -r ${GAMENAME}-data_$VERSION-1_all.deb debian-binary control.tar.gz data.tar.gz
+		ar -r ${GAMENAME}-data_$VERSION-$DATA_DEB_VERSION_all.deb debian-binary control.tar.gz data.tar.gz
 
-		mv ${GAMENAME}-data_$VERSION-1_all.deb ..
+		mv ${GAMENAME}-data_$VERSION-$DATA_DEB_VERSION_all.deb ..
 
 		cd $STARTDIR
 
