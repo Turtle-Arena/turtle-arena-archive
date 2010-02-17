@@ -69,7 +69,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 1773
+IOQ3_REVISION = 1774
 
 #
 # Start build type
@@ -757,7 +757,7 @@ ifeq ($(PLATFORM),mingw32)
 
   BINEXT=.exe
 
-  LIBS= -lws2_32 -lwinmm
+  LIBS= -lws2_32 -lwinmm -lpsapi
   CLIENT_LDFLAGS = -mwindows
   CLIENT_LIBS = -lgdi32 -lole32 -lopengl32
 
