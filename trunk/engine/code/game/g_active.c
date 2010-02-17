@@ -1206,26 +1206,6 @@ static qboolean G_ByEnemyFlag(int team, vec3_t origin)
 
 	return qfalse;
 }
-
-static qboolean BG_ByWeapon(vec3_t origin)
-{
-#if 0
-	gentity_t      *ent = NULL;
-	int radius;
-
-	// Turtle Man: TODO: Base on speed, animation time, and stuff...
-	radius = 2000;
-
-	while((ent = G_FindRadius(ent, origin, radius)) != NULL)
-	{
-		if (0)
-		{
-			return qtrue;
-		}
-	}
-#endif
-	return qfalse;
-}
 #endif
 
 #ifdef TMNTSP
@@ -1451,30 +1431,26 @@ void ClientThink_real( gentity_t *ent ) {
 		qboolean holdingFlag = (client->ps.powerups[PW_BLUEFLAG]
 								|| client->ps.powerups[PW_REDFLAG]
 								|| client->ps.powerups[PW_NEUTRALFLAG]);
-		qboolean byFlag = G_ByEnemyFlag(client->ps.persistant[PERS_TEAM], client->ps.origin);
-		qboolean byWeapon = BG_ByWeapon(client->ps.origin);
-		qboolean singleHanded = (holdingFlag || byFlag || byWeapon);
 
-		if (singleHanded)
+		// Switch to single handed
+		if (holdingFlag || G_ByEnemyFlag(client->ps.persistant[PERS_TEAM], client->ps.origin))
 		{
 			// The Good: When byFlag and attacking, use both hands to attack.
 			// The Bad: If standing by flag, secondary weapon is got out and
 			//    put away before/after each attack...
-			if (!holdingFlag && (client->ps.meleeTime || client->ps.weaponTime))
+			if (!holdingFlag && client->ps.meleeTime)
 			{
 				client->ps.eFlags &= ~EF_PRIMARY_HAND;
 			}
 			else
-			// Don't change while melee attacking?
-			//if (!client->ps.meleeTime)
 			{
 				client->ps.eFlags |= EF_PRIMARY_HAND;
 			}
 		}
 		else if (client->ps.eFlags & EF_PRIMARY_HAND)
 		{
-			// Don't change while melee attacking?
-			//if (!client->ps.meleeTime)
+			// Don't change while melee attacking
+			if (!client->ps.meleeTime)
 			{
 				client->ps.eFlags &= ~EF_PRIMARY_HAND;
 			}
