@@ -1196,7 +1196,7 @@ Index: src/libmm3d/md3filter.cc
 +{
 +   for (int i = 0; s_animLoop[i] != NULL; i++)
 +   {
-+      if (strcmp(s_animLoop[i], name.c_str()) == 0)
++      if (strncasecmp(s_animLoop[i], name.c_str(), name.length()) == 0)
 +      {
 +         return true;
 +      }
@@ -1208,7 +1208,7 @@ Index: src/libmm3d/md3filter.cc
 +{
 +   for (int i = 0; s_animSyncWarning[i] != NULL; i++)
 +   {
-+      if (strcmp(s_animSyncWarning[i], name.c_str()) == 0)
++      if (strncasecmp(s_animSyncWarning[i], name.c_str(), name.length()) == 0)
 +      {
 +         return true;
 +      }
