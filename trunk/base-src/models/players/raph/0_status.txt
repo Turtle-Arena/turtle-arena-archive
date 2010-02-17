@@ -6,3 +6,19 @@ u_torso_control Torso can rotate just the torso
 joint_torso     Legs can rotate the torso
 root			Legs can rotate the whole model
 l_legs_control	Legs can rotate just the legs
+
+
+==Missing animations for raph_v9==
+
+===Both===
+death2
+death3
+
+===Torso===
+Team Arena Animations
+TMNT Animations
+
+===Legs===
+back run
+walkcr (Copy of idlecr's first frame)
+Jump/land B (Copy of Jump/land)
