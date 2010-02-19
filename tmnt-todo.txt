@@ -185,8 +185,7 @@ DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
 
 [todo] Add announcer sound files (That sound like the Gyoji of the Battle Nexus?)
 
-[todo] Have weapon models for all weapons;
-* Missing Katana (Daisho), Wakizashi (Daisho), and Daisho pickup
+[todo] Add models for Daisho weapon group (See tmnt-needed-files.txt)
 
 [todo] Have a intro video (video/intro.[roq|ogm]) before the menu.
 
