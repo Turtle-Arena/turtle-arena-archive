@@ -1,13 +1,9 @@
-"ioq3ztm" is ioquake3 with some of the changes from TMNT Arena.
+This directory contains replacement data for quake3 that is no longer used by TMNT Arena.
 
-This data contains the needed scripts/weaponinfo.txt as well as extra
-[q3 replacement] data made for TMNT Arena that is no longer used by TMNT Arena.
+So if I ever decide to try and run TMNT Arena with a unmodified ioquake3 (Need the PNG and Ogg Vobis support) there is some data here.
 
-== Usage ==
-Idealy there should be a directory in the quake3 folder
-	"/path/to/quake3/ioq3ztm/"
- that contains the ioq3ztm qvm files and the TMNT Arena pak0.pk3 and *this*
- ioq3ztm data as "pak1_ioq3ztm.pk3"
 
- So data override as ioq3ztm > TMNT Arena > [Team Arena >] Quake III: Arena
+The file scripts/weaponinfo.txt attempts to recreate the Quake3 and Team Arena weapons
+	using the weapon scripting for TMNT Arena.
 
+This was done to improve the weapon system and in case someone wanted to use quake3's weapons with TMNT Arena's weapon scripting.
