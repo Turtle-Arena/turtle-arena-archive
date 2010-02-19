@@ -4,7 +4,9 @@ See base/sound/sounds.txt for list of needed sounds.
 
 == Weapons ==
 
-models/weapons2/*
+models/weapons2/daisho/* (Daisho Pickup)
+models/weapons2/katana/* (Daisho)
+models/weapons2/wakizashi/* (Daisho)
 
 == Powerup models ==
 
@@ -16,7 +18,6 @@ TEMP: shurikenlaser.md3
 
 models/powerups/instant/*
 
-TEMP: flight.md3
 TEMP: defense.md3
 TEMP: strength.md3
 TEMP: speed.md3
@@ -27,8 +28,6 @@ Defense - Shield
 Strength - Arm showing stregth? Or red glowing transparent sword?
 Speed - Zippy Lad's Headgear thing? A blue glowing transparent bunny?...
 Invisibility - Foot Tech belt, around waist over shoulder with foot logo on over-shoulder-part
-
-Flight - flight.md3 Red Cape on blue man? (superman-ish)
 
 Invulnerability - White sphere?
 

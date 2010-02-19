@@ -175,8 +175,9 @@ then
 
 	if [ $LINUX -eq 1 ]
 	then
+		
 		# Copy linux launcher too
-		cp tmntarena.sh $INSTALLDIR
+		cp extras/tmntarena.sh $INSTALLDIR
 	fi
 
 	cp tmnt-readme.txt $INSTALLDIR/readme.txt
