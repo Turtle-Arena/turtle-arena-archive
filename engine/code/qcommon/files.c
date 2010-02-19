@@ -2245,6 +2245,18 @@ int	FS_GetModList( char *listbuf, int bufsize ) {
 					nDescLen = fread(descPath, 1, 48, file);
 					if (nDescLen >= 0) {
 						descPath[nDescLen] = '\0';
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Remove newline from description.txt
+						nDescLen--;
+
+						// Remove \n, \r\n, and \r
+						if (nDescLen >= 0 && descPath[nDescLen] == '\n') {
+							descPath[nDescLen] = '\0';
+							nDescLen--;
+						}
+						if (nDescLen >= 0 && descPath[nDescLen] == '\r') {
+							descPath[nDescLen] = '\0';
+						}
+#endif
 					}
 					FS_FCloseFile(descHandle);
 				} else {
