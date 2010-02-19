@@ -28,7 +28,6 @@ Strength - Arm showing stregth? Or red glowing transparent sword?
 Speed - Zippy Lad's Headgear thing? A blue glowing transparent bunny?...
 Invisibility - Foot Tech belt, around waist over shoulder with foot logo on over-shoulder-part
 
-Health Regen - regen.md3 Red "+"?
 Flight - flight.md3 Red Cape on blue man? (superman-ish)
 
 Invulnerability - White sphere?

@@ -382,8 +382,7 @@ typedef enum {
 	PW_HASTE, // PW_SPEED: More Speed
 	PW_INVIS, // Foot Tech powerup?
 
-	// Turtle Man: TODO: Remove regen and change flight to NiGHTS mode...
-	PW_REGEN,		// Give health back. 15 health per second?
+	// Turtle Man: TODO: Change flight to NiGHTS mode...
 	PW_FLIGHT,		// Allow player to fly around the level.
 
 	PW_INVUL,		// New invulerrability

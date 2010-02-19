@@ -1559,10 +1559,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 	case EV_POWERUP_REGEN:
 		DEBUGNAME("EV_POWERUP_REGEN");
+#ifndef TMNT // POWERS
 		if ( es->number == cg.snap->ps.clientNum ) {
 			cg.powerupActive = PW_REGEN;
 			cg.powerupTime = cg.time;
 		}
+#endif
 		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.regenSound );
 		break;
 #ifdef TMNT // POWERS

@@ -513,9 +513,9 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	while ( client->timeResidual >= 1000 ) {
 		client->timeResidual -= 1000;
 
+#ifndef TMNT // POWERS // Guards having health regen makes them pretty much unkillable, and removed regen powerup.
 		// regenerate
 #ifdef MISSIONPACK
-#ifndef TMNT // Guards having health regen makes them pretty much unkillable.
 #ifdef TMNTWEAPSYS
 		if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
@@ -524,9 +524,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		{
 			maxHealth = client->ps.stats[STAT_MAX_HEALTH] / 2;
 		}
-		else
-#endif
-		if ( client->ps.powerups[PW_REGEN] ) {
+		else if ( client->ps.powerups[PW_REGEN] ) {
 			maxHealth = client->ps.stats[STAT_MAX_HEALTH];
 		}
 		else {
@@ -562,7 +560,9 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				G_AddEvent( ent, EV_POWERUP_REGEN, 0 );
 			}
 #endif
-		} else {
+		} else
+#endif
+		{
 			// count down health when over max
 			if ( ent->health > client->ps.stats[STAT_MAX_HEALTH] ) {
 				ent->health--;

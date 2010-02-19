@@ -3017,14 +3017,12 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 				ent->customShader = cgs.media.quadShader;
 			trap_R_AddRefEntityToScene( ent );
 		}
-#endif
 		if ( state->powerups & ( 1 << PW_REGEN ) ) {
 			if ( ( ( cg.time / 100 ) % 10 ) == 1 ) {
 				ent->customShader = cgs.media.regenShader;
 				trap_R_AddRefEntityToScene( ent );
 			}
 		}
-#ifndef TMNT // POWERS
 		if ( state->powerups & ( 1 << PW_BATTLESUIT ) ) {
 			ent->customShader = cgs.media.battleSuitShader;
 			trap_R_AddRefEntityToScene( ent );

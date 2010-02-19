@@ -69,6 +69,9 @@
 		Added mirrorType to item_*/holdable_*/weapon_*, misc_object, and team_CTF_*flag
 		Added "No Drop" spawnflag to team_CTF_*flag
 
+	February 19, 2010:
+		Removed item_regen
+
       TODO:
 		Add new WIP path_* entities, path_start path_point path_end
 		Add WIP Nights mode items, nights_start nights_target
@@ -996,32 +999,6 @@ When the random key is set, its value is used to calculate a minimum and a maxim
 
 <point name="item_strength" color=".5 0 1" box="-16 -16 -16 16 16 16" model="models/powerups/instant/strength.md3">
 Strength power-up. Lasts 30 seconds.
--------- KEYS --------
-<real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 120, -1 = never respawn).</real>
-<real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
-<mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
-<real key="count" name="Powerup Duration">time in seconds power-up will last when picked up (default 30).</real>
-<string key="team" name="Team Name">set this to team items. Teamed items will respawn randomly after team master is picked up (see Notes).</string>
-<target key="target" name="Target">picking up the item will trigger the entity this points to.</target>
-<targetname key="targetname" name="Target Name">a target_give entity can point to this for respawn freebies.</targetname>
-<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
-<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
-<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
-<boolean key="notbot" name="Invisible To Bots">used to make an item invisible for bot attraction.</boolean>
--------- SPAWNFLAGS --------
-<flag key="SUSPENDED" name="No Drop To Floor" bit="0">item will spawn where it was placed in map and won't drop to the floor.</flag>
--------- NOTES --------
-The amount of time it takes for an item in the team to respawn is determined by the "wait" value of the item that was picked up previously. So if one of the items in the team has it's "wait" key set to -1 (never respawn), the random respawning cycle of the teamed items will stop after that item is picked up.
-
-When the random key is set, its value is used to calculate a minimum and a maximum delay. The final time delay will be a random value anywhere between the minimum and maximum values: (min delay = wait - random) (max delay = wait + random).
-</point>
-
-<!--
-=============================================================================
--->
-
-<point name="item_regen" color=".5 0 1" box="-16 -16 -16 16 16 16" model="models/powerups/instant/regen.md3">
-Health Regeneration power-up. This will boost your current health by 5 points every second for a period of up to 30 seconds or up to 200 points whichever comes first. Afterwards, any health points over 100 slowly wears out to 100.
 -------- KEYS --------
 <real key="wait" name="Respawn Delay">time in seconds before item respawns after being picked up (default 120, -1 = never respawn).</real>
 <real key="random" name="Respawn Delay Variance">random time variance in seconds added or subtracted from "wait" delay (default 0 - see Notes).</real>
