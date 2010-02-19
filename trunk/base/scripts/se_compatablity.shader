@@ -37,6 +37,29 @@ icons/teleporter
 	}
 }
 
+// Turtle Man: Removed PW_REGEN
+icons/regen
+{
+	nopicmip
+	{
+		map icons/regen.png
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+powerups/regen
+{
+	deformVertexes wave 100 sin 3 0 0 0
+	{
+		map textures/effects/regenmap2.jpg
+		blendfunc GL_ONE GL_ONE
+		tcGen environment
+                tcmod rotate 30
+		//tcMod turb 0 0.2 0 .2
+                tcmod scroll 1 .1
+	}
+}
+
 // Turtle Man: So Quake3 finds our powerup icons...
 icons/envirosuit
 {

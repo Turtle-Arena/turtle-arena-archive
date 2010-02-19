@@ -440,6 +440,7 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
 
+/*
 iteminfo "item_regen"
 {
 name		"Regeneration"
@@ -451,6 +452,7 @@ respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
+*/
 
 iteminfo "item_flight"
 {

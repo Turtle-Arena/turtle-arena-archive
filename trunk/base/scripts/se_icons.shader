@@ -90,14 +90,6 @@ icons/invis
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
-icons/regen
-{
-	nopicmip
-	{
-		map icons/regen.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
 icons/flight
 {
 	nopicmip

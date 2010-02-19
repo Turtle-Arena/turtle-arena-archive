@@ -2030,7 +2030,9 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_ENVIRONMENTSUIT] = bs->cur_ps.powerups[PW_BATTLESUIT] != 0;
 	bs->inventory[INVENTORY_HASTE] = bs->cur_ps.powerups[PW_HASTE] != 0;
 	bs->inventory[INVENTORY_INVISIBILITY] = bs->cur_ps.powerups[PW_INVIS] != 0;
+#ifndef TMNT // POWERS
 	bs->inventory[INVENTORY_REGEN] = bs->cur_ps.powerups[PW_REGEN] != 0;
+#endif
 	bs->inventory[INVENTORY_FLIGHT] = bs->cur_ps.powerups[PW_FLIGHT] != 0;
 #ifdef TMNT // POWERS
 	bs->inventory[INVENTORY_INVUL] = bs->cur_ps.powerups[PW_INVUL] != 0;

@@ -1038,15 +1038,12 @@ gitem_t	bg_itemlist[] =
 /* sounds */ ""
 	},
 
+#ifndef TMNT // POWERS
 /*QUAKED item_regen (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
 		"item_regen",
-#ifdef TMNT // POWERS
-		"sound/items/powerup_pickup.ogg",
-#else
 		"sound/items/regeneration.wav",
-#endif
         { "models/powerups/instant/regen.md3", 
 		"models/powerups/instant/regen_ring.md3", 
 		NULL, NULL },
@@ -1058,6 +1055,7 @@ gitem_t	bg_itemlist[] =
 /* precache */ "",
 /* sounds */ "sound/items/regen.wav"
 	},
+#endif
 
 /*QUAKED item_flight (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
