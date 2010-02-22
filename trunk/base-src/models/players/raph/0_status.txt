@@ -7,18 +7,21 @@ joint_torso     Legs can rotate the torso
 root			Legs can rotate the whole model
 l_legs_control	Legs can rotate just the legs
 
+TODO: Split arms from torso, it would solve some animation issues with the sholder going flat when rotated...
+: For Example: TORSO_GUARDBASE frame 4
 
 ==Missing animations for raph_v9==
 
 ===Both===
-death2
-death3
+death2 (Copy of death1)
+death3 (Copy of death1)
 
 ===Torso===
-Team Arena Animations
+Quake3 Animations
+* Run (Doesn't look right)
+* Walk (Doesn't look right)
+Team Arena Animations (done)
 TMNT Animations
 
 ===Legs===
-back run
-walkcr (Copy of idlecr's first frame)
 Jump/land B (Copy of Jump/land)
