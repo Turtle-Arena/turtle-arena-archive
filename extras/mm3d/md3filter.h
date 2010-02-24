@@ -28,6 +28,19 @@
 #ifndef __MD3FILTER_H
 #define __MD3FILTER_H
 
+#define TMNT // Enable special support my ioq3 mod, TMNT Arena, that should not be in mm3d :(
+
+// ZTM: TODO: Finish moving unfinished MDR stuff from plugin to here.
+//#define MDR_LOAD // Unfinished
+//#define MDR_EXPORT // Unfinished
+
+#if defined MDR_LOAD || defined MDR_EXPORT
+#define MDR_GENERAL // Stuff for load and export
+#define MDR_VERSION	2
+#endif
+
+
+
 #define MD3_VERSION 15
 #define MAX_QPATH 64
 #define MD3_MAX_FRAMES 1024
@@ -73,6 +86,16 @@ class Md3Filter : public ModelFilter
 
    protected:
 
+#ifdef MDR_GENERAL
+      typedef enum _MeshType_e
+      {
+         MT_None = -1,
+         MT_MD3,
+         MT_MDR,
+         MT_MAX
+      } MeshTypeE;
+#endif
+
       typedef enum _MeshSection_e
       {
          MS_None = -1,
@@ -100,18 +123,27 @@ class Md3Filter : public ModelFilter
 
       typedef struct _Md3FileData_t
       {
+#ifdef MDR_GENERAL
+         MeshTypeE type; // MD3 or MDR
+#endif
          MeshSectionE section;
          string modelBaseName;
          string modelFile;
          string tag;
          int32_t tagPoint;
          DataSource * src;
-         int32_t offsetMeshes;
-         int32_t numMeshes;
+         int32_t offsetMeshes; // MD3 only
+         int32_t numMeshes; // MD3 only
          int32_t offsetTags;
          int32_t numTags;
          int32_t numFrames;
-         MeshVectorInfoT ** meshVecInfos;
+         MeshVectorInfoT ** meshVecInfos; // MD3 only
+#ifdef MDR_GENERAL
+         // Only used by MDR
+         int32_t numBones;
+         int32_t numLODs;
+         int32_t offsetLODs;
+#endif
       } Md3FileDataT;
       typedef std::list< Md3FileDataT > Md3FileDataList;
 
@@ -122,6 +154,19 @@ class Md3Filter : public ModelFilter
          std::string path;
       } Md3PathT;
       typedef std::vector< Md3PathT > Md3PathList;
+
+#ifdef MDR_GENERAL
+      typedef struct _MdrAnimation_t
+      {
+         std::string name;
+         bool loop;
+      } MdrAnimationT;
+      typedef std::vector< MdrAnimationT > MdrAnimatoinList;
+
+      typedef struct {
+      	float		matrix[3][4];
+      } mdrBone_t;
+#endif
 
       unsigned readString( char * dest, size_t len );
 
@@ -164,17 +209,24 @@ class Md3Filter : public ModelFilter
       Md3PathList      m_pathList;
 
       //writes
+#ifdef MDR_EXPORT
+      Model::ModelErrorE writeSectionFile( const char * filename, Md3Filter::MeshTypeE type,
+            Md3Filter::MeshSectionE section, MeshList & meshes );
+#else
       Model::ModelErrorE writeSectionFile( const char * filename, MeshSectionE section, MeshList & meshes );
+#endif
       bool     writeAnimations();
       size_t   writeIdentity();
       DataDest * m_dst;
 
       //writes util
+      bool AnimLoop(std::string name);
+      bool AnimSyncWarning(std::string name);
       bool     getVertexNormal(Model * model, int groupId, int vertexId, float *normal);
       double   greater(double a, double b);
       double   smaller(double a, double b);
       Matrix   getMatrixFromPoint( int anim, int frame, int point );
-      void getExportAnimData( int fileAnim, int & modelAnim, 
+      bool getExportAnimData( int modelAnim,
             int & fileFrame, int & frameCount, int & fps );
 
 };
