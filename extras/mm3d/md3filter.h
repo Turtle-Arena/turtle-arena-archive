@@ -28,9 +28,8 @@
 #ifndef __MD3FILTER_H
 #define __MD3FILTER_H
 
-#define TMNT // Enable special support my ioq3 mod, TMNT Arena, that should not be in mm3d :(
+#define TMNT // Enable special support my ioquake3 mod, TMNT Arena, that should not be in mm3d
 
-// ZTM: TODO: Finish moving unfinished MDR stuff from plugin to here.
 //#define MDR_LOAD // Unfinished
 //#define MDR_EXPORT // Unfinished
 
@@ -86,15 +85,15 @@ class Md3Filter : public ModelFilter
 
    protected:
 
-#ifdef MDR_GENERAL
       typedef enum _MeshType_e
       {
-         MT_None = -1,
+         MT_None,
          MT_MD3,
+#ifdef MDR_GENERAL
          MT_MDR,
+#endif
          MT_MAX
       } MeshTypeE;
-#endif
 
       typedef enum _MeshSection_e
       {
@@ -123,9 +122,7 @@ class Md3Filter : public ModelFilter
 
       typedef struct _Md3FileData_t
       {
-#ifdef MDR_GENERAL
          MeshTypeE type; // MD3 or MDR
-#endif
          MeshSectionE section;
          string modelBaseName;
          string modelFile;
@@ -161,11 +158,7 @@ class Md3Filter : public ModelFilter
          std::string name;
          bool loop;
       } MdrAnimationT;
-      typedef std::vector< MdrAnimationT > MdrAnimatoinList;
-
-      typedef struct {
-      	float		matrix[3][4];
-      } mdrBone_t;
+      typedef std::vector< MdrAnimationT > MdrAnimationList;
 #endif
 
       unsigned readString( char * dest, size_t len );
@@ -196,6 +189,11 @@ class Md3Filter : public ModelFilter
       std::string sectionToPath( int materialIndex );
       std::string defaultPath();
 
+#ifdef MDR_GENERAL
+      bool isMdr(const char *filename);
+      Model::AnimationModeE animMode(Md3Filter::MeshTypeE type);
+#endif
+
       Model      * m_model;
       DataSource * m_src;
       //      int32_t   ** meshVecIds;
@@ -207,6 +205,7 @@ class Md3Filter : public ModelFilter
       int              m_idleFrame;
       std::string      m_lastMd3Path;
       Md3PathList      m_pathList;
+      Model::AnimationModeE m_animationMode;
 
       //writes
 #ifdef MDR_EXPORT
@@ -220,8 +219,8 @@ class Md3Filter : public ModelFilter
       DataDest * m_dst;
 
       //writes util
-      bool AnimLoop(std::string name);
-      bool AnimSyncWarning(std::string name);
+      bool animLoop(std::string name);
+      bool animSyncWarning(std::string name);
       bool     getVertexNormal(Model * model, int groupId, int vertexId, float *normal);
       double   greater(double a, double b);
       double   smaller(double a, double b);
