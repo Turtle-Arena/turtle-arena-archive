@@ -755,23 +755,13 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	}
 	
 	// simple bounds check
-#ifdef IOQ3ZTM
-	if(pinmodel->numBones < 0)
-	{
-#ifndef RENDERLESS_MODELS
-		ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure (numBones < 0).\n", mod_name);
-#endif
-		return qfalse;
-	}
-	else
-#endif
 	if(pinmodel->numBones < 0 ||
 		sizeof(*mdr) + pinmodel->numFrames * (sizeof(*frame) + (pinmodel->numBones - 1) * sizeof(*frame->bones)) > size)
 	{
 #ifdef RENDERLESS_MODELS
-		Com_Printf("R_LoadMDR: %s has broken structure (bad bones or frames).\n", mod_name);
+		Com_Printf("R_LoadMDR: %s has broken structure.\n", mod_name);
 #else
-		ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure (bad bones or frames).\n", mod_name);
+		ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
 #endif
 		return qfalse;
 	}
@@ -893,7 +883,7 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 		if((byte *) (lod + 1) > (byte *) mdr + size)
 		{
 #ifndef RENDERLESS_MODELS
-			ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure (bad lod).\n", mod_name);
+			ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
 #endif
 			return qfalse;
 		}
@@ -911,7 +901,7 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			if((byte *) (surf + 1) > (byte *) mdr + size)
 			{
 #ifndef RENDERLESS_MODELS
-				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure (bad surface).\n", mod_name);
+				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
 #endif
 				return qfalse;
 			}
@@ -933,14 +923,14 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 #ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
 			if ( surf->numVerts > SHADER_MAX_VERTEXES )
 			{
-				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i verts on %s (%i)",
+				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i verts on %s (%i)\n",
 					  mod_name, SHADER_MAX_VERTEXES, surf->name[0] == '\0' ? "a surface" : surf->name,
 					  surf->numVerts );
 				return qfalse;
 			}
 			if ( surf->numTriangles*3 > SHADER_MAX_INDEXES )
 			{
-				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i triangles on %s (%i)",
+				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i triangles on %s (%i)\n",
 					  mod_name, SHADER_MAX_INDEXES / 3, surf->name[0] == '\0' ? "a surface" : surf->name,
 					  surf->numTriangles );
 				return qfalse;
@@ -988,7 +978,7 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 				if(curv->numWeights < 0 || (byte *) (v + 1) + (curv->numWeights - 1) * sizeof(*weight) > (byte *) mdr + size)
 				{
 #ifndef RENDERLESS_MODELS
-					ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure (bad weights).\n", mod_name);
+					ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
 #endif
 					return qfalse;
 				}
@@ -1028,20 +1018,10 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			curtri = (mdrTriangle_t *)((byte *) cursurf + LittleLong(cursurf->ofsTriangles));
 			
 			// simple bounds check
-#ifdef IOQ3ZTM
-			if(surf->numTriangles < 0)
-			{
-#ifndef RENDERLESS_MODELS
-				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure (numTriangles < 0).\n", mod_name);
-#endif
-				return qfalse;
-			}
-			else
-#endif
 			if(surf->numTriangles < 0 || (byte *) (tri + surf->numTriangles) > (byte *) mdr + size)
 			{
 #ifndef RENDERLESS_MODELS
-				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure (bad triangles).\n", mod_name);
+				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
 #endif
 				return qfalse;
 			}
@@ -1081,7 +1061,7 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	if(mdr->numTags < 0 || (byte *) (tag + mdr->numTags) > (byte *) mdr + size)
 	{
 #ifndef RENDERLESS_MODELS
-		ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure (bad tags).\n", mod_name);
+		ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has broken structure.\n", mod_name);
 #endif
 		return qfalse;
 	}

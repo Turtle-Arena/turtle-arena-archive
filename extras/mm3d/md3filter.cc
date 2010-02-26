@@ -692,14 +692,17 @@ Model::ModelErrorE Md3Filter::readFile( Model * model, const char * const filena
       for ( it = fileList.begin(); it != fileList.end(); it++ )
       {
 #ifdef MDR_LOAD
-         if ((*it).type != MT_MD3)
-            continue;
+         if ((*it).type == MT_MD3)
+         {
 #endif
          for ( int i = 0; i < (*it).numMeshes; i++ )
          {
             delete[] (*it).meshVecInfos[i];
          }
          delete[] (*it).meshVecInfos;
+#ifdef MDR_LOAD
+         }
+#endif
 
          (*it).src->close();
          (*it).src = NULL;
@@ -1787,6 +1790,28 @@ bool Md3Filter::groupInSection( std::string groupName, MeshSectionE section )
    return false;
 }
 
+#ifdef MDR_EXPORT
+bool Md3Filter::boneJointInSection( std::string jointName, MeshSectionE section )
+{
+   if ( groupInSection(jointName, section) )
+   {
+      // not a player model or specificly defined as part of this section
+      return true;
+   }
+
+   if ( strncasecmp( jointName.c_str(), "joint_tag", 9) == 0 )
+   {
+      return tagInSection(&jointName[5], section);
+   }
+   if ( strcasecmp( jointName.c_str(), "root_joint") == 0 )
+   {
+      return (section == MS_Lower);
+   }
+
+   return false;
+}
+#endif
+
 bool Md3Filter::tagInSection( std::string tagName, MeshSectionE section )
 {
    if ( section == MS_None )
@@ -2184,7 +2209,6 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
    }
 
    unsigned pcount = m_model->getPointCount();
-#ifdef MD3_GENERAL
    int32_t numTags = (int32_t) pcount;
    // If spliting model, count tags.
    if (section == MS_Head || section == MS_Lower || section == MS_Upper)
@@ -2198,21 +2222,6 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
          }
       }
    }
-#else
-   int32_t numTags = (int32_t) pcount;
-   switch ( section )
-   {
-      case MS_Head:
-      case MS_Lower:
-         numTags = 1;
-         break;
-      case MS_Upper:
-         numTags = 3;
-         break;
-      default:
-         break;
-   }
-#endif
 
    MeshList::iterator mlit;
 
@@ -2261,9 +2270,26 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
    int32_t offsetMeshes = 0; // MD3
    int32_t offsetEnd = 0;
    int32_t compress = 0; // MDR
+   unsigned bcount = 0; // MDR
    if (type == MT_MDR)
    {
-      numBones = m_model->getBoneJointCount(); // ZTM: FIXME: Only if bone joint is in section?
+      bcount = m_model->getBoneJointCount();
+      if (section == MS_Head || section == MS_Lower || section == MS_Upper)
+      {
+         numBones = 0;
+         for ( unsigned j = 0; j < bcount; j++ )
+         {
+            if ( boneJointInSection( m_model->getBoneJointName( j ), section ) )
+            {
+               numBones++;
+            }
+         }
+      }
+      else
+      {
+         numBones = (int32_t) bcount;
+      }
+
       offsetFrames = MDR_HEADER_SIZE;
       numLODs = 1;
       offsetLODs = offsetFrames + numFrames * (MDR_FRAME_SIZE + numBones * MDR_BONE_SIZE);
@@ -2399,7 +2425,10 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                      {
                         int vertex = m_model->getTriangleVertex( *it, n );
                         double cords[3];
-                        m_model->getFrameAnimVertexCoords( a, t, vertex, cords[0], cords[1], cords[2] );
+                        if (m_animationMode == Model::ANIMMODE_SKELETAL)
+                           m_model->getVertexCoords(vertex, cords); // ZTM: FIXME: Get cords for this frame!
+                        else
+                           m_model->getFrameAnimVertexCoords( a, t, vertex, cords[0], cords[1], cords[2] );
                         dmax[0] = greater( dmax[0], cords[0] );
                         dmax[1] = greater( dmax[1], cords[1] );
                         dmax[2] = greater( dmax[2], cords[2] );
@@ -2445,21 +2474,45 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 #ifdef MDR_EXPORT
             if (type == MT_MDR)
             {
-               // ZTM: FIXME: Write MDR bone locations.
-               for (int bone = 0; bone < numBones; bone++)
+               // Write MDR bones
+               for ( unsigned j = 0; j < bcount; j++ )
                {
-                  Matrix boneMatrix;
+                  if ( !boneJointInSection( m_model->getBoneJointName( j ), section ) )
+                     continue;
 
-                  // ZTM: FIXME: I have no idea if this is right...
-                  m_model->getBoneJointFinalMatrix(bone, boneMatrix);
+                  Matrix rotMatrix;
+                  double rotVector[3];
+                  m_model->interpSkelAnimKeyframe( a, t, animLoop(animName), j, true, rotVector[0], rotVector[1], rotVector[2] );
 
-                  for (unsigned v = 0; v < 3; v++)
+                  // Seems whenver we have a nan its from a identity matrix
+                  if ( rotVector[0] != rotVector[0] || rotVector[1] != rotVector[1] || rotVector[2] != rotVector[2] )
                   {
-                     for (unsigned w = 0; w < 4; w++)
-                  	 {
-                  	    m_dst->write( (float)boneMatrix.get(v,w) );
-                  	 }
+                     writeIdentity();
                   }
+                  else
+                  {
+                     rotMatrix.setRotation( rotVector );
+                     rotMatrix = rotMatrix*saveMatrix;
+
+                     // orientation
+                     for ( int m = 0; m < 3; m++ )
+                     {
+                        for ( int n = 0; n < 3; n++ )
+                        {
+                           m_dst->write( (float) rotMatrix.get( m, n ) );
+                        }
+                     }
+                  }
+
+                  // origin
+                  double origin[4] = { 0, 0, 0, 1 };
+                  m_model->interpSkelAnimKeyframe( a, t, animLoop(animName), j, false, origin[0], origin[1], origin[2] );
+
+                  saveMatrix.apply( origin );
+
+                  m_dst->write( (float) origin[0] );
+                  m_dst->write( (float) origin[1] );
+                  m_dst->write( (float) origin[2] );
                }
             }
 #endif
@@ -2552,25 +2605,24 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 #ifdef MDR_EXPORT
    if (type == MT_MDR)
    {
-      // ZTM: FIXME: Write MDR LODs
+      // Write MDR LODs
       log_debug( "writing LODs at %d/%d\n", offsetLODs, m_dst->offset() );
 #if 1
+      int32_t lodEndPos;
+      int32_t offsetEndLod = 0;
+
       // Write LODs
-      //for (unsigned i = 0; i < numLODs; i++)
+      for (int i = 0; i < numLODs; i++)
       {
-         m_dst->write( (int32_t) numMeshes ); // write the number of surfaces (Meshes) (numSurfaces),
-         m_dst->write( (int32_t) offsetMeshes ); // offset of the first surfaces (Meshes) (offsetSurfaces),
-         m_dst->write( (int32_t) offsetLODs ); // and the offset of the next LOD (offsetEnd)
-      }
+         m_dst->write( (int32_t) numMeshes );
+         m_dst->write( (int32_t) (4 * 3) ); // offset of the first mesh from this LOD
+         lodEndPos = m_dst->offset();
+         m_dst->write( (int32_t) offsetEndLod ); // offset of the next LOD from this LOD
 
-      log_debug( "writing meshes at %d/%d\n", offsetMeshes, m_dst->offset() );
-
-      // Write meshes
-      //for (unsigned i = 0; i < numLODs; i++)
-      {
          for ( mlit = meshes.begin(); mlit != meshes.end(); mlit++ )
          {
-            if ( (*mlit).group >= 0 && groupInSection( m_model->getGroupName( (*mlit).group ), section ) )
+            if ( (*mlit).group >= 0 && groupInSection( m_model->getGroupName( (*mlit).group ), section )
+				/* && groupInLOD( (*mlit).group ), i ) */)
             {
                log_debug( "writing mdr mesh header at %d\n", m_dst->offset() );
 
@@ -2598,11 +2650,11 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 
                int32_t mNumVerts    = (*mlit).vertices.size();
                int32_t mNumTris     = (*mlit).faces.size();
-               int32_t mNumBoneRefs = 0; // ZTM: FIXME?: BoneReferences (unused by ioquake3)
+               int32_t mNumBoneRefs = 0; // (unused by ioquake3)
                int32_t mOffHeader   = 0-(m_dst->offset()); // this will be a negative number (unused by ioquake3)
                int32_t mOffTris     = (10 * 4) + MAX_QPATH + MAX_QPATH; // size of mesh header
                int32_t mOffVerts    = mOffTris + mNumTris * TRI_SIZE;
-               int32_t mOffBoneRefs = mOffVerts + mNumVerts * VERT_SIZE;
+               int32_t mOffBoneRefs = mOffVerts + mNumVerts * VERT_SIZE; // (unused by ioquake3)
 
                // Add mdrWeight_t for each bone ref in vertex
                for ( vit = (*mlit).vertices.begin(); vit != (*mlit).vertices.end(); vit++ )
@@ -2739,9 +2791,9 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                   saveMatrix.apply( meshVec );
                   saveMatrix.apply( meshNor );
 
-                  m_dst->write( (float32_t)meshNor[0] );
-                  m_dst->write( (float32_t)meshNor[1] );
-                  m_dst->write( (float32_t)meshNor[2] );
+                  m_dst->write( (float) meshNor[0] );
+                  m_dst->write( (float) meshNor[1] );
+                  m_dst->write( (float) meshNor[2] );
 
                   // TEXT COORDS
                   m_dst->write( (*vit).uv[0] );
@@ -2756,29 +2808,78 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                   int32_t numWeights = ilist.size();
                   m_dst->write( numWeights );
 
+                  // ZTM: FIXME: I have no idea if this is right
                   for ( it = ilist.begin(); it != ilist.end(); it++ )
                   {
-                     int32_t   boneIndex = (*it).m_boneId; // these are indexes into the boneReferences,
-                                                           // not the global per-frame bone list
-                     float32_t     boneWeight = (*it).m_weight; // ZTM: FIXME: Not right?
-                     float32_t     offset[3] = {0, 0, 0}; // ZTM: FIXME
+                     float     boneWeight = 1.0f / numWeights; //(*it).m_weight;
+                     float     offset[3] = {0.0f, 0.0f, 10.0f};
+                     // MD4: offset gives the direction vector of the weight's influence.
 
-                     offset[0] = meshVec[0];
-                     offset[1] = meshVec[1];
-                     offset[2] = meshVec[2];
+// VectorLength
+#define Length(v) (sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]))
 
-                     m_dst->write( boneIndex );
+/*
+            // get the bone scaling
+            tm = bone->GetNodeTM( interfaceptr->GetTime() );
+
+            // scale the offset and store it in our vertex
+            p = v->GetOffsetVector( i );
+            offset[ 0 ] = p.x * Length( tm.GetRow( 0 ) );
+            offset[ 1 ] = p.y * Length( tm.GetRow( 1 ) );
+            offset[ 2 ] = p.z * Length( tm.GetRow( 2 ) );
+
+// GetOffsetVector() will return the coordinates of the vertex
+// in the local coordinates of associated INode pointer from GetNode
+// this is NOT THE SAME as the .vph file coordinates. (It is simpler)
+// the world coordinates of the vertex have been transformed by the Inverse of the INode pointer.
+*/
+
+                     Matrix rotMatrix;
+                     double forward[3], right[3], up[3];
+
+                     m_model->getBoneJointFinalMatrix((*it).m_boneId, rotMatrix);
+                     rotMatrix = rotMatrix*saveMatrix;
+
+                     forward[0] = rotMatrix.get(0,0);
+                     forward[1] = rotMatrix.get(0,1);
+                     forward[2] = rotMatrix.get(0,2);
+
+                     right[0] = rotMatrix.get(1,0);
+                     right[1] = rotMatrix.get(1,1);
+                     right[2] = rotMatrix.get(1,2);
+
+                     up[0] = rotMatrix.get(2,0);
+                     up[1] = rotMatrix.get(2,1);
+                     up[2] = rotMatrix.get(2,2);
+
+                     Matrix InvMatrix;
+                     Vector offsetVec;
+
+                     InvMatrix = rotMatrix.getInverse();
+                     offsetVec.setAll(meshVec);
+                     offsetVec.transform3(InvMatrix);
+
+                     offset[0] = offsetVec[0] * Length(forward);
+                     offset[1] = offsetVec[1] * Length(right);
+                     offset[2] = offsetVec[2] * Length(up);
+
+                     log_debug("offset=%f,%f,%f\n", offset[0], offset[1], offset[2]);
+
+                     m_dst->write( (int32_t) (*it).m_boneId );
                      m_dst->write( boneWeight );
                      m_dst->write( offset[0] );
                      m_dst->write( offset[1] );
                      m_dst->write( offset[2] );
                   }
                }
-
-               // ZTM: FIXME: mNumBoneRefs
-
             }
          }
+
+         // Go fix offsetEndLod
+         offsetEndLod = m_dst->offset();
+         m_dst->seek( lodEndPos );
+         m_dst->write( offsetEndLod );
+         m_dst->seek( offsetEndLod );
       }
 
       // ZTM: FIXME
@@ -2786,7 +2887,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
       offsetTags += m_dst->offset() - offsetMeshes;
 
       // Go back and fix offsetTags
-      uint32_t tagPos = endPos-4-4;
+      uint32_t tagPos = endPos-4;
       m_dst->seek( tagPos );
       m_dst->write( offsetTags );
 
@@ -2798,11 +2899,8 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
          // offset of the first surfaces (Meshes) (offsetSurfaces),
          // and the offset of the next LOD (offsetEnd)
 
-      // end LODs
-
-      // for each LOD
          // Write surface (Mesh)
-      // end surfaces (Meshes)
+      // end LODs
 #endif
    }
    else // MT_MD3

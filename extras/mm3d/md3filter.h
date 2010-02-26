@@ -31,7 +31,7 @@
 #define TMNT // Enable special support my ioquake3 mod, TMNT Arena, that should not be in mm3d
 
 //#define MDR_LOAD // Unfinished
-//#define MDR_EXPORT // Unfinished
+#define MDR_EXPORT // Unfinished
 
 #if defined MDR_LOAD || defined MDR_EXPORT
 #define MDR_GENERAL // Stuff for load and export
@@ -85,15 +85,15 @@ class Md3Filter : public ModelFilter
 
    protected:
 
+#ifdef MDR_GENERAL
       typedef enum _MeshType_e
       {
          MT_None,
          MT_MD3,
-#ifdef MDR_GENERAL
          MT_MDR,
-#endif
          MT_MAX
       } MeshTypeE;
+#endif
 
       typedef enum _MeshSection_e
       {
@@ -122,7 +122,9 @@ class Md3Filter : public ModelFilter
 
       typedef struct _Md3FileData_t
       {
+#ifdef MDR_GENERAL
          MeshTypeE type; // MD3 or MDR
+#endif
          MeshSectionE section;
          string modelBaseName;
          string modelFile;
@@ -152,15 +154,6 @@ class Md3Filter : public ModelFilter
       } Md3PathT;
       typedef std::vector< Md3PathT > Md3PathList;
 
-#ifdef MDR_GENERAL
-      typedef struct _MdrAnimation_t
-      {
-         std::string name;
-         bool loop;
-      } MdrAnimationT;
-      typedef std::vector< MdrAnimationT > MdrAnimationList;
-#endif
-
       unsigned readString( char * dest, size_t len );
 
       bool     readAnimations( bool create );
@@ -179,9 +172,12 @@ class Md3Filter : public ModelFilter
       // Indicates if the animation specified is contained in the 
       // specified MD3 model section 
       bool     animInSection( std::string animName, MeshSectionE section );
-      bool     groupInSection( std::string animName, MeshSectionE section );
-      bool     tagInSection( std::string animName, MeshSectionE section );
-      bool     tagIsSectionRoot( std::string animName, MeshSectionE section );
+      bool     groupInSection( std::string groupName, MeshSectionE section );
+#ifdef MDR_EXPORT
+      bool boneJointInSection( std::string jointName, MeshSectionE section );
+#endif
+      bool     tagInSection( std::string tagName, MeshSectionE section );
+      bool     tagIsSectionRoot( std::string tagName, MeshSectionE section );
 
       // Path handling functions
       std::string extractPath( const char * md3DataPath );
