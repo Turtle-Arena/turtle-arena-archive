@@ -14,3 +14,26 @@
 
   * MapSetup
   * MapRotation
+
+= Tools =
+== Text (C-source, script files, etc) ==
+
+  * Code::Blocks — Programming IDE
+  * gedit (GNOME Text Editor) — Syntax highlighting, tabs
+  * Microsoft Windows Notepad and Wordpad
+
+== 3D Models ==
+
+  * Wings3D — 3D modeler
+  * Misfit Model 3D — 3D modeler and animator
+
+== 2D Graphics ==
+
+  * GIMP — Raster graphics
+  * Inkscape — Scalable Vector Graphics
+
+== Levels ==
+
+  * NetRadiant — Improved GtkRadiant
+  * BSPC — Creates bot navigation information for the levels.
+  * GenSurf — Used for part of the map "test"
