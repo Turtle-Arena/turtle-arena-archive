@@ -80,6 +80,7 @@ DONE:	cgs.media.obeliskRespawnSound = trap_S_RegisterSound( "sound/items/obelisk
 TEMP:	cgs.media.teleInSound = trap_S_RegisterSound( "sound/world/telein.wav", qfalse );
 TEMP:	cgs.media.teleOutSound = trap_S_RegisterSound( "sound/world/teleout.wav", qfalse );
 
+// ZTM: NOTE: noAmmoSound is currently unused. Use or move to base_ioq3ztm?
 TEMP:	cgs.media.noAmmoSound = trap_S_RegisterSound( "sound/weapons/noammo.wav", qfalse );
 
 TEMP:	cgs.media.talkSound = trap_S_RegisterSound( "sound/player/talk.wav", qfalse );
@@ -96,9 +97,11 @@ OA:	cgs.media.watrUnSound = trap_S_RegisterSound( "sound/player/watr_un.wav", qf
 	cgs.media.jumpPadSound = trap_S_RegisterSound ("sound/world/jumppad.wav", qfalse );
 
 	Footstep sounds;
-		step%d (default)
+		OA: step%d (default)
 		boot%d
 		DONE: clank%d
+		DONE: flesh%d
+		OA: splash%d
 
 
 	// FIXME: only needed with item
