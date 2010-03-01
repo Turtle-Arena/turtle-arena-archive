@@ -1401,15 +1401,13 @@ typedef enum {
 	FOOTSTEP_TOTAL
 } footstep_t;
 
-/*
 // see tmnt-abilities.txt
 typedef enum {
 	ABILITY_NONE,
 	ABILITY_TECH,
-	ABILITY_STRENGTH,
+//	ABILITY_STRENGTH,
 	ABILITY_MAX
 } ablitiy_t;
-*/
 
 typedef struct bg_playercfg_s
 {
@@ -1446,7 +1444,7 @@ typedef struct bg_playercfg_s
 	float accelerate_speed; // Replaces pm_accelerate; default 10.0f
 	float accelstart;
 
-	//ablitiy_t ability;
+	ablitiy_t ability;
 
 } bg_playercfg_t;
 

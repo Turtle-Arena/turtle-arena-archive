@@ -5780,6 +5780,18 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		//	// Like color2
 		//}
 		else if ( !Q_stricmp( token, "ability" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			if ( !Q_stricmp( token, "none" ) ) {
+				playercfg->ability = ABILITY_NONE;
+			} else if ( !Q_stricmp( token, "tech" ) ) {
+				playercfg->ability = ABILITY_TECH;
+			} else {
+				Com_Printf( "Bad ability parm in %s: %s\n", filename, token );
+			}
+			continue;
 		}
 		// "speed" is the max speed that the
 		// player runs without powerups.
@@ -5998,6 +6010,8 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	playercfg->max_speed = 320;
 	playercfg->accelerate_speed = 10.0f;
 	playercfg->accelstart = 50.0f;
+
+	playercfg->ability = ABILITY_NONE;
 
 	// Use first frame for all animations.
 	for (i = 0; i < MAX_TOTALANIMATIONS; i++)

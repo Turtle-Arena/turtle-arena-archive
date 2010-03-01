@@ -57,6 +57,12 @@ void multi_trigger( gentity_t *ent, gentity_t *activator ) {
 			activator->client->sess.sessionTeam != TEAM_BLUE ) {
 			return;
 		}
+#ifdef TMNTPLAYERSYS // ABILITY_TECH
+		if ( ( ent->spawnflags & 4 ) &&
+			activator->client->pers.playercfg.ability != ABILITY_TECH ) {
+			return;
+		}
+#endif
 	}
 
 	G_UseTargets (ent, ent->activator);
@@ -84,7 +90,7 @@ void Touch_Multi( gentity_t *self, gentity_t *other, trace_t *trace ) {
 	multi_trigger( self, other );
 }
 
-/*QUAKED trigger_multiple (.5 .5 .5) ?
+/*QUAKED trigger_multiple (.5 .5 .5) ? RED_ONLY BLUE_ONLY TECH
 "wait" : Seconds between triggerings, 0.5 default, -1 = one time only.
 "random"	wait variance, default is 0
 Variable sized repeatable trigger.  Must be targeted at one or more entities.
