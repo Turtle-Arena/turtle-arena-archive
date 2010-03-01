@@ -92,6 +92,10 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
 
+[todo] Support bots using func_use (use via holdable item button)
+
+[todo] Show in cgame that player can use func_use if they press 'use holdable' button
+
 // The below are somewhat long...
 
 [todo] Update camera system.

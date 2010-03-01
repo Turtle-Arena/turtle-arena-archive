@@ -1718,3 +1718,47 @@ void SP_func_pendulum(gentity_t *ent) {
 	ent->s.apos.trType = TR_SINE;
 	ent->s.apos.trDelta[2] = speed;
 }
+
+#ifdef TMNTENTSYS // FUNC_USE
+/*
+===============================================================================
+
+USE
+
+===============================================================================
+*/
+
+void multi_trigger( gentity_t *ent, gentity_t *activator );
+
+void Use_FuncUse( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
+	multi_trigger( ent, activator );
+}
+
+/*QUAKED func_use (.5 .5 .5) ? RED_ONLY BLUE_ONLY TECH
+"wait" : Seconds between triggerings, 0.5 default, -1 = one time only.
+"random"	wait variance, default is 0
+"model2"	.md3 model to also draw
+"color"		constantLight color
+"light"		constantLight radius
+Variable sized repeatable trigger.  Must be targeted at one or more entities.
+so, the basic time between firing is a random time between
+(wait - random) and (wait + random)
+*/
+void SP_func_use( gentity_t *ent ) {
+	G_SpawnFloat( "wait", "0.5", &ent->wait );
+	G_SpawnFloat( "random", "0", &ent->random );
+
+	if ( ent->random >= ent->wait && ent->wait >= 0 ) {
+		ent->random = ent->wait - FRAMETIME;
+		G_Printf( "trigger_multiple has random >= wait\n" );
+	}
+
+	trap_SetBrushModel( ent, ent->model );
+	ent->r.contents = CONTENTS_SOLID;		// replaces the -1 from trap_SetBrushModel
+	InitMover( ent );
+	VectorCopy( ent->s.origin, ent->s.pos.trBase );
+	VectorCopy( ent->s.origin, ent->r.currentOrigin );
+
+	ent->use = Use_FuncUse;
+}
+#endif

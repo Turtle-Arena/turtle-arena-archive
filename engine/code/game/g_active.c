@@ -433,8 +433,10 @@ Actions that happen once a second
 */
 void ClientTimerActions( gentity_t *ent, int msec ) {
 	gclient_t	*client;
+#ifndef TMNT // POWERS
 #ifdef MISSIONPACK
 	int			maxHealth;
+#endif
 #endif
 
 	client = ent->client;
@@ -1212,6 +1214,48 @@ static qboolean G_ByEnemyFlag(int team, vec3_t origin)
 void ExitLevel( void );
 #endif
 
+#ifdef TMNTENTSYS // FUNC_USE
+/*
+==============
+G_UseEntity
+==============
+*/
+qboolean G_UseEntity( gentity_t *ent )
+{
+	trace_t tr;
+	vec3_t muzzle;
+	vec3_t forward, right, up;
+	vec3_t end;
+	gentity_t *traceEnt;
+
+	if (!ent || !ent->client)
+		return qfalse;
+
+	AngleVectors (ent->client->ps.viewangles, forward, right, up);
+
+	CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+
+	VectorMA (muzzle, 32, forward, end);
+
+	trap_Trace( &tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
+
+	if (tr.fraction == 1.0)
+		return qfalse;
+
+	if (tr.entityNum >= ENTITYNUM_MAX_NORMAL)
+		return qfalse;
+
+	traceEnt = &g_entities[ tr.entityNum ];
+	if (traceEnt->use && traceEnt->classname && strcmp(traceEnt->classname, "func_use") == 0)
+	{
+		traceEnt->use( traceEnt, ent, ent );
+		return qtrue;
+	}
+
+	return qfalse;
+}
+#endif
+
 /*
 ==============
 ClientThink
@@ -1499,6 +1543,26 @@ void ClientThink_real( gentity_t *ent ) {
 		ent->flags &= ~FL_FORCE_GESTURE;
 		ent->client->pers.cmd.buttons |= BUTTON_GESTURE;
 	}
+
+#ifdef TMNTENTSYS // FUNC_USE
+	if ((ucmd->buttons & BUTTON_USE_HOLDABLE) &&
+#ifdef TMNTHOLDABLE
+		ent->client->ps.holdableTime <= 0
+#else
+		! ( ent->client->ps.pm_flags & PMF_USE_ITEM_HELD )
+#endif
+		)
+	{
+		if (G_UseEntity(ent))
+		{
+#ifdef TMNTHOLDABLE
+			ent->client->ps.holdableTime = 500;
+#else
+			ent->client->ps.pm_flags |= PMF_USE_ITEM_HELD;
+#endif
+		}
+	}
+#endif
 
 #ifndef TMNT // POWERS
 #ifdef MISSIONPACK

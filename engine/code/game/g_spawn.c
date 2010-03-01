@@ -152,6 +152,9 @@ void SP_func_timer (gentity_t *self);
 #ifdef TMNTENTSYS // BREAKABLE
 void SP_func_breakable (gentity_t *self);
 #endif
+#ifdef TMNTENTSYS // FUNC_USE
+void SP_func_use (gentity_t *ent);
+#endif
 
 void SP_trigger_always (gentity_t *ent);
 void SP_trigger_multiple (gentity_t *ent);
@@ -249,6 +252,9 @@ spawn_t	spawns[] = {
 	{"func_timer", SP_func_timer},			// rename trigger_timer?
 #ifdef TMNTENTSYS // BREAKABLE
 	{"func_breakable", SP_func_breakable},
+#endif
+#ifdef TMNTENTSYS // FUNC_USE
+	{"func_use", SP_func_use},
 #endif
 
 	// Triggers are brush objects that cause an effect when contacted
