@@ -632,8 +632,8 @@ CLUI_GetCDKey
 ====================
 */
 #ifdef IOQUAKE3 // Turtle Man: CDKEY
-#ifndef STANDALONE
 static void CLUI_GetCDKey( char *buf, int buflen ) {
+#ifndef STANDALONE
 	cvar_t	*fs;
 	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 	if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
@@ -643,6 +643,9 @@ static void CLUI_GetCDKey( char *buf, int buflen ) {
 		Com_Memcpy( buf, cl_cdkey, 16);
 		buf[16] = 0;
 	}
+#else
+	*buf = 0;
+#endif
 }
 
 
@@ -651,6 +654,7 @@ static void CLUI_GetCDKey( char *buf, int buflen ) {
 CLUI_SetCDKey
 ====================
 */
+#ifndef STANDALONE
 static void CLUI_SetCDKey( char *buf ) {
 	cvar_t	*fs;
 	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
@@ -977,21 +981,15 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 
 #if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
 	case UI_GET_CDKEY:
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
-#ifndef STANDALONE
 		CLUI_GetCDKey( VMA(1), args[2] );
-#endif
-#endif
 		return 0;
 
 	case UI_SET_CDKEY:
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 		CLUI_SetCDKey( VMA(1) );
 #endif
-#endif
 		return 0;
-#endif // IOQUAKE3 // Turtle Man: CDKEY
+#endif
 	
 #if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: punkbuster
 	case UI_SET_PBCLSTATUS:
@@ -1082,13 +1080,8 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 
 #if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
 	case UI_VERIFY_CDKEY:
-#ifndef STANDALONE
 		return CL_CDKeyValidate(VMA(1), VMA(2));
-#else
-		return 1;
 #endif
-#endif
-
 		
 	default:
 		Com_Error( ERR_DROP, "Bad UI system trap: %ld", (long int) args[0] );
