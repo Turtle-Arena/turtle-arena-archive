@@ -2580,18 +2580,34 @@ qboolean FS_idPak( char *pak, char *base ) {
 		if ( !FS_FilenameCompare(pak, va("%s/pak%d", base, i)) ) {
 			break;
 		}
-#ifdef TMNT
-		// Don't auto download assets either. (TMNT Arena uses assets0.pk3 instead of pak0.pk3)
-		if ( !FS_FilenameCompare(pak, va("%s/assets%d", base, i)) ) {
-			break;
-		}
-#endif
 	}
 	if (i < NUM_ID_PAKS) {
 		return qtrue;
 	}
 	return qfalse;
 }
+
+#ifdef TMNT
+/*
+================
+FS_DefaultPak
+================
+*/
+qboolean FS_DefaultPak( char *pak, char *base ) {
+	int i;
+
+	for (i = 0; i < NUM_ID_PAKS; i++) {
+		if ( !FS_FilenameCompare(pak, va("%s/assets%d", base, i))
+			|| !FS_FilenameCompare(pak, va("%s/pak%d", base, i)) ) {
+			break;
+		}
+	}
+	if (i < NUM_ID_PAKS) {
+		return qtrue;
+	}
+	return qfalse;
+}
+#endif
 
 /*
 ================
@@ -2654,13 +2670,17 @@ qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring ) {
 		havepak = qfalse;
 
 		// never autodownload any of the id paks
-		if ( FS_idPak(fs_serverReferencedPakNames[i], BASEGAME)
-#ifdef STANDALONE // IOQ3ZTM // Someone could use id paks as a mod.
-		|| FS_idPak(fs_serverReferencedPakNames[i], "baseq3")
-#endif
+		if ( FS_idPak(fs_serverReferencedPakNames[i], "baseq3")
 		|| FS_idPak(fs_serverReferencedPakNames[i], "missionpack") ) {
 			continue;
 		}
+
+#ifdef TMNT
+		// never autodownload any of the default paks
+		if ( FS_DefaultPak(fs_serverReferencedPakNames[i], BASEGAME) ) {
+			continue;
+		}
+#endif
 
 		// Make sure the server cannot make us write to non-quake3 directories.
 		if(FS_CheckDirTraversal(fs_serverReferencedPakNames[i]))
