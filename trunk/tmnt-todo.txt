@@ -212,17 +212,13 @@ DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
 == Misfit Model 3D ==
 : Stuff I'd like to do to the MD3 part of MM3D...
 
-[todo] Replace hardcode loopframe list with ' "MD3_LOOPFRAMES" "00010101010" ' (use real list...) in the metadata
-: Or have the "Loop" in the animation view set the loop for the animation,
-:  currently "Loop" isn't per animation however.
-
-[todo] Metadata to set type of loop frames (Quake3 or Elite Force) or have "2" in MD3_LOOPFRAMES be Elite style?
-
-[todo] Metadata to set type of animations to save in animation.cfg?
-: Quake3 (and Elite Force MP) "0 0 0 0 // TYPE_NAME"
-: Elite Force SP "TYPE_NAME 0 0 0 0" (Supported by TMNT Arena!)
+[todo] Allow per-animation "Loop" setting (Currently hardcoded list)
+: Have the "Loop" in the animation view set the loop for the animation, currently "Loop" isn't per animation however...
 
 [todo] When exporting a player I have to open and save the upper and head models (with no change) to fix model lighting?
 
-[todo] Finish writing (and porting my work from old verion to svn head) MDR plugin for Misfit Model 3D.
+[todo] Finish writing MDR plugin for Misfit Model 3D.
+
+[todo] Export lower LODs of MD3 models (head_1.md3, head_2.md3), and include lower LODs in MDR models
+: Maybe use gts.sourceforge.net? The gallery shows its possible.
 
