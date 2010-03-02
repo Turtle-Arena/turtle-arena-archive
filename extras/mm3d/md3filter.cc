@@ -731,6 +731,8 @@ bool Md3Filter::readAnimations( bool create )
    int animCount = 0;
    std::vector<std::string> animNames;
    int last_fcount = 0;
+   bool eliteLoop = false;
+   int animKeyword = 0;
 
    m_animStartFrame.clear();
    m_standFrame = 0;
@@ -781,7 +783,7 @@ bool Md3Filter::readAnimations( bool create )
 			    || (sscanf( line, "%s %d %d %d %d",
                       fname, &first, &fcount, &loop, &fps ) == 5
 				    && (strncasecmp(fname, "both_", 5) == 0 || strncasecmp(fname, "torso_", 6) == 0
-                      || strncasecmp(fname, "legs_", 5) == 0) ))
+                      || strncasecmp(fname, "legs_", 5) == 0) && (animKeyword || (animKeyword = 1)) ))
             {
                log_debug( "got anim frame details\n" );
 
@@ -790,6 +792,18 @@ bool Md3Filter::readAnimations( bool create )
                {
                   // ZTM: FIXME: Make a note that it is reversed?
                   fcount = abs(fcount);
+               }
+
+               if (create && loop == -1 && !eliteLoop)
+               {
+                  m_model->addMetaData( "MD3_EliteLoop", "1" );
+                  eliteLoop = true;
+               }
+
+               if (create && animKeyword == 1)
+               {
+                  m_model->addMetaData( "MD3_AnimKeyword", "1" );
+                  animKeyword = 2; // Avoid setting MD3_AnimKeyword each time
                }
 
                char * name = NULL;
@@ -3217,6 +3231,8 @@ bool Md3Filter::writeAnimations()
 {
    string animFile = m_modelPath + "/animation.cfg";
    FILE * fp = fopen( animFile.c_str(), "w" );
+   bool eliteLoop = false;
+   bool animKeyword = false;
 
    if ( fp != NULL )
    {
@@ -3261,6 +3277,15 @@ bool Md3Filter::writeAnimations()
             else
                fprintf( fp, "%s\r\n", &keyword[4] );
          }
+         // animations.cfg format settings
+         else if (strncasecmp(keyword, "MD3_EliteLoop", 13) == 0)
+         {
+            eliteLoop = (atoi(value) > 0);
+         }
+         else if (strncasecmp(keyword, "MD3_AnimKeyword", 15) == 0)
+         {
+            animKeyword = (atoi(value) > 0);
+         }
       }
 
       fprintf( fp, "\r\n" );
@@ -3295,9 +3320,34 @@ bool Md3Filter::writeAnimations()
             loop = 0;
          }
 
-         fprintf( fp, "%d\t%d\t%d\t%d\t\t// %s%s\r\n", 
-               animFrame, count, loop, fps, name.c_str(),
-               (animSyncWarning(name) ? warning : "") );
+         // Convert to Elite Force Single Player Style
+         if (eliteLoop)
+         {
+            if (loop == 0)
+               loop = -1; // No loop
+            else
+               loop = 0; // Loop
+         }
+
+         if (animKeyword)
+         {
+            // Aline animFrame
+            char spaces[23] = {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','\0','\0'};
+            int numSpaces = (20 - name.length() > 0) ? (20 - name.length()) : 0;
+
+            spaces[numSpaces] = spaces[numSpaces+1] = '\0';
+
+            if (animSyncWarning(name))
+               fprintf( fp, "%s%s\t%d\t%d\t%d\t%d\t\t// %s\r\n", 
+                     name.c_str(), spaces, animFrame, count, loop, fps, warning );
+            else
+               fprintf( fp, "%s%s\t%d\t%d\t%d\t%d\r\n", 
+                     name.c_str(), spaces, animFrame, count, loop, fps );
+         }
+         else
+            fprintf( fp, "%d\t%d\t%d\t%d\t\t// %s%s\r\n", 
+                  animFrame, count, loop, fps, name.c_str(),
+                  (animSyncWarning(name) ? warning : "") );
       }
       fclose( fp );
       return true;

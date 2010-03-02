@@ -7,3 +7,21 @@ There are still things that are not general, like the hard coded list of animati
 
 It adds code for MDR models, but is unfinished (It can't import or export yet).
 
+= Changes =
+Incomplete list of changes.
+
+== Animations.cfg ==
+Animation name is loaded from the animations.cfg, with fallback to default q3 name, instead of just a hardcoded list.
+
+Reads/Saves all of the animations instead of just the first 25 (MD3_ANIMATIONS).
+
+== Metadata ==
+Changes add suppport for MD3_CFG_* metadata to insert data into animations.cfg
+	(Still supports hardcoded MD3_footsteps, MD3_headoffset, etc)
+
+If MD3_EliteLoop value is 1 uses STV: Elite Force Single Player style loopframes
+	(Where 0 is loop, and -1 is don't loop in animations.cfg)
+
+If MD3_AnimKeyword value is 1 uses Elite Force Single Player style animation list
+Example: "BOTH_DEATH1 0 5 5 15"
+
