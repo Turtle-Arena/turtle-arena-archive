@@ -1,27 +1,29 @@
 /*
 ===========================================================================
 Copyright (C) 2007 Open Arena Team
+Copyright (C) 2010 Zack "ZTurtleMan" Middleton
 
-This file is part of Open Arena.
+This file is part of TMNT Arena.
 
-Open Arena is free software; you can redistribute it
+TMNT Arena is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Open Arena is distributed in the hope that it will be
+TMNT Arena is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Open Arena; if not, write to the Free Software
+along with TMNT Arena; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
+// Incomplete HUD for MISSIONPACK UI
+
 #include "ui/menudef.h"
-//will be the minimal hud but full hud for now
 {
   assetGlobalDef {
 	font "gfx/2d/bigchars" 16
@@ -36,19 +38,19 @@ menuDef {
 	fullScreen 0
 	visible 1
 	focusColor 0.1 0.6 1 1
-	rect 2 425 190 55
+	rect 40 55 190 157
 
 itemDef {
-	name backer
+	name "backer"
 	textstyle 3
 	textscale 0.7
-	rect 0 0 636 55
-	border 1
+	rect 0 0 150 102
+	//border 1
 	style WINDOW_STYLE_FILLED
 	background "ui/assets/sbar"
-	bordercolor   0.25 0.25 0.25 0.7
+	//bordercolor   0.25 0.25 0.25 0.7
 	forecolor     1   0.5   0.01   1
-	backcolor     0.0 0.0 0.0 0.5
+	backcolor     0 1 0 0.33
 	outlinecolor  1   0.5   0.01   0.3
 	decoration
 	visible 1
@@ -56,26 +58,28 @@ itemDef {
 
 itemDef {
 	name "thehead"
-	rect 228 8 50 50
+	rect -20 0 60 60
 	visible 1
 	decoration
-	ownerdraw CG_PLAYER_HEAD 
+	ownerdraw CG_PLAYER_HEAD
 	}
 
 itemDef {
-	name healthness
+	name "healthness"
 	textstyle 3
 	textscale 1
-	rect 288 0 84 48
-	textalign 0		
-	textalignx 1	
+	rect 50 0 84 48
+	textalign 0
+	textalignx 1
 	textaligny 1
 	ownerdraw CG_PLAYER_HEALTH
-	forecolor 1 1 0.6 1
+	forecolor 1 1 1 1
 	decoration
-	visible 1 
+	visible 1
 	}
 
+// TMNT Arena doesn't have armor, support on HUD anyway?...
+/*
 itemDef {
 	name aricon
 	rect 500 0 50 50
@@ -98,40 +102,57 @@ itemDef {
 	decoration
 	visible 1 
 	}
+*/
 
+// TMNT Arena uses weapon models
 itemDef {
-	name amicon
-	rect 87 10 45 45
+	name "amicon"
+	rect 0 52 48 48 // 3D: 0 52 80 48
 	visible 1
 	decoration
-	ownerdraw CG_PLAYER_AMMO_ICON
+	ownerdraw CG_PLAYER_AMMO_ICON2D // ZTM: 3D doesn't look right currently.
 	}
 
 itemDef {
-	name ammo
+	name "ammo"
 	textstyle 3
 	textscale 1
-	rect 4 0 84 48
+	rect 20 30 84 48
 	textalign 0
 	textalignx 1
 	textaligny 1
 	textscale .75
 	ownerdraw CG_PLAYER_AMMO_VALUE
-	forecolor 1 1 0.6 1
+	forecolor 1 1 1 1
 	decoration
-	visible 1 
+	visible 1
 	}
 
 itemDef {
-	name itemicon
-	rect 135 10 15 15
+	name "itemicon"
+	rect 80 52 48 48
 	visible 1
 	decoration
 	ownerdraw CG_PLAYER_ITEM
 	}
 
 itemDef {
-	name perpow
+	name "itemvalue"
+	textstyle 3
+	textscale 1
+	rect 100 30 84 48
+	textalign 0
+	textalignx 1
+	textaligny 1
+	textscale .75
+	ownerdraw CG_PLAYER_ITEM_VALUE
+	forecolor 1 1 1 1
+	decoration
+	visible 1
+	}
+
+itemDef {
+	name "perpow"
 	rect 135 36 15 15
 	visible 1
 	decoration
@@ -139,7 +160,7 @@ itemDef {
 	}
 
 itemDef {
-	name flag1
+	name "flag1"
 	rect 151 10 35 35
 	visible 1
 	decoration
@@ -147,7 +168,7 @@ itemDef {
 	}
 
 itemDef {
-	name skull1
+	name "skull1"
 	rect 151 10 50 35
 	visible 1
 	decoration
@@ -155,19 +176,19 @@ itemDef {
 	}
 
 itemDef {
-	name spscore
+	name "spscore"
 	rect 380 15 40 12
 	visible 1
 	decoration
 	forecolor 1 1 1 1
-	text "KillLimit: "
+	text "ScoreLimit: "
 	textscale .25
 	ownerdrawflag CG_SHOW_ANYNONTEAMGAME
 	ownerdraw CG_CAPFRAGLIMIT
 	}
 
 itemDef {
-	name spscore1
+	name "spscore1"
 	rect 380 30 40 12
 	visible 1
 	decoration
@@ -179,7 +200,7 @@ itemDef {
 	}
 
 itemDef {
-	name spscore2
+	name "spscore2"
 	rect 440 30 40 12
 	visible 1
 	decoration
@@ -191,7 +212,7 @@ itemDef {
 	}
 
 itemDef {
-	name spscore3
+	name "spscore3"
 	rect 380 45 40 0
 	visible 1
 	decoration
@@ -203,7 +224,7 @@ itemDef {
 	}
 
 itemDef {
-	name tscore
+	name "tscore:"
 	rect 380 15 40 12
 	visible 1
 	decoration
@@ -215,7 +236,7 @@ itemDef {
 	}
 
 itemDef {
-	name tscore1
+	name "tscore1"
 	rect 380 30 16 0
 	visible 1
 	decoration
@@ -227,7 +248,7 @@ itemDef {
 	}
 
 itemDef {
-	name tscore2
+	name "tscore2"
 	rect 380 40 20 0
 	visible 1
 	decoration
@@ -239,7 +260,7 @@ itemDef {
 	}
 
 itemDef {
-	name tscore3
+	name "tscore3"
 	rect 380 50 16 0
 	visible 1
 	decoration
@@ -258,8 +279,8 @@ itemDef {
 // ==============================
 menuDef {
 	name "voiceMenu"
-        fullScreen MENU_FALSE
-        visible MENU_FALSE
+	fullScreen MENU_FALSE
+	visible MENU_FALSE
 	focusColor 0.1 0.6 1 1
 	rect 2 2 190 75
 itemDef {
@@ -291,9 +312,9 @@ itemDef {
 	decoration
 	ownerdraw CG_VOICE_NAME
 	textstyle 6
-      	textscale .20
-      	textalign 0		
-     	textalignx 0	
+	textscale .20
+	textalign 0		
+	textalignx 0	
 	textaligny 10    
 	}
 	}
