@@ -225,7 +225,6 @@ static float healthColors[4][4] = {
   { 1.0f, 1.0f, 1.0f, 1.0f } };		// health > 100
 #endif
 
-#ifndef TMNTWEAPONS
 static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 	centity_t	*cent;
 	playerState_t	*ps;
@@ -238,7 +237,11 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 	if ( draw2D || (!cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 	  qhandle_t	icon;
 #ifdef TMNTWEAPSYS
+#ifdef TMNTWEAPONS
+		icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].weaponIcon;
+#else
 		icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].ammoIcon;
+#endif
 #else
 		icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
 #endif
@@ -248,26 +251,54 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
   } else if (cg_draw3dIcons.integer) {
   	if ( cent->currentState.weapon &&
 #ifdef TMNTWEAPSYS
+#ifdef TMNTWEAPONS
+		cg_weapongroups[ cent->currentState.weapon ].weaponModel
+#else
 		cg_weapongroups[ cent->currentState.weapon ].ammoModel
+#endif
 #else
 		cg_weapons[ cent->currentState.weapon ].ammoModel
 #endif
   	) {
 	    VectorClear( angles );
+#ifdef TMNTWEAPONS
+		angles[YAW] = 20 * sin( cg.time / 1000.0 );
+
+	  	if (bg_weapongroupinfo[ cent->currentState.weapon ].weapon[0]->weapontype == WT_GUN) {
+			origin[0] = 80;
+			origin[1] = -20;
+	  	} else {
+			origin[0] = 50;
+			origin[1] = 0;
+		}
+  		origin[2] = -10;
+
+  		// If it doesn't have a special pickup weapon model...
+		if (cg_weapongroups[ cent->currentState.weapon ].weaponModel ==
+			cg_weapons[bg_weapongroupinfo[ cent->currentState.weapon ].weaponnum[0]].weaponModel)
+		{
+			angles[YAW] += 25 + 90;
+		}
+#else
 	  	origin[0] = 70;
   		origin[1] = 0;
   		origin[2] = 0;
   		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
+#endif
   		CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h,
 #ifdef TMNTWEAPSYS
-			cg_weapongroups[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
+#ifdef TMNTWEAPONS
+			cg_weapongroups[ cent->currentState.weapon ].weaponModel,
 #else
-			cg_weapons[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
+			cg_weapongroups[ cent->currentState.weapon ].ammoModel,
 #endif
+#else
+			cg_weapons[ cent->currentState.weapon ].ammoModel,
+#endif
+			0, origin, angles );
   	}
   }
 }
-#endif // !TMNTWEAPONS
 
 static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
 	char	num[16];
@@ -544,6 +575,37 @@ static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qboolean draw2D) {
 	}
 
 }
+
+#ifdef TMNTHOLDSYS
+static void CG_DrawPlayerItemValue(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
+	char	num[16];
+	int value;
+	int giveQuantity;
+	playerState_t	*ps;
+
+	ps = &cg.snap->ps;
+
+	if ( ps->holdableIndex ) {
+		giveQuantity = BG_ItemForItemNum(BG_ItemNumForHoldableNum(ps->holdableIndex))->quantity;
+		value = ps->holdable[cg.snap->ps.holdableIndex];
+
+		if ((giveQuantity > 0 && value > 0)
+			|| (giveQuantity == 0 && value > 1)) // Only happens with give command.
+		{
+			if (shader) {
+		    trap_R_SetColor( color );
+				CG_DrawPic(rect->x, rect->y, rect->w, rect->h, shader);
+			  trap_R_SetColor( NULL );
+			} else {
+				Com_sprintf (num, sizeof(num), "%i", value);
+				value = CG_Text_Width(num, scale, 0);
+				CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+			}
+		}
+	}
+
+}
+#endif
 
 
 static void CG_DrawSelectedPlayerPowerup( rectDef_t *rect, qboolean draw2D ) {
@@ -983,13 +1045,13 @@ float CG_GetValue(int ownerDraw) {
     break;
 #endif
   case CG_PLAYER_AMMO_VALUE:
-		if ( cent->currentState.weapon ) {
 #ifdef TMNTWEAPSYS_EX
-		  return ps->stats[STAT_AMMO];
+		return ps->stats[STAT_AMMO];
 #else
+		if ( cent->currentState.weapon ) {
 		  return ps->ammo[cent->currentState.weapon];
-#endif
 		}
+#endif
     break;
   case CG_PLAYER_SCORE:
 	  return cg.snap->ps.persistant[PERS_SCORE];
@@ -997,6 +1059,11 @@ float CG_GetValue(int ownerDraw) {
   case CG_PLAYER_HEALTH:
 		return ps->stats[STAT_HEALTH];
     break;
+#ifdef TMNTHOLDSYS
+  case CG_PLAYER_ITEM_VALUE:
+		return cg.snap->ps.holdable[cg.snap->ps.holdableIndex];
+    break;
+#endif
   case CG_RED_SCORE:
 		return cgs.scores1;
     break;
@@ -1621,14 +1688,12 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
     CG_DrawPlayerArmorValue(&rect, scale, color, shader, textStyle);
     break;
 #endif
-#ifndef TMNTWEAPONS
   case CG_PLAYER_AMMO_ICON:
     CG_DrawPlayerAmmoIcon(&rect, ownerDrawFlags & CG_SHOW_2DONLY);
     break;
   case CG_PLAYER_AMMO_ICON2D:
     CG_DrawPlayerAmmoIcon(&rect, qtrue);
     break;
-#endif
   case CG_PLAYER_AMMO_VALUE:
     CG_DrawPlayerAmmoValue(&rect, scale, color, shader, textStyle);
     break;
@@ -1670,6 +1735,11 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   case CG_PLAYER_ITEM:
     CG_DrawPlayerItem(&rect, scale, ownerDrawFlags & CG_SHOW_2DONLY);
     break;
+#ifdef TMNTHOLDSYS // CG_DrawPlayerAmmoValue
+  case CG_PLAYER_ITEM_VALUE:
+    CG_DrawPlayerItemValue(&rect, scale, color, shader, textStyle);
+    break;
+#endif
   case CG_PLAYER_SCORE:
     CG_DrawPlayerScore(&rect, scale, color, shader, textStyle);
     break;

@@ -564,7 +564,9 @@ typedef struct weaponGroupInfo_s {
 	vec3_t			weaponMidpoint;		// so it will rotate centered instead of by tag
 
 	qhandle_t		weaponIcon;
-#ifndef TMNTWEAPONS
+#ifdef TMNTWEAPONS
+	qhandle_t		weaponModel; // Pickup model, only used by new UI.
+#else
 	qhandle_t		ammoIcon;
 
 	qhandle_t		ammoModel;
