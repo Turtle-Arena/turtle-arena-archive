@@ -94,7 +94,7 @@ weapongroup "wp_fists"
 }
 
 //
-// Leo's Katanas
+// Leo's Katanas (ninjaken)
 //
 // ...Leo's Katanas are 'Katanas' in name only.
 // Real Katanas are curved (by the way they are made), Leo's are straight.

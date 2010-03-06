@@ -2,16 +2,46 @@ TMNT Arena Ideas file (Formarly "todo" file)
 
 TODO: Move this stuff somewhere else and remove this file.
 
-== Single Player Design/"Story" ==
-Ideas;
-* Try to fit into the 2003 TV series or just be standalone?
-* Have there be stages containing multiple levels.
-* Have one of the stages take place in Usagi's world
-* Have one of the stages take place in Moo Mesa?
-* The Purple Dragons may appear
-* The Earth Protection Force (Agent Bishop) may appear
-* It is unknown if The Foot will appear.
-* Mousers may appear
+== Single Player Design/Story ==
+* Base on 2003 TV series or just be standalone?
+
+* Something like "Turtles In Time" or maybe somewhat more like "The Hyperstone Heist"
+** Each stage has its own "total different" environment
+** Per-level gimmick or two
+** Light on story (Meaning no long cutscenes between, or in the middle of, levels)
+** Have each "stage" contain multiple levels (Have all/most contain the same number).
+
+== Stage Ideas ==
+* New York / City
+** Sewer and/or Underground
+** Streets and/or Rooftops
+* Country / (Casey's Grandmother's farmhouse)
+** Forest
+* Water (Surf level)?
+* Desert/Mountain
+* Snow
+* Foot base in space
+
+* Usagi's world?
+* Moo Mesa?
+
+=== Stage story Idea ===
+Enemy:		Environment:		Story stuff.
+
+Mousers:	Underground:		The Turtles are attacked near their lair by Mousers
+Foot:		Streets/Rooftops:	and head for the rooftops. After battling the Foot,
+???:		Country/Forest:		they head to Casey's Grandmother's farmhouse. While exploring the Forest, they find something and
+???:		Water?:				fall into a underground river (with mutant? creators), and
+???:		Desert/Mountain:	end up in a Desert. They climb the mountain (for some reason)
+???:		Snow:				At the top of the Mountain is a transmat which teleports them to a space station.
+Foot:		Space:				Shredders on the space station. He must be stopped.
+
+== Enemy Ideas ==
+* The Foot
+* Mousers
+* The Purple Dragons possibly
+* The Earth Protection Force
+** Agent Bishop
 
 == Objects ==
 : Objects and NPCs share lots of code...
