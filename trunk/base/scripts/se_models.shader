@@ -100,9 +100,9 @@ models/players/raph/head_red
 	}
 }
 
-// Raph/Fungioid skin!
+// The Fugitoid!
 // green eyes and mouth
-models/players/raph/green
+models/players/fugitoid/eyes_mouth
 {
 	{
 		map $whiteimage
@@ -110,16 +110,23 @@ models/players/raph/green
 	}
 }
 
-models/players/raph/body_fugitoid
+models/players/fugitoid/eyes_mouth_red
 {
 	{
-		map textures/effects/tinfx.png
-		tcGen environment
-		rgbGen lightingDiffuse
+		map $whiteimage
+		rgbGen const ( 0.9 0.0 0.0 )
 	}
 }
 
-models/players/raph/body_fugitoid_lighter
+models/players/fugitoid/eyes_mouth_blue
+{
+	{
+		map $whiteimage
+		rgbGen const ( 0.0 0.0 0.9 )
+	}
+}
+
+models/players/fugitoid/body
 {
 	{
 		map textures/effects/tinfx_lighter.png
