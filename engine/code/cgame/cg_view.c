@@ -229,45 +229,72 @@ static void CG_OffsetThirdPersonView( void ) {
 	static vec3_t	maxs = { 4, 4, 4 };
 	vec3_t		focusPoint;
 	float		focusDist;
-#ifndef IOQ3ZTM // BETTER_THIRD_PERSON
+#ifdef IOQ3ZTM // BETTER_THIRD_PERSON
+	float		distance;
+#else
 	float		forwardScale, sideScale;
 #endif
 
 	cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
+#ifdef IOQ3ZTM // BETTER_THIRD_PERSON
+	distance = cg_thirdPersonRange.value;
+#endif
 
 #ifdef TMNT // LOCKON
 	if (cg.snap && cg.snap->ps.enemyEnt != ENTITYNUM_NONE) {
+		int i;
 		vec3_t dir;
 		vec3_t targetAngles;
 		vec3_t angDiff;
 		float f;
+		float time;
+		qboolean completedMove;
+		static float max_fraction = 1.0f;
 
-		// Get view angles to look at target
-		VectorSubtract( cg.snap->ps.enemyOrigin, cg.snap->ps.origin, dir );
-		vectoangles( dir, targetAngles );
+		time = LOCKON_TIME;
+		if (!cg.lockedOn)
+			time *= max_fraction;
 
-		// get diff of normal and target view angles.
-		if ( cg.lockedOn ) {
-			VectorSubtract(targetAngles, cg.refdefViewAngles, dir);
+		// Setup fraction
+		f = ( cg.time - cg.lockonTime ) / time;
+		if (f > 1.0f) {
+			f = 1.0f;
+			completedMove = qtrue;
 		} else {
-			VectorSubtract(cg.refdefViewAngles, targetAngles, dir);
+			completedMove = qfalse;
 		}
 
-		// Scale the difference of the angles
-		f = ( cg.time - cg.lockonTime ) / (float)LOCKON_TIME;
-		VectorScale(dir, f, angDiff);
+		if (cg.lockedOn) {
+			max_fraction = f;
+		} else {
+			f = max_fraction - f * max_fraction;
+		}
 
-		if ( cg.lockedOn ) {
-			if ( f > 1.0 ) {
+		if (cg.lockedOn || !completedMove ) {
+			// Move camera back
+			distance += cg_thirdPersonRange.value*0.3f*f;
+
+			// Get view angles to look at target
+			VectorSubtract( cg.snap->ps.enemyOrigin, cg.snap->ps.origin, dir );
+			vectoangles( dir, targetAngles );
+
+			if ( completedMove ) {
 				VectorCopy(targetAngles, cg.refdefViewAngles);
 			} else {
+				// get diff of normal and target view angles.
+				VectorSubtract(targetAngles, cg.refdefViewAngles, angDiff);
+
+				// Stop camera from spinning 360 degrees.
+				for (i = 0; i < 3; i++)
+				{
+					angDiff[i] = AngleNormalize180(angDiff[i]);
+				}
+
+				// Scale the difference of the angles
+				VectorScale(angDiff, f, angDiff);
+
+				// Add the scaled angle difference
 				VectorAdd(cg.refdefViewAngles, angDiff, cg.refdefViewAngles);
-			}
-		} else {
-			if ( f > 1.0 ) {
-				//VectorCopy( cg.refdefViewAngles, cg.refdefViewAngles);
-			} else {
-				VectorAdd(targetAngles, angDiff, cg.refdefViewAngles);
 			}
 		}
 	}
@@ -295,7 +322,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
 	// Focus on player
-	VectorMA( cg.refdef.vieworg, cg_thirdPersonRange.value, forward, focusPoint );
+	VectorMA( cg.refdef.vieworg, distance, forward, focusPoint );
 #else
 	VectorMA( cg.refdef.vieworg, FOCUS_DISTANCE, forward, focusPoint );
 #endif
@@ -310,7 +337,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
 	// Move camera behind player
-	VectorMA( view, -cg_thirdPersonRange.value, forward, view );
+	VectorMA( view, -distance, forward, view );
 #else
 	forwardScale = cos( cg_thirdPersonAngle.value / 180 * M_PI );
 	sideScale = sin( cg_thirdPersonAngle.value / 180 * M_PI );
