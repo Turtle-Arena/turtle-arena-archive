@@ -104,6 +104,7 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 BETTER(not done?): When moving the camera around the player, focus on the player. (Like in NiGHTS: Journey of Dreams)
 
 STARTED(TMNT // LOCKON): [todo] When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
+: [bug] When higher then target to focus on it gets all messed up.
 
 [todo] Merge Quake3 and Team Arena bot chat systems; One chat system to rule them all!
 * Problem: Team Arena adds voice chats, which are only used in gametypes >= GT_TEAM. There was also players that could only be used in gametypes >= GT_TEAM that did not have q3 chats. Leaving q3 players for FFA and Duel (with there normal q3 chats) (The TA players have no q3 chats and the players can't be used in q3, q3 players can't be used in gametypes >= GT_TEAM and have no voice chats.) So Team Arena had two seperate chat systems. TMNT Arena supports Q3 and Team Arena players in all gametypes and allows merged Q3/TA players. But in the gametypes >= GT_TEAM ONLY the TA voice chats are used. And like wise in non-team gametypes only "Q3 chats" are used.
@@ -215,10 +216,10 @@ DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
 [todo] Allow per-animation "Loop" setting (Currently hardcoded list)
 : Have the "Loop" in the animation view set the loop for the animation, currently "Loop" isn't per animation however...
 
-[todo] When exporting a player I have to open and save the upper and head models (with no change) to fix model lighting?
+[bug] After exporting a player I have to open, touch, and save the upper and head models (with no change) to fix model lighting.
 
-[todo] Finish writing MDR plugin for Misfit Model 3D.
+[todo] Finish MDR support for Misfit Model 3D.
 
 [todo] Export lower LODs of MD3 models (head_1.md3, head_2.md3), and include lower LODs in MDR models
-: Maybe use gts.sourceforge.net? The gallery shows its possible.
+: Maybe use gts.sourceforge.net to generate lower LODs? The gallery shows its possible. Somehow.
 

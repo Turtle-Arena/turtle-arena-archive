@@ -56,7 +56,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	DEAD_VIEWHEIGHT		-16
 
 #ifdef TMNT // LOCKON
-#define LOCKON_TIME 200 // Time it take to be fully facing target
+#define LOCKON_TIME 500 // Time it take to be fully facing target
 #endif
 
 //
