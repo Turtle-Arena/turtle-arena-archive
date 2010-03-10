@@ -1951,14 +1951,18 @@ static void PM_FinishWeaponChange( void ) {
 	PM_StartTorsoAnim( TORSO_RAISE );
 #endif
 #ifdef TMNTWEAPSYS_EX
-	// Drop weapon and setup ammo
-	if (pm->ps->stats[STAT_PENDING_WEAPON] == pm->ps->stats[STAT_DEFAULTWEAPON])
+	// Drop weapon if not default
+	if (oldWeapon != pm->ps->stats[STAT_DEFAULTWEAPON])
 	{
 		// drop weapon
 		pm->ps->stats[STAT_DROP_WEAPON] = oldWeapon;
 		pm->ps->stats[STAT_DROP_AMMO] = pm->ps->stats[STAT_AMMO];
 		PM_AddEvent( EV_DROP_WEAPON );
+	}
 
+	// Setup ammo
+	if (pm->ps->stats[STAT_PENDING_WEAPON] == pm->ps->stats[STAT_DEFAULTWEAPON])
+	{
 		// Default weapons don't use ammo.
 		pm->ps->stats[STAT_AMMO] = -1;
 	}
