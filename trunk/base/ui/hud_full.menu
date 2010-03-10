@@ -42,6 +42,7 @@ menuDef {
 
 itemDef {
 	name "backer"
+	ownerdraw CG_TEAM_COLOR
 	textstyle 3
 	textscale 0.7
 	rect 0 0 150 102
@@ -49,7 +50,7 @@ itemDef {
 	style WINDOW_STYLE_FILLED
 	background "ui/assets/sbar"
 	//bordercolor   0.25 0.25 0.25 0.7
-	forecolor     1   0.5   0.01   1
+	forecolor     0 1 0 0.33
 	backcolor     0 1 0 0.33
 	outlinecolor  1   0.5   0.01   0.3
 	decoration
@@ -76,6 +77,9 @@ itemDef {
 	forecolor 1 1 1 1
 	decoration
 	visible 1
+	addColorRange -999 24 1 0 0 1 //Red
+	addColorRange  25 100 1 0.69 0 1 //Yellow
+	addColorRange 101 999 1 1 1 1 //White
 	}
 
 // TMNT Arena doesn't have armor, support on HUD anyway?...
@@ -152,14 +156,6 @@ itemDef {
 	}
 
 itemDef {
-	name "perpow"
-	rect 135 36 15 15
-	visible 1
-	decoration
-	ownerdraw CG_CTF_POWERUP
-	}
-
-itemDef {
 	name "flag1"
 	rect 151 10 35 35
 	visible 1
@@ -174,6 +170,16 @@ itemDef {
 	decoration
 	ownerdraw CG_HARVESTER_SKULLS
 	}
+
+itemDef {
+	name "perpow"
+	rect 0 105 48 48
+	visible 1
+	decoration
+	ownerdraw CG_CTF_POWERUP
+	}
+
+
 
 itemDef {
 	name "spscore"
@@ -282,7 +288,7 @@ menuDef {
 	fullScreen MENU_FALSE
 	visible MENU_FALSE
 	focusColor 0.1 0.6 1 1
-	rect 2 2 190 75
+	rect 2 265 190 75
 itemDef {
 	name backer
 	textstyle 3
