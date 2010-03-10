@@ -25,6 +25,10 @@ TMNT Animations
 Jump/land B (Copy of Jump/land)
 
 
+== Notes ==
+Changed head to be split into bottom, mask, and top (instead of left/right).
+	Haven't updated raph_v9.mm3d!
+
 
 == TODO ==
 Split arms from torso, it would solve some animation issues with the sholder going flat when rotated...
