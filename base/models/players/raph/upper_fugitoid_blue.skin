@@ -4,7 +4,7 @@ u_torso_right_hand,models/players/fugitoid/body
 u_torso_left_hand,models/players/fugitoid/body
 u_plastron,models/players/fugitoid/body
 u_carapace,models/players/fugitoid/body
-u_belt,models/players/fugitoid/body
+u_belt,models/players/raph/belt_blue.png
 tag_flag,
 tag_weapon,
 tag_head,
