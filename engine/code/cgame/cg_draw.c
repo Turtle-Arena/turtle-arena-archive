@@ -3069,7 +3069,11 @@ void CG_DrawTimedMenus( void ) {
 		int t = cg.time - cg.voiceTime;
 		if ( t > 2500 ) {
 			Menus_CloseByName("voiceMenu");
+#ifdef IOQ3ZTM // USE_FREETYPE
+			trap_Cvar_Set("cl_conXOffset", "10");
+#else
 			trap_Cvar_Set("cl_conXOffset", "0");
+#endif
 			cg.voiceTime = 0;
 		}
 	}
