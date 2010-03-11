@@ -28,6 +28,7 @@ MAKEZIP=1
 
 	# Package win32 binaries for zip install
 	WIN32=1
+	# TODO: Support 64-bit Windows? (ioquake3 does)
 
 
 # Make .deb package for Debian based systems
@@ -80,7 +81,7 @@ fi
 
 if [ $WIN32 -eq 1 ]
 then
-	sh cross-make-mingw.sh BUILD_GAME_SO=0
+	sh cross-make-mingw.sh ARCH=x86 BUILD_GAME_SO=0
 fi
 
 cd $STARTDIR
