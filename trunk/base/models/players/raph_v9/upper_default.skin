@@ -1,0 +1,11 @@
+u_torso_right,models/players/raph/torso.png
+u_torso_left,models/players/raph/torso.png
+u_hand_right,models/players/raph_v9/hand.png
+u_hand_left,models/players/raph_v9/hand.png
+u_plastron,models/players/raph/plastron.png
+u_carapace,models/players/raph/carapace.png
+u_belt,models/players/raph/belt.png
+tag_flag,
+tag_weapon,
+tag_head,
+tag_torso,
