@@ -185,10 +185,6 @@ then
 	cp COPYING.txt $INSTALLDIR
 	cp COPYRIGHTS.txt $INSTALLDIR
 
-	# write version file
-	echo "TMNT Arena Alpha $VERSION" > $INSTALLDIR/version.txt
-	#echo "Packaged by: $NAME_AND_EMAIL" >> $INSTALLDIR/version.txt
-
 	# Copy all of the files other then base/ into tmntarena-src/ and zip it.
 	echo "Warning: You need to manually copy the source into $INSTALLDIR !"
 
@@ -281,14 +277,14 @@ function make_client_deb() {
 	# write the debian-binary file
 	echo "2.0" > debian-binary
 
-	if [ -f ${GAMENAME}_$VERSION-$CLIENT_DEB_VERSION_$DEBARCH.deb ]
+	if [ -f ${GAMENAME}_$VERSION-${CLIENT_DEB_VERSION}_$DEBARCH.deb ]
 	then
-		rm ${GAMENAME}_$VERSION-$CLIENT_DEB_VERSION_$DEBARCH.deb
+		rm ${GAMENAME}_$VERSION-${CLIENT_DEB_VERSION}_$DEBARCH.deb
 	fi
 
-	fakeroot ar -r ${GAMENAME}_$VERSION-$CLIENT_DEB_VERSION_$DEBARCH.deb debian-binary control.tar.gz data.tar.gz
+	fakeroot ar -r ${GAMENAME}_$VERSION-${CLIENT_DEB_VERSION}_$DEBARCH.deb debian-binary control.tar.gz data.tar.gz
 
-	mv ${GAMENAME}_$VERSION-$CLIENT_DEB_VERSION_$DEBARCH.deb ..
+	mv ${GAMENAME}_$VERSION-${CLIENT_DEB_VERSION}_$DEBARCH.deb ..
 
 	cd $STARTDIR
 
@@ -343,14 +339,14 @@ then
 		# write the debian-binary file
 		echo "2.0" > debian-binary
 
-		if [ -f ${GAMENAME}-data_$VERSION-$DATA_DEB_VERSION_all.deb ]
+		if [ -f ${GAMENAME}-data_$VERSION-${DATA_DEB_VERSION}_all.deb ]
 		then
-			rm ${GAMENAME}-data_$VERSION-$DATA_DEB_VERSION_all.deb
+			rm ${GAMENAME}-data_$VERSION-${DATA_DEB_VERSION}_all.deb
 		fi
 
-		ar -r ${GAMENAME}-data_$VERSION-$DATA_DEB_VERSION_all.deb debian-binary control.tar.gz data.tar.gz
+		ar -r ${GAMENAME}-data_$VERSION-${DATA_DEB_VERSION}_all.deb debian-binary control.tar.gz data.tar.gz
 
-		mv ${GAMENAME}-data_$VERSION-$DATA_DEB_VERSION_all.deb ..
+		mv ${GAMENAME}-data_$VERSION-${DATA_DEB_VERSION}_all.deb ..
 
 		cd $STARTDIR
 
