@@ -96,7 +96,7 @@ IOQ3_REVISION = 1782
 # -DNOTRATEDM - Disable stuff in Quake3 engine that made it rated M. (default blood to off, remove gibs,
 #            remove strong lang) This however doesn't change the gamedata, like the botfiles strong lang,
 #            bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
-#            Turtle Man: TODO: Rename this define to ...?
+#            ZTM: TODO: Rename this define to ...?
 # -DNOBLOOD - Removes blood, if this is defined "NOTRATEDM" must also be.
 #
 ifeq ($(BUILD_IOQ3ZTM),1)
@@ -1636,7 +1636,7 @@ $(Q3ASM): $(Q3ASMOBJ)
 #############################################################################
 # SPLINES
 #############################################################################
-# Turtle Man
+# ZTM
 
 SPLINESOBJ =
 
@@ -1979,7 +1979,7 @@ Q3POBJ_SMP += \
 ifeq ($(BUILD_SPLINES),1)
 # TTimo: splines code requires C++ linking, but splines have
 # not been officially included in the codebase
-# Turtle Man: now it has, so use C++ linking.
+# ZTM: now it has, so use C++ linking.
 $(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
@@ -2101,7 +2101,7 @@ ifeq ($(ARCH),x86)
       $(B)/ded/snapvectora.o \
       $(B)/ded/matha.o
 endif
-#Turtle Man: if TMNT_GAME_TAGS
+#ZTM: if TMNT_GAME_TAGS
 ifeq ($(DED_USE_MODELS),1)
 Q3DOBJ += \
       $(B)/ded/tr_model.o
@@ -2297,7 +2297,7 @@ Q3GOBJ_ = \
   $(B)/$(BASEGAME)/qcommon/q_math.o \
   $(B)/$(BASEGAME)/qcommon/q_shared.o
 
-#Turtle Man: Files I added.
+#ZTM: Files I added.
 Q3GOBJ_ += $(B)/$(BASEGAME)/game/g_save.o \
   $(B)/$(BASEGAME)/game/g_paths.o \
   $(B)/$(BASEGAME)/game/g_npcsys.o
@@ -2353,7 +2353,7 @@ MPGOBJ_ = \
   $(B)/missionpack/qcommon/q_math.o \
   $(B)/missionpack/qcommon/q_shared.o
 
-#Turtle Man: Files I added.
+#ZTM: Files I added.
 MPGOBJ_ += $(B)/missionpack/game/g_save.o \
   $(B)/missionpack/game/g_paths.o \
   $(B)/missionpack/game/g_npcsys.o
@@ -2539,7 +2539,7 @@ $(B)/ded/%.o: $(SYSDIR)/%.rc
 $(B)/ded/%.o: $(NDIR)/%.c
 	$(DO_DED_CC)
 
-# Turtle Man: TMNT_GAME_TAGS ded
+# ZTM: TMNT_GAME_TAGS ded
 ifeq ($(DED_USE_MODELS),1)
 $(B)/ded/%.o: $(RDIR)/%.c
 	$(DO_DED_CC)

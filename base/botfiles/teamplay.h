@@ -21,17 +21,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// Turtle Man: Cleaned up lang... TODO: Rewrite.
+// ZTM: Cleaned up lang... TODO: Rewrite.
 
 	//the bot doesn't know who someone is
 type "whois"
 {
 "Ok, so who is ", 0, "?";
 "Who in their right mind uses the name ", 0, "?";
-"Who is ", 0, "?"; // Turtle Man
+"Who is ", 0, "?"; // ZTM
 //"Who in the hell is ", 0, "?";
 "Is ", 0, " a friend of yours?";
-//"Who the bloodyhell is ",0," ."; // Turtle Man: DISABLED
+//"Who the bloodyhell is ",0," ."; // ZTM: DISABLED
 0, "!?! Who dat?";
 "How can I kill ", 0, " when I haven't the foggiest idea who ", 0, " is?";
 
@@ -44,7 +44,7 @@ type "whereis"
 "Ok, so where is", 0, ".";
 "Would someone please tell me where ", 0, " is.";
 " ", 0, " hanging out?";
-"Where is ", 0, "?"; // Turtle Man
+"Where is ", 0, "?"; // ZTM
 //"Where the hell is ", 0, "?";
 "Since when am I ", 0, "'s keeper?";
 }
@@ -63,7 +63,7 @@ type "whereareyou"
 type "cannotfind"
 {
 "Where would that be ", 0, "?";
-"Where is a ", 0, "?"; // Turtle Man
+"Where is a ", 0, "?"; // ZTM
 //"Where the hell is a ", 0, "?";
 "Where is a ", 0, " in this level?";
 "Is there a, ", 0, " in this level? I sure can't find it, I must be blind.";
@@ -110,7 +110,7 @@ type "accompany_stop"
 	//cannot find companion
 type "accompany_cannotfind"
 {
-"Where are you ", 0, "?"; // Turtle Man
+"Where are you ", 0, "?"; // ZTM
 //"Where the hell are you ", 0, "?";
 "Where are you hiding ", 0, "?";
 0, "... come out, come out wherever you are...";
@@ -285,7 +285,7 @@ affirmative, " Yep ", 0, " at ", 1, " is there.";
 	//follow me
 type "followme"
 {
-"What are you waiting for ", 0, "? Get over here!"; // Turtle Man
+"What are you waiting for ", 0, "? Get over here!"; // ZTM
 //"What the hell are you waiting for ", 0, "? Get over here!";
 "Hey!  ", 0, " follow me and be quick about it.";
 }
@@ -309,7 +309,7 @@ type "helping"
 type "accompanying"
 {
 "I'm shadowing ", 0, ".  Is that alright?";
-"Following ", 0, ", trying not to get hit."; // Turtle Man: Changed "shot" tp "hit"
+"Following ", 0, ", trying not to get hit."; // ZTM: Changed "shot" tp "hit"
 }
 
 	//the bot is defending something
@@ -411,7 +411,7 @@ type "keepinmind"
 	//team mate killed the bot
 type "death_teammate"
 {
-"Same team stupid!";//"Same team, dumbass!"; // Turtle Man
+"Same team stupid!";//"Same team, dumbass!"; // ZTM
 "Hey ", 0," I'm on your team... idiot!";
 "Why did you kill me?";
 }

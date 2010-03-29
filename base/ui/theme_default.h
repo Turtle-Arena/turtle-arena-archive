@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 2007 Open Arena Team
-Copyright (C) 2009 by Turtle Man
+Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
 This file is part of TMNT Arena source code.
 

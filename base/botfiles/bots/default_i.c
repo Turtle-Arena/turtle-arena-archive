@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// Turtle Man: Modified for TMNT Arena.
+// ZTM: Modified for TMNT Arena.
 
 #include "inv.h"
 

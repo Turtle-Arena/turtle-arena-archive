@@ -147,7 +147,7 @@ chat "raph"
 		//"...";
 	}
 
-/* Turtle Man: No longer used.
+/* ZTM: No longer used.
 	type "death_gauntlet"
 	{
 		"Ow";
@@ -183,7 +183,7 @@ chat "raph"
 		"I think your getting the hang of this.";
 	}
 
-/* Turtle Man: No longer used.
+/* ZTM: No longer used.
 	type "kill_rail"
 	{
 		"Take that!";

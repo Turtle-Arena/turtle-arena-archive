@@ -46,7 +46,7 @@ equ trap_SnapVector			-43
 equ trap_TraceCapsule		-44
 equ trap_EntityContactCapsule	-45
 equ trap_FS_Seek -46
-;; Turtle Man: For TMNT_GAME_MODELS
+;; ZTM: For TMNT_GAME_MODELS
 equ trap_RegisterModel -47
 equ trap_LerpTag -48
 

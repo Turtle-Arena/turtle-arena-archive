@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
-Copyright (C) 2010 by ZTurtleMan
+Copyright (C) 2010 by Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena source code.
 

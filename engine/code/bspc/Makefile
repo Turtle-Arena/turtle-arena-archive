@@ -9,7 +9,7 @@
 # TODO: the intermediate object files should go into their own directory
 #   specially for ../botlib and ../qcommon, the compilation flags on those might not be what you expect
 #
-# Turtle Man 2/25/2009
+# ZTM 2/25/2009
 # Changed Makefile to be like ioquake3 Makefile, currently still only for linux
 #   but should change later.
 
@@ -149,7 +149,7 @@ ifeq ($(PLATFORM),linux)
   endif
 
 #use these cflags to optimize it
-#Turtle Man: -m486 :  error: unrecognized command line option "-m486"
+#ZTM: -m486 :  error: unrecognized command line option "-m486"
   CFLAGS=$(BASE_CFLAGS) -O6 -ffast-math -funroll-loops \
 	-fomit-frame-pointer -fexpensive-optimizations -falign-loops=2 \
 	-falign-jumps=2 -falign-functions=2

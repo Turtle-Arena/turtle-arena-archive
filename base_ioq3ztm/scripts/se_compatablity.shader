@@ -1,7 +1,7 @@
 // Shaders that are not used by TMNT Arena,
 //  but we have them for "quake3 engine compatablity"... They may be removed leter.
 
-// Turtle Man: TMNT Arena uses the shader name set in model, "models/misc/telep"
+// ZTM: TMNT Arena uses the shader name set in model, "models/misc/telep"
 //             While Q3 uses a hardcoded name.
 teleportEffect
 {
@@ -27,7 +27,7 @@ menubacknologo
 	}
 }
 
-// Turtle Man: Removed HI_TELEPORTER
+// ZTM: Removed HI_TELEPORTER
 icons/teleporter
 {
 	nopicmip
@@ -37,7 +37,7 @@ icons/teleporter
 	}
 }
 
-// Turtle Man: Removed PW_REGEN
+// ZTM: Removed PW_REGEN
 icons/regen
 {
 	nopicmip
@@ -60,7 +60,7 @@ powerups/regen
 	}
 }
 
-// Turtle Man: So Quake3 finds our powerup icons...
+// ZTM: So Quake3 finds our powerup icons...
 icons/envirosuit
 {
 	nopicmip
@@ -124,7 +124,7 @@ medal_gauntlet
 }
 
 
-// Turtle Man: Renamed 3 (of 4) health icons;
+// ZTM: Renamed 3 (of 4) health icons;
 // Q3: green - TMNT: small
 // Q3: yellow - TMNT: medium
 // Q3: red - TMNT: large
@@ -158,7 +158,7 @@ icons/iconh_red
 
 // icons/iconh_mega -- same as in Q3.
 
-// Turtle Man: Renamed to sprites/talkBalloon ...
+// ZTM: Renamed to sprites/talkBalloon ...
 sprites/balloon3
 {
 	{
@@ -167,7 +167,7 @@ sprites/balloon3
 	}
 }
 
-// Turtle Man: Used in Team modes, it is above your teammate's head.
+// ZTM: Used in Team modes, it is above your teammate's head.
 sprites/foe
 {
 	nomipmaps
@@ -177,7 +177,7 @@ sprites/foe
 	}
 }
 
-// Turtle Man: Not used by TMNT Arena
+// ZTM: Not used by TMNT Arena
 gfx/2d/crosshaire
 {
 	nopicmip

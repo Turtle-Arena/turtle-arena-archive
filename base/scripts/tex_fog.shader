@@ -9,11 +9,11 @@
 //
 
 // The below is from: http://www.game-artist.net/forums/support/79-quake-3-foggy.html
-// Turtle Man: Fragger's shader used 1024, not 256.
+// ZTM: Fragger's shader used 1024, not 256.
 //Fog Shader by Fragger
 //You can use this as you please
 
-// Turtle Man: See much less (than 1024)
+// ZTM: See much less (than 1024)
 textures/fog/fogwhite_256
 {
     qer_editorimage textures/fog/fogwhite.jpg // This is the image we get to see in Radiant
