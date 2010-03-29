@@ -60,7 +60,7 @@ h_mouth_right,models/players/raph/white
 tag_head,
 }}}
 
-TMNT Arena also supports using *$(dir)* instead of the directory where the player is.
+Turtle Arena also supports using *$(dir)* instead of the directory where the player is.
 Example: "$(dir)/head" instead of "models/players/raph/head".
 
 = animation.cfg =
@@ -93,7 +93,7 @@ List of player tags by models.
   * tag_torso
 
 == Full skin search info ==
-Below is the seach order for ".skin" files in TMNT Arena. It uses code from Quake III: Team Arena to allow per-team skins. So Team Arena Players work in Team gametypes as well as Quake 3 players.
+Below is the seach order for ".skin" files in Turtle Arena. It uses code from Quake III: Team Arena to allow per-team skins. So Team Arena Players work in Team gametypes as well as Quake 3 players.
 
 Based on http://rfactory.org/idteam.html#appendh with the changes I've made to ioquake3.
 
