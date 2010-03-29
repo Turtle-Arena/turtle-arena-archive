@@ -2,7 +2,7 @@
 #labels Phase-Implementation
 
 = Introduction =
-The weapon system used in TMNT Arena;
+The weapon system used in Turtle Arena;
 
   * *TMNTWEAPSYS define*
   * Loads weapons from external text files ([http://turtlearena.googlecode.com/svn/trunk/base/scripts/weaponinfo.txt scripts/weaponinfo.txt] and scripts/?.weap files)
@@ -19,11 +19,11 @@ The weapon system used in TMNT Arena;
 
   * *TMNTWEAPONS define*
   * Removes code that is only for Quake3's weapon system
-  * Add code for TMNT weapons.
+  * Add code for Turtle Arena weapons.
 
   * *TMNT_GAME_MODELS*
   * Game QVM loads player models to get tag origin and angles (Allowing for better melee attacking)
-  * Note: The polygons (etc) are loaded as well, but currently unused. (TMNT dedicated server will use more RAM then ioquake3 dedicated server.)
+  * Note: The polygons (etc) are loaded as well, but currently unused. (Turtle Arena dedicated server will use more RAM then ioquake3 dedicated server.)
 
 = Definitions =
 There are weapon groups, weapons, and projectiles.
