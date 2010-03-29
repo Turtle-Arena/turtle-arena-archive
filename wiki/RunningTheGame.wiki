@@ -15,7 +15,7 @@ You will need to do a Source Checkout, see http://code.google.com/p/turtlearena/
 
 = Compiling the source =
 
-Currently the easist way to compile TMNT Arena is Make.
+Currently the easist way to compile Turtle Arena is Make.
 
 == Linux - Make ==
   # In a terminal change to the engine/ directory and run "make"
@@ -30,7 +30,7 @@ NOTE: Compiling only works on Windows. However it can be used to view and edit t
   # Rebuild workspace
   # Output will be in engine/build/
 
-Defines maybe out of date... so copy the defines from the TMNT config section of the Makefile into all projects (Except Splines and BSPC).
+Defines maybe out of date... so copy the defines from the Turtle Arena config section of the Makefile into all projects (Except Splines and BSPC).
 
 == Others ==
 See http://wiki.ioquake3.org/Building_ioquake3 for other platforms and methods of building.
@@ -38,7 +38,7 @@ See http://wiki.ioquake3.org/Building_ioquake3 for other platforms and methods o
 === Microsoft Visual C++ ===
 Currently unsupported. There are project files for ioquake3 in engine/misc/msvc/.
 
-Below are changes that ''should'' make the ioquake3 projects compile TMNT Arena. This is untested.
+Below are changes that ''should'' make the ioquake3 projects compile Turtle Arena. This is untested.
 
 Workspace:
 Add below to workspace
@@ -63,16 +63,16 @@ Q3_UI project:
 Add below to project
   * engine/code/q3_ui/ui_spplayer.c
 
-Copy the defines from the TMNT config section of the Makefile into all projects (Except Splines).
+Copy the defines from the Turtle Arena config section of the Makefile into all projects (Except Splines).
 
 = Final setup and execution =
 
 == Windows (Mingw) ==
 1. Copy the qvms files from engine/build/release-?/base/vm/ to base/vm/
 
-2. In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TMNTArena\svn\"
+2. In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TurtleArena\svn\"
 
-3. Run in the command prompt: engine\build\release-mingw32-x86\tmntarena.x86 +set fs_basepath "."
+3. Run in the command prompt: engine\build\release-mingw32-x86\turtlearena.x86 +set fs_basepath "."
 
 == Windows (Other) ==
 Other being Code::Blocks or Microsoft Visual C++.
@@ -88,9 +88,9 @@ The DLLs are used for testing/debuging, while QVMs are used for release. Mingw a
 
 to base/
 
-2. In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TMNTArena\svn\"
+2. In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TurtleArena\svn\"
 
-3. Run in the command prompt: engine\build\release-mingw32-x86\tmntarena.x86 +set fs_basepath "." +set vm_game 0 +set vm_cgame 0 +set vm_ui 0
+3. Run in the command prompt: engine\build\release-mingw32-x86\turtlearena.x86 +set fs_basepath "." +set vm_game 0 +set vm_cgame 0 +set vm_ui 0
 
 == Linux ==
 1. Create a link to each of the 3 qvm files in engine/build/release-?/base/vm/?.qvm in base/vm/
@@ -98,6 +98,6 @@ This way you don't have to copy the qvms after each compile.
 
 OR Copy the qvms files instead, to allow running in Windows as well.
 
-2. In the terminal change to the directory where you did the checkout. Example: cd /home/$USER/TMNTArena/svn/
+2. In the terminal change to the directory where you did the checkout. Example: cd /home/$USER/TurtleArena/svn/
 
-3. Run in the terminal; Example: Run ./engine/build/release-linux-x86/tmntarena.x86 +set fs_basepath "."
+3. Run in the terminal; Example: Run ./engine/build/release-linux-x86/turtlearena.x86 +set fs_basepath "."
