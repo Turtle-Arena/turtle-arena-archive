@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "inv.h"
 
-// Turtle Man: NOTE: type and index seem to be unused.
+// ZTM: NOTE: type and index seem to be unused.
 
 #define NOITEM		0
 #define AMMOI		1
@@ -593,7 +593,7 @@ maxs		{14, 14, 87}
 } 
 
 /*
-// For MISSIONPACK Harvester gametype (Turtle Man: Removed from TMNT Arena. #ifdef MISSIONPACK_HARVESTER)
+// For MISSIONPACK Harvester gametype (ZTM: Removed from TMNT Arena. #ifdef MISSIONPACK_HARVESTER)
 iteminfo "item_redcube"
 {
 name		"Red Cube"

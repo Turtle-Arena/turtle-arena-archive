@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2009 ZTM
+Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena source code.
 

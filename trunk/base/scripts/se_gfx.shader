@@ -23,7 +23,7 @@ railDisc
 		blendFunc GL_ONE GL_ONE
 		rgbGen vertex
 		tcMod rotate -30
-		// tcMod rotate 931 // Turtle Man
+		// tcMod rotate 931 // ZTM
 	}
 }
 
@@ -60,7 +60,7 @@ lightningBoltNew
 	}
 }
 
-// Grappling Hook Cable, grapple trail shader --Turtle Man
+// Grappling Hook Cable, grapple trail shader --ZTM
 GrappleCable
 {
 	cull disable
@@ -151,7 +151,7 @@ projectionShadow
 	}
 }
 
-// Turtle Man: In OpenArena this is called "oldwake", see OA for their new wake.
+// ZTM: In OpenArena this is called "oldwake", see OA for their new wake.
 wake
 {
 	{
@@ -326,7 +326,7 @@ gfx/misc/tracer
 	}
 }
 
-// Turtle Man: Used by unfinished WP_GUN
+// ZTM: Used by unfinished WP_GUN
 gfx/damage/bullet_mrk
 {
 	polygonoffset
@@ -337,7 +337,7 @@ gfx/damage/bullet_mrk
 	}
 }
 
-// Turtle Man: Used by rocket launcher and homing-rocket launcher
+// ZTM: Used by rocket launcher and homing-rocket launcher
 gfx/damage/burn_med_mrk
 {
 	polygonoffset
@@ -348,7 +348,7 @@ gfx/damage/burn_med_mrk
 	}
 }
 
-// Turtle Man: Used by grapple and melee weapons.
+// ZTM: Used by grapple and melee weapons.
 gfx/damage/hole_lg_mrk
 {
 	polygonoffset
@@ -359,7 +359,7 @@ gfx/damage/hole_lg_mrk
 	}
 }
 
-// Turtle Man: Used by the electric launcher
+// ZTM: Used by the electric launcher
 gfx/damage/plasma_mrk
 {
 	polygonoffset
@@ -371,7 +371,7 @@ gfx/damage/plasma_mrk
 	}
 }
 
-// Turtle Man: Used by hammer melee weapon
+// ZTM: Used by hammer melee weapon
 gfx/damage/hammer_mrk
 {
 	polygonoffset

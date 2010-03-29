@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2009-2010 by Turtle Man
+Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
 This file is part of TMNT Arena.
 
@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// Turtle Man: Bot names can be characters or aliases (or bots.txt names?)
+// ZTM: Bot names can be characters or aliases (or bots.txt names?)
 // Beside the "asset" there is two images loaded based on it,
 //    "asset_metal" (metal version of asset) and "asset_name" (image of the name).
 teams {
@@ -39,7 +39,7 @@ teams {
 	// Foot: Shredder, Foot, Foot Tech, Foot Mech, ?
 	// Dragons: Hun, Two Ton?, Dragon1, Dragon2, Dragon3
 
-// Turtle Man: ...yeah 36 characters WAY to many for me to plan on making.
+// ZTM: ...yeah 36 characters WAY to many for me to plan on making.
 //             The way it is currently, it may be better to have teams of 4, instead of 5.
 //             I shouldn't be wasting time on this right now anyway...
 }

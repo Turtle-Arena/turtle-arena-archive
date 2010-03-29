@@ -512,7 +512,7 @@ models/materials/glass
 models/flags/pole
 {
 	{
-		// Turtle Man: Changed image.
+		// ZTM: Changed image.
 		map textures/effects/tinfx.png
 		//map models/flags/pole.png
 		tcGen environment
@@ -523,7 +523,7 @@ models/flags/pole
 models/flags/skull
 {
 	{
-		// Turtle Man: Changed image.
+		// ZTM: Changed image.
 		map textures/effects/envmapmach.png
 		//map models/flags/skull.png
 		tcGen environment
@@ -759,7 +759,7 @@ models/powerups/ob2_2
 	//	tcGen environment
 		rgbGen entity
 
-		// Turtle Man: Invul powerup shader
+		// ZTM: Invul powerup shader
 		//map models/powerups/instant/invul.png
 		blendfunc GL_ONE GL_ONE
 		//rgbGen lightingDiffuse
@@ -785,7 +785,7 @@ models/powerups/ob2_4
 {
 	cull disable
 	{
-		// Turtle Man: Don't have pop_bw
+		// ZTM: Don't have pop_bw
 		//map models/powerups/pop_bw.tga
 		map textures/effects/tinfx.png
 		tcMod turb 0 0.1 0 0.1
@@ -927,7 +927,7 @@ models/powerups/ammo2
 	{
 		map models/powerups/ammo2.png
 		blendfunc Add
-		// Turtle Man: Go the same speed as others.
+		// ZTM: Go the same speed as others.
 		//tcmod Scroll 1.3 0
 		tcmod Scroll .9 0
 		rgbGen identity

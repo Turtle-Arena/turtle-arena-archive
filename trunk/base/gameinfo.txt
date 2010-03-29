@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2009 by Turtle Man
+Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
 This file is part of TMNT Arena.
 
@@ -29,7 +29,7 @@ gametypes {
   { "Capture the Flag" 4 }
   { "One Flag CTF" 5 }
   { "Overload" 6 }
-  //{ "Harvester" 7 }		// Turtle Man: Removed Harvester gametype.
+  //{ "Harvester" 7 }		// ZTM: Removed Harvester gametype.
 }
 
 // Used in MISSIONPACK Join Server menu
@@ -42,7 +42,7 @@ joingametypes {
   { "Capture the Flag" 4 }
   { "One Flag CTF" 5 }
   { "Overload" 6 }
-  //{ "Harvester" 7 }		// Turtle Man: Removed Harvester gametype.
+  //{ "Harvester" 7 }		// ZTM: Removed Harvester gametype.
 }
 
 // mapName, mapLoadName, teamMembers, opponentName, gametypenum "timetobeat" gametypenum "timetobeat" ...

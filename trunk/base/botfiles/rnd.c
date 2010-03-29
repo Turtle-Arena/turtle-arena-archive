@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// Turtle Man: "Cleaned up" chat, for till I rewrite it.
+// ZTM: "Cleaned up" chat, for till I rewrite it.
 
 // group A sayings
 
@@ -158,7 +158,7 @@ DEATH_SLIME0 = {
 
 DEATH_SLIME1 = {
 	"Where is Ralph Nader when you need him?";
-	//"Someone call Sally Struthers!"; // Turtle Man: Who is that?
+	//"Someone call Sally Struthers!"; // ZTM: Who is that?
 	"This is NOT a safe working environment, I want to talk to my Union Rep!";
 	"This level needs an enema!";
 }
@@ -630,7 +630,7 @@ language = {
 }
 
 weapon = {
-	// Turtle Man: Rewrote.
+	// ZTM: Rewrote.
 	"katana";
 	"sai";
 	"nunchuck";
@@ -661,7 +661,7 @@ response_insult = {
 }
 
 counselor = {
-	// Turtle Man: Disabled...
+	// ZTM: Disabled...
 	//"school nurse";
 	"astrologer";
 	"shrink";
@@ -702,7 +702,7 @@ friendname = {
 }
 
 fighter = {
-	// Turtle Man: Disabled "some" of the fighter strings...
+	// ZTM: Disabled "some" of the fighter strings...
 	"gladiator";
 	//"pickle brain";
 	"dweeb";
@@ -767,7 +767,7 @@ botnames = {
 }
 
 negative = {
-	// Turtle Man: Disabled...
+	// ZTM: Disabled...
 	"Nada.";
 	"no.";
 	"nope";
@@ -829,7 +829,7 @@ number = {
 }
 
 profession = {
-	// Turtle Man: Disabled...
+	// ZTM: Disabled...
 	"police officer";
 	"programmer";
 	"level designer";
@@ -838,17 +838,17 @@ profession = {
 }
 
 disease = {
-	// Turtle Man: Disabled... ...
+	// ZTM: Disabled... ...
 	"flue";
-	// Turtle Man: REMOVED DISABLED TEXT
+	// ZTM: REMOVED DISABLED TEXT
 }
 
 peeps = {
 	"Mr. Smith";
 	"John Doe";
-	// Turtle Man: Disabled...
+	// ZTM: Disabled...
 	"dmn_clown";
-	// Turtle Man: REMOVED DISABLED TEXT
+	// ZTM: REMOVED DISABLED TEXT
 }
 
 immaturity01 = {
@@ -943,7 +943,7 @@ ampm = {
 }
 
 food = {
-	// Turtle Man: Disabled...
+	// ZTM: Disabled...
 	"pizza";
 	"cheeseburger";
 	"tofu";
@@ -955,7 +955,7 @@ food = {
 }
 
 animal = {
-	"gnu"; // Turtle Man: Added because I can.
+	"gnu"; // ZTM: Added because I can.
 
 	"goat";
 	"simian";
@@ -980,13 +980,13 @@ animal = {
 }
 
 weather = {
-	// Turtle Man: Disabled...
+	// ZTM: Disabled...
 	"hot";
 	"windy";
 	"rainy";
 	"snowing";
 	"warm";
-	// Turtle Man: REMOVED DISABLED TEXT
+	// ZTM: REMOVED DISABLED TEXT
 }
 
 month = {
@@ -1005,28 +1005,28 @@ month = {
 }
 
 substance = {
-	// Turtle Man: Added
+	// ZTM: Added
 	"water";
 	"pizza";
 	"suashi";
-	// Turtle Man: Disabled...
+	// ZTM: Disabled...
 	"ink";
 	"chalk";
 	"salt";
 	"pepper";
-	// Turtle Man: REMOVED DISABLED TEXT
+	// ZTM: REMOVED DISABLED TEXT
 }
 
 curse = {
-	// Turtle Man: Added
+	// ZTM: Added
     //"curses!";
 	"Bonehead!";
-	// Turtle Man: REMOVED DISABLED TEXT
+	// ZTM: REMOVED DISABLED TEXT
 }
 
 vicious_insult = {
-	// Turtle Man: Disabled...
-	// Turtle Man: REMOVED DISABLED TEXT
+	// ZTM: Disabled...
+	// ZTM: REMOVED DISABLED TEXT
 	"moron";
 	"idiot";
 }

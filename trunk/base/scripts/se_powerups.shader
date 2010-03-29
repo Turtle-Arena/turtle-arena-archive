@@ -28,7 +28,7 @@
 //		blendfunc GL_ONE GL_ONE
 //	}
 //}
-// Turtle Man: Added rgbGen and alphaGen 
+// ZTM: Added rgbGen and alphaGen 
 powerups/invisibility
 {
 	{

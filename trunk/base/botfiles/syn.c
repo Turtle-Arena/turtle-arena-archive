@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "syn.h"
 
-// Turtle Man: Modified for TMNT Arena.
+// ZTM: Modified for TMNT Arena.
 
 CONTEXT_NEARBYITEM
 {
@@ -187,7 +187,7 @@ CONTEXT_REPLY
 
 CONTEXT_NAMES
 {
-	// Turtle Man: Rewrote
+	// ZTM: Rewrote
 	[("Leo", 1),		("Leonardo", 0.4), ("Fearless Leader", 0.3)]
 	[("Don", 1),		("Donny", 0.6), ("Donatello", 0.4)]
 	[("Raph", 1),		("Raphael", 0.4), ("Hot-Head", 0.2)]

@@ -1,7 +1,7 @@
 // Sprite shaders.
 // A sprite is a image in the 3D world that always faces the camera.
 
-// Turtle Man: Drawn over player's head when in console or chat mode.
+// ZTM: Drawn over player's head when in console or chat mode.
 sprites/talkBalloon
 {
 	entityMergable
@@ -37,7 +37,7 @@ smokePuff
 	}
 }
 
-// Turtle Man: Drawn at player's feet when player has speed powerups
+// ZTM: Drawn at player's feet when player has speed powerups
 hasteSmokePuff
 {
 	cull none
@@ -51,7 +51,7 @@ hasteSmokePuff
 	}
 }
 
-// Turtle Man: Empty transparent image.
+// ZTM: Empty transparent image.
 smokePuffRagePro
 {
 	cull none
@@ -62,12 +62,12 @@ smokePuffRagePro
 	}
 }
 
-// Turtle Man:
+// ZTM:
 // Used for breath, g_enableBreath 1 in console
 // or "enableBreath" "1" in worldspawn
 shotgunSmokePuff
 {
-	entityMergable // Turtle Man: Should be okay.
+	entityMergable // ZTM: Should be okay.
 	cull none
 	{
 		map gfx/misc/smokepuff2b.png
@@ -92,7 +92,7 @@ nailtrail
 
 flareShader
 {
-	//entityMergable // Turtle Man: Should be okay?
+	//entityMergable // ZTM: Should be okay?
 	cull none
 	{
 		map gfx/misc/flare.tga
@@ -103,7 +103,7 @@ flareShader
 
 sun
 {
-	//entityMergable // Turtle Man: Should be okay?
+	//entityMergable // ZTM: Should be okay?
 	cull none
 	{
 		map gfx/misc/sun.jpg
@@ -112,7 +112,7 @@ sun
 	}
 }
 
-// Turtle Man: Used in Team modes, it is above your teammate's head.
+// ZTM: Used in Team modes, it is above your teammate's head.
 sprites/team_red
 {
 	entityMergable
@@ -158,7 +158,7 @@ sprites/plasma1
 		tcMod rotate 931
 	}
 
-	// Turtle Man: Looks cool.
+	// ZTM: Looks cool.
 	{
 		clampmap sprites/plasmaa.png
 		blendfunc GL_ONE GL_ONE

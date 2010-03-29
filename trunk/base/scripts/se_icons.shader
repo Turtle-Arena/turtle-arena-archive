@@ -1,4 +1,4 @@
-// Turtle Man: Based on OpenArena -> iconsprites.shader
+// ZTM: Based on OpenArena -> iconsprites.shader
 // just simple icon shaders needed
 
 // HOLDABLE ICONS
@@ -108,7 +108,7 @@ icons/invul
 	}
 }
 
-// MEDAL ICONS -- Turtle Man: Move to se_sprites.shader ?
+// MEDAL ICONS -- ZTM: Move to se_sprites.shader ?
 medal_assist
 {
 	nopicmip

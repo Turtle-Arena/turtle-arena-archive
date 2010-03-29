@@ -131,7 +131,7 @@ DONE(untested)?: Melee combo system, with different animations for each attack? 
 [todo] Feet tags, for attack checking? And/or for attaching hoverboard to player?
 
 [todo] Use vertex lighting on misc_model entities? http://xreal.svn.sourceforge.net/viewvc/xreal?view=rev&revision=3049
-: Turtle Man: I could add a option so use vertex lighting, but normally use lightmapping?
+: ZTM: I could add a option so use vertex lighting, but normally use lightmapping?
 :   OR Just use misc_object as they use vertex lighting.
 :        Misc_model is a way to insert a *static* model, so lightmap like the level.
 

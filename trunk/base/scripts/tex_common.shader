@@ -6,7 +6,7 @@ textures/REGION
 	surfaceparm nolightmap
 }
 
-// Turtle Man: Added for terrain. (http://www.simonoc.com/pages/articles.htm)
+// ZTM: Added for terrain. (http://www.simonoc.com/pages/articles.htm)
 // ======================================================================
 // alpha fade shaders
 // (c) 2004 randy reddig

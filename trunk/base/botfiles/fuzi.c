@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// Turtle Man: Modified for TMNT Arena.
+// ZTM: Modified for TMNT Arena.
 
 #define AMMO				20
 #define HEALTH				20
@@ -113,7 +113,7 @@ weight "weapon_default"
 	return 0;
 }
 
-// Turtle Man: TODO: TMNTWEAPSYS should setup the weapon item weights.
+// ZTM: TODO: TMNTWEAPSYS should setup the weapon item weights.
 weight "weapon_katanas"
 {
 	switch(INVENTORY_KATANAS)
@@ -264,7 +264,7 @@ weight "holdable_teleporter"
 
 weight "holdable_medkit"
 {
-	switch(INVENTORY_MEDKIT) // Turtle Man: BUGFIX?: Was INVENTORY_TELEPORTER
+	switch(INVENTORY_MEDKIT) // ZTM: BUGFIX?: Was INVENTORY_TELEPORTER
 	{
 	case 1: return PS(MEDW);
 	default: return 0;
@@ -276,7 +276,7 @@ weight "holdable_medkit"
 #define KAMW				200
 weight "holdable_kamikaze"
 {
-	switch(INVENTORY_KAMIKAZE) // Turtle Man: BUGFIX?: Was INVENTORY_TELEPORTER
+	switch(INVENTORY_KAMIKAZE) // ZTM: BUGFIX?: Was INVENTORY_TELEPORTER
 	{
 	case 1: return PS(KAMW);
 	default: return 0;
@@ -286,7 +286,7 @@ weight "holdable_kamikaze"
 
 weight "holdable_portal"
 {
-	switch(INVENTORY_PORTAL) // Turtle Man: BUGFIX?: Was INVENTORY_TELEPORTER
+	switch(INVENTORY_PORTAL) // ZTM: BUGFIX?: Was INVENTORY_TELEPORTER
 	{
 	case 1: return PS(PORW);
 	default: return 0;
@@ -296,7 +296,7 @@ weight "holdable_portal"
 /* Removed from TMNT Arena
 weight "holdable_invulnerability"
 {
-	switch(INVENTORY_INVULNERABILITY) // Turtle Man: BUGFIX?: Was INVENTORY_TELEPORTER
+	switch(INVENTORY_INVULNERABILITY) // ZTM: BUGFIX?: Was INVENTORY_TELEPORTER
 	{
 	case 1: return PS(IBW);
 	default: return 0;
