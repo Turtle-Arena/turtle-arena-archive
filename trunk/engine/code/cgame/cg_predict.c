@@ -621,7 +621,7 @@ void CG_PredictPlayerState( void ) {
 		//CG_CheckChangedPredictableEvents(&cg.predictedPlayerState);
 	}
 
-#ifdef TMNTHOLDSYS/*2*/ // Turtle Man: Fix for auto changing in PMove!
+#ifdef TMNTHOLDSYS/*2*/ // ZTM: Fix for auto changing in PMove!
 	cg.holdableSelect = HI_NO_SELECT;
 #endif
 

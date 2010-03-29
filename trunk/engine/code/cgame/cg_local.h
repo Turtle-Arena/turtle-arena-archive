@@ -523,7 +523,7 @@ typedef struct projectileInfo_s {
 	sfxHandle_t		hitMetalSound;
 	sfxHandle_t		bounceSound[2]; // Bounce sounds, random select
 
-	// Turtle Man: TODO: missileTrailShader (and missile vars 1 and 2 ?)
+	// ZTM: TODO: missileTrailShader (and missile vars 1 and 2 ?)
 
 } projectileInfo_t;
 
@@ -1102,7 +1102,7 @@ typedef struct {
 
 	// special effects models
 	qhandle_t	teleportEffectModel;
-#if !defined MISSIONPACK && !defined TMNT // Turtle Man: MP removes loading and using...
+#if !defined MISSIONPACK && !defined TMNT // ZTM: MP removes loading and using...
 	qhandle_t	teleportEffectShader;
 #endif
 #ifdef MISSIONPACK

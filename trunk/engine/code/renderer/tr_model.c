@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // tr_models.c -- model loading and caching
 
 #if defined TMNT_GAME_MODELS && defined DEDICATED
-#define RENDERLESS_MODELS // Turtle Man: Ded server needs the tags for melee attacks
+#define RENDERLESS_MODELS // ZTM: Ded server needs the tags for melee attacks
 #endif
 
 #ifdef RENDERLESS_MODELS
@@ -65,7 +65,7 @@ typedef struct model_s {
 	int			index;				// model = tr.models[model->index]
 
 	int			dataSize;			// just for listing purposes
-	// Turtle Man: Not needed by ded server
+	// ZTM: Not needed by ded server
 	//bmodel_t	*bmodel;			// only if type == MOD_BRUSH
 	md3Header_t	*md3[MD3_MAX_LODS];	// only if type == MOD_MESH
 	void	*md4;				// only if type == (MOD_MD4 | MOD_MDR)
@@ -600,7 +600,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
         LL(surf->ofsEnd);
 		
 #ifndef RENDERLESS_MODELS
-#ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
+#ifdef IOQ3ZTM // ZTM: Show the name of the surface, it is helpful.
 		if ( surf->numVerts > SHADER_MAX_VERTEXES ) {
 			ri.Printf(PRINT_WARNING, "R_LoadMD3: %s has more than %i verts on %s (%i)",
 				mod_name, SHADER_MAX_VERTEXES, surf->name[0] == '\0' ? "a surface" : surf->name,
@@ -920,7 +920,7 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			
 #ifndef RENDERLESS_MODELS
 			// now do the checks that may fail.
-#ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
+#ifdef IOQ3ZTM // ZTM: Show the name of the surface, it is helpful.
 			if ( surf->numVerts > SHADER_MAX_VERTEXES )
 			{
 				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i verts on %s (%i)\n",
@@ -1175,7 +1175,7 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 			LL(surf->ofsEnd);
 			
 #ifndef RENDERLESS_MODELS
-#ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
+#ifdef IOQ3ZTM // ZTM: Show the name of the surface, it is helpful.
 			if ( surf->numVerts > SHADER_MAX_VERTEXES ) {
 				ri.Printf(PRINT_WARNING, "R_LoadMD4: %s has more than %i verts on %s (%i)",
 					mod_name, SHADER_MAX_VERTEXES, surf->name[0] == '\0' ? "a surface" : surf->name,

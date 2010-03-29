@@ -179,7 +179,7 @@ void SP_target_push (gentity_t *ent);
 #ifdef TMNTSP
 void SP_target_level_end (gentity_t *ent);
 #endif
-#ifdef CAMERASCRIPT // Turtle Man: i made this
+#ifdef CAMERASCRIPT // ZTM: i made this
 void SP_target_start_camera (gentity_t *ent);
 #endif
 
@@ -286,7 +286,7 @@ spawn_t	spawns[] = {
 #ifdef TMNTSP
 	{"target_level_end", SP_target_level_end},
 #endif
-#ifdef CAMERASCRIPT // Turtle Man: i made this
+#ifdef CAMERASCRIPT // ZTM: i made this
 	{"target_start_camera", SP_target_start_camera},
 #endif
 
@@ -362,7 +362,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	}
 
 #ifdef TMNTWEAPSYS
-	// Turtle Man: NOTE: Placed before items so if weapon is on both list
+	// ZTM: NOTE: Placed before items so if weapon is on both list
 	//                    uses external item.
 	// check weapon item spawn functions
 	for ( i = 1; i < BG_NumWeaponGroups(); i++ ) {

@@ -901,8 +901,8 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[3] = color[3];
 		UI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
 
-#ifdef TMNT // Turtle Man: This is like the UI Main menu text drawing, but its not.
-        // Turtle Man: hack-ish thing to do?...
+#ifdef TMNT // ZTM: This is like the UI Main menu text drawing, but its not.
+        // ZTM: hack-ish thing to do?...
         // text_color_highlight is UI local...
 		drawcolor[0] = 1.00f;//text_color_highlight[0];
 		drawcolor[1] = 0.43f;//text_color_highlight[1];

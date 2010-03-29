@@ -260,7 +260,7 @@ extern int demo_protocols[];
 #endif
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
-#if 0 // #ifdef TMNT // Turtle Man: TODO: Use a different master server?
+#if 0 // #ifdef TMNT // ZTM: TODO: Use a different master server?
 #define MASTER_SERVER_NAME	""
 #else
 #define MASTER_SERVER_NAME	"master.quake3arena.com"
@@ -768,7 +768,7 @@ MISC
 ==============================================================
 */
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 // centralizing the declarations for cl_cdkey
 // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=470
 extern char cl_cdkey[34];
@@ -997,7 +997,7 @@ void	CL_ForwardCommandToServer( const char *string );
 // things like godmode, noclip, etc, are commands directed to the server,
 // so when they are typed in at the console, they will need to be forwarded.
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 void CL_CDDialog( void );
 // bring up the "need a cd to play" dialog
 #endif
@@ -1039,7 +1039,7 @@ qboolean SV_GameCommand( void );
 // UI interface
 //
 qboolean UI_GameCommand( void );
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 qboolean UI_usesUniqueCDKey(void);
 #endif
 

@@ -302,7 +302,7 @@ static void CG_Obituary( entityState_t *ent ) {
 
 	if ( attacker != ENTITYNUM_WORLD ) {
 #ifdef TMNTWEAPSYS
-		// Turtle Man: TODO: Stop this &name[2] stuff, add a MOD name or use the whole name.
+		// ZTM: TODO: Stop this &name[2] stuff, add a MOD name or use the whole name.
 		//                      Both require changing weaponinfo.txt.
 		if (mod == MOD_PROJECTILE)
 		{
@@ -521,8 +521,8 @@ static void CG_UseItem( centity_t *cent ) {
 		break;
 #endif
 #endif
-#ifdef TMNTHOLDABLE // Turtle Man: Holdable
-	// Turtle Man: Play shuriken use sound
+#ifdef TMNTHOLDABLE // ZTM: Holdable
+	// ZTM: Play shuriken use sound
 	case HI_SHURIKEN:
 	case HI_FIRESHURIKEN:
 	case HI_ELECTRICSHURIKEN:
@@ -1574,7 +1574,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			cg.powerupActive = PW_INVUL;
 			cg.powerupTime = cg.time;
 		}
-		// Turtle Man: New sound?
+		// ZTM: New sound?
 		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.protectSound );
 		break;
 #endif

@@ -586,7 +586,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 		hcolor[1] = 0;
 		hcolor[2] = 1;
 	} else {
-#ifdef TMNTHUD // Turtle Man: TODO?: Use player's effects color?
+#ifdef TMNTHUD // ZTM: TODO?: Use player's effects color?
 		hcolor[0] = 0;
 		hcolor[1] = 1;
 		hcolor[2] = 0;
@@ -596,7 +596,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 	}
 	trap_R_SetColor( hcolor );
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	// Turtle Man: Hacky (Don't have TMNT status fit screen)
+	// ZTM: Hacky (Don't have TMNT status fit screen)
 	if (w == SCREEN_WIDTH)
 	{
 		CG_DrawPicFit( x, y, w, h, cgs.media.teamStatusBar );
@@ -1494,7 +1494,7 @@ static float CG_DrawScores( float y ) {
 			x -= w;
 			CG_DrawBigString( x + 4, y, s, 1.0F);
 		}
-#ifdef MISSIONPACK // Turtle Man: Support missionpack with old hud; oddly flagShader wasn't used
+#ifdef MISSIONPACK // ZTM: Support missionpack with old hud; oddly flagShader wasn't used
 		if ( cgs.gametype == GT_1FCTF ) {
 			// Display flag status
 			item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
@@ -1627,7 +1627,7 @@ static float CG_DrawPowerups( float y ) {
 		if ( !ps->powerups[ i ] ) {
 			continue;
 		}
-#ifdef MISSIONPACK // IOQ3ZTM // Turtle Man: Skip persistant powerups!
+#ifdef MISSIONPACK // IOQ3ZTM // ZTM: Skip persistant powerups!
 		if (i == PW_SCOUT
 			|| i == PW_GUARD
 			|| i == PW_DOUBLER
@@ -1907,7 +1907,7 @@ CG_DrawPersistantPowerup
 ===================
 */
 //#if 0 // sos001208 - DEAD
-#ifndef MISSIONPACK_HUD // IOQ3ZTM // Turtle Man: For playing MISSIONPACK without new HUD.
+#ifndef MISSIONPACK_HUD // IOQ3ZTM // ZTM: For playing MISSIONPACK without new HUD.
 static void CG_DrawPersistantPowerup( void ) { 
 	int		value;
 
@@ -2614,7 +2614,7 @@ static void CG_DrawVote(void) {
 	if ( sec < 0 ) {
 		sec = 0;
 	}
-#ifdef MISSIONPACK_HUD // Turtle Man: TODO: Add vote to Q3 ingame menu?
+#ifdef MISSIONPACK_HUD // ZTM: TODO: Add vote to Q3 ingame menu?
 	s = va("VOTE(%i):%s yes:%i no:%i", sec, cgs.voteString, cgs.voteYes, cgs.voteNo);
 	CG_DrawSmallString( 0, 58, s, 1.0F );
 	s = "or press ESC then click Vote";
@@ -3214,7 +3214,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 #ifndef TMNTHUD
 			CG_DrawHoldableItem();
 #endif
-#elif !defined MISSIONPACK_HUD // IOQ3ZTM // Turtle Man: For playing MISSIONPACK without new HUD.
+#elif !defined MISSIONPACK_HUD // IOQ3ZTM // ZTM: For playing MISSIONPACK without new HUD.
 			CG_DrawPersistantPowerup();
 #endif
 			CG_DrawReward();
@@ -3379,7 +3379,7 @@ void CG_ToggleLetterbox(qboolean onscreen, qboolean instant)
 	cg.letterbox = onscreen;
 	cg.letterboxTime = cg.time;
 
-	// Turtle Man: Play sounds like in LOZ:TP
+	// ZTM: Play sounds like in LOZ:TP
 	if (cg.letterbox)
 	{
 		// move on screen

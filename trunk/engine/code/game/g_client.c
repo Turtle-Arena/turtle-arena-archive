@@ -96,7 +96,7 @@ qboolean SpotWouldTelefrag( gentity_t *spot
 #ifdef TMNTPLAYERSYS
 	if (ent && ent->client)
 	{
-		// Turtle Man: Use per-player bounding box for telefrag checking!
+		// ZTM: Use per-player bounding box for telefrag checking!
 		VectorAdd( spot->s.origin, ent->client->pers.playercfg.bbmins, mins );
 		VectorAdd( spot->s.origin, ent->client->pers.playercfg.bbmaxs, maxs );
 	}
@@ -127,7 +127,7 @@ qboolean SpotWouldTelefrag( gentity_t *spot
 	return qfalse;
 }
 
-#ifndef IOQ3ZTM // Turtle Man: unused
+#ifndef IOQ3ZTM // ZTM: unused
 /*
 ================
 SelectNearestDeathmatchSpawnPoint
@@ -953,7 +953,7 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 			return;
 		}
 
-	// Turtle Man: NOTE: This message was used to tell when a client get playercfg loaded.
+	// ZTM: NOTE: This message was used to tell when a client get playercfg loaded.
 	//G_Printf("DEBUG: Changed player old=%s, new=%s\n", playercfg->model, model);
 
 	// Load animation.cfg
@@ -1609,7 +1609,7 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.holdableIndex = HI_NONE;
 #endif
 #endif
-#ifdef TMNTWEAPSYS // Turtle Man: Respawn code. Start with default weapon. Set ammo values.
+#ifdef TMNTWEAPSYS // ZTM: Respawn code. Start with default weapon. Set ammo values.
 	// Set default weapon
 #if defined TMNTPLAYERSYS
 	client->ps.stats[STAT_DEFAULTWEAPON] = client->pers.playercfg.default_weapon;
@@ -1647,7 +1647,7 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 
 	{
-		// Turtle Man: Start with default weapon.
+		// ZTM: Start with default weapon.
 		gitem_t *item = NULL;
 		weapon_t weapon;
 
@@ -1731,8 +1731,8 @@ void ClientSpawn(gentity_t *ent) {
 		trap_LinkEntity (ent);
 
 		// force the base weapon up
-#ifdef TMNTWEAPSYS // Turtle Man: Set ready weapon to default weapon.
-		// Turtle Man: Start with default weapon.
+#ifdef TMNTWEAPSYS // ZTM: Set ready weapon to default weapon.
+		// ZTM: Start with default weapon.
 		client->ps.weapon = client->ps.stats[STAT_DEFAULTWEAPON];
 		// Set default hands.
 		client->ps.weaponHands = BG_WeaponHandsForWeaponNum(client->ps.stats[STAT_DEFAULTWEAPON]);
@@ -1900,7 +1900,7 @@ void ClientDisconnect( int clientNum ) {
 }
 
 #ifdef TMNTSP // save/load
-// Turtle Man: TODO: Merge with g_session.c ? ( G_WriteClientSessionData )
+// ZTM: TODO: Merge with g_session.c ? ( G_WriteClientSessionData )
 /*
 ===========
 G_SavePersistant
@@ -1986,7 +1986,7 @@ void G_SavePersistant(char *nextmap)
 		// Check var bounds
 		if (strlen(savedata) > MAX_CVAR_VALUE_STRING)
 		{
-			// Turtle Man: This shouldn't happen.
+			// ZTM: This shouldn't happen.
 			trap_Cvar_Set("g_spSaveData", "");
 
 			if (g_singlePlayer.value)
@@ -2138,7 +2138,7 @@ void G_NiGHTSizePlayer( gentity_t *ent )
 {
 	int mare;
 
-	// Turtle Man: TODO: Find lowest mare with a undead nights_target
+	// ZTM: TODO: Find lowest mare with a undead nights_target
 	//     find mare_start_1 thought mare_start_9 and look for nights_target,
 	//		if found and alive use path.
 	mare = 1;

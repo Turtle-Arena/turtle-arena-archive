@@ -249,7 +249,7 @@ static void Main_MenuDraw( void ) {
 	trap_R_RenderScene( &refdef );
 #endif
 	
-#ifdef IOQ3ZTM // Turtle Man: FIXME: Why does error draw when there isn't a com_errorMessage?? note: ui.qvm only not ui*.so
+#ifdef IOQ3ZTM // ZTM: FIXME: Why does error draw when there isn't a com_errorMessage?? note: ui.qvm only not ui*.so
 	if (s_errorMessage.errorMessage[0] && strlen(s_errorMessage.errorMessage) == 1)
 	{
 		Com_Printf(S_COLOR_YELLOW "WARNING: Buggy com_errorMessage, com_errorMessage[0]='%s'\n", s_errorMessage.errorMessage);
@@ -336,7 +336,7 @@ void UI_MainMenu( void ) {
 
 	trap_Cvar_Set( "sv_killserver", "1" );
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	if( !uis.demoversion && !ui_cdkeychecked.integer ) {
 		char	key[17];
 

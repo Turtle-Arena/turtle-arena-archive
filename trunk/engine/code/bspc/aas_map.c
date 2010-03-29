@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../botlib/aasfile.h"		//aas_bbox_t
 #include "aas_store.h"				//AAS_MAX_BBOXES
 #include "aas_cfg.h"
-#include "../qcommon/surfaceflags.h" // Turtle Man(IOQ3): game to qcommon
+#include "../qcommon/surfaceflags.h" // ZTM(IOQ3): game to qcommon
 
 #define SPAWNFLAG_NOT_EASY			0x00000100
 #define SPAWNFLAG_NOT_MEDIUM		0x00000200

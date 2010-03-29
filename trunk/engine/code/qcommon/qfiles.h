@@ -416,7 +416,7 @@ typedef struct {
 
 #define	MAX_MAP_AREAS		0x100	// MAX_MAP_AREA_BYTES in q_shared must match!
 #define	MAX_MAP_FOGS		0x100
-#ifndef IOQ3ZTM // Turtle Man: Unused.
+#ifndef IOQ3ZTM // ZTM: Unused.
 #define	MAX_MAP_PLANES		0x20000
 #endif
 #define	MAX_MAP_NODES		0x20000

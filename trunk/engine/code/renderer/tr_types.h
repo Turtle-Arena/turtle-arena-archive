@@ -51,7 +51,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef IOQ3ZTM // RENDERFLAGS
 #define RF_FORCE_ENT_ALPHA	0x0400		// IOSTVEF: override shader alpha value and take the one from the entity.
 
-// Turtle Man: FIXME: I don't like RF_THIRD_PERSON or RF_FIRST_PERSON (so fix me?)...
+// ZTM: FIXME: I don't like RF_THIRD_PERSON or RF_FIRST_PERSON (so fix me?)...
 #define	RF_ONLY_MIRROR		0x0800		// only draw in mirrors
 #define	RF_NOT_MIRROR		0x1000		// do not draw in mirrors
 #endif

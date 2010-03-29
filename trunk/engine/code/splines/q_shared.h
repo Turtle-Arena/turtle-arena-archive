@@ -200,17 +200,17 @@ void Sys_PumpEvents( void );
 #define	CPUSTRING	"linux-i386"
 #elif defined __axp__
 #define	CPUSTRING	"linux-alpha"
-#elif defined __x86_64__ // Turtle Man: From ioquake3 r7
+#elif defined __x86_64__ // ZTM: From ioquake3 r7
 #define CPUSTRING       "linux-x86_64"
-#elif defined __powerpc64__ // Turtle Man: From ioquake3 r23
+#elif defined __powerpc64__ // ZTM: From ioquake3 r23
 #define CPUSTRING       "linux-ppc64"
-#elif defined __powerpc__ // Turtle Man: From ioquake3 r23
+#elif defined __powerpc__ // ZTM: From ioquake3 r23
 #define CPUSTRING       "linux-ppc"
-#elif defined __s390__ // Turtle Man: From ioquake3 r44
+#elif defined __s390__ // ZTM: From ioquake3 r44
 #define CPUSTRING       "linux-s390"
-#elif defined __s390x__ // Turtle Man: From ioquake3 r44
+#elif defined __s390x__ // ZTM: From ioquake3 r44
 #define CPUSTRING       "linux-s390x"
-#elif defined __ia64__ // Turtle Man: From ioquake3 r44
+#elif defined __ia64__ // ZTM: From ioquake3 r44
 #define CPUSTRING       "linux-ia64"
 #else
 #define	CPUSTRING	"linux-other"
@@ -228,7 +228,7 @@ void Sys_PumpEvents( void );
 
 #endif
 
-// Turtle Man: FreeBSD defines from ioquake3 r107
+// ZTM: FreeBSD defines from ioquake3 r107
 //======================= FreeBSD DEFINES =====================
 /* Adapted from game/q_shared.h */
 #ifdef __FreeBSD__ // rb010123

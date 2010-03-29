@@ -3027,7 +3027,7 @@ qboolean BG_ParseWeaponInfoFile( const char *filename ) {
 	char		*text_p;
 	int			len;
 	char		*token;
-	char		text[30000]; // Turtle Man: FIXME: was 20000, but the file became too long...
+	char		text[30000]; // ZTM: FIXME: was 20000, but the file became too long...
 	fileHandle_t	f;
 
 	// load the file
@@ -3079,7 +3079,7 @@ qboolean BG_ParseWeaponInfoFile( const char *filename ) {
 }
 
 #if 0
-// Turtle Man: Weapon info debuging tool
+// ZTM: Weapon info debuging tool
 void BG_DumpWeaponInfo(void)
 {
 	int i, j;
@@ -3317,7 +3317,7 @@ void BG_InitWeaponInfo(void)
 		BG_ParseWeaponInfoFile(filename);
 	}
 
-	// Turtle Man: TODO: Missing weapon info, try to avoid crash!
+	// ZTM: TODO: Missing weapon info, try to avoid crash!
 	if (!bg_projectileinfo[1].name[0])
 	{
 		strcpy(bg_projectileinfo[1].name, "p_gun");
@@ -3387,7 +3387,7 @@ int BG_MaxAttackCombo(playerState_t *ps)
 		}
 	}
 
-	// Turtle Man: if running "max_combo /= 2"; like in LoZ:TP
+	// ZTM: if running "max_combo /= 2"; like in LoZ:TP
 	{
 		vec_t xyspeed = sqrt( ps->velocity[0] * ps->velocity[0] +
 			ps->velocity[1] * ps->velocity[1] );
@@ -3404,7 +3404,7 @@ int BG_MaxAttackCombo(playerState_t *ps)
 	return max_combo;
 }
 
-#ifdef TMNTNPCSYS // Turtle Man: NPC info loading based on weapon info loading.
+#ifdef TMNTNPCSYS // ZTM: NPC info loading based on weapon info loading.
 bg_npcinfo_t bg_npcinfo[MAX_NPCS];
 static qboolean bg_npcsys_init = qfalse;
 static int bg_numNPCs = 0;
@@ -3476,7 +3476,7 @@ static qboolean NPC_Parse(char **p) {
 	npc.maxs[0] = npc.maxs[1] = 5.0f;
 	npc.maxs[2] = 10.0f;
 
-	npc.viewheight = 20; // Turtle Man: FIXME: Pulled number out of the air.
+	npc.viewheight = 20; // ZTM: FIXME: Pulled number out of the air.
 
 	animations = npc.animations;
 
@@ -3653,7 +3653,7 @@ static qboolean NPC_Parse(char **p) {
 		{
 			qboolean animName = qfalse;
 
-			// Turtle Man: New animation loading.
+			// ZTM: New animation loading.
 			for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
 			{
 				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
@@ -4139,7 +4139,7 @@ int BG_ItemNumForItem( gitem_t *item )
 
 		weaponNum = item->giTag;
 
-		// Turtle Man: Check weapon item address
+		// ZTM: Check weapon item address
 		if (weaponNum >= 0 && weaponNum < BG_NumWeaponGroups()
 			&& (gitem_t*)&bg_weapongroupinfo[weaponNum].item == item)
 		{
@@ -5416,7 +5416,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 		if (anim[i] == -1)
 			break;
 
-		// Turtle Man: FIXME: Can't use a animation for this one,
+		// ZTM: FIXME: Can't use a animation for this one,
 		//    if it hasn't loaded it. I could "flag" it and load it
 		//    after all the animtions have loaded...
 		if (!loadedAnim && index <= anim[i])
@@ -5495,7 +5495,7 @@ int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip)
 		return 0;
 	}
 
-	// Turtle Man: NOTE: After loading all frames we check if Elite Force style,
+	// ZTM: NOTE: After loading all frames we check if Elite Force style,
 	//                     and convert it to Quake3 style loopFrames if needed.
 		animations[i].loopFrames = atoi( token );
 
@@ -5597,7 +5597,7 @@ BOTH_DEAD3		94	1	0	20
 Both styles also support Elite Force (SP/MP) "loopFrames" (-1 = no loop, 0 = loop all frames.)
   NOTE: q3 style "loopFrames" (0 = no loop, # = loop num frames, normally equal to numframes.)
 
-Turtle Man: NOTE: I changed it to parse animation name instead of having a defined order
+ZTM: NOTE: I changed it to parse animation name instead of having a defined order
 			(and a comment with the name.) and then found out it was the same
 			in Elite Force Single Player, so I added support for elite force "loopFrames"
 ======================
@@ -5644,7 +5644,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		prev = text_p;	// so we can unget
 		token = COM_Parse( &text_p );
 
-		// Turtle Man: NOTE: Must check for (!*token) because (!token) is ALWAYS false.
+		// ZTM: NOTE: Must check for (!*token) because (!token) is ALWAYS false.
 		//       This is a bug in the Quake3 source.
 		//       It doesn't cause a problem in the animation.cfg parse
 		//          due to special checking/breaking for animations.
@@ -5668,10 +5668,10 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 				playercfg->footsteps = FOOTSTEP_MECH;
 			} else if ( !Q_stricmp( token, "energy" ) ) {
 				playercfg->footsteps = FOOTSTEP_ENERGY;
-			// Turtle Man: Hey why not, its valid. (Not in Q3)
+			// ZTM: Hey why not, its valid. (Not in Q3)
 			} else if ( !Q_stricmp( token, "splash" ) ) {
 				playercfg->footsteps = FOOTSTEP_SPLASH;
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF // Turtle Man: Elite Force
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF // ZTM: Elite Force
 			} else if ( !Q_stricmp( token, "borg" ) ) {
 				playercfg->footsteps = FOOTSTEP_MECH;
 			} else if ( !Q_stricmp( token, "reaver" ) ) {
@@ -5731,7 +5731,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		}
 
 		// TMNT_SUPPORTEF
-		// Turtle Man: Support Elite Force Stuff
+		// ZTM: Support Elite Force Stuff
 		//
 		else if ( !Q_stricmp( token, "soundpath" ) ) {
 			token = COM_Parse( &text_p );
@@ -5768,10 +5768,10 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			continue;
 		}
 
-		// Turtle Man: TODO: Jump Percent 1-100 ?
+		// ZTM: TODO: Jump Percent 1-100 ?
 		else if ( !Q_stricmp( token, "jumpheight" ) ) {
 		}
-		// Turtle Man: TODO?: Hud color in SP (and non-team gametypes? or use "color1" in non-team?)
+		// ZTM: TODO?: Hud color in SP (and non-team gametypes? or use "color1" in non-team?)
 		// color1 and color2 are used for the railgun blast color
 		else if ( !Q_stricmp( token, "prefcolor1" ) ) {
 			// Like color1
@@ -5828,7 +5828,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		//else if ( !Q_stricmp( token, "thrustfactor" ) ) {
 		//}
 
-#ifdef TMNTWEAPSYS // Turtle Man: DEFAULT_WEAPON
+#ifdef TMNTWEAPSYS // ZTM: DEFAULT_WEAPON
 		else if ( !Q_stricmp( token, "default_weapon" ) ) {
 			int j;
 			token = COM_Parse( &text_p );
@@ -5845,7 +5845,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		}
 #endif
 
-		// Turtle Man: New animation loading.
+		// ZTM: New animation loading.
 		for (i = 0; playerAnimationDefs[i].name != NULL; i++)
 		{
 			if ( !Q_stricmp( token, playerAnimationDefs[i].name ) ) {
@@ -6290,7 +6290,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 		{
 			qboolean animName = qfalse;
 
-		// Turtle Man: New animation loading.
+		// ZTM: New animation loading.
 			for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
 		{
 				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
@@ -6331,7 +6331,7 @@ const char *bg_playerDirs[MAX_PLAYER_DIRS] =
 	"models/players2",
 #endif
 #ifndef TMNT
-	// Turtle Man: Do any players use this? There isn't any reason to,
+	// ZTM: Do any players use this? There isn't any reason to,
 	//             unless you want to have players that aren't in the player select menu.
 	"models/players/characters",
 #endif

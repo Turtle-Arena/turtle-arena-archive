@@ -1004,7 +1004,7 @@ BotChatTime
 ==================
 */
 float BotChatTime(bot_state_t *bs) {
-#ifdef IOQ3ZTM // Turtle Man: cleanup
+#ifdef IOQ3ZTM // ZTM: cleanup
 	return 2.0;
 #else
 	int cpm;

@@ -285,7 +285,7 @@ Handles user intended acceleration
 ==============
 */
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
-#ifndef TMNTMISC // Turtle Man: TEST
+#ifndef TMNTMISC // ZTM: TEST
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;
@@ -1072,7 +1072,7 @@ static void PM_CrashLand( void ) {
 	float		a, b, c, den;
 
 #ifdef IOQ3ZTM
-	// Turtle Man: Don't land when swimming
+	// ZTM: Don't land when swimming
 	if ( pm->waterlevel == 3
 #ifdef TMNTNPCSYS // NPCs can't swim?
 		&& !pm->npc
@@ -1573,7 +1573,7 @@ static void PM_CheckDuck (void)
 
 	if (pm->cmd.upmove < 0)
 	{	// duck
-#ifdef IOQ3ZTM // Turtle Man: Only set ducked if on the ground
+#ifdef IOQ3ZTM // ZTM: Only set ducked if on the ground
 		if (pml.groundPlane)
 #endif
 		pm->ps->pm_flags |= PMF_DUCKED;
@@ -1685,11 +1685,11 @@ static void PM_Footsteps( void ) {
 			} else {
 				PM_ContinueLegsAnim( LEGS_IDLE );
 			}
-#ifdef IOQ3ZTM // Turtle Man: TEST
+#ifdef IOQ3ZTM // ZTM: TEST
 			return;
 #endif
 		}
-#ifndef IOQ3ZTM // Turtle Man: TEST
+#ifndef IOQ3ZTM // ZTM: TEST
 		return;
 #endif
 	}
@@ -2048,7 +2048,7 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 		}
 		else
 		{
-				// Turtle Man: Shouldn't happen, if I made it right...
+				// ZTM: Shouldn't happen, if I made it right...
 			Com_Printf("PM_BeginDefaultWeaponChange: Bad hands; last_hands=%i, hands=%i\n", last_hands, hands);
 		}
 
@@ -2061,7 +2061,7 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 		}
 	else
 	{
-			// Turtle Man: FIXME: Draw the "pickup weapon" secondary weapon somewhere on the player!
+			// ZTM: FIXME: Draw the "pickup weapon" secondary weapon somewhere on the player!
 
 			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
 			// Don't override gesture when capturing the flag.
@@ -2149,7 +2149,7 @@ PM_TorsoAnimation
 */
 static void PM_TorsoAnimation( void ) {
 	if ( pm->ps->weaponstate == WEAPON_READY ) {
-#ifdef TMNTWEAPSYS // Turtle Man: Weapon type code.
+#ifdef TMNTWEAPSYS // ZTM: Weapon type code.
 		PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
 #else
 		if ( pm->ps->weapon == WP_GAUNTLET ) {
@@ -2224,7 +2224,7 @@ static void PM_Weapon( void ) {
 
 	// check for dead player
 	if ( pm->ps->stats[STAT_HEALTH] <= 0 ) {
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Shouldn't be done if player died in NODROP...
+#ifdef TMNTWEAPSYS // ZTM: FIXME: Shouldn't be done if player died in NODROP...
 		qboolean nodrop = qfalse;
 
 		// Player should let go of the dropped weapon.
@@ -2324,7 +2324,7 @@ static void PM_Weapon( void ) {
 	if ( pm->ps->weaponTime <= 0 && pm->ps->weaponstate != WEAPON_FIRING
 		&& ((pm->cmd.buttons & BUTTON_DROP_WEAPON)
 		|| (pm->ps->stats[STAT_AMMO] == 0
-#ifdef MISSIONPACK // TMNT only // Turtle Man: Don't auto drop if have ammo regen!
+#ifdef MISSIONPACK // TMNT only // ZTM: Don't auto drop if have ammo regen!
 #ifdef TMNTWEAPSYS
 		&& BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag != PW_AMMOREGEN
 #else
@@ -2423,7 +2423,7 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
-#ifdef TMNTWEAPSYS // Turtle Man: Weapon type code.
+#ifdef TMNTWEAPSYS // ZTM: Weapon type code.
 	if ( BG_WeaponHasMelee(pm->ps->weapon) )
 	{
 		// check for fire (Melee weapons can do damage while not holding attack)

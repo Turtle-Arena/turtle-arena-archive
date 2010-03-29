@@ -76,7 +76,7 @@ void UI_StartDemoLoop( void ) {
 }
 
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 #ifndef MISSIONPACK
 static void NeedCDAction( qboolean result ) {
 	if ( !result ) {
@@ -386,7 +386,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 	}
 
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	if ( Q_stricmp (cmd, "ui_cdkey") == 0 ) {
 		//UI_CDKeyMenu_f();
 		return qtrue;

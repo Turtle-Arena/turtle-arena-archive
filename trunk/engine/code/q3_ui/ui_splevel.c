@@ -252,7 +252,7 @@ static void UI_SPLevelMenu_SetMenuArena( int n, int level, const char *arenaInfo
 	Q_strncpyz( map, Info_ValueForKey( arenaInfo, "map" ), sizeof(map) );
 
 	Q_strncpyz( levelMenuInfo.levelNames[n], map, sizeof(levelMenuInfo.levelNames[n]) );
-#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK // Turtle Man: Disabled to be constant.
+#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK // ZTM: Disabled to be constant.
 	Q_strupr( levelMenuInfo.levelNames[n] );
 #endif
 
@@ -390,7 +390,7 @@ static void UI_SPLevelMenu_ResetAction( qboolean result ) {
 
 	// clear game variables
 	UI_NewGame();
-#ifdef TMNTSP // Turtle Man: -4 starts on training (trainingTier) level (i dont have one)
+#ifdef TMNTSP // ZTM: -4 starts on training (trainingTier) level (i dont have one)
 	trap_Cvar_SetValue( "ui_spSelection", 0 );
 #else
 	trap_Cvar_SetValue( "ui_spSelection", -4 );

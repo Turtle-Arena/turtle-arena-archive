@@ -929,7 +929,7 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 	}
 #endif
 
-#if !defined IOQ3ZTM || (CTF_FLAG_BONUS != 0) // Turtle Man: Does a "0" spawn in Q3?
+#if !defined IOQ3ZTM || (CTF_FLAG_BONUS != 0) // ZTM: Does a "0" spawn in Q3?
 	AddScore(other, ent->r.currentOrigin, CTF_FLAG_BONUS);
 #endif
 	cl->pers.teamState.flagsince = level.time;

@@ -1616,7 +1616,7 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 #endif
 
 	// if any skins failed to load, fall back to default
-#ifdef TMNT // Turtle Man: FIXME: Use same skin loading in ui as in cgame.
+#ifdef TMNT // ZTM: FIXME: Use same skin loading in ui as in cgame.
 #endif
 	if ( !UI_RegisterClientSkin( pi, modelName, skinName, headModelName, headSkinName, teamName) ) {
 		if ( !UI_RegisterClientSkin( pi, modelName, "default", headModelName, "default", teamName ) ) {

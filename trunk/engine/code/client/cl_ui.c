@@ -301,7 +301,7 @@ static void LAN_GetServerInfo( int source, int n, char *buf, int buflen ) {
 		Info_SetValueForKey( info, "gametype", va("%i",server->gameType));
 		Info_SetValueForKey( info, "nettype", va("%i",server->netType));
 		Info_SetValueForKey( info, "addr", NET_AdrToStringwPort(server->adr));
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 		Info_SetValueForKey( info, "punkbuster", va("%i", server->punkbuster));
 #endif
 		Q_strncpyz(buf, info, buflen);
@@ -631,7 +631,7 @@ static void Key_GetBindingBuf( int keynum, char *buf, int buflen ) {
 CLUI_GetCDKey
 ====================
 */
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 static void CLUI_GetCDKey( char *buf, int buflen ) {
 #ifndef STANDALONE
 	cvar_t	*fs;
@@ -670,7 +670,7 @@ static void CLUI_SetCDKey( char *buf ) {
 	}
 }
 #endif
-#endif // Turtle Man: CDKEY
+#endif // ZTM: CDKEY
 
 /*
 ====================
@@ -979,7 +979,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 	case UI_MEMORY_REMAINING:
 		return Hunk_MemoryRemaining();
 
-#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: CDKEY
 	case UI_GET_CDKEY:
 		CLUI_GetCDKey( VMA(1), args[2] );
 		return 0;
@@ -991,7 +991,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 #endif
 	
-#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: punkbuster
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: punkbuster
 	case UI_SET_PBCLSTATUS:
 		return 0;	
 #endif
@@ -1078,7 +1078,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		re.RemapShader( VMA(1), VMA(2), VMA(3) );
 		return 0;
 
-#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: CDKEY
 	case UI_VERIFY_CDKEY:
 		return CL_CDKeyValidate(VMA(1), VMA(2));
 #endif
@@ -1152,7 +1152,7 @@ void CL_InitUI( void ) {
 		Cvar_SetCheatState();
 }
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 #ifndef STANDALONE
 qboolean UI_usesUniqueCDKey( void ) {
 	if (uivm) {
@@ -1162,7 +1162,7 @@ qboolean UI_usesUniqueCDKey( void ) {
 	}
 }
 #endif
-#endif // IOQUAKE3 // Turtle Man: CDKEY
+#endif // IOQUAKE3 // ZTM: CDKEY
 
 /*
 ====================

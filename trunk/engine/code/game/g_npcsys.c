@@ -237,7 +237,7 @@ void G_NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 		G_NPC_StartAction(self, attacker, NACT_ATTACK);
 	}
 
-	// Turtle Man: TODO: Limit how soon to call paintarget again? Use pain_debounce?
+	// ZTM: TODO: Limit how soon to call paintarget again? Use pain_debounce?
 	if ( self->paintarget )
 	{
 		G_UseTargets2(self, attacker, self->paintarget);
@@ -412,7 +412,7 @@ void G_RunNPC( gentity_t *ent )
 	Com_Memset(&ucmd, 0, sizeof (ucmd));
 	ucmd.serverTime = level.time;
 
-	// Turtle Man: TODO: Think here (setup ucmd).
+	// ZTM: TODO: Think here (setup ucmd).
 	switch (ent->bgNPC.action)
 	{
 		case NACT_IDLE:
@@ -440,7 +440,7 @@ void G_RunNPC( gentity_t *ent )
 	}
 
 	ent->bgNPC.npc_ps.gravity = g_gravity.value;
-	//ent->bgNPC.npc_ps.clientNum = ent->s.number; // Turtle Man: Why?
+	//ent->bgNPC.npc_ps.clientNum = ent->s.number; // ZTM: Why?
 
 	ent->bgNPC.npc_ps.speed = g_speed.value;
 

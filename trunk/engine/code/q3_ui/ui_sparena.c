@@ -58,7 +58,7 @@ void UI_SPArena_Start( const char *arenaInfo ) {
 //
 #define ART_BACK0			"menu/art/back_0"
 #define ART_BACK1			"menu/art/back_1"
-// Turtle Man: Demos use play_0/play_1 i use load_0/load_1
+// ZTM: Demos use play_0/play_1 i use load_0/load_1
 #define ART_GO0				"menu/art/load_0"
 #define ART_GO1				"menu/art/load_1"
 #define ART_FRAMEL			"menu/art/frame2_l"

@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2009 Turtle Man
+Copyright (C) 2009 ZTM
 
 This file is part of Turtle Arena source code.
 
@@ -76,7 +76,7 @@ qboolean G_SaveGame(fileHandle_t f)
 	// Setup header
     memset(&saveData, 0, sizeof (save_t));
 	saveData.version = SAVE_VERSION;
-	// Turtle Man: FIXME: Use next_map? So we can save before loading map?
+	// ZTM: FIXME: Use next_map? So we can save before loading map?
 	trap_Cvar_VariableStringBuffer( "mapname", saveData.mapname, MAX_QPATH );
 	saveData.skill = trap_Cvar_VariableIntegerValue("g_spSkill");
 	saveData.maxclients = level.maxclients;

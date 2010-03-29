@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // 
 // string allocation/managment
-// Turtle Man: NOTE: Shared by ui and cgame
+// ZTM: NOTE: Shared by ui and cgame
 
 #include "ui_shared.h"
 

@@ -559,7 +559,7 @@ static void SV_ClipMoveToEntities( moveclip_t *clip ) {
 		angles = touch->r.currentAngles;
 
 
-#ifndef IOQ3ZTM // Turtle Man: TEST
+#ifndef IOQ3ZTM // ZTM: TEST
 		if ( !touch->r.bmodel ) {
 			angles = vec3_origin;	// boxes don't rotate
 		}

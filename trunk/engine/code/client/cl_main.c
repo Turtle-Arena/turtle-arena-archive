@@ -139,7 +139,7 @@ void CL_ShowIP_f(void);
 void CL_ServerStatus_f(void);
 void CL_ServerStatusResponse( netadr_t from, msg_t *msg );
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 /*
 ===============
 CL_CDDialog
@@ -1340,7 +1340,7 @@ void CL_RequestMotd( void ) {
 	}
 
 #ifdef IOQ3ZTM
-	// Turtle Man: Check if there is there a valid motd server
+	// ZTM: Check if there is there a valid motd server
 	//             Because in Turtle Arena there isn't.
 	if (strlen(UPDATE_SERVER_NAME) < 1)
 	{
@@ -1410,7 +1410,7 @@ in anyway.
 */
 #ifndef STANDALONE
 void CL_RequestAuthorization( void ) {
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	char	nums[64];
 	int		i, j, l;
 	cvar_t	*fs;
@@ -2660,7 +2660,7 @@ void CL_Frame ( int msec ) {
 	}
 #endif
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	if ( cls.cddialog ) {
 		// bring up the cd error dialog if needed
 		cls.cddialog = qfalse;
@@ -3417,7 +3417,7 @@ static void CL_SetServerInfo(serverInfo_t *server, const char *info, int ping) {
 			server->netType = atoi(Info_ValueForKey(info, "nettype"));
 			server->minPing = atoi(Info_ValueForKey(info, "minping"));
 			server->maxPing = atoi(Info_ValueForKey(info, "maxping"));
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 			server->punkbuster = atoi(Info_ValueForKey(info, "punkbuster"));
 #endif
 		}
@@ -3537,7 +3537,7 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.localServers[i].game[0] = '\0';
 	cls.localServers[i].gameType = 0;
 	cls.localServers[i].netType = from.type;
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	cls.localServers[i].punkbuster = 0;
 #endif
 									 

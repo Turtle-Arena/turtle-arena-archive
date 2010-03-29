@@ -78,7 +78,7 @@ qboolean	forcesidesvisible;	//force all brush sides to be visible when loaded fr
 qboolean	capsule_collision = 0;
 
 
-#if 1 // Turtle Man(IOQ3): Moved here
+#if 1 // ZTM(IOQ3): Moved here
 //===========================================================================
 //
 // Parameter:			-

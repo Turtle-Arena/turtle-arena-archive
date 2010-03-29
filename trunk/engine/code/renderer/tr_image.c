@@ -962,7 +962,7 @@ static byte getImageA(byte *targa_rgba, int x, int y, int columns, int rows)
 	return *pixbuf;
 }
 
-#if 0 // Turtle Man: This is unused so disable it.
+#if 0 // ZTM: This is unused so disable it.
 static void setImageA(byte *targa_rgba, int x, int y, int columns, int rows, byte value)
 {
 	byte	*pixbuf;
@@ -1275,7 +1275,7 @@ static void kuwahara(int columns, int rows, byte *targa_rgba){
 }
 
 
-#if 0 // Turtle Man: This is unused so disable it.
+#if 0 // ZTM: This is unused so disable it.
 #define FLT_MAX		3.40282346638528860000e+38
 static void kuwahara3(int columns, int rows, byte *targa_rgba)
 {

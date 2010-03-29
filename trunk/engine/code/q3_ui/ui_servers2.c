@@ -66,7 +66,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define ART_UNKNOWNMAP			"menu/art/unknownmap"
 #define ART_REMOVE0				"menu/art/delete_0"
 #define ART_REMOVE1				"menu/art/delete_1"
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 #define ART_PUNKBUSTER		"menu/art/pblogo"
 #endif
 
@@ -86,7 +86,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #endif
 #define ID_CONNECT			22
 #define ID_REMOVE			23
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 #define ID_PUNKBUSTER 24
 #endif
 
@@ -224,13 +224,13 @@ static char* netnames[] = {
 	NULL
 };
 
-#ifdef TMNT // Turtle Man: Website
+#ifdef TMNT // ZTM: Website
 static char quake3worldMessage[] = "Visit turtlearena.googlecode.com for News and Updates";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
 #endif
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 const char* punkbuster_items[] = {
 	"Disabled",
 	"Enabled",
@@ -263,7 +263,7 @@ typedef struct servernode_s {
 	int		nettype;
 	int		minPing;
 	int		maxPing;
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	qboolean bPB;
 #endif
 
@@ -316,7 +316,7 @@ typedef struct {
 	char				favoriteaddresses[MAX_FAVORITESERVERS][MAX_ADDRESSLENGTH];
 	int					numfavoriteaddresses;
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	menulist_s		punkbuster;
 	menubitmap_s	pblogo;
 #endif
@@ -492,7 +492,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.list.generic.flags		&= ~QMF_GRAYED;
 			g_arenaservers.refresh.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.go.generic.flags			&= ~QMF_GRAYED;
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 			g_arenaservers.punkbuster.generic.flags &= ~QMF_GRAYED;
 #endif
 
@@ -521,7 +521,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.list.generic.flags		|= QMF_GRAYED;
 			g_arenaservers.refresh.generic.flags	|= QMF_GRAYED;
 			g_arenaservers.go.generic.flags			|= QMF_GRAYED;
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 			g_arenaservers.punkbuster.generic.flags |= QMF_GRAYED;
 #endif
 		}
@@ -550,7 +550,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.list.generic.flags		|= QMF_GRAYED;
 			g_arenaservers.refresh.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.go.generic.flags			|= QMF_GRAYED;
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 			g_arenaservers.punkbuster.generic.flags &= ~QMF_GRAYED;
 #endif
 		}
@@ -664,7 +664,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			pingColor = S_COLOR_RED;
 		}
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 #ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s%s%3d " S_COLOR_YELLOW "%s",
 #else
@@ -673,7 +673,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			servernodeptr->hostname, servernodeptr->mapname, servernodeptr->numclients,
  			servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime, servernodeptr->bPB ? "Yes" : "No" );
-#else // Turtle Man: No punkbuster
+#else // ZTM: No punkbuster
 #ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s%s%3d " S_COLOR_YELLOW "",
 #else
@@ -802,7 +802,7 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	servernodeptr->pingtime   = pingtime;
 	servernodeptr->minPing    = atoi( Info_ValueForKey( info, "minPing") );
 	servernodeptr->maxPing    = atoi( Info_ValueForKey( info, "maxPing") );
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	servernodeptr->bPB = atoi( Info_ValueForKey( info, "punkbuster") );
 #endif
 
@@ -1351,7 +1351,7 @@ int ArenaServers_SetType( int type )
 	return type;
 }
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 /*
 =================
 PunkBuster_Confirm
@@ -1468,7 +1468,7 @@ static void ArenaServers_Event( void* ptr, int event ) {
 		ArenaServers_UpdateMenu();
 		break;
 	
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	case ID_PUNKBUSTER:
 		if (g_arenaservers.punkbuster.curvalue)			
 		{
@@ -1750,7 +1750,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.go.height				= 64;
 	g_arenaservers.go.focuspic				= ART_CONNECT1;
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	g_arenaservers.punkbuster.generic.type			= MTYPE_SPINCONTROL;
 	g_arenaservers.punkbuster.generic.name			= "Punkbuster:";
 	g_arenaservers.punkbuster.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -1795,7 +1795,7 @@ static void ArenaServers_MenuInit( void ) {
 #endif
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.go );
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.punkbuster );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.pblogo );
 #endif
@@ -1821,7 +1821,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_emptyservers = Com_Clamp( 0, 1, ui_browserShowEmpty.integer );
 	g_arenaservers.showempty.curvalue = g_emptyservers;
 	
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	g_arenaservers.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "cl_punkbuster" ) );
 #endif
 
@@ -1854,7 +1854,7 @@ void ArenaServers_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_ARROWS_UP );
 	trap_R_RegisterShaderNoMip( ART_ARROWS_DOWN );
 	trap_R_RegisterShaderNoMip( ART_UNKNOWNMAP );
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	trap_R_RegisterShaderNoMip( ART_PUNKBUSTER );
 #endif
 }

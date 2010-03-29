@@ -363,7 +363,7 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 			return;		// off blink
 		}
 
-#ifdef IOQ3ZTM // USE_FREETYPE Turtle Man: i made this
+#ifdef IOQ3ZTM // USE_FREETYPE ZTM: i made this
 		if (!cls.useLegacyConsoleFont)
 		{
 			if ( key_overstrikeMode ) {
@@ -383,7 +383,7 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 		i = drawLen - strlen( str );
 
 		if ( size == SMALLCHAR_WIDTH ) {
-#ifdef IOQ3ZTM // USE_FREETYPE Turtle Man: i made this
+#ifdef IOQ3ZTM // USE_FREETYPE ZTM: i made this
 			float strWidth = 0;
 			int id;
 			for (id = 0; id < (edit->cursor - prestep - i); i++)

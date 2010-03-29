@@ -584,7 +584,7 @@ static void Controls_UpdateModel( int anim ) {
 	case ANIM_WEAPON8:
 	case ANIM_WEAPON9:
 	case ANIM_WEAPON10:
-	// Turtle Man: TODO?: Support upto 16 weapons in menu?
+	// ZTM: TODO?: Support upto 16 weapons in menu?
 		s_controls.playerWeapon = anim - ANIM_WEAPON1 + 1;
 		break;
 #else
@@ -820,7 +820,7 @@ static void Controls_DrawKeyBinding( void *self )
 		}
 		else
 		{
-#ifdef IOQ3ZTM // Turtle Man: Use correct text_color_normal, in Q3 is was the same color.
+#ifdef IOQ3ZTM // ZTM: Use correct text_color_normal, in Q3 is was the same color.
 			UI_DrawString( x - SMALLCHAR_WIDTH, y, g_bindings[a->generic.id].label, UI_RIGHT|UI_SMALLFONT, text_color_normal );
 			UI_DrawString( x + SMALLCHAR_WIDTH, y, name, UI_LEFT|UI_SMALLFONT, text_color_normal );
 #else

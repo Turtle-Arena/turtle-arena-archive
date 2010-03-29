@@ -259,7 +259,7 @@ void G_AddRandomBot( int team )
 	num = 0;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
-#ifdef RANDOMBOT // Turtle Man: Random bot
+#ifdef RANDOMBOT // ZTM: Random bot
 		// Skip random bot.
 		if ( !Q_stricmp( value, "Random" ) ) {
 			continue;
@@ -288,7 +288,7 @@ void G_AddRandomBot( int team )
 	num = random() * num;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
-#ifdef RANDOMBOT // Turtle Man: Random bot
+#ifdef RANDOMBOT // ZTM: Random bot
 		// Skip random bot.
 		if ( !Q_stricmp( value, "Random" ) ) {
 			continue;
@@ -637,8 +637,8 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	char			*headmodel;
 	char			userinfo[MAX_INFO_STRING];
 
-#ifdef RANDOMBOT // Turtle Man: Random bot
-    // Turtle Man: Check for random bot.
+#ifdef RANDOMBOT // ZTM: Random bot
+    // ZTM: Check for random bot.
     if (Q_stricmp(name, "Random") == 0)
     {
     	int t;

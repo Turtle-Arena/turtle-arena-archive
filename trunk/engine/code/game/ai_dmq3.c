@@ -1582,7 +1582,7 @@ int BotSynonymContext(bot_state_t *bs) {
 }
 
 #ifdef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
-// Turtle Man: TODO: Use attackDelay?
+// ZTM: TODO: Use attackDelay?
 // Weight is total damage of the weapon (plus 100).
 int BotWeaponWeight(weapon_t w)
 {
@@ -1872,7 +1872,7 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_WEAPON] = bs->cur_ps.weapon;
 	bs->inventory[INVENTORY_AMMO] = bs->cur_ps.stats[STAT_AMMO];
 #endif
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Is there a better way?
+#ifdef TMNTWEAPSYS // ZTM: FIXME: Is there a better way?
 #if 0 //  (It would be better if we did the weight stuff in game)
 	int i;
 
@@ -2526,7 +2526,7 @@ TeamPlayIsOn
 ==================
 */
 int TeamPlayIsOn(void) {
-#ifdef TMNTSP // Turtle Man: Co-op is "teamplay"
+#ifdef TMNTSP // ZTM: Co-op is "teamplay"
 	return ( gametype >= GT_TEAM || gametype == GT_SINGLE_PLAYER );
 #else
 	return ( gametype >= GT_TEAM );
@@ -3970,8 +3970,8 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	//get the weapon information
 	trap_BotGetWeaponInfo(bs->ws, bs->weaponnum, &wi);
 #endif
-#ifndef TMNTWEAPONS // Turtle Man: Removed per-gun accuracy/skill.
-#ifndef TMNTWEAPSYS // Turtle Man: WONTFIX: Fix support for per-weapon aim_accuracy/aim_skill?
+#ifndef TMNTWEAPONS // ZTM: Removed per-gun accuracy/skill.
+#ifndef TMNTWEAPSYS // ZTM: WONTFIX: Fix support for per-weapon aim_accuracy/aim_skill?
 	//get the weapon specific aim accuracy and or aim skill
 	if (wi.number == WP_MACHINEGUN) {
 		aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_MACHINEGUN, 0, 1);
@@ -4234,11 +4234,11 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	//set the ideal view angles
 	vectoangles(dir, bs->ideal_viewangles);
 	//take the weapon spread into account for lower skilled bots
-#ifndef TMNTWEAPSYS // Turtle Man: FIXME?: vspread. It was always 0, why fix?
+#ifndef TMNTWEAPSYS // ZTM: FIXME?: vspread. It was always 0, why fix?
 	bs->ideal_viewangles[PITCH] += 6 * wi.vspread * crandom() * (1 - aim_accuracy);
 #endif
 	bs->ideal_viewangles[PITCH] = AngleMod(bs->ideal_viewangles[PITCH]);
-#ifndef TMNTWEAPSYS // Turtle Man: FIXME?: hspread. It was always 0, why fix?
+#ifndef TMNTWEAPSYS // ZTM: FIXME?: hspread. It was always 0, why fix?
 	bs->ideal_viewangles[YAW] += 6 * wi.hspread * crandom() * (1 - aim_accuracy);
 #endif
 	bs->ideal_viewangles[YAW] = AngleMod(bs->ideal_viewangles[YAW]);
@@ -4378,7 +4378,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	{
 		bgProj = bg_weapongroupinfo[bs->weaponnum].weapon[0]->proj;
 	}
-	// Turtle Man: NOTE: bgProj is NULL if holding a melee weapon and not throwing a shuriken.
+	// ZTM: NOTE: bgProj is NULL if holding a melee weapon and not throwing a shuriken.
 #else
 	//get the weapon info
 	trap_BotGetWeaponInfo(bs->ws, bs->weaponnum, &wi);

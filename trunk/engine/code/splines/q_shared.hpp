@@ -216,7 +216,7 @@ void Sys_PumpEvents( void );
 
 #endif
 
-// Turtle Man: FreeBSD defines from ioquake3 r107
+// ZTM: FreeBSD defines from ioquake3 r107
 //======================= FreeBSD DEFINES =================================
 
 // the mac compiler can't handle >32k of locals, so we

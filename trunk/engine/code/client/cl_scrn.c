@@ -164,7 +164,7 @@ void SCR_DrawConsoleFontChar( float x, float y, int ch )
 
     if(ch==' ') return;
 
-	// Turtle Man
+	// ZTM
 	y += SCR_ConsoleFontCharHeight();
 
     fontInfo_t *font = &cls.consoleFont;

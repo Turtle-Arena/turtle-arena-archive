@@ -1721,7 +1721,7 @@ static qboolean ParseShader( char **text )
 			ParseSort( text );
 			continue;
 		}
-#ifdef CELSHADING // Turtle Man: Allow per-shader celoutline.
+#ifdef CELSHADING // ZTM: Allow per-shader celoutline.
 		// celoutline
 		else if ( !Q_stricmp( token, "celoutline" ) )
 		{

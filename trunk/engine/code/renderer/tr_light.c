@@ -319,7 +319,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	}
 
 	// bonus items and view weapons have a fixed minimum add
-#ifdef TMNT // Turtle Man: TEST: Have players be darker, hide in shadows better.
+#ifdef TMNT // ZTM: TEST: Have players be darker, hide in shadows better.
 	if ( ent->e.renderfx & RF_MINLIGHT )
 #else
 	if ( 1 /* ent->e.renderfx & RF_MINLIGHT */ )

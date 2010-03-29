@@ -179,7 +179,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_debugAlloc, "g_debugAlloc", "0", 0, 0, qfalse },
 	{ &g_motd, "g_motd", "", 0, 0, qfalse },
 #ifndef NOBLOOD
-#ifdef NOTRATEDM // Turtle Man: Default to no blood.
+#ifdef NOTRATEDM // ZTM: Default to no blood.
 	{ &g_blood, "com_blood", "0", 0, 0, qfalse },
 #else
 	{ &g_blood, "com_blood", "1", 0, 0, qfalse },
@@ -386,7 +386,7 @@ void G_FindTeams( void ) {
 }
 
 void G_RemapTeamShaders( void ) {
-#if defined MISSIONPACK || defined IOQ3ZTM // TMNT? // Turtle Man: Do it in TMNT as well.
+#if defined MISSIONPACK || defined IOQ3ZTM // TMNT? // ZTM: Do it in TMNT as well.
 	char string[1024];
 	float f = level.time * 0.001;
 	Com_sprintf( string, sizeof(string), "team_icon/%s_red", g_redteam.string );

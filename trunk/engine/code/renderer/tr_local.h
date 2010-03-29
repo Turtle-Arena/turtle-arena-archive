@@ -354,7 +354,7 @@ typedef struct {
 	float	depthForOpaque;
 } fogParms_t;
 
-#ifdef CELSHADING // Turtle Man
+#ifdef CELSHADING // ZTM
 typedef struct
 {
 	float			width;				// Width of cel outline.
@@ -402,7 +402,7 @@ typedef struct shader_s {
 
 	int			multitextureEnv;		// 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
 
-#ifdef CELSHADING // Turtle Man
+#ifdef CELSHADING // ZTM
 	celoutline_t celoutline;
 #endif
 
@@ -570,7 +570,7 @@ typedef struct drawSurf_s {
 	surfaceType_t		*surface;		// any of surface*_t
 } drawSurf_t;
 
-#if 0 // #ifdef TMNTMISC // Turtle Man: TODO: I *think* this is the "max lightmapped surface verts" in q3map2
+#if 0 // #ifdef TMNTMISC // ZTM: TODO: I *think* this is the "max lightmapped surface verts" in q3map2
 #define	MAX_FACE_POINTS		999
 #else
 #define	MAX_FACE_POINTS		64
@@ -1501,7 +1501,7 @@ void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, fl
 void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_RenderScene( const refdef_t *fd );
 
-#if 0 // #ifdef RAVENMD4 // Turtle Man: Moved to tr_model.c
+#if 0 // #ifdef RAVENMD4 // ZTM: Moved to tr_model.c
 /*
 =============================================================
 

@@ -2803,7 +2803,7 @@ void FS_Shutdown( qboolean closemfp ) {
 #endif
 }
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 #ifndef STANDALONE
 void Com_AppendCDKey( const char *filename );
 void Com_ReadCDKey( const char *filename );
@@ -2946,7 +2946,7 @@ static void FS_Startup( const char *gameName )
 		}
 	}
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 #ifndef STANDALONE
 	if(!Cvar_VariableIntegerValue("com_standalone"))
 	{
@@ -2959,7 +2959,7 @@ static void FS_Startup( const char *gameName )
 		}
 	}
 #endif
-#endif // Turtle Man: CDKEY
+#endif // ZTM: CDKEY
 
 	// add our commands
 	Cmd_AddCommand ("path", FS_Path_f);
@@ -3103,7 +3103,7 @@ Checks that assets0.pk3 is present and its checksum is correct
 static void FS_CheckPaks( void )
 {
 #ifdef TMNTRELEASE // Only for release version (That has pk3 files).
-	// Turtle Man: Make sure all of the default pk3 file(s) are found and unmodified, like in SRB2...
+	// ZTM: Make sure all of the default pk3 file(s) are found and unmodified, like in SRB2...
 	searchpath_t	*path;
 	unsigned foundPak = 0;
 	unsigned invalidPak = 0;

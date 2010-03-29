@@ -564,13 +564,13 @@ void SP_target_level_end( gentity_t *self ) {
 }
 #endif
 
-#ifdef CAMERASCRIPT // Turtle Man: i made this
+#ifdef CAMERASCRIPT // ZTM: i made this
 /*QUAKED target_start_camera (1 0 0) (-16 -16 -24) (16 16 32) redteam blueteam everyone
 when triggered, starts a camera script.
 "message"	use it to set the name of the camera script without any extension or "cameras/" dir
 targetname: To trigger the camera script.
 If "private", only the activator gets the camera.  If no checks, all clients get the camera.
-Turtle Man: TODO?: Option for whether it can be skipped.
+ZTM: TODO?: Option for whether it can be skipped.
 */
 void target_start_camera_use(gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	if (ent->message == NULL || *ent->message == '\0') {

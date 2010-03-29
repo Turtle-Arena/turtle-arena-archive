@@ -372,7 +372,7 @@ typedef enum {
 	BOTLIB_AI_FREE_MOVE_STATE,
 	BOTLIB_AI_INIT_MOVE_STATE,
 
-//#ifndef TMNTWEAPSYS // Turtle Man: NOTE: Can't disable unless I modified the g_syscall.asm file.
+//#ifndef TMNTWEAPSYS // ZTM: NOTE: Can't disable unless I modified the g_syscall.asm file.
 	BOTLIB_AI_CHOOSE_BEST_FIGHT_WEAPON,
 	BOTLIB_AI_GET_WEAPON_INFO,
 	BOTLIB_AI_LOAD_WEAPON_WEIGHTS,

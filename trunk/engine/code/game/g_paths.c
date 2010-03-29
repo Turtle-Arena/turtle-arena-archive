@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
-Copyright (C) 2009 Turtle Man
+Copyright (C) 2009 ZTM
 
 This file is part of Turtle Arena source code.
 
@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-/* Turtle Man: TODO: Finish new general path code,
+/* ZTM: TODO: Finish new general path code,
 		for trains, camera "scripts", NPCs, NiGHTS mode?, 2D mode?
 		and what not.
 
@@ -243,7 +243,7 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 	return PATH_CIRCIT;
 }
 
-// Turtle Man: TODO: Reached_Train
+// ZTM: TODO: Reached_Train
 //was G_NextPath
 qboolean G_ReachedPath(gentity_t *ent, qboolean backward, qboolean check)
 {
@@ -260,11 +260,11 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean backward, qboolean check)
 		|| (backward && (!prev || !prev->prevTrain)) )
 	{
 		// end of train or path not setup.
-		// Turtle Man: TODO: spawnflag for trains to allow PATH_LINE support or always support it?
+		// ZTM: TODO: spawnflag for trains to allow PATH_LINE support or always support it?
 		return qfalse;		// train just stops
 	}
 
-	// Turtle Man: Check if we have made it to the nextTrain/prevTrain
+	// ZTM: Check if we have made it to the nextTrain/prevTrain
 	//               Doesn't work with PATHF_AXIS!
 	if (check)
 	{
@@ -278,7 +278,7 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean backward, qboolean check)
 
 		dist = Distance(ent->s.origin/*s.pos*/, targetPos);
 
-		// Turtle Man: Value is untested.
+		// ZTM: Value is untested.
 		if (dist > 20.0f)
 		return qfalse;
 		else {
