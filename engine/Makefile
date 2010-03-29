@@ -254,7 +254,7 @@ else # END QUAKE3
 	USE_CODEC_THEORA=1
 
 	# TMNT Arena version
-	VERSION=0.1
+	VERSION=0.2
 
 	# TMNT Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"
