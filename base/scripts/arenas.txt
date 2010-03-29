@@ -15,20 +15,6 @@ bots		"RaphFugitoid"
 //allies		"leo don mike"
 }
 
-// Stage 2
-{
-map			"sp2a1"
-longname	"Stage 2: Area 1"
-type		"single"
-}
-
-{
-map			"sp2boss"
-longname	"Stage 2: Boss"
-type		"single"
-bots		"RaphFugitoid"
-}
-
 // Special Stage keywords
 // special		"Training" (First level, in a Tier by its self)
 // special		"Final" (Last level, in a Tier by its self)

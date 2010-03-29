@@ -469,6 +469,8 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.string				= "Load Game";
 	spMenuInfo.sp_loadgame.color				= color_red;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
+	// Disabled for now.
+	spMenuInfo.sp_loadgame.generic.flags |= QMF_GRAYED;
 
 	// Extra space between, "single player" and the others
 	y += VERTICAL_SPACING;
@@ -480,7 +482,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_levelselect.generic.y			= y;
 	spMenuInfo.sp_levelselect.generic.id		= ID_SP_LEVELSELECT;
 	spMenuInfo.sp_levelselect.generic.callback	= UI_SPMenu_Event;
-	spMenuInfo.sp_levelselect.string			= "Level Select (WIP)";
+	spMenuInfo.sp_levelselect.string			= "Level Select";
 	spMenuInfo.sp_levelselect.color				= color_red;
 	spMenuInfo.sp_levelselect.style				= UI_CENTER;
 
