@@ -3,20 +3,20 @@
 Copyright (C) 2007 Open Arena Team
 Copyright (C) 2010 Zack "ZTurtleMan" Middleton
 
-This file is part of TMNT Arena.
+This file is part of Turtle Arena.
 
-TMNT Arena is free software; you can redistribute it
+Turtle Arena is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-TMNT Arena is distributed in the hope that it will be
+Turtle Arena is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with TMNT Arena; if not, write to the Free Software
+along with Turtle Arena; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -82,7 +82,7 @@ itemDef {
 	addColorRange 101 999 1 1 1 1 //White
 	}
 
-// TMNT Arena doesn't have armor, support on HUD anyway?...
+// Turtle Arena doesn't have armor, support on HUD anyway?...
 /*
 itemDef {
 	name aricon
@@ -108,7 +108,7 @@ itemDef {
 	}
 */
 
-// TMNT Arena uses weapon models
+// Turtle Arena uses weapon models
 itemDef {
 	name "amicon"
 	rect 0 52 48 48 // 3D: 0 52 80 48

@@ -1,4 +1,4 @@
-// TMNT Arena Terrain
+// Turtle Arena Terrain
 
 // ======================================================================
 // Hong Phonged textures

@@ -1,4 +1,4 @@
-TMNT Arena Ideas file (Formarly "todo" file)
+Turtle Arena Ideas file (Formarly "todo" file)
 
 TODO: Move this stuff somewhere else and remove this file.
 

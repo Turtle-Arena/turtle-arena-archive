@@ -1,4 +1,4 @@
-// TMNT Arena team shaders. Based on MISSIONPACK demo shaders in team.shader
+// Turtle Arena team shaders. Based on MISSIONPACK demo shaders in team.shader
 
 team_icon/Sais_red
 {

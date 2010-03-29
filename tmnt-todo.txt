@@ -1,4 +1,4 @@
-TMNT Arena TODO/BUGS file
+Turtle Arena TODO/BUGS file
 
 Bugs that have found that have not been fixed yet, and things that should to be done (or that I'd like to be done...).
 
@@ -105,7 +105,7 @@ STARTED(TMNT // LOCKON): [todo] When attacking a player (or NPC) focus on them? 
 : [bug] When higher then target to focus on it gets all messed up.
 
 [todo] Merge Quake3 and Team Arena bot chat systems; One chat system to rule them all!
-* Problem: Team Arena adds voice chats, which are only used in gametypes >= GT_TEAM. There was also players that could only be used in gametypes >= GT_TEAM that did not have q3 chats. Leaving q3 players for FFA and Duel (with there normal q3 chats) (The TA players have no q3 chats and the players can't be used in q3, q3 players can't be used in gametypes >= GT_TEAM and have no voice chats.) So Team Arena had two seperate chat systems. TMNT Arena supports Q3 and Team Arena players in all gametypes and allows merged Q3/TA players. But in the gametypes >= GT_TEAM ONLY the TA voice chats are used. And like wise in non-team gametypes only "Q3 chats" are used.
+* Problem: Team Arena adds voice chats, which are only used in gametypes >= GT_TEAM. There was also players that could only be used in gametypes >= GT_TEAM that did not have q3 chats. Leaving q3 players for FFA and Duel (with there normal q3 chats) (The TA players have no q3 chats and the players can't be used in q3, q3 players can't be used in gametypes >= GT_TEAM and have no voice chats.) So Team Arena had two seperate chat systems. Turtle Arena supports Q3 and Team Arena players in all gametypes and allows merged Q3/TA players. But in the gametypes >= GT_TEAM ONLY the TA voice chats are used. And like wise in non-team gametypes only "Q3 chats" are used.
 * Fix: Merge systems.
 ** Allow sound filenames in Q3 chat files?
 ** Everywhere that passes a "Q3 chat" name use voice chats instead.
@@ -178,7 +178,7 @@ DONE: Have player fade out when dead instead of BodySink
 
 
 == Master Server ==
-[todo] Should dpmaster be modified for TMNT Arena? (It should work as is...)
+[todo] Should dpmaster be modified for Turtle Arena? (It should work as is...)
 
 
 == Data ==

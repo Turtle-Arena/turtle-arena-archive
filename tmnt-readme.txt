@@ -1,24 +1,24 @@
-TMNT Arena is a work-in-progress Teenage Mutant Ninja Turtle fangame based on the ioquake3 engine.
+Turtle Arena is a work-in-progress Teenage Mutant Ninja Turtle fangame based on the ioquake3 engine.
 
 == Installing ==
-Extract TMNT Arena into a directory. It can be placed anywhere, but suggestions below
+Extract Turtle Arena into a directory. It can be placed anywhere, but suggestions below
 
 Windows:  C:\Program Files\TMNTArena\
 Mac OS X: /Applications/TMNTArena/
 Linux:    /usr/local/games/tmntarena/
 
 == Uninstalling ==
-Delete the directory where you extracted TMNT Arena.
+Delete the directory where you extracted Turtle Arena.
 
-TMNT Arena saves data outside of its directory, so you may wish to remove it.
+Turtle Arena saves data outside of its directory, so you may wish to remove it.
 
-Windows 2000/XP: C:\Documents and Settings\%USERNAME%\Application Data\TMNTArena\
-Windows Vista/7: C:\Users\%USERNAME%\AppData\Roaming\TMNTArena\
-Mac OS X: /Users/$USERNAME/Library/Application Support/TMNTArena/
-Linux: /home/$USERNAME/.tmntarena/
+Windows 2000/XP: C:\Documents and Settings\%USERNAME%\Application Data\TurtleArena\
+Windows Vista/7: C:\Users\%USERNAME%\AppData\Roaming\TurtleArena\
+Mac OS X: /Users/$USERNAME/Library/Application Support/TurtleArena/
+Linux: /home/$USERNAME/.turtlearena/
 
 == License ==
-The TMNT Arena source code and data are licensed under the GNU General Public License version 2 or later.
+The Turtle Arena source code and data are licensed under the GNU General Public License version 2 or later.
 	(See COPYING.txt for full license)
 
 See COPYRIGHTS.txt for data per-file copyrights.
@@ -35,7 +35,7 @@ See COPYRIGHTS.txt for data per-file copyrights.
 * Zack "ZTurtleMan" Middleton
 
 == Code ==
-TMNT Arena uses code directly or based on the following.
+Turtle Arena uses code directly or based on the following.
 
 === GPL ===
 * ioquake3 (Base engine): http://ioquake3.org/
@@ -69,7 +69,7 @@ TMNT Arena uses code directly or based on the following.
 * "inolan.com", basic breakable brush code: http://www.quake3hut.co.uk/q3coding/Breakable%20Glass.htm
 
 == Software used ==
-Software used to create the TMNT Arena data files.
+Software used to create the Turtle Arena data files.
 
 === Text ===
 * Code::Blocks

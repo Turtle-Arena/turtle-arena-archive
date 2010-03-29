@@ -188,7 +188,7 @@ control(Tokenrow *trp)
 		if (ifsatisfied[ifdepth]==2)
 			error(ERROR, "#else after #else");
 		if (trp->lp - trp->bp != 3
-#if 1 // ZTM: FIXME: Only happens on 64 bit TMNT Arena
+#if 1 // ZTM: FIXME: Only happens on 64 bit Turtle Arena
 			&& trp->lp - trp->bp != 4
 #endif
 			)
@@ -205,7 +205,7 @@ control(Tokenrow *trp)
 		--ifdepth;
 		--cursource->ifdepth;
 		if (trp->lp - trp->bp != 3
-#if 1 // ZTM: FIXME: Only happens on 64 bit TMNT Arena
+#if 1 // ZTM: FIXME: Only happens on 64 bit Turtle Arena
 			&& trp->lp - trp->bp != 4
 #endif
 			)

@@ -1,4 +1,4 @@
-// TMNT Arena (Shell Engine) shader list
+// Turtle Arena (Shell Engine) shader list
 se_gfx
 se_icons
 se_menu

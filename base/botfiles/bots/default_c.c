@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "chars.h"
 
-// ZTM: Modified for TMNT Arena.
+// ZTM: Modified for Turtle Arena.
 // NOTE: This file uses "bots/raph_t.c" for the chat file because "bots/default_t.c" doesn't have any chat strings.
 
 skill 1

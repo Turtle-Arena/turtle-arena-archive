@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
-	<Workspace title="TMNT Arena workspace">
+	<Workspace title="Turtle Arena workspace">
 		<Project filename="bspc.cbp" />
-		<Project filename="..\..\code\splines\Splines.cbp" />
+		<Project filename="../../code/splines/Splines.cbp" />
 		<Project filename="quake3.cbp" active="1">
-			<Depends filename="..\..\code\splines\Splines.cbp" />
+			<Depends filename="../../code/splines/Splines.cbp" />
 		</Project>
 		<Project filename="cgame.cbp" />
 		<Project filename="game.cbp" />

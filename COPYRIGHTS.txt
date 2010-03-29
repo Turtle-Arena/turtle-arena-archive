@@ -1,4 +1,4 @@
-The TMNT Arena data copyrights.
+Turtle Arena data copyrights.
 
 All of the data (unless otherwised noted) is license under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
 
@@ -74,7 +74,7 @@ base/gfx/2d/numbers/*.png 0 - 9 and '-' [11 images]	FreeSansBold.ttf
 base/gfx/2d/crosshaira.png							FreeSans.ttf
 base/textures/common/alpha* [6 images]				FreeSans.ttf
 
-Below were created by TMNT Arena, using freetype2	FreeSans.ttf
+Below were created by Turtle Arena, using freetype2	FreeSans.ttf
 base/fonts/FreeSans_0_12.tga
 base/fonts/FreeSans_0_16.tga
 base/fonts/FreeSans_0_20.tga

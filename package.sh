@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Package TMNT Arena for release.
+# Package Turtle Arena for release.
 #
 #  Supports Zip and Deb releases.
 #
@@ -11,9 +11,9 @@ STARTDIR=`pwd`
 # Directory to put the files for release
 INSTALLDIR=install
 
-# Version (Current TMNT Arena version)
+# Version (Current Turtle Arena version)
 VERSION=0.2
-# For deb only fixes update DEB_VERSION "tmntarena_$VERSION-$*DEB_VERSION"
+# For deb only fixes update DEB_VERSION "turtlearena_$VERSION-$*DEB_VERSION"
 CLIENT_DEB_VERSION=1
 DATA_DEB_VERSION=1
 
@@ -35,13 +35,13 @@ MAKEZIP=1
 MAKEDEB=1
 
 	# Game name for deb package
-	GAMENAME="tmntarena"
+	GAMENAME="turtlearena"
 
 	# Long Title
 	LONGTITLE="Third-person arena game"
 
 	# Description
-	DESC="TMNT Arena is a Ninja Turtle fangame based on ioquake3."
+	DESC="Turtle Arena is a Ninja Turtle fangame based on ioquake3."
 
 	# Packager's name and email
 	# Example: "John Smith <address@example.com>"
@@ -103,20 +103,20 @@ then
 
 	if [ $LINUX -eq 1 ]
 	then
-		cp engine/build/release-$PLATFORM/tmntarena.$ARCH $INSTALLDIR
-		cp engine/build/release-$PLATFORM/tmntarena-ded.$ARCH $INSTALLDIR
+		cp engine/build/release-$PLATFORM/turtlearena.$ARCH $INSTALLDIR
+		cp engine/build/release-$PLATFORM/turtlearena-ded.$ARCH $INSTALLDIR
 
 		if [ $ARCH = "x86_64" ]
 		then
-			cp engine/build/release-linux-i386/tmntarena.i386 $INSTALLDIR
-			cp engine/build/release-linux-i386/tmntarena-ded.i386 $INSTALLDIR
+			cp engine/build/release-linux-i386/turtlearena.i386 $INSTALLDIR
+			cp engine/build/release-linux-i386/turtlearena-ded.i386 $INSTALLDIR
 		fi
 	fi
 
 	if [ $WIN32 -eq 1 ]
 	then
-		cp engine/build/release-mingw32-x86/tmntarena.x86.exe $INSTALLDIR
-		cp engine/build/release-mingw32-x86/tmntarena-ded.x86.exe $INSTALLDIR
+		cp engine/build/release-mingw32-x86/turtlearena.x86.exe $INSTALLDIR
+		cp engine/build/release-mingw32-x86/turtlearena-ded.x86.exe $INSTALLDIR
 
 		echo "  Warning: You need to manually copy SDL.dll vserion 1.2.14 into $INSTALLDIR !"
 	fi
@@ -178,14 +178,14 @@ then
 	then
 		
 		# Copy linux launcher too
-		cp extras/tmntarena.sh $INSTALLDIR
+		cp extras/turtlearena.sh $INSTALLDIR
 	fi
 
-	cp tmnt-readme.txt $INSTALLDIR/readme.txt
+	cp game-readme.txt $INSTALLDIR/readme.txt
 	cp COPYING.txt $INSTALLDIR
 	cp COPYRIGHTS.txt $INSTALLDIR
 
-	# Copy all of the files other then base/ into tmntarena-src/ and zip it.
+	# Copy all of the files other then base/ into turtlearena-src/ and zip it.
 	echo "Warning: You need to manually copy the source into $INSTALLDIR !"
 
 	# zip install?
@@ -218,20 +218,20 @@ function make_client_deb() {
 	cd $INSTALLDIR/deb-client/
 
 	# write the README file
-	echo "This package contains TMNT Arena client." > usr/share/doc/$GAMENAME/README
+	echo "This package contains Turtle Arena client." > usr/share/doc/$GAMENAME/README
 
-	# write the tmntarena menu file
+	# write the turtlearena menu file
 	echo "?package($GAMENAME): \\" > usr/share/menu/$GAMENAME
 	echo -e "\tneeds=\"X11\" \\" >> usr/share/menu/$GAMENAME
 	echo -e "\tsection=\"Games/Action\" \\" >> usr/share/menu/$GAMENAME
-	echo -e "\ttitle=\"TMNT Arena\" \\" >> usr/share/menu/$GAMENAME
+	echo -e "\ttitle=\"Turtle Arena\" \\" >> usr/share/menu/$GAMENAME
 	echo -e "\tlongtitle=\"$LONGTITLE\" \\" >> usr/share/menu/$GAMENAME
 	echo -e "\ticon=\"/usr/share/pixmaps/${GAMENAME}32.png\" \\" >> usr/share/menu/$GAMENAME
-	echo -e "\tcommand=\"/usr/games/tmntarena\"" >> usr/share/menu/$GAMENAME
+	echo -e "\tcommand=\"/usr/games/turtlearena\"" >> usr/share/menu/$GAMENAME
 
-	# write the tmntarena.desktop file
+	# write the turtlearena.desktop file
 	echo "[Desktop Entry]" > usr/share/applications/$GAMENAME.desktop
-	echo "Name=TMNT Arena" >> usr/share/applications/$GAMENAME.desktop
+	echo "Name=Turtle Arena" >> usr/share/applications/$GAMENAME.desktop
 	echo "Comment=$LONGTITLE" >> usr/share/applications/$GAMENAME.desktop
 	echo "Exec=$GAMENAME" >> usr/share/applications/$GAMENAME.desktop
 	echo "Terminal=false" >> usr/share/applications/$GAMENAME.desktop
@@ -247,7 +247,7 @@ function make_client_deb() {
 	echo "Architecture: $DEBARCH" >> control
 	echo "Installed-Size: `du -ks usr|cut -f 1`" >> control
 	# Depends taken from openarena_0.8.1-4_amd64.deb
-	echo "Depends: libc6 (>= 2.4), libcurl3-gnutls (>= 7.16.2-1), libgl1-mesa-glx | libgl1, libogg0 (>= 1.0rc3), libopenal1, libsdl1.2debian (>= 1.2.10-1), libspeex1 (>= 1.2~beta3-1), libspeexdsp1 (>= 1.2~beta3.2-1), libvorbis0a (>= 1.1.2), libvorbisfile3 (>= 1.1.2), tmntarena-data (>= $VERSION-1)" >> control
+	echo "Depends: libc6 (>= 2.4), libcurl3-gnutls (>= 7.16.2-1), libgl1-mesa-glx | libgl1, libogg0 (>= 1.0rc3), libopenal1, libsdl1.2debian (>= 1.2.10-1), libspeex1 (>= 1.2~beta3-1), libspeexdsp1 (>= 1.2~beta3.2-1), libvorbis0a (>= 1.1.2), libvorbisfile3 (>= 1.1.2), ${GAMENAME}-data (>= $VERSION-1)" >> control
 	echo "Maintainer: $NAME_AND_EMAIL" >> control
 	echo "Homepage: http://turtlearena.googlecode.com/" >> control
 	echo "Description: $LONGTITLE" >> control
@@ -293,7 +293,7 @@ function make_client_deb() {
 
 
 # NOTE: I have made a change from the OpenArena client
-#  * client binary is in /usr/games/ instead of /usr/games/tmntarena/
+#  * client binary is in /usr/games/ instead of /usr/games/turtlearena/
 #
 # https://synthesize.us/HOWTO_make_a_deb_archive_without_dpkg
 if [ $MAKEDEB -eq 1 ]
@@ -318,7 +318,7 @@ then
 		cd $INSTALLDIR/deb-data/
 
 		# write the README file
-		echo "This package contains the required data for TMNT Arena." > usr/share/doc/$GAMENAME-data/README
+		echo "This package contains the required data for Turtle Arena." > usr/share/doc/$GAMENAME-data/README
 
 		# write the control file
 		echo "Package: $GAMENAME-data" > control
@@ -329,8 +329,8 @@ then
 		echo "Installed-Size: `du -ks usr|cut -f 1`" >> control
 		echo "Maintainer: $NAME_AND_EMAIL" >> control
 		echo "Homepage: http://turtlearena.googlecode.com/" >> control
-		echo "Description: TMNT Arena data files" >> control
-		echo " TMNT Arena requires this in order to run." >> control
+		echo "Description: Turtle Arena data files" >> control
+		echo " Turtle Arena requires this in order to run." >> control
 
 		fakeroot tar czf data.tar.gz ./usr/*
 

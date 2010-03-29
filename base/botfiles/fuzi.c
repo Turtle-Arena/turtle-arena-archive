@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// ZTM: Modified for TMNT Arena.
+// ZTM: Modified for Turtle Arena.
 
 #define AMMO				20
 #define HEALTH				20
@@ -249,7 +249,7 @@ weight "weapon_grapplinghook"
 	}
 }
 
-/* Removed from TMNT Arena
+/* Removed from Turtle Arena
 //teleport
 #define TELW				190
 weight "holdable_teleporter"
@@ -271,7 +271,7 @@ weight "holdable_medkit"
 	}
 }
 
-/* Removed from TMNT Arena
+/* Removed from Turtle Arena
 //kamikaze
 #define KAMW				200
 weight "holdable_kamikaze"
@@ -293,7 +293,7 @@ weight "holdable_portal"
 	}
 }
 
-/* Removed from TMNT Arena
+/* Removed from Turtle Arena
 weight "holdable_invulnerability"
 {
 	switch(INVENTORY_INVULNERABILITY) // ZTM: BUGFIX?: Was INVENTORY_TELEPORTER
@@ -454,7 +454,7 @@ weight "item_botroam"
 	return 1;
 }
 
-// For Team Arena Harvester gametype (Disabled in TMNT Arena)
+// For Team Arena Harvester gametype (Disabled in Turtle Arena)
 weight "item_redcube"
 {
 	return 200;//REDCW;

@@ -593,7 +593,7 @@ maxs		{14, 14, 87}
 } 
 
 /*
-// For MISSIONPACK Harvester gametype (ZTM: Removed from TMNT Arena. #ifdef MISSIONPACK_HARVESTER)
+// For MISSIONPACK Harvester gametype (ZTM: Removed from Turtle Arena. #ifdef MISSIONPACK_HARVESTER)
 iteminfo "item_redcube"
 {
 name		"Red Cube"

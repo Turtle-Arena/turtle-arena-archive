@@ -1,4 +1,4 @@
-TMNT Arena source directories setup
+Turtle Arena source directories setup
 
 base (or assets0.pk3) - Game data used to run the engine
 base-src - Source files for the game data that are not used by the engine

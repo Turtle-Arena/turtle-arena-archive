@@ -1,4 +1,4 @@
-'''TMNT Arena''' is a Teenage Mutant Ninja Turtle fangame being made by ZTurtleMan based on the ioquake3 engine.
+'''Turtle Arena''' is a Teenage Mutant Ninja Turtle fangame being made by ZTurtleMan based on the ioquake3 engine.
 
 == Current Features ==
 * Five playable characters (Leo, Don, Raph, Mike and Casey)
@@ -24,5 +24,5 @@
 * Sonic Team Jr. - for making Sonic Robo Blast 2 which started this whole thing.
 
 == External Links ==
-* [http://code.google.com/p/turtlearena/ TMNT Arena on Google Code]
+* [http://code.google.com/p/turtlearena/ Turtle Arena on Google Code]
 

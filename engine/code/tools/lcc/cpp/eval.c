@@ -108,7 +108,7 @@ eval(Tokenrow *trp, int kw)
 	trp->tp++;
 	if (kw==KIFDEF || kw==KIFNDEF) {
 		if (
-#if 1 // ZTM: FIXME: Only happens on 64 bit TMNT Arena
+#if 1 // ZTM: FIXME: Only happens on 64 bit Turtle Arena
 		(trp->lp - trp->bp != 4 && trp->lp - trp->bp != 5) ||
 #else
 		trp->lp - trp->bp != 4 ||
