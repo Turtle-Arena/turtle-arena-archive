@@ -260,7 +260,7 @@ extern int demo_protocols[];
 #endif
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
-#ifdef TMNT // Don't talk to quake3arena.com.
+#if 0 // #ifdef TMNT // Turtle Man: TODO: Use a different master server?
 #define MASTER_SERVER_NAME	""
 #else
 #define MASTER_SERVER_NAME	"master.quake3arena.com"
