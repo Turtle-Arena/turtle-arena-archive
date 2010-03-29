@@ -12,7 +12,7 @@ STARTDIR=`pwd`
 INSTALLDIR=install
 
 # Version (Current TMNT Arena version)
-VERSION=0.1
+VERSION=0.2
 # For deb only fixes update DEB_VERSION "tmntarena_$VERSION-$*DEB_VERSION"
 CLIENT_DEB_VERSION=1
 DATA_DEB_VERSION=1
