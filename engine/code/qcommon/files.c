@@ -2902,7 +2902,7 @@ static void FS_Startup( const char *gameName )
 	{
 		// Required files are missing, use location of the Deb package data
 #ifdef TMNT
-		Cvar_Set("fs_basepath", "/usr/share/games/tmntarena" );
+		Cvar_Set("fs_basepath", "/usr/share/games/turtlearena" );
 #else
 		Cvar_Set("fs_basepath", "/usr/share/games/ioquake3" );
 #endif
@@ -3147,11 +3147,11 @@ static void FS_CheckPaks( void )
 
 		if (invalidPak)
 		{
-			Com_Error(ERR_FATAL, "Default Pk3 file(s) are missing, corrupt, or modified.\nYou need to reinstall TMNT Arena in order to play");
+			Com_Error(ERR_FATAL, "Default Pk3 file(s) are missing, corrupt, or modified.\nYou need to reinstall Turtle Arena in order to play");
 		}
 		else
 		{
-			Com_Error(ERR_FATAL, "Missing default Pk3 file(s).\nYou need to reinstall TMNT Arena in order to play");
+			Com_Error(ERR_FATAL, "Missing default Pk3 file(s).\nYou need to reinstall Turtle Arena in order to play");
 		}
 	}
 #endif

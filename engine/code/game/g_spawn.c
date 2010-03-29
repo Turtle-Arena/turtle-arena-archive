@@ -543,7 +543,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	}
 
 #ifdef TMNT
-	G_SpawnInt( "nottmnt", "0", &i );
+	G_SpawnInt( "notturtlearena", "0", &i );
 	if ( i ) {
 		G_FreeEntity( ent );
 		return;

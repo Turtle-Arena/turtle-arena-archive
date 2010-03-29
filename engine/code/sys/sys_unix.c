@@ -59,9 +59,9 @@ char *Sys_DefaultHomePath(void)
 #ifdef TMNT
 #ifdef MACOS_X
 			Q_strcat( homePath, sizeof( homePath ),
-					"/Library/Application Support/TMNTArena" );
+					"/Library/Application Support/TurtleArena" );
 #else
-			Q_strcat( homePath, sizeof( homePath ), "/.tmntarena" );
+			Q_strcat( homePath, sizeof( homePath ), "/.turtlearena" );
 #endif
 #else
 #ifdef MACOS_X
