@@ -1,19 +1,19 @@
 #!/bin/sh
-# BSPC Linux Launcher
-# Automaticly selects 32/64 bit version of BSPC.
+# Turtle Arena Linux Launcher
+# Automaticly selects 32/64 bit version of Turtle Arena.
 #
 # Based on xreal ( http://www.xreal-project.net ) script
 
 # Select binary
 case `uname -m` in
 	x86_64)
-		BIN='bspc.x86_64'
+		BIN='turtlearena.x86_64'
 		;;
 	i386|i486|i586|i686)
-		BIN='bspc.i386'
+		BIN='turtlearena.i386'
 		;;
 #	powerpc|powerpc64)
-#		BIN='bspc.ppc'
+#		BIN='turtlearena.ppc'
 #		;;
 	*)
 		echo "You are not running a supported platform, if you would like to play Turtle Arena on your platform, please visit http://code.google.com/p/turtlearena/ for contact information."
@@ -22,9 +22,9 @@ case `uname -m` in
 esac
 
 if [ ! -f $BIN ]; then
-	echo "BSPC binary '$BIN' not found!"
+	echo "Game binary '$BIN' not found!"
 	exit 1
 fi
 
-# Run # -nograpplereach
-./$BIN -forcesidesvisible -bsp2aas "../../base/maps/*.bsp"
+# Run
+./$BIN $@

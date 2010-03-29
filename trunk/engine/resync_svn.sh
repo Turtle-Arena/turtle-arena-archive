@@ -4,7 +4,7 @@
 #   working copy to a newer revision of a main Subversion Repository.
 #
 # Created to resync standalone games based on ioquake3 (ioq3).
-#     (Such as TMNT Arena, Smokin' Guns, and many more)
+#     (Such as Turtle Arena, Smokin' Guns, and many more)
 #
 
 #

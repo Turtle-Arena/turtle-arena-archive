@@ -1,4 +1,4 @@
-// Shaders that are not need (and shouldn't be used by TMNT Arena maps),
+// Shaders that are not need (and shouldn't be used by Turtle Arena maps),
 //  but we have them for "quake3 map compatablity"... They may be removed leter.
 
 // See textures/common/mirror1 in tex_common.shader

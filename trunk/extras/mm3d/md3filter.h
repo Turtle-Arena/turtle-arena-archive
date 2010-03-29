@@ -28,7 +28,7 @@
 #ifndef __MD3FILTER_H
 #define __MD3FILTER_H
 
-#define TMNT // Enable special support my ioquake3 mod, TMNT Arena, that should not be in mm3d
+#define TURTLE_ARENA // Enable special support my ioquake3 mod, Turtle Arena, that should not be in mm3d
 
 //#define MDR_LOAD // Unfinished
 #define MDR_EXPORT // Unfinished

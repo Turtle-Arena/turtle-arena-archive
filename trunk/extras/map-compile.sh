@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# NOTE: This is currently NOT used to compile TMNT Arena maps.
+# NOTE: This is currently NOT used to compile Turtle Arena maps.
 
 # Use xreal script?:
 # http://xreal.svn.sourceforge.net/viewvc/xreal/trunk/xreal/base/maps/xmap2_compile?revision=3652&view=markup

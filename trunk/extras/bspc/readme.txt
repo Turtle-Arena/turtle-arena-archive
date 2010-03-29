@@ -3,7 +3,7 @@ BSPC is the Quake3 bot aas compiler.
 == Changes from 2.1h ==
 :2.1h was the version that was include with Quake3 1.32b source release
 
-Version is "2.1h [TMNT Arena]" instead of "2.1h"
+Version is "2.1h [Turtle Arena]" instead of "2.1h"
 Removed disabled BFG Jumping code.
 "-grapplereach" is true by default, -nograpplereach disables it.
 Supports "func_breakable" entities.

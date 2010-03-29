@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /*
 NOTE: death_gauntlet, death_rail, death_bfg, kill_rail and kill_gauntlet
-		are not used in TMNT Arena.
+		are not used in Turtle Arena.
 */
 
 chat "default"
@@ -117,7 +117,7 @@ chat "default"
 		// 0 = random opponent
 	} //end type
 
-	/* ZTM: death_gauntlet, death_rail, and death_bfg are not used in TMNT Arena.
+	/* ZTM: death_gauntlet, death_rail, and death_bfg are not used in Turtle Arena.
 	type "death_gauntlet" //initiated when the bot is killed by a gauntlet attack
 	{
 		// 0 = enemy name
@@ -147,7 +147,7 @@ chat "default"
 	} //end type
 	//======================================================
 	//======================================================
-	/* ZTM: kill_rail and kill_gauntlet are not used in TMNT Arena.
+	/* ZTM: kill_rail and kill_gauntlet are not used in Turtle Arena.
 	type "kill_rail" //initiated when the bot kills someone with rail gun
 	{
 		// 0 = enemy name

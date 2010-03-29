@@ -1,7 +1,7 @@
-// Shaders that are not used by TMNT Arena,
+// Shaders that are not used by Turtle Arena,
 //  but we have them for "quake3 engine compatablity"... They may be removed leter.
 
-// ZTM: TMNT Arena uses the shader name set in model, "models/misc/telep"
+// ZTM: Turtle Arena uses the shader name set in model, "models/misc/telep"
 //             While Q3 uses a hardcoded name.
 teleportEffect
 {
@@ -17,7 +17,7 @@ teleportEffect
 	}
 }
 
-// TMNT Arena no longer uses "no logo" version
+// Turtle Arena no longer uses "no logo" version
 menubacknologo
 {
 	nomipmaps
@@ -86,7 +86,7 @@ icons/haste
 	}
 }
 
-// Medals that are not used by TMNT Arena.
+// Medals that are not used by Turtle Arena.
 medal_excellent
 {
 	nopicmip
@@ -177,7 +177,7 @@ sprites/foe
 	}
 }
 
-// ZTM: Not used by TMNT Arena
+// ZTM: Not used by Turtle Arena
 gfx/2d/crosshaire
 {
 	nopicmip

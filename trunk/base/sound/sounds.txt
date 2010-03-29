@@ -3,7 +3,7 @@ Note: Added a dummy sound at sound/feedback/hit.wav so unmoded Quake3 can start 
 == Copied Sounds ==
 misc/menu1.ogg and misc/menu3.ogg are a louder-copy of player/footsteps/clank2.ogg
 
-items/use_nothing.ogg is a copy of misc/menu4.ogg  (items/use_nothing is unused by TMNT Arena?...)
+items/use_nothing.ogg is a copy of misc/menu4.ogg  (items/use_nothing is unused by Turtle Arena?...)
 
 weapons/melee_swing.ogg is a louder-version of weapons/change.ogg (For testing...)
 

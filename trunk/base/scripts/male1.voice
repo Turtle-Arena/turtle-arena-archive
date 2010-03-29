@@ -178,13 +178,13 @@ onreturnflag
 	sound/voices/male1/gettingourflag.ogg	"Getting our flag!"
 }
 
-// TMNT Arena has no harvester gametype...
+// Turtle Arena has no harvester gametype...
 harvest
 {
 //	sound/voices/male1/getsomeskulls.ogg	"Get some skulls"
 }
 
-// TMNT Arena has no gaunlet
+// Turtle Arena has no gaunlet
 kill_gauntlet
 {
 

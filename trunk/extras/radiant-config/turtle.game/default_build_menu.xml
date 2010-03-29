@@ -2,7 +2,7 @@
 <!--
 build commands
 [RadiantPath]: path to Radiant .. C:\Program Files\NetRadiant\
-[EnginePath]: path to the engine .. C:\Program Files\TMNT Arena\ /usr/local/games/tmntarena/
+[EnginePath]: path to the engine .. C:\Program Files\TurtleArena\ /usr/local/games/turtlearena/
 -->
 <project version="2.0">
 <var name="q3map2">"[RadiantPath]q3map2.[ExecutableType]" -v<cond value="[MonitorAddress]"> -connect [MonitorAddress]</cond> -game quake3 -fs_basepath "[EnginePath]"<cond value="[GameName]"> -fs_game [GameName]</cond></var>
