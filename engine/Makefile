@@ -69,7 +69,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 1779
+IOQ3_REVISION = 1782
 
 #
 # Start build type
@@ -742,7 +742,7 @@ ifeq ($(PLATFORM),mingw32)
     CLIENT_CFLAGS += -DUSE_CIN_THEORA
   endif
 
-  ifeq ($(ARCH),x86_64)
+  ifeq ($(ARCH),x64)
     OPTIMIZEVM = -O3 -fno-omit-frame-pointer \
       -falign-loops=2 -funroll-loops -falign-jumps=2 -falign-functions=2 \
       -fstrength-reduce
@@ -783,7 +783,7 @@ ifeq ($(PLATFORM),mingw32)
     ifneq ($(USE_CURL_DLOPEN),1)
       ifeq ($(USE_LOCAL_HEADERS),1)
         CLIENT_CFLAGS += -DCURL_STATICLIB
-        ifeq ($(ARCH),x86_64)
+        ifeq ($(ARCH),x64)
 	  CLIENT_LIBS += $(LIBSDIR)/win64/libcurl.a
 	else
           CLIENT_LIBS += $(LIBSDIR)/win32/libcurl.a
@@ -1216,9 +1216,7 @@ endif
 
 ifeq ($(USE_INTERNAL_ZLIB),1)
   BASE_CFLAGS += -DNO_GZIP
-  ifneq ($(USE_LOCAL_HEADERS),1)
-    BASE_CFLAGS += -I$(ZDIR)
-  endif
+  BASE_CFLAGS += -I$(ZDIR)
 else
   LIBS += -lz
 endif
@@ -1939,6 +1937,9 @@ ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),amd64)
     Q3OBJ += $(B)/client/vm_x86_64.o $(B)/client/vm_x86_64_assembler.o
   endif
+  ifeq ($(ARCH),x64)
+    Q3OBJ += $(B)/client/vm_x86_64.o $(B)/client/vm_x86_64_assembler.o
+  endif
   ifeq ($(ARCH),ppc)
     Q3OBJ += $(B)/client/vm_powerpc.o $(B)/client/vm_powerpc_asm.o
   endif
@@ -2127,6 +2128,9 @@ ifeq ($(HAVE_VM_COMPILED),true)
     Q3DOBJ += $(B)/ded/vm_x86_64.o $(B)/ded/vm_x86_64_assembler.o
   endif
   ifeq ($(ARCH),amd64)
+    Q3DOBJ += $(B)/ded/vm_x86_64.o $(B)/ded/vm_x86_64_assembler.o
+  endif
+  ifeq ($(ARCH),x64)
     Q3DOBJ += $(B)/ded/vm_x86_64.o $(B)/ded/vm_x86_64_assembler.o
   endif
   ifeq ($(ARCH),ppc)
