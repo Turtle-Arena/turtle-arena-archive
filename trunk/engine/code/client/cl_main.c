@@ -1341,7 +1341,7 @@ void CL_RequestMotd( void ) {
 
 #ifdef IOQ3ZTM
 	// Turtle Man: Check if there is there a valid motd server
-	//             Because in TMNT Arena there isn't.
+	//             Because in Turtle Arena there isn't.
 	if (strlen(UPDATE_SERVER_NAME) < 1)
 	{
 		return;

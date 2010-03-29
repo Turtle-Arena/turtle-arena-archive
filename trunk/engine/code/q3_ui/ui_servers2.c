@@ -225,7 +225,7 @@ static char* netnames[] = {
 };
 
 #ifdef TMNT // Turtle Man: Website
-static char quake3worldMessage[] = "Visit turtlearena.googlecode.com - News, Updates";
+static char quake3worldMessage[] = "Visit turtlearena.googlecode.com for News and Updates";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
 #endif

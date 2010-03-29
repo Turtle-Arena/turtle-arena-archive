@@ -86,7 +86,7 @@ char *Sys_DefaultHomePath( void )
 		}
 		Q_strncpyz( homePath, szPath, sizeof( homePath ) );
 #ifdef TMNT // Turtle Man: Don't put it with Quake3 stuff.
-		Q_strcat( homePath, sizeof( homePath ), "\\TMNTArena" );
+		Q_strcat( homePath, sizeof( homePath ), "\\TurtleArena" );
 #else
 		Q_strcat( homePath, sizeof( homePath ), "\\Quake3" );
 #endif

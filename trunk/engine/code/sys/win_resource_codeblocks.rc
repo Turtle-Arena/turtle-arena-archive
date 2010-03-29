@@ -63,7 +63,7 @@ IDI_ICON1               ICON    DISCARDABLE     "../quake3.ico"
 
 STRINGTABLE DISCARDABLE
 BEGIN
-    IDS_STRING1             "TMNTArena"
+    IDS_STRING1             "Turtle Arena"
 END
 
 #endif    // English (U.S.) resources

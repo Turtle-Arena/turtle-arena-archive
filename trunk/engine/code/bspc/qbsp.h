@@ -37,14 +37,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "l_log.h"
 #include "l_qfiles.h"
 
-#define TMNT // Turtle Man: Minor changes for TMNT Arena
+#define TMNT // Turtle Man: Minor changes for Turtle Arena
 
 #ifdef TMNT
 #define TMNTENTSYS
 #define TMNTWEAPSYS
 #define TMNTMISC
 
-#define BSPC_VERSION		"2.1h [TMNT Arena]"
+#define BSPC_VERSION		"2.1h [Turtle Arena]"
 #else
 #define BSPC_VERSION		"2.1h"
 #endif

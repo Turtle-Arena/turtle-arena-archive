@@ -28,18 +28,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef STANDALONE
   #ifdef TMNT // Turtle Man: Changed game info defines.
-    #define PRODUCT_NAME			"TMNT Arena"
+    #define PRODUCT_NAME			"Turtle Arena"
     #define BASEGAME			"base"
-    #define CLIENT_WINDOW_TITLE     	"TMNT Arena"
-    #define CLIENT_WINDOW_MIN_TITLE 	"TMNT Arena"
-    #define GAMENAME_FOR_MASTER		"TMNTArena"
+    #define CLIENT_WINDOW_TITLE     	"Turtle Arena"
+    #define CLIENT_WINDOW_MIN_TITLE 	"Turtle Arena"
+    #define GAMENAME_FOR_MASTER		"TurtleArena"
   #elif defined IOQ3ZTM
-	// Standalone IOQ3ZTM is a mod for TMNT Arena
-    #define PRODUCT_NAME			"ioq3tmnt"
+	// Standalone IOQ3ZTM is a mod for Turtle Arena
+    #define PRODUCT_NAME			"ioq3turtle"
     #define BASEGAME				"base"
-    #define CLIENT_WINDOW_TITLE     "ioquake3tmnt"
-    #define CLIENT_WINDOW_MIN_TITLE "ioq3tmnt"
-    #define GAMENAME_FOR_MASTER		"TMNTArena"
+    #define CLIENT_WINDOW_TITLE     "ioquake3turtle"
+    #define CLIENT_WINDOW_MIN_TITLE "ioq3turtle"
+    #define GAMENAME_FOR_MASTER		"TurtleArena"
   #else
     #define PRODUCT_NAME			"iofoo3"
     #define BASEGAME			"foobar"

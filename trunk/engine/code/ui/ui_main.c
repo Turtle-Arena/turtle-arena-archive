@@ -73,7 +73,7 @@ static const int numNetSources = sizeof(netSources) / sizeof(const char*);
 static const serverFilter_t serverFilters[] = {
 	{"All", "" },
 #ifdef TMNT
-	{"TMNT Arena", "" },
+	{"Turtle Arena", "" },
 	{"Quake 3 Arena", "baseq3" },
 #else
 	{"Quake 3 Arena", "" },

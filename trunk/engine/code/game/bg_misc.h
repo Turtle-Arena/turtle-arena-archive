@@ -1401,7 +1401,6 @@ typedef enum {
 	FOOTSTEP_TOTAL
 } footstep_t;
 
-// see tmnt-abilities.txt
 typedef enum {
 	ABILITY_NONE,
 	ABILITY_TECH,
