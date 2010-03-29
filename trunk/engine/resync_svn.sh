@@ -268,7 +268,9 @@ fi
 #     Cut characters after 'r' through end!
 # 1754
 
-HEAD_REV=`svn log $SVN_PATH -rHEAD | grep "^r[0-9]*" | cut -f1 -d' ' | cut -c 2-`
+HEAD_REV=`svn log $SVN_PATH -rHEAD | grep "^r[0-9]" | cut -f1 -d' ' | cut -c 2-`
+
+
 
 # There are some places we can't use "HEAD" so just use the integer.
 if [ "$CURRENT_REV" = "HEAD" ]
