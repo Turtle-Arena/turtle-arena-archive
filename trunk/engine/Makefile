@@ -1,5 +1,5 @@
 #
-# TMNT Arena Makefile
+# Turtle Arena Makefile
 #
 # GNU Make required
 #
@@ -109,10 +109,10 @@ ifeq ($(QUAKE3),1)
 
 	ifeq ($(BUILD_IOQ3ZTM),1)
 
-		# Build ioq3ztm for running in TMNT Arena
-		IOQ3TMNT=0
+		# Build ioq3ztm for running in Turtle Arena
+		IOQ3TURTLE=0
 
-		ifeq ($(IOQ3TMNT),1)
+		ifeq ($(IOQ3TURTLE),1)
 			ifneq ($(BUILD_CLIENT),1)
 			  BUILD_CLIENT     =0
 			endif
@@ -126,7 +126,7 @@ ifeq ($(QUAKE3),1)
 			  BUILD_GAME_SO    =0
 			endif
 
-			# Copied from TMNT Arena BUILD_DEFINES
+			# Copied from Turtle Arena BUILD_DEFINES
 			ENGINE_CFLAGS = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DNOTRATEDM -DNOBLOOD -DRAVENMD4 \
 						-DTMNTHOLDSYS -DTMNTWEAPSYS_NOCOMPAT \
@@ -142,13 +142,13 @@ ifeq ($(QUAKE3),1)
 			ENGINE_CFLAGS += -DTMNT_GAME_MODELS
 			QUAKE3_CFLAGS += -DTMNT_GAME_MODELS
 
-			VERSION=1.36tmnt
+			VERSION=1.36turtle
 			BASEGAME=baseq3
 			BASEGAME_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS)
 			MISSIONPACK_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) \
 						-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
 			ifndef COPYDIR
-				COPYDIR="/usr/local/games/tmntarena"
+				COPYDIR="/usr/local/games/turtlearena"
 			endif
 		else
 			# Build modified ioquake3, it only runs using its own sever/client binaries
@@ -207,11 +207,11 @@ ifeq ($(QUAKE3),1)
 else # END QUAKE3
 
 	###################################################################
-	# Default TMNT config
+	# Default Turtle Arena config
 	#  - All of this can be overriden by makefile.local
 	###################################################################
 
-	# Please note: TMNT*SYS defines are general system changes, not total specifiy for TMNT Arena
+	# Please note: TMNT*SYS defines are general system changes, not total specifiy for Turtle Arena
 	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
 	# -DANALOG		 # Allows players to rotate the camera and move based on the camera angles
 	# -DARRAYMAX     # TODO: This ''was'' going to remove the bit max problem with Q3 network (ie more then 16 weapons).
@@ -240,26 +240,26 @@ else # END QUAKE3
 						-DTMNTDATA \
 						-DNIGHTSMODE
 
-	# Currently TMNT Arena doesn't use camera scripts.
-	BUILD_SPLINES=1 # Adds -DCAMERASCRIPT automaticly
+	# Currently Turtle Arena doesn't use camera scripts.
+	BUILD_SPLINES=1 # Adds -DCAMERASCRIPT
 
 	# Use model tags for true melee attacking
 	DED_USE_MODELS=1
 	BUILD_DEFINES += -DTMNT_GAME_MODELS
 
-	# TMNT Arena's sounds are ogg vorbis
+	# Turtle Arena's sounds are ogg vorbis
 	USE_CODEC_VORBIS=1
 
-	# TMNT Arena's intro video will be ogg theora
+	# Turtle Arena's intro video will be ogg theora
 	USE_CODEC_THEORA=1
 
-	# TMNT Arena version
+	# Turtle Arena version
 	VERSION=0.2
 
-	# TMNT Arena currently use MISSIONPACK game/cgame and baseq3-based ui
+	# Turtle Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"
-	SERVERBIN=tmntarena-ded
-	CLIENTBIN=tmntarena
+	SERVERBIN=turtlearena-ded
+	CLIENTBIN=turtlearena
 	BASEGAME=base
 	BASEGAME_FLAGS = -DMISSIONPACK -DTMNTHUD
 	MISSIONPACK_FLAGS= -DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
@@ -271,7 +271,7 @@ else # END QUAKE3
 	endif
 
 	ifndef COPYDIR
-	COPYDIR="/usr/local/games/tmntarena"
+	COPYDIR="/usr/local/games/turtlearena"
 	endif
 	ifndef BUILD_DIR
 	BUILD_DIR=build
@@ -1134,7 +1134,7 @@ endif #SunOS
 
 TARGETS =
 
-ifeq ($(IOQ3TMNT),1)
+ifeq ($(IOQ3TURTLE),1)
   CLIENT_CFLAGS+=$(ENGINE_CFLAGS)
   SERVER_CFLAGS+=$(ENGINE_CFLAGS)
 endif
@@ -1363,7 +1363,7 @@ targets: makedirs
 ifeq ($(QUAKE3),1)
 	@echo "Building ioquake3 in $(B):"
 else
-	@echo "Building TMNT Arena in $(B):"
+	@echo "Building Turtle Arena in $(B):"
 endif
 ifdef IOQ3_REVISION
 # IOQ3_REVISION can be defined to keep trace of the ioquake3 supported revision
