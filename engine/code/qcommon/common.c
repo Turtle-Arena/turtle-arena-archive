@@ -43,7 +43,7 @@ int demo_protocols[] =
 
 #define MIN_DEDICATED_COMHUNKMEGS 1
 #define MIN_COMHUNKMEGS		56
-#ifdef TMNT // Turtle Man: Some maps need more then 64 Megs of RAM to load.
+#ifdef TMNT // ZTM: Some maps need more then 64 Megs of RAM to load.
 #define DEF_COMHUNKMEGS		76
 #else
 #define DEF_COMHUNKMEGS		64
@@ -302,7 +302,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 	va_end (argptr);
 
 	if (code != ERR_DISCONNECT
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
         && code != ERR_NEED_CD
 #endif
         )
@@ -328,7 +328,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 		FS_PureServerSetLoadedPaks("", "");
 		com_errorEntered = qfalse;
 		longjmp (abortframe, -1);
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	} else if ( code == ERR_NEED_CD ) {
 		SV_Shutdown( "Server didn't have CD" );
 		if ( com_cl_running && com_cl_running->integer ) {
@@ -2490,7 +2490,7 @@ void Com_GameRestart_f(void)
 	Com_GameRestart(0, qtrue);
 }
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 #ifndef STANDALONE
 
 // TTimo: centralizing the cl_cdkey stuff after I discovered a buffer overflow problem with the dedicated server version
@@ -2612,7 +2612,7 @@ out:
 #endif
 
 #endif // STANDALONE
-#endif // IOQUAKE3 // Turtle Man: CDKEY
+#endif // IOQUAKE3 // ZTM: CDKEY
 
 static void Com_DetectAltivec(void)
 {
@@ -2738,7 +2738,7 @@ void Com_Init( char *commandLine ) {
 	com_altivec = Cvar_Get ("com_altivec", "1", CVAR_ARCHIVE);
 	com_maxfps = Cvar_Get ("com_maxfps", "85", CVAR_ARCHIVE);
 #ifndef NOBLOOD
-#ifdef NOTRATEDM // Turtle Man: Default to no blood.
+#ifdef NOTRATEDM // ZTM: Default to no blood.
 	com_blood = Cvar_Get ("com_blood", "0", CVAR_ARCHIVE);
 #else
 	com_blood = Cvar_Get ("com_blood", "1", CVAR_ARCHIVE);
@@ -2900,7 +2900,7 @@ void Com_WriteConfiguration( void ) {
 	// not needed for dedicated
 #ifndef DEDICATED
 	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 #ifndef STANDALONE
 	if(!Cvar_VariableIntegerValue("com_standalone"))
 	{
@@ -2911,7 +2911,7 @@ void Com_WriteConfiguration( void ) {
 		}
 	}
 #endif
-#endif // IOQUAKE3 // Turtle Man: CDKEY
+#endif // IOQUAKE3 // ZTM: CDKEY
 #endif
 }
 

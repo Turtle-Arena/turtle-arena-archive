@@ -582,7 +582,7 @@ void DropPortalSource( gentity_t *player ) {
 }
 #endif
 #ifdef TMNTENTSYS // MISC_OBJECT
-// Turtle Man: TODO: There should also be func_* for brushes that acts mostly the same?
+// ZTM: TODO: There should also be func_* for brushes that acts mostly the same?
 
 /*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath
 "model"		arbitrary .md3 file to display
@@ -630,7 +630,7 @@ void misc_object_pain(gentity_t *self, gentity_t *attacker, int damage)
 		//G_Printf("    anim = OBJECT_DEATH1\n");
 	}
 
-	// Turtle Man: TODO: Limit how soon to call paintarget again? Use pain_debounce?
+	// ZTM: TODO: Limit how soon to call paintarget again? Use pain_debounce?
 	if ( self->paintarget )
 	{
 		G_UseTargets2(self, attacker, self->paintarget);
@@ -644,7 +644,7 @@ void misc_object_respawn(gentity_t *self)
 	G_Printf("misc_object_respawn: respawning...\n");
 	if (self->activator->spawnflags & MOBJF_KNOCKBACK)
 	{
-		// Turtle Man: FIXME: Not right if "self" moved from origin.
+		// ZTM: FIXME: Not right if "self" moved from origin.
 
 		// MOBJ_KNOCKBACK doesn't work with respawning if...
 		//  clone spawning or on train? (or other moving brush?)
@@ -794,7 +794,7 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 			G_SetOrigin( ent, tr.endpos );
 		}
 
-		// Turtle Man: TODO: Have gravity/pushable spawnflag?
+		// ZTM: TODO: Have gravity/pushable spawnflag?
 		//ent->s.pos.trType = TR_GRAVITY;
 		//ent->s.pos.trTime = level.time;
 	}
@@ -856,7 +856,7 @@ void SP_misc_object( gentity_t *ent ) {
 	// Use a animation config file!
 	{
 		char filename[MAX_QPATH];
-		bg_objectcfg_t objectcfg; // Turtle Man: TODO: Move to gentity_s ?
+		bg_objectcfg_t objectcfg; // ZTM: TODO: Move to gentity_s ?
 
 		Com_Memset(&objectcfg, 0, sizeof (objectcfg));
 

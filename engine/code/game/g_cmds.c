@@ -68,7 +68,7 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
 			cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime)/60000,
 			scoreFlags, g_entities[level.sortedClients[i]].s.powerups, accuracy, 
-#ifdef TMNTWEAPONS // Turtle Man: FIXME: Completely remove. See postgame
+#ifdef TMNTWEAPONS // ZTM: FIXME: Completely remove. See postgame
 			0,
 			0,
 			0,

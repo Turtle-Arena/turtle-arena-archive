@@ -552,8 +552,8 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[3] = color[3];
 		UI_DrawProportionalString2( x, y, str, color, sizeScale, uis.charsetProp );
 
-#ifdef TMNT // Turtle Man: Main menu text drawing.
-        // Turtle Man: hack-ish thing to do?...
+#ifdef TMNT // ZTM: Main menu text drawing.
+        // ZTM: hack-ish thing to do?...
 		drawcolor[0] = text_color_highlight[0];
 		drawcolor[1] = text_color_highlight[1];
 		drawcolor[2] = text_color_highlight[2];
@@ -800,7 +800,7 @@ qboolean UI_IsFullscreen( void ) {
 	return qfalse;
 }
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 static void NeedCDAction( qboolean result ) {
 	if ( !result ) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, "quit\n" );
@@ -826,7 +826,7 @@ void UI_SetActiveMenu( uiMenuCommand_t menu ) {
 	case UIMENU_MAIN:
 		UI_MainMenu();
 		return;
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	case UIMENU_NEED_CD:
 		UI_ConfirmMenu( "Insert the CD", 0, NeedCDAction );
 		return;
@@ -1007,7 +1007,7 @@ void UI_Cache_f( void ) {
 //	UI_LoadConfig_Cache();
 //	UI_SaveConfigMenu_Cache();
 	UI_BotSelectMenu_Cache();
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	UI_CDKeyMenu_Cache();
 #endif
 	UI_ModsMenu_Cache();
@@ -1075,7 +1075,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		return qtrue;
 	}
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	if ( Q_stricmp (cmd, "ui_cdkey") == 0 ) {
 		UI_CDKeyMenu_f();
 		return qtrue;

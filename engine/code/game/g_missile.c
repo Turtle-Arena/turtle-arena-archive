@@ -111,7 +111,7 @@ static void G_Missile_Die(gentity_t * ent, gentity_t * inflictor, gentity_t * at
 	ent->think = G_ExplodeMissile;
 }
 
-// Turtle Man: XREAL allows for missile to use accel, but they added TR_ACCELERATION
+// ZTM: XREAL allows for missile to use accel, but they added TR_ACCELERATION
 //              so it makes sense...
 void G_SetMissileVelocity(gentity_t *bolt, vec3_t dir, int projnum)
 {
@@ -120,7 +120,7 @@ void G_SetMissileVelocity(gentity_t *bolt, vec3_t dir, int projnum)
 	velocity = bg_projectileinfo[projnum].speed;
 	velocity += random() * bg_projectileinfo[projnum].spdRndAdd;
 
-#if 0 // Turtle Man: Ug, Q3 doesn't have TR_ACCELERATION ...
+#if 0 // ZTM: Ug, Q3 doesn't have TR_ACCELERATION ...
 	//XREAL: if (g_rocketAcceleration.integer)
 	if (acceleration)
 	{
@@ -307,7 +307,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 	}
 
 	spread = bg_projectileinfo[projnum].spread;
-#if 0 // Turtle Man: WONTFIX: Only for machinegun
+#if 0 // ZTM: WONTFIX: Only for machinegun
 	if (g_gametype.integer == GT_TEAM)
 	{
 		damage = bg_projectileinfo[projnum].damage * 0.7;
@@ -506,7 +506,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 #endif
 					{
 						G_Damage( traceEnt, self, self,
-#if 1 // Turtle Man: Knockback in direction projectile was moving
+#if 1 // ZTM: Knockback in direction projectile was moving
 							dir,
 #else
 							forward,
@@ -521,7 +521,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 						}
 #endif
 
-						// Turtle Man: TODO: Splash damage?
+						// ZTM: TODO: Splash damage?
 					}
 				}
 
@@ -658,7 +658,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		// Limit bounces
 		bolt->s.modelindex2 = bg_projectileinfo[projnum].maxBounces;
 
-		// Turtle Man: Shootable missiles, taken from XREAL
+		// ZTM: Shootable missiles, taken from XREAL
 		if (bg_projectileinfo[projnum].shootable)
 		{
 			// Make the projectile shootable
@@ -675,7 +675,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		}
 
 		// Taken from Q3's fire_prox;
-		// Turtle Man: Used by prox mines so that if that player changes teams the mines
+		// ZTM: Used by prox mines so that if that player changes teams the mines
 		//        don't "change" teams as well (or something...).
 		//id: FIXME: we prolly wanna abuse another field
 		bolt->s.generic1 = self->client->sess.sessionTeam;
@@ -1422,7 +1422,7 @@ void G_RunMissile( gentity_t *ent ) {
 	}
 #if defined MISSIONPACK || defined TMNTWEAPSYS
 	// if the prox mine wasn't yet outside the player body
-#ifdef TMNTWEAPSYS // Turtle Man: TODO: Add a option to/not-to damage owner?
+#ifdef TMNTWEAPSYS // ZTM: TODO: Add a option to/not-to damage owner?
 	if (qfalse && !(ent->count & 1))
 #else
 	if (ent->s.weapon == WP_PROX_LAUNCHER && !ent->count)

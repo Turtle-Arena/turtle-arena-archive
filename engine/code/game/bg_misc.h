@@ -69,7 +69,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CS_MESSAGE				3		// from the map worldspawn's message field
 #define	CS_MOTD					4		// g_motd string for server message of the day
 /* bg_public.h
-	Turtle Man: NOTE: Server exspects CS_WARMUP as 5.
+	ZTM: NOTE: Server exspects CS_WARMUP as 5.
 */
 #define	CS_WARMUP				5		// server time when the match will be restarted
 #define	CS_SCORES1				6
@@ -136,7 +136,7 @@ typedef enum {
 #ifdef MISSIONPACK_HARVESTER
 	GT_HARVESTER,
 #endif
-#if 0 // Turtle Man: In the gametype name arrays there is a Team Tournament.
+#if 0 // ZTM: In the gametype name arrays there is a Team Tournament.
 	GT_TEAMTOURNAMENT,
 #endif
 	GT_MAX_GAME_TYPE
@@ -382,7 +382,7 @@ typedef enum {
 	PW_HASTE, // PW_SPEED: More Speed
 	PW_INVIS, // Foot Tech powerup?
 
-	// Turtle Man: TODO: Change flight to NiGHTS mode...
+	// ZTM: TODO: Change flight to NiGHTS mode...
 	PW_FLIGHT,		// Allow player to fly around the level.
 
 	PW_INVUL,		// New invulerrability
@@ -428,7 +428,7 @@ typedef enum {
 /*
 	No item in bg_itemlist can use the same HI_* tag.
 	There can be a max of 16 holdable items, see MAX_HOLDABLE.
-	~Turtle Man Nov 3, 2008
+	~ZTM Nov 3, 2008
 */
 #endif
 typedef enum {
@@ -466,13 +466,13 @@ typedef enum {
 	HI_FIRESHURIKEN,
 	HI_LASERSHURIKEN,
 
-	// Turtle Man: TODO: Make the grapple a holdable item?
+	// ZTM: TODO: Make the grapple a holdable item?
 	//       So that players can use the grapple and a weapon at the same time?
 	// 20090316: Have the grapple in the player's secondary hand like the flag?
 	// 20090409:   and use "use item" to fire?
 #endif
 
-#ifdef TMNTHOLDSYS // Turtle Man: Moved "out of the way"
+#ifdef TMNTHOLDSYS // ZTM: Moved "out of the way"
 	HI_PORTAL,
 #endif
 
@@ -490,7 +490,7 @@ typedef enum
 {
     WT_NONE, // Dummy type
 
-	// Turtle Man: NOTE: Gauntlet code hasn't been tested...
+	// ZTM: NOTE: Gauntlet code hasn't been tested...
 	WT_GAUNTLET, // Uses primary hand only
     WT_GUN, // One gun, both hands.
 	WT_MELEE,
@@ -544,7 +544,7 @@ typedef enum {
 	WP_BAMBOO, // Bamboo [bo type]
 
     // \guns
-	// Turtle Man: TODO: Finish WP_GUN. It was going to be a chaingun like in Mutant Melee,
+	// ZTM: TODO: Finish WP_GUN. It was going to be a chaingun like in Mutant Melee,
 	//                   but I think I will make it a tri-blaster instead~
 	WP_GUN,
 	WP_PLASMAGUN, //WP_ELECTRIC_LAUNCHER, // Federation? or Tri? // Currently just Q3 WP_PLASMAGUN.
@@ -828,7 +828,7 @@ typedef struct
 #else
 #define MAX_BG_PROJ 32
 #define MAX_BG_WEAPONS 32
-#define MAX_BG_WEAPON_GROUPS 16 // Turtle Man: WONTFIX: Player's are limited to 16 weapons.
+#define MAX_BG_WEAPON_GROUPS 16 // ZTM: WONTFIX: Player's are limited to 16 weapons.
 #endif
 extern bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 extern bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
@@ -1104,8 +1104,8 @@ typedef enum {
 	// Place default weapons somewhere on there person while there not used.
 	// TORSO_***DEFAULT_SECONDARY for Don should be
 	//  switching to/from two handed Bo to using one hand.
-	// Turtle Man: NOTE: Currently first half to going to weapon spot, second half is moving back.
-	// Turtle Man: TODO: Should I split into 2 animations?
+	// ZTM: NOTE: Currently first half to going to weapon spot, second half is moving back.
+	// ZTM: TODO: Should I split into 2 animations?
 	TORSO_PUTDEFAULT_BOTH,
 	TORSO_PUTDEFAULT_PRIMARY,
 	TORSO_PUTDEFAULT_SECONDARY,
@@ -1195,7 +1195,7 @@ typedef enum {
 
 	MAX_ANIMATIONS,
 
-#ifdef IOQ3ZTM // Turtle Man: There is no "MAX_ANIMATIONS" animation
+#ifdef IOQ3ZTM // ZTM: There is no "MAX_ANIMATIONS" animation
 	LEGS_BACKCR = MAX_ANIMATIONS,
 #else
 	LEGS_BACKCR,
@@ -1265,8 +1265,8 @@ typedef enum
 	OBJECT_DEAD2,
 	OBJECT_DEAD3,
 
-	OBJECT_LAND, // Turtle Man: TODO: misc_object hit ground.
-	OBJECT_PAIN, // Turtle Man: TODO: "Pain" animation of misc_object with no health (Dead).
+	OBJECT_LAND, // ZTM: TODO: misc_object hit ground.
+	OBJECT_PAIN, // ZTM: TODO: "Pain" animation of misc_object with no health (Dead).
 
 #ifdef TMNTNPCSYS
 	// Animations only used by NPCs
@@ -1283,7 +1283,7 @@ typedef enum
 	MAX_MISC_OBJECT_ANIMATIONS
 } miscObjectAnim_t;
 
-// Turtle Man: TODO: Sounds like Jedi Knight 2's animsounds.cfg, see Sounds_Parse
+// ZTM: TODO: Sounds like Jedi Knight 2's animsounds.cfg, see Sounds_Parse
 //   Only cgame and ui need this, game doesn't use sounds.
 #define MAX_RAND_SOUNDS 5
 typedef struct
@@ -1317,7 +1317,7 @@ typedef struct animation_s {
 #define	ANIM_TOGGLEBIT		128
 
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-// Turtle Man: This was moved to BG as TMNTWEAPSYS_1 needs it in game
+// ZTM: This was moved to BG as TMNTWEAPSYS_1 needs it in game
 
 // when changing animation, set animationTime to frameTime + lerping time
 // The current lerp will finish out, then it will lerp to the new animation
@@ -1340,7 +1340,7 @@ typedef struct {
 	int			animationTime;		// time when the first frame of the animation will be exact
 } lerpFrame_t;
 
-// Turtle Man: for time use;
+// ZTM: for time use;
 // * cgame - cg.time
 // * ui - dp_realtime
 // * game - level.time
@@ -1465,7 +1465,7 @@ typedef struct
 	float speed;
 	int lerpframes; // Use raw frames, don't interperate them.
 
-	// Turtle Man: TODO: For NPCs
+	// ZTM: TODO: For NPCs
 	// Speed control, some characters are faster then others.
 	//int   max_speed;
 	//float accelerate_speed; // Replaces pm_accelerate; default 10.0f
@@ -1497,7 +1497,7 @@ typedef enum {
 	PM_DEAD,		// no acceleration or turning, but free falling
 	PM_FREEZE,		// stuck in place with no control
 	/* bg_public.h
-		Turtle Man: NOTE: Client (not cgame) exspects PM_INTERMISSION as 5 and
+		ZTM: NOTE: Client (not cgame) exspects PM_INTERMISSION as 5 and
 			PM_SPINTERMISSION as 6.
 	*/
 	PM_INTERMISSION,	// no movement or status bar
@@ -1515,7 +1515,7 @@ typedef enum {
 } weaponstate_t;
 
 #ifdef TMNTNPCSYS
-// Turtle Man: Flags for general NPC effects.
+// ZTM: Flags for general NPC effects.
 typedef enum
 {
 	NPCF_NODROPWEAPON	= 1, // Don't drop weapon when killed.
@@ -1530,7 +1530,7 @@ typedef enum
 
 } npcflag_e;
 
-// Turtle Man: General death types.
+// ZTM: General death types.
 typedef enum
 {
 	NPCD_NONE, // Stays there doing nothing. Forever.
@@ -1546,7 +1546,7 @@ typedef struct
 {
 	char classname[MAX_NPCNAME];
 	char model[MAX_QPATH];
-	int weaponGroup; // Turtle Man: weapon group to hold/use
+	int weaponGroup; // ZTM: weapon group to hold/use
 	int flags; // see npcflag_e
 	int deathType; // see npcDeath_e
 	int health;
@@ -1860,7 +1860,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 //
 typedef enum {
 	/* bg_public.h
-		Turtle Man: NOTE: Botlib exspects theses five in this order.
+		ZTM: NOTE: Botlib exspects theses five in this order.
 	*/
 	ET_GENERAL,
 	ET_PLAYER,

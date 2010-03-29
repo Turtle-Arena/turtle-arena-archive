@@ -7,7 +7,7 @@ static const struct {
   unsigned char	 pixel_data[32 * 32 * 4 + 1];
 } CLIENT_WINDOW_ICON = {
   32, 32, 4,
-#ifdef TMNT // Turtle Man: Changed client window icon! (note to self: Save image as .c not .h ...)
+#ifdef TMNT // ZTM: Changed client window icon! (note to self: Save image as .c not .h ...)
   "\1\1\0\274\0\0\0\206\0\0\0C\0\0\0\13\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
   "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
   "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"

@@ -733,7 +733,7 @@ static void CG_PlasmaTrail( centity_t *cent, const weaponInfo_t *wi )
 
 #ifdef TMNTWEAPSYS
 	{
-		// Turtle Man: NOTE: Can't get really flash color
+		// ZTM: NOTE: Can't get really flash color
 		//                     as it is in weaponInfo_t
 		vec3_t flashDlightColor = {0.6, 0.6, 1.0};
 		re->shaderRGBA[0] = flashDlightColor[0] * 63;
@@ -911,7 +911,7 @@ static void CG_SparkTrail( centity_t *ent, const projectileInfo_t *wi )
 		// use the optimized local entity add
 		smoke->leType = LE_SCALE_FADE;
 
-		// Turtle Man: add dynamic light
+		// ZTM: add dynamic light
 		if ( wi->missileDlight*0.66f > 0 ) {
 			smoke->light = wi->missileDlight*0.66f; // 2/3 size
 			VectorCopy(wi->missileDlightColor, smoke->lightColor);
@@ -1578,7 +1578,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	if ( item->giType == IT_HOLDABLE ) {
 		CG_RegisterHoldable( item->giTag );
 	}
-	// Turtle Man: Cache shurikens
+	// ZTM: Cache shurikens
 	if (item->giType == IT_PERSISTANT_POWERUP
 		&& item->giTag == PW_AMMOREGEN)
 	{
@@ -1828,7 +1828,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 
 	// add the impact flare if it hit something
 	if ( trace.fraction < 1.0 ) {
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Support Q3 lightning gun
+#ifdef TMNTWEAPSYS // ZTM: FIXME: Support Q3 lightning gun
 		// PT_LIGHTNING
 		// CG_MissileHitWall (Exposion only, no sounds or wallmarks.)
 #endif
@@ -2032,7 +2032,7 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups )
 //
 // CG_AddWeaponTrail
 //
-// Turtle Man: TODO: Add weapon trails!
+// ZTM: TODO: Add weapon trails!
 //
 /* Idea
 Draw a shader from bottom of weapon attack to top of weapon attack,
@@ -2041,7 +2041,7 @@ Allow the shader to be per-weapon
 */
 void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 {
-#if 0 // Turtle Man: Disabled
+#if 0 // ZTM: Disabled
 	weapon_t weaponNum;
 	refEntity_t trail;
 	vec3_t		angles, dir;
@@ -2067,7 +2067,7 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 	// show the trail model
 	memset( &trail, 0, sizeof(trail) );
 	trail.hModel = cgs.media.flagFlapModel;
-	// Turtle Man: TODO?: Per-weapon trail shader?
+	// ZTM: TODO?: Per-weapon trail shader?
 	trail.customShader = cgs.media.weaponTrailShader;
 	VectorCopy( gun->lightingOrigin, trail.lightingOrigin );
 	trail.shadowPlane = gun->shadowPlane;
@@ -2080,7 +2080,7 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 		VectorCopy( cent->currentState.pos.trDelta, dir );
 		// add gravity
 		//dir[2] += 100;
-		// Turtle Man: Up not down.
+		// ZTM: Up not down.
 		dir[2] -= 100;
 
 		VectorNormalize( dir );
@@ -2405,7 +2405,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	// set custom shading for railgun refire rate
 	if ( ps ) {
 		if (
-#ifndef TMNTWEAPSYS // Turtle Man: Do it for all weapons.
+#ifndef TMNTWEAPSYS // ZTM: Do it for all weapons.
 			cg.predictedPlayerState.weapon == WP_RAILGUN &&
 #endif
 			cg.predictedPlayerState.weaponstate == WEAPON_FIRING )
@@ -2445,7 +2445,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	gun.hModel = weapon->weaponModel;
 #endif
 #ifdef TMNTWEAPSYS
-	// Turtle Man: Allow different model to be used in each hand!
+	// ZTM: Allow different model to be used in each hand!
 	gun_left.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[1]].weaponModel;
 	if (!gun.hModel && !gun_left.hModel) {
 		return;
@@ -2539,7 +2539,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 		CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
 
-		// Turtle Man: Add weapon trail
+		// ZTM: Add weapon trail
 		CG_AddWeaponTrail(cent, &gun, HAND_PRIMARY);
 	}
 
@@ -2563,7 +2563,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 		CG_AddWeaponWithPowerups( &gun_left, cent->currentState.powerups );
 
-		// Turtle Man: Add weapon trail
+		// ZTM: Add weapon trail
 		CG_AddWeaponTrail(cent, &gun_left, HAND_SECONDARY);
 	}
 
@@ -2577,7 +2577,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 #ifdef TMNTWEAPSYS
 	// Even if no barrel check for firingStoppedSound
-	// Turtle Man: FIXME: Both weapons share the same barrelSpinAngle/firingStoppedSound
+	// ZTM: FIXME: Both weapons share the same barrelSpinAngle/firingStoppedSound
 	//                      (Bad for nunchucks?)
 	barrelSpinAngle = CG_MachinegunSpinAngle( cent );
 #endif
@@ -2612,7 +2612,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #ifdef TMNTWEAPSYS
 		barrel.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].barrelModel;
 
-		// Turtle Man: TESTME: In the UI there are checks for gauntlet and BFG
+		// ZTM: TESTME: In the UI there are checks for gauntlet and BFG
 		//                        to spin pitch, but not here?
 		// CHECKED: It should always be BS_ROLL in Q3, the `tag_barrel's are
 		//		setup that way in the models.
@@ -2698,7 +2698,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 		if (!flash.hModel) {
 #ifdef IOQ3ZTM
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Support secondary weapon!
+#ifdef TMNTWEAPSYS // ZTM: FIXME: Support secondary weapon!
 			if (i == 0)
 #endif
 			{
@@ -2714,7 +2714,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		angles[ROLL] = crandom() * 10;
 		AnglesToAxis( angles, flash.axis );
 
-#ifdef TMNTWEAPSYS // Turtle Man: Do it for all weapons...
+#ifdef TMNTWEAPSYS // ZTM: Do it for all weapons...
 		// colorize the flash
 #else
 		// colorize the railgun blast
@@ -2744,7 +2744,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 		if ( ps || cg.renderingThirdPerson ||
 			cent->currentState.number != cg.predictedPlayerState.clientNum ) {
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Support secondary weapon!
+#ifdef TMNTWEAPSYS // ZTM: FIXME: Support secondary weapon!
 			if (i == 0)
 #endif
 			{
@@ -2845,7 +2845,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 
 			cent = &cg_entities[ps->clientNum];
 
-			// Turtle Man: FIXME: Support secondary weapon!
+			// ZTM: FIXME: Support secondary weapon!
 			// Use default flashOrigin when no flash model.
 			VectorCopy(cent->lerpOrigin, cent->pe.flashOrigin);
 			cent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
@@ -3321,7 +3321,7 @@ void CG_FireWeapon( centity_t *cent ) {
 	// append the flash to the weapon model
 	cent->muzzleFlashTime = cg.time;
 
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Add a flag for this?
+#ifdef TMNTWEAPSYS // ZTM: FIXME: Add a flag for this?
 						// The flag would make it so that when holding the attack
 						//   button the flash sound and brass ecj would happen only on
 						//   the first press.
@@ -3567,7 +3567,7 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 }
 #endif
 
-#ifndef TMNTWEAPSYS // Turtle Man: FIXME: Remerged the two version of CG_MissileHitWall...
+#ifndef TMNTWEAPSYS // ZTM: FIXME: Remerged the two version of CG_MissileHitWall...
 /*
 =================
 CG_MissileHitWall
@@ -3866,7 +3866,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #endif
 	}
 
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Each weapon in the group has its own!
+#ifdef TMNTWEAPSYS // ZTM: FIXME: Each weapon in the group has its own!
 	mark = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkShader;
 	radius = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkRadius;
 #endif
@@ -4018,7 +4018,7 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 	{
 		//CG_MeleeHit(origin);
 
-#if 0 // Turtle Man: TODO: Only when hit entity that take_damage and not client.
+#if 0 // ZTM: TODO: Only when hit entity that take_damage and not client.
 		mod = cgs.media.dishFlashModel;
 		isSprite = qtrue;
 		// Smaller explosion
@@ -4044,7 +4044,7 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 	}
 #endif
 
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Each weapon in the group has its own!
+#ifdef TMNTWEAPSYS // ZTM: FIXME: Each weapon in the group has its own!
 	mark = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkShader;
 	radius = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkRadius;
 

@@ -1530,7 +1530,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 	bot_goal_t goal;
 	char netname[MAX_MESSAGE_SIZE];
 	char *nearbyitems[] = {
-#ifdef TMNTWEAPONS // Turtle Man: FIXME: How is this data used?
+#ifdef TMNTWEAPONS // ZTM: FIXME: How is this data used?
 		"Fists",
 		"Katanas",
 		"Daisho",

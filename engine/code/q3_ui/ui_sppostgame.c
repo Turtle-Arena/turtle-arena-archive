@@ -640,7 +640,7 @@ void UI_SPPostgameMenu_f( void ) {
 	// process award stats and prepare presentation data
 	awardValues[AWARD_ACCURACY] = atoi( UI_Argv( 3 ) );
 #ifdef TMNTWEAPONS
-	// Turtle Man: TODO: I was lazy at removal, so 0 is passed as the AWARD_IMPRESSIVE, etc.
+	// ZTM: TODO: I was lazy at removal, so 0 is passed as the AWARD_IMPRESSIVE, etc.
 #else
 	awardValues[AWARD_IMPRESSIVE] = atoi( UI_Argv( 4 ) );
 	awardValues[AWARD_EXCELLENT] = atoi( UI_Argv( 5 ) );

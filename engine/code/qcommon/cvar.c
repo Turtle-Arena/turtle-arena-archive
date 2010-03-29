@@ -864,7 +864,7 @@ void Cvar_WriteVariables(fileHandle_t f)
 
 	for (var = cvar_vars; var; var = var->next)
 	{
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 		if(!var->name || Q_stricmp( var->name, "cl_cdkey" ) == 0)
 			continue;
 #else

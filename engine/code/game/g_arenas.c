@@ -108,7 +108,7 @@ void UpdateTournamentInfo( void ) {
 		} else {
 			perfect = 0;
 		}
-#ifdef TMNTWEAPONS // Turtle Man: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
+#ifdef TMNTWEAPONS // ZTM: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
 			0, 0, player->client->ps.persistant[PERS_DEFEND_COUNT],
 			player->client->ps.persistant[PERS_ASSIST_COUNT], 0, player->client->ps.persistant[PERS_SCORE],
@@ -121,7 +121,7 @@ void UpdateTournamentInfo( void ) {
 #endif
 #else
 		perfect = ( level.clients[playerClientNum].ps.persistant[PERS_RANK] == 0 && player->client->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
-#ifdef TMNTWEAPONS // Turtle Man: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
+#ifdef TMNTWEAPONS // ZTM: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
 			0, 0,
 			0, player->client->ps.persistant[PERS_SCORE],

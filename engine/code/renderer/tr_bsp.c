@@ -125,7 +125,7 @@ static	void R_ColorShiftLightingBytes( byte in[4], byte out[4] ) {
 	out[3] = in[3];
 }
 
-#ifdef IOQ3ZTM // EXTERNAL_LIGHTMAPS // Turtle Man: Load external lightmaps, as well as internal ones.
+#ifdef IOQ3ZTM // EXTERNAL_LIGHTMAPS // ZTM: Load external lightmaps, as well as internal ones.
 /*
 ===============
 R_LoadLightmaps & LightmapNameCompare
@@ -134,7 +134,7 @@ If it doesnt find any external lightmaps then it will fall back to q3
 style of lightmapping. Thanks to Tr3B for coding in external lightmapping
 for Xreal and making this easy. :) ENC
 
-Turtle Man: Patch for ioquake3 made by "Jeffro11" (website says "Jeff Attwood")
+ZTM: Patch for ioquake3 made by "Jeffro11" (website says "Jeff Attwood")
 	Using code from XReal ( http://ioquake.org/forums/viewtopic.php?f=2&t=100 )
 	http://theone.lithfaq.com/Engine/ioex/External%20lightmaps.patch
 	Fri Feb 13, 2009
@@ -196,7 +196,7 @@ static void R_LoadLightmaps(lump_t * l/*, const char *bspName*/)
 	char            mapName[MAX_QPATH];
 	char          **lightmapFiles;
 	int             numLightmaps;
-	const char *bspName = s_worldData.name; // Turtle Man: Get map .bsp filename
+	const char *bspName = s_worldData.name; // ZTM: Get map .bsp filename
 
 	len = l->filelen;
 

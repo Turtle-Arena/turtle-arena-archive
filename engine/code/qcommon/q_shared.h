@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // A user mod should never modify this file
 
 #ifdef STANDALONE
-  #ifdef TMNT // Turtle Man: Changed game info defines.
+  #ifdef TMNT // ZTM: Changed game info defines.
     #define PRODUCT_NAME			"Turtle Arena"
     #define BASEGAME			"base"
     #define CLIENT_WINDOW_TITLE     	"Turtle Arena"
@@ -281,7 +281,7 @@ typedef enum {
 	ERR_DROP,					// print to console and disconnect from game
 	ERR_SERVERDISCONNECT,		// don't kill server
 	ERR_DISCONNECT,				// client disconnected from the server
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	ERR_NEED_CD					// pop up the need-cd dialog
 #endif
 } errorParm_t;
@@ -640,7 +640,7 @@ float AngleDelta ( float angle1, float angle2 );
 float AngleBetweenVectors(const vec3_t a, const vec3_t b);
 #endif
 
-#ifndef BSPC // Turtle Man: BSP2
+#ifndef BSPC // ZTM: BSP2
 qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
 #endif
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
@@ -671,7 +671,7 @@ void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 
 void	COM_BeginParseSession( const char *name );
 int		COM_GetCurrentParseLine( void );
-#ifndef BSPC // Turtle Man: BSP2
+#ifndef BSPC // ZTM: BSP2
 char	*COM_Parse( char **data_p );
 #endif
 char	*COM_ParseExt( char **data_p, qboolean allowLineBreak );
@@ -911,7 +911,7 @@ PlaneTypeForNormal
 =================
 */
 
-#ifndef BSPC // Turtle Man: BSP2
+#ifndef BSPC // ZTM: BSP2
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
 #endif
 
@@ -1201,7 +1201,7 @@ typedef struct playerState_s {
 	int		meleeLinkTime; // Time left till will be unable to continue meleeAttack
 
 	// Melee damage hits, add more points for higher chain?
-	//    Turtle Man: TODO: Use for NiGHTS links count too?
+	//    ZTM: TODO: Use for NiGHTS links count too?
 	int		chain;
 	int		chainTime;
 
@@ -1441,7 +1441,7 @@ typedef enum _flag_status {
 #define SAY_TEAM	1
 #define SAY_TELL	2
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 #define CDKEY_LEN 16
 #define CDCHKSUM_LEN 2
 #endif

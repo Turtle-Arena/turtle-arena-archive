@@ -474,8 +474,8 @@ static void CG_MiscObject( centity_t *cent ) {
 
 #ifdef TMNTNPCSYS
 	// Add NPC's weapon
-	// Turtle Man: TODO: Can I reuse the player weapon drawing code?
-	// Turtle Man: TODO: Support secondary weapon model.
+	// ZTM: TODO: Can I reuse the player weapon drawing code?
+	// ZTM: TODO: Support secondary weapon model.
 	if (isNPC && s1->weapon > WP_NONE && s1->weapon < BG_NumWeaponGroups())
 	{
 		refEntity_t	weapon;
@@ -618,7 +618,7 @@ static void CG_Item( centity_t *cent ) {
 	cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
 #endif
 #ifdef IOQ3ZTM // If missing item model, use item sprite.
-	// Turtle Man: Not all of the items have models yet, so use the sprite!
+	// ZTM: Not all of the items have models yet, so use the sprite!
 	if ( (!cg_items[es->modelindex].models[0] || cg_simpleItems.integer) && item->giType != IT_TEAM )
 #else
 	if ( cg_simpleItems.integer && item->giType != IT_TEAM )
@@ -1586,7 +1586,7 @@ static void CG_TeamBase( centity_t *cent ) {
 			// show hit model
 			// modelindex2 is the health value of the obelisk
 			c = cent->currentState.modelindex2;
-#ifdef IOQ3ZTM // Turtle Man: Green damage orb
+#ifdef IOQ3ZTM // ZTM: Green damage orb
 			model.shaderRGBA[0] = c;
 			model.shaderRGBA[1] = 0xff;
 			model.shaderRGBA[2] = c;
@@ -1598,12 +1598,12 @@ static void CG_TeamBase( centity_t *cent ) {
 			model.shaderRGBA[3] = 0xff;
 #endif
 			//
-#ifdef TMNTDATA // Turtle Man: Use same origin as target.
+#ifdef TMNTDATA // ZTM: Use same origin as target.
 			model.origin[2] += 56;
 #endif
 			model.hModel = cgs.media.overloadEnergyModel;
 			trap_R_AddRefEntityToScene( &model );
-#ifdef TMNTDATA // Turtle Man: Use same origin as target.
+#ifdef TMNTDATA // ZTM: Use same origin as target.
 			model.origin[2] -= 56;
 #endif
 		}
@@ -1662,7 +1662,7 @@ static void CG_TeamBase( centity_t *cent ) {
 			}
 #ifdef IOQ3ZTM
 			if (c < 0.6f && (t & 100)) {
-				// Turtle Man: Smoke particles
+				// ZTM: Smoke particles
 				localEntity_t	*smoke;
 				vec3_t			up = {0, 0, 1};
 				vec3_t			origin;
@@ -1688,7 +1688,7 @@ static void CG_TeamBase( centity_t *cent ) {
 			cent->muzzleFlashTime = 0;
 			// modelindex2 is the health value of the obelisk
 			c = cent->currentState.modelindex2;
-#ifdef IOQ3ZTM // Turtle Man: Have the blue overload turn blue instead of red
+#ifdef IOQ3ZTM // ZTM: Have the blue overload turn blue instead of red
 			if ( cent->currentState.modelindex == TEAM_BLUE ) {
 				model.shaderRGBA[0] = c;
 				model.shaderRGBA[1] = c;

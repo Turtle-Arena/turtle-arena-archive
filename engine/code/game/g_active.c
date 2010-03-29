@@ -473,10 +473,10 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			max_combo = BG_MaxAttackCombo(&client->ps);
 			weap_delay = bg_weapongroupinfo[client->ps.weapon].weapon[0]->attackDelay;
 
-			// Turtle Man: TEST; with the accel changes (xyspeed) weap_delay is way too long.
+			// ZTM: TEST; with the accel changes (xyspeed) weap_delay is way too long.
 			weap_delay /= 2;
 
-			// Turtle Man: if running "weap_delay = 0"; like in LoZ:TP
+			// ZTM: if running "weap_delay = 0"; like in LoZ:TP
 			{
 				vec_t xyspeed = sqrt( client->ps.velocity[0] * client->ps.velocity[0] +
 					client->ps.velocity[1] * client->ps.velocity[1] );
@@ -612,7 +612,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			w = weapList[i];
 #endif
 
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Make ammo regen non-hardcoded. (AND make sense...)
+#ifdef TMNTWEAPSYS // ZTM: FIXME: Make ammo regen non-hardcoded. (AND make sense...)
 			// NOTE: max is wrong for WP_BFG: max should be 10 instead of 20
 			//                        WP_MACHINEGUN: max should be 50 instead of 40
 			//       inc is wrong for WP_MACHINEGUN: inc should be 4 instead of 5
@@ -883,7 +883,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				if (ammo == 0)
 				{
 					// Gun with no ammo. if someone picks it up, they will get default ammo.
-					// Turtle Man: TODO: Throw the weapon and have it fade alpha? (and can't pickup)
+					// ZTM: TODO: Throw the weapon and have it fade alpha? (and can't pickup)
 					break;
 				}
 
@@ -1389,7 +1389,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// Let go of the hook if we aren't firing
 	if (
-#ifdef TMNTWEAPSYS // Turtle Man: FIXME: This doesn't allow shurikens to be grappling.
+#ifdef TMNTWEAPSYS // ZTM: FIXME: This doesn't allow shurikens to be grappling.
 		bg_weapongroupinfo[client->ps.weapon].weapon[0]->proj->grappling
 #else
 		client->ps.weapon == WP_GRAPPLING_HOOK
@@ -1469,8 +1469,8 @@ void ClientThink_real( gentity_t *ent ) {
 
 #ifdef TMNTWEAPSYS
 	// Switch to single handed when close to CTF flag
-	//    Turtle Man: TODO: Single handed when by weapons too?
-	// Turtle Man: TODO: Don't allow CTF flag to be picked up while melee attacking?
+	//    ZTM: TODO: Single handed when by weapons too?
+	// ZTM: TODO: Don't allow CTF flag to be picked up while melee attacking?
 	{
 		qboolean holdingFlag = (client->ps.powerups[PW_BLUEFLAG]
 								|| client->ps.powerups[PW_REDFLAG]
@@ -1607,7 +1607,7 @@ void ClientThink_real( gentity_t *ent ) {
 	else {
 		pm.tracemask = MASK_PLAYERSOLID;
 	}
-#if 0 // #ifdef IOQ3ZTM // Turtle Man: TEST: Its shaky on slopes.
+#if 0 // #ifdef IOQ3ZTM // ZTM: TEST: Its shaky on slopes.
 	pm.trace = trap_TraceCapsule;
 #else
 	pm.trace = trap_Trace;
@@ -1727,7 +1727,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// check for respawning
 	if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
-#ifdef TMNTSP // Turtle Man: Single player death think
+#ifdef TMNTSP // ZTM: Single player death think
 		// wait for the attack button to be pressed
 		if (g_gametype.integer == GT_SINGLE_PLAYER)
 		{
@@ -1747,7 +1747,7 @@ void ClientThink_real( gentity_t *ent ) {
 				{
 					/*if (g_singlePlayer.integer && client->ps.pers[PERS_CONTINUES])
 					{
-						// Turtle Man: TODO: Open "Contiue?" menu/screen
+						// ZTM: TODO: Open "Contiue?" menu/screen
 					}
 					else */if (client->ps.persistant[PERS_CONTINUES])
 					{
@@ -1922,7 +1922,7 @@ void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t hea
 		legsAngles[ROLL] = 0.0f;
 	}
 
-	// Turtle Man: TODO: Add pain twitch ?
+	// ZTM: TODO: Add pain twitch ?
 	//CG_AddPainTwitch( cent, torsoAngles );
 
 	// pull the angles back out of the hierarchial chain
@@ -1948,7 +1948,7 @@ void G_PlayerAnimation( gentity_t *ent )
 		ent->client->pers.playercfg.animations,
 #else
 #error "ERROR: TMNTPLAYERSYS needs to be defined."
-		NULL, // Turtle Man: This must be valid!
+		NULL, // ZTM: This must be valid!
 #endif
 		legsAnim, level.time, ent->client->ps.powerups[PW_HASTE] ? 1.5f : 1.0f );
 
@@ -1957,7 +1957,7 @@ void G_PlayerAnimation( gentity_t *ent )
 		ent->client->pers.playercfg.animations,
 #else
 #error "ERROR: TMNTPLAYERSYS needs to be defined."
-		NULL, // Turtle Man: This must be valid!
+		NULL, // ZTM: This must be valid!
 #endif
 		ent->client->ps.torsoAnim, level.time, ent->client->ps.powerups[PW_HASTE] ? 1.5f : 1.0f );
 }

@@ -369,7 +369,7 @@ static cvarTable_t cvarTable[] = {
 #else
 	{ &cg_deferPlayers, "cg_deferPlayers", "1", CVAR_ARCHIVE },
 #endif
-#ifdef TMNT // Turtle Man: Draw team overlay info at the top right of the screen.
+#ifdef TMNT // ZTM: Draw team overlay info at the top right of the screen.
 	{ &cg_drawTeamOverlay, "cg_drawTeamOverlay", "1", CVAR_ARCHIVE },
 #else
 	{ &cg_drawTeamOverlay, "cg_drawTeamOverlay", "0", CVAR_ARCHIVE },
@@ -385,7 +385,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_buildScript, "com_buildScript", "0", 0 },	// force loading of all possible data amd error on failures
 	{ &cg_paused, "cl_paused", "0", CVAR_ROM },
 #ifndef NOBLOOD
-#ifdef NOTRATEDM // Turtle Man: Default to no blood.
+#ifdef NOTRATEDM // ZTM: Default to no blood.
 	{ &cg_blood, "com_blood", "0", CVAR_ARCHIVE },
 #else
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
@@ -1106,7 +1106,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.playerTeleportShader = trap_R_RegisterShader("playerTeleportEffect" );
 #endif
 
-#ifdef MISSIONPACK_HARVESTER // Turtle Man: THIS IS MISSIONPACK STUFF.
+#ifdef MISSIONPACK_HARVESTER // ZTM: THIS IS MISSIONPACK STUFF.
 #ifdef IOQ3ZTM
 	if ( cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
 #elif defined MISSIONPACK
@@ -1298,7 +1298,7 @@ static void CG_RegisterGraphics( void ) {
 #ifndef NOBLOOD
 	cgs.media.bloodExplosionShader = trap_R_RegisterShader( "bloodExplosion" );
 #endif
-#ifdef TMNTWEAPONS // Turtle Man: FIXME: TMNTWEAPSYS?
+#ifdef TMNTWEAPONS // ZTM: FIXME: TMNTWEAPSYS?
 	cgs.media.meleeHit1Shader = trap_R_RegisterShader( "meleeHit1" );
 	cgs.media.meleeHit2Shader = trap_R_RegisterShader( "meleeHit2" );
 	cgs.media.meleeHit3Shader = trap_R_RegisterShader( "meleeHit3" );
@@ -2339,7 +2339,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	// get the rendering configuration from the client system
 	trap_GetGlconfig( &cgs.glconfig );
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	// Turtle Man: Don't strech HUD, make it a cvar?
+	// ZTM: Don't strech HUD, make it a cvar?
 	cgs.screenXScaleFit = cgs.glconfig.vidWidth * (1.0/640.0);
 	cgs.screenYScaleFit = cgs.glconfig.vidHeight * (1.0/480.0);
 	if ( cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
@@ -2456,7 +2456,7 @@ int CG_ViewType(void)
 #ifdef ANALOG
 		if (cg.renderingThirdPerson)
 		{
-			// Turtle Man: Check if analog is on
+			// ZTM: Check if analog is on
 			if (cg_thirdPersonAnalog.integer)
 			{
 				return 2;

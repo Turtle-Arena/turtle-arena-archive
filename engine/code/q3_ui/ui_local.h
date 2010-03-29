@@ -49,7 +49,7 @@ extern vmCvar_t	ui_ctf_capturelimit;
 extern vmCvar_t	ui_ctf_timelimit;
 extern vmCvar_t	ui_ctf_friendly;
 
-#ifdef MISSIONPACK // Turtle Man: MP_GAMETYPES
+#ifdef MISSIONPACK // ZTM: MP_GAMETYPES
 extern vmCvar_t	ui_1flag_capturelimit;
 extern vmCvar_t	ui_1flag_timelimit;
 extern vmCvar_t	ui_1flag_friendly;
@@ -109,7 +109,7 @@ extern vmCvar_t	ui_server14;
 extern vmCvar_t	ui_server15;
 extern vmCvar_t	ui_server16;
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 extern vmCvar_t	ui_cdkey;
 extern vmCvar_t	ui_cdkeychecked;
 #endif
@@ -427,7 +427,7 @@ extern void UI_MultiplayerMenu( void );
 extern void UI_Multiplayer_Cache( void );
 #endif
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 //
 // ui_cdkey.c
 //
@@ -760,7 +760,7 @@ void			trap_LAN_ClearPing( int n );
 void			trap_LAN_GetPing( int n, char *buf, int buflen, int *pingtime );
 void			trap_LAN_GetPingInfo( int n, char *buf, int buflen );
 int				trap_MemoryRemaining( void );
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 void			trap_GetCDKey( char *buf, int buflen );
 void			trap_SetCDKey( char *buf );
 
@@ -771,7 +771,7 @@ void			trap_S_StopBackgroundTrack( void );
 void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
 #endif
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 void			trap_SetPbClStatus( int status );
 #endif
 

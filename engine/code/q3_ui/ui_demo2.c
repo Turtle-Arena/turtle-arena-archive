@@ -248,7 +248,7 @@ static void Demos_MenuInit( void ) {
 		
 		// strip extension
 		len = strlen( demoname );
-#ifdef IOQ3ZTM // Turtle Man: Backported from missionpack ui.
+#ifdef IOQ3ZTM // ZTM: Backported from missionpack ui.
 		if (!Q_stricmp(demoname +  len - strlen(extension), extension)) {
 			demoname[len-strlen(extension)-1] = '\0';
 		}

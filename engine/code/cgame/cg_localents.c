@@ -490,7 +490,7 @@ static void CG_AddExplosion( localEntity_t *ex ) {
 	// add the entity
 	trap_R_AddRefEntityToScene(ent);
 
-#ifndef IOQ3ZTM // Turtle Man: Anything glows!
+#ifndef IOQ3ZTM // ZTM: Anything glows!
 	// add the dlight
 	if ( ex->light ) {
 		float		light;
@@ -538,7 +538,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 
 	trap_R_AddRefEntityToScene( &re );
 
-#ifndef IOQ3ZTM // Turtle Man: Anything glows!
+#ifndef IOQ3ZTM // ZTM: Anything glows!
 	// add the dlight
 	if ( le->light ) {
 		float		light;
@@ -877,7 +877,7 @@ void CG_AddLocalEntities( void ) {
 			CG_FreeLocalEntity( le );
 			continue;
 		}
-#ifdef IOQ3ZTM // Turtle Man: Anything glows!
+#ifdef IOQ3ZTM // ZTM: Anything glows!
 		// add the dlight
 		if ( le->light ) {
 			float		light;

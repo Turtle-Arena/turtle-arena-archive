@@ -127,7 +127,7 @@ int G_SoundIndex( char *name ) {
 // type origin origin2 numparticles turb snum
 // "1   0.1 0.4 11.55  0.1 0.4 11.55  256  1  1"
 // str will be parsed and used in CG_NewParticleArea
-// Turtle Man: I have no idea what they all do.
+// ZTM: I have no idea what they all do.
 //
 int G_ParticleAreaIndex( char *str ) {
 	return G_FindConfigstringIndex (str, CS_PARTICLES, MAX_PARTICLES_AREAS, qtrue);
@@ -792,7 +792,7 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 	if (target == source)
 		return qfalse;
 
-	// Turtle Man: Target players, overload base, and NPCs.
+	// ZTM: Target players, overload base, and NPCs.
 	if (!target->client// && !target->takedamage
 #ifdef MISSIONPACK
 		&& !(source->client && target->pain == ObeliskPain
@@ -923,7 +923,7 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 		{
 			VectorSubtract(targetOrg, start, blipdir);
 
-			// Turtle Man: Disabled best angle (for now), always shoot closest?
+			// ZTM: Disabled best angle (for now), always shoot closest?
 			/* if (!besttarget || VectorLength(blipdir) < VectorLength(bestdir)) */
 			{
 				angle = AngleBetweenVectors(dir, blipdir);

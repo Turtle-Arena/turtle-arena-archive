@@ -801,7 +801,7 @@ static int CG_CalcViewValues( void ) {
 			cg.refdef.rdflags |= RDF_NOWORLDMODEL | RDF_HYPERSPACE;
 		}
 
-		// Turtle Man: TODO?: Perdiction.
+		// ZTM: TODO?: Perdiction.
 		VectorCopy(ps->camera.angles, cg.refdefViewAngles);
 		VectorCopy(ps->camera.pos, cg.refdef.vieworg);
 		AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );

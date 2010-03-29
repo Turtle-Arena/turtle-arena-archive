@@ -133,7 +133,7 @@ bot_movestate_t *botmovestates[MAX_CLIENTS+1];
 qboolean BotValidWeapon(int client, int weaponnum)
 {
 #ifdef TMNTWEAPSYS_EX
-	// Turtle Man: if (client current weapon == weaponnum) return qtrue;
+	// ZTM: if (client current weapon == weaponnum) return qtrue;
 	aas_entityinfo_t entinfo;
 
 	if (weaponnum < 0) {
@@ -151,7 +151,7 @@ qboolean BotValidWeapon(int client, int weaponnum)
 		return qfalse;
 	} //end if
 
-	// Turtle Man: FIXME?: Bots always want Grappling Hook.
+	// ZTM: FIXME?: Bots always want Grappling Hook.
 	return qtrue;
 #endif
 } // end of the function BotValidWeapon
@@ -3626,7 +3626,7 @@ int BotSetupMoveAI(void)
 	sv_maxbarrier = LibVar("sv_maxbarrier", "32");
 	sv_gravity = LibVar("sv_gravity", "800");
 #ifdef TMNTWEAPSYS
-	// Turtle Man: NOTE: We don't know the indexes (game should set them).
+	// ZTM: NOTE: We don't know the indexes (game should set them).
 	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "-1");
 	weapindex_grapple = LibVar("weapindex_grapple", "-1");
 #else

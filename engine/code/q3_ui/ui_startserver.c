@@ -131,7 +131,7 @@ static int gametype_remap[] = {GT_FFA, GT_TOURNAMENT, GT_SINGLE_PLAYER, GT_TEAM,
 
 /*
 // Order of gametype_items, must
-// Turtle Man: NOTE: Why does this need to be seperate from gametype_remap?
+// ZTM: NOTE: Why does this need to be seperate from gametype_remap?
 static int gametype_remap2[] = {
 	0,		// Free For All
 	1,		// Duel
@@ -185,7 +185,7 @@ static int gametype_remap2[] = {0, 2, 0, 1, 3
 };
 #endif
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 // use ui_servers2.c definition
 extern const char* punkbuster_items[];
 #endif
@@ -235,7 +235,7 @@ static int GametypeBits( char *string ) {
 			bits |= 1 << GT_CTF;
 			continue;
 		}
-#ifdef MISSIONPACK // Turtle Man: Support MISSIONPACK gametypes!
+#ifdef MISSIONPACK // ZTM: Support MISSIONPACK gametypes!
 		if( Q_stricmp( token, "oneflag" ) == 0 ) {
 			bits |= 1 << GT_1FCTF;
 			continue;
@@ -820,7 +820,7 @@ typedef struct {
 	int					newBotIndex;
 	char				newBotName[16];
 	
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	menulist_s		punkbuster;
 #endif
 } serveroptions_t;
@@ -1026,7 +1026,7 @@ static void ServerOptions_Start( void ) {
 	trap_Cvar_SetValue( "sv_pure", pure );
 	trap_Cvar_Set("sv_hostname", s_serveroptions.hostname.field.buffer );
 	
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	trap_Cvar_SetValue( "sv_punkbuster", s_serveroptions.punkbuster.curvalue );
 #endif
 
@@ -1577,14 +1577,14 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 
 	memset( &s_serveroptions, 0 ,sizeof(serveroptions_t) );
 	s_serveroptions.multiplayer = multiplayer;
-#ifdef MISSIONPACK // Turtle Man: Allow all game types.
+#ifdef MISSIONPACK // ZTM: Allow all game types.
 	s_serveroptions.gametype = (int)Com_Clamp( 0, GT_MAX_GAME_TYPE-1, trap_Cvar_VariableValue( "g_gametype" ) );
 #elif defined IOQ3ZTM // IOQ3BUGFIX: Quake3 only had 4 gametypes
 	s_serveroptions.gametype = (int)Com_Clamp( 0, 4, trap_Cvar_VariableValue( "g_gametype" ) );
 #else
 	s_serveroptions.gametype = (int)Com_Clamp( 0, 5, trap_Cvar_VariableValue( "g_gameType" ) );
 #endif
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	s_serveroptions.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_punkbuster" ) );
 #endif
 
@@ -1714,7 +1714,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.hostname.field.maxchars     = 64;
 	}
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	y += BIGCHAR_HEIGHT+2;
 	s_serveroptions.punkbuster.generic.type			= MTYPE_SPINCONTROL;
 	s_serveroptions.punkbuster.generic.name			= "Punkbuster:";
@@ -1860,7 +1860,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.next );
 	Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.go );
 
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	Menu_AddItem( &s_serveroptions.menu, (void*) &s_serveroptions.punkbuster );
 #endif
 	
@@ -1973,8 +1973,8 @@ static int QDECL UI_BotSelectMenu_SortCompare( const void *arg1, const void *arg
 	name1 = Info_ValueForKey( info1, "name" );
 	name2 = Info_ValueForKey( info2, "name" );
 
-#ifdef RANDOMBOT // Turtle Man: Random bot
-    // Turtle Man: Random bot comes first on the list.
+#ifdef RANDOMBOT // ZTM: Random bot
+    // ZTM: Random bot comes first on the list.
     if (Q_stricmp(name1, "Random") == 0 || Q_stricmp(name2, "Random") == 0)
     {
         return Q_stricmp( Q_stricmp(name1, "Random") == 0 ? "0" : "1",
@@ -2019,8 +2019,8 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
 	char	*skin;
 	char	model[MAX_QPATH];
 
-#ifdef RANDOMBOT // Turtle Man: Random bot
-    // Turtle Man: Random bot's icon is in a different spot then a normal player.
+#ifdef RANDOMBOT // ZTM: Random bot
+    // ZTM: Random bot's icon is in a different spot then a normal player.
     if (Q_stricmp(modelAndSkin, "Random") == 0)
     {
         Com_sprintf(iconName, iconNameMaxSize, "menu/art/randombot_icon.tga");

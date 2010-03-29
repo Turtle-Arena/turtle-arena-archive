@@ -146,10 +146,10 @@ void TossClientItems( gentity_t *self ) {
 #endif // TMNTWEWAPONS3
 
 #ifdef TMNTWEAPSYS_EX
-	// Turtle Man: Drop valid selected weapon to drop
+	// ZTM: Drop valid selected weapon to drop
 	if (weapon > WP_NONE && weapon < BG_NumWeaponGroups())
 #elif defined TMNTWEAPSYS
-	// Turtle Man: Drop all weapons except default.
+	// ZTM: Drop all weapons except default.
 	if ( weapon != self->client->ps.stats[STAT_DEFAULTWEAPON] )
 #else
 	if ( weapon > WP_MACHINEGUN && weapon != WP_GRAPPLING_HOOK && 
@@ -785,7 +785,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	self->s.loopSound = 0;
 
-#if 0 //#ifdef TMNTPLAYERSYS // Turtle Man: FIXME: Use per-player bounding box!
+#if 0 //#ifdef TMNTPLAYERSYS // ZTM: FIXME: Use per-player bounding box!
 #else
 	self->r.maxs[2] = -8;
 #endif
@@ -1087,7 +1087,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 #ifdef TMNTWEAPSYS
 	if (targ->mustcut && !(dflags & DAMAGE_CUTS))
 	{
-		// Turtle Man: TODO: Have a effect to user knows it is can only be broke by WIF_CUTS?
+		// ZTM: TODO: Have a effect to user knows it is can only be broke by WIF_CUTS?
 		//                       or have textures that users know can only be broke by WIF_CUTS?
 		return;
 	}

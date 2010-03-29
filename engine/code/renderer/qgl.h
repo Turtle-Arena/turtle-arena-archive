@@ -32,11 +32,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #	include <SDL_opengl.h>
 #endif
 
-// Turtle Man:
+// ZTM:
 #if !defined(APIENTRYP)
 #  define APIENTRYP APIENTRY*
 #endif
-// Turtle Man:
+// ZTM:
 // http://svn.icculus.org/quake3/branches/unified-sdl/code/renderer/qgl.h?revision=775&view=markup&pathrev=1156
 // S3TC compression constants
 #define GL_RGB_S3TC                         0x83A0

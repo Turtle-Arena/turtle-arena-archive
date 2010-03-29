@@ -462,7 +462,7 @@ void R_BloomInit( void ) {
 	memset( &bloom, 0, sizeof( bloom ));
 
 	r_bloom = ri.Cvar_Get( "r_bloom", "0", CVAR_ARCHIVE );
-#ifdef IOQ3ZTM // Turtle Man: AlienArena values
+#ifdef IOQ3ZTM // ZTM: AlienArena values
 	r_bloom_alpha = ri.Cvar_Get( "r_bloom_alpha", "0.2", CVAR_ARCHIVE );
 	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
 	r_bloom_intensity = ri.Cvar_Get( "r_bloom_intensity", "0.5", CVAR_ARCHIVE );

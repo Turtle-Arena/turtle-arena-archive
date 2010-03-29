@@ -700,7 +700,7 @@ void CG_LoadVoiceChats( void ) {
 	// First loaded voice chat is default
 	CG_HeadModelVoiceChats("scripts/default.vc");
 
-	// Turtle Man: TODO?: Pre-cache voice chats? ( currently have no voice chats )
+	// ZTM: TODO?: Pre-cache voice chats? ( currently have no voice chats )
 	//CG_HeadModelVoiceChats("scripts/raph.vc");
 #else
 	CG_ParseVoiceChats( "scripts/female1.voice", &voiceChatLists[0], MAX_VOICECHATS );

@@ -424,7 +424,7 @@ bspbrush_t *AllocBrush (int numsides)
 	bspbrush_t	*bb;
 	int			c;
 
-	// Turtle Man: int to size_t
+	// ZTM: int to size_t
 	c = (size_t)&(((bspbrush_t *)0)->sides[numsides]);
 	bb = GetMemory(c);
 	memset (bb, 0, c);
@@ -488,7 +488,7 @@ bspbrush_t *CopyBrush (bspbrush_t *brush)
 	int			size;
 	int			i;
 
-	// Turtle Man: int to size_t
+	// ZTM: int to size_t
 	size = (size_t)&(((bspbrush_t *)0)->sides[brush->numsides]);
 
 	newbrush = AllocBrush (brush->numsides);
@@ -928,7 +928,7 @@ void LeafNode(node_t *node, bspbrush_t *brushes)
 //===========================================================================
 void CheckPlaneAgainstParents (int pnum, node_t *node)
 {
-#if 0 // Turtle Man: FIXME: This causes some of my map to fail. Why is this done? What is it doing?
+#if 0 // ZTM: FIXME: This causes some of my map to fail. Why is this done? What is it doing?
 	node_t	*p;
 
 	for (p = node->parent; p; p = p->parent)

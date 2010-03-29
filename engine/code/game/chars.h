@@ -77,7 +77,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //chat
 //========================================================
 #ifdef TMNTWEAPONS // BOTCODE
-// Turtle Man: Why can't this be a enum?...
+// ZTM: Why can't this be a enum?...
 //    OK it turns out that THIS file is used in pak0.pk3/botfiles/chars.h and the
 //    bot lib supports defines, but not enums?
 

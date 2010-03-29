@@ -363,13 +363,13 @@ static void UI_LoadBots( void ) {
 	char*		dirptr;
 	int			i;
 	int			dirlen;
-#ifdef RANDOMBOT // Turtle Man: Random bot
+#ifdef RANDOMBOT // ZTM: Random bot
 	char info[MAX_INFO_STRING];
 #endif
 
 	ui_numBots = 0;
 
-#ifdef RANDOMBOT // Turtle Man: Init Random bot.
+#ifdef RANDOMBOT // ZTM: Init Random bot.
 	memset(info, 0, MAX_INFO_STRING);
         Info_SetValueForKey(info, "name", "Random");
         // Random bot doesn't have a model, but it has a icon.

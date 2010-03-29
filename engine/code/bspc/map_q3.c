@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "aas_map.h"			//AAS_CreateMapBrushes
 #include "l_bsp_q3.h"
 #include "../qcommon/cm_patch.h"
-#include "../qcommon/surfaceflags.h" // Turtle Man(IOQ3): game to qcommon
+#include "../qcommon/surfaceflags.h" // ZTM(IOQ3): game to qcommon
 
 #define NODESTACKSIZE		1024
 

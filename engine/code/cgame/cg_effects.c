@@ -643,7 +643,7 @@ void CG_GibPlayer( vec3_t playerOrigin ) {
 		return;
 	}
 
-#ifdef IOQ3ZTM // Turtle Man: Have cg_gibs disable ALL gibs.
+#ifdef IOQ3ZTM // ZTM: Have cg_gibs disable ALL gibs.
 	// allow gibs to be turned off
 	if ( !cg_gibs.integer ) {
 		return;

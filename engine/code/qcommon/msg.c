@@ -864,7 +864,7 @@ netField_t	entityStateFields[] =
 { NETF(legsAnim), 8 },
 { NETF(groundEntityNum), GENTITYNUM_BITS },
 { NETF(pos.trType), 8 },
-#ifdef IOQ3ZTM_NO_COMPAT // EFLAG_FIX; Turtle Man: Just send all 32 bits!
+#ifdef IOQ3ZTM_NO_COMPAT // EFLAG_FIX; ZTM: Just send all 32 bits!
 { NETF(eFlags), 32 },
 #else
 { NETF(eFlags), 19 },
@@ -1189,7 +1189,7 @@ netField_t	playerStateFields[] =
 { PSF(pm_flags), 16 },
 { PSF(groundEntityNum), GENTITYNUM_BITS },
 { PSF(weaponstate), 4 },
-#ifdef IOQ3ZTM_NO_COMPAT // EFLAG_FIX; Turtle Man: Just send all 32 bits!
+#ifdef IOQ3ZTM_NO_COMPAT // EFLAG_FIX; ZTM: Just send all 32 bits!
 { PSF(eFlags), 32 },
 #else
 { PSF(eFlags), 16 },

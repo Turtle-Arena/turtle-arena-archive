@@ -229,7 +229,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 	  case UI_DRAW_CONNECT_SCREEN:
 		  UI_DrawConnectScreen( arg0 );
 		  return 0;
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	  case UI_HASUNIQUECDKEY: // mod authors need to observe this
 	    return qtrue; // change this to qfalse for mods!
 #endif
@@ -3055,7 +3055,7 @@ static void UI_StartSkirmish(qboolean next) {
 
 	k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
 
-#ifdef TMNTSP // Turtle Man: TODO: Custom Game (skirmish) uses 2 while Single Player uses 1.
+#ifdef TMNTSP // ZTM: TODO: Custom Game (skirmish) uses 2 while Single Player uses 1.
 	trap_Cvar_Set("ui_singlePlayerActive", "2");
 #else
 	trap_Cvar_Set("ui_singlePlayerActive", "1");
@@ -3331,7 +3331,7 @@ static void UI_RunMenuScript(char **args) {
 			Controls_SetDefaults();
 			trap_Cvar_Set("com_introPlayed", "1" );
 			trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 		} else if (Q_stricmp(name, "getCDKey") == 0) {
 			char out[17];
 			trap_GetCDKey(buff, 17);
@@ -3635,7 +3635,7 @@ static void UI_RunMenuScript(char **args) {
 			if (String_Parse(args, &name2)) {
 				UI_Update(name2);
 			}
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 		} else if (Q_stricmp(name, "setPbClStatus") == 0) {
 			int stat;
 			if ( Int_Parse( args, &stat ) )
@@ -4423,9 +4423,9 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 		return UI_SelectedMap(index, &actual);
 	} else if (feederID == FEEDER_SERVERS) {
 		if (index >= 0 && index < uiInfo.serverStatus.numDisplayServers) {
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 			int ping, game, punkbuster;
-#else // Turtle Man: No punkbuster
+#else // ZTM: No punkbuster
 			int ping, game;
 #endif
 			if (lastColumn != column || lastTime > uiInfo.uiDC.realTime + 5000) {
@@ -4471,7 +4471,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 					} else {
 						return Info_ValueForKey(info, "ping");
 					}
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 				case SORT_PUNKBUSTER:
 					punkbuster = atoi(Info_ValueForKey(info, "punkbuster"));
 					if ( punkbuster ) {
@@ -4729,7 +4729,7 @@ static qboolean Character_Parse(char **p) {
       uiInfo.characterList[uiInfo.characterCount].headImage = -1;
 			uiInfo.characterList[uiInfo.characterCount].imageName = String_Alloc(va("models/players/heads/%s/icon_default.tga", uiInfo.characterList[uiInfo.characterCount].name));
 
-	  /* Turtle Man: NOTE: About characters block in teaminfo.txt ...
+	  /* ZTM: NOTE: About characters block in teaminfo.txt ...
 	               In Team Arena they just list "male" and "female"
 	                   for the base model meaning James and Janet.
 	               I plan to just list the name (Casey/April/Raph/...), but it is left for compatiblity.
@@ -5446,7 +5446,7 @@ void _UI_SetActiveMenu( uiMenuCommand_t menu ) {
 			trap_Key_SetCatcher( KEYCATCH_UI );
       Menus_ActivateByName("team");
 		  return;
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	  case UIMENU_NEED_CD:
 			// no cd check in TA
 			//trap_Key_SetCatcher( KEYCATCH_UI );
@@ -5814,7 +5814,7 @@ vmCvar_t	ui_server14;
 vmCvar_t	ui_server15;
 vmCvar_t	ui_server16;
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 vmCvar_t	ui_cdkeychecked;
 #endif
 
@@ -5956,7 +5956,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_server14, "server14", "", CVAR_ARCHIVE },
 	{ &ui_server15, "server15", "", CVAR_ARCHIVE },
 	{ &ui_server16, "server16", "", CVAR_ARCHIVE },
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	{ &ui_cdkeychecked, "ui_cdkeychecked", "0", CVAR_ROM },
 #endif
 	{ &ui_new, "ui_new", "0", CVAR_TEMP },

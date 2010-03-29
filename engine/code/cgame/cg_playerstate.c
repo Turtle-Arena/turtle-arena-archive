@@ -565,7 +565,7 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 		CG_CheckLocalSounds( ps, ops );
 	}
 
-#ifndef TMNTWEAPSYS // Turtle Man: No ammo warnings.
+#ifndef TMNTWEAPSYS // ZTM: No ammo warnings.
 	// check for going low on ammo
 	CG_CheckAmmo();
 #endif

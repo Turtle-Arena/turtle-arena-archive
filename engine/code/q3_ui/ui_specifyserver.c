@@ -120,7 +120,7 @@ static void SpecifyServer_Event( void* ptr, int event )
 			if (s_specifyserver.domain.field.buffer[0])
 			{
 				strcpy(buff,s_specifyserver.domain.field.buffer);
-#if 0 // Turtle Man: FIXME?: Support port? It can't be in fav server address?
+#if 0 // ZTM: FIXME?: Support port? It can't be in fav server address?
 				if (s_specifyserver.port.field.buffer[0])
 					Com_sprintf( buff+strlen(buff), 128, ":%s", s_specifyserver.port.field.buffer );
 #endif
@@ -157,7 +157,7 @@ static void SpecifyServer_Event( void* ptr, int event )
 					}
 					else
 					{
-						// Turtle Man: TODO: Show message. ("Can't add, all fav slots full.")
+						// ZTM: TODO: Show message. ("Can't add, all fav slots full.")
 					}
 				}
 			}
@@ -330,7 +330,7 @@ void SpecifyServer_MenuInit( void )
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.go );
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.back );
 
-	// Turtle Man: NOTE: If PORT_SERVER is changed update this.
+	// ZTM: NOTE: If PORT_SERVER is changed update this.
 	Com_sprintf( s_specifyserver.port.field.buffer, 6, "%i", 27960 );
 }
 

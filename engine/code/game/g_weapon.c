@@ -131,7 +131,7 @@ G_ThrowShuriken
 
 Spawns shuriken missile based on holdable number.
 
-Turtle Man: TODO: Player animation for throw shuriken and use origin of tag_hand_* (primary or secondary)?
+ZTM: TODO: Player animation for throw shuriken and use origin of tag_hand_* (primary or secondary)?
 ================
 */
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
@@ -172,7 +172,7 @@ void G_StartMeleeAttack(gentity_t *ent)
 	}
 	client->fireHeld = qtrue;
 
-	// Turtle Man: Use the animation time for the attack time!
+	// ZTM: Use the animation time for the attack time!
 	client->ps.meleeTime = BG_AnimationTime(&ent->client->pers.playercfg.animations[BG_TorsoAttackForPlayerState(&ent->client->ps)]);
 	client->ps.meleeLinkTime = 3.75f * client->ps.meleeTime; // MELEE_CHAINTIME
 
@@ -628,11 +628,11 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 		{
 			// pain_debounce?
 
-			// Turtle Man: NOTE: Disabled, I don't need to see this as much as I once did.
+			// ZTM: NOTE: Disabled, I don't need to see this as much as I once did.
 			//                     (plus it fills the console.)
 			//G_Printf("DEBUG: client %i hit client %i\n", ent - g_entities, tr.entityNum);
 
-			// Turtle Man: Do a effect when hit anything!
+			// ZTM: Do a effect when hit anything!
 			//   based on G_MissileImpact code
 			if ( traceEnt->takedamage && traceEnt->client ) {
 				tent = G_TempEntity( tr.endpos, EV_WEAPON_HIT );
@@ -640,7 +640,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 			} else if( tr.surfaceFlags & SURF_METALSTEPS ) {
 				tent = G_TempEntity( tr.endpos, EV_WEAPON_MISS_METAL );
 			}
-			// Turtle Man: Don't show melee effect when hitting the air...
+			// ZTM: Don't show melee effect when hitting the air...
 			else if (tr.fraction != 1.0) {
 				tent = G_TempEntity( tr.endpos, EV_WEAPON_MISS );
 			}
@@ -820,7 +820,7 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 	}
 }
 
-#ifndef TMNTWEAPSYS // Turtle Man: I replaced all of these, see fire_weapon
+#ifndef TMNTWEAPSYS // ZTM: I replaced all of these, see fire_weapon
 #ifdef MISSIONPACK
 #define CHAINGUN_SPREAD		600
 #endif
@@ -1273,7 +1273,7 @@ void Weapon_HookFree (gentity_t *ent)
 #ifdef IOQ3ZTM // Better grapple.
 	if (ent->parent->client->ps.pm_type != PM_DEAD)
 	{
-		// Turtle Man: TODO: Pull grapple back to player before removing entity, like LoZ: TP?
+		// ZTM: TODO: Pull grapple back to player before removing entity, like LoZ: TP?
 	}
 #endif
 	ent->parent->client->hook = NULL;
@@ -1455,7 +1455,7 @@ qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
 	}
 
 	if( !target->client
-#ifdef TMNTNPCSYS // Turtle Man: When hit NPCs too
+#ifdef TMNTNPCSYS // ZTM: When hit NPCs too
 		&& target->s.eType != ET_NPC
 #endif
 	) {
@@ -1466,7 +1466,7 @@ qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
 		return qfalse;
 	}
 
-#ifdef TMNTNPCSYS // Turtle Man: When hit NPCs too
+#ifdef TMNTNPCSYS // ZTM: When hit NPCs too
 	if (!target->client)
 	{
 		if( target->health <= 0 ) {

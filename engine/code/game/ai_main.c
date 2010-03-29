@@ -1081,7 +1081,7 @@ int BotAI(int client, float thinktime) {
         else if (bs->weaponnum != 0
 			&& bs->weaponnum != bs->cur_ps.stats[STAT_PENDING_WEAPON])
         {
-#if 0 // Turtle Man: Fixed bots wanting weapons they can't have, so this doesn't happen anymore.
+#if 0 // ZTM: Fixed bots wanting weapons they can't have, so this doesn't happen anymore.
 			if (bs->cur_ps.weapon == bs->cur_ps.stats[STAT_DEFAULTWEAPON])
 				Com_Printf("DEBUG: bot wants weapon %i, but can't have it only %i\n", bs->weaponnum, bs->cur_ps.weapon);
 			else
@@ -1747,7 +1747,7 @@ int BotInitLibrary(void) {
 #ifdef TMNTWEAPSYS // Use correct index
 	trap_BotLibVarSet("weapindex_rocket", va("%i", BG_WeaponGroupIndexForName("wp_rocket_launcher")));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", BG_WeaponGroupIndexForName("wp_grappling_hook")));
-#elif defined IOQ3ZTM // Turtle Man: Always sure these are correct...
+#elif defined IOQ3ZTM // ZTM: Always sure these are correct...
 	trap_BotLibVarSet("weapindex_rocket", va("%i", WP_ROCKET_LAUNCHER));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", WP_GRAPPLING_HOOK));
 #endif

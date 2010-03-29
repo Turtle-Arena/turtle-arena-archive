@@ -1742,7 +1742,7 @@ static void CG_AddPainTwitch( centity_t *cent, vec3_t torsoAngles ) {
 
 	f = 1.0 - (float)t / PAIN_TWITCH_TIME;
 
-#if 0 // #ifdef TMNTMISC // Turtle Man: TEST
+#if 0 // #ifdef TMNTMISC // ZTM: TEST
 	if (cent->currentState.clientNum == cg.predictedPlayerEntity.currentState.clientNum)
 	{
 		Com_Printf("DEBUG: damageYaw=%d\n", cg.predictedPlayerState.damageYaw);
@@ -2056,7 +2056,7 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 	VectorSet( up, 0, 0, 8 );
 	VectorMA(head->origin, 8, head->axis[0], origin);
 	VectorMA(origin, -4, head->axis[2], origin);
-#ifdef TMNTMISC // Turtle Man: Bubbles under water! (and slime/lava?)
+#ifdef TMNTMISC // ZTM: Bubbles under water! (and slime/lava?)
 	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) {
 		CG_SpawnBreathBubbles(origin);
 	}
@@ -2297,7 +2297,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 		vec3_t			axis[3];
 
 #if 0 // #ifdef IOQ3ZTM // FLAG // Don't draw CTF flag for the holder in third person, blocks view.
-						// Turtle Man: Could we make if transparent instead?
+						// ZTM: Could we make if transparent instead?
 						//     RF_FORCEENTALPHA
 		if (cent->currentState.clientNum == cg.predictedPlayerState.clientNum
 			&& cg_thirdPerson.integer)
@@ -2340,8 +2340,8 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	legsAnim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
 	if( legsAnim == LEGS_IDLE || legsAnim == LEGS_IDLECR ) {
 		flagAnim = FLAG_STAND;
-#ifdef IOQ3ZTM // Turtle Man: TEST: Always update flag angle.
-		// Turtle Man: TODO: Have a idle timer to know if its been awile since they moved to NOT updateangles?
+#ifdef IOQ3ZTM // ZTM: TEST: Always update flag angle.
+		// ZTM: TODO: Have a idle timer to know if its been awile since they moved to NOT updateangles?
 		updateangles = qtrue;
 #endif
 	} else if ( legsAnim == LEGS_WALK || legsAnim == LEGS_WALKCR ) {
@@ -2694,7 +2694,7 @@ static void CG_PlayerSprites( centity_t *cent
 		return;
 	}
 
-#ifdef TMNTSP // Turtle Man: NOTE: Must disable talk balloon in sp intermission (not co-op), because there is a menu open.
+#ifdef TMNTSP // ZTM: NOTE: Must disable talk balloon in sp intermission (not co-op), because there is a menu open.
 	if ( (cent->currentState.eFlags & EF_TALK)
 			&& !(cg.intermissionStarted && cg_singlePlayerActive.integer
 			&& cg.snap->ps.pm_type == PM_SPINTERMISSION) )

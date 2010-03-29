@@ -220,7 +220,7 @@ void EA_Use(int client)
 	bi = &botinputs[client];
 
 #ifdef TMNTHOLDSYS
-	// Turtle Man: no change is -1
+	// ZTM: no change is -1
 	if (holdable >= 0) {
 		bi->actionflags |= ACTION_USE;
 	}

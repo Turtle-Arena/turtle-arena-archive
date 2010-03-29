@@ -300,7 +300,7 @@ typedef struct {
 	int			maxPing;
 	int			ping;
 	qboolean	visible;
-#ifdef IOQUAKE3 // Turtle Man: punkbuster
+#ifdef IOQUAKE3 // ZTM: punkbuster
 	int			punkbuster;
 #endif
 } serverInfo_t;
@@ -308,7 +308,7 @@ typedef struct {
 typedef struct {
 	connstate_t	state;				// connection status
 
-#ifdef IOQUAKE3 // Turtle Man: CDKEY
+#ifdef IOQUAKE3 // ZTM: CDKEY
 	qboolean	cddialog;			// bring up the cd needed dialog next frame
 #endif
 
