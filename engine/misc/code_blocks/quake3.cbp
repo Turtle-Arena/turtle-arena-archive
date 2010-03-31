@@ -7,11 +7,13 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release Win32">
-				<Option output="../../build/tmntarena_release/tmntarena" prefix_auto="1" extension_auto="1" />
+				<Option platforms="Windows;" />
+				<Option output="../../build/tmntarena_release/tmntarena.x86.exe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/tmntarena_release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
+				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -29,17 +31,33 @@
 					<Add option="-DUSE_CIN_THEORA" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
+					<Add directory="../../code/libs/win32/include" />
 				</Compiler>
 				<Linker>
 					<Add library="../../build/splines_release/libsplines.a" />
+					<Add library="mingw32" />
+					<Add library="user32" />
+					<Add library="advapi32" />
+					<Add library="winmm" />
+					<Add library="ws2_32" />
+					<Add library="SDLmain" />
+					<Add library="SDL" />
+					<Add library="OpenGL32" />
+					<Add library="theora" />
+					<Add library="vorbisfile" />
+					<Add library="vorbis" />
+					<Add library="ogg" />
+					<Add directory="../../code/libs/win32" />
 				</Linker>
 			</Target>
 			<Target title="Debug Win32">
-				<Option output="../../build/tmntarena_debug/tmntarena" prefix_auto="1" extension_auto="1" />
+				<Option platforms="Windows;" />
+				<Option output="../../build/tmntarena_debug/tmntarena.x86.exe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/tmntarena_debug" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
+				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
 					<Add option="-W" />
 					<Add option="-g" />
@@ -58,9 +76,137 @@
 					<Add option="-DUSE_CIN_THEORA" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
+					<Add directory="../../code/libs/win32/include" />
 				</Compiler>
 				<Linker>
 					<Add library="../../build/splines_debug/libsplines.a" />
+					<Add library="mingw32" />
+					<Add library="user32" />
+					<Add library="advapi32" />
+					<Add library="winmm" />
+					<Add library="ws2_32" />
+					<Add library="SDLmain" />
+					<Add library="SDL" />
+					<Add library="OpenGL32" />
+					<Add library="theora" />
+					<Add library="vorbisfile" />
+					<Add library="vorbis" />
+					<Add library="ogg" />
+					<Add directory="../../code/libs/win32" />
+				</Linker>
+			</Target>
+			<Target title="Release Linux x86">
+				<Option platforms="Unix;Mac;" />
+				<Option output="../../build/tmntarena_release/tmntarena.x86" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/tmntarena_release" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add option="-DBOTLIB" />
+					<Add option="-DUSE_ICON" />
+					<Add option="-DUSE_CURL" />
+					<Add option="-DUSE_CURL_DLOPEN" />
+					<Add option="-DUSE_LOCAL_HEADERS" />
+					<Add option="-DUSE_VOIP" />
+					<Add option="-DUSE_CODEC_VORBIS" />
+					<Add option="-DUSE_CIN_THEORA" />
+					<Add option="-DFLOATING_POINT" />
+					<Add option="-DUSE_ALLOCA" />
+				</Compiler>
+				<Linker>
+					<Add library="../../build/splines_release/libsplines.a" />
+					<Add library="GL" />
+				</Linker>
+			</Target>
+			<Target title="Debug Linux x86">
+				<Option platforms="Unix;Mac;" />
+				<Option output="../../build/tmntarena_debug/tmntarena.x86" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/tmntarena_debug" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add option="-DBOTLIB" />
+					<Add option="-DUSE_ICON" />
+					<Add option="-DUSE_CURL" />
+					<Add option="-DUSE_CURL_DLOPEN" />
+					<Add option="-DUSE_LOCAL_HEADERS" />
+					<Add option="-DUSE_VOIP" />
+					<Add option="-DUSE_CODEC_VORBIS" />
+					<Add option="-DUSE_CIN_THEORA" />
+					<Add option="-DFLOATING_POINT" />
+					<Add option="-DUSE_ALLOCA" />
+				</Compiler>
+				<Linker>
+					<Add library="../../build/splines_debug/libsplines.a" />
+					<Add library="GL" />
+				</Linker>
+			</Target>
+			<Target title="Release Linux x86_64">
+				<Option platforms="Unix;Mac;" />
+				<Option output="../../build/tmntarena_release/tmntarena.x86_64" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/tmntarena_release" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add option="-DBOTLIB" />
+					<Add option="-DUSE_ICON" />
+					<Add option="-DUSE_CURL" />
+					<Add option="-DUSE_CURL_DLOPEN" />
+					<Add option="-DUSE_LOCAL_HEADERS" />
+					<Add option="-DUSE_VOIP" />
+					<Add option="-DUSE_CODEC_VORBIS" />
+					<Add option="-DUSE_CIN_THEORA" />
+					<Add option="-DFLOATING_POINT" />
+					<Add option="-DUSE_ALLOCA" />
+				</Compiler>
+				<Linker>
+					<Add library="../../build/splines_release/libsplines.a" />
+					<Add library="GL" />
+				</Linker>
+			</Target>
+			<Target title="Debug Linux x86_64">
+				<Option platforms="Unix;Mac;" />
+				<Option output="../../build/tmntarena_debug/tmntarena.x86_64" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/tmntarena_debug" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
+					<Add option="-DBOTLIB" />
+					<Add option="-DUSE_ICON" />
+					<Add option="-DUSE_CURL" />
+					<Add option="-DUSE_CURL_DLOPEN" />
+					<Add option="-DUSE_LOCAL_HEADERS" />
+					<Add option="-DUSE_VOIP" />
+					<Add option="-DUSE_CODEC_VORBIS" />
+					<Add option="-DUSE_CIN_THEORA" />
+					<Add option="-DFLOATING_POINT" />
+					<Add option="-DUSE_ALLOCA" />
+				</Compiler>
+				<Linker>
+					<Add library="../../build/splines_debug/libsplines.a" />
+					<Add library="GL" />
 				</Linker>
 			</Target>
 		</Build>
@@ -85,6 +231,7 @@
 			<Add option="-DTMNTWEAPSYS" />
 			<Add option="-DTMNTWEAPSYS_NOCOMPAT" />
 			<Add option="-DTMNTWEAPSYS_EX" />
+			<Add option="-DTMNTWEAPSYS_EX_COMPAT" />
 			<Add option="-DTMNTWEAPONS" />
 			<Add option="-DTMNTPLAYERSYS" />
 			<Add option="-DTMNTPLAYERS" />
@@ -101,17 +248,10 @@
 			<Add directory="../../code/libcurl" />
 			<Add directory="../../code/AL" />
 			<Add directory="../../code/libspeex/include" />
-			<Add directory="../../code/libs/win32/include" />
 		</Compiler>
 		<Linker>
-			<Add library="mingw32" />
-			<Add library="user32" />
-			<Add library="advapi32" />
-			<Add library="winmm" />
-			<Add library="ws2_32" />
 			<Add library="SDLmain" />
 			<Add library="SDL" />
-			<Add library="OpenGL32" />
 			<Add library="theora" />
 			<Add library="vorbisfile" />
 			<Add library="vorbis" />
@@ -120,7 +260,6 @@
 			<Add directory="../../code/libcurl" />
 			<Add directory="../../code/AL" />
 			<Add directory="../../code/libspeex" />
-			<Add directory="../../code/libs/win32" />
 		</Linker>
 		<Unit filename="../../code/asm/ftola.s">
 			<Option compilerVar="CC" />
@@ -704,6 +843,20 @@
 		<Unit filename="../../code/qcommon/vm_local.h" />
 		<Unit filename="../../code/qcommon/vm_x86.c">
 			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+			<Option target="Release Linux x86" />
+			<Option target="Debug Linux x86" />
+		</Unit>
+		<Unit filename="../../code/qcommon/vm_x86_64.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Linux x86_64" />
+			<Option target="Debug Linux x86_64" />
+		</Unit>
+		<Unit filename="../../code/qcommon/vm_x86_64_assembler.c">
+			<Option compilerVar="CC" />
+			<Option target="Release Linux x86_64" />
+			<Option target="Debug Linux x86_64" />
 		</Unit>
 		<Unit filename="../../code/renderer/qgl.h" />
 		<Unit filename="../../code/renderer/tr_animation.c">
@@ -848,15 +1001,21 @@
 		</Unit>
 		<Unit filename="../../code/sys/sys_unix.c">
 			<Option compilerVar="CC" />
-			<Option compile="0" />
-			<Option link="0" />
+			<Option target="Release Linux x86" />
+			<Option target="Debug Linux x86" />
+			<Option target="Release Linux x86_64" />
+			<Option target="Debug Linux x86_64" />
 		</Unit>
 		<Unit filename="../../code/sys/sys_win32.c">
 			<Option compilerVar="CC" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
 		</Unit>
 		<Unit filename="../../code/sys/win_resource.h" />
 		<Unit filename="../../code/sys/win_resource_codeblocks.rc">
 			<Option compilerVar="WINDRES" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
 		</Unit>
 		<Unit filename="../../code/ui/keycodes.h" />
 		<Unit filename="../../code/ui/ui_public.h" />

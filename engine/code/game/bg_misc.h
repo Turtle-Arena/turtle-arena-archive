@@ -981,7 +981,7 @@ typedef enum {
 	EV_POWERUP_QUAD,
 	EV_POWERUP_BATTLESUIT,
 	EV_POWERUP_REGEN,
-#if !defined TMNT || defined NET_COMPAT  // POWERS
+#if defined TMNT || defined NET_COMPAT  // POWERS
 	EV_POWERUP_INVUL,
 #endif
 
