@@ -373,9 +373,9 @@ void UI_MainMenu( void ) {
 		s_errorMessage.banner_image.generic.name				= ART_BANNER_IMAGE;
 		s_errorMessage.banner_image.generic.flags				= QMF_CENTER_JUSTIFY|QMF_INACTIVE;
 		s_errorMessage.banner_image.generic.x					= 320;
-		s_errorMessage.banner_image.generic.y					= 96;
-		s_errorMessage.banner_image.width  						= 427;
-		s_errorMessage.banner_image.height  					= 128;
+		s_errorMessage.banner_image.generic.y					= 32;
+		s_errorMessage.banner_image.width  						= 512;
+		s_errorMessage.banner_image.height  					= 256;
 
 		Menu_AddItem( &s_errorMessage.menu,	&s_errorMessage.banner_image );
 #endif
@@ -407,9 +407,9 @@ void UI_MainMenu( void ) {
 	s_main.banner_image.generic.name				= ART_BANNER_IMAGE;
 	s_main.banner_image.generic.flags				= QMF_CENTER_JUSTIFY|QMF_INACTIVE;
 	s_main.banner_image.generic.x					= 320;
-	s_main.banner_image.generic.y					= 96;
-	s_main.banner_image.width  						= 427;
-	s_main.banner_image.height  					= 128;
+	s_main.banner_image.generic.y					= 32;
+	s_main.banner_image.width  						= 512;
+	s_main.banner_image.height  					= 256;
 #endif
 
 #ifdef TMNTSP
