@@ -94,6 +94,15 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Show in cgame that player can use func_use if they press 'use holdable' button
 
+[bug] Hunk_Alloc[ateTempMemory] fails when changing maps with many different player models.
+: ERROR: Hunk_AllocateTempMemory failed on 4991448: label=models/players/don/upper.md3, file=code/qcommon/files.c, line=1611
+: TODO: Increase hunk
+
+[todo] Allow SP player select when setting up a custom game.
+
+[todo] Show "spmodel" instead of "name" next to "human" in custom game.
+: Change "spmodel" by clicking it?
+
 // The below are somewhat long...
 
 [todo] Update camera system.

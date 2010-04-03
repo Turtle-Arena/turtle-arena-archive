@@ -41,9 +41,8 @@ model		mike/default
 aifile	bots/raph_c.c
 }
 
-// Shouldn't use in team gametypes as it looks and acts like Raph...
 {
-name		RaphFugitoid
+name		FugiTurtle
 model		raph/fugitoid
 headmodel	*fugitoid
 aifile	bots/raph_c.c
