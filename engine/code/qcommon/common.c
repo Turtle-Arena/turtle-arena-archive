@@ -41,11 +41,13 @@ int demo_protocols[] =
 
 #define MAX_NUM_ARGVS	50
 
+#ifdef TMNT // ZTM: Turtle Arena uses more memory.
+#define MIN_DEDICATED_COMHUNKMEGS 16
+#define MIN_COMHUNKMEGS		64
+#define DEF_COMHUNKMEGS		128
+#else
 #define MIN_DEDICATED_COMHUNKMEGS 1
 #define MIN_COMHUNKMEGS		56
-#ifdef TMNT // ZTM: Some maps need more then 64 Megs of RAM to load.
-#define DEF_COMHUNKMEGS		76
-#else
 #define DEF_COMHUNKMEGS		64
 #endif
 #define DEF_COMZONEMEGS		24
@@ -1725,7 +1727,11 @@ void *Hunk_Alloc( int size, ha_pref preference ) {
 		Hunk_Log();
 		Hunk_SmallLog();
 #endif
+#ifdef HUNK_DEBUG
+		Com_Error( ERR_DROP, "Hunk_Alloc failed on %i: label=%s, file=%s, line=%d\n", size, label, file, line);
+#else
 		Com_Error( ERR_DROP, "Hunk_Alloc failed on %i", size );
+#endif
 	}
 
 	if ( hunk_permanent == &hunk_low ) {
