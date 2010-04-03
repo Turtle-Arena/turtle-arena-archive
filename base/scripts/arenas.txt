@@ -11,7 +11,7 @@ type		"single"
 map			"sp1boss"
 longname	"Stage 1: Boss"
 type		"single"
-bots		"RaphFugitoid"
+bots		"FugiTurtle"
 //allies		"leo don mike"
 }
 
