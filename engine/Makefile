@@ -168,7 +168,7 @@ ifeq ($(QUAKE3),1)
 		endif
 
 		#
-		# Server-Only
+		# Server/Client-Only
 		#
 		USE_CODEC_VORBIS=1
 		USE_CODEC_THEORA=1
@@ -212,7 +212,6 @@ else # END QUAKE3
 	###################################################################
 
 	# Please note: TMNT*SYS defines are general system changes, not total specifiy for Turtle Arena
-	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
 	# -DANALOG		 # Allows players to rotate the camera and move based on the camera angles
 	# -DARRAYMAX     # TODO: This ''was'' going to remove the bit max problem with Q3 network (ie more then 16 weapons).
 	# -DTMNTWEAPSYS is the core changes to the weapon system

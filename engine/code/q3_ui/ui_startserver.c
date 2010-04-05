@@ -1690,6 +1690,13 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	s_serveroptions.pure.generic.x				= OPTIONS_X;
 	s_serveroptions.pure.generic.y				= y;
 	s_serveroptions.pure.generic.name			= "Pure Server:";
+#ifdef TMNT // FS_PURE
+	if (!trap_Cvar_VariableValue( "fs_pure" ))
+	{
+		// Don't let users think they can modify sv_pure, it won't work.
+		s_serveroptions.pure.generic.flags |= QMF_GRAYED;
+	}
+#endif
 
 	if( s_serveroptions.multiplayer ) {
 		y += BIGCHAR_HEIGHT+2;

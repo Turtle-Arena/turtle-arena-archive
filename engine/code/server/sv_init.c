@@ -591,7 +591,15 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	}
 #endif
 
-#ifdef IOQ3ZTM
+#ifdef TMNT // FS_PURE
+	// Force sv_pure to off.
+	if (sv_pure->integer && !com_fs_pure->integer)
+	{
+		Cvar_Set( "sv_pure", "0" );
+	}
+#endif
+
+#if defined IOQ3ZTM && !defined TMNT // FS_PURE // ZTM: FS_PURE code replaces this.
 	// the server sends these to the clients so they will only
 	// load pk3s also loaded at the server
 	if (sv_pure->integer && (p = FS_LoadedPakChecksums()) && (strlen(p) > 0))
@@ -623,9 +631,11 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 		// load pk3s also loaded at the server
 		p = FS_LoadedPakChecksums();
 		Cvar_Set( "sv_paks", p );
+#ifndef TMNT // FS_PURE
 		if (strlen(p) == 0) {
 			Com_Printf( "WARNING: sv_pure set but no PK3 files loaded\n" );
 		}
+#endif
 		p = FS_LoadedPakNames();
 		Cvar_Set( "sv_pakNames", p );
 
@@ -703,6 +713,13 @@ void SV_Init (void) {
 	// systeminfo
 	Cvar_Get ("sv_cheats", "1", CVAR_SYSTEMINFO | CVAR_ROM );
 	sv_serverid = Cvar_Get ("sv_serverid", "0", CVAR_SYSTEMINFO | CVAR_ROM );
+#ifdef TMNT // FS_PURE
+	if (com_fs_pure && !com_fs_pure->integer)
+	{
+		sv_pure = Cvar_Get ("sv_pure", "0", CVAR_SYSTEMINFO | CVAR_ROM );
+	}
+	else
+#endif
 	sv_pure = Cvar_Get ("sv_pure", "1", CVAR_SYSTEMINFO );
 #ifdef USE_VOIP
 	sv_voip = Cvar_Get ("sv_voip", "1", CVAR_SYSTEMINFO | CVAR_LATCH);
