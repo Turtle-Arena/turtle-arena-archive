@@ -29,6 +29,8 @@ List of *Console variables* (also called Cvars) that have been added and removed
   * cg_drawSpeed - Draw player's speed on the HUD
   * cg_drawMeleeWeaponTrails - Draw (unfinished) melee weapon trails
 
+  * fs_pure - Read only cvar: fs_pure prevents sv_pure from being set to true when the default Pk3 files are missing or modified.
+
 = Removed =
 
   * com_blood

@@ -177,7 +177,7 @@ or configs will never get loaded from disk!
 #ifdef TMNT
 #define NUM_DEFAULT_PAKS 1 // Allows for assets0.pk3 through assets9.pk3
 static const unsigned pak_checksums[NUM_DEFAULT_PAKS] = {
-	2192442826u
+	2799211236u
 };
 #else
 #define	DEMO_PAK0_CHECKSUM	2985612116u
@@ -3092,7 +3092,7 @@ static void FS_CheckPak0( void )
 }
 #endif
 
-#ifdef TMNT
+#ifdef TMNT // FS_PURE
 /*
 ===================
 FS_CheckPaks
@@ -3100,13 +3100,20 @@ FS_CheckPaks
 Checks that assets0.pk3 is present and its checksum is correct
 ===================
 */
+// Pak PreFix
+#define PPF "assets" // "pak"
+#define PPF_LEN 6 // 3
 static void FS_CheckPaks( void )
 {
-#ifdef TMNTRELEASE // Only for release version (That has pk3 files).
-	// ZTM: Make sure all of the default pk3 file(s) are found and unmodified, like in SRB2...
 	searchpath_t	*path;
 	unsigned foundPak = 0;
 	unsigned invalidPak = 0;
+	qboolean hasPakFile = qfalse;
+	int i, total = 0;
+
+	// If we're not pure don't check
+	if (com_fs_pure && !com_fs_pure->integer)
+		return;
 
 	for( path = fs_searchpaths; path; path = path->next )
 	{
@@ -3115,46 +3122,56 @@ static void FS_CheckPaks( void )
 		if (!path->pack)
 			continue;
 
+		hasPakFile = qtrue;
+
 		if(!Q_stricmpn( path->pack->pakGamename, BASEGAME, MAX_OSPATH )
-			&& strlen(pakBasename) == 4 && !Q_stricmpn( pakBasename, "assets", 3 )
-			&& pakBasename[3] >= '0' && pakBasename[3] < '0'+NUM_DEFAULT_PAKS)
+			&& strlen(pakBasename) == PPF_LEN+1 && !Q_stricmpn( pakBasename, PPF, PPF_LEN )
+			&& pakBasename[PPF_LEN] >= '0' && pakBasename[PPF_LEN] < '0'+NUM_DEFAULT_PAKS)
 		{
-			if( path->pack->checksum != pak_checksums[pakBasename[3]-'0'] )
+			if( path->pack->checksum != pak_checksums[pakBasename[PPF_LEN]-'0'] )
 			{
 				Com_Printf("\n\n"
-					"**************************************************\n"
-					"WARNING: assets%d.pk3 is present but its checksum (%u)\n"
-					"is not correct. Please re-install the point release\n"
-					"**************************************************\n\n\n",
-					pakBasename[3]-'0', path->pack->checksum );
+					"**********************************************************************\n"
+					"WARNING: %s%d.pk3 is present but its checksum (%u) is not correct.\n"
+					"**********************************************************************\n\n\n",
+					PPF, pakBasename[PPF_LEN]-'0', path->pack->checksum );
 
-				invalidPak |= 1<<(pakBasename[3]-'0');
+				invalidPak |= 1<<(pakBasename[PPF_LEN]-'0');
 			}
 			else
 			{
 				// Found pk3 AND its checksum matches.
-				foundPak |= 1<<(pakBasename[3]-'0');
+				foundPak |= 1<<(pakBasename[PPF_LEN]-'0');
 			}
 		}
 	}
 
-	if ( !(foundPak & (1<<NUM_DEFAULT_PAKS)) || invalidPak )
+	// Add up total value of foundPak
+	for (i = 0; i < NUM_DEFAULT_PAKS; i++) {
+		total += 1<<i;
+	}
+
+	if (((foundPak & total) != total) || invalidPak)
 	{
-		Com_Printf("\n\n"
-			"Check that the executable is in\n"
-			"the correct place and that every file\n"
-			"in the '%s' directory is present and readable.\n\n", BASEGAME);
+		const char *line1 = NULL;
+		const char *line2 = "You need to reinstall " PRODUCT_NAME " in order to play on pure servers.";
+
+		// server can't ever be pure (sv_pure), as we're missing the pure files.
+		Cvar_Set("fs_pure", "0");
 
 		if (invalidPak)
-		{
-			Com_Error(ERR_FATAL, "Default Pk3 file(s) are missing, corrupt, or modified.\nYou need to reinstall Turtle Arena in order to play");
-		}
+			line1 = "Default Pk3 file(s) are missing, corrupt, or modified.";
 		else
-		{
-			Com_Error(ERR_FATAL, "Missing default Pk3 file(s).\nYou need to reinstall Turtle Arena in order to play");
-		}
-	}
+			line1 = "Missing default Pk3 file(s).";
+
+		Com_Printf(S_COLOR_YELLOW "WARNING: %s\n%s\n", line1, line2);
+
+#ifndef DEDICATED
+		// Don't warn developers; development takes place without Pk3 files, the files are unzipped.
+		if (hasPakFile || !FS_BaseFileExists("default.cfg"))
+			Sys_Dialog( DT_WARNING, va("%s %s", line1, line2), "Unpure" );
 #endif
+	}
 }
 #endif
 
@@ -3524,7 +3541,7 @@ void FS_InitFilesystem( void ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-#ifdef TMNT
+#ifdef TMNT // FS_PURE
 	FS_CheckPaks();
 #endif
 #ifndef STANDALONE
