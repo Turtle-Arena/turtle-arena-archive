@@ -20,5 +20,6 @@ tex_plants
 tex_sfx
 tex_singleplayer
 tex_skies
+tex_tech
 tex_terrain
 
