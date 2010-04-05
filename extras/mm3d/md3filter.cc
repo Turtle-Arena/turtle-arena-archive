@@ -2896,7 +2896,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
          m_dst->seek( offsetEndLod );
       }
 
-      // ZTM: FIXME
+      // ZTM: TODO: Should offsetTags be set at the begining?
       // Add size of meshes
       offsetTags += m_dst->offset() - offsetMeshes;
 
