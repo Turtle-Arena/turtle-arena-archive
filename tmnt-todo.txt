@@ -39,8 +39,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Improve bot_shareditem_t weight code (Currently only supports constant weights, add support to be weight 0 if INVENTORY_X >= 1)
 
-[todo] Backport TMNTWEAPSYS_EX's weapon dropping to TMNTWEAPSYS?
-
 [todo] Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder }
 : ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
 
@@ -65,6 +63,8 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects.
 : When PW_FLASHING wears off while in a solid, they are killed. Otherwise they would be stuck.
+
+[bug] The PW_FLASHING workaround shouldn't apply to bbmodel, the sloped brush in the map "test" that is a "computer" causes the player to die for no reason.
 
 [todo] Have shurikens do damage while they are in the wall/ground?
 
@@ -99,6 +99,8 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 [todo] Show "spmodel" instead of "name" next to "human" in custom game.
 : Change "spmodel" by clicking it?
 
+[todo] Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
+
 // The below are somewhat long...
 
 [todo] Update camera system.
@@ -111,7 +113,7 @@ STARTED(TMNT // LOCKON): [todo] When attacking a player (or NPC) focus on them? 
 
 [todo] Merge Quake3 and Team Arena bot chat systems; One chat system to rule them all!
 * Problem: Team Arena adds voice chats, which are only used in gametypes >= GT_TEAM. There was also players that could only be used in gametypes >= GT_TEAM that did not have q3 chats. Leaving q3 players for FFA and Duel (with there normal q3 chats) (The TA players have no q3 chats and the players can't be used in q3, q3 players can't be used in gametypes >= GT_TEAM and have no voice chats.) So Team Arena had two seperate chat systems. Turtle Arena supports Q3 and Team Arena players in all gametypes and allows merged Q3/TA players. But in the gametypes >= GT_TEAM ONLY the TA voice chats are used. And like wise in non-team gametypes only "Q3 chats" are used.
-* Fix: Merge systems.
+* Fix: Replace Q3 bot chat system with Team Arena voice chat system (I allow 64 voice chat files, so we could allow bots to have custom chats)
 ** Allow sound filenames in Q3 chat files?
 ** Everywhere that passes a "Q3 chat" name use voice chats instead.
 ** Set voicechat filename and soundpath in "head.cfg" in player head directory. Head animations would go in it as well.
@@ -158,6 +160,8 @@ WONTFIX?: [bug/todo] First Person weapon doesn't draw correctly (It draws too ne
 [todo] Per-triangle collision for player damage, use lowest LOD model or have a model special for collision?
 : Using a special model for collision we could use group names to set what part of player is hit,
 :   so shell takes less damage, banndana takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
+
+[todo] Backport TMNTWEAPSYS_EX's weapon dropping to TMNTWEAPSYS?
 
 === Done? ===
 DONE?: TMNTWEAPSYS weapon_random entity that spawns a random weapon each time the weapon respawns

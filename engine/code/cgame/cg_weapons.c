@@ -2041,24 +2041,74 @@ Allow the shader to be per-weapon
 */
 void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 {
-#if 0 // ZTM: Disabled
 	weapon_t weaponNum;
 	refEntity_t trail;
 	vec3_t		angles, dir;
 	float		angle, d;
 	float *yawAngle;
 	qboolean *yawing;
+	int clientNum;
+	clientInfo_t *ci;
+	float scale;
+	int anim;
 
-	if (!BG_WeaponHasMelee(cent->currentState.weapon))
+	static vec3_t weaponMoveDir[MAX_CLIENTS][MAX_HANDS];
+	static vec3_t trailOldOrigin[MAX_CLIENTS][MAX_HANDS];
+	static int weaponMoveDirInit = 0;
+	if (!weaponMoveDirInit)
 	{
-		// Only melee weapons have trails.
-		return;
+		weaponMoveDirInit = 1;
+		memset(&weaponMoveDir, 0, sizeof (weaponMoveDir));
+		memset(&trailOldOrigin, 0, sizeof (trailOldOrigin));
 	}
+
+	if (!cg_drawMeleeWeaponTrails.integer)
+		return;
+
+	// Only melee weapons have trails.
+	if (!BG_WeaponHasMelee(cent->currentState.weapon))
+		return;
+
+	anim = ( cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT );
+
+	if (!BG_PlayerAttackAnim(anim))
+		return;
 
 	yawAngle = &cent->pe.weaponTrails[weaponHand].yawAngle;
 	yawing = &cent->pe.weaponTrails[weaponHand].yawing;
 
 	weaponNum = cent->currentState.weapon;
+
+	clientNum = cent->currentState.clientNum;
+	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
+		ci = &cgs.clientinfo[ clientNum ];
+
+		// Scale up and back down
+		scale = (float)(cent->pe.torso.frame-ci->playercfg.animations[anim].firstFrame) / ci->playercfg.animations[anim].numFrames;
+
+		if (scale > 0.5f)
+			scale = 1.0f - scale;
+
+		scale *= 2;
+
+		// Set move dir
+		if (!VectorLength(weaponMoveDir[clientNum][weaponHand]))
+		{
+			VectorCopy( cent->currentState.pos.trDelta, weaponMoveDir[clientNum][weaponHand]);
+		}
+
+		VectorCopy( weaponMoveDir[clientNum][weaponHand], dir );
+	}
+	else
+	{
+		ci = NULL;
+		scale = 1.0f;
+		VectorCopy( cent->currentState.pos.trDelta, dir );
+		// add gravity
+		//dir[2] += 100;
+		// ZTM: Up not down.
+		dir[2] -= 100;
+	}
 
 	//
 	// Use code from CTF flag so it can turn and stuff
@@ -2077,12 +2127,6 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 
 	//if ( updateangles )
 	{
-		VectorCopy( cent->currentState.pos.trDelta, dir );
-		// add gravity
-		//dir[2] += 100;
-		// ZTM: Up not down.
-		dir[2] -= 100;
-
 		VectorNormalize( dir );
 		d = DotProduct(gun->axis[2], dir);
 		// if there is anough movement orthogonal to the flag pole
@@ -2130,7 +2174,7 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 		d = DotProduct(pole.axis[1], dir);
 		if (d < 0) {
 			angle = 360 - angle * 180 / M_PI;
-	}
+		}
 		else {
 			angle = angle * 180 / M_PI;
 		}
@@ -2145,30 +2189,21 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 
 	// set the yaw angle
 	angles[YAW] = *yawAngle;
-#if 1
 	trail.oldframe = 0;
 	trail.frame = 0;
 	trail.backlerp = 0;
-#else
-#ifndef TMNT_SUPPORTQ3
-	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-#endif
-	// lerp the flag animation frames
-#ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // FLAG_ANIMATIONS
-	BG_RunLerpFrame( &cent->pe.flag, cgs.media.flag_animations, flagAnim, cg.time, 1 );
-#else
-	CG_RunLerpFrame( ci, &cent->pe.flag, flagAnim, 1 );
-#endif
-	trail.oldframe = cent->pe.flag.oldFrame;
-	trail.frame = cent->pe.flag.frame;
-	trail.backlerp = cent->pe.flag.backlerp;
-#endif
 
 	AnglesToAxis( angles, trail.axis );
+	VectorScale(trail.axis[0], scale, trail.axis[0]);
 	CG_PositionRotatedEntityOnTag( &trail, gun, gun->hModel, "tag_weapon" );
 
 	trap_R_AddRefEntityToScene( &trail );
-#endif
+
+	if ( clientNum >= 0 && clientNum < MAX_CLIENTS )
+	{
+		VectorSubtract(trail.origin, trailOldOrigin[clientNum][weaponHand], weaponMoveDir[clientNum][weaponHand]);
+		VectorCopy(trail.origin, trailOldOrigin[clientNum][weaponHand]);
+	}
 }
 #endif
 
@@ -2539,7 +2574,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 		CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
 
-		// ZTM: Add weapon trail
+		// MELEE_TRAIL
 		CG_AddWeaponTrail(cent, &gun, HAND_PRIMARY);
 	}
 
@@ -2563,7 +2598,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 		CG_AddWeaponWithPowerups( &gun_left, cent->currentState.powerups );
 
-		// ZTM: Add weapon trail
+		// MELEE_TRAIL
 		CG_AddWeaponTrail(cent, &gun_left, HAND_SECONDARY);
 	}
 
