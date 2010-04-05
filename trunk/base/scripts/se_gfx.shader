@@ -5,9 +5,8 @@ weaponTrail
 {
 	cull disable
 	{
-		map models/misc/telep.png
-		blendfunc GL_ONE GL_ONE
-		tcGen environment
+		map gfx/misc/weapontrail
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
 

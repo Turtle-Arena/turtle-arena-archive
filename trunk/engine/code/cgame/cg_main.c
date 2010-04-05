@@ -238,6 +238,9 @@ vmCvar_t	cg_recordSPDemo;
 vmCvar_t	cg_recordSPDemoName;
 vmCvar_t	cg_obeliskRespawnDelay;
 #endif
+#ifdef TMNTWEAPSYS // MELEE_TRAIL
+vmCvar_t	cg_drawMeleeWeaponTrails;
+#endif
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -444,6 +447,9 @@ static cvarTable_t cvarTable[] = {
 #endif
 	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE}
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
+#ifdef TMNTWEAPSYS // MELEE_TRAIL
+	,{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "0", CVAR_ARCHIVE}
+#endif
 };
 
 static int  cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );

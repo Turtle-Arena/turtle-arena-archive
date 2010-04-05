@@ -1607,6 +1607,9 @@ extern  vmCvar_t		cg_recordSPDemo;
 extern  vmCvar_t		cg_recordSPDemoName;
 extern	vmCvar_t		cg_obeliskRespawnDelay;
 #endif
+#ifdef TMNTWEAPSYS // MELEE_TRAIL
+extern	vmCvar_t		cg_drawMeleeWeaponTrails;
+#endif
 
 //
 // cg_main.c

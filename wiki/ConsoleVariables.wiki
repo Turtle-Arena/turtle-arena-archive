@@ -27,6 +27,7 @@ List of *Console variables* (also called Cvars) that have been added and removed
   * g_teleportFluxTime - Time in seconds to be non-solid after teleporting
 
   * cg_drawSpeed - Draw player's speed on the HUD
+  * cg_drawMeleeWeaponTrails - Draw (unfinished) melee weapon trails
 
 = Removed =
 
