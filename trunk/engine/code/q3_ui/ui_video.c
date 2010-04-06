@@ -725,7 +725,11 @@ static void GraphicsOptions_ApplyChanges( void *unused, int notification )
 	trap_Cvar_SetValue( "r_fullscreen", s_graphicsoptions.fs.curvalue );
 	trap_Cvar_SetValue( "r_colorbits", 0 );
 	trap_Cvar_SetValue( "r_depthbits", 0 );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix for cg_shadows 2
+	trap_Cvar_SetValue( "r_stencilbits", 8 );
+#else
 	trap_Cvar_SetValue( "r_stencilbits", 0 );
+#endif
 	trap_Cvar_SetValue( "r_vertexLight", s_graphicsoptions.lighting.curvalue );
 #ifdef OA_BLOOM
 	trap_Cvar_SetValue( "r_bloom", s_graphicsoptions.bloom.curvalue );
