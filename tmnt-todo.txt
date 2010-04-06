@@ -56,9 +56,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 
 [todo] Savegames for single player
 
-[bug] cg_shadows 2 doesn't work if config is changed from default config?
-: Which cvar is the problem?
-
 [todo] Pull grapple back to player before removing entity like LoZ: TP?
 
 [bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects.
