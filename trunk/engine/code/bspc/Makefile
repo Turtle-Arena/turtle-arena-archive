@@ -156,7 +156,7 @@ ifeq ($(PLATFORM),linux)
 #use these when debugging 
 #CFLAGS=$(BASE_CFLAGS) -g
 
-  LDFLAGS=-ldl -lm -lpthread
+  LIBS=-ldl -lm -lpthread
 
 else # ifeq Linux
 
@@ -299,7 +299,6 @@ targets: makedirs
 	@echo "Building bspc in $(B):"
 	@echo "  PLATFORM: $(PLATFORM)"
 	@echo "  ARCH: $(ARCH)"
-	@echo "  VERSION: $(VERSION)"
 	@echo "  COMPILE_PLATFORM: $(COMPILE_PLATFORM)"
 	@echo "  COMPILE_ARCH: $(COMPILE_ARCH)"
 	@echo "  CC: $(CC)"
@@ -426,7 +425,7 @@ endif
 
 $(B)/bspc.$(ARCH)$(BINEXT) : $(BSPC_OBJS)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(BSPC_OBJS)
+	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(BSPC_OBJS) $(LIBS)
 
 #############################################################################
 # MISC
@@ -436,11 +435,6 @@ OBJ=$(BSPC_OBJS)
 OBJ_D_FILES=$(filter %.d,$(OBJ:%.o=%.d))
 
 clean: clean-debug clean-release
-#ifeq ($(PLATFORM),mingw32)
-#	@$(MAKE) -C $(NSISDIR) clean
-#else
-#	@$(MAKE) -C $(LOKISETUPDIR) clean
-#endif
 
 clean-debug:
 	@$(MAKE) clean2 B=$(BD)
@@ -458,10 +452,6 @@ depend:
 	$(echo_cmd) "DEPEND $(B)"
 	$(Q)$(CC) -MM $(BSPC_OBJS:.o=.c)
 
-#install:
-#	cp bspci386 ..
-
-#
-# From "make depend"
-#
+install:
+	cp $(BR)/bspc.$(ARCH)$(BINEXT) $(BSPCDIR)/../../../extras/bspc/
 

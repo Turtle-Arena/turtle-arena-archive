@@ -541,6 +541,9 @@ int main (int argc, char **argv)
 
 #ifdef TMNT
 	calcgrapplereach = true;
+	forcesidesvisible = true; // Currently always required. So always enable.
+	Log_Print("grapplereach = true\n");
+	Log_Print("forcesidesvisible = true\n");
 #endif
 	DefaultCfg();
 	for (i = 1; i < argc; i++)
@@ -660,17 +663,16 @@ int main (int argc, char **argv)
 			freetree = true;
 			Log_Print("freetree = true\n");
 		} //end else if
-#ifdef TMNT
-		else if (!stricmp(argv[i], "-nograpplereach"))
-		{
-			calcgrapplereach = false;
-			Log_Print("nograpplereach = true\n");
-		} //end else if
-#else
 		else if (!stricmp(argv[i], "-grapplereach"))
 		{
 			calcgrapplereach = true;
 			Log_Print("grapplereach = true\n");
+		} //end else if
+#ifdef TMNT
+		else if (!stricmp(argv[i], "-nograpplereach"))
+		{
+			calcgrapplereach = false;
+			Log_Print("grapplereach = false\n");
 		} //end else if
 #endif
 		else if (!stricmp(argv[i], "-nobrushmerge"))
@@ -688,6 +690,13 @@ int main (int argc, char **argv)
 			forcesidesvisible = true;
 			Log_Print("forcesidesvisible = true\n");
 		} //end else if
+#ifdef TMNT
+		else if (!stricmp(argv[i], "-noforcesidesvisible"))
+		{
+			forcesidesvisible = false;
+			Log_Print("forcesidesvisible = false\n");
+		} //end else if
+#endif
 		else if (!stricmp(argv[i], "-output"))
 		{
 			if (i + 1 >= argc) {i = 0; break;}

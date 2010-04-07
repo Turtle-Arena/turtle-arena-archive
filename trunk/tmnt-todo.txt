@@ -141,8 +141,6 @@ DONE(untested)?: Melee combo system, with different animations for each attack? 
 :   OR Just use misc_object as they use vertex lighting.
 :        Misc_model is a way to insert a *static* model, so lightmap like the level.
 
-WONTFIX?: [bug] Raph's legs go through his shell when crouching and looking at the floor.
-
 WONTFIX?: [bug/todo] First Person weapon doesn't draw correctly (It draws too near to the screen)
 			This happens due to changing the field of view to 70 (Q3 uses 90)
 
@@ -181,8 +179,10 @@ DONE: Have player fade out when dead instead of BodySink
 
 
 == BSPC ==
-// BSPC is the BSP map to .aas (Arena Awareness System) compiler. The aas file is used by bots.
+// BSPC is the map .bsp to .aas (Arena Awareness System) compiler. The aas file is used by bots.
 [bug] Fix compiling with cross-make-mingw.sh
+
+[todo] Recompile outdated win32 BSPC, extras/bspc/bspc.x86.exe
 
 
 == Master Server ==
