@@ -2088,7 +2088,7 @@ void ClientEndFrame( gentity_t *ent ) {
 						hit = &g_entities[touch[i]];
 
 						// Skip non-solid misc_objects
-						if ( !hit->client && !hit->s.solid)
+						if ( !hit->client && (!hit->s.solid || hit->s.solid == SOLID_BMODEL) )
 							continue;
 
 						// nail it

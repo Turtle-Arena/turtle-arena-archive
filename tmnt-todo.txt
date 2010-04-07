@@ -61,8 +61,6 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 [bug] When players have PW_FLASHING they can walk though Obelisks/misc_objects.
 : When PW_FLASHING wears off while in a solid, they are killed. Otherwise they would be stuck.
 
-[bug] The PW_FLASHING workaround shouldn't apply to bbmodel, the sloped brush in the map "test" that is a "computer" causes the player to die for no reason.
-
 [todo] Have shurikens do damage while they are in the wall/ground?
 
 [todo] Add misc_bubbles entity.
@@ -97,6 +95,10 @@ STARTED ( TMNTWEAPSYS ): [todo] Support Quake III: Team Arena weapon features vi
 : Change "spmodel" by clicking it?
 
 [todo] Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
+
+[todo] framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
+
+[todo] Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161
 
 // The below are somewhat long...
 
