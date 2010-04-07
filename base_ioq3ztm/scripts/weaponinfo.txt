@@ -83,6 +83,7 @@ projectile "p_machinegun"
 	damage 7
 	trailType PT_BULLET
 	deathType PD_BULLET
+	explosionType "PE_NONE"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	spread 200
@@ -123,6 +124,7 @@ projectile "p_shotgun"
 	instantDamage 1
 	damage 10
 	deathType PD_BULLET
+	explosionType "PE_NONE"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	spread 700
@@ -243,7 +245,7 @@ weapongroup "wp_rocket_launcher"
 }
 
 //
-// Lightning (Not done, has no explosion [is that all?])
+// Lightning (Not done, has no explosion, does't draw in third person, [is that all?])
 //
 
 projectile "p_lightning"
@@ -502,8 +504,8 @@ weapongroup "wp_nailgun"
 //
 // Prox Mine Launcher (Can't be remade yet.)
 //               Need to be able to damage owner in G_RunMissile
-//               Need to generlize prox explosion stuff (when player is clost, etc).
-//               WONTFIX?: Stick mines to players (I don't like the idea of it...).
+//               Need to generlize prox stuff (tigger, and stick sounds)
+//               WONTFIX?: Stick mines to players.
 //
 
 projectile "p_prox_mine"
@@ -517,6 +519,7 @@ projectile "p_prox_mine"
 	timetolive 3000
 	trailType "PT_GRENADE"
 	deathType "PD_GRENADE"
+	explosionType "PE_PROX"
 	useGravity 1
 	stickOnImpact 3
 	hitSound0 "sound/weapons/proxmine/wstbexpl.wav"
@@ -554,6 +557,7 @@ projectile "p_chaingun"
 	damage 7
 	trailType "PT_BULLET"
 	deathType "PD_BULLET"
+	explosionType "PE_NONE"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	spread 600

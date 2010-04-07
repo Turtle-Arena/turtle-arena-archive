@@ -3977,6 +3977,7 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 	// some weapons will make an explosion with the blood, while
 	// others will just make the blood
 #ifdef TMNTWEAPSYS
+	// ZTM: TODO: Check explosionType != PE_NONE instead of deathType?
 	if (bg_projectileinfo[weapon].deathType != PD_NONE)
 	{
 		CG_MissileHitWall( weapon, 0, origin, dir, IMPACTSOUND_FLESH );

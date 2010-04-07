@@ -67,6 +67,14 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	vec3_t		dir;
 	vec3_t		origin;
 
+#ifdef TMNTWEAPSYS
+	if (bg_projectileinfo[ent->s.weapon].explosionType == PE_NONE)
+	{
+		G_FreeEntity(ent);
+		return;
+	}
+#endif
+
 	BG_EvaluateTrajectory( &ent->s.pos, level.time, origin );
 	SnapVector( origin );
 	G_SetOrigin( ent, origin );
@@ -881,7 +889,7 @@ gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t 
 
 #endif
 
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#if defined MISSIONPACK || defined TMNTWEAPSYS
 /*
 ================
 ProximityMine_Explode
@@ -941,7 +949,11 @@ void ProximityMine_Trigger( gentity_t *trigger, gentity_t *other, trace_t *trace
 	// trigger the mine!
 	mine = trigger->parent;
 	mine->s.loopSound = 0;
+#ifdef TMNTWEAPSYS
+	G_AddEvent( mine, EV_PROJECTILE_TRIGGER, 0 );
+#else
 	G_AddEvent( mine, EV_PROXIMITY_MINE_TRIGGER, 0 );
+#endif
 	mine->nextthink = level.time + 500;
 
 	G_FreeEntity( trigger );
@@ -957,7 +969,11 @@ static void ProximityMine_Activate( gentity_t *ent ) {
 	float		r;
 
 	ent->think = ProximityMine_Explode;
+#ifdef TMNTWEAPONS
+	ent->nextthink = level.time + 20000;
+#else
 	ent->nextthink = level.time + g_proxMineTimeout.integer;
+#endif
 
 	ent->takedamage = qtrue;
 	ent->health = 1;
@@ -986,6 +1002,7 @@ static void ProximityMine_Activate( gentity_t *ent ) {
 	ent->activator = trigger;
 }
 
+#ifndef TMNTWEAPONS
 /*
 ================
 ProximityMine_ExplodeOnPlayer
@@ -1055,6 +1072,7 @@ static void ProximityMine_Player( gentity_t *mine, gentity_t *player ) {
 	}
 }
 #endif
+#endif
 
 /*
 ================
@@ -1067,6 +1085,9 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 #if defined MISSIONPACK && !defined TMNT // POWERS
 	vec3_t			forward, impactpoint, bouncedir;
 	int				eFlags;
+#endif
+#ifdef TMNTWEAPSYS
+	qboolean damagedOther = qfalse;
 #endif
 	other = &g_entities[trace->entityNum];
 
@@ -1119,7 +1140,12 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	}
 #endif
 	// impact damage
-	if (other->takedamage) {
+	if (other->takedamage
+#ifdef TMNTWEAPSYS // stickOnImpact only damages once
+		&& !(ent->count & 2)
+#endif
+		)
+	{
 		// FIXME: wrong damage direction?
 		if ( ent->damage ) {
 			vec3_t	velocity;
@@ -1139,6 +1165,9 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			G_Damage (other, ent, &g_entities[ent->r.ownerNum], velocity,
 				ent->s.origin, ent->damage, 
 				0, ent->methodOfDeath);
+#ifdef TMNTWEAPSYS
+			damagedOther = qtrue;
+#endif
 		}
 	}
 
@@ -1151,17 +1180,20 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			return;
 		ent->count |= 2;
 
+#if 0
 		// if it's a player, stick it on to them (flag them and remove this entity)
-		if( other->s.eType == ET_PLAYER && other->health > 0 ) {
-			//ProximityMine_Player( ent, other );
-			G_ExplodeMissile( ent );
+		if( bg_projectileinfo[ent->s.weapon].explosionType == PE_PROX &&
+			other->s.eType == ET_PLAYER && other->health > 0 )
+		{
+			ProximityMine_Player( ent, other );
 			return;
 		}
+#endif
 
-		// Don't continue to damage obelisk
-		if (other->takedamage)
+		// Don't stick to obelisk and don't stick to the entity that this missile just killed.
+		if ((other->pain == ObeliskPain) || (damagedOther && other->health <= 0) || other->s.eType == ET_PLAYER)
 		{
-			G_ExplodeMissile( ent );
+			goto missileImpact;
 		}
 
 		SnapVectorTowards( trace->endpos, ent->s.pos.trBase );
@@ -1191,25 +1223,28 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			VectorCopy(trace->plane.normal, dir);
 #endif
 		}
-		if ( other->client )
+
+		ent->s.pos.trType = TR_STATIONARY;
+		VectorClear( ent->s.pos.trDelta );
+
+		G_AddEvent( ent, EV_PROJECTILE_STICK, DirToByte(trace->plane.normal) );
+		ent->s.otherEntityNum = 0; // radius 0=default
+		ent->s.time2 = trace->surfaceFlags; // surface
+		//ent->s.number
+
+		if (bg_projectileinfo[ent->s.weapon].explosionType == PE_PROX)
 		{
-			ent->s.pos.trType = TR_GRAVITY;
-			VectorClear( ent->s.pos.trDelta );
+			ent->think = ProximityMine_Activate;
+			ent->nextthink = level.time + 2000;
+			ent->die = ProximityMine_Die;
 		}
 		else
 		{
-			ent->s.pos.trType = TR_STATIONARY;
-			VectorClear( ent->s.pos.trDelta );
+			ent->die = G_Missile_Die;
 		}
-
-		//G_AddEvent( ent, EV_PROXIMITY_MINE_STICK, trace->surfaceFlags );
-
-		//ent->think = ProximityMine_Activate;
-		//ent->nextthink = level.time + 2000;
 
 		// link the prox mine to the other entity
 		ent->enemy = other;
-		//ent->die = ProximityMine_Die;
 		VectorCopy(dir, ent->movedir);
 		VectorSet(ent->r.mins, -4, -4, -4);
 		VectorSet(ent->r.maxs, 4, 4, 4);
@@ -1312,6 +1347,10 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 		return;
 	}
+
+#ifdef TMNTWEAPSYS
+missileImpact:
+#endif
 
 	// is it cheaper in bandwidth to just remove this ent and create a new
 	// one, rather than changing the missile into the explosion?
