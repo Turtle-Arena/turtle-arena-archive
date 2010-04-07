@@ -319,15 +319,30 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 	for ( e = 0 ; e < listedEntities ; e++ ) {
 		check = &g_entities[ entityList[ e ] ];
 
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#if defined MISSIONPACK || defined TMNTWEAPSYS
 		if ( check->s.eType == ET_MISSILE ) {
+#ifdef TMNTWEAPSYS
+			if (bg_projectileinfo[check->s.weapon].stickOnImpact)
+#else
 			// if it is a prox mine
-			if ( !strcmp(check->classname, "prox mine") ) {
+			if ( !strcmp(check->classname, "prox mine") )
+#endif
+			{
 				// if this prox mine is attached to this mover try to move it with the pusher
 				if ( check->enemy == pusher ) {
 					if (!G_TryPushingProxMine( check, pusher, move, amove )) {
 						//explode
 						check->s.loopSound = 0;
+#ifdef TMNTWEAPSYS
+						if (bg_projectileinfo[check->s.weapon].explosionType == PE_PROX) {
+							G_AddEvent( check, EV_PROJECTILE_TRIGGER, 0 );
+							if (check->activator) {
+								G_FreeEntity(check->activator);
+								check->activator = NULL;
+							}
+						}
+						G_ExplodeMissile(check);
+#else
 						G_AddEvent( check, EV_PROXIMITY_MINE_TRIGGER, 0 );
 						G_ExplodeMissile(check);
 						if (check->activator) {
@@ -335,6 +350,7 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 							check->activator = NULL;
 						}
 						//G_Printf("prox mine explodes\n");
+#endif
 					}
 				}
 				else {
@@ -342,6 +358,16 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 					if (!G_CheckProxMinePosition( check )) {
 						//explode
 						check->s.loopSound = 0;
+#ifdef TMNTWEAPSYS
+						if (bg_projectileinfo[check->s.weapon].explosionType == PE_PROX) {
+							G_AddEvent( check, EV_PROJECTILE_TRIGGER, 0 );
+							if (check->activator) {
+								G_FreeEntity(check->activator);
+								check->activator = NULL;
+							}
+						}
+						G_ExplodeMissile(check);
+#else
 						G_AddEvent( check, EV_PROXIMITY_MINE_TRIGGER, 0 );
 						G_ExplodeMissile(check);
 						if (check->activator) {
@@ -349,6 +375,7 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 							check->activator = NULL;
 						}
 						//G_Printf("prox mine explodes\n");
+#endif
 					}
 				}
 				continue;

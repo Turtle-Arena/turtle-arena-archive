@@ -610,6 +610,10 @@ typedef enum {
 #define PD_BFG 6
 #define PD_LIGHTNING 7
 #define PD_ROCKET_SMALL 8
+//projectile explosion types
+#define PE_NORMAL 0 // default (explode after timetolive)
+#define PE_NONE 1
+#define PE_PROX 2 // (stickOnImpact prox mine)
 //projectile spin types
 #define PS_ROLL 0 // default
 #define PS_NONE 1
@@ -639,6 +643,7 @@ typedef struct
 	qboolean shootable;
 	int trailType;
 	int deathType;
+	int explosionType;
 	int missileDlight;
 	vec3_t missileDlightColor;
 	char missileSoundName[MAX_QPATH];
@@ -942,6 +947,8 @@ typedef enum {
 
 #ifdef TMNTWEAPSYS
 	EV_PROJECTILE_BOUNCE,
+	EV_PROJECTILE_STICK,
+	EV_PROJECTILE_TRIGGER,
 #else
 	EV_GRENADE_BOUNCE,		// eventParm will be the soundindex
 #endif

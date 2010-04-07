@@ -43,6 +43,7 @@ projectile "p_shuriken"
 	speed 700
 	timetolive 15000
 	spinType "PS_PITCH"
+	explosionType "PE_NONE"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	stickOnImpact 1

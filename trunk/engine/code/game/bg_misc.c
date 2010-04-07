@@ -1870,7 +1870,7 @@ const char *pt_names[] =
 
 //projectile death types
 const char *pd_names[] =
-	{
+{
 	"PD_NONE",
 	"PD_PLASMA",
 	"PD_ROCKET",
@@ -1883,7 +1883,16 @@ const char *pd_names[] =
 	NULL
 };
 
-//projectile death types
+//projectile explosion types
+const char *pe_names[] =
+{
+	"PE_NORMAL",
+	"PE_NONE",
+	"PE_PROX",
+	NULL
+};
+
+//projectile spin types
 const char *ps_names[] =
 {
 	"PS_ROLL",
@@ -2048,6 +2057,19 @@ static qboolean Projectile_Parse(char **p) {
 			{
 				if ( !Q_stricmp( token, pd_names[i] ) ) {
 					projectile.deathType = i;
+					break;
+				}
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "explosionType" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			for (i = 0; pe_names[i] != NULL; i++)
+			{
+				if ( !Q_stricmp( token, pe_names[i] ) ) {
+					projectile.explosionType = i;
 					break;
 				}
 			}
@@ -3119,6 +3141,7 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tshootable %d\r\n", projectile->shootable);
 		FS_Printf2("\ttrailType %d\r\n", projectile->trailType);
 		FS_Printf2("\tdeathType %d\r\n", projectile->deathType);
+		FS_Printf2("\texplosionType %d\r\n", projectile->explosionType);
 		FS_Printf2("\tmissileDlight %d\r\n", projectile->missileDlight);
 		FS_Printf4("\tmissileDlightColor %f %f %f\r\n", projectile->missileDlightColor[0], projectile->missileDlightColor[1], projectile->missileDlightColor[2]);
 		FS_Printf2("\tmissileSound \"%s\"\r\n", projectile->missileSoundName);
@@ -4630,6 +4653,8 @@ char *eventnames[] = {
 
 #ifdef TMNTWEAPSYS
 	"EV_PROJECTILE_BOUNCE",
+	"EV_PROJECTILE_STICK",
+	"EV_PROJECTILE_TRIGGER",
 #else
 	"EV_GRENADE_BOUNCE",		// eventParm will be the soundindex
 #endif

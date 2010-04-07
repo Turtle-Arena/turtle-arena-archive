@@ -1150,7 +1150,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 
 		// For Laser Shuriken, not Grenade.
-		if (bg_projectileinfo[es->weapon].bounceType == PB_FULL) {
+		if (bg_projectileinfo[es->weapon].bounceType != PB_HALF) {
 			if (es->eventParm == 255) {
 				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 			} else {
@@ -1158,6 +1158,27 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 			}
 		}
+		break;
+
+	case EV_PROJECTILE_STICK: // EV_PROXIMITY_MINE_STICK
+		DEBUGNAME("EV_PROJECTILE_STICK");
+		// es->time2 is the surfaceflags
+		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].bounceSound[0] );
+
+#ifdef TMNTMISC // MATERIALS
+		if (es->eventParm != 255)
+			ByteToDir( es->eventParm, dir );
+		else
+			VectorSet(dir, 0, 0, 1);
+
+		CG_ImpactParticles(position, dir, es->otherEntityNum ? es->otherEntityNum : 8, es->time2, es->number);
+#endif
+		break;
+
+	case EV_PROJECTILE_TRIGGER: // EV_PROXIMITY_MINE_TRIGGER
+		DEBUGNAME("EV_PROJECTILE_TRIGGER");
+		// play sound
+		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].bounceSound[1] );
 		break;
 #else
 	case EV_GRENADE_BOUNCE:
