@@ -48,7 +48,7 @@ build commands
 <build name="Q3Map2: (final) BSP -meta -custinfoparms -flares -skyfix, -vis, -light -fast -filter -super 2 -bounce 8">
 <command>[q3map2] -meta -custinfoparms -flares -skyfix "[MapFile]"</command>
 <command>[q3map2] -vis -saveprt "[MapFile]"</command>
-<command>[q3map2] -light  -lightmapsize 512 -fast -super 2 -filter -bounce 8 "[MapFile]"</command>
+<command>[q3map2] -light -lightmapsize 512 -fast -super 2 -filter -bounce 8 "[MapFile]"</command>
 </build>
 <build name="Q3Map2: (simulate old style -light -extra) BSP -meta -custinfoparms, -vis, -light -super 2">
 <command>[q3map2] -meta -custinfoparms "[MapFile]"</command>
