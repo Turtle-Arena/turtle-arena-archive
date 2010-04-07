@@ -26,5 +26,5 @@ if [ ! -f $BIN ]; then
 	exit 1
 fi
 
-# Run # -nograpplereach
-./$BIN -forcesidesvisible -bsp2aas "../../base/maps/*.bsp"
+# Run
+./$BIN -bsp2aas "../../base/maps/*.bsp"
