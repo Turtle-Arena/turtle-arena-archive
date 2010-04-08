@@ -1682,6 +1682,9 @@ void ClientThink_real( gentity_t *ent ) {
 
 	if ( !( ent->client->ps.eFlags & EF_FIRING ) ) {
 		client->fireHeld = qfalse;		// for grapple
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
+		client->ps.pm_flags &= ~PMF_GRAPPLE_SHOT;
+#endif
 	}
 
 	// use the snapped origin for linking so it matches client predicted versions

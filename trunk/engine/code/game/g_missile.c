@@ -1319,7 +1319,11 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		} else {
 			VectorCopy(trace->endpos, v);
 			G_AddEvent( nent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
+#ifdef TMNTWEAPSYS // GRAPPLE_MOVE
+			ent->enemy = other;
+#else
 			ent->enemy = NULL;
+#endif
 		}
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Fix grapple wallmark/death-effect/debris (only tested with TMNTWEAPSYS...)
 		nent->s.weapon = ent->s.weapon;
