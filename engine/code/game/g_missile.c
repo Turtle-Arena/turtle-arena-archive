@@ -1234,9 +1234,14 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 		if (bg_projectileinfo[ent->s.weapon].explosionType == PE_PROX)
 		{
-			ent->think = ProximityMine_Activate;
-			ent->nextthink = level.time + 2000;
-			ent->die = ProximityMine_Die;
+			// When a BREAKABLE ET_MOVER is killed it drops the projectiles stuck to it,
+			//   so don't setup the prox mine when it impact a surface if it already hit been setup.
+			if (ent->die != ProximityMine_Die)
+			{
+				ent->think = ProximityMine_Activate;
+				ent->nextthink = level.time + 2000;
+				ent->die = ProximityMine_Die;
+			}
 		}
 		else
 		{
