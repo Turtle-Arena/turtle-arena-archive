@@ -1278,15 +1278,22 @@ void Weapon_HookFree (gentity_t *ent)
 #endif
 	ent->parent->client->hook = NULL;
 	ent->parent->client->ps.pm_flags &= ~PMF_GRAPPLE_PULL;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
-	ent->parent->client->ps.pm_flags &= ~PMF_GRAPPLE_SHOT;
-#endif
 	G_FreeEntity( ent );
 }
 
 void Weapon_HookThink (gentity_t *ent)
 {
-	if (ent->enemy) {
+#ifdef TMNTWEAPSYS // GRAPPLE_MOVE
+	// Update grapple position each frame
+	ent->nextthink = level.time + FRAMETIME;
+#endif
+
+	if (ent->enemy
+#ifdef TMNTWEAPSYS // GRAPPLE_MOVE
+		&& ent->enemy->client
+#endif
+		)
+	{
 		vec3_t v, oldorigin;
 
 		VectorCopy(ent->r.currentOrigin, oldorigin);

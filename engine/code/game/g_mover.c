@@ -320,9 +320,16 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 		check = &g_entities[ entityList[ e ] ];
 
 #if defined MISSIONPACK || defined TMNTWEAPSYS
-		if ( check->s.eType == ET_MISSILE ) {
+		if ( check->s.eType == ET_MISSILE
+#ifdef TMNTWEAPSYS // GRAPPLE_MOVE
+			|| check->s.eType == ET_GRAPPLE
+#endif
+			)
+		{
 #ifdef TMNTWEAPSYS
-			if (bg_projectileinfo[check->s.weapon].stickOnImpact)
+			if (bg_projectileinfo[check->s.weapon].stickOnImpact
+				// GRAPPLE_MOVE
+				|| check->s.eType == ET_GRAPPLE)
 #else
 			// if it is a prox mine
 			if ( !strcmp(check->classname, "prox mine") )
@@ -341,7 +348,17 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 								check->activator = NULL;
 							}
 						}
-						G_ExplodeMissile(check);
+
+						// GRAPPLE_MOVE
+						if (bg_projectileinfo[check->s.weapon].grappling
+							&& check->parent && check->parent->client && check->parent->client->hook == check)
+						{
+							Weapon_HookFree(check);
+						}
+						else
+						{
+							G_ExplodeMissile(check);
+						}
 #else
 						G_AddEvent( check, EV_PROXIMITY_MINE_TRIGGER, 0 );
 						G_ExplodeMissile(check);
@@ -366,7 +383,17 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 								check->activator = NULL;
 							}
 						}
-						G_ExplodeMissile(check);
+
+						// GRAPPLE_MOVE
+						if (bg_projectileinfo[check->s.weapon].grappling
+							&& check->parent && check->parent->client && check->parent->client->hook == check)
+						{
+							Weapon_HookFree(check);
+						}
+						else
+						{
+							G_ExplodeMissile(check);
+						}
 #else
 						G_AddEvent( check, EV_PROXIMITY_MINE_TRIGGER, 0 );
 						G_ExplodeMissile(check);
