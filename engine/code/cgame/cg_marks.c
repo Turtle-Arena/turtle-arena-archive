@@ -153,6 +153,16 @@ void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 	qboolean addedMark = qfalse;
 #endif
 
+#ifdef IOQ3ZTM // LASERTAG
+	if ( cg_laserTag.integer ) {
+#ifdef TMNTWEAPSYS
+		return qfalse;
+#else
+		return;
+#endif
+	}
+#endif
+
 	if ( !cg_addMarks.integer ) {
 #ifdef TMNTWEAPSYS
 		return qfalse;

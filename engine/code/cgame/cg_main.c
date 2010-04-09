@@ -241,6 +241,9 @@ vmCvar_t	cg_obeliskRespawnDelay;
 #ifdef TMNTWEAPSYS // MELEE_TRAIL
 vmCvar_t	cg_drawMeleeWeaponTrails;
 #endif
+#ifdef IOQ3ZTM // LASERTAG
+vmCvar_t	cg_laserTag;
+#endif
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -449,6 +452,9 @@ static cvarTable_t cvarTable[] = {
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
 #ifdef TMNTWEAPSYS // MELEE_TRAIL
 	,{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "0", CVAR_ARCHIVE}
+#endif
+#ifdef IOQ3ZTM // LASERTAG
+	,{ &cg_laserTag, "g_laserTag", "0", CVAR_SERVERINFO },
 #endif
 };
 
@@ -2443,6 +2449,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CG_ShaderStateChanged();
 
 	trap_S_ClearLoopingSounds( qtrue );
+
+#if defined IOQ3ZTM && defined THIRD_PERSON // LASERTAG
+	if (cg_laserTag.integer)
+		trap_Cvar_Set("cg_thirdPerson", "0");
+	else
+		trap_Cvar_Set("cg_thirdPerson", "1");
+#endif
 }
 
 #ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY

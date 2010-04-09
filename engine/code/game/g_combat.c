@@ -1192,6 +1192,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( dflags & DAMAGE_NO_KNOCKBACK ) {
 		knockback = 0;
 	}
+#ifdef IOQ3ZTM // LASERTAG
+	if (g_laserTag.integer) {
+		knockback = 0;
+	}
+#endif
 
 	// figure momentum add, even if the damage won't be taken
 	if ( knockback && targ->client ) {
@@ -1252,6 +1257,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 				return;
 			}
 		}
+		// ZTM: TODO: PE_PROX or all projectiles.
 #ifndef TMNTWEAPONS // MOD
 #ifdef MISSIONPACK
 		if (mod == MOD_PROXIMITY_MINE) {
@@ -1372,6 +1378,12 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// set the last client who damaged the target
 		targ->client->lasthurt_client = attacker->s.number;
 		targ->client->lasthurt_mod = mod;
+#ifdef IOQ3ZTM // LASERTAG
+		if (g_laserTag.integer == 1) {
+			take = 0;
+			AddScore(attacker, targ->r.currentOrigin, 5);
+		}
+#endif
 	}
 
 	// do the damage

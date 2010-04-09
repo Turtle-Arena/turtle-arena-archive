@@ -1603,8 +1603,16 @@ void ClientSpawn(gentity_t *ent) {
 
 #ifdef TMNTHOLDSYS
 #ifdef TMNTHOLDABLE // Start with 10 shurikens!
+#ifdef IOQ3ZTM // LASERTAG
+	if (g_laserTag.integer) {
+		client->ps.holdableIndex = HI_NONE;
+	} else {
+#endif
 	client->ps.holdable[HI_SHURIKEN] = 10;
 	client->ps.holdableIndex = HI_SHURIKEN;
+#ifdef IOQ3ZTM // LASERTAG
+	}
+#endif
 #else
 	client->ps.holdableIndex = HI_NONE;
 #endif
@@ -1648,9 +1656,12 @@ void ClientSpawn(gentity_t *ent) {
 
 	{
 		// ZTM: Start with default weapon.
-		gitem_t *item = NULL;
+#ifndef TMNTWEAPSYS_EX
+		gitem_t *item;
+#endif
 		weapon_t weapon;
 
+		// DEFAULT_DEFAULT_WEAPON
 		weapon = client->ps.stats[STAT_DEFAULTWEAPON];
 #ifdef TMNTWEAPSYS_EX
 		client->ps.stats[STAT_PENDING_WEAPON] = weapon;
@@ -1658,6 +1669,10 @@ void ClientSpawn(gentity_t *ent) {
 		client->ps.stats[STAT_WEAPONS] = ( 1 << weapon);
 #endif
 
+#ifdef TMNTWEAPSYS_EX
+		// Default weapon doesn't use ammo.
+		client->ps.stats[STAT_AMMO] = -1;
+#else
 		if (weapon > 0)
 		{
 			item = BG_FindItemForWeapon( weapon );
@@ -1666,32 +1681,29 @@ void ClientSpawn(gentity_t *ent) {
 		if (!item || (item && item->quantity == 0))
 		{
 			// Weapon that doesn't use ammo.
-#ifdef TMNTWEAPSYS_EX
-			client->ps.stats[STAT_AMMO] = -1;
-#else
 			client->ps.ammo[weapon] = -1;
-#endif
 		}
 		else
 		{
-#ifdef TMNTWEAPSYS_EX
-			client->ps.stats[STAT_AMMO] = item->quantity;
-
-			if ( g_gametype.integer == GT_TEAM )
-			{
-				client->ps.stats[STAT_AMMO] /= 2;
-			}
-#else
 			client->ps.ammo[weapon] = item->quantity;
 
 			if ( g_gametype.integer == GT_TEAM )
 			{
 				client->ps.ammo[weapon] /= 2;
 			}
-#endif
 		}
+#endif
 	}
 #else
+#ifdef IOQ3ZTM // LASERTAG
+	if (g_laserTag.integer)
+	{
+		client->ps.stats[STAT_WEAPONS] = ( 1 << WP_RAILGUN );
+		client->ps.ammo[WP_RAILGUN] = -1;
+	}
+	else
+	{
+#endif
 	client->ps.stats[STAT_WEAPONS] = ( 1 << WP_MACHINEGUN );
 	if ( g_gametype.integer == GT_TEAM ) {
 		client->ps.ammo[WP_MACHINEGUN] = 50;
@@ -1702,6 +1714,9 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.stats[STAT_WEAPONS] |= ( 1 << WP_GAUNTLET );
 	client->ps.ammo[WP_GAUNTLET] = -1;
 	client->ps.ammo[WP_GRAPPLING_HOOK] = -1;
+#ifdef IOQ3ZTM // LASERTAG
+	}
+#endif
 #endif
 
 #ifdef TMNTMISC // no health countdown
@@ -1737,6 +1752,11 @@ void ClientSpawn(gentity_t *ent) {
 		// Set default hands.
 		client->ps.weaponHands = BG_WeaponHandsForWeaponNum(client->ps.stats[STAT_DEFAULTWEAPON]);
 #else
+#ifdef IOQ3ZTM // LASERTAG
+		if (g_laserTag.integer)
+			client->ps.weapon = WP_RAILGUN;
+		else
+#endif
 		client->ps.weapon = WP_MACHINEGUN;
 #endif
 		client->ps.weaponstate = WEAPON_READY;

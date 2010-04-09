@@ -361,7 +361,20 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 		return qfalse;
 	}
 
+
+
 #ifdef TMNTWEAPSYS
+#ifdef IOQ3ZTM // LASERTAG
+	if (g_laserTag.integer)
+	{
+		if ( !strcmp("weapon_random", ent->classname) ) {
+			return qfalse;
+		}
+	}
+
+	if (!g_laserTag.integer)
+	{
+#endif
 	// ZTM: NOTE: Placed before items so if weapon is on both list
 	//                    uses external item.
 	// check weapon item spawn functions
@@ -371,6 +384,9 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
+#ifdef IOQ3ZTM // LASERTAG
+	}
+#endif
 #endif
 
 #ifdef TMNTNPCSYS
@@ -383,6 +399,10 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	}
 #endif
 
+#ifdef IOQ3ZTM // LASERTAG
+	if (!g_laserTag.integer)
+	{
+#endif
 	// check item spawn functions
 	for ( item=bg_itemlist+1 ; item->classname ; item++ ) {
 		if ( !strcmp(item->classname, ent->classname) ) {
@@ -390,6 +410,9 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
+#ifdef IOQ3ZTM // LASERTAG
+	}
+#endif
 
 	// check normal spawn functions
 	for ( s=spawns ; s->name ; s++ ) {
