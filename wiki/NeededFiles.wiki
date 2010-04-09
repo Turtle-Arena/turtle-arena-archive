@@ -1,6 +1,12 @@
+#summary Needed data files
+#labels Phase-Implementation
+
+Files that are missing or "TEMP:" if I haven't decide if its finished yet. List is incomplete.
+
+= Sounds =
 Note: Added a dummy sound at sound/feedback/hit.wav so unmoded Quake3 can start with only TMNT sounds.
 
-== Copied Sounds ==
+== Note: Copies ==
 misc/menu1.ogg and misc/menu3.ogg are a louder-copy of player/footsteps/clank2.ogg
 
 items/use_nothing.ogg is a copy of misc/menu4.ogg  (items/use_nothing is unused by Turtle Arena?...)
@@ -10,14 +16,12 @@ weapons/melee_swing.ogg is a louder-version of weapons/change.ogg (For testing..
 player/raph/death2 and death3 are copies of death1
 player/casey/death2 and death3 are copies of death1
 
-
-== Needed Sounds ==
-// New sounds
+== New sounds ==
 :Like in LOZ:TP
 TEMP: sound/misc/letterboxon
 TEMP: sound/misc/letterboxoff
 
-// player sounds
+== Player Sounds ==
 base/sound/player/leo/*
 base/sound/player/don/*
 TEMP: base/sound/player/raph/*
@@ -38,7 +42,8 @@ pain50_1.wav
 pain25_1.wav
 taunt.wav
 
-// Needed sounds from CG_RegisterSounds.
+== Others ==
+Needed sounds from CG_RegisterSounds.
 
 TEMP: sound/feedback/1_minute.wav - Gyoji: "One minute remaining" ?
 TEMP: sound/feedback/5_minute.wav - Gyoji: "Five minutes remaining" ?
@@ -166,4 +171,78 @@ TEMP:	sound/feedback/teamstied.wav - "Teams are tied"
 TEMP:		sound/teamplay/voc_base_attack.wav - "Your base is under attack!"
 	}
 }
+
+= Models =
+
+== Weapons ==
+
+models/weapons2/daisho/* (Daisho Pickup)
+models/weapons2/katana/* (Daisho)
+models/weapons2/wakizashi/* (Daisho)
+
+== Powerup models ==
+
+models/powerups/holdable/*
+
+TEMP: shurikenelectric.md3
+TEMP: shurikenfire.md3
+TEMP: shurikenlaser.md3
+
+models/powerups/instant/*
+
+TEMP: defense.md3
+TEMP: strength.md3
+TEMP: speed.md3
+TEMP: invis.md3
+TEMP: invul.md3
+
+Defense - Shield
+Strength - Arm showing stregth? Or red glowing transparent sword?
+Speed - Zippy Lad's Headgear thing? A blue glowing transparent bunny?...
+Invisibility - Foot Tech belt, around waist over shoulder with foot logo on over-shoulder-part
+
+Invulnerability - White sphere?
+
+== MISSIONPACK CTF flags ==
+
+Animations Need Work: models/flag2/flagflap3.md3
+
+TEMP: models/mapobjects/flagbase/red_base.md3
+TEMP: models/mapobjects/flagbase/blue_base.md3
+TEMP: models/mapobjects/flagbase/ntrl_base.md3
+
+== Team Arena UI ==
+: Only used the scriptable UI HUD. (Which currently isn't used.)
+: NOTE: Currently I have the cursors point to the normal q3 cursor image.
+	cgs.media.selectCursor = trap_R_RegisterShaderNoMip( "ui/assets/selectcursor.tga" );
+	cgs.media.sizeCursor = trap_R_RegisterShaderNoMip( "ui/assets/sizecursor.tga" );
+
+== Demo Quake3's pak0.pk3 ==
+While replacing stuff I was deleting what I had replaced or was no longer used in the demoq3 pak0.pk3
+the following were not removed from the pk3; (I have a list so I can delete the pk3)
+
+models/powerups/*					--replaced/unused by tmnt
+models/weapons2/*					--replaced/unused by tmnt
+models/weaphits/*
+models/weaphits/bfg.md3				--unused by tmnt
+models/weaphits/crackle.md3			--unused by tmnt
+models/weaphits/boom01.md3			--replaced by tmnt
+models/weaphits/ring02.md3			--replaced by tmnt
+models/weaphits/bullet.md3			--replaced by tmnt
+
+
+Replaced in base_ioq3ztm
+
+TEMP: menu/medals/medal_impressive.tga	--unused by tmnt --Kill two (or more) players with one railgun shot.
+TEMP: menu/medals/medal_excellent.tga	--unused by tmnt --Kill two players close together
+TEMP: menu/medals/medal_accuracy.tga	--unused by tmnt
+TEMP: menu/medals/medal_gauntlet.tga	--unused by tmnt
+TEMP: menu/medals/medal_victory.tga		--unused by tmnt
+
+== Demo TA pak0.pk3 ==
+: There is [or maybe] more, I didn't delete stuff as I replaced stuff.
+models/powerups/*					--replaced/unused by tmnt
+
+models/powerups/pop.md3
+: Just copy models/misc/telep.md3 and move it so its offset correctly?
 

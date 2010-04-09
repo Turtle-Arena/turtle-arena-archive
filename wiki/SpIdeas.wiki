@@ -1,6 +1,7 @@
-Turtle Arena Ideas file (Formarly "todo" file)
+#summary Single Player Ideas
+#labels Phase-Design
 
-TODO: Move this stuff somewhere else and remove this file.
+Turtle Arena Single Player Ideas.
 
 == Single Player Design/Story ==
 * Base on 2003 TV series or just be standalone?
@@ -42,23 +43,4 @@ Foot:		Space:				Shredders on the space station. He must be stopped.
 * The Purple Dragons possibly
 * The Earth Protection Force
 ** Agent Bishop
-
-== Objects ==
-: Objects and NPCs share lots of code...
-
-TODO: Make more mapobjects;
-Most of the mapobjects should be damageable.
-
-  * Clump of tall grass (Like in TMNT2 NGC level 2 and LoZ:TP)
-  * Animated flower bud
-
-Trees, bushes, flowers, tall-grasses,
-Traffic barrel-thingy? Traffic "saw-horse"-thingy
-Firehydroant, lightpole,
-street-signs (one-way, 3rd street, Stop, Yield, people crossing, speed limit)
-
-misc_object
-Style 1: Option to animate and trigger "target" on touch,
-Style 2: Damageable and have a "paintarget" and trigger "target" on death.
-			TODO: Also option to spawn item on death, and option to respawn.
 
