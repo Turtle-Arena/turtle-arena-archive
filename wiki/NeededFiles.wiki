@@ -76,14 +76,12 @@ Note: There are more announcer files with the per-gametype sounds.
 
 == Misc ==
   * TEMP:	cgs.media.tracerSound = trap_S_RegisterSound( "sound/weapons/machinegun/buletby1.wav", qfalse );
-  * DONE:	cgs.media.selectSound = trap_S_RegisterSound( "sound/weapons/change.wav", qfalse );
-  * DONE:	cgs.media.wearOffSound = trap_S_RegisterSound( "sound/items/wearoff.wav", qfalse );
-  * DONE:	cgs.media.useNothingSound = trap_S_RegisterSound( "sound/items/use_nothing.wav", qfalse );
+  * TEMP:	cgs.media.selectSound = trap_S_RegisterSound( "sound/weapons/change.wav", qfalse );
 
   * TEMP:	cgs.media.obeliskHitSound1 = trap_S_RegisterSound( "sound/items/obelisk_hit_01.wav", qfalse );
   * TEMP:	cgs.media.obeliskHitSound2 = trap_S_RegisterSound( "sound/items/obelisk_hit_02.wav", qfalse );
   * TEMP:	cgs.media.obeliskHitSound3 = trap_S_RegisterSound( "sound/items/obelisk_hit_03.wav", qfalse );
-  * DONE:	cgs.media.obeliskRespawnSound = trap_S_RegisterSound( "sound/items/obelisk_respawn.wav", qfalse );
+  * TEMP:	cgs.media.obeliskRespawnSound = trap_S_RegisterSound( "sound/items/obelisk_respawn.wav", qfalse );
 
   * TEMP:	cgs.media.teleInSound = trap_S_RegisterSound( "sound/world/telein.wav", qfalse );
   * TEMP:	cgs.media.teleOutSound = trap_S_RegisterSound( "sound/world/teleout.wav", qfalse );
@@ -116,14 +114,12 @@ Note: There are more announcer files with the per-gametype sounds.
   * cgs.media.sfx_ric2 = trap_S_RegisterSound ("sound/weapons/machinegun/ric2.wav", qfalse);
   * cgs.media.sfx_ric3 = trap_S_RegisterSound ("sound/weapons/machinegun/ric3.wav", qfalse);
   * TEMP: cgs.media.sfx_rockexp = trap_S_RegisterSound ("sound/weapons/rocket/rocklx1a.wav", qfalse);
-  * DONE: cgs.media.sfx_plasmaexp = trap_S_RegisterSound ("sound/weapons/plasma/plasmx1a.wav", qfalse);
 #ifdef MISSIONPACK
   * cgs.media.weaponHoverSound = trap_S_RegisterSound( "sound/weapons/weapon_hover.wav", qfalse );
   * cgs.media.winnerSound = trap_S_RegisterSound( "sound/feedback/voc_youwin.wav", qfalse );
   * cgs.media.loserSound = trap_S_RegisterSound( "sound/feedback/voc_youlose.wav", qfalse );
 #endif
 
-  * DONE: cgs.media.regenSound = trap_S_RegisterSound("sound/items/regen.wav", qfalse);
   * cgs.media.protectSound = trap_S_RegisterSound("sound/items/protect3.wav", qfalse);
 
 == Footstep sounds ==
