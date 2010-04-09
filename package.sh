@@ -176,16 +176,19 @@ then
 
 	if [ $LINUX -eq 1 ]
 	then
-		
 		# Copy linux launcher too
 		cp extras/turtlearena.sh $INSTALLDIR
 	fi
 
-	cp game-readme.txt $INSTALLDIR/readme.txt
+	cp GAME_README.txt $INSTALLDIR/readme.txt
 	cp COPYING.txt $INSTALLDIR
 	cp COPYRIGHTS.txt $INSTALLDIR
+	cp CREDITS.txt $INSTALLDIR
 
-	# Copy all of the files other then base/ into turtlearena-src/ and zip it.
+	# Convert to dos line ending
+	unix2dos $INSTALLDIR/*.txt
+
+	# Copy all of the files other than base/ into turtlearena-src/ and zip it.
 	echo "Warning: You need to manually copy the source into $INSTALLDIR !"
 
 	# zip install?

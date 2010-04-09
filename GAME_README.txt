@@ -1,0 +1,31 @@
+Turtle Arena is a work-in-progress Ninja Turtle fangame based on the ioquake3 engine.
+
+== Installing ==
+Extract Turtle Arena into a directory. It can be placed anywhere, but suggestions below
+
+Windows:  C:\Program Files\TMNTArena\
+Mac OS X: /Applications/TMNTArena/
+Linux:    /usr/local/games/tmntarena/
+
+== Uninstalling ==
+Delete the directory where you extracted Turtle Arena.
+
+Turtle Arena saves data outside of its directory, so you may wish to remove it.
+
+Windows 2000/XP: C:\Documents and Settings\%USERNAME%\Application Data\TurtleArena\
+Windows Vista/7: C:\Users\%USERNAME%\AppData\Roaming\TurtleArena\
+Mac OS X: /Users/$USERNAME/Library/Application Support/TurtleArena/
+Linux: /home/$USERNAME/.turtlearena/
+
+== License ==
+The Turtle Arena source code and data are licensed under the GNU General Public License version 2 or later.
+	(See COPYING.txt for full license)
+
+== Credits ==
+id software, ioquake3 developers, Thilo Schulz, Open Arena, Xreal project, Smokin' Guns, Mercenaries Guild Client for Tremulous, GNU FreeFonts, rfactory.org, "inolan.com", Zack "ZTurtleMan" Middleton
+
+See CREDITS.txt for details.
+
+== Website ==
+* [http://code.google.com/p/turtlearena/ Project page at Google code]
+
