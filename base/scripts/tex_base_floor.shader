@@ -231,3 +231,17 @@ textures/base_floor/subway_ceiling
 		blendFunc GL_DST_COLOR GL_ZERO
 	}
 }
+
+textures/base_floor/wood
+{
+	surfaceparm wood
+	{
+		map textures/base_floor/wood
+		rgbGen identity
+	}
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+	}
+}

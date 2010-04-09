@@ -159,6 +159,34 @@ textures/base_wall/tac_board
 	}
 }
 
+textures/base_wall/crate
+{
+	surfaceparm wood
+	{
+		map textures/base_wall/crate
+		rgbGen identity
+	}
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+	}
+}
+
+textures/base_wall/crate_item
+{
+	surfaceparm wood
+	{
+		map textures/base_wall/crate_item
+		rgbGen identity
+	}
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+	}
+}
+
 textures/base_wall/sewer
 {
 	surfaceparm dust
