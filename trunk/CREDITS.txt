@@ -1,27 +1,4 @@
-Turtle Arena is a work-in-progress Teenage Mutant Ninja Turtle fangame based on the ioquake3 engine.
-
-== Installing ==
-Extract Turtle Arena into a directory. It can be placed anywhere, but suggestions below
-
-Windows:  C:\Program Files\TMNTArena\
-Mac OS X: /Applications/TMNTArena/
-Linux:    /usr/local/games/tmntarena/
-
-== Uninstalling ==
-Delete the directory where you extracted Turtle Arena.
-
-Turtle Arena saves data outside of its directory, so you may wish to remove it.
-
-Windows 2000/XP: C:\Documents and Settings\%USERNAME%\Application Data\TurtleArena\
-Windows Vista/7: C:\Users\%USERNAME%\AppData\Roaming\TurtleArena\
-Mac OS X: /Users/$USERNAME/Library/Application Support/TurtleArena/
-Linux: /home/$USERNAME/.turtlearena/
-
-== License ==
-The Turtle Arena source code and data are licensed under the GNU General Public License version 2 or later.
-	(See COPYING.txt for full license)
-
-See COPYRIGHTS.txt for data per-file copyrights.
+Turtle Arena credits.
 
 == Credits ==
 * id software			(For making and releasing Quake III Arena's source code)
@@ -33,6 +10,16 @@ See COPYRIGHTS.txt for data per-file copyrights.
 * GNU FreeFonts			(For FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf)
 * Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)
 * Zack "ZTurtleMan" Middleton
+
+
+== License ==
+The Turtle Arena source code and data are licensed under the GNU General Public License version 2 or later.
+	(See COPYING.txt for full license)
+
+
+== Data ==
+See COPYRIGHTS.txt for data per-file copyrights.
+
 
 == Code ==
 Turtle Arena uses code directly or based on the following.
@@ -68,6 +55,7 @@ Turtle Arena uses code directly or based on the following.
 
 * "inolan.com", basic breakable brush code: http://www.quake3hut.co.uk/q3coding/Breakable%20Glass.htm
 
+
 == Software used ==
 Software used to create the Turtle Arena data files.
 
@@ -88,7 +76,4 @@ Software used to create the Turtle Arena data files.
 * GtkRadiant
 * NetRadiant
 * GenSurf
-
-== External Links ==
-* [http://code.google.com/p/turtlearena/ Project page at Google code]
 
