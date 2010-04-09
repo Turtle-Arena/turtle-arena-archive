@@ -1,6 +1,6 @@
-Additions from Team Arena, the plan is to remove and intagrate all parts of the MISSIONPACK define into base Turtle Arena.
+Additions from Quake III: Team Arena, the plan is to remove and intagrate all parts of the MISSIONPACK define into base Turtle Arena.
 
-== Supported/used ==
+== Supported and/or used ==
 
 * One Flag CTF gametype: Take the center flag to the other team's base.
 * Overload gametype: Defend object at base and attack other teams base object.
@@ -10,17 +10,17 @@ Additions from Team Arena, the plan is to remove and intagrate all parts of the 
 ***  ZTM: NOTE: I cut start health and pickup health in half.
 
 ** Guard (Incressed health, and Health regen)           (2x health, PW_BATTLESUIT is .5 damage receive)
-***  ZTM: NOTE: I disabled Health regen (Seems overpowered) and give 2x health from pickup items.
+***  ZTM: NOTE: I disabled Health regen (Seemed overpowered) and give 2x health from pickup items.
 
-** Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, as I set it 2x damage)
+** Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, as I set it to 2x damage)
 ** Ammo Regen (Player ammo/shuriken counts slowly increment)
 
-* Chaingun --Supported
-* Nailgun --Supported
-* Prox Launcher --Partly supported
+* Chaingun (Supported)
+* Nailgun (Supported)
+* Prox Launcher (Partly supported)
 
 * Voice chats for bots and humans
-* Per-team skins for players
+* Per-team skins for players (Supported, but not currently used)
 
 * Portal holdable item (Not used in final version of Team Arena)
 ** I did some fixing to the code and added models and an icon, it is usable.
@@ -29,9 +29,9 @@ Additions from Team Arena, the plan is to remove and intagrate all parts of the 
 
 * Scriptable UI/HUD
 ** (UI only) Teams: 5 bots, team-name, and logo-gfxs.
-* Harvester --Removed (!defined MISSIONPACK_HARVESTER)
+* Harvester --Disabled (!defined MISSIONPACK_HARVESTER)
 ** kill people, then a skull (of the attacker's team color) will spawn at the center object, then attacker's team must take the skull to the other team's base, if killee's team touch it [object that spawned at center], it is removed.)
-* Kamikaze holdable item (Removed)
-* Invul holdable item (Removed)
-* Prox Launcher --Partly supported
+* Kamikaze holdable item (Disabled)
+* Invul holdable item (Disabled)
+* Prox Launcher (Partly unsupported)
 
