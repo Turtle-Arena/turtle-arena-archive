@@ -973,6 +973,9 @@ extern	vmCvar_t	g_proxMineTimeout;
 #ifdef TMNT // POWERS // PW_FLASHING
 extern	vmCvar_t	g_teleportFluxTime;
 #endif
+#ifdef IOQ3ZTM // LASERTAG
+extern	vmCvar_t	g_laserTag;
+#endif
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );

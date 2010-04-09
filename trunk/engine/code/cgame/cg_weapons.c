@@ -435,7 +435,11 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 
 	AxisClear( re->axis );
  
-	if (cg_oldRail.integer)
+	if (cg_oldRail.integer
+#ifdef IOQ3ZTM // LASERTAG
+		|| cg_laserTag.integer
+#endif
+		)
 	{
 		// nudge down a bit so it isn't exactly in center
 		re->origin[2] -= 8;
@@ -3532,6 +3536,12 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 	vec3_t newOrigin;
 	trace_t trace;
 
+#ifdef IOQ3ZTM // LASERTAG
+	if ( cg_laserTag.integer ) {
+		return;
+	}
+#endif
+
 	if (dir && VectorLength(dir))
 	{
 		// Move away from surface
@@ -3631,6 +3641,13 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #ifdef TMNTWEAPSYS // SPR_EXP_SCALE
 	int exp_base;
 	int exp_add;
+#endif
+
+#ifdef IOQ3ZTM // LASERTAG
+	if (cg_laserTag.integer)
+	{
+		return;
+	}
 #endif
 
 	mark = 0;
@@ -4028,6 +4045,13 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 	int exp_add;
 #endif
 
+#ifdef IOQ3ZTM // LASERTAG
+	if (cg_laserTag.integer)
+	{
+		return;
+	}
+#endif
+
 	mark = 0;
 	radius = 32;
 	sfx = 0;
@@ -4175,6 +4199,13 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	vec3_t			sprVel;
 	int exp_base;
 	int exp_add;
+
+#ifdef IOQ3ZTM // LASERTAG
+	if (cg_laserTag.integer)
+	{
+		return;
+	}
+#endif
 
 	mark = 0;
 	radius = 32;

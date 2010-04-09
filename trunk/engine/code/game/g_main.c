@@ -114,6 +114,9 @@ vmCvar_t	g_saveTypes;
 #ifdef TMNT // POWERS // PW_FLASHING
 vmCvar_t	g_teleportFluxTime;
 #endif
+#ifdef IOQ3ZTM // LASERTAG
+vmCvar_t	g_laserTag;
+#endif
 
 static cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -236,6 +239,9 @@ static cvarTable_t		gameCvarTable[] = {
 #endif
 #ifdef TMNT // POWERS // PW_FLASHING
 	{ &g_teleportFluxTime, "g_teleportFluxTime", "5", CVAR_SERVERINFO, 0, qfalse},
+#endif
+#ifdef IOQ3ZTM // LASERTAG
+	{ &g_laserTag, "g_laserTag", "0", CVAR_SERVERINFO, qtrue, qfalse},
 #endif
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},

@@ -1071,11 +1071,23 @@ void ClearRegisteredItems( void ) {
 
 	// players always start with the base weapon
 #ifdef TMNTHOLDABLE // Start with shurikens
+#ifdef IOQ3ZTM // LASERTAG
+	if (!g_laserTag.integer)
+#endif
 	RegisterItem( BG_FindItemForHoldable( HI_SHURIKEN ) );
 #endif
 #ifndef TMNTWEAPSYS
+#ifdef IOQ3ZTM // LASERTAG
+	if (g_laserTag.integer)
+		RegisterItem( BG_FindItemForWeapon( WP_RAILGUN ) );
+	else
+	{
+#endif
 	RegisterItem( BG_FindItemForWeapon( WP_MACHINEGUN ) );
 	RegisterItem( BG_FindItemForWeapon( WP_GAUNTLET ) );
+#ifdef IOQ3ZTM // LASERTAG
+	}
+#endif
 #endif
 #ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {

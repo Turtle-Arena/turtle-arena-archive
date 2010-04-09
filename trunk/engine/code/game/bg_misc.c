@@ -6084,6 +6084,16 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 		Com_sprintf( filename, sizeof( filename ), "%s/%s/animation.cfg", bg_playerDirs[i], model );
 		if ( BG_ParsePlayerCFGFile(filename, playercfg) )
 		{
+#if defined IOQ3ZTM && (defined QAGAME || defined CGAME) // LASERTAG
+#ifdef QAGAME
+			extern vmCvar_t g_laserTag;
+			if (g_laserTag.integer)
+#else //if defined CGAME
+			extern vmCvar_t cg_laserTag;
+			if (cg_laserTag.integer)
+#endif
+				playercfg->default_weapon = BG_WeaponGroupIndexForName("wp_lasergun");
+#endif
 			return qtrue;
 		}
 	}

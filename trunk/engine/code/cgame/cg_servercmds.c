@@ -531,6 +531,11 @@ static void CG_MapRestart( void ) {
 	}
 #endif
 #ifdef THIRD_PERSON
+#ifdef IOQ3ZTM // LASERTAG
+	if (cg_laserTag.integer)
+		trap_Cvar_Set("cg_thirdPerson", "0");
+	else
+#endif
 	trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
