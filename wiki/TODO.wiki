@@ -5,7 +5,6 @@
 
 = 0.2 (Beta) =
   * New Melee swing sound effects?
-  * Improve bots doing damage to other players with melee weapons
 
 = engine =
 == Weapons ==
@@ -118,8 +117,11 @@ Weapons (and attacking)
 
   * TODO: Stop debris being in sitting in the air due to the object they were on being removed.
 
-  * TODO: Check to see if bots press and hold attack with melee weapons or just hold attack down
-    * Disable fireHeld check for melee weapons to see
+  * TODO: Don't show Failed to load models/players2//torso.md3 message (Due to model reset fix)
+
+  * TODO: Don't show hit effect when hitting player with PW_FLASHING (G_MeleeDamageSingle)
+
+  * TODO: Have bots not attack players with PW_FLASHING
 
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
