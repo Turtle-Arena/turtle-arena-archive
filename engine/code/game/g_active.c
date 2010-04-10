@@ -1687,9 +1687,10 @@ void ClientThink_real( gentity_t *ent ) {
 	SendPendingPredictableEvents( &ent->client->ps );
 
 	if ( !( ent->client->ps.eFlags & EF_FIRING ) ) {
+#ifdef IOQ3ZTM
+		client->ps.pm_flags &= ~PMF_FIRE_HELD;
+#else
 		client->fireHeld = qfalse;		// for grapple
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
-		client->ps.pm_flags &= ~PMF_GRAPPLE_SHOT;
 #endif
 	}
 

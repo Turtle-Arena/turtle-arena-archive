@@ -167,10 +167,17 @@ void G_StartMeleeAttack(gentity_t *ent)
 	}
 
 	// Must press the button each time to attack...
+#ifdef IOQ3ZTM
+	if (client->ps.pm_flags & PMF_FIRE_HELD) {
+		return;
+	}
+	client->ps.pm_flags |= PMF_FIRE_HELD;
+#else
 	if (client->fireHeld) {
 		return;
 	}
 	client->fireHeld = qtrue;
+#endif
 
 	// ZTM: Use the animation time for the attack time!
 	client->ps.meleeTime = BG_AnimationTime(&ent->client->pers.playercfg.animations[BG_TorsoAttackForPlayerState(&ent->client->ps)]);
@@ -1257,10 +1264,17 @@ GRAPPLING HOOK
 #ifndef TMNTWEAPSYS
 void Weapon_GrapplingHook_Fire (gentity_t *ent)
 {
+#ifdef IOQ3ZTM
+	if (!(ent->client->ps.pm_flags & PMF_FIRE_HELD) && !ent->client->hook)
+		fire_grapple (ent, muzzle, forward);
+
+	ent->client->ps.pm_flags |= PMF_FIRE_HELD;
+#else
 	if (!ent->client->fireHeld && !ent->client->hook)
 		fire_grapple (ent, muzzle, forward);
 
 	ent->client->fireHeld = qtrue;
+#endif
 }
 #endif
 

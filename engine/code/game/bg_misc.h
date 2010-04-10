@@ -176,8 +176,8 @@ typedef enum {
 // pmove->pm_flags
 #define	PMF_DUCKED			1
 #define	PMF_JUMP_HELD		2
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
-#define PMF_GRAPPLE_SHOT	4
+#ifdef IOQ3ZTM
+#define PMF_FIRE_HELD		4		// set when attack has been started
 #endif
 #define	PMF_BACKWARDS_JUMP	8		// go into backwards land
 #define	PMF_BACKWARDS_RUN	16		// coast down to backwards run
@@ -1599,8 +1599,8 @@ typedef struct
 // pmove->pm_flags
 #define	PMF_DUCKED			1
 #define	PMF_JUMP_HELD		2
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
-#define PMF_GRAPPLE_SHOT	4
+#ifdef IOQ3ZTM
+#define PMF_FIRE_HELD		4		// set when attack has been started
 #endif
 #define	PMF_BACKWARDS_JUMP	8		// go into backwards land
 #define	PMF_BACKWARDS_RUN	16		// coast down to backwards run

@@ -354,7 +354,9 @@ struct gclient_s {
 	int			finishTime; // when the client finished the level.
 #endif
 
+#ifndef IOQ3ZTM
 	qboolean	fireHeld;			// used for hook
+#endif
 	gentity_t	*hook;				// grapple hook if out
 
 	int			switchTeamTime;		// time the player switched teams
