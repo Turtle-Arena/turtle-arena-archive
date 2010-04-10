@@ -117,8 +117,6 @@ Weapons (and attacking)
 
   * TODO: Stop debris being in sitting in the air due to the object they were on being removed.
 
-  * TODO: Don't show Failed to load models/players2//torso.md3 message (Due to model reset fix)
-
   * TODO: Don't show hit effect when hitting player with PW_FLASHING (G_MeleeDamageSingle)
 
   * TODO: Have bots not attack players with PW_FLASHING
