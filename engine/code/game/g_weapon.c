@@ -292,13 +292,13 @@ qboolean G_SetupPlayerTagOrientation(gentity_t *ent, orientation_t *legsOrientat
 
 	if (legsOrientation != NULL)
 	{
-	// Clear memory
+		// Clear memory
 		memset(legsOrientation, 0, sizeof (*legsOrientation));
 
-	// Set to player's origin
+		// Set to player's origin
 		VectorCopy(ent->r.currentOrigin, legsOrientation->origin);
 
-	// Use pre-calculated legsAxis
+		// Use pre-calculated legsAxis
 		AxisCopy(ent->client->pers.legsAxis, legsOrientation->axis);
 	}
 
@@ -307,15 +307,16 @@ qboolean G_SetupPlayerTagOrientation(gentity_t *ent, orientation_t *legsOrientat
 		// Clear memory
 		memset(torsoOrientation, 0, sizeof (*torsoOrientation));
 
-	// Use pre-calculated torsoAxis
+		// Use pre-calculated torsoAxis
 		AxisCopy(ent->client->pers.torsoAxis, torsoOrientation->axis);
 
 		if (legsOrientation != NULL)
 		{
-	// Find torso origin
+			// Find torso origin
 			if (!G_PositionRotatedEntityOnTag(torsoOrientation, &ent->client->pers.legs,
 				*legsOrientation, ent->client->pers.legsModel, "tag_torso"))
 			{
+				G_Printf("DEBUG: G_GetPlayerTagOrientation: Failed to find tag_torso\n");
 				return qfalse;
 			}
 		}
@@ -380,7 +381,7 @@ qboolean G_GetPlayerTagOrientation(gentity_t *ent, char *tagName, qboolean onLeg
 #endif
 
 // Based on CheckGauntletHit
-qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapontype_t wt, qboolean checkTeamHit)
+qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, weapontype_t wt)
 {
 	trace_t		tr;
 	vec3_t		start;
@@ -491,11 +492,6 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 	//VectorCopy(up, pushDir);
 	VectorCopy(forward, pushDir);
 
-	if (!dodamage && !checkTeamHit)
-	{
-		return qtrue;
-	}
-
 	traceHit = qfalse;
 
 	if (hand == HAND_PRIMARY)
@@ -540,7 +536,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 		trap_Trace (&tr, start, NULL, NULL, end, ent->s.number, MASK_SHOT);
 
 		if ( tr.surfaceFlags & SURF_NOIMPACT ) {
-				continue;
+			continue;
 		}
 
 		if (ent->client->ps.powerups[PW_QUAD] ) {
@@ -556,7 +552,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 
 		damage = weapon->blades[i].damage * s_quadFactor;
 
-		if ( dodamage && (tr.startsolid || (tr.contents & CONTENTS_SOLID)) ) {
+		if ( !checkTeamHit && (tr.startsolid || (tr.contents & CONTENTS_SOLID)) ) {
 			// Push player away from trace dir!
 			// Based on code in G_Damage
 			vec3_t	kvel;
@@ -618,19 +614,15 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 			continue;
 		}
 
-		if (!dodamage)
-		{
-			continue;
-		}
-
 		// If client hit another client
-		if (!traceEnt->client || !OnSameTeam(ent, traceEnt) || g_friendlyFire.integer != 0)
+		if (!traceEnt->client || (traceEnt->client &&
+			(!OnSameTeam(ent, traceEnt) || g_friendlyFire.integer != 0)))
 		{
 			// pain_debounce?
 
 			// ZTM: NOTE: Disabled, I don't need to see this as much as I once did.
 			//                     (plus it fills the console.)
-			//G_Printf("DEBUG: client %i hit client %i\n", ent - g_entities, tr.entityNum);
+			//G_Printf("DEBUG: client %i hit entity %i\n", ent - g_entities, tr.entityNum);
 
 			// ZTM: Do a effect when hit anything!
 			//   based on G_MissileImpact code
@@ -694,25 +686,23 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapon
 qboolean G_MeleeDamage(gentity_t *ent, qboolean forceDamage)
 {
 	qboolean rtn, rtn2;
-	qboolean damage;
 
 	rtn = rtn2 = qfalse;
 
 	if (ent->client->ps.weaponHands & HAND_PRIMARY)
 	{
-		damage = forceDamage;
-		if (!damage) {
-			damage = (bg_weapongroupinfo[ent->client->ps.weapon].weapon[0]->flags & WIF_ALWAYS_DAMAGE);
+		if (forceDamage || (bg_weapongroupinfo[ent->client->ps.weapon].weapon[0]->flags & WIF_ALWAYS_DAMAGE))
+		{
+			rtn = G_MeleeDamageSingle(ent, qfalse, HAND_PRIMARY, bg_weapongroupinfo[ent->client->ps.weapon].weapon[0]->weapontype);
 		}
-		rtn = G_MeleeDamageSingle(ent, damage, HAND_PRIMARY, bg_weapongroupinfo[ent->client->ps.weapon].weapon[0]->weapontype, qfalse);
 	}
+
 	if (ent->client->ps.weaponHands & HAND_SECONDARY)
 	{
-		damage = forceDamage;
-		if (!damage) {
-			damage = (bg_weapongroupinfo[ent->client->ps.weapon].weapon[1]->flags & WIF_ALWAYS_DAMAGE);
+		if (forceDamage || (bg_weapongroupinfo[ent->client->ps.weapon].weapon[1]->flags & WIF_ALWAYS_DAMAGE))
+		{
+			rtn2 = G_MeleeDamageSingle(ent, qfalse, HAND_SECONDARY, bg_weapongroupinfo[ent->client->ps.weapon].weapon[1]->weapontype);
 		}
-		rtn2 = G_MeleeDamageSingle(ent, damage, HAND_SECONDARY, bg_weapongroupinfo[ent->client->ps.weapon].weapon[1]->weapontype, qfalse);
 	}
 
 	return (rtn || rtn2);

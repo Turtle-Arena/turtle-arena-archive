@@ -906,9 +906,9 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 	}
 
 #ifdef TMNT_GAME_MODELS
-	// Load model tags
-
-	// Currently uses models, so they may be invalid after vid_restart / level change...?
+	// Load model tags (Currently loads the whole model.)
+	// Game and cgame share the same models so an extra ClientUserinfoChanged is called on model reset (R_ModelInit),
+	//   otherwise the model number were incorrent for bots (and maybe other clients).
 	client->pers.torsoModel = 0;
 	client->pers.legsModel = 0;
 

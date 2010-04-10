@@ -177,40 +177,40 @@ qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 )
 #ifdef TMNTSP
 	// Co-op player are on the same "team"
 	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
-	int team1, team2;
+		int team1, team2;
 
-	if ( ent1->client)
-		team1 = ent1->client->sess.sessionTeam;
+		if ( ent1->client)
+			team1 = ent1->client->sess.sessionTeam;
 #ifdef TMNTNPCSYS
-		else if (ent1->s.eType == ET_NPC)
-		{
-			if (ent1->bgNPC.info->flags & NPCF_ALLY) {
-				team1 = TEAM_FREE;
-			} else {
-				team1 = TEAM_RED;
+			else if (ent1->s.eType == ET_NPC)
+			{
+				if (ent1->bgNPC.info->flags & NPCF_ALLY) {
+					team1 = TEAM_FREE;
+				} else {
+					team1 = TEAM_RED;
+				}
 			}
-		}
 #endif
-	else
-		return qfalse;
+		else
+			return qfalse;
 
-	if ( ent2->client)
-		team2 = ent2->client->sess.sessionTeam;
+		if ( ent2->client)
+			team2 = ent2->client->sess.sessionTeam;
 #ifdef TMNTNPCSYS
-		else if (ent2->s.eType == ET_NPC) {
-			if (ent2->bgNPC.info->flags & NPCF_ALLY) {
-				team2 = TEAM_FREE;
-			} else {
-				team2 = TEAM_RED;
+			else if (ent2->s.eType == ET_NPC) {
+				if (ent2->bgNPC.info->flags & NPCF_ALLY) {
+					team2 = TEAM_FREE;
+				} else {
+					team2 = TEAM_RED;
+				}
 			}
-		}
 #endif
-	else
-		return qfalse;
+		else
+			return qfalse;
 
-	if ( team1 == team2 ) {
-		return qtrue;
-	}
+		if ( team1 == team2 ) {
+			return qtrue;
+		}
 	}
 #endif
 

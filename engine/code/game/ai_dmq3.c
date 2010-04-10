@@ -4392,14 +4392,14 @@ void BotCheckAttack(bot_state_t *bs) {
 
 		if (bs->cur_ps.weaponHands & HAND_PRIMARY)
 		{
-			if (G_MeleeDamageSingle(ent, qfalse, HAND_PRIMARY, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[0]->weapontype, qtrue))
+			if (G_MeleeDamageSingle(ent, qtrue, HAND_PRIMARY, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[0]->weapontype))
 			{
 				return;
 			}
 		}
 		if (bs->cur_ps.weaponHands & HAND_SECONDARY)
 		{
-			if (G_MeleeDamageSingle(ent, qfalse, HAND_SECONDARY, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[1]->weapontype, qtrue))
+			if (G_MeleeDamageSingle(ent, qtrue, HAND_SECONDARY, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[1]->weapontype))
 			{
 				return;
 			}

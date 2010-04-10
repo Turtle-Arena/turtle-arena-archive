@@ -681,7 +681,7 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable);
 #endif
 #ifdef TMNTWEAPSYS // MELEEATTACK
-qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean dodamage, int hand, weapontype_t wt, qboolean checkTeamHit);
+qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, weapontype_t wt);
 qboolean G_MeleeDamage( gentity_t *ent, qboolean forceDamage );
 void G_StartMeleeAttack(gentity_t *ent);
 #else

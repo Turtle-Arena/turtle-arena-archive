@@ -21,13 +21,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // tr_models.c -- model loading and caching
 
+#ifdef TMNT_GAME_MODELS
+#include "../server/server.h"
+#endif
+
 #if defined TMNT_GAME_MODELS && defined DEDICATED
 #define RENDERLESS_MODELS // ZTM: Ded server needs the tags for melee attacks
 #endif
 
 #ifdef RENDERLESS_MODELS
-#include "../server/server.h"
-
 // any changes in surfaceType must be mirrored in rb_surfaceTable[]
 typedef enum {
 	SF_BAD,
@@ -1311,6 +1313,20 @@ void R_ModelInit( void ) {
 
 	mod = R_AllocModel();
 	mod->type = MOD_BAD;
+
+#ifdef TMNT_GAME_MODELS
+	// Game needs to reload the player models
+	if (Cvar_VariableValue("sv_running") && gvm)
+	{
+		int i;
+
+		for (i = 0; i < sv_maxclients->integer; i++)
+		{
+			// call prog code to allow overrides
+			VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, i );
+		}
+	}
+#endif
 }
 
 
