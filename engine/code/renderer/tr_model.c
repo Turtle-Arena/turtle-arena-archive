@@ -1315,14 +1315,18 @@ void R_ModelInit( void ) {
 	mod->type = MOD_BAD;
 
 #ifdef TMNT_GAME_MODELS
-	// Game needs to reload the player models
+	// Models in game are no longer valid
 	if (Cvar_VariableValue("sv_running") && gvm)
 	{
 		int i;
 
 		for (i = 0; i < sv_maxclients->integer; i++)
 		{
-			// call prog code to allow overrides
+			if (svs.clients[i].state != CS_ACTIVE) {
+				continue;
+			}
+
+			// call prog code to reload player model
 			VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, i );
 		}
 	}
