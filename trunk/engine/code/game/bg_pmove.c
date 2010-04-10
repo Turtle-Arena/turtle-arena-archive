@@ -2407,7 +2407,7 @@ static void PM_Weapon( void ) {
 #endif
 	{
 		// If player has a shot grapple don't play attack animation.
-		if (pm->ps->pm_flags & PMF_GRAPPLE_SHOT)
+		if (pm->ps->pm_flags & PMF_FIRE_HELD)
 		{
 #ifdef TMNTWEAPSYS
 			PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );

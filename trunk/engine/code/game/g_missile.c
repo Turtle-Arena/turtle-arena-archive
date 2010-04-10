@@ -308,10 +308,17 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 	// Check if can fire grappling projectile
 	if (self && self->client && bg_projectileinfo[projnum].grappling)
 	{
+#ifdef IOQ3ZTM
+		if ((self->client->ps.pm_flags & PMF_FIRE_HELD) || self->client->hook) {
+			return qfalse;
+		}
+		self->client->ps.pm_flags |= PMF_FIRE_HELD;
+#else
 		if (self->client->fireHeld || self->client->hook) {
 			return qfalse;
 		}
 		self->client->fireHeld = qtrue;
+#endif
 	}
 
 	spread = bg_projectileinfo[projnum].spread;
@@ -605,9 +612,6 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			bolt->think = Weapon_HookFree;
 
 			self->client->hook = bolt;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
-			self->client->ps.pm_flags |= PMF_GRAPPLE_SHOT;
-#endif
 		}
 		else if (bg_projectileinfo[projnum].homing)
 		{
@@ -1708,9 +1712,6 @@ gentity_t *fire_grapple (gentity_t *self, vec3_t start, vec3_t dir) {
 	VectorCopy (start, hook->r.currentOrigin);
 
 	self->client->hook = hook;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
-	self->client->ps.pm_flags |= PMF_GRAPPLE_SHOT;
-#endif
 
 	return hook;
 }
