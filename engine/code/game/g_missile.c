@@ -1091,29 +1091,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 #endif
 	other = &g_entities[trace->entityNum];
 
-	// check for bounce
-	if ( !other->takedamage &&
-		( ent->s.eFlags & ( EF_BOUNCE | EF_BOUNCE_HALF ) ) ) {
-		G_BounceMissile( ent, trace );
-#ifdef TMNTWEAPSYS // Bounce missiles
-		// Die on Nth bounce
-		if (ent->s.modelindex2 > 0)
-		{
-			ent->s.modelindex2--;
-			if (ent->s.modelindex2 == 0)
-			{
-				// Kill missile
-				G_ExplodeMissile( ent );
-				return;
-			}
-		}
-		G_AddEvent( ent, EV_PROJECTILE_BOUNCE, DirToByte( trace->plane.normal ) );
-#else
-		G_AddEvent( ent, EV_GRENADE_BOUNCE, 0 );
-#endif
-		return;
-	}
-
 #if defined MISSIONPACK && !defined TMNT // POWERS
 	if ( other->takedamage ) {
 #ifdef TMNTWEAPSYS
@@ -1162,15 +1139,45 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 				velocity[2] = 1;	// stepped on a grenade
 #endif
 			}
+#ifdef TMNTWEAPSYS
+			damagedOther = G_Damage (other, ent, &g_entities[ent->r.ownerNum], velocity,
+				ent->s.origin, ent->damage,
+				0, ent->methodOfDeath);
+#else
 			G_Damage (other, ent, &g_entities[ent->r.ownerNum], velocity,
 				ent->s.origin, ent->damage, 
 				0, ent->methodOfDeath);
-#ifdef TMNTWEAPSYS
-			damagedOther = qtrue;
 #endif
 		}
 	}
 
+	// check for bounce
+	if (
+#ifdef TMNTWEAPSYS
+		!damagedOther &&
+#else
+		!other->takedamage &&
+#endif
+		( ent->s.eFlags & ( EF_BOUNCE | EF_BOUNCE_HALF ) ) ) {
+		G_BounceMissile( ent, trace );
+#ifdef TMNTWEAPSYS // Bounce missiles
+		// Die on Nth bounce
+		if (ent->s.modelindex2 > 0)
+		{
+			ent->s.modelindex2--;
+			if (ent->s.modelindex2 == 0)
+			{
+				// Kill missile
+				G_ExplodeMissile( ent );
+				return;
+			}
+		}
+		G_AddEvent( ent, EV_PROJECTILE_BOUNCE, DirToByte( trace->plane.normal ) );
+#else
+		G_AddEvent( ent, EV_GRENADE_BOUNCE, 0 );
+#endif
+		return;
+	}
 
 #ifdef TMNTWEAPSYS
 	if (bg_projectileinfo[ent->s.weapon].stickOnImpact) {
@@ -1193,7 +1200,18 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		// Don't stick to obelisk and don't stick to the entity that this missile just killed.
 		if ((other->pain == ObeliskPain) || (damagedOther && other->health <= 0) || other->s.eType == ET_PLAYER)
 		{
-			goto missileImpact;
+			// Don't remove porjectile if it doesn't explode.
+			if (bg_projectileinfo[ent->s.weapon].explosionType == PE_NONE)
+			{
+				ent->s.pos.trType = TR_GRAVITY;
+				ent->s.pos.trTime = level.time;
+				ent->count &= ~2;
+				return;
+			}
+			else
+			{
+				goto missileImpact;
+			}
 		}
 
 		SnapVectorTowards( trace->endpos, ent->s.pos.trBase );
