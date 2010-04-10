@@ -399,7 +399,7 @@ typedef struct {
 // Support using "tag_weapon" for the primary weapon,
 //           and "tag_flag" for the secondary weapon / flag.
 // So it will allow team arena models to be ported easier?
-//   and allow Turtle Arena players in q3/ta?
+//   and allow Turtle Arena players in Quake3/Team Arena?
 enum
 {
 #ifdef TMNT_SUPPORTQ3

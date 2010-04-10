@@ -2002,7 +2002,7 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, vec4_t color, int textSt
 
 	// build null terminated extension strings
   // TTimo: https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=399
-  // in TA this was not directly crashing, but displaying a nasty broken shader right in the middle
+  // in Team Arena this was not directly crashing, but displaying a nasty broken shader right in the middle
   // brought down the string size to 1024, there's not much that can be shown on the screen anyway
 	Q_strncpyz(buff, uiInfo.uiDC.glconfig.extensions_string, 1024);
 	eptr = buff;
@@ -5448,13 +5448,13 @@ void _UI_SetActiveMenu( uiMenuCommand_t menu ) {
 		  return;
 #ifdef IOQUAKE3 // ZTM: CDKEY
 	  case UIMENU_NEED_CD:
-			// no cd check in TA
+			// no cd check in Team Arena
 			//trap_Key_SetCatcher( KEYCATCH_UI );
       //Menus_ActivateByName("needcd");
 		  //UI_ConfirmMenu( "Insert the CD", NULL, NeedCDAction );
 		  return;
 	  case UIMENU_BAD_CD_KEY:
-			// no cd check in TA
+			// no cd check in Team Arena
 			//trap_Key_SetCatcher( KEYCATCH_UI );
       //Menus_ActivateByName("badcd");
 		  //UI_ConfirmMenu( "Bad CD Key", NULL, NeedCDKeyAction );
