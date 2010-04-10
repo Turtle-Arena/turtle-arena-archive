@@ -107,11 +107,11 @@ Weapons (and attacking)
 
   * TODO: Allow func_breakable and misc_object to be pushable.
 
-  * TODO: Move base/sound/*.wav to base-src/sound/unused/ ?
+  * TODO: Move base/sound/`*`.wav to base-src/sound/unused/ ?
 
-  * TODO: Rename or move to the wiki the tmnt-*.txt files
+  * TODO: Rename or move to the wiki the tmnt-`*`.txt files
 
-  * TODO: Rename TMNT* defines?... to what?
+  * TODO: Rename TMNT`*` defines?... to what?
 
   * TODO: Have bots not attack players with PW_FLASHING
 
