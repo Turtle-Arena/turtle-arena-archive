@@ -251,7 +251,7 @@ void CL_Voip_f( void )
 		CL_UpdateVoipIgnore(Cmd_Argv(2), qfalse);
 	} else if (strcmp(cmd, "gain") == 0) {
 		if (Cmd_Argc() > 3) {
-		CL_UpdateVoipGain(Cmd_Argv(2), atof(Cmd_Argv(3)));
+			CL_UpdateVoipGain(Cmd_Argv(2), atof(Cmd_Argv(3)));
 		} else if (Q_isanumber(Cmd_Argv(2))) {
 			int id = atoi(Cmd_Argv(2));
 			if (id >= 0 && id < MAX_CLIENTS) {
@@ -273,8 +273,8 @@ void CL_Voip_f( void )
 		clc.voipMuteAll = qfalse;
 	} else {
 		Com_Printf("usage: voip [un]ignore <playerID#>\n"
-				"       voip [un]muteall\n"
-				"       voip gain <playerID#> [value]\n");
+		           "       voip [un]muteall\n"
+		           "       voip gain <playerID#> [value]\n");
 	}
 }
 
@@ -474,7 +474,7 @@ not have future usercmd_t executed before it is executed
 void CL_AddReliableCommand(const char *cmd, qboolean isDisconnectCmd)
 {
 	int unacknowledged = clc.reliableSequence - clc.reliableAcknowledge;
-
+	
 	// if we would be losing an old command that hasn't been acknowledged,
 	// we must drop the connection
 	// also leave one slot open for the disconnect command in this case.
@@ -485,7 +485,7 @@ void CL_AddReliableCommand(const char *cmd, qboolean isDisconnectCmd)
 		if(com_errorEntered)
 			return;
 		else
-		Com_Error( ERR_DROP, "Client command overflow" );
+			Com_Error(ERR_DROP, "Client command overflow");
 	}
 
 	Q_strncpyz(clc.reliableCommands[++clc.reliableSequence & (MAX_RELIABLE_COMMANDS - 1)],
@@ -2391,7 +2391,7 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 	{
 		if (cls.state != CA_CONNECTING)
 		{
-			Com_DPrintf( "Unwanted challenge response received.  Ignored.\n" );
+			Com_DPrintf("Unwanted challenge response received.  Ignored.\n");
 			return;
 		}
 		
@@ -2411,15 +2411,15 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 		}
 
 		// start sending challenge response instead of challenge request packets
-			clc.challenge = atoi(Cmd_Argv(1));
-			cls.state = CA_CHALLENGING;
-			clc.connectPacketCount = 0;
-			clc.connectTime = -99999;
+		clc.challenge = atoi(Cmd_Argv(1));
+		cls.state = CA_CHALLENGING;
+		clc.connectPacketCount = 0;
+		clc.connectTime = -99999;
 
-			// take this address as the new server address.  This allows
-			// a server proxy to hand off connections to multiple servers
-			clc.serverAddress = from;
-			Com_DPrintf ("challengeResponse: %d\n", clc.challenge);
+		// take this address as the new server address.  This allows
+		// a server proxy to hand off connections to multiple servers
+		clc.serverAddress = from;
+		Com_DPrintf ("challengeResponse: %d\n", clc.challenge);
 		return;
 	}
 
@@ -2430,7 +2430,7 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 			return;
 		}
 		if ( cls.state != CA_CHALLENGING ) {
-			Com_Printf ("connectResponse packet while not connecting.  Ignored.\n");
+			Com_Printf ("connectResponse packet while not connecting. Ignored.\n");
 			return;
 		}
 		if ( !NET_CompareAdr( from, clc.serverAddress ) ) {
