@@ -2850,7 +2850,7 @@ static void FS_ReorderPurePaks( void )
 	}
 }
 
-#if !defined WIN32 && !defined MACOS_X
+#if defined TMNT || (!defined WIN32 && !defined MACOS_X)
 /*
 ================
 FS_BaseFileExists
