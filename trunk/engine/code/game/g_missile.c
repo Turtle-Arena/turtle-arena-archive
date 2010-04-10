@@ -1204,7 +1204,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			if (bg_projectileinfo[ent->s.weapon].explosionType == PE_NONE)
 			{
 				ent->s.pos.trType = TR_GRAVITY;
-				ent->s.pos.trTime = level.time;
 				ent->count &= ~2;
 				return;
 			}
@@ -1213,6 +1212,9 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 				goto missileImpact;
 			}
 		}
+
+		if (bg_projectileinfo[ent->s.weapon].shootable)
+			VectorMA(trace->endpos, -8, trace->plane.normal, trace->endpos);
 
 		SnapVectorTowards( trace->endpos, ent->s.pos.trBase );
 		G_SetOrigin( ent, trace->endpos );
@@ -1440,7 +1442,7 @@ void G_RunMissile( gentity_t *ent ) {
 	// missiles that left the owner bbox will attack anything, even the owner
 	else if (ent->count & 1)
 	{
-		passent = ENTITYNUM_NONE;
+		passent = ent->s.number;
 	}
 #elif defined MISSIONPACK
 	// prox mines that left the owner bbox will attach to anything, even the owner
@@ -1488,8 +1490,8 @@ void G_RunMissile( gentity_t *ent ) {
 	}
 #if defined MISSIONPACK || defined TMNTWEAPSYS
 	// if the prox mine wasn't yet outside the player body
-#ifdef TMNTWEAPSYS // ZTM: TODO: Add a option to/not-to damage owner?
-	if (qfalse && !(ent->count & 1))
+#ifdef TMNTWEAPSYS // ZTM: TODO: Add a option not to damage owner?
+	if (!(ent->count & 1))
 #else
 	if (ent->s.weapon == WP_PROX_LAUNCHER && !ent->count)
 #endif

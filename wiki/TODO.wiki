@@ -113,8 +113,6 @@ Weapons (and attacking)
 
   * TODO: Rename TMNT* defines?... to what?
 
-  * TODO: Fire shuriken doesn't move with movers, but is pushed.
-
   * TODO: Stop debris being in sitting in the air due to the object they were on being removed.
 
   * TODO: Don't show hit effect when hitting player with PW_FLASHING (G_MeleeDamageSingle)
