@@ -77,8 +77,6 @@ Weapons (and attacking)
   * BUG: When players have PW_FLASHING they can walk though Obelisks/misc_objects.
     * When PW_FLASHING wears off while in a solid, they are killed. Otherwise they would be stuck.
 
-  * TODO: Have shurikens do damage while they are in the wall/ground?
-
   * TODO: Add misc_bubbles entity.
 
   * TODO: Add misc_dripper entity.
@@ -107,7 +105,7 @@ Weapons (and attacking)
 
   * TODO: Rename or move to the wiki the tmnt-`*`.txt files
 
-  * TODO: Rename TMNT`*` defines?... to what?
+  * TODO: Rename TMNT`*` defines to TA`*`?
 
   * TODO: Have bots not attack players with PW_FLASHING
 
@@ -174,6 +172,8 @@ Most of the mapobjects should be damageable.
     * so shell takes less damage, banndana takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
 
   * TODO: Backport TMNTWEAPSYS_EX's weapon dropping to TMNTWEAPSYS?
+
+  * TODO: Have shurikens do damage while they are in the wall/ground?
 
 == Done? ==
   * DONE?: TMNTWEAPSYS weapon_random entity that spawns a random weapon each time the weapon respawns
