@@ -102,9 +102,24 @@ Weapons (and attacking)
 
   * TODO: Remove gclient_t's fireHeld and only use PMF_GRAPPLE_SHOT (and rename to PMF_FIRE_HELD) ?
 
-  * TODO: Have a option for func_breakable and misc_object to spawn item on death, and option to respawn?
+  * TODO: Have a option for func_breakable and misc_object to spawn an item on death
+
+  * TODO: Have a option for func_breakable and misc_object to respawn
 
   * TODO: Allow func_breakable and misc_object to be pushable.
+
+  * TODO: Move base/sound/*.wav to base-src/sound/unused/ ?
+
+  * TODO: Rename or move to the wiki the tmnt-*.txt files
+
+  * TODO: Rename TMNT* defines?... to what?
+
+  * TODO: Fire shuriken doesn't move with movers, but is pushed.
+
+  * TODO: Stop debris being in sitting in the air due to the object they were on being removed.
+
+  * TODO: Check to see if bots press and hold attack with melee weapons or just hold attack down
+    * Disable fireHeld check for melee weapons to see
 
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)

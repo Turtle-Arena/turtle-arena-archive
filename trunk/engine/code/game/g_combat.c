@@ -1051,7 +1051,7 @@ dflags		these flags are used to control how T_Damage works
 ============
 */
 
-void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
+qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			   vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
 	int			take;
@@ -1066,13 +1066,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 #endif
 
 	if (!targ->takedamage) {
-		return;
+		return qfalse;
 	}
 
 	// the intermission has allready been qualified for, so don't
 	// allow any extra scoring
 	if ( level.intermissionQueued ) {
-		return;
+		return qfalse;
 	}
 #if defined MISSIONPACK && !defined TMNT // POWERS
 	if ( targ->client && mod != MOD_JUICED) {
@@ -1080,7 +1080,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			if ( dir && point ) {
 				G_InvulnerabilityEffect( targ, dir, point, impactpoint, bouncedir );
 			}
-			return;
+			return qfalse;
 		}
 	}
 #endif
@@ -1089,7 +1089,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	{
 		// ZTM: TODO: Have a effect to user knows it is can only be broke by WIF_CUTS?
 		//                       or have textures that users know can only be broke by WIF_CUTS?
-		return;
+		return qfalse;
 	}
 #endif
 	if ( !inflictor ) {
@@ -1108,7 +1108,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		if ( targ->use && targ->moverState == MOVER_POS1 ) {
 			targ->use( targ, inflictor, attacker );
 		}
-		return;
+		return qtrue;
 	}
 #ifdef TMNTENTSYS // BREAKABLE
 	// Allow breakable movers
@@ -1137,13 +1137,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 			G_FreeEntity( targ );
 		}
-		return;
+		return qtrue;
 	}
 #endif
 
 #ifdef MISSIONPACK
 	if( g_gametype.integer == GT_OBELISK && CheckObeliskAttack( targ, attacker ) ) {
-		return;
+		return qfalse;
 	}
 #endif
 	// reduce damage by the attacker's handicap value
@@ -1167,11 +1167,11 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	if ( client ) {
 		if ( client->noclip ) {
-			return;
+			return qfalse;
 		}
 #ifdef TMNT // POWERS
 		if ( client->ps.powerups[PW_FLASHING] ) {
-			return;
+			return qfalse;
 		}
 #endif
 	}
@@ -1254,7 +1254,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 #endif
 		{
 			if ( !g_friendlyFire.integer ) {
-				return;
+				return qfalse;
 			}
 		}
 		// ZTM: TODO: PE_PROX or all projectiles.
@@ -1262,10 +1262,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 #ifdef MISSIONPACK
 		if (mod == MOD_PROXIMITY_MINE) {
 			if (inflictor && inflictor->parent && OnSameTeam(targ, inflictor->parent)) {
-				return;
+				return qfalse;
 			}
 			if (targ == attacker) {
-				return;
+				return qfalse;
 			}
 		}
 #endif
@@ -1273,7 +1273,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 		// check for godmode
 		if ( targ->flags & FL_GODMODE ) {
-			return;
+			return qfalse;
 		}
 	}
 
@@ -1283,7 +1283,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		G_AddEvent( targ, EV_POWERUP_BATTLESUIT, 0 );
 #ifndef TMNT // POWERS
 		if ( ( dflags & DAMAGE_RADIUS ) || ( mod == MOD_FALLING ) ) {
-			return;
+			return qfalse;
 		}
 #endif
 		damage *= 0.5;
@@ -1292,7 +1292,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	// never take any damage.
 	if ( client && client->ps.powerups[PW_INVUL] ) {
 		G_AddEvent( targ, EV_POWERUP_INVUL, 0 );
-		return;
+		return qfalse;
 	}
 #endif
 
@@ -1402,12 +1402,13 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 			targ->enemy = attacker;
 			targ->die (targ, inflictor, attacker, take, mod);
-			return;
 		} else if ( targ->pain ) {
 			targ->pain (targ, attacker, take);
 		}
+		return qtrue;
 	}
 
+	return qfalse;
 }
 
 
