@@ -614,6 +614,12 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 			continue;
 		}
 
+		// Don't show hit effects on clients who can't be damaged
+		if (traceEnt->client && (traceEnt->client->ps.powerups[PW_FLASHING]
+			|| traceEnt->client->ps.powerups[PW_INVUL])) {
+			continue;
+		}
+
 		// If client hit another client
 		if (!traceEnt->client || (traceEnt->client &&
 			(!OnSameTeam(ent, traceEnt) || g_friendlyFire.integer != 0)))

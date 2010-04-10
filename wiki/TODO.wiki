@@ -115,8 +115,6 @@ Weapons (and attacking)
 
   * TODO: Stop debris being in sitting in the air due to the object they were on being removed.
 
-  * TODO: Don't show hit effect when hitting player with PW_FLASHING (G_MeleeDamageSingle)
-
   * TODO: Have bots not attack players with PW_FLASHING
 
   * TODO: Improve camera system.
