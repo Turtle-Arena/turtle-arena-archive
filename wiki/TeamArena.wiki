@@ -29,7 +29,7 @@ Additions from Quake III: Team Arena, the plan is to remove and integrate all pa
   * Scriptable UI/HUD
     * (UI only) Teams: 5 bots, team-name, and logo-gfxs.
   * Harvester --Disabled (!defined MISSIONPACK_HARVESTER)
-    * kill people, then a skull (of the attacker's team color) will spawn at the center object, then attacker's team must take the skull to the other team's base, if killee's team touch it [object that spawned at center], it is removed.)
+    * kill people, then a skull (of the attacker's team color) will spawn at the center object, then attacker's team must take the skull to the other team's base, if killee's team touch it (object that spawned at center), it is removed.)
   * Kamikaze holdable item (Disabled)
   * Invul holdable item (Disabled)
   * Prox Launcher (Partly unsupported)
