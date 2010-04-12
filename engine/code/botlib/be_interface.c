@@ -455,7 +455,7 @@ int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3)
 		botimport.Print(PRT_MESSAGE, "\n");
 		botimport.Print(PRT_MESSAGE, "travel time to goal (%d) = %d\n", botlibglobals.goalareanum,
 					AAS_AreaTravelTimeToGoalArea(newarea, origin, botlibglobals.goalareanum, TFL_DEFAULT
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 					|TFL_ROCKETJUMP
 #endif
 					));
@@ -579,7 +579,7 @@ int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3)
 										  lastgoalareanum, lastareanum,
 										  avoidreach, avoidreachtimes, avoidreachtries,
 										  &goal, TFL_DEFAULT|TFL_FUNCBOB
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 										  |TFL_ROCKETJUMP
 #endif
 										  , TFL_DEFAULT|TFL_FUNCBOB|TFL_ROCKETJUMP,

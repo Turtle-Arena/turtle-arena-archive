@@ -1308,18 +1308,26 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 		return bs->inventory[INVENTORY_DEFAULTWEAPON];
 
     return bs->inventory[INVENTORY_WEAPON];
-#elif defined TMNTWEAPONS // BETA // Guns only
-	if (bs->inventory[INVENTORY_GUN] > 0 && bs->inventory[INVENTORY_AMMOGUN] > 0)
-		return WEAPONINDEX_GUN;
-	else if (bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOELECTRIC] > 0)
-		return WEAPONINDEX_ELECTRIC_LAUNCHER;
-	else if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOHOMING] > 0)
-		return WEAPONINDEX_HOMING_LAUNCHER;
-	else if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOROCKET] > 0)
-		return WEAPONINDEX_ROCKET_LAUNCHER;
-	else {
-		return -1;
+#elif defined TMNTWEAPSYS
+	{
+		int i;
+
+		for (i = 1; i < BG_NumWeaponGroups(); i++)
+		{
+			if (bs->inventory[INVENTORY_WEAPON_START+i] > 0)
+			{
+				if (BG_WeaponHasMelee(i))
+					return i;
+				else // WT_GUN
+				{
+					if (bs->inventory[INVENTORY_AMMO_START+i] > 0 || bs->inventory[INVENTORY_AMMO_START+i] == -1)
+						return i;
+				}
+			}
+		}
 	}
+
+	return -1;
 #else
 	if (bs->inventory[INVENTORY_MACHINEGUN] > 0 && bs->inventory[INVENTORY_BULLETS] > 0)
 		return WEAPONINDEX_MACHINEGUN;
@@ -1765,7 +1773,7 @@ int AINode_Seek_NBG(bot_state_t *bs) {
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
@@ -1910,7 +1918,7 @@ int AINode_Seek_LTG(bot_state_t *bs)
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
@@ -2189,7 +2197,7 @@ int AINode_Battle_Fight(bot_state_t *bs) {
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
@@ -2284,7 +2292,7 @@ int AINode_Battle_Chase(bot_state_t *bs)
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
@@ -2608,7 +2616,7 @@ int AINode_Battle_NBG(bot_state_t *bs) {
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;

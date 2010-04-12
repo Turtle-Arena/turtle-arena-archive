@@ -2716,7 +2716,7 @@ static void CG_PlayerSprites( centity_t *cent
 		|| cg_draw2D.integer == 0 )
 	{
 #endif
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	if ( cent->currentState.eFlags & EF_AWARD_IMPRESSIVE ) {
 #ifdef IOQ3ZTM
 		CG_PlayerFloatSprite( origin, 0, cgs.media.medalImpressive );

@@ -96,7 +96,7 @@ int BotWantsToRetreat(bot_state_t *bs);
 int BotWantsToChase(bot_state_t *bs);
 //returns true if the bot wants to help
 int BotWantsToHelp(bot_state_t *bs);
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 //returns true if the bot can and wants to rocketjump
 int BotCanAndWantsToRocketJump(bot_state_t *bs);
 #endif
@@ -203,7 +203,7 @@ extern int gametype;		//game type
 extern int maxclients;		//maximum number of clients
 
 extern vmCvar_t bot_grapple;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 extern vmCvar_t bot_rocketjump;
 #endif
 extern vmCvar_t bot_fastchat;

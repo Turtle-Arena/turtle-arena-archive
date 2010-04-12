@@ -119,7 +119,7 @@ void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
 	trap_Cvar_Set("ui_scoreExcellents", 	va("%i", newInfo->excellents));
 	trap_Cvar_Set("ui_scoreDefends", 			va("%i", newInfo->defends));
 	trap_Cvar_Set("ui_scoreAssists", 			va("%i", newInfo->assists));
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	trap_Cvar_Set("ui_scoreGauntlets", 		va("%i", newInfo->gauntlets));
 #endif
 	trap_Cvar_Set("ui_scoreScore", 				va("%i", newInfo->score));
@@ -137,7 +137,7 @@ void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
 		trap_Cvar_Set("ui_scoreExcellents2", 	va("%i", newInfo->excellents));
 		trap_Cvar_Set("ui_scoreDefends2", 			va("%i", newInfo->defends));
 		trap_Cvar_Set("ui_scoreAssists2", 			va("%i", newInfo->assists));
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 		trap_Cvar_Set("ui_scoreGauntlets2", 		va("%i", newInfo->gauntlets));
 #endif
 		trap_Cvar_Set("ui_scoreScore2", 				va("%i", newInfo->score));
@@ -254,7 +254,7 @@ static void UI_CalcPostGameStats( void ) {
 	newInfo.excellents = atoi(UI_Argv(5));
 	newInfo.defends = atoi(UI_Argv(6));
 	newInfo.assists = atoi(UI_Argv(7));
-#ifdef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	// NOTE: I pass 0 as argv 8 so I don't have to change numbers...
 #else
 	newInfo.gauntlets = atoi(UI_Argv(8));

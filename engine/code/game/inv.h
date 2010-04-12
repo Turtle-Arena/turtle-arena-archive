@@ -36,6 +36,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_AMMO 		59 // Ammo for current weapon,
 //#endif
 
+#if 0
 //#ifdef TMNTWEAPONS
 // weapons, currently (if !defined TMNTWEAPSYS_EX) there is a max of 16 - which I am over...
 //#define INVENTORY_WP_NONE			0
@@ -61,6 +62,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_AMMOHOMING		19
 #define INVENTORY_AMMOROCKET		20
 //#endif // TMNTWEAPONS
+#endif
 
 // holdable items, currently there is a max of 16
 // Q3 holdable defines.
@@ -115,6 +117,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 55-59 are at top of file.
 #define INVENTORY_PERSISTANT_POWER 60
+
+//TMNTWEAPSYS TMNTWEAPONS
+#define INVENTORY_WEAPON_START 61
+#define INVENTORY_WEAPON_LAST 93 // INVENTORY_WEAPON_START + MAX_BG_WEAPON_GROUPS
+#define INVENTORY_AMMO_START 94 //INVENTORY_WEAPON_LAST+1
+#define INVENTORY_AMMO_LAST 126 //INVENTORY_AMMO_START + MAX_BG_WEAPON_GROUPS
 
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
@@ -190,7 +198,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODELINDEX_DEFAULTWEAPON	40 // weapon index -1
 
 // WEAPONINDEX_*
-#ifdef TMNTWEAPONS
+#if 1 //#ifdef TMNTWEAPONS
+#if 0
 //#define WEAPONINDEX_DEFAULT				-1
 //#define WEAPONINDEX_NONE				0
 #define WEAPONINDEX_FISTS				1
@@ -209,6 +218,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define WEAPONINDEX_ROCKET_LAUNCHER		14
 #define WEAPONINDEX_HOMING_LAUNCHER		15
 #define WEAPONINDEX_GRAPPLING_HOOK		16
+#endif
 
 #else
 

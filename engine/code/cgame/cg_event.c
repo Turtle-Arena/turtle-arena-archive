@@ -199,7 +199,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "goes out with a bang";
 			break;
 #endif
-#ifndef TMNTWEAPONS // MOD
+#ifndef TURTLEARENA // MOD
 		case MOD_GRENADE_SPLASH:
 			if ( gender == GENDER_FEMALE )
 				message = "tripped on her own grenade";
@@ -324,7 +324,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		case MOD_GRAPPLE:
 			message = "was caught by";
 			break;
-#ifndef TMNTWEAPONS // MOD
+#ifndef TURTLEARENA // MOD
 		case MOD_GAUNTLET:
 			message = "was pummeled by";
 			break;
@@ -379,7 +379,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			break;
 #endif
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS // MOD
+#ifndef TURTLEARENA // MOD
 		case MOD_NAIL:
 			message = "was nailed by";
 			break;
@@ -398,7 +398,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message2 = "'s Kamikaze blast";
 			break;
 #endif
-#ifndef TMNTWEAPONS // MOD
+#ifndef TURTLEARENA // POWERS
 		case MOD_JUICED:
 			message = "was juiced by";
 			break;
@@ -1204,7 +1204,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS
+#ifndef TMNTWEAPSYS
 	case EV_PROXIMITY_MINE_STICK:
 		DEBUGNAME("EV_PROXIMITY_MINE_STICK");
 		if( es->eventParm & SURF_FLESH ) {

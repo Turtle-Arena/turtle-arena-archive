@@ -36,30 +36,31 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_AMMO 		59 // Ammo for current weapon,
 //#endif
 
+
 //#ifdef TMNTWEAPONS
 // weapons, currently there is a max of 16 - which I am over...
-//#define INVENTORY_WP_NONE			0
-#define INVENTORY_FISTS				1
-#define INVENTORY_KATANAS			2
-#define INVENTORY_DAISHO			3 // Usagi's weapons
-#define INVENTORY_SAIS				4
-#define INVENTORY_NUNCHUCKS			5
-#define INVENTORY_HAMMER			6
-#define INVENTORY_AXE				7
-#define INVENTORY_LONGSWORD			8
-#define INVENTORY_BAT				9
-#define INVENTORY_BO				10
-#define INVENTORY_BAMBOOBO			11
-#define INVENTORY_GUN				12
-#define INVENTORY_ELECTRIC_LAUNCHER	13
-#define INVENTORY_HOMING_LAUNCHER	14
-#define INVENTORY_ROCKET_LAUNCHER	15
-#define INVENTORY_GRAPPLING_HOOK	16
+//#define INVENTORY_WP_NONE			93
+#define INVENTORY_FISTS				94
+#define INVENTORY_KATANAS			95
+#define INVENTORY_DAISHO			96 // Usagi's weapons
+#define INVENTORY_SAIS				97
+#define INVENTORY_NUNCHUCKS			98
+#define INVENTORY_HAMMER			99
+#define INVENTORY_AXE				100
+#define INVENTORY_LONGSWORD			101
+#define INVENTORY_BAT				102
+#define INVENTORY_BO				103
+#define INVENTORY_BAMBOOBO			104
+#define INVENTORY_GUN				105
+#define INVENTORY_ELECTRIC_LAUNCHER	106
+#define INVENTORY_HOMING_LAUNCHER	107
+#define INVENTORY_ROCKET_LAUNCHER	108
+#define INVENTORY_GRAPPLING_HOOK	109
 
-#define INVENTORY_AMMOGUN			17
-#define INVENTORY_AMMOELECTRIC		18
-#define INVENTORY_AMMOHOMING		19
-#define INVENTORY_AMMOROCKET		20
+#define INVENTORY_AMMOGUN			137 // 105 +32
+#define INVENTORY_AMMOELECTRIC		138 // 106 +32
+#define INVENTORY_AMMOHOMING		139 // 107 +32
+#define INVENTORY_AMMOROCKET		140 // 108 +32
 //#endif // TMNTWEAPONS
 
 // holdable items, currently there is a max of 16

@@ -2859,7 +2859,7 @@ static qboolean CG_DrawFollow( void ) {
 
 
 
-#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
+#ifndef TURTLEARENA // NO_AMMO_WARNINGS
 /*
 =================
 CG_DrawAmmoWarning
@@ -2889,7 +2889,7 @@ static void CG_DrawAmmoWarning( void ) {
 }
 #endif
 
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#if defined MISSIONPACK && !defined TURTLEARENA // WEAPONS
 /*
 =================
 CG_DrawProxWarning
@@ -3217,11 +3217,11 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			CG_DrawMiddleLeft();
 #endif
 
-#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
+#ifndef TURTLEARENA // NO_AMMO_WARNINGS
 			CG_DrawAmmoWarning();
 #endif
 
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#if defined MISSIONPACK && !defined TURTLEARENA // WEAPONS
 			CG_DrawProxWarning();
 #endif      
 			if(stereoFrame == STEREO_CENTER)

@@ -902,7 +902,7 @@ void Bullet_Fire (gentity_t *ent, float spread, int damage ) {
 #endif
 				G_Damage( traceEnt, ent, ent, forward, tr.endpos,
 					damage, 0,
-#ifdef TMNTWEAPONS // MOD
+#ifdef TURTLEARENA // MOD
 					MOD_GUN);
 #else
 					MOD_MACHINEGUN);

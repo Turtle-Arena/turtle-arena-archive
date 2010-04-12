@@ -253,267 +253,7 @@ gitem_t	bg_itemlist[] =
 #ifdef TMNTWEAPSYS // Keep the model index correct for items after weapons...
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
-#ifdef TMNTWEAPONS
-	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
-	{ EMPTY_GITEM },
-#endif
-#elif defined TMNTWEAPONS
-/*QUAKED weapon_fists (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_fists",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/fists/fists.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_fists",
-/* pickup */	"Fists",
-		0,
-		IT_WEAPON,
-		WP_FISTS,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_katanas (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_katanas",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/katana_leo/katanas_pickup.md3",
-		NULL, "models/weapons2/katana_leo/katana_leo.md3", "models/weapons2/katana_leo/katana_leo.md3"},
-/* icon */		"icons/iconw_katanas",
-/* pickup */	"Katanas",
-		0,
-		IT_WEAPON,
-		WP_KATANAS,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_daisho (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_daisho",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/daisho/daisho_pickup.md3",
-		NULL, "models/weapons2/katana/katana.md3", "models/weapons2/wakizashi/wakizashi.md3"},
-/* icon */		"icons/iconw_daisho",
-/* pickup */	"Daisho",
-		0,
-		IT_WEAPON,
-		WP_DAISHO,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_sais (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_sais",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/sai/sais_pickup.md3",
-		NULL, "models/weapons2/sai/sai.md3", "models/weapons2/sai/sai.md3"},
-/* icon */		"icons/iconw_sais",
-/* pickup */	"Sais",
-		0,
-		IT_WEAPON,
-		WP_SAIS,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_nunchucks (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_nunchucks",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/nunchuck/nunchucks_pickup.md3",
-		NULL, "models/weapons2/nunchuck/nunchuck.md3", "models/weapons2/nunchuck/nunchuck.md3"},
-/* icon */		"icons/iconw_nunchucks",
-/* pickup */	"Nunchucks",
-		0,
-		IT_WEAPON,
-		WP_NUNCHUCKS,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_hammer (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_hammer",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/hammer/hammer.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_hammer",
-/* pickup */	"Hammer",
-		0,
-		IT_WEAPON,
-		WP_HAMMER,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_axe (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_axe",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/axe/axe.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_axe",
-/* pickup */	"Battle Axe", // "Axe",
-		0,
-		IT_WEAPON,
-		WP_AXE,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_longsword (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_longsword",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/longsword/longsword.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_longsword",
-/* pickup */	"Long Sword",
-		0,
-		IT_WEAPON,
-		WP_LONGSWORD,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_bat (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_bat",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/bat/bat_pickup.md3",
-		NULL, "models/weapons2/bat/bat.md3", NULL},
-/* icon */		"icons/iconw_bat",
-/* pickup */	"Baseball bat",
-		0,
-		IT_WEAPON,
-		WP_BAT,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_bo (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_bo",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/bo/bo_pickup.md3",
-		NULL, "models/weapons2/bo/bo.md3", NULL},
-/* icon */		"icons/iconw_bo",
-/* pickup */	"Bo Staff",
-		0,
-		IT_WEAPON,
-		WP_BO,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_bamboo (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_bamboo",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/bamboo/bamboo.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_bamboo",
-/* pickup */	"Bamboo",
-		0,
-		IT_WEAPON,
-		WP_BAMBOO,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_gun (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_gun",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/gun/gun.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_gun",
-/* pickup */	"Gun",
-		100,
-		IT_WEAPON,
-		WP_GUN,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_electriclauncher (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_electriclauncher",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/electricl/electricl.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_electric",
-/* pickup */	"Electric Launcher",
-		40,
-		IT_WEAPON,
-		WP_PLASMAGUN, // WP_ELECTRIC_LAUNCHER
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_rocketlauncher (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_rocketlauncher",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/rocketl/rocketl.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_rocket",
-/* pickup */	"Rocket Launcher",
-		10,
-		IT_WEAPON,
-		WP_ROCKET_LAUNCHER,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_hominglauncher (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_hominglauncher",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/homingl/homingl.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_homing",
-/* pickup */	"Homing Rocket Launcher", // "Homing Launcher"
-		5,
-		IT_WEAPON,
-		WP_HOMING_LAUNCHER,
-/* precache */ "",
-/* sounds */ ""
-	},
-
-/*QUAKED weapon_grapplinghook (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
-*/
-	{
-		"weapon_grapplinghook",
-		"sound/misc/w_pkup.wav",
-        { "models/weapons2/grapple/grapple.md3",
-		NULL, NULL, NULL},
-/* icon */		"icons/iconw_grapple",
-/* pickup */	"Grappling Hook",
-		0,
-		IT_WEAPON,
-		WP_GRAPPLING_HOOK,
-/* precache */ "",
-/* sounds */ ""
-	},
-#else // !TMNTWEAPONS
+#else
 /*QUAKED weapon_gauntlet (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -673,12 +413,12 @@ gitem_t	bg_itemlist[] =
 /* precache */ "",
 /* sounds */ ""
 	},
-#endif // TMNTWEAPONS
+#endif
 
 #ifdef TMNTWEAPSYS
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
-#elif !defined TMNTWEAPONS
+#else
 	//
 	// AMMO ITEMS
 	//
@@ -810,7 +550,7 @@ gitem_t	bg_itemlist[] =
 /* precache */ "",
 /* sounds */ ""
 	},
-#endif // TMNTWEAPONS
+#endif
 
 #ifndef TMNTHOLDABLE // no q3 teleprter
 	//
@@ -1215,7 +955,7 @@ Only in CTF games
 
 #ifdef TMNTWEAPSYS
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
-#elif !defined TMNTWEAPONS
+#else
 /*QUAKED ammo_nails (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -1263,7 +1003,7 @@ Only in CTF games
 /* precache */ "",
 /* sounds */ ""
 	},
-#endif // !TMNTWEAPONS
+#endif
 
 	//
 	// PERSISTANT POWERUP ITEMS
@@ -1403,7 +1143,6 @@ Only in One Flag CTF games
 /* sounds */ ""
 	},
 #endif
-#ifndef TMNTWEAPONS
 #ifdef TMNTWEAPSYS // Keep the model index correct for items after weapons...
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
 #else
@@ -1460,7 +1199,6 @@ Only in One Flag CTF games
 /* sounds */ "sound/weapons/vulcan/wvulwind.wav"
 	},
 #endif // TMNTWEAPSYS
-#endif // TMNTWEAPONS
 #endif
 
 #ifdef TMNTWEAPSYS
@@ -1642,7 +1380,7 @@ playerAnimationDef_t playerAnimationDefs[] = {
 
 char	*modNames[] = {
 	"MOD_UNKNOWN",
-#ifdef TMNTWEAPONS // MOD
+#ifdef TURTLEARENA // MOD
 	"MOD_FIST",
 	"MOD_KATANA",
 	"MOD_WAKIZASHI",
@@ -1696,7 +1434,7 @@ char	*modNames[] = {
 	"MOD_EXPLOSION",
 #endif
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS // MOD
+#ifndef TURTLEARENA // MOD
 	"MOD_NAIL",
 	"MOD_CHAINGUN",
 	"MOD_PROXIMITY_MINE",
@@ -1704,7 +1442,7 @@ char	*modNames[] = {
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	"MOD_KAMIKAZE",
 #endif
-#ifndef TMNTWEAPONS // MOD
+#ifndef TURTLEARENA // POWERS
 	"MOD_JUICED",
 #endif
 #endif
@@ -4707,7 +4445,7 @@ char *eventnames[] = {
 #endif
 
 //#ifdef MISSIONPACK
-#if !defined TMNTWEAPONS || defined NET_COMPAT
+#if !defined TMNTWEAPSYS || defined NET_COMPAT
 	"EV_PROXIMITY_MINE_STICK",
 	"EV_PROXIMITY_MINE_TRIGGER",
 #endif

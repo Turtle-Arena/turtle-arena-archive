@@ -373,7 +373,7 @@ static void CG_TauntDeathInsult_f (void ) {
 	trap_SendConsoleCommand("cmd vsay death_insult\n");
 }
 
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 static void CG_TauntGauntlet_f (void ) {
 	trap_SendConsoleCommand("cmd vsay kill_guantlet\n");
 }
@@ -679,7 +679,7 @@ static consoleCommand_t	commands[] = {
 	{ "tauntPraise", CG_TauntPraise_f },
 	{ "tauntTaunt", CG_TauntTaunt_f },
 	{ "tauntDeathInsult", CG_TauntDeathInsult_f },
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	{ "tauntGauntlet", CG_TauntGauntlet_f },
 #endif
 	{ "spWin", CG_spWin_f },

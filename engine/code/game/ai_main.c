@@ -1469,10 +1469,8 @@ int BotAILoadMap( int restart ) {
 	return qtrue;
 }
 
-#ifndef TMNTWEAPONS // missionpack
 #ifdef MISSIONPACK
 void ProximityMine_Trigger( gentity_t *trigger, gentity_t *other, trace_t *trace );
-#endif
 #endif
 
 /*
@@ -1491,7 +1489,7 @@ int BotAIStartFrame(int time) {
 
 	G_CheckBotSpawn();
 
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	trap_Cvar_Update(&bot_rocketjump);
 #endif
 	trap_Cvar_Update(&bot_grapple);
@@ -1596,7 +1594,6 @@ int BotAIStartFrame(int time) {
 				trap_BotLibUpdateEntity(i, NULL);
 				continue;
 			}
-#ifndef TMNTWEAPONS // missionpack
 #ifdef MISSIONPACK
 			// never link prox mine triggers
 			if (ent->r.contents == CONTENTS_TRIGGER) {
@@ -1605,7 +1602,6 @@ int BotAIStartFrame(int time) {
 					continue;
 				}
 			}
-#endif
 #endif
 			//
 			memset(&state, 0, sizeof(bot_entitystate_t));
@@ -1753,8 +1749,6 @@ int BotInitLibrary(void) {
 #endif
 #ifdef TURTLEARENA
 	trap_BotLibDefine("TURTLEARENA");
-#endif
-#ifdef TMNTWEAPONS
 	trap_BotLibDefine("TMNTWEAPONS");
 #endif
 #ifdef MISSIONPACK

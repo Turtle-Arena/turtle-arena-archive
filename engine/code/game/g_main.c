@@ -100,9 +100,7 @@ vmCvar_t	g_singlePlayer;
 #endif
 vmCvar_t	g_enableDust;
 vmCvar_t	g_enableBreath;
-#ifndef TMNTWEAPONS // missionpack
 vmCvar_t	g_proxMineTimeout;
-#endif
 #endif
 #ifdef TMNTSP
 vmCvar_t	g_singlePlayer;
@@ -218,9 +216,7 @@ static cvarTable_t		gameCvarTable[] = {
 
 	{ &g_enableDust, "g_enableDust", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
 	{ &g_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
-#ifndef TMNTWEAPONS // missionpack
 	{ &g_proxMineTimeout, "g_proxMineTimeout", "20000", 0, 0, qfalse },
-#endif
 #endif
 #ifdef TMNTSP
 	{ &g_singlePlayer, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM, 0, qfalse, qfalse  },

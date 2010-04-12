@@ -120,7 +120,7 @@ extern vmCvar_t	ui_scoreImpressives;
 extern vmCvar_t	ui_scoreExcellents;
 extern vmCvar_t	ui_scoreDefends;
 extern vmCvar_t	ui_scoreAssists;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 extern vmCvar_t	ui_scoreGauntlets;
 #endif
 extern vmCvar_t	ui_scoreScore;
@@ -870,7 +870,7 @@ typedef struct {
 	qhandle_t	q3HeadIcons[MAX_PLAYERMODELS];
 	int				q3SelectedHead;
 
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
 	int effectsColor;
 #endif
 
@@ -1097,7 +1097,7 @@ void UI_NetworkOptionsMenu( void );
 //
 typedef enum {
 	AWARD_ACCURACY,
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	AWARD_IMPRESSIVE,
 	AWARD_EXCELLENT,
 	AWARD_GAUNTLET,
@@ -1168,7 +1168,7 @@ typedef struct postGameInfo_s {
 	int excellents;
 	int defends;
 	int assists;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	int gauntlets;
 #endif
 	int	captures;

@@ -151,7 +151,7 @@ void AAS_InitTravelFlagFromType(void)
 	aasworld.travelflagfortype[TRAVEL_WATERJUMP] = TFL_WATERJUMP;
 	aasworld.travelflagfortype[TRAVEL_TELEPORT] = TFL_TELEPORT;
 	aasworld.travelflagfortype[TRAVEL_ELEVATOR] = TFL_ELEVATOR;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	aasworld.travelflagfortype[TRAVEL_ROCKETJUMP] = TFL_ROCKETJUMP;
 #endif
 #ifndef TMNTWEAPSYS

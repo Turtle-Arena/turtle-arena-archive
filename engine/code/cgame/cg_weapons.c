@@ -1107,7 +1107,7 @@ void CG_RegisterProjectile( int projectileNum )
 			break;
 		case PD_GRENADE:
 			cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
-#ifdef TMNTWEAPONS
+#ifdef TMNTDATA
 			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 #else
 			cgs.media.grenadeExplosionShader = trap_R_RegisterShader( "grenadeExplosion" );
@@ -1115,7 +1115,7 @@ void CG_RegisterProjectile( int projectileNum )
 			break;
 		case PD_RAIL:
 			cgs.media.ringFlashModel = trap_R_RegisterModel("models/weaphits/ring02.md3");
-#ifdef TMNTWEAPONS
+#ifdef TMNTDATA
 			cgs.media.plasmaExplosionShader = trap_R_RegisterShader( "plasmaExplosion" );
 #else
 			cgs.media.railExplosionShader = trap_R_RegisterShader( "railExplosion" );
@@ -1123,7 +1123,7 @@ void CG_RegisterProjectile( int projectileNum )
 			break;
 		case PD_BFG:
 			cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
-#ifdef TMNTWEAPONS
+#ifdef TMNTDATA
 			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 #else
 			cgs.media.bfgExplosionShader = trap_R_RegisterShader( "bfgExplosion" );
@@ -1217,7 +1217,7 @@ void CG_RegisterWeapon( int weaponNum )
 #else
 	weaponInfo_t	*weaponInfo;
 #endif
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 	gitem_t			*item;
 #else
 	gitem_t			*item, *ammo;
@@ -1305,7 +1305,7 @@ void CG_RegisterWeapon( int weaponNum )
 #else
 	weaponInfo->weaponIcon = trap_R_RegisterShader( item->icon );
 #endif
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	weaponInfo->ammoIcon = trap_R_RegisterShader( item->icon );
 
 #ifdef TMNTWEAPSYS
@@ -1315,13 +1315,18 @@ void CG_RegisterWeapon( int weaponNum )
 		ammo = BG_ItemForItemNum(i);
 		if (!ammo->classname)
 			continue;
-#else
-	for ( ammo = bg_itemlist + 1 ; ammo->classname ; ammo++ ) {
-#endif
 		if ( ammo->giType == IT_AMMO && ammo->giTag == weaponNum ) {
 			break;
 		}
 	}
+#else
+	for ( ammo = bg_itemlist + 1 ; ammo->classname ; ammo++ ) {
+		if ( ammo->giType == IT_AMMO && ammo->giTag == weaponNum ) {
+			break;
+		}
+	}
+#endif
+
 	if (
 #ifdef TMNTWEAPSYS // stop warning
 	ammo &&
@@ -1835,8 +1840,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 #ifdef TMNTWEAPSYS // ZTM: FIXME: Support Q3 lightning gun
 		// PT_LIGHTNING
 		// CG_MissileHitWall (Exposion only, no sounds or wallmarks.)
-#endif
-#ifndef TMNTWEAPONS
+#else
 		vec3_t	angles;
 		vec3_t	dir;
 
@@ -3121,7 +3125,7 @@ void CG_NextWeapon_f( void ) {
 		if ( cg.weaponSelect == MAX_WEAPONS ) {
 			cg.weaponSelect = 0;
 		}
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 #ifdef TMNTWEAPSYS
 		if ( cg.weaponSelect == cg.snap->ps.stats[STAT_DEFAULTWEAPON] ) {
 			continue;		// never cycle to gauntlet
@@ -3165,7 +3169,7 @@ void CG_PrevWeapon_f( void ) {
 		if ( cg.weaponSelect == -1 ) {
 			cg.weaponSelect = MAX_WEAPONS - 1;
 		}
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 #ifdef TMNTWEAPSYS
 		if ( cg.weaponSelect == cg.snap->ps.stats[STAT_DEFAULTWEAPON] ) {
 			continue;		// never cycle to gauntlet
@@ -3429,7 +3433,7 @@ void CG_FireWeapon( centity_t *cent ) {
 #endif
 }
 
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 /*
 =================
 CG_MeleeHit
@@ -4286,7 +4290,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 				break;
 			case PD_GRENADE:
 				mod = cgs.media.dishFlashModel;
-#ifdef TMNTWEAPONS
+#ifdef TMNTDATA
 				shader = cgs.media.rocketExplosionShader;
 #else
 				shader = cgs.media.grenadeExplosionShader;
@@ -4309,7 +4313,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 				break;
 			case PD_RAIL:
 				mod = cgs.media.ringFlashModel;
-#ifdef TMNTWEAPONS
+#ifdef TMNTDATA
 				shader = cgs.media.plasmaExplosionShader;
 #else
 				shader = cgs.media.railExplosionShader;
@@ -4318,7 +4322,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 				break;
 			case PD_BFG:
 				mod = cgs.media.dishFlashModel;
-#ifdef TMNTWEAPONS
+#ifdef TMNTDATA
 				shader = cgs.media.rocketExplosionShader;
 #else
 				shader = cgs.media.bfgExplosionShader;
@@ -4361,7 +4365,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	case WP_LIGHTNING:
 		// no explosion at LG impact, it is added with the beam
 		break;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	case WP_SHOTGUN:
 		sfx = 0;
 		break;
@@ -4442,7 +4446,7 @@ void CG_WeaponHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum ) 
 		if ((bg_weaponinfo[weapon].flags & WIF_CUTS) || (rand()&20 > 15))
 			CG_Bleed( origin, entityNum );
 #endif
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 		CG_MeleeHit(origin);
 #endif
 		return;

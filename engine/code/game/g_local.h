@@ -346,7 +346,7 @@ struct gclient_s {
 
 	int			airOutTime;
 
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	int			lastKillTime;		// for multiple kill rewards
 #endif
 
@@ -969,9 +969,7 @@ extern	vmCvar_t	g_singlePlayer;
 #ifdef TMNTSP
 extern	vmCvar_t	g_spSaveData;
 #endif
-#ifndef TMNTWEAPONS // missionpack
 extern	vmCvar_t	g_proxMineTimeout;
-#endif
 #ifdef TURTLEARENA // POWERS // PW_FLASHING
 extern	vmCvar_t	g_teleportFluxTime;
 #endif
