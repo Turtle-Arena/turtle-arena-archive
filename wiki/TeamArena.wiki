@@ -1,20 +1,19 @@
 #summary MISSIONPACK
+#labels Phase-Design
 
-Additions from Quake III: Team Arena, the plan is to remove and intagrate all parts of the MISSIONPACK define into base Turtle Arena.
+Additions from Quake III: Team Arena, the plan is to remove and integrate all parts of the MISSIONPACK define into base Turtle Arena.
 
 == Supported and/or used ==
   * One Flag CTF gametype: Take the center flag to the other team's base.
-  * Overload gametype: Defend object at base and attack other teams base object.
+  * Overload gametype: Defend object at your base and attack other teams base object.
 
   * Persistant Powerups (For Team gametypes)
     * Scout (Incressed speed, and no armor? (armor is removed in Turtle Arena) ) (speed is 1.5, haste speed is 1.3)
       * ZTM: NOTE: I cut start health and pickup health in half.
-
     * Guard (Incressed health, and Health regen)           (2x health, PW_BATTLESUIT is .5 damage receive)
       * ZTM: NOTE: I disabled Health regen (Seemed overpowered) and give 2x health from pickup items.
-
-  * Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, as I set it to 2x damage)
-  * Ammo Regen (Player ammo/shuriken counts slowly increment)
+    * Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, as I set it to 2x damage)
+    * Ammo Regen (Player ammo/shuriken counts slowly increment)
 
   * Chaingun (Supported)
   * Nailgun (Supported)
