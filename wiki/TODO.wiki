@@ -98,8 +98,6 @@ Weapons (and attacking)
 
   * TODO: Allow func_breakable and misc_object to be pushable.
 
-  * TODO: Rename or move to the wiki the tmnt-`*`.txt files
-
   * TODO: Rename TMNT`*` defines to TA`*`?
 
   * TODO: Have bots not attack players with PW_FLASHING
