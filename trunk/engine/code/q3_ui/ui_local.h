@@ -696,6 +696,8 @@ void UI_SPSkillMenu_Cache( void );
 //
 // ui_spPlayer.c
 //
+#define NUM_SPPLAYERS 4
+extern const char *spPlayerNames[NUM_SPPLAYERS];
 void UI_SPPlayerMenu( const char *arenaInfo );
 void UI_SPPlayerMenu_Cache( void );
 #endif

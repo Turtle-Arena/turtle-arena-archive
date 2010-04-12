@@ -56,12 +56,9 @@ Weapons (and attacking)
 
   * TODO: Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161
 
-  * TODO: Allow SP player select when setting up a custom game.
-
-  * TODO: Show "spmodel" instead of "name" next to "human" in custom game.
-    * Change "spmodel" by clicking it?
-
   * TODO: Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
+
+  * TODO: Replace usage of color_red with color_textnormal? (I changed color_red to be white.)
 
 == Misc ==
   * TODO: Add optional run animations for torso
