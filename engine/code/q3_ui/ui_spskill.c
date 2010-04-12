@@ -119,13 +119,13 @@ static void UI_SPSkillMenu_SkillEvent( void *ptr, int notification ) {
 	if (notification != QM_ACTIVATED)
 		return;
 
-	SetSkillColor( (int)trap_Cvar_VariableValue( "g_spSkill" ), color_red );
+	SetSkillColor( (int)trap_Cvar_VariableValue( "g_spSkill" ), text_big_color );
 
 	id = ((menucommon_s*)ptr)->id;
 	skill = id - ID_BABY + 1;
 	trap_Cvar_SetValue( "g_spSkill", skill );
 
-#ifdef TMNTMISC
+#ifdef TMNT
 	SetSkillColor( skill, color_orange );
 #else
 	SetSkillColor( skill, color_white );
@@ -243,7 +243,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.art_banner.generic.x			= 320;
 	skillMenuInfo.art_banner.generic.y			= 16;
 	skillMenuInfo.art_banner.string				= "DIFFICULTY";
-	skillMenuInfo.art_banner.color				= color_white;
+	skillMenuInfo.art_banner.color				= text_banner_color;
 	skillMenuInfo.art_banner.style				= UI_CENTER;
 
 	skillMenuInfo.item_baby.generic.type		= MTYPE_PTEXT;
@@ -257,7 +257,7 @@ static void UI_SPSkillMenu_Init( void ) {
 #else
 	skillMenuInfo.item_baby.string				= "I Can Win";
 #endif
-	skillMenuInfo.item_baby.color				= color_red;
+	skillMenuInfo.item_baby.color				= text_big_color;
 	skillMenuInfo.item_baby.style				= UI_CENTER;
 
 	skillMenuInfo.item_easy.generic.type		= MTYPE_PTEXT;
@@ -271,7 +271,7 @@ static void UI_SPSkillMenu_Init( void ) {
 #else
 	skillMenuInfo.item_easy.string				= "Bring It On";
 #endif
-	skillMenuInfo.item_easy.color				= color_red;
+	skillMenuInfo.item_easy.color				= text_big_color;
 	skillMenuInfo.item_easy.style				= UI_CENTER;
 
 	skillMenuInfo.item_medium.generic.type		= MTYPE_PTEXT;
@@ -285,7 +285,7 @@ static void UI_SPSkillMenu_Init( void ) {
 #else
 	skillMenuInfo.item_medium.string			= "Hurt Me Plenty";
 #endif
-	skillMenuInfo.item_medium.color				= color_red;
+	skillMenuInfo.item_medium.color				= text_big_color;
 	skillMenuInfo.item_medium.style				= UI_CENTER;
 
 	skillMenuInfo.item_hard.generic.type		= MTYPE_PTEXT;
@@ -299,7 +299,7 @@ static void UI_SPSkillMenu_Init( void ) {
 #else
 	skillMenuInfo.item_hard.string				= "Hardcore";
 #endif
-	skillMenuInfo.item_hard.color				= color_red;
+	skillMenuInfo.item_hard.color				= text_big_color;
 	skillMenuInfo.item_hard.style				= UI_CENTER;
 
 	skillMenuInfo.item_nightmare.generic.type		= MTYPE_PTEXT;
@@ -313,7 +313,7 @@ static void UI_SPSkillMenu_Init( void ) {
 #else
 	skillMenuInfo.item_nightmare.string				= "NIGHTMARE!";
 #endif
-	skillMenuInfo.item_nightmare.color				= color_red;
+	skillMenuInfo.item_nightmare.color				= text_big_color;
 	skillMenuInfo.item_nightmare.style				= UI_CENTER;
 
 	skillMenuInfo.item_back.generic.type		= MTYPE_BITMAP;
@@ -357,7 +357,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	Menu_AddItem( &skillMenuInfo.menu, ( void * )&skillMenuInfo.item_fight );
 
 	skill = (int)Com_Clamp( 1, 5, trap_Cvar_VariableValue( "g_spSkill" ) );
-#ifdef TMNTMISC
+#ifdef TMNT
 	SetSkillColor( skill, color_orange );
 #else
 	SetSkillColor( skill, color_white );

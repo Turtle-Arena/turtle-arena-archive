@@ -205,7 +205,7 @@ static void UI_SPPlayerMenu_Init( void ) {
 	playerMenuInfo.art_banner.generic.x			= 320;
 	playerMenuInfo.art_banner.generic.y			= 16;
 	playerMenuInfo.art_banner.string			= "PLAYER SELECT";
-	playerMenuInfo.art_banner.color				= color_white;
+	playerMenuInfo.art_banner.color				= text_banner_color;
 	playerMenuInfo.art_banner.style				= UI_CENTER;
 
 	i = 0;

@@ -811,7 +811,11 @@ static void UI_SPLevelMenu_Init( void ) {
 #else
 	levelMenuInfo.item_banner.string				= "CHOOSE LEVEL";
 #endif
+#ifdef TMNTMISC
+	levelMenuInfo.item_banner.color					= text_banner_color;
+#else
 	levelMenuInfo.item_banner.color					= color_red;
+#endif
 	levelMenuInfo.item_banner.style					= UI_CENTER;
 
 	levelMenuInfo.item_leftarrow.generic.type		= MTYPE_BITMAP;

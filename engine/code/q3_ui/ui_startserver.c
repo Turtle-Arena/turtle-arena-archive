@@ -538,7 +538,7 @@ static void StartServer_MenuInit( void ) {
 	else
 #endif
 	s_startserver.banner.string        = "GAME SERVER";
-	s_startserver.banner.color         = color_white;
+	s_startserver.banner.color         = text_banner_color;
 	s_startserver.banner.style         = UI_CENTER;
 
 	s_startserver.framel.generic.type  = MTYPE_BITMAP;
@@ -1635,7 +1635,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	s_serveroptions.banner.generic.x			= 320;
 	s_serveroptions.banner.generic.y			= 16;
 	s_serveroptions.banner.string  				= "GAME SERVER";
-	s_serveroptions.banner.color  				= color_white;
+	s_serveroptions.banner.color  				= text_banner_color;
 	s_serveroptions.banner.style  				= UI_CENTER;
 
 	s_serveroptions.mappic.generic.type			= MTYPE_BITMAP;
@@ -2111,7 +2111,11 @@ static void UI_BotSelectMenu_UpdateGrid( void ) {
 			Q_CleanStr( botSelectInfo.botnames[i] );
  			botSelectInfo.pics[i].generic.name = botSelectInfo.boticons[i];
 			if( BotAlreadySelected( botSelectInfo.botnames[i] ) ) {
+#ifdef TMNT
+				botSelectInfo.picnames[i].color = color_white;
+#else
 				botSelectInfo.picnames[i].color = color_red;
+#endif
 			}
 			else {
 				botSelectInfo.picnames[i].color = color_orange;
@@ -2315,7 +2319,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.banner.generic.x		= 320;
 	botSelectInfo.banner.generic.y		= 16;
 	botSelectInfo.banner.string			= "SELECT BOT";
-	botSelectInfo.banner.color			= color_white;
+	botSelectInfo.banner.color			= text_banner_color;
 	botSelectInfo.banner.style			= UI_CENTER;
 
 	y =	80;

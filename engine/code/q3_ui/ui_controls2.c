@@ -1351,7 +1351,7 @@ static void Controls_MenuInit( void )
 	s_controls.banner.generic.x		= 320;
 	s_controls.banner.generic.y		= 16;
 	s_controls.banner.string		= "CONTROLS";
-	s_controls.banner.color			= color_white;
+	s_controls.banner.color			= text_banner_color;
 	s_controls.banner.style			= UI_CENTER;
 
 	s_controls.framel.generic.type  = MTYPE_BITMAP;
@@ -1378,7 +1378,7 @@ static void Controls_MenuInit( void )
 	s_controls.looking.generic.y	    = 240 - 2 * PROP_HEIGHT;
 	s_controls.looking.string			= "LOOK";
 	s_controls.looking.style			= UI_RIGHT;
-	s_controls.looking.color			= color_red;
+	s_controls.looking.color			= text_big_color;
 
 	s_controls.movement.generic.type     = MTYPE_PTEXT;
 	s_controls.movement.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1388,7 +1388,7 @@ static void Controls_MenuInit( void )
 	s_controls.movement.generic.y	     = 240 - PROP_HEIGHT;
 	s_controls.movement.string			= "MOVE";
 	s_controls.movement.style			= UI_RIGHT;
-	s_controls.movement.color			= color_red;
+	s_controls.movement.color			= text_big_color;
 
 	s_controls.weapons.generic.type	    = MTYPE_PTEXT;
 	s_controls.weapons.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1402,7 +1402,7 @@ static void Controls_MenuInit( void )
 	s_controls.weapons.string			= "SHOOT";
 #endif
 	s_controls.weapons.style			= UI_RIGHT;
-	s_controls.weapons.color			= color_red;
+	s_controls.weapons.color			= text_big_color;
 
 	s_controls.misc.generic.type	 = MTYPE_PTEXT;
 	s_controls.misc.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1412,7 +1412,7 @@ static void Controls_MenuInit( void )
 	s_controls.misc.generic.y		 = 240 + PROP_HEIGHT;
 	s_controls.misc.string			= "MISC";
 	s_controls.misc.style			= UI_RIGHT;
-	s_controls.misc.color			= color_red;
+	s_controls.misc.color			= text_big_color;
 
 	s_controls.back.generic.type	 = MTYPE_BITMAP;
 	s_controls.back.generic.name     = ART_BACK0;
