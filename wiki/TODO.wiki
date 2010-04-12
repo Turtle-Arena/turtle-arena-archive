@@ -108,6 +108,10 @@ Weapons (and attacking)
 
   * TODO: Remarge the two version of CG_MissileHitWall
 
+  * FIXME: Resync MODELINDEX_* (I removed the extra Turtle Arena Weapons and enabled ammo?)
+
+  * FIXME: Use BotInventoryWeapon and BotInventoryAmmo?
+
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
     * (NiGHTS: Journey of Dreams) Move camera if holding 'z' and move analog stick, can't look around while moving
