@@ -316,9 +316,6 @@ extern vec4_t		color_yellow;
 extern vec4_t		color_blue;
 extern vec4_t		color_orange;
 extern vec4_t		color_red;
-#ifdef TMNT // I changed red so that it is white, so I need a new "red"...
-extern vec4_t		color_TMNTred;
-#endif
 extern vec4_t		color_dim;
 extern vec4_t		name_color;
 extern vec4_t		list_color;
@@ -326,6 +323,8 @@ extern vec4_t		listbar_color;
 extern vec4_t		text_color_disabled; 
 extern vec4_t		text_color_normal;
 extern vec4_t		text_color_highlight;
+extern vec4_t		text_banner_color;
+extern vec4_t		text_big_color;
 
 extern char	*ui_medalNames[];
 extern char	*ui_medalPicNames[];

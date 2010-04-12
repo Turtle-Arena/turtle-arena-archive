@@ -175,7 +175,7 @@ static void LoadGame_MenuInit( void ) {
 	s_savegames.banner.generic.x		= 320;
 	s_savegames.banner.generic.y		= 16;
 	s_savegames.banner.string			= "LOAD SAVE GAME"; // TMNTSP
-	s_savegames.banner.color			= color_white;
+	s_savegames.banner.color			= text_banner_color;
 	s_savegames.banner.style			= UI_CENTER;
 
 	s_savegames.framel.generic.type		= MTYPE_BITMAP;
@@ -429,7 +429,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.banner.generic.x			= 320;
 	spMenuInfo.banner.generic.y			= 16;
 	spMenuInfo.banner.string			= "PLAY";
-	spMenuInfo.banner.color				= color_white;
+	spMenuInfo.banner.color				= text_banner_color;
 	spMenuInfo.banner.style				= UI_CENTER;
 
 	spMenuInfo.framel.generic.type		= MTYPE_BITMAP;
@@ -456,7 +456,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_newgame.generic.id		= ID_SP_NEWGAME;
 	spMenuInfo.sp_newgame.generic.callback	= UI_SPMenu_Event;
 	spMenuInfo.sp_newgame.string			= "New Game";
-	spMenuInfo.sp_newgame.color				= color_red;
+	spMenuInfo.sp_newgame.color				= text_big_color;
 	spMenuInfo.sp_newgame.style				= UI_CENTER;
 
 	y += VERTICAL_SPACING;
@@ -467,7 +467,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.generic.id			= ID_SP_LOADGAME;
 	spMenuInfo.sp_loadgame.generic.callback		= UI_SPMenu_Event;
 	spMenuInfo.sp_loadgame.string				= "Load Game";
-	spMenuInfo.sp_loadgame.color				= color_red;
+	spMenuInfo.sp_loadgame.color				= text_big_color;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
 	// Disabled for now.
 	spMenuInfo.sp_loadgame.generic.flags |= QMF_GRAYED;
@@ -483,7 +483,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_levelselect.generic.id		= ID_SP_LEVELSELECT;
 	spMenuInfo.sp_levelselect.generic.callback	= UI_SPMenu_Event;
 	spMenuInfo.sp_levelselect.string			= "Level Select";
-	spMenuInfo.sp_levelselect.color				= color_red;
+	spMenuInfo.sp_levelselect.color				= text_big_color;
 	spMenuInfo.sp_levelselect.style				= UI_CENTER;
 
 	// Moved here from SP arena select
@@ -495,7 +495,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_custom.generic.id					= ID_SP_CUSTOM;
 	spMenuInfo.sp_custom.generic.callback			= UI_SPMenu_Event;
 	spMenuInfo.sp_custom.string						= "Custom Game"; // Skirmish
-	spMenuInfo.sp_custom.color						= color_red;
+	spMenuInfo.sp_custom.color						= text_big_color;
 	spMenuInfo.sp_custom.style						= UI_CENTER;
 
 	// Moved here from q3 main menu.
@@ -507,7 +507,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_demos.generic.id					= ID_SP_DEMOS;
 	spMenuInfo.sp_demos.generic.callback			= UI_SPMenu_Event;
 	spMenuInfo.sp_demos.string						= "Demos";
-	spMenuInfo.sp_demos.color						= color_red;
+	spMenuInfo.sp_demos.color						= text_big_color;
 	spMenuInfo.sp_demos.style						= UI_CENTER;
 
 	y += VERTICAL_SPACING;
@@ -518,7 +518,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_cinematics.generic.id				= ID_SP_CINEMATICS;
 	spMenuInfo.sp_cinematics.generic.callback		= UI_SPMenu_Event;
 	spMenuInfo.sp_cinematics.string					= "Cinematics";
-	spMenuInfo.sp_cinematics.color					= color_red;
+	spMenuInfo.sp_cinematics.color					= text_big_color;
 	spMenuInfo.sp_cinematics.style					= UI_CENTER;
 	// Disabled for now.
 	spMenuInfo.sp_cinematics.generic.flags |= QMF_GRAYED;
@@ -534,7 +534,7 @@ static void UI_SPMenu_Init( void ) {
 		s_main.teamArena.generic.id				= ID_TEAMARENA;
 		s_main.teamArena.generic.callback		= UI_SPMenu_Event;
 		s_main.teamArena.string					= "TEAM ARENA";
-		s_main.teamArena.color					= color_red;
+		s_main.teamArena.color					= text_big_color;
 		s_main.teamArena.style					= UI_CENTER;
 	}
 */
@@ -547,7 +547,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_mods.generic.id		= ID_SP_MODS;
 	spMenuInfo.sp_mods.generic.callback	= UI_SPMenu_Event;
 	spMenuInfo.sp_mods.string			= "Mods";
-	spMenuInfo.sp_mods.color			= color_red;
+	spMenuInfo.sp_mods.color			= text_big_color;
 	spMenuInfo.sp_mods.style			= UI_CENTER;
 
 	spMenuInfo.back.generic.type		= MTYPE_BITMAP;

@@ -58,8 +58,6 @@ Weapons (and attacking)
 
   * TODO: Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
 
-  * TODO: Replace usage of color_red with color_textnormal? (I changed color_red to be white.)
-
 == Misc ==
   * TODO: Add optional run animations for torso
 
