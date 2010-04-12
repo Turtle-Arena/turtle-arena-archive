@@ -118,7 +118,7 @@ static void Preferences_SetMenuItems( void ) {
 	s_preferences.dynamiclights.curvalue	= trap_Cvar_VariableValue( "r_dynamiclight" ) != 0;
 	s_preferences.highqualitysky.curvalue	= trap_Cvar_VariableValue ( "r_fastsky" ) == 0;
 	s_preferences.synceveryframe.curvalue	= trap_Cvar_VariableValue( "r_finish" ) != 0;
-#ifdef TMNT // NO_CGFORCEMODLE
+#ifdef TURTLEARENA // NO_CGFORCEMODLE
 	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_deferPlayers" ) != 0;
 #else
 	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_forcemodel" ) != 0;
@@ -184,7 +184,7 @@ static void Preferences_Event( void* ptr, int notification ) {
 		break;
 
 	case ID_FORCEMODEL:
-#ifdef TMNT // NO_CGFORCEMODLE
+#ifdef TURTLEARENA // NO_CGFORCEMODLE
 		trap_Cvar_SetValue( "cg_deferPlayers", s_preferences.forcemodel.curvalue );
 #else
 		trap_Cvar_SetValue( "cg_forcemodel", s_preferences.forcemodel.curvalue );
@@ -388,7 +388,7 @@ static void Preferences_MenuInit( void ) {
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.forcemodel.generic.type     = MTYPE_RADIOBUTTON;
-#ifdef TMNT // NO_CGFORCEMODLE
+#ifdef TURTLEARENA // NO_CGFORCEMODLE
 	s_preferences.forcemodel.generic.name	  = "Defer Player Loading:";
 #else
 	s_preferences.forcemodel.generic.name	  = "Force Player Models:";

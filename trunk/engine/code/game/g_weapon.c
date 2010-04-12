@@ -51,7 +51,7 @@ void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout 
 }
 
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 /*
 ================
 G_AutoAim
@@ -90,7 +90,7 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 
 	// Clients update target (ent->enemy) each frame.
 	if (
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 		!ent->client &&
 #endif
 		!G_ValidTarget(ent, target, start, forward, range, angle, 2)) // && !NPC?
@@ -834,7 +834,7 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 void Bullet_Fire (gentity_t *ent, float spread, int damage ) {
 	trace_t		tr;
 	vec3_t		end;
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	vec3_t		impactpoint, bouncedir;
 #endif
 	float		r;
@@ -884,7 +884,7 @@ void Bullet_Fire (gentity_t *ent, float spread, int damage ) {
 		tent->s.otherEntityNum = ent->s.number;
 
 		if ( traceEnt->takedamage) {
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 			if ( traceEnt->client && traceEnt->client->invulnerabilityTime > level.time ) {
 				if (G_InvulnerabilityEffect( traceEnt, forward, tr.endpos, impactpoint, bouncedir )) {
 					G_BounceProjectile( muzzle, impactpoint, bouncedir, end );
@@ -907,7 +907,7 @@ void Bullet_Fire (gentity_t *ent, float spread, int damage ) {
 #else
 					MOD_MACHINEGUN);
 #endif
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 			}
 #endif
 		}
@@ -950,7 +950,7 @@ qboolean ShotgunPellet( vec3_t start, vec3_t end, gentity_t *ent ) {
 	trace_t		tr;
 	int			damage, i, passent;
 	gentity_t	*traceEnt;
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	vec3_t		impactpoint, bouncedir;
 #endif
 	vec3_t		tr_start, tr_end;
@@ -969,7 +969,7 @@ qboolean ShotgunPellet( vec3_t start, vec3_t end, gentity_t *ent ) {
 
 		if ( traceEnt->takedamage) {
 			damage = DEFAULT_SHOTGUN_DAMAGE * s_quadFactor;
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 			if ( traceEnt->client && traceEnt->client->invulnerabilityTime > level.time ) {
 				if (G_InvulnerabilityEffect( traceEnt, forward, tr.endpos, impactpoint, bouncedir )) {
 					G_BounceProjectile( tr_start, impactpoint, bouncedir, tr_end );
@@ -1128,7 +1128,7 @@ weapon_railgun_fire
 #define	MAX_RAIL_HITS	4
 void weapon_railgun_fire (gentity_t *ent) {
 	vec3_t		end;
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	vec3_t impactpoint, bouncedir;
 #endif
 	trace_t		trace;
@@ -1156,7 +1156,7 @@ void weapon_railgun_fire (gentity_t *ent) {
 		}
 		traceEnt = &g_entities[ trace.entityNum ];
 		if ( traceEnt->takedamage ) {
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 			if ( traceEnt->client && traceEnt->client->invulnerabilityTime > level.time ) {
 				if ( G_InvulnerabilityEffect( traceEnt, forward, trace.endpos, impactpoint, bouncedir ) ) {
 					G_BounceProjectile( muzzle, impactpoint, bouncedir, end );
@@ -1330,7 +1330,7 @@ LIGHTNING GUN
 void Weapon_LightningFire( gentity_t *ent ) {
 	trace_t		tr;
 	vec3_t		end;
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	vec3_t impactpoint, bouncedir;
 #endif
 	gentity_t	*traceEnt, *tent;
@@ -1344,7 +1344,7 @@ void Weapon_LightningFire( gentity_t *ent ) {
 
 		trap_Trace( &tr, muzzle, NULL, NULL, end, passent, MASK_SHOT );
 
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 		// if not the first trace (the lightning bounced of an invulnerability sphere)
 		if (i) {
 			// add bounced off lightning bolt temp entity
@@ -1363,7 +1363,7 @@ void Weapon_LightningFire( gentity_t *ent ) {
 		traceEnt = &g_entities[ tr.entityNum ];
 
 		if ( traceEnt->takedamage) {
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 			if ( traceEnt->client && traceEnt->client->invulnerabilityTime > level.time ) {
 				if (G_InvulnerabilityEffect( traceEnt, forward, tr.endpos, impactpoint, bouncedir )) {
 					G_BounceProjectile( muzzle, impactpoint, bouncedir, end );
@@ -1591,7 +1591,7 @@ void FireWeapon( gentity_t *ent ) {
 		else if (ent->client->pers.playercfg.primaryHandSide == HAND_LEFT)
 			VectorMA (muzzle, -4, right, muzzle);
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
 				muzzle, forward, right, up);
 #endif
@@ -1609,7 +1609,7 @@ void FireWeapon( gentity_t *ent ) {
 		else if (ent->client->pers.playercfg.secondaryHandSide == HAND_LEFT)
 			VectorMA (muzzle, -4, right, muzzle);
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
 				muzzle, forward, right, up);
 #endif
@@ -1622,7 +1622,7 @@ void FireWeapon( gentity_t *ent ) {
 
 	CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	G_AutoAim(ent, 0, muzzle, forward, right, up);
 #endif
 	// fire the specific weapon
@@ -1952,7 +1952,7 @@ void NPC_FireWeapon(gentity_t *ent)
 		else if (ent->bgNPC.info->primaryHandSide == HAND_LEFT)
 			VectorMA (muzzle, -4, right, muzzle);
 
-	#ifdef TMNT // LOCKON
+	#ifdef TURTLEARENA // LOCKON
 		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
 				muzzle, forward, right, up);
 	#else
@@ -1972,7 +1972,7 @@ void NPC_FireWeapon(gentity_t *ent)
 		else if (ent->bgNPC.info->secondaryHandSide == HAND_LEFT)
 			VectorMA (muzzle, -4, right, muzzle);
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
 				muzzle, forward, right, up);
 #else

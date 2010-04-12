@@ -123,9 +123,9 @@ static void UI_Mods_LoadMods( void ) {
 	s_mods.descriptionPtr = s_mods.description;
 	s_mods.fs_gamePtr = s_mods.fs_game;
 
-	// always start off with baseq3
+	// always start off with BASEGAME
 	s_mods.list.numitems = 1;
-#if defined TMNT || (defined STANDALONE && defined IOQ3ZTM)
+#if defined TURTLEARENA || (defined STANDALONE && defined IOQ3ZTM)
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Turtle Arena";
 #else
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Quake III Arena";

@@ -27,11 +27,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // A user mod should never modify this file
 
 #ifdef STANDALONE
-  #ifdef TMNT // ZTM: Changed game info defines.
+  #ifdef TURTLEARENA
     #define PRODUCT_NAME			"Turtle Arena"
-    #define BASEGAME			"base"
-    #define CLIENT_WINDOW_TITLE     	"Turtle Arena"
-    #define CLIENT_WINDOW_MIN_TITLE 	"Turtle Arena"
+    #define BASEGAME				"base"
+    #define CLIENT_WINDOW_TITLE     "Turtle Arena"
+    #define CLIENT_WINDOW_MIN_TITLE "Turtle Arena"
     #define GAMENAME_FOR_MASTER		"TurtleArena"
   #elif defined IOQ3ZTM
 	// Standalone IOQ3ZTM is a mod for Turtle Arena
@@ -61,7 +61,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #ifndef PRODUCT_VERSION
-  #ifdef TMNT
+  #ifdef TURTLEARENA
     #define PRODUCT_VERSION "0.2"
   #else
     #define PRODUCT_VERSION "1.36"
@@ -1182,7 +1182,7 @@ typedef struct playerState_s {
 	int			loopSound;
 	int			jumppad_ent;	// jumppad entity hit this frame
 
-#if defined TMNT || defined NET_COMPAT // LOCKON
+#if defined TURTLEARENA || defined NET_COMPAT // LOCKON
 	// Target for lockon
 	int			enemyEnt;
 	vec3_t		enemyOrigin;

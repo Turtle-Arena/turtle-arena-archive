@@ -279,7 +279,7 @@ static void G_MissileFall_Die(gentity_t * ent, gentity_t * inflictor, gentity_t 
 	ent->think = G_MissileFall;
 }
 
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 void G_BounceProjectile( vec3_t start, vec3_t impact, vec3_t dir, vec3_t endout );
 #endif
 
@@ -394,7 +394,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			// Based on Q3's Bullet_Fire
 			//    (with extra code from Weapon_LightningFire and weapon_railgun_fire)
 			trace_t		tr;
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 			vec3_t		impactpoint, bouncedir;
 #endif
 			gentity_t	*tent;
@@ -411,7 +411,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			{
 				trap_Trace (&tr, start, NULL, NULL, end, passent, MASK_SHOT);
 
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 				// if not the first trace (the lightning bounced off an invulnerability sphere)
 				if (i && bg_projectileinfo[projnum].trailType == PT_LIGHTNING) {
 					// add bounced off lightning bolt temp entity
@@ -480,7 +480,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 
 				if ( traceEnt->takedamage)
 				{
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 					if ( traceEnt->client && traceEnt->client->invulnerabilityTime > level.time )
 					{
 						if (G_InvulnerabilityEffect( traceEnt, dir, tr.endpos, impactpoint, bouncedir ))
@@ -782,7 +782,7 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 	return qfalse;
 }
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	G_AutoAim(self, projnum, start, forward, right, up);
 #endif
 
@@ -1018,7 +1018,7 @@ static void ProximityMine_ExplodeOnPlayer( gentity_t *mine ) {
 	player = mine->enemy;
 	player->client->ps.eFlags &= ~EF_TICKING;
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	if ( player->client->invulnerabilityTime > level.time ) {
 		G_Damage( player, mine->parent, mine->parent, vec3_origin, mine->s.origin, 1000, DAMAGE_NO_KNOCKBACK, MOD_JUICED );
 		player->client->invulnerabilityTime = 0;
@@ -1065,7 +1065,7 @@ static void ProximityMine_Player( gentity_t *mine, gentity_t *player ) {
 
 	mine->enemy = player;
 	mine->think = ProximityMine_ExplodeOnPlayer;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	if ( player->client->invulnerabilityTime > level.time ) {
 		mine->nextthink = level.time + 2 * 1000;
 	}
@@ -1086,7 +1086,7 @@ G_MissileImpact
 void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	gentity_t		*other;
 	qboolean		hitClient = qfalse;
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	vec3_t			forward, impactpoint, bouncedir;
 	int				eFlags;
 #endif
@@ -1095,7 +1095,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 #endif
 	other = &g_entities[trace->entityNum];
 
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	if ( other->takedamage ) {
 #ifdef TMNTWEAPSYS
 		if ( !bg_projectileinfo[ent->s.weapon].stickOnImpact )

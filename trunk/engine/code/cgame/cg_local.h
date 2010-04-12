@@ -50,7 +50,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	PAIN_TWITCH_TIME	200
 #define	WEAPON_SELECT_TIME	1400
 #define	ITEM_SCALEUP_TIME	1000
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 #define	ZOOM_TIME			150
 #endif
 #define	ITEM_BLOB_TIME		200
@@ -90,7 +90,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
 
 #ifndef TMNTPLAYERSYS // Moved to bg_misc.h
-#ifdef TMNT // DEFAULT_PLAYER
+#ifdef TURTLEARENA // DEFAULT_PLAYER
 #define	DEFAULT_MODEL			"raph"
 #define	DEFAULT_TEAM_MODEL		"raph"
 #define	DEFAULT_TEAM_HEAD		"raph"
@@ -103,9 +103,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	DEFAULT_TEAM_MODEL		"sarge"
 #define	DEFAULT_TEAM_HEAD		"sarge"
 #endif
-#endif // TMNT
+#endif // TURTLEARENA
 
-#ifdef TMNT // DEFAULT_TEAMS
+#ifdef TURTLEARENA // DEFAULT_TEAMS
 #define DEFAULT_REDTEAM_NAME		"Sais"
 #define DEFAULT_BLUETEAM_NAME		"Katanas"
 #else
@@ -305,7 +305,7 @@ typedef enum {
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	LE_KAMIKAZE,
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	LE_INVULIMPACT,
 	LE_INVULJUICED,
 #endif
@@ -428,7 +428,7 @@ typedef struct {
 	int				score;			// updated by score servercmds
 	int				location;		// location index for team mode
 	int				health;			// you only get this info about your teammates
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	int				armor;
 #endif
 	int				curWeapon;
@@ -442,7 +442,7 @@ typedef struct {
 	int				powerups;		// so can display quad/flag status
 
 	int				medkitUsageTime;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	int				invulnerabilityStartTime;
 	int				invulnerabilityStopTime;
 #endif
@@ -740,13 +740,13 @@ typedef struct {
 	refdef_t	refdef;
 	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	// lockon key
 	qboolean	lockedOn;
 	int			lockonTime;
 #endif
 
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	// zoom key
 	qboolean	zoomed;
 	int			zoomTime;
@@ -964,7 +964,7 @@ typedef struct {
 	qhandle_t	harvesterNeutralModel;
 #endif
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	qhandle_t	armorModel;
 	qhandle_t	armorIcon;
 #endif
@@ -1007,7 +1007,7 @@ typedef struct {
 	qhandle_t	blueFriendShader;
 #endif
 	qhandle_t	friendShader;
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	qhandle_t	targetShader;
 #endif
 
@@ -1058,14 +1058,14 @@ typedef struct {
 	qhandle_t	energyMarkShader;
 
 	// powerup shaders
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	qhandle_t	quadShader;
 	qhandle_t	redQuadShader;
 	qhandle_t	quadWeaponShader;
 #endif
 	qhandle_t	invisShader;
 	qhandle_t	regenShader;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	qhandle_t	battleSuitShader;
 	qhandle_t	battleWeaponShader;
 #endif
@@ -1074,7 +1074,7 @@ typedef struct {
 	qhandle_t	redKamikazeShader;
 	qhandle_t	blueKamikazeShader;
 #endif
-#ifdef TMNT // POWERS // PW_FLASHING
+#ifdef TURTLEARENA // POWERS // PW_FLASHING
 	qhandle_t	playerTeleportShader;
 #endif
 
@@ -1102,7 +1102,7 @@ typedef struct {
 
 	// special effects models
 	qhandle_t	teleportEffectModel;
-#if !defined MISSIONPACK && !defined TMNT // ZTM: MP removes loading and using...
+#if !defined MISSIONPACK && !defined TURTLEARENA // ZTM: MP removes loading and using...
 	qhandle_t	teleportEffectShader;
 #endif
 #ifdef MISSIONPACK
@@ -1114,7 +1114,7 @@ typedef struct {
 	qhandle_t	scoutPowerupModel;
 	qhandle_t	doublerPowerupModel;
 	qhandle_t	ammoRegenPowerupModel;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	qhandle_t	invulnerabilityImpactModel;
 	qhandle_t	invulnerabilityJuicedModel;
 #endif
@@ -1122,7 +1122,7 @@ typedef struct {
 	qhandle_t	dustPuffShader;
 	qhandle_t	heartShader;
 #endif
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	qhandle_t	strengthPowerupModel;
 	qhandle_t	defensePowerupModel;
 	qhandle_t	speedPowerupModel;
@@ -1192,7 +1192,7 @@ typedef struct {
 	sfxHandle_t kamikazeImplodeSound;
 	sfxHandle_t kamikazeFarSound;
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	sfxHandle_t useInvulnerabilitySound;
 	sfxHandle_t invulnerabilityImpactSound1;
 	sfxHandle_t invulnerabilityImpactSound2;
@@ -1238,7 +1238,7 @@ typedef struct {
 	sfxHandle_t oneFragSound;
 
 	sfxHandle_t hitSound;
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	sfxHandle_t hitSoundHighArmor;
 	sfxHandle_t hitSoundLowArmor;
 #endif
@@ -1329,7 +1329,7 @@ typedef struct {
 	qhandle_t flagShaders[3];
 	sfxHandle_t	countPrepareTeamSound;
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	sfxHandle_t ammoregenSound;
 	sfxHandle_t doublerSound;
 	sfxHandle_t guardSound;
@@ -1342,7 +1342,7 @@ typedef struct {
 
 	sfxHandle_t	regenSound;
 	sfxHandle_t	protectSound;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	sfxHandle_t	n_healthSound;
 #endif
 #ifndef TMNTWEAPSYS
@@ -1540,7 +1540,7 @@ extern	vmCvar_t		cg_autoswitch;
 extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;
 extern	vmCvar_t		cg_fov;
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 extern	vmCvar_t		cg_zoomFov;
 #endif
 extern	vmCvar_t		cg_thirdPersonRange;
@@ -1555,7 +1555,7 @@ extern	vmCvar_t		cg_synchronousClients;
 extern	vmCvar_t		cg_teamChatTime;
 extern	vmCvar_t		cg_teamChatHeight;
 extern	vmCvar_t		cg_stats;
-#ifndef TMNT // NO_CGFORCEMODLE
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
 extern	vmCvar_t 		cg_forceModel;
 #endif
 extern	vmCvar_t 		cg_buildScript;
@@ -1648,7 +1648,7 @@ void CG_TestModelNextFrame_f (void);
 void CG_TestModelPrevFrame_f (void);
 void CG_TestModelNextSkin_f (void);
 void CG_TestModelPrevSkin_f (void);
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
 #endif
@@ -1689,7 +1689,7 @@ float	*CG_FadeColor( int startMsec, int totalMsec );
 float *CG_TeamColor( int team );
 void CG_TileClear( void );
 void CG_ColorForHealth( vec4_t hcolor );
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 void CG_GetColorForHealth( int health, vec4_t hcolor );
 #else
 void CG_GetColorForHealth( int health, int armor, vec4_t hcolor );
@@ -1903,7 +1903,7 @@ void CG_KamikazeEffect( vec3_t org );
 #endif
 void CG_ObeliskExplode( vec3_t org, int entityNum );
 void CG_ObeliskPain( vec3_t org );
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 void CG_InvulnerabilityImpact( vec3_t org, vec3_t angles );
 void CG_InvulnerabilityJuiced( vec3_t org );
 void CG_LightningBoltBeam( vec3_t start, vec3_t end );

@@ -111,7 +111,7 @@ static void CG_ParseScores( void ) {
 =================
 CG_ParseTeamInfo
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 Format:
 "tinfo" numstrings string(there are numstrings strings)
 // NOARMOR
@@ -135,7 +135,7 @@ static void CG_ParseTeamInfo( void ) {
 	}
 
 	for ( i = 0 ; i < numSortedTeamPlayers ; i++ ) {
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 		//
 		client = atoi( CG_Argv( i * 5 + 2 ) );
 

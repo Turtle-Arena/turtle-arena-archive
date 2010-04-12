@@ -85,7 +85,7 @@ char *Sys_DefaultHomePath( void )
 			return NULL;
 		}
 		Q_strncpyz( homePath, szPath, sizeof( homePath ) );
-#ifdef TMNT // ZTM: Don't put it with Quake3 stuff.
+#ifdef TURTLEARENA // ZTM: Don't put it with Quake3 stuff.
 		Q_strcat( homePath, sizeof( homePath ), "\\TurtleArena" );
 #else
 		Q_strcat( homePath, sizeof( homePath ), "\\Quake3" );

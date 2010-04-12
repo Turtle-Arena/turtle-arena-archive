@@ -691,7 +691,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	key = "model";
 	model = Info_ValueForKey( botinfo, key );
 	if ( !*model ) {
-#ifdef TMNT // DEFAULT_MODEL
+#ifdef TURTLEARENA // DEFAULT_MODEL
 		model = "raph/default";
 #else
 		model = "visor/default";
@@ -880,7 +880,7 @@ void Svcmd_BotList_f( void ) {
 			strcpy(funname, "");
 		}
 		strcpy(model, Info_ValueForKey( g_botInfos[i], "model" ));
-#ifdef TMNT // DEFAULT_MODEL
+#ifdef TURTLEARENA // DEFAULT_MODEL
 		if ( !*model ) {
 			strcpy(model, "raph/default");
 		}
@@ -1100,12 +1100,12 @@ void G_InitBots( qboolean restart ) {
 #ifdef TMNTMISC // frag to score
 		strValue = Info_ValueForKey( arenainfo, "scorelimit" );
 		fragLimit = atoi( strValue );
-#if !defined TMNT || defined TMNT_SUPPORTQ3
+#if !defined TURTLEARENA || defined TMNT_SUPPORTQ3
 		// Support Q3 "fraglimit" in arenas.txt
 		if ( !fragLimit )
 		{
-		strValue = Info_ValueForKey( arenainfo, "fraglimit" );
-		fragLimit = atoi( strValue );
+			strValue = Info_ValueForKey( arenainfo, "fraglimit" );
+			fragLimit = atoi( strValue )*50;
 		}
 #endif
 		if ( fragLimit ) {

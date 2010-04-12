@@ -248,14 +248,14 @@ void CG_SpawnEffect( vec3_t org ) {
 	re->reType = RT_MODEL;
 	re->shaderTime = cg.time / 1000.0f;
 
-#if !defined MISSIONPACK && !defined TMNT
+#if !defined MISSIONPACK && !defined TURTLEARENA
 	re->customShader = cgs.media.teleportEffectShader;
 #endif
 	re->hModel = cgs.media.teleportEffectModel;
 	AxisClear( re->axis );
 
 	VectorCopy( org, re->origin );
-#if defined MISSIONPACK || defined TMNT // Center teleport effect model Z
+#if defined MISSIONPACK || defined TURTLEARENA // Center teleport effect model Z
 	re->origin[2] += 16;
 #else
 	re->origin[2] -= 24;
@@ -264,7 +264,7 @@ void CG_SpawnEffect( vec3_t org ) {
 
 
 #ifdef MISSIONPACK
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 /*
 ===============
 CG_LightningBoltBeam
@@ -368,7 +368,7 @@ void CG_ObeliskPain( vec3_t org ) {
 }
 
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 /*
 ==================
 CG_InvulnerabilityImpact

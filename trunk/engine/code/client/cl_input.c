@@ -49,7 +49,7 @@ at the same time.
 
 kbutton_t	in_left, in_right, in_forward, in_back;
 kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
-#ifdef TMNT // NO_SPEED_KEY
+#ifdef TURTLEARENA // NO_SPEED_KEY
 kbutton_t	in_strafe;
 #else
 kbutton_t	in_strafe, in_speed;
@@ -60,7 +60,7 @@ kbutton_t	in_up, in_down;
 kbutton_t	in_voiprecord;
 #endif
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 kbutton_t	in_lockon;
 #endif
 
@@ -223,14 +223,14 @@ void IN_MoveleftUp(void) {IN_KeyUp(&in_moveleft);}
 void IN_MoverightDown(void) {IN_KeyDown(&in_moveright);}
 void IN_MoverightUp(void) {IN_KeyUp(&in_moveright);}
 
-#ifndef TMNT // NO_SPEED_KEY
+#ifndef TURTLEARENA // NO_SPEED_KEY
 void IN_SpeedDown(void) {IN_KeyDown(&in_speed);}
 void IN_SpeedUp(void) {IN_KeyUp(&in_speed);}
 #endif
 void IN_StrafeDown(void) {IN_KeyDown(&in_strafe);}
 void IN_StrafeUp(void) {IN_KeyUp(&in_strafe);}
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 void IN_LockonDown(void) {IN_KeyDown(&in_lockon);IN_KeyDown(&in_strafe);}
 void IN_LockonUp(void) {IN_KeyUp(&in_lockon);IN_KeyUp(&in_strafe);}
 #endif
@@ -301,7 +301,7 @@ cvar_t	*cl_sidespeed;
 cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 cvar_t	*cl_run;
 #endif
 
@@ -318,7 +318,7 @@ Moves the local angle positions
 void CL_AdjustAngles( void ) {
 	float	speed;
 	
-#ifdef TMNT // LOCKON // NO_SPEED_KEY
+#ifdef TURTLEARENA // LOCKON // NO_SPEED_KEY
 	if ( !in_lockon.active )
 #else
 	if ( in_speed.active )
@@ -354,7 +354,7 @@ void CL_KeyMove( usercmd_t *cmd ) {
 	// the walking flag is to keep animations consistant
 	// even during acceleration and develeration
 	//
-#ifdef TMNT // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
+#ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
 	if (!in_lockon.active)
 #else
 	if ( in_speed.active ^ cl_run->integer )
@@ -429,7 +429,7 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 	int		movespeed;
 	float	anglespeed;
 
-#ifdef TMNT // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
+#ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
 	if (!in_lockon.active)
 #else
 	if ( in_speed.active ^ cl_run->integer )
@@ -441,7 +441,7 @@ void CL_JoystickMove( usercmd_t *cmd ) {
 		cmd->buttons |= BUTTON_WALKING;
 	}
 
-#ifdef TMNT // LOCKON // NO_SPEED_KEY
+#ifdef TURTLEARENA // LOCKON // NO_SPEED_KEY
 	if ( !in_lockon.active )
 #else
 	if ( in_speed.active )
@@ -547,7 +547,7 @@ void CL_MouseMove(usercmd_t *cmd)
 	// add mouse X/Y movement to cmd
 	if(in_strafe.active) {
 		cmd->rightmove = ClampChar(cmd->rightmove + m_side->value * mx);
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 		// if walking, don't go over 64 side move
 		if (in_lockon.active)
 		{
@@ -562,7 +562,7 @@ void CL_MouseMove(usercmd_t *cmd)
 		cl.viewangles[YAW] -= m_yaw->value * mx;
 
 	if ((in_mlooking || cl_freelook->integer)
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 		&& (in_lockon.active || !in_strafe.active)
 #else
 		&& !in_strafe.active
@@ -1067,11 +1067,11 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-moveleft", IN_MoveleftUp);
 	Cmd_AddCommand ("+moveright", IN_MoverightDown);
 	Cmd_AddCommand ("-moveright", IN_MoverightUp);
-#ifndef TMNT // NO_SPEED_KEY
+#ifndef TURTLEARENA // NO_SPEED_KEY
 	Cmd_AddCommand ("+speed", IN_SpeedDown);
 	Cmd_AddCommand ("-speed", IN_SpeedUp);
 #endif
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	Cmd_AddCommand ("+lockon", IN_LockonDown);
 	Cmd_AddCommand ("-lockon", IN_LockonUp);
 #endif

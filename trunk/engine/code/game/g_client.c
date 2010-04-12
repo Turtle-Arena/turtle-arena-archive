@@ -528,7 +528,7 @@ void BodySink( gentity_t *ent ) {
 		return;	
 	}
 	ent->nextthink = level.time + 100;
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	ent->s.powerups |= (1 << PW_FLASHING);
 
 	// Set Alpha value
@@ -634,7 +634,7 @@ void CopyToBodyQue( gentity_t *ent ) {
 	body->r.contents = CONTENTS_CORPSE;
 	body->r.ownerNum = ent->s.number;
 
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	body->nextthink = level.time + 200;
 #else
 	body->nextthink = level.time + 5000;
@@ -1554,7 +1554,7 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.persistant[PERS_SPAWN_COUNT]++;
 	client->ps.persistant[PERS_TEAM] = client->sess.sessionTeam;
 
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	if (g_teleportFluxTime.integer)
 	{
 		client->ps.powerups[PW_FLASHING] = level.time + g_teleportFluxTime.integer * 1000;
@@ -1738,7 +1738,7 @@ void ClientSpawn(gentity_t *ent) {
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 
 	} else {
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		// Only kill box if client is solid.
 		if (!client->ps.powerups[PW_FLASHING])
 #endif

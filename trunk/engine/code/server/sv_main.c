@@ -232,7 +232,7 @@ but not on every player enter or exit.
 ================
 */
 #define	HEARTBEAT_MSEC	300*1000
-#ifdef TMNT
+#ifdef TURTLEARENA
 #define	HEARTBEAT_GAME	"TurtleArena-1"
 #else
 #define	HEARTBEAT_GAME	"QuakeArena-1"

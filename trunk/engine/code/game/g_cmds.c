@@ -305,7 +305,7 @@ void Cmd_Give_f (gentity_t *ent)
 			return;
 	}
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	if (give_all || Q_stricmp(name, "armor") == 0)
 	{
 		ent->client->ps.stats[STAT_ARMOR] = 200;

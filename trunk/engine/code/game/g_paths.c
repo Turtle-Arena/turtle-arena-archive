@@ -58,7 +58,7 @@ gpathinfo_t gpathinfo[] =
 	// TDC_NPC compatiblity...
 	{ "npcpath", PATHF_BEGIN | PATHF_POINT | PATHF_CANFINISH },
 
-	// TMNT Path entities
+	// Turtle Arena path entities
 	{ "path_start", PATHF_BEGIN | PATHF_POINT }, // Is there a reason for "start"?
 	{ "path_point", PATHF_POINT },
 	{ "path_axis", PATHF_AXIS }, // Like SRB2's MT_AXIS, for NiGHTS mode. (entity is point to be rotated around)

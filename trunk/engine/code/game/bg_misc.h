@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef NOTRATEDM // No gibs.
 #define	GIB_HEALTH			-40
 #endif
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 #define	ARMOR_PROTECTION	0.66
 #endif
 
@@ -55,7 +55,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CROUCH_VIEWHEIGHT	12
 #define	DEAD_VIEWHEIGHT		-16
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 #define LOCKON_TIME 500 // Time it take to be fully facing target
 #endif
 
@@ -117,7 +117,7 @@ typedef enum {
 	GT_TOURNAMENT,		// one on one tournament
 	GT_SINGLE_PLAYER,	// single player ffa
 
-#if 0 // #ifdef TMNT
+#if 0 // #ifdef TURTLEARENA
 	GT_LMS,				// Last Man Standing
 	GT_KOTH,			// King Of The Hill
 	GT_KEEPAWAY,		// Keep Away
@@ -127,7 +127,7 @@ typedef enum {
 	//-- team games go after this --
 
 	GT_TEAM,			// team deathmatch
-#if 0 // #ifdef TMNT
+#if 0 // #ifdef TURTLEARENA
 	GT_LTEAMS,			// last team standing
 #endif
 	GT_CTF,				// capture the flag
@@ -263,7 +263,7 @@ typedef enum {
 #else
 	STAT_WEAPONS,					// 16 bit fields
 #endif
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	STAT_ARMOR,
 #endif
 	STAT_DEAD_YAW,					// look this direction when dead (FIXME: get rid of?)
@@ -286,7 +286,7 @@ typedef enum {
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 #endif
 	PERS_ATTACKER,					// clientnum of last damage inflicter
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	PERS_ATTACKEE_ARMOR,			// health/armor of last person we attacked
 #endif
 	PERS_KILLED,					// count of the number of times you died
@@ -351,7 +351,7 @@ typedef enum {
 #ifdef TMNTSP
 #define EF_FINISHED			0x00100000		// Finished level
 #endif
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 #define EF_LOCKON			0x00200000
 #endif
 #ifdef IOQ3ZTM // RENDERFLAGS
@@ -371,7 +371,7 @@ typedef enum {
 // NOTE: may not have more than 16
 typedef enum {
 	PW_NONE,
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	// TODO: Limited time version of PW_AMMOREGEN?
 	// pw_infinity, // Green [White in TMNT3] crystal: Unlimited Shuriken for a limited period.
 
@@ -400,7 +400,7 @@ typedef enum {
 	PW_AMMOREGEN,	// Regen ammo and shurikens --What about Melee weapons?
 					//    Give melee weapons limited uses? So that ammo give no limit?
 					//    Give melee weapons time-to-live? So that ammo give no limit?
-	//PW_INVULNERABILITY, // TMNT Disables MISSIONPACK's PW_INVULNERABILITY
+	//PW_INVULNERABILITY, // TURTLEARENA Disables MISSIONPACK's PW_INVULNERABILITY
 #else
 	PW_QUAD,
 	PW_BATTLESUIT,
@@ -453,7 +453,7 @@ typedef enum {
 #ifndef TMNTHOLDSYS
 	HI_PORTAL,
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	HI_INVULNERABILITY,
 #elif !defined TMNTHOLDSYS
 	HI_INVULNERABILITY_REMOVED, // Q3 want them in this order in "game" qvm
@@ -514,7 +514,7 @@ typedef enum {
 	WP_NONE,
 
 #ifdef TMNTWEAPONS
-	// Many of the weapons are based on weapons in TMNT: Mutant Melee
+	// Many of the weapons are based on weapons in TURTLEARENA: Mutant Melee
 	// For players like Hun who don't have a default "weapon" but just use there fists.
 	WP_FISTS, // Invisible weapon, each hand, short range damage.
 
@@ -549,7 +549,7 @@ typedef enum {
 	WP_GUN,
 	WP_PLASMAGUN, //WP_ELECTRIC_LAUNCHER, // Federation? or Tri? // Currently just Q3 WP_PLASMAGUN.
 	WP_ROCKET_LAUNCHER, // Tri rocket launcher // AI Same as in Q3...
-	WP_HOMING_LAUNCHER, // Earth Protection Force homing rocket launcher // TMNT:MM Yellow homing-rocket launcher
+	WP_HOMING_LAUNCHER, // Earth Protection Force homing rocket launcher // TURTLEARENA:MM Yellow homing-rocket launcher
 
     // Leave gappling hook in, because its cool.
 	WP_GRAPPLING_HOOK, // Model will be modified tri-blaster
@@ -763,7 +763,7 @@ typedef enum {
 	IT_BAD,
 	IT_WEAPON,				// EFX: rotate + upscale + minlight
 	IT_AMMO,				// EFX: rotate
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	IT_ARMOR,				// EFX: rotate + minlight
 #endif
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
@@ -988,7 +988,7 @@ typedef enum {
 	EV_POWERUP_QUAD,
 	EV_POWERUP_BATTLESUIT,
 	EV_POWERUP_REGEN,
-#if defined TMNT || defined NET_COMPAT  // POWERS
+#if defined TURTLEARENA || defined NET_COMPAT  // POWERS
 	EV_POWERUP_INVUL,
 #endif
 
@@ -1010,7 +1010,7 @@ typedef enum {
 #endif
 	EV_OBELISKEXPLODE,		// obelisk explodes
 	EV_OBELISKPAIN,			// obelisk is in pain
-#if !defined TMNT || defined NET_COMPAT  // POWERS
+#if !defined TURTLEARENA || defined NET_COMPAT  // POWERS
 	EV_INVUL_IMPACT,		// invulnerability sphere impact
 	EV_JUICED,				// invulnerability juiced effect
 	EV_LIGHTNINGBOLT,		// lightning bolt bounced of invulnerability sphere
@@ -1107,7 +1107,7 @@ typedef enum {
 	TORSO_AFFIRMATIVE,
 	TORSO_NEGATIVE,
 
-#ifdef TMNTPLAYERS // New TMNT player animations
+#ifdef TMNTPLAYERS // New Turtle Arena player animations
 	// Place default weapons somewhere on there person while there not used.
 	// TORSO_***DEFAULT_SECONDARY for Don should be
 	//  switching to/from two handed Bo to using one hand.
@@ -1372,7 +1372,7 @@ extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 #endif
 
 #ifdef TMNTPLAYERSYS
-#ifdef TMNT // DEFAULT_PLAYER
+#ifdef TURTLEARENA // DEFAULT_PLAYER
 #define	DEFAULT_MODEL			"raph"
 #define	DEFAULT_TEAM_MODEL		"raph"
 #define	DEFAULT_TEAM_HEAD		"raph"
@@ -1385,9 +1385,9 @@ extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 #define	DEFAULT_TEAM_MODEL		"sarge"
 #define	DEFAULT_TEAM_HEAD		"sarge"
 #endif
-#endif // TMNT
+#endif // TURTLEARENA
 
-#ifdef TMNT // DEFAULT_TEAMS
+#ifdef TURTLEARENA // DEFAULT_TEAMS
 #define DEFAULT_REDTEAM_NAME		"Sais"
 #define DEFAULT_BLUETEAM_NAME		"Katanas"
 #else
@@ -1433,7 +1433,7 @@ typedef struct bg_playercfg_s
 	// Elite Force support
 	char soundpath[MAX_QPATH];
 
-	// New Info for TMNT, allows player models to have data that changes
+	// New Info for Turtle Arena, allows player models to have data that changes
 	//  what happens in game.
 #ifdef TMNTWEAPSYS
     weapon_t default_weapon;
@@ -1614,7 +1614,7 @@ typedef struct
 #define PMF_GRAPPLE_PULL	2048	// pull towards grapple location
 #define PMF_FOLLOW			4096	// spectate following another player
 #define PMF_SCOREBOARD		8192	// spectate as a scoreboard
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 #define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
 #endif
 
@@ -1787,7 +1787,7 @@ typedef enum {
 	IT_BAD,
 	IT_WEAPON,				// EFX: rotate + upscale + minlight
 	IT_AMMO,				// EFX: rotate
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	IT_ARMOR,				// EFX: rotate + minlight
 #endif
 	IT_HEALTH,				// EFX: static external sphere + rotating internal

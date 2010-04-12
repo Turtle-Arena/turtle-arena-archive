@@ -93,7 +93,7 @@ static void DriverInfo_MenuDraw( void )
 
 	Menu_Draw( &s_driverinfo.menu );
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 	UI_DrawString( 320, 80, "VENDOR", UI_CENTER|UI_SMALLFONT, text_color_highlight );
 	UI_DrawString( 320, 152, "PIXELFORMAT", UI_CENTER|UI_SMALLFONT, text_color_highlight );
 	UI_DrawString( 320, 192, "EXTENSIONS", UI_CENTER|UI_SMALLFONT, text_color_highlight );

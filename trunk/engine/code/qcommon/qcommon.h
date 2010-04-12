@@ -242,7 +242,7 @@ PROTOCOL
 ==============================================================
 */
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 #define	PROTOCOL_VERSION	2
 #else
 #define	PROTOCOL_VERSION	68
@@ -253,14 +253,14 @@ PROTOCOL
 // NOTE: that stuff only works with two digits protocols
 extern int demo_protocols[];
 
-#ifdef TMNT // Don't talk to quake3arena.com.
+#ifdef TURTLEARENA // Don't talk to quake3arena.com
 #define	UPDATE_SERVER_NAME	""
 #else
 #define	UPDATE_SERVER_NAME	"update.quake3arena.com"
 #endif
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
-#if 0 // #ifdef TMNT // ZTM: TODO: Use a different master server?
+#if 0 // #ifdef TURTLEARENA // ZTM: TODO: Use a different master server?
 #define MASTER_SERVER_NAME	""
 #else
 #define MASTER_SERVER_NAME	"master.quake3arena.com"

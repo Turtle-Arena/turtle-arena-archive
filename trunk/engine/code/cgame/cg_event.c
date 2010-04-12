@@ -515,7 +515,7 @@ static void CG_UseItem( centity_t *cent ) {
 
 	case HI_PORTAL:
 		break;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	case HI_INVULNERABILITY:
 		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.useInvulnerabilitySound );
 		break;
@@ -945,7 +945,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			item = &bg_itemlist[ index ];
 #endif
 
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 			if ( item->pickup_sound ) {
 				trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( item->pickup_sound, qfalse ) );
 			}
@@ -1235,7 +1235,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_OBELISKPAIN");
 		CG_ObeliskPain( cent->lerpOrigin );
 		break;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	case EV_INVUL_IMPACT:
 		DEBUGNAME("EV_INVUL_IMPACT");
 		CG_InvulnerabilityImpact( cent->lerpOrigin, cent->currentState.angles );
@@ -1547,7 +1547,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_OBITUARY:
 		DEBUGNAME("EV_OBITUARY");
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 #ifdef IOQ3ZTM
 		// check for death of the current clientNum
 		if ( es->otherEntityNum == cg.snap->ps.clientNum ) {
@@ -1580,7 +1580,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 	case EV_POWERUP_REGEN:
 		DEBUGNAME("EV_POWERUP_REGEN");
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 		if ( es->number == cg.snap->ps.clientNum ) {
 			cg.powerupActive = PW_REGEN;
 			cg.powerupTime = cg.time;
@@ -1588,7 +1588,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
 		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.regenSound );
 		break;
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	case EV_POWERUP_INVUL:
 		DEBUGNAME("EV_POWERUP_INVUL");
 		if ( es->number == cg.snap->ps.clientNum ) {

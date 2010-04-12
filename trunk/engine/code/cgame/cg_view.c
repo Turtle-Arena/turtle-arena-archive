@@ -240,7 +240,7 @@ static void CG_OffsetThirdPersonView( void ) {
 	distance = cg_thirdPersonRange.value;
 #endif
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	if (cg.snap && cg.snap->ps.enemyEnt != ENTITYNUM_NONE) {
 		int i;
 		vec3_t dir;
@@ -544,7 +544,7 @@ static void CG_OffsetFirstPersonView( void ) {
 
 //======================================================================
 
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 void CG_ZoomDown_f( void ) { 
 	if ( cg.zoomed ) {
 		return;
@@ -579,7 +579,7 @@ static int CG_CalcFov( void ) {
 	float	v;
 	int		contents;
 	float	fov_x, fov_y;
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	float	zoomFov;
 	float	f;
 #endif
@@ -610,7 +610,7 @@ static int CG_CalcFov( void ) {
 			}
 		}
 
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 		// account for zooms
 		zoomFov = cg_zoomFov.value;
 		if ( zoomFov < 1 ) {
@@ -659,7 +659,7 @@ static int CG_CalcFov( void ) {
 	cg.refdef.fov_x = fov_x;
 	cg.refdef.fov_y = fov_y;
 
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	if ( !cg.zoomed ) {
 		cg.zoomSensitivity = 1;
 	} else {
@@ -889,7 +889,7 @@ static void CG_PowerupTimerSounds( void ) {
 	// powerup timers going away
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
 		t = cg.snap->ps.powerups[i];
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		if (i == PW_FLASHING)
 		{
 			continue;
@@ -983,7 +983,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	}
 
 	// let the client system know what our weapon and zoom settings are
-#ifdef TMNT // NOZOOM
+#ifdef TURTLEARENA // NOZOOM
 	mouseSensitivity = 1;
 #else
 	mouseSensitivity = cg.zoomSensitivity;
@@ -1005,7 +1005,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	// update cg.predictedPlayerState
 	CG_PredictPlayerState();
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	if (!cg.lockedOn && (cg.predictedPlayerState.eFlags & EF_LOCKON))
 	{
 		cg.lockedOn = qtrue;

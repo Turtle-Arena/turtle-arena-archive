@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 displayContextDef_t cgDC;
 #endif
 
-#ifndef TMNT // NO_CGFORCEMODLE
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
 int forceModelModificationCount = -1;
 #endif
 
@@ -166,7 +166,7 @@ vmCvar_t	cg_autoswitch;
 vmCvar_t	cg_ignore;
 vmCvar_t	cg_simpleItems;
 vmCvar_t	cg_fov;
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 vmCvar_t	cg_zoomFov;
 #endif
 vmCvar_t	cg_thirdPerson;
@@ -182,7 +182,7 @@ vmCvar_t 	cg_teamChatTime;
 vmCvar_t 	cg_teamChatHeight;
 vmCvar_t 	cg_stats;
 vmCvar_t 	cg_buildScript;
-#ifndef TMNT // NO_CGFORCEMODLE
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
 vmCvar_t 	cg_forceModel;
 #endif
 vmCvar_t	cg_paused;
@@ -257,12 +257,12 @@ static cvarTable_t cvarTable[] = {
 #ifndef TMNTWEAPSYS_EX
 	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
 #endif
-#ifdef TMNT // First person weapons are currently unsupported.
+#ifdef TURTLEARENA // First person weapons are currently unsupported.
 	{ &cg_drawGun, "cg_drawGun", "0", CVAR_ARCHIVE },
 #else
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 #endif
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
 #endif
 #ifdef TMNTMISC // FOV
@@ -366,7 +366,7 @@ static cvarTable_t cvarTable[] = {
 #else
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "0", CVAR_ARCHIVE  },
 #endif
-#ifndef TMNT // NO_CGFORCEMODLE
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
 	{ &cg_forceModel, "cg_forceModel", "0", CVAR_ARCHIVE  },
 #endif
 	{ &cg_predictItems, "cg_predictItems", "1", CVAR_ARCHIVE },
@@ -375,7 +375,7 @@ static cvarTable_t cvarTable[] = {
 #else
 	{ &cg_deferPlayers, "cg_deferPlayers", "1", CVAR_ARCHIVE },
 #endif
-#ifdef TMNT // ZTM: Draw team overlay info at the top right of the screen.
+#ifdef TURTLEARENA // ZTM: Draw team overlay info at the top right of the screen.
 	{ &cg_drawTeamOverlay, "cg_drawTeamOverlay", "1", CVAR_ARCHIVE },
 #else
 	{ &cg_drawTeamOverlay, "cg_drawTeamOverlay", "0", CVAR_ARCHIVE },
@@ -479,7 +479,7 @@ void CG_RegisterCvars( void ) {
 	trap_Cvar_VariableStringBuffer( "sv_running", var, sizeof( var ) );
 	cgs.localServer = atoi( var );
 
-#ifndef TMNT // NO_CGFORCEMODLE
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
 	forceModelModificationCount = cg_forceModel.modificationCount;
 #endif
 
@@ -495,7 +495,7 @@ void CG_RegisterCvars( void ) {
 #endif
 }
 
-#ifndef TMNT // NO_CGFORCEMODLE
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
 /*																																			
 ===================
 CG_ForceModelChange
@@ -543,7 +543,7 @@ void CG_UpdateCvars( void ) {
 		}
 	}
 
-#ifndef TMNT // NO_CGFORCEMODLE
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
 	// if force model changed
 	if ( forceModelModificationCount != cg_forceModel.modificationCount ) {
 		forceModelModificationCount = cg_forceModel.modificationCount;
@@ -780,7 +780,7 @@ static void CG_RegisterSounds( void ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	cgs.media.useInvulnerabilitySound = trap_S_RegisterSound( "sound/items/invul_activate.wav", qfalse );
 	cgs.media.invulnerabilityImpactSound1 = trap_S_RegisterSound( "sound/items/invul_impact_01.wav", qfalse );
 	cgs.media.invulnerabilityImpactSound2 = trap_S_RegisterSound( "sound/items/invul_impact_02.wav", qfalse );
@@ -792,7 +792,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.obeliskHitSound3 = trap_S_RegisterSound( "sound/items/obelisk_hit_03.wav", qfalse );
 	cgs.media.obeliskRespawnSound = trap_S_RegisterSound( "sound/items/obelisk_respawn.wav", qfalse );
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	cgs.media.ammoregenSound = trap_S_RegisterSound("sound/items/cl_ammoregen.wav", qfalse);
 	cgs.media.doublerSound = trap_S_RegisterSound("sound/items/cl_doubler.wav", qfalse);
 	cgs.media.guardSound = trap_S_RegisterSound("sound/items/cl_guard.wav", qfalse);
@@ -815,7 +815,7 @@ static void CG_RegisterSounds( void ) {
 #endif
 
 	cgs.media.hitSound = trap_S_RegisterSound( "sound/feedback/hit.wav", qfalse );
-#if defined MISSIONPACK && !defined TMNT // NOARMOR
+#if defined MISSIONPACK && !defined TURTLEARENA // NOARMOR
 	cgs.media.hitSoundHighArmor = trap_S_RegisterSound( "sound/feedback/hithi.wav", qfalse );
 	cgs.media.hitSoundLowArmor = trap_S_RegisterSound( "sound/feedback/hitlo.wav", qfalse );
 #endif
@@ -953,7 +953,7 @@ static void CG_RegisterSounds( void ) {
 
 	cgs.media.regenSound = trap_S_RegisterSound("sound/items/regen.wav", qfalse);
 	cgs.media.protectSound = trap_S_RegisterSound("sound/items/protect3.wav", qfalse);
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	cgs.media.n_healthSound = trap_S_RegisterSound("sound/items/n_health.wav", qfalse );
 #endif
 #ifndef TMNTWEAPSYS
@@ -1042,7 +1042,7 @@ static void CG_RegisterGraphics( void ) {
 		cgs.media.numberShaders[i] = trap_R_RegisterShader( sb_nums[i] );
 	}
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 	cgs.media.botSkillShaders[0] = trap_R_RegisterShader( "menu/art/skill1.png" );
 	cgs.media.botSkillShaders[1] = trap_R_RegisterShader( "menu/art/skill2.png" );
 	cgs.media.botSkillShaders[2] = trap_R_RegisterShader( "menu/art/skill3.png" );
@@ -1060,7 +1060,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.viewBloodShader = trap_R_RegisterShader( "viewBloodBlend" );
 #endif
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 	cgs.media.deferShader = trap_R_RegisterShaderNoMip( "gfx/2d/defer" );
 
 	cgs.media.scoreboardName = trap_R_RegisterShaderNoMip( "menu/tab/name" );
@@ -1105,7 +1105,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.noammoShader = trap_R_RegisterShader( "icons/noammo" );
 
 	// powerup shaders
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	cgs.media.quadShader = trap_R_RegisterShader("powerups/quad" );
 	cgs.media.quadWeaponShader = trap_R_RegisterShader("powerups/quadWeapon" );
 	cgs.media.battleSuitShader = trap_R_RegisterShader("powerups/battleSuit" );
@@ -1114,7 +1114,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.invisShader = trap_R_RegisterShader("powerups/invisibility" );
 	cgs.media.regenShader = trap_R_RegisterShader("powerups/regen" );
 	cgs.media.hastePuffShader = trap_R_RegisterShader("hasteSmokePuff" );
-#ifdef TMNT // POWERS // PW_FLASHING
+#ifdef TURTLEARENA // POWERS // PW_FLASHING
 	cgs.media.playerTeleportShader = trap_R_RegisterShader("playerTeleportEffect" );
 #endif
 
@@ -1243,7 +1243,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.dustPuffShader = trap_R_RegisterShader("hasteSmokePuff" );
 #endif
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	cgs.media.targetShader = trap_R_RegisterShader( "sprites/target" );
 #endif
 
@@ -1252,7 +1252,7 @@ static void CG_RegisterGraphics( void ) {
 		// Sprites used by Elite Force
 		cgs.media.blueFriendShader = trap_R_RegisterShader( "sprites/team_blue" );
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/team_red" );
-#if !defined TMNT || defined TMNT_SUPPORTQ3 // Fall back to Q3 friend shader
+#if !defined TURTLEARENA || defined TMNT_SUPPORTQ3 // Fall back to Q3 friend shader
 		if (!cgs.media.friendShader)
 		{
 			cgs.media.friendShader = trap_R_RegisterShader( "sprites/foe" );
@@ -1261,7 +1261,7 @@ static void CG_RegisterGraphics( void ) {
 #else
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/foe" );
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 		cgs.media.redQuadShader = trap_R_RegisterShader("powerups/blueflag" );
 #endif
 #ifndef TMNTHUD
@@ -1276,7 +1276,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar.png" );
 #endif
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	cgs.media.armorModel = trap_R_RegisterModel( "models/powerups/armor/armor_yel.md3" );
 	cgs.media.armorIcon  = trap_R_RegisterShaderNoMip( "icons/iconr_yellow" );
 #endif
@@ -1335,7 +1335,7 @@ static void CG_RegisterGraphics( void ) {
 	}
 #endif
 #endif
-#ifdef TMNT
+#ifdef TURTLEARENA
 	cgs.media.teleportEffectModel = trap_R_RegisterModel( "models/misc/telep.md3" );
 #elif defined MISSIONPACK
 	cgs.media.teleportEffectModel = trap_R_RegisterModel( "models/powerups/pop.md3" );
@@ -1352,7 +1352,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.scoutPowerupModel = trap_R_RegisterModel( "models/powerups/scout_player.md3" );
 	cgs.media.doublerPowerupModel = trap_R_RegisterModel( "models/powerups/doubler_player.md3" );
 	cgs.media.ammoRegenPowerupModel = trap_R_RegisterModel( "models/powerups/ammo_player.md3" );
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	cgs.media.invulnerabilityImpactModel = trap_R_RegisterModel( "models/powerups/shield/impact.md3" );
 	cgs.media.invulnerabilityJuicedModel = trap_R_RegisterModel( "models/powerups/shield/juicer.md3" );
 #endif
@@ -1360,7 +1360,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.heartShader = trap_R_RegisterShaderNoMip( "ui/assets/statusbar/selectedhealth.tga" );
 #endif
 
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	cgs.media.strengthPowerupModel = trap_R_RegisterModel( "models/powerups/shield/strength.md3" );
 	cgs.media.defensePowerupModel = trap_R_RegisterModel( "models/powerups/shield/defense.md3" );
 	cgs.media.speedPowerupModel = trap_R_RegisterModel( "models/powerups/shield/speed.md3" );
@@ -1470,7 +1470,7 @@ static void CG_RegisterGraphics( void ) {
 
 #ifdef MISSIONPACK
 	// new stuff
-#ifdef TMNT
+#ifdef TURTLEARENA
 	cgs.media.patrolShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/patrol.png");
 	cgs.media.assaultShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/assault.png");
 	cgs.media.campShader = trap_R_RegisterShaderNoMip("ui/assets/statusbar/camp.png");

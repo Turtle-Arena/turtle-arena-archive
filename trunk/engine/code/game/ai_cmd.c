@@ -1556,7 +1556,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 		"Lightning Gun",
 		"BFG10K",
 #endif
-#ifdef TMNT // POWERS, NOARMOR
+#ifdef TURTLEARENA // POWERS, NOARMOR
 		"Strength",
 		"Regeneration",
 		"Defense",

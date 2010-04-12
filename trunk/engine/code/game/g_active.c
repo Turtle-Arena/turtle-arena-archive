@@ -51,7 +51,7 @@ void P_DamageFeedback( gentity_t *player ) {
 	}
 
 	// total points of damage shot at the player this frame
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 	count = client->damage_blood;
 #else
 	count = client->damage_blood + client->damage_armor;
@@ -93,7 +93,7 @@ void P_DamageFeedback( gentity_t *player ) {
 	// clear totals
 	//
 	client->damage_blood = 0;
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	client->damage_armor = 0;
 #endif
 	client->damage_knockback = 0;
@@ -109,7 +109,7 @@ Check for lava / slime contents and drowning
 =============
 */
 void P_WorldEffects( gentity_t *ent ) {
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	qboolean	envirosuit;
 #endif
 	int			waterlevel;
@@ -121,7 +121,7 @@ void P_WorldEffects( gentity_t *ent ) {
 
 	waterlevel = ent->waterlevel;
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	envirosuit = ent->client->ps.powerups[PW_BATTLESUIT] > level.time;
 #endif
 
@@ -129,7 +129,7 @@ void P_WorldEffects( gentity_t *ent ) {
 	// check for drowning
 	//
 	if ( waterlevel == 3 ) {
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 		// envirosuit give air
 		if ( envirosuit ) {
 			ent->client->airOutTime = level.time + 10000;
@@ -175,7 +175,7 @@ void P_WorldEffects( gentity_t *ent ) {
 		if (ent->health > 0
 			&& ent->pain_debounce_time <= level.time	) {
 
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 			if ( ent->client->ps.powerups[PW_INVUL] > level.time ) {
 				G_AddEvent( ent, EV_POWERUP_INVUL, 0 );
 			} else
@@ -439,7 +439,7 @@ Actions that happen once a second
 */
 void ClientTimerActions( gentity_t *ent, int msec ) {
 	gclient_t	*client;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 #ifdef MISSIONPACK
 	int			maxHealth;
 #endif
@@ -521,7 +521,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	while ( client->timeResidual >= 1000 ) {
 		client->timeResidual -= 1000;
 
-#ifndef TMNT // POWERS // Guards having health regen makes them pretty much unkillable, and removed regen powerup.
+#ifndef TURTLEARENA // POWERS // Guards having health regen makes them pretty much unkillable, and removed regen powerup.
 		// regenerate
 #ifdef MISSIONPACK
 #ifdef TMNTWEAPSYS
@@ -577,7 +577,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			}
 		}
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 		// count down armor when over max
 		if ( client->ps.stats[STAT_ARMOR] > client->ps.stats[STAT_MAX_HEALTH] ) {
 			client->ps.stats[STAT_ARMOR]--;
@@ -1018,7 +1018,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 #else
 		case EV_USE_ITEM3:		// kamikaze
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 			// make sure the invulnerability is off
 			ent->client->invulnerabilityTime = 0;
 #endif
@@ -1040,7 +1040,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			}
 			break;
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 #ifdef TMNTHOLDSYS
 				case HI_INVULNERABILITY:
 #else
@@ -1048,7 +1048,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 #endif
 			ent->client->invulnerabilityTime = level.time + 10000;
 			break;
-#endif // TMNT // POWERS
+#endif // TURTLEARENA // POWERS
 
 #endif // MISSIONPACK
 
@@ -1076,13 +1076,13 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 }
 
-#if defined MISSIONPACK || defined TMNT // POWERS
+#if defined MISSIONPACK || defined TURTLEARENA // POWERS
 /*
 ==============
 StuckInOtherClient
 ==============
 */
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 static gentity_t *StuckInOtherClient(gentity_t *ent)
 #else
 static int StuckInOtherClient(gentity_t *ent)
@@ -1105,7 +1105,7 @@ static int StuckInOtherClient(gentity_t *ent)
 		if ( ent2->health <= 0 ) {
 			continue;
 		}
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		if ( !(ent2->r.contents & CONTENTS_BODY) ) {
 			continue;
 		}
@@ -1123,13 +1123,13 @@ static int StuckInOtherClient(gentity_t *ent)
 			continue;
 		if (ent2->r.absmax[2] < ent->r.absmin[2])
 			continue;
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		return ent2;
 #else
 		return qtrue;
 #endif
 	}
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	return NULL;
 #else
 	return qfalse;
@@ -1279,7 +1279,7 @@ void ClientThink_real( gentity_t *ent ) {
 	int			oldEventSequence;
 	int			msec;
 	usercmd_t	*ucmd;
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	vec3_t vieworigin;
 #endif
 
@@ -1404,7 +1404,7 @@ void ClientThink_real( gentity_t *ent ) {
 		Weapon_HookFree(client->hook);
 	}
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	if (ent->enemy && (ent->enemy == ent || !ent->enemy->takedamage))
 	{
 		ent->enemy = NULL;
@@ -1570,7 +1570,7 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 #endif
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 #ifdef MISSIONPACK
 	// check for invulnerability expansion before doing the Pmove
 	if (client->ps.powerups[PW_INVULNERABILITY] ) {
@@ -2061,7 +2061,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	// turn off any expired powerups
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
 		if ( ent->client->ps.powerups[ i ] < level.time ) {
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 			if (ent->client->ps.powerups[ i ] > 0
 				&& i == PW_FLASHING)
 			{
@@ -2152,7 +2152,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_AMMOREGEN] = level.time;
 	}
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	if ( ent->client->invulnerabilityTime > level.time ) {
 		ent->client->ps.powerups[PW_INVULNERABILITY] = level.time;
 	}

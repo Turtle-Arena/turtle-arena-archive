@@ -152,7 +152,7 @@ int Pickup_PersistantPowerup( gentity_t *ent, gentity_t *other ) {
 		other->health = max;
 		other->client->ps.stats[STAT_HEALTH] = max;
 		other->client->ps.stats[STAT_MAX_HEALTH] = max;
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 		other->client->ps.stats[STAT_ARMOR] = max;
 #endif
 		other->client->pers.maxHealth = max;
@@ -166,8 +166,8 @@ int Pickup_PersistantPowerup( gentity_t *ent, gentity_t *other ) {
 		if( handicap<=0.0f || handicap>100.0f) {
 			handicap = 100.0f;
 		}
-#ifdef TMNT // Only half as much health.
-		max = (int)(handicap / 2);
+#ifdef TURTLEARENA // Only half as much health.
+		max = (int)(0.5f *  handicap);
 
 		other->health = max;
 		other->client->ps.stats[STAT_HEALTH] = max;
@@ -176,7 +176,7 @@ int Pickup_PersistantPowerup( gentity_t *ent, gentity_t *other ) {
 #else
 		other->client->pers.maxHealth = handicap;
 #endif
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 		other->client->ps.stats[STAT_ARMOR] = 0;
 #endif
 		break;
@@ -350,7 +350,7 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 			quantity = ent->item->quantity;
 		}
 
-#if defined TMNTWEAPSYS && defined TMNT
+#if defined TMNTWEAPSYS && defined TURTLEARENA
 		// Dropped items have the ammo from the player who dropped it
 		//   so don't mess with it.
 		if ( !(ent->flags & FL_DROPPED_ITEM) )
@@ -465,7 +465,7 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 		quantity = ent->item->quantity;
 	}
 
-#ifdef TMNT // Guards having health regen makes them pretty much unkillable.
+#ifdef TURTLEARENA // Guards having health regen makes them pretty much unkillable.
 			// So get 2x health from pickups!
 #ifdef TMNTWEAPSYS
 	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
@@ -483,7 +483,7 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
 #endif
 	{
-		other->health += (int)quantity/2;
+		other->health += quantity*0.5f;
 	}
 	else
 #endif
@@ -501,7 +501,7 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	return RESPAWN_HEALTH;
 }
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 //======================================================================
 
 int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
@@ -670,7 +670,7 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		respawn = Pickup_Ammo(ent, other);
 //		predict = qfalse;
 		break;
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	case IT_ARMOR:
 		respawn = Pickup_Armor(ent, other);
 		break;

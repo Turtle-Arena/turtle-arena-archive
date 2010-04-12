@@ -57,7 +57,7 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 	if ( level.warmupTime ) {
 		return;
 	}
-#ifdef IOQ3ZTM // TMNT // CTF_FRAG_CARRIER_BONUS is 0, so don't show they got 0 points.
+#ifdef IOQ3ZTM // TURTLEARENA // SCORING // CTF_FRAG_CARRIER_BONUS is 0, so don't show they got 0 points.
 	if (!score) {
 		return;
 	}
@@ -68,7 +68,8 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 	ent->client->ps.persistant[PERS_SCORE] += score;
 	if ( g_gametype.integer == GT_TEAM )
 		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
-#ifdef TMNT // No negative scores
+#ifdef TURTLEARENA // SCORING
+	// No negative scores
 	if (ent->client->ps.persistant[PERS_SCORE] < 0) {
 		ent->client->ps.persistant[PERS_SCORE] = 0;
 	}
@@ -633,7 +634,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (attacker && attacker->client) {
 		attacker->client->lastkilled_client = self->s.number;
 
-#ifdef TMNT
+#ifdef TURTLEARENA // SCORING
 		if ( attacker == self )
 		{
 			// Suicide penalty
@@ -650,7 +651,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 #endif
 		else
 		{
-#ifdef TMNT
+#ifdef TURTLEARENA // SCORING
 			AddScore( attacker, self->r.currentOrigin, 50 );
 #else
 			AddScore( attacker, self->r.currentOrigin, 1 );
@@ -694,7 +695,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 #endif
 		}
 	} else {
-#ifdef TMNT
+#ifdef TURTLEARENA // SCORING
 		// Suicide penalty
 		AddScore( self, self->r.currentOrigin, -50 );
 #else
@@ -859,7 +860,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 }
 
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 /*
 ================
 CheckArmor
@@ -934,7 +935,7 @@ int RaySphereIntersections( vec3_t origin, float radius, vec3_t point, vec3_t di
 	return 0;
 }
 
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 /*
 ================
 G_InvulnerabilityEffect
@@ -1056,12 +1057,12 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	gclient_t	*client;
 	int			take;
 	int			save;
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	int			asave;
 #endif
 	int			knockback;
 	int			max;
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	vec3_t		bouncedir, impactpoint;
 #endif
 
@@ -1074,7 +1075,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( level.intermissionQueued ) {
 		return qfalse;
 	}
-#if defined MISSIONPACK && !defined TMNT // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	if ( targ->client && mod != MOD_JUICED) {
 		if ( targ->client->invulnerabilityTime > level.time) {
 			if ( dir && point ) {
@@ -1169,7 +1170,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		if ( client->noclip ) {
 			return qfalse;
 		}
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		if ( client->ps.powerups[PW_FLASHING] ) {
 			return qfalse;
 		}
@@ -1281,14 +1282,14 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	// and protects 50% against all damage
 	if ( client && client->ps.powerups[PW_BATTLESUIT] ) {
 		G_AddEvent( targ, EV_POWERUP_BATTLESUIT, 0 );
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 		if ( ( dflags & DAMAGE_RADIUS ) || ( mod == MOD_FALLING ) ) {
 			return qfalse;
 		}
 #endif
 		damage *= 0.5;
 	}
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	// never take any damage.
 	if ( client && client->ps.powerups[PW_INVUL] ) {
 		G_AddEvent( targ, EV_POWERUP_INVUL, 0 );
@@ -1309,7 +1310,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		} else {
 			attacker->client->ps.persistant[PERS_HITS]++;
 		}
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 		attacker->client->ps.persistant[PERS_ATTACKEE_ARMOR] = (targ->health<<8)|(client->ps.stats[STAT_ARMOR]);
 #endif
 	}
@@ -1326,14 +1327,14 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	take = damage;
 	save = 0;
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	// save some from armor
 	asave = CheckArmor (targ, take, dflags);
 	take -= asave;
 #endif
 
 	if ( g_debugDamage.integer ) {
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 		G_Printf( "%i: client:%i health:%i damage:%i\n", level.time, targ->s.number,
 			targ->health, take );
 #else
@@ -1351,7 +1352,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		} else {
 			client->ps.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
 		}
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 		client->damage_armor += asave;
 #endif
 		client->damage_blood += take;

@@ -72,7 +72,7 @@ static const int numNetSources = sizeof(netSources) / sizeof(const char*);
 
 static const serverFilter_t serverFilters[] = {
 	{"All", "" },
-#ifdef TMNT
+#ifdef TURTLEARENA
 	{"Turtle Arena", "" },
 	{"Quake 3 Arena", "baseq3" },
 #else
@@ -5962,7 +5962,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_new, "ui_new", "0", CVAR_TEMP },
 	{ &ui_debug, "ui_debug", "0", CVAR_TEMP },
 	{ &ui_initialized, "ui_initialized", "0", CVAR_TEMP },
-#ifdef TMNT // DEFAULT_TEAMS
+#ifdef TURTLEARENA // DEFAULT_TEAMS
 	{ &ui_teamName, "ui_teamName", "Sais", CVAR_ARCHIVE },
 	{ &ui_opponentName, "ui_opponentName", "Katanas", CVAR_ARCHIVE },
 	{ &ui_redteam, "ui_redteam", "Sais", CVAR_ARCHIVE },
@@ -6027,7 +6027,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_captureLimit, "ui_captureLimit", "5", 0},
 	{ &ui_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
 	{ &ui_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
-#ifdef TMNT // DEFAULT_PLAYER
+#ifdef TURTLEARENA // DEFAULT_PLAYER
 	{ &ui_findPlayer, "ui_findPlayer", "Raph", CVAR_ARCHIVE},
 #else
 	{ &ui_findPlayer, "ui_findPlayer", "Sarge", CVAR_ARCHIVE},

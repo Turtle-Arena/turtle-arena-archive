@@ -1282,7 +1282,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// model
 	v = Info_ValueForKey( configstring, "model" );
-#ifndef TMNT // NO_CGFORCEMODLE
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
 	if ( cg_forceModel.integer ) {
 		// forcemodel makes everyone use a single model
 		// to prevent load hitches
@@ -1335,7 +1335,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// head model
 	v = Info_ValueForKey( configstring, "hmodel" );
-#ifndef TMNT // NO_CGFORCEMODLE
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
 	if ( cg_forceModel.integer ) {
 		// forcemodel makes everyone use a single model
 		// to prevent load hitches
@@ -2521,7 +2521,7 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 		return;
 	}
 
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	// Add powerup dlights
 	// If one or two powers use haste light
 	if ( (powerups & ( 1 << PW_HASTE )) &&
@@ -2775,7 +2775,7 @@ static void CG_PlayerSprites( centity_t *cent
 	}
 #endif
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	// Show local client's target marker over this client
 #ifdef IOQ3ZTM
 	if (cg.snap->ps.enemyEnt == cent->currentState.number)
@@ -2972,7 +2972,7 @@ Also called by CG_Missile for quad rockets, but nobody can tell...
 ===============
 */
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
 		int alpha;
 
@@ -3008,7 +3008,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 			trap_R_AddRefEntityToScene( ent );
 		//}
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 		if ( state->powerups & ( 1 << PW_QUAD ) )
 		{
 			if (team == TEAM_RED)
@@ -3094,14 +3094,14 @@ void CG_Player( centity_t *cent ) {
 	int				renderfx;
 	qboolean		shadow;
 	float			shadowPlane;
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	refEntity_t		powerup;
 #endif
 #ifdef MISSIONPACK
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	refEntity_t		skull;
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	refEntity_t		powerup;
 #endif
 	int				t;
@@ -3139,7 +3139,7 @@ void CG_Player( centity_t *cent ) {
 				return;
 			}
 		}
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 		// Show target marker for non-client entities.
 #ifdef IOQ3ZTM
 		if (cg.snap->ps.enemyEnt >= MAX_CLIENTS && cg.snap->ps.enemyEnt != ENTITYNUM_NONE)
@@ -3374,7 +3374,7 @@ void CG_Player( centity_t *cent ) {
 #ifdef IOQ3ZTM
 	}
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	if ( cent->currentState.powerups & ( 1 << PW_INVULNERABILITY ) ) {
 		if ( !ci->invulnerabilityStartTime ) {
 			ci->invulnerabilityStartTime = cg.time;
@@ -3437,7 +3437,7 @@ void CG_Player( centity_t *cent ) {
 		trap_R_AddRefEntityToScene( &powerup );
 	}
 #endif // MISSIONPACK
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	VectorClear(angles);
 	AnglesToAxis(angles, powerup.axis);
 	VectorCopy(cent->lerpOrigin, powerup.origin);

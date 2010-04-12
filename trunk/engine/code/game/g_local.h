@@ -320,7 +320,7 @@ struct gclient_s {
 
 	// sum up damage over an entire frame, so
 	// shotgun blasts give a single big kick
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	int			damage_armor;		// damage absorbed by armor
 #endif
 	int			damage_blood;		// damage taken out of health
@@ -376,7 +376,7 @@ struct gclient_s {
 #ifdef TMNTHOLDABLE // REGEN_SHURIKENS
 	int			holdableTimes[HI_NUM_HOLDABLE];
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	int			invulnerabilityTime;
 #endif
 #endif
@@ -384,7 +384,7 @@ struct gclient_s {
 	int melee_debounce; // Delay doing damage for primary weapon
 	int melee_debounce2; // delay doing damage for secondary weapon
 #endif
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	int lockonTime;
 	qboolean hadLockon;
 #endif
@@ -676,7 +676,7 @@ void DropPortalDestination( gentity_t *ent );
 qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker );
 void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint );
 void SnapVectorTowards( vec3_t v, vec3_t to );
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t right, vec3_t up);
 #endif
 #ifdef TMNTHOLDABLE
@@ -807,7 +807,7 @@ void G_RunClient( gentity_t *ent );
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
 void Team_CheckDroppedItem( gentity_t *dropped );
 qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
-#if defined TMNT || defined TMNTWEAPSYS // LOCKON
+#if defined TURTLEARENA || defined TMNTWEAPSYS // LOCKON
 void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage );
 #endif
 
@@ -972,7 +972,7 @@ extern	vmCvar_t	g_spSaveData;
 #ifndef TMNTWEAPONS // missionpack
 extern	vmCvar_t	g_proxMineTimeout;
 #endif
-#ifdef TMNT // POWERS // PW_FLASHING
+#ifdef TURTLEARENA // POWERS // PW_FLASHING
 extern	vmCvar_t	g_teleportFluxTime;
 #endif
 #ifdef IOQ3ZTM // LASERTAG

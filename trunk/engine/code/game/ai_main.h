@@ -176,7 +176,7 @@ typedef struct bot_state_s
 	float stand_time;								//time the bot is standing still
 	float lastchat_time;							//time the bot last selected a chat
 	float kamikaze_time;							//time to check for kamikaze usage
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	float invulnerability_time;						//time to check for invulnerability usage
 #endif
 	float standfindenemy_time;						//time to find enemy while standing

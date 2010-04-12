@@ -552,7 +552,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[3] = color[3];
 		UI_DrawProportionalString2( x, y, str, color, sizeScale, uis.charsetProp );
 
-#ifdef TMNT // ZTM: Main menu text drawing.
+#ifdef TURTLEARENA // ZTM: Main menu text drawing.
         // ZTM: hack-ish thing to do?...
 		drawcolor[0] = text_color_highlight[0];
 		drawcolor[1] = text_color_highlight[1];

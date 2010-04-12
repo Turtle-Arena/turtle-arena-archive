@@ -596,7 +596,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 	}
 	trap_R_SetColor( hcolor );
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	// ZTM: Hacky (Don't have TMNT status fit screen)
+	// ZTM: Hacky (Don't have Turtle Arena status fit screen)
 	if (w == SCREEN_WIDTH)
 	{
 		CG_DrawPicFit( x, y, w, h, cgs.media.teamStatusBar );
@@ -934,7 +934,7 @@ static void CG_DrawStatusBar( void ) {
 		CG_DrawStatusBarFlag( 185 + CHAR_WIDTH*3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_FREE );
 	}
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	if ( ps->stats[ STAT_ARMOR ] ) {
 		origin[0] = 90;
 		origin[1] = 0;
@@ -1003,7 +1003,7 @@ static void CG_DrawStatusBar( void ) {
 	trap_R_SetColor( hcolor );
 
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	//
 	// armor
 	//
@@ -1320,7 +1320,7 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 					TEAM_OVERLAY_MAXLOCATION_WIDTH);
 			}
 
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 			CG_GetColorForHealth( ci->health, hcolor );
 
 			Com_sprintf (st, sizeof(st), "%3i", ci->health);

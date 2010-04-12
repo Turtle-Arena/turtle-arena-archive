@@ -719,7 +719,7 @@ void CG_AddKamikaze( localEntity_t *le ) {
 }
 #endif
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 /*
 ===================
 CG_AddInvulnerabilityImpact
@@ -949,7 +949,7 @@ void CG_AddLocalEntities( void ) {
 			CG_AddKamikaze( le );
 			break;
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 		case LE_INVULIMPACT:
 			CG_AddInvulnerabilityImpact( le );
 			break;

@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 
-#ifdef TMNT
+#ifdef TURTLEARENA // SCORING
 
 #define CTF_CAPTURE_BONUS		250		// what you get for capture
 #define CTF_TEAM_BONUS			50		// what your team gets for capture

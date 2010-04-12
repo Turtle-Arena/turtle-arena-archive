@@ -1751,8 +1751,8 @@ int BotInitLibrary(void) {
 	trap_BotLibVarSet("weapindex_rocket", va("%i", WP_ROCKET_LAUNCHER));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", WP_GRAPPLING_HOOK));
 #endif
-#ifdef TMNT
-	trap_BotLibDefine("TMNT");
+#ifdef TURTLEARENA
+	trap_BotLibDefine("TURTLEARENA");
 #endif
 #ifdef TMNTWEAPONS
 	trap_BotLibDefine("TMNTWEAPONS");

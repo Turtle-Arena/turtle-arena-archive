@@ -61,7 +61,7 @@ void CG_NextHoldable_f( void ) {
 		cg.holdableSelect == HI_KAMIKAZE ||
 #endif
 		cg.holdableSelect == HI_PORTAL
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 			|| cg.holdableSelect == HI_INVULNERABILITY
 #endif
 			) {
@@ -115,7 +115,7 @@ void CG_PrevHoldable_f( void ) {
 		cg.holdableSelect == HI_KAMIKAZE ||
 #endif
 		cg.holdableSelect == HI_PORTAL
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 			|| cg.holdableSelect == HI_INVULNERABILITY
 #endif
 			) {
@@ -1047,7 +1047,7 @@ void CG_RegisterProjectile( int projectileNum )
 		case PT_GRAPPLE:
 			projectileInfo->missileTrailFunc = CG_GrappleTrail;
 			cgs.media.grappleCableShader = trap_R_RegisterShader( "GrappleCable");
-#if !defined TMNT || defined TMNT_SUPPORTQ3
+#if !defined TURTLEARENA || defined TMNT_SUPPORTQ3
 			if (!cgs.media.grappleCableShader)
 				cgs.media.grappleCableShader = trap_R_RegisterShader( "lightningBoltNew");
 #endif
@@ -1606,7 +1606,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	// powerups have an accompanying ring or sphere
 	//
 	if ( item->giType == IT_POWERUP || item->giType == IT_HEALTH || 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 		item->giType == IT_ARMOR ||
 #endif
 		item->giType == IT_HOLDABLE ) {
@@ -2000,7 +2000,7 @@ CG_AddWeaponWithPowerups
 static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups )
 {
 	// add powerup effects
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	if ( powerups & ( 1 << PW_FLASHING ) ) {
 		gun->renderfx |= RF_FORCE_ENT_ALPHA;
 		gun->shaderRGBA[3] = 32;
@@ -2017,7 +2017,7 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups )
 	} else {
 		trap_R_AddRefEntityToScene( gun );
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 		if ( powerups & ( 1 << PW_BATTLESUIT ) ) {
 			gun->customShader = cgs.media.battleWeaponShader;
 			trap_R_AddRefEntityToScene( gun );
@@ -3382,7 +3382,7 @@ void CG_FireWeapon( centity_t *cent ) {
 	}
 #endif
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	// play quad sound if needed
 	if ( cent->currentState.powerups & ( 1 << PW_QUAD ) ) {
 		trap_S_StartSound (NULL, cent->currentState.number, CHAN_ITEM, cgs.media.quadSound );
