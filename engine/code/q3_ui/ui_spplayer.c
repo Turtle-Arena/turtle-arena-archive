@@ -57,9 +57,7 @@ SINGLE PLAYER, PLAYER SELECT MENU
 #define ID_BACK						14
 #define ID_FIGHT					15
 
-#define NUM_SPPLAYERS 4
-
-const char *playerNames[NUM_SPPLAYERS] = { "leo", "don", "raph", "mike" };
+const char *spPlayerNames[NUM_SPPLAYERS] = { "leo", "don", "raph", "mike" };
 
 typedef struct {
 	menuframework_s	menu;
@@ -94,8 +92,8 @@ static void UI_SPPlayerMenu_PlayerEvent( void *ptr, int notification ) {
 
 	id = ((menucommon_s*)ptr)->id;
 	player = id - ID_LEO;
-	trap_Cvar_Set( "spmodel", playerNames[player] );
-	trap_Cvar_Set( "spheadmodel", playerNames[player] );
+	trap_Cvar_Set( "spmodel", spPlayerNames[player] );
+	trap_Cvar_Set( "spheadmodel", spPlayerNames[player] );
 
 	trap_S_StartLocalSound( playerMenuInfo.playerSound[player], CHAN_ANNOUNCER );
 
@@ -180,7 +178,7 @@ void UI_SPPlayerMenu_Cache( void ) {
 
 	for (i = 0; i < NUM_SPPLAYERS; i++)
 	{
-		playerMenuInfo.playerSound[i] = trap_S_RegisterSound( va("sound/misc/ui_%s.wav", playerNames[i]), qfalse );
+		playerMenuInfo.playerSound[i] = trap_S_RegisterSound( va("sound/misc/ui_%s.wav", spPlayerNames[i]), qfalse );
 	}
 
 	playerMenuInfo.silenceSound = trap_S_RegisterSound( "sound/misc/silence.wav", qfalse );
@@ -293,7 +291,7 @@ static void UI_SPPlayerMenu_Init( void ) {
 	trap_Cvar_VariableStringBuffer( "spmodel", playerModel, sizeof(playerModel) );
 	for (i = 0; i < NUM_SPPLAYERS; i++)
 	{
-		if (Q_stricmp(playerNames[i], playerModel) == 0)
+		if (Q_stricmp(spPlayerNames[i], playerModel) == 0)
 		{
 			playerMenuInfo.player = i;
 			break;

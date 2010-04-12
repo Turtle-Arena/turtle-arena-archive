@@ -1095,9 +1095,23 @@ static void ServerOptions_InitPlayerItems( void ) {
 	// if not a dedicated server, first slot is reserved for the human on the server
 	if( s_serveroptions.dedicated.curvalue == 0 ) {
 		// human
+#ifdef TMNTSP // SPMODEL
+		s_serveroptions.playerType[0].curvalue = 0;
+		if (!s_serveroptions.multiplayer)
+		{
+			trap_Cvar_VariableStringBuffer( "spmodel", s_serveroptions.playerNameBuffers[0], sizeof(s_serveroptions.playerNameBuffers[0]) );
+			s_serveroptions.playerNameBuffers[0][0] = toupper(s_serveroptions.playerNameBuffers[0][0]);
+		}
+		else
+		{
+			s_serveroptions.playerType[0].generic.flags |= QMF_INACTIVE;
+			trap_Cvar_VariableStringBuffer( "name", s_serveroptions.playerNameBuffers[0], sizeof(s_serveroptions.playerNameBuffers[0]) );
+		}
+#else
 		s_serveroptions.playerType[0].generic.flags |= QMF_INACTIVE;
 		s_serveroptions.playerType[0].curvalue = 0;
 		trap_Cvar_VariableStringBuffer( "name", s_serveroptions.playerNameBuffers[0], sizeof(s_serveroptions.playerNameBuffers[0]) );
+#endif
 		Q_CleanStr( s_serveroptions.playerNameBuffers[0] );
 	}
 
@@ -1137,6 +1151,11 @@ static void ServerOptions_SetPlayerItems( void ) {
 	// names
 	if( s_serveroptions.dedicated.curvalue == 0 ) {
 		s_serveroptions.player0.string = "Human";
+#ifdef TMNTSP
+		if (!s_serveroptions.multiplayer)
+			s_serveroptions.playerName[0].generic.flags &= ~(QMF_INACTIVE|QMF_HIDDEN);
+		else
+#endif
 		s_serveroptions.playerName[0].generic.flags &= ~QMF_HIDDEN;
 
 		start = 1;
@@ -1220,6 +1239,25 @@ static void ServerOptions_PlayerNameEvent( void* ptr, int event ) {
 		return;
 	}
 	n = ((menutext_s*)ptr)->generic.id;
+#ifdef TMNTSP
+	if (s_serveroptions.dedicated.curvalue == 0 && n == 0)
+	{
+		int i;
+
+		for (i = 0; i < NUM_SPPLAYERS; i++)
+		{
+			if (Q_stricmp(s_serveroptions.playerNameBuffers[0], spPlayerNames[i]) == 0)
+			{
+				n = (i+1)%NUM_SPPLAYERS; // next model
+			}
+		}
+
+		trap_Cvar_Set("spmodel", spPlayerNames[n]);
+		strcpy(s_serveroptions.playerNameBuffers[0], spPlayerNames[n]);
+		s_serveroptions.playerNameBuffers[0][0] = toupper(spPlayerNames[n][0]);
+		return;
+	}
+#endif
 	s_serveroptions.newBotIndex = n;
 	UI_BotSelectMenu( s_serveroptions.playerNameBuffers[n] );
 }
