@@ -65,7 +65,7 @@ static fileHandle_t logfile;
 fileHandle_t	com_journalFile;			// events are written here
 fileHandle_t	com_journalDataFile;		// config files are written here
 
-#ifdef TMNT // FS_PURE
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 cvar_t	*com_fs_pure;
 #endif
 cvar_t	*com_speeds;
@@ -2703,7 +2703,7 @@ void Com_Init( char *commandLine ) {
 	// done early so bind command exists
 	CL_InitKeyCommands();
 
-#ifdef TMNT // FS_PURE
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 	com_fs_pure = Cvar_Get ("fs_pure", "1", CVAR_ROM);
 #endif
 
