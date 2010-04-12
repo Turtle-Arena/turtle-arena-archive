@@ -174,12 +174,20 @@ or configs will never get loaded from disk!
 
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
-#ifdef TMNT
-#define NUM_DEFAULT_PAKS 1 // Allows for assets0.pk3 through assets9.pk3
+#if defined STANDALONE && defined IOQ3ZTM /* && defined TMNT */ // FS_PURE
+// Turtle Arena and ioq3turtle
+#define PAK "assets"
+#define PAK_LEN 6
+#define NUM_DEFAULT_PAKS 1 // Maximum 10
 static const unsigned pak_checksums[NUM_DEFAULT_PAKS] = {
 	2799211236u
 };
 #else
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+#define PAK "pak"
+#define PAK_LEN 3
+#define NUM_DEFAULT_PAKS NUM_ID_PAKS // 9
+#endif
 #define	DEMO_PAK0_CHECKSUM	2985612116u
 static const unsigned pak_checksums[] = {
 	1566731103u,
@@ -2587,7 +2595,7 @@ qboolean FS_idPak( char *pak, char *base ) {
 	return qfalse;
 }
 
-#ifdef TMNT
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 /*
 ================
 FS_DefaultPak
@@ -2596,13 +2604,12 @@ FS_DefaultPak
 qboolean FS_DefaultPak( char *pak, char *base ) {
 	int i;
 
-	for (i = 0; i < NUM_ID_PAKS; i++) {
-		if ( !FS_FilenameCompare(pak, va("%s/assets%d", base, i))
-			|| !FS_FilenameCompare(pak, va("%s/pak%d", base, i)) ) {
+	for (i = 0; i < NUM_DEFAULT_PAKS; i++) {
+		if ( !FS_FilenameCompare(pak, va("%s/%s%d", base, PAK, i)) ) {
 			break;
 		}
 	}
-	if (i < NUM_ID_PAKS) {
+	if (i < NUM_DEFAULT_PAKS) {
 		return qtrue;
 	}
 	return qfalse;
@@ -2675,7 +2682,7 @@ qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring ) {
 			continue;
 		}
 
-#ifdef TMNT
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 		// never autodownload any of the default paks
 		if ( FS_DefaultPak(fs_serverReferencedPakNames[i], BASEGAME) ) {
 			continue;
@@ -3092,7 +3099,7 @@ static void FS_CheckPak0( void )
 }
 #endif
 
-#ifdef TMNT // FS_PURE
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 /*
 ===================
 FS_CheckPaks
@@ -3100,9 +3107,6 @@ FS_CheckPaks
 Checks that assets0.pk3 is present and its checksum is correct
 ===================
 */
-// Pak PreFix
-#define PPF "assets" // "pak"
-#define PPF_LEN 6 // 3
 static void FS_CheckPaks( void )
 {
 	searchpath_t	*path;
@@ -3125,23 +3129,23 @@ static void FS_CheckPaks( void )
 		hasPakFile = qtrue;
 
 		if(!Q_stricmpn( path->pack->pakGamename, BASEGAME, MAX_OSPATH )
-			&& strlen(pakBasename) == PPF_LEN+1 && !Q_stricmpn( pakBasename, PPF, PPF_LEN )
-			&& pakBasename[PPF_LEN] >= '0' && pakBasename[PPF_LEN] < '0'+NUM_DEFAULT_PAKS)
+			&& strlen(pakBasename) == PAK_LEN+1 && !Q_stricmpn( pakBasename, PAK, PAK_LEN )
+			&& pakBasename[PAK_LEN] >= '0' && pakBasename[PAK_LEN] < '0'+NUM_DEFAULT_PAKS)
 		{
-			if( path->pack->checksum != pak_checksums[pakBasename[PPF_LEN]-'0'] )
+			if( path->pack->checksum != pak_checksums[pakBasename[PAK_LEN]-'0'] )
 			{
 				Com_Printf("\n\n"
 					"**********************************************************************\n"
 					"WARNING: %s%d.pk3 is present but its checksum (%u) is not correct.\n"
 					"**********************************************************************\n\n\n",
-					PPF, pakBasename[PPF_LEN]-'0', path->pack->checksum );
+					PAK, pakBasename[PAK_LEN]-'0', path->pack->checksum );
 
-				invalidPak |= 1<<(pakBasename[PPF_LEN]-'0');
+				invalidPak |= 1<<(pakBasename[PAK_LEN]-'0');
 			}
 			else
 			{
 				// Found pk3 AND its checksum matches.
-				foundPak |= 1<<(pakBasename[PPF_LEN]-'0');
+				foundPak |= 1<<(pakBasename[PAK_LEN]-'0');
 			}
 		}
 	}
@@ -3541,11 +3545,12 @@ void FS_InitFilesystem( void ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-#ifdef TMNT // FS_PURE
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 	FS_CheckPaks();
-#endif
+#else
 #ifndef STANDALONE
 	FS_CheckPak0( );
+#endif
 #endif
 
 	// if we can't find default.cfg, assume that the paths are
