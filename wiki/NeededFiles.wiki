@@ -6,7 +6,7 @@ Files that are missing or "TEMP:" if I haven't decide if its finished yet. List 
 <wiki:toc max_depth="3" />
 
 = Sounds =
-Note: Added a dummy sound at sound/feedback/hit.wav so unmoded Quake3 can start with only TMNT sounds.
+Note: Added a dummy sound at sound/feedback/hit.wav so unmoded Quake3 can start with only Turtle Arena sounds.
 
 == Note: Copies ==
   * misc/menu1.ogg and misc/menu3.ogg are a louder-copy of player/footsteps/clank2.ogg
@@ -203,26 +203,26 @@ NOTE: Currently I have the cursors point to the normal q3 cursor image.
 While replacing stuff I was deleting what I had replaced or was no longer used in the demoq3 pak0.pk3
 the following were not removed from the pk3; (I have a list so I can delete the pk3)
 
-  * models/powerups/				--replaced/unused by tmnt
-  * models/weapons2/				--replaced/unused by tmnt
+  * models/powerups/					--replaced/unused by turtlearena
+  * models/weapons2/					--replaced/unused by turtlearena
   * models/weaphits/
-  * models/weaphits/bfg.md3			--unused by tmnt
-  * models/weaphits/crackle.md3			--unused by tmnt
-  * models/weaphits/boom01.md3			--replaced by tmnt
-  * models/weaphits/ring02.md3			--replaced by tmnt
-  * models/weaphits/bullet.md3			--replaced by tmnt
+  * models/weaphits/bfg.md3			--unused by turtlearena
+  * models/weaphits/crackle.md3			--unused by turtlearena
+  * models/weaphits/boom01.md3		--replaced by turtlearena
+  * models/weaphits/ring02.md3			--replaced by turtlearena
+  * models/weaphits/bullet.md3			--replaced by turtlearena
 
 
 Replaced in base_ioq3ztm
 
-  * TEMP: menu/medals/medal_impressive.tga	--unused by tmnt --Kill two (or more) players with one railgun shot.
-  * TEMP: menu/medals/medal_excellent.tga	--unused by tmnt --Kill two players close together
-  * TEMP: menu/medals/medal_accuracy.tga	--unused by tmnt
-  * TEMP: menu/medals/medal_gauntlet.tga	--unused by tmnt
-  * TEMP: menu/medals/medal_victory.tga		--unused by tmnt
+  * TEMP: menu/medals/medal_impressive.tga	--unused by turtlearena --Kill two (or more) players with one railgun shot.
+  * TEMP: menu/medals/medal_excellent.tga	--unused by turtlearena --Kill two players close together
+  * TEMP: menu/medals/medal_accuracy.tga	--unused by turtlearena
+  * TEMP: menu/medals/medal_gauntlet.tga		--unused by turtlearena
+  * TEMP: menu/medals/medal_victory.tga		--unused by turtlearena
 
 == Demo TA pak0.pk3 ==
 There is (or maybe) more, I didn't delete stuff as I replaced stuff.
 
-  * models/powerups/?  --replaced/unused by tmnt
-  * models/powerups/pop.md3  --Just copy models/misc/telep.md3 and move it so its offset correctly?
+  * models/powerups/?  --replaced/unused by turtlearena
+  * models/powerups/pop.md3 --unused by turtlearena --Just copy models/misc/telep.md3 and move it so its offset correctly?
