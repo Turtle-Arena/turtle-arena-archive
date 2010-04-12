@@ -282,7 +282,7 @@ typedef enum {
 	PERS_RANK,						// player rank or team rank
 	PERS_TEAM,						// player team
 	PERS_SPAWN_COUNT,				// incremented every respawn
-#if !defined TMNTMISC || !defined TMNTWEAPONS || !defined NOTRATEDM
+#if !defined TMNTMISC || !defined NOTRATEDM || !defined TURTLEARENA // WEAPONS
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 #endif
 	PERS_ATTACKER,					// clientnum of last damage inflicter
@@ -295,13 +295,13 @@ typedef enum {
 	PERS_CONTINUES,
 #endif
 	// player awards tracking
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	PERS_IMPRESSIVE_COUNT,			// two railgun hits in a row
 	PERS_EXCELLENT_COUNT,			// two successive kills in a short amount of time
 #endif
 	PERS_DEFEND_COUNT,				// defend awards
 	PERS_ASSIST_COUNT,				// assist awards
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	PERS_GAUNTLET_FRAG_COUNT,		// kills with the guantlet
 #endif
 	PERS_CAPTURES					// captures
@@ -310,17 +310,17 @@ typedef enum {
 
 // entityState_t->eFlags
 #define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#if defined MISSIONPACK && !defined TURTLEARENA // WEAPONS
 #define EF_TICKING			0x00000002		// used to make players play the prox mine ticking sound
 #endif
 #define	EF_TELEPORT_BIT		0x00000004		// toggled every time the origin abruptly changes
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 #define	EF_AWARD_EXCELLENT	0x00000008		// draw an excellent sprite
 #endif
 #define EF_PLAYER_EVENT		0x00000010
 #define	EF_BOUNCE			0x00000010		// for missiles
 #define	EF_BOUNCE_HALF		0x00000020		// for missiles
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 #define	EF_AWARD_GAUNTLET	0x00000040		// draw a gauntlet sprite
 #endif
 #define	EF_NODRAW			0x00000080		// may have an event, but no model (unspawned items)
@@ -336,7 +336,7 @@ typedef enum {
 #define	EF_TALK				0x00001000		// draw a talk balloon
 #define	EF_CONNECTION		0x00002000		// draw a connection trouble sprite
 #define	EF_VOTED			0x00004000		// already cast a vote
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 #define	EF_AWARD_IMPRESSIVE	0x00008000		// draw an impressive sprite
 #endif
 #define	EF_AWARD_DEFEND		0x00010000		// draw a defend sprite
@@ -360,7 +360,7 @@ typedef enum {
 #endif
 
 #ifdef IOQ3ZTM
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // AWARDS
 // Removed EF_AWARD_GAUNTLET, EF_AWARD_IMPRESSIVE, and EF_AWARD_EXCELLENT
 #define EF_AWARD_BITS ( EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP )
 #else
@@ -499,7 +499,7 @@ typedef enum
 } weapontype_t;
 
 // Default weapon if animation.cfg doesn't set one.
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 #define DEFAULT_DEFAULT_WEAPON "WP_FISTS"
 #else
 #define DEFAULT_DEFAULT_WEAPON "WP_GAUNTLET" // "WP_MACHINEGUN"
@@ -513,49 +513,6 @@ typedef enum
 typedef enum {
 	WP_NONE,
 
-#ifdef TMNTWEAPONS
-	// Many of the weapons are based on weapons in TURTLEARENA: Mutant Melee
-	// For players like Hun who don't have a default "weapon" but just use there fists.
-	WP_FISTS, // Invisible weapon, each hand, short range damage.
-
-	// \swords
-    WP_KATANAS, // Two swords.
-    WP_DAISHO, // 1 katana and 1 wakizashi, for Usagi...
-
-	// \sais --short swords?
-    WP_SAIS, // Two sais
-
-	// \nunchucks
-    WP_NUNCHUCKS, // Two nunchucks
-    // WP_CHAINS, // Two metal chains, one in each hand, used like Nunchucks
-
-	// \hammers
-	WP_HAMMER,
-	WP_AXE, // Battle Axe
-	//WP_BAMBOOHAMMER, // Bamboo [hammer type], its in Mutant Melee but I don't plan on adding it.
-
-	// \sword1_both
-	WP_LONGSWORD,
-	WP_BAT,
-	//WP_SPIKEDCLUB, // In Mutant Melee...
-
-    // \bos
-    WP_BO, // One Bo, uses both hands
-	WP_BAMBOO, // Bamboo [bo type]
-
-    // \guns
-	// ZTM: TODO: Finish WP_GUN. It was going to be a chaingun like in Mutant Melee,
-	//                   but I think I will make it a tri-blaster instead~
-	WP_GUN,
-	WP_PLASMAGUN, //WP_ELECTRIC_LAUNCHER, // Federation? or Tri? // Currently just Q3 WP_PLASMAGUN.
-	WP_ROCKET_LAUNCHER, // Tri rocket launcher // AI Same as in Q3...
-	WP_HOMING_LAUNCHER, // Earth Protection Force homing rocket launcher // TURTLEARENA:MM Yellow homing-rocket launcher
-
-    // Leave gappling hook in, because its cool.
-	WP_GRAPPLING_HOOK, // Model will be modified tri-blaster
-
-	WP_NUM_WEAPONS
-#else
 	WP_GAUNTLET,
 	WP_MACHINEGUN,
 	WP_SHOTGUN,
@@ -573,7 +530,6 @@ typedef enum {
 #endif
 
 	WP_NUM_WEAPONS
-#endif // TMNTWEAPONS
 } weapon_t;
 #endif
 
@@ -1001,7 +957,7 @@ typedef enum {
 #endif
 
 //#ifdef MISSIONPACK
-#if !defined TMNTWEAPONS || defined NET_COMPAT
+#if !defined TMNTWEAPSYS || defined NET_COMPAT
 	EV_PROXIMITY_MINE_STICK,
 	EV_PROXIMITY_MINE_TRIGGER,
 #endif
@@ -1763,7 +1719,7 @@ typedef enum {
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	MOD_KAMIKAZE,
 #endif
-#ifndef TMNTWEAPONS // MOD
+#ifndef TMNTWEAPONS // POWERS
 	MOD_JUICED,
 #endif
 #endif

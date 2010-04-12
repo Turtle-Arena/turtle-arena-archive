@@ -387,7 +387,7 @@ void SP_shooter_plasma( gentity_t *ent ) {
 	int weapon;
 
 	weapon = BG_WeaponGroupIndexForName("wp_plasmagun");
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 	if (!weapon) {
 		weapon = BG_WeaponGroupIndexForName("wp_electric_launcher");
 	}
@@ -408,7 +408,7 @@ void SP_shooter_grenade( gentity_t *ent ) {
 	int weapon;
 
 	weapon = BG_WeaponGroupIndexForName("wp_grenade_launcher");
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 	if (!weapon) {
 		weapon = BG_WeaponGroupIndexForName("wp_homing_launcher");
 	}

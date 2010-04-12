@@ -80,7 +80,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_SCRIPT_ARGS 12
 #define MAX_EDITFIELD 256
 
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
 #define ART_FX_BASE			"menu/art/fx_base"
 #define ART_FX_BLUE			"menu/art/fx_blue"
 #define ART_FX_CYAN			"menu/art/fx_cyan"
@@ -310,7 +310,7 @@ typedef struct {
   qboolean fontRegistered;
 
   // player settings
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
 	qhandle_t fxBasePic;
   qhandle_t fxPic[7];
 #endif

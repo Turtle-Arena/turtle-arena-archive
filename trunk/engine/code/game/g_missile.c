@@ -973,11 +973,7 @@ static void ProximityMine_Activate( gentity_t *ent ) {
 	float		r;
 
 	ent->think = ProximityMine_Explode;
-#ifdef TMNTWEAPONS
-	ent->nextthink = level.time + 20000;
-#else
 	ent->nextthink = level.time + g_proxMineTimeout.integer;
-#endif
 
 	ent->takedamage = qtrue;
 	ent->health = 1;
@@ -1006,7 +1002,7 @@ static void ProximityMine_Activate( gentity_t *ent ) {
 	ent->activator = trigger;
 }
 
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 /*
 ================
 ProximityMine_ExplodeOnPlayer
@@ -1281,7 +1277,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 		return;
 	}
-#elif defined MISSIONPACK && !defined TMNTWEAPONS
+#elif defined MISSIONPACK
 	if( ent->s.weapon == WP_PROX_LAUNCHER ) {
 		if( ent->s.pos.trType != TR_GRAVITY ) {
 			return;

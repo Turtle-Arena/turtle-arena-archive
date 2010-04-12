@@ -830,7 +830,7 @@ void UI_NetworkOptionsMenu( void );
 //
 typedef enum {
 	AWARD_ACCURACY,
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	AWARD_IMPRESSIVE,
 	AWARD_EXCELLENT,
 	AWARD_GAUNTLET,

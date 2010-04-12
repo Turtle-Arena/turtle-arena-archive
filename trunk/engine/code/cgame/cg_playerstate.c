@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
-#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
+#ifndef TURTLEARENA // NO_AMMO_WARNINGS
 /*
 ==============
 CG_CheckAmmo
@@ -336,7 +336,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 #else
 	int			highScore, health, armor, reward;
 #endif
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	sfxHandle_t sfx;
 #endif
 
@@ -386,7 +386,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("capture\n");
 	}
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	if (ps->persistant[PERS_IMPRESSIVE_COUNT] != ops->persistant[PERS_IMPRESSIVE_COUNT]) {
 #ifdef MISSIONPACK
 		if (ps->persistant[PERS_IMPRESSIVE_COUNT] == 1) {
@@ -440,7 +440,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("assist\n");
 	}
-#if !defined TMNTMISC || !defined TMNTWEAPONS || !defined NOTRATEDM
+#if !defined TMNTMISC || !defined NOTRATEDM || !defined TURTLEARENA // AWARDS
 	// if any of the player event bits changed
 	if (ps->persistant[PERS_PLAYEREVENTS] != ops->persistant[PERS_PLAYEREVENTS]) {
 #ifndef TMNTMISC
@@ -449,7 +449,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 			trap_S_StartLocalSound( cgs.media.deniedSound, CHAN_ANNOUNCER );
 		} else
 #endif
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD)) {
 			trap_S_StartLocalSound( cgs.media.humiliationSound, CHAN_ANNOUNCER );

@@ -237,7 +237,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 	if ( draw2D || (!cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 	  qhandle_t	icon;
 #ifdef TMNTWEAPSYS
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 		icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].weaponIcon;
 #else
 		icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].ammoIcon;
@@ -251,7 +251,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
   } else if (cg_draw3dIcons.integer) {
   	if ( cent->currentState.weapon &&
 #ifdef TMNTWEAPSYS
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 		cg_weapongroups[ cent->currentState.weapon ].weaponModel
 #else
 		cg_weapongroups[ cent->currentState.weapon ].ammoModel
@@ -261,7 +261,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 #endif
   	) {
 	    VectorClear( angles );
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 		angles[YAW] = 20 * sin( cg.time / 1000.0 );
 
 	  	if (bg_weapongroupinfo[ cent->currentState.weapon ].weapon[0]->weapontype == WT_GUN) {
@@ -287,7 +287,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 #endif
   		CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h,
 #ifdef TMNTWEAPSYS
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 			cg_weapongroups[ cent->currentState.weapon ].weaponModel,
 #else
 			cg_weapongroups[ cent->currentState.weapon ].ammoModel,

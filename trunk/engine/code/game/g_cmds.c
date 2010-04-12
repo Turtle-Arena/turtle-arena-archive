@@ -68,7 +68,7 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
 			cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime)/60000,
 			scoreFlags, g_entities[level.sortedClients[i]].s.powerups, accuracy, 
-#ifdef TMNTWEAPONS // ZTM: FIXME: Completely remove. See postgame
+#ifdef TURTLEARENA // AWARDS // ZTM: FIXME: Completely remove. See postgame
 			0,
 			0,
 			0,
@@ -315,7 +315,7 @@ void Cmd_Give_f (gentity_t *ent)
 	}
 #endif
 
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	if (Q_stricmp(name, "excellent") == 0) {
 		ent->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
 		return;
@@ -1252,7 +1252,7 @@ static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
 		who = g_entities + ent->client->lastkilled_client;
 		if (who->client) {
 			// who is the person I just killed
-#ifndef TMNTWEAPONS // MOD
+#ifndef TURTLEARENA // WEAPONS // MOD
 			if (who->client->lasthurt_mod == MOD_GAUNTLET) {
 				if (!(who->r.svFlags & SVF_BOT)) {
 					G_Voice( ent, who, SAY_TELL, VOICECHAT_KILLGAUNTLET, qfalse );	// and I killed them with a gauntlet

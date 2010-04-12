@@ -126,7 +126,7 @@ vmCvar_t	cg_drawFPS;
 vmCvar_t	cg_drawSnapshot;
 vmCvar_t	cg_draw3dIcons;
 vmCvar_t	cg_drawIcons;
-#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
+#ifndef TURTLEARENA // NO_AMMO_WARNINGS
 vmCvar_t	cg_drawAmmoWarning;
 #endif
 vmCvar_t	cg_drawCrosshair;
@@ -289,7 +289,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
 	{ &cg_drawIcons, "cg_drawIcons", "1", CVAR_ARCHIVE  },
-#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
+#ifndef TURTLEARENA // NO_AMMO_WARNINGS
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
 #endif
 	{ &cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE  },
@@ -439,7 +439,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE},
 	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
 	{ &cg_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // WEAPONS
 	{ &cg_oldRail, "cg_oldRail", "0", CVAR_ARCHIVE},
 	{ &cg_oldRocket, "cg_oldRocket", "1", CVAR_ARCHIVE},
 	{ &cg_oldPlasma, "cg_oldPlasma", "0", CVAR_ARCHIVE},
@@ -820,20 +820,20 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.hitSoundLowArmor = trap_S_RegisterSound( "sound/feedback/hitlo.wav", qfalse );
 #endif
 
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	cgs.media.impressiveSound = trap_S_RegisterSound( "sound/feedback/impressive.wav", qtrue );
 	cgs.media.excellentSound = trap_S_RegisterSound( "sound/feedback/excellent.wav", qtrue );
 #endif
 #ifndef TMNTMISC
 	cgs.media.deniedSound = trap_S_RegisterSound( "sound/feedback/denied.wav", qtrue );
 #endif
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	cgs.media.humiliationSound = trap_S_RegisterSound( "sound/feedback/humiliation.wav", qtrue );
 #endif
 	cgs.media.assistSound = trap_S_RegisterSound( "sound/feedback/assist.wav", qtrue );
 	cgs.media.defendSound = trap_S_RegisterSound( "sound/feedback/defense.wav", qtrue );
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	cgs.media.firstImpressiveSound = trap_S_RegisterSound( "sound/feedback/first_impressive.wav", qtrue );
 	cgs.media.firstExcellentSound = trap_S_RegisterSound( "sound/feedback/first_excellent.wav", qtrue );
 	cgs.media.firstHumiliationSound = trap_S_RegisterSound( "sound/feedback/first_gauntlet.wav", qtrue );
@@ -922,7 +922,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.sfx_plasmaexp = trap_S_RegisterSound ("sound/weapons/plasma/plasmx1a.wav", qfalse);
 #endif
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	cgs.media.sfx_proxexp = trap_S_RegisterSound( "sound/weapons/proxmine/wstbexpl.wav" , qfalse);
 	cgs.media.sfx_nghit = trap_S_RegisterSound( "sound/weapons/nailgun/wnalimpd.wav" , qfalse);
 	cgs.media.sfx_nghitflesh = trap_S_RegisterSound( "sound/weapons/nailgun/wnalimpl.wav" , qfalse);
@@ -943,7 +943,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.youSuckSound = trap_S_RegisterSound( "sound/misc/yousuck.wav", qfalse );
 #endif
 
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	cgs.media.wstbimplSound = trap_S_RegisterSound("sound/weapons/proxmine/wstbimpl.wav", qfalse);
 	cgs.media.wstbimpmSound = trap_S_RegisterSound("sound/weapons/proxmine/wstbimpm.wav", qfalse);
 	cgs.media.wstbimpdSound = trap_S_RegisterSound("sound/weapons/proxmine/wstbimpd.wav", qfalse);
@@ -1282,7 +1282,7 @@ static void CG_RegisterGraphics( void ) {
 #endif
 
 	cgs.media.machinegunBrassModel = trap_R_RegisterModel( "models/weapons2/shells/m_shell.md3" );
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	cgs.media.shotgunBrassModel = trap_R_RegisterModel( "models/weapons2/shells/s_shell.md3" );
 #endif
 
@@ -1310,7 +1310,7 @@ static void CG_RegisterGraphics( void ) {
 #ifndef NOBLOOD
 	cgs.media.bloodExplosionShader = trap_R_RegisterShader( "bloodExplosion" );
 #endif
-#ifdef TMNTWEAPONS // ZTM: FIXME: TMNTWEAPSYS?
+#ifdef TURTLEARENA // WEAPONS // ZTM: FIXME: TMNTWEAPSYS?
 	cgs.media.meleeHit1Shader = trap_R_RegisterShader( "meleeHit1" );
 	cgs.media.meleeHit2Shader = trap_R_RegisterShader( "meleeHit2" );
 	cgs.media.meleeHit3Shader = trap_R_RegisterShader( "meleeHit3" );
@@ -1368,7 +1368,7 @@ static void CG_RegisterGraphics( void ) {
 #else
 	cgs.media.invulnerabilityPowerupModel = trap_R_RegisterModel( "models/powerups/shield/shield.md3" );
 #endif
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	cgs.media.medalImpressive = trap_R_RegisterShaderNoMip( "medal_impressive" );
 	cgs.media.medalExcellent = trap_R_RegisterShaderNoMip( "medal_excellent" );
 	cgs.media.medalGauntlet = trap_R_RegisterShaderNoMip( "medal_gauntlet" );
@@ -2264,7 +2264,7 @@ void CG_AssetCache( void ) {
 	//Assets.background = trap_R_RegisterShaderNoMip( ASSET_BACKGROUND );
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
 	cgDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
 	cgDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
 	cgDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	cgDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );

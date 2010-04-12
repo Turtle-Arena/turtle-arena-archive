@@ -75,13 +75,13 @@ SINGLE PLAYER LEVEL SELECT MENU
 
 #define PLAYER_Y			314
 #define AWARDS_Y			(PLAYER_Y + 26)
-#if defined IOQ3ZTM && !defined TMNTSP
-#ifdef TMNTWEAPONS
+#ifndef TMNTSP
+#ifdef TURTLEARENA // AWARDS
 #define MAX_UI_AWARDS		3
 #else
 #define MAX_UI_AWARDS		6
-#endif // TMNTWEAPONS
-#endif // IOQ3ZTM
+#endif
+#endif
 
 
 typedef struct {
@@ -252,7 +252,7 @@ static void UI_SPLevelMenu_SetMenuArena( int n, int level, const char *arenaInfo
 	Q_strncpyz( map, Info_ValueForKey( arenaInfo, "map" ), sizeof(map) );
 
 	Q_strncpyz( levelMenuInfo.levelNames[n], map, sizeof(levelMenuInfo.levelNames[n]) );
-#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK // ZTM: Disabled to be constant.
+#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK // ZTM: Disabled to be consistant.
 	Q_strupr( levelMenuInfo.levelNames[n] );
 #endif
 
@@ -614,11 +614,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	// draw player award levels
 	y = AWARDS_Y;
 	i = 0;
-#ifdef IOQ3ZTM
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
-#else
-	for( n = 0; n < 6; n++ )
-#endif
 	{
 		level = levelMenuInfo.awardLevels[n];
 		if( level > 0 ) {
@@ -755,11 +751,7 @@ void UI_SPLevelMenu_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_CUSTOM1 );
 
 #ifndef TMNTSP
-#ifdef IOQ3ZTM
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
-#else
-	for( n = 0; n < 6; n++ )
-#endif
 	{
 		trap_R_RegisterShaderNoMip( ui_medalPicNames[n] );
 		levelMenuInfo.awardSounds[n] = trap_S_RegisterSound( ui_medalSounds[n], qfalse );
@@ -901,11 +893,7 @@ static void UI_SPLevelMenu_Init( void ) {
 #endif
 
 #ifndef TMNTSP
-#ifdef IOQ3ZTM
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
-#else
-	for( n = 0; n < 6; n++ )
-#endif
 	{
 		levelMenuInfo.awardLevels[n] = UI_GetAwardLevel( n );
 	}
@@ -913,11 +901,7 @@ static void UI_SPLevelMenu_Init( void ) {
 
 	y = AWARDS_Y;
 	count = 0;
-#ifdef IOQ3ZTM
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
-#else
-	for( n = 0; n < 6; n++ )
-#endif
 	{
 		if( levelMenuInfo.awardLevels[n] ) {
 			if( count & 1 ) {

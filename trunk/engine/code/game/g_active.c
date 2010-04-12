@@ -207,7 +207,7 @@ G_SetClientSound
 ===============
 */
 void G_SetClientSound( gentity_t *ent ) {
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#if defined MISSIONPACK && !defined TURTLEARENA // WEAPONS
 	if( ent->s.eFlags & EF_TICKING ) {
 		ent->client->ps.loopSound = G_SoundIndex( "sound/weapons/proxmine/wstbtick.wav");
 	}

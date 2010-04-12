@@ -30,8 +30,8 @@ SINGLE PLAYER POSTGAME MENU
 
 #include "ui_local.h"
 
-#if defined IOQ3ZTM && !defined TMNTSP
-#ifdef TMNTWEAPONS
+#ifndef TMNTSP
+#ifdef TURTLEARENA // AWARDS
 #define MAX_UI_AWARDS		3
 #else
 #define MAX_UI_AWARDS		6
@@ -81,15 +81,9 @@ typedef struct {
 	int				won;
 #ifndef TMNTSP
 	int				numAwards;
-#ifdef IOQ3ZTM
 	int				awardsEarned[MAX_UI_AWARDS];
 	int				awardsLevels[MAX_UI_AWARDS];
 	qboolean		playedSound[MAX_UI_AWARDS];
-#else
-	int				awardsEarned[6];
-	int				awardsLevels[6];
-	qboolean		playedSound[6];
-#endif
 #endif
 	int				lastTier;
 	sfxHandle_t		winnerSound;
@@ -100,13 +94,13 @@ static char					arenainfo[MAX_INFO_VALUE];
 
 #ifndef TMNTSP
 char	*ui_medalNames[] = {"Accuracy",
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 "Impressive", "Excellent", "Gauntlet",
 #endif
 "Frags", "Perfect"};
 char	*ui_medalPicNames[] = {
 	"menu/medals/medal_accuracy",
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	"menu/medals/medal_impressive",
 	"menu/medals/medal_excellent",
 	"menu/medals/medal_gauntlet",
@@ -116,7 +110,7 @@ char	*ui_medalPicNames[] = {
 };
 char	*ui_medalSounds[] = {
 	"sound/feedback/accuracy.wav",
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	"sound/feedback/impressive_a.wav",
 	"sound/feedback/excellent_a.wav",
 	"sound/feedback/gauntlet.wav",
@@ -250,7 +244,7 @@ static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
 
 
 #ifndef TMNTSP
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // AWARDS
 static int medalLocations[MAX_UI_AWARDS] = {144, 32, 560};
 #else
 static int medalLocations[6] = {144, 448, 88, 504, 32, 560};
@@ -473,11 +467,7 @@ void UI_SPPostgameMenu_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_NEXT0 );
 	trap_R_RegisterShaderNoMip( ART_NEXT1 );
 #ifndef TMNTSP
-#ifdef IOQ3ZTM
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
-#else
-	for( n = 0; n < 6; n++ )
-#endif
 	{
 		trap_R_RegisterShaderNoMip( ui_medalPicNames[n] );
 		trap_S_RegisterSound( ui_medalSounds[n], qfalse );
@@ -592,11 +582,7 @@ void UI_SPPostgameMenu_f( void ) {
 #endif
 	const char	*arena;
 #ifndef TMNTSP
-#ifdef IOQ3ZTM
 	int			awardValues[MAX_UI_AWARDS];
-#else
-	int			awardValues[6];
-#endif
 #endif
 	char		map[MAX_QPATH];
 	char		info[MAX_INFO_STRING];
@@ -639,7 +625,7 @@ void UI_SPPostgameMenu_f( void ) {
 #ifndef TMNTSP
 	// process award stats and prepare presentation data
 	awardValues[AWARD_ACCURACY] = atoi( UI_Argv( 3 ) );
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // AWARDS
 	// ZTM: TODO: I was lazy at removal, so 0 is passed as the AWARD_IMPRESSIVE, etc.
 #else
 	awardValues[AWARD_IMPRESSIVE] = atoi( UI_Argv( 4 ) );
@@ -658,7 +644,7 @@ void UI_SPPostgameMenu_f( void ) {
 		postgameMenuInfo.numAwards++;
 	}
 
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	if( awardValues[AWARD_IMPRESSIVE] ) {
 		UI_LogAwardData( AWARD_IMPRESSIVE, awardValues[AWARD_IMPRESSIVE] );
 		postgameMenuInfo.awardsEarned[postgameMenuInfo.numAwards] = AWARD_IMPRESSIVE;

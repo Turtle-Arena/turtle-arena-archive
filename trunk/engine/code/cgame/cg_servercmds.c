@@ -1054,7 +1054,7 @@ void CG_VoiceChat( int mode ) {
 	if (cg_noTaunt.integer != 0) {
 		if (!strcmp(cmd, VOICECHAT_KILLINSULT)  || !strcmp(cmd, VOICECHAT_TAUNT) ||
 			!strcmp(cmd, VOICECHAT_DEATHINSULT) ||
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 			!strcmp(cmd, VOICECHAT_KILLGAUNTLET) ||
 #endif
 			!strcmp(cmd, VOICECHAT_PRAISE)) {

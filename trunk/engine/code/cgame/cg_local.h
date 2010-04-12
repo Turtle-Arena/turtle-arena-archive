@@ -564,7 +564,7 @@ typedef struct weaponGroupInfo_s {
 	vec3_t			weaponMidpoint;		// so it will rotate centered instead of by tag
 
 	qhandle_t		weaponIcon;
-#ifdef TMNTWEAPONS
+#ifdef TURTLEARENA // NOAMMO
 	qhandle_t		weaponModel; // Pickup model, only used by new UI.
 #else
 	qhandle_t		ammoIcon;
@@ -787,7 +787,7 @@ typedef struct {
 	char		centerPrint[1024];
 	int			centerPrintLines;
 
-#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
+#ifndef TURTLEARENA // NO_AMMO_WARNINGS
 	// low ammo warning state
 	int			lowAmmoWarning;		// 1 = low, 2 = empty
 #endif
@@ -990,7 +990,7 @@ typedef struct {
 #endif
 
 	qhandle_t	machinegunBrassModel;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	qhandle_t	shotgunBrassModel;
 #endif
 
@@ -1145,7 +1145,7 @@ typedef struct {
 	qhandle_t	scoreboardTime;
 
 	// medals shown during gameplay
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	qhandle_t	medalImpressive;
 	qhandle_t	medalExcellent;
 	qhandle_t	medalGauntlet;
@@ -1178,7 +1178,7 @@ typedef struct {
 	sfxHandle_t	sfx_rockexp;
 	sfxHandle_t	sfx_plasmaexp;
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	sfxHandle_t	sfx_proxexp;
 	sfxHandle_t	sfx_nghit;
 	sfxHandle_t	sfx_nghitflesh;
@@ -1243,19 +1243,19 @@ typedef struct {
 	sfxHandle_t hitSoundLowArmor;
 #endif
 	sfxHandle_t hitTeamSound;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	sfxHandle_t impressiveSound;
 	sfxHandle_t excellentSound;
 #endif
 #ifndef TMNTMISC
 	sfxHandle_t deniedSound;
 #endif
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	sfxHandle_t humiliationSound;
 #endif
 	sfxHandle_t assistSound;
 	sfxHandle_t defendSound;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 	sfxHandle_t firstImpressiveSound;
 	sfxHandle_t firstExcellentSound;
 	sfxHandle_t firstHumiliationSound;
@@ -1349,7 +1349,7 @@ typedef struct {
 	sfxHandle_t	hgrenb1aSound;
 	sfxHandle_t	hgrenb2aSound;
 #endif
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	sfxHandle_t	wstbimplSound;
 	sfxHandle_t	wstbimpmSound;
 	sfxHandle_t	wstbimpdSound;
@@ -1497,7 +1497,7 @@ extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_draw3dIcons;
 extern	vmCvar_t		cg_drawIcons;
-#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
+#ifndef TURTLEARENA // NO_AMMO_WARNINGS
 extern	vmCvar_t		cg_drawAmmoWarning;
 #endif
 extern	vmCvar_t		cg_drawCrosshair;

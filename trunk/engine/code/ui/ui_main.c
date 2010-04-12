@@ -148,7 +148,7 @@ static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community,
 #endif
 #endif
 
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
 static int gamecodetoui[] = {4,2,3,0,5,1,6};
 static int uitogamecode[] = {4,6,2,3,1,5,7};
 #endif
@@ -248,7 +248,7 @@ void AssetCache( void ) {
 	//Assets.background = trap_R_RegisterShaderNoMip( ASSET_BACKGROUND );
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
 	uiInfo.uiDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
 	uiInfo.uiDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
 	uiInfo.uiDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	uiInfo.uiDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
@@ -1233,7 +1233,7 @@ static void UI_DrawTeamMember(rectDef_t *rect, float scale, vec4_t color, qboole
   Text_Paint(rect->x, rect->y, scale, color, text, 0, 0, textStyle);
 }
 
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
 static void UI_DrawEffects(rectDef_t *rect, float scale, vec4_t color) {
 	UI_DrawHandlePic( rect->x, rect->y - 14, 128, 8, uiInfo.uiDC.Assets.fxBasePic );
 	UI_DrawHandlePic( rect->x + uiInfo.effectsColor * 16 + 8, rect->y - 16, 16, 12, uiInfo.uiDC.Assets.fxPic[uiInfo.effectsColor] );
@@ -2052,7 +2052,7 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
       UI_DrawHandicap(&rect, scale, color, textStyle);
       break;
     case UI_EFFECTS:
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
       UI_DrawEffects(&rect, scale, color);
 #endif
       break;
@@ -2340,7 +2340,7 @@ static qboolean UI_Handicap_HandleKey(int flags, float *special, int key) {
   return qfalse;
 }
 
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
 static qboolean UI_Effects_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 
@@ -2750,7 +2750,7 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, 
       return UI_Handicap_HandleKey(flags, special, key);
       break;
     case UI_EFFECTS:
-#ifdef TMNTWEAPONS // NO_COLOR_BAR
+#ifdef TURTLEARENA // NO_COLOR_BAR
       return qfalse;
 #else
       return UI_Effects_HandleKey(flags, special, key);
@@ -5322,7 +5322,7 @@ void _UI_Init( qboolean inGameLoad ) {
 	UI_LoadBots();
 
 	// sets defaults for ui temp cvars
-#ifndef TMNTWEAPONS // NO_COLOR_BAR
+#ifndef TURTLEARENA // NO_COLOR_BAR
 	uiInfo.effectsColor = gamecodetoui[(int)trap_Cvar_VariableValue("color1")-1];
 #endif
 	uiInfo.currentCrosshair = (int)trap_Cvar_VariableValue("cg_drawCrosshair");
@@ -5858,7 +5858,7 @@ vmCvar_t	ui_scoreExcellents;
 vmCvar_t	ui_scoreCaptures;
 vmCvar_t	ui_scoreDefends;
 vmCvar_t	ui_scoreAssists;
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 vmCvar_t	ui_scoreGauntlets;
 #endif
 vmCvar_t	ui_scoreScore;
@@ -6012,7 +6012,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_scoreCaptures, "ui_scoreCaptures", "0", CVAR_ARCHIVE},
 	{ &ui_scoreDefends, "ui_scoreDefends", "0", CVAR_ARCHIVE},
 	{ &ui_scoreAssists, "ui_scoreAssists", "0", CVAR_ARCHIVE},
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // WEAPONS
 	{ &ui_scoreGauntlets, "ui_scoreGauntlets", "0",CVAR_ARCHIVE},
 #endif
 	{ &ui_scoreScore, "ui_scoreScore", "0", CVAR_ARCHIVE},

@@ -104,6 +104,10 @@ Weapons (and attacking)
 
   * TODO: Have bots not attack players with PW_FLASHING
 
+  * TODO (STARTED): Marge TMNTWEAPONS with other defines, like TURTLEARENA and TMNTWEAPSYS
+
+  * TODO: Remarge the two version of CG_MissileHitWall
+
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
     * (NiGHTS: Journey of Dreams) Move camera if holding 'z' and move analog stick, can't look around while moving

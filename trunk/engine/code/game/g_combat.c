@@ -541,7 +541,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (self->client && self->client->hook) {
 		Weapon_HookFree(self->client->hook);
 	}
-#if defined MISSIONPACK && !defined TMNTWEAPONS
+#if defined MISSIONPACK && !defined TURTLEARENA // WEAPONS
 	if ((self->client->ps.eFlags & EF_TICKING) && self->activator) {
 		self->client->ps.eFlags &= ~EF_TICKING;
 		self->activator->think = G_FreeEntity;
@@ -657,7 +657,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			AddScore( attacker, self->r.currentOrigin, 1 );
 #endif
 
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 			if( meansOfDeath == MOD_GAUNTLET ) {
 				
 				// play humiliation on player
@@ -1246,7 +1246,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// if the attacker was on the same team
 #ifdef MISSIONPACK
 		if (
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // POWERS
 			mod != MOD_JUICED &&
 #endif
 			targ != attacker && !(dflags & DAMAGE_NO_TEAM_PROTECTION) && OnSameTeam (targ, attacker)  )

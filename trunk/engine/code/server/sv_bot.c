@@ -500,7 +500,7 @@ void SV_BotInitCvars(void) {
 	Cvar_Get("bot_nochat", "0", 0);						//disable chats
 	Cvar_Get("bot_pause", "0", CVAR_CHEAT);				//pause the bots thinking
 	Cvar_Get("bot_report", "0", CVAR_CHEAT);			//get a full report in ctf
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	Cvar_Get("bot_rocketjump", "1", 0);					//enable rocket jumping
 #endif
 #ifdef TMNTMISC

@@ -45,7 +45,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CHARACTERISTIC_REACTIONTIME					6	//float [0, 5]
 //accuracy when aiming
 #define CHARACTERISTIC_AIM_ACCURACY					7	//float [0, 1]
-#ifndef TMNTWEAPONS // BOTCODE
+#ifndef TURTLEARENA // WEAPONS
 //weapon specific aim accuracy
 #define CHARACTERISTIC_AIM_ACCURACY_MACHINEGUN		8	//float [0, 1]
 #define CHARACTERISTIC_AIM_ACCURACY_SHOTGUN			9	//float [0, 1]
@@ -63,7 +63,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // >  0.5 && <= 1.0 = prediction shots when enemy is not visible
 // >  0.6 && <= 1.0 = splash damage by shooting nearby geometry
 
-#ifdef TMNTWEAPONS // BOTCODE
+#ifdef TURTLEARENA // WEAPONS
 #define CHARACTERISTIC_AIM_SKILL					8	//float [0, 1]
 #else
 #define CHARACTERISTIC_AIM_SKILL					16	//float [0, 1]
@@ -76,7 +76,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //========================================================
 //chat
 //========================================================
-#ifdef TMNTWEAPONS // BOTCODE
+#ifdef TURTLEARENA // WEAPONS
 // ZTM: Why can't this be a enum?...
 //    OK it turns out that THIS file is used in pak0.pk3/botfiles/chars.h and the
 //    bot lib supports defines, but not enums?
@@ -146,7 +146,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // NEW TURTLE ARENA CHARACTERISTICS WILL GO HERE.
 
-#else // !TMNTWEAPONS =============== !!!!!!END OF RENUMBER!!!!!!! ===========
+#else // !TURTLEARENA =============== !!!!!!END OF RENUMBER!!!!!!! ===========
 
 
 //file with chats
@@ -213,5 +213,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CHARACTERISTIC_ALERTNESS					46	//float [0, 1]
 //how much the bot fires it's weapon
 #define CHARACTERISTIC_FIRETHROTTLE					47	//float [0, 1]
-#endif // TMNTWEAPONS // BOTCODE
+#endif // TURTLEARENA // WEAPONS
 
