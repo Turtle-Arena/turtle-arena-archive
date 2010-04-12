@@ -144,9 +144,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //how much the bot fires it's weapon
 #define CHARACTERISTIC_FIRETHROTTLE					35	//float [0, 1]
 
-// NEW TMNT CHARACTERISTICS WILL GO HERE.
+// NEW TURTLE ARENA CHARACTERISTICS WILL GO HERE.
 
-#else // !TMNTWEAPON =============== !!!!!!END OF RENUMBER!!!!!!! ===========
+#else // !TMNTWEAPONS =============== !!!!!!END OF RENUMBER!!!!!!! ===========
 
 
 //file with chats

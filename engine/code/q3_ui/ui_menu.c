@@ -43,7 +43,7 @@ MAIN MENU
 #endif
 #define ID_EXIT					17
 
-#ifdef TMNT // BANNER_IMAGE
+#ifdef TURTLEARENA // BANNER_IMAGE
 #define ART_BANNER_IMAGE				"menu/art/titlebanner"
 #else
 #define MAIN_BANNER_MODEL				"models/mapobjects/banner/banner5.md3"
@@ -54,7 +54,7 @@ MAIN MENU
 typedef struct {
 	menuframework_s	menu;
 
-#ifdef TMNT // BANNER_IMAGE
+#ifdef TURTLEARENA // BANNER_IMAGE
 	menubitmap_s	banner_image;
 #endif
 	menutext_s		singleplayer;
@@ -68,7 +68,7 @@ typedef struct {
 #endif
 	menutext_s		exit;
 
-#ifndef TMNT // BANNER_IMAGE
+#ifndef TURTLEARENA // BANNER_IMAGE
 	qhandle_t		bannerModel;
 #endif
 } mainmenu_t;
@@ -83,7 +83,7 @@ typedef struct {
 #else
 	char errorMessage[4096];
 #endif
-#ifdef TMNT // BANNER_IMAGE
+#ifdef TURTLEARENA // BANNER_IMAGE
 	menubitmap_s	banner_image;
 #endif
 } errorMessage_t;
@@ -168,7 +168,7 @@ MainMenu_Cache
 ===============
 */
 void MainMenu_Cache( void ) {
-#ifndef TMNT // BANNER_IMAGE
+#ifndef TURTLEARENA // BANNER_IMAGE
 	s_main.bannerModel = trap_R_RegisterModel( MAIN_BANNER_MODEL );
 #endif
 }
@@ -188,7 +188,7 @@ TTimo: this function is common to the main menu and errorMessage menu
 */
 
 static void Main_MenuDraw( void ) {
-#ifndef TMNT // BANNER_IMAGE
+#ifndef TURTLEARENA // BANNER_IMAGE
 	refdef_t		refdef;
 	refEntity_t		ent;
 	vec3_t			origin;
@@ -196,11 +196,11 @@ static void Main_MenuDraw( void ) {
 	float			adjust;
 	float			x, y, w, h;
 #endif
-#ifndef TMNT
+#ifndef TURTLEARENA
 	vec4_t			color = {0.5, 0, 0, 1};
 #endif
 
-#ifndef TMNT // BANNER_IMAGE
+#ifndef TURTLEARENA // BANNER_IMAGE
 	// setup the refdef
 
 	memset( &refdef, 0, sizeof( refdef ) );
@@ -258,7 +258,7 @@ static void Main_MenuDraw( void ) {
 #endif
 	if (strlen(s_errorMessage.errorMessage))
 	{
-#ifdef TMNT // BANNER_IMAGE
+#ifdef TURTLEARENA // BANNER_IMAGE
 		// standard menu drawing
 		Menu_Draw( &s_errorMessage.menu );
 
@@ -276,9 +276,7 @@ static void Main_MenuDraw( void ) {
 		Menu_Draw( &s_main.menu );		
 	}
 
-#ifdef TMNT // Legal stuff...
-	//UI_DrawString( 320, 450, "This is a fangame, TMNT is used without permission. TMNT(c) Viacom.", UI_CENTER|UI_SMALLFONT, color );
-#else
+#ifndef TURTLEARENA // Legal stuff...
 	if (uis.demoversion) {
 		UI_DrawProportionalString( 320, 372, "DEMO      FOR MATURE AUDIENCES      DEMO", UI_CENTER|UI_SMALLFONT, color );
 		UI_DrawString( 320, 400, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );
@@ -368,7 +366,7 @@ void UI_MainMenu( void ) {
 		s_errorMessage.menu.noEscape = qtrue;
 #endif
 
-#ifdef TMNT // BANNER_IMAGE
+#ifdef TURTLEARENA // BANNER_IMAGE
 		s_errorMessage.banner_image.generic.type				= MTYPE_BITMAP;
 		s_errorMessage.banner_image.generic.name				= ART_BANNER_IMAGE;
 		s_errorMessage.banner_image.generic.flags				= QMF_CENTER_JUSTIFY|QMF_INACTIVE;
@@ -402,7 +400,7 @@ void UI_MainMenu( void ) {
 	s_main.menu.noEscape = qtrue;
 #endif
 
-#ifdef TMNT // BANNER_IMAGE
+#ifdef TURTLEARENA // BANNER_IMAGE
 	s_main.banner_image.generic.type				= MTYPE_BITMAP;
 	s_main.banner_image.generic.name				= ART_BANNER_IMAGE;
 	s_main.banner_image.generic.flags				= QMF_CENTER_JUSTIFY|QMF_INACTIVE;
@@ -517,7 +515,7 @@ void UI_MainMenu( void ) {
 	s_main.exit.color						= text_big_color;
 	s_main.exit.style						= style;
 
-#ifdef TMNT // BANNER_IMAGE
+#ifdef TURTLEARENA // BANNER_IMAGE
 	Menu_AddItem( &s_main.menu,	&s_main.banner_image );
 #endif
 	Menu_AddItem( &s_main.menu,	&s_main.singleplayer );

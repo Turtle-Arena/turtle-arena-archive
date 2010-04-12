@@ -1763,7 +1763,7 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 		offence = qtrue;
 	}
 #endif
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	if (!oldinventory[INVENTORY_INVUL] && bs->inventory[INVENTORY_INVUL] >= 1) {
 		offence = qtrue;
 	}
@@ -1863,7 +1863,7 @@ void BotUpdateInventory(bot_state_t *bs) {
 	int oldinventory[MAX_ITEMS];
 
 	memcpy(oldinventory, bs->inventory, sizeof(oldinventory));
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	//armor
 	bs->inventory[INVENTORY_ARMOR] = bs->cur_ps.stats[STAT_ARMOR];
 #endif
@@ -2009,9 +2009,9 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_KAMIKAZE] = bs->cur_ps.holdable[HI_KAMIKAZE] != 0;
 #endif
 	bs->inventory[INVENTORY_PORTAL] = bs->cur_ps.holdable[HI_PORTAL] != 0;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	bs->inventory[INVENTORY_INVULNERABILITY] = bs->cur_ps.holdable[HI_INVULNERABILITY] != 0;
-#endif // TMNT // POWERS
+#endif // TURTLEARENA // POWERS
 #endif
 #else
 	bs->inventory[INVENTORY_TELEPORTER] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_TELEPORTER;
@@ -2021,24 +2021,24 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_KAMIKAZE] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_KAMIKAZE;
 #endif
 	bs->inventory[INVENTORY_PORTAL] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_PORTAL;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	bs->inventory[INVENTORY_INVULNERABILITY] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_INVULNERABILITY;
-#endif // TMNT // POWERS
+#endif // TURTLEARENA // POWERS
 #endif
 #endif
 	bs->inventory[INVENTORY_QUAD] = bs->cur_ps.powerups[PW_QUAD] != 0;
 	bs->inventory[INVENTORY_ENVIRONMENTSUIT] = bs->cur_ps.powerups[PW_BATTLESUIT] != 0;
 	bs->inventory[INVENTORY_HASTE] = bs->cur_ps.powerups[PW_HASTE] != 0;
 	bs->inventory[INVENTORY_INVISIBILITY] = bs->cur_ps.powerups[PW_INVIS] != 0;
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	bs->inventory[INVENTORY_REGEN] = bs->cur_ps.powerups[PW_REGEN] != 0;
 #endif
 	bs->inventory[INVENTORY_FLIGHT] = bs->cur_ps.powerups[PW_FLIGHT] != 0;
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	bs->inventory[INVENTORY_INVUL] = bs->cur_ps.powerups[PW_INVUL] != 0;
 #endif
 #ifdef MISSIONPACK
-#ifdef TMNT
+#ifdef TURTLEARENA
 	bs->inventory[INVENTORY_PERSISTANT_POWER] = (bs->cur_ps.stats[STAT_PERSISTANT_POWERUP] != 0);
 #endif
 	bs->inventory[INVENTORY_SCOUT] = bs->cur_ps.stats[STAT_PERSISTANT_POWERUP] == MODELINDEX_SCOUT;
@@ -2214,7 +2214,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 }
 #endif
 
-#ifndef TMNT // POWERS // INVENTORY_INVULNERABILITY is disabled
+#ifndef TURTLEARENA // POWERS // INVENTORY_INVULNERABILITY is disabled
 /*
 ==================
 BotUseInvulnerability
@@ -2340,7 +2340,7 @@ void BotUseInvulnerability(bot_state_t *bs) {
 	}
 #endif
 }
-#endif // TMNT // POWERS
+#endif // TURTLEARENA // POWERS
 #endif
 
 /*
@@ -2382,7 +2382,7 @@ void BotBattleUseItems(bot_state_t *bs) {
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	BotUseKamikaze(bs);
 #endif
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	BotUseInvulnerability(bs);
 #endif
 #endif
@@ -2574,7 +2574,7 @@ float BotAggression(bot_state_t *bs) {
 	}
 	//if the enemy is located way higher than the bot
 	if (bs->inventory[ENEMY_HEIGHT] > 200) return 0;
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 	//if the bot is low on health
 	if (bs->inventory[INVENTORY_HEALTH] < 50) return 0;
 #else
@@ -2902,7 +2902,7 @@ int BotCanAndWantsToRocketJump(bot_state_t *bs) {
 	if (bs->inventory[INVENTORY_ROCKETS] < 3) return qfalse;
 	//never rocket jump with the Quad
 	if (bs->inventory[INVENTORY_QUAD]) return qfalse;
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 	//if low on health
 	if (bs->inventory[INVENTORY_HEALTH] < 75) return qfalse;
 #else
@@ -2936,7 +2936,7 @@ int BotHasPersistantPowerupAndWeapon(bot_state_t *bs) {
 		return qfalse;
 	}
 #endif
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 	//if the bot is low on health
 	if (bs->inventory[INVENTORY_HEALTH] < 70) return qfalse;
 #else

@@ -463,7 +463,7 @@ float *CG_TeamColor( int team ) {
 CG_GetColorForHealth
 =================
 */
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 void CG_GetColorForHealth( int health, vec4_t hcolor ) {
 #else
 void CG_GetColorForHealth( int health, int armor, vec4_t hcolor ) {
@@ -478,7 +478,7 @@ void CG_GetColorForHealth( int health, int armor, vec4_t hcolor ) {
 		hcolor[3] = 1;
 		return;
 	}
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	count = armor;
 	max = health * ARMOR_PROTECTION / ( 1.0 - ARMOR_PROTECTION );
 	if ( max < count ) {
@@ -514,7 +514,7 @@ CG_ColorForHealth
 */
 void CG_ColorForHealth( vec4_t hcolor ) {
 
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], hcolor );
 #else
 	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], 
@@ -901,7 +901,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[3] = color[3];
 		UI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
 
-#ifdef TMNT // ZTM: This is like the UI Main menu text drawing, but its not.
+#ifdef TURTLEARENA // ZTM: This is like the UI Main menu text drawing, but its not.
         // ZTM: hack-ish thing to do?...
         // text_color_highlight is UI local...
 		drawcolor[0] = 1.00f;//text_color_highlight[0];

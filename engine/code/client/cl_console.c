@@ -651,7 +651,7 @@ void Con_DrawSolidConsole( float frac ) {
 		SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
 	}
 
-#ifdef TMNT // Console
+#ifdef TURTLEARENA // Console edge color
 	color[0] = 0;
 	color[1] = 1;
 	color[2] = 0;
@@ -667,7 +667,7 @@ void Con_DrawSolidConsole( float frac ) {
 
 	// draw the version number
 
-#ifdef TMNT // Console
+#ifdef TURTLEARENA // Console edge color
 	re.SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
 #else
 	re.SetColor( g_color_table[ColorIndex(COLOR_RED)] );

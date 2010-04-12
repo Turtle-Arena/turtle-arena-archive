@@ -3157,7 +3157,7 @@ void CL_Init( void ) {
 	cl_maxpackets = Cvar_Get ("cl_maxpackets", "30", CVAR_ARCHIVE );
 	cl_packetdup = Cvar_Get ("cl_packetdup", "1", CVAR_ARCHIVE );
 
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE);
 #endif
 	cl_sensitivity = Cvar_Get ("sensitivity", "5", CVAR_ARCHIVE);
@@ -3229,7 +3229,7 @@ void CL_Init( void ) {
 	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("rate", "25000", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("snaps", "20", CVAR_USERINFO | CVAR_ARCHIVE );
-#ifdef TMNT
+#ifdef TURTLEARENA
 	// DEFAULT_PLAYER
 #ifdef TMNTSP // SPMODEL
 	Cvar_Get ("spmodel", "raph", CVAR_USERINFO | CVAR_ROM );

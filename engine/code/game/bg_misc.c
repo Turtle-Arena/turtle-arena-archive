@@ -73,7 +73,7 @@ gitem_t	bg_itemlist[] =
 /* sounds */ ""
 	},	// leave index 0 alone
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	//
 	// ARMOR
 	//
@@ -942,7 +942,7 @@ gitem_t	bg_itemlist[] =
 /*QUAKED item_quad (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		"item_strength",
 		"sound/items/powerup_pickup.ogg",
         { "models/powerups/instant/strength.md3",
@@ -968,7 +968,7 @@ gitem_t	bg_itemlist[] =
 /*QUAKED item_enviro (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		"item_defense",
 		"sound/items/powerup_pickup.ogg",
         { "models/powerups/instant/defense.md3",
@@ -994,7 +994,7 @@ gitem_t	bg_itemlist[] =
 /*QUAKED item_haste (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		"item_speed",
 		"sound/items/powerup_pickup.ogg",
         { "models/powerups/instant/speed.md3",
@@ -1021,7 +1021,7 @@ gitem_t	bg_itemlist[] =
 */
 	{
 		"item_invis",
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		"sound/items/powerup_pickup.ogg",
 #else
 		"sound/items/invisibility.wav",
@@ -1038,7 +1038,7 @@ gitem_t	bg_itemlist[] =
 /* sounds */ ""
 	},
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 /*QUAKED item_regen (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -1061,7 +1061,7 @@ gitem_t	bg_itemlist[] =
 */
 	{
 		"item_flight",
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		"sound/items/powerup_pickup.ogg",
 #else
 		"sound/items/flight.wav",
@@ -1078,7 +1078,7 @@ gitem_t	bg_itemlist[] =
 /* sounds */ "sound/items/flight.wav"
 	},
 
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 /*QUAKED item_invul (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -1191,7 +1191,7 @@ Only in CTF games
 /* sounds */ ""
 	},
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 /*QUAKED holdable_invulnerability (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -1272,7 +1272,7 @@ Only in CTF games
 */
 	{
 		"item_scout",
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		"sound/items/powerup_pickup.ogg",
 #else
 		"sound/items/scout.wav",
@@ -1292,7 +1292,7 @@ Only in CTF games
 */
 	{
 		"item_guard",
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		"sound/items/powerup_pickup.ogg",
 #else
 		"sound/items/guard.wav",
@@ -1312,7 +1312,7 @@ Only in CTF games
 */
 	{
 		"item_doubler",
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		"sound/items/powerup_pickup.ogg",
 #else
 		"sound/items/doubler.wav",
@@ -1332,7 +1332,7 @@ Only in CTF games
 */
 	{
 		"item_ammoregen",
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		"sound/items/powerup_pickup.ogg",
 #else
 		"sound/items/ammoregen.wav",
@@ -1541,8 +1541,8 @@ playerAnimationDef_t playerAnimationDefs[] = {
 	ANIMDEF(TORSO_AFFIRMATIVE),
 	ANIMDEF(TORSO_NEGATIVE),
 
-	// TMNT
-#ifdef TMNTPLAYERS // New TMNT player animations
+	// TURTLEARENA
+#ifdef TMNTPLAYERS // New TURTLEARENA player animations
 	// Place default weapons somewhere on there person while there not used.
 	ANIMDEF(TORSO_PUTDEFAULT_BOTH),
 	ANIMDEF(TORSO_PUTDEFAULT_PRIMARY),
@@ -4327,7 +4327,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #endif
 		return qtrue;
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 	case IT_ARMOR:
 #ifdef MISSIONPACK
 #ifdef TMNTWEAPSYS
@@ -4694,7 +4694,7 @@ char *eventnames[] = {
 	"EV_POWERUP_QUAD",
 	"EV_POWERUP_BATTLESUIT",
 	"EV_POWERUP_REGEN",
-#if !defined TMNT || defined NET_COMPAT  // POWERS
+#if !defined TURTLEARENA || defined NET_COMPAT  // POWERS
 	"EV_POWERUP_INVUL",
 #endif
 
@@ -4718,7 +4718,7 @@ char *eventnames[] = {
 #ifdef IOQ3ZTM // IOQ3BUGFIX: EV_OBELISKPAIN was missing here!
 	"EV_OBELISKPAIN",		// obelisk pain
 #endif
-#if !defined TMNT || defined NET_COMPAT  // POWERS
+#if !defined TURTLEARENA || defined NET_COMPAT  // POWERS
 	"EV_INVUL_IMPACT",		// invulnerability sphere impact
 	"EV_JUICED",				// invulnerability juiced effect
 	"EV_LIGHTNINGBOLT",		// lightning bolt bounced of invulnerability sphere
@@ -5363,7 +5363,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 
 
 #ifdef TMNTPLAYERS
-	// Set defaults for TMNT animations
+	// Set defaults for Turtle Arena animations
 	// default weapon, put away
 	if (index >= TORSO_PUTDEFAULT_BOTH && index <= TORSO_PUTDEFAULT_SECONDARY)
 	{
@@ -5768,7 +5768,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		}
 
 		//
-		// NEW TMNT STUFF
+		// New Turtle Arena stuff
 		//
 
 		// boundingbox -15 -15 -24 15 15 32
@@ -5891,7 +5891,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			}
 		}
 
-#if !defined TMNT || defined TMNT_SUPPORTQ3 // animation.cfg
+#if !defined TURTLEARENA || defined TMNT_SUPPORTQ3 // animation.cfg
 		// if it is a number, start parsing animations
 		if ( token[0] >= '0' && token[0] <= '9' ) {
 			text_p = prev;	// unget the token
@@ -5915,7 +5915,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			}
 		}
 	}
-#if !defined TMNT || defined TMNT_SUPPORTQ3 // animation.cfg
+#if !defined TURTLEARENA || defined TMNT_SUPPORTQ3 // animation.cfg
 	else
 	{
 		// Assume Quake3 (or Elite Force MP) player.
@@ -6365,7 +6365,7 @@ const char *bg_playerDirs[MAX_PLAYER_DIRS] =
 #ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
 	"models/players2",
 #endif
-#ifndef TMNT
+#ifndef TURTLEARENA
 	// ZTM: Do any players use this? There isn't any reason to,
 	//             unless you want to have players that aren't in the player select menu.
 	"models/players/characters",

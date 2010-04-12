@@ -565,7 +565,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 		}
 	}
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 	G_SpawnInt( "notturtlearena", "0", &i );
 	if ( i ) {
 		G_FreeEntity( ent );

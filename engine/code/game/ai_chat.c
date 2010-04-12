@@ -413,7 +413,7 @@ int BotValidChatPosition(bot_state_t *bs) {
 	if (bs->inventory[INVENTORY_QUAD] ||
 		bs->inventory[INVENTORY_HASTE] ||
 		bs->inventory[INVENTORY_INVISIBILITY] ||
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 		bs->inventory[INVENTORY_REGEN] ||
 #endif
 		bs->inventory[INVENTORY_FLIGHT]) return qfalse;

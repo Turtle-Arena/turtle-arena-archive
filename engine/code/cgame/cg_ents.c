@@ -756,7 +756,7 @@ static void CG_Item( centity_t *cent ) {
 	ent.renderfx |= RF_MINLIGHT;
 #else
 	if ( ( item->giType == IT_WEAPON )
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 		 || ( item->giType == IT_ARMOR )
 #endif
 		 )

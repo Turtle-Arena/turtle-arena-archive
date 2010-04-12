@@ -54,7 +54,7 @@ vec4_t color_dim	    = {0.00f, 0.00f, 0.00f, 0.25f};
 // current color scheme
 vec4_t pulse_color          = {1.00f, 1.00f, 1.00f, 1.00f};
 vec4_t text_color_disabled  = {0.50f, 0.50f, 0.50f, 1.00f};	// light gray
-#ifdef TMNT
+#ifdef TURTLEARENA
 vec4_t text_color_normal    = {1.00f, 1.00f, 1.00f, 1.00f};	// bright white
 vec4_t text_color_highlight = {1.00f, 0.43f, 0.00f, 1.00f};	// light orange
 #else
@@ -63,7 +63,7 @@ vec4_t text_color_highlight = {1.00f, 1.00f, 0.00f, 1.00f};	// bright yellow
 #endif
 vec4_t listbar_color        = {1.00f, 0.43f, 0.00f, 0.30f};	// transluscent orange
 vec4_t text_banner_color	= {1.00f, 1.00f, 1.00f, 1.00f};	// bright white
-#ifdef TMNT
+#ifdef TURTLEARENA
 vec4_t text_big_color		= {1.00f, 1.00f, 1.00f, 1.00f};	// bright white
 #else
 vec4_t text_big_color		= {1.00f, 0.00f, 0.00f, 1.00f};	// bright red

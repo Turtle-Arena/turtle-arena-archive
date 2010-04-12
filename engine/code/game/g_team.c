@@ -1172,7 +1172,7 @@ static int QDECL SortClients( const void *a, const void *b ) {
 TeamplayLocationsMessage
 
 Format:
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 	clientNum location health weapon powerups
 #else
 	clientNum location health armor weapon powerups
@@ -1187,7 +1187,7 @@ void TeamplayInfoMessage( gentity_t *ent ) {
 	int			i, j;
 	gentity_t	*player;
 	int			cnt;
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 	int			h;
 #else
 	int			h, a;
@@ -1221,15 +1221,15 @@ void TeamplayInfoMessage( gentity_t *ent ) {
 			ent->client->sess.sessionTeam ) {
 
 			h = player->client->ps.stats[STAT_HEALTH];
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 			a = player->client->ps.stats[STAT_ARMOR];
 #endif
 			if (h < 0) h = 0;
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 			if (a < 0) a = 0;
 #endif
 
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 			Com_sprintf (entry, sizeof(entry),
 				" %i %i %i %i %i",
 //				level.sortedClients[i], player->client->pers.teamState.location, h, a,
@@ -1435,7 +1435,7 @@ static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 }
 #endif // #ifdef MISSIONPACK_HARVESTER
 
-#if !defined TMNT && !defined TMNTWEAPSYS // LOCKON
+#if !defined TURTLEARENA && !defined TMNTWEAPSYS // LOCKON
 static
 #endif
 void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage ) {
@@ -1469,11 +1469,7 @@ gentity_t *SpawnObelisk( vec3_t origin, int team, int spawnflags) {
 	ent->flags = FL_NO_KNOCKBACK;
 
 	if( g_gametype.integer == GT_OBELISK ) {
-#ifdef TMNT // POWERS PW_FLASHING
 		ent->r.contents = CONTENTS_SOLID;
-#else
-		ent->r.contents = CONTENTS_SOLID;
-#endif
 		ent->takedamage = qtrue;
 		ent->health = g_obeliskHealth.integer;
 		ent->die = ObeliskDie;

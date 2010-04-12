@@ -111,7 +111,7 @@ vmCvar_t	g_spSaveData; // Used to save data between levels.
 vmCvar_t	g_saveVersions;
 vmCvar_t	g_saveTypes;
 #endif
-#ifdef TMNT // POWERS // PW_FLASHING
+#ifdef TURTLEARENA // POWERS // PW_FLASHING
 vmCvar_t	g_teleportFluxTime;
 #endif
 #ifdef IOQ3ZTM // LASERTAG
@@ -168,7 +168,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_speed, "g_speed", "320", 0, 0, qtrue  },
 	{ &g_gravity, "g_gravity", "800", 0, 0, qtrue  },
 	{ &g_knockback, "g_knockback", "1000", 0, 0, qtrue  },
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	{ &g_quadfactor, "g_quadfactor", "2", 0, 0, qtrue  },
 #else
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue  },
@@ -229,7 +229,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_saveTypes, "g_saveTypes", BG_SAVE_TYPES, CVAR_ROM, 0, 0, qfalse },
 #endif
 #ifdef IOQ3ZTM
-#ifdef TMNT // DEFAULT_TEAMS
+#ifdef TURTLEARENA // DEFAULT_TEAMS
 	{ &g_redteam, "g_redteam", "Sais", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
 	{ &g_blueteam, "g_blueteam", "Katanas", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #else
@@ -237,7 +237,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #endif
 #endif
-#ifdef TMNT // POWERS // PW_FLASHING
+#ifdef TURTLEARENA // POWERS // PW_FLASHING
 	{ &g_teleportFluxTime, "g_teleportFluxTime", "5", CVAR_SERVERINFO, 0, qfalse},
 #endif
 #ifdef IOQ3ZTM // LASERTAG
@@ -392,7 +392,7 @@ void G_FindTeams( void ) {
 }
 
 void G_RemapTeamShaders( void ) {
-#if defined MISSIONPACK || defined IOQ3ZTM // TMNT? // ZTM: Do it in TMNT as well.
+#if defined MISSIONPACK || defined IOQ3ZTM // TURTLEARENA? // ZTM: Do it in TURTLEARENA as well.
 	char string[1024];
 	float f = level.time * 0.001;
 	Com_sprintf( string, sizeof(string), "team_icon/%s_red", g_redteam.string );

@@ -125,7 +125,7 @@ static void UI_SPSkillMenu_SkillEvent( void *ptr, int notification ) {
 	skill = id - ID_BABY + 1;
 	trap_Cvar_SetValue( "g_spSkill", skill );
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 	SetSkillColor( skill, color_orange );
 #else
 	SetSkillColor( skill, color_white );
@@ -357,7 +357,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	Menu_AddItem( &skillMenuInfo.menu, ( void * )&skillMenuInfo.item_fight );
 
 	skill = (int)Com_Clamp( 1, 5, trap_Cvar_VariableValue( "g_spSkill" ) );
-#ifdef TMNT
+#ifdef TURTLEARENA
 	SetSkillColor( skill, color_orange );
 #else
 	SetSkillColor( skill, color_white );

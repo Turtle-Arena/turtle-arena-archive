@@ -37,9 +37,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "l_log.h"
 #include "l_qfiles.h"
 
-#define TMNT // ZTM: Minor changes for Turtle Arena
+#define TURTLEARENA // ZTM: Minor changes for Turtle Arena
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 #define TMNTENTSYS
 #define TMNTWEAPSYS
 #define TMNTMISC

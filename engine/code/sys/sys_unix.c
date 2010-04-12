@@ -56,7 +56,7 @@ char *Sys_DefaultHomePath(void)
 		if( ( p = getenv( "HOME" ) ) != NULL )
 		{
 			Q_strncpyz( homePath, p, sizeof( homePath ) );
-#ifdef TMNT
+#ifdef TURTLEARENA
 #ifdef MACOS_X
 			Q_strcat( homePath, sizeof( homePath ),
 					"/Library/Application Support/TurtleArena" );

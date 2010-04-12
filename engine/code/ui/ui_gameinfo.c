@@ -327,7 +327,7 @@ char *UI_GetBotNameByNumber( int num ) {
 	if (info) {
 		return Info_ValueForKey( info, "name" );
 	}
-#ifdef TMNT // DEFAULT_PLAYER
+#ifdef TURTLEARENA // DEFAULT_PLAYER
 	return "Raph";
 #else
 	return "Sarge";

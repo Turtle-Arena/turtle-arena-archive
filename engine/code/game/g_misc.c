@@ -103,7 +103,7 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	// toggle the teleport bit so the client knows to not lerp
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 	if (g_teleportFluxTime.integer)
 	{
 		player->client->ps.powerups[PW_FLASHING] = level.time + g_teleportFluxTime.integer * 1000;
@@ -117,7 +117,7 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	// kill anything at the destination
 	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		if (!player->client->ps.powerups[PW_FLASHING])
 #endif
 		G_KillBox (player);
@@ -269,7 +269,7 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 		VectorCopy( ent->movedir, dir );
 	}
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	if (ent->random == -1)
 	{
 #ifdef TMNTWEAPSYS
@@ -282,18 +282,18 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	else
 	{
 #endif
-	// randomize a bit
-	PerpendicularVector( up, dir );
-	CrossProduct( up, dir, right );
+		// randomize a bit
+		PerpendicularVector( up, dir );
+		CrossProduct( up, dir, right );
 
-	deg = crandom() * ent->random;
-	VectorMA( dir, deg, up, dir );
+		deg = crandom() * ent->random;
+		VectorMA( dir, deg, up, dir );
 
-	deg = crandom() * ent->random;
-	VectorMA( dir, deg, right, dir );
+		deg = crandom() * ent->random;
+		VectorMA( dir, deg, right, dir );
 
-	VectorNormalize( dir );
-#ifdef TMNT
+		VectorNormalize( dir );
+#ifdef TURTLEARENA
 	}
 #endif
 
@@ -335,15 +335,15 @@ void InitShooter( gentity_t *ent, int weapon ) {
 
 	G_SetMovedir( ent->s.angles, ent->movedir );
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	if (ent->random != -1)
 	{
 #endif
-	if ( !ent->random ) {
-		ent->random = 1.0;
-	}
-	ent->random = sin( M_PI * ent->random / 180 );
-#ifdef TMNT // LOCKON
+		if ( !ent->random ) {
+			ent->random = 1.0;
+		}
+		ent->random = sin( M_PI * ent->random / 180 );
+#ifdef TURTLEARENA // LOCKON
 	}
 #endif
 	// target might be a moving object, so we can't set movedir for it

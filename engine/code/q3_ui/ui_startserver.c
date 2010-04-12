@@ -101,7 +101,7 @@ typedef struct {
 
 static startserver_t s_startserver;
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 // Gametype names
 static const char *gametype_items[] = {
 	"Free For All",
@@ -1306,7 +1306,7 @@ static void ServerOptions_LevelshotDraw( void *self ) {
 	UI_DrawString( x, y, s_serveroptions.mapnamebuffer, UI_CENTER|UI_SMALLFONT, color_orange );
 
 	y += SMALLCHAR_HEIGHT;
-#ifdef TMNT
+#ifdef TURTLEARENA
 	UI_DrawString( x, y, gametype_items[gametype_remap[s_serveroptions.gametype]], UI_CENTER|UI_SMALLFONT, color_orange );
 #else
 	UI_DrawString( x, y, gametype_items[gametype_remap2[s_serveroptions.gametype]], UI_CENTER|UI_SMALLFONT, color_orange );
@@ -2111,7 +2111,7 @@ static void UI_BotSelectMenu_UpdateGrid( void ) {
 			Q_CleanStr( botSelectInfo.botnames[i] );
  			botSelectInfo.pics[i].generic.name = botSelectInfo.boticons[i];
 			if( BotAlreadySelected( botSelectInfo.botnames[i] ) ) {
-#ifdef TMNT
+#ifdef TURTLEARENA
 				botSelectInfo.picnames[i].color = color_white;
 #else
 				botSelectInfo.picnames[i].color = color_red;

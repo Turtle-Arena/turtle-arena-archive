@@ -107,7 +107,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define SORT_GAME			3
 #define SORT_PING			4
 
-#ifdef TMNT // MP_GAMETYPES
+#ifdef TURTLEARENA // MP_GAMETYPES
 #define GAMES_ALL			0
 #define GAMES_FFA			1
 #define GAMES_TOURNEY		2
@@ -150,7 +150,7 @@ static const char *master_items[] = {
 static const char *servertype_items[] = {
 	"All",
 	"Free For All",
-#ifndef TMNT // MP_GAMETYPES
+#ifndef TURTLEARENA // MP_GAMETYPES
 	"Team Deathmatch",
 #endif
 #ifdef TMNTMISC // tornament to duel
@@ -158,7 +158,7 @@ static const char *servertype_items[] = {
 #else
 	"Tournament",
 #endif
-#ifdef TMNT // MP_GAMETYPES
+#ifdef TURTLEARENA // MP_GAMETYPES
 	"Cooperative",
 	"Team Deathmatch",
 #endif
@@ -195,7 +195,7 @@ static char* gamenames[] = {
 	"One Flag CTF",		// one flag ctf
 	"OverLoad",				// Overload
 	"Harvester",			// Harvester
-#ifndef TMNT
+#ifndef TURTLEARENA
 	"Rocket Arena 3",	// Rocket Arena 3
 	"Q3F",						// Q3F
 	"Urban Terror",		// Urban Terror
@@ -205,11 +205,7 @@ static char* gamenames[] = {
 	NULL
 };
 #ifdef IOQ3ZTM // Net gametype browse
-#ifdef TMNT
-int numNetGametypes = 8; // 7 + unknown
-#else
-int numNetGametypes = 12; // 11 + unknown
-#endif
+int numNetGametypes = (sizeof( gamenames ) / sizeof( gamenames[0] )) - 1; // gamenames(w/unknown) - NULL
 #endif
 
 static char* netnames[] = {
@@ -224,7 +220,7 @@ static char* netnames[] = {
 	NULL
 };
 
-#ifdef TMNT // ZTM: Website
+#ifdef TURTLEARENA // ZTM: Website
 static char quake3worldMessage[] = "Visit turtlearena.googlecode.com for News and Updates";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
@@ -592,7 +588,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			}
 			break;
 
-#ifndef TMNT // MP_GAMETYPES
+#ifndef TURTLEARENA // MP_GAMETYPES
 		case GAMES_TEAMPLAY:
 			if( servernodeptr->gametype != GT_TEAM ) {
 				continue;
@@ -606,7 +602,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			}
 			break;
 
-#ifdef TMNT // MP_GAMETYPES
+#ifdef TURTLEARENA // MP_GAMETYPES
 		case GAMES_COOP:
 			if( servernodeptr->gametype != GT_SINGLE_PLAYER ) {
 				continue;
@@ -1191,7 +1187,7 @@ void ArenaServers_StartRefresh( void )
 			strcpy( myargs, " ffa" );
 			break;
 
-#ifndef TMNT // MP_GAMETYPES
+#ifndef TURTLEARENA // MP_GAMETYPES
 		case GAMES_TEAMPLAY:
 			strcpy( myargs, " team" );
 			break;
@@ -1201,7 +1197,7 @@ void ArenaServers_StartRefresh( void )
 			strcpy( myargs, " tourney" );
 			break;
 
-#ifdef TMNT // MP_GAMETYPES
+#ifdef TURTLEARENA // MP_GAMETYPES
 		case GAMES_COOP:
 			strcpy( myargs, " coop" );
 			break;

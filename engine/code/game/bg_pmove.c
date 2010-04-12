@@ -603,7 +603,7 @@ static void PM_WaterMove( void ) {
 	PM_SlideMove( qfalse );
 }
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 #ifdef MISSIONPACK
 /*
 ===================
@@ -1498,7 +1498,7 @@ static void PM_CheckDuck (void)
 	}
 #endif
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 	if ( pm->ps->powerups[PW_INVULNERABILITY] ) {
 		if ( pm->ps->pm_flags & PMF_INVULEXPAND ) {
 			// invulnerability sphere has a 42 units radius
@@ -1657,7 +1657,7 @@ static void PM_Footsteps( void ) {
 #endif
 	) {
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 		if ( pm->ps->powerups[PW_INVULNERABILITY] ) {
 			PM_ContinueLegsAnim( LEGS_IDLECR );
 		}
@@ -2182,7 +2182,7 @@ static void PM_NextHoldable(void)
 		pm->ps->holdableIndex == HI_KAMIKAZE ||
 #endif
 		pm->ps->holdableIndex == HI_PORTAL
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 			|| pm->ps->holdableIndex == HI_INVULNERABILITY
 #endif
 			) {
@@ -2324,7 +2324,7 @@ static void PM_Weapon( void ) {
 	if ( pm->ps->weaponTime <= 0 && pm->ps->weaponstate != WEAPON_FIRING
 		&& ((pm->cmd.buttons & BUTTON_DROP_WEAPON)
 		|| (pm->ps->stats[STAT_AMMO] == 0
-#ifdef MISSIONPACK // TMNT only // ZTM: Don't auto drop if have ammo regen!
+#ifdef MISSIONPACK // ZTM: Don't auto drop if have ammo regen!
 #ifdef TMNTWEAPSYS
 		&& BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag != PW_AMMOREGEN
 #else
@@ -2794,7 +2794,7 @@ void PmoveSingle (pmove_t *pmove) {
 	pm->waterlevel = 0;
 
 	if ( pm->ps->stats[STAT_HEALTH] <= 0
-#ifdef TMNT // POWERS
+#ifdef TURTLEARENA // POWERS
 		|| pm->ps->powerups[PW_FLASHING] > 0
 #endif
 		)
@@ -2808,7 +2808,7 @@ void PmoveSingle (pmove_t *pmove) {
 		pm->cmd.buttons &= ~BUTTON_WALKING;
 	}
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	// set the lock-on flag
 	if ( pm->ps->stats[STAT_HEALTH] > 0 && (pm->cmd.buttons & BUTTON_WALKING) ) {
 		pm->ps->eFlags |= EF_LOCKON;
@@ -2986,7 +2986,7 @@ void PmoveSingle (pmove_t *pmove) {
 	pm_flyaccelerate = pm_accelerate * 0.8f;
 #endif
 
-#ifndef TMNT // POWERS
+#ifndef TURTLEARENA // POWERS
 #ifdef MISSIONPACK
 	if ( pm->ps->powerups[PW_INVULNERABILITY] ) {
 		PM_InvulnerabilityMove();

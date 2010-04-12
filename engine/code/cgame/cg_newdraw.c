@@ -164,7 +164,7 @@ void CG_SelectPrevPlayer( void ) {
 }
 
 #ifdef MISSIONPACK_HUD
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 static void CG_DrawPlayerArmorIcon( rectDef_t *rect, qboolean draw2D ) {
 	centity_t	*cent;
 	playerState_t	*ps;
@@ -214,7 +214,7 @@ static void CG_DrawPlayerArmorValue(rectDef_t *rect, float scale, vec4_t color, 
 	  CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 	}
 }
-#endif // !TMNT
+#endif // !TURTLEARENA
 
 #ifndef MISSIONPACK
 static float healthColors[4][4] = { 
@@ -401,7 +401,7 @@ static void CG_DrawSelectedPlayerHealth( rectDef_t *rect, float scale, vec4_t co
 	}
 }
 
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
 static void CG_DrawSelectedPlayerArmor( rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
 	clientInfo_t *ci;
 	int value;
@@ -421,7 +421,7 @@ static void CG_DrawSelectedPlayerArmor( rectDef_t *rect, float scale, vec4_t col
 		}
  	}
 }
-#endif // !TMNT
+#endif // !TURTLEARENA
 
 qhandle_t CG_StatusHandle(int task) {
 	qhandle_t h = cgs.media.assaultShader;
@@ -1029,7 +1029,7 @@ float CG_GetValue(int ownerDraw) {
 	ps = &cg.snap->ps;
 
   switch (ownerDraw) {
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
   case CG_SELECTEDPLAYER_ARMOR:
     ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
     return ci->armor;
@@ -1039,7 +1039,7 @@ float CG_GetValue(int ownerDraw) {
     ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
     return ci->health;
     break;
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
   case CG_PLAYER_ARMOR_VALUE:
 		return ps->stats[STAT_ARMOR];
     break;
@@ -1461,7 +1461,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 			// FIXME: max of 3 powerups shown properly
 			xx = rect->x + (PIC_WIDTH * 3) + 2;
 
-#ifdef TMNT // NOARMOR
+#ifdef TURTLEARENA // NOARMOR
 			CG_GetColorForHealth( ci->health, hcolor );
 #else
 			CG_GetColorForHealth( ci->health, ci->armor, hcolor );
@@ -1677,7 +1677,7 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   rect.h = h;
 
   switch (ownerDraw) {
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
   case CG_PLAYER_ARMOR_ICON:
     CG_DrawPlayerArmorIcon(&rect, ownerDrawFlags & CG_SHOW_2DONLY);
     break;
@@ -1709,7 +1709,7 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   case CG_SELECTEDPLAYER_STATUS:
     CG_DrawSelectedPlayerStatus(&rect);
     break;
-#ifndef TMNT // NOARMOR
+#ifndef TURTLEARENA // NOARMOR
   case CG_SELECTEDPLAYER_ARMOR:
     CG_DrawSelectedPlayerArmor(&rect, scale, color, shader, textStyle);
     break;

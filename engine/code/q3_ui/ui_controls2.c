@@ -80,7 +80,7 @@ typedef struct
 enum {
 	ID_SHOWSCORES,
 	ID_USEITEM,
-#ifndef TMNT // NO_SPEED_KEY
+#ifndef TURTLEARENA // NO_SPEED_KEY
 	ID_SPEED,
 #endif
 	ID_FORWARD,
@@ -96,10 +96,10 @@ enum {
 	ID_LOOKDOWN,
 	ID_MOUSELOOK,
 	ID_CENTERVIEW,
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	ID_LOCKON,
 #endif
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	ID_ZOOMVIEW,
 #endif
 #ifndef TMNTWEAPSYS_EX
@@ -131,7 +131,7 @@ enum {
 #endif
 	ID_FREELOOK,
 	ID_INVERTMOUSE,
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	ID_ALWAYSRUN,
 #endif
 	ID_AUTOSWITCH,
@@ -193,7 +193,7 @@ typedef struct
 	menuaction_s		turnleft;
 	menuaction_s		turnright;
 	menuaction_s		sidestep;
-#ifndef TMNT // NO_SPEED_KEY
+#ifndef TURTLEARENA // NO_SPEED_KEY
 	menuaction_s		run;
 #endif
 #ifndef TMNTWEAPSYS_EX
@@ -219,17 +219,17 @@ typedef struct
 	menuaction_s		mouselook;
 	menuradiobutton_s	freelook;
 	menuaction_s		centerview;
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	menuaction_s		lockon;
 #endif
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	menuaction_s		zoomview;
 #endif
 	menuaction_s		gesture;
 	menuradiobutton_s	invertmouse;
 	menuslider_s		sensitivity;
 	menuradiobutton_s	smoothmouse;
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	menuradiobutton_s	alwaysrun;
 #endif
 	menuaction_s		showscores;
@@ -273,7 +273,7 @@ static bind_t g_bindings[] =
 {
 	{"+scores",			"show scores",		ID_SHOWSCORES,	ANIM_IDLE,		K_TAB,			-1,		-1, -1},
 	{"+button2",		"use item",			ID_USEITEM,		ANIM_IDLE,		K_ENTER,		-1,		-1, -1},
-#ifdef TMNT // ALWAYS_RUN // NO_SPEED_KEY
+#ifdef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
 	{"+forward", 		"forward",			ID_FORWARD,		ANIM_RUN,		K_UPARROW,		-1,		-1, -1},
 #else
 	{"+speed", 			"run / walk",		ID_SPEED,		ANIM_RUN,		K_SHIFT,		-1,		-1,	-1},
@@ -291,10 +291,10 @@ static bind_t g_bindings[] =
 	{"+lookdown", 		"look down",		ID_LOOKDOWN,	ANIM_LOOKDOWN,	K_DEL,			-1,		-1, -1},
 	{"+mlook", 			"mouse look",		ID_MOUSELOOK,	ANIM_IDLE,		'/',			-1,		-1, -1},
 	{"centerview", 		"center view",		ID_CENTERVIEW,	ANIM_IDLE,		K_END,			-1,		-1, -1},
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	{"+lockon", 		"lock-on",			ID_LOCKON,		ANIM_IDLE,		K_MOUSE3,		'l',	-1, -1},
 #endif
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	{"+zoom", 			"zoom view",		ID_ZOOMVIEW,	ANIM_IDLE,		-1,				-1,		-1, -1},
 #endif
 #ifndef TMNTWEAPSYS_EX
@@ -333,7 +333,7 @@ static bind_t g_bindings[] =
 
 static configcvar_t g_configcvars[] =
 {
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	{"cl_run",			0,					0},
 #endif
 	{"m_pitch",			0,					0},
@@ -350,13 +350,13 @@ static configcvar_t g_configcvars[] =
 
 static menucommon_s *g_movement_controls[] =
 {
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	(menucommon_s *)&s_controls.lockon,
 #endif
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	(menucommon_s *)&s_controls.alwaysrun,     
 #endif
-#ifndef TMNT // NO_SPEED_KEY
+#ifndef TURTLEARENA // NO_SPEED_KEY
 	(menucommon_s *)&s_controls.run,    
 #endif        
 	(menucommon_s *)&s_controls.walkforward,
@@ -401,7 +401,7 @@ static menucommon_s *g_looking_controls[] = {
 	(menucommon_s *)&s_controls.mouselook,
 	(menucommon_s *)&s_controls.freelook,
 	(menucommon_s *)&s_controls.centerview,
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	(menucommon_s *)&s_controls.zoomview,
 #endif
 	(menucommon_s *)&s_controls.joyenable,
@@ -920,7 +920,7 @@ static void Controls_GetConfig( void )
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarValue( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "m_filter" ) );
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_run" ) );
 #endif
 #ifndef TMNTWEAPSYS_EX
@@ -966,7 +966,7 @@ static void Controls_SetConfig( void )
 		trap_Cvar_SetValue( "m_pitch", fabs( trap_Cvar_VariableValue( "m_pitch" ) ) );
 
 	trap_Cvar_SetValue( "m_filter", s_controls.smoothmouse.curvalue );
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	trap_Cvar_SetValue( "cl_run", s_controls.alwaysrun.curvalue );
 #endif
 #ifndef TMNTWEAPSYS_EX
@@ -1004,7 +1004,7 @@ static void Controls_SetDefaults( void )
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarDefault( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = Controls_GetCvarDefault( "m_filter" );
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	s_controls.alwaysrun.curvalue    = Controls_GetCvarDefault( "cl_run" );
 #endif
 #ifndef TMNTWEAPSYS_EX
@@ -1240,7 +1240,7 @@ static void Controls_MenuEvent( void* ptr, int event )
 		case ID_MOUSESPEED:
 		case ID_INVERTMOUSE:
 		case ID_SMOOTHMOUSE:
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 		case ID_ALWAYSRUN:
 #endif
 #ifndef TMNTWEAPSYS_EX
@@ -1396,7 +1396,7 @@ static void Controls_MenuInit( void )
 	s_controls.weapons.generic.callback	= Controls_MenuEvent;
 	s_controls.weapons.generic.x	    = 152;
 	s_controls.weapons.generic.y	    = 240;
-#ifdef TMNT
+#ifdef TURTLEARENA
 	s_controls.weapons.string			= "ATTACK";
 #else
 	s_controls.weapons.string			= "SHOOT";
@@ -1487,7 +1487,7 @@ static void Controls_MenuInit( void )
 	s_controls.sidestep.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.sidestep.generic.id        = ID_STRAFE;
 
-#ifndef TMNT // NO_SPEED_KEY
+#ifndef TURTLEARENA // NO_SPEED_KEY
 	s_controls.run.generic.type	     = MTYPE_ACTION;
 	s_controls.run.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.run.generic.callback  = Controls_ActionEvent;
@@ -1609,7 +1609,7 @@ static void Controls_MenuInit( void )
 	s_controls.centerview.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.centerview.generic.id        = ID_CENTERVIEW;
 
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	s_controls.lockon.generic.type	  = MTYPE_ACTION;
 	s_controls.lockon.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.lockon.generic.callback  = Controls_ActionEvent;
@@ -1617,7 +1617,7 @@ static void Controls_MenuInit( void )
 	s_controls.lockon.generic.id        = ID_LOCKON;
 #endif
 
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	s_controls.zoomview.generic.type	  = MTYPE_ACTION;
 	s_controls.zoomview.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.zoomview.generic.callback  = Controls_ActionEvent;
@@ -1667,7 +1667,7 @@ static void Controls_MenuInit( void )
 	s_controls.smoothmouse.generic.callback  = Controls_MenuEvent;
 	s_controls.smoothmouse.generic.statusbar = Controls_StatusBar;
 
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	s_controls.alwaysrun.generic.type      = MTYPE_RADIOBUTTON;
 	s_controls.alwaysrun.generic.flags	   = QMF_SMALLFONT;
 	s_controls.alwaysrun.generic.x	       = SCREEN_WIDTH/2;
@@ -1772,19 +1772,19 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.mouselook );
 	Menu_AddItem( &s_controls.menu, &s_controls.freelook );
 	Menu_AddItem( &s_controls.menu, &s_controls.centerview );
-#ifdef TMNT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	Menu_AddItem( &s_controls.menu, &s_controls.lockon );
 #endif
-#ifndef TMNT // NOZOOM
+#ifndef TURTLEARENA // NOZOOM
 	Menu_AddItem( &s_controls.menu, &s_controls.zoomview );
 #endif
 	Menu_AddItem( &s_controls.menu, &s_controls.joyenable );
 	Menu_AddItem( &s_controls.menu, &s_controls.joythreshold );
 
-#ifndef TMNT // ALWAYS_RUN
+#ifndef TURTLEARENA // ALWAYS_RUN
 	Menu_AddItem( &s_controls.menu, &s_controls.alwaysrun );
 #endif
-#ifndef TMNT // NO_SPEED_KEY
+#ifndef TURTLEARENA // NO_SPEED_KEY
 	Menu_AddItem( &s_controls.menu, &s_controls.run );
 #endif
 	Menu_AddItem( &s_controls.menu, &s_controls.walkforward );

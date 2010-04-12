@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#ifdef TMNT
+#ifdef TURTLEARENA
 #define INVENTORY_NONE				0
 #define INVENTORY_HEALTH			55
 
@@ -71,7 +71,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_PORTAL			24
 #define INVENTORY_INVULNERABILITY	25	// removed
 
-// TMNT holdable defines.
+// Turtle Arena holdable defines.
 // HI_SHURIKEN, HI_ELECTRICSHURIKEN, HI_FIRESHURIKEN, HI_LASERSHURIKEN
 #define INVENTORY_SHURIKEN			26
 #define INVENTORY_ELECTRICSHURIKEN	27
@@ -93,7 +93,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_INVISIBILITY		40
 #define INVENTORY_FLIGHT			41
 
-// TMNT invulerability
+// Turtle Arena invulerability
 #define INVENTORY_INVUL				42
 
 #define INVENTORY_REDFLAG			43
@@ -160,7 +160,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODELINDEX_REGEN			0	// removed
 #define MODELINDEX_FLIGHT			30
 
-// TMNT power
+// Turtle Arena powerup
 #define MODELINDEX_INVUL			31
 
 #define MODELINDEX_REDFLAG			32
@@ -255,7 +255,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #endif
 
-#else // NOT TMNT ===================================================
+#else // NOT TURTLEARENA ===================================================
 
 #define INVENTORY_NONE				0
 //armor
@@ -405,4 +405,4 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define WEAPONINDEX_PROXLAUNCHER		12
 #define WEAPONINDEX_CHAINGUN			13
 
-#endif // TMNT
+#endif // TURTLEARENA

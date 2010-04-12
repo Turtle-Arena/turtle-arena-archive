@@ -1229,7 +1229,7 @@ netField_t	playerStateFields[] =
 #if defined TMNTHOLDABLE || defined NET_COMPAT
 ,{ PSF(holdableTime), -16 }
 #endif
-#if defined TMNT || defined NET_COMPAT // LOCKON
+#if defined TURTLEARENA || defined NET_COMPAT // LOCKON
 ,{ PSF(enemyEnt), GENTITYNUM_BITS },
 { PSF(enemyOrigin[0]), 0 },
 { PSF(enemyOrigin[1]), 0 },
