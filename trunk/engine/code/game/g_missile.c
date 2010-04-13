@@ -1202,8 +1202,14 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 #endif
 
-		// Don't stick to obelisk and don't stick to the entity that this missile just killed.
-		if ((other->pain == ObeliskPain) || (damagedOther && other->health <= 0) || other->s.eType == ET_PLAYER)
+		// Don't stick to obelisk
+		if ((other->pain == ObeliskPain) || other->s.eType == ET_PLAYER)
+		{
+			goto missileImpact;
+		}
+
+		// Don't stick to the entity that this missile just killed.
+		if (damagedOther && other->health <= 0)
 		{
 			// Don't remove porjectile if it doesn't explode.
 			if (bg_projectileinfo[ent->s.weapon].explosionType == PE_NONE)

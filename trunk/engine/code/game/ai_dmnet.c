@@ -1314,13 +1314,13 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 
 		for (i = 1; i < BG_NumWeaponGroups(); i++)
 		{
-			if (bs->inventory[INVENTORY_WEAPON_START+i] > 0)
+			if (bs->inventory[INVENTORY_WEAPON_START+i-1] > 0)
 			{
 				if (BG_WeaponHasMelee(i))
 					return i;
 				else // WT_GUN
 				{
-					if (bs->inventory[INVENTORY_AMMO_START+i] > 0 || bs->inventory[INVENTORY_AMMO_START+i] == -1)
+					if (bs->inventory[INVENTORY_AMMO_START+i-1] > 0 || bs->inventory[INVENTORY_AMMO_START+i-1] == -1)
 						return i;
 				}
 			}
@@ -1370,8 +1370,6 @@ qboolean G_CanShootProx(weapon_t w)
 	for (i = 0; i < MAX_HANDS; i++)
 	{
 		if (bg_weapongroupinfo[w].weapon[i]->weapontype != WT_GUN)
-			continue;
-		if (bg_weapongroupinfo[w].weapon[i]->proj->instantDamage)
 			continue;
 		if (bg_weapongroupinfo[w].weapon[i]->proj->splashDamage <= 0)
 			continue;
@@ -1473,15 +1471,18 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
             else {
             	moveresult->weapon = 0;
             }
-#elif defined TMNTWEAPONS // BETA
-			if (bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOELECTRIC] > 0)
-				moveresult->weapon = WEAPONINDEX_ELECTRIC_LAUNCHER;
-			else if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOROCKET] > 0)
-				moveresult->weapon = WEAPONINDEX_ROCKET_LAUNCHER;
-			else if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOHOMING] > 0)
-				moveresult->weapon = WEAPONINDEX_HOMING_LAUNCHER;
-			else {
-				moveresult->weapon = 0;
+#elif defined TMNTWEAPSYS
+			moveresult->weapon = 0;
+			for (i = 1; i < BG_NumWeaponGroups(); i++)
+			{
+				if (bs->inventory[INVENTORY_WEAPON_START+i-1] > 0
+					&& (bs->inventory[INVENTORY_AMMO_START+i-1] > 0
+					|| bs->inventory[INVENTORY_AMMO_START+i-1] == -1)
+					&& G_CanShootProx(i))
+				{
+					moveresult->weapon = i;
+					break;
+				}
 			}
 #else
 			if (bs->inventory[INVENTORY_PLASMAGUN] > 0 && bs->inventory[INVENTORY_CELLS] > 0)

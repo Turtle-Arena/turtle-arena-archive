@@ -117,6 +117,7 @@ typedef struct iteminfo_s
 	int number;							//number of the item info
 #ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
 	int defaultWeight;					//inline weight, for if only a constant value is needed.
+	int inventory;						//inline inventory number
 #endif
 } iteminfo_t;
 
@@ -133,7 +134,8 @@ fielddef_t iteminfo_fields[] =
 {"mins", ITEMINFO_OFS(mins), FT_FLOAT|FT_ARRAY, 3},
 {"maxs", ITEMINFO_OFS(maxs), FT_FLOAT|FT_ARRAY, 3},
 #ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
-{"defaultweight", ITEMINFO_OFS(defaultWeight), FT_INT},
+{"defaultWeight", ITEMINFO_OFS(defaultWeight), FT_INT},
+{"inventory", ITEMINFO_OFS(inventory), FT_INT},
 #endif
 {NULL, 0, 0}
 };
@@ -329,6 +331,9 @@ itemconfig_t *LoadItemConfig(char *filename)
 } //end of the function LoadItemConfig
 #ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
 #define MAX_INVENTORYVALUE			999999 // be_ai_weight.c
+#ifndef max
+#define max(x,y) (x) > (y) ? (x) : (y)
+#endif
 //===========================================================================
 // atemps to create a fuzzy weight for item
 //
@@ -349,6 +354,54 @@ int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
 
 	iwc->weights[index].name = (char *) GetClearedMemory(strlen(item->classname) + 1);
 	strcpy(iwc->weights[index].name, item->classname);
+
+	if (item->inventory)
+	{
+		fuzzyseperator_t *firstfs = NULL;
+		fuzzyseperator_t *lastfs = NULL;
+
+		//switch(INVENTORY_DAISHO)
+		//{
+		//case 1: return WS(DAW);
+		//default: return 0;
+		//}
+
+		// Setup fuzzyseperator
+		fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
+		fs->index = item->inventory; //switch(INVENTORY_*)
+		if (lastfs) lastfs->next = fs;
+		else firstfs = fs;
+		lastfs = fs;
+		fs->value = 1; //case 1: return defaultWeight;
+#if 1
+		// Setup balance
+		fs->type = WT_BALANCE;
+		fs->weight = item->defaultWeight;
+		fs->minweight = max(1, fs->weight/20.0f);
+		fs->maxweight = max(1, fs->weight*20.0f);
+#else
+		// Setup a simple "return weight;"
+		fs->type = 0;
+		fs->weight = item->defaultWeight;
+		fs->minweight = fs->weight;
+		fs->maxweight = fs->weight;
+#endif
+
+		//default: return 0;
+		fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
+		fs->index = item->inventory;
+		fs->value = MAX_INVENTORYVALUE;
+		fs->weight = 0;
+		fs->next = NULL;
+		fs->child = NULL;
+		if (lastfs) lastfs->next = fs;
+		else firstfs = fs;
+		lastfs = fs;
+
+		iwc->weights[index].firstseperator = firstfs;
+		iwc->numweights++;
+		return index;
+	}
 
 	// Setup fuzzyseperator
 	fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
@@ -371,7 +424,6 @@ int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
 #endif
 
 	iwc->weights[index].firstseperator = fs;
-
 	iwc->numweights++;
 
 	return index;
@@ -627,6 +679,8 @@ void BotInitLevelItems(void)
 			Q_strncpyz(ic->iteminfo[i].model, itemInfos[j].model, MAX_QPATH);
 			ic->iteminfo[i].modelindex = itemInfos[j].modelindex;
 			ic->iteminfo[i].respawntime = itemInfos[j].respawntime;
+			ic->iteminfo[i].defaultWeight = itemInfos[j].defaultWeight;
+			ic->iteminfo[i].inventory = itemInfos[j].inventory;
 
 			// Unused
 			//ic->iteminfo[i].type = 0;

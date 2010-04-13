@@ -278,28 +278,28 @@ BotWeaponNameForMeansOfDeath
 ==================
 */
 
-char *BotWeaponNameForMeansOfDeath(int mod) {
+#ifdef TMNTWEAPSYS
+char *BotWeaponNameForMeansOfDeath(int mod, int weapon) {
 	switch(mod) {
-#ifdef TMNTWEAPONS // MOD
-		case MOD_FIST: return "Fist";
-		case MOD_KATANA: return "Katana";
-		case MOD_WAKIZASHI: return "Wakizashi";
-		case MOD_SAI: return "Sai";
-		case MOD_NUNCHUCK: return "Nunchuck";
-		case MOD_HAMMER: return "Hammer";
-		case MOD_AXE: return "Axe";
-		case MOD_SWORD: return "Sword";
-		case MOD_BAT: return "Baseball Bat";
-		case MOD_BO: return "Bo";
-		case MOD_BAMBOO: return "Bamboo";
-		case MOD_GUN: return "Gun";
-		case MOD_ELECTRIC:
-		case MOD_ELECTRIC_SPLASH: return "Electric Launcher";
-		case MOD_ROCKET:
-		case MOD_ROCKET_SPLASH: return "Rocket Launcher";
-		case MOD_HOMING:
-		case MOD_HOMING_SPLASH: return "Homing-Rocket Launcher";
+		case MOD_PROJECTILE:
+			return &bg_projectileinfo[weapon].name[2];
+			break;
+		case MOD_WEAPON_PRIMARY:
+		case MOD_WEAPON_SECONDARY:
+			return &bg_weapongroupinfo[weapon].weapon[mod-MOD_WEAPON_PRIMARY]->name[2];
+			break;
+		default:
+			return "[unknown weapon]";
+	}
+}
 #else
+// ZTM: Support not defining TMNTWEAPSYS (Define missing vars, and add int unused to function)
+#define botdeathweapon botdeathtype
+#define lasthurt_weapon botdeathtype
+char *BotWeaponNameForMeansOfDeath(int mod, int unused) {
+	(void)unused;
+
+	switch(mod) {
 		case MOD_SHOTGUN: return "Shotgun";
 		case MOD_GAUNTLET: return "Gauntlet";
 		case MOD_MACHINEGUN: return "Machinegun";
@@ -322,11 +322,11 @@ char *BotWeaponNameForMeansOfDeath(int mod) {
 #endif
 		case MOD_JUICED: return "Prox mine";
 #endif
-#endif
 		case MOD_GRAPPLE: return "Grapple";
 		default: return "[unknown weapon]";
 	}
 }
+#endif
 
 /*
 ==================
@@ -668,18 +668,18 @@ int BotChat_Death(bot_state_t *bs) {
 
 				if (bs->botdeathtype == MOD_GAUNTLET)
 					BotAI_BotInitialChat(bs, "death_gauntlet",
-							name,												// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+							name,																	// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 							NULL);
 				else if (bs->botdeathtype == MOD_RAILGUN)
 					BotAI_BotInitialChat(bs, "death_rail",
-							name,												// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+							name,																	// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 							NULL);
 				else
 					BotAI_BotInitialChat(bs, "death_bfg",
-							name,												// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+							name,																	// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 							NULL);
 			}
 			//choose between insult and praise
@@ -687,14 +687,14 @@ int BotChat_Death(bot_state_t *bs) {
 #endif
 			if (random() < trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_INSULT, 0, 1)) {
 				BotAI_BotInitialChat(bs, "death_insult",
-							name,												// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+							name,																	// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 							NULL);
 			}
 			else {
 				BotAI_BotInitialChat(bs, "death_praise",
-							name,												// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+							name,																	// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 							NULL);
 			}
 		}
@@ -840,7 +840,12 @@ int BotChat_HitTalking(bot_state_t *bs) {
 	if (!BotValidChatPosition(bs)) return qfalse;
 	//
 	ClientName(g_entities[bs->client].client->lasthurt_client, name, sizeof(name));
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Typo, should be MOD
+	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_mod,
+				g_entities[bs->client].client->lasthurt_weapon);
+#else
 	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_client);
+#endif
 	//
 	BotAI_BotInitialChat(bs, "hit_talking", name, weap, NULL);
 	bs->lastchat_time = FloatTime();
@@ -885,7 +890,8 @@ int BotChat_HitNoDeath(bot_state_t *bs) {
 	if (EntityIsShooting(&entinfo)) return qfalse;
 	//
 	ClientName(lasthurt_client, name, sizeof(name));
-	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_mod);
+	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_mod,
+				g_entities[bs->client].client->lasthurt_weapon);
 	//
 	BotAI_BotInitialChat(bs, "hit_nodeath", name, weap, NULL);
 	bs->lastchat_time = FloatTime();
@@ -923,7 +929,8 @@ int BotChat_HitNoKill(bot_state_t *bs) {
 	if (EntityIsShooting(&entinfo)) return qfalse;
 	//
 	ClientName(bs->enemy, name, sizeof(name));
-	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->enemy].client->lasthurt_mod);
+	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->enemy].client->lasthurt_mod,
+				g_entities[bs->client].client->lasthurt_weapon);
 	//
 	BotAI_BotInitialChat(bs, "hit_nokill", name, weap, NULL);
 	bs->lastchat_time = FloatTime();
@@ -1136,8 +1143,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_gauntlet",
-				name,												// 0
-				BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+				name,																	// 0
+				BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 				NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1145,8 +1152,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_rail",
-				name,												// 0
-				BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+				name,																	// 0
+				BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 				NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1154,8 +1161,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_bfg",
-				name,												// 0
-				BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+				name,																	// 0
+				BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 				NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1163,8 +1170,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_insult",
-					name,												// 0
-					BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+					name,																	// 0
+					BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 					NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1172,8 +1179,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_praise",
-					name,												// 0
-					BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
+					name,																	// 0
+					BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
 					NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1218,7 +1225,8 @@ void BotChatTest(bot_state_t *bs) {
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
 	ClientName(g_entities[bs->client].client->lasthurt_client, name, sizeof(name));
-	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_client);
+	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_client,
+				g_entities[bs->client].client->lasthurt_weapon);
 	num = trap_BotNumInitialChats(bs->cs, "hit_talking");
 	for (i = 0; i < num; i++)
 	{

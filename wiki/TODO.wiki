@@ -32,8 +32,6 @@ Weapons (and attacking)
   * TODO: Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
     * Logic-wise `tag_hand_*` make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
 
-  * TODO: Improve bot_shareditem_t weight code (Currently only supports constant weights, add support to be weight 0 if INVENTORY_X >= 1)
-
   * TODO: Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder }
     * ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
 
@@ -102,11 +100,7 @@ Weapons (and attacking)
 
   * TODO: Have bots not attack players with PW_FLASHING
 
-  * TODO (STARTED): Marge TMNTWEAPONS with other defines, like TURTLEARENA and TMNTWEAPSYS
-
   * TODO: Remarge the two version of CG_MissileHitWall
-
-  * FIXME: Resync MODELINDEX_* (I removed the extra Turtle Arena Weapons and enabled ammo?)
 
   * FIXME: Use BotInventoryWeapon and BotInventoryAmmo?
 
@@ -125,6 +119,8 @@ Weapons (and attacking)
       * Everywhere that passes a "Q3 chat" name use voice chats instead.
       * Set voicechat filename and soundpath in "head.cfg" in player head directory. Head animations would go in it as well.
         * Or Load it from animation.cfg and allow loading 2 animation.cfg files for each player, one for body and one for head.
+        * //don't chat in teamplay
+        * if (TeamPlayIsOn()) return qfalse;
 
   * TODO: Add MD5 model support (MD5 use single model and skeleton, the animations can move any part of the model, and multiple animations can animate at the same time.)
   * TODO-after-above: Re-rig and reanimate players in Blender for MD5

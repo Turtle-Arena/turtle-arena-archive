@@ -3634,9 +3634,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	float			light;
 	vec3_t			lightColor;
 	localEntity_t	*le;
-#ifndef TMNTWEAPONS
 	int				r;
-#endif
 	qboolean		alphaFade;
 	qboolean		isSprite;
 	int				duration;
@@ -3733,25 +3731,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #endif
 	switch ( weapon ) {
 	default:
-#ifdef TMNTWEAPONS
-	case WP_GUN:
-		mod = cgs.media.bulletFlashModel;
-		shader = cgs.media.bulletExplosionShader;
-		mark = cgs.media.bulletMarkShader;
-		radius = 8;
-
-		// sound...
-		sfx = 0;
-		break;
-
-	case WP_GRAPPLING_HOOK:
-		// sound...
-		//sfx = 0;
-
-		mark = cgs.media.holeMarkShader;
-		radius = 12;
-		break;
-#else
 #ifdef MISSIONPACK
 	case WP_NAILGUN:
 		if( soundType == IMPACTSOUND_FLESH ) {
@@ -3798,7 +3777,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		light = 300;
 		isSprite = qtrue;
 		break;
-#endif
 	case WP_ROCKET_LAUNCHER:
 		mod = cgs.media.dishFlashModel;
 		shader = cgs.media.rocketExplosionShader;
@@ -3819,33 +3797,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
 		}
 		break;
-#ifdef TMNTWEAPONS
-	case WP_HOMING_LAUNCHER:
-		// Smaller explosion (It does half as much damage.)
-		exp_base = 30 / 2;
-		exp_add = 42 / 2;
-
-		mod = cgs.media.dishFlashModel;
-		shader = cgs.media.rocketExplosionShader;
-		sfx = cgs.media.sfx_rockexp;
-		mark = cgs.media.burnMarkShader;
-		radius = 64 / 2;
-		light = 300 / 2;
-		isSprite = qtrue;
-		duration = 1000;
-		lightColor[0] = 1;
-		lightColor[1] = 0.75;
-		lightColor[2] = 0.0;
-		if (cg_oldRocket.integer == 0) {
-			// explosion sprite animation
-			VectorMA( origin, 24, dir, sprOrg );
-			VectorScale( dir, 64 / 2, sprVel );
-
-			CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
-		}
-		break;
-#endif
-#ifndef TMNTWEAPONS
 	case WP_RAILGUN:
 		mod = cgs.media.ringFlashModel;
 		shader = cgs.media.railExplosionShader;
@@ -3853,7 +3804,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		mark = cgs.media.energyMarkShader;
 		radius = 24;
 		break;
-#endif
 	case WP_PLASMAGUN:
 		mod = cgs.media.ringFlashModel;
 		shader = cgs.media.plasmaExplosionShader;
@@ -3861,7 +3811,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		mark = cgs.media.energyMarkShader;
 		radius = 16;
 		break;
-#ifndef TMNTWEAPONS
 	case WP_BFG:
 		mod = cgs.media.dishFlashModel;
 		shader = cgs.media.bfgExplosionShader;
@@ -3919,7 +3868,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 
 		radius = 8;
 		break;
-#endif
 	}
 
 #ifdef TMNTWEAPSYS // ZTM: FIXME: Each weapon in the group has its own!
@@ -3940,12 +3888,10 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 							   duration, isSprite );
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
-#ifndef TMNTWEAPONS
 		if ( weapon == WP_RAILGUN ) {
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
 		}
-#endif
 #ifdef TMNTWEAPSYS // SPR_EXP_SCALE
 		le->radius = exp_base;
 		le->refEntity.radius = exp_add;

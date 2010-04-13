@@ -250,9 +250,12 @@ gitem_t	bg_itemlist[] =
 	//
 	// WEAPONS 
 	//
-#ifdef TMNTWEAPSYS // Keep the model index correct for items after weapons...
+#ifdef TMNTWEAPSYS
+#ifndef TURTLEARENA
+	// Keep the model indexs correct for items after weapons.
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
+#endif
 #else
 /*QUAKED weapon_gauntlet (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
@@ -416,8 +419,11 @@ gitem_t	bg_itemlist[] =
 #endif
 
 #ifdef TMNTWEAPSYS
+#ifndef TURTLEARENA
+	// Keep the model indexs correct for items after ammo.
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
+#endif
 #else
 	//
 	// AMMO ITEMS
@@ -552,7 +558,12 @@ gitem_t	bg_itemlist[] =
 	},
 #endif
 
-#ifndef TMNTHOLDABLE // no q3 teleprter
+#ifdef TMNTHOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA
+	// Keep the model indexs correct for items after teleporter.
+	{ EMPTY_GITEM },
+#endif
+#else
 	//
 	// HOLDABLE ITEMS
 	//
@@ -607,6 +618,9 @@ gitem_t	bg_itemlist[] =
 	},
 
 #ifdef TMNTHOLDABLE
+#ifndef TURTLEARENA
+#warning: "Model indexs will not match Quake3 botfiles/inv.h!"
+#endif
 /*QUAKED holdable_shuriken (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -889,7 +903,11 @@ Only in CTF games
 	},
 
 #ifdef MISSIONPACK
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifdef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA
+	{ EMPTY_GITEM },
+#endif
+#else
 /*QUAKED holdable_kamikaze (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -954,7 +972,10 @@ Only in CTF games
 #endif
 
 #ifdef TMNTWEAPSYS
+#ifndef TURTLEARENA
+	// Keep the model indexs correct for items after ammo.
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
+#endif
 #else
 /*QUAKED ammo_nails (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
@@ -1142,9 +1163,18 @@ Only in One Flag CTF games
 /* precache */ "",
 /* sounds */ ""
 	},
+#else
+#ifndef TURTLEARENA
+	// Keep the model indexs correct for items after cubes.
+	{ EMPTY_GITEM },{ EMPTY_GITEM },
 #endif
-#ifdef TMNTWEAPSYS // Keep the model index correct for items after weapons...
+#endif
+
+#ifdef TMNTWEAPSYS
+#ifndef TURTLEARENA
+	// Keep the model indexs correct for items after weapons.
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
+#endif
 #else
 /*QUAKED weapon_nailgun (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
@@ -1380,26 +1410,7 @@ playerAnimationDef_t playerAnimationDefs[] = {
 
 char	*modNames[] = {
 	"MOD_UNKNOWN",
-#ifdef TURTLEARENA // MOD
-	"MOD_FIST",
-	"MOD_KATANA",
-	"MOD_WAKIZASHI",
-	"MOD_SAI",
-	"MOD_NUNCHUCK",
-	"MOD_HAMMER",
-	"MOD_AXE",
-	"MOD_SWORD",
-	"MOD_BAT",
-	"MOD_BO",
-	"MOD_BAMBOO",
-	"MOD_GUN",
-	"MOD_ELECTRIC",
-	"MOD_ELECTRIC_SPLASH",
-	"MOD_ROCKET",
-	"MOD_ROCKET_SPLASH",
-	"MOD_HOMING",
-	"MOD_HOMING_SPLASH",
-#else
+#ifndef TURTLEARENA // MOD
 	"MOD_SHOTGUN",
 	"MOD_GAUNTLET",
 	"MOD_MACHINEGUN",

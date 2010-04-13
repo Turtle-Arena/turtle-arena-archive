@@ -1530,24 +1530,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 	bot_goal_t goal;
 	char netname[MAX_MESSAGE_SIZE];
 	char *nearbyitems[] = {
-#ifdef TMNTWEAPONS // ZTM: FIXME: How is this data used?
-		"Fists",
-		"Katanas",
-		"Daisho",
-		"Sais",
-		"Nunchucks",
-		"Hammer",
-		"Battle Axe",
-		"Long Sword",
-		"Bat",
-		"Bo",
-		"Bam-boo Bo",
-		"Gun",
-		"Electric Launcher",
-		"Homing Rocket Launcher",
-		"Rocket Launcher",
-		"Grappling Hook",
-#else
+#ifndef TMNTWEAPSYS
 		"Shotgun",
 		"Grenade Launcher",
 		"Rocket Launcher",
@@ -1577,7 +1560,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 		"Red Flag",
 		"Blue Flag",
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS
+#ifndef TMNTWEAPSYS
 		"Nailgun",
 		"Prox Launcher",
 		"Chaingun",
@@ -1611,6 +1594,16 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 			bestitem = i;
 		}
 	}
+#ifdef TMNTWEAPSYS
+	// Check weapons
+	for (i = 1; i < BG_NumWeaponGroups(); i++) {
+		dist = BotNearestVisibleItem(bs, bg_weapongroupinfo[i].pickupName, &goal);
+		if (dist < bestdist) {
+			bestdist = dist;
+			bestitem = i;
+		}
+	}
+#endif
 	if (bestitem != -1) {
 		if (gametype == GT_CTF
 #ifdef MISSIONPACK
