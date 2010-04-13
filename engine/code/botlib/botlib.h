@@ -214,6 +214,7 @@ typedef struct
 	int modelindex;
 	int respawntime;
 	int defaultWeight; // If item isn't in character item weight file use this weight.
+	int inventory;
 } bot_shareditem_t;
 #endif
 

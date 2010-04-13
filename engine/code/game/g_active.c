@@ -630,7 +630,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			else
 				inc = 5;
 
-#if 0 // #ifdef TMNTWEAPONS
+#if 0 // Less hacky
 			if (inc > 1) {
 				t = (bg_weapongroupinfo[w].weapon[0]->attackDelay * inc) * 2;
 			} else {

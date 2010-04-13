@@ -820,7 +820,7 @@ int BG_ItemNumForHoldableNum(holdable_t holdablenum);
 #ifndef TMNTMISC
 #define	PLAYEREVENT_DENIEDREWARD		0x0001
 #endif
-#ifndef TMNTWEAPONS
+#ifndef TURTLEARENA // AWARDS
 #define	PLAYEREVENT_GAUNTLETREWARD		0x0002
 #endif
 #ifndef NOTRATEDM // Disable strong lang.
@@ -1654,28 +1654,7 @@ typedef enum {
 // means of death
 typedef enum {
 	MOD_UNKNOWN,
-#ifdef TMNTWEAPONS // MOD
-	MOD_FIST, // _FISTS
-	MOD_KATANA, // _KATANAS
-	MOD_WAKIZASHI, // Usagi's shorter sword
-	MOD_SAI,	// _SAIS
-	MOD_NUNCHUCK, // _NUNCHUCKS
-	MOD_HAMMER,
-	MOD_AXE,
-	//MOD_BAMBOOHAMMER,
-	MOD_SWORD, // _LONGSWORD
-	MOD_BAT,
-	//MOD_SPIKEDCLUB,
-	MOD_BO,
-	MOD_BAMBOO,
-	MOD_GUN,
-	MOD_ELECTRIC,
-	MOD_ELECTRIC_SPLASH,
-	MOD_ROCKET,
-	MOD_ROCKET_SPLASH,
-	MOD_HOMING,
-	MOD_HOMING_SPLASH,
-#else
+#ifndef TURTLEARENA // MOD
 	MOD_SHOTGUN,
 	MOD_GAUNTLET,
 	MOD_MACHINEGUN,
@@ -1710,7 +1689,7 @@ typedef enum {
 	MOD_EXPLOSION,
 #endif
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPONS // MOD
+#ifndef TURTLEARENA // MOD
 	MOD_NAIL,
 	MOD_CHAINGUN,
 	MOD_PROXIMITY_MINE,
@@ -1719,7 +1698,7 @@ typedef enum {
 #ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	MOD_KAMIKAZE,
 #endif
-#ifndef TMNTWEAPONS // POWERS
+#ifndef TURTLEARENA // POWERS
 	MOD_JUICED,
 #endif
 #endif

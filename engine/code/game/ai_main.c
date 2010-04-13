@@ -1445,6 +1445,7 @@ int BotAILoadMap( int restart ) {
 			}
 
 			itemInfos[item].defaultWeight = BotWeaponWeight(i);
+			itemInfos[item].inventory = INVENTORY_WEAPON_START+i-1;
 
 			item++;
 		}
@@ -1749,7 +1750,6 @@ int BotInitLibrary(void) {
 #endif
 #ifdef TURTLEARENA
 	trap_BotLibDefine("TURTLEARENA");
-	trap_BotLibDefine("TMNTWEAPONS");
 #endif
 #ifdef MISSIONPACK
 	trap_BotLibDefine("MISSIONPACK");

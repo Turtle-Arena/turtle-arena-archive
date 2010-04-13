@@ -307,7 +307,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define VOICECHAT_KILLINSULT		"kill_insult"			// I just killed you
 #define VOICECHAT_TAUNT				"taunt"					// I want to taunt you
 #define VOICECHAT_DEATHINSULT		"death_insult"			// you just killed me
-/*#ifndef TMNTWEAPONS
+/*#ifndef TURTLEARENA // WEAPONS
 #define VOICECHAT_KILLGAUNTLET		"kill_gauntlet"			// I just killed you with the gauntlet
 #endif*/
 #define VOICECHAT_PRAISE			"praise"				// you did something good

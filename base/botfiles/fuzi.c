@@ -113,7 +113,8 @@ weight "weapon_default"
 	return 0;
 }
 
-// ZTM: TODO: TMNTWEAPSYS should setup the weapon item weights.
+// TMNTWEAPSYS sets up the weapon item weights.
+/*
 weight "weapon_katanas"
 {
 	switch(INVENTORY_KATANAS)
@@ -248,6 +249,7 @@ weight "weapon_grapplinghook"
 	default: return 0;
 	}
 }
+*/
 
 /* Removed from Turtle Arena
 //teleport

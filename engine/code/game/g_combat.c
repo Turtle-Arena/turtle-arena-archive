@@ -1387,6 +1387,15 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// set the last client who damaged the target
 		targ->client->lasthurt_client = attacker->s.number;
 		targ->client->lasthurt_mod = mod;
+#ifdef TMNTWEAPSYS
+		if (mod == MOD_PROJECTILE)
+			targ->client->lasthurt_weapon = inflictor->s.weapon;
+		else if (mod == MOD_WEAPON_PRIMARY
+			|| mod == MOD_WEAPON_SECONDARY)
+			targ->client->lasthurt_weapon = attacker->s.weapon;
+		else
+			targ->client->lasthurt_weapon = 0;
+#endif
 #ifdef IOQ3ZTM // LASERTAG
 		if (g_laserTag.integer == 1) {
 			take = 0;

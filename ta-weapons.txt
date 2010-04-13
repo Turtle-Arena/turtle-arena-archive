@@ -1,3 +1,5 @@
+Old hardcoded weapon info stuff.
+
 typedef struct
 {
 	// Many of the weapons are based on weapons in TMNT: Mutant Melee
@@ -42,3 +44,26 @@ typedef struct
 
 	WP_NUM_WEAPONS
 } weapon_t;
+
+// means of death list
+
+	MOD_FIST, // _FISTS
+	MOD_KATANA, // _KATANAS
+	MOD_WAKIZASHI, // Usagi's shorter sword
+	MOD_SAI,	// _SAIS
+	MOD_NUNCHUCK, // _NUNCHUCKS
+	MOD_HAMMER,
+	MOD_AXE,
+	//MOD_BAMBOOHAMMER,
+	MOD_SWORD, // _LONGSWORD
+	MOD_BAT,
+	//MOD_SPIKEDCLUB,
+	MOD_BO,
+	MOD_BAMBOO,
+	MOD_GUN,
+	MOD_ELECTRIC,
+	MOD_ELECTRIC_SPLASH,
+	MOD_ROCKET,
+	MOD_ROCKET_SPLASH,
+	MOD_HOMING,
+	MOD_HOMING_SPLASH,
