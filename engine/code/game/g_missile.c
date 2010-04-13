@@ -299,6 +299,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 	int splashDamage;
 	float splashRadius;
 	int range;
+	qboolean hitClient;
 
 	if (projnum < 0 || projnum >= BG_NumProjectiles())
 	{
@@ -514,8 +515,8 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 							passent = traceEnt->s.number;
 						}
 						if (bg_projectileinfo[projnum].trailType != PT_RAIL) {
-						continue;
-					}
+							continue;
+						}
 					}
 					else
 #endif
@@ -530,13 +531,17 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 							damage,
 							0, mod);
 
-#if 0 // Should this be done here? (Its in shotgun code)
-						if( LogAccuracyHit( traceEnt, ent ) ) {
-							ent->client->accuracy_hits++;
-						}
-#endif
+						hitClient = LogAccuracyHit( traceEnt, self );
 
-						// ZTM: TODO: Splash damage?
+						// Splash damage!
+						if (G_RadiusDamage(tr.endpos, self, damage, splashRadius, traceEnt, splashMod))
+						{
+							hitClient = qtrue;
+						}
+
+						if( hitClient ) {
+							self->client->accuracy_hits++;
+						}
 					}
 				}
 
@@ -557,8 +562,8 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 						break;
 					}
 				} else {
-				break;
-			}
+					break;
+				}
 			}
 
 			// link back in any entities we unlinked

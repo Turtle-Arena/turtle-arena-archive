@@ -1258,8 +1258,16 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 				return qfalse;
 			}
 		}
-		// ZTM: TODO: PE_PROX or all projectiles.
-#ifndef TMNTWEAPONS // MOD
+#ifdef TMNTWEAPSYS
+		if (inflictor && bg_projectileinfo[inflictor->s.weapon].explosionType == PE_PROX) {
+			if (inflictor->parent && OnSameTeam(targ, inflictor->parent)) {
+				return qfalse;
+			}
+			if (targ == attacker) {
+				return qfalse;
+			}
+		}
+#else
 #ifdef MISSIONPACK
 		if (mod == MOD_PROXIMITY_MINE) {
 			if (inflictor && inflictor->parent && OnSameTeam(targ, inflictor->parent)) {
