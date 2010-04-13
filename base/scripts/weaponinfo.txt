@@ -543,7 +543,7 @@ weapongroup "wp_axe"
 //	}
 //}
 
-weapon "w_long_sword"
+weapon "w_long sword"
 {
 	weapontype WT_MELEE
 	model "models/weapons2/longsword/longsword.md3"
@@ -571,7 +571,7 @@ weapongroup "wp_longsword"
 	pickupName "Long Sword"
 	pickupModel "models/weapons2/longsword/longsword.md3"
 	iconName "icons/iconw_longsword"
-	weapon_primary "w_long_sword"
+	weapon_primary "w_long sword"
 
 	normalAnims
 	{
