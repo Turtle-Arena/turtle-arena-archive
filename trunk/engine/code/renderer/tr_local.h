@@ -570,11 +570,7 @@ typedef struct drawSurf_s {
 	surfaceType_t		*surface;		// any of surface*_t
 } drawSurf_t;
 
-#if 0 // #ifdef TMNTMISC // ZTM: TODO: I *think* this is the "max lightmapped surface verts" in q3map2
-#define	MAX_FACE_POINTS		999
-#else
 #define	MAX_FACE_POINTS		64
-#endif
 
 #define	MAX_PATCH_SIZE		32			// max dimensions of a patch mesh in map file
 #define	MAX_GRID_SIZE		65			// max dimensions of a grid mesh in memory
