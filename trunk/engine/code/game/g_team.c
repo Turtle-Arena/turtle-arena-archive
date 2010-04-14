@@ -630,7 +630,7 @@ void Team_ResetFlags( void ) {
 		Team_ResetFlag( TEAM_RED );
 		Team_ResetFlag( TEAM_BLUE );
 	}
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	else if( g_gametype.integer == GT_1FCTF ) {
 		Team_ResetFlag( TEAM_FREE );
 	}
@@ -771,7 +771,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 	gclient_t	*cl = other->client;
 	int			enemy_flag;
 
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	if( g_gametype.integer == GT_1FCTF ) {
 		enemy_flag = PW_NEUTRALFLAG;
 	}
@@ -794,7 +794,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 		Team_ReturnFlagSound(Team_ResetFlag(team), team);
 		return 0;
 	}
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	}
 #endif
 
@@ -802,14 +802,14 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 	// flag, he's just won!
 	if (!cl->ps.powerups[enemy_flag])
 		return 0; // We don't have the flag
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	if( g_gametype.integer == GT_1FCTF ) {
 		PrintMsg( NULL, "%s" S_COLOR_WHITE " captured the flag!\n", cl->pers.netname );
 	}
 	else {
 #endif
 	PrintMsg( NULL, "%s" S_COLOR_WHITE " captured the %s flag!\n", cl->pers.netname, TeamName(OtherTeam(team)));
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	}
 #endif
 
@@ -901,7 +901,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 	gclient_t *cl = other->client;
 
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	if( g_gametype.integer == GT_1FCTF ) {
 		PrintMsg (NULL, "%s" S_COLOR_WHITE " got the flag!\n", other->client->pers.netname );
 
@@ -925,7 +925,7 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 			cl->ps.powerups[PW_BLUEFLAG] = INT_MAX; // flags never expire
 
 		Team_SetFlagStatus( team, FLAG_TAKEN );
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	}
 #endif
 
@@ -942,7 +942,7 @@ int Pickup_Team( gentity_t *ent, gentity_t *other ) {
 	int team;
 	gclient_t *cl = other->client;
 
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	if( g_gametype.integer == GT_OBELISK ) {
 		// there are no team items that can be picked up in obelisk
 		G_FreeEntity( ent );
@@ -967,7 +967,7 @@ int Pickup_Team( gentity_t *ent, gentity_t *other ) {
 	else if( strcmp(ent->classname, "team_CTF_blueflag") == 0 ) {
 		team = TEAM_BLUE;
 	}
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	else if( strcmp(ent->classname, "team_CTF_neutralflag") == 0  ) {
 		team = TEAM_FREE;
 	}
@@ -976,7 +976,7 @@ int Pickup_Team( gentity_t *ent, gentity_t *other ) {
 		PrintMsg ( other, "Don't know what team the flag is on.\n");
 		return 0;
 	}
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	if( g_gametype.integer == GT_1FCTF ) {
 		if( team == TEAM_FREE ) {
 			return Team_TouchEnemyFlag( ent, other, cl->sess.sessionTeam );

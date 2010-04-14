@@ -1451,7 +1451,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					}
 					else {
 					if (cgs.clientinfo[cg.clientNum].team == TEAM_BLUE) {
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 							if (cgs.gametype == GT_1FCTF) 
 								CG_AddBufferedSound( cgs.media.yourTeamTookTheFlagSound );
 							else
@@ -1459,7 +1459,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 						 	CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
 						}
 						else if (cgs.clientinfo[cg.clientNum].team == TEAM_RED) {
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 							if (cgs.gametype == GT_1FCTF)
 								CG_AddBufferedSound( cgs.media.enemyTookTheFlagSound );
 							else
@@ -1474,7 +1474,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					}
 					else {
 						if (cgs.clientinfo[cg.clientNum].team == TEAM_RED) {
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 							if (cgs.gametype == GT_1FCTF)
 								CG_AddBufferedSound( cgs.media.yourTeamTookTheFlagSound );
 							else
@@ -1482,7 +1482,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 							CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
 						}
 						else if (cgs.clientinfo[cg.clientNum].team == TEAM_BLUE) {
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 							if (cgs.gametype == GT_1FCTF)
 								CG_AddBufferedSound( cgs.media.enemyTookTheFlagSound );
 							else

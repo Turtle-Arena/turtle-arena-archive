@@ -66,11 +66,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define LEGS_BACKCR 31
 #define LEGS_BACKWALK 32
 
-// TMNT player animations
+// Turtle Arena player animations
 //  ...unfinished
 
 
-// TMNT weapon numbers
+// Turtle Arena weapon numbers
 #define WP_NONE 0
 
 #define WP_FISTS 1

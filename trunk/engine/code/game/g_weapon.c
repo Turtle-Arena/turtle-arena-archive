@@ -551,7 +551,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		} else {
 			s_quadFactor = 1;
 		}
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 		if( ent->client->persistantPowerup && ent->client->persistantPowerup->item && ent->client->persistantPowerup->item->giTag == PW_DOUBLER ) {
 			s_quadFactor *= 2;
 		}
@@ -1554,7 +1554,7 @@ void FireWeapon( gentity_t *ent ) {
 	} else {
 		s_quadFactor = 1;
 	}
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	if( ent->client->persistantPowerup && ent->client->persistantPowerup->item && ent->client->persistantPowerup->item->giTag == PW_DOUBLER ) {
 		s_quadFactor *= 2;
 	}

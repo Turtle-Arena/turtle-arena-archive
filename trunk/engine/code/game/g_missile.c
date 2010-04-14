@@ -755,7 +755,7 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 	} else {
 		s_quadFactor = 1;
 	}
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 	if( self->client->persistantPowerup && self->client->persistantPowerup->item && self->client->persistantPowerup->item->giTag == PW_DOUBLER ) {
 		s_quadFactor *= 2;
 	}

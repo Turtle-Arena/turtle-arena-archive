@@ -3,9 +3,9 @@ Turtle Arena is a work-in-progress Ninja Turtle fangame based on the ioquake3 en
 == Installing ==
 Extract Turtle Arena into a directory. It can be placed anywhere, but suggestions below
 
-Windows:  C:\Program Files\TMNTArena\
-Mac OS X: /Applications/TMNTArena/
-Linux:    /usr/local/games/tmntarena/
+Windows:  C:\Program Files\TurtleArena\
+Mac OS X: /Applications/TurtleArena/
+Linux:    /usr/local/games/turtlearena/
 
 == Uninstalling ==
 Delete the directory where you extracted Turtle Arena.

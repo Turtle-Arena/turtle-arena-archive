@@ -485,7 +485,7 @@
 {
 "classname" "misc_object"
 "origin" "400.000000 656.000000 -192.000000"
-"model" "models/mapobjects/traffic_cone/tmnt_traffic_cone.md3"
+"model" "models/mapobjects/traffic_cone/traffic_cone.md3"
 "angle" "45.000000"
 }
 // entity 38

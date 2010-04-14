@@ -21,7 +21,7 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
 					<Add option="-DMISSIONPACK" />
-					<Add option="-DTMNTHUD" />
+					<Add option="-DTA_HUD" />
 				</Compiler>
 			</Target>
 			<Target title="Debug Win32">
@@ -40,7 +40,7 @@
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
 					<Add option="-DMISSIONPACK" />
-					<Add option="-DTMNTHUD" />
+					<Add option="-DTA_HUD" />
 				</Compiler>
 			</Target>
 			<Target title="Release TA_UI Win32">
