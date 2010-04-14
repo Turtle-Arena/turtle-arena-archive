@@ -140,7 +140,7 @@
        id="image3992"
        height="64"
        width="128"
-       xlink:href="file:///home/zack/TMNT_Arena_svn/trunk/base/menu/art/back_0.png" />
+       xlink:href="file:///home/zack/Turtle_Arena_svn/trunk/base/menu/art/back_0.png" />
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;fill:#eeeeec;fill-opacity:1;stroke:none;font-family:FreeSerif;-inkscape-font-specification:FreeSerif"
@@ -157,7 +157,7 @@
        id="image3156"
        height="64"
        width="128"
-       xlink:href="file:///home/zack/TMNT_Arena_svn/trunk/base/menu/art/play_0.png" />
+       xlink:href="file:///home/zack/Turtle_Arena_svn/trunk/base/menu/art/play_0.png" />
   </g>
   <g
      style="display:inline"
