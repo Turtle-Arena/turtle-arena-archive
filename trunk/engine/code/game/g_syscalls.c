@@ -228,7 +228,7 @@ void trap_SnapVector( float *v ) {
 	return;
 }
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 qhandle_t trap_RegisterModel( const char *name ) {
 	return syscall( G_REGISTERMODEL, name );
 }

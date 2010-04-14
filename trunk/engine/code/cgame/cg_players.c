@@ -990,7 +990,7 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	if ( ci->torsoModel ) {
 		orientation_t tag;
 #ifdef TMNTWEAPSYS
-#ifdef TMNT_SUPPORTQ3
+#ifdef TA_SUPPORTQ3
 		if ( trap_R_LerpTag( &tag, ci->torsoModel, 0, 0, 1, "tag_weapon" ) ) {
 			ci->tagInfo |= TI_TAG_WEAPON;
 		}
@@ -1043,7 +1043,7 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 		// if the model didn't load use the sounds of the default model
 		if (modelloaded) {
 			ci->sounds[i] = trap_S_RegisterSound( va("sound/player/%s/%s", dir, s + 1), qfalse );
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF // Elite Force player sounds are in a different directory.
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF // Elite Force player sounds are in a different directory.
 			if ( !ci->sounds[i] ) {
 				ci->sounds[i] = trap_S_RegisterSound( va("sound/voice/%s/%s", dir, s + 1), qfalse );
 			}
@@ -2227,7 +2227,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #ifdef IOQ3ZTM // FLAG
 #ifdef TMNTWEAPSYS
 	if (!(ci->tagInfo & TI_TAG_HAND_SECONDARY)
-#ifdef TMNT_SUPPORTQ3
+#ifdef TA_SUPPORTQ3
 		&& !(ci->tagInfo & TI_TAG_FLAG)
 #endif
 		)
@@ -2262,7 +2262,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #endif
 		}
 	}
-#ifdef TMNT_SUPPORTQ3
+#ifdef TA_SUPPORTQ3
 	else if (ci->tagInfo & TI_TAG_FLAG)
 	{
 		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" ))

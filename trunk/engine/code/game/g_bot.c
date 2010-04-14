@@ -1100,7 +1100,7 @@ void G_InitBots( qboolean restart ) {
 #ifdef TMNTMISC // frag to score
 		strValue = Info_ValueForKey( arenainfo, "scorelimit" );
 		fragLimit = atoi( strValue );
-#if !defined TURTLEARENA || defined TMNT_SUPPORTQ3
+#if !defined TURTLEARENA || defined TA_SUPPORTQ3
 		// Support Q3 "fraglimit" in arenas.txt
 		if ( !fragLimit )
 		{

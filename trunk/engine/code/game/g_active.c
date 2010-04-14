@@ -1816,7 +1816,7 @@ void ClientThink( int clientNum ) {
 	}
 }
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 /*
 ===============
 CG_PlayerAngles
@@ -1974,7 +1974,7 @@ void G_PlayerAnimation( gentity_t *ent )
 #endif
 
 void G_RunClient( gentity_t *ent ) {
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 	G_PlayerAngles(ent, ent->client->pers.legsAxis, ent->client->pers.torsoAxis, ent->client->pers.headAxis);
 
 	G_PlayerAnimation(ent);

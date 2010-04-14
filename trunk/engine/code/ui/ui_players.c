@@ -1029,7 +1029,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		memset( &gun, 0, sizeof(gun) );
 		gun.hModel = pi->weaponModel;
 		VectorCopy( origin, gun.lightingOrigin );
-#ifdef TMNT_SUPPORTQ3
+#ifdef TA_SUPPORTQ3
 		if (!UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary"))
 		{
 			UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
@@ -1049,7 +1049,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 
 		if (gun_left.hModel)
 		{
-#ifdef TMNT_SUPPORTQ3
+#ifdef TA_SUPPORTQ3
 			if (!UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_hand_secondary"))
 			{
 				UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_flag");

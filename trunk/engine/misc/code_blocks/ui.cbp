@@ -7,8 +7,8 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release TA_UI Win32">
-				<Option output="..\..\build\ui_release_ta\uix86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\ui_release_ta" />
+				<Option output="../../build/ui_release_ta/uix86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/ui_release_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -30,8 +30,8 @@
 				</Linker>
 			</Target>
 			<Target title="Debug TA_UI Win32">
-				<Option output="..\..\build\ui_debug_ta\uix86" prefix_auto="1" extension_auto="1" />
-				<Option object_output="..\..\build\ui_debug_ta" />
+				<Option output="../../build/ui_debug_ta/uix86" prefix_auto="1" extension_auto="1" />
+				<Option object_output="../../build/ui_debug_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -65,7 +65,7 @@
 			<Add option="-DNOBLOOD" />
 			<Add option="-DTHIRD_PERSON" />
 			<Add option="-DRAVENMD4" />
-			<Add option="-DTMNT" />
+			<Add option="-DTURTLEARENA" />
 			<Add option="-DTMNTMISC" />
 			<Add option="-DTMNTHUD" />
 			<Add option="-DTMNTSP" />
@@ -74,10 +74,9 @@
 			<Add option="-DTMNTWEAPSYS" />
 			<Add option="-DTMNTWEAPSYS_NOCOMPAT" />
 			<Add option="-DTMNTWEAPSYS_EX" />
-			<Add option="-DTMNTWEAPONS" />
 			<Add option="-DTMNTPLAYERSYS" />
 			<Add option="-DTMNTPLAYERS" />
-			<Add option="-DTMNT_SUPPORTQ3" />
+			<Add option="-DTA_SUPPORTQ3" />
 			<Add option="-DTMNTENTSYS" />
 			<Add option="-DTMNTPATHSYS" />
 			<Add option="-DTMNTNPCSYS" />
@@ -85,44 +84,44 @@
 			<Add option="-DOA_BLOOM" />
 			<Add option="-DNIGHTSMODE" />
 			<Add option="-DCAMERASCRIPT" />
-			<Add option="-DTMNT_GAME_MODELS" />
+			<Add option="-DTA_GAME_MODELS" />
 		</Compiler>
-		<Unit filename="..\..\code\game\bg_lib.c">
+		<Unit filename="../../code/game/bg_lib.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="..\..\code\game\bg_misc.c">
+		<Unit filename="../../code/game/bg_misc.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\game\bg_misc.h" />
-		<Unit filename="..\..\code\qcommon\q_math.c">
+		<Unit filename="../../code/game/bg_misc.h" />
+		<Unit filename="../../code/qcommon/q_math.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\qcommon\q_shared.c">
+		<Unit filename="../../code/qcommon/q_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\ui\ui_atoms.c">
+		<Unit filename="../../code/ui/ui_atoms.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\ui\ui_gameinfo.c">
+		<Unit filename="../../code/ui/ui_gameinfo.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\ui\ui_local.h" />
-		<Unit filename="..\..\code\ui\ui_main.c">
+		<Unit filename="../../code/ui/ui_local.h" />
+		<Unit filename="../../code/ui/ui_main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\ui\ui_players.c">
+		<Unit filename="../../code/ui/ui_players.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\ui\ui_public.h" />
-		<Unit filename="..\..\code\ui\ui_shared.c">
+		<Unit filename="../../code/ui/ui_public.h" />
+		<Unit filename="../../code/ui/ui_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\ui\ui_shared.h" />
-		<Unit filename="..\..\code\ui\ui_syscalls.c">
+		<Unit filename="../../code/ui/ui_shared.h" />
+		<Unit filename="../../code/ui/ui_syscalls.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="..\..\code\..\ui\menudef.h" />
+		<Unit filename="../../code/../ui/menudef.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

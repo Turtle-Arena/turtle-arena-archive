@@ -27,7 +27,7 @@
 	+ Disabled missionpack's HI_INVUL and HI_KAMIKAZE (TMNTHOLDABLE)
 	+ Use item sprite when no item model is loaded (IOQ3ZTM)
 	+ Elite Force style team firend shaders, "sprites/team_red" and "sprites/team_blue" (IOQ3ZTM)
-	++ If TMNT_SUPPORTQ3 falls back to "sprites/foe"
+	++ If TA_SUPPORTQ3 falls back to "sprites/foe"
 	+ If loaded "sprites/team_blue" and a spectator draw team icon for all players. (IOQ3ZTM)
 	+ New define MISSIONPACK_HUD, mostly renamed MISSIONPACK ifdef's
 	++ by NOT defining it, you can use the Quake3 hud in the MISSIONPACK.

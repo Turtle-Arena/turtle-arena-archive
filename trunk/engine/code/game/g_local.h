@@ -274,7 +274,7 @@ typedef struct {
 #ifdef TMNTPLAYERSYS
     bg_playercfg_t playercfg;        // data loaded from animation.cfg
 #endif
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 	// loaded using trap_RegisterModel, used in trap_LerpTag
 	qhandle_t	torsoModel;
 	qhandle_t	legsModel;
@@ -1030,7 +1030,7 @@ qboolean	trap_GetEntityToken( char *buffer, int bufferSize );
 int		trap_DebugPolygonCreate(int color, int numPoints, vec3_t *points);
 void	trap_DebugPolygonDelete(int id);
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 qhandle_t trap_RegisterModel( const char *name );
 int trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
 					   float frac, const char *tagName );
