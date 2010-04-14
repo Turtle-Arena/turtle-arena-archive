@@ -76,7 +76,7 @@ extern vmCvar_t	ui_spAwards;
 extern vmCvar_t	ui_spVideos;
 extern vmCvar_t	ui_spSkill;
 
-#ifdef TMNTSP
+#ifdef TA_SP
 extern vmCvar_t	ui_singlePlayerActive;
 #endif
 extern vmCvar_t	ui_spSelection;
@@ -181,7 +181,7 @@ typedef struct _tag_menuframework
 
 	qboolean	wrapAround;
 	qboolean	fullscreen;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	qboolean	showlogo;
 #endif
 #ifdef IOQ3ZTM
@@ -300,7 +300,7 @@ extern sfxHandle_t	menu_move_sound;
 extern sfxHandle_t	menu_out_sound;
 extern sfxHandle_t	menu_buzz_sound;
 extern sfxHandle_t	menu_null_sound;
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 extern sfxHandle_t	weaponChangeSound;
 #endif
 extern vec4_t		menu_text_color;
@@ -360,7 +360,7 @@ extern void UI_CreditMenu( void );
 extern void InGame_Cache( void );
 extern void UI_InGameMenu(void);
 
-#ifdef TMNTMISC // INGAME_SERVER_MENU
+#ifdef TA_MISC // INGAME_SERVER_MENU
 //
 // ui_ingame_server.c
 //
@@ -418,7 +418,7 @@ extern void UI_CinematicsMenu_Cache( void );
 extern void UI_ModsMenu( void );
 extern void UI_ModsMenu_Cache( void );
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 //
 // ui_multiplayer.c
 //
@@ -538,7 +538,7 @@ typedef struct {
 	qhandle_t		headModel;
 	qhandle_t		headSkin;
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	bg_playercfg_t	playercfg;
 #else
 	animation_t		animations[MAX_ANIMATIONS];
@@ -548,7 +548,7 @@ typedef struct {
 	qhandle_t		barrelModel;
 	qhandle_t		flashModel;
 	vec3_t			flashDlightColor;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	qhandle_t		weaponModel2;
 	qhandle_t		barrelModel2;
 	qhandle_t		flashModel2;
@@ -604,12 +604,12 @@ typedef struct {
 	qboolean			debug;
 	qhandle_t			whiteShader;
 	qhandle_t			menuBackShader;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	qhandle_t			menuBackNoLogoShader;
 #endif
 	qhandle_t			charset;
 	qhandle_t			charsetProp;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	qhandle_t			charsetPropGlow;
 #endif
 	qhandle_t			charsetPropB;
@@ -671,7 +671,7 @@ void UI_SPLevelMenu_ReInit( void );
 // ui_spArena.c
 //
 void UI_SPArena_Start( const char *arenaInfo );
-#ifdef TMNTSP
+#ifdef TA_SP
 void UI_LoadGameMenu( void );
 void LoadGame_Cache( void );
 void UI_SPMenu( void );
@@ -691,7 +691,7 @@ void UI_SPPostgameMenu_f( void );
 void UI_SPSkillMenu( const char *arenaInfo );
 void UI_SPSkillMenu_Cache( void );
 
-#ifdef TMNTSP
+#ifdef TA_SP
 //
 // ui_spPlayer.c
 //
@@ -767,7 +767,7 @@ void			trap_SetCDKey( char *buf );
 
 qboolean               trap_VerifyCDKey( const char *key, const char *chksum);
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 void			trap_S_StopBackgroundTrack( void );
 void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
 #endif

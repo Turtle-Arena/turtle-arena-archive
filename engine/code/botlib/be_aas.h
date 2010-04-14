@@ -49,7 +49,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef TURTLEARENA // NO_ROCKET_JUMPING
 #define TFL_ROCKETJUMP			0x00001000	//rocket jumping
 #endif
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 #define TFL_BFGJUMP				0x00002000	//bfg jumping
 #endif
 #define TFL_GRAPPLEHOOK			0x00004000	//grappling hook

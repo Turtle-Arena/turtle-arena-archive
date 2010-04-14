@@ -103,7 +103,7 @@ field_t fields[] = {
 	{"spawnflags", FOFS(spawnflags), F_INT},
 	{"speed", FOFS(speed), F_FLOAT},
 	{"target", FOFS(target), F_LSTRING},
-#ifdef TMNTENTSYS
+#ifdef TA_ENTSYS
 	{"paintarget", FOFS(paintarget), F_LSTRING},
 #endif
 	{"targetname", FOFS(targetname), F_LSTRING},
@@ -119,7 +119,7 @@ field_t fields[] = {
 	{"angle", FOFS(s.angles), F_ANGLEHACK},
 	{"targetShaderName", FOFS(targetShaderName), F_LSTRING},
 	{"targetShaderNewName", FOFS(targetShaderNewName), F_LSTRING},
-#ifdef TMNTWEAPSYS // WIF_CUTS
+#ifdef TA_WEAPSYS // WIF_CUTS
 	{"mustcut", FOFS(mustcut), F_INT},
 #endif
 
@@ -149,10 +149,10 @@ void SP_func_button (gentity_t *ent);
 void SP_func_door (gentity_t *ent);
 void SP_func_train (gentity_t *ent);
 void SP_func_timer (gentity_t *self);
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 void SP_func_breakable (gentity_t *self);
 #endif
-#ifdef TMNTENTSYS // FUNC_USE
+#ifdef TA_ENTSYS // FUNC_USE
 void SP_func_use (gentity_t *ent);
 #endif
 
@@ -176,7 +176,7 @@ void SP_target_kill (gentity_t *ent);
 void SP_target_position (gentity_t *ent);
 void SP_target_location (gentity_t *ent);
 void SP_target_push (gentity_t *ent);
-#ifdef TMNTSP
+#ifdef TA_SP
 void SP_target_level_end (gentity_t *ent);
 #endif
 #ifdef CAMERASCRIPT // ZTM: i made this
@@ -191,13 +191,13 @@ void SP_path_corner (gentity_t *self);
 
 void SP_misc_teleporter_dest (gentity_t *self);
 void SP_misc_model(gentity_t *ent);
-#ifdef TMNTENTSYS // MISC_OBJECT
+#ifdef TA_ENTSYS // MISC_OBJECT
 void SP_misc_object(gentity_t *ent);
 #endif
 void SP_misc_portal_camera(gentity_t *ent);
 void SP_misc_portal_surface(gentity_t *ent);
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 void SP_misc_shooter( gentity_t *ent );
 #endif
 void SP_shooter_rocket( gentity_t *ent );
@@ -216,12 +216,12 @@ void SP_team_redobelisk( gentity_t *ent );
 void SP_team_neutralobelisk( gentity_t *ent );
 #endif
 void SP_item_botroam( gentity_t *ent ) { }
-#ifdef TMNTPATHSYS
+#ifdef TA_PATHSYS
 void SP_path_start( gentity_t *ent );
-#elif !defined TMNTPATHSYS
+#elif !defined TA_PATHSYS
 void SP_npcpath( gentity_t *ent );
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 void SP_weapon_random( gentity_t *ent );
 #endif
 #ifdef NIGHTSMODE
@@ -250,10 +250,10 @@ spawn_t	spawns[] = {
 	{"func_train", SP_func_train},
 	{"func_group", SP_info_null},
 	{"func_timer", SP_func_timer},			// rename trigger_timer?
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 	{"func_breakable", SP_func_breakable},
 #endif
-#ifdef TMNTENTSYS // FUNC_USE
+#ifdef TA_ENTSYS // FUNC_USE
 	{"func_use", SP_func_use},
 #endif
 
@@ -283,7 +283,7 @@ spawn_t	spawns[] = {
 	{"target_position", SP_target_position},
 	{"target_location", SP_target_location},
 	{"target_push", SP_target_push},
-#ifdef TMNTSP
+#ifdef TA_SP
 	{"target_level_end", SP_target_level_end},
 #endif
 #ifdef CAMERASCRIPT // ZTM: i made this
@@ -292,7 +292,7 @@ spawn_t	spawns[] = {
 
 	{"light", SP_light},
 	{"path_corner", SP_path_corner},
-#ifdef TMNTPATHSYS
+#ifdef TA_PATHSYS
 	{"path_start", SP_path_start},
 	{"path_point", SP_path_corner},
 	{"path_axis", SP_path_corner},
@@ -301,13 +301,13 @@ spawn_t	spawns[] = {
 
 	{"misc_teleporter_dest", SP_misc_teleporter_dest},
 	{"misc_model", SP_misc_model},
-#ifdef TMNTENTSYS // MISC_OBJECT
+#ifdef TA_ENTSYS // MISC_OBJECT
 	{"misc_object", SP_misc_object},
 #endif
 	{"misc_portal_surface", SP_misc_portal_surface},
 	{"misc_portal_camera", SP_misc_portal_camera},
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	{"misc_shooter", SP_misc_shooter},
 #endif
 	{"shooter_rocket", SP_shooter_rocket},
@@ -327,10 +327,10 @@ spawn_t	spawns[] = {
 #endif
 	{"item_botroam", SP_item_botroam},
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	{"weapon_random", SP_weapon_random},
 #endif
-#if defined TMNTNPCSYS && !defined TMNTPATHSYS
+#if defined TA_NPCSYS && !defined TA_PATHSYS
 	{"npcpath", SP_npcpath},
 #endif
 #ifdef NIGHTSMODE
@@ -352,7 +352,7 @@ returning qfalse if not found
 qboolean G_CallSpawn( gentity_t *ent ) {
 	spawn_t	*s;
 	gitem_t	*item;
-#if defined TMNTWEAPSYS || defined TMNTNPCSYS
+#if defined TA_WEAPSYS || defined TA_NPCSYS
 	int i;
 #endif
 
@@ -363,7 +363,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 
 
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #ifdef IOQ3ZTM // LASERTAG
 	if (g_laserTag.integer)
 	{
@@ -389,7 +389,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 #endif
 #endif
 
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 	// check NPC spawn functions
 	for ( i = 1; i < BG_NumNPCs(); i++ ) {
 		if ( !strcmp(bg_npcinfo[i].classname, ent->classname) ) {
@@ -529,7 +529,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	int			i;
 	gentity_t	*ent;
 	char		*s, *value, *gametypeName;
-#ifdef TMNTMISC // tornament to duel, obelisk to overload
+#ifdef TA_MISC // tornament to duel, obelisk to overload
 	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "overload", "harvester", "teamtournament"};
 #else
 	static char *gametypeNames[] = {"ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // g_client.c -- client functions that don't happen every frame
 
-#ifndef TMNTPLAYERSYS
+#ifndef TA_PLAYERSYS
 static vec3_t	playerMins = {-15, -15, -24};
 static vec3_t	playerMaxs = {15, 15, 32};
 #endif
@@ -53,7 +53,7 @@ void SP_info_player_deathmatch( gentity_t *ent ) {
 equivelant to info_player_deathmatch
 */
 void SP_info_player_start(gentity_t *ent) {
-#ifndef TMNTSP
+#ifndef TA_SP
 	ent->classname = "info_player_deathmatch";
 #endif
 	SP_info_player_deathmatch( ent );
@@ -83,7 +83,7 @@ SpotWouldTelefrag
 ================
 */
 qboolean SpotWouldTelefrag( gentity_t *spot
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	, gentity_t *ent
 #endif
 	)
@@ -93,7 +93,7 @@ qboolean SpotWouldTelefrag( gentity_t *spot
 	gentity_t	*hit;
 	vec3_t		mins, maxs;
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	if (ent && ent->client)
 	{
 		// ZTM: Use per-player bounding box for telefrag checking!
@@ -211,7 +211,7 @@ SelectRandomFurthestSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 gentity_t *SelectRandomFurthestSpawnPoint ( gentity_t *ent, vec3_t origin, vec3_t angles, qboolean isbot )
 #else
 gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot )
@@ -223,7 +223,7 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 	float		list_dist[MAX_SPAWN_POINTS];
 	gentity_t	*list_spot[MAX_SPAWN_POINTS];
 	int			numSpots, rnd, i, j;
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	vec3_t avoidPoint;
 
 	if (ent && ent->client)
@@ -241,7 +241,7 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 
 	while((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
 	{
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 		if(SpotWouldTelefrag(spot, ent))
 #else
 		if(SpotWouldTelefrag(spot))
@@ -317,13 +317,13 @@ SelectSpawnPoint
 Chooses a player start, deathmatch start, etc
 ============
 */
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 gentity_t *SelectSpawnPoint ( gentity_t *ent, vec3_t origin, vec3_t angles, qboolean isbot )
 #else
 gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot )
 #endif
 {
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	return SelectRandomFurthestSpawnPoint( ent, origin, angles, isbot );
 #else
 	return SelectRandomFurthestSpawnPoint( avoidPoint, origin, angles, isbot );
@@ -358,7 +358,7 @@ gentity_t *SelectSpawnPoint ( vec3_t avoidPoint, vec3_t origin, vec3_t angles, q
 	*/
 }
 
-#ifdef TMNTSP
+#ifdef TA_SP
 /*
 ===========
 SelectSinglePlayerSpawnPoint
@@ -371,7 +371,7 @@ if none uses deathmatch spawn point.
 ============
 */
 gentity_t *SelectSinglePlayerSpawnPoint(
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	gentity_t *ent,
 #endif
 	int clientnum, vec3_t origin, vec3_t angles, qboolean isbot )
@@ -382,7 +382,7 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 
 	while ((spot = G_Find (spot, FOFS(classname), "info_player_start")) != NULL) {
 		spotlast = spot;
-#ifdef TMNTSP
+#ifdef TA_SP
 		// Save spot 0 as it will be the default there isn't one for this client.
 		if (spot->count == 0) {
 			spot0 = spot;
@@ -411,7 +411,7 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 		}
 	}
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	if ( !spot || SpotWouldTelefrag( spot, ent ) )
 		return SelectSpawnPoint( ent, origin, angles, isbot );
 #else
@@ -435,7 +435,7 @@ Try to find a spawn point marked 'initial', otherwise
 use normal spawn selection.
 ============
 */
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 gentity_t *SelectInitialSpawnPoint( gentity_t *ent, vec3_t origin, vec3_t angles, qboolean isbot )
 #else
 gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, qboolean isbot )
@@ -457,7 +457,7 @@ gentity_t *SelectInitialSpawnPoint( vec3_t origin, vec3_t angles, qboolean isbot
 			break;
 	}
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	if (!spot || SpotWouldTelefrag(spot, ent))
 		return SelectSpawnPoint(ent, origin, angles, isbot);
 #else
@@ -550,7 +550,7 @@ just like the existing corpse to leave behind.
 =============
 */
 void CopyToBodyQue( gentity_t *ent ) {
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	gentity_t	*e;
 	int i;
 #endif
@@ -573,7 +573,7 @@ void CopyToBodyQue( gentity_t *ent ) {
 
 	body->s = ent->s;
 	body->s.eFlags = EF_DEAD;		// clear EF_TALK, etc
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	if ( ent->s.eFlags & EF_KAMIKAZE ) {
 		body->s.eFlags |= EF_KAMIKAZE;
 
@@ -693,7 +693,7 @@ void respawn( gentity_t *ent ) {
 	CopyToBodyQue (ent);
 	ClientSpawn(ent);
 
-#if 0 //#ifdef TMNTSP // No teleport effect in Single Player
+#if 0 //#ifdef TA_SP // No teleport effect in Single Player
     if (g_gametype.integer == GT_SINGLE_PLAYER)
     {
         return;
@@ -763,7 +763,7 @@ PickTeam
 team_t PickTeam( int ignoreClientNum ) {
 	int		counts[TEAM_NUM_TEAMS];
 
-#ifdef TMNTSP // SP_BOSS
+#ifdef TA_SP // SP_BOSS
 	if (g_gametype.integer == GT_SINGLE_PLAYER)
 		return TEAM_FREE;
 #endif
@@ -864,7 +864,7 @@ static void ClientCleanName(const char *in, char *out, int outSize)
 		Q_strncpyz(out, "UnnamedPlayer", outSize );
 }
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 /*
 ===========
 G_LoadPlayer
@@ -880,7 +880,7 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
     gentity_t *ent;
     gclient_t *client;
     bg_playercfg_t *playercfg;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
     weapon_t oldDefault;
 #endif
 #ifdef TA_GAME_MODELS
@@ -977,18 +977,18 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 	VectorCopy (client->pers.playercfg.bbmins, ent->r.mins);
 	VectorCopy (client->pers.playercfg.bbmaxs, ent->r.maxs);
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	// DEFAULT_DEFAULT_WEAPON
 	oldDefault = g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON];
 
 	g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON] = playercfg->default_weapon;
 
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	// Set the ammo value.
 	g_entities[clientNum].client->ps.ammo[playercfg->default_weapon] = -1;
 #endif
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	// If not holding new default, change to it.
 	if (g_entities[clientNum].client->ps.weapon != g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON])
 	{
@@ -1007,8 +1007,8 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 		// Only update "ammo"
 		g_entities[clientNum].client->ps.stats[STAT_AMMO] = -1;
 	}
-#endif // TMNTWEAPSYS_EX
-#endif // TMNTWEAPSYS
+#endif // TA_WEAPSYS_EX
+#endif // TA_WEAPSYS
 }
 #endif
 
@@ -1101,7 +1101,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 
 	// set model
-#ifdef TMNTSP // SPMODEL
+#ifdef TA_SP // SPMODEL
 	if ( g_singlePlayer.integer == 1 /* && g_gametype.integer == GT_SINGLE_PLAYER*/ ) {
 		Q_strncpyz( model, Info_ValueForKey (userinfo, "spmodel"), sizeof( model ) );
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "spheadmodel"), sizeof( headModel ) );
@@ -1118,12 +1118,12 @@ void ClientUserinfoChanged( int clientNum ) {
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "headmodel"), sizeof( headModel ) );
 	}
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
     G_LoadPlayer(clientNum, model, headModel);
 #endif
 
 	// bots set their team a few frames later
-#ifdef TMNTSP
+#ifdef TA_SP
 	if ((g_gametype.integer == GT_SINGLE_PLAYER || g_gametype.integer >= GT_TEAM)
 		&& g_entities[clientNum].r.svFlags & SVF_BOT)
 #else
@@ -1312,7 +1312,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	ClientUserinfoChanged( clientNum );
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
-#ifdef TMNTSP
+#ifdef TA_SP
     // If its single player don't add message.
 	if ( firstTime && !g_singlePlayer.integer)
 #else
@@ -1377,7 +1377,7 @@ void ClientBegin( int clientNum ) {
 	flags = client->ps.eFlags;
 	memset( &client->ps, 0, sizeof( client->ps ) );
 	client->ps.eFlags = flags;
-#ifdef TMNTSP
+#ifdef TA_SP
 	if (g_gametype.integer == GT_SINGLE_PLAYER)
 	{
 		if (client->sess.sessionTeam != TEAM_FREE)
@@ -1397,7 +1397,7 @@ void ClientBegin( int clientNum ) {
 	}
 #endif
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	G_LoadPlayer(clientNum, client->pers.playercfg.model, client->pers.playercfg.headModel);
 #endif
 
@@ -1405,7 +1405,7 @@ void ClientBegin( int clientNum ) {
 	ClientSpawn( ent );
 
 	if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
-#ifdef TMNTSP
+#ifdef TA_SP
 		if (!(g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER))
 		{
 #endif
@@ -1416,7 +1416,7 @@ void ClientBegin( int clientNum ) {
 		if ( g_gametype.integer != GT_TOURNAMENT  ) {
 			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
 		}
-#ifdef TMNTSP
+#ifdef TA_SP
 		}
 #endif
 	}
@@ -1463,23 +1463,23 @@ void ClientSpawn(gentity_t *ent) {
 		spawnPoint = SelectSpectatorSpawnPoint ( 
 						spawn_origin, spawn_angles);
 	} else if (g_gametype.integer >= GT_CTF
-#ifdef TMNTSP // SP_BOSS
+#ifdef TA_SP // SP_BOSS
 	|| (g_gametype.integer == GT_SINGLE_PLAYER && client->sess.sessionTeam != TEAM_FREE)
 #endif
 	) {
 		// all base oriented team games use the CTF spawn points
 		spawnPoint = SelectCTFSpawnPoint ( 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 						ent,
 #endif
 						client->sess.sessionTeam, 
 						client->pers.teamState.state, 
 						spawn_origin, spawn_angles,
 						!!(ent->r.svFlags & SVF_BOT));
-#ifdef TMNTSP
+#ifdef TA_SP
 	} else if (g_gametype.integer == GT_SINGLE_PLAYER) {
 		spawnPoint = SelectSinglePlayerSpawnPoint(
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 						ent,
 #endif
 						index, spawn_origin, spawn_angles,
@@ -1493,7 +1493,7 @@ void ClientSpawn(gentity_t *ent) {
 		{
 			client->pers.initialSpawn = qtrue;
 			spawnPoint = SelectInitialSpawnPoint(
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 								ent,
 #endif
 								spawn_origin, spawn_angles,
@@ -1503,7 +1503,7 @@ void ClientSpawn(gentity_t *ent) {
 		{
 			// don't spawn near existing origin if possible
 			spawnPoint = SelectSpawnPoint ( 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 				ent,
 #else
 				client->ps.origin, 
@@ -1513,7 +1513,7 @@ void ClientSpawn(gentity_t *ent) {
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
 
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	// always clear the kamikaze flag
 	ent->s.eFlags &= ~EF_KAMIKAZE;
 #endif
@@ -1587,7 +1587,7 @@ void ClientSpawn(gentity_t *ent) {
 	ent->watertype = 0;
 	ent->flags = 0;
 	
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	VectorCopy (client->pers.playercfg.bbmins, ent->r.mins);
 	VectorCopy (client->pers.playercfg.bbmaxs, ent->r.maxs);
 #else
@@ -1597,12 +1597,12 @@ void ClientSpawn(gentity_t *ent) {
 
 	client->ps.clientNum = index;
 
-#ifdef TMNTCAMERA
+#ifdef TA_CAMERA
 	G_ClientCameraReset(client);
 #endif
 
-#ifdef TMNTHOLDSYS
-#ifdef TMNTHOLDABLE // Start with 10 shurikens!
+#ifdef TA_HOLDSYS
+#ifdef TA_HOLDABLE // Start with 10 shurikens!
 #ifdef IOQ3ZTM // LASERTAG
 	if (g_laserTag.integer) {
 		client->ps.holdableIndex = HI_NONE;
@@ -1617,15 +1617,15 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.holdableIndex = HI_NONE;
 #endif
 #endif
-#ifdef TMNTWEAPSYS // ZTM: Respawn code. Start with default weapon. Set ammo values.
+#ifdef TA_WEAPSYS // ZTM: Respawn code. Start with default weapon. Set ammo values.
 	// Set default weapon
-#if defined TMNTPLAYERSYS
+#if defined TA_PLAYERSYS
 	client->ps.stats[STAT_DEFAULTWEAPON] = client->pers.playercfg.default_weapon;
 #else
 	client->ps.stats[STAT_DEFAULTWEAPON] = DEFAULT_DEFAULT_WEAPON;
 #endif
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	// Set default ammo values.
 	client->ps.stats[STAT_AMMO] = -1;
 	client->ps.stats[STAT_PENDING_AMMO] = -1;
@@ -1634,7 +1634,7 @@ void ClientSpawn(gentity_t *ent) {
 	// Set default ammo values.
 	{
 		int i;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		int max = BG_NumWeaponGroups();
 		for (i = 0; i < max; i++)
 #else
@@ -1656,20 +1656,20 @@ void ClientSpawn(gentity_t *ent) {
 
 	{
 		// ZTM: Start with default weapon.
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 		gitem_t *item;
 #endif
 		weapon_t weapon;
 
 		// DEFAULT_DEFAULT_WEAPON
 		weapon = client->ps.stats[STAT_DEFAULTWEAPON];
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		client->ps.stats[STAT_PENDING_WEAPON] = weapon;
 #else
 		client->ps.stats[STAT_WEAPONS] = ( 1 << weapon);
 #endif
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		// Default weapon doesn't use ammo.
 		client->ps.stats[STAT_AMMO] = -1;
 #else
@@ -1719,7 +1719,7 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 #endif
 
-#ifdef TMNTMISC // no health countdown
+#ifdef TA_MISC // no health countdown
 	ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH];
 #else
 	// health will count down towards max_health
@@ -1746,7 +1746,7 @@ void ClientSpawn(gentity_t *ent) {
 		trap_LinkEntity (ent);
 
 		// force the base weapon up
-#ifdef TMNTWEAPSYS // ZTM: Set ready weapon to default weapon.
+#ifdef TA_WEAPSYS // ZTM: Set ready weapon to default weapon.
 		// ZTM: Start with default weapon.
 		client->ps.weapon = client->ps.stats[STAT_DEFAULTWEAPON];
 		// Set default hands.
@@ -1781,10 +1781,10 @@ void ClientSpawn(gentity_t *ent) {
 		// fire the targets of the spawn point
 		G_UseTargets( spawnPoint, ent );
 
-#ifndef TMNTWEAPSYS_EX // don't select any weapon after spawning
+#ifndef TA_WEAPSYS_EX // don't select any weapon after spawning
 		// select the highest weapon number available, after any
 		// spawn given items have fired
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		for ( i = BG_NumWeaponGroups() - 1 ; i > 0 ; i-- )
 #else
 		client->ps.weapon = 1;
@@ -1799,7 +1799,7 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 	}
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	//
 	// Load persistant data
 	//
@@ -1919,7 +1919,7 @@ void ClientDisconnect( int clientNum ) {
 	}
 }
 
-#ifdef TMNTSP // save/load
+#ifdef TA_SP // save/load
 // ZTM: TODO: Merge with g_session.c ? ( G_WriteClientSessionData )
 /*
 ===========
@@ -1939,7 +1939,7 @@ void G_SavePersistant(char *nextmap)
 	char *s;
 	int i;
 	gclient_t *client;
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	int j;
 	char holdableData[(MAX_HOLDABLE*2)+1];
 	int save_array;
@@ -1969,7 +1969,7 @@ void G_SavePersistant(char *nextmap)
 	{
 		client = &level.clients[i];
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 		s = va("livs\\%d\\ctns\\%d\\scr\\%i\\hi\\%i",
 				client->ps.persistant[PERS_LIVES],
 				client->ps.persistant[PERS_CONTINUES],
@@ -1982,7 +1982,7 @@ void G_SavePersistant(char *nextmap)
 #endif
 		Q_strncpyz(savedata, s, sizeof(savedata));
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 		// Save arrays.
 		holdableData[0] = '\0';
 		save_array = 0;
@@ -2037,7 +2037,7 @@ void G_LoadPersistant(int clientnum)
 	int i;
 	char *config;
 	char *s;
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	int j;
 	int array_len;
 	char array_data[3];
@@ -2112,7 +2112,7 @@ void G_LoadPersistant(int clientnum)
 			}
 			client->ps.persistant[PERS_CONTINUES] = atoi(Info_ValueForKey(config, "ctns"));
 			client->ps.persistant[PERS_SCORE] = atoi(Info_ValueForKey(config, "scr"));
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 			client->ps.holdableIndex = atoi(Info_ValueForKey(config, "hi"));
 
 			// Read array

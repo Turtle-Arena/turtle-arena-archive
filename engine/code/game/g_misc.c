@@ -272,7 +272,7 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 #ifdef TURTLEARENA // LOCKON
 	if (ent->random == -1)
 	{
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
 				ent->s.origin, dir, right, up);
 #else
@@ -297,7 +297,7 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	}
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (!fire_weapon(ent, ent->s.origin, dir, right, up,
 				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], 1, HAND_NONE))
 	{
@@ -354,7 +354,7 @@ void InitShooter( gentity_t *ent, int weapon ) {
 	trap_LinkEntity( ent );
 }
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 /*QUAKED misc_shooter (1 0 0) (-16 -16 -16) (16 16 16)
 Fires at either the target or the current direction.
 "random" the number of degrees of deviance from the taget. (1.0 default)
@@ -371,7 +371,7 @@ Fires at either the target or the current direction.
 "random" the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_rocket( gentity_t *ent ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	InitShooter( ent, BG_WeaponGroupIndexForName("wp_rocket_launcher") );
 #else
 	InitShooter( ent, WP_ROCKET_LAUNCHER );
@@ -383,7 +383,7 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_plasma( gentity_t *ent ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	int weapon;
 
 	weapon = BG_WeaponGroupIndexForName("wp_plasmagun");
@@ -404,7 +404,7 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_grenade( gentity_t *ent ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	int weapon;
 
 	weapon = BG_WeaponGroupIndexForName("wp_grenade_launcher");
@@ -461,7 +461,7 @@ void DropPortalDestination( gentity_t *player ) {
 	ent->count = player->client->portalID;
 
 	// give the item back so they can drop the source now
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	player->client->ps.holdableIndex = HI_PORTAL;
 	player->client->ps.holdable[HI_PORTAL]++;
 #else
@@ -581,7 +581,7 @@ void DropPortalSource( gentity_t *player ) {
 
 }
 #endif
-#ifdef TMNTENTSYS // MISC_OBJECT
+#ifdef TA_ENTSYS // MISC_OBJECT
 // ZTM: TODO: There should also be func_* for brushes that acts mostly the same?
 
 /*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath

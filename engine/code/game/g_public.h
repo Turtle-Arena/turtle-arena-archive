@@ -292,11 +292,11 @@ typedef enum {
 	BOTLIB_EA_MOVE_LEFT,
 	BOTLIB_EA_MOVE_RIGHT,
 
-#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
+#if defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT // BOTLIB
 	BOTLIB_EA_DROP_WEAPON,
 #else
 	BOTLIB_EA_SELECT_WEAPON,
-#ifdef TMNTWEAPSYS_EX // TMNTWEAPSYS_EX_COMPAT
+#ifdef TA_WEAPSYS_EX // TA_WEAPSYS_EX_COMPAT
 #define BOTLIB_EA_DROP_WEAPON BOTLIB_EA_SELECT_WEAPON
 #endif
 #endif
@@ -372,7 +372,7 @@ typedef enum {
 	BOTLIB_AI_FREE_MOVE_STATE,
 	BOTLIB_AI_INIT_MOVE_STATE,
 
-//#ifndef TMNTWEAPSYS // ZTM: NOTE: Can't disable unless I modified the g_syscall.asm file.
+//#ifndef TA_WEAPSYS // ZTM: NOTE: Can't disable unless I modified the g_syscall.asm file.
 	BOTLIB_AI_CHOOSE_BEST_FIGHT_WEAPON,
 	BOTLIB_AI_GET_WEAPON_INFO,
 	BOTLIB_AI_LOAD_WEAPON_WEIGHTS,
@@ -438,7 +438,7 @@ typedef enum {
 	// The game can issue trap_argc() / trap_argv() commands to get the command
 	// and parameters.  Return qfalse if the game doesn't recognize it as a command.
 
-#ifdef TMNTSP // Save/load
+#ifdef TA_SP // Save/load
 	GAME_SAVEGAME, // ( fileHandle_t f );
 
 	GAME_LOADGAME, // ( fileHandle_t f );

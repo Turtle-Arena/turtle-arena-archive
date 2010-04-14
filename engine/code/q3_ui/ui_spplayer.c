@@ -34,7 +34,7 @@ SINGLE PLAYER, PLAYER SELECT MENU
 
 #define ART_BACK					"menu/art/back_0.tga"
 #define ART_BACK_FOCUS				"menu/art/back_1.tga"
-#ifdef TMNTMISC // NO_MENU_FIGHT
+#ifdef TA_MISC // NO_MENU_FIGHT
 #define ART_FIGHT					"menu/art/play_0"
 #define ART_FIGHT_FOCUS				"menu/art/play_1"
 #else
@@ -145,7 +145,7 @@ UI_SPPlayerMenu_Key
 */
 static sfxHandle_t UI_SPPlayerMenu_Key( int key ) {
 	if(
-#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
 	key == K_MOUSE2 ||
 #endif
 	key == K_ESCAPE ) {

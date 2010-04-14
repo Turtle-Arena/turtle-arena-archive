@@ -45,7 +45,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 
 #define ART_BACK0				"menu/art/back_0"
 #define ART_BACK1				"menu/art/back_1"
-#ifndef TMNTMISC
+#ifndef TA_MISC
 #define ART_CREATE0				"menu/art/create_0"
 #define ART_CREATE1				"menu/art/create_1"
 #endif
@@ -53,7 +53,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define ART_SPECIFY1			"menu/art/specify_1"
 #define ART_REFRESH0			"menu/art/refresh_0"
 #define ART_REFRESH1			"menu/art/refresh_1"
-#ifdef TMNTDATA // NO_MENU_FIGHT
+#ifdef TA_DATA // NO_MENU_FIGHT
 #define ART_CONNECT0			"menu/art/join_0"
 #define ART_CONNECT1			"menu/art/join_1"
 #else
@@ -81,7 +81,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define ID_BACK				18
 #define ID_REFRESH			19
 #define ID_SPECIFY			20
-#ifndef TMNTMISC
+#ifndef TA_MISC
 #define ID_CREATE			21
 #endif
 #define ID_CONNECT			22
@@ -153,7 +153,7 @@ static const char *servertype_items[] = {
 #ifndef TURTLEARENA // MP_GAMETYPES
 	"Team Deathmatch",
 #endif
-#ifdef TMNTMISC // tornament to duel
+#ifdef TA_MISC // tornament to duel
 	"Duel",
 #else
 	"Tournament",
@@ -185,7 +185,7 @@ static const char *sortkey_items[] = {
 static char* gamenames[] = {
 	"DM ",	// deathmatch
 	"1v1",	// tournament
-#ifdef TMNTSP
+#ifdef TA_SP
 	"Co-op",	// single player
 #else
 	"SP ",	// single player
@@ -293,7 +293,7 @@ typedef struct {
 	menubitmap_s		back;
 	menubitmap_s		refresh;
 	menubitmap_s		specify;
-#ifndef TMNTMISC
+#ifndef TA_MISC
 	menubitmap_s		create;
 #endif
 	menubitmap_s		go;
@@ -442,7 +442,7 @@ static void ArenaServers_UpdatePicture( void ) {
 	}
 	else {
 		servernodeptr = g_arenaservers.table[g_arenaservers.list.curvalue].servernode;
-#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
+#ifdef TA_DATA // TEAMARENA_LEVELSHOTS
 		Com_sprintf( picname, sizeof(picname), "levelshots/%s_small", servernodeptr->mapname );
 #else
 		Com_sprintf( picname, sizeof(picname), "levelshots/%s.tga", servernodeptr->mapname );
@@ -1449,7 +1449,7 @@ static void ArenaServers_Event( void* ptr, int event ) {
 #endif
 		break;
 
-#ifndef TMNTMISC
+#ifndef TA_MISC
 	case ID_CREATE:
 		UI_StartServerMenu( qtrue );
 		break;
@@ -1513,7 +1513,7 @@ static sfxHandle_t ArenaServers_MenuKey( int key ) {
 	}
 
 	if(
-#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
 	key == K_MOUSE2 ||
 #endif
 	key == K_ESCAPE ) {
@@ -1697,7 +1697,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.specify.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	g_arenaservers.specify.generic.callback = ArenaServers_Event;
 	g_arenaservers.specify.generic.id	    = ID_SPECIFY;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	g_arenaservers.specify.generic.x		= 176;
 #else
 	g_arenaservers.specify.generic.x		= 128;
@@ -1712,7 +1712,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.refresh.generic.flags	= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	g_arenaservers.refresh.generic.callback	= ArenaServers_Event;
 	g_arenaservers.refresh.generic.id		= ID_REFRESH;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	g_arenaservers.refresh.generic.x		= 352;
 #else
 	g_arenaservers.refresh.generic.x		= 256;
@@ -1722,7 +1722,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.refresh.height			= 64;
 	g_arenaservers.refresh.focuspic			= ART_REFRESH1;
 
-#ifndef TMNTMISC
+#ifndef TA_MISC
 	g_arenaservers.create.generic.type		= MTYPE_BITMAP;
 	g_arenaservers.create.generic.name		= ART_CREATE0;
 	g_arenaservers.create.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1786,7 +1786,7 @@ static void ArenaServers_MenuInit( void ) {
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.back );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.specify );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.refresh );
-#ifndef TMNTMISC
+#ifndef TA_MISC
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.create );
 #endif
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.go );
@@ -1836,7 +1836,7 @@ ArenaServers_Cache
 void ArenaServers_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_BACK0 );
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
-#ifndef TMNTMISC
+#ifndef TA_MISC
 	trap_R_RegisterShaderNoMip( ART_CREATE0 );
 	trap_R_RegisterShaderNoMip( ART_CREATE1 );
 #endif

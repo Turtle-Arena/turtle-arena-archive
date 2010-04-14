@@ -121,7 +121,7 @@ int G_SoundIndex( char *name ) {
 	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, qtrue);
 }
 
-#ifdef TMNTMISC // Particles
+#ifdef TA_MISC // Particles
 // str should be
 // int  f f f   f f f   int         int   int
 // type origin origin2 numparticles turb snum
@@ -245,7 +245,7 @@ match (string)self.target and call their .use function
 
 ==============================
 */
-#ifdef TMNTENTSYS
+#ifdef TA_ENTSYS
 void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *target ) {
 	gentity_t		*t;
 
@@ -276,7 +276,7 @@ void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *target ) {
 			G_Printf("entity was removed while using targets\n");
 			return;
 		}
-#ifdef TMNTWEAPSYS // Check if weapon_default was given.
+#ifdef TA_WEAPSYS // Check if weapon_default was given.
         if (ent->s.weapon == WP_DEFAULT)
         {
             if (ent->client)
@@ -329,7 +329,7 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 			G_Printf("entity was removed while using targets\n");
 			return;
 		}
-#ifdef TMNTWEAPSYS // Check if weapon_default was given.
+#ifdef TA_WEAPSYS // Check if weapon_default was given.
         if (ent->s.weapon == WP_DEFAULT)
         {
             if (ent->client)
@@ -446,7 +446,7 @@ float vectoyaw( const vec3_t vec ) {
 
 void G_InitGentity( gentity_t *e ) {
 	e->inuse = qtrue;
-#ifdef TMNTWEAPSYS // XREAL
+#ifdef TA_WEAPSYS // XREAL
 	e->spawnTime = level.time;
 #endif
 	e->classname = "noclass";
@@ -712,7 +712,7 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin ) {
 	VectorCopy( origin, ent->r.currentOrigin );
 }
 
-#ifdef TMNTWEAPSYS // XREAL r2785
+#ifdef TA_WEAPSYS // XREAL r2785
 /*
 =================
 G_FindRadius
@@ -798,7 +798,7 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 		&& !(source->client && target->pain == ObeliskPain
 			&& target->spawnflags != source->client->sess.sessionTeam)
 #endif
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 		&& !(source->client && target->s.eType == ET_NPC)
 #endif
 	)

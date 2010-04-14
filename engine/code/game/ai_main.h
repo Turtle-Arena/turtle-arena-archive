@@ -151,7 +151,7 @@ typedef struct bot_state_s
 	int lastkilledby;								//player that last killed this bot
 	int botdeathtype;								//the death type of the bot
 	int enemydeathtype;								//the death type of the enemy
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	int botdeathweapon;								//the missile that killed the bot
 #endif
 	int botsuicide;									//true when the bot suicides
@@ -221,7 +221,7 @@ typedef struct bot_state_s
 	int ms;											//move state of the bot
 	int gs;											//goal state of the bot
 	int cs;											//chat state of the bot
-#ifndef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS // BOT_WEAP_WEIGHTS
 	int ws;											//weapon state of the bot
 #endif
 	//

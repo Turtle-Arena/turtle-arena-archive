@@ -57,7 +57,7 @@ void multi_trigger( gentity_t *ent, gentity_t *activator ) {
 			activator->client->sess.sessionTeam != TEAM_BLUE ) {
 			return;
 		}
-#ifdef TMNTPLAYERSYS // ABILITY_TECH
+#ifdef TA_PLAYERSYS // ABILITY_TECH
 		if ( ( ent->spawnflags & 4 ) &&
 			activator->client->pers.playercfg.ability != ABILITY_TECH ) {
 			return;

@@ -278,7 +278,7 @@ BotWeaponNameForMeansOfDeath
 ==================
 */
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 char *BotWeaponNameForMeansOfDeath(int mod, int weapon) {
 	switch(mod) {
 		case MOD_PROJECTILE:
@@ -293,7 +293,7 @@ char *BotWeaponNameForMeansOfDeath(int mod, int weapon) {
 	}
 }
 #else
-// ZTM: Support not defining TMNTWEAPSYS (Define missing vars, and add int unused to function)
+// ZTM: Support not defining TA_WEAPSYS (Define missing vars, and add int unused to function)
 #define botdeathweapon botdeathtype
 #define lasthurt_weapon botdeathtype
 char *BotWeaponNameForMeansOfDeath(int mod, int unused) {
@@ -317,7 +317,7 @@ char *BotWeaponNameForMeansOfDeath(int mod, int unused) {
 		case MOD_NAIL: return "Nailgun";
 		case MOD_CHAINGUN: return "Chaingun";
 		case MOD_PROXIMITY_MINE: return "Proximity Launcher";
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE: return "Kamikaze";
 #endif
 		case MOD_JUICED: return "Prox mine";
@@ -336,7 +336,7 @@ BotRandomWeaponName
 char *BotRandomWeaponName(void) {
 	int rnd;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	rnd = random() * (float)(BG_NumWeaponGroups() + 0.9f);
 	if (rnd >= BG_NumWeaponGroups())
 		rnd = BG_NumWeaponGroups()-1;
@@ -648,14 +648,14 @@ int BotChat_Death(bot_state_t *bs) {
 				bs->botdeathtype == MOD_SUICIDE ||
 				bs->botdeathtype == MOD_TARGET_LASER ||
 				bs->botdeathtype == MOD_TRIGGER_HURT ||
-#ifdef TMNTENTSYS
+#ifdef TA_ENTSYS
 				bs->botdeathtype == MOD_EXPLOSION ||
 #endif
 				bs->botdeathtype == MOD_UNKNOWN)
 			BotAI_BotInitialChat(bs, "death_suicide", BotRandomOpponentName(bs), NULL);
 		else if (bs->botdeathtype == MOD_TELEFRAG)
 			BotAI_BotInitialChat(bs, "death_telefrag", name, NULL);
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		else if (bs->botdeathtype == MOD_KAMIKAZE && trap_BotNumInitialChats(bs->cs, "death_kamikaze"))
 			BotAI_BotInitialChat(bs, "death_kamikaze", name, NULL);
 #endif
@@ -755,7 +755,7 @@ int BotChat_Kill(bot_state_t *bs) {
 		if (bs->enemydeathtype == MOD_TELEFRAG) {
 			BotAI_BotInitialChat(bs, "kill_telefrag", name, NULL);
 		}
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		else if (bs->botdeathtype == MOD_KAMIKAZE && trap_BotNumInitialChats(bs->cs, "kill_kamikaze"))
 			BotAI_BotInitialChat(bs, "kill_kamikaze", name, NULL);
 #endif

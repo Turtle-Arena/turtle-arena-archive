@@ -35,7 +35,7 @@ menuDef_t *menuScoreboard = NULL;
 int drawTeamOverlayModificationCount = -1;
 #endif
 
-#ifdef TMNTHUD
+#ifdef TA_HUD
 #define HUD_X 40
 #define HUD_Y 55 // letterbox view shouldn't overlap hud
 #define HUD_WIDTH 150
@@ -350,7 +350,7 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 		origin[0] = len / 0.268;	// len / tan( fov/2 )
 
 		// allow per-model tweaking
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 		VectorAdd( origin, ci->playercfg.headOffset, origin );
 #else
 		VectorAdd( origin, ci->headOffset, origin );
@@ -375,7 +375,7 @@ Used for both the status bar and the scoreboard
 ================
 */
 void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean force2D ) {
-#ifdef TMNTDATA // FLAG_MODEL
+#ifdef TA_DATA // FLAG_MODEL
 	gitem_t *item;
 	int itemIndex;
 
@@ -541,7 +541,7 @@ static void CG_DrawStatusBarHead( float x ) {
 	angles[YAW] = cg.headStartYaw + ( cg.headEndYaw - cg.headStartYaw ) * frac;
 	angles[PITCH] = cg.headStartPitch + ( cg.headEndPitch - cg.headStartPitch ) * frac;
 
-#ifdef TMNTHUD
+#ifdef TA_HUD
 	CG_DrawHead( x,  (HUD_Y+(ICON_SIZE * 1.25)) - size, size, size,
 #else
 	CG_DrawHead( x, 480 - size, size, size, 
@@ -558,7 +558,7 @@ CG_DrawStatusBarFlag
 */
 #ifndef MISSIONPACK_HUD
 static void CG_DrawStatusBarFlag( float x, int team ) {
-#ifdef TMNTHUD
+#ifdef TA_HUD
 	CG_DrawFlagModel( x, HUD_Y, ICON_SIZE, ICON_SIZE, team, qfalse );
 #else
 	CG_DrawFlagModel( x, 480 - ICON_SIZE, ICON_SIZE, ICON_SIZE, team, qfalse );
@@ -586,7 +586,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 		hcolor[1] = 0;
 		hcolor[2] = 1;
 	} else {
-#ifdef TMNTHUD // ZTM: TODO?: Use player's effects color?
+#ifdef TA_HUD // ZTM: TODO?: Use player's effects color?
 		hcolor[0] = 0;
 		hcolor[1] = 1;
 		hcolor[2] = 0;
@@ -607,7 +607,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 	trap_R_SetColor( NULL );
 }
 
-#ifdef TMNTHUD
+#ifdef TA_HUD
 void CG_DrawFieldSmall(int x, int y, int width, int value)
 {
 	char	num[16], *ptr;
@@ -678,11 +678,11 @@ static void CG_DrawStatusBar( void ) {
 	centity_t	*cent;
 	playerState_t	*ps;
 	int			value;
-#ifndef TMNTHUD
+#ifndef TA_HUD
 	vec4_t		hcolor;
 #endif
 	vec3_t		angles;
-#ifdef TMNTHUD
+#ifdef TA_HUD
 	int			start_x;
 	int			x;
 	int			y;
@@ -722,7 +722,7 @@ static void CG_DrawStatusBar( void ) {
 	}
 #endif
 
-#ifdef TMNTHUD
+#ifdef TA_HUD
 	CG_HudPlacement(HUD_LEFT);
 
 	start_x = x = HUD_X;
@@ -784,13 +784,13 @@ static void CG_DrawStatusBar( void ) {
 
 	// LINE3: Weapon
 	if ( cent->currentState.weapon ) {
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		value = ps->stats[STAT_AMMO];
 #else
 		value = ps->ammo[cent->currentState.weapon];
 #endif
 		// Draw weapon icon
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if ( cg_weapongroups[cent->currentState.weapon].weaponIcon ) {
 			CG_DrawPic( x, y, ICON_SIZE, ICON_SIZE,
 				cg_weapongroups[cent->currentState.weapon].weaponIcon );
@@ -830,7 +830,7 @@ static void CG_DrawStatusBar( void ) {
 	}
 
 	// LINE3: Holdable item
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	value = BG_ItemNumForHoldableNum(cg.snap->ps.holdableIndex);
 #else
 	value = cg.snap->ps.stats[STAT_HOLDABLE_ITEM];
@@ -842,11 +842,11 @@ static void CG_DrawStatusBar( void ) {
 		}
 		x += ICON_SIZE;
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 		// draw value
 
 		{
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			int giveQuantity = BG_ItemForItemNum(value)->quantity;
 #else
 			int giveQuantity = bg_itemlist[ value ].quantity;
@@ -877,7 +877,7 @@ static void CG_DrawStatusBar( void ) {
 		x += (2 * (CHAR_WIDTH/2));
 	}
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	// LINE4: Lives (Single Player and Co-op only)
 	if (cgs.gametype == GT_SINGLE_PLAYER)
 	{
@@ -906,7 +906,7 @@ static void CG_DrawStatusBar( void ) {
 	VectorClear( angles );
 
 	// draw any 3D icons first, so the changes back to 2D are minimized
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if ( cent->currentState.weapon && cg_weapongroups[ cent->currentState.weapon ].ammoModel )
 #else
 	if ( cent->currentState.weapon && cg_weapons[ cent->currentState.weapon ].ammoModel )
@@ -917,7 +917,7 @@ static void CG_DrawStatusBar( void ) {
 		origin[2] = 0;
 		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
 		CG_Draw3DModel( CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE,
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 					   cg_weapongroups[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
 #else
 					   cg_weapons[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
@@ -970,7 +970,7 @@ static void CG_DrawStatusBar( void ) {
 			if ( !cg_draw3dIcons.integer && cg_drawIcons.integer ) {
 				qhandle_t	icon;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 				icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].ammoIcon;
 #else
 				icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
@@ -1019,11 +1019,11 @@ static void CG_DrawStatusBar( void ) {
 
 	}
 #endif
-#endif // TMNTHUD
+#endif // TA_HUD
 }
 #endif // MISSIONPACK_HUD
 
-#if defined TMNTWEAPSYS || defined IOQ3ZTM // SHOW_SPEED
+#if defined TA_WEAPSYS || defined IOQ3ZTM // SHOW_SPEED
 /*
 ================
 CG_DrawMiddleLeft
@@ -1340,7 +1340,7 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 			// draw weapon icon
 			xx += TINYCHAR_WIDTH * 3;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
 				CG_DrawPic( xx, y, TINYCHAR_WIDTH, TINYCHAR_HEIGHT,
 					cg_weapongroups[ci->curWeapon].weaponIcon );
@@ -1543,7 +1543,7 @@ static float CG_DrawScores( float y ) {
 #endif
 
 	} else
-#ifdef TMNTHUD // Not ffa or sp, but still in tournament?
+#ifdef TA_HUD // Not ffa or sp, but still in tournament?
 	if (cgs.gametype == GT_TOURNAMENT)
 #endif
 	{
@@ -1755,7 +1755,7 @@ CG_DrawPickupItem
 static int CG_DrawPickupItem( int y ) {
 	int		value;
 	float	*fadeColor;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	gitem_t *item;
 #endif
 
@@ -1766,7 +1766,7 @@ static int CG_DrawPickupItem( int y ) {
 	y -= ICON_SIZE;
 
 	value = cg.itemPickup;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	item = BG_ItemForItemNum(value);
 	if (item && item->giType == IT_WEAPON
 		&& item->giTag == WP_DEFAULT)
@@ -1781,7 +1781,7 @@ static int CG_DrawPickupItem( int y ) {
 			CG_RegisterItemVisuals( value );
 			trap_R_SetColor( fadeColor );
 			CG_DrawPic( 8, y, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			CG_DrawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), item->pickup_name, fadeColor[0] );
 #else
 			CG_DrawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), bg_itemlist[ value ].pickup_name, fadeColor[0] );
@@ -1902,12 +1902,12 @@ static void CG_DrawTeamInfo( void ) {
 CG_DrawHoldableItem
 ===================
 */
-#ifndef TMNTHUD
+#ifndef TA_HUD
 #ifndef MISSIONPACK_HUD
 static void CG_DrawHoldableItem( void ) { 
 	int		value;
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	value = BG_ItemNumForHoldableNum(cg.snap->ps.holdableIndex);
 #else
 	value = cg.snap->ps.stats[STAT_HOLDABLE_ITEM];
@@ -1937,7 +1937,7 @@ static void CG_DrawPersistantPowerup( void ) {
 	value = cg.snap->ps.stats[STAT_PERSISTANT_POWERUP];
 	if ( value ) {
 		CG_RegisterItemVisuals( value );
-#ifdef TMNTHUD
+#ifdef TA_HUD
 		CG_DrawPic( HUD_X, (SCREEN_HEIGHT-ICON_SIZE)/2 - ICON_SIZE, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
 #else
 		CG_DrawPic( 640-ICON_SIZE, (SCREEN_HEIGHT-ICON_SIZE)/2 - ICON_SIZE, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
@@ -2755,7 +2755,7 @@ static qboolean CG_DrawScoreboard( void ) {
 #endif
 }
 
-#ifdef TMNTSP
+#ifdef TA_SP
 /*
 =================
 CG_DrawIntermission
@@ -2808,14 +2808,14 @@ CG_DrawIntermission
 */
 static void CG_DrawIntermission( void ) {
 //	int key;
-#if defined MISSIONPACK_HUD && !defined TMNTSP
+#if defined MISSIONPACK_HUD && !defined TA_SP
 	//if (cg_singlePlayer.integer) {
 	//	CG_DrawCenterString();
 	//	return;
 	//}
 #else
 	if ( cgs.gametype == GT_SINGLE_PLAYER ) {
-#ifdef TMNTSP
+#ifdef TA_SP
 		CG_DrawSPIntermission();
 #endif
 		CG_DrawCenterString();
@@ -3100,7 +3100,7 @@ void CG_DrawTimedMenus( void ) {
 	}
 }
 #endif
-#ifdef TMNTSP
+#ifdef TA_SP
 /*
 =================
 CG_DrawGameOver
@@ -3170,7 +3170,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 	}
 
 	if ( cg.snap->ps.pm_type == PM_INTERMISSION
-#ifdef TMNTSP
+#ifdef TA_SP
 		|| cg.snap->ps.pm_type == PM_SPINTERMISSION
 #endif
 	) {
@@ -3199,7 +3199,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 	} else {
 		// don't draw any status if dead or the scoreboard is being explicitly shown
 		if (
-#ifndef TMNTHUD
+#ifndef TA_HUD
 		!cg.showScores &&
 #endif
 		cg.snap->ps.stats[STAT_HEALTH] > 0 ) {
@@ -3213,7 +3213,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			CG_DrawStatusBar();
 #endif
       
-#if defined TMNTWEAPSYS || defined IOQ3ZTM // SHOW_SPEED
+#if defined TA_WEAPSYS || defined IOQ3ZTM // SHOW_SPEED
 			CG_DrawMiddleLeft();
 #endif
 
@@ -3227,12 +3227,12 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			if(stereoFrame == STEREO_CENTER)
 				CG_DrawCrosshair();
 			CG_DrawCrosshairNames();
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 			CG_DrawWeaponSelect();
 #endif
 
 #ifndef MISSIONPACK
-#ifndef TMNTHUD
+#ifndef TA_HUD
 			CG_DrawHoldableItem();
 #endif
 #elif !defined MISSIONPACK_HUD // IOQ3ZTM // ZTM: For playing MISSIONPACK without new HUD.
@@ -3273,7 +3273,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 	// don't draw center string if scoreboard is up
 	cg.scoreBoardShowing = CG_DrawScoreboard();
 	if ( !cg.scoreBoardShowing) {
-#ifdef TMNTSP
+#ifdef TA_SP
 		CG_DrawGameOver();
 #endif
 		CG_DrawCenterString();
@@ -3324,7 +3324,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	// draw status bar and other floating elements
  	CG_Draw2D(stereoView);
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	// Draw black bars if needed.
 	CG_DrawLetterbox();
 #endif
@@ -3376,7 +3376,7 @@ void CG_DrawFlashFade( void ) {
 }
 #endif
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 /*
 =============
 CG_ToggleLetterbox

@@ -367,7 +367,7 @@ void CL_SystemInfoChanged( void ) {
 	//  accept explicitly 1, not generally non-zero.
 	s = Info_ValueForKey( systemInfo, "sv_voip" );
 	if (
-#ifndef TMNTSP
+#ifndef TA_SP
 		Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
 #endif
 		Cvar_VariableValue("ui_singlePlayerActive"))

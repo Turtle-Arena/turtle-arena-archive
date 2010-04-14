@@ -67,7 +67,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	vec3_t		dir;
 	vec3_t		origin;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (bg_projectileinfo[ent->s.weapon].explosionType == PE_NONE)
 	{
 		G_FreeEntity(ent);
@@ -85,7 +85,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 
 	ent->s.eType = ET_GENERAL;
 	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ) );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (ent->parent)
 		ent->s.clientNum = ent->parent->s.number;
 	else
@@ -105,7 +105,7 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	trap_LinkEntity( ent );
 }
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 /*
 ================
 G_Missile_Die
@@ -173,7 +173,7 @@ void G_HomingMissile(gentity_t * ent)
 	vec_t           angle;
 	const int		HOMING_THINK_TIME = 60;
 
-#ifdef TMNTWEAPSYS // XREAL: spawnTime
+#ifdef TA_WEAPSYS // XREAL: spawnTime
 	// explode after 15 seconds without a hit
 	if (bg_projectileinfo[ent->s.weapon].timetolive != -1
 		&& ent->spawnTime + bg_projectileinfo[ent->s.weapon].timetolive <= level.time)
@@ -447,7 +447,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 				{
 					// send bullet impact
 					if ( traceEnt->takedamage && (traceEnt->client
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 						|| traceEnt->s.eType == ET_NPC
 #endif
 						))
@@ -737,13 +737,13 @@ qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir, int weaponnum
 }
 #endif
 
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 /*
 =================
 fire_shuriken
 =================
 */
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable, int handSide)
 {
 	int projnum = 0;
@@ -898,7 +898,7 @@ gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t 
 
 #endif
 
-#if defined MISSIONPACK || defined TMNTWEAPSYS
+#if defined MISSIONPACK || defined TA_WEAPSYS
 /*
 ================
 ProximityMine_Explode
@@ -958,7 +958,7 @@ void ProximityMine_Trigger( gentity_t *trigger, gentity_t *other, trace_t *trace
 	// trigger the mine!
 	mine = trigger->parent;
 	mine->s.loopSound = 0;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	G_AddEvent( mine, EV_PROJECTILE_TRIGGER, 0 );
 #else
 	G_AddEvent( mine, EV_PROXIMITY_MINE_TRIGGER, 0 );
@@ -1091,14 +1091,14 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	vec3_t			forward, impactpoint, bouncedir;
 	int				eFlags;
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	qboolean damagedOther = qfalse;
 #endif
 	other = &g_entities[trace->entityNum];
 
 #if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	if ( other->takedamage ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if ( !bg_projectileinfo[ent->s.weapon].stickOnImpact )
 #else
 		if ( ent->s.weapon != WP_PROX_LAUNCHER )
@@ -1123,7 +1123,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 #endif
 	// impact damage
 	if (other->takedamage
-#ifdef TMNTWEAPSYS // stickOnImpact only damages once
+#ifdef TA_WEAPSYS // stickOnImpact only damages once
 		&& !(ent->count & 2)
 #endif
 		)
@@ -1144,7 +1144,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 				velocity[2] = 1;	// stepped on a grenade
 #endif
 			}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			damagedOther = G_Damage (other, ent, &g_entities[ent->r.ownerNum], velocity,
 				ent->s.origin, ent->damage,
 				0, ent->methodOfDeath);
@@ -1158,14 +1158,14 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 	// check for bounce
 	if (
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		!damagedOther &&
 #else
 		!other->takedamage &&
 #endif
 		( ent->s.eFlags & ( EF_BOUNCE | EF_BOUNCE_HALF ) ) ) {
 		G_BounceMissile( ent, trace );
-#ifdef TMNTWEAPSYS // Bounce missiles
+#ifdef TA_WEAPSYS // Bounce missiles
 		// Die on Nth bounce
 		if (ent->s.modelindex2 > 0)
 		{
@@ -1184,7 +1184,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		return;
 	}
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (bg_projectileinfo[ent->s.weapon].stickOnImpact) {
 		vec3_t dir;
 
@@ -1325,7 +1325,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	}
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (bg_projectileinfo[ent->s.weapon].grappling)
 #else
 	if (!strcmp(ent->classname, "hook"))
@@ -1350,16 +1350,16 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		} else {
 			VectorCopy(trace->endpos, v);
 			G_AddEvent( nent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
-#ifdef TMNTWEAPSYS // GRAPPLE_MOVE
+#ifdef TA_WEAPSYS // GRAPPLE_MOVE
 			ent->enemy = other;
 #else
 			ent->enemy = NULL;
 #endif
 		}
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix grapple wallmark/death-effect/debris (only tested with TMNTWEAPSYS...)
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix grapple wallmark/death-effect/debris (only tested with TA_WEAPSYS...)
 		nent->s.weapon = ent->s.weapon;
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (ent->parent)
 			nent->s.clientNum = ent->parent->s.number;
 		else
@@ -1388,7 +1388,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		return;
 	}
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 missileImpact:
 #endif
 
@@ -1403,7 +1403,7 @@ missileImpact:
 	} else {
 		G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( trace->plane.normal ) );
 	}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (ent->parent)
 		ent->s.clientNum = ent->parent->s.number;
 	else
@@ -1449,7 +1449,7 @@ void G_RunMissile( gentity_t *ent ) {
 	if ( ent->target_ent ) {
 		passent = ent->target_ent->s.number;
 	}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	// missiles that left the owner bbox will attack anything, even the owner
 	else if (ent->count & 1)
 	{
@@ -1499,9 +1499,9 @@ void G_RunMissile( gentity_t *ent ) {
 			return;		// exploded
 		}
 	}
-#if defined MISSIONPACK || defined TMNTWEAPSYS
+#if defined MISSIONPACK || defined TA_WEAPSYS
 	// if the prox mine wasn't yet outside the player body
-#ifdef TMNTWEAPSYS // ZTM: TODO: Add a option not to damage owner?
+#ifdef TA_WEAPSYS // ZTM: TODO: Add a option not to damage owner?
 	if (!(ent->count & 1))
 #else
 	if (ent->s.weapon == WP_PROX_LAUNCHER && !ent->count)
@@ -1510,7 +1510,7 @@ void G_RunMissile( gentity_t *ent ) {
 		// check if the prox mine is outside the owner bbox
 		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, ENTITYNUM_NONE, ent->clipmask );
 		if (!tr.startsolid || tr.entityNum != ent->r.ownerNum) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			ent->count |= 1;
 #else
 			ent->count = 1;
@@ -1523,7 +1523,7 @@ void G_RunMissile( gentity_t *ent ) {
 }
 
 
-#ifndef TMNTWEAPSYS // There is now a fire_projectile that replaces all of these.
+#ifndef TA_WEAPSYS // There is now a fire_projectile that replaces all of these.
 //=============================================================================
 
 /*
@@ -1821,4 +1821,4 @@ gentity_t *fire_prox( gentity_t *self, vec3_t start, vec3_t dir ) {
 }
 #endif
 
-#endif // #ifndef TMNTWEAPSYS
+#endif // #ifndef TA_WEAPSYS

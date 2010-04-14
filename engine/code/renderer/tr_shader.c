@@ -1372,7 +1372,7 @@ infoParm_t	infoParms[] = {
 	{"nodlight",	0,	SURF_NODLIGHT, 0 },		// don't ever add dynamic lights
 	{"dust",		0,	SURF_DUST, 0}			// leave a dust trail when walking on this surface
 
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 	,
 	// material surface types
 	{"dirt",		0,	SURF_DIRT,		0 },

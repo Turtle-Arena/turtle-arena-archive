@@ -463,7 +463,7 @@ void AAS_ShowTotals(void)
 	AAS_ShowNumReachabilities(TRAVEL_TELEPORT, "teleport");
 	AAS_ShowNumReachabilities(TRAVEL_ELEVATOR, "elevator");
 	AAS_ShowNumReachabilities(TRAVEL_ROCKETJUMP, "rocket jump");
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	AAS_ShowNumReachabilities(TRAVEL_BFGJUMP, "bfg jump");
 #endif
 	AAS_ShowNumReachabilities(TRAVEL_GRAPPLEHOOK, "grapple hook");

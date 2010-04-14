@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_NONE				0
 #define INVENTORY_HEALTH			1
 
-//#ifdef TMNTWEAPSYS_EX
+//#ifdef TA_WEAPSYS_EX
 // The most weapons a player can have is 2!
 //  (well they do have 3 when switching pickup for pickup and have a default weapon)
 // Default weapon for the player,
@@ -48,7 +48,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // MISSIONPACK holdables
 #define INVENTORY_PORTAL			16
 
-// TMNTHOLDABLE
+// TA_HOLDABLE
 #define INVENTORY_SHURIKEN			17
 #define INVENTORY_ELECTRICSHURIKEN	18
 #define INVENTORY_FIRESHURIKEN		19
@@ -71,7 +71,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_DOUBLER			41
 #define INVENTORY_AMMOREGEN			42
 
-//TMNTWEAPSYS
+//TA_WEAPSYS
 #define INVENTORY_WEAPON_START 45 // 31 slots starting here
 #define INVENTORY_AMMO_START 76 // 31 slots starting here
 

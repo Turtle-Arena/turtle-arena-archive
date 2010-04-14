@@ -46,13 +46,13 @@ void UI_SPArena_Start( const char *arenaInfo ) {
 	trap_Cvar_SetValue( "ui_spSelection", level );
 
 	map = Info_ValueForKey( arenaInfo, "map" );
-#ifdef TMNTSP
+#ifdef TA_SP
 	trap_Cvar_Set("ui_singlePlayerActive", "1");
 #endif
 	trap_Cmd_ExecuteText( EXEC_APPEND, va( "spmap %s\n", map ) );
 }
 
-#ifdef TMNTSP
+#ifdef TA_SP
 
 // Load Game Menu, based on demos menu
 //
@@ -77,7 +77,7 @@ void UI_SPArena_Start( const char *arenaInfo ) {
 #define ID_LEFT				14
 
 #define ARROWS_WIDTH		128
-#ifdef TMNTDATA
+#ifdef TA_DATA
 #define ARROWS_HEIGHT		64
 #else
 #define ARROWS_HEIGHT		48
@@ -120,7 +120,7 @@ static void LoadGame_MenuEvent( void *ptr, int event ) {
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_GO:
 		UI_ForceMenuOff ();
-		trap_Cmd_ExecuteText( EXEC_APPEND, va( "loadgame %s\n", // TMNTSP
+		trap_Cmd_ExecuteText( EXEC_APPEND, va( "loadgame %s\n", // TA_SP
 								s_savegames.list.itemnames[s_savegames.list.curvalue]) );
 		break;
 
@@ -174,7 +174,7 @@ static void LoadGame_MenuInit( void ) {
 	s_savegames.banner.generic.type		= MTYPE_BTEXT;
 	s_savegames.banner.generic.x		= 320;
 	s_savegames.banner.generic.y		= 16;
-	s_savegames.banner.string			= "LOAD SAVE GAME"; // TMNTSP
+	s_savegames.banner.string			= "LOAD SAVE GAME"; // TA_SP
 	s_savegames.banner.color			= text_banner_color;
 	s_savegames.banner.style			= UI_CENTER;
 
@@ -258,7 +258,7 @@ static void LoadGame_MenuInit( void ) {
 	s_savegames.list.columns			= 3;
 
 	if (!s_savegames.list.numitems) {
-		strcpy( s_savegames.names, "No Save Games.sav" ); // TMNTSP
+		strcpy( s_savegames.names, "No Save Games.sav" ); // TA_SP
 		s_savegames.list.numitems = 1;
 
 		//degenerate case, not selectable
@@ -273,7 +273,7 @@ static void LoadGame_MenuInit( void ) {
 
 		// strip extension
 		len = strlen( demoname );
-		if (!Q_stricmp(demoname +  len - 4,".sav")) // TMNTSP
+		if (!Q_stricmp(demoname +  len - 4,".sav")) // TA_SP
 			demoname[len-4] = '\0';
 
 //		Q_strupr(demoname);

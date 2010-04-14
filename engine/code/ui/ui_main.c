@@ -44,7 +44,7 @@ static const char *MonthAbbrev[] = {
 
 
 static const char *skillLevels[] = {
-#ifdef TMNTMISC // rip off SRB2 skills...
+#ifdef TA_MISC // rip off SRB2 skills...
   "Easy",
   "Normal",
   "Hard",
@@ -87,7 +87,7 @@ static const serverFilter_t serverFilters[] = {
 
 static const char *teamArenaGameTypes[] = {
 	"FFA",
-#ifdef TMNTMISC // tournament to duel
+#ifdef TA_MISC // tournament to duel
 	"DUEL",
 #else
 	"TOURNAMENT",
@@ -106,7 +106,7 @@ static int const numTeamArenaGameTypes = sizeof(teamArenaGameTypes) / sizeof(con
 
 static const char *teamArenaGameNames[] = {
 	"Free For All",
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	"Duel",
 #else
 	"Tournament",
@@ -141,7 +141,7 @@ static char* netnames[] = {
 };
 
 #ifndef MISSIONPACK
-#ifdef TMNTMISC
+#ifdef TA_MISC
 static char quake3worldMessage[] = "Visit turtlearena.googlecode.com - News, Updates";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
@@ -1075,14 +1075,14 @@ static void UI_SetCapFragLimits(qboolean uiVars) {
 	}
 	if (uiVars) {
 		trap_Cvar_Set("ui_captureLimit", va("%d", cap));
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		trap_Cvar_Set("ui_scoreLimit", va("%d", frag));
 #else
 		trap_Cvar_Set("ui_fragLimit", va("%d", frag));
 #endif
 	} else {
 		trap_Cvar_Set("capturelimit", va("%d", cap));
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		trap_Cvar_Set("scorelimit", va("%d", frag));
 #else
 		trap_Cvar_Set("fraglimit", va("%d", frag));
@@ -1355,7 +1355,7 @@ static void UI_DrawPlayerModel(rectDef_t *rect) {
   	viewangles[ROLL]  = 0;
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info, model, head, team);
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
     UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info.weapon, qfalse );
 #else
     UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
@@ -1555,7 +1555,7 @@ static void UI_DrawOpponent(rectDef_t *rect) {
   	viewangles[ROLL]  = 0;
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info2, model, headmodel, "");
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
     UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info2.weapon, qfalse );
 #else
     UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
@@ -2394,7 +2394,7 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 		int oldCount = UI_MapCountByGameType(qtrue);
 
-#ifdef TMNTMISC // Removed skipping ffa and sp
+#ifdef TA_MISC // Removed skipping ffa and sp
 		if (key == K_MOUSE2) {
 			ui_gameType.integer--;
 			if (ui_gameType.integer < 0) {
@@ -3055,7 +3055,7 @@ static void UI_StartSkirmish(qboolean next) {
 
 	k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
 
-#ifdef TMNTSP // ZTM: TODO: Custom Game (skirmish) uses 2 while Single Player uses 1.
+#ifdef TA_SP // ZTM: TODO: Custom Game (skirmish) uses 2 while Single Player uses 1.
 	trap_Cvar_Set("ui_singlePlayerActive", "2");
 #else
 	trap_Cvar_Set("ui_singlePlayerActive", "1");
@@ -3064,7 +3064,7 @@ static void UI_StartSkirmish(qboolean next) {
 	// set up sp overrides, will be replaced on postgame
 	temp = trap_Cvar_VariableValue( "capturelimit" );
 	trap_Cvar_Set("ui_saveCaptureLimit", va("%i", temp));
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 	temp = trap_Cvar_VariableValue( "scorelimit" );
 	trap_Cvar_Set("ui_saveScoreLimit", va("%i", temp));
 #else
@@ -3980,7 +3980,7 @@ serverStatusCvar_t serverStatusCvars[] = {
 	{"version", ""},
 	{"protocol", ""},
 	{"timelimit", ""},
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 	{"scorelimit", ""},
 #else
 	{"fraglimit", ""},
@@ -5202,7 +5202,7 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	UI_RegisterCvars();
 	UI_InitMemory();
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	BG_InitWeaponInfo();
 #endif
 
@@ -5882,21 +5882,21 @@ vmCvar_t	ui_realWarmUp;
 vmCvar_t	ui_serverStatusTimeOut;
 
 static cvarTable_t		cvarTable[] = {
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "1000", CVAR_ARCHIVE },
 #else
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 #endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
-#ifdef TMNTMISC // frag to score and changed KO limit to 3
+#ifdef TA_MISC // frag to score and changed KO limit to 3
 	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
 #endif
 	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "15", CVAR_ARCHIVE },
 
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 	{ &ui_team_fraglimit, "ui_team_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_team_fraglimit, "ui_team_fraglimit", "0", CVAR_ARCHIVE },
@@ -5904,7 +5904,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_team_timelimit, "ui_team_timelimit", "20", CVAR_ARCHIVE },
 	{ &ui_team_friendly, "ui_team_friendly",  "1", CVAR_ARCHIVE },
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	{ &ui_ctf_capturelimit, "ui_ctf_capturelimit", "5", CVAR_ARCHIVE },
 #else
 	{ &ui_ctf_capturelimit, "ui_ctf_capturelimit", "8", CVAR_ARCHIVE },
@@ -5932,7 +5932,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_browserShowEmpty, "ui_browserShowEmpty", "1", CVAR_ARCHIVE },
 
 	{ &ui_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "1", CVAR_ARCHIVE },
 #else
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
@@ -6001,7 +6001,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_lastServerRefresh_1, "ui_lastServerRefresh_1", "", CVAR_ARCHIVE},
 	{ &ui_lastServerRefresh_2, "ui_lastServerRefresh_2", "", CVAR_ARCHIVE},
 	{ &ui_lastServerRefresh_3, "ui_lastServerRefresh_3", "", CVAR_ARCHIVE},
-#ifdef TMNTSP
+#ifdef TA_SP
 	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
 #else
 	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", 0},

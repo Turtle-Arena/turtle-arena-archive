@@ -35,7 +35,7 @@ MAIN MENU
 #define ID_SINGLEPLAYER			10
 #define ID_MULTIPLAYER			11
 #define ID_SETUP				12
-#ifndef TMNTSP
+#ifndef TA_SP
 #define ID_DEMOS				13
 #define ID_CINEMATICS			14
 #define ID_TEAMARENA		15
@@ -60,7 +60,7 @@ typedef struct {
 	menutext_s		singleplayer;
 	menutext_s		multiplayer;
 	menutext_s		setup;
-#ifndef TMNTSP
+#ifndef TA_SP
 	menutext_s		demos;
 	menutext_s		cinematics;
 	menutext_s		teamArena;
@@ -117,7 +117,7 @@ void Main_MenuEvent (void* ptr, int event) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_SINGLEPLAYER:
-#ifdef TMNTSP
+#ifdef TA_SP
 		UI_SPMenu();
 #else
 		UI_SPLevelMenu();
@@ -125,7 +125,7 @@ void Main_MenuEvent (void* ptr, int event) {
 		break;
 
 	case ID_MULTIPLAYER:
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		UI_MultiplayerMenu();
 #else
 		UI_ArenaServersMenu();
@@ -136,7 +136,7 @@ void Main_MenuEvent (void* ptr, int event) {
 		UI_SetupMenu();
 		break;
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	case ID_DEMOS:
 		UI_DemosMenu();
 		break;
@@ -287,7 +287,7 @@ static void Main_MenuDraw( void ) {
 }
 
 
-#ifndef TMNTSP
+#ifndef TA_SP
 /*
 ===============
 UI_TeamArenaExists
@@ -327,7 +327,7 @@ and that local cinematics are killed
 */
 void UI_MainMenu( void ) {
 	int		y;
-#ifndef TMNTSP
+#ifndef TA_SP
 	qboolean teamArena = qfalse;
 #endif
 	int		style = UI_CENTER | UI_DROPSHADOW;
@@ -359,7 +359,7 @@ void UI_MainMenu( void ) {
 		s_errorMessage.menu.key = ErrorMessage_Key;
 		s_errorMessage.menu.fullscreen = qtrue;
 		s_errorMessage.menu.wrapAround = qtrue;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 		s_errorMessage.menu.showlogo = qtrue;		
 #endif
 #ifdef IOQ3ZTM
@@ -385,7 +385,7 @@ void UI_MainMenu( void ) {
 		return;
 	}
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	trap_S_StopBackgroundTrack();
 	trap_S_StartBackgroundTrack("music/menu.ogg", NULL);
 #endif
@@ -393,7 +393,7 @@ void UI_MainMenu( void ) {
 	s_main.menu.draw = Main_MenuDraw;
 	s_main.menu.fullscreen = qtrue;
 	s_main.menu.wrapAround = qtrue;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	s_main.menu.showlogo = qtrue;
 #endif
 #ifdef IOQ3ZTM
@@ -410,7 +410,7 @@ void UI_MainMenu( void ) {
 	s_main.banner_image.height  					= 256;
 #endif
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	y = 480 - (MAIN_MENU_VERTICAL_SPACING * 6);
 #else
 	y = 134;
@@ -421,7 +421,7 @@ void UI_MainMenu( void ) {
 	s_main.singleplayer.generic.y			= y;
 	s_main.singleplayer.generic.id			= ID_SINGLEPLAYER;
 	s_main.singleplayer.generic.callback	= Main_MenuEvent; 
-#ifdef TMNTSP // Moved to PLAY Menu.
+#ifdef TA_SP // Moved to PLAY Menu.
 	s_main.singleplayer.string				= "PLAY";
 #else
 	s_main.singleplayer.string				= "SINGLE PLAYER";
@@ -447,7 +447,7 @@ void UI_MainMenu( void ) {
 	s_main.setup.generic.y					= y;
 	s_main.setup.generic.id					= ID_SETUP;
 	s_main.setup.generic.callback			= Main_MenuEvent; 
-#ifdef TMNTSP // Moved to OPTIONS Menu.
+#ifdef TA_SP // Moved to OPTIONS Menu.
 	s_main.setup.string						= "OPTIONS";
 #else
 	s_main.setup.string						= "SETUP";
@@ -455,7 +455,7 @@ void UI_MainMenu( void ) {
 	s_main.setup.color						= text_big_color;
 	s_main.setup.style						= style;
 
-#ifndef TMNTSP // Moved to PLAY Menu.
+#ifndef TA_SP // Moved to PLAY Menu.
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.demos.generic.type				= MTYPE_PTEXT;
 	s_main.demos.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -521,7 +521,7 @@ void UI_MainMenu( void ) {
 	Menu_AddItem( &s_main.menu,	&s_main.singleplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.multiplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.setup );
-#ifndef TMNTSP // Moved to PLAY Menu.
+#ifndef TA_SP // Moved to PLAY Menu.
 	Menu_AddItem( &s_main.menu,	&s_main.demos );
 	Menu_AddItem( &s_main.menu,	&s_main.cinematics );
 	if (teamArena) {

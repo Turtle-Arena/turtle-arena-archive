@@ -167,7 +167,7 @@ typedef enum {
 	// 1.32
 	CG_FS_SEEK,
 
-#if defined CAMERASCRIPT || defined TMNTWEAPSYS
+#if defined CAMERASCRIPT || defined TA_WEAPSYS
 	CG_LOADCAMERA,
 	CG_STARTCAMERA,
 	CG_GETCAMERAINFO,
@@ -179,7 +179,7 @@ typedef enum {
 */
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	CG_FS_GETFILELIST,
 #endif
 

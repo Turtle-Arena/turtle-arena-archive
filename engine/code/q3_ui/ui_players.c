@@ -25,15 +25,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "ui_local.h"
 
 
-#ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifndef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 #define UI_TIMER_GESTURE		2300
 #endif
 #define UI_TIMER_JUMP			1000
-#ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifndef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 #define UI_TIMER_LAND			130
 #endif
 #define UI_TIMER_WEAPON_SWITCH	300
-#ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifndef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 #define UI_TIMER_ATTACK			500
 #endif
 #define	UI_TIMER_MUZZLE_FLASH	20
@@ -59,20 +59,20 @@ UI_PlayerInfo_SetWeapon
 ===============
 */
 static void UI_PlayerInfo_SetWeapon( playerInfo_t *pi, weapon_t weaponNum ) {
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	gitem_t *	item;
 #endif
 	char		path[MAX_QPATH];
 
 	pi->currentWeapon = weaponNum;
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 tryagain:
 #endif
 	pi->realWeapon = weaponNum;
 	pi->weaponModel = 0;
 	pi->barrelModel = 0;
 	pi->flashModel = 0;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	pi->weaponModel2 = 0;
 	pi->barrelModel2 = 0;
 	pi->flashModel2 = 0;
@@ -82,7 +82,7 @@ tryagain:
 		return;
 	}
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (bg_weapongroupinfo[weaponNum].weapon[0]->model[0] != '\0')
 	{
 		pi->weaponModel = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[0]->model);
@@ -244,20 +244,20 @@ static void UI_ForceTorsoAnim( playerInfo_t *pi, int anim ) {
 	pi->torsoAnim = ( ( pi->torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | anim;
 
 	if ( anim == TORSO_GESTURE ) {
-#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 		pi->torsoAnimationTimer = BG_AnimationTime(&pi->playercfg.animations[anim]);
 #else
 		pi->torsoAnimationTimer = UI_TIMER_GESTURE;
 #endif
 	}
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (BG_PlayerAttackAnim(anim))
 #else
 	if ( anim == TORSO_ATTACK || anim == TORSO_ATTACK2 )
 #endif
 	{
-#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 		pi->torsoAnimationTimer = BG_AnimationTime(&pi->playercfg.animations[anim]);
 #else
 		pi->torsoAnimationTimer = UI_TIMER_ATTACK;
@@ -303,7 +303,7 @@ static void UI_TorsoSequencing( playerInfo_t *pi ) {
 	}
 
 	if( currentAnim == TORSO_GESTURE ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		UI_SetTorsoAnim( pi, BG_TorsoStandForWeapon(pi->realWeapon) );
 #else
 		UI_SetTorsoAnim( pi, TORSO_STAND );
@@ -311,7 +311,7 @@ static void UI_TorsoSequencing( playerInfo_t *pi ) {
 		return;
 	}
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (BG_PlayerAttackAnim(currentAnim)) {
 		UI_SetTorsoAnim( pi, BG_TorsoStandForWeapon(pi->realWeapon) );
 		return;
@@ -331,7 +331,7 @@ static void UI_TorsoSequencing( playerInfo_t *pi ) {
 	}
 
 	if ( currentAnim == TORSO_RAISE ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		UI_SetTorsoAnim( pi, BG_TorsoStandForWeapon(pi->realWeapon) );
 #else
 		UI_SetTorsoAnim( pi, TORSO_STAND );
@@ -360,7 +360,7 @@ static void UI_LegsSequencing( playerInfo_t *pi ) {
 
 	if ( currentAnim == LEGS_JUMP ) {
 		UI_ForceLegsAnim( pi, LEGS_LAND );
-#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 		pi->legsAnimationTimer = BG_AnimationTime(&pi->playercfg.animations[LEGS_LAND]);
 #else
 		pi->legsAnimationTimer = UI_TIMER_LAND;
@@ -481,7 +481,7 @@ static void UI_SetLerpFrameAnimation( playerInfo_t *ci, lerpFrame_t *lf, int new
 		trap_Error( va("Bad animation number: %i", newAnimation) );
 	}
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	anim = &ci->playercfg.animations[ newAnimation ];
 #else
 	anim = &ci->animations[ newAnimation ];
@@ -574,7 +574,7 @@ static void UI_PlayerAnimation( playerInfo_t *pi, int *legsOld, int *legs, float
 	if ( pi->legs.yawing && ( pi->legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE ) {
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 		BG_RunLerpFrame( &pi->legs,
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 			pi->playercfg.animations,
 #else
 			pi->animations,
@@ -586,7 +586,7 @@ static void UI_PlayerAnimation( playerInfo_t *pi, int *legsOld, int *legs, float
 	} else {
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 		BG_RunLerpFrame( &pi->legs,
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 			pi->playercfg.animations,
 #else
 			pi->animations,
@@ -610,7 +610,7 @@ static void UI_PlayerAnimation( playerInfo_t *pi, int *legsOld, int *legs, float
 
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 	BG_RunLerpFrame( &pi->torso,
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 		pi->playercfg.animations,
 #else
 		pi->animations,
@@ -753,7 +753,7 @@ static void UI_PlayerAngles( playerInfo_t *pi, vec3_t legs[3], vec3_t torso[3], 
 	// allow yaw to drift a bit
 	if ( ( pi->legsAnim & ~ANIM_TOGGLEBIT ) != LEGS_IDLE 
 		|| ( pi->torsoAnim & ~ANIM_TOGGLEBIT ) !=
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		BG_TorsoStandForWeapon(pi->realWeapon)
 #else
 		TORSO_STAND
@@ -851,7 +851,7 @@ float	UI_MachinegunSpinAngle( playerInfo_t *pi ) {
 	}
 
 	torsoAnim = pi->torsoAnim  & ~ANIM_TOGGLEBIT;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (BG_PlayerAttackAnim(torsoAnim))
 #else
 	if( torsoAnim == TORSO_ATTACK2 )
@@ -880,7 +880,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	refEntity_t		torso;
 	refEntity_t		head;
 	refEntity_t		gun;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	refEntity_t		gun_left;
 #endif
 	refEntity_t		barrel;
@@ -891,14 +891,14 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	vec3_t			maxs = {16, 16, 32};
 	float			len;
 	float			xx;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	int				i;
 	qhandle_t		barrelModel;
 	vec3_t			angles;
 #endif
 
 	if ( !pi->legsModel || !pi->torsoModel || !pi->headModel
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	|| !pi->playercfg.animations[0].numFrames ) {
 #else
 	|| !pi->animations[0].numFrames ) {
@@ -913,7 +913,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		pi->lastWeapon = pi->pendingWeapon;
 		pi->pendingWeapon = -1;
 		pi->weaponTimer = 0;
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 		if( pi->currentWeapon != pi->weapon ) {
 			trap_S_StartLocalSound( weaponChangeSound, CHAN_LOCAL );
 		}
@@ -1027,14 +1027,14 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		{
 		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
 		}
-#elif defined TMNTPLAYERS
+#elif defined TA_PLAYERS
 		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary");
 #else
 		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
 #endif
 		gun.renderfx = renderfx;
 		trap_R_AddRefEntityToScene( &gun );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		// Secondary weapon
 		memset( &gun_left, 0, sizeof(gun_left) );
 		gun_left.hModel = pi->weaponModel2;
@@ -1047,7 +1047,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 			{
 				UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_flag");
 			}
-#elif defined TMNTPLAYERS
+#elif defined TA_PLAYERS
 			UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_hand_primary");
 #else
 			UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_flag");
@@ -1061,13 +1061,13 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	//
 	// add the spinning barrel
 	//
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	for (i = 0; i < 2; i++)
 #else
 	if ( pi->realWeapon == WP_MACHINEGUN || pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG )
 #endif
 	{
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (i == 1)
 			barrelModel = pi->barrelModel2;
 		else
@@ -1083,7 +1083,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		VectorCopy( origin, barrel.lightingOrigin );
 		barrel.renderfx = renderfx;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		barrel.hModel = barrelModel;
 		VectorClear(angles);
 		if (bg_weapongroupinfo[pi->realWeapon].weapon[i]->barrelSpin != BS_NONE)
@@ -1107,7 +1107,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #endif
 		AnglesToAxis( angles, barrel.axis );
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (i == 1)
 			UI_PositionRotatedEntityOnTag( &barrel, &gun_left, pi->weaponModel2, "tag_barrel");
 		else
@@ -1121,7 +1121,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	// add muzzle flash
 	//
 	if ( dp_realtime <= pi->muzzleFlashTime ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		vec3_t *flashDlightColor;
 		
 		for (i = 0; i < 2; i++)
@@ -1174,7 +1174,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	// add the chat icon
 	//
 	if ( pi->chat ) {
-#ifdef TMNTDATA
+#ifdef TA_DATA
 		UI_PlayerFloatSprite( pi, origin, trap_R_RegisterShaderNoMip( "sprites/talkBalloon" ) );
 #else
 		UI_PlayerFloatSprite( pi, origin, trap_R_RegisterShaderNoMip( "sprites/balloon3" ) );
@@ -1245,7 +1245,7 @@ static qboolean UI_RegisterClientSkin( playerInfo_t *pi, const char *modelName, 
 }
 
 
-#ifndef TMNTPLAYERSYS // Moved to bg_misc.c BG_LoadPlayerCFGFile
+#ifndef TA_PLAYERSYS // Moved to bg_misc.c BG_LoadPlayerCFGFile
 /*
 ======================
 UI_ParseAnimationFile
@@ -1499,7 +1499,7 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 	}
 
 	// load the animations
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	return BG_LoadPlayerCFGFile(&pi->playercfg, modelName, modelName);
 #else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/animation.cfg", modelName );
@@ -1521,7 +1521,7 @@ UI_PlayerInfo_SetModel
 void UI_PlayerInfo_SetModel( playerInfo_t *pi, const char *model ) {
 	memset( pi, 0, sizeof(*pi) );
 	UI_RegisterClientModelname( pi, model );
-#if defined TMNTPLAYERSYS && defined TMNTWEAPSYS
+#if defined TA_PLAYERSYS && defined TA_WEAPSYS
 	pi->weapon = pi->playercfg.default_weapon;
 #else
 	pi->weapon = WP_MACHINEGUN;
@@ -1618,7 +1618,7 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	}
 
 	// torso animation
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (BG_PlayerStandAnim(torsoAnim))
 	{
 		torsoAnim = BG_TorsoStandForWeapon(weaponNum);
@@ -1634,7 +1634,7 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	}
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (BG_PlayerAttackAnim(torsoAnim))
 	{
 		torsoAnim = BG_TorsoAttackForWeapon(weaponNum);
@@ -1663,7 +1663,7 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 		pi->pendingTorsoAnim = torsoAnim;
 	}
 	else if ( ( currentAnim == TORSO_GESTURE ||
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	BG_PlayerAttackAnim(currentAnim)
 #else
 	currentAnim == TORSO_ATTACK

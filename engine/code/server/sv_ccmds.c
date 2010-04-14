@@ -204,7 +204,7 @@ static void SV_Map_f( void ) {
 			cheat = qfalse;
 			killBots = qfalse;
 		}
-#ifndef TMNTSP // Allow SP on net!
+#ifndef TA_SP // Allow SP on net!
 		if( sv_gametype->integer == GT_SINGLE_PLAYER ) {
 			Cvar_SetValue( "g_gametype", GT_FFA );
 		}
@@ -1244,7 +1244,7 @@ static void SV_KillServer_f( void ) {
 	SV_Shutdown( "killserver" );
 }
 
-#ifdef TMNTSP // Save/load
+#ifdef TA_SP // Save/load
 static void SV_SaveGame_f(void) {
 	char savegame[MAX_TOKEN_CHARS];
 	char filename[MAX_QPATH];
@@ -1489,7 +1489,7 @@ void SV_AddOperatorCommands( void ) {
 	Cmd_AddCommand("bandel", SV_BanDel_f);
 	Cmd_AddCommand("exceptdel", SV_ExceptDel_f);
 	Cmd_AddCommand("flushbans", SV_FlushBans_f);
-#ifdef TMNTSP // Save/load
+#ifdef TA_SP // Save/load
 	Cmd_AddCommand("savegame", SV_SaveGame_f);
 	Cmd_AddCommand("loadgame", SV_LoadGame_f);
 #endif

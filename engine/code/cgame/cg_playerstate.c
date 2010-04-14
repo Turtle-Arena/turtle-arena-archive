@@ -39,41 +39,41 @@ void CG_CheckAmmo( void ) {
 	int		i;
 	int		total;
 	int		previous;
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	int		weapons;
 #endif
 
 	// see about how many seconds of ammo we have remaining
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	weapons = cg.snap->ps.stats[ STAT_WEAPONS ];
 #endif
 	total = 0;
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	i = cg.snap->ps.weapon;
 #else
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	for ( i = 1 ; i < BG_NumWeaponGroups() ; i++ )
 #else
 	for ( i = WP_MACHINEGUN ; i < WP_NUM_WEAPONS ; i++ )
 #endif
 #endif
 	{
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (!BG_WeapUseAmmo(i)) {
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 			continue;
 #endif
 		}
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		else
 #endif
 #endif
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 		if ( ! ( weapons & ( 1 << i ) ) ) {
 			continue;
 		}
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		total += cg.snap->ps.ammo[i] * bg_weapongroupinfo[i].weapon[0]->attackDelay;
 #else
 		switch ( i ) {
@@ -223,14 +223,14 @@ void CG_Respawn( void ) {
 	// no error decay on player movement
 	cg.thisFrameTeleport = qtrue;
 
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	// display weapons available
 	cg.weaponSelectTime = cg.time;
 
 	// select the weapon the server says we are using
 	cg.weaponSelect = cg.snap->ps.weapon;
 #endif
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 	cg.holdableSelect = cg.snap->ps.holdableIndex;
 #endif
 }
@@ -440,10 +440,10 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("assist\n");
 	}
-#if !defined TMNTMISC || !defined NOTRATEDM || !defined TURTLEARENA // AWARDS
+#if !defined TA_MISC || !defined NOTRATEDM || !defined TURTLEARENA // AWARDS
 	// if any of the player event bits changed
 	if (ps->persistant[PERS_PLAYEREVENTS] != ops->persistant[PERS_PLAYEREVENTS]) {
-#ifndef TMNTMISC
+#ifndef TA_MISC
 		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD)) {
 			trap_S_StartLocalSound( cgs.media.deniedSound, CHAN_ANNOUNCER );
@@ -565,7 +565,7 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 		CG_CheckLocalSounds( ps, ops );
 	}
 
-#ifndef TMNTWEAPSYS // ZTM: No ammo warnings.
+#ifndef TA_WEAPSYS // ZTM: No ammo warnings.
 	// check for going low on ammo
 	CG_CheckAmmo();
 #endif

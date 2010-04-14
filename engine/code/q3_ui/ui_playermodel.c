@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODEL_FRAMEL		"menu/art/frame1_l"
 #define MODEL_FRAMER		"menu/art/frame1_r"
 #define MODEL_PORTS			"menu/art/player_models_ports"
-#ifdef TMNTDATA
+#ifdef TA_DATA
 #define MODEL_ARROWS		"menu/art/arrows_horz_0"
 #define MODEL_ARROWSL		"menu/art/arrows_horz_left"
 #define MODEL_ARROWSR		"menu/art/arrows_horz_right"
@@ -190,7 +190,7 @@ static void PlayerModel_UpdateModel( void )
 	VectorClear( moveangles );
 
 	UI_PlayerInfo_SetModel( &s_playermodel.playerinfo, s_playermodel.modelskin );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playermodel.playerinfo.weapon), viewangles, moveangles, s_playermodel.playerinfo.weapon, qfalse );
 #else
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, WP_MACHINEGUN, qfalse );
@@ -259,7 +259,7 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 
 	switch (key)
 	{
-#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_KP_LEFTARROW:
@@ -309,7 +309,7 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 			}
 			break;
 			
-#ifndef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifndef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_ESCAPE:
@@ -628,7 +628,7 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.pics[k].width  		   = 64;
 			s_playermodel.pics[k].height  		   = 64;
 			s_playermodel.pics[k].focuspic         = MODEL_SELECTED;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 			s_playermodel.pics[k].focuscolor       = colorRed;
 #endif
 
@@ -645,7 +645,7 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.picbuttons[k].width  		     = 128;
 			s_playermodel.picbuttons[k].height  		 = 128;
 			s_playermodel.picbuttons[k].focuspic  		 = MODEL_SELECT;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 			s_playermodel.picbuttons[k].focuscolor  	 = colorRed;
 #endif
 
@@ -691,7 +691,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.arrows.generic.flags		= QMF_INACTIVE;
 	s_playermodel.arrows.generic.x			= 125;
 	s_playermodel.arrows.generic.y			= 340;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	s_playermodel.arrows.width				= MODEL_ARROWS_WIDTH;
 	s_playermodel.arrows.height				= MODEL_ARROWS_HEIGHT;
 #else
@@ -705,7 +705,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.left.generic.id			= ID_PREVPAGE;
 	s_playermodel.left.generic.x			= 125;
 	s_playermodel.left.generic.y			= 340;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	s_playermodel.left.width  				= MODEL_ARROWS_WIDTH/2;
 	s_playermodel.left.height  				= MODEL_ARROWS_HEIGHT;
 #else
@@ -718,13 +718,13 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_playermodel.right.generic.callback	= PlayerModel_MenuEvent;
 	s_playermodel.right.generic.id			= ID_NEXTPAGE;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	s_playermodel.right.generic.x			= 125+MODEL_ARROWS_WIDTH/2;
 #else
 	s_playermodel.right.generic.x			= 125+61;
 #endif
 	s_playermodel.right.generic.y			= 340;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	s_playermodel.right.width  				= MODEL_ARROWS_WIDTH/2;
 	s_playermodel.right.height  			= MODEL_ARROWS_HEIGHT;
 #else

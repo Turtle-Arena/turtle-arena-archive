@@ -115,7 +115,7 @@ typedef struct iteminfo_s
 	vec3_t mins;						//mins of the item
 	vec3_t maxs;						//maxs of the item
 	int number;							//number of the item info
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 	int defaultWeight;					//inline weight, for if only a constant value is needed.
 	int inventory;						//inline inventory number
 #endif
@@ -133,7 +133,7 @@ fielddef_t iteminfo_fields[] =
 {"respawntime", ITEMINFO_OFS(respawntime), FT_FLOAT},
 {"mins", ITEMINFO_OFS(mins), FT_FLOAT|FT_ARRAY, 3},
 {"maxs", ITEMINFO_OFS(maxs), FT_FLOAT|FT_ARRAY, 3},
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 {"defaultWeight", ITEMINFO_OFS(defaultWeight), FT_INT},
 {"inventory", ITEMINFO_OFS(inventory), FT_INT},
 #endif
@@ -329,7 +329,7 @@ itemconfig_t *LoadItemConfig(char *filename)
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
 	return ic;
 } //end of the function LoadItemConfig
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 #define MAX_INVENTORYVALUE			999999 // be_ai_weight.c
 #ifndef max
 #define max(x,y) (x) > (y) ? (x) : (y)
@@ -446,7 +446,7 @@ int *ItemWeightIndex(weightconfig_t *iwc, itemconfig_t *ic)
 	for (i = 0; i < ic->numiteminfo; i++)
 	{
 		index[i] = FindFuzzyWeight(iwc, ic->iteminfo[i].classname);
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 		if (index[i] < 0)
 		{
 			index[i] = CreateFuzzyWeight(iwc, &ic->iteminfo[i]);
@@ -631,7 +631,7 @@ void BotInitInfoEntities(void)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 void BotInitLevelItems(bot_shareditem_t *itemInfos)
 #else
 void BotInitLevelItems(void)
@@ -659,7 +659,7 @@ void BotInitLevelItems(void)
 	//if there's no AAS file loaded
 	if (!AAS_Loaded()) return;
 
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 	// Add the new items.
 	if (itemInfos != NULL)
 	{

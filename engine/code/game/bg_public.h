@@ -56,12 +56,12 @@ enum {
 // server and botlib
 
 // ZTM: Server and botlib need GT_SINGLE_PLAYER and [just] botlib needs GT_TEAM
-//             If TMNTSP is not defined Client also needs GT_SINGLE_PLAYER and
+//             If TA_SP is not defined Client also needs GT_SINGLE_PLAYER and
 //               Server also needs GT_FFA
 
 //FIXME: these are game specific
 
-#ifdef TMNTSP
+#ifdef TA_SP
 //GT_FFA 0						// free for all
 #else
 #define GT_FFA 0				// free for all

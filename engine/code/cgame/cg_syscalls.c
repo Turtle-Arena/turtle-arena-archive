@@ -98,7 +98,7 @@ void	trap_FS_FCloseFile( fileHandle_t f ) {
 	syscall( CG_FS_FCLOSEFILE, f );
 }
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 int trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize ) {
 	return syscall( CG_FS_GETFILELIST, path, extension, listbuf, bufsize );
 }
@@ -335,7 +335,7 @@ qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return syscall( CG_GETUSERCMD, cmdNumber, ucmd );
 }
 
-#if defined TMNTHOLDSYS/*2*/
+#if defined TA_HOLDSYS/*2*/
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue ) {
 	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale), holdableValue );
 }

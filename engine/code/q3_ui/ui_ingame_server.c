@@ -33,7 +33,7 @@ Server only controls
 
 #include "ui_local.h"
 
-#ifdef TMNTMISC // INGAME_SERVER_MENU
+#ifdef TA_MISC // INGAME_SERVER_MENU
 
 //#define INGAME_FRAME					"menu/art/addbotframe"
 #define INGAME_FRAME					"menu/art/cut_frame"
@@ -167,7 +167,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.addbots.color				= text_big_color;
 	s_inserver.addbots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
-#ifdef TMNTSP
+#ifdef TA_SP
 	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
@@ -187,7 +187,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.removebots.color				= text_big_color;
 	s_inserver.removebots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
-#ifdef TMNTSP
+#ifdef TA_SP
 	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)

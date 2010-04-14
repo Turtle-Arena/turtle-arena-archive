@@ -408,7 +408,7 @@ void S_Base_BeginRegistration( void ) {
 		Com_Memset( s_knownSfx, 0, sizeof( s_knownSfx ) );
 		Com_Memset(sfxHash, 0, sizeof(sfx_t *)*LOOP_HASH);
 
-#ifdef TMNTDATA // OPENARENA
+#ifdef TA_DATA // OPENARENA
 		S_Base_RegisterSound("sound/misc/silence.wav", qfalse);
 #else
 		S_Base_RegisterSound("sound/feedback/hit.wav", qfalse);		// changed to a sound in baseq3

@@ -52,7 +52,7 @@ DEMOS MENU
 #define ID_LEFT				14
 
 #define ARROWS_WIDTH		128
-#ifdef TMNTDATA
+#ifdef TA_DATA
 #define ARROWS_HEIGHT		64
 #else
 #define ARROWS_HEIGHT		48

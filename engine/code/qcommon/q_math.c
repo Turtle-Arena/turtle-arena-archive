@@ -648,7 +648,7 @@ float AngleDelta ( float angle1, float angle2 ) {
 	return AngleNormalize180( angle1 - angle2 );
 }
 
-#ifdef TMNTWEAPSYS // XREAL
+#ifdef TA_WEAPSYS // XREAL
 /*
 =================
 AngleBetweenVectors

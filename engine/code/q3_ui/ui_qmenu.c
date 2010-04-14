@@ -32,7 +32,7 @@ sfxHandle_t menu_move_sound;
 sfxHandle_t menu_out_sound;
 sfxHandle_t menu_buzz_sound;
 sfxHandle_t menu_null_sound;
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 sfxHandle_t weaponChangeSound;
 #endif
 
@@ -480,7 +480,7 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 		case K_KP_ENTER:
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
-#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_KP_RIGHTARROW:
@@ -601,7 +601,7 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 				sound = 0;
 			break;
 
-#if 0 //#ifdef TMNTMISC // MENU: Right Mouse button = left arrow // NOT HERE.
+#if 0 //#ifdef TA_MISC // MENU: Right Mouse button = left arrow // NOT HERE.
 		case K_MOUSE2:
 #endif
 		case K_KP_LEFTARROW:
@@ -817,7 +817,7 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 	switch (key)
 	{
 		case K_MOUSE1:
-#ifdef TMNTMISC // MENU: listbox goes around.
+#ifdef TA_MISC // MENU: listbox goes around.
 		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 #endif
@@ -827,12 +827,12 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 			sound = menu_move_sound;
 			break;
 		
-#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
-#ifdef TMNTMISC // MENU: listbox goes around.
+#ifdef TA_MISC // MENU: listbox goes around.
 			s->curvalue--;
 			if (s->curvalue < 0)
 				s->curvalue = s->numitems-1;
@@ -848,7 +848,7 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 #endif
 			break;
 
-#ifndef TMNTMISC // MENU: listbox goes around.
+#ifndef TA_MISC // MENU: listbox goes around.
 		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 			if (s->curvalue < s->numitems-1)
@@ -1128,7 +1128,7 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 
 			return menu_move_sound;
 
-#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_KP_LEFTARROW:
@@ -1625,7 +1625,7 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 	// menu system keys
 	switch ( key )
 	{
-#ifndef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifndef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_ESCAPE:
@@ -1764,7 +1764,7 @@ void Menu_Cache( void )
 {
 	uis.charset			= trap_R_RegisterShaderNoMip( "gfx/2d/bigchars" );
 	uis.charsetProp		= trap_R_RegisterShaderNoMip( "menu/art/font1_prop.tga" );
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	uis.charsetPropGlow	= trap_R_RegisterShaderNoMip( "menu/art/font1_prop_glo.tga" );
 #endif
 	uis.charsetPropB	= trap_R_RegisterShaderNoMip( "menu/art/font2_prop.tga" );
@@ -1779,7 +1779,7 @@ void Menu_Cache( void )
 	} else {
 		uis.menuBackShader	= trap_R_RegisterShaderNoMip( "menuback" );
 	}
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	uis.menuBackNoLogoShader = trap_R_RegisterShaderNoMip( "menubacknologo" );
 #endif
 
@@ -1787,7 +1787,7 @@ void Menu_Cache( void )
 	menu_move_sound	= trap_S_RegisterSound( "sound/misc/menu2.wav", qfalse );
 	menu_out_sound	= trap_S_RegisterSound( "sound/misc/menu3.wav", qfalse );
 	menu_buzz_sound	= trap_S_RegisterSound( "sound/misc/menu4.wav", qfalse );
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	weaponChangeSound	= trap_S_RegisterSound( "sound/weapons/change.wav", qfalse );
 #endif
 

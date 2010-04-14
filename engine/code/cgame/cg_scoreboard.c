@@ -295,7 +295,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 		return qfalse;
 	}
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	if ( cgs.gametype == GT_SINGLE_PLAYER && cg.predictedPlayerState.stats[STAT_HEALTH] <= 0
 		&& !cg.showScores )
 	{
@@ -323,7 +323,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 	// fragged by ... line
 	if ( cg.killerName[0] ) {
-#ifdef TMNTMISC // frag to KO
+#ifdef TA_MISC // frag to KO
 		s = va("Knocked out by %s", cg.killerName );
 #else
 		s = va("Fragged by %s", cg.killerName );
@@ -337,7 +337,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 	// current rank
 	if ( cgs.gametype < GT_TEAM) {
 		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR
-#ifdef TMNTSP
+#ifdef TA_SP
 			&& cgs.gametype != GT_SINGLE_PLAYER
 #endif
 			)

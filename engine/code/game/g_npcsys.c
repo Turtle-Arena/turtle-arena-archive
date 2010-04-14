@@ -22,20 +22,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-#ifdef TMNTENTSYS
+#ifdef TA_ENTSYS
 // Misc_object uses modelindex2
 // NPC uses ps.legsAnim due to Pmove currently.
 //    But it is copied to ent->s.modelindex2 after Pmove.
 void G_SetMiscAnim(gentity_t *ent, int anim)
 {
 	ent->s.modelindex2 = ((ent->s.modelindex2 & ANIM_TOGGLEBIT)^ANIM_TOGGLEBIT) | anim;
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 	ent->bgNPC.npc_ps.legsAnim = ent->s.modelindex2;
 #endif
 }
 #endif
 
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 qboolean	npcRegistered[MAX_NPCS];
 
 /*
@@ -110,7 +110,7 @@ void NPC_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean
 	s->modelindex2 = ps->legsAnim;
 }
 
-#ifndef TMNTPATHSYS
+#ifndef TA_PATHSYS
 void SP_npcpath( gentity_t *self )
 {
 	if ( !self->targetname ) {
@@ -306,7 +306,7 @@ void FinishSpawningNPC( gentity_t *ent ) {
 	// NPCs can target a path to follow
 	if (ent->target)
 	{
-#ifdef TMNTPATHSYS
+#ifdef TA_PATHSYS
 		if (G_SetupPath(ent, ent->target) != PATH_ERROR)
 		{
 			// Path is okay to use.

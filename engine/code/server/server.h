@@ -231,7 +231,7 @@ typedef struct {
 	netadr_t	redirectAddress;			// for rcon return messages
 
 	netadr_t	authorizeAddress;			// for rcon return messages
-#ifdef TMNTSP // GAME_LOADGAME
+#ifdef TA_SP // GAME_LOADGAME
 	char loadgame[MAX_QPATH];
 #endif
 } serverStatic_t;

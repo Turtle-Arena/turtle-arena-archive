@@ -236,7 +236,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 
 	if ( draw2D || (!cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 	  qhandle_t	icon;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #ifdef TURTLEARENA // WEAPONS
 		icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].weaponIcon;
 #else
@@ -250,7 +250,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 		}
   } else if (cg_draw3dIcons.integer) {
   	if ( cent->currentState.weapon &&
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #ifdef TURTLEARENA // WEAPONS
 		cg_weapongroups[ cent->currentState.weapon ].weaponModel
 #else
@@ -286,7 +286,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
   		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
 #endif
   		CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h,
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #ifdef TURTLEARENA // WEAPONS
 			cg_weapongroups[ cent->currentState.weapon ].weaponModel,
 #else
@@ -310,7 +310,7 @@ static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, q
 	ps = &cg.snap->ps;
 
 	if ( cent->currentState.weapon ) {
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		value = ps->stats[STAT_AMMO];
 #else
 		value = ps->ammo[cent->currentState.weapon];
@@ -519,7 +519,7 @@ static void CG_DrawSelectedPlayerWeapon( rectDef_t *rect ) {
 
   ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
   if (ci) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
 			CG_DrawPic( rect->x, rect->y, rect->w, rect->h, cg_weapongroups[ci->curWeapon].weaponIcon );
 		}
@@ -553,7 +553,7 @@ static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qboolean draw2D) {
 	int		value;
   vec3_t origin, angles;
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	value = BG_ItemNumForHoldableNum(cg.snap->ps.holdableIndex);
 #else
 	value = cg.snap->ps.stats[STAT_HOLDABLE_ITEM];
@@ -576,7 +576,7 @@ static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qboolean draw2D) {
 
 }
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 static void CG_DrawPlayerItemValue(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
 	char	num[16];
 	int value;
@@ -664,7 +664,7 @@ static void CG_DrawSelectedPlayerHead( rectDef_t *rect, qboolean draw2D, qboolea
   		origin[0] = len / 0.268;	// len / tan( fov/2 )
 
   		// allow per-model tweaking
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 		VectorAdd( origin, ci->playercfg.headOffset, origin );
 #else
   		VectorAdd( origin, ci->headOffset, origin );
@@ -1045,7 +1045,7 @@ float CG_GetValue(int ownerDraw) {
     break;
 #endif
   case CG_PLAYER_AMMO_VALUE:
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		return ps->stats[STAT_AMMO];
 #else
 		if ( cent->currentState.weapon ) {
@@ -1059,7 +1059,7 @@ float CG_GetValue(int ownerDraw) {
   case CG_PLAYER_HEALTH:
 		return ps->stats[STAT_HEALTH];
     break;
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
   case CG_PLAYER_ITEM_VALUE:
 		return cg.snap->ps.holdable[cg.snap->ps.holdableIndex];
     break;
@@ -1264,7 +1264,7 @@ static void CG_DrawAreaChat(rectDef_t *rect, float scale, vec4_t color, qhandle_
 const char *CG_GetKillerText(void) {
 	const char *s = "";
 	if ( cg.killerName[0] ) {
-#ifdef TMNTMISC // frag to KO
+#ifdef TA_MISC // frag to KO
 		s = va("Knocked out by %s", cg.killerName );
 #else
 		s = va("Fragged by %s", cg.killerName );
@@ -1477,7 +1477,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 
 // weapon used is not that useful, use the space for task
 #if 0
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
 				CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, cg_weapongroups[ci->curWeapon].weaponIcon );
 			}
@@ -1735,7 +1735,7 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   case CG_PLAYER_ITEM:
     CG_DrawPlayerItem(&rect, scale, ownerDrawFlags & CG_SHOW_2DONLY);
     break;
-#ifdef TMNTHOLDSYS // CG_DrawPlayerAmmoValue
+#ifdef TA_HOLDSYS // CG_DrawPlayerAmmoValue
   case CG_PLAYER_ITEM_VALUE:
     CG_DrawPlayerItemValue(&rect, scale, color, shader, textStyle);
     break;

@@ -277,7 +277,7 @@ static void CG_TouchItem( centity_t *cent ) {
 		return;		// can't hold it
 	}
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	item = BG_ItemForItemNum(cent->currentState.modelindex);
 #else
 	item = &bg_itemlist[ cent->currentState.modelindex ];
@@ -318,7 +318,7 @@ static void CG_TouchItem( centity_t *cent ) {
 
 	// if its a weapon, give them some predicted ammo so the autoswitch will work
 	if ( item->giType == IT_WEAPON ) {
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
 		if ( !cg.predictedPlayerState.stats[STAT_PENDING_AMMO] ) {
 			cg.predictedPlayerState.stats[STAT_PENDING_AMMO] = 1;
@@ -458,7 +458,7 @@ void CG_PredictPlayerState( void ) {
 
 	// prepare for pmove
 	cg_pmove.ps = &cg.predictedPlayerState;
-#ifdef TMNTPLAYERSYS // Pmove
+#ifdef TA_PLAYERSYS // Pmove
 	cg_pmove.playercfg = &cgs.clientinfo[ cg.predictedPlayerState.clientNum ].playercfg;
 #endif
 	cg_pmove.trace = CG_Trace;
@@ -621,7 +621,7 @@ void CG_PredictPlayerState( void ) {
 		//CG_CheckChangedPredictableEvents(&cg.predictedPlayerState);
 	}
 
-#ifdef TMNTHOLDSYS/*2*/ // ZTM: Fix for auto changing in PMove!
+#ifdef TA_HOLDSYS/*2*/ // ZTM: Fix for auto changing in PMove!
 	cg.holdableSelect = HI_NO_SELECT;
 #endif
 

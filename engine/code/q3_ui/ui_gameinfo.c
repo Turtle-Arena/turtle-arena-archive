@@ -499,7 +499,7 @@ void UI_SetBestScore( int level, int score ) {
 	char	arenaKey[16];
 	char	scores[MAX_INFO_VALUE];
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	score = ui_singlePlayerActive.integer;
 
 	// validate score
@@ -832,7 +832,7 @@ void UI_InitGameinfo( void ) {
 
 	UI_InitMemory();
 	UI_LoadArenas();
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	BG_InitWeaponInfo();
 #endif
 	UI_LoadBots();

@@ -172,7 +172,7 @@ int Export_BotLibSetup(void)
 	if (errnum != BLERR_NOERROR) return errnum;
 	errnum = EA_Setup();			//be_ea.c
 	if (errnum != BLERR_NOERROR) return errnum;
-#ifndef TMNTWEAPSYS_NOCOMPAT
+#ifndef TA_WEAPSYS_NOCOMPAT
 	errnum = BotSetupWeaponAI();	//be_ai_weap.c
 	if (errnum != BLERR_NOERROR)return errnum;
 #endif
@@ -204,7 +204,7 @@ int Export_BotLibShutdown(void)
 	BotShutdownChatAI();		//be_ai_chat.c
 	BotShutdownMoveAI();		//be_ai_move.c
 	BotShutdownGoalAI();		//be_ai_goal.c
-#ifndef TMNTWEAPSYS_NOCOMPAT
+#ifndef TA_WEAPSYS_NOCOMPAT
 	BotShutdownWeaponAI();		//be_ai_weap.c
 #endif
 	BotShutdownWeights();		//be_ai_weight.c
@@ -276,7 +276,7 @@ int Export_BotLibStartFrame(float time)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 int Export_BotLibLoadMap(const char *mapname, bot_shareditem_t *itemInfos)
 #else
 int Export_BotLibLoadMap(const char *mapname)
@@ -294,7 +294,7 @@ int Export_BotLibLoadMap(const char *mapname)
 	errnum = AAS_LoadMap(mapname);
 	if (errnum != BLERR_NOERROR) return errnum;
 	//initialize the items in the level
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 	BotInitLevelItems(itemInfos);		//be_ai_goal.h
 #else
 	BotInitLevelItems();		//be_ai_goal.h
@@ -767,7 +767,7 @@ static void Init_EA_Export( ea_export_t *ea ) {
 	ea->EA_MoveLeft = EA_MoveLeft;
 	ea->EA_MoveRight = EA_MoveRight;
 
-#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
+#if defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT // BOTLIB
 	ea->EA_DropWeapon = EA_DropWeapon;
 #else
 	ea->EA_SelectWeapon = EA_SelectWeapon;
@@ -868,7 +868,7 @@ static void Init_AI_Export( ai_export_t *ai ) {
 	ai->BotFreeMoveState = BotFreeMoveState;
 	ai->BotInitMoveState = BotInitMoveState;
 	ai->BotAddAvoidSpot = BotAddAvoidSpot;
-#ifndef TMNTWEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 	//-----------------------------------
 	// be_ai_weap.h
 	//-----------------------------------

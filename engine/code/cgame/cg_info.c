@@ -79,7 +79,7 @@ CG_LoadingItem
 void CG_LoadingItem( int itemNum ) {
 	gitem_t		*item;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[itemNum];
@@ -107,7 +107,7 @@ void CG_LoadingClient( int clientNum ) {
 	int				i;
 #endif
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	if (cgs.gametype == GT_SINGLE_PLAYER)
 	{
 		return;
@@ -284,7 +284,7 @@ void CG_DrawInformation( void ) {
 		s = "Free For All";
 		break;
 	case GT_SINGLE_PLAYER:
-#ifdef TMNTSP
+#ifdef TA_SP
 		if (cg_singlePlayerActive.integer != 1)
 			s = "Cooperative";
 		else
@@ -292,7 +292,7 @@ void CG_DrawInformation( void ) {
 		s = "Single Player";
 		break;
 	case GT_TOURNAMENT:
-#ifdef TMNTMISC // tournament to duel
+#ifdef TA_MISC // tournament to duel
 		s = "Duel";
 #else
 		s = "Tournament";
@@ -333,17 +333,17 @@ void CG_DrawInformation( void ) {
 	}
 
 	if (
-#ifdef TMNTSP
+#ifdef TA_SP
 	cgs.gametype != GT_SINGLE_PLAYER &&
 #endif
 	cgs.gametype < GT_CTF ) {
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		value = atoi( Info_ValueForKey( info, "scorelimit" ) );
 #else
 		value = atoi( Info_ValueForKey( info, "fraglimit" ) );
 #endif
 		if ( value ) {
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 			UI_DrawProportionalString( 320, y, va( "scorelimit %i", value ),
 				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 #else

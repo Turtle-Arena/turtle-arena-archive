@@ -186,7 +186,7 @@ void UI_LoadArenas( void ) {
 			if( strstr( type, "tourney" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_TOURNAMENT);
 			}
-#ifdef TMNTMISC // TMNTSP?
+#ifdef TA_MISC // TA_SP?
 			if( strstr( type, "single" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_SINGLE_PLAYER);
 			}

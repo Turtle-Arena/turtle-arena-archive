@@ -1737,7 +1737,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 		if (item->window.flags & WINDOW_HORIZONTAL) {
 			viewmax = (item->window.rect.w / listPtr->elementWidth);
 			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW
-#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
 				|| key == K_MOUSE2
 #endif
 			)
@@ -2129,7 +2129,7 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 			}
 
 			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW
-#if 0 // #ifdef TMNTMISC // MENU: Right Mouse button = left arrow // NOT HERE
+#if 0 // #ifdef TA_MISC // MENU: Right Mouse button = left arrow // NOT HERE
 				|| key == K_MOUSE2
 #endif
 			)
@@ -3149,7 +3149,7 @@ static bind_t g_bindings[] =
 {
 	{"+scores",			 K_TAB,				-1,		-1, -1},
 	{"+button2",		 K_ENTER,			-1,		-1, -1},
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 	{"holdnext",		 K_MWHEELUP,		'\'',	-1, -1},
 	{"holdprev",		 K_MWHEELDOWN,		-1,		-1, -1},
 #endif
@@ -3186,7 +3186,7 @@ static bind_t g_bindings[] =
 	{"weapon 12",		 -1,					-1,		-1, -1},
 	{"weapon 13",		 -1,					-1,		-1, -1},
 	{"+attack", 		 K_CTRL,				-1,		-1, -1},
-#ifdef TMNTWEAPSYS_EX // +dropweapon
+#ifdef TA_WEAPSYS_EX // +dropweapon
 	{"+button13",		 ';',					-1,		-1, -1},
 #else
 	{"weapprev",		 '[',					-1,		-1, -1},
@@ -3231,7 +3231,7 @@ static configcvar_t g_configcvars[] =
 	{"cl_run",			0,					0},
 #endif
 	{"m_pitch",			0,					0},
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	{"cg_autoswitch",	0,					0},
 #endif
 	{"sensitivity",		0,					0},

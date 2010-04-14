@@ -60,7 +60,7 @@ void SV_GetChallenge(netadr_t from)
 
 	// ignore if we are in single player
 	if (
-#ifndef TMNTSP
+#ifndef TA_SP
 	Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
 #endif
 	Cvar_VariableValue("ui_singlePlayerActive")) {

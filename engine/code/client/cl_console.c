@@ -551,7 +551,7 @@ void Con_DrawNotify (void)
 		text = con.text + (i % con.totallines)*con.linewidth;
 
 		if (cl.snap.ps.pm_type != PM_INTERMISSION
-#ifdef TMNTSP
+#ifdef TA_SP
 		&& cl.snap.ps.pm_type != PM_SPINTERMISSION
 #endif
 		&& Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {

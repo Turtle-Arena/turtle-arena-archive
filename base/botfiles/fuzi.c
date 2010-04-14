@@ -113,7 +113,7 @@ weight "weapon_default"
 	return 0;
 }
 
-// TMNTWEAPSYS sets up the weapon item weights.
+// TA_WEAPSYS sets up the weapon item weights.
 /*
 weight "weapon_katanas"
 {

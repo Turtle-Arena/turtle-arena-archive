@@ -384,7 +384,7 @@ static void CG_ConfigStringModified( void ) {
 	else if ( num == CS_SHADERSTATE ) {
 		CG_ShaderStateChanged();
 	}
-#ifdef TMNTMISC // Particles
+#ifdef TA_MISC // Particles
 	else if (num >= CS_PARTICLES && num < CS_PARTICLES+MAX_PARTICLES_AREAS)
 	{
 		// Allow new particle areas to be added after level load.
@@ -516,7 +516,7 @@ static void CG_MapRestart( void ) {
 	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */ )
 	{
 		trap_S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
-#ifdef TMNTDATA
+#ifdef TA_DATA
 		CG_CenterPrint( "BEGIN!", 120, GIANTCHAR_WIDTH*2 );
 #else
 		CG_CenterPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
@@ -540,7 +540,7 @@ static void CG_MapRestart( void ) {
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	cg_thirdPersonAngle.value = 0;
 #endif
 }
@@ -685,7 +685,7 @@ int CG_ParseVoiceChats( const char *filename, voiceChatList_t *voiceChatList, in
 	return qtrue;
 }
 
-#ifdef TMNTDATA // LOAD_VOICE_FILES
+#ifdef TA_DATA // LOAD_VOICE_FILES
 int CG_HeadModelVoiceChats( char *filename );
 #endif
 
@@ -698,7 +698,7 @@ void CG_LoadVoiceChats( void ) {
 	int size;
 
 	size = trap_MemoryRemaining();
-#if defined TMNTDATA && defined IOQ3ZTM // LOAD_VOICE_FILES
+#if defined TA_DATA && defined IOQ3ZTM // LOAD_VOICE_FILES
 #ifdef IOQ3ZTM // LOAD_VOICE_FILES
 	numVoiceChats = 0;
 #endif
@@ -856,7 +856,7 @@ voiceChatList_t *CG_VoiceChatListForClient( int clientNum ) {
 			}
 		}
 	}
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	gender = ci->playercfg.gender;
 #else
 	gender = ci->gender;
@@ -1108,7 +1108,7 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	if ( !strcmp( cmd, "letterbox" ) ) {
 		CG_ToggleLetterbox( atoi(CG_Argv(1)), atoi(CG_Argv(2)) );
 		return;

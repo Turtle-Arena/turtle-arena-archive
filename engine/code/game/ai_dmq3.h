@@ -38,7 +38,7 @@ void BotShutdownDeathmatchAI(void);
 void BotDeathmatchAI(bot_state_t *bs, float thinktime);
 //free waypoints
 void BotFreeWaypoints(bot_waypoint_t *wp);
-#ifdef TMNTWEAPSYS // BOT_WEAP_WEIGHTS
+#ifdef TA_WEAPSYS // BOT_WEAP_WEIGHTS
 //bot weight for weapon
 int BotWeaponWeight(weapon_t w);
 #endif
@@ -66,7 +66,7 @@ qboolean EntityIsDead(aas_entityinfo_t *entinfo);
 qboolean EntityIsInvisible(aas_entityinfo_t *entinfo);
 //returns true if the entity is shooting
 qboolean EntityIsShooting(aas_entityinfo_t *entinfo);
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 //returns true if this entity has the kamikaze
 qboolean EntityHasKamikaze(aas_entityinfo_t *entinfo);
 #endif
@@ -170,7 +170,7 @@ int BotTeamCubeCarrierVisible(bot_state_t *bs);
 int BotEnemyCubeCarrierVisible(bot_state_t *bs);
 #endif
 #endif
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 qboolean G_CanShootProx(weapon_t w);
 #endif
 //get a random alternate route goal towards the given base

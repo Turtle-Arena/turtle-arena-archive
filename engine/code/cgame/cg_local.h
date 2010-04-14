@@ -80,7 +80,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	GIANT_WIDTH			32
 #define	GIANT_HEIGHT		48
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 #define	NUM_CROSSHAIRS		4
 #else
 #define	NUM_CROSSHAIRS		10
@@ -89,7 +89,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEAM_OVERLAY_MAXNAME_WIDTH	12
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
 
-#ifndef TMNTPLAYERSYS // Moved to bg_misc.h
+#ifndef TA_PLAYERSYS // Moved to bg_misc.h
 #ifdef TURTLEARENA // DEFAULT_PLAYER
 #define	DEFAULT_MODEL			"raph"
 #define	DEFAULT_TEAM_MODEL		"raph"
@@ -132,7 +132,7 @@ typedef enum {
 	IMPACTSOUND_FLESH
 } impactSound_t;
 
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 // Models Per Material type
 #define NUM_MATERIAL_MODELS		5
 #endif
@@ -169,7 +169,7 @@ typedef struct {
 } lerpFrame_t;
 #endif
 
-#ifdef TMNTWEAPSYS // MELEE_TRAIL
+#ifdef TA_WEAPSYS // MELEE_TRAIL
 typedef struct
 {
 	float yawAngle;
@@ -187,7 +187,7 @@ typedef struct {
 	int				painDirection;	// flip from 0 to 1
 	int				lightningFiring;
 
-#ifdef TMNTWEAPSYS // MELEE_TRAIL
+#ifdef TA_WEAPSYS // MELEE_TRAIL
 	// melee weapon trails
 	meleeTrail_t weaponTrails[MAX_WEAPON_TRAILS];
 #endif
@@ -209,7 +209,7 @@ typedef struct {
 
 //=================================================
 
-#ifdef TMNTENTSYS // MISC_OBJECT
+#ifdef TA_ENTSYS // MISC_OBJECT
 // misc_object/NPC data
 enum
 {
@@ -249,7 +249,7 @@ typedef struct centity_s {
 	int				snapShotTime;	// last time this entity was found in a snapshot
 
 	playerEntity_t	pe;
-#ifdef TMNTENTSYS // MISC_OBJECT
+#ifdef TA_ENTSYS // MISC_OBJECT
 	bg_objectcfg_t	objectcfg;
 	objectEntity_t	oe; // misc_object/NPC data
 #endif
@@ -296,13 +296,13 @@ typedef enum {
 	LE_FADE_RGB,
 	LE_SCALE_FADE,
 	LE_SCOREPLUM,
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	LE_BUBBLE,
 	//LE_SNOW,
 	//LE_RAIN,
 #endif
 #ifdef MISSIONPACK
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	LE_KAMIKAZE,
 #endif
 #ifndef TURTLEARENA // POWERS
@@ -316,7 +316,7 @@ typedef enum {
 typedef enum {
 	LEF_PUFF_DONT_SCALE  = 0x0001,			// do not scale size over time
 	LEF_TUMBLE			 = 0x0002,			// tumble over time, used for ejecting shells
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	LEF_SOUND1			 = 0x0004,			// sound 1 for kamikaze
 	LEF_SOUND2			 = 0x0008			// sound 2 for kamikaze
 #endif
@@ -395,7 +395,7 @@ typedef struct {
 // usually as a result of a userinfo (name, model, etc) change
 #define	MAX_CUSTOM_SOUNDS	32
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 // Support using "tag_weapon" for the primary weapon,
 //           and "tag_flag" for the secondary weapon / flag.
 // So it will allow team arena models to be ported easier?
@@ -460,12 +460,12 @@ typedef struct {
 	char			blueTeam[MAX_TEAMNAME];
 	qboolean		deferred;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	int				tagInfo;
 #else
 	qboolean		newAnims;		// true if using the new mission pack animations
 #endif
-#ifndef TMNTPLAYERSYS
+#ifndef TA_PLAYERSYS
 	qboolean		fixedlegs;		// true if legs yaw is always the same as torso yaw
 	qboolean		fixedtorso;		// true if torso never changes yaw
 
@@ -485,7 +485,7 @@ typedef struct {
 
 	qhandle_t		modelIcon;
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	bg_playercfg_t  playercfg;
 #else
 	animation_t		animations[MAX_TOTALANIMATIONS];
@@ -495,7 +495,7 @@ typedef struct {
 } clientInfo_t;
 
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 typedef struct projectileInfo_s {
 	qboolean		registered;
 
@@ -629,7 +629,7 @@ typedef struct {
 #endif
 } itemInfo_t;
 
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 typedef struct {
 	qboolean		registered;
 
@@ -723,10 +723,10 @@ typedef struct {
 	int			landTime;
 
 	// input state sent to server
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	int			weaponSelect;
 #endif
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 	int			holdableSelect;
 #endif
 
@@ -837,7 +837,7 @@ typedef struct {
 	int			itemPickupTime;
 	int			itemPickupBlendTime;	// the pulse around the crosshair is timed seperately
 
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	int			weaponSelectTime;
 #endif
 	int			weaponAnimation;
@@ -876,7 +876,7 @@ typedef struct {
 #else
 	//qboolean cameraMode;		// if rendering from a loaded camera
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	// Use CG_ToggleLetterbox to change letterbox mode
 	qboolean letterbox;	// qtrue if moving onto the screen, or is done moving on.
 						// qfalse if moving off, or is off
@@ -911,7 +911,7 @@ typedef enum
 typedef struct {
 	qhandle_t	charsetShader;
 	qhandle_t	charsetProp;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	qhandle_t	charsetPropGlow;
 #endif
 	qhandle_t	charsetPropB;
@@ -923,7 +923,7 @@ typedef struct {
 	qhandle_t	redCubeIcon;
 	qhandle_t	blueCubeIcon;
 #endif
-#ifndef TMNTDATA // FLAG_MODEL
+#ifndef TA_DATA // FLAG_MODEL
 	qhandle_t	redFlagModel;
 	qhandle_t	blueFlagModel;
 	qhandle_t	neutralFlagModel;
@@ -932,14 +932,14 @@ typedef struct {
 	qhandle_t	blueFlagShader[3];
 	qhandle_t	flagShader[4];
 
-#ifndef TMNTDATA // FLAG_MODEL
+#ifndef TA_DATA // FLAG_MODEL
 	qhandle_t	flagPoleModel;
 	qhandle_t	flagFlapModel;
 
 	qhandle_t	redFlagFlapSkin;
 	qhandle_t	blueFlagFlapSkin;
 	qhandle_t	neutralFlagFlapSkin;
-#elif defined TMNTWEAPSYS // MELEE_TRAIL
+#elif defined TA_WEAPSYS // MELEE_TRAIL
 	qhandle_t	flagFlapModel;
 #endif
 
@@ -998,7 +998,7 @@ typedef struct {
 	qhandle_t	railCoreShader;
 
 	qhandle_t	lightningShader;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	qhandle_t	grappleCableShader;
 	qhandle_t	sparkTrailShader;
 #endif
@@ -1027,7 +1027,7 @@ typedef struct {
 	qhandle_t	smokePuffShader;
 	qhandle_t	smokePuffRageProShader;
 	qhandle_t	shotgunSmokePuffShader;
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	qhandle_t	plasmaBallShader;
 #endif
 	qhandle_t	waterBubbleShader;
@@ -1036,7 +1036,7 @@ typedef struct {
 #endif
 #ifdef MISSIONPACK
 	qhandle_t	nailPuffShader;
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	qhandle_t	blueProxMine;
 #endif
 #endif
@@ -1070,7 +1070,7 @@ typedef struct {
 	qhandle_t	battleWeaponShader;
 #endif
 	qhandle_t	hastePuffShader;
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	qhandle_t	redKamikazeShader;
 	qhandle_t	blueKamikazeShader;
 #endif
@@ -1094,7 +1094,7 @@ typedef struct {
 #ifndef NOBLOOD
 	qhandle_t	bloodExplosionShader;
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	qhandle_t	meleeHit1Shader;
 	qhandle_t	meleeHit2Shader;
 	qhandle_t	meleeHit3Shader;
@@ -1129,8 +1129,8 @@ typedef struct {
 #endif
 	qhandle_t	invulnerabilityPowerupModel;
 
-#ifndef TMNTWEAPSYS
-#ifdef TMNTHOLDABLE
+#ifndef TA_WEAPSYS
+#ifdef TA_HOLDABLE
 	qhandle_t	shurikenModel;
 	qhandle_t	shurikenFireModel;
 	qhandle_t	shurikenElectricModel;
@@ -1154,7 +1154,7 @@ typedef struct {
 	qhandle_t	medalAssist;
 	qhandle_t	medalCapture;
 
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 	qhandle_t	matModels[NUM_MATERIAL_TYPES][NUM_MATERIAL_MODELS];
 	int			matNumModels[NUM_MATERIAL_TYPES];
 #endif
@@ -1187,7 +1187,7 @@ typedef struct {
 	sfxHandle_t	sfx_chghitflesh;
 	sfxHandle_t	sfx_chghitmetal;
 #endif
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	sfxHandle_t kamikazeExplodeSound;
 	sfxHandle_t kamikazeImplodeSound;
 	sfxHandle_t kamikazeFarSound;
@@ -1224,7 +1224,7 @@ typedef struct {
 	sfxHandle_t fallSound;
 	sfxHandle_t jumpPadSound;
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	sfxHandle_t letterBoxOnSound;
 	sfxHandle_t letterBoxOffSound;
 #endif
@@ -1247,7 +1247,7 @@ typedef struct {
 	sfxHandle_t impressiveSound;
 	sfxHandle_t excellentSound;
 #endif
-#ifndef TMNTMISC
+#ifndef TA_MISC
 	sfxHandle_t deniedSound;
 #endif
 #ifndef TURTLEARENA // AWARDS
@@ -1275,7 +1275,7 @@ typedef struct {
 
 	sfxHandle_t flightSound;
 	sfxHandle_t medkitSound;
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 	sfxHandle_t shurikenSound;
 #endif
 
@@ -1345,7 +1345,7 @@ typedef struct {
 #ifndef TURTLEARENA // POWERS
 	sfxHandle_t	n_healthSound;
 #endif
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	sfxHandle_t	hgrenb1aSound;
 	sfxHandle_t	hgrenb2aSound;
 #endif
@@ -1355,7 +1355,7 @@ typedef struct {
 	sfxHandle_t	wstbimpdSound;
 	sfxHandle_t	wstbactvSound;
 #endif
-#ifdef TMNTWEAPSYS // MELEE_TRAIL
+#ifdef TA_WEAPSYS // MELEE_TRAIL
 	qhandle_t	weaponTrailShader;
 #endif
 
@@ -1465,7 +1465,7 @@ typedef struct {
 extern	cgs_t			cgs;
 extern	cg_t			cg;
 extern	centity_t		cg_entities[MAX_GENTITIES];
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 extern	projectileInfo_t	cg_projectiles[MAX_BG_PROJ];
 extern	weaponInfo_t		cg_weapons[MAX_BG_WEAPONS];
 extern	weaponGroupInfo_t	cg_weapongroups[MAX_BG_WEAPON_GROUPS];
@@ -1473,7 +1473,7 @@ extern	weaponGroupInfo_t	cg_weapongroups[MAX_BG_WEAPON_GROUPS];
 extern	weaponInfo_t	cg_weapons[MAX_WEAPONS];
 #endif
 extern	itemInfo_t		cg_items[MAX_ITEMS];
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 extern	npcInfo_t		cg_npcs[MAX_NPCS];
 #endif
 extern	markPoly_t		cg_markPolys[MAX_MARK_POLYS];
@@ -1534,7 +1534,7 @@ extern	vmCvar_t		cg_viewsize;
 extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
 extern	vmCvar_t		cg_tracerLength;
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 extern	vmCvar_t		cg_autoswitch;
 #endif
 extern	vmCvar_t		cg_ignore;
@@ -1607,7 +1607,7 @@ extern  vmCvar_t		cg_recordSPDemo;
 extern  vmCvar_t		cg_recordSPDemoName;
 extern	vmCvar_t		cg_obeliskRespawnDelay;
 #endif
-#ifdef TMNTWEAPSYS // MELEE_TRAIL
+#ifdef TA_WEAPSYS // MELEE_TRAIL
 extern	vmCvar_t		cg_drawMeleeWeaponTrails;
 #endif
 #ifdef IOQ3ZTM // LASERTAG
@@ -1797,56 +1797,56 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 //
 // cg_weapons.c
 //
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 void CG_NextHoldable_f( void );
 void CG_PrevHoldable_f( void );
 void CG_Holdable_f( void );
 #endif
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 void CG_NextWeapon_f( void );
 void CG_PrevWeapon_f( void );
 void CG_Weapon_f( void );
 #endif
 
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 void CG_RegisterHoldable( int holdableNum );
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 void CG_RegisterProjectile( int projectileNum );
 #endif
 void CG_RegisterWeapon( int weaponNum );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 void CG_RegisterWeaponGroup( int weaponNum );
 #endif
 void CG_RegisterItemVisuals( int itemNum );
 
 void CG_FireWeapon( centity_t *cent );
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFlags, int skipNum );
 #endif
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_WeaponHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
 #else
 void CG_ShotgunFire( entityState_t *es );
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum, int projnum);
 #else
 void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum);
 #endif
 
 void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 void CG_GrappleTrail( centity_t *ent, const projectileInfo_t *wi );
 #else
 void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi );
 #endif
 void CG_AddViewWeapon (playerState_t *ps);
 void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team );
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 void CG_DrawWeaponSelect( void );
 
 void CG_OutOfAmmoChange( void );	// should this be in pmove?
@@ -1857,7 +1857,7 @@ void CG_OutOfAmmoChange( void );	// should this be in pmove?
 //
 void	CG_InitMarkPolys( void );
 void	CG_AddMarks( void );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 qboolean	CG_ImpactMark( qhandle_t markShader,
 				    const vec3_t origin, const vec3_t dir, 
 					float orientation, 
@@ -1893,12 +1893,12 @@ localEntity_t *CG_SmokePuff( const vec3_t p,
 				   int leFlags,
 				   qhandle_t hShader );
 void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 qboolean CG_BulletBubbleTrail( vec3_t start, vec3_t end, int skipNum );
 #endif
 void CG_SpawnEffect( vec3_t org );
 #ifdef MISSIONPACK
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 void CG_KamikazeEffect( vec3_t org );
 #endif
 void CG_ObeliskExplode( vec3_t org, int entityNum );
@@ -1927,7 +1927,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 void CG_Fade( int a, int time, int duration );
 void CG_DrawFlashFade( void );
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 void CG_ToggleLetterbox(qboolean onscreen, qboolean instant);
 void CG_DrawLetterbox(void);
 #endif
@@ -1975,7 +1975,7 @@ void CG_Respawn( void );
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void CG_CheckChangedPredictableEvents( playerState_t *ps );
 
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 //
 // cg_npcs.c
 //
@@ -2017,7 +2017,7 @@ int			trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void		trap_FS_Read( void *buffer, int len, fileHandle_t f );
 void		trap_FS_Write( const void *buffer, int len, fileHandle_t f );
 void		trap_FS_FCloseFile( fileHandle_t f );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 int			trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf, int bufsize );
 #endif
 int			trap_FS_Seek( fileHandle_t f, long offset, int origin ); // fsOrigin_t
@@ -2140,7 +2140,7 @@ int			trap_GetCurrentCmdNumber( void );
 
 qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
 
-#if defined TMNTHOLDSYS/*2*/
+#if defined TA_HOLDSYS/*2*/
 // used for the weapon select, holdable select, and zoom
 void		trap_SetUserCmdValue( int holdableValue, float sensitivityScale, int weaponValue );
 #else
