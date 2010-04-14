@@ -1947,7 +1947,7 @@ static void CG_HasteTrail( centity_t *cent ) {
 	smoke->leType = LE_SCALE_FADE;
 }
 
-#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef MISSIONPACK
 #ifdef TA_MISC
 
 /*
@@ -3500,7 +3500,7 @@ void CG_Player( centity_t *cent ) {
 	CG_PlayerSprites( cent, &head );
 #endif
 
-#ifdef MISSIONPACK // OR TA_MISC ? // MP_TMNT_OK
+#ifdef MISSIONPACK
 	CG_BreathPuffs(cent, &head);
 
 	CG_DustTrail(cent);

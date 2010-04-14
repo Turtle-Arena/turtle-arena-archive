@@ -8,8 +8,8 @@
 		<Build>
 			<Target title="Release Win32">
 				<Option platforms="Windows;" />
-				<Option output="../../build/tmntarena_release/tmntarena.x86.exe" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/tmntarena_release" />
+				<Option output="../../build/turtlearena_release/turtlearena.x86.exe" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/turtlearena_release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
@@ -52,8 +52,8 @@
 			</Target>
 			<Target title="Debug Win32">
 				<Option platforms="Windows;" />
-				<Option output="../../build/tmntarena_debug/tmntarena.x86.exe" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/tmntarena_debug" />
+				<Option output="../../build/turtlearena_debug/turtlearena.x86.exe" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/turtlearena_debug" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
@@ -97,8 +97,8 @@
 			</Target>
 			<Target title="Release Linux x86">
 				<Option platforms="Unix;Mac;" />
-				<Option output="../../build/tmntarena_release/tmntarena.x86" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/tmntarena_release" />
+				<Option output="../../build/turtlearena_release/turtlearena.x86" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/turtlearena_release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
@@ -125,8 +125,8 @@
 			</Target>
 			<Target title="Debug Linux x86">
 				<Option platforms="Unix;Mac;" />
-				<Option output="../../build/tmntarena_debug/tmntarena.x86" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/tmntarena_debug" />
+				<Option output="../../build/turtlearena_debug/turtlearena.x86" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/turtlearena_debug" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
@@ -154,8 +154,8 @@
 			</Target>
 			<Target title="Release Linux x86_64">
 				<Option platforms="Unix;Mac;" />
-				<Option output="../../build/tmntarena_release/tmntarena.x86_64" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/tmntarena_release" />
+				<Option output="../../build/turtlearena_release/turtlearena.x86_64" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/turtlearena_release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
@@ -182,8 +182,8 @@
 			</Target>
 			<Target title="Debug Linux x86_64">
 				<Option platforms="Unix;Mac;" />
-				<Option output="../../build/tmntarena_debug/tmntarena.x86_64" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/tmntarena_debug" />
+				<Option output="../../build/turtlearena_debug/turtlearena.x86_64" prefix_auto="0" extension_auto="0" />
+				<Option object_output="../../build/turtlearena_debug" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />

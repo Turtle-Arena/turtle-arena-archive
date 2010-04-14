@@ -518,36 +518,3 @@ type "cmd_harvest"
 0, ", you should collect some skulls.";
 }
 
-/* Domination is unsupported by TMNT
-	//Double Domination stuff:
-type "dd_start_pointa"
-{
-"I'll dominate point A";
-}
-
-type "dd_start_pointb"
-{
-"I'll dominate point B";
-}
-
-type "dd_pointa"
-{
-"Dominating point A";
-}
-
-type "dd_pointb"
-{
-"Dominating point B";
-}
-
-//DD orders:
-type "cmd_takea"
-{
-0, " dominate point A";
-}
-
-type "cmd_takeb"
-{
-0, " dominate point B";
-}
-*/

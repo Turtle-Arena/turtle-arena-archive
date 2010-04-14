@@ -18,8 +18,8 @@ death3 (Copy of death1)
 Quake3 Animations
 * Run (Doesn't look right)
 * Walk (Doesn't look right)
-Team Arena Animations (done)
-TMNT Animations
+MISSIONPACK Animations (done)
+Turtle Arena Animations
 
 ===Legs===
 Jump/land B (Copy of Jump/land)

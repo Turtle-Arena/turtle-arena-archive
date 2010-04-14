@@ -125,9 +125,9 @@ medal_gauntlet
 
 
 // ZTM: Renamed 3 (of 4) health icons;
-// Q3: green - TMNT: small
-// Q3: yellow - TMNT: medium
-// Q3: red - TMNT: large
+// Q3: green - Turtle Arena: small
+// Q3: yellow - Turtle Arena: medium
+// Q3: red - Turtle Arena: large
 icons/iconh_green
 {
 	nopicmip

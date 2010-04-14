@@ -6,4 +6,4 @@ So if I ever decide to try and run Turtle Arena with a unmodified ioquake3 (Need
 The file scripts/weaponinfo.txt attempts to recreate the Quake3 and Team Arena weapons
 	using the weapon scripting for Turtle Arena.
 
-This was done to improve the weapon system and in case someone wanted to use quake3's weapons with TMNT Arena's weapon scripting.
+This was done to improve the weapon system and in case someone wanted to use quake3's weapons with Turtle Arena's weapon scripting.

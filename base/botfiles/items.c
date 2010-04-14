@@ -38,7 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	RESPAWN_ARMOR		25
 #define	RESPAWN_HEALTH		35
 #define	RESPAWN_AMMO		40
-//#ifdef TMNTHOLDABLE
+//#ifdef TA_HOLDABLE
 #define RESPAWN_HOLDABLE	35
 //#else
 //#define RESPAWN_HOLDABLE	60
@@ -206,7 +206,7 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
-// TMNTWEAPSYS uses weaponinfo.txt to setup the weapon items.
+// TA_WEAPSYS uses weaponinfo.txt to setup the weapon items.
 // (Weapons could still be here, but they would over-ride weaponinfo.txt items)
 /*
 //weapon_default?
