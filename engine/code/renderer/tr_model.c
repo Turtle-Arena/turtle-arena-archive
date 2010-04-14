@@ -21,11 +21,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // tr_models.c -- model loading and caching
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 #include "../server/server.h"
 #endif
 
-#if defined TMNT_GAME_MODELS && defined DEDICATED
+#if defined TA_GAME_MODELS && defined DEDICATED
 #define RENDERLESS_MODELS // ZTM: Ded server needs the tags for melee attacks
 #endif
 
@@ -1314,7 +1314,7 @@ void R_ModelInit( void ) {
 	mod = R_AllocModel();
 	mod->type = MOD_BAD;
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 	// Models in game are no longer valid
 	if (Cvar_VariableValue("sv_running") && gvm)
 	{

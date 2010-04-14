@@ -191,7 +191,7 @@ void G_StartMeleeAttack(gentity_t *ent)
 	G_AddEvent( ent, EV_FIRE_WEAPON, 0 );
 }
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 /*
 ======================
 G_PositionEntityOnTag
@@ -404,7 +404,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 	int i;
 	qboolean traceHit;
 	orientation_t	weaponOrientation;
-#ifdef TMNT_GAME_MODELS // Use the weapon tag angles and pos!
+#ifdef TA_GAME_MODELS // Use the weapon tag angles and pos!
 	orientation_t	legsOrientation;
 	orientation_t	torsoOrientation;
 
@@ -430,14 +430,14 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		{
 			return qfalse;
 		}
-#ifdef TMNT_GAME_MODELS // TMNTWEAPSYS
+#ifdef TA_GAME_MODELS // TMNTWEAPSYS
 		// put weapon on torso
 #ifdef TMNTPLAYERS
 		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_primary"))
 #endif
 		{
-#if !defined TMNTPLAYERS || defined TMNT_SUPPORTQ3
+#if !defined TMNTPLAYERS || defined TA_SUPPORTQ3
 			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 				torsoOrientation, ent->client->pers.torsoModel, "tag_weapon"))
 #endif
@@ -460,14 +460,14 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		{
 			return qfalse;
 		}
-#ifdef TMNT_GAME_MODELS // TMNTWEAPSYS
+#ifdef TA_GAME_MODELS // TMNTWEAPSYS
 		// put weapon on torso
 #ifdef TMNTPLAYERS
 		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_secondary"))
 #endif
 		{
-#if !defined TMNTPLAYERS || defined TMNT_SUPPORTQ3
+#if !defined TMNTPLAYERS || defined TA_SUPPORTQ3
 			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 				torsoOrientation, ent->client->pers.torsoModel, "tag_flag"))
 #endif
@@ -481,7 +481,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 #endif
 	}
 
-#ifdef TMNT_GAME_MODELS // TMNTWEAPSYS
+#ifdef TA_GAME_MODELS // TMNTWEAPSYS
 	// Setup "start" and "end" using weaponOrientation
 	VectorCopy(weaponOrientation.axis[0], forward);
 	VectorCopy(weaponOrientation.axis[1], right);

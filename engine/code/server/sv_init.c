@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "server.h"
 
-#if defined TMNT_GAME_MODELS && defined DEDICATED
+#if defined TA_GAME_MODELS && defined DEDICATED
 // tr_model.c
 void R_Init(void);
 #endif
@@ -426,7 +426,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	// clear the whole hunk because we're (re)loading the server
 	Hunk_Clear();
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 	// Restart renderer
 #ifdef DEDICATED
 	R_Init();

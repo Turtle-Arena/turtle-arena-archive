@@ -1047,7 +1047,7 @@ void CG_RegisterProjectile( int projectileNum )
 		case PT_GRAPPLE:
 			projectileInfo->missileTrailFunc = CG_GrappleTrail;
 			cgs.media.grappleCableShader = trap_R_RegisterShader( "GrappleCable");
-#if !defined TURTLEARENA || defined TMNT_SUPPORTQ3
+#if !defined TURTLEARENA || defined TA_SUPPORTQ3
 			if (!cgs.media.grappleCableShader)
 				cgs.media.grappleCableShader = trap_R_RegisterShader( "lightningBoltNew");
 #endif
@@ -2553,7 +2553,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		{
 			CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_hand_primary");
 		}
-#ifdef TMNT_SUPPORTQ3
+#ifdef TA_SUPPORTQ3
 		else if (ci->tagInfo & TI_TAG_WEAPON)
 		{
 			CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_weapon");
@@ -2593,7 +2593,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		{
 			CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_hand_secondary");
 		}
-#ifdef TMNT_SUPPORTQ3
+#ifdef TA_SUPPORTQ3
 		else if (ci->tagInfo & TI_TAG_FLAG)
 		{
 			CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_flag");

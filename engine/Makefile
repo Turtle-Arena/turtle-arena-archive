@@ -131,7 +131,7 @@ ifeq ($(QUAKE3),1)
 						-DNOTRATEDM -DNOBLOOD -DRAVENMD4 \
 						-DTMNTHOLDSYS -DTMNTWEAPSYS_NOCOMPAT \
 						-DTMNTWEAPSYS -DTMNTPLAYERSYS \
-						-DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
+						-DTA_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
 						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
 
 			QUAKE3_CFLAGS =
@@ -139,8 +139,8 @@ ifeq ($(QUAKE3),1)
 			# Use model tags for "true" melee attacking (Gauntlet)
 			#  Can't be used as a quake3 mod, as it uses new VM-to-server calls.
 			DED_USE_MODELS=1
-			ENGINE_CFLAGS += -DTMNT_GAME_MODELS
-			QUAKE3_CFLAGS += -DTMNT_GAME_MODELS
+			ENGINE_CFLAGS += -DTA_GAME_MODELS
+			QUAKE3_CFLAGS += -DTA_GAME_MODELS
 
 			VERSION=1.36turtle
 			BASEGAME=baseq3
@@ -154,7 +154,7 @@ ifeq ($(QUAKE3),1)
 			# Build modified ioquake3, it only runs using its own sever/client binaries
 			#   and currently doesn't support Q3 mods.
 			BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
-								-DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
+								-DTMNTPLAYERSYS -DTA_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
 								-DTMNTWEAPSYS -DOA_BLOOM
 
 			VERSION=1.36ztm
@@ -230,7 +230,7 @@ else # END QUAKE3
 						-DNOTRATEDM -DNOBLOOD -DRAVENMD4 \
 						-DTMNTHOLDSYS -DTMNTWEAPSYS_NOCOMPAT \
 						-DTMNTWEAPSYS -DTMNTPLAYERSYS \
-						-DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
+						-DTA_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
 						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
 
 	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTMNTMISC -DTMNTSP -DTMNTHOLDABLE \
@@ -244,7 +244,7 @@ else # END QUAKE3
 
 	# Use model tags for true melee attacking
 	DED_USE_MODELS=1
-	BUILD_DEFINES += -DTMNT_GAME_MODELS
+	BUILD_DEFINES += -DTA_GAME_MODELS
 
 	# Turtle Arena's sounds are ogg vorbis
 	USE_CODEC_VORBIS=1
@@ -2100,7 +2100,7 @@ ifeq ($(ARCH),x86)
       $(B)/ded/snapvectora.o \
       $(B)/ded/matha.o
 endif
-#ZTM: if TMNT_GAME_TAGS
+#ZTM: if TA_GAME_TAGS
 ifeq ($(DED_USE_MODELS),1)
 Q3DOBJ += \
       $(B)/ded/tr_model.o
@@ -2538,7 +2538,7 @@ $(B)/ded/%.o: $(SYSDIR)/%.rc
 $(B)/ded/%.o: $(NDIR)/%.c
 	$(DO_DED_CC)
 
-# ZTM: TMNT_GAME_TAGS ded
+# ZTM: TA_GAME_TAGS ded
 ifeq ($(DED_USE_MODELS),1)
 $(B)/ded/%.o: $(RDIR)/%.c
 	$(DO_DED_CC)

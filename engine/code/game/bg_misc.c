@@ -5352,7 +5352,7 @@ models/players/raph/animation.cfg, etc
 
 Supports Quake3 and Elite Force animation styles.
 
-Quake3 style (also used by Elite Force MP): (TMNT_SUPPORTQ3 must be defined)
+Quake3 style (also used by Elite Force MP): (TA_SUPPORTQ3 must be defined)
 0	31	0	20		// BOTH_DEATH1
 30	1	0	20		// BOTH_DEAD1
 31	31	0	20		// BOTH_DEATH2
@@ -5445,7 +5445,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			// ZTM: Hey why not, its valid. (Not in Q3)
 			} else if ( !Q_stricmp( token, "splash" ) ) {
 				playercfg->footsteps = FOOTSTEP_SPLASH;
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF // ZTM: Elite Force
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF // ZTM: Elite Force
 			} else if ( !Q_stricmp( token, "borg" ) ) {
 				playercfg->footsteps = FOOTSTEP_MECH;
 			} else if ( !Q_stricmp( token, "reaver" ) ) {
@@ -5504,7 +5504,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			continue;
 		}
 
-		// TMNT_SUPPORTEF
+		// TA_SUPPORTEF
 		// ZTM: Support Elite Force Stuff
 		//
 		else if ( !Q_stricmp( token, "soundpath" ) ) {
@@ -5640,7 +5640,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			}
 		}
 
-#if !defined TURTLEARENA || defined TMNT_SUPPORTQ3 // animation.cfg
+#if !defined TURTLEARENA || defined TA_SUPPORTQ3 // animation.cfg
 		// if it is a number, start parsing animations
 		if ( token[0] >= '0' && token[0] <= '9' ) {
 			text_p = prev;	// unget the token
@@ -5664,7 +5664,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			}
 		}
 	}
-#if !defined TURTLEARENA || defined TMNT_SUPPORTQ3 // animation.cfg
+#if !defined TURTLEARENA || defined TA_SUPPORTQ3 // animation.cfg
 	else
 	{
 		// Assume Quake3 (or Elite Force MP) player.
@@ -5713,7 +5713,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 	}
 #endif
 
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
 	BG_ConvertEFAnimationsToQ3(animations, MAX_TOTALANIMATIONS);
 #endif
 
@@ -6111,7 +6111,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 const char *bg_playerDirs[MAX_PLAYER_DIRS] =
 {
 	"models/players",
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
 	"models/players2",
 #endif
 #ifndef TURTLEARENA

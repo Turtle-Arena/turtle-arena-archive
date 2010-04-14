@@ -351,7 +351,7 @@ static void PlayerModel_PicEvent( void* ptr, int event )
 	// get model and strip icon_
 	modelnum = s_playermodel.modelpage*MAX_MODELSPERPAGE + i;
 	buffptr  = s_playermodel.modelnames[modelnum] + strlen("models/players/");
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
 	if (buffptr[0] == '/') // models/players2/
 		buffptr++;
 #endif
@@ -417,7 +417,7 @@ static void PlayerModel_BuildList( void )
 	char	skinname[MAX_QPATH];
 	char*	dirptr;
 	char*	fileptr;
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
 	int		h;
 #endif
 	int		i;
@@ -431,7 +431,7 @@ static void PlayerModel_BuildList( void )
 	s_playermodel.modelpage = 0;
 	s_playermodel.nummodels = 0;
 
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
   for (h = 0; h < MAX_UI_PLAYERDIRS && bg_playerDirs[h] != NULL; h++)
   {
 	// iterate directory of all player models
@@ -451,7 +451,7 @@ static void PlayerModel_BuildList( void )
 			continue;
 			
 		// iterate all skin files in directory
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
 		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "", filelist, 2048 );
 #else
@@ -476,7 +476,7 @@ static void PlayerModel_BuildList( void )
 			{
 				Com_sprintf( s_playermodel.modelnames[s_playermodel.nummodels++],
 					sizeof( s_playermodel.modelnames[s_playermodel.nummodels] ),
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
 					"%s/%s/%s", bg_playerDirs[h], dirptr, skinname );
 #else
 					"models/players/%s/%s", dirptr, skinname );
@@ -490,7 +490,7 @@ static void PlayerModel_BuildList( void )
 			}
 		}
 	}	
-#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
   }
 #endif
 

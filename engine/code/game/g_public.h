@@ -229,7 +229,7 @@ typedef enum {
 	// 1.32
 	G_FS_SEEK,
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 	G_REGISTERMODEL, // CG_R_REGISTERMODEL
 	G_LERPTAG,		// CG_R_LERPTAG
 #endif

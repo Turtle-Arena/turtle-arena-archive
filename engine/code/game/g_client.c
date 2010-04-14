@@ -883,7 +883,7 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 #ifdef TMNTWEAPSYS
     weapon_t oldDefault;
 #endif
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
     char filename[MAX_QPATH];
 #ifdef IOQ3ZTM // PLAYER_DIR
 	int i;
@@ -905,7 +905,7 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 		*p = 0;
 	}
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 	// Load model tags (Currently loads the whole model.)
 	// Game and cgame share the same models so an extra ClientUserinfoChanged is called on model reset (R_ModelInit),
 	//   otherwise the model number were incorrent for bots (and maybe other clients).

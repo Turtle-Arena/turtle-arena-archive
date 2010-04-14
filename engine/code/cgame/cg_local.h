@@ -402,7 +402,7 @@ typedef struct {
 //   and allow Turtle Arena players in Quake3/Team Arena?
 enum
 {
-#ifdef TMNT_SUPPORTQ3
+#ifdef TA_SUPPORTQ3
 	TI_TAG_WEAPON = 1,
 	TI_TAG_FLAG = 2,
 #endif

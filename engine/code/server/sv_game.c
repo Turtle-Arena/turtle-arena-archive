@@ -290,7 +290,7 @@ static int	FloatAsInt( float f ) {
 	return fi.i;
 }
 
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 qhandle_t	RE_RegisterModel( const char *name );
 int			R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
 					 float frac, const char *tagName );
@@ -442,7 +442,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_SNAPVECTOR:
 		Sys_SnapVector( VMA(1) );
 		return 0;
-#ifdef TMNT_GAME_MODELS
+#ifdef TA_GAME_MODELS
 	case G_REGISTERMODEL:
 		return RE_RegisterModel( VMA(1) );
 	case G_LERPTAG:

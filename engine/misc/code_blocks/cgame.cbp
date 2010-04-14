@@ -92,7 +92,7 @@
 			<Add option="-DNOBLOOD" />
 			<Add option="-DTHIRD_PERSON" />
 			<Add option="-DRAVENMD4" />
-			<Add option="-DTMNT" />
+			<Add option="-DTURTLEARENA" />
 			<Add option="-DTMNTMISC" />
 			<Add option="-DTMNTHUD" />
 			<Add option="-DTMNTSP" />
@@ -101,10 +101,9 @@
 			<Add option="-DTMNTWEAPSYS" />
 			<Add option="-DTMNTWEAPSYS_NOCOMPAT" />
 			<Add option="-DTMNTWEAPSYS_EX" />
-			<Add option="-DTMNTWEAPONS" />
 			<Add option="-DTMNTPLAYERSYS" />
 			<Add option="-DTMNTPLAYERS" />
-			<Add option="-DTMNT_SUPPORTQ3" />
+			<Add option="-DTA_SUPPORTQ3" />
 			<Add option="-DTMNTENTSYS" />
 			<Add option="-DTMNTPATHSYS" />
 			<Add option="-DTMNTNPCSYS" />
@@ -112,7 +111,7 @@
 			<Add option="-DOA_BLOOM" />
 			<Add option="-DNIGHTSMODE" />
 			<Add option="-DCAMERASCRIPT" />
-			<Add option="-DTMNT_GAME_MODELS" />
+			<Add option="-DTA_GAME_MODELS" />
 		</Compiler>
 		<Linker>
 			<Add library="odbc32" />
