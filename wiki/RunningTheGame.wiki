@@ -1,39 +1,56 @@
-#summary How to run the game from the SVN
+#summary How to build the game
 #labels Featured,Phase-Deploy
 
 = Introduction =
 
-*Runing the game* from the SVN (Subversion repository) is split into three parts.
+*Building the game* from source is split into four parts.
 
+  * Getting the Libaries
   * Getting the source
   * Compiling the source
   * Final setup and execution
 
-= Getting the source =
+== Getting the Libaries (Linux, Mac) ==
+You will need the following development libraries; SDL, GL, GLU, Ogg, Vorbis, and Theora.
 
-You will need to do a Source Checkout, see http://code.google.com/p/turtlearena/source/checkout
+In Debian and Debian based distros (Such as Ubuntu) you can run the below in the terminal.
+  sudo apt-get install subversion libsdl1.2-dev libgl1-mesa-dev libglu1-mesa-dev libogg-dev libvorbis-dev libtheora-dev
 
-= Compiling the source =
+== Getting the source ==
+You can get the lastest development source from the SVN or use the source from a released version.
 
-Currently the easist way to compile Turtle Arena is Make.
+=== SVN ===
+You will need a subversion client to get the source, such as [http://tortoisesvn.tigris.org/ TortoiseSVN] (Windows), [http://www.rabbitvcs.org RabbitVCS] (Linux), or the terminal program "svn" (In Debian/Ubuntu, sudo apt-get install subversion).
 
-== Linux - Make ==
+You will need to do a source checkout (Project members see http://code.google.com/p/turtlearena/source/checkout)
+
+	svn checkout http://turtlearena.googlecode.com/svn/trunk/ turtlearena-read-only
+
+=== Zipped ===
+A zip file containing the source is included with the release, simply unzip it.
+
+
+== Compiling the source ==
+Currently the best way to compile Turtle Arena is from a terminal using "make".
+
+=== Linux - Make ===
   # In a terminal change to the engine/ directory and run "make"
   # Output will be in engine/build/*dir*/ (Where *dir* is something like "release-linux-x86")
 
-== Windows - Make ==
-See http://wiki.ioquake3.org/Building_ioquake3_on_Windows_-_mingw_and_msys
+=== Windows - Mingw ===
+See [http://wiki.ioquake3.org/Building_ioquake3_on_Windows_-_mingw_and_msys Building ioquake3 on Windows - mingw and msys]
 
-== Windows - Code::Blocks ==
-NOTE: Compiling only works on Windows. However it can be used to view and edit the source on other platforms.
+=== Windows/Linux - Code::Blocks ===
+NOTE: Compiling is only supported on Windows and Linux currently. However it can be used to view and edit the source on all platforms Code::Blocks supports.
   # Open engine/misc/code_blocks/ioq3.workspace
+  # Select Platform
   # Rebuild workspace
   # Output will be in engine/build/
 
-Defines maybe out of date... so copy the defines from the Turtle Arena config section of the Makefile into all projects (Except Splines and BSPC).
-
-== Others ==
-See http://wiki.ioquake3.org/Building_ioquake3 for other platforms and methods of building.
+=== Mac [http://wiki.ioquake3.org/Building_ioquake3_on_Mac 1]===
+====Snow Leopard - Mac OS X 10.6.2====
+  # In a terminal change to the engine/ directory and run "CC=gcc-4.0 ./make-macosx-ub.sh"
+  # Output will be in engine/build/
 
 === Microsoft Visual C++ ===
 Currently unsupported. There are project files for ioquake3 in engine/misc/msvc/.
@@ -63,12 +80,26 @@ Q3_UI project:
 Add below to project
   * engine/code/q3_ui/ui_spplayer.c
 
-Copy the defines from the Turtle Arena config section of the Makefile into all projects (Except Splines).
+Copy the defines from the Turtle Arena config section of the engine/Makefile into all projects (Except Splines and BSPC).
+
+=== Windows - Visual Studio 2005 and 2008 ===
+See Building ioquake3 on Windows - Visual Studio [http://wiki.ioquake3.org/Building_ioquake3_on_Windows_-_Visual_Studio_2005 2005] and [http://wiki.ioquake3.org/Building_ioquake3_on_Windows_-_Visual_Studio_2008 2008]
+
 
 = Final setup and execution =
 
-== Windows (Mingw) ==
-1. Copy the qvms files from engine/build/release-?/base/vm/ to base/vm/
+== Linux - Make ==
+1. Create a link to each of the 3 qvm files in `engine/build/release-*/base/vm/*.qvm` in base/vm/
+This way you don't have to copy the qvms after each compile.
+
+OR Copy the qvms files instead, to allow running in Windows as well.
+
+2. In the terminal change to the directory where you did the checkout. Example: cd /home/$USER/TurtleArena/svn/
+
+3. Run in the terminal; (Example) ./engine/build/release-linux-x86/turtlearena.x86 +set fs_basepath "."
+
+== Windows - Mingw ==
+1. Copy the qvms files from engine\build\release-mingw32-x86\base\vm\ to base\vm\
 
 2. In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TurtleArena\svn\"
 
@@ -78,26 +109,16 @@ Copy the defines from the Turtle Arena config section of the Makefile into all p
 Other being Code::Blocks or Microsoft Visual C++.
 
 The Code::Blocks and Microsoft Visual C++ projects do not compile QVMs, only DLLs.
-The DLLs are used for testing/debuging, while QVMs are used for release. Mingw also compiles DLLs as well as QVMs.
+The DLLs are used for testing/debugging, while QVMs are used for release. Mingw also compiles DLLs as well as QVMs.
 
 1. Copy the DLLs files from
 
-  * engine/build/cgame_release/cgamex86.dll
-  * engine/build/game_release/qagamex86.dll
-  * engine/build/q3_ui_release/uix86.dll
+  * engine\build\cgame_release\cgamex86.dll
+  * engine\build\game_release\qagamex86.dll
+  * engine\build\q3_ui_release\uix86.dll
 
-to base/
+to base\
 
 2. In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TurtleArena\svn\"
 
 3. Run in the command prompt: engine\build\release-mingw32-x86\turtlearena.x86 +set fs_basepath "." +set vm_game 0 +set vm_cgame 0 +set vm_ui 0
-
-== Linux ==
-1. Create a link to each of the 3 qvm files in engine/build/release-?/base/vm/?.qvm in base/vm/
-This way you don't have to copy the qvms after each compile.
-
-OR Copy the qvms files instead, to allow running in Windows as well.
-
-2. In the terminal change to the directory where you did the checkout. Example: cd /home/$USER/TurtleArena/svn/
-
-3. Run in the terminal; Example: Run ./engine/build/release-linux-x86/turtlearena.x86 +set fs_basepath "."
