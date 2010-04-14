@@ -1038,6 +1038,16 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		UI_StartServerMenu( qfalse );
 		return qtrue;
 	}
+
+	if ( Q_stricmp (cmd, "sp_complete") == 0 ) {
+		trap_Cvar_Set( "com_errorMessage", "Game Complete!" );
+		return qtrue;
+	}
+
+	if ( Q_stricmp (cmd, "sp_gameover") == 0 ) {
+		trap_Cvar_Set( "com_errorMessage", "Game Over" );
+		return qtrue;
+	}
 #endif
 
 	if ( Q_stricmp (cmd, "levelselect") == 0 ) {
