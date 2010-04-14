@@ -2618,6 +2618,7 @@ CG_DrawVote
 static void CG_DrawVote(void) {
 	char	*s;
 	int		sec;
+	float	y;
 
 	if ( !cgs.voteTime ) {
 		return;
@@ -2635,14 +2636,19 @@ static void CG_DrawVote(void) {
 	if ( sec < 0 ) {
 		sec = 0;
 	}
+#ifdef TURTLEARENA
+	y = 304;
+#else
+	y = 58;
+#endif
 #ifdef MISSIONPACK_HUD // ZTM: TODO: Add vote to Q3 ingame menu?
 	s = va("VOTE(%i):%s yes:%i no:%i", sec, cgs.voteString, cgs.voteYes, cgs.voteNo);
-	CG_DrawSmallString( 0, 58, s, 1.0F );
+	CG_DrawSmallString( 0, y, s, 1.0F );
 	s = "or press ESC then click Vote";
-	CG_DrawSmallString( 0, 58 + SMALLCHAR_HEIGHT + 2, s, 1.0F );
+	CG_DrawSmallString( 0, y + SMALLCHAR_HEIGHT + 2, s, 1.0F );
 #else
 	s = va("VOTE(%i):%s yes:%i no:%i", sec, cgs.voteString, cgs.voteYes, cgs.voteNo );
-	CG_DrawSmallString( 0, 58, s, 1.0F );
+	CG_DrawSmallString( 0, y, s, 1.0F );
 #endif
 }
 
@@ -2654,6 +2660,7 @@ CG_DrawTeamVote
 static void CG_DrawTeamVote(void) {
 	char	*s;
 	int		sec, cs_offset;
+	float	y;
 
 	if ( cgs.clientinfo->team == TEAM_RED )
 		cs_offset = 0;
@@ -2678,9 +2685,14 @@ static void CG_DrawTeamVote(void) {
 	if ( sec < 0 ) {
 		sec = 0;
 	}
+#ifdef TURTLEARENA
+	y = 336;
+#else
+	y = 90;
+#endif
 	s = va("TEAMVOTE(%i):%s yes:%i no:%i", sec, cgs.teamVoteString[cs_offset],
 							cgs.teamVoteYes[cs_offset], cgs.teamVoteNo[cs_offset] );
-	CG_DrawSmallString( 0, 90, s, 1.0F );
+	CG_DrawSmallString( 0, y, s, 1.0F );
 }
 
 
@@ -2856,6 +2868,104 @@ static qboolean CG_DrawFollow( void ) {
 
 	return qtrue;
 }
+
+#ifdef TA_ENTSYS // FUNC_USE
+/*
+==============
+CG_UseEntity
+==============
+*/
+static qboolean CG_UseEntity(void)
+{
+	trace_t tr;
+	vec3_t muzzle;
+	vec3_t forward, right, up;
+	vec3_t end;
+	centity_t *traceEnt;
+
+	if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
+		return qfalse;
+	}
+
+	AngleVectors (cg.snap->ps.viewangles, forward, right, up);
+
+	// CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+	VectorCopy(cg.snap->ps.origin, muzzle);
+	muzzle[2] += cg.snap->ps.viewheight;
+	VectorMA( muzzle, 14, forward, muzzle );
+
+	VectorMA (muzzle, 32, forward, end);
+
+	CG_Trace( &tr, muzzle, NULL, NULL, end, cg.snap->ps.clientNum, MASK_SHOT);
+
+	if (tr.fraction == 1.0)
+		return qfalse;
+
+	if (tr.entityNum >= ENTITYNUM_MAX_NORMAL)
+		return qfalse;
+
+	traceEnt = &cg_entities[ tr.entityNum ];
+	if (traceEnt->currentState.eType == ET_MOVER && (traceEnt->currentState.generic1 & 128))
+	{
+		if ( ( traceEnt->currentState.generic1 & 1 ) &&
+			cg.snap->ps.persistant[PERS_TEAM] != TEAM_RED ) {
+			return qfalse;
+		}
+		if ( ( traceEnt->currentState.generic1 & 2 ) &&
+			cg.snap->ps.persistant[PERS_TEAM] != TEAM_BLUE ) {
+			return qfalse;
+		}
+#ifdef TA_PLAYERSYS // ABILITY_TECH
+		if ( ( traceEnt->currentState.generic1 & 4 ) &&
+			cgs.clientinfo[cg.snap->ps.clientNum].playercfg.ability != ABILITY_TECH ) {
+			return qfalse;
+		}
+#endif
+
+		return qtrue;
+	}
+
+	return qfalse;
+}
+
+static qboolean CG_DrawUseEntity(void)
+{
+	const char *s;
+	float		w;
+	float		x;
+	float		y;
+	vec4_t		color;
+
+	if (!CG_UseEntity())
+		return qfalse;
+
+	color[0] = 1;
+	color[1] = 1;
+	color[2] = 1;
+	color[3] = 1;
+
+	CG_HudPlacement(HUD_CENTER);
+
+	//CG_DrawBigString( 320 - 9 * 8, 24, "following", 1.0F );
+
+	s = "Use Entity!";
+
+	w = BIGCHAR_WIDTH * CG_DrawStrlen( s );
+	x = 0.5 * ( 640 - w );
+	y = 480-BIGCHAR_HEIGHT-12;
+
+	CG_DrawTeamBackground(x - 6, y - 6, w + 6*2, BIGCHAR_HEIGHT + 6*2, 0.33f, cg.snap->ps.persistant[PERS_TEAM]);
+
+	CG_DrawStringExt( x, y, s, color, qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+
+	//s =  "Use Entity!";
+	//w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
+	//CG_DrawTeamBackground(635 - w - 6, y + 2 - 6, w + 6*2, BIGCHAR_HEIGHT + 6*2, 0.33f, cg.snap->ps.persistant[PERS_TEAM]);
+	//CG_DrawBigString( 635 - w, y + 2, s, 1.0F);
+
+	return qtrue;
+}
+#endif
 
 
 
@@ -3239,6 +3349,10 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			CG_DrawPersistantPowerup();
 #endif
 			CG_DrawReward();
+
+#ifdef TA_ENTSYS // FUNC_USE
+			CG_DrawUseEntity();
+#endif
 		}
     
 #ifndef MISSIONPACK_HUD
