@@ -59,13 +59,13 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 
 		le = CG_AllocLocalEntity();
 		le->leFlags = LEF_PUFF_DONT_SCALE;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		le->leType = LE_BUBBLE;
 #else
 		le->leType = LE_MOVE_SCALE_FADE;
 #endif
 		le->startTime = cg.time;
-#ifdef TMNTMISC // Bubbles should make it to the surface
+#ifdef TA_MISC // Bubbles should make it to the surface
 		le->endTime = cg.time + 8000 + random() * 250;
 #else
 		le->endTime = cg.time + 1000 + random() * 250;
@@ -77,7 +77,7 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 
 		re->reType = RT_SPRITE;
 		re->rotation = 0;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		re->radius = 2 + random() * 2;
 #else
 		re->radius = 3;
@@ -95,7 +95,7 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 		VectorCopy( move, le->pos.trBase );
 		le->pos.trDelta[0] = crandom()*5;
 		le->pos.trDelta[1] = crandom()*5;
-#ifdef TMNTMISC // Always move up.
+#ifdef TA_MISC // Always move up.
 		le->pos.trDelta[2] = 8 + random()*5;
 #else
 		le->pos.trDelta[2] = crandom()*5 + 6;
@@ -105,7 +105,7 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 	}
 }
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 /*
 ==================
 CG_BulletBubbleTrail
@@ -291,7 +291,7 @@ void CG_LightningBoltBeam( vec3_t start, vec3_t end ) {
 }
 #endif
 
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 CG_KamikazeEffect
@@ -520,7 +520,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 		VectorScale( dir, 16, tmpVec );
 		VectorAdd( tmpVec, origin, newOrigin );
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		// Allow sprite explosion to be different sizes.
 		ex->radius = 30;
 		ex->refEntity.radius = 42;

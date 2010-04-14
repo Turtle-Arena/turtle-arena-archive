@@ -129,10 +129,10 @@ ifeq ($(QUAKE3),1)
 			# Copied from Turtle Arena BUILD_DEFINES
 			ENGINE_CFLAGS = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DNOTRATEDM -DNOBLOOD -DRAVENMD4 \
-						-DTMNTHOLDSYS -DTMNTWEAPSYS_NOCOMPAT \
-						-DTMNTWEAPSYS -DTMNTPLAYERSYS \
-						-DTA_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
-						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
+						-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
+						-DTA_WEAPSYS -DTA_PLAYERSYS \
+						-DTA_SUPPORTQ3  -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
+						-DOA_BLOOM -DTA_WEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
 
 			QUAKE3_CFLAGS =
 
@@ -154,8 +154,8 @@ ifeq ($(QUAKE3),1)
 			# Build modified ioquake3, it only runs using its own sever/client binaries
 			#   and currently doesn't support Q3 mods.
 			BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
-								-DTMNTPLAYERSYS -DTA_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
-								-DTMNTWEAPSYS -DOA_BLOOM
+								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
+								-DTA_WEAPSYS -DOA_BLOOM
 
 			VERSION=1.36ztm
 
@@ -211,32 +211,32 @@ else # END QUAKE3
 	#  - All of this can be overriden by makefile.local
 	###################################################################
 
-	# Please note: TMNT*SYS defines are general system changes, not total specifiy for Turtle Arena
+	# Please note: TA_*SYS defines are general system changes, not total specifiy for Turtle Arena
 	# -DANALOG		 # Allows players to rotate the camera and move based on the camera angles
 	# -DARRAYMAX     # TODO: This ''was'' going to remove the bit max problem with Q3 network (ie more then 16 weapons).
-	# -DTMNTWEAPSYS is the core changes to the weapon system
+	# -DTA_WEAPSYS is the core changes to the weapon system
 	#					loads the weapons from a text file, allowing for easy modifing,
 	#						and new custom default weapons for players.
-	# -DTMNTWEAPSYS_NOCOMPAT removes botlib weapon weight code because when WEAP_SCRIPT is define
+	# -DTA_WEAPSYS_NOCOMPAT removes botlib weapon weight code because when WEAP_SCRIPT is define
 	#  							"game" does its own weapon weight stuff.
-	# -DTMNTWEAPSYS_EX changes from holding multiple weapons to only one default and one pickup.
-	# -DTMNTWEAPSYS_EX_COMPAT keeps compatiblity with mods not using TMNTWEAPSYS_EX
-	# -DTMNTHOLDSYS Allow players to hold multiple holdable items and change to any holdable.
+	# -DTA_WEAPSYS_EX changes from holding multiple weapons to only one default and one pickup.
+	# -DTA_WEAPSYS_EX_COMPAT keeps compatiblity with mods not using TA_WEAPSYS_EX
+	# -DTA_HOLDSYS Allow players to hold multiple holdable items and change to any holdable.
 	#					(Based on Q3's weapon changing)
-	# -DTMNTNPCSYS   WIP NPC system, based on TDC_NPC system and code in Quake3
+	# -DTA_NPCSYS   WIP NPC system, based on TDC_NPC system and code in Quake3
 
-	# Some of these aren't as independent as they should be, TMNTWEAPSYS requires TMNTPLAYERSYS,  etc
+	# Some of these aren't as independent as they should be, TA_WEAPSYS requires TA_PLAYERSYS,  etc
 	BUILD_DEFINES = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DNOTRATEDM -DNOBLOOD -DRAVENMD4 \
-						-DTMNTHOLDSYS -DTMNTWEAPSYS_NOCOMPAT \
-						-DTMNTWEAPSYS -DTMNTPLAYERSYS \
-						-DTA_SUPPORTQ3  -DTMNTENTSYS -DTMNTNPCSYS -DTMNTPATHSYS \
-						-DOA_BLOOM -DTMNTWEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
+						-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
+						-DTA_WEAPSYS -DTA_PLAYERSYS \
+						-DTA_SUPPORTQ3  -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
+						-DOA_BLOOM -DTA_WEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
 
-	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTMNTMISC -DTMNTSP -DTMNTHOLDABLE \
-						-DTMNTWEAPSYS_EX \
-						-DTMNTPLAYERS \
-						-DTMNTDATA \
+	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
+						-DTA_WEAPSYS_EX \
+						-DTA_PLAYERS \
+						-DTA_DATA \
 						-DNIGHTSMODE
 
 	# Currently Turtle Arena doesn't use camera scripts.
@@ -260,7 +260,7 @@ else # END QUAKE3
 	SERVERBIN=turtlearena-ded
 	CLIENTBIN=turtlearena
 	BASEGAME=base
-	BASEGAME_FLAGS = -DMISSIONPACK -DTMNTHUD
+	BASEGAME_FLAGS = -DMISSIONPACK -DTA_HUD
 	MISSIONPACK_FLAGS= -DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
 
 	# Disable building scriptable hud and scriptable ui versions of cgame/ui

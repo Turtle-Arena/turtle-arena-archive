@@ -116,8 +116,8 @@ static void CG_Obituary( entityState_t *ent ) {
 
 	message2 = "";
 
-#ifdef TMNTMISC
-#ifdef TMNTPLAYERSYS
+#ifdef TA_MISC
+#ifdef TA_PLAYERSYS
 		gender = ci->playercfg.gender;
 #else
 		gender = ci->gender;
@@ -131,7 +131,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		message = "suicides";
 		break;
 	case MOD_FALLING:
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		if ( gender == GENDER_FEMALE )
 			message = "fell to her doom";
 		else if ( gender == GENDER_NEUTER )
@@ -146,28 +146,28 @@ static void CG_Obituary( entityState_t *ent ) {
 		message = "was squished";
 		break;
 	case MOD_WATER:
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		message = "drowned";
 #else
 		message = "sank like a rock";
 #endif
 		break;
 	case MOD_SLIME:
-#ifdef TMNTMISC // From SRB2...
+#ifdef TA_MISC // From SRB2...
 		message = "fell in some nasty goop";
 #else
 		message = "melted";
 #endif
 		break;
 	case MOD_LAVA:
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		message = "was fried";
 #else
 		message = "does a back flip into the lava";
 #endif
 		break;
 	case MOD_TARGET_LASER:
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		message = "died";
 #else
 		message = "saw the light";
@@ -176,7 +176,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	case MOD_TRIGGER_HURT:
 		message = "was in the wrong place";
 		break;
-#ifdef TMNTENTSYS
+#ifdef TA_ENTSYS
 	case MOD_EXPLOSION:
 		message = "was in the explosion";
 #endif
@@ -186,15 +186,15 @@ static void CG_Obituary( entityState_t *ent ) {
 	}
 
 	if (attacker == target) {
-#ifndef TMNTMISC
-#ifdef TMNTPLAYERSYS
+#ifndef TA_MISC
+#ifdef TA_PLAYERSYS
 		gender = ci->playercfg.gender;
 #else
 		gender = ci->gender;
 #endif
 #endif
 		switch (mod) {
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE:
 			message = "goes out with a bang";
 			break;
@@ -259,7 +259,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	if ( attacker == cg.snap->ps.clientNum ) {
 		char	*s;
 
-#ifdef TMNTMISC // frag to KO
+#ifdef TA_MISC // frag to KO
 		if ( cgs.gametype < GT_TEAM ) {
 			s = va("You knocked out %s\n%s place with %i", targetName,
 				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
@@ -301,7 +301,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	}
 
 	if ( attacker != ENTITYNUM_WORLD ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		// ZTM: TODO: Stop this &name[2] stuff, add a MOD name or use the whole name.
 		//                      Both require changing weaponinfo.txt.
 		//            If this is changed update BotWeaponNameForMeansOfDeath
@@ -336,7 +336,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was gunned down by";
 			break;
 		case MOD_GRENADE:
-#ifdef TMNTMISC
+#ifdef TA_MISC
 			message = "was killed by";
 #else
 			message = "ate";
@@ -348,7 +348,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message2 = "'s shrapnel";
 			break;
 		case MOD_ROCKET:
-#ifdef TMNTMISC
+#ifdef TA_MISC
 			message = "was killed by";
 #else
 			message = "ate";
@@ -393,7 +393,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message2 = "'s Prox Mine";
 			break;
 #endif
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE:
 			message = "falls to";
 			message2 = "'s Kamikaze blast";
@@ -405,7 +405,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			break;
 #endif
 #endif
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 		case MOD_SHURIKEN:
 			message = "was killed by";
 			message2 = "'s shuriken";
@@ -472,12 +472,12 @@ static void CG_UseItem( centity_t *cent ) {
 		if ( !itemNum ) {
 			CG_CenterPrint( "No item to use", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 		} else
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 		if (itemNum < HI_SHURIKEN || itemNum > HI_LASERSHURIKEN)
 #endif
 		{
 			item = BG_FindItemForHoldable( itemNum );
-#ifdef TMNTHOLDABLE // TMNTDATA : Eat pizza, don't "use" it.
+#ifdef TA_HOLDABLE // TA_DATA : Eat pizza, don't "use" it.
 			if (itemNum == HI_MEDKIT)
 			{
 				CG_CenterPrint( va("Ate %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
@@ -494,7 +494,7 @@ static void CG_UseItem( centity_t *cent ) {
 		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.useNothingSound );
 		break;
 
-#ifndef TMNTHOLDABLE // no q3 teleprter
+#ifndef TA_HOLDABLE // no q3 teleprter
 	case HI_TELEPORTER:
 		break;
 #endif
@@ -509,7 +509,7 @@ static void CG_UseItem( centity_t *cent ) {
 		break;
 
 #ifdef MISSIONPACK
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	case HI_KAMIKAZE:
 		break;
 #endif
@@ -522,7 +522,7 @@ static void CG_UseItem( centity_t *cent ) {
 		break;
 #endif
 #endif
-#ifdef TMNTHOLDABLE // ZTM: Holdable
+#ifdef TA_HOLDABLE // ZTM: Holdable
 	// ZTM: Play shuriken use sound
 	case HI_SHURIKEN:
 	case HI_FIRESHURIKEN:
@@ -543,10 +543,10 @@ A new item was picked up this frame
 ================
 */
 static void CG_ItemPickup( int itemNum ) {
-#if defined TMNTWEAPSYS || defined TMNTHOLDSYS
+#if defined TA_WEAPSYS || defined TA_HOLDSYS
 	gitem_t *item;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[itemNum];
@@ -556,10 +556,10 @@ static void CG_ItemPickup( int itemNum ) {
 	cg.itemPickupTime = cg.time;
 	cg.itemPickupBlendTime = cg.time;
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	if (item->giType == IT_HOLDABLE)
 	{
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 		// Select the holdable
 		cg.holdableSelect = item->giTag;
 #endif
@@ -575,30 +575,30 @@ static void CG_ItemPickup( int itemNum ) {
 	}
 #endif
 	// see if it should be the grabbed weapon
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if ( item->giType == IT_WEAPON )
 #else
 	if ( bg_itemlist[itemNum].giType == IT_WEAPON )
 #endif
 	{
 		// select it immediately
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		// always switch
-#elif defined TMNTWEAPSYS || defined IOQ3ZTM
+#elif defined TA_WEAPSYS || defined IOQ3ZTM
 		if ( cg_autoswitch.integer )
 #else
 		if ( cg_autoswitch.integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN )
 #endif
 		{
-#ifdef TMNTWEAPSYS_EX // The weapon "should" be selected in game and sent in the next snap too
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS_EX // The weapon "should" be selected in game and sent in the next snap too
+#ifdef TA_WEAPSYS
 			cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
 #else
 			cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = bg_itemlist[itemNum].giTag;
 #endif
 #else
 			cg.weaponSelectTime = cg.time;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			cg.weaponSelect = item->giTag;
 #else
 			cg.weaponSelect = bg_itemlist[itemNum].giTag;
@@ -641,8 +641,8 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	cent->pe.painDirection ^= 1;
 }
 
-#ifdef TMNTMISC // DEBUG_ORIGIN
-// Based on CG_Item, used to be game model tags working ( TMNTWEAPSYS_1 )
+#ifdef TA_MISC // DEBUG_ORIGIN
+// Based on CG_Item, used to be game model tags working ( TA_WEAPSYS_1 )
 void CG_DebugOrigin(centity_t *cent)
 {
 	entityState_t	*es;
@@ -748,7 +748,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_FOOTSTEP");
 		if (cg_footsteps.integer) {
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 				cgs.media.footsteps[ ci->playercfg.footsteps ][rand()&3] );
 #else
 				cgs.media.footsteps[ ci->footsteps ][rand()&3] );
@@ -932,7 +932,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			if ( index < 1 || index >= BG_NumItems() )
 #else
 			if ( index < 1 || index >= bg_numItems )
@@ -940,7 +940,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			{
 				break;
 			}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			item = BG_ItemForItemNum(index);
 #else
 			item = &bg_itemlist[ index ];
@@ -993,7 +993,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			if ( index < 1 || index >= BG_NumItems() )
 #else
 			if ( index < 1 || index >= bg_numItems )
@@ -1001,7 +1001,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			{
 				break;
 			}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			item = BG_ItemForItemNum(index);
 #else
 			item = &bg_itemlist[ index ];
@@ -1021,7 +1021,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	//
 	// weapon events
 	//
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	case EV_DROP_WEAPON:
 		DEBUGNAME("EV_DROP_WEAPON");
 		// Start a sound when a weapon is dropped?
@@ -1141,7 +1141,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.respawnSound );
 		break;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	case EV_PROJECTILE_BOUNCE:
 		DEBUGNAME("EV_PROJECTILE_BOUNCE");
 		if ((rand() & 1) && cg_projectiles[es->weapon].bounceSound[1]) {
@@ -1166,7 +1166,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		// es->time2 is the surfaceflags
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].bounceSound[0] );
 
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 		if (es->eventParm != 255)
 			ByteToDir( es->eventParm, dir );
 		else
@@ -1184,7 +1184,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #else
 	case EV_GRENADE_BOUNCE:
 		DEBUGNAME("EV_GRENADE_BOUNCE");
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 		if (bg_projectileinfo[es->weapon].bounceType == PB_FULL) {
 			/*if (es->eventParm == 255) {
 				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
@@ -1205,7 +1205,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	case EV_PROXIMITY_MINE_STICK:
 		DEBUGNAME("EV_PROXIMITY_MINE_STICK");
 		if( es->eventParm & SURF_FLESH ) {
@@ -1222,7 +1222,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.wstbactvSound );
 		break;
 #endif
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	case EV_KAMIKAZE:
 		DEBUGNAME("EV_KAMIKAZE");
 		CG_KamikazeEffect( cent->lerpOrigin );
@@ -1256,7 +1256,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_ScorePlum( cent->currentState.otherEntityNum, cent->lerpOrigin, cent->currentState.time );
 		break;
 
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 	case EV_SPAWN_DEBRIS:
 		DEBUGNAME("EV_SPAWN_DEBRIS");
 		if ( es->eventParm != 255 ) {
@@ -1273,7 +1273,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			VectorSet(dir, 0, 0, 1);
 		}
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 		CG_ImpactParticles(position, dir, es->otherEntityNum, es->time2, es->number);
 #endif
 		break;
@@ -1285,7 +1285,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_MISSILE_HIT:
 		DEBUGNAME("EV_MISSILE_HIT");
 		ByteToDir( es->eventParm, dir );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (bg_projectileinfo[es->weapon].trailType == PT_BULLET)
 		{
 			CG_Bullet( es->pos.trBase, es->clientNum, dir, qtrue, es->otherEntityNum, es->weapon );
@@ -1298,7 +1298,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_MISSILE_MISS:
 		DEBUGNAME("EV_MISSILE_MISS");
 		ByteToDir( es->eventParm, dir );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (bg_projectileinfo[es->weapon].trailType == PT_BULLET)
 		{
 			CG_Bullet( es->pos.trBase, es->clientNum, dir, qfalse, es->otherEntityNum, es->weapon );
@@ -1313,7 +1313,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_MISSILE_MISS_METAL:
 		DEBUGNAME("EV_MISSILE_MISS_METAL");
 		ByteToDir( es->eventParm, dir );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (bg_projectileinfo[es->weapon].trailType == PT_BULLET)
 		{
 			CG_Bullet( es->pos.trBase, es->clientNum, dir, qfalse, es->otherEntityNum, es->weapon );
@@ -1327,7 +1327,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_RAILTRAIL:
 		DEBUGNAME("EV_RAILTRAIL");
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 		cent->currentState.weapon = WP_RAILGUN;
 		
 		if(es->clientNum == cg.snap->ps.clientNum && !cg.renderingThirdPerson)
@@ -1348,7 +1348,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 		break;
 
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	case EV_BULLET_HIT_WALL:
 		DEBUGNAME("EV_BULLET_HIT_WALL");
 		ByteToDir( es->eventParm, dir );
@@ -1361,14 +1361,14 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 #endif
 
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	case EV_SHOTGUN:
 		DEBUGNAME("EV_SHOTGUN");
 		CG_ShotgunFire( es );
 		break;
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	//
 	// Melee weapon impacts
 	//
@@ -1517,7 +1517,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				case GTS_TEAMS_ARE_TIED:
 					CG_AddBufferedSound( cgs.media.teamsTiedSound );
 					break;
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 				case GTS_KAMIKAZE:
 					trap_S_StartLocalSound(cgs.media.kamikazeFarSound, CHAN_ANNOUNCER);
 					break;
@@ -1604,7 +1604,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifndef NOTRATEDM // No gibs.
 	case EV_GIB_PLAYER:
 		DEBUGNAME("EV_GIB_PLAYER");
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		// don't play gib sound when using the kamikaze because it interferes
 		// with the kamikaze sound, downside is that the gib sound will also
 		// not be played when someone is gibbed while just carrying the kamikaze
@@ -1629,7 +1629,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_Beam( cent );
 		break;
 
-#ifdef TMNTMISC // DEBUG_ORIGIN
+#ifdef TA_MISC // DEBUG_ORIGIN
 	case EV_DEBUG_ORIGIN:
 		DEBUGNAME("EV_DEBUG_LINE");
 		CG_DebugOrigin( cent );

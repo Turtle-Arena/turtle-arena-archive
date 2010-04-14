@@ -235,7 +235,7 @@ void CG_ReflectVelocity( localEntity_t *le, trace_t *trace ) {
 	VectorCopy( trace->endpos, le->pos.trBase );
 	le->pos.trTime = cg.time;
 
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 	// Delay before becoming stationary to prevent debris getting stuck in the air.
 	if ((cg.time - le->startTime) < 100)
 		return;
@@ -534,7 +534,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 	re.shaderRGBA[3] = 0xff * c * 0.33;
 
 	re.reType = RT_SPRITE;
-#ifdef TMNTWEAPSYS // SPR_EXP_SCALE
+#ifdef TA_WEAPSYS // SPR_EXP_SCALE
 	// CG_MakeExplosion
 	re.radius = le->refEntity.radius * ( 1.0 - c ) + le->radius;
 #else
@@ -560,7 +560,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 #endif
 }
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 /*
 ====================
 CG_BubbleThink
@@ -589,7 +589,7 @@ void CG_BubbleThink( localEntity_t *le ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ====================
 CG_AddKamikaze
@@ -937,14 +937,14 @@ void CG_AddLocalEntities( void ) {
 			CG_AddScorePlum( le );
 			break;
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		case LE_BUBBLE:
 			CG_BubbleThink( le );
 			break;
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		case LE_KAMIKAZE:
 			CG_AddKamikaze( le );
 			break;

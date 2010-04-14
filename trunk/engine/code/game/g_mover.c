@@ -319,14 +319,14 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 	for ( e = 0 ; e < listedEntities ; e++ ) {
 		check = &g_entities[ entityList[ e ] ];
 
-#if defined MISSIONPACK || defined TMNTWEAPSYS
+#if defined MISSIONPACK || defined TA_WEAPSYS
 		if ( check->s.eType == ET_MISSILE
-#ifdef TMNTWEAPSYS // GRAPPLE_MOVE
+#ifdef TA_WEAPSYS // GRAPPLE_MOVE
 			|| check->s.eType == ET_GRAPPLE
 #endif
 			)
 		{
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			if (bg_projectileinfo[check->s.weapon].stickOnImpact
 				// GRAPPLE_MOVE
 				|| check->s.eType == ET_GRAPPLE)
@@ -340,7 +340,7 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 					if (!G_TryPushingProxMine( check, pusher, move, amove )) {
 						//explode
 						check->s.loopSound = 0;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 						if (bg_projectileinfo[check->s.weapon].explosionType == PE_PROX) {
 							G_AddEvent( check, EV_PROJECTILE_TRIGGER, 0 );
 							if (check->activator) {
@@ -375,7 +375,7 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 					if (!G_CheckProxMinePosition( check )) {
 						//explode
 						check->s.loopSound = 0;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 						if (bg_projectileinfo[check->s.weapon].explosionType == PE_PROX) {
 							G_AddEvent( check, EV_PROJECTILE_TRIGGER, 0 );
 							if (check->activator) {
@@ -411,10 +411,10 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 #endif
 		// only push items and players
 		if ( check->s.eType != ET_ITEM && check->s.eType != ET_PLAYER &&
-#ifdef TMNTENTSYS // MISC_OBJECT
+#ifdef TA_ENTSYS // MISC_OBJECT
 			check->s.eType != ET_MISCOBJECT &&
 #endif
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 			check->s.eType != ET_NPC &&
 #endif
 			!check->physicsObject ) {
@@ -842,7 +842,7 @@ void InitMover( gentity_t *ent ) {
 		ent->s.pos.trDuration = 1;
 	}
 
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 	if (ent->health > 0)
 	{
 		char *mat;
@@ -886,7 +886,7 @@ Blocked_Door
 void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 	// remove anything other than a client
 	if ( !other->client
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 		&& other->s.eType != ET_NPC
 #endif
 	) {
@@ -1084,7 +1084,7 @@ void SP_func_door (gentity_t *ent) {
 	ent->nextthink = level.time + FRAMETIME;
 
 	if ( ! (ent->flags & FL_TEAMSLAVE ) ) {
-#ifdef TMNTENTSYS // BREAKABLE // Doors are not killable...
+#ifdef TA_ENTSYS // BREAKABLE // Doors are not killable...
 		if (ent->health)
 		{
 			ent->takedamage = qtrue;
@@ -1329,7 +1329,7 @@ void SP_func_button( gentity_t *ent ) {
 	if (ent->health) {
 		// shootable button
 		ent->takedamage = qtrue;
-#ifdef TMNTENTSYS // BREAKABLE // Buttons are not killable...
+#ifdef TA_ENTSYS // BREAKABLE // Buttons are not killable...
 		ent->health = -1;
 #endif
 	} else {
@@ -1451,7 +1451,7 @@ Link all the corners together
 ===============
 */
 void Think_SetupTrainTargets( gentity_t *ent ) {
-#ifdef TMNTPATHSYS
+#ifdef TA_PATHSYS
 	if (G_SetupPath(ent, ent->target) == PATH_ERROR)
 	{
 		return;
@@ -1585,7 +1585,7 @@ void SP_func_static( gentity_t *ent ) {
 }
 
 
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 /*
 ===============================================================================
 
@@ -1773,7 +1773,7 @@ void SP_func_pendulum(gentity_t *ent) {
 	ent->s.apos.trDelta[2] = speed;
 }
 
-#ifdef TMNTENTSYS // FUNC_USE
+#ifdef TA_ENTSYS // FUNC_USE
 /*
 ===============================================================================
 

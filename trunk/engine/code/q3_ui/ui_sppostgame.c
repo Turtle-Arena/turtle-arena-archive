@@ -30,7 +30,7 @@ SINGLE PLAYER POSTGAME MENU
 
 #include "ui_local.h"
 
-#ifndef TMNTSP
+#ifndef TA_SP
 #ifdef TURTLEARENA // AWARDS
 #define MAX_UI_AWARDS		3
 #else
@@ -57,7 +57,7 @@ typedef struct {
 	menuframework_s	menu;
 
 	menubitmap_s	item_again;
-#ifndef TMNTSP
+#ifndef TA_SP
 	menubitmap_s	item_next;
 #endif
 	menubitmap_s	item_menu;
@@ -72,14 +72,14 @@ typedef struct {
 	int				ranks[MAX_SCOREBOARD_CLIENTS];
 	int				scores[MAX_SCOREBOARD_CLIENTS];
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	char			placeNames[3][64];
 #endif
 
 	int				level;
 	int				numClients;
 	int				won;
-#ifndef TMNTSP
+#ifndef TA_SP
 	int				numAwards;
 	int				awardsEarned[MAX_UI_AWARDS];
 	int				awardsLevels[MAX_UI_AWARDS];
@@ -92,7 +92,7 @@ typedef struct {
 static postgameMenuInfo_t	postgameMenuInfo;
 static char					arenainfo[MAX_INFO_VALUE];
 
-#ifndef TMNTSP
+#ifndef TA_SP
 char	*ui_medalNames[] = {"Accuracy",
 #ifndef TURTLEARENA // AWARDS
 "Impressive", "Excellent", "Gauntlet",
@@ -135,7 +135,7 @@ static void UI_SPPostgameMenu_AgainEvent( void* ptr, int event )
 }
 
 
-#ifndef TMNTSP
+#ifndef TA_SP
 /*
 =================
 UI_SPPostgameMenu_NextEvent
@@ -193,7 +193,7 @@ static void UI_SPPostgameMenu_MenuEvent( void* ptr, int event )
 		return;
 	}
 	UI_PopMenu();
-#ifdef TMNTSP
+#ifdef TA_SP
 	trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; customgame\n" );
 #else
 	trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; levelselect\n" );
@@ -212,7 +212,7 @@ static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
 	}
 
 	if( postgameMenuInfo.phase == 1 ) {
-#ifndef TMNTSP
+#ifndef TA_SP
 		trap_Cmd_ExecuteText( EXEC_APPEND, "abort_podium\n" );
 #endif
 		postgameMenuInfo.phase = 2;
@@ -221,7 +221,7 @@ static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
 		return 0;
 	}
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	if( postgameMenuInfo.phase == 2 ) {
 		postgameMenuInfo.phase = 3;
 		postgameMenuInfo.starttime = uis.realtime;
@@ -231,7 +231,7 @@ static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
 #endif
 
 	if( key == K_ESCAPE
-#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		|| key == K_MOUSE2
 #endif
 		)
@@ -243,7 +243,7 @@ static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
 }
 
 
-#ifndef TMNTSP
+#ifndef TA_SP
 #ifdef TURTLEARENA // AWARDS
 static int medalLocations[MAX_UI_AWARDS] = {144, 32, 560};
 #else
@@ -352,7 +352,7 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 	}
 
 	// phase 1
-#ifndef TMNTSP
+#ifndef TA_SP
 	if ( postgameMenuInfo.numClients > 2 ) {
 		UI_DrawProportionalString( 510, 480 - 64 - PROP_HEIGHT, postgameMenuInfo.placeNames[2], UI_CENTER, color_white );
 	}
@@ -377,7 +377,7 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 
 	// phase 2
 	if( postgameMenuInfo.phase == 2 ) {
-#ifndef TMNTSP
+#ifndef TA_SP
 		timer = uis.realtime - postgameMenuInfo.starttime;
 		if( timer >= ( postgameMenuInfo.numAwards * AWARD_PRESENTATION_TIME ) ) {
 
@@ -417,12 +417,12 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 		}
 
 		postgameMenuInfo.item_again.generic.flags &= ~QMF_INACTIVE;
-#ifndef TMNTSP
+#ifndef TA_SP
 		postgameMenuInfo.item_next.generic.flags &= ~QMF_INACTIVE;
 #endif
 		postgameMenuInfo.item_menu.generic.flags &= ~QMF_INACTIVE;
 
-#ifndef TMNTSP
+#ifndef TA_SP
 		UI_SPPostgameMenu_DrawAwardsMedals( postgameMenuInfo.numAwards );
 #endif
 
@@ -453,7 +453,7 @@ UI_SPPostgameMenu_Cache
 =================
 */
 void UI_SPPostgameMenu_Cache( void ) {
-#ifndef TMNTSP
+#ifndef TA_SP
 	int			n;
 #endif
 	qboolean	buildscript;
@@ -466,7 +466,7 @@ void UI_SPPostgameMenu_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_REPLAY1 );
 	trap_R_RegisterShaderNoMip( ART_NEXT0 );
 	trap_R_RegisterShaderNoMip( ART_NEXT1 );
-#ifndef TMNTSP
+#ifndef TA_SP
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
 	{
 		trap_R_RegisterShaderNoMip( ui_medalPicNames[n] );
@@ -475,7 +475,7 @@ void UI_SPPostgameMenu_Cache( void ) {
 #endif
 
 	if( buildscript ) {
-#ifdef TMNTSP
+#ifdef TA_SP
 		trap_S_RegisterSound( "music/win.wav", qfalse );
 #else
 		trap_S_RegisterSound( "music/loss.wav", qfalse );
@@ -512,7 +512,7 @@ static void UI_SPPostgameMenu_Init( void ) {
 
 	postgameMenuInfo.item_again.generic.type		= MTYPE_BITMAP;
 	postgameMenuInfo.item_again.generic.name		= ART_REPLAY0;
-#ifdef TMNTSP
+#ifdef TA_SP
 	postgameMenuInfo.item_again.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
 	postgameMenuInfo.item_again.generic.x			= 640;
 #else
@@ -526,7 +526,7 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_again.height				= 64;
 	postgameMenuInfo.item_again.focuspic			= ART_REPLAY1;
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	postgameMenuInfo.item_next.generic.type			= MTYPE_BITMAP;
 	postgameMenuInfo.item_next.generic.name			= ART_NEXT0;
 	postgameMenuInfo.item_next.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
@@ -541,13 +541,13 @@ static void UI_SPPostgameMenu_Init( void ) {
 
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_menu );
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_again );
-#ifndef TMNTSP
+#ifndef TA_SP
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_next );
 #endif
 }
 
 
-#ifndef TMNTSP
+#ifndef TA_SP
 static void Prepname( int index ) {
 	int		len;
 	char	name[64];
@@ -577,11 +577,11 @@ void UI_SPPostgameMenu_f( void ) {
 	int			playerGameRank;
 	int			playerClientNum;
 	int			n;
-#ifndef TMNTSP
+#ifndef TA_SP
 	int			oldFrags, newFrags;
 #endif
 	const char	*arena;
-#ifndef TMNTSP
+#ifndef TA_SP
 	int			awardValues[MAX_UI_AWARDS];
 #endif
 	char		map[MAX_QPATH];
@@ -622,7 +622,7 @@ void UI_SPPostgameMenu_f( void ) {
 
 	UI_SetBestScore( postgameMenuInfo.level, playerGameRank );
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	// process award stats and prepare presentation data
 	awardValues[AWARD_ACCURACY] = atoi( UI_Argv( 3 ) );
 #ifdef TURTLEARENA // AWARDS
@@ -700,7 +700,7 @@ void UI_SPPostgameMenu_f( void ) {
 	UI_SPPostgameMenu_Init();
 	UI_PushMenu( &postgameMenuInfo.menu );
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_again );
 
 	postgameMenuInfo.winnerSound = trap_S_RegisterSound( "sound/player/announce/youwin.wav", qfalse );

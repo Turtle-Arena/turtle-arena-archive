@@ -94,7 +94,7 @@ void TossClientItems( gentity_t *self ) {
 	int			i;
 	gentity_t	*drop;
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	int statAmmo = -1;
 
 	if (self->client)
@@ -132,7 +132,7 @@ void TossClientItems( gentity_t *self ) {
 	// weapon that isn't the mg or gauntlet.  Without this, a client
 	// can pick up a weapon, be killed, and not drop the weapon because
 	// their weapon change hasn't completed yet and they are still holding the MG.
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON]) {
 #else
 	if ( weapon == WP_MACHINEGUN || weapon == WP_GRAPPLING_HOOK ) {
@@ -144,12 +144,12 @@ void TossClientItems( gentity_t *self ) {
 			weapon = WP_NONE;
 		}
 	}
-#endif // TMNTWEWAPONS3
+#endif // TA_WEWAPONS3
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	// ZTM: Drop valid selected weapon to drop
 	if (weapon > WP_NONE && weapon < BG_NumWeaponGroups())
-#elif defined TMNTWEAPSYS
+#elif defined TA_WEAPSYS
 	// ZTM: Drop all weapons except default.
 	if ( weapon != self->client->ps.stats[STAT_DEFAULTWEAPON] )
 #else
@@ -161,11 +161,11 @@ void TossClientItems( gentity_t *self ) {
 		item = BG_FindItemForWeapon( weapon );
 
 		// spawn the item
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		drop = Drop_Item( self, item, 0 );
 		if (drop) {
 			int ammo;
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 			if (statAmmo != -1)
 			{
 				ammo = self->client->ps.stats[statAmmo];
@@ -187,12 +187,12 @@ void TossClientItems( gentity_t *self ) {
 #endif
 	}
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	angle = 45;
 #endif
 	// drop all the powerups if not in teamplay
 	if ( g_gametype.integer != GT_TEAM ) {
-#ifndef TMNTHOLDSYS
+#ifndef TA_HOLDSYS
 		angle = 45;
 #endif
 		for ( i = 1 ; i < PW_NUM_POWERUPS ; i++ ) {
@@ -211,7 +211,7 @@ void TossClientItems( gentity_t *self ) {
 			}
 		}
 	}
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	// drop all the holdable items
 	for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
 		if ( self->client->ps.holdable[ i ] != 0 ) {
@@ -346,7 +346,7 @@ void GibEntity( gentity_t *self, int killer ) {
 	gentity_t *ent;
 	int i;
 
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	//if this entity still has kamikaze
 	if (self->s.eFlags & EF_KAMIKAZE) {
 		// check if there is a kamikaze timer around for this owner
@@ -390,7 +390,7 @@ void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 }
 
 
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 Kamikaze_DeathActivate
@@ -569,7 +569,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		killerName = "<world>";
 	}
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if ( meansOfDeath < 0 || meansOfDeath >= modNamesSize )
 #else
 	if ( meansOfDeath < 0 || meansOfDeath >= sizeof( modNames ) / sizeof( modNames[0] ) )
@@ -589,7 +589,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	ent->s.eventParm = meansOfDeath;
 	ent->s.otherEntityNum = self->s.number;
 	ent->s.otherEntityNum2 = killer;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	ent->s.weapon = 0; // unknown projectile/weapon
 	// projectile or weapon group number, for MOD_PROJECTILE or MOD_WEAPON_*
 	if (meansOfDeath == MOD_PROJECTILE)
@@ -599,7 +599,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		}
 		// Check for instant damage guns
 		else if (inflictor == attacker && (attacker->client
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 			|| attacker->s.eType == ET_NPC
 #endif
 			) && bg_weapongroupinfo[attacker->s.weapon].weapon[0]->proj->instantDamage)
@@ -611,7 +611,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		|| meansOfDeath == MOD_WEAPON_SECONDARY)
 	{
 		if (attacker && (attacker->client
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 			|| attacker->s.eType == ET_NPC
 #endif
 		))
@@ -625,7 +625,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	self->enemy = attacker;
 
 	self->client->ps.persistant[PERS_KILLED]++;
-#ifdef TMNTSP // Loss a life when you die.
+#ifdef TA_SP // Loss a life when you die.
 	if (self->client->ps.persistant[PERS_LIVES] > 0) {
 		self->client->ps.persistant[PERS_LIVES]--;
 	}
@@ -772,7 +772,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	self->takedamage = qtrue;	// can still be gibbed
 
-#ifndef TMNTWEAPSYS // Players don't let go of default weapon.
+#ifndef TA_WEAPSYS // Players don't let go of default weapon.
 	self->s.weapon = WP_NONE;
 #endif
 	self->s.powerups = 0;
@@ -786,7 +786,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	self->s.loopSound = 0;
 
-#if 0 //#ifdef TMNTPLAYERSYS // ZTM: FIXME: Use per-player bounding box!
+#if 0 //#ifdef TA_PLAYERSYS // ZTM: FIXME: Use per-player bounding box!
 #else
 	self->r.maxs[2] = -8;
 #endif
@@ -822,7 +822,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			break;
 		}
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 		// Wait for death animation to end before respawning
 		self->client->respawnTime = level.time + BG_AnimationTime(&self->client->pers.playercfg.animations[anim]);
 #endif
@@ -848,7 +848,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		// globally cycle through the different death animations
 		i = ( i + 1 ) % 3;
 
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		if (self->s.eFlags & EF_KAMIKAZE) {
 			Kamikaze_DeathTimer( self );
 		}
@@ -975,7 +975,7 @@ int G_InvulnerabilityEffect( gentity_t *targ, vec3_t dir, vec3_t point, vec3_t i
 }
 #endif
 
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 /*
 =================
 G_BreakableDebris
@@ -1085,7 +1085,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		}
 	}
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (targ->mustcut && !(dflags & DAMAGE_CUTS))
 	{
 		// ZTM: TODO: Have a effect to user knows it is can only be broke by WIF_CUTS?
@@ -1102,7 +1102,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	// shootable doors / buttons don't actually have any health
 	if ( targ->s.eType == ET_MOVER
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 		&& targ->health == -1
 #endif
 	) {
@@ -1111,7 +1111,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		}
 		return qtrue;
 	}
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 	// Allow breakable movers
 	if ( targ->s.eType == ET_MOVER && targ->health > 0 )
 	{
@@ -1152,7 +1152,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( attacker->client && attacker != targ ) {
 		max = attacker->client->ps.stats[STAT_MAX_HEALTH];
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if( BG_ItemForItemNum(attacker->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[attacker->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -1225,7 +1225,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			targ->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 		}
 	}
-#ifdef TMNTENTSYS // MISC_OBJECT
+#ifdef TA_ENTSYS // MISC_OBJECT
 	else if (knockback)
 	{
 		vec3_t	kvel;
@@ -1258,7 +1258,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 				return qfalse;
 			}
 		}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (inflictor && bg_projectileinfo[inflictor->s.weapon].explosionType == PE_PROX) {
 			if (inflictor->parent && OnSameTeam(targ, inflictor->parent)) {
 				return qfalse;
@@ -1309,7 +1309,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( attacker->client && client
 			&& targ != attacker && targ->health > 0
 			&& targ->s.eType != ET_MISSILE
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 			&& targ->s.eType != ET_NPC
 #endif
 			&& targ->s.eType != ET_GENERAL) {
@@ -1387,7 +1387,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// set the last client who damaged the target
 		targ->client->lasthurt_client = attacker->s.number;
 		targ->client->lasthurt_mod = mod;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (mod == MOD_PROJECTILE)
 			targ->client->lasthurt_weapon = inflictor->s.weapon;
 		else if (mod == MOD_WEAPON_PRIMARY

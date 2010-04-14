@@ -37,7 +37,7 @@ INGAME MENU
 #define INGAME_MENU_VERTICAL_SPACING	28
 
 #define ID_TEAM					10
-#ifdef TMNTMISC // INGAME_SERVER_MENU
+#ifdef TA_MISC // INGAME_SERVER_MENU
 #define ID_SERVER				11
 #else
 #define ID_ADDBOTS				11
@@ -46,17 +46,17 @@ INGAME MENU
 #define ID_SETUP				13
 #define ID_SERVERINFO			14
 #define ID_LEAVEARENA			15
-#ifndef TMNTMISC // INGAME_SERVER_MENU
+#ifndef TA_MISC // INGAME_SERVER_MENU
 #define ID_RESTART				16
 #endif
 #define ID_QUIT					17
 #define ID_RESUME				18
 #define ID_TEAMORDERS			19
-#ifdef TMNTMISC // SMART_JOIN_MENU
+#ifdef TA_MISC // SMART_JOIN_MENU
 #define ID_JOINGAME				20
 #define ID_SPECTATE				21
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 #define ID_CUSTOMIZEPLAYER		22
 #endif
 
@@ -69,14 +69,14 @@ typedef struct {
 	menutext_s		setup;
 	menutext_s		server;
 	menutext_s		leave;
-#ifdef TMNTMISC // INGAME_SERVER_MENU
+#ifdef TA_MISC // INGAME_SERVER_MENU
 	menutext_s		inserver;
 #else
 	menutext_s		restart;
 	menutext_s		addbots;
 	menutext_s		removebots;
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	menutext_s		setupplayer;
 #endif
 	menutext_s		teamorders;
@@ -87,7 +87,7 @@ typedef struct {
 static ingamemenu_t	s_ingame;
 
 
-#ifndef TMNTMISC // INGAME_SERVER_MENU
+#ifndef TA_MISC // INGAME_SERVER_MENU
 /*
 =================
 InGame_RestartAction
@@ -133,7 +133,7 @@ void InGame_Event( void *ptr, int notification ) {
 		UI_TeamMainMenu();
 		break;
 
-#ifdef TMNTMISC // SMART_JOIN_MENU
+#ifdef TA_MISC // SMART_JOIN_MENU
 	case ID_JOINGAME:
 		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team free\n" );
 		UI_ForceMenuOff();
@@ -153,7 +153,7 @@ void InGame_Event( void *ptr, int notification ) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect\n" );
 		break;
 
-#ifndef TMNTMISC // INGAME_SERVER_MENU
+#ifndef TA_MISC // INGAME_SERVER_MENU
 	case ID_RESTART:
 		UI_ConfirmMenu( "RESTART ARENA?", 0, InGame_RestartAction );
 		break;
@@ -167,7 +167,7 @@ void InGame_Event( void *ptr, int notification ) {
 		UI_ServerInfoMenu();
 		break;
 
-#ifdef TMNTMISC // INGAME_SERVER_MENU
+#ifdef TA_MISC // INGAME_SERVER_MENU
 	case ID_SERVER:
 		UI_InServerMenu();
 		break;
@@ -181,7 +181,7 @@ void InGame_Event( void *ptr, int notification ) {
 		break;
 #endif
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
 		UI_PlayerSettingsMenu();
 		break;
@@ -224,13 +224,13 @@ void InGame_MenuInit( void ) {
 	s_ingame.frame.width				= 466;//359;
 	s_ingame.frame.height				= 332;//256;
 
-#ifdef TMNTMISC // INGAME_SERVER_MENU
+#ifdef TA_MISC // INGAME_SERVER_MENU
 	y = 88+INGAME_MENU_VERTICAL_SPACING;
 #else
 	//y = 96;
 	y = 88;
 #endif
-#ifdef TMNTMISC // SMART_JOIN_MENU
+#ifdef TA_MISC // SMART_JOIN_MENU
 	if( (trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
 		s_ingame.team.generic.type			= MTYPE_PTEXT;
 		s_ingame.team.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -282,7 +282,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 #endif
 
-#ifndef TMNTMISC // INGAME_SERVER_MENU
+#ifndef TA_MISC // INGAME_SERVER_MENU
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.addbots.generic.type		= MTYPE_PTEXT;
 	s_ingame.addbots.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -294,7 +294,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.addbots.color				= text_big_color;
 	s_ingame.addbots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" )
-#ifdef TMNTSP
+#ifdef TA_SP
 	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
@@ -314,7 +314,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.removebots.color				= text_big_color;
 	s_ingame.removebots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" )
-#ifdef TMNTSP
+#ifdef TA_SP
 	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
@@ -353,7 +353,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.setup.generic.y			= y;
 	s_ingame.setup.generic.id			= ID_SETUP;
 	s_ingame.setup.generic.callback		= InGame_Event; 
-#ifdef TMNTSP // New menus
+#ifdef TA_SP // New menus
 	s_ingame.setup.string				= "OPTIONS";
 #else
 	s_ingame.setup.string				= "SETUP";
@@ -361,7 +361,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.setup.color				= text_big_color;
 	s_ingame.setup.style				= UI_CENTER|UI_SMALLFONT;
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.setupplayer.generic.type		= MTYPE_PTEXT;
 	s_ingame.setupplayer.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -374,7 +374,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.setupplayer.style				= UI_CENTER|UI_SMALLFONT;
 #endif
 
-#ifdef TMNTMISC // INGAME_SERVER_MENU
+#ifdef TA_MISC // INGAME_SERVER_MENU
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.inserver.generic.type		= MTYPE_PTEXT;
 	s_ingame.inserver.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -401,7 +401,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.server.color				= text_big_color;
 	s_ingame.server.style				= UI_CENTER|UI_SMALLFONT;
 
-#ifndef TMNTMISC // INGAME_SERVER_MENU
+#ifndef TA_MISC // INGAME_SERVER_MENU
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.restart.generic.type		= MTYPE_PTEXT;
 	s_ingame.restart.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -452,20 +452,20 @@ void InGame_MenuInit( void ) {
 
 	Menu_AddItem( &s_ingame.menu, &s_ingame.frame );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.team );
-#ifndef TMNTMISC // INGAME_SERVER_MENU
+#ifndef TA_MISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.addbots );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.removebots );
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.teamorders );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setup );
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setupplayer );
 #endif
-#ifdef TMNTMISC // INGAME_SERVER_MENU
+#ifdef TA_MISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.inserver );
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.server );
-#ifndef TMNTMISC // INGAME_SERVER_MENU
+#ifndef TA_MISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.restart );
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.resume );

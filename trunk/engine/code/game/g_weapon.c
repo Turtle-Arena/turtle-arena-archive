@@ -29,7 +29,7 @@ static	float	s_quadFactor;
 static	vec3_t	forward, right, up;
 static	vec3_t	muzzle;
 
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 #define NUM_NAILSHOTS 15
 #endif
 
@@ -124,7 +124,7 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 }
 #endif
 
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 /*
 ================
 G_ThrowShuriken
@@ -155,7 +155,7 @@ void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
 }
 #endif
 
-#ifdef TMNTWEAPSYS // MELEEATTACK
+#ifdef TA_WEAPSYS // MELEEATTACK
 #define MELEE_CHAINTIME 1500
 void G_StartMeleeAttack(gentity_t *ent)
 {
@@ -430,14 +430,14 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		{
 			return qfalse;
 		}
-#ifdef TA_GAME_MODELS // TMNTWEAPSYS
+#ifdef TA_GAME_MODELS // TA_WEAPSYS
 		// put weapon on torso
-#ifdef TMNTPLAYERS
+#ifdef TA_PLAYERS
 		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_primary"))
 #endif
 		{
-#if !defined TMNTPLAYERS || defined TA_SUPPORTQ3
+#if !defined TA_PLAYERS || defined TA_SUPPORTQ3
 			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 				torsoOrientation, ent->client->pers.torsoModel, "tag_weapon"))
 #endif
@@ -460,14 +460,14 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		{
 			return qfalse;
 		}
-#ifdef TA_GAME_MODELS // TMNTWEAPSYS
+#ifdef TA_GAME_MODELS // TA_WEAPSYS
 		// put weapon on torso
-#ifdef TMNTPLAYERS
+#ifdef TA_PLAYERS
 		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_secondary"))
 #endif
 		{
-#if !defined TMNTPLAYERS || defined TA_SUPPORTQ3
+#if !defined TA_PLAYERS || defined TA_SUPPORTQ3
 			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 				torsoOrientation, ent->client->pers.torsoModel, "tag_flag"))
 #endif
@@ -481,7 +481,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 #endif
 	}
 
-#ifdef TA_GAME_MODELS // TMNTWEAPSYS
+#ifdef TA_GAME_MODELS // TA_WEAPSYS
 	// Setup "start" and "end" using weaponOrientation
 	VectorCopy(weaponOrientation.axis[0], forward);
 	VectorCopy(weaponOrientation.axis[1], right);
@@ -720,8 +720,8 @@ qboolean G_MeleeDamage(gentity_t *ent, qboolean forceDamage)
 
 	return (rtn || rtn2);
 }
-#endif // TMNTWEAPSYS
-#ifndef TMNTWEAPSYS
+#endif // TA_WEAPSYS
+#ifndef TA_WEAPSYS
 /*
 ======================================================================
 
@@ -790,7 +790,7 @@ qboolean CheckGauntletAttack( gentity_t *ent ) {
 
 	return qtrue;
 }
-#endif // TMNTWEAPSYS
+#endif // TA_WEAPSYS
 
 
 /*
@@ -823,7 +823,7 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 	}
 }
 
-#ifndef TMNTWEAPSYS // ZTM: I replaced all of these, see fire_weapon
+#ifndef TA_WEAPSYS // ZTM: I replaced all of these, see fire_weapon
 #ifdef MISSIONPACK
 #define CHAINGUN_SPREAD		600
 #endif
@@ -866,7 +866,7 @@ void Bullet_Fire (gentity_t *ent, float spread, int damage ) {
 		SnapVectorTowards( tr.endpos, muzzle );
 
 		// send bullet impact
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 		if ( traceEnt->takedamage && (traceEnt->client || traceEnt->s.eType == ET_NPC))
 #else
 		if ( traceEnt->takedamage && traceEnt->client )
@@ -1251,7 +1251,7 @@ void weapon_railgun_fire (gentity_t *ent) {
 	}
 
 }
-#endif // #ifndef TMNTWEAPSYS
+#endif // #ifndef TA_WEAPSYS
 
 /*
 ======================================================================
@@ -1261,7 +1261,7 @@ GRAPPLING HOOK
 ======================================================================
 */
 
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 void Weapon_GrapplingHook_Fire (gentity_t *ent)
 {
 #ifdef IOQ3ZTM
@@ -1293,13 +1293,13 @@ void Weapon_HookFree (gentity_t *ent)
 
 void Weapon_HookThink (gentity_t *ent)
 {
-#ifdef TMNTWEAPSYS // GRAPPLE_MOVE
+#ifdef TA_WEAPSYS // GRAPPLE_MOVE
 	// Update grapple position each frame
 	ent->nextthink = level.time + FRAMETIME;
 #endif
 
 	if (ent->enemy
-#ifdef TMNTWEAPSYS // GRAPPLE_MOVE
+#ifdef TA_WEAPSYS // GRAPPLE_MOVE
 		&& ent->enemy->client
 #endif
 		)
@@ -1318,7 +1318,7 @@ void Weapon_HookThink (gentity_t *ent)
 	VectorCopy( ent->r.currentOrigin, ent->parent->client->ps.grapplePoint);
 }
 
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 /*
 ======================================================================
 
@@ -1452,7 +1452,7 @@ void weapon_proxlauncher_fire (gentity_t *ent) {
 }
 
 #endif
-#endif // #ifndef TMNTWEAPSYS
+#endif // #ifndef TA_WEAPSYS
 
 //======================================================================
 
@@ -1472,7 +1472,7 @@ qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
 	}
 
 	if( !target->client
-#ifdef TMNTNPCSYS // ZTM: When hit NPCs too
+#ifdef TA_NPCSYS // ZTM: When hit NPCs too
 		&& target->s.eType != ET_NPC
 #endif
 	) {
@@ -1483,7 +1483,7 @@ qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker ) {
 		return qfalse;
 	}
 
-#ifdef TMNTNPCSYS // ZTM: When hit NPCs too
+#ifdef TA_NPCSYS // ZTM: When hit NPCs too
 	if (!target->client)
 	{
 		if( target->health <= 0 ) {
@@ -1513,7 +1513,7 @@ set muzzle location relative to pivoting eye
 */
 void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint ) {
 	VectorCopy( ent->s.pos.trBase, muzzlePoint );
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 	if (ent->bgNPC.info)
 	{
 		muzzlePoint[2] += ent->bgNPC.npc_ps.viewheight;
@@ -1561,13 +1561,13 @@ void FireWeapon( gentity_t *ent ) {
 #endif
 
 	// track shots taken for accuracy tracking.  Grapple is not a weapon and gauntet is just not tracked
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if (BG_WeapUseAmmo(ent->s.weapon))
 #else
 	if( ent->s.weapon != WP_GRAPPLING_HOOK && ent->s.weapon != WP_GAUNTLET )
 #endif
 	{
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		ent->client->accuracy_shots += bg_weapongroupinfo[ent->s.weapon].weapon[0]->proj->numProjectiles;
 #elif defined MISSIONPACK
 		if( ent->s.weapon == WP_NAILGUN ) {
@@ -1580,7 +1580,7 @@ void FireWeapon( gentity_t *ent ) {
 #endif
 	}
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
     if (bg_weapongroupinfo[ent->s.weapon].weapon[0]->weapontype == WT_GUN)
     {
 		// set aiming directions
@@ -1680,7 +1680,7 @@ void FireWeapon( gentity_t *ent ) {
 }
 
 
-#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 
 /*
 ===============
@@ -1931,7 +1931,7 @@ void G_StartKamikaze( gentity_t *ent ) {
 }
 #endif
 
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 void NPC_FireWeapon(gentity_t *ent)
 {
 	// set aiming directions

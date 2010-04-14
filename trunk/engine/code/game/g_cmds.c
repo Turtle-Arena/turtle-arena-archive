@@ -229,7 +229,7 @@ void Cmd_Give_f (gentity_t *ent)
 	else
 		give_all = qfalse;
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	if (give_all || Q_stricmp( name, "holdable") == 0)
 	{
 		// Skip HI_NONE
@@ -251,7 +251,7 @@ void Cmd_Give_f (gentity_t *ent)
 			return;
 	}
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	// \give weapon1
 	// The above will give WP_KATANAS
 	if (Q_strncmp(name, "weapon", 6) == 0)
@@ -260,7 +260,7 @@ void Cmd_Give_f (gentity_t *ent)
 		w = atoi(&name[6]);
 		if (w == WP_DEFAULT)
 			w = ent->client->ps.stats[STAT_DEFAULTWEAPON];
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if (w < WP_NONE || w >= BG_NumWeaponGroups())
 #else
 		if (w < WP_NONE || w >= WP_NUM_WEAPONS)
@@ -273,12 +273,12 @@ void Cmd_Give_f (gentity_t *ent)
 	if (give_all || Q_stricmp(name, "weapons") == 0)
 	{
 		ent->client->ps.stats[STAT_WEAPONS] =
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		(1 << BG_NumWeaponGroups()) - 1
 #else
 		(1 << WP_NUM_WEAPONS) - 1
 #endif
-#if !defined IOQ3ZTM && !defined TMNTWEAPSYS // Give grapple too.
+#if !defined IOQ3ZTM && !defined TA_WEAPSYS // Give grapple too.
 			- ( 1 << WP_GRAPPLING_HOOK )
 #endif
 			- ( 1 << WP_NONE );
@@ -289,13 +289,13 @@ void Cmd_Give_f (gentity_t *ent)
 
 	if (give_all || Q_stricmp(name, "ammo") == 0)
 	{
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		if (BG_WeapUseAmmo(ent->client->ps.weapon)) {
 			ent->client->ps.stats[STAT_AMMO] = 999;
 		}
 #else
 		for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			if (BG_WeapUseAmmo(i))
 #endif
 			ent->client->ps.ammo[i] = 999;
@@ -530,7 +530,7 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the spectators.\n\"",
 		client->pers.netname));
 	} else if ( client->sess.sessionTeam == TEAM_FREE ) {
-#ifdef TMNTSP
+#ifdef TA_SP
 		if (g_gametype.integer == GT_SINGLE_PLAYER)
 			trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the game.\n\"",
 			client->pers.netname));
@@ -577,7 +577,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FREE;
 	} else if ( g_gametype.integer >= GT_TEAM
-#ifdef TMNTSP // SP_BOSS
+#ifdef TA_SP // SP_BOSS
 			|| (g_gametype.integer == GT_SINGLE_PLAYER && (ent->r.svFlags & SVF_BOT))
 #endif
 		)
@@ -776,7 +776,7 @@ G_AllowPeaking
 */
 qboolean G_AllowPeaking(void)
 {
-#ifdef TMNTSP
+#ifdef TA_SP
 	if (g_gametype.integer == GT_SINGLE_PLAYER)
 		return qtrue;
 #endif
@@ -1340,7 +1340,7 @@ void Cmd_Where_f( gentity_t *ent ) {
 
 static const char *gameNames[] = {
 	"Free For All",
-#ifdef TMNTMISC // tournament to duel
+#ifdef TA_MISC // tournament to duel
 	"Duel",
 #else
 	"Tournament",
@@ -1406,14 +1406,14 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	} else if ( !Q_stricmp( arg1, "clientkick" ) ) {
 	} else if ( !Q_stricmp( arg1, "g_doWarmup" ) ) {
 	} else if ( !Q_stricmp( arg1, "timelimit" ) ) {
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 	} else if ( !Q_stricmp( arg1, "scorelimit" ) ) {
 #else
 	} else if ( !Q_stricmp( arg1, "fraglimit" ) ) {
 #endif
 	} else {
 		trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, scorelimit <score>.\n\"" );
 #else
 		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>.\n\"" );
@@ -1431,7 +1431,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	if ( !Q_stricmp( arg1, "g_gametype" ) ) {
 		i = atoi( arg2 );
 		if(
-#ifndef TMNTSP
+#ifndef TA_SP
 		i == GT_SINGLE_PLAYER ||
 #endif
 		i < GT_FFA || i >= GT_MAX_GAME_TYPE) {

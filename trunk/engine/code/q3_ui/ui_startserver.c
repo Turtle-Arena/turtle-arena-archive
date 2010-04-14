@@ -40,7 +40,7 @@ START SERVER MENU *****
 #define GAMESERVER_FRAMER		"menu/art/frame1_r"
 #define GAMESERVER_SELECT		"menu/art/maps_select"
 #define GAMESERVER_SELECTED		"menu/art/maps_selected"
-#ifdef TMNTMISC // NO_MENU_FIGHT
+#ifdef TA_MISC // NO_MENU_FIGHT
 #define GAMESERVER_FIGHT0		"menu/art/play_0"
 #define GAMESERVER_FIGHT1		"menu/art/play_1"
 #else
@@ -48,7 +48,7 @@ START SERVER MENU *****
 #define GAMESERVER_FIGHT1		"menu/art/fight_1"
 #endif
 #define GAMESERVER_UNKNOWNMAP	"menu/art/unknownmap"
-#ifdef TMNTDATA
+#ifdef TA_DATA
 #define GAMESERVER_ARROWS		"menu/art/arrows_horz_0"
 #define GAMESERVER_ARROWSL		"menu/art/arrows_horz_left"
 #define GAMESERVER_ARROWSR		"menu/art/arrows_horz_right"
@@ -151,7 +151,7 @@ static int gametype_remap2[] = {
 static const char *gametype_items[] = {
 	"Free For All",
 	"Team Deathmatch",
-#ifdef TMNTMISC // tornament to duel
+#ifdef TA_MISC // tornament to duel
 	"Duel",
 #else
 	"Tournament",
@@ -282,7 +282,7 @@ static void StartServer_Update( void ) {
 		Q_strupr( mapname );
 #endif
 
-#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
+#ifdef TA_DATA // TEAMARENA_LEVELSHOTS
 		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s_small", mapname );
 #else
  		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s", mapname );
@@ -323,7 +323,7 @@ static void StartServer_Update( void ) {
 		if ( i >=0 && i < MAX_MAPSPERPAGE ) 
 		{
 			s_startserver.mappics[i].generic.flags    |= QMF_HIGHLIGHT;
-#ifndef TMNTDATA // MENU
+#ifndef TA_DATA // MENU
 			s_startserver.mapbuttons[i].generic.flags &= ~QMF_PULSEIFFOCUS;
 #endif
 		}
@@ -373,7 +373,7 @@ static void StartServer_GametypeEvent( void* ptr, int event ) {
 	count = UI_GetNumArenas();
 	s_startserver.nummaps = 0;
 	matchbits = 1 << gametype_remap[s_startserver.gametype.curvalue];
-#ifndef TMNTSP // Single player has own gametype on net now.
+#ifndef TA_SP // Single player has own gametype on net now.
 	if( gametype_remap[s_startserver.gametype.curvalue] == GT_FFA ) {
 		matchbits |= ( 1 << GT_SINGLE_PLAYER );
 	}
@@ -424,7 +424,7 @@ static void StartServer_MenuEvent( void* ptr, int event ) {
 
 	case ID_STARTSERVERNEXT:
 		trap_Cvar_SetValue( "g_gameType", gametype_remap[s_startserver.gametype.curvalue] );
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		// If ingame, don't go to server options
 		if (trap_Cvar_VariableValue("sv_running"))
 		{
@@ -514,7 +514,7 @@ static void StartServer_MenuInit( void ) {
 	int	x;
 	int	y;
 	static char mapnamebuffer[64];
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	int inGame = trap_Cvar_VariableValue("sv_running");
 #endif
 
@@ -524,7 +524,7 @@ static void StartServer_MenuInit( void ) {
 	StartServer_Cache();
 
 	s_startserver.menu.wrapAround = qtrue;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	if (!inGame)
 #endif
 	s_startserver.menu.fullscreen = qtrue;
@@ -532,7 +532,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.banner.generic.type  = MTYPE_BTEXT;
 	s_startserver.banner.generic.x	   = 320;
 	s_startserver.banner.generic.y	   = 16;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	if (inGame)
 		s_startserver.banner.string    = "CHANGE MAP";
 	else
@@ -565,7 +565,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.gametype.generic.x		= 320 - 24;
 	s_startserver.gametype.generic.y		= 368;
 	s_startserver.gametype.itemnames		= gametype_items;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	if (inGame)
 		s_startserver.gametype.curvalue		= trap_Cvar_VariableValue("g_gameType");
 #endif
@@ -606,7 +606,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.arrows.generic.flags = QMF_INACTIVE;
 	s_startserver.arrows.generic.x	   = 260;
 	s_startserver.arrows.generic.y	   = 400;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	s_startserver.arrows.width  	   = GAMESERVER_ARROWS_WIDTH;
 	s_startserver.arrows.height  	   = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -620,7 +620,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.prevpage.generic.id	    = ID_PREVPAGE;
 	s_startserver.prevpage.generic.x		= 260;
 	s_startserver.prevpage.generic.y		= 400;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	s_startserver.prevpage.width  		    = GAMESERVER_ARROWS_WIDTH/2;
 	s_startserver.prevpage.height  		    = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -633,13 +633,13 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.nextpage.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_startserver.nextpage.generic.callback = StartServer_MenuEvent;
 	s_startserver.nextpage.generic.id	    = ID_NEXTPAGE;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	s_startserver.nextpage.generic.x		= 260+GAMESERVER_ARROWS_WIDTH/2;
 #else
 	s_startserver.nextpage.generic.x		= 321;
 #endif
 	s_startserver.nextpage.generic.y		= 400;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	s_startserver.nextpage.width  		    = GAMESERVER_ARROWS_WIDTH/2;
 	s_startserver.nextpage.height  		    = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -744,7 +744,7 @@ void StartServer_Cache( void )
 			Q_strupr( mapname );
 #endif
 	
-#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
+#ifdef TA_DATA // TEAMARENA_LEVELSHOTS
 			Com_sprintf( picname, sizeof(picname), "levelshots/%s_small", mapname );
 #else
 			Com_sprintf( picname, sizeof(picname), "levelshots/%s", mapname );
@@ -848,7 +848,7 @@ static const char *playerTeam_list[] = {
 };
 
 static const char *botSkill_list[] = {
-#ifdef TMNTMISC // rip off SRB2 skills...
+#ifdef TA_MISC // rip off SRB2 skills...
 	"Easy",
 	"Normal",
 	"Hard",
@@ -928,7 +928,7 @@ static void ServerOptions_Start( void ) {
 		maxclients++;
 	}
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	// Don't allow clients to join in non-multiplayer.
 	if (!s_serveroptions.multiplayer)
 		trap_Cvar_SetValue( "ui_singlePlayerActive", 2 );
@@ -939,7 +939,7 @@ static void ServerOptions_Start( void ) {
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		trap_Cvar_SetValue( "ui_ffa_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_ffa_fraglimit", fraglimit );
@@ -948,7 +948,7 @@ static void ServerOptions_Start( void ) {
 		break;
 
 	case GT_TOURNAMENT:
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		trap_Cvar_SetValue( "ui_tourney_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_tourney_fraglimit", fraglimit );
@@ -956,14 +956,14 @@ static void ServerOptions_Start( void ) {
 		trap_Cvar_SetValue( "ui_tourney_timelimit", timelimit );
 		break;
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	case GT_SINGLE_PLAYER:
 		// Co-op settings
 		break;
 #endif
 
 	case GT_TEAM:
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		trap_Cvar_SetValue( "ui_team_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_team_fraglimit", fraglimit );
@@ -1016,7 +1016,7 @@ static void ServerOptions_Start( void ) {
 	trap_Cvar_SetValue( "sv_maxclients", Com_Clamp( 0, 12, maxclients ) );
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, dedicated ) );
 	trap_Cvar_SetValue ("timelimit", Com_Clamp( 0, timelimit, timelimit ) );
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 	trap_Cvar_SetValue ("scorelimit", Com_Clamp( 0, fraglimit, fraglimit ) );
 #else
 	trap_Cvar_SetValue ("fraglimit", Com_Clamp( 0, fraglimit, fraglimit ) );
@@ -1095,7 +1095,7 @@ static void ServerOptions_InitPlayerItems( void ) {
 	// if not a dedicated server, first slot is reserved for the human on the server
 	if( s_serveroptions.dedicated.curvalue == 0 ) {
 		// human
-#ifdef TMNTSP // SPMODEL
+#ifdef TA_SP // SPMODEL
 		s_serveroptions.playerType[0].curvalue = 0;
 		if (!s_serveroptions.multiplayer)
 		{
@@ -1151,7 +1151,7 @@ static void ServerOptions_SetPlayerItems( void ) {
 	// names
 	if( s_serveroptions.dedicated.curvalue == 0 ) {
 		s_serveroptions.player0.string = "Human";
-#ifdef TMNTSP
+#ifdef TA_SP
 		if (!s_serveroptions.multiplayer)
 			s_serveroptions.playerName[0].generic.flags &= ~(QMF_INACTIVE|QMF_HIDDEN);
 		else
@@ -1239,7 +1239,7 @@ static void ServerOptions_PlayerNameEvent( void* ptr, int event ) {
 		return;
 	}
 	n = ((menutext_s*)ptr)->generic.id;
-#ifdef TMNTSP
+#ifdef TA_SP
 	if (s_serveroptions.dedicated.curvalue == 0 && n == 0)
 	{
 		int i;
@@ -1334,7 +1334,7 @@ static void ServerOptions_InitBotNames( void ) {
 #endif
 		}
 #endif
-#ifdef TMNTMISC // DEFAULT_PLAYER
+#ifdef TA_MISC // DEFAULT_PLAYER
 		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "Random", 16 ); // RaphBlue
 		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "Random", 16 ); // RaphBlue
 		if( s_serveroptions.gametype == GT_TEAM ) {
@@ -1353,7 +1353,7 @@ static void ServerOptions_InitBotNames( void ) {
 		s_serveroptions.playerType[4].curvalue = 2;
 		s_serveroptions.playerType[5].curvalue = 2;
 
-#ifdef TMNTMISC // DEFAULT_PLAYER
+#ifdef TA_MISC // DEFAULT_PLAYER
 		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "Random", 16 ); // RaphRed
@@ -1462,7 +1462,7 @@ static void ServerOptions_SetMenuItems( void ) {
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_ffa_scorelimit" ) ) );
 #else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_ffa_fraglimit" ) ) );
@@ -1471,7 +1471,7 @@ static void ServerOptions_SetMenuItems( void ) {
 		break;
 
 	case GT_TOURNAMENT:
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_tourney_scorelimit" ) ) );
 #else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_fraglimit" ) ) );
@@ -1479,7 +1479,7 @@ static void ServerOptions_SetMenuItems( void ) {
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_timelimit" ) ) );
 		break;
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	case GT_SINGLE_PLAYER:
 		Com_sprintf( s_serveroptions.flaglimit.field.buffer, 4, "%i", 0 );
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", 0 );
@@ -1488,7 +1488,7 @@ static void ServerOptions_SetMenuItems( void ) {
 #endif
 
 	case GT_TEAM:
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_team_scorelimit" ) ) );
 #else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_fraglimit" ) ) );
@@ -1533,7 +1533,7 @@ static void ServerOptions_SetMenuItems( void ) {
 	info = UI_GetArenaInfoByNumber( s_startserver.maplist[ s_startserver.currentmap ]);
 	Q_strncpyz( mapname, Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
 	Q_strupr( mapname );
-#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
+#ifdef TA_DATA // TEAMARENA_LEVELSHOTS
 	Com_sprintf( picname, 64, "levelshots/%s_small", mapname );
 #else
 	Com_sprintf( picname, 64, "levelshots/%s", mapname );
@@ -1656,18 +1656,18 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	s_serveroptions.picframe.focuspic			= GAMESERVER_SELECT;
 
 	y = 272;
-#ifdef TMNTSP
+#ifdef TA_SP
 	if (s_serveroptions.gametype != GT_SINGLE_PLAYER)
 	{
 #endif
-#ifdef MISSIONPACK // TMNTMISSIONPACK
+#ifdef MISSIONPACK // TA_MISSIONPACK
 	if( s_serveroptions.gametype <= GT_TEAM )
 #else
 	if( s_serveroptions.gametype != GT_CTF )
 #endif
 	{
 		s_serveroptions.fraglimit.generic.type       = MTYPE_FIELD;
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		s_serveroptions.fraglimit.generic.name       = "Score Limit:";
 #else
 		s_serveroptions.fraglimit.generic.name       = "Frag Limit:";
@@ -1676,7 +1676,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.fraglimit.generic.x	         = OPTIONS_X;
 		s_serveroptions.fraglimit.generic.y	         = y;
 		s_serveroptions.fraglimit.generic.statusbar  = ServerOptions_StatusBar;
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		s_serveroptions.fraglimit.field.widthInChars = 4;
 		s_serveroptions.fraglimit.field.maxchars     = 4;
 #else
@@ -1705,7 +1705,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	s_serveroptions.timelimit.field.widthInChars = 3;
 	s_serveroptions.timelimit.field.maxchars     = 3;
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	}
 #endif
 
@@ -1715,7 +1715,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.friendlyfire.generic.flags    = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 		s_serveroptions.friendlyfire.generic.x	      = OPTIONS_X;
 		s_serveroptions.friendlyfire.generic.y	      = y;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		s_serveroptions.friendlyfire.generic.name	  = "Team Damage:";
 #else
 		s_serveroptions.friendlyfire.generic.name	  = "Friendly Fire:";
@@ -1871,11 +1871,11 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		}
 	}
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	if (s_serveroptions.gametype != GT_SINGLE_PLAYER)
 	{
 #endif
-#ifdef MISSIONPACK // TMNTMISSIONPACK
+#ifdef MISSIONPACK // TA_MISSIONPACK
 	if( s_serveroptions.gametype <= GT_TEAM )
 #else
 	if( s_serveroptions.gametype != GT_CTF )
@@ -1887,7 +1887,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.flaglimit );
 	}
 	Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.timelimit );
-#ifdef TMNTSP
+#ifdef TA_SP
 	}
 #endif
 	if( s_serveroptions.gametype >= GT_TEAM ) {
@@ -1954,7 +1954,7 @@ BOT SELECT MENU *****
 #define BOTSELECT_ACCEPT1		"menu/art/accept_1"
 #define BOTSELECT_SELECT		"menu/art/opponents_select"
 #define BOTSELECT_SELECTED		"menu/art/opponents_selected"
-#ifdef TMNTDATA
+#ifdef TA_DATA
 #define BOTSELECT_ARROWS		"menu/art/arrows_horz_0"
 #define BOTSELECT_ARROWSL		"menu/art/arrows_horz_left"
 #define BOTSELECT_ARROWSR		"menu/art/arrows_horz_right"
@@ -2334,7 +2334,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 			botSelectInfo.pics[k].width						= 64;
 			botSelectInfo.pics[k].height					= 64;
 			botSelectInfo.pics[k].focuspic					= BOTSELECT_SELECTED;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 			botSelectInfo.pics[k].focuscolor				= colorRed;
 #endif
 
@@ -2351,7 +2351,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 			botSelectInfo.picbuttons[k].width				= 128;
 			botSelectInfo.picbuttons[k].height				= 128;
 			botSelectInfo.picbuttons[k].focuspic			= BOTSELECT_SELECT;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 			botSelectInfo.picbuttons[k].focuscolor			= colorRed;
 #endif
 
@@ -2372,7 +2372,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.arrows.generic.name		= BOTSELECT_ARROWS;
 	botSelectInfo.arrows.generic.flags		= QMF_INACTIVE;
 	botSelectInfo.arrows.generic.x			= 260;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	botSelectInfo.arrows.generic.y			= 400;
 	botSelectInfo.arrows.width				= BOTSELECT_ARROWS_WIDTH;
 	botSelectInfo.arrows.height				= BOTSELECT_ARROWS_HEIGHT;
@@ -2386,7 +2386,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.left.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	botSelectInfo.left.generic.callback		= UI_BotSelectMenu_LeftEvent;
 	botSelectInfo.left.generic.x			= 260;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	botSelectInfo.left.generic.y			= 400;
 	botSelectInfo.left.width  				= BOTSELECT_ARROWS_WIDTH/2;
 	botSelectInfo.left.height  				= BOTSELECT_ARROWS_HEIGHT;
@@ -2400,7 +2400,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.right.generic.type	    = MTYPE_BITMAP;
 	botSelectInfo.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	botSelectInfo.right.generic.callback	= UI_BotSelectMenu_RightEvent;
-#ifdef TMNTDATA
+#ifdef TA_DATA
 	botSelectInfo.right.generic.x			= 260+BOTSELECT_ARROWS_WIDTH/2;
 	botSelectInfo.right.generic.y			= 400;
 	botSelectInfo.right.width  				= BOTSELECT_ARROWS_WIDTH/2;

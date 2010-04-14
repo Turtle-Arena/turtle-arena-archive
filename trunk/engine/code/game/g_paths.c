@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 	It is however unfinish and untested.
 */
 
-#ifdef TMNTPATHSYS
+#ifdef TA_PATHSYS
 typedef enum
 {
 	PATHF_BEGIN		= 0x01, // path can start on this entity

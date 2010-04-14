@@ -2773,7 +2773,7 @@ void Com_Init( char *commandLine ) {
 	// Get client game vars.
 	cl_thirdPerson = Cvar_Get ("cg_thirdPerson", "1", 0);
 	cl_thirdPersonAngle = Cvar_Get ("cg_thirdPersonAngle", "0", 0);
-#ifdef TMNTMISC // FOV
+#ifdef TA_MISC // FOV
 	cl_thirdPersonRange = Cvar_Get ("cg_thirdPersonRange", "120", 0);
 #else
 	cl_thirdPersonRange = Cvar_Get ("cg_thirdPersonRange", "40", 0);

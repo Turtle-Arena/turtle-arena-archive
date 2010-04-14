@@ -420,7 +420,7 @@ void SP_target_position( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 }
 
-#ifdef TMNTSP // Save/load
+#ifdef TA_SP // Save/load
 void target_location_linkup(gentity_t *ent)
 #else
 static void target_location_linkup(gentity_t *ent)
@@ -469,7 +469,7 @@ void SP_target_location( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 }
 
-#ifdef TMNTSP
+#ifdef TA_SP
 /*QUAKED target_level_end (1 0 0) (-16 -16 -24) (16 16 32)
 when triggered, the level ends
 "message"	use it to set the name of the next level without any extension

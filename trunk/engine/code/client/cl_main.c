@@ -234,7 +234,7 @@ void CL_Voip_f( void )
 	else if (!cl_connectedToVoipServer)
 		reason = "Server doesn't support VoIP";
 	else if (
-#ifndef TMNTSP
+#ifndef TA_SP
 	Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
 #endif
 	Cvar_VariableValue("ui_singlePlayerActive"))
@@ -3192,7 +3192,7 @@ void CL_Init( void ) {
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
 
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	// init autoswitch so the ui will have it correctly even
 	// if the cgame hasn't been started
 	Cvar_Get ("cg_autoswitch", "1", CVAR_ARCHIVE);
@@ -3231,7 +3231,7 @@ void CL_Init( void ) {
 	Cvar_Get ("snaps", "20", CVAR_USERINFO | CVAR_ARCHIVE );
 #ifdef TURTLEARENA
 	// DEFAULT_PLAYER
-#ifdef TMNTSP // SPMODEL
+#ifdef TA_SP // SPMODEL
 	Cvar_Get ("spmodel", "raph", CVAR_USERINFO | CVAR_ROM );
 	Cvar_Get ("spheadmodel", "raph", CVAR_USERINFO | CVAR_ROM );
 #endif

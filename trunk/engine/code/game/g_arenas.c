@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-#ifndef TMNTSP
+#ifndef TA_SP
 gentity_t	*podium1;
 gentity_t	*podium2;
 gentity_t	*podium3;
@@ -148,7 +148,7 @@ void UpdateTournamentInfo( void ) {
 	trap_SendConsoleCommand( EXEC_APPEND, msg );
 }
 
-#ifndef TMNTSP
+#ifndef TA_SP
 static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity_t *ent, int place ) {
 	gentity_t	*body;
 	vec3_t		vec;
@@ -175,7 +175,7 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 	body->s.pos.trType = TR_STATIONARY;
 	body->s.groundEntityNum = ENTITYNUM_WORLD;
 	body->s.legsAnim = LEGS_IDLE;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if( body->s.weapon == WP_NONE || body->s.weapon == WP_DEFAULT) {
 		body->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
 	}
@@ -223,7 +223,7 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 static void CelebrateStop( gentity_t *player ) {
 	int		anim;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	anim = BG_TorsoStandForPlayerState(&player->client->ps);
 #else
 	if( player->s.weapon == WP_GAUNTLET) {
@@ -237,12 +237,12 @@ static void CelebrateStop( gentity_t *player ) {
 }
 
 
-#ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifndef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 #define	TIMER_GESTURE	(34*66+50)
 #endif
 static void CelebrateStart( gentity_t *player ) {
 	player->s.torsoAnim = ( ( player->s.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | TORSO_GESTURE;
-#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 	player->nextthink = level.time + BG_AnimationTime(&player->client->pers.playercfg.animations[TORSO_GESTURE]);
 #else
 	player->nextthink = level.time + TIMER_GESTURE;

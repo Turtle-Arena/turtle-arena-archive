@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //#include "../qcommon/q_shared.h"
 #include "g_local.h"
 
-#ifdef TMNTSP // Save/load
+#ifdef TA_SP // Save/load
 
 // NOTE: Make sure BG_SAVE_VERSIONS and BG_SAVE_TYPES stay up to date
 //         with current save code.
@@ -150,4 +150,4 @@ void G_LoadGame(fileHandle_t f)
 		level.clients[client].ps.persistant[PERS_CONTINUES] = saveData.clients[client].continues;
 	}
 }
-#endif // TMNTSP
+#endif // TA_SP

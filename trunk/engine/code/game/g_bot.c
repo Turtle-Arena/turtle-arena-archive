@@ -47,7 +47,7 @@ static botSpawnQueue_t	botSpawnQueue[BOT_SPAWN_QUEUE_DEPTH];
 
 vmCvar_t bot_minplayers;
 
-#ifndef TMNTSP
+#ifndef TA_SP
 extern gentity_t	*podium1;
 extern gentity_t	*podium2;
 extern gentity_t	*podium3;
@@ -702,7 +702,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	key = "team_model";
 	Info_SetValueForKey( userinfo, key, model );
 #endif
-#ifdef TMNTSP // SPMODEL
+#ifdef TA_SP // SPMODEL
 	key = "spmodel";
 	Info_SetValueForKey( userinfo, key, model );
 #endif
@@ -715,7 +715,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	Info_SetValueForKey( userinfo, key, headmodel );
 	key = "team_headmodel";
 	Info_SetValueForKey( userinfo, key, headmodel );
-#ifdef TMNTSP // SPMODEL
+#ifdef TA_SP // SPMODEL
 	key = "spheadmodel";
 	Info_SetValueForKey( userinfo, key, headmodel );
 #endif
@@ -903,7 +903,7 @@ void Svcmd_BotList_f( void ) {
 G_SpawnBots
 ===============
 */
-#ifdef TMNTSP // SP_BOSS
+#ifdef TA_SP // SP_BOSS
 static void G_SpawnBots( char *botList, int baseDelay, char *team )
 #else
 static void G_SpawnBots( char *botList, int baseDelay )
@@ -915,7 +915,7 @@ static void G_SpawnBots( char *botList, int baseDelay )
 	int			delay;
 	char		bots[MAX_INFO_VALUE];
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	podium1 = NULL;
 	podium2 = NULL;
 	podium3 = NULL;
@@ -956,7 +956,7 @@ static void G_SpawnBots( char *botList, int baseDelay )
 
 		// we must add the bot this way, calling G_AddBot directly at this stage
 		// does "Bad Things"
-#ifdef TMNTSP // SP_BOSS
+#ifdef TA_SP // SP_BOSS
 		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", bot, skill, team, delay) );
 #else
 		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f free %i\n", bot, skill, delay) );
@@ -1097,7 +1097,7 @@ void G_InitBots( qboolean restart ) {
 			return;
 		}
 
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 		strValue = Info_ValueForKey( arenainfo, "scorelimit" );
 		fragLimit = atoi( strValue );
 #if !defined TURTLEARENA || defined TA_SUPPORTQ3
@@ -1135,7 +1135,7 @@ void G_InitBots( qboolean restart ) {
 		}
 
 		if ( !fragLimit && !timeLimit ) {
-#ifdef TMNTMISC // frag to score
+#ifdef TA_MISC // frag to score
 			trap_Cvar_Set( "scorelimit", "500" );
 #else
 			trap_Cvar_Set( "fraglimit", "10" );
@@ -1150,7 +1150,7 @@ void G_InitBots( qboolean restart ) {
 		}
 
 		if( !restart ) {
-#ifdef TMNTSP // SP_BOSS
+#ifdef TA_SP // SP_BOSS
 			G_SpawnBots( Info_ValueForKey( arenainfo, "allies" ), basedelay, "free" );
 			G_SpawnBots( Info_ValueForKey( arenainfo, "bots" ), basedelay, "red" );
 #else

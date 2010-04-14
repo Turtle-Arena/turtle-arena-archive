@@ -1294,7 +1294,7 @@ BotSelectActivateWeapon
 */
 int BotSelectActivateWeapon(bot_state_t *bs) {
 	//
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
     // Decide if the pickup waepon is better then default weapon.
 
 	if ((bs->inventory[INVENTORY_WEAPON] == bs->inventory[INVENTORY_DEFAULTWEAPON])
@@ -1308,7 +1308,7 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 		return bs->inventory[INVENTORY_DEFAULTWEAPON];
 
     return bs->inventory[INVENTORY_WEAPON];
-#elif defined TMNTWEAPSYS
+#elif defined TA_WEAPSYS
 	{
 		int i;
 
@@ -1355,7 +1355,7 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 #endif
 }
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 /*
 ==================
 G_CanShootProx
@@ -1463,7 +1463,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			VectorSubtract(target, bs->eye, dir);
 			vectoangles(dir, moveresult->ideal_viewangles);
 			// if the bot has a weapon that does splash damage
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
             if (G_CanShootProx(bs->cur_ps.weapon))
 				moveresult->weapon = bs->cur_ps.weapon;
             else if (G_CanShootProx(bs->cur_ps.stats[STAT_DEFAULTWEAPON]))
@@ -1471,7 +1471,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
             else {
             	moveresult->weapon = 0;
             }
-#elif defined TMNTWEAPSYS
+#elif defined TA_WEAPSYS
 			moveresult->weapon = 0;
 			for (i = 1; i < BG_NumWeaponGroups(); i++)
 			{

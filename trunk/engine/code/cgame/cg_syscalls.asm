@@ -96,7 +96,7 @@ equ trap_loadCamera						-91
 equ trap_startCamera					-92
 equ trap_getCameraInfo					-93
 
-;;ZTM: TMNTWEAPSYS_2
+;;ZTM: TA_WEAPSYS
 equ trap_FS_GetFileList					-94
 
 equ	memset						-101

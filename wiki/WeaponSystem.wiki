@@ -4,22 +4,18 @@
 = Introduction =
 The weapon system used in Turtle Arena;
 
-  * *TMNTWEAPSYS define*
+  * *TA_WEAPSYS define*
   * Loads weapons from external text files ([http://turtlearena.googlecode.com/svn/trunk/base/scripts/weaponinfo.txt scripts/weaponinfo.txt] and scripts/?.weap files)
   * Supports melee and projectile weapons
   * Per-player default weapon (Set in player's animation.cfg)
   * Allows for easy modification and custom default weapons, or new weapons for custom maps.
 
-  * *TMNTWEAPSYS_EX define*
+  * *TA_WEAPSYS_EX define*
   * Removes (works around) ioquake3 16 weapon group limit.
   * Each client is limited to holding 2 weapons (default and pickup), unlike 16 in ioquake3
   * If holding a pickup weapon the default weapon can't be used
   * Pickup weapon can be drop via a button to use default weapon
   * Automaticly drops picked up guns when they run out of ammo (When player doesn't have PW_AMMOREGEN)
-
-  * *TMNTWEAPONS define*
-  * Removes code that is only for Quake3's weapon system
-  * Add code for Turtle Arena weapons.
 
   * *TA_GAME_MODELS*
   * Game QVM loads player models to get tag origin and angles (Allowing for better melee attacking)

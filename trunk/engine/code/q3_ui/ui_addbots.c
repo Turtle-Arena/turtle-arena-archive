@@ -244,7 +244,7 @@ UI_AddBotsMenu_Init
 =================
 */
 static const char *skillNames[] = {
-#ifdef TMNTMISC // rip off SRB2 skills...
+#ifdef TA_MISC // rip off SRB2 skills...
 	"Easy",
 	"Normal",
 	"Hard",

@@ -202,7 +202,7 @@ typedef struct _tag_menuframework
 
 	qboolean	wrapAround;
 	qboolean	fullscreen;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	qboolean	showlogo;
 #endif
 #ifdef IOQ3ZTM
@@ -321,7 +321,7 @@ extern sfxHandle_t	menu_move_sound;
 extern sfxHandle_t	menu_out_sound;
 extern sfxHandle_t	menu_buzz_sound;
 extern sfxHandle_t	menu_null_sound;
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 extern sfxHandle_t	weaponChangeSound;
 #endif
 extern vec4_t		menu_text_color;
@@ -549,7 +549,7 @@ typedef struct {
 	qhandle_t		headModel;
 	qhandle_t		headSkin;
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	bg_playercfg_t	playercfg;
 #else
 	animation_t		animations[MAX_TOTALANIMATIONS];
@@ -559,7 +559,7 @@ typedef struct {
 	qhandle_t		barrelModel;
 	qhandle_t		flashModel;
 	vec3_t			flashDlightColor;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	qhandle_t		weaponModel2;
 	qhandle_t		barrelModel2;
 	qhandle_t		flashModel2;
@@ -614,12 +614,12 @@ typedef struct {
 	qhandle_t		whiteShader;
 	qhandle_t		menuBackShader;
 	qhandle_t		menuBackShader2;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	qhandle_t		menuBackNoLogoShader;
 #endif
 	qhandle_t		charset;
 	qhandle_t		charsetProp;
-#ifndef TMNTDATA
+#ifndef TA_DATA
 	qhandle_t		charsetPropGlow;
 #endif
 	qhandle_t		charsetPropB;
@@ -932,7 +932,7 @@ void UI_SPLevelMenu_ReInit( void );
 // ui_spArena.c
 //
 void UI_SPArena_Start( const char *arenaInfo );
-#ifdef TMNTSP
+#ifdef TA_SP
 void UI_SPMenu( void );
 void UI_SPMenu_f( void );
 void UI_SPMenu_Cache( void );

@@ -593,7 +593,7 @@ issues.
 
 #define	MAX_FILE_HANDLES	64
 
-#ifdef TMNTMISC // Config file name
+#ifdef TA_MISC // Config file name
 #ifdef DEDICATED
 #	define Q3CONFIG_CFG "config_server.cfg"
 #else

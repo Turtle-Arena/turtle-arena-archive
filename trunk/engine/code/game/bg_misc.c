@@ -41,7 +41,7 @@ An item fires all of its targets when it is picked up.  If the toucher can't car
 "count" override quantity or duration on most items.
 */
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #define EMPTY_GITEM "item_health_small", \
 		"sound/items/s_health.wav", \
         { "models/powerups/health/small.md3", \
@@ -136,7 +136,7 @@ gitem_t	bg_itemlist[] =
 	{
 		"item_health_small",
 		"sound/items/s_health.wav",
-#ifdef TMNTDATA
+#ifdef TA_DATA
         { "models/powerups/health/small.md3",
 		NULL, NULL, NULL },
 #else
@@ -144,12 +144,12 @@ gitem_t	bg_itemlist[] =
 		"models/powerups/health/small_sphere.md3", 
 		NULL, NULL },
 #endif
-#ifdef TMNTDATA
+#ifdef TA_DATA
 /* icon */		"icons/iconh_small",
 #else
 /* icon */		"icons/iconh_green",
 #endif
-#ifdef TMNTDATA
+#ifdef TA_DATA
 /* pickup */	"5% Health",
 #else
 /* pickup */	"5 Health",
@@ -166,7 +166,7 @@ gitem_t	bg_itemlist[] =
 	{
 		"item_health",
 		"sound/items/n_health.wav",
-#ifdef TMNTDATA
+#ifdef TA_DATA
         { "models/powerups/health/medium.md3",
 		NULL, NULL, NULL },
 #else
@@ -174,12 +174,12 @@ gitem_t	bg_itemlist[] =
 		"models/powerups/health/medium_sphere.md3", 
 		NULL, NULL },
 #endif
-#ifdef TMNTDATA
+#ifdef TA_DATA
 /* icon */		"icons/iconh_medium",
 #else
 /* icon */		"icons/iconh_yellow",
 #endif
-#ifdef TMNTDATA
+#ifdef TA_DATA
 /* pickup */	"25% Health",
 #else
 /* pickup */	"25 Health",
@@ -196,7 +196,7 @@ gitem_t	bg_itemlist[] =
 	{
 		"item_health_large",
 		"sound/items/l_health.wav",
-#ifdef TMNTDATA
+#ifdef TA_DATA
         { "models/powerups/health/large.md3",
 		NULL, NULL, NULL },
 #else
@@ -204,12 +204,12 @@ gitem_t	bg_itemlist[] =
 		"models/powerups/health/large_sphere.md3", 
 		NULL, NULL },
 #endif
-#ifdef TMNTDATA
+#ifdef TA_DATA
 /* icon */		"icons/iconh_large",
 #else
 /* icon */		"icons/iconh_red",
 #endif
-#ifdef TMNTDATA
+#ifdef TA_DATA
 /* pickup */	"50% Health",
 #else
 /* pickup */	"50 Health",
@@ -226,7 +226,7 @@ gitem_t	bg_itemlist[] =
 	{
 		"item_health_mega",
 		"sound/items/m_health.wav",
-#ifdef TMNTDATA
+#ifdef TA_DATA
         { "models/powerups/health/mega.md3",
 		NULL, NULL, NULL },
 #else
@@ -235,7 +235,7 @@ gitem_t	bg_itemlist[] =
 		NULL, NULL },
 #endif
 /* icon */		"icons/iconh_mega",
-#ifdef TMNTDATA
+#ifdef TA_DATA
 /* pickup */	"100% Health",
 #else
 /* pickup */	"Mega Health",
@@ -250,7 +250,7 @@ gitem_t	bg_itemlist[] =
 	//
 	// WEAPONS 
 	//
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #ifndef TURTLEARENA
 	// Keep the model indexs correct for items after weapons.
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
@@ -418,7 +418,7 @@ gitem_t	bg_itemlist[] =
 	},
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #ifndef TURTLEARENA
 	// Keep the model indexs correct for items after ammo.
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
@@ -558,7 +558,7 @@ gitem_t	bg_itemlist[] =
 	},
 #endif
 
-#ifdef TMNTHOLDABLE // no q3 teleprter
+#ifdef TA_HOLDABLE // no q3 teleprter
 #ifndef TURTLEARENA
 	// Keep the model indexs correct for items after teleporter.
 	{ EMPTY_GITEM },
@@ -576,7 +576,7 @@ gitem_t	bg_itemlist[] =
 		NULL, NULL, NULL},
 /* icon */		"icons/teleporter",
 /* pickup */	"Personal Teleporter",
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 		0,	// Only ever have one use, even if picked up 2 (or 100)
 #else
 		60,
@@ -594,19 +594,19 @@ gitem_t	bg_itemlist[] =
 		"sound/items/holdable.wav",
         { 
 		"models/powerups/holdable/medkit.md3", 
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 		NULL,
 #else
 		"models/powerups/holdable/medkit_sphere.md3",
 #endif
 		NULL, NULL},
 /* icon */		"icons/medkit",
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 /* pickup */	"Pizza-to-Go",
 #else
 /* pickup */	"Medkit",
 #endif
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 		0,	// Only ever have one use, even if picked up 2 (or 100)
 #else
 		60,
@@ -617,7 +617,7 @@ gitem_t	bg_itemlist[] =
 /* sounds */ "sound/items/use_medkit.wav"
 	},
 
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 #ifndef TURTLEARENA
 #warning: "Model indexs will not match Quake3 botfiles/inv.h!"
 #endif
@@ -856,7 +856,7 @@ Only in CTF games
 	{
 		"team_CTF_redflag",
 		NULL,
-#ifdef TMNTDATA // FLAG_MODEL
+#ifdef TA_DATA // FLAG_MODEL
         { "models/flag2/flagpole.md3",
 		"models/flag2/flagflap3.md3", NULL, NULL },
 #else
@@ -868,7 +868,7 @@ Only in CTF games
 		0,
 		IT_TEAM,
 		PW_REDFLAG,
-#ifdef TMNTDATA // FLAG_MODEL
+#ifdef TA_DATA // FLAG_MODEL
 		"models/flag2/red.skin",
 #else
 /* precache */ "",
@@ -882,7 +882,7 @@ Only in CTF games
 	{
 		"team_CTF_blueflag",
 		NULL,
-#ifdef TMNTDATA // FLAG_MODEL
+#ifdef TA_DATA // FLAG_MODEL
         { "models/flag2/flagpole.md3",
 		"models/flag2/flagflap3.md3", NULL, NULL },
 #else
@@ -894,7 +894,7 @@ Only in CTF games
 		0,
 		IT_TEAM,
 		PW_BLUEFLAG,
-#ifdef TMNTDATA // FLAG_MODEL
+#ifdef TA_DATA // FLAG_MODEL
 		"models/flag2/blue.skin",
 #else
 /* precache */ "",
@@ -903,7 +903,7 @@ Only in CTF games
 	},
 
 #ifdef MISSIONPACK
-#ifdef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifdef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 #ifndef TURTLEARENA
 	{ EMPTY_GITEM },
 #endif
@@ -917,7 +917,7 @@ Only in CTF games
 		NULL, NULL, NULL},
 /* icon */		"icons/kamikaze",
 /* pickup */	"Kamikaze",
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 		0,	// Only ever has one use, even if picked up 2 (or 100)
 #else
 		60,
@@ -938,7 +938,7 @@ Only in CTF games
 		NULL, NULL, NULL},
 /* icon */		"icons/portal",
 /* pickup */	"Portal",
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 		0,	// Only ever has one use, even if picked up 2 (or 100)
 #else
 		60,
@@ -959,7 +959,7 @@ Only in CTF games
 		NULL, NULL, NULL},
 /* icon */		"icons/invulnerability",
 /* pickup */	"Invulnerability",
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 		0,	// Only ever has one use, even if picked up 2 (or 100)
 #else
 		60,
@@ -971,7 +971,7 @@ Only in CTF games
 	},
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #ifndef TURTLEARENA
 	// Keep the model indexs correct for items after ammo.
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
@@ -1115,7 +1115,7 @@ Only in One Flag CTF games
 	{
 		"team_CTF_neutralflag",
 		NULL,
-#ifdef TMNTDATA // FLAG_MODEL
+#ifdef TA_DATA // FLAG_MODEL
         { "models/flag2/flagpole.md3",
 		"models/flag2/flagflap3.md3", NULL, NULL },
 #else
@@ -1127,7 +1127,7 @@ Only in One Flag CTF games
 		0,
 		IT_TEAM,
 		PW_NEUTRALFLAG,
-#ifdef TMNTDATA // FLAG_MODEL
+#ifdef TA_DATA // FLAG_MODEL
 		"models/flag2/white.skin",
 #else
 /* precache */ "",
@@ -1170,7 +1170,7 @@ Only in One Flag CTF games
 #endif
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #ifndef TURTLEARENA
 	// Keep the model indexs correct for items after weapons.
 	{ EMPTY_GITEM },{ EMPTY_GITEM },{ EMPTY_GITEM },
@@ -1228,10 +1228,10 @@ Only in One Flag CTF games
 /* precache */ "",
 /* sounds */ "sound/weapons/vulcan/wvulwind.wav"
 	},
-#endif // TMNTWEAPSYS
+#endif // TA_WEAPSYS
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 /*QUAKED weapon_default (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -1255,7 +1255,7 @@ Only in One Flag CTF games
 
 int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
 
-#if defined TMNTWEAPSYS || defined TMNTPLAYERSYS
+#if defined TA_WEAPSYS || defined TA_PLAYERSYS
 typedef struct
 {
 	int num;
@@ -1310,7 +1310,7 @@ playerAnimationDef_t playerAnimationDefs[] = {
 	ANIMDEF(TORSO_NEGATIVE),
 
 	// TURTLEARENA
-#ifdef TMNTPLAYERS // New TURTLEARENA player animations
+#ifdef TA_PLAYERS // New TURTLEARENA player animations
 	// Place default weapons somewhere on there person while there not used.
 	ANIMDEF(TORSO_PUTDEFAULT_BOTH),
 	ANIMDEF(TORSO_PUTDEFAULT_PRIMARY),
@@ -1425,7 +1425,7 @@ char	*modNames[] = {
 	"MOD_BFG",
 	"MOD_BFG_SPLASH",
 #endif
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 	"MOD_SHURIKEN",
 	"MOD_FIRESHURIKEN",
 	"MOD_FIRESHURIKEN_EXPLOSION",
@@ -1441,7 +1441,7 @@ char	*modNames[] = {
 	"MOD_SUICIDE",
 	"MOD_TARGET_LASER",
 	"MOD_TRIGGER_HURT",
-#ifdef TMNTENTSYS
+#ifdef TA_ENTSYS
 	"MOD_EXPLOSION",
 #endif
 #ifdef MISSIONPACK
@@ -1450,7 +1450,7 @@ char	*modNames[] = {
 	"MOD_CHAINGUN",
 	"MOD_PROXIMITY_MINE",
 #endif
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	"MOD_KAMIKAZE",
 #endif
 #ifndef TURTLEARENA // POWERS
@@ -1464,7 +1464,7 @@ char	*modNames[] = {
 };
 int modNamesSize = sizeof( modNames ) / sizeof( modNames[0] );
 
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 materialInfo_t materialInfo[NUM_MATERIAL_TYPES] = {
 	{"none",	0 },
 	{"dirt",	SURF_DIRT },
@@ -1477,7 +1477,7 @@ materialInfo_t materialInfo[NUM_MATERIAL_TYPES] = {
 };
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
@@ -3176,7 +3176,7 @@ int BG_MaxAttackCombo(playerState_t *ps)
 	return max_combo;
 }
 
-#ifdef TMNTNPCSYS // ZTM: NPC info loading based on weapon info loading.
+#ifdef TA_NPCSYS // ZTM: NPC info loading based on weapon info loading.
 bg_npcinfo_t bg_npcinfo[MAX_NPCS];
 static qboolean bg_npcsys_init = qfalse;
 static int bg_numNPCs = 0;
@@ -3693,7 +3693,7 @@ qboolean BG_PlayerAttackAnim(int a)
 	return qfalse;
 #else
 	return (a == TORSO_ATTACK || a == TORSO_ATTACK2
-#ifdef TMNTPLAYERS
+#ifdef TA_PLAYERS
 	|| (a >= TORSO_ATTACK_GUN_PRIMARY && a <= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C)
 #endif
 	);
@@ -3714,15 +3714,15 @@ qboolean BG_PlayerStandAnim(int a)
 	return qfalse;
 #else
 	return (a == TORSO_STAND || a == TORSO_STAND2
-#ifdef TMNTPLAYERS
+#ifdef TA_PLAYERS
 	|| (a >= TORSO_STAND_GUN_PRIMARY && a <= TORSO_STAND_NUNCHUCKS1_PRIMARY)
 #endif
 	);
 #endif
 }
-#endif // TMNTWEAPSYS
+#endif // TA_WEAPSYS
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 /*
 ==============
 BG_ItemNumForHoldableNum
@@ -3733,7 +3733,7 @@ Returns 0 if not found.
 */
 int BG_ItemNumForHoldableNum(holdable_t holdablenum)
 {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	gitem_t	*it;
 	int i;
 
@@ -3769,7 +3769,7 @@ BG_FindItemForPowerup
 ==============
 */
 gitem_t	*BG_FindItemForPowerup( powerup_t pw ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	gitem_t	*it;
 	int i;
 
@@ -3809,7 +3809,7 @@ BG_FindItemForHoldable
 ==============
 */
 gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	gitem_t	*it;
 	int i;
 
@@ -3845,7 +3845,7 @@ BG_FindItemForWeapon
 ===============
 */
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	gitem_t	*it;
 	int i;
 
@@ -3875,7 +3875,7 @@ BG_FindItem
 ===============
 */
 gitem_t	*BG_FindItem( const char *pickupName ) {
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	gitem_t	*it;
 	int i;
 
@@ -3896,7 +3896,7 @@ gitem_t	*BG_FindItem( const char *pickupName ) {
 	return NULL;
 }
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 int BG_ItemNumForItem( gitem_t *item )
 {
 	if (!item)
@@ -3989,11 +3989,11 @@ This needs to be the same for client side prediction and server use.
 */
 qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const playerState_t *ps ) {
 	gitem_t	*item;
-#if defined MISSIONPACK || defined TMNTHOLDSYS
+#if defined MISSIONPACK || defined TA_HOLDSYS
 	int		upperBound;
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if ( ent->modelindex < 1 || ent->modelindex >= BG_NumItems() )
 #else
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems )
@@ -4002,7 +4002,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: index out of range" );
 	}
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	item = BG_ItemForItemNum(ent->modelindex);
 #else
 	item = &bg_itemlist[ent->modelindex];
@@ -4010,7 +4010,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 	switch( item->giType ) {
 	case IT_WEAPON:
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		if (ps->weapon != ps->stats[STAT_PENDING_WEAPON])
 		{
 			return qfalse;
@@ -4032,7 +4032,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 			return qfalse;
 		}
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		// Don't pick up a melee weapon (or another weapon that doesn't use ammo)
 		//   if your holding one of the same type.
 		if (item->giTag == WP_DEFAULT)
@@ -4052,7 +4052,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		return qtrue;	// weapons are always picked up
 
 	case IT_AMMO:
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		{
 			int stat = -1;
 
@@ -4079,7 +4079,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #ifndef TURTLEARENA // NOARMOR
 	case IT_ARMOR:
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if( BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -4089,7 +4089,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		}
 
 		// we also clamp armor to the maxhealth for handicapping
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if( BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -4116,7 +4116,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		// small and mega healths will go over the max, otherwise
 		// don't pick up if already at max
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if( BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -4126,7 +4126,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		}
 		else
 #endif
-#ifndef TMNTMISC
+#ifndef TA_MISC
 		if ( item->quantity == 5 || item->quantity == 100 )
 #endif
 		{
@@ -4212,7 +4212,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		return qfalse;
 
 	case IT_HOLDABLE:
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 		// Single use holdable item
 		if (item->quantity == 0)
 		{
@@ -4370,7 +4370,7 @@ char *eventnames[] = {
 	"EV_ITEM_PICKUP",			// normal item pickups are predictable
 	"EV_GLOBAL_ITEM_PICKUP",	// powerup / team sounds are broadcast to everyone
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	"EV_DROP_WEAPON",
 #else
 	"EV_NOAMMO",
@@ -4400,7 +4400,7 @@ char *eventnames[] = {
 	"EV_PLAYER_TELEPORT_IN",
 	"EV_PLAYER_TELEPORT_OUT",
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	"EV_PROJECTILE_BOUNCE",
 	"EV_PROJECTILE_STICK",
 	"EV_PROJECTILE_TRIGGER",
@@ -4412,7 +4412,7 @@ char *eventnames[] = {
 	"EV_GLOBAL_SOUND",		// no attenuation
 	"EV_GLOBAL_TEAM_SOUND",
 
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	"EV_BULLET_HIT_FLESH",
 	"EV_BULLET_HIT_WALL",
 #endif
@@ -4421,14 +4421,14 @@ char *eventnames[] = {
 	"EV_MISSILE_MISS",
 	"EV_MISSILE_MISS_METAL",
 	"EV_RAILTRAIL",
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	"EV_SHOTGUN",
 #endif
 #ifndef IOQ3ZTM_NO_COMPAT
 	"EV_BULLET",				// otherEntity is the shooter
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	"EV_WEAPON_HIT",
 	"EV_WEAPON_MISS",
 	"EV_WEAPON_MISS_METAL",
@@ -4451,16 +4451,16 @@ char *eventnames[] = {
 	"EV_GIB_PLAYER",			// gib a previously living player
 #endif
 	"EV_SCOREPLUM",			// score plum
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 	"EV_SPAWN_DEBRIS",
 #endif
 
 //#ifdef MISSIONPACK
-#if !defined TMNTWEAPSYS || defined NET_COMPAT
+#if !defined TA_WEAPSYS || defined NET_COMPAT
 	"EV_PROXIMITY_MINE_STICK",
 	"EV_PROXIMITY_MINE_TRIGGER",
 #endif
-#if !defined TMNTHOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
+#if !defined TA_HOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
 	"EV_KAMIKAZE",			// kamikaze explodes
 #endif
 	"EV_OBELISKEXPLODE",		// obelisk explodes
@@ -4475,7 +4475,7 @@ char *eventnames[] = {
 //#endif
 
 	"EV_DEBUG_LINE",
-#if defined TMNTMISC || defined NET_COMPAT // DEBUG_ORIGIN
+#if defined TA_MISC || defined NET_COMPAT // DEBUG_ORIGIN
 	"EV_DEBUG_ORIGIN",
 #endif
 	"EV_STOPLOOPINGSOUND",
@@ -4629,7 +4629,7 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 
 	s->loopSound = ps->loopSound;
 	s->generic1 = ps->generic1;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	// cgame needs the weaponHands for all clients.
 	s->weaponHands = ps->weaponHands;
 #endif
@@ -4715,7 +4715,7 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 
 	s->loopSound = ps->loopSound;
 	s->generic1 = ps->generic1;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	// cgame needs the weaponHands for all clients.
 	s->weaponHands = ps->weaponHands;
 #endif
@@ -4929,7 +4929,7 @@ void BG_SwingAngles( float destination, float swingTolerance, float clampToleran
 }
 #endif
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 /*
 ===============
 BG_AnimationTime
@@ -4954,7 +4954,7 @@ int BG_AnimationTime(animation_t *anim)
 	return time;
 }
 
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 // These are in game, cgame, and ui, but not in bg - so its okay to use here...
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
@@ -5111,7 +5111,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 		}
 
 
-#ifdef TMNTPLAYERS
+#ifdef TA_PLAYERS
 	// Set defaults for Turtle Arena animations
 	// default weapon, put away
 	if (index >= TORSO_PUTDEFAULT_BOTH && index <= TORSO_PUTDEFAULT_SECONDARY)
@@ -5602,7 +5602,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		//else if ( !Q_stricmp( token, "thrustfactor" ) ) {
 		//}
 
-#ifdef TMNTWEAPSYS // ZTM: DEFAULT_WEAPON
+#ifdef TA_WEAPSYS // ZTM: DEFAULT_WEAPON
 		else if ( !Q_stricmp( token, "default_weapon" ) ) {
 			int j;
 			token = COM_Parse( &text_p );
@@ -5749,7 +5749,7 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	// Use the head model name for the default soundpath.
 	Q_strncpyz(playercfg->soundpath, headModel, sizeof (playercfg->soundpath));
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	playercfg->primaryHandSide = HAND_RIGHT;
 	playercfg->secondaryHandSide = HAND_LEFT;
 	playercfg->default_weapon = BG_WeaponGroupIndexForName(DEFAULT_DEFAULT_WEAPON);
@@ -5864,7 +5864,7 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 }
 #endif
 
-#ifdef TMNTENTSYS // MISC_OBJECT
+#ifdef TA_ENTSYS // MISC_OBJECT
 const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
 {
 	"OBJECT_IDLE",
@@ -5876,7 +5876,7 @@ const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
 	"OBJECT_DEAD3",
 	"OBJECT_LAND",
 	"OBJECT_PAIN"
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 	,
 	"OBJECT_TAUNT",
 	"OBJECT_ATTACK_FAR",

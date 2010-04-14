@@ -43,7 +43,7 @@ SINGLE PLAYER LEVEL SELECT MENU
 #define ART_MAP_COMPLETE5			"menu/art/level_complete5"
 #define ART_BACK0					"menu/art/back_0"
 #define ART_BACK1					"menu/art/back_1"	
-#ifdef TMNTMISC // NO_MENU_FIGHT
+#ifdef TA_MISC // NO_MENU_FIGHT
 #define ART_FIGHT0					"menu/art/next_0"
 #define ART_FIGHT1					"menu/art/next_1"
 #else
@@ -75,7 +75,7 @@ SINGLE PLAYER LEVEL SELECT MENU
 
 #define PLAYER_Y			314
 #define AWARDS_Y			(PLAYER_Y + 26)
-#ifndef TMNTSP
+#ifndef TA_SP
 #ifdef TURTLEARENA // AWARDS
 #define MAX_UI_AWARDS		3
 #else
@@ -90,12 +90,12 @@ typedef struct {
 	menubitmap_s	item_leftarrow;
 	menubitmap_s	item_maps[ARENAS_PER_TIER];
 	menubitmap_s	item_rightarrow;
-#ifndef TMNTSP // SPMODEL
+#ifndef TA_SP // SPMODEL
 	menubitmap_s	item_player;
 #endif
 	menubitmap_s	item_awards[6];
 	menubitmap_s	item_back;
-#ifndef TMNTSP
+#ifndef TA_SP
 	menubitmap_s	item_reset;
 	menubitmap_s	item_custom;
 #endif
@@ -116,7 +116,7 @@ typedef struct {
 
 	char			playerModel[MAX_QPATH];
 	char			playerPicName[MAX_QPATH];
-#ifndef TMNTSP
+#ifndef TA_SP
 #ifdef IOQ3ZTM
 	int				awardLevels[MAX_UI_AWARDS];
 	sfxHandle_t		awardSounds[MAX_UI_AWARDS];
@@ -261,7 +261,7 @@ static void UI_SPLevelMenu_SetMenuArena( int n, int level, const char *arenaInfo
 		levelMenuInfo.levelScores[n] = 8;
 	}
 
-#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
+#ifdef TA_DATA // TEAMARENA_LEVELSHOTS
 	strcpy( levelMenuInfo.levelPicNames[n], va( "levelshots/%s_small", map ) );
 #else
 	strcpy( levelMenuInfo.levelPicNames[n], va( "levelshots/%s.tga", map ) );
@@ -370,7 +370,7 @@ static void UI_SPLevelMenu_SetMenuItems( void ) {
 }
 
 
-#ifndef TMNTSP
+#ifndef TA_SP
 /*
 =================
 UI_SPLevelMenu_ResetEvent
@@ -390,7 +390,7 @@ static void UI_SPLevelMenu_ResetAction( qboolean result ) {
 
 	// clear game variables
 	UI_NewGame();
-#ifdef TMNTSP // ZTM: -4 starts on training (trainingTier) level (i dont have one)
+#ifdef TA_SP // ZTM: -4 starts on training (trainingTier) level (i dont have one)
 	trap_Cvar_SetValue( "ui_spSelection", 0 );
 #else
 	trap_Cvar_SetValue( "ui_spSelection", -4 );
@@ -472,7 +472,7 @@ static void UI_SPLevelMenu_RightArrowEvent( void* ptr, int notification ) {
 }
 
 
-#ifndef TMNTSP
+#ifndef TA_SP
 /*
 =================
 UI_SPLevelMenu_PlayerEvent
@@ -488,7 +488,7 @@ static void UI_SPLevelMenu_PlayerEvent( void* ptr, int notification ) {
 #endif
 
 
-#ifndef TMNTSP
+#ifndef TA_SP
 /*
 =================
 UI_SPLevelMenu_AwardEvent
@@ -547,7 +547,7 @@ static void UI_SPLevelMenu_BackEvent( void* ptr, int notification ) {
 }
 
 
-#ifndef TMNTSP
+#ifndef TA_SP
 /*
 =================
 UI_SPLevelMenu_CustomEvent
@@ -571,14 +571,14 @@ UI_SPLevelMenu_MenuDraw
 #define LEVEL_DESC_LEFT_MARGIN		332
 
 static void UI_SPLevelMenu_MenuDraw( void ) {
-#ifdef TMNTSP
+#ifdef TA_SP
 	int				n;
 #else
 	int				n, i;
 #endif
 	int				x, y;
 	vec4_t			color;
-#ifndef TMNTSP
+#ifndef TA_SP
 	int				level;
 #endif
 //	int				fraglimit;
@@ -593,7 +593,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	}
 
 	// draw player name
-#ifndef TMNTSP // SPMODEL
+#ifndef TA_SP // SPMODEL
 	trap_Cvar_VariableStringBuffer( "name", string, 32 );
 	Q_CleanStr( string );
 	UI_DrawProportionalString( 320, PLAYER_Y, string, UI_CENTER|UI_SMALLFONT, color_orange );
@@ -610,7 +610,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	// standard menu drawing
 	Menu_Draw( &levelMenuInfo.menu );
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	// draw player award levels
 	y = AWARDS_Y;
 	i = 0;
@@ -645,7 +645,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	}
 #endif
 
-#ifdef TMNTSP
+#ifdef TA_SP
 	UI_DrawProportionalString( 18, 38, va( "Stage %i", selectedArenaSet + 1 ), UI_LEFT|UI_SMALLFONT, color_orange );
 #else
 	UI_DrawProportionalString( 18, 38, va( "Tier %i", selectedArenaSet + 1 ), UI_LEFT|UI_SMALLFONT, color_orange );
@@ -677,7 +677,7 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 
 		if ( n == selectedArena ) {
 			if( Menu_ItemAtCursor( &levelMenuInfo.menu ) == &levelMenuInfo.item_maps[n] ) {
-#ifdef TMNTDATA // MENU
+#ifdef TA_DATA // MENU
 				UI_DrawHandlePic( x-31, y-30, 256, 256-27, levelMenuInfo.levelFocusPic);
 #endif
 				trap_R_SetColor( color );
@@ -727,7 +727,7 @@ UI_SPLevelMenu_Cache
 =================
 */
 void UI_SPLevelMenu_Cache( void ) {
-#ifndef TMNTSP
+#ifndef TA_SP
 	int				n;
 #endif
 
@@ -750,7 +750,7 @@ void UI_SPLevelMenu_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_CUSTOM0 );
 	trap_R_RegisterShaderNoMip( ART_CUSTOM1 );
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
 	{
 		trap_R_RegisterShaderNoMip( ui_medalPicNames[n] );
@@ -776,7 +776,7 @@ UI_SPLevelMenu_Init
 static void UI_SPLevelMenu_Init( void ) {
 	int		skill;
 	int		n;
-#ifndef TMNTSP
+#ifndef TA_SP
 	int		x, y;
 	int		count;
 #endif
@@ -798,12 +798,12 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_banner.generic.type			= MTYPE_BTEXT;
 	levelMenuInfo.item_banner.generic.x				= 320;
 	levelMenuInfo.item_banner.generic.y				= 16;
-#ifdef TMNTSP
+#ifdef TA_SP
 	levelMenuInfo.item_banner.string				= "CHOOSE AREA";
 #else
 	levelMenuInfo.item_banner.string				= "CHOOSE LEVEL";
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	levelMenuInfo.item_banner.color					= text_banner_color;
 #else
 	levelMenuInfo.item_banner.color					= color_red;
@@ -878,7 +878,7 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_rightarrow.height			= 114;
 	levelMenuInfo.item_rightarrow.focuspic			= ART_ARROW_FOCUS;
 
-#ifndef TMNTSP // SPMODEL
+#ifndef TA_SP // SPMODEL
 	trap_Cvar_VariableStringBuffer( "model", levelMenuInfo.playerModel, sizeof(levelMenuInfo.playerModel) );
 	PlayerIcon( levelMenuInfo.playerModel, levelMenuInfo.playerPicName, sizeof(levelMenuInfo.playerPicName) );
 	levelMenuInfo.item_player.generic.type			= MTYPE_BITMAP;
@@ -892,7 +892,7 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_player.height				= 64;
 #endif
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
 	{
 		levelMenuInfo.awardLevels[n] = UI_GetAwardLevel( n );
@@ -936,7 +936,7 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_back.height					= 64;
 	levelMenuInfo.item_back.focuspic				= ART_BACK1;
 
-#ifndef TMNTSP // SP data is no longer saved like in Q3 // Custom moved to PLAY menu 
+#ifndef TA_SP // SP data is no longer saved like in Q3 // Custom moved to PLAY menu 
 	levelMenuInfo.item_reset.generic.type			= MTYPE_BITMAP;
 	levelMenuInfo.item_reset.generic.name			= ART_RESET0;
 	levelMenuInfo.item_reset.generic.flags			= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1003,17 +1003,17 @@ static void UI_SPLevelMenu_Init( void ) {
 #endif
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_rightarrow );
 
-#ifndef TMNTSP // SPMODEL
+#ifndef TA_SP // SPMODEL
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_player );
 #endif
 
-#ifndef TMNTSP
+#ifndef TA_SP
 	for( n = 0; n < count; n++ ) {
 		Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_awards[n] );
 	}
 #endif
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_back );
-#ifndef TMNTSP
+#ifndef TA_SP
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_reset );
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_custom );
 #endif

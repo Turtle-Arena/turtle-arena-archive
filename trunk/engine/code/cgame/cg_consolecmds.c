@@ -184,7 +184,7 @@ static void CG_spLose_f( void) {
 #endif
 	CG_AddBufferedSound(cgs.media.loserSound);
 	//trap_S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
-#ifdef TMNTSP
+#ifdef TA_SP
 	if (cgs.gametype != GT_SINGLE_PLAYER)
 #endif
 #ifndef MISSIONPACK_HUD
@@ -470,7 +470,7 @@ void CG_StartCamera( const char *name, qboolean startBlack, qboolean endBlack) {
 			CG_Fade(0, cg.time, 1500);
 		}
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		CG_ToggleLetterbox(qtrue, startBlack);
 #endif
 		cg.cameraEndBlack = endBlack;
@@ -500,7 +500,7 @@ static void CG_Camera_f( void ) {
 */
 #endif
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 void CG_Letterbox(void)
 {
 	qboolean onscreen, instant;
@@ -515,7 +515,7 @@ void CG_Letterbox(void)
 }
 #endif
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 float camRotDir = 0;
 qboolean camleft = qfalse;
 qboolean camright = qfalse;
@@ -633,7 +633,7 @@ static consoleCommand_t	commands[] = {
 	{ "+zoom", CG_ZoomDown_f },
 	{ "-zoom", CG_ZoomUp_f },
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	{ "camreset", CG_CamReset_f },
 	{ "+camleft", CG_CamLeftDown_f },
 	{ "-camleft", CG_CamLeftUp_f },
@@ -642,12 +642,12 @@ static consoleCommand_t	commands[] = {
 #endif
 	{ "sizeup", CG_SizeUp_f },
 	{ "sizedown", CG_SizeDown_f },
-#ifndef TMNTWEAPSYS_EX
+#ifndef TA_WEAPSYS_EX
 	{ "weapnext", CG_NextWeapon_f },
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },
 #endif
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 	{ "holdnext", CG_NextHoldable_f },
 	{ "holdprev", CG_PrevHoldable_f },
 	{ "holdable", CG_Holdable_f },
@@ -695,7 +695,7 @@ static consoleCommand_t	commands[] = {
 #else
 	//{ "camera", CG_Camera_f },
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	{ "letterbox", CG_Letterbox },
 #endif
 	{ "loaddeferred", CG_LoadDeferredPlayers }	
@@ -777,7 +777,7 @@ void CG_InitConsoleCommands( void ) {
 #else
 	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
 #endif
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	trap_AddCommand ("letterbox" );
 #endif
 }

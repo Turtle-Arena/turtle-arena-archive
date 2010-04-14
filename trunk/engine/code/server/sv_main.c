@@ -552,7 +552,7 @@ static void SVC_Status( netadr_t from ) {
 	static leakyBucket_t bucket;
 
 	// ignore if we are in single player
-#ifdef TMNTSP
+#ifdef TA_SP
 	if ( Cvar_VariableValue("ui_singlePlayerActive") )
 #else
 	if ( Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER )
@@ -617,7 +617,7 @@ void SVC_Info( netadr_t from ) {
 
 	// ignore if we are in single player
 	if (
-#ifndef TMNTSP
+#ifndef TA_SP
 	Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
 #endif
 	Cvar_VariableValue("ui_singlePlayerActive")) {

@@ -92,7 +92,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CS_BOTINFO				25
 
 #define	CS_ITEMS				27		// string of 0's and 1's that tell which items are present
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 #define	CS_NPCS					28
 #endif
 
@@ -102,7 +102,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
 #define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
 
-#ifdef TMNTMISC // Particles
+#ifdef TA_MISC // Particles
 #define CS_MAX					(CS_PARTICLES+MAX_PARTICLES_AREAS)
 #else
 #define CS_MAX					(CS_PARTICLES+MAX_LOCATIONS)
@@ -144,7 +144,7 @@ typedef enum {
 
 typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
-#ifndef TMNTPLAYERSYS // Moved below bg_playercfg_t
+#ifndef TA_PLAYERSYS // Moved below bg_playercfg_t
 /*
 ===================================================================================
 
@@ -197,7 +197,7 @@ typedef enum {
 typedef struct {
 	// state (in / out)
 	playerState_t	*ps;
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 	bg_npc_t		*npc;
 #endif
 
@@ -242,17 +242,17 @@ void Pmove (pmove_t *pmove);
 // NOTE: may not have more than 16
 typedef enum {
 	STAT_HEALTH,
-#ifndef TMNTHOLDSYS
+#ifndef TA_HOLDSYS
 	STAT_HOLDABLE_ITEM,
 #endif
 #ifdef MISSIONPACK
 	STAT_PERSISTANT_POWERUP,
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	STAT_NEW_WEAPON_HANDS, // Set in PM_BeginWeaponHandsChange
 	STAT_DEFAULTWEAPON, // default weapon
 #endif
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	STAT_AMMO, // Ammo for current weapon
 
 	STAT_PENDING_WEAPON, // Weapon to change to.
@@ -282,7 +282,7 @@ typedef enum {
 	PERS_RANK,						// player rank or team rank
 	PERS_TEAM,						// player team
 	PERS_SPAWN_COUNT,				// incremented every respawn
-#if !defined TMNTMISC || !defined NOTRATEDM || !defined TURTLEARENA // WEAPONS
+#if !defined TA_MISC || !defined NOTRATEDM || !defined TURTLEARENA // WEAPONS
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 #endif
 	PERS_ATTACKER,					// clientnum of last damage inflicter
@@ -290,7 +290,7 @@ typedef enum {
 	PERS_ATTACKEE_ARMOR,			// health/armor of last person we attacked
 #endif
 	PERS_KILLED,					// count of the number of times you died
-#ifdef TMNTSP
+#ifdef TA_SP
 	PERS_LIVES,
 	PERS_CONTINUES,
 #endif
@@ -325,7 +325,7 @@ typedef enum {
 #endif
 #define	EF_NODRAW			0x00000080		// may have an event, but no model (unspawned items)
 #define	EF_FIRING			0x00000100		// for lightning gun
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 #define	EF_KAMIKAZE			0x00000200
 #endif
 #ifdef NIGHTSMODE
@@ -344,11 +344,11 @@ typedef enum {
 #ifndef IOQ3ZTM // unused
 #define EF_AWARD_DENIED		0x00040000		// denied
 #endif
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #define	EF_PRIMARY_HAND		0x00040000		// player flag for primary hand only
 #endif
 #define EF_TEAMVOTED		0x00080000		// already cast a team vote
-#ifdef TMNTSP
+#ifdef TA_SP
 #define EF_FINISHED			0x00100000		// Finished level
 #endif
 #ifdef TURTLEARENA // LOCKON
@@ -373,7 +373,7 @@ typedef enum {
 	PW_NONE,
 #ifdef TURTLEARENA // POWERS
 	// TODO: Limited time version of PW_AMMOREGEN?
-	// pw_infinity, // Green [White in TMNT3] crystal: Unlimited Shuriken for a limited period.
+	// pw_infinity, // Green [White in TA_3] crystal: Unlimited Shuriken for a limited period.
 
 	// Limited time powerups
 
@@ -424,7 +424,7 @@ typedef enum {
 
 } powerup_t;
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 /*
 	No item in bg_itemlist can use the same HI_* tag.
 	There can be a max of 16 holdable items, see MAX_HOLDABLE.
@@ -432,34 +432,34 @@ typedef enum {
 */
 #endif
 typedef enum {
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 	// cg.holdableSelect is passed to server (game) in bg if it
 	//  is *not* HI_NO_SELECT the player's holdableIndex is set to it.
 	HI_NO_SELECT = -1, // Used by cgame to disable overriding bg change
 #endif
 	HI_NONE,
 
-#ifndef TMNTHOLDABLE // no q3 teleprter
+#ifndef TA_HOLDABLE // no q3 teleprter
 	HI_TELEPORTER,
-#elif !defined TMNTHOLDSYS
+#elif !defined TA_HOLDSYS
 	HI_TELEPORTER_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
 	HI_MEDKIT,
-#ifndef TMNTHOLDABLE // no q3 teleprter
+#ifndef TA_HOLDABLE // no q3 teleprter
 	HI_KAMIKAZE,
-#elif !defined TMNTHOLDSYS
+#elif !defined TA_HOLDSYS
 	HI_KAMIKAZE_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
-#ifndef TMNTHOLDSYS
+#ifndef TA_HOLDSYS
 	HI_PORTAL,
 #endif
 #ifndef TURTLEARENA // POWERS
 	HI_INVULNERABILITY,
-#elif !defined TMNTHOLDSYS
+#elif !defined TA_HOLDSYS
 	HI_INVULNERABILITY_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
 
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 	// Shurikens
 	HI_SHURIKEN,
 	HI_ELECTRICSHURIKEN,
@@ -472,19 +472,19 @@ typedef enum {
 	// 20090409:   and use "use item" to fire?
 #endif
 
-#ifdef TMNTHOLDSYS // ZTM: Moved "out of the way"
+#ifdef TA_HOLDSYS // ZTM: Moved "out of the way"
 	HI_PORTAL,
 #endif
 
 	HI_NUM_HOLDABLE
 } holdable_t;
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 // Hold a max of 99 of each shuriken type. (Or any other holdable).
 #define MAX_SHURIKENS 99
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 // Weapon type
 typedef enum
 {
@@ -533,7 +533,7 @@ typedef enum {
 } weapon_t;
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 #define HAND_NONE 0
 #define HAND_PRIMARY 1
 #define HAND_SECONDARY 2
@@ -782,7 +782,7 @@ typedef struct
 
 } bg_weapongroupinfo_t;
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 #define MAX_BG_PROJ 64
 #define MAX_BG_WEAPONS 64
 #define MAX_BG_WEAPON_GROUPS 32
@@ -812,12 +812,12 @@ qboolean BG_WeapUseAmmo(weapon_t w);
 qboolean BG_PlayerAttackAnim(int a);
 qboolean BG_PlayerStandAnim(int a);
 #endif
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 int BG_ItemNumForHoldableNum(holdable_t holdablenum);
 #endif
 
 // reward sounds (stored in ps->persistant[PERS_PLAYEREVENTS])
-#ifndef TMNTMISC
+#ifndef TA_MISC
 #define	PLAYEREVENT_DENIEDREWARD		0x0001
 #endif
 #ifndef TURTLEARENA // AWARDS
@@ -871,7 +871,7 @@ typedef enum {
 	EV_ITEM_PICKUP,			// normal item pickups are predictable
 	EV_GLOBAL_ITEM_PICKUP,	// powerup / team sounds are broadcast to everyone
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	EV_DROP_WEAPON,
 #else
 	EV_NOAMMO,
@@ -901,7 +901,7 @@ typedef enum {
 	EV_PLAYER_TELEPORT_IN,
 	EV_PLAYER_TELEPORT_OUT,
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	EV_PROJECTILE_BOUNCE,
 	EV_PROJECTILE_STICK,
 	EV_PROJECTILE_TRIGGER,
@@ -913,7 +913,7 @@ typedef enum {
 	EV_GLOBAL_SOUND,		// no attenuation
 	EV_GLOBAL_TEAM_SOUND,
 
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	EV_BULLET_HIT_FLESH,
 	EV_BULLET_HIT_WALL,
 #endif
@@ -922,14 +922,14 @@ typedef enum {
 	EV_MISSILE_MISS,
 	EV_MISSILE_MISS_METAL,
 	EV_RAILTRAIL,
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 	EV_SHOTGUN,
 #endif
 #ifndef IOQ3ZTM_NO_COMPAT
 	EV_BULLET,				// otherEntity is the shooter
 #endif
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	EV_WEAPON_HIT,
 	EV_WEAPON_MISS,
 	EV_WEAPON_MISS_METAL,
@@ -952,16 +952,16 @@ typedef enum {
 	EV_GIB_PLAYER,			// gib a previously living player
 #endif
 	EV_SCOREPLUM,			// score plum
-#ifdef TMNTENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE
 	EV_SPAWN_DEBRIS,
 #endif
 
 //#ifdef MISSIONPACK
-#if !defined TMNTWEAPSYS || defined NET_COMPAT
+#if !defined TA_WEAPSYS || defined NET_COMPAT
 	EV_PROXIMITY_MINE_STICK,
 	EV_PROXIMITY_MINE_TRIGGER,
 #endif
-#if !defined TMNTHOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
+#if !defined TA_HOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
 	EV_KAMIKAZE,			// kamikaze explodes
 #endif
 	EV_OBELISKEXPLODE,		// obelisk explodes
@@ -974,7 +974,7 @@ typedef enum {
 //#endif
 
 	EV_DEBUG_LINE,
-#if defined TMNTMISC || defined NET_COMPAT // DEBUG_ORIGIN
+#if defined TA_MISC || defined NET_COMPAT // DEBUG_ORIGIN
 	EV_DEBUG_ORIGIN,
 #endif
 	EV_STOPLOOPINGSOUND,
@@ -1007,13 +1007,13 @@ typedef enum {
 	GTS_REDTEAM_TOOK_LEAD,
 	GTS_BLUETEAM_TOOK_LEAD,
 	GTS_TEAMS_ARE_TIED,
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	GTS_KAMIKAZE
 #endif
 } global_team_sound_t;
 
 // animations
-#ifdef TMNTPLAYERS
+#ifdef TA_PLAYERS
 // NOTE: In animation.cfg I call some animations by other names;
 // * TORSO_ATTACK_GUN is TORSO_ATTACK
 // * TORSO_ATTACK_GUNTLET is TORSO_ATTACK2
@@ -1063,7 +1063,7 @@ typedef enum {
 	TORSO_AFFIRMATIVE,
 	TORSO_NEGATIVE,
 
-#ifdef TMNTPLAYERS // New Turtle Arena player animations
+#ifdef TA_PLAYERS // New Turtle Arena player animations
 	// Place default weapons somewhere on there person while there not used.
 	// TORSO_***DEFAULT_SECONDARY for Don should be
 	//  switching to/from two handed Bo to using one hand.
@@ -1173,7 +1173,7 @@ typedef enum {
 	MAX_TOTALANIMATIONS
 } animNumber_t;
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 // For bg/game/cgame
 animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps);
 animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps);
@@ -1183,7 +1183,7 @@ animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
 #endif
 
 
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 typedef enum
 {
 	MT_NONE,
@@ -1208,8 +1208,8 @@ typedef struct
 extern materialInfo_t materialInfo[NUM_MATERIAL_TYPES];
 #endif
 
-#ifdef TMNTENTSYS // MISC_OBJECT
-// TMNTNPCSYS: Have Misc_Objects and NPCs use the same animations
+#ifdef TA_ENTSYS // MISC_OBJECT
+// TA_NPCSYS: Have Misc_Objects and NPCs use the same animations
 // Keep in sycn with CG's misc_object_anim_names
 typedef enum
 {
@@ -1231,7 +1231,7 @@ typedef enum
 	OBJECT_LAND, // ZTM: TODO: misc_object hit ground.
 	OBJECT_PAIN, // ZTM: TODO: "Pain" animation of misc_object with no health (Dead).
 
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 	// Animations only used by NPCs
 	OBJECT_TAUNT,
 	OBJECT_ATTACK_FAR,
@@ -1280,7 +1280,7 @@ typedef struct animation_s {
 #define	ANIM_TOGGLEBIT		128
 
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-// ZTM: This was moved to BG as TMNTWEAPSYS_1 needs it in game
+// ZTM: This was moved to BG as TA_WEAPSYS_1 needs it in game
 
 // when changing animation, set animationTime to frameTime + lerping time
 // The current lerp will finish out, then it will lerp to the new animation
@@ -1327,7 +1327,7 @@ void BG_SwingAngles( float destination, float swingTolerance, float clampToleran
 extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 #endif
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 #ifdef TURTLEARENA // DEFAULT_PLAYER
 #define	DEFAULT_MODEL			"raph"
 #define	DEFAULT_TEAM_MODEL		"raph"
@@ -1391,7 +1391,7 @@ typedef struct bg_playercfg_s
 
 	// New Info for Turtle Arena, allows player models to have data that changes
 	//  what happens in game.
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
     weapon_t default_weapon;
 	int primaryHandSide;
 	int secondaryHandSide;
@@ -1415,7 +1415,7 @@ int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip);
 //qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg);
 qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, const char *headModel);
 
-#ifdef TMNTENTSYS
+#ifdef TA_ENTSYS
 typedef struct
 {
 	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
@@ -1441,7 +1441,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg);
 #endif
 #endif
 
-#ifdef TMNTPLAYERSYS // Moved below bg_playercfg_t
+#ifdef TA_PLAYERSYS // Moved below bg_playercfg_t
 /*
 ===================================================================================
 
@@ -1472,12 +1472,12 @@ typedef enum {
 	WEAPON_RAISING,
 	WEAPON_DROPPING,
 	WEAPON_FIRING
-#ifdef TMNTPLAYERSYS // WEAPONS
+#ifdef TA_PLAYERSYS // WEAPONS
 	,WEAPON_HAND_CHANGE
 #endif
 } weaponstate_t;
 
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 // ZTM: Flags for general NPC effects.
 typedef enum
 {
@@ -1564,7 +1564,7 @@ typedef struct
 #define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
 #define	PMF_TIME_WATERJUMP	256		// pm_time is waterjump
 #define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
-#ifndef TMNTHOLDABLE
+#ifndef TA_HOLDABLE
 #define	PMF_USE_ITEM_HELD	1024
 #endif
 #define PMF_GRAPPLE_PULL	2048	// pull towards grapple location
@@ -1580,10 +1580,10 @@ typedef struct
 typedef struct {
 	// state (in / out)
 	playerState_t	*ps;
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	bg_playercfg_t	*playercfg;
 #endif
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 	bg_npc_t		*npc;
 #endif
 
@@ -1669,7 +1669,7 @@ typedef enum {
 	MOD_BFG,
 	MOD_BFG_SPLASH,
 #endif
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 	MOD_SHURIKEN,
 	MOD_FIRESHURIKEN,
 	MOD_FIRESHURIKEN_EXPLOSION,
@@ -1685,7 +1685,7 @@ typedef enum {
 	MOD_SUICIDE,
 	MOD_TARGET_LASER,
 	MOD_TRIGGER_HURT,
-#ifdef TMNTENTSYS
+#ifdef TA_ENTSYS
 	MOD_EXPLOSION,
 #endif
 #ifdef MISSIONPACK
@@ -1695,7 +1695,7 @@ typedef enum {
 	MOD_PROXIMITY_MINE,
 #endif
 
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	MOD_KAMIKAZE,
 #endif
 #ifndef TURTLEARENA // POWERS
@@ -1703,7 +1703,7 @@ typedef enum {
 #endif
 #endif
 	MOD_GRAPPLE
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	,MOD_PROJECTILE,
 	MOD_WEAPON_PRIMARY,
 	MOD_WEAPON_SECONDARY,
@@ -1716,7 +1716,7 @@ extern int modNamesSize;
 
 //---------------------------------------------------------
 
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 // gitem_t->type
 typedef enum {
 	IT_BAD,
@@ -1766,7 +1766,7 @@ gitem_t	*BG_FindItem( const char *pickupName );
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon );
 gitem_t	*BG_FindItemForPowerup( powerup_t pw );
 gitem_t	*BG_FindItemForHoldable( holdable_t pw );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 int BG_ItemNumForItem( gitem_t *item );
 gitem_t	*BG_ItemForItemNum( int itemNum );
 int BG_NumItems(void);
@@ -1790,7 +1790,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #define	MASK_DEADSOLID			(CONTENTS_SOLID|CONTENTS_PLAYERCLIP)
 #define	MASK_WATER				(CONTENTS_WATER|CONTENTS_LAVA|CONTENTS_SLIME)
 #define	MASK_OPAQUE				(CONTENTS_SOLID|CONTENTS_SLIME|CONTENTS_LAVA)
-#ifdef TMNTWEAPSYS // XREAL
+#ifdef TA_WEAPSYS // XREAL
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE|CONTENTS_SHOOTABLE)
 #else
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE)
@@ -1818,10 +1818,10 @@ typedef enum {
 	ET_INVISIBLE,
 	ET_GRAPPLE,				// grapple hooked on wall
 	ET_TEAM,
-#ifdef TMNTENTSYS // MISC_OBJECT
+#ifdef TA_ENTSYS // MISC_OBJECT
 	ET_MISCOBJECT,
 #endif
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 	ET_NPC,
 #endif
 
@@ -1845,7 +1845,7 @@ void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
 
-#ifdef TMNTSP
+#ifdef TA_SP
 #define ARENAS_PER_TIER		2
 #else
 #define ARENAS_PER_TIER		4
@@ -1879,7 +1879,7 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define KAMI_BOOMSPHERE_MAXRADIUS		720
 #define KAMI_SHOCKWAVE2_MAXRADIUS		704
 
-#ifdef TMNTSP
+#ifdef TA_SP
 // Set as defaults for g_saveVersions and g_saveTypes so server can tell if can load savefile.
 // They are setup in q3_ui/ui and game
 #define BG_SAVE_VERSIONS "1" // Example: "0;1;2;3"

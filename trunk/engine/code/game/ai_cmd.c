@@ -1530,7 +1530,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 	bot_goal_t goal;
 	char netname[MAX_MESSAGE_SIZE];
 	char *nearbyitems[] = {
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 		"Shotgun",
 		"Grenade Launcher",
 		"Rocket Launcher",
@@ -1560,7 +1560,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 		"Red Flag",
 		"Blue Flag",
 #ifdef MISSIONPACK
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 		"Nailgun",
 		"Prox Launcher",
 		"Chaingun",
@@ -1594,7 +1594,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 			bestitem = i;
 		}
 	}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	// Check weapons
 	for (i = 1; i < BG_NumWeaponGroups(); i++) {
 		dist = BotNearestVisibleItem(bs, bg_weapongroupinfo[i].pickupName, &goal);

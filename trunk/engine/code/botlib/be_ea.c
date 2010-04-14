@@ -138,7 +138,7 @@ void EA_Command(int client, char *command)
 {
 	botimport.BotClientCommand(client, command);
 } //end of the function EA_Command
-#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
+#if defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT // BOTLIB
 //===========================================================================
 //
 // Parameter:			-
@@ -167,7 +167,7 @@ void EA_SelectWeapon(int client, int weapon)
 
 	bi = &botinputs[client];
 
-#ifdef TMNTWEAPSYS_EX // TMNTWEAPSYS_EX_COMPAT
+#ifdef TA_WEAPSYS_EX // TA_WEAPSYS_EX_COMPAT
 	if (!weapon)
 		bi->actionflags |= ACTION_DROP_WEAPON;
 	else
@@ -209,7 +209,7 @@ void EA_Talk(int client)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 void EA_Use(int client, int holdable)
 #else
 void EA_Use(int client)
@@ -219,7 +219,7 @@ void EA_Use(int client)
 
 	bi = &botinputs[client];
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	// ZTM: no change is -1
 	if (holdable >= 0) {
 		bi->actionflags |= ACTION_USE;

@@ -253,7 +253,7 @@ static void PlayerSettings_DrawPlayer( void *self ) {
 		viewangles[YAW]   = 180 - 30;
 		viewangles[PITCH] = 0;
 		viewangles[ROLL]  = 0;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playersettings.playerinfo.weapon), viewangles, vec3_origin, s_playersettings.playerinfo.weapon, qfalse );
 #else
 		UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
@@ -291,7 +291,7 @@ PlayerSettings_MenuKey
 */
 static sfxHandle_t PlayerSettings_MenuKey( int key ) {
 	if(
-#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		key == K_MOUSE2 ||
 #endif
 		key == K_ESCAPE ) {
@@ -333,7 +333,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 	viewangles[ROLL]  = 0;
 
 	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, UI_Cvar_VariableString( "model" ) );
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playersettings.playerinfo.weapon), viewangles, vec3_origin, s_playersettings.playerinfo.weapon, qfalse );
 #else
 	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );

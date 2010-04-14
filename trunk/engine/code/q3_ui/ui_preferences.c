@@ -60,7 +60,7 @@ GAME OPTIONS MENU
 #endif
 #endif
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 #define	NUM_CROSSHAIRS			4
 #else
 #define	NUM_CROSSHAIRS			10
@@ -143,7 +143,7 @@ static void Preferences_Event( void* ptr, int notification ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_CROSSHAIR:
-#ifndef TMNTMISC // MENU: Support right mouse button = prev crosshair
+#ifndef TA_MISC // MENU: Support right mouse button = prev crosshair
 		s_preferences.crosshair.curvalue++;
 		if( s_preferences.crosshair.curvalue == NUM_CROSSHAIRS ) {
 			s_preferences.crosshair.curvalue = 0;
@@ -303,7 +303,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.framer.height  	   = 334;
 
 	y = 144;
-#ifdef TMNTMISC // MENU: Support right mouse button = prev crosshair
+#ifdef TA_MISC // MENU: Support right mouse button = prev crosshair
 	s_preferences.crosshair.generic.type		= MTYPE_SPINCONTROL;
 #else
 	s_preferences.crosshair.generic.type		= MTYPE_TEXT;
@@ -319,7 +319,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.crosshair.generic.bottom		= y + 20;
 	s_preferences.crosshair.generic.left		= PREFERENCES_X_POS - ( ( strlen(s_preferences.crosshair.generic.name) + 1 ) * SMALLCHAR_WIDTH );
 	s_preferences.crosshair.generic.right		= PREFERENCES_X_POS + 48;
-#ifdef TMNTMISC // MENU: Support right mouse button = prev crosshair
+#ifdef TA_MISC // MENU: Support right mouse button = prev crosshair
 	s_preferences.crosshair.numitems = NUM_CROSSHAIRS;
 #endif
 

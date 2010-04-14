@@ -37,7 +37,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CONTENTS_NOTTEAM2		0x0100
 #define CONTENTS_NOBOTCLIP		0x0200
 
-#ifdef TMNTWEAPSYS // XREAL
+#ifdef TA_WEAPSYS // XREAL
 // ZTM: Used for shootable projectiles.
 #define CONTENTS_SHOOTABLE		0x0400	// Tr3B: used for game entities that can be destroyed like railgun spheres
 #endif
@@ -84,7 +84,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	SURF_NODLIGHT			0x20000	// don't dlight even if solid (solid lava, skies)
 #define SURF_DUST				0x40000 // leave a dust trail when walking on this surface
 
-#ifdef TMNTMISC // MATERIALS
+#ifdef TA_MISC // MATERIALS
 // MT_DIRT
 #define SURF_DIRT				0x80000
 #define SURF_GRASS				0x100000

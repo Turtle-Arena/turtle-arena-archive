@@ -587,7 +587,7 @@ static int CG_CalcFov( void ) {
 
 	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		// if in intermission, use a fixed value
-#ifdef TMNTMISC // FOV
+#ifdef TA_MISC // FOV
 		fov_x = 70;
 #else
 		fov_x = 90;
@@ -596,7 +596,7 @@ static int CG_CalcFov( void ) {
 		// user selectable
 		if ( cgs.dmflags & DF_FIXED_FOV ) {
 			// dmflag to prevent wide fov for all clients
-#ifdef TMNTMISC // FOV
+#ifdef TA_MISC // FOV
 			fov_x = 70;
 #else
 			fov_x = 90;
@@ -772,7 +772,7 @@ static int CG_CalcViewValues( void ) {
 				CG_Fade(0, cg.time + 200, 1500);	// then fadeup
 			}
 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 			CG_ToggleLetterbox(qfalse, cg.cameraEndBlack);
 #endif
 		}
@@ -793,7 +793,7 @@ static int CG_CalcViewValues( void ) {
 	}
 */
 #endif
-#ifdef TMNTCAMERA
+#ifdef TA_CAMERA
 	// If not a Q3 camera use new camera code.
 	if (ps->camera.mode != CAM_FIRSTPERSON && ps->camera.mode != CAM_Q3THIRDPERSON)
 	{
@@ -811,7 +811,7 @@ static int CG_CalcViewValues( void ) {
 #endif
 	// intermission view
 	if ( ps->pm_type == PM_INTERMISSION
-#ifdef TMNTSP
+#ifdef TA_SP
 		&& cgs.gametype != GT_SINGLE_PLAYER
 #endif
 	) {
@@ -836,7 +836,7 @@ static int CG_CalcViewValues( void ) {
 			cg_thirdPersonAngle.value += cg_cameraOrbit.value;
 		}
 	}
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	else
 	{
 		extern void CG_CamUpdate(void);
@@ -988,12 +988,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #else
 	mouseSensitivity = cg.zoomSensitivity;
 #endif
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 	weaponSelect = 0;
 #else
 	weaponSelect = cg.weaponSelect;
 #endif
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.holdableSelect );
 #else
 	trap_SetUserCmdValue( weaponSelect, mouseSensitivity );
@@ -1010,7 +1010,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	{
 		cg.lockedOn = qtrue;
 		cg.lockonTime = cg.time;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		CG_ToggleLetterbox(qtrue, qfalse);
 #endif
 	}
@@ -1018,7 +1018,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	{
 		cg.lockedOn = qfalse;
 		cg.lockonTime = cg.time;
-#ifdef TMNTMISC
+#ifdef TA_MISC
 		CG_ToggleLetterbox(qfalse, qfalse);
 #endif
 	}

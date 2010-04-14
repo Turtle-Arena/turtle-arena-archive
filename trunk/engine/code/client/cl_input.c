@@ -615,10 +615,10 @@ void CL_FinishMove( usercmd_t *cmd ) {
 	int		i;
 
 	// copy the state that the cgame is currently sending
-#if !defined TMNTWEAPSYS_EX || defined TMNTWEAPSYS_EX_COMPAT
+#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
 	cmd->weapon = cl.cgameUserCmdValue;
 #endif
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 	cmd->holdable = cl.cgameHoldableValue;
 #endif
 

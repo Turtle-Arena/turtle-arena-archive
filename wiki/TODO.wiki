@@ -12,7 +12,7 @@ Weapons (and attacking)
 
   * TODO: Add code so that Nunchuk can spin when standing? When not spining have gravity, like MISSIONPACK held CTF flag?
 
-  * STARTED ( TMNTWEAPSYS ): TODO: Support Quake III: Team Arena weapon features via weapon scripting
+  * STARTED ( TA_WEAPSYS ): TODO: Support Quake III: Team Arena weapon features via weapon scripting
 
   * TODO: Spawn Ammo items from weaponinfo.txt
     * If I make it so weapon/ammo items are in text files, should I have all items in iteminfo.txt (and `*`.item) too?...
@@ -96,8 +96,6 @@ Weapons (and attacking)
 
   * TODO: Allow func_breakable and misc_object to be pushable.
 
-  * TODO: Rename TMNT`*` defines to TA`*`?
-
   * TODO: Have bots not attack players with PW_FLASHING
 
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
@@ -107,7 +105,7 @@ Weapons (and attacking)
     * (NiGHTS: Journey of Dreams) Move camera if holding 'z' and move analog stick, can't look around while moving
     * BETTER(not done?): When moving the camera around the player, focus on the player. (Like in NiGHTS: Journey of Dreams)
 
-  * TODO: STARTED(TMNT // LOCKON): When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
+  * TODO: STARTED(TURTLEARENA // LOCKON): When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
   * BUG: When higher then target to focus on it gets all messed up.
 
   * TODO: Merge Quake3 and Team Arena bot chat systems; One chat system to rule them all!
@@ -135,11 +133,11 @@ Most of the mapobjects should be damageable.
     * street-signs (one-way, 3rd street, Stop, Yield, people crossing, speed limit)
 
 == Testing! ==
-  * DONE(untested)?: Melee combo system, with different animations for each attack? (TMNTWEAPSYS)
+  * DONE(untested)?: Melee combo system, with different animations for each attack? (TA_WEAPSYS)
 
   * TODO: Test/use the "noise" and "random" waveforms that I copied from IOSTVEF
 
-  * TODO: Check if "TMNTWEAPSYS // BOT_ITEM_INFOS" breaks compatibility with q3 mods.
+  * TODO: Check if "TA_WEAPSYS // BOT_ITEM_INFOS" breaks compatibility with q3 mods.
 
 == Don't do? (Dead Ideas?) ==
   * TODO: Feet tags, for attack checking? And/or for attaching hoverboard to player?
@@ -166,12 +164,12 @@ Most of the mapobjects should be damageable.
     * Using a special model for collision we could use group names to set what part of player is hit,
     * so shell takes less damage, banndana takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
 
-  * TODO: Backport TMNTWEAPSYS_EX's weapon dropping to TMNTWEAPSYS?
+  * TODO: Backport TA_WEAPSYS_EX's weapon dropping to TA_WEAPSYS?
 
   * TODO: Have shurikens do damage while they are in the wall/ground?
 
 == Done? ==
-  * DONE?: TMNTWEAPSYS weapon_random entity that spawns a random weapon each time the weapon respawns
+  * DONE?: TA_WEAPSYS weapon_random entity that spawns a random weapon each time the weapon respawns
     * Only spawn weapons with a classname, have flags for melee and gun weapon spawning.
   * TODO: ...also allow list of weapons in message field?
 

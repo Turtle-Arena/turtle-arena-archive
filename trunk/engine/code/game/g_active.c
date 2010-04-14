@@ -361,7 +361,7 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 		// set up for pmove
 		memset (&pm, 0, sizeof(pm));
 		pm.ps = &client->ps;
-#ifdef TMNTPLAYERSYS // Pmove
+#ifdef TA_PLAYERSYS // Pmove
 		pm.playercfg = &client->pers.playercfg;
 #endif
 		pm.cmd = *ucmd;
@@ -448,7 +448,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 	client = ent->client;
 	client->timeResidual += msec;
 
-#ifdef TMNTWEAPSYS // MELEEATTACK
+#ifdef TA_WEAPSYS // MELEEATTACK
 	if (client->ps.meleeLinkTime > 0)
 	{
 		client->ps.meleeLinkTime -= msec;
@@ -524,7 +524,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #ifndef TURTLEARENA // POWERS // Guards having health regen makes them pretty much unkillable, and removed regen powerup.
 		// regenerate
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -585,20 +585,20 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #endif
 	}
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
 #else
 	if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )
 #endif
 	{
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		int w, max, inc, t;
 
 		// Ony gives ammo for current weapon
 		w = client->ps.weapon;
 #else
 		int w, max, inc, t, i;
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 		int weapList[MAX_BG_WEAPON_GROUPS];
 		int weapCount = 0;
 		max = BG_NumWeaponGroups();
@@ -618,7 +618,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			w = weapList[i];
 #endif
 
-#ifdef TMNTWEAPSYS // ZTM: FIXME: Make ammo regen non-hardcoded. (AND make sense...)
+#ifdef TA_WEAPSYS // ZTM: FIXME: Make ammo regen non-hardcoded. (AND make sense...)
 			// NOTE: max is wrong for WP_BFG: max should be 10 instead of 20
 			//                        WP_MACHINEGUN: max should be 50 instead of 40
 			//       inc is wrong for WP_MACHINEGUN: inc should be 4 instead of 5
@@ -698,7 +698,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				default: max = 0; inc = 0; t = 1000; break;
 			}
 #endif
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 			if (max > 0)
 			{
 				client->ammoTimes[w] += msec;
@@ -715,7 +715,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				}
 			}
 #else
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			if (max > 0)
 			{
 #endif
@@ -731,12 +731,12 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 						client->ps.ammo[w] = max;
 					}
 				}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 			}
 #endif
     }
 #endif
-#ifdef TMNTHOLDABLE // REGEN_SHURIKENS
+#ifdef TA_HOLDABLE // REGEN_SHURIKENS
 		// Team Arena Ammo Regen for Shurikens
 		{
 			int h, /*max, inc, t,*/ i;
@@ -791,7 +791,7 @@ void ClientIntermissionThink( gclient_t *client ) {
 	// swap and latch button actions
 	client->oldbuttons = client->buttons;
 	client->buttons = client->pers.cmd.buttons;
-#ifdef TMNTSP
+#ifdef TA_SP
 	if (g_gametype.integer == GT_SINGLE_PLAYER)
 	{
 		client->readyToExit = 1;
@@ -814,7 +814,7 @@ but any server game effects are handled here
 ================
 */
 void ClientEvents( gentity_t *ent, int oldEventSequence ) {
-#ifdef TMNTHOLDABLE // no q3 teleporter
+#ifdef TA_HOLDABLE // no q3 teleporter
 	int		i;
 #else
 	int		i, j;
@@ -823,13 +823,13 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 	gclient_t *client;
 	int		damage;
 	vec3_t	dir;
-#ifndef TMNTHOLDABLE // no q3 teleporter
+#ifndef TA_HOLDABLE // no q3 teleporter
 	vec3_t	origin, angles;
 #endif
 //	qboolean	fired;
 	gitem_t *item;
 	gentity_t *drop;
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	int itemNum;
 #endif
 
@@ -860,7 +860,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			G_Damage (ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
 			break;
 
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 		case EV_DROP_WEAPON:
 			if (ent->client)
 			{
@@ -916,7 +916,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			FireWeapon( ent );
 			break;
 
-#ifdef TMNTHOLDSYS // HI_* is not hooked to EV_USE_ITEM in game now.
+#ifdef TA_HOLDSYS // HI_* is not hooked to EV_USE_ITEM in game now.
 		case EV_USE_ITEM0:
 		case EV_USE_ITEM1:
 		case EV_USE_ITEM2:
@@ -937,14 +937,14 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			itemNum = event-EV_USE_ITEM0;
 			switch (itemNum)
 			{
-#endif // TMNTHOLDSYS
+#endif // TA_HOLDSYS
 
-#ifndef TMNTHOLDABLE // no q3 teleprter
-#ifdef TMNTHOLDSYS
+#ifndef TA_HOLDABLE // no q3 teleprter
+#ifdef TA_HOLDSYS
 				case HI_TELEPORTER:
 #else
 		case EV_USE_ITEM1:		// teleporter
-#endif // TMNTHOLDSYS
+#endif // TA_HOLDSYS
 			// drop flags in CTF
 			item = NULL;
 			j = 0;
@@ -993,16 +993,16 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				}
 			}
 #endif
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 			SelectSpawnPoint( ent, origin, angles, qfalse );
 #else
 			SelectSpawnPoint( ent->client->ps.origin, origin, angles, qfalse );
 #endif
 			TeleportPlayer( ent, origin, angles );
 			break;
-#endif // !TMNTHOLDABLE
+#endif // !TA_HOLDABLE
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 				case HI_MEDKIT:
 #else
 		case EV_USE_ITEM2:		// medkit
@@ -1012,8 +1012,8 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			break;
 
 #ifdef MISSIONPACK
-#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
-#ifdef TMNTHOLDSYS
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifdef TA_HOLDSYS
 				case HI_KAMIKAZE:
 #else
 		case EV_USE_ITEM3:		// kamikaze
@@ -1027,7 +1027,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			break;
 #endif
 
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 				case HI_PORTAL:
 #else
 		case EV_USE_ITEM4:		// portal
@@ -1041,7 +1041,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			break;
 
 #ifndef TURTLEARENA // POWERS
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 				case HI_INVULNERABILITY:
 #else
 		case EV_USE_ITEM5:		// invulnerability
@@ -1052,8 +1052,8 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 #endif // MISSIONPACK
 
-#ifdef TMNTHOLDSYS
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDSYS
+#ifdef TA_HOLDABLE
 				case HI_SHURIKEN:
 				case HI_ELECTRICSHURIKEN:
 				case HI_FIRESHURIKEN:
@@ -1176,7 +1176,7 @@ void SendPendingPredictableEvents( playerState_t *ps ) {
 
 
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 // Switch to onhanded if by a CTF flag that can be picked up,
 //    so that its like the "player" is planning on picking up the flag.
 static qboolean G_ByEnemyFlag(int team, vec3_t origin)
@@ -1216,11 +1216,11 @@ static qboolean G_ByEnemyFlag(int team, vec3_t origin)
 }
 #endif
 
-#ifdef TMNTSP
+#ifdef TA_SP
 void ExitLevel( void );
 #endif
 
-#ifdef TMNTENTSYS // FUNC_USE
+#ifdef TA_ENTSYS // FUNC_USE
 /*
 ==============
 G_UseEntity
@@ -1372,14 +1372,14 @@ void ClientThink_real( gentity_t *ent ) {
 	client->ps.gravity = g_gravity.value;
 
 	// set speed
-#ifdef TMNTPLAYERSYS // PER_PLAYER_SPEED
+#ifdef TA_PLAYERSYS // PER_PLAYER_SPEED
 	client->ps.speed = client->pers.playercfg.max_speed * (g_speed.value / 320);
 #else
 	client->ps.speed = g_speed.value;
 #endif
 
 #ifdef MISSIONPACK
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -1395,7 +1395,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// Let go of the hook if we aren't firing
 	if (
-#ifdef TMNTWEAPSYS // ZTM: FIXME: This doesn't allow shurikens to be grappling.
+#ifdef TA_WEAPSYS // ZTM: FIXME: This doesn't allow shurikens to be grappling.
 		bg_weapongroupinfo[client->ps.weapon].weapon[0]->proj->grappling
 #else
 		client->ps.weapon == WP_GRAPPLING_HOOK
@@ -1473,7 +1473,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	memset (&pm, 0, sizeof(pm));
 
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	// Switch to single handed when close to CTF flag
 	//    ZTM: TODO: Single handed when by weapons too?
 	// ZTM: TODO: Don't allow CTF flag to be picked up while melee attacking?
@@ -1508,7 +1508,7 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 #endif
 
-#ifdef TMNTWEAPSYS // MELEEATTACK
+#ifdef TA_WEAPSYS // MELEEATTACK
 	if (client->ps.pm_type != PM_DEAD)
 	{
 		if (BG_WeaponHasType(client->ps.weapon, WT_GAUNTLET))
@@ -1550,9 +1550,9 @@ void ClientThink_real( gentity_t *ent ) {
 		ent->client->pers.cmd.buttons |= BUTTON_GESTURE;
 	}
 
-#ifdef TMNTENTSYS // FUNC_USE
+#ifdef TA_ENTSYS // FUNC_USE
 	if ((ucmd->buttons & BUTTON_USE_HOLDABLE) &&
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 		ent->client->ps.holdableTime <= 0
 #else
 		! ( ent->client->ps.pm_flags & PMF_USE_ITEM_HELD )
@@ -1561,7 +1561,7 @@ void ClientThink_real( gentity_t *ent ) {
 	{
 		if (G_UseEntity(ent))
 		{
-#ifdef TMNTHOLDABLE
+#ifdef TA_HOLDABLE
 			ent->client->ps.holdableTime = 500;
 #else
 			ent->client->ps.pm_flags |= PMF_USE_ITEM_HELD;
@@ -1600,7 +1600,7 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 
 	pm.ps = &client->ps;
-#ifdef TMNTPLAYERSYS // PMove
+#ifdef TA_PLAYERSYS // PMove
 	pm.playercfg = &client->pers.playercfg;
 #endif
 	pm.cmd = *ucmd;
@@ -1625,7 +1625,7 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.pmove_fixed = pmove_fixed.integer | client->pers.pmoveFixed;
 	pm.pmove_msec = pmove_msec.integer;
 
-#if 0 // #ifdef TMNTMISC // TEST: push players
+#if 0 // #ifdef TA_MISC // TEST: push players
 	if ( !client->noclip )
 	{
 		// XXX
@@ -1731,13 +1731,13 @@ void ClientThink_real( gentity_t *ent ) {
 	client->buttons = ucmd->buttons;
 	client->latched_buttons |= client->buttons & ~client->oldbuttons;
 
-#ifdef TMNTCAMERA
+#ifdef TA_CAMERA
 	G_ClientCameraThink(client);
 #endif
 
 	// check for respawning
 	if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
-#ifdef TMNTSP // ZTM: Single player death think
+#ifdef TA_SP // ZTM: Single player death think
 		// wait for the attack button to be pressed
 		if (g_gametype.integer == GT_SINGLE_PLAYER)
 		{
@@ -1891,7 +1891,7 @@ void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t hea
 	torsoAngles[PITCH] = ent->client->pers.torso.pitchAngle;
 
 	//
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	if ( ent->client->pers.playercfg.fixedtorso )
 #else
 	if ( qfalse )
@@ -1921,7 +1921,7 @@ void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t hea
 	}
 
 	//
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	if ( ent->client->pers.playercfg.fixedlegs )
 #else
 	if ( qfalse )
@@ -1954,19 +1954,19 @@ void G_PlayerAnimation( gentity_t *ent )
 		legsAnim = ent->client->ps.legsAnim;
 
 	BG_RunLerpFrame( &ent->client->pers.legs,
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 		ent->client->pers.playercfg.animations,
 #else
-#error "ERROR: TMNTPLAYERSYS needs to be defined."
+#error "ERROR: TA_PLAYERSYS needs to be defined."
 		NULL, // ZTM: This must be valid!
 #endif
 		legsAnim, level.time, ent->client->ps.powerups[PW_HASTE] ? 1.5f : 1.0f );
 
 	BG_RunLerpFrame( &ent->client->pers.torso,
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 		ent->client->pers.playercfg.animations,
 #else
-#error "ERROR: TMNTPLAYERSYS needs to be defined."
+#error "ERROR: TA_PLAYERSYS needs to be defined."
 		NULL, // ZTM: This must be valid!
 #endif
 		ent->client->ps.torsoAnim, level.time, ent->client->ps.powerups[PW_HASTE] ? 1.5f : 1.0f );
@@ -2120,7 +2120,7 @@ void ClientEndFrame( gentity_t *ent ) {
 
 #ifdef MISSIONPACK
 	// set powerup for player animation
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -2128,7 +2128,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_GUARD] = level.time;
 	}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -2136,7 +2136,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_SCOUT] = level.time;
 	}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_DOUBLER )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_DOUBLER )
@@ -2144,7 +2144,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_DOUBLER] = level.time;
 	}
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )

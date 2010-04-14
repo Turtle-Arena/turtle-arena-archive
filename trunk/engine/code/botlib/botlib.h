@@ -30,27 +30,27 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 // ZTM: Botlib is not compatible with (io)quake3 (or anyone else)
-#if defined TMNTWEAPSYS || defined TMNTWEAPSYS_NOCOMPAT || (defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT) || defined TMNTHOLDSYS
+#if defined TA_WEAPSYS || defined TA_WEAPSYS_NOCOMPAT || (defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT) || defined TA_HOLDSYS
 	
-	#ifdef TMNTWEAPSYS // & 4
+	#ifdef TA_WEAPSYS // & 4
 		#define BOTLIB_API_BIT4 4
 	#else
 		#define BOTLIB_API_BIT4 0
 	#endif
 
-	#ifdef TMNTWEAPSYS_NOCOMPAT // & 32
+	#ifdef TA_WEAPSYS_NOCOMPAT // & 32
 		#define BOTLIB_API_BIT32 32
 	#else
 		#define BOTLIB_API_BIT32 0
 	#endif
 
-	#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // & 8
+	#if defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT // & 8
 		#define BOTLIB_API_BIT8 8
 	#else
 		#define BOTLIB_API_BIT8 0
 	#endif
 
-	#ifdef TMNTHOLDSYS // & 16
+	#ifdef TA_HOLDSYS // & 16
 		#define BOTLIB_API_BIT16 16
 	#else
 		#define BOTLIB_API_BIT16 0
@@ -130,7 +130,7 @@ struct weaponinfo_s;
 #define ACTION_GUARDBASE		0x1000000
 #define ACTION_PATROL			0x2000000
 #define ACTION_FOLLOWME			0x8000000
-#ifdef TMNTWEAPSYS_EX // BOTLIB
+#ifdef TA_WEAPSYS_EX // BOTLIB
 #define ACTION_DROP_WEAPON		0x10000000
 #endif
 
@@ -142,10 +142,10 @@ typedef struct bot_input_s
 	float speed;			//speed in the range [0, 400]
 	vec3_t viewangles;		//the view angles
 	int actionflags;		//one of the ACTION_? flags
-#if !defined TMNTWEAPSYS_EX || defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
+#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT // BOTLIB
 	int weapon;				//weapon to use
 #endif
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	int holdable;			//holdable to use
 #endif
 } bot_input_t;
@@ -203,7 +203,7 @@ typedef struct bot_entitystate_s
 	int		torsoAnim;		// mask off ANIM_TOGGLEBIT
 } bot_entitystate_t;
 
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 //game can send extra items not in "botfiles/items.c"
 //note: the items can be any type, not just weapons.
 typedef struct
@@ -328,7 +328,7 @@ typedef struct ea_export_s
 	void	(*EA_Gesture)(int client);
 	void	(*EA_Talk)(int client);
 	void	(*EA_Attack)(int client);
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	void	(*EA_Use)(int client, int holdable);
 #else
 	void	(*EA_Use)(int client);
@@ -342,7 +342,7 @@ typedef struct ea_export_s
 	void	(*EA_MoveRight)(int client);
 	void	(*EA_Crouch)(int client);
 
-#if defined TMNTWEAPSYS_EX && !defined TMNTWEAPSYS_EX_COMPAT // BOTLIB
+#if defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT // BOTLIB
 	void	(*EA_DropWeapon)(int client);
 #else
 	void	(*EA_SelectWeapon)(int client, int weapon);
@@ -416,7 +416,7 @@ typedef struct ai_export_s
 	int		(*BotGetMapLocationGoal)(char *name, struct bot_goal_s *goal);
 	float	(*BotAvoidGoalTime)(int goalstate, int number);
 	void	(*BotSetAvoidGoalTime)(int goalstate, int number, float avoidtime);
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 	void	(*BotInitLevelItems)(bot_shareditem_t *itemInfos);
 #else
 	void	(*BotInitLevelItems)(void);
@@ -444,7 +444,7 @@ typedef struct ai_export_s
 	void	(*BotFreeMoveState)(int handle);
 	void	(*BotInitMoveState)(int handle, struct bot_initmove_s *initmove);
 	void	(*BotAddAvoidSpot)(int movestate, vec3_t origin, float radius, int type);
-#ifndef TMNTWEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 	//-----------------------------------
 	// be_ai_weap.h
 	//-----------------------------------
@@ -489,7 +489,7 @@ typedef struct botlib_export_s
 	//start a frame in the bot library
 	int (*BotLibStartFrame)(float time);
 	//load a new map in the bot library
-#ifdef TMNTWEAPSYS // BOT_ITEM_INFOS
+#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 	int (*BotLibLoadMap)(const char *mapname, bot_shareditem_t *itemInfos);
 #else
 	int (*BotLibLoadMap)(const char *mapname);
@@ -565,7 +565,7 @@ name:						default:			module(s):			description:
 "ai_gametype"				"0"					be_ai_goal.c		game type
 "droppedweight"				"1000"				be_ai_goal.c		additional dropped item weight
 "weapindex_rocketlauncher"	"5"					be_ai_move.c		rl weapon index for rocket jumping
-#ifndef TMNTWEAPSYS
+#ifndef TA_WEAPSYS
 "weapindex_bfg10k"			"9"					be_ai_move.c		bfg weapon index for bfg jumping
 #endif
 "weapindex_grapple"			"10"				be_ai_move.c		grapple weapon index for grappling
@@ -574,7 +574,7 @@ name:						default:			module(s):			description:
 "cmd_grappleon"				"grappleon"			be_ai_move.c		command to activate off hand grapple
 "cmd_grappleoff"			"grappleoff"		be_ai_move.c		command to deactivate off hand grapple
 "itemconfig"				"items.c"			be_ai_goal.c		item configuration file
-#ifndef TMNTWEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 "weaponconfig"				"weapons.c"			be_ai_weap.c		weapon configuration file
 #endif
 "synfile"					"syn.c"				be_ai_chat.c		file with synonyms
@@ -582,7 +582,7 @@ name:						default:			module(s):			description:
 "matchfile"					"match.c"			be_ai_chat.c		file with match strings
 "nochat"					"0"					be_ai_chat.c		disable chats
 "max_messages"				"1024"				be_ai_chat.c		console message heap size
-#ifndef TMNTWEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 "max_weaponinfo"			"32"				be_ai_weap.c		maximum number of weapon info
 "max_projectileinfo"		"32"				be_ai_weap.c		maximum number of projectile info
 #endif

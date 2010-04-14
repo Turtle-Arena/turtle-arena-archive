@@ -174,14 +174,14 @@ OnSameTeam
 */
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 )
 {
-#ifdef TMNTSP
+#ifdef TA_SP
 	// Co-op player are on the same "team"
 	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
 		int team1, team2;
 
 		if ( ent1->client)
 			team1 = ent1->client->sess.sessionTeam;
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 			else if (ent1->s.eType == ET_NPC)
 			{
 				if (ent1->bgNPC.info->flags & NPCF_ALLY) {
@@ -196,7 +196,7 @@ qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 )
 
 		if ( ent2->client)
 			team2 = ent2->client->sess.sessionTeam;
-#ifdef TMNTNPCSYS
+#ifdef TA_NPCSYS
 			else if (ent2->s.eType == ET_NPC) {
 				if (ent2->bgNPC.info->flags & NPCF_ALLY) {
 					team2 = TEAM_FREE;
@@ -364,7 +364,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->pers.teamState.lastfraggedcarrier = level.time;
 		AddScore(attacker, targ->r.currentOrigin, CTF_FRAG_CARRIER_BONUS);
 		attacker->client->pers.teamState.fragcarrier++;
-#ifdef TMNTMISC // frag to KO
+#ifdef TA_MISC // frag to KO
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " knocked out %s's flag carrier!\n",
 #else
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " fragged %s's flag carrier!\n",
@@ -386,7 +386,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->pers.teamState.lastfraggedcarrier = level.time;
 		AddScore(attacker, targ->r.currentOrigin, CTF_FRAG_CARRIER_BONUS * tokens * tokens);
 		attacker->client->pers.teamState.fragcarrier++;
-#ifdef TMNTMISC // frag to KO
+#ifdef TA_MISC // frag to KO
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " knocked out %s's skull carrier!\n",
 #else
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " fragged %s's skull carrier!\n",
@@ -1073,7 +1073,7 @@ go to a random point that doesn't telefrag
 */
 #define	MAX_TEAM_SPAWN_POINTS	32
 gentity_t *SelectRandomTeamSpawnPoint(
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	gentity_t *ent,
 #endif
 	int teamstate, team_t team )
@@ -1105,7 +1105,7 @@ gentity_t *SelectRandomTeamSpawnPoint(
 
 	while ((spot = G_Find (spot, FOFS(classname), classname)) != NULL) {
 		if ( SpotWouldTelefrag( spot
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 			, ent
 #endif
 		) ) {
@@ -1131,7 +1131,7 @@ SelectCTFSpawnPoint
 
 ============
 */
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 gentity_t *SelectCTFSpawnPoint ( gentity_t *ent, team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot )
 #else
 gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot )
@@ -1139,14 +1139,14 @@ gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3
 {
 	gentity_t	*spot;
 
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 	spot = SelectRandomTeamSpawnPoint ( ent, teamstate, team );
 #else
 	spot = SelectRandomTeamSpawnPoint ( teamstate, team );
 #endif
 
 	if (!spot) {
-#ifdef TMNTPLAYERSYS
+#ifdef TA_PLAYERSYS
 		return SelectSpawnPoint( ent, origin, angles, isbot );
 #else
 		return SelectSpawnPoint( vec3_origin, origin, angles, isbot );
@@ -1435,7 +1435,7 @@ static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 }
 #endif // #ifdef MISSIONPACK_HARVESTER
 
-#if !defined TURTLEARENA && !defined TMNTWEAPSYS // LOCKON
+#if !defined TURTLEARENA && !defined TA_WEAPSYS // LOCKON
 static
 #endif
 void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage ) {

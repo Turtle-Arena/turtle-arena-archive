@@ -55,7 +55,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define GAMENAME_FOR_MASTER		"Quake3Arena"
 #endif
 
-#ifdef TMNTSP
+#ifdef TA_SP
   // Its really "fs_game\\saves", so each mod has its own saves dir.
   #define SAVEGAMEDIR "saves"
 #endif
@@ -636,7 +636,7 @@ void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
 float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
-#ifdef TMNTWEAPSYS // XREAL
+#ifdef TA_WEAPSYS // XREAL
 float AngleBetweenVectors(const vec3_t a, const vec3_t b);
 #endif
 
@@ -1001,7 +1001,7 @@ typedef enum {
 //
 #define	MAX_CLIENTS			64		// absolute limit
 #define MAX_LOCATIONS		64
-#ifdef TMNTMISC // Particles
+#ifdef TA_MISC // Particles
 #define MAX_PARTICLES_AREAS 64
 #endif
 
@@ -1044,12 +1044,12 @@ typedef struct {
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16 // PW_* are still limited by bit fields.
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 #define	MAX_WEAPONS				32
 #else
-#define	MAX_WEAPONS				16 // If not TMNTWEAPSYS_EX limited to 16
+#define	MAX_WEAPONS				16 // If not TA_WEAPSYS_EX limited to 16
 #endif
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 #define	MAX_HOLDABLE			16
 #endif
 #else
@@ -1058,7 +1058,7 @@ typedef struct {
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16
 #define	MAX_WEAPONS				16		
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 #define	MAX_HOLDABLE			16
 #endif
 #endif
@@ -1067,7 +1067,7 @@ typedef struct {
 
 #define PS_PMOVEFRAMECOUNTBITS	6
 
-#ifdef TMNTCAMERA
+#ifdef TA_CAMERA
 typedef enum
 {
 	CAM_FIRSTPERSON, ///< Q3 default
@@ -1148,14 +1148,14 @@ typedef struct playerState_s {
 	int			clientNum;		// ranges from 0 to MAX_CLIENTS-1
 	int			weapon;			// copied to entityState_t->weapon
 	int			weaponstate;
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	int			holdableIndex; // Index of holdable items, for shurikens.
 #endif
-#if defined TMNTHOLDABLE || defined NET_COMPAT
+#if defined TA_HOLDABLE || defined NET_COMPAT
 	int			holdableTime;  // Like weaponTime, but for shurikens.
 #endif
 
-#ifdef TMNTCAMERA
+#ifdef TA_CAMERA
 	camera_t	camera;
 #else
 	vec3_t		viewangles;		// for fixed views
@@ -1171,10 +1171,10 @@ typedef struct playerState_s {
 	int			stats[MAX_STATS];
 	int			persistant[MAX_PERSISTANT];	// stats that aren't cleared on death
 	int			powerups[MAX_POWERUPS];	// level.time that the powerup runs out
-#if !defined TMNTWEAPSYS_EX || defined TMNTWEAPSYS_EX_COMPAT
+#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
 	int			ammo[MAX_WEAPONS];
 #endif
-#ifdef TMNTHOLDSYS
+#ifdef TA_HOLDSYS
 	int			holdable[MAX_HOLDABLE];
 #endif
 
@@ -1188,7 +1188,7 @@ typedef struct playerState_s {
 	vec3_t		enemyOrigin;
 #endif
 
-#ifdef TMNTWEAPSYS // MELEEATTACK
+#ifdef TA_WEAPSYS // MELEEATTACK
 	//
 	// Melee weapons
 	//
@@ -1242,10 +1242,10 @@ typedef struct playerState_s {
 
 #define	BUTTON_ANY			2048			// any key whatsoever
 
-#ifdef TMNTHOLDSYS // NEXTHOLDABLE
+#ifdef TA_HOLDSYS // NEXTHOLDABLE
 #define	BUTTON_NEXT_HOLDABLE			4096
 #endif
-#ifdef TMNTWEAPSYS_EX
+#ifdef TA_WEAPSYS_EX
 #define BUTTON_DROP_WEAPON			8192
 #endif
 
@@ -1257,10 +1257,10 @@ typedef struct usercmd_s {
 	int				serverTime;
 	int				angles[3];
 	int 			buttons;
-#if !defined TMNTWEAPSYS_EX || defined TMNTWEAPSYS_EX_COMPAT
+#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
 	byte			weapon;           // weapon 
 #endif
-#ifdef TMNTHOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 	byte			holdable;         // holdable
 #endif
 	signed char	forwardmove, rightmove, upmove;
@@ -1335,7 +1335,7 @@ typedef struct entityState_s {
 	int		weapon;			// determines weapon and flash model, etc
 	int		legsAnim;		// mask off ANIM_TOGGLEBIT
 	int		torsoAnim;		// mask off ANIM_TOGGLEBIT
-#ifdef TMNTWEAPSYS
+#ifdef TA_WEAPSYS
 	int		weaponHands;
 #endif
 

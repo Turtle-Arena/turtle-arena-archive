@@ -171,7 +171,7 @@ static void UI_CinematicsMenu_Init( void ) {
 	cinematicsMenuInfo.cin_idlogo.generic.y			= y;
 	cinematicsMenuInfo.cin_idlogo.generic.id		= ID_CIN_IDLOGO;
 	cinematicsMenuInfo.cin_idlogo.generic.callback	= UI_CinematicsMenu_Event; 
-#ifdef TMNTMISC
+#ifdef TA_MISC
 	cinematicsMenuInfo.cin_idlogo.string			= "MAIN";
 #else
 	cinematicsMenuInfo.cin_idlogo.string			= "ID LOGO";
