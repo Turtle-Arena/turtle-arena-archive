@@ -3616,7 +3616,6 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 }
 #endif
 
-#ifndef TMNTWEAPSYS // ZTM: FIXME: Remerged the two version of CG_MissileHitWall...
 /*
 =================
 CG_MissileHitWall
@@ -3665,6 +3664,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	// set defaults
 	isSprite = qfalse;
 	duration = 600;
+
 #ifdef TMNTWEAPSYS // SPR_EXP_SCALE
 	// Sprite explosion scaling, starts at "exp_base" and add on "exp_add" using time scaling.
 	//		so the bigest it will be is "exp_base"+"exp_add".
@@ -3673,62 +3673,149 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #endif
 
 #ifdef TMNTWEAPSYS
-	// Melee Weapon hit wall.
-	if (BG_WeaponHasMelee(weapon)))
+	if (bg_projectileinfo[weapon].trailType != PT_LIGHTNING)
 	{
-		/*if( soundType == IMPACTSOUND_FLESH ) {
-			sfx = cgs.media.sfx_meleehit;//sfx_meleehitflesh;
-		} else if( soundType == IMPACTSOUND_METAL ) {
-			sfx = cgs.media.sfx_meleehitmetal;
-		} else {
-			sfx = cgs.media.sfx_meleehit;
-		}*/
-
-		mark = cgs.media.holeMarkShader;
-		radius = 12;
-	}
-	else
-#endif
-#ifdef TMNTHOLDABLE
-	if (weapon >= WP_NUM_WEAPONS)
-	{
-		// Shuriken.
-		int holdable = weapon - WP_NUM_WEAPONS;
-		switch ( holdable ) {
+		switch (bg_projectileinfo[weapon].deathType)
+		{
 			default:
-			case HI_SHURIKEN:
-			case HI_ELECTRICSHURIKEN:
-				mark = cgs.media.bulletMarkShader;
-				radius = 16;
-				sfx = 0;
+			case PD_NONE:
 				break;
-			case HI_FIRESHURIKEN: // Same as homing rocket ... less particles.
-				// Smaller explosion
+			case PD_PLASMA:
+				mod = cgs.media.ringFlashModel;
+				shader = cgs.media.plasmaExplosionShader;
+				sfx = cgs.media.sfx_plasmaexp;
+				break;
+			case PD_ROCKET:
+				mod = cgs.media.dishFlashModel;
+				shader = cgs.media.rocketExplosionShader;
+				sfx = cgs.media.sfx_rockexp;
+				//mark = cgs.media.burnMarkShader;
+				//radius = 64;
+				light = 300;
+				isSprite = qtrue;
+				duration = 1000;
+				lightColor[0] = 1;
+				lightColor[1] = 0.75;
+				lightColor[2] = 0.0;
+				if (cg_oldRocket.integer == 0) {
+					// explosion sprite animation
+					VectorMA( origin, 24, dir, sprOrg );
+					VectorScale( dir, 64, sprVel );
+
+					CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
+				}
+				break;
+			case PD_ROCKET_SMALL: // Smaller explosion
 				exp_base = 30 / 2;
 				exp_add = 42 / 2;
+				VectorScale( dir, 0.5f, dir );
 
 				mod = cgs.media.dishFlashModel;
 				shader = cgs.media.rocketExplosionShader;
 				sfx = cgs.media.sfx_rockexp;
-				mark = cgs.media.burnMarkShader;
-				radius = 64 / 2;
+				//mark = cgs.media.burnMarkShader;
+				//radius = 64 / 2;
 				light = 300 / 2;
 				isSprite = qtrue;
 				duration = 1000;
 				lightColor[0] = 1;
 				lightColor[1] = 0.75;
 				lightColor[2] = 0.0;
+				/*
+				if (cg_oldRocket.integer == 0) {
+					// explosion sprite animation
+					VectorMA( origin, 24, dir, sprOrg );
+					VectorScale( dir, 64, sprVel );
+
+					CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
+				}
+				*/
 				break;
-			// This is called each time it bounces and when it dies.
-			case HI_LASERSHURIKEN:
-				mark = cgs.media.energyMarkShader;
-				radius = 8;
-				sfx = 0; // EV_LASERSHURIKEN_BOUNCE plays a sound? (Move here?)
+			case PD_GRENADE:
+				mod = cgs.media.dishFlashModel;
+#ifdef TMNTDATA
+				shader = cgs.media.rocketExplosionShader;
+#else
+				shader = cgs.media.grenadeExplosionShader;
+#endif
+				sfx = cgs.media.sfx_rockexp;
+				light = 300;
+				isSprite = qtrue;
+				break;
+			case PD_BULLET:
+				mod = cgs.media.bulletFlashModel;
+				shader = cgs.media.bulletExplosionShader;
+				r = rand() & 3;
+				if ( r == 0 ) {
+					sfx = cgs.media.sfx_ric1;
+				} else if ( r == 1 ) {
+					sfx = cgs.media.sfx_ric2;
+				} else {
+					sfx = cgs.media.sfx_ric3;
+				}
+				break;
+			case PD_RAIL:
+				mod = cgs.media.ringFlashModel;
+#ifdef TMNTDATA
+				shader = cgs.media.plasmaExplosionShader;
+#else
+				shader = cgs.media.railExplosionShader;
+#endif
+				sfx = cgs.media.sfx_plasmaexp;
+				break;
+			case PD_BFG:
+				mod = cgs.media.dishFlashModel;
+#ifdef TMNTDATA
+				shader = cgs.media.rocketExplosionShader;
+#else
+				shader = cgs.media.bfgExplosionShader;
+#endif
+				sfx = cgs.media.sfx_rockexp;
+				break;
+			case PD_LIGHTNING:
+				//
 				break;
 		}
 	}
-	else
+
+	// play sound
+	if( soundType == IMPACTSOUND_FLESH && cg_projectiles[weapon].hitPlayerSound ) {
+		sfx = cg_projectiles[weapon].hitPlayerSound;
+	} else if( soundType == IMPACTSOUND_METAL && cg_projectiles[weapon].hitMetalSound ) {
+		sfx = cg_projectiles[weapon].hitMetalSound;
+	} else {
+		for ( r = 0 ; r < 3 ; r++ ) {
+			if ( !cg_projectiles[weapon].hitSound[r] )
+			{
+				break;
+			}
+		}
+		if ( r > 0 ) {
+			r = rand() & 3;
+			if ( r < 2 ) {
+				sfx = cg_projectiles[weapon].hitSound[1];
+			} else if ( r == 2 ) {
+				sfx = cg_projectiles[weapon].hitSound[0];
+			} else {
+				sfx = cg_projectiles[weapon].hitSound[2];
+			}
+		}
+	}
+
+/*
+	switch ( weapon ) {
+	default:
+	case WP_LIGHTNING:
+		// no explosion at LG impact, it is added with the beam
+		break;
+#ifndef TURTLEARENA // WEAPONS
+	case WP_SHOTGUN:
+		sfx = 0;
+		break;
 #endif
+	}
+*/
+#else
 	switch ( weapon ) {
 	default:
 #ifdef MISSIONPACK
@@ -3869,10 +3956,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		radius = 8;
 		break;
 	}
-
-#ifdef TMNTWEAPSYS // ZTM: FIXME: Each weapon in the group has its own!
-	mark = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkShader;
-	radius = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkRadius;
 #endif
 
 	if ( sfx ) {
@@ -3888,7 +3971,12 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 							   duration, isSprite );
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
-		if ( weapon == WP_RAILGUN ) {
+#ifdef TMNTWEAPSYS
+		if (bg_projectileinfo[weapon].flags & PF_EXPLOSION_COLORIZE)
+#else
+		if ( weapon == WP_RAILGUN )
+#endif
+		{
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
 		}
@@ -3898,18 +3986,27 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #endif
 	}
 
+#ifdef TMNTWEAPSYS
+	mark = cg_projectiles[weapon].wallmarkShader;
+	radius = cg_projectiles[weapon].wallmarkRadius;
+
+	if (!mark || radius <= 0)
+	{
+		// No mark or radius.
+		return;
+	}
+#endif
+
 	//
 	// impact mark
 	//
 #ifdef TMNTWEAPSYS
 	// plasma fades alpha, all others fade color
-	alphaFade = (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_FADE_ALPHA);
+	alphaFade = (bg_projectileinfo[weapon].flags & PF_WALLMARK_FADE_ALPHA);
+
+	if (bg_projectileinfo[weapon].flags & PF_WALLMARK_COLORIZE)
 #else
 	alphaFade = (mark == cgs.media.energyMarkShader);	// plasma fades alpha, all others fade color
-#endif
-#ifdef TMNTWEAPSYS
-	if (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_COLORIZE)
-#else
 	if ( weapon == WP_RAILGUN )
 #endif
 	{
@@ -3917,9 +4014,19 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 
 		// colorize with client color
 		color = cgs.clientinfo[clientNum].color2;
+#ifdef TMNTWEAPSYS
+		if (!CG_ImpactMark( mark, origin, dir, random()*360, color[0],color[1], color[2],1, alphaFade, radius, qfalse ))
+			return;
+#else
 		CG_ImpactMark( mark, origin, dir, random()*360, color[0],color[1], color[2],1, alphaFade, radius, qfalse );
+#endif
 	} else {
+#ifdef TMNTWEAPSYS
+		if (!CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, alphaFade, radius, qfalse ))
+			return;
+#else
 		CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, alphaFade, radius, qfalse );
+#endif
 	}
 
 #ifdef TMNTMISC // MATERIALS
@@ -3929,7 +4036,6 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		CG_ImpactParticles(origin, dir, radius, -1, clientNum);
 #endif
 }
-#endif // !TMNTWEAPSYS
 
 /*
 =================
@@ -3990,10 +4096,8 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 	int				duration;
 	//vec3_t			sprOrg;
 	//vec3_t			sprVel;
-#ifdef TMNTWEAPSYS // SPR_EXP_SCALE
 	int exp_base;
 	int exp_add;
-#endif
 
 #ifdef IOQ3ZTM // LASERTAG
 	if (cg_laserTag.integer)
@@ -4015,14 +4119,12 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 	// set defaults
 	isSprite = qfalse;
 	duration = 600;
-#ifdef TMNTWEAPSYS // SPR_EXP_SCALE
+
 	// Sprite explosion scaling, starts at "exp_base" and add on "exp_add" using time scaling.
 	//		so the bigest it will be is "exp_base"+"exp_add".
 	exp_base = 30;
 	exp_add = 42;
-#endif
 
-#ifdef TMNTWEAPSYS
 	// Melee Weapon hit wall.
 	if (BG_WeaponHasMelee(weapon))
 	{
@@ -4052,18 +4154,7 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 			sfx = cgs.media.sfx_meleehit;
 		}*/
 	}
-#endif
 
-#ifdef TMNTWEAPSYS // ZTM: FIXME: Each weapon in the group has its own!
-	mark = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkShader;
-	radius = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkRadius;
-
-	if (!mark || radius <= 0)
-	{
-		// No mark or radius.
-		return;
-	}
-#endif
 
 	if ( sfx ) {
 		trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
@@ -4078,261 +4169,7 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 							   duration, isSprite );
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
-#ifdef TMNTWEAPSYS
 		if (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_COLORIZE)
-#else
-		if ( weapon == WP_RAILGUN )
-#endif
-		{
-			// colorize with client color
-			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
-		}
-#ifdef TMNTWEAPSYS // SPR_EXP_SCALE
-		le->radius = exp_base;
-		le->refEntity.radius = exp_add;
-#endif
-	}
-
-	//
-	// impact mark
-	//
-#ifdef TMNTWEAPSYS
-	// plasma fades alpha, all others fade color
-	alphaFade = (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_FADE_ALPHA);
-
-	if (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_COLORIZE)
-#else
-	alphaFade = (mark == cgs.media.energyMarkShader);	// plasma fades alpha, all others fade color
-	if ( weapon == WP_RAILGUN )
-#endif
-	{
-		float	*color;
-
-		// colorize with client color
-		color = cgs.clientinfo[clientNum].color2;
-		if (!CG_ImpactMark( mark, origin, dir, random()*360, color[0],color[1], color[2],1, alphaFade, radius, qfalse ))
-			return; // no impact
-	} else {
-		if (!CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, alphaFade, radius, qfalse ))
-			return; // no impact
-	}
-#ifdef TMNTMISC // MATERIALS
-	if (soundType == IMPACTSOUND_METAL)
-		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS, clientNum);
-	else
-		CG_ImpactParticles(origin, dir, radius, -1, clientNum);
-#endif
-}
-
-/*
-=================
-CG_MissileHitWall
-
-Caused by an EV_MISSILE_MISS event, or directly by local bullet tracing
-=================
-*/
-void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
-{
-	qhandle_t		mod;
-	qhandle_t		mark;
-	qhandle_t		shader;
-	sfxHandle_t		sfx;
-	float			radius;
-	float			light;
-	vec3_t			lightColor;
-	localEntity_t	*le;
-	int				r;
-	qboolean		alphaFade;
-	qboolean		isSprite;
-	int				duration;
-	vec3_t			sprOrg;
-	vec3_t			sprVel;
-	int exp_base;
-	int exp_add;
-
-#ifdef IOQ3ZTM // LASERTAG
-	if (cg_laserTag.integer)
-	{
-		return;
-	}
-#endif
-
-	mark = 0;
-	radius = 32;
-	sfx = 0;
-	mod = 0;
-	shader = 0;
-	light = 0;
-	lightColor[0] = 1;
-	lightColor[1] = 1;
-	lightColor[2] = 0;
-
-	// set defaults
-	isSprite = qfalse;
-	duration = 600;
-
-	// Sprite explosion scaling, starts at "exp_base" and add on "exp_add" using time scaling.
-	//		so the bigest it will be is "exp_base"+"exp_add".
-	exp_base = 30;
-	exp_add = 42;
-
-	if (bg_projectileinfo[weapon].trailType != PT_LIGHTNING)
-	{
-		switch (bg_projectileinfo[weapon].deathType)
-		{
-			default:
-			case PD_NONE:
-				break;
-			case PD_PLASMA:
-				mod = cgs.media.ringFlashModel;
-				shader = cgs.media.plasmaExplosionShader;
-				sfx = cgs.media.sfx_plasmaexp;
-				break;
-			case PD_ROCKET:
-				mod = cgs.media.dishFlashModel;
-				shader = cgs.media.rocketExplosionShader;
-				sfx = cgs.media.sfx_rockexp;
-				//mark = cgs.media.burnMarkShader;
-				//radius = 64;
-				light = 300;
-				isSprite = qtrue;
-				duration = 1000;
-				lightColor[0] = 1;
-				lightColor[1] = 0.75;
-				lightColor[2] = 0.0;
-				if (cg_oldRocket.integer == 0) {
-					// explosion sprite animation
-					VectorMA( origin, 24, dir, sprOrg );
-					VectorScale( dir, 64, sprVel );
-
-					CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
-				}
-				break;
-			case PD_ROCKET_SMALL: // Smaller explosion
-				exp_base = 30 / 2;
-				exp_add = 42 / 2;
-				VectorScale( dir, 0.5f, dir );
-
-				mod = cgs.media.dishFlashModel;
-				shader = cgs.media.rocketExplosionShader;
-				sfx = cgs.media.sfx_rockexp;
-				//mark = cgs.media.burnMarkShader;
-				//radius = 64 / 2;
-				light = 300 / 2;
-				isSprite = qtrue;
-				duration = 1000;
-				lightColor[0] = 1;
-				lightColor[1] = 0.75;
-				lightColor[2] = 0.0;
-				/*
-				if (cg_oldRocket.integer == 0) {
-					// explosion sprite animation
-					VectorMA( origin, 24, dir, sprOrg );
-					VectorScale( dir, 64, sprVel );
-
-					CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
-				}
-				*/
-				break;
-			case PD_GRENADE:
-				mod = cgs.media.dishFlashModel;
-#ifdef TMNTDATA
-				shader = cgs.media.rocketExplosionShader;
-#else
-				shader = cgs.media.grenadeExplosionShader;
-#endif
-				sfx = cgs.media.sfx_rockexp;
-				light = 300;
-				isSprite = qtrue;
-				break;
-			case PD_BULLET:
-				mod = cgs.media.bulletFlashModel;
-				shader = cgs.media.bulletExplosionShader;
-				r = rand() & 3;
-				if ( r == 0 ) {
-					sfx = cgs.media.sfx_ric1;
-				} else if ( r == 1 ) {
-					sfx = cgs.media.sfx_ric2;
-				} else {
-					sfx = cgs.media.sfx_ric3;
-				}
-				break;
-			case PD_RAIL:
-				mod = cgs.media.ringFlashModel;
-#ifdef TMNTDATA
-				shader = cgs.media.plasmaExplosionShader;
-#else
-				shader = cgs.media.railExplosionShader;
-#endif
-				sfx = cgs.media.sfx_plasmaexp;
-				break;
-			case PD_BFG:
-				mod = cgs.media.dishFlashModel;
-#ifdef TMNTDATA
-				shader = cgs.media.rocketExplosionShader;
-#else
-				shader = cgs.media.bfgExplosionShader;
-#endif
-				sfx = cgs.media.sfx_rockexp;
-				break;
-			case PD_LIGHTNING:
-				//
-				break;
-		}
-	}
-
-	// play sound
-	if( soundType == IMPACTSOUND_FLESH && cg_projectiles[weapon].hitPlayerSound ) {
-		sfx = cg_projectiles[weapon].hitPlayerSound;
-	} else if( soundType == IMPACTSOUND_METAL && cg_projectiles[weapon].hitMetalSound ) {
-		sfx = cg_projectiles[weapon].hitMetalSound;
-	} else {
-		for ( r = 0 ; r < 3 ; r++ ) {
-			if ( !cg_projectiles[weapon].hitSound[r] )
-			{
-				break;
-			}
-		}
-		if ( r > 0 ) {
-			r = rand() & 3;
-			if ( r < 2 ) {
-				sfx = cg_projectiles[weapon].hitSound[1];
-			} else if ( r == 2 ) {
-				sfx = cg_projectiles[weapon].hitSound[0];
-			} else {
-				sfx = cg_projectiles[weapon].hitSound[2];
-			}
-		}
-	}
-
-/* SOUNDS
-	switch ( weapon ) {
-	default:
-	case WP_LIGHTNING:
-		// no explosion at LG impact, it is added with the beam
-		break;
-#ifndef TURTLEARENA // WEAPONS
-	case WP_SHOTGUN:
-		sfx = 0;
-		break;
-#endif
-	}
-*/
-
-	if ( sfx ) {
-		trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
-	}
-
-	//
-	// create the explosion
-	//
-	if ( mod ) {
-		le = CG_MakeExplosion( origin, dir, 
-							   mod,	shader,
-							   duration, isSprite );
-		le->light = light;
-		VectorCopy( lightColor, le->lightColor );
-		if (bg_projectileinfo[weapon].flags & PF_EXPLOSION_COLORIZE)
 		{
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
@@ -4341,8 +4178,9 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		le->refEntity.radius = exp_add;
 	}
 
-	mark = cg_projectiles[weapon].wallmarkShader;
-	radius = cg_projectiles[weapon].wallmarkRadius;
+	// ZTM: FIXME: Each weapon in the group has its own!
+	mark = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkShader;
+	radius = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkRadius;
 
 	if (!mark || radius <= 0)
 	{
@@ -4354,19 +4192,21 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	// impact mark
 	//
 	// plasma fades alpha, all others fade color
-	alphaFade = (bg_projectileinfo[weapon].flags & PF_WALLMARK_FADE_ALPHA);
-	if (bg_projectileinfo[weapon].flags & PF_WALLMARK_COLORIZE)
+	alphaFade = (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_FADE_ALPHA);
+
+	if (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_COLORIZE)
 	{
 		float	*color;
 
 		// colorize with client color
 		color = cgs.clientinfo[clientNum].color2;
 		if (!CG_ImpactMark( mark, origin, dir, random()*360, color[0],color[1], color[2],1, alphaFade, radius, qfalse ))
-			return;
+			return; // no impact
 	} else {
 		if (!CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, alphaFade, radius, qfalse ))
-			return;
+			return; // no impact
 	}
+
 #ifdef TMNTMISC // MATERIALS
 	if (soundType == IMPACTSOUND_METAL)
 		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS, clientNum);
