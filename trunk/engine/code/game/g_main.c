@@ -1693,7 +1693,7 @@ void CheckExitRules( void ) {
 			if (g_singlePlayer.integer == 1)
 			{
 				// Return to the title screen.
-				trap_Cvar_Set("nextmap", "disconnect");
+				trap_Cvar_Set("nextmap", "disconnect; sp_gameover");
 				LogExit( "Game Over" );
 				return;
 			}
