@@ -100,9 +100,7 @@ Weapons (and attacking)
 
   * TODO: Have bots not attack players with PW_FLASHING
 
-  * TODO: Remarge the two version of CG_MissileHitWall
-
-  * FIXME: Use BotInventoryWeapon and BotInventoryAmmo?
+  * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
 
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
