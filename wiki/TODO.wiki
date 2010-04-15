@@ -22,11 +22,6 @@ Weapons (and attacking)
 		and do collision so that weapons don't go into the wall. (And bounce back if you hit the wall?)
   * TODO-after-above: Add a option to weapon group info to hold a weapon upside-down.
 
-  * TODO: Weapon trails; Every-so-often while attacking send EV_TRAIL_POS with the clientnum, trailnum, and trail base and top origins.
-    * When the trail end send EV_TRAIL_END clientnum and trailnum, so the next trail doesn't connect to last trail.
-    * When rendering create polygons connecting the trail.
-    * Each client think move the base of the trail up, and if (base[Z] >= top[Z]) remove this trail base/top
-
   * TODO: Attack movement flags. Stop, cut speed in half, double speed, turn right?, etc.
 
   * TODO: Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
@@ -50,6 +45,9 @@ Weapons (and attacking)
   * TODO: NPRQuake has some awesome rendering options... (If I wanted it to look like a comic book it might help.)
 
   * TODO: framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
+
+  * TODO-BETA: Fix alpha issue with RF_FORCE_ENT_ALPHA; the ent goes transparent but only the level can be seen though it, not other entities
+    * Affects melee weapons trails (and looks really bad at time)
 
 == UI ==
   * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?
@@ -91,11 +89,11 @@ Weapons (and attacking)
 
   * TODO: Have a option for func_breakable and misc_object to spawn an item on death
 
-  * TODO: Have a option for func_breakable and misc_object to respawn
+  * TODO-BETA: Have a option for func_breakable and misc_object to respawn
 
   * TODO: Allow func_breakable and misc_object to be pushable.
 
-  * TODO: Have bots not attack players with PW_FLASHING
+  * TODO-BETA: Have bots not attack players with PW_FLASHING
 
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
 
@@ -104,7 +102,7 @@ Weapons (and attacking)
     * (NiGHTS: Journey of Dreams) Move camera if holding 'z' and move analog stick, can't look around while moving
     * BETTER(not done?): When moving the camera around the player, focus on the player. (Like in NiGHTS: Journey of Dreams)
 
-  * TODO: STARTED(TURTLEARENA // LOCKON): When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
+  * TODO-BETA: STARTED(TURTLEARENA // LOCKON): When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
   * BUG: When higher then target to focus on it gets all messed up.
 
   * TODO: Merge Quake3 and Team Arena bot chat systems; One chat system to rule them all!

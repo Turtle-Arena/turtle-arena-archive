@@ -2036,18 +2036,61 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups )
 
 
 
+#ifdef TA_MISC // GHOST
+/*
+=============
+CG_GhostRefEntity
+=============
+*/
+localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive)
+{
+	localEntity_t	*le;
+	refEntity_t		*re;
+
+	le = CG_AllocLocalEntity();
+	le->leFlags = LEF_PUFF_DONT_SCALE;
+	le->leType = LE_MOVE_SCALE_FADE;
+	le->startTime = cg.time;
+	le->endTime = cg.time + timetolive;
+	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+
+	le->refEntity = *refEnt;
+	re = &le->refEntity;
+
+	re->shaderTime = cg.time / 1000.0f;
+
+	re->radius = 5;
+	//re->customShader = 0;
+	re->shaderRGBA[0] = 0xff;
+	re->shaderRGBA[1] = 0xff;
+	re->shaderRGBA[2] = 0xff;
+	re->shaderRGBA[3] = 0xff;
+	re->renderfx |= RF_FORCE_ENT_ALPHA;
+
+	le->color[3] = 1.0;
+
+	le->pos.trType = TR_LINEAR;
+	le->pos.trTime = cg.time;
+	VectorCopy( refEnt->origin, le->pos.trBase );
+	VectorClear(le->pos.trDelta);
+	//le->pos.trDelta[0] = crandom()*5;
+	//le->pos.trDelta[1] = crandom()*5;
+	//le->pos.trDelta[2] = crandom()*5 + 6;
+
+	return le;
+}
+#endif
+
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 //
-// CG_AddWeaponTrail
-//
-// ZTM: TODO: Add weapon trails!
+// CG_AddWeaponTrailOld
 //
 /* Idea
 Draw a shader from bottom of weapon attack to top of weapon attack,
      scale length using speed weapon is moving?
 Allow the shader to be per-weapon
 */
-void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
+void CG_AddWeaponTrailOld(centity_t *cent, refEntity_t *gun, int weaponHand)
 {
 	weapon_t weaponNum;
 	refEntity_t trail;
@@ -2212,6 +2255,55 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand)
 		VectorSubtract(trail.origin, trailOldOrigin[clientNum][weaponHand], weaponMoveDir[clientNum][weaponHand]);
 		VectorCopy(trail.origin, trailOldOrigin[clientNum][weaponHand]);
 	}
+}
+
+/*
+=============
+CG_AddWeaponTrail
+
+Add tranparent copies of the model when melee attacking
+=============
+*/
+void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand, qboolean barrel)
+{
+	int anim;
+
+	static int trailOldTime[MAX_CLIENTS][MAX_HANDS];
+	static int weaponMoveDirInit = 0;
+	if (!weaponMoveDirInit)
+	{
+		weaponMoveDirInit = 1;
+		memset(&trailOldTime, 0, sizeof (trailOldTime));
+	}
+
+	// Old type
+	if (cg_drawMeleeWeaponTrails.integer == 2)
+	{
+		if (barrel)
+			return;
+
+		CG_AddWeaponTrailOld(cent, gun, weaponHand);
+		return;
+	}
+
+	if (!cg_drawMeleeWeaponTrails.integer)
+		return;
+
+	// Only melee weapons have trails.
+	if (!BG_WeaponHasMelee(cent->currentState.weapon))
+		return;
+
+	anim = ( cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT );
+
+	if (!BG_PlayerAttackAnim(anim))
+		return;
+
+	if (cg.time > trailOldTime[cent->currentState.clientNum][weaponHand] // barrel will be same time
+		&& cg.time - trailOldTime[cent->currentState.clientNum][weaponHand] < 10)
+		return;
+
+	trailOldTime[cent->currentState.clientNum][weaponHand] = cg.time;
+	CG_GhostRefEntity(gun, 100);
 }
 #endif
 
@@ -2583,7 +2675,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
 
 		// MELEE_TRAIL
-		CG_AddWeaponTrail(cent, &gun, HAND_PRIMARY);
+		CG_AddWeaponTrail(cent, &gun, HAND_PRIMARY, qfalse);
 	}
 
 	// Secondary weapon.
@@ -2607,7 +2699,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		CG_AddWeaponWithPowerups( &gun_left, cent->currentState.powerups );
 
 		// MELEE_TRAIL
-		CG_AddWeaponTrail(cent, &gun_left, HAND_SECONDARY);
+		CG_AddWeaponTrail(cent, &gun_left, HAND_SECONDARY, qfalse);
 	}
 
 	// NOTE: Any weapon type can have a barrel model and/or flash model
@@ -2684,12 +2776,18 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			CG_PositionRotatedEntityOnTag( &barrel, &gun_left,
 				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
 				"tag_barrel" );
+
+			// MELEE_TRAIL
+			CG_AddWeaponTrail(cent, &barrel, HAND_SECONDARY, qtrue);
 		}
 		else
 		{
 			CG_PositionRotatedEntityOnTag( &barrel, &gun,
 				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
 				"tag_barrel" );
+
+			// MELEE_TRAIL
+			CG_AddWeaponTrail(cent, &barrel, HAND_PRIMARY, qtrue);
 		}
 #else
 		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, "tag_barrel" );
