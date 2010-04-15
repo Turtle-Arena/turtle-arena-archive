@@ -446,6 +446,9 @@ typedef struct {
 	int				invulnerabilityStartTime;
 	int				invulnerabilityStopTime;
 #endif
+#ifdef TA_MISC // GHOST
+	int				ghostTime;
+#endif
 
 	int				breathPuffTime;
 
