@@ -2042,7 +2042,7 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups )
 CG_GhostRefEntity
 =============
 */
-localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive)
+localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive, int alpha)
 {
 	localEntity_t	*le;
 	refEntity_t		*re;
@@ -2064,10 +2064,10 @@ localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive)
 	re->shaderRGBA[0] = 0xff;
 	re->shaderRGBA[1] = 0xff;
 	re->shaderRGBA[2] = 0xff;
-	re->shaderRGBA[3] = 0xff;
+	re->shaderRGBA[3] = alpha;
 	re->renderfx |= RF_FORCE_ENT_ALPHA;
 
-	le->color[3] = 1.0;
+	le->color[3] = alpha / 0xff;
 
 	le->pos.trType = TR_LINEAR;
 	le->pos.trTime = cg.time;
@@ -2303,7 +2303,7 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand, qboole
 		return;
 
 	trailOldTime[cent->currentState.clientNum][weaponHand] = cg.time;
-	CG_GhostRefEntity(gun, 100);
+	CG_GhostRefEntity(gun, 100, gun->shaderRGBA[3]);
 }
 #endif
 
@@ -2776,24 +2776,22 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			CG_PositionRotatedEntityOnTag( &barrel, &gun_left,
 				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
 				"tag_barrel" );
-
-			// MELEE_TRAIL
-			CG_AddWeaponTrail(cent, &barrel, HAND_SECONDARY, qtrue);
 		}
 		else
 		{
 			CG_PositionRotatedEntityOnTag( &barrel, &gun,
 				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
 				"tag_barrel" );
-
-			// MELEE_TRAIL
-			CG_AddWeaponTrail(cent, &barrel, HAND_PRIMARY, qtrue);
 		}
 #else
 		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, "tag_barrel" );
 #endif
 
 		CG_AddWeaponWithPowerups( &barrel, cent->currentState.powerups );
+
+#ifdef TA_WEAPSYS // MELEE_TRAIL
+		CG_AddWeaponTrail(cent, &barrel, i, qtrue);
+#endif
 	}
 
 	// make sure we aren't looking at cg.predictedPlayerEntity for LG

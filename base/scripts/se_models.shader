@@ -149,8 +149,8 @@ models/misc/telep
 		//tcMod turb 0 0.1 0 0.1
 		//tcmod rotate 311
 		//tcmod scroll 1 1
-		blendfunc Add
-		rgbGen entity
+		blendfunc add
+		rgbGen lightingDiffuse
 	}
 }
 
@@ -240,7 +240,6 @@ models/mapobjects/traffic_cone/traffic_cone
 
 models/powerups/health/health
 {
-	cull disable
 	{
 		map models/powerups/health/health.png
 		rgbGen lightingDiffuse
