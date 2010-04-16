@@ -735,9 +735,6 @@ static void CG_Item( centity_t *cent ) {
 		if (ent.shaderRGBA[3] >= 255)
 			ent.shaderRGBA[3] = 254;
 		ent.renderfx |= RF_FORCE_ENT_ALPHA;
-#if 1 // SORT_BUG temp fix for sort bug
-		ent.customShader = cgs.media.playerTeleportShader;
-#endif
 	} else {
 		frac = 1.0;
 	}

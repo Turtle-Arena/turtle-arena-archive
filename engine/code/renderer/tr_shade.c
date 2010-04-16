@@ -1480,11 +1480,7 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 
 #ifdef IOQ3ZTM // IOSTVEF RENDERFLAGS
 		// Override the shader alpha channel if requested.
-		if ((backEnd.currentEntity->e.renderfx & RF_FORCE_ENT_ALPHA)
-#if 0 // SORT_BUG
-			&& pStage->alphaGen != AGEN_ENTITY
-#endif
-			)
+		if (backEnd.currentEntity->e.renderfx & RF_FORCE_ENT_ALPHA)
 		{
 			overridealpha = qtrue;
 			oldalphaGen = pStage->alphaGen;
@@ -1538,17 +1534,12 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 			if (overridealpha && backEnd.currentEntity->e.shaderRGBA[3] < 0xFF
 					&& !(pStage->stateBits & GLS_ATEST_BITS))
 			{
-#if 0 // SORT_BUG
-				// GLS_DEPTHMASK_TRUE is bad here?
-				GL_State(GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA | GLS_ATEST_GT_0);
-#else
 				GL_State(
 					// remove the shader set values.
 					(pStage->stateBits & ~(GLS_SRCBLEND_BITS | GLS_DSTBLEND_BITS | GLS_ATEST_BITS))
 					// Now add the default values.
 					| GLS_SRCBLEND_SRC_ALPHA | GLS_DSTBLEND_ONE_MINUS_SRC_ALPHA | GLS_ATEST_GT_0
 					);
-#endif
 			}
 			else
 #endif
