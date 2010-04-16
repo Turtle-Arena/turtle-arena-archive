@@ -567,6 +567,9 @@ typedef enum {
 
 typedef struct drawSurf_s {
 	unsigned			sort;			// bit combination for fast compares
+#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+	unsigned			shaderIndex;
+#endif
 	surfaceType_t		*surface;		// any of surface*_t
 } drawSurf_t;
 
@@ -829,7 +832,11 @@ the bits are allocated as follows:
 2-6   : fog index
 0-1   : dlightmap index
 */
+#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+#define	QSORT_ORDER_SHIFT		17 // Only uses 5 bits
+#else
 #define	QSORT_SHADERNUM_SHIFT	17
+#endif
 #define	QSORT_ENTITYNUM_SHIFT	7
 #define	QSORT_FOGNUM_SHIFT		2
 
@@ -1173,11 +1180,21 @@ void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
 void R_AddPolygonSurfaces( void );
 
+#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+void R_ComposeSort( drawSurf_t *drawSurf, int entityNum, shader_t *shader, 
+					 int fogIndex, int dlightMap, int sortOrder);
+void R_DecomposeSort( const drawSurf_t *drawSurf, int *entityNum, shader_t **shader, 
+					 int *fogNum, int *dlightMap, int *sortOrder);
+
+int R_SortOrder(trRefEntity_t *ent);
+
+void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader, int fogIndex, int dlightMap, int sortOrder );
+#else
 void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader, 
 					 int *fogNum, int *dlightMap );
 
 void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader, int fogIndex, int dlightMap );
-
+#endif
 
 #define	CULL_IN		0		// completely unclipped
 #define	CULL_CLIP	1		// clipped by one or more planes

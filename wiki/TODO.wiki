@@ -46,9 +46,7 @@ Weapons (and attacking)
 
   * TODO: framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
 
-  * TODO-BETA: Fix alpha issue with RF_FORCE_ENT_ALPHA; the ent goes transparent but only the level can be seen though it, not other entities
-    * Affects melee weapons trails, item respawn/disappear, player speed ghosting
-    * Bug is due to sorting not knowing that RF_FORCE_ENT_ALPHA is see though
+  * TODO: When there are mulitple ghost models they may not be sorted into correct order?
 
 == UI ==
   * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?

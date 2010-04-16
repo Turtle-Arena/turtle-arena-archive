@@ -2188,16 +2188,28 @@ static void FixRenderCommandList( int newShader ) {
 				int			fogNum;
 				int			entityNum;
 				int			dlightMap;
+#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+				int			sortOrder;
+#endif
 				int			sortedIndex;
 				const drawSurfsCommand_t *ds_cmd =  (const drawSurfsCommand_t *)curCmd;
 
 				for( i = 0, drawSurf = ds_cmd->drawSurfs; i < ds_cmd->numDrawSurfs; i++, drawSurf++ ) {
+#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+					R_DecomposeSort( drawSurf, &entityNum, &shader, &fogNum, &dlightMap, &sortOrder);
+                    sortedIndex = shader->sortedIndex;
+					if( sortedIndex >= newShader ) {
+						sortedIndex++;
+						R_ComposeSort(drawSurf, entityNum, shader, fogNum, dlightMap, sortOrder);
+					}
+#else
 					R_DecomposeSort( drawSurf->sort, &entityNum, &shader, &fogNum, &dlightMap );
                     sortedIndex = (( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1));
 					if( sortedIndex >= newShader ) {
 						sortedIndex++;
 						drawSurf->sort = (sortedIndex << QSORT_SHADERNUM_SHIFT) | entityNum | ( fogNum << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
 					}
+#endif
 				}
 				curCmd = (const void *)(ds_cmd + 1);
 				break;

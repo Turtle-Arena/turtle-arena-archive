@@ -2065,9 +2065,10 @@ localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive, int alpha)
 	re->shaderRGBA[1] = 0xff;
 	re->shaderRGBA[2] = 0xff;
 	re->shaderRGBA[3] = alpha;
-	re->renderfx |= RF_FORCE_ENT_ALPHA;
+	re->renderfx |= RF_FORCE_ENT_ALPHA | RF_NOSHADOW;
 
-	le->color[3] = alpha / 0xff;
+	// ZTM: FIXME: Use alpha
+	le->color[3] = 1.0f; // (float)((float)alpha / 255.0f);
 
 	le->pos.trType = TR_LINEAR;
 	le->pos.trTime = cg.time;
