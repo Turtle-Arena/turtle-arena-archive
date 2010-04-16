@@ -3081,7 +3081,7 @@ int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
 #endif
 
 #ifdef TA_MISC // GHOST
-localEntity_t *CG_GhostRefEntity(refEntity_t *re, int timetolive);
+localEntity_t *CG_GhostRefEntity(refEntity_t *re, int timetolive, int alpha);
 #endif
 
 /*
@@ -3510,18 +3510,6 @@ void CG_Player( centity_t *cent ) {
 	CG_DustTrail(cent);
 #endif
 
-#ifdef TA_MISC // GHOST
-	if ((cent->currentState.powerups & ( 1 << PW_HASTE )
-		|| cent->currentState.powerups & ( 1 << PW_SCOUT ))
-		&& cg.time - ci->ghostTime >= 10)
-	{
-		ci->ghostTime = cg.time;
-		CG_GhostRefEntity(&legs, 50);
-		CG_GhostRefEntity(&torso, 50);
-		CG_GhostRefEntity(&head, 50);
-	}
-#endif
-
 	//
 	// add the gun / barrel / flash
 	//
@@ -3529,6 +3517,18 @@ void CG_Player( centity_t *cent ) {
 
 	// add powerups floating behind the player
 	CG_PlayerPowerups( cent, &torso );
+
+#ifdef TA_MISC // GHOST
+	if ((cent->currentState.powerups & ( 1 << PW_HASTE )
+		|| cent->currentState.powerups & ( 1 << PW_SCOUT ))
+		&& cg.time - ci->ghostTime >= 10)
+	{
+		ci->ghostTime = cg.time;
+		CG_GhostRefEntity(&legs, 50, legs.shaderRGBA[3]);
+		CG_GhostRefEntity(&torso, 50, torso.shaderRGBA[3]);
+		CG_GhostRefEntity(&head, 50, head.shaderRGBA[3]);
+	}
+#endif
 }
 
 
