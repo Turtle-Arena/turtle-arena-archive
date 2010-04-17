@@ -235,12 +235,7 @@ void CG_ReflectVelocity( localEntity_t *le, trace_t *trace ) {
 	VectorCopy( trace->endpos, le->pos.trBase );
 	le->pos.trTime = cg.time;
 
-#ifdef TA_MISC // MATERIALS
-	// Delay before becoming stationary to prevent debris getting stuck in the air.
-	if ((cg.time - le->startTime) < 100)
-		return;
-#endif
-
+#ifndef TA_MISC // MATERIALS // ZTM: FIXME?: Stop debris from being in the air when it should fall...
 	// check for stop, making sure that even on low FPS systems it doesn't bobble
 	if ( trace->allsolid || 
 		( trace->plane.normal[2] > 0 && 
@@ -249,6 +244,7 @@ void CG_ReflectVelocity( localEntity_t *le, trace_t *trace ) {
 	} else {
 
 	}
+#endif
 }
 
 /*
