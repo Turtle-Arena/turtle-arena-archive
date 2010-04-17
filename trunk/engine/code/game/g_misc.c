@@ -650,7 +650,7 @@ void misc_object_respawn(gentity_t *self)
 	// Don't let the humans see it respawn
 	if (G_SeenByHumans(self))
 	{
-		G_Printf("DEBUG: respawing deffered...\n");
+		G_Printf("DEBUG: respawing deferred...\n");
 
 		// Try again later
 		self->nextthink = level.time + 1000;
