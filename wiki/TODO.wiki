@@ -94,8 +94,6 @@ Weapons (and attacking)
 
   * TODO: Allow func_breakable and misc_object to be pushable.
 
-  * TODO-BETA: Have bots not attack players with PW_FLASHING
-
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
 
   * TODO: Improve camera system.
