@@ -355,6 +355,7 @@ int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
 	iwc->weights[index].name = (char *) GetClearedMemory(strlen(item->classname) + 1);
 	strcpy(iwc->weights[index].name, item->classname);
 
+#if 0 // ZTM: FIXME: Causes SIGBUS error in FuzzyWeightUndecided_r
 	if (item->inventory)
 	{
 		fuzzyseperator_t *firstfs = NULL;
@@ -368,6 +369,8 @@ int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
 
 		// Setup fuzzyseperator
 		fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
+		fs->next = NULL;
+		fs->child = NULL;
 		fs->index = item->inventory; //switch(INVENTORY_*)
 		if (lastfs) lastfs->next = fs;
 		else firstfs = fs;
@@ -402,6 +405,7 @@ int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
 		iwc->numweights++;
 		return index;
 	}
+#endif
 
 	// Setup fuzzyseperator
 	fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
