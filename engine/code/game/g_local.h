@@ -542,7 +542,7 @@ void SaveRegisteredItems( void );
 int G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
 #ifdef TA_MISC // Particles
-int G_ParticleAreaIndex( char *str );
+int		G_ParticleAreaIndex( char *str );
 #endif
 void	G_TeamCommand( team_t team, char *cmd );
 void	G_KillBox (gentity_t *ent);
@@ -656,6 +656,9 @@ gentity_t *fire_prox( gentity_t *self, vec3_t start, vec3_t aimdir );
 //
 void G_RunMover( gentity_t *ent );
 void Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace );
+#ifdef TA_ENTSYS // BREAKABLE
+qboolean G_SeenByHumans( gentity_t *ent );
+#endif
 
 //
 // g_trigger.c

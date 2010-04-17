@@ -772,13 +772,11 @@ G_SeenByHumans
 Based on Smokin' Guns G_BreakableRespawn
 ================
 */
-#if 0
 qboolean G_SeenByHumans( gentity_t *ent )
 {
 	gentity_t	*player;
 	gclient_t	*client;
 	int			i;
-#if 0
 	const float fov = 100;
 	float		diff;
 	float		angle;
@@ -787,7 +785,21 @@ qboolean G_SeenByHumans( gentity_t *ent )
 	vec3_t		eye;
 	qboolean	cont;
 	int			j;
-#endif
+	vec3_t		origin;
+
+	if (ent->s.eType == ET_MISCOBJECT)
+	{
+		VectorCopy(ent->r.currentOrigin, origin);
+	}
+	else
+	{
+		vec3_t pos1, pos2;
+
+        // Tequila comment: set breakable center as origin for G_BreakableRespawn needs
+        VectorSubtract(ent->r.absmax, ent->r.absmin, pos1);
+        VectorScale(pos1, 0.5f, pos2);
+        VectorAdd(pos2, ent->r.absmin, origin);
+	}
 
 	// cycle through all players and see if the breakable respawn would be visible to them
 	for (i = 0; i < level.maxclients; i++) {
@@ -798,67 +810,66 @@ qboolean G_SeenByHumans( gentity_t *ent )
 			continue;
 
 		// if it's too near abort
-		if (Distance(client->ps.origin, ent->pos2) < 300)
-			return qfalse;
+		cont = (Distance(client->ps.origin, origin) >= 300);
 
-		// first check if player could be stuck in the breakable
-		if ( player->r.absmin[0] >= ent->r.absmax[0]
-			|| player->r.absmin[1] >= ent->r.absmax[1]
-			|| player->r.absmin[2] >= ent->r.absmax[2]
-			|| player->r.absmax[0] <= ent->r.absmin[0]
-			|| player->r.absmax[1] <= ent->r.absmin[1]
-			|| player->r.absmax[2] <= ent->r.absmin[2] ) {
-			//
-		} else {
-			return qfalse;
-		}
-
-#if 0 // Doesn't seem to work correctly currently?
-		// Don't process field of vision tests
-		//if (g_forcebreakrespawn.integer)
-			//continue;
-
-		// Tequila comment: Minor server optimization, don't check if breakable is in a bot FOV
-		// They really don't care to "see" a breakable respawn, so we won't delay the respawn
-		// because of bot proximity.
-		if (player->r.svFlags & SVF_BOT)
-			continue;
-
-		// check if its in field of vision
-		VectorCopy(client->ps.origin, eye);
-		eye[2] += client->ps.viewheight;
-
-		VectorSubtract(ent->pos2, eye, dir);
-		vectoangles(dir, angles);
-
-		cont = qfalse;
-
-		for (j = 0; j < 2; j++) {
-			angle = AngleMod(client->ps.viewangles[j]);
-			angles[j] = AngleMod(angles[j]);
-			diff = fabs(angles[j] - angle);
-
-			if (diff > 180.0)
-				diff -= 360.0;
-
-			// if not in field of vision continue;
-			if ( fabs(diff) > fov/2 ) {
+		if (cont)
+		{
+			// first check if player could be stuck in the breakable
+			if ( player->r.absmin[0] > ent->r.absmax[0]
+				|| player->r.absmin[1] > ent->r.absmax[1]
+				|| player->r.absmin[2] > ent->r.absmax[2]
+				|| player->r.absmax[0] < ent->r.absmin[0]
+				|| player->r.absmax[1] < ent->r.absmin[1]
+				|| player->r.absmax[2] < ent->r.absmin[2] ) {
 				cont = qtrue;
-				break;
+			} else {
+				cont = qfalse;
 			}
 		}
 
-		// it's in the field of vision
-		if (!cont) {
-			return qfalse;
+		// Process field of vision tests
+		if (cont) // && !g_forcebreakrespawn.integer
+		{
+			// Tequila comment: Minor server optimization, don't check if breakable is in a bot FOV
+			// They really don't care to "see" a breakable respawn, so we won't delay the respawn
+			// because of bot proximity.
+			if (player->r.svFlags & SVF_BOT)
+				continue;
+
+			// check if its in field of vision
+			VectorCopy(client->ps.origin, eye);
+			eye[2] += client->ps.viewheight;
+
+			VectorSubtract(origin, eye, dir);
+			vectoangles(dir, angles);
+
+			cont = qfalse;
+
+			for (j = 0; j < 2; j++) {
+				angle = AngleMod(client->ps.viewangles[j]);
+				angles[j] = AngleMod(angles[j]);
+				diff = fabs(angles[j] - angle);
+
+				if (diff > 180.0)
+					diff -= 360.0;
+
+				// if not in field of vision continue;
+				if ( fabs(diff) > fov/2 ) {
+					cont = qtrue;
+					break;
+				}
+			}
 		}
-#endif
+
+		if (!cont) {
+			// it might be seen
+			return qtrue;
+		}
 	}
 
 	// now while nobody can see it respawn the breakable
-	return qtrue;
+	return qfalse;
 }
-#endif
 
 /*
 ================
@@ -867,23 +878,25 @@ G_BreakableRespawn
 */
 void G_BreakableRespawn( gentity_t *self )
 {
-#if 1
-	// Kill players so they don't get stuck
-	G_KillBox(self);
-#else
-	G_Printf("DEBUG: Atempting to respawn...\n");
-
 	// Don't let the humans see it respawn
 	if (G_SeenByHumans(self))
 	{
-		G_Printf("DEBUG: respawing deferred...\n");
+		// Defer for a max of the total respawn time
+		if (self->random < self->wait)
+		{
+			self->random++;
 
-		// Try again later
-		self->nextthink = level.time + 1000;
-		self->think = G_BreakableRespawn;
-		return;
+			// Try again later
+			self->nextthink = level.time + 1000;
+			self->think = G_BreakableRespawn;
+			return;
+		}
 	}
-#endif
+
+	// Kill players so they don't get stuck
+	G_KillBox(self);
+
+	self->random = 0; // clear defer count
 	self->health = self->splashRadius;
 
 	VectorCopy(self->pos1, self->s.origin); // SMOKIN_GUNS

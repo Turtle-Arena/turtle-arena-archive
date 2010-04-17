@@ -641,23 +641,25 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles);
 
 void misc_object_respawn(gentity_t *self)
 {
-#if 1
-	// Kill players so they don't get stuck
-	G_KillBox(self);
-#else
-	G_Printf("DEBUG: Atempting to respawn...\n");
-
 	// Don't let the humans see it respawn
 	if (G_SeenByHumans(self))
 	{
-		G_Printf("DEBUG: respawing deferred...\n");
+		// Defer for a max of the total respawn time
+		if (self->random < self->wait)
+		{
+			self->random++;
 
-		// Try again later
-		self->nextthink = level.time + 1000;
-		self->think = misc_object_respawn;
-		return;
+			// Try again later
+			self->nextthink = level.time + 1000;
+			self->think = misc_object_respawn;
+			return;
+		}
 	}
-#endif
+
+	// Kill players so they don't get stuck
+	G_KillBox(self);
+
+	self->random = 0; // clear defer count
 	
 	//G_Printf("misc_object_respawn: respawning...\n");
 	if (self->activator->spawnflags & MOBJF_KNOCKBACK)
