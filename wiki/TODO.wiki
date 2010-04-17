@@ -88,9 +88,15 @@ Weapons (and attacking)
 
   * TODO: Support bots using func_use (use via holdable item button)
 
-  * TODO: Have a option for func_breakable and misc_object to spawn an item on death
-
   * TODO: Allow func_breakable and misc_object to be pushable.
+
+  * TODO: Add paintarget to func_breakable
+
+  * TODO: Remove metal surfaceflag from grate textures
+
+  * TODO: Add a metal create texture
+
+  * TODO: Fix textures on grate paths in subway
 
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
 

@@ -3896,6 +3896,35 @@ gitem_t	*BG_FindItem( const char *pickupName ) {
 	return NULL;
 }
 
+#ifdef IOQ3ZTM
+/*
+===============
+BG_FindItemForClassname
+===============
+*/
+gitem_t	*BG_FindItemForClassname( const char *classname ) {
+#ifdef TA_WEAPSYS
+	gitem_t	*it;
+	int i;
+
+	for (i = BG_NumItems()-1; i > 0; i--)
+	{
+		it = BG_ItemForItemNum(i);
+		if (!it->classname)
+			continue;
+#else
+	gitem_t	*it;
+	
+	for ( it = bg_itemlist + 1 ; it->classname ; it++ ) {
+#endif
+		if ( !Q_stricmp( it->classname, classname ) )
+			return it;
+	}
+
+	return NULL;
+}
+#endif
+
 #ifdef TA_WEAPSYS
 int BG_ItemNumForItem( gitem_t *item )
 {

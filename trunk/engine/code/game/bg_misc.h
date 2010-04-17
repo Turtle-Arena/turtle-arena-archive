@@ -1766,6 +1766,9 @@ gitem_t	*BG_FindItem( const char *pickupName );
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon );
 gitem_t	*BG_FindItemForPowerup( powerup_t pw );
 gitem_t	*BG_FindItemForHoldable( holdable_t pw );
+#ifdef IOQ3ZTM
+gitem_t	*BG_FindItemForClassname( const char *classname );
+#endif
 #ifdef TA_WEAPSYS
 int BG_ItemNumForItem( gitem_t *item );
 gitem_t	*BG_ItemForItemNum( int itemNum );

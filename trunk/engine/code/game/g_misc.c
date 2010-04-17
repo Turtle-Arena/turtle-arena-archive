@@ -631,10 +631,7 @@ void misc_object_pain(gentity_t *self, gentity_t *attacker, int damage)
 	}
 
 	// ZTM: TODO: Limit how soon to call paintarget again? Use pain_debounce?
-	if ( self->paintarget )
-	{
-		G_UseTargets2(self, attacker, self->paintarget);
-	}
+	G_UseTargets2(self, attacker, self->paintarget);
 }
 
 gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles);
@@ -655,12 +652,16 @@ void misc_object_respawn(gentity_t *self)
 			return;
 		}
 	}
+	self->random = 0; // clear defer count
 
 	// Kill players so they don't get stuck
 	G_KillBox(self);
 
-	self->random = 0; // clear defer count
-	
+	// Remove dropped item
+	if (self->enemy) {
+		G_FreeEntity(self->enemy);
+	}
+
 	//G_Printf("misc_object_respawn: respawning...\n");
 	if (self->activator->spawnflags & MOBJF_KNOCKBACK)
 	{
@@ -712,9 +713,32 @@ void misc_object_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 		self->think = misc_object_respawn;
 	}
 
-	if( self->target )
+	G_UseTargets(self, attacker);
+
+	// Spawn item
+	if (self->message)
 	{
-		G_UseTargets(self, attacker);
+		vec3_t origin, pos1, pos2;
+
+		// Tequila comment: set breakable center as origin for G_BreakableRespawn needs
+		VectorSubtract(self->r.absmax, self->r.absmin, pos1);
+		VectorScale(pos1, 0.5f, pos2);
+		VectorAdd(pos2, self->r.absmin, origin);
+
+		if (Q_stricmp(self->message, "weapon_random") == 0) {
+			// weapon_random: Change item!
+			if (!(self->s.eFlags & EF_VOTED) && !self->item) {
+				self->item = G_RandomWeaponItem(self, self->spawnflags>>7);
+			}
+		} else {
+			self->item = BG_FindItemForClassname(self->message);
+		}
+
+		if (self->item) {
+			self->enemy = LaunchItem(self->item, origin, vec3_origin);
+		} else {
+			self->enemy = NULL;
+		}
 	}
 }
 
@@ -736,10 +760,7 @@ void Use_MiscObject(gentity_t *self, gentity_t *other, gentity_t *activator)
 void misc_object_touch(gentity_t *self, gentity_t *activator, trace_t *trace)
 {
 	//G_Printf("misc_object_touch: touched\n");
-	if( self->target )
-	{
-		G_UseTargets(self, activator);
-	}
+	G_UseTargets(self, activator);
 }
 
 // Basd on SpawnObelisk
@@ -764,6 +785,15 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 	VectorCopy(owner->r.maxs, ent->r.maxs);
 	ent->target = owner->target;
 	ent->wait = owner->wait;
+	ent->message = owner->message;
+	ent->spawnflags = owner->spawnflags;
+
+	// No not constant random weapon...
+	if (!(ent->spawnflags & 8<<7))
+	{
+		// Change weapons on respawn
+		ent->s.eFlags |= EF_VOTED;
+	}
 
 	ent->s.eType = ET_MISCOBJECT;
 	if (!(owner->spawnflags & MOBJF_KNOCKBACK)) {

@@ -238,10 +238,7 @@ void G_NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	}
 
 	// ZTM: TODO: Limit how soon to call paintarget again? Use pain_debounce?
-	if ( self->paintarget )
-	{
-		G_UseTargets2(self, attacker, self->paintarget);
-	}
+	G_UseTargets2(self, attacker, self->paintarget);
 }
 
 /*

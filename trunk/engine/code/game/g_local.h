@@ -536,6 +536,10 @@ void ClearRegisteredItems( void );
 void RegisterItem( gitem_t *item );
 void SaveRegisteredItems( void );
 
+#ifdef TA_WEAPSYS // weapon_random
+gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags );
+#endif
+
 //
 // g_utils.c
 //

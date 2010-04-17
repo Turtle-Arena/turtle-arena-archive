@@ -96,6 +96,7 @@ When destroyed, it triggers all its targets and disappears.
 <real key="health" name="Health">(default 10) ammount of damage the brush must recive to break</real>
 <integer key="wait" name="Respawn Delay">number of seconds before the entity respawns (default 0, 0 = never respawn).</integer>
 <string key="material" name="Material">the valid values are dirt, grass, wood, stone, metal, sparks, glass. It will spawn the listed material(s) when destroyed. Separate materials by commas.</string>
+<string key="message" name="Item">item to spawn on death</string>
 <integer key="mustcut" name="Must Cut">(default 0) if 1 only weapons with "cuts 1" can damage it</integer>
 <real key="light" name="Model Light Intensity">constantLight radius of .md3 model included with entity. Has no effect on the entity's brushes (default 0).</real>
 <color key="color" name="Model Light Color">constantLight color of .md3 model included with entity. Has no effect on the entity's brushes (default 1 1 1).</color>
@@ -115,7 +116,9 @@ When destroyed, it triggers all its targets and disappears.
 <integer key="_layers;layers" name="Terrain Layers">Integer value is the number unique root shaders that will be use on the terrain.</integer>
 <texture key="_shader;shader" name="Terrain MetaShader">Path to the metashader used to assign textures to the terrain entity. Note: Omit the "textures/" prefix.</texture>
 -------- SPAWNFLAGS --------
-<flag key="INVINCIBLE" name="Invincible" bit="5">a tirger must be used to break the brush</flag>
+<flag key="MELEE" name="Spawn Melee Weapons" bit="6">spawn melee weapons (Default on - see weapon_random Notes).</flag>
+<flag key="GUNS" name="Spawn Guns" bit="7">spawn guns (Default on - see weapon_random Notes).</flag>
+<flag key="CONSTANT" name="Select Weapon Once" bit="8">don't change weapon each respawn (see weapon_random Notes).</flag>
 -------- NOTES --------
 Setting the origin key is simply an alternate method to using an origin brush. When using the model2 key, the origin point of the model will correspond to the origin point defined by either the origin brush or the origin coordinate value.
 
@@ -1183,12 +1186,16 @@ Generic placeholder for inserting animated MD3/MDR models in game.
 <targetname key="targetname" name="Target Name">kills this entity when triggered</targetname>
 <integer key="health" name="Health">object's health, if 0 can't be damaged or killed. (default 0)</integer>
 <integer key="wait" name="Respawn Delay">number of seconds before the entity respawns (default 0, 0 = never respawn).</integer>
+<string key="message" name="Item">item to spawn on death</string>
 <target key="target" name="Target">killing (or touching if spawn health is 0) the object will trigger the entity this points to.</target>
 <target key="paintarget" name="Pain Target">damaging the object will trigger the entity this points to.</target>
 -------- SPAWNFLAGS --------
 <flag key="SUSPENDED" name="No Drop To Floor" bit="0">object will spawn where it was placed in map and won't drop to the floor.</flag>
 <flag key="KNOCKBACK" name="Allow Knockback" bit="1">model can move when damaged.</flag>
 <flag key="UNSOLIDDEATH" name="Unsolid on Death" bit="2">makes the object non-solid when killed.</flag>
+<flag key="MELEE" name="Spawn Melee Weapons" bit="6">spawn melee weapons (Default on - see weapon_random Notes).</flag>
+<flag key="GUNS" name="Spawn Guns" bit="7">spawn guns (Default on - see weapon_random Notes).</flag>
+<flag key="CONSTANT" name="Select Weapon Once" bit="8">don't change weapon each respawn (see weapon_random Notes).</flag>
 
 </point>
 
