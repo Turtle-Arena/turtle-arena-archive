@@ -89,10 +89,10 @@ Target this entity with a misc_model to have the model attached to the entity (s
 -->
 
 <group name="func_breakable" color="0 .5 .8">
-When destroyed, it triggers all its targets and disapears.
+When destroyed, it triggers all its targets and disappears.
 -------- KEYS --------
 <target key="target" name="Target">all entities with a matching targetname will be triggered.</target>
-<real key="wait" name="Respawn Delay">TODO: number of seconds before the brush respawns (default -1, -1 = never return).</real>
+<real key="wait" name="Respawn Delay">number of seconds before the brush respawns (default 0, 0 = never respawn).</real>
 <targetname key="targetname" name="Target Name">if set a trigger can be used to break the brush</targetname>
 <real key="health" name="Health">(default 10) ammount of damage the brush must recive to break</real>
 <string key="material" name="Material">the valid values are dirt, grass, wood, stone, metal, sparks, glass. It will spawn the listed material(s) when destroyed. Separate materials by commas.</string>

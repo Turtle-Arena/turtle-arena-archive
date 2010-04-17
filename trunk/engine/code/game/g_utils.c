@@ -611,8 +611,20 @@ void G_KillBox (gentity_t *ent) {
 	gentity_t	*hit;
 	vec3_t		mins, maxs;
 
+#ifdef TA_ENTSYS // BREAKABLE
+	if (!ent->client)
+	{
+		VectorAdd( ent->r.currentOrigin, ent->r.mins, mins );
+		VectorAdd( ent->r.currentOrigin, ent->r.maxs, maxs );
+	}
+	else
+	{
+#endif
 	VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
 	VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
+#ifdef TA_ENTSYS // BREAKABLE
+	}
+#endif
 	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
 
 	for (i=0 ; i<num ; i++) {
