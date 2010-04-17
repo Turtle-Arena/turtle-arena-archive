@@ -538,10 +538,6 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
 
 //======================================================================
 
-#ifdef TA_WEAPSYS // weapon_random
-gitem_t *G_RandomWeaponItem( gentity_t *ent );
-#endif
-
 /*
 ===============
 RespawnItem
@@ -574,7 +570,7 @@ void RespawnItem( gentity_t *ent ) {
 	{
 		gitem_t *item;
 
-		item = G_RandomWeaponItem(ent);
+		item = G_RandomWeaponItem(ent, ent->spawnflags>>1);
 		if (item) {
 			ent->item = item;
 			ent->s.modelindex = ITEM_INDEX(item);
@@ -1231,7 +1227,7 @@ void G_SpawnItem (gentity_t *ent, gitem_t *item) {
 G_RandomWeaponItem
 ============
 */
-gitem_t *G_RandomWeaponItem( gentity_t *ent ) {
+gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags ) {
 	int validWeapons[MAX_BG_WEAPON_GROUPS];
 	int numweapons;
 	int i;
@@ -1246,13 +1242,13 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent ) {
 		if (!bg_weapongroupinfo[i].randomSpawn) {
 			continue;
 		}
-		if (!(ent->spawnflags & 2)) // Don't spawn melee weapons
+		if (!(flags & 1)) // Don't spawn melee weapons
 		{
 			if (BG_WeaponHasMelee(i)) {
 				continue;
 			}
 		}
-		if (!(ent->spawnflags & 4)) // Don't spawn guns
+		if (!(flags & 2)) // Don't spawn guns
 		{
 			if (BG_WeaponHasType(i, WT_GUN)) {
 				continue;
@@ -1312,7 +1308,7 @@ void SP_weapon_random( gentity_t *ent ) {
 		ent->s.eFlags |= EF_NOT_MIRROR;
 #endif
 
-	item = G_RandomWeaponItem(ent);
+	item = G_RandomWeaponItem(ent, ent->spawnflags>>1);
 	if (!item) {
 		return;
 	}
