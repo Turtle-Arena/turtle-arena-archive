@@ -764,6 +764,174 @@ void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 }
 
 
+#ifdef TA_ENTSYS // BREAKABLE
+/*
+================
+G_SeenByHumans
+
+Based on Smokin' Guns G_BreakableRespawn
+================
+*/
+#if 0
+qboolean G_SeenByHumans( gentity_t *ent )
+{
+	gentity_t	*player;
+	gclient_t	*client;
+	int			i;
+#if 0
+	const float fov = 100;
+	float		diff;
+	float		angle;
+	vec3_t		angles;
+	vec3_t		dir;
+	vec3_t		eye;
+	qboolean	cont;
+	int			j;
+#endif
+
+	// cycle through all players and see if the breakable respawn would be visible to them
+	for (i = 0; i < level.maxclients; i++) {
+		player = &g_entities[i];
+		client = &level.clients[i];
+
+		if (client->pers.connected != CON_CONNECTED)
+			continue;
+
+		// if it's too near abort
+		if (Distance(client->ps.origin, ent->pos2) < 300)
+			return qfalse;
+
+		// first check if player could be stuck in the breakable
+		if ( player->r.absmin[0] >= ent->r.absmax[0]
+			|| player->r.absmin[1] >= ent->r.absmax[1]
+			|| player->r.absmin[2] >= ent->r.absmax[2]
+			|| player->r.absmax[0] <= ent->r.absmin[0]
+			|| player->r.absmax[1] <= ent->r.absmin[1]
+			|| player->r.absmax[2] <= ent->r.absmin[2] ) {
+			//
+		} else {
+			return qfalse;
+		}
+
+#if 0 // Doesn't seem to work correctly currently?
+		// Don't process field of vision tests
+		//if (g_forcebreakrespawn.integer)
+			//continue;
+
+		// Tequila comment: Minor server optimization, don't check if breakable is in a bot FOV
+		// They really don't care to "see" a breakable respawn, so we won't delay the respawn
+		// because of bot proximity.
+		if (player->r.svFlags & SVF_BOT)
+			continue;
+
+		// check if its in field of vision
+		VectorCopy(client->ps.origin, eye);
+		eye[2] += client->ps.viewheight;
+
+		VectorSubtract(ent->pos2, eye, dir);
+		vectoangles(dir, angles);
+
+		cont = qfalse;
+
+		for (j = 0; j < 2; j++) {
+			angle = AngleMod(client->ps.viewangles[j]);
+			angles[j] = AngleMod(angles[j]);
+			diff = fabs(angles[j] - angle);
+
+			if (diff > 180.0)
+				diff -= 360.0;
+
+			// if not in field of vision continue;
+			if ( fabs(diff) > fov/2 ) {
+				cont = qtrue;
+				break;
+			}
+		}
+
+		// it's in the field of vision
+		if (!cont) {
+			return qfalse;
+		}
+#endif
+	}
+
+	// now while nobody can see it respawn the breakable
+	return qtrue;
+}
+#endif
+
+/*
+================
+G_BreakableRespawn
+================
+*/
+void G_BreakableRespawn( gentity_t *self )
+{
+#if 1
+	// Kill players so they don't get stuck
+	G_KillBox(self);
+#else
+	G_Printf("DEBUG: Atempting to respawn...\n");
+
+	// Don't let the humans see it respawn
+	if (G_SeenByHumans(self))
+	{
+		G_Printf("DEBUG: respawing deffered...\n");
+
+		// Try again later
+		self->nextthink = level.time + 1000;
+		self->think = G_BreakableRespawn;
+		return;
+	}
+#endif
+	self->health = self->splashRadius;
+
+	VectorCopy(self->pos1, self->s.origin); // SMOKIN_GUNS
+
+	trap_LinkEntity(self);
+}
+
+/*
+================
+G_BreakableDie
+================
+*/
+void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
+{
+	gentity_t *target;
+
+	// If a stickOnImpact projectile is stuck into this breakable have it fall!
+	for (target = g_entities; target < &g_entities[level.num_entities]; target++)
+	{
+		if (target->s.eType == ET_MISSILE && (target->count & 2) && target->enemy == self)
+		{
+			target->count &= ~2; // Remove impact flag
+			target->s.pos.trType = TR_GRAVITY;
+			target->s.pos.trTime = level.time;
+		}
+	}
+
+	if( self->target )
+	{
+		G_UseTargets(self, attacker);
+	}
+
+	// if respawn
+	if (self->wait > 0)
+	{
+		// Respawn after X seconds
+		self->nextthink = level.time + (self->wait * 1000);
+		self->think = G_BreakableRespawn;
+		trap_UnlinkEntity(self);
+	}
+	else
+	{
+		// Good bye!
+		G_FreeEntity(self);
+	}
+}
+#endif
+
 
 /*
 ================
@@ -843,15 +1011,20 @@ void InitMover( gentity_t *ent ) {
 	}
 
 #ifdef TA_ENTSYS // BREAKABLE
+	// Setup breakable ET_MOVER
 	if (ent->health > 0)
 	{
 		char *mat;
 		int i;
 
+		// Save health for respawning
+		ent->splashRadius = ent->health;
+
 		ent->takedamage = qtrue;
+		ent->die = G_BreakableDie;
 		// TODO: Set damage and pain?
 
-		ent->s.time2 = -1; // surfaceFlags
+		ent->s.time2 = -1; // auto surfaceFlags
 
 		if( G_SpawnString( "material", NULL, &mat ) && mat && strlen(mat)) {
 			ent->s.time2 = 0;
@@ -1579,9 +1752,15 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 */
 void SP_func_static( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
+#ifdef IOQ3TM // BREAKABLE
+	VectorCopy( ent->s.origin, ent->pos1);
+	VectorCopy( ent->s.origin, ent->pos2);
+#endif
 	InitMover( ent );
+#ifdef IOQ3TM // BREAKABLE
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
+#endif
 }
 
 
@@ -1613,9 +1792,9 @@ It's like func_static, except that bots will attack it.
 */
 void SP_func_breakable( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
+	VectorCopy( ent->s.origin, ent->pos1);
+	VectorCopy( ent->s.origin, ent->pos2);
 	InitMover( ent );
-	VectorCopy( ent->s.origin, ent->s.pos.trBase );
-	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 }
 #endif
 

@@ -1121,22 +1121,9 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 		G_BreakableDebris(targ, inflictor, attacker, dir, point);
 
-		if (targ->health <= 0)
+		if (targ->health <= 0 && targ->die)
 		{
-			gentity_t *target;
-
-			// If a stickOnImpact projectile is stuck into this breakable have it fall!
-			for (target = g_entities; target < &g_entities[level.num_entities]; target++)
-			{
-				if (target->s.eType == ET_MISSILE && (target->count & 2) && target->enemy == targ)
-				{
-					target->count &= ~2; // Remove impact flag
-					target->s.pos.trType = TR_GRAVITY;
-					target->s.pos.trTime = level.time;
-				}
-			}
-
-			G_FreeEntity( targ );
+			targ->die (targ, inflictor, attacker, damage, mod);
 		}
 		return qtrue;
 	}
