@@ -641,7 +641,25 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles);
 
 void misc_object_respawn(gentity_t *self)
 {
-	G_Printf("misc_object_respawn: respawning...\n");
+#if 1
+	// Kill players so they don't get stuck
+	G_KillBox(self);
+#else
+	G_Printf("DEBUG: Atempting to respawn...\n");
+
+	// Don't let the humans see it respawn
+	if (G_SeenByHumans(self))
+	{
+		G_Printf("DEBUG: respawing deffered...\n");
+
+		// Try again later
+		self->nextthink = level.time + 1000;
+		self->think = misc_object_respawn;
+		return;
+	}
+#endif
+	
+	//G_Printf("misc_object_respawn: respawning...\n");
 	if (self->activator->spawnflags & MOBJF_KNOCKBACK)
 	{
 		// ZTM: FIXME: Not right if "self" moved from origin.
@@ -698,12 +716,19 @@ void misc_object_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 	}
 }
 
+#if 0
 void misc_object_think(gentity_t *self)
 {
 	self->nextthink = level.time + 1000;
 
 	// Do once per-second thinking code.
 	// Such as animation (but that should be in cgame...)
+}
+#endif
+
+void Use_MiscObject(gentity_t *self, gentity_t *other, gentity_t *activator)
+{
+	misc_object_die(self, NULL, activator, 10000, MOD_UNKNOWN);
 }
 
 void misc_object_touch(gentity_t *self, gentity_t *activator, trace_t *trace)
@@ -736,6 +761,7 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 	VectorCopy(owner->r.mins, ent->r.mins);
 	VectorCopy(owner->r.maxs, ent->r.maxs);
 	ent->target = owner->target;
+	ent->wait = owner->wait;
 
 	ent->s.eType = ET_MISCOBJECT;
 	if (!(owner->spawnflags & MOBJF_KNOCKBACK)) {
@@ -755,11 +781,12 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 		//G_Printf("misc_object_spawn: animated damagable\n");
 		ent->r.contents = CONTENTS_BODY;
 		ent->health = owner->health;
-			ent->takedamage = qtrue;
+		ent->takedamage = qtrue;
 		ent->die = misc_object_die;
 		ent->pain = misc_object_pain;
-		ent->think = misc_object_think;
-		ent->nextthink = level.time + 1000;
+		ent->use = Use_MiscObject;
+		//ent->think = misc_object_think;
+		//ent->nextthink = level.time + 1000;
 	} else if ( ent->target ) {
 		//G_Printf("misc_object_spawn: animated touchable\n");
 		ent->r.contents = CONTENTS_TRIGGER;
@@ -870,7 +897,7 @@ void SP_misc_object( gentity_t *ent ) {
 		}
 		else
 		{
-		G_SetFileExt(filename, ".cfg");
+			G_SetFileExt(filename, ".cfg");
 		}
 
 		BG_ParseObjectCFGFile(filename, &objectcfg);
@@ -906,7 +933,7 @@ void SP_misc_object( gentity_t *ent ) {
 		}
 	}
 
-	trap_LinkEntity (ent);
+	//trap_LinkEntity (ent);
 
 	misc_object_spawn(ent, ent->s.origin, ent->s.angles);
 }

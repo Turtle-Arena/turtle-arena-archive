@@ -504,6 +504,7 @@
 "origin" "432.000000 728.000000 -192.000000"
 "model" "models/mapobjects/pots/pot1.md3"
 "spawnflags" "4"
+"wait" "5"
 }
 // entity 41
 {
@@ -1935,6 +1936,7 @@
 "classname" "func_breakable"
 "health" "10"
 "material" "glass"
+"wait" "26"
 // brush 0
 {
 ( 1344 576 -136 ) ( 1344 320 -136 ) ( 1280 576 -136 ) common/caulk 0 0 0 0.5 0.5 0 0 0

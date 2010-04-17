@@ -92,9 +92,9 @@ Target this entity with a misc_model to have the model attached to the entity (s
 When destroyed, it triggers all its targets and disappears.
 -------- KEYS --------
 <target key="target" name="Target">all entities with a matching targetname will be triggered.</target>
-<real key="wait" name="Respawn Delay">number of seconds before the brush respawns (default 0, 0 = never respawn).</real>
 <targetname key="targetname" name="Target Name">if set a trigger can be used to break the brush</targetname>
 <real key="health" name="Health">(default 10) ammount of damage the brush must recive to break</real>
+<integer key="wait" name="Respawn Delay">number of seconds before the entity respawns (default 0, 0 = never respawn).</integer>
 <string key="material" name="Material">the valid values are dirt, grass, wood, stone, metal, sparks, glass. It will spawn the listed material(s) when destroyed. Separate materials by commas.</string>
 <integer key="mustcut" name="Must Cut">(default 0) if 1 only weapons with "cuts 1" can damage it</integer>
 <real key="light" name="Model Light Intensity">constantLight radius of .md3 model included with entity. Has no effect on the entity's brushes (default 0).</real>
@@ -1180,11 +1180,11 @@ Generic placeholder for inserting animated MD3/MDR models in game.
 <angle key="angle" name="Yaw Angle">direction in which model will be oriented.</angle>
 <model key="model" name="Model File">path/name of model to use (eg: models/mapobjects/teleporter/teleporter.md3).</model>
 <mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
-<targetname key="targetname" name="Target Name">TODO: Kill or damage the object?</targetname>
+<targetname key="targetname" name="Target Name">kills this entity when triggered</targetname>
 <integer key="health" name="Health">object's health, if 0 can't be damaged or killed. (default 0)</integer>
+<integer key="wait" name="Respawn Delay">number of seconds before the entity respawns (default 0, 0 = never respawn).</integer>
 <target key="target" name="Target">killing (or touching if spawn health is 0) the object will trigger the entity this points to.</target>
 <target key="paintarget" name="Pain Target">damaging the object will trigger the entity this points to.</target>
-<integer key="wait" name="Respawn Time">time in seconds for the object to respawn when killed, if 0 doesn't respawn. (default 0)</integer>
 -------- SPAWNFLAGS --------
 <flag key="SUSPENDED" name="No Drop To Floor" bit="0">object will spawn where it was placed in map and won't drop to the floor.</flag>
 <flag key="KNOCKBACK" name="Allow Knockback" bit="1">model can move when damaged.</flag>
