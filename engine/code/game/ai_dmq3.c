@@ -244,6 +244,11 @@ qboolean EntityIsInvisible(aas_entityinfo_t *entinfo) {
 	if (entinfo->powerups & (1 << PW_INVIS)) {
 		return qtrue;
 	}
+#ifdef TURTLEARENA // POWERS
+	if (entinfo->powerups & (1 << PW_FLASHING)) {
+		return qtrue;
+	}
+#endif
 	return qfalse;
 }
 
@@ -253,6 +258,12 @@ EntityIsShooting
 ==================
 */
 qboolean EntityIsShooting(aas_entityinfo_t *entinfo) {
+#ifdef TURTLEARENA // POWERS
+	// ignore PW_FLASHING players
+	if (entinfo->powerups & (1 << PW_FLASHING)) {
+		return qfalse;
+	}
+#endif
 	if (entinfo->flags & EF_FIRING) {
 		return qtrue;
 	}
