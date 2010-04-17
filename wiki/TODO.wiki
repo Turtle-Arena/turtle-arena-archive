@@ -90,8 +90,6 @@ Weapons (and attacking)
 
   * TODO: Have a option for func_breakable and misc_object to spawn an item on death
 
-  * TODO-BETA: Defer func_breakable and misc_object respawn if a player would be in the entity (Optional spawnflag or cvar?)
-
   * TODO: Allow func_breakable and misc_object to be pushable.
 
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
