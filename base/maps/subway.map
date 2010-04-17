@@ -1993,20 +1993,20 @@ base_wall/subway_wall_red
 // brush 212
 {
 ( 480 384 144 ) ( 480 72 144 ) ( 360 384 144 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
-( 464 256 144 ) ( 344 256 144 ) ( 464 256 80 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 464 256 144 ) ( 344 256 144 ) ( 464 256 80 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 488 384 144 ) ( 488 384 80 ) ( 488 72 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 360 72 136 ) ( 480 72 136 ) ( 360 384 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 392 72 80 ) ( 392 384 80 ) ( 392 72 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 480 16 136 ) ( 464 16 144 ) ( 480 16 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 392 72 80 ) ( 392 384 80 ) ( 392 72 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 480 16 136 ) ( 464 16 144 ) ( 480 16 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 213
 {
 ( 480 384 144 ) ( 480 72 144 ) ( 360 384 144 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
 ( 360 72 136 ) ( 480 72 136 ) ( 360 384 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 352 -16 80 ) ( 352 -16 144 ) ( 472 -16 80 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 392 72 80 ) ( 392 384 80 ) ( 392 72 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 480 16 144 ) ( 464 16 144 ) ( 480 16 136 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 456 -16 144 ) ( 456 0 136 ) ( 456 -16 136 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 392 72 80 ) ( 392 384 80 ) ( 392 72 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 480 16 144 ) ( 464 16 144 ) ( 480 16 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 456 -16 144 ) ( 456 0 136 ) ( 456 -16 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 214
 {
@@ -2568,11 +2568,11 @@ sfx/beam
 // brush 267
 {
 ( 392 -16 144 ) ( 488 -256 56 ) ( 392 -256 56 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
-( 488 -16 144 ) ( 392 -16 136 ) ( 488 -16 136 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 488 -16 144 ) ( 392 -16 136 ) ( 488 -16 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 488 -16 144 ) ( 488 -16 136 ) ( 488 -256 56 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 488 -256 48 ) ( 488 -16 136 ) ( 392 -16 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 488 -256 -72 ) ( 392 -256 56 ) ( 488 -256 56 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 392 -256 56 ) ( 392 -16 136 ) ( 392 -16 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 488 -256 -72 ) ( 392 -256 56 ) ( 488 -256 56 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 392 -256 56 ) ( 392 -16 136 ) ( 392 -16 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 268
 {
@@ -2580,8 +2580,8 @@ sfx/beam
 ( 488 -256 56 ) ( 488 -256 48 ) ( 656 -256 -48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 656 -384 -56 ) ( 656 -384 -48 ) ( 656 -256 -48 ) base_floor/grate_rust 0 8 0 0.5 0.5 0 0 0
 ( 656 -384 -56 ) ( 488 -256 48 ) ( 488 -384 48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 656 -384 -48 ) ( 488 -384 48 ) ( 488 -384 56 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 488 -256 56 ) ( 488 -384 48 ) ( 488 -256 48 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 656 -384 -48 ) ( 488 -384 48 ) ( 488 -384 56 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 488 -256 56 ) ( 488 -384 48 ) ( 488 -256 48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 269
 {
@@ -2595,20 +2595,20 @@ sfx/beam
 // brush 270
 {
 ( 480 -256 56 ) ( 480 -320 56 ) ( 384 -256 56 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
-( 488 -256 144 ) ( 488 -256 -72 ) ( 488 -320 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 488 -256 144 ) ( 488 -256 -72 ) ( 488 -320 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 400 -320 48 ) ( 496 -320 48 ) ( 400 -256 48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 392 -384 -72 ) ( 392 -384 144 ) ( 488 -384 -72 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 392 -320 -72 ) ( 392 -256 -72 ) ( 392 -320 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 480 -288 136 ) ( 464 -288 144 ) ( 464 -288 136 ) base_floor/metal2 0 0 0 0.5 0.5 0 0 0
+( 392 -384 -72 ) ( 392 -384 144 ) ( 488 -384 -72 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 392 -320 -72 ) ( 392 -256 -72 ) ( 392 -320 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 480 -288 136 ) ( 464 -288 144 ) ( 464 -288 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 271
 {
 ( 480 -256 56 ) ( 480 -320 56 ) ( 384 -256 56 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
-( 488 -256 144 ) ( 392 -256 144 ) ( 488 -256 -72 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 488 -256 144 ) ( 392 -256 144 ) ( 488 -256 -72 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 400 -320 48 ) ( 496 -320 48 ) ( 400 -256 48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 392 -320 -72 ) ( 392 -256 -72 ) ( 392 -320 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 464 -288 136 ) ( 464 -288 144 ) ( 480 -288 136 ) base_floor/metal2 0 0 0 0.5 0.5 0 0 0
-( 456 -288 144 ) ( 456 -272 136 ) ( 456 -288 136 ) base_floor/metal2 0 0 0 0.5 0.5 0 0 0
+( 392 -320 -72 ) ( 392 -256 -72 ) ( 392 -320 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 464 -288 136 ) ( 464 -288 144 ) ( 480 -288 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 456 -288 144 ) ( 456 -272 136 ) ( 456 -288 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 272
 {
@@ -2622,38 +2622,38 @@ sfx/beam
 // brush 273
 {
 ( 1056 256 56 ) ( 1056 320 56 ) ( 1152 256 56 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
-( 1048 256 144 ) ( 1048 256 -72 ) ( 1048 320 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1048 256 144 ) ( 1048 256 -72 ) ( 1048 320 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 1136 320 48 ) ( 1040 320 48 ) ( 1136 256 48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 1144 384 -72 ) ( 1144 384 144 ) ( 1048 384 -72 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 1144 320 -72 ) ( 1144 256 -72 ) ( 1144 320 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 1056 288 136 ) ( 1072 288 144 ) ( 1072 288 136 ) base_floor/metal2 0 0 0 0.5 0.5 0 0 0
+( 1144 384 -72 ) ( 1144 384 144 ) ( 1048 384 -72 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 1144 320 -72 ) ( 1144 256 -72 ) ( 1144 320 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 1056 288 136 ) ( 1072 288 144 ) ( 1072 288 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 274
 {
 ( 1056 -384 144 ) ( 1056 -72 144 ) ( 1176 -384 144 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
-( 1072 -256 144 ) ( 1192 -256 144 ) ( 1072 -256 80 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1072 -256 144 ) ( 1192 -256 144 ) ( 1072 -256 80 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 1048 -384 144 ) ( 1048 -384 80 ) ( 1048 -72 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 1176 -72 136 ) ( 1056 -72 136 ) ( 1176 -384 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 1144 -72 80 ) ( 1144 -384 80 ) ( 1144 -72 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 1056 -16 136 ) ( 1072 -16 144 ) ( 1056 -16 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1144 -72 80 ) ( 1144 -384 80 ) ( 1144 -72 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 1056 -16 136 ) ( 1072 -16 144 ) ( 1056 -16 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 275
 {
 ( 1056 -384 144 ) ( 1056 -72 144 ) ( 1176 -384 144 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
 ( 1176 -72 136 ) ( 1056 -72 136 ) ( 1176 -384 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 1184 16 80 ) ( 1184 16 144 ) ( 1064 16 80 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 1144 -72 80 ) ( 1144 -384 80 ) ( 1144 -72 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 1056 -16 144 ) ( 1072 -16 144 ) ( 1056 -16 136 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 1080 16 144 ) ( 1080 0 136 ) ( 1080 16 136 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1144 -72 80 ) ( 1144 -384 80 ) ( 1144 -72 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 1056 -16 144 ) ( 1072 -16 144 ) ( 1056 -16 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 1080 16 144 ) ( 1080 0 136 ) ( 1080 16 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 276
 {
 ( 1144 16 144 ) ( 1048 256 56 ) ( 1144 256 56 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
-( 1048 16 144 ) ( 1144 16 136 ) ( 1048 16 136 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1048 16 144 ) ( 1144 16 136 ) ( 1048 16 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 1048 16 144 ) ( 1048 16 136 ) ( 1048 256 56 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 1048 256 48 ) ( 1048 16 136 ) ( 1144 16 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 1048 256 -72 ) ( 1144 256 56 ) ( 1048 256 56 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 1144 256 56 ) ( 1144 16 136 ) ( 1144 16 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1048 256 -72 ) ( 1144 256 56 ) ( 1048 256 56 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 1144 256 56 ) ( 1144 16 136 ) ( 1144 16 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 277
 {
@@ -2670,8 +2670,8 @@ sfx/beam
 ( 1048 256 56 ) ( 1048 256 48 ) ( 880 256 -48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 880 384 -56 ) ( 880 384 -48 ) ( 880 256 -48 ) base_floor/grate_rust 0 8 0 0.5 0.5 0 0 0
 ( 880 384 -56 ) ( 1048 256 48 ) ( 1048 384 48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 880 384 -48 ) ( 1048 384 48 ) ( 1048 384 56 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 1048 256 56 ) ( 1048 384 48 ) ( 1048 256 48 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 880 384 -48 ) ( 1048 384 48 ) ( 1048 384 56 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 1048 256 56 ) ( 1048 384 48 ) ( 1048 256 48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 279
 {
@@ -2685,11 +2685,11 @@ sfx/beam
 // brush 280
 {
 ( 1056 256 56 ) ( 1056 320 56 ) ( 1152 256 56 ) base_floor/grate_rust 0 0 0 0.5 0.5 0 0 0
-( 1048 256 144 ) ( 1144 256 144 ) ( 1048 256 -72 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1048 256 144 ) ( 1144 256 144 ) ( 1048 256 -72 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 ( 1136 320 48 ) ( 1040 320 48 ) ( 1136 256 48 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
-( 1144 320 -72 ) ( 1144 256 -72 ) ( 1144 320 144 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 1072 288 136 ) ( 1072 288 144 ) ( 1056 288 136 ) base_floor/metal2 0 0 0 0.5 0.5 0 0 0
-( 1080 288 144 ) ( 1080 272 136 ) ( 1080 288 136 ) base_floor/metal2 0 0 0 0.5 0.5 0 0 0
+( 1144 320 -72 ) ( 1144 256 -72 ) ( 1144 320 144 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 1072 288 136 ) ( 1072 288 144 ) ( 1056 288 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
+( 1080 288 144 ) ( 1080 272 136 ) ( 1080 288 136 ) common/nodraw 0 0 0 0.5 0.5 0 0 0
 }
 // brush 281
 {
@@ -3358,6 +3358,58 @@ base_wall/subway_wall_clean
 ( 1208 96 328 ) ( 1208 96 200 ) ( 1200 96 328 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( 1208 96 328 ) ( 1208 160 328 ) ( 1208 96 200 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 }
+// brush 349
+{
+patchDef2
+{
+base_floor/subway_tile
+( 3 5 0 0 0 )
+(
+( ( 1040.1068115234 -304 280 32.5033378601 9.5 ) ( 1040.1068115234 -282.3999938965 280 32.5033378601 8.8249998093 ) ( 1064 -282.3999938965 280 33.25 8.8249998093 ) ( 1087.8931884766 -282.3999938965 280 33.9966621399 8.8249998093 ) ( 1087.8931884766 -304 280 33.9966621399 9.5 ) )
+( ( 1040.1068115234 -304 280 32.5033378601 9.5 ) ( 1040.1068115234 -304 280 32.5033378601 9.5 ) ( 1064 -304 280 33.25 9.5 ) ( 1087.8931884766 -304 280 33.9966621399 9.5 ) ( 1087.8931884766 -304 280 33.9966621399 9.5 ) )
+( ( 1040.1068115234 -304 280 32.5033378601 9.5 ) ( 1040.1068115234 -325.6000061035 280 32.5033378601 10.1750001907 ) ( 1064 -325.6000061035 280 33.25 10.1750001907 ) ( 1087.8931884766 -325.6000061035 280 33.9966621399 10.1750001907 ) ( 1087.8931884766 -304 280 33.9966621399 9.5 ) )
+)
+}
+}
+// brush 350
+{
+patchDef2
+{
+base_floor/grate_rust
+( 3 5 0 0 0 )
+(
+( ( 1040.1068115234 -304 112 -9.5 -3.5 ) ( 1040.1068115234 -325.6000061035 112 -10.1750001907 -3.5 ) ( 1064 -325.6000061035 112 -10.1750001907 -3.5 ) ( 1087.8931884766 -325.6000061035 112 -10.1750001907 -3.5 ) ( 1087.8931884766 -304 112 -9.5 -3.5 ) )
+( ( 1040.1068115234 -304 112 -9.5 -3.5 ) ( 1040.1068115234 -304 112 -9.5 -3.5 ) ( 1064 -304 112 -9.5 -3.5 ) ( 1087.8931884766 -304 112 -9.5 -3.5 ) ( 1087.8931884766 -304 112 -9.5 -3.5 ) )
+( ( 1040.1068115234 -304 112 -9.5 -3.5 ) ( 1040.1068115234 -282.3999938965 112 -8.8249998093 -3.5 ) ( 1064 -282.3999938965 112 -8.8249998093 -3.5 ) ( 1087.8931884766 -282.3999938965 112 -8.8249998093 -3.5 ) ( 1087.8931884766 -304 112 -9.5 -3.5 ) )
+)
+}
+}
+// brush 351
+{
+patchDef2
+{
+base_floor/subway_tile
+( 3 5 0 0 0 )
+(
+( ( 495.8931884766 304 280 15.4966621399 -9.5 ) ( 495.8931884766 282.4000244141 280 15.4966621399 -8.8250007629 ) ( 472 282.4000244141 280 14.75 -8.8250007629 ) ( 448.1068115234 282.4000244141 280 14.0033378601 -8.8250007629 ) ( 448.1068115234 304 280 14.0033378601 -9.5 ) )
+( ( 495.8931884766 304 280 15.4966621399 -9.5 ) ( 495.8931884766 304 280 15.4966621399 -9.5 ) ( 472 304 280 14.75 -9.5 ) ( 448.1068115234 304 280 14.0033378601 -9.5 ) ( 448.1068115234 304 280 14.0033378601 -9.5 ) )
+( ( 495.8931884766 304 280 15.4966621399 -9.5 ) ( 495.8931884766 325.5999755859 280 15.4966621399 -10.1749992371 ) ( 472 325.5999755859 280 14.75 -10.1749992371 ) ( 448.1068115234 325.5999755859 280 14.0033378601 -10.1749992371 ) ( 448.1068115234 304 280 14.0033378601 -9.5 ) )
+)
+}
+}
+// brush 352
+{
+patchDef2
+{
+base_floor/grate_rust
+( 3 5 0 0 0 )
+(
+( ( 495.8931884766 304 112 9.5 -3.5 ) ( 495.8931884766 325.5999755859 112 10.1749992371 -3.5 ) ( 472 325.5999755859 112 10.1749992371 -3.5 ) ( 448.1068115234 325.5999755859 112 10.1749992371 -3.5 ) ( 448.1068115234 304 112 9.5 -3.5 ) )
+( ( 495.8931884766 304 112 9.5 -3.5 ) ( 495.8931884766 304 112 9.5 -3.5 ) ( 472 304 112 9.5 -3.5 ) ( 448.1068115234 304 112 9.5 -3.5 ) ( 448.1068115234 304 112 9.5 -3.5 ) )
+( ( 495.8931884766 304 112 9.5 -3.5 ) ( 495.8931884766 282.4000244141 112 8.8250007629 -3.5 ) ( 472 282.4000244141 112 8.8250007629 -3.5 ) ( 448.1068115234 282.4000244141 112 8.8250007629 -3.5 ) ( 448.1068115234 304 112 9.5 -3.5 ) )
+)
+}
+}
 }
 // entity 1
 {
@@ -3391,130 +3443,124 @@ base_wall/subway_wall_clean
 {
 "classname" "team_CTF_redspawn"
 "origin" "1888.000000 0.000000 24.000000"
-"angle" "180.000000"
-}
-// entity 7
-{
-"classname" "team_CTF_redspawn"
-"origin" "1888.000000 0.000000 24.000000"
 "angle" "135.000000"
 }
-// entity 8
+// entity 7
 {
 "classname" "team_CTF_redspawn"
 "origin" "1888.000000 96.000000 24.000000"
 "angle" "135.000000"
 }
-// entity 9
+// entity 8
 {
 "classname" "team_CTF_redspawn"
 "origin" "1888.000000 208.000000 24.000000"
 "angle" "135.000000"
 }
-// entity 10
+// entity 9
 {
 "classname" "team_CTF_redspawn"
 "origin" "1888.000000 -112.000000 24.000000"
 "angle" "-135.000000"
 }
-// entity 11
+// entity 10
 {
 "classname" "team_CTF_redspawn"
 "origin" "1888.000000 -216.000000 24.000000"
 "angle" "-135.000000"
 }
-// entity 12
+// entity 11
 {
 "classname" "team_CTF_bluespawn"
 "origin" "-352.000000 208.000000 24.000000"
 "angle" "45.000000"
 }
-// entity 13
+// entity 12
 {
 "classname" "team_CTF_bluespawn"
 "origin" "-352.000000 96.000000 24.000000"
 "angle" "45.000000"
 }
-// entity 14
+// entity 13
 {
 "classname" "team_CTF_bluespawn"
 "origin" "-352.000000 0.000000 24.000000"
 }
-// entity 15
+// entity 14
 {
 "classname" "team_CTF_bluespawn"
 "origin" "-352.000000 -112.000000 24.000000"
 "angle" "-45.000000"
 }
-// entity 16
+// entity 15
 {
 "classname" "team_CTF_bluespawn"
 "origin" "-352.000000 -216.000000 24.000000"
 "angle" "-45.000000"
 }
-// entity 17
+// entity 16
 {
 "classname" "holdable_shurikenfire"
 "origin" "368.000000 320.000000 208.000000"
 "angle" "180.000000"
 }
-// entity 18
+// entity 17
 {
 "classname" "item_scout"
 "origin" "-992.000000 32.000000 32.000000"
 "spawnflags" "4"
 "gametype" "ctf,oneflag,obelisk,harvester"
 }
-// entity 19
+// entity 18
 {
 "classname" "item_guard"
 "origin" "-992.000000 96.000000 32.000000"
 "spawnflags" "4"
 "gametype" "ctf,oneflag,obelisk,harvester"
 }
-// entity 20
+// entity 19
 {
 "classname" "item_doubler"
 "origin" "-992.000000 -32.000000 32.000000"
 "spawnflags" "4"
 "gametype" "ctf,oneflag,obelisk,harvester"
 }
-// entity 21
+// entity 20
 {
 "classname" "item_ammoregen"
 "origin" "-992.000000 -96.000000 32.000000"
 "spawnflags" "4"
 "gametype" "ctf,oneflag,obelisk,harvester"
 }
-// entity 22
+// entity 21
 {
 "classname" "item_scout"
 "origin" "-480.000000 96.000000 32.000000"
 "spawnflags" "4"
 "gametype" "ctf,oneflag,obelisk,harvester"
 }
-// entity 23
+// entity 22
 {
 "classname" "item_guard"
 "origin" "-480.000000 160.000000 32.000000"
 "spawnflags" "4"
 "gametype" "ctf,oneflag,obelisk,harvester"
 }
-// entity 24
+// entity 23
 {
 "classname" "item_doubler"
 "origin" "-480.000000 -96.000000 32.000000"
 "spawnflags" "4"
 "gametype" "ctf,oneflag,obelisk,harvester"
 }
-// entity 25
+// entity 24
 {
 "classname" "item_ammoregen"
 "origin" "-480.000000 -160.000000 32.000000"
 "spawnflags" "4"
 "gametype" "ctf,oneflag,obelisk,harvester"
 }
-// entity 26
+// entity 25
 {
 "classname" "item_scout"
 "origin" "2016.000000 -96.000000 32.000000"
@@ -3522,7 +3568,7 @@ base_wall/subway_wall_clean
 "gametype" "ctf,oneflag,obelisk,harvester"
 "angle" "180.000000"
 }
-// entity 27
+// entity 26
 {
 "classname" "item_guard"
 "origin" "2016.000000 -160.000000 32.000000"
@@ -3530,7 +3576,7 @@ base_wall/subway_wall_clean
 "gametype" "ctf,oneflag,obelisk,harvester"
 "angle" "180.000000"
 }
-// entity 28
+// entity 27
 {
 "classname" "item_doubler"
 "origin" "2016.000000 96.000000 32.000000"
@@ -3538,7 +3584,7 @@ base_wall/subway_wall_clean
 "gametype" "ctf,oneflag,obelisk,harvester"
 "angle" "180.000000"
 }
-// entity 29
+// entity 28
 {
 "classname" "item_ammoregen"
 "origin" "2016.000000 160.000000 32.000000"
@@ -3546,7 +3592,7 @@ base_wall/subway_wall_clean
 "gametype" "ctf,oneflag,obelisk,harvester"
 "angle" "180.000000"
 }
-// entity 30
+// entity 29
 {
 "classname" "item_scout"
 "origin" "2528.000000 -32.000000 32.000000"
@@ -3554,7 +3600,7 @@ base_wall/subway_wall_clean
 "gametype" "ctf,oneflag,obelisk,harvester"
 "angle" "180.000000"
 }
-// entity 31
+// entity 30
 {
 "classname" "item_guard"
 "origin" "2528.000000 -96.000000 32.000000"
@@ -3562,7 +3608,7 @@ base_wall/subway_wall_clean
 "gametype" "ctf,oneflag,obelisk,harvester"
 "angle" "180.000000"
 }
-// entity 32
+// entity 31
 {
 "classname" "item_doubler"
 "origin" "2528.000000 32.000000 32.000000"
@@ -3570,7 +3616,7 @@ base_wall/subway_wall_clean
 "gametype" "ctf,oneflag,obelisk,harvester"
 "angle" "180.000000"
 }
-// entity 33
+// entity 32
 {
 "classname" "item_ammoregen"
 "origin" "2528.000000 96.000000 32.000000"
@@ -3578,339 +3624,339 @@ base_wall/subway_wall_clean
 "gametype" "ctf,oneflag,obelisk,harvester"
 "angle" "180.000000"
 }
-// entity 34
+// entity 33
 {
 "classname" "team_CTF_redplayer"
 "origin" "2360.000000 152.000000 24.000000"
 "angle" "180.000000"
 }
-// entity 35
+// entity 34
 {
 "classname" "team_CTF_redplayer"
 "origin" "2464.000000 40.000000 24.000000"
 "angle" "180.000000"
 }
-// entity 36
+// entity 35
 {
 "classname" "team_CTF_redplayer"
 "origin" "2464.000000 96.000000 24.000000"
 "angle" "180.000000"
 }
-// entity 37
+// entity 36
 {
 "classname" "team_CTF_redplayer"
 "origin" "2368.000000 -152.000000 24.000000"
 "angle" "180.000000"
 }
-// entity 38
+// entity 37
 {
 "classname" "team_CTF_redplayer"
 "origin" "2464.000000 152.000000 24.000000"
 "angle" "180.000000"
 }
-// entity 39
+// entity 38
 {
 "classname" "team_CTF_redplayer"
 "origin" "2464.000000 -40.000000 24.000000"
 "angle" "180.000000"
 }
-// entity 40
+// entity 39
 {
 "classname" "team_CTF_redplayer"
 "origin" "2464.000000 -96.000000 24.000000"
 "angle" "180.000000"
 }
-// entity 41
+// entity 40
 {
 "classname" "team_CTF_redplayer"
 "origin" "2464.000000 -152.000000 24.000000"
 "angle" "180.000000"
 }
-// entity 42
+// entity 41
 {
 "classname" "info_player_deathmatch"
 "origin" "568.000000 0.000000 -32.000000"
 }
-// entity 43
+// entity 42
 {
 "classname" "info_player_deathmatch"
 "origin" "576.000000 336.000000 -32.000000"
 "angle" "-90.000000"
 }
-// entity 44
+// entity 43
 {
 "classname" "info_player_deathmatch"
 "origin" "688.000000 -344.000000 -32.000000"
 "angle" "90.000000"
 }
-// entity 45
+// entity 44
 {
 "classname" "info_player_deathmatch"
 "origin" "928.000000 -344.000000 -32.000000"
 "angle" "90.000000"
 }
-// entity 46
+// entity 45
 {
 "classname" "info_player_deathmatch"
 "origin" "848.000000 336.000000 -32.000000"
 "angle" "-90.000000"
 }
-// entity 47
+// entity 46
 {
 "classname" "info_player_deathmatch"
 "origin" "968.000000 0.000000 -32.000000"
 "angle" "180.000000"
 }
-// entity 48
+// entity 47
 {
 "classname" "info_player_deathmatch"
 "origin" "1744.000000 -504.000000 -32.000000"
 "angle" "180.000000"
 }
-// entity 49
+// entity 48
 {
 "classname" "info_player_intermission"
 "origin" "496.000000 -280.000000 136.000000"
 "target" "target_intermission"
 }
-// entity 50
+// entity 49
 {
 "classname" "target_position"
 "origin" "632.000000 -112.000000 120.000000"
 "targetname" "target_intermission"
 }
-// entity 51
+// entity 50
 {
 "classname" "target_location"
 "origin" "1984.000000 0.000000 48.000000"
 "count" "0"
 "message" "Red Base"
 }
-// entity 52
+// entity 51
 {
 "classname" "target_location"
 "origin" "2368.000000 0.000000 48.000000"
 "count" "0"
 "message" "Red Room"
 }
-// entity 53
+// entity 52
 {
 "classname" "target_location"
 "origin" "1768.000000 -544.000000 48.000000"
 "message" "Red Track"
 }
-// entity 54
+// entity 53
 {
 "classname" "target_location"
 "origin" "768.000000 0.000000 48.000000"
 "message" "Main Room"
 }
-// entity 55
+// entity 54
 {
 "classname" "target_location"
 "origin" "-224.000000 544.000000 48.000000"
 "message" "Blue Track"
 }
-// entity 56
+// entity 55
 {
 "classname" "item_botroam"
 "origin" "1672.000000 -544.000000 48.000000"
 "weight" "10"
 }
-// entity 57
+// entity 56
 {
 "classname" "item_botroam"
 "origin" "760.000000 -544.000000 48.000000"
 "weight" "10"
 "angle" "180.000000"
 }
-// entity 58
+// entity 57
 {
 "classname" "item_botroam"
 "origin" "768.000000 544.000000 48.000000"
 "weight" "10"
 }
-// entity 59
+// entity 58
 {
 "classname" "item_botroam"
 "origin" "768.000000 0.000000 88.000000"
 "weight" "11"
 }
-// entity 60
+// entity 59
 {
 "classname" "info_player_deathmatch"
 "origin" "-184.000000 -520.000000 -32.000000"
 }
-// entity 61
+// entity 60
 {
 "classname" "target_location"
 "origin" "-224.000000 -544.000000 48.000000"
 "message" "Blue Track"
 }
-// entity 62
+// entity 61
 {
 "classname" "info_player_deathmatch"
 "origin" "1744.000000 504.000000 -32.000000"
 "angle" "180.000000"
 }
-// entity 63
+// entity 62
 {
 "classname" "target_location"
 "origin" "1768.000000 544.000000 48.000000"
 "message" "Red Track"
 }
-// entity 64
+// entity 63
 {
 "classname" "item_botroam"
 "origin" "1672.000000 544.000000 48.000000"
 "weight" "10"
 }
-// entity 65
+// entity 64
 {
 "classname" "target_location"
 "origin" "-448.000000 0.000000 48.000000"
 "count" "0"
 "message" "Blue Base"
 }
-// entity 66
+// entity 65
 {
 "classname" "team_CTF_blueflag"
 "origin" "-832.000000 0.000000 32.000000"
 "gametype" "ctf,oneflag"
 }
-// entity 67
+// entity 66
 {
 "classname" "team_blueobelisk"
 "origin" "-832.000000 0.000000 0.000000"
 }
-// entity 68
+// entity 67
 {
 "classname" "team_CTF_blueplayer"
 "origin" "-832.000000 -152.000000 24.000000"
 }
-// entity 69
+// entity 68
 {
 "classname" "team_CTF_blueplayer"
 "origin" "-920.000000 -40.000000 24.000000"
 }
-// entity 70
+// entity 69
 {
 "classname" "team_CTF_blueplayer"
 "origin" "-920.000000 -96.000000 24.000000"
 }
-// entity 71
+// entity 70
 {
 "classname" "team_CTF_blueplayer"
 "origin" "-824.000000 152.000000 24.000000"
 }
-// entity 72
+// entity 71
 {
 "classname" "team_CTF_blueplayer"
 "origin" "-920.000000 -152.000000 24.000000"
 }
-// entity 73
+// entity 72
 {
 "classname" "team_CTF_blueplayer"
 "origin" "-920.000000 40.000000 24.000000"
 }
-// entity 74
+// entity 73
 {
 "classname" "team_CTF_blueplayer"
 "origin" "-920.000000 96.000000 24.000000"
 }
-// entity 75
+// entity 74
 {
 "classname" "team_CTF_blueplayer"
 "origin" "-920.000000 152.000000 24.000000"
 }
-// entity 76
+// entity 75
 {
 "classname" "target_location"
 "origin" "-832.000000 0.000000 48.000000"
 "count" "0"
 "message" "Blue Room"
 }
-// entity 77
+// entity 76
 {
 "classname" "item_health"
 "origin" "448.000000 128.000000 192.000000"
 "angle" "180.000000"
 }
-// entity 78
+// entity 77
 {
 "classname" "item_health_small"
 "origin" "320.000000 616.000000 0.000000"
 }
-// entity 79
+// entity 78
 {
 "classname" "item_health_small"
 "origin" "384.000000 616.000000 0.000000"
 }
-// entity 80
+// entity 79
 {
 "classname" "item_health_small"
 "origin" "448.000000 616.000000 0.000000"
 }
-// entity 81
+// entity 80
 {
 "classname" "item_health_small"
 "origin" "448.000000 -616.000000 0.000000"
 }
-// entity 82
+// entity 81
 {
 "classname" "item_health_small"
 "origin" "320.000000 -616.000000 0.000000"
 }
-// entity 83
+// entity 82
 {
 "classname" "item_health_small"
 "origin" "384.000000 -616.000000 0.000000"
 }
-// entity 84
+// entity 83
 {
 "classname" "item_health_small"
 "origin" "1216.000000 -616.000000 0.000000"
 }
-// entity 85
+// entity 84
 {
 "classname" "item_health_small"
 "origin" "1088.000000 -616.000000 0.000000"
 }
-// entity 86
+// entity 85
 {
 "classname" "item_health_small"
 "origin" "1152.000000 -616.000000 0.000000"
 }
-// entity 87
+// entity 86
 {
 "classname" "item_health_small"
 "origin" "1216.000000 616.000000 0.000000"
 }
-// entity 88
+// entity 87
 {
 "classname" "item_health_small"
 "origin" "1088.000000 616.000000 0.000000"
 }
-// entity 89
+// entity 88
 {
 "classname" "item_health_small"
 "origin" "1152.000000 616.000000 0.000000"
 }
-// entity 90
+// entity 89
 {
 "classname" "item_botroam"
 "origin" "-128.000000 544.000000 48.000000"
 "weight" "10"
 "angle" "180.000000"
 }
-// entity 91
+// entity 90
 {
 "classname" "item_botroam"
 "origin" "1448.000000 0.000000 232.000000"
 "weight" "10"
 "angle" "180.000000"
 }
-// entity 92
+// entity 91
 {
 "classname" "weapon_random"
 "origin" "448.000000 192.000000 -24.000000"
@@ -3918,7 +3964,7 @@ base_wall/subway_wall_clean
 "random" "3"
 "spawnflags" "2"
 }
-// entity 93
+// entity 92
 {
 "classname" "weapon_random"
 "origin" "768.000000 0.000000 88.000000"
@@ -3926,17 +3972,17 @@ base_wall/subway_wall_clean
 "wait" "10"
 "spawnflags" "5"
 }
-// entity 94
+// entity 93
 {
 "classname" "holdable_shurikenfire"
 "origin" "1160.000000 -320.000000 216.000000"
 }
-// entity 95
+// entity 94
 {
 "classname" "item_health"
 "origin" "1088.000000 -128.000000 192.000000"
 }
-// entity 96
+// entity 95
 {
 "classname" "weapon_random"
 "origin" "1088.000000 -192.000000 -24.000000"
@@ -3944,31 +3990,31 @@ base_wall/subway_wall_clean
 "random" "3"
 "spawnflags" "2"
 }
-// entity 97
+// entity 96
 {
 "classname" "item_botroam"
 "origin" "-128.000000 -544.000000 48.000000"
 "weight" "10"
 "angle" "180.000000"
 }
-// entity 98
+// entity 97
 {
 "classname" "item_botroam"
 "origin" "64.000000 0.000000 232.000000"
 "weight" "10"
 "angle" "180.000000"
 }
-// entity 99
+// entity 98
 {
 "classname" "weapon_random"
 "origin" "768.000000 416.000000 216.000000"
 }
-// entity 100
+// entity 99
 {
 "classname" "weapon_random"
 "origin" "768.000000 -416.000000 216.000000"
 }
-// entity 101
+// entity 100
 {
 "classname" "func_breakable"
 "material" "wood"
@@ -3983,7 +4029,7 @@ base_wall/subway_wall_clean
 ( 192 456 -64 ) ( 192 520 -64 ) ( 192 456 64 ) base_wall/crate 224 32 0 0.25 0.25 0 0 0
 }
 }
-// entity 102
+// entity 101
 {
 "classname" "func_breakable"
 "material" "wood"
@@ -3998,7 +4044,7 @@ base_wall/subway_wall_clean
 ( 127.3147735596 474.7503662109 -64 ) ( 82.7503509521 520.6852416992 -64 ) ( 127.3147735596 474.7503662109 64 ) base_wall/crate 170.1650390625 32 0 0.1794330925 0.25 0 0 0
 }
 }
-// entity 103
+// entity 102
 {
 "classname" "func_breakable"
 "material" "wood"
@@ -4013,7 +4059,7 @@ base_wall/subway_wall_clean
 ( 1344 -456 -64 ) ( 1344 -520 -64 ) ( 1344 -456 64 ) base_wall/crate 32 32 0 0.25 0.25 0 0 0
 }
 }
-// entity 104
+// entity 103
 {
 "classname" "func_breakable"
 "material" "wood"
