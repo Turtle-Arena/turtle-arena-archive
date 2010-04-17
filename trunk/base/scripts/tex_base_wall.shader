@@ -187,6 +187,20 @@ textures/base_wall/crate_item
 	}
 }
 
+textures/base_wall/crate_metal
+{
+	surfaceparm metalsteps
+	{
+		map textures/base_wall/crate_metal
+		rgbGen identity
+	}
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+	}
+}
+
 textures/base_wall/sewer
 {
 	surfaceparm dust

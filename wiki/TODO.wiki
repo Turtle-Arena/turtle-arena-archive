@@ -92,11 +92,7 @@ Weapons (and attacking)
 
   * TODO: Add paintarget to func_breakable
 
-  * TODO: Remove metal surfaceflag from grate textures
-
-  * TODO: Add a metal create texture
-
-  * TODO: Fix textures on grate paths in subway
+  * TODO: Remove metal debris from grate textures
 
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
 
