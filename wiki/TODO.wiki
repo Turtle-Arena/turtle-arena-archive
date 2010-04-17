@@ -30,6 +30,8 @@ Weapons (and attacking)
   * TODO: Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder }
     * ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
 
+  * BUG: CreateFuzzyWeight doesn't setup inventory weight correctly, causes SIGBUS in FuzzyWeightUndecided_r
+
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
 
