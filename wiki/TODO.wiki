@@ -102,7 +102,7 @@ Weapons (and attacking)
     * BETTER(not done?): When moving the camera around the player, focus on the player. (Like in NiGHTS: Journey of Dreams)
 
   * TODO-BETA: STARTED(TURTLEARENA // LOCKON): When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
-  * BUG: When higher then target to focus on it gets all messed up.
+    * BUG: When higher then target to focus on it gets all messed up.
 
   * TODO: Merge Quake3 and Team Arena bot chat systems; One chat system to rule them all!
     * Problem: Team Arena adds voice chats, which are only used in gametypes >= GT_TEAM. There was also players that could only be used in gametypes >= GT_TEAM that did not have q3 chats. Leaving q3 players for FFA and Duel (with there normal q3 chats) (The TA players have no q3 chats and the players can't be used in q3, q3 players can't be used in gametypes >= GT_TEAM and have no voice chats.) So Team Arena had two seperate chat systems. Turtle Arena supports Q3 and Team Arena players in all gametypes and allows merged Q3/TA players. But in the gametypes >= GT_TEAM ONLY the TA voice chats are used. And like wise in non-team gametypes only "Q3 chats" are used.
