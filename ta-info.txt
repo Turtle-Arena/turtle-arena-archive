@@ -4,7 +4,7 @@
 * Five playable characters (Leo, Don, Raph, Mike and Casey)
 * 7 playable gametypes (Single Player/Co-op, Free For All, Dual, Team Deathmatch, Capture the Flag (CTF), 1 Flag CTF, Overload)
 * Play versus bots in different game types.
-* 2 Single Player/Co-op maps and 3 multiplayer maps
+* 2 Single Player/Co-op maps and 4 multiplayer maps
 * Internet (and local network) multiplayer
 
 == Credits ==

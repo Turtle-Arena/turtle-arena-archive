@@ -37,6 +37,12 @@ longname	"Leaks"
 type		"ffa tourney team"
 }
 
+{
+map			"dm2"
+longname	"Space"
+type		"ffa tourney team"
+}
+
 // Team (Support all team gametypes)
 {
 map			"team1"
