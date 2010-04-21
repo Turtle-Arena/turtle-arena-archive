@@ -2285,9 +2285,12 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
    int32_t offsetEnd = 0;
    int32_t compress = 0; // MDR
    unsigned bcount = 0; // MDR
+   unsigned bonesRemap[1024]; // Remap MM3D's bone indexes to the local model
+                              // ZTM: FIXME: What should be max be? (ioquake3 defines MDR_MAX_BONES to 128, but never uses it)
    if (type == MT_MDR)
    {
       bcount = m_model->getBoneJointCount();
+      memset(bonesRemap, 0, sizeof (bonesRemap));
       if (section == MS_Head || section == MS_Lower || section == MS_Upper)
       {
          numBones = 0;
@@ -2295,6 +2298,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
          {
             if ( boneJointInSection( m_model->getBoneJointName( j ), section ) )
             {
+               bonesRemap[j] = numBones;
                numBones++;
             }
          }
@@ -2481,9 +2485,16 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
             }
             //log_debug( "Frame radius: %f\n", ( (float) radius ) );
             m_dst->write( (float) radius );
+#ifdef MDR_EXPORT // Compressed MDRs don't save frame name
+			if (type != MT_MDR || (type == MT_MDR && !compress))
+			{
+#endif
             char name[16] = "Misfit Model 3D"; // this is what other exporters do
             PORT_snprintf( name, sizeof(name), "%s%02d", animName.c_str(), t);
             m_dst->writeBytes( (uint8_t*) name, sizeof(name) );
+#ifdef MDR_EXPORT
+			}
+#endif
 
 #ifdef MDR_EXPORT
             if (type == MT_MDR)
@@ -2498,35 +2509,63 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                   double rotVector[3];
                   m_model->interpSkelAnimKeyframe( a, t, animLoop(animName), j, true, rotVector[0], rotVector[1], rotVector[2] );
 
-                  // Seems whenver we have a nan its from a identity matrix
-                  if ( rotVector[0] != rotVector[0] || rotVector[1] != rotVector[1] || rotVector[2] != rotVector[2] )
-                  {
-                     writeIdentity();
-                  }
-                  else
-                  {
-                     rotMatrix.setRotation( rotVector );
-                     rotMatrix = rotMatrix*saveMatrix;
-
-                     // orientation
-                     for ( int m = 0; m < 3; m++ )
-                     {
-                        for ( int n = 0; n < 3; n++ )
-                        {
-                           m_dst->write( (float) rotMatrix.get( m, n ) );
-                        }
-                     }
-                  }
-
                   // origin
                   double origin[4] = { 0, 0, 0, 1 };
                   m_model->interpSkelAnimKeyframe( a, t, animLoop(animName), j, false, origin[0], origin[1], origin[2] );
 
                   saveMatrix.apply( origin );
 
-                  m_dst->write( (float) origin[0] );
-                  m_dst->write( (float) origin[1] );
-                  m_dst->write( (float) origin[2] );
+                  if (compress)
+                  {
+					uint8_t data[24];
+
+                     // ZTM: TODO: Compressed MDR bone matrix and origin
+
+					m_dst->writeBytes( (uint8_t *)data, 24 );
+                  }
+                  else
+                  {
+                     // Seems whenver we have a nan its from a identity matrix
+                     if ( rotVector[0] != rotVector[0] || rotVector[1] != rotVector[1] || rotVector[2] != rotVector[2] )
+                     {
+                        // writeIdentity();
+                        size_t count = 0;
+                        float z = 0.0;
+                        float o = 1.0;
+                        for ( int i = 0; i < 3; i++ )
+                        {
+                           for ( int j = 0; j < 3; j++ )
+                           {
+                              if ( i == j )
+	                         {
+	                        	count += m_dst->write( o );
+	                         }
+	                         else
+	                         {
+	                        	count += m_dst->write( z );
+	                         }
+                           }
+
+                           m_dst->write( (float) origin[i] );
+                        }
+                     }
+                     else
+                     {
+                        rotMatrix.setRotation( rotVector );
+                        rotMatrix = rotMatrix*saveMatrix;
+
+                        // orientation and origin
+                        for ( int m = 0; m < 3; m++ )
+                        {
+                           for ( int n = 0; n < 3; n++ )
+                           {
+                              m_dst->write( (float) rotMatrix.get( m, n ) );
+                           }
+
+                           m_dst->write( (float) origin[m] );
+                        }
+                     }
+                  }
                }
             }
 #endif
@@ -2629,7 +2668,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
       for (int i = 0; i < numLODs; i++)
       {
          m_dst->write( (int32_t) numMeshes );
-         m_dst->write( (int32_t) (4 * 3) ); // offset of the first mesh from this LOD
+         m_dst->write( (int32_t) MDR_LOD_SIZE ); // offset of the first mesh from this LOD
          lodEndPos = m_dst->offset();
          m_dst->write( (int32_t) offsetEndLod ); // offset of the next LOD from this LOD
 
@@ -2877,9 +2916,9 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                      offset[1] = offsetVec[1] * Length(right);
                      offset[2] = offsetVec[2] * Length(up);
 
-                     log_debug("offset=%f,%f,%f\n", offset[0], offset[1], offset[2]);
+                     //log_debug("offset=%f,%f,%f\n", offset[0], offset[1], offset[2]);
 
-                     m_dst->write( (int32_t) (*it).m_boneId );
+                     m_dst->write( (int32_t) bonesRemap[(*it).m_boneId] );
                      m_dst->write( boneWeight );
                      m_dst->write( offset[0] );
                      m_dst->write( offset[1] );
@@ -2890,10 +2929,12 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
          }
 
          // Go fix offsetEndLod
-         offsetEndLod = m_dst->offset();
+         offsetEndLod = m_dst->offset() - offsetLODs;
          m_dst->seek( lodEndPos );
          m_dst->write( offsetEndLod );
-         m_dst->seek( offsetEndLod );
+         m_dst->seek( (offsetLODs+offsetEndLod) );
+
+         offsetLODs = offsetEndLod; // for next LOD
       }
 
       // ZTM: TODO: Should offsetTags be set at the begining?
@@ -3175,7 +3216,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
       {
          if ( tagInSection( m_model->getPointName( j ), section ) )
          {
-            int32_t boneIndex = m_model->getPointBoneJoint(j);
+            int32_t boneIndex = bonesRemap[m_model->getPointBoneJoint(j)];
 			m_dst->write(boneIndex);
 
             char tName[32];

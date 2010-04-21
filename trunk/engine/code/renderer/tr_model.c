@@ -786,6 +786,10 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	mdr->numTags = LittleLong(pinmodel->numTags);
 	// We don't care about the other offset values, we'll generate them ourselves while loading.
 
+#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
+	ri.Printf(PRINT_WARNING, "R_LoadMDR: Loading %s...\n", mod_name);
+#endif
+
 	mod->numLods = mdr->numLODs;
 
 	if ( mdr->numFrames < 1 ) 
@@ -798,6 +802,13 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 
 	/* The first frame will be put into the first free space after the header */
 	frame = (mdrFrame_t *)(mdr + 1);
+#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
+	mdr->ofsFrames = pinmodel->ofsFrames;
+	if (mdr->ofsFrames != (int)((byte *) frame - (byte *) mdr))
+	{
+		ri.Printf(PRINT_WARNING, "R_LoadMDR: mdr->ofsFrames miss match (%d/%d)!\n", mdr->ofsFrames, (int)((byte *) frame - (byte *) mdr));
+	}
+#endif
 	mdr->ofsFrames = (int)((byte *) frame - (byte *) mdr);
 		
 	if (pinmodel->ofsFrames < 0)
@@ -867,13 +878,26 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 				((float *)frame->bones)[j] = LittleFloat( ((float *)curframe->bones)[j] );
 			}
 			
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Load uncompressed MDR models!
+			// Next Frame...
+			curframe = (mdrFrame_t *) &curframe->bones[mdr->numBones];
+			frame = (mdrFrame_t *) &frame->bones[mdr->numBones];
+#else
 			curframe++;
 			frame++;
+#endif
 		}
 	}
 	
 	// frame should now point to the first free address after all frames.
 	lod = (mdrLOD_t *) frame;
+#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
+	mdr->ofsLODs = LittleLong(pinmodel->ofsLODs);
+	if (mdr->ofsLODs != (int) ((byte *) lod - (byte *)mdr))
+	{
+		ri.Printf(PRINT_WARNING, "R_LoadMDR: mdr->ofsLODs miss match (%d/%d)!\n", mdr->ofsLODs, (int) ((byte *) lod - (byte *)mdr));
+	}
+#endif
 	mdr->ofsLODs = (int) ((byte *) lod - (byte *)mdr);
 	
 	curlod = (mdrLOD_t *)((byte *) pinmodel + LittleLong(pinmodel->ofsLODs));
@@ -894,6 +918,13 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 		
 		// swap all the surfaces
 		surf = (mdrSurface_t *) (lod + 1);
+#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
+		lod->ofsSurfaces = LittleLong(curlod->ofsSurfaces);
+		if (lod->ofsSurfaces != (int)((byte *) surf - (byte *) lod))
+		{
+			ri.Printf(PRINT_WARNING, "R_LoadMDR: lod->ofsSurfaces miss match (%d/%d)!\n", lod->ofsSurfaces, (int)((byte *) surf - (byte *) lod));
+		}
+#endif
 		lod->ofsSurfaces = (int)((byte *) surf - (byte *) lod);
 		cursurf = (mdrSurface_t *) ((byte *)curlod + LittleLong(curlod->ofsSurfaces));
 		
@@ -1039,6 +1070,13 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			}
 			
 			// tri now points to the end of the surface.
+#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
+			surf->ofsEnd = LittleLong(cursurf->ofsEnd);
+			if (surf->ofsEnd != (byte *) tri - (byte *) surf)
+			{
+				ri.Printf(PRINT_WARNING, "R_LoadMDR: surf->ofsEnd (lod=%d) miss match (%d/%d)!\n", l, surf->ofsEnd, (int)((byte *) tri - (byte *) surf));
+			}
+#endif
 			surf->ofsEnd = (byte *) tri - (byte *) surf;
 			surf = (mdrSurface_t *) tri;
 
@@ -1047,6 +1085,13 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 		}
 
 		// surf points to the next lod now.
+#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
+		lod->ofsEnd = LittleLong(curlod->ofsEnd);
+		if (lod->ofsEnd != (int)((byte *) surf - (byte *) lod))
+		{
+			ri.Printf(PRINT_WARNING, "R_LoadMDR: lod->ofsEnd (lod=%d) miss match (%d/%d)!\n", l, lod->ofsEnd, (int)((byte *) surf - (byte *) lod));
+		}
+#endif
 		lod->ofsEnd = (int)((byte *) surf - (byte *) lod);
 		lod = (mdrLOD_t *) surf;
 
@@ -1056,6 +1101,13 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	
 	// lod points to the first tag now, so update the offset too.
 	tag = (mdrTag_t *) lod;
+#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
+	mdr->ofsTags = LittleLong(pinmodel->ofsTags);
+	if (mdr->ofsTags != (int)((byte *) tag - (byte *) mdr))
+	{
+		ri.Printf(PRINT_WARNING, "R_LoadMDR: mdr->ofsTags miss match (%d/%d)!\n", mdr->ofsTags, (int)((byte *) tag - (byte *) mdr));
+	}
+#endif
 	mdr->ofsTags = (int)((byte *) tag - (byte *) mdr);
 	curtag = (mdrTag_t *) ((byte *)pinmodel + LittleLong(pinmodel->ofsTags));
 
@@ -1078,6 +1130,14 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	}
 	
 	// And finally we know the real offset to the end.
+#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
+	// ZTM: My MM3D MDR exporter fails this test.
+	mdr->ofsEnd = LittleLong(pinmodel->ofsEnd);
+	if (mdr->ofsEnd != (int)((byte *) tag - (byte *) mdr))
+	{
+		ri.Printf(PRINT_WARNING, "R_LoadMDR: mdr->ofsEnd miss match (%d/%d)!\n", mdr->ofsEnd, (int)((byte *) tag - (byte *) mdr));
+	}
+#endif
 	mdr->ofsEnd = (int)((byte *) tag - (byte *) mdr);
 
 	// phew! we're done.

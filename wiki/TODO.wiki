@@ -58,6 +58,19 @@ Weapons (and attacking)
   * TODO (STARTED): Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
     * sp_complete and sp_gameover
 
+  * TODO: Mouser NPC
+
+== Teamplay ==
+  * TODO: Team skins for players
+
+  * TODO: Per-team flag skins?... (Team icon is on flag skin)
+
+  * TODO: Have Foot be the default red team (Update flag skin)
+
+  * TODO: Have Guardian be the default blue team?
+
+  * TODO: Have a extra team (Needed for mp_ui), like (Purple) Dragon
+
 == Misc ==
   * TODO: Add optional run animations for torso
 
