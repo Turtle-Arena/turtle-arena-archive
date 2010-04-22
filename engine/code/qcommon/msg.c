@@ -1252,9 +1252,6 @@ MSG_WriteDeltaPlayerstate
 
 =============
 */
-#ifdef ARRAYMAX // IOQ3ZTM
-#define NUM_INTEGER_BITS 16 // In Quake 3 there are only 16 weapons, powerups, persistant etc...
-#endif
 void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct playerState_s *to ) {
 	int				i;
 	playerState_t	dummy;
@@ -1264,9 +1261,6 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 	int				powerupbits;
 #ifdef TA_HOLDSYS
 	int				holdablebits;
-#endif
-#if defined ARRAYMAX && (MAX_STATS > 16 && MAX_PERSISTANT > 16 && MAX_WEAPONS > 16 && MAX_POWERUPS > 16 && MAX_HOLDABLE > 16) // IOQ3ZTM
-	int				n;
 #endif
 	int				numFields;
 	int				c;
@@ -1338,59 +1332,34 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 	statsbits = 0;
 	for (i=0 ; i<MAX_STATS ; i++) {
 		if (to->stats[i] != from->stats[i]) {
-#if defined ARRAYMAX && (MAX_STATS > 16) // IOQ3ZTM
-			statsbits = 1;
-			break;
-#else
 			statsbits |= 1<<i;
-#endif
 		}
 	}
 	persistantbits = 0;
 	for (i=0 ; i<MAX_PERSISTANT ; i++) {
 		if (to->persistant[i] != from->persistant[i]) {
-#if defined ARRAYMAX && (MAX_PERSISTANT > 16) // IOQ3ZTM
-			persistantbits = 1;
-			break;
-#else
 			persistantbits |= 1<<i;
-#endif
 		}
 	}
 	ammobits = 0;
 #if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
 	for (i=0 ; i<MAX_WEAPONS ; i++) {
 		if (to->ammo[i] != from->ammo[i]) {
-#if defined ARRAYMAX && (MAX_WEAPONS > 16) // IOQ3ZTM
-			ammobits = 1;
-			break;
-#else
 			ammobits |= 1<<i;
-#endif
 		}
 	}
 #endif
 	powerupbits = 0;
 	for (i=0 ; i<MAX_POWERUPS ; i++) {
 		if (to->powerups[i] != from->powerups[i]) {
-#if defined ARRAYMAX && (MAX_POWERUPS > 16) // IOQ3ZTM
-			powerupbits = 1;
-			break;
-#else
 			powerupbits |= 1<<i;
-#endif
 		}
 	}
 #ifdef TA_HOLDSYS
 	holdablebits = 0;
 	for (i=0 ; i<MAX_HOLDABLE ; i++) {
 		if (to->holdable[i] != from->holdable[i]) {
-#if defined ARRAYMAX && (MAX_HOLDABLE > 16) // IOQ3ZTM
-			holdablebits = 1;
-			break;
-#else
 			holdablebits |= 1<<i;
-#endif
 		}
 	}
 
@@ -1406,29 +1375,10 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 
 	if ( statsbits ) {
 		MSG_WriteBits( msg, 1, 1 );	// changed
-#if defined ARRAYMAX && (MAX_STATS > 16) // IOQ3ZTM
-		n = 0;
-		while (n < MAX_STATS)
-		{
-			statsbits = 0;
-
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_STATS; i++)
-				if (to->stats[n+i] != from->stats[n+i])
-					statsbits |= 1<<i;
-
-			MSG_WriteBits( msg, statsbits, NUM_INTEGER_BITS );
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_STATS; i++)
-				if ( statsbits & (1<<i) )
-					MSG_WriteShort (msg, to->stats[n+i]);
-
-			n += NUM_INTEGER_BITS;
-		}
-#else
 		MSG_WriteBits( msg, statsbits, MAX_STATS );
 		for (i=0 ; i<MAX_STATS ; i++)
 			if (statsbits & (1<<i) )
 				MSG_WriteShort (msg, to->stats[i]);
-#endif
 	} else {
 		MSG_WriteBits( msg, 0, 1 );	// no change
 	}
@@ -1436,29 +1386,10 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 
 	if ( persistantbits ) {
 		MSG_WriteBits( msg, 1, 1 );	// changed
-#if defined ARRAYMAX && (MAX_PERSISTANT > 16) // IOQ3ZTM
-		n = 0;
-		while (n < MAX_PERSISTANT)
-		{
-			persistantbits = 0;
-
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_PERSISTANT; i++)
-				if (to->persistant[n+i] != from->persistant[n+i])
-					persistantbits |= 1<<i;
-
-			MSG_WriteBits( msg, persistantbits, NUM_INTEGER_BITS );
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_PERSISTANT; i++)
-				if (persistantbits & (1<<i))
-					MSG_WriteShort (msg, to->persistant[n+i]);
-
-			n += NUM_INTEGER_BITS;
-		}
-#else
 		MSG_WriteBits( msg, persistantbits, MAX_PERSISTANT );
 		for (i=0 ; i<MAX_PERSISTANT ; i++)
 			if (persistantbits & (1<<i) )
 				MSG_WriteShort (msg, to->persistant[i]);
-#endif
 	} else {
 		MSG_WriteBits( msg, 0, 1 );	// no change
 	}
@@ -1466,60 +1397,21 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 #if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
 	if ( ammobits ) {
 		MSG_WriteBits( msg, 1, 1 );	// changed
-#if defined ARRAYMAX && (MAX_WEAPONS > 16) // IOQ3ZTM
-		n = 0;
-		while (n < MAX_WEAPONS)
-		{
-			ammobits = 0;
-
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_WEAPONS; i++)
-				if (to->ammo[n+i] != from->ammo[n+i])
-					ammobits |= 1<<i;
-
-			MSG_WriteBits( msg, ammobits, NUM_INTEGER_BITS );
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_WEAPONS; i++)
-				if (ammobits & (1<<i))
-					MSG_WriteShort (msg, to->ammo[n+i]);
-
-			n += NUM_INTEGER_BITS;
-		}
-#else
 		MSG_WriteBits( msg, ammobits, MAX_WEAPONS );
 		for (i=0 ; i<MAX_WEAPONS ; i++)
 			if (ammobits & (1<<i) )
 				MSG_WriteShort (msg, to->ammo[i]);
-#endif
 	} else {
 		MSG_WriteBits( msg, 0, 1 );	// no change
 	}
 #endif
 
-
 	if ( powerupbits ) {
 		MSG_WriteBits( msg, 1, 1 );	// changed
-#if defined ARRAYMAX && (MAX_POWERUPS > 16) // IOQ3ZTM
-		n = 0;
-		while (n < MAX_POWERUPS)
-		{
-			powerupbits = 0;
-
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_POWERUPS; i++)
-				if (to->powerups[n+i] != from->powerups[n+i])
-					powerupbits |= 1<<i;
-
-			MSG_WriteBits( msg, powerupbits, NUM_INTEGER_BITS );
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_POWERUPS; i++)
-				if (powerupbits & (1<<i))
-					MSG_WriteLong (msg, to->powerups[n+i]);
-
-			n += NUM_INTEGER_BITS;
-		}
-#else
 		MSG_WriteBits( msg, powerupbits, MAX_POWERUPS );
 		for (i=0 ; i<MAX_POWERUPS ; i++)
 			if (powerupbits & (1<<i) )
 				MSG_WriteLong( msg, to->powerups[i] );
-#endif
 	} else {
 		MSG_WriteBits( msg, 0, 1 );	// no change
 	}
@@ -1527,29 +1419,10 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 #ifdef TA_HOLDSYS
 	if ( holdablebits ) {
 		MSG_WriteBits( msg, 1, 1 );	// changed
-#if defined ARRAYMAX && (MAX_HOLDABLE > 16) // IOQ3ZTM
-		n = 0;
-		while (n < MAX_HOLDABLE)
-		{
-			holdablebits = 0;
-
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_HOLDABLE; i++)
-				if (to->holdable[n+i] != from->holdable[n+i])
-					holdablebits |= 1<<i;
-
-			MSG_WriteBits( msg, holdablebits, NUM_INTEGER_BITS );
-			for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_HOLDABLE; i++)
-				if (holdablebits & (1<<i))
-					MSG_WriteShort (msg, to->holdable[n+i]);
-
-			n += NUM_INTEGER_BITS;
-		}
-#else
 		MSG_WriteBits( msg, holdablebits, MAX_HOLDABLE );
 		for (i=0 ; i<MAX_HOLDABLE ; i++)
 			if (holdablebits & (1<<i) )
 				MSG_WriteShort( msg, to->holdable[i] );
-#endif
 	} else {
 		MSG_WriteBits( msg, 0, 1 );	// no change
 	}
@@ -1572,9 +1445,6 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 	int			*fromF, *toF;
 	int			trunc;
 	playerState_t	dummy;
-#if defined ARRAYMAX && (MAX_STATS > 16 && MAX_PERSISTANT > 16 && MAX_WEAPONS > 16 && MAX_POWERUPS > 16 && MAX_HOLDABLE > 16) // IOQ3ZTM
-	int			n;
-#endif
 
 	if ( !from ) {
 		from = &dummy;
@@ -1648,129 +1518,59 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 		// parse stats
 		if ( MSG_ReadBits( msg, 1 ) ) {
 			LOG("PS_STATS");
-#if defined ARRAYMAX && (MAX_STATS > 16) // IOQ3ZTM
-			n = 0;
-			while (n < MAX_STATS)
-			{
-				bits = MSG_ReadBits (msg, NUM_INTEGER_BITS);
-				for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_STATS; i++)
-				{
-					if (bits & (1<<i))
-						to->stats[n+i] = MSG_ReadShort(msg);
-				}
-				n += NUM_INTEGER_BITS;
-			}
-#else
 			bits = MSG_ReadBits (msg, MAX_STATS);
 			for (i=0 ; i<MAX_STATS ; i++) {
 				if (bits & (1<<i) ) {
 					to->stats[i] = MSG_ReadShort(msg);
 				}
 			}
-#endif
 		}
 
 		// parse persistant stats
 		if ( MSG_ReadBits( msg, 1 ) ) {
 			LOG("PS_PERSISTANT");
-#if defined ARRAYMAX && (MAX_PERSISTANT > 16) // IOQ3ZTM
-			n = 0;
-			while (n < MAX_PERSISTANT)
-			{
-				bits = MSG_ReadBits (msg, NUM_INTEGER_BITS);
-				for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_PERSISTANT; i++)
-				{
-					if (bits & (1<<i))
-						to->persistant[n+i] = MSG_ReadShort(msg);
-				}
-				n += NUM_INTEGER_BITS;
-			}
-#else
 			bits = MSG_ReadBits (msg, MAX_PERSISTANT);
 			for (i=0 ; i<MAX_PERSISTANT ; i++) {
 				if (bits & (1<<i) ) {
 					to->persistant[i] = MSG_ReadShort(msg);
 				}
 			}
-#endif
 		}
 
 #if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
 		// parse ammo
 		if ( MSG_ReadBits( msg, 1 ) ) {
 			LOG("PS_AMMO");
-#if defined ARRAYMAX && (MAX_WEAPONS > 16) // IOQ3ZTM
-			n = 0;
-			while (n < MAX_WEAPONS)
-			{
-				bits = MSG_ReadBits (msg, NUM_INTEGER_BITS);
-				for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_WEAPONS; i++)
-				{
-					if (bits & (1<<i))
-						to->ammo[n+i] = MSG_ReadShort(msg);
-				}
-				n += NUM_INTEGER_BITS;
-			}
-#else
 			bits = MSG_ReadBits (msg, MAX_WEAPONS);
 			for (i=0 ; i<MAX_WEAPONS ; i++) {
 				if (bits & (1<<i) ) {
 					to->ammo[i] = MSG_ReadShort(msg);
 				}
 			}
-#endif
 		}
 #endif
 
 		// parse powerups
 		if ( MSG_ReadBits( msg, 1 ) ) {
 			LOG("PS_POWERUPS");
-#if defined ARRAYMAX && (MAX_POWERUPS > 16) // IOQ3ZTM
-			n = 0;
-			while (n < MAX_POWERUPS)
-			{
-				bits = MSG_ReadBits (msg, NUM_INTEGER_BITS);
-				for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_POWERUPS; i++)
-				{
-					if (bits & (1<<i))
-						to->powerups[n+i] = MSG_ReadLong(msg);
-				}
-				n += NUM_INTEGER_BITS;
-			}
-#else
 			bits = MSG_ReadBits (msg, MAX_POWERUPS);
 			for (i=0 ; i<MAX_POWERUPS ; i++) {
 				if (bits & (1<<i) ) {
 					to->powerups[i] = MSG_ReadLong(msg);
 				}
 			}
-#endif
 		}
 
 #ifdef TA_HOLDSYS
 		// parse holdable items
 		if ( MSG_ReadBits( msg, 1 ) ) {
 			LOG("PS_HOLDABLE");
-#if defined ARRAYMAX && (MAX_HOLDABLE > 16) // IOQ3ZTM
-			n = 0;
-			while (n < MAX_HOLDABLE)
-			{
-				bits = MSG_ReadBits (msg, NUM_INTEGER_BITS);
-				for (i=0; i < NUM_INTEGER_BITS && n+i < MAX_HOLDABLE; i++)
-				{
-					if (bits & (1<<i))
-						to->holdable[n+i] = MSG_ReadShort(msg);
-	}
-				n += NUM_INTEGER_BITS;
-			}
-#else
 			bits = MSG_ReadBits (msg, MAX_HOLDABLE);
 			for (i=0 ; i<MAX_HOLDABLE ; i++) {
 				if (bits & (1<<i) ) {
 					to->holdable[i] = MSG_ReadShort(msg);
 				}
 			}
-#endif
 		}
 #endif
 	}

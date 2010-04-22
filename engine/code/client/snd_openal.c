@@ -557,7 +557,7 @@ static void _S_AL_SanitiseVector( vec3_t v, int line )
 }
 
 
-#ifndef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
+#ifndef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 #define AL_THIRD_PERSON_THRESHOLD_SQ (48.0f*48.0f)
 #endif
 
@@ -623,13 +623,13 @@ S_AL_HearingThroughEntity
 */
 static qboolean S_AL_HearingThroughEntity( int entityNum )
 {
-#ifndef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
+#ifndef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 	float	distanceSq;
 #endif
 
 	if( clc.clientNum == entityNum )
 	{
-#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
+#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 		// ZTM: I changed the cgame API so that this doesn't have to be a hack.
 		if (VM_Call(cgvm, CG_VIEW_TYPE) == 0)
 		{

@@ -74,31 +74,6 @@ IOQ3_REVISION = 1783
 #
 # Start build type
 #
-# USE_FREETYPE Currently doesn't work when using pk3 files
-#                 instead of using unzipped files?
-#
-# Common Defines;
-# -DIOQUAKE3  - Enables CD key check and punkbuster [ui] code
-# -DIOQ3ZTM   - Misc changes and "fixes" that I always want to be enabled.
-# -DIOQ3ZTM_NO_COMPAT - Breaks compatiblity with Q3 mod qvms.
-#
-#   1. EAR_IN_ENTITY; It fixes checking if we are in first person in sound code.
-#       Q3 mods will CG_Error("vmMain: unknown command 9") however...
-#   2. FIXED_ACOS; It moves Q_acos from qcommon/common.c to qcommon/q_math.c.
-#                    Now in vms "acos" is just "acos" not Q_acos.
-#		Does it break compatibliy with mods? (But only when server/client is compiled with MS VC?)
-#   3. EFLAG_FIX; Fix playerState not geting some higher eflag bits,
-#                    entities sent 19 eflag bits, and playerState sent 16; Send 32 bits!
-#       May cause problems with Quake3, not sure and untested...
-#
-# -DIOQ3ZTM_NO_TEAM_MODEL - Removes team_model and team_headmodel cvars.
-#                             Could messup Team Arena (and other mods), unsure.
-# -DNOTRATEDM - Disable stuff in Quake3 engine that made it rated M. (default blood to off, remove gibs,
-#            remove strong lang) This however doesn't change the gamedata, like the botfiles strong lang,
-#            bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
-#            ZTM: TODO: Rename this define to ...?
-# -DNOBLOOD - Removes blood, if this is defined "NOTRATEDM" must also be.
-#
 ifeq ($(BUILD_IOQ3ZTM),1)
 QUAKE3=1
 endif
@@ -110,7 +85,7 @@ ifeq ($(QUAKE3),1)
 	ifeq ($(BUILD_IOQ3ZTM),1)
 
 		# Build ioq3ztm for running in Turtle Arena
-		IOQ3TURTLE=0
+		IOQ3TURTLE=1
 
 		ifeq ($(IOQ3TURTLE),1)
 			ifneq ($(BUILD_CLIENT),1)
@@ -127,12 +102,14 @@ ifeq ($(QUAKE3),1)
 			endif
 
 			# Copied from Turtle Arena BUILD_DEFINES
-			ENGINE_CFLAGS = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-						-DNOTRATEDM -DNOBLOOD -DRAVENMD4 \
-						-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
-						-DTA_WEAPSYS -DTA_PLAYERSYS \
-						-DTA_SUPPORTQ3  -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
-						-DOA_BLOOM -DTA_WEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
+			ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 \
+								-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
+								-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
+								-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
+								-DTA_WEAPSYS -DTA_PLAYERSYS \
+								-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
+								-DTA_WEAPSYS_EX_COMPAT \
+								-DOA_BLOOM
 
 			QUAKE3_CFLAGS =
 
@@ -211,32 +188,94 @@ else # END QUAKE3
 	#  - All of this can be overriden by makefile.local
 	###################################################################
 
-	# Please note: TA_*SYS defines are general system changes, not total specifiy for Turtle Arena
-	# -DANALOG		 # Allows players to rotate the camera and move based on the camera angles
-	# -DARRAYMAX     # TODO: This ''was'' going to remove the bit max problem with Q3 network (ie more then 16 weapons).
-	# -DTA_WEAPSYS is the core changes to the weapon system
-	#					loads the weapons from a text file, allowing for easy modifing,
-	#						and new custom default weapons for players.
-	# -DTA_WEAPSYS_NOCOMPAT removes botlib weapon weight code because when WEAP_SCRIPT is define
-	#  							"game" does its own weapon weight stuff.
-	# -DTA_WEAPSYS_EX changes from holding multiple weapons to only one default and one pickup.
-	# -DTA_WEAPSYS_EX_COMPAT keeps compatiblity with mods not using TA_WEAPSYS_EX
-	# -DTA_HOLDSYS Allow players to hold multiple holdable items and change to any holdable.
-	#					(Based on Q3's weapon changing)
-	# -DTA_NPCSYS   WIP NPC system, based on TDC_NPC system and code in Quake3
+	# Some of the defines aren't as independent as they should be, TA_WEAPSYS requires TA_PLAYERSYS, etc
+	# Please note: TA_*SYS defines are general system changes, not 'totally' specifiy for Turtle Arena
 
-	# Some of these aren't as independent as they should be, TA_WEAPSYS requires TA_PLAYERSYS,  etc
-	BUILD_DEFINES = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-						-DNOTRATEDM -DNOBLOOD -DRAVENMD4 \
+	# USE_FREETYPE Currently doesn't work when using pk3 files
+	#                 instead of using unzipped files?
+
+	##### ioquake3 defines
+	# STANDALONE			ioquake3 define to disable quake3 code for authicating, and stuff.
+	# RAVENMD4				Enable support for loading MDR models when atempting to load *.mdr.
+	#							It isn't ever used as ioq3 only asks for .md3 (However, IOQ3ZTM checks for mdr before loading md3)
+	# MISSIONPACK			Quake3 expansion pack, Team Arena.
+	##### "new ioquake3 defines"
+	# IOQUAKE3				Enables CD key check and punkbuster ui code
+	# MISSIONPACK_HUD		Use MISSIONPACK ui scripting in cgame for hud and menus. (ZTM: Split from MISSIONPACK define)
+	# MISSIONPACK_HARVESTER	Enable MISSIONPACK harevester gametype (ZTM: Split from MISSIONPACK define)
+
+
+	# Turtle Arena "general" defines
+	#####
+	# IOQ3ZTM				ZTurtleMan's misc changes and fixes to IOQuake3
+	# IOQ3ZTM_NO_COMPAT		Changes that are not compatible with quake3 mods
+	#
+	#   1. EAR_IN_ENTITY; It fixes checking if we are in first person in sound code.
+	#       Q3 mods will CG_Error("vmMain: unknown command 9") however...
+	#   2. FIXED_ACOS; It moves Q_acos from qcommon/common.c to qcommon/q_math.c.
+	#                    Now in vms "acos" is just "acos" not Q_acos.
+	#		Does it break compatibliy with mods? (But only when server/client is compiled with MS VC?)
+	#   3. EFLAG_FIX; Fix playerState not geting some higher eflag bits,
+	#                    entities sent 19 eflag bits, and playerState sent 16; Send 32 bits!
+	#       May cause problems with Quake3, not sure and untested...
+	#
+	# IOQ3ZTM_NO_TEAM_MODEL	Removes team_model and team_headmodel cvars. (Could break Quake III: Team Arena and other mods?)
+	#####
+	# RANDOMBOT				Adds a hardcoded bot, Random. Adding the bot "Random" will add a bot choosen randomly.
+	# CELSHADING			"Cel-shaing" and cel outlines, based on the celshading patch for ioquake3
+	# NOTRATEDM				Disable stuff in Quake3 engine that made it rated M. (default blood to off, remove gibs,
+	#							remove strong lang) This however doesn't change the gamedata, like the botfiles strong lang,
+	#							bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
+	#							ZTM: TODO: Rename this define to ...?
+	# NOBLOOD				Removes blood. If this is defined, NOTRATEDM must also be defined.
+	# ANALOG				Allows players to rotate the camera and move based on the camera angles
+	# NET_COMPAT			Working on having Turtle Arena and ioq3ztm run on the same engine.
+	# THIRD_PERSON			Game defaults to third person instead of first person
+	#####
+	# TA_WEAPSYS			This is the core changes to the weapon system
+	#							loads the weapons from a text file, allowing for easy modifing,
+	#							and new custom default weapons for players.
+	# TA_WEAPSYS_NOCOMPAT	Removes botlib weapon weight code because when WEAP_SCRIPT is define
+	#  							"game" does its own weapon weight stuff.
+	# TA_WEAPSYS_EX			Changes from holding multiple weapons to only one default and one pickup.
+	# TA_WEAPSYS_EX_COMPAT	Keeps compatiblity with mods not using TA_WEAPSYS_EX
+	# TA_GAME_MODELS		Allow "game" to use model tags. Player tags are used for melee weapon attacking.
+	# TA_HOLDSYS			Allow players to hold multiple holdable items and change to any holdable.
+	#							(Based on Q3's weapon changing)
+	# TA_PLAYERSYS			Allows player config to be used in game, allowing for per-player settings.
+	# TA_PATHSYS			Unfinished general path system using entities like path_corner
+	# TA_ENTSYS				Adds new entities and allows all ET_MOVER entities to be breakable.
+	# TA_NPCSYS   			WIP NPC system, based on TDC_NPC system and code in Quake3
+	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
+	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
+	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
+	#							Kinda pointless. (Note: TA_PLAYERSYS adds support for Elite Force soundpath keyword in animations.cfg)
+
+
+	# Turtle Arena "specific" defines
+	#####
+	# TURTLEARENA			Turtle Arena branding, version, file/directory name, and more
+	# TA_MISC				This is stuff that I don't want in ioq3ztm, but would use in another standalone mod
+	#							(Like a NiGHTS into Dreams clone or Sonic Robo Blast Arena...)
+	# TA_SP
+	# TA_HOLDABLE			Turtle Arena holdable items. Shurikens and Pizza-to-Go.
+	# TA_PLAYERS			Turtle Arena player stuff?
+	# TA_DATA				Changes for Turtle Arena data.
+	# TA_HUD				Replaces Quake3 HUD, with one for Turtle Arena...
+	#####
+	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
+
+	BUILD_DEFINES = -DSTANDALONE -DRAVENMD4 \
+						-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
+						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
 						-DTA_WEAPSYS -DTA_PLAYERSYS \
-						-DTA_SUPPORTQ3  -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
-						-DOA_BLOOM -DTA_WEAPSYS_EX_COMPAT -DNET_COMPAT -DANALOG
+						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
+						-DTA_WEAPSYS_EX_COMPAT \
+						-DOA_BLOOM
 
 	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
-						-DTA_WEAPSYS_EX \
-						-DTA_PLAYERS \
-						-DTA_DATA \
+						-DTA_WEAPSYS_EX -DTA_PLAYERS -DTA_DATA \
 						-DNIGHTSMODE
 
 	# Currently Turtle Arena doesn't use camera scripts.

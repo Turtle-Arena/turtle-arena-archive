@@ -35,7 +35,7 @@ int forceModelModificationCount = -1;
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
-#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
+#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 int CG_ViewType(void);
 #endif
 
@@ -79,7 +79,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 	case CG_EVENT_HANDLING:
 		CG_EventHandling(arg0);
 		return 0;
-#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
+#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 	case CG_VIEW_TYPE:
 		return CG_ViewType();
 #endif
@@ -2458,7 +2458,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 #endif
 }
 
-#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
+#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 /*
 =================
 CG_ViewType
@@ -2473,17 +2473,17 @@ Return 2 if in third person using analog control.
 int CG_ViewType(void)
 {
 #ifdef ANALOG
-		if (cg.renderingThirdPerson)
+	if (cg.renderingThirdPerson)
+	{
+		// ZTM: Check if analog is on
+		if (cg_thirdPersonAnalog.integer)
 		{
-			// ZTM: Check if analog is on
-			if (cg_thirdPersonAnalog.integer)
-			{
-				return 2;
-			}
+			return 2;
 		}
+	}
 #endif
 
-		return cg.renderingThirdPerson;
+	return cg.renderingThirdPerson;
 }
 #endif
 

@@ -1038,29 +1038,15 @@ typedef struct {
 
 //=========================================================
 
-#ifdef ARRAYMAX  // IOQ3ZTM
-// array limits, these can be incresed if needed
-//    Only if you are building a EXE, if just a mod don't change theses.
-#define	MAX_STATS				16
-#define	MAX_PERSISTANT			16
-#define	MAX_POWERUPS			16 // PW_* are still limited by bit fields.
-#ifdef TA_WEAPSYS_EX
-#define	MAX_WEAPONS				32
-#else
-#define	MAX_WEAPONS				16 // If not TA_WEAPSYS_EX limited to 16
-#endif
-#ifdef TA_HOLDSYS
-#define	MAX_HOLDABLE			16
-#endif
-#else
 // bit field limits
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16
+#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
 #define	MAX_WEAPONS				16		
+#endif
 #ifdef TA_HOLDSYS
 #define	MAX_HOLDABLE			16
-#endif
 #endif
 
 #define	MAX_PS_EVENTS			2
