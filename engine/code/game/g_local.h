@@ -890,7 +890,8 @@ typedef enum
 } gpathtype_e;
 
 gpathtype_e G_SetupPath(gentity_t *ent, const char *target);
-//qboolean G_NextPath(gentity_t *ent);
+qboolean G_ReachedPath(gentity_t *ent, qboolean backward, qboolean check);
+void G_MoveOnPath(gentity_t *ent);
 #endif
 
 // ai_main.c

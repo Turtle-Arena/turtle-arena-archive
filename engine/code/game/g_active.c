@@ -1467,6 +1467,12 @@ void ClientThink_real( gentity_t *ent ) {
 		SetClientViewAngle(ent, viewAngles);
 	}
 #endif
+#ifdef NIGHTSMODE
+	if (client->ps.eFlags & EF_NIGHTSMODE)
+	{
+		G_MoveOnPath(ent);
+	}
+#endif
 
 	// set up for pmove
 	oldEventSequence = client->ps.eventSequence;

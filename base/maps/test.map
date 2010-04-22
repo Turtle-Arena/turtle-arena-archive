@@ -299,6 +299,15 @@
 ( 128 896 -208 ) ( 128 896 -80 ) ( 192 896 -208 ) tech/terminal_grey 0 0 0 0.5 0.5 0 0 0
 ( 128 896 -208 ) ( 128 960 -208 ) ( 128 896 -80 ) tech/terminal_grey 0 0 0 0.5 0.5 0 0 0
 }
+// brush 33
+{
+( 1352 -768 -200 ) ( 1352 -832 -200 ) ( 1288 -768 -200 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+( 1344 -768 -80 ) ( 1280 -768 -80 ) ( 1344 -768 -208 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+( 1344 -768 -80 ) ( 1344 -768 -208 ) ( 1344 -832 -80 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+( 1280 -832 -208 ) ( 1344 -832 -208 ) ( 1280 -768 -208 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1280 -832 -208 ) ( 1280 -832 -80 ) ( 1344 -832 -208 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+( 1280 -832 -208 ) ( 1280 -768 -208 ) ( 1280 -832 -80 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+}
 }
 // entity 1
 {
@@ -1984,4 +1993,32 @@
 ( 1280 192 -64 ) ( 1280 192 64 ) ( 1408 192 -64 ) tech/terminal_grey 0 0 0 0.5 0.5 0 0 0
 ( 1280 192 -64 ) ( 1280 376 -64 ) ( 1280 192 64 ) tech/terminal_grey 0 0 0 0.5 0.5 0 0 0
 }
+}
+// entity 61
+{
+"classname" "nights_start"
+"origin" "1312.000000 -800.000000 -176.000000"
+"target" "mare_start_1"
+"targetname" "nights_start1"
+}
+// entity 62
+{
+"classname" "path_corner"
+"origin" "1312.000000 -616.000000 -176.000000"
+"targetname" "mare_start_1"
+"target" "path_corner2"
+}
+// entity 63
+{
+"classname" "path_corner"
+"origin" "1120.000000 -616.000000 -176.000000"
+"targetname" "path_corner2"
+"target" "nights_target1"
+}
+// entity 64
+{
+"classname" "nights_target"
+"origin" "1120.000000 -800.000000 -176.000000"
+"targetname" "nights_target1"
+"target" "nights_start1"
 }
