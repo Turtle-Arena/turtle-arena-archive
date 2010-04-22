@@ -245,7 +245,7 @@ typedef enum {
 //	void	(*CG_MouseEvent)( int dx, int dy );
 	CG_EVENT_HANDLING,
 //	void (*CG_EventHandling)(int type);
-#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
+#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 	CG_VIEW_TYPE
 //	int (*CG_ViewType)( void );
 #endif

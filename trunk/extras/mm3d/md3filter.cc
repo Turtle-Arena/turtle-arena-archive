@@ -104,7 +104,7 @@ const char s_animNames[ MD3_ANIMATIONS ][16] =
    "legs_turn",
 };
 
-// ZTM: FIXME: Allow user to have any animation loop
+// ZTM: TODO: Allow user to have any animation loop
 const char *s_animLoop[] =
 {
    "torso_stand",
@@ -120,7 +120,7 @@ const char *s_animLoop[] =
    NULL
 };
 
-// ZTM: FIXME: Allow user to have any animation have sync warning? (Or at least disable?)
+// ZTM: TODO: Allow user to have any animation have sync warning? (Or at least disable?)
 const char *s_animSyncWarning[] =
 {
    "torso_attack",

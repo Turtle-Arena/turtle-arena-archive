@@ -5104,7 +5104,7 @@ static void UI_BuildQ3Model_List( void )
 	char	scratch[256];
 	char*	dirptr;
 	char*	fileptr;
-#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
+#ifdef TA_SUPPORTEF
 	int		h;
 #endif
 	int		i;
@@ -5114,7 +5114,7 @@ static void UI_BuildQ3Model_List( void )
 
 	uiInfo.q3HeadCount = 0;
 
-#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
+#ifdef TA_SUPPORTEF
   for (h = 0; h < MAX_UI_PLAYERDIRS && bg_playerDirs[h] != NULL; h++)
   {
 	// iterate directory of all player models
@@ -5134,7 +5134,7 @@ static void UI_BuildQ3Model_List( void )
 			continue;
 			
 		// iterate all skin files in directory
-#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
+#ifdef TA_SUPPORTEF
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
 		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "", filelist, 2048 );
 #else
@@ -5172,7 +5172,7 @@ static void UI_BuildQ3Model_List( void )
 				if (!dirty) {
 					Com_sprintf( uiInfo.q3HeadNames[uiInfo.q3HeadCount], sizeof(uiInfo.q3HeadNames[uiInfo.q3HeadCount]), "%s", scratch);
 					uiInfo.q3HeadIcons[uiInfo.q3HeadCount++] =
-#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
+#ifdef TA_SUPPORTEF
 							trap_R_RegisterShaderNoMip(va("%s/%s/%s",bg_playerDirs[h],dirptr,skinname));
 #else
 							trap_R_RegisterShaderNoMip(va("models/players/%s/%s",dirptr,skinname));
@@ -5182,7 +5182,7 @@ static void UI_BuildQ3Model_List( void )
 
 		}
 	}	
-#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
+#ifdef TA_SUPPORTEF
   }
 #endif
 }

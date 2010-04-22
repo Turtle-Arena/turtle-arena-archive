@@ -5474,18 +5474,9 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			// ZTM: Hey why not, its valid. (Not in Q3)
 			} else if ( !Q_stricmp( token, "splash" ) ) {
 				playercfg->footsteps = FOOTSTEP_SPLASH;
-#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF // ZTM: Elite Force
-			} else if ( !Q_stricmp( token, "borg" ) ) {
-				playercfg->footsteps = FOOTSTEP_MECH;
-			} else if ( !Q_stricmp( token, "reaver" ) ) {
-				playercfg->footsteps = FOOTSTEP_NORMAL;
-			} else if ( !Q_stricmp( token, "species" ) ) {
-				playercfg->footsteps = FOOTSTEP_FLESH;
-			} else if ( !Q_stricmp( token, "warbot" ) ) {
-				playercfg->footsteps = FOOTSTEP_NORMAL;
-#endif
 			} else {
-				Com_Printf( "Bad footsteps parm in %s: %s\n", filename, token );
+				Com_Printf( "Bad footsteps parm (using default) in %s: %s\n", filename, token );
+				playercfg->footsteps = FOOTSTEP_NORMAL;
 			}
 			continue;
 		} else if ( !Q_stricmp( token, "headoffset" ) ) {
@@ -5533,8 +5524,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			continue;
 		}
 
-		// TA_SUPPORTEF
-		// ZTM: Support Elite Force Stuff
+		//
+		// Support Elite Force soundpath keyword
 		//
 		else if ( !Q_stricmp( token, "soundpath" ) ) {
 			token = COM_Parse( &text_p );
@@ -5742,7 +5733,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 	}
 #endif
 
-#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
+#ifdef TA_SUPPORTEF
 	BG_ConvertEFAnimationsToQ3(animations, MAX_TOTALANIMATIONS);
 #endif
 
@@ -6140,7 +6131,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 const char *bg_playerDirs[MAX_PLAYER_DIRS] =
 {
 	"models/players",
-#ifdef TA_SUPPORTQ3 // TA_SUPPORTEF
+#ifdef TA_SUPPORTEF
 	"models/players2",
 #endif
 #ifndef TURTLEARENA
