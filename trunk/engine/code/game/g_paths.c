@@ -66,6 +66,7 @@ gpathinfo_t gpathinfo[] =
 
 #ifdef NIGHTSMODE
 	// NiGHTS
+	{ "nights_start", PATHF_BEGIN | PATHF_POINT },
 	{ "nights_target", PATHF_POINT },
 #endif
 
@@ -220,6 +221,7 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 			start->pathflags = PATH_LINE | PATH_FIRST;
 			next->pathflags = PATH_LINE | PATH_LAST;
 			next->nextTrain = NULL;
+			ent->prevTrain = NULL;
 			return PATH_LINE;
 		}
 		if ((gpathinfo[i].flags & PATHF_CANFINISH) && !next->target)
@@ -227,6 +229,7 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 			start->pathflags = PATH_LINE | PATH_FIRST;
 			next->pathflags = PATH_LINE | PATH_LAST;
 			next->nextTrain = NULL;
+			ent->prevTrain = NULL;
 			return PATH_LINE;
 		}
 
@@ -240,94 +243,132 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 	start->pathflags = PATH_CIRCIT | PATH_FIRST;
 	next->pathflags = PATH_CIRCIT | PATH_LAST;
 
+	ent->prevTrain = next;
+
 	return PATH_CIRCIT;
 }
 
-// ZTM: TODO: Reached_Train
-//was G_NextPath
+// ZTM: TODO: Replace Reached_Train
 qboolean G_ReachedPath(gentity_t *ent, qboolean backward, qboolean check)
 {
-	gentity_t		*next, *prev;
+	gentity_t	*next;
+	//gentity_t	*prev;
 
 	if (!ent) {
 		return qfalse;
 	}
 
-	prev = ent->prevTrain;
-	next = ent->nextTrain;
+	backward = qfalse;
 
-	if ( (!backward && (!next || !next->nextTrain))
-		|| (backward && (!prev || !prev->prevTrain)) )
+	if (backward)
 	{
-		// end of train or path not setup.
+		next = ent->prevTrain;
+		//prev = ent->nextTrain;
+	}
+	else
+	{
+		//prev = ent->prevTrain;
+		next = ent->nextTrain;
+	}
+
+	if (!next)
+	{
+		// end of train
 		// ZTM: TODO: spawnflag for trains to allow PATH_LINE support or always support it?
 		return qfalse;		// train just stops
 	}
 
-	// ZTM: Check if we have made it to the nextTrain/prevTrain
+	if ((!backward && next == next->nextTrain)/* || (backward && next == next->prevTrain)*/)
+	{
+		G_Printf("DEBUG: G_ReachedPath: ent points to self...\n");
+	}
+
+	// ZTM: Check if we have made it to the next train
 	//               Doesn't work with PATHF_AXIS!
 	if (check)
 	{
 		vec3_t targetPos;
+		vec3_t origin;
 		vec_t dist;
 
-		if (backward)
-			VectorCopy(prev->s.origin/*s.pos*/, targetPos);
-		else
-			VectorCopy(next->s.origin/*s.pos*/, targetPos);
+		VectorCopy(next->s.origin/*s.pos*/, targetPos);
 
-		dist = Distance(ent->s.origin/*s.pos*/, targetPos);
+		if (ent->client)
+			VectorCopy(ent->client->ps.origin, origin);
+		else
+			VectorCopy(ent->s.origin/*s.pos*/, origin);
+
+#ifdef NIGHTSMODE
+		if (ent->client && (ent->client->ps.eFlags & EF_NIGHTSMODE)) {
+			origin[2] = targetPos[2] = 0; // Don't compare Z
+		}
+#endif
+		dist = Distance(origin, targetPos);
+
+		G_Printf("DEBUG: G_ReachedPath: dist = %f...\n", dist);
 
 		// ZTM: Value is untested.
 		if (dist > 20.0f)
-		return qfalse;
+			return qfalse;
 		else {
 			G_Printf("DEBUG: G_ReachedPath: Made it to path entity...\n");
 		}
 	}
 
 	// fire all other targets
-	if (backward)
-		G_UseTargets( prev, ent/*NULL*/ );
-	else
-		G_UseTargets( next, ent/*NULL*/ );
+	G_UseTargets( next, ent );
 
 	// Setup next move
+	ent->prevTrain = next;
 	if (backward)
-	{
 		ent->nextTrain = next->prevTrain;
-		ent->prevTrain = prev->prevTrain;
-	}
 	else
-	{
 		ent->nextTrain = next->nextTrain;
-		ent->prevTrain = prev->nextTrain;
-	}
 
-	if (ent->s.eType == ET_MOVER) {
+	if (ent->s.eType == ET_MOVER && ent->nextTrain) {
 		// set the new trajectory
-		if (backward)
-		{
-		VectorCopy( next->s.origin, ent->pos1 );
-		VectorCopy( next->nextTrain->s.origin, ent->pos2 );
+		VectorCopy( ent->prevTrain->s.origin, ent->pos1 );
+		VectorCopy( ent->nextTrain->s.origin, ent->pos2 );
 	}
-		else
-		{
-			VectorCopy( next->s.origin, ent->pos1 );
-			VectorCopy( next->nextTrain->s.origin, ent->pos2 );
-		}
+#ifdef NIGHTSMODE
+	else if (ent->client && (ent->client->ps.eFlags & EF_NIGHTSMODE) && ent->nextTrain)
+	{
+		vec3_t dir;
+		vec3_t viewAngles;
+
+		VectorCopy(ent->nextTrain->s.origin, ent->client->ps.grapplePoint);
+
+		VectorSubtract( ent->nextTrain->r.currentOrigin, ent->client->ps.origin, dir );
+		vectoangles( dir, viewAngles );
+		viewAngles[ROLL] = ent->client->ps.viewangles[ROLL];
+		viewAngles[PITCH] = ent->client->ps.viewangles[PITCH];
+		SetClientViewAngle(ent, viewAngles);
 	}
+#endif
 
 	return qtrue;
 }
 
 void G_MoveOnPath(gentity_t *ent)
 {
+	qboolean backward;
+
 	if (!ent)
 		return;
+
+#ifdef NIGHTSMODE
 	if (ent->client)
 	{
-		// Player... NiGHTS mode or 2D mode.
+		// ZTM: NOTE: Should work for now, but should check if moving away from nextTrain
+		//              (In case they were shoot and knocked back)
+		backward = (ent->client->ps.pm_flags & PMF_BACKWARDS_RUN);
 	}
+	else
+#endif
+	{
+		backward = qfalse;
+	}
+
+	G_ReachedPath(ent, backward, qtrue);
 }
 #endif

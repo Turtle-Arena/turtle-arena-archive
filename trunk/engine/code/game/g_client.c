@@ -2158,18 +2158,21 @@ void G_NiGHTSizePlayer( gentity_t *ent )
 {
 	int mare;
 
+	if (!ent || !ent->client || (ent->client->ps.eFlags & EF_NIGHTSMODE)) {
+		return;
+	}
+
 	// ZTM: TODO: Find lowest mare with a undead nights_target
 	//     find mare_start_1 thought mare_start_9 and look for nights_target,
 	//		if found and alive use path.
 	mare = 1;
 
-	G_SetupPath(ent, va("mare_start_%d", mare));
-
-	if (ent->s.eFlags & EF_NIGHTSMODE) {
-		return;
+	if (G_SetupPath(ent, va("mare_start_%d", mare)) != PATH_ERROR)
+	{
+		ent->client->ps.eFlags |= EF_NIGHTSMODE;
+		ent->client->ps.powerups[PW_FLIGHT] = 99 * 1000;
+		G_ReachedPath(ent, qfalse, qfalse);
 	}
-
-	ent->s.eFlags |= EF_NIGHTSMODE;
 }
 
 void Drone_Touch(gentity_t *self, gentity_t *other, trace_t *trace )

@@ -631,6 +631,11 @@ enum
 };
 
 static void PM_NightsMove( void ) {
+	int		i;
+	vec3_t	wishvel;
+	float	wishspeed;
+	vec3_t	wishdir;
+	float	scale;
 	int style;
 	vec3_t angles;
 
@@ -650,6 +655,7 @@ static void PM_NightsMove( void ) {
 	if (style == NM_TOP)
 	{
 		pm->cmd.upmove = 0;
+		pm->ps->stats[STAT_DEAD_YAW] = pm->ps->viewangles[YAW];
 	}
 	else if (style == NM_BACK)
 	{
@@ -658,9 +664,64 @@ static void PM_NightsMove( void ) {
 	else // NM_SIDE
 	{
 		// If 2D side view mode
+		pm->cmd.upmove = pm->cmd.forwardmove;
+		pm->cmd.forwardmove = pm->cmd.rightmove;
 		pm->cmd.rightmove = 0;
-		pm->cmd.angles[YAW] = angles[YAW];
+		//pm->cmd.angles[YAW] = angles[YAW];
+
+		pm->ps->stats[STAT_DEAD_YAW] = pm->ps->viewangles[YAW]+90;
+		//self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw ( dir );
 	}
+
+	// normal slowdown
+	PM_Friction ();
+
+	scale = PM_CmdScale( &pm->cmd );
+	//
+	// user intentions
+	//
+	if ( !scale ) {
+		wishvel[0] = 0;
+		wishvel[1] = 0;
+		wishvel[2] = -20;
+	} else {
+		for (i=0 ; i<3 ; i++) {
+			wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
+		}
+
+		wishvel[2] += scale * pm->cmd.upmove;
+	}
+
+#if 1
+	{
+		vec3_t vel, v;
+		float vlen;
+
+		VectorScale(pml.forward, -16, v);
+		VectorAdd(pm->ps->grapplePoint, v, v);
+		VectorSubtract(v, pm->ps->origin, vel);
+		vlen = VectorLength(vel);
+		VectorNormalize( vel );
+
+		if (vlen <= 100)
+			VectorScale(vel, 10 * vlen, vel);
+		else
+			VectorScale(vel, 800, vel);
+
+		VectorCopy(vel, pm->ps->velocity);
+
+		pml.groundPlane = qfalse;
+	}
+#else
+	VectorCopy (wishvel, wishdir);
+	wishspeed = VectorNormalize(wishdir);
+
+	PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
+#endif
+
+	PM_StepSlideMove( qfalse );
+
+	PM_ContinueLegsAnim( LEGS_IDLE );
 }
 #endif
 
@@ -2756,6 +2817,10 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 
 	// circularly clamp the angles with deltas
 	for (i=0 ; i<3 ; i++) {
+#ifdef NIGHTSMODE
+		if ((pm->ps->eFlags & EF_NIGHTSMODE) && i == YAW)
+			continue;
+#endif
 		temp = cmd->angles[i] + ps->delta_angles[i];
 		if ( i == PITCH ) {
 			// don't let the player look up or down more than 90 degrees
@@ -2909,6 +2974,15 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	// decide if backpedaling animations should be used
+#ifdef NIGHTSMODE
+	if ( pm->ps->eFlags & EF_NIGHTSMODE ) {
+		if ( pm->cmd.rightmove < 0 ) {
+			pm->ps->pm_flags |= PMF_BACKWARDS_RUN;
+		} else if ( pm->cmd.rightmove > 0 || ( pm->cmd.rightmove == 0 && pm->cmd.forwardmove ) ) {
+			pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
+		}
+	} else
+#endif
 	if ( pm->cmd.forwardmove < 0 ) {
 		pm->ps->pm_flags |= PMF_BACKWARDS_RUN;
 	} else if ( pm->cmd.forwardmove > 0 || ( pm->cmd.forwardmove == 0 && pm->cmd.rightmove ) ) {
