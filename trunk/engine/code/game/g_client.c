@@ -2146,33 +2146,66 @@ NiGHTS mode
 // Go out of Nights mode, nights time ran out.
 void G_DeNiGHTSizePlayer( gentity_t *ent )
 {
-	if (!(ent->s.eFlags & EF_NIGHTSMODE)) {
+	if (!ent || !ent->client)
 		return;
-	}
 
-	ent->s.eFlags &= ~EF_NIGHTSMODE;
+	ent->client->ps.powerups[PW_FLIGHT] = 0;
+	ent->client->ps.eFlags &= ~EF_NIGHTSMODE;
 }
+
+#if 0
+int G_FindCurrentNightsTarget(void)
+{
+	int mare = 1;
+	gentity_t *target;
+	
+	for (mare = 1; mare < 10; mare++)
+	{
+		target = G_Find( NULL, FOFS(targetname), va("nights_target_%d", mare) );
+		if ( !target ) {
+			continue;
+		}
+		if (target->health)
+			return mare;
+	}
+}
+#endif
 
 // Go into Nights mode
 void G_NiGHTSizePlayer( gentity_t *ent )
 {
-	int mare;
+	static int mare = 1;
 
-	if (!ent || !ent->client || (ent->client->ps.eFlags & EF_NIGHTSMODE)) {
+	if (!ent || !ent->client)
 		return;
-	}
 
+#if 0
 	// ZTM: TODO: Find lowest mare with a undead nights_target
 	//     find mare_start_1 thought mare_start_9 and look for nights_target,
 	//		if found and alive use path.
 	mare = 1;
+#endif
 
-	if (G_SetupPath(ent, va("mare_start_%d", mare)) != PATH_ERROR)
+	if (!G_Find( NULL, FOFS(targetname), va("mare_start_%d", mare) )
+		|| G_SetupPath(ent, va("mare_start_%d", mare)) == PATH_ERROR)
 	{
-		ent->client->ps.eFlags |= EF_NIGHTSMODE;
-		ent->client->ps.powerups[PW_FLIGHT] = 99 * 1000;
-		G_ReachedPath(ent, qfalse, qfalse);
+		if (mare == 1)
+			return;
+
+		mare = 1;
+		if (G_SetupPath(ent, "mare_start_1") == PATH_ERROR)
+		{
+			return;
+		}
 	}
+	else
+	{
+		mare++;
+	}
+
+	ent->client->ps.eFlags |= EF_NIGHTSMODE;
+	ent->client->ps.powerups[PW_FLIGHT] = level.time + 120 * 1000;
+	G_ReachedPath(ent, qfalse);
 }
 
 void Drone_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
@@ -2201,12 +2234,22 @@ void SP_nights_start( gentity_t *ent )
 
 void Capture_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
 {
+	int amount = other->health; //other->count
+	
+	if (amount > self->health)
+		amount = self->health;
+	
+	self->health -= amount;
+	other->health -= amount; //other->count
 }
 
 // Ideya Capture
 // Touch go use collected Blue Chips to damage Ideya Capture
 void SP_nights_target( gentity_t *ent )
 {
+	VectorSet( ent->r.mins, -15, -15, -15 );
+	VectorSet( ent->r.maxs, 15, 15, 15 );
+
 	ent->s.eType = ET_GENERAL;
 	ent->flags = FL_NO_KNOCKBACK;
 	ent->r.contents = CONTENTS_TRIGGER;

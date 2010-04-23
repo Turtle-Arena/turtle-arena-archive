@@ -72,6 +72,12 @@ int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 
 	other->client->ps.powerups[ent->item->giTag] += quantity * 1000;
 
+#ifdef NIGHTSMODE
+	if (ent->item->giTag == PW_FLIGHT) {
+		G_NiGHTSizePlayer(other);
+	}
+#endif
+
 #ifndef TA_MISC
 	// give any nearby players a "denied" anti-reward
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
@@ -928,7 +934,11 @@ void FinishSpawningItem( gentity_t *ent ) {
 	}
 
 	// powerups don't spawn in for a while
-	if ( ent->item->giType == IT_POWERUP ) {
+	if ( ent->item->giType == IT_POWERUP
+#ifdef NIGHTSMODE
+		&& ent->item->giTag != PW_FLIGHT
+#endif
+	) {
 		float	respawn;
 
 		respawn = 45 + crandom() * 15;

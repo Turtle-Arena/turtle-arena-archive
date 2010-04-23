@@ -1573,6 +1573,9 @@ typedef struct
 #ifndef TURTLEARENA // POWERS
 #define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
 #endif
+#ifdef NIGHTSMODE
+#define PMF_TRAINBACKWARD	32768
+#endif
 
 #define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
 
