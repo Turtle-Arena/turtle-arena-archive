@@ -733,6 +733,10 @@ qboolean SpotWouldTelefrag( gentity_t *spot, gentity_t *ent );
 #else
 qboolean SpotWouldTelefrag( gentity_t *spot );
 #endif
+#ifdef NIGHTSMODE
+void G_DeNiGHTSizePlayer( gentity_t *ent );
+void G_NiGHTSizePlayer( gentity_t *ent );
+#endif
 
 //
 // g_svcmds.c
@@ -890,7 +894,7 @@ typedef enum
 } gpathtype_e;
 
 gpathtype_e G_SetupPath(gentity_t *ent, const char *target);
-qboolean G_ReachedPath(gentity_t *ent, qboolean backward, qboolean check);
+qboolean G_ReachedPath(gentity_t *ent, qboolean check);
 void G_MoveOnPath(gentity_t *ent);
 #endif
 

@@ -301,12 +301,12 @@
 }
 // brush 33
 {
-( 1352 -768 -200 ) ( 1352 -832 -200 ) ( 1288 -768 -200 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
-( 1344 -768 -80 ) ( 1280 -768 -80 ) ( 1344 -768 -208 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
-( 1344 -768 -80 ) ( 1344 -768 -208 ) ( 1344 -832 -80 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
-( 1280 -832 -208 ) ( 1344 -832 -208 ) ( 1280 -768 -208 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( 1280 -832 -208 ) ( 1280 -832 -80 ) ( 1344 -832 -208 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
-( 1280 -832 -208 ) ( 1280 -768 -208 ) ( 1280 -832 -80 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+( 1288 -704 -200 ) ( 1288 -768 -200 ) ( 1224 -704 -200 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+( 1280 -704 -80 ) ( 1216 -704 -80 ) ( 1280 -704 -208 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+( 1280 -704 -80 ) ( 1280 -704 -208 ) ( 1280 -768 -80 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+( 1216 -768 -208 ) ( 1280 -768 -208 ) ( 1216 -704 -208 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1216 -768 -208 ) ( 1216 -768 -80 ) ( 1280 -768 -208 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
+( 1216 -768 -208 ) ( 1216 -704 -208 ) ( 1216 -768 -80 ) base_floor/gray1 0 0 0 0.5 0.5 0 0 0
 }
 }
 // entity 1
@@ -362,7 +362,8 @@
 // entity 11
 {
 "classname" "item_flight"
-"origin" "-968.000000 -496.000000 -168.000000"
+"origin" "1248.000000 -736.000000 -168.000000"
+"wait" "1"
 }
 // entity 12
 {
@@ -1996,29 +1997,65 @@
 }
 // entity 61
 {
-"classname" "nights_start"
-"origin" "1312.000000 -800.000000 -176.000000"
-"target" "mare_start_1"
-"targetname" "nights_start1"
+"classname" "path_corner"
+"origin" "1240.000000 -728.000000 -176.000000"
+"targetname" "mare_start_1"
+"target" "path_corner2"
+"angle" "-90.000000"
 }
 // entity 62
 {
 "classname" "path_corner"
-"origin" "1312.000000 -616.000000 -176.000000"
-"targetname" "mare_start_1"
-"target" "path_corner2"
+"origin" "1240.000000 -536.000000 -176.000000"
+"targetname" "path_corner2"
+"target" "nights_target1"
+"angle" "-90.000000"
 }
 // entity 63
 {
-"classname" "path_corner"
-"origin" "1120.000000 -616.000000 -176.000000"
-"targetname" "path_corner2"
-"target" "nights_target1"
+"classname" "nights_target"
+"origin" "1056.000000 -536.000000 -176.000000"
+"targetname" "nights_target1"
+"target" "nights_start1"
+"angle" "-90.000000"
 }
 // entity 64
 {
+"classname" "path_corner"
+"origin" "1056.000000 -728.000000 -176.000000"
+"target" "mare_start_1"
+"targetname" "nights_start1"
+"angle" "-90.000000"
+}
+// entity 65
+{
+"classname" "path_corner"
+"origin" "1256.000000 -744.000000 -176.000000"
+"targetname" "mare_start_2"
+"target" "path_corner1"
+"angle" "90.000000"
+}
+// entity 66
+{
+"classname" "path_corner"
+"origin" "1256.000000 -936.000000 -176.000000"
+"targetname" "path_corner1"
+"target" "nights_target2"
+"angle" "90.000000"
+}
+// entity 67
+{
 "classname" "nights_target"
-"origin" "1120.000000 -800.000000 -176.000000"
-"targetname" "nights_target1"
-"target" "nights_start1"
+"origin" "1440.000000 -936.000000 -176.000000"
+"targetname" "nights_target2"
+"target" "nights_start2"
+"angle" "90.000000"
+}
+// entity 68
+{
+"classname" "path_corner"
+"origin" "1440.000000 -744.000000 -176.000000"
+"target" "mare_start_2"
+"targetname" "nights_start2"
+"angle" "90.000000"
 }

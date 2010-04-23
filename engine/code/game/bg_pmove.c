@@ -440,7 +440,11 @@ static qboolean PM_CheckJump( void ) {
 	pm->ps->velocity[2] = JUMP_VELOCITY;
 	PM_AddEvent( EV_JUMP );
 
-	if ( pm->cmd.forwardmove >= 0 ) {
+	if ( pm->cmd.forwardmove >= 0
+#ifdef NIGHTSMODE
+			|| (pm->ps->pm_flags & EF_NIGHTSMODE)
+#endif
+	 ) {
 #ifdef TA_NPCSYS
 		if (pm->npc) {
 			PM_ForceLegsAnim( OBJECT_JUMP );
@@ -625,7 +629,7 @@ static void PM_InvulnerabilityMove( void ) {
 // Nights Move style
 enum
 {
-	NM_SIDE, // normal
+	NM_SIDE, // normal (only working move type)
 	NM_TOP,
 	NM_BACK
 };
@@ -637,11 +641,14 @@ static void PM_NightsMove( void ) {
 	vec3_t	wishdir;
 	float	scale;
 	int style;
-	vec3_t angles;
+	vec3_t vel, v;
+	float vlen;
+	int move;
+	//vec3_t angles;
 
 	// default...
 	style = NM_SIDE;
-	VectorClear(angles);
+	//VectorClear(angles);
 
 	// if on axis, instead of a line {
 	//   angle = angle between axis point and player point + 90;
@@ -652,13 +659,14 @@ static void PM_NightsMove( void ) {
 		// angles = angle between point1 and point2
 	}
 
+	// Controls
 	if (style == NM_TOP)
 	{
 		pm->cmd.upmove = 0;
-		pm->ps->stats[STAT_DEAD_YAW] = pm->ps->viewangles[YAW];
 	}
 	else if (style == NM_BACK)
 	{
+		pm->cmd.upmove = pm->cmd.forwardmove;
 		pm->cmd.forwardmove = 0;
 	}
 	else // NM_SIDE
@@ -668,8 +676,6 @@ static void PM_NightsMove( void ) {
 		pm->cmd.forwardmove = pm->cmd.rightmove;
 		pm->cmd.rightmove = 0;
 		//pm->cmd.angles[YAW] = angles[YAW];
-
-		pm->ps->stats[STAT_DEAD_YAW] = pm->ps->viewangles[YAW]+90;
 		//self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw ( dir );
 	}
 
@@ -692,32 +698,28 @@ static void PM_NightsMove( void ) {
 		wishvel[2] += scale * pm->cmd.upmove;
 	}
 
-#if 1
-	{
-		vec3_t vel, v;
-		float vlen;
-
-		VectorScale(pml.forward, -16, v);
+	VectorScale(pml.forward, -16, v);
+	if (pm->ps->pm_flags & PMF_TRAINBACKWARD) {
+		move = -pm->cmd.forwardmove;
 		VectorAdd(pm->ps->grapplePoint, v, v);
-		VectorSubtract(v, pm->ps->origin, vel);
-		vlen = VectorLength(vel);
-		VectorNormalize( vel );
-
-		if (vlen <= 100)
-			VectorScale(vel, 10 * vlen, vel);
-		else
-			VectorScale(vel, 800, vel);
-
-		VectorCopy(vel, pm->ps->velocity);
-
-		pml.groundPlane = qfalse;
+	} else {
+		move = pm->cmd.forwardmove;
+		VectorAdd(pm->ps->grapplePoint2, v, v);
 	}
-#else
-	VectorCopy (wishvel, wishdir);
-	wishspeed = VectorNormalize(wishdir);
+	v[2] = pm->ps->origin[2];
+	VectorSubtract(v, pm->ps->origin, vel);
+	vlen = VectorLength(vel);
+	VectorNormalize( vel );
 
+	VectorScale(vel, move, vel);
+	vel[2] = wishvel[2];
+
+	VectorCopy (vel, wishdir);
+	wishspeed = VectorNormalize(wishdir);
+	
 	PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
-#endif
+
+	pml.groundPlane = qfalse;
 
 	PM_StepSlideMove( qfalse );
 
@@ -1322,7 +1324,11 @@ static void PM_GroundTraceMissed( void ) {
 
 		pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, point, pm->ps->clientNum, pm->tracemask);
 		if ( trace.fraction == 1.0 ) {
-			if ( pm->cmd.forwardmove >= 0 ) {
+			if ( pm->cmd.forwardmove >= 0 
+#ifdef NIGHTSMODE
+			|| (pm->ps->pm_flags & EF_NIGHTSMODE)
+#endif
+			) {
 #ifdef TA_NPCSYS
 				if (pm->npc) {
 					PM_ForceLegsAnim( OBJECT_JUMP );
@@ -1386,7 +1392,11 @@ static void PM_GroundTrace( void ) {
 			Com_Printf("%i:kickoff\n", c_pmove);
 		}
 		// go into jump animation
-		if ( pm->cmd.forwardmove >= 0 ) {
+		if ( pm->cmd.forwardmove >= 0 
+#ifdef NIGHTSMODE
+			|| (pm->ps->pm_flags & EF_NIGHTSMODE)
+#endif
+		) {
 #ifdef TA_NPCSYS
 			if (pm->npc) {
 				PM_ForceLegsAnim( OBJECT_JUMP );
@@ -2976,11 +2986,7 @@ void PmoveSingle (pmove_t *pmove) {
 	// decide if backpedaling animations should be used
 #ifdef NIGHTSMODE
 	if ( pm->ps->eFlags & EF_NIGHTSMODE ) {
-		if ( pm->cmd.rightmove < 0 ) {
-			pm->ps->pm_flags |= PMF_BACKWARDS_RUN;
-		} else if ( pm->cmd.rightmove > 0 || ( pm->cmd.rightmove == 0 && pm->cmd.forwardmove ) ) {
-			pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
-		}
+		pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
 	} else
 #endif
 	if ( pm->cmd.forwardmove < 0 ) {
@@ -3068,7 +3074,7 @@ void PmoveSingle (pmove_t *pmove) {
 #endif
 #endif
 #ifdef NIGHTSMODE
-	if ( pm->ps->eFlags & EF_NIGHTSMODE ) {
+	if ( pm->ps->powerups[PW_FLIGHT] && (pm->ps->eFlags & EF_NIGHTSMODE) ) {
 		PM_NightsMove();
 	} else
 #endif

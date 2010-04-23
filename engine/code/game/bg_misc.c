@@ -825,7 +825,11 @@ gitem_t	bg_itemlist[] =
 		NULL, NULL },
 /* icon */		"icons/flight",
 /* pickup */	"Flight",
+#ifdef NIGHTSMODE
+		120,
+#else
 		60,
+#endif
 		IT_POWERUP,
 		PW_FLIGHT,
 /* precache */ "",

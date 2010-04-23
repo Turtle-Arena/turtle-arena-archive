@@ -1470,6 +1470,30 @@ void ClientThink_real( gentity_t *ent ) {
 #ifdef NIGHTSMODE
 	if (client->ps.eFlags & EF_NIGHTSMODE)
 	{
+		// A_FaceTarget!
+		if (ent->client->pers.cmd.rightmove != 0)
+		{
+			vec3_t dir;
+			vec3_t viewAngles;
+
+			if (ent->client->pers.cmd.rightmove < 0) { // LEFT, pervTrain
+				client->ps.pm_flags |= PMF_TRAINBACKWARD;
+				VectorSubtract( ent->pos1, client->ps.origin, dir );
+			} else { // RIGHT, nextTrain
+				client->ps.pm_flags &= ~PMF_TRAINBACKWARD;
+				VectorSubtract( ent->pos2, client->ps.origin, dir );
+			}
+			
+			dir[2] = 0;
+
+			vectoangles( dir, viewAngles );
+
+			//BG_SwingAngles( viewAngles[YAW], 40, 90, BG_SWINGSPEED, &ent->client->pers.legs.yawAngle, &ent->client->pers.legs.yawing, (level.time - level.previousTime) );
+			//viewAngles[YAW] = ent->client->pers.legs.yawAngle;
+
+			SetClientViewAngle(ent, viewAngles);
+		}
+
 		G_MoveOnPath(ent);
 	}
 #endif
@@ -2067,6 +2091,14 @@ void ClientEndFrame( gentity_t *ent ) {
 	// turn off any expired powerups
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
 		if ( ent->client->ps.powerups[ i ] < level.time ) {
+#ifdef NIGHTSMODE
+			if (ent->client->ps.powerups[ i ] > 0
+				&& i == PW_FLIGHT)
+			{
+				G_DeNiGHTSizePlayer(ent);
+			}
+			else
+#endif
 #ifdef TURTLEARENA // POWERS
 			if (ent->client->ps.powerups[ i ] > 0
 				&& i == PW_FLASHING)
