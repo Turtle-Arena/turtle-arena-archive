@@ -3,8 +3,27 @@
 
 *Turtle Arena TODO and BUGS*
 
-= 0.2 (Beta) =
-  * New Melee swing sound effects?
+= Roadmap =
+== 0.2 ==
+  * Improve Raph
+  * Add the other 3 Turtles (Leo, Don, and Mike)
+
+== 0.4 ==
+  * MDR player models (with multiple levels of detail?)
+  * Remake UI with missionpack ui scripting
+  * Custom animations for all players
+  * Player Abilities
+  * Focus on Single Player
+    * NPCs
+    * Maps
+    * Savegames
+
+== 0.6 ==
+
+== 0.8 ==
+
+== 1.0 ==
+  * Polish
 
 = engine =
 == Weapons ==
