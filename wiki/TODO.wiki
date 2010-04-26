@@ -86,9 +86,9 @@ Weapons (and attacking)
 
   * TODO: Have Foot be the default red team (Update flag skin)
 
-  * TODO: Have Guardian be the default blue team?
+  * TODO: Have Shell be the default blue team? (Base Shell icon on game icon)
 
-  * TODO: Have a extra team (Needed for mp_ui), like (Purple) Dragon
+  * TODO: Have a extra team (Needed for mp_ui), like (Purple) Dragon, or Guardian
 
 == Misc ==
   * TODO: Add optional run animations for torso

@@ -168,6 +168,8 @@ Target this entity with a misc_model to have the model attached to the entity (s
 <group name="func_door" color="0 .5 .8">
 Normal sliding door entity. By default, the door will activate when player walks close to it or when damage is inflicted to it.
 -------- KEYS --------
+<sound key="noiseStart" name="Start Sound">path/name of .wav file to play on start move (default sound/movers/doors/dr1_strt.wav)</sound>
+<sound key="noiseEnd" name="End Sound">path/name of .wav file to play on end move (default sound/movers/doors/dr1_end.wav)</sound>
 <direction key="angle" name="Direction">determines the opening direction of door (up = -1, down = -2).</direction>
 <real key="speed" name="Move Speed">determines how fast the door moves (default 100).</real>
 <real key="wait" name="Return Delay">number of seconds before door returns (default 2, -1 = return immediately)</real>
