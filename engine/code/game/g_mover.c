@@ -1251,15 +1251,28 @@ NOMONSTER	monsters will not trigger this door
 "color"		constantLight color
 "light"		constantLight radius
 "health"	if set, the door must be shot open
+#ifdef IOQ3ZTM
+"noiseStart"door start move sound (default: sound/movers/doors/dr1_strt.wav)
+"noiseEnd"	door end move sound (default: sound/movers/doors/dr1_end.wav)
+#endif
 */
 void SP_func_door (gentity_t *ent) {
 	vec3_t	abs_movedir;
 	float	distance;
 	vec3_t	size;
 	float	lip;
+#ifdef IOQ3ZTM // Allow per-entity door sounds
+	char *sound;
 
+	G_SpawnString( "noiseStart", "sound/movers/doors/dr1_strt.wav", &sound );
+	ent->sound1to2 = ent->sound2to1 = G_SoundIndex(sound);
+
+	G_SpawnString( "noiseEnd", "sound/movers/doors/dr1_end.wav", &sound );
+	ent->soundPos1 = ent->soundPos2 = G_SoundIndex(sound);
+#else
 	ent->sound1to2 = ent->sound2to1 = G_SoundIndex("sound/movers/doors/dr1_strt.wav");
 	ent->soundPos1 = ent->soundPos2 = G_SoundIndex("sound/movers/doors/dr1_end.wav");
+#endif
 
 	ent->blocked = Blocked_Door;
 
