@@ -151,8 +151,18 @@ PlayerIcon
 static void PlayerIcon( const char *modelAndSkin, char *iconName, int iconNameMaxSize ) {
 	char	*skin;
 	char	model[MAX_QPATH];
+#ifdef IOQ3ZTM // BOT_HEADMODEL
+	qboolean headmodel;
 
+	headmodel = (modelAndSkin[0] == '*');
+	if (headmodel) {
+		Q_strncpyz( model, &modelAndSkin[1], sizeof(model));
+	} else {
+		Q_strncpyz( model, modelAndSkin, sizeof(model));
+	}
+#else
 	Q_strncpyz( model, modelAndSkin, sizeof(model));
+#endif
 	skin = Q_strrchr( model, '/' );
 	if ( skin ) {
 		*skin++ = '\0';
@@ -161,6 +171,20 @@ static void PlayerIcon( const char *modelAndSkin, char *iconName, int iconNameMa
 		skin = "default";
 	}
 
+#ifdef IOQ3ZTM // BOT_HEADMODEL
+	if (headmodel)
+	{
+		Com_sprintf(iconName, iconNameMaxSize, "models/players/heads/%s/icon_%s.tga", model, skin );
+
+		if( !trap_R_RegisterShaderNoMip( iconName ) && Q_stricmp( skin, "default" ) != 0 ) {
+			Com_sprintf(iconName, iconNameMaxSize, "models/players/heads/%s/icon_default.tga", model );
+		}
+
+		if (trap_R_RegisterShaderNoMip( iconName )) {
+			return;
+		}
+	}
+#endif
 	Com_sprintf(iconName, iconNameMaxSize, "models/players/%s/icon_%s.tga", model, skin );
 
 	if( !trap_R_RegisterShaderNoMip( iconName ) && Q_stricmp( skin, "default" ) != 0 ) {
@@ -228,6 +252,10 @@ static void UI_SPLevelMenu_SetBots( void ) {
 		}
 	
 		if( botInfo ) {
+#ifdef IOQ3ZTM // BOT_HEADMODEL
+			levelMenuInfo.botPics[levelMenuInfo.numBots] = PlayerIconHandle( Info_ValueForKey( botInfo, "headmodel" ) );
+			if (!levelMenuInfo.botPics[levelMenuInfo.numBots])
+#endif
 			levelMenuInfo.botPics[levelMenuInfo.numBots] = PlayerIconHandle( Info_ValueForKey( botInfo, "model" ) );
 			Q_strncpyz( levelMenuInfo.botNames[levelMenuInfo.numBots], Info_ValueForKey( botInfo, "name" ), 10 );
 		}
