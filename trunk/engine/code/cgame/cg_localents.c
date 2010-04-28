@@ -556,7 +556,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 #endif
 }
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // BUBBLES
 /*
 ====================
 CG_BubbleThink
@@ -933,7 +933,7 @@ void CG_AddLocalEntities( void ) {
 			CG_AddScorePlum( le );
 			break;
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // BUBBLES
 		case LE_BUBBLE:
 			CG_BubbleThink( le );
 			break;

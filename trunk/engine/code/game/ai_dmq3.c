@@ -2931,6 +2931,9 @@ int BotWantsToCamp(bot_state_t *bs) {
 	float camper;
 	int cs, traveltime, besttraveltime;
 	bot_goal_t goal, bestgoal;
+#if defined TA_WEAPSYS && !defined TA_WEAPSYS_EX
+	int i;
+#endif
 
 	camper = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CAMPER, 0, 1);
 	if (camper < 0.1) return qfalse;
@@ -2969,8 +2972,9 @@ int BotWantsToCamp(bot_state_t *bs) {
 		if (bs->inventory[INVENTORY_AMMO_START+i-1] <= 0 && bs->inventory[INVENTORY_AMMO_START+i-1] != -1)
 			continue;
 
-		if (bg_weapongroupinfo[0].weapon[0]->damage >= 50
-			|| bg_weapongroupinfo[0].weapon[0]->proj->damage >= 50)
+		// ZTM: FIXME: Add up all blades for both weapons
+		if (bg_weapongroupinfo[i].weapon[0]->blades[0].damage >= 50
+			|| (bg_weapongroupinfo[i].weapon[0]->proj->damage + bg_weapongroupinfo[i].weapon[1]->proj->damage) >= 50)
 		{
 			break;
 		}
@@ -5394,7 +5398,7 @@ void BotCheckForProxMines(bot_state_t *bs, entityState_t *state) {
 	// if this is not a prox mine
 	if (state->eType != ET_MISSILE
 #ifdef TA_WEAPSYS
-		|| !bg_projectileinfo[state->weapon].stickOnImpact
+		|| bg_projectileinfo[state->weapon].explosionType != PE_PROX
 #else
 		|| state->weapon != WP_PROX_LAUNCHER
 #endif
@@ -5406,6 +5410,26 @@ void BotCheckForProxMines(bot_state_t *bs, entityState_t *state) {
 #ifdef TA_WEAPSYS_EX
 	if (!G_CanShootProx(bs->cur_ps.weapon) && !G_CanShootProx(bs->cur_ps.stats[STAT_DEFAULTWEAPON])) {
 		return;
+	}
+#elif defined TA_WEAPSYS
+	{
+		int i;
+
+		for (i = 1; i < BG_NumWeaponGroups(); i++)
+		{
+			if (bs->inventory[INVENTORY_WEAPON_START+i-1] > 0
+				&& (bs->inventory[INVENTORY_AMMO_START+i-1] > 0
+				|| bs->inventory[INVENTORY_AMMO_START+i-1] == -1)
+				&& G_CanShootProx(i))
+			{
+				break;
+			}
+		}
+
+		if (i == BG_NumWeaponGroups())
+		{
+			return;
+		}
 	}
 #else
 	// if the bot doesn't have a weapon to deactivate the mine
@@ -6108,7 +6132,7 @@ void BotSetupDeathmatchAI(void) {
 #ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	trap_Cvar_Register(&bot_rocketjump, "bot_rocketjump", "1", 0);
 #endif
-#ifdef TA_MISC // BOTLIB
+#ifdef TURTLEARENA // BOTLIB
 	trap_Cvar_Register(&bot_grapple, "bot_grapple", "1", 0);
 #else
 	trap_Cvar_Register(&bot_grapple, "bot_grapple", "0", 0);

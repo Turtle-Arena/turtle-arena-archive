@@ -307,7 +307,7 @@ static void UI_CalcPostGameStats( void ) {
  
 	// put back all the ui overrides
 	trap_Cvar_Set("capturelimit", UI_Cvar_VariableString("ui_saveCaptureLimit"));
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 	trap_Cvar_Set("scorelimit", UI_Cvar_VariableString("ui_saveScoreLimit"));
 #else
 	trap_Cvar_Set("fraglimit", UI_Cvar_VariableString("ui_saveFragLimit"));

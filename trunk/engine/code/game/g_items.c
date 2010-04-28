@@ -52,7 +52,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 	int			quantity;
-#ifndef TA_MISC
+#ifndef TURTLEARENA // AWARDS
 	int			i;
 	gclient_t	*client;
 #endif
@@ -78,7 +78,7 @@ int Pickup_Powerup( gentity_t *ent, gentity_t *other ) {
 	}
 #endif
 
-#ifndef TA_MISC
+#ifndef TURTLEARENA // AWARDS
 	// give any nearby players a "denied" anti-reward
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		vec3_t		delta;
@@ -455,7 +455,7 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	}
 	else
 #endif
-#ifndef TA_MISC
+#ifndef TURTLEARENA // Treat all health items the same
 	if ( ent->item->quantity != 5 && ent->item->quantity != 100 ) {
 		max = other->client->ps.stats[STAT_MAX_HEALTH];
 	}

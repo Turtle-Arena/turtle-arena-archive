@@ -80,7 +80,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	GIANT_WIDTH			32
 #define	GIANT_HEIGHT		48
 
-#ifdef TA_MISC
+#ifdef TA_DATA
 #define	NUM_CROSSHAIRS		4
 #else
 #define	NUM_CROSSHAIRS		10
@@ -296,10 +296,8 @@ typedef enum {
 	LE_FADE_RGB,
 	LE_SCALE_FADE,
 	LE_SCOREPLUM,
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // BUBBLES
 	LE_BUBBLE,
-	//LE_SNOW,
-	//LE_RAIN,
 #endif
 #ifdef MISSIONPACK
 #ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
@@ -446,7 +444,7 @@ typedef struct {
 	int				invulnerabilityStartTime;
 	int				invulnerabilityStopTime;
 #endif
-#ifdef TA_MISC // GHOST
+#ifdef IOQ3ZTM // GHOST
 	int				ghostTime;
 #endif
 
@@ -879,7 +877,7 @@ typedef struct {
 #else
 	//qboolean cameraMode;		// if rendering from a loaded camera
 #endif
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 	// Use CG_ToggleLetterbox to change letterbox mode
 	qboolean letterbox;	// qtrue if moving onto the screen, or is done moving on.
 						// qfalse if moving off, or is off
@@ -920,7 +918,7 @@ typedef struct {
 	qhandle_t	charsetPropB;
 	qhandle_t	whiteShader;
 
-#ifdef MISSIONPACK // IOQ3BUGFIX: THIS IS MISSIONPACK STUFF. But it didn't have a #ifdef.
+#ifdef MISSIONPACK // IOQ3BUGFIX: This is MISSIONPACK stuff but it didn't have a #ifdef.
 	qhandle_t	redCubeModel;
 	qhandle_t	blueCubeModel;
 	qhandle_t	redCubeIcon;
@@ -1227,7 +1225,7 @@ typedef struct {
 	sfxHandle_t fallSound;
 	sfxHandle_t jumpPadSound;
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 	sfxHandle_t letterBoxOnSound;
 	sfxHandle_t letterBoxOffSound;
 #endif
@@ -1249,11 +1247,7 @@ typedef struct {
 #ifndef TURTLEARENA // AWARDS
 	sfxHandle_t impressiveSound;
 	sfxHandle_t excellentSound;
-#endif
-#ifndef TA_MISC
 	sfxHandle_t deniedSound;
-#endif
-#ifndef TURTLEARENA // AWARDS
 	sfxHandle_t humiliationSound;
 #endif
 	sfxHandle_t assistSound;
@@ -1854,6 +1848,9 @@ void CG_DrawWeaponSelect( void );
 
 void CG_OutOfAmmoChange( void );	// should this be in pmove?
 #endif
+#ifdef IOQ3ZTM // GHOST
+localEntity_t *CG_GhostRefEntity(refEntity_t *re, int timetolive, int alpha);
+#endif
 
 //
 // cg_marks.c
@@ -1930,7 +1927,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 void CG_Fade( int a, int time, int duration );
 void CG_DrawFlashFade( void );
 #endif
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 void CG_ToggleLetterbox(qboolean onscreen, qboolean instant);
 void CG_DrawLetterbox(void);
 #endif

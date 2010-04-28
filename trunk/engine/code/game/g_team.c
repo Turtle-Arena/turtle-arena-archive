@@ -364,7 +364,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->pers.teamState.lastfraggedcarrier = level.time;
 		AddScore(attacker, targ->r.currentOrigin, CTF_FRAG_CARRIER_BONUS);
 		attacker->client->pers.teamState.fragcarrier++;
-#ifdef TA_MISC // frag to KO
+#ifdef NOTRATEDM // frag to KO
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " knocked out %s's flag carrier!\n",
 #else
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " fragged %s's flag carrier!\n",
@@ -386,7 +386,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->pers.teamState.lastfraggedcarrier = level.time;
 		AddScore(attacker, targ->r.currentOrigin, CTF_FRAG_CARRIER_BONUS * tokens * tokens);
 		attacker->client->pers.teamState.fragcarrier++;
-#ifdef TA_MISC // frag to KO
+#ifdef NOTRATEDM // frag to KO
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " knocked out %s's skull carrier!\n",
 #else
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " fragged %s's skull carrier!\n",
@@ -1435,7 +1435,7 @@ static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 }
 #endif // #ifdef MISSIONPACK_HARVESTER
 
-#if !defined TURTLEARENA && !defined TA_WEAPSYS // LOCKON
+#ifndef TA_WEAPSYS
 static
 #endif
 void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage ) {

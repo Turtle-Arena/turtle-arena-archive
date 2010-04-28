@@ -59,13 +59,13 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 
 		le = CG_AllocLocalEntity();
 		le->leFlags = LEF_PUFF_DONT_SCALE;
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // BUBBLES
 		le->leType = LE_BUBBLE;
 #else
 		le->leType = LE_MOVE_SCALE_FADE;
 #endif
 		le->startTime = cg.time;
-#ifdef TA_MISC // Bubbles should make it to the surface
+#ifdef IOQ3ZTM // BUBBLES // try to make it to the water surface
 		le->endTime = cg.time + 8000 + random() * 250;
 #else
 		le->endTime = cg.time + 1000 + random() * 250;
@@ -77,7 +77,7 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 
 		re->reType = RT_SPRITE;
 		re->rotation = 0;
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // BUBBLES
 		re->radius = 2 + random() * 2;
 #else
 		re->radius = 3;
@@ -95,7 +95,7 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 		VectorCopy( move, le->pos.trBase );
 		le->pos.trDelta[0] = crandom()*5;
 		le->pos.trDelta[1] = crandom()*5;
-#ifdef TA_MISC // Always move up.
+#ifdef IOQ3ZTM // BUBBLES // Always move up.
 		le->pos.trDelta[2] = 8 + random()*5;
 #else
 		le->pos.trDelta[2] = crandom()*5 + 6;

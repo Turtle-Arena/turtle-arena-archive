@@ -42,7 +42,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef TURTLEARENA
 #define TA_ENTSYS
 #define TA_WEAPSYS
-#define TA_MISC
 
 #define BSPC_VERSION		"2.1h [Turtle Arena]"
 #else

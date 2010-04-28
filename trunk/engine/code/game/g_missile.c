@@ -1019,7 +1019,7 @@ static void ProximityMine_ExplodeOnPlayer( gentity_t *mine ) {
 	player = mine->enemy;
 	player->client->ps.eFlags &= ~EF_TICKING;
 
-#ifndef TURTLEARENA // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	if ( player->client->invulnerabilityTime > level.time ) {
 		G_Damage( player, mine->parent, mine->parent, vec3_origin, mine->s.origin, 1000, DAMAGE_NO_KNOCKBACK, MOD_JUICED );
 		player->client->invulnerabilityTime = 0;
@@ -1031,7 +1031,9 @@ static void ProximityMine_ExplodeOnPlayer( gentity_t *mine ) {
 		G_SetOrigin( mine, player->s.pos.trBase );
 		// make sure the explosion gets to the client
 		mine->r.svFlags &= ~SVF_NOCLIENT;
+#ifndef TA_WEAPSYS
 		mine->splashMethodOfDeath = MOD_PROXIMITY_MINE;
+#endif
 		G_ExplodeMissile( mine );
 	}
 }
@@ -1066,7 +1068,7 @@ static void ProximityMine_Player( gentity_t *mine, gentity_t *player ) {
 
 	mine->enemy = player;
 	mine->think = ProximityMine_ExplodeOnPlayer;
-#ifndef TURTLEARENA // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 	if ( player->client->invulnerabilityTime > level.time ) {
 		mine->nextthink = level.time + 2 * 1000;
 	}
@@ -1202,8 +1204,12 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		}
 #endif
 
-		// Don't stick to obelisk
-		if ((other->pain == ObeliskPain) || other->s.eType == ET_PLAYER)
+		// Don't stick to players or obelisk
+		if (other->s.eType == ET_PLAYER
+#ifdef MISSIONPACK
+			|| (other->pain == ObeliskPain)
+#endif
+			)
 		{
 			goto missileImpact;
 		}

@@ -181,21 +181,21 @@ vmCvar_t	ui_cdkeychecked;
 vmCvar_t	ui_ioq3;
 
 static cvarTable_t		cvarTable[] = {
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "1000", CVAR_ARCHIVE },
 #else
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 #endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
-#ifdef TA_MISC // frag to score and changed KO limit to 3
+#ifdef NOTRATEDM // frag to score
 	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
 #endif
 	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "15", CVAR_ARCHIVE },
 
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 	{ &ui_team_fraglimit, "ui_team_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_team_fraglimit, "ui_team_fraglimit", "0", CVAR_ARCHIVE },
@@ -252,7 +252,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_browserShowEmpty, "ui_browserShowEmpty", "1", CVAR_ARCHIVE },
 
 	{ &ui_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
-#ifdef TA_MISC
+#ifdef TA_DATA
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "1", CVAR_ARCHIVE },
 #else
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },

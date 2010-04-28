@@ -314,7 +314,7 @@ struct gclient_s {
 	int			latched_buttons;
 
 	vec3_t		oldOrigin;
-#if 0 //#ifdef TA_MISC // TEST: push players
+#if 0 //#ifdef TURTLEARENA // TEST: push players
 	float		oldYaw;
 #endif
 
@@ -545,7 +545,7 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags );
 //
 int G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
-#ifdef TA_MISC // Particles
+#ifdef IOQ3TM // Particles
 int		G_ParticleAreaIndex( char *str );
 #endif
 void	G_TeamCommand( team_t team, char *cmd );
@@ -821,7 +821,7 @@ void G_RunClient( gentity_t *ent );
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 );
 void Team_CheckDroppedItem( gentity_t *dropped );
 qboolean CheckObeliskAttack( gentity_t *obelisk, gentity_t *attacker );
-#if defined TURTLEARENA || defined TA_WEAPSYS // LOCKON
+#if defined MISSIONPACK && defined TA_WEAPSYS
 void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage );
 #endif
 

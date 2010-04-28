@@ -337,13 +337,13 @@ void CG_DrawInformation( void ) {
 	cgs.gametype != GT_SINGLE_PLAYER &&
 #endif
 	cgs.gametype < GT_CTF ) {
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		value = atoi( Info_ValueForKey( info, "scorelimit" ) );
 #else
 		value = atoi( Info_ValueForKey( info, "fraglimit" ) );
 #endif
 		if ( value ) {
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 			UI_DrawProportionalString( 320, y, va( "scorelimit %i", value ),
 				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 #else

@@ -725,7 +725,7 @@ static void CG_Item( centity_t *cent ) {
 	else
 #endif
 	msec = cg.time - cent->miscTime;
-#ifdef TA_MISC // Have items fade in
+#ifdef TURTLEARENA // Have items fade in
 	// Doesn't work well with powerup shaders as they use alphagen...
 	if ( msec >= 0 && msec < 3000 ) {
 		frac = (float)msec / 3000;

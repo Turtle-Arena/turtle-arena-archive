@@ -1355,7 +1355,7 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 #endif
 }
 
-#ifdef TA_WEAPSYS_EX
+#ifdef TA_WEAPSYS
 /*
 ==================
 G_CanShootProx

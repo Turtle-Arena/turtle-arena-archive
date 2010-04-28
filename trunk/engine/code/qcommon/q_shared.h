@@ -1001,7 +1001,7 @@ typedef enum {
 //
 #define	MAX_CLIENTS			64		// absolute limit
 #define MAX_LOCATIONS		64
-#ifdef TA_MISC // Particles
+#ifdef IOQ3ZTM // Particles
 #define MAX_PARTICLES_AREAS 64
 #endif
 

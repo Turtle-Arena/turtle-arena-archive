@@ -44,7 +44,7 @@ static const char *MonthAbbrev[] = {
 
 
 static const char *skillLevels[] = {
-#ifdef TA_MISC // rip off SRB2 skills...
+#ifdef TA_MISC // SRB2_SKILLS
   "Easy",
   "Normal",
   "Hard",
@@ -106,7 +106,7 @@ static int const numTeamArenaGameTypes = sizeof(teamArenaGameTypes) / sizeof(con
 
 static const char *teamArenaGameNames[] = {
 	"Free For All",
-#ifdef TA_MISC
+#ifdef TA_MISC // tornament to duel
 	"Duel",
 #else
 	"Tournament",
@@ -141,7 +141,7 @@ static char* netnames[] = {
 };
 
 #ifndef MISSIONPACK
-#ifdef TA_MISC
+#ifdef TURTLEARENA // BRANDING
 static char quake3worldMessage[] = "Visit turtlearena.googlecode.com - News, Updates";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
@@ -1075,14 +1075,14 @@ static void UI_SetCapFragLimits(qboolean uiVars) {
 	}
 	if (uiVars) {
 		trap_Cvar_Set("ui_captureLimit", va("%d", cap));
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		trap_Cvar_Set("ui_scoreLimit", va("%d", frag));
 #else
 		trap_Cvar_Set("ui_fragLimit", va("%d", frag));
 #endif
 	} else {
 		trap_Cvar_Set("capturelimit", va("%d", cap));
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		trap_Cvar_Set("scorelimit", va("%d", frag));
 #else
 		trap_Cvar_Set("fraglimit", va("%d", frag));
@@ -2394,9 +2394,14 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 		int oldCount = UI_MapCountByGameType(qtrue);
 
-#ifdef TA_MISC // Removed skipping ffa and sp
+#ifdef TURTLEARENA // Don't skip FFA
 		if (key == K_MOUSE2) {
 			ui_gameType.integer--;
+#ifndef TA_SP // Don't skip SP
+			if (ui_gameType.integer == 2) {
+				ui_gameType.integer = 1;
+			} else
+#endif
 			if (ui_gameType.integer < 0) {
 				ui_gameType.integer = uiInfo.numGameTypes - 1;
 			}
@@ -2405,6 +2410,11 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
 			if (ui_gameType.integer >= uiInfo.numGameTypes) {
 				ui_gameType.integer = 0;
 			}
+#ifndef TA_SP // Don't skip SP
+			else if (ui_gameType.integer == 2) {
+				ui_gameType.integer = 3;
+			}
+#endif
 		}
 
 		if (uiInfo.gameTypes[ui_gameType.integer].gtEnum < GT_TEAM) {
@@ -3064,7 +3074,7 @@ static void UI_StartSkirmish(qboolean next) {
 	// set up sp overrides, will be replaced on postgame
 	temp = trap_Cvar_VariableValue( "capturelimit" );
 	trap_Cvar_Set("ui_saveCaptureLimit", va("%i", temp));
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 	temp = trap_Cvar_VariableValue( "scorelimit" );
 	trap_Cvar_Set("ui_saveScoreLimit", va("%i", temp));
 #else
@@ -3980,7 +3990,7 @@ serverStatusCvar_t serverStatusCvars[] = {
 	{"version", ""},
 	{"protocol", ""},
 	{"timelimit", ""},
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 	{"scorelimit", ""},
 #else
 	{"fraglimit", ""},
@@ -5882,21 +5892,21 @@ vmCvar_t	ui_realWarmUp;
 vmCvar_t	ui_serverStatusTimeOut;
 
 static cvarTable_t		cvarTable[] = {
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "1000", CVAR_ARCHIVE },
 #else
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 #endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
-#ifdef TA_MISC // frag to score and changed KO limit to 3
+#ifdef NOTRATEDM // frag to score
 	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
 #endif
 	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "15", CVAR_ARCHIVE },
 
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 	{ &ui_team_fraglimit, "ui_team_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_team_fraglimit, "ui_team_fraglimit", "0", CVAR_ARCHIVE },
@@ -5932,7 +5942,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_browserShowEmpty, "ui_browserShowEmpty", "1", CVAR_ARCHIVE },
 
 	{ &ui_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
-#ifdef TA_MISC
+#ifdef TA_DATA
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "1", CVAR_ARCHIVE },
 #else
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },

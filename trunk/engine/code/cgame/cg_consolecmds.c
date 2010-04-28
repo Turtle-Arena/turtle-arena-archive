@@ -470,7 +470,7 @@ void CG_StartCamera( const char *name, qboolean startBlack, qboolean endBlack) {
 			CG_Fade(0, cg.time, 1500);
 		}
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 		CG_ToggleLetterbox(qtrue, startBlack);
 #endif
 		cg.cameraEndBlack = endBlack;
@@ -500,7 +500,7 @@ static void CG_Camera_f( void ) {
 */
 #endif
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 void CG_Letterbox(void)
 {
 	qboolean onscreen, instant;
@@ -515,7 +515,7 @@ void CG_Letterbox(void)
 }
 #endif
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // NEW_CAM
 float camRotDir = 0;
 qboolean camleft = qfalse;
 qboolean camright = qfalse;
@@ -633,7 +633,7 @@ static consoleCommand_t	commands[] = {
 	{ "+zoom", CG_ZoomDown_f },
 	{ "-zoom", CG_ZoomUp_f },
 #endif
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // NEW_CAM
 	{ "camreset", CG_CamReset_f },
 	{ "+camleft", CG_CamLeftDown_f },
 	{ "-camleft", CG_CamLeftUp_f },
@@ -695,7 +695,7 @@ static consoleCommand_t	commands[] = {
 #else
 	//{ "camera", CG_Camera_f },
 #endif
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 	{ "letterbox", CG_Letterbox },
 #endif
 	{ "loaddeferred", CG_LoadDeferredPlayers }	
@@ -777,7 +777,7 @@ void CG_InitConsoleCommands( void ) {
 #else
 	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
 #endif
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 	trap_AddCommand ("letterbox" );
 #endif
 }

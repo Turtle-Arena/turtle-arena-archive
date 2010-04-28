@@ -1264,7 +1264,7 @@ static void CG_DrawAreaChat(rectDef_t *rect, float scale, vec4_t color, qhandle_
 const char *CG_GetKillerText(void) {
 	const char *s = "";
 	if ( cg.killerName[0] ) {
-#ifdef TA_MISC // frag to KO
+#ifdef NOTRATEDM // frag to KO
 		s = va("Knocked out by %s", cg.killerName );
 #else
 		s = va("Fragged by %s", cg.killerName );

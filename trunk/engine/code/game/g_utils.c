@@ -121,7 +121,7 @@ int G_SoundIndex( char *name ) {
 	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, qtrue);
 }
 
-#ifdef TA_MISC // Particles
+#ifdef IOQ3ZTM // Particles
 // str should be
 // int  f f f   f f f   int         int   int
 // type origin origin2 numparticles turb snum

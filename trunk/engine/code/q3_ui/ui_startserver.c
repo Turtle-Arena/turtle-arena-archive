@@ -848,7 +848,7 @@ static const char *playerTeam_list[] = {
 };
 
 static const char *botSkill_list[] = {
-#ifdef TA_MISC // rip off SRB2 skills...
+#ifdef TA_MISC // SRB2_SKILLS
 	"Easy",
 	"Normal",
 	"Hard",
@@ -939,7 +939,7 @@ static void ServerOptions_Start( void ) {
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		trap_Cvar_SetValue( "ui_ffa_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_ffa_fraglimit", fraglimit );
@@ -948,7 +948,7 @@ static void ServerOptions_Start( void ) {
 		break;
 
 	case GT_TOURNAMENT:
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		trap_Cvar_SetValue( "ui_tourney_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_tourney_fraglimit", fraglimit );
@@ -963,7 +963,7 @@ static void ServerOptions_Start( void ) {
 #endif
 
 	case GT_TEAM:
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		trap_Cvar_SetValue( "ui_team_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_team_fraglimit", fraglimit );
@@ -1016,7 +1016,7 @@ static void ServerOptions_Start( void ) {
 	trap_Cvar_SetValue( "sv_maxclients", Com_Clamp( 0, 12, maxclients ) );
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, dedicated ) );
 	trap_Cvar_SetValue ("timelimit", Com_Clamp( 0, timelimit, timelimit ) );
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 	trap_Cvar_SetValue ("scorelimit", Com_Clamp( 0, fraglimit, fraglimit ) );
 #else
 	trap_Cvar_SetValue ("fraglimit", Com_Clamp( 0, fraglimit, fraglimit ) );
@@ -1334,7 +1334,7 @@ static void ServerOptions_InitBotNames( void ) {
 #endif
 		}
 #endif
-#ifdef TA_MISC // DEFAULT_PLAYER
+#ifdef RANDOMBOT // DEFAULT_PLAYER
 		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "Random", 16 ); // RaphBlue
 		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "Random", 16 ); // RaphBlue
 		if( s_serveroptions.gametype == GT_TEAM ) {
@@ -1353,7 +1353,7 @@ static void ServerOptions_InitBotNames( void ) {
 		s_serveroptions.playerType[4].curvalue = 2;
 		s_serveroptions.playerType[5].curvalue = 2;
 
-#ifdef TA_MISC // DEFAULT_PLAYER
+#ifdef RANDOMBOT // DEFAULT_PLAYER
 		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "Random", 16 ); // RaphRed
@@ -1462,7 +1462,7 @@ static void ServerOptions_SetMenuItems( void ) {
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_ffa_scorelimit" ) ) );
 #else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_ffa_fraglimit" ) ) );
@@ -1471,7 +1471,7 @@ static void ServerOptions_SetMenuItems( void ) {
 		break;
 
 	case GT_TOURNAMENT:
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_tourney_scorelimit" ) ) );
 #else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_fraglimit" ) ) );
@@ -1488,7 +1488,7 @@ static void ServerOptions_SetMenuItems( void ) {
 #endif
 
 	case GT_TEAM:
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_team_scorelimit" ) ) );
 #else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_fraglimit" ) ) );
@@ -1667,7 +1667,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 #endif
 	{
 		s_serveroptions.fraglimit.generic.type       = MTYPE_FIELD;
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		s_serveroptions.fraglimit.generic.name       = "Score Limit:";
 #else
 		s_serveroptions.fraglimit.generic.name       = "Frag Limit:";
@@ -1676,7 +1676,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.fraglimit.generic.x	         = OPTIONS_X;
 		s_serveroptions.fraglimit.generic.y	         = y;
 		s_serveroptions.fraglimit.generic.statusbar  = ServerOptions_StatusBar;
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		s_serveroptions.fraglimit.field.widthInChars = 4;
 		s_serveroptions.fraglimit.field.maxchars     = 4;
 #else
@@ -1715,7 +1715,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.friendlyfire.generic.flags    = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 		s_serveroptions.friendlyfire.generic.x	      = OPTIONS_X;
 		s_serveroptions.friendlyfire.generic.y	      = y;
-#ifdef TA_MISC
+#ifdef IOQ3ZTM
 		s_serveroptions.friendlyfire.generic.name	  = "Team Damage:";
 #else
 		s_serveroptions.friendlyfire.generic.name	  = "Friendly Fire:";

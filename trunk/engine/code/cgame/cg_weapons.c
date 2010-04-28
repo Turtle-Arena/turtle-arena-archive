@@ -1282,6 +1282,7 @@ void CG_RegisterWeapon( int weaponNum )
 #ifdef TA_WEAPSYS
 	if ( item->classname )
 	{
+#ifdef TURTLEARENA // NOAMMO
 		weaponInfo->weaponModel = trap_R_RegisterModel( item->world_model[0] );
 
 		// calc midpoint for rotation
@@ -1289,6 +1290,13 @@ void CG_RegisterWeapon( int weaponNum )
 		for ( i = 0 ; i < 3 ; i++ ) {
 			weaponInfo->weaponMidpoint[i] = mins[i] + 0.5 * ( maxs[i] - mins[i] );
 		}
+#else
+		// calc midpoint for rotation
+		trap_R_ModelBounds( trap_R_RegisterModel( item->world_model[0] ), mins, maxs );
+		for ( i = 0 ; i < 3 ; i++ ) {
+			weaponInfo->weaponMidpoint[i] = mins[i] + 0.5 * ( maxs[i] - mins[i] );
+		}
+#endif
 	}
 #else
 	weaponInfo->weaponModel = trap_R_RegisterModel( item->world_model[0] );
@@ -2036,7 +2044,7 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups )
 
 
 
-#ifdef TA_MISC // GHOST
+#ifdef IOQ3ZTM // GHOST
 /*
 =============
 CG_GhostRefEntity
@@ -2067,7 +2075,7 @@ localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive, int alpha)
 	re->shaderRGBA[3] = alpha;
 	re->renderfx |= RF_FORCE_ENT_ALPHA | RF_NOSHADOW;
 
-	// ZTM: FIXME: Use alpha
+	// ZTM: FIXME: Use alpha?
 	le->color[3] = 1.0f; // (float)((float)alpha / 255.0f);
 
 	le->pos.trType = TR_LINEAR;
@@ -3033,7 +3041,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	// drop gun lower at higher fov
 	if ( cg_fov.integer > 90 ) {
 		fovOffset = -0.2 * ( cg_fov.integer - 90 );
-#ifdef TA_MISC // FOV
+#ifdef TURTLEARENA // FOV
 	} else {
 		fovOffset = 0.2 * ( cg_fov.integer - 90 );
 	}

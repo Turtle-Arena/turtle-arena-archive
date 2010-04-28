@@ -285,7 +285,7 @@ Handles user intended acceleration
 ==============
 */
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
-#ifndef TA_MISC // ZTM: TEST
+#ifndef TURTLEARENA // Use proper acceleration
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;
@@ -772,11 +772,11 @@ static void PM_FlyMove( void ) {
 		// Flying animation for flying NPCs
 		PM_ContinueLegsAnim( OBJECT_WALK );
 	}
-#ifdef TA_MISC
+#ifdef IOQ3ZTM
 	else
 #endif
 #endif
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // Don't use whatever random leg animation the player was in
 	PM_ContinueLegsAnim( LEGS_IDLE );
 #endif
 }

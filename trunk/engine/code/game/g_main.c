@@ -100,6 +100,8 @@ vmCvar_t	g_singlePlayer;
 #endif
 vmCvar_t	g_enableDust;
 vmCvar_t	g_enableBreath;
+#endif
+#if defined MISSIONPACK || defined TA_WEAPSYS
 vmCvar_t	g_proxMineTimeout;
 #endif
 #ifdef TA_SP
@@ -134,7 +136,7 @@ static cvarTable_t		gameCvarTable[] = {
 
 	// change anytime vars
 	{ &g_dmflags, "dmflags", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 	{ &g_fraglimit, "scorelimit", "1000", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 #else
 	{ &g_fraglimit, "fraglimit", "20", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
@@ -194,7 +196,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
 
 #ifdef MISSIONPACK
-#ifdef TA_MISC
+#ifdef TURTLEARENA
 	{ &g_obeliskHealth, "g_obeliskHealth", "1000", 0, 0, qfalse },
 	{ &g_obeliskRegenPeriod, "g_obeliskRegenPeriod", "1", 0, 0, qfalse },
 	{ &g_obeliskRegenAmount, "g_obeliskRegenAmount", "3", 0, 0, qfalse },
@@ -216,6 +218,8 @@ static cvarTable_t		gameCvarTable[] = {
 
 	{ &g_enableDust, "g_enableDust", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
 	{ &g_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
+#endif
+#if defined MISSIONPACK || defined TA_WEAPSYS
 	{ &g_proxMineTimeout, "g_proxMineTimeout", "20000", 0, 0, qfalse },
 #endif
 #ifdef TA_SP
@@ -1764,7 +1768,7 @@ void CheckExitRules( void ) {
 
 	if ( g_gametype.integer < GT_CTF && g_fraglimit.integer ) {
 		if ( level.teamScores[TEAM_RED] >= g_fraglimit.integer ) {
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 			trap_SendServerCommand( -1, "print \"Red hit the scorelimit.\n\"" );
 			LogExit( "Scorelimit hit." );
 #else
@@ -1775,7 +1779,7 @@ void CheckExitRules( void ) {
 		}
 
 		if ( level.teamScores[TEAM_BLUE] >= g_fraglimit.integer ) {
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 			trap_SendServerCommand( -1, "print \"Blue hit the scorelimit.\n\"" );
 			LogExit( "Scorelimit hit." );
 #else
@@ -1795,7 +1799,7 @@ void CheckExitRules( void ) {
 			}
 
 			if ( cl->ps.persistant[PERS_SCORE] >= g_fraglimit.integer ) {
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 				LogExit( "Scorelimit hit." );
 				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the scorelimit.\n\"",
 					cl->pers.netname ) );

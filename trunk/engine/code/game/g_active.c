@@ -1655,7 +1655,7 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.pmove_fixed = pmove_fixed.integer | client->pers.pmoveFixed;
 	pm.pmove_msec = pmove_msec.integer;
 
-#if 0 // #ifdef TA_MISC // TEST: push players
+#if 0 // #ifdef TURTLEARENA // TEST: push players
 	if ( !client->noclip )
 	{
 		// XXX

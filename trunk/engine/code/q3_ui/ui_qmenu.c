@@ -469,6 +469,9 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 	switch (key)
 	{
 		case K_MOUSE1:
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+		case K_MOUSE2:
+#endif
 			if (!(rb->generic.flags & QMF_HASMOUSEFOCUS))
 				break;
 
@@ -480,9 +483,6 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 		case K_KP_ENTER:
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
-		case K_MOUSE2:
-#endif
 		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 			rb->curvalue = !rb->curvalue;

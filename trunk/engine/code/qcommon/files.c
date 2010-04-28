@@ -2253,7 +2253,7 @@ int	FS_GetModList( char *listbuf, int bufsize ) {
 					nDescLen = fread(descPath, 1, 48, file);
 					if (nDescLen >= 0) {
 						descPath[nDescLen] = '\0';
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Remove newline from description.txt
+#ifdef IOQ3ZTM // Remove newline from description.txt
 						nDescLen--;
 
 						// Remove \n, \r\n, and \r
