@@ -153,7 +153,20 @@ static void PlayerIcon( const char *modelAndSkin, char *iconName, int iconNameMa
 	char	model[MAX_QPATH];
 #ifdef IOQ3ZTM // BOT_HEADMODEL
 	qboolean headmodel;
+#endif
 
+#ifdef RANDOMBOT // ZTM: Random bot
+    // ZTM: Random bot's icon is in a different spot then a normal player.
+    if (Q_stricmp(modelAndSkin, "Random") == 0)
+    {
+        Com_sprintf(iconName, iconNameMaxSize, "menu/art/randombot_icon.tga");
+
+        trap_R_RegisterShaderNoMip( iconName );
+        return;
+    }
+#endif
+
+#ifdef IOQ3ZTM // BOT_HEADMODEL
 	headmodel = (modelAndSkin[0] == '*');
 	if (headmodel) {
 		Q_strncpyz( model, &modelAndSkin[1], sizeof(model));

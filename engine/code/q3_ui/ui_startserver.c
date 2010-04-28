@@ -2063,6 +2063,9 @@ ServerPlayerIcon
 static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int iconNameMaxSize ) {
 	char	*skin;
 	char	model[MAX_QPATH];
+#ifdef IOQ3ZTM // BOT_HEADMODEL
+	qboolean headmodel;
+#endif
 
 #ifdef RANDOMBOT // ZTM: Random bot
     // ZTM: Random bot's icon is in a different spot then a normal player.
@@ -2075,7 +2078,16 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
     }
 #endif
 
+#ifdef IOQ3ZTM // BOT_HEADMODEL
+	headmodel = (modelAndSkin[0] == '*');
+	if (headmodel) {
+		Q_strncpyz( model, &modelAndSkin[1], sizeof(model));
+	} else {
+		Q_strncpyz( model, modelAndSkin, sizeof(model));
+	}
+#else
 	Q_strncpyz( model, modelAndSkin, sizeof(model));
+#endif
 	skin = Q_strrchr( model, '/' );
 	if ( skin ) {
 		*skin++ = '\0';
@@ -2084,6 +2096,21 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
 		skin = "default";
 	}
 
+#ifdef IOQ3ZTM // BOT_HEADMODEL
+	if (headmodel)
+	{
+		Com_sprintf(iconName, iconNameMaxSize, "models/players/heads/%s/icon_%s.tga", model, skin );
+
+		if( !trap_R_RegisterShaderNoMip( iconName ) && Q_stricmp( skin, "default" ) != 0 ) {
+			Com_sprintf(iconName, iconNameMaxSize, "models/players/heads/%s/icon_default.tga", model );
+		}
+
+		if (trap_R_RegisterShaderNoMip( iconName )) {
+			return;
+		}
+	}
+#endif
+
 	Com_sprintf(iconName, iconNameMaxSize, "models/players/%s/icon_%s.tga", model, skin );
 
 	if( !trap_R_RegisterShaderNoMip( iconName ) && Q_stricmp( skin, "default" ) != 0 ) {
@@ -2091,6 +2118,18 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
 	}
 }
 
+
+#ifdef IOQ3ZTM // BOT_HEADMODEL
+/*
+=================
+PlayerIconhandle
+=================
+*/
+static qhandle_t ServerPlayerIconHandle( const char *modelAndSkin, char *iconName, size_t iconSize ) {
+	ServerPlayerIcon( modelAndSkin, iconName, iconSize);
+	return trap_R_RegisterShaderNoMip( iconName );
+}
+#endif
 
 /*
 =================
@@ -2106,6 +2145,9 @@ static void UI_BotSelectMenu_UpdateGrid( void ) {
 	for( i = 0; i < (PLAYERGRID_ROWS * PLAYERGRID_COLS); i++, j++) {
 		if( j < botSelectInfo.numBots ) { 
 			info = UI_GetBotInfoByNumber( botSelectInfo.sortedBotNums[j] );
+#ifdef IOQ3ZTM // BOT_HEADMODEL
+			if (!ServerPlayerIconHandle( Info_ValueForKey( info, "headmodel" ), botSelectInfo.boticons[i], MAX_QPATH ))
+#endif
 			ServerPlayerIcon( Info_ValueForKey( info, "model" ), botSelectInfo.boticons[i], MAX_QPATH );
 			Q_strncpyz( botSelectInfo.botnames[i], Info_ValueForKey( info, "name" ), 16 );
 			Q_CleanStr( botSelectInfo.botnames[i] );
