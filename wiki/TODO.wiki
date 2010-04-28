@@ -5,25 +5,41 @@
 
 = Roadmap =
 == 0.2 ==
-  * Improve Raph
-  * Add the other 3 Turtles (Leo, Don, and Mike)
+First stable playable release.
+
+  * Standalone from Quake III: Arena
+  * Bot support (botfiles based on OpenArena)
+  * All 4 Turtles (Leo, Don, Raph, and Mike)
+  * Melee weapons
+  * Reworked weapon system (Only hold 2 weapons, default and a pickup)
+  * Hold multiple holdable items
+  * Shurikens (holdable items)
+  * Maps for all gametypes
 
 == 0.4 ==
-  * MDR player models (with multiple levels of detail?)
-  * Remake UI with missionpack ui scripting
-  * Custom animations for all players
+Focus on players, themes, and multiplayer maps
+
+  * Map Themes (textures, models, misc_objects, and maybe music?)
+  * Improve player models, each player should have their own animations
   * Player Abilities
-  * Focus on Single Player
-    * NPCs
-    * Maps
-    * Savegames
+  * Have player models be MDR (Finish Misfit Model 3D MDR exporting)
+  * Multiple levels of detail for players and other models
+  * Bring back player effect colors?
+    * (Like to control Turtle mask color and/or melee trail color?)
+  * Remake UI with missionpack ui scripting?
+  * Reduce overall number of TODOs and FIXMEs in the source
 
 == 0.6 ==
+Focus on Single Player
+
+  * Enemies for Single Player
+  * Single Player Maps
+  * Gimmicks
+  * Savegames
 
 == 0.8 ==
 
 == 1.0 ==
-  * Polish
 
 = engine =
 == Weapons ==
@@ -34,7 +50,7 @@ Weapons (and attacking)
   * STARTED ( TA_WEAPSYS ): TODO: Support Quake III: Team Arena weapon features via weapon scripting
 
   * TODO: Spawn Ammo items from weaponinfo.txt
-    * If I make it so weapon/ammo items are in text files, should I have all items in iteminfo.txt (and `*`.item) too?...
+    * If I make it so weapon/ammo items are in text files, should I have all items in iteminfo.txt (and `*.item`) too?...
 
   * TODO: Have weapons be seperate entities (ET_WEAPON) from the player,
 		allowing one rendering function that can be use for all weapons,
@@ -54,7 +70,7 @@ Weapons (and attacking)
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
 
-  * TODO: Lua Scripting? (For NPCs?) http://xreal.svn.sourceforge.net/viewvc/xreal/trunk/xreal/base/code/game/g_lua.c?view=markup
+  * TODO: Lua Scripting for NPCs? http://xreal.svn.sourceforge.net/viewvc/xreal/trunk/xreal/base/code/game/g_lua.c?view=markup
 
   * TODO: Savegames for single player
 
@@ -77,7 +93,7 @@ Weapons (and attacking)
   * TODO (STARTED): Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
     * sp_complete and sp_gameover
 
-  * TODO: Mouser NPC
+  * TODO: Mouser NPC, or call it ABMT? (A Better Mouse Trap)
 
 == Teamplay ==
   * TODO: Team skins for players
@@ -108,9 +124,9 @@ Weapons (and attacking)
 
   * TODO: Add misc_dripper entity.
 
-  * TODO: NiGHTS [into Dreams...] mode (Maybe instead NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...)
+  * STARTED(NIGHTSMODE): NiGHTS [into Dreams...] mode (Maybe instead NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...)
 
-  * TODO: 'New' gametypes; Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
+  * TODO: New gametypes; Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
 
   * TODO: http://code.google.com/p/oax/wiki/Dynamic_QVM_Memory_Allocation
 
@@ -220,7 +236,7 @@ BSPC is the map .bsp to .aas (Arena Awareness System) compiler. The aas file is 
 
 
 = Master Server =
-  * TODO: Should dpmaster be modified for Turtle Arena? (It should work as is...)
+  * NOTE: dpmaster is a open source master server that should support Turtle Arena
 
 
 = Data =
