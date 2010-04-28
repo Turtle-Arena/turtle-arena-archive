@@ -86,9 +86,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_DOUBLER			41
 #define INVENTORY_AMMOREGEN			42
 
+// 45-49 are free
+
 //TA_WEAPSYS
-#define INVENTORY_WEAPON_START 45 // 31 slots starting here
-#define INVENTORY_AMMO_START 76 // 31 slots starting here
+#define INVENTORY_WEAPON_START 50 // 31 slots starting here
+#define INVENTORY_AMMO_START 81 // 31 slots starting here
 
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
@@ -237,6 +239,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_NEUTRALFLAG		47
 #define INVENTORY_REDCUBE			48
 #define INVENTORY_BLUECUBE			49
+#ifdef TA_WEAPSYS
+#define INVENTORY_WEAPON_START 50 // 31 slots starting here
+#define INVENTORY_AMMO_START 81 // 31 slots starting here
+#endif
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
 #define ENEMY_HEIGHT				201

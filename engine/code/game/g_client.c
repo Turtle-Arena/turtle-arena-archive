@@ -1719,7 +1719,7 @@ void ClientSpawn(gentity_t *ent) {
 #endif
 #endif
 
-#ifdef TA_MISC // no health countdown
+#ifdef TURTLEARENA // no health countdown
 	ent->health = client->ps.stats[STAT_HEALTH] = client->ps.stats[STAT_MAX_HEALTH];
 #else
 	// health will count down towards max_health

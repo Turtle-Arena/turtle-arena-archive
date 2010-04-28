@@ -4159,7 +4159,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		}
 		else
 #endif
-#ifndef TA_MISC
+#ifndef TURTLEARENA // Treat all health items the same
 		if ( item->quantity == 5 || item->quantity == 100 )
 #endif
 		{
@@ -4508,11 +4508,19 @@ char *eventnames[] = {
 //#endif
 
 	"EV_DEBUG_LINE",
-#if defined TA_MISC || defined NET_COMPAT // DEBUG_ORIGIN
+#ifdef IOQ3ZTM // DEBUG_ORIGIN
 	"EV_DEBUG_ORIGIN",
 #endif
 	"EV_STOPLOOPINGSOUND",
 	"EV_TAUNT"
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Missing strings
+	,"EV_TAUNT_YES",
+	"EV_TAUNT_NO",
+	"EV_TAUNT_FOLLOWME",
+	"EV_TAUNT_GETFLAG",
+	"EV_TAUNT_GUARDBASE",
+	"EV_TAUNT_PATROL"
+#endif
 
 };
 

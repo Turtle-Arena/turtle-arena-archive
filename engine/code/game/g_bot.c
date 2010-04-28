@@ -1097,7 +1097,7 @@ void G_InitBots( qboolean restart ) {
 			return;
 		}
 
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 		strValue = Info_ValueForKey( arenainfo, "scorelimit" );
 		fragLimit = atoi( strValue );
 #if !defined TURTLEARENA || defined TA_SUPPORTQ3
@@ -1135,7 +1135,7 @@ void G_InitBots( qboolean restart ) {
 		}
 
 		if ( !fragLimit && !timeLimit ) {
-#ifdef TA_MISC // frag to score
+#ifdef NOTRATEDM // frag to score
 			trap_Cvar_Set( "scorelimit", "500" );
 #else
 			trap_Cvar_Set( "fraglimit", "10" );

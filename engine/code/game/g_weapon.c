@@ -621,11 +621,13 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 			continue;
 		}
 
+#ifdef TURTLEARENA // POWERS
 		// Don't show hit effects on clients who can't be damaged
 		if (traceEnt->client && (traceEnt->client->ps.powerups[PW_FLASHING]
 			|| traceEnt->client->ps.powerups[PW_INVUL])) {
 			continue;
 		}
+#endif
 
 		// If client hit another client
 		if (!traceEnt->client || (traceEnt->client &&

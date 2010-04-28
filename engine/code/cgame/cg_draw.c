@@ -3438,7 +3438,7 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	// draw status bar and other floating elements
  	CG_Draw2D(stereoView);
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 	// Draw black bars if needed.
 	CG_DrawLetterbox();
 #endif
@@ -3490,7 +3490,7 @@ void CG_DrawFlashFade( void ) {
 }
 #endif
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 /*
 =============
 CG_ToggleLetterbox

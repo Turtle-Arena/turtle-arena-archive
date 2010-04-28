@@ -231,7 +231,7 @@ static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
 #endif
 
 	if( key == K_ESCAPE
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+#ifndef TA_MISC // MENU: Right Mouse button = left arrow
 		|| key == K_MOUSE2
 #endif
 		)

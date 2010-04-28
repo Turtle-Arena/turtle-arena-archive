@@ -265,7 +265,7 @@ static cvarTable_t cvarTable[] = {
 #ifndef TURTLEARENA // NOZOOM
 	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
 #endif
-#ifdef TA_MISC // FOV
+#ifdef TURTLEARENA // FOV
 	{ &cg_fov, "cg_fov", "70", CVAR_ARCHIVE },
 #else
 	{ &cg_fov, "cg_fov", "90", CVAR_ARCHIVE },
@@ -293,7 +293,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawAmmoWarning, "cg_drawAmmoWarning", "1", CVAR_ARCHIVE  },
 #endif
 	{ &cg_drawAttacker, "cg_drawAttacker", "1", CVAR_ARCHIVE  },
-#ifdef TA_MISC
+#ifdef TA_DATA
 	{ &cg_drawCrosshair, "cg_drawCrosshair", "1", CVAR_ARCHIVE },
 #else
 	{ &cg_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
@@ -336,7 +336,7 @@ static cvarTable_t cvarTable[] = {
 #ifdef ANALOG // cg var
 	{ &cg_thirdPersonAnalog, "cg_thirdPersonAnalog", "1", 0 },
 #endif
-#ifdef TA_MISC // FOV
+#ifdef TURTLEARENA // FOV
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "120", 0 },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", 0 },
 #else
@@ -349,17 +349,9 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
 #endif
 #ifdef IOQ3ZTM // TEAM_CHAT_CON // con_notifytime
-#ifdef TA_MISC // Give me more time to read...
 	{ &cg_teamChatTime, "cg_teamChatTime", "5", CVAR_ARCHIVE  },
 #else
-	{ &cg_teamChatTime, "cg_teamChatTime", "3", CVAR_ARCHIVE  },
-#endif // TA_MISC
-#else
-#ifdef TA_MISC // Give me more time to read...
-	{ &cg_teamChatTime, "cg_teamChatTime", "5000", CVAR_ARCHIVE  },
-#else
 	{ &cg_teamChatTime, "cg_teamChatTime", "3000", CVAR_ARCHIVE  },
-#endif // TA_MISC
 #endif // IOQ3ZTM
 #ifdef TA_MISC // TEAM_CHAT_CON
 	{ &cg_teamChatHeight, "cg_teamChatHeight", "8", CVAR_ARCHIVE  },
@@ -809,7 +801,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.talkSound = trap_S_RegisterSound( "sound/player/talk.wav", qfalse );
 	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav", qfalse);
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 	cgs.media.letterBoxOnSound = trap_S_RegisterSound( "sound/misc/letterboxon.wav", qfalse );
 	cgs.media.letterBoxOffSound = trap_S_RegisterSound( "sound/misc/letterboxoff.wav", qfalse );
 #endif
@@ -823,11 +815,7 @@ static void CG_RegisterSounds( void ) {
 #ifndef TURTLEARENA // AWARDS
 	cgs.media.impressiveSound = trap_S_RegisterSound( "sound/feedback/impressive.wav", qtrue );
 	cgs.media.excellentSound = trap_S_RegisterSound( "sound/feedback/excellent.wav", qtrue );
-#endif
-#ifndef TA_MISC
 	cgs.media.deniedSound = trap_S_RegisterSound( "sound/feedback/denied.wav", qtrue );
-#endif
-#ifndef TURTLEARENA // AWARDS
 	cgs.media.humiliationSound = trap_S_RegisterSound( "sound/feedback/humiliation.wav", qtrue );
 #endif
 	cgs.media.assistSound = trap_S_RegisterSound( "sound/feedback/assist.wav", qtrue );
@@ -961,7 +949,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.hgrenb2aSound = trap_S_RegisterSound("sound/weapons/grenade/hgrenb2a.wav", qfalse);
 #endif
 
-#if defined MISSIONPACK && !defined TA_MISC // Don't percache sounds we don't use.
+#if defined MISSIONPACK && !defined TA_DATA // Don't percache sounds we don't use.
 	trap_S_RegisterSound("sound/player/james/death1.wav", qfalse );
 	trap_S_RegisterSound("sound/player/james/death2.wav", qfalse );
 	trap_S_RegisterSound("sound/player/james/death3.wav", qfalse );
@@ -1502,7 +1490,7 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.flagShaders[2] = trap_R_RegisterShaderNoMip("ui/assets/statusbar/flag_missing.tga");
 #endif
 
-#ifndef TA_MISC // Don't percache models we don't have.
+#ifndef TA_DATA // Don't percache models we don't have.
 	trap_R_RegisterModel( "models/players/james/lower.md3" );
 	trap_R_RegisterModel( "models/players/james/upper.md3" );
 	trap_R_RegisterModel( "models/players/heads/james/james.md3" );
@@ -1514,7 +1502,7 @@ static void CG_RegisterGraphics( void ) {
 
 #endif
 	CG_ClearParticles ();
-#ifdef TA_MISC // Particles
+#ifdef IOQ3ZTM // Particles
 	// In GAME call G_ParticleAreaIndex(str) to add a paritcle area.
 	for (i=1; i<MAX_PARTICLES_AREAS; i++)
 	{

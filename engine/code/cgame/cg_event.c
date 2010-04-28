@@ -116,12 +116,10 @@ static void CG_Obituary( entityState_t *ent ) {
 
 	message2 = "";
 
-#ifdef TA_MISC
 #ifdef TA_PLAYERSYS
-		gender = ci->playercfg.gender;
+	gender = ci->playercfg.gender;
 #else
-		gender = ci->gender;
-#endif
+	gender = ci->gender;
 #endif
 
 	// check for single client messages
@@ -131,7 +129,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		message = "suicides";
 		break;
 	case MOD_FALLING:
-#ifdef TA_MISC
+#ifdef TA_MISC // MOD
 		if ( gender == GENDER_FEMALE )
 			message = "fell to her doom";
 		else if ( gender == GENDER_NEUTER )
@@ -146,28 +144,28 @@ static void CG_Obituary( entityState_t *ent ) {
 		message = "was squished";
 		break;
 	case MOD_WATER:
-#ifdef TA_MISC
+#ifdef TA_MISC // MOD
 		message = "drowned";
 #else
 		message = "sank like a rock";
 #endif
 		break;
 	case MOD_SLIME:
-#ifdef TA_MISC // From SRB2...
+#ifdef TA_MISC // MOD // Copied from SRB2
 		message = "fell in some nasty goop";
 #else
 		message = "melted";
 #endif
 		break;
 	case MOD_LAVA:
-#ifdef TA_MISC
+#ifdef TA_MISC // MOD
 		message = "was fried";
 #else
 		message = "does a back flip into the lava";
 #endif
 		break;
 	case MOD_TARGET_LASER:
-#ifdef TA_MISC
+#ifdef TA_MISC // MOD
 		message = "died";
 #else
 		message = "saw the light";
@@ -186,13 +184,6 @@ static void CG_Obituary( entityState_t *ent ) {
 	}
 
 	if (attacker == target) {
-#ifndef TA_MISC
-#ifdef TA_PLAYERSYS
-		gender = ci->playercfg.gender;
-#else
-		gender = ci->gender;
-#endif
-#endif
 		switch (mod) {
 #if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE:
@@ -259,7 +250,7 @@ static void CG_Obituary( entityState_t *ent ) {
 	if ( attacker == cg.snap->ps.clientNum ) {
 		char	*s;
 
-#ifdef TA_MISC // frag to KO
+#ifdef NOTRATEDM // frag to KO
 		if ( cgs.gametype < GT_TEAM ) {
 			s = va("You knocked out %s\n%s place with %i", targetName,
 				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
@@ -336,11 +327,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was gunned down by";
 			break;
 		case MOD_GRENADE:
-#ifdef TA_MISC
-			message = "was killed by";
-#else
 			message = "ate";
-#endif
 			message2 = "'s grenade";
 			break;
 		case MOD_GRENADE_SPLASH:
@@ -348,11 +335,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message2 = "'s shrapnel";
 			break;
 		case MOD_ROCKET:
-#ifdef TA_MISC
-			message = "was killed by";
-#else
 			message = "ate";
-#endif
 			message2 = "'s rocket";
 			break;
 		case MOD_ROCKET_SPLASH:
@@ -641,8 +624,8 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	cent->pe.painDirection ^= 1;
 }
 
-#ifdef TA_MISC // DEBUG_ORIGIN
-// Based on CG_Item, used to be game model tags working ( TA_WEAPSYS_1 )
+#ifdef IOQ3ZTM // DEBUG_ORIGIN
+// Based on CG_Item, used to be game model tags working ( TA_WEAPSYS )
 void CG_DebugOrigin(centity_t *cent)
 {
 	entityState_t	*es;
@@ -653,15 +636,15 @@ void CG_DebugOrigin(centity_t *cent)
 	es = &cent->currentState;
 
 	// if set to invisible, skip
-	//if ( es->eFlags & EF_NODRAW ) {
-	//	return;
-	//}
+	if ( es->eFlags & EF_NODRAW ) {
+		return;
+	}
 
 	le = CG_AllocLocalEntity();
 	re = &le->refEntity;
 
 #ifdef MISSIONPACK
-	le->leType = LE_SHOWREFENTITY;//LE_FRAGMENT;
+	le->leType = LE_SHOWREFENTITY;
 #else
 	le->leType = LE_FRAGMENT;
 #endif
@@ -670,23 +653,42 @@ void CG_DebugOrigin(centity_t *cent)
 	le->pos.trType = TR_STATIONARY;
 	le->pos.trTime = cg.time;
 
-	// Draw a colored model (like a powerup sphere ...)
+	// Draw a colored sphere model
+#ifdef TA_DATA
 	if (cent->currentState.eventParm == 1) // blue
 	{
-		re->hModel = trap_R_RegisterModel( "models/powerups/instant/speed_1.md3" );
+		re->hModel = trap_R_RegisterModel( "models/powerups/instant/speed.md3" );
 	}
 	else if (cent->currentState.eventParm == 2) // yellow
 	{
-		re->hModel = trap_R_RegisterModel( "models/powerups/instant/defense_1.md3" );
+		re->hModel = trap_R_RegisterModel( "models/powerups/instant/defense.md3" );
 	}
 	else if (cent->currentState.eventParm == 3) // grey
 	{
-		re->hModel = trap_R_RegisterModel( "models/powerups/instant/invul_1.md3" );
+		re->hModel = trap_R_RegisterModel( "models/powerups/instant/invul.md3" );
 	}
 	else // red
 	{
-		re->hModel = trap_R_RegisterModel( "models/powerups/instant/strength_1.md3" );
+		re->hModel = trap_R_RegisterModel( "models/powerups/instant/strength.md3" );
 	}
+#else
+	if (cent->currentState.eventParm == 1) // blue
+	{
+		re->hModel = trap_R_RegisterModel( "models/powerups/health/mega_sphere.md3" );
+	}
+	else if (cent->currentState.eventParm == 2) // green?
+	{
+		re->hModel = trap_R_RegisterModel( "models/powerups/health/large_sphere.md3" );
+	}
+	else if (cent->currentState.eventParm == 3) // clear
+	{
+		re->hModel = trap_R_RegisterModel( "models/powerups/health/small_sphere.md3" );
+	}
+	else // orange
+	{
+		re->hModel = trap_R_RegisterModel( "models/powerups/health/medium_sphere.md3" );
+	}
+#endif
 
 	VectorCopy( cent->currentState.pos.trBase, re->origin );
 
@@ -1629,7 +1631,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_Beam( cent );
 		break;
 
-#ifdef TA_MISC // DEBUG_ORIGIN
+#ifdef IOQ3ZTM // DEBUG_ORIGIN
 	case EV_DEBUG_ORIGIN:
 		DEBUGNAME("EV_DEBUG_LINE");
 		CG_DebugOrigin( cent );

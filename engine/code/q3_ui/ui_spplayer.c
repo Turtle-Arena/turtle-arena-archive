@@ -31,6 +31,7 @@ SINGLE PLAYER, PLAYER SELECT MENU
 
 #include "ui_local.h"
 
+#ifdef TA_SP
 
 #define ART_BACK					"menu/art/back_0.tga"
 #define ART_BACK_FOCUS				"menu/art/back_1.tga"
@@ -145,7 +146,7 @@ UI_SPPlayerMenu_Key
 */
 static sfxHandle_t UI_SPPlayerMenu_Key( int key ) {
 	if(
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+#ifndef TA_MISC // MENU: Right Mouse button = left arrow
 	key == K_MOUSE2 ||
 #endif
 	key == K_ESCAPE ) {
@@ -309,3 +310,5 @@ void UI_SPPlayerMenu( const char *arenaInfo ) {
 	UI_PushMenu( &playerMenuInfo.menu );
 	Menu_SetCursorToItem( &playerMenuInfo.menu, &playerMenuInfo.item_fight );
 }
+
+#endif // TA_SP

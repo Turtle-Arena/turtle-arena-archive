@@ -180,7 +180,7 @@ UI_SPSkillMenu_Key
 */
 static sfxHandle_t UI_SPSkillMenu_Key( int key ) {
 	if(
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+#ifndef TA_MISC // MENU: Right Mouse button = left arrow
 	key == K_MOUSE2 ||
 #endif
 	key == K_ESCAPE ) {
@@ -207,8 +207,8 @@ void UI_SPSkillMenu_Cache( void ) {
 	skillMenuInfo.skillpics[3] = trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE4 );
 	skillMenuInfo.skillpics[4] = trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE5 );
 
-#ifdef TA_MISC // rip off SRB2 skills...
-	skillMenuInfo.nightmareSound = trap_S_RegisterSound( "sound/misc/ultimate.wav", qfalse );
+#ifdef TA_MISC // SRB2_SKILLS
+	skillMenuInfo.nightmareSound = 0;
 #else
 	skillMenuInfo.nightmareSound = trap_S_RegisterSound( "sound/misc/nightmare.wav", qfalse );
 #endif
@@ -252,7 +252,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_baby.generic.y			= 170;
 	skillMenuInfo.item_baby.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_baby.generic.id			= ID_BABY;
-#ifdef TA_MISC // rip off SRB2 skills...
+#ifdef TA_MISC // SRB2_SKILLS
 	skillMenuInfo.item_baby.string				= "Easy";
 #else
 	skillMenuInfo.item_baby.string				= "I Can Win";
@@ -266,7 +266,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_easy.generic.y			= 198;
 	skillMenuInfo.item_easy.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_easy.generic.id			= ID_EASY;
-#ifdef TA_MISC // rip off SRB2 skills...
+#ifdef TA_MISC // SRB2_SKILLS
 	skillMenuInfo.item_easy.string				= "Normal";
 #else
 	skillMenuInfo.item_easy.string				= "Bring It On";
@@ -280,7 +280,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_medium.generic.y			= 227;
 	skillMenuInfo.item_medium.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_medium.generic.id		= ID_MEDIUM;
-#ifdef TA_MISC // rip off SRB2 skills...
+#ifdef TA_MISC // SRB2_SKILLS
 	skillMenuInfo.item_medium.string			= "Hard";
 #else
 	skillMenuInfo.item_medium.string			= "Hurt Me Plenty";
@@ -294,7 +294,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_hard.generic.y			= 255;
 	skillMenuInfo.item_hard.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_hard.generic.id			= ID_HARD;
-#ifdef TA_MISC // rip off SRB2 skills...
+#ifdef TA_MISC // SRB2_SKILLS
 	skillMenuInfo.item_hard.string				= "Very Hard";
 #else
 	skillMenuInfo.item_hard.string				= "Hardcore";
@@ -308,7 +308,7 @@ static void UI_SPSkillMenu_Init( void ) {
 	skillMenuInfo.item_nightmare.generic.y			= 283;
 	skillMenuInfo.item_nightmare.generic.callback	= UI_SPSkillMenu_SkillEvent;
 	skillMenuInfo.item_nightmare.generic.id			= ID_NIGHTMARE;
-#ifdef TA_MISC // rip off SRB2 skills...
+#ifdef TA_MISC // SRB2_SKILLS
 	skillMenuInfo.item_nightmare.string				= "Ultimate";
 #else
 	skillMenuInfo.item_nightmare.string				= "NIGHTMARE!";

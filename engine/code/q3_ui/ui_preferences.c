@@ -60,7 +60,7 @@ GAME OPTIONS MENU
 #endif
 #endif
 
-#ifdef TA_MISC
+#ifdef TA_DATA
 #define	NUM_CROSSHAIRS			4
 #else
 #define	NUM_CROSSHAIRS			10
@@ -320,7 +320,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.crosshair.generic.left		= PREFERENCES_X_POS - ( ( strlen(s_preferences.crosshair.generic.name) + 1 ) * SMALLCHAR_WIDTH );
 	s_preferences.crosshair.generic.right		= PREFERENCES_X_POS + 48;
 #ifdef TA_MISC // MENU: Support right mouse button = prev crosshair
-	s_preferences.crosshair.numitems = NUM_CROSSHAIRS;
+	s_preferences.crosshair.numitems			= NUM_CROSSHAIRS;
 #endif
 
 	y += BIGCHAR_HEIGHT+2+4;

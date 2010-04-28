@@ -291,7 +291,7 @@ PlayerSettings_MenuKey
 */
 static sfxHandle_t PlayerSettings_MenuKey( int key ) {
 	if(
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+#ifndef TA_MISC // MENU: Right Mouse button = left arrow
 		key == K_MOUSE2 ||
 #endif
 		key == K_ESCAPE ) {

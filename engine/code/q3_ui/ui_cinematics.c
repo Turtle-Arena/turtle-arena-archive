@@ -180,9 +180,9 @@ static void UI_CinematicsMenu_Init( void ) {
 	cinematicsMenuInfo.cin_idlogo.style				= UI_CENTER;
 #ifdef IOQ3ZTM
 	// Check if there is a video file
-    if (!UI_CanShowVideo(cinematics[0])) {
-    cinematicsMenuInfo.cin_idlogo.generic.flags |= QMF_GRAYED;
-    }
+	if (!UI_CanShowVideo(cinematics[0])) {
+		cinematicsMenuInfo.cin_idlogo.generic.flags |= QMF_GRAYED;
+	}
 #endif
 
 	y += VERTICAL_SPACING;

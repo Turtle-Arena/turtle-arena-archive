@@ -384,7 +384,7 @@ static void CG_ConfigStringModified( void ) {
 	else if ( num == CS_SHADERSTATE ) {
 		CG_ShaderStateChanged();
 	}
-#ifdef TA_MISC // Particles
+#ifdef IOQ3ZTM // Particles
 	else if (num >= CS_PARTICLES && num < CS_PARTICLES+MAX_PARTICLES_AREAS)
 	{
 		// Allow new particle areas to be added after level load.
@@ -540,7 +540,7 @@ static void CG_MapRestart( void ) {
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
 #endif
-#ifdef TA_MISC
+#ifdef IOQ3ZTM
 	cg_thirdPersonAngle.value = 0;
 #endif
 }
@@ -1108,7 +1108,7 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 #endif
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 	if ( !strcmp( cmd, "letterbox" ) ) {
 		CG_ToggleLetterbox( atoi(CG_Argv(1)), atoi(CG_Argv(2)) );
 		return;

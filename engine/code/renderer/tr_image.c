@@ -1491,13 +1491,13 @@ typedef struct
 // when there are multiple images of different formats available
 static imageExtToLoaderMap_t imageLoaders[ ] =
 {
-#ifdef TA_MISC // Load PNG first.
+#ifdef TA_DATA // Load PNG first.
 	{ "png",  R_LoadPNG },
 #endif
 	{ "tga",  R_LoadTGA },
 	{ "jpg",  R_LoadJPG },
 	{ "jpeg", R_LoadJPG },
-#ifndef TA_MISC
+#ifndef TA_DATA
 	{ "png",  R_LoadPNG },
 #endif
 	{ "pcx",  R_LoadPCX },

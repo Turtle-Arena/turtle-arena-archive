@@ -102,7 +102,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
 #define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
 
-#ifdef TA_MISC // Particles
+#ifdef IOQ3ZTM // Particles
 #define CS_MAX					(CS_PARTICLES+MAX_PARTICLES_AREAS)
 #else
 #define CS_MAX					(CS_PARTICLES+MAX_LOCATIONS)
@@ -282,7 +282,7 @@ typedef enum {
 	PERS_RANK,						// player rank or team rank
 	PERS_TEAM,						// player team
 	PERS_SPAWN_COUNT,				// incremented every respawn
-#if !defined TA_MISC || !defined NOTRATEDM || !defined TURTLEARENA // WEAPONS
+#if !defined NOTRATEDM || !defined TURTLEARENA // AWARDS
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 #endif
 	PERS_ATTACKER,					// clientnum of last damage inflicter
@@ -310,7 +310,7 @@ typedef enum {
 
 // entityState_t->eFlags
 #define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
-#if defined MISSIONPACK && !defined TURTLEARENA // WEAPONS
+#if (defined MISSIONPACK || defined TA_WEAPSYS) && !defined TURTLEARENA // WEAPONS
 #define EF_TICKING			0x00000002		// used to make players play the prox mine ticking sound
 #endif
 #define	EF_TELEPORT_BIT		0x00000004		// toggled every time the origin abruptly changes
@@ -817,10 +817,8 @@ int BG_ItemNumForHoldableNum(holdable_t holdablenum);
 #endif
 
 // reward sounds (stored in ps->persistant[PERS_PLAYEREVENTS])
-#ifndef TA_MISC
-#define	PLAYEREVENT_DENIEDREWARD		0x0001
-#endif
 #ifndef TURTLEARENA // AWARDS
+#define	PLAYEREVENT_DENIEDREWARD		0x0001
 #define	PLAYEREVENT_GAUNTLETREWARD		0x0002
 #endif
 #ifndef NOTRATEDM // Disable strong lang.
@@ -974,7 +972,7 @@ typedef enum {
 //#endif
 
 	EV_DEBUG_LINE,
-#if defined TA_MISC || defined NET_COMPAT // DEBUG_ORIGIN
+#ifdef IOQ3ZTM // DEBUG_ORIGIN
 	EV_DEBUG_ORIGIN,
 #endif
 	EV_STOPLOOPINGSOUND,

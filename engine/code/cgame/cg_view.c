@@ -558,6 +558,9 @@ void CG_ZoomDown_f( void ) {
 	}
 	cg.zoomed = qtrue;
 	cg.zoomTime = cg.time;
+#ifdef IOQ3ZTM // LETTERBOX
+	CG_ToggleLetterbox(qtrue, qfalse);
+#endif
 }
 
 void CG_ZoomUp_f( void ) { 
@@ -566,6 +569,9 @@ void CG_ZoomUp_f( void ) {
 	}
 	cg.zoomed = qfalse;
 	cg.zoomTime = cg.time;
+#ifdef IOQ3ZTM // LETTERBOX
+	CG_ToggleLetterbox(qfalse, qfalse);
+#endif
 }
 #endif
 
@@ -594,7 +600,7 @@ static int CG_CalcFov( void ) {
 
 	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		// if in intermission, use a fixed value
-#ifdef TA_MISC // FOV
+#ifdef TURTLEARENA // FOV
 		fov_x = 70;
 #else
 		fov_x = 90;
@@ -603,7 +609,7 @@ static int CG_CalcFov( void ) {
 		// user selectable
 		if ( cgs.dmflags & DF_FIXED_FOV ) {
 			// dmflag to prevent wide fov for all clients
-#ifdef TA_MISC // FOV
+#ifdef TURTLEARENA // FOV
 			fov_x = 70;
 #else
 			fov_x = 90;
@@ -679,7 +685,7 @@ static int CG_CalcFov( void ) {
 
 
 
-#ifndef NOBLOOD // Should be NOTRATEDM ?
+#ifndef NOBLOOD
 /*
 ===============
 CG_DamageBlendBlob
@@ -690,6 +696,12 @@ static void CG_DamageBlendBlob( void ) {
 	int			t;
 	int			maxTime;
 	refEntity_t		ent;
+
+#ifdef NOTRATEDM // Only if blood is enabled
+	if (!cg_blood.integer) {
+		return;
+	}
+#endif
 
 	if ( !cg.damageValue ) {
 		return;
@@ -779,7 +791,7 @@ static int CG_CalcViewValues( void ) {
 				CG_Fade(0, cg.time + 200, 1500);	// then fadeup
 			}
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 			CG_ToggleLetterbox(qfalse, cg.cameraEndBlack);
 #endif
 		}
@@ -843,7 +855,7 @@ static int CG_CalcViewValues( void ) {
 			cg_thirdPersonAngle.value += cg_cameraOrbit.value;
 		}
 	}
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // NEW_CAM
 	else
 	{
 		extern void CG_CamUpdate(void);
@@ -1017,7 +1029,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	{
 		cg.lockedOn = qtrue;
 		cg.lockonTime = cg.time;
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 		CG_ToggleLetterbox(qtrue, qfalse);
 #endif
 	}
@@ -1025,7 +1037,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	{
 		cg.lockedOn = qfalse;
 		cg.lockonTime = cg.time;
-#ifdef TA_MISC
+#ifdef IOQ3ZTM // LETTERBOX
 		CG_ToggleLetterbox(qfalse, qfalse);
 #endif
 	}
@@ -1042,7 +1054,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	// build cg.refdef
 	inwater = CG_CalcViewValues();
 
-#ifndef NOBLOOD // Should be NOTRATEDM ?
+#ifndef NOBLOOD
 	// first person blend blobs, done after AnglesToAxis
 	if ( !cg.renderingThirdPerson ) {
 		CG_DamageBlendBlob();

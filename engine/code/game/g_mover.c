@@ -1055,8 +1055,10 @@ void InitMover( gentity_t *ent ) {
 	// Setup breakable ET_MOVER
 	if (ent->health > 0)
 	{
+#ifdef TA_MISC // MATERIALS
 		char *mat;
 		int i;
+#endif
 
 		// No not constant random weapon...
 		if (!(ent->spawnflags & 8<<7))
@@ -1074,6 +1076,7 @@ void InitMover( gentity_t *ent ) {
 
 		ent->s.time2 = -1; // auto surfaceFlags
 
+#ifdef TA_MISC // MATERIALS
 		if( G_SpawnString( "material", NULL, &mat ) && mat && strlen(mat)) {
 			ent->s.time2 = 0;
 			for ( i = 1; i < NUM_MATERIAL_TYPES; i++)
@@ -1083,6 +1086,7 @@ void InitMover( gentity_t *ent ) {
 				}
 			}
 		}
+#endif
 	}
 #endif
 }

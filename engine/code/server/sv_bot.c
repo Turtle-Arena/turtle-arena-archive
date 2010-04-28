@@ -503,7 +503,7 @@ void SV_BotInitCvars(void) {
 #ifndef TURTLEARENA // NO_ROCKET_JUMPING
 	Cvar_Get("bot_rocketjump", "1", 0);					//enable rocket jumping
 #endif
-#ifdef TA_MISC
+#ifdef TURTLEARENA // BOTLIB
 	Cvar_Get("bot_grapple", "1", 0);					//enable grapple
 #else
 	Cvar_Get("bot_grapple", "0", 0);					//enable grapple
