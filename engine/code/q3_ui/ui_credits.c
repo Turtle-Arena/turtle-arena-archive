@@ -144,7 +144,7 @@ static void UI_CreditMenu_Draw( void ) {
 
 	// Copyright.
 	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
-	UI_DrawProportionalString( 320, y, "TA_(c) 2010 Viacom", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "TMNT(c) 2010 Viacom", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "Turtle Arena(c) 2009-2010 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
 #else
