@@ -232,8 +232,6 @@ BSPC is the map .bsp to .aas (Arena Awareness System) compiler. The aas file is 
 
   * BUG: Fix compiling with cross-make-mingw.sh
 
-  * TODO: Recompile outdated win32 BSPC, extras/bspc/bspc.x86.exe
-
 
 = Master Server =
   * NOTE: dpmaster is a open source master server that should support Turtle Arena
