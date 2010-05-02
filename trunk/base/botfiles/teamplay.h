@@ -60,6 +60,7 @@ type "whereareyou"
 }
 
 //cannot find something
+//note: Disable in engine, unused.
 type "cannotfind"
 {
 "Where would that be ", 0, "?";
