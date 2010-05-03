@@ -6,7 +6,7 @@ Incomplete list editing information for new features not found in ioquake3.
 == Shaders ==
 
 === vextexlight/novertexlight ===
-Search for "IOQ3ZTM // EF2_SHADERS" in the code to see implantation.
+_Search for "IOQ3ZTM // EF2_SHADERS" in the code to see implantation._
 
 Support for Star Trek Elite Force 2 if no/vextexlight shaders.
 
@@ -40,7 +40,7 @@ endif
 Skins are used for players and CTF flags.
 
 === $(dir) ===
-Search for "IOQ3ZTM // $DIR_IN_SKIN" in the code to see implantation.
+_Search for "IOQ3ZTM // $DIR_IN_SKIN" in the code to see implantation._
 
 $(dir) can be used to specify the directory that the skin file is in.
 
@@ -49,4 +49,20 @@ Example skin:
 l_leg_right,$(dir)/legs.png
 l_leg_left,$(dir)/legs.png
 tag_torso,
+}}}
+
+
+== animations.cfg ==
+Player model config file.
+
+=== soundpath ===
+_Added by define TA_PLAYERSYS in engine._
+
+By placing "soundpath NAME" in animation.cfg the client will use sounds from "sound/NAME/" instead of "sound/PLAYERNAME/". Soundpath defaults to the client's headmodel name (which is usally the player model directory name).
+
+soundpath is used in Star Trek Elite Force.
+
+Example:
+{{{
+soundpath raph
 }}}
