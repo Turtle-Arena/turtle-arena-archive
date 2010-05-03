@@ -90,11 +90,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
 
 #ifndef TA_PLAYERSYS // Moved to bg_misc.h
-#ifdef TURTLEARENA // DEFAULT_PLAYER
-#define	DEFAULT_MODEL			"raph"
-#define	DEFAULT_TEAM_MODEL		"raph"
-#define	DEFAULT_TEAM_HEAD		"raph"
-#else // Q3
 #define	DEFAULT_MODEL			"sarge"
 #ifdef MISSIONPACK
 #define	DEFAULT_TEAM_MODEL		"james"
@@ -103,15 +98,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	DEFAULT_TEAM_MODEL		"sarge"
 #define	DEFAULT_TEAM_HEAD		"sarge"
 #endif
-#endif // TURTLEARENA
 
-#ifdef TURTLEARENA // DEFAULT_TEAMS
-#define DEFAULT_REDTEAM_NAME		"Sais"
-#define DEFAULT_BLUETEAM_NAME		"Katanas"
-#else
 #define DEFAULT_REDTEAM_NAME		"Stroggs"
 #define DEFAULT_BLUETEAM_NAME		"Pagans"
-#endif
 
 typedef enum {
 	FOOTSTEP_NORMAL,

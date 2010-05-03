@@ -5312,7 +5312,7 @@ int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip)
 
 	// ZTM: NOTE: After loading all frames we check if Elite Force style,
 	//                     and convert it to Quake3 style loopFrames if needed.
-		animations[i].loopFrames = atoi( token );
+	animations[i].loopFrames = atoi( token );
 
 	token = COM_Parse( text_p );
 	if ( !*token ) {
@@ -5329,6 +5329,7 @@ int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip)
 	return 1;
 }
 
+#ifdef TA_SUPPORTEF
 /*
 ===============
 BG_ConvertEFAnimationsToQ3
@@ -5378,6 +5379,7 @@ static void BG_ConvertEFAnimationsToQ3(animation_t *animations, int numanims)
 		}
 	}
 }
+#endif
 
 
 /*
@@ -5417,7 +5419,7 @@ ZTM: NOTE: I changed it to parse animation name instead of having a defined orde
 			in Elite Force Single Player, so I added support for elite force "loopFrames"
 ======================
 */
-qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg ) {
+qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, qboolean headConfig ) {
 	char		*text_p, *prev;
 	int			len;
 	int			i;
@@ -5473,6 +5475,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			if ( !*token ) {
 				break;
 			}
+			if (headConfig) // skip footsteps
+				continue;
 			if ( !Q_stricmp( token, "default" ) || !Q_stricmp( token, "normal" ) ) {
 				playercfg->footsteps = FOOTSTEP_NORMAL;
 			} else if ( !Q_stricmp( token, "boot" ) ) {
@@ -5514,9 +5518,13 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			}
 			continue;
 		} else if ( !Q_stricmp( token, "fixedlegs" ) ) {
+			if (headConfig) // skip fixedlegs
+				continue;
 			playercfg->fixedlegs = qtrue;
 			continue;
 		} else if ( !Q_stricmp( token, "fixedtorso" ) ) {
+			if (headConfig) // skip fixedtorso
+				continue;
 			playercfg->fixedtorso = qtrue;
 			continue;
 		} else if ( !Q_stricmp( token, "primaryHand" ) ) {
@@ -5524,6 +5532,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			if ( !*token ) {
 				break;
 			}
+			if (headConfig) // skip primaryHand
+				continue;
 			if ( !Q_stricmp( token, "left" ) ) {
 				playercfg->primaryHandSide = HAND_LEFT;
 				playercfg->secondaryHandSide = HAND_RIGHT;
@@ -5559,7 +5569,9 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 				if ( !*token ) {
 					break;
 				}
-				playercfg->bbmins[i] = atof( token );
+				if (!headConfig) { // skip boundingbox
+					playercfg->bbmins[i] = atof( token );
+				}
 			}
 			if (i == 3) // found all tokens
 			{
@@ -5568,7 +5580,9 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 					if ( !*token ) {
 						break;
 					}
-					playercfg->bbmaxs[i] = atof( token );
+					if (!headConfig) { // skip boundingbox
+						playercfg->bbmaxs[i] = atof( token );
+					}
 				}
 			}
 			continue;
@@ -5590,6 +5604,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			if ( !*token ) {
 				break;
 			}
+			if (headConfig) // skip ability
+				continue;
 			if ( !Q_stricmp( token, "none" ) ) {
 				playercfg->ability = ABILITY_NONE;
 			} else if ( !Q_stricmp( token, "tech" ) ) {
@@ -5607,6 +5623,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			if ( !*token ) {
 				break;
 			}
+			if (headConfig) // skip speed
+				continue;
 			playercfg->max_speed = atoi( token );
 			continue;
 		}
@@ -5619,6 +5637,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			if ( !*token ) {
 				break;
 			}
+			if (headConfig) // skip accelstart
+				continue;
 			playercfg->accelstart = atof( token );
 			continue;
 		}
@@ -5627,6 +5647,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 			if ( !*token ) {
 				break;
 			}
+			if (headConfig) // skip acceleration
+				continue;
 			playercfg->accelerate_speed = atof( token );
 			continue;
 		}
@@ -5651,24 +5673,27 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		}
 #endif
 
-		// ZTM: New animation loading.
-		for (i = 0; playerAnimationDefs[i].name != NULL; i++)
+		if (!headConfig) // skip animations
 		{
-			if ( !Q_stricmp( token, playerAnimationDefs[i].name ) ) {
-				foundAnim = qtrue;
-				rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip);
-				if (rtn == -1)
-				{
-					BG_SetDefaultAnimation(loadedAnim, playerAnimationDefs[i].num, animations);
-					loadedAnim[playerAnimationDefs[i].num] = qtrue;
-				} else if (rtn == 0) {
-					Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n",
-							playerAnimationDefs[i].name);
+			// ZTM: New animation loading.
+			for (i = 0; playerAnimationDefs[i].name != NULL; i++)
+			{
+				if ( !Q_stricmp( token, playerAnimationDefs[i].name ) ) {
+					foundAnim = qtrue;
+					rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip);
+					if (rtn == -1)
+					{
+						BG_SetDefaultAnimation(loadedAnim, playerAnimationDefs[i].num, animations);
+						loadedAnim[playerAnimationDefs[i].num] = qtrue;
+					} else if (rtn == 0) {
+						Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n",
+								playerAnimationDefs[i].name);
+					}
+					else {
+						loadedAnim[playerAnimationDefs[i].num] = qtrue;
+					}
+					break;
 				}
-				else {
-					loadedAnim[playerAnimationDefs[i].num] = qtrue;
-				}
-				break;
 			}
 		}
 
@@ -5681,6 +5706,11 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 #endif
 
 		Com_Printf( "unknown token '%s' in %s\n", token, filename );
+	}
+
+	if (headConfig) // skip animations
+	{
+		return qtrue;
 	}
 
 	// Found an Elite Foce (SP) style animation.
@@ -5731,7 +5761,9 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg )
 		if ( i != MAX_ANIMATIONS )
 #endif
 		{
+#ifdef TA_SUPPORTEF
 			BG_ConvertEFAnimationsToQ3(animations, MAX_TOTALANIMATIONS);
+#endif
 			Com_Printf( "Error parsing animation file: %s", filename );
 			return qfalse;
 		}
@@ -5762,11 +5794,17 @@ Load animation.cfg for model into playercfg
 qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, const char *headModel)
 {
 	char filename[MAX_QPATH];
+	qboolean foundConfig;
 	int i;
 
 	if (!model)
 	{
 		model = DEFAULT_MODEL;
+	}
+
+	if (!headModel)
+	{
+		headModel = model;
 	}
 
 	Q_strncpyz(playercfg->model, model, MAX_QPATH);
@@ -5778,8 +5816,8 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	playercfg->fixedlegs = qfalse;
 	playercfg->fixedtorso = qfalse;
 
-	// Use the head model name for the default soundpath.
-	Q_strncpyz(playercfg->soundpath, headModel, sizeof (playercfg->soundpath));
+	// Use the model name for the default soundpath.
+	Q_strncpyz(playercfg->soundpath, model, sizeof (playercfg->soundpath));
 
 #ifdef TA_WEAPSYS
 	playercfg->primaryHandSide = HAND_RIGHT;
@@ -5860,27 +5898,20 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 
 #ifdef IOQ3ZTM // PLAYER_DIR
 	// load animation.cfg
+	foundConfig = qfalse;
 	for (i=0; bg_playerDirs[i] != NULL; i++)
 	{
 		Com_sprintf( filename, sizeof( filename ), "%s/%s/animation.cfg", bg_playerDirs[i], model );
-		if ( BG_ParsePlayerCFGFile(filename, playercfg) )
-		{
-#if defined IOQ3ZTM && (defined QAGAME || defined CGAME) // LASERTAG
-#ifdef QAGAME
-			extern vmCvar_t g_laserTag;
-			if (g_laserTag.integer)
-#else //if defined CGAME
-			extern vmCvar_t cg_laserTag;
-			if (cg_laserTag.integer)
-#endif
-				playercfg->default_weapon = BG_WeaponGroupIndexForName("wp_lasergun");
-#endif
-			return qtrue;
-		}
+		foundConfig = BG_ParsePlayerCFGFile(filename, playercfg, qfalse);
+
+		if (foundConfig)
+			break;
 	}
 
-	Com_Printf( "Failed to load animation.cfg for %s\n", model );
-	return qfalse;
+	if (!foundConfig) {
+		Com_Printf( "Failed to load animation.cfg for %s\n", model );
+		return qfalse;
+	}
 #else
 	// load animation.cfg
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/animation.cfg", model );
@@ -5891,8 +5922,74 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 			return qfalse;
 		}
 	}
-	return qtrue;
 #endif
+
+	// If using a different head model load the correct head settings.
+	if (Q_stricmp(model, headModel) != 0)
+	{
+		if (headModel[0] == '*') {
+			Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/animation.cfg", headModel );
+			foundConfig = BG_ParsePlayerCFGFile(filename, playercfg, qtrue);
+		} else {
+			foundConfig = qfalse;
+		}
+
+		if (!foundConfig)
+		{
+			char oldSoundPath[MAX_QPATH];
+			const char *head;
+
+			Q_strncpyz(oldSoundPath, playercfg->soundpath, sizeof (playercfg->soundpath));
+			Q_strncpyz(playercfg->soundpath, "", sizeof (playercfg->soundpath));
+
+			if (headModel[0] == '*')
+				head = &headModel[1];
+			else
+				head = headModel;
+
+			for (i=0; bg_playerDirs[i] != NULL; i++)
+			{
+				Com_sprintf( filename, sizeof( filename ), "%s/%s/animation.cfg", bg_playerDirs[i], head );
+				foundConfig = BG_ParsePlayerCFGFile(filename, playercfg, qtrue);
+
+				if (foundConfig)
+					break;
+			}
+
+			// If found animation.cfg and didn't set soundpath
+			if (foundConfig && !strlen(playercfg->soundpath))
+			{
+				// Use the implied soundpath
+				Q_strncpyz(playercfg->soundpath, head, sizeof (playercfg->soundpath));
+			}
+			else if (!foundConfig)
+			{
+				// Restore soundpath
+				Q_strncpyz(playercfg->soundpath, oldSoundPath, sizeof (playercfg->soundpath));
+			}
+
+			if (!foundConfig && headModel[0] != '*')
+			{
+				Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/animation.cfg", headModel );
+				foundConfig = BG_ParsePlayerCFGFile(filename, playercfg, qtrue);
+			}
+		}
+	}
+
+#if defined IOQ3ZTM && (defined QAGAME || defined CGAME) // LASERTAG
+	{
+#ifdef QAGAME
+		extern vmCvar_t g_laserTag;
+		if (g_laserTag.integer)
+#else //if defined CGAME
+		extern vmCvar_t cg_laserTag;
+		if (cg_laserTag.integer)
+#endif
+			playercfg->default_weapon = BG_WeaponGroupIndexForName("wp_lasergun");
+	}
+#endif
+
+	return qtrue;
 }
 #endif
 

@@ -1328,16 +1328,21 @@ extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 #ifdef TA_PLAYERSYS
 #ifdef TURTLEARENA // DEFAULT_PLAYER
 #define	DEFAULT_MODEL			"raph"
+#define DEFAULT_MODEL_FEMALE	"raph" // ZTM: TODO: Add female model/sounds
 #define	DEFAULT_TEAM_MODEL		"raph"
 #define	DEFAULT_TEAM_HEAD		"raph"
+#define DEFAULT_TEAM_MODEL_FEMALE	"raph" // ZTM: TODO: Add female model/sounds
 #else // Q3
 #define	DEFAULT_MODEL			"sarge"
+#define	DEFAULT_MODEL_FEMALE	"crash"
 #ifdef MISSIONPACK
 #define	DEFAULT_TEAM_MODEL		"james"
 #define	DEFAULT_TEAM_HEAD		"*james"
+#define	DEFAULT_TEAM_MODEL_FEMALE	"janet"
 #else
 #define	DEFAULT_TEAM_MODEL		"sarge"
 #define	DEFAULT_TEAM_HEAD		"sarge"
+#define	DEFAULT_TEAM_MODEL_FEMALE	"crash"
 #endif
 #endif // TURTLEARENA
 
@@ -1349,7 +1354,7 @@ extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 #define DEFAULT_BLUETEAM_NAME		"Pagans"
 #endif
 
-// Moved footstep_t to both game from client game.
+// Moved footstep_t to bg_misc.h from cg_local.h
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
@@ -1387,8 +1392,8 @@ typedef struct bg_playercfg_s
 	// Elite Force support
 	char soundpath[MAX_QPATH];
 
-	// New Info for Turtle Arena, allows player models to have data that changes
-	//  what happens in game.
+	// Allow player models to have data that changes what happens in game.
+
 #ifdef TA_WEAPSYS
     weapon_t default_weapon;
 	int primaryHandSide;
@@ -1410,7 +1415,6 @@ typedef struct bg_playercfg_s
 
 int BG_AnimationTime(animation_t *anim);
 int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip);
-//qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg);
 qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, const char *headModel);
 
 #ifdef TA_ENTSYS

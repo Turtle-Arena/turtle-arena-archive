@@ -2247,7 +2247,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		surf = skin->surfaces[ skin->numSurfaces ] = ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low );
 		Q_strncpyz( surf->name, surfName, sizeof( surf->name ) );
 #ifdef IOQ3ZTM // $DIR_IN_SKIN
-		// 6: "$(dir)" 1: '/' or '\\' 1+: path
+		// Lengths "$(dir)"=6, PATH_SEPERATOR=1, path=1 or more
 		//  $(dir)/torso.png
 		if (strlen(token) > 6 && Q_stricmpn("$(dir)", token, 6) == 0)
 		{
