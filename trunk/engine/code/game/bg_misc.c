@@ -5589,13 +5589,13 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 		}
 
 		// ZTM: TODO: Jump Percent 1-100 ?
-		else if ( !Q_stricmp( token, "jumpheight" ) ) {
-		}
+		//else if ( !Q_stricmp( token, "jumpheight" ) ) {
+		//}
 		// ZTM: TODO?: Hud color in SP (and non-team gametypes? or use "color1" in non-team?)
 		// color1 and color2 are used for the railgun blast color
-		else if ( !Q_stricmp( token, "prefcolor1" ) ) {
+		//else if ( !Q_stricmp( token, "prefcolor1" ) ) {
 			// Like color1
-		}
+		//}
 		//else if ( !Q_stricmp( token, "prefcolor2" ) ) {
 		//	// Like color2
 		//}
@@ -5629,8 +5629,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			continue;
 		}
 		// Speed to start run animtion.
-		else if ( !Q_stricmp( token, "runspeed" ) ) {
-		}
+		//else if ( !Q_stricmp( token, "runspeed" ) ) {
+		//}
 		// Accel when move starts.
 		else if ( !Q_stricmp( token, "accelstart" ) ) {
 			token = COM_Parse( &text_p );
@@ -5663,6 +5663,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			if ( !*token ) {
 				break;
 			}
+			if (headConfig) // skip default_weapon
+				continue;
 			j = BG_WeaponGroupIndexForName(token);
 			if (j) {
 				playercfg->default_weapon = j;
