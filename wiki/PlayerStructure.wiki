@@ -67,7 +67,7 @@ Example: "$(dir)/head" instead of "models/players/raph/head".
 animation.cfg contains the animations and other settings. The animation.cfg is normally created when exporting a player model to MD3.
 
 == soundpath ==
-By placing "soundpath NAME" in animation.cfg the player will use sounds from "sound/NAME/" instead of "sound/PLAYERNAME/". Soundpath defaults to the player's directory name.
+By placing "soundpath NAME" in animation.cfg the client will use sounds from "sound/NAME/" instead of "sound/HEADMODELNAME/". Soundpath defaults to the client's headmodel name (which is usally the player model directory name).
 
 = Documentation =
 == Tags ==
