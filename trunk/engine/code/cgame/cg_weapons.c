@@ -2285,6 +2285,9 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand, qboole
 		memset(&trailOldTime, 0, sizeof (trailOldTime));
 	}
 
+	if (cent->currentState.powerups & ( 1 << PW_INVIS ))
+		return;
+
 	// Old type
 	if (cg_drawMeleeWeaponTrails.integer == 2)
 	{

@@ -3517,6 +3517,7 @@ void CG_Player( centity_t *cent ) {
 #ifdef IOQ3ZTM // GHOST
 	if ((cent->currentState.powerups & ( 1 << PW_HASTE )
 		|| cent->currentState.powerups & ( 1 << PW_SCOUT ))
+		&& !(cent->currentState.powerups & ( 1 << PW_INVIS ))
 		&& cg.time - ci->ghostTime >= 10)
 	{
 		ci->ghostTime = cg.time;
