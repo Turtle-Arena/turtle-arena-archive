@@ -1021,16 +1021,16 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	// sounds
 #ifdef TA_PLAYERSYS // SOUNDPATH
 	dir = ci->playercfg.soundpath;
-	/*if (ci->playercfg.gender == GENDER_FEMALE)
-	{
-		fallback = "april";
-	}
-	else*/
-	{
+#else
+	dir = ci->modelName;
+#endif
+#ifdef TA_PLAYERSYS // Have women default to female voice
+	if (ci->playercfg.gender == GENDER_FEMALE) {
+		fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL_FEMALE : DEFAULT_MODEL_FEMALE;
+	} else {
 		fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL : DEFAULT_MODEL;
 	}
 #else
-	dir = ci->modelName;
 	fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL : DEFAULT_MODEL;
 #endif
 
