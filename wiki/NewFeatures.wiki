@@ -1,0 +1,52 @@
+#summary How to use the new features in Turtle Arena
+#labels Phase-Implementation
+
+Incomplete list editing information for new features not found in ioquake3.
+
+== Shaders ==
+
+=== vextexlight/novertexlight ===
+Search for "IOQ3ZTM // EF2_SHADERS" in the code to see implantation.
+
+Support for Star Trek Elite Force 2 if no/vextexlight shaders.
+
+Example shader:
+{{{
+textures/name
+{
+if novertexlight
+	{
+		map textures/name_novertexlight
+	}
+	{
+		map textures/name_1
+		blendFunc BLEND
+	}
+	{
+		map textures/name_2
+		blendFunc BLEND
+	}
+endif
+if vertexlight
+	{
+		map textures/name_vertexlight
+	}
+endif
+}
+}}}
+
+
+== Skins ==
+Skins are used for players and CTF flags.
+
+=== $(dir) ===
+Search for "IOQ3ZTM // $DIR_IN_SKIN" in the code to see implantation.
+
+$(dir) can be used to specify the directory that the skin file is in.
+
+Example skin:
+{{{
+l_leg_right,$(dir)/legs.png
+l_leg_left,$(dir)/legs.png
+tag_torso,
+}}}
