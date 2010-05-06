@@ -117,7 +117,20 @@ void CG_LoadingClient( int clientNum ) {
 	info = CG_ConfigString( CS_PLAYERS + clientNum );
 
 	if ( loadingPlayerIconCount < MAX_LOADING_PLAYER_ICONS ) {
+#ifdef IOQ3ZTM // PLAYER_DIR // Support Team Arena players.
+		qboolean head = qfalse;
+
+		Q_strncpyz( model, Info_ValueForKey( info, "hmodel" ), sizeof( model ) );
+
+		if (model[0] == '*') {
+			memcpy(model, &model[1], MAX_QPATH-1);
+			head = qtrue;
+		} else if (model[0] == '\0') {
+			Q_strncpyz( model, Info_ValueForKey( info, "model" ), sizeof( model ) );
+		}
+#else
 		Q_strncpyz( model, Info_ValueForKey( info, "model" ), sizeof( model ) );
+#endif
 		skin = Q_strrchr( model, '/' );
 		if ( skin ) {
 			*skin++ = '\0';
@@ -126,26 +139,28 @@ void CG_LoadingClient( int clientNum ) {
 		}
 
 #ifdef IOQ3ZTM // PLAYER_DIR // Support Team Arena players.
-		if (model[0] == '*')
+		if (head)
 		{
-			Com_sprintf( iconName, MAX_QPATH, "models/players/heads/%s/icon_%s.tga", &model[1], skin );
+			Com_sprintf( iconName, MAX_QPATH, "models/players/heads/%s/icon_%s.tga", model, skin );
 			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
 		}
+
 		if (!loadingPlayerIcons[loadingPlayerIconCount])
 		{
-		for (i = 0; bg_playerDirs[i] != NULL; i++)
-		{
-			Com_sprintf( iconName, MAX_QPATH, "%s/%s/icon_%s.tga", bg_playerDirs[i], model, skin );
-			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
-
-			if (loadingPlayerIcons[loadingPlayerIconCount])
+			for (i = 0; bg_playerDirs[i] != NULL; i++)
 			{
-				break;
+				Com_sprintf( iconName, MAX_QPATH, "%s/%s/icon_%s.tga", bg_playerDirs[i], model, skin );
+				loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
+
+				if (loadingPlayerIcons[loadingPlayerIconCount])
+				{
+					break;
+				}
 			}
 		}
-		}
-		// Try heads directory.
-		if (!loadingPlayerIcons[loadingPlayerIconCount])
+
+		// Fall back to heads directory
+		if (!head && !loadingPlayerIcons[loadingPlayerIconCount])
 		{
 			Com_sprintf( iconName, MAX_QPATH, "models/players/heads/%s/icon_%s.tga", model, skin );
 			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
