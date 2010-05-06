@@ -2311,7 +2311,7 @@ static void PM_Weapon( void ) {
 
 #ifdef TA_HOLDSYS
 	// Check if valid, in cgame we have to
-	//   pass HI_NO_SELECT (-1) (as a byte its 255)
+	//   pass HI_NO_SELECT (255)
 	//   so bg can change to the next holdable.
 	if (pm->cmd.holdable < HI_NUM_HOLDABLE)
 	{
