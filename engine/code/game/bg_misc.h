@@ -435,11 +435,6 @@ typedef enum {
 */
 #endif
 typedef enum {
-#ifdef TA_HOLDSYS/*2*/
-	// cg.holdableSelect is passed to server (game) in bg if it
-	//  is *not* HI_NO_SELECT the player's holdableIndex is set to it.
-	HI_NO_SELECT = -1, // Used by cgame to disable overriding bg change
-#endif
 	HI_NONE,
 
 #ifndef TA_HOLDABLE // no q3 teleprter
@@ -480,6 +475,12 @@ typedef enum {
 #endif
 
 	HI_NUM_HOLDABLE
+
+#ifdef TA_HOLDSYS/*2*/
+	// cg.holdableSelect is passed to server (game) in Pmove if it
+	//  is *not* HI_NO_SELECT the player's holdableIndex is set to it.
+	,HI_NO_SELECT = 255 // Used by cgame to disable overriding Pmove change
+#endif
 } holdable_t;
 
 #ifdef TA_HOLDSYS
