@@ -934,7 +934,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 		case EV_USE_ITEM14:
 		case EV_USE_ITEM15:
 		{
-			itemNum = event-EV_USE_ITEM0;
+			itemNum = (event & ~EV_EVENT_BITS) - EV_USE_ITEM0;
 			switch (itemNum)
 			{
 #endif // TA_HOLDSYS
@@ -1058,12 +1058,12 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				case HI_ELECTRICSHURIKEN:
 				case HI_FIRESHURIKEN:
 				case HI_LASERSHURIKEN:
-					G_ThrowShuriken(ent, (holdable_t)event-EV_USE_ITEM0);
+					G_ThrowShuriken(ent, itemNum);
 					break;
 #endif
 
 				default:
-					G_Printf("  EV_USE_ITEM: No code for holdable %d.\n", event-EV_USE_ITEM0);
+					G_Printf("  EV_USE_ITEM: No code for holdable %d.\n", itemNum);
 					break;
 			}
 		}
