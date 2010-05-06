@@ -761,8 +761,6 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 	}
 #endif
 
-	mod = splashMod = MOD_UNKNOWN;
-
 	switch (holdable)
 	{
 		case HI_SHURIKEN:
@@ -783,9 +781,8 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 			mod = splashMod = MOD_LASERSHURIKEN;
 			break;
 		default:
-			projnum = 0;
-	return qfalse;
-}
+			return qfalse;
+	}
 
 #ifdef TURTLEARENA // LOCKON
 	G_AutoAim(self, projnum, start, forward, right, up);
