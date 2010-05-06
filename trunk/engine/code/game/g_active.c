@@ -1223,10 +1223,10 @@ void ExitLevel( void );
 #ifdef TA_ENTSYS // FUNC_USE
 /*
 ==============
-G_UseEntity
+G_FindUseEntity
 ==============
 */
-qboolean G_UseEntity( gentity_t *ent )
+gentity_t *G_FindUseEntity( gentity_t *ent )
 {
 	trace_t tr;
 	vec3_t muzzle;
@@ -1235,7 +1235,7 @@ qboolean G_UseEntity( gentity_t *ent )
 	gentity_t *traceEnt;
 
 	if (!ent || !ent->client)
-		return qfalse;
+		return NULL;
 
 	AngleVectors (ent->client->ps.viewangles, forward, right, up);
 
@@ -1246,19 +1246,34 @@ qboolean G_UseEntity( gentity_t *ent )
 	trap_Trace( &tr, muzzle, NULL, NULL, end, ent->s.number, MASK_SHOT);
 
 	if (tr.fraction == 1.0)
-		return qfalse;
+		return NULL;
 
 	if (tr.entityNum >= ENTITYNUM_MAX_NORMAL)
-		return qfalse;
+		return NULL;
 
 	traceEnt = &g_entities[ tr.entityNum ];
 	if (traceEnt->use && traceEnt->classname && strcmp(traceEnt->classname, "func_use") == 0)
 	{
-		traceEnt->use( traceEnt, ent, ent );
-		return qtrue;
+		// Check to make sure multi_trigger will trigger
+		if ( ( traceEnt->spawnflags & 1 ) &&
+			ent->client->ps.persistant[PERS_TEAM] != TEAM_RED ) {
+			return NULL;
+		}
+		if ( ( traceEnt->spawnflags & 2 ) &&
+			ent->client->ps.persistant[PERS_TEAM] != TEAM_BLUE ) {
+			return NULL;
+		}
+#ifdef TA_PLAYERSYS // ABILITY_TECH
+		if ( ( traceEnt->spawnflags & 4 ) &&
+			ent->client->pers.playercfg.ability != ABILITY_TECH ) {
+			return NULL;
+		}
+#endif
+
+		return traceEnt;
 	}
 
-	return qfalse;
+	return NULL;
 }
 #endif
 
@@ -1281,6 +1296,9 @@ void ClientThink_real( gentity_t *ent ) {
 	usercmd_t	*ucmd;
 #ifdef TURTLEARENA // LOCKON
 	vec3_t vieworigin;
+#endif
+#ifdef TA_ENTSYS // FUNC_USE
+	gentity_t *useEnt;
 #endif
 
 	client = ent->client;
@@ -1581,22 +1599,33 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 #ifdef TA_ENTSYS // FUNC_USE
-	if ((ucmd->buttons & BUTTON_USE_HOLDABLE) &&
-#ifdef TA_HOLDABLE
-		ent->client->ps.holdableTime <= 0
-#else
-		! ( ent->client->ps.pm_flags & PMF_USE_ITEM_HELD )
-#endif
-		)
+	useEnt = G_FindUseEntity(ent);
+
+	if (useEnt)
 	{
-		if (G_UseEntity(ent))
+		ent->client->ps.eFlags |= EF_USE_ENT;
+
+		if ((ucmd->buttons & BUTTON_USE_HOLDABLE) &&
+#ifdef TA_HOLDABLE
+			ent->client->ps.holdableTime <= 0
+#else
+			! ( ent->client->ps.pm_flags & PMF_USE_ITEM_HELD )
+#endif
+			)
 		{
+			if (useEnt->use) {
+				useEnt->use(useEnt, ent, ent);
+			}
 #ifdef TA_HOLDABLE
 			ent->client->ps.holdableTime = 500;
 #else
 			ent->client->ps.pm_flags |= PMF_USE_ITEM_HELD;
 #endif
 		}
+	}
+	else
+	{
+		ent->client->ps.eFlags &= ~EF_USE_ENT;
 	}
 #endif
 

@@ -2058,7 +2058,5 @@ void SP_func_use( gentity_t *ent ) {
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 
 	ent->use = Use_FuncUse;
-
-	ent->s.generic1 = (ent->spawnflags | 128); // & 128 tells cgame this is a func_use ...
 }
 #endif
