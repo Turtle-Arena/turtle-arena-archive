@@ -442,7 +442,7 @@ static qboolean PM_CheckJump( void ) {
 
 	if ( pm->cmd.forwardmove >= 0
 #ifdef NIGHTSMODE
-			|| (pm->ps->pm_flags & EF_NIGHTSMODE)
+			|| (pm->ps->eFlags & EF_NIGHTSMODE)
 #endif
 	 ) {
 #ifdef TA_NPCSYS
@@ -1326,7 +1326,7 @@ static void PM_GroundTraceMissed( void ) {
 		if ( trace.fraction == 1.0 ) {
 			if ( pm->cmd.forwardmove >= 0 
 #ifdef NIGHTSMODE
-			|| (pm->ps->pm_flags & EF_NIGHTSMODE)
+			|| (pm->ps->eFlags & EF_NIGHTSMODE)
 #endif
 			) {
 #ifdef TA_NPCSYS
@@ -1394,7 +1394,7 @@ static void PM_GroundTrace( void ) {
 		// go into jump animation
 		if ( pm->cmd.forwardmove >= 0 
 #ifdef NIGHTSMODE
-			|| (pm->ps->pm_flags & EF_NIGHTSMODE)
+			|| (pm->ps->eFlags & EF_NIGHTSMODE)
 #endif
 		) {
 #ifdef TA_NPCSYS
