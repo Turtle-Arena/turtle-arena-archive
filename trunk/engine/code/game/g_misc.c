@@ -582,8 +582,6 @@ void DropPortalSource( gentity_t *player ) {
 }
 #endif
 #ifdef TA_ENTSYS // MISC_OBJECT
-// ZTM: TODO: There should also be func_* for brushes that acts mostly the same?
-
 /*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath
 "model"		arbitrary .md3 file to display
 

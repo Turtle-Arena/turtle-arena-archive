@@ -2439,7 +2439,7 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team) 
 	// NOTE: Any weapon type can have a barrel model
 
 	// add the barrel for the weapons
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < MAX_HANDS; i++)
 	{
 		if (i == 1)
 		{
@@ -2731,7 +2731,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	// add the spinning barrel
 #ifdef TA_WEAPSYS
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < MAX_HANDS; i++)
 #else
 	if ( weapon->barrelModel )
 #endif
@@ -2818,7 +2818,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	// add the flash
 #ifdef TA_WEAPSYS
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < MAX_HANDS; i++)
 #endif
 	{
 		if (

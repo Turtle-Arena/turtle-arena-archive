@@ -2983,11 +2983,41 @@ void CL_InitRef( void ) {
 void CL_SetModel_f( void ) {
 	char	*arg;
 	char	name[256];
+#if 0 //#ifdef IOQ3ZTM
+	char headmodel[256];
+#endif
 
 	arg = Cmd_Argv( 1 );
 	if (arg[0]) {
+#if 0 //#ifdef IOQ3ZTM // Only change headmodel if its the same as model.
+/* ZTM: TODO: See below;
+May breaks compatiblity with Quake III: Team Arena?
+	But Team Arena use team_headmodel not headmodel.
+
+It's rather hacky, special case, and may cause comfusion.
+	But only if you've been messing with headmodel in the console.
+	(Or if IOQ3ZTM_NO_TEAM_MODEL is defined in Team Arena...)
+
+Hm... what if headmodel defaulted to "", and if headmodel is "" uses model to get head.
+	So in effect model "controls" headmodel unless it has been set.
+	Plus if you want headmodel to be auto just set it to "".
+	I like it.
+
+And/or change current "model" command to be "player" (set model and headmodel) and have a "model" command that just changes the model and not the headmodel.
+*/
+
+		Cvar_VariableStringBuffer( "model", name, sizeof(name) );
+		Cvar_VariableStringBuffer( "headmodel", headmodel, sizeof(headmodel) );
+
+		if (Q_stricmp(name, headmodel) == 0)
+		{
+			Cvar_Set( "headmodel", arg );
+		}
+		Cvar_Set( "model", arg );
+#else
 		Cvar_Set( "model", arg );
 		Cvar_Set( "headmodel", arg );
+#endif
 	} else {
 		Cvar_VariableStringBuffer( "model", name, sizeof(name) );
 		Com_Printf("model is set to %s\n", name);

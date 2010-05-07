@@ -96,7 +96,7 @@ Weapons (and attacking)
   * TODO: Mouser NPC, or call it ABMT? (A Better Mouse Trap)
 
 == Teamplay ==
-  * TODO: Team skins for players
+  * TODO: Data: Team skins for players
 
   * TODO: Per-team flag skins?... (Team icon is on flag skin)
 
@@ -109,9 +109,11 @@ Weapons (and attacking)
 == Misc ==
   * TODO: Add optional run animations for torso
 
-  * STARTED (TA_PATHSYS): Finish new path system "g_paths.c" for movers (trains), NPCs?, (and hopefully players; NiGHTS mode!)
+  * STARTED (TA_PATHSYS): Finish new path system "g_paths.c" for NPCs (and players not in NiGHTS mode?).
+  * TODO: Support path_axis (orbit around ent)
+  * TODO: Make sure players support PATH_LINE
 
-  * TODO: Support models/players/NAME/animsounds.cfg used in STV:Elite Force (SP?) (Also used in Jedi Knight 2) ?
+  * TODO: Support models/players/NAME/animsounds.cfg used in STV:Elite Force (SP) (Also used in Jedi Knight 2) ?
     * Started see bg_sound_t and Sounds_Parse; it is similar to animsounds, but different.
     * It currently doesn't load sounds and is for NPC and misc objects only.
 
@@ -124,7 +126,8 @@ Weapons (and attacking)
 
   * TODO: Add misc_dripper entity.
 
-  * STARTED(NIGHTSMODE): NiGHTS [into Dreams...] mode (Maybe instead NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...)
+  * STARTED (NIGHTSMODE): NiGHTS into Dreams mode
+    * Maybe instead of NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...
 
   * TODO: New gametypes; Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
 
@@ -268,7 +271,7 @@ BSPC is the map .bsp to .aas (Arena Awareness System) compiler. The aas file is 
   * TODO: Finish Casey Jones model mesh
      * Casey's feet look ugly (fix them), and allow the toes to bend.
 
-  * TODO: Add Casey bot chats.
+  * TODO: Add Leo, Don, Mike, and Casey bot chats.
 
 
 = Misfit Model 3D =

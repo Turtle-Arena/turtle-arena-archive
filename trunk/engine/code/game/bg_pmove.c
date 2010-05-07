@@ -699,7 +699,7 @@ static void PM_NightsMove( void ) {
 	}
 
 	VectorScale(pml.forward, -16, v);
-	if (pm->ps->pm_flags & PMF_TRAINBACKWARD) {
+	if (pm->ps->eFlags & EF_TRAINBACKWARD) {
 		move = -pm->cmd.forwardmove;
 		VectorAdd(pm->ps->grapplePoint, v, v);
 	} else {

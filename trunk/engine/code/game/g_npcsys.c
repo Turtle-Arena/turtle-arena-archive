@@ -216,7 +216,7 @@ void G_NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	G_SetMiscAnim(self, OBJECT_PAIN);
 	self->bgNPC.npc_ps.legsTimer = BG_AnimationTime(&self->bgNPC.info->animations[OBJECT_PAIN]);
 
-	if (!attacker || !attacker->client || !attacker->bgNPC.info) {
+	if (!attacker || (!attacker->client && !attacker->bgNPC.info)) {
 		return;
 	}
 
@@ -354,10 +354,12 @@ Spawn the NPC
 */
 void Use_NPC( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	if ((ent->spawnflags & 2)
-		&& (level.time-ent->spawnTime > FRAMETIME * 2)
 		&& ent->s.eType != ET_NPC)
 	{
-		FinishSpawningNPC( ent );
+		// some movers spawn on the second frame, so delay item
+		// spawns until the third frame so they can ride trains
+		ent->nextthink = level.time + FRAMETIME * 2;
+		ent->think = FinishSpawningNPC;
 	}
 }
 
