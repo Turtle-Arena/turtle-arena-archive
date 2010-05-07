@@ -618,11 +618,10 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			w = weapList[i];
 #endif
 
-#ifdef TA_WEAPSYS // ZTM: FIXME: Make ammo regen non-hardcoded. (AND make sense...)
+#ifdef TA_WEAPSYS // ZTM: FIXME: Make ammo regen less-hacky, have it make sense.
 			// NOTE: max is wrong for WP_BFG: max should be 10 instead of 20
 			//                        WP_MACHINEGUN: max should be 50 instead of 40
 			//       inc is wrong for WP_MACHINEGUN: inc should be 4 instead of 5
-			//       t is only right for railgun...?
 			max = bg_weapongroupinfo[w].item.quantity;
 
 			if (max <= 25)
@@ -659,9 +658,8 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			if (inc > 1) {
 				t = (bg_weapongroupinfo[w].weapon[0]->attackDelay * inc) * 2;
 			} else {
-				t = bg_weapongroupinfo[w].weapon[0]->attackDelay;
-				// hack for railgun
-				t *= 1.166666667f;
+				// 1.166666667f is a hack for railgun
+				t = bg_weapongroupinfo[w].weapon[0]->attackDelay * 1.166666667f;
 			}
 
 			// shotgun/plasmagun hack, other wise would be 1000.
@@ -935,6 +933,9 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 		case EV_USE_ITEM15:
 		{
 			itemNum = (event & ~EV_EVENT_BITS) - EV_USE_ITEM0;
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+			G_ThrowShuriken(ent, itemNum);
+#endif
 			switch (itemNum)
 			{
 #endif // TA_HOLDSYS
@@ -1053,17 +1054,11 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 #endif // MISSIONPACK
 
 #ifdef TA_HOLDSYS
-#ifdef TA_HOLDABLE
-				case HI_SHURIKEN:
-				case HI_ELECTRICSHURIKEN:
-				case HI_FIRESHURIKEN:
-				case HI_LASERSHURIKEN:
-					G_ThrowShuriken(ent, itemNum);
-					break;
-#endif
-
 				default:
-					G_Printf("  EV_USE_ITEM: No code for holdable %d.\n", itemNum);
+#ifdef TA_HOLDABLE
+					if (!BG_ProjectileIndexForHoldable(itemNum))
+#endif
+						G_Printf("  EV_USE_ITEM: No code for holdable %d.\n", itemNum);
 					break;
 			}
 		}
@@ -1412,15 +1407,26 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	// Let go of the hook if we aren't firing
-	if (
-#ifdef TA_WEAPSYS // ZTM: FIXME: This doesn't allow shurikens to be grappling.
-		bg_weapongroupinfo[client->ps.weapon].weapon[0]->proj->grappling
-#else
-		client->ps.weapon == WP_GRAPPLING_HOOK
+#ifdef TA_WEAPSYS
+	if (client->hook) {
+		qboolean weapon_grapple = client->hook->s.weapon == bg_weapongroupinfo[client->ps.weapon].weapon[0]->projnum
+							|| client->hook->s.weapon == bg_weapongroupinfo[client->ps.weapon].weapon[1]->projnum;
+
+		if ( (weapon_grapple && !(ucmd->buttons & BUTTON_ATTACK))
+#ifdef TA_HOLDSYS // Allow shurikens to be grappling
+			|| (!weapon_grapple && !(ucmd->buttons & BUTTON_USE_HOLDABLE))
 #endif
-		&& client->hook && !( ucmd->buttons & BUTTON_ATTACK ) ) {
+			)
+		{
+			Weapon_HookFree(client->hook);
+		}
+	}
+#else
+	if ( client->ps.weapon == WP_GRAPPLING_HOOK &&
+		client->hook && !( ucmd->buttons & BUTTON_ATTACK ) ) {
 		Weapon_HookFree(client->hook);
 	}
+#endif
 
 #ifdef TURTLEARENA // LOCKON
 	if (ent->enemy && (ent->enemy == ent || !ent->enemy->takedamage))
@@ -1605,7 +1611,7 @@ void ClientThink_real( gentity_t *ent ) {
 		ent->client->ps.eFlags |= EF_USE_ENT;
 
 		if ((ucmd->buttons & BUTTON_USE_HOLDABLE) &&
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 			ent->client->ps.holdableTime <= 0
 #else
 			! ( ent->client->ps.pm_flags & PMF_USE_ITEM_HELD )
@@ -1615,7 +1621,7 @@ void ClientThink_real( gentity_t *ent ) {
 			if (useEnt->use) {
 				useEnt->use(useEnt, ent, ent);
 			}
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 			ent->client->ps.holdableTime = 500;
 #else
 			ent->client->ps.pm_flags |= PMF_USE_ITEM_HELD;

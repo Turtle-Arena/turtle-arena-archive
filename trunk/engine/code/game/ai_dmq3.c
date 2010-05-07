@@ -1597,42 +1597,7 @@ int BotSynonymContext(bot_state_t *bs) {
 // Weight is total damage of the weapon (plus 100).
 int BotWeaponWeight(weapon_t w)
 {
-	int weight = 0;
-	int damage1 = 0;
-	int damage2 = 0;
-	int i;
-	bg_weaponinfo_t *weapon;
-
-	// Primary weapon
-	weapon = bg_weapongroupinfo[w].weapon[0];
-	if (weapon->weapontype == WT_GUN)
-	{
-		damage1 += weapon->proj->damage;
-	}
-	else
-	{
-		for (i = 0; i < MAX_WEAPON_BLADES; i++)
-		{
-			damage1 += weapon->blades[i].damage;
-		}
-	}
-
-	// Secondary weapon
-	weapon = bg_weapongroupinfo[w].weapon[1];
-	if (weapon->weapontype == WT_GUN)
-	{
-		damage2 += weapon->proj->damage;
-	}
-	else
-	{
-		for (i = 0; i < MAX_WEAPON_BLADES; i++)
-		{
-			damage2 += weapon->blades[i].damage;
-		}
-	}
-
-	weight = damage1 + damage2 + 100;
-	return weight;
+	return BG_WeaponGroupTotalDamage(w)+100;
 }
 
 // BotChooseBestFightWeapon
@@ -2504,11 +2469,10 @@ int TeamPlayIsOn(void) {
 #ifdef TA_WEAPSYS
 qboolean BotCanUseShurikens(bot_state_t *bs)
 {
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	if (bs->inventory[ENEMY_HORIZONTAL_DIST] >= 256
 		&& bs->inventory[ENEMY_HORIZONTAL_DIST] <= 768 // LOCKON range
-	&& (bs->cur_ps.holdableIndex >= HI_SHURIKEN &&
-		bs->cur_ps.holdableIndex <= HI_LASERSHURIKEN)
+		&& BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex)
 		&& bs->cur_ps.holdable[bs->cur_ps.holdableIndex] > 0)
 	{
 		return qtrue;
@@ -2554,21 +2518,9 @@ float BotAggression(bot_state_t *bs) {
 		if (bs->inventory[INVENTORY_ARMOR] < 40) return 0;
 	}
 #endif
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	if (BotCanUseShurikens(bs)) {
-		switch (bs->cur_ps.holdableIndex)
-		{
-			case HI_SHURIKEN:
-				return 80;
-			case HI_ELECTRICSHURIKEN:
-				return 80;
-			case HI_FIRESHURIKEN:
-				return 90;
-			case HI_LASERSHURIKEN:
-				return 90;
-			default:
-				break;
-		}
+		return 80;
 	}
 #endif
 #ifdef TA_WEAPSYS_EX
@@ -2965,23 +2917,21 @@ int BotWantsToCamp(bot_state_t *bs) {
 		return qfalse;
     }
 #elif defined TA_WEAPSYS
-	for (cs = 1; cs < BG_NumWeaponGroups(); cs++)
+	for (i = 1; i < BG_NumWeaponGroups(); i++)
 	{
 		if (!bs->inventory[INVENTORY_WEAPON_START+i-1])
 			continue;
 		if (bs->inventory[INVENTORY_AMMO_START+i-1] <= 0 && bs->inventory[INVENTORY_AMMO_START+i-1] != -1)
 			continue;
 
-		// ZTM: FIXME: Add up all blades for both weapons
-		if (bg_weapongroupinfo[i].weapon[0]->blades[0].damage >= 50
-			|| (bg_weapongroupinfo[i].weapon[0]->proj->damage + bg_weapongroupinfo[i].weapon[1]->proj->damage) >= 50)
+		if (BG_WeaponGroupTotalDamage(i) >= 50)
 		{
 			break;
 		}
 	}
 
 	// Didn't find weapon for camp
-	if (cs == BG_NumWeaponGroups())
+	if (i == BG_NumWeaponGroups())
 	{
 		return qfalse;
 	}
@@ -4074,11 +4024,11 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	//set the ideal view angles
 	vectoangles(dir, bs->ideal_viewangles);
 	//take the weapon spread into account for lower skilled bots
-#ifndef TA_WEAPSYS // ZTM: FIXME?: vspread. It was always 0, why fix?
+#ifndef TA_WEAPSYS // ZTM: NOTE: vspread was unused by quake3, so why bother adding support for it?
 	bs->ideal_viewangles[PITCH] += 6 * wi.vspread * crandom() * (1 - aim_accuracy);
 #endif
 	bs->ideal_viewangles[PITCH] = AngleMod(bs->ideal_viewangles[PITCH]);
-#ifndef TA_WEAPSYS // ZTM: FIXME?: hspread. It was always 0, why fix?
+#ifndef TA_WEAPSYS // ZTM: NOTE: hspread was unused by quake3, so why bother adding support for it?
 	bs->ideal_viewangles[YAW] += 6 * wi.hspread * crandom() * (1 - aim_accuracy);
 #endif
 	bs->ideal_viewangles[YAW] = AngleMod(bs->ideal_viewangles[YAW]);
@@ -4108,7 +4058,7 @@ void BotCheckAttack(bot_state_t *bs) {
 #ifdef TA_WEAPSYS
 	vec3_t offset;
 	bg_projectileinfo_t *bgProj;
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	qboolean firedShuriken = qfalse;
 #endif
 #else
@@ -4182,27 +4132,10 @@ void BotCheckAttack(bot_state_t *bs) {
 
 #ifdef TA_WEAPSYS
 	bgProj = NULL;
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	if (BotCanUseShurikens(bs))
 	{
-		int projnum = 0;
-		switch (bs->cur_ps.holdableIndex)
-		{
-			case HI_SHURIKEN:
-				projnum = BG_ProjectileIndexForName("p_shuriken");
-				break;
-			case HI_ELECTRICSHURIKEN:
-				projnum = BG_ProjectileIndexForName("p_electricshuriken");
-				break;
-			case HI_FIRESHURIKEN:
-				projnum = BG_ProjectileIndexForName("p_fireshuriken");
-				break;
-			case HI_LASERSHURIKEN:
-				projnum = BG_ProjectileIndexForName("p_lasershuriken");
-				break;
-			default:
-				break;
-		}
+		int projnum = BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex);
 		if (projnum > 0) {
 			bgProj = &bg_projectileinfo[projnum];
 			firedShuriken = qtrue;
@@ -4304,7 +4237,7 @@ void BotCheckAttack(bot_state_t *bs) {
 #ifdef TA_WEAPSYS
 	}
 #endif
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	if (firedShuriken)
 	{
 		trap_EA_Use(bs->client, bs->cur_ps.holdableIndex);

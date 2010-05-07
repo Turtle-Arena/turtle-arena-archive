@@ -67,6 +67,11 @@ Weapons (and attacking)
 
   * BUG: CreateFuzzyWeight doesn't setup inventory weight correctly, causes SIGBUS in FuzzyWeightUndecided_r
 
+  * TODO: Draw the secondary pickup weapon somewhere on the player when single handed
+
+  * STARTED (TA_HOLDABLE): Make shurikens/holdable-projectiles general like weapons groups.
+    * (So they can be totally configured from .weap, and add new ones)
+
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
 
@@ -110,7 +115,7 @@ Weapons (and attacking)
   * TODO: Add optional run animations for torso
 
   * STARTED (TA_PATHSYS): Finish new path system "g_paths.c" for NPCs (and players not in NiGHTS mode?).
-  * TODO: Support path_axis (orbit around ent)
+  * TODO: Support path_axis (orbit around ent), use TR_SINE?
   * TODO: Make sure players support PATH_LINE
 
   * TODO: Support models/players/NAME/animsounds.cfg used in STV:Elite Force (SP) (Also used in Jedi Knight 2) ?

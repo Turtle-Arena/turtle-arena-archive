@@ -310,10 +310,22 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 	if (self && self->client && bg_projectileinfo[projnum].grappling)
 	{
 #ifdef IOQ3ZTM
-		if ((self->client->ps.pm_flags & PMF_FIRE_HELD) || self->client->hook) {
-			return qfalse;
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+		if (handSide == HAND_NONE) // Shuriken holdable item
+		{
+			if ((self->client->ps.pm_flags & PMF_USE_ITEM_HELD) || self->client->hook) {
+				return qfalse;
+			}
+			self->client->ps.pm_flags |= PMF_USE_ITEM_HELD;
 		}
-		self->client->ps.pm_flags |= PMF_FIRE_HELD;
+		else
+#endif
+		{
+			if ((self->client->ps.pm_flags & PMF_FIRE_HELD) || self->client->hook) {
+				return qfalse;
+			}
+			self->client->ps.pm_flags |= PMF_FIRE_HELD;
+		}
 #else
 		if (self->client->fireHeld || self->client->hook) {
 			return qfalse;
@@ -348,7 +360,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		mod = MOD_PROJECTILE;
 	}
 	if (splashMod == MOD_UNKNOWN) {
-		splashMod = MOD_PROJECTILE;
+		splashMod = MOD_PROJECTILE_EXPLOSION;
 	}
 
 	range = 0;
@@ -737,18 +749,17 @@ qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir, int weaponnum
 }
 #endif
 
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 /*
 =================
 fire_shuriken
 =================
 */
-#ifdef TA_WEAPSYS
-qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable, int handSide)
+qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable)
 {
-	int projnum = 0;
+#ifdef TA_WEAPSYS
+	int projnum;
 	float s_quadFactor;
-	int mod, splashMod;
 
 	if (self->client->ps.powerups[PW_QUAD] ) {
 		s_quadFactor = g_quadfactor.value;
@@ -761,138 +772,16 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 	}
 #endif
 
-	switch (holdable)
-	{
-		case HI_SHURIKEN:
-			projnum = BG_ProjectileIndexForName("p_shuriken");
-			mod = splashMod = MOD_SHURIKEN;
-			break;
-		case HI_ELECTRICSHURIKEN:
-			projnum = BG_ProjectileIndexForName("p_electricshuriken");
-			mod = splashMod = MOD_ELECTRICSHURIKEN;
-			break;
-		case HI_FIRESHURIKEN:
-			projnum = BG_ProjectileIndexForName("p_fireshuriken");
-			mod = MOD_FIRESHURIKEN;
-			splashMod = MOD_FIRESHURIKEN_EXPLOSION;
-			break;
-		case HI_LASERSHURIKEN:
-			projnum = BG_ProjectileIndexForName("p_lasershuriken");
-			mod = splashMod = MOD_LASERSHURIKEN;
-			break;
-		default:
-			return qfalse;
-	}
+	projnum = BG_ProjectileIndexForHoldable(holdable);
 
 #ifdef TURTLEARENA // LOCKON
 	G_AutoAim(self, projnum, start, forward, right, up);
 #endif
 
 	return fire_projectile(self, start, forward, right, up, projnum,
-				s_quadFactor, mod, splashMod, handSide);
-}
-#else
-gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable)
-{
-	gentity_t	*bolt;
-	vec3_t          mins = { -8, -8, -8 };
-	vec3_t			maxs = { 8, 8, 8 };
-	vec3_t			dir;
-
-	VectorCopy(forward, dir);
-
-	VectorNormalize (dir);
-
-	bolt = G_Spawn();
-
-	// So that CG_Shuriken has the right yaw.
-	bolt->s.angles[1] = self->client->ps.viewangles[1];
-
-	// Shuriken: 10 damage.
-	// Electric Shuriken: Low Damage (5) TODO: Stun player and electricfy water.
-	// Fire Shuriken: Higher damage (15), plus explode
-	// Laser Shuriken: Faster, bounce (max of 3), low damage (7).
-
-	if (holdable == HI_LASERSHURIKEN)
-	{
-		bolt->classname = "thrown laser shuriken";
-		bolt->s.eFlags = EF_BOUNCE;
-		bolt->s.modelindex2 = 3; // Die on 3rd bounce
-
-		bolt->damage = 7;
-		bolt->splashDamage = 0;
-		bolt->splashRadius = 0;
-		bolt->methodOfDeath = MOD_LASERSHURIKEN;
-		bolt->splashMethodOfDeath = MOD_LASERSHURIKEN;
-
-		VectorScale( dir, 400, bolt->s.pos.trDelta );
-	}
-	else if (holdable == HI_FIRESHURIKEN)
-	{
-		bolt->classname = "thrown fire shuriken";
-
-		bolt->damage = 15;
-		bolt->splashDamage = 100;//15;
-		bolt->splashRadius = 120;//60; //120;
-		bolt->methodOfDeath = MOD_FIRESHURIKEN;
-		bolt->splashMethodOfDeath = MOD_FIRESHURIKEN_EXPLOSION;
-
-		VectorScale( dir, 700, bolt->s.pos.trDelta );
-	}
-	else if (holdable == HI_ELECTRICSHURIKEN)
-	{
-		bolt->classname = "thrown electric shuriken";
-
-		bolt->damage = 10;
-		bolt->splashDamage = 0;
-		bolt->splashRadius = 0;
-		bolt->methodOfDeath = MOD_ELECTRICSHURIKEN;
-		bolt->splashMethodOfDeath = MOD_ELECTRICSHURIKEN;
-
-		VectorScale( dir, 700, bolt->s.pos.trDelta );
-	}
-	else
-	{
-		bolt->classname = "thrown shuriken";
-
-		bolt->damage = 10;
-		bolt->splashDamage = 0;
-		bolt->splashRadius = 0;
-		bolt->methodOfDeath = MOD_SHURIKEN;
-		bolt->splashMethodOfDeath = MOD_SHURIKEN;
-
-		VectorScale( dir, 700, bolt->s.pos.trDelta );
-	}
-
-	bolt->nextthink = level.time + 15000;
-	bolt->think = G_ExplodeMissile;
-	bolt->s.eType = ET_MISSILE;
-	bolt->r.svFlags = SVF_USE_CURRENT_ORIGIN;
-	bolt->s.weapon = WP_NUM_WEAPONS+holdable;
-	bolt->r.ownerNum = self->s.number;
-	bolt->parent = self;
-
-	bolt->clipmask = MASK_SHOT;
-	bolt->target_ent = NULL;
-
-	bolt->s.pos.trType = TR_LINEAR;
-	bolt->s.pos.trTime = level.time - MISSILE_PRESTEP_TIME;		// move a bit on the very first frame
-	VectorCopy( start, bolt->s.pos.trBase );
-	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
-	VectorCopy (start, bolt->r.currentOrigin);
-
-	// make the rocket shootable
-	bolt->r.contents = CONTENTS_SHOOTABLE;
-	VectorCopy(mins, bolt->r.mins);
-	VectorCopy(maxs, bolt->r.maxs);
-	bolt->takedamage = qtrue;
-	bolt->health = 10;
-	bolt->die = G_Missile_Die;
-
-	return bolt;
-}
+				s_quadFactor, MOD_UNKNOWN, MOD_UNKNOWN, HAND_NONE);
 #endif
-
+}
 #endif
 
 #if defined MISSIONPACK || defined TA_WEAPSYS

@@ -282,6 +282,7 @@ BotWeaponNameForMeansOfDeath
 char *BotWeaponNameForMeansOfDeath(int mod, int weapon) {
 	switch(mod) {
 		case MOD_PROJECTILE:
+		case MOD_PROJECTILE_EXPLOSION:
 			return &bg_projectileinfo[weapon].name[2];
 			break;
 		case MOD_WEAPON_PRIMARY:

@@ -55,11 +55,9 @@ projectile "p_electricshuriken"
 	model "models/shurikens/shurikenelectric.md3"
 	damage 10
 	speed 700
-	//timetolive 15000
 	spinType "PS_PITCH"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
-	//stickOnImpact 1
 
 	bounceType "PB_HALF"
 	useGravity 1
@@ -67,6 +65,15 @@ projectile "p_electricshuriken"
 	splashDamage 10
 	splashRadius 60
 	deathType "PD_ROCKET_SMALL"
+
+	// grappling shuriken
+	//timetolive 10000
+	//trailType "PT_GRAPPLE"
+	//deathType "PD_BULLET"
+	//wallmarkName "gfx/damage/hole_lg_mrk"
+	//wallmarkRadius 12
+	//grappling 1
+	//spinType "PS_NONE"
 }
 
 projectile "p_fireshuriken"

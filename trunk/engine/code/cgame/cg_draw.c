@@ -845,6 +845,9 @@ static void CG_DrawStatusBar( void ) {
 #ifdef TA_HOLDSYS
 		// draw value
 
+#ifdef TA_HOLDABLE // Grappling shuriken use no ammo.
+		if (!bg_projectileinfo[BG_ProjectileIndexForHoldable(cg.snap->ps.holdableIndex)].grappling)
+#endif
 		{
 #ifdef TA_WEAPSYS
 			int giveQuantity = BG_ItemForItemNum(value)->quantity;

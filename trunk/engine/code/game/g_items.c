@@ -226,12 +226,9 @@ int Pickup_Holdable( gentity_t *ent, gentity_t *other ) {
 	else
 		other->client->ps.holdable[other->client->ps.holdableIndex] += ent->item->quantity;
 
-	//if (ent->item->giTag >= HI_SHURIKEN && ent->item->giTag <= HI_LASERSHURIKEN)
+	if (other->client->ps.holdable[other->client->ps.holdableIndex] > MAX_SHURIKENS)
 	{
-		if (other->client->ps.holdable[other->client->ps.holdableIndex] > MAX_SHURIKENS)
-		{
-			other->client->ps.holdable[other->client->ps.holdableIndex] = MAX_SHURIKENS;
-		}
+		other->client->ps.holdable[other->client->ps.holdableIndex] = MAX_SHURIKENS;
 	}
 #else
 #ifdef IOQ3ZTM

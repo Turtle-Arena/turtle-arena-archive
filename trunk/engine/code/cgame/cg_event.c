@@ -296,11 +296,14 @@ static void CG_Obituary( entityState_t *ent ) {
 		// ZTM: TODO: Stop this &name[2] stuff, add a MOD name or use the whole name.
 		//                      Both require changing weaponinfo.txt.
 		//            If this is changed update BotWeaponNameForMeansOfDeath
-		if (mod == MOD_PROJECTILE)
+		if (mod == MOD_PROJECTILE || mod == MOD_PROJECTILE_EXPLOSION)
 		{
-			message = "was killed by";
+			if (mod == MOD_PROJECTILE_EXPLOSION)
+				message = "almost dodged";
+			else
+				message = "was killed by";
 			CG_Printf( "%s %s %s's %s\n",
-				targetName, message, attackerName, &bg_projectileinfo[ent->weapon].name[2]);
+					targetName, message, attackerName, &bg_projectileinfo[ent->weapon].name[2]);
 			return;
 		}
 		if (mod == MOD_WEAPON_PRIMARY ||
@@ -308,7 +311,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		{
 			message = "was killed by";
 			CG_Printf( "%s %s %s's %s\n",
-				targetName, message, attackerName, &bg_weapongroupinfo[ent->weapon].weapon[mod-MOD_WEAPON_PRIMARY]->name[2]);
+					targetName, message, attackerName, &bg_weapongroupinfo[ent->weapon].weapon[mod-MOD_WEAPON_PRIMARY]->name[2]);
 			return;
 		}
 #endif
@@ -388,28 +391,6 @@ static void CG_Obituary( entityState_t *ent ) {
 			break;
 #endif
 #endif
-#ifdef TA_HOLDABLE
-		case MOD_SHURIKEN:
-			message = "was killed by";
-			message2 = "'s shuriken";
-			break;
-		case MOD_FIRESHURIKEN:
-			message = "was killed by";
-			message2 = "'s fire shuriken";
-			break;
-		case MOD_FIRESHURIKEN_EXPLOSION:
-			message = "almost dodged";
-			message2 = "'s fire shuriken";
-			break;
-		case MOD_ELECTRICSHURIKEN:
-			message = "was killed by";
-			message2 = "'s electric shuriken";
-			break;
-		case MOD_LASERSHURIKEN:
-			message = "was killed by";
-			message2 = "'s laser shuriken";
-			break;
-#endif
 		case MOD_TELEFRAG:
 			message = "tried to invade";
 			message2 = "'s personal space";
@@ -455,12 +436,12 @@ static void CG_UseItem( centity_t *cent ) {
 		if ( !itemNum ) {
 			CG_CenterPrint( "No item to use", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 		} else
-#ifdef TA_HOLDABLE
-		if (itemNum < HI_SHURIKEN || itemNum > HI_LASERSHURIKEN)
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+		if (!BG_ProjectileIndexForHoldable(itemNum))
 #endif
 		{
 			item = BG_FindItemForHoldable( itemNum );
-#ifdef TA_HOLDABLE // TA_DATA : Eat pizza, don't "use" it.
+#ifdef TA_DATA // Eat pizza, don't "use" it.
 			if (itemNum == HI_MEDKIT)
 			{
 				CG_CenterPrint( va("Ate %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
@@ -473,6 +454,13 @@ static void CG_UseItem( centity_t *cent ) {
 
 	switch ( itemNum ) {
 	default:
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+		// ZTM: Play shuriken use sound
+		if (BG_ProjectileIndexForHoldable(itemNum)) {
+			trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.shurikenSound );
+			break;
+		}
+#endif
 	case HI_NONE:
 		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.useNothingSound );
 		break;
@@ -504,15 +492,6 @@ static void CG_UseItem( centity_t *cent ) {
 		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.useInvulnerabilitySound );
 		break;
 #endif
-#endif
-#ifdef TA_HOLDABLE // ZTM: Holdable
-	// ZTM: Play shuriken use sound
-	case HI_SHURIKEN:
-	case HI_FIRESHURIKEN:
-	case HI_ELECTRICSHURIKEN:
-	case HI_LASERSHURIKEN:
-		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.shurikenSound );
-		break;
 #endif
 	}
 
@@ -1186,18 +1165,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #else
 	case EV_GRENADE_BOUNCE:
 		DEBUGNAME("EV_GRENADE_BOUNCE");
-#ifdef TA_HOLDABLE
-		if (bg_projectileinfo[es->weapon].bounceType == PB_FULL) {
-			/*if (es->eventParm == 255) {
-				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
-			} else*/ {
-				trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.shurikenSound );
-				ByteToDir( es->eventParm, dir );
-				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
-			}
-		}
-		else
-#endif
 		if ( rand() & 1 ) {
 			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.hgrenb1aSound );
 		} else {

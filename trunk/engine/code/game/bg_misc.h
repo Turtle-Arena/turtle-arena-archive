@@ -459,7 +459,7 @@ typedef enum {
 	HI_INVULNERABILITY_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
 
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	// Shurikens
 	HI_SHURIKEN,
 	HI_ELECTRICSHURIKEN,
@@ -800,6 +800,9 @@ typedef struct
 extern bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 extern bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 extern bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+int BG_ProjectileIndexForHoldable(int holdable);
+#endif
 int BG_ProjectileIndexForName(const char *name);
 int BG_WeaponIndexForName(const char *name);
 int BG_WeaponGroupIndexForName(const char *name);
@@ -817,6 +820,7 @@ qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt);
 qboolean BG_WeapUseAmmo(weapon_t w);
 qboolean BG_PlayerAttackAnim(int a);
 qboolean BG_PlayerStandAnim(int a);
+int BG_WeaponGroupTotalDamage(int weaponGroup);
 #endif
 #ifdef TA_HOLDSYS
 int BG_ItemNumForHoldableNum(holdable_t holdablenum);
@@ -1572,9 +1576,7 @@ typedef struct
 #define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
 #define	PMF_TIME_WATERJUMP	256		// pm_time is waterjump
 #define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
-#ifndef TA_HOLDABLE
 #define	PMF_USE_ITEM_HELD	1024
-#endif
 #define PMF_GRAPPLE_PULL	2048	// pull towards grapple location
 #define PMF_FOLLOW			4096	// spectate following another player
 #define PMF_SCOREBOARD		8192	// spectate as a scoreboard
@@ -1677,13 +1679,6 @@ typedef enum {
 	MOD_BFG,
 	MOD_BFG_SPLASH,
 #endif
-#ifdef TA_HOLDABLE
-	MOD_SHURIKEN,
-	MOD_FIRESHURIKEN,
-	MOD_FIRESHURIKEN_EXPLOSION,
-	MOD_ELECTRICSHURIKEN,
-	MOD_LASERSHURIKEN,
-#endif
 	MOD_WATER,
 	MOD_SLIME,
 	MOD_LAVA,
@@ -1713,6 +1708,7 @@ typedef enum {
 	MOD_GRAPPLE
 #ifdef TA_WEAPSYS
 	,MOD_PROJECTILE,
+	MOD_PROJECTILE_EXPLOSION,
 	MOD_WEAPON_PRIMARY,
 	MOD_WEAPON_SECONDARY,
 	MOD_MAX

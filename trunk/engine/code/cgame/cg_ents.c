@@ -916,66 +916,6 @@ static void CG_Item( centity_t *cent ) {
 
 //============================================================================
 
-#if defined TA_HOLDABLE && !defined TA_WEAPSYS
-/*
-===============
-CG_Shuriken
-Based on CG_MISSILE
-===============
-*/
-static void CG_Shuriken( centity_t *cent, holdable_t holdable ) {
-	refEntity_t			ent;
-	entityState_t		*s1;
-
-	s1 = &cent->currentState;
-
-	// create the render entity
-	memset (&ent, 0, sizeof(ent));
-
-	VectorCopy( cent->lerpOrigin, ent.origin);
-	VectorCopy( cent->lerpOrigin, ent.oldorigin);
-
-	// flicker between two skins
-	ent.skinNum = cg.clientFrame & 1;
-
-	switch (holdable)
-	{
-		case HI_SHURIKEN:
-			ent.hModel = cgs.media.shurikenModel;
-			break;
-		case HI_ELECTRICSHURIKEN:
-			ent.hModel = cgs.media.shurikenElectricModel;
-			break;
-		case HI_FIRESHURIKEN:
-			ent.hModel = cgs.media.shurikenFireModel;
-			break;
-		case HI_LASERSHURIKEN:
-			ent.hModel = cgs.media.shurikenLaserModel;
-			break;
-		default:
-			ent.hModel = 0;
-			break;
-	}
-	ent.renderfx = RF_NOSHADOW;
-
-	// spin pitch and use fired yaw!
-		if ( s1->pos.trType != TR_STATIONARY )
-		{
-			cent->lerpAngles[0] = cg.autoAngles[1]; // Spin pitch!
-		}
-		else
-		{
-			// Does the "engine" change lerpAngles[0] or is it the last value it was?
-		}
-		cent->lerpAngles[1] = s1->angles[1];		// Angle it was shot at.
-		cent->lerpAngles[2] = 0;					// Don't roll.
-		AnglesToAxis( cent->lerpAngles, ent.axis );
-
-	// add to refresh list, possibly with quad glow
-	CG_AddRefEntityWithPowerups( &ent, s1, TEAM_FREE );
-}
-#endif
-
 /*
 ===============
 CG_Missile
@@ -985,30 +925,11 @@ static void CG_Missile( centity_t *cent ) {
 	refEntity_t			ent;
 	entityState_t		*s1;
 #ifdef TA_WEAPSYS
-	const projectileInfo_t		*projectile;
+	const projectileInfo_t	*projectile;
 #else
 	const weaponInfo_t		*weapon;
 #endif
 //	int	col;
-#if defined TA_HOLDABLE && !defined TA_WEAPSYS
-	int holdable;
-
-	s1 = &cent->currentState;
-	if ( s1->weapon >= WP_NUM_WEAPONS ) {
-		holdable = s1->weapon - WP_NUM_WEAPONS;
-		switch (holdable)
-		{
-			case HI_SHURIKEN:
-			case HI_ELECTRICSHURIKEN:
-			case HI_FIRESHURIKEN:
-			case HI_LASERSHURIKEN:
-				CG_Shuriken(cent, holdable);
-				return;
-			default:
-				s1->weapon = 0;
-		}
-	}
-#else
 	s1 = &cent->currentState;
 #ifdef TA_WEAPSYS
 	if ( s1->weapon >= BG_NumProjectiles() )
@@ -1020,7 +941,6 @@ static void CG_Missile( centity_t *cent ) {
 	{
 		s1->weapon = 0;
 	}
-#endif
 #ifdef TA_WEAPSYS
 	projectile = &cg_projectiles[s1->weapon];
 #else
