@@ -1231,7 +1231,7 @@ netField_t	playerStateFields[] =
 #ifdef TA_HOLDSYS
 ,{ PSF(holdableIndex), 5 }
 #endif
-#if defined TA_HOLDABLE || defined NET_COMPAT
+#if defined TA_HOLDABLE || defined NET_COMPAT // HOLD_SHURIKEN
 ,{ PSF(holdableTime), -16 }
 #endif
 #if defined TURTLEARENA || defined NET_COMPAT // LOCKON

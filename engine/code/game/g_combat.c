@@ -591,8 +591,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	ent->s.otherEntityNum2 = killer;
 #ifdef TA_WEAPSYS
 	ent->s.weapon = 0; // unknown projectile/weapon
-	// projectile or weapon group number, for MOD_PROJECTILE or MOD_WEAPON_*
-	if (meansOfDeath == MOD_PROJECTILE)
+	// projectile or weapon group number, for MOD_PROJECTILE, MOD_PROJECTILE_EXPLOSION, or MOD_WEAPON_*
+	if (meansOfDeath == MOD_PROJECTILE || meansOfDeath == MOD_PROJECTILE_EXPLOSION)
 	{
 		if (inflictor && inflictor->s.eType == ET_MISSILE) {
 			ent->s.weapon = inflictor->s.weapon;
@@ -1375,7 +1375,8 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		targ->client->lasthurt_client = attacker->s.number;
 		targ->client->lasthurt_mod = mod;
 #ifdef TA_WEAPSYS
-		if (mod == MOD_PROJECTILE)
+		if (mod == MOD_PROJECTILE
+			|| mod == MOD_PROJECTILE_EXPLOSION)
 			targ->client->lasthurt_weapon = inflictor->s.weapon;
 		else if (mod == MOD_WEAPON_PRIMARY
 			|| mod == MOD_WEAPON_SECONDARY)

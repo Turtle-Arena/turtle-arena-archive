@@ -925,45 +925,15 @@ static void CG_SparkTrail( centity_t *ent, const projectileInfo_t *wi )
 }
 #endif
 
-#ifdef TA_HOLDABLE
-// Currently this should only be called by CG_RegisterItemVisuals ...
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+// Currently this should only be called by CG_RegisterItemVisuals
 void CG_RegisterHoldable( int holdableNum )
 {
 	//CG_RegisterItemVisuals(BG_ItemNumForHoldableNum(holdableNum));
 
-	switch (holdableNum)
-	{
-		case HI_SHURIKEN:
 #ifdef TA_WEAPSYS
-			CG_RegisterProjectile(BG_ProjectileIndexForName("p_shuriken"));
-#else
-			cgs.media.shurikenModel = trap_R_RegisterModel( "models/shurikens/shuriken.md3" );
+	CG_RegisterProjectile(BG_ProjectileIndexForHoldable(holdableNum));
 #endif
-			break;
-		case HI_ELECTRICSHURIKEN:
-#ifdef TA_WEAPSYS
-			CG_RegisterProjectile(BG_ProjectileIndexForName("p_electricshuriken"));
-#else
-			cgs.media.shurikenElectricModel = trap_R_RegisterModel( "models/shurikens/shurikenelectric.md3" );
-#endif
-			break;
-		case HI_FIRESHURIKEN:
-#ifdef TA_WEAPSYS
-			CG_RegisterProjectile(BG_ProjectileIndexForName("p_fireshuriken"));
-#else
-			cgs.media.shurikenFireModel = trap_R_RegisterModel( "models/shurikens/shurikenfire.md3" );
-#endif
-			break;
-		case HI_LASERSHURIKEN:
-#ifdef TA_WEAPSYS
-			CG_RegisterProjectile(BG_ProjectileIndexForName("p_lasershuriken"));
-#else
-				cgs.media.shurikenLaserModel = trap_R_RegisterModel( "models/shurikens/shurikenlaser.md3" );
-#endif
-			break;
-		default:
-			break;
-	}
 }
 #endif
 
@@ -2833,7 +2803,21 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		} else {
 			// impulse flash
 			if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME && !cent->pe.railgunFlash ) {
+#ifdef IOQ3ZTM
+#ifdef TA_WEAPSYS // ZTM: FIXME: Support secondary weapon!
+				if (i == 0)
+#endif
+				{
+					// Use default flashOrigin when no flash model.
+					VectorCopy(nonPredictedCent->lerpOrigin, nonPredictedCent->pe.flashOrigin);
+					nonPredictedCent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
+				}
+#endif
+#ifdef TA_WEAPSYS
+				continue;
+#else
 				return;
+#endif
 			}
 		}
 
@@ -2858,7 +2842,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 				nonPredictedCent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
 			}
 #endif
+
+#ifdef TA_WEAPSYS
+			continue;
+#else
 			return;
+#endif
 		}
 		angles[YAW] = 0;
 		angles[PITCH] = 0;

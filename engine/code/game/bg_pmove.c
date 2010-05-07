@@ -1926,7 +1926,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 	pm->ps->weaponstate = WEAPON_DROPPING;
 #ifdef TA_PLAYERS // WEAPONS
 	{
-		int anim = TORSO_DROP;
+		animNumber_t anim = TORSO_DROP;
 
 		if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
 		{
@@ -2060,6 +2060,7 @@ hands = 3 = primary and secondary.
 */
 static void PM_BeginWeaponHandsChange( int hands ) {
 	int last_hands;
+	animNumber_t anim;
 
 	if ( hands < HAND_NONE || hands > HAND_BOTH ) {
 		return;
@@ -2085,62 +2086,58 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 
 	//Com_Printf("DEBUG: Changing hands (new=%d, old=%d)\n", hands, last_hands);
 
-	{
-		int anim = TORSO_DROP;
+	anim = TORSO_DROP;
 
-		if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
-		{
+	if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
+	{
 		// both hands
 		if (last_hands == HAND_BOTH && hands == HAND_NONE)
 		{
-				anim = TORSO_PUTDEFAULT_BOTH;
+			anim = TORSO_PUTDEFAULT_BOTH;
 		}
 		else if (last_hands == HAND_NONE && hands == HAND_BOTH)
 		{
-				anim = TORSO_GETDEFAULT_BOTH;
+			anim = TORSO_GETDEFAULT_BOTH;
 		}
 		// primary hand
 		else if (last_hands == HAND_BOTH && hands == HAND_SECONDARY)
 		{
-				anim = TORSO_PUTDEFAULT_PRIMARY;
+			anim = TORSO_PUTDEFAULT_PRIMARY;
 		}
 		else if (last_hands == HAND_SECONDARY && hands == HAND_BOTH)
 		{
-				anim = TORSO_GETDEFAULT_PRIMARY;
+			anim = TORSO_GETDEFAULT_PRIMARY;
 		}
 		// secondary hand
 		else if (last_hands == HAND_BOTH && hands == HAND_PRIMARY)
 		{
-				anim = TORSO_PUTDEFAULT_SECONDARY;
+			anim = TORSO_PUTDEFAULT_SECONDARY;
 		}
 		else if (last_hands == HAND_PRIMARY && hands == HAND_BOTH)
 		{
-				anim = TORSO_GETDEFAULT_SECONDARY;
+			anim = TORSO_GETDEFAULT_SECONDARY;
 		}
 		else
 		{
-				// ZTM: Shouldn't happen, if I made it right...
+			// ZTM: Shouldn't happen, if I made it right...
 			Com_Printf("PM_BeginDefaultWeaponChange: Bad hands; last_hands=%i, hands=%i\n", last_hands, hands);
 		}
 
-			// The animation is "drop" and "raise", so split time in half.
-			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
-			// Don't override gesture when capturing the flag.
-			if (!pm->ps->torsoTimer) {
+		// The animation is "drop" and "raise", so split time in half.
+		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
+		// Don't override gesture when capturing the flag.
+		if (!pm->ps->torsoTimer) {
 			PM_StartTorsoAnim( anim );
-	}
 		}
+	}
 	else
 	{
-			// ZTM: FIXME: Draw the "pickup weapon" secondary weapon somewhere on the player!
-
-			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
-			// Don't override gesture when capturing the flag.
-			if (!pm->ps->torsoTimer) {
+		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
+		// Don't override gesture when capturing the flag.
+		if (!pm->ps->torsoTimer) {
 			PM_StartTorsoAnim( anim );
 		}
 	}
-}
 }
 
 
@@ -2301,7 +2298,7 @@ static void PM_Weapon( void ) {
 		// Player should let go of the dropped weapon.
 		if (!nodrop && pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON])
 		{
-		pm->ps->weapon = WP_NONE;
+			pm->ps->weapon = WP_NONE;
 		}
 #else
 		pm->ps->weapon = WP_NONE;
@@ -2319,8 +2316,8 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
-#ifdef TA_HOLDABLE
-	// make weapon function
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+	// make holdable function
 	if ( pm->ps->holdableTime > 0 ) {
 		pm->ps->holdableTime -= pml.msec;
 	}
@@ -2329,7 +2326,7 @@ static void PM_Weapon( void ) {
 	// check for item using
 	if ( pm->cmd.buttons & BUTTON_USE_HOLDABLE ) {
 		if (
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 		pm->ps->holdableTime <= 0
 #else
 		! ( pm->ps->pm_flags & PMF_USE_ITEM_HELD )
@@ -2352,7 +2349,7 @@ static void PM_Weapon( void ) {
 				&& pm->ps->stats[STAT_HEALTH] >= (pm->ps->stats[STAT_MAX_HEALTH] + 25) ) {
 				// don't use medkit if at max health
 			} else {
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 				pm->ps->holdableTime = 500;
 #else
 				pm->ps->pm_flags |= PMF_USE_ITEM_HELD;
@@ -2365,7 +2362,11 @@ static void PM_Weapon( void ) {
 				PM_AddEvent( EV_USE_ITEM0 + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag );
 #endif
 #ifdef TA_HOLDSYS
-				if (pm->ps->holdable[pm->ps->holdableIndex] > 0) {
+				if (pm->ps->holdable[pm->ps->holdableIndex] > 0
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN // Grappling shurikens don't use ammo
+					&& !bg_projectileinfo[BG_ProjectileIndexForHoldable(pm->ps->holdableIndex)].grappling
+#endif
+				) {
 					pm->ps->holdable[pm->ps->holdableIndex]--;
 
 					// It holdable item can no longer be used,
@@ -2381,11 +2382,9 @@ static void PM_Weapon( void ) {
 			return;
 		}
 	}
-#ifndef TA_HOLDABLE
 	else {
 		pm->ps->pm_flags &= ~PMF_USE_ITEM_HELD;
 	}
-#endif
 
 	// make weapon function
 	if ( pm->ps->weaponTime > 0 ) {

@@ -625,9 +625,9 @@ void TossClientCubes( gentity_t *self );
 void G_RunMissile( gentity_t *ent );
 
 #ifdef TA_WEAPSYS
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward,
-		vec3_t right, vec3_t up, holdable_t holdable, int handSide);
+		vec3_t right, vec3_t up, holdable_t holdable);
 #endif
 
 qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
@@ -640,10 +640,6 @@ qboolean fire_weapon(gentity_t *self, vec3_t start, vec3_t forward,
 qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir,
 		int weaponnum, float quadFactor, int handSide);
 #else
-#ifdef TA_HOLDABLE
-gentity_t *fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward,
-		vec3_t right, vec3_t up, holdable_t holdable);
-#endif
 #ifndef IOQ3ZTM // unused
 gentity_t *fire_blaster (gentity_t *self, vec3_t start, vec3_t aimdir);
 #endif
@@ -693,7 +689,7 @@ void SnapVectorTowards( vec3_t v, vec3_t to );
 #ifdef TURTLEARENA // LOCKON
 void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t right, vec3_t up);
 #endif
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable);
 #endif
 #ifdef TA_WEAPSYS // MELEEATTACK

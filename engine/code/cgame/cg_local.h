@@ -1119,15 +1119,6 @@ typedef struct {
 #endif
 	qhandle_t	invulnerabilityPowerupModel;
 
-#ifndef TA_WEAPSYS
-#ifdef TA_HOLDABLE
-	qhandle_t	shurikenModel;
-	qhandle_t	shurikenFireModel;
-	qhandle_t	shurikenElectricModel;
-	qhandle_t	shurikenLaserModel;
-#endif
-#endif
-
 	// scoreboard headers
 	qhandle_t	scoreboardName;
 	qhandle_t	scoreboardPing;
@@ -1794,7 +1785,7 @@ void CG_PrevWeapon_f( void );
 void CG_Weapon_f( void );
 #endif
 
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 void CG_RegisterHoldable( int holdableNum );
 #endif
 #ifdef TA_WEAPSYS

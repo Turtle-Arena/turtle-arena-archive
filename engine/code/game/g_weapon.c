@@ -124,7 +124,7 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 }
 #endif
 
-#ifdef TA_HOLDABLE
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 /*
 ================
 G_ThrowShuriken
@@ -136,22 +136,14 @@ ZTM: TODO: Player animation for throw shuriken and use origin of tag_hand_* (pri
 */
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
 {
-	switch (holdable)
-	{
-		case HI_SHURIKEN:
-		case HI_ELECTRICSHURIKEN:
-		case HI_FIRESHURIKEN:
-		case HI_LASERSHURIKEN:
-			// set aiming directions
-			AngleVectors (ent->client->ps.viewangles, forward, right, up);
-			CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+	if (!BG_ProjectileIndexForHoldable(holdable))
+		return;
 
-			fire_shuriken (ent, muzzle, forward, right, up, holdable, HAND_NONE);
-			break;
-		default:
-			G_Error("Unknown shuriken type (holdable=%d)\n", holdable);
-			return;
-	}
+	// set aiming directions
+	AngleVectors (ent->client->ps.viewangles, forward, right, up);
+	CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+
+	fire_shuriken (ent, muzzle, forward, right, up, holdable);
 }
 #endif
 

@@ -594,14 +594,14 @@ gitem_t	bg_itemlist[] =
 		"sound/items/holdable.wav",
         { 
 		"models/powerups/holdable/medkit.md3", 
-#ifdef TA_HOLDABLE
+#ifdef TA_DATA
 		NULL,
 #else
 		"models/powerups/holdable/medkit_sphere.md3",
 #endif
 		NULL, NULL},
 /* icon */		"icons/medkit",
-#ifdef TA_HOLDABLE
+#ifdef TA_DATA
 /* pickup */	"Pizza-to-Go",
 #else
 /* pickup */	"Medkit",
@@ -1429,13 +1429,6 @@ char	*modNames[] = {
 	"MOD_BFG",
 	"MOD_BFG_SPLASH",
 #endif
-#ifdef TA_HOLDABLE
-	"MOD_SHURIKEN",
-	"MOD_FIRESHURIKEN",
-	"MOD_FIRESHURIKEN_EXPLOSION",
-	"MOD_ELECTRICSHURIKEN",
-	"MOD_LASERSHURIKEN",
-#endif
 	"MOD_WATER",
 	"MOD_SLIME",
 	"MOD_LAVA",
@@ -1463,6 +1456,7 @@ char	*modNames[] = {
 #endif
 	"MOD_GRAPPLE",
 	"MOD_PROJECTILE",
+	"MOD_PROJECTILE_EXPLOSION",
 	"MOD_WEAPON_PRIMARY",
 	"MOD_WEAPON_SECONDARY",
 };
@@ -1498,6 +1492,34 @@ void	trap_FS_FCloseFile( fileHandle_t f );
 //#ifndef CGAME // FIXME
 int		trap_FS_GetFileList( const char *path, const char *extension, char *listbuf, int bufsize );
 //#endif
+
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+int BG_ProjectileIndexForHoldable(int holdable)
+{
+	int projnum;
+
+	switch (holdable)
+	{
+		case HI_SHURIKEN:
+			projnum = BG_ProjectileIndexForName("p_shuriken");
+			break;
+		case HI_ELECTRICSHURIKEN:
+			projnum = BG_ProjectileIndexForName("p_electricshuriken");
+			break;
+		case HI_FIRESHURIKEN:
+			projnum = BG_ProjectileIndexForName("p_fireshuriken");
+			break;
+		case HI_LASERSHURIKEN:
+			projnum = BG_ProjectileIndexForName("p_lasershuriken");
+			break;
+		default:
+			projnum = BG_ProjectileIndexForName(va("p_holdable%d", holdable));
+			break;
+	}
+
+	return projnum;
+}
+#endif
 
 int BG_ProjectileIndexForName(const char *name)
 {
@@ -3252,7 +3274,7 @@ static qboolean NPC_Parse(char **p) {
 	npc.maxs[0] = npc.maxs[1] = 5.0f;
 	npc.maxs[2] = 10.0f;
 
-	npc.viewheight = 20; // ZTM: FIXME: Pulled number out of the air.
+	npc.viewheight = 5; // middle of default bounding box
 
 	animations = npc.animations;
 
@@ -3723,6 +3745,35 @@ qboolean BG_PlayerStandAnim(int a)
 #endif
 	);
 #endif
+}
+
+/*
+==============
+BG_WeaponGroupTotalDamage
+
+Returns the total damage the weaponGroup can do in one frame.
+==============
+*/
+int BG_WeaponGroupTotalDamage(int weaponGroup)
+{
+	int damage = 0;
+	int i, j;
+
+	if (weaponGroup <= 1 || weaponGroup >= BG_NumWeaponGroups()) {
+		return 0;
+	}
+
+	for (i = 0; i < MAX_HANDS; i++) {
+		if (bg_weapongroupinfo[weaponGroup].weapon[i]->projnum) {
+			damage += bg_weapongroupinfo[weaponGroup].weapon[i]->proj->damage*bg_weapongroupinfo[weaponGroup].weapon[i]->proj->numProjectiles;
+		} else {
+			for (j = 0; j < MAX_WEAPON_BLADES; j++) {
+				damage += bg_weapongroupinfo[weaponGroup].weapon[i]->blades[j].damage;
+			}
+		}
+	}
+
+	return damage;
 }
 #endif // TA_WEAPSYS
 
