@@ -1495,10 +1495,10 @@ void ClientThink_real( gentity_t *ent ) {
 			vec3_t viewAngles;
 
 			if (ent->client->pers.cmd.rightmove < 0) { // LEFT, pervTrain
-				client->ps.pm_flags |= PMF_TRAINBACKWARD;
+				client->ps.eFlags |= EF_TRAINBACKWARD;
 				VectorSubtract( ent->pos1, client->ps.origin, dir );
 			} else { // RIGHT, nextTrain
-				client->ps.pm_flags &= ~PMF_TRAINBACKWARD;
+				client->ps.eFlags &= ~EF_TRAINBACKWARD;
 				VectorSubtract( ent->pos2, client->ps.origin, dir );
 			}
 			
@@ -1523,7 +1523,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 #ifdef TA_WEAPSYS
 	// Switch to single handed when close to CTF flag
-	//    ZTM: TODO: Single handed when by weapons too?
 	// ZTM: TODO: Don't allow CTF flag to be picked up while melee attacking?
 	{
 		qboolean holdingFlag = (client->ps.powerups[PW_BLUEFLAG]

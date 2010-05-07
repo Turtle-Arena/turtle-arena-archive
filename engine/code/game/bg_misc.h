@@ -361,6 +361,9 @@ typedef enum {
 #ifdef TA_ENTSYS // FUNC_USE
 #define EF_USE_ENT			0x01000000 // Use entity not holdable item
 #endif
+#ifdef TA_PATHSYS
+#define EF_TRAINBACKWARD	0x02000000
+#endif
 
 #ifdef IOQ3ZTM
 #ifdef TURTLEARENA // AWARDS
@@ -376,7 +379,7 @@ typedef enum {
 	PW_NONE,
 #ifdef TURTLEARENA // POWERS
 	// TODO: Limited time version of PW_AMMOREGEN?
-	// pw_infinity, // Green [White in TA_3] crystal: Unlimited Shuriken for a limited period.
+	// pw_infinity, // Green [White in TMNT3] crystal: Unlimited Shuriken for a limited period.
 
 	// Limited time powerups
 
@@ -385,7 +388,6 @@ typedef enum {
 	PW_HASTE, // PW_SPEED: More Speed
 	PW_INVIS, // Foot Tech powerup?
 
-	// ZTM: TODO: Change flight to NiGHTS mode...
 	PW_FLIGHT,		// Allow player to fly around the level.
 
 	PW_INVUL,		// New invulerrability
@@ -1578,9 +1580,6 @@ typedef struct
 #define PMF_SCOREBOARD		8192	// spectate as a scoreboard
 #ifndef TURTLEARENA // POWERS
 #define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
-#endif
-#ifdef NIGHTSMODE
-#define PMF_TRAINBACKWARD	32768
 #endif
 
 #define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)

@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
-Copyright (C) 2009 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena source code.
 
@@ -26,8 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 /* ZTM: TODO: Finish new general path code,
 		for trains, camera "scripts", NPCs, NiGHTS mode?, 2D mode?
 		and what not.
-
-	It is however unfinish and untested.
 */
 
 #ifdef TA_PATHSYS
@@ -61,8 +59,8 @@ gpathinfo_t gpathinfo[] =
 	// Turtle Arena path entities
 	{ "path_start", PATHF_BEGIN | PATHF_POINT }, // Is there a reason for "start"?
 	{ "path_point", PATHF_POINT },
-	{ "path_axis", PATHF_AXIS }, // Like SRB2's MT_AXIS, for NiGHTS mode. (entity is point to be rotated around)
-	{ "path_end", PATHF_FINISH | PATHF_POINT }, // A end is not needed for circit paths, just link "end" to path_start.
+	{ "path_axis", PATHF_AXIS }, // ZTM: TODO: Like SRB2's MT_AXIS, for NiGHTS mode. (entity is point to be rotated around)
+	{ "path_end", PATHF_FINISH | PATHF_POINT }, // A end is not needed for circit paths
 
 #ifdef NIGHTSMODE
 	// NiGHTS
@@ -246,24 +244,26 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 	return PATH_CIRCIT;
 }
 
-// ZTM: TODO: Replace Reached_Train
+// g_mover.c
+void Think_BeginMoving( gentity_t *ent );
+void SetMoverState( gentity_t *ent, moverState_t moverState, int time );
+
+/*
+===========
+G_ReachedPath
+===========
+*/
 qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 {
 	gentity_t	*point;
-	gentity_t	*next = NULL;
-	gentity_t	*prev = NULL;
 	qboolean	backward;
 
-	if (!ent) {
-		return qfalse;
-	}
-
 #ifdef NIGHTSMODE
-	if (ent->client && check)
+	if (ent->client)
 	{
 		if (ent->client->ps.eFlags & EF_NIGHTSMODE)
 		{
-			backward = (ent->client->ps.pm_flags & PMF_TRAINBACKWARD);
+			backward = (ent->client->ps.eFlags & EF_TRAINBACKWARD);
 		}
 		else
 		{
@@ -275,7 +275,7 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 	else
 #endif
 	{
-		backward = qfalse;
+		backward = (ent->s.eFlags & EF_TRAINBACKWARD);
 	}
 
 	if (backward) {
@@ -286,9 +286,8 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 
 	if (!point)
 	{
-		// end of train, turn around?
-		// ZTM: TODO: spawnflag for trains to allow PATH_LINE support or always support it?
-		return qfalse;		// train just stops
+		// no current point, nothing to do.
+		return qfalse;
 	}
 
 	if ((!backward && point == point->nextTrain) || (backward && point == point->prevTrain))
@@ -306,12 +305,12 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		vec3_t origin;
 		vec_t dist;
 
-		VectorCopy(point->s.origin/*s.pos*/, targetPos);
+		VectorCopy(point->s.origin, targetPos);
 
 		if (ent->client)
 			VectorCopy(ent->client->ps.origin, origin);
 		else
-			VectorCopy(ent->s.origin/*s.pos*/, origin);
+			VectorCopy(ent->s.origin, origin);
 
 #ifdef NIGHTSMODE
 		if (ent->client && (ent->client->ps.eFlags & EF_NIGHTSMODE)) {
@@ -324,31 +323,122 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 			return qfalse;
 	}
 
-	//G_Printf("DEBUG: Reached point!\n");
-
 	// fire all other targets
 	G_UseTargets( point, ent );
 
 	// Setup next move
 	if (backward) {
 		ent->prevTrain = point->prevTrain;
-		ent->nextTrain = point;
+		if (ent->prevTrain) {
+			ent->nextTrain = point;
+		}
 	} else {
-		ent->prevTrain = point;
 		ent->nextTrain = point->nextTrain;
+		if (ent->nextTrain) {
+			ent->prevTrain = point;
+		}
 	}
 
-	prev = ent->prevTrain;
-	next = ent->nextTrain;
-
 	// set the new trajectory
-	if (prev)
-		VectorCopy( prev->s.origin, ent->pos1 );
-	if (next)
-		VectorCopy( next->s.origin, ent->pos2 );
+	if (ent->prevTrain) {
+		VectorCopy( ent->prevTrain->s.origin, ent->pos1 );
+	}
+	if (ent->nextTrain) {
+		VectorCopy( ent->nextTrain->s.origin, ent->pos2 );
+	}
 
+	if (ent->s.eType == ET_MOVER)
+	{
+		float			speed;
+		vec3_t			move;
+		float			length;
+
+		// Next point
+		if (backward)
+			point = ent->prevTrain;
+		else
+			point = ent->nextTrain;
+
+		if (!point)
+		{
+			// end of path
+			if (!(ent->spawnflags & 1))
+			{
+				// Stop train
+				return qfalse;
+			}
+
+			// Go back the way you came
+			backward = !backward;
+			ent->s.eFlags ^= EF_TRAINBACKWARD;
+
+			// Next point
+			if (backward)
+				point = ent->prevTrain;
+			else
+				point = ent->nextTrain;
+
+			if (!point)
+			{
+				// Stop train
+				return qfalse;
+			}
+		}
+
+		// if the path_corner has a speed, use that
+		if ( point->speed ) {
+			speed = point->speed;
+		} else {
+			// otherwise use the train's speed
+			speed = ent->speed;
+		}
+		if ( speed < 1 ) {
+			speed = 1;
+		}
+
+		// calculate duration
+		VectorSubtract( ent->pos2, ent->pos1, move );
+		length = VectorLength( move );
+
+		ent->s.pos.trDuration = length * 1000 / speed;
+
+		// Tequila comment: Be sure to send to clients after any fast move case
+		ent->r.svFlags &= ~SVF_NOCLIENT;
+
+		// Tequila comment: Fast move case
+		if(ent->s.pos.trDuration<1) {
+			// Tequila comment: As trDuration is used later in a division, we need to avoid that case now
+			// With null trDuration,
+			// the calculated rocks bounding box becomes infinite and the engine think for a short time
+			// any entity is riding that mover but not the world entity... In rare case, I found it
+			// can also stuck every map entities after func_door are used.
+			// The desired effect with very very big speed is to have instant move, so any not null duration
+			// lower than a frame duration should be sufficient.
+			// Afaik, the negative case don't have to be supported.
+			ent->s.pos.trDuration=1;
+
+			// Tequila comment: Don't send entity to clients so it becomes really invisible 
+			ent->r.svFlags |= SVF_NOCLIENT;
+		}
+
+		// looping sound
+		ent->s.loopSound = point->soundLoop;
+
+		// start it going
+		if (backward)
+			SetMoverState( ent, MOVER_2TO1, level.time );
+		else
+			SetMoverState( ent, MOVER_1TO2, level.time );
+
+		// if there is a "wait" value on the target, don't start moving yet
+		if ( point->wait ) {
+			ent->nextthink = level.time + point->wait * 1000;
+			ent->think = Think_BeginMoving;
+			ent->s.pos.trType = TR_STATIONARY;
+		}
+	}
 #ifdef NIGHTSMODE
-	if (ent->client && (ent->client->ps.eFlags & EF_NIGHTSMODE))
+	else if (ent->client && (ent->client->ps.eFlags & EF_NIGHTSMODE))
 	{
 		vec3_t dir;
 		vec3_t viewAngles;
@@ -360,6 +450,7 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 			VectorSubtract( ent->pos1, ent->client->ps.origin, dir );
 		else
 			VectorSubtract( ent->pos2, ent->client->ps.origin, dir );
+
 		vectoangles( dir, viewAngles );
 		viewAngles[ROLL] = ent->client->ps.viewangles[ROLL];
 		viewAngles[PITCH] = ent->client->ps.viewangles[PITCH];

@@ -2,10 +2,6 @@
 <!--
  Turtle Arena entity definition file for GtkRadiant 1.5.0 / NetRadiant
  Based on Quake III Arena entity definition file
-
- TODO:
-  Add new WIP path_* entities, path_start path_point path_end
-  Add WIP Nights mode items, nights_start nights_target
 -->
 <classes>
 <!-- Use by many entities -->
@@ -410,6 +406,8 @@ Trains are moving solids that follow a string of path_corner entities. Trains in
 <texture key="_indexmap;alphamap" name="Terrain Blending Map">Path/name for the art file used to guide the mapping of textures on the terrain surface.</texture>
 <integer key="_layers;layers" name="Terrain Layers">Integer value is the number unique root shaders that will be use on the terrain.</integer>
 <texture key="_shader;shader" name="Terrain MetaShader">Path to the metashader used to assign textures to the terrain entity. Note: Omit the "textures/" prefix.</texture>
+-------- SPAWNFLAGS --------
+<flag key="DONT_STOP" name="Don't Stop" bit="0">don't stop when reaching the end of the path, instead goes backward</flag>
 -------- NOTES --------
 1. Trains always start on in the game.
 2. Trains do not damage the played when blocked.
@@ -1275,6 +1273,42 @@ Teleport destination location point for trigger_teleporter entities.
 <!--
 =============================================================================
 
+NIGHTS_* ENTITIES
+
+=============================================================================
+-->
+
+<point name="nights_start" color=".5 0 .5" box="-8 -8 -8 8 8 8">
+NiGHTSize player, then go to the current mare (path entity with targetname "mare_start_1").
+-------- KEYS --------
+<real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
+<real key="wait" name="Corner Delay">number of seconds func_train will pause on entity before moving to next path entity (default 0 - see Notes).</real>
+<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
+<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
+<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+-------- NOTES --------
+Setting the wait key to -1 will not make the train stop on the entity, it will simply default to 0.
+</point>
+
+<point name="nights_target" color=".5 0 .5" box="-8 -8 -8 8 8 8">
+NiGHTS track target. Targetname should be nights_target1, nights_target2, ..., or nights_target9 depending on which mare its on.
+Can be used like a path corner entity for func_trains.
+-------- KEYS --------
+<integer key="health" name="Health">number of blue chips it takes to destroy the target. (default: 20)</integer>
+<target key="target" name="Target">point to next path entity in the path.</target>
+<targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
+<real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
+<real key="wait" name="Corner Delay">number of seconds func_train will pause on entity before moving to next path entity (default 0 - see Notes).</real>
+<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
+<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
+<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+-------- NOTES --------
+Setting the wait key to -1 will not make the train stop on the entity, it will simply default to 0.
+</point>
+
+<!--
+=============================================================================
+
 NPC_* ENTITIES
 
 =============================================================================
@@ -1361,18 +1395,62 @@ PATH_* ENTITIES
 =============================================================================
 -->
 
-<point name="path_corner" color=".5 .3 0" box="-8 -8 -8 8 8 8">
-Path corner entity that func_trains can be made to follow.
+<point name="path_axis" color=".5 .3 0" box="-8 -8 -8 8 8 8">
+TODO: Path axis entity that func_trains can be made to orbit around.
 -------- KEYS --------
-<target key="target" name="Target">point to next path_corner in the path.</target>
-<targetname key="targetname" name="Target Name">the train following the path or the previous path_corner in the path points to this.</targetname>
-<real key="speed" name="Move Speed">speed of func_train while moving to the next path corner. This will override the speed value of the train.</real>
-<real key="wait" name="Corner Delay">number of seconds func_train will pause on path corner before moving to next path corner (default 0 - see Notes).</real>
+<target key="target" name="Target">point to next path entity in the path.</target>
+<targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
+<real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
+<real key="wait" name="Delay">number of seconds func_train will pause on entity before moving to next path entity (default 0 - see Notes).</real>
 <boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
 <boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
 <boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
 -------- NOTES --------
-Setting the wait key to -1 will not make the train stop on the path corner, it will simply default to 0.
+Setting the wait key to -1 will not make the train stop on the entity, it will simply default to 0.
+</point>
+
+<point name="path_corner" color=".5 .3 0" box="-8 -8 -8 8 8 8">
+Path corner entity that func_trains can be made to follow.
+-------- KEYS --------
+<target key="target" name="Target">point to next path entity in the path.</target>
+<targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
+<real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
+<real key="wait" name="Delay">number of seconds func_train will pause on entity before moving to next path entity (default 0 - see Notes).</real>
+<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
+<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
+<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+-------- NOTES --------
+Setting the wait key to -1 will not make the train stop on the entity, it will simply default to 0.
+</point>
+
+<point name="path_end" color=".5 .3 0" box="-8 -8 -8 8 8 8">
+Path end marker entity that func_trains will stop at, unless DONT_STOP spawnflag in func_train is set.
+-------- KEYS --------
+<target key="target" name="Target">point to next path entity in the path.</target>
+<targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
+<real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
+<real key="wait" name="Delay">number of seconds func_train will pause on entity before moving to next path entity (default 0 - see Notes).</real>
+<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
+<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
+<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+-------- NOTES --------
+Setting the wait key to -1 will not make the train stop on the entity, it will simply default to 0.
+</point>
+
+<!-- path_point is like path_corner only it can't start paths. -->
+
+<point name="path_start" color=".5 .3 0" box="-8 -8 -8 8 8 8">
+Path start entity that func_trains can be made to follow.
+-------- KEYS --------
+<target key="target" name="Target">point to next path entity in the path.</target>
+<targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
+<real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
+<real key="wait" name="Delay">number of seconds func_train will pause on entity before moving to next path entity (default 0 - see Notes).</real>
+<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
+<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
+<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+-------- NOTES --------
+Setting the wait key to -1 will not make the train stop on the entity, it will simply default to 0.
 </point>
 
 <!--

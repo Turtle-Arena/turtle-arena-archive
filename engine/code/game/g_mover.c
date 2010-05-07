@@ -1611,6 +1611,9 @@ Reached_Train
 ===============
 */
 void Reached_Train( gentity_t *ent ) {
+#ifdef TA_PATHSYS
+	G_ReachedPath(ent, qfalse);
+#else
 	gentity_t		*next;
 	float			speed;
 	vec3_t			move;
@@ -1678,6 +1681,7 @@ void Reached_Train( gentity_t *ent ) {
 		ent->think = Think_BeginMoving;
 		ent->s.pos.trType = TR_STATIONARY;
 	}
+#endif
 }
 
 
@@ -1690,9 +1694,9 @@ Link all the corners together
 */
 void Think_SetupTrainTargets( gentity_t *ent ) {
 #ifdef TA_PATHSYS
-	if (G_SetupPath(ent, ent->target) == PATH_ERROR)
-	{
-		return;
+	if (G_SetupPath(ent, ent->target) != PATH_ERROR) {
+		// start the train moving from the first corner
+		G_ReachedPath(ent, qfalse);
 	}
 #else
 	gentity_t		*path, *next, *start;
@@ -1731,10 +1735,10 @@ void Think_SetupTrainTargets( gentity_t *ent ) {
 
 		path->nextTrain = next;
 	}
-#endif
 
 	// start the train moving from the first corner
 	Reached_Train( ent );
+#endif
 }
 
 

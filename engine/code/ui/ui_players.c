@@ -1069,7 +1069,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	// add the spinning barrel
 	//
 #ifdef TA_WEAPSYS
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < MAX_HANDS; i++)
 #else
 	if ( pi->realWeapon == WP_MACHINEGUN || pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG )
 #endif
@@ -1127,7 +1127,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #ifdef TA_WEAPSYS
 		vec3_t *flashDlightColor;
 		
-		for (i = 0; i < 2; i++)
+		for (i = 0; i < MAX_HANDS; i++)
 		{
 			memset( &flash, 0, sizeof(flash) );
 			if (i == 1) {

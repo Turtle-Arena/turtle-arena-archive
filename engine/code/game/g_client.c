@@ -2143,64 +2143,100 @@ NiGHTS mode
 ============
 */
 
+#define MAX_MARES 10
+
 // Go out of Nights mode, nights time ran out.
 void G_DeNiGHTSizePlayer( gentity_t *ent )
 {
 	if (!ent || !ent->client)
 		return;
 
+	ent->client->mare = 0;
 	ent->client->ps.powerups[PW_FLIGHT] = 0;
 	ent->client->ps.eFlags &= ~EF_NIGHTSMODE;
 }
 
-#if 0
-int G_FindCurrentNightsTarget(void)
+int G_NumMares(void)
 {
-	int mare = 1;
-	gentity_t *target;
-	
-	for (mare = 1; mare < 10; mare++)
+	int mare = 0;
+	int i;
+
+	for (i = 1; i < MAX_MARES; i++)
 	{
-		target = G_Find( NULL, FOFS(targetname), va("nights_target_%d", mare) );
-		if ( !target ) {
-			continue;
-		}
-		if (target->health)
-			return mare;
+		if (!G_Find( NULL, FOFS(targetname), va("mare_start_%d", i) ))
+			break;
+
+		mare++;
 	}
+
+	return mare;
 }
-#endif
 
 // Go into Nights mode
 void G_NiGHTSizePlayer( gentity_t *ent )
 {
-	static int mare = 1;
+	int mare;
+	gentity_t *target;
 
 	if (!ent || !ent->client)
 		return;
 
-#if 0
-	// ZTM: TODO: Find lowest mare with a undead nights_target
+	// Find lowest mare with a undead nights_target
 	//     find mare_start_1 thought mare_start_9 and look for nights_target,
 	//		if found and alive use path.
-	mare = 1;
-#endif
+	for (mare = 1; mare < MAX_MARES; mare++)
+	{
+		if ((target = G_Find( NULL, FOFS(targetname), va("nights_target%d", mare) )))
+		{
+			if (target->health)
+				break;
+		}
+	}
+
+	if (mare == MAX_MARES)
+	{
+		if (g_gametype.integer == GT_SINGLE_PLAYER)
+		{
+			// No targets left, do level end.
+			ent->client->finishTime = level.time;
+			return;
+		}
+		else
+		{
+			// ZTM: TODO: Fix gametype != GT_SINGLE_PLAYER mare switching when all the nights_target are dead.
+			//				Avoid changing mare when player hasn't left nights_start
+
+			// Just loop around the mares.
+			if (ent->client->ps.eFlags & EF_TRAINBACKWARD)
+				mare = ent->client->mare-1;
+			else
+				mare = ent->client->mare+1;
+
+			if (mare < 1)
+				mare = G_NumMares();
+			else if (mare > G_NumMares())
+				mare = 1;
+		}
+	}
+
+	if (mare == ent->client->mare)
+		return;
+
+	ent->client->mare = mare;
+
+	//G_Printf("DEBUG: Entered new mare %d\n", mare);
 
 	if (!G_Find( NULL, FOFS(targetname), va("mare_start_%d", mare) )
 		|| G_SetupPath(ent, va("mare_start_%d", mare)) == PATH_ERROR)
 	{
-		if (mare == 1)
+		if (ent->client->mare == 1)
 			return;
 
-		mare = 1;
+		ent->client->mare = 1;
 		if (G_SetupPath(ent, "mare_start_1") == PATH_ERROR)
 		{
 			return;
 		}
-	}
-	else
-	{
-		mare++;
 	}
 
 	ent->client->ps.eFlags |= EF_NIGHTSMODE;
@@ -2226,6 +2262,9 @@ void SP_nights_start( gentity_t *ent )
 	ent->flags = FL_NO_KNOCKBACK;
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->touch = Drone_Touch;
+
+	// ZTM: TODO: In Single Player remove model when player is NiGHTS, and put it back when they lose NiGHTS mode
+	ent->s.modelindex = G_ModelIndex(BG_FindItemForPowerup(PW_FLIGHT)->world_model[0]);
 
 	G_SetOrigin( ent, ent->s.origin );
 
