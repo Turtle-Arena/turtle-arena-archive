@@ -72,6 +72,8 @@ Weapons (and attacking)
   * STARTED (TA_HOLDABLE): Make shurikens/holdable-projectiles general like weapons groups.
     * (So they can be totally configured from .weap, and add new ones)
 
+  * TODO: Cleanup CG_AddPlayerWeapon like CG_AddDefaultPlayerWeapon
+
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
 

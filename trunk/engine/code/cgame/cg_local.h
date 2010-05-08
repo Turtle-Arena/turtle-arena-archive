@@ -190,7 +190,10 @@ typedef struct {
 	int				barrelTime;
 	qboolean		barrelSpinning;
 
-#ifdef IOQ3ZTM
+#ifdef TA_WEAPSYS
+	// Hook grapple chain to flash origin
+	vec3_t flashOrigin[MAX_HANDS];
+#elif defined IOQ3ZTM
 	// Hook grapple chain to flash origin
 	vec3_t flashOrigin;
 #endif
