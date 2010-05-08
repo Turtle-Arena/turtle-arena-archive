@@ -533,13 +533,6 @@ typedef struct weaponInfo_s {
 
 	void			(*ejectBrassFunc)( centity_t * );
 
-	// loopped sounds
-	sfxHandle_t		readySound;
-	sfxHandle_t		firingSound;
-
-	// sounds played once
-	sfxHandle_t		firingStoppedSound; // gun barrel stopped spining
-
 	// wall marks for melee weapons, gun have projectiles with wallmarks
 	qhandle_t		wallmarkShader;
 	int				wallmarkRadius;
@@ -564,6 +557,13 @@ typedef struct weaponGroupInfo_s {
 
 	qhandle_t		ammoModel;
 #endif
+
+	// loopped sounds
+	sfxHandle_t		readySound;
+	sfxHandle_t		firingSound;
+
+	// sounds played once
+	sfxHandle_t		firingStoppedSound; // gun barrel stopped spining
 
 } weaponGroupInfo_t;
 #else

@@ -1017,8 +1017,6 @@ weapon "w_grappling_hook"
 	continuousFlash 1 // update chain position
 	ejectSmoke 1
 	flashColor 0 0 0 // no flash
-	//readySound "sound/weapons/melee/fsthum.wav"
-	//firingSound "sound/weapons/melee/fstrun.wav"
 	flashSound0 "sound/weapons/grapple/grapplef1a.wav"
 	projectile "p_grappling hook"
 }
@@ -1032,6 +1030,8 @@ weapongroup "wp_grappling_hook"
 	pickupModel "models/weapons2/grapple/grapple.md3"
 	iconName "icons/iconw_grapple"
 	//pickupAmmo 1		// grappling projectiles use no ammo.
+	//readySound "sound/weapons/melee/fsthum.wav"
+	//firingSound "sound/weapons/melee/fstrun.wav"
 	weapon_primary "w_grappling_hook"
 
 	normalAnims

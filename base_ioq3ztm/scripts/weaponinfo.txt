@@ -37,7 +37,6 @@ weapon "w_gauntlet"
 	//wallmarkRadius 12
 	continuousFlash 1
 	flashColor 0.6 0.6 1.0
-	firingSound "sound/weapons/melee/fstrun.wav"
 	flashSound0 "sound/weapons/melee/fstatck.wav"
 	//barrelSpin BS_PITCH
 
@@ -58,6 +57,7 @@ weapongroup "wp_gauntlet"
 	pickupName "Gauntlet"
 	pickupModel "models/weapons2/gauntlet/gauntlet.md3"
 	iconName "icons/iconw_gauntlet"
+	firingSound "sound/weapons/melee/fstrun.wav"
 	weapon_primary "w_gauntlet"
 
 	normalAnims
@@ -271,8 +271,6 @@ weapon "w_lightning"
 	flashColor 0.6 0.6 1
 	continuousFlash 1
 	flashSound0 "sound/weapons/lightning/lg_fire.wav"
-	firingSound "sound/weapons/lightning/lg_hum.wav"
-	readySound "sound/weapons/melee/fsthum.wav"
 	projectile "p_lightning"
 }
 
@@ -284,6 +282,8 @@ weapongroup "wp_lightning"
 	pickupModel "models/weapons2/lightning/lightning.md3"
 	iconName "icons/iconw_lightning"
 	pickupAmmo 100
+	firingSound "sound/weapons/lightning/lg_hum.wav"
+	readySound "sound/weapons/melee/fsthum.wav"
 	weapon_primary "w_lightning"
 }
 
@@ -313,7 +313,6 @@ weapon "w_railgun"
 	attackDelay 1500
 	flashColor 1 0.5 0
 	flashSound0 "sound/weapons/railgun/railgf1a.wav"
-	readySound "sound/weapons/railgun/rg_hum.wav"
 	projectile "p_rail"
 }
 
@@ -324,6 +323,7 @@ weapongroup "wp_railgun"
 	pickupModel "models/weapons2/railgun/railgun.md3"
 	iconName "icons/iconw_railgun"
 	pickupAmmo 10
+	readySound "sound/weapons/railgun/rg_hum.wav"
 	weapon_primary "w_railgun"
 }
 
@@ -397,7 +397,6 @@ weapon "w_bfg"
 	splashMod MOD_BFG_SPLASH
 	flashColor 1 0.7 1
 	flashSound0 "sound/weapons/bfg/bfg_fire.wav"
-	readySound "sound/weapons/bfg/bfg_hum.wav"
 	//barrelSpin BS_PITCH
 	projectile "p_bfg"
 }
@@ -409,6 +408,7 @@ weapongroup "wp_bfg"
 	pickupModel "models/weapons2/bfg/bfg.md3"
 	iconName "icons/iconw_bfg"
 	pickupAmmo 20
+	readySound "sound/weapons/bfg/bfg_hum.wav"
 	weapon_primary "w_bfg"
 }
 
@@ -437,8 +437,6 @@ weapon "w_grappling_hook"
 	attackDelay 400
 	continuousFlash 1
 	flashColor 0.6 0.6 1.0
-	readySound "sound/weapons/melee/fsthum.wav"
-	firingSound "sound/weapons/melee/fstrun.wav"
 	projectile "p_grappling_hook"
 }
 
@@ -450,6 +448,8 @@ weapongroup "wp_grappling_hook"
 	pickupModel "models/weapons2/grapple/grapple.md3"
 	iconName "icons/iconw_grapple"
 	// NOTE: grappling projectiles use no ammo.
+	readySound "sound/weapons/melee/fsthum.wav"
+	firingSound "sound/weapons/melee/fstrun.wav"
 	weapon_primary "w_grappling_hook"
 }
 
@@ -580,7 +580,6 @@ weapon "w_chaingun"
 	flashSound1 "sound/weapons/vulcan/vulcanf2b.wav"
 	flashSound2 "sound/weapons/vulcan/vulcanf3b.wav"
 	flashSound3 "sound/weapons/vulcan/vulcanf4b.wav"
-	firingStoppedSound "sound/weapons/vulcan/wvulwind.wav"
 	projectile "p_chaingun"
 }
 
@@ -591,6 +590,7 @@ weapongroup "wp_chaingun"
 	pickupModel "models/weapons/vulcan/vulcan.md3"
 	iconName "icons/iconw_chaingun"
 	pickupAmmo 80
+	firingStoppedSound "sound/weapons/vulcan/wvulwind.wav"
 	weapon_primary "w_chaingun"
 }
 
