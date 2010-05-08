@@ -1162,10 +1162,6 @@ void CG_RegisterWeapon( int weaponNum )
 	weaponInfo->wallmarkRadius = weap->wallmarkRadius;
 
 	// Sounds
-	if (weap->readySoundName[0] != '\0')
-		weaponInfo->readySound = trap_S_RegisterSound( weap->readySoundName, qfalse );
-	if (weap->firingSoundName[0] != '\0')
-		weaponInfo->firingSound = trap_S_RegisterSound( weap->firingSoundName, qfalse );
 	if (weap->flashSoundName[0][0] != '\0')
 		weaponInfo->flashSound[0] = trap_S_RegisterSound( weap->flashSoundName[0], qfalse );
 	if (weap->flashSoundName[1][0] != '\0')
@@ -1174,9 +1170,6 @@ void CG_RegisterWeapon( int weaponNum )
 		weaponInfo->flashSound[2] = trap_S_RegisterSound( weap->flashSoundName[2], qfalse );
 	if (weap->flashSoundName[3][0] != '\0')
 		weaponInfo->flashSound[3] = trap_S_RegisterSound( weap->flashSoundName[3], qfalse );
-	if (weap->firingStoppedSoundName[0] != '\0')
-		weaponInfo->firingStoppedSound = trap_S_RegisterSound( weap->firingStoppedSoundName, qfalse );
-
 
 	// \unused
 	//weaponInfo->ejectBrassFunc = NULL;
@@ -1367,8 +1360,16 @@ void CG_RegisterWeapon( int weaponNum )
 #endif
 
 #ifdef TA_WEAPSYS
-	CG_RegisterWeapon(bg_weapongroupinfo[weaponNum].weaponnum[0]);
-	CG_RegisterWeapon(bg_weapongroupinfo[weaponNum].weaponnum[1]);
+	if (bg_weapongroupinfo[weaponNum].readySoundName[0] != '\0')
+		weaponInfo->readySound = trap_S_RegisterSound( bg_weapongroupinfo[weaponNum].readySoundName, qfalse );
+	if (bg_weapongroupinfo[weaponNum].firingSoundName[0] != '\0')
+		weaponInfo->firingSound = trap_S_RegisterSound( bg_weapongroupinfo[weaponNum].firingSoundName, qfalse );
+	if (bg_weapongroupinfo[weaponNum].firingStoppedSoundName[0] != '\0')
+		weaponInfo->firingStoppedSound = trap_S_RegisterSound( bg_weapongroupinfo[weaponNum].firingStoppedSoundName, qfalse );
+
+	for (i = 0; i < MAX_HANDS; i++) {
+		CG_RegisterWeapon(bg_weapongroupinfo[weaponNum].weaponnum[i]);
+	}
 #else
 	switch ( weaponNum ) {
 	case WP_GAUNTLET:
@@ -1975,7 +1976,7 @@ static float	CG_MachinegunSpinAngle( centity_t *cent ) {
 #ifdef TA_WEAPSYS
 		// Stopped firing, play sound
 		if ( !cent->pe.barrelSpinning ) {
-			trap_S_StartSound( NULL, cent->currentState.number, CHAN_WEAPON, cg_weapons[bg_weapongroupinfo[cent->currentState.weapon].weaponnum[0]].firingStoppedSound );
+			trap_S_StartSound( NULL, cent->currentState.number, CHAN_WEAPON, cg_weapongroups[cent->currentState.weapon].firingStoppedSound );
 		}
 #else
 #ifdef MISSIONPACK
@@ -2449,27 +2450,29 @@ sound should only be done on the world model case.
 =============
 */
 void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team) {
+#ifndef TA_WEAPSYS
 	refEntity_t	gun;
+#endif
 	refEntity_t	barrel;
 	refEntity_t	flash;
 	int flashDLight;
 	vec3_t		angles;
 	weapon_t	weaponNum;
-#ifdef TA_WEAPSYS
-	weaponGroupInfo_t	*weapon;
-	int i;
-#else
+#ifndef TA_WEAPSYS
 	weaponInfo_t	*weapon;
 #endif
 	centity_t	*nonPredictedCent;
 #ifdef TA_WEAPSYS
-	qboolean	drawFlash;
-	float		barrelSpinAngle;
-	refEntity_t	gun_left; // Left (secondary) hand weapon.
-	//refEntity_t	gun; // Right (primary) hand weapon.
-	// When "both hand" share the weapon, primary hand tag is used.
-	qboolean draw_primary = qfalse, draw_secondary = qfalse;
-	clientInfo_t	*ci;
+	qboolean			drawFlash;
+	float				barrelSpinAngle;
+	bg_weapongroupinfo_t *weaponGroup;
+	refEntity_t			gun[MAX_HANDS];
+	qboolean			drawWeapon[MAX_HANDS];
+	int					i;
+	clientInfo_t		*ci;
+	qboolean			foundModel;
+	char *newTagNames[3] = { "tag_hand_primary", "tag_hand_secondary", NULL };
+	char *originalTagNames[3] = { "tag_weapon", "tag_flag", NULL };
 
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #else
@@ -2480,7 +2483,8 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 #ifdef TA_WEAPSYS
 	CG_RegisterWeaponGroup( weaponNum );
-	weapon = &cg_weapongroups[weaponNum];
+
+	weaponGroup = &bg_weapongroupinfo[weaponNum];
 #else
 	CG_RegisterWeapon( weaponNum );
 	weapon = &cg_weapons[weaponNum];
@@ -2488,29 +2492,64 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 #ifdef TA_WEAPSYS
 	// If world model, add default weapon
-	if (ps == NULL)
-	{
+	if (ps == NULL) {
 		CG_AddPlayerDefaultWeapon(parent, cent, team);
 	}
 
-	if (cent->currentState.weapon <= 0 || cent->currentState.weapon >= BG_NumWeaponGroups())
-	{
+	if (cent->currentState.weapon <= 0 || cent->currentState.weapon >= BG_NumWeaponGroups()) {
 		return;
 	}
 #endif
 
 	// add the weapon
 	memset( &gun, 0, sizeof( gun ) );
+
+#ifdef TA_WEAPSYS
+	VectorCopy( parent->lightingOrigin, gun[0].lightingOrigin );
+	gun[0].shadowPlane = parent->shadowPlane;
+	gun[0].renderfx = parent->renderfx;
+#else
 	VectorCopy( parent->lightingOrigin, gun.lightingOrigin );
 	gun.shadowPlane = parent->shadowPlane;
 	gun.renderfx = parent->renderfx;
+#endif
 
 	// set custom shading for railgun refire rate
-	if ( ps ) {
-		if (
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black.
+	if ( ps &&
 #ifndef TA_WEAPSYS // ZTM: Do it for all weapons.
-			cg.predictedPlayerState.weapon == WP_RAILGUN &&
+		cg.predictedPlayerState.weapon == WP_RAILGUN && 
 #endif
+		cg.predictedPlayerState.weaponstate == WEAPON_FIRING )
+	{
+		float	f;
+
+		f = (float)cg.predictedPlayerState.weaponTime / 1500;
+#ifdef TA_WEAPSYS
+		gun[0].shaderRGBA[1] = 0;
+		gun[0].shaderRGBA[0] = 
+		gun[0].shaderRGBA[2] = 255 * ( 1.0 - f );
+#else
+		gun.shaderRGBA[1] = 0;
+		gun.shaderRGBA[0] = 
+		gun.shaderRGBA[2] = 255 * ( 1.0 - f );
+#endif
+	} else {
+#ifdef TA_WEAPSYS
+		gun[0].shaderRGBA[0] = 255;
+		gun[0].shaderRGBA[1] = 255;
+		gun[0].shaderRGBA[2] = 255;
+		gun[0].shaderRGBA[3] = 255;
+#else
+		gun.shaderRGBA[0] = 255;
+		gun.shaderRGBA[1] = 255;
+		gun.shaderRGBA[2] = 255;
+		gun.shaderRGBA[3] = 255;
+#endif
+	}
+#else
+	if ( ps ) {
+		if ( cg.predictedPlayerState.weapon == WP_RAILGUN &&
 			cg.predictedPlayerState.weaponstate == WEAPON_FIRING )
 		{
 			float	f;
@@ -2527,33 +2566,29 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		}
 
 	}
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black.
-	else
-	{
-		gun.shaderRGBA[0] = 255;
-		gun.shaderRGBA[1] = 255;
-		gun.shaderRGBA[2] = 255;
-		gun.shaderRGBA[3] = 255;
-	}
 #endif
 
 #ifdef TA_WEAPSYS
+	foundModel = qfalse;
+
 	// Copy the primary hand weapon to the secondary hand weapon.
-	memcpy( &gun_left, &gun, sizeof( gun_left ) );
-#endif
+	for (i = 0; i < MAX_HANDS; i++)
+	{
+		if (i > 0) {
+			memcpy( &gun[i], &gun[0], sizeof( gun[0] ) );
+		}
+		gun[i].hModel = cg_weapons[weaponGroup->weaponnum[i]].weaponModel;
+		
+		if (gun[i].hModel) {
+			foundModel = qtrue;
+		}
+	}
 
-#ifdef TA_WEAPSYS
-	gun.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].weaponModel;
-#else
-	gun.hModel = weapon->weaponModel;
-#endif
-#ifdef TA_WEAPSYS
-	// ZTM: Allow different model to be used in each hand!
-	gun_left.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[1]].weaponModel;
-	if (!gun.hModel && !gun_left.hModel) {
+	if (!foundModel) {
 		return;
 	}
 #else
+	gun.hModel = weapon->weaponModel;
 	if (!gun.hModel) {
 		return;
 	}
@@ -2564,7 +2599,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		cent->pe.lightningFiring = qfalse;
 		if ( ( cent->currentState.eFlags & EF_FIRING ) &&
 #ifdef TA_WEAPSYS
-			cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].firingSound
+			cg_weapongroups[weaponNum].firingSound
 #else
 			weapon->firingSound
 #endif
@@ -2572,117 +2607,85 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			// lightning gun and guantlet make a different sound when fire is held down
 			trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin,
 #ifdef TA_WEAPSYS
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].firingSound
+					cg_weapongroups[weaponNum].firingSound
 #else
-				weapon->firingSound
+					weapon->firingSound
 #endif
-				);
+					);
 			cent->pe.lightningFiring = qtrue;
 		} else if (
 #ifdef TA_WEAPSYS
-			cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].readySound
+			cg_weapongroups[weaponNum].readySound
 #else
 			weapon->readySound
 #endif
 			) {
 			trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin,
 #ifdef TA_WEAPSYS
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].readySound
+					cg_weapongroups[weaponNum].readySound
 #else
-				weapon->readySound
+					weapon->readySound
 #endif
-				);
+					);
 		}
 	}
 
 #ifdef TA_WEAPSYS
 	// get hands from cent
-	if (cent->currentState.weaponHands & HAND_PRIMARY)
+	for (i = 0; i < MAX_HANDS; i++)
 	{
-		draw_primary = qtrue;
-	}
-	if (cent->currentState.weaponHands & HAND_SECONDARY)
-	{
-		draw_secondary = qtrue;
+		drawWeapon[i] = ((cent->currentState.weaponHands & (1<<i)) && gun[i].hModel);
+
+		if (!originalTagNames[i]
+#ifdef TA_PLAYERS
+			|| !newTagNames[i]
+#endif
+			)
+		{
+			break;
+		}
+
+		if (drawWeapon[i])
+		{
+			// ZTM: TODO: Use ci->tagInfo to speed up tests?
+			if (
+#ifdef TA_PLAYERS
+				!CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, newTagNames[i]) &&
+#endif
+				!CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, originalTagNames[i]))
+			{
+				// Failed to find tag
+				continue;
+			}
+
+			CG_AddWeaponWithPowerups( &gun[i], cent->currentState.powerups );
+
+			// MELEE_TRAIL
+			CG_AddWeaponTrail(cent, &gun[i], HAND_PRIMARY, qfalse);
+		}
 	}
 
-	// Primary weapon.
-	if ( draw_primary && gun.hModel ) {
-#ifdef TA_WEAPSYS
-		if (ci->tagInfo & TI_TAG_HAND_PRIMARY)
-		{
-			CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_hand_primary");
-		}
-#ifdef TA_SUPPORTQ3
-		else if (ci->tagInfo & TI_TAG_WEAPON)
-		{
-			CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_weapon");
-		}
-#endif
-#elif defined TA_PLAYERS
-		CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_hand_primary");
+	// Even if no barrel, check for firingStoppedSound
+	barrelSpinAngle = CG_MachinegunSpinAngle( cent );
 #else
-		trap_R_LerpTag(&lerped, parent->hModel, parent->oldframe, parent->frame,
-			1.0 - parent->backlerp, "tag_weapon");
-		VectorCopy(parent->origin, gun.origin);
-	  
-		VectorMA(gun.origin, lerped.origin[0], parent->axis[0], gun.origin);
+	trap_R_LerpTag(&lerped, parent->hModel, parent->oldframe, parent->frame,
+		1.0 - parent->backlerp, "tag_weapon");
+	VectorCopy(parent->origin, gun.origin);
+  
+	VectorMA(gun.origin, lerped.origin[0], parent->axis[0], gun.origin);
 
-		// Make weapon appear left-handed for 2 and centered for 3
-		if(ps && cg_drawGun.integer == 2)
-			VectorMA(gun.origin, -lerped.origin[1], parent->axis[1], gun.origin);
-		else if(!ps || cg_drawGun.integer != 3)
-		   	VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
+	// Make weapon appear left-handed for 2 and centered for 3
+	if(ps && cg_drawGun.integer == 2)
+		VectorMA(gun.origin, -lerped.origin[1], parent->axis[1], gun.origin);
+	else if(!ps || cg_drawGun.integer != 3)
+		VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
 
-		VectorMA(gun.origin, lerped.origin[2], parent->axis[2], gun.origin);
+	VectorMA(gun.origin, lerped.origin[2], parent->axis[2], gun.origin);
 
-		MatrixMultiply(lerped.axis, ((refEntity_t *)parent)->axis, gun.axis);
-		gun.backlerp = parent->backlerp;
-#endif
-
-		CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
-
-		// MELEE_TRAIL
-		CG_AddWeaponTrail(cent, &gun, HAND_PRIMARY, qfalse);
-	}
-
-	// Secondary weapon.
-	if ( draw_secondary && gun_left.hModel ) {
-#ifdef TA_WEAPSYS
-		if (ci->tagInfo & TI_TAG_HAND_SECONDARY)
-		{
-			CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_hand_secondary");
-		}
-#ifdef TA_SUPPORTQ3
-		else if (ci->tagInfo & TI_TAG_FLAG)
-		{
-			CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_flag");
-		}
-#endif
-#elif defined TA_PLAYERS
-		CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_hand_secondary");
-#else
-		CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_flag");
-#endif
-		CG_AddWeaponWithPowerups( &gun_left, cent->currentState.powerups );
-
-		// MELEE_TRAIL
-		CG_AddWeaponTrail(cent, &gun_left, HAND_SECONDARY, qfalse);
-	}
-
-	// NOTE: Any weapon type can have a barrel model and/or flash model
-	//         (And firingStoppedSound)
-#else
-	CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_weapon");
+	MatrixMultiply(lerped.axis, ((refEntity_t *)parent)->axis, gun.axis);
+	gun.backlerp = parent->backlerp;
 
 	CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
-#endif
-
-#ifdef TA_WEAPSYS
-	// Even if no barrel check for firingStoppedSound
-	// ZTM: FIXME: Both weapons share the same barrelSpinAngle/firingStoppedSound
-	//                      (Bad for nunchucks?)
-	barrelSpinAngle = CG_MachinegunSpinAngle( cent );
 #endif
 
 	// add the spinning barrel
@@ -2693,18 +2696,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 	{
 #ifdef TA_WEAPSYS
-		if (i == 1)
-		{
-			if (!draw_secondary)
-				continue;
-		}
-		else
-		{
-			if (!draw_primary)
-				continue;
-		}
-
-		if (!cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].barrelModel)
+		if (!drawWeapon[i] || !cg_weapons[weaponGroup->weaponnum[i]].barrelModel)
 			continue;
 #endif
 		memset( &barrel, 0, sizeof( barrel ) );
@@ -2713,7 +2705,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		barrel.renderfx = parent->renderfx;
 
 #ifdef TA_WEAPSYS
-		barrel.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].barrelModel;
+		barrel.hModel = cg_weapons[weaponGroup->weaponnum[i]].barrelModel;
 
 		// ZTM: TESTME: In the UI there are checks for gauntlet and BFG
 		//                        to spin pitch, but not here?
@@ -2722,12 +2714,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		// So the code in the UI isn't getting run, ui ALWAYS spins ROLL
 		//		(even with the checks).
 		VectorClear(angles);
-		if (bg_weapongroupinfo[weaponNum].weapon[i]->barrelSpin != BS_NONE)
+		if (weaponGroup->weapon[i]->barrelSpin != BS_NONE)
 		{
-			if (i == 1) // Spin other direction
-				angles[bg_weapongroupinfo[weaponNum].weapon[i]->barrelSpin] = 360-barrelSpinAngle;
+			if (i & 1) // Spin other direction
+				angles[weaponGroup->weapon[i]->barrelSpin] = 360-barrelSpinAngle;
 			else
-				angles[bg_weapongroupinfo[weaponNum].weapon[i]->barrelSpin] = barrelSpinAngle;
+				angles[weaponGroup->weapon[i]->barrelSpin] = barrelSpinAngle;
 		}
 #else
 		barrel.hModel = weapon->barrelModel;
@@ -2739,18 +2731,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		AnglesToAxis( angles, barrel.axis );
 
 #ifdef TA_WEAPSYS
-		if (i == 1)
-		{
-			CG_PositionRotatedEntityOnTag( &barrel, &gun_left,
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
-				"tag_barrel" );
-		}
-		else
-		{
-			CG_PositionRotatedEntityOnTag( &barrel, &gun,
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
-				"tag_barrel" );
-		}
+		CG_PositionRotatedEntityOnTag( &barrel, &gun[i], gun[i].hModel, "tag_barrel" );
 #else
 		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, "tag_barrel" );
 #endif
@@ -2783,7 +2764,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 		if (
 #ifdef TA_WEAPSYS
-			( bg_weapongroupinfo[weaponNum].weapon[i]->flags & WIF_CONTINUOUS_FLASH )
+			( weaponGroup->weapon[i]->flags & WIF_CONTINUOUS_FLASH )
 #else
 			( weaponNum == WP_LIGHTNING || weaponNum == WP_GAUNTLET || weaponNum == WP_GRAPPLING_HOOK )
 #endif
@@ -2808,7 +2789,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		flash.renderfx = parent->renderfx;
 
 #ifdef TA_WEAPSYS
-		flash.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashModel;
+		flash.hModel = cg_weapons[weaponGroup->weaponnum[i]].flashModel;
 #else
 		flash.hModel = weapon->flashModel;
 #endif
@@ -2849,12 +2830,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 
 #ifdef TA_WEAPSYS
-		if (i == 1)
-			CG_PositionRotatedEntityOnTag( &flash, &gun_left,
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel, "tag_flash");
-		else
-			CG_PositionRotatedEntityOnTag( &flash, &gun,
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel, "tag_flash");
+		CG_PositionRotatedEntityOnTag( &flash, &gun[i], gun[i].hModel, "tag_flash");
 #else
 		CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, "tag_flash");
 #endif
@@ -2878,11 +2854,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			if (!drawFlash) {
 				continue;
 			}
-#endif
-
-#ifdef TA_WEAPSYS
-			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->trailType == PT_LIGHTNING
-				&& bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->instantDamage)
+ 
+			if (weaponGroup->weapon[i]->proj->trailType == PT_LIGHTNING
+				&& weaponGroup->weapon[i]->proj->instantDamage)
 #endif
 			{
 				// add lightning bolt
@@ -2890,7 +2864,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			}
 
 #ifdef TA_WEAPSYS
-			if ( bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->trailType == PT_RAIL)
+			if ( weaponGroup->weapon[i]->proj->trailType == PT_RAIL)
 #endif
 			{
 				// add rail trail
@@ -2904,14 +2878,14 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			flashDLight = 300 + (rand()&31);
 #endif
 #ifdef TA_WEAPSYS
-			if (cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[0]
-				|| cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[1]
-				|| cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[2])
+			if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0]
+				|| cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1]
+				|| cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2])
 			{
 				trap_R_AddLightToScene( flash.origin, flashDLight,
-					cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[0],
-					cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[1],
-					cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].flashDlightColor[2] );
+					cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0],
+					cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1],
+					cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2] );
 			}
 #else
 			if ( weapon->flashDlightColor[0] || weapon->flashDlightColor[1] || weapon->flashDlightColor[2] ) {

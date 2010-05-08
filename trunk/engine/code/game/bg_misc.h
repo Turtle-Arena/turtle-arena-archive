@@ -686,9 +686,6 @@ typedef struct
 	int attackDelay;
 
 	// sounds
-	char readySoundName[MAX_QPATH];
-	char firingSoundName[MAX_QPATH];
-	char firingStoppedSoundName[MAX_QPATH];
 	char flashSoundName[4][MAX_QPATH];
 
 	// bit flags
@@ -776,6 +773,11 @@ typedef struct
 	char iconName[MAX_QPATH];
 	char pickupName[MAX_QPATH]; // Example; "Sais"
 	// pickupAmmo is stored in "item.quantity"
+
+	// Sounds
+	char readySoundName[MAX_QPATH];
+	char firingSoundName[MAX_QPATH];
+	char firingStoppedSoundName[MAX_QPATH];
 
 	// Weapon pointers
 	bg_weaponinfo_t *weapon[MAX_HANDS];

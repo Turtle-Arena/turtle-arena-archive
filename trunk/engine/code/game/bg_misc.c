@@ -2478,22 +2478,6 @@ static qboolean Weapon_Parse(char **p) {
 			weapon.projnum = BG_ProjectileIndexForName(token);
 			weapon.proj = &bg_projectileinfo[weapon.projnum];
 			continue;
-		} else if ( !Q_stricmp( token, "readySound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.readySoundName, sizeof (weapon.readySoundName), "%s", token);
-			} else {
-				weapon.readySoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "firingSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.firingSoundName, sizeof (weapon.firingSoundName), "%s", token);
-			} else {
-				weapon.firingSoundName[0] = '\0';
-			}
-			continue;
 		} else if ( !Q_stricmp( token, "flashSound0" ) ) {
 			token = COM_Parse( p );
 			if ( *token ) {
@@ -2524,14 +2508,6 @@ static qboolean Weapon_Parse(char **p) {
 				Com_sprintf(weapon.flashSoundName[3], sizeof (weapon.flashSoundName[3]), "%s", token);
 			} else {
 				weapon.flashSoundName[3][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "firingStoppedSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.firingStoppedSoundName, sizeof (weapon.firingStoppedSoundName), "%s", token);
-			} else {
-				weapon.firingStoppedSoundName[0] = '\0';
 			}
 			continue;
 		} else if ( !Q_stricmp( token, "barrelSpin" ) ) {
@@ -2791,6 +2767,30 @@ static qboolean WeaponGroup_Parse(char **p) {
 			}
 			weaponGroup.item.quantity = atoi(token);
 			continue;
+		} else if ( !Q_stricmp( token, "readySound" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(weaponGroup.readySoundName, sizeof (weaponGroup.readySoundName), "%s", token);
+			} else {
+				weaponGroup.readySoundName[0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "firingSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(weaponGroup.firingSoundName, sizeof (weaponGroup.firingSoundName), "%s", token);
+			} else {
+				weaponGroup.firingSoundName[0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "firingStoppedSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(weaponGroup.firingStoppedSoundName, sizeof (weaponGroup.firingStoppedSoundName), "%s", token);
+			} else {
+				weaponGroup.firingStoppedSoundName[0] = '\0';
+			}
+			continue;
 		} else if ( !Q_stricmp( token, "weapon_primary" )
 			|| !Q_stricmp( token, "weapon_secondary" ) )
 		{
@@ -2983,9 +2983,6 @@ void BG_DumpWeaponInfo(void)
 
 		FS_Printf2("\tsplashMod %s\r\n", modNames[weapon->splashMod]);
 		FS_Printf4("\tflashColor %f %f %f\r\n", weapon->flashColor[0], weapon->flashColor[1], weapon->flashColor[2]);
-		FS_Printf2("\treadySound \"%s\"\r\n", weapon->readySoundName);
-		FS_Printf2("\tfiringSound \"%s\"\r\n", weapon->firingSoundName);
-		FS_Printf2("\tfiringStoppedSound \"%s\"\r\n", weapon->firingStoppedSoundName);
 		FS_Printf2("\tflashSound0 \"%s\"\r\n", weapon->flashSoundName[0]);
 		FS_Printf2("\tflashSound1 \"%s\"\r\n", weapon->flashSoundName[1]);
 		FS_Printf2("\tflashSound2 \"%s\"\r\n", weapon->flashSoundName[2]);
@@ -3022,6 +3019,9 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\ticonName \"%s\"\r\n", weaponGroup->iconName);
 		FS_Printf2("\tpickupName \"%s\"\r\n", weaponGroup->pickupName);
 		FS_Printf2("\tpickupAmmo %i\r\n", weaponGroup->item.quantity);
+		FS_Printf2("\treadySound \"%s\"\r\n", weaponGroup->readySoundName);
+		FS_Printf2("\tfiringSound \"%s\"\r\n", weaponGroup->firingSoundName);
+		FS_Printf2("\tfiringStoppedSound \"%s\"\r\n", weaponGroup->firingStoppedSoundName);
 
 		if (weaponGroup->weaponnum[0]) {
 			FS_Printf2("\tweapon_primary \"%s\"\r\n", weaponGroup->weapon[0]->name);
