@@ -2294,76 +2294,62 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand, qboole
 =============
 CG_AddPlayerDefaultWeapon
 
-Used to add default weapon(s) on the player when not in use.
+Add the default weapon(s) on the player when not in use.
 
-Draw default weapon at "tag_wp_away_primary" and "tag_wp_away_secondary"
-	when a different weapon is being used.
+Draw default weapon(s) at "tag_wp_away_primary" and "tag_wp_away_secondary"
+	when not in use.
 =============
 */
-void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team) {
-	refEntity_t	gun;
-	refEntity_t	barrel;
-	vec3_t		angles;
-	weapon_t weaponNum;
-	weaponGroupInfo_t	*weapon;
-	int i;
-	//centity_t	*nonPredictedCent;
-	weapon_t heldWeaponNum;
-	refEntity_t	gun_left; // Left (secondary) hand weapon.
-	//refEntity_t	gun; // Right (primary) hand weapon.
-	// When "both hand" share the weapon, primary hand tag is used.
-	qboolean draw_primary = qfalse, draw_secondary = qfalse;
-	clientInfo_t	*ci;
+void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
+{
+	weapon_t			weaponGroupNum;
+	bg_weapongroupinfo_t *weaponGroup;
+	qboolean			drawWeapon[MAX_HANDS];
+	refEntity_t			gun[MAX_HANDS];
+	refEntity_t			barrel;
+	vec3_t				angles;
+	int					i;
+	clientInfo_t		*ci;
+	qboolean			foundModel;
+	char *awayTagNames[3] = { "tag_wp_away_primary", "tag_wp_away_secondary", NULL};
 
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 
-	weaponNum = cgs.clientinfo[cent->currentState.clientNum].playercfg.default_weapon;
+	weaponGroupNum = cgs.clientinfo[cent->currentState.clientNum].playercfg.default_weapon;
+	weaponGroup = &bg_weapongroupinfo[weaponGroupNum];
 
-	//if (cent->currentState.weapon == weaponNum)
-	//{
-		//return;
-	//}
+	CG_RegisterWeaponGroup(weaponGroupNum);
 
-	heldWeaponNum = cent->currentState.weapon;
-
-	CG_RegisterWeaponGroup( weaponNum );
-	weapon = &cg_weapongroups[weaponNum];
-
-	if (bg_weapongroupinfo[weaponNum].weaponnum[0])
+	for (i = 0; i < MAX_HANDS; i++)
 	{
-		draw_primary = qtrue;
-	}
-	if (bg_weapongroupinfo[weaponNum].weaponnum[1])
-	{
-		draw_secondary = qtrue;
+		drawWeapon[i] = (weaponGroup->weaponnum[i] > 0);
 	}
 
-	// get hands from cent
-	if (heldWeaponNum == weaponNum)
+	// get hands from cent, holding default weaponGroup
+	if (cent->currentState.weapon == weaponGroupNum)
 	{
 		// If player is holding the weapon, don't draw it "away"
-		if (cent->currentState.weaponHands & HAND_PRIMARY)
+		for (i = 0; i < MAX_HANDS; i++)
 		{
-			draw_primary = qfalse;
-		}
-		if (cent->currentState.weaponHands & HAND_SECONDARY)
-		{
-			draw_secondary = qfalse;
+			if (cent->currentState.weaponHands & (1<<i))
+			{
+				drawWeapon[i] = qfalse;
+			}
 		}
 	}
 
 	// Check if we have some where to put it.
-	if (draw_primary && draw_secondary
+	if (drawWeapon[HAND_PRIMARY] && drawWeapon[HAND_SECONDARY]
 		&& !(ci->tagInfo & TI_TAG_WP_AWAY_PRIMARY) && !(ci->tagInfo & TI_TAG_WP_AWAY_SECONDARY))
 	{
 		return;
 	}
-	if (draw_primary && !draw_secondary
+	if (drawWeapon[HAND_PRIMARY] && !drawWeapon[HAND_SECONDARY]
 		&& !(ci->tagInfo & TI_TAG_WP_AWAY_PRIMARY))
 	{
 		return;
 	}
-	if (!draw_primary && draw_secondary
+	if (!drawWeapon[HAND_PRIMARY] && drawWeapon[HAND_SECONDARY]
 		&& !(ci->tagInfo & TI_TAG_WP_AWAY_SECONDARY))
 	{
 		return;
@@ -2371,58 +2357,50 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team) 
 
 	// add the weapon
 	memset( &gun, 0, sizeof( gun ) );
-	VectorCopy( parent->lightingOrigin, gun.lightingOrigin );
-	gun.shadowPlane = parent->shadowPlane;
-	gun.renderfx = parent->renderfx;
+	foundModel = qfalse;
 
-	// Copy the primary hand weapon to the secondary hand weapon.
-	memcpy( &gun_left, &gun, sizeof( gun_left ) );
+	for (i = 0; i < MAX_HANDS; i++)
+	{
+		VectorCopy( parent->lightingOrigin, gun[i].lightingOrigin );
+		gun[i].shadowPlane = parent->shadowPlane;
+		gun[i].renderfx = parent->renderfx;
+		gun[i].hModel = cg_weapons[weaponGroup->weaponnum[i]].weaponModel;
 
-	gun.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[0]].weaponModel;
-	gun_left.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[1]].weaponModel;
-	if (!gun.hModel && !gun_left.hModel) {
+		if (gun[i].hModel) {
+			foundModel = qtrue;
+		}
+	}
+
+	if (!foundModel) {
 		return;
 	}
 
-	// Primary weapon.
-	if ( draw_primary && gun.hModel ) {
-		if (!CG_PositionEntityOnTag( &gun, parent, parent->hModel, "tag_wp_away_primary"))
+	for (i = 0; i < MAX_HANDS; i++)
+	{
+		if (awayTagNames[i] == NULL) {
+			break;
+		}
+
+		if (drawWeapon[i] && gun[i].hModel)
 		{
-			// no weapon tag
-			draw_primary = qfalse;
-		} else {
-			CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
+			if (!CG_PositionEntityOnTag( &gun[i], parent, parent->hModel, awayTagNames[i]))
+			{
+				// no weapon tag
+				drawWeapon[i] = qfalse;
+			} else {
+				CG_AddWeaponWithPowerups( &gun[i], cent->currentState.powerups );
+			}
 		}
 	}
-
-	// Secondary weapon.
-	if ( draw_secondary && gun_left.hModel ) {
-		if (!CG_PositionEntityOnTag( &gun_left, parent, parent->hModel, "tag_wp_away_secondary"))
-		{
-			// no weapon tag
-			draw_secondary = qfalse;
-		} else {
-			CG_AddWeaponWithPowerups( &gun_left, cent->currentState.powerups );
-		}
-	}
-
-	// NOTE: Any weapon type can have a barrel model
 
 	// add the barrel for the weapons
 	for (i = 0; i < MAX_HANDS; i++)
 	{
-		if (i == 1)
-		{
-			if (!draw_secondary)
-				continue;
-		}
-		else
-		{
-			if (!draw_primary)
-				continue;
+		if (!drawWeapon[i]) {
+			continue;
 		}
 
-		if (!cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].barrelModel)
+		if (!cg_weapons[weaponGroup->weaponnum[i]].barrelModel)
 			continue;
 
 		memset( &barrel, 0, sizeof( barrel ) );
@@ -2430,24 +2408,15 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team) 
 		barrel.shadowPlane = parent->shadowPlane;
 		barrel.renderfx = parent->renderfx;
 
-		barrel.hModel = cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].barrelModel;
+		barrel.hModel = cg_weapons[weaponGroup->weaponnum[i]].barrelModel;
 		angles[YAW] = 0;
 		angles[PITCH] = 0;
 		angles[ROLL] = 0; // Don't spin Gauntlet when not using it...
 		AnglesToAxis( angles, barrel.axis );
 
-		if (i == 1)
-		{
-			CG_PositionRotatedEntityOnTag( &barrel, &gun_left,
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
-				"tag_barrel" );
-		}
-		else
-		{
-			CG_PositionRotatedEntityOnTag( &barrel, &gun,
-				cg_weapons[bg_weapongroupinfo[weaponNum].weaponnum[i]].weaponModel,
-				"tag_barrel" );
-		}
+		CG_PositionRotatedEntityOnTag( &barrel, &gun[i],
+			cg_weapons[weaponGroup->weaponnum[i]].weaponModel,
+			"tag_barrel" );
 
 		CG_AddWeaponWithPowerups( &barrel, cent->currentState.powerups );
 	}
@@ -2985,7 +2954,6 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 
 			cent = &cg_entities[ps->clientNum];
 
-			// ZTM: FIXME: Support secondary weapon!
 			// Use default flashOrigin when no flash model.
 			VectorCopy(cent->lerpOrigin, cent->pe.flashOrigin);
 			cent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
@@ -3001,7 +2969,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 				else if (handSide == HAND_LEFT)
 					VectorMA( origin, 8, cg.refdef.viewaxis[2], origin );
 
-				CG_LightningBolt( cent, origin, LIGHTNING_RANGE);
+				CG_LightningBolt( cent, origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->speed);
 			}
 
 			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[1]->proj->trailType == PT_LIGHTNING
@@ -3014,7 +2982,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 					VectorMA( origin, -8, cg.refdef.viewaxis[2], origin );
 				else if (handSide == HAND_LEFT)
 					VectorMA( origin, 8, cg.refdef.viewaxis[2], origin );
-				CG_LightningBolt( cent, origin, LIGHTNING_RANGE);
+				CG_LightningBolt( cent, origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[1]->proj->speed);
 			}
 #else
 			VectorCopy( cg.refdef.vieworg, origin );
@@ -3538,7 +3506,7 @@ CG_MeleeHit
 Spawn "hit marker", based on CG_Bleed
 =================
 */
-void CG_MeleeHit( vec3_t origin/*, int entityNum */) {
+void CG_MeleeHit( vec3_t origin ) {
 	localEntity_t	*ex;
 	int r = rand()%3;
 
@@ -4174,10 +4142,10 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 =================
 CG_WeaponHitWall
 
-Caused by an EV_MISSILE_MISS event, or directly by local bullet tracing
+Melee weapon hit wall, caused by an EV_WEAPON_MISS event.
 =================
 */
-void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
+void CG_WeaponHitWall( int weaponGroup, int handSide, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
 {
 	qhandle_t		mod;
 	qhandle_t		mark;
@@ -4191,10 +4159,8 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 	qboolean		alphaFade;
 	qboolean		isSprite;
 	int				duration;
-	//vec3_t			sprOrg;
-	//vec3_t			sprVel;
-	int exp_base;
-	int exp_add;
+	int				exp_base;
+	int				exp_add;
 
 #ifdef IOQ3ZTM // LASERTAG
 	if (cg_laserTag.integer)
@@ -4222,12 +4188,11 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 	exp_base = 30;
 	exp_add = 42;
 
-	// Melee Weapon hit wall.
-	if (BG_WeaponHasMelee(weapon))
-	{
-		//CG_MeleeHit(origin);
+	//CG_MeleeHit(origin);
 
-#if 0 // ZTM: TODO: Only when hit entity that take_damage and not client.
+#if 0 // #ifdef TURTLEARENA // WEAPONS // ZTM: TODO: Only when hit entity that take_damage and not client.
+	if (soundType != IMPACTSOUND_FLESH)
+	{
 		mod = cgs.media.dishFlashModel;
 		isSprite = qtrue;
 		// Smaller explosion
@@ -4241,17 +4206,18 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 			shader = cgs.media.meleeHit2Shader;
 		else
 			shader = cgs.media.meleeHit3Shader;
+	}
 #endif
 
-		/*if( soundType == IMPACTSOUND_FLESH ) {
-			sfx = cgs.media.sfx_meleehit;//sfx_meleehitflesh;
-		} else if( soundType == IMPACTSOUND_METAL ) {
-			sfx = cgs.media.sfx_meleehitmetal;
-		} else {
-			sfx = cgs.media.sfx_meleehit;
-		}*/
+#if 0 // ZTM: TODO: Per-weapon melee hit sounds
+	if( soundType == IMPACTSOUND_FLESH ) {
+		sfx = cgs.media.sfx_meleehit; // sfx_meleehitflesh
+	} else if( soundType == IMPACTSOUND_METAL ) {
+		sfx = cgs.media.sfx_meleehitmetal;
+	} else {
+		sfx = cgs.media.sfx_meleehit;
 	}
-
+#endif
 
 	if ( sfx ) {
 		trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
@@ -4266,7 +4232,7 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 							   duration, isSprite );
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
-		if (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_COLORIZE)
+		if (bg_weapongroupinfo[weaponGroup].weapon[handSide]->flags & WIF_WALLMARK_COLORIZE)
 		{
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
@@ -4275,9 +4241,8 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 		le->refEntity.radius = exp_add;
 	}
 
-	// ZTM: FIXME: Each weapon in the group has its own!
-	mark = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkShader;
-	radius = cg_weapons[bg_weapongroupinfo[weapon].weaponnum[0]].wallmarkRadius;
+	mark = cg_weapons[bg_weapongroupinfo[weaponGroup].weaponnum[handSide]].wallmarkShader;
+	radius = cg_weapons[bg_weapongroupinfo[weaponGroup].weaponnum[handSide]].wallmarkRadius;
 
 	if (!mark || radius <= 0)
 	{
@@ -4289,9 +4254,9 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 	// impact mark
 	//
 	// plasma fades alpha, all others fade color
-	alphaFade = (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_FADE_ALPHA);
+	alphaFade = (bg_weapongroupinfo[weaponGroup].weapon[handSide]->flags & WIF_WALLMARK_FADE_ALPHA);
 
-	if (bg_weapongroupinfo[weapon].weapon[0]->flags & WIF_WALLMARK_COLORIZE)
+	if (bg_weapongroupinfo[weaponGroup].weapon[handSide]->flags & WIF_WALLMARK_COLORIZE)
 	{
 		float	*color;
 
@@ -4316,35 +4281,19 @@ void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, imp
 =================
 CG_WeaponHitPlayer
 
-weapon is weapon group index
-
-This is called then there is a attack trace without a missile (melee weapons, lightning gun, etc)
+Melee weapon hit player
 =================
 */
-void CG_WeaponHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum ) {
-
-	if (BG_WeaponHasMelee(weapon))
-	{
+void CG_WeaponHitPlayer( int weaponGroup, int handSide, vec3_t origin, vec3_t dir, int entityNum )
+{
 #ifndef NOBLOOD
-		if ((bg_weaponinfo[weapon].flags & WIF_CUTS) || (rand()&20 > 15))
-			CG_Bleed( origin, entityNum );
+	if ((bg_weapongroupinfo[weaponGroup].weapon[handSide]->flags & WIF_CUTS) || (rand()&20 > 15)) {
+		CG_Bleed( origin, entityNum );
+	}
 #endif
 #ifdef TURTLEARENA // WEAPONS
-		CG_MeleeHit(origin);
+	CG_MeleeHit(origin);
 #endif
-		return;
-	}
-
-#ifndef NOBLOOD
-	CG_Bleed( origin, entityNum );
-#endif
-
-	// some weapons will make an explosion with the blood, while
-	// others will just make the blood
-	if (bg_weapongroupinfo[weapon].weapon[0]->proj->deathType != PD_NONE)
-	{
-		CG_MissileHitWall( bg_weapongroupinfo[weapon].weapon[0]->projnum, 0, origin, dir, IMPACTSOUND_FLESH );
-	}
 }
 #endif
 
