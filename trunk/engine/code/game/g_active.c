@@ -1406,6 +1406,18 @@ void ClientThink_real( gentity_t *ent ) {
 		client->ps.speed *= 1.3;
 	}
 
+#ifdef TURTLEARENA // LOCKON
+	if (client->ps.eFlags & EF_LOCKON)
+	{
+		// Walk faster forward like in LOZ:TP
+		if (ucmd->forwardmove > 0) {
+			client->ps.speed *= 1.5;
+		} else {
+			client->ps.speed /= 1.4;
+		}
+	}
+#endif
+
 	// Let go of the hook if we aren't firing
 #ifdef TA_WEAPSYS
 	if (client->hook) {
