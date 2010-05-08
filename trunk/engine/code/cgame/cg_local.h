@@ -1084,7 +1084,7 @@ typedef struct {
 #ifndef NOBLOOD
 	qhandle_t	bloodExplosionShader;
 #endif
-#ifdef TA_WEAPSYS
+#ifdef TURTLEARENA // WEAPONS
 	qhandle_t	meleeHit1Shader;
 	qhandle_t	meleeHit2Shader;
 	qhandle_t	meleeHit3Shader;
@@ -1804,8 +1804,8 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
 #ifdef TA_WEAPSYS
-void CG_WeaponHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
-void CG_WeaponHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
+void CG_WeaponHitWall( int weaponGroup, int handSide, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
+void CG_WeaponHitPlayer( int weaponGroup, int handSide, vec3_t origin, vec3_t dir, int entityNum );
 #else
 void CG_ShotgunFire( entityState_t *es );
 #endif

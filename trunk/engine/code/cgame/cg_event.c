@@ -1345,19 +1345,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_WEAPON_HIT:
 		DEBUGNAME("EV_WEAPON_HIT");
 		ByteToDir( es->eventParm, dir );
-		CG_WeaponHitPlayer( es->weapon, position, dir, es->otherEntityNum );
+		CG_WeaponHitPlayer( es->weapon, es->weaponHands, position, dir, es->otherEntityNum );
 		break;
 
 	case EV_WEAPON_MISS:
 		DEBUGNAME("EV_WEAPON_MISS");
 		ByteToDir( es->eventParm, dir );
-		CG_WeaponHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
+		CG_WeaponHitWall( es->weapon, es->weaponHands, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
 		break;
 
 	case EV_WEAPON_MISS_METAL:
 		DEBUGNAME("EV_WEAPON_MISS_METAL");
 		ByteToDir( es->eventParm, dir );
-		CG_WeaponHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_METAL );
+		CG_WeaponHitWall( es->weapon, es->weaponHands, es->clientNum, position, dir, IMPACTSOUND_METAL );
 		break;
 #endif
 

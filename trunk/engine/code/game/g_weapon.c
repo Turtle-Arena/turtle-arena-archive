@@ -382,24 +382,30 @@ qboolean G_GetPlayerTagOrientation(gentity_t *ent, char *tagName, qboolean onLeg
 // Based on CheckGauntletHit
 qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, weapontype_t wt)
 {
-	trace_t		tr;
-	vec3_t		start;
-	vec3_t		end;
-	vec3_t		pushDir; // dir for knockback
-	gentity_t	*tent;
-	gentity_t	*traceEnt;
-	int			damage;
-	int			dflags;
-	weapon_t weaponnum;
-	int mod; // Means of death
-	bg_weaponinfo_t *weapon;
-	int i;
-	qboolean traceHit;
+	trace_t			tr;
+	vec3_t			start;
+	vec3_t			end;
+	vec3_t			pushDir; // dir for knockback
+	gentity_t		*tent;
+	gentity_t		*traceEnt;
+	int				damage;
+	int				dflags;
+	weapon_t		weaponGroupNum;
+	int				mod; // Means of death
+	bg_weaponinfo_t	*weapon;
+	int				i;
+	qboolean		traceHit;
 	orientation_t	weaponOrientation;
-#ifdef TA_GAME_MODELS // Use the weapon tag angles and pos!
+#ifdef TA_GAME_MODELS
 	orientation_t	legsOrientation;
 	orientation_t	torsoOrientation;
+#endif
 
+	if (!BG_WeapTypeIsMelee(wt)) {
+		return qfalse;
+	}
+
+#ifdef TA_GAME_MODELS // Use the weapon tag angles and pos!
 	// Setup the orientations
 	if (!G_SetupPlayerTagOrientation(ent, &legsOrientation, &torsoOrientation, &weaponOrientation))
 	{
@@ -407,12 +413,8 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 	}
 #endif
 
-	if (!BG_WeapTypeIsMelee(wt)) {
-		return qfalse;
-	}
-
 	dflags = 0;
-	weaponnum = ent->client->ps.weapon;
+	weaponGroupNum = ent->client->ps.weapon;
 
 	// Use hand to select the weapon tag.
 	if (hand == HAND_PRIMARY)
@@ -495,7 +497,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 
 	if (hand == HAND_PRIMARY)
 	{
-		weapon = bg_weapongroupinfo[weaponnum].weapon[0];
+		weapon = bg_weapongroupinfo[weaponGroupNum].weapon[0];
 		mod = weapon->mod;
 		// Use default kill message
 		if (mod == MOD_UNKNOWN) {
@@ -504,7 +506,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 	}
 	else
 	{
-		weapon = bg_weapongroupinfo[weaponnum].weapon[1];
+		weapon = bg_weapongroupinfo[weaponGroupNum].weapon[1];
 		mod = weapon->mod;
 		// Use default kill message
 		if (mod == MOD_UNKNOWN) {
@@ -651,7 +653,8 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 			if (tent)
 			{
 				tent->s.eventParm = DirToByte( tr.plane.normal );
-				tent->s.weapon = ent->s.weapon;
+				tent->s.weapon = weaponGroupNum;
+				tent->s.weaponHands = hand; // handSide
 				tent->s.clientNum = ent->s.number;
 			}
 		}
@@ -1946,12 +1949,12 @@ void NPC_FireWeapon(gentity_t *ent)
 		else if (ent->bgNPC.info->primaryHandSide == HAND_LEFT)
 			VectorMA (muzzle, -4, right, muzzle);
 
-	#ifdef TURTLEARENA // LOCKON
+#ifdef TURTLEARENA // LOCKON
 		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
 				muzzle, forward, right, up);
-	#else
+#else
 		// NPC just shoots forward, not at target...
-	#endif
+#endif
 		fire_weapon(ent, muzzle, forward, right, up,
 				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, ent->bgNPC.info->primaryHandSide);
     }
