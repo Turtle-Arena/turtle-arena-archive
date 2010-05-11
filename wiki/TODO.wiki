@@ -17,15 +17,16 @@ First stable playable release.
   * Maps for all gametypes
 
 == 0.4 ==
-Focus on players, themes, and multiplayer maps
+Focus on players, map themes, and multiplayer maps
 
   * Map Themes (textures, models, misc_objects, and maybe music?)
-  * Improve player models, each player should have their own animations
+  * Improve player models; each player should have their own animations, etc et
   * Player Abilities
   * Have player models be MDR (Finish Misfit Model 3D MDR exporting)
   * Multiple levels of detail for players and other models
   * Bring back player effect colors?
     * (Like to control Turtle mask color and/or melee trail color?)
+  * Add more players (Mirage or 2003 based?); Shredder, Foot, etc
   * Remake UI with missionpack ui scripting?
   * Reduce overall number of TODOs and FIXMEs in the source
 
@@ -82,6 +83,14 @@ Weapons (and attacking)
   * TODO: Rewrite single player post-game data saving.
     * Have it be more like in Team Arena then Q3, using ".game" files instead of cvars in config.
     * Or one single data file with all of the sp data (Or SP data files -like SRB2 2.0)
+
+== Single Player (NiGHTS) ==
+  * TODO: Chet into Dreams...  (A boy dreams of his lost turtles.)
+    * NiGHTS would replaced with a Ninja Turtle?
+    * The level could be set in side an aquarium (With the aquarium at very large scale)
+    * Before the dream Chet could be replaying the events of how he lost his turtles
+       * After the people around him, and the TCRI truck, could turn into nightmarens. (The truck could turn into the boss)
+    * After the dream Chet would see the Turtles outside his window.
 
 == Render ==
   * TODO: NPRQuake has some awesome rendering options... (If I wanted it to look like a comic book it might help.)
@@ -291,3 +300,15 @@ Stuff I'd like to do to the MD3 part of MM3D...
 
   * TODO: Export lower LODs of MD3 models (head_1.md3, head_2.md3), and include lower LODs in MDR models
     * Maybe use gts.sourceforge.net to generate lower LODs? The gallery shows its possible. Somehow.
+
+= Website =
+Current Location: http://ztm.x10hosting.com/
+
+  * TODO: Find a new host
+
+  * TODO: Get a domain name?
+
+  * TODO (STARTED): Updating website for Turtle Arena 0.4
+
+  * TODO: Add a screenshot to the main page?
+    * See 'Note to software creators' at the bottom of http://www.opensourcewindows.org/
