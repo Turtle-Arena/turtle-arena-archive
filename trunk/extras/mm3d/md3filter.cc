@@ -104,22 +104,6 @@ const char s_animNames[ MD3_ANIMATIONS ][16] =
    "legs_turn",
 };
 
-// ZTM: TODO: Allow user to have any animation loop
-const char *s_animLoop[] =
-{
-   "torso_stand",
-   "torso_stand2",
-   "legs_walkcr",
-   "legs_walk",
-   "legs_run",
-   "legs_back",
-   "legs_swim",
-   "legs_idle",
-   "legs_idlecr",
-   "legs_turn",
-   NULL
-};
-
 // ZTM: TODO: Allow user to have any animation have sync warning? (Or at least disable?)
 const char *s_animSyncWarning[] =
 {
@@ -132,16 +116,10 @@ const char *s_animSyncWarning[] =
 
 Md3Filter::Md3Filter()
 {
-#ifdef MDR_GENERAL
-   //log_enable_debug(true);
-#endif
 }
 
 Md3Filter::~Md3Filter()
 {
-#ifdef MDR_GENERAL
-   //log_enable_debug(false);
-#endif
 }
 
 #ifdef MDR_GENERAL
@@ -151,9 +129,7 @@ bool Md3Filter::isMdr(const char *filename)
 
    return ( len >= 4 && strcasecmp( &filename[len-4], ".mdr" ) == 0 );
 }
-#endif
 
-#ifdef MDR_GENERAL
 Model::AnimationModeE Md3Filter::animMode(Md3Filter::MeshTypeE type)
 {
 
@@ -614,10 +590,10 @@ Model::ModelErrorE Md3Filter::readFile( Model * model, const char * const filena
                int animIndex = m_model->addAnimation( m_animationMode, "AnimFrames" );
                m_model->setAnimFPS( m_animationMode, animIndex, 15.0);
                m_model->setAnimFrameCount( m_animationMode, animIndex, fileList.front().numFrames );
+               m_model->setAnimationLooping( m_animationMode, animIndex, false );
             }
          }
       }
-
 
       for ( it = fileList.begin(); it != fileList.end(); it++ )
       {
@@ -926,6 +902,16 @@ bool Md3Filter::readAnimations( bool create )
                   int animIndex = m_model->addAnimation( m_animationMode, name );
                   m_model->setAnimFPS( m_animationMode, animIndex, (double) fps );
                   m_model->setAnimFrameCount( m_animationMode, animIndex, fcount );
+
+                  // Set looping
+                  if (eliteLoop)
+                  {
+                     m_model->setAnimationLooping( m_animationMode, animIndex, (loop == 0) );
+                  }
+                  else
+                  {
+                     m_model->setAnimationLooping( m_animationMode, animIndex, (loop != 0) );
+                  }
                }
 
                animCount++;
@@ -1867,7 +1853,7 @@ bool Md3Filter::tagInSection( std::string tagName, MeshSectionE section )
    }
    else
    {
-      // Support unknown tags. Mods could add new tags.
+      // Support unknown tags. Mods can add new tags.
       //   Better to have unknown tag in all models then none.
       // In Quake3 the programmer selects which section the tag is on,
       //   so it should be harmless (Other then the larger file size in the models that don't use the tag...).
@@ -2507,11 +2493,12 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 
                   Matrix rotMatrix;
                   double rotVector[3];
-                  m_model->interpSkelAnimKeyframe( a, t, animLoop(animName), j, true, rotVector[0], rotVector[1], rotVector[2] );
+                  bool m_animationLoop = m_model->isAnimationLooping( m_animationMode, a );
+                  m_model->interpSkelAnimKeyframe( a, t, m_animationLoop, j, true, rotVector[0], rotVector[1], rotVector[2] );
 
                   // origin
                   double origin[4] = { 0, 0, 0, 1 };
-                  m_model->interpSkelAnimKeyframe( a, t, animLoop(animName), j, false, origin[0], origin[1], origin[2] );
+                  m_model->interpSkelAnimKeyframe( a, t, m_animationLoop, j, false, origin[0], origin[1], origin[2] );
 
                   saveMatrix.apply( origin );
 
@@ -3244,18 +3231,6 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
    return Model::ERROR_NONE;
 }
 
-bool Md3Filter::animLoop(std::string name)
-{
-   for (unsigned i = 0; s_animLoop[i] != NULL; i++)
-   {
-      if (strncasecmp(s_animLoop[i], name.c_str(), name.length()) == 0)
-      {
-         return true;
-      }
-   }
-   return false;
-}
-
 bool Md3Filter::animSyncWarning(std::string name)
 {
    for (unsigned i = 0; s_animSyncWarning[i] != NULL; i++)
@@ -3356,7 +3331,7 @@ bool Md3Filter::writeAnimations()
          }
 
          // disable looping on non-looping anims
-         if ( count <= 1 || !animLoop(name) )
+         if ( count <= 1 || !m_model->isAnimationLooping( m_animationMode, anim ) )
          {
             loop = 0;
          }
@@ -3386,9 +3361,11 @@ bool Md3Filter::writeAnimations()
                      name.c_str(), spaces, animFrame, count, loop, fps );
          }
          else
+         {
             fprintf( fp, "%d\t%d\t%d\t%d\t\t// %s%s\r\n", 
                   animFrame, count, loop, fps, name.c_str(),
                   (animSyncWarning(name) ? warning : "") );
+         }
       }
       fclose( fp );
       return true;

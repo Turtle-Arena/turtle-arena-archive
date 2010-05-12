@@ -28,7 +28,7 @@
 #ifndef __MD3FILTER_H
 #define __MD3FILTER_H
 
-#define TURTLE_ARENA // Enable special support my ioquake3 mod, Turtle Arena, that should not be in mm3d
+#define TURTLE_ARENA // Enable special tag support for my ioquake3 mod, Turtle Arena, that should not be in mm3d
 
 //#define MDR_LOAD // Unfinished
 #define MDR_EXPORT // Unfinished
@@ -215,7 +215,6 @@ class Md3Filter : public ModelFilter
       DataDest * m_dst;
 
       //writes util
-      bool animLoop(std::string name);
       bool animSyncWarning(std::string name);
       bool     getVertexNormal(Model * model, int groupId, int vertexId, float *normal);
       double   greater(double a, double b);
