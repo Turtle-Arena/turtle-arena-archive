@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 2006 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com))
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+Copyright (C) 2010 Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena and is based upon botfiles by
 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com)) from Open Arena which
@@ -23,78 +23,73 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-chat "raph"
+chat "casey"
 {
 	#include "teamplay.h"
 
 	type "game_enter"
 	{
-		"I am so going to enjoy this.";
-		"I'm here, now the game can really begin!";
-		"Hey guys.";
+		"Time to bust up this joint!";
+		"Hey, let do this!";
+		//
 	}
 
 	type "game_exit"
 	{
-		"I need a break, I've been playing all day long.";
-		"Later guys, I've got some stuff to do in the 'real world.'";
-		"Time to go.";
-		"There are better thing to do than beating up guys in video game you know. Like doing it in real life! Later.";
+		"So long losers.";
+		"Gotta run.";
+		"Oops, it quitin' time.";
+		"See ya' later.";
 	}
 
 	type "level_start"
 	{
-		//4,", yeah... its a okay I guess";
-		//4," ...it feels like I just played this map.";
-		"Let the butt kickin' begin!";
-		4,", is this the map Mikey made? 'cause if it is, I not playing.";
-		"Oh yeah, time to bust some heads!";
+		"Woo Hoo!";
+		//
+		"Oh yeah, time to bust up this joint!";
 	}
 
 	type "level_end"
 	{
-		"Geez, I though it never end.";
-		"Boy, smashing that guy was fun!";
-		//"Is this it? Is it finally over?";
-		"Aww, it was just gettin' fun!";
+		"Is it over already?";
+		//"Boy, smashing that guy was fun!";
+		//
+		//"Aww, it was just gettin' fun!";
 	}
 
 	type "level_end_victory"
 	{
-		"Oh yeah, I win again!";
-		"Ha, you thought you can beat me?";
-		"Ha, I'd like to see you do this good! ...well not really.";
+		"Goongala! Goongala!";
+		"Take that ya' wimps!";
+		"Yeah!";
 	}
 
 	type "level_end_lose"
 	{
-		"How 'bout a rematch?";
-		"Next time you won't be so lucky.";
-		//"No comment...";
-		//"Guess I've got some training to do.";
+		"Gaaa";
+		"Aww come on that guy musta' cheated.";
 	}
 
 	type "hit_talking"
 	{
-		"Well excuse me, I was talking!";
-		"You are so going to paid for that!";
-		"Bonehead!";
-		//"Is there a sign over my head that reads 'shoot me'?";
+		"Punk!";
+		"Time for some head bashing!";
+		"What is wrong with you, you Bonehead!";
 	}
 
 	type "hit_nodeath"
 	{
-		"You just don't die do you!";
-		//"I guess I should've trained more.";
-		"How could you live through that!?";
-		//"I need a better weapon.";
+		"Gaaa";
+		"Just die!?";
 	}
+
+	// 
+	// Below is raph chats
+	//
 
 	type "hit_nokill"
 	{
 		"Maybe you should try using a real weapon!";
-		// TODO: Have 1 = weapon name (fist - sai - katana - bo - etc) ?
-		//"Do you even know how to use your ", 1, "?";
 		"Nice try!";
 		"Try again, I dear you!";
 		"Are you even trying?";
@@ -127,8 +122,6 @@ chat "raph"
 	type "death_slime"
 	{
 		"I hope this slime doesn't cause a secondary mutation!"; // Like what happened to Donny!
-		//"...and who forgot to label this toxic?!";
-		//"How was I suppost to know it was toxic?";
 		"Grr... who put this toxic waste here!";
 		"Man, it feels gross in here.";
 		"Yuck.";
@@ -137,43 +130,20 @@ chat "raph"
 	type "death_drown"
 	{
 		"Goodbye water world";
-		//"Sometimes I wish I was a amphibian...";
 		"I need to get me an air tank or somethin'...";
-		//"I was just proving that turtles don't have gills.";
 	}
 
 	type "death_suicide"
 	{
 		"I am never going hear the end of this.";
 		"Gr... that did not just happen.";
-		//"...";
 	}
-
-/* ZTM: No longer used.
-	type "death_gauntlet"
-	{
-		"Ow";
-		"What the...";
-	}
-
-	type "death_rail"
-	{
-		"That was cheap";
-	}
-
-	type "death_bfg"
-	{
-		"That was cheap";
-	}
-*/
 
 	type "death_insult"
 	{
 		"All you accomplished is to tick me off!";
 		"Well it sure took you long enough.";
-		//"I've seen Mikey do better than that.";
 		"Bonehead!";
-		//"What the...";
 		//curse;
 	}
 
@@ -185,19 +155,6 @@ chat "raph"
 		"I think your getting the hang of this.";
 	}
 
-/* ZTM: No longer used.
-	type "kill_rail"
-	{
-		"Take that!";
-	}
-
-	type "kill_gauntlet"
-	{
-		"Take that!";
-		KILL_GAUNTLET1;
-		KILL_GAUNTLET0;
-	}
-*/
 	type "kill_telefrag"
 	{
 		"Oh you were standing there?  I am now.";

@@ -203,12 +203,13 @@ NOTE: Currently I have the cursors point to the normal q3 cursor image.
 While replacing stuff I was deleting what I had replaced or was no longer used in the demoq3 pak0.pk3
 the following were not removed from the pk3; (I have a list so I can delete the pk3)
 
+  * models/gibs							--unused by turtlearena
   * models/powerups/					--replaced/unused by turtlearena
   * models/weapons2/					--replaced/unused by turtlearena
   * models/weaphits/
-  * models/weaphits/bfg.md3			--unused by turtlearena
+  * models/weaphits/bfg.md3				--unused by turtlearena
   * models/weaphits/crackle.md3			--unused by turtlearena
-  * models/weaphits/boom01.md3		--replaced by turtlearena
+  * models/weaphits/boom01.md3			--replaced by turtlearena
   * models/weaphits/ring02.md3			--replaced by turtlearena
   * models/weaphits/bullet.md3			--replaced by turtlearena
 

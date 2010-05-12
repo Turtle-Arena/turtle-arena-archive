@@ -278,6 +278,8 @@ BSPC is the map .bsp to .aas (Arena Awareness System) compiler. The aas file is 
   * TODO: Raph and Casey really need to /swing/ the melee weapons.
     * Casey's swinging isn't that bad, but Raph's swinging sure is.
 
+  * TODO: Set looping in leo, don, raph, mike, and casey mm3d models and re-export
+
 === Raph ====
   * TODO: Finish animating raph_v9.mm3d
 

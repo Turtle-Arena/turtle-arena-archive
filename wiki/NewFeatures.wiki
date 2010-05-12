@@ -1,7 +1,7 @@
 #summary How to use the new features in Turtle Arena
 #labels Phase-Implementation
 
-Incomplete list editing information for new features not found in ioquake3.
+Incomplete list of editing information for new features not found in ioquake3.
 
 == Shaders ==
 
