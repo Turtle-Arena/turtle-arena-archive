@@ -1,22 +1,24 @@
 /*
 ===========================================================================
 Copyright (C) 2006 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com))
+Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
-This file is part of Open Arena and is based upon Mr. Elusive's fuzzy logic
-system found in Quake 3 Arena.
+This file is part of Turtle Arena and is based upon botfiles by
+Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com)) from Open Arena which
+are based on Mr. Elusive's fuzzy logic system found in Quake 3 Arena.
 
-Open Arena is free software; you can redistribute it
+Turtle Arena is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Open Arena is distributed in the hope that it will be
+Turtle Arena is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
+along with Turtle Arena; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -185,7 +187,7 @@ D_PRAISE0 = {
 	//"Nice shot.";
 	"Care to show how that move is accomplished in slow motion?";
 	"You are good.";
-	"Nice one."; // "Nice 1";
+	"Nice ~one."; // "Nice 1";
 }
 
 D_PRAISE1 = {
@@ -453,9 +455,9 @@ TAUNT2 = {
 }
 
 TAUNT_FEM0 = {
-	"Put that thing away, do you want to go blind?";
-	"Do you shave your palms?";
-	"I hear that ", 0, " got ", disease, " from ", botnames, ".";
+	//"Put that thing away, do you want to go blind?";
+	//"Do you shave your palms?";
+	//"I hear that ", 0, " got ", disease, " from ", botnames, ".";
 }
 
 TELEFRAGGED0 = {
@@ -630,7 +632,6 @@ language = {
 }
 
 weapon = {
-	// ZTM: Rewrote.
 	"katana";
 	"sai";
 	"nunchuck";
@@ -639,12 +640,12 @@ weapon = {
 	"long sword";
 	"bat";
 	"bo";
-	"bamboo"; // bamboo bo
+	"bamboo";
 	"gun";
 	"electric launcher";
 	"rocket launcher";
 	"homing-rocket launcher";
-	//"grappling hook"; // not really a "weapon" since its not used for damaging stuff
+	//"grappling hook"; // not really a "weapon"
 }
 
 ponder = {
@@ -702,7 +703,6 @@ friendname = {
 }
 
 fighter = {
-	// ZTM: Disabled "some" of the fighter strings...
 	"gladiator";
 	//"pickle brain";
 	"dweeb";
@@ -767,7 +767,6 @@ botnames = {
 }
 
 negative = {
-	// ZTM: Disabled...
 	"Nada.";
 	"no.";
 	"nope";
@@ -829,26 +828,20 @@ number = {
 }
 
 profession = {
-	// ZTM: Disabled...
 	"police officer";
 	"programmer";
 	"level designer";
-	//"bum";
 	"student";
 }
 
 disease = {
-	// ZTM: Disabled... ...
 	"flue";
-	// ZTM: REMOVED DISABLED TEXT
 }
 
 peeps = {
 	"Mr. Smith";
 	"John Doe";
-	// ZTM: Disabled...
 	"dmn_clown";
-	// ZTM: REMOVED DISABLED TEXT
 }
 
 immaturity01 = {
@@ -943,7 +936,6 @@ ampm = {
 }
 
 food = {
-	// ZTM: Disabled...
 	"pizza";
 	"cheeseburger";
 	"tofu";
@@ -980,13 +972,11 @@ animal = {
 }
 
 weather = {
-	// ZTM: Disabled...
 	"hot";
 	"windy";
 	"rainy";
 	"snowing";
 	"warm";
-	// ZTM: REMOVED DISABLED TEXT
 }
 
 month = {
@@ -1005,28 +995,21 @@ month = {
 }
 
 substance = {
-	// ZTM: Added
 	"water";
 	"pizza";
 	"suashi";
-	// ZTM: Disabled...
 	"ink";
 	"chalk";
 	"salt";
 	"pepper";
-	// ZTM: REMOVED DISABLED TEXT
 }
 
 curse = {
-	// ZTM: Added
     //"curses!";
 	"Bonehead!";
-	// ZTM: REMOVED DISABLED TEXT
 }
 
 vicious_insult = {
-	// ZTM: Disabled...
-	// ZTM: REMOVED DISABLED TEXT
 	"moron";
 	"idiot";
 }
