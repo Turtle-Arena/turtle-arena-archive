@@ -730,14 +730,22 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	key = "color1";
 	s = Info_ValueForKey( botinfo, key );
 	if ( !*s ) {
+#ifdef TURTLEARENA
+		s = "5";
+#else
 		s = "4";
+#endif
 	}
 	Info_SetValueForKey( userinfo, key, s );
 
 	key = "color2";
 	s = Info_ValueForKey( botinfo, key );
 	if ( !*s ) {
+#ifdef TURTLEARENA
+		s = "4";
+#else
 		s = "5";
+#endif
 	}
 	Info_SetValueForKey( userinfo, key, s );
 
