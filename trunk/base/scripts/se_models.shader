@@ -430,13 +430,13 @@ models/weapons2/nunchuck/chain
 	}
 }
 
-models/weapons2/gun/flash
+models/weapons2/triblaster/flash
 {
 	cull disable
 	deformVertexes autosprite
 
 	{
-		clampmap models/weapons2/gun/flash
+		clampmap models/weapons2/triblaster/flash
 		blendfunc add
 
 		tcMod stretch triangle .6 0.1 0 8

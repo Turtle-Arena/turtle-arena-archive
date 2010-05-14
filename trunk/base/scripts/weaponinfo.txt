@@ -809,7 +809,7 @@ projectile "p_pulse"
 weapon "w_triblaster"
 {
 	weapontype "WT_GUN"
-	model "models/weapons2/gun/gun.md3"
+	model "models/weapons2/triblaster/triblaster.md3"
 	attackDelay 400
 	continuousFlash 1
 	flashColor 0.8 0 1 // cc00ff
@@ -822,7 +822,7 @@ weapongroup "wp_triblaster"
 	clone "wt_gun"
 	itemName "weapon_gun"
 	pickupName "Tri-Blaster"
-	pickupModel "models/weapons2/gun/gun.md3"
+	pickupModel "models/weapons2/triblaster/triblaster.md3"
 	iconName "icons/iconw_triblaster"
 	pickupAmmo 50
 	weapon_primary "w_triblaster"
