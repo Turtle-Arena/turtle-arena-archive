@@ -540,10 +540,14 @@ typedef enum {
 #endif
 
 #ifdef TA_WEAPSYS
-#define HAND_NONE 0
-#define HAND_PRIMARY 1
-#define HAND_SECONDARY 2
-#define HAND_BOTH (HAND_PRIMARY|HAND_SECONDARY)
+// bitflags
+#define HAND_NONE		0 // dummy flag
+#define HAND_PRIMARY	1
+#define HAND_SECONDARY	2
+#define HAND_BOTH		3
+#define HAND_MAX		(HAND_PRIMARY|HAND_SECONDARY)+1
+
+// array max
 #define MAX_HANDS 2 // Only support two hands for fighting.
 
 // handSide
