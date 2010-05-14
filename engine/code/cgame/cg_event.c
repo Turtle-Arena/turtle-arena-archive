@@ -1308,6 +1308,22 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 #endif
 
+#ifdef TA_WEAPSYS
+		if (es->clientNum < MAX_CLIENTS && es->weaponHands < HAND_MAX) {
+			VectorCopy(cg_entities[es->clientNum].pe.flashOrigin[(1>>es->weaponHands)], es->origin2);
+		} else {
+			es->origin2[2] -= 4;
+		}
+#elif defined IOQ3ZTM
+#ifndef MISSIONPACK // ZTM: TODO: Check for rail bounce?...
+		if (es->clientNum < MAX_CLIENTS) {
+			VectorCopy(cg_entities[es->clientNum].pe.flashOrigin, es->origin2)
+		} else
+#endif
+		{
+			es->origin2[2] -= 4;
+		}
+#endif
 		CG_RailTrail(ci, es->origin2, es->pos.trBase);
 
 		// if the end was on a nomark surface, don't make an explosion

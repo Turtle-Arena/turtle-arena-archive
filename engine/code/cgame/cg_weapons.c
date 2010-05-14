@@ -406,7 +406,9 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 #define ROTATION 1
 #define SPACING  5
  
+#if !defined TA_WEAYSYS && !defined IOQ3ZTM
 	start[2] -= 4;
+#endif
  
 	le = CG_AllocLocalEntity();
 	re = &le->refEntity;
@@ -441,9 +443,11 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 #endif
 		)
 	{
+#ifndef IOQ3ZTM
 		// nudge down a bit so it isn't exactly in center
 		re->origin[2] -= 8;
 		re->oldorigin[2] -= 8;
+#endif
 		return;
 	}
 

@@ -150,10 +150,12 @@ void G_SetMissileVelocity(gentity_t *bolt, vec3_t dir, int projnum)
 		//VectorScale(dir, g_rocketVelocity.value * 0.25, bolt->s.pos.trDelta);
 	}
 
+#if 0
 	if (bolt->parent && bolt->parent->client) {
 		// "real" physics
 		VectorAdd( bolt->s.pos.trDelta, bolt->parent->client->ps.velocity, bolt->s.pos.trDelta );
 	}
+#endif
 
 	SnapVector( bolt->s.pos.trDelta );			// save net bandwidth
 }
@@ -507,6 +509,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 								tent = G_TempEntity( tr.endpos, EV_RAILTRAIL );
 								// set player number for custom colors on the railtrail
 								tent->s.clientNum = self->s.clientNum;
+								tent->s.weaponHands = HAND_MAX; // Don't attach to client's gun
 								VectorCopy( start, tent->s.origin2 );
 								// move origin a bit to come closer to the drawn gun muzzle
 								VectorMA( tent->s.origin2, 4, right, tent->s.origin2 );
@@ -598,6 +601,11 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 
 				// set player number for custom colors on the railtrail
 				tent->s.clientNum = self->s.clientNum;
+				if (self->client->pers.playercfg.primaryHandSide == handSide) {
+					tent->s.weaponHands = HAND_PRIMARY;
+				} else {
+					tent->s.weaponHands = HAND_SECONDARY;
+				}
 
 				VectorCopy( start, tent->s.origin2 );
 				// move origin a bit to come closer to the drawn gun muzzle
