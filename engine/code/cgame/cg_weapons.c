@@ -1353,7 +1353,7 @@ void CG_RegisterWeapon( int weaponNum )
 
 	if ( !weaponInfo->handsModel ) {
 #ifdef TA_DATA
-		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/gun/gun_hand.md3" );
+		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/triblaster/triblaster_hand.md3" );
 #else
 		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/shotgun/shotgun_hand.md3" );
 #endif
