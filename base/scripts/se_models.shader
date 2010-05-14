@@ -430,6 +430,37 @@ models/weapons2/nunchuck/chain
 	}
 }
 
+models/weapons2/gun/flash
+{
+	cull disable
+	deformVertexes autosprite
+
+	{
+		clampmap models/weapons2/gun/flash
+		blendfunc add
+
+		tcMod stretch triangle .6 0.1 0 8
+		tcmod rotate 999
+		rgbGen entity
+	}
+}
+
+//
+// Projectiles
+//
+models/ammo/pulse/pulse
+{
+	sort nearest
+	cull none
+	deformVertexes autosprite2
+
+	{
+		map models/ammo/pulse/pulse
+		blendFunc blend
+		rgbGen identity
+	}
+}
+
 //
 // MATERIALS
 //

@@ -789,39 +789,43 @@ weapongroup "wp_bamboo"
 //	}
 //}
 
-projectile "p_bullet"
+projectile "p_pulse"
 {
-	instantDamage 1
-	damage 7
-	trailType PT_BULLET
+	//model "models/ammo/pulse/pulse.md3"
+	damage 10
+	speed 100
+	//timetolive 10000
+	//trailType PT_BULLET
 	deathType PD_BULLET
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
-	spread 200
+	//spread 200
+
+	instantDamage 1
+	trailType PT_RAIL
+	speed 768 // range
 }
 
-weapon "w_gun"
+weapon "w_triblaster"
 {
 	weapontype "WT_GUN"
 	model "models/weapons2/gun/gun.md3"
-	//mod MOD_GUN
-	attackDelay 100
-	ejectBrass 1
-	//splashMod MOD_GUN
-	flashColor 1 0.75 0
-	flashSound0 "sound/weapons/machinegun/machgf1b.wav"
-	projectile "p_bullet"
+	attackDelay 400
+	continuousFlash 1
+	flashColor 0.8 0 1 // cc00ff
+	//flashSound0 "sound/weapons/triblaster/fire.wav"
+	projectile "p_pulse"
 }
 
-weapongroup "wp_gun"
+weapongroup "wp_triblaster"
 {
 	clone "wt_gun"
 	itemName "weapon_gun"
-	pickupName "Gun"
+	pickupName "Tri-Blaster"
 	pickupModel "models/weapons2/gun/gun.md3"
-	iconName "icons/iconw_gun"
-	pickupAmmo 100
-	weapon_primary "w_gun"
+	iconName "icons/iconw_triblaster"
+	pickupAmmo 50
+	weapon_primary "w_triblaster"
 
 	normalAnims
 	{
