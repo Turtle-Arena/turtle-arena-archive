@@ -1922,6 +1922,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 }
 */
 
+#ifndef IOQ3ZTM // Unused-rail
 /*
 ===============
 CG_SpawnRailTrail
@@ -1933,11 +1934,9 @@ different than the muzzle point used for determining hits.
 static void CG_SpawnRailTrail( centity_t *cent, vec3_t origin ) {
 	clientInfo_t	*ci;
 
-#ifndef TA_WEAPSYS
 	if ( cent->currentState.weapon != WP_RAILGUN ) {
 		return;
 	}
-#endif
 	if ( !cent->pe.railgunFlash ) {
 		return;
 	}
@@ -1945,6 +1944,7 @@ static void CG_SpawnRailTrail( centity_t *cent, vec3_t origin ) {
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 	CG_RailTrail( ci, origin, cent->pe.railgunImpact );
 }
+#endif
 
 
 /*
@@ -2775,7 +2775,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			// continuous flash
 		} else {
 			// impulse flash
-			if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME && !cent->pe.railgunFlash ) {
+			if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME
+#ifndef IOQ3ZTM // Unused-rail
+				&& !cent->pe.railgunFlash
+#endif
+				)
+			{
 #ifdef TA_WEAPSYS
 				// Don't draw flash, but update flashOrigin
 				drawFlash = qfalse;
@@ -2865,13 +2870,10 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 				CG_LightningBolt( nonPredictedCent, flash.origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->speed );
 			}
 
-#ifdef TA_WEAPSYS
-			if ( weaponGroup->weapon[i]->proj->trailType == PT_RAIL)
+#ifndef IOQ3ZTM // Unused-rail
+			// add rail trail
+			CG_SpawnRailTrail( cent, flash.origin );
 #endif
-			{
-				// add rail trail
-				CG_SpawnRailTrail( cent, flash.origin );
-			}
 
 
 #ifdef IOQ3ZTM // SMOOTH_FLASH
