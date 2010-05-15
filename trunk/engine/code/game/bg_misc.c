@@ -3264,8 +3264,8 @@ static qboolean NPC_Parse(char **p) {
 
 	// Defaults
 	npc.deathType = NPCD_SINK;
-	npc.primaryHandSide = HAND_RIGHT;
-	npc.secondaryHandSide = HAND_LEFT;
+	npc.handSide[HAND_PRIMARY] = HS_RIGHT;
+	npc.handSide[HAND_SECONDARY] = HS_LEFT;
 
 	// Default boundingbox
 	npc.mins[0] = npc.mins[1] = -5.0f;
@@ -3437,11 +3437,11 @@ static qboolean NPC_Parse(char **p) {
 				break;
 			}
 			if ( !Q_stricmp( token, "left" ) ) {
-				npc.primaryHandSide = HAND_LEFT;
-				npc.secondaryHandSide = HAND_RIGHT;
+				npc.handSide[HAND_PRIMARY] = HS_LEFT;
+				npc.handSide[HAND_SECONDARY] = HS_RIGHT;
 			} else if ( !Q_stricmp( token, "right" ) ) {
-				npc.primaryHandSide = HAND_RIGHT;
-				npc.secondaryHandSide = HAND_LEFT;
+				npc.handSide[HAND_PRIMARY] = HS_RIGHT;
+				npc.handSide[HAND_SECONDARY] = HS_LEFT;
 			} else {
 				Com_Printf( "Bad primaryHand parm [%s] for [%s]\n", token, npc.classname);
 			}
@@ -3644,18 +3644,10 @@ int BG_WeaponHandsForPlayerState(playerState_t *ps)
 {
 	if (ps->eFlags & EF_PRIMARY_HAND)
 	{
-		return HAND_PRIMARY;
+		return HB_PRIMARY;
 	}
 
-	if (bg_weapongroupinfo[ps->weapon].weaponnum[0]
-		&& bg_weapongroupinfo[ps->weapon].weaponnum[1])
-	{
-		return HAND_BOTH;
-	}
-	else //if (bg_weapongroupinfo[ps->weapon].weaponnum[0])
-	{
-		return HAND_PRIMARY;
-	}
+	return BG_WeaponHandsForWeaponNum(ps->weapon);
 }
 
 /*
@@ -3665,12 +3657,16 @@ BG_WeaponHandsForWeaponNum
 */
 int BG_WeaponHandsForWeaponNum(weapon_t weaponnum)
 {
-	int hands = 0;
+	int hands = 0; // HB_NONE
+	int i;
 
-	if (bg_weapongroupinfo[weaponnum].weaponnum[0])
-		hands |= HAND_PRIMARY;
-	if (bg_weapongroupinfo[weaponnum].weaponnum[1])
-		hands |= HAND_SECONDARY;
+	for (i = 0; i < MAX_HANDS; i++)
+	{
+		if (bg_weapongroupinfo[weaponnum].weaponnum[i])
+		{
+			hands |= HAND_TO_HB(i);
+		}
+	}
 
 	return hands;
 }
@@ -5586,11 +5582,11 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			if (headConfig) // skip primaryHand
 				continue;
 			if ( !Q_stricmp( token, "left" ) ) {
-				playercfg->primaryHandSide = HAND_LEFT;
-				playercfg->secondaryHandSide = HAND_RIGHT;
+				playercfg->handSide[HAND_PRIMARY] = HS_LEFT;
+				playercfg->handSide[HAND_SECONDARY] = HS_RIGHT;
 			} else if ( !Q_stricmp( token, "right" ) ) {
-				playercfg->primaryHandSide = HAND_RIGHT;
-				playercfg->secondaryHandSide = HAND_LEFT;
+				playercfg->handSide[HAND_PRIMARY] = HS_RIGHT;
+				playercfg->handSide[HAND_SECONDARY] = HS_LEFT;
 			} else {
 				Com_Printf( "Bad primaryHand parm in %s: %s\n", filename, token );
 			}
@@ -5873,8 +5869,8 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	Q_strncpyz(playercfg->soundpath, model, sizeof (playercfg->soundpath));
 
 #ifdef TA_WEAPSYS
-	playercfg->primaryHandSide = HAND_RIGHT;
-	playercfg->secondaryHandSide = HAND_LEFT;
+	playercfg->handSide[HAND_PRIMARY] = HS_RIGHT;
+	playercfg->handSide[HAND_SECONDARY] = HS_LEFT;
 	playercfg->default_weapon = BG_WeaponGroupIndexForName(DEFAULT_DEFAULT_WEAPON);
 
 	// If the default weapon wasn't found.

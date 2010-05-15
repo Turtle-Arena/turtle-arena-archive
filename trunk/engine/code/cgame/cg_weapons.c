@@ -201,9 +201,9 @@ static void CG_MachineGunEjectBrass( centity_t *cent
 
 	offset[0] = 8;
 #ifdef TA_WEAPSYS
-	if (handSide == HAND_RIGHT)
+	if (handSide == HS_RIGHT)
 		offset[1] = -4;
-	else if (handSide == HAND_LEFT)
+	else if (handSide == HS_LEFT)
 		offset[1] = 4;
 	else
 		offset[1] = 0;
@@ -294,9 +294,9 @@ static void CG_ShotgunEjectBrass( centity_t *cent
 
 		offset[0] = 8;
 #ifdef TA_WEAPSYS
-		if (handSide == HAND_RIGHT)
+		if (handSide == HS_RIGHT)
 			offset[1] = -4;
-		else if (handSide == HAND_LEFT)
+		else if (handSide == HS_LEFT)
 			offset[1] = 4;
 		else
 			offset[1] = 0;
@@ -365,9 +365,9 @@ static void CG_NailgunEjectBrass( centity_t *cent
 
 	offset[0] = 0;
 #ifdef TA_WEAPSYS
-	if (handSide == HAND_RIGHT)
+	if (handSide == HS_RIGHT)
 		offset[1] = -12;
-	else if (handSide == HAND_LEFT)
+	else if (handSide == HS_LEFT)
 		offset[1] = 12;
 	else
 		offset[1] = 0;
@@ -406,9 +406,7 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 #define ROTATION 1
 #define SPACING  5
  
-#if !defined TA_WEAYSYS && !defined IOQ3ZTM
 	start[2] -= 4;
-#endif
  
 	le = CG_AllocLocalEntity();
 	re = &le->refEntity;
@@ -2946,43 +2944,34 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 		if ( cg.predictedPlayerState.eFlags & EF_FIRING ) {
 			// special hack for lightning gun...
 #ifdef TA_WEAPSYS
-			int handSide;
 			int i;
 
 			cent = &cg_entities[ps->clientNum];
 
-			// Use default flash origin when no flash model.
 			for (i = 0; i < MAX_HANDS; i++)
 			{
-				VectorCopy(cent->lerpOrigin, cent->pe.flashOrigin[i]);
-				cent->pe.flashOrigin[i][2] += DEFAULT_VIEWHEIGHT - 6;
-			}
-
-			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->trailType == PT_LIGHTNING
-				&& bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->instantDamage)
-			{
+				// Set weapon muzzle origin
 				VectorCopy( cg.refdef.vieworg, origin );
-
-				handSide = cgs.clientinfo[cent->currentState.number].playercfg.primaryHandSide;
-				if (handSide == HAND_RIGHT)
+	
+				if (cgs.clientinfo[cent->currentState.number].playercfg.handSide[i] == HS_RIGHT)
 					VectorMA( origin, -8, cg.refdef.viewaxis[2], origin );
-				else if (handSide == HAND_LEFT)
+				else if (cgs.clientinfo[cent->currentState.number].playercfg.handSide[i] == HS_LEFT)
 					VectorMA( origin, 8, cg.refdef.viewaxis[2], origin );
+	
+				// Set flash origin
+				VectorCopy( origin, cent->pe.flashOrigin[i] );
 
-				CG_LightningBolt( cent, origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[0]->proj->speed);
-			}
+				// Check if holding weapon
+				if (!(cent->currentState.weaponHands & HAND_TO_HB(i)) {
+					continue;
+				}
 
-			if (bg_weapongroupinfo[cent->currentState.weapon].weapon[1]->proj->trailType == PT_LIGHTNING
-				&& bg_weapongroupinfo[cent->currentState.weapon].weapon[1]->proj->instantDamage)
-			{
-				VectorCopy( cg.refdef.vieworg, origin );
-
-				handSide = cgs.clientinfo[cent->currentState.number].playercfg.secondaryHandSide;
-				if (handSide == HAND_RIGHT)
-					VectorMA( origin, -8, cg.refdef.viewaxis[2], origin );
-				else if (handSide == HAND_LEFT)
-					VectorMA( origin, 8, cg.refdef.viewaxis[2], origin );
-				CG_LightningBolt( cent, origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[1]->proj->speed);
+				// Add instant lightning
+				if (bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->trailType == PT_LIGHTNING
+					&& bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->instantDamage)
+				{
+					CG_LightningBolt( cent, origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->speed);
+				}
 			}
 #else
 #ifdef IOQ3ZTM
@@ -3494,8 +3483,9 @@ void CG_FireWeapon( centity_t *cent ) {
 
 	// do brass ejection
 #ifdef TA_WEAPSYS
-	CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.primaryHandSide, bg_weapongroupinfo[ent->weapon].weaponnum[0]);
-	CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.secondaryHandSide, bg_weapongroupinfo[ent->weapon].weaponnum[1]);
+	for (c = 0; c < MAX_HANDS; c++) {
+		CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.handSide[c], bg_weapongroupinfo[ent->weapon].weaponnum[c]);
+	}
 #else
 	if ( weap->ejectBrassFunc && cg_brassTime.integer > 0 ) {
 		weap->ejectBrassFunc( cent );
@@ -4150,7 +4140,7 @@ CG_WeaponHitWall
 Melee weapon hit wall, caused by an EV_WEAPON_MISS event.
 =================
 */
-void CG_WeaponHitWall( int weaponGroup, int handSide, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
+void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
 {
 	qhandle_t		mod;
 	qhandle_t		mark;
@@ -4237,7 +4227,7 @@ void CG_WeaponHitWall( int weaponGroup, int handSide, int clientNum, vec3_t orig
 							   duration, isSprite );
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
-		if (bg_weapongroupinfo[weaponGroup].weapon[handSide]->flags & WIF_WALLMARK_COLORIZE)
+		if (bg_weapongroupinfo[weaponGroup].weapon[hand]->flags & WIF_WALLMARK_COLORIZE)
 		{
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
@@ -4246,8 +4236,8 @@ void CG_WeaponHitWall( int weaponGroup, int handSide, int clientNum, vec3_t orig
 		le->refEntity.radius = exp_add;
 	}
 
-	mark = cg_weapons[bg_weapongroupinfo[weaponGroup].weaponnum[handSide]].wallmarkShader;
-	radius = cg_weapons[bg_weapongroupinfo[weaponGroup].weaponnum[handSide]].wallmarkRadius;
+	mark = cg_weapons[bg_weapongroupinfo[weaponGroup].weaponnum[hand]].wallmarkShader;
+	radius = cg_weapons[bg_weapongroupinfo[weaponGroup].weaponnum[hand]].wallmarkRadius;
 
 	if (!mark || radius <= 0)
 	{
@@ -4259,9 +4249,9 @@ void CG_WeaponHitWall( int weaponGroup, int handSide, int clientNum, vec3_t orig
 	// impact mark
 	//
 	// plasma fades alpha, all others fade color
-	alphaFade = (bg_weapongroupinfo[weaponGroup].weapon[handSide]->flags & WIF_WALLMARK_FADE_ALPHA);
+	alphaFade = (bg_weapongroupinfo[weaponGroup].weapon[hand]->flags & WIF_WALLMARK_FADE_ALPHA);
 
-	if (bg_weapongroupinfo[weaponGroup].weapon[handSide]->flags & WIF_WALLMARK_COLORIZE)
+	if (bg_weapongroupinfo[weaponGroup].weapon[hand]->flags & WIF_WALLMARK_COLORIZE)
 	{
 		float	*color;
 
@@ -4289,10 +4279,10 @@ CG_WeaponHitPlayer
 Melee weapon hit player
 =================
 */
-void CG_WeaponHitPlayer( int weaponGroup, int handSide, vec3_t origin, vec3_t dir, int entityNum )
+void CG_WeaponHitPlayer( int weaponGroup, int hand, vec3_t origin, vec3_t dir, int entityNum )
 {
 #ifndef NOBLOOD
-	if ((bg_weapongroupinfo[weaponGroup].weapon[handSide]->flags & WIF_CUTS) || (rand()&20 > 15)) {
+	if ((bg_weapongroupinfo[weaponGroup].weapon[hand]->flags & WIF_CUTS) || (rand()&20 > 15)) {
 		CG_Bleed( origin, entityNum );
 	}
 #endif

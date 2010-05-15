@@ -1807,8 +1807,8 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
 #ifdef TA_WEAPSYS
-void CG_WeaponHitWall( int weaponGroup, int handSide, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
-void CG_WeaponHitPlayer( int weaponGroup, int handSide, vec3_t origin, vec3_t dir, int entityNum );
+void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
+void CG_WeaponHitPlayer( int weaponGroup, int hand, vec3_t origin, vec3_t dir, int entityNum );
 #else
 void CG_ShotgunFire( entityState_t *es );
 #endif

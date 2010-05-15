@@ -313,7 +313,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 	{
 #ifdef IOQ3ZTM
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
-		if (handSide == HAND_NONE) // Shuriken holdable item
+		if (handSide == HS_CENTER) // Shuriken holdable item
 		{
 			if ((self->client->ps.pm_flags & PMF_USE_ITEM_HELD) || self->client->hook) {
 				return qfalse;
@@ -509,7 +509,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 								tent = G_TempEntity( tr.endpos, EV_RAILTRAIL );
 								// set player number for custom colors on the railtrail
 								tent->s.clientNum = self->s.clientNum;
-								tent->s.weaponHands = HAND_MAX; // Don't attach to client's gun
+								tent->s.weaponHands = MAX_HANDS; // Don't attach to client's gun
 								VectorCopy( start, tent->s.origin2 );
 								// move origin a bit to come closer to the drawn gun muzzle
 								VectorMA( tent->s.origin2, 4, right, tent->s.origin2 );
@@ -601,17 +601,36 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 
 				// set player number for custom colors on the railtrail
 				tent->s.clientNum = self->s.clientNum;
-				if (self->client->pers.playercfg.primaryHandSide == handSide) {
-					tent->s.weaponHands = HAND_PRIMARY;
-				} else {
-					tent->s.weaponHands = HAND_SECONDARY;
+
+				// ZTM: FIXME: Hacky way to find hand?
+				tent->s.weaponHands = MAX_HANDS;
+				if (self->client) {
+					for (i = 0; i < MAX_HANDS; i++)
+					{
+						if (self->client->pers.playercfg.handSide[i] == handSide) {
+							tent->s.weaponHands = i;
+							break;
+						}
+					}
 				}
+#ifdef TA_NPCSYS
+				else if (self->bgNPC.info)
+				{
+					for (i = 0; i < MAX_HANDS; i++)
+					{
+						if (self->bgNPC.info->handSide[i] == handSide) {
+							tent->s.weaponHands = i;
+							break;
+						}
+					}
+				}
+#endif
 
 				VectorCopy( start, tent->s.origin2 );
 				// move origin a bit to come closer to the drawn gun muzzle
-				if (handSide == HAND_RIGHT)
+				if (handSide == HS_RIGHT)
 					VectorMA( tent->s.origin2, 4, right, tent->s.origin2 );
-				else if (handSide == HAND_LEFT)
+				else if (handSide == HS_LEFT)
 					VectorMA( tent->s.origin2, -4, right, tent->s.origin2 );
 				VectorMA( tent->s.origin2, -1, up, tent->s.origin2 );
 
@@ -787,7 +806,7 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 #endif
 
 	return fire_projectile(self, start, forward, right, up, projnum,
-				s_quadFactor, MOD_UNKNOWN, MOD_UNKNOWN, HAND_NONE);
+				s_quadFactor, MOD_UNKNOWN, MOD_UNKNOWN, HS_CENTER);
 #endif
 }
 #endif
