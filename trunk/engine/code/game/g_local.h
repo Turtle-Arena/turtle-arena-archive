@@ -694,7 +694,7 @@ void G_ThrowShuriken(gentity_t *ent, holdable_t holdable);
 #endif
 #ifdef TA_WEAPSYS // MELEEATTACK
 qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, weapontype_t wt);
-qboolean G_MeleeDamage( gentity_t *ent, qboolean forceDamage );
+qboolean G_MeleeDamage( gentity_t *ent, qboolean attacking );
 void G_StartMeleeAttack(gentity_t *ent);
 #else
 qboolean CheckGauntletAttack( gentity_t *ent );

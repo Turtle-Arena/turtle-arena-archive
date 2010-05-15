@@ -2962,7 +2962,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 				VectorCopy( origin, cent->pe.flashOrigin[i] );
 
 				// Check if holding weapon
-				if (!(cent->currentState.weaponHands & HAND_TO_HB(i)) {
+				if (!(cent->currentState.weaponHands & HAND_TO_HB(i))) {
 					continue;
 				}
 

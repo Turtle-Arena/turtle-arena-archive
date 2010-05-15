@@ -686,18 +686,18 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 	return traceHit;
 }
 
-qboolean G_MeleeDamage(gentity_t *ent, qboolean forceDamage)
+qboolean G_MeleeDamage(gentity_t *ent, qboolean attacking)
 {
 	qboolean rtn;
 	int i;
 
-	rtn qfalse;
+	rtn = qfalse;
 
 	for (i = 0; i < MAX_HANDS; i++)
 	{
 		if (ent->client->ps.weaponHands & HAND_TO_HB(i))
 		{
-			if (forceDamage || (bg_weapongroupinfo[ent->client->ps.weapon].weapon[i]->flags & WIF_ALWAYS_DAMAGE))
+			if (attacking || (bg_weapongroupinfo[ent->client->ps.weapon].weapon[i]->flags & WIF_ALWAYS_DAMAGE))
 			{
 				if (G_MeleeDamageSingle(ent, qfalse, i, bg_weapongroupinfo[ent->client->ps.weapon].weapon[i]->weapontype))
 				{
@@ -1572,7 +1572,7 @@ void FireWeapon( gentity_t *ent ) {
 #ifdef TA_WEAPSYS
 	for (i = 0; i < MAX_HANDS; i++)
 	{
-		if (!(ent->client->ps.weaponHands & HAND_TO_HB(i)) {
+		if (!(ent->client->ps.weaponHands & HAND_TO_HB(i))) {
 			continue;
 		}
 
