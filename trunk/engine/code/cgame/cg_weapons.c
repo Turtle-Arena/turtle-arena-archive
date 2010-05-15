@@ -2350,7 +2350,7 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
 		// If player is holding the weapon, don't draw it "away"
 		for (i = 0; i < MAX_HANDS; i++)
 		{
-			if (cent->currentState.weaponHands & (1<<i))
+			if (cent->currentState.weaponHands & HAND_TO_HB(i))
 			{
 				drawWeapon[i] = qfalse;
 			}
@@ -2636,7 +2636,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	// get hands from cent
 	for (i = 0; i < MAX_HANDS; i++)
 	{
-		drawWeapon[i] = ((cent->currentState.weaponHands & (1<<i)) && gun[i].hModel);
+		drawWeapon[i] = ((cent->currentState.weaponHands & HAND_TO_HB(i)) && gun[i].hModel);
 
 		if (!originalTagNames[i]
 #ifdef TA_PLAYERS

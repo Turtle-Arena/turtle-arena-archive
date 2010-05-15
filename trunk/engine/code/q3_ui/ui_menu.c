@@ -249,13 +249,6 @@ static void Main_MenuDraw( void ) {
 	trap_R_RenderScene( &refdef );
 #endif
 	
-#ifdef IOQ3ZTM // ZTM: FIXME: Why does error draw when there isn't a com_errorMessage?? note: ui.qvm only not ui*.so
-	if (s_errorMessage.errorMessage[0] && strlen(s_errorMessage.errorMessage) == 1)
-	{
-		Com_Printf(S_COLOR_YELLOW "WARNING: Buggy com_errorMessage, com_errorMessage[0]='%s'\n", s_errorMessage.errorMessage);
-		s_errorMessage.errorMessage[0] ='\0';
-	}
-#endif
 	if (strlen(s_errorMessage.errorMessage))
 	{
 #ifdef TURTLEARENA // BANNER_IMAGE
