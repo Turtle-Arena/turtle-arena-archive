@@ -1203,6 +1203,9 @@ void weapon_railgun_fire (gentity_t *ent) {
 
 	// set player number for custom colors on the railtrail
 	tent->s.clientNum = ent->s.clientNum;
+#ifdef IOQ3ZTM // ATTACH_RAIL_TO_FLASH
+	tent->s.generic1 = 1;
+#endif
 
 	VectorCopy( muzzle, tent->s.origin2 );
 	// move origin a bit to come closer to the drawn gun muzzle
