@@ -181,9 +181,11 @@ typedef struct {
 	meleeTrail_t weaponTrails[MAX_WEAPON_TRAILS];
 #endif
 
+#ifndef IOQ3ZTM // Unused-rail
 	// railgun trail spawning
 	vec3_t			railgunImpact;
 	qboolean		railgunFlash;
+#endif
 
 	// machinegun spinning
 	float			barrelAngle;
