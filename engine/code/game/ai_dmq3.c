@@ -4166,7 +4166,7 @@ void BotCheckAttack(bot_state_t *bs) {
 
 		for (i = 0; i < MAX_HANDS; i++)
 		{
-			if (bs->cur_ps.weaponHands & HB_TO_HAND(i))
+			if (bs->cur_ps.weaponHands & HAND_TO_HB(i))
 			{
 				if (G_MeleeDamageSingle(ent, qtrue, i, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[i]->weapontype))
 				{
