@@ -26,6 +26,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 /* ZTM: TODO: Finish new general path code,
 		for trains, camera "scripts", NPCs, NiGHTS mode?, 2D mode?
 		and what not.
+
+	Supports trains
+		players in NiGHTS mode are mostly-working (I don't think the problems are in g_path)
+		others are untested
 */
 
 #ifdef TA_PATHSYS
