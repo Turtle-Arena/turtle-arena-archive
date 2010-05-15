@@ -1930,17 +1930,17 @@ static void PM_BeginWeaponChange( int weapon ) {
 
 		if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
 		{
-			if (pm->ps->weaponHands == HAND_PRIMARY)
+			if (pm->ps->weaponHands & HB_BOTH)
+			{
+				anim = TORSO_PUTDEFAULT_BOTH;
+			}
+			else if (pm->ps->weaponHands & HB_PRIMARY)
 			{
 				anim = TORSO_PUTDEFAULT_PRIMARY;
 			}
-			else if (pm->ps->weaponHands == HAND_SECONDARY)
+			else if (pm->ps->weaponHands & HB_SECONDARY)
 			{
 				anim = TORSO_PUTDEFAULT_SECONDARY;
-			}
-			else if (pm->ps->weaponHands == HAND_BOTH)
-			{
-				anim = TORSO_PUTDEFAULT_BOTH;
 			}
 		}
 
@@ -2000,17 +2000,17 @@ static void PM_FinishWeaponChange( void ) {
 
 		if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
 		{
-			if (pm->ps->weaponHands == HAND_PRIMARY)
+			if (pm->ps->weaponHands & HB_BOTH)
 			{
-					anim = TORSO_GETDEFAULT_PRIMARY;
+				anim = TORSO_GETDEFAULT_BOTH;
 			}
-			else if (pm->ps->weaponHands == HAND_SECONDARY)
+			else if (pm->ps->weaponHands & HB_PRIMARY)
 			{
-					anim = TORSO_GETDEFAULT_SECONDARY;
+				anim = TORSO_GETDEFAULT_PRIMARY;
 			}
-			else if (pm->ps->weaponHands == HAND_BOTH)
+			else if (pm->ps->weaponHands & HB_SECONDARY)
 			{
-					anim = TORSO_GETDEFAULT_BOTH;
+				anim = TORSO_GETDEFAULT_SECONDARY;
 			}
 		}
 
@@ -2062,7 +2062,7 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 	int last_hands;
 	animNumber_t anim;
 
-	if ( hands < HAND_NONE || hands > HAND_BOTH ) {
+	if ( hands < HB_NONE || hands >= HB_MAX ) {
 		return;
 	}
 
@@ -2091,29 +2091,29 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 	if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
 	{
 		// both hands
-		if (last_hands == HAND_BOTH && hands == HAND_NONE)
+		if (last_hands == HB_BOTH && hands == HB_NONE)
 		{
 			anim = TORSO_PUTDEFAULT_BOTH;
 		}
-		else if (last_hands == HAND_NONE && hands == HAND_BOTH)
+		else if (last_hands == HB_NONE && hands == HB_BOTH)
 		{
 			anim = TORSO_GETDEFAULT_BOTH;
 		}
 		// primary hand
-		else if (last_hands == HAND_BOTH && hands == HAND_SECONDARY)
+		else if (last_hands == HB_BOTH && hands == HB_SECONDARY)
 		{
 			anim = TORSO_PUTDEFAULT_PRIMARY;
 		}
-		else if (last_hands == HAND_SECONDARY && hands == HAND_BOTH)
+		else if (last_hands == HB_SECONDARY && hands == HB_BOTH)
 		{
 			anim = TORSO_GETDEFAULT_PRIMARY;
 		}
 		// secondary hand
-		else if (last_hands == HAND_BOTH && hands == HAND_PRIMARY)
+		else if (last_hands == HB_BOTH && hands == HB_PRIMARY)
 		{
 			anim = TORSO_PUTDEFAULT_SECONDARY;
 		}
-		else if (last_hands == HAND_PRIMARY && hands == HAND_BOTH)
+		else if (last_hands == HB_PRIMARY && hands == HB_BOTH)
 		{
 			anim = TORSO_GETDEFAULT_SECONDARY;
 		}
@@ -2148,6 +2148,7 @@ PM_FinishWeaponHandsChange
 */
 static void PM_FinishWeaponHandsChange( void ) {
 	int last_hands, hands;
+	animNumber_t anim;
 
 	// Reusing WEAPON_RAISING should be okay here.
 	pm->ps->weaponstate = WEAPON_RAISING;
@@ -2157,55 +2158,53 @@ static void PM_FinishWeaponHandsChange( void ) {
 
 	pm->ps->weaponHands = pm->ps->stats[STAT_NEW_WEAPON_HANDS];
 
-	{
-		int anim = TORSO_RAISE;
+	anim = TORSO_RAISE;
 
 	if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
 	{
-			// both hands
-			if (last_hands == HAND_BOTH && hands == HAND_NONE)
-			{
-				anim = TORSO_PUTDEFAULT_BOTH;
-	}
-			else if (last_hands == HAND_NONE && hands == HAND_BOTH)
-	{
-				anim = TORSO_GETDEFAULT_BOTH;
-			}
-			// primary hand
-			else if (last_hands == HAND_BOTH && hands == HAND_SECONDARY)
-			{
-				anim = TORSO_PUTDEFAULT_PRIMARY;
-			}
-			else if (last_hands == HAND_SECONDARY && hands == HAND_BOTH)
-			{
-				anim = TORSO_GETDEFAULT_PRIMARY;
-			}
-			// secondary hand
-			else if (last_hands == HAND_BOTH && hands == HAND_PRIMARY)
-			{
-				anim = TORSO_PUTDEFAULT_SECONDARY;
-			}
-			else if (last_hands == HAND_PRIMARY && hands == HAND_BOTH)
-			{
-				anim = TORSO_GETDEFAULT_SECONDARY;
-			}
-
-			// Just let the animation run.
-			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
-			// If started a animation, continue it.
-			if ( ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) >= TORSO_PUTDEFAULT_BOTH
-				&& ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) <= TORSO_GETDEFAULT_SECONDARY) {
-			PM_ContinueTorsoAnim( anim );
-			}
-			return;
+		// both hands
+		if (last_hands == HB_BOTH && hands == HB_NONE)
+		{
+			anim = TORSO_PUTDEFAULT_BOTH;
+		}
+		else if (last_hands == HB_NONE && hands == HB_BOTH)
+		{
+			anim = TORSO_GETDEFAULT_BOTH;
+		}
+		// primary hand
+		else if (last_hands == HB_BOTH && hands == HB_SECONDARY)
+		{
+			anim = TORSO_PUTDEFAULT_PRIMARY;
+		}
+		else if (last_hands == HB_SECONDARY && hands == HB_BOTH)
+		{
+			anim = TORSO_GETDEFAULT_PRIMARY;
+		}
+		// secondary hand
+		else if (last_hands == HB_BOTH && hands == HB_PRIMARY)
+		{
+			anim = TORSO_PUTDEFAULT_SECONDARY;
+		}
+		else if (last_hands == HB_PRIMARY && hands == HB_BOTH)
+		{
+			anim = TORSO_GETDEFAULT_SECONDARY;
 		}
 
-		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
-		// Don't override gesture when capturing the flag.
-		if (!pm->ps->torsoTimer) {
+		// Just let the animation run.
+		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
+		// If started a animation, continue it.
+		if ( ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) >= TORSO_PUTDEFAULT_BOTH
+			&& ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) <= TORSO_GETDEFAULT_SECONDARY) {
+			PM_ContinueTorsoAnim( anim );
+		}
+		return;
+	}
+
+	pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
+	// Don't override gesture when capturing the flag.
+	if (!pm->ps->torsoTimer) {
 		PM_StartTorsoAnim( anim );
 	}
-}
 }
 #endif
 

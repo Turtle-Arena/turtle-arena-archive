@@ -495,21 +495,14 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 
 	traceHit = qfalse;
 
-	if (hand == HAND_PRIMARY)
-	{
-		weapon = bg_weapongroupinfo[weaponGroupNum].weapon[0];
-		mod = weapon->mod;
-		// Use default kill message
-		if (mod == MOD_UNKNOWN) {
+	weapon = bg_weapongroupinfo[weaponGroupNum].weapon[hand];
+	mod = weapon->mod;
+
+	// Use default kill message
+	if (mod == MOD_UNKNOWN) {
+		if (hand == HAND_PRIMARY) {
 			mod = MOD_WEAPON_PRIMARY;
-		}
-	}
-	else
-	{
-		weapon = bg_weapongroupinfo[weaponGroupNum].weapon[1];
-		mod = weapon->mod;
-		// Use default kill message
-		if (mod == MOD_UNKNOWN) {
+		} else {
 			mod = MOD_WEAPON_SECONDARY;
 		}
 	}
@@ -654,7 +647,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 			{
 				tent->s.eventParm = DirToByte( tr.plane.normal );
 				tent->s.weapon = weaponGroupNum;
-				tent->s.weaponHands = hand; // handSide
+				tent->s.weaponHands = hand;
 				tent->s.clientNum = ent->s.number;
 			}
 		}
@@ -695,27 +688,26 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 
 qboolean G_MeleeDamage(gentity_t *ent, qboolean forceDamage)
 {
-	qboolean rtn, rtn2;
+	qboolean rtn;
+	int i;
 
-	rtn = rtn2 = qfalse;
+	rtn qfalse;
 
-	if (ent->client->ps.weaponHands & HAND_PRIMARY)
+	for (i = 0; i < MAX_HANDS; i++)
 	{
-		if (forceDamage || (bg_weapongroupinfo[ent->client->ps.weapon].weapon[0]->flags & WIF_ALWAYS_DAMAGE))
+		if (ent->client->ps.weaponHands & HAND_TO_HB(i))
 		{
-			rtn = G_MeleeDamageSingle(ent, qfalse, HAND_PRIMARY, bg_weapongroupinfo[ent->client->ps.weapon].weapon[0]->weapontype);
+			if (forceDamage || (bg_weapongroupinfo[ent->client->ps.weapon].weapon[i]->flags & WIF_ALWAYS_DAMAGE))
+			{
+				if (G_MeleeDamageSingle(ent, qfalse, i, bg_weapongroupinfo[ent->client->ps.weapon].weapon[i]->weapontype))
+				{
+					rtn = qtrue;
+				}
+			}
 		}
 	}
 
-	if (ent->client->ps.weaponHands & HAND_SECONDARY)
-	{
-		if (forceDamage || (bg_weapongroupinfo[ent->client->ps.weapon].weapon[1]->flags & WIF_ALWAYS_DAMAGE))
-		{
-			rtn2 = G_MeleeDamageSingle(ent, qfalse, HAND_SECONDARY, bg_weapongroupinfo[ent->client->ps.weapon].weapon[1]->weapontype);
-		}
-	}
-
-	return (rtn || rtn2);
+	return rtn;
 }
 #endif // TA_WEAPSYS
 #ifndef TA_WEAPSYS
@@ -1546,6 +1538,10 @@ FireWeapon
 ===============
 */
 void FireWeapon( gentity_t *ent ) {
+#ifdef TA_WEAPSYS
+	int i;
+#endif
+
 	if (ent->client->ps.powerups[PW_QUAD] ) {
 		s_quadFactor = g_quadfactor.value;
 	} else {
@@ -1557,16 +1553,11 @@ void FireWeapon( gentity_t *ent ) {
 	}
 #endif
 
+#ifndef TA_WEAPSYS
 	// track shots taken for accuracy tracking.  Grapple is not a weapon and gauntet is just not tracked
-#ifdef TA_WEAPSYS
-	if (BG_WeapUseAmmo(ent->s.weapon))
-#else
 	if( ent->s.weapon != WP_GRAPPLING_HOOK && ent->s.weapon != WP_GAUNTLET )
-#endif
 	{
-#ifdef TA_WEAPSYS
-		ent->client->accuracy_shots += bg_weapongroupinfo[ent->s.weapon].weapon[0]->proj->numProjectiles;
-#elif defined MISSIONPACK
+#ifdef MISSIONPACK
 		if( ent->s.weapon == WP_NAILGUN ) {
 			ent->client->accuracy_shots += NUM_NAILSHOTS;
 		} else {
@@ -1576,43 +1567,39 @@ void FireWeapon( gentity_t *ent ) {
 		ent->client->accuracy_shots++;
 #endif
 	}
+#endif
 
 #ifdef TA_WEAPSYS
-    if (bg_weapongroupinfo[ent->s.weapon].weapon[0]->weapontype == WT_GUN)
-    {
-		// set aiming directions
-		AngleVectors (ent->client->ps.viewangles, forward, right, up);
-		CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
-		if (ent->client->pers.playercfg.primaryHandSide == HAND_RIGHT)
-			VectorMA (muzzle, 4, right, muzzle);
-		else if (ent->client->pers.playercfg.primaryHandSide == HAND_LEFT)
-			VectorMA (muzzle, -4, right, muzzle);
+	for (i = 0; i < MAX_HANDS; i++)
+	{
+		if (!(ent->client->ps.weaponHands & HAND_TO_HB(i)) {
+			continue;
+		}
+
+		if (bg_weapongroupinfo[ent->s.weapon].weapon[i]->weapontype == WT_GUN)
+		{
+			// track shots taken for accuracy tracking.
+			if (BG_WeapUseAmmo(ent->s.weapon)) {
+				ent->client->accuracy_shots += bg_weapongroupinfo[ent->s.weapon].weapon[i]->proj->numProjectiles;
+			}
+
+			// set aiming directions
+			AngleVectors (ent->client->ps.viewangles, forward, right, up);
+			CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
+			if (ent->client->pers.playercfg.handSide[i] == HS_RIGHT)
+				VectorMA (muzzle, 4, right, muzzle);
+			else if (ent->client->pers.playercfg.handSide[i] == HS_LEFT)
+				VectorMA (muzzle, -4, right, muzzle);
 
 #ifdef TURTLEARENA // LOCKON
-		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
-				muzzle, forward, right, up);
+			G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[i]->projnum,
+					muzzle, forward, right, up);
 #endif
-		fire_weapon(ent, muzzle, forward, right, up,
-				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, ent->client->pers.playercfg.primaryHandSide);
-    }
+			fire_weapon(ent, muzzle, forward, right, up,
+					bg_weapongroupinfo[ent->s.weapon].weaponnum[i], s_quadFactor, ent->client->pers.playercfg.handSide[i]);
+		}
 
-    if (bg_weapongroupinfo[ent->s.weapon].weapon[1]->weapontype == WT_GUN)
-    {
-		// set aiming directions
-		AngleVectors (ent->client->ps.viewangles, forward, right, up);
-		CalcMuzzlePointOrigin ( ent, ent->client->oldOrigin, forward, right, up, muzzle );
-		if (ent->client->pers.playercfg.secondaryHandSide == HAND_RIGHT)
-			VectorMA (muzzle, 4, right, muzzle);
-		else if (ent->client->pers.playercfg.secondaryHandSide == HAND_LEFT)
-			VectorMA (muzzle, -4, right, muzzle);
-
-#ifdef TURTLEARENA // LOCKON
-		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
-				muzzle, forward, right, up);
-#endif
-		fire_weapon(ent, muzzle, forward, right, up,
-				bg_weapongroupinfo[ent->s.weapon].weaponnum[1], s_quadFactor, ent->client->pers.playercfg.secondaryHandSide);
-    }
+	}
 #else
 	// set aiming directions
 	AngleVectors (ent->client->ps.viewangles, forward, right, up);
@@ -1931,6 +1918,8 @@ void G_StartKamikaze( gentity_t *ent ) {
 #ifdef TA_NPCSYS
 void NPC_FireWeapon(gentity_t *ent)
 {
+	int i;
+
 	// set aiming directions
 	AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
 
@@ -1939,44 +1928,27 @@ void NPC_FireWeapon(gentity_t *ent)
 
 	s_quadFactor=1;
 
-    if (bg_weapongroupinfo[ent->s.weapon].weapon[0]->weapontype == WT_GUN)
-    {
-		// set aiming directions
-		AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
-		CalcMuzzlePoint ( ent, forward, right, up, muzzle );
-		if (ent->bgNPC.info->primaryHandSide == HAND_RIGHT)
-			VectorMA (muzzle, 4, right, muzzle);
-		else if (ent->bgNPC.info->primaryHandSide == HAND_LEFT)
-			VectorMA (muzzle, -4, right, muzzle);
+	for (i = 0; i < MAX_HANDS; i++)
+	{
+		if (bg_weapongroupinfo[ent->s.weapon].weapon[i]->weapontype == WT_GUN)
+		{
+			// set aiming directions
+			AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
+			CalcMuzzlePoint ( ent, forward, right, up, muzzle );
+			if (ent->bgNPC.info->handSide[i] == HS_RIGHT)
+				VectorMA (muzzle, 4, right, muzzle);
+			else if (ent->bgNPC.info->handSide[i] == HS_LEFT)
+				VectorMA (muzzle, -4, right, muzzle);
 
 #ifdef TURTLEARENA // LOCKON
-		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
-				muzzle, forward, right, up);
+			G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[i]->projnum,
+					muzzle, forward, right, up);
 #else
-		// NPC just shoots forward, not at target...
+			// NPC just shoots forward, not at target...
 #endif
-		fire_weapon(ent, muzzle, forward, right, up,
-				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], s_quadFactor, ent->bgNPC.info->primaryHandSide);
-    }
-
-    if (bg_weapongroupinfo[ent->s.weapon].weapon[1]->weapontype == WT_GUN)
-    {
-		// set aiming directions
-		AngleVectors (ent->bgNPC.npc_ps.viewangles, forward, right, up);
-		CalcMuzzlePoint ( ent, forward, right, up, muzzle );
-		if (ent->bgNPC.info->secondaryHandSide == HAND_RIGHT)
-			VectorMA (muzzle, 4, right, muzzle);
-		else if (ent->bgNPC.info->secondaryHandSide == HAND_LEFT)
-			VectorMA (muzzle, -4, right, muzzle);
-
-#ifdef TURTLEARENA // LOCKON
-		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[1]->projnum,
-				muzzle, forward, right, up);
-#else
-		// NPC just shoots forward, not at target...
-#endif
-		fire_weapon(ent, muzzle, forward, right, up,
-				bg_weapongroupinfo[ent->s.weapon].weaponnum[1], s_quadFactor, ent->bgNPC.info->secondaryHandSide);
-    }
+			fire_weapon(ent, muzzle, forward, right, up,
+					bg_weapongroupinfo[ent->s.weapon].weaponnum[i], s_quadFactor, ent->bgNPC.info->handSide[i]);
+		}
+	}
 }
 #endif

@@ -1194,7 +1194,7 @@ typedef struct playerState_s {
 	int		chain;
 	int		chainTime;
 
-	int			weaponHands;	// HAND_NONE, HAND_PRIMARY, HAND_SECONDARY, or HAND_BOTH
+	int			weaponHands;	// HB_NONE, HB_PRIMARY, HB_SECONDARY, or HB_BOTH
 #endif
 
 	// not communicated over the net at all

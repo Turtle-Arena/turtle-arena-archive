@@ -4162,19 +4162,16 @@ void BotCheckAttack(bot_state_t *bs) {
 	{
 		// G_MeleeDamage
 		gentity_t *ent = &g_entities[bs->entitynum];
+		int i;
 
-		if (bs->cur_ps.weaponHands & HAND_PRIMARY)
+		for (i = 0; i < MAX_HANDS; i++)
 		{
-			if (G_MeleeDamageSingle(ent, qtrue, HAND_PRIMARY, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[0]->weapontype))
+			if (bs->cur_ps.weaponHands & HB_TO_HAND(i))
 			{
-				return;
-			}
-		}
-		if (bs->cur_ps.weaponHands & HAND_SECONDARY)
-		{
-			if (G_MeleeDamageSingle(ent, qtrue, HAND_SECONDARY, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[1]->weapontype))
-			{
-				return;
+				if (G_MeleeDamageSingle(ent, qtrue, i, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[i]->weapontype))
+				{
+					return;
+				}
 			}
 		}
 	}

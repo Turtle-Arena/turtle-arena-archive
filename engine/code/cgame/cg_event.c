@@ -1309,8 +1309,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
 
 #ifdef TA_WEAPSYS
-		if (es->clientNum < MAX_CLIENTS && es->weaponHands < HAND_MAX) {
-			VectorCopy(cg_entities[es->clientNum].pe.flashOrigin[(1>>es->weaponHands)], es->origin2);
+		if (es->clientNum < MAX_CLIENTS && es->weaponHands < MAX_HANDS) {
+			VectorCopy(cg_entities[es->clientNum].pe.flashOrigin[es->weaponHands], es->origin2);
 		} else {
 			es->origin2[2] -= 4;
 		}

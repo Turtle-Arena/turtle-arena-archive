@@ -540,20 +540,42 @@ typedef enum {
 #endif
 
 #ifdef TA_WEAPSYS
-// bitflags
-#define HAND_NONE		0 // dummy flag
-#define HAND_PRIMARY	1
-#define HAND_SECONDARY	2
-#define HAND_BOTH		3
-#define HAND_MAX		(HAND_PRIMARY|HAND_SECONDARY)+1
+// Currently only support two hands
+typedef enum
+{
+	HAND_PRIMARY,
+	HAND_SECONDARY,
+#if 0
+	HAND_THIRD,
+	HAND_FOURTH,
+#endif
+	MAX_HANDS
+} hand_e;
 
-// array max
-#define MAX_HANDS 2 // Only support two hands for fighting.
+// hand bits, usally used in weaponHands
+typedef enum
+{
+	HB_NONE			= 0,
+	HB_PRIMARY		= 1,
+	HB_SECONDARY	= 2,
+	HB_BOTH			= 3, // (HB_PRIMARY|HB_SECONDARY)
+#if 0 // ZTM: NOTE: May have to update weaponHands sent bits over network, add more MOD_WEAPON_*, and stuff.
+	HB_THIRD		= 4,
+	HB_FOURTH		= 8,
+	HB_ALL			= 15, // (HB_PRIMARY|HB_SECONDARY|HB_THIRD|HB_FOURTH)
+	HB_MAX			= 16 // (HB_PRIMARY|HB_SECONDARY|HB_THIRD|HB_FOURTH)+1
+#else
+	HB_MAX			= 4 // (HB_PRIMARY|HB_SECONDARY)+1
+#endif
+} handbits_e;
+
+#define HAND_TO_HB(hand) (1<<(hand))
+//#define HB_TO_HAND(handbit) (1>>(handbit))
 
 // handSide
-#define HAND_CENTER 0
-#define HAND_RIGHT 1
-#define HAND_LEFT 2
+#define HS_CENTER 0
+#define HS_RIGHT 1
+#define HS_LEFT 2
 
 //projectile trail types
 #define PT_NONE 0
@@ -1412,8 +1434,7 @@ typedef struct bg_playercfg_s
 
 #ifdef TA_WEAPSYS
     weapon_t default_weapon;
-	int primaryHandSide;
-	int secondaryHandSide;
+	int handSide[MAX_HANDS];
 #endif
 
 	// Player's boundingbox
@@ -1534,8 +1555,7 @@ typedef struct
 	int viewheight;
 	vec3_t mins, maxs;
 	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
-	int primaryHandSide;
-	int secondaryHandSide;
+	int handSide[MAX_HANDS];
 
 } bg_npcinfo_t;
 
