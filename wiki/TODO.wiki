@@ -170,7 +170,7 @@ Weapons (and attacking)
     * (NiGHTS: Journey of Dreams) Move camera if holding 'z' and move analog stick, can't look around while moving
     * BETTER(not done?): When moving the camera around the player, focus on the player. (Like in NiGHTS: Journey of Dreams)
 
-  * TODO-BETA: STARTED(TURTLEARENA // LOCKON): When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
+  * TODO: STARTED(TURTLEARENA // LOCKON): When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
     * BUG: When higher then target to focus on it gets all messed up.
 
   * TODO: Merge Quake3 bot chat and Team Arena voice chat systems?
@@ -191,7 +191,7 @@ Weapons (and attacking)
     * MD5 use single model and skeleton
     * the animations can move any part of the model
     * multiple animations can animate at the same time
-  * TODO-after-above: Re-rig and reanimate players in Blender for MD5?
+  * TODO-after-above: Re-rig and reanimate players in Blender for MD5? (or add MD5 export to MM3D?)
 
 == Objects ==
 Most of the mapobjects should be damageable.
