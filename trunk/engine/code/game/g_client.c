@@ -1946,10 +1946,12 @@ void G_SavePersistant(char *nextmap)
 #endif
 	int skill;
 
+#if 0 // ZTM: FIXME: Save loading doesn't work
 	// If in real single player auto-save on level end? in case of crash or something?...
 	if (g_singlePlayer.integer) {
 		trap_SendConsoleCommand( EXEC_APPEND, va("savegame autosave -minimum %s", nextmap) );
 	}
+#endif
 	skill = trap_Cvar_VariableValue( "g_spSkill" );
 
 	memset(savedata, 0, sizeof(savedata));
