@@ -445,12 +445,14 @@ bulletExplosion
 	cull disable
 	{
 		animmap 5 models/weaphits/bullet1.png  models/weaphits/bullet2.png  models/weaphits/bullet3.png gfx/colors/black.png
-		rgbGen wave inversesawtooth 0 1 0 5
+		//rgbGen wave inversesawtooth 0 1 0 5
+		rgbGen entity // Tri-Blaster colorize
 		blendfunc add
 	}
 	{
 		animmap 5 models/weaphits/bullet2.png  models/weaphits/bullet3.png  gfx/colors/black.png gfx/colors/black.png
-		rgbGen wave sawtooth 0 1 0 5
+		//rgbGen wave sawtooth 0 1 0 5
+		rgbGen entity // Tri-Blaster colorize
 		blendfunc add
 	}
 }

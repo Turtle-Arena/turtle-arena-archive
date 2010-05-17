@@ -614,8 +614,7 @@ typedef enum
 //projectile flags
 #define PF_WALLMARK_FADE_ALPHA 1
 #define PF_WALLMARK_COLORIZE 2
-#define PF_EXPLOSION_COLORIZE 4
-#define PF_USE_GRAVITY 8
+#define PF_USE_GRAVITY 4
 // missile stuff (func, model, etc)
 typedef struct
 {

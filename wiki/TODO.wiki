@@ -73,6 +73,8 @@ Weapons (and attacking)
   * STARTED (TA_HOLDABLE): Make shurikens/holdable-projectiles general like weapons groups.
     * (So they can be totally configured from .weap, and add new ones)
 
+  * BUG: Rail origin is incorrect
+
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
 
@@ -160,6 +162,8 @@ Weapons (and attacking)
   * TODO: Remove metal debris from grate textures
 
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
+
+  * BUG: Bloom in windowed mode only effecting the top 480 (or is it 640?) pixels?
 
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
