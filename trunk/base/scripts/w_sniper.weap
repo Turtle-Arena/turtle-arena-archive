@@ -17,9 +17,8 @@ projectile "p_rail"
 weapon "w_railgun"
 {
 	weapontype WT_GUN
-	//model "models/weapons2/railgun/railgun.md3"
-	model "models/weapons2/gun/gun.md3"
-	mod MOD_RAILGUN
+	model "models/weapons2/railgun/railgun.md3"
+	//mod MOD_RAILGUN
 	attackDelay 1500
 	flashColor 1 0.5 0
 	//flashSound0 "sound/weapons/railgun/railgf1a.wav"
@@ -32,9 +31,9 @@ weapongroup "wp_railgun"
 	itemName "weapon_railgun"
 	//pickupName "Railgun"
 	pickupName "Sniper Rifle"
-	//pickupModel "models/weapons2/railgun/railgun.md3"
-	pickupModel "models/weapons2/gun/gun.md3"
+	pickupModel "models/weapons2/railgun/railgun.md3"
 	iconName "icons/iconw_railgun"
 	pickupAmmo 10
 	weapon_primary "w_railgun"
 }
+

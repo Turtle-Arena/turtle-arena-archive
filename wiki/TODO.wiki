@@ -73,7 +73,7 @@ Weapons (and attacking)
   * STARTED (TA_HOLDABLE): Make shurikens/holdable-projectiles general like weapons groups.
     * (So they can be totally configured from .weap, and add new ones)
 
-  * BUG: Rail origin is incorrect
+  * BUG: Flash origin isn't updated when missing weapon model
 
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
