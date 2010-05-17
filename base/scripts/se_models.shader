@@ -418,15 +418,29 @@ models/weapons2/nunchuck/w_nunchuck
 
 models/weapons2/nunchuck/chain
 {
-	{
-		map $whiteimage
-		rgbGen const ( 0.4 0.4 0.4 )
-	}
+	//{
+	//	map $whiteimage
+	//	rgbGen const ( 0.4 0.4 0.4 )
+	//}
 	{
 		map textures/effects/tinfx_lighter.png
 		tcGen environment
 		rgbGen lightingDiffuse
 		//alphaGen wave sin .6 .2 0 .6
+	}
+}
+
+models/weapons2/railgun/railgun
+{
+	{
+		map textures/sfx/detail.jpg
+		tcmod rotate 50
+		rgbGen entity
+	}
+	{
+		map models/weapons2/railgun/railgun
+		blendfunc blend
+		rgbGen lightingDiffuse
 	}
 }
 

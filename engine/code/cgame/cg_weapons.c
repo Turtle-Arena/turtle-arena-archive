@@ -2508,48 +2508,28 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	// add the weapon
 	memset( &gun, 0, sizeof( gun ) );
 
-#ifdef TA_WEAPSYS
-	VectorCopy( parent->lightingOrigin, gun[0].lightingOrigin );
-	gun[0].shadowPlane = parent->shadowPlane;
-	gun[0].renderfx = parent->renderfx;
-#else
+#ifndef TA_WEAPSYS
 	VectorCopy( parent->lightingOrigin, gun.lightingOrigin );
 	gun.shadowPlane = parent->shadowPlane;
 	gun.renderfx = parent->renderfx;
-#endif
 
 	// set custom shading for railgun refire rate
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black.
-	if ( ps &&
-#ifndef TA_WEAPSYS // ZTM: Do it for all weapons.
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black. (and use correct glow in third person)
+	if ( ( ps || cent->currentState.clientNum == cg.predictedPlayerState.clientNum ) &&
 		cg.predictedPlayerState.weapon == WP_RAILGUN && 
-#endif
 		cg.predictedPlayerState.weaponstate == WEAPON_FIRING )
 	{
 		float	f;
 
 		f = (float)cg.predictedPlayerState.weaponTime / 1500;
-#ifdef TA_WEAPSYS
-		gun[0].shaderRGBA[1] = 0;
-		gun[0].shaderRGBA[0] = 
-		gun[0].shaderRGBA[2] = 255 * ( 1.0 - f );
-#else
 		gun.shaderRGBA[1] = 0;
 		gun.shaderRGBA[0] = 
 		gun.shaderRGBA[2] = 255 * ( 1.0 - f );
-#endif
 	} else {
-#ifdef TA_WEAPSYS
-		gun[0].shaderRGBA[0] = 255;
-		gun[0].shaderRGBA[1] = 255;
-		gun[0].shaderRGBA[2] = 255;
-		gun[0].shaderRGBA[3] = 255;
-#else
 		gun.shaderRGBA[0] = 255;
 		gun.shaderRGBA[1] = 255;
 		gun.shaderRGBA[2] = 255;
 		gun.shaderRGBA[3] = 255;
-#endif
 	}
 #else
 	if ( ps ) {
@@ -2571,6 +2551,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	}
 #endif
+#endif
 
 #ifdef TA_WEAPSYS
 	foundModel = qfalse;
@@ -2578,11 +2559,36 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	// Copy the primary hand weapon to the secondary hand weapon.
 	for (i = 0; i < MAX_HANDS; i++)
 	{
-		if (i > 0) {
-			memcpy( &gun[i], &gun[0], sizeof( gun[0] ) );
+		VectorCopy( parent->lightingOrigin, gun[i].lightingOrigin );
+		gun[i].shadowPlane = parent->shadowPlane;
+		gun[i].renderfx = parent->renderfx;
+
+		// set custom shading for railgun refire rate
+		if ( ( ps || cent->currentState.clientNum == cg.predictedPlayerState.clientNum )
+			&& cg.predictedPlayerState.weaponstate == WEAPON_FIRING
+			&& weaponGroup->weapon[i]->attackDelay > 0)
+		{
+			float	f;
+
+			f = (float)cg.predictedPlayerState.weaponTime / weaponGroup->weapon[i]->attackDelay;
+#if 1 // Use color2
+			gun[i].shaderRGBA[0] = ci->color2[0] * 255 * ( 1.0 - f );
+			gun[i].shaderRGBA[1] = ci->color2[1] * 255 * ( 1.0 - f );
+			gun[i].shaderRGBA[2] = ci->color2[2] * 255 * ( 1.0 - f );
+#else // Use purple
+			gun[i].shaderRGBA[1] = 0;
+			gun[i].shaderRGBA[0] = 
+			gun[i].shaderRGBA[2] = 255 * ( 1.0 - f );
+#endif
+		} else {
+			gun[i].shaderRGBA[0] = 255;
+			gun[i].shaderRGBA[1] = 255;
+			gun[i].shaderRGBA[2] = 255;
+			gun[i].shaderRGBA[3] = 255;
 		}
+
 		gun[i].hModel = cg_weapons[weaponGroup->weaponnum[i]].weaponModel;
-		
+
 		if (gun[i].hModel) {
 			foundModel = qtrue;
 		}
