@@ -6281,11 +6281,8 @@ const char *bg_playerDirs[MAX_PLAYER_DIRS] =
 #ifdef TA_SUPPORTEF
 	"models/players2",
 #endif
-#ifndef TURTLEARENA
-	// ZTM: Do any players use this? There isn't any reason to,
-	//             unless you want to have players that aren't in the player select menu.
+	// Players in the below directories are listed in the player select menu.
 	"models/players/characters",
-#endif
 	NULL
 };
 #endif
