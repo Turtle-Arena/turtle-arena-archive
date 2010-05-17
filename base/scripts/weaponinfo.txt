@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //       hole is used by grappling hook and all melee weapons...
 //	cgs.media.energyMarkShader = trap_R_RegisterShader( "gfx/damage/plasma_mrk" );
 //  	Hammer mark - gfx/damage/hammer_mrk
-// TODO:
+// ZTM: TODO:
 //  New melee weapon with blade		gfx/damage/melee_mrk_sharp
 //  New non-bladed (Bo, and whatever)  gfx/damage/melee_mrk_dull
 
@@ -195,7 +195,7 @@ weapon "w_katana"
 
 weapongroup "wp_daisho"
 {
-	randomSpawn 0 // FIXME: Missing models
+	randomSpawn 0 // ZTM: FIXME: Missing models
 	itemName "weapon_daisho"
 	pickupName "Daisho"
 	pickupModel "models/weapons2/daisho/daisho_pickup.md3"
@@ -1050,7 +1050,7 @@ weapongroup "wp_grappling_hook"
 	}
 }
 
-// TODO: Fall out of air after time to live.
+// ZTM: TODO: Fall out of air after time to live.
 projectile "p_dart"
 {
 	model "models/ammo/rocket/rocket.md3"
@@ -1076,6 +1076,7 @@ weapon "w_dartgun"
 weapongroup "wp_dartgun"
 {
 	clone "wt_gun"
+	randomSpawn 0 // unfinished weapon
 	itemName "weapon_dartgun"
 	pickupName "Dart Gun"
 	pickupModel "models/weapons2/gun/gun.md3"
