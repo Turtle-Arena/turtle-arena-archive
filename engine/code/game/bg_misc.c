@@ -1956,16 +1956,6 @@ static qboolean Projectile_Parse(char **p) {
 			else
 				projectile.flags &= ~PF_WALLMARK_COLORIZE;
 			continue;
-		} else if ( !Q_stricmp( token, "explosionColorize" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				projectile.flags |= PF_EXPLOSION_COLORIZE;
-			else
-				projectile.flags &= ~PF_EXPLOSION_COLORIZE;
-			continue;
 		} else if ( !Q_stricmp( token, "useGravity" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
@@ -2930,7 +2920,6 @@ void BG_DumpWeaponInfo(void)
 
 		FS_Printf2("\twallmarkFadeAlpha %d\r\n", (projectile->flags & PF_WALLMARK_FADE_ALPHA));
 		FS_Printf2("\twallmarkColorize %d\r\n", (projectile->flags & PF_WALLMARK_COLORIZE));
-		FS_Printf2("\texplosionColorize %d\r\n", (projectile->flags & PF_EXPLOSION_COLORIZE));
 		FS_Printf2("\tuseGravity %d\r\n", (projectile->flags & PF_USE_GRAVITY));
 
 		FS_Printf2("\tstickOnImpact %d\r\n", projectile->stickOnImpact);

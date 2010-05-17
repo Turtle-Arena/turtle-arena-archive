@@ -2064,6 +2064,8 @@ localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive, int alpha)
 	re->shaderRGBA[3] = alpha;
 	re->renderfx |= RF_FORCE_ENT_ALPHA | RF_NOSHADOW;
 
+	le->color[0] = le->color[1] = le->color[2] = 1.0f;
+
 	// ZTM: FIXME: Use alpha?
 	le->color[3] = 1.0f; // (float)((float)alpha / 255.0f);
 
@@ -4033,14 +4035,18 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 							   duration, isSprite );
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
-#ifdef TA_WEAPSYS
-		if (bg_projectileinfo[weapon].flags & PF_EXPLOSION_COLORIZE)
-#else
+#ifndef TA_WEAPSYS // ZTM: Do it for all weapons
 		if ( weapon == WP_RAILGUN )
 #endif
 		{
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: let use color
+			le->refEntity.shaderRGBA[0] = le->color[0] * 0xff;
+			le->refEntity.shaderRGBA[1] = le->color[1] * 0xff;
+			le->refEntity.shaderRGBA[2] = le->color[2] * 0xff;
+			le->refEntity.shaderRGBA[3] = 0xff;
+#endif
 		}
 #ifdef TA_WEAPSYS // SPR_EXP_SCALE
 		le->radius = exp_base;
@@ -4229,11 +4235,13 @@ void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, 
 							   duration, isSprite );
 		le->light = light;
 		VectorCopy( lightColor, le->lightColor );
-		if (bg_weapongroupinfo[weaponGroup].weapon[hand]->flags & WIF_WALLMARK_COLORIZE)
-		{
-			// colorize with client color
-			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
-		}
+		// colorize with client color
+		VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
+		le->refEntity.shaderRGBA[0] = le->color[0] * 0xff;
+		le->refEntity.shaderRGBA[1] = le->color[1] * 0xff;
+		le->refEntity.shaderRGBA[2] = le->color[2] * 0xff;
+		le->refEntity.shaderRGBA[3] = 0xff;
+
 		le->radius = exp_base;
 		le->refEntity.radius = exp_add;
 	}

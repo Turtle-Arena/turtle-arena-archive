@@ -290,8 +290,6 @@ weapongroup "wp_lightning"
 //
 // Railgun (Done)
 //
-// Railgun explosions are not colorized?
-//
 
 projectile "p_rail"
 {
