@@ -6281,7 +6281,7 @@ const char *bg_playerDirs[MAX_PLAYER_DIRS] =
 #ifdef TA_SUPPORTEF
 	"models/players2",
 #endif
-	// Players in the below directories are listed in the player select menu.
+	// Players in the below directories are not listed in the player select menu.
 	"models/players/characters",
 	NULL
 };
