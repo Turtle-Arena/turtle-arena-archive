@@ -115,6 +115,7 @@ Weapons (and attacking)
   * TODO: Data: Team skins for players
 
   * TODO: Per-team flag skins?... (Team icon is on flag skin)
+     * Would a shader remap work?
 
   * TODO: Have Foot be the default red team (Update flag skin)
 
@@ -164,6 +165,8 @@ Weapons (and attacking)
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
 
   * BUG: Bloom in windowed mode only effecting the top 480 (or is it 640?) pixels?
+
+  * TODO: Make a original character (In case the Ninja Turtles have to be removed at some point)
 
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)

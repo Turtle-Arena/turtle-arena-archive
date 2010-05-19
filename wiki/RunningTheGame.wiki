@@ -14,13 +14,16 @@
 You will need the following development libraries; SDL, GL, GLU, Ogg, Vorbis, and Theora.
 
 In Debian and Debian based distros (Such as Ubuntu) you can run the below in the terminal.
-  sudo apt-get install subversion libsdl1.2-dev libgl1-mesa-dev libglu1-mesa-dev libogg-dev libvorbis-dev libtheora-dev
+  sudo apt-get install libsdl1.2-dev libgl1-mesa-dev libglu1-mesa-dev libogg-dev libvorbis-dev libtheora-dev
 
 == Getting the source ==
 You can get the lastest development source from the SVN or use the source from a released version.
 
 === SVN ===
-You will need a subversion client to get the source, such as [http://tortoisesvn.tigris.org/ TortoiseSVN] (Windows), [http://www.rabbitvcs.org RabbitVCS] (Linux), or the terminal program "svn" (In Debian/Ubuntu, sudo apt-get install subversion).
+You will need a subversion client to get the source, such as [http://tortoisesvn.tigris.org/ TortoiseSVN] (Windows), [http://www.rabbitvcs.org RabbitVCS] (Linux), or the command line program "svn"
+
+In Debian/Ubuntu you can install the command line program using
+	sudo apt-get install subversion
 
 You will need to do a source checkout (Project members see http://code.google.com/p/turtlearena/source/checkout)
 
