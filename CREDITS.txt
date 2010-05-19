@@ -6,7 +6,7 @@ Turtle Arena credits.
 * ioSTVEF				(For "noise" and "random" waveform keywords, and RF_FORCE_ENT_ALPHA render flag)
 * Open Arena			(For botfiles, images, ...)
 * Xreal project			(For Homing rockets and shootable rockets)
-* Smokin' Guns			(For a minor animation time fix)
+* Smokin' Guns			(For some breakable respawn code and a minor animation time fix)
 * GNU FreeFonts			(For FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf)
 * Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)
 * Zack "ZTurtleMan" Middleton
@@ -43,6 +43,7 @@ Turtle Arena uses code directly or based on the following.
 
 * Smokin' Guns (SMOKIN_GUNS): http://www.smokin-guns.net/
 ** Fixed animation timing based on PM_AnimLength from Smokin' Guns' bg_pmove.c
+** Used some of Smokin' Guns' breakable respawn code for my breakables
 
 * Mercenaries Guild Client 1.011 for Tremulous: http://projects.mercenariesguild.net/projects/mgclient
 ** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some parts, ...)
