@@ -136,6 +136,10 @@ then
 	mkdir -p $INSTALLDIR/base_svn
 	cp -r base/* $INSTALLDIR/base_svn
 
+	# Remove shared libraries
+	rm $INSTALLDIR/base_svn/*.so
+	rm $INSTALLDIR/base_svn/*.dll
+
 	# Copy QVMs to $INSTALLDIR/base_svn
 	echo "  Coping QVMs..."
 	rm $INSTALLDIR/base_svn/vm/*.qvm
