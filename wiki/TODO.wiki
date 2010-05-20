@@ -89,7 +89,7 @@ Weapons (and attacking)
 == Single Player (NiGHTS) ==
   * TODO: Chet into Dreams...  (A boy dreams of his lost turtles.)
     * NiGHTS would replaced with a Ninja Turtle?
-    * The level could be set in side an aquarium (With the aquarium at very large scale)
+    * The level could be set inside an aquarium (With the aquarium at very large scale)
     * Before the dream Chet could be replaying the events of how he lost his turtles
        * After the people around him, and the TCRI truck, could turn into nightmarens. (The truck could turn into the boss)
     * After the dream Chet would see the Turtles outside his window.
@@ -99,7 +99,7 @@ Weapons (and attacking)
 
   * TODO: framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
 
-  * TODO: When there are mulitple ghost models they may not be sorted into correct order?
+  * TODO: When there are multiple ghost models they may not be sorted into correct order?
 
 == UI ==
   * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?
@@ -158,8 +158,6 @@ Weapons (and attacking)
 
   * TODO: Allow func_breakable and misc_object to be pushable.
 
-  * TODO: Add paintarget to func_breakable
-
   * TODO: Remove metal debris from grate textures
 
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
@@ -186,9 +184,6 @@ Weapons (and attacking)
     * (Turtle Arena allows 64 voice chat files, so we could allow bots to have custom chats)
 
   * TODO: Set voicechat filename in animations.cfg
-
-  * TODO: Load extra player setting from head.cfg in directory where the headmodel is?
-    * Like soundpath and voicechat filename, and maybe in the future head animations
 
   * TODO: Add MD5 model support
     * MD5 use single model and skeleton
