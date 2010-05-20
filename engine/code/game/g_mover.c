@@ -909,6 +909,12 @@ void G_BreakableRespawn( gentity_t *self )
 	trap_LinkEntity(self);
 }
 
+void G_BreakablePain( gentity_t *self, gentity_t *attacker, int damage )
+{
+	// ZTM: TODO: Limit how soon to call paintarget again? Use pain_debounce?
+	G_UseTargets2(self, attacker, self->paintarget);
+}
+
 /*
 ================
 G_BreakableDie
@@ -1072,7 +1078,9 @@ void InitMover( gentity_t *ent ) {
 
 		ent->takedamage = qtrue;
 		ent->die = G_BreakableDie;
-		// TODO: Set damage and pain?
+		// ZTM: TODO: Set damage?
+
+		ent->pain = G_BreakablePain;
 
 		ent->s.time2 = -1; // auto surfaceFlags
 
