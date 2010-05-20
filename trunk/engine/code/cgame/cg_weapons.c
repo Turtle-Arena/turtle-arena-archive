@@ -4105,7 +4105,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 
 #ifdef TA_MISC // MATERIALS
 	if (soundType == IMPACTSOUND_METAL)
-		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS, clientNum);
+		CG_ImpactParticles(origin, dir, radius, SURF_METAL, clientNum);
 	else
 		CG_ImpactParticles(origin, dir, radius, -1, clientNum);
 #endif
@@ -4282,7 +4282,7 @@ void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, 
 
 #ifdef TA_MISC // MATERIALS
 	if (soundType == IMPACTSOUND_METAL)
-		CG_ImpactParticles(origin, dir, radius, SURF_METALSTEPS, clientNum);
+		CG_ImpactParticles(origin, dir, radius, SURF_METAL, clientNum);
 	else
 		CG_ImpactParticles(origin, dir, radius, -1, clientNum);
 #endif

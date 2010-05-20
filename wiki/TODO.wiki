@@ -158,8 +158,6 @@ Weapons (and attacking)
 
   * TODO: Allow func_breakable and misc_object to be pushable.
 
-  * TODO: Remove metal debris from grate textures
-
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
 
   * BUG: Bloom in windowed mode only effecting the top 480 (or is it 640?) pixels?
