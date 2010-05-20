@@ -86,6 +86,7 @@ textures/base_floor/grate
 textures/base_floor/metal
 {
 	surfaceparm metalsteps
+	surfaceparm metal
 	{
 		map textures/base_floor/metal
 		rgbGen identity
@@ -99,6 +100,7 @@ textures/base_floor/metal
 textures/base_floor/metal2
 {
 	surfaceparm metalsteps
+	surfaceparm metal
 	{
 		map textures/base_floor/metal2
 		rgbGen identity
@@ -112,6 +114,7 @@ textures/base_floor/metal2
 textures/base_floor/metal_textured
 {
 	surfaceparm metalsteps
+	surfaceparm metal
 	{
 		map textures/base_floor/metal_textured
 		rgbGen identity

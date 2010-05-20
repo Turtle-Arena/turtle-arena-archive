@@ -190,6 +190,7 @@ textures/base_wall/crate_item
 textures/base_wall/crate_metal
 {
 	surfaceparm metalsteps
+	surfaceparm metal
 	{
 		map textures/base_wall/crate_metal
 		rgbGen identity

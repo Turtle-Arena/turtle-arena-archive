@@ -1379,9 +1379,9 @@ infoParm_t	infoParms[] = {
 	{"grass",		0,	SURF_GRASS,		0 },
 	{"wood",		0,	SURF_WOOD,		0 },
 	{"stone",		0,	SURF_STONE,		0 },
-	{"metal",		0,	SURF_METALSTEPS,0 },
 	{"sparks",		0,	SURF_SPARKS,	0 },
-	{"glass",		0,	SURF_GLASS,		0 }
+	{"glass",		0,	SURF_GLASS,		0 },
+	{"metal",		0,	SURF_METAL,		0 }
 #endif
 };
 

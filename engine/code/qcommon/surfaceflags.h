@@ -90,7 +90,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define SURF_GRASS				0x100000
 #define SURF_WOOD				0x200000
 #define SURF_STONE				0x400000
-//#define SURF_METAL				SURF_METALSTEPS
 #define SURF_SPARKS				0x800000
 #define SURF_GLASS				0x1000000
+#define SURF_METAL				0x2000000
 #endif

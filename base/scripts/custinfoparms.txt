@@ -11,16 +11,14 @@
 }
 
 //custom SURF_ flags
-//metal is the same as metalsteps currently
 {
   dirt    0x80000
   grass   0x100000
   wood    0x200000
   stone   0x400000
-  metal   0x1000
   sparks  0x800000
   glass   0x1000000
-  free1   0x2000000
+  metal   0x2000000
   free2   0x4000000
   free3   0x8000000
   free4   0x10000000

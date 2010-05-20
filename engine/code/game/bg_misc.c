@@ -1469,9 +1469,9 @@ materialInfo_t materialInfo[NUM_MATERIAL_TYPES] = {
 	{"grass",	SURF_GRASS },
 	{"wood",	SURF_WOOD },
 	{"stone",	SURF_STONE },
-	{"metal",	SURF_METALSTEPS },
 	{"sparks",	SURF_SPARKS },
-	{"glass",	SURF_GLASS }
+	{"glass",	SURF_GLASS },
+	{"metal",	SURF_METAL }
 };
 #endif
 
