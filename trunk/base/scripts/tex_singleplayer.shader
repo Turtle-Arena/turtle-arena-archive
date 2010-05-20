@@ -10,12 +10,12 @@ textures/singleplayer/finish
 	{
 		map textures/singleplayer/finish.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
+		rgbGen identity
 	}
 	{
 		map textures/singleplayer/finish.png
 		alphaFunc GE128
-		rgbGen vertex
+		rgbGen identity
 		depthWrite
 	}
 }
