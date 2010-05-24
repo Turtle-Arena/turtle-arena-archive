@@ -627,9 +627,6 @@ void misc_object_pain(gentity_t *self, gentity_t *attacker, int damage)
 		G_SetMiscAnim(self, OBJECT_DEATH1);
 		//G_Printf("    anim = OBJECT_DEATH1\n");
 	}
-
-	// ZTM: TODO: Limit how soon to call paintarget again? Use pain_debounce?
-	G_UseTargets2(self, attacker, self->paintarget);
 }
 
 gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles);
