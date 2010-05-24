@@ -1411,6 +1411,15 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		} else if ( targ->pain ) {
 			targ->pain (targ, attacker, take);
 		}
+
+#ifdef TA_ENTSYS
+		// Trigger entity's paintarget
+		if (targ->health > 0 && !targ->client && targ->paintarget && level.time > targ->pain_debounce_time) {
+			G_UseTargets2(targ, attacker, targ->paintarget);
+			// Limit how soon to call paintarget again
+			targ->pain_debounce_time = level.time+100; // ZTM: TODO: Set in entity
+		}
+#endif
 		return qtrue;
 	}
 

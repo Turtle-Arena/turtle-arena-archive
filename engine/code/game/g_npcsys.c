@@ -236,9 +236,6 @@ void G_NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 		// Tell NPC to kill attacker!
 		G_NPC_StartAction(self, attacker, NACT_ATTACK);
 	}
-
-	// ZTM: TODO: Limit how soon to call paintarget again? Use pain_debounce?
-	G_UseTargets2(self, attacker, self->paintarget);
 }
 
 /*
