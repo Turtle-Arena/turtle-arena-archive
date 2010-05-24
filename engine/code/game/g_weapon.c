@@ -616,15 +616,11 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		}
 #endif
 
-		// If client hit another client
+		// Client hit an entity
 		if (!traceEnt->client || (traceEnt->client &&
 			(!OnSameTeam(ent, traceEnt) || g_friendlyFire.integer != 0)))
 		{
-			// pain_debounce?
-
-			// ZTM: NOTE: Disabled, I don't need to see this as much as I once did.
-			//                     (plus it fills the console.)
-			//G_Printf("DEBUG: client %i hit entity %i\n", ent - g_entities, tr.entityNum);
+			// pain_debounce_time?
 
 			// ZTM: Do a effect when hit anything!
 			//   based on G_MissileImpact code
