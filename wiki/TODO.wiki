@@ -307,7 +307,12 @@ Current Location: http://ztm.x10hosting.com/
 
   * TODO: Get a domain name?
 
-  * TODO (STARTED): Updating website for Turtle Arena 0.4
+  * TODO (STARTED): Updating website for Turtle Arena 0.2
 
   * TODO: Add a screenshot to the main page?
     * See 'Note to software creators' at the bottom of http://www.opensourcewindows.org/
+
+  * TODO: Update Features page?
+
+  * TODO: Add button (well really a image) instead of just text download link?
+
