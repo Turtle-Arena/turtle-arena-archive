@@ -217,7 +217,7 @@ then
 		cp engine/build/release-mingw32-x86/turtlearena.x86.exe $INSTALLDIR
 		cp engine/build/release-mingw32-x86/turtlearena-ded.x86.exe $INSTALLDIR
 
-		echo "  Warning: You need to manually copy SDL.dll vserion 1.2.14 into $INSTALLDIR !"
+		echo "  Warning: You need to manually copy SDL.dll version 1.2.14 into \"$INSTALLDIR\"!"
 	fi
 
 fi
