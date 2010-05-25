@@ -49,7 +49,7 @@ Turtle Arena uses code directly or based on the following.
 ** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some parts, ...)
 
 === Other ===
-: Code based on guides, etc.
+Code based on guides, etc.
 
 * rfactory: http://www.rfactory.org/
 ** The Dark Conjunction (via rfactory): http://tdc.planetquake.gamespy.com/news.htm

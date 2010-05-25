@@ -303,9 +303,9 @@ Stuff I'd like to do to the MD3 part of MM3D...
 = Website =
 Current Location: http://ztm.x10hosting.com/
 
-  * TODO: Find a new host
+  * TODO: Find a new host?
 
-  * TODO: Get a domain name?
+  * TODO: Get a domain name
 
   * TODO (STARTED): Updating website for Turtle Arena 0.2
 
