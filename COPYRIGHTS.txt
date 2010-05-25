@@ -38,13 +38,22 @@ The following are from OpenArena,
 base/menu/art/font1_prop.tga
 base/gfx/2d/bigchars.png
 
-: Currently not in a big rush to replace this, as it is for the unsupported first-person camera mode.
-base/models/weapons2/gun/gun_hand.md3 (Copied from OA's base/models/weapons2/shotgun/shotgun_hand.md3)
+base/models/weapons2/triblaster/triblaster_hand.md3 (Copied from OA's base/models/weapons2/shotgun/shotgun_hand.md3)
 
 base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
 base/gfx/damage/shadow.tga
 base/gfx/misc/flare.tga
+
+base/textures/sfx/flame1.tga
+base/textures/sfx/flame2.tga
+base/textures/sfx/flame3.tga
+base/textures/sfx/flame4.tga
+base/textures/sfx/flame5.tga
+base/textures/sfx/flame6.tga
+base/textures/sfx/flame7.tga
+base/textures/sfx/flame8.tga
+base/textures/sfx/flameball.jpg
 
 base/sound/player/watr_in.wav
 base/sound/player/watr_out.wav
