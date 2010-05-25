@@ -422,6 +422,21 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
+
+#ifdef TA_WEAPSYS
+	// Unknown weapon, spawn weapon_random
+	if (Q_stricmpn(ent->classname, "weapon_", 7) == 0)
+	{
+		for ( s=spawns ; s->name ; s++ ) {
+			if ( !strcmp(s->name, "weapon_random") ) {
+				// found it
+				G_Printf ("%s doesn't have a spawn function, using weapon_random instead\n", ent->classname);
+				s->spawn(ent);
+				return qtrue;
+			}
+		}
+	}
+#endif
 	G_Printf ("%s doesn't have a spawn function\n", ent->classname);
 	return qfalse;
 }
