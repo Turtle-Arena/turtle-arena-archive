@@ -3653,6 +3653,19 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 
 	for (i = 1; i < NUM_MATERIAL_TYPES; i++)
 	{
+		// Add spark particles
+		if ((surfaceFlags & materialInfo[i].surfaceFlag)
+			&& (materialInfo[i].surfaceFlag & SURF_SPARKS))
+		{
+			for (j = 0; j < numParticles; j++)
+			{
+				VectorScale( dir, EXP_JUMP+random()*EXP_VELOCITY, velocity );
+				velocity[2] -= 20;
+
+				CG_ParticleSparks (origin, velocity, 1000, radius, radius, -300);
+			}
+		}
+
 		if (cgs.media.matNumModels[i] > 0
 			&& ((surfaceFlags & materialInfo[i].surfaceFlag)
 			// default to stone debris if their is no set debris
