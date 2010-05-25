@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "server.h"
 
-#if defined TA_GAME_MODELS && defined DEDICATED
+#if defined TMNT_GAME_MODELS && defined DEDICATED
 // tr_model.c
 void R_Init(void);
 #endif
@@ -143,7 +143,6 @@ void SV_SetConfigstring (int index, const char *val) {
 			if ( index == CS_SERVERINFO && client->gentity && (client->gentity->r.svFlags & SVF_NOSERVERINFO) ) {
 				continue;
 			}
-		
 			SV_SendConfigstring(client, index);
 		}
 	}
@@ -426,7 +425,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	// clear the whole hunk because we're (re)loading the server
 	Hunk_Clear();
 
-#ifdef TA_GAME_MODELS
+#ifdef TMNT_GAME_MODELS
 	// Restart renderer
 #ifdef DEDICATED
 	R_Init();
@@ -575,31 +574,27 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 		}
 	}	
 
+#ifdef TMNTSP
+	// GAME_LOADGAME
+	if (svs.loadgame[0])
+	{
+		// We were loading a savegame...
+		Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s\n", svs.loadgame));
+		svs.loadgame[0] = '\0';
+	}
+	else
+	{
+		// Turtle Man: TODO: Call G_LoadPersistant here?
+	}
+#endif
+
 	// run another frame to allow things to look at all the players
 	VM_Call (gvm, GAME_RUN_FRAME, sv.time);
 	SV_BotFrame (sv.time);
 	sv.time += 100;
 	svs.time += 100;
 
-#ifdef TA_SP
-	// GAME_LOADGAME
-	if (svs.loadgame[0])
-	{
-		// We were loading a savegame...
-		Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s 1\n", svs.loadgame));
-		svs.loadgame[0] = '\0';
-	}
-#endif
-
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-	// Force sv_pure to off.
-	if (sv_pure->integer && !com_fs_pure->integer)
-	{
-		Cvar_Set( "sv_pure", "0" );
-	}
-#endif
-
-#if !defined STANDALONE && defined IOQ3ZTM // ZTM: FS_PURE code replaces this.
+#ifdef IOQ3ZTM
 	// the server sends these to the clients so they will only
 	// load pk3s also loaded at the server
 	if (sv_pure->integer && (p = FS_LoadedPakChecksums()) && (strlen(p) > 0))
@@ -631,11 +626,9 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 		// load pk3s also loaded at the server
 		p = FS_LoadedPakChecksums();
 		Cvar_Set( "sv_paks", p );
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 		if (strlen(p) == 0) {
 			Com_Printf( "WARNING: sv_pure set but no PK3 files loaded\n" );
 		}
-#endif
 		p = FS_LoadedPakNames();
 		Cvar_Set( "sv_pakNames", p );
 
@@ -690,8 +683,8 @@ void SV_Init (void) {
 
 	// serverinfo vars
 	Cvar_Get ("dmflags", "0", CVAR_SERVERINFO);
-#ifdef NOTRATEDM // frag to score
-	Cvar_Get ("scorelimit", "1000", CVAR_SERVERINFO);
+#ifdef TMNTMISC // frag to score
+	Cvar_Get ("scorelimit", "20", CVAR_SERVERINFO);
 #else
 	Cvar_Get ("fraglimit", "20", CVAR_SERVERINFO);
 #endif
@@ -713,13 +706,6 @@ void SV_Init (void) {
 	// systeminfo
 	Cvar_Get ("sv_cheats", "1", CVAR_SYSTEMINFO | CVAR_ROM );
 	sv_serverid = Cvar_Get ("sv_serverid", "0", CVAR_SYSTEMINFO | CVAR_ROM );
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-	if (com_fs_pure && !com_fs_pure->integer)
-	{
-		sv_pure = Cvar_Get ("sv_pure", "0", CVAR_SYSTEMINFO | CVAR_ROM );
-	}
-	else
-#endif
 	sv_pure = Cvar_Get ("sv_pure", "1", CVAR_SYSTEMINFO );
 #ifdef USE_VOIP
 	sv_voip = Cvar_Get ("sv_voip", "1", CVAR_SYSTEMINFO | CVAR_LATCH);

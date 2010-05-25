@@ -33,10 +33,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // >= 0.4 && <  1.0 = circle strafing
 // >  0.7 && <  1.0 = random strafe direction change
 #define CHARACTERISTIC_ATTACK_SKILL					2	//float [0, 1]
-#ifndef TA_WEAPSYS // BOT_WEAP_WEIGHTS
 //weapon weight file
 #define CHARACTERISTIC_WEAPONWEIGHTS				3	//string
-#endif
 //view angle difference to angle change factor
 #define CHARACTERISTIC_VIEW_FACTOR					4	//float <0, 1]
 //maximum view angle change
@@ -45,7 +43,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CHARACTERISTIC_REACTIONTIME					6	//float [0, 5]
 //accuracy when aiming
 #define CHARACTERISTIC_AIM_ACCURACY					7	//float [0, 1]
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS // BOTCODE
 //weapon specific aim accuracy
 #define CHARACTERISTIC_AIM_ACCURACY_MACHINEGUN		8	//float [0, 1]
 #define CHARACTERISTIC_AIM_ACCURACY_SHOTGUN			9	//float [0, 1]
@@ -63,7 +61,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // >  0.5 && <= 1.0 = prediction shots when enemy is not visible
 // >  0.6 && <= 1.0 = splash damage by shooting nearby geometry
 
-#ifdef TURTLEARENA // WEAPONS
+#ifdef TMNTWEAPONS // BOTCODE
 #define CHARACTERISTIC_AIM_SKILL					8	//float [0, 1]
 #else
 #define CHARACTERISTIC_AIM_SKILL					16	//float [0, 1]
@@ -76,8 +74,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //========================================================
 //chat
 //========================================================
-#ifdef TURTLEARENA // WEAPONS
-// ZTM: Why can't this be a enum?...
+#ifdef TMNTWEAPONS // BOTCODE
+// Turtle Man: Why can't this be a enum?...
 //    OK it turns out that THIS file is used in pak0.pk3/botfiles/chars.h and the
 //    bot lib supports defines, but not enums?
 
@@ -144,9 +142,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //how much the bot fires it's weapon
 #define CHARACTERISTIC_FIRETHROTTLE					35	//float [0, 1]
 
-// NEW TURTLE ARENA CHARACTERISTICS WILL GO HERE.
+// NEW TMNT CHARACTERISTICS WILL GO HERE.
 
-#else // !TURTLEARENA =============== !!!!!!END OF RENUMBER!!!!!!! ===========
+#else // !TMNTWEAPON =============== !!!!!!END OF RENUMBER!!!!!!! ===========
 
 
 //file with chats
@@ -213,5 +211,4 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CHARACTERISTIC_ALERTNESS					46	//float [0, 1]
 //how much the bot fires it's weapon
 #define CHARACTERISTIC_FIRETHROTTLE					47	//float [0, 1]
-#endif // TURTLEARENA // WEAPONS
-
+#endif // TMNTWEAPONS // BOTCODE

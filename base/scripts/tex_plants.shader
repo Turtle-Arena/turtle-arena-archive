@@ -13,7 +13,7 @@ textures/plants/grass1
 
 
 	//deformVertexes wave 16 sin 0 0.5 0 0.1
-	deformVertexes autosprite2 // ZTM
+	deformVertexes autosprite2 // Turtle Man
 	{
 		map textures/plants/grass1
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA

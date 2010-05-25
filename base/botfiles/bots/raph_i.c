@@ -1,24 +1,22 @@
 /*
 ===========================================================================
 Copyright (C) 2006 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com))
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
-This file is part of Turtle Arena and is based upon botfiles by
-Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com)) from Open Arena which
-are based on Mr. Elusive's fuzzy logic system found in Quake 3 Arena.
+This file is part of Open Arena and is based upon Mr. Elusive's fuzzy logic
+system found in Quake 3 Arena.
 
-Turtle Arena is free software; you can redistribute it
+Open Arena is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena is distributed in the hope that it will be
+Open Arena is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena; if not, write to the Free Software
+along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -43,7 +41,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define HLW				400
 #define GHW				90
 
+//#define TELW				190
 #define MEDW				50
+//#define KAMW				200
 #define PORW				300
 #define SURW				150
 #define SUREW				160

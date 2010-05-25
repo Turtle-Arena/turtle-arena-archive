@@ -151,10 +151,10 @@ void AAS_InitTravelFlagFromType(void)
 	aasworld.travelflagfortype[TRAVEL_WATERJUMP] = TFL_WATERJUMP;
 	aasworld.travelflagfortype[TRAVEL_TELEPORT] = TFL_TELEPORT;
 	aasworld.travelflagfortype[TRAVEL_ELEVATOR] = TFL_ELEVATOR;
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 	aasworld.travelflagfortype[TRAVEL_ROCKETJUMP] = TFL_ROCKETJUMP;
 #endif
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 	aasworld.travelflagfortype[TRAVEL_BFGJUMP] = TFL_BFGJUMP;
 #endif
 	aasworld.travelflagfortype[TRAVEL_GRAPPLEHOOK] = TFL_GRAPPLEHOOK;
@@ -1187,7 +1187,7 @@ void AAS_InitReachabilityAreas(void)
 			//trace arch
 			case TRAVEL_JUMP: break;
 			case TRAVEL_ROCKETJUMP: break;
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 			case TRAVEL_BFGJUMP: break;
 #endif
 			case TRAVEL_JUMPPAD: break;

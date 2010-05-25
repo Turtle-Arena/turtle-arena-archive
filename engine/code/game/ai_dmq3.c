@@ -75,7 +75,7 @@ int gametype;		//game type
 int maxclients;		//maximum number of clients
 
 vmCvar_t bot_grapple;
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 vmCvar_t bot_rocketjump;
 #endif
 vmCvar_t bot_fastchat;
@@ -244,11 +244,6 @@ qboolean EntityIsInvisible(aas_entityinfo_t *entinfo) {
 	if (entinfo->powerups & (1 << PW_INVIS)) {
 		return qtrue;
 	}
-#ifdef TURTLEARENA // POWERS
-	if (entinfo->powerups & (1 << PW_FLASHING)) {
-		return qtrue;
-	}
-#endif
 	return qfalse;
 }
 
@@ -258,12 +253,6 @@ EntityIsShooting
 ==================
 */
 qboolean EntityIsShooting(aas_entityinfo_t *entinfo) {
-#ifdef TURTLEARENA // POWERS
-	// ignore PW_FLASHING players
-	if (entinfo->powerups & (1 << PW_FLASHING)) {
-		return qfalse;
-	}
-#endif
 	if (entinfo->flags & EF_FIRING) {
 		return qtrue;
 	}
@@ -295,7 +284,7 @@ qboolean EntityHasQuad(aas_entityinfo_t *entinfo) {
 }
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 EntityHasKamikze
@@ -1592,20 +1581,62 @@ int BotSynonymContext(bot_state_t *bs) {
 	return context;
 }
 
-#ifdef TA_WEAPSYS // BOT_WEAP_WEIGHTS
-// ZTM: TODO: Use attackDelay?
+#ifdef TMNTWEAPSYS
+#ifdef TMNTWEAPSYS_2 // BOT_WEAP_WEIGHTS
+// Turtle Man: TODO: Use attackDelay?
 // Weight is total damage of the weapon (plus 100).
 int BotWeaponWeight(weapon_t w)
 {
-	return BG_WeaponGroupTotalDamage(w)+100;
+#if 0
+	return 100 + w*5;
+#else
+	int weight = 0;
+	int damage1 = 0;
+	int damage2 = 0;
+	int i;
+	bg_weaponinfo_t *weapon;
+
+	// Primary weapon
+	weapon = bg_weapongroupinfo[w].weapon[0];
+	if (weapon->weapontype == WT_GUN)
+	{
+		damage1 += weapon->proj->damage;
+	}
+	else
+	{
+		for (i = 0; i < MAX_WEAPON_BLADES; i++)
+		{
+			damage1 += weapon->blades[i].damage;
+		}
+	}
+
+	// Secondary weapon
+	weapon = bg_weapongroupinfo[w].weapon[1];
+	if (weapon->weapontype == WT_GUN)
+	{
+		damage2 += weapon->proj->damage;
+	}
+	else
+	{
+		for (i = 0; i < MAX_WEAPON_BLADES; i++)
+		{
+			damage2 += weapon->blades[i].damage;
+		}
+	}
+
+	weight = damage1 + damage2 + 100;
+	return weight;
+#endif
 }
+#endif
 
 // BotChooseBestFightWeapon
 int BotChooseBestWeapon(bot_state_t *bs)
 {
+#ifdef TMNTWEAPSYS_2 // BOT_WEAP_WEIGHTS
 	int weight, bestWeight;
 	int newweaponnum;
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 
 	newweaponnum = bs->cur_ps.weapon; // bs->weaponnum;
 	bestWeight = BotWeaponWeight(newweaponnum);
@@ -1633,8 +1664,11 @@ int BotChooseBestWeapon(bot_state_t *bs)
 		}
 	}
 #endif
-	
+
 	return newweaponnum;
+#else
+	return trap_BotChooseBestFightWeapon(bs->ws, bs->inventory);
+#endif
 }
 #endif
 
@@ -1644,7 +1678,7 @@ BotChooseWeapon
 ==================
 */
 void BotChooseWeapon(bot_state_t *bs) {
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 	int newweaponnum;
 
 	if (bs->cur_ps.weaponstate == WEAPON_RAISING ||
@@ -1653,7 +1687,7 @@ void BotChooseWeapon(bot_state_t *bs) {
 		bs->weaponnum = bs->cur_ps.weapon;
 	}
 	else {
-#ifdef TA_WEAPSYS // BOT_WEAP_WEIGHTS
+#ifdef TMNTWEAPSYS
 		newweaponnum = BotChooseBestWeapon(bs);
 #else
 		newweaponnum = trap_BotChooseBestFightWeapon(bs->ws, bs->inventory);
@@ -1670,7 +1704,7 @@ void BotChooseWeapon(bot_state_t *bs) {
 		trap_EA_SelectWeapon(bs->client, bs->weaponnum);
 	}
 	else {
-#ifdef TA_WEAPSYS // BOT_WEAP_WEIGHTS
+#ifdef TMNTWEAPSYS
 		newweaponnum = BotChooseBestWeapon(bs);
 #else
 		newweaponnum = trap_BotChooseBestFightWeapon(bs->ws, bs->inventory);
@@ -1733,13 +1767,13 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 		return;
 
 	offence = -1;
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	// go into offence if picked up the kamikaze or invulnerability
 	if (!oldinventory[INVENTORY_KAMIKAZE] && bs->inventory[INVENTORY_KAMIKAZE] >= 1) {
 		offence = qtrue;
 	}
 #endif
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 	if (!oldinventory[INVENTORY_INVUL] && bs->inventory[INVENTORY_INVUL] >= 1) {
 		offence = qtrue;
 	}
@@ -1830,27 +1864,6 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 #endif
 }
 
-#if 0 // #ifdef TA_WEAPSYS
-// Find out if a bot has a weapon using its name (Example: "wp_rocket_launcher"
-int BotInventoryWeapon(bot_state_t *bs, const char *weaponGroup)
-{
-	int w;
-
-	w = BG_WeaponGroupIndexForName(weaponGroup);
-
-	return bs->inventory[INVENTORY_WEAPON_START+w-1];
-}
-
-int BotInventoryAmmo(bot_state_t *bs, const char *weaponGroup)
-{
-	int w;
-
-	w = BG_WeaponGroupIndexForName(weaponGroup);
-
-	return bs->inventory[INVENTORY_AMMO_START+w-1];
-}
-#endif
-
 /*
 ==================
 BotUpdateInventory
@@ -1858,46 +1871,112 @@ BotUpdateInventory
 */
 void BotUpdateInventory(bot_state_t *bs) {
 	int oldinventory[MAX_ITEMS];
-#ifdef TA_WEAPSYS
-	int i;
-#endif
 
 	memcpy(oldinventory, bs->inventory, sizeof(oldinventory));
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 	//armor
 	bs->inventory[INVENTORY_ARMOR] = bs->cur_ps.stats[STAT_ARMOR];
 #endif
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 	bs->inventory[INVENTORY_DEFAULTWEAPON] = bs->cur_ps.stats[STAT_DEFAULTWEAPON];
 	bs->inventory[INVENTORY_WEAPON] = bs->cur_ps.weapon;
+	bs->inventory[INVENTORY_DEFAULTAMMO] = bs->cur_ps.stats[STAT_SAVEDAMMO];
 	bs->inventory[INVENTORY_AMMO] = bs->cur_ps.stats[STAT_AMMO];
 #endif
-#ifdef TA_WEAPSYS
-	//weapons and ammo
+#ifdef TMNTWEAPSYS_2 // Turtle Man: FIXME: Is there a better way?
+#if 0 //  (It would be better if we did the weight stuff in game)
+	int i;
+
+	//weapons
 	for (i = 1; i < BG_NumWeaponGroups(); i++)
 	{
-#ifdef TA_WEAPSYS_EX
-		// weapon
-		bs->inventory[INVENTORY_WEAPON_START+i-1] =
+#ifdef TMNTWEAPSYS2
+		bs->inventory[INVENTORY_WEAPON_START+i] =
 				((bs->cur_ps.weapon == i) || (bs->cur_ps.stats[STAT_DEFAULTWEAPON] == i));
-
-		// ammo
-		if (bs->cur_ps.weapon == i)
-			bs->inventory[INVENTORY_AMMO_START+i-1] = bs->cur_ps.stats[STAT_AMMO];
-		else if (bs->cur_ps.stats[STAT_DEFAULTWEAPON] == i)
-			bs->inventory[INVENTORY_AMMO_START+i-1] = 1;
-		else
-			bs->inventory[INVENTORY_AMMO_START+i-1] = 0;
 #else
-		// weapon
-		bs->inventory[INVENTORY_WEAPON_START+i-1] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << i)) != 0;
-
-		// ammo
-		bs->inventory[INVENTORY_AMMO_START+i-1] = bs->cur_ps.ammo[i];
+		if (i >= 16)
+			break;
+		bs->inventory[INVENTORY_WEAPON_START+i] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << i)) != 0;
 #endif
 	}
+
+	// ammo
+	// ...now what?
+#endif
+#elif defined TMNTWEAPONS // BETA
+	//weapons
+#ifdef TMNTWEAPSYS2
+#define BOT_HAS_WEAP(_wp) ((bs->cur_ps.weapon == _wp) || (bs->cur_ps.stats[STAT_DEFAULTWEAPON] == _wp))
+#else
+#define BOT_HAS_WEAP(_wp) (bs->cur_ps.stats[STAT_WEAPONS] & (1 << _wp)) != 0;
+#endif
+	bs->inventory[INVENTORY_FISTS] = BOT_HAS_WEAP(WP_FISTS);
+	bs->inventory[INVENTORY_KATANAS] = BOT_HAS_WEAP(WP_KATANAS);
+	bs->inventory[INVENTORY_DAISHO] = BOT_HAS_WEAP(WP_DAISHO);
+	bs->inventory[INVENTORY_SAIS] = BOT_HAS_WEAP(WP_SAIS);
+	bs->inventory[INVENTORY_NUNCHUKS] = BOT_HAS_WEAP(WP_NUNCHUKS);
+	bs->inventory[INVENTORY_HAMMER] = BOT_HAS_WEAP(WP_HAMMER);
+	bs->inventory[INVENTORY_AXE] = BOT_HAS_WEAP(WP_AXE);
+	bs->inventory[INVENTORY_LONGSWORD] = BOT_HAS_WEAP(WP_LONGSWORD);
+	bs->inventory[INVENTORY_BAT] = BOT_HAS_WEAP(WP_BAT);
+	bs->inventory[INVENTORY_BO] = BOT_HAS_WEAP(WP_BO);
+	bs->inventory[INVENTORY_BAMBOO] = BOT_HAS_WEAP(WP_BAMBOO);
+	bs->inventory[INVENTORY_GUN] = BOT_HAS_WEAP(WP_GUN);
+	// WP_ELECTRIC_LAUNCHER
+	bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] = BOT_HAS_WEAP(WP_PLASMAGUN);
+	bs->inventory[INVENTORY_HOMING_LAUNCHER] = BOT_HAS_WEAP(WP_HOMING_LAUNCHER);
+	bs->inventory[INVENTORY_ROCKET_LAUNCHER] = BOT_HAS_WEAP(WP_ROCKET_LAUNCHER);
+	bs->inventory[INVENTORY_GRAPPLING_HOOK] = BOT_HAS_WEAP(WP_GRAPPLING_HOOK);
+#undef BOT_HAS_WEAP
+#ifdef TMNTWEAPSYS2
+#define BOT_HAS_AMMO(_wp) (bs->cur_ps.weapon == _wp ? bs->cur_ps.stats[STAT_AMMO] : (bs->cur_ps.stats[STAT_DEFAULTWEAPON] == _wp ? bs->cur_ps.stats[STAT_SAVEDAMMO] : 0))
+#else
+#define BOT_HAS_AMMO(_wp) bs->cur_ps.ammo[_wp]
+#endif
+	//ammo
+	bs->inventory[INVENTORY_AMMOGUN] = BOT_HAS_AMMO(WP_GUN);
+	// WP_ELECTRIC_LAUNCHER
+	bs->inventory[INVENTORY_AMMOELECTRIC] = BOT_HAS_AMMO(WP_PLASMAGUN);
+	bs->inventory[INVENTORY_AMMOHOMING] = BOT_HAS_AMMO(WP_HOMING_LAUNCHER);
+	bs->inventory[INVENTORY_AMMOROCKET] = BOT_HAS_AMMO(WP_ROCKET_LAUNCHER);
+#undef BOT_HAS_AMMO
 #else
 	//weapons
+#ifdef TMNTWEAPSYS2
+#define BOT_HAS_WEAP(_wp) ((bs->cur_ps.weapon == _wp) || (bs->cur_ps.stats[STAT_DEFAULTWEAPON] == _wp))
+	bs->inventory[INVENTORY_GAUNTLET] = BOT_HAS_WEAP(WP_GAUNTLET);
+	bs->inventory[INVENTORY_SHOTGUN] = BOT_HAS_WEAP(WP_SHOTGUN);
+	bs->inventory[INVENTORY_MACHINEGUN] = BOT_HAS_WEAP(WP_MACHINEGUN);
+	bs->inventory[INVENTORY_GRENADELAUNCHER] = BOT_HAS_WEAP(WP_GRENADE_LAUNCHER);
+	bs->inventory[INVENTORY_ROCKETLAUNCHER] = BOT_HAS_WEAP(WP_ROCKET_LAUNCHER);
+	bs->inventory[INVENTORY_LIGHTNING] = BOT_HAS_WEAP(WP_LIGHTNING);
+	bs->inventory[INVENTORY_RAILGUN] = BOT_HAS_WEAP(WP_RAILGUN);
+	bs->inventory[INVENTORY_PLASMAGUN] = BOT_HAS_WEAP(WP_PLASMAGUN);
+	bs->inventory[INVENTORY_BFG10K] = BOT_HAS_WEAP(WP_BFG);
+	bs->inventory[INVENTORY_GRAPPLINGHOOK] = BOT_HAS_WEAP(WP_GRAPPLING_HOOK);
+#ifdef MISSIONPACK
+	bs->inventory[INVENTORY_NAILGUN] = BOT_HAS_WEAP(WP_NAILGUN);
+	bs->inventory[INVENTORY_PROXLAUNCHER] = BOT_HAS_WEAP(WP_PROX_LAUNCHER);
+	bs->inventory[INVENTORY_CHAINGUN] = BOT_HAS_WEAP(WP_CHAINGUN);
+#endif
+#undef BOT_HAS_WEAP
+#define BOT_HAS_AMMO(_wp) (bs->cur_ps.weapon == _wp ? bs->cur_ps.stats[STAT_AMMO] : (bs->cur_ps.stats[STAT_DEFAULTWEAPON] == _wp ? bs->cur_ps.stats[STAT_SAVEDAMMO] : 0))
+	//ammo
+	bs->inventory[INVENTORY_SHELLS] = BOT_HAS_AMMO(WP_SHOTGUN);
+	bs->inventory[INVENTORY_BULLETS] = BOT_HAS_AMMO(WP_MACHINEGUN);
+	bs->inventory[INVENTORY_GRENADES] = BOT_HAS_AMMO(WP_GRENADE_LAUNCHER);
+	bs->inventory[INVENTORY_CELLS] = BOT_HAS_AMMO(WP_PLASMAGUN);
+	bs->inventory[INVENTORY_LIGHTNINGAMMO] = BOT_HAS_AMMO(WP_LIGHTNING);
+	bs->inventory[INVENTORY_ROCKETS] = BOT_HAS_AMMO(WP_ROCKET_LAUNCHER);
+	bs->inventory[INVENTORY_SLUGS] = BOT_HAS_AMMO(WP_RAILGUN);
+	bs->inventory[INVENTORY_BFGAMMO] = BOT_HAS_AMMO(WP_BFG);
+#ifdef MISSIONPACK
+	bs->inventory[INVENTORY_NAILS] = BOT_HAS_AMMO(WP_NAILGUN);
+	bs->inventory[INVENTORY_MINES] = BOT_HAS_AMMO(WP_PROX_LAUNCHER);
+	bs->inventory[INVENTORY_BELT] = BOT_HAS_AMMO(WP_CHAINGUN);
+#endif
+#undef BOT_HAS_AMMO
+#else
 	bs->inventory[INVENTORY_GAUNTLET] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_GAUNTLET)) != 0;
 	bs->inventory[INVENTORY_SHOTGUN] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_SHOTGUN)) != 0;
 	bs->inventory[INVENTORY_MACHINEGUN] = (bs->cur_ps.stats[STAT_WEAPONS] & (1 << WP_MACHINEGUN)) != 0;
@@ -1927,49 +2006,48 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_MINES] = bs->cur_ps.ammo[WP_PROX_LAUNCHER];
 	bs->inventory[INVENTORY_BELT] = bs->cur_ps.ammo[WP_CHAINGUN];
 #endif
-#endif
+#endif // TMNTWEAPSYS2
+#endif // TMNTWEAPONS
 	//powerups
 	bs->inventory[INVENTORY_HEALTH] = bs->cur_ps.stats[STAT_HEALTH];
-#ifdef TA_HOLDSYS
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifdef TMNTHOLDSYS
+#ifndef TMNTHOLDABLE // no q3 teleprter
 	bs->inventory[INVENTORY_TELEPORTER] = bs->cur_ps.holdable[HI_TELEPORTER] != 0;
 #endif
 	bs->inventory[INVENTORY_MEDKIT] = bs->cur_ps.holdable[HI_MEDKIT] != 0;
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	bs->inventory[INVENTORY_KAMIKAZE] = bs->cur_ps.holdable[HI_KAMIKAZE] != 0;
 #endif
 	bs->inventory[INVENTORY_PORTAL] = bs->cur_ps.holdable[HI_PORTAL] != 0;
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 	bs->inventory[INVENTORY_INVULNERABILITY] = bs->cur_ps.holdable[HI_INVULNERABILITY] != 0;
-#endif // TURTLEARENA // POWERS
+#endif // TMNT // POWERS
 #endif
 #else
 	bs->inventory[INVENTORY_TELEPORTER] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_TELEPORTER;
 	bs->inventory[INVENTORY_MEDKIT] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_MEDKIT;
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	bs->inventory[INVENTORY_KAMIKAZE] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_KAMIKAZE;
 #endif
 	bs->inventory[INVENTORY_PORTAL] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_PORTAL;
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 	bs->inventory[INVENTORY_INVULNERABILITY] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_INVULNERABILITY;
-#endif // TURTLEARENA // POWERS
+#endif // TMNT // POWERS
 #endif
 #endif
 	bs->inventory[INVENTORY_QUAD] = bs->cur_ps.powerups[PW_QUAD] != 0;
 	bs->inventory[INVENTORY_ENVIRONMENTSUIT] = bs->cur_ps.powerups[PW_BATTLESUIT] != 0;
 	bs->inventory[INVENTORY_HASTE] = bs->cur_ps.powerups[PW_HASTE] != 0;
 	bs->inventory[INVENTORY_INVISIBILITY] = bs->cur_ps.powerups[PW_INVIS] != 0;
-#ifndef TURTLEARENA // POWERS
 	bs->inventory[INVENTORY_REGEN] = bs->cur_ps.powerups[PW_REGEN] != 0;
-#endif
 	bs->inventory[INVENTORY_FLIGHT] = bs->cur_ps.powerups[PW_FLIGHT] != 0;
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 	bs->inventory[INVENTORY_INVUL] = bs->cur_ps.powerups[PW_INVUL] != 0;
 #endif
 #ifdef MISSIONPACK
-#ifdef TURTLEARENA
+#ifdef TMNT
 	bs->inventory[INVENTORY_PERSISTANT_POWER] = (bs->cur_ps.stats[STAT_PERSISTANT_POWERUP] != 0);
 #endif
 	bs->inventory[INVENTORY_SCOUT] = bs->cur_ps.stats[STAT_PERSISTANT_POWERUP] == MODELINDEX_SCOUT;
@@ -1981,7 +2059,6 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_BLUEFLAG] = bs->cur_ps.powerups[PW_BLUEFLAG] != 0;
 #ifdef MISSIONPACK
 	bs->inventory[INVENTORY_NEUTRALFLAG] = bs->cur_ps.powerups[PW_NEUTRALFLAG] != 0;
-#ifdef MISSIONPACK_HARVESTER
 	if (BotTeam(bs) == TEAM_RED) {
 		bs->inventory[INVENTORY_REDCUBE] = bs->cur_ps.generic1;
 		bs->inventory[INVENTORY_BLUECUBE] = 0;
@@ -1990,7 +2067,6 @@ void BotUpdateInventory(bot_state_t *bs) {
 		bs->inventory[INVENTORY_REDCUBE] = 0;
 		bs->inventory[INVENTORY_BLUECUBE] = bs->cur_ps.generic1;
 	}
-#endif
 #endif
 	BotCheckItemPickup(bs, oldinventory);
 }
@@ -2013,7 +2089,7 @@ void BotUpdateBattleInventory(bot_state_t *bs, int enemy) {
 }
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 BotUseKamikaze
@@ -2051,7 +2127,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 			VectorSubtract(entinfo.origin, bs->origin, dir);
 			if (VectorLengthSquared(dir) < Square(KAMIKAZE_DIST)) {
 				trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 				, HI_KAMIKAZE
 #endif
 				);
@@ -2076,7 +2152,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 			VectorSubtract(entinfo.origin, bs->origin, dir);
 			if (VectorLengthSquared(dir) < Square(KAMIKAZE_DIST)) {
 				trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 				, HI_KAMIKAZE
 #endif
 				);
@@ -2097,7 +2173,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 			BotAI_Trace(&trace, bs->eye, NULL, NULL, target, bs->client, CONTENTS_SOLID);
 			if (trace.fraction >= 1 || trace.ent == goal->entitynum) {
 				trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 				, HI_KAMIKAZE
 #endif
 				);
@@ -2124,7 +2200,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 			VectorSubtract(entinfo.origin, bs->origin, dir);
 			if (VectorLengthSquared(dir) < Square(KAMIKAZE_DIST)) {
 				trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 				, HI_KAMIKAZE
 #endif
 				);
@@ -2138,7 +2214,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 	//
 	if (enemies > 2 && enemies > teammates+1) {
 		trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 				, HI_KAMIKAZE
 #endif
 		);
@@ -2147,7 +2223,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 }
 #endif
 
-#ifndef TURTLEARENA // POWERS // INVENTORY_INVULNERABILITY is disabled
+#ifndef TMNT // POWERS // INVENTORY_INVULNERABILITY is disabled
 /*
 ==================
 BotUseInvulnerability
@@ -2184,11 +2260,7 @@ void BotUseInvulnerability(bot_state_t *bs) {
 		if (VectorLengthSquared(dir) < Square(200)) {
 			BotAI_Trace(&trace, bs->eye, NULL, NULL, target, bs->client, CONTENTS_SOLID);
 			if (trace.fraction >= 1 || trace.ent == goal->entitynum) {
-				trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
-				, HI_INVULNERABILITY
-#endif
-				);
+				trap_EA_Use(bs->client);
 				return;
 			}
 		}
@@ -2212,11 +2284,7 @@ void BotUseInvulnerability(bot_state_t *bs) {
 		if (VectorLengthSquared(dir) < Square(200)) {
 			BotAI_Trace(&trace, bs->eye, NULL, NULL, target, bs->client, CONTENTS_SOLID);
 			if (trace.fraction >= 1 || trace.ent == goal->entitynum) {
-				trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
-				, HI_INVULNERABILITY
-#endif
-				);
+				trap_EA_Use(bs->client);
 				return;
 			}
 		}
@@ -2233,11 +2301,7 @@ void BotUseInvulnerability(bot_state_t *bs) {
 		if (VectorLengthSquared(dir) < Square(300)) {
 			BotAI_Trace(&trace, bs->eye, NULL, NULL, target, bs->client, CONTENTS_SOLID);
 			if (trace.fraction >= 1 || trace.ent == goal->entitynum) {
-				trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
-				, HI_INVULNERABILITY
-#endif
-				);
+				trap_EA_Use(bs->client);
 				return;
 			}
 		}
@@ -2262,18 +2326,14 @@ void BotUseInvulnerability(bot_state_t *bs) {
 		if (VectorLengthSquared(dir) < Square(200)) {
 			BotAI_Trace(&trace, bs->eye, NULL, NULL, target, bs->client, CONTENTS_SOLID);
 			if (trace.fraction >= 1 || trace.ent == goal->entitynum) {
-				trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
-				, HI_INVULNERABILITY
-#endif
-				);
+				trap_EA_Use(bs->client);
 				return;
 			}
 		}
 	}
 #endif
 }
-#endif // TURTLEARENA // POWERS
+#endif // TMNT // POWERS
 #endif
 
 /*
@@ -2282,7 +2342,7 @@ BotBattleUseItems
 ==================
 */
 void BotBattleUseItems(bot_state_t *bs) {
-#ifndef TA_HOLDABLE // no q3 teleporter
+#ifndef TMNTHOLDABLE // no q3 teleporter
 	if (bs->inventory[INVENTORY_HEALTH] < 40) {
 		if (bs->inventory[INVENTORY_TELEPORTER] > 0) {
 			if (!BotCTFCarryingFlag(bs)
@@ -2294,7 +2354,7 @@ void BotBattleUseItems(bot_state_t *bs) {
 #endif
 				) {
 				trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 							, HI_TELEPORTER
 #endif
 				);
@@ -2305,17 +2365,17 @@ void BotBattleUseItems(bot_state_t *bs) {
 	if (bs->inventory[INVENTORY_HEALTH] < 60) {
 		if (bs->inventory[INVENTORY_MEDKIT] > 0) {
 			trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 							, HI_MEDKIT
 #endif
 			);
 		}
 	}
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	BotUseKamikaze(bs);
 #endif
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 	BotUseInvulnerability(bs);
 #endif
 #endif
@@ -2364,7 +2424,7 @@ qboolean BotIntermission(bot_state_t *bs) {
 	//NOTE: we shouldn't be looking at the game code...
 	if (level.intermissiontime) return qtrue;
 	return (bs->cur_ps.pm_type == PM_FREEZE || bs->cur_ps.pm_type == PM_INTERMISSION
-#ifdef TA_SP
+#ifdef TMNTSP
 		|| bs->cur_ps.pm_type == PM_SPINTERMISSION
 #endif
 	);
@@ -2459,20 +2519,20 @@ TeamPlayIsOn
 ==================
 */
 int TeamPlayIsOn(void) {
-#ifdef TA_SP // ZTM: Co-op is "teamplay"
+#ifdef TMNTSP // Turtle Man: TEST: Co-op is "teamplay"
 	return ( gametype >= GT_TEAM || gametype == GT_SINGLE_PLAYER );
 #else
 	return ( gametype >= GT_TEAM );
 #endif
 }
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 qboolean BotCanUseShurikens(bot_state_t *bs)
 {
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
-	if (bs->inventory[ENEMY_HORIZONTAL_DIST] >= 256
-		&& bs->inventory[ENEMY_HORIZONTAL_DIST] <= 768 // LOCKON range
-		&& BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex)
+#ifdef TMNTHOLDABLE
+	if (bs->inventory[ENEMY_HORIZONTAL_DIST] >= 300 // Turtle Man: Was 200
+	&& (bs->cur_ps.holdableIndex >= HI_SHURIKEN &&
+		bs->cur_ps.holdableIndex <= HI_LASERSHURIKEN)
 		&& bs->cur_ps.holdable[bs->cur_ps.holdableIndex] > 0)
 	{
 		return qtrue;
@@ -2492,8 +2552,8 @@ float BotAggression(bot_state_t *bs) {
 	//if the bot has quad
 	if (bs->inventory[INVENTORY_QUAD]) {
 		//if the bot is not holding the gauntlet or the enemy is really nearby
-#ifdef TA_WEAPSYS
-        if (!BG_WeaponHasMelee(bs->cur_ps.weapon)
+#ifdef TMNTWEAPSYS
+        if (!BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(&bs->cur_ps) )
 			|| BotCanUseShurikens(bs)
             || bs->inventory[ENEMY_HORIZONTAL_DIST] < 80)
 #else
@@ -2506,7 +2566,7 @@ float BotAggression(bot_state_t *bs) {
 	}
 	//if the enemy is located way higher than the bot
 	if (bs->inventory[ENEMY_HEIGHT] > 200) return 0;
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 	//if the bot is low on health
 	if (bs->inventory[INVENTORY_HEALTH] < 50) return 0;
 #else
@@ -2518,47 +2578,130 @@ float BotAggression(bot_state_t *bs) {
 		if (bs->inventory[INVENTORY_ARMOR] < 40) return 0;
 	}
 #endif
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TMNTHOLDABLE
 	if (BotCanUseShurikens(bs)) {
-		return 80;
+	switch (bs->cur_ps.holdableIndex)
+	{
+		case HI_SHURIKEN:
+			return 80;
+		case HI_ELECTRICSHURIKEN:
+			return 80;
+		case HI_FIRESHURIKEN:
+			return 90;
+		case HI_LASERSHURIKEN:
+			return 90;
+		default:
+			break;
+	}
 	}
 #endif
-#ifdef TA_WEAPSYS_EX
-	if (BG_WeaponHasMelee(bs->inventory[INVENTORY_WEAPON]))
-	{
-		if (bs->inventory[ENEMY_HORIZONTAL_DIST] < 80)
-			return 70;
-		else
-			return 60;
-	}
-	else // WT_GUN
-	{
-		if (bs->inventory[INVENTORY_AMMO] > 0 || bs->inventory[INVENTORY_AMMO] == -1)
-			return 80;
-	}
-#elif defined TA_WEAPSYS
-	{
-		int i;
+#ifdef TMNTWEAPSYS2
+    switch(bs->inventory[INVENTORY_WEAPON])
+    {
+#ifdef TMNTWEAPONS
+        case WEAPONINDEX_FISTS:
+        case WEAPONINDEX_KATANAS:
+        case WEAPONINDEX_DAISHO:
+        case WEAPONINDEX_SAIS:
+        case WEAPONINDEX_NUNCHUKS:
+        case WEAPONINDEX_HAMMER:
+        case WEAPONINDEX_AXE:
+        case WEAPONINDEX_LONGSWORD:
+        case WEAPONINDEX_BAT:
+        case WEAPONINDEX_BO:
+        case WEAPONINDEX_BAMBOO:
+#else
+		case WEAPONINDEX_GAUNTLET:
+#endif
+            if (bs->inventory[ENEMY_HORIZONTAL_DIST] < 80)
+                return 70;
+            else
+                return 60;
 
-		for (i = 1; i < BG_NumWeaponGroups(); i++)
-		{
-			if (!bs->inventory[INVENTORY_WEAPON_START+i-1])
-				continue;
+#ifdef TMNTWEAPONS
+        case WEAPONINDEX_GUN:
+            if (bs->inventory[INVENTORY_AMMO] > 9)
+                return 80;
+            break;
 
-			if (BG_WeaponHasMelee(i))
-			{
-				if (bs->inventory[ENEMY_HORIZONTAL_DIST] < 80)
-					return 70;
-				else
-					return 60;
-			}
-			else // WT_GUN
-			{
-				if (bs->inventory[INVENTORY_AMMO_START+i] > 1 || bs->inventory[INVENTORY_AMMO_START+i] == -1)
-					return 80;
-			}
-		}
+        case WEAPONINDEX_ELECTRIC_LAUNCHER:
+            if (bs->inventory[INVENTORY_AMMO] > 9)
+                return 85;
+            break;
+
+        case WEAPONINDEX_HOMING_LAUNCHER:
+            if (bs->inventory[INVENTORY_AMMO] > 4)
+                return 95;
+            break;
+
+        case WEAPONINDEX_ROCKET_LAUNCHER:
+            if (bs->inventory[INVENTORY_AMMO] > 4)
+                return 90;
+            break;
+#else
+        case WEAPONINDEX_BFG:
+			if (bs->inventory[INVENTORY_AMMO] > 7) return 100;
+			break;
+        case WEAPONINDEX_RAILGUN:
+			if (bs->inventory[INVENTORY_AMMO] > 5) return 95;
+			break;
+        case WEAPONINDEX_LIGHTNING:
+			if (bs->inventory[INVENTORY_AMMO] > 50) return 90;
+			break;
+        case WEAPONINDEX_ROCKET_LAUNCHER:
+			if (bs->inventory[INVENTORY_AMMO] > 5) return 90;
+			break;
+        case WEAPONINDEX_PLASMAGUN:
+			if (bs->inventory[INVENTORY_CELLS] > 40) return 85;
+			break;
+        case WEAPONINDEX_GRENADE_LAUNCHER:
+			if (bs->inventory[INVENTORY_GRENADES] > 10) return 80;
+			break;
+        case WEAPONINDEX_SHOTGUN:
+			if (bs->inventory[INVENTORY_SHELLS] > 10) return 50;
+			break;
+#endif
+
+        case WEAPONINDEX_GRAPPLING_HOOK:
+        default:
+            break;
+    }
+#elif defined TMNTWEAPONS // BETA
+	// Guns
+	//if the bot can use the homing rocketlauncher
+	if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 &&
+			bs->inventory[INVENTORY_AMMOHOMING] > 3) return 95;
+	//if the bot can use the rocketlauncher
+	if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 &&
+			bs->inventory[INVENTORY_AMMOROCKET] > 5) return 90;
+	//if the bot can use the electric launcher
+	if (bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] > 0 &&
+			bs->inventory[INVENTORY_AMMOELECTRIC] > 20) return 85;
+	//if the bot can use the electric launcher
+	if (bs->inventory[INVENTORY_GUN] > 0 &&
+			bs->inventory[INVENTORY_AMMOGUN] > 10) return 50;
+
+	// Check melee weapons too
+#define CHECK_MELEE_WP(_wpname) \
+	if (bs->inventory[INVENTORY_##_wpname] > 0) {\
+		if (bs->inventory[ENEMY_HORIZONTAL_DIST] < 80) {\
+			return 70;\
+		}\
+		return 60;\
 	}
+
+	CHECK_MELEE_WP(FISTS)
+	CHECK_MELEE_WP(KATANAS)
+	CHECK_MELEE_WP(DAISHO)
+	CHECK_MELEE_WP(SAIS)
+	CHECK_MELEE_WP(NUNCHUKS)
+	CHECK_MELEE_WP(HAMMER)
+	CHECK_MELEE_WP(AXE)
+	CHECK_MELEE_WP(LONGSWORD)
+	CHECK_MELEE_WP(BAT)
+	CHECK_MELEE_WP(BO)
+	CHECK_MELEE_WP(BAMBOO)
+#undef CHECK_MELEE_WP
 #else
 	//if the bot can use the bfg
 	if (bs->inventory[INVENTORY_BFG10K] > 0 &&
@@ -2592,21 +2735,15 @@ BotFeelingBad
 ==================
 */
 float BotFeelingBad(bot_state_t *bs) {
-#ifndef TURTLEARENA // WEAPONS
-#ifdef TA_WEAPSYS
-	if (bs->weaponnum == bs->cur_ps.stats[STAT_DEFAULTWEAPON]) {
-		return 100;
-	}
-#else
+#ifndef TMNTWEAPONS
 	if (bs->weaponnum == WP_GAUNTLET) {
 		return 100;
 	}
 #endif
-#endif
 	if (bs->inventory[INVENTORY_HEALTH] < 40) {
 		return 100;
 	}
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPONS
 	if (bs->weaponnum == WP_MACHINEGUN) {
 		return 90;
 	}
@@ -2734,7 +2871,7 @@ int BotWantsToHelp(bot_state_t *bs) {
 	return qtrue;
 }
 
-#ifndef TURTLEARENA // WEAPONS // I don't like Rocket jump, and it no longer does enough damage to rocket jump.
+#ifndef TMNTWEAPONS // I don't like Rocket jump, and it no longer does enough damage to rocket jump.
 /*
 ==================
 BotCanAndWantsToRocketJump
@@ -2751,6 +2888,10 @@ int BotCanAndWantsToRocketJump(bot_state_t *bs) {
 	if (bs->inventory[INVENTORY_ROCKETS] < 3) return qfalse;
 	//never rocket jump with the Quad
 	if (bs->inventory[INVENTORY_QUAD]) return qfalse;
+#ifdef TMNT // NOARMOR
+	//if low on health
+	if (bs->inventory[INVENTORY_HEALTH] < 75) return qfalse;
+#else
 	//if low on health
 	if (bs->inventory[INVENTORY_HEALTH] < 60) return qfalse;
 	//if not full health
@@ -2758,6 +2899,7 @@ int BotCanAndWantsToRocketJump(bot_state_t *bs) {
 		//if the bot has insufficient armor
 		if (bs->inventory[INVENTORY_ARMOR] < 40) return qfalse;
 	}
+#endif
 
 	rocketjumper = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_WEAPONJUMPING, 0, 1);
 	if (rocketjumper < 0.5) return qfalse;
@@ -2780,7 +2922,7 @@ int BotHasPersistantPowerupAndWeapon(bot_state_t *bs) {
 		return qfalse;
 	}
 #endif
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 	//if the bot is low on health
 	if (bs->inventory[INVENTORY_HEALTH] < 70) return qfalse;
 #else
@@ -2792,32 +2934,107 @@ int BotHasPersistantPowerupAndWeapon(bot_state_t *bs) {
 		if (bs->inventory[INVENTORY_ARMOR] < 40) return qfalse;
 	}
 #endif
-#ifdef TA_WEAPSYS_EX
-	if (BG_WeaponHasMelee(bs->inventory[INVENTORY_WEAPON]))
-		return qtrue;
-	else // WT_GUN
-	{
-		if (bs->inventory[INVENTORY_AMMO] > 1 || bs->inventory[INVENTORY_AMMO] == -1)
-			return qtrue;
-	}
-#elif defined TA_WEAPSYS
-	{
-		int i;
+#ifdef TMNTWEAPSYS2
+    switch(bs->inventory[INVENTORY_WEAPON])
+    {
+#ifdef TMNTWEAPONS
+        case WEAPONINDEX_FISTS:
+        case WEAPONINDEX_KATANAS:
+        case WEAPONINDEX_DAISHO:
+        case WEAPONINDEX_SAIS:
+        case WEAPONINDEX_NUNCHUKS:
+        case WEAPONINDEX_HAMMER:
+        case WEAPONINDEX_AXE:
+        case WEAPONINDEX_LONGSWORD:
+        case WEAPONINDEX_BAT:
+        case WEAPONINDEX_BO:
+        case WEAPONINDEX_BAMBOO:
+#else
+		case WEAPONINDEX_GAUNTLET:
+#endif
+            return qtrue;
 
-		for (i = 1; i < BG_NumWeaponGroups(); i++)
-		{
-			if (!bs->inventory[INVENTORY_WEAPON_START+i-1])
-				continue;
+#ifdef TMNTWEAPONS
+        case WEAPONINDEX_GUN:
+            if (bs->inventory[INVENTORY_AMMO] > 9)
+                return qtrue;
+            break;
 
-			if (BG_WeaponHasMelee(i))
-				return qtrue;
-			else // WT_GUN
-			{
-				if (bs->inventory[INVENTORY_AMMO_START+i] > 0 || bs->inventory[INVENTORY_AMMO_START+i] == -1)
-					return qtrue;
-			}
-		}
+        case WEAPONINDEX_ELECTRIC_LAUNCHER:
+            if (bs->inventory[INVENTORY_AMMO] > 9)
+                return qtrue;
+            break;
+
+        case WEAPONINDEX_HOMING_LAUNCHER:
+            if (bs->inventory[INVENTORY_AMMO] > 4)
+                return qtrue;
+            break;
+
+        case WEAPONINDEX_ROCKET_LAUNCHER:
+            if (bs->inventory[INVENTORY_AMMO] > 4)
+                return qtrue;
+            break;
+#else
+        case WEAPONINDEX_BFG:
+			if (bs->inventory[INVENTORY_AMMO] > 7) return qtrue;
+			break;
+        case WEAPONINDEX_RAILGUN:
+			if (bs->inventory[INVENTORY_AMMO] > 5) return qtrue;
+			break;
+        case WEAPONINDEX_LIGHTNING:
+			if (bs->inventory[INVENTORY_AMMO] > 50) return qtrue;
+			break;
+        case WEAPONINDEX_ROCKET_LAUNCHER:
+			if (bs->inventory[INVENTORY_AMMO] > 5) return qtrue;
+			break;
+        case WEAPONINDEX_PLASMAGUN:
+			if (bs->inventory[INVENTORY_CELLS] > 40) return qtrue;
+			break;
+        case WEAPONINDEX_GRENADE_LAUNCHER:
+			if (bs->inventory[INVENTORY_GRENADES] > 10) return qtrue;
+			break;
+        case WEAPONINDEX_SHOTGUN:
+			if (bs->inventory[INVENTORY_SHELLS] > 10) return qtrue;
+			break;
+#endif
+
+        case WEAPONINDEX_GRAPPLING_HOOK:
+        default:
+            break;
+    }
+#elif defined TMNTWEAPONS // BETA
+	// Guns
+	//if the bot can use the homing rocketlauncher
+	if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 &&
+			bs->inventory[INVENTORY_AMMOHOMING] > 3) return qtrue;
+	//if the bot can use the rocketlauncher
+	if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 &&
+			bs->inventory[INVENTORY_AMMOROCKET] > 5) return qtrue;
+	//if the bot can use the electric launcher
+	if (bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] > 0 &&
+			bs->inventory[INVENTORY_AMMOELECTRIC] > 20) return qtrue;
+	//if the bot can use the electric launcher
+	if (bs->inventory[INVENTORY_GUN] > 0 &&
+			bs->inventory[INVENTORY_AMMOGUN] > 10) return qtrue;
+
+	// Check melee weapons too
+#define CHECK_MELEE_WP(_wpname) \
+	if (bs->inventory[INVENTORY_##_wpname] > 0) {\
+		return qtrue;\
 	}
+
+	CHECK_MELEE_WP(FISTS)
+	CHECK_MELEE_WP(KATANAS)
+	CHECK_MELEE_WP(DAISHO)
+	CHECK_MELEE_WP(SAIS)
+	CHECK_MELEE_WP(NUNCHUKS)
+	CHECK_MELEE_WP(HAMMER)
+	CHECK_MELEE_WP(AXE)
+	CHECK_MELEE_WP(LONGSWORD)
+	CHECK_MELEE_WP(BAT)
+	CHECK_MELEE_WP(BO)
+	CHECK_MELEE_WP(BAMBOO)
+#undef CHECK_MELEE_WP
 #else
 	//if the bot can use the bfg
 	if (bs->inventory[INVENTORY_BFG10K] > 0 &&
@@ -2883,9 +3100,6 @@ int BotWantsToCamp(bot_state_t *bs) {
 	float camper;
 	int cs, traveltime, besttraveltime;
 	bot_goal_t goal, bestgoal;
-#if defined TA_WEAPSYS && !defined TA_WEAPSYS_EX
-	int i;
-#endif
 
 	camper = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CAMPER, 0, 1);
 	if (camper < 0.1) return qfalse;
@@ -2909,41 +3123,23 @@ int BotWantsToCamp(bot_state_t *bs) {
 	}
 	//if the bot isn't healthy anough
 	if (BotAggression(bs) < 50) return qfalse;
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
     // if the bot has a gun they must have ammo
     if (BG_WeapUseAmmo(bs->inventory[INVENTORY_WEAPON])
         && bs->inventory[INVENTORY_AMMO] < 10)
     {
 		return qfalse;
     }
-#elif defined TA_WEAPSYS
-	for (i = 1; i < BG_NumWeaponGroups(); i++)
-	{
-		if (!bs->inventory[INVENTORY_WEAPON_START+i-1])
-			continue;
-		if (bs->inventory[INVENTORY_AMMO_START+i-1] <= 0 && bs->inventory[INVENTORY_AMMO_START+i-1] != -1)
-			continue;
-
-		if (BG_WeaponGroupTotalDamage(i) >= 50)
-		{
-			break;
-		}
-	}
-
-	// Didn't find weapon for camp
-	if (i == BG_NumWeaponGroups())
-	{
+#elif defined TMNTWEAPONS // BETA
+	if ((bs->inventory[INVENTORY_GUN] <= 0 || bs->inventory[INVENTORY_AMMOGUN] < 10) &&
+		(bs->inventory[INVENTORY_ROCKET_LAUNCHER] <= 0 || bs->inventory[INVENTORY_AMMOROCKET] < 10) &&
+		(bs->inventory[INVENTORY_HOMING_LAUNCHER] <= 0 || bs->inventory[INVENTORY_AMMOHOMING] < 10) &&
+		(bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] <= 0 || bs->inventory[INVENTORY_AMMOELECTRIC] < 10)) {
 		return qfalse;
 	}
 #else
 	//the bot should have at least have the rocket launcher, the railgun or the bfg10k with some ammo
-	if ((bs->inventory[INVENTORY_ROCKETLAUNCHER] <= 0 ||
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Typo
-		bs->inventory[INVENTORY_ROCKETS] < 10
-#else
-		bs->inventory[INVENTORY_ROCKETS < 10]
-#endif
-		) &&
+	if ((bs->inventory[INVENTORY_ROCKETLAUNCHER] <= 0 || bs->inventory[INVENTORY_ROCKETS < 10]) &&
 		(bs->inventory[INVENTORY_RAILGUN] <= 0 || bs->inventory[INVENTORY_SLUGS] < 10) &&
 		(bs->inventory[INVENTORY_BFG10K] <= 0 || bs->inventory[INVENTORY_BFGAMMO] < 10)) {
 		return qfalse;
@@ -3126,8 +3322,9 @@ bot_moveresult_t BotAttackMove(bot_state_t *bs, int tfl) {
 			bs->attackjump_time = FloatTime() + 1;
 		}
 	}
-#ifdef TA_WEAPSYS
-	if (BG_WeaponHasMelee(bs->cur_ps.weapon) && !BotCanUseShurikens(bs))
+#ifdef TMNTWEAPSYS
+	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))
+		&& !BotCanUseShurikens(bs))
 #else
 	if (bs->cur_ps.weapon == WP_GAUNTLET)
 #endif
@@ -3215,17 +3412,17 @@ int BotSameTeam(bot_state_t *bs, int entnum) {
 		//BotAI_Print(PRT_ERROR, "BotSameTeam: client out of range\n");
 		return qfalse;
 	}
-	if ( gametype >= GT_TEAM
-#ifdef TA_SP // SP_BOSS
-		|| gametype == GT_SINGLE_PLAYER
-#endif
-		)
-	{
+	if ( gametype >= GT_TEAM ) {
 		trap_GetConfigstring(CS_PLAYERS+bs->client, info1, sizeof(info1));
 		trap_GetConfigstring(CS_PLAYERS+entnum, info2, sizeof(info2));
 		//
 		if (atoi(Info_ValueForKey(info1, "t")) == atoi(Info_ValueForKey(info2, "t"))) return qtrue;
 	}
+#ifdef TMNTSP // Co-op
+	else if (gametype == GT_SINGLE_PLAYER) {
+		return qtrue;
+	}
+#endif
 	return qfalse;
 }
 
@@ -3707,7 +3904,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	float dist, f, aim_skill, aim_accuracy, speed, reactiontime;
 	vec3_t dir, bestorigin, end, start, groundtarget, cmdmove, enemyvelocity;
 	vec3_t mins = {-4,-4,-4}, maxs = {4, 4, 4};
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	bg_projectileinfo_t *bgProj;
 #else
 	weaponinfo_t wi;
@@ -3754,14 +3951,14 @@ void BotAimAtEnemy(bot_state_t *bs) {
 		if (bs->teleport_time > FloatTime() - reactiontime) return;
 	}
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	bgProj = bg_weapongroupinfo[bs->weaponnum].weapon[0]->proj;
 #else
 	//get the weapon information
 	trap_BotGetWeaponInfo(bs->ws, bs->weaponnum, &wi);
 #endif
-#ifndef TURTLEARENA // WEAPONS // ZTM: Removed per-gun accuracy/skill.
-#ifndef TA_WEAPSYS // ZTM: WONTFIX: Fix support for per-weapon aim_accuracy/aim_skill?
+#ifndef TMNTWEAPONS // Turtle Man: Removed per-gun accuracy/skill.
+#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME: Fix support for per-weapon aim_accuracy/aim_skill?
 	//get the weapon specific aim accuracy and or aim skill
 	if (wi.number == WP_MACHINEGUN) {
 		aim_accuracy = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_AIM_ACCURACY_MACHINEGUN, 0, 1);
@@ -3834,8 +4031,8 @@ void BotAimAtEnemy(bot_state_t *bs) {
 		//NOTE: the x and y projectile start offsets are ignored
 		VectorCopy(bs->origin, start);
 		start[2] += bs->cur_ps.viewheight;
-#ifdef TA_WEAPSYS
-		start[2] += bg_weapongroupinfo[bs->weaponnum].weapon[0]->aimOffset[2];
+#ifdef TMNTWEAPSYS_2
+			start[2] += bg_weapongroupinfo[bs->weaponnum].weapon[0]->aimOffset[2];
 #else
 		start[2] += wi.offset[2];
 #endif
@@ -3846,7 +4043,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
 			bestorigin[2] += 16;
 		}
 		//if it is not an instant hit weapon the bot might want to predict the enemy
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 		if (!bgProj->instantDamage && bgProj->speed)
 #else
 		if (wi.speed)
@@ -3881,7 +4078,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
 					trap_AAS_PredictClientMovement(&move, bs->enemy, origin,
 														PRESENCE_CROUCH, qfalse,
 														dir, cmdmove, 0,
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 														dist * 10 / bgProj->speed,
 #else
 														dist * 10 / wi.speed,
@@ -3902,7 +4099,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
 					speed = VectorNormalize(dir) / entinfo.update_time;
 					//botimport.Print(PRT_MESSAGE, "speed = %f, wi->speed = %f\n", speed, wi->speed);
 					//best spot to aim at
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 					VectorMA(entinfo.origin, (dist / bgProj->speed) * speed, dir, bestorigin);
 #else
 					VectorMA(entinfo.origin, (dist / wi.speed) * speed, dir, bestorigin);
@@ -3912,7 +4109,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
 		}
 		//if the projectile does radial damage
 		if (aim_skill > 0.6 &&
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 			(bgProj->splashRadius > 0 && bgProj->splashDamage > 0)
 #else
 			wi.proj.damagetype & DAMAGETYPE_RADIAL
@@ -3962,7 +4159,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
 		//if the bot is skilled anough
 		if (aim_skill > 0.5) {
 			//do prediction shots around corners
-#ifdef TA_WEAPSYS // This works the same as quake3
+#ifdef TMNTWEAPSYS_2 // This works the same as quake3
 			if (bgProj->speed > 0 && bgProj->splashDamage > 0 &&
 				// not plasmagun?
 				bgProj->splashRadius > 20)
@@ -4001,7 +4198,7 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	//get aim direction
 	VectorSubtract(bestorigin, bs->eye, dir);
 	//
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	if (bg_weapongroupinfo[bs->weaponnum].weapon[0]->proj->instantDamage)
 #else
 	if (wi.number == WP_MACHINEGUN ||
@@ -4024,11 +4221,11 @@ void BotAimAtEnemy(bot_state_t *bs) {
 	//set the ideal view angles
 	vectoangles(dir, bs->ideal_viewangles);
 	//take the weapon spread into account for lower skilled bots
-#ifndef TA_WEAPSYS // ZTM: NOTE: vspread was unused by quake3, so why bother adding support for it?
+#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME?: vspread. It was always 0, why fix?
 	bs->ideal_viewangles[PITCH] += 6 * wi.vspread * crandom() * (1 - aim_accuracy);
 #endif
 	bs->ideal_viewangles[PITCH] = AngleMod(bs->ideal_viewangles[PITCH]);
-#ifndef TA_WEAPSYS // ZTM: NOTE: hspread was unused by quake3, so why bother adding support for it?
+#ifndef TMNTWEAPSYS_2 // Turtle Man: FIXME?: hspread. It was always 0, why fix?
 	bs->ideal_viewangles[YAW] += 6 * wi.hspread * crandom() * (1 - aim_accuracy);
 #endif
 	bs->ideal_viewangles[YAW] = AngleMod(bs->ideal_viewangles[YAW]);
@@ -4055,10 +4252,10 @@ void BotCheckAttack(bot_state_t *bs) {
 	bsp_trace_t bsptrace;
 	//float selfpreservation;
 	vec3_t forward, right, start, end, dir, angles;
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	vec3_t offset;
 	bg_projectileinfo_t *bgProj;
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TMNTHOLDABLE
 	qboolean firedShuriken = qfalse;
 #endif
 #else
@@ -4108,8 +4305,9 @@ void BotCheckAttack(bot_state_t *bs) {
 	//
 	VectorSubtract(bs->aimtarget, bs->eye, dir);
 	//
-#ifdef TA_WEAPSYS
-	if (BG_WeaponHasMelee(bs->cur_ps.weapon) && !BotCanUseShurikens(bs))
+#ifdef TMNTWEAPSYS
+	if (BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps))
+		&& !BotCanUseShurikens(bs))
 #else
 	if (bs->weaponnum == WP_GAUNTLET)
 #endif
@@ -4130,12 +4328,29 @@ void BotCheckAttack(bot_state_t *bs) {
 	if (bsptrace.fraction < 1 && bsptrace.ent != attackentity)
 		return;
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	bgProj = NULL;
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TMNTHOLDABLE
 	if (BotCanUseShurikens(bs))
 	{
-		int projnum = BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex);
+		int projnum = 0;
+		switch (bs->cur_ps.holdableIndex)
+		{
+			case HI_SHURIKEN:
+				projnum = BG_ProjectileIndexForName("p_shuriken");
+				break;
+			case HI_ELECTRICSHURIKEN:
+				projnum = BG_ProjectileIndexForName("p_electricshuriken");
+				break;
+			case HI_FIRESHURIKEN:
+				projnum = BG_ProjectileIndexForName("p_fireshuriken");
+				break;
+			case HI_LASERSHURIKEN:
+				projnum = BG_ProjectileIndexForName("p_lasershuriken");
+				break;
+			default:
+				break;
+		}
 		if (projnum > 0) {
 			bgProj = &bg_projectileinfo[projnum];
 			firedShuriken = qtrue;
@@ -4147,94 +4362,101 @@ void BotCheckAttack(bot_state_t *bs) {
 	}
 	else
 #endif
-	if (!BG_WeaponHasMelee(bs->cur_ps.weapon))
+	if (!BG_WeapTypeIsMelee(BG_WeaponTypeForPlayerState(&bs->cur_ps)))
 	{
 		bgProj = bg_weapongroupinfo[bs->weaponnum].weapon[0]->proj;
 	}
-	// ZTM: NOTE: bgProj is NULL if holding a melee weapon and not throwing a shuriken.
+	// Turtle Man: NOTE: bgProj is NULL if holding a melee weapon and not throwing a shuriken.
 #else
 	//get the weapon info
 	trap_BotGetWeaponInfo(bs->ws, bs->weaponnum, &wi);
 #endif
 	//get the start point shooting from
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	if (!bgProj) // Melee attacking
 	{
+		// Turtle Man: FIXME: Is it bad to use g_entities in bot code?
 		// G_MeleeDamage
+		weapontype_t wt;
 		gentity_t *ent = &g_entities[bs->entitynum];
-		int i;
 
-		for (i = 0; i < MAX_HANDS; i++)
+		wt = BG_WeaponTypeForPlayerState(&bs->cur_ps);
+
+		if (bs->cur_ps.weaponHands & HAND_PRIMARY)
 		{
-			if (bs->cur_ps.weaponHands & HAND_TO_HB(i))
+			if (G_MeleeDamageSingle(ent, qfalse, HAND_PRIMARY, wt, qtrue))
 			{
-				if (G_MeleeDamageSingle(ent, qtrue, i, bg_weapongroupinfo[bs->cur_ps.weapon].weapon[i]->weapontype))
-				{
-					return;
-				}
+				return;
+			}
+		}
+		if (bs->cur_ps.weaponHands & HAND_SECONDARY)
+		{
+			if (G_MeleeDamageSingle(ent, qfalse, HAND_SECONDARY, wt, qtrue))
+			{
+				return;
 			}
 		}
 	}
 	else
 	{
 #endif
-		VectorCopy(bs->origin, start);
-		start[2] += bs->cur_ps.viewheight;
-		AngleVectors(bs->viewangles, forward, right, NULL);
-#ifdef TA_WEAPSYS
+	VectorCopy(bs->origin, start);
+	start[2] += bs->cur_ps.viewheight;
+	AngleVectors(bs->viewangles, forward, right, NULL);
+#ifdef TMNTWEAPSYS_2
 		VectorCopy(bg_weapongroupinfo[bs->weaponnum].weapon[0]->aimOffset, offset);
 
-		start[0] += forward[0] * offset[0] + right[0] * offset[1];
-		start[1] += forward[1] * offset[0] + right[1] * offset[1];
-		start[2] += forward[2] * offset[0] + right[2] * offset[1] + offset[2];
+	start[0] += forward[0] * offset[0] + right[0] * offset[1];
+	start[1] += forward[1] * offset[0] + right[1] * offset[1];
+	start[2] += forward[2] * offset[0] + right[2] * offset[1] + offset[2];
 #else
-		start[0] += forward[0] * wi.offset[0] + right[0] * wi.offset[1];
-		start[1] += forward[1] * wi.offset[0] + right[1] * wi.offset[1];
-		start[2] += forward[2] * wi.offset[0] + right[2] * wi.offset[1] + wi.offset[2];
+	start[0] += forward[0] * wi.offset[0] + right[0] * wi.offset[1];
+	start[1] += forward[1] * wi.offset[0] + right[1] * wi.offset[1];
+	start[2] += forward[2] * wi.offset[0] + right[2] * wi.offset[1] + wi.offset[2];
 #endif
-		//end point aiming at
-		VectorMA(start, 1000, forward, end);
-		//a little back to make sure not inside a very close enemy
-		VectorMA(start, -12, forward, start);
-		BotAI_Trace(&trace, start, mins, maxs, end, bs->entitynum, MASK_SHOT);
-		//if the entity is a client
-		if (trace.ent > 0 && trace.ent <= MAX_CLIENTS) {
-			if (trace.ent != attackentity) {
-				//if a teammate is hit
-				if (BotSameTeam(bs, trace.ent))
+	//end point aiming at
+	VectorMA(start, 1000, forward, end);
+	//a little back to make sure not inside a very close enemy
+	VectorMA(start, -12, forward, start);
+	BotAI_Trace(&trace, start, mins, maxs, end, bs->entitynum, MASK_SHOT);
+	//if the entity is a client
+	if (trace.ent > 0 && trace.ent <= MAX_CLIENTS) {
+		if (trace.ent != attackentity) {
+			//if a teammate is hit
+			if (BotSameTeam(bs, trace.ent))
+				return;
+		}
+	}
+	//if won't hit the enemy or not attacking a player (obelisk)
+	if (trace.ent != attackentity || attackentity >= MAX_CLIENTS) {
+		//if the projectile does radial damage
+#ifdef TMNTWEAPSYS_2
+		if (bgProj && bgProj->splashRadius > 0 && bgProj->splashDamage > 0)
+		{
+			if (trace.fraction * 1000 < bgProj->splashRadius) {
+				points = (bgProj->splashDamage - 0.5 * trace.fraction * 1000) * 0.5;
+				if (points > 0) {
 					return;
-			}
-		}
-		//if won't hit the enemy or not attacking a player (obelisk)
-		if (trace.ent != attackentity || attackentity >= MAX_CLIENTS) {
-			//if the projectile does radial damage
-#ifdef TA_WEAPSYS
-			if (bgProj && bgProj->splashRadius > 0 && bgProj->splashDamage > 0)
-			{
-				if (trace.fraction * 1000 < bgProj->splashRadius) {
-					points = (bgProj->splashDamage - 0.5 * trace.fraction * 1000) * 0.5;
-					if (points > 0) {
-						return;
-					}
 				}
-				//FIXME: check if a teammate gets radial damage
 			}
+			//FIXME: check if a teammate gets radial damage
+		}
 #else
-			if (wi.proj.damagetype & DAMAGETYPE_RADIAL) {
-				if (trace.fraction * 1000 < wi.proj.radius) {
-					points = (wi.proj.damage - 0.5 * trace.fraction * 1000) * 0.5;
-					if (points > 0) {
-						return;
-					}
+		if (wi.proj.damagetype & DAMAGETYPE_RADIAL) {
+			if (trace.fraction * 1000 < wi.proj.radius) {
+				points = (wi.proj.damage - 0.5 * trace.fraction * 1000) * 0.5;
+				if (points > 0) {
+					return;
 				}
-				//FIXME: check if a teammate gets radial damage
 			}
-#endif
+			//FIXME: check if a teammate gets radial damage
 		}
-#ifdef TA_WEAPSYS
+#endif
+	}
+#ifdef TMNTWEAPSYS_2
 	}
 #endif
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TMNTHOLDABLE
 	if (firedShuriken)
 	{
 		trap_EA_Use(bs->client, bs->cur_ps.holdableIndex);
@@ -4242,7 +4464,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	else
 #endif
 	//if fire has to be release to activate weapon
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2 // Not used by Quake3/Team Arena or anything?
 	// Melee and grappling hook must be release and pressed again to fire.
 	if (!bgProj || bgProj->grappling)
 #else
@@ -4833,7 +5055,7 @@ int BotGetActivateGoal(bot_state_t *bs, int entitynum, bot_activategoal_t *activ
 	if (!strcmp(classname, "func_button")) {
 		return 0;
 	}
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 	// if it is a breakable, okay for bot to damage it.
  	if (!strcmp(classname, "func_breakable")) {
  		return ent;
@@ -5306,9 +5528,9 @@ BotCheckEvents
 void BotCheckForGrenades(bot_state_t *bs, entityState_t *state) {
 	// if this is not a grenade
 	if (state->eType != ET_MISSILE ||
-#ifdef TA_WEAPSYS // Must have gravity and bounce
+#ifdef TMNTWEAPSYS_2 // Must have gravity and bounce
 	!(bg_projectileinfo[state->weapon].flags & PF_USE_GRAVITY)
-	|| bg_projectileinfo[state->weapon].bounceType == PB_HALF
+	|| bg_projectileinfo[state->weapon].bounceType != PB_NONE
 #else
 	state->weapon != WP_GRENADE_LAUNCHER
 #endif
@@ -5319,6 +5541,7 @@ void BotCheckForGrenades(bot_state_t *bs, entityState_t *state) {
 }
 
 #ifdef MISSIONPACK
+#ifndef TMNTWEAPONS // missionpack
 /*
 ==================
 BotCheckForProxMines
@@ -5326,49 +5549,17 @@ BotCheckForProxMines
 */
 void BotCheckForProxMines(bot_state_t *bs, entityState_t *state) {
 	// if this is not a prox mine
-	if (state->eType != ET_MISSILE
-#ifdef TA_WEAPSYS
-		|| bg_projectileinfo[state->weapon].explosionType != PE_PROX
-#else
-		|| state->weapon != WP_PROX_LAUNCHER
-#endif
-		)
+	if (state->eType != ET_MISSILE || state->weapon != WP_PROX_LAUNCHER)
 		return;
 	// if this prox mine is from someone on our own team
 	if (state->generic1 == BotTeam(bs))
 		return;
-#ifdef TA_WEAPSYS_EX
-	if (!G_CanShootProx(bs->cur_ps.weapon) && !G_CanShootProx(bs->cur_ps.stats[STAT_DEFAULTWEAPON])) {
-		return;
-	}
-#elif defined TA_WEAPSYS
-	{
-		int i;
-
-		for (i = 1; i < BG_NumWeaponGroups(); i++)
-		{
-			if (bs->inventory[INVENTORY_WEAPON_START+i-1] > 0
-				&& (bs->inventory[INVENTORY_AMMO_START+i-1] > 0
-				|| bs->inventory[INVENTORY_AMMO_START+i-1] == -1)
-				&& G_CanShootProx(i))
-			{
-				break;
-			}
-		}
-
-		if (i == BG_NumWeaponGroups())
-		{
-			return;
-		}
-	}
-#else
 	// if the bot doesn't have a weapon to deactivate the mine
 	if (!(bs->inventory[INVENTORY_PLASMAGUN] > 0 && bs->inventory[INVENTORY_CELLS] > 0) &&
 		!(bs->inventory[INVENTORY_ROCKETLAUNCHER] > 0 && bs->inventory[INVENTORY_ROCKETS] > 0) &&
 		!(bs->inventory[INVENTORY_BFG10K] > 0 && bs->inventory[INVENTORY_BFGAMMO] > 0) ) {
 		return;
 	}
-#endif
 	// try to avoid the prox mine
 	trap_BotAddAvoidSpot(bs->ms, state->pos.trBase, 160, AVOID_ALWAYS);
 	//
@@ -5377,8 +5568,9 @@ void BotCheckForProxMines(bot_state_t *bs, entityState_t *state) {
 	bs->proxmines[bs->numproxmines] = state->number;
 	bs->numproxmines++;
 }
+#endif
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 BotCheckForKamikazeBody
@@ -5435,9 +5627,6 @@ void BotCheckEvents(bot_state_t *bs, entityState_t *state) {
 			//
 			if (target == bs->client) {
 				bs->botdeathtype = mod;
-#ifdef TA_WEAPSYS
-				bs->botdeathweapon = state->weapon;
-#endif
 				bs->lastkilledby = attacker;
 				//
 				if (target == attacker ||
@@ -5583,7 +5772,7 @@ void BotCheckEvents(bot_state_t *bs, entityState_t *state) {
 		}
 		case EV_GENERAL_SOUND:
 		{
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TMNTHOLDABLE // no q3 teleprter
 			//if this sound is played on the bot
 			if (state->number == bs->client) {
 				if (state->eventParm < 0 || state->eventParm > MAX_SOUNDS) {
@@ -5598,7 +5787,7 @@ void BotCheckEvents(bot_state_t *bs, entityState_t *state) {
 					if (bs->inventory[INVENTORY_TELEPORTER] > 0) {
 						//use the holdable item
 						trap_EA_Use(bs->client
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 							, HI_TELEPORTER
 #endif
 						);
@@ -5629,7 +5818,7 @@ void BotCheckEvents(bot_state_t *bs, entityState_t *state) {
 		case EV_WATER_CLEAR:
 		case EV_ITEM_PICKUP:
 		case EV_GLOBAL_ITEM_PICKUP:
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 		case EV_DROP_WEAPON:
 #else
 		case EV_NOAMMO:
@@ -5673,8 +5862,10 @@ void BotCheckSnapshot(bot_state_t *bs) {
 	trap_BotAddAvoidSpot(bs->ms, vec3_origin, 0, AVOID_CLEAR);
 	//reset kamikaze body
 	bs->kamikazebody = 0;
+#ifndef TMNTWEAPONS
 	//reset number of proxmines
 	bs->numproxmines = 0;
+#endif
 	//
 	ent = 0;
 	while( ( ent = BotAI_GetSnapshotEntity( bs->client, ent, &state ) ) != -1 ) {
@@ -5684,9 +5875,11 @@ void BotCheckSnapshot(bot_state_t *bs) {
 		BotCheckForGrenades(bs, &state);
 		//
 #ifdef MISSIONPACK
+#ifndef TMNTWEAPONS // missionpack
 		//check for proximity mines which the bot should deactivate
 		BotCheckForProxMines(bs, &state);
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#endif
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		//check for dead bodies with the kamikaze effect which should be gibbed
 		BotCheckForKamikazeBody(bs, &state);
 #endif
@@ -6059,10 +6252,10 @@ void BotSetupDeathmatchAI(void) {
 	gametype = trap_Cvar_VariableIntegerValue("g_gametype");
 	maxclients = trap_Cvar_VariableIntegerValue("sv_maxclients");
 
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 	trap_Cvar_Register(&bot_rocketjump, "bot_rocketjump", "1", 0);
 #endif
-#ifdef TURTLEARENA // BOTLIB
+#ifdef TMNTMISC // BOTLIB
 	trap_Cvar_Register(&bot_grapple, "bot_grapple", "1", 0);
 #else
 	trap_Cvar_Register(&bot_grapple, "bot_grapple", "0", 0);

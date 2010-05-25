@@ -42,24 +42,6 @@ void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
 
 /*
 ================
-CG_HudPlacement
-================
-*/
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-int cg_hudPlacement = HUD_CENTER;
-void CG_HudPlacement(int pos)
-{
-	cg_hudPlacement = pos;
-}
-#else
-void CG_HudPlacement(int pos)
-{
-	(void)pos;
-}
-#endif
-
-/*
-================
 CG_AdjustFrom640
 
 Adjusted for resolution and screen aspect ratio
@@ -67,12 +49,7 @@ Adjusted for resolution and screen aspect ratio
 */
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	if (cg_hudPlacement == HUD_LEFT)
-		*x = *x * cgs.screenXScale;
-	else if (cg_hudPlacement == HUD_RIGHT)
-		*x = *x * cgs.screenXScale + cgs.screenXBias*2;
-	else // HUD_CENTER
-		*x = *x * cgs.screenXScale + cgs.screenXBias;
+	*x = *x * cgs.screenXScale + cgs.screenXBias;
 #else
 #if 0
 	// adjust for wide screens
@@ -179,18 +156,6 @@ void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader 
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
-
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-/*
-================
-CG_DrawPicFit
-=================
-*/
-void CG_DrawPicFit( float x, float y, float width, float height, qhandle_t hShader ) {
-	CG_AdjustFrom640Fit( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
-}
-#endif
 
 
 
@@ -463,7 +428,7 @@ float *CG_TeamColor( int team ) {
 CG_GetColorForHealth
 =================
 */
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 void CG_GetColorForHealth( int health, vec4_t hcolor ) {
 #else
 void CG_GetColorForHealth( int health, int armor, vec4_t hcolor ) {
@@ -478,7 +443,7 @@ void CG_GetColorForHealth( int health, int armor, vec4_t hcolor ) {
 		hcolor[3] = 1;
 		return;
 	}
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 	count = armor;
 	max = health * ARMOR_PROTECTION / ( 1.0 - ARMOR_PROTECTION );
 	if ( max < count ) {
@@ -514,7 +479,7 @@ CG_ColorForHealth
 */
 void CG_ColorForHealth( vec4_t hcolor ) {
 
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], hcolor );
 #else
 	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], 
@@ -901,8 +866,8 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[3] = color[3];
 		UI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
 
-#ifdef TURTLEARENA // ZTM: This is like the UI Main menu text drawing, but its not.
-        // ZTM: hack-ish thing to do?...
+#ifdef TMNT // Turtle Man: This is like the UI Main menu text drawing, but its not.
+        // Turtle Man: hack-ish thing to do?...
         // text_color_highlight is UI local...
 		drawcolor[0] = 1.00f;//text_color_highlight[0];
 		drawcolor[1] = 0.43f;//text_color_highlight[1];
@@ -913,7 +878,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[2] = color[2];
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( cg.time / PULSE_DIVISOR );
-#ifdef TA_DATA
+#ifdef TMNTDATA
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetProp );
 #else
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow );

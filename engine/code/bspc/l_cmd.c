@@ -390,7 +390,7 @@ void Q_getwd (char *out)
    getcwd (out, 256);
 		strcat (out, "\\");
 #else
-   getcwd(out, 256); // ZTM: Was getwd(out);
+   getcwd(out, 256); // Turtle Man: Was getwd(out);
 	strcat(out, "/");
 #endif
 }

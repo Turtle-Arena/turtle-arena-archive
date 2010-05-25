@@ -318,7 +318,7 @@ int trap_MemoryRemaining( void ) {
 	return syscall( UI_MEMORY_REMAINING );
 }
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 void trap_GetCDKey( char *buf, int buflen ) {
 	syscall( UI_GET_CDKEY, buf, buflen );
 }
@@ -394,13 +394,13 @@ void	trap_R_RemapShader( const char *oldShader, const char *newShader, const cha
 	syscall( UI_R_REMAP_SHADER, oldShader, newShader, timeOffset );
 }
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 qboolean trap_VerifyCDKey( const char *key, const char *chksum) {
 	return syscall( UI_VERIFY_CDKEY, key, chksum);
 }
 #endif
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 void trap_SetPbClStatus( int status ) {
 	syscall( UI_SET_PBCLSTATUS, status );
 }

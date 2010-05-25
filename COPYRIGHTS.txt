@@ -1,13 +1,16 @@
-Turtle Arena data copyrights.
+The TMNT Arena data copyrights.
 
 All of the data (unless otherwised noted) is license under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
 
 == ZTM ==
-All data, unless otherwise noted, is Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+All data, unless otherwise noted, is Copyright (C) 2009 Zack "ZTurtleMan" Middleton
 	and are license under the GNU General Public License; either version 2 of the License, or
 	(at your option) any later version.
 
 The data files that have other source files are included in base-src/
+
+Some of my data is based Quake III: Arena and OpenArena data.
+	There are no Quake III: Arena graphics included.
 
 	base/gfx/damage/bullet_mrk.png was drawn over OpenArena's gfx/damage/bullet_mrk
 	base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
@@ -38,34 +41,14 @@ The following are from OpenArena,
 base/menu/art/font1_prop.tga
 base/gfx/2d/bigchars.png
 
-base/models/weapons2/triblaster/triblaster_hand.md3 (Copied from OA's base/models/weapons2/shotgun/shotgun_hand.md3)
+: Currently not in a big rush to replace this, as it is for the unsupported first-person camera mode.
+base/models/weapons2/gun/gun_hand.md3 (Copied from OA's base/models/weapons2/shotgun/shotgun_hand.md3)
 
+: Currently plan to replace these.
 base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
 base/gfx/damage/shadow.tga
-base/gfx/misc/flare.tga
-
-base/textures/sfx/flame1.tga
-base/textures/sfx/flame2.tga
-base/textures/sfx/flame3.tga
-base/textures/sfx/flame4.tga
-base/textures/sfx/flame5.tga
-base/textures/sfx/flame6.tga
-base/textures/sfx/flame7.tga
-base/textures/sfx/flame8.tga
-base/textures/sfx/flameball.jpg
-
-base/sound/player/watr_in.wav
-base/sound/player/watr_out.wav
-base/sound/player/watr_un.wav
-base/sound/player/footsteps/splash1.wav
-base/sound/player/footsteps/splash2.wav
-base/sound/player/footsteps/splash3.wav
-base/sound/player/footsteps/splash4.wav
-base/sound/player/footsteps/step1.wav
-base/sound/player/footsteps/step2.wav
-base/sound/player/footsteps/step3.wav
-base/sound/player/footsteps/step4.wav
+base/gfx/misc/flare.jpg
 
 == GNU FreeFonts ==
 The following files were created using the GNU Freefonts,
@@ -83,21 +66,16 @@ base/gfx/2d/numbers/*.png 0 - 9 and '-' [11 images]	FreeSansBold.ttf
 base/gfx/2d/crosshaira.png							FreeSans.ttf
 base/textures/common/alpha* [6 images]				FreeSans.ttf
 
-Below were created by Turtle Arena, using freetype2	FreeSans.ttf
-base/fonts/FreeSans_0_12.tga
-base/fonts/FreeSans_0_16.tga
-base/fonts/FreeSans_0_20.tga
-base/fonts/FreeSans_1_20.tga
-base/fonts/FreeSans_12.dat
-base/fonts/FreeSans_16.dat
-base/fonts/FreeSans_20.dat
-
-Copies of FreeSans_*.dat for compatability with Quake III: Team Arena
+Below were created by TMNT Arena, using freetype2	FreeSans.ttf
+base/fonts/fontImage_0_12.tga
+base/fonts/fontImage_0_16.tga
+base/fonts/fontImage_0_20.tga
+base/fonts/fontImage_1_20.tga
 base/fonts/fontImage_12.dat
 base/fonts/fontImage_16.dat
 base/fonts/fontImage_20.dat
 
-Used by the console.								FreeSansBold.ttf
+Used by the console.									FreeSansBold.ttf
 base/fonts/FreeSansBold_0_16.tga
 base/fonts/FreeSansBold_16.dat
 

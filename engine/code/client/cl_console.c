@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 int g_console_field_width = 78;
 
-#ifdef IOQ3ZTM // ZTM: More chat lines
+#ifdef IOQ3ZTM // Turtle Man: More chat lines
 #define	NUM_CON_TIMES 6
 #else
 #define	NUM_CON_TIMES 4
@@ -551,18 +551,18 @@ void Con_DrawNotify (void)
 		text = con.text + (i % con.totallines)*con.linewidth;
 
 		if (cl.snap.ps.pm_type != PM_INTERMISSION
-#ifdef TA_SP
+#ifdef TMNTSP
 		&& cl.snap.ps.pm_type != PM_SPINTERMISSION
 #endif
 		&& Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
 			continue;
 		}
 
-#ifdef IOQ3ZTM // USE_FREETYPE // ZTM: I added this...
+#ifdef IOQ3ZTM // USE_FREETYPE // Turtle Man: I added this...
 		float currentWidthLocation = cl_conXOffset->integer;
 #endif
 		for (x = 0 ; x < con.linewidth ; x++) {
-#ifndef IOQ3ZTM // USE_FREETYPE // ZTM: I added this...
+#ifndef IOQ3ZTM // USE_FREETYPE // Turtle Man: I added this...
 			if ( ( text[x] & 0xff ) == ' ' ) {
 				continue;
 			}
@@ -571,7 +571,7 @@ void Con_DrawNotify (void)
 				currentColor = (text[x]>>8)&7;
 				re.SetColor( g_color_table[currentColor] );
 			}
-#ifdef IOQ3ZTM // USE_FREETYPE // ZTM: I added this...
+#ifdef IOQ3ZTM // USE_FREETYPE // Turtle Man: I added this...
 			SCR_DrawConsoleFontChar( con.xadjust + currentWidthLocation, v, text[x] & 0xff );
 			currentWidthLocation += SCR_ConsoleFontCharWidth( text[x] & 0xff );
 #else
@@ -579,7 +579,7 @@ void Con_DrawNotify (void)
 #endif
 		}
 
-#ifdef IOQ3ZTM // USE_FREETYPE // ZTM: I added this...
+#ifdef IOQ3ZTM // USE_FREETYPE // Turtle Man: I added this...
 		v += SCR_ConsoleFontCharHeight();
 #else
 		v += SMALLCHAR_HEIGHT;
@@ -651,7 +651,7 @@ void Con_DrawSolidConsole( float frac ) {
 		SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
 	}
 
-#ifdef TURTLEARENA // Console edge color
+#ifdef TMNT // Console
 	color[0] = 0;
 	color[1] = 1;
 	color[2] = 0;
@@ -667,7 +667,7 @@ void Con_DrawSolidConsole( float frac ) {
 
 	// draw the version number
 
-#ifdef TURTLEARENA // Console edge color
+#ifdef TMNT // Console
 	re.SetColor( g_color_table[ColorIndex(COLOR_GREEN)] );
 #else
 	re.SetColor( g_color_table[ColorIndex(COLOR_RED)] );

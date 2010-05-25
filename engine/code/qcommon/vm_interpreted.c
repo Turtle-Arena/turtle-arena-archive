@@ -239,7 +239,7 @@ void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header ) {
 	int_pc = 0;
 	instruction = 0;
 	code = (byte *)header + header->codeOffset;
-	
+
 	// Now that the code has been expanded to int-sized opcodes, we'll translate instruction index
 	//into an index into codeBase[], which contains opcodes and operands.
 	while ( instruction < header->instructionCount ) {
@@ -247,24 +247,24 @@ void VM_PrepareInterpreter( vm_t *vm, vmHeader_t *header ) {
 		instruction++;
 		int_pc++;
 		
-		switch ( op ) {
+			switch(op) {
 		// These ops need to translate addresses in jumps from instruction index to int index
-		case OP_EQ:
-		case OP_NE:
-		case OP_LTI:
-		case OP_LEI:
-		case OP_GTI:
-		case OP_GEI:
-		case OP_LTU:
-		case OP_LEU:
-		case OP_GTU:
-		case OP_GEU:
-		case OP_EQF:
-		case OP_NEF:
-		case OP_LTF:
-		case OP_LEF:
-		case OP_GTF:
-		case OP_GEF:
+				case OP_EQ:
+				case OP_NE:
+				case OP_LTI:
+				case OP_LEI:
+				case OP_GTI:
+				case OP_GEI:
+				case OP_LTU:
+				case OP_LEU:
+				case OP_GTU:
+				case OP_GEU:
+				case OP_EQF:
+				case OP_NEF:
+				case OP_LTF:
+				case OP_LEF:
+				case OP_GTF:
+				case OP_GEF:
 			// codeBase[pc] is the instruction index. Convert that into an offset into
 			//the int-aligned codeBase[] by the lookup table.
 			codeBase[int_pc] = vm->instructionPointers[codeBase[int_pc]];
@@ -516,20 +516,18 @@ nextInstruction2:
 
 //VM_LogSyscalls( (int *)&image[ programStack + 4 ] );
 				{
-					// the vm has ints on the stack, we expect
-					// pointers so we might have to convert it
-					if (sizeof(intptr_t) != sizeof(int)) {
-						intptr_t argarr[16];
-						int *imagePtr = (int *)&image[programStack];
-						int i;
-						for (i = 0; i < 16; ++i) {
-							argarr[i] = *(++imagePtr);
-						}
-						r = vm->systemCall( argarr );
-					} else {
-						intptr_t* argptr = (intptr_t *)&image[ programStack + 4 ];
-						r = vm->systemCall( argptr );
+					intptr_t* argptr = (intptr_t *)&image[ programStack + 4 ];
+				#if __WORDSIZE == 64
+				// the vm has ints on the stack, we expect
+				// longs so we have to convert it
+					intptr_t argarr[16];
+					int i;
+					for (i = 0; i < 16; ++i) {
+						argarr[i] = *(int*)&image[ programStack + 4 + 4*i ];
 					}
+					argptr = argarr;
+				#endif
+					r = vm->systemCall( argptr );
 				}
 
 #ifdef DEBUG_VM

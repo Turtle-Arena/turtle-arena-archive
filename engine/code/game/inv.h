@@ -20,77 +20,102 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#ifdef TURTLEARENA
-// inventory
-//
-// none - 0
-// health - 1
-// weapon stuff - 2,3,4
-// persistant power - 5
-// free slots (for stuff like missionpack cubes)
-// holdables - start at 15
-// powerups - start at 30
-// weapons - start at 45
-// ammo - start at 76 (weapons + 31) (31 is MAX_BG_WEAPONS-1)
-// 
-// bot stuff - start at 200
-
+#ifdef TMNT // Turtle Man: TODO: FINISH THIS (Is it done yet?)
 #define INVENTORY_NONE				0
-#define INVENTORY_HEALTH			1
+#define INVENTORY_HEALTH			55
 
-//#ifdef TA_WEAPSYS_EX
+//#ifdef TMNTWEAPSYS2
 // The most weapons a player can have is 2!
 //  (well they do have 3 when switching pickup for pickup and have a default weapon)
 // Default weapon for the player,
 // If INVENTORY_WAEPON is different, the default can be used by dropping current weapon.
-#define INVENTORY_DEFAULTWEAPON		2
+#define INVENTORY_DEFAULTWEAPON		56
 // Weapon the player is using
-#define INVENTORY_WEAPON			3
-// Ammo for current weapon,
-#define INVENTORY_AMMO 				4
+#define INVENTORY_WEAPON			57
+
+#define INVENTORY_DEFAULTAMMO 58 // Ammo for default weapon.
+#define INVENTORY_AMMO 		59 // Ammo for current weapon,
 //#endif
 
-// MISSIONPACK
-#define INVENTORY_PERSISTANT_POWER	5
-//#ifdef MISSIONPACK_HARVESTER
-//#define INVENTORY_REDCUBE			0
-//#define INVENTORY_BLUECUBE		0
-//#endif
+//#ifdef TMNTWEAPONS
+// weapons, currently (if !defined TMNTWEAPSYS2) there is a max of 16 - which I am over...
+//#define INVENTORY_WP_NONE			0
+#define INVENTORY_FISTS				1
+#define INVENTORY_KATANAS			2
+#define INVENTORY_DAISHO			3 // Usagi's weapons
+#define INVENTORY_SAIS				4
+#define INVENTORY_NUNCHUKS			5
+#define INVENTORY_HAMMER			6
+#define INVENTORY_AXE				7
+#define INVENTORY_LONGSWORD			8
+#define INVENTORY_BAT				9
+#define INVENTORY_BO				10
+#define INVENTORY_BAMBOO			11
+#define INVENTORY_GUN				12
+#define INVENTORY_ELECTRIC_LAUNCHER	13
+#define INVENTORY_HOMING_LAUNCHER	14
+#define INVENTORY_ROCKET_LAUNCHER	15
+#define INVENTORY_GRAPPLING_HOOK	16
 
-// holdable items
-// Q3 holdables
-#define INVENTORY_MEDKIT			15
-// MISSIONPACK holdables
-#define INVENTORY_PORTAL			16
+#define INVENTORY_AMMOGUN			17
+#define INVENTORY_AMMOELECTRIC		18
+#define INVENTORY_AMMOHOMING		19
+#define INVENTORY_AMMOROCKET		20
+//#endif // TMNTWEAPONS
 
-// TA_HOLDABLE
-#define INVENTORY_SHURIKEN			17
-#define INVENTORY_ELECTRICSHURIKEN	18
-#define INVENTORY_FIRESHURIKEN		19
-#define INVENTORY_LASERSHURIKEN		20
+// holdable items, currently there is a max of 16
+// Q3 holdable defines.
+#define INVENTORY_TELEPORTER		21	// removed
+#define INVENTORY_MEDKIT			22
+//MISSIONPACK
+#define INVENTORY_KAMIKAZE			23	// removed
+#define INVENTORY_PORTAL			24
+#define INVENTORY_INVULNERABILITY	25	// removed
 
-// powerups
-#define INVENTORY_QUAD				30
-#define INVENTORY_ENVIRONMENTSUIT	31
-#define INVENTORY_HASTE				32
-#define INVENTORY_INVISIBILITY		33
-#define INVENTORY_FLIGHT			34
-#define INVENTORY_INVUL				35 // TURTLEARENA // POWERS
-#define INVENTORY_REDFLAG			36
-#define INVENTORY_BLUEFLAG			37
-#define INVENTORY_NEUTRALFLAG		38
+// TMNT holdable defines.
+// HI_SHURIKEN, HI_ELECTRICSHURIKEN, HI_FIRESHURIKEN, HI_LASERSHURIKEN
+#define INVENTORY_SHURIKEN			26
+#define INVENTORY_ELECTRICSHURIKEN	27
+#define INVENTORY_FIRESHURIKEN		28
+#define INVENTORY_LASERSHURIKEN		29
+//#define INVENTORY_HOLDABLE9		30
+//#define INVENTORY_HOLDABLE10		31
+//#define INVENTORY_HOLDABLE11		32
+//#define INVENTORY_HOLDABLE12		33
+//#define INVENTORY_HOLDABLE13		34
+//#define INVENTORY_HOLDABLE14		35
+//#define INVENTORY_HOLDABLE15		36
 
-// MISSIONPACK persistant powers
-#define INVENTORY_SCOUT				39
-#define INVENTORY_GUARD				40
-#define INVENTORY_DOUBLER			41
-#define INVENTORY_AMMOREGEN			42
+// powerups, currently there is a max of 16
+// Q3 powerup defines.
+#define INVENTORY_QUAD				37
+#define INVENTORY_ENVIRONMENTSUIT	38
+#define INVENTORY_HASTE				39
+#define INVENTORY_INVISIBILITY		40
+#define INVENTORY_REGEN				41
+#define INVENTORY_FLIGHT			42
 
-// 45-49 are free
+// TMNT invulerability
+#define INVENTORY_INVUL				43
 
-//TA_WEAPSYS
-#define INVENTORY_WEAPON_START 50 // 31 slots starting here
-#define INVENTORY_AMMO_START 81 // 31 slots starting here
+#define INVENTORY_REDFLAG			44
+#define INVENTORY_BLUEFLAG			45
+#define INVENTORY_NEUTRALFLAG		46
+
+// persistant powers MISSIONPACK defines
+#define INVENTORY_SCOUT				47
+#define INVENTORY_GUARD				48
+#define INVENTORY_DOUBLER			49
+#define INVENTORY_AMMOREGEN			50
+//#define INVENTORY_POWERUP14			51
+//#define INVENTORY_POWERUP15			52
+
+// other MISSIONPACK
+#define INVENTORY_REDCUBE			53
+#define INVENTORY_BLUECUBE			54
+
+// 55-59 are at top of file.
+#define INVENTORY_PERSISTANT_POWER 60
 
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
@@ -105,40 +130,88 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODELINDEX_HEALTHLARGE		3
 #define MODELINDEX_HEALTHMEGA		4
 
-#define MODELINDEX_MEDKIT			5
-#define MODELINDEX_SHURIKEN			6
-#define MODELINDEX_ELECTRICSHURIKEN	7
-#define MODELINDEX_FIRESHURIKEN		8
-#define MODELINDEX_LASERSHURIKEN	9
+#define MODELINDEX_DEFAULTWEAPON	5 // weapon index -1
+#define MODELINDEX_FISTS			6
+#define MODELINDEX_KATANAS			7
+#define MODELINDEX_DAISHO			8
+#define MODELINDEX_SAIS				9
+#define MODELINDEX_NUNCHUKS			10
+#define MODELINDEX_HAMMER			11
+#define MODELINDEX_AXE				12
+#define MODELINDEX_LONGSWORD		13
+#define MODELINDEX_BAT				14
+#define MODELINDEX_BO				15
+#define MODELINDEX_BAMBOO			16
+#define MODELINDEX_GUN				17
+#define MODELINDEX_ELECTRICLAUNCHER	18
+#define MODELINDEX_ROCKETLAUNCHER	19
+#define MODELINDEX_HOMINGLAUNCHER	20
+#define MODELINDEX_GRAPPLINGHOOK	21
 
-#define MODELINDEX_QUAD				10
-#define MODELINDEX_ENVIRONMENTSUIT	11
-#define MODELINDEX_HASTE			12
-#define MODELINDEX_INVISIBILITY		13
-#define MODELINDEX_FLIGHT			14
-#define MODELINDEX_INVUL			15 // TURTLEARENA // POWERS
-#define MODELINDEX_REDFLAG			16
-#define MODELINDEX_BLUEFLAG			17
+#define MODELINDEX_TELEPORTER		0	// removed
+#define MODELINDEX_MEDKIT			22
+#define MODELINDEX_SHURIKEN			23
+#define MODELINDEX_ELECTRICSHURIKEN	24
+#define MODELINDEX_FIRESHURIKEN		25
+#define MODELINDEX_LASERSHURIKEN	26
+
+#define MODELINDEX_QUAD				27
+#define MODELINDEX_ENVIRONMENTSUIT	28
+#define MODELINDEX_HASTE			29
+#define MODELINDEX_INVISIBILITY		30
+#define MODELINDEX_REGEN			31
+#define MODELINDEX_FLIGHT			32
+
+// TMNT power
+#define MODELINDEX_INVUL			33
+
+#define MODELINDEX_REDFLAG			34
+#define MODELINDEX_BLUEFLAG			35
 
 // mission pack only defines
-#define MODELINDEX_PORTAL			18
 
-#define MODELINDEX_SCOUT			19
-#define MODELINDEX_GUARD			20
-#define MODELINDEX_DOUBLER			21
-#define MODELINDEX_AMMOREGEN		22
+#define MODELINDEX_KAMIKAZE			0	// removed
+#define MODELINDEX_PORTAL			36
+#define MODELINDEX_INVULNERABILITY	0	// removed
 
-#define MODELINDEX_NEUTRALFLAG		23
+#define MODELINDEX_SCOUT			37
+#define MODELINDEX_GUARD			38
+#define MODELINDEX_DOUBLER			39
+#define MODELINDEX_AMMOREGEN		40
+
+#define MODELINDEX_NEUTRALFLAG		41
 //#ifdef MISSIONPACK_HARVESTER
 //#define MODELINDEX_REDCUBE			0
 //#define MODELINDEX_BLUECUBE			0
 //#endif
 
-#define MODELINDEX_DEFAULTWEAPON	24 // weapon index -1
+//#define MODELINDEX_NAILGUN			0
+//#define MODELINDEX_PROXLAUNCHER		0
+//#define MODELINDEX_CHAINGUN			0
 
-#ifdef TA_WEAPSYS
+// TMNT item
+#define MODELINDEX_CRATE			42
 
-// In botfiles setup WEAPONINDEX_*s and INVENTORY_*s for weapons?
+// WEAPONINDEX_*
+#ifdef TMNTWEAPONS
+//#define WEAPONINDEX_DEFAULT				-1
+//#define WEAPONINDEX_NONE				0
+#define WEAPONINDEX_FISTS				1
+#define WEAPONINDEX_KATANAS				2
+#define WEAPONINDEX_DAISHO				3
+#define WEAPONINDEX_SAIS				4
+#define WEAPONINDEX_NUNCHUKS			5
+#define WEAPONINDEX_HAMMER				6
+#define WEAPONINDEX_AXE					7
+#define WEAPONINDEX_LONGSWORD			8
+#define WEAPONINDEX_BAT					9
+#define WEAPONINDEX_BO					10
+#define WEAPONINDEX_BAMBOO				11
+#define WEAPONINDEX_GUN					12
+#define WEAPONINDEX_ELECTRIC_LAUNCHER	13
+#define WEAPONINDEX_ROCKET_LAUNCHER		14
+#define WEAPONINDEX_HOMING_LAUNCHER		15
+#define WEAPONINDEX_GRAPPLING_HOOK		16
 
 #else
 
@@ -185,7 +258,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #endif
 
-#else // NOT TURTLEARENA ===================================================
+#else // NOT TMNT ===================================================
 
 #define INVENTORY_NONE				0
 //armor
@@ -239,10 +312,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_NEUTRALFLAG		47
 #define INVENTORY_REDCUBE			48
 #define INVENTORY_BLUECUBE			49
-#ifdef TA_WEAPSYS
-#define INVENTORY_WEAPON_START 50 // 31 slots starting here
-#define INVENTORY_AMMO_START 81 // 31 slots starting here
-#endif
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
 #define ENEMY_HEIGHT				201
@@ -320,9 +389,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODELINDEX_PROXLAUNCHER		50
 #define MODELINDEX_CHAINGUN			51
 
-#ifdef TA_WEAPSYS
-#define MODELINDEX_DEFAULTWEAPON	52 // weapon index -1
-#endif
 
 //
 #define WEAPONINDEX_GAUNTLET			1
@@ -339,4 +405,4 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define WEAPONINDEX_PROXLAUNCHER		12
 #define WEAPONINDEX_CHAINGUN			13
 
-#endif // TURTLEARENA
+#endif // TMNT

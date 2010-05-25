@@ -71,7 +71,7 @@ functions imported from the main executable
 
 #define	CGAME_IMPORT_API_VERSION	4
 
-// ZTM: Note to self: The order is important and if any
+// Turtle Man: Note to self: The order is important and if any
 //             more are added update cg_syscalls.ASM
 typedef enum {
 	CG_PRINT,
@@ -167,7 +167,7 @@ typedef enum {
 	// 1.32
 	CG_FS_SEEK,
 
-#if defined CAMERASCRIPT || defined TA_WEAPSYS
+#if defined CAMERASCRIPT || defined TMNTWEAPSYS_2
 	CG_LOADCAMERA,
 	CG_STARTCAMERA,
 	CG_GETCAMERAINFO,
@@ -179,7 +179,7 @@ typedef enum {
 */
 #endif
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	CG_FS_GETFILELIST,
 #endif
 
@@ -245,7 +245,7 @@ typedef enum {
 //	void	(*CG_MouseEvent)( int dx, int dy );
 	CG_EVENT_HANDLING,
 //	void (*CG_EventHandling)(int type);
-#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
+#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
 	CG_VIEW_TYPE
 //	int (*CG_ViewType)( void );
 #endif

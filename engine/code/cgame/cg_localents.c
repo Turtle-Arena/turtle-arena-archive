@@ -235,7 +235,7 @@ void CG_ReflectVelocity( localEntity_t *le, trace_t *trace ) {
 	VectorCopy( trace->endpos, le->pos.trBase );
 	le->pos.trTime = cg.time;
 
-#ifndef TA_MISC // MATERIALS // ZTM: Stop debris from being in the air when it should fall...
+
 	// check for stop, making sure that even on low FPS systems it doesn't bobble
 	if ( trace->allsolid || 
 		( trace->plane.normal[2] > 0 && 
@@ -244,7 +244,6 @@ void CG_ReflectVelocity( localEntity_t *le, trace_t *trace ) {
 	} else {
 
 	}
-#endif
 }
 
 /*
@@ -491,7 +490,7 @@ static void CG_AddExplosion( localEntity_t *ex ) {
 	// add the entity
 	trap_R_AddRefEntityToScene(ent);
 
-#ifndef IOQ3ZTM // ZTM: Anything glows!
+#ifndef IOQ3ZTM // Turtle Man: Anything glows!
 	// add the dlight
 	if ( ex->light ) {
 		float		light;
@@ -530,16 +529,23 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 	re.shaderRGBA[3] = 0xff * c * 0.33;
 
 	re.reType = RT_SPRITE;
-#ifdef TA_WEAPSYS // SPR_EXP_SCALE
+#ifdef TMNTWEAPSYS // SPR_EXP_SCALE
 	// CG_MakeExplosion
-	re.radius = le->refEntity.radius * ( 1.0 - c ) + le->radius;
+	//if (le->radius > 0 && le->refEntity.radius > 0)
+	//{
+		re.radius = le->refEntity.radius * ( 1.0 - c ) + le->radius;
+	//}
+	//else
+	//{
+	//	re.radius = 42 * ( 1.0 - c ) + 30;
+	//}
 #else
 	re.radius = 42 * ( 1.0 - c ) + 30;
 #endif
 
 	trap_R_AddRefEntityToScene( &re );
 
-#ifndef IOQ3ZTM // ZTM: Anything glows!
+#ifndef IOQ3ZTM // Turtle Man: Anything glows!
 	// add the dlight
 	if ( le->light ) {
 		float		light;
@@ -556,7 +562,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 #endif
 }
 
-#ifdef IOQ3ZTM // BUBBLES
+#ifdef TMNTMISC
 /*
 ====================
 CG_BubbleThink
@@ -585,7 +591,7 @@ void CG_BubbleThink( localEntity_t *le ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ====================
 CG_AddKamikaze
@@ -715,7 +721,7 @@ void CG_AddKamikaze( localEntity_t *le ) {
 }
 #endif
 
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 /*
 ===================
 CG_AddInvulnerabilityImpact
@@ -878,7 +884,7 @@ void CG_AddLocalEntities( void ) {
 			CG_FreeLocalEntity( le );
 			continue;
 		}
-#ifdef IOQ3ZTM // ZTM: Anything glows!
+#ifdef IOQ3ZTM // Turtle Man: Anything glows!
 		// add the dlight
 		if ( le->light ) {
 			float		light;
@@ -933,19 +939,19 @@ void CG_AddLocalEntities( void ) {
 			CG_AddScorePlum( le );
 			break;
 
-#ifdef IOQ3ZTM // BUBBLES
+#ifdef TMNTMISC
 		case LE_BUBBLE:
 			CG_BubbleThink( le );
 			break;
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		case LE_KAMIKAZE:
 			CG_AddKamikaze( le );
 			break;
 #endif
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 		case LE_INVULIMPACT:
 			CG_AddInvulnerabilityImpact( le );
 			break;

@@ -38,10 +38,6 @@ void BotShutdownDeathmatchAI(void);
 void BotDeathmatchAI(bot_state_t *bs, float thinktime);
 //free waypoints
 void BotFreeWaypoints(bot_waypoint_t *wp);
-#ifdef TA_WEAPSYS // BOT_WEAP_WEIGHTS
-//bot weight for weapon
-int BotWeaponWeight(weapon_t w);
-#endif
 //choose a weapon
 void BotChooseWeapon(bot_state_t *bs);
 //setup movement stuff
@@ -66,7 +62,7 @@ qboolean EntityIsDead(aas_entityinfo_t *entinfo);
 qboolean EntityIsInvisible(aas_entityinfo_t *entinfo);
 //returns true if the entity is shooting
 qboolean EntityIsShooting(aas_entityinfo_t *entinfo);
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 //returns true if this entity has the kamikaze
 qboolean EntityHasKamikaze(aas_entityinfo_t *entinfo);
 #endif
@@ -96,7 +92,7 @@ int BotWantsToRetreat(bot_state_t *bs);
 int BotWantsToChase(bot_state_t *bs);
 //returns true if the bot wants to help
 int BotWantsToHelp(bot_state_t *bs);
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 //returns true if the bot can and wants to rocketjump
 int BotCanAndWantsToRocketJump(bot_state_t *bs);
 #endif
@@ -170,9 +166,6 @@ int BotTeamCubeCarrierVisible(bot_state_t *bs);
 int BotEnemyCubeCarrierVisible(bot_state_t *bs);
 #endif
 #endif
-#ifdef TA_WEAPSYS
-qboolean G_CanShootProx(weapon_t w);
-#endif
 //get a random alternate route goal towards the given base
 int BotGetAlternateRouteGoal(bot_state_t *bs, int base);
 //returns either the alternate route goal or the given goal
@@ -203,7 +196,7 @@ extern int gametype;		//game type
 extern int maxclients;		//maximum number of clients
 
 extern vmCvar_t bot_grapple;
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 extern vmCvar_t bot_rocketjump;
 #endif
 extern vmCvar_t bot_fastchat;

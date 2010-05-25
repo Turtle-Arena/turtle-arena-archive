@@ -1,38 +1,36 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009 Turtle Man
 
-This file is part of Turtle Arena source code.
+This file is part of TMNT Arena source code.
 
-Turtle Arena source code is free software; you can redistribute it
+TMNT Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena source code is distributed in the hope that it will be
+TMNT Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena source code; if not, write to the Free Software
+along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
 #include "g_local.h"
 
-/* ZTM: TODO: Finish new general path code,
+/* Turtle Man: TODO: Finish new general path code,
 		for trains, camera "scripts", NPCs, NiGHTS mode?, 2D mode?
 		and what not.
 
-	Supports trains
-		players in NiGHTS mode are mostly-working (I don't think the problems are in g_path)
-		others are untested
+	It is however unfinish and untested.
 */
 
-#ifdef TA_PATHSYS
+#ifdef TMNTPATHSYS
 typedef enum
 {
 	PATHF_BEGIN		= 0x01, // path can start on this entity
@@ -60,15 +58,14 @@ gpathinfo_t gpathinfo[] =
 	// TDC_NPC compatiblity...
 	{ "npcpath", PATHF_BEGIN | PATHF_POINT | PATHF_CANFINISH },
 
-	// Turtle Arena path entities
+	// TMNT Path entities
 	{ "path_start", PATHF_BEGIN | PATHF_POINT }, // Is there a reason for "start"?
 	{ "path_point", PATHF_POINT },
-	{ "path_axis", PATHF_AXIS }, // ZTM: TODO: Like SRB2's MT_AXIS, for NiGHTS mode. (entity is point to be rotated around)
-	{ "path_end", PATHF_FINISH | PATHF_POINT }, // A end is not needed for circit paths
+	{ "path_axis", PATHF_AXIS }, // Like SRB2's MT_AXIS, for NiGHTS mode. (entity is point to be rotated around)
+	{ "path_end", PATHF_FINISH | PATHF_POINT }, // A end is not needed for circit paths, just link "end" to path_start.
 
 #ifdef NIGHTSMODE
 	// NiGHTS
-	{ "nights_start", PATHF_BEGIN | PATHF_POINT },
 	{ "nights_target", PATHF_POINT },
 #endif
 
@@ -223,7 +220,6 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 			start->pathflags = PATH_LINE | PATH_FIRST;
 			next->pathflags = PATH_LINE | PATH_LAST;
 			next->nextTrain = NULL;
-			ent->prevTrain = NULL;
 			return PATH_LINE;
 		}
 		if ((gpathinfo[i].flags & PATHF_CANFINISH) && !next->target)
@@ -231,7 +227,6 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 			start->pathflags = PATH_LINE | PATH_FIRST;
 			next->pathflags = PATH_LINE | PATH_LAST;
 			next->nextTrain = NULL;
-			ent->prevTrain = NULL;
 			return PATH_LINE;
 		}
 
@@ -239,233 +234,89 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 	}
 
 	// If we made it here the path is a circit, so link the first and last.
-	start->pathflags = PATH_CIRCIT | PATH_FIRST;
-	start->prevTrain->pathflags = PATH_CIRCIT | PATH_LAST;
+	start->prevTrain = next;
+	next->nextTrain = start;
 
-	ent->nextTrain = start;
-	ent->prevTrain = start->prevTrain;
+	start->pathflags = PATH_CIRCIT | PATH_FIRST;
+	next->pathflags = PATH_CIRCIT | PATH_LAST;
 
 	return PATH_CIRCIT;
 }
 
-// g_mover.c
-void Think_BeginMoving( gentity_t *ent );
-void SetMoverState( gentity_t *ent, moverState_t moverState, int time );
-
-/*
-===========
-G_ReachedPath
-===========
-*/
-qboolean G_ReachedPath(gentity_t *ent, qboolean check)
+// Turtle Man: TODO: Reached_Train
+//was G_NextPath
+qboolean G_ReachedPath(gentity_t *ent, qboolean backward, qboolean check)
 {
-	gentity_t	*point;
-	qboolean	backward;
+	gentity_t		*next, *prev;
 
-#ifdef NIGHTSMODE
-	if (ent->client)
-	{
-		if (ent->client->ps.eFlags & EF_NIGHTSMODE)
-		{
-			backward = (ent->client->ps.eFlags & EF_TRAINBACKWARD);
-		}
-		else
-		{
-			// ZTM: NOTE: Should work for now, but should check if moving away from nextTrain
-			//              (In case they were shoot and knocked back)
-			backward = (ent->client->ps.pm_flags & PMF_BACKWARDS_RUN);
-		}
-	}
-	else
-#endif
-	{
-		backward = (ent->s.eFlags & EF_TRAINBACKWARD);
-	}
-
-	if (backward) {
-		point = ent->prevTrain;
-	} else {
-		point = ent->nextTrain;
-	}
-
-	if (!point)
-	{
-		// no current point, nothing to do.
+	if (!ent) {
 		return qfalse;
 	}
 
-	if ((!backward && point == point->nextTrain) || (backward && point == point->prevTrain))
+	prev = ent->prevTrain;
+	next = ent->nextTrain;
+
+	if ( (!backward && (!next || !next->nextTrain))
+		|| (backward && (!prev || !prev->prevTrain)) )
 	{
-		// Entity points to self...
-		G_Printf("DEBUG: Entity points to self!\n");
-		return qfalse;
+		// end of train or path not setup.
+		// Turtle Man: TODO: spawnflag for trains to allow PATH_LINE support or always support it?
+		return qfalse;		// train just stops
 	}
 
-	// ZTM: Check if we have made it to the next train
+	// Turtle Man: Check if we have made it to the nextTrain/prevTrain
 	//               Doesn't work with PATHF_AXIS!
 	if (check)
 	{
 		vec3_t targetPos;
-		vec3_t origin;
 		vec_t dist;
 
-		VectorCopy(point->s.origin, targetPos);
-
-		if (ent->client)
-			VectorCopy(ent->client->ps.origin, origin);
+		if (backward)
+			VectorCopy(prev->s.origin/*s.pos*/, targetPos);
 		else
-			VectorCopy(ent->s.origin, origin);
+			VectorCopy(next->s.origin/*s.pos*/, targetPos);
 
-#ifdef NIGHTSMODE
-		if (ent->client && (ent->client->ps.eFlags & EF_NIGHTSMODE)) {
-			origin[2] = targetPos[2] = 0; // Don't compare Z
-		}
-#endif
-		dist = Distance(origin, targetPos);
+		dist = Distance(ent->s.origin/*s.pos*/, targetPos);
 
+		// Turtle Man: Value is untested.
 		if (dist > 20.0f)
-			return qfalse;
+		return qfalse;
+		else {
+			G_Printf("DEBUG: G_ReachedPath: Made it to path entity...\n");
+		}
 	}
 
 	// fire all other targets
-	G_UseTargets( point, ent );
+	if (backward)
+		G_UseTargets( prev, ent/*NULL*/ );
+	else
+		G_UseTargets( next, ent/*NULL*/ );
 
 	// Setup next move
-	if (backward) {
-		ent->prevTrain = point->prevTrain;
-		if (ent->prevTrain) {
-			ent->nextTrain = point;
-		}
-	} else {
-		ent->nextTrain = point->nextTrain;
-		if (ent->nextTrain) {
-			ent->prevTrain = point;
-		}
-	}
-
-	// set the new trajectory
-	if (ent->prevTrain) {
-		VectorCopy( ent->prevTrain->s.origin, ent->pos1 );
-	}
-	if (ent->nextTrain) {
-		VectorCopy( ent->nextTrain->s.origin, ent->pos2 );
-	}
-
-	if (ent->s.eType == ET_MOVER)
+	if (backward)
 	{
-		float			speed;
-		vec3_t			move;
-		float			length;
+		ent->nextTrain = next->prevTrain;
+		ent->prevTrain = prev->prevTrain;
+	}
+	else
+	{
+		ent->nextTrain = next->nextTrain;
+		ent->prevTrain = prev->nextTrain;
+	}
 
-		// Next point
+	if (ent->s.eType == ET_MOVER) {
+		// set the new trajectory
 		if (backward)
-			point = ent->prevTrain;
-		else
-			point = ent->nextTrain;
-
-		if (!point)
 		{
-			// end of path
-			if (!(ent->spawnflags & 1))
-			{
-				// Stop train
-				return qfalse;
-			}
-
-			// Go back the way you came
-			backward = !backward;
-			ent->s.eFlags ^= EF_TRAINBACKWARD;
-
-			// Next point
-			if (backward)
-				point = ent->prevTrain;
-			else
-				point = ent->nextTrain;
-
-			if (!point)
-			{
-				// Stop train
-				return qfalse;
-			}
-		}
-
-		// if the path_corner has a speed, use that
-		if ( point->speed ) {
-			speed = point->speed;
-		} else {
-			// otherwise use the train's speed
-			speed = ent->speed;
-		}
-		if ( speed < 1 ) {
-			speed = 1;
-		}
-
-		// calculate duration
-		VectorSubtract( ent->pos2, ent->pos1, move );
-		length = VectorLength( move );
-
-		ent->s.pos.trDuration = length * 1000 / speed;
-
-		// Tequila comment: Be sure to send to clients after any fast move case
-		ent->r.svFlags &= ~SVF_NOCLIENT;
-
-		// Tequila comment: Fast move case
-		if(ent->s.pos.trDuration<1) {
-			// Tequila comment: As trDuration is used later in a division, we need to avoid that case now
-			// With null trDuration,
-			// the calculated rocks bounding box becomes infinite and the engine think for a short time
-			// any entity is riding that mover but not the world entity... In rare case, I found it
-			// can also stuck every map entities after func_door are used.
-			// The desired effect with very very big speed is to have instant move, so any not null duration
-			// lower than a frame duration should be sufficient.
-			// Afaik, the negative case don't have to be supported.
-			ent->s.pos.trDuration=1;
-
-			// Tequila comment: Don't send entity to clients so it becomes really invisible 
-			ent->r.svFlags |= SVF_NOCLIENT;
-		}
-
-		// looping sound
-		ent->s.loopSound = point->soundLoop;
-
-		// start it going
-		if (backward)
-			SetMoverState( ent, MOVER_2TO1, level.time );
+		VectorCopy( next->s.origin, ent->pos1 );
+		VectorCopy( next->nextTrain->s.origin, ent->pos2 );
+	}
 		else
-			SetMoverState( ent, MOVER_1TO2, level.time );
-
-		// if there is a "wait" value on the target, don't start moving yet
-		if ( point->wait ) {
-			ent->nextthink = level.time + point->wait * 1000;
-			ent->think = Think_BeginMoving;
-			ent->s.pos.trType = TR_STATIONARY;
+		{
+			VectorCopy( next->s.origin, ent->pos1 );
+			VectorCopy( next->nextTrain->s.origin, ent->pos2 );
 		}
 	}
-#ifdef NIGHTSMODE
-	else if (ent->client && (ent->client->ps.eFlags & EF_NIGHTSMODE))
-	{
-		vec3_t dir;
-		vec3_t viewAngles;
-
-		VectorCopy( ent->pos1, ent->client->ps.grapplePoint );
-		VectorCopy( ent->pos2, ent->client->ps.grapplePoint2 );
-
-		if (backward)
-			VectorSubtract( ent->pos1, ent->client->ps.origin, dir );
-		else
-			VectorSubtract( ent->pos2, ent->client->ps.origin, dir );
-
-		vectoangles( dir, viewAngles );
-		viewAngles[ROLL] = ent->client->ps.viewangles[ROLL];
-		viewAngles[PITCH] = ent->client->ps.viewangles[PITCH];
-		SetClientViewAngle(ent, viewAngles);
-
-		if (backward)
-			ent->client->ps.stats[STAT_DEAD_YAW] = viewAngles[YAW]-90;
-		else
-			ent->client->ps.stats[STAT_DEAD_YAW] = viewAngles[YAW]+90;
-	}
-#endif
 
 	return qtrue;
 }
@@ -474,7 +325,9 @@ void G_MoveOnPath(gentity_t *ent)
 {
 	if (!ent)
 		return;
-
-	G_ReachedPath(ent, qtrue);
+	if (ent->client)
+	{
+		// Player... NiGHTS mode or 2D mode.
+	}
 }
 #endif

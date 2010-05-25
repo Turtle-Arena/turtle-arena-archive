@@ -61,7 +61,7 @@ extern "C" {
 #if defined(STRICTUNZIP) || defined(STRICTZIPUNZIP)
 /* like the STRICT of WIN32, we define a pointer that cannot be converted
     from (void*) without cast */
-typedef struct TagunzFile__ { int unused; } unzFile__;
+typedef struct TagunzFile__ { int unused; } unzFile__; 
 typedef unzFile__ *unzFile;
 #else
 typedef voidp unzFile;
@@ -78,7 +78,7 @@ typedef voidp unzFile;
 #define UNZ_CRCERROR                    (-105)
 
 /* tm_unz contain date/time info */
-typedef struct tm_unz_s
+typedef struct tm_unz_s 
 {
     uInt tm_sec;            /* seconds after the minute - [0,59] */
     uInt tm_min;            /* minutes after the hour - [0,59] */
@@ -127,9 +127,9 @@ extern int ZEXPORT unzStringFileNameCompare OF ((const char* fileName1,
    Compare two filename (fileName1,fileName2).
    If iCaseSenisivity = 1, comparision is case sensitivity (like strcmp)
    If iCaseSenisivity = 2, comparision is not case sensitivity (like strcmpi
-                                or strcasecmp)
+								or strcasecmp)
    If iCaseSenisivity = 0, case sensitivity is defaut of your operating system
-    (like 1 on Unix, 2 on Windows)
+	(like 1 on Unix, 2 on Windows)
 */
 
 
@@ -138,10 +138,10 @@ extern unzFile ZEXPORT unzOpen OF((const char *path));
   Open a Zip file. path contain the full pathname (by example,
      on a Windows XP computer "c:\\zlib\\zlib113.zip" or on an Unix computer
      "zlib/zlib113.zip".
-     If the zipfile cannot be opened (file don't exist or in not valid), the
-       return value is NULL.
+	 If the zipfile cannot be opened (file don't exist or in not valid), the
+	   return value is NULL.
      Else, the return value is a unzFile Handle, usable with other function
-       of this unzip package.
+	   of this unzip package.
 */
 
 extern unzFile ZEXPORT unzOpen2 OF((const char *path,
@@ -235,14 +235,14 @@ extern int ZEXPORT unzGetCurrentFileInfo OF((unzFile file,
 /*
   Get Info about the current file
   if pfile_info!=NULL, the *pfile_info structure will contain somes info about
-        the current file
+	    the current file
   if szFileName!=NULL, the filemane string will be copied in szFileName
-            (fileNameBufferSize is the size of the buffer)
+			(fileNameBufferSize is the size of the buffer)
   if extraField!=NULL, the extra field information will be copied in extraField
-            (extraFieldBufferSize is the size of the buffer).
-            This is the Central-header version of the extra field
+			(extraFieldBufferSize is the size of the buffer).
+			This is the Central-header version of the extra field
   if szComment!=NULL, the comment string of the file will be copied in szComment
-            (commentBufferSize is the size of the buffer)
+			(commentBufferSize is the size of the buffer)
 */
 
 /***************************************************************************/
@@ -319,7 +319,7 @@ extern z_off_t ZEXPORT unztell OF((unzFile file));
 
 extern int ZEXPORT unzeof OF((unzFile file));
 /*
-  return 1 if the end of file was reached, 0 elsewhere
+  return 1 if the end of file was reached, 0 elsewhere 
 */
 
 extern int ZEXPORT unzGetLocalExtrafield OF((unzFile file,
@@ -333,9 +333,9 @@ extern int ZEXPORT unzGetLocalExtrafield OF((unzFile file,
   if buf==NULL, it return the size of the local extra field
 
   if buf!=NULL, len is the size of the buffer, the extra header is copied in
-    buf.
+	buf.
   the return value is the number of bytes copied in buf, or (if <0)
-    the error code
+	the error code
 */
 
 /***************************************************************************/

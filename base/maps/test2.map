@@ -62,7 +62,6 @@
 "classname" "info_player_start"
 "origin" "-35.555557 411.600006 -179.199997"
 "angle" "-90"
-"count" "0"
 }
 // entity 2
 {
@@ -79,51 +78,68 @@
 }
 // entity 4
 {
+"classname" "func_train"
+"target" "path_corner1"
+"speed" "100"
+}
+// entity 5
+{
+"classname" "func_train"
+"target" "path_corner1"
+}
+// entity 6
+{
 "classname" "path_corner"
 "origin" "480.000000 -280.000000 -112.000000"
 "targetname" "path_corner1"
 "target" "path_corner2"
 }
-// entity 5
+// entity 7
 {
 "classname" "path_corner"
 "origin" "-760.000000 -240.000000 -112.000000"
 "targetname" "path_corner6"
 "target" "path_corner1"
 }
-// entity 6
+// entity 8
 {
 "classname" "path_corner"
 "origin" "672.000000 -120.000000 -112.000000"
 "targetname" "path_corner2"
 "target" "path_corner3"
 }
-// entity 7
+// entity 9
 {
 "classname" "path_corner"
 "origin" "528.000000 56.000000 -112.000000"
 "targetname" "path_corner3"
 "target" "path_corner4"
 }
-// entity 8
+// entity 10
 {
 "classname" "path_corner"
 "origin" "-760.000000 56.000000 -112.000000"
 "target" "path_corner5"
 "targetname" "path_corner4"
 }
-// entity 9
+// entity 11
 {
 "classname" "path_corner"
 "origin" "-936.000000 -88.000000 -112.000000"
 "targetname" "path_corner5"
 "target" "path_corner6"
 }
-// entity 10
+// entity 12
+{
+"classname" "func_group"
+}
+// entity 13
 {
 "classname" "func_train"
-"target" "path_corner1"
-"speed" "100"
+}
+// entity 14
+{
+"classname" "func_train"
 // brush 0
 {
 ( 104 -224 -96 ) ( 104 -352 -96 ) ( -200 -224 -96 ) base_floor/concrete 0 0 0 0.5 0.5 0 0 0

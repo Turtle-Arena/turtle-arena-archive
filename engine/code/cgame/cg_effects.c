@@ -59,13 +59,13 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 
 		le = CG_AllocLocalEntity();
 		le->leFlags = LEF_PUFF_DONT_SCALE;
-#ifdef IOQ3ZTM // BUBBLES
+#ifdef TMNTMISC
 		le->leType = LE_BUBBLE;
 #else
 		le->leType = LE_MOVE_SCALE_FADE;
 #endif
 		le->startTime = cg.time;
-#ifdef IOQ3ZTM // BUBBLES // try to make it to the water surface
+#ifdef TMNTMISC // Bubbles should make it to the surface
 		le->endTime = cg.time + 8000 + random() * 250;
 #else
 		le->endTime = cg.time + 1000 + random() * 250;
@@ -77,7 +77,7 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 
 		re->reType = RT_SPRITE;
 		re->rotation = 0;
-#ifdef IOQ3ZTM // BUBBLES
+#ifdef TMNTMISC
 		re->radius = 2 + random() * 2;
 #else
 		re->radius = 3;
@@ -95,7 +95,7 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 		VectorCopy( move, le->pos.trBase );
 		le->pos.trDelta[0] = crandom()*5;
 		le->pos.trDelta[1] = crandom()*5;
-#ifdef IOQ3ZTM // BUBBLES // Always move up.
+#ifdef TMNTMISC // Always move up.
 		le->pos.trDelta[2] = 8 + random()*5;
 #else
 		le->pos.trDelta[2] = crandom()*5 + 6;
@@ -105,7 +105,7 @@ void CG_BubbleTrail( vec3_t start, vec3_t end, float spacing ) {
 	}
 }
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 /*
 ==================
 CG_BulletBubbleTrail
@@ -248,14 +248,14 @@ void CG_SpawnEffect( vec3_t org ) {
 	re->reType = RT_MODEL;
 	re->shaderTime = cg.time / 1000.0f;
 
-#if !defined MISSIONPACK && !defined TURTLEARENA
+#if !defined MISSIONPACK && !defined TMNT
 	re->customShader = cgs.media.teleportEffectShader;
 #endif
 	re->hModel = cgs.media.teleportEffectModel;
 	AxisClear( re->axis );
 
 	VectorCopy( org, re->origin );
-#if defined MISSIONPACK || defined TURTLEARENA // Center teleport effect model Z
+#if defined MISSIONPACK || defined TMNT // Center teleport effect model Z
 	re->origin[2] += 16;
 #else
 	re->origin[2] -= 24;
@@ -264,7 +264,7 @@ void CG_SpawnEffect( vec3_t org ) {
 
 
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 /*
 ===============
 CG_LightningBoltBeam
@@ -291,7 +291,7 @@ void CG_LightningBoltBeam( vec3_t start, vec3_t end ) {
 }
 #endif
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 CG_KamikazeEffect
@@ -368,7 +368,7 @@ void CG_ObeliskPain( vec3_t org ) {
 }
 
 
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 /*
 ==================
 CG_InvulnerabilityImpact
@@ -520,7 +520,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 		VectorScale( dir, 16, tmpVec );
 		VectorAdd( tmpVec, origin, newOrigin );
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 		// Allow sprite explosion to be different sizes.
 		ex->radius = 30;
 		ex->refEntity.radius = 42;
@@ -588,7 +588,11 @@ void CG_Bleed( vec3_t origin, int entityNum ) {
 
 	// don't show player's own blood in view
 	if ( entityNum == cg.snap->ps.clientNum ) {
+#ifdef IOQ3ZTM // RENDERFLAGS
+		ex->refEntity.renderfx |= RF_ONLY_MIRROR;		// only draw from mirrors
+#else
 		ex->refEntity.renderfx |= RF_THIRD_PERSON;
+#endif
 	}
 }
 #endif
@@ -643,7 +647,7 @@ void CG_GibPlayer( vec3_t playerOrigin ) {
 		return;
 	}
 
-#ifdef IOQ3ZTM // ZTM: Have cg_gibs disable ALL gibs.
+#ifdef IOQ3ZTM // Turtle Man: Have cg_gibs disable ALL gibs.
 	// allow gibs to be turned off
 	if ( !cg_gibs.integer ) {
 		return;

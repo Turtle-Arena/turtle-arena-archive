@@ -116,11 +116,15 @@ typedef struct {
 	int			joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
 
 	// cgame communicates a few values to the client system
-#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
-	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
+#ifdef TMNTWEAPSYS2
+#ifdef TMNTHOLDSYS/*2*/
+	int			cgameUserCmdValue;	// current holdable to add to usercmd_t
 #endif
-#ifdef TA_HOLDSYS/*2*/
+#else
+	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
+#ifdef TMNTHOLDSYS/*2*/
 	int			cgameHoldableValue;	// current holdable to add to usercmd_t
+#endif
 #endif
 	float		cgameSensitivity;
 
@@ -300,7 +304,7 @@ typedef struct {
 	int			maxPing;
 	int			ping;
 	qboolean	visible;
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	int			punkbuster;
 #endif
 } serverInfo_t;
@@ -308,7 +312,7 @@ typedef struct {
 typedef struct {
 	connstate_t	state;				// connection status
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	qboolean	cddialog;			// bring up the cd needed dialog next frame
 #endif
 
@@ -605,21 +609,6 @@ void CIN_SetExtents (int handle, int x, int y, int w, int h);
 void CIN_SetLooping (int handle, qboolean loop);
 void CIN_UploadCinematic(int handle);
 void CIN_CloseAllVideos(void);
-
-// yuv->rgb will be used for Theora(ogm)
-void ROQ_GenYUVTables(void);
-void Frame_yuv_to_rgb24(const unsigned char *y, const unsigned char *u, const unsigned char *v,
-		int width, int height, int y_stride, int uv_stride,
-		int yWShift, int uvWShift, int yHShift, int uvHShift, unsigned int *output);
-
-//
-// cl_cin_ogm.c
-//
-
-int				Cin_OGM_Init(const char *filename);
-int				Cin_OGM_Run(int time);
-unsigned char	*Cin_OGM_GetOutput(int *outWidth, int *outHeight);
-void			Cin_OGM_Shutdown(void);
 
 //
 // cl_cgame.c

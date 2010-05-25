@@ -90,8 +90,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define PRESENCE_NONE				1
 #define PRESENCE_NORMAL				2
 #define PRESENCE_CROUCH				4
+#ifndef TMNTWEAPONS
 //
 #define MAX_PROXMINES				64
+#endif
 
 //check points
 typedef struct bot_waypoint_s
@@ -151,9 +153,6 @@ typedef struct bot_state_s
 	int lastkilledby;								//player that last killed this bot
 	int botdeathtype;								//the death type of the bot
 	int enemydeathtype;								//the death type of the enemy
-#ifdef TA_WEAPSYS
-	int botdeathweapon;								//the missile that killed the bot
-#endif
 	int botsuicide;									//true when the bot suicides
 	int enemysuicide;								//true when the enemy of the bot suicides
 	int setupcount;									//true when the bot has just been setup
@@ -179,7 +178,7 @@ typedef struct bot_state_s
 	float stand_time;								//time the bot is standing still
 	float lastchat_time;							//time the bot last selected a chat
 	float kamikaze_time;							//time to check for kamikaze usage
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 	float invulnerability_time;						//time to check for invulnerability usage
 #endif
 	float standfindenemy_time;						//time to find enemy while standing
@@ -214,16 +213,16 @@ typedef struct bot_state_s
 	vec3_t enemyorigin;								//enemy origin 0.5 secs ago during battle
 	//
 	int kamikazebody;								//kamikaze body
+#ifndef TMNTWEAPONS
 	int proxmines[MAX_PROXMINES];
 	int numproxmines;
+#endif
 	//
 	int character;									//the bot character
 	int ms;											//move state of the bot
 	int gs;											//goal state of the bot
 	int cs;											//chat state of the bot
-#ifndef TA_WEAPSYS // BOT_WEAP_WEIGHTS
 	int ws;											//weapon state of the bot
-#endif
 	//
 	int enemy;										//enemy entity number
 	int lastenemyareanum;							//last reachability area the enemy was in

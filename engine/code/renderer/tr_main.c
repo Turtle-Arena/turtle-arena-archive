@@ -857,9 +857,6 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 	shader_t *shader;
 	int		fogNum;
 	int dlighted;
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	int sortOrder;
-#endif
 	vec4_t clip, eye;
 	int i;
 	unsigned int pointOr = 0;
@@ -871,11 +868,7 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 
 	R_RotateForViewer();
 
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	R_DecomposeSort( drawSurf, &entityNum, &shader, &fogNum, &dlighted, &sortOrder );
-#else
 	R_DecomposeSort( drawSurf->sort, &entityNum, &shader, &fogNum, &dlighted );
-#endif
 	RB_BeginSurface( shader, fogNum );
 	rb_surfaceTable[ *drawSurf->surface ]( drawSurf->surface );
 
@@ -1111,14 +1104,8 @@ static void R_RadixSort( drawSurf_t *source, int size )
 R_AddDrawSurf
 =================
 */
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
-				   int fogIndex, int dlightMap, int sortOrder )
-#else
 void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader, 
-				   int fogIndex, int dlightMap )
-#endif
-{
+				   int fogIndex, int dlightMap ) {
 	int			index;
 
 	// instead of checking for overflow, we just mask the index
@@ -1126,63 +1113,12 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
 	// the sort data is packed into a single 32 bit value so it can be
 	// compared quickly during the qsorting process
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	if (sortOrder == SS_BAD && shader) {
-		sortOrder = shader->sort;
-	}
-
-	R_ComposeSort(&tr.refdef.drawSurfs[index], tr.shiftedEntityNum, shader, 
-					fogIndex, dlightMap, sortOrder);
-#else
 	tr.refdef.drawSurfs[index].sort = (shader->sortedIndex << QSORT_SHADERNUM_SHIFT) 
 		| tr.shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
-#endif
 	tr.refdef.drawSurfs[index].surface = surface;
 	tr.refdef.numDrawSurfs++;
 }
 
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-/*
-=================
-R_ComposeSort
-=================
-*/
-void R_ComposeSort( drawSurf_t *drawSurf, int shiftedEntityNum, shader_t *shader, 
-					 int fogIndex, int dlightMap, int sortOrder)
-{
-	drawSurf->sort = (sortOrder << QSORT_ORDER_SHIFT) 
-		| shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
-
-	drawSurf->shaderIndex = shader->index;
-}
-
-/*
-=================
-R_DecomposeSort
-=================
-*/
-void R_DecomposeSort( const drawSurf_t *drawSurf, int *entityNum, shader_t **shader, 
-					 int *fogNum, int *dlightMap, int *sortOrder) {
-	*fogNum = ( drawSurf->sort >> QSORT_FOGNUM_SHIFT ) & 31;
-	*sortOrder = ( drawSurf->sort >> QSORT_ORDER_SHIFT );
-	*entityNum = ( drawSurf->sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
-	*dlightMap = drawSurf->sort & 3;
-
-	*shader = tr.shaders[ drawSurf->shaderIndex ];
-}
-
-/*
-=================
-R_SortOrder
-
-Returns entity defined sort order, returns SS_BAD if no sort order is defined
-=================
-*/
-int R_SortOrder(trRefEntity_t *ent)
-{
-	return ((ent && (ent->e.renderfx & RF_FORCE_ENT_ALPHA) && ent->e.shaderRGBA[3] < 0xFF) ? SS_BLEND0 : SS_BAD);
-}
-#else
 /*
 =================
 R_DecomposeSort
@@ -1195,7 +1131,6 @@ void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
 	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
 	*dlightMap = sort & 3;
 }
-#endif
 
 /*
 =================
@@ -1207,9 +1142,6 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	int				fogNum;
 	int				entityNum;
 	int				dlighted;
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	int				sortOrder;
-#endif
 	int				i;
 
 	// it is possible for some views to not have any surfaces
@@ -1232,22 +1164,6 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	// check for any pass through drawing, which
 	// may cause another view to be rendered first
 	for ( i = 0 ; i < numDrawSurfs ; i++ ) {
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-		R_DecomposeSort( (drawSurfs+i), &entityNum, &shader, &fogNum, &dlighted, &sortOrder );
-
-		if ( sortOrder > SS_PORTAL ) {
-			break;
-		}
-
-		// no shader should ever have this sort type
-		if ( sortOrder == SS_BAD ) {
-			if ( shader->sort == SS_BAD ) {
-				ri.Error (ERR_DROP, "Shader '%s' with sort == SS_BAD", shader->name );
-			} else {
-				ri.Error (ERR_DROP, "Surface with shader '%s' has sort == SS_BAD", shader->name );
-			}
-		}
-#else
 		R_DecomposeSort( (drawSurfs+i)->sort, &entityNum, &shader, &fogNum, &dlighted );
 
 		if ( shader->sort > SS_PORTAL ) {
@@ -1258,7 +1174,6 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 		if ( shader->sort == SS_BAD ) {
 			ri.Error (ERR_DROP, "Shader '%s'with sort == SS_BAD", shader->name );
 		}
-#endif
 
 		// if the mirror was completely clipped away, we may need to check another surface
 		if ( R_MirrorViewBySurface( (drawSurfs+i), entityNum) ) {
@@ -1339,11 +1254,7 @@ void R_AddEntitySurfaces (void) {
 				continue;
 			}
 			shader = R_GetShaderByHandle( ent->e.customShader );
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-			R_AddDrawSurf( &entitySurface, shader, R_SpriteFogNum( ent ), 0, R_SortOrder(ent) );
-#else
 			R_AddDrawSurf( &entitySurface, shader, R_SpriteFogNum( ent ), 0 );
-#endif
 			break;
 
 		case RT_MODEL:
@@ -1352,11 +1263,7 @@ void R_AddEntitySurfaces (void) {
 
 			tr.currentModel = R_GetModelByHandle( ent->e.hModel );
 			if (!tr.currentModel) {
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-				R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0, R_SortOrder(ent) );
-#else
 				R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0 );
-#endif
 			} else {
 				switch ( tr.currentModel->type ) {
 				case MOD_MESH:
@@ -1378,11 +1285,7 @@ void R_AddEntitySurfaces (void) {
 						break;
 					}
 					shader = R_GetShaderByHandle( ent->e.customShader );
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-					R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0, R_SortOrder(ent) );
-#else
 					R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0 );
-#endif
 					break;
 				default:
 					ri.Error( ERR_DROP, "R_AddEntitySurfaces: Bad modeltype" );

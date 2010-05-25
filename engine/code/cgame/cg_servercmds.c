@@ -111,7 +111,7 @@ static void CG_ParseScores( void ) {
 =================
 CG_ParseTeamInfo
 
-#ifdef TURTLEARENA
+#ifdef TMNT
 Format:
 "tinfo" numstrings string(there are numstrings strings)
 // NOARMOR
@@ -135,7 +135,7 @@ static void CG_ParseTeamInfo( void ) {
 	}
 
 	for ( i = 0 ; i < numSortedTeamPlayers ; i++ ) {
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 		//
 		client = atoi( CG_Argv( i * 5 + 2 ) );
 
@@ -384,7 +384,7 @@ static void CG_ConfigStringModified( void ) {
 	else if ( num == CS_SHADERSTATE ) {
 		CG_ShaderStateChanged();
 	}
-#ifdef IOQ3ZTM // Particles
+#ifdef TMNTMISC // Particles
 	else if (num >= CS_PARTICLES && num < CS_PARTICLES+MAX_PARTICLES_AREAS)
 	{
 		// Allow new particle areas to be added after level load.
@@ -513,14 +513,14 @@ static void CG_MapRestart( void ) {
 	// we really should clear more parts of cg here and stop sounds
 
 	// play the "fight" sound if this is a restart without warmup
-	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */ )
+	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */
+#ifdef TMNTSP // Not in single player
+		&& cg_singlePlayerActive.integer != 1
+#endif
+		)
 	{
 		trap_S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
-#ifdef TA_DATA
-		CG_CenterPrint( "BEGIN!", 120, GIANTCHAR_WIDTH*2 );
-#else
 		CG_CenterPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
-#endif
 	}
 #ifdef MISSIONPACK
 	if (cg_singlePlayerActive.integer) {
@@ -531,17 +531,9 @@ static void CG_MapRestart( void ) {
 	}
 #endif
 #ifdef THIRD_PERSON
-#ifdef IOQ3ZTM // LASERTAG
-	if (cg_laserTag.integer)
-		trap_Cvar_Set("cg_thirdPerson", "0");
-	else
-#endif
 	trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
-#endif
-#ifdef IOQ3ZTM
-	cg_thirdPersonAngle.value = 0;
 #endif
 }
 
@@ -685,7 +677,7 @@ int CG_ParseVoiceChats( const char *filename, voiceChatList_t *voiceChatList, in
 	return qtrue;
 }
 
-#ifdef TA_DATA // LOAD_VOICE_FILES
+#ifdef TMNTDATA // LOAD_VOICE_FILES
 int CG_HeadModelVoiceChats( char *filename );
 #endif
 
@@ -698,14 +690,14 @@ void CG_LoadVoiceChats( void ) {
 	int size;
 
 	size = trap_MemoryRemaining();
-#if defined TA_DATA && defined IOQ3ZTM // LOAD_VOICE_FILES
+#if defined TMNTDATA && defined IOQ3ZTM // LOAD_VOICE_FILES
 #ifdef IOQ3ZTM // LOAD_VOICE_FILES
 	numVoiceChats = 0;
 #endif
 	// First loaded voice chat is default
 	CG_HeadModelVoiceChats("scripts/default.vc");
 
-	// ZTM: TODO?: Pre-cache voice chats? ( currently have no voice chats )
+	// Turtle Man: TODO?: Pre-cache voice chats? ( currently have no voice chats )
 	//CG_HeadModelVoiceChats("scripts/raph.vc");
 #else
 	CG_ParseVoiceChats( "scripts/female1.voice", &voiceChatLists[0], MAX_VOICECHATS );
@@ -856,7 +848,7 @@ voiceChatList_t *CG_VoiceChatListForClient( int clientNum ) {
 			}
 		}
 	}
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	gender = ci->playercfg.gender;
 #else
 	gender = ci->gender;
@@ -938,9 +930,7 @@ void CG_PlayVoiceChat( bufferedVoiceChat_t *vchat ) {
 	}
 	if (!vchat->voiceOnly && !cg_noVoiceText.integer) {
 		CG_AddToTeamChat( vchat->message );
-#ifndef IOQ3ZTM // TEAM_CHAT_CON
 		CG_Printf( "%s\n", vchat->message );
-#endif
 	}
 	voiceChatBuffer[cg.voiceChatBufferOut].snd = 0;
 #endif
@@ -1054,7 +1044,7 @@ void CG_VoiceChat( int mode ) {
 	if (cg_noTaunt.integer != 0) {
 		if (!strcmp(cmd, VOICECHAT_KILLINSULT)  || !strcmp(cmd, VOICECHAT_TAUNT) ||
 			!strcmp(cmd, VOICECHAT_DEATHINSULT) ||
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS
 			!strcmp(cmd, VOICECHAT_KILLGAUNTLET) ||
 #endif
 			!strcmp(cmd, VOICECHAT_PRAISE)) {
@@ -1108,7 +1098,7 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 #endif
-#ifdef IOQ3ZTM // LETTERBOX
+#ifdef TMNTMISC
 	if ( !strcmp( cmd, "letterbox" ) ) {
 		CG_ToggleLetterbox( atoi(CG_Argv(1)), atoi(CG_Argv(2)) );
 		return;
@@ -1154,7 +1144,7 @@ static void CG_ServerCommand( void ) {
 		Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );
-#ifndef IOQ3ZTM // TEAM_CHAT_CON
+#ifndef IOQ3ZTM // TEST_CHAT_CON
 		CG_Printf( "%s\n", text );
 #endif
 		return;

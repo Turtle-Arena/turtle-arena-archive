@@ -403,10 +403,12 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 	//Compatibility: If there is no extension, assume this is loading one of the legacy fonts
 	if(!Q_stricmpn(strippedName, fontName, strlen(fontName)))
 	{
-		Q_strncpyz(strippedName, "fonts/fontImage", sizeof (strippedName));
+		Com_sprintf(name, sizeof(name), "fonts/fontImage_%i.dat",pointSize);
 	}
-
-	Com_sprintf(name, sizeof(name), "%s_%i.dat", strippedName, pointSize);
+	else
+	{
+		Com_sprintf(name, sizeof(name), "%s_%i.dat", strippedName, pointSize);
+	}
 #else
 	Com_sprintf(name, sizeof(name), "fonts/fontImage_%i.dat",pointSize);
 #endif
@@ -459,18 +461,10 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
   }
 
 #ifdef IOQ3ZTM // USE_FREETYPE
-	//Compatibility: This is loading one of the legacy fonts
-	if(!Q_stricmpn(strippedName, "fonts/fontImage", strlen(fontName)))
-		Q_strncpyz(name, "fonts/FreeSans.ttf", sizeof (name));
-	else
-		Com_sprintf(name, sizeof(name), "%s", fontName);
+  Com_sprintf(name, sizeof(name), "%s", fontName);
 #endif
 
-#ifdef IOQ3ZTM // USE_FREETYPE
-  len = ri.FS_ReadFile(name, &faceData);
-#else
   len = ri.FS_ReadFile(fontName, &faceData);
-#endif
   if (len <= 0) {
 #ifdef IOQ3ZTM // USE_FREETYPE
     ri.Printf(PRINT_ALL, "RE_RegisterFont: Unable to read font file %s\n", name);

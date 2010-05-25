@@ -521,9 +521,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	int				fogNum, oldFogNum;
 	int				entityNum, oldEntityNum;
 	int				dlighted, oldDlighted;
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	int				sortOrder, oldSortOrder;
-#endif
 	qboolean		depthRange, oldDepthRange, isCrosshair, wasCrosshair;
 	int				i;
 	drawSurf_t		*drawSurf;
@@ -544,40 +541,25 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	oldDepthRange = qfalse;
 	wasCrosshair = qfalse;
 	oldDlighted = qfalse;
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	oldSortOrder = -1;
-#endif
 	oldSort = -1;
 	depthRange = qfalse;
 
 	backEnd.pc.c_surfaces += numDrawSurfs;
 
 	for (i = 0, drawSurf = drawSurfs ; i < numDrawSurfs ; i++, drawSurf++) {
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-		if ( drawSurf->sort == oldSort && (shader_t*)tr.shaders[ drawSurf->shaderIndex ] == oldShader)
-#else
-		if ( drawSurf->sort == oldSort )
-#endif
-		{
+		if ( drawSurf->sort == oldSort ) {
 			// fast path, same as previous sort
 			rb_surfaceTable[ *drawSurf->surface ]( drawSurf->surface );
 			continue;
 		}
 		oldSort = drawSurf->sort;
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-		R_DecomposeSort( drawSurf, &entityNum, &shader, &fogNum, &dlighted, &sortOrder );
-#else
 		R_DecomposeSort( drawSurf->sort, &entityNum, &shader, &fogNum, &dlighted );
-#endif
 
 		//
 		// change the tess parameters if needed
 		// a "entityMergable" shader is a shader that can have surfaces from seperate
 		// entities merged into a single batch, like smoke and blood puff sprites
 		if (shader != oldShader || fogNum != oldFogNum || dlighted != oldDlighted 
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-			|| sortOrder != oldSortOrder
-#endif
 			|| ( entityNum != oldEntityNum && !shader->entityMergable ) ) {
 			if (oldShader != NULL) {
 				RB_EndSurface();
@@ -586,9 +568,6 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 			oldShader = shader;
 			oldFogNum = fogNum;
 			oldDlighted = dlighted;
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-			oldSortOrder = sortOrder;
-#endif
 		}
 
 		//

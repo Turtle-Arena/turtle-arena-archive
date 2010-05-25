@@ -105,11 +105,7 @@ void R_AddPolygonSurfaces( void ) {
 
 	for ( i = 0, poly = tr.refdef.polys; i < tr.refdef.numPolys ; i++, poly++ ) {
 		sh = R_GetShaderByHandle( poly->hShader );
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-		R_AddDrawSurf( ( void * )poly, sh, poly->fogIndex, qfalse, SS_BAD );
-#else
 		R_AddDrawSurf( ( void * )poly, sh, poly->fogIndex, qfalse );
-#endif
 	}
 }
 

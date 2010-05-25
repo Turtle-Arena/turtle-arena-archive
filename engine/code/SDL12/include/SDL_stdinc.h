@@ -137,7 +137,7 @@ SDL_COMPILE_TIME_ASSERT(sint64, sizeof(Sint64) == 8);
  *  For both Watcom C/C++ and Borland C/C++ the compiler option that makes
  *  enums having the size of an int must be enabled.
  *  This is "-b" for Borland C/C++ and "-ei" for Watcom C/C++ (v11).
- */
+*/
 /* Enable enums always int in CodeWarrior (for MPW use "-enum int") */
 #ifdef __MWERKS__
 #pragma enumsalwaysint on
@@ -605,7 +605,7 @@ extern DECLSPEC int SDLCALL SDL_iconv_close(SDL_iconv_t cd);
 extern DECLSPEC size_t SDLCALL SDL_iconv(SDL_iconv_t cd, const char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft);
 /** This function converts a string between encodings in one pass, returning a
  *  string that must be freed with SDL_free() or NULL on error.
- */
+*/
 extern DECLSPEC char * SDLCALL SDL_iconv_string(const char *tocode, const char *fromcode, const char *inbuf, size_t inbytesleft);
 #define SDL_iconv_utf8_locale(S)	SDL_iconv_string("", "UTF-8", S, SDL_strlen(S)+1)
 #define SDL_iconv_utf8_ucs2(S)		(Uint16 *)SDL_iconv_string("UCS-2", "UTF-8", S, SDL_strlen(S)+1)

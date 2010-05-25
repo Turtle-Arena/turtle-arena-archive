@@ -1,0 +1,9 @@
+mm3d_patch.diff is a patch for Misfit Model 3D writen by ZTurtleMan to add support for non-quake3 md3 players.
+It adds support for Quake III: Team Arena, Smokin' Guns, and others mods (Like TMNT Arena).
+
+This patch is required to export the TMNT Arena players from mm3d to md3.
+
+There are still things that are not general, like the hard coded list of animations that use loopframes.
+
+It adds code for MDR models, but is unfinished (It can't import or export yet).
+

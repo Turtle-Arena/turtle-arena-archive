@@ -363,12 +363,12 @@ void	Svcmd_EntityList_f (void) {
 		case ET_GRAPPLE:
 			G_Printf("ET_GRAPPLE          ");
 			break;
-#ifdef TA_ENTSYS
+#ifdef TMNTENTSYS
 		case ET_MISCOBJECT:
 			G_Printf("ET_MISCOBJECT       ");
 			break;
 #endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		case ET_NPC:
 			G_Printf("ET_NPC              ");
 			break;
@@ -483,7 +483,7 @@ qboolean	ConsoleCommand( void ) {
 		return qtrue;
 	}
 
-#ifndef TA_SP
+#ifndef TMNTSP
 	if (Q_stricmp (cmd, "abort_podium") == 0) {
 		Svcmd_AbortPodium_f();
 		return qtrue;

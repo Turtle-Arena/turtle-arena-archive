@@ -56,7 +56,7 @@ typedef struct {
 	menutext_s		banner;
 	menubitmap_s	framel;
 	menubitmap_s	framer;
-#ifndef TA_MISC
+#ifndef TMNTMISC
 	menutext_s		setupplayer;
 #endif
 	menutext_s		setupcontrols;
@@ -109,7 +109,7 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 	}
 
 	switch( ((menucommon_s*)ptr)->id ) {
-#ifndef TA_MISC
+#ifndef TMNTMISC
 	case ID_CUSTOMIZEPLAYER:
 		UI_PlayerSettingsMenu();
 		break;
@@ -127,7 +127,7 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 		UI_PreferencesMenu();
 		break;
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	case ID_CDKEY:
 		UI_CDKeyMenu();
 		break;
@@ -169,12 +169,12 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.banner.generic.type				= MTYPE_BTEXT;
 	setupMenuInfo.banner.generic.x					= 320;
 	setupMenuInfo.banner.generic.y					= 16;
-#ifdef TA_SP // New menus
+#ifdef TMNTSP // New menus
 	setupMenuInfo.banner.string						= "OPTIONS";
 #else
 	setupMenuInfo.banner.string						= "SETUP";
 #endif
-	setupMenuInfo.banner.color						= text_banner_color;
+	setupMenuInfo.banner.color						= color_white;
 	setupMenuInfo.banner.style						= UI_CENTER;
 
 	setupMenuInfo.framel.generic.type				= MTYPE_BITMAP;
@@ -194,7 +194,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.framer.height  					= 334;
 
 	y = 134;
-#ifndef TA_MISC
+#ifndef TMNTMISC
 	setupMenuInfo.setupplayer.generic.type			= MTYPE_PTEXT;
 	setupMenuInfo.setupplayer.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	setupMenuInfo.setupplayer.generic.x				= 320;
@@ -202,7 +202,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
 	setupMenuInfo.setupplayer.generic.callback		= UI_SetupMenu_Event; 
 	setupMenuInfo.setupplayer.string				= "PLAYER";
-	setupMenuInfo.setupplayer.color					= text_big_color;
+	setupMenuInfo.setupplayer.color					= color_red;
 	setupMenuInfo.setupplayer.style					= UI_CENTER;
 #endif
 
@@ -214,7 +214,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.setupcontrols.generic.id			= ID_CUSTOMIZECONTROLS;
 	setupMenuInfo.setupcontrols.generic.callback	= UI_SetupMenu_Event; 
 	setupMenuInfo.setupcontrols.string				= "CONTROLS";
-	setupMenuInfo.setupcontrols.color				= text_big_color;
+	setupMenuInfo.setupcontrols.color				= color_red;
 	setupMenuInfo.setupcontrols.style				= UI_CENTER;
 
 	y += SETUP_MENU_VERTICAL_SPACING;
@@ -225,7 +225,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.setupsystem.generic.id			= ID_SYSTEMCONFIG;
 	setupMenuInfo.setupsystem.generic.callback		= UI_SetupMenu_Event; 
 	setupMenuInfo.setupsystem.string				= "SYSTEM";
-	setupMenuInfo.setupsystem.color					= text_big_color;
+	setupMenuInfo.setupsystem.color					= color_red;
 	setupMenuInfo.setupsystem.style					= UI_CENTER;
 
 	y += SETUP_MENU_VERTICAL_SPACING;
@@ -236,10 +236,10 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.game.generic.id					= ID_GAME;
 	setupMenuInfo.game.generic.callback				= UI_SetupMenu_Event; 
 	setupMenuInfo.game.string						= "GAME OPTIONS";
-	setupMenuInfo.game.color						= text_big_color;
+	setupMenuInfo.game.color						= color_red;
 	setupMenuInfo.game.style						= UI_CENTER;
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	y += SETUP_MENU_VERTICAL_SPACING;
 	setupMenuInfo.cdkey.generic.type				= MTYPE_PTEXT;
 	setupMenuInfo.cdkey.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -248,7 +248,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.cdkey.generic.id					= ID_CDKEY;
 	setupMenuInfo.cdkey.generic.callback			= UI_SetupMenu_Event; 
 	setupMenuInfo.cdkey.string						= "CD Key";
-	setupMenuInfo.cdkey.color						= text_big_color;
+	setupMenuInfo.cdkey.color						= color_red;
 	setupMenuInfo.cdkey.style						= UI_CENTER;
 #endif
 
@@ -262,7 +262,7 @@ static void UI_SetupMenu_Init( void ) {
 		setupMenuInfo.load.generic.id					= ID_LOAD;
 		setupMenuInfo.load.generic.callback				= UI_SetupMenu_Event; 
 		setupMenuInfo.load.string						= "LOAD";
-		setupMenuInfo.load.color						= text_big_color;
+		setupMenuInfo.load.color						= color_red;
 		setupMenuInfo.load.style						= UI_CENTER;
 
 		y += SETUP_MENU_VERTICAL_SPACING;
@@ -273,7 +273,7 @@ static void UI_SetupMenu_Init( void ) {
 		setupMenuInfo.save.generic.id					= ID_SAVE;
 		setupMenuInfo.save.generic.callback				= UI_SetupMenu_Event; 
 		setupMenuInfo.save.string						= "SAVE";
-		setupMenuInfo.save.color						= text_big_color;
+		setupMenuInfo.save.color						= color_red;
 		setupMenuInfo.save.style						= UI_CENTER;
 #endif
 
@@ -285,7 +285,7 @@ static void UI_SetupMenu_Init( void ) {
 		setupMenuInfo.defaults.generic.id				= ID_DEFAULTS;
 		setupMenuInfo.defaults.generic.callback			= UI_SetupMenu_Event; 
 		setupMenuInfo.defaults.string					= "DEFAULTS";
-		setupMenuInfo.defaults.color					= text_big_color;
+		setupMenuInfo.defaults.color					= color_red;
 		setupMenuInfo.defaults.style					= UI_CENTER;
 	}
 
@@ -303,13 +303,13 @@ static void UI_SetupMenu_Init( void ) {
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.banner );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.framel );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.framer );
-#ifndef TA_MISC
+#ifndef TMNTMISC
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupplayer );
 #endif
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupcontrols );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupsystem );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.game );
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.cdkey );
 #endif
 //	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.load );

@@ -1,0 +1,5 @@
+h_head,$(dir)/head
+h_neck,$(dir)/head
+h_hair,$(dir)/hair
+h_mask,$(dir)/mask
+tag_head,

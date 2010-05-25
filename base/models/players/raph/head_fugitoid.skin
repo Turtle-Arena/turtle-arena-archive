@@ -1,8 +1,7 @@
-h_head_left,models/players/fugitoid/body
-h_head_right,models/players/fugitoid/body
-h_eye_left,models/players/fugitoid/eyes_mouth
-h_eye_right,models/players/fugitoid/eyes_mouth
-h_mouth_left,models/players/fugitoid/eyes_mouth
-h_mouth_right,models/players/fugitoid/eyes_mouth
-h_bandana,textures/common/invisible
+h_head,models/players/raph/body_fugitoid
+h_head2,models/players/raph/body_fugitoid
+h_eye_left,models/players/raph/green
+h_eye_right,models/players/raph/green
+h_mouth_left,models/players/raph/green
+h_mouth_right,models/players/raph/green
 tag_head,

@@ -1,4 +1,4 @@
-// Turtle Arena
+// TMNT Arena
 // Quit Dialog box
 // Base on rfactory.org out_quit.menu
 #include "ui/menudef.h"
@@ -37,7 +37,7 @@
 		itemDef
 		{
 			name quit_title
-			text "Quit Turtle Arena?"
+			text "Quit TMNT Arena?"
 			//style WINDOW_STYLE_SHADER
 			//background "ui/assets/dialog_headerback"
 			rect 5 20 340 30

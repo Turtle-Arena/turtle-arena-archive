@@ -68,7 +68,7 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			" %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.sortedClients[i],
 			cl->ps.persistant[PERS_SCORE], ping, (level.time - cl->pers.enterTime)/60000,
 			scoreFlags, g_entities[level.sortedClients[i]].s.powerups, accuracy, 
-#ifdef TURTLEARENA // AWARDS // ZTM: TODO: Completely remove. See postgame
+#ifdef TMNTWEAPONS // Turtle Man: FIXME: Completely remove. See postgame
 			0,
 			0,
 			0,
@@ -229,7 +229,7 @@ void Cmd_Give_f (gentity_t *ent)
 	else
 		give_all = qfalse;
 
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 	if (give_all || Q_stricmp( name, "holdable") == 0)
 	{
 		// Skip HI_NONE
@@ -251,7 +251,7 @@ void Cmd_Give_f (gentity_t *ent)
 			return;
 	}
 
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 	// \give weapon1
 	// The above will give WP_KATANAS
 	if (Q_strncmp(name, "weapon", 6) == 0)
@@ -260,25 +260,25 @@ void Cmd_Give_f (gentity_t *ent)
 		w = atoi(&name[6]);
 		if (w == WP_DEFAULT)
 			w = ent->client->ps.stats[STAT_DEFAULTWEAPON];
-#ifdef TA_WEAPSYS
-		if (w < WP_NONE || w >= BG_NumWeaponGroups())
+		if (w < WP_NONE) w = WP_NONE;
+#ifdef TMNTWEAPSYS_2
+		if (w >= BG_NumWeaponGroups()) w = BG_NumWeaponGroups()-1;
 #else
-		if (w < WP_NONE || w >= WP_NUM_WEAPONS)
+		if (w >= WP_NUM_WEAPONS) w = WP_NUM_WEAPONS-1;
 #endif
-			return;
 
-		ent->client->ps.stats[STAT_PENDING_WEAPON] = w;
+		ent->client->ps.stats[STAT_NEWWEAPON] = w;
 	}
 #else
 	if (give_all || Q_stricmp(name, "weapons") == 0)
 	{
 		ent->client->ps.stats[STAT_WEAPONS] =
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 		(1 << BG_NumWeaponGroups()) - 1
 #else
 		(1 << WP_NUM_WEAPONS) - 1
 #endif
-#if !defined IOQ3ZTM && !defined TA_WEAPSYS // Give grapple too.
+#if !defined IOQ3ZTM && !defined TMNTWEAPSYS_2 // Give grapple too.
 			- ( 1 << WP_GRAPPLING_HOOK )
 #endif
 			- ( 1 << WP_NONE );
@@ -289,13 +289,14 @@ void Cmd_Give_f (gentity_t *ent)
 
 	if (give_all || Q_stricmp(name, "ammo") == 0)
 	{
-#ifdef TA_WEAPSYS_EX
-		if (BG_WeapUseAmmo(ent->client->ps.weapon)) {
-			ent->client->ps.stats[STAT_AMMO] = 999;
-		}
+#ifdef TMNTWEAPSYS2
+		if (BG_WeapUseAmmo(ent->client->ps.stats[STAT_DEFAULTWEAPON]))
+		ent->client->ps.stats[STAT_SAVEDAMMO] = 999;
+		if (BG_WeapUseAmmo(ent->client->ps.weapon))
+		ent->client->ps.stats[STAT_AMMO] = 999;
 #else
 		for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 			if (BG_WeapUseAmmo(i))
 #endif
 			ent->client->ps.ammo[i] = 999;
@@ -305,7 +306,7 @@ void Cmd_Give_f (gentity_t *ent)
 			return;
 	}
 
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 	if (give_all || Q_stricmp(name, "armor") == 0)
 	{
 		ent->client->ps.stats[STAT_ARMOR] = 200;
@@ -315,7 +316,7 @@ void Cmd_Give_f (gentity_t *ent)
 	}
 #endif
 
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 	if (Q_stricmp(name, "excellent") == 0) {
 		ent->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
 		return;
@@ -530,12 +531,6 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the spectators.\n\"",
 		client->pers.netname));
 	} else if ( client->sess.sessionTeam == TEAM_FREE ) {
-#ifdef TA_SP
-		if (g_gametype.integer == GT_SINGLE_PLAYER)
-			trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the game.\n\"",
-			client->pers.netname));
-		else
-#endif
 		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the battle.\n\"",
 		client->pers.netname));
 	}
@@ -576,12 +571,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 	} else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) ) {
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FREE;
-	} else if ( g_gametype.integer >= GT_TEAM
-#ifdef TA_SP // SP_BOSS
-			|| (g_gametype.integer == GT_SINGLE_PLAYER && (ent->r.svFlags & SVF_BOT))
-#endif
-		)
-	{
+	} else if ( g_gametype.integer >= GT_TEAM ) {
 		// if running a team game, assign player to one of the teams
 		specState = SPECTATOR_NOT;
 		if ( !Q_stricmp( s, "red" ) || !Q_stricmp( s, "r" ) ) {
@@ -693,26 +683,6 @@ to free floating spectator mode
 =================
 */
 void StopFollowing( gentity_t *ent ) {
-#ifdef IOQ3ZTM // PEAKING
-	if (ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-	{
-		int flags;
-
-		flags = (ent->client->savedPS.eFlags & ~(EF_VOTED | EF_TEAMVOTED)) | (ent->client->ps.eFlags & (EF_VOTED | EF_TEAMVOTED));
-		ent->client->ps = ent->client->savedPS;
-		ent->client->ps.pm_flags &= ~PMF_FOLLOW;
-		ent->client->ps.eFlags = flags;
-
-		ent->client->ps.clientNum = ent - g_entities;
-		ent->client->sess.spectatorState = SPECTATOR_NOT;
-		ent->client->sess.spectatorClient = ent->client->ps.clientNum;
-		ent->r.svFlags &= ~SVF_BOT;
-		return;
-	}
-#endif
-#ifdef IOQ3ZTM // SPECTATOR
-	SetClientViewAngle(ent, ent->client->ps.viewangles);
-#endif
 	ent->client->ps.persistant[ PERS_TEAM ] = TEAM_SPECTATOR;	
 	ent->client->sess.sessionTeam = TEAM_SPECTATOR;	
 	ent->client->sess.spectatorState = SPECTATOR_FREE;
@@ -768,22 +738,6 @@ void Cmd_Team_f( gentity_t *ent ) {
 }
 
 
-#ifdef IOQ3ZTM // PEAKING
-/*
-=================
-G_AllowPeaking
-=================
-*/
-qboolean G_AllowPeaking(void)
-{
-#ifdef TA_SP
-	if (g_gametype.integer == GT_SINGLE_PLAYER)
-		return qtrue;
-#endif
-	return (g_gametype.integer >= GT_TEAM);
-}
-#endif
-
 /*
 =================
 Cmd_Follow_f
@@ -816,33 +770,14 @@ void Cmd_Follow_f( gentity_t *ent ) {
 		return;
 	}
 
-#ifdef IOQ3ZTM // PEAKING
-	// Only view player on your team
-	if (G_AllowPeaking() && ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
-		if ( level.clients[ i ].sess.sessionTeam != ent->client->sess.sessionTeam ) {
-			return;
-		}
-	}
-#endif
-
 	// if they are playing a tournement game, count as a loss
 	if ( (g_gametype.integer == GT_TOURNAMENT )
 		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
 		ent->client->sess.losses++;
 	}
 
-#ifdef IOQ3ZTM // PEAKING
-	if (ent->client->sess.spectatorState == SPECTATOR_NOT) {
-		ent->client->savedPS = ent->client->ps;
-	}
-#endif
-
 	// first set them to spectator
-	if (
-#ifdef IOQ3ZTM // PEAKING
-	!G_AllowPeaking() &&
-#endif
-	ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+	if ( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
 		SetTeam( ent, "spectator" );
 	}
 
@@ -864,20 +799,8 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 		&& ent->client->sess.sessionTeam == TEAM_FREE ) {
 		ent->client->sess.losses++;
 	}
-
-#ifdef IOQ3ZTM // PEAKING
-	if (ent->client->sess.spectatorState == SPECTATOR_NOT) {
-		ent->client->savedPS = ent->client->ps;
-	}
-#endif
-
 	// first set them to spectator
-#ifdef IOQ3ZTM // PEAKING
-	if (!G_AllowPeaking() && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-#else
-	if ( ent->client->sess.spectatorState == SPECTATOR_NOT )
-#endif
-	{
+	if ( ent->client->sess.spectatorState == SPECTATOR_NOT ) {
 		SetTeam( ent, "spectator" );
 	}
 
@@ -896,12 +819,11 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 			clientnum = level.maxclients - 1;
 		}
 
-#ifdef IOQ3ZTM // PEAKING
+#if 0 // #ifdef IOQ3ZTM // Turtle Man: Switch to free as well.
 		if (clientnum == ent->client - level.clients )
 		{
-			if (G_AllowPeaking() && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-			{
-				// Switch to yourself
+			if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
+				ent->client->sess.spectatorClient = clientnum;
 				StopFollowing(ent);
 				return;
 			} else {
@@ -919,15 +841,6 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 		if ( level.clients[ clientnum ].sess.sessionTeam == TEAM_SPECTATOR ) {
 			continue;
 		}
-
-#ifdef IOQ3ZTM // PEAKING
-		// Only view players on your team
-		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
-			if ( level.clients[ clientnum ].sess.sessionTeam != ent->client->sess.sessionTeam ) {
-				continue;
-			}
-		}
-#endif
 
 		// this is good, we can use it
 		ent->client->sess.spectatorClient = clientnum;
@@ -1252,7 +1165,7 @@ static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
 		who = g_entities + ent->client->lastkilled_client;
 		if (who->client) {
 			// who is the person I just killed
-#ifndef TURTLEARENA // WEAPONS // MOD
+#ifndef TMNTWEAPONS // MOD
 			if (who->client->lasthurt_mod == MOD_GAUNTLET) {
 				if (!(who->r.svFlags & SVF_BOT)) {
 					G_Voice( ent, who, SAY_TELL, VOICECHAT_KILLGAUNTLET, qfalse );	// and I killed them with a gauntlet
@@ -1340,7 +1253,7 @@ void Cmd_Where_f( gentity_t *ent ) {
 
 static const char *gameNames[] = {
 	"Free For All",
-#ifdef TA_MISC // tournament to duel
+#ifdef TMNTMISC // tournament to duel
 	"Duel",
 #else
 	"Tournament",
@@ -1406,14 +1319,14 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	} else if ( !Q_stricmp( arg1, "clientkick" ) ) {
 	} else if ( !Q_stricmp( arg1, "g_doWarmup" ) ) {
 	} else if ( !Q_stricmp( arg1, "timelimit" ) ) {
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 	} else if ( !Q_stricmp( arg1, "scorelimit" ) ) {
 #else
 	} else if ( !Q_stricmp( arg1, "fraglimit" ) ) {
 #endif
 	} else {
 		trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, scorelimit <score>.\n\"" );
 #else
 		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>.\n\"" );
@@ -1431,7 +1344,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	if ( !Q_stricmp( arg1, "g_gametype" ) ) {
 		i = atoi( arg2 );
 		if(
-#ifndef TA_SP
+#ifndef TMNTSP
 		i == GT_SINGLE_PLAYER ||
 #endif
 		i < GT_FFA || i >= GT_MAX_GAME_TYPE) {

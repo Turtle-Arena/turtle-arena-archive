@@ -24,10 +24,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
 #include "../qcommon/q_shared.h"
-#ifdef QAGAME // TA_NPCSYS
+#ifdef QAGAME // TMNTNPCSYS
 #include "g_local.h"
-#else
-//#include ../cgame/cg_local.h"
+#else // #include ../cgame/cg_local.h"
 #include "bg_misc.h"
 #endif
 #include "bg_local.h"
@@ -64,7 +63,7 @@ PM_AddEvent
 ===============
 */
 void PM_AddEvent( int newEvent ) {
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 	if (pm->npc) {
 		return;
 	}
@@ -223,7 +222,7 @@ static void PM_Friction( void ) {
 		}
 	}
 
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 	// JPL - bat flying has "ground" friction
 	if (pm->npc && pm->ps->powerups[PW_FLIGHT])
 	{
@@ -285,7 +284,7 @@ Handles user intended acceleration
 ==============
 */
 static void PM_Accelerate( vec3_t wishdir, float wishspeed, float accel ) {
-#ifndef TURTLEARENA // Use proper acceleration
+#if 1 // #ifndef TMNTMISC // Turtle Man: TEST
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;
@@ -367,7 +366,7 @@ to the facing dir
 ================
 */
 static void PM_SetMovementDir( void ) {
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 	if (pm->npc)
 	{
 		pm->ps->movementDir = 0;
@@ -432,7 +431,7 @@ static qboolean PM_CheckJump( void ) {
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 	if (pm->npc) {
 		pm->ps->velocity[2] = pm->cmd.upmove*8;
 	} else
@@ -440,12 +439,8 @@ static qboolean PM_CheckJump( void ) {
 	pm->ps->velocity[2] = JUMP_VELOCITY;
 	PM_AddEvent( EV_JUMP );
 
-	if ( pm->cmd.forwardmove >= 0
-#ifdef NIGHTSMODE
-			|| (pm->ps->eFlags & EF_NIGHTSMODE)
-#endif
-	 ) {
-#ifdef TA_NPCSYS
+	if ( pm->cmd.forwardmove >= 0 ) {
+#ifdef TMNTNPCSYS
 		if (pm->npc) {
 			PM_ForceLegsAnim( OBJECT_JUMP );
 		} else
@@ -453,7 +448,7 @@ static qboolean PM_CheckJump( void ) {
 		PM_ForceLegsAnim( LEGS_JUMP );
 		pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
 	} else {
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		if (pm->npc) {
 			PM_ForceLegsAnim( OBJECT_JUMP );
 		} else
@@ -607,7 +602,7 @@ static void PM_WaterMove( void ) {
 	PM_SlideMove( qfalse );
 }
 
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 #ifdef MISSIONPACK
 /*
 ===================
@@ -629,26 +624,18 @@ static void PM_InvulnerabilityMove( void ) {
 // Nights Move style
 enum
 {
-	NM_SIDE, // normal (only working move type)
+	NM_SIDE, // normal
 	NM_TOP,
 	NM_BACK
 };
 
 static void PM_NightsMove( void ) {
-	int		i;
-	vec3_t	wishvel;
-	float	wishspeed;
-	vec3_t	wishdir;
-	float	scale;
 	int style;
-	vec3_t vel, v;
-	float vlen;
-	int move;
-	//vec3_t angles;
+	vec3_t angles;
 
 	// default...
 	style = NM_SIDE;
-	//VectorClear(angles);
+	VectorClear(angles);
 
 	// if on axis, instead of a line {
 	//   angle = angle between axis point and player point + 90;
@@ -659,71 +646,20 @@ static void PM_NightsMove( void ) {
 		// angles = angle between point1 and point2
 	}
 
-	// Controls
 	if (style == NM_TOP)
 	{
 		pm->cmd.upmove = 0;
 	}
 	else if (style == NM_BACK)
 	{
-		pm->cmd.upmove = pm->cmd.forwardmove;
 		pm->cmd.forwardmove = 0;
 	}
 	else // NM_SIDE
 	{
 		// If 2D side view mode
-		pm->cmd.upmove = pm->cmd.forwardmove;
-		pm->cmd.forwardmove = pm->cmd.rightmove;
 		pm->cmd.rightmove = 0;
-		//pm->cmd.angles[YAW] = angles[YAW];
-		//self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw ( dir );
+		pm->cmd.angles[YAW] = angles[YAW];
 	}
-
-	// normal slowdown
-	PM_Friction ();
-
-	scale = PM_CmdScale( &pm->cmd );
-	//
-	// user intentions
-	//
-	if ( !scale ) {
-		wishvel[0] = 0;
-		wishvel[1] = 0;
-		wishvel[2] = -20;
-	} else {
-		for (i=0 ; i<3 ; i++) {
-			wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
-		}
-
-		wishvel[2] += scale * pm->cmd.upmove;
-	}
-
-	VectorScale(pml.forward, -16, v);
-	if (pm->ps->eFlags & EF_TRAINBACKWARD) {
-		move = -pm->cmd.forwardmove;
-		VectorAdd(pm->ps->grapplePoint, v, v);
-	} else {
-		move = pm->cmd.forwardmove;
-		VectorAdd(pm->ps->grapplePoint2, v, v);
-	}
-	v[2] = pm->ps->origin[2];
-	VectorSubtract(v, pm->ps->origin, vel);
-	vlen = VectorLength(vel);
-	VectorNormalize( vel );
-
-	VectorScale(vel, move, vel);
-	vel[2] = wishvel[2];
-
-	VectorCopy (vel, wishdir);
-	wishspeed = VectorNormalize(wishdir);
-	
-	PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
-
-	pml.groundPlane = qfalse;
-
-	PM_StepSlideMove( qfalse );
-
-	PM_ContinueLegsAnim( LEGS_IDLE );
 }
 #endif
 
@@ -767,16 +703,16 @@ static void PM_FlyMove( void ) {
 
 	PM_StepSlideMove( qfalse );
 
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	if (pm->npc) {
 		// Flying animation for flying NPCs
 		PM_ContinueLegsAnim( OBJECT_WALK );
 	}
-#ifdef IOQ3ZTM
+#ifdef TMNTMISC
 	else
 #endif
 #endif
-#ifdef IOQ3ZTM // Don't use whatever random leg animation the player was in
+#ifdef TMNTMISC
 	PM_ContinueLegsAnim( LEGS_IDLE );
 #endif
 }
@@ -824,7 +760,7 @@ static void PM_AirMove( void ) {
 	wishspeed *= scale;
 
 	// not on ground, so little effect on velocity
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 	if (pm->npc && cmd.upmove > 0)
 		PM_Accelerate (wishdir, wishspeed, pm_accelerate); // just jumped, do normal acceleration
 	else
@@ -967,14 +903,14 @@ static void PM_WalkMove( void ) {
 	if ( ( pml.groundTrace.surfaceFlags & SURF_SLICK ) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK ) {
 		accelerate = pm_airaccelerate;
 	} else {
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 		pm->xyspeed = sqrt( pm->ps->velocity[0] * pm->ps->velocity[0]
 			+  pm->ps->velocity[1] * pm->ps->velocity[1] );
 
 		// if !running AND melee attacking; based on LoZ:TP
 		if (pm->xyspeed < 200 && (pm->ps->meleeTime || pm->ps->meleeDelay))
 		{
-			accelerate = pm_accelerate/4;
+			accelerate = pm_accelerate/5;
 		}
 		else
 #endif
@@ -1135,9 +1071,9 @@ static void PM_CrashLand( void ) {
 	float		a, b, c, den;
 
 #ifdef IOQ3ZTM
-	// ZTM: Don't land when swimming
+	// Turtle Man: Don't land when swimming
 	if ( pm->waterlevel == 3
-#ifdef TA_NPCSYS // NPCs can't swim?
+#ifdef TMNTNPCSYS // NPCs can't swim?
 		&& !pm->npc
 #endif
 		)
@@ -1147,7 +1083,7 @@ static void PM_CrashLand( void ) {
 #endif
 
 	// decide which landing animation to use
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	if (pm->npc)
 	{
 		PM_ForceLegsAnim( OBJECT_LAND );
@@ -1160,19 +1096,19 @@ static void PM_CrashLand( void ) {
 #endif
 	if ( pm->ps->pm_flags & PMF_BACKWARDS_JUMP ) {
 		PM_ForceLegsAnim( LEGS_LANDB );
-#if 0 // #ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
+#if 0 // #ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
 		pm->ps->legsTimer = BG_AnimationTime(&pm->playercfg->animations[LEGS_LANDB]);
 #endif
 	} else {
 		PM_ForceLegsAnim( LEGS_LAND );
-#if 0 // #ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
+#if 0 // #ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
 		pm->ps->legsTimer = BG_AnimationTime(&pm->playercfg->animations[LEGS_LAND]);
 #endif
 	}
-#if 1 // #ifndef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
+#if 1 // #ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
 	pm->ps->legsTimer = TIMER_LAND;
 #endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	}
 #endif
 
@@ -1324,12 +1260,8 @@ static void PM_GroundTraceMissed( void ) {
 
 		pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, point, pm->ps->clientNum, pm->tracemask);
 		if ( trace.fraction == 1.0 ) {
-			if ( pm->cmd.forwardmove >= 0 
-#ifdef NIGHTSMODE
-			|| (pm->ps->eFlags & EF_NIGHTSMODE)
-#endif
-			) {
-#ifdef TA_NPCSYS
+			if ( pm->cmd.forwardmove >= 0 ) {
+#ifdef TMNTNPCSYS
 				if (pm->npc) {
 					PM_ForceLegsAnim( OBJECT_JUMP );
 				} else
@@ -1337,7 +1269,7 @@ static void PM_GroundTraceMissed( void ) {
 				PM_ForceLegsAnim( LEGS_JUMP );
 				pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
 			} else {
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 				if (pm->npc) {
 					PM_ForceLegsAnim( OBJECT_JUMP );
 				} else
@@ -1392,12 +1324,8 @@ static void PM_GroundTrace( void ) {
 			Com_Printf("%i:kickoff\n", c_pmove);
 		}
 		// go into jump animation
-		if ( pm->cmd.forwardmove >= 0 
-#ifdef NIGHTSMODE
-			|| (pm->ps->eFlags & EF_NIGHTSMODE)
-#endif
-		) {
-#ifdef TA_NPCSYS
+		if ( pm->cmd.forwardmove >= 0 ) {
+#ifdef TMNTNPCSYS
 			if (pm->npc) {
 				PM_ForceLegsAnim( OBJECT_JUMP );
 			} else
@@ -1405,7 +1333,7 @@ static void PM_GroundTrace( void ) {
 			PM_ForceLegsAnim( LEGS_JUMP );
 			pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
 		} else {
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			if (pm->npc) {
 				PM_ForceLegsAnim( OBJECT_JUMP );
 			} else
@@ -1449,7 +1377,7 @@ static void PM_GroundTrace( void ) {
 			Com_Printf("%i:Land\n", c_pmove);
 		}
 		
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 		// NPCs only land when jumping
 		if (!pm->npc || (pm->npc && (pm->ps->legsAnim & ~ANIM_TOGGLEBIT ) == OBJECT_JUMP))
 #endif
@@ -1491,12 +1419,12 @@ static void PM_SetWaterLevel( void ) {
 
 	point[0] = pm->ps->origin[0];
 	point[1] = pm->ps->origin[1];
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	if (pm->npc) {
 		point[2] = pm->ps->origin[2] + pm->npc->info->mins[2] + 1;
 	} else
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 		point[2] = pm->ps->origin[2] + pm->playercfg->bbmins[2] + 1;
 #else
 	point[2] = pm->ps->origin[2] + MINS_Z + 1;	
@@ -1505,12 +1433,12 @@ static void PM_SetWaterLevel( void ) {
 	cont = pm->pointcontents( point, pm->ps->clientNum );
 
 	if ( cont & MASK_WATER ) {
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		if (pm->npc) {
 			sample2 = pm->ps->viewheight - pm->npc->info->mins[2];
 		} else
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 			sample2 = pm->ps->viewheight - pm->playercfg->bbmins[2];
 #else
 		sample2 = pm->ps->viewheight - MINS_Z;
@@ -1519,12 +1447,12 @@ static void PM_SetWaterLevel( void ) {
 
 		pm->watertype = cont;
 		pm->waterlevel = 1;
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		if (pm->npc) {
 			point[2] = pm->ps->origin[2] + pm->npc->info->mins[2] + sample1;
 		} else
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 			point[2] = pm->ps->origin[2] + pm->playercfg->bbmins[2] + sample1;
 #else
 		point[2] = pm->ps->origin[2] + MINS_Z + sample1;
@@ -1532,12 +1460,12 @@ static void PM_SetWaterLevel( void ) {
 		cont = pm->pointcontents (point, pm->ps->clientNum );
 		if ( cont & MASK_WATER ) {
 			pm->waterlevel = 2;
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			if (pm->npc) {
 				point[2] = pm->ps->origin[2] + pm->npc->info->mins[2] + sample2;
 			} else
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 				point[2] = pm->ps->origin[2] + pm->playercfg->bbmins[2] + sample2;
 #else
 			point[2] = pm->ps->origin[2] + MINS_Z + sample2;
@@ -1562,14 +1490,14 @@ static void PM_CheckDuck (void)
 {
 	trace_t	trace;
 
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 	if (pm->npc)
 	{
 		return;
 	}
 #endif
 
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 	if ( pm->ps->powerups[PW_INVULNERABILITY] ) {
 		if ( pm->ps->pm_flags & PMF_INVULEXPAND ) {
 			// invulnerability sphere has a 42 units radius
@@ -1577,20 +1505,20 @@ static void PM_CheckDuck (void)
 			VectorSet( pm->maxs, 42, 42, 42 );
 		}
 		else {
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			if (pm->npc) {
 					VectorCopy( pm->npc->info->mins, pm->mins );
 					VectorCopy( pm->npc->info->maxs, pm->maxs );
 			} else {
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 				VectorCopy( pm->playercfg->bbmins, pm->mins );
 				VectorCopy( pm->playercfg->bbmaxs, pm->maxs );
 #else
 			VectorSet( pm->mins, -15, -15, MINS_Z );
 			VectorSet( pm->maxs, 15, 15, 16 );
 #endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			}
 #endif
 		}
@@ -1601,14 +1529,14 @@ static void PM_CheckDuck (void)
 	pm->ps->pm_flags &= ~PMF_INVULEXPAND;
 #endif
 
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	if (pm->npc) {
 		VectorCopy( pm->npc->info->mins, pm->mins );
 		pm->maxs[0] = pm->npc->info->maxs[0];
 		pm->maxs[1] = pm->npc->info->maxs[1];
 	} else {
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 		VectorCopy( pm->playercfg->bbmins, pm->mins );
 
 		pm->maxs[0] = pm->playercfg->bbmaxs[0];
@@ -1622,18 +1550,18 @@ static void PM_CheckDuck (void)
 
 	pm->mins[2] = MINS_Z;
 #endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	}
 #endif
 
 	if (pm->ps->pm_type == PM_DEAD)
 	{
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		if (pm->npc) {
 			pm->maxs[2] = (pm->npc->info->maxs[2] / 4) * -1;
 		} else
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 		pm->maxs[2] = (pm->playercfg->bbmaxs[2] / 4) * -1;
 #else
 		pm->maxs[2] = -8;
@@ -1644,7 +1572,7 @@ static void PM_CheckDuck (void)
 
 	if (pm->cmd.upmove < 0)
 	{	// duck
-#ifdef IOQ3ZTM // ZTM: Only set ducked if on the ground
+#ifdef IOQ3ZTM // Turtle Man: Only set ducked if on the ground
 		if (pml.groundPlane)
 #endif
 		pm->ps->pm_flags |= PMF_DUCKED;
@@ -1654,12 +1582,12 @@ static void PM_CheckDuck (void)
 		if (pm->ps->pm_flags & PMF_DUCKED)
 		{
 			// try to stand up
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			if (pm->npc) {
 				pm->maxs[2] = pm->npc->info->maxs[2];
 			} else
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 				pm->maxs[2] = pm->playercfg->bbmaxs[2];
 #else
 			pm->maxs[2] = 32;
@@ -1672,12 +1600,12 @@ static void PM_CheckDuck (void)
 
 	if (pm->ps->pm_flags & PMF_DUCKED)
 	{
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		if (pm->npc) {
 			pm->maxs[2] = pm->npc->info->maxs[2] / 2;
 		} else
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 			pm->maxs[2] = pm->playercfg->bbmaxs[2] / 2;
 #else
 		pm->maxs[2] = 16;
@@ -1686,12 +1614,12 @@ static void PM_CheckDuck (void)
 	}
 	else
 	{
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		if (pm->npc) {
 			pm->maxs[2] = pm->npc->info->maxs[2];
 		} else
 #endif
-#ifdef TA_PLAYERSYS // BOUNDINGBOX
+#ifdef TMNTPLAYERSYS // BOUNDINGBOX
 			pm->maxs[2] = pm->playercfg->bbmaxs[2];
 #else
 		pm->maxs[2] = 32;
@@ -1728,7 +1656,7 @@ static void PM_Footsteps( void ) {
 #endif
 	) {
 
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 		if ( pm->ps->powerups[PW_INVULNERABILITY] ) {
 			PM_ContinueLegsAnim( LEGS_IDLECR );
 		}
@@ -1744,7 +1672,7 @@ static void PM_Footsteps( void ) {
 	if ( !pm->cmd.forwardmove && !pm->cmd.rightmove ) {
 		if (  pm->xyspeed < 5 ) {
 			pm->ps->bobCycle = 0;	// start at beginning of cycle again
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			if ( pm->npc)
 			{
 				PM_ContinueLegsAnim( OBJECT_IDLE );
@@ -1756,11 +1684,11 @@ static void PM_Footsteps( void ) {
 			} else {
 				PM_ContinueLegsAnim( LEGS_IDLE );
 			}
-#ifdef IOQ3ZTM // ZTM: TEST
+#ifdef IOQ3ZTM // Turtle Man: TEST
 			return;
 #endif
 		}
-#ifndef IOQ3ZTM // ZTM: TEST
+#ifndef IOQ3ZTM // Turtle Man: TEST
 		return;
 #endif
 	}
@@ -1785,7 +1713,7 @@ static void PM_Footsteps( void ) {
 		} else {
 			bobmove = 0.3;
 		}
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		if (pm->npc)
 			PM_ContinueLegsAnim( OBJECT_BACKPEDAL );
 		else
@@ -1796,7 +1724,7 @@ static void PM_Footsteps( void ) {
 		if ( !( pm->cmd.buttons & BUTTON_WALKING ) ) {
 			bobmove = 0.4f;	// faster speeds bob faster
 			if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 				if (pm->npc)
 					PM_ContinueLegsAnim( OBJECT_BACKPEDAL );
 				else
@@ -1804,7 +1732,7 @@ static void PM_Footsteps( void ) {
 				PM_ContinueLegsAnim( LEGS_BACK );
 			}
 			else {
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 				if (pm->npc)
 					PM_ContinueLegsAnim( OBJECT_RUN );
 				else
@@ -1815,7 +1743,7 @@ static void PM_Footsteps( void ) {
 		} else {
 			bobmove = 0.3f;	// walking bobs slow
 			if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 				if (pm->npc)
 					PM_ContinueLegsAnim( OBJECT_BACKPEDAL );
 				else
@@ -1823,7 +1751,7 @@ static void PM_Footsteps( void ) {
 				PM_ContinueLegsAnim( LEGS_BACKWALK );
 			}
 			else {
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 				if (pm->npc)
 					PM_ContinueLegsAnim( OBJECT_WALK );
 				else
@@ -1902,7 +1830,7 @@ PM_BeginWeaponChange
 */
 static void PM_BeginWeaponChange( int weapon ) {
 	if ( weapon <= WP_NONE ||
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 		weapon >= BG_NumWeaponGroups()
 #else
 		weapon >= WP_NUM_WEAPONS
@@ -1912,7 +1840,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 		return;
 	}
 
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 	if ( !( pm->ps->stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
 		return;
 	}
@@ -1924,25 +1852,25 @@ static void PM_BeginWeaponChange( int weapon ) {
 
 	PM_AddEvent( EV_CHANGE_WEAPON );
 	pm->ps->weaponstate = WEAPON_DROPPING;
-#ifdef TA_PLAYERS // WEAPONS
+#ifdef TMNTPLAYERS // WEAPONS
 	{
-		animNumber_t anim = TORSO_DROP;
+		int anim = TORSO_DROP;
 
-		if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
+	if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
+	{
+		if (pm->ps->weaponHands == HAND_PRIMARY)
 		{
-			if (pm->ps->weaponHands & HB_BOTH)
-			{
-				anim = TORSO_PUTDEFAULT_BOTH;
-			}
-			else if (pm->ps->weaponHands & HB_PRIMARY)
-			{
 				anim = TORSO_PUTDEFAULT_PRIMARY;
-			}
-			else if (pm->ps->weaponHands & HB_SECONDARY)
-			{
-				anim = TORSO_PUTDEFAULT_SECONDARY;
-			}
 		}
+		else if (pm->ps->weaponHands == HAND_SECONDARY)
+		{
+				anim = TORSO_PUTDEFAULT_SECONDARY;
+		}
+		else if (pm->ps->weaponHands == HAND_BOTH)
+		{
+				anim = TORSO_PUTDEFAULT_BOTH;
+		}
+	}
 
 		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
 		PM_StartTorsoAnim( anim );
@@ -1961,19 +1889,14 @@ PM_FinishWeaponChange
 */
 static void PM_FinishWeaponChange( void ) {
 	int		weapon;
-#ifdef TA_WEAPSYS_EX
-	int oldWeapon;
 
-	oldWeapon = pm->ps->weapon;
-#endif
-
-#ifdef TA_WEAPSYS_EX
-	weapon = pm->ps->stats[STAT_PENDING_WEAPON];
+#ifdef TMNTWEAPSYS2
+	weapon = pm->ps->stats[STAT_NEWWEAPON];
 #else
 	weapon = pm->cmd.weapon;
 #endif
 	if ( weapon < WP_NONE ||
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 		weapon >= BG_NumWeaponGroups()
 #else
 		weapon >= WP_NUM_WEAPONS
@@ -1983,7 +1906,7 @@ static void PM_FinishWeaponChange( void ) {
 		weapon = WP_NONE;
 	}
 
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 	if ( !( pm->ps->stats[STAT_WEAPONS] & ( 1 << weapon ) ) ) {
 		weapon = WP_NONE;
 	}
@@ -1991,28 +1914,28 @@ static void PM_FinishWeaponChange( void ) {
 
 	pm->ps->weapon = weapon;
 	pm->ps->weaponstate = WEAPON_RAISING;
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	pm->ps->weaponHands = BG_WeaponHandsForPlayerState(pm->ps);
 #endif
-#ifdef TA_PLAYERS // WEAPONS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TMNTPLAYERS // WEAPONS // PLAYERCFG_ANIMATION_TIMES
 	{
 		int anim = TORSO_RAISE;
 
-		if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
+	if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
+	{
+		if (pm->ps->weaponHands == HAND_PRIMARY)
 		{
-			if (pm->ps->weaponHands & HB_BOTH)
-			{
-				anim = TORSO_GETDEFAULT_BOTH;
-			}
-			else if (pm->ps->weaponHands & HB_PRIMARY)
-			{
 				anim = TORSO_GETDEFAULT_PRIMARY;
-			}
-			else if (pm->ps->weaponHands & HB_SECONDARY)
-			{
-				anim = TORSO_GETDEFAULT_SECONDARY;
-			}
 		}
+		else if (pm->ps->weaponHands == HAND_SECONDARY)
+		{
+				anim = TORSO_GETDEFAULT_SECONDARY;
+		}
+		else if (pm->ps->weaponHands == HAND_BOTH)
+		{
+				anim = TORSO_GETDEFAULT_BOTH;
+		}
+	}
 
 		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
 		PM_StartTorsoAnim( anim );
@@ -2021,32 +1944,9 @@ static void PM_FinishWeaponChange( void ) {
 	pm->ps->weaponTime += 250;
 	PM_StartTorsoAnim( TORSO_RAISE );
 #endif
-#ifdef TA_WEAPSYS_EX
-	// Drop weapon if not default
-	if (oldWeapon != pm->ps->stats[STAT_DEFAULTWEAPON])
-	{
-		// drop weapon
-		pm->ps->stats[STAT_DROP_WEAPON] = oldWeapon;
-		pm->ps->stats[STAT_DROP_AMMO] = pm->ps->stats[STAT_AMMO];
-		PM_AddEvent( EV_DROP_WEAPON );
-	}
-
-	// Setup ammo
-	if (pm->ps->stats[STAT_PENDING_WEAPON] == pm->ps->stats[STAT_DEFAULTWEAPON])
-	{
-		// Default weapons don't use ammo.
-		pm->ps->stats[STAT_AMMO] = -1;
-	}
-	else
-	{
-		// Set ammo for new weapon.
-		pm->ps->stats[STAT_AMMO] = pm->ps->stats[STAT_PENDING_AMMO];
-		pm->ps->stats[STAT_PENDING_AMMO] = -1;
-	}
-#endif
 }
 
-#ifdef TA_PLAYERS // WEAPONS
+#ifdef TMNTPLAYERS // WEAPONS
 /*
 ===============
 PM_BeginWeaponChange
@@ -2060,9 +1960,8 @@ hands = 3 = primary and secondary.
 */
 static void PM_BeginWeaponHandsChange( int hands ) {
 	int last_hands;
-	animNumber_t anim;
 
-	if ( hands < HB_NONE || hands >= HB_MAX ) {
+	if ( hands < HAND_NONE || hands > HAND_BOTH ) {
 		return;
 	}
 
@@ -2086,58 +1985,62 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 
 	//Com_Printf("DEBUG: Changing hands (new=%d, old=%d)\n", hands, last_hands);
 
-	anim = TORSO_DROP;
-
-	if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
 	{
+		int anim = TORSO_DROP;
+
+		if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
+		{
 		// both hands
-		if (last_hands == HB_BOTH && hands == HB_NONE)
+		if (last_hands == HAND_BOTH && hands == HAND_NONE)
 		{
-			anim = TORSO_PUTDEFAULT_BOTH;
+				anim = TORSO_PUTDEFAULT_BOTH;
 		}
-		else if (last_hands == HB_NONE && hands == HB_BOTH)
+		else if (last_hands == HAND_NONE && hands == HAND_BOTH)
 		{
-			anim = TORSO_GETDEFAULT_BOTH;
+				anim = TORSO_GETDEFAULT_BOTH;
 		}
 		// primary hand
-		else if (last_hands == HB_BOTH && hands == HB_SECONDARY)
+		else if (last_hands == HAND_BOTH && hands == HAND_SECONDARY)
 		{
-			anim = TORSO_PUTDEFAULT_PRIMARY;
+				anim = TORSO_PUTDEFAULT_PRIMARY;
 		}
-		else if (last_hands == HB_SECONDARY && hands == HB_BOTH)
+		else if (last_hands == HAND_SECONDARY && hands == HAND_BOTH)
 		{
-			anim = TORSO_GETDEFAULT_PRIMARY;
+				anim = TORSO_GETDEFAULT_PRIMARY;
 		}
 		// secondary hand
-		else if (last_hands == HB_BOTH && hands == HB_PRIMARY)
+		else if (last_hands == HAND_BOTH && hands == HAND_PRIMARY)
 		{
-			anim = TORSO_PUTDEFAULT_SECONDARY;
+				anim = TORSO_PUTDEFAULT_SECONDARY;
 		}
-		else if (last_hands == HB_PRIMARY && hands == HB_BOTH)
+		else if (last_hands == HAND_PRIMARY && hands == HAND_BOTH)
 		{
-			anim = TORSO_GETDEFAULT_SECONDARY;
+				anim = TORSO_GETDEFAULT_SECONDARY;
 		}
 		else
 		{
-			// ZTM: Shouldn't happen, if I made it right...
+				// Turtle Man: Shouldn't happen, if I made it right...
 			Com_Printf("PM_BeginDefaultWeaponChange: Bad hands; last_hands=%i, hands=%i\n", last_hands, hands);
 		}
 
-		// The animation is "drop" and "raise", so split time in half.
-		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
-		// Don't override gesture when capturing the flag.
-		if (!pm->ps->torsoTimer) {
+			// The animation is "drop" and "raise", so split time in half.
+			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
+			// Don't override gesture when capturing the flag.
+			if (!pm->ps->torsoTimer) {
 			PM_StartTorsoAnim( anim );
-		}
 	}
+		}
 	else
 	{
-		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
-		// Don't override gesture when capturing the flag.
-		if (!pm->ps->torsoTimer) {
+			// Turtle Man: FIXME: Draw the "pickup weapon" secondary weapon somewhere on the player!
+
+			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
+			// Don't override gesture when capturing the flag.
+			if (!pm->ps->torsoTimer) {
 			PM_StartTorsoAnim( anim );
 		}
 	}
+}
 }
 
 
@@ -2148,7 +2051,6 @@ PM_FinishWeaponHandsChange
 */
 static void PM_FinishWeaponHandsChange( void ) {
 	int last_hands, hands;
-	animNumber_t anim;
 
 	// Reusing WEAPON_RAISING should be okay here.
 	pm->ps->weaponstate = WEAPON_RAISING;
@@ -2158,53 +2060,55 @@ static void PM_FinishWeaponHandsChange( void ) {
 
 	pm->ps->weaponHands = pm->ps->stats[STAT_NEW_WEAPON_HANDS];
 
-	anim = TORSO_RAISE;
+	{
+		int anim = TORSO_RAISE;
 
 	if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
 	{
-		// both hands
-		if (last_hands == HB_BOTH && hands == HB_NONE)
-		{
-			anim = TORSO_PUTDEFAULT_BOTH;
-		}
-		else if (last_hands == HB_NONE && hands == HB_BOTH)
-		{
-			anim = TORSO_GETDEFAULT_BOTH;
-		}
-		// primary hand
-		else if (last_hands == HB_BOTH && hands == HB_SECONDARY)
-		{
-			anim = TORSO_PUTDEFAULT_PRIMARY;
-		}
-		else if (last_hands == HB_SECONDARY && hands == HB_BOTH)
-		{
-			anim = TORSO_GETDEFAULT_PRIMARY;
-		}
-		// secondary hand
-		else if (last_hands == HB_BOTH && hands == HB_PRIMARY)
-		{
-			anim = TORSO_PUTDEFAULT_SECONDARY;
-		}
-		else if (last_hands == HB_PRIMARY && hands == HB_BOTH)
-		{
-			anim = TORSO_GETDEFAULT_SECONDARY;
-		}
-
-		// Just let the animation run.
-		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
-		// If started a animation, continue it.
-		if ( ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) >= TORSO_PUTDEFAULT_BOTH
-			&& ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) <= TORSO_GETDEFAULT_SECONDARY) {
-			PM_ContinueTorsoAnim( anim );
-		}
-		return;
+			// both hands
+			if (last_hands == HAND_BOTH && hands == HAND_NONE)
+			{
+				anim = TORSO_PUTDEFAULT_BOTH;
 	}
+			else if (last_hands == HAND_NONE && hands == HAND_BOTH)
+	{
+				anim = TORSO_GETDEFAULT_BOTH;
+			}
+			// primary hand
+			else if (last_hands == HAND_BOTH && hands == HAND_SECONDARY)
+			{
+				anim = TORSO_PUTDEFAULT_PRIMARY;
+			}
+			else if (last_hands == HAND_SECONDARY && hands == HAND_BOTH)
+			{
+				anim = TORSO_GETDEFAULT_PRIMARY;
+			}
+			// secondary hand
+			else if (last_hands == HAND_BOTH && hands == HAND_PRIMARY)
+			{
+				anim = TORSO_PUTDEFAULT_SECONDARY;
+			}
+			else if (last_hands == HAND_PRIMARY && hands == HAND_BOTH)
+			{
+				anim = TORSO_GETDEFAULT_SECONDARY;
+			}
 
-	pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
-	// Don't override gesture when capturing the flag.
-	if (!pm->ps->torsoTimer) {
+			// Just let the animation run.
+			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
+			// If started a animation, continue it.
+			if ( ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) >= TORSO_PUTDEFAULT_BOTH
+				&& ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) <= TORSO_GETDEFAULT_SECONDARY) {
+			PM_ContinueTorsoAnim( anim );
+			}
+			return;
+		}
+
+		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
+		// Don't override gesture when capturing the flag.
+		if (!pm->ps->torsoTimer) {
 		PM_StartTorsoAnim( anim );
 	}
+}
 }
 #endif
 
@@ -2216,7 +2120,7 @@ PM_TorsoAnimation
 */
 static void PM_TorsoAnimation( void ) {
 	if ( pm->ps->weaponstate == WEAPON_READY ) {
-#ifdef TA_WEAPSYS // ZTM: Weapon type code.
+#ifdef TMNTWEAPSYS // Turtle Man: Weapon type code.
 		PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
 #else
 		if ( pm->ps->weapon == WP_GAUNTLET ) {
@@ -2229,7 +2133,7 @@ static void PM_TorsoAnimation( void ) {
 	}
 }
 
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 static void PM_NextHoldable(void)
 {
 	int i, original;
@@ -2245,11 +2149,11 @@ static void PM_NextHoldable(void)
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
 		if (
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		pm->ps->holdableIndex == HI_KAMIKAZE ||
 #endif
 		pm->ps->holdableIndex == HI_PORTAL
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 			|| pm->ps->holdableIndex == HI_INVULNERABILITY
 #endif
 			) {
@@ -2291,13 +2195,13 @@ static void PM_Weapon( void ) {
 
 	// check for dead player
 	if ( pm->ps->stats[STAT_HEALTH] <= 0 ) {
-#ifdef TA_WEAPSYS // ZTM: FIXME: Shouldn't be done if player died in NODROP...
+#ifdef TMNTWEAPSYS // Turtle Man: FIXME: Shouldn't be done if player died in NODROP...
 		qboolean nodrop = qfalse;
 
 		// Player should let go of the dropped weapon.
 		if (!nodrop && pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON])
 		{
-			pm->ps->weapon = WP_NONE;
+		pm->ps->weapon = WP_NONE;
 		}
 #else
 		pm->ps->weapon = WP_NONE;
@@ -2305,9 +2209,9 @@ static void PM_Weapon( void ) {
 		return;
 	}
 
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 	// Check if valid, in cgame we have to
-	//   pass HI_NO_SELECT (255)
+	//   pass HI_NO_SELECT (-1) (as a byte its 255)
 	//   so bg can change to the next holdable.
 	if (pm->cmd.holdable < HI_NUM_HOLDABLE)
 	{
@@ -2315,8 +2219,8 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
-	// make holdable function
+#ifdef TMNTHOLDABLE
+	// make weapon function
 	if ( pm->ps->holdableTime > 0 ) {
 		pm->ps->holdableTime -= pml.msec;
 	}
@@ -2325,22 +2229,19 @@ static void PM_Weapon( void ) {
 	// check for item using
 	if ( pm->cmd.buttons & BUTTON_USE_HOLDABLE ) {
 		if (
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TMNTHOLDABLE
 		pm->ps->holdableTime <= 0
 #else
 		! ( pm->ps->pm_flags & PMF_USE_ITEM_HELD )
 #endif
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 			&& pm->ps->holdable[pm->ps->holdableIndex] != 0
-#endif
-#ifdef TA_ENTSYS // FUNC_USE
-			&& !(pm->ps->eFlags & EF_USE_ENT)
 #endif
 		) {
 			if (
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 			pm->ps->holdableIndex == HI_MEDKIT
-#elif defined TA_WEAPSYS
+#elif defined TMNTWEAPSYS_2
 			BG_ItemForItemNum(pm->ps->stats[STAT_HOLDABLE_ITEM])->giTag == HI_MEDKIT
 #else
 			bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag == HI_MEDKIT
@@ -2348,24 +2249,20 @@ static void PM_Weapon( void ) {
 				&& pm->ps->stats[STAT_HEALTH] >= (pm->ps->stats[STAT_MAX_HEALTH] + 25) ) {
 				// don't use medkit if at max health
 			} else {
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TMNTHOLDABLE
 				pm->ps->holdableTime = 500;
 #else
 				pm->ps->pm_flags |= PMF_USE_ITEM_HELD;
 #endif
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 				PM_AddEvent( EV_USE_ITEM0 + pm->ps->holdableIndex );
-#elif defined TA_WEAPSYS
+#elif defined TMNTWEAPSYS_2
 				PM_AddEvent( EV_USE_ITEM0 + BG_ItemForItemNum(pm->ps->stats[STAT_HOLDABLE_ITEM])->giTag );
 #else
 				PM_AddEvent( EV_USE_ITEM0 + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag );
 #endif
-#ifdef TA_HOLDSYS
-				if (pm->ps->holdable[pm->ps->holdableIndex] > 0
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN // Grappling shurikens don't use ammo
-					&& !bg_projectileinfo[BG_ProjectileIndexForHoldable(pm->ps->holdableIndex)].grappling
-#endif
-				) {
+#ifdef TMNTHOLDSYS
+				if (pm->ps->holdable[pm->ps->holdableIndex] > 0) {
 					pm->ps->holdable[pm->ps->holdableIndex]--;
 
 					// It holdable item can no longer be used,
@@ -2381,23 +2278,25 @@ static void PM_Weapon( void ) {
 			return;
 		}
 	}
+#ifndef TMNTHOLDABLE
 	else {
 		pm->ps->pm_flags &= ~PMF_USE_ITEM_HELD;
 	}
+#endif
 
 	// make weapon function
 	if ( pm->ps->weaponTime > 0 ) {
 		pm->ps->weaponTime -= pml.msec;
 	}
 
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 	// Drop pickup weapon (User pressed key)
 	// and check for out of ammo for pickup weapons
 	if ( pm->ps->weaponTime <= 0 && pm->ps->weaponstate != WEAPON_FIRING
 		&& ((pm->cmd.buttons & BUTTON_DROP_WEAPON)
 		|| (pm->ps->stats[STAT_AMMO] == 0
-#ifdef MISSIONPACK // ZTM: Don't auto drop if have ammo regen!
-#ifdef TA_WEAPSYS
+#ifdef MISSIONPACK // TMNT only // Turtle Man: Don't auto drop if have ammo regen!
+#ifdef TMNTWEAPSYS_2
 		&& BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag != PW_AMMOREGEN
 #else
 		&& bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag != PW_AMMOREGEN
@@ -2406,7 +2305,7 @@ static void PM_Weapon( void ) {
 		))
 		&& pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON])
 	{
-		pm->ps->stats[STAT_PENDING_WEAPON] = pm->ps->stats[STAT_DEFAULTWEAPON];
+		pm->ps->stats[STAT_NEWWEAPON] = pm->ps->stats[STAT_DEFAULTWEAPON];
 	}
 #endif
 
@@ -2414,16 +2313,16 @@ static void PM_Weapon( void ) {
 	// can't change if weapon is firing, but can change
 	// again if lowering or raising
 	if ( pm->ps->weaponTime <= 0 || pm->ps->weaponstate != WEAPON_FIRING ) {
-#ifdef TA_WEAPSYS_EX
-		if ( pm->ps->weapon != pm->ps->stats[STAT_PENDING_WEAPON] ) {
-			PM_BeginWeaponChange( pm->ps->stats[STAT_PENDING_WEAPON] );
+#ifdef TMNTWEAPSYS2
+		if ( pm->ps->weapon != pm->ps->stats[STAT_NEWWEAPON] ) {
+			PM_BeginWeaponChange( pm->ps->stats[STAT_NEWWEAPON] );
 		}
 #else
 		if ( pm->ps->weapon != pm->cmd.weapon ) {
 			PM_BeginWeaponChange( pm->cmd.weapon );
 		}
 #endif
-#ifdef TA_PLAYERS // WEAPONS
+#ifdef TMNTPLAYERS // WEAPONS
 		// Just check the ones we can do it in?
 		if (pm->ps->weaponstate != WEAPON_DROPPING
 			&& pm->ps->weaponstate != WEAPON_HAND_CHANGE)
@@ -2443,12 +2342,54 @@ static void PM_Weapon( void ) {
 
 	// change weapon if time
 	if ( pm->ps->weaponstate == WEAPON_DROPPING ) {
+#ifdef TMNTWEAPSYS2
+		// If the weapon that were changing to is a different weapon,
+		// and the current weapon is valid,
+		// and its not the default weapon,
+		// then drop it.
+		if ( pm->ps->weapon != pm->ps->stats[STAT_NEWWEAPON]
+			&& (pm->ps->weapon > WP_NONE && pm->ps->weapon <
+#ifdef TMNTWEAPSYS_2
+			BG_NumWeaponGroups()
+#else
+			WP_NUM_WEAPONS
+#endif
+			)
+			&& pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON] )
+		{
+			// drop weapon
+			pm->ps->stats[STAT_OLDWEAPON] = pm->ps->weapon;
+			pm->ps->stats[STAT_OLDAMMO] = pm->ps->stats[STAT_AMMO];
+			PM_AddEvent( EV_DROP_WEAPON );
+		}
+
+		// Save/load default weapon's ammo.
+		if (pm->ps->stats[STAT_NEWWEAPON] == pm->ps->stats[STAT_DEFAULTWEAPON])
+		{
+			pm->ps->stats[STAT_AMMO] = pm->ps->stats[STAT_SAVEDAMMO];
+			pm->ps->stats[STAT_SAVEDAMMO] = 0;
+			if (pm->ps->stats[STAT_NEWAMMO] > 0) {
+				pm->ps->stats[STAT_AMMO] += pm->ps->stats[STAT_NEWAMMO];
+			}
+		}
+		else if (pm->ps->weapon == pm->ps->stats[STAT_DEFAULTWEAPON])
+		{
+			pm->ps->stats[STAT_SAVEDAMMO] = pm->ps->stats[STAT_AMMO];
+			pm->ps->stats[STAT_AMMO] = pm->ps->stats[STAT_NEWAMMO];
+		}
+		else
+		{
+			// Set ammo for new weapon.
+			pm->ps->stats[STAT_AMMO] = pm->ps->stats[STAT_NEWAMMO];
+		}
+		pm->ps->stats[STAT_NEWAMMO] = -1;
+#endif
 		PM_FinishWeaponChange();
 		return;
 	}
 
 	if ( pm->ps->weaponstate == WEAPON_RAISING ) {
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 		pm->ps->weaponstate = WEAPON_READY;
 		PM_StartTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
 #else
@@ -2462,7 +2403,7 @@ static void PM_Weapon( void ) {
 		return;
 	}
 
-#ifdef TA_PLAYERS // WEAPONS
+#ifdef TMNTPLAYERS // WEAPONS
 	if ( pm->ps->weaponstate == WEAPON_HAND_CHANGE ) {
 		PM_FinishWeaponHandsChange();
 		return;
@@ -2472,16 +2413,16 @@ static void PM_Weapon( void ) {
 
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
 	// Handle grapple
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0]->proj->grappling)
 #else
 	if (pm->ps->weapon == WP_GRAPPLING_HOOK)
 #endif
 	{
 		// If player has a shot grapple don't play attack animation.
-		if (pm->ps->pm_flags & PMF_FIRE_HELD)
+		if (pm->ps->pm_flags & PMF_GRAPPLE_SHOT)
 		{
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 			PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
 #else
 			PM_ContinueTorsoAnim( TORSO_STAND );
@@ -2495,9 +2436,9 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
-#ifdef TA_WEAPSYS // ZTM: Weapon type code.
-	if ( BG_WeaponHasMelee(pm->ps->weapon) )
-	{
+#ifdef TMNTWEAPSYS // Turtle Man: Weapon type code.
+	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) ))
+		{
 		// check for fire (Melee weapons can do damage while not holding attack)
 		if ( !pm->ps->meleeTime && !pm->ps->meleeDelay ) {
 			pm->ps->weaponTime = 0;
@@ -2507,16 +2448,16 @@ static void PM_Weapon( void ) {
 	}
 	else
 	{
-		// check for fire
-		if ( ! (pm->cmd.buttons & BUTTON_ATTACK) ) {
-			pm->ps->weaponTime = 0;
-			pm->ps->weaponstate = WEAPON_READY;
-			return;
-		}
+	// check for fire
+	if ( ! (pm->cmd.buttons & BUTTON_ATTACK) ) {
+		pm->ps->weaponTime = 0;
+		pm->ps->weaponstate = WEAPON_READY;
+		return;
+	}
 	}
 
 	// Gauntlet-type
-	if ( BG_WeaponHasType(pm->ps->weapon, WT_GAUNTLET) ) {
+	if ( BG_WeaponTypeForPlayerState(pm->ps) == WT_GAUNTLET ) {
 		// the guantlet only "fires" when it actually hits something
 		if ( !pm->gauntletHit ) {
 			pm->ps->weaponTime = 0;
@@ -2546,11 +2487,11 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 	pm->ps->weaponstate = WEAPON_FIRING;
 #endif
 
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 	// check for out of ammo,
 	//  only happens for default weapon.
 	//  pickup weapons have already been handled.
@@ -2569,7 +2510,7 @@ static void PM_Weapon( void ) {
 #endif
 
 	// take an ammo away if not infinite
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 	if (pm->ps->stats[STAT_AMMO] != -1) {
 		pm->ps->stats[STAT_AMMO]--;
 	}
@@ -2579,12 +2520,12 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	// Make sure we have ammo before attacking.
 	pm->ps->weaponstate = WEAPON_FIRING;
 
 	// MELEEATTACK
-	if ( BG_WeaponHasMelee(pm->ps->weapon) )
+	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) ) )
 	{
 		int anim;
 
@@ -2594,8 +2535,8 @@ static void PM_Weapon( void ) {
 		{
 			PM_StartTorsoAnim( anim );
 
-			// fire weapon
-			PM_AddEvent( EV_FIRE_WEAPON );
+	// fire weapon
+	PM_AddEvent( EV_FIRE_WEAPON );
 		}
 	}
 	else
@@ -2610,13 +2551,15 @@ static void PM_Weapon( void ) {
 	PM_AddEvent( EV_FIRE_WEAPON );
 #endif
 
-#ifdef TA_WEAPSYS
-	if (BG_WeaponHasType(pm->ps->weapon, WT_MELEE))
+#ifdef TMNTWEAPSYS
+	if ( BG_WeapTypeIsMelee( BG_WeaponTypeForPlayerState(pm->ps) )
+		&& BG_WeaponTypeForPlayerState(pm->ps) != WT_GAUNTLET)
 	{
 		pm->ps->weaponTime = pm->ps->meleeDelay;
 		return;
 	}
-
+#endif
+#ifdef TMNTWEAPSYS_2
 	addTime = bg_weapongroupinfo[pm->ps->weapon].weapon[0]->attackDelay;
 #else
 	switch( pm->ps->weapon ) {
@@ -2666,7 +2609,7 @@ static void PM_Weapon( void ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	if( BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -2675,7 +2618,7 @@ static void PM_Weapon( void ) {
 		addTime /= 1.5;
 	}
 	else
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	if( BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
 #else
 	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )
@@ -2702,7 +2645,7 @@ static void PM_Animate( void ) {
 	if ( pm->cmd.buttons & BUTTON_GESTURE ) {
 		if ( pm->ps->torsoTimer == 0 ) {
 			PM_StartTorsoAnim( TORSO_GESTURE );
-#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 			pm->ps->torsoTimer = BG_AnimationTime(&pm->playercfg->animations[TORSO_GESTURE]);
 #else
 			pm->ps->torsoTimer = TIMER_GESTURE;
@@ -2713,7 +2656,7 @@ static void PM_Animate( void ) {
 	} else if ( pm->cmd.buttons & BUTTON_GETFLAG ) {
 		if ( pm->ps->torsoTimer == 0 ) {
 			PM_StartTorsoAnim( TORSO_GETFLAG );
-#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 			pm->ps->torsoTimer = BG_AnimationTime(&pm->playercfg->animations[TORSO_GETFLAG]);
 #else
 			pm->ps->torsoTimer = 600;	//TIMER_GESTURE;
@@ -2722,7 +2665,7 @@ static void PM_Animate( void ) {
 	} else if ( pm->cmd.buttons & BUTTON_GUARDBASE ) {
 		if ( pm->ps->torsoTimer == 0 ) {
 			PM_StartTorsoAnim( TORSO_GUARDBASE );
-#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 			pm->ps->torsoTimer = BG_AnimationTime(&pm->playercfg->animations[TORSO_GUARDBASE]);
 #else
 			pm->ps->torsoTimer = 600;	//TIMER_GESTURE;
@@ -2731,7 +2674,7 @@ static void PM_Animate( void ) {
 	} else if ( pm->cmd.buttons & BUTTON_PATROL ) {
 		if ( pm->ps->torsoTimer == 0 ) {
 			PM_StartTorsoAnim( TORSO_PATROL );
-#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 			pm->ps->torsoTimer = BG_AnimationTime(&pm->playercfg->animations[TORSO_PATROL]);
 #else
 			pm->ps->torsoTimer = 600;	//TIMER_GESTURE;
@@ -2740,7 +2683,7 @@ static void PM_Animate( void ) {
 	} else if ( pm->cmd.buttons & BUTTON_FOLLOWME ) {
 		if ( pm->ps->torsoTimer == 0 ) {
 			PM_StartTorsoAnim( TORSO_FOLLOWME );
-#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 			pm->ps->torsoTimer = BG_AnimationTime(&pm->playercfg->animations[TORSO_FOLLOWME]);
 #else
 			pm->ps->torsoTimer = 600;	//TIMER_GESTURE;
@@ -2749,7 +2692,7 @@ static void PM_Animate( void ) {
 	} else if ( pm->cmd.buttons & BUTTON_AFFIRMATIVE ) {
 		if ( pm->ps->torsoTimer == 0 ) {
 			PM_StartTorsoAnim( TORSO_AFFIRMATIVE );
-#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 			pm->ps->torsoTimer = BG_AnimationTime(&pm->playercfg->animations[TORSO_AFFIRMATIVE]);
 #else
 			pm->ps->torsoTimer = 600;	//TIMER_GESTURE;
@@ -2758,7 +2701,7 @@ static void PM_Animate( void ) {
 	} else if ( pm->cmd.buttons & BUTTON_NEGATIVE ) {
 		if ( pm->ps->torsoTimer == 0 ) {
 			PM_StartTorsoAnim( TORSO_NEGATIVE );
-#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 			pm->ps->torsoTimer = BG_AnimationTime(&pm->playercfg->animations[TORSO_NEGATIVE]);
 #else
 			pm->ps->torsoTimer = 600;	//TIMER_GESTURE;
@@ -2813,12 +2756,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 	short		temp;
 	int		i;
 
-	if ( ps->pm_type == PM_INTERMISSION
-#ifndef TA_SP
-		|| ps->pm_type == PM_SPINTERMISSION
-#endif
-		)
-	{
+	if ( ps->pm_type == PM_INTERMISSION || ps->pm_type == PM_SPINTERMISSION) {
 		return;		// no view changes at all
 	}
 
@@ -2828,10 +2766,6 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 
 	// circularly clamp the angles with deltas
 	for (i=0 ; i<3 ; i++) {
-#ifdef NIGHTSMODE
-		if ((pm->ps->eFlags & EF_NIGHTSMODE) && i == YAW)
-			continue;
-#endif
 		temp = cmd->angles[i] + ps->delta_angles[i];
 		if ( i == PITCH ) {
 			// don't let the player look up or down more than 90 degrees
@@ -2870,7 +2804,7 @@ void PmoveSingle (pmove_t *pmove) {
 	pm->waterlevel = 0;
 
 	if ( pm->ps->stats[STAT_HEALTH] <= 0
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 		|| pm->ps->powerups[PW_FLASHING] > 0
 #endif
 		)
@@ -2884,15 +2818,6 @@ void PmoveSingle (pmove_t *pmove) {
 		pm->cmd.buttons &= ~BUTTON_WALKING;
 	}
 
-#ifdef TURTLEARENA // LOCKON
-	// set the lock-on flag
-	if ( pm->ps->stats[STAT_HEALTH] > 0 && (pm->cmd.buttons & BUTTON_WALKING) ) {
-		pm->ps->eFlags |= EF_LOCKON;
-	} else {
-		pm->ps->eFlags &= ~EF_LOCKON;
-	}
-#endif
-
 	// set the talk balloon flag
 	if ( pm->cmd.buttons & BUTTON_TALK ) {
 		pm->ps->eFlags |= EF_TALK;
@@ -2902,10 +2827,10 @@ void PmoveSingle (pmove_t *pmove) {
 
 	// set the firing flag for continuous beam weapons
 	if ( !(pm->ps->pm_flags & PMF_RESPAWNED) && pm->ps->pm_type != PM_INTERMISSION
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 		&& ( pm->ps->meleeTime ||
 			(( pm->cmd.buttons & BUTTON_ATTACK )
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 			&& pm->ps->stats[STAT_AMMO] != 0
 #else
 			&& pm->ps->ammo[ pm->ps->weapon ] != 0
@@ -2937,15 +2862,6 @@ void PmoveSingle (pmove_t *pmove) {
 		pmove->cmd.rightmove = 0;
 		pmove->cmd.upmove = 0;
 	}
-#ifdef TA_SP
-	// Don't move after you have finished the level
-	else if ( pm->ps->eFlags & EF_FINISHED ) {
-		pmove->cmd.buttons = 0;
-		pmove->cmd.forwardmove = 0;
-		pmove->cmd.rightmove = 0;
-		pmove->cmd.upmove = 0;
-	}
-#endif
 
 	// clear all pmove local vars
 	memset (&pml, 0, sizeof(pml));
@@ -2967,13 +2883,13 @@ void PmoveSingle (pmove_t *pmove) {
 
 	pml.frametime = pml.msec * 0.001;
 
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 	if (!pm->npc)
 	{
 #endif
 	// update the viewangles
 	PM_UpdateViewAngles( pm->ps, &pm->cmd );
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	}
 #endif
 
@@ -2985,11 +2901,6 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	// decide if backpedaling animations should be used
-#ifdef NIGHTSMODE
-	if ( pm->ps->eFlags & EF_NIGHTSMODE ) {
-		pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
-	} else
-#endif
 	if ( pm->cmd.forwardmove < 0 ) {
 		pm->ps->pm_flags |= PMF_BACKWARDS_RUN;
 	} else if ( pm->cmd.forwardmove > 0 || ( pm->cmd.forwardmove == 0 && pm->cmd.rightmove ) ) {
@@ -3023,12 +2934,7 @@ void PmoveSingle (pmove_t *pmove) {
 		return;		// no movement at all
 	}
 
-	if ( pm->ps->pm_type == PM_INTERMISSION
-#ifndef TA_SP
-		|| pm->ps->pm_type == PM_SPINTERMISSION
-#endif
-		)
-	{
+	if ( pm->ps->pm_type == PM_INTERMISSION || pm->ps->pm_type == PM_SPINTERMISSION) {
 		return;		// no movement at all
 	}
 
@@ -3052,7 +2958,7 @@ void PmoveSingle (pmove_t *pmove) {
 
 	PM_DropTimers();
 
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
     // Setup accelerates based on the per-player one.
 	if (pm->playercfg)
 	{
@@ -3067,7 +2973,7 @@ void PmoveSingle (pmove_t *pmove) {
 	pm_flyaccelerate = pm_accelerate * 0.8f;
 #endif
 
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 #ifdef MISSIONPACK
 	if ( pm->ps->powerups[PW_INVULNERABILITY] ) {
 		PM_InvulnerabilityMove();
@@ -3075,7 +2981,7 @@ void PmoveSingle (pmove_t *pmove) {
 #endif
 #endif
 #ifdef NIGHTSMODE
-	if ( pm->ps->powerups[PW_FLIGHT] && (pm->ps->eFlags & EF_NIGHTSMODE) ) {
+	if ( pm->ps->eFlags & EF_NIGHTSMODE ) {
 		PM_NightsMove();
 	} else
 #endif
@@ -3113,12 +3019,12 @@ void PmoveSingle (pmove_t *pmove) {
 		PM_AirMove();
 	}
 
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 	if (!pm->npc)
 	{
 #endif
 	PM_Animate();
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	}
 #endif
 
@@ -3126,7 +3032,7 @@ void PmoveSingle (pmove_t *pmove) {
 	PM_GroundTrace();
 	PM_SetWaterLevel();
 
-#ifdef TA_NPCSYS // TDC_NPC
+#ifdef TMNTNPCSYS // TDC_NPC
 	if (!pm->npc)
 	{
 #endif
@@ -3135,7 +3041,7 @@ void PmoveSingle (pmove_t *pmove) {
 
 	// torso animation
 	PM_TorsoAnimation();
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	}
 #endif
 
@@ -3160,7 +3066,7 @@ Can be called by either the server or the client
 void Pmove (pmove_t *pmove) {
 	int			finalTime;
 
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	if (!pmove->playercfg)
 	{
 		// Spectators were not passing playercfg...

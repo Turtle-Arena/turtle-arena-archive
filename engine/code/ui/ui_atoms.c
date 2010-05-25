@@ -76,7 +76,7 @@ void UI_StartDemoLoop( void ) {
 }
 
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef MISSIONPACK
 static void NeedCDAction( qboolean result ) {
 	if ( !result ) {
@@ -119,7 +119,7 @@ void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
 	trap_Cvar_Set("ui_scoreExcellents", 	va("%i", newInfo->excellents));
 	trap_Cvar_Set("ui_scoreDefends", 			va("%i", newInfo->defends));
 	trap_Cvar_Set("ui_scoreAssists", 			va("%i", newInfo->assists));
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS
 	trap_Cvar_Set("ui_scoreGauntlets", 		va("%i", newInfo->gauntlets));
 #endif
 	trap_Cvar_Set("ui_scoreScore", 				va("%i", newInfo->score));
@@ -137,7 +137,7 @@ void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
 		trap_Cvar_Set("ui_scoreExcellents2", 	va("%i", newInfo->excellents));
 		trap_Cvar_Set("ui_scoreDefends2", 			va("%i", newInfo->defends));
 		trap_Cvar_Set("ui_scoreAssists2", 			va("%i", newInfo->assists));
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS
 		trap_Cvar_Set("ui_scoreGauntlets2", 		va("%i", newInfo->gauntlets));
 #endif
 		trap_Cvar_Set("ui_scoreScore2", 				va("%i", newInfo->score));
@@ -254,7 +254,7 @@ static void UI_CalcPostGameStats( void ) {
 	newInfo.excellents = atoi(UI_Argv(5));
 	newInfo.defends = atoi(UI_Argv(6));
 	newInfo.assists = atoi(UI_Argv(7));
-#ifndef TURTLEARENA // WEAPONS
+#ifdef TMNTWEAPONS
 	// NOTE: I pass 0 as argv 8 so I don't have to change numbers...
 #else
 	newInfo.gauntlets = atoi(UI_Argv(8));
@@ -307,7 +307,7 @@ static void UI_CalcPostGameStats( void ) {
  
 	// put back all the ui overrides
 	trap_Cvar_Set("capturelimit", UI_Cvar_VariableString("ui_saveCaptureLimit"));
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 	trap_Cvar_Set("scorelimit", UI_Cvar_VariableString("ui_saveScoreLimit"));
 #else
 	trap_Cvar_Set("fraglimit", UI_Cvar_VariableString("ui_saveFragLimit"));
@@ -386,7 +386,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 	}
 
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	if ( Q_stricmp (cmd, "ui_cdkey") == 0 ) {
 		//UI_CDKeyMenu_f();
 		return qtrue;

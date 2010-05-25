@@ -278,29 +278,28 @@ BotWeaponNameForMeansOfDeath
 ==================
 */
 
-#ifdef TA_WEAPSYS
-char *BotWeaponNameForMeansOfDeath(int mod, int weapon) {
+char *BotWeaponNameForMeansOfDeath(int mod) {
 	switch(mod) {
-		case MOD_PROJECTILE:
-		case MOD_PROJECTILE_EXPLOSION:
-			return &bg_projectileinfo[weapon].name[2];
-			break;
-		case MOD_WEAPON_PRIMARY:
-		case MOD_WEAPON_SECONDARY:
-			return &bg_weapongroupinfo[weapon].weapon[mod-MOD_WEAPON_PRIMARY]->name[2];
-			break;
-		default:
-			return "[unknown weapon]";
-	}
-}
+#ifdef TMNTWEAPONS // MOD
+		case MOD_FIST: return "Fist";
+		case MOD_KATANA: return "Katana";
+		case MOD_WAKIZASHI: return "Wakizashi";
+		case MOD_SAI: return "Sai";
+		case MOD_NUNCHUK: return "Nunchuk";
+		case MOD_HAMMER: return "Hammer";
+		case MOD_AXE: return "Axe";
+		case MOD_SWORD: return "Sword";
+		case MOD_BAT: return "Baseball Bat";
+		case MOD_BO: return "Bo";
+		case MOD_BAMBOO: return "Bamboo";
+		case MOD_GUN: return "Gun";
+		case MOD_ELECTRIC:
+		case MOD_ELECTRIC_SPLASH: return "Electric Launcher";
+		case MOD_ROCKET:
+		case MOD_ROCKET_SPLASH: return "Rocket Launcher";
+		case MOD_HOMING:
+		case MOD_HOMING_SPLASH: return "Homing-Rocket Launcher";
 #else
-// ZTM: Support not defining TA_WEAPSYS (Define missing vars, and add int unused to function)
-#define botdeathweapon botdeathtype
-#define lasthurt_weapon botdeathtype
-char *BotWeaponNameForMeansOfDeath(int mod, int unused) {
-	(void)unused;
-
-	switch(mod) {
 		case MOD_SHOTGUN: return "Shotgun";
 		case MOD_GAUNTLET: return "Gauntlet";
 		case MOD_MACHINEGUN: return "Machinegun";
@@ -318,16 +317,16 @@ char *BotWeaponNameForMeansOfDeath(int mod, int unused) {
 		case MOD_NAIL: return "Nailgun";
 		case MOD_CHAINGUN: return "Chaingun";
 		case MOD_PROXIMITY_MINE: return "Proximity Launcher";
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE: return "Kamikaze";
 #endif
 		case MOD_JUICED: return "Prox mine";
+#endif
 #endif
 		case MOD_GRAPPLE: return "Grapple";
 		default: return "[unknown weapon]";
 	}
 }
-#endif
 
 /*
 ==================
@@ -337,18 +336,39 @@ BotRandomWeaponName
 char *BotRandomWeaponName(void) {
 	int rnd;
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	rnd = random() * (float)(BG_NumWeaponGroups() + 0.9f);
 	if (rnd >= BG_NumWeaponGroups())
 		rnd = BG_NumWeaponGroups()-1;
 	return bg_weapongroupinfo[rnd].pickupName;
+#else
+#ifdef TMNTWEAPONS
+	rnd = random() * 14.9;
 #else
 #ifdef MISSIONPACK
 	rnd = random() * 11.9;
 #else
 	rnd = random() * 8.9;
 #endif
+#endif
 	switch(rnd) {
+#ifdef TMNTWEAPONS // weapon names
+		case 0: return "Fist";
+		case 1: return "Katana";
+		case 2: return "Daisho";
+		case 3: return "Sai";
+		case 4: return "Nunchuk";
+		case 5: return "Hammer";
+		case 6: return "Battle Axe";
+		case 7: return "Sword";
+		case 8: return "Baseball Bat";
+		case 9: return "Bo";
+		case 10: return "Bamboo";
+		case 11: return "Gun";
+		case 12: return "Electric Launcher";
+		case 13: return "Rocket Launcher";
+		default: return "Homing-Rocket Launcher";
+#else
 		case 0: return "Gauntlet";
 		case 1: return "Shotgun";
 		case 2: return "Machinegun";
@@ -363,6 +383,7 @@ char *BotRandomWeaponName(void) {
 		case 10: return "Proximity Launcher";
 #endif
 		default: return "BFG10K";
+#endif
 	}
 #endif
 }
@@ -414,9 +435,7 @@ int BotValidChatPosition(bot_state_t *bs) {
 	if (bs->inventory[INVENTORY_QUAD] ||
 		bs->inventory[INVENTORY_HASTE] ||
 		bs->inventory[INVENTORY_INVISIBILITY] ||
-#ifndef TURTLEARENA // POWERS
 		bs->inventory[INVENTORY_REGEN] ||
-#endif
 		bs->inventory[INVENTORY_FLIGHT]) return qfalse;
 	//must be on the ground
 	//if (bs->cur_ps.groundEntityNum != ENTITYNUM_NONE) return qfalse;
@@ -649,19 +668,19 @@ int BotChat_Death(bot_state_t *bs) {
 				bs->botdeathtype == MOD_SUICIDE ||
 				bs->botdeathtype == MOD_TARGET_LASER ||
 				bs->botdeathtype == MOD_TRIGGER_HURT ||
-#ifdef TA_ENTSYS
+#ifdef TMNTENTSYS
 				bs->botdeathtype == MOD_EXPLOSION ||
 #endif
 				bs->botdeathtype == MOD_UNKNOWN)
 			BotAI_BotInitialChat(bs, "death_suicide", BotRandomOpponentName(bs), NULL);
 		else if (bs->botdeathtype == MOD_TELEFRAG)
 			BotAI_BotInitialChat(bs, "death_telefrag", name, NULL);
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		else if (bs->botdeathtype == MOD_KAMIKAZE && trap_BotNumInitialChats(bs->cs, "death_kamikaze"))
 			BotAI_BotInitialChat(bs, "death_kamikaze", name, NULL);
 #endif
 		else {
-#ifndef TURTLEARENA // MOD
+#ifndef TMNTWEAPONS // MOD
 			if ((bs->botdeathtype == MOD_GAUNTLET ||
 				bs->botdeathtype == MOD_RAILGUN ||
 				bs->botdeathtype == MOD_BFG ||
@@ -669,18 +688,18 @@ int BotChat_Death(bot_state_t *bs) {
 
 				if (bs->botdeathtype == MOD_GAUNTLET)
 					BotAI_BotInitialChat(bs, "death_gauntlet",
-							name,																	// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+							name,												// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 							NULL);
 				else if (bs->botdeathtype == MOD_RAILGUN)
 					BotAI_BotInitialChat(bs, "death_rail",
-							name,																	// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+							name,												// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 							NULL);
 				else
 					BotAI_BotInitialChat(bs, "death_bfg",
-							name,																	// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+							name,												// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 							NULL);
 			}
 			//choose between insult and praise
@@ -688,14 +707,14 @@ int BotChat_Death(bot_state_t *bs) {
 #endif
 			if (random() < trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_INSULT, 0, 1)) {
 				BotAI_BotInitialChat(bs, "death_insult",
-							name,																	// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+							name,												// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 							NULL);
 			}
 			else {
 				BotAI_BotInitialChat(bs, "death_praise",
-							name,																	// 0
-							BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+							name,												// 0
+							BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 							NULL);
 			}
 		}
@@ -744,7 +763,7 @@ int BotChat_Kill(bot_state_t *bs) {
 			return qfalse;			// don't wait
 		}
 		//
-#ifndef TURTLEARENA // MOD
+#ifndef TMNTWEAPONS
 		if (bs->enemydeathtype == MOD_GAUNTLET) {
 			BotAI_BotInitialChat(bs, "kill_gauntlet", name, NULL);
 		}
@@ -756,7 +775,7 @@ int BotChat_Kill(bot_state_t *bs) {
 		if (bs->enemydeathtype == MOD_TELEFRAG) {
 			BotAI_BotInitialChat(bs, "kill_telefrag", name, NULL);
 		}
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		else if (bs->botdeathtype == MOD_KAMIKAZE && trap_BotNumInitialChats(bs->cs, "kill_kamikaze"))
 			BotAI_BotInitialChat(bs, "kill_kamikaze", name, NULL);
 #endif
@@ -841,12 +860,7 @@ int BotChat_HitTalking(bot_state_t *bs) {
 	if (!BotValidChatPosition(bs)) return qfalse;
 	//
 	ClientName(g_entities[bs->client].client->lasthurt_client, name, sizeof(name));
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Typo, should be MOD
-	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_mod,
-				g_entities[bs->client].client->lasthurt_weapon);
-#else
 	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_client);
-#endif
 	//
 	BotAI_BotInitialChat(bs, "hit_talking", name, weap, NULL);
 	bs->lastchat_time = FloatTime();
@@ -891,8 +905,7 @@ int BotChat_HitNoDeath(bot_state_t *bs) {
 	if (EntityIsShooting(&entinfo)) return qfalse;
 	//
 	ClientName(lasthurt_client, name, sizeof(name));
-	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_mod,
-				g_entities[bs->client].client->lasthurt_weapon);
+	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_mod);
 	//
 	BotAI_BotInitialChat(bs, "hit_nodeath", name, weap, NULL);
 	bs->lastchat_time = FloatTime();
@@ -930,8 +943,7 @@ int BotChat_HitNoKill(bot_state_t *bs) {
 	if (EntityIsShooting(&entinfo)) return qfalse;
 	//
 	ClientName(bs->enemy, name, sizeof(name));
-	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->enemy].client->lasthurt_mod,
-				g_entities[bs->client].client->lasthurt_weapon);
+	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->enemy].client->lasthurt_mod);
 	//
 	BotAI_BotInitialChat(bs, "hit_nokill", name, weap, NULL);
 	bs->lastchat_time = FloatTime();
@@ -1012,7 +1024,7 @@ BotChatTime
 ==================
 */
 float BotChatTime(bot_state_t *bs) {
-#ifdef IOQ3ZTM // ZTM: cleanup
+#ifdef IOQ3ZTM // Turtle Man: cleanup
 	return 2.0;
 #else
 	int cpm;
@@ -1144,8 +1156,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_gauntlet",
-				name,																	// 0
-				BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+				name,												// 0
+				BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 				NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1153,8 +1165,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_rail",
-				name,																	// 0
-				BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+				name,												// 0
+				BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 				NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1162,8 +1174,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_bfg",
-				name,																	// 0
-				BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+				name,												// 0
+				BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 				NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1171,8 +1183,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_insult",
-					name,																	// 0
-					BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+					name,												// 0
+					BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 					NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1180,8 +1192,8 @@ void BotChatTest(bot_state_t *bs) {
 	for (i = 0; i < num; i++)
 	{
 		BotAI_BotInitialChat(bs, "death_praise",
-					name,																	// 0
-					BotWeaponNameForMeansOfDeath(bs->botdeathtype, bs->botdeathweapon),		// 1
+					name,												// 0
+					BotWeaponNameForMeansOfDeath(bs->botdeathtype),		// 1
 					NULL);
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
@@ -1226,8 +1238,7 @@ void BotChatTest(bot_state_t *bs) {
 		trap_BotEnterChat(bs->cs, 0, CHAT_ALL);
 	}
 	ClientName(g_entities[bs->client].client->lasthurt_client, name, sizeof(name));
-	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_client,
-				g_entities[bs->client].client->lasthurt_weapon);
+	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_client);
 	num = trap_BotNumInitialChats(bs->cs, "hit_talking");
 	for (i = 0; i < num; i++)
 	{

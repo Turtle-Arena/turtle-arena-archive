@@ -6,7 +6,7 @@ textures/REGION
 	surfaceparm nolightmap
 }
 
-// ZTM: Added for terrain. (http://www.simonoc.com/pages/articles.htm)
+// Turtle Man: Added for terrain. (http://www.simonoc.com/pages/articles.htm)
 // ======================================================================
 // alpha fade shaders
 // (c) 2004 randy reddig
@@ -269,7 +269,6 @@ textures/common/mirror1
 {
 	qer_editorimage textures/common/mirror1.jpg
 	surfaceparm nolightmap
-	surfaceparm glass
 	portal
   	{
 		map textures/common/invisible.tga
@@ -283,7 +282,6 @@ textures/common/mirror2
 {
 	qer_editorimage textures/common/mirror1.jpg
 	surfaceparm nolightmap
-	surfaceparm glass
 	portal
 	{
 		map textures/common/invisible.tga
@@ -291,8 +289,9 @@ textures/common/mirror2
 		depthWrite
 	}
 	{
-		map textures/sfx/mirror.png
-		//tcMod turb 0 0.25 0 0.05
+		//map textures/sfx/mirror.tga
+		map textures/skies/testsky_clouds.png
+		tcMod turb 0 0.25 0 0.05
 		blendFunc GL_ZERO GL_ONE_MINUS_SRC_COLOR
 	}
 }

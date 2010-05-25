@@ -147,20 +147,20 @@ int Export_BotLibSetup(void)
 		char *homedir, *gamedir;
 		char logfilename[MAX_OSPATH];
 
-		homedir = LibVarGetString("homedir");
-		gamedir = LibVarGetString("gamedir");
+	homedir = LibVarGetString("homedir");
+	gamedir = LibVarGetString("gamedir");
 
 		if (*homedir)
 		{
 			if(*gamedir)
-				Com_sprintf(logfilename, sizeof(logfilename), "%s%c%s%cbotlib.log", homedir, PATH_SEP, gamedir, PATH_SEP);
+			Com_sprintf(logfilename, sizeof(logfilename), "%s%c%s%cbotlib.log", homedir, PATH_SEP, gamedir, PATH_SEP);
 			else
-				Com_sprintf(logfilename, sizeof(logfilename), "%s%c" BASEGAME "%cbotlib.log", homedir, PATH_SEP, PATH_SEP);
+			Com_sprintf(logfilename, sizeof(logfilename), "%s%c" BASEGAME "%cbotlib.log", homedir, PATH_SEP, PATH_SEP);
 		}
 		else
-			Com_sprintf(logfilename, sizeof(logfilename), "botlib.log");
+		Com_sprintf(logfilename, sizeof(logfilename), "botlib.log");
 	
-		Log_Open(logfilename);
+	Log_Open(logfilename);
 	}
 
 	botimport.Print(PRT_MESSAGE, "------- BotLib Initialization -------\n");
@@ -172,7 +172,7 @@ int Export_BotLibSetup(void)
 	if (errnum != BLERR_NOERROR) return errnum;
 	errnum = EA_Setup();			//be_ea.c
 	if (errnum != BLERR_NOERROR) return errnum;
-#ifndef TA_WEAPSYS_NOCOMPAT
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 	errnum = BotSetupWeaponAI();	//be_ai_weap.c
 	if (errnum != BLERR_NOERROR)return errnum;
 #endif
@@ -204,7 +204,7 @@ int Export_BotLibShutdown(void)
 	BotShutdownChatAI();		//be_ai_chat.c
 	BotShutdownMoveAI();		//be_ai_move.c
 	BotShutdownGoalAI();		//be_ai_goal.c
-#ifndef TA_WEAPSYS_NOCOMPAT
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 	BotShutdownWeaponAI();		//be_ai_weap.c
 #endif
 	BotShutdownWeights();		//be_ai_weight.c
@@ -276,7 +276,7 @@ int Export_BotLibStartFrame(float time)
 // Returns:					-
 // Changes Globals:		-
 //===========================================================================
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
 int Export_BotLibLoadMap(const char *mapname, bot_shareditem_t *itemInfos)
 #else
 int Export_BotLibLoadMap(const char *mapname)
@@ -294,7 +294,7 @@ int Export_BotLibLoadMap(const char *mapname)
 	errnum = AAS_LoadMap(mapname);
 	if (errnum != BLERR_NOERROR) return errnum;
 	//initialize the items in the level
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
 	BotInitLevelItems(itemInfos);		//be_ai_goal.h
 #else
 	BotInitLevelItems();		//be_ai_goal.h
@@ -455,7 +455,7 @@ int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3)
 		botimport.Print(PRT_MESSAGE, "\n");
 		botimport.Print(PRT_MESSAGE, "travel time to goal (%d) = %d\n", botlibglobals.goalareanum,
 					AAS_AreaTravelTimeToGoalArea(newarea, origin, botlibglobals.goalareanum, TFL_DEFAULT
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 					|TFL_ROCKETJUMP
 #endif
 					));
@@ -579,7 +579,7 @@ int BotExportTest(int parm0, char *parm1, vec3_t parm2, vec3_t parm3)
 										  lastgoalareanum, lastareanum,
 										  avoidreach, avoidreachtimes, avoidreachtries,
 										  &goal, TFL_DEFAULT|TFL_FUNCBOB
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 										  |TFL_ROCKETJUMP
 #endif
 										  , TFL_DEFAULT|TFL_FUNCBOB|TFL_ROCKETJUMP,
@@ -767,7 +767,7 @@ static void Init_EA_Export( ea_export_t *ea ) {
 	ea->EA_MoveLeft = EA_MoveLeft;
 	ea->EA_MoveRight = EA_MoveRight;
 
-#if defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT // BOTLIB
+#ifdef TMNTWEAPSYS2 // BOTLIB
 	ea->EA_DropWeapon = EA_DropWeapon;
 #else
 	ea->EA_SelectWeapon = EA_SelectWeapon;
@@ -868,7 +868,7 @@ static void Init_AI_Export( ai_export_t *ai ) {
 	ai->BotFreeMoveState = BotFreeMoveState;
 	ai->BotInitMoveState = BotInitMoveState;
 	ai->BotAddAvoidSpot = BotAddAvoidSpot;
-#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 	//-----------------------------------
 	// be_ai_weap.h
 	//-----------------------------------

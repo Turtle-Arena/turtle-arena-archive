@@ -9,9 +9,9 @@
 # TODO: the intermediate object files should go into their own directory
 #   specially for ../botlib and ../qcommon, the compilation flags on those might not be what you expect
 #
-# ZTM 2/25/2009
+# Turtle Man 2/25/2009
 # Changed Makefile to be like ioquake3 Makefile, currently still only for linux
-#   but should change later.
+# but should change later.
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]')
 
@@ -79,14 +79,6 @@ ifndef BUILD_DIR
 BUILD_DIR=../../build
 endif
 
-ifndef USE_INTERNAL_ZLIB
-USE_INTERNAL_ZLIB=1
-endif
-
-ifndef USE_LOCAL_HEADERS
-USE_LOCAL_HEADERS=1
-endif
-
 #############################################################################
 
 BD=$(BUILD_DIR)/bspc-debug-$(PLATFORM)-$(ARCH)
@@ -95,7 +87,6 @@ BR=$(BUILD_DIR)/bspc-release-$(PLATFORM)-$(ARCH)
 BLIBDIR=$(MOUNT_DIR)/botlib
 BSPCDIR=$(MOUNT_DIR)/bspc
 CMDIR=$(MOUNT_DIR)/qcommon
-ZDIR=$(MOUNT_DIR)/zlib
 
 ifeq ($(V),1)
 echo_cmd=@:
@@ -109,15 +100,6 @@ define DO_CC
 $(echo_cmd) "CC $<"
 $(Q)$(CC) $(CFLAGS) -o $@ -c $<
 endef
-
-ifeq ($(USE_INTERNAL_ZLIB),1)
-  BASE_CFLAGS += -DNO_GZIP
-  ifneq ($(USE_LOCAL_HEADERS),1)
-    BASE_CFLAGS += -I$(ZDIR)
-  endif
-else
-  LIBS += -lz
-endif
 
 TARGETS=$(B)/bspc.$(ARCH)$(BINEXT)
 
@@ -149,14 +131,14 @@ ifeq ($(PLATFORM),linux)
   endif
 
 #use these cflags to optimize it
-#ZTM: -m486 :  error: unrecognized command line option "-m486"
+#Turtle Man: -m486 :  error: unrecognized command line option "-m486"
   CFLAGS=$(BASE_CFLAGS) -O6 -ffast-math -funroll-loops \
 	-fomit-frame-pointer -fexpensive-optimizations -falign-loops=2 \
 	-falign-jumps=2 -falign-functions=2
 #use these when debugging 
 #CFLAGS=$(BASE_CFLAGS) -g
 
-  LIBS=-ldl -lm -lpthread
+  LDFLAGS=-ldl -lm -lpthread
 
 else # ifeq Linux
 
@@ -174,12 +156,6 @@ else # ifeq darwin
 #############################################################################
 
 ifeq ($(PLATFORM),mingw32)
-
-  # Some MinGW installations define CC to cc, but don't actually provide cc,
-  # so explicitly use gcc instead (which is the only option anyway)
-  ifeq ($(call bin_path, $(CC)),)
-    CC=gcc
-  endif
 
   ARCH=x86
   BINEXT=.exe
@@ -299,6 +275,7 @@ targets: makedirs
 	@echo "Building bspc in $(B):"
 	@echo "  PLATFORM: $(PLATFORM)"
 	@echo "  ARCH: $(ARCH)"
+	@echo "  VERSION: $(VERSION)"
 	@echo "  COMPILE_PLATFORM: $(COMPILE_PLATFORM)"
 	@echo "  COMPILE_ARCH: $(COMPILE_ARCH)"
 	@echo "  CC: $(CC)"
@@ -314,12 +291,12 @@ targets: makedirs
 	do \
 		echo "    $$i"; \
 	done
-	@echo ""
-	@echo "  LIBS:"
-	-@for i in $(LIBS); \
-	do \
-		echo "    $$i"; \
-	done
+#	@echo ""
+#	@echo "  LIBS:"
+#	-@for i in $(LIBS); \
+#	do \
+#		echo "    $$i"; \
+#	done
 	@echo ""
 	@echo "  Output:"
 	-@for i in $(TARGETS); \
@@ -337,7 +314,6 @@ makedirs:
 	@if [ ! -d $(B)/bspc ];then $(MKDIR) $(B)/bspc;fi
 	@if [ ! -d $(B)/botlib ];then $(MKDIR) $(B)/botlib;fi
 	@if [ ! -d $(B)/qcommon ];then $(MKDIR) $(B)/qcommon;fi
-	@if [ ! -d $(B)/zlib ];then $(MKDIR) $(B)/zlib;fi
 
 #############################################################################
 # BUILD BSPC
@@ -349,10 +325,8 @@ $(B)/bspc/%.o: $(BSPCDIR)/%.c
 	$(DO_CC)
 $(B)/qcommon/%.o: $(CMDIR)/%.c
 	$(DO_CC)
-$(B)/zlib/%.o: $(ZDIR)/%.c
-	$(DO_CC)
 
-BSPC_OBJS = \
+GAME_OBJS = \
 	$(B)/bspc/aas_areamerging.o\
 	$(B)/bspc/aas_cfg.o\
 	$(B)/bspc/aas_create.o\
@@ -408,33 +382,27 @@ BSPC_OBJS = \
 	$(B)/bspc/portals.o\
 	$(B)/bspc/textures.o\
 	$(B)/bspc/tree.o\
-	$(B)/qcommon/ioapi.o\
 	$(B)/qcommon/unzip.o
 
         #tetrahedron.o
 
-ifeq ($(USE_INTERNAL_ZLIB),1)
-BSPC_OBJS += \
-  $(B)/zlib/adler32.o \
-  $(B)/zlib/crc32.o \
-  $(B)/zlib/inffast.o \
-  $(B)/zlib/inflate.o \
-  $(B)/zlib/inftrees.o \
-  $(B)/zlib/zutil.o
-endif
-
-$(B)/bspc.$(ARCH)$(BINEXT) : $(BSPC_OBJS)
+$(B)/bspc.$(ARCH)$(BINEXT) : $(GAME_OBJS)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(BSPC_OBJS) $(LIBS)
+	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(GAME_OBJS)
 
 #############################################################################
 # MISC
 #############################################################################
 
-OBJ=$(BSPC_OBJS)
+OBJ=$(GAME_OBJ)
 OBJ_D_FILES=$(filter %.d,$(OBJ:%.o=%.d))
 
 clean: clean-debug clean-release
+#ifeq ($(PLATFORM),mingw32)
+#	@$(MAKE) -C $(NSISDIR) clean
+#else
+#	@$(MAKE) -C $(LOKISETUPDIR) clean
+#endif
 
 clean-debug:
 	@$(MAKE) clean2 B=$(BD)
@@ -450,8 +418,12 @@ clean2:
 
 depend:
 	$(echo_cmd) "DEPEND $(B)"
-	$(Q)$(CC) -MM $(BSPC_OBJS:.o=.c)
+	$(Q)$(CC) -MM $(GAME_OBJS:.o=.c)
 
-install:
-	cp $(BR)/bspc.$(ARCH)$(BINEXT) $(BSPCDIR)/../../../extras/bspc/
+#install:
+#	cp bspci386 ..
+
+#
+# From "make depend"
+#
 

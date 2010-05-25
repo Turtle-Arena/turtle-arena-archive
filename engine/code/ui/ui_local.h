@@ -57,6 +57,9 @@ extern vmCvar_t	ui_spAwards;
 extern vmCvar_t	ui_spVideos;
 extern vmCvar_t	ui_spSkill;
 
+#ifdef TMNTSP
+extern vmCvar_t ui_spStage;
+#endif
 extern vmCvar_t	ui_spSelection;
 
 extern vmCvar_t	ui_browserMaster;
@@ -87,7 +90,7 @@ extern vmCvar_t	ui_server14;
 extern vmCvar_t	ui_server15;
 extern vmCvar_t	ui_server16;
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 extern vmCvar_t	ui_cdkey;
 extern vmCvar_t	ui_cdkeychecked;
 #endif
@@ -120,7 +123,7 @@ extern vmCvar_t	ui_scoreImpressives;
 extern vmCvar_t	ui_scoreExcellents;
 extern vmCvar_t	ui_scoreDefends;
 extern vmCvar_t	ui_scoreAssists;
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS
 extern vmCvar_t	ui_scoreGauntlets;
 #endif
 extern vmCvar_t	ui_scoreScore;
@@ -202,7 +205,7 @@ typedef struct _tag_menuframework
 
 	qboolean	wrapAround;
 	qboolean	fullscreen;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 	qboolean	showlogo;
 #endif
 #ifdef IOQ3ZTM
@@ -321,7 +324,7 @@ extern sfxHandle_t	menu_move_sound;
 extern sfxHandle_t	menu_out_sound;
 extern sfxHandle_t	menu_buzz_sound;
 extern sfxHandle_t	menu_null_sound;
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 extern sfxHandle_t	weaponChangeSound;
 #endif
 extern vec4_t		menu_text_color;
@@ -337,6 +340,9 @@ extern vec4_t		color_yellow;
 extern vec4_t		color_blue;
 extern vec4_t		color_orange;
 extern vec4_t		color_red;
+#ifdef TMNT // I changed red so that it is white, so I need a new "red"...
+extern vec4_t		color_TMNTred;
+#endif
 extern vec4_t		color_dim;
 extern vec4_t		name_color;
 extern vec4_t		list_color;
@@ -344,8 +350,6 @@ extern vec4_t		listbar_color;
 extern vec4_t		text_color_disabled; 
 extern vec4_t		text_color_normal;
 extern vec4_t		text_color_highlight;
-extern vec4_t		text_banner_color;
-extern vec4_t		text_big_color;
 
 extern char	*ui_medalNames[];
 extern char	*ui_medalPicNames[];
@@ -441,7 +445,7 @@ extern void UI_CinematicsMenu_Cache( void );
 extern void UI_ModsMenu( void );
 extern void UI_ModsMenu_Cache( void );
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 //
 // ui_cdkey.c
 //
@@ -549,22 +553,19 @@ typedef struct {
 	qhandle_t		headModel;
 	qhandle_t		headSkin;
 
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	bg_playercfg_t	playercfg;
 #else
 	animation_t		animations[MAX_TOTALANIMATIONS];
 #endif
 
 	qhandle_t		weaponModel;
+#ifdef TMNTWEAPSYS
+	qhandle_t		weaponModel2;
+#endif
 	qhandle_t		barrelModel;
 	qhandle_t		flashModel;
 	vec3_t			flashDlightColor;
-#ifdef TA_WEAPSYS
-	qhandle_t		weaponModel2;
-	qhandle_t		barrelModel2;
-	qhandle_t		flashModel2;
-	vec3_t			flashDlightColor2;
-#endif
 	int				muzzleFlashTime;
 
 	// currently in use drawing parms
@@ -614,12 +615,12 @@ typedef struct {
 	qhandle_t		whiteShader;
 	qhandle_t		menuBackShader;
 	qhandle_t		menuBackShader2;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 	qhandle_t		menuBackNoLogoShader;
 #endif
 	qhandle_t		charset;
 	qhandle_t		charsetProp;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 	qhandle_t		charsetPropGlow;
 #endif
 	qhandle_t		charsetPropB;
@@ -870,7 +871,7 @@ typedef struct {
 	qhandle_t	q3HeadIcons[MAX_PLAYERMODELS];
 	int				q3SelectedHead;
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	int effectsColor;
 #endif
 
@@ -932,10 +933,13 @@ void UI_SPLevelMenu_ReInit( void );
 // ui_spArena.c
 //
 void UI_SPArena_Start( const char *arenaInfo );
-#ifdef TA_SP
+#ifdef TMNTSP
 void UI_SPMenu( void );
 void UI_SPMenu_f( void );
 void UI_SPMenu_Cache( void );
+void UI_StageMenu( void );
+void UI_StageMenu_f( void );
+void UI_StageMenu_Cache( void );
 #endif
 
 //
@@ -1021,7 +1025,7 @@ void			trap_LAN_ResetPings(int n);
 int				trap_LAN_ServerStatus( const char *serverAddress, char *serverStatus, int maxLen );
 int				trap_LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int s2 );
 int				trap_MemoryRemaining( void );
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 void			trap_GetCDKey( char *buf, int buflen );
 void			trap_SetCDKey( char *buf );
 #endif
@@ -1035,11 +1039,11 @@ void			trap_CIN_DrawCinematic (int handle);
 void			trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
 int				trap_RealTime(qtime_t *qtime);
 void			trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset );
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 qboolean		trap_VerifyCDKey( const char *key, const char *chksum);
 #endif
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 void			trap_SetPbClStatus( int status );
 #endif
 
@@ -1097,7 +1101,7 @@ void UI_NetworkOptionsMenu( void );
 //
 typedef enum {
 	AWARD_ACCURACY,
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 	AWARD_IMPRESSIVE,
 	AWARD_EXCELLENT,
 	AWARD_GAUNTLET,
@@ -1168,7 +1172,7 @@ typedef struct postGameInfo_s {
 	int excellents;
 	int defends;
 	int assists;
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS
 	int gauntlets;
 #endif
 	int	captures;

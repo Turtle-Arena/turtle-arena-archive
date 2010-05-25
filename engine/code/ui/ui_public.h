@@ -88,10 +88,10 @@ typedef enum {
 	UI_CVAR_REGISTER,
 	UI_CVAR_UPDATE,
 	UI_MEMORY_REMAINING,
-//#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: CDKEY (MUST UPDATE ui_syscalls.asm!!)
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
 	UI_GET_CDKEY,
 	UI_SET_CDKEY,
-//#endif
+#endif
 	UI_R_REGISTERFONT,
 	UI_R_MODELBOUNDS,
 	UI_PC_ADD_GLOBAL_DEFINE,
@@ -118,18 +118,18 @@ typedef enum {
 	UI_CIN_DRAWCINEMATIC,
 	UI_CIN_SETEXTENTS,
 	UI_R_REMAP_SHADER,
-//#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: CDKEY (MUST UPDATE ui_syscalls.asm!!)
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: CDKEY
 	UI_VERIFY_CDKEY,
-//#endif
+#endif
 	UI_LAN_SERVERSTATUS,
 	UI_LAN_GETSERVERPING,
 	UI_LAN_SERVERISVISIBLE,
 	UI_LAN_COMPARESERVERS,
 	// 1.32
 	UI_FS_SEEK,
-//#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: punkbuster (MUST UPDATE ui_syscalls.asm!!)
+#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // Turtle Man: punkbuster
 	UI_SET_PBCLSTATUS,
-//#endif
+#endif
 
 	UI_MEMSET = 100,
 	UI_MEMCPY,
@@ -139,9 +139,9 @@ typedef enum {
 	UI_ATAN2,
 	UI_SQRT,
 	UI_FLOOR,
-	UI_CEIL
+	UI_CEIL,
 #ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
-	,UI_ACOS
+	UI_ACOS
 #endif
 } uiImport_t;
 
@@ -149,7 +149,7 @@ typedef enum {
 	UIMENU_NONE,
 	UIMENU_MAIN,
 	UIMENU_INGAME,
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	UIMENU_NEED_CD,
 	UIMENU_BAD_CD_KEY,
 #endif
@@ -162,7 +162,7 @@ typedef enum {
 #define SORT_CLIENTS		2
 #define SORT_GAME			3
 #define SORT_PING			4
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 #define SORT_PUNKBUSTER		5
 #endif
 
@@ -195,7 +195,7 @@ typedef enum {
 
 	UI_DRAW_CONNECT_SCREEN,
 //	void	UI_DrawConnectScreen( qboolean overlay );
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	UI_HASUNIQUECDKEY
 #endif
 // if !overlay, the background will be drawn, otherwise it will be

@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#include "../qcommon/q_shared.h" // ZTM(IOQ3): game to qcommon
+#include "../qcommon/q_shared.h" // Turtle Man(IOQ3): game to qcommon
 #include "../bspc/l_log.h"
 #include "../bspc/l_qfiles.h"
 #include "../botlib/l_memory.h"
@@ -28,8 +28,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../botlib/l_precomp.h"
 #include "../botlib/l_struct.h"
 #include "../botlib/aasfile.h"
-#include "../botlib/botlib.h" // ZTM(IOQ3): game to botlib
-#include "../botlib/be_aas.h" // ZTM(IOQ3): game to botlib
+#include "../botlib/botlib.h" // Turtle Man(IOQ3): game to botlib
+#include "../botlib/be_aas.h" // Turtle Man(IOQ3): game to botlib
 #include "../botlib/be_aas_def.h"
 #include "../qcommon/cm_public.h"
 
@@ -217,7 +217,7 @@ void Com_DPrintf(char *fmt, ...)
 int COM_Compress( char *data_p ) {
 	return strlen(data_p);
 }
-#if 0 // ZTM(IOQ3): Disabled
+#if 0 // Turtle Man(IOQ3): Disabled
 //===========================================================================
 //
 // Parameter:			-

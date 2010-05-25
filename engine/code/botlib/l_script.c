@@ -1440,7 +1440,7 @@ void FreeScript(script_t *script)
 void PS_SetBaseFolder(char *path)
 {
 #ifdef BSPC
-	// ZTM(IOQ3): Stop warning
+	// Turtle Man(IOQ3): Stop warning
 	snprintf(basefolder, sizeof(basefolder), "%s", path);
 #else
 	Com_sprintf(basefolder, sizeof(basefolder), "%s", path);

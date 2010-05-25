@@ -52,7 +52,7 @@ DEMOS MENU
 #define ID_LEFT				14
 
 #define ARROWS_WIDTH		128
-#ifdef TA_DATA
+#ifdef TMNTDATA
 #define ARROWS_HEIGHT		64
 #else
 #define ARROWS_HEIGHT		48
@@ -150,7 +150,7 @@ static void Demos_MenuInit( void ) {
 	s_demos.banner.generic.x		= 320;
 	s_demos.banner.generic.y		= 16;
 	s_demos.banner.string			= "DEMOS";
-	s_demos.banner.color			= text_banner_color;
+	s_demos.banner.color			= color_white;
 	s_demos.banner.style			= UI_CENTER;
 
 	s_demos.framel.generic.type		= MTYPE_BITMAP;
@@ -248,7 +248,7 @@ static void Demos_MenuInit( void ) {
 		
 		// strip extension
 		len = strlen( demoname );
-#ifdef IOQ3ZTM // ZTM: Backported from missionpack ui.
+#ifdef IOQ3ZTM // Turtle Man: Backported from missionpack ui.
 		if (!Q_stricmp(demoname +  len - strlen(extension), extension)) {
 			demoname[len-strlen(extension)-1] = '\0';
 		}

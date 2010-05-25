@@ -1,9 +1,13 @@
 #!/bin/sh
-# ZTM: Based on trem-compile.sh
-# ZTM: NOTE: This is currently NOT used to compile Turtle Arena maps.
 
-# ZTM: Use xreal script?:
+# NOTE: This is currently NOT used to compile TMNT Arena maps.
+
+# Use xreal script?:
 # http://xreal.svn.sourceforge.net/viewvc/xreal/trunk/xreal/base/maps/xmap2_compile?revision=3652&view=markup
+
+# Turtle Man: Based on trem-compile.sh
+#-lightmapsize 512 -lightmapdir "lightmaps" -fast -shade -dirty -patchshadows -samples 3 -bounce 6 -bouncegrid
+#-lightmapsize 512 -lightmapdir "lightmaps" -fast -super 2 -filter -bounce 8
 
 # simple script to compile tremulous .map files with q3map2
 # ingar@telenet.be
@@ -18,8 +22,9 @@
 #q3map2bin="/opt/gtkradiant/q3map2"
 mapdir="../base/maps"
 gamedir=".."
+#gamename="tmnt"
 gamename="quake3"
-q3map2bin="/host/Data/Zack_No_Backup/idtech3/NetRadiant_linux2010_01_07/q3map2.x86"
+q3map2bin="/host/Data/Zack_No_Backup/NetRadiant_linux2009_04_23/q3map2.x86"
 
 # -------------------------------------
 
@@ -46,26 +51,21 @@ q3map="${q3map2bin} -v -game ${gamename} -fs_basepath ${gamedir} -fs_game base"
 if [ "${final}" = "true" ]; then
 	echo "------- COMPILING WITH FINAL SETTINGS ----"
 	# LIGHT options for final compile
-	#bspoptions="-samplesize 8"
+	bspoptions="-samplesize 8"
 	# -scale 1.1
-	#lightoptions="-lightmapsize 512 -fast -shade -dirty -patchshadows -samples 3 -bounce 6 -bouncegrid"
-
-	lightoptions="-lightmapsize 512 -fast -super 2 -filter -bounce 8"
+	lightoptions="-lightmapsize 512 -fast -shade -dirty -patchshadows -samples 3 -bounce 6 -bouncegrid"
 else
 	echo "------- COMPILING WITH FAST SETTINGS ----"
 	# LIGHT options for test compile
-	#bspoptions="-samplesize 16"
+	bspoptions="-samplesize 16"
 	#lightoptions="-lightmapsize 512 -faster -samples 2 -patchshadows"
-
-	lightoptions="-lightmapsize 512 -fast -super 2 -filter"
+	lightoptions="-light -lightmapsize 512 -fast -super 2 -filter -bounce 8"
 fi
-
-bspoptions="-custinfoparms -flares -skyfix"
 
 echo "------- ${map}"
 echo "------- BSP ------------------------------"
 # -leaktest -custinfoparms ${bspoptions} 
-${q3map} -meta ${bspoptions} "${map}"
+${q3map} -meta "${map}"
 if [ ! "$?" = "0" ]; then
 	exit 1;
 fi

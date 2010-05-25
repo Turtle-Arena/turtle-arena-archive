@@ -228,7 +228,7 @@ void trap_SnapVector( float *v ) {
 	return;
 }
 
-#ifdef TA_GAME_MODELS
+#ifdef TMNT_GAME_MODELS
 qhandle_t trap_RegisterModel( const char *name ) {
 	return syscall( G_REGISTERMODEL, name );
 }
@@ -264,7 +264,7 @@ int trap_BotLibStartFrame(float time) {
 	return syscall( BOTLIB_START_FRAME, PASSFLOAT( time ) );
 }
 
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
 int trap_BotLibLoadMap(const char *mapname, void /* bot_shareditem_t */ *itemInfos) {
 	return syscall( BOTLIB_LOAD_MAP, mapname, itemInfos );
 }
@@ -416,7 +416,7 @@ void trap_EA_Attack(int client) {
 	syscall( BOTLIB_EA_ATTACK, client );
 }
 
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 void trap_EA_Use(int client, int holdable) {
 	syscall( BOTLIB_EA_USE, client, holdable );
 }
@@ -458,7 +458,7 @@ void trap_EA_MoveRight(int client) {
 	syscall( BOTLIB_EA_MOVE_RIGHT, client );
 }
 
-#ifdef TA_WEAPSYS_EX // BOTLIB
+#ifdef TMNTWEAPSYS2 // BOTLIB
 void trap_EA_DropWeapon(int client) {
 	syscall( BOTLIB_EA_DROP_WEAPON, client );
 }
@@ -690,7 +690,7 @@ void trap_BotSetAvoidGoalTime(int goalstate, int number, float avoidtime) {
 	syscall( BOTLIB_AI_SET_AVOID_GOAL_TIME, goalstate, number, PASSFLOAT(avoidtime));
 }
 
-#ifndef TA_WEAPSYS // BOT_ITEM_INFOS
+#ifndef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
 void trap_BotInitLevelItems(void) {
 	syscall( BOTLIB_AI_INIT_LEVEL_ITEMS );
 }
@@ -776,7 +776,7 @@ void trap_BotInitMoveState(int handle, void /* struct bot_initmove_s */ *initmov
 	syscall( BOTLIB_AI_INIT_MOVE_STATE, handle, initmove );
 }
 
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS_2
 int trap_BotChooseBestFightWeapon(int weaponstate, int *inventory) {
 	return syscall( BOTLIB_AI_CHOOSE_BEST_FIGHT_WEAPON, weaponstate, inventory );
 }

@@ -139,7 +139,7 @@ void CL_ShowIP_f(void);
 void CL_ServerStatus_f(void);
 void CL_ServerStatusResponse( netadr_t from, msg_t *msg );
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 /*
 ===============
 CL_CDDialog
@@ -234,7 +234,7 @@ void CL_Voip_f( void )
 	else if (!cl_connectedToVoipServer)
 		reason = "Server doesn't support VoIP";
 	else if (
-#ifndef TA_SP
+#ifndef TMNTSP
 	Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
 #endif
 	Cvar_VariableValue("ui_singlePlayerActive"))
@@ -251,7 +251,7 @@ void CL_Voip_f( void )
 		CL_UpdateVoipIgnore(Cmd_Argv(2), qfalse);
 	} else if (strcmp(cmd, "gain") == 0) {
 		if (Cmd_Argc() > 3) {
-			CL_UpdateVoipGain(Cmd_Argv(2), atof(Cmd_Argv(3)));
+		CL_UpdateVoipGain(Cmd_Argv(2), atof(Cmd_Argv(3)));
 		} else if (Q_isanumber(Cmd_Argv(2))) {
 			int id = atoi(Cmd_Argv(2));
 			if (id >= 0 && id < MAX_CLIENTS) {
@@ -273,8 +273,8 @@ void CL_Voip_f( void )
 		clc.voipMuteAll = qfalse;
 	} else {
 		Com_Printf("usage: voip [un]ignore <playerID#>\n"
-		           "       voip [un]muteall\n"
-		           "       voip gain <playerID#> [value]\n");
+				"       voip [un]muteall\n"
+				"       voip gain <playerID#> [value]\n");
 	}
 }
 
@@ -333,6 +333,12 @@ void CL_CaptureVoip(void)
 			dontCapture = qtrue;  // not connected to a server.
 		else if (!cl_connectedToVoipServer)
 			dontCapture = qtrue;  // server doesn't support VoIP.
+		else if (
+#ifndef TMNTSP
+		Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
+#endif
+		Cvar_VariableValue("ui_singlePlayerActive"))
+			dontCapture = qtrue;  // single player game.
 		else if (clc.demoplaying)
 			dontCapture = qtrue;  // playing back a demo.
 		else if ( cl_voip->integer == 0 )
@@ -474,7 +480,7 @@ not have future usercmd_t executed before it is executed
 void CL_AddReliableCommand(const char *cmd, qboolean isDisconnectCmd)
 {
 	int unacknowledged = clc.reliableSequence - clc.reliableAcknowledge;
-	
+
 	// if we would be losing an old command that hasn't been acknowledged,
 	// we must drop the connection
 	// also leave one slot open for the disconnect command in this case.
@@ -485,7 +491,7 @@ void CL_AddReliableCommand(const char *cmd, qboolean isDisconnectCmd)
 		if(com_errorEntered)
 			return;
 		else
-			Com_Error(ERR_DROP, "Client command overflow");
+		Com_Error( ERR_DROP, "Client command overflow" );
 	}
 
 	Q_strncpyz(clc.reliableCommands[++clc.reliableSequence & (MAX_RELIABLE_COMMANDS - 1)],
@@ -1340,8 +1346,8 @@ void CL_RequestMotd( void ) {
 	}
 
 #ifdef IOQ3ZTM
-	// ZTM: Check if there is there a valid motd server
-	//             Because in Turtle Arena there isn't.
+	// Turtle Man: Check if there is there a valid motd server
+	//             Because in TMNT Arena there isn't.
 	if (strlen(UPDATE_SERVER_NAME) < 1)
 	{
 		return;
@@ -1410,7 +1416,7 @@ in anyway.
 */
 #ifndef STANDALONE
 void CL_RequestAuthorization( void ) {
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	char	nums[64];
 	int		i, j, l;
 	cvar_t	*fs;
@@ -2391,7 +2397,7 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 	{
 		if (cls.state != CA_CONNECTING)
 		{
-			Com_DPrintf("Unwanted challenge response received.  Ignored.\n");
+			Com_DPrintf( "Unwanted challenge response received.  Ignored.\n" );
 			return;
 		}
 		
@@ -2411,15 +2417,15 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 		}
 
 		// start sending challenge response instead of challenge request packets
-		clc.challenge = atoi(Cmd_Argv(1));
-		cls.state = CA_CHALLENGING;
-		clc.connectPacketCount = 0;
-		clc.connectTime = -99999;
+			clc.challenge = atoi(Cmd_Argv(1));
+			cls.state = CA_CHALLENGING;
+			clc.connectPacketCount = 0;
+			clc.connectTime = -99999;
 
-		// take this address as the new server address.  This allows
-		// a server proxy to hand off connections to multiple servers
-		clc.serverAddress = from;
-		Com_DPrintf ("challengeResponse: %d\n", clc.challenge);
+			// take this address as the new server address.  This allows
+			// a server proxy to hand off connections to multiple servers
+			clc.serverAddress = from;
+			Com_DPrintf ("challengeResponse: %d\n", clc.challenge);
 		return;
 	}
 
@@ -2430,7 +2436,7 @@ void CL_ConnectionlessPacket( netadr_t from, msg_t *msg ) {
 			return;
 		}
 		if ( cls.state != CA_CHALLENGING ) {
-			Com_Printf ("connectResponse packet while not connecting. Ignored.\n");
+			Com_Printf ("connectResponse packet while not connecting.  Ignored.\n");
 			return;
 		}
 		if ( !NET_CompareAdr( from, clc.serverAddress ) ) {
@@ -2660,7 +2666,7 @@ void CL_Frame ( int msec ) {
 	}
 #endif
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	if ( cls.cddialog ) {
 		// bring up the cd error dialog if needed
 		cls.cddialog = qfalse;
@@ -2983,41 +2989,11 @@ void CL_InitRef( void ) {
 void CL_SetModel_f( void ) {
 	char	*arg;
 	char	name[256];
-#if 0 //#ifdef IOQ3ZTM
-	char headmodel[256];
-#endif
 
 	arg = Cmd_Argv( 1 );
 	if (arg[0]) {
-#if 0 //#ifdef IOQ3ZTM // Only change headmodel if its the same as model.
-/* ZTM: TODO: See below;
-May breaks compatiblity with Quake III: Team Arena?
-	But Team Arena use team_headmodel not headmodel.
-
-It's rather hacky, special case, and may cause comfusion.
-	But only if you've been messing with headmodel in the console.
-	(Or if IOQ3ZTM_NO_TEAM_MODEL is defined in Team Arena...)
-
-Hm... what if headmodel defaulted to "", and if headmodel is "" uses model to get head.
-	So in effect model "controls" headmodel unless it has been set.
-	Plus if you want headmodel to be auto just set it to "".
-	I like it.
-
-And/or change current "model" command to be "player" (set model and headmodel) and have a "model" command that just changes the model and not the headmodel.
-*/
-
-		Cvar_VariableStringBuffer( "model", name, sizeof(name) );
-		Cvar_VariableStringBuffer( "headmodel", headmodel, sizeof(headmodel) );
-
-		if (Q_stricmp(name, headmodel) == 0)
-		{
-			Cvar_Set( "headmodel", arg );
-		}
-		Cvar_Set( "model", arg );
-#else
 		Cvar_Set( "model", arg );
 		Cvar_Set( "headmodel", arg );
-#endif
 	} else {
 		Cvar_VariableStringBuffer( "model", name, sizeof(name) );
 		Com_Printf("model is set to %s\n", name);
@@ -3187,9 +3163,7 @@ void CL_Init( void ) {
 	cl_maxpackets = Cvar_Get ("cl_maxpackets", "30", CVAR_ARCHIVE );
 	cl_packetdup = Cvar_Get ("cl_packetdup", "1", CVAR_ARCHIVE );
 
-#ifndef TURTLEARENA // ALWAYS_RUN
 	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE);
-#endif
 	cl_sensitivity = Cvar_Get ("sensitivity", "5", CVAR_ARCHIVE);
 	cl_mouseAccel = Cvar_Get ("cl_mouseAccel", "0", CVAR_ARCHIVE);
 	cl_freelook = Cvar_Get( "cl_freelook", "1", CVAR_ARCHIVE );
@@ -3222,7 +3196,7 @@ void CL_Init( void ) {
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
 
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 	// init autoswitch so the ui will have it correctly even
 	// if the cgame hasn't been started
 	Cvar_Get ("cg_autoswitch", "1", CVAR_ARCHIVE);
@@ -3257,11 +3231,11 @@ void CL_Init( void ) {
 
 	// userinfo
 	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("rate", "25000", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("rate", "3000", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("snaps", "20", CVAR_USERINFO | CVAR_ARCHIVE );
-#ifdef TURTLEARENA
+#ifdef TMNT
 	// DEFAULT_PLAYER
-#ifdef TA_SP // SPMODEL
+#ifdef TMNTSP // SPMODEL
 	Cvar_Get ("spmodel", "raph", CVAR_USERINFO | CVAR_ROM );
 	Cvar_Get ("spheadmodel", "raph", CVAR_USERINFO | CVAR_ROM );
 #endif
@@ -3284,13 +3258,8 @@ void CL_Init( void ) {
 	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #endif
-#ifdef TURTLEARENA
-	Cvar_Get ("color1",  "5", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("color2", "4", CVAR_USERINFO | CVAR_ARCHIVE );
-#else
 	Cvar_Get ("color1",  "4", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("color2", "5", CVAR_USERINFO | CVAR_ARCHIVE );
-#endif
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("teamtask", "0", CVAR_USERINFO );
 	Cvar_Get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
@@ -3323,7 +3292,7 @@ void CL_Init( void ) {
 	//  just demand it. Who doesn't have at least a DSL line now, anyhow? If
 	//  you don't, you don't need VoIP.  :)
 	if ((cl_voip->integer) && (Cvar_VariableIntegerValue("rate") < 25000)) {
-		Com_Printf(S_COLOR_YELLOW "Your network rate is too slow for VoIP.\n");
+		Com_Printf("Your network rate is too slow for VoIP.\n");
 		Com_Printf("Set 'Data Rate' to 'LAN/Cable/xDSL' in 'Setup/System/Network' and restart.\n");
 		Com_Printf("Until then, VoIP is disabled.\n");
 		Cvar_Set("cl_voip", "0");
@@ -3386,14 +3355,14 @@ CL_Shutdown
 
 ===============
 */
-void CL_Shutdown( char *finalmsg ) {
+void CL_Shutdown( void ) {
 	static qboolean recursive = qfalse;
 	
 	// check whether the client is running at all.
 	if(!(com_cl_running && com_cl_running->integer))
 		return;
 	
-	Com_Printf( "----- Client Shutdown (%s) -----\n", finalmsg );
+	Com_Printf( "----- CL_Shutdown -----\n" );
 
 	if ( recursive ) {
 		Com_Printf( "WARNING: Recursive shutdown\n" );
@@ -3452,7 +3421,7 @@ static void CL_SetServerInfo(serverInfo_t *server, const char *info, int ping) {
 			server->netType = atoi(Info_ValueForKey(info, "nettype"));
 			server->minPing = atoi(Info_ValueForKey(info, "minping"));
 			server->maxPing = atoi(Info_ValueForKey(info, "maxping"));
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 			server->punkbuster = atoi(Info_ValueForKey(info, "punkbuster"));
 #endif
 		}
@@ -3572,7 +3541,7 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.localServers[i].game[0] = '\0';
 	cls.localServers[i].gameType = 0;
 	cls.localServers[i].netType = from.type;
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	cls.localServers[i].punkbuster = 0;
 #endif
 									 
@@ -4276,13 +4245,14 @@ void CL_ShowIP_f(void) {
 	Sys_ShowIP();
 }
 
+#ifndef STANDALONE
 /*
 =================
 bool CL_CDKeyValidate
 =================
 */
 qboolean CL_CDKeyValidate( const char *key, const char *checksum ) {
-#ifdef STANDALONE
+#ifndef IOQUAKE3 // Turtle Man: CDKEY
 	return qtrue;
 #else
 	char	ch;
@@ -4343,3 +4313,4 @@ qboolean CL_CDKeyValidate( const char *key, const char *checksum ) {
 	return qfalse;
 #endif
 }
+#endif

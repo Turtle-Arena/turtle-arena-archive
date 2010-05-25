@@ -181,7 +181,7 @@ qboolean	NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask);
 qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b);
 qboolean	NET_IsLocalAddress (netadr_t adr);
 const char	*NET_AdrToString (netadr_t a);
-const char	*NET_AdrToStringwPort (netadr_t a);
+const char      *NET_AdrToStringwPort (netadr_t a);
 int		NET_StringToAdr ( const char *s, netadr_t *a, netadrtype_t family);
 qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_message);
 void		NET_JoinMulticast6(void);
@@ -242,8 +242,8 @@ PROTOCOL
 ==============================================================
 */
 
-#ifdef TURTLEARENA
-#define	PROTOCOL_VERSION	2
+#ifdef TMNT
+#define	PROTOCOL_VERSION	1
 #else
 #define	PROTOCOL_VERSION	68
 // 1.31 - 67
@@ -253,14 +253,14 @@ PROTOCOL
 // NOTE: that stuff only works with two digits protocols
 extern int demo_protocols[];
 
-#ifdef TURTLEARENA // Don't talk to quake3arena.com
+#ifdef TMNT // Don't talk to quake3arena.com.
 #define	UPDATE_SERVER_NAME	""
 #else
 #define	UPDATE_SERVER_NAME	"update.quake3arena.com"
 #endif
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
-#if 0 // #ifdef TURTLEARENA // ZTM: TODO: Use a different master server?
+#ifdef TMNT // Don't talk to quake3arena.com.
 #define MASTER_SERVER_NAME	""
 #else
 #define MASTER_SERVER_NAME	"master.quake3arena.com"
@@ -593,7 +593,7 @@ issues.
 
 #define	MAX_FILE_HANDLES	64
 
-#ifdef TURTLEARENA // BRANDING
+#ifdef TMNTMISC // Config file name
 #ifdef DEDICATED
 #	define Q3CONFIG_CFG "config_server.cfg"
 #else
@@ -768,7 +768,7 @@ MISC
 ==============================================================
 */
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 // centralizing the declarations for cl_cdkey
 // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=470
 extern char cl_cdkey[34];
@@ -839,9 +839,6 @@ void		Com_StartupVariable( const char *match );
 // only a set with the exact name.  Only used during startup.
 
 
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-extern	cvar_t	*com_fs_pure;
-#endif
 extern	cvar_t	*com_developer;
 extern	cvar_t	*com_dedicated;
 extern	cvar_t	*com_speeds;
@@ -973,7 +970,7 @@ void CL_InitKeyCommands( void );
 
 void CL_Init( void );
 void CL_Disconnect( qboolean showMainMenu );
-void CL_Shutdown( char *finalmsg );
+void CL_Shutdown( void );
 void CL_Frame( int msec );
 qboolean CL_GameCommand( void );
 void CL_KeyEvent (int key, qboolean down, unsigned time);
@@ -1000,7 +997,7 @@ void	CL_ForwardCommandToServer( const char *string );
 // things like godmode, noclip, etc, are commands directed to the server,
 // so when they are typed in at the console, they will need to be forwarded.
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 void CL_CDDialog( void );
 // bring up the "need a cd to play" dialog
 #endif
@@ -1042,7 +1039,7 @@ qboolean SV_GameCommand( void );
 // UI interface
 //
 qboolean UI_GameCommand( void );
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 qboolean UI_usesUniqueCDKey(void);
 #endif
 
@@ -1127,7 +1124,6 @@ char    *Sys_DefaultAppPath(void);
 
 void  Sys_SetDefaultHomePath(const char *path);
 char	*Sys_DefaultHomePath(void);
-const char	*Sys_TempPath(void);
 const char *Sys_Dirname( char *path );
 const char *Sys_Basename( char *path );
 char *Sys_ConsoleInput(void);
@@ -1139,27 +1135,6 @@ void	Sys_Sleep(int msec);
 qboolean Sys_LowPhysicalMemory( void );
 
 void Sys_SetEnv(const char *name, const char *value);
-
-typedef enum
-{
-	DR_YES = 0,
-	DR_NO = 1,
-	DR_OK = 0,
-	DR_CANCEL = 1
-} dialogResult_t;
-
-typedef enum
-{
-	DT_INFO,
-	DT_WARNING,
-	DT_ERROR,
-	DT_YES_NO,
-	DT_OK_CANCEL
-} dialogType_t;
-
-dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title );
-
-qboolean Sys_WritePIDFile( void );
 
 /* This is based on the Adaptive Huffman algorithm described in Sayood's Data
  * Compression book.  The ranks are not actually stored, but implicitly defined

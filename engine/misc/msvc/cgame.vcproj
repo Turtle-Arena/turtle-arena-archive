@@ -1506,7 +1506,7 @@
 			<File
 				RelativePath=".\cgame.def"
 				>
-			</File>
+		</File>
 		</Filter>
 	</Files>
 	<Globals>

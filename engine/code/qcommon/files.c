@@ -174,20 +174,12 @@ or configs will never get loaded from disk!
 
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
-#if defined STANDALONE && defined IOQ3ZTM /* && defined TURTLEARENA */ // FS_PURE
-// Turtle Arena and ioq3turtle
-#define PAK "assets"
-#define PAK_LEN 6
-#define NUM_DEFAULT_PAKS 1 // Maximum 10
+#ifdef TMNT
+#define NUM_DEFAULT_PAKS 1 // Allows for assets0.pk3 through assets9.pk3
 static const unsigned pak_checksums[NUM_DEFAULT_PAKS] = {
-	2799211236u
+	2192442826u
 };
 #else
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-#define PAK "pak"
-#define PAK_LEN 3
-#define NUM_DEFAULT_PAKS NUM_ID_PAKS // 9
-#endif
 #define	DEMO_PAK0_CHECKSUM	2985612116u
 static const unsigned pak_checksums[] = {
 	1566731103u,
@@ -2253,18 +2245,6 @@ int	FS_GetModList( char *listbuf, int bufsize ) {
 					nDescLen = fread(descPath, 1, 48, file);
 					if (nDescLen >= 0) {
 						descPath[nDescLen] = '\0';
-#ifdef IOQ3ZTM // Remove newline from description.txt
-						nDescLen--;
-
-						// Remove \n, \r\n, and \r
-						if (nDescLen >= 0 && descPath[nDescLen] == '\n') {
-							descPath[nDescLen] = '\0';
-							nDescLen--;
-						}
-						if (nDescLen >= 0 && descPath[nDescLen] == '\r') {
-							descPath[nDescLen] = '\0';
-						}
-#endif
 					}
 					FS_FCloseFile(descHandle);
 				} else {
@@ -2563,7 +2543,7 @@ void FS_AddGameDirectory( const char *path, const char *dir ) {
 			continue;
 		// store the game name for downloading
 		strcpy(pak->pakGamename, dir);
-		
+
 		fs_packFiles += pak->numfiles;
 
 		search = Z_Malloc (sizeof(searchpath_t));
@@ -2588,33 +2568,18 @@ qboolean FS_idPak( char *pak, char *base ) {
 		if ( !FS_FilenameCompare(pak, va("%s/pak%d", base, i)) ) {
 			break;
 		}
+#ifdef TMNT
+		// Don't auto download assets either. (TMNT Arena uses assets0.pk3 instead of pak0.pk3)
+		if ( !FS_FilenameCompare(pak, va("%s/assets%d", base, i)) ) {
+			break;
+		}
+#endif
 	}
 	if (i < NUM_ID_PAKS) {
 		return qtrue;
 	}
 	return qfalse;
 }
-
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-/*
-================
-FS_DefaultPak
-================
-*/
-qboolean FS_DefaultPak( char *pak, char *base ) {
-	int i;
-
-	for (i = 0; i < NUM_DEFAULT_PAKS; i++) {
-		if ( !FS_FilenameCompare(pak, va("%s/%s%d", base, PAK, i)) ) {
-			break;
-		}
-	}
-	if (i < NUM_DEFAULT_PAKS) {
-		return qtrue;
-	}
-	return qfalse;
-}
-#endif
 
 /*
 ================
@@ -2677,17 +2642,13 @@ qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring ) {
 		havepak = qfalse;
 
 		// never autodownload any of the id paks
-		if ( FS_idPak(fs_serverReferencedPakNames[i], "baseq3")
+		if ( FS_idPak(fs_serverReferencedPakNames[i], BASEGAME)
+#ifdef STANDALONE // IOQ3ZTM // Someone could use id paks as a mod.
+		|| FS_idPak(fs_serverReferencedPakNames[i], "baseq3")
+#endif
 		|| FS_idPak(fs_serverReferencedPakNames[i], "missionpack") ) {
 			continue;
 		}
-
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-		// never autodownload any of the default paks
-		if ( FS_DefaultPak(fs_serverReferencedPakNames[i], BASEGAME) ) {
-			continue;
-		}
-#endif
 
 		// Make sure the server cannot make us write to non-quake3 directories.
 		if(FS_CheckDirTraversal(fs_serverReferencedPakNames[i]))
@@ -2790,9 +2751,9 @@ void FS_Shutdown( qboolean closemfp ) {
 		if(p->pack)
 			FS_FreePak(p->pack);
 		if (p->dir)
-			Z_Free(p->dir);
+			Z_Free( p->dir );
 
-		Z_Free(p);
+		Z_Free( p );
 	}
 
 	// any FS_ calls will now be an error until reinitialized
@@ -2810,7 +2771,7 @@ void FS_Shutdown( qboolean closemfp ) {
 #endif
 }
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 void Com_AppendCDKey( const char *filename );
 void Com_ReadCDKey( const char *filename );
@@ -2859,26 +2820,6 @@ static void FS_ReorderPurePaks( void )
 
 /*
 ================
-FS_BaseFileExists
-================
-*/
-qboolean FS_BaseFileExists( const char *file )
-{
-	FILE *f;
-	char *testpath;
-
-	testpath = FS_BuildOSPath( fs_basepath->string, BASEGAME, file );
-
-	f = fopen( testpath, "rb" );
-	if (f) {
-		fclose( f );
-		return qtrue;
-	}
-	return qfalse;
-}
-
-/*
-================
 FS_Startup
 ================
 */
@@ -2901,18 +2842,6 @@ static void FS_Startup( const char *gameName )
 	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 
 	// add search path elements in reverse priority order
-#if !defined WIN32 && !defined MACOS_X
-	if (fs_basepath->string[0] == '.' && !FS_BaseFileExists("default.cfg")
-		&& !FS_BaseFileExists("pak0.pk3") && !FS_BaseFileExists("assets0.pk3"))
-	{
-		// Required files are missing, use location of the Deb package data
-#ifdef TURTLEARENA
-		Cvar_Set("fs_basepath", "/usr/share/games/turtlearena" );
-#else
-		Cvar_Set("fs_basepath", "/usr/share/games/ioquake3" );
-#endif
-	}
-#endif
 	if (fs_basepath->string[0]) {
 		FS_AddGameDirectory( fs_basepath->string, gameName );
 	}
@@ -2951,7 +2880,7 @@ static void FS_Startup( const char *gameName )
 		}
 	}
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 	if(!Cvar_VariableIntegerValue("com_standalone"))
 	{
@@ -2964,7 +2893,7 @@ static void FS_Startup( const char *gameName )
 		}
 	}
 #endif
-#endif // ZTM: CDKEY
+#endif // Turtle Man: CDKEY
 
 	// add our commands
 	Cmd_AddCommand ("path", FS_Path_f);
@@ -3097,7 +3026,7 @@ static void FS_CheckPak0( void )
 }
 #endif
 
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+#ifdef TMNT
 /*
 ===================
 FS_CheckPaks
@@ -3107,15 +3036,11 @@ Checks that assets0.pk3 is present and its checksum is correct
 */
 static void FS_CheckPaks( void )
 {
+#ifdef TMNTRELEASE // Only for release version (That has pk3 files).
+	// Turtle Man: Make sure all of the default pk3 file(s) are found and unmodified, like in SRB2...
 	searchpath_t	*path;
 	unsigned foundPak = 0;
 	unsigned invalidPak = 0;
-	qboolean hasPakFile = qfalse;
-	int i, total = 0;
-
-	// If we're not pure don't check
-	if (com_fs_pure && !com_fs_pure->integer)
-		return;
 
 	for( path = fs_searchpaths; path; path = path->next )
 	{
@@ -3124,56 +3049,46 @@ static void FS_CheckPaks( void )
 		if (!path->pack)
 			continue;
 
-		hasPakFile = qtrue;
-
 		if(!Q_stricmpn( path->pack->pakGamename, BASEGAME, MAX_OSPATH )
-			&& strlen(pakBasename) == PAK_LEN+1 && !Q_stricmpn( pakBasename, PAK, PAK_LEN )
-			&& pakBasename[PAK_LEN] >= '0' && pakBasename[PAK_LEN] < '0'+NUM_DEFAULT_PAKS)
+			&& strlen(pakBasename) == 4 && !Q_stricmpn( pakBasename, "assets", 3 )
+			&& pakBasename[3] >= '0' && pakBasename[3] < '0'+NUM_DEFAULT_PAKS)
 		{
-			if( path->pack->checksum != pak_checksums[pakBasename[PAK_LEN]-'0'] )
+			if( path->pack->checksum != pak_checksums[pakBasename[3]-'0'] )
 			{
 				Com_Printf("\n\n"
-					"**********************************************************************\n"
-					"WARNING: %s%d.pk3 is present but its checksum (%u) is not correct.\n"
-					"**********************************************************************\n\n\n",
-					PAK, pakBasename[PAK_LEN]-'0', path->pack->checksum );
+					"**************************************************\n"
+					"WARNING: assets%d.pk3 is present but its checksum (%u)\n"
+					"is not correct. Please re-install the point release\n"
+					"**************************************************\n\n\n",
+					pakBasename[3]-'0', path->pack->checksum );
 
-				invalidPak |= 1<<(pakBasename[PAK_LEN]-'0');
+				invalidPak |= 1<<(pakBasename[3]-'0');
 			}
 			else
 			{
 				// Found pk3 AND its checksum matches.
-				foundPak |= 1<<(pakBasename[PAK_LEN]-'0');
+				foundPak |= 1<<(pakBasename[3]-'0');
 			}
 		}
 	}
 
-	// Add up total value of foundPak
-	for (i = 0; i < NUM_DEFAULT_PAKS; i++) {
-		total += 1<<i;
-	}
-
-	if (((foundPak & total) != total) || invalidPak)
+	if ( !(foundPak & (1<<NUM_DEFAULT_PAKS)) || invalidPak )
 	{
-		const char *line1 = NULL;
-		const char *line2 = "You need to reinstall " PRODUCT_NAME " in order to play on pure servers.";
-
-		// server can't ever be pure (sv_pure), as we're missing the pure files.
-		Cvar_Set("fs_pure", "0");
+		Com_Printf("\n\n"
+			"Check that the executable is in\n"
+			"the correct place and that every file\n"
+			"in the '%s' directory is present and readable.\n\n", BASEGAME);
 
 		if (invalidPak)
-			line1 = "Default Pk3 file(s) are missing, corrupt, or modified.";
+		{
+			Com_Error(ERR_FATAL, "Default Pk3 file(s) are missing, corrupt, or modified.\nYou need to reinstall TMNT Arena in order to play");
+		}
 		else
-			line1 = "Missing default Pk3 file(s).";
-
-		Com_Printf(S_COLOR_YELLOW "WARNING: %s\n%s\n", line1, line2);
-
-#ifndef DEDICATED
-		// Don't warn developers; development takes place without Pk3 files, the files are unzipped.
-		if (hasPakFile || !FS_BaseFileExists("default.cfg"))
-			Sys_Dialog( DT_WARNING, va("%s %s", line1, line2), "Unpure" );
-#endif
+		{
+			Com_Error(ERR_FATAL, "Missing default Pk3 file(s).\nYou need to reinstall TMNT Arena in order to play");
+		}
 	}
+#endif
 }
 #endif
 
@@ -3543,12 +3458,11 @@ void FS_InitFilesystem( void ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+#ifdef TMNT
 	FS_CheckPaks();
-#else
+#endif
 #ifndef STANDALONE
 	FS_CheckPak0( );
-#endif
 #endif
 
 	// if we can't find default.cfg, assume that the paths are
@@ -3582,12 +3496,11 @@ void FS_Restart( int checksumFeed ) {
 	// try to start up normally
 	FS_Startup( BASEGAME );
 
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+#ifdef TMNT
 	FS_CheckPaks();
-#else
+#endif
 #ifndef STANDALONE
 	FS_CheckPak0( );
-#endif
 #endif
 
 	// if we can't find default.cfg, assume that the paths are
@@ -3595,7 +3508,7 @@ void FS_Restart( int checksumFeed ) {
 	// graphics screen when the font fails to load
 	if ( FS_ReadFile( "default.cfg", NULL ) <= 0 ) {
 		// this might happen when connecting to a pure server not using BASEGAME/pak0.pk3
-		// (for instance a Team Arena demo server)
+		// (for instance a TA demo server)
 		if (lastValidBase[0]) {
 			FS_PureServerSetLoadedPaks("", "");
 			Cvar_Set("fs_basepath", lastValidBase);

@@ -962,7 +962,7 @@ static byte getImageA(byte *targa_rgba, int x, int y, int columns, int rows)
 	return *pixbuf;
 }
 
-#if 0 // ZTM: This is unused so disable it.
+#if 0 // Turtle Man: This is unused so disable it.
 static void setImageA(byte *targa_rgba, int x, int y, int columns, int rows, byte value)
 {
 	byte	*pixbuf;
@@ -1275,7 +1275,7 @@ static void kuwahara(int columns, int rows, byte *targa_rgba){
 }
 
 
-#if 0 // ZTM: This is unused so disable it.
+#if 0 // Turtle Man: This is unused so disable it.
 #define FLT_MAX		3.40282346638528860000e+38
 static void kuwahara3(int columns, int rows, byte *targa_rgba)
 {
@@ -1491,13 +1491,13 @@ typedef struct
 // when there are multiple images of different formats available
 static imageExtToLoaderMap_t imageLoaders[ ] =
 {
-#ifdef TA_DATA // Load PNG first.
+#ifdef TMNTMISC // Load PNG first.
 	{ "png",  R_LoadPNG },
 #endif
 	{ "tga",  R_LoadTGA },
 	{ "jpg",  R_LoadJPG },
 	{ "jpeg", R_LoadJPG },
-#ifndef TA_DATA
+#ifndef TMNTMISC
 	{ "png",  R_LoadPNG },
 #endif
 	{ "pcx",  R_LoadPCX },
@@ -2247,7 +2247,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		surf = skin->surfaces[ skin->numSurfaces ] = ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low );
 		Q_strncpyz( surf->name, surfName, sizeof( surf->name ) );
 #ifdef IOQ3ZTM // $DIR_IN_SKIN
-		// Lengths "$(dir)"=6, PATH_SEPERATOR=1, path=1 or more
+		// 6: "$(dir)" 1: '/' or '\\' 1+: path
 		//  $(dir)/torso.png
 		if (strlen(token) > 6 && Q_stricmpn("$(dir)", token, 6) == 0)
 		{

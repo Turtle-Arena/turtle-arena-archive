@@ -212,13 +212,8 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		}
 
 		hcolor[3] = fade * 0.7;
-#ifdef IOQ3ZTM // ZTM: Use correct width
-		CG_FillRect( SB_SCORELINE_X + BIGCHAR_WIDTH + (SB_RATING_WIDTH / 2), y, 
-			640 - SB_SCORELINE_X - BIGCHAR_WIDTH - (SB_RATING_WIDTH / 2), BIGCHAR_HEIGHT+1, hcolor );
-#else
 		CG_FillRect( SB_SCORELINE_X + BIGCHAR_WIDTH + (SB_RATING_WIDTH / 2), y, 
 			640 - SB_SCORELINE_X - BIGCHAR_WIDTH, BIGCHAR_HEIGHT+1, hcolor );
-#endif
 	}
 
 	CG_DrawBigString( SB_SCORELINE_X + (SB_RATING_WIDTH / 2), y, string, fade );
@@ -277,8 +272,6 @@ qboolean CG_DrawOldScoreboard( void ) {
 	int lineHeight;
 	int topBorderSize, bottomBorderSize;
 
-	CG_HudPlacement(HUD_CENTER);
-
 	// don't draw amuthing if the menu or console is up
 	if ( cg_paused.integer ) {
 		cg.deferredPlayerLoading = 0;
@@ -295,7 +288,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 		return qfalse;
 	}
 
-#ifdef TA_SP
+#ifdef TMNTSP
 	if ( cgs.gametype == GT_SINGLE_PLAYER && cg.predictedPlayerState.stats[STAT_HEALTH] <= 0
 		&& !cg.showScores )
 	{
@@ -323,7 +316,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 	// fragged by ... line
 	if ( cg.killerName[0] ) {
-#ifdef NOTRATEDM // frag to KO
+#ifdef TMNTMISC // frag to KO
 		s = va("Knocked out by %s", cg.killerName );
 #else
 		s = va("Fragged by %s", cg.killerName );
@@ -336,12 +329,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 	// current rank
 	if ( cgs.gametype < GT_TEAM) {
-		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR
-#ifdef TA_SP
-			&& cgs.gametype != GT_SINGLE_PLAYER
-#endif
-			)
-		{
+		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 			s = va("%s place with %i",
 				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
 				cg.snap->ps.persistant[PERS_SCORE] );

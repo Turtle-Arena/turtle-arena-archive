@@ -25,7 +25,7 @@
  *  This file sets things up for C dynamic library function definitions,
  *  static inlined functions, and structures aligned at 4-byte alignment.
  *  If you don't like ugly C preprocessor code, don't look at this file. :)
- */
+*/
 
 /** 
  *  @file begin_code.h
@@ -90,22 +90,22 @@
  *  By default SDL uses the C calling convention
  */
 #ifndef SDLCALL
-# if defined(__WIN32__) && !defined(__GNUC__)
-#  define SDLCALL __cdecl
+#if defined(__WIN32__) && !defined(__GNUC__)
+#define SDLCALL __cdecl
 # elif defined(__OS2__)
 #  if defined (__GNUC__) && __GNUC__ < 4
 #   /* Added support for GCC-EMX <v4.x */
 #   /* this is needed for XFree86/OS2 developement */
 #   /* F. Ambacher(anakor@snafu.de) 05.2008 */
 #   define SDLCALL _cdecl
-#  else
+#else
 #   /* On other compilers on OS/2, we use the _System calling convention */
 #   /* to be compatible with every compiler */
-#   define SDLCALL _System
+#define SDLCALL _System
 #  endif
-# else
-#  define SDLCALL
-# endif
+#else
+#define SDLCALL
+#endif
 #endif /* SDLCALL */
 
 #ifdef __SYMBIAN32__ 
@@ -171,7 +171,7 @@
  *  If inlining isn't supported, remove "__inline__", turning static
  *  inlined functions into static functions (resulting in code bloat
  *  in all files which include the offending header files)
- */
+*/
 #ifndef SDL_INLINE_OKAY
 #define __inline__
 #endif

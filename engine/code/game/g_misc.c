@@ -103,7 +103,7 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	// toggle the teleport bit so the client knows to not lerp
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 	if (g_teleportFluxTime.integer)
 	{
 		player->client->ps.powerups[PW_FLASHING] = level.time + g_teleportFluxTime.integer * 1000;
@@ -117,7 +117,7 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 
 	// kill anything at the destination
 	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 		if (!player->client->ps.powerups[PW_FLASHING])
 #endif
 		G_KillBox (player);
@@ -269,10 +269,10 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 		VectorCopy( ent->movedir, dir );
 	}
 
-#ifdef TURTLEARENA // LOCKON
+#ifdef TMNT
 	if (ent->random == -1)
 	{
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 		G_AutoAim(ent, bg_weapongroupinfo[ent->s.weapon].weapon[0]->projnum,
 				ent->s.origin, dir, right, up);
 #else
@@ -282,24 +282,24 @@ void Use_Shooter( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	else
 	{
 #endif
-		// randomize a bit
-		PerpendicularVector( up, dir );
-		CrossProduct( up, dir, right );
+	// randomize a bit
+	PerpendicularVector( up, dir );
+	CrossProduct( up, dir, right );
 
-		deg = crandom() * ent->random;
-		VectorMA( dir, deg, up, dir );
+	deg = crandom() * ent->random;
+	VectorMA( dir, deg, up, dir );
 
-		deg = crandom() * ent->random;
-		VectorMA( dir, deg, right, dir );
+	deg = crandom() * ent->random;
+	VectorMA( dir, deg, right, dir );
 
-		VectorNormalize( dir );
-#ifdef TURTLEARENA
+	VectorNormalize( dir );
+#ifdef TMNT
 	}
 #endif
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	if (!fire_weapon(ent, ent->s.origin, dir, right, up,
-				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], 1, HS_CENTER))
+				bg_weapongroupinfo[ent->s.weapon].weaponnum[0], 1))
 	{
 		return;
 	}
@@ -335,15 +335,15 @@ void InitShooter( gentity_t *ent, int weapon ) {
 
 	G_SetMovedir( ent->s.angles, ent->movedir );
 
-#ifdef TURTLEARENA // LOCKON
+#ifdef TMNT // G_AutoAim
 	if (ent->random != -1)
 	{
 #endif
-		if ( !ent->random ) {
-			ent->random = 1.0;
-		}
-		ent->random = sin( M_PI * ent->random / 180 );
-#ifdef TURTLEARENA // LOCKON
+	if ( !ent->random ) {
+		ent->random = 1.0;
+	}
+	ent->random = sin( M_PI * ent->random / 180 );
+#ifdef TMNT // G_AutoAim
 	}
 #endif
 	// target might be a moving object, so we can't set movedir for it
@@ -354,7 +354,7 @@ void InitShooter( gentity_t *ent, int weapon ) {
 	trap_LinkEntity( ent );
 }
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 /*QUAKED misc_shooter (1 0 0) (-16 -16 -16) (16 16 16)
 Fires at either the target or the current direction.
 "random" the number of degrees of deviance from the taget. (1.0 default)
@@ -371,7 +371,7 @@ Fires at either the target or the current direction.
 "random" the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_rocket( gentity_t *ent ) {
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	InitShooter( ent, BG_WeaponGroupIndexForName("wp_rocket_launcher") );
 #else
 	InitShooter( ent, WP_ROCKET_LAUNCHER );
@@ -383,13 +383,15 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_plasma( gentity_t *ent ) {
-#ifdef TA_WEAPSYS
-	int weapon;
+#ifdef TMNTWEAPSYS_2
+	int weapon = 0;
 
-	weapon = BG_WeaponGroupIndexForName("wp_plasmagun");
-#ifdef TURTLEARENA // WEAPONS
+#ifdef TMNTWEAPONS
+	weapon = BG_WeaponGroupIndexForName("wp_electric_launcher");
+#endif
+#if !defined TMNT || defined TMNT_SUPPORTQ3
 	if (!weapon) {
-		weapon = BG_WeaponGroupIndexForName("wp_electric_launcher");
+		weapon = BG_WeaponGroupIndexForName("wp_plasmagun");
 	}
 #endif
 
@@ -404,13 +406,15 @@ Fires at either the target or the current direction.
 "random" is the number of degrees of deviance from the taget. (1.0 default)
 */
 void SP_shooter_grenade( gentity_t *ent ) {
-#ifdef TA_WEAPSYS
-	int weapon;
+#ifdef TMNTWEAPSYS_2
+	int weapon = 0;
 
-	weapon = BG_WeaponGroupIndexForName("wp_grenade_launcher");
-#ifdef TURTLEARENA // WEAPONS
+#ifdef TMNTWEAPONS
+	weapon = BG_WeaponGroupIndexForName("wp_homing_launcher");
+#endif
+#if !defined TMNT || defined TMNT_SUPPORTQ3
 	if (!weapon) {
-		weapon = BG_WeaponGroupIndexForName("wp_homing_launcher");
+		weapon = BG_WeaponGroupIndexForName("wp_grenade_launcher");
 	}
 #endif
 
@@ -461,7 +465,7 @@ void DropPortalDestination( gentity_t *player ) {
 	ent->count = player->client->portalID;
 
 	// give the item back so they can drop the source now
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 	player->client->ps.holdableIndex = HI_PORTAL;
 	player->client->ps.holdable[HI_PORTAL]++;
 #else
@@ -581,7 +585,9 @@ void DropPortalSource( gentity_t *player ) {
 
 }
 #endif
-#ifdef TA_ENTSYS // MISC_OBJECT
+#ifdef TMNTENTSYS // MISC_OBJECT
+// Turtle Man: TODO: There should also be func_* for brushes that acts mostly the same?
+
 /*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath
 "model"		arbitrary .md3 file to display
 
@@ -627,40 +633,22 @@ void misc_object_pain(gentity_t *self, gentity_t *attacker, int damage)
 		G_SetMiscAnim(self, OBJECT_DEATH1);
 		//G_Printf("    anim = OBJECT_DEATH1\n");
 	}
+
+	// Turtle Man: TODO: Limit how soon to call paintarget again? Use pain_debounce?
+	if ( self->paintarget )
+	{
+		G_UseTargets2(self, attacker, self->paintarget);
+	}
 }
 
 gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles);
 
 void misc_object_respawn(gentity_t *self)
 {
-	// Don't let the humans see it respawn
-	if (G_SeenByHumans(self))
-	{
-		// Defer for a max of the total respawn time
-		if (self->random < self->wait)
-		{
-			self->random++;
-
-			// Try again later
-			self->nextthink = level.time + 1000;
-			self->think = misc_object_respawn;
-			return;
-		}
-	}
-	self->random = 0; // clear defer count
-
-	// Kill players so they don't get stuck
-	G_KillBox(self);
-
-	// Remove dropped item
-	if (self->enemy) {
-		G_FreeEntity(self->enemy);
-	}
-
-	//G_Printf("misc_object_respawn: respawning...\n");
+	G_Printf("misc_object_respawn: respawning...\n");
 	if (self->activator->spawnflags & MOBJF_KNOCKBACK)
 	{
-		// ZTM: FIXME: Not right if "self" moved from origin.
+		// Turtle Man: FIXME: Not right if "self" moved from origin.
 
 		// MOBJ_KNOCKBACK doesn't work with respawning if...
 		//  clone spawning or on train? (or other moving brush?)
@@ -708,36 +696,12 @@ void misc_object_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 		self->think = misc_object_respawn;
 	}
 
-	G_UseTargets(self, attacker);
-
-	// Spawn item
-	if (self->message)
+	if( self->target )
 	{
-		vec3_t origin, pos1, pos2;
-
-		// Tequila comment: set breakable center as origin for G_BreakableRespawn needs
-		VectorSubtract(self->r.absmax, self->r.absmin, pos1);
-		VectorScale(pos1, 0.5f, pos2);
-		VectorAdd(pos2, self->r.absmin, origin);
-
-		if (Q_stricmp(self->message, "weapon_random") == 0) {
-			// weapon_random: Change item!
-			if (!(self->s.eFlags & EF_VOTED) && !self->item) {
-				self->item = G_RandomWeaponItem(self, self->spawnflags>>7);
-			}
-		} else {
-			self->item = BG_FindItemForClassname(self->message);
-		}
-
-		if (self->item) {
-			self->enemy = LaunchItem(self->item, origin, vec3_origin);
-		} else {
-			self->enemy = NULL;
-		}
+		G_UseTargets(self, attacker);
 	}
 }
 
-#if 0
 void misc_object_think(gentity_t *self)
 {
 	self->nextthink = level.time + 1000;
@@ -745,17 +709,14 @@ void misc_object_think(gentity_t *self)
 	// Do once per-second thinking code.
 	// Such as animation (but that should be in cgame...)
 }
-#endif
-
-void Use_MiscObject(gentity_t *self, gentity_t *other, gentity_t *activator)
-{
-	misc_object_die(self, NULL, activator, 10000, MOD_UNKNOWN);
-}
 
 void misc_object_touch(gentity_t *self, gentity_t *activator, trace_t *trace)
 {
 	//G_Printf("misc_object_touch: touched\n");
-	G_UseTargets(self, activator);
+	if( self->target )
+	{
+		G_UseTargets(self, activator);
+	}
 }
 
 // Basd on SpawnObelisk
@@ -779,16 +740,6 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 	VectorCopy(owner->r.mins, ent->r.mins);
 	VectorCopy(owner->r.maxs, ent->r.maxs);
 	ent->target = owner->target;
-	ent->wait = owner->wait;
-	ent->message = owner->message;
-	ent->spawnflags = owner->spawnflags;
-
-	// No not constant random weapon...
-	if (!(ent->spawnflags & 8<<7))
-	{
-		// Change weapons on respawn
-		ent->s.eFlags |= EF_VOTED;
-	}
 
 	ent->s.eType = ET_MISCOBJECT;
 	if (!(owner->spawnflags & MOBJF_KNOCKBACK)) {
@@ -808,12 +759,11 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 		//G_Printf("misc_object_spawn: animated damagable\n");
 		ent->r.contents = CONTENTS_BODY;
 		ent->health = owner->health;
-		ent->takedamage = qtrue;
+			ent->takedamage = qtrue;
 		ent->die = misc_object_die;
 		ent->pain = misc_object_pain;
-		ent->use = Use_MiscObject;
-		//ent->think = misc_object_think;
-		//ent->nextthink = level.time + 1000;
+		ent->think = misc_object_think;
+		ent->nextthink = level.time + 1000;
 	} else if ( ent->target ) {
 		//G_Printf("misc_object_spawn: animated touchable\n");
 		ent->r.contents = CONTENTS_TRIGGER;
@@ -848,7 +798,7 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 			G_SetOrigin( ent, tr.endpos );
 		}
 
-		// ZTM: TODO: Have gravity/pushable spawnflag?
+		// Turtle Man: TODO: Have gravity/pushable spawnflag?
 		//ent->s.pos.trType = TR_GRAVITY;
 		//ent->s.pos.trTime = level.time;
 	}
@@ -881,21 +831,10 @@ void SP_misc_object( gentity_t *ent ) {
 	qboolean entWait;
 	qboolean entSpeed;
 	qboolean entMins, entMaxs;
-#ifdef IOQ3ZTM // RENDERFLAGS
-	int mirrorType;
-#endif
 
 	entHealth = G_SpawnInt( "health", "0", &ent->health);
 	entWait = G_SpawnFloat( "wait", "0", &ent->wait);
 	entSpeed = G_SpawnFloat( "speed", "0", &ent->speed);
-#ifdef IOQ3ZTM // RENDERFLAGS
-	G_SpawnInt("mirrorType", "0", &mirrorType );
-
-	if (mirrorType == 1)
-		ent->s.eFlags |= EF_ONLY_MIRROR;
-	else if (mirrorType == 2)
-		ent->s.eFlags |= EF_NOT_MIRROR;
-#endif
 
 #if 1
 	entMins = entMaxs = qfalse;
@@ -910,7 +849,7 @@ void SP_misc_object( gentity_t *ent ) {
 	// Use a animation config file!
 	{
 		char filename[MAX_QPATH];
-		bg_objectcfg_t objectcfg; // ZTM: TODO: Move to gentity_s ?
+		bg_objectcfg_t objectcfg; // Turtle Man: TODO: Move to gentity_s ?
 
 		Com_Memset(&objectcfg, 0, sizeof (objectcfg));
 
@@ -924,7 +863,7 @@ void SP_misc_object( gentity_t *ent ) {
 		}
 		else
 		{
-			G_SetFileExt(filename, ".cfg");
+		G_SetFileExt(filename, ".cfg");
 		}
 
 		BG_ParseObjectCFGFile(filename, &objectcfg);
@@ -960,7 +899,7 @@ void SP_misc_object( gentity_t *ent ) {
 		}
 	}
 
-	//trap_LinkEntity (ent);
+	trap_LinkEntity (ent);
 
 	misc_object_spawn(ent, ent->s.origin, ent->s.angles);
 }

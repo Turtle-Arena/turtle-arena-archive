@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MODEL_FRAMEL		"menu/art/frame1_l"
 #define MODEL_FRAMER		"menu/art/frame1_r"
 #define MODEL_PORTS			"menu/art/player_models_ports"
-#ifdef TA_DATA
+#ifdef TMNTDATA
 #define MODEL_ARROWS		"menu/art/arrows_horz_0"
 #define MODEL_ARROWSL		"menu/art/arrows_horz_left"
 #define MODEL_ARROWSR		"menu/art/arrows_horz_right"
@@ -190,8 +190,10 @@ static void PlayerModel_UpdateModel( void )
 	VectorClear( moveangles );
 
 	UI_PlayerInfo_SetModel( &s_playermodel.playerinfo, s_playermodel.modelskin );
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
+	//Com_Printf("PlayerModel_UpdateModel: pre-weapon=%i\n", s_playermodel.playerinfo.weapon);
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playermodel.playerinfo.weapon), viewangles, moveangles, s_playermodel.playerinfo.weapon, qfalse );
+	//Com_Printf("PlayerModel_UpdateModel: after-weapon=%i\n", s_playermodel.playerinfo.weapon);
 #else
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, WP_MACHINEGUN, qfalse );
 #endif
@@ -259,7 +261,7 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 
 	switch (key)
 	{
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_KP_LEFTARROW:
@@ -309,7 +311,7 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 			}
 			break;
 			
-#ifndef TA_MISC // MENU: Right Mouse button = left arrow
+#ifndef TMNTMISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_ESCAPE:
@@ -351,7 +353,7 @@ static void PlayerModel_PicEvent( void* ptr, int event )
 	// get model and strip icon_
 	modelnum = s_playermodel.modelpage*MAX_MODELSPERPAGE + i;
 	buffptr  = s_playermodel.modelnames[modelnum] + strlen("models/players/");
-#ifdef TA_SUPPORTEF
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
 	if (buffptr[0] == '/') // models/players2/
 		buffptr++;
 #endif
@@ -417,7 +419,7 @@ static void PlayerModel_BuildList( void )
 	char	skinname[MAX_QPATH];
 	char*	dirptr;
 	char*	fileptr;
-#ifdef TA_SUPPORTEF
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
 	int		h;
 #endif
 	int		i;
@@ -431,8 +433,8 @@ static void PlayerModel_BuildList( void )
 	s_playermodel.modelpage = 0;
 	s_playermodel.nummodels = 0;
 
-#ifdef TA_SUPPORTEF
-  for (h = 0; h < MAX_UI_PLAYERDIRS && bg_playerDirs[h] != NULL; h++)
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+  for (h = 0; h < 2 && bg_playerDirs[h] != NULL; h++)
   {
 	// iterate directory of all player models
 	numdirs = trap_FS_GetFileList(bg_playerDirs[h], "/", dirlist, 2048 );
@@ -451,7 +453,7 @@ static void PlayerModel_BuildList( void )
 			continue;
 			
 		// iterate all skin files in directory
-#ifdef TA_SUPPORTEF
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
 		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "", filelist, 2048 );
 #else
@@ -476,7 +478,7 @@ static void PlayerModel_BuildList( void )
 			{
 				Com_sprintf( s_playermodel.modelnames[s_playermodel.nummodels++],
 					sizeof( s_playermodel.modelnames[s_playermodel.nummodels] ),
-#ifdef TA_SUPPORTEF
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
 					"%s/%s/%s", bg_playerDirs[h], dirptr, skinname );
 #else
 					"models/players/%s/%s", dirptr, skinname );
@@ -490,7 +492,7 @@ static void PlayerModel_BuildList( void )
 			}
 		}
 	}	
-#ifdef TA_SUPPORTEF
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
   }
 #endif
 
@@ -588,7 +590,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.banner.generic.x     = 320;
 	s_playermodel.banner.generic.y     = 16;
 	s_playermodel.banner.string        = "PLAYER MODEL";
-	s_playermodel.banner.color         = text_banner_color;
+	s_playermodel.banner.color         = color_white;
 	s_playermodel.banner.style         = UI_CENTER;
 
 	s_playermodel.framel.generic.type  = MTYPE_BITMAP;
@@ -628,7 +630,7 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.pics[k].width  		   = 64;
 			s_playermodel.pics[k].height  		   = 64;
 			s_playermodel.pics[k].focuspic         = MODEL_SELECTED;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 			s_playermodel.pics[k].focuscolor       = colorRed;
 #endif
 
@@ -645,7 +647,7 @@ static void PlayerModel_MenuInit( void )
 			s_playermodel.picbuttons[k].width  		     = 128;
 			s_playermodel.picbuttons[k].height  		 = 128;
 			s_playermodel.picbuttons[k].focuspic  		 = MODEL_SELECT;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 			s_playermodel.picbuttons[k].focuscolor  	 = colorRed;
 #endif
 
@@ -691,7 +693,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.arrows.generic.flags		= QMF_INACTIVE;
 	s_playermodel.arrows.generic.x			= 125;
 	s_playermodel.arrows.generic.y			= 340;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	s_playermodel.arrows.width				= MODEL_ARROWS_WIDTH;
 	s_playermodel.arrows.height				= MODEL_ARROWS_HEIGHT;
 #else
@@ -705,7 +707,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.left.generic.id			= ID_PREVPAGE;
 	s_playermodel.left.generic.x			= 125;
 	s_playermodel.left.generic.y			= 340;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	s_playermodel.left.width  				= MODEL_ARROWS_WIDTH/2;
 	s_playermodel.left.height  				= MODEL_ARROWS_HEIGHT;
 #else
@@ -718,13 +720,13 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_playermodel.right.generic.callback	= PlayerModel_MenuEvent;
 	s_playermodel.right.generic.id			= ID_NEXTPAGE;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	s_playermodel.right.generic.x			= 125+MODEL_ARROWS_WIDTH/2;
 #else
 	s_playermodel.right.generic.x			= 125+61;
 #endif
 	s_playermodel.right.generic.y			= 340;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	s_playermodel.right.width  				= MODEL_ARROWS_WIDTH/2;
 	s_playermodel.right.height  			= MODEL_ARROWS_HEIGHT;
 #else

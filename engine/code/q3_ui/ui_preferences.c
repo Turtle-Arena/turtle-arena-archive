@@ -60,7 +60,7 @@ GAME OPTIONS MENU
 #endif
 #endif
 
-#ifdef TA_DATA
+#ifdef TMNTMISC
 #define	NUM_CROSSHAIRS			4
 #else
 #define	NUM_CROSSHAIRS			10
@@ -118,7 +118,7 @@ static void Preferences_SetMenuItems( void ) {
 	s_preferences.dynamiclights.curvalue	= trap_Cvar_VariableValue( "r_dynamiclight" ) != 0;
 	s_preferences.highqualitysky.curvalue	= trap_Cvar_VariableValue ( "r_fastsky" ) == 0;
 	s_preferences.synceveryframe.curvalue	= trap_Cvar_VariableValue( "r_finish" ) != 0;
-#ifdef TURTLEARENA // NO_CGFORCEMODLE
+#ifdef TMNT // NO_CGFORCEMODLE
 	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_deferPlayers" ) != 0;
 #else
 	s_preferences.forcemodel.curvalue		= trap_Cvar_VariableValue( "cg_forcemodel" ) != 0;
@@ -143,7 +143,7 @@ static void Preferences_Event( void* ptr, int notification ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_CROSSHAIR:
-#ifndef TA_MISC // MENU: Support right mouse button = prev crosshair
+#ifndef TMNTMISC // MENU: Support right mouse button = prev crosshair
 		s_preferences.crosshair.curvalue++;
 		if( s_preferences.crosshair.curvalue == NUM_CROSSHAIRS ) {
 			s_preferences.crosshair.curvalue = 0;
@@ -184,7 +184,7 @@ static void Preferences_Event( void* ptr, int notification ) {
 		break;
 
 	case ID_FORCEMODEL:
-#ifdef TURTLEARENA // NO_CGFORCEMODLE
+#ifdef TMNT // NO_CGFORCEMODLE
 		trap_Cvar_SetValue( "cg_deferPlayers", s_preferences.forcemodel.curvalue );
 #else
 		trap_Cvar_SetValue( "cg_forcemodel", s_preferences.forcemodel.curvalue );
@@ -283,7 +283,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.banner.generic.x	   = 320;
 	s_preferences.banner.generic.y	   = 16;
 	s_preferences.banner.string		   = "GAME OPTIONS";
-	s_preferences.banner.color         = text_banner_color;
+	s_preferences.banner.color         = color_white;
 	s_preferences.banner.style         = UI_CENTER;
 
 	s_preferences.framel.generic.type  = MTYPE_BITMAP;
@@ -303,7 +303,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.framer.height  	   = 334;
 
 	y = 144;
-#ifdef TA_MISC // MENU: Support right mouse button = prev crosshair
+#ifdef TMNTMISC // MENU: Support right mouse button = prev crosshair
 	s_preferences.crosshair.generic.type		= MTYPE_SPINCONTROL;
 #else
 	s_preferences.crosshair.generic.type		= MTYPE_TEXT;
@@ -319,8 +319,8 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.crosshair.generic.bottom		= y + 20;
 	s_preferences.crosshair.generic.left		= PREFERENCES_X_POS - ( ( strlen(s_preferences.crosshair.generic.name) + 1 ) * SMALLCHAR_WIDTH );
 	s_preferences.crosshair.generic.right		= PREFERENCES_X_POS + 48;
-#ifdef TA_MISC // MENU: Support right mouse button = prev crosshair
-	s_preferences.crosshair.numitems			= NUM_CROSSHAIRS;
+#ifdef TMNTMISC // MENU: Support right mouse button = prev crosshair
+	s_preferences.crosshair.numitems = NUM_CROSSHAIRS;
 #endif
 
 	y += BIGCHAR_HEIGHT+2+4;
@@ -388,7 +388,7 @@ static void Preferences_MenuInit( void ) {
 
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.forcemodel.generic.type     = MTYPE_RADIOBUTTON;
-#ifdef TURTLEARENA // NO_CGFORCEMODLE
+#ifdef TMNT // NO_CGFORCEMODLE
 	s_preferences.forcemodel.generic.name	  = "Defer Player Loading:";
 #else
 	s_preferences.forcemodel.generic.name	  = "Force Player Models:";

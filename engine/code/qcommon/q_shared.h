@@ -27,25 +27,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // A user mod should never modify this file
 
 #ifdef STANDALONE
-  #ifdef TURTLEARENA
-    #define PRODUCT_NAME			"Turtle Arena"
-    #define BASEGAME				"base"
-    #define CLIENT_WINDOW_TITLE     "Turtle Arena"
-    #define CLIENT_WINDOW_MIN_TITLE "Turtle Arena"
-    #define GAMENAME_FOR_MASTER		"TurtleArena"
-  #elif defined IOQ3ZTM
-	// Standalone IOQ3ZTM is a mod for Turtle Arena
-    #define PRODUCT_NAME			"ioq3turtle"
-    #define BASEGAME				"base"
-    #define CLIENT_WINDOW_TITLE     "ioquake3turtle"
-    #define CLIENT_WINDOW_MIN_TITLE "ioq3turtle"
-    #define GAMENAME_FOR_MASTER		"TurtleArena"
+  #ifdef TMNT // Turtle Man: Changed game info defines.
+    #define PRODUCT_NAME			"TMNT Arena"
+    #define BASEGAME			"base"
+    #define CLIENT_WINDOW_TITLE     	"TMNT Arena"
+    #define CLIENT_WINDOW_MIN_TITLE 	"TMNT Arena"
+    #define GAMENAME_FOR_MASTER		"TMNTArena"
   #else
-    #define PRODUCT_NAME			"iofoo3"
-    #define BASEGAME			"foobar"
-    #define CLIENT_WINDOW_TITLE     	"changeme"
-    #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
-    #define GAMENAME_FOR_MASTER		"iofoo3"	// must NOT contain whitespaces
+  #define PRODUCT_NAME			"iofoo3"
+  #define BASEGAME			"foobar"
+  #define CLIENT_WINDOW_TITLE     	"changeme"
+  #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
+  #define GAMENAME_FOR_MASTER		"iofoo3"	// must NOT contain whitespaces
   #endif
 #else
   #define PRODUCT_NAME			"ioq3"
@@ -55,14 +48,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define GAMENAME_FOR_MASTER		"Quake3Arena"
 #endif
 
-#ifdef TA_SP
+#ifdef TMNTSP
   // Its really "fs_game\\saves", so each mod has its own saves dir.
   #define SAVEGAMEDIR "saves"
 #endif
 
 #ifndef PRODUCT_VERSION
-  #ifdef TURTLEARENA
-    #define PRODUCT_VERSION "0.2"
+  #ifdef TMNT
+    #define PRODUCT_VERSION "alpha_IOQ3v1.36"
   #else
     #define PRODUCT_VERSION "1.36"
   #endif
@@ -281,7 +274,7 @@ typedef enum {
 	ERR_DROP,					// print to console and disconnect from game
 	ERR_SERVERDISCONNECT,		// don't kill server
 	ERR_DISCONNECT,				// client disconnected from the server
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	ERR_NEED_CD					// pop up the need-cd dialog
 #endif
 } errorParm_t;
@@ -309,7 +302,7 @@ typedef enum {
 #define UI_INVERSE		0x00002000
 #define UI_PULSE		0x00004000
 
-#if (defined(_DEBUG) || !defined (NDEBUG)) && !defined(BSPC)
+#if defined(_DEBUG) && !defined(BSPC)
 	#define HUNK_DEBUG
 #endif
 
@@ -342,7 +335,6 @@ MATHLIB
 
 ==============================================================
 */
-
 
 typedef float vec_t;
 typedef vec_t vec2_t[2];
@@ -393,18 +385,18 @@ extern	vec4_t		colorDkGrey;
 #define Q_COLOR_ESCAPE	'^'
 #define Q_IsColorString(p)	((p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) && isalnum(*((p)+1))) // ^[0-9a-zA-Z]
 
-#define COLOR_BLACK	'0'
-#define COLOR_RED	'1'
-#define COLOR_GREEN	'2'
+#define COLOR_BLACK		'0'
+#define COLOR_RED		'1'
+#define COLOR_GREEN		'2'
 #define COLOR_YELLOW	'3'
-#define COLOR_BLUE	'4'
-#define COLOR_CYAN	'5'
+#define COLOR_BLUE		'4'
+#define COLOR_CYAN		'5'
 #define COLOR_MAGENTA	'6'
-#define COLOR_WHITE	'7'
+#define COLOR_WHITE		'7'
 #define ColorIndex(c)	(((c) - '0') & 0x07)
 
 #define S_COLOR_BLACK	"^0"
-#define S_COLOR_RED	"^1"
+#define S_COLOR_RED		"^1"
 #define S_COLOR_GREEN	"^2"
 #define S_COLOR_YELLOW	"^3"
 #define S_COLOR_BLUE	"^4"
@@ -544,6 +536,7 @@ static ID_INLINE vec_t Distance( const vec3_t p1, const vec3_t p2 ) {
 	return VectorLength( v );
 }
 
+
 static ID_INLINE vec_t DistanceSquared( const vec3_t p1, const vec3_t p2 ) {
 	vec3_t	v;
 
@@ -636,11 +629,11 @@ void	AnglesSubtract( vec3_t v1, vec3_t v2, vec3_t v3 );
 float AngleNormalize360 ( float angle );
 float AngleNormalize180 ( float angle );
 float AngleDelta ( float angle1, float angle2 );
-#ifdef TA_WEAPSYS // XREAL
+#ifdef TMNTWEAPSYS_2 // XREAL
 float AngleBetweenVectors(const vec3_t a, const vec3_t b);
 #endif
 
-#ifndef BSPC // ZTM: BSP2
+#ifndef BSPC // Turtle Man: BSP2
 qboolean PlaneFromPoints( vec4_t plane, const vec3_t a, const vec3_t b, const vec3_t c );
 #endif
 void ProjectPointOnPlane( vec3_t dst, const vec3_t p, const vec3_t normal );
@@ -671,7 +664,7 @@ void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 
 void	COM_BeginParseSession( const char *name );
 int		COM_GetCurrentParseLine( void );
-#ifndef BSPC // ZTM: BSP2
+#ifndef BSPC // Turtle Man: BSP2
 char	*COM_Parse( char **data_p );
 #endif
 char	*COM_ParseExt( char **data_p, qboolean allowLineBreak );
@@ -911,7 +904,7 @@ PlaneTypeForNormal
 =================
 */
 
-#ifndef BSPC // ZTM: BSP2
+#ifndef BSPC // Turtle Man: BSP2
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
 #endif
 
@@ -1001,7 +994,7 @@ typedef enum {
 //
 #define	MAX_CLIENTS			64		// absolute limit
 #define MAX_LOCATIONS		64
-#ifdef IOQ3ZTM // Particles
+#ifdef TMNTMISC // Particles
 #define MAX_PARTICLES_AREAS 64
 #endif
 
@@ -1038,22 +1031,36 @@ typedef struct {
 
 //=========================================================
 
+#ifdef ARRAYMAX  // IOQ3ZTM
+// array limits, these can be incresed if needed
+//    Only if you are building a EXE, if just a mod don't change theses.
+#define	MAX_STATS				16
+#define	MAX_PERSISTANT			16
+#define	MAX_POWERUPS			16 // PW_* are still limited by bit fields.
+#ifdef TMNTWEAPSYS2
+#define	MAX_WEAPONS				32
+#else
+#define	MAX_WEAPONS				16 // If not TMNTWEAPSYS2 limited to 16
+#endif
+#ifdef TMNTHOLDSYS
+#define	MAX_HOLDABLE			16
+#endif
+#else
 // bit field limits
 #define	MAX_STATS				16
 #define	MAX_PERSISTANT			16
 #define	MAX_POWERUPS			16
-#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
 #define	MAX_WEAPONS				16		
-#endif
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 #define	MAX_HOLDABLE			16
+#endif
 #endif
 
 #define	MAX_PS_EVENTS			2
 
 #define PS_PMOVEFRAMECOUNTBITS	6
 
-#ifdef TA_CAMERA
+#ifdef TMNTCAMERA
 typedef enum
 {
 	CAM_FIRSTPERSON, ///< Q3 default
@@ -1120,9 +1127,6 @@ typedef struct playerState_s {
 								// used to twist the legs during strafing
 
 	vec3_t		grapplePoint;	// location of grapple to pull towards if PMF_GRAPPLE_PULL
-#ifdef NIGHTSMODE
-	vec3_t		grapplePoint2;	// NiGHTS next point // ZTM: TODO: Secondary grapple (like LOZ_TP)?
-#endif
 
 	int			eFlags;			// copied to entityState_t->eFlags
 
@@ -1137,14 +1141,14 @@ typedef struct playerState_s {
 	int			clientNum;		// ranges from 0 to MAX_CLIENTS-1
 	int			weapon;			// copied to entityState_t->weapon
 	int			weaponstate;
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 	int			holdableIndex; // Index of holdable items, for shurikens.
 #endif
-#if defined TA_HOLDABLE || defined NET_COMPAT // HOLD_SHURIKEN
+#ifdef TMNTHOLDABLE
 	int			holdableTime;  // Like weaponTime, but for shurikens.
 #endif
 
-#ifdef TA_CAMERA
+#ifdef TMNTCAMERA
 	camera_t	camera;
 #else
 	vec3_t		viewangles;		// for fixed views
@@ -1160,10 +1164,10 @@ typedef struct playerState_s {
 	int			stats[MAX_STATS];
 	int			persistant[MAX_PERSISTANT];	// stats that aren't cleared on death
 	int			powerups[MAX_POWERUPS];	// level.time that the powerup runs out
-#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
+#ifndef TMNTWEAPSYS2
 	int			ammo[MAX_WEAPONS];
 #endif
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 	int			holdable[MAX_HOLDABLE];
 #endif
 
@@ -1171,13 +1175,7 @@ typedef struct playerState_s {
 	int			loopSound;
 	int			jumppad_ent;	// jumppad entity hit this frame
 
-#if defined TURTLEARENA || defined NET_COMPAT // LOCKON
-	// Target for lockon
-	int			enemyEnt;
-	vec3_t		enemyOrigin;
-#endif
-
-#ifdef TA_WEAPSYS // MELEEATTACK
+#ifdef TMNTWEAPSYS // MELEEATTACK
 	//
 	// Melee weapons
 	//
@@ -1190,11 +1188,11 @@ typedef struct playerState_s {
 	int		meleeLinkTime; // Time left till will be unable to continue meleeAttack
 
 	// Melee damage hits, add more points for higher chain?
-	//    ZTM: TODO: Use for NiGHTS links count too?
+	//    Turtle Man: TODO: Use for NiGHTS links count too?
 	int		chain;
 	int		chainTime;
 
-	int			weaponHands;	// HB_NONE, HB_PRIMARY, HB_SECONDARY, or HB_BOTH
+	int			weaponHands;	// HAND_NONE, HAND_PRIMARY, HAND_SECONDARY, or HAND_BOTH
 #endif
 
 	// not communicated over the net at all
@@ -1231,10 +1229,10 @@ typedef struct playerState_s {
 
 #define	BUTTON_ANY			2048			// any key whatsoever
 
-#ifdef TA_HOLDSYS // NEXTHOLDABLE
+#ifdef TMNTHOLDSYS // NEXTHOLDABLE
 #define	BUTTON_NEXT_HOLDABLE			4096
 #endif
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 #define BUTTON_DROP_WEAPON			8192
 #endif
 
@@ -1246,10 +1244,10 @@ typedef struct usercmd_s {
 	int				serverTime;
 	int				angles[3];
 	int 			buttons;
-#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
+#ifndef TMNTWEAPSYS2
 	byte			weapon;           // weapon 
 #endif
-#ifdef TA_HOLDSYS/*2*/
+#ifdef TMNTHOLDSYS/*2*/
 	byte			holdable;         // holdable
 #endif
 	signed char	forwardmove, rightmove, upmove;
@@ -1324,7 +1322,7 @@ typedef struct entityState_s {
 	int		weapon;			// determines weapon and flash model, etc
 	int		legsAnim;		// mask off ANIM_TOGGLEBIT
 	int		torsoAnim;		// mask off ANIM_TOGGLEBIT
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	int		weaponHands;
 #endif
 
@@ -1430,7 +1428,7 @@ typedef enum _flag_status {
 #define SAY_TEAM	1
 #define SAY_TELL	2
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #define CDKEY_LEN 16
 #define CDCHKSUM_LEN 2
 #endif

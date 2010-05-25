@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "g_local.h"
 
-#ifndef TA_SP
+#ifndef TMNTSP
 gentity_t	*podium1;
 gentity_t	*podium2;
 gentity_t	*podium3;
@@ -108,7 +108,7 @@ void UpdateTournamentInfo( void ) {
 		} else {
 			perfect = 0;
 		}
-#ifdef TURTLEARENA // AWARDS // ZTM: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
+#ifdef TMNTWEAPONS // Turtle Man: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
 			0, 0, player->client->ps.persistant[PERS_DEFEND_COUNT],
 			player->client->ps.persistant[PERS_ASSIST_COUNT], 0, player->client->ps.persistant[PERS_SCORE],
@@ -121,7 +121,7 @@ void UpdateTournamentInfo( void ) {
 #endif
 #else
 		perfect = ( level.clients[playerClientNum].ps.persistant[PERS_RANK] == 0 && player->client->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
-#ifdef TURTLEARENA // AWARDS // ZTM: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
+#ifdef TMNTWEAPONS // Turtle Man: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
 			0, 0,
 			0, player->client->ps.persistant[PERS_SCORE],
@@ -148,7 +148,7 @@ void UpdateTournamentInfo( void ) {
 	trap_SendConsoleCommand( EXEC_APPEND, msg );
 }
 
-#ifndef TA_SP
+#ifndef TMNTSP
 static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity_t *ent, int place ) {
 	gentity_t	*body;
 	vec3_t		vec;
@@ -175,7 +175,7 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 	body->s.pos.trType = TR_STATIONARY;
 	body->s.groundEntityNum = ENTITYNUM_WORLD;
 	body->s.legsAnim = LEGS_IDLE;
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	if( body->s.weapon == WP_NONE || body->s.weapon == WP_DEFAULT) {
 		body->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
 	}
@@ -223,7 +223,7 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 static void CelebrateStop( gentity_t *player ) {
 	int		anim;
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	anim = BG_TorsoStandForPlayerState(&player->client->ps);
 #else
 	if( player->s.weapon == WP_GAUNTLET) {
@@ -237,12 +237,12 @@ static void CelebrateStop( gentity_t *player ) {
 }
 
 
-#ifndef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 #define	TIMER_GESTURE	(34*66+50)
 #endif
 static void CelebrateStart( gentity_t *player ) {
 	player->s.torsoAnim = ( ( player->s.torsoAnim & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | TORSO_GESTURE;
-#ifdef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 	player->nextthink = level.time + BG_AnimationTime(&player->client->pers.playercfg.animations[TORSO_GESTURE]);
 #else
 	player->nextthink = level.time + TIMER_GESTURE;
@@ -256,7 +256,6 @@ static void CelebrateStart( gentity_t *player ) {
 	*/
 	G_AddEvent(player, EV_TAUNT, 0);
 }
-
 
 static vec3_t	offsetFirst  = {0, 0, 74};
 static vec3_t	offsetSecond = {-10, 60, 54};
@@ -317,7 +316,6 @@ static void PodiumPlacementThink( gentity_t *podium ) {
 	}
 }
 
-
 static gentity_t *SpawnPodium( void ) {
 	gentity_t	*podium;
 	vec3_t		vec;
@@ -349,7 +347,6 @@ static gentity_t *SpawnPodium( void ) {
 	return podium;
 }
 
-
 /*
 ==================
 SpawnModelsOnVictoryPads
@@ -362,6 +359,7 @@ void SpawnModelsOnVictoryPads( void ) {
 	podium1 = NULL;
 	podium2 = NULL;
 	podium3 = NULL;
+
 
 	podium = SpawnPodium();
 
@@ -387,7 +385,6 @@ void SpawnModelsOnVictoryPads( void ) {
 		}
 	}
 }
-
 
 /*
 ===============

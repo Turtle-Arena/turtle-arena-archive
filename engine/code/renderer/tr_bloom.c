@@ -200,7 +200,7 @@ static void R_Bloom_DrawEffect( void )
 	GL_Bind( bloom.effect.texture );
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE );
 	qglColor4f( r_bloom_alpha->value, r_bloom_alpha->value, r_bloom_alpha->value, 1.0f );
-	R_Bloom_Quad( glConfig.vidWidth, glConfig.vidHeight, 0, 0, bloom.effect.readW, bloom.effect.readH );
+	R_Bloom_Quad( glConfig.vidWidth, glConfig.vidHeight, 0, 0, bloom.effect.readW, bloom.effect.readW );
 }
 
 
@@ -462,7 +462,7 @@ void R_BloomInit( void ) {
 	memset( &bloom, 0, sizeof( bloom ));
 
 	r_bloom = ri.Cvar_Get( "r_bloom", "0", CVAR_ARCHIVE );
-#ifdef IOQ3ZTM // ZTM: AlienArena values
+#ifdef IOQ3ZTM // Turtle Man: AlienArena values
 	r_bloom_alpha = ri.Cvar_Get( "r_bloom_alpha", "0.2", CVAR_ARCHIVE );
 	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
 	r_bloom_intensity = ri.Cvar_Get( "r_bloom_intensity", "0.5", CVAR_ARCHIVE );

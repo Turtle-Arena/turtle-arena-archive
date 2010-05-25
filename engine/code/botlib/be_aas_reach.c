@@ -3996,7 +3996,7 @@ void AAS_SetWeaponJumpAreaFlags(void)
 //===========================================================================
 int AAS_Reachability_WeaponJump(int area1num, int area2num)
 {
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	int face2num, i, ret, visualize;
 #else
 	int face2num, i, n, ret, visualize;
@@ -4047,13 +4047,13 @@ int AAS_Reachability_WeaponJump(int area1num, int area2num)
 		AAS_FaceCenter(face2num, facecenter);
 		//only go higher up with weapon jumps
 		if (facecenter[2] < areastart[2] + 64) continue;
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 		//NOTE: set to 2 to allow bfg jump reachabilities
 		for (n = 0; n < 1/*2*/; n++)
 #endif
 		{
 			//get the rocket jump z velocity
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 			zvel = AAS_RocketJumpZVelocity(areastart);
 #else
 			if (n) zvel = AAS_BFGJumpZVelocity(areastart);
@@ -4099,7 +4099,7 @@ int AAS_Reachability_WeaponJump(int area1num, int area2num)
 						lreach->edgenum = 0;
 						VectorCopy(areastart, lreach->start);
 						VectorCopy(facecenter, lreach->end);
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 						if (n)
 						{
 							lreach->traveltype = TRAVEL_BFGJUMP;
@@ -4361,7 +4361,7 @@ void AAS_StoreReachability(void)
 // TRAVEL_RAMPJUMP				  0%
 // TRAVEL_STRAFEJUMP			  0%
 // TRAVEL_ROCKETJUMP			100%	(currently limited towards areas with items)
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 // TRAVEL_BFGJUMP				  0%	(currently disabled)
 #endif
 // TRAVEL_JUMPPAD				100%

@@ -92,7 +92,7 @@ typedef struct SDL_PixelFormat {
 
 /** This structure should be treated as read-only, except for 'pixels',
  *  which, if not NULL, contains the raw pixel data for the surface.
- */
+*/
 typedef struct SDL_Surface {
 	Uint32 flags;				/**< Read-only */
 	SDL_PixelFormat *format;		/**< Read-only */
@@ -512,7 +512,7 @@ extern DECLSPEC void SDLCALL SDL_GetRGB(Uint32 pixel,
  */
 extern DECLSPEC void SDLCALL SDL_GetRGBA(Uint32 pixel,
 				const SDL_PixelFormat * const fmt,
-				Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a);
+				 Uint8 *r, Uint8 *g, Uint8 *b, Uint8 *a);
 
 /** @sa SDL_CreateRGBSurface */
 #define SDL_AllocSurface    SDL_CreateRGBSurface
@@ -739,18 +739,18 @@ extern DECLSPEC SDL_Surface * SDLCALL SDL_ConvertSurface
  *
  * You should call SDL_BlitSurface() unless you know exactly how SDL
  * blitting works internally and how to use the other blit functions.
- */
+*/
 #define SDL_BlitSurface SDL_UpperBlit
 
 /** This is the public blit function, SDL_BlitSurface(), and it performs
  *  rectangle validation and clipping before passing it to SDL_LowerBlit()
- */
+*/
 extern DECLSPEC int SDLCALL SDL_UpperBlit
 			(SDL_Surface *src, SDL_Rect *srcrect,
 			 SDL_Surface *dst, SDL_Rect *dstrect);
 /** This is a semi-private blit function and it performs low-level surface
  *  blitting only.
- */
+*/
 extern DECLSPEC int SDLCALL SDL_LowerBlit
 			(SDL_Surface *src, SDL_Rect *srcrect,
 			 SDL_Surface *dst, SDL_Rect *dstrect);
@@ -803,7 +803,7 @@ extern DECLSPEC SDL_Surface * SDLCALL SDL_DisplayFormatAlpha(SDL_Surface *surfac
  *  Calling the returned surface an overlay is something of a misnomer because
  *  the contents of the display surface underneath the area where the overlay
  *  is shown is undefined - it may be overwritten with the converted YUV data.
- */
+*/
 extern DECLSPEC SDL_Overlay * SDLCALL SDL_CreateYUVOverlay(int width, int height,
 				Uint32 format, SDL_Surface *display);
 
@@ -816,7 +816,7 @@ extern DECLSPEC void SDLCALL SDL_UnlockYUVOverlay(SDL_Overlay *overlay);
  *  not defined.  
  *  The width and height of the destination rectangle may be different from
  *  that of the overlay, but currently only 2x scaling is supported.
- */
+*/
 extern DECLSPEC int SDLCALL SDL_DisplayYUVOverlay(SDL_Overlay *overlay, SDL_Rect *dstrect);
 
 /** Free a video overlay */

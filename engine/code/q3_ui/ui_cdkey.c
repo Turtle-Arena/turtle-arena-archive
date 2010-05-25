@@ -31,7 +31,7 @@ CD KEY MENU
 
 #include "ui_local.h"
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 
 #define ART_FRAME		"menu/art/cut_frame"
 #define ART_ACCEPT0		"menu/art/accept_0"
@@ -200,7 +200,7 @@ static void UI_CDKeyMenu_Init( void ) {
 	cdkeyMenuInfo.banner.generic.x					= 320;
 	cdkeyMenuInfo.banner.generic.y					= 16;
 	cdkeyMenuInfo.banner.string						= "CD KEY";
-	cdkeyMenuInfo.banner.color						= text_banner_color;
+	cdkeyMenuInfo.banner.color						= color_white;
 	cdkeyMenuInfo.banner.style						= UI_CENTER;
 
 	cdkeyMenuInfo.frame.generic.type				= MTYPE_BITMAP;
@@ -291,4 +291,4 @@ void UI_CDKeyMenu_f( void ) {
 	UI_CDKeyMenu();
 }
 
-#endif // IOQUAKE3 // ZTM: CDKEY
+#endif // IOQUAKE3 // Turtle Man: CDKEY

@@ -1594,7 +1594,7 @@ void RB_StageIteratorGeneric( void )
 
 #ifdef CELSHADING
 	// Draw cel outlines. There has to be a better place to put this.
-	// ZTM: Set r_celoutline to -1 to disable per-shader celoutlines
+	// Turtle Man: Set r_celoutline to -1 to disable per-shader celoutlines
 	if (r_celoutline->integer != -1) {
 		if (input->shader->celoutline.width > 0) {
 			DrawCel(&tess, input->shader->celoutline.width, &input->shader->celoutline);

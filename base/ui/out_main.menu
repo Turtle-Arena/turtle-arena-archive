@@ -1,4 +1,4 @@
-// Turtle Arena
+// TMNT Arena
 // Main menu
 // Base on rfactory.org out_main.menu
 #include "ui/menudef.h"

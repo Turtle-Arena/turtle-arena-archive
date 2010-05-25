@@ -1,0 +1,3 @@
+l_leg_right,$(dir)/leg
+l_leg_left,$(dir)/leg
+tag_torso,

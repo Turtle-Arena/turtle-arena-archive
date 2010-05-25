@@ -37,13 +37,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "l_log.h"
 #include "l_qfiles.h"
 
-#define TURTLEARENA // ZTM: Minor changes for Turtle Arena
+#define TMNT // Turtle Man: Minor changes for TMNT Arena
 
-#ifdef TURTLEARENA
-#define TA_ENTSYS
-#define TA_WEAPSYS
+#ifdef TMNT
+#define TMNTENTSYS
+#define TMNTWEAPSYS
+#define TMNTMISC
 
-#define BSPC_VERSION		"2.1h [Turtle Arena]"
+#define BSPC_VERSION		"2.1h [TMNT Arena]"
 #else
 #define BSPC_VERSION		"2.1h"
 #endif
@@ -53,7 +54,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define NODELIST
 #define SIN
 
-#if 1 // ZTM(IOQ3): From ioquake3/code/qcommon/q_shared.c
+#if 1 // Turtle Man(IOQ3): From ioquake3/code/qcommon/q_shared.c
 // vsnprintf is ISO/IEC 9899:1999
 // abstracting this to make it portable
 #ifdef _WIN32

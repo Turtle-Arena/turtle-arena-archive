@@ -1,3 +1,5 @@
-# Windows batch file
+# Windows bat file
 
-bspc.x86.exe -bsp2aas "..\base\maps\*.bsp"
+;; -nograpplereach
+
+bspc.exe -forcesidesvisible -bsp2aas "..\base\maps\*.bsp"

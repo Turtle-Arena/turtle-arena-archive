@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef NOTRATEDM // No gibs.
 #define	GIB_HEALTH			-40
 #endif
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 #define	ARMOR_PROTECTION	0.66
 #endif
 
@@ -55,10 +55,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CROUCH_VIEWHEIGHT	12
 #define	DEAD_VIEWHEIGHT		-16
 
-#ifdef TURTLEARENA // LOCKON
-#define LOCKON_TIME 500 // Time it take to be fully facing target
-#endif
-
 //
 // config strings are a general means of communicating variable length strings
 // from the server to all connected clients.
@@ -69,7 +65,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CS_MESSAGE				3		// from the map worldspawn's message field
 #define	CS_MOTD					4		// g_motd string for server message of the day
 /* bg_public.h
-	ZTM: NOTE: Server exspects CS_WARMUP as 5.
+	Turtle Man: NOTE: Server exspects CS_WARMUP as 5.
 */
 #define	CS_WARMUP				5		// server time when the match will be restarted
 #define	CS_SCORES1				6
@@ -92,7 +88,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CS_BOTINFO				25
 
 #define	CS_ITEMS				27		// string of 0's and 1's that tell which items are present
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 #define	CS_NPCS					28
 #endif
 
@@ -102,7 +98,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
 #define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
 
-#ifdef IOQ3ZTM // Particles
+#ifdef TMNTMISC // Particles
 #define CS_MAX					(CS_PARTICLES+MAX_PARTICLES_AREAS)
 #else
 #define CS_MAX					(CS_PARTICLES+MAX_LOCATIONS)
@@ -117,7 +113,7 @@ typedef enum {
 	GT_TOURNAMENT,		// one on one tournament
 	GT_SINGLE_PLAYER,	// single player ffa
 
-#if 0 // #ifdef TURTLEARENA
+#if 0 // #ifdef TMNT
 	GT_LMS,				// Last Man Standing
 	GT_KOTH,			// King Of The Hill
 	GT_KEEPAWAY,		// Keep Away
@@ -127,7 +123,7 @@ typedef enum {
 	//-- team games go after this --
 
 	GT_TEAM,			// team deathmatch
-#if 0 // #ifdef TURTLEARENA
+#if 0 // #ifdef TMNT
 	GT_LTEAMS,			// last team standing
 #endif
 	GT_CTF,				// capture the flag
@@ -136,7 +132,7 @@ typedef enum {
 #ifdef MISSIONPACK_HARVESTER
 	GT_HARVESTER,
 #endif
-#if 0 // ZTM: In the gametype name arrays there is a Team Tournament.
+#if 0 // Turtle Man: In the gametype name arrays there is a Team Tournament.
 	GT_TEAMTOURNAMENT,
 #endif
 	GT_MAX_GAME_TYPE
@@ -144,7 +140,7 @@ typedef enum {
 
 typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
-#ifndef TA_PLAYERSYS // Moved below bg_playercfg_t
+#ifndef TMNTPLAYERSYS // Moved below bg_playercfg_t
 /*
 ===================================================================================
 
@@ -176,8 +172,8 @@ typedef enum {
 // pmove->pm_flags
 #define	PMF_DUCKED			1
 #define	PMF_JUMP_HELD		2
-#ifdef IOQ3ZTM
-#define PMF_FIRE_HELD		4		// set when attack has been started
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
+#define PMF_GRAPPLE_SHOT	4
 #endif
 #define	PMF_BACKWARDS_JUMP	8		// go into backwards land
 #define	PMF_BACKWARDS_RUN	16		// coast down to backwards run
@@ -197,7 +193,7 @@ typedef enum {
 typedef struct {
 	// state (in / out)
 	playerState_t	*ps;
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	bg_npc_t		*npc;
 #endif
 
@@ -242,28 +238,31 @@ void Pmove (pmove_t *pmove);
 // NOTE: may not have more than 16
 typedef enum {
 	STAT_HEALTH,
-#ifndef TA_HOLDSYS
+#ifndef TMNTHOLDSYS
 	STAT_HOLDABLE_ITEM,
 #endif
 #ifdef MISSIONPACK
 	STAT_PERSISTANT_POWERUP,
 #endif
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	STAT_NEW_WEAPON_HANDS, // Set in PM_BeginWeaponHandsChange
 	STAT_DEFAULTWEAPON, // default weapon
 #endif
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
+	// Players can have 3 weapons at once, there is a extra one when switching from pickup to pickup
+	STAT_NEWWEAPON, // weapon that the player touched, they will change to it ASAP.
+	STAT_OLDWEAPON, // weapon that the player just changed from
+	//STAT_CURRENTWEAPON, // ps.weapon is the current weapon!
+
+	// Replacement for the ammo array in playerState_t
+	STAT_SAVEDAMMO, // Saved ammo for default weapon
+	STAT_OLDAMMO, // ammo for STAT_OLDWEAPON
+	STAT_NEWAMMO, // ammo for STAT_NEWWEAPON
 	STAT_AMMO, // Ammo for current weapon
-
-	STAT_PENDING_WEAPON, // Weapon to change to.
-	STAT_PENDING_AMMO, // Ammo for pending weapon
-
-	STAT_DROP_WEAPON, // Weapon to drop.
-	STAT_DROP_AMMO, // Ammo for weapon to drop
 #else
 	STAT_WEAPONS,					// 16 bit fields
 #endif
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 	STAT_ARMOR,
 #endif
 	STAT_DEAD_YAW,					// look this direction when dead (FIXME: get rid of?)
@@ -282,27 +281,29 @@ typedef enum {
 	PERS_RANK,						// player rank or team rank
 	PERS_TEAM,						// player team
 	PERS_SPAWN_COUNT,				// incremented every respawn
-#if !defined NOTRATEDM || !defined TURTLEARENA // AWARDS
+#if !defined TMNTMISC || !defined TMNTWEAPONS || !defined NOTRATEDM
 	PERS_PLAYEREVENTS,				// 16 bits that can be flipped for events
 #endif
 	PERS_ATTACKER,					// clientnum of last damage inflicter
-#ifndef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
+	PERS_ATTACKEE_HEALTH,			// health of last person we attacked
+#else
 	PERS_ATTACKEE_ARMOR,			// health/armor of last person we attacked
 #endif
 	PERS_KILLED,					// count of the number of times you died
-#ifdef TA_SP
-	PERS_LIVES,
-	PERS_CONTINUES,
-#endif
 	// player awards tracking
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 	PERS_IMPRESSIVE_COUNT,			// two railgun hits in a row
 	PERS_EXCELLENT_COUNT,			// two successive kills in a short amount of time
 #endif
 	PERS_DEFEND_COUNT,				// defend awards
 	PERS_ASSIST_COUNT,				// assist awards
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 	PERS_GAUNTLET_FRAG_COUNT,		// kills with the guantlet
+#endif
+#ifdef TMNTSP
+	PERS_LIVES,
+	PERS_CONTINUES,
 #endif
 	PERS_CAPTURES					// captures
 } persEnum_t;
@@ -310,22 +311,22 @@ typedef enum {
 
 // entityState_t->eFlags
 #define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
-#if (defined MISSIONPACK || defined TA_WEAPSYS) && !defined TURTLEARENA // WEAPONS
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 #define EF_TICKING			0x00000002		// used to make players play the prox mine ticking sound
 #endif
 #define	EF_TELEPORT_BIT		0x00000004		// toggled every time the origin abruptly changes
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 #define	EF_AWARD_EXCELLENT	0x00000008		// draw an excellent sprite
 #endif
 #define EF_PLAYER_EVENT		0x00000010
 #define	EF_BOUNCE			0x00000010		// for missiles
 #define	EF_BOUNCE_HALF		0x00000020		// for missiles
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 #define	EF_AWARD_GAUNTLET	0x00000040		// draw a gauntlet sprite
 #endif
 #define	EF_NODRAW			0x00000080		// may have an event, but no model (unspawned items)
 #define	EF_FIRING			0x00000100		// for lightning gun
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 #define	EF_KAMIKAZE			0x00000200
 #endif
 #ifdef NIGHTSMODE
@@ -336,7 +337,7 @@ typedef enum {
 #define	EF_TALK				0x00001000		// draw a talk balloon
 #define	EF_CONNECTION		0x00002000		// draw a connection trouble sprite
 #define	EF_VOTED			0x00004000		// already cast a vote
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 #define	EF_AWARD_IMPRESSIVE	0x00008000		// draw an impressive sprite
 #endif
 #define	EF_AWARD_DEFEND		0x00010000		// draw a defend sprite
@@ -344,29 +345,13 @@ typedef enum {
 #ifndef IOQ3ZTM // unused
 #define EF_AWARD_DENIED		0x00040000		// denied
 #endif
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 #define	EF_PRIMARY_HAND		0x00040000		// player flag for primary hand only
 #endif
 #define EF_TEAMVOTED		0x00080000		// already cast a team vote
-#ifdef TA_SP
-#define EF_FINISHED			0x00100000		// Finished level
-#endif
-#ifdef TURTLEARENA // LOCKON
-#define EF_LOCKON			0x00200000
-#endif
-#ifdef IOQ3ZTM // RENDERFLAGS
-#define EF_ONLY_MIRROR		0x00400000 // Only render in mirrors
-#define EF_NOT_MIRROR		0x00800000 // Do not render in mirrors
-#endif
-#ifdef TA_ENTSYS // FUNC_USE
-#define EF_USE_ENT			0x01000000 // Use entity not holdable item
-#endif
-#ifdef TA_PATHSYS
-#define EF_TRAINBACKWARD	0x02000000
-#endif
 
 #ifdef IOQ3ZTM
-#ifdef TURTLEARENA // AWARDS
+#ifdef TMNTWEAPONS
 // Removed EF_AWARD_GAUNTLET, EF_AWARD_IMPRESSIVE, and EF_AWARD_EXCELLENT
 #define EF_AWARD_BITS ( EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP )
 #else
@@ -377,7 +362,7 @@ typedef enum {
 // NOTE: may not have more than 16
 typedef enum {
 	PW_NONE,
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 	// TODO: Limited time version of PW_AMMOREGEN?
 	// pw_infinity, // Green [White in TMNT3] crystal: Unlimited Shuriken for a limited period.
 
@@ -388,6 +373,8 @@ typedef enum {
 	PW_HASTE, // PW_SPEED: More Speed
 	PW_INVIS, // Foot Tech powerup?
 
+	// Turtle Man: TODO: Remove regen and change flight to NiGHTS mode...
+	PW_REGEN,		// Give health back. 15 health per second?
 	PW_FLIGHT,		// Allow player to fly around the level.
 
 	PW_INVUL,		// New invulerrability
@@ -405,7 +392,7 @@ typedef enum {
 	PW_AMMOREGEN,	// Regen ammo and shurikens --What about Melee weapons?
 					//    Give melee weapons limited uses? So that ammo give no limit?
 					//    Give melee weapons time-to-live? So that ammo give no limit?
-	//PW_INVULNERABILITY, // TURTLEARENA Disables MISSIONPACK's PW_INVULNERABILITY
+	//PW_INVULNERABILITY, // TMNT Disables MISSIONPACK's PW_INVULNERABILITY
 #else
 	PW_QUAD,
 	PW_BATTLESUIT,
@@ -429,94 +416,211 @@ typedef enum {
 
 } powerup_t;
 
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 /*
 	No item in bg_itemlist can use the same HI_* tag.
 	There can be a max of 16 holdable items, see MAX_HOLDABLE.
-	~ZTM Nov 3, 2008
+	~Turtle Man Nov 3, 2008
 */
 #endif
 typedef enum {
+#ifdef TMNTHOLDSYS/*2*/
+	// cg.holdableSelect is passed to server (game) in bg if it
+	//  is *not* HI_NO_SELECT the player's holdableIndex is set to it.
+	HI_NO_SELECT = -1, // Used by cgame to disable overriding bg change
+#endif
 	HI_NONE,
 
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TMNTHOLDABLE // no q3 teleprter
 	HI_TELEPORTER,
-#elif !defined TA_HOLDSYS
+#elif !defined TMNTHOLDSYS
 	HI_TELEPORTER_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
 	HI_MEDKIT,
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TMNTHOLDABLE // no q3 teleprter
 	HI_KAMIKAZE,
-#elif !defined TA_HOLDSYS
+#elif !defined TMNTHOLDSYS
 	HI_KAMIKAZE_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
-#ifndef TA_HOLDSYS
+#ifndef TMNTHOLDSYS
 	HI_PORTAL,
 #endif
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 	HI_INVULNERABILITY,
-#elif !defined TA_HOLDSYS
+#elif !defined TMNTHOLDSYS
 	HI_INVULNERABILITY_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TMNTHOLDABLE
 	// Shurikens
 	HI_SHURIKEN,
 	HI_ELECTRICSHURIKEN,
 	HI_FIRESHURIKEN,
 	HI_LASERSHURIKEN,
 
-	// ZTM: TODO: Make the grapple a holdable item?
+	// Turtle Man: TODO: Make the grapple a holdable item?
 	//       So that players can use the grapple and a weapon at the same time?
 	// 20090316: Have the grapple in the player's secondary hand like the flag?
 	// 20090409:   and use "use item" to fire?
 #endif
 
-#ifdef TA_HOLDSYS // ZTM: Moved "out of the way"
+#ifdef TMNTHOLDSYS // Turtle Man: Moved "out of the way"
 	HI_PORTAL,
 #endif
 
 	HI_NUM_HOLDABLE
-
-#ifdef TA_HOLDSYS/*2*/
-	// cg.holdableSelect is passed to server (game) in Pmove if it
-	//  is *not* HI_NO_SELECT the player's holdableIndex is set to it.
-	,HI_NO_SELECT = 255 // Used by cgame to disable overriding Pmove change
-#endif
 } holdable_t;
 
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 // Hold a max of 99 of each shuriken type. (Or any other holdable).
 #define MAX_SHURIKENS 99
 #endif
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 // Weapon type
+// The "Primary" weapon hand is choosen by the modeler, the "normal" is right hand.
+// \note if any weapon types are added/removed, update bg_weapontypeinfo
 typedef enum
 {
     WT_NONE, // Dummy type
 
-	// ZTM: NOTE: Gauntlet code hasn't been tested...
+	// Turtle Man: NOTE: Gauntlet code has been tested...
 	WT_GAUNTLET, // Uses primary hand only
+
     WT_GUN, // One gun, both hands.
+#ifdef TMNTWEAPSYS_2
 	WT_MELEE,
+#else
+    WT_GUN_PRIMARY, // One gun, left hand
+
+#ifdef TMNTWEAPONS
+	// Sword1 types.
+    WT_SWORD1_BOTH, // One sword, uses both hands
+	WT_SWORD1_PRIMARY, // One sword, uses left hand only
+
+	// Sword2 types.
+	// The one handed version is WT_SWORD1_PRIMARY
+	WT_SWORD2, // Two swords, one in each hand.
+	WT_DAISHO, // Daisho for Usagi ...secondary (left) is wakizashi (short), primary (right) is katana (long)
+
+	WT_SAI2, // Two Sais, one in each hand.
+	WT_SAI1_PRIMARY, // One Sai, uses left hand only
+
+    WT_BO, // One Bo, uses both hands
+    WT_BO_PRIMARY, // One Bo, left hand.
+
+    WT_HAMMER, // One hammer, uses both hands
+    WT_HAMMER_PRIMARY, // One hammer, left hand.
+
+	// Nunchuks are going take more work then the other weapons.
+	// Have three models, handle, chain, handle2
+	//   connect the three models using tags and swing the chain and handle2 using the
+	//   flag swing code.
+	// OR: Have one model that is animated. Better/easier thing to do?
+	//   but it needs more thinking...
+	//
+	// Ooh! Maybe I can use Q3 "_barrel.md3" the code!
+    WT_NUNCHUKS, // Two nunchuk, one in each hand.
+    WT_NUNCHUKS1_PRIMARY, // One nunchuk, left hand.
+#endif
+#endif
+
     WT_MAX
 
 } weapontype_t;
 
 // Default weapon if animation.cfg doesn't set one.
-#ifdef TURTLEARENA // WEAPONS
+#ifdef TMNTWEAPONS
+/*#ifdef TMNT_SUPPORTQ3
+// Quake 3 players don't have a "default_weapon" in there animation.cfg
+// GUNS_AS_DEFAULT  --Search Keyword
+// Turtle Man: Should be WP_GAUNTLET for quake3 players,
+//     but I have no gauntlet... (and don't really want one.)
+//   Guns as default weapon is disabled.
+//   This is due to ammo for default weapons being problatic;
+//   Guns will be one of three things, unlimited ammo or cheatable
+//    (swap to other player and back to get ammo)
+//    or unable to be used...
+//   Not sure if I want to try and fix this, and currently
+//   FIXED?:  modifying any part of the player's info string will reload the player,
+//   FIXED?:  causing ammo to reset.
+
+#ifdef TMNTWEAPSYS_2
+#define DEFAULT_DEFAULT_WEAPON "WP_GUN" // "WP_GAUNTLET"
+#else
+#define DEFAULT_DEFAULT_WEAPON WP_GUN // WP_GAUNTLET
+#endif // TMNTWEAPSYS_2
+#else // !TMNT_SUPPORTQ3
+*/
+#ifdef TMNTWEAPSYS_2
 #define DEFAULT_DEFAULT_WEAPON "WP_FISTS"
 #else
+#define DEFAULT_DEFAULT_WEAPON WP_FISTS
+#endif // TMNTWEAPSYS_2
+//#endif // TMNT_SUPPORTQ3
+
+#else
+#ifdef TMNTWEAPSYS_2
 #define DEFAULT_DEFAULT_WEAPON "WP_GAUNTLET" // "WP_MACHINEGUN"
+#else
+#define DEFAULT_DEFAULT_WEAPON WP_GAUNTLET // WP_MACHINEGUN
+#endif // TMNTWEAPSYS_2
+#endif
+#endif // TMNTWEAPSYS
+
+typedef enum {
+#ifdef TMNTWEAPSYS
+    WP_DEFAULT = -1, // This weapon will need to be remapped to the default weapon.
 #endif
 
-// WP_DEFAULT will need to be remapped to the default weapon.
-#define WP_DEFAULT	-1
-#define WP_NONE		0
-#define weapon_t	int
+#ifdef TMNTWEAPONS
+	// Many of the weapons are based on weapons in TMNT: Mutant Melee
+
+	WP_NONE,
+
+#ifndef TMNTWEAPSYS_2
+	// For players like Hun who don't have a default "weapon" but just use there fists.
+	WP_FISTS, // Invisible weapon, each hand, short range damage.
+
+	// \swords
+    WP_KATANAS, // Two swords.
+    WP_DAISHO, // 1 katana and 1 wakizashi, for Usagi...
+
+	// \sais --short swords?
+    WP_SAIS, // Two sais
+
+	// \nunchuks
+    WP_NUNCHUKS, // Two nunchuks
+    // WP_CHAINS, // Two metal chains, one in each hand, used like Nunchuks
+
+	// \hammers
+	WP_HAMMER,
+	WP_AXE, // Battle Axe
+	//WP_BAMBOOHAMMER, // Bamboo [hammer type], its in Mutant Melee but I don't plan on adding it.
+
+	// \sword1_both
+	WP_LONGSWORD,
+	WP_BAT,
+	//WP_SPIKEDCLUB, // In Mutant Melee...
+
+    // \bos
+    WP_BO, // One Bo, uses both hands
+	WP_BAMBOO, // Bamboo [bo type]
+
+    // \guns
+	// Turtle Man: TODO: Finish WP_GUN. It was going to be a chaingun like in Mutant Melee,
+	//                   but I think I will make it a tri-blaster instead~
+	WP_GUN,
+	WP_PLASMAGUN, //WP_ELECTRIC_LAUNCHER, // Federation? or Tri? // Currently just Q3 WP_PLASMAGUN.
+	WP_ROCKET_LAUNCHER, // Tri rocket launcher // AI Same as in Q3...
+	WP_HOMING_LAUNCHER, // Earth Protection Force homing rocket launcher // TMNT:MM Yellow homing-rocket launcher
+
+    // Leave gappling hook in, because its cool.
+	WP_GRAPPLING_HOOK, // Model will be modified tri-blaster
+
+	WP_NUM_WEAPONS
+#endif
 #else
-typedef enum {
 	WP_NONE,
 
 	WP_GAUNTLET,
@@ -536,47 +640,30 @@ typedef enum {
 #endif
 
 	WP_NUM_WEAPONS
+#endif // TMNTWEAPONS
 } weapon_t;
-#endif
 
-#ifdef TA_WEAPSYS
-// Currently only support two hands
-typedef enum
+#ifdef TMNTWEAPSYS
+#define HAND_NONE 0
+#define HAND_PRIMARY 1
+#define HAND_SECONDARY 2
+#define HAND_BOTH (HAND_PRIMARY|HAND_SECONDARY)
+#define MAX_HANDS 2 // Currently players can only have 2 hands...
+#ifndef TMNTWEAPSYS_2
+typedef struct
 {
-	HAND_PRIMARY,
-	HAND_SECONDARY,
-#if 0
-	HAND_THIRD,
-	HAND_FOURTH,
+	int hands; // bitfield, see HAND_* defines
+	weapontype_t primaryOnly;	// Use this type when holding a CTF flag.
+	int standAnim;
+	int attackAnim;
+	// Melee weapons should have more than one attack
+	//int attackAnim2;
+	//int attackAnim3;
+
+} bg_weapontypeinfo_t;
 #endif
-	MAX_HANDS
-} hand_e;
 
-// hand bits, usally used in weaponHands
-typedef enum
-{
-	HB_NONE			= 0,
-	HB_PRIMARY		= 1,
-	HB_SECONDARY	= 2,
-	HB_BOTH			= 3, // (HB_PRIMARY|HB_SECONDARY)
-#if 0 // ZTM: NOTE: May have to update weaponHands sent bits over network, add more MOD_WEAPON_*, and stuff.
-	HB_THIRD		= 4,
-	HB_FOURTH		= 8,
-	HB_ALL			= 15, // (HB_PRIMARY|HB_SECONDARY|HB_THIRD|HB_FOURTH)
-	HB_MAX			= 16 // (HB_PRIMARY|HB_SECONDARY|HB_THIRD|HB_FOURTH)+1
-#else
-	HB_MAX			= 4 // (HB_PRIMARY|HB_SECONDARY)+1
-#endif
-} handbits_e;
-
-#define HAND_TO_HB(hand) (1<<(hand))
-//#define HB_TO_HAND(handbit) (1>>(handbit))
-
-// handSide
-#define HS_CENTER 0
-#define HS_RIGHT 1
-#define HS_LEFT 2
-
+#ifdef TMNTWEAPSYS_2
 //projectile trail types
 #define PT_NONE 0
 #define PT_PLASMA 1
@@ -598,10 +685,6 @@ typedef enum
 #define PD_BFG 6
 #define PD_LIGHTNING 7
 #define PD_ROCKET_SMALL 8
-//projectile explosion types
-#define PE_NORMAL 0 // default (explode after timetolive)
-#define PE_NONE 1
-#define PE_PROX 2 // (stickOnImpact prox mine)
 //projectile spin types
 #define PS_ROLL 0 // default
 #define PS_NONE 1
@@ -614,7 +697,8 @@ typedef enum
 //projectile flags
 #define PF_WALLMARK_FADE_ALPHA 1
 #define PF_WALLMARK_COLORIZE 2
-#define PF_USE_GRAVITY 4
+#define PF_EXPLOSION_COLORIZE 4
+#define PF_USE_GRAVITY 8
 // missile stuff (func, model, etc)
 typedef struct
 {
@@ -630,7 +714,6 @@ typedef struct
 	qboolean shootable;
 	int trailType;
 	int deathType;
-	int explosionType;
 	int missileDlight;
 	vec3_t missileDlightColor;
 	char missileSoundName[MAX_QPATH];
@@ -653,18 +736,12 @@ typedef struct
 	int numProjectiles;
 
 	int homing;
-	// if "homing" > 0 then projectile is a homing missile,
-	//   homing is also used as the delay (in msec) before homing in on a player.
+	// if more then 0 projectile is a homing missile,
+	//   homing is used as delay (in msec) before homing in on a player
 
 	int grappling;
 	int instantDamage;
 	int maxHits; // Projectiles can go through players... currently instantDamage only
-
-	// Hit sounds
-	char hitSoundName[3][MAX_QPATH];
-	char hitPlayerSoundName[MAX_QPATH];
-	char hitMetalSoundName[MAX_QPATH];
-	char bounceSoundName[2][MAX_QPATH];
 
 } bg_projectileinfo_t;
 
@@ -678,19 +755,18 @@ typedef struct
 	int trailStyle;		///< TRAIL_* defines
 } bg_bladeinfo_t;
 
-// Non-specific
+// Melee and guns
 #define WIF_WALLMARK_FADE_ALPHA	1
 #define WIF_WALLMARK_COLORIZE	2
-// Melee-specific
+// Melee only
 #define WIF_ALWAYS_DAMAGE		4 // Do damage even while not attacking, like a lightsaber.
-#define WIF_CUTS				8 // Swords can cuts things that a bo, nunchunk, and sai can not.
-// Guns-specific
-#define WIF_CONTINUOUS_FLASH	16
-// Non-specific, Eject "brass" functions
-#define WIF_EJECT_BRASS			32		// CG_MachineGunEjectBrass
-#define WIF_EJECT_BRASS2		64		// CG_ShotgunEjectBrass
-#define WIF_EJECT_SMOKE			128		// CG_NailgunEjectBrass
-#define WIF_EJECT_SMOKE2		256		// Shotgun smoke
+// Guns only
+#define WIF_CONTINUOUS_FLASH	8
+//  Eject "brass" functions
+#define WIF_EJECT_BRASS			16		// CG_MachineGunEjectBrass
+#define WIF_EJECT_BRASS2		32		// CG_ShotgunEjectBrass
+#define WIF_EJECT_SMOKE			64		// CG_NailgunEjectBrass
+#define WIF_EJECT_SMOKE2		128		// Shotgun smoke
 
 // Barrel Spin
 #define BS_PITCH PITCH // 0
@@ -699,7 +775,7 @@ typedef struct
 #define BS_NONE 3
 #define BS_MAX 4
 
-#define MAX_WEAPON_BLADES 5 // Katana use 1, Bo use 2, Sai use 3, etc
+#define MAX_WEAPON_BLADES 4 // Katana use 1, Bo use 2, Sai use 3, etc
 typedef struct
 {
 	char name[MAX_QPATH];
@@ -711,6 +787,9 @@ typedef struct
 	int attackDelay;
 
 	// sounds
+	char readySoundName[MAX_QPATH];
+	char firingSoundName[MAX_QPATH];
+	char firingStoppedSoundName[MAX_QPATH];
 	char flashSoundName[4][MAX_QPATH];
 
 	// bit flags
@@ -723,7 +802,7 @@ typedef struct
 	int projnum; // bg_projectileinfo[projnum]
 	// aimOffset is the weapon aim offset for bots
 	vec3_t aimOffset;
-	int barrelSpin; // BS_*
+	int barrelSpin; // BS_*  (Turtle Man: TODO: May use for nunchuks?)
 
 	// melee only
 	char wallmarkName[MAX_QPATH];
@@ -747,8 +826,11 @@ typedef enum {
 	IT_BAD,
 	IT_WEAPON,				// EFX: rotate + upscale + minlight
 	IT_AMMO,				// EFX: rotate
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 	IT_ARMOR,				// EFX: rotate + minlight
+#endif
+#ifdef TMNT // CRATE
+	IT_CRATE,				// EFX: Turtle Man: TODO: solid + minlight
 #endif
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
 	IT_POWERUP,				// instant on, timer based
@@ -799,11 +881,6 @@ typedef struct
 	char pickupName[MAX_QPATH]; // Example; "Sais"
 	// pickupAmmo is stored in "item.quantity"
 
-	// Sounds
-	char readySoundName[MAX_QPATH];
-	char firingSoundName[MAX_QPATH];
-	char firingStoppedSoundName[MAX_QPATH];
-
 	// Weapon pointers
 	bg_weaponinfo_t *weapon[MAX_HANDS];
 	int weaponnum[MAX_HANDS];
@@ -815,21 +892,18 @@ typedef struct
 
 } bg_weapongroupinfo_t;
 
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 #define MAX_BG_PROJ 64
 #define MAX_BG_WEAPONS 64
 #define MAX_BG_WEAPON_GROUPS 32
 #else
 #define MAX_BG_PROJ 32
 #define MAX_BG_WEAPONS 32
-#define MAX_BG_WEAPON_GROUPS 16 // ZTM: WONTFIX: Player's are limited to 16 weapons.
+#define MAX_BG_WEAPON_GROUPS 16 // Turtle Man: WONTFIX: Player's are limited to 16 weapons.
 #endif
 extern bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 extern bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 extern bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
-int BG_ProjectileIndexForHoldable(int holdable);
-#endif
 int BG_ProjectileIndexForName(const char *name);
 int BG_WeaponIndexForName(const char *name);
 int BG_WeaponGroupIndexForName(const char *name);
@@ -838,24 +912,63 @@ int BG_NumWeapons(void);
 int BG_NumWeaponGroups(void);
 void BG_InitWeaponInfo(void);
 int BG_MaxAttackCombo(playerState_t *ps);
+#else
+// Turtle Man: TODO?: Use info for guns too. Currently they don't use any (other then weapontype).
+typedef struct
+{
+	//char name[MAX_QPATH];
+	//gitem_t *item;
 
+	weapontype_t weapontype;
+	int mod; // Means of death, MOD_* enum - Primary weapon
+	// Turtle Man: TODO?: If WT_GUN, have mod2 be splash damage MOD?
+	//                   -or- support guns in both hands?...
+	int mod2; // Means of death, MOD_* enum - Secondary weapon
+
+	// Damage amounts
+	int damage; // Damage given by Primary weapon
+	// Turtle Man: TODO?: If WT_GUN, have damge2 be splash damage?
+	//                   -or- support guns in both hands?...
+	int damage2; // Damage given by Secondary weapon
+
+	// Melee weapons
+	// Primary weapon
+	//vec3_t mins;
+	//vec3_t maxs;
+	int start_range;			// can be neg to have the weapon do damge below tag
+	int end_range;				// Dist to attack
+
+	// Secondary weapon
+	//vec3_t mins2;
+	//vec3_t maxs2;
+	int start_range2;
+	int end_range2;
+
+} bg_weaponinfo_t;
+
+extern bg_weapontypeinfo_t bg_weapontypeinfo[WT_MAX];
+extern bg_weaponinfo_t bg_weaponinfo[WP_NUM_WEAPONS];
+#endif
+
+weapontype_t BG_WeaponTypeForPlayerState(playerState_t *ps);
+weapontype_t BG_WeaponTypeForEntityState(entityState_t *es);
+weapontype_t BG_WeaponTypeForNum(weapon_t weaponnum);
 int BG_WeaponHandsForPlayerState(playerState_t *ps);
 int BG_WeaponHandsForWeaponNum(weapon_t weaponnum);
 qboolean BG_WeapTypeIsMelee(weapontype_t wt);
-qboolean BG_WeaponHasMelee(weapon_t weaponnum);
-qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt);
 qboolean BG_WeapUseAmmo(weapon_t w);
 qboolean BG_PlayerAttackAnim(int a);
 qboolean BG_PlayerStandAnim(int a);
-int BG_WeaponGroupTotalDamage(int weaponGroup);
 #endif
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 int BG_ItemNumForHoldableNum(holdable_t holdablenum);
 #endif
 
 // reward sounds (stored in ps->persistant[PERS_PLAYEREVENTS])
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTMISC
 #define	PLAYEREVENT_DENIEDREWARD		0x0001
+#endif
+#ifndef TMNTWEAPONS
 #define	PLAYEREVENT_GAUNTLETREWARD		0x0002
 #endif
 #ifndef NOTRATEDM // Disable strong lang.
@@ -906,7 +1019,7 @@ typedef enum {
 	EV_ITEM_PICKUP,			// normal item pickups are predictable
 	EV_GLOBAL_ITEM_PICKUP,	// powerup / team sounds are broadcast to everyone
 
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 	EV_DROP_WEAPON,
 #else
 	EV_NOAMMO,
@@ -936,10 +1049,8 @@ typedef enum {
 	EV_PLAYER_TELEPORT_IN,
 	EV_PLAYER_TELEPORT_OUT,
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	EV_PROJECTILE_BOUNCE,
-	EV_PROJECTILE_STICK,
-	EV_PROJECTILE_TRIGGER,
 #else
 	EV_GRENADE_BOUNCE,		// eventParm will be the soundindex
 #endif
@@ -948,7 +1059,7 @@ typedef enum {
 	EV_GLOBAL_SOUND,		// no attenuation
 	EV_GLOBAL_TEAM_SOUND,
 
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS_2
 	EV_BULLET_HIT_FLESH,
 	EV_BULLET_HIT_WALL,
 #endif
@@ -957,14 +1068,14 @@ typedef enum {
 	EV_MISSILE_MISS,
 	EV_MISSILE_MISS_METAL,
 	EV_RAILTRAIL,
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS_2
 	EV_SHOTGUN,
 #endif
 #ifndef IOQ3ZTM_NO_COMPAT
 	EV_BULLET,				// otherEntity is the shooter
 #endif
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	EV_WEAPON_HIT,
 	EV_WEAPON_MISS,
 	EV_WEAPON_MISS_METAL,
@@ -979,7 +1090,7 @@ typedef enum {
 	EV_POWERUP_QUAD,
 	EV_POWERUP_BATTLESUIT,
 	EV_POWERUP_REGEN,
-#if defined TURTLEARENA || defined NET_COMPAT  // POWERS
+#ifdef TMNT // POWERS
 	EV_POWERUP_INVUL,
 #endif
 
@@ -987,21 +1098,18 @@ typedef enum {
 	EV_GIB_PLAYER,			// gib a previously living player
 #endif
 	EV_SCOREPLUM,			// score plum
-#ifdef TA_ENTSYS // BREAKABLE
-	EV_SPAWN_DEBRIS,
-#endif
 
 //#ifdef MISSIONPACK
-#if !defined TA_WEAPSYS || defined NET_COMPAT
+#ifndef TMNTWEAPONS
 	EV_PROXIMITY_MINE_STICK,
 	EV_PROXIMITY_MINE_TRIGGER,
 #endif
-#if !defined TA_HOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	EV_KAMIKAZE,			// kamikaze explodes
 #endif
 	EV_OBELISKEXPLODE,		// obelisk explodes
 	EV_OBELISKPAIN,			// obelisk is in pain
-#if !defined TURTLEARENA || defined NET_COMPAT  // POWERS
+#ifndef TMNT // POWERS
 	EV_INVUL_IMPACT,		// invulnerability sphere impact
 	EV_JUICED,				// invulnerability juiced effect
 	EV_LIGHTNINGBOLT,		// lightning bolt bounced of invulnerability sphere
@@ -1009,7 +1117,7 @@ typedef enum {
 //#endif
 
 	EV_DEBUG_LINE,
-#ifdef IOQ3ZTM // DEBUG_ORIGIN
+#ifdef TMNTMISC // DEBUG_ORIGIN
 	EV_DEBUG_ORIGIN,
 #endif
 	EV_STOPLOOPINGSOUND,
@@ -1042,13 +1150,13 @@ typedef enum {
 	GTS_REDTEAM_TOOK_LEAD,
 	GTS_BLUETEAM_TOOK_LEAD,
 	GTS_TEAMS_ARE_TIED,
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	GTS_KAMIKAZE
 #endif
 } global_team_sound_t;
 
 // animations
-#ifdef TA_PLAYERS
+#ifdef TMNTPLAYERS
 // NOTE: In animation.cfg I call some animations by other names;
 // * TORSO_ATTACK_GUN is TORSO_ATTACK
 // * TORSO_ATTACK_GUNTLET is TORSO_ATTACK2
@@ -1098,12 +1206,12 @@ typedef enum {
 	TORSO_AFFIRMATIVE,
 	TORSO_NEGATIVE,
 
-#ifdef TA_PLAYERS // New Turtle Arena player animations
+#ifdef TMNTPLAYERS // New TMNT player animations
 	// Place default weapons somewhere on there person while there not used.
 	// TORSO_***DEFAULT_SECONDARY for Don should be
 	//  switching to/from two handed Bo to using one hand.
-	// ZTM: NOTE: Currently first half to going to weapon spot, second half is moving back.
-	// ZTM: TODO: Should I split into 2 animations?
+	// Turtle Man: NOTE: Currently first half to going to weapon spot, second half is moving back.
+	// Turtle Man: TODO: Should I split into 2 animations?
 	TORSO_PUTDEFAULT_BOTH,
 	TORSO_PUTDEFAULT_PRIMARY,
 	TORSO_PUTDEFAULT_SECONDARY,
@@ -1136,8 +1244,8 @@ typedef enum {
     TORSO_STAND_HAMMER,
     TORSO_STAND_HAMMER_PRIMARY,
 
-    TORSO_STAND_NUNCHUCKS,
-    TORSO_STAND_NUNCHUCKS1_PRIMARY,
+    TORSO_STAND_NUNCHUKS,
+    TORSO_STAND_NUNCHUKS1_PRIMARY,
 
 	// Gun attacks
     //TORSO_ATTACK_GUNTLET, // Would be the same as TORSO_ATTACK2...
@@ -1182,18 +1290,18 @@ typedef enum {
     TORSO_ATTACK_HAMMER_A,
     TORSO_ATTACK_HAMMER_PRIMARY_A,
 
-    TORSO_ATTACK_NUNCHUCKS_A,
-    TORSO_ATTACK_NUNCHUCKS_B,
-    TORSO_ATTACK_NUNCHUCKS_C,
-    TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A,
-    TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B,
-    TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C,
+    TORSO_ATTACK_NUNCHUKS_A,
+    TORSO_ATTACK_NUNCHUKS_B,
+    TORSO_ATTACK_NUNCHUKS_C,
+    TORSO_ATTACK_NUNCHUKS1_PRIMARY_A,
+    TORSO_ATTACK_NUNCHUKS1_PRIMARY_B,
+    TORSO_ATTACK_NUNCHUKS1_PRIMARY_C,
     // NOTE: If more animations are added update BG_PlayerAttackAnim
 #endif
 
 	MAX_ANIMATIONS,
 
-#ifdef IOQ3ZTM // ZTM: There is no "MAX_ANIMATIONS" animation
+#ifdef IOQ3ZTM // Turtle Man: There is no "MAX_ANIMATIONS" animation
 	LEGS_BACKCR = MAX_ANIMATIONS,
 #else
 	LEGS_BACKCR,
@@ -1208,7 +1316,7 @@ typedef enum {
 	MAX_TOTALANIMATIONS
 } animNumber_t;
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 // For bg/game/cgame
 animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps);
 animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps);
@@ -1217,34 +1325,8 @@ animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum);
 animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
 #endif
 
-
-#ifdef TA_MISC // MATERIALS
-typedef enum
-{
-	MT_NONE,
-	MT_DIRT,
-	MT_GRASS,
-	MT_WOOD,
-	MT_STONE,
-	MT_METAL,
-	MT_SPARKS,
-	MT_GLASS,
-
-	NUM_MATERIAL_TYPES
-
-} materialType_t;
-
-typedef struct
-{
-	char	*name;
-	int		surfaceFlag;
-} materialInfo_t;
-
-extern materialInfo_t materialInfo[NUM_MATERIAL_TYPES];
-#endif
-
-#ifdef TA_ENTSYS // MISC_OBJECT
-// TA_NPCSYS: Have Misc_Objects and NPCs use the same animations
+#ifdef TMNTENTSYS // MISC_OBJECT
+// TMNTNPCSYS: Have Misc_Objects and NPCs use the same animations
 // Keep in sycn with CG's misc_object_anim_names
 typedef enum
 {
@@ -1263,10 +1345,10 @@ typedef enum
 	OBJECT_DEAD2,
 	OBJECT_DEAD3,
 
-	OBJECT_LAND, // ZTM: TODO: misc_object hit ground.
-	OBJECT_PAIN, // ZTM: TODO: "Pain" animation of misc_object with no health (Dead).
+	OBJECT_LAND, // Turtle Man: TODO: misc_object hit ground.
+	OBJECT_PAIN, // Turtle Man: TODO: "Pain" animation of misc_object with no health (Dead).
 
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	// Animations only used by NPCs
 	OBJECT_TAUNT,
 	OBJECT_ATTACK_FAR,
@@ -1281,7 +1363,7 @@ typedef enum
 	MAX_MISC_OBJECT_ANIMATIONS
 } miscObjectAnim_t;
 
-// ZTM: TODO: Sounds like Jedi Knight 2's animsounds.cfg, see Sounds_Parse
+// Turtle Man: TODO: Sounds like Jedi Knight 2's animsounds.cfg, see Sounds_Parse
 //   Only cgame and ui need this, game doesn't use sounds.
 #define MAX_RAND_SOUNDS 5
 typedef struct
@@ -1315,7 +1397,7 @@ typedef struct animation_s {
 #define	ANIM_TOGGLEBIT		128
 
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-// ZTM: This was moved to BG as TA_WEAPSYS_1 needs it in game
+// Turtle Man: This was moved to BG as TMNTWEAPSYS_1 needs it in game
 
 // when changing animation, set animationTime to frameTime + lerping time
 // The current lerp will finish out, then it will lerp to the new animation
@@ -1338,7 +1420,7 @@ typedef struct {
 	int			animationTime;		// time when the first frame of the animation will be exact
 } lerpFrame_t;
 
-// ZTM: for time use;
+// Turtle man: for time use;
 // * cgame - cg.time
 // * ui - dp_realtime
 // * game - level.time
@@ -1346,44 +1428,29 @@ void BG_ClearLerpFrame(lerpFrame_t * lf, animation_t *animations, int animationN
 void BG_SetLerpFrameAnimation( lerpFrame_t *lf, animation_t *animations, int newAnimation );
 void BG_RunLerpFrame( lerpFrame_t *lf, animation_t *animations, int newAnimation, int time, float speedScale );
 #endif
-#ifdef IOQ3ZTM // BG_SWING_ANGLES
-#define BG_SWINGSPEED 0.3f // default swing speed // cg_swingSpeed.value
-void BG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
-					float speed, float *angle, qboolean *swinging, int frametime );
-#endif
 
 #ifdef IOQ3ZTM // PLAYER_DIR
 #define MAX_PLAYER_DIRS 4
-#ifdef TA_SUPPORTEF
-#define MAX_UI_PLAYERDIRS 2
-#else
-#define MAX_UI_PLAYERDIRS 1
-#endif
 extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 #endif
 
-#ifdef TA_PLAYERSYS
-#ifdef TURTLEARENA // DEFAULT_PLAYER
+#ifdef TMNTPLAYERSYS
+#ifdef TMNT // DEFAULT_PLAYER
 #define	DEFAULT_MODEL			"raph"
-#define DEFAULT_MODEL_FEMALE	"raph" // ZTM: TODO: Add female model/sounds
 #define	DEFAULT_TEAM_MODEL		"raph"
 #define	DEFAULT_TEAM_HEAD		"raph"
-#define DEFAULT_TEAM_MODEL_FEMALE	"raph" // ZTM: TODO: Add female model/sounds
 #else // Q3
 #define	DEFAULT_MODEL			"sarge"
-#define	DEFAULT_MODEL_FEMALE	"crash"
 #ifdef MISSIONPACK
 #define	DEFAULT_TEAM_MODEL		"james"
 #define	DEFAULT_TEAM_HEAD		"*james"
-#define	DEFAULT_TEAM_MODEL_FEMALE	"janet"
 #else
 #define	DEFAULT_TEAM_MODEL		"sarge"
 #define	DEFAULT_TEAM_HEAD		"sarge"
-#define	DEFAULT_TEAM_MODEL_FEMALE	"crash"
 #endif
-#endif // TURTLEARENA
+#endif // TMNT
 
-#ifdef TURTLEARENA // DEFAULT_TEAMS
+#ifdef TMNT // DEFAULT_TEAMS
 #define DEFAULT_REDTEAM_NAME		"Sais"
 #define DEFAULT_BLUETEAM_NAME		"Katanas"
 #else
@@ -1391,7 +1458,7 @@ extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 #define DEFAULT_BLUETEAM_NAME		"Pagans"
 #endif
 
-// Moved footstep_t to bg_misc.h from cg_local.h
+// Moved footstep_t to both game from client game.
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,
@@ -1403,13 +1470,6 @@ typedef enum {
 
 	FOOTSTEP_TOTAL
 } footstep_t;
-
-typedef enum {
-	ABILITY_NONE,
-	ABILITY_TECH,
-//	ABILITY_STRENGTH,
-	ABILITY_MAX
-} ablitiy_t;
 
 typedef struct bg_playercfg_s
 {
@@ -1429,11 +1489,10 @@ typedef struct bg_playercfg_s
 	// Elite Force support
 	char soundpath[MAX_QPATH];
 
-	// Allow player models to have data that changes what happens in game.
-
-#ifdef TA_WEAPSYS
+	// New Info for TMNT, allows player models to have data that changes
+	//  what happens in game.
+#ifdef TMNTWEAPSYS
     weapon_t default_weapon;
-	int handSide[MAX_HANDS];
 #endif
 
 	// Player's boundingbox
@@ -1443,17 +1502,15 @@ typedef struct bg_playercfg_s
 	// Speed control, some characters are faster then others.
 	int   max_speed;
 	float accelerate_speed; // Replaces pm_accelerate; default 10.0f
-	float accelstart;
-
-	ablitiy_t ability;
 
 } bg_playercfg_t;
 
 int BG_AnimationTime(animation_t *anim);
 int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip);
+//qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg);
 qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, const char *headModel);
 
-#ifdef TA_ENTSYS
+#ifdef TMNTENTSYS
 typedef struct
 {
 	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
@@ -1466,11 +1523,10 @@ typedef struct
 	float speed;
 	int lerpframes; // Use raw frames, don't interperate them.
 
-	// ZTM: TODO: For NPCs
+	// Turtle Man: TODO: For NPCs
 	// Speed control, some characters are faster then others.
 	//int   max_speed;
 	//float accelerate_speed; // Replaces pm_accelerate; default 10.0f
-	//float accelstart;
 
 } bg_objectcfg_t;
 
@@ -1479,7 +1535,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg);
 #endif
 #endif
 
-#ifdef TA_PLAYERSYS // Moved below bg_playercfg_t
+#ifdef TMNTPLAYERSYS // Moved below bg_playercfg_t
 /*
 ===================================================================================
 
@@ -1498,7 +1554,7 @@ typedef enum {
 	PM_DEAD,		// no acceleration or turning, but free falling
 	PM_FREEZE,		// stuck in place with no control
 	/* bg_public.h
-		ZTM: NOTE: Client (not cgame) exspects PM_INTERMISSION as 5 and
+		Turtle Man: NOTE: Client (not cgame) exspects PM_INTERMISSION as 5 and
 			PM_SPINTERMISSION as 6.
 	*/
 	PM_INTERMISSION,	// no movement or status bar
@@ -1510,13 +1566,13 @@ typedef enum {
 	WEAPON_RAISING,
 	WEAPON_DROPPING,
 	WEAPON_FIRING
-#ifdef TA_PLAYERSYS // WEAPONS
+#ifdef TMNTPLAYERSYS // WEAPONS
 	,WEAPON_HAND_CHANGE
 #endif
 } weaponstate_t;
 
-#ifdef TA_NPCSYS
-// ZTM: Flags for general NPC effects.
+#ifdef TMNTNPCSYS
+// Turtle Man: Flags for general NPC effects.
 typedef enum
 {
 	NPCF_NODROPWEAPON	= 1, // Don't drop weapon when killed.
@@ -1531,7 +1587,7 @@ typedef enum
 
 } npcflag_e;
 
-// ZTM: General death types.
+// Turtle Man: General death types.
 typedef enum
 {
 	NPCD_NONE, // Stays there doing nothing. Forever.
@@ -1547,14 +1603,13 @@ typedef struct
 {
 	char classname[MAX_NPCNAME];
 	char model[MAX_QPATH];
-	int weaponGroup; // ZTM: weapon group to hold/use
+	int weaponGroup; // Turtle Man: weapon group to hold/use
 	int flags; // see npcflag_e
 	int deathType; // see npcDeath_e
 	int health;
 	int viewheight;
 	vec3_t mins, maxs;
 	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
-	int handSide[MAX_HANDS];
 
 } bg_npcinfo_t;
 
@@ -1592,8 +1647,8 @@ typedef struct
 // pmove->pm_flags
 #define	PMF_DUCKED			1
 #define	PMF_JUMP_HELD		2
-#ifdef IOQ3ZTM
-#define PMF_FIRE_HELD		4		// set when attack has been started
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
+#define PMF_GRAPPLE_SHOT	4
 #endif
 #define	PMF_BACKWARDS_JUMP	8		// go into backwards land
 #define	PMF_BACKWARDS_RUN	16		// coast down to backwards run
@@ -1601,11 +1656,13 @@ typedef struct
 #define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
 #define	PMF_TIME_WATERJUMP	256		// pm_time is waterjump
 #define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
+#ifndef TMNTHOLDABLE
 #define	PMF_USE_ITEM_HELD	1024
+#endif
 #define PMF_GRAPPLE_PULL	2048	// pull towards grapple location
 #define PMF_FOLLOW			4096	// spectate following another player
 #define PMF_SCOREBOARD		8192	// spectate as a scoreboard
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 #define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
 #endif
 
@@ -1615,10 +1672,10 @@ typedef struct
 typedef struct {
 	// state (in / out)
 	playerState_t	*ps;
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	bg_playercfg_t	*playercfg;
 #endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	bg_npc_t		*npc;
 #endif
 
@@ -1689,7 +1746,28 @@ typedef enum {
 // means of death
 typedef enum {
 	MOD_UNKNOWN,
-#ifndef TURTLEARENA // MOD
+#ifdef TMNTWEAPONS // MOD
+	MOD_FIST, // _FISTS
+	MOD_KATANA, // _KATANAS
+	MOD_WAKIZASHI, // Usagi's shorter sword
+	MOD_SAI,	// _SAIS
+	MOD_NUNCHUK, // _NUNCHUKS
+	MOD_HAMMER,
+	MOD_AXE,
+	//MOD_BAMBOOHAMMER,
+	MOD_SWORD, // _LONGSWORD
+	MOD_BAT,
+	//MOD_SPIKEDCLUB,
+	MOD_BO,
+	MOD_BAMBOO,
+	MOD_GUN,
+	MOD_ELECTRIC,
+	MOD_ELECTRIC_SPLASH,
+	MOD_ROCKET,
+	MOD_ROCKET_SPLASH,
+	MOD_HOMING,
+	MOD_HOMING_SPLASH,
+#else
 	MOD_SHOTGUN,
 	MOD_GAUNTLET,
 	MOD_MACHINEGUN,
@@ -1704,6 +1782,13 @@ typedef enum {
 	MOD_BFG,
 	MOD_BFG_SPLASH,
 #endif
+#ifdef TMNTHOLDABLE
+	MOD_SHURIKEN,
+	MOD_FIRESHURIKEN,
+	MOD_FIRESHURIKEN_EXPLOSION,
+	MOD_ELECTRICSHURIKEN,
+	MOD_LASERSHURIKEN,
+#endif
 	MOD_WATER,
 	MOD_SLIME,
 	MOD_LAVA,
@@ -1713,46 +1798,45 @@ typedef enum {
 	MOD_SUICIDE,
 	MOD_TARGET_LASER,
 	MOD_TRIGGER_HURT,
-#ifdef TA_ENTSYS
+#ifdef TMNTENTSYS
 	MOD_EXPLOSION,
 #endif
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // MOD
+#ifndef TMNTWEAPONS // MOD
 	MOD_NAIL,
 	MOD_CHAINGUN,
 	MOD_PROXIMITY_MINE,
 #endif
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	MOD_KAMIKAZE,
 #endif
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNTWEAPONS // MOD
 	MOD_JUICED,
 #endif
 #endif
 	MOD_GRAPPLE
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	,MOD_PROJECTILE,
-	MOD_PROJECTILE_EXPLOSION,
 	MOD_WEAPON_PRIMARY,
 	MOD_WEAPON_SECONDARY,
 	MOD_MAX
 #endif
 } meansOfDeath_t;
 
-extern char	*modNames[];
-extern int modNamesSize;
-
 //---------------------------------------------------------
 
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS_2
 // gitem_t->type
 typedef enum {
 	IT_BAD,
 	IT_WEAPON,				// EFX: rotate + upscale + minlight
 	IT_AMMO,				// EFX: rotate
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 	IT_ARMOR,				// EFX: rotate + minlight
+#endif
+#ifdef TMNT // CRATE
+	IT_CRATE,				// EFX: Turtle Man: TODO: solid + minlight
 #endif
 	IT_HEALTH,				// EFX: static external sphere + rotating internal
 	IT_POWERUP,				// instant on, timer based
@@ -1795,13 +1879,10 @@ gitem_t	*BG_FindItem( const char *pickupName );
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon );
 gitem_t	*BG_FindItemForPowerup( powerup_t pw );
 gitem_t	*BG_FindItemForHoldable( holdable_t pw );
-#ifdef IOQ3ZTM
-gitem_t	*BG_FindItemForClassname( const char *classname );
-#endif
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 int BG_ItemNumForItem( gitem_t *item );
 gitem_t	*BG_ItemForItemNum( int itemNum );
-int BG_NumItems(void);
+#define NUM_BG_ITEMS (bg_numItems+BG_NumWeaponGroups())
 #define	ITEM_INDEX(x) (BG_ItemNumForItem(x))
 #else
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)
@@ -1822,7 +1903,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #define	MASK_DEADSOLID			(CONTENTS_SOLID|CONTENTS_PLAYERCLIP)
 #define	MASK_WATER				(CONTENTS_WATER|CONTENTS_LAVA|CONTENTS_SLIME)
 #define	MASK_OPAQUE				(CONTENTS_SOLID|CONTENTS_SLIME|CONTENTS_LAVA)
-#ifdef TA_WEAPSYS // XREAL
+#ifdef TMNTWEAPSYS_2 // XREAL
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE|CONTENTS_SHOOTABLE)
 #else
 #define	MASK_SHOT				(CONTENTS_SOLID|CONTENTS_BODY|CONTENTS_CORPSE)
@@ -1834,7 +1915,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 //
 typedef enum {
 	/* bg_public.h
-		ZTM: NOTE: Botlib exspects theses five in this order.
+		Turtle Man: NOTE: Botlib exspects theses five in this order.
 	*/
 	ET_GENERAL,
 	ET_PLAYER,
@@ -1850,10 +1931,10 @@ typedef enum {
 	ET_INVISIBLE,
 	ET_GRAPPLE,				// grapple hooked on wall
 	ET_TEAM,
-#ifdef TA_ENTSYS // MISC_OBJECT
+#ifdef TMNTENTSYS // MISC_OBJECT
 	ET_MISCOBJECT,
 #endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	ET_NPC,
 #endif
 
@@ -1877,11 +1958,7 @@ void	BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTime );
 
 
-#ifdef TA_SP
-#define ARENAS_PER_TIER		2
-#else
 #define ARENAS_PER_TIER		4
-#endif
 #define MAX_ARENAS			1024
 #define	MAX_ARENAS_TEXT		8192
 
@@ -1911,7 +1988,7 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define KAMI_BOOMSPHERE_MAXRADIUS		720
 #define KAMI_SHOCKWAVE2_MAXRADIUS		704
 
-#ifdef TA_SP
+#ifdef TMNTSP
 // Set as defaults for g_saveVersions and g_saveTypes so server can tell if can load savefile.
 // They are setup in q3_ui/ui and game
 #define BG_SAVE_VERSIONS "1" // Example: "0;1;2;3"

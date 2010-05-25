@@ -1,26 +1,53 @@
 /*
 ===========================================================================
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009 ZTurtleMan
 
-This file is part of Turtle Arena source code.
+This file is part of TMNT Arena source code.
 
-Turtle Arena source code is free software; you can redistribute it
+TMNT Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena source code is distributed in the hope that it will be
+TMNT Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena source code; if not, write to the Free Software
+along with TMNT Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// TODO: Finish remaking Prox Mine Launcher weapon info.
+// TODO: Remake Quake III: Team Arena weapon info
+
+// Turtle Man: FIXME: Use correct hit sounds for all weapons, see CG_MissileHitWall!
+// For Each BG Projectile Info
+//   hit1Sound
+//   hit2Sound
+//   hit3Sound
+//   hitPlayerSound (hitFleshSound)
+//   hitMetalSound
+//
+// Example: *Sfx are cached indexes for the sounds.
+//
+//		if( soundType == IMPACTSOUND_FLESH && hitPlayerSfx) {
+//			sfx = hitPlayerSfx;
+//		} else if( soundType == IMPACTSOUND_METAL && hitMetalSfx) {
+//			sfx = hitMetalSfx;
+//		} else {
+//			r = rand() & 3;
+//			if ( r < 2 ) {
+//				sfx = hit1Sfx;
+//			} else if ( r == 2 ) {
+//				sfx = hit2Sfx;
+//			} else {
+//				sfx = hit3Sfx;
+//			}
+//		}
+//
+// hitBounce for Grenade and Laser Shuriken would be nice too.
 
 //
 // Gauntlet (Done; but need to check blade)
@@ -37,8 +64,9 @@ weapon "w_gauntlet"
 	//wallmarkRadius 12
 	continuousFlash 1
 	flashColor 0.6 0.6 1.0
+	firingSound "sound/weapons/melee/fstrun.wav"
 	flashSound0 "sound/weapons/melee/fstatck.wav"
-	//barrelSpin BS_PITCH
+	barrelSpin BS_PITCH
 
 	// Blade location hasn't been tested.
 	blade 0
@@ -57,7 +85,6 @@ weapongroup "wp_gauntlet"
 	pickupName "Gauntlet"
 	pickupModel "models/weapons2/gauntlet/gauntlet.md3"
 	iconName "icons/iconw_gauntlet"
-	firingSound "sound/weapons/melee/fstrun.wav"
 	weapon_primary "w_gauntlet"
 
 	normalAnims
@@ -83,7 +110,6 @@ projectile "p_machinegun"
 	damage 7
 	trailType PT_BULLET
 	deathType PD_BULLET
-	explosionType "PE_NONE"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	spread 200
@@ -101,7 +127,7 @@ weapon "w_machinegun"
 	flashSound1 "sound/weapons/machinegun/machgf2b.wav"
 	flashSound2 "sound/weapons/machinegun/machgf3b.wav"
 	flashSound3 "sound/weapons/machinegun/machgf4b.wav"
-	//barrelSpin BS_ROLL
+	barrelSpin BS_ROLL
 	projectile "p_machinegun"
 }
 
@@ -124,7 +150,6 @@ projectile "p_shotgun"
 	instantDamage 1
 	damage 10
 	deathType PD_BULLET
-	explosionType "PE_NONE"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	spread 700
@@ -156,7 +181,7 @@ weapongroup "wp_shotgun"
 }
 
 //
-// Grenade Launcher (Done)
+// Grenade Launcher (Done) (FIXME: It explodes each time it hits something)
 //
 
 projectile "p_grenade"
@@ -175,8 +200,6 @@ projectile "p_grenade"
 	wallmarkRadius 64
 	bounceType "PB_HALF"
 	useGravity 1
-	bounceSound0 "sound/weapons/grenade/hgrenb1a.wav"
-	bounceSound1 "sound/weapons/grenade/hgrenb2a.wav"
 }
 
 weapon "w_grenadel"
@@ -245,7 +268,7 @@ weapongroup "wp_rocket_launcher"
 }
 
 //
-// Lightning (Not done, has no explosion, does't draw in third person, [is that all?])
+// Lightning (Not done, has no explosion [is that all?])
 //
 
 projectile "p_lightning"
@@ -257,9 +280,6 @@ projectile "p_lightning"
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 12
 	speed 768 // range of instantDamage
-	hitSound0 "sound/weapons/lightning/lg_hit.wav"
-	hitSound1 "sound/weapons/lightning/lg_hit2.wav"
-	hitSound2 "sound/weapons/lightning/lg_hit3.wav"
 }
 
 weapon "w_lightning"
@@ -271,6 +291,8 @@ weapon "w_lightning"
 	flashColor 0.6 0.6 1
 	continuousFlash 1
 	flashSound0 "sound/weapons/lightning/lg_fire.wav"
+	firingSound "sound/weapons/lightning/lg_hum.wav"
+	readySound "sound/weapons/melee/fsthum.wav"
 	projectile "p_lightning"
 }
 
@@ -282,13 +304,13 @@ weapongroup "wp_lightning"
 	pickupModel "models/weapons2/lightning/lightning.md3"
 	iconName "icons/iconw_lightning"
 	pickupAmmo 100
-	firingSound "sound/weapons/lightning/lg_hum.wav"
-	readySound "sound/weapons/melee/fsthum.wav"
 	weapon_primary "w_lightning"
 }
 
 //
 // Railgun (Done)
+//
+// Railgun explosions are not colorized?
 //
 
 projectile "p_rail"
@@ -311,6 +333,7 @@ weapon "w_railgun"
 	attackDelay 1500
 	flashColor 1 0.5 0
 	flashSound0 "sound/weapons/railgun/railgf1a.wav"
+	readySound "sound/weapons/railgun/rg_hum.wav"
 	projectile "p_rail"
 }
 
@@ -321,7 +344,6 @@ weapongroup "wp_railgun"
 	pickupModel "models/weapons2/railgun/railgun.md3"
 	iconName "icons/iconw_railgun"
 	pickupAmmo 10
-	readySound "sound/weapons/railgun/rg_hum.wav"
 	weapon_primary "w_railgun"
 }
 
@@ -395,7 +417,8 @@ weapon "w_bfg"
 	splashMod MOD_BFG_SPLASH
 	flashColor 1 0.7 1
 	flashSound0 "sound/weapons/bfg/bfg_fire.wav"
-	//barrelSpin BS_PITCH
+	readySound "sound/weapons/bfg/bfg_hum.wav"
+	barrelSpin BS_PITCH
 	projectile "p_bfg"
 }
 
@@ -406,7 +429,6 @@ weapongroup "wp_bfg"
 	pickupModel "models/weapons2/bfg/bfg.md3"
 	iconName "icons/iconw_bfg"
 	pickupAmmo 20
-	readySound "sound/weapons/bfg/bfg_hum.wav"
 	weapon_primary "w_bfg"
 }
 
@@ -435,6 +457,8 @@ weapon "w_grappling_hook"
 	attackDelay 400
 	continuousFlash 1
 	flashColor 0.6 0.6 1.0
+	readySound "sound/weapons/melee/fsthum.wav"
+	firingSound "sound/weapons/melee/fstrun.wav"
 	projectile "p_grappling_hook"
 }
 
@@ -446,8 +470,6 @@ weapongroup "wp_grappling_hook"
 	pickupModel "models/weapons2/grapple/grapple.md3"
 	iconName "icons/iconw_grapple"
 	// NOTE: grappling projectiles use no ammo.
-	readySound "sound/weapons/melee/fsthum.wav"
-	firingSound "sound/weapons/melee/fstrun.wav"
 	weapon_primary "w_grappling_hook"
 }
 
@@ -472,9 +494,6 @@ projectile "p_nail"
 	wallmarkRadius 12
 	spread 500
 	numProjectiles 15
-	hitPlayerSound "sound/weapons/nailgun/wnalimpl.wav"
-	hitMetalSound "sound/weapons/nailgun/wnalimpm.wav"
-	hitSound0 "sound/weapons/nailgun/wnalimpd.wav"
 }
 
 weapon "w_nailgun"
@@ -502,8 +521,8 @@ weapongroup "wp_nailgun"
 //
 // Prox Mine Launcher (Can't be remade yet.)
 //               Need to be able to damage owner in G_RunMissile
-//               Need to generlize prox stuff (tigger, and stick sounds)
-//               WONTFIX?: Stick mines to players.
+//               Need to generlize prox explosion stuff (when player is clost, etc).
+//               WONTFIX?: Stick mines to players (I don't like the idea of it...).
 //
 
 projectile "p_prox_mine"
@@ -517,10 +536,8 @@ projectile "p_prox_mine"
 	timetolive 3000
 	trailType "PT_GRENADE"
 	deathType "PD_GRENADE"
-	explosionType "PE_PROX"
 	useGravity 1
 	stickOnImpact 3
-	hitSound0 "sound/weapons/proxmine/wstbexpl.wav"
 }
 
 weapon "w_prox_launcher"
@@ -555,15 +572,9 @@ projectile "p_chaingun"
 	damage 7
 	trailType "PT_BULLET"
 	deathType "PD_BULLET"
-	explosionType "PE_NONE"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	spread 600
-
-	// In vanilla Quake III: Team Arena, Chaingun sounds were overriden with normal bullet sounds.
-	//hitPlayerSound "sound/weapons/vulcan/wvulimpl.wav"
-	//hitMetalSound "sound/weapons/vulcan/wvulimpm.wav"
-	//hitSound0 "sound/weapons/vulcan/wvulimpd.wav"
 }
 
 weapon "w_chaingun"
@@ -578,6 +589,7 @@ weapon "w_chaingun"
 	flashSound1 "sound/weapons/vulcan/vulcanf2b.wav"
 	flashSound2 "sound/weapons/vulcan/vulcanf3b.wav"
 	flashSound3 "sound/weapons/vulcan/vulcanf4b.wav"
+	firingStoppedSound "sound/weapons/vulcan/wvulwind.wav"
 	projectile "p_chaingun"
 }
 
@@ -588,7 +600,6 @@ weapongroup "wp_chaingun"
 	pickupModel "models/weapons/vulcan/vulcan.md3"
 	iconName "icons/iconw_chaingun"
 	pickupAmmo 80
-	firingStoppedSound "sound/weapons/vulcan/wvulwind.wav"
 	weapon_primary "w_chaingun"
 }
 

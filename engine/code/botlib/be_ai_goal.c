@@ -89,6 +89,40 @@ typedef struct campspot_s
 	struct campspot_s *next;
 } campspot_t;
 
+#if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h
+//FIXME: these are game specific
+typedef enum {
+	GT_FFA,				// free for all
+	GT_TOURNAMENT,		// one on one tournament
+	GT_SINGLE_PLAYER,	// single player tournament
+
+#if 0 // #ifdef TMNT
+	GT_LMS,				// Last Man Standing
+	GT_KOTH,			// King Of The Hill
+	GT_KEEPAWAY,		// Keep Away
+#endif
+
+	//-- team games go after this --
+
+	GT_TEAM,			// team deathmatch
+#if 0 // #ifdef TMNT
+	GT_LTEAMS,			// last team standing
+#endif
+	GT_CTF,				// capture the flag
+#ifdef MISSIONPACK
+	GT_1FCTF,
+	GT_OBELISK,
+#ifdef MISSIONPACK_HARVESTER
+	GT_HARVESTER,
+#endif
+#if 0 // Turtle Man: In the gametype name arrays there is a Team Tournament.
+	GT_TEAMTOURNAMENT,
+#endif
+#endif
+	GT_MAX_GAME_TYPE
+} gametype_t;
+#endif
+
 typedef struct levelitem_s
 {
 	int number;							//number of the level item
@@ -115,10 +149,6 @@ typedef struct iteminfo_s
 	vec3_t mins;						//mins of the item
 	vec3_t maxs;						//maxs of the item
 	int number;							//number of the item info
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
-	int defaultWeight;					//inline weight, for if only a constant value is needed.
-	int inventory;						//inline inventory number
-#endif
 } iteminfo_t;
 
 #define ITEMINFO_OFS(x)	(size_t)&(((iteminfo_t *)0)->x)
@@ -133,10 +163,6 @@ fielddef_t iteminfo_fields[] =
 {"respawntime", ITEMINFO_OFS(respawntime), FT_FLOAT},
 {"mins", ITEMINFO_OFS(mins), FT_FLOAT|FT_ARRAY, 3},
 {"maxs", ITEMINFO_OFS(maxs), FT_FLOAT|FT_ARRAY, 3},
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
-{"defaultWeight", ITEMINFO_OFS(defaultWeight), FT_INT},
-{"inventory", ITEMINFO_OFS(inventory), FT_INT},
-#endif
 {NULL, 0, 0}
 };
 
@@ -329,110 +355,6 @@ itemconfig_t *LoadItemConfig(char *filename)
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
 	return ic;
 } //end of the function LoadItemConfig
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
-#define MAX_INVENTORYVALUE			999999 // be_ai_weight.c
-#ifndef max
-#define max(x,y) (x) > (y) ? (x) : (y)
-#endif
-//===========================================================================
-// atemps to create a fuzzy weight for item
-//
-// Parameter:				-
-// Returns:					-
-// Changes Globals:		-
-//===========================================================================
-int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
-{
-	fuzzyseperator_t *fs;
-	int index;
-
-	if (iwc->numweights >= MAX_WEIGHTS || !item->defaultWeight) {
-		return -1;
-	}
-
-	index = iwc->numweights;
-
-	iwc->weights[index].name = (char *) GetClearedMemory(strlen(item->classname) + 1);
-	strcpy(iwc->weights[index].name, item->classname);
-
-#if 0 // ZTM: FIXME: Causes SIGBUS error in FuzzyWeightUndecided_r
-	if (item->inventory)
-	{
-		fuzzyseperator_t *firstfs = NULL;
-		fuzzyseperator_t *lastfs = NULL;
-
-		//switch(INVENTORY_DAISHO)
-		//{
-		//case 1: return WS(DAW);
-		//default: return 0;
-		//}
-
-		// Setup fuzzyseperator
-		fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
-		fs->next = NULL;
-		fs->child = NULL;
-		fs->index = item->inventory; //switch(INVENTORY_*)
-		if (lastfs) lastfs->next = fs;
-		else firstfs = fs;
-		lastfs = fs;
-		fs->value = 1; //case 1: return defaultWeight;
-#if 1
-		// Setup balance
-		fs->type = WT_BALANCE;
-		fs->weight = item->defaultWeight;
-		fs->minweight = max(1, fs->weight/20.0f);
-		fs->maxweight = max(1, fs->weight*20.0f);
-#else
-		// Setup a simple "return weight;"
-		fs->type = 0;
-		fs->weight = item->defaultWeight;
-		fs->minweight = fs->weight;
-		fs->maxweight = fs->weight;
-#endif
-
-		//default: return 0;
-		fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
-		fs->index = item->inventory;
-		fs->value = MAX_INVENTORYVALUE;
-		fs->weight = 0;
-		fs->next = NULL;
-		fs->child = NULL;
-		if (lastfs) lastfs->next = fs;
-		else firstfs = fs;
-		lastfs = fs;
-
-		iwc->weights[index].firstseperator = firstfs;
-		iwc->numweights++;
-		return index;
-	}
-#endif
-
-	// Setup fuzzyseperator
-	fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
-	fs->index = 0;
-	fs->value = MAX_INVENTORYVALUE;
-	fs->next = NULL;
-	fs->child = NULL;
-#if 0
-	// Setup balance
-	fs->type = WT_BALANCE;
-	fs->weight = item->defaultWeight;
-	fs->minweight = max(1, fs->weight/20.0f);
-	fs->maxweight = max(1, fs->weight*20.0f);
-#else
-	// Setup a simple "return weight;"
-	fs->type = 0;
-	fs->weight = item->defaultWeight;
-	fs->minweight = fs->weight;
-	fs->maxweight = fs->weight;
-#endif
-
-	iwc->weights[index].firstseperator = fs;
-	iwc->numweights++;
-
-	return index;
-} //end of the function CreateFuzzyWeight
-#endif
 //===========================================================================
 // index to find the weight function of an iteminfo
 //
@@ -450,12 +372,6 @@ int *ItemWeightIndex(weightconfig_t *iwc, itemconfig_t *ic)
 	for (i = 0; i < ic->numiteminfo; i++)
 	{
 		index[i] = FindFuzzyWeight(iwc, ic->iteminfo[i].classname);
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
-		if (index[i] < 0)
-		{
-			index[i] = CreateFuzzyWeight(iwc, &ic->iteminfo[i]);
-		}
-#endif
 		if (index[i] < 0)
 		{
 			Log_Write("item info %d \"%s\" has no fuzzy weight\r\n", i, ic->iteminfo[i].classname);
@@ -635,7 +551,7 @@ void BotInitInfoEntities(void)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
 void BotInitLevelItems(bot_shareditem_t *itemInfos)
 #else
 void BotInitLevelItems(void)
@@ -663,7 +579,7 @@ void BotInitLevelItems(void)
 	//if there's no AAS file loaded
 	if (!AAS_Loaded()) return;
 
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
 	// Add the new items.
 	if (itemInfos != NULL)
 	{
@@ -683,8 +599,6 @@ void BotInitLevelItems(void)
 			Q_strncpyz(ic->iteminfo[i].model, itemInfos[j].model, MAX_QPATH);
 			ic->iteminfo[i].modelindex = itemInfos[j].modelindex;
 			ic->iteminfo[i].respawntime = itemInfos[j].respawntime;
-			ic->iteminfo[i].defaultWeight = itemInfos[j].defaultWeight;
-			ic->iteminfo[i].inventory = itemInfos[j].inventory;
 
 			// Unused
 			//ic->iteminfo[i].type = 0;
@@ -696,6 +610,23 @@ void BotInitLevelItems(void)
 
 			ic->iteminfo[i].number = ic->numiteminfo;
 
+			// Turtle Man: FIXME: Setup weight
+#if 0
+			for (k = 0; k < MAX_CLIENTS; k++)
+			{
+				if (!botgoalstates[k])
+					continue; // Avoid unwated errors in BotGoalStateFromHandle
+
+				gs = BotGoalStateFromHandle(k);
+				if (!gs)
+					continue;
+				if (!gs->itemweightconfig)
+					continue;
+
+				// Turtle Man: I wish I could just set the weight...
+				gs->itemweightindex[ic->iteminfo[i].number] = 0;
+			}
+#endif
 			ic->numiteminfo++;
 		}
 	}
@@ -1145,6 +1076,12 @@ void BotFindEntityForLevelItem(levelitem_t *li)
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
+
+#if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h
+//NOTE: enum entityType_t in bg_public.h
+#define ET_ITEM			2
+#endif
+
 void BotUpdateEntityItems(void)
 {
 	int ent, i, modelindex;

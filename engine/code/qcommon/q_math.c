@@ -366,7 +366,6 @@ void RotateAroundDirection( vec3_t axis[3], float yaw ) {
 	CrossProduct( axis[0], axis[1], axis[2] );
 }
 
-
 #ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS // XREAL?
 /*
 =====================
@@ -648,7 +647,7 @@ float AngleDelta ( float angle1, float angle2 ) {
 	return AngleNormalize180( angle1 - angle2 );
 }
 
-#ifdef TA_WEAPSYS // XREAL
+#ifdef TMNTWEAPSYS_2 // XREAL
 /*
 =================
 AngleBetweenVectors
@@ -670,11 +669,8 @@ float AngleBetweenVectors(const vec3_t a, const vec3_t b)
 	// this results in:
 	//
 	// angle = acos( (a * b) / (|a| * |b|) )
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
+	// Turtle Man: NOTE: Must have IOQ3ZTM3 defined here
 	return RAD2DEG(Q_acos(DotProduct(a, b) / (alen * blen)));
-#else
-	return RAD2DEG(acos(DotProduct(a, b) / (alen * blen)));
-#endif
 }
 #endif
 
@@ -707,12 +703,12 @@ BoxOnPlaneSide
 Returns 1, 2, or 1 + 2
 ==================
 */
-int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, struct cplane_s *p)
+int BoxOnPlaneSide (vec3_t emins, vec3_t emaxs, struct cplane_s *p)
 {
 	float	dist[2];
 	int		sides, b, i;
 
-	// fast axial cases
+// fast axial cases
 	if (p->type < 3)
 	{
 		if (p->dist <= emins[p->type])
@@ -722,12 +718,12 @@ int BoxOnPlaneSide(vec3_t emins, vec3_t emaxs, struct cplane_s *p)
 		return 3;
 	}
 
-	// general case
+// general case
 	dist[0] = dist[1] = 0;
 	if (p->signbits < 8) // >= 8: default case is original code (dist[0]=dist[1]=0)
 	{
 		for (i=0 ; i<3 ; i++)
-		{
+	{
 			b = (p->signbits >> i) & 1;
 			dist[ b] += p->normal[i]*emaxs[i];
 			dist[!b] += p->normal[i]*emins[i];

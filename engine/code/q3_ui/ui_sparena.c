@@ -37,7 +37,7 @@ void UI_SPArena_Start( const char *arenaInfo ) {
 	txt = Info_ValueForKey( arenaInfo, "special" );
 	if( txt[0] ) {
 		if( Q_stricmp( txt, "training" ) == 0 ) {
-			level = -ARENAS_PER_TIER;
+			level = -4;
 		}
 		else if( Q_stricmp( txt, "final" ) == 0 ) {
 			level = UI_GetNumSPTiers() * ARENAS_PER_TIER;
@@ -46,19 +46,19 @@ void UI_SPArena_Start( const char *arenaInfo ) {
 	trap_Cvar_SetValue( "ui_spSelection", level );
 
 	map = Info_ValueForKey( arenaInfo, "map" );
-#ifdef TA_SP
+#ifdef TMNTSP
 	trap_Cvar_Set("ui_singlePlayerActive", "1");
 #endif
 	trap_Cmd_ExecuteText( EXEC_APPEND, va( "spmap %s\n", map ) );
 }
 
-#ifdef TA_SP
+#ifdef TMNTSP
 
 // Load Game Menu, based on demos menu
 //
 #define ART_BACK0			"menu/art/back_0"
 #define ART_BACK1			"menu/art/back_1"
-// ZTM: Demos use play_0/play_1 i use load_0/load_1
+// Turtle Man: Demos use play_0/play_1 i use load_0/load_1
 #define ART_GO0				"menu/art/load_0"
 #define ART_GO1				"menu/art/load_1"
 #define ART_FRAMEL			"menu/art/frame2_l"
@@ -77,7 +77,7 @@ void UI_SPArena_Start( const char *arenaInfo ) {
 #define ID_LEFT				14
 
 #define ARROWS_WIDTH		128
-#ifdef TA_DATA
+#ifdef TMNTDATA
 #define ARROWS_HEIGHT		64
 #else
 #define ARROWS_HEIGHT		48
@@ -120,7 +120,7 @@ static void LoadGame_MenuEvent( void *ptr, int event ) {
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_GO:
 		UI_ForceMenuOff ();
-		trap_Cmd_ExecuteText( EXEC_APPEND, va( "loadgame %s\n", // TA_SP
+		trap_Cmd_ExecuteText( EXEC_APPEND, va( "loadgame %s\n", // TMNTSP
 								s_savegames.list.itemnames[s_savegames.list.curvalue]) );
 		break;
 
@@ -174,8 +174,8 @@ static void LoadGame_MenuInit( void ) {
 	s_savegames.banner.generic.type		= MTYPE_BTEXT;
 	s_savegames.banner.generic.x		= 320;
 	s_savegames.banner.generic.y		= 16;
-	s_savegames.banner.string			= "LOAD SAVE GAME"; // TA_SP
-	s_savegames.banner.color			= text_banner_color;
+	s_savegames.banner.string			= "LOAD SAVE GAME"; // TMNTSP
+	s_savegames.banner.color			= color_white;
 	s_savegames.banner.style			= UI_CENTER;
 
 	s_savegames.framel.generic.type		= MTYPE_BITMAP;
@@ -258,7 +258,7 @@ static void LoadGame_MenuInit( void ) {
 	s_savegames.list.columns			= 3;
 
 	if (!s_savegames.list.numitems) {
-		strcpy( s_savegames.names, "No Save Games.sav" ); // TA_SP
+		strcpy( s_savegames.names, "No Save Games.sav" ); // TMNTSP
 		s_savegames.list.numitems = 1;
 
 		//degenerate case, not selectable
@@ -273,7 +273,7 @@ static void LoadGame_MenuInit( void ) {
 
 		// strip extension
 		len = strlen( demoname );
-		if (!Q_stricmp(demoname +  len - 4,".sav")) // TA_SP
+		if (!Q_stricmp(demoname +  len - 4,".sav")) // TMNTSP
 			demoname[len-4] = '\0';
 
 //		Q_strupr(demoname);
@@ -319,6 +319,203 @@ void UI_LoadGameMenu( void ) {
 	UI_PushMenu( &s_savegames.menu );
 }
 
+// Save Game Menu, UI_SpecifyServerMenu
+// Turtle Man: TODO: Also browse for save game to over write, using load game menu?
+//
+/*********************************************************************************
+	SPECIFY SAVE
+*********************************************************************************/
+
+#define SPECIFYSERVER_FRAMEL	"menu/art/frame2_l"
+#define SPECIFYSERVER_FRAMER	"menu/art/frame1_r"
+#define SPECIFYSERVER_BACK0		"menu/art/back_0"
+#define SPECIFYSERVER_BACK1		"menu/art/back_1"
+// Turtle Man: SPECIFY SEVER uses flight_0/1 i use save_0/1
+#define SPECIFYSERVER_FIGHT0	"menu/art/save_0"
+#define SPECIFYSERVER_FIGHT1	"menu/art/save_1"
+
+#define ID_SPECIFYSERVERBACK	102
+#define ID_SPECIFYSERVERGO		103
+
+static char* specifysave_artlist[] =
+{
+	SPECIFYSERVER_FRAMEL,
+	SPECIFYSERVER_FRAMER,
+	SPECIFYSERVER_BACK0,
+	SPECIFYSERVER_BACK1,
+	SPECIFYSERVER_FIGHT0,
+	SPECIFYSERVER_FIGHT1,
+	NULL
+};
+
+typedef struct
+{
+	menuframework_s	menu;
+	menutext_s		banner;
+	menubitmap_s	framel;
+	menubitmap_s	framer;
+	menufield_s		domain;
+	//menufield_s		port;
+	menubitmap_s	go;
+	menubitmap_s	back;
+} specifysave_t;
+
+static specifysave_t	s_specifysave;
+
+/*
+=================
+SpecifySave_Event
+=================
+*/
+static void SpecifySave_Event( void* ptr, int event )
+{
+	char	buff[256];
+
+	switch (((menucommon_s*)ptr)->id)
+	{
+		case ID_SPECIFYSERVERGO:
+			if (event != QM_ACTIVATED)
+				break;
+
+			if (s_specifysave.domain.field.buffer[0])
+			{
+				strcpy(buff,s_specifysave.domain.field.buffer);
+				//if (s_specifysave.port.field.buffer[0])
+					//Com_sprintf( buff+strlen(buff), 128, ":%s", s_specifysave.port.field.buffer );
+
+				// Turtle Man: TODO: If file "SAVEGAMEDIR/buff" exist ask for over write.
+
+				trap_Cmd_ExecuteText( EXEC_APPEND, va( "savegame %s\n", buff ) );
+			}
+			break;
+
+		case ID_SPECIFYSERVERBACK:
+			if (event != QM_ACTIVATED)
+				break;
+
+			UI_PopMenu();
+			break;
+	}
+}
+
+/*
+=================
+SpecifySave_MenuInit
+=================
+*/
+void SpecifySave_MenuInit( void )
+{
+	// zero set all our globals
+	memset( &s_specifysave, 0 ,sizeof(specifysave_t) );
+
+	SpecifySave_Cache();
+
+	s_specifysave.menu.wrapAround = qtrue;
+	s_specifysave.menu.fullscreen = qtrue;
+
+	s_specifysave.banner.generic.type	 = MTYPE_BTEXT;
+	s_specifysave.banner.generic.x     = 320;
+	s_specifysave.banner.generic.y     = 16;
+	s_specifysave.banner.string		 = "SPECIFY SAVE";
+	s_specifysave.banner.color  		 = color_white;
+	s_specifysave.banner.style  		 = UI_CENTER;
+
+	s_specifysave.framel.generic.type  = MTYPE_BITMAP;
+	s_specifysave.framel.generic.name  = SPECIFYSERVER_FRAMEL;
+	s_specifysave.framel.generic.flags = QMF_INACTIVE;
+	s_specifysave.framel.generic.x	 = 0;
+	s_specifysave.framel.generic.y	 = 78;
+	s_specifysave.framel.width  	     = 256;
+	s_specifysave.framel.height  	     = 329;
+
+	s_specifysave.framer.generic.type  = MTYPE_BITMAP;
+	s_specifysave.framer.generic.name  = SPECIFYSERVER_FRAMER;
+	s_specifysave.framer.generic.flags = QMF_INACTIVE;
+	s_specifysave.framer.generic.x	 = 376;
+	s_specifysave.framer.generic.y	 = 76;
+	s_specifysave.framer.width  	     = 256;
+	s_specifysave.framer.height  	     = 334;
+
+	s_specifysave.domain.generic.type       = MTYPE_FIELD;
+	s_specifysave.domain.generic.name       = "Save Name:";
+	s_specifysave.domain.generic.flags      = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_specifysave.domain.generic.x	      = 206;
+	s_specifysave.domain.generic.y	      = 220;
+	s_specifysave.domain.field.widthInChars = 38;
+	s_specifysave.domain.field.maxchars     = 80;
+
+/*
+	s_specifysave.port.generic.type       = MTYPE_FIELD;
+	s_specifysave.port.generic.name	    = "Port:";
+	s_specifysave.port.generic.flags	    = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
+	s_specifysave.port.generic.x	        = 206;
+	s_specifysave.port.generic.y	        = 250;
+	s_specifysave.port.field.widthInChars = 6;
+	s_specifysave.port.field.maxchars     = 5;
+*/
+
+	s_specifysave.go.generic.type	    = MTYPE_BITMAP;
+	s_specifysave.go.generic.name     = SPECIFYSERVER_FIGHT0;
+	s_specifysave.go.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_specifysave.go.generic.callback = SpecifySave_Event;
+	s_specifysave.go.generic.id	    = ID_SPECIFYSERVERGO;
+	s_specifysave.go.generic.x		= 640;
+	s_specifysave.go.generic.y		= 480-64;
+	s_specifysave.go.width  		    = 128;
+	s_specifysave.go.height  		    = 64;
+	s_specifysave.go.focuspic         = SPECIFYSERVER_FIGHT1;
+
+	s_specifysave.back.generic.type	  = MTYPE_BITMAP;
+	s_specifysave.back.generic.name     = SPECIFYSERVER_BACK0;
+	s_specifysave.back.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_specifysave.back.generic.callback = SpecifySave_Event;
+	s_specifysave.back.generic.id	      = ID_SPECIFYSERVERBACK;
+	s_specifysave.back.generic.x		  = 0;
+	s_specifysave.back.generic.y		  = 480-64;
+	s_specifysave.back.width  		  = 128;
+	s_specifysave.back.height  		  = 64;
+	s_specifysave.back.focuspic         = SPECIFYSERVER_BACK1;
+
+	Menu_AddItem( &s_specifysave.menu, &s_specifysave.banner );
+	Menu_AddItem( &s_specifysave.menu, &s_specifysave.framel );
+	Menu_AddItem( &s_specifysave.menu, &s_specifysave.framer );
+	Menu_AddItem( &s_specifysave.menu, &s_specifysave.domain );
+	//Menu_AddItem( &s_specifysave.menu, &s_specifysave.port );
+	Menu_AddItem( &s_specifysave.menu, &s_specifysave.go );
+	Menu_AddItem( &s_specifysave.menu, &s_specifysave.back );
+
+	//Com_sprintf( s_specifysave.port.field.buffer, 6, "%i", 27960 );
+}
+
+/*
+=================
+SpecifySave_Cache
+=================
+*/
+void SpecifySave_Cache( void )
+{
+	int	i;
+
+	// touch all our pics
+	for (i=0; ;i++)
+	{
+		if (!specifysave_artlist[i])
+			break;
+		trap_R_RegisterShaderNoMip(specifysave_artlist[i]);
+	}
+}
+
+/*
+=================
+UI_SpecifySaveMenu
+=================
+*/
+void UI_SpecifySaveMenu( void )
+{
+	SpecifySave_MenuInit();
+	UI_PushMenu( &s_specifysave.menu );
+}
+
 // Single Player Menu
 //
 
@@ -332,11 +529,10 @@ void UI_LoadGameMenu( void ) {
 #define ID_BACK				10
 #define ID_SP_NEWGAME		11
 #define ID_SP_LOADGAME		12
-#define ID_SP_LEVELSELECT	13
-#define ID_SP_CUSTOM		14
-#define ID_SP_DEMOS			15
-#define ID_SP_CINEMATICS	16
-#define ID_SP_MODS			17
+#define ID_SP_CUSTOM		13
+#define ID_SP_DEMOS			14
+#define ID_SP_CINEMATICS	15
+#define ID_SP_MODS			16
 
 typedef struct {
 	menuframework_s	menu;
@@ -345,7 +541,6 @@ typedef struct {
 	menubitmap_s	framer;
 	menutext_s		sp_newgame;
 	menutext_s		sp_loadgame;
-	menutext_s		sp_levelselect;
 	menutext_s		sp_custom; // skirmish
 	menutext_s		sp_demos;
 	menutext_s		sp_cinematics;
@@ -381,16 +576,22 @@ static void UI_SPMenu_Event( void *ptr, int event ) {
 	{
 		default:
 		case ID_SP_NEWGAME:
-			UI_SPSkillMenu(UI_GetArenaInfoByNumber(0));
+			// If in a game, ask user to confirm.
+			//if ( !trap_Cvar_VariableValue( "sv_running" )
+				//|| AskExitServer() == qtrue )
+			UI_StageMenu();
 			break;
 
 		case ID_SP_LOADGAME:
+			// If in a game, ask user to confirm.
+			//if ( !trap_Cvar_VariableValue( "sv_running" )
+				//|| AskExitServer() == qtrue )
 			UI_LoadGameMenu();
 			break;
 
-		case ID_SP_LEVELSELECT:
-			UI_SPLevelMenu();
-			break;
+		//case ID_SP_SAVEGAME:
+			//UI_SpecifySaveMenu();
+			//break;
 
 		case ID_SP_CUSTOM: // skirmish
 			UI_StartServerMenu( qfalse );
@@ -429,7 +630,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.banner.generic.x			= 320;
 	spMenuInfo.banner.generic.y			= 16;
 	spMenuInfo.banner.string			= "PLAY";
-	spMenuInfo.banner.color				= text_banner_color;
+	spMenuInfo.banner.color				= color_white;
 	spMenuInfo.banner.style				= UI_CENTER;
 
 	spMenuInfo.framel.generic.type		= MTYPE_BITMAP;
@@ -455,8 +656,8 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_newgame.generic.y			= y;
 	spMenuInfo.sp_newgame.generic.id		= ID_SP_NEWGAME;
 	spMenuInfo.sp_newgame.generic.callback	= UI_SPMenu_Event;
-	spMenuInfo.sp_newgame.string			= "New Game";
-	spMenuInfo.sp_newgame.color				= text_big_color;
+	spMenuInfo.sp_newgame.string			= "New Game (unfinished)";
+	spMenuInfo.sp_newgame.color				= color_red;
 	spMenuInfo.sp_newgame.style				= UI_CENTER;
 
 	y += VERTICAL_SPACING;
@@ -466,25 +667,31 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.generic.y			= y;
 	spMenuInfo.sp_loadgame.generic.id			= ID_SP_LOADGAME;
 	spMenuInfo.sp_loadgame.generic.callback		= UI_SPMenu_Event;
-	spMenuInfo.sp_loadgame.string				= "Load Game";
-	spMenuInfo.sp_loadgame.color				= text_big_color;
+	spMenuInfo.sp_loadgame.string				= "Load Game (unfinished)";
+	spMenuInfo.sp_loadgame.color				= color_red;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
-	// Disabled for now.
-	spMenuInfo.sp_loadgame.generic.flags |= QMF_GRAYED;
 
-	// Extra space between, "single player" and the others
+#if 0
 	y += VERTICAL_SPACING;
+	spMenuInfo.sp_savegame.generic.type			= MTYPE_PTEXT;
+	spMenuInfo.sp_savegame.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	spMenuInfo.sp_savegame.generic.x			= 320;
+	spMenuInfo.sp_savegame.generic.y			= y;
+	spMenuInfo.sp_savegame.generic.id			= ID_SP_SAVEGAME;
+	spMenuInfo.sp_savegame.generic.callback		= UI_SPMenu_Event;
+	spMenuInfo.sp_savegame.string				= "Save Game";
+	spMenuInfo.sp_savegame.color				= color_red;
+	spMenuInfo.sp_savegame.style				= UI_CENTER;
 
+	// If not in a single player game, set grayed.
+	// NOTE: This is ALWAYS grayed out. because its in the main menu, which can only be gotten to when not in a game.
+	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "ui_singlePlayerActive" ) ) {
+		spMenuInfo.sp_savegame.generic.flags |= QMF_GRAYED;
+	}
+#endif
+
+	// Extra space.
 	y += VERTICAL_SPACING;
-	spMenuInfo.sp_levelselect.generic.type		= MTYPE_PTEXT;
-	spMenuInfo.sp_levelselect.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	spMenuInfo.sp_levelselect.generic.x			= 320;
-	spMenuInfo.sp_levelselect.generic.y			= y;
-	spMenuInfo.sp_levelselect.generic.id		= ID_SP_LEVELSELECT;
-	spMenuInfo.sp_levelselect.generic.callback	= UI_SPMenu_Event;
-	spMenuInfo.sp_levelselect.string			= "Level Select";
-	spMenuInfo.sp_levelselect.color				= text_big_color;
-	spMenuInfo.sp_levelselect.style				= UI_CENTER;
 
 	// Moved here from SP arena select
 	y += VERTICAL_SPACING;
@@ -495,7 +702,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_custom.generic.id					= ID_SP_CUSTOM;
 	spMenuInfo.sp_custom.generic.callback			= UI_SPMenu_Event;
 	spMenuInfo.sp_custom.string						= "Custom Game"; // Skirmish
-	spMenuInfo.sp_custom.color						= text_big_color;
+	spMenuInfo.sp_custom.color						= color_red;
 	spMenuInfo.sp_custom.style						= UI_CENTER;
 
 	// Moved here from q3 main menu.
@@ -507,7 +714,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_demos.generic.id					= ID_SP_DEMOS;
 	spMenuInfo.sp_demos.generic.callback			= UI_SPMenu_Event;
 	spMenuInfo.sp_demos.string						= "Demos";
-	spMenuInfo.sp_demos.color						= text_big_color;
+	spMenuInfo.sp_demos.color						= color_red;
 	spMenuInfo.sp_demos.style						= UI_CENTER;
 
 	y += VERTICAL_SPACING;
@@ -518,7 +725,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_cinematics.generic.id				= ID_SP_CINEMATICS;
 	spMenuInfo.sp_cinematics.generic.callback		= UI_SPMenu_Event;
 	spMenuInfo.sp_cinematics.string					= "Cinematics";
-	spMenuInfo.sp_cinematics.color					= text_big_color;
+	spMenuInfo.sp_cinematics.color					= color_red;
 	spMenuInfo.sp_cinematics.style					= UI_CENTER;
 	// Disabled for now.
 	spMenuInfo.sp_cinematics.generic.flags |= QMF_GRAYED;
@@ -534,7 +741,7 @@ static void UI_SPMenu_Init( void ) {
 		s_main.teamArena.generic.id				= ID_TEAMARENA;
 		s_main.teamArena.generic.callback		= UI_SPMenu_Event;
 		s_main.teamArena.string					= "TEAM ARENA";
-		s_main.teamArena.color					= text_big_color;
+		s_main.teamArena.color					= color_red;
 		s_main.teamArena.style					= UI_CENTER;
 	}
 */
@@ -547,7 +754,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_mods.generic.id		= ID_SP_MODS;
 	spMenuInfo.sp_mods.generic.callback	= UI_SPMenu_Event;
 	spMenuInfo.sp_mods.string			= "Mods";
-	spMenuInfo.sp_mods.color			= text_big_color;
+	spMenuInfo.sp_mods.color			= color_red;
 	spMenuInfo.sp_mods.style			= UI_CENTER;
 
 	spMenuInfo.back.generic.type		= MTYPE_BITMAP;
@@ -566,7 +773,6 @@ static void UI_SPMenu_Init( void ) {
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.framer );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_newgame );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_loadgame );
-	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_levelselect );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_custom );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_demos );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_cinematics );
@@ -611,5 +817,224 @@ void UI_SPMenu_f( void ) {
 	uis.menusp = 0;
 	UI_SPMenu();
 	Menu_SetCursorToItem( &spMenuInfo.menu, spMenuInfo.menu.items[n + 3] );
+}
+
+
+// Stage Select Menu
+//
+
+#if 0 // Reuse defines from above menu.
+#define ART_BACK0		"menu/art/back_0"
+#define ART_BACK1		"menu/art/back_1"
+#define ART_FRAMEL		"menu/art/frame2_l"
+#define ART_FRAMER		"menu/art/frame1_r"
+
+#define VERTICAL_SPACING	30
+
+#define ID_BACK			10
+#endif
+#define ID_STAGE1	11
+#define ID_STAGE2	12
+#define ID_STAGE3	13
+#define ID_STAGE4	13
+#define ID_STAGE5	15
+#define ID_STAGE6	16
+#define ID_STAGE7	17
+#define ID_STAGE8	18
+#define ID_STAGE9	19
+#define ID_STAGE10	20
+#define ID_STAGE11	21
+#define ID_STAGE12	22
+#define ID_STAGE13	23
+
+//#define NUM_SP_STAGES 13 // Turtle Man: Am I thinking to big?
+#define NUM_SP_STAGES 2
+
+typedef struct {
+	menuframework_s	menu;
+	menutext_s		banner;
+	menubitmap_s	framel;
+	menubitmap_s	framer;
+	menutext_s		sp_stages[NUM_SP_STAGES];
+	menubitmap_s	back;
+} stageMenuInfo_t;
+
+static stageMenuInfo_t stageMenuInfo;
+
+static char *stagename[/*NUM_SP_STAGES*/] =
+{
+	"Stage 1",
+	"Stage 2",
+	"Stage 3",
+	"Stage 4",
+	"Stage 5",
+	"Stage 6",
+	"Stage 7",
+	"Stage 8",
+	"Stage 9",
+	"Stage 10",
+	"Stage 11",
+	"Stage 12",
+	"Stage 13"
+};
+
+/*
+===============
+UI_StageMenu_BackEvent
+===============
+*/
+static void UI_StageMenu_BackEvent( void *ptr, int event ) {
+	if( event != QM_ACTIVATED ) {
+		return;
+	}
+	UI_PopMenu();
+}
+
+
+/*
+===============
+UI_StageMenu_Event
+===============
+*/
+static void UI_StageMenu_Event( void *ptr, int event ) {
+	int stageNum;
+	if (event != QM_ACTIVATED)
+		return;
+
+	stageNum = ((menucommon_s*)ptr)->id - ID_STAGE1;
+
+	if (stageNum >= 0 && stageNum < NUM_SP_STAGES)
+	{
+		trap_Cvar_SetValue( "ui_spStage", stageNum );
+		trap_Cvar_SetValue( "ui_spSelection", stageNum * ARENAS_PER_TIER );
+		UI_SPLevelMenu();
+	}
+}
+
+
+/*
+===============
+UI_StageMenu_Init
+===============
+*/
+static void UI_StageMenu_Init( void ) {
+	int		y;
+	int		x;
+	int		i;
+
+	UI_StageMenu_Cache();
+
+	memset( &stageMenuInfo, 0, sizeof(stageMenuInfo) );
+	stageMenuInfo.menu.fullscreen = qtrue;
+
+	stageMenuInfo.banner.generic.type		= MTYPE_BTEXT;
+	stageMenuInfo.banner.generic.x			= 320;
+	stageMenuInfo.banner.generic.y			= 16;
+	stageMenuInfo.banner.string				= "STAGE SELECT";
+	stageMenuInfo.banner.color				= color_white;
+	stageMenuInfo.banner.style				= UI_CENTER;
+
+	stageMenuInfo.framel.generic.type		= MTYPE_BITMAP;
+	stageMenuInfo.framel.generic.name		= ART_FRAMEL;
+	stageMenuInfo.framel.generic.flags		= QMF_INACTIVE;
+	stageMenuInfo.framel.generic.x			= 0;
+	stageMenuInfo.framel.generic.y			= 78;
+	stageMenuInfo.framel.width  			= 256;
+	stageMenuInfo.framel.height  			= 329;
+
+	stageMenuInfo.framer.generic.type		= MTYPE_BITMAP;
+	stageMenuInfo.framer.generic.name		= ART_FRAMER;
+	stageMenuInfo.framer.generic.flags		= QMF_INACTIVE;
+	stageMenuInfo.framer.generic.x			= 376;
+	stageMenuInfo.framer.generic.y			= 76;
+	stageMenuInfo.framer.width  			= 256;
+	stageMenuInfo.framer.height  			= 334;
+
+	y = 135;
+	x = 160+80;
+
+	for (i = 0; i < NUM_SP_STAGES; i++)
+	{
+		// Move to next collum.
+		if (i == 7)
+		{
+			y = 135+15;
+			x = 320+80;
+		}
+		stageMenuInfo.sp_stages[i].generic.type			= MTYPE_PTEXT;
+		stageMenuInfo.sp_stages[i].generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+		stageMenuInfo.sp_stages[i].generic.x			= x;
+		stageMenuInfo.sp_stages[i].generic.y			= y;
+		stageMenuInfo.sp_stages[i].generic.id			= ID_STAGE1 + i;
+		stageMenuInfo.sp_stages[i].generic.callback		= UI_StageMenu_Event;
+		stageMenuInfo.sp_stages[i].string				= (char*)stagename[i];
+		stageMenuInfo.sp_stages[i].color				= color_red;
+		stageMenuInfo.sp_stages[i].style				= UI_CENTER;
+
+		//if (qtrue) {
+		//	stageMenuInfo.sp_stages[i].generic.flags |= QMF_GRAYED;
+		//}
+
+		y += VERTICAL_SPACING;
+	}
+
+	stageMenuInfo.back.generic.type			= MTYPE_BITMAP;
+	stageMenuInfo.back.generic.name			= ART_BACK0;
+	stageMenuInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
+	stageMenuInfo.back.generic.id			= ID_BACK;
+	stageMenuInfo.back.generic.callback		= UI_StageMenu_BackEvent;
+	stageMenuInfo.back.generic.x			= 0;
+	stageMenuInfo.back.generic.y			= 480-64;
+	stageMenuInfo.back.width				= 128;
+	stageMenuInfo.back.height				= 64;
+	stageMenuInfo.back.focuspic				= ART_BACK1;
+
+	Menu_AddItem( &stageMenuInfo.menu, &stageMenuInfo.banner );
+	Menu_AddItem( &stageMenuInfo.menu, &stageMenuInfo.framel );
+	Menu_AddItem( &stageMenuInfo.menu, &stageMenuInfo.framer );
+	for (i = 0; i < NUM_SP_STAGES; i++)
+	{
+		Menu_AddItem( &stageMenuInfo.menu, &stageMenuInfo.sp_stages[i] );
+	}
+	Menu_AddItem( &stageMenuInfo.menu, &stageMenuInfo.back );
+}
+
+
+/*
+=================
+UI_StageMenu_Cache
+=================
+*/
+void UI_StageMenu_Cache( void ) {
+	trap_R_RegisterShaderNoMip( ART_BACK0 );
+	trap_R_RegisterShaderNoMip( ART_BACK1 );
+	trap_R_RegisterShaderNoMip( ART_FRAMEL );
+	trap_R_RegisterShaderNoMip( ART_FRAMER );
+}
+
+
+/*
+===============
+UI_StageMenu
+===============
+*/
+void UI_StageMenu( void ) {
+	UI_StageMenu_Init();
+	UI_PushMenu( &stageMenuInfo.menu );
+}
+
+
+/*
+===============
+UI_StageMenu_f
+===============
+*/
+void UI_StageMenu_f( void ) {
+	int		n;
+
+	n = atoi( UI_Argv( 1 ) );
+	uis.menusp = 0;
+	UI_StageMenu();
+	Menu_SetCursorToItem( &stageMenuInfo.menu, stageMenuInfo.menu.items[n + 3] );
 }
 #endif

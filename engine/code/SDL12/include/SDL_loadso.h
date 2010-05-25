@@ -37,7 +37,7 @@
  *    namespace for the application.  If it does and it conflicts with
  *    symbols in your code or other shared libraries, you will not get
  *    the results you expect. :)
- */
+*/
 
 
 #ifndef _SDL_loadso_h

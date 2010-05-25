@@ -28,10 +28,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	JUMP_VELOCITY	270
 
-#if 1 // #ifndef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
+#if 1 // #ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES // Doesn't work correctly?
 #define	TIMER_LAND		130
 #endif
-#ifndef TA_PLAYERSYS // PLAYERCFG_ANIMATION_TIMES
+#ifndef TMNTPLAYERSYS // PLAYERCFG_ANIMATION_TIMES
 #define	TIMER_GESTURE	(34*66+50)
 #endif
 

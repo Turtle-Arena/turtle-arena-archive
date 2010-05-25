@@ -87,13 +87,13 @@ extern DECLSPEC int SDLCALL SDL_EnableUNICODE(int enable);
  * Enable/Disable keyboard repeat.  Keyboard repeat defaults to off.
  *
  *  @param[in] delay
- *  'delay' is the initial delay in ms between the time when a key is
- *  pressed, and keyboard repeat begins.
+ * 'delay' is the initial delay in ms between the time when a key is
+ * pressed, and keyboard repeat begins.
  *
  *  @param[in] interval
- *  'interval' is the time in ms between keyboard repeat events.
+ * 'interval' is the time in ms between keyboard repeat events.
  *
- *  If 'delay' is set to 0, keyboard repeat is disabled.
+ * If 'delay' is set to 0, keyboard repeat is disabled.
  */
 extern DECLSPEC int SDLCALL SDL_EnableKeyRepeat(int delay, int interval);
 extern DECLSPEC void SDLCALL SDL_GetKeyRepeat(int *delay, int *interval);

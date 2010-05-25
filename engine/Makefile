@@ -1,5 +1,5 @@
 #
-# Turtle Arena Makefile
+# TMNT Arena Makefile
 #
 # GNU Make required
 #
@@ -53,7 +53,7 @@ ifneq ($(PLATFORM),darwin)
 endif
 
 ifndef USE_FREETYPE
-  USE_FREETYPE=0
+USE_FREETYPE=0
 endif
 ifndef BUILD_SPLINES
   BUILD_SPLINES=
@@ -61,18 +61,43 @@ endif
 ifndef BUILD_DEFINES
   BUILD_DEFINES=
 endif
-ifndef BUILD_IOQ3
-  BUILD_IOQ3=
+ifndef QUAKE3
+  QUAKE3=
 endif
-ifndef BUILD_IOQ3ZTM
-  BUILD_IOQ3ZTM=
+ifndef BUILD_REALIOQUAKE3
+  BUILD_REALIOQUAKE3=
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 1783
+IOQ3_REVISION = 1753
 
 #
 # Start build type
+#
+# USE_FREETYPE Currently doesn't work when using pk3 files
+#                 instead of using unzipped files?
+#
+# Common Defines;
+# -DIOQUAKE3  - Enables CD key check and punkbuster [ui] code
+# -DIOQ3ZTM   - Misc changes and "fixes" that I always want to be enabled.
+# -DIOQ3ZTM_NO_COMPAT - Breaks compatiblity with Q3 mod qvms.
+#
+#   1. EAR_IN_ENTITY; It fixes checking if we are in first person in sound code.
+#       Q3 mods will CG_Error("vmMain: unknown command 9") however...
+#   2. FIXED_ACOS; It moves Q_acos from qcommon/common.c to qcommon/q_math.c.
+#                    Now in vms "acos" is just "acos" not Q_acos.
+#		Does it break compatibliy with mods? (But only when server/client is compiled with MS VC?)
+#   3. EFLAG_FIX; Fix playerState not geting some higher eflag bits,
+#                    entities sent 19 eflag bits, and playerState sent 16; Send 32 bits!
+#       May cause problems with Quake3, not sure and untested...
+#
+# -DIOQ3ZTM_NO_TEAM_MODEL - Removes team_model and team_headmodel cvars.
+#                             Could messup Team Arena (and other mods), unsure.
+# -DNOTRATEDM - Disable stuff in Quake3 engine that made it rated M. (default blood to off, remove gibs,
+#            remove strong lang) This however doesn't change the gamedata, like the botfiles strong lang,
+#            bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
+#            Turtle Man: TODO: Rename this define to ...?
+# -DNOBLOOD - Removes blood, if this is defined "NOTRATEDM" must also be.
 #
 ifeq ($(BUILD_IOQ3ZTM),1)
 QUAKE3=1
@@ -84,78 +109,24 @@ ifeq ($(QUAKE3),1)
 
 	ifeq ($(BUILD_IOQ3ZTM),1)
 
-		# Build ioq3ztm for running in Turtle Arena
-		IOQ3TURTLE=1
+		# Build modified ioquake3; should be compatible with quake3 mods.
+		BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
+							-DTMNTPLAYERSYS -DTMNT_SUPPORTQ3 -DTMNTENTSYS -DTMNTPATHSYS \
+							-DTMNTWEAPSYS -DTMNTWEAPSYS_2 -DRAVENMD4 -DOA_BLOOM
 
-		ifeq ($(IOQ3TURTLE),1)
-			ifneq ($(BUILD_CLIENT),1)
-			  BUILD_CLIENT     =0
-			endif
-			ifneq ($(BUILD_CLIENT_SMP),1)
-			  BUILD_CLIENT_SMP =0
-			endif
-			ifneq ($(BUILD_SERVER),1)
-			  BUILD_SERVER     =0
-			endif
-			ifneq ($(BUILD_GAME_SO),1)
-			  BUILD_GAME_SO    =0
-			endif
-
-			# Copied from Turtle Arena BUILD_DEFINES
-			ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 \
-								-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
-								-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-								-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
-								-DTA_WEAPSYS -DTA_PLAYERSYS \
-								-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
-								-DTA_WEAPSYS_EX_COMPAT \
-								-DOA_BLOOM
-
-			QUAKE3_CFLAGS =
-
-			# Use model tags for "true" melee attacking (Gauntlet)
-			#  Can't be used as a quake3 mod, as it uses new VM-to-server calls.
-			DED_USE_MODELS=1
-			ENGINE_CFLAGS += -DTA_GAME_MODELS
-			QUAKE3_CFLAGS += -DTA_GAME_MODELS
-
-			VERSION=1.36turtle
-			BASEGAME=baseq3
-			BASEGAME_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS)
-			MISSIONPACK_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) \
-						-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
-			ifndef COPYDIR
-				COPYDIR="/usr/local/games/turtlearena"
-			endif
-		else
-			# Build modified ioquake3, it only runs using its own sever/client binaries
-			#   and currently doesn't support Q3 mods.
-			BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
-								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
-								-DTA_WEAPSYS -DOA_BLOOM
-
-			VERSION=1.36ztm
-
-			BASEGAME=baseq3
-			BASEGAME_FLAGS =
-			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
-			ifndef COPYDIR
-				COPYDIR="/usr/local/games/quake3"
-			endif
-		endif
+		# Use model tags for "true" melee attacking (Used for gauntlet)
+		# (Can't be used as a quake3 mod, as it uses new VM-to-server calls.
+		#    It doesn't break compatiblity with other q3 mods however -untested)
+		DED_USE_MODELS=1
+		BUILD_DEFINES += -DTMNT_GAME_MODELS
 
 		#
-		# Server/Client-Only
+		# Break compatibility because I don't play q3 nor its mods...
 		#
-		USE_CODEC_VORBIS=1
-		USE_CODEC_THEORA=1
+		BUILD_DEFINES += -DIOQ3ZTM_NO_COMPAT -DTMNTWEAPSYS_2_NOCOMPAT
 
 		SERVERBIN=ioq3ztmded
 		CLIENTBIN=ioq3ztm
-
-		ifndef BUILD_DIR
-			BUILD_DIR=build-ioq3ztm
-		endif
 
 	else
 
@@ -165,151 +136,84 @@ ifeq ($(QUAKE3),1)
 		SERVERBIN=ioq3ded
 		CLIENTBIN=ioquake3
 
-		ifndef BUILD_DIR
-			BUILD_DIR=build-ioq3
-		endif
+	endif
 
-		VERSION=1.36
+	VERSION=1.36
 
-		BASEGAME=baseq3
-		BASEGAME_FLAGS =
-		MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+	BASEGAME=baseq3
+	BASEGAME_FLAGS =
+	MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
 
-		ifndef COPYDIR
-			COPYDIR="/usr/local/games/quake3"
-		endif
-
+	ifndef COPYDIR
+	COPYDIR="/usr/local/games/quake3"
+	endif
+	ifndef BUILD_DIR
+	BUILD_DIR=build-q3
 	endif
 
 else # END QUAKE3
 
 	###################################################################
-	# Default Turtle Arena config
+	# Default TMNT config
 	#  - All of this can be overriden by makefile.local
 	###################################################################
 
-	# Some of the defines aren't as independent as they should be, TA_WEAPSYS requires TA_PLAYERSYS, etc
-	# Please note: TA_*SYS defines are general system changes, not 'totally' specifiy for Turtle Arena
+	# -DTMNTRELEASE  # Define to enable "pak_checksums" checking
+	# -DANALOG		 # TODO: Finish analog control.
+	# -DARRAYMAX     # TODO: This ''was'' going to remove the bit max problem with Q3 network (ie more then 16 weapons).
+	# -DTMNTWEAPSYS is (or was...) the core changes to the weapon system
+	# -DTMNTWEAPSYS2 changes from holding multiple weapons to only one default and one pickup.
+	# -DTMNTHOLDSYS Allow players to hold multiple holdable items and change to any holdable.
+	#					(Based on Q3's weapon changing)
+	# -DTMNTNPCSYS   # WIP: NPC system, based on TDC_NPC system and code in Quake3
 
-	# USE_FREETYPE Currently doesn't work when using pk3 files
-	#                 instead of using unzipped files?
+	# -DTMNTWEAPSYS_2 loads the weapons from a text file, allowing for easy modifing,
+	#						and new custom default weapons for players.
+	# 				  This should be merged with TMNTWEAPSYS.
 
-	##### ioquake3 defines
-	# STANDALONE			ioquake3 define to disable quake3 code for authicating, and stuff.
-	# RAVENMD4				Enable support for loading MDR models when atempting to load *.mdr.
-	#							It isn't ever used as ioq3 only asks for .md3 (However, IOQ3ZTM checks for mdr before loading md3)
-	# MISSIONPACK			Quake3 expansion pack, Team Arena.
-	##### "new ioquake3 defines"
-	# IOQUAKE3				Enables CD key check and punkbuster ui code
-	# MISSIONPACK_HUD		Use MISSIONPACK ui scripting in cgame for hud and menus. (ZTM: Split from MISSIONPACK define)
-	# MISSIONPACK_HARVESTER	Enable MISSIONPACK harevester gametype (ZTM: Split from MISSIONPACK define)
-
-
-	# Turtle Arena "general" defines
-	#####
-	# IOQ3ZTM				ZTurtleMan's misc changes and fixes to IOQuake3
-	# IOQ3ZTM_NO_COMPAT		Changes that are not compatible with quake3 mods
-	#
-	#   1. EAR_IN_ENTITY; It fixes checking if we are in first person in sound code.
-	#       Q3 mods will CG_Error("vmMain: unknown command 9") however...
-	#   2. FIXED_ACOS; It moves Q_acos from qcommon/common.c to qcommon/q_math.c.
-	#                    Now in vms "acos" is just "acos" not Q_acos.
-	#		Does it break compatibliy with mods? (But only when server/client is compiled with MS VC?)
-	#   3. EFLAG_FIX; Fix playerState not geting some higher eflag bits,
-	#                    entities sent 19 eflag bits, and playerState sent 16; Send 32 bits!
-	#       May cause problems with Quake3, not sure and untested...
-	#
-	# IOQ3ZTM_NO_TEAM_MODEL	Removes team_model and team_headmodel cvars. (Could break Quake III: Team Arena and other mods?)
-	#####
-	# RANDOMBOT				Adds a hardcoded bot, Random. Adding the bot "Random" will add a bot choosen randomly.
-	# CELSHADING			"Cel-shaing" and cel outlines, based on the celshading patch for ioquake3
-	# NOTRATEDM				Disable stuff in Quake3 engine that made it rated M. (default blood to off, remove gibs,
-	#							remove strong lang) This however doesn't change the gamedata, like the botfiles strong lang,
-	#							bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
-	#							ZTM: TODO: Rename this define to ...?
-	# NOBLOOD				Removes blood. If this is defined, NOTRATEDM must also be defined.
-	# ANALOG				Allows players to rotate the camera and move based on the camera angles
-	# NET_COMPAT			Working on having Turtle Arena and ioq3ztm run on the same engine.
-	# THIRD_PERSON			Game defaults to third person instead of first person
-	#####
-	# TA_WEAPSYS			This is the core changes to the weapon system
-	#							loads the weapons from a text file, allowing for easy modifing,
-	#							and new custom default weapons for players.
-	# TA_WEAPSYS_NOCOMPAT	Removes botlib weapon weight code because when WEAP_SCRIPT is define
+	# TMNTWEAPSYS_2_NOCOMPAT removes botlib weapon weight code because when TMNTWEAPSYS_2 is define
 	#  							"game" does its own weapon weight stuff.
-	# TA_WEAPSYS_EX			Changes from holding multiple weapons to only one default and one pickup.
-	# TA_WEAPSYS_EX_COMPAT	Keeps compatiblity with mods not using TA_WEAPSYS_EX
-	# TA_GAME_MODELS		Allow "game" to use model tags. Player tags are used for melee weapon attacking.
-	# TA_HOLDSYS			Allow players to hold multiple holdable items and change to any holdable.
-	#							(Based on Q3's weapon changing)
-	# TA_PLAYERSYS			Allows player config to be used in game, allowing for per-player settings.
-	# TA_PATHSYS			Unfinished general path system using entities like path_corner
-	# TA_ENTSYS				Adds new entities and allows all ET_MOVER entities to be breakable.
-	# TA_NPCSYS   			WIP NPC system, based on TDC_NPC system and code in Quake3
-	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
-	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
-	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
-	#							Kinda pointless. (Note: TA_PLAYERSYS adds support for Elite Force soundpath keyword in animations.cfg)
+	# 				  After TMNTWEAPSYS_2 is merged with TMNTWEAPSYS
+	#					this should be renamed to TMNTWEAPSYS_NOCOMPAT.
 
+	# Some of these aren't as independent as they should be, TMNTWEAPSYS requires TMNTPLAYERSYS etc
+	BUILD_DEFINES = -DSTANDALONE -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
+						-DNOTRATEDM -DNOBLOOD -DTHIRD_PERSON -DRAVENMD4 \
+					-DTMNT -DTMNTMISC -DTMNTSP -DTMNTHOLDSYS -DTMNTHOLDABLE \
+						-DTMNTWEAPSYS -DTMNTWEAPSYS2 -DTMNTWEAPONS -DTMNTPLAYERSYS -DTMNTPLAYERS \
+						-DTMNT_SUPPORTQ3  -DTMNTENTSYS -DTMNTPATHSYS -DTMNTNPCSYS \
+						-DTMNTDATA -DTMNTWEAPSYS_2 -DTMNTWEAPSYS_2_NOCOMPAT -DOA_BLOOM \
+						 -DNIGHTSMODE
 
-	# Turtle Arena "specific" defines
-	#####
-	# TURTLEARENA			Turtle Arena branding, version, file/directory name, and more
-	# TA_MISC				This is stuff that I don't want in ioq3ztm, but would use in another standalone mod
-	#							(Like a NiGHTS into Dreams clone or Sonic Robo Blast Arena...)
-	# TA_SP
-	# TA_HOLDABLE			Turtle Arena holdable items. Shurikens and Pizza-to-Go.
-	# TA_PLAYERS			Turtle Arena player stuff?
-	# TA_DATA				Changes for Turtle Arena data.
-	# TA_HUD				Replaces Quake3 HUD, with one for Turtle Arena...
-	#####
-	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
-
-	BUILD_DEFINES = -DSTANDALONE -DRAVENMD4 \
-						-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
-						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-						-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
-						-DTA_WEAPSYS -DTA_PLAYERSYS \
-						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
-						-DTA_WEAPSYS_EX_COMPAT \
-						-DOA_BLOOM
-
-	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
-						-DTA_WEAPSYS_EX -DTA_PLAYERS -DTA_DATA \
-						-DNIGHTSMODE
-
-	# Currently Turtle Arena doesn't use camera scripts.
-	BUILD_SPLINES=1 # Adds -DCAMERASCRIPT
+	# Currently TMNT Arena doesn't use camera scripts.
+	BUILD_SPLINES=1 # Adds -DCAMERASCRIPT automaticly
 
 	# Use model tags for true melee attacking
 	DED_USE_MODELS=1
-	BUILD_DEFINES += -DTA_GAME_MODELS
+	BUILD_DEFINES += -DTMNT_GAME_MODELS
 
-	# Turtle Arena's sounds are ogg vorbis
+	# TMNT Arena's sounds are ogg vorbis, if there was music is would be ogg vorbis too...
 	USE_CODEC_VORBIS=1
 
-	# Turtle Arena's intro video will be ogg theora
-	USE_CODEC_THEORA=1
+	# Turtle Man: TMNT Arena version (YYYYMMDD)
+	VERSION=$(shell date +%Y%m%d)
 
-	# Turtle Arena version
-	VERSION=0.2
-
-	# Turtle Arena currently use MISSIONPACK game/cgame and baseq3-based ui
+	# TMNT Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"
-	SERVERBIN=turtlearena-ded
-	CLIENTBIN=turtlearena
+	SERVERBIN=tmntarena-ded
+	CLIENTBIN=tmntarena
 	BASEGAME=base
-	BASEGAME_FLAGS = -DMISSIONPACK -DTA_HUD
+	BASEGAME_FLAGS = -DMISSIONPACK -DTMNTHUD
 	MISSIONPACK_FLAGS= -DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
 
 	# Disable building scriptable hud and scriptable ui versions of cgame/ui
 	#    game is unchanged.
-	ifneq ($(BUILD_MISSIONPACK),1)
+	ifneq ($BUILD_MISSIONPACK),1)
 		BUILD_MISSIONPACK=0
 	endif
 
 	ifndef COPYDIR
-	COPYDIR="/usr/local/games/turtlearena"
+	COPYDIR="/usr/local/games/tmntarena"
 	endif
 	ifndef BUILD_DIR
 	BUILD_DIR=build
@@ -391,10 +295,6 @@ ifndef USE_CODEC_VORBIS
 USE_CODEC_VORBIS=0
 endif
 
-ifndef USE_CODEC_THEORA
-USE_CODEC_THEORA=0
-endif
-
 ifndef USE_MUMBLE
 USE_MUMBLE=1
 endif
@@ -462,6 +362,7 @@ ifneq ($(BUILD_CLIENT),0)
     CURL_LIBS=$(shell pkg-config --silence-errors --libs libcurl)
     OPENAL_CFLAGS=$(shell pkg-config --silence-errors --cflags openal)
     OPENAL_LIBS=$(shell pkg-config --silence-errors --libs openal)
+    # FIXME: introduce CLIENT_CFLAGS
     SDL_CFLAGS=$(shell pkg-config --silence-errors --cflags sdl|sed 's/-Dmain=SDL_main//')
     SDL_LIBS=$(shell pkg-config --silence-errors --libs sdl)
   endif
@@ -549,9 +450,6 @@ ifeq ($(PLATFORM),linux)
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
   endif
-  ifeq ($(USE_CODEC_THEORA),1)
-    CLIENT_CFLAGS += -DUSE_CIN_THEORA
-  endif
 
   OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer
   OPTIMIZE = $(OPTIMIZEVM) -ffast-math
@@ -614,9 +512,6 @@ ifeq ($(PLATFORM),linux)
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
   endif
-  ifeq ($(USE_CODEC_THEORA),1)
-    CLIENT_LIBS += -ltheora
-  endif
 
   ifeq ($(USE_MUMBLE),1)
     CLIENT_LIBS += -lrt
@@ -647,7 +542,6 @@ else # ifeq Linux
 
 ifeq ($(PLATFORM),darwin)
   HAVE_VM_COMPILED=true
-  LIBS = -framework Cocoa
   CLIENT_LIBS=
   OPTIMIZEVM=
   
@@ -701,10 +595,6 @@ ifeq ($(PLATFORM),darwin)
     CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
   endif
-  ifeq ($(USE_CODEC_THEORA),1)
-    CLIENT_CFLAGS += -DUSE_CIN_THEORA
-    CLIENT_LIBS += -ltheora
-  endif
 
   BASE_CFLAGS += -D_THREAD_SAFE=1
 
@@ -716,7 +606,7 @@ ifeq ($(PLATFORM),darwin)
   #  the file has been modified by each build.
   LIBSDLMAIN=$(B)/libSDLmain.a
   LIBSDLMAINSRC=$(LIBSDIR)/macosx/libSDLmain.a
-  CLIENT_LIBS += -framework IOKit -framework OpenGL \
+  CLIENT_LIBS += -framework Cocoa -framework IOKit -framework OpenGL \
     $(LIBSDIR)/macosx/libSDL-1.2.0.dylib
 
   OPTIMIZEVM += -falign-loops=16
@@ -753,6 +643,8 @@ ifeq ($(PLATFORM),mingw32)
     WINDRES=windres
   endif
 
+  ARCH=x86
+
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
     -DUSE_ICON
   CLIENT_CFLAGS =
@@ -776,24 +668,13 @@ ifeq ($(PLATFORM),mingw32)
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
   endif
-  ifeq ($(USE_CODEC_THEORA),1)
-    CLIENT_CFLAGS += -DUSE_CIN_THEORA
-  endif
 
-  ifeq ($(ARCH),x64)
-    OPTIMIZEVM = -O3 -fno-omit-frame-pointer \
-      -falign-loops=2 -funroll-loops -falign-jumps=2 -falign-functions=2 \
-      -fstrength-reduce
-    OPTIMIZE = $(OPTIMIZEVM) --fast-math
-    HAVE_VM_COMPILED = true
-  endif
-  ifeq ($(ARCH),x86)
-    OPTIMIZEVM = -O3 -march=i586 -fno-omit-frame-pointer \
-      -falign-loops=2 -funroll-loops -falign-jumps=2 -falign-functions=2 \
-      -fstrength-reduce
-    OPTIMIZE = $(OPTIMIZEVM) -ffast-math
-    HAVE_VM_COMPILED = true
-  endif
+  OPTIMIZEVM = -O3 -march=i586 -fno-omit-frame-pointer \
+    -falign-loops=2 -funroll-loops -falign-jumps=2 -falign-functions=2 \
+    -fstrength-reduce
+  OPTIMIZE = $(OPTIMIZEVM) -ffast-math
+
+  HAVE_VM_COMPILED = true
 
   SHLIBEXT=dll
   SHLIBCFLAGS=
@@ -801,7 +682,7 @@ ifeq ($(PLATFORM),mingw32)
 
   BINEXT=.exe
 
-  LIBS= -lws2_32 -lwinmm -lpsapi
+  LIBS= -lws2_32 -lwinmm
   CLIENT_LDFLAGS = -mwindows
   CLIENT_LIBS = -lgdi32 -lole32 -lopengl32
 
@@ -821,11 +702,7 @@ ifeq ($(PLATFORM),mingw32)
     ifneq ($(USE_CURL_DLOPEN),1)
       ifeq ($(USE_LOCAL_HEADERS),1)
         CLIENT_CFLAGS += -DCURL_STATICLIB
-        ifeq ($(ARCH),x64)
-	  CLIENT_LIBS += $(LIBSDIR)/win64/libcurl.a
-	else
-          CLIENT_LIBS += $(LIBSDIR)/win32/libcurl.a
-        endif
+        CLIENT_LIBS += $(LIBSDIR)/win32/libcurl.a
       else
         CLIENT_LIBS += $(CURL_LIBS)
       endif
@@ -835,55 +712,27 @@ ifeq ($(PLATFORM),mingw32)
   ifeq ($(ARCH),x86)
     # build 32bit
     BASE_CFLAGS += -m32
-  else
-    BASE_CFLAGS += -m64
   endif
 
   # libmingw32 must be linked before libSDLmain
   CLIENT_LIBS += -lmingw32
   ifeq ($(USE_LOCAL_HEADERS),1)
     CLIENT_CFLAGS += -I$(SDLHDIR)/include
-    ifeq ($(ARCH), x86)
     CLIENT_LIBS += $(LIBSDIR)/win32/libSDLmain.a \
                       $(LIBSDIR)/win32/libSDL.dll.a
-    else
-    CLIENT_LIBS += $(LIBSDIR)/win64/libSDLmain.a \
-                      $(LIBSDIR)/win64/libSDL.dll.a \
-                      $(LIBSDIR)/win64/libSDL.a
-    endif
-
-    # Extra libs, easier to just include in source tree
-    ifeq ($(ARCH), x86)
-      ifeq ($(USE_CODEC_VORBIS),1)
-        CLIENT_CFLAGS += -I$(LIBSDIR)/win32/include
-        CLIENT_LIBS += $(LIBSDIR)/win32/libvorbisfile.a \
+    # Turtle Man include ogg vorbis
+    ifeq ($(USE_CODEC_VORBIS),1)
+      CLIENT_CFLAGS += -I$(LIBSDIR)/win32/include
+      CLIENT_LIBS += $(LIBSDIR)/win32/libvorbisfile.a \
                         $(LIBSDIR)/win32/libvorbis.a\
 						$(LIBSDIR)/win32/libogg.a
-      endif
-      ifeq ($(USE_CODEC_THEORA),1)
-        CLIENT_LIBS += $(LIBSDIR)/win32/libtheora.a
-      endif
-    else
-      ifeq ($(USE_CODEC_VORBIS),1)
-        CLIENT_CFLAGS += -I$(LIBSDIR)/win64/include
-        CLIENT_LIBS += $(LIBSDIR)/win64/libvorbisfile.a \
-                        $(LIBSDIR)/win64/libvorbis.a\
-						$(LIBSDIR)/win64/libogg.a
-      endif
-      ifeq ($(USE_CODEC_THEORA),1)
-        CLIENT_LIBS += $(LIBSDIR)/win64/libtheora.a
-      endif
     endif
-
   else
     CLIENT_CFLAGS += $(SDL_CFLAGS)
     CLIENT_LIBS += $(SDL_LIBS)
     ifeq ($(USE_CODEC_VORBIS),1)
       CLIENT_LIBS += -lvorbisfile -lvorbis -logg
-    endif
-    ifeq ($(USE_CODEC_THEORA),1)
-      CLIENT_LIBS += -ltheora
-    endif
+  endif
   endif
 
 
@@ -898,16 +747,45 @@ else # ifeq mingw32
 
 ifeq ($(PLATFORM),freebsd)
 
-  # flags
-  BASE_CFLAGS = $(shell env MACHINE_ARCH=$(ARCH) make -f /dev/null -VCFLAGS) \
-    -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
-    -DUSE_ICON -DMAP_ANONYMOUS=MAP_ANON
+  ifneq (,$(findstring alpha,$(shell uname -m)))
+    ARCH=axp
+  else #default to i386
+    ARCH=i386
+  endif #alpha test
+
+  BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
+    -DUSE_ICON
   CLIENT_CFLAGS = $(SDL_CFLAGS)
   SERVER_CFLAGS = 
-  HAVE_VM_COMPILED = true
 
-  OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer -ffast-math
-  OPTIMIZE = $(OPTIMIZEVM)
+  ifeq ($(USE_OPENAL),1)
+    CLIENT_CFLAGS += -DUSE_OPENAL
+    ifeq ($(USE_OPENAL_DLOPEN),1)
+      CLIENT_CFLAGS += -DUSE_OPENAL_DLOPEN
+    endif
+  endif
+
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
+  endif
+
+  OPTIMIZEVM = -DNDEBUG -O3 -funroll-loops -fomit-frame-pointer
+
+  ifeq ($(ARCH),axp)
+    BASE_CFLAGS += -DNO_VM_COMPILED
+    OPTIMIZEVM += -fexpensive-optimizations
+  else
+  ifeq ($(ARCH),i386)
+    OPTIMIZEVM += -mtune=pentiumpro \
+      -march=pentium -pipe -falign-loops=2 -falign-jumps=2 \
+      -falign-functions=2 -funroll-loops -fstrength-reduce
+    HAVE_VM_COMPILED=true
+  else
+    BASE_CFLAGS += -DNO_VM_COMPILED
+  endif
+  endif
+
+  OPTIMIZE = $(OPTIMIZEVM) -ffast-math
 
   SHLIBEXT=so
   SHLIBCFLAGS=-fPIC
@@ -921,41 +799,14 @@ ifeq ($(PLATFORM),freebsd)
 
   CLIENT_LIBS += $(SDL_LIBS) -lGL
 
-  # optional features/libraries
   ifeq ($(USE_OPENAL),1)
-    CLIENT_CFLAGS += -DUSE_OPENAL
-    ifeq ($(USE_OPENAL_DLOPEN),1)
-      CLIENT_CFLAGS += -DUSE_OPENAL_DLOPEN
+    ifneq ($(USE_OPENAL_DLOPEN),1)
       CLIENT_LIBS += $(THREAD_LIBS) -lopenal
     endif
   endif
 
-  ifeq ($(USE_CURL),1)
-    CLIENT_CFLAGS += -DUSE_CURL
-    ifeq ($(USE_CURL_DLOPEN),1)
-      CLIENT_CFLAGS += -DUSE_CURL_DLOPEN
-      CLIENT_LIBS += -lcurl
-    endif
-  endif
-
-  ifeq ($(USE_CODEC_VORBIS),1)
-    CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
-  endif
-
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
-  endif
-
-  # cross-compiling tweaks
-  ifeq ($(ARCH),i386)
-    ifeq ($(CROSS_COMPILING),1)
-      BASE_CFLAGS += -m32
-    endif
-  endif
-  ifeq ($(ARCH),amd64)
-    ifeq ($(CROSS_COMPILING),1)
-      BASE_CFLAGS += -m64
-    endif
   endif
 
 else # ifeq freebsd
@@ -983,9 +834,6 @@ ifeq ($(PLATFORM),openbsd)
 
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
-  endif
-  ifeq ($(USE_CODEC_THEORA),1)
-    CLIENT_CFLAGS += -DUSE_CIN_THEORA
   endif
 
   ifeq ($(USE_CURL),1)
@@ -1016,9 +864,6 @@ ifeq ($(PLATFORM),openbsd)
 
   ifeq ($(USE_CODEC_VORBIS),1)
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
-  endif
-  ifeq ($(USE_CODEC_THEORA),1)
-    CLIENT_LIBS += -ltheora
   endif
 
   ifeq ($(USE_CURL),1) 
@@ -1113,7 +958,7 @@ ifeq ($(PLATFORM),sunos)
   CLIENT_CFLAGS = $(SDL_CFLAGS)
   SERVER_CFLAGS =
 
-  OPTIMIZEVM = -O3 -funroll-loops
+  OPTIMIZEVM = -O3 -funroll-loops -DNDEBUG
 
   ifeq ($(ARCH),sparc)
     OPTIMIZEVM += -O3 \
@@ -1155,7 +1000,7 @@ else # ifeq sunos
 # SETUP AND BUILD -- GENERIC
 #############################################################################
   BASE_CFLAGS=-DNO_VM_COMPILED
-  OPTIMIZE = -O3
+  OPTIMIZE = -DNDEBUG -O3
 
   SHLIBEXT=so
   SHLIBCFLAGS=-fPIC
@@ -1171,11 +1016,6 @@ endif #IRIX
 endif #SunOS
 
 TARGETS =
-
-ifeq ($(IOQ3TURTLE),1)
-  CLIENT_CFLAGS+=$(ENGINE_CFLAGS)
-  SERVER_CFLAGS+=$(ENGINE_CFLAGS)
-endif
 
 ifeq ($(BUILD_SPLINES),1)
   TARGETS += $(B)/splines/libsplines.a
@@ -1244,7 +1084,6 @@ endif
 
 ifeq ($(USE_VOIP),1)
   CLIENT_CFLAGS += -DUSE_VOIP
-  SERVER_CFLAGS += -DUSE_VOIP
   ifeq ($(USE_INTERNAL_SPEEX),1)
     CLIENT_CFLAGS += -DFLOATING_POINT -DUSE_ALLOCA -I$(SPEEXDIR)/include
   else
@@ -1254,7 +1093,9 @@ endif
 
 ifeq ($(USE_INTERNAL_ZLIB),1)
   BASE_CFLAGS += -DNO_GZIP
-  BASE_CFLAGS += -I$(ZDIR)
+  ifneq ($(USE_LOCAL_HEADERS),1)
+    BASE_CFLAGS += -I$(ZDIR)
+  endif
 else
   LIBS += -lz
 endif
@@ -1284,7 +1125,11 @@ else
 endif
 
 BASE_CFLAGS += -DPRODUCT_VERSION=\\\"$(VERSION)\\\"
+# Turtle Man
 BASE_CFLAGS += $(BUILD_DEFINES)
+NOTSHLIBCFLAGS += $(BUILD_DEFINES)
+SHLIBCFLAGS += $(BUILD_DEFINES)
+#TOOLS_CFLAGS += $(BUILD_DEFINES)
 
 ifeq ($(V),1)
 echo_cmd=@:
@@ -1363,12 +1208,12 @@ endef
 
 define DO_AS
 $(echo_cmd) "AS $<"
-$(Q)$(CC) $(CFLAGS) $(OPTIMIZE) -x assembler-with-cpp -o $@ -c $<
+$(Q)$(CC) $(CFLAGS) -x assembler-with-cpp -o $@ -c $<
 endef
 
 define DO_DED_CC
 $(echo_cmd) "DED_CC $<"
-$(Q)$(CC) $(NOTSHLIBCFLAGS) -DDEDICATED $(CFLAGS) $(SERVER_CFLAGS) $(OPTIMIZE) -o $@ -c $<
+$(Q)$(CC) $(NOTSHLIBCFLAGS) -DDEDICATED $(CFLAGS) -o $@ -c $<
 endef
 
 define DO_WINDRES
@@ -1391,7 +1236,7 @@ debug:
 
 release:
 	@$(MAKE) targets B=$(BR) CFLAGS="$(CFLAGS) $(BASE_CFLAGS) $(DEPEND_CFLAGS)" \
-	  OPTIMIZE="-DNDEBUG $(OPTIMIZE)" OPTIMIZEVM="-DNDEBUG $(OPTIMIZEVM)" \
+	  OPTIMIZE="$(OPTIMIZE)" OPTIMIZEVM="$(OPTIMIZEVM)" \
 	  CLIENT_CFLAGS="$(CLIENT_CFLAGS)" SERVER_CFLAGS="$(SERVER_CFLAGS)" V=$(V)
 
 # Create the build directories, check libraries and print out
@@ -1401,7 +1246,7 @@ targets: makedirs
 ifeq ($(QUAKE3),1)
 	@echo "Building ioquake3 in $(B):"
 else
-	@echo "Building Turtle Arena in $(B):"
+	@echo "Building TMNT Arena in $(B):"
 endif
 ifdef IOQ3_REVISION
 # IOQ3_REVISION can be defined to keep trace of the ioquake3 supported revision
@@ -1504,7 +1349,7 @@ endif
 # QVM BUILD TOOLS
 #############################################################################
 
-TOOLS_OPTIMIZE = -g -Wall -fno-strict-aliasing
+TOOLS_OPTIMIZE = -g -O2 -Wall -fno-strict-aliasing
 TOOLS_CFLAGS += $(TOOLS_OPTIMIZE) \
                -DTEMPDIR=\"$(TEMPDIR)\" -DSYSTEM=\"\" \
                -I$(Q3LCCSRCDIR) \
@@ -1674,7 +1519,7 @@ $(Q3ASM): $(Q3ASMOBJ)
 #############################################################################
 # SPLINES
 #############################################################################
-# ZTM
+# Turtle Man
 
 SPLINESOBJ =
 
@@ -1725,7 +1570,6 @@ endif
 Q3OBJ = \
   $(B)/client/cl_cgame.o \
   $(B)/client/cl_cin.o \
-  $(B)/client/cl_cin_ogm.o \
   $(B)/client/cl_console.o \
   $(B)/client/cl_input.o \
   $(B)/client/cl_keys.o \
@@ -1972,12 +1816,6 @@ ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),x86_64)
     Q3OBJ += $(B)/client/vm_x86_64.o $(B)/client/vm_x86_64_assembler.o
   endif
-  ifeq ($(ARCH),amd64)
-    Q3OBJ += $(B)/client/vm_x86_64.o $(B)/client/vm_x86_64_assembler.o
-  endif
-  ifeq ($(ARCH),x64)
-    Q3OBJ += $(B)/client/vm_x86_64.o $(B)/client/vm_x86_64_assembler.o
-  endif
   ifeq ($(ARCH),ppc)
     Q3OBJ += $(B)/client/vm_powerpc.o $(B)/client/vm_powerpc_asm.o
   endif
@@ -2000,7 +1838,7 @@ endif
 
 ifeq ($(PLATFORM),darwin)
   Q3OBJ += \
-    $(B)/client/sys_osx.o
+    $(B)/client/sys_cocoa.o
 endif
 
 ifeq ($(USE_MUMBLE),1)
@@ -2017,7 +1855,7 @@ Q3POBJ_SMP += \
 ifeq ($(BUILD_SPLINES),1)
 # TTimo: splines code requires C++ linking, but splines have
 # not been officially included in the codebase
-# ZTM: now it has, so use C++ linking.
+# Turtle Man: now it has, so use C++ linking.
 $(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
@@ -2139,7 +1977,7 @@ ifeq ($(ARCH),x86)
       $(B)/ded/snapvectora.o \
       $(B)/ded/matha.o
 endif
-#ZTM: if TA_GAME_TAGS
+#Turtle Man: if TMNT_GAME_TAGS
 ifeq ($(DED_USE_MODELS),1)
 Q3DOBJ += \
       $(B)/ded/tr_model.o
@@ -2165,12 +2003,6 @@ ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),x86_64)
     Q3DOBJ += $(B)/ded/vm_x86_64.o $(B)/ded/vm_x86_64_assembler.o
   endif
-  ifeq ($(ARCH),amd64)
-    Q3DOBJ += $(B)/ded/vm_x86_64.o $(B)/ded/vm_x86_64_assembler.o
-  endif
-  ifeq ($(ARCH),x64)
-    Q3DOBJ += $(B)/ded/vm_x86_64.o $(B)/ded/vm_x86_64_assembler.o
-  endif
   ifeq ($(ARCH),ppc)
     Q3DOBJ += $(B)/ded/vm_powerpc.o $(B)/ded/vm_powerpc_asm.o
   endif
@@ -2193,10 +2025,11 @@ else
     $(B)/ded/con_tty.o
 endif
 
-ifeq ($(PLATFORM),darwin)
-  Q3DOBJ += \
-    $(B)/ded/sys_osx.o
-endif
+# Not currently referenced in the dedicated server.
+#ifeq ($(PLATFORM),darwin)
+#  Q3DOBJ += \
+#    $(B)/ded/sys_cocoa.o
+#endif
 
 $(B)/$(SERVERBIN)$(FULLBINEXT): $(Q3DOBJ)
 	$(echo_cmd) "LD $@"
@@ -2335,7 +2168,7 @@ Q3GOBJ_ = \
   $(B)/$(BASEGAME)/qcommon/q_math.o \
   $(B)/$(BASEGAME)/qcommon/q_shared.o
 
-#ZTM: Files I added.
+#Turtle Man: Files I added.
 Q3GOBJ_ += $(B)/$(BASEGAME)/game/g_save.o \
   $(B)/$(BASEGAME)/game/g_paths.o \
   $(B)/$(BASEGAME)/game/g_npcsys.o
@@ -2391,7 +2224,7 @@ MPGOBJ_ = \
   $(B)/missionpack/qcommon/q_math.o \
   $(B)/missionpack/qcommon/q_shared.o
 
-#ZTM: Files I added.
+#Turtle Man: Files I added.
 MPGOBJ_ += $(B)/missionpack/game/g_save.o \
   $(B)/missionpack/game/g_paths.o \
   $(B)/missionpack/game/g_npcsys.o
@@ -2451,7 +2284,6 @@ Q3UIOBJ_ = \
   $(B)/$(BASEGAME)/ui/ui_sparena.o \
   $(B)/$(BASEGAME)/ui/ui_specifyserver.o \
   $(B)/$(BASEGAME)/ui/ui_splevel.o \
-  $(B)/$(BASEGAME)/ui/ui_spplayer.o \
   $(B)/$(BASEGAME)/ui/ui_sppostgame.o \
   $(B)/$(BASEGAME)/ui/ui_spskill.o \
   $(B)/$(BASEGAME)/ui/ui_startserver.o \
@@ -2577,7 +2409,7 @@ $(B)/ded/%.o: $(SYSDIR)/%.rc
 $(B)/ded/%.o: $(NDIR)/%.c
 	$(DO_DED_CC)
 
-# ZTM: TA_GAME_TAGS ded
+# Turtle Man: TMNT_GAME_TAGS ded
 ifeq ($(DED_USE_MODELS),1)
 $(B)/ded/%.o: $(RDIR)/%.c
 	$(DO_DED_CC)
@@ -2778,9 +2610,9 @@ dist:
 #############################################################################
 
 ifneq ($(B),)
-  OBJ_D_FILES=$(filter %.d,$(OBJ:%.o=%.d))
-  TOOLSOBJ_D_FILES=$(filter %.d,$(TOOLSOBJ:%.o=%.d))
-  -include $(OBJ_D_FILES) $(TOOLSOBJ_D_FILES)
+OBJ_D_FILES=$(filter %.d,$(OBJ:%.o=%.d))
+TOOLSOBJ_D_FILES=$(filter %.d,$(TOOLSOBJ:%.o=%.d))
+-include $(OBJ_D_FILES) $(TOOLSOBJ_D_FILES)
 endif
 
 .PHONY: all clean clean2 clean-debug clean-release copyfiles \

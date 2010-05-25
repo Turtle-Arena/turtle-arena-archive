@@ -352,19 +352,8 @@ sfxHandle_t	S_Base_RegisterSound( const char *name, qboolean compressed ) {
 		return 0;
 	}
 
-#ifdef IOQ3ZTM
-	if (!name) {
-		Com_Printf( S_COLOR_YELLOW "WARNING: Sound name is NULL\n" );
-		return 0;
-	}
-#endif
-
 	if ( strlen( name ) >= MAX_QPATH ) {
-#ifdef IOQ3ZTM
-		Com_Printf( S_COLOR_YELLOW "WARNING: Sound name exceeds MAX_QPATH\n" );
-#else
 		Com_Printf( "Sound name exceeds MAX_QPATH\n" );
-#endif
 		return 0;
 	}
 
@@ -383,7 +372,7 @@ sfxHandle_t	S_Base_RegisterSound( const char *name, qboolean compressed ) {
   S_memoryLoad(sfx);
 
 	if ( sfx->defaultSound ) {
-#ifndef IOQ3ZTM // ZTM: Shut up, I know I need sounds.
+#ifndef IOQ3ZTM // Turtle Man: Shut up, I know I need sounds.
 		Com_Printf( S_COLOR_YELLOW "WARNING: could not find %s - using default\n", sfx->soundName );
 #endif
 		return 0;
@@ -408,7 +397,7 @@ void S_Base_BeginRegistration( void ) {
 		Com_Memset( s_knownSfx, 0, sizeof( s_knownSfx ) );
 		Com_Memset(sfxHash, 0, sizeof(sfx_t *)*LOOP_HASH);
 
-#ifdef TA_DATA // OPENARENA
+#ifdef TMNTDATA // OPENARENA
 		S_Base_RegisterSound("sound/misc/silence.wav", qfalse);
 #else
 		S_Base_RegisterSound("sound/feedback/hit.wav", qfalse);		// changed to a sound in baseq3
@@ -1355,7 +1344,7 @@ void S_Base_StartBackgroundTrack( const char *intro, const char *loop ){
 		return;
 	}
 
-#ifndef IOQ3ZTM // ZTM: FIXME?: It works so why the warning?
+#ifndef IOQ3ZTM // Turtle Man: FIXME?: It works so why the warning?
 	if(s_backgroundStream->info.channels != 2 || s_backgroundStream->info.rate != 22050) {
 		Com_Printf(S_COLOR_YELLOW "WARNING: music file %s is not 22k stereo\n", intro );
 	}

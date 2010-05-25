@@ -100,9 +100,9 @@ models/players/raph/head_red
 	}
 }
 
-// The Fugitoid!
+// Raph/Fungioid skin!
 // green eyes and mouth
-models/players/fugitoid/eyes_mouth
+models/players/raph/green
 {
 	{
 		map $whiteimage
@@ -110,28 +110,31 @@ models/players/fugitoid/eyes_mouth
 	}
 }
 
-models/players/fugitoid/eyes_mouth_red
+models/players/raph/body_fugitoid
 {
 	{
 		map $whiteimage
-		rgbGen const ( 0.9 0.0 0.0 )
+		rgbGen const ( 0.4 0.4 0.4 )
+	}
+	{
+		map textures/effects/tinfx.png
+		tcGen environment
+		rgbGen lightingDiffuse
+		//alphaGen wave sin .6 .2 0 .6
 	}
 }
 
-models/players/fugitoid/eyes_mouth_blue
+models/players/raph/body_fugitoid_lighter
 {
 	{
 		map $whiteimage
-		rgbGen const ( 0.0 0.0 0.9 )
+		rgbGen const ( 0.4 0.4 0.4 )
 	}
-}
-
-models/players/fugitoid/body
-{
 	{
 		map textures/effects/tinfx_lighter.png
 		tcGen environment
 		rgbGen lightingDiffuse
+		//alphaGen wave sin .6 .2 0 .6
 	}
 }
 
@@ -149,8 +152,8 @@ models/misc/telep
 		//tcMod turb 0 0.1 0 0.1
 		//tcmod rotate 311
 		//tcmod scroll 1 1
-		blendfunc add
-		rgbGen lightingDiffuse
+		blendfunc Add
+		rgbGen entity
 	}
 }
 
@@ -240,6 +243,7 @@ models/mapobjects/traffic_cone/traffic_cone
 
 models/powerups/health/health
 {
+	cull disable
 	{
 		map models/powerups/health/health.png
 		rgbGen lightingDiffuse
@@ -308,9 +312,7 @@ models/powerups/instant/strength
 	}
 }
 
-//
 // Powerup rings
-//
 //models/powerups/instant/defense
 models/powerups/shield/yellow
 {
@@ -363,10 +365,7 @@ models/powerups/shield/red
 	}
 }
 
-//
 // Weapons
-//
-
 models/weapons2/katana_leo/w_katana
 {
 	{
@@ -407,112 +406,12 @@ models/weapons2/sai/w_sai
 	//}
 }
 
-models/weapons2/nunchuck/w_nunchuck
-{
-	{
-		map models/weapons2/nunchuck/w_nunchuck.png
-		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
-	}
-}
-
-models/weapons2/nunchuck/chain
-{
-	//{
-	//	map $whiteimage
-	//	rgbGen const ( 0.4 0.4 0.4 )
-	//}
-	{
-		map textures/effects/tinfx_lighter.png
-		tcGen environment
-		rgbGen lightingDiffuse
-		//alphaGen wave sin .6 .2 0 .6
-	}
-}
-
-models/weapons2/railgun/railgun
-{
-	{
-		map textures/sfx/detail.jpg
-		tcmod rotate 50
-		rgbGen entity
-	}
-	{
-		map models/weapons2/railgun/railgun
-		blendfunc blend
-		rgbGen lightingDiffuse
-	}
-}
-
-models/weapons2/triblaster/flash
-{
-	cull disable
-	deformVertexes autosprite
-
-	{
-		clampmap models/weapons2/triblaster/flash
-		blendfunc add
-
-		tcMod stretch triangle .6 0.1 0 8
-		tcmod rotate 999
-		rgbGen entity
-	}
-}
-
-//
-// Projectiles
-//
-models/ammo/pulse/pulse
-{
-	sort nearest
-	cull none
-	deformVertexes autosprite2
-
-	{
-		map models/ammo/pulse/pulse
-		blendFunc blend
-		rgbGen identity
-	}
-}
-
 //
 // MATERIALS
 //
-models/materials/dirt
-{
-	celoutline 2
-
-	{
-		map models/materials/dirt.png
-		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
-	}
-}
-
-models/materials/grass
-{
-	celoutline 2
-
-	{
-		map models/materials/grass.png
-		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
-	}
-}
-
-models/materials/wood
-{
-	celoutline 2
-
-	{
-		map models/materials/wood.png
-		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
-	}
-}
-
 models/materials/stone
 {
+	// It look better with a cel outline
 	celoutline 2
 
 	{
@@ -522,41 +421,13 @@ models/materials/stone
 	}
 }
 
-models/materials/metal
-{
-	celoutline 2
-
-	{
-		map models/materials/metal.png
-		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
-	}
-}
-
-//models/materials/sparks
-
-//Based on textures/base_wall/glass01
-models/materials/glass
-{
-	surfaceparm trans
-	cull none
-	celoutline 2
-
-	{
-		map textures/effects/tinfx.png
-		tcgen environment
-		blendFunc GL_ONE GL_ONE
-		rgbGen identity
-	}
-}
-
 
 // CTF FLAGS / MISSIONPACK CTF FLAGS
 // Below CTF flay shaders from MISSIONPACK demo pak0.pk3/scripts/models.shader
 models/flags/pole
 {
 	{
-		// ZTM: Changed image.
+		// Turtle Man: Changed image.
 		map textures/effects/tinfx.png
 		//map models/flags/pole.png
 		tcGen environment
@@ -567,7 +438,7 @@ models/flags/pole
 models/flags/skull
 {
 	{
-		// ZTM: Changed image.
+		// Turtle Man: Changed image.
 		map textures/effects/envmapmach.png
 		//map models/flags/skull.png
 		tcGen environment
@@ -803,7 +674,7 @@ models/powerups/ob2_2
 	//	tcGen environment
 		rgbGen entity
 
-		// ZTM: Invul powerup shader
+		// Turtle Man: Invul powerup shader
 		//map models/powerups/instant/invul.png
 		blendfunc GL_ONE GL_ONE
 		//rgbGen lightingDiffuse
@@ -829,7 +700,7 @@ models/powerups/ob2_4
 {
 	cull disable
 	{
-		// ZTM: Don't have pop_bw
+		// Turtle Man: Don't have pop_bw
 		//map models/powerups/pop_bw.tga
 		map textures/effects/tinfx.png
 		tcMod turb 0 0.1 0 0.1
@@ -971,7 +842,7 @@ models/powerups/ammo2
 	{
 		map models/powerups/ammo2.png
 		blendfunc Add
-		// ZTM: Go the same speed as others.
+		// Turtle Man: Go the same speed as others.
 		//tcmod Scroll 1.3 0
 		tcmod Scroll .9 0
 		rgbGen identity

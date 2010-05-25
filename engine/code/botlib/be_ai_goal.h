@@ -95,7 +95,7 @@ float BotAvoidGoalTime(int goalstate, int number);
 //set the avoid goal time
 void BotSetAvoidGoalTime(int goalstate, int number, float avoidtime);
 //initializes the items in the level
-#ifdef TA_WEAPSYS // BOT_ITEM_INFOS
+#ifdef TMNTWEAPSYS_2 // BOT_ITEM_INFOS
 void BotInitLevelItems(bot_shareditem_t *itemInfos);
 #else
 void BotInitLevelItems(void);

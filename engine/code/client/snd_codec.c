@@ -31,7 +31,7 @@ static snd_codec_t *codecs;
 S_FileExtension
 =================
 */
-char *S_FileExtension(const char *fni)
+static char *S_FileExtension(const char *fni)
 {
 	// we should search from the ending to the last '/'
 

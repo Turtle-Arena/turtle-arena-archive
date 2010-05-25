@@ -103,7 +103,7 @@ void AAS_InitSettings(void)
 	aassettings.rs_startwalkoffledge		= LibVarValue("rs_startwalkoffledge", "70");
 	aassettings.rs_startjump				= LibVarValue("rs_startjump", "300");
 	aassettings.rs_rocketjump				= LibVarValue("rs_rocketjump", "500");
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 	aassettings.rs_bfgjump					= LibVarValue("rs_bfgjump", "500");
 #endif
 	aassettings.rs_jumppad					= LibVarValue("rs_jumppad", "250");
@@ -345,7 +345,7 @@ float AAS_RocketJumpZVelocity(vec3_t origin)
 	//rocket radius damage is 120 (p_weapon.c: Weapon_RocketLauncher_Fire)
 	return AAS_WeaponJumpZVelocity(origin, 120);
 } //end of the function AAS_RocketJumpZVelocity
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 //===========================================================================
 //
 // Parameter:			-
@@ -367,7 +367,7 @@ float AAS_BFGJumpZVelocity(vec3_t origin)
 //===========================================================================
 void AAS_Accelerate(vec3_t velocity, float frametime, vec3_t wishdir, float wishspeed, float accel)
 {
-#ifndef TURTLEARENA // Use proper acceleration
+#if 1 // #ifndef TMNTMISC // Turtle Man: TEST
 	// q2 style
 	int			i;
 	float		addspeed, accelspeed, currentspeed;

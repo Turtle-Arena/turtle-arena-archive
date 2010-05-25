@@ -420,7 +420,7 @@ void SP_target_position( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 }
 
-#ifdef TA_SP // Save/load
+#ifdef TMNTSP // Save/load
 void target_location_linkup(gentity_t *ent)
 #else
 static void target_location_linkup(gentity_t *ent)
@@ -469,7 +469,7 @@ void SP_target_location( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 }
 
-#ifdef TA_SP
+#ifdef TMNTSP
 /*QUAKED target_level_end (1 0 0) (-16 -16 -24) (16 16 32)
 when triggered, the level ends
 "message"	use it to set the name of the next level without any extension
@@ -491,18 +491,15 @@ void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activat
 		return;
 	}
 
-	// If trigered by a client, that isn't a spectator or boss,
+	// If trigered by a client, that isn't a spectator,
 	//  and that hasn't finished the level.
 	if (activator && activator->client
-		&& activator->client->sess.sessionTeam == TEAM_FREE
+		&& activator->client->sess.sessionTeam != TEAM_SPECTATOR
 		&& !activator->client->finishTime)
 	{
 		// Set finish time.
 		activator->client->finishTime = level.time;
-		activator->client->ps.eFlags = EF_FINISHED;
-		activator->s.eFlags |= EF_FINISHED;
-
-		// Print message
+		// Print message,
 		if (!g_singlePlayer.integer)
 		{
 			G_Printf("%s finished the level.\n", activator->client->pers.netname );
@@ -517,38 +514,8 @@ void target_level_end_use( gentity_t *self, gentity_t *other, gentity_t *activat
 	// Save client data for next level.
 	G_SavePersistant(nextMap);
 
-	// Reached the end of the single player levels
-	if (Q_stricmp(nextMap, "sp_end") == 0)
-	{
-		if (g_singlePlayer.integer == 1)
-		{
-			// Return to the title screen.
-			trap_Cvar_Set("nextmap", "disconnect; sp_complete");
-			return;
-		}
-		else
-		{
-			const char *info;
-
-			nextMap = NULL;
-
-#ifdef IOQ3ZTM // MAP_ROTATION
-			info = G_GetMapRotationInfoByGametype(GT_SINGLE_PLAYER);
-			if (info) {
-				nextMap = Info_ValueForKey(info, "m1");
-			}
-#endif
-
-			if (!nextMap || !strlen(nextMap))
-			{
-				// Default to sp1a1
-				nextMap = "sp1a1";
-			}
-		}
-	}
-
 	// Set cvar for level change.
-	Com_sprintf(buf, MAX_QPATH, "spmap %s", nextMap);
+	Com_sprintf(buf, MAX_QPATH, "map %s", nextMap);
 	trap_Cvar_Set("nextmap", buf);
 }
 
@@ -564,13 +531,13 @@ void SP_target_level_end( gentity_t *self ) {
 }
 #endif
 
-#ifdef CAMERASCRIPT // ZTM: i made this
+#ifdef CAMERASCRIPT // Turtle Man: i made this
 /*QUAKED target_start_camera (1 0 0) (-16 -16 -24) (16 16 32) redteam blueteam everyone
 when triggered, starts a camera script.
 "message"	use it to set the name of the camera script without any extension or "cameras/" dir
 targetname: To trigger the camera script.
 If "private", only the activator gets the camera.  If no checks, all clients get the camera.
-ZTM: TODO?: Option for whether it can be skipped.
+Turtle Man: TODO?: Option for whether it can be skipped.
 */
 void target_start_camera_use(gentity_t *ent, gentity_t *other, gentity_t *activator) {
 	if (ent->message == NULL || *ent->message == '\0') {

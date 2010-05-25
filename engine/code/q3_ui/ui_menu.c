@@ -35,7 +35,7 @@ MAIN MENU
 #define ID_SINGLEPLAYER			10
 #define ID_MULTIPLAYER			11
 #define ID_SETUP				12
-#ifndef TA_SP
+#ifndef TMNTSP
 #define ID_DEMOS				13
 #define ID_CINEMATICS			14
 #define ID_TEAMARENA		15
@@ -43,7 +43,7 @@ MAIN MENU
 #endif
 #define ID_EXIT					17
 
-#ifdef TURTLEARENA // BANNER_IMAGE
+#ifdef TMNT // BANNER_IMAGE
 #define ART_BANNER_IMAGE				"menu/art/titlebanner"
 #else
 #define MAIN_BANNER_MODEL				"models/mapobjects/banner/banner5.md3"
@@ -54,13 +54,13 @@ MAIN MENU
 typedef struct {
 	menuframework_s	menu;
 
-#ifdef TURTLEARENA // BANNER_IMAGE
+#ifdef TMNT // BANNER_IMAGE
 	menubitmap_s	banner_image;
 #endif
 	menutext_s		singleplayer;
 	menutext_s		multiplayer;
 	menutext_s		setup;
-#ifndef TA_SP
+#ifndef TMNTSP
 	menutext_s		demos;
 	menutext_s		cinematics;
 	menutext_s		teamArena;
@@ -68,7 +68,7 @@ typedef struct {
 #endif
 	menutext_s		exit;
 
-#ifndef TURTLEARENA // BANNER_IMAGE
+#ifndef TMNT // BANNER_IMAGE
 	qhandle_t		bannerModel;
 #endif
 } mainmenu_t;
@@ -83,7 +83,7 @@ typedef struct {
 #else
 	char errorMessage[4096];
 #endif
-#ifdef TURTLEARENA // BANNER_IMAGE
+#ifdef TMNT // BANNER_IMAGE
 	menubitmap_s	banner_image;
 #endif
 } errorMessage_t;
@@ -117,7 +117,7 @@ void Main_MenuEvent (void* ptr, int event) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_SINGLEPLAYER:
-#ifdef TA_SP
+#ifdef TMNTSP
 		UI_SPMenu();
 #else
 		UI_SPLevelMenu();
@@ -125,7 +125,7 @@ void Main_MenuEvent (void* ptr, int event) {
 		break;
 
 	case ID_MULTIPLAYER:
-#ifdef TA_MISC
+#ifdef TMNTMISC
 		UI_MultiplayerMenu();
 #else
 		UI_ArenaServersMenu();
@@ -136,7 +136,7 @@ void Main_MenuEvent (void* ptr, int event) {
 		UI_SetupMenu();
 		break;
 
-#ifndef TA_SP
+#ifndef TMNTSP
 	case ID_DEMOS:
 		UI_DemosMenu();
 		break;
@@ -168,7 +168,7 @@ MainMenu_Cache
 ===============
 */
 void MainMenu_Cache( void ) {
-#ifndef TURTLEARENA // BANNER_IMAGE
+#ifndef TMNT // BANNER_IMAGE
 	s_main.bannerModel = trap_R_RegisterModel( MAIN_BANNER_MODEL );
 #endif
 }
@@ -188,7 +188,7 @@ TTimo: this function is common to the main menu and errorMessage menu
 */
 
 static void Main_MenuDraw( void ) {
-#ifndef TURTLEARENA // BANNER_IMAGE
+#ifndef TMNT // BANNER_IMAGE
 	refdef_t		refdef;
 	refEntity_t		ent;
 	vec3_t			origin;
@@ -196,11 +196,11 @@ static void Main_MenuDraw( void ) {
 	float			adjust;
 	float			x, y, w, h;
 #endif
-#ifndef TURTLEARENA
+#ifndef TMNT
 	vec4_t			color = {0.5, 0, 0, 1};
 #endif
 
-#ifndef TURTLEARENA // BANNER_IMAGE
+#ifndef TMNT // BANNER_IMAGE
 	// setup the refdef
 
 	memset( &refdef, 0, sizeof( refdef ) );
@@ -249,9 +249,16 @@ static void Main_MenuDraw( void ) {
 	trap_R_RenderScene( &refdef );
 #endif
 	
+#ifdef IOQ3ZTM // Turtle Man: FIXME: Why does error draw when there isn't a com_errorMessage?? note: ui.qvm only not ui*.so
+	if (s_errorMessage.errorMessage[0] && strlen(s_errorMessage.errorMessage) == 1)
+	{
+		Com_Printf(S_COLOR_YELLOW "WARNING: Buggy com_errorMessage, com_errorMessage[0]='%s'\n", s_errorMessage.errorMessage);
+		s_errorMessage.errorMessage[0] ='\0';
+	}
+#endif
 	if (strlen(s_errorMessage.errorMessage))
 	{
-#ifdef TURTLEARENA // BANNER_IMAGE
+#ifdef TMNT // BANNER_IMAGE
 		// standard menu drawing
 		Menu_Draw( &s_errorMessage.menu );
 
@@ -269,7 +276,9 @@ static void Main_MenuDraw( void ) {
 		Menu_Draw( &s_main.menu );		
 	}
 
-#ifndef TURTLEARENA // Legal stuff...
+#ifdef TMNT // Legal stuff...
+	//UI_DrawString( 320, 450, "This is a fangame, TMNT is used without permission. TMNT(c) Mirage Studios.", UI_CENTER|UI_SMALLFONT, color );
+#else
 	if (uis.demoversion) {
 		UI_DrawProportionalString( 320, 372, "DEMO      FOR MATURE AUDIENCES      DEMO", UI_CENTER|UI_SMALLFONT, color );
 		UI_DrawString( 320, 400, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color );
@@ -280,7 +289,7 @@ static void Main_MenuDraw( void ) {
 }
 
 
-#ifndef TA_SP
+#ifndef TMNTSP
 /*
 ===============
 UI_TeamArenaExists
@@ -320,14 +329,14 @@ and that local cinematics are killed
 */
 void UI_MainMenu( void ) {
 	int		y;
-#ifndef TA_SP
+#ifndef TMNTSP
 	qboolean teamArena = qfalse;
 #endif
 	int		style = UI_CENTER | UI_DROPSHADOW;
 
 	trap_Cvar_Set( "sv_killserver", "1" );
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	if( !uis.demoversion && !ui_cdkeychecked.integer ) {
 		char	key[17];
 
@@ -352,21 +361,21 @@ void UI_MainMenu( void ) {
 		s_errorMessage.menu.key = ErrorMessage_Key;
 		s_errorMessage.menu.fullscreen = qtrue;
 		s_errorMessage.menu.wrapAround = qtrue;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 		s_errorMessage.menu.showlogo = qtrue;		
 #endif
 #ifdef IOQ3ZTM
 		s_errorMessage.menu.noEscape = qtrue;
 #endif
 
-#ifdef TURTLEARENA // BANNER_IMAGE
+#ifdef TMNT // BANNER_IMAGE
 		s_errorMessage.banner_image.generic.type				= MTYPE_BITMAP;
 		s_errorMessage.banner_image.generic.name				= ART_BANNER_IMAGE;
 		s_errorMessage.banner_image.generic.flags				= QMF_CENTER_JUSTIFY|QMF_INACTIVE;
 		s_errorMessage.banner_image.generic.x					= 320;
-		s_errorMessage.banner_image.generic.y					= 32;
-		s_errorMessage.banner_image.width  						= 512;
-		s_errorMessage.banner_image.height  					= 256;
+		s_errorMessage.banner_image.generic.y					= 96;
+		s_errorMessage.banner_image.width  						= 427;
+		s_errorMessage.banner_image.height  					= 128;
 
 		Menu_AddItem( &s_errorMessage.menu,	&s_errorMessage.banner_image );
 #endif
@@ -378,7 +387,7 @@ void UI_MainMenu( void ) {
 		return;
 	}
 
-#ifdef TA_MISC
+#ifdef TMNTMISC
 	trap_S_StopBackgroundTrack();
 	trap_S_StartBackgroundTrack("music/menu.ogg", NULL);
 #endif
@@ -386,24 +395,24 @@ void UI_MainMenu( void ) {
 	s_main.menu.draw = Main_MenuDraw;
 	s_main.menu.fullscreen = qtrue;
 	s_main.menu.wrapAround = qtrue;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 	s_main.menu.showlogo = qtrue;
 #endif
 #ifdef IOQ3ZTM
 	s_main.menu.noEscape = qtrue;
 #endif
 
-#ifdef TURTLEARENA // BANNER_IMAGE
+#ifdef TMNT // BANNER_IMAGE
 	s_main.banner_image.generic.type				= MTYPE_BITMAP;
 	s_main.banner_image.generic.name				= ART_BANNER_IMAGE;
 	s_main.banner_image.generic.flags				= QMF_CENTER_JUSTIFY|QMF_INACTIVE;
 	s_main.banner_image.generic.x					= 320;
-	s_main.banner_image.generic.y					= 32;
-	s_main.banner_image.width  						= 512;
-	s_main.banner_image.height  					= 256;
+	s_main.banner_image.generic.y					= 96;
+	s_main.banner_image.width  						= 427;
+	s_main.banner_image.height  					= 128;
 #endif
 
-#ifdef TA_SP
+#ifdef TMNTSP
 	y = 480 - (MAIN_MENU_VERTICAL_SPACING * 6);
 #else
 	y = 134;
@@ -414,12 +423,12 @@ void UI_MainMenu( void ) {
 	s_main.singleplayer.generic.y			= y;
 	s_main.singleplayer.generic.id			= ID_SINGLEPLAYER;
 	s_main.singleplayer.generic.callback	= Main_MenuEvent; 
-#ifdef TA_SP // Moved to PLAY Menu.
+#ifdef TMNTSP // Moved to PLAY Menu.
 	s_main.singleplayer.string				= "PLAY";
 #else
 	s_main.singleplayer.string				= "SINGLE PLAYER";
 #endif
-	s_main.singleplayer.color				= text_big_color;
+	s_main.singleplayer.color				= color_red;
 	s_main.singleplayer.style				= style;
 
 	y += MAIN_MENU_VERTICAL_SPACING;
@@ -430,7 +439,7 @@ void UI_MainMenu( void ) {
 	s_main.multiplayer.generic.id			= ID_MULTIPLAYER;
 	s_main.multiplayer.generic.callback		= Main_MenuEvent; 
 	s_main.multiplayer.string				= "MULTIPLAYER";
-	s_main.multiplayer.color				= text_big_color;
+	s_main.multiplayer.color				= color_red;
 	s_main.multiplayer.style				= style;
 
 	y += MAIN_MENU_VERTICAL_SPACING;
@@ -440,15 +449,15 @@ void UI_MainMenu( void ) {
 	s_main.setup.generic.y					= y;
 	s_main.setup.generic.id					= ID_SETUP;
 	s_main.setup.generic.callback			= Main_MenuEvent; 
-#ifdef TA_SP // Moved to OPTIONS Menu.
+#ifdef TMNTSP // Moved to OPTIONS Menu.
 	s_main.setup.string						= "OPTIONS";
 #else
 	s_main.setup.string						= "SETUP";
 #endif
-	s_main.setup.color						= text_big_color;
+	s_main.setup.color						= color_red;
 	s_main.setup.style						= style;
 
-#ifndef TA_SP // Moved to PLAY Menu.
+#ifndef TMNTSP // Moved to PLAY Menu.
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.demos.generic.type				= MTYPE_PTEXT;
 	s_main.demos.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -457,7 +466,7 @@ void UI_MainMenu( void ) {
 	s_main.demos.generic.id					= ID_DEMOS;
 	s_main.demos.generic.callback			= Main_MenuEvent; 
 	s_main.demos.string						= "DEMOS";
-	s_main.demos.color						= text_big_color;
+	s_main.demos.color						= color_red;
 	s_main.demos.style						= style;
 
 	y += MAIN_MENU_VERTICAL_SPACING;
@@ -468,7 +477,7 @@ void UI_MainMenu( void ) {
 	s_main.cinematics.generic.id			= ID_CINEMATICS;
 	s_main.cinematics.generic.callback		= Main_MenuEvent; 
 	s_main.cinematics.string				= "CINEMATICS";
-	s_main.cinematics.color					= text_big_color;
+	s_main.cinematics.color					= color_red;
 	s_main.cinematics.style					= style;
 
 	if (UI_TeamArenaExists()) {
@@ -481,7 +490,7 @@ void UI_MainMenu( void ) {
 		s_main.teamArena.generic.id				= ID_TEAMARENA;
 		s_main.teamArena.generic.callback		= Main_MenuEvent; 
 		s_main.teamArena.string					= "TEAM ARENA";
-		s_main.teamArena.color					= text_big_color;
+		s_main.teamArena.color					= color_red;
 		s_main.teamArena.style					= style;
 	}
 
@@ -493,7 +502,7 @@ void UI_MainMenu( void ) {
 	s_main.mods.generic.id				= ID_MODS;
 	s_main.mods.generic.callback		= Main_MenuEvent; 
 	s_main.mods.string					= "MODS";
-	s_main.mods.color					= text_big_color;
+	s_main.mods.color					= color_red;
 	s_main.mods.style					= style;
 #endif
 
@@ -505,16 +514,16 @@ void UI_MainMenu( void ) {
 	s_main.exit.generic.id					= ID_EXIT;
 	s_main.exit.generic.callback			= Main_MenuEvent; 
 	s_main.exit.string						= "EXIT";
-	s_main.exit.color						= text_big_color;
+	s_main.exit.color						= color_red;
 	s_main.exit.style						= style;
 
-#ifdef TURTLEARENA // BANNER_IMAGE
+#ifdef TMNT // BANNER_IMAGE
 	Menu_AddItem( &s_main.menu,	&s_main.banner_image );
 #endif
 	Menu_AddItem( &s_main.menu,	&s_main.singleplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.multiplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.setup );
-#ifndef TA_SP // Moved to PLAY Menu.
+#ifndef TMNTSP // Moved to PLAY Menu.
 	Menu_AddItem( &s_main.menu,	&s_main.demos );
 	Menu_AddItem( &s_main.menu,	&s_main.cinematics );
 	if (teamArena) {

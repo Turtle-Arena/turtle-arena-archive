@@ -86,7 +86,6 @@ textures/base_floor/grate
 textures/base_floor/metal
 {
 	surfaceparm metalsteps
-	surfaceparm metal
 	{
 		map textures/base_floor/metal
 		rgbGen identity
@@ -100,7 +99,6 @@ textures/base_floor/metal
 textures/base_floor/metal2
 {
 	surfaceparm metalsteps
-	surfaceparm metal
 	{
 		map textures/base_floor/metal2
 		rgbGen identity
@@ -114,7 +112,6 @@ textures/base_floor/metal2
 textures/base_floor/metal_textured
 {
 	surfaceparm metalsteps
-	surfaceparm metal
 	{
 		map textures/base_floor/metal_textured
 		rgbGen identity
@@ -199,47 +196,6 @@ textures/base_floor/grass2-old
 	surfaceparm grass
 	{
 		map textures/base_floor/grass2-old
-		rgbGen identity
-	}
-	{
-		map $lightmap
-		rgbGen identity
-		blendFunc GL_DST_COLOR GL_ZERO
-	}
-}
-
-textures/base_floor/subway_tile
-{
-	surfaceparm stone
-	{
-		map textures/base_floor/subway_tile
-		rgbGen identity
-	}
-	{
-		map $lightmap
-		rgbGen identity
-		blendFunc GL_DST_COLOR GL_ZERO
-	}
-}
-textures/base_floor/subway_ceiling
-{
-	surfaceparm stone
-	{
-		map textures/base_floor/subway_ceiling
-		rgbGen identity
-	}
-	{
-		map $lightmap
-		rgbGen identity
-		blendFunc GL_DST_COLOR GL_ZERO
-	}
-}
-
-textures/base_floor/wood
-{
-	surfaceparm wood
-	{
-		map textures/base_floor/wood
 		rgbGen identity
 	}
 	{

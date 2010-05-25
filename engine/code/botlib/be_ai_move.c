@@ -92,8 +92,8 @@ typedef struct bot_movestate_s
 //prediction times
 #define PREDICTIONTIME_JUMP	3		//in seconds
 #define PREDICTIONTIME_MOVE	2		//in seconds
-#ifndef IOQ3ZTM // These defines are not used
 //weapon indexes for weapon jumping
+#ifndef TMNTWEAPSYS // These defines are not used
 #define WEAPONINDEX_ROCKET_LAUNCHER		5
 #define WEAPONINDEX_BFG					9
 #endif
@@ -102,7 +102,7 @@ typedef struct bot_movestate_s
 #define MODELTYPE_FUNC_BOB		2
 #define MODELTYPE_FUNC_DOOR		3
 #define MODELTYPE_FUNC_STATIC	4
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 #define MODELTYPE_FUNC_BREAKABLE	5
 #endif
 
@@ -110,7 +110,7 @@ libvar_t *sv_maxstep;
 libvar_t *sv_maxbarrier;
 libvar_t *sv_gravity;
 libvar_t *weapindex_rocketlauncher;
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 libvar_t *weapindex_bfg10k;
 #endif
 libvar_t *weapindex_grapple;
@@ -123,7 +123,7 @@ int modeltypes[MAX_MODELS];
 
 bot_movestate_t *botmovestates[MAX_CLIENTS+1];
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 //========================================================================
 //
 // Parameter:			client number, weapon number
@@ -132,11 +132,11 @@ bot_movestate_t *botmovestates[MAX_CLIENTS+1];
 //========================================================================
 qboolean BotValidWeapon(int client, int weaponnum)
 {
-#ifdef TA_WEAPSYS_EX
-	// ZTM: if (client current weapon == weaponnum) return qtrue;
+#ifdef TMNTWEAPSYS2
+	// Turtle Man: if (client current weapon == weaponnum) return qtrue;
 	aas_entityinfo_t entinfo;
 
-	if (weaponnum < 0) {
+	if (weaponnum <= 0) {
 		return qfalse;
 	} //end if
 
@@ -147,11 +147,7 @@ qboolean BotValidWeapon(int client, int weaponnum)
 	} //end if
 	return qfalse;
 #else
-	if (weaponnum < 0) {
-		return qfalse;
-	} //end if
-
-	// ZTM: FIXME?: Bots always want Grappling Hook.
+	// Turtle Man: FIXME?: Bots always want Grappling Hook.
 	return qtrue;
 #endif
 } // end of the function BotValidWeapon
@@ -576,7 +572,7 @@ void BotSetBrushModelTypes(void)
 			modeltypes[modelnum] = MODELTYPE_FUNC_DOOR;
 		else if (!Q_stricmp(classname, "func_static"))
 			modeltypes[modelnum] = MODELTYPE_FUNC_STATIC;
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 		else if (!Q_stricmp(classname, "func_breakable"))
 			modeltypes[modelnum] = MODELTYPE_FUNC_BREAKABLE;
 #endif
@@ -711,7 +707,7 @@ int BotAvoidSpots(vec3_t origin, aas_reachability_t *reach, bot_avoidspot_t *avo
 		case TRAVEL_ELEVATOR: checkbetween = qfalse; break;
 		case TRAVEL_GRAPPLEHOOK: checkbetween = qfalse; break;
 		case TRAVEL_ROCKETJUMP: checkbetween = qfalse; break;
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 		case TRAVEL_BFGJUMP: checkbetween = qfalse; break;
 #endif
 		case TRAVEL_JUMPPAD: checkbetween = qfalse; break;
@@ -910,7 +906,7 @@ int BotMovementViewTarget(int movestate, bot_goal_t *goal, int travelflags, floa
 		if ((reach.traveltype & TRAVELTYPE_MASK) == TRAVEL_TELEPORT) return qtrue;
 		//never look beyond the weapon jump point
 		if ((reach.traveltype & TRAVELTYPE_MASK) == TRAVEL_ROCKETJUMP) return qtrue;
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 		if ((reach.traveltype & TRAVELTYPE_MASK) == TRAVEL_BFGJUMP) return qtrue;
 #endif
 		//don't add jump pad distances
@@ -2619,7 +2615,7 @@ bot_moveresult_t BotTravel_Grapple(bot_movestate_t *ms, aas_reachability_t *reac
 		ms->moveflags &= ~MFL_ACTIVEGRAPPLE;
 		return result;
 	} //end if
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	// Check if bot has grapple.
 	if (!(int) offhandgrapple->value && !BotValidWeapon(ms->client, weapindex_grapple->value)) {
 #ifdef DEBUG_GRAPPLE
@@ -2770,7 +2766,7 @@ bot_moveresult_t BotTravel_RocketJump(bot_movestate_t *ms, aas_reachability_t *r
 	float dist, speed;
 	bot_moveresult_t_cleared( result );
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	// Check if bot has rocketlauncher.
 	if (!BotValidWeapon(ms->client, weapindex_rocketlauncher->value)) {
 		//botimport.Print(PRT_ERROR, "doesn't own rocketlauncher\n");
@@ -2821,7 +2817,7 @@ bot_moveresult_t BotTravel_RocketJump(bot_movestate_t *ms, aas_reachability_t *r
 	EA_View(ms->client, result.ideal_viewangles);
 	//view is important for the movment
 	result.flags |= MOVERESULT_MOVEMENTVIEWSET;
-#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT // BOTLIB
+#ifndef TMNTWEAPSYS2 // BOTLIB
 	//select the rocket launcher
 	EA_SelectWeapon(ms->client, (int) weapindex_rocketlauncher->value);
 #endif
@@ -2833,7 +2829,7 @@ bot_moveresult_t BotTravel_RocketJump(bot_movestate_t *ms, aas_reachability_t *r
 	//
 	return result;
 } //end of the function BotTravel_RocketJump
-#ifndef TA_WEAPSYS // unused
+#ifndef TMNTWEAPSYS // unused
 //===========================================================================
 //
 // Parameter:				-
@@ -3010,7 +3006,7 @@ int BotReachabilityTime(aas_reachability_t *reach)
 		case TRAVEL_ELEVATOR: return 10;
 		case TRAVEL_GRAPPLEHOOK: return 8;
 		case TRAVEL_ROCKETJUMP: return 6;
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 		case TRAVEL_BFGJUMP: return 6;
 #endif
 		case TRAVEL_JUMPPAD: return 10;
@@ -3196,7 +3192,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 					result->flags |= MOVERESULT_ONTOPOF_FUNCBOB;
 				} //end if
 				else if (modeltype == MODELTYPE_FUNC_STATIC || modeltype == MODELTYPE_FUNC_DOOR
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 					|| modeltype == MODELTYPE_FUNC_BREAKABLE
 #endif
 					)
@@ -3408,7 +3404,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				case TRAVEL_ELEVATOR: *result = BotTravel_Elevator(ms, &reach); break;
 				case TRAVEL_GRAPPLEHOOK: *result = BotTravel_Grapple(ms, &reach); break;
 				case TRAVEL_ROCKETJUMP: *result = BotTravel_RocketJump(ms, &reach); break;
-#ifndef TA_WEAPSYS // unused
+#ifndef TMNTWEAPSYS // unused
 				case TRAVEL_BFGJUMP: *result = BotTravel_BFGJump(ms, &reach); break;
 #endif
 				case TRAVEL_JUMPPAD: *result = BotTravel_JumpPad(ms, &reach); break;
@@ -3518,7 +3514,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				case TRAVEL_TELEPORT: /*do nothing*/ break;
 				case TRAVEL_ELEVATOR: *result = BotFinishTravel_Elevator(ms, &reach); break;
 				case TRAVEL_GRAPPLEHOOK: *result = BotTravel_Grapple(ms, &reach); break;
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 				case TRAVEL_ROCKETJUMP: *result = BotFinishTravel_WeaponJump(ms, &reach); break;
 #else
 				case TRAVEL_ROCKETJUMP:
@@ -3625,10 +3621,10 @@ int BotSetupMoveAI(void)
 	sv_maxstep = LibVar("sv_step", "18");
 	sv_maxbarrier = LibVar("sv_maxbarrier", "32");
 	sv_gravity = LibVar("sv_gravity", "800");
-#ifdef TA_WEAPSYS
-	// ZTM: NOTE: We don't know the indexes (game should set them).
-	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "-1");
-	weapindex_grapple = LibVar("weapindex_grapple", "-1");
+#ifdef TMNTWEAPSYS
+	// Turtle Man: NOTE: We don't know the indexes ("game" should set them).
+	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "0");
+	weapindex_grapple = LibVar("weapindex_grapple", "0");
 #else
 	weapindex_rocketlauncher = LibVar("weapindex_rocketlauncher", "5");
 	weapindex_bfg10k = LibVar("weapindex_bfg10k", "9");

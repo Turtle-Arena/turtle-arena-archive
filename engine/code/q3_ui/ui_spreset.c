@@ -64,9 +64,16 @@ void Reset_MenuEvent(void* ptr, int event) {
 
 	// reset the game, pop the level menu and restart it so it updates
 	UI_NewGame();
+#ifdef TMNTSP
+	trap_Cvar_SetValue( "ui_spStage", 0 );
+	trap_Cvar_SetValue( "ui_spSelection", 0 );
+	UI_PopMenu();
+	UI_StageMenu();
+#else
 	trap_Cvar_SetValue( "ui_spSelection", 0 );
 	UI_PopMenu();
 	UI_SPLevelMenu();
+#endif
 }
 
 
@@ -106,8 +113,8 @@ Reset_MenuDraw
 */
 static void Reset_MenuDraw( void ) {
 	UI_DrawNamedPic( 142, 118, 359, 256, ART_FRAME );
-	UI_DrawProportionalString( 320, 194 + 10, "RESET GAME?", UI_CENTER|UI_INVERSE, text_big_color );
-	UI_DrawProportionalString( s_reset.slashX, 265, "/", UI_LEFT|UI_INVERSE, text_big_color );
+	UI_DrawProportionalString( 320, 194 + 10, "RESET GAME?", UI_CENTER|UI_INVERSE, color_red );
+	UI_DrawProportionalString( s_reset.slashX, 265, "/", UI_LEFT|UI_INVERSE, color_red );
 	Menu_Draw( &s_reset.menu );
 
 	UI_DrawProportionalString( SCREEN_WIDTH/2, 356 + PROP_HEIGHT * 0, "WARNING: This resets all of the", UI_CENTER|UI_SMALLFONT, color_yellow );
@@ -172,7 +179,7 @@ void UI_ResetMenu(void) {
 	s_reset.yes.generic.x			= l1;
 	s_reset.yes.generic.y			= 264;
 	s_reset.yes.string				= "YES";
-	s_reset.yes.color				= text_big_color;
+	s_reset.yes.color				= color_red;
 	s_reset.yes.style				= UI_LEFT;
 
 	s_reset.no.generic.type			= MTYPE_PTEXT;      
@@ -182,7 +189,7 @@ void UI_ResetMenu(void) {
 	s_reset.no.generic.x		    = l3;
 	s_reset.no.generic.y		    = 264;
 	s_reset.no.string				= "NO";
-	s_reset.no.color			    = text_big_color;
+	s_reset.no.color			    = color_red;
 	s_reset.no.style			    = UI_LEFT;
 
 	Menu_AddItem( &s_reset.menu,	&s_reset.yes );             

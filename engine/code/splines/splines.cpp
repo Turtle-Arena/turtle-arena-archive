@@ -355,7 +355,7 @@ const idVec3_t *idSplineList::getPosition(long t) {
 		return &zero;
 	}
 
-	// ZTM: Disabled time message.
+	// Turtle Man: Disabled time message.
 	//Com_Printf("Time: %d\n", t);
 	assert(splineTime.Num() == splinePoints.Num());
 
@@ -647,7 +647,7 @@ void idCameraDef::buildCamera() {
 void idCameraDef::startCamera(long t) {
 	buildCamera();
 	cameraPosition->start(t);
-	// ZTM: FOV
+	// Turtle Man: FOV
 	fov.start(t);
 	//for (int i = 0; i < targetPositions.Num(); i++) {
 	//	targetPositions[i]->
@@ -1227,15 +1227,15 @@ qboolean loadCamera(const char *name) {
   return static_cast<qboolean>(camera.load(name));
 }
 
-// ZTM: FOV, added ", float *fov"
+// Turtle Man: FOV, added ", float *fov"
 qboolean getCameraInfo(int time, float *origin, float *angles, float *fov) {
 	idVec3_t dir, org;
 	org[0] = origin[0];
 	org[1] = origin[1];
 	org[2] = origin[2];
-	// ZTM: FOV, commented fov = 90 out.
+	// Turtle Man: FOV, commented fov = 90 out.
 	//float fov = 90;
-	// ZTM: FOV, changed "&fov" to "fov"
+	// Turtle Man: FOV, changed "&fov" to "fov"
 	if (camera.getCameraInfo(time, org, dir, fov)) {
 		origin[0] = org[0];
 		origin[1] = org[1];

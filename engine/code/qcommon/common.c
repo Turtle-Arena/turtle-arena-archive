@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <winsock.h>
 #endif
 
-#ifdef TURTLEARENA
+#ifdef TMNT
 int demo_protocols[] =
 { PROTOCOL_VERSION, 0 };
 #else
@@ -41,15 +41,9 @@ int demo_protocols[] =
 
 #define MAX_NUM_ARGVS	50
 
-#ifdef TURTLEARENA // ZTM: Turtle Arena uses more memory.
-#define MIN_DEDICATED_COMHUNKMEGS 16
-#define MIN_COMHUNKMEGS		64
-#define DEF_COMHUNKMEGS		128
-#else
 #define MIN_DEDICATED_COMHUNKMEGS 1
 #define MIN_COMHUNKMEGS		56
 #define DEF_COMHUNKMEGS		64
-#endif
 #define DEF_COMZONEMEGS		24
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)
@@ -65,9 +59,6 @@ static fileHandle_t logfile;
 fileHandle_t	com_journalFile;			// events are written here
 fileHandle_t	com_journalDataFile;		// config files are written here
 
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-cvar_t	*com_fs_pure;
-#endif
 cvar_t	*com_speeds;
 cvar_t	*com_developer;
 cvar_t	*com_dedicated;
@@ -98,7 +89,6 @@ cvar_t	*com_unfocused;
 cvar_t	*com_maxfpsUnfocused;
 cvar_t	*com_minimized;
 cvar_t	*com_maxfpsMinimized;
-cvar_t	*com_abnormalExit;
 cvar_t	*com_standalone;
 #ifdef ANALOG // cl vars
 cvar_t	*cl_thirdPerson;
@@ -260,7 +250,7 @@ void QDECL Com_DPrintf( const char *fmt, ...) {
 Com_Error
 
 Both client and server can use this, and it will
-do the appropriate thing.
+do the apropriate things.
 =============
 */
 void QDECL Com_Error( int code, const char *fmt, ... ) {
@@ -307,7 +297,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 	va_end (argptr);
 
 	if (code != ERR_DISCONNECT
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
         && code != ERR_NEED_CD
 #endif
         )
@@ -333,7 +323,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 		FS_PureServerSetLoadedPaks("", "");
 		com_errorEntered = qfalse;
 		longjmp (abortframe, -1);
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	} else if ( code == ERR_NEED_CD ) {
 		SV_Shutdown( "Server didn't have CD" );
 		if ( com_cl_running && com_cl_running->integer ) {
@@ -351,7 +341,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 		longjmp (abortframe, -1);
 #endif
 	} else {
-		CL_Shutdown (va("Client fatal crashed: %s", com_errorMessage));
+		CL_Shutdown ();
 		SV_Shutdown (va("Server fatal crashed: %s", com_errorMessage));
 	}
 
@@ -375,7 +365,7 @@ void Com_Quit_f( void ) {
 	char *p = Cmd_Args( );
 	if ( !com_errorEntered ) {
 		SV_Shutdown (p[0] ? p : "Server quit");
-		CL_Shutdown (p[0] ? p : "Client quit");
+		CL_Shutdown ();
 		Com_Shutdown ();
 		FS_Shutdown(qtrue);
 	}
@@ -1730,11 +1720,7 @@ void *Hunk_Alloc( int size, ha_pref preference ) {
 		Hunk_Log();
 		Hunk_SmallLog();
 #endif
-#ifdef HUNK_DEBUG
-		Com_Error( ERR_DROP, "Hunk_Alloc failed on %i: label=%s, file=%s, line=%d\n", size, label, file, line);
-#else
 		Com_Error( ERR_DROP, "Hunk_Alloc failed on %i", size );
-#endif
 	}
 
 	if ( hunk_permanent == &hunk_low ) {
@@ -2499,7 +2485,7 @@ void Com_GameRestart_f(void)
 	Com_GameRestart(0, qtrue);
 }
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 
 // TTimo: centralizing the cl_cdkey stuff after I discovered a buffer overflow problem with the dedicated server version
@@ -2621,7 +2607,7 @@ out:
 #endif
 
 #endif // STANDALONE
-#endif // IOQUAKE3 // ZTM: CDKEY
+#endif // IOQUAKE3 // Turtle Man: CDKEY
 
 static void Com_DetectAltivec(void)
 {
@@ -2678,8 +2664,8 @@ void Com_Init( char *commandLine ) {
 	// initialize the weak pseudo-random number generator for use later.
 	Com_InitRand();
 
-	// do this before anything else decides to push events
-	Com_InitPushEvent();
+  // do this before anything else decides to push events
+  Com_InitPushEvent();
 
 	Com_InitSmallZoneMemory();
 	Cvar_Init ();
@@ -2702,10 +2688,6 @@ void Com_Init( char *commandLine ) {
 
 	// done early so bind command exists
 	CL_InitKeyCommands();
-
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-	com_fs_pure = Cvar_Get ("fs_pure", "1", CVAR_ROM);
-#endif
 
 	FS_InitFilesystem ();
 
@@ -2751,7 +2733,7 @@ void Com_Init( char *commandLine ) {
 	com_altivec = Cvar_Get ("com_altivec", "1", CVAR_ARCHIVE);
 	com_maxfps = Cvar_Get ("com_maxfps", "85", CVAR_ARCHIVE);
 #ifndef NOBLOOD
-#ifdef NOTRATEDM // ZTM: Default to no blood.
+#ifdef NOTRATEDM // Turtle Man: Default to no blood.
 	com_blood = Cvar_Get ("com_blood", "0", CVAR_ARCHIVE);
 #else
 	com_blood = Cvar_Get ("com_blood", "1", CVAR_ARCHIVE);
@@ -2773,7 +2755,7 @@ void Com_Init( char *commandLine ) {
 	// Get client game vars.
 	cl_thirdPerson = Cvar_Get ("cg_thirdPerson", "1", 0);
 	cl_thirdPersonAngle = Cvar_Get ("cg_thirdPersonAngle", "0", 0);
-#ifdef TURTLEARENA // FOV
+#ifdef TMNTMISC // FOV
 	cl_thirdPersonRange = Cvar_Get ("cg_thirdPersonRange", "120", 0);
 #else
 	cl_thirdPersonRange = Cvar_Get ("cg_thirdPersonRange", "40", 0);
@@ -2794,7 +2776,6 @@ void Com_Init( char *commandLine ) {
 	com_maxfpsUnfocused = Cvar_Get( "com_maxfpsUnfocused", "0", CVAR_ARCHIVE );
 	com_minimized = Cvar_Get( "com_minimized", "0", CVAR_ROM );
 	com_maxfpsMinimized = Cvar_Get( "com_maxfpsMinimized", "0", CVAR_ARCHIVE );
-	com_abnormalExit = Cvar_Get( "com_abnormalExit", "0", CVAR_ROM );
 	com_standalone = Cvar_Get( "com_standalone", "0", CVAR_INIT );
 
 	com_introPlayed = Cvar_Get( "com_introplayed", "0", CVAR_ARCHIVE);
@@ -2803,18 +2784,6 @@ void Com_Init( char *commandLine ) {
 	com_version = Cvar_Get ("version", s, CVAR_ROM | CVAR_SERVERINFO );
 
 	Sys_Init();
-
-	if( Sys_WritePIDFile( ) ) {
-#ifndef DEDICATED
-		const char *message = "The last time " CLIENT_WINDOW_TITLE " ran, "
-			"it didn't exit properly. This may be due to inappropriate video "
-			"settings. Would you like to start with \"safe\" video settings?";
-
-		if( Sys_Dialog( DT_YES_NO, message, "Abnormal Exit" ) == DR_YES ) {
-			Cvar_Set( "com_abnormalExit", "1" );
-		}
-#endif
-	}
 
 	// Pick a random port value
 	Com_RandomBytes( (byte*)&qport, sizeof(int) );
@@ -2875,8 +2844,8 @@ void Com_WriteConfigToFile( const char *filename ) {
 		return;
 	}
 
-#ifdef IOQ3ZTM
-	FS_Printf (f, "// Generated by " PRODUCT_NAME ", do not modify\n");
+#ifdef TMNT
+	FS_Printf (f, "// Generated by TMNT Arena, do not modify\n");
 #else
 	FS_Printf (f, "// generated by quake, do not modify\n");
 #endif
@@ -2913,7 +2882,7 @@ void Com_WriteConfiguration( void ) {
 	// not needed for dedicated
 #ifndef DEDICATED
 	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 #ifndef STANDALONE
 	if(!Cvar_VariableIntegerValue("com_standalone"))
 	{
@@ -2924,7 +2893,7 @@ void Com_WriteConfiguration( void ) {
 		}
 	}
 #endif
-#endif // IOQUAKE3 // ZTM: CDKEY
+#endif // IOQUAKE3 // Turtle Man: CDKEY
 #endif
 }
 
@@ -3140,12 +3109,6 @@ void Com_Frame( void ) {
 
 	if ( com_speeds->integer ) {
 		timeAfter = Sys_Milliseconds ();
-	}
-#else
-	if ( com_speeds->integer ) {
-		timeAfter = Sys_Milliseconds ();
-		timeBeforeEvents = timeAfter;
-		timeBeforeClient = timeAfter;
 	}
 #endif
 

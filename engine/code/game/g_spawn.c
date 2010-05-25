@@ -103,7 +103,7 @@ field_t fields[] = {
 	{"spawnflags", FOFS(spawnflags), F_INT},
 	{"speed", FOFS(speed), F_FLOAT},
 	{"target", FOFS(target), F_LSTRING},
-#ifdef TA_ENTSYS
+#ifdef TMNTENTSYS
 	{"paintarget", FOFS(paintarget), F_LSTRING},
 #endif
 	{"targetname", FOFS(targetname), F_LSTRING},
@@ -119,9 +119,6 @@ field_t fields[] = {
 	{"angle", FOFS(s.angles), F_ANGLEHACK},
 	{"targetShaderName", FOFS(targetShaderName), F_LSTRING},
 	{"targetShaderNewName", FOFS(targetShaderNewName), F_LSTRING},
-#ifdef TA_WEAPSYS // WIF_CUTS
-	{"mustcut", FOFS(mustcut), F_INT},
-#endif
 
 	{NULL}
 };
@@ -149,11 +146,8 @@ void SP_func_button (gentity_t *ent);
 void SP_func_door (gentity_t *ent);
 void SP_func_train (gentity_t *ent);
 void SP_func_timer (gentity_t *self);
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 void SP_func_breakable (gentity_t *self);
-#endif
-#ifdef TA_ENTSYS // FUNC_USE
-void SP_func_use (gentity_t *ent);
 #endif
 
 void SP_trigger_always (gentity_t *ent);
@@ -176,10 +170,10 @@ void SP_target_kill (gentity_t *ent);
 void SP_target_position (gentity_t *ent);
 void SP_target_location (gentity_t *ent);
 void SP_target_push (gentity_t *ent);
-#ifdef TA_SP
+#ifdef TMNTSP
 void SP_target_level_end (gentity_t *ent);
 #endif
-#ifdef CAMERASCRIPT // ZTM: i made this
+#ifdef CAMERASCRIPT // Turtle Man: i made this
 void SP_target_start_camera (gentity_t *ent);
 #endif
 
@@ -191,13 +185,13 @@ void SP_path_corner (gentity_t *self);
 
 void SP_misc_teleporter_dest (gentity_t *self);
 void SP_misc_model(gentity_t *ent);
-#ifdef TA_ENTSYS // MISC_OBJECT
+#ifdef TMNTENTSYS // MISC_OBJECT
 void SP_misc_object(gentity_t *ent);
 #endif
 void SP_misc_portal_camera(gentity_t *ent);
 void SP_misc_portal_surface(gentity_t *ent);
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 void SP_misc_shooter( gentity_t *ent );
 #endif
 void SP_shooter_rocket( gentity_t *ent );
@@ -216,12 +210,13 @@ void SP_team_redobelisk( gentity_t *ent );
 void SP_team_neutralobelisk( gentity_t *ent );
 #endif
 void SP_item_botroam( gentity_t *ent ) { }
-#ifdef TA_PATHSYS
+#ifdef TMNTNPCSYS
 void SP_path_start( gentity_t *ent );
-#elif !defined TA_PATHSYS
+#ifndef TMNTPATHSYS
 void SP_npcpath( gentity_t *ent );
 #endif
-#ifdef TA_WEAPSYS
+#endif
+#ifdef TMNTWEAPSYS_2
 void SP_weapon_random( gentity_t *ent );
 #endif
 #ifdef NIGHTSMODE
@@ -250,11 +245,8 @@ spawn_t	spawns[] = {
 	{"func_train", SP_func_train},
 	{"func_group", SP_info_null},
 	{"func_timer", SP_func_timer},			// rename trigger_timer?
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 	{"func_breakable", SP_func_breakable},
-#endif
-#ifdef TA_ENTSYS // FUNC_USE
-	{"func_use", SP_func_use},
 #endif
 
 	// Triggers are brush objects that cause an effect when contacted
@@ -283,16 +275,16 @@ spawn_t	spawns[] = {
 	{"target_position", SP_target_position},
 	{"target_location", SP_target_location},
 	{"target_push", SP_target_push},
-#ifdef TA_SP
+#ifdef TMNTSP
 	{"target_level_end", SP_target_level_end},
 #endif
-#ifdef CAMERASCRIPT // ZTM: i made this
+#ifdef CAMERASCRIPT // Turtle Man: i made this
 	{"target_start_camera", SP_target_start_camera},
 #endif
 
 	{"light", SP_light},
 	{"path_corner", SP_path_corner},
-#ifdef TA_PATHSYS
+#ifdef TMNTPATHSYS
 	{"path_start", SP_path_start},
 	{"path_point", SP_path_corner},
 	{"path_axis", SP_path_corner},
@@ -301,13 +293,13 @@ spawn_t	spawns[] = {
 
 	{"misc_teleporter_dest", SP_misc_teleporter_dest},
 	{"misc_model", SP_misc_model},
-#ifdef TA_ENTSYS // MISC_OBJECT
+#ifdef TMNTENTSYS // MISC_OBJECT
 	{"misc_object", SP_misc_object},
 #endif
 	{"misc_portal_surface", SP_misc_portal_surface},
 	{"misc_portal_camera", SP_misc_portal_camera},
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	{"misc_shooter", SP_misc_shooter},
 #endif
 	{"shooter_rocket", SP_shooter_rocket},
@@ -327,10 +319,10 @@ spawn_t	spawns[] = {
 #endif
 	{"item_botroam", SP_item_botroam},
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	{"weapon_random", SP_weapon_random},
 #endif
-#if defined TA_NPCSYS && !defined TA_PATHSYS
+#if defined TMNTNPCSYS && !defined TMNTPATHSYS
 	{"npcpath", SP_npcpath},
 #endif
 #ifdef NIGHTSMODE
@@ -352,7 +344,7 @@ returning qfalse if not found
 qboolean G_CallSpawn( gentity_t *ent ) {
 	spawn_t	*s;
 	gitem_t	*item;
-#if defined TA_WEAPSYS || defined TA_NPCSYS
+#if defined TMNTWEAPSYS_2 || defined TMNTNPCSYS
 	int i;
 #endif
 
@@ -361,21 +353,8 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 		return qfalse;
 	}
 
-
-
-#ifdef TA_WEAPSYS
-#ifdef IOQ3ZTM // LASERTAG
-	if (g_laserTag.integer)
-	{
-		if ( !strcmp("weapon_random", ent->classname) ) {
-			return qfalse;
-		}
-	}
-
-	if (!g_laserTag.integer)
-	{
-#endif
-	// ZTM: NOTE: Placed before items so if weapon is on both list
+#ifdef TMNTWEAPSYS_2
+	// Turtle Man: NOTE: Placed before items so if weapon is on both list
 	//                    uses external item.
 	// check weapon item spawn functions
 	for ( i = 1; i < BG_NumWeaponGroups(); i++ ) {
@@ -384,12 +363,9 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
-#ifdef IOQ3ZTM // LASERTAG
-	}
-#endif
 #endif
 
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	// check NPC spawn functions
 	for ( i = 1; i < BG_NumNPCs(); i++ ) {
 		if ( !strcmp(bg_npcinfo[i].classname, ent->classname) ) {
@@ -399,10 +375,6 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	}
 #endif
 
-#ifdef IOQ3ZTM // LASERTAG
-	if (!g_laserTag.integer)
-	{
-#endif
 	// check item spawn functions
 	for ( item=bg_itemlist+1 ; item->classname ; item++ ) {
 		if ( !strcmp(item->classname, ent->classname) ) {
@@ -410,9 +382,6 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
-#ifdef IOQ3ZTM // LASERTAG
-	}
-#endif
 
 	// check normal spawn functions
 	for ( s=spawns ; s->name ; s++ ) {
@@ -422,21 +391,6 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
-
-#ifdef TA_WEAPSYS
-	// Unknown weapon, spawn weapon_random
-	if (Q_stricmpn(ent->classname, "weapon_", 7) == 0)
-	{
-		for ( s=spawns ; s->name ; s++ ) {
-			if ( !strcmp(s->name, "weapon_random") ) {
-				// found it
-				G_Printf ("%s doesn't have a spawn function, using weapon_random instead\n", ent->classname);
-				s->spawn(ent);
-				return qtrue;
-			}
-		}
-	}
-#endif
 	G_Printf ("%s doesn't have a spawn function\n", ent->classname);
 	return qfalse;
 }
@@ -544,8 +498,8 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	int			i;
 	gentity_t	*ent;
 	char		*s, *value, *gametypeName;
-#ifdef TA_MISC // tornament to duel, obelisk to overload
-	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "overload", "harvester", "teamtournament"};
+#ifdef TMNTMISC // tornament to duel
+	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
 #else
 	static char *gametypeNames[] = {"ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
 #endif
@@ -580,8 +534,8 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 		}
 	}
 
-#ifdef TURTLEARENA
-	G_SpawnInt( "notturtlearena", "0", &i );
+#ifdef TMNT
+	G_SpawnInt( "nottmnt", "0", &i );
 	if ( i ) {
 		G_FreeEntity( ent );
 		return;

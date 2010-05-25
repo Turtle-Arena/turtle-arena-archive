@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ART_MODEL1			"menu/art/model_1"
 #define ART_BACK0			"menu/art/back_0"
 #define ART_BACK1			"menu/art/back_1"
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 #define ART_FX_BASE			"menu/art/fx_base"
 #define ART_FX_BLUE			"menu/art/fx_blue"
 #define ART_FX_CYAN			"menu/art/fx_cyan"
@@ -58,7 +58,7 @@ typedef struct {
 
 	menufield_s			name;
 	menulist_s			handicap;
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	menulist_s			effects;
 #endif
 
@@ -66,7 +66,7 @@ typedef struct {
 	menubitmap_s		model;
 	menubitmap_s		item_null;
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	qhandle_t			fxBasePic;
 	qhandle_t			fxPic[7];
 #endif
@@ -77,7 +77,7 @@ typedef struct {
 
 static playersettings_t	s_playersettings;
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 static int gamecodetoui[] = {4,2,3,0,5,1,6};
 static int uitogamecode[] = {4,6,2,3,1,5,7};
 #endif
@@ -205,7 +205,7 @@ static void PlayerSettings_DrawHandicap( void *self ) {
 }
 
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 /*
 =================
 PlayerSettings_DrawEffects
@@ -253,8 +253,10 @@ static void PlayerSettings_DrawPlayer( void *self ) {
 		viewangles[YAW]   = 180 - 30;
 		viewangles[PITCH] = 0;
 		viewangles[ROLL]  = 0;
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
+		//Com_Printf("PlayerSettings_DrawPlayer: pre-weapon=%i\n", s_playersettings.playerinfo.weapon);
 		UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playersettings.playerinfo.weapon), viewangles, vec3_origin, s_playersettings.playerinfo.weapon, qfalse );
+		//Com_Printf("PlayerSettings_DrawPlayer: after-weapon=%i\n", s_playersettings.playerinfo.weapon);
 #else
 		UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
 #endif
@@ -277,7 +279,7 @@ static void PlayerSettings_SaveChanges( void ) {
 	// handicap
 	trap_Cvar_SetValue( "handicap", 100 - s_playersettings.handicap.curvalue * 5 );
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	// effects color
 	trap_Cvar_SetValue( "color1", uitogamecode[s_playersettings.effects.curvalue] );
 #endif
@@ -290,11 +292,7 @@ PlayerSettings_MenuKey
 =================
 */
 static sfxHandle_t PlayerSettings_MenuKey( int key ) {
-	if(
-#ifndef TA_MISC // MENU: Right Mouse button = left arrow
-		key == K_MOUSE2 ||
-#endif
-		key == K_ESCAPE ) {
+	if( key == K_MOUSE2 || key == K_ESCAPE ) {
 		PlayerSettings_SaveChanges();
 	}
 	return Menu_DefaultKey( &s_playersettings.menu, key );
@@ -308,7 +306,7 @@ PlayerSettings_SetMenuItems
 */
 static void PlayerSettings_SetMenuItems( void ) {
 	vec3_t	viewangles;
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	int		c;
 #endif
 	int		h;
@@ -316,7 +314,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 	// name
 	Q_strncpyz( s_playersettings.name.field.buffer, UI_Cvar_VariableString("name"), sizeof(s_playersettings.name.field.buffer) );
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	// effects color
 	c = trap_Cvar_VariableValue( "color1" ) - 1;
 	if( c < 0 || c > 6 ) {
@@ -333,7 +331,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 	viewangles[ROLL]  = 0;
 
 	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, UI_Cvar_VariableString( "model" ) );
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playersettings.playerinfo.weapon), viewangles, vec3_origin, s_playersettings.playerinfo.weapon, qfalse );
 #else
 	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
@@ -393,7 +391,7 @@ static void PlayerSettings_MenuInit( void ) {
 	s_playersettings.banner.generic.x     = 320;
 	s_playersettings.banner.generic.y     = 16;
 	s_playersettings.banner.string        = "PLAYER SETTINGS";
-	s_playersettings.banner.color         = text_banner_color;
+	s_playersettings.banner.color         = color_white;
 	s_playersettings.banner.style         = UI_CENTER;
 
 	s_playersettings.framel.generic.type  = MTYPE_BITMAP;
@@ -438,7 +436,7 @@ static void PlayerSettings_MenuInit( void ) {
 	s_playersettings.handicap.generic.bottom	= y + 2 * PROP_HEIGHT;
 	s_playersettings.handicap.numitems			= 20;
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	y += 3 * PROP_HEIGHT;
 	s_playersettings.effects.generic.type		= MTYPE_SPINCONTROL;
 	s_playersettings.effects.generic.flags		= QMF_NODEFAULTINIT;
@@ -496,7 +494,7 @@ static void PlayerSettings_MenuInit( void ) {
 
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.name );
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.handicap );
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.effects );
 #endif
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.model );
@@ -523,7 +521,7 @@ void PlayerSettings_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_BACK0 );
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	s_playersettings.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
 	s_playersettings.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	s_playersettings.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );

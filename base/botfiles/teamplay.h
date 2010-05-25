@@ -1,39 +1,37 @@
 /*
 ===========================================================================
 Copyright (C) 2006 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com))
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
-This file is part of Turtle Arena and is based upon botfiles by
-Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com)) from Open Arena which
-are based on Mr. Elusive's fuzzy logic system found in Quake 3 Arena.
+This file is part of Open Arena and is based upon Mr. Elusive's fuzzy logic
+system found in Quake 3 Arena.
 
-Turtle Arena is free software; you can redistribute it
+Open Arena is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena is distributed in the hope that it will be
+Open Arena is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena; if not, write to the Free Software
+along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// ZTM: TODO: Rewrite.
+// Turtle Man: Cleaned up lang... TODO: Rewrite.
 
 	//the bot doesn't know who someone is
 type "whois"
 {
 "Ok, so who is ", 0, "?";
 "Who in their right mind uses the name ", 0, "?";
-"Who is ", 0, "?"; // ZTM
+"Who is ", 0, "?"; // Turtle Man
 //"Who in the hell is ", 0, "?";
 "Is ", 0, " a friend of yours?";
-//"Who the bloodyhell is ",0," ."; // ZTM: DISABLED
+//"Who the bloodyhell is ",0," ."; // Turtle Man: DISABLED
 0, "!?! Who dat?";
 "How can I kill ", 0, " when I haven't the foggiest idea who ", 0, " is?";
 
@@ -46,7 +44,7 @@ type "whereis"
 "Ok, so where is", 0, ".";
 "Would someone please tell me where ", 0, " is.";
 " ", 0, " hanging out?";
-"Where is ", 0, "?"; // ZTM
+"Where is ", 0, "?"; // Turtle Man
 //"Where the hell is ", 0, "?";
 "Since when am I ", 0, "'s keeper?";
 }
@@ -62,11 +60,10 @@ type "whereareyou"
 }
 
 //cannot find something
-//note: Disable in engine, unused.
 type "cannotfind"
 {
 "Where would that be ", 0, "?";
-"Where is a ", 0, "?"; // ZTM
+"Where is a ", 0, "?"; // Turtle Man
 //"Where the hell is a ", 0, "?";
 "Where is a ", 0, " in this level?";
 "Is there a, ", 0, " in this level? I sure can't find it, I must be blind.";
@@ -113,7 +110,7 @@ type "accompany_stop"
 	//cannot find companion
 type "accompany_cannotfind"
 {
-"Where are you ", 0, "?"; // ZTM
+"Where are you ", 0, "?"; // Turtle Man
 //"Where the hell are you ", 0, "?";
 "Where are you hiding ", 0, "?";
 0, "... come out, come out wherever you are...";
@@ -288,7 +285,7 @@ affirmative, " Yep ", 0, " at ", 1, " is there.";
 	//follow me
 type "followme"
 {
-"What are you waiting for ", 0, "? Get over here!"; // ZTM
+"What are you waiting for ", 0, "? Get over here!"; // Turtle Man
 //"What the hell are you waiting for ", 0, "? Get over here!";
 "Hey!  ", 0, " follow me and be quick about it.";
 }
@@ -312,7 +309,7 @@ type "helping"
 type "accompanying"
 {
 "I'm shadowing ", 0, ".  Is that alright?";
-"Following ", 0, ", trying not to get hit."; // ZTM: Changed "shot" tp "hit"
+"Following ", 0, ", trying not to get hit."; // Turtle Man: Changed "shot" tp "hit"
 }
 
 	//the bot is defending something
@@ -414,7 +411,7 @@ type "keepinmind"
 	//team mate killed the bot
 type "death_teammate"
 {
-"Same team stupid!";//"Same team, dumbass!"; // ZTM
+"Same team stupid!";//"Same team, dumbass!"; // Turtle Man
 "Hey ", 0," I'm on your team... idiot!";
 "Why did you kill me?";
 }
@@ -521,3 +518,36 @@ type "cmd_harvest"
 0, ", you should collect some skulls.";
 }
 
+/* Domination is unsupported by TMNT
+	//Double Domination stuff:
+type "dd_start_pointa"
+{
+"I'll dominate point A";
+}
+
+type "dd_start_pointb"
+{
+"I'll dominate point B";
+}
+
+type "dd_pointa"
+{
+"Dominating point A";
+}
+
+type "dd_pointb"
+{
+"Dominating point B";
+}
+
+//DD orders:
+type "cmd_takea"
+{
+0, " dominate point A";
+}
+
+type "cmd_takeb"
+{
+0, " dominate point B";
+}
+*/

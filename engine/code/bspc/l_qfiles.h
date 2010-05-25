@@ -71,7 +71,7 @@ typedef struct quakefile_s
 	int type;
 	int offset;
 	int length;
-	unzFile zinfo;
+	unz_s zipinfo;				// Turtle Man: FIXME: ioq3 updated zlib now unz_s is only in a .c file, use unzFile?
 	struct quakefile_s *next;
 } quakefile_t;
 

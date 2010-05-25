@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // 
 // string allocation/managment
-// ZTM: NOTE: Shared by ui and cgame
+// Turtle Man: NOTE: Shared by ui and cgame
 
 #include "ui_shared.h"
 
@@ -1737,7 +1737,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 		if (item->window.flags & WINDOW_HORIZONTAL) {
 			viewmax = (item->window.rect.w / listPtr->elementWidth);
 			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
 				|| key == K_MOUSE2
 #endif
 			)
@@ -2129,7 +2129,7 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 			}
 
 			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW
-#if 0 // #ifdef TA_MISC // MENU: Right Mouse button = left arrow // NOT HERE
+#if 0 // #ifdef TMNTMISC // MENU: Right Mouse button = left arrow // NOT HERE
 				|| key == K_MOUSE2
 #endif
 			)
@@ -3149,13 +3149,11 @@ static bind_t g_bindings[] =
 {
 	{"+scores",			 K_TAB,				-1,		-1, -1},
 	{"+button2",		 K_ENTER,			-1,		-1, -1},
-#ifdef TA_HOLDSYS/*2*/
+#ifdef TMNTHOLDSYS/*2*/
 	{"holdnext",		 K_MWHEELUP,		'\'',	-1, -1},
 	{"holdprev",		 K_MWHEELDOWN,		-1,		-1, -1},
 #endif
-#ifndef TURTLEARENA // NO_SPEED_KEY
 	{"+speed", 			 K_SHIFT,			-1,		-1,	-1},
-#endif
 	{"+forward", 		 K_UPARROW,		-1,		-1, -1},
 	{"+back", 			 K_DOWNARROW,	-1,		-1, -1},
 	{"+moveleft", 	 ',',					-1,		-1, -1},
@@ -3169,9 +3167,7 @@ static bind_t g_bindings[] =
 	{"+lookdown", 	 K_DEL,				-1,		-1, -1},
 	{"+mlook", 			 '/',					-1,		-1, -1},
 	{"centerview", 	 K_END,				-1,		-1, -1},
-#ifndef TURTLEARENA // NOZOOM
 	{"+zoom", 			 -1,						-1,		-1, -1},
-#endif
 	{"weapon 1",		 '1',					-1,		-1, -1},
 	{"weapon 2",		 '2',					-1,		-1, -1},
 	{"weapon 3",		 '3',					-1,		-1, -1},
@@ -3186,7 +3182,7 @@ static bind_t g_bindings[] =
 	{"weapon 12",		 -1,					-1,		-1, -1},
 	{"weapon 13",		 -1,					-1,		-1, -1},
 	{"+attack", 		 K_CTRL,				-1,		-1, -1},
-#ifdef TA_WEAPSYS_EX // +dropweapon
+#ifdef TMNTWEAPSYS2 // +dropweapon
 	{"+button13",		 ';',					-1,		-1, -1},
 #else
 	{"weapprev",		 '[',					-1,		-1, -1},
@@ -3227,13 +3223,9 @@ static const int g_bindCount = sizeof(g_bindings) / sizeof(bind_t);
 #ifndef MISSIONPACK
 static configcvar_t g_configcvars[] =
 {
-#ifndef TURTLEARENA // ALWAYS_RUN
 	{"cl_run",			0,					0},
-#endif
 	{"m_pitch",			0,					0},
-#ifndef TA_WEAPSYS_EX
 	{"cg_autoswitch",	0,					0},
-#endif
 	{"sensitivity",		0,					0},
 	{"in_joystick",		0,					0},
 	{"joy_threshold",	0,					0},

@@ -186,7 +186,7 @@ void UI_LoadArenas( void ) {
 			if( strstr( type, "tourney" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_TOURNAMENT);
 			}
-#ifdef TA_SP
+#ifdef TMNTMISC // TMNTSP?
 			if( strstr( type, "single" ) ) {
 				uiInfo.mapList[uiInfo.mapCount].typeBits |= (1 << GT_SINGLE_PLAYER);
 			}
@@ -327,7 +327,7 @@ char *UI_GetBotNameByNumber( int num ) {
 	if (info) {
 		return Info_ValueForKey( info, "name" );
 	}
-#ifdef TURTLEARENA // DEFAULT_PLAYER
+#ifdef TMNT // DEFAULT_PLAYER
 	return "Raph";
 #else
 	return "Sarge";

@@ -1294,8 +1294,11 @@ BotSelectActivateWeapon
 */
 int BotSelectActivateWeapon(bot_state_t *bs) {
 	//
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
     // Decide if the pickup waepon is better then default weapon.
+
+    //weapontype_t wt;
+    //weapontype_t dwt;
 
 	if ((bs->inventory[INVENTORY_WEAPON] == bs->inventory[INVENTORY_DEFAULTWEAPON])
         || bs->inventory[INVENTORY_WEAPON] <= 0)
@@ -1303,31 +1306,26 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 		return bs->inventory[INVENTORY_DEFAULTWEAPON];
     }
 
+	//wt = BG_WeaponTypeForNum(bs->inventory[INVENTORY_WEAPON]);
+	//dwt = BG_WeaponTypeForNum(bs->inventory[INVENTORY_DEFAULTWEAPON]);
+
     // Gun with no ammo.
     if (BG_WeapUseAmmo(bs->inventory[INVENTORY_WEAPON]) && !bs->inventory[INVENTORY_AMMO])
 		return bs->inventory[INVENTORY_DEFAULTWEAPON];
 
     return bs->inventory[INVENTORY_WEAPON];
-#elif defined TA_WEAPSYS
-	{
-		int i;
-
-		for (i = 1; i < BG_NumWeaponGroups(); i++)
-		{
-			if (bs->inventory[INVENTORY_WEAPON_START+i-1] > 0)
-			{
-				if (BG_WeaponHasMelee(i))
-					return i;
-				else // WT_GUN
-				{
-					if (bs->inventory[INVENTORY_AMMO_START+i-1] > 0 || bs->inventory[INVENTORY_AMMO_START+i-1] == -1)
-						return i;
-				}
-			}
-		}
+#elif defined TMNTWEAPONS // BETA // Guns only
+	if (bs->inventory[INVENTORY_GUN] > 0 && bs->inventory[INVENTORY_AMMOGUN] > 0)
+		return WEAPONINDEX_GUN;
+	else if (bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOELECTRIC] > 0)
+		return WEAPONINDEX_ELECTRIC_LAUNCHER;
+	else if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOHOMING] > 0)
+		return WEAPONINDEX_HOMING_LAUNCHER;
+	else if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOROCKET] > 0)
+		return WEAPONINDEX_ROCKET_LAUNCHER;
+	else {
+		return -1;
 	}
-
-	return -1;
 #else
 	if (bs->inventory[INVENTORY_MACHINEGUN] > 0 && bs->inventory[INVENTORY_BULLETS] > 0)
 		return WEAPONINDEX_MACHINEGUN;
@@ -1355,36 +1353,6 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 #endif
 }
 
-#ifdef TA_WEAPSYS
-/*
-==================
-G_CanShootProx
-
- return qtrue if w can be used to kill a proximity mine
-==================
-*/
-qboolean G_CanShootProx(weapon_t w)
-{
-	int i;
-
-	for (i = 0; i < MAX_HANDS; i++)
-	{
-		if (bg_weapongroupinfo[w].weapon[i]->weapontype != WT_GUN)
-			continue;
-		if (bg_weapongroupinfo[w].weapon[i]->proj->splashDamage <= 0)
-			continue;
-		if (bg_weapongroupinfo[w].weapon[i]->proj->splashRadius <= 0)
-			continue;
-		if (bg_weapongroupinfo[w].weapon[i]->proj->flags & PF_USE_GRAVITY)
-			continue;
-
-		return qtrue;
-	}
-
-	return qfalse;
-}
-#endif
-
 /*
 ==================
 BotClearPath
@@ -1393,8 +1361,10 @@ BotClearPath
 ==================
 */
 void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
+#ifndef TMNTWEAPONS
 	int i, bestmine;
 	float dist, bestdist;
+#endif
 	vec3_t target, dir;
 	bsp_trace_t bsptrace;
 	entityState_t state;
@@ -1437,6 +1407,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 	if (moveresult->flags & MOVERESULT_BLOCKEDBYAVOIDSPOT) {
 		bs->blockedbyavoidspot_time = FloatTime() + 5;
 	}
+#ifndef TMNTWEAPONS
 	// if blocked by an avoid spot and the view angles and weapon are used for movement
 	if (bs->blockedbyavoidspot_time > FloatTime() &&
 		!(moveresult->flags & (MOVERESULT_MOVEMENTVIEW | MOVERESULT_MOVEMENTWEAPON)) ) {
@@ -1463,26 +1434,56 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			VectorSubtract(target, bs->eye, dir);
 			vectoangles(dir, moveresult->ideal_viewangles);
 			// if the bot has a weapon that does splash damage
-#ifdef TA_WEAPSYS_EX
-            if (G_CanShootProx(bs->cur_ps.weapon))
-				moveresult->weapon = bs->cur_ps.weapon;
-            else if (G_CanShootProx(bs->cur_ps.stats[STAT_DEFAULTWEAPON]))
-            	moveresult->weapon = bs->cur_ps.stats[STAT_DEFAULTWEAPON];
-            else {
-            	moveresult->weapon = 0;
+#ifdef TMNTWEAPSYS2
+            moveresult->weapon = 0;
+            if (bs->inventory[INVENTORY_AMMO] > 0)
+            {
+                switch (bs->inventory[INVENTORY_WEAPON])
+                {
+#ifdef TMNTWEAPONS
+                    case WEAPONINDEX_ELECTRIC_LAUNCHER:
+                    case WEAPONINDEX_ROCKET_LAUNCHER:
+                    case WEAPONINDEX_HOMING_LAUNCHER:
+#else
+					case WEAPONINDEX_PLASMAGUN:
+                    case WEAPONINDEX_ROCKET_LAUNCHER:
+                    case WEAPONINDEX_BFG:
+#endif
+                        moveresult->weapon = bs->inventory[INVENTORY_WEAPON];
+                    default:
+                        break;
+                }
             }
-#elif defined TA_WEAPSYS
-			moveresult->weapon = 0;
-			for (i = 1; i < BG_NumWeaponGroups(); i++)
-			{
-				if (bs->inventory[INVENTORY_WEAPON_START+i-1] > 0
-					&& (bs->inventory[INVENTORY_AMMO_START+i-1] > 0
-					|| bs->inventory[INVENTORY_AMMO_START+i-1] == -1)
-					&& G_CanShootProx(i))
-				{
-					moveresult->weapon = i;
-					break;
-				}
+            if (!moveresult->weapon)
+            {
+                if (bs->inventory[INVENTORY_DEFAULTAMMO] > 0)
+                {
+                    switch (bs->inventory[INVENTORY_DEFAULTWEAPON])
+                    {
+#ifdef TMNTWEAPONS
+						case WEAPONINDEX_ELECTRIC_LAUNCHER:
+						case WEAPONINDEX_ROCKET_LAUNCHER:
+						case WEAPONINDEX_HOMING_LAUNCHER:
+#else
+						case WEAPONINDEX_PLASMAGUN:
+						case WEAPONINDEX_ROCKET_LAUNCHER:
+						case WEAPONINDEX_BFG:
+#endif
+                            moveresult->weapon = bs->inventory[INVENTORY_DEFAULTWEAPON];
+                        default:
+                            break;
+                    }
+                }
+            }
+#elif defined TMNTWEAPONS // BETA
+			if (bs->inventory[INVENTORY_ELECTRIC_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOELECTRIC] > 0)
+				moveresult->weapon = WEAPONINDEX_ELECTRIC_LAUNCHER;
+			else if (bs->inventory[INVENTORY_ROCKET_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOROCKET] > 0)
+				moveresult->weapon = WEAPONINDEX_ROCKET_LAUNCHER;
+			else if (bs->inventory[INVENTORY_HOMING_LAUNCHER] > 0 && bs->inventory[INVENTORY_AMMOHOMING] > 0)
+				moveresult->weapon = WEAPONINDEX_HOMING_LAUNCHER;
+			else {
+				moveresult->weapon = 0;
 			}
 #else
 			if (bs->inventory[INVENTORY_PLASMAGUN] > 0 && bs->inventory[INVENTORY_CELLS] > 0)
@@ -1514,6 +1515,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			}
 		}
 	}
+#endif // !TMNTWEAPONS
 }
 
 /*
@@ -1774,7 +1776,7 @@ int AINode_Seek_NBG(bot_state_t *bs) {
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
@@ -1919,7 +1921,7 @@ int AINode_Seek_LTG(bot_state_t *bs)
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
@@ -2198,7 +2200,7 @@ int AINode_Battle_Fight(bot_state_t *bs) {
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
@@ -2293,7 +2295,7 @@ int AINode_Battle_Chase(bot_state_t *bs)
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;
@@ -2617,7 +2619,7 @@ int AINode_Battle_NBG(bot_state_t *bs) {
 	if (bot_grapple.integer) bs->tfl |= TFL_GRAPPLEHOOK;
 	//if in lava or slime the bot should be able to get out
 	if (BotInLavaOrSlime(bs)) bs->tfl |= TFL_LAVA|TFL_SLIME;
-#ifndef TURTLEARENA // NO_ROCKET_JUMPING
+#ifndef TMNTWEAPONS
 	//
 	if (BotCanAndWantsToRocketJump(bs)) {
 		bs->tfl |= TFL_ROCKETJUMP;

@@ -1372,16 +1372,16 @@ infoParm_t	infoParms[] = {
 	{"nodlight",	0,	SURF_NODLIGHT, 0 },		// don't ever add dynamic lights
 	{"dust",		0,	SURF_DUST, 0}			// leave a dust trail when walking on this surface
 
-#ifdef TA_MISC // MATERIALS
+#ifdef TMNTMISC // MATERIALS
 	,
 	// material surface types
 	{"dirt",		0,	SURF_DIRT,		0 },
 	{"grass",		0,	SURF_GRASS,		0 },
 	{"wood",		0,	SURF_WOOD,		0 },
 	{"stone",		0,	SURF_STONE,		0 },
+	{"metal",		0,	SURF_METALSTEPS,0 },
 	{"sparks",		0,	SURF_SPARKS,	0 },
-	{"glass",		0,	SURF_GLASS,		0 },
-	{"metal",		0,	SURF_METAL,		0 }
+	{"glass",		0,	SURF_GLASS,		0 }
 #endif
 };
 
@@ -1413,85 +1413,6 @@ static void ParseSurfaceParm( char **text ) {
 	}
 }
 
-#ifdef IOQ3ZTM // EF2_SHADERS
-/*
-===============
-ParseIf
-
-Based on Elite Force 2
-
-shader/name/etc
-{
-  mipmaps // etc
-if novertexlight
-  ... shader stages
-endif
-if vertexlight
-  ... shader stages
-endif
-}
-===============
-*/
-static qboolean ParseIf( char **text, int *ifIndent ) {
-	char	*token;
-	int		indent;
-
-	indent = 1;
-
-	*ifIndent = *ifIndent + 1;
-
-	token = COM_ParseExt( text, qfalse );
-	if ( !token[0] )
-	{
-		ri.Printf( PRINT_WARNING, "WARNING: missing parm for 'if' keyword in shader '%s'\n", shader.name );
-		return qtrue;
-	}
-
-	if ( !Q_stricmp( token, "novertexlight" ) ) {
-		if (!r_vertexLight->integer) {
-			return qtrue;
-		}
-		// else skip if-block
-	} else if ( !Q_stricmp( token, "vertexlight" ) ) {
-		if (r_vertexLight->integer) {
-			return qtrue;
-		}
-		// else skip if-block
-	} else {
-		ri.Printf( PRINT_WARNING, "WARNING: unknown parm '%s' for 'if' keyword in shader '%s'\n", token, shader.name );
-		// skip if-block
-	}
-
-	// Skip tokens inside of if-block
-	while ( 1 )
-	{
-		token = COM_ParseExt( text, qtrue );
-		if ( !token[0] )
-		{
-			ri.Printf( PRINT_WARNING, "WARNING: no concluding '}' in shader %s\n", shader.name );
-			return qfalse;
-		}
-
-		if ( token[0] == '}' && indent == 1)
-		{
-			ri.Printf( PRINT_WARNING, "WARNING: no concluding 'endif' in shader %s\n", shader.name );
-			break;
-		}
-
-		if ( token[0] == '}' )
-			indent--;
-		else if ( token[0] == '{' )
-			indent++;
-		else if ( !Q_stricmp( token, "endif" ) )
-		{
-			*ifIndent = *ifIndent - 1;
-			break;
-		}
-	}
-	return qtrue;
-}
-#endif
-
 /*
 =================
 ParseShader
@@ -1505,9 +1426,6 @@ static qboolean ParseShader( char **text )
 {
 	char *token;
 	int s;
-#ifdef IOQ3ZTM // EF2_SHADERS
-	int ifIndent = 0;
-#endif
 
 	s = 0;
 
@@ -1532,25 +1450,6 @@ static qboolean ParseShader( char **text )
 		{
 			break;
 		}
-#ifdef IOQ3ZTM // EF2_SHADERS
-		else if ( !Q_stricmp( token, "if" ) )
-		{
-			if ( !ParseIf( text, &ifIndent ) )
-			{
-				return qfalse;
-			}
-			continue;
-		}
-		else if ( !Q_stricmp( token, "endif" ) )
-		{
-			ifIndent--;
-			if ( ifIndent < 0 ) {
-				ifIndent = 0;
-				ri.Printf( PRINT_WARNING, "WARNING: 'endif' with no 'if' in shader %s\n", shader.name );
-			}
-			continue;
-		}
-#endif
 		// stage definition
 		else if ( token[0] == '{' )
 		{
@@ -1721,7 +1620,7 @@ static qboolean ParseShader( char **text )
 			ParseSort( text );
 			continue;
 		}
-#ifdef CELSHADING // ZTM: Allow per-shader celoutline.
+#ifdef CELSHADING // Turtle Man: Allow per-shader celoutline.
 		// celoutline
 		else if ( !Q_stricmp( token, "celoutline" ) )
 		{
@@ -2188,28 +2087,16 @@ static void FixRenderCommandList( int newShader ) {
 				int			fogNum;
 				int			entityNum;
 				int			dlightMap;
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-				int			sortOrder;
-#endif
 				int			sortedIndex;
 				const drawSurfsCommand_t *ds_cmd =  (const drawSurfsCommand_t *)curCmd;
 
 				for( i = 0, drawSurf = ds_cmd->drawSurfs; i < ds_cmd->numDrawSurfs; i++, drawSurf++ ) {
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-					R_DecomposeSort( drawSurf, &entityNum, &shader, &fogNum, &dlightMap, &sortOrder);
-                    sortedIndex = shader->sortedIndex;
-					if( sortedIndex >= newShader ) {
-						sortedIndex++;
-						R_ComposeSort(drawSurf, entityNum, shader, fogNum, dlightMap, sortOrder);
-					}
-#else
 					R_DecomposeSort( drawSurf->sort, &entityNum, &shader, &fogNum, &dlightMap );
                     sortedIndex = (( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1));
 					if( sortedIndex >= newShader ) {
 						sortedIndex++;
 						drawSurf->sort = (sortedIndex << QSORT_SHADERNUM_SHIFT) | entityNum | ( fogNum << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
 					}
-#endif
 				}
 				curCmd = (const void *)(ds_cmd + 1);
 				break;

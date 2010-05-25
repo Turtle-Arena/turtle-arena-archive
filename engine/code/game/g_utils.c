@@ -121,13 +121,13 @@ int G_SoundIndex( char *name ) {
 	return G_FindConfigstringIndex (name, CS_SOUNDS, MAX_SOUNDS, qtrue);
 }
 
-#ifdef IOQ3ZTM // Particles
+#ifdef TMNTMISC // Particles
 // str should be
 // int  f f f   f f f   int         int   int
 // type origin origin2 numparticles turb snum
 // "1   0.1 0.4 11.55  0.1 0.4 11.55  256  1  1"
 // str will be parsed and used in CG_NewParticleArea
-// ZTM: I have no idea what they all do.
+// Turtle Man: I have no idea what they all do.
 //
 int G_ParticleAreaIndex( char *str ) {
 	return G_FindConfigstringIndex (str, CS_PARTICLES, MAX_PARTICLES_AREAS, qtrue);
@@ -245,7 +245,7 @@ match (string)self.target and call their .use function
 
 ==============================
 */
-#ifdef TA_ENTSYS
+#ifdef TMNTENTSYS
 void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *target ) {
 	gentity_t		*t;
 
@@ -276,7 +276,7 @@ void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *target ) {
 			G_Printf("entity was removed while using targets\n");
 			return;
 		}
-#ifdef TA_WEAPSYS // Check if weapon_default was given.
+#ifdef TMNTWEAPSYS // Check if weapon_default was given.
         if (ent->s.weapon == WP_DEFAULT)
         {
             if (ent->client)
@@ -329,13 +329,13 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 			G_Printf("entity was removed while using targets\n");
 			return;
 		}
-#ifdef TA_WEAPSYS // Check if weapon_default was given.
+#ifdef TMNTWEAPSYS // Check if weapon_default was given.
         if (ent->s.weapon == WP_DEFAULT)
         {
             if (ent->client)
             {
                 ent->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
-			}
+	}
             else
             {
                 ent->s.weapon = WP_NONE;
@@ -446,7 +446,7 @@ float vectoyaw( const vec3_t vec ) {
 
 void G_InitGentity( gentity_t *e ) {
 	e->inuse = qtrue;
-#ifdef TA_WEAPSYS // XREAL
+#ifdef TMNTMISC // XREAL
 	e->spawnTime = level.time;
 #endif
 	e->classname = "noclass";
@@ -611,20 +611,8 @@ void G_KillBox (gentity_t *ent) {
 	gentity_t	*hit;
 	vec3_t		mins, maxs;
 
-#ifdef TA_ENTSYS // BREAKABLE
-	if (!ent->client)
-	{
-		VectorAdd( ent->r.currentOrigin, ent->r.mins, mins );
-		VectorAdd( ent->r.currentOrigin, ent->r.maxs, maxs );
-	}
-	else
-	{
-#endif
 	VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
 	VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
-#ifdef TA_ENTSYS // BREAKABLE
-	}
-#endif
 	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
 
 	for (i=0 ; i<num ; i++) {
@@ -724,7 +712,7 @@ void G_SetOrigin( gentity_t *ent, vec3_t origin ) {
 	VectorCopy( origin, ent->r.currentOrigin );
 }
 
-#ifdef TA_WEAPSYS // XREAL r2785
+#ifdef TMNTWEAPSYS // XREAL r2785
 /*
 =================
 G_FindRadius
@@ -736,81 +724,63 @@ G_FindRadius (origin, radius)
 */
 gentity_t *G_FindRadius(gentity_t *from, const vec3_t org, float rad)
 {
-	vec3_t	eorg;
-	vec3_t	targetOrg;
-	int		j;
+  vec3_t  eorg;
+  int j;
 
-	if (!from)
-		from = g_entities;
-	else
-		from++;
+	if(!from)
+    from = g_entities;
+  else
+    from++;
 
 	for(; from < &g_entities[level.num_entities]; from++)
-	{
+  {
 		if(!from->inuse)
-			continue;
-
-		if (from-g_entities < MAX_CLIENTS) {
-			VectorCopy(from->client->ps.origin, targetOrg);
-			targetOrg[2] += from->client->ps.viewheight;
-		} else {
-			VectorCopy(from->r.currentOrigin, targetOrg);
-			targetOrg[2] += 40;
-		}
+      continue;
 
 		for(j = 0; j < 3; j++)
-			eorg[j] = org[j] - (targetOrg[j] + (from->r.mins[j] + from->r.maxs[j]) * 0.5);
+			eorg[j] = org[j] - (from->s.origin[j] + (from->r.mins[j] + from->r.maxs[j]) * 0.5);
 
-		if (VectorLength(eorg) > rad)
-			continue;
+		if(VectorLength(eorg) > rad)
+      continue;
 
-		return from;
-	}
+    return from;
+  }
 
-	return NULL;
+  return NULL;
 }
 
 // Visiblilty check
-qboolean G_IsVisible(int skipEnt, const vec3_t start, const vec3_t goal)
+qboolean G_IsVisible(const gentity_t *self, const vec3_t goal)
 {
-	trace_t trace;
+  trace_t trace;
 
-	trap_Trace(&trace, start, NULL, NULL, goal, skipEnt, MASK_SHOT);
+	trap_Trace(&trace, self->r.currentOrigin, NULL, NULL, goal, self->s.number, MASK_SHOT);
 
 	// Yes we can see it
-	if (trace.contents & CONTENTS_SOLID)
-		return qfalse;
+	if(trace.contents & CONTENTS_SOLID)
+    return qfalse;
 	else
-		return qtrue;
+  return qtrue;
 }
+
+// g_team.c
+void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage );
 
 qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 		const vec3_t start, const vec3_t dir,
 		float range, float ang, int tests)
 {
-	vec3_t eorg;
-	int j;
-	vec3_t blipdir;
-	float angle;
-	float dist;
-	vec3_t targetOrg;
-
-	if (!target)
-		return qfalse;
-
 	if (!target->inuse)
 		return qfalse;
 
 	if (target == source)
 		return qfalse;
 
-	// ZTM: Target players, overload base, and NPCs.
+	// Turtle Man: Target players, overload base, and NPCs.
 	if (!target->client// && !target->takedamage
-#ifdef MISSIONPACK
 		&& !(source->client && target->pain == ObeliskPain
 			&& target->spawnflags != source->client->sess.sessionTeam)
-#endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		&& !(source->client && target->s.eType == ET_NPC)
 #endif
 	)
@@ -822,40 +792,40 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 	if (target->client && target->client->sess.sessionTeam >= TEAM_SPECTATOR)
 		return qfalse;
 
-	if (OnSameTeam(target, source))
+	if (g_gametype.integer >= GT_TEAM && OnSameTeam(target, source))
 		return qfalse;
-
-	if (target-g_entities < MAX_CLIENTS) {
-		VectorCopy(target->client->ps.origin, targetOrg);
-		targetOrg[2] += target->client->ps.viewheight;
-	} else {
-		VectorCopy(target->r.currentOrigin, targetOrg);
-		targetOrg[2] += (target->r.mins[2] + target->r.maxs[2])/2;
-	}
 
 	// Unneeded for target trace test, the trace found it so it is visable
 	if (tests >= 1)
 	{
-		if (!G_IsVisible(source->s.number, start, targetOrg))
+		if (!G_IsVisible(source, target->r.currentOrigin))
 			return qfalse;
 	}
 	// G_FindTarget does its own dist/angle check, for best target.
 	if (tests >= 2)
 	{
+		vec3_t eorg;
+		int j;
+		vec3_t blipdir;
+		float angle;
+
 		for(j = 0; j < 3; j++) {
-			eorg[j] = start[j] - (targetOrg[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
+			eorg[j] = source->s.origin[j] - (target->s.origin[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
 		}
 
-		dist = VectorLength(eorg);
-		if (dist > range)
+		if (VectorLength(eorg) > range)
 			return qfalse;
 
 		// Angle check
-		if (dist > 128.0f && ang < 360)
+		if (ang < 360)
 		{
-			VectorSubtract(targetOrg, start, blipdir);
+			VectorSubtract(target->r.currentOrigin, source->r.currentOrigin, blipdir);
 
-			angle = AngleBetweenVectors(dir, blipdir);
+			if (source-g_entities < MAX_CLIENTS) {
+				angle = AngleBetweenVectors(source->s.apos.trBase, blipdir);
+			} else {
+				angle = AngleBetweenVectors(source->r.currentAngles, blipdir);
+			}
 			if (angle > ang) {
 				return qfalse;
 			}
@@ -880,24 +850,22 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 	gentity_t		*target;
 	gentity_t		*besttarget;
 	float			bestdist, dist, angle;
-	vec3_t			blipdir;
-	//vec3_t			bestdir;
-	vec3_t			targetOrg;
+	vec3_t			blipdir, bestdir;
 
 	besttarget = NULL;
 	bestdist = range;
 	VectorClear(blipdir);
-	//VectorClear(bestdir);
+	VectorClear(bestdir);
 
 	// First check if where we are aiming at something we can damage?
-	/*{
+	{
 		trace_t trace;
 		vec3_t goal;
 
 		// Use correct range.
 		VectorMA(start, range, dir, goal);
 
-		trap_Trace(&trace, start, NULL, NULL, goal, source->s.number, MASK_SHOT);
+		trap_Trace(&trace, source->r.currentOrigin, NULL, NULL, goal, source->s.number, MASK_SHOT);
 
 		target = &g_entities[ trace.entityNum ];
 
@@ -905,7 +873,7 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 		{
 			return target;
 		}
-	}*/
+	}
 
 	for (target = g_entities; target < &g_entities[level.num_entities]; target++)
 	{
@@ -914,16 +882,8 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 			continue;
 		}
 
-		if (target-g_entities < MAX_CLIENTS) {
-			VectorCopy(target->client->ps.origin, targetOrg);
-			targetOrg[2] += target->client->ps.viewheight;
-		} else {
-			VectorCopy(target->r.currentOrigin, targetOrg);
-			targetOrg[2] += (target->r.mins[2] + target->r.maxs[2])/2;
-		}
-
 		for(j = 0; j < 3; j++) {
-			eorg[j] = start[j] - (targetOrg[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
+			eorg[j] = source->s.origin[j] - (target->s.origin[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
 		}
 
 		dist = VectorLength(eorg);
@@ -931,18 +891,22 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 			continue;
 
 		// Angle check
-		if (dist > 128.0f && ang < 360)
+		if (ang < 360)
 		{
-			VectorSubtract(targetOrg, start, blipdir);
+			VectorSubtract(target->r.currentOrigin, source->r.currentOrigin, blipdir);
 
-			// ZTM: Disabled best angle (for now), always shoot closest?
-			/* if (!besttarget || VectorLength(blipdir) < VectorLength(bestdir)) */
+			// Turtle Man: Disabled best angle (for now), allways shoot closest?
+			if (!besttarget/* || VectorLength(blipdir) < VectorLength(bestdir)*/)
 			{
-				angle = AngleBetweenVectors(dir, blipdir);
+				if (source-g_entities < MAX_CLIENTS) {
+					angle = AngleBetweenVectors(source->s.apos.trBase, blipdir);
+				} else {
+					angle = AngleBetweenVectors(source->r.currentAngles, blipdir);
+				}
 				if (angle > ang) {
 					continue;
 				}
-				//VectorCopy(blipdir, bestdir);
+				VectorCopy(blipdir, bestdir);
 			}
 		}
 

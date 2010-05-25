@@ -1,21 +1,21 @@
 /*
 ===========================================================================
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009 ZTurtleMan
 
-This file is part of Turtle Arena source code.
+This file is part of TMNT Arena source code.
 
-Turtle Arena source code is free software; you can redistribute it
+TMNT Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena source code is distributed in the hope that it will be
+TMNT Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena source code; if not, write to the Free Software
+along with TMNT Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -43,7 +43,6 @@ projectile "p_shuriken"
 	speed 700
 	timetolive 15000
 	spinType "PS_PITCH"
-	explosionType "PE_NONE"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	stickOnImpact 1
@@ -55,9 +54,11 @@ projectile "p_electricshuriken"
 	model "models/shurikens/shurikenelectric.md3"
 	damage 10
 	speed 700
+	//timetolive 15000
 	spinType "PS_PITCH"
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
+	//stickOnImpact 1
 
 	bounceType "PB_HALF"
 	useGravity 1
@@ -65,15 +66,6 @@ projectile "p_electricshuriken"
 	splashDamage 10
 	splashRadius 60
 	deathType "PD_ROCKET_SMALL"
-
-	// grappling shuriken
-	//timetolive 10000
-	//trailType "PT_GRAPPLE"
-	//deathType "PD_BULLET"
-	//wallmarkName "gfx/damage/hole_lg_mrk"
-	//wallmarkRadius 12
-	//grappling 1
-	//spinType "PS_NONE"
 }
 
 projectile "p_fireshuriken"
@@ -102,7 +94,6 @@ projectile "p_lasershuriken"
 	spinType "PS_PITCH"
 	bounceType "PB_FULL"
 	maxBounces 10
-	bounceSound0 "sound/items/lasershuriken_bounce.ogg"
 	wallmarkName "gfx/damage/plasma_mrk"
 	wallmarkRadius 8
 	wallmarkFadeAlpha 1

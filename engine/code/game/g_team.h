@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 
-#ifdef TURTLEARENA // SCORING
+#ifdef TMNT
 
 #define CTF_CAPTURE_BONUS		250		// what you get for capture
 #define CTF_TEAM_BONUS			50		// what your team gets for capture
@@ -94,7 +94,7 @@ void Team_CheckHurtCarrier(gentity_t *targ, gentity_t *attacker);
 void Team_InitGame(void);
 void Team_ReturnFlag(int team);
 void Team_FreeEntity(gentity_t *ent);
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 gentity_t *SelectCTFSpawnPoint ( gentity_t *ent, team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot );
 #else
 gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot );

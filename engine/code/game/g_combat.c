@@ -57,7 +57,7 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 	if ( level.warmupTime ) {
 		return;
 	}
-#ifdef IOQ3ZTM // TURTLEARENA // SCORING // CTF_FRAG_CARRIER_BONUS is 0, so don't show they got 0 points.
+#ifdef IOQ3ZTM // TMNT // CTF_FRAG_CARRIER_BONUS is 0, so don't show they got 0 points.
 	if (!score) {
 		return;
 	}
@@ -68,15 +68,6 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 	ent->client->ps.persistant[PERS_SCORE] += score;
 	if ( g_gametype.integer == GT_TEAM )
 		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] += score;
-#ifdef TURTLEARENA // SCORING
-	// No negative scores
-	if (ent->client->ps.persistant[PERS_SCORE] < 0) {
-		ent->client->ps.persistant[PERS_SCORE] = 0;
-	}
-	if ( g_gametype.integer == GT_TEAM && level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] < 0) {
-		level.teamScores[ ent->client->ps.persistant[PERS_TEAM] ] = 0;
-	}
-#endif
 	CalculateRanks();
 }
 
@@ -94,23 +85,28 @@ void TossClientItems( gentity_t *self ) {
 	int			i;
 	gentity_t	*drop;
 
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2 // Turtle Man: FIXME: Drop upto three weapons?
+					//  (self->s.weapon, STAT_NEWWEAPON, and STAT_OLDWEAPON)
 	int statAmmo = -1;
 
 	if (self->client)
 	{
 		// Clients can have two weapon, pickup and default,
-		//   only the pickup weapon will be dropped.
+		//  pickup will be in s.weapon if s.weapon != STAT_DEFAULTWEAPON
 
 		weapon = WP_NONE;
 
-		// don't drop default weapon
-		if (self->client->ps.stats[STAT_PENDING_WEAPON]
-			!= self->client->ps.stats[STAT_DEFAULTWEAPON])
+		// check if dropping weapon
+		if (self->client->ps.weaponstate == WEAPON_DROPPING)
 		{
-			weapon = self->client->ps.stats[STAT_PENDING_WEAPON];
-			self->client->ps.stats[STAT_PENDING_WEAPON] = WP_NONE;
-			statAmmo = STAT_PENDING_AMMO;
+		// don't drop default weapon
+			if (self->client->ps.stats[STAT_NEWWEAPON]
+				!= self->client->ps.stats[STAT_DEFAULTWEAPON])
+			{
+				weapon = self->client->ps.stats[STAT_NEWWEAPON];
+				self->client->ps.stats[STAT_NEWWEAPON] = WP_NONE;
+				statAmmo = STAT_NEWAMMO;
+			}
 		}
 		// else if has pickup weapon
 		else if (self->s.weapon != self->client->ps.stats[STAT_DEFAULTWEAPON])
@@ -132,8 +128,8 @@ void TossClientItems( gentity_t *self ) {
 	// weapon that isn't the mg or gauntlet.  Without this, a client
 	// can pick up a weapon, be killed, and not drop the weapon because
 	// their weapon change hasn't completed yet and they are still holding the MG.
-#ifdef TA_WEAPSYS
-	if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON]) {
+#ifdef TMNTWEAPONS // Turtle Man: NOTE: It would change q3 gameplay, so not TMNTWEAPSYS?
+	if (weapon == self->client->ps.stats[STAT_DEFAULTWEAPON] ) {
 #else
 	if ( weapon == WP_MACHINEGUN || weapon == WP_GRAPPLING_HOOK ) {
 #endif
@@ -144,13 +140,19 @@ void TossClientItems( gentity_t *self ) {
 			weapon = WP_NONE;
 		}
 	}
-#endif // TA_WEWAPONS3
+#endif // TMNTWEWAPONS3
 
-#ifdef TA_WEAPSYS_EX
-	// ZTM: Drop valid selected weapon to drop
-	if (weapon > WP_NONE && weapon < BG_NumWeaponGroups())
-#elif defined TA_WEAPSYS
-	// ZTM: Drop all weapons except default.
+#ifdef TMNTWEAPSYS2
+	// Turtle Man: Drop valid selected weapon to drop
+	if (weapon > WP_NONE && weapon <
+#ifdef TMNTWEAPSYS_2
+		BG_NumWeaponGroups()
+#else
+		WP_NUM_WEAPONS
+#endif
+		)
+#elif defined TMNTWEAPSYS
+	// Turtle Man: Drop all weapons except default.
 	if ( weapon != self->client->ps.stats[STAT_DEFAULTWEAPON] )
 #else
 	if ( weapon > WP_MACHINEGUN && weapon != WP_GRAPPLING_HOOK && 
@@ -161,11 +163,11 @@ void TossClientItems( gentity_t *self ) {
 		item = BG_FindItemForWeapon( weapon );
 
 		// spawn the item
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 		drop = Drop_Item( self, item, 0 );
 		if (drop) {
 			int ammo;
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 			if (statAmmo != -1)
 			{
 				ammo = self->client->ps.stats[statAmmo];
@@ -187,12 +189,12 @@ void TossClientItems( gentity_t *self ) {
 #endif
 	}
 
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 	angle = 45;
 #endif
 	// drop all the powerups if not in teamplay
 	if ( g_gametype.integer != GT_TEAM ) {
-#ifndef TA_HOLDSYS
+#ifndef TMNTHOLDSYS
 		angle = 45;
 #endif
 		for ( i = 1 ; i < PW_NUM_POWERUPS ; i++ ) {
@@ -211,7 +213,7 @@ void TossClientItems( gentity_t *self ) {
 			}
 		}
 	}
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 	// drop all the holdable items
 	for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
 		if ( self->client->ps.holdable[ i ] != 0 ) {
@@ -346,7 +348,7 @@ void GibEntity( gentity_t *self, int killer ) {
 	gentity_t *ent;
 	int i;
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	//if this entity still has kamikaze
 	if (self->s.eFlags & EF_KAMIKAZE) {
 		// check if there is a kamikaze timer around for this owner
@@ -390,7 +392,84 @@ void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 }
 
 
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+// these are just for logging, the client prints its own messages
+#ifdef TMNTWEAPSYS_2 // Moved to bg_misc.c
+extern char	*modNames[];
+extern int modNamesSize;
+#else
+char	*modNames[] = {
+	"MOD_UNKNOWN",
+#ifdef TMNTWEAPONS // MOD
+	"MOD_FIST",
+	"MOD_KATANA",
+	"MOD_WAKIZASHI",
+	"MOD_SAI",
+	"MOD_NUNCHUK",
+	"MOD_HAMMER",
+	"MOD_AXE",
+	"MOD_SWORD",
+	"MOD_BAT",
+	"MOD_BO",
+	"MOD_BAMBOO",
+	"MOD_GUN",
+	"MOD_ELECTRIC",
+	"MOD_ELECTRIC_SPLASH",
+	"MOD_ROCKET",
+	"MOD_ROCKET_SPLASH",
+	"MOD_HOMING",
+	"MOD_HOMING_SPLASH",
+#else
+	"MOD_SHOTGUN",
+	"MOD_GAUNTLET",
+	"MOD_MACHINEGUN",
+	"MOD_GRENADE",
+	"MOD_GRENADE_SPLASH",
+	"MOD_ROCKET",
+	"MOD_ROCKET_SPLASH",
+	"MOD_PLASMA",
+	"MOD_PLASMA_SPLASH",
+	"MOD_RAILGUN",
+	"MOD_LIGHTNING",
+	"MOD_BFG",
+	"MOD_BFG_SPLASH",
+#endif
+#ifdef TMNTHOLDABLE
+	"MOD_SHURIKEN",
+	"MOD_FIRESHURIKEN",
+	"MOD_FIRESHURIKEN_EXPLOSION",
+	"MOD_ELECTRICSHURIKEN",
+	"MOD_LASERSHURIKEN",
+#endif
+	"MOD_WATER",
+	"MOD_SLIME",
+	"MOD_LAVA",
+	"MOD_CRUSH",
+	"MOD_TELEFRAG",
+	"MOD_FALLING",
+	"MOD_SUICIDE",
+	"MOD_TARGET_LASER",
+	"MOD_TRIGGER_HURT",
+#ifdef TMNTENTSYS
+	"MOD_EXPLOSION",
+#endif
+#ifdef MISSIONPACK
+#ifndef TMNTWEAPONS // MOD
+	"MOD_NAIL",
+	"MOD_CHAINGUN",
+	"MOD_PROXIMITY_MINE",
+#endif
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
+	"MOD_KAMIKAZE",
+#endif
+#ifndef TMNTWEAPONS // MOD
+	"MOD_JUICED",
+#endif
+#endif
+	"MOD_GRAPPLE"
+};
+#endif
+
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 Kamikaze_DeathActivate
@@ -541,7 +620,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (self->client && self->client->hook) {
 		Weapon_HookFree(self->client->hook);
 	}
-#if defined MISSIONPACK && !defined TURTLEARENA // WEAPONS
+#if defined MISSIONPACK && !defined TMNTWEAPONS
 	if ((self->client->ps.eFlags & EF_TICKING) && self->activator) {
 		self->client->ps.eFlags &= ~EF_TICKING;
 		self->activator->think = G_FreeEntity;
@@ -569,7 +648,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		killerName = "<world>";
 	}
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	if ( meansOfDeath < 0 || meansOfDeath >= modNamesSize )
 #else
 	if ( meansOfDeath < 0 || meansOfDeath >= sizeof( modNames ) / sizeof( modNames[0] ) )
@@ -589,17 +668,17 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	ent->s.eventParm = meansOfDeath;
 	ent->s.otherEntityNum = self->s.number;
 	ent->s.otherEntityNum2 = killer;
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	ent->s.weapon = 0; // unknown projectile/weapon
-	// projectile or weapon group number, for MOD_PROJECTILE, MOD_PROJECTILE_EXPLOSION, or MOD_WEAPON_*
-	if (meansOfDeath == MOD_PROJECTILE || meansOfDeath == MOD_PROJECTILE_EXPLOSION)
+	// projectile or weapon group number, for MOD_PROJECTILE or MOD_WEAPON_*
+	if (meansOfDeath == MOD_PROJECTILE)
 	{
 		if (inflictor && inflictor->s.eType == ET_MISSILE) {
 			ent->s.weapon = inflictor->s.weapon;
 		}
 		// Check for instant damage guns
 		else if (inflictor == attacker && (attacker->client
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			|| attacker->s.eType == ET_NPC
 #endif
 			) && bg_weapongroupinfo[attacker->s.weapon].weapon[0]->proj->instantDamage)
@@ -611,7 +690,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		|| meansOfDeath == MOD_WEAPON_SECONDARY)
 	{
 		if (attacker && (attacker->client
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			|| attacker->s.eType == ET_NPC
 #endif
 		))
@@ -625,7 +704,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	self->enemy = attacker;
 
 	self->client->ps.persistant[PERS_KILLED]++;
-#ifdef TA_SP // Loss a life when you die.
+#ifdef TMNTSP // Loss a life when you die.
 	if (self->client->ps.persistant[PERS_LIVES] > 0) {
 		self->client->ps.persistant[PERS_LIVES]--;
 	}
@@ -634,7 +713,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	if (attacker && attacker->client) {
 		attacker->client->lastkilled_client = self->s.number;
 
-#ifdef TURTLEARENA // SCORING
+#ifdef TMNT
 		if ( attacker == self )
 		{
 			// Suicide penalty
@@ -651,13 +730,13 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 #endif
 		else
 		{
-#ifdef TURTLEARENA // SCORING
+#ifdef TMNT
 			AddScore( attacker, self->r.currentOrigin, 50 );
 #else
 			AddScore( attacker, self->r.currentOrigin, 1 );
 #endif
 
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 			if( meansOfDeath == MOD_GAUNTLET ) {
 				
 				// play humiliation on player
@@ -695,7 +774,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 #endif
 		}
 	} else {
-#ifdef TURTLEARENA // SCORING
+#ifdef TMNT
 		// Suicide penalty
 		AddScore( self, self->r.currentOrigin, -50 );
 #else
@@ -772,7 +851,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	self->takedamage = qtrue;	// can still be gibbed
 
-#ifndef TA_WEAPSYS // Players don't let go of default weapon.
+#ifndef TMNTWEAPSYS // Players don't let go of default weapon.
 	self->s.weapon = WP_NONE;
 #endif
 	self->s.powerups = 0;
@@ -786,7 +865,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	self->s.loopSound = 0;
 
-#if 0 //#ifdef TA_PLAYERSYS // ZTM: FIXME: Use per-player bounding box!
+#if 0 //#ifdef TMNTPLAYERSYS // Turtle Man: FIXME: Use per-player bounding box!
 #else
 	self->r.maxs[2] = -8;
 #endif
@@ -822,7 +901,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			break;
 		}
 
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 		// Wait for death animation to end before respawning
 		self->client->respawnTime = level.time + BG_AnimationTime(&self->client->pers.playercfg.animations[anim]);
 #endif
@@ -848,7 +927,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		// globally cycle through the different death animations
 		i = ( i + 1 ) % 3;
 
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 		if (self->s.eFlags & EF_KAMIKAZE) {
 			Kamikaze_DeathTimer( self );
 		}
@@ -860,7 +939,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 }
 
 
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 /*
 ================
 CheckArmor
@@ -935,7 +1014,7 @@ int RaySphereIntersections( vec3_t origin, float radius, vec3_t point, vec3_t di
 	return 0;
 }
 
-#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
+#if defined MISSIONPACK && !defined TMNT // POWERS
 /*
 ================
 G_InvulnerabilityEffect
@@ -974,60 +1053,6 @@ int G_InvulnerabilityEffect( gentity_t *targ, vec3_t dir, vec3_t point, vec3_t i
 	}
 }
 #endif
-
-#ifdef TA_ENTSYS // BREAKABLE
-/*
-=================
-G_BreakableDebris
-
-Spawn debris from breakable, the debris itself is not beakable.
-=================
-*/
-void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point)
-{
-	gentity_t   *tent;
-	vec3_t      size;
- 
- 	VectorSubtract(targ->r.maxs, targ->r.mins, size);
- 	VectorScale(size, 0.5, size);
- 
-	// point doesn't work with splash damage weapons?
-	if (targ->health <= 0 || !dir || VectorLength(dir) == 0)
-	{
-		vec3_t      center;
-
-		// Find the center of the brush
-		VectorAdd(targ->r.mins, size, center);
-
-		tent = G_TempEntity( center, EV_SPAWN_DEBRIS );
-		tent->s.eventParm = 255;
-
-		tent->s.time2 = targ->s.time2; // surfaceFlags
-	}
-	else
-	{
-		tent = G_TempEntity( point, EV_SPAWN_DEBRIS );
-		VectorInverse(dir);
-		tent->s.eventParm = DirToByte(dir);
-		tent->s.time2 = -1; // surfaceFlags
-	}
-
-	tent->s.number = inflictor->s.number;
-
-	// only use small size debris if not exploding
-	if (targ->health > 0 && inflictor->s.weapon != WP_NONE)
-	{
-		if (inflictor->s.eType == ET_MISSILE)
-			tent->s.otherEntityNum = bg_projectileinfo[inflictor->s.weapon].wallmarkRadius;
-		else if (inflictor == attacker && inflictor->client) // Melee damage
-			tent->s.otherEntityNum = bg_weapongroupinfo[inflictor->s.weapon].weapon[0]->wallmarkRadius;
-	}
-
-	if (!tent->s.otherEntityNum)
-		tent->s.otherEntityNum = VectorLength(size);
-}
-#endif
-
 /*
 ============
 T_Damage
@@ -1052,45 +1077,37 @@ dflags		these flags are used to control how T_Damage works
 ============
 */
 
-qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
+void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			   vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
 	int			take;
 	int			save;
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 	int			asave;
 #endif
 	int			knockback;
 	int			max;
-#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
+#if defined MISSIONPACK && !defined TMNT // POWERS
 	vec3_t		bouncedir, impactpoint;
 #endif
 
 	if (!targ->takedamage) {
-		return qfalse;
+		return;
 	}
 
 	// the intermission has allready been qualified for, so don't
 	// allow any extra scoring
 	if ( level.intermissionQueued ) {
-		return qfalse;
+		return;
 	}
-#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
+#if defined MISSIONPACK && !defined TMNT // POWERS
 	if ( targ->client && mod != MOD_JUICED) {
 		if ( targ->client->invulnerabilityTime > level.time) {
 			if ( dir && point ) {
 				G_InvulnerabilityEffect( targ, dir, point, impactpoint, bouncedir );
 			}
-			return qfalse;
+			return;
 		}
-	}
-#endif
-#ifdef TA_WEAPSYS
-	if (targ->mustcut && !(dflags & DAMAGE_CUTS))
-	{
-		// ZTM: TODO: Have a effect to user knows it is can only be broke by WIF_CUTS?
-		//                       or have textures that users know can only be broke by WIF_CUTS?
-		return qfalse;
 	}
 #endif
 	if ( !inflictor ) {
@@ -1102,16 +1119,16 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	// shootable doors / buttons don't actually have any health
 	if ( targ->s.eType == ET_MOVER
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 		&& targ->health == -1
 #endif
 	) {
 		if ( targ->use && targ->moverState == MOVER_POS1 ) {
 			targ->use( targ, inflictor, attacker );
 		}
-		return qtrue;
+		return;
 	}
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 	// Allow breakable movers
 	if ( targ->s.eType == ET_MOVER && targ->health > 0 )
 	{
@@ -1119,19 +1136,20 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		if (targ->health < 0)
 			targ->health = 0;
 
-		G_BreakableDebris(targ, inflictor, attacker, dir, point);
+		// Turtle Man: TODO: Spawn particles (model materials and smoke sprites)
+		// G_BreakGlass( targ, point, mod );
 
-		if (targ->health <= 0 && targ->die)
+		if (targ->health <= 0)
 		{
-			targ->die (targ, inflictor, attacker, damage, mod);
+			G_FreeEntity( targ );
 		}
-		return qtrue;
+		return;
 	}
 #endif
 
 #ifdef MISSIONPACK
 	if( g_gametype.integer == GT_OBELISK && CheckObeliskAttack( targ, attacker ) ) {
-		return qfalse;
+		return;
 	}
 #endif
 	// reduce damage by the attacker's handicap value
@@ -1139,7 +1157,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( attacker->client && attacker != targ ) {
 		max = attacker->client->ps.stats[STAT_MAX_HEALTH];
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 		if( BG_ItemForItemNum(attacker->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[attacker->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -1155,11 +1173,11 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	if ( client ) {
 		if ( client->noclip ) {
-			return qfalse;
+			return;
 		}
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 		if ( client->ps.powerups[PW_FLASHING] ) {
-			return qfalse;
+			return;
 		}
 #endif
 	}
@@ -1180,11 +1198,6 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( dflags & DAMAGE_NO_KNOCKBACK ) {
 		knockback = 0;
 	}
-#ifdef IOQ3ZTM // LASERTAG
-	if (g_laserTag.integer) {
-		knockback = 0;
-	}
-#endif
 
 	// figure momentum add, even if the damage won't be taken
 	if ( knockback && targ->client ) {
@@ -1212,7 +1225,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			targ->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 		}
 	}
-#ifdef TA_ENTSYS // MISC_OBJECT
+#ifdef TMNTENTSYS // MISC_OBJECT
 	else if (knockback)
 	{
 		vec3_t	kvel;
@@ -1233,7 +1246,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// if the attacker was on the same team
 #ifdef MISSIONPACK
 		if (
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNTWEAPONS
 			mod != MOD_JUICED &&
 #endif
 			targ != attacker && !(dflags & DAMAGE_NO_TEAM_PROTECTION) && OnSameTeam (targ, attacker)  )
@@ -1242,26 +1255,17 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 #endif
 		{
 			if ( !g_friendlyFire.integer ) {
-				return qfalse;
+				return;
 			}
 		}
-#ifdef TA_WEAPSYS
-		if (inflictor && bg_projectileinfo[inflictor->s.weapon].explosionType == PE_PROX) {
-			if (inflictor->parent && OnSameTeam(targ, inflictor->parent)) {
-				return qfalse;
-			}
-			if (targ == attacker) {
-				return qfalse;
-			}
-		}
-#else
+#ifndef TMNTWEAPONS // MOD
 #ifdef MISSIONPACK
 		if (mod == MOD_PROXIMITY_MINE) {
 			if (inflictor && inflictor->parent && OnSameTeam(targ, inflictor->parent)) {
-				return qfalse;
+				return;
 			}
 			if (targ == attacker) {
-				return qfalse;
+				return;
 			}
 		}
 #endif
@@ -1269,7 +1273,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 		// check for godmode
 		if ( targ->flags & FL_GODMODE ) {
-			return qfalse;
+			return;
 		}
 	}
 
@@ -1277,18 +1281,18 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	// and protects 50% against all damage
 	if ( client && client->ps.powerups[PW_BATTLESUIT] ) {
 		G_AddEvent( targ, EV_POWERUP_BATTLESUIT, 0 );
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 		if ( ( dflags & DAMAGE_RADIUS ) || ( mod == MOD_FALLING ) ) {
-			return qfalse;
+			return;
 		}
 #endif
 		damage *= 0.5;
 	}
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 	// never take any damage.
 	if ( client && client->ps.powerups[PW_INVUL] ) {
 		G_AddEvent( targ, EV_POWERUP_INVUL, 0 );
-		return qfalse;
+		return;
 	}
 #endif
 
@@ -1296,7 +1300,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( attacker->client && client
 			&& targ != attacker && targ->health > 0
 			&& targ->s.eType != ET_MISSILE
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			&& targ->s.eType != ET_NPC
 #endif
 			&& targ->s.eType != ET_GENERAL) {
@@ -1305,7 +1309,9 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		} else {
 			attacker->client->ps.persistant[PERS_HITS]++;
 		}
-#ifndef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
+		attacker->client->ps.persistant[PERS_ATTACKEE_HEALTH] = targ->health;
+#else
 		attacker->client->ps.persistant[PERS_ATTACKEE_ARMOR] = (targ->health<<8)|(client->ps.stats[STAT_ARMOR]);
 #endif
 	}
@@ -1322,14 +1328,14 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	take = damage;
 	save = 0;
 
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 	// save some from armor
 	asave = CheckArmor (targ, take, dflags);
 	take -= asave;
 #endif
 
 	if ( g_debugDamage.integer ) {
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 		G_Printf( "%i: client:%i health:%i damage:%i\n", level.time, targ->s.number,
 			targ->health, take );
 #else
@@ -1347,7 +1353,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		} else {
 			client->ps.persistant[PERS_ATTACKER] = ENTITYNUM_WORLD;
 		}
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 		client->damage_armor += asave;
 #endif
 		client->damage_blood += take;
@@ -1374,22 +1380,6 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// set the last client who damaged the target
 		targ->client->lasthurt_client = attacker->s.number;
 		targ->client->lasthurt_mod = mod;
-#ifdef TA_WEAPSYS
-		if (mod == MOD_PROJECTILE
-			|| mod == MOD_PROJECTILE_EXPLOSION)
-			targ->client->lasthurt_weapon = inflictor->s.weapon;
-		else if (mod == MOD_WEAPON_PRIMARY
-			|| mod == MOD_WEAPON_SECONDARY)
-			targ->client->lasthurt_weapon = attacker->s.weapon;
-		else
-			targ->client->lasthurt_weapon = 0;
-#endif
-#ifdef IOQ3ZTM // LASERTAG
-		if (g_laserTag.integer == 1) {
-			take = 0;
-			AddScore(attacker, targ->r.currentOrigin, 5);
-		}
-#endif
 	}
 
 	// do the damage
@@ -1408,22 +1398,12 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 			targ->enemy = attacker;
 			targ->die (targ, inflictor, attacker, take, mod);
+			return;
 		} else if ( targ->pain ) {
 			targ->pain (targ, attacker, take);
 		}
-
-#ifdef TA_ENTSYS
-		// Trigger entity's paintarget
-		if (targ->health > 0 && !targ->client && targ->paintarget && level.time > targ->pain_debounce_time) {
-			G_UseTargets2(targ, attacker, targ->paintarget);
-			// Limit how soon to call paintarget again
-			targ->pain_debounce_time = level.time+100; // ZTM: TODO: Set in entity
-		}
-#endif
-		return qtrue;
 	}
 
-	return qfalse;
 }
 
 

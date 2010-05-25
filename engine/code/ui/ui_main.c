@@ -44,7 +44,7 @@ static const char *MonthAbbrev[] = {
 
 
 static const char *skillLevels[] = {
-#ifdef TA_MISC // SRB2_SKILLS
+#ifdef TMNTMISC // rip off SRB2 skills...
   "Easy",
   "Normal",
   "Hard",
@@ -72,8 +72,8 @@ static const int numNetSources = sizeof(netSources) / sizeof(const char*);
 
 static const serverFilter_t serverFilters[] = {
 	{"All", "" },
-#ifdef TURTLEARENA
-	{"Turtle Arena", "" },
+#ifdef TMNT
+	{"TMNT Arena", "" },
 	{"Quake 3 Arena", "baseq3" },
 #else
 	{"Quake 3 Arena", "" },
@@ -87,7 +87,7 @@ static const serverFilter_t serverFilters[] = {
 
 static const char *teamArenaGameTypes[] = {
 	"FFA",
-#ifdef TA_MISC // tournament to duel
+#ifdef TMNTMISC // tournament to duel
 	"DUEL",
 #else
 	"TOURNAMENT",
@@ -97,7 +97,7 @@ static const char *teamArenaGameTypes[] = {
 	"CTF",
 	"1FCTF",
 	"OVERLOAD",
-	"HARVESTER",
+	"HARVESTER"
 	"TEAMTOURNAMENT"
 };
 
@@ -106,7 +106,7 @@ static int const numTeamArenaGameTypes = sizeof(teamArenaGameTypes) / sizeof(con
 
 static const char *teamArenaGameNames[] = {
 	"Free For All",
-#ifdef TA_MISC // tornament to duel
+#ifdef TMNTMISC
 	"Duel",
 #else
 	"Tournament",
@@ -141,14 +141,14 @@ static char* netnames[] = {
 };
 
 #ifndef MISSIONPACK
-#ifdef TURTLEARENA // BRANDING
-static char quake3worldMessage[] = "Visit turtlearena.googlecode.com - News, Updates";
+#ifdef TMNTMISC // Turtle Man: TODO: Add a url, etc?
+static char quake3worldMessage[] = "";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
 #endif
 #endif
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 static int gamecodetoui[] = {4,2,3,0,5,1,6};
 static int uitogamecode[] = {4,6,2,3,1,5,7};
 #endif
@@ -229,7 +229,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 	  case UI_DRAW_CONNECT_SCREEN:
 		  UI_DrawConnectScreen( arg0 );
 		  return 0;
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	  case UI_HASUNIQUECDKEY: // mod authors need to observe this
 	    return qtrue; // change this to qfalse for mods!
 #endif
@@ -248,7 +248,7 @@ void AssetCache( void ) {
 	//Assets.background = trap_R_RegisterShaderNoMip( ASSET_BACKGROUND );
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
 	uiInfo.uiDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	uiInfo.uiDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
 	uiInfo.uiDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	uiInfo.uiDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
@@ -976,11 +976,7 @@ void UI_LoadMenus(const char *menuFile, qboolean reset) {
 
 	handle = trap_PC_LoadSource( menuFile );
 	if (!handle) {
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Can't try default of we error first...
-		Com_Printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
-#else
 		trap_Error( va( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile ) );
-#endif
 		handle = trap_PC_LoadSource( "ui/menus.txt" );
 		if (!handle) {
 			trap_Error( va( S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!\n") );
@@ -1075,14 +1071,14 @@ static void UI_SetCapFragLimits(qboolean uiVars) {
 	}
 	if (uiVars) {
 		trap_Cvar_Set("ui_captureLimit", va("%d", cap));
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_Set("ui_scoreLimit", va("%d", frag));
 #else
 		trap_Cvar_Set("ui_fragLimit", va("%d", frag));
 #endif
 	} else {
 		trap_Cvar_Set("capturelimit", va("%d", cap));
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_Set("scorelimit", va("%d", frag));
 #else
 		trap_Cvar_Set("fraglimit", va("%d", frag));
@@ -1233,7 +1229,7 @@ static void UI_DrawTeamMember(rectDef_t *rect, float scale, vec4_t color, qboole
   Text_Paint(rect->x, rect->y, scale, color, text, 0, 0, textStyle);
 }
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 static void UI_DrawEffects(rectDef_t *rect, float scale, vec4_t color) {
 	UI_DrawHandlePic( rect->x, rect->y - 14, 128, 8, uiInfo.uiDC.Assets.fxBasePic );
 	UI_DrawHandlePic( rect->x + uiInfo.effectsColor * 16 + 8, rect->y - 16, 16, 12, uiInfo.uiDC.Assets.fxPic[uiInfo.effectsColor] );
@@ -1355,7 +1351,7 @@ static void UI_DrawPlayerModel(rectDef_t *rect) {
   	viewangles[ROLL]  = 0;
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info, model, head, team);
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
     UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info.weapon, qfalse );
 #else
     UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
@@ -1555,7 +1551,7 @@ static void UI_DrawOpponent(rectDef_t *rect) {
   	viewangles[ROLL]  = 0;
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info2, model, headmodel, "");
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
     UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info2.weapon, qfalse );
 #else
     UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
@@ -2002,7 +1998,7 @@ static void UI_DrawGLInfo(rectDef_t *rect, float scale, vec4_t color, int textSt
 
 	// build null terminated extension strings
   // TTimo: https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=399
-  // in Team Arena this was not directly crashing, but displaying a nasty broken shader right in the middle
+  // in TA this was not directly crashing, but displaying a nasty broken shader right in the middle
   // brought down the string size to 1024, there's not much that can be shown on the screen anyway
 	Q_strncpyz(buff, uiInfo.uiDC.glconfig.extensions_string, 1024);
 	eptr = buff;
@@ -2052,7 +2048,7 @@ static void UI_OwnerDraw(float x, float y, float w, float h, float text_x, float
       UI_DrawHandicap(&rect, scale, color, textStyle);
       break;
     case UI_EFFECTS:
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
       UI_DrawEffects(&rect, scale, color);
 #endif
       break;
@@ -2340,7 +2336,7 @@ static qboolean UI_Handicap_HandleKey(int flags, float *special, int key) {
   return qfalse;
 }
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 static qboolean UI_Effects_HandleKey(int flags, float *special, int key) {
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 
@@ -2394,14 +2390,9 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 		int oldCount = UI_MapCountByGameType(qtrue);
 
-#ifdef TURTLEARENA // Don't skip FFA
+#ifdef TMNTMISC // Removed skipping ffa and sp
 		if (key == K_MOUSE2) {
 			ui_gameType.integer--;
-#ifndef TA_SP // Don't skip SP
-			if (ui_gameType.integer == 2) {
-				ui_gameType.integer = 1;
-			} else
-#endif
 			if (ui_gameType.integer < 0) {
 				ui_gameType.integer = uiInfo.numGameTypes - 1;
 			}
@@ -2410,11 +2401,6 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
 			if (ui_gameType.integer >= uiInfo.numGameTypes) {
 				ui_gameType.integer = 0;
 			}
-#ifndef TA_SP // Don't skip SP
-			else if (ui_gameType.integer == 2) {
-				ui_gameType.integer = 3;
-			}
-#endif
 		}
 
 		if (uiInfo.gameTypes[ui_gameType.integer].gtEnum < GT_TEAM) {
@@ -2760,7 +2746,7 @@ static qboolean UI_OwnerDrawHandleKey(int ownerDraw, int flags, float *special, 
       return UI_Handicap_HandleKey(flags, special, key);
       break;
     case UI_EFFECTS:
-#ifdef TURTLEARENA // NO_COLOR_BAR
+#ifdef TMNTWEAPONS // NO_COLOR_BAR
       return qfalse;
 #else
       return UI_Effects_HandleKey(flags, special, key);
@@ -3065,7 +3051,7 @@ static void UI_StartSkirmish(qboolean next) {
 
 	k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
 
-#ifdef TA_SP // ZTM: TODO: Custom Game (skirmish) uses 2 while Single Player uses 1.
+#ifdef TMNTSP // Turtle Man: TODO: Custom Game (skirmish) uses 2 while Single Player uses 1.
 	trap_Cvar_Set("ui_singlePlayerActive", "2");
 #else
 	trap_Cvar_Set("ui_singlePlayerActive", "1");
@@ -3074,7 +3060,7 @@ static void UI_StartSkirmish(qboolean next) {
 	// set up sp overrides, will be replaced on postgame
 	temp = trap_Cvar_VariableValue( "capturelimit" );
 	trap_Cvar_Set("ui_saveCaptureLimit", va("%i", temp));
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 	temp = trap_Cvar_VariableValue( "scorelimit" );
 	trap_Cvar_Set("ui_saveScoreLimit", va("%i", temp));
 #else
@@ -3341,7 +3327,7 @@ static void UI_RunMenuScript(char **args) {
 			Controls_SetDefaults();
 			trap_Cvar_Set("com_introPlayed", "1" );
 			trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 		} else if (Q_stricmp(name, "getCDKey") == 0) {
 			char out[17];
 			trap_GetCDKey(buff, 17);
@@ -3359,7 +3345,6 @@ static void UI_RunMenuScript(char **args) {
 				Q_strncpyz(out, buff + 12, 5);
 				trap_Cvar_Set("cdkey4", out);
 			}
-
 		} else if (Q_stricmp(name, "verifyCDKey") == 0) {
 			buff[0] = '\0';
 			Q_strcat(buff, 1024, UI_Cvar_VariableString("cdkey1")); 
@@ -3645,7 +3630,7 @@ static void UI_RunMenuScript(char **args) {
 			if (String_Parse(args, &name2)) {
 				UI_Update(name2);
 			}
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 		} else if (Q_stricmp(name, "setPbClStatus") == 0) {
 			int stat;
 			if ( Int_Parse( args, &stat ) )
@@ -3990,7 +3975,7 @@ serverStatusCvar_t serverStatusCvars[] = {
 	{"version", ""},
 	{"protocol", ""},
 	{"timelimit", ""},
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 	{"scorelimit", ""},
 #else
 	{"fraglimit", ""},
@@ -4433,9 +4418,9 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 		return UI_SelectedMap(index, &actual);
 	} else if (feederID == FEEDER_SERVERS) {
 		if (index >= 0 && index < uiInfo.serverStatus.numDisplayServers) {
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 			int ping, game, punkbuster;
-#else // ZTM: No punkbuster
+#else // Turtle Man: No punkbuster
 			int ping, game;
 #endif
 			if (lastColumn != column || lastTime > uiInfo.uiDC.realTime + 5000) {
@@ -4481,7 +4466,7 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 					} else {
 						return Info_ValueForKey(info, "ping");
 					}
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 				case SORT_PUNKBUSTER:
 					punkbuster = atoi(Info_ValueForKey(info, "punkbuster"));
 					if ( punkbuster ) {
@@ -4739,7 +4724,7 @@ static qboolean Character_Parse(char **p) {
       uiInfo.characterList[uiInfo.characterCount].headImage = -1;
 			uiInfo.characterList[uiInfo.characterCount].imageName = String_Alloc(va("models/players/heads/%s/icon_default.tga", uiInfo.characterList[uiInfo.characterCount].name));
 
-	  /* ZTM: NOTE: About characters block in teaminfo.txt ...
+	  /* Turtle Man: NOTE: About characters block in teaminfo.txt ...
 	               In Team Arena they just list "male" and "female"
 	                   for the base model meaning James and Janet.
 	               I plan to just list the name (Casey/April/Raph/...), but it is left for compatiblity.
@@ -5114,7 +5099,7 @@ static void UI_BuildQ3Model_List( void )
 	char	scratch[256];
 	char*	dirptr;
 	char*	fileptr;
-#ifdef TA_SUPPORTEF
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
 	int		h;
 #endif
 	int		i;
@@ -5124,8 +5109,8 @@ static void UI_BuildQ3Model_List( void )
 
 	uiInfo.q3HeadCount = 0;
 
-#ifdef TA_SUPPORTEF
-  for (h = 0; h < MAX_UI_PLAYERDIRS && bg_playerDirs[h] != NULL; h++)
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
+  for (h = 0; h < 2 && bg_playerDirs[h] != NULL; h++)
   {
 	// iterate directory of all player models
 	numdirs = trap_FS_GetFileList(bg_playerDirs[h], "/", dirlist, 2048 );
@@ -5144,7 +5129,7 @@ static void UI_BuildQ3Model_List( void )
 			continue;
 			
 		// iterate all skin files in directory
-#ifdef TA_SUPPORTEF
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
 		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "", filelist, 2048 );
 #else
@@ -5182,7 +5167,7 @@ static void UI_BuildQ3Model_List( void )
 				if (!dirty) {
 					Com_sprintf( uiInfo.q3HeadNames[uiInfo.q3HeadCount], sizeof(uiInfo.q3HeadNames[uiInfo.q3HeadCount]), "%s", scratch);
 					uiInfo.q3HeadIcons[uiInfo.q3HeadCount++] =
-#ifdef TA_SUPPORTEF
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
 							trap_R_RegisterShaderNoMip(va("%s/%s/%s",bg_playerDirs[h],dirptr,skinname));
 #else
 							trap_R_RegisterShaderNoMip(va("models/players/%s/%s",dirptr,skinname));
@@ -5192,7 +5177,7 @@ static void UI_BuildQ3Model_List( void )
 
 		}
 	}	
-#ifdef TA_SUPPORTEF
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF
   }
 #endif
 }
@@ -5212,7 +5197,7 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	UI_RegisterCvars();
 	UI_InitMemory();
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	BG_InitWeaponInfo();
 #endif
 
@@ -5332,7 +5317,7 @@ void _UI_Init( qboolean inGameLoad ) {
 	UI_LoadBots();
 
 	// sets defaults for ui temp cvars
-#ifndef TURTLEARENA // NO_COLOR_BAR
+#ifndef TMNTWEAPONS // NO_COLOR_BAR
 	uiInfo.effectsColor = gamecodetoui[(int)trap_Cvar_VariableValue("color1")-1];
 #endif
 	uiInfo.currentCrosshair = (int)trap_Cvar_VariableValue("cg_drawCrosshair");
@@ -5456,15 +5441,15 @@ void _UI_SetActiveMenu( uiMenuCommand_t menu ) {
 			trap_Key_SetCatcher( KEYCATCH_UI );
       Menus_ActivateByName("team");
 		  return;
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	  case UIMENU_NEED_CD:
-			// no cd check in Team Arena
+			// no cd check in TA
 			//trap_Key_SetCatcher( KEYCATCH_UI );
       //Menus_ActivateByName("needcd");
 		  //UI_ConfirmMenu( "Insert the CD", NULL, NeedCDAction );
 		  return;
 	  case UIMENU_BAD_CD_KEY:
-			// no cd check in Team Arena
+			// no cd check in TA
 			//trap_Key_SetCatcher( KEYCATCH_UI );
       //Menus_ActivateByName("badcd");
 		  //UI_ConfirmMenu( "Bad CD Key", NULL, NeedCDKeyAction );
@@ -5794,6 +5779,9 @@ vmCvar_t	ui_spAwards;
 vmCvar_t	ui_spVideos;
 vmCvar_t	ui_spSkill;
 
+#ifdef TMNTSP
+vmCvar_t	ui_spStage;
+#endif
 vmCvar_t	ui_spSelection;
 
 vmCvar_t	ui_browserMaster;
@@ -5824,7 +5812,7 @@ vmCvar_t	ui_server14;
 vmCvar_t	ui_server15;
 vmCvar_t	ui_server16;
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 vmCvar_t	ui_cdkeychecked;
 #endif
 
@@ -5868,7 +5856,7 @@ vmCvar_t	ui_scoreExcellents;
 vmCvar_t	ui_scoreCaptures;
 vmCvar_t	ui_scoreDefends;
 vmCvar_t	ui_scoreAssists;
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS
 vmCvar_t	ui_scoreGauntlets;
 #endif
 vmCvar_t	ui_scoreScore;
@@ -5892,21 +5880,21 @@ vmCvar_t	ui_realWarmUp;
 vmCvar_t	ui_serverStatusTimeOut;
 
 static cvarTable_t		cvarTable[] = {
-#ifdef NOTRATEDM // frag to score
-	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "1000", CVAR_ARCHIVE },
+#ifdef TMNTMISC // frag to score
+	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "20", CVAR_ARCHIVE },
 #else
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 #endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
-#ifdef NOTRATEDM // frag to score
-	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
+#ifdef TMNTMISC // frag to score and changed KO limit to 3
+	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "3", CVAR_ARCHIVE },
 #else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
 #endif
 	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "15", CVAR_ARCHIVE },
 
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 	{ &ui_team_fraglimit, "ui_team_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_team_fraglimit, "ui_team_fraglimit", "0", CVAR_ARCHIVE },
@@ -5914,25 +5902,24 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_team_timelimit, "ui_team_timelimit", "20", CVAR_ARCHIVE },
 	{ &ui_team_friendly, "ui_team_friendly",  "1", CVAR_ARCHIVE },
 
-#ifdef TA_MISC
-	{ &ui_ctf_capturelimit, "ui_ctf_capturelimit", "5", CVAR_ARCHIVE },
-#else
 	{ &ui_ctf_capturelimit, "ui_ctf_capturelimit", "8", CVAR_ARCHIVE },
-#endif
 	{ &ui_ctf_timelimit, "ui_ctf_timelimit", "30", CVAR_ARCHIVE },
 	{ &ui_ctf_friendly, "ui_ctf_friendly",  "0", CVAR_ARCHIVE },
 
 	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM },
 	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM },
-	{ &ui_spScores1, "g_spScores1", "", CVAR_ARCHIVE },
-	{ &ui_spScores2, "g_spScores2", "", CVAR_ARCHIVE },
-	{ &ui_spScores3, "g_spScores3", "", CVAR_ARCHIVE },
-	{ &ui_spScores4, "g_spScores4", "", CVAR_ARCHIVE },
-	{ &ui_spScores5, "g_spScores5", "", CVAR_ARCHIVE },
-	{ &ui_spAwards, "g_spAwards", "", CVAR_ARCHIVE },
-	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE },
+	{ &ui_spScores1, "g_spScores1", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores2, "g_spScores2", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores3, "g_spScores3", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores4, "g_spScores4", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores5, "g_spScores5", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spAwards, "g_spAwards", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE },
 
+#ifdef TMNTSP
+	{ &ui_spStage, "ui_spStage", "0", CVAR_ROM },
+#endif
 	{ &ui_spSelection, "ui_spSelection", "", CVAR_ROM },
 
 	{ &ui_browserMaster, "ui_browserMaster", "0", CVAR_ARCHIVE },
@@ -5942,11 +5929,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_browserShowEmpty, "ui_browserShowEmpty", "1", CVAR_ARCHIVE },
 
 	{ &ui_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
-#ifdef TA_DATA
-	{ &ui_drawCrosshair, "cg_drawCrosshair", "1", CVAR_ARCHIVE },
-#else
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
-#endif
 	{ &ui_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &ui_marks, "cg_marks", "1", CVAR_ARCHIVE },
 
@@ -5966,13 +5949,13 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_server14, "server14", "", CVAR_ARCHIVE },
 	{ &ui_server15, "server15", "", CVAR_ARCHIVE },
 	{ &ui_server16, "server16", "", CVAR_ARCHIVE },
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	{ &ui_cdkeychecked, "ui_cdkeychecked", "0", CVAR_ROM },
 #endif
 	{ &ui_new, "ui_new", "0", CVAR_TEMP },
 	{ &ui_debug, "ui_debug", "0", CVAR_TEMP },
 	{ &ui_initialized, "ui_initialized", "0", CVAR_TEMP },
-#ifdef TURTLEARENA // DEFAULT_TEAMS
+#ifdef TMNT // DEFAULT_TEAMS
 	{ &ui_teamName, "ui_teamName", "Sais", CVAR_ARCHIVE },
 	{ &ui_opponentName, "ui_opponentName", "Katanas", CVAR_ARCHIVE },
 	{ &ui_redteam, "ui_redteam", "Sais", CVAR_ARCHIVE },
@@ -6011,8 +5994,8 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_lastServerRefresh_1, "ui_lastServerRefresh_1", "", CVAR_ARCHIVE},
 	{ &ui_lastServerRefresh_2, "ui_lastServerRefresh_2", "", CVAR_ARCHIVE},
 	{ &ui_lastServerRefresh_3, "ui_lastServerRefresh_3", "", CVAR_ARCHIVE},
-#ifdef TA_SP
-	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
+#ifdef TMNTSP
+	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_ROM},
 #else
 	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", 0},
 #endif
@@ -6022,7 +6005,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_scoreCaptures, "ui_scoreCaptures", "0", CVAR_ARCHIVE},
 	{ &ui_scoreDefends, "ui_scoreDefends", "0", CVAR_ARCHIVE},
 	{ &ui_scoreAssists, "ui_scoreAssists", "0", CVAR_ARCHIVE},
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS
 	{ &ui_scoreGauntlets, "ui_scoreGauntlets", "0",CVAR_ARCHIVE},
 #endif
 	{ &ui_scoreScore, "ui_scoreScore", "0", CVAR_ARCHIVE},
@@ -6037,7 +6020,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_captureLimit, "ui_captureLimit", "5", 0},
 	{ &ui_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
 	{ &ui_bigFont, "ui_bigFont", "0.4", CVAR_ARCHIVE},
-#ifdef TURTLEARENA // DEFAULT_PLAYER
+#ifdef TMNT // DEFAULT_PLAYER
 	{ &ui_findPlayer, "ui_findPlayer", "Raph", CVAR_ARCHIVE},
 #else
 	{ &ui_findPlayer, "ui_findPlayer", "Sarge", CVAR_ARCHIVE},

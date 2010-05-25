@@ -123,10 +123,10 @@ static void UI_Mods_LoadMods( void ) {
 	s_mods.descriptionPtr = s_mods.description;
 	s_mods.fs_gamePtr = s_mods.fs_game;
 
-	// always start off with BASEGAME
+	// always start off with baseq3
 	s_mods.list.numitems = 1;
-#if defined TURTLEARENA || (defined STANDALONE && defined IOQ3ZTM)
-	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Turtle Arena";
+#ifdef TMNT
+	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "TMNT Arena";
 #else
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Quake III Arena";
 #endif
@@ -164,7 +164,7 @@ static void UI_Mods_MenuInit( void ) {
 	s_mods.banner.generic.x			= 320;
 	s_mods.banner.generic.y			= 16;
 	s_mods.banner.string			= "MODS";
-	s_mods.banner.color				= text_banner_color;
+	s_mods.banner.color				= color_white;
 	s_mods.banner.style				= UI_CENTER;
 
 	s_mods.framel.generic.type		= MTYPE_BITMAP;

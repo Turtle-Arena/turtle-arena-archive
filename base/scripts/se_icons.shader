@@ -1,4 +1,4 @@
-// ZTM: Based on OpenArena -> iconsprites.shader
+// Turtle Man: Based on OpenArena -> iconsprites.shader
 // just simple icon shaders needed
 
 // HOLDABLE ICONS
@@ -90,6 +90,14 @@ icons/invis
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
+icons/regen
+{
+	nopicmip
+	{
+		map icons/regen.png
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
 icons/flight
 {
 	nopicmip
@@ -108,7 +116,7 @@ icons/invul
 	}
 }
 
-// MEDAL ICONS -- ZTM: Move to se_sprites.shader ?
+// MEDAL ICONS -- Turtle Man: Move to se_sprites.shader ?
 medal_assist
 {
 	nopicmip
@@ -173,11 +181,11 @@ icons/iconw_sais
 	}
 }
 
-icons/iconw_nunchucks
+icons/iconw_nunchuks
 {
 	nopicmip
 	{
-		map icons/iconw_nunchucks.png
+		map icons/iconw_nunchuks.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }

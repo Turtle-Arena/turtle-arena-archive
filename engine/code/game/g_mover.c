@@ -319,47 +319,15 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 	for ( e = 0 ; e < listedEntities ; e++ ) {
 		check = &g_entities[ entityList[ e ] ];
 
-#if defined MISSIONPACK || defined TA_WEAPSYS
-		if ( check->s.eType == ET_MISSILE
-#ifdef TA_WEAPSYS // GRAPPLE_MOVE
-			|| check->s.eType == ET_GRAPPLE
-#endif
-			)
-		{
-#ifdef TA_WEAPSYS
-			if (bg_projectileinfo[check->s.weapon].stickOnImpact
-				// GRAPPLE_MOVE
-				|| check->s.eType == ET_GRAPPLE)
-#else
+#if defined MISSIONPACK && !defined TMNTWEAPONS
+		if ( check->s.eType == ET_MISSILE ) {
 			// if it is a prox mine
-			if ( !strcmp(check->classname, "prox mine") )
-#endif
-			{
+			if ( !strcmp(check->classname, "prox mine") ) {
 				// if this prox mine is attached to this mover try to move it with the pusher
 				if ( check->enemy == pusher ) {
 					if (!G_TryPushingProxMine( check, pusher, move, amove )) {
 						//explode
 						check->s.loopSound = 0;
-#ifdef TA_WEAPSYS
-						if (bg_projectileinfo[check->s.weapon].explosionType == PE_PROX) {
-							G_AddEvent( check, EV_PROJECTILE_TRIGGER, 0 );
-							if (check->activator) {
-								G_FreeEntity(check->activator);
-								check->activator = NULL;
-							}
-						}
-
-						// GRAPPLE_MOVE
-						if (bg_projectileinfo[check->s.weapon].grappling
-							&& check->parent && check->parent->client && check->parent->client->hook == check)
-						{
-							Weapon_HookFree(check);
-						}
-						else
-						{
-							G_ExplodeMissile(check);
-						}
-#else
 						G_AddEvent( check, EV_PROXIMITY_MINE_TRIGGER, 0 );
 						G_ExplodeMissile(check);
 						if (check->activator) {
@@ -367,7 +335,6 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 							check->activator = NULL;
 						}
 						//G_Printf("prox mine explodes\n");
-#endif
 					}
 				}
 				else {
@@ -375,26 +342,6 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 					if (!G_CheckProxMinePosition( check )) {
 						//explode
 						check->s.loopSound = 0;
-#ifdef TA_WEAPSYS
-						if (bg_projectileinfo[check->s.weapon].explosionType == PE_PROX) {
-							G_AddEvent( check, EV_PROJECTILE_TRIGGER, 0 );
-							if (check->activator) {
-								G_FreeEntity(check->activator);
-								check->activator = NULL;
-							}
-						}
-
-						// GRAPPLE_MOVE
-						if (bg_projectileinfo[check->s.weapon].grappling
-							&& check->parent && check->parent->client && check->parent->client->hook == check)
-						{
-							Weapon_HookFree(check);
-						}
-						else
-						{
-							G_ExplodeMissile(check);
-						}
-#else
 						G_AddEvent( check, EV_PROXIMITY_MINE_TRIGGER, 0 );
 						G_ExplodeMissile(check);
 						if (check->activator) {
@@ -402,7 +349,6 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 							check->activator = NULL;
 						}
 						//G_Printf("prox mine explodes\n");
-#endif
 					}
 				}
 				continue;
@@ -411,10 +357,10 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 #endif
 		// only push items and players
 		if ( check->s.eType != ET_ITEM && check->s.eType != ET_PLAYER &&
-#ifdef TA_ENTSYS // MISC_OBJECT
+#ifdef TMNTENTSYS // MISC_OBJECT
 			check->s.eType != ET_MISCOBJECT &&
 #endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 			check->s.eType != ET_NPC &&
 #endif
 			!check->physicsObject ) {
@@ -764,215 +710,6 @@ void Use_BinaryMover( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 }
 
 
-#ifdef TA_ENTSYS // BREAKABLE
-/*
-================
-G_SeenByHumans
-
-Based on Smokin' Guns G_BreakableRespawn
-================
-*/
-qboolean G_SeenByHumans( gentity_t *ent )
-{
-	gentity_t	*player;
-	gclient_t	*client;
-	int			i;
-	const float fov = 100;
-	float		diff;
-	float		angle;
-	vec3_t		angles;
-	vec3_t		dir;
-	vec3_t		eye;
-	qboolean	cont;
-	int			j;
-	vec3_t		origin;
-
-	if (ent->s.eType == ET_MISCOBJECT)
-	{
-		VectorCopy(ent->r.currentOrigin, origin);
-	}
-	else
-	{
-		vec3_t pos1, pos2;
-
-        // Tequila comment: set breakable center as origin for G_BreakableRespawn needs
-        VectorSubtract(ent->r.absmax, ent->r.absmin, pos1);
-        VectorScale(pos1, 0.5f, pos2);
-        VectorAdd(pos2, ent->r.absmin, origin);
-	}
-
-	// cycle through all players and see if the breakable respawn would be visible to them
-	for (i = 0; i < level.maxclients; i++) {
-		player = &g_entities[i];
-		client = &level.clients[i];
-
-		if (client->pers.connected != CON_CONNECTED)
-			continue;
-
-		// if it's too near abort
-		cont = (Distance(client->ps.origin, origin) >= 300);
-
-		if (cont)
-		{
-			// first check if player could be stuck in the breakable
-			if ( player->r.absmin[0] > ent->r.absmax[0]
-				|| player->r.absmin[1] > ent->r.absmax[1]
-				|| player->r.absmin[2] > ent->r.absmax[2]
-				|| player->r.absmax[0] < ent->r.absmin[0]
-				|| player->r.absmax[1] < ent->r.absmin[1]
-				|| player->r.absmax[2] < ent->r.absmin[2] ) {
-				cont = qtrue;
-			} else {
-				cont = qfalse;
-			}
-		}
-
-		// Process field of vision tests
-		if (cont) // && !g_forcebreakrespawn.integer
-		{
-			// Tequila comment: Minor server optimization, don't check if breakable is in a bot FOV
-			// They really don't care to "see" a breakable respawn, so we won't delay the respawn
-			// because of bot proximity.
-			if (player->r.svFlags & SVF_BOT)
-				continue;
-
-			// check if its in field of vision
-			VectorCopy(client->ps.origin, eye);
-			eye[2] += client->ps.viewheight;
-
-			VectorSubtract(origin, eye, dir);
-			vectoangles(dir, angles);
-
-			cont = qfalse;
-
-			for (j = 0; j < 2; j++) {
-				angle = AngleMod(client->ps.viewangles[j]);
-				angles[j] = AngleMod(angles[j]);
-				diff = fabs(angles[j] - angle);
-
-				if (diff > 180.0)
-					diff -= 360.0;
-
-				// if not in field of vision continue;
-				if ( fabs(diff) > fov/2 ) {
-					cont = qtrue;
-					break;
-				}
-			}
-		}
-
-		if (!cont) {
-			// it might be seen
-			return qtrue;
-		}
-	}
-
-	// now while nobody can see it respawn the breakable
-	return qfalse;
-}
-
-/*
-================
-G_BreakableRespawn
-================
-*/
-void G_BreakableRespawn( gentity_t *self )
-{
-	// Don't let the humans see it respawn
-	if (G_SeenByHumans(self))
-	{
-		// Defer for a max of the total respawn time
-		if (self->random < self->wait)
-		{
-			self->random++;
-
-			// Try again later
-			self->nextthink = level.time + 1000;
-			self->think = G_BreakableRespawn;
-			return;
-		}
-	}
-	self->random = 0; // clear defer count
-
-	// Kill players so they don't get stuck
-	G_KillBox(self);
-
-	// Remove dropped item
-	if (self->enemy) {
-		G_FreeEntity(self->enemy);
-	}
-
-	self->health = self->splashRadius;
-
-	VectorCopy(self->pos1, self->s.origin); // SMOKIN_GUNS
-
-	trap_LinkEntity(self);
-}
-
-/*
-================
-G_BreakableDie
-================
-*/
-void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath )
-{
-	gentity_t *target;
-
-	// If a stickOnImpact projectile is stuck into this breakable have it fall!
-	for (target = g_entities; target < &g_entities[level.num_entities]; target++)
-	{
-		if (target->s.eType == ET_MISSILE && (target->count & 2) && target->enemy == self)
-		{
-			target->count &= ~2; // Remove impact flag
-			target->s.pos.trType = TR_GRAVITY;
-			target->s.pos.trTime = level.time;
-		}
-	}
-
-	G_UseTargets(self, attacker);
-
-	// Spawn item
-	if (self->message)
-	{
-		vec3_t origin, pos1, pos2;
-
-		// Tequila comment: set breakable center as origin for G_BreakableRespawn needs
-		VectorSubtract(self->r.absmax, self->r.absmin, pos1);
-		VectorScale(pos1, 0.5f, pos2);
-		VectorAdd(pos2, self->r.absmin, origin);
-
-		if (Q_stricmp(self->message, "weapon_random") == 0) {
-			// weapon_random: Change item!
-			if (!(self->s.eFlags & EF_VOTED) && !self->item) {
-				self->item = G_RandomWeaponItem(self, self->spawnflags>>7);
-			}
-		} else {
-			self->item = BG_FindItemForClassname(self->message);
-		}
-
-		if (self->item) {
-			self->enemy = LaunchItem(self->item, origin, vec3_origin);
-		} else {
-			self->enemy = NULL;
-		}
-	}
-
-	// if respawn
-	if (self->wait > 0)
-	{
-		// Respawn after X seconds
-		self->nextthink = level.time + (self->wait * 1000);
-		self->think = G_BreakableRespawn;
-		trap_UnlinkEntity(self);
-	}
-	else
-	{
-		// Good bye!
-		G_FreeEntity(self);
-	}
-}
-#endif
-
 
 /*
 ================
@@ -1051,42 +788,11 @@ void InitMover( gentity_t *ent ) {
 		ent->s.pos.trDuration = 1;
 	}
 
-#ifdef TA_ENTSYS // BREAKABLE
-	// Setup breakable ET_MOVER
+#ifdef TMNTENTSYS // BREAKABLE
 	if (ent->health > 0)
 	{
-#ifdef TA_MISC // MATERIALS
-		char *mat;
-		int i;
-#endif
-
-		// No not constant random weapon...
-		if (!(ent->spawnflags & 8<<7))
-		{
-			// Change weapons on respawn
-			ent->s.eFlags |= EF_VOTED;
-		}
-
-		// Save health for respawning
-		ent->splashRadius = ent->health;
-
 		ent->takedamage = qtrue;
-		ent->die = G_BreakableDie;
-		// ZTM: TODO: Set damage?
-
-		ent->s.time2 = -1; // auto surfaceFlags
-
-#ifdef TA_MISC // MATERIALS
-		if( G_SpawnString( "material", NULL, &mat ) && mat && strlen(mat)) {
-			ent->s.time2 = 0;
-			for ( i = 1; i < NUM_MATERIAL_TYPES; i++)
-			{
-				if ( strstr( mat, materialInfo[i].name ) != NULL ) {
-					ent->s.time2 |= materialInfo[i].surfaceFlag;
-				}
-			}
-		}
-#endif
+		// TODO: Set damage and pain?
 	}
 #endif
 }
@@ -1111,7 +817,7 @@ Blocked_Door
 void Blocked_Door( gentity_t *ent, gentity_t *other ) {
 	// remove anything other than a client
 	if ( !other->client
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		&& other->s.eType != ET_NPC
 #endif
 	) {
@@ -1255,28 +961,15 @@ NOMONSTER	monsters will not trigger this door
 "color"		constantLight color
 "light"		constantLight radius
 "health"	if set, the door must be shot open
-#ifdef IOQ3ZTM
-"noiseStart"door start move sound (default: sound/movers/doors/dr1_strt.wav)
-"noiseEnd"	door end move sound (default: sound/movers/doors/dr1_end.wav)
-#endif
 */
 void SP_func_door (gentity_t *ent) {
 	vec3_t	abs_movedir;
 	float	distance;
 	vec3_t	size;
 	float	lip;
-#ifdef IOQ3ZTM // Allow per-entity door sounds
-	char *sound;
 
-	G_SpawnString( "noiseStart", "sound/movers/doors/dr1_strt.wav", &sound );
-	ent->sound1to2 = ent->sound2to1 = G_SoundIndex(sound);
-
-	G_SpawnString( "noiseEnd", "sound/movers/doors/dr1_end.wav", &sound );
-	ent->soundPos1 = ent->soundPos2 = G_SoundIndex(sound);
-#else
 	ent->sound1to2 = ent->sound2to1 = G_SoundIndex("sound/movers/doors/dr1_strt.wav");
 	ent->soundPos1 = ent->soundPos2 = G_SoundIndex("sound/movers/doors/dr1_end.wav");
-#endif
 
 	ent->blocked = Blocked_Door;
 
@@ -1322,7 +1015,7 @@ void SP_func_door (gentity_t *ent) {
 	ent->nextthink = level.time + FRAMETIME;
 
 	if ( ! (ent->flags & FL_TEAMSLAVE ) ) {
-#ifdef TA_ENTSYS // BREAKABLE // Doors are not killable...
+#ifdef TMNTENTSYS // BREAKABLE // Doors are not killable...
 		if (ent->health)
 		{
 			ent->takedamage = qtrue;
@@ -1567,7 +1260,7 @@ void SP_func_button( gentity_t *ent ) {
 	if (ent->health) {
 		// shootable button
 		ent->takedamage = qtrue;
-#ifdef TA_ENTSYS // BREAKABLE // Buttons are not killable...
+#ifdef TMNTENTSYS // BREAKABLE // Buttons are not killable...
 		ent->health = -1;
 #endif
 	} else {
@@ -1611,9 +1304,6 @@ Reached_Train
 ===============
 */
 void Reached_Train( gentity_t *ent ) {
-#ifdef TA_PATHSYS
-	G_ReachedPath(ent, qfalse);
-#else
 	gentity_t		*next;
 	float			speed;
 	vec3_t			move;
@@ -1681,7 +1371,6 @@ void Reached_Train( gentity_t *ent ) {
 		ent->think = Think_BeginMoving;
 		ent->s.pos.trType = TR_STATIONARY;
 	}
-#endif
 }
 
 
@@ -1693,10 +1382,10 @@ Link all the corners together
 ===============
 */
 void Think_SetupTrainTargets( gentity_t *ent ) {
-#ifdef TA_PATHSYS
-	if (G_SetupPath(ent, ent->target) != PATH_ERROR) {
-		// start the train moving from the first corner
-		G_ReachedPath(ent, qfalse);
+#ifdef TMNTPATHSYS
+	if (G_SetupPath(ent, ent->target) == PATH_ERROR)
+	{
+		return;
 	}
 #else
 	gentity_t		*path, *next, *start;
@@ -1735,10 +1424,10 @@ void Think_SetupTrainTargets( gentity_t *ent ) {
 
 		path->nextTrain = next;
 	}
+#endif
 
 	// start the train moving from the first corner
 	Reached_Train( ent );
-#endif
 }
 
 
@@ -1821,19 +1510,13 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 */
 void SP_func_static( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
-#ifdef IOQ3TM // BREAKABLE
-	VectorCopy( ent->s.origin, ent->pos1);
-	VectorCopy( ent->s.origin, ent->pos2);
-#endif
 	InitMover( ent );
-#ifdef IOQ3TM // BREAKABLE
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
-#endif
 }
 
 
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TMNTENTSYS // BREAKABLE
 /*
 ===============================================================================
 
@@ -1847,6 +1530,7 @@ All movers (less func_door and func_button) can be killed,
 "paintarget" Trigers target ent on pain.
 * /
 
+Turtle Man: TODO: Support STY:EF func_breakable entity?
 ===============================================================================
 */
 
@@ -1861,9 +1545,9 @@ It's like func_static, except that bots will attack it.
 */
 void SP_func_breakable( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
-	VectorCopy( ent->s.origin, ent->pos1);
-	VectorCopy( ent->s.origin, ent->pos2);
 	InitMover( ent );
+	VectorCopy( ent->s.origin, ent->s.pos.trBase );
+	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 }
 #endif
 
@@ -2020,47 +1704,3 @@ void SP_func_pendulum(gentity_t *ent) {
 	ent->s.apos.trType = TR_SINE;
 	ent->s.apos.trDelta[2] = speed;
 }
-
-#ifdef TA_ENTSYS // FUNC_USE
-/*
-===============================================================================
-
-USE
-
-===============================================================================
-*/
-
-void multi_trigger( gentity_t *ent, gentity_t *activator );
-
-void Use_FuncUse( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
-	multi_trigger( ent, activator );
-}
-
-/*QUAKED func_use (.5 .5 .5) ? RED_ONLY BLUE_ONLY TECH
-"wait" : Seconds between triggerings, 0.5 default, -1 = one time only.
-"random"	wait variance, default is 0
-"model2"	.md3 model to also draw
-"color"		constantLight color
-"light"		constantLight radius
-Variable sized repeatable trigger.  Must be targeted at one or more entities.
-so, the basic time between firing is a random time between
-(wait - random) and (wait + random)
-*/
-void SP_func_use( gentity_t *ent ) {
-	G_SpawnFloat( "wait", "0.5", &ent->wait );
-	G_SpawnFloat( "random", "0", &ent->random );
-
-	if ( ent->random >= ent->wait && ent->wait >= 0 ) {
-		ent->random = ent->wait - FRAMETIME;
-		G_Printf( "trigger_multiple has random >= wait\n" );
-	}
-
-	trap_SetBrushModel( ent, ent->model );
-	ent->r.contents = CONTENTS_SOLID;		// replaces the -1 from trap_SetBrushModel
-	InitMover( ent );
-	VectorCopy( ent->s.origin, ent->s.pos.trBase );
-	VectorCopy( ent->s.origin, ent->r.currentOrigin );
-
-	ent->use = Use_FuncUse;
-}
-#endif

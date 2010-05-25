@@ -42,7 +42,7 @@ extern "C" {
  *  In order to use these functions, SDL_Init() must have been called
  *  with the SDL_INIT_CDROM flag.  This causes SDL to scan the system
  *  for CD-ROM drives, and load appropriate drivers.
- */
+*/
 
 /** The maximum number of CD-ROM tracks on a disk */
 #define SDL_MAX_TRACKS	99
@@ -119,7 +119,7 @@ extern DECLSPEC int SDLCALL SDL_CDNumDrives(void);
  *   - "/dev/cdrom"
  *   - "E:"
  *   - "/dev/disk/ide/1/master"
- */
+*/
 extern DECLSPEC const char * SDLCALL SDL_CDName(int drive);
 
 /**
@@ -128,14 +128,14 @@ extern DECLSPEC const char * SDLCALL SDL_CDName(int drive);
  *  becomes the default CD used when other CD functions are passed a NULL
  *  CD-ROM handle.
  *  Drives are numbered starting with 0.  Drive 0 is the system default CD-ROM.
- */
+*/
 extern DECLSPEC SDL_CD * SDLCALL SDL_CDOpen(int drive);
 
 /**
  *  This function returns the current status of the given drive.
  *  If the drive has a CD in it, the table of contents of the CD and current
  *  play position of the CD will be stored in the SDL_CD structure.
- */
+*/
 extern DECLSPEC CDstatus SDLCALL SDL_CDStatus(SDL_CD *cdrom);
 
 /**
@@ -159,14 +159,14 @@ extern DECLSPEC CDstatus SDLCALL SDL_CDStatus(SDL_CD *cdrom);
  *      @endcode
  *
  *  @return This function returns 0, or -1 if there was an error.
- */
+*/
 extern DECLSPEC int SDLCALL SDL_CDPlayTracks(SDL_CD *cdrom,
 		int start_track, int start_frame, int ntracks, int nframes);
 
 /**
  *  Play the given CD starting at 'start' frame for 'length' frames.
  *  @return It returns 0, or -1 if there was an error.
- */
+*/
 extern DECLSPEC int SDLCALL SDL_CDPlay(SDL_CD *cdrom, int start, int length);
 
 /** Pause play

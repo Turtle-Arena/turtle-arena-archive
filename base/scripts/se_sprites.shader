@@ -1,10 +1,10 @@
 // Sprite shaders.
 // A sprite is a image in the 3D world that always faces the camera.
 
-// ZTM: Drawn over player's head when in console or chat mode.
+// Turtle Man: Drawn over player's head when in console or chat mode.
 sprites/talkBalloon
 {
-	entityMergable
+	entityMergable // Turtle Man: Should be okay.
 	{
 		map sprites/talkBalloon.png
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
@@ -37,7 +37,7 @@ smokePuff
 	}
 }
 
-// ZTM: Drawn at player's feet when player has speed powerups
+// Turtle Man: Drawn at player's feet when player has speed powerups
 hasteSmokePuff
 {
 	cull none
@@ -51,7 +51,7 @@ hasteSmokePuff
 	}
 }
 
-// ZTM: Empty transparent image.
+// Turtle Man: Empty transparent image.
 smokePuffRagePro
 {
 	cull none
@@ -62,12 +62,12 @@ smokePuffRagePro
 	}
 }
 
-// ZTM:
+// Turtle Man:
 // Used for breath, g_enableBreath 1 in console
 // or "enableBreath" "1" in worldspawn
 shotgunSmokePuff
 {
-	entityMergable // ZTM: Should be okay.
+	entityMergable // Turtle Man: Should be okay.
 	cull none
 	{
 		map gfx/misc/smokepuff2b.png
@@ -92,10 +92,10 @@ nailtrail
 
 flareShader
 {
-	//entityMergable // ZTM: Should be okay?
+	//entityMergable // Turtle Man: Should be okay?
 	cull none
 	{
-		map gfx/misc/flare.tga
+		map gfx/misc/flare.jpg
 		blendFunc GL_ONE GL_ONE
 		rgbGen vertex
 	}
@@ -103,7 +103,7 @@ flareShader
 
 sun
 {
-	//entityMergable // ZTM: Should be okay?
+	//entityMergable // Turtle Man: Should be okay?
 	cull none
 	{
 		map gfx/misc/sun.jpg
@@ -112,10 +112,10 @@ sun
 	}
 }
 
-// ZTM: Used in Team modes, it is above your teammate's head.
+// Turtle Man: Used in Team modes, it is above your teammate's head.
 sprites/team_red
 {
-	entityMergable
+	entityMergable // Turtle Man: Should be okay.
 	nomipmaps
 	nopicmip
 	{
@@ -126,23 +126,11 @@ sprites/team_red
 
 sprites/team_blue
 {
-	entityMergable
+	entityMergable // Turtle Man: Should be okay.
 	nomipmaps
 	nopicmip
 	{
 		map sprites/friend_b.png
-		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-	}
-}
-
-// Shows over the target entity
-sprites/target
-{
-	entityMergable
-	nomipmaps
-	nopicmip
-	{
-		map sprites/target.png
 		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -158,7 +146,7 @@ sprites/plasma1
 		tcMod rotate 931
 	}
 
-	// ZTM: Looks cool.
+	// Turtle Man: Looks cool.
 	{
 		clampmap sprites/plasmaa.png
 		blendfunc GL_ONE GL_ONE

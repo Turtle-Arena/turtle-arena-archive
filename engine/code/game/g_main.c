@@ -95,27 +95,24 @@ vmCvar_t	g_obeliskRespawnDelay;
 vmCvar_t	g_cubeTimeout;
 vmCvar_t	g_redteam;
 vmCvar_t	g_blueteam;
-#ifndef TA_SP
+#ifndef TMNTSP
 vmCvar_t	g_singlePlayer;
 #endif
 vmCvar_t	g_enableDust;
 vmCvar_t	g_enableBreath;
-#endif
-#if defined MISSIONPACK || defined TA_WEAPSYS
+#ifndef TMNTWEAPONS // missionpack
 vmCvar_t	g_proxMineTimeout;
 #endif
-#ifdef TA_SP
+#endif
+#ifdef TMNTSP
 vmCvar_t	g_singlePlayer;
 vmCvar_t	g_spSaveData; // Used to save data between levels.
 //vmCvar_t	g_spSaveDataNet[MAX_CLIENTS]; // Save data for all clients
 vmCvar_t	g_saveVersions;
 vmCvar_t	g_saveTypes;
 #endif
-#ifdef TURTLEARENA // POWERS // PW_FLASHING
+#ifdef TMNT // POWERS // PW_FLASHING
 vmCvar_t	g_teleportFluxTime;
-#endif
-#ifdef IOQ3ZTM // LASERTAG
-vmCvar_t	g_laserTag;
 #endif
 
 static cvarTable_t		gameCvarTable[] = {
@@ -136,8 +133,8 @@ static cvarTable_t		gameCvarTable[] = {
 
 	// change anytime vars
 	{ &g_dmflags, "dmflags", "0", CVAR_SERVERINFO | CVAR_ARCHIVE, 0, qtrue  },
-#ifdef NOTRATEDM // frag to score
-	{ &g_fraglimit, "scorelimit", "1000", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
+#ifdef TMNTMISC // frag to score
+	{ &g_fraglimit, "scorelimit", "20", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 #else
 	{ &g_fraglimit, "fraglimit", "20", CVAR_SERVERINFO | CVAR_ARCHIVE | CVAR_NORESTART, 0, qtrue },
 #endif
@@ -168,7 +165,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_speed, "g_speed", "320", 0, 0, qtrue  },
 	{ &g_gravity, "g_gravity", "800", 0, 0, qtrue  },
 	{ &g_knockback, "g_knockback", "1000", 0, 0, qtrue  },
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS // was TMNTWEAPSYS
 	{ &g_quadfactor, "g_quadfactor", "2", 0, 0, qtrue  },
 #else
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue  },
@@ -182,7 +179,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_debugAlloc, "g_debugAlloc", "0", 0, 0, qfalse },
 	{ &g_motd, "g_motd", "", 0, 0, qfalse },
 #ifndef NOBLOOD
-#ifdef NOTRATEDM // ZTM: Default to no blood.
+#ifdef NOTRATEDM // Turtle Man: Default to no blood.
 	{ &g_blood, "com_blood", "0", 0, 0, qfalse },
 #else
 	{ &g_blood, "com_blood", "1", 0, 0, qfalse },
@@ -196,7 +193,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
 
 #ifdef MISSIONPACK
-#ifdef TURTLEARENA
+#ifdef TMNTMISC
 	{ &g_obeliskHealth, "g_obeliskHealth", "1000", 0, 0, qfalse },
 	{ &g_obeliskRegenPeriod, "g_obeliskRegenPeriod", "1", 0, 0, qfalse },
 	{ &g_obeliskRegenAmount, "g_obeliskRegenAmount", "3", 0, 0, qfalse },
@@ -212,24 +209,23 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_redteam, "g_redteam", "Stroggs", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
 	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #endif
-#ifndef TA_SP
+#ifndef TMNTSP
 	{ &g_singlePlayer, "ui_singlePlayerActive", "", 0, 0, qfalse, qfalse  },
 #endif
-
 	{ &g_enableDust, "g_enableDust", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
 	{ &g_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
-#endif
-#if defined MISSIONPACK || defined TA_WEAPSYS
+#ifndef TMNTWEAPONS // missionpack
 	{ &g_proxMineTimeout, "g_proxMineTimeout", "20000", 0, 0, qfalse },
 #endif
-#ifdef TA_SP
+#endif
+#ifdef TMNTSP
 	{ &g_singlePlayer, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM, 0, qfalse, qfalse  },
 	{ &g_spSaveData, "g_spSaveData", "", CVAR_SYSTEMINFO, 0, qfalse, qfalse  },
 	{ &g_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM, 0, 0, qfalse },
 	{ &g_saveTypes, "g_saveTypes", BG_SAVE_TYPES, CVAR_ROM, 0, 0, qfalse },
 #endif
 #ifdef IOQ3ZTM
-#ifdef TURTLEARENA // DEFAULT_TEAMS
+#ifdef TMNT // DEFAULT_TEAMS
 	{ &g_redteam, "g_redteam", "Sais", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
 	{ &g_blueteam, "g_blueteam", "Katanas", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #else
@@ -237,11 +233,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #endif
 #endif
-#ifdef TURTLEARENA // POWERS // PW_FLASHING
+#ifdef TMNT // POWERS // PW_FLASHING
 	{ &g_teleportFluxTime, "g_teleportFluxTime", "5", CVAR_SERVERINFO, 0, qfalse},
-#endif
-#ifdef IOQ3ZTM // LASERTAG
-	{ &g_laserTag, "g_laserTag", "0", CVAR_SERVERINFO, qtrue, qfalse},
 #endif
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},
@@ -298,7 +291,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		return 0;
 	case GAME_CONSOLE_COMMAND:
 		return ConsoleCommand();
-#ifdef TA_SP // Save/load
+#ifdef TMNTSP // Save/load
 	case GAME_SAVEGAME:
 		return G_SaveGame((fileHandle_t)arg0);
 	case GAME_LOADGAME:
@@ -392,7 +385,7 @@ void G_FindTeams( void ) {
 }
 
 void G_RemapTeamShaders( void ) {
-#if defined MISSIONPACK || defined IOQ3ZTM // TURTLEARENA? // ZTM: Do it in TURTLEARENA as well.
+#if defined MISSIONPACK || defined IOQ3ZTM // TMNT? // Turtle Man: Do it in TMNT as well.
 	char string[1024];
 	float f = level.time * 0.001;
 	Com_sprintf( string, sizeof(string), "team_icon/%s_red", g_redteam.string );
@@ -431,7 +424,7 @@ void G_RegisterCvars( void ) {
 		G_RemapTeamShaders();
 	}
 
-#if 0 //#ifdef TA_SP
+#if 0 //#ifdef TMNTSP
 	// Register other g_spSaveData vars.
 	//{ &g_spSaveData, "g_spSaveData", "", CVAR_SYSTEMINFO, 0, qfalse, qfalse  },
 	for (i = 0; i < MAX_CLIENTS; i++)
@@ -484,154 +477,6 @@ void G_UpdateCvars( void ) {
 	}
 }
 
-#ifdef IOQ3ZTM // MAP_ROTATION
-#define MAX_MAPS_PER_ROTATION	32
-#define MAX_MAPROTATIONS		16 // MAX_ARENAS // 1024
-#define	MAX_MAPROTATIONS_TEXT	4096 // MAX_ARENAS_TEXT // 8192
-
-int				g_numMapRotations;
-static char		*g_mapRotationInfos[MAX_MAPROTATIONS];
-
-int G_ParseInfos( char *buf, int max, char *infos[] );
-
-/*
-===============
-G_LoadMapRotationsFromFile
-===============
-*/
-static void G_LoadMapRotationsFromFile( char *filename ) {
-	int				len;
-	fileHandle_t	f;
-	char			buf[MAX_MAPROTATIONS_TEXT];
-
-	len = trap_FS_FOpenFile( filename, &f, FS_READ );
-	if ( !f ) {
-		trap_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
-		return;
-	}
-	if ( len >= MAX_ARENAS_TEXT ) {
-		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MAPROTATIONS_TEXT ) );
-		trap_FS_FCloseFile( f );
-		return;
-	}
-
-	trap_FS_Read( buf, len, f );
-	buf[len] = 0;
-	trap_FS_FCloseFile( f );
-
-	g_numMapRotations += G_ParseInfos( buf, MAX_MAPROTATIONS - g_numMapRotations, &g_mapRotationInfos[g_numMapRotations] );
-}
-
-/*
-===============
-G_GetMapRotationInfoByGametype
-===============
-*/
-const char *G_GetMapRotationInfoByGametype( int gametype ) {
-	int			n;
-	// TA_MISC gametypeNames from G_SpawnGEntityFromSpawnVars
-	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "overload", "harvester", "teamtournament"};
-
-	// Find rotation for the current gametype
-	for( n = 0; n < g_numMapRotations; n++ ) {
-		if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[gametype] ) == 0 ) {
-			return g_mapRotationInfos[n];
-		}
-	}
-
-	// oneflag, overload, and harvester default to CTF
-	if (gametype > GT_CTF)
-	{
-		for( n = 0; n < g_numMapRotations; n++ ) {
-			if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[GT_CTF] ) == 0 ) {
-				return g_mapRotationInfos[n];
-			}
-		}
-	}
-
-	// Default to ffa
-	for( n = 0; n < g_numMapRotations; n++ ) {
-		if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[GT_FFA] ) == 0 ) {
-			return g_mapRotationInfos[n];
-		}
-	}
-
-	return NULL;
-}
-
-void G_InitMapRotation(void)
-{
-	g_numMapRotations = 0;
-
-	G_LoadMapRotationsFromFile("map_rotations.cfg");
-}
-
-void G_AdvanceMapRotation(void)
-{
-	char		map[MAX_QPATH];
-	char		serverinfo[MAX_INFO_STRING];
-	const char	*info;
-	char		*str;
-	int			i;
-	qboolean	foundMap;
-
-	foundMap = qfalse;
-
-#ifdef TA_SP
-	// Single player doesn't rotate maps like the other gametypes.
-	if (g_gametype.integer == GT_SINGLE_PLAYER
-		|| trap_Cvar_VariableValue( "ui_singlePlayerActive" ))
-	{
-		return;
-	}
-#endif
-
-	// Get map rotation info
-	info = G_GetMapRotationInfoByGametype(g_gametype.integer);
-	if (info)
-	{
-		trap_GetServerinfo( serverinfo, sizeof(serverinfo) );
-		Q_strncpyz( map, Info_ValueForKey( serverinfo, "mapname" ), sizeof(map) );
-
-		// Find current map
-		for (i = 1; i < MAX_MAPS_PER_ROTATION+1; i++)
-		{
-			str = Info_ValueForKey(info, va("m%d", i));
-
-			// if str is blank
-			if (!str || !strlen(str))
-				continue;
-
-			if (foundMap) {
-				trap_Cvar_Set("nextmap", va("map %s", str));
-				return;
-			}
-			if( !Q_stricmp( str, map ) ) {
-				foundMap = qtrue;
-			}
-		}
-		// Found currently but didn't find next map
-		if (foundMap)
-		{
-			// Set nextmap to the first map in the rotation
-			str = Info_ValueForKey(info, "m1");
-
-			if (!str || !strlen(str))
-				return;
-
-			if (!Q_stricmp( str, map ))
-			{
-				// First and last map are the same, just restart.
-				return;
-			}
-
-			trap_Cvar_Set("nextmap", va("map %s", str));
-			return;
-		}
-	}
-}
-#endif
-
 /*
 ============
 G_InitGame
@@ -660,7 +505,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 	level.snd_fry = G_SoundIndex("sound/player/fry.wav");	// FIXME standing in lava / slime
 
-#ifdef TA_SP
+#ifdef TMNTSP
 	if ( !g_singlePlayer.integer && g_logfile.string[0] ) {
 #else
 	if ( g_gametype.integer != GT_SINGLE_PLAYER && g_logfile.string[0] ) {
@@ -713,17 +558,14 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	InitBodyQue();
 
 	ClearRegisteredItems();
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	ClearRegisteredNPCs();
 #endif
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	BG_InitWeaponInfo();
 #endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	BG_InitNPCInfo();
-#endif
-#ifdef IOQ3ZTM // MAP_ROTATION
-	G_InitMapRotation();
 #endif
 
 	// parse the key/value pairs and spawn gentities
@@ -738,16 +580,14 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	}
 
 	SaveRegisteredItems();
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	SaveRegisteredNPCs();
 #endif
 
 	G_Printf ("-----------------------------------\n");
 
 	if( g_gametype.integer == GT_SINGLE_PLAYER || trap_Cvar_VariableIntegerValue( "com_buildScript" ) ) {
-#ifndef TA_SP
 		G_ModelIndex( SP_PODIUM_MODEL );
-#endif
 		G_SoundIndex( "sound/player/gurp1.wav" );
 		G_SoundIndex( "sound/player/gurp2.wav" );
 	}
@@ -1152,11 +992,18 @@ If a new client connects, this will be called after the spawn function.
 ========================
 */
 void MoveClientToIntermission( gentity_t *ent ) {
-#ifdef TA_SP
+#ifdef TMNTSP
 	if ( g_gametype.integer == GT_SINGLE_PLAYER )
 	{
 		// Don't move clients in single player.
 		ent->client->ps.pm_type = PM_SPINTERMISSION;
+		ent->client->ps.eFlags = 0;
+		ent->s.eFlags = 0;
+		ent->s.eType = ET_GENERAL;
+		ent->s.modelindex = 0;
+		ent->s.loopSound = 0;
+		ent->s.event = 0;
+		ent->r.contents = 0;
 		return;
 	}
 #endif
@@ -1198,7 +1045,7 @@ void FindIntermissionPoint( void ) {
 	// find the intermission spot
 	ent = G_Find (NULL, FOFS(classname), "info_player_intermission");
 	if ( !ent ) {	// the map creator forgot to put in an intermission point...
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 		SelectSpawnPoint ( NULL, level.intermission_origin, level.intermission_angle, qfalse );
 #else
 		SelectSpawnPoint ( vec3_origin, level.intermission_origin, level.intermission_angle, qfalse );
@@ -1239,12 +1086,7 @@ void BeginIntermission( void ) {
 	level.intermissiontime = level.time;
 	FindIntermissionPoint();
 
-#ifdef TA_SP
-	// if custom game and not co-op
-	if (g_singlePlayer.integer == 2 && g_gametype.integer != GT_SINGLE_PLAYER) {
-		UpdateTournamentInfo();
-	}
-#elif defined MISSIONPACK
+#ifdef MISSIONPACK
 	if (g_singlePlayer.integer) {
 		trap_Cvar_Set("ui_singlePlayerActive", "0");
 		UpdateTournamentInfo();
@@ -1253,24 +1095,19 @@ void BeginIntermission( void ) {
 	// if single player game
 	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
 		UpdateTournamentInfo();
+#ifndef TMNTSP
 		SpawnModelsOnVictoryPads();
+#endif
 	}
 #endif
-
 
 	// move all clients to the intermission point
 	for (i=0 ; i< level.maxclients ; i++) {
 		client = g_entities + i;
 		if (!client->inuse)
 			continue;
-
 		// respawn if dead
-		if (client->health <= 0
-#ifdef TA_SP
-			&& g_gametype.integer != GT_SINGLE_PLAYER
-#endif
-			)
-		{
+		if (client->health <= 0) {
 			respawn(client);
 		}
 		MoveClientToIntermission( client );
@@ -1312,10 +1149,6 @@ void ExitLevel (void) {
 		}
 		return;	
 	}
-
-#ifdef IOQ3ZTM // MAP_ROTATION
-	G_AdvanceMapRotation();
-#endif
 
 	trap_Cvar_VariableStringBuffer( "nextmap", nextmap, sizeof(nextmap) );
 	trap_Cvar_VariableStringBuffer( "d1", d1, sizeof(d1) );
@@ -1402,7 +1235,6 @@ void LogExit( const char *string ) {
 	gclient_t		*cl;
 #ifdef MISSIONPACK
 	qboolean won = qtrue;
-	team_t team = TEAM_RED; // Default team is red in Team Arena and blue in Quake3
 #endif
 	G_LogPrintf( "Exit: %s\n", string );
 
@@ -1439,21 +1271,11 @@ void LogExit( const char *string ) {
 
 		G_LogPrintf( "score: %i  ping: %i  client: %i %s\n", cl->ps.persistant[PERS_SCORE], ping, level.sortedClients[i],	cl->pers.netname );
 #ifdef MISSIONPACK
-		if (g_singlePlayer.integer && !(g_entities[cl - level.clients].r.svFlags & SVF_BOT)) {
-			team = cl->sess.sessionTeam;
-		}
 		if (g_singlePlayer.integer && g_gametype.integer == GT_TOURNAMENT) {
 			if (g_entities[cl - level.clients].r.svFlags & SVF_BOT && cl->ps.persistant[PERS_RANK] == 0) {
 				won = qfalse;
 			}
 		}
-#ifdef TA_SP
-		if (g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER) {
-			if (!cl->ps.persistant[PERS_LIVES] && !cl->ps.persistant[PERS_CONTINUES]) {
-				won = qfalse;
-			}
-		}
-#endif
 #endif
 
 	}
@@ -1461,10 +1283,7 @@ void LogExit( const char *string ) {
 #ifdef MISSIONPACK
 	if (g_singlePlayer.integer) {
 		if (g_gametype.integer >= GT_CTF) {
-			if (team == TEAM_BLUE)
-				won = level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED];
-			else
-				won = level.teamScores[TEAM_RED] > level.teamScores[TEAM_BLUE];
+			won = level.teamScores[TEAM_RED] > level.teamScores[TEAM_BLUE];
 		}
 		trap_SendConsoleCommand( EXEC_APPEND, (won) ? "spWin\n" : "spLose\n" );
 	}
@@ -1490,8 +1309,8 @@ void CheckIntermissionExit( void ) {
 	gclient_t	*cl;
 	int			readyMask;
 
-#ifdef TA_SP
-	if ( g_singlePlayer.integer == 2 && g_gametype.integer != GT_SINGLE_PLAYER ) {
+#ifdef TMNTSP
+	if ( g_singlePlayer.integer ) {
 		return;
 	}
 #else
@@ -1612,7 +1431,7 @@ void CheckExitRules( void ) {
 	}
 
 	if ( level.intermissionQueued ) {
-#ifdef TA_SP // Based on MISSIONPACK code.
+#ifdef TMNTSP // Based on MISSIONPACK code.
 		int time = /*(g_gametype.integer == GT_SINGLE_PLAYER) ?
 				SP_INTERMISSION_DELAY_TIME : */INTERMISSION_DELAY_TIME;
 		if ( level.time - level.intermissionQueued >= time ) {
@@ -1636,33 +1455,17 @@ void CheckExitRules( void ) {
 		return;
 	}
 
-#ifdef TA_SP // exiting
+#ifdef TMNTSP // exiting
 	// If single player, and not exiting.
-	if (g_gametype.integer == GT_SINGLE_PLAYER && !level.intermissionQueued)
+	if ( g_gametype.integer == GT_SINGLE_PLAYER
+		&& !level.intermissionQueued )
 	{
 		int numClients = 0; // Number of clients in the game.
 		int deadClients = 0; // No lives or continues.
-		int numBossClients = 0;
-		int deadBossClients = 0;
 
 		for ( i=0 ; i< g_maxclients.integer ; i++ ) {
 			cl = level.clients + i;
 			if ( cl->pers.connected != CON_CONNECTED ) {
-				continue;
-			}
-			// Skip bots
-			if (g_entities[i].r.svFlags & SVF_BOT) {
-				if (cl->sess.sessionTeam == TEAM_RED)
-				{
-					numBossClients++;
-					if (!cl->ps.persistant[PERS_LIVES] && !cl->ps.persistant[PERS_CONTINUES])
-					{
-						// Client has tried to respawn (or waited 3 seconds) with no lives or continues.
-						if (cl->respawnTime == -1) {
-							deadBossClients++;
-						}
-					}
-				}
 				continue;
 			}
 
@@ -1690,58 +1493,23 @@ void CheckExitRules( void ) {
 				}
 			}
 		}
-
 		// Check for Game Over
 		if (numClients > 0 && numClients == deadClients)
 		{
-			if (g_singlePlayer.integer == 1)
+			if (g_singlePlayer.integer)
 			{
 				// Return to the title screen.
-				trap_Cvar_Set("nextmap", "disconnect; sp_gameover");
-				LogExit( "Game Over" );
-				return;
+				trap_DropClient( 0, "Game Over" );
 			}
 			else
 			{
-				// Restart on the first single player map.
+				// Restart at map sp1a1?
 				char buf[MAX_QPATH];
-				const char *info;
-				const char *str;
 
-				str = NULL;
-
-#ifdef IOQ3ZTM // MAP_ROTATION
-				info = G_GetMapRotationInfoByGametype(GT_SINGLE_PLAYER);
-				if (info) {
-					str = Info_ValueForKey(info, "m1");
-				}
-#endif
-
-				if (!str || !strlen(str))
-				{
-					// Default to sp1a1
-					str = "sp1a1";
-				}
-
-				// wait before restarting
-				Com_sprintf(buf, sizeof(buf), "wait 1500; map %s", str);
+				Com_sprintf(buf, sizeof(buf), "spmap sp1a1");
 				trap_Cvar_Set("nextmap", buf);
 
 				ExitLevel();
-			}
-		}
-		if (numBossClients > 0 && numBossClients == deadBossClients)
-		{
-			for ( i=0 ; i < g_maxclients.integer ; i++ ) {
-				cl = level.clients + i;
-				if ( cl->pers.connected != CON_CONNECTED )
-					continue;
-				if (g_entities[i].r.svFlags & SVF_BOT)
-					continue;
-				if (cl->sess.sessionTeam == TEAM_SPECTATOR)
-					continue;
-
-				G_UseTargets2(&g_entities[i], &g_entities[i], "boss_death");
 			}
 		}
 		return;
@@ -1768,7 +1536,7 @@ void CheckExitRules( void ) {
 
 	if ( g_gametype.integer < GT_CTF && g_fraglimit.integer ) {
 		if ( level.teamScores[TEAM_RED] >= g_fraglimit.integer ) {
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 			trap_SendServerCommand( -1, "print \"Red hit the scorelimit.\n\"" );
 			LogExit( "Scorelimit hit." );
 #else
@@ -1779,7 +1547,7 @@ void CheckExitRules( void ) {
 		}
 
 		if ( level.teamScores[TEAM_BLUE] >= g_fraglimit.integer ) {
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 			trap_SendServerCommand( -1, "print \"Blue hit the scorelimit.\n\"" );
 			LogExit( "Scorelimit hit." );
 #else
@@ -1799,7 +1567,7 @@ void CheckExitRules( void ) {
 			}
 
 			if ( cl->ps.persistant[PERS_SCORE] >= g_fraglimit.integer ) {
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 				LogExit( "Scorelimit hit." );
 				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " hit the scorelimit.\n\"",
 					cl->pers.netname ) );
@@ -2229,13 +1997,13 @@ int start, end;
 			continue;
 		}
 
-#ifdef TA_ENTSYS // MISC_OBJECT
+#ifdef TMNTENTSYS // MISC_OBJECT
 		if ( ent->s.eType == ET_MISCOBJECT ) {
 			G_RunItem( ent );
 			continue;
 		}
 #endif
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 		if ( ent->s.eType == ET_NPC ) {
 			G_RunNPC( ent );
 			continue;

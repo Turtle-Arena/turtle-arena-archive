@@ -78,7 +78,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 	case UI_DRAW_CONNECT_SCREEN:
 		UI_DrawConnectScreen( arg0 );
 		return 0;
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	case UI_HASUNIQUECDKEY:				// mod authors need to observe this
 		return qtrue;  // change this to qfalse for mods!
 #endif
@@ -115,7 +115,7 @@ vmCvar_t	ui_ctf_capturelimit;
 vmCvar_t	ui_ctf_timelimit;
 vmCvar_t	ui_ctf_friendly;
 
-#ifdef MISSIONPACK // ZTM: MP_GAMETYPES
+#ifdef MISSIONPACK // Turtle Man: MP_GAMETYPES
 vmCvar_t	ui_1flag_capturelimit;
 vmCvar_t	ui_1flag_timelimit;
 vmCvar_t	ui_1flag_friendly;
@@ -142,8 +142,9 @@ vmCvar_t	ui_spAwards;
 vmCvar_t	ui_spVideos;
 vmCvar_t	ui_spSkill;
 
-#ifdef TA_SP
+#ifdef TMNTSP
 vmCvar_t	ui_singlePlayerActive;
+vmCvar_t	ui_spStage;
 vmCvar_t	ui_saveVersions;
 vmCvar_t	ui_saveTypes;
 #endif
@@ -181,21 +182,21 @@ vmCvar_t	ui_cdkeychecked;
 vmCvar_t	ui_ioq3;
 
 static cvarTable_t		cvarTable[] = {
-#ifdef NOTRATEDM // frag to score
-	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "1000", CVAR_ARCHIVE },
+#ifdef TMNTMISC // frag to score
+	{ &ui_ffa_fraglimit, "ui_ffa_scorelimit", "20", CVAR_ARCHIVE },
 #else
 	{ &ui_ffa_fraglimit, "ui_ffa_fraglimit", "20", CVAR_ARCHIVE },
 #endif
 	{ &ui_ffa_timelimit, "ui_ffa_timelimit", "0", CVAR_ARCHIVE },
 
-#ifdef NOTRATEDM // frag to score
-	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "0", CVAR_ARCHIVE },
+#ifdef TMNTMISC // frag to score and changed KO limit to 3
+	{ &ui_tourney_fraglimit, "ui_tourney_scorelimit", "3", CVAR_ARCHIVE },
 #else
 	{ &ui_tourney_fraglimit, "ui_tourney_fraglimit", "0", CVAR_ARCHIVE },
 #endif
 	{ &ui_tourney_timelimit, "ui_tourney_timelimit", "15", CVAR_ARCHIVE },
 
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 	{ &ui_team_fraglimit, "ui_team_scorelimit", "0", CVAR_ARCHIVE },
 #else
 	{ &ui_team_fraglimit, "ui_team_fraglimit", "0", CVAR_ARCHIVE },
@@ -203,7 +204,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_team_timelimit, "ui_team_timelimit", "20", CVAR_ARCHIVE },
 	{ &ui_team_friendly, "ui_team_friendly",  "1", CVAR_ARCHIVE },
 
-#ifdef TA_MISC
+#ifdef TMNTMISC
 	{ &ui_ctf_capturelimit, "ui_ctf_capturelimit", "5", CVAR_ARCHIVE },
 #else
 	{ &ui_ctf_capturelimit, "ui_ctf_capturelimit", "8", CVAR_ARCHIVE },
@@ -211,7 +212,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_ctf_timelimit, "ui_ctf_timelimit", "30", CVAR_ARCHIVE },
 	{ &ui_ctf_friendly, "ui_ctf_friendly",  "0", CVAR_ARCHIVE },
 
-#ifdef MISSIONPACK // ZTM: MP_GAMETYPES
+#ifdef MISSIONPACK // Turtle Man: MP_GAMETYPES
 	{ &ui_1flag_capturelimit, "ui_1flag_capturelimit", "5", CVAR_ARCHIVE },
 	{ &ui_1flag_timelimit, "ui_1flag_timelimit", "30", CVAR_ARCHIVE },
 	{ &ui_1flag_friendly, "ui_1flag_friendly",  "0", CVAR_ARCHIVE },
@@ -229,17 +230,18 @@ static cvarTable_t		cvarTable[] = {
 
 	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM },
 	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM },
-	{ &ui_spScores1, "g_spScores1", "", CVAR_ARCHIVE },
-	{ &ui_spScores2, "g_spScores2", "", CVAR_ARCHIVE },
-	{ &ui_spScores3, "g_spScores3", "", CVAR_ARCHIVE },
-	{ &ui_spScores4, "g_spScores4", "", CVAR_ARCHIVE },
-	{ &ui_spScores5, "g_spScores5", "", CVAR_ARCHIVE },
-	{ &ui_spAwards, "g_spAwards", "", CVAR_ARCHIVE },
-	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE },
+	{ &ui_spScores1, "g_spScores1", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores2, "g_spScores2", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores3, "g_spScores3", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores4, "g_spScores4", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spScores5, "g_spScores5", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spAwards, "g_spAwards", "", CVAR_ARCHIVE | CVAR_ROM },
+	{ &ui_spVideos, "g_spVideos", "", CVAR_ARCHIVE | CVAR_ROM },
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE | CVAR_LATCH },
 
-#ifdef TA_SP
-	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
+#ifdef TMNTSP
+	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", /*CVAR_SERVERINFO|*/CVAR_ROM},
+	{ &ui_spStage, "ui_spStage", "0", CVAR_ROM },
 	{ &ui_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM },
 	{ &ui_saveTypes, "g_saveTypes", BG_SAVE_TYPES, CVAR_ROM },
 #endif
@@ -252,11 +254,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_browserShowEmpty, "ui_browserShowEmpty", "1", CVAR_ARCHIVE },
 
 	{ &ui_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
-#ifdef TA_DATA
-	{ &ui_drawCrosshair, "cg_drawCrosshair", "1", CVAR_ARCHIVE },
-#else
 	{ &ui_drawCrosshair, "cg_drawCrosshair", "4", CVAR_ARCHIVE },
-#endif
 	{ &ui_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &ui_marks, "cg_marks", "1", CVAR_ARCHIVE },
 
@@ -277,7 +275,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_server15, "server15", "", CVAR_ARCHIVE },
 	{ &ui_server16, "server16", "", CVAR_ARCHIVE },
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 	{ &ui_cdkeychecked, "ui_cdkeychecked", "0", CVAR_ROM },
 #endif
 	{ &ui_ioq3, "ui_ioq3", "1", CVAR_ROM }

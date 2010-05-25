@@ -21,15 +21,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // tr_models.c -- model loading and caching
 
-#ifdef TA_GAME_MODELS
-#include "../server/server.h"
-#endif
-
-#if defined TA_GAME_MODELS && defined DEDICATED
-#define RENDERLESS_MODELS // ZTM: Ded server needs the tags for melee attacks
+#if defined TMNT_GAME_MODELS && defined DEDICATED
+#define RENDERLESS_MODELS // Turtle Man: Ded server needs the tags for melee attacks
 #endif
 
 #ifdef RENDERLESS_MODELS
+#include "../server/server.h"
+
 // any changes in surfaceType must be mirrored in rb_surfaceTable[]
 typedef enum {
 	SF_BAD,
@@ -67,7 +65,7 @@ typedef struct model_s {
 	int			index;				// model = tr.models[model->index]
 
 	int			dataSize;			// just for listing purposes
-	// ZTM: Not needed by ded server
+	// Turtle Man: Not needed by ded server
 	//bmodel_t	*bmodel;			// only if type == MOD_BRUSH
 	md3Header_t	*md3[MD3_MAX_LODS];	// only if type == MOD_MESH
 	void	*md4;				// only if type == (MOD_MD4 | MOD_MDR)
@@ -602,7 +600,7 @@ static qboolean R_LoadMD3 (model_t *mod, int lod, void *buffer, const char *mod_
         LL(surf->ofsEnd);
 		
 #ifndef RENDERLESS_MODELS
-#ifdef IOQ3ZTM // ZTM: Show the name of the surface, it is helpful.
+#ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
 		if ( surf->numVerts > SHADER_MAX_VERTEXES ) {
 			ri.Printf(PRINT_WARNING, "R_LoadMD3: %s has more than %i verts on %s (%i)",
 				mod_name, SHADER_MAX_VERTEXES, surf->name[0] == '\0' ? "a surface" : surf->name,
@@ -786,10 +784,6 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	mdr->numTags = LittleLong(pinmodel->numTags);
 	// We don't care about the other offset values, we'll generate them ourselves while loading.
 
-#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
-	ri.Printf(PRINT_WARNING, "R_LoadMDR: Loading %s...\n", mod_name);
-#endif
-
 	mod->numLods = mdr->numLODs;
 
 	if ( mdr->numFrames < 1 ) 
@@ -802,13 +796,6 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 
 	/* The first frame will be put into the first free space after the header */
 	frame = (mdrFrame_t *)(mdr + 1);
-#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
-	mdr->ofsFrames = pinmodel->ofsFrames;
-	if (mdr->ofsFrames != (int)((byte *) frame - (byte *) mdr))
-	{
-		ri.Printf(PRINT_WARNING, "R_LoadMDR: mdr->ofsFrames miss match (%d/%d)!\n", mdr->ofsFrames, (int)((byte *) frame - (byte *) mdr));
-	}
-#endif
 	mdr->ofsFrames = (int)((byte *) frame - (byte *) mdr);
 		
 	if (pinmodel->ofsFrames < 0)
@@ -878,26 +865,13 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 				((float *)frame->bones)[j] = LittleFloat( ((float *)curframe->bones)[j] );
 			}
 			
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Load uncompressed MDR models!
-			// Next Frame...
-			curframe = (mdrFrame_t *) &curframe->bones[mdr->numBones];
-			frame = (mdrFrame_t *) &frame->bones[mdr->numBones];
-#else
 			curframe++;
 			frame++;
-#endif
 		}
 	}
 	
 	// frame should now point to the first free address after all frames.
 	lod = (mdrLOD_t *) frame;
-#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
-	mdr->ofsLODs = LittleLong(pinmodel->ofsLODs);
-	if (mdr->ofsLODs != (int) ((byte *) lod - (byte *)mdr))
-	{
-		ri.Printf(PRINT_WARNING, "R_LoadMDR: mdr->ofsLODs miss match (%d/%d)!\n", mdr->ofsLODs, (int) ((byte *) lod - (byte *)mdr));
-	}
-#endif
 	mdr->ofsLODs = (int) ((byte *) lod - (byte *)mdr);
 	
 	curlod = (mdrLOD_t *)((byte *) pinmodel + LittleLong(pinmodel->ofsLODs));
@@ -918,13 +892,6 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 		
 		// swap all the surfaces
 		surf = (mdrSurface_t *) (lod + 1);
-#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
-		lod->ofsSurfaces = LittleLong(curlod->ofsSurfaces);
-		if (lod->ofsSurfaces != (int)((byte *) surf - (byte *) lod))
-		{
-			ri.Printf(PRINT_WARNING, "R_LoadMDR: lod->ofsSurfaces miss match (%d/%d)!\n", lod->ofsSurfaces, (int)((byte *) surf - (byte *) lod));
-		}
-#endif
 		lod->ofsSurfaces = (int)((byte *) surf - (byte *) lod);
 		cursurf = (mdrSurface_t *) ((byte *)curlod + LittleLong(curlod->ofsSurfaces));
 		
@@ -953,17 +920,17 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			
 #ifndef RENDERLESS_MODELS
 			// now do the checks that may fail.
-#ifdef IOQ3ZTM // ZTM: Show the name of the surface, it is helpful.
+#ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
 			if ( surf->numVerts > SHADER_MAX_VERTEXES )
 			{
-				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i verts on %s (%i)\n",
+				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i verts on %s (%i)",
 					  mod_name, SHADER_MAX_VERTEXES, surf->name[0] == '\0' ? "a surface" : surf->name,
 					  surf->numVerts );
 				return qfalse;
 			}
 			if ( surf->numTriangles*3 > SHADER_MAX_INDEXES )
 			{
-				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i triangles on %s (%i)\n",
+				ri.Printf(PRINT_WARNING, "R_LoadMDR: %s has more than %i triangles on %s (%i)",
 					  mod_name, SHADER_MAX_INDEXES / 3, surf->name[0] == '\0' ? "a surface" : surf->name,
 					  surf->numTriangles );
 				return qfalse;
@@ -1070,13 +1037,6 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 			}
 			
 			// tri now points to the end of the surface.
-#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
-			surf->ofsEnd = LittleLong(cursurf->ofsEnd);
-			if (surf->ofsEnd != (byte *) tri - (byte *) surf)
-			{
-				ri.Printf(PRINT_WARNING, "R_LoadMDR: surf->ofsEnd (lod=%d) miss match (%d/%d)!\n", l, surf->ofsEnd, (int)((byte *) tri - (byte *) surf));
-			}
-#endif
 			surf->ofsEnd = (byte *) tri - (byte *) surf;
 			surf = (mdrSurface_t *) tri;
 
@@ -1085,13 +1045,6 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 		}
 
 		// surf points to the next lod now.
-#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
-		lod->ofsEnd = LittleLong(curlod->ofsEnd);
-		if (lod->ofsEnd != (int)((byte *) surf - (byte *) lod))
-		{
-			ri.Printf(PRINT_WARNING, "R_LoadMDR: lod->ofsEnd (lod=%d) miss match (%d/%d)!\n", l, lod->ofsEnd, (int)((byte *) surf - (byte *) lod));
-		}
-#endif
 		lod->ofsEnd = (int)((byte *) surf - (byte *) lod);
 		lod = (mdrLOD_t *) surf;
 
@@ -1101,13 +1054,6 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	
 	// lod points to the first tag now, so update the offset too.
 	tag = (mdrTag_t *) lod;
-#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
-	mdr->ofsTags = LittleLong(pinmodel->ofsTags);
-	if (mdr->ofsTags != (int)((byte *) tag - (byte *) mdr))
-	{
-		ri.Printf(PRINT_WARNING, "R_LoadMDR: mdr->ofsTags miss match (%d/%d)!\n", mdr->ofsTags, (int)((byte *) tag - (byte *) mdr));
-	}
-#endif
 	mdr->ofsTags = (int)((byte *) tag - (byte *) mdr);
 	curtag = (mdrTag_t *) ((byte *)pinmodel + LittleLong(pinmodel->ofsTags));
 
@@ -1130,14 +1076,6 @@ static qboolean R_LoadMDR( model_t *mod, void *buffer, int filesize, const char 
 	}
 	
 	// And finally we know the real offset to the end.
-#if 0 // #ifndef RENDERLESS_MODELS // ZTM: More MDR testing
-	// ZTM: My MM3D MDR exporter fails this test.
-	mdr->ofsEnd = LittleLong(pinmodel->ofsEnd);
-	if (mdr->ofsEnd != (int)((byte *) tag - (byte *) mdr))
-	{
-		ri.Printf(PRINT_WARNING, "R_LoadMDR: mdr->ofsEnd miss match (%d/%d)!\n", mdr->ofsEnd, (int)((byte *) tag - (byte *) mdr));
-	}
-#endif
 	mdr->ofsEnd = (int)((byte *) tag - (byte *) mdr);
 
 	// phew! we're done.
@@ -1237,7 +1175,7 @@ static qboolean R_LoadMD4( model_t *mod, void *buffer, const char *mod_name ) {
 			LL(surf->ofsEnd);
 			
 #ifndef RENDERLESS_MODELS
-#ifdef IOQ3ZTM // ZTM: Show the name of the surface, it is helpful.
+#ifdef IOQ3ZTM // Turtle Man: Show the name of the surface, it is helpful.
 			if ( surf->numVerts > SHADER_MAX_VERTEXES ) {
 				ri.Printf(PRINT_WARNING, "R_LoadMD4: %s has more than %i verts on %s (%i)",
 					mod_name, SHADER_MAX_VERTEXES, surf->name[0] == '\0' ? "a surface" : surf->name,
@@ -1373,24 +1311,6 @@ void R_ModelInit( void ) {
 
 	mod = R_AllocModel();
 	mod->type = MOD_BAD;
-
-#ifdef TA_GAME_MODELS
-	// Models in game are no longer valid
-	if (Cvar_VariableValue("sv_running") && gvm)
-	{
-		int i;
-
-		for (i = 0; i < sv_maxclients->integer; i++)
-		{
-			if (svs.clients[i].state != CS_ACTIVE) {
-				continue;
-			}
-
-			// call prog code to reload player model
-			VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, i );
-		}
-	}
-#endif
 }
 
 

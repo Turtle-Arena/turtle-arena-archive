@@ -79,7 +79,7 @@ CG_LoadingItem
 void CG_LoadingItem( int itemNum ) {
 	gitem_t		*item;
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[itemNum];
@@ -107,7 +107,7 @@ void CG_LoadingClient( int clientNum ) {
 	int				i;
 #endif
 
-#ifdef TA_SP
+#ifdef TMNTSP
 	if (cgs.gametype == GT_SINGLE_PLAYER)
 	{
 		return;
@@ -117,20 +117,7 @@ void CG_LoadingClient( int clientNum ) {
 	info = CG_ConfigString( CS_PLAYERS + clientNum );
 
 	if ( loadingPlayerIconCount < MAX_LOADING_PLAYER_ICONS ) {
-#ifdef IOQ3ZTM // PLAYER_DIR // Support Team Arena players.
-		qboolean head = qfalse;
-
-		Q_strncpyz( model, Info_ValueForKey( info, "hmodel" ), sizeof( model ) );
-
-		if (model[0] == '*') {
-			memcpy(model, &model[1], MAX_QPATH-1);
-			head = qtrue;
-		} else if (model[0] == '\0') {
-			Q_strncpyz( model, Info_ValueForKey( info, "model" ), sizeof( model ) );
-		}
-#else
 		Q_strncpyz( model, Info_ValueForKey( info, "model" ), sizeof( model ) );
-#endif
 		skin = Q_strrchr( model, '/' );
 		if ( skin ) {
 			*skin++ = '\0';
@@ -139,28 +126,26 @@ void CG_LoadingClient( int clientNum ) {
 		}
 
 #ifdef IOQ3ZTM // PLAYER_DIR // Support Team Arena players.
-		if (head)
+		if (model[0] == '*')
 		{
-			Com_sprintf( iconName, MAX_QPATH, "models/players/heads/%s/icon_%s.tga", model, skin );
+			Com_sprintf( iconName, MAX_QPATH, "models/players/heads/%s/icon_%s.tga", &model[1], skin );
 			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
 		}
-
 		if (!loadingPlayerIcons[loadingPlayerIconCount])
 		{
-			for (i = 0; bg_playerDirs[i] != NULL; i++)
-			{
-				Com_sprintf( iconName, MAX_QPATH, "%s/%s/icon_%s.tga", bg_playerDirs[i], model, skin );
-				loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
+		for (i = 0; bg_playerDirs[i] != NULL; i++)
+		{
+			Com_sprintf( iconName, MAX_QPATH, "%s/%s/icon_%s.tga", bg_playerDirs[i], model, skin );
+			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
 
-				if (loadingPlayerIcons[loadingPlayerIconCount])
-				{
-					break;
-				}
+			if (loadingPlayerIcons[loadingPlayerIconCount])
+			{
+				break;
 			}
 		}
-
-		// Fall back to heads directory
-		if (!head && !loadingPlayerIcons[loadingPlayerIconCount])
+		}
+		// Try heads directory.
+		if (!loadingPlayerIcons[loadingPlayerIconCount])
 		{
 			Com_sprintf( iconName, MAX_QPATH, "models/players/heads/%s/icon_%s.tga", model, skin );
 			loadingPlayerIcons[loadingPlayerIconCount] = trap_R_RegisterShaderNoMip( iconName );
@@ -299,7 +284,7 @@ void CG_DrawInformation( void ) {
 		s = "Free For All";
 		break;
 	case GT_SINGLE_PLAYER:
-#ifdef TA_SP
+#ifdef TMNTSP
 		if (cg_singlePlayerActive.integer != 1)
 			s = "Cooperative";
 		else
@@ -307,7 +292,7 @@ void CG_DrawInformation( void ) {
 		s = "Single Player";
 		break;
 	case GT_TOURNAMENT:
-#ifdef TA_MISC // tournament to duel
+#ifdef TMNTMISC // tournament to duel
 		s = "Duel";
 #else
 		s = "Tournament";
@@ -319,7 +304,7 @@ void CG_DrawInformation( void ) {
 	case GT_CTF:
 		s = "Capture The Flag";
 		break;
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	case GT_1FCTF:
 		s = "One Flag CTF";
 		break;
@@ -348,17 +333,17 @@ void CG_DrawInformation( void ) {
 	}
 
 	if (
-#ifdef TA_SP
+#ifdef TMNTSP
 	cgs.gametype != GT_SINGLE_PLAYER &&
 #endif
 	cgs.gametype < GT_CTF ) {
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 		value = atoi( Info_ValueForKey( info, "scorelimit" ) );
 #else
 		value = atoi( Info_ValueForKey( info, "fraglimit" ) );
 #endif
 		if ( value ) {
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 			UI_DrawProportionalString( 320, y, va( "scorelimit %i", value ),
 				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 #else

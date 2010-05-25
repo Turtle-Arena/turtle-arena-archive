@@ -209,9 +209,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CG_1STPLACE 67
 #define CG_2NDPLACE 68
 #define CG_CAPTURES 69
-//#ifdef TA_HOLDSYS
-#define CG_PLAYER_ITEM_VALUE 70
-//#endif
 
 
 
@@ -307,7 +304,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define VOICECHAT_KILLINSULT		"kill_insult"			// I just killed you
 #define VOICECHAT_TAUNT				"taunt"					// I want to taunt you
 #define VOICECHAT_DEATHINSULT		"death_insult"			// you just killed me
-/*#ifndef TURTLEARENA // WEAPONS
+/*#ifndef TMNTWEAPONS
 #define VOICECHAT_KILLGAUNTLET		"kill_gauntlet"			// I just killed you with the gauntlet
 #endif*/
 #define VOICECHAT_PRAISE			"praise"				// you did something good

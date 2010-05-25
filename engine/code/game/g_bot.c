@@ -47,7 +47,7 @@ static botSpawnQueue_t	botSpawnQueue[BOT_SPAWN_QUEUE_DEPTH];
 
 vmCvar_t bot_minplayers;
 
-#ifndef TA_SP
+#ifndef TMNTSP
 extern gentity_t	*podium1;
 extern gentity_t	*podium2;
 extern gentity_t	*podium3;
@@ -259,7 +259,7 @@ void G_AddRandomBot( int team )
 	num = 0;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
-#ifdef RANDOMBOT // ZTM: Random bot
+#ifdef RANDOMBOT // Turtle Man: Random bot
 		// Skip random bot.
 		if ( !Q_stricmp( value, "Random" ) ) {
 			continue;
@@ -288,7 +288,7 @@ void G_AddRandomBot( int team )
 	num = random() * num;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
-#ifdef RANDOMBOT // ZTM: Random bot
+#ifdef RANDOMBOT // Turtle Man: Random bot
 		// Skip random bot.
 		if ( !Q_stricmp( value, "Random" ) ) {
 			continue;
@@ -637,8 +637,8 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	char			*headmodel;
 	char			userinfo[MAX_INFO_STRING];
 
-#ifdef RANDOMBOT // ZTM: Random bot
-    // ZTM: Check for random bot.
+#ifdef RANDOMBOT // Turtle Man: Random bot
+    // Turtle Man: Check for random bot.
     if (Q_stricmp(name, "Random") == 0)
     {
     	int t;
@@ -691,7 +691,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	key = "model";
 	model = Info_ValueForKey( botinfo, key );
 	if ( !*model ) {
-#ifdef TURTLEARENA // DEFAULT_MODEL
+#ifdef TMNT // DEFAULT_MODEL
 		model = "raph/default";
 #else
 		model = "visor/default";
@@ -702,7 +702,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	key = "team_model";
 	Info_SetValueForKey( userinfo, key, model );
 #endif
-#ifdef TA_SP // SPMODEL
+#ifdef TMNTSP // SPMODEL
 	key = "spmodel";
 	Info_SetValueForKey( userinfo, key, model );
 #endif
@@ -715,7 +715,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	Info_SetValueForKey( userinfo, key, headmodel );
 	key = "team_headmodel";
 	Info_SetValueForKey( userinfo, key, headmodel );
-#ifdef TA_SP // SPMODEL
+#ifdef TMNTSP // SPMODEL
 	key = "spheadmodel";
 	Info_SetValueForKey( userinfo, key, headmodel );
 #endif
@@ -730,22 +730,14 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	key = "color1";
 	s = Info_ValueForKey( botinfo, key );
 	if ( !*s ) {
-#ifdef TURTLEARENA
-		s = "5";
-#else
 		s = "4";
-#endif
 	}
 	Info_SetValueForKey( userinfo, key, s );
 
 	key = "color2";
 	s = Info_ValueForKey( botinfo, key );
 	if ( !*s ) {
-#ifdef TURTLEARENA
-		s = "4";
-#else
 		s = "5";
-#endif
 	}
 	Info_SetValueForKey( userinfo, key, s );
 
@@ -888,7 +880,7 @@ void Svcmd_BotList_f( void ) {
 			strcpy(funname, "");
 		}
 		strcpy(model, Info_ValueForKey( g_botInfos[i], "model" ));
-#ifdef TURTLEARENA // DEFAULT_MODEL
+#ifdef TMNT // DEFAULT_MODEL
 		if ( !*model ) {
 			strcpy(model, "raph/default");
 		}
@@ -911,19 +903,14 @@ void Svcmd_BotList_f( void ) {
 G_SpawnBots
 ===============
 */
-#ifdef TA_SP // SP_BOSS
-static void G_SpawnBots( char *botList, int baseDelay, char *team )
-#else
-static void G_SpawnBots( char *botList, int baseDelay )
-#endif
-{
+static void G_SpawnBots( char *botList, int baseDelay ) {
 	char		*bot;
 	char		*p;
 	float		skill;
 	int			delay;
 	char		bots[MAX_INFO_VALUE];
 
-#ifndef TA_SP
+#ifndef TMNTSP
 	podium1 = NULL;
 	podium2 = NULL;
 	podium3 = NULL;
@@ -964,11 +951,7 @@ static void G_SpawnBots( char *botList, int baseDelay )
 
 		// we must add the bot this way, calling G_AddBot directly at this stage
 		// does "Bad Things"
-#ifdef TA_SP // SP_BOSS
-		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", bot, skill, team, delay) );
-#else
 		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f free %i\n", bot, skill, delay) );
-#endif
 
 		delay += BOT_BEGIN_DELAY_INCREMENT;
 	}
@@ -1105,15 +1088,15 @@ void G_InitBots( qboolean restart ) {
 			return;
 		}
 
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 		strValue = Info_ValueForKey( arenainfo, "scorelimit" );
 		fragLimit = atoi( strValue );
-#if !defined TURTLEARENA || defined TA_SUPPORTQ3
+#if !defined TMNT || defined TMNT_SUPPORTQ3
 		// Support Q3 "fraglimit" in arenas.txt
 		if ( !fragLimit )
 		{
-			strValue = Info_ValueForKey( arenainfo, "fraglimit" );
-			fragLimit = atoi( strValue )*50;
+		strValue = Info_ValueForKey( arenainfo, "fraglimit" );
+		fragLimit = atoi( strValue );
 		}
 #endif
 		if ( fragLimit ) {
@@ -1143,8 +1126,8 @@ void G_InitBots( qboolean restart ) {
 		}
 
 		if ( !fragLimit && !timeLimit ) {
-#ifdef NOTRATEDM // frag to score
-			trap_Cvar_Set( "scorelimit", "500" );
+#ifdef TMNTMISC // frag to score
+			trap_Cvar_Set( "scorelimit", "10" );
 #else
 			trap_Cvar_Set( "fraglimit", "10" );
 #endif
@@ -1158,12 +1141,7 @@ void G_InitBots( qboolean restart ) {
 		}
 
 		if( !restart ) {
-#ifdef TA_SP // SP_BOSS
-			G_SpawnBots( Info_ValueForKey( arenainfo, "allies" ), basedelay, "free" );
-			G_SpawnBots( Info_ValueForKey( arenainfo, "bots" ), basedelay, "red" );
-#else
 			G_SpawnBots( Info_ValueForKey( arenainfo, "bots" ), basedelay );
-#endif
 		}
 	}
 }

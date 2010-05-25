@@ -34,15 +34,14 @@ CREDITS
 
 typedef struct {
 	menuframework_s	menu;
-#ifndef TURTLEARENA
+#ifndef TMNT
 	int frame;
 #endif
 } creditsmenu_t;
 
 static creditsmenu_t	s_credits;
 
-
-#ifndef TURTLEARENA
+#ifndef TMNT
 /*
 ===============
 UI_CreditMenu_Draw_ioq3
@@ -83,7 +82,6 @@ static void UI_CreditMenu_Draw_ioq3( void ) {
 }
 #endif
 
-
 /*
 =================
 UI_CreditMenu_Key
@@ -94,7 +92,7 @@ static sfxHandle_t UI_CreditMenu_Key( int key ) {
 		return 0;
 	}
 
-#ifndef TURTLEARENA
+#ifndef TMNT
 	s_credits.frame++;
 	if (s_credits.frame == 1) {
 		s_credits.menu.draw = UI_CreditMenu_Draw_ioq3;
@@ -115,7 +113,7 @@ UI_CreditMenu_Draw
 static void UI_CreditMenu_Draw( void ) {
 	int		y;
 
-#ifdef TURTLEARENA
+#ifdef TMNT
 	// Credit id software and ioquake3, and legal stuff.
 	y = 72;
 	UI_DrawProportionalString( 320, y, "Credits", UI_CENTER|UI_SMALLFONT, color_white );
@@ -127,7 +125,7 @@ static void UI_CreditMenu_Draw( void ) {
 	UI_DrawProportionalString( 320, y, "ioquake3 - www.ioquake3.org", UI_CENTER|UI_SMALLFONT, color_white );
 
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Zack \"ZTurtleMan\" Middleton", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Gap.
 	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
@@ -136,17 +134,17 @@ static void UI_CreditMenu_Draw( void ) {
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "Copyright", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Turtle Arena developer(s) are in", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "TMNT Arena developer(s) are in no way", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "no way affiliated with", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "affiliated with", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Viacom, Mirage Studios, 4KidsTV, or Ubisoft.", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "Mirage Studios, 4KidsTV, Konami, or Ubisoft.", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Copyright.
 	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
-	UI_DrawProportionalString( 320, y, "TMNT(c) 2010 Viacom", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "TMNT(c) 1984-2009 Mirage Studios", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Turtle Arena(c) 2009-2010 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "TMNT Arena(c) 2009 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
 #else
 	y = 12;
 	UI_DrawProportionalString( 320, y, "id Software is:", UI_CENTER|UI_SMALLFONT, color_white );

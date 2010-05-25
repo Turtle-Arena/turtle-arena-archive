@@ -98,6 +98,7 @@ static void UI_AddBotsMenu_FightEvent( void* ptr, int event ) {
 	trap_Cmd_ExecuteText( EXEC_APPEND, va("addbot %s %i %s %i\n",
 		addBotsMenuInfo.botnames[addBotsMenuInfo.selectedBotNum], skill, team, addBotsMenuInfo.delay) );
 
+
 	addBotsMenuInfo.delay += 1500;
 }
 
@@ -201,8 +202,8 @@ static int QDECL UI_AddBotsMenu_SortCompare( const void *arg1, const void *arg2 
 	name1 = Info_ValueForKey( info1, "name" );
 	name2 = Info_ValueForKey( info2, "name" );
 
-#ifdef RANDOMBOT // ZTM: Random bot
-    // ZTM: Random bot comes first on the list.
+#ifdef RANDOMBOT // Turtle Man: Random bot
+    // Turtle Man: Random bot comes first on the list.
     if (Q_stricmp(name1, "Random") == 0 || Q_stricmp(name2, "Random") == 0)
     {
         return Q_stricmp( Q_stricmp(name1, "Random") == 0 ? "0" : "1",
@@ -230,7 +231,7 @@ UI_AddBotsMenu_Draw
 =================
 */
 static void UI_AddBotsMenu_Draw( void ) {
-	UI_DrawBannerString( 320, 16, "ADD BOTS", UI_CENTER, text_banner_color );
+	UI_DrawBannerString( 320, 16, "ADD BOTS", UI_CENTER, color_white );
 	UI_DrawNamedPic( 320-233, 240-166, 466, 332, ART_BACKGROUND );
 
 	// standard menu drawing
@@ -244,7 +245,7 @@ UI_AddBotsMenu_Init
 =================
 */
 static const char *skillNames[] = {
-#ifdef TA_MISC // SRB2_SKILLS
+#ifdef TMNTMISC // rip off SRB2 skills...
 	"Easy",
 	"Normal",
 	"Hard",

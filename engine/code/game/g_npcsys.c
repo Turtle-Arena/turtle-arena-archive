@@ -1,41 +1,41 @@
 /*
 ===========================================================================
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009 ZTurtleMan
 
-This file is part of Turtle Arena source code.
+This file is part of TMNT Arena source code.
 
-Turtle Arena source code is free software; you can redistribute it
+TMNT Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena source code is distributed in the hope that it will be
+TMNT Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena source code; if not, write to the Free Software
+along with TMNT Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
 #include "g_local.h"
 
-#ifdef TA_ENTSYS
+#ifdef TMNTENTSYS
 // Misc_object uses modelindex2
 // NPC uses ps.legsAnim due to Pmove currently.
 //    But it is copied to ent->s.modelindex2 after Pmove.
 void G_SetMiscAnim(gentity_t *ent, int anim)
 {
 	ent->s.modelindex2 = ((ent->s.modelindex2 & ANIM_TOGGLEBIT)^ANIM_TOGGLEBIT) | anim;
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 	ent->bgNPC.npc_ps.legsAnim = ent->s.modelindex2;
 #endif
 }
 #endif
 
-#ifdef TA_NPCSYS
+#ifdef TMNTNPCSYS
 qboolean	npcRegistered[MAX_NPCS];
 
 /*
@@ -110,7 +110,7 @@ void NPC_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean
 	s->modelindex2 = ps->legsAnim;
 }
 
-#ifndef TA_PATHSYS
+#ifndef TMNTPATHSYS
 void SP_npcpath( gentity_t *self )
 {
 	if ( !self->targetname ) {
@@ -179,8 +179,13 @@ static void G_NPC_Die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 	}
 
 	// Drop weapon
-	if ((self->s.weapon > WP_NONE && self->s.weapon < BG_NumWeaponGroups())
-		&& !(self->bgNPC.info->flags & NPCF_NODROPWEAPON))
+	if ((self->s.weapon > WP_NONE && self->s.weapon <
+#ifdef TMNTWEAPSYS_2
+		BG_NumWeaponGroups()
+#else
+		WP_NUM_WEAPONS
+#endif
+		) && !(self->bgNPC.info->flags & NPCF_NODROPWEAPON))
 	{
 		gitem_t *item = BG_FindItemForWeapon( self->s.weapon );
 		Drop_Item(self, item, 0);
@@ -216,7 +221,7 @@ void G_NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	G_SetMiscAnim(self, OBJECT_PAIN);
 	self->bgNPC.npc_ps.legsTimer = BG_AnimationTime(&self->bgNPC.info->animations[OBJECT_PAIN]);
 
-	if (!attacker || (!attacker->client && !attacker->bgNPC.info)) {
+	if (!attacker || !attacker->client || !attacker->bgNPC.info) {
 		return;
 	}
 
@@ -235,6 +240,12 @@ void G_NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	{
 		// Tell NPC to kill attacker!
 		G_NPC_StartAction(self, attacker, NACT_ATTACK);
+	}
+
+	// Turtle Man: TODO: Limit how soon to call paintarget again? Use pain_debounce?
+	if ( self->paintarget )
+	{
+		G_UseTargets2(self, attacker, self->paintarget);
 	}
 }
 
@@ -258,7 +269,6 @@ void FinishSpawningNPC( gentity_t *ent ) {
 	ent->s.modelindex2 = 0; // zero indicates this isn't a dropped item
 
 	ent->r.contents = CONTENTS_BODY;
-	ent->clipmask = MASK_PLAYERSOLID;
 	//ent->touch = Touch_Item;
 
 	if ( ent->spawnflags & 1 ) {
@@ -300,7 +310,7 @@ void FinishSpawningNPC( gentity_t *ent ) {
 	// NPCs can target a path to follow
 	if (ent->target)
 	{
-#ifdef TA_PATHSYS
+#ifdef TMNTPATHSYS
 		if (G_SetupPath(ent, ent->target) != PATH_ERROR)
 		{
 			// Path is okay to use.
@@ -351,12 +361,10 @@ Spawn the NPC
 */
 void Use_NPC( gentity_t *ent, gentity_t *other, gentity_t *activator ) {
 	if ((ent->spawnflags & 2)
+		&& (level.time-ent->spawnTime > FRAMETIME * 2)
 		&& ent->s.eType != ET_NPC)
 	{
-		// some movers spawn on the second frame, so delay item
-		// spawns until the third frame so they can ride trains
-		ent->nextthink = level.time + FRAMETIME * 2;
-		ent->think = FinishSpawningNPC;
+		FinishSpawningNPC( ent );
 	}
 }
 
@@ -408,7 +416,7 @@ void G_RunNPC( gentity_t *ent )
 	Com_Memset(&ucmd, 0, sizeof (ucmd));
 	ucmd.serverTime = level.time;
 
-	// ZTM: TODO: Think here (setup ucmd).
+	// Turtle Man: TODO: Think here (setup ucmd).
 	switch (ent->bgNPC.action)
 	{
 		case NACT_IDLE:
@@ -436,7 +444,7 @@ void G_RunNPC( gentity_t *ent )
 	}
 
 	ent->bgNPC.npc_ps.gravity = g_gravity.value;
-	//ent->bgNPC.npc_ps.clientNum = ent->s.number; // ZTM: Why?
+	//ent->bgNPC.npc_ps.clientNum = ent->s.number; // Turtle Man: Why?
 
 	ent->bgNPC.npc_ps.speed = g_speed.value;
 

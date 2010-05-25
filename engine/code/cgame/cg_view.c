@@ -229,76 +229,12 @@ static void CG_OffsetThirdPersonView( void ) {
 	static vec3_t	maxs = { 4, 4, 4 };
 	vec3_t		focusPoint;
 	float		focusDist;
-#ifdef IOQ3ZTM // BETTER_THIRD_PERSON
-	float		distance;
-#else
+#ifndef IOQ3ZTM // BETTER_THIRD_PERSON
 	float		forwardScale, sideScale;
 #endif
 
 	cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
-#ifdef IOQ3ZTM // BETTER_THIRD_PERSON
-	distance = cg_thirdPersonRange.value;
-#endif
 
-#ifdef TURTLEARENA // LOCKON
-	if (cg.snap && cg.snap->ps.enemyEnt != ENTITYNUM_NONE) {
-		int i;
-		vec3_t dir;
-		vec3_t targetAngles;
-		vec3_t angDiff;
-		float f;
-		float time;
-		qboolean completedMove;
-		static float max_fraction = 1.0f;
-
-		time = LOCKON_TIME;
-		if (!cg.lockedOn)
-			time *= max_fraction;
-
-		// Setup fraction
-		f = ( cg.time - cg.lockonTime ) / time;
-		if (f > 1.0f) {
-			f = 1.0f;
-			completedMove = qtrue;
-		} else {
-			completedMove = qfalse;
-		}
-
-		if (cg.lockedOn) {
-			max_fraction = f;
-		} else {
-			f = max_fraction - f * max_fraction;
-		}
-
-		if (cg.lockedOn || !completedMove ) {
-			// Move camera back
-			distance += cg_thirdPersonRange.value*0.3f*f;
-
-			// Get view angles to look at target
-			VectorSubtract( cg.snap->ps.enemyOrigin, cg.snap->ps.origin, dir );
-			vectoangles( dir, targetAngles );
-
-			if ( completedMove ) {
-				VectorCopy(targetAngles, cg.refdefViewAngles);
-			} else {
-				// get diff of normal and target view angles.
-				VectorSubtract(targetAngles, cg.refdefViewAngles, angDiff);
-
-				// Stop camera from spinning 360 degrees.
-				for (i = 0; i < 3; i++)
-				{
-					angDiff[i] = AngleNormalize180(angDiff[i]);
-				}
-
-				// Scale the difference of the angles
-				VectorScale(angDiff, f, angDiff);
-
-				// Add the scaled angle difference
-				VectorAdd(cg.refdefViewAngles, angDiff, cg.refdefViewAngles);
-			}
-		}
-	}
-#endif
 	VectorCopy( cg.refdefViewAngles, focusAngles );
 
 	// if dead, look at killer
@@ -306,13 +242,6 @@ static void CG_OffsetThirdPersonView( void ) {
 		focusAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
 		cg.refdefViewAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
 	}
-#ifdef NIGHTSMODE
-	else if (cg.snap->ps.eFlags & EF_NIGHTSMODE)
-	{
-		focusAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
-		cg.refdefViewAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
-	}
-#endif
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
 	else
 	{
@@ -329,7 +258,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
 	// Focus on player
-	VectorMA( cg.refdef.vieworg, distance, forward, focusPoint );
+	VectorMA( cg.refdef.vieworg, cg_thirdPersonRange.value, forward, focusPoint );
 #else
 	VectorMA( cg.refdef.vieworg, FOCUS_DISTANCE, forward, focusPoint );
 #endif
@@ -344,7 +273,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
 	// Move camera behind player
-	VectorMA( view, -distance, forward, view );
+	VectorMA( view, -cg_thirdPersonRange.value, forward, view );
 #else
 	forwardScale = cos( cg_thirdPersonAngle.value / 180 * M_PI );
 	sideScale = sin( cg_thirdPersonAngle.value / 180 * M_PI );
@@ -551,14 +480,13 @@ static void CG_OffsetFirstPersonView( void ) {
 
 //======================================================================
 
-#ifndef TURTLEARENA // NOZOOM
 void CG_ZoomDown_f( void ) { 
 	if ( cg.zoomed ) {
 		return;
 	}
 	cg.zoomed = qtrue;
 	cg.zoomTime = cg.time;
-#ifdef IOQ3ZTM // LETTERBOX
+#ifdef TMNTMISC
 	CG_ToggleLetterbox(qtrue, qfalse);
 #endif
 }
@@ -569,11 +497,10 @@ void CG_ZoomUp_f( void ) {
 	}
 	cg.zoomed = qfalse;
 	cg.zoomTime = cg.time;
-#ifdef IOQ3ZTM // LETTERBOX
+#ifdef TMNTMISC
 	CG_ToggleLetterbox(qfalse, qfalse);
 #endif
 }
-#endif
 
 
 /*
@@ -592,15 +519,13 @@ static int CG_CalcFov( void ) {
 	float	v;
 	int		contents;
 	float	fov_x, fov_y;
-#ifndef TURTLEARENA // NOZOOM
 	float	zoomFov;
 	float	f;
-#endif
 	int		inwater;
 
 	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		// if in intermission, use a fixed value
-#ifdef TURTLEARENA // FOV
+#ifdef TMNTMISC // FOV
 		fov_x = 70;
 #else
 		fov_x = 90;
@@ -609,7 +534,7 @@ static int CG_CalcFov( void ) {
 		// user selectable
 		if ( cgs.dmflags & DF_FIXED_FOV ) {
 			// dmflag to prevent wide fov for all clients
-#ifdef TURTLEARENA // FOV
+#ifdef TMNTMISC // FOV
 			fov_x = 70;
 #else
 			fov_x = 90;
@@ -623,7 +548,6 @@ static int CG_CalcFov( void ) {
 			}
 		}
 
-#ifndef TURTLEARENA // NOZOOM
 		// account for zooms
 		zoomFov = cg_zoomFov.value;
 		if ( zoomFov < 1 ) {
@@ -647,7 +571,6 @@ static int CG_CalcFov( void ) {
 				fov_x = zoomFov + f * ( fov_x - zoomFov );
 			}
 		}
-#endif
 	}
 
 	x = cg.refdef.width / tan( fov_x / 360 * M_PI );
@@ -672,20 +595,18 @@ static int CG_CalcFov( void ) {
 	cg.refdef.fov_x = fov_x;
 	cg.refdef.fov_y = fov_y;
 
-#ifndef TURTLEARENA // NOZOOM
 	if ( !cg.zoomed ) {
 		cg.zoomSensitivity = 1;
 	} else {
 		cg.zoomSensitivity = cg.refdef.fov_y / 75.0;
 	}
-#endif
 
 	return inwater;
 }
 
 
 
-#ifndef NOBLOOD
+#ifndef NOBLOOD // Should be NOTRATEDM ?
 /*
 ===============
 CG_DamageBlendBlob
@@ -696,12 +617,6 @@ static void CG_DamageBlendBlob( void ) {
 	int			t;
 	int			maxTime;
 	refEntity_t		ent;
-
-#ifdef NOTRATEDM // Only if blood is enabled
-	if (!cg_blood.integer) {
-		return;
-	}
-#endif
 
 	if ( !cg.damageValue ) {
 		return;
@@ -791,7 +706,7 @@ static int CG_CalcViewValues( void ) {
 				CG_Fade(0, cg.time + 200, 1500);	// then fadeup
 			}
 
-#ifdef IOQ3ZTM // LETTERBOX
+#ifdef TMNTMISC
 			CG_ToggleLetterbox(qfalse, cg.cameraEndBlack);
 #endif
 		}
@@ -812,7 +727,7 @@ static int CG_CalcViewValues( void ) {
 	}
 */
 #endif
-#ifdef TA_CAMERA
+#ifdef TMNTCAMERA
 	// If not a Q3 camera use new camera code.
 	if (ps->camera.mode != CAM_FIRSTPERSON && ps->camera.mode != CAM_Q3THIRDPERSON)
 	{
@@ -820,7 +735,7 @@ static int CG_CalcViewValues( void ) {
 			cg.refdef.rdflags |= RDF_NOWORLDMODEL | RDF_HYPERSPACE;
 		}
 
-		// ZTM: TODO?: Perdiction.
+		// Turtle Man: TODO?: Perdiction.
 		VectorCopy(ps->camera.angles, cg.refdefViewAngles);
 		VectorCopy(ps->camera.pos, cg.refdef.vieworg);
 		AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
@@ -830,7 +745,7 @@ static int CG_CalcViewValues( void ) {
 #endif
 	// intermission view
 	if ( ps->pm_type == PM_INTERMISSION
-#ifdef TA_SP
+#ifdef TMNTSP
 		&& cgs.gametype != GT_SINGLE_PLAYER
 #endif
 	) {
@@ -855,13 +770,6 @@ static int CG_CalcViewValues( void ) {
 			cg_thirdPersonAngle.value += cg_cameraOrbit.value;
 		}
 	}
-#ifdef IOQ3ZTM // NEW_CAM
-	else
-	{
-		extern void CG_CamUpdate(void);
-		CG_CamUpdate();
-	}
-#endif
 	// add error decay
 	if ( cg_errorDecay.value > 0 ) {
 		int		t;
@@ -876,6 +784,20 @@ static int CG_CalcViewValues( void ) {
 		}
 	}
 
+#ifdef ANALOG // Turtle Man: TODO?: Analog camera.
+	if (cg_thirdPerson.integer && cg_thirdPersonAnalog.integer)
+	{
+		// Analog camera.
+		cg.refdef.vieworg[0] = 0;
+		cg.refdef.vieworg[1] = 0;
+		cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight*2;
+
+		cg.refdefViewAngles[ROLL] = 0;
+		cg.refdefViewAngles[PITCH] = 0;
+		cg.refdefViewAngles[YAW] = 0;
+	}
+	else
+#endif
 	if ( cg.renderingThirdPerson ) {
 		// back away from character
 		CG_OffsetThirdPersonView();
@@ -908,7 +830,7 @@ static void CG_PowerupTimerSounds( void ) {
 	// powerup timers going away
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
 		t = cg.snap->ps.powerups[i];
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 		if (i == PW_FLASHING)
 		{
 			continue;
@@ -968,8 +890,6 @@ Generates and draws a game scene and status information at the given time.
 */
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback ) {
 	int		inwater;
-	float	mouseSensitivity;
-	int		weaponSelect;
 
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
@@ -1002,20 +922,18 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	}
 
 	// let the client system know what our weapon and zoom settings are
-#ifdef TURTLEARENA // NOZOOM
-	mouseSensitivity = 1;
+#ifdef TMNTWEAPSYS2
+#ifdef TMNTHOLDSYS/*2*/
+	trap_SetUserCmdValue( cg.holdableSelect, cg.zoomSensitivity );
 #else
-	mouseSensitivity = cg.zoomSensitivity;
+	trap_SetUserCmdValue( 0, cg.zoomSensitivity );
 #endif
-#ifdef TA_WEAPSYS_EX
-	weaponSelect = 0;
 #else
-	weaponSelect = cg.weaponSelect;
+#ifdef TMNTHOLDSYS/*2*/
+	trap_SetUserCmdValue( cg.weaponSelect, cg.holdableSelect, cg.zoomSensitivity );
+#else
+	trap_SetUserCmdValue( cg.weaponSelect, cg.zoomSensitivity );
 #endif
-#ifdef TA_HOLDSYS/*2*/
-	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.holdableSelect );
-#else
-	trap_SetUserCmdValue( weaponSelect, mouseSensitivity );
 #endif
 
 	// this counter will be bumped for every valid scene we generate
@@ -1023,25 +941,6 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// update cg.predictedPlayerState
 	CG_PredictPlayerState();
-
-#ifdef TURTLEARENA // LOCKON
-	if (!cg.lockedOn && (cg.predictedPlayerState.eFlags & EF_LOCKON))
-	{
-		cg.lockedOn = qtrue;
-		cg.lockonTime = cg.time;
-#ifdef IOQ3ZTM // LETTERBOX
-		CG_ToggleLetterbox(qtrue, qfalse);
-#endif
-	}
-	else if (cg.lockedOn && !(cg.predictedPlayerState.eFlags & EF_LOCKON))
-	{
-		cg.lockedOn = qfalse;
-		cg.lockonTime = cg.time;
-#ifdef IOQ3ZTM // LETTERBOX
-		CG_ToggleLetterbox(qfalse, qfalse);
-#endif
-	}
-#endif
 
 	// decide on third person view
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, if spectator always be in first person.
@@ -1054,7 +953,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	// build cg.refdef
 	inwater = CG_CalcViewValues();
 
-#ifndef NOBLOOD
+#ifndef NOBLOOD // Should be NOTRATEDM ?
 	// first person blend blobs, done after AnglesToAxis
 	if ( !cg.renderingThirdPerson ) {
 		CG_DamageBlendBlob();

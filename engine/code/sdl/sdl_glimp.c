@@ -221,13 +221,13 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 
 		if( videoInfo->current_h > 0 )
 		{
-			// Guess the display aspect ratio through the desktop resolution
-			// by assuming (relatively safely) that it is set at or close to
-			// the display's native aspect ratio
-			displayAspect = (float)videoInfo->current_w / (float)videoInfo->current_h;
+		// Guess the display aspect ratio through the desktop resolution
+		// by assuming (relatively safely) that it is set at or close to
+		// the display's native aspect ratio
+		displayAspect = (float)videoInfo->current_w / (float)videoInfo->current_h;
 
-			ri.Printf( PRINT_ALL, "Estimated display aspect: %.3f\n", displayAspect );
-		}
+		ri.Printf( PRINT_ALL, "Estimated display aspect: %.3f\n", displayAspect );
+	}
 		else
 		{
 			ri.Printf( PRINT_ALL,
@@ -257,7 +257,7 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		glConfig.isFullscreen = qfalse;
 	}
 
-	colorbits = r_colorbits->value;
+		colorbits = r_colorbits->value;
 	if ((!colorbits) || (colorbits >= 32))
 		colorbits = 24;
 
@@ -673,14 +673,6 @@ void GLimp_Init( void )
 	r_allowResize = ri.Cvar_Get( "r_allowResize", "0", CVAR_ARCHIVE );
 	r_centerWindow = ri.Cvar_Get( "r_centerWindow", "0", CVAR_ARCHIVE );
 
-	if( Cvar_VariableIntegerValue( "com_abnormalExit" ) )
-	{
-		ri.Cvar_Set( "r_mode", va( "%d", R_MODE_FALLBACK ) );
-		ri.Cvar_Set( "r_fullscreen", "0" );
-		ri.Cvar_Set( "r_centerWindow", "0" );
-		ri.Cvar_Set( "com_abnormalExit", "0" );
-	}
-
 	Sys_SetEnv( "SDL_VIDEO_CENTERED", r_centerWindow->integer ? "1" : "" );
 
 	Sys_GLimpInit( );
@@ -696,17 +688,17 @@ void GLimp_Init( void )
 		goto success;
 
 	// Finally, try the default screen resolution
-	if( r_mode->integer != R_MODE_FALLBACK )
-	{
-		ri.Printf( PRINT_ALL, "Setting r_mode %d failed, falling back on r_mode %d\n",
-				r_mode->integer, R_MODE_FALLBACK );
+		if( r_mode->integer != R_MODE_FALLBACK )
+		{
+			ri.Printf( PRINT_ALL, "Setting r_mode %d failed, falling back on r_mode %d\n",
+					r_mode->integer, R_MODE_FALLBACK );
 
-		if(GLimp_StartDriverAndSetMode(R_MODE_FALLBACK, qfalse, qfalse))
+		if(GLimp_StartDriverAndSetMode(R_MODE_FALLBACK, r_fullscreen->integer, qfalse))
 			goto success;
 	}
 
 	// Nothing worked, give up
-	ri.Error( ERR_FATAL, "GLimp_Init() - could not load OpenGL subsystem\n" );
+		ri.Error( ERR_FATAL, "GLimp_Init() - could not load OpenGL subsystem\n" );
 
 success:
 	// This values force the UI to disable driver selection

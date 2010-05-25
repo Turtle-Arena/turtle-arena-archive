@@ -45,7 +45,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 
 #define ART_BACK0				"menu/art/back_0"
 #define ART_BACK1				"menu/art/back_1"
-#ifndef TA_MISC
+#ifndef TMNTMISC
 #define ART_CREATE0				"menu/art/create_0"
 #define ART_CREATE1				"menu/art/create_1"
 #endif
@@ -53,7 +53,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define ART_SPECIFY1			"menu/art/specify_1"
 #define ART_REFRESH0			"menu/art/refresh_0"
 #define ART_REFRESH1			"menu/art/refresh_1"
-#ifdef TA_DATA // NO_MENU_FIGHT
+#ifdef TMNTDATA // NO_MENU_FIGHT
 #define ART_CONNECT0			"menu/art/join_0"
 #define ART_CONNECT1			"menu/art/join_1"
 #else
@@ -66,7 +66,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define ART_UNKNOWNMAP			"menu/art/unknownmap"
 #define ART_REMOVE0				"menu/art/delete_0"
 #define ART_REMOVE1				"menu/art/delete_1"
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 #define ART_PUNKBUSTER		"menu/art/pblogo"
 #endif
 
@@ -81,12 +81,12 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define ID_BACK				18
 #define ID_REFRESH			19
 #define ID_SPECIFY			20
-#ifndef TA_MISC
+#ifndef TMNTMISC
 #define ID_CREATE			21
 #endif
 #define ID_CONNECT			22
 #define ID_REMOVE			23
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 #define ID_PUNKBUSTER 24
 #endif
 
@@ -107,7 +107,7 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #define SORT_GAME			3
 #define SORT_PING			4
 
-#ifdef TURTLEARENA // MP_GAMETYPES
+#ifdef TMNT // MP_GAMETYPES
 #define GAMES_ALL			0
 #define GAMES_FFA			1
 #define GAMES_TOURNEY		2
@@ -150,15 +150,15 @@ static const char *master_items[] = {
 static const char *servertype_items[] = {
 	"All",
 	"Free For All",
-#ifndef TURTLEARENA // MP_GAMETYPES
+#ifndef TMNT // MP_GAMETYPES
 	"Team Deathmatch",
 #endif
-#ifdef TA_MISC // tornament to duel
+#ifdef TMNTMISC // tornament to duel
 	"Duel",
 #else
 	"Tournament",
 #endif
-#ifdef TURTLEARENA // MP_GAMETYPES
+#ifdef TMNT // MP_GAMETYPES
 	"Cooperative",
 	"Team Deathmatch",
 #endif
@@ -185,7 +185,7 @@ static const char *sortkey_items[] = {
 static char* gamenames[] = {
 	"DM ",	// deathmatch
 	"1v1",	// tournament
-#ifdef TA_SP
+#ifdef TMNTSP
 	"Co-op",	// single player
 #else
 	"SP ",	// single player
@@ -195,7 +195,7 @@ static char* gamenames[] = {
 	"One Flag CTF",		// one flag ctf
 	"OverLoad",				// Overload
 	"Harvester",			// Harvester
-#ifndef TURTLEARENA
+#ifndef TMNT
 	"Rocket Arena 3",	// Rocket Arena 3
 	"Q3F",						// Q3F
 	"Urban Terror",		// Urban Terror
@@ -205,7 +205,11 @@ static char* gamenames[] = {
 	NULL
 };
 #ifdef IOQ3ZTM // Net gametype browse
-int numNetGametypes = (sizeof( gamenames ) / sizeof( gamenames[0] )) - 1; // gamenames(w/unknown) - NULL
+#ifdef TMNT
+int numNetGametypes = 8; // 7 + unknown
+#else
+int numNetGametypes = 12; // 11 + unknown
+#endif
 #endif
 
 static char* netnames[] = {
@@ -220,13 +224,13 @@ static char* netnames[] = {
 	NULL
 };
 
-#ifdef TURTLEARENA // ZTM: Website
-static char quake3worldMessage[] = "Visit turtlearena.googlecode.com for News and Updates";
+#ifdef TMNT // Turtle Man: TODO: Add a url, etc?
+static char quake3worldMessage[] = "";
 #else
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
 #endif
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 const char* punkbuster_items[] = {
 	"Disabled",
 	"Enabled",
@@ -259,7 +263,7 @@ typedef struct servernode_s {
 	int		nettype;
 	int		minPing;
 	int		maxPing;
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	qboolean bPB;
 #endif
 
@@ -293,7 +297,7 @@ typedef struct {
 	menubitmap_s		back;
 	menubitmap_s		refresh;
 	menubitmap_s		specify;
-#ifndef TA_MISC
+#ifndef TMNTMISC
 	menubitmap_s		create;
 #endif
 	menubitmap_s		go;
@@ -312,7 +316,7 @@ typedef struct {
 	char				favoriteaddresses[MAX_FAVORITESERVERS][MAX_ADDRESSLENGTH];
 	int					numfavoriteaddresses;
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	menulist_s		punkbuster;
 	menubitmap_s	pblogo;
 #endif
@@ -442,7 +446,7 @@ static void ArenaServers_UpdatePicture( void ) {
 	}
 	else {
 		servernodeptr = g_arenaservers.table[g_arenaservers.list.curvalue].servernode;
-#ifdef TA_DATA // TEAMARENA_LEVELSHOTS
+#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 		Com_sprintf( picname, sizeof(picname), "levelshots/%s_small", servernodeptr->mapname );
 #else
 		Com_sprintf( picname, sizeof(picname), "levelshots/%s.tga", servernodeptr->mapname );
@@ -488,7 +492,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.list.generic.flags		&= ~QMF_GRAYED;
 			g_arenaservers.refresh.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.go.generic.flags			&= ~QMF_GRAYED;
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 			g_arenaservers.punkbuster.generic.flags &= ~QMF_GRAYED;
 #endif
 
@@ -517,7 +521,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.list.generic.flags		|= QMF_GRAYED;
 			g_arenaservers.refresh.generic.flags	|= QMF_GRAYED;
 			g_arenaservers.go.generic.flags			|= QMF_GRAYED;
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 			g_arenaservers.punkbuster.generic.flags |= QMF_GRAYED;
 #endif
 		}
@@ -546,7 +550,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.list.generic.flags		|= QMF_GRAYED;
 			g_arenaservers.refresh.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.go.generic.flags			|= QMF_GRAYED;
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 			g_arenaservers.punkbuster.generic.flags &= ~QMF_GRAYED;
 #endif
 		}
@@ -588,7 +592,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			}
 			break;
 
-#ifndef TURTLEARENA // MP_GAMETYPES
+#ifndef TMNT // MP_GAMETYPES
 		case GAMES_TEAMPLAY:
 			if( servernodeptr->gametype != GT_TEAM ) {
 				continue;
@@ -602,7 +606,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			}
 			break;
 
-#ifdef TURTLEARENA // MP_GAMETYPES
+#ifdef TMNT // MP_GAMETYPES
 		case GAMES_COOP:
 			if( servernodeptr->gametype != GT_SINGLE_PLAYER ) {
 				continue;
@@ -660,7 +664,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			pingColor = S_COLOR_RED;
 		}
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 #ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s%s%3d " S_COLOR_YELLOW "%s",
 #else
@@ -669,7 +673,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			servernodeptr->hostname, servernodeptr->mapname, servernodeptr->numclients,
  			servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime, servernodeptr->bPB ? "Yes" : "No" );
-#else // ZTM: No punkbuster
+#else // Turtle Man: No punkbuster
 #ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s%s%3d " S_COLOR_YELLOW "",
 #else
@@ -798,7 +802,7 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	servernodeptr->pingtime   = pingtime;
 	servernodeptr->minPing    = atoi( Info_ValueForKey( info, "minPing") );
 	servernodeptr->maxPing    = atoi( Info_ValueForKey( info, "maxPing") );
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	servernodeptr->bPB = atoi( Info_ValueForKey( info, "punkbuster") );
 #endif
 
@@ -1187,7 +1191,7 @@ void ArenaServers_StartRefresh( void )
 			strcpy( myargs, " ffa" );
 			break;
 
-#ifndef TURTLEARENA // MP_GAMETYPES
+#ifndef TMNT // MP_GAMETYPES
 		case GAMES_TEAMPLAY:
 			strcpy( myargs, " team" );
 			break;
@@ -1197,7 +1201,7 @@ void ArenaServers_StartRefresh( void )
 			strcpy( myargs, " tourney" );
 			break;
 
-#ifdef TURTLEARENA // MP_GAMETYPES
+#ifdef TMNT // MP_GAMETYPES
 		case GAMES_COOP:
 			strcpy( myargs, " coop" );
 			break;
@@ -1347,7 +1351,7 @@ int ArenaServers_SetType( int type )
 	return type;
 }
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 /*
 =================
 PunkBuster_Confirm
@@ -1449,7 +1453,7 @@ static void ArenaServers_Event( void* ptr, int event ) {
 #endif
 		break;
 
-#ifndef TA_MISC
+#ifndef TMNTMISC
 	case ID_CREATE:
 		UI_StartServerMenu( qtrue );
 		break;
@@ -1464,7 +1468,7 @@ static void ArenaServers_Event( void* ptr, int event ) {
 		ArenaServers_UpdateMenu();
 		break;
 	
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	case ID_PUNKBUSTER:
 		if (g_arenaservers.punkbuster.curvalue)			
 		{
@@ -1512,11 +1516,7 @@ static sfxHandle_t ArenaServers_MenuKey( int key ) {
 		return menu_move_sound;
 	}
 
-	if(
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
-	key == K_MOUSE2 ||
-#endif
-	key == K_ESCAPE ) {
+	if( key == K_MOUSE2 || key == K_ESCAPE ) {
 		ArenaServers_StopRefresh();
 		ArenaServers_SaveChanges();
 	}
@@ -1553,7 +1553,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.banner.generic.y	    = 16;
 	g_arenaservers.banner.string  		= "ARENA SERVERS";
 	g_arenaservers.banner.style  	    = UI_CENTER;
-	g_arenaservers.banner.color  	    = text_banner_color;
+	g_arenaservers.banner.color  	    = color_white;
 
 	y = 80;
 	g_arenaservers.master.generic.type			= MTYPE_SPINCONTROL;
@@ -1697,7 +1697,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.specify.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	g_arenaservers.specify.generic.callback = ArenaServers_Event;
 	g_arenaservers.specify.generic.id	    = ID_SPECIFY;
-#ifdef TA_MISC
+#ifdef TMNTMISC
 	g_arenaservers.specify.generic.x		= 176;
 #else
 	g_arenaservers.specify.generic.x		= 128;
@@ -1712,7 +1712,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.refresh.generic.flags	= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	g_arenaservers.refresh.generic.callback	= ArenaServers_Event;
 	g_arenaservers.refresh.generic.id		= ID_REFRESH;
-#ifdef TA_MISC
+#ifdef TMNTMISC
 	g_arenaservers.refresh.generic.x		= 352;
 #else
 	g_arenaservers.refresh.generic.x		= 256;
@@ -1722,7 +1722,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.refresh.height			= 64;
 	g_arenaservers.refresh.focuspic			= ART_REFRESH1;
 
-#ifndef TA_MISC
+#ifndef TMNTMISC
 	g_arenaservers.create.generic.type		= MTYPE_BITMAP;
 	g_arenaservers.create.generic.name		= ART_CREATE0;
 	g_arenaservers.create.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1746,7 +1746,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.go.height				= 64;
 	g_arenaservers.go.focuspic				= ART_CONNECT1;
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	g_arenaservers.punkbuster.generic.type			= MTYPE_SPINCONTROL;
 	g_arenaservers.punkbuster.generic.name			= "Punkbuster:";
 	g_arenaservers.punkbuster.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -1786,12 +1786,12 @@ static void ArenaServers_MenuInit( void ) {
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.back );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.specify );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.refresh );
-#ifndef TA_MISC
+#ifndef TMNTMISC
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.create );
 #endif
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.go );
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.punkbuster );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.pblogo );
 #endif
@@ -1817,7 +1817,7 @@ static void ArenaServers_MenuInit( void ) {
 	g_emptyservers = Com_Clamp( 0, 1, ui_browserShowEmpty.integer );
 	g_arenaservers.showempty.curvalue = g_emptyservers;
 	
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	g_arenaservers.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "cl_punkbuster" ) );
 #endif
 
@@ -1836,7 +1836,7 @@ ArenaServers_Cache
 void ArenaServers_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_BACK0 );
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
-#ifndef TA_MISC
+#ifndef TMNTMISC
 	trap_R_RegisterShaderNoMip( ART_CREATE0 );
 	trap_R_RegisterShaderNoMip( ART_CREATE1 );
 #endif
@@ -1850,7 +1850,7 @@ void ArenaServers_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_ARROWS_UP );
 	trap_R_RegisterShaderNoMip( ART_ARROWS_DOWN );
 	trap_R_RegisterShaderNoMip( ART_UNKNOWNMAP );
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	trap_R_RegisterShaderNoMip( ART_PUNKBUSTER );
 #endif
 }

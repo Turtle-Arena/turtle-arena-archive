@@ -37,7 +37,7 @@ extern "C" {
 
 /** @name Version Number
  *  Printable format: "%d.%d.%d", MAJOR, MINOR, PATCHLEVEL
- */
+*/
 /*@{*/
 #define SDL_MAJOR_VERSION	1
 #define SDL_MINOR_VERSION	2
@@ -64,7 +64,7 @@ typedef struct SDL_version {
 /** This macro turns the version numbers into a numeric value:
  *  (1,2,3) -> (1203)
  *  This assumes that there will never be more than 100 patchlevels
- */
+*/
 #define SDL_VERSIONNUM(X, Y, Z)						\
 	((X)*1000 + (Y)*100 + (Z))
 

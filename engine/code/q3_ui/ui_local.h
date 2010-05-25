@@ -49,7 +49,7 @@ extern vmCvar_t	ui_ctf_capturelimit;
 extern vmCvar_t	ui_ctf_timelimit;
 extern vmCvar_t	ui_ctf_friendly;
 
-#ifdef MISSIONPACK // ZTM: MP_GAMETYPES
+#ifdef MISSIONPACK // Turtle Man: MP_GAMETYPES
 extern vmCvar_t	ui_1flag_capturelimit;
 extern vmCvar_t	ui_1flag_timelimit;
 extern vmCvar_t	ui_1flag_friendly;
@@ -76,8 +76,9 @@ extern vmCvar_t	ui_spAwards;
 extern vmCvar_t	ui_spVideos;
 extern vmCvar_t	ui_spSkill;
 
-#ifdef TA_SP
+#ifdef TMNTSP
 extern vmCvar_t	ui_singlePlayerActive;
+extern vmCvar_t ui_spStage;
 #endif
 extern vmCvar_t	ui_spSelection;
 
@@ -109,7 +110,7 @@ extern vmCvar_t	ui_server14;
 extern vmCvar_t	ui_server15;
 extern vmCvar_t	ui_server16;
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 extern vmCvar_t	ui_cdkey;
 extern vmCvar_t	ui_cdkeychecked;
 #endif
@@ -181,7 +182,7 @@ typedef struct _tag_menuframework
 
 	qboolean	wrapAround;
 	qboolean	fullscreen;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 	qboolean	showlogo;
 #endif
 #ifdef IOQ3ZTM
@@ -300,7 +301,7 @@ extern sfxHandle_t	menu_move_sound;
 extern sfxHandle_t	menu_out_sound;
 extern sfxHandle_t	menu_buzz_sound;
 extern sfxHandle_t	menu_null_sound;
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 extern sfxHandle_t	weaponChangeSound;
 #endif
 extern vec4_t		menu_text_color;
@@ -316,6 +317,9 @@ extern vec4_t		color_yellow;
 extern vec4_t		color_blue;
 extern vec4_t		color_orange;
 extern vec4_t		color_red;
+#ifdef TMNT // I changed red so that it is white, so I need a new "red"...
+extern vec4_t		color_TMNTred;
+#endif
 extern vec4_t		color_dim;
 extern vec4_t		name_color;
 extern vec4_t		list_color;
@@ -323,8 +327,6 @@ extern vec4_t		listbar_color;
 extern vec4_t		text_color_disabled; 
 extern vec4_t		text_color_normal;
 extern vec4_t		text_color_highlight;
-extern vec4_t		text_banner_color;
-extern vec4_t		text_big_color;
 
 extern char	*ui_medalNames[];
 extern char	*ui_medalPicNames[];
@@ -360,7 +362,7 @@ extern void UI_CreditMenu( void );
 extern void InGame_Cache( void );
 extern void UI_InGameMenu(void);
 
-#ifdef TA_MISC // INGAME_SERVER_MENU
+#ifdef TMNTMISC // INGAME_SERVER_MENU
 //
 // ui_ingame_server.c
 //
@@ -418,7 +420,7 @@ extern void UI_CinematicsMenu_Cache( void );
 extern void UI_ModsMenu( void );
 extern void UI_ModsMenu_Cache( void );
 
-#ifdef TA_MISC
+#ifdef TMNTMISC
 //
 // ui_multiplayer.c
 //
@@ -426,7 +428,7 @@ extern void UI_MultiplayerMenu( void );
 extern void UI_Multiplayer_Cache( void );
 #endif
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 //
 // ui_cdkey.c
 //
@@ -538,22 +540,19 @@ typedef struct {
 	qhandle_t		headModel;
 	qhandle_t		headSkin;
 
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	bg_playercfg_t	playercfg;
 #else
 	animation_t		animations[MAX_ANIMATIONS];
 #endif
 
 	qhandle_t		weaponModel;
+#ifdef TMNTWEAPSYS
+	qhandle_t		weaponModel2;
+#endif
 	qhandle_t		barrelModel;
 	qhandle_t		flashModel;
 	vec3_t			flashDlightColor;
-#ifdef TA_WEAPSYS
-	qhandle_t		weaponModel2;
-	qhandle_t		barrelModel2;
-	qhandle_t		flashModel2;
-	vec3_t			flashDlightColor2;
-#endif
 	int				muzzleFlashTime;
 
 	// currently in use drawing parms
@@ -604,12 +603,12 @@ typedef struct {
 	qboolean			debug;
 	qhandle_t			whiteShader;
 	qhandle_t			menuBackShader;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 	qhandle_t			menuBackNoLogoShader;
 #endif
 	qhandle_t			charset;
 	qhandle_t			charsetProp;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 	qhandle_t			charsetPropGlow;
 #endif
 	qhandle_t			charsetPropB;
@@ -671,12 +670,18 @@ void UI_SPLevelMenu_ReInit( void );
 // ui_spArena.c
 //
 void UI_SPArena_Start( const char *arenaInfo );
-#ifdef TA_SP
+#ifdef TMNTSP
 void UI_LoadGameMenu( void );
 void LoadGame_Cache( void );
+void UI_SpecifySaveMenu( void );
+void SpecifySave_Cache( void );
+
 void UI_SPMenu( void );
 void UI_SPMenu_f( void );
 void UI_SPMenu_Cache( void );
+void UI_StageMenu( void );
+void UI_StageMenu_f( void );
+void UI_StageMenu_Cache( void );
 #endif
 
 //
@@ -690,16 +695,6 @@ void UI_SPPostgameMenu_f( void );
 //
 void UI_SPSkillMenu( const char *arenaInfo );
 void UI_SPSkillMenu_Cache( void );
-
-#ifdef TA_SP
-//
-// ui_spPlayer.c
-//
-#define NUM_SPPLAYERS 4
-extern const char *spPlayerNames[NUM_SPPLAYERS];
-void UI_SPPlayerMenu( const char *arenaInfo );
-void UI_SPPlayerMenu_Cache( void );
-#endif
 
 //
 // ui_syscalls.c
@@ -761,18 +756,18 @@ void			trap_LAN_ClearPing( int n );
 void			trap_LAN_GetPing( int n, char *buf, int buflen, int *pingtime );
 void			trap_LAN_GetPingInfo( int n, char *buf, int buflen );
 int				trap_MemoryRemaining( void );
-#ifdef IOQUAKE3 // ZTM: CDKEY
+#ifdef IOQUAKE3 // Turtle Man: CDKEY
 void			trap_GetCDKey( char *buf, int buflen );
 void			trap_SetCDKey( char *buf );
 
 qboolean               trap_VerifyCDKey( const char *key, const char *chksum);
 #endif
-#ifdef TA_MISC
+#ifdef TMNTMISC
 void			trap_S_StopBackgroundTrack( void );
 void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
 #endif
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 void			trap_SetPbClStatus( int status );
 #endif
 
@@ -830,7 +825,7 @@ void UI_NetworkOptionsMenu( void );
 //
 typedef enum {
 	AWARD_ACCURACY,
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 	AWARD_IMPRESSIVE,
 	AWARD_EXCELLENT,
 	AWARD_GAUNTLET,

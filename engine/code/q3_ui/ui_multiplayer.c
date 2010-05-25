@@ -30,7 +30,6 @@ MULTIPLAYER MENU
 
 #include "ui_local.h"
 
-#ifdef TA_MISC
 
 #define SETUP_MENU_VERTICAL_SPACING		34
 
@@ -117,7 +116,7 @@ static void UI_Multiplayer_MenuInit( void ) {
 	multiplayerMenu.banner.generic.x				= 320;
 	multiplayerMenu.banner.generic.y				= 16;
 	multiplayerMenu.banner.string					= "MULTIPLAYER";
-	multiplayerMenu.banner.color					= text_banner_color;
+	multiplayerMenu.banner.color					= color_white;
 	multiplayerMenu.banner.style					= UI_CENTER;
 
 	multiplayerMenu.framel.generic.type				= MTYPE_BITMAP;
@@ -144,7 +143,7 @@ static void UI_Multiplayer_MenuInit( void ) {
 	multiplayerMenu.creategame.generic.id			= ID_CREATEGAME;
 	multiplayerMenu.creategame.generic.callback		= UI_MultiplayerMenu_Event;
 	multiplayerMenu.creategame.string				= "Create";
-	multiplayerMenu.creategame.color				= text_big_color;
+	multiplayerMenu.creategame.color				= color_red;
 	multiplayerMenu.creategame.style				= UI_CENTER;
 
 	y += SETUP_MENU_VERTICAL_SPACING;
@@ -155,7 +154,7 @@ static void UI_Multiplayer_MenuInit( void ) {
 	multiplayerMenu.joinsearch.generic.id			= ID_JOINSEARCH;
 	multiplayerMenu.joinsearch.generic.callback		= UI_MultiplayerMenu_Event;
 	multiplayerMenu.joinsearch.string				= "Search";
-	multiplayerMenu.joinsearch.color				= text_big_color;
+	multiplayerMenu.joinsearch.color				= color_red;
 	multiplayerMenu.joinsearch.style				= UI_CENTER;
 
 	y += SETUP_MENU_VERTICAL_SPACING;
@@ -166,7 +165,7 @@ static void UI_Multiplayer_MenuInit( void ) {
 	multiplayerMenu.joinspecify.generic.id			= ID_JOINSPECIFY;
 	multiplayerMenu.joinspecify.generic.callback	= UI_MultiplayerMenu_Event;
 	multiplayerMenu.joinspecify.string				= "Specify IP";
-	multiplayerMenu.joinspecify.color				= text_big_color;
+	multiplayerMenu.joinspecify.color				= color_red;
 	multiplayerMenu.joinspecify.style				= UI_CENTER;
 
 	y += SETUP_MENU_VERTICAL_SPACING;
@@ -177,7 +176,7 @@ static void UI_Multiplayer_MenuInit( void ) {
 	multiplayerMenu.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
 	multiplayerMenu.setupplayer.generic.callback	= UI_MultiplayerMenu_Event;
 	multiplayerMenu.setupplayer.string				= "Player";
-	multiplayerMenu.setupplayer.color				= text_big_color;
+	multiplayerMenu.setupplayer.color				= color_red;
 	multiplayerMenu.setupplayer.style				= UI_CENTER;
 
 
@@ -227,5 +226,3 @@ void UI_MultiplayerMenu( void )
 	UI_Multiplayer_MenuInit();
 	UI_PushMenu( &multiplayerMenu.menu );
 }
-
-#endif // TA_MISC

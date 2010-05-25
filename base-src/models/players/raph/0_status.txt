@@ -1,39 +1,9 @@
-The current player, raph_v8.mm3d, is a mix of raph_v8.wings and raph_v9.wings.
-Raph_v9 is the work-in-progress to fix and improve the model, some of which has been backported to raph_v8.mm3d.
+May 14, 2009 ~ZTurtleMan
+DONE: I need to reskin the head model
+DONE: Have eyes on image, but have them as there own mesh for $whitemap and not lightmap?
+DONE (Well its skinned...): Finish carapace (shell back) mesh and skin it.
+DONE: I would like to have the torso use "mirror skining" see tmnt-editing-players.txt.
+DONE: Had to split hands into there own meshes (In .mmd3 and .md3), now its done in the Wings3D raph_v9 file too.
 
-raph_v9.mm3d bone joint notes:
-u_torso_control Torso can rotate just the torso
-joint_torso     Legs can rotate the torso
-root			Legs can rotate the whole model
-l_legs_control	Legs can rotate just the legs
+raph_v8 is the current model in base. raph_v9 is the work-in-progress to fix and improve the model.
 
-
-==Missing animations for raph_v9==
-
-===Both===
-death2 (Copy of death1)
-death3 (Copy of death1)
-
-===Torso===
-Quake3 Animations
-* Run (Doesn't look right)
-* Walk (Doesn't look right)
-MISSIONPACK Animations (done)
-Turtle Arena Animations
-
-===Legs===
-Jump/land B (Copy of Jump/land)
-
-
-== Notes ==
-Changed head to be split into bottom, mask, and top (instead of left/right).
-	Haven't updated raph_v9.mm3d!
-
-
-== TODO ==
-Split arms from torso, it would solve some animation issues with the sholder going flat when rotated...
-: For Example: TORSO_GUARDBASE frame 4
-
-raph_v9: Merge torso.png and hand.png
-
-Merge torso.png and legs.png?

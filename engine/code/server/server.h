@@ -28,6 +28,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //=============================================================================
 
+#if 0 // Turtle Man: FIXED (somewhat): moved to bg_public.h
+#define	PERS_SCORE				0		// !!! MUST NOT CHANGE, SERVER AND
+										// GAME BOTH REFERENCE !!!
+#endif
 
 #define	MAX_ENT_CLUSTERS	16
 
@@ -231,7 +235,7 @@ typedef struct {
 	netadr_t	redirectAddress;			// for rcon return messages
 
 	netadr_t	authorizeAddress;			// for rcon return messages
-#ifdef TA_SP // GAME_LOADGAME
+#ifdef TMNTSP // GAME_LOADGAME
 	char loadgame[MAX_QPATH];
 #endif
 } serverStatic_t;

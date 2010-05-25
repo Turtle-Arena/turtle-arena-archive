@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define SPECIFYSERVER_FRAMER	"menu/art/frame1_r"
 #define SPECIFYSERVER_BACK0		"menu/art/back_0"
 #define SPECIFYSERVER_BACK1		"menu/art/back_1"
-#ifdef TA_DATA // NO_MENU_FIGHT
+#ifdef TMNTDATA // NO_MENU_FIGHT
 #define SPECIFYSERVER_FIGHT0	"menu/art/join_0"
 #define SPECIFYSERVER_FIGHT1	"menu/art/join_1"
 #else
@@ -120,7 +120,7 @@ static void SpecifyServer_Event( void* ptr, int event )
 			if (s_specifyserver.domain.field.buffer[0])
 			{
 				strcpy(buff,s_specifyserver.domain.field.buffer);
-#if 0 // ZTM: FIXME?: Support port? It can't be in fav server address?
+#if 0 // Turtle Man: FIXME?: Support port? It can't be in fav server address?
 				if (s_specifyserver.port.field.buffer[0])
 					Com_sprintf( buff+strlen(buff), 128, ":%s", s_specifyserver.port.field.buffer );
 #endif
@@ -157,7 +157,7 @@ static void SpecifyServer_Event( void* ptr, int event )
 					}
 					else
 					{
-						// ZTM: TODO: Show message. ("Can't add, all fav slots full.")
+						// Turtle Man: TODO: Show message. ("Can't add, all fav slots full.")
 					}
 				}
 			}
@@ -197,7 +197,7 @@ void SpecifyServer_MenuInit( void )
 	else
 #endif
 	s_specifyserver.banner.string		 = "SPECIFY SERVER";
-	s_specifyserver.banner.color  		 = text_banner_color;
+	s_specifyserver.banner.color  		 = color_white;
 	s_specifyserver.banner.style  		 = UI_CENTER;
 
 	s_specifyserver.framel.generic.type  = MTYPE_BITMAP;
@@ -225,10 +225,10 @@ void SpecifyServer_MenuInit( void )
 	s_specifyserver.domain.field.maxchars     = 80;
 
 	s_specifyserver.port.generic.type       = MTYPE_FIELD;
-#if defined IOQ3ZTM && !defined TA_MISC // SPECIFY_FAV
+#if defined IOQ3ZTM && !defined TMNTMISC // SPECIFY_FAV
 	if (s_specifyserverFav)
 	{
-#ifdef TA_DATA // NO_MENU_FIGHT
+#ifdef TMNTDATA // NO_MENU_FIGHT
 		s_specifyserver.port.generic.name	    = "Port (Join only):";
 #else
 		s_specifyserver.port.generic.name	    = "Port (Fight only):";
@@ -243,7 +243,7 @@ void SpecifyServer_MenuInit( void )
 	s_specifyserver.port.field.widthInChars = 6;
 	s_specifyserver.port.field.maxchars     = 5;
 
-#ifdef TA_MISC // SPECIFY_FAV
+#ifdef TMNTMISC // SPECIFY_FAV
 	if (s_specifyserverFav)
 	{
 		s_specifyserver.go.generic.type	    = MTYPE_BITMAP;
@@ -320,17 +320,17 @@ void SpecifyServer_MenuInit( void )
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.framel );
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.framer );
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.domain );
-#ifdef TA_MISC // SPECIFY_FAV
+#ifdef TMNTMISC // SPECIFY_FAV
 	if (!s_specifyserverFav)
 #endif
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.port );
-#if defined IOQ3ZTM && !defined TA_MISC // SPECIFY_FAV
+#if defined IOQ3ZTM && !defined TMNTMISC // SPECIFY_FAV
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.add );
 #endif
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.go );
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.back );
 
-	// ZTM: NOTE: If PORT_SERVER is changed update this.
+	// Turtle Man: NOTE: If PORT_SERVER is changed update this.
 	Com_sprintf( s_specifyserver.port.field.buffer, 6, "%i", 27960 );
 }
 

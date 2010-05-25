@@ -93,15 +93,9 @@ static void DriverInfo_MenuDraw( void )
 
 	Menu_Draw( &s_driverinfo.menu );
 
-#ifdef TURTLEARENA
-	UI_DrawString( 320, 80, "VENDOR", UI_CENTER|UI_SMALLFONT, text_color_highlight );
-	UI_DrawString( 320, 152, "PIXELFORMAT", UI_CENTER|UI_SMALLFONT, text_color_highlight );
-	UI_DrawString( 320, 192, "EXTENSIONS", UI_CENTER|UI_SMALLFONT, text_color_highlight );
-#else
 	UI_DrawString( 320, 80, "VENDOR", UI_CENTER|UI_SMALLFONT, color_red );
 	UI_DrawString( 320, 152, "PIXELFORMAT", UI_CENTER|UI_SMALLFONT, color_red );
 	UI_DrawString( 320, 192, "EXTENSIONS", UI_CENTER|UI_SMALLFONT, color_red );
-#endif
 
 	UI_DrawString( 320, 80+16, uis.glconfig.vendor_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
 	UI_DrawString( 320, 96+16, uis.glconfig.version_string, UI_CENTER|UI_SMALLFONT, text_color_normal );
@@ -161,7 +155,7 @@ static void UI_DriverInfo_Menu( void )
 	s_driverinfo.banner.generic.x	  = 320;
 	s_driverinfo.banner.generic.y	  = 16;
 	s_driverinfo.banner.string		  = "DRIVER INFO";
-	s_driverinfo.banner.color	      = text_banner_color;
+	s_driverinfo.banner.color	      = color_white;
 	s_driverinfo.banner.style	      = UI_CENTER;
 
 	s_driverinfo.framel.generic.type  = MTYPE_BITMAP;
@@ -451,21 +445,21 @@ GraphicsOptions_GetAspectRatios
 static void GraphicsOptions_GetAspectRatios( void )
 {
 	int i, r;
-	
+
 	// build ratio list from resolutions
 	for( r = 0; resolutions[r]; r++ )
 	{
 		int w, h;
 		char *x;
 		char str[ sizeof(ratioBuf[0]) ];
-		
+
 		// calculate resolution's aspect ratio
 		x = strchr( resolutions[r], 'x' ) + 1;
 		Q_strncpyz( str, resolutions[r], x-resolutions[r] );
 		w = atoi( str );
 		h = atoi( x );
 		Com_sprintf( str, sizeof(str), "%.2f:1", (float)w / (float)h );
-		
+
 		// add ratio to list if it is new
 		// establish res/ratio relationship
 		for( i = 0; ratioBuf[i][0]; i++ )
@@ -480,7 +474,7 @@ static void GraphicsOptions_GetAspectRatios( void )
 		}
 		resToRatio[r] = i;
 	}
-	
+
 	// prepare itemlist pointer array
 	// rename common ratios ("1.33:1" -> "4:3")
 	for( r = 0; ratioBuf[r][0]; r++ )
@@ -731,11 +725,7 @@ static void GraphicsOptions_ApplyChanges( void *unused, int notification )
 	trap_Cvar_SetValue( "r_fullscreen", s_graphicsoptions.fs.curvalue );
 	trap_Cvar_SetValue( "r_colorbits", 0 );
 	trap_Cvar_SetValue( "r_depthbits", 0 );
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix for cg_shadows 2
-	trap_Cvar_SetValue( "r_stencilbits", 8 );
-#else
 	trap_Cvar_SetValue( "r_stencilbits", 0 );
-#endif
 	trap_Cvar_SetValue( "r_vertexLight", s_graphicsoptions.lighting.curvalue );
 #ifdef OA_BLOOM
 	trap_Cvar_SetValue( "r_bloom", s_graphicsoptions.bloom.curvalue );
@@ -786,7 +776,7 @@ static void GraphicsOptions_Event( void* ptr, int event ) {
 		s_graphicsoptions.mode.curvalue =
 			ratioToRes[ s_graphicsoptions.ratio.curvalue ];
 		// fall through to apply mode constraints
-		
+
 	case ID_MODE:
 		// clamp 3dfx video modes
 		if ( s_graphicsoptions.driver.curvalue == 1 )
@@ -1071,7 +1061,7 @@ void GraphicsOptions_MenuInit( void )
 
 	GraphicsOptions_GetResolutions();
 	GraphicsOptions_GetAspectRatios();
-	
+
 	GraphicsOptions_Cache();
 
 	s_graphicsoptions.menu.wrapAround = qtrue;
@@ -1082,7 +1072,7 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.banner.generic.x	   = 320;
 	s_graphicsoptions.banner.generic.y	   = 16;
 	s_graphicsoptions.banner.string  	   = "SYSTEM SETUP";
-	s_graphicsoptions.banner.color         = text_banner_color;
+	s_graphicsoptions.banner.color         = color_white;
 	s_graphicsoptions.banner.style         = UI_CENTER;
 
 	s_graphicsoptions.framel.generic.type  = MTYPE_BITMAP;
@@ -1109,7 +1099,7 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.graphics.generic.y		= 240 - 2 * PROP_HEIGHT;
 	s_graphicsoptions.graphics.string			= "GRAPHICS";
 	s_graphicsoptions.graphics.style			= UI_RIGHT;
-	s_graphicsoptions.graphics.color			= text_big_color;
+	s_graphicsoptions.graphics.color			= color_red;
 
 	s_graphicsoptions.display.generic.type		= MTYPE_PTEXT;
 	s_graphicsoptions.display.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1119,7 +1109,7 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.display.generic.y			= 240 - PROP_HEIGHT;
 	s_graphicsoptions.display.string			= "DISPLAY";
 	s_graphicsoptions.display.style				= UI_RIGHT;
-	s_graphicsoptions.display.color				= text_big_color;
+	s_graphicsoptions.display.color				= color_red;
 
 	s_graphicsoptions.sound.generic.type		= MTYPE_PTEXT;
 	s_graphicsoptions.sound.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1129,7 +1119,7 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.sound.generic.y			= 240;
 	s_graphicsoptions.sound.string				= "SOUND";
 	s_graphicsoptions.sound.style				= UI_RIGHT;
-	s_graphicsoptions.sound.color				= text_big_color;
+	s_graphicsoptions.sound.color				= color_red;
 
 	s_graphicsoptions.network.generic.type		= MTYPE_PTEXT;
 	s_graphicsoptions.network.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -1139,7 +1129,7 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.network.generic.y			= 240 + PROP_HEIGHT;
 	s_graphicsoptions.network.string			= "NETWORK";
 	s_graphicsoptions.network.style				= UI_RIGHT;
-	s_graphicsoptions.network.color				= text_big_color;
+	s_graphicsoptions.network.color				= color_red;
 
 	y = 240 - 7 * (BIGCHAR_HEIGHT + 2);
 	s_graphicsoptions.list.generic.type     = MTYPE_SPINCONTROL;
@@ -1275,7 +1265,7 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.driverinfo.generic.y        = y;
 	s_graphicsoptions.driverinfo.string           = "Driver Info";
 	s_graphicsoptions.driverinfo.style            = UI_CENTER|UI_SMALLFONT;
-	s_graphicsoptions.driverinfo.color            = text_big_color;
+	s_graphicsoptions.driverinfo.color            = color_red;
 	y += BIGCHAR_HEIGHT+2;
 
 	s_graphicsoptions.back.generic.type	    = MTYPE_BITMAP;

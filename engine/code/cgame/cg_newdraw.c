@@ -20,13 +20,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#include "cg_local.h"
-#include "../ui/ui_shared.h"
-
 //#ifndef MISSIONPACK
 //#error This file not be used for classic Q3A.
 //#endif
 #ifdef MISSIONPACK
+
+#include "cg_local.h"
+#include "../ui/ui_shared.h"
 
 #ifdef MISSIONPACK_HUD
 extern displayContextDef_t cgDC;
@@ -164,7 +164,7 @@ void CG_SelectPrevPlayer( void ) {
 }
 
 #ifdef MISSIONPACK_HUD
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 static void CG_DrawPlayerArmorIcon( rectDef_t *rect, qboolean draw2D ) {
 	centity_t	*cent;
 	playerState_t	*ps;
@@ -214,7 +214,7 @@ static void CG_DrawPlayerArmorValue(rectDef_t *rect, float scale, vec4_t color, 
 	  CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 	}
 }
-#endif // !TURTLEARENA
+#endif // !TMNT
 
 #ifndef MISSIONPACK
 static float healthColors[4][4] = { 
@@ -225,6 +225,7 @@ static float healthColors[4][4] = {
   { 1.0f, 1.0f, 1.0f, 1.0f } };		// health > 100
 #endif
 
+#ifndef TMNTWEAPONS
 static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 	centity_t	*cent;
 	playerState_t	*ps;
@@ -236,69 +237,37 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 
 	if ( draw2D || (!cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 	  qhandle_t	icon;
-#ifdef TA_WEAPSYS
-#ifdef TURTLEARENA // WEAPONS
-		icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].weaponIcon;
-#else
+#ifdef TMNTWEAPSYS_2
 		icon = cg_weapongroups[ cg.predictedPlayerState.weapon ].ammoIcon;
-#endif
 #else
-		icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
+    icon = cg_weapons[ cg.predictedPlayerState.weapon ].ammoIcon;
 #endif
 		if ( icon ) {
 		  CG_DrawPic( rect->x, rect->y, rect->w, rect->h, icon );
 		}
   } else if (cg_draw3dIcons.integer) {
   	if ( cent->currentState.weapon &&
-#ifdef TA_WEAPSYS
-#ifdef TURTLEARENA // WEAPONS
-		cg_weapongroups[ cent->currentState.weapon ].weaponModel
+#ifdef TMNTWEAPSYS_2
+  	cg_weapongroups[ cent->currentState.weapon ].ammoModel
 #else
-		cg_weapongroups[ cent->currentState.weapon ].ammoModel
-#endif
-#else
-		cg_weapons[ cent->currentState.weapon ].ammoModel
+  	cg_weapons[ cent->currentState.weapon ].ammoModel
 #endif
   	) {
 	    VectorClear( angles );
-#ifdef TURTLEARENA // WEAPONS
-		angles[YAW] = 20 * sin( cg.time / 1000.0 );
-
-	  	if (bg_weapongroupinfo[ cent->currentState.weapon ].weapon[0]->weapontype == WT_GUN) {
-			origin[0] = 80;
-			origin[1] = -20;
-	  	} else {
-			origin[0] = 50;
-			origin[1] = 0;
-		}
-  		origin[2] = -10;
-
-  		// If it doesn't have a special pickup weapon model...
-		if (cg_weapongroups[ cent->currentState.weapon ].weaponModel ==
-			cg_weapons[bg_weapongroupinfo[ cent->currentState.weapon ].weaponnum[0]].weaponModel)
-		{
-			angles[YAW] += 25 + 90;
-		}
-#else
 	  	origin[0] = 70;
   		origin[1] = 0;
   		origin[2] = 0;
   		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
-#endif
   		CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h,
-#ifdef TA_WEAPSYS
-#ifdef TURTLEARENA // WEAPONS
-			cg_weapongroups[ cent->currentState.weapon ].weaponModel,
+#ifdef TMNTWEAPSYS_2
+			cg_weapongroups[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
 #else
-			cg_weapongroups[ cent->currentState.weapon ].ammoModel,
+			cg_weapons[ cent->currentState.weapon ].ammoModel, 0, origin, angles );
 #endif
-#else
-			cg_weapons[ cent->currentState.weapon ].ammoModel,
-#endif
-			0, origin, angles );
   	}
   }
 }
+#endif // !TMNTWEAPONS
 
 static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
 	char	num[16];
@@ -310,7 +279,7 @@ static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, q
 	ps = &cg.snap->ps;
 
 	if ( cent->currentState.weapon ) {
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 		value = ps->stats[STAT_AMMO];
 #else
 		value = ps->ammo[cent->currentState.weapon];
@@ -401,7 +370,7 @@ static void CG_DrawSelectedPlayerHealth( rectDef_t *rect, float scale, vec4_t co
 	}
 }
 
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 static void CG_DrawSelectedPlayerArmor( rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
 	clientInfo_t *ci;
 	int value;
@@ -421,7 +390,7 @@ static void CG_DrawSelectedPlayerArmor( rectDef_t *rect, float scale, vec4_t col
 		}
  	}
 }
-#endif // !TURTLEARENA
+#endif // !TMNT
 
 qhandle_t CG_StatusHandle(int task) {
 	qhandle_t h = cgs.media.assaultShader;
@@ -519,7 +488,7 @@ static void CG_DrawSelectedPlayerWeapon( rectDef_t *rect ) {
 
   ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
   if (ci) {
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 		if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
 			CG_DrawPic( rect->x, rect->y, rect->w, rect->h, cg_weapongroups[ci->curWeapon].weaponIcon );
 		}
@@ -553,7 +522,7 @@ static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qboolean draw2D) {
 	int		value;
   vec3_t origin, angles;
 
-#ifdef TA_HOLDSYS
+#ifdef TMNTHOLDSYS
 	value = BG_ItemNumForHoldableNum(cg.snap->ps.holdableIndex);
 #else
 	value = cg.snap->ps.stats[STAT_HOLDABLE_ITEM];
@@ -575,37 +544,6 @@ static void CG_DrawPlayerItem( rectDef_t *rect, float scale, qboolean draw2D) {
 	}
 
 }
-
-#ifdef TA_HOLDSYS
-static void CG_DrawPlayerItemValue(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
-	char	num[16];
-	int value;
-	int giveQuantity;
-	playerState_t	*ps;
-
-	ps = &cg.snap->ps;
-
-	if ( ps->holdableIndex ) {
-		giveQuantity = BG_ItemForItemNum(BG_ItemNumForHoldableNum(ps->holdableIndex))->quantity;
-		value = ps->holdable[cg.snap->ps.holdableIndex];
-
-		if ((giveQuantity > 0 && value > 0)
-			|| (giveQuantity == 0 && value > 1)) // Only happens with give command.
-		{
-			if (shader) {
-		    trap_R_SetColor( color );
-				CG_DrawPic(rect->x, rect->y, rect->w, rect->h, shader);
-			  trap_R_SetColor( NULL );
-			} else {
-				Com_sprintf (num, sizeof(num), "%i", value);
-				value = CG_Text_Width(num, scale, 0);
-				CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
-			}
-		}
-	}
-
-}
-#endif
 
 
 static void CG_DrawSelectedPlayerPowerup( rectDef_t *rect, qboolean draw2D ) {
@@ -664,7 +602,7 @@ static void CG_DrawSelectedPlayerHead( rectDef_t *rect, qboolean draw2D, qboolea
   		origin[0] = len / 0.268;	// len / tan( fov/2 )
 
   		// allow per-model tweaking
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 		VectorAdd( origin, ci->playercfg.headOffset, origin );
 #else
   		VectorAdd( origin, ci->headOffset, origin );
@@ -1029,7 +967,7 @@ float CG_GetValue(int ownerDraw) {
 	ps = &cg.snap->ps;
 
   switch (ownerDraw) {
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
   case CG_SELECTEDPLAYER_ARMOR:
     ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
     return ci->armor;
@@ -1039,19 +977,19 @@ float CG_GetValue(int ownerDraw) {
     ci = cgs.clientinfo + sortedTeamPlayers[CG_GetSelectedPlayer()];
     return ci->health;
     break;
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
   case CG_PLAYER_ARMOR_VALUE:
 		return ps->stats[STAT_ARMOR];
     break;
 #endif
   case CG_PLAYER_AMMO_VALUE:
-#ifdef TA_WEAPSYS_EX
-		return ps->stats[STAT_AMMO];
-#else
 		if ( cent->currentState.weapon ) {
+#ifdef TMNTWEAPSYS2
+		  return ps->stats[STAT_AMMO];
+#else
 		  return ps->ammo[cent->currentState.weapon];
-		}
 #endif
+		}
     break;
   case CG_PLAYER_SCORE:
 	  return cg.snap->ps.persistant[PERS_SCORE];
@@ -1059,11 +997,6 @@ float CG_GetValue(int ownerDraw) {
   case CG_PLAYER_HEALTH:
 		return ps->stats[STAT_HEALTH];
     break;
-#ifdef TA_HOLDSYS
-  case CG_PLAYER_ITEM_VALUE:
-		return cg.snap->ps.holdable[cg.snap->ps.holdableIndex];
-    break;
-#endif
   case CG_RED_SCORE:
 		return cgs.scores1;
     break;
@@ -1264,7 +1197,7 @@ static void CG_DrawAreaChat(rectDef_t *rect, float scale, vec4_t color, qhandle_
 const char *CG_GetKillerText(void) {
 	const char *s = "";
 	if ( cg.killerName[0] ) {
-#ifdef NOTRATEDM // frag to KO
+#ifdef TMNTMISC // frag to KO
 		s = va("Knocked out by %s", cg.killerName );
 #else
 		s = va("Fragged by %s", cg.killerName );
@@ -1461,7 +1394,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 			// FIXME: max of 3 powerups shown properly
 			xx = rect->x + (PIC_WIDTH * 3) + 2;
 
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 			CG_GetColorForHealth( ci->health, hcolor );
 #else
 			CG_GetColorForHealth( ci->health, ci->armor, hcolor );
@@ -1477,7 +1410,7 @@ void CG_DrawNewTeamInfo(rectDef_t *rect, float text_x, float text_y, float scale
 
 // weapon used is not that useful, use the space for task
 #if 0
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 			if ( cg_weapongroups[ci->curWeapon].weaponIcon ) {
 				CG_DrawPic( xx, y, PIC_WIDTH, PIC_WIDTH, cg_weapongroups[ci->curWeapon].weaponIcon );
 			}
@@ -1677,7 +1610,7 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   rect.h = h;
 
   switch (ownerDraw) {
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
   case CG_PLAYER_ARMOR_ICON:
     CG_DrawPlayerArmorIcon(&rect, ownerDrawFlags & CG_SHOW_2DONLY);
     break;
@@ -1688,12 +1621,14 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
     CG_DrawPlayerArmorValue(&rect, scale, color, shader, textStyle);
     break;
 #endif
+#ifndef TMNTWEAPONS
   case CG_PLAYER_AMMO_ICON:
     CG_DrawPlayerAmmoIcon(&rect, ownerDrawFlags & CG_SHOW_2DONLY);
     break;
   case CG_PLAYER_AMMO_ICON2D:
     CG_DrawPlayerAmmoIcon(&rect, qtrue);
     break;
+#endif
   case CG_PLAYER_AMMO_VALUE:
     CG_DrawPlayerAmmoValue(&rect, scale, color, shader, textStyle);
     break;
@@ -1709,7 +1644,7 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   case CG_SELECTEDPLAYER_STATUS:
     CG_DrawSelectedPlayerStatus(&rect);
     break;
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
   case CG_SELECTEDPLAYER_ARMOR:
     CG_DrawSelectedPlayerArmor(&rect, scale, color, shader, textStyle);
     break;
@@ -1735,11 +1670,6 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   case CG_PLAYER_ITEM:
     CG_DrawPlayerItem(&rect, scale, ownerDrawFlags & CG_SHOW_2DONLY);
     break;
-#ifdef TA_HOLDSYS // CG_DrawPlayerAmmoValue
-  case CG_PLAYER_ITEM_VALUE:
-    CG_DrawPlayerItemValue(&rect, scale, color, shader, textStyle);
-    break;
-#endif
   case CG_PLAYER_SCORE:
     CG_DrawPlayerScore(&rect, scale, color, shader, textStyle);
     break;

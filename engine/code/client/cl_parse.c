@@ -366,15 +366,7 @@ void CL_SystemInfoChanged( void ) {
 	// in the future, (val) will be a protocol version string, so only
 	//  accept explicitly 1, not generally non-zero.
 	s = Info_ValueForKey( systemInfo, "sv_voip" );
-	if (
-#ifndef TA_SP
-		Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
-#endif
-		Cvar_VariableValue("ui_singlePlayerActive"))
-		cl_connectedToVoipServer = qfalse;
-	else
-		cl_connectedToVoipServer = (atoi( s ) == 1);
-
+	cl_connectedToVoipServer = (atoi( s ) == 1);
 #endif
 
 	s = Info_ValueForKey( systemInfo, "sv_cheats" );

@@ -32,7 +32,7 @@ sfxHandle_t menu_move_sound;
 sfxHandle_t menu_out_sound;
 sfxHandle_t menu_buzz_sound;
 sfxHandle_t menu_null_sound;
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 sfxHandle_t weaponChangeSound;
 #endif
 
@@ -48,13 +48,20 @@ vec4_t color_yellow	    = {1.00f, 1.00f, 0.00f, 1.00f};
 vec4_t color_blue	    = {0.00f, 0.00f, 1.00f, 1.00f};
 vec4_t color_lightOrange    = {1.00f, 0.68f, 0.00f, 1.00f };
 vec4_t color_orange	    = {1.00f, 0.43f, 0.00f, 1.00f};
+#ifdef TMNTMISC
+// Turtle Man: White is the new red.
+vec4_t color_red    = {1.00f, 1.00f, 1.00f, 1.00f};
+vec4_t color_TMNTred = {1.00f, 0.00f, 0.00f, 1.00f};
+#else
 vec4_t color_red	    = {1.00f, 0.00f, 0.00f, 1.00f};
+#endif
 vec4_t color_dim	    = {0.00f, 0.00f, 0.00f, 0.25f};
 
 // current color scheme
 vec4_t pulse_color          = {1.00f, 1.00f, 1.00f, 1.00f};
 vec4_t text_color_disabled  = {0.50f, 0.50f, 0.50f, 1.00f};	// light gray
-#ifdef TURTLEARENA
+#ifdef TMNT
+// Turtle Man: Changed colors.
 vec4_t text_color_normal    = {1.00f, 1.00f, 1.00f, 1.00f};	// bright white
 vec4_t text_color_highlight = {1.00f, 0.43f, 0.00f, 1.00f};	// light orange
 #else
@@ -62,12 +69,7 @@ vec4_t text_color_normal    = {1.00f, 0.43f, 0.00f, 1.00f};	// light orange
 vec4_t text_color_highlight = {1.00f, 1.00f, 0.00f, 1.00f};	// bright yellow
 #endif
 vec4_t listbar_color        = {1.00f, 0.43f, 0.00f, 0.30f};	// transluscent orange
-vec4_t text_banner_color	= {1.00f, 1.00f, 1.00f, 1.00f};	// bright white
-#ifdef TURTLEARENA
-vec4_t text_big_color		= {1.00f, 1.00f, 1.00f, 1.00f};	// bright white
-#else
-vec4_t text_big_color		= {1.00f, 0.00f, 0.00f, 1.00f};	// bright red
-#endif
+vec4_t text_color_status    = {1.00f, 1.00f, 1.00f, 1.00f};	// bright white	
 
 // action widget
 static void	Action_Init( menuaction_s *a );
@@ -469,9 +471,6 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 	switch (key)
 	{
 		case K_MOUSE1:
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
-		case K_MOUSE2:
-#endif
 			if (!(rb->generic.flags & QMF_HASMOUSEFOCUS))
 				break;
 
@@ -483,6 +482,9 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 		case K_KP_ENTER:
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
+		case K_MOUSE2:
+#endif
 		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 			rb->curvalue = !rb->curvalue;
@@ -601,7 +603,7 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 				sound = 0;
 			break;
 
-#if 0 //#ifdef TA_MISC // MENU: Right Mouse button = left arrow // NOT HERE.
+#if 0 //#ifdef TMNTMISC // MENU: Right Mouse button = left arrow // NOT HERE.
 		case K_MOUSE2:
 #endif
 		case K_KP_LEFTARROW:
@@ -817,7 +819,7 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 	switch (key)
 	{
 		case K_MOUSE1:
-#ifdef TA_MISC // MENU: listbox goes around.
+#ifdef TMNTMISC // MENU: listbox goes around.
 		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 #endif
@@ -827,12 +829,12 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 			sound = menu_move_sound;
 			break;
 		
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
-#ifdef TA_MISC // MENU: listbox goes around.
+#ifdef TMNTMISC // MENU: listbox goes around.
 			s->curvalue--;
 			if (s->curvalue < 0)
 				s->curvalue = s->numitems-1;
@@ -848,7 +850,7 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 #endif
 			break;
 
-#ifndef TA_MISC // MENU: listbox goes around.
+#ifndef TMNTMISC // MENU: listbox goes around.
 		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 			if (s->curvalue < s->numitems-1)
@@ -1128,7 +1130,7 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 
 			return menu_move_sound;
 
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+#ifdef TMNTMISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_KP_LEFTARROW:
@@ -1625,7 +1627,7 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 	// menu system keys
 	switch ( key )
 	{
-#ifndef TA_MISC // MENU: Right Mouse button = left arrow
+#ifndef TMNTMISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
 		case K_ESCAPE:
@@ -1764,7 +1766,7 @@ void Menu_Cache( void )
 {
 	uis.charset			= trap_R_RegisterShaderNoMip( "gfx/2d/bigchars" );
 	uis.charsetProp		= trap_R_RegisterShaderNoMip( "menu/art/font1_prop.tga" );
-#ifndef TA_DATA
+#ifndef TMNTDATA
 	uis.charsetPropGlow	= trap_R_RegisterShaderNoMip( "menu/art/font1_prop_glo.tga" );
 #endif
 	uis.charsetPropB	= trap_R_RegisterShaderNoMip( "menu/art/font2_prop.tga" );
@@ -1779,7 +1781,7 @@ void Menu_Cache( void )
 	} else {
 		uis.menuBackShader	= trap_R_RegisterShaderNoMip( "menuback" );
 	}
-#ifndef TA_DATA
+#ifndef TMNTDATA
 	uis.menuBackNoLogoShader = trap_R_RegisterShaderNoMip( "menubacknologo" );
 #endif
 
@@ -1787,7 +1789,7 @@ void Menu_Cache( void )
 	menu_move_sound	= trap_S_RegisterSound( "sound/misc/menu2.wav", qfalse );
 	menu_out_sound	= trap_S_RegisterSound( "sound/misc/menu3.wav", qfalse );
 	menu_buzz_sound	= trap_S_RegisterSound( "sound/misc/menu4.wav", qfalse );
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 	weaponChangeSound	= trap_S_RegisterSound( "sound/weapons/change.wav", qfalse );
 #endif
 

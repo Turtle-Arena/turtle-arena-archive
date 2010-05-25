@@ -33,7 +33,7 @@ Server only controls
 
 #include "ui_local.h"
 
-#ifdef TA_MISC // INGAME_SERVER_MENU
+#ifdef TMNTMISC // INGAME_SERVER_MENU
 
 //#define INGAME_FRAME					"menu/art/addbotframe"
 #define INGAME_FRAME					"menu/art/cut_frame"
@@ -150,7 +150,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.map.generic.id			= ID_CHANGEMAP;
 	s_inserver.map.generic.callback		= InServer_Event;
 	s_inserver.map.string				= "CHANGE MAP";
-	s_inserver.map.color				= text_big_color;
+	s_inserver.map.color				= color_red;
 	s_inserver.map.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) ) {
 		s_inserver.map.generic.flags |= QMF_GRAYED;
@@ -164,11 +164,11 @@ void InServer_MenuInit( void ) {
 	s_inserver.addbots.generic.id			= ID_ADDBOTS;
 	s_inserver.addbots.generic.callback		= InServer_Event; 
 	s_inserver.addbots.string				= "ADD BOTS";
-	s_inserver.addbots.color				= text_big_color;
+	s_inserver.addbots.color				= color_red;
 	s_inserver.addbots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
-#ifdef TA_SP
-	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
+#ifdef TMNTSP
+	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
@@ -184,11 +184,11 @@ void InServer_MenuInit( void ) {
 	s_inserver.removebots.generic.id		= ID_REMOVEBOTS;
 	s_inserver.removebots.generic.callback	= InServer_Event; 
 	s_inserver.removebots.string			= "REMOVE BOTS";
-	s_inserver.removebots.color				= text_big_color;
+	s_inserver.removebots.color				= color_red;
 	s_inserver.removebots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
-#ifdef TA_SP
-	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
+#ifdef TMNTSP
+	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
@@ -204,7 +204,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.restart.generic.id			= ID_RESTART;
 	s_inserver.restart.generic.callback		= InServer_Event; 
 	s_inserver.restart.string				= "RESTART ARENA";
-	s_inserver.restart.color				= text_big_color;
+	s_inserver.restart.color				= color_red;
 	s_inserver.restart.style				= UI_CENTER|UI_SMALLFONT;
 
 
@@ -216,7 +216,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.back.generic.id			= ID_BACK;
 	s_inserver.back.generic.callback	= InServer_Event; 
 	s_inserver.back.string				= "BACK";
-	s_inserver.back.color				= text_big_color;
+	s_inserver.back.color				= color_red;
 	s_inserver.back.style				= UI_CENTER|UI_SMALLFONT;
 
 	Menu_AddItem( &s_inserver.menu, &s_inserver.frame );

@@ -40,7 +40,7 @@ START SERVER MENU *****
 #define GAMESERVER_FRAMER		"menu/art/frame1_r"
 #define GAMESERVER_SELECT		"menu/art/maps_select"
 #define GAMESERVER_SELECTED		"menu/art/maps_selected"
-#ifdef TA_MISC // NO_MENU_FIGHT
+#ifdef TMNTMISC // NO_MENU_FIGHT
 #define GAMESERVER_FIGHT0		"menu/art/play_0"
 #define GAMESERVER_FIGHT1		"menu/art/play_1"
 #else
@@ -48,7 +48,7 @@ START SERVER MENU *****
 #define GAMESERVER_FIGHT1		"menu/art/fight_1"
 #endif
 #define GAMESERVER_UNKNOWNMAP	"menu/art/unknownmap"
-#ifdef TA_DATA
+#ifdef TMNTDATA
 #define GAMESERVER_ARROWS		"menu/art/arrows_horz_0"
 #define GAMESERVER_ARROWSL		"menu/art/arrows_horz_left"
 #define GAMESERVER_ARROWSR		"menu/art/arrows_horz_right"
@@ -101,7 +101,7 @@ typedef struct {
 
 static startserver_t s_startserver;
 
-#ifdef TURTLEARENA
+#ifdef TMNT
 // Gametype names
 static const char *gametype_items[] = {
 	"Free For All",
@@ -131,7 +131,7 @@ static int gametype_remap[] = {GT_FFA, GT_TOURNAMENT, GT_SINGLE_PLAYER, GT_TEAM,
 
 /*
 // Order of gametype_items, must
-// ZTM: NOTE: Why does this need to be seperate from gametype_remap?
+// Turtle Man: NOTE: Why does this need to be seperate from gametype_remap?
 static int gametype_remap2[] = {
 	0,		// Free For All
 	1,		// Duel
@@ -151,7 +151,7 @@ static int gametype_remap2[] = {
 static const char *gametype_items[] = {
 	"Free For All",
 	"Team Deathmatch",
-#ifdef TA_MISC // tornament to duel
+#ifdef TMNTMISC // tornament to duel
 	"Duel",
 #else
 	"Tournament",
@@ -185,7 +185,7 @@ static int gametype_remap2[] = {0, 2, 0, 1, 3
 };
 #endif
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 // use ui_servers2.c definition
 extern const char* punkbuster_items[];
 #endif
@@ -235,7 +235,7 @@ static int GametypeBits( char *string ) {
 			bits |= 1 << GT_CTF;
 			continue;
 		}
-#ifdef MISSIONPACK // ZTM: Support MISSIONPACK gametypes!
+#ifdef MISSIONPACK // Turtle Man: Support MISSIONPACK gametypes!
 		if( Q_stricmp( token, "oneflag" ) == 0 ) {
 			bits |= 1 << GT_1FCTF;
 			continue;
@@ -282,7 +282,7 @@ static void StartServer_Update( void ) {
 		Q_strupr( mapname );
 #endif
 
-#ifdef TA_DATA // TEAMARENA_LEVELSHOTS
+#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s_small", mapname );
 #else
  		Com_sprintf( picname[i], sizeof(picname[i]), "levelshots/%s", mapname );
@@ -323,7 +323,7 @@ static void StartServer_Update( void ) {
 		if ( i >=0 && i < MAX_MAPSPERPAGE ) 
 		{
 			s_startserver.mappics[i].generic.flags    |= QMF_HIGHLIGHT;
-#ifndef TA_DATA // MENU
+#ifndef TMNTDATA // MENU
 			s_startserver.mapbuttons[i].generic.flags &= ~QMF_PULSEIFFOCUS;
 #endif
 		}
@@ -373,14 +373,14 @@ static void StartServer_GametypeEvent( void* ptr, int event ) {
 	count = UI_GetNumArenas();
 	s_startserver.nummaps = 0;
 	matchbits = 1 << gametype_remap[s_startserver.gametype.curvalue];
-#ifndef TA_SP // Single player has own gametype on net now.
+#ifndef TMNTSP // Single player has own gametype on net now.
 	if( gametype_remap[s_startserver.gametype.curvalue] == GT_FFA ) {
 		matchbits |= ( 1 << GT_SINGLE_PLAYER );
 	}
 #endif
 	for( i = 0; i < count; i++ ) {
 		info = UI_GetArenaInfoByNumber( i );
-	
+
 		gamebits = GametypeBits( Info_ValueForKey( info, "type") );
 		if( !( gamebits & matchbits ) ) {
 			continue;
@@ -424,7 +424,7 @@ static void StartServer_MenuEvent( void* ptr, int event ) {
 
 	case ID_STARTSERVERNEXT:
 		trap_Cvar_SetValue( "g_gameType", gametype_remap[s_startserver.gametype.curvalue] );
-#ifdef TA_MISC
+#ifdef TMNTMISC
 		// If ingame, don't go to server options
 		if (trap_Cvar_VariableValue("sv_running"))
 		{
@@ -514,7 +514,7 @@ static void StartServer_MenuInit( void ) {
 	int	x;
 	int	y;
 	static char mapnamebuffer[64];
-#ifdef TA_MISC
+#ifdef TMNTMISC
 	int inGame = trap_Cvar_VariableValue("sv_running");
 #endif
 
@@ -524,7 +524,7 @@ static void StartServer_MenuInit( void ) {
 	StartServer_Cache();
 
 	s_startserver.menu.wrapAround = qtrue;
-#ifdef TA_MISC
+#ifdef TMNTMISC
 	if (!inGame)
 #endif
 	s_startserver.menu.fullscreen = qtrue;
@@ -532,13 +532,13 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.banner.generic.type  = MTYPE_BTEXT;
 	s_startserver.banner.generic.x	   = 320;
 	s_startserver.banner.generic.y	   = 16;
-#ifdef TA_MISC
+#ifdef TMNTMISC
 	if (inGame)
 		s_startserver.banner.string    = "CHANGE MAP";
 	else
 #endif
 	s_startserver.banner.string        = "GAME SERVER";
-	s_startserver.banner.color         = text_banner_color;
+	s_startserver.banner.color         = color_white;
 	s_startserver.banner.style         = UI_CENTER;
 
 	s_startserver.framel.generic.type  = MTYPE_BITMAP;
@@ -565,7 +565,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.gametype.generic.x		= 320 - 24;
 	s_startserver.gametype.generic.y		= 368;
 	s_startserver.gametype.itemnames		= gametype_items;
-#ifdef TA_MISC
+#ifdef TMNTMISC
 	if (inGame)
 		s_startserver.gametype.curvalue		= trap_Cvar_VariableValue("g_gameType");
 #endif
@@ -606,7 +606,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.arrows.generic.flags = QMF_INACTIVE;
 	s_startserver.arrows.generic.x	   = 260;
 	s_startserver.arrows.generic.y	   = 400;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	s_startserver.arrows.width  	   = GAMESERVER_ARROWS_WIDTH;
 	s_startserver.arrows.height  	   = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -620,7 +620,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.prevpage.generic.id	    = ID_PREVPAGE;
 	s_startserver.prevpage.generic.x		= 260;
 	s_startserver.prevpage.generic.y		= 400;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	s_startserver.prevpage.width  		    = GAMESERVER_ARROWS_WIDTH/2;
 	s_startserver.prevpage.height  		    = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -633,13 +633,13 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.nextpage.generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_startserver.nextpage.generic.callback = StartServer_MenuEvent;
 	s_startserver.nextpage.generic.id	    = ID_NEXTPAGE;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	s_startserver.nextpage.generic.x		= 260+GAMESERVER_ARROWS_WIDTH/2;
 #else
 	s_startserver.nextpage.generic.x		= 321;
 #endif
 	s_startserver.nextpage.generic.y		= 400;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	s_startserver.nextpage.width  		    = GAMESERVER_ARROWS_WIDTH/2;
 	s_startserver.nextpage.height  		    = GAMESERVER_ARROWS_HEIGHT;
 #else
@@ -738,13 +738,13 @@ void StartServer_Cache( void )
 
 	if( precache ) {
 		for( i = 0; i < UI_GetNumArenas(); i++ ) {
-			info = UI_GetArenaInfoByNumber( i );
+		info = UI_GetArenaInfoByNumber( i );
 			Q_strncpyz( mapname, Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
 #ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 			Q_strupr( mapname );
 #endif
-	
-#ifdef TA_DATA // TEAMARENA_LEVELSHOTS
+
+#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 			Com_sprintf( picname, sizeof(picname), "levelshots/%s_small", mapname );
 #else
 			Com_sprintf( picname, sizeof(picname), "levelshots/%s", mapname );
@@ -820,7 +820,7 @@ typedef struct {
 	int					newBotIndex;
 	char				newBotName[16];
 	
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	menulist_s		punkbuster;
 #endif
 } serveroptions_t;
@@ -848,7 +848,7 @@ static const char *playerTeam_list[] = {
 };
 
 static const char *botSkill_list[] = {
-#ifdef TA_MISC // SRB2_SKILLS
+#ifdef TMNTMISC // rip off SRB2 skills...
 	"Easy",
 	"Normal",
 	"Hard",
@@ -928,7 +928,7 @@ static void ServerOptions_Start( void ) {
 		maxclients++;
 	}
 
-#ifdef TA_SP
+#ifdef TMNTSP
 	// Don't allow clients to join in non-multiplayer.
 	if (!s_serveroptions.multiplayer)
 		trap_Cvar_SetValue( "ui_singlePlayerActive", 2 );
@@ -939,7 +939,7 @@ static void ServerOptions_Start( void ) {
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_SetValue( "ui_ffa_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_ffa_fraglimit", fraglimit );
@@ -948,7 +948,7 @@ static void ServerOptions_Start( void ) {
 		break;
 
 	case GT_TOURNAMENT:
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_SetValue( "ui_tourney_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_tourney_fraglimit", fraglimit );
@@ -956,14 +956,14 @@ static void ServerOptions_Start( void ) {
 		trap_Cvar_SetValue( "ui_tourney_timelimit", timelimit );
 		break;
 
-#ifdef TA_SP
+#ifdef TMNTSP
 	case GT_SINGLE_PLAYER:
 		// Co-op settings
 		break;
 #endif
 
 	case GT_TEAM:
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 		trap_Cvar_SetValue( "ui_team_scorelimit", fraglimit );
 #else
 		trap_Cvar_SetValue( "ui_team_fraglimit", fraglimit );
@@ -1016,7 +1016,7 @@ static void ServerOptions_Start( void ) {
 	trap_Cvar_SetValue( "sv_maxclients", Com_Clamp( 0, 12, maxclients ) );
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, dedicated ) );
 	trap_Cvar_SetValue ("timelimit", Com_Clamp( 0, timelimit, timelimit ) );
-#ifdef NOTRATEDM // frag to score
+#ifdef TMNTMISC // frag to score
 	trap_Cvar_SetValue ("scorelimit", Com_Clamp( 0, fraglimit, fraglimit ) );
 #else
 	trap_Cvar_SetValue ("fraglimit", Com_Clamp( 0, fraglimit, fraglimit ) );
@@ -1026,7 +1026,7 @@ static void ServerOptions_Start( void ) {
 	trap_Cvar_SetValue( "sv_pure", pure );
 	trap_Cvar_Set("sv_hostname", s_serveroptions.hostname.field.buffer );
 	
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	trap_Cvar_SetValue( "sv_punkbuster", s_serveroptions.punkbuster.curvalue );
 #endif
 
@@ -1095,23 +1095,9 @@ static void ServerOptions_InitPlayerItems( void ) {
 	// if not a dedicated server, first slot is reserved for the human on the server
 	if( s_serveroptions.dedicated.curvalue == 0 ) {
 		// human
-#ifdef TA_SP // SPMODEL
-		s_serveroptions.playerType[0].curvalue = 0;
-		if (!s_serveroptions.multiplayer)
-		{
-			trap_Cvar_VariableStringBuffer( "spmodel", s_serveroptions.playerNameBuffers[0], sizeof(s_serveroptions.playerNameBuffers[0]) );
-			s_serveroptions.playerNameBuffers[0][0] = toupper(s_serveroptions.playerNameBuffers[0][0]);
-		}
-		else
-		{
-			s_serveroptions.playerType[0].generic.flags |= QMF_INACTIVE;
-			trap_Cvar_VariableStringBuffer( "name", s_serveroptions.playerNameBuffers[0], sizeof(s_serveroptions.playerNameBuffers[0]) );
-		}
-#else
 		s_serveroptions.playerType[0].generic.flags |= QMF_INACTIVE;
 		s_serveroptions.playerType[0].curvalue = 0;
 		trap_Cvar_VariableStringBuffer( "name", s_serveroptions.playerNameBuffers[0], sizeof(s_serveroptions.playerNameBuffers[0]) );
-#endif
 		Q_CleanStr( s_serveroptions.playerNameBuffers[0] );
 	}
 
@@ -1151,11 +1137,6 @@ static void ServerOptions_SetPlayerItems( void ) {
 	// names
 	if( s_serveroptions.dedicated.curvalue == 0 ) {
 		s_serveroptions.player0.string = "Human";
-#ifdef TA_SP
-		if (!s_serveroptions.multiplayer)
-			s_serveroptions.playerName[0].generic.flags &= ~(QMF_INACTIVE|QMF_HIDDEN);
-		else
-#endif
 		s_serveroptions.playerName[0].generic.flags &= ~QMF_HIDDEN;
 
 		start = 1;
@@ -1239,25 +1220,6 @@ static void ServerOptions_PlayerNameEvent( void* ptr, int event ) {
 		return;
 	}
 	n = ((menutext_s*)ptr)->generic.id;
-#ifdef TA_SP
-	if (s_serveroptions.dedicated.curvalue == 0 && n == 0)
-	{
-		int i;
-
-		for (i = 0; i < NUM_SPPLAYERS; i++)
-		{
-			if (Q_stricmp(s_serveroptions.playerNameBuffers[0], spPlayerNames[i]) == 0)
-			{
-				n = (i+1)%NUM_SPPLAYERS; // next model
-			}
-		}
-
-		trap_Cvar_Set("spmodel", spPlayerNames[n]);
-		strcpy(s_serveroptions.playerNameBuffers[0], spPlayerNames[n]);
-		s_serveroptions.playerNameBuffers[0][0] = toupper(spPlayerNames[n][0]);
-		return;
-	}
-#endif
 	s_serveroptions.newBotIndex = n;
 	UI_BotSelectMenu( s_serveroptions.playerNameBuffers[n] );
 }
@@ -1306,7 +1268,7 @@ static void ServerOptions_LevelshotDraw( void *self ) {
 	UI_DrawString( x, y, s_serveroptions.mapnamebuffer, UI_CENTER|UI_SMALLFONT, color_orange );
 
 	y += SMALLCHAR_HEIGHT;
-#ifdef TURTLEARENA
+#ifdef TMNT
 	UI_DrawString( x, y, gametype_items[gametype_remap[s_serveroptions.gametype]], UI_CENTER|UI_SMALLFONT, color_orange );
 #else
 	UI_DrawString( x, y, gametype_items[gametype_remap2[s_serveroptions.gametype]], UI_CENTER|UI_SMALLFONT, color_orange );
@@ -1334,7 +1296,7 @@ static void ServerOptions_InitBotNames( void ) {
 #endif
 		}
 #endif
-#ifdef RANDOMBOT // DEFAULT_PLAYER
+#ifdef TMNTMISC // DEFAULT_PLAYER
 		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "Random", 16 ); // RaphBlue
 		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "Random", 16 ); // RaphBlue
 		if( s_serveroptions.gametype == GT_TEAM ) {
@@ -1353,7 +1315,7 @@ static void ServerOptions_InitBotNames( void ) {
 		s_serveroptions.playerType[4].curvalue = 2;
 		s_serveroptions.playerType[5].curvalue = 2;
 
-#ifdef RANDOMBOT // DEFAULT_PLAYER
+#ifdef TMNTMISC // DEFAULT_PLAYER
 		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "Random", 16 ); // RaphRed
@@ -1462,8 +1424,8 @@ static void ServerOptions_SetMenuItems( void ) {
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
-#ifdef NOTRATEDM // frag to score
-		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_ffa_scorelimit" ) ) );
+#ifdef TMNTMISC // frag to score
+		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_ffa_scorelimit" ) ) );
 #else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_ffa_fraglimit" ) ) );
 #endif
@@ -1471,15 +1433,15 @@ static void ServerOptions_SetMenuItems( void ) {
 		break;
 
 	case GT_TOURNAMENT:
-#ifdef NOTRATEDM // frag to score
-		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_tourney_scorelimit" ) ) );
+#ifdef TMNTMISC // frag to score
+		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_scorelimit" ) ) );
 #else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_fraglimit" ) ) );
 #endif
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_timelimit" ) ) );
 		break;
 
-#ifdef TA_SP
+#ifdef TMNTSP
 	case GT_SINGLE_PLAYER:
 		Com_sprintf( s_serveroptions.flaglimit.field.buffer, 4, "%i", 0 );
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", 0 );
@@ -1488,8 +1450,8 @@ static void ServerOptions_SetMenuItems( void ) {
 #endif
 
 	case GT_TEAM:
-#ifdef NOTRATEDM // frag to score
-		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_team_scorelimit" ) ) );
+#ifdef TMNTMISC // frag to score
+		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_scorelimit" ) ) );
 #else
 		Com_sprintf( s_serveroptions.fraglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_fraglimit" ) ) );
 #endif
@@ -1533,7 +1495,7 @@ static void ServerOptions_SetMenuItems( void ) {
 	info = UI_GetArenaInfoByNumber( s_startserver.maplist[ s_startserver.currentmap ]);
 	Q_strncpyz( mapname, Info_ValueForKey( info, "map"), MAX_NAMELENGTH );
 	Q_strupr( mapname );
-#ifdef TA_DATA // TEAMARENA_LEVELSHOTS
+#ifdef TMNTDATA // TEAMARENA_LEVELSHOTS
 	Com_sprintf( picname, 64, "levelshots/%s_small", mapname );
 #else
 	Com_sprintf( picname, 64, "levelshots/%s", mapname );
@@ -1615,14 +1577,14 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 
 	memset( &s_serveroptions, 0 ,sizeof(serveroptions_t) );
 	s_serveroptions.multiplayer = multiplayer;
-#ifdef MISSIONPACK // ZTM: Allow all game types.
+#ifdef MISSIONPACK // Turtle Man: Allow all game types.
 	s_serveroptions.gametype = (int)Com_Clamp( 0, GT_MAX_GAME_TYPE-1, trap_Cvar_VariableValue( "g_gametype" ) );
 #elif defined IOQ3ZTM // IOQ3BUGFIX: Quake3 only had 4 gametypes
 	s_serveroptions.gametype = (int)Com_Clamp( 0, 4, trap_Cvar_VariableValue( "g_gametype" ) );
 #else
 	s_serveroptions.gametype = (int)Com_Clamp( 0, 5, trap_Cvar_VariableValue( "g_gameType" ) );
 #endif
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	s_serveroptions.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_punkbuster" ) );
 #endif
 
@@ -1635,7 +1597,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	s_serveroptions.banner.generic.x			= 320;
 	s_serveroptions.banner.generic.y			= 16;
 	s_serveroptions.banner.string  				= "GAME SERVER";
-	s_serveroptions.banner.color  				= text_banner_color;
+	s_serveroptions.banner.color  				= color_white;
 	s_serveroptions.banner.style  				= UI_CENTER;
 
 	s_serveroptions.mappic.generic.type			= MTYPE_BITMAP;
@@ -1656,19 +1618,19 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	s_serveroptions.picframe.focuspic			= GAMESERVER_SELECT;
 
 	y = 272;
-#ifdef TA_SP
+#ifdef TMNTSP
 	if (s_serveroptions.gametype != GT_SINGLE_PLAYER)
 	{
 #endif
-#ifdef MISSIONPACK // TA_MISSIONPACK
+#ifdef MISSIONPACK // TMNTMISSIONPACK
 	if( s_serveroptions.gametype <= GT_TEAM )
 #else
 	if( s_serveroptions.gametype != GT_CTF )
 #endif
 	{
 		s_serveroptions.fraglimit.generic.type       = MTYPE_FIELD;
-#ifdef NOTRATEDM // frag to score
-		s_serveroptions.fraglimit.generic.name       = "Score Limit:";
+#ifdef TMNTMISC // frag to KO
+		s_serveroptions.fraglimit.generic.name       = "Knock Out Limit:";
 #else
 		s_serveroptions.fraglimit.generic.name       = "Frag Limit:";
 #endif
@@ -1676,13 +1638,8 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.fraglimit.generic.x	         = OPTIONS_X;
 		s_serveroptions.fraglimit.generic.y	         = y;
 		s_serveroptions.fraglimit.generic.statusbar  = ServerOptions_StatusBar;
-#ifdef NOTRATEDM // frag to score
-		s_serveroptions.fraglimit.field.widthInChars = 4;
-		s_serveroptions.fraglimit.field.maxchars     = 4;
-#else
 		s_serveroptions.fraglimit.field.widthInChars = 3;
 		s_serveroptions.fraglimit.field.maxchars     = 3;
-#endif
 	}
 	else {
 		s_serveroptions.flaglimit.generic.type       = MTYPE_FIELD;
@@ -1705,7 +1662,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	s_serveroptions.timelimit.field.widthInChars = 3;
 	s_serveroptions.timelimit.field.maxchars     = 3;
 
-#ifdef TA_SP
+#ifdef TMNTSP
 	}
 #endif
 
@@ -1715,11 +1672,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.friendlyfire.generic.flags    = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 		s_serveroptions.friendlyfire.generic.x	      = OPTIONS_X;
 		s_serveroptions.friendlyfire.generic.y	      = y;
-#ifdef IOQ3ZTM
-		s_serveroptions.friendlyfire.generic.name	  = "Team Damage:";
-#else
 		s_serveroptions.friendlyfire.generic.name	  = "Friendly Fire:";
-#endif
 	}
 
 	y += BIGCHAR_HEIGHT+2;
@@ -1728,13 +1681,6 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	s_serveroptions.pure.generic.x				= OPTIONS_X;
 	s_serveroptions.pure.generic.y				= y;
 	s_serveroptions.pure.generic.name			= "Pure Server:";
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-	if (!trap_Cvar_VariableValue( "fs_pure" ))
-	{
-		// Don't let users think they can modify sv_pure, it won't work.
-		s_serveroptions.pure.generic.flags |= QMF_GRAYED;
-	}
-#endif
 
 	if( s_serveroptions.multiplayer ) {
 		y += BIGCHAR_HEIGHT+2;
@@ -1759,7 +1705,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.hostname.field.maxchars     = 64;
 	}
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	y += BIGCHAR_HEIGHT+2;
 	s_serveroptions.punkbuster.generic.type			= MTYPE_SPINCONTROL;
 	s_serveroptions.punkbuster.generic.name			= "Punkbuster:";
@@ -1871,11 +1817,11 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		}
 	}
 
-#ifdef TA_SP
+#ifdef TMNTSP
 	if (s_serveroptions.gametype != GT_SINGLE_PLAYER)
 	{
 #endif
-#ifdef MISSIONPACK // TA_MISSIONPACK
+#ifdef MISSIONPACK // TMNTMISSIONPACK
 	if( s_serveroptions.gametype <= GT_TEAM )
 #else
 	if( s_serveroptions.gametype != GT_CTF )
@@ -1887,7 +1833,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.flaglimit );
 	}
 	Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.timelimit );
-#ifdef TA_SP
+#ifdef TMNTSP
 	}
 #endif
 	if( s_serveroptions.gametype >= GT_TEAM ) {
@@ -1905,7 +1851,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.next );
 	Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.go );
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
+#ifdef IOQUAKE3 // Turtle Man: punkbuster
 	Menu_AddItem( &s_serveroptions.menu, (void*) &s_serveroptions.punkbuster );
 #endif
 	
@@ -1954,7 +1900,7 @@ BOT SELECT MENU *****
 #define BOTSELECT_ACCEPT1		"menu/art/accept_1"
 #define BOTSELECT_SELECT		"menu/art/opponents_select"
 #define BOTSELECT_SELECTED		"menu/art/opponents_selected"
-#ifdef TA_DATA
+#ifdef TMNTDATA
 #define BOTSELECT_ARROWS		"menu/art/arrows_horz_0"
 #define BOTSELECT_ARROWSL		"menu/art/arrows_horz_left"
 #define BOTSELECT_ARROWSR		"menu/art/arrows_horz_right"
@@ -2018,8 +1964,8 @@ static int QDECL UI_BotSelectMenu_SortCompare( const void *arg1, const void *arg
 	name1 = Info_ValueForKey( info1, "name" );
 	name2 = Info_ValueForKey( info2, "name" );
 
-#ifdef RANDOMBOT // ZTM: Random bot
-    // ZTM: Random bot comes first on the list.
+#ifdef RANDOMBOT // Turtle Man: Random bot
+    // Turtle Man: Random bot comes first on the list.
     if (Q_stricmp(name1, "Random") == 0 || Q_stricmp(name2, "Random") == 0)
     {
         return Q_stricmp( Q_stricmp(name1, "Random") == 0 ? "0" : "1",
@@ -2063,12 +2009,9 @@ ServerPlayerIcon
 static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int iconNameMaxSize ) {
 	char	*skin;
 	char	model[MAX_QPATH];
-#ifdef IOQ3ZTM // BOT_HEADMODEL
-	qboolean headmodel;
-#endif
 
-#ifdef RANDOMBOT // ZTM: Random bot
-    // ZTM: Random bot's icon is in a different spot then a normal player.
+#ifdef RANDOMBOT // Turtle Man: Random bot
+    // Turtle Man: Random bot's icon is in a different spot then a normal player.
     if (Q_stricmp(modelAndSkin, "Random") == 0)
     {
         Com_sprintf(iconName, iconNameMaxSize, "menu/art/randombot_icon.tga");
@@ -2078,16 +2021,7 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
     }
 #endif
 
-#ifdef IOQ3ZTM // BOT_HEADMODEL
-	headmodel = (modelAndSkin[0] == '*');
-	if (headmodel) {
-		Q_strncpyz( model, &modelAndSkin[1], sizeof(model));
-	} else {
-		Q_strncpyz( model, modelAndSkin, sizeof(model));
-	}
-#else
 	Q_strncpyz( model, modelAndSkin, sizeof(model));
-#endif
 	skin = Q_strrchr( model, '/' );
 	if ( skin ) {
 		*skin++ = '\0';
@@ -2096,21 +2030,6 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
 		skin = "default";
 	}
 
-#ifdef IOQ3ZTM // BOT_HEADMODEL
-	if (headmodel)
-	{
-		Com_sprintf(iconName, iconNameMaxSize, "models/players/heads/%s/icon_%s.tga", model, skin );
-
-		if( !trap_R_RegisterShaderNoMip( iconName ) && Q_stricmp( skin, "default" ) != 0 ) {
-			Com_sprintf(iconName, iconNameMaxSize, "models/players/heads/%s/icon_default.tga", model );
-		}
-
-		if (trap_R_RegisterShaderNoMip( iconName )) {
-			return;
-		}
-	}
-#endif
-
 	Com_sprintf(iconName, iconNameMaxSize, "models/players/%s/icon_%s.tga", model, skin );
 
 	if( !trap_R_RegisterShaderNoMip( iconName ) && Q_stricmp( skin, "default" ) != 0 ) {
@@ -2118,18 +2037,6 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
 	}
 }
 
-
-#ifdef IOQ3ZTM // BOT_HEADMODEL
-/*
-=================
-PlayerIconhandle
-=================
-*/
-static qhandle_t ServerPlayerIconHandle( const char *modelAndSkin, char *iconName, size_t iconSize ) {
-	ServerPlayerIcon( modelAndSkin, iconName, iconSize);
-	return trap_R_RegisterShaderNoMip( iconName );
-}
-#endif
 
 /*
 =================
@@ -2143,21 +2050,15 @@ static void UI_BotSelectMenu_UpdateGrid( void ) {
 
 	j = botSelectInfo.modelpage * MAX_MODELSPERPAGE;
 	for( i = 0; i < (PLAYERGRID_ROWS * PLAYERGRID_COLS); i++, j++) {
+
 		if( j < botSelectInfo.numBots ) { 
 			info = UI_GetBotInfoByNumber( botSelectInfo.sortedBotNums[j] );
-#ifdef IOQ3ZTM // BOT_HEADMODEL
-			if (!ServerPlayerIconHandle( Info_ValueForKey( info, "headmodel" ), botSelectInfo.boticons[i], MAX_QPATH ))
-#endif
 			ServerPlayerIcon( Info_ValueForKey( info, "model" ), botSelectInfo.boticons[i], MAX_QPATH );
 			Q_strncpyz( botSelectInfo.botnames[i], Info_ValueForKey( info, "name" ), 16 );
 			Q_CleanStr( botSelectInfo.botnames[i] );
  			botSelectInfo.pics[i].generic.name = botSelectInfo.boticons[i];
 			if( BotAlreadySelected( botSelectInfo.botnames[i] ) ) {
-#ifdef TURTLEARENA
-				botSelectInfo.picnames[i].color = color_white;
-#else
 				botSelectInfo.picnames[i].color = color_red;
-#endif
 			}
 			else {
 				botSelectInfo.picnames[i].color = color_orange;
@@ -2361,7 +2262,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.banner.generic.x		= 320;
 	botSelectInfo.banner.generic.y		= 16;
 	botSelectInfo.banner.string			= "SELECT BOT";
-	botSelectInfo.banner.color			= text_banner_color;
+	botSelectInfo.banner.color			= color_white;
 	botSelectInfo.banner.style			= UI_CENTER;
 
 	y =	80;
@@ -2376,7 +2277,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 			botSelectInfo.pics[k].width						= 64;
 			botSelectInfo.pics[k].height					= 64;
 			botSelectInfo.pics[k].focuspic					= BOTSELECT_SELECTED;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 			botSelectInfo.pics[k].focuscolor				= colorRed;
 #endif
 
@@ -2393,7 +2294,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 			botSelectInfo.picbuttons[k].width				= 128;
 			botSelectInfo.picbuttons[k].height				= 128;
 			botSelectInfo.picbuttons[k].focuspic			= BOTSELECT_SELECT;
-#ifndef TA_DATA
+#ifndef TMNTDATA
 			botSelectInfo.picbuttons[k].focuscolor			= colorRed;
 #endif
 
@@ -2414,7 +2315,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.arrows.generic.name		= BOTSELECT_ARROWS;
 	botSelectInfo.arrows.generic.flags		= QMF_INACTIVE;
 	botSelectInfo.arrows.generic.x			= 260;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	botSelectInfo.arrows.generic.y			= 400;
 	botSelectInfo.arrows.width				= BOTSELECT_ARROWS_WIDTH;
 	botSelectInfo.arrows.height				= BOTSELECT_ARROWS_HEIGHT;
@@ -2428,7 +2329,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.left.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	botSelectInfo.left.generic.callback		= UI_BotSelectMenu_LeftEvent;
 	botSelectInfo.left.generic.x			= 260;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	botSelectInfo.left.generic.y			= 400;
 	botSelectInfo.left.width  				= BOTSELECT_ARROWS_WIDTH/2;
 	botSelectInfo.left.height  				= BOTSELECT_ARROWS_HEIGHT;
@@ -2442,7 +2343,7 @@ static void UI_BotSelectMenu_Init( char *bot ) {
 	botSelectInfo.right.generic.type	    = MTYPE_BITMAP;
 	botSelectInfo.right.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 	botSelectInfo.right.generic.callback	= UI_BotSelectMenu_RightEvent;
-#ifdef TA_DATA
+#ifdef TMNTDATA
 	botSelectInfo.right.generic.x			= 260+BOTSELECT_ARROWS_WIDTH/2;
 	botSelectInfo.right.generic.y			= 400;
 	botSelectInfo.right.width  				= BOTSELECT_ARROWS_WIDTH/2;

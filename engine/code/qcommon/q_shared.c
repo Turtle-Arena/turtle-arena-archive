@@ -948,12 +948,12 @@ void QDECL Com_sprintf( char *dest, int size, const char *fmt, ...) {
 	if (len >= size) {
 		Com_Printf ("Com_sprintf: overflow of %i in %i\n", len, size);
 #ifdef	_DEBUG
-#ifdef _MSC_VER
+#ifdef __MINGW32__ // Turtle Man
+        __asm__("int3");
+#else
 		__asm {
 			int 3;
 		}
-#else
-        __asm__("int3");
 #endif
 #endif
 	}

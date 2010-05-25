@@ -36,7 +36,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define AAS_MAX_CLUSTERS					65536
 
 #define BSPCINCLUDE
-#include "../botlib/be_aas.h" // ZTM(IOQ3): game to botlib
+#include "../botlib/be_aas.h" // Turtle Man(IOQ3): game to botlib
 #include "../botlib/be_aas_def.h"
 
 /*

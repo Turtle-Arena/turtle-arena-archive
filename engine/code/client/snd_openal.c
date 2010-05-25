@@ -414,7 +414,7 @@ qboolean S_AL_BufferInit( void )
 	numSfx = 0;
 
 	// Load the default sound, and lock it
-#ifdef TA_DATA // OPENARENA
+#ifdef TMNTDATA // OPENARENA
 	default_sfx = S_AL_BufferFind("sound/misc/silence.wav");
 #else
 	default_sfx = S_AL_BufferFind("sound/feedback/hit.wav");
@@ -557,7 +557,7 @@ static void _S_AL_SanitiseVector( vec3_t v, int line )
 }
 
 
-#ifndef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
+#ifndef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
 #define AL_THIRD_PERSON_THRESHOLD_SQ (48.0f*48.0f)
 #endif
 
@@ -623,14 +623,14 @@ S_AL_HearingThroughEntity
 */
 static qboolean S_AL_HearingThroughEntity( int entityNum )
 {
-#ifndef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
+#ifndef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
 	float	distanceSq;
 #endif
 
 	if( clc.clientNum == entityNum )
 	{
-#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
-		// ZTM: I changed the cgame API so that this doesn't have to be a hack.
+#ifdef IOQ3ZTM_NON_COMPAT // EAR_IN_ENTITY
+		// Turtle Man: I changed the cgame API so that this doesn't have to be a hack.
 		if (VM_Call(cgvm, CG_VIEW_TYPE) == 0)
 		{
 			//we're the player

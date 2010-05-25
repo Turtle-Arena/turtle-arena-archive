@@ -1,31 +1,29 @@
 /*
 ===========================================================================
 Copyright (C) 2006 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com))
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
-This file is part of Turtle Arena and is based upon botfiles by
-Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com)) from Open Arena which
-are based on Mr. Elusive's fuzzy logic system found in Quake 3 Arena.
+This file is part of Open Arena and is based upon Mr. Elusive's fuzzy logic
+system found in Quake 3 Arena.
 
-Turtle Arena is free software; you can redistribute it
+Open Arena is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena is distributed in the hope that it will be
+Open Arena is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena; if not, write to the Free Software
+along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
 #include "inv.h"
 
-// ZTM: NOTE: type and index seem to be unused.
+// Turtle Man: NOTE: type and index seem to be unused.
 
 #define NOITEM		0
 #define AMMOI		1
@@ -40,7 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	RESPAWN_ARMOR		25
 #define	RESPAWN_HEALTH		35
 #define	RESPAWN_AMMO		40
-//#ifdef TA_HOLDABLE
+//#ifdef TMNTHOLDABLE
 #define RESPAWN_HOLDABLE	35
 //#else
 //#define RESPAWN_HOLDABLE	60
@@ -208,7 +206,7 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
-// TA_WEAPSYS uses weaponinfo.txt to setup the weapon items.
+// TMNTWEAPSYS_2 uses weaponinfo.txt to setup the weapon items.
 // (Weapons could still be here, but they would over-ride weaponinfo.txt items)
 /*
 //weapon_default?
@@ -249,13 +247,13 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 
-iteminfo "weapon_nunchucks"
+iteminfo "weapon_nunchuks"
 {
-name		"Nunchucks"
-model		"models/weapons2/nunchuck/nunchuck_pickup.md3"
-modelindex	MODELINDEX_NUNCHUCKS
+name		"Nunchuks"
+model		"models/weapons2/nunchuk/nunchuk_pickup.md3"
+modelindex	MODELINDEX_NUNCHUKS
 type		WEAPONI
-index		INVENTORY_NUNCHUCKS
+index		INVENTORY_NUNCHUKS
 respawntime	30
 mins		{-13,-13,-13}
 maxs		{13,13,13}
@@ -442,7 +440,6 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
 
-/*
 iteminfo "item_regen"
 {
 name		"Regeneration"
@@ -454,7 +451,6 @@ respawntime	RESPAWN_POWERUP
 mins		{-13,-13,-13}
 maxs		{13,13,13}
 } 
-*/
 
 iteminfo "item_flight"
 {
@@ -595,7 +591,7 @@ maxs		{14, 14, 87}
 } 
 
 /*
-// For MISSIONPACK Harvester gametype (ZTM: Removed from Turtle Arena. #ifdef MISSIONPACK_HARVESTER)
+// For MISSIONPACK Harvester gametype (Turtle Man: Removed from TMNT Arena. #ifdef MISSIONPACK_HARVESTER)
 iteminfo "item_redcube"
 {
 name		"Red Cube"

@@ -162,16 +162,10 @@ static void CG_spWin_f( void) {
 	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
-#ifndef THIRD_PERSON
 	trap_Cvar_Set("cg_thirdPersonRange", "100");
-#endif
 	CG_AddBufferedSound(cgs.media.winnerSound);
 	//trap_S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
-#ifndef MISSIONPACK_HUD
-	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
-#else
 	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, 0);
-#endif
 }
 
 static void CG_spLose_f( void) {
@@ -179,19 +173,10 @@ static void CG_spLose_f( void) {
 	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
-#ifndef THIRD_PERSON
 	trap_Cvar_Set("cg_thirdPersonRange", "100");
-#endif
 	CG_AddBufferedSound(cgs.media.loserSound);
 	//trap_S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
-#ifdef TA_SP
-	if (cgs.gametype != GT_SINGLE_PLAYER)
-#endif
-#ifndef MISSIONPACK_HUD
-	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
-#else
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, 0);
-#endif
 }
 
 #endif
@@ -373,7 +358,7 @@ static void CG_TauntDeathInsult_f (void ) {
 	trap_SendConsoleCommand("cmd vsay death_insult\n");
 }
 
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS
 static void CG_TauntGauntlet_f (void ) {
 	trap_SendConsoleCommand("cmd vsay kill_guantlet\n");
 }
@@ -447,9 +432,7 @@ static void CG_StartOrbit_f( void ) {
 		trap_Cvar_Set("cg_cameraOrbit", "5");
 		trap_Cvar_Set("cg_thirdPerson", "1");
 		trap_Cvar_Set("cg_thirdPersonAngle", "0");
-#ifndef THIRD_PERSON
 		trap_Cvar_Set("cg_thirdPersonRange", "100");
-#endif
 	}
 }
 
@@ -470,7 +453,7 @@ void CG_StartCamera( const char *name, qboolean startBlack, qboolean endBlack) {
 			CG_Fade(0, cg.time, 1500);
 		}
 
-#ifdef IOQ3ZTM // LETTERBOX
+#ifdef TMNTMISC
 		CG_ToggleLetterbox(qtrue, startBlack);
 #endif
 		cg.cameraEndBlack = endBlack;
@@ -500,7 +483,7 @@ static void CG_Camera_f( void ) {
 */
 #endif
 
-#ifdef IOQ3ZTM // LETTERBOX
+#ifdef TMNTMISC
 void CG_Letterbox(void)
 {
 	qboolean onscreen, instant;
@@ -512,105 +495,6 @@ void CG_Letterbox(void)
 	instant = atoi(name);
 
 	CG_ToggleLetterbox( onscreen, instant );
-}
-#endif
-
-#ifdef IOQ3ZTM // NEW_CAM
-float camRotDir = 0;
-qboolean camleft = qfalse;
-qboolean camright = qfalse;
-qboolean camreseting = qfalse;
-void CG_CamMoveLeft(qboolean down)
-{
-	camleft = down;
-	if (down) {
-		camRotDir += 1.0f;
-		camreseting = qfalse;
-	}
-}
-
-void CG_CamMoveRight(qboolean down)
-{
-	camright = down;
-	if (down) {
-		camRotDir -= 1.0f;
-		camreseting = qfalse;
-	}
-}
-
-void CG_CamLeftDown_f(void)
-{
-	CG_CamMoveLeft(qtrue);
-}
-
-void CG_CamLeftUp_f(void)
-{
-	CG_CamMoveLeft(qfalse);
-}
-
-void CG_CamRightDown_f(void)
-{
-	CG_CamMoveRight(qtrue);
-}
-
-void CG_CamRightUp_f(void)
-{
-	CG_CamMoveRight(qfalse);
-}
-
-void CG_CamUpdate(void)
-{
-	if (camreseting)
-	{
-		float speed = 5.0f;
-		if (cg_thirdPersonAngle.value >= 360-speed || cg_thirdPersonAngle.value <= speed)
-		{
-			cg_thirdPersonAngle.value = 0;
-			camRotDir = 0;
-			camreseting = qfalse;
-		}
-		else if (cg_thirdPersonAngle.value > 180)
-			cg_thirdPersonAngle.value += speed;
-		else if (cg_thirdPersonAngle.value > speed)
-			cg_thirdPersonAngle.value -= speed;
-	}
-	else
-	{
-		if (camleft)
-			camRotDir += 0.2f;
-		else if (camRotDir >= 0.1f)
-			camRotDir -= 0.1f;
-
-		if (camright)
-			camRotDir -= 0.2f;
-		else if (camRotDir <= -0.1f)
-			camRotDir += 0.1f;
-
-		if (!camleft && !camright && camRotDir >= -0.2f && camRotDir <= 0.2f)
-			camRotDir = 0;
-
-		if (camRotDir > 3)
-			camRotDir = 3;
-		else if (camRotDir < -3)
-			camRotDir = -3;
-
-		cg_thirdPersonAngle.value = cg_thirdPersonAngle.value+camRotDir;
-	}
-
-	if (cg_thirdPersonAngle.value > 360)
-		cg_thirdPersonAngle.value -= 360;
-	if (cg_thirdPersonAngle.value < 0)
-		cg_thirdPersonAngle.value += 360;
-
-	// Update the cvar...
-	if (cg_thirdPersonAngle.integer != (int)cg_thirdPersonAngle.value)
-		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", cg_thirdPersonAngle.value));
-}
-
-void CG_CamReset_f(void)
-{
-	camreseting = qtrue;
-	camRotDir = 0;
 }
 #endif
 
@@ -629,25 +513,16 @@ static consoleCommand_t	commands[] = {
 	{ "viewpos", CG_Viewpos_f },
 	{ "+scores", CG_ScoresDown_f },
 	{ "-scores", CG_ScoresUp_f },
-#ifndef TURTLEARENA // NOZOOM
 	{ "+zoom", CG_ZoomDown_f },
 	{ "-zoom", CG_ZoomUp_f },
-#endif
-#ifdef IOQ3ZTM // NEW_CAM
-	{ "camreset", CG_CamReset_f },
-	{ "+camleft", CG_CamLeftDown_f },
-	{ "-camleft", CG_CamLeftUp_f },
-	{ "+camright", CG_CamRightDown_f },
-	{ "-camright", CG_CamRightUp_f },
-#endif
 	{ "sizeup", CG_SizeUp_f },
 	{ "sizedown", CG_SizeDown_f },
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 	{ "weapnext", CG_NextWeapon_f },
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },
 #endif
-#ifdef TA_HOLDSYS/*2*/
+#ifdef TMNTHOLDSYS/*2*/
 	{ "holdnext", CG_NextHoldable_f },
 	{ "holdprev", CG_PrevHoldable_f },
 	{ "holdable", CG_Holdable_f },
@@ -679,7 +554,7 @@ static consoleCommand_t	commands[] = {
 	{ "tauntPraise", CG_TauntPraise_f },
 	{ "tauntTaunt", CG_TauntTaunt_f },
 	{ "tauntDeathInsult", CG_TauntDeathInsult_f },
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TMNTWEAPONS
 	{ "tauntGauntlet", CG_TauntGauntlet_f },
 #endif
 	{ "spWin", CG_spWin_f },
@@ -695,7 +570,7 @@ static consoleCommand_t	commands[] = {
 #else
 	//{ "camera", CG_Camera_f },
 #endif
-#ifdef IOQ3ZTM // LETTERBOX
+#ifdef TMNTMISC
 	{ "letterbox", CG_Letterbox },
 #endif
 	{ "loaddeferred", CG_LoadDeferredPlayers }	
@@ -777,7 +652,7 @@ void CG_InitConsoleCommands( void ) {
 #else
 	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
 #endif
-#ifdef IOQ3ZTM // LETTERBOX
+#ifdef TMNTMISC
 	trap_AddCommand ("letterbox" );
 #endif
 }

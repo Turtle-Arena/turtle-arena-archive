@@ -1,5 +1,4 @@
-// Taken from Open Arena
-// (changed filenames "sound\voices\rott\" to "sound/voices/male1/")
+// Open Arena (changed filenames "sound\voices\rott\" to "sound/voices/male1/")
 male
 
 getflag
@@ -64,8 +63,7 @@ enemyhasflag
 
 ongetflag
 {
-	// oops, this was supposed to be for one flag ctf but we didn't have a getting the flag...
-	sound/voices/male1/gettingourflag.ogg	"Getting our flag"
+	sound/voices/male1/gettingourflag.ogg	"Getting our flag" // oops, this was supposed to be for one flag ctf but we didn't have a getting the flag...
 }
 
 onoffense
@@ -178,13 +176,13 @@ onreturnflag
 	sound/voices/male1/gettingourflag.ogg	"Getting our flag!"
 }
 
-// Turtle Arena has no harvester gametype...
+// TMNT Arena has no harvester gametype...
 harvest
 {
 //	sound/voices/male1/getsomeskulls.ogg	"Get some skulls"
 }
 
-// Turtle Arena has no gaunlet
+// TMNT Arena has no gaunlet
 kill_gauntlet
 {
 

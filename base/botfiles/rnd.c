@@ -1,29 +1,27 @@
 /*
 ===========================================================================
 Copyright (C) 2006 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com))
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
-This file is part of Turtle Arena and is based upon botfiles by
-Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com)) from Open Arena which
-are based on Mr. Elusive's fuzzy logic system found in Quake 3 Arena.
+This file is part of Open Arena and is based upon Mr. Elusive's fuzzy logic
+system found in Quake 3 Arena.
 
-Turtle Arena is free software; you can redistribute it
+Open Arena is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena is distributed in the hope that it will be
+Open Arena is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena; if not, write to the Free Software
+along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// ZTM: "Cleaned up" chat, for till I rewrite it.
+// Turtle Man: "Cleaned up" chat, for till I rewrite it.
 
 // group A sayings
 
@@ -160,7 +158,7 @@ DEATH_SLIME0 = {
 
 DEATH_SLIME1 = {
 	"Where is Ralph Nader when you need him?";
-	//"Someone call Sally Struthers!"; // ZTM: Who is that?
+	//"Someone call Sally Struthers!"; // Turtle Man: Who is that?
 	"This is NOT a safe working environment, I want to talk to my Union Rep!";
 	"This level needs an enema!";
 }
@@ -187,7 +185,7 @@ D_PRAISE0 = {
 	//"Nice shot.";
 	"Care to show how that move is accomplished in slow motion?";
 	"You are good.";
-	"Nice ~one."; // "Nice 1";
+	"Nice one."; // "Nice 1";
 }
 
 D_PRAISE1 = {
@@ -455,9 +453,9 @@ TAUNT2 = {
 }
 
 TAUNT_FEM0 = {
-	//"Put that thing away, do you want to go blind?";
-	//"Do you shave your palms?";
-	//"I hear that ", 0, " got ", disease, " from ", botnames, ".";
+	"Put that thing away, do you want to go blind?";
+	"Do you shave your palms?";
+	"I hear that ", 0, " got ", disease, " from ", botnames, ".";
 }
 
 TELEFRAGGED0 = {
@@ -632,20 +630,21 @@ language = {
 }
 
 weapon = {
+	// Turtle Man: Rewrote.
 	"katana";
 	"sai";
-	"nunchuck";
+	"nunchuk";
 	"hammer";
 	"axe";
 	"long sword";
 	"bat";
 	"bo";
-	"bamboo";
+	"bamboo"; // bamboo bo
 	"gun";
 	"electric launcher";
 	"rocket launcher";
 	"homing-rocket launcher";
-	//"grappling hook"; // not really a "weapon"
+	//"grappling hook"; // not really a "weapon" since its not used for damaging stuff
 }
 
 ponder = {
@@ -662,7 +661,7 @@ response_insult = {
 }
 
 counselor = {
-	// ZTM: Disabled...
+	// Turtle Man: Disabled...
 	//"school nurse";
 	"astrologer";
 	"shrink";
@@ -703,6 +702,7 @@ friendname = {
 }
 
 fighter = {
+	// Turtle Man: Disabled "some" of the fighter strings...
 	"gladiator";
 	//"pickle brain";
 	"dweeb";
@@ -767,6 +767,7 @@ botnames = {
 }
 
 negative = {
+	// Turtle Man: Disabled...
 	"Nada.";
 	"no.";
 	"nope";
@@ -828,20 +829,26 @@ number = {
 }
 
 profession = {
+	// Turtle Man: Disabled...
 	"police officer";
 	"programmer";
 	"level designer";
+	//"bum";
 	"student";
 }
 
 disease = {
+	// Turtle Man: Disabled... ...
 	"flue";
+	// Turtle Man: REMOVED DISABLED TEXT
 }
 
 peeps = {
 	"Mr. Smith";
 	"John Doe";
+	// Turtle Man: Disabled...
 	"dmn_clown";
+	// Turtle Man: REMOVED DISABLED TEXT
 }
 
 immaturity01 = {
@@ -936,6 +943,7 @@ ampm = {
 }
 
 food = {
+	// Turtle Man: Disabled...
 	"pizza";
 	"cheeseburger";
 	"tofu";
@@ -947,7 +955,7 @@ food = {
 }
 
 animal = {
-	"gnu"; // ZTM: Added because I can.
+	"gnu"; // Turtle Man: Added because I can.
 
 	"goat";
 	"simian";
@@ -972,11 +980,13 @@ animal = {
 }
 
 weather = {
+	// Turtle Man: Disabled...
 	"hot";
 	"windy";
 	"rainy";
 	"snowing";
 	"warm";
+	// Turtle Man: REMOVED DISABLED TEXT
 }
 
 month = {
@@ -995,21 +1005,28 @@ month = {
 }
 
 substance = {
+	// Turtle Man: Added
 	"water";
 	"pizza";
 	"suashi";
+	// Turtle Man: Disabled...
 	"ink";
 	"chalk";
 	"salt";
 	"pepper";
+	// Turtle Man: REMOVED DISABLED TEXT
 }
 
 curse = {
+	// Turtle Man: Added
     //"curses!";
 	"Bonehead!";
+	// Turtle Man: REMOVED DISABLED TEXT
 }
 
 vicious_insult = {
+	// Turtle Man: Disabled...
+	// Turtle Man: REMOVED DISABLED TEXT
 	"moron";
 	"idiot";
 }

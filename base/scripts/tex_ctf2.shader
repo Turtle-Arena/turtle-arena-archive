@@ -122,7 +122,7 @@ textures/ctf2/blue_banner02
 	}
 }
 
-// ntrl flag version for Turtle Arena based on red/blue ones.
+// ntrl flag version for TMNT Arena based on red/blue ones.
 textures/ctf2/ntrl_banner02
 {
 	tessSize 64

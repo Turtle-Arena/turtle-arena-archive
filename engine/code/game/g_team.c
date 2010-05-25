@@ -174,43 +174,43 @@ OnSameTeam
 */
 qboolean OnSameTeam( gentity_t *ent1, gentity_t *ent2 )
 {
-#ifdef TA_SP
+#ifdef TMNTSP
 	// Co-op player are on the same "team"
 	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
-		int team1, team2;
+	int team1, team2;
 
-		if ( ent1->client)
-			team1 = ent1->client->sess.sessionTeam;
-#ifdef TA_NPCSYS
-			else if (ent1->s.eType == ET_NPC)
-			{
-				if (ent1->bgNPC.info->flags & NPCF_ALLY) {
-					team1 = TEAM_FREE;
-				} else {
-					team1 = TEAM_RED;
-				}
+	if ( ent1->client)
+		team1 = ent1->client->sess.sessionTeam;
+#ifdef TMNTNPCSYS
+		else if (ent1->s.eType == ET_NPC)
+		{
+			if (ent1->bgNPC.info->flags & NPCF_ALLY) {
+				team1 = TEAM_FREE;
+			} else {
+				team1 = TEAM_RED;
 			}
-#endif
-		else
-			return qfalse;
-
-		if ( ent2->client)
-			team2 = ent2->client->sess.sessionTeam;
-#ifdef TA_NPCSYS
-			else if (ent2->s.eType == ET_NPC) {
-				if (ent2->bgNPC.info->flags & NPCF_ALLY) {
-					team2 = TEAM_FREE;
-				} else {
-					team2 = TEAM_RED;
-				}
-			}
-#endif
-		else
-			return qfalse;
-
-		if ( team1 == team2 ) {
-			return qtrue;
 		}
+#endif
+	else
+		return qfalse;
+
+	if ( ent2->client)
+		team2 = ent2->client->sess.sessionTeam;
+#ifdef TMNTNPCSYS
+		else if (ent2->s.eType == ET_NPC) {
+			if (ent2->bgNPC.info->flags & NPCF_ALLY) {
+				team2 = TEAM_FREE;
+			} else {
+				team2 = TEAM_RED;
+			}
+		}
+#endif
+	else
+		return qfalse;
+
+	if ( team1 == team2 ) {
+		return qtrue;
+	}
 	}
 #endif
 
@@ -364,7 +364,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->pers.teamState.lastfraggedcarrier = level.time;
 		AddScore(attacker, targ->r.currentOrigin, CTF_FRAG_CARRIER_BONUS);
 		attacker->client->pers.teamState.fragcarrier++;
-#ifdef NOTRATEDM // frag to KO
+#ifdef TMNTMISC // frag to KO
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " knocked out %s's flag carrier!\n",
 #else
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " fragged %s's flag carrier!\n",
@@ -386,7 +386,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		attacker->client->pers.teamState.lastfraggedcarrier = level.time;
 		AddScore(attacker, targ->r.currentOrigin, CTF_FRAG_CARRIER_BONUS * tokens * tokens);
 		attacker->client->pers.teamState.fragcarrier++;
-#ifdef NOTRATEDM // frag to KO
+#ifdef TMNTMISC // frag to KO
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " knocked out %s's skull carrier!\n",
 #else
 		PrintMsg(NULL, "%s" S_COLOR_WHITE " fragged %s's skull carrier!\n",
@@ -630,7 +630,7 @@ void Team_ResetFlags( void ) {
 		Team_ResetFlag( TEAM_RED );
 		Team_ResetFlag( TEAM_BLUE );
 	}
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	else if( g_gametype.integer == GT_1FCTF ) {
 		Team_ResetFlag( TEAM_FREE );
 	}
@@ -771,7 +771,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 	gclient_t	*cl = other->client;
 	int			enemy_flag;
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	if( g_gametype.integer == GT_1FCTF ) {
 		enemy_flag = PW_NEUTRALFLAG;
 	}
@@ -794,7 +794,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 		Team_ReturnFlagSound(Team_ResetFlag(team), team);
 		return 0;
 	}
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	}
 #endif
 
@@ -802,14 +802,14 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 	// flag, he's just won!
 	if (!cl->ps.powerups[enemy_flag])
 		return 0; // We don't have the flag
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	if( g_gametype.integer == GT_1FCTF ) {
 		PrintMsg( NULL, "%s" S_COLOR_WHITE " captured the flag!\n", cl->pers.netname );
 	}
 	else {
 #endif
 	PrintMsg( NULL, "%s" S_COLOR_WHITE " captured the %s flag!\n", cl->pers.netname, TeamName(OtherTeam(team)));
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	}
 #endif
 
@@ -901,7 +901,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 	gclient_t *cl = other->client;
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	if( g_gametype.integer == GT_1FCTF ) {
 		PrintMsg (NULL, "%s" S_COLOR_WHITE " got the flag!\n", other->client->pers.netname );
 
@@ -925,11 +925,11 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 			cl->ps.powerups[PW_BLUEFLAG] = INT_MAX; // flags never expire
 
 		Team_SetFlagStatus( team, FLAG_TAKEN );
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	}
 #endif
 
-#if !defined IOQ3ZTM || (CTF_FLAG_BONUS != 0) // ZTM: Does a "0" spawn in Q3?
+#if !defined IOQ3ZTM || (CTF_FLAG_BONUS != 0) // Turtle Man: Does a "0" spawn in Q3?
 	AddScore(other, ent->r.currentOrigin, CTF_FLAG_BONUS);
 #endif
 	cl->pers.teamState.flagsince = level.time;
@@ -942,7 +942,7 @@ int Pickup_Team( gentity_t *ent, gentity_t *other ) {
 	int team;
 	gclient_t *cl = other->client;
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	if( g_gametype.integer == GT_OBELISK ) {
 		// there are no team items that can be picked up in obelisk
 		G_FreeEntity( ent );
@@ -967,7 +967,7 @@ int Pickup_Team( gentity_t *ent, gentity_t *other ) {
 	else if( strcmp(ent->classname, "team_CTF_blueflag") == 0 ) {
 		team = TEAM_BLUE;
 	}
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	else if( strcmp(ent->classname, "team_CTF_neutralflag") == 0  ) {
 		team = TEAM_FREE;
 	}
@@ -976,7 +976,7 @@ int Pickup_Team( gentity_t *ent, gentity_t *other ) {
 		PrintMsg ( other, "Don't know what team the flag is on.\n");
 		return 0;
 	}
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // MP_TMNT_OK
 	if( g_gametype.integer == GT_1FCTF ) {
 		if( team == TEAM_FREE ) {
 			return Team_TouchEnemyFlag( ent, other, cl->sess.sessionTeam );
@@ -1073,7 +1073,7 @@ go to a random point that doesn't telefrag
 */
 #define	MAX_TEAM_SPAWN_POINTS	32
 gentity_t *SelectRandomTeamSpawnPoint(
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	gentity_t *ent,
 #endif
 	int teamstate, team_t team )
@@ -1105,7 +1105,7 @@ gentity_t *SelectRandomTeamSpawnPoint(
 
 	while ((spot = G_Find (spot, FOFS(classname), classname)) != NULL) {
 		if ( SpotWouldTelefrag( spot
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 			, ent
 #endif
 		) ) {
@@ -1131,7 +1131,7 @@ SelectCTFSpawnPoint
 
 ============
 */
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 gentity_t *SelectCTFSpawnPoint ( gentity_t *ent, team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot )
 #else
 gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3_t angles, qboolean isbot )
@@ -1139,14 +1139,14 @@ gentity_t *SelectCTFSpawnPoint ( team_t team, int teamstate, vec3_t origin, vec3
 {
 	gentity_t	*spot;
 
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	spot = SelectRandomTeamSpawnPoint ( ent, teamstate, team );
 #else
 	spot = SelectRandomTeamSpawnPoint ( teamstate, team );
 #endif
 
 	if (!spot) {
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 		return SelectSpawnPoint( ent, origin, angles, isbot );
 #else
 		return SelectSpawnPoint( vec3_origin, origin, angles, isbot );
@@ -1172,7 +1172,7 @@ static int QDECL SortClients( const void *a, const void *b ) {
 TeamplayLocationsMessage
 
 Format:
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 	clientNum location health weapon powerups
 #else
 	clientNum location health armor weapon powerups
@@ -1187,7 +1187,7 @@ void TeamplayInfoMessage( gentity_t *ent ) {
 	int			i, j;
 	gentity_t	*player;
 	int			cnt;
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 	int			h;
 #else
 	int			h, a;
@@ -1221,15 +1221,15 @@ void TeamplayInfoMessage( gentity_t *ent ) {
 			ent->client->sess.sessionTeam ) {
 
 			h = player->client->ps.stats[STAT_HEALTH];
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 			a = player->client->ps.stats[STAT_ARMOR];
 #endif
 			if (h < 0) h = 0;
-#ifndef TURTLEARENA // NOARMOR
+#ifndef TMNT // NOARMOR
 			if (a < 0) a = 0;
 #endif
 
-#ifdef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
 			Com_sprintf (entry, sizeof(entry),
 				" %i %i %i %i %i",
 //				level.sortedClients[i], player->client->pers.teamState.location, h, a,
@@ -1435,7 +1435,7 @@ static void ObeliskTouch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 }
 #endif // #ifdef MISSIONPACK_HARVESTER
 
-#ifndef TA_WEAPSYS
+#ifndef TMNT
 static
 #endif
 void ObeliskPain( gentity_t *self, gentity_t *attacker, int damage ) {
@@ -1469,7 +1469,11 @@ gentity_t *SpawnObelisk( vec3_t origin, int team, int spawnflags) {
 	ent->flags = FL_NO_KNOCKBACK;
 
 	if( g_gametype.integer == GT_OBELISK ) {
+#ifdef TMNT // POWERS PW_FLASHING
 		ent->r.contents = CONTENTS_SOLID;
+#else
+		ent->r.contents = CONTENTS_SOLID;
+#endif
 		ent->takedamage = qtrue;
 		ent->health = g_obeliskHealth.integer;
 		ent->die = ObeliskDie;

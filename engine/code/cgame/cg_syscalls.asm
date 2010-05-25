@@ -91,12 +91,12 @@ equ	trap_R_AddPolysToScene				-88
 equ trap_R_inPVS						-89
 equ trap_FS_Seek			-90
 
-;;ZTM: CAMERASCRIPT
+;;Turtle Man: Can I use a define here?... CAMERASCRIPT
 equ trap_loadCamera						-91
 equ trap_startCamera					-92
 equ trap_getCameraInfo					-93
 
-;;ZTM: TA_WEAPSYS
+;;Turtle Man: TMNTWEAPSYS_2
 equ trap_FS_GetFileList					-94
 
 equ	memset						-101

@@ -346,11 +346,7 @@ int WriteFloat(FILE *fp, float value)
 	char buf[128];
 	int l;
 
-#ifdef BSPC // ZTM(IOQ3): There is no Com_sprintf
-	snprintf(buf, sizeof(buf), "%f", value);
-#else
 	Com_sprintf(buf, sizeof(buf), "%f", value);
-#endif
 	l = strlen(buf);
 	//strip any trailing zeros
 	while(l-- > 1)

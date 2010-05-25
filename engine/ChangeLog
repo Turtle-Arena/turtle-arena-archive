@@ -1,4 +1,4 @@
-2008-11-xx? to 2009-06-01 Zack Middleton <ZTurtleMan@gmail.com>
+2008-11-xx? to 2009-06-01 ZTurtleMan <TMNT>
 	NOTE: (X) notes that X must be defined. (!X) notes that X must not be defined.
 	+ Disabled PunkBuster code (!IOQUAKE3)
 	+ Disabled CD Key code (!IOQUAKE3)
@@ -9,25 +9,25 @@
 	+ Added rfactory.org NPC code "game/g_npc.c", "game/g_npcmove.c", "game/g_npcthink.c",
 		"game/g_savestate.c", and "cgame/cg_npcs.c" (SP_NPC)
 	+ Disabled the gib code (NOTRATEDM)
-	+ Renamed shader "sprites/balloon3" to "sprites/talkBalloon" (Yeah, big change. Very pointful too.) (TA_DATA)
-	+ Disabled Armor code. (TURTLEARENA)
-	+ Lots of changes to the weapon system. (TA_WEAPSYS, TA_WEAPSYS_EX)
-	+ Replaced Quake3's weapons with new weapons
+	+ Renamed shader "sprites/balloon3" to "sprites/talkBalloon" (Yeah, big change. Very pointful too.) (TMNTDATASYS)
+	+ Disabled Armor code. (TMNT)
+	+ Lots of changes to the weapon system. (TMNTWEAPSYS, TMNTWEAPSYS_1, TMNTWEAPSYS2)
+	+ Replaced Quake3's weapons with TMNT weapons (TMNTWEAPONS)
 	+ Readded BSPC code (In code/bspc/)
 	+ Support Team Arena players in Quake3 and Quake3 players in Team Arena team play modes (IOQ3ZTM)
-	+ Renamed tournament to duel (TA_MISC)
-	+ Added Shurikens (Holdable items with multiple uses) (TA_HOLDABLE)
-	+ Disabled HI_TELEPORTER Quake3's personal teleporter (TA_HOLDABLE)
-	+ Per-player Bounding box (Stored in animation.cfg "boundingbox minX minY minZ maxX maxY maxZ") (TA_PLAYERSYS)
+	+ Renamed tournament to duel (TMNTMISC)
+	+ Added Shurikens (Holdable items with multiple uses) (TMNTHOLDABLE)
+	+ Disabled HI_TELEPORTER Quake3's personal teleporter (TMNTHOLDABLE)
+	+ Per-player Bounding box (Stored in animation.cfg "boundingbox minX minY minZ maxX maxY maxZ") (TMNTPLAYERSYS)
 	+ Atemp to load MDR models before MD3, allowing any model to be a MDR model (IOQ3ZTM)
 	+ models/players/*dir*/icon_*skin*.tga files no longer are limited to TGA,
 		now supports PNG, TGA, JPG, JPEG, PCX, and BMP (IOQ3ZTM)
-	+ Support Elite Force "soundpath" keyword in player animation.cfg (TA_PLAYERSYS)
+	+ Support Elite Force "soundpath" keyword in player animation.cfg (TMNTPLAYERSYS)
 	+ Support voice chat files other then male[1-5].voice and female[1-3].voice (IOQ3ZTM)
-	+ Disabled missionpack's HI_INVUL and HI_KAMIKAZE (TA_HOLDABLE)
+	+ Disabled missionpack's HI_INVUL and HI_KAMIKAZE (TMNTHOLDABLE)
 	+ Use item sprite when no item model is loaded (IOQ3ZTM)
 	+ Elite Force style team firend shaders, "sprites/team_red" and "sprites/team_blue" (IOQ3ZTM)
-	++ If TA_SUPPORTQ3 falls back to "sprites/foe"
+	++ If TMNT_SUPPORTQ3 falls back to "sprites/foe"
 	+ If loaded "sprites/team_blue" and a spectator draw team icon for all players. (IOQ3ZTM)
 	+ New define MISSIONPACK_HUD, mostly renamed MISSIONPACK ifdef's
 	++ by NOT defining it, you can use the Quake3 hud in the MISSIONPACK.

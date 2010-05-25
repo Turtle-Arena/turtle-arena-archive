@@ -1,26 +1,26 @@
 /*
 ===========================================================================
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009 ZTurtleMan
 
-This file is part of Turtle Arena source code.
+This file is part of TMNT Arena source code.
 
-Turtle Arena source code is free software; you can redistribute it
+TMNT Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena source code is distributed in the hope that it will be
+TMNT Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena source code; if not, write to the Free Software
+along with TMNT Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// Turtle Arena weapon info
+// TMNT Arena weapon info
 
 // NOTE:
 //  Blade origin and tip are "forward, right, up" (Values of less then 0 are backward, left, down)
@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //       hole is used by grappling hook and all melee weapons...
 //	cgs.media.energyMarkShader = trap_R_RegisterShader( "gfx/damage/plasma_mrk" );
 //  	Hammer mark - gfx/damage/hammer_mrk
-// ZTM: TODO:
+// TODO:
 //  New melee weapon with blade		gfx/damage/melee_mrk_sharp
 //  New non-bladed (Bo, and whatever)  gfx/damage/melee_mrk_dull
 
@@ -94,7 +94,7 @@ weapongroup "wp_fists"
 }
 
 //
-// Leo's Katanas (ninjaken)
+// Leo's Katanas
 //
 // ...Leo's Katanas are 'Katanas' in name only.
 // Real Katanas are curved (by the way they are made), Leo's are straight.
@@ -108,7 +108,6 @@ weapon "w_straight katana"
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 4
-	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -160,7 +159,6 @@ weapon "w_wakizashi"
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 2
-	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -182,7 +180,6 @@ weapon "w_katana"
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 4
-	cuts 1
 
 	blade 0
 	{
@@ -195,7 +192,7 @@ weapon "w_katana"
 
 weapongroup "wp_daisho"
 {
-	randomSpawn 0 // ZTM: FIXME: Missing models
+	randomSpawn 0 // FIXME: Missing models
 	itemName "weapon_daisho"
 	pickupName "Daisho"
 	pickupModel "models/weapons2/daisho/daisho_pickup.md3"
@@ -311,108 +308,75 @@ weapongroup "wp_sais"
 
 
 //
-// Nunchuck-type weapons
+// Nunchuk-type weapons
 //
 
-//weapongroup "wt_nunchucks"
+//weapongroup "wt_nunchuks"
 //{
 //	normalAnims
 //	{
-//		standAnim "TORSO_STAND_NUNCHUCKS"
-//		attackAnim1 "TORSO_ATTACK_NUNCHUCKS_A"
-//		attackAnim2 "TORSO_ATTACK_NUNCHUCKS_B"
-//		attackAnim3 "TORSO_ATTACK_NUNCHUCKS_A"
-//		attackAnim4 "TORSO_ATTACK_NUNCHUCKS_C"
+//		standAnim "TORSO_STAND_NUNCHUKS"
+//		attackAnim1 "TORSO_ATTACK_NUNCHUKS_A"
+//		attackAnim2 "TORSO_ATTACK_NUNCHUKS_B"
+//		attackAnim3 "TORSO_ATTACK_NUNCHUKS_A"
+//		attackAnim4 "TORSO_ATTACK_NUNCHUKS_C"
 //	}
 //	primaryAnims
 //	{
-//		standAnim "TORSO_STAND_NUNCHUCKS1_PRIMARY"
-//		attackAnim1 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A"
-//		attackAnim2 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B"
-//		attackAnim3 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A"
-//		attackAnim4 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C"
+//		standAnim "TORSO_STAND_NUNCHUKS1_PRIMARY"
+//		attackAnim1 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_A"
+//		attackAnim2 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_B"
+//		attackAnim3 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_A"
+//		attackAnim4 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_C"
 //	}
 //}
 
-weapon "w_nunchuck"
+weapon "w_nunchuk"
 {
 	weapontype WT_MELEE
-	model "models/weapons2/nunchuck/nunchuck.md3"
-	//mod MOD_NUNCHUCK
+	model "models/weapons2/nunchuk/nunchuk.md3"
+	//mod MOD_NUNCHUK
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 4
-	barrelSpin BS_YAW
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
-	// up
 	blade 0
 	{
 		damage 10
 		origin 0 0 0
-		tip 0 0 8
-		trailStyle none
-	}
-	// forward
-	blade 1
-	{
-		damage 10
-		origin 0 0 8
-		tip 0 12 8
-		trailStyle default
-	}
-	// left
-	blade 2
-	{
-		damage 10
-		origin 0 0 8
-		tip 12 0 8
-		trailStyle default
-	}
-	// right
-	blade 3
-	{
-		damage 10
-		origin 0 0 8
-		tip -12 0 8
-		trailStyle default
-	}
-	// back
-	blade 4
-	{
-		damage 10
-		origin 0 0 8
-		tip 0 -12 8
+		tip 0 0 16
 		trailStyle default
 	}
 }
 
-weapongroup "wp_nunchucks"
+weapongroup "wp_nunchuks"
 {
-	clone "wt_nunchucks"
-	itemName "weapon_nunchucks"
-	pickupName "Nunchucks"
-	pickupModel "models/weapons2/nunchuck/nunchucks_pickup.md3"
-	iconName "icons/iconw_nunchucks"
-	weapon_primary "w_nunchuck"
-	weapon_secondary "w_nunchuck"
+	clone "wt_nunchuks"
+	randomSpawn 0 // FIXME: Missing models
+	itemName "weapon_nunchuks"
+	pickupName "Nunchuks"
+	pickupModel "models/weapons2/nunchuk/nunchuks_pickup.md3"
+	iconName "icons/iconw_nunchuks"
+	weapon_primary "w_nunchuk"
+	weapon_secondary "w_nunchuk"
 
 	normalAnims
 	{
-		standAnim "TORSO_STAND_NUNCHUCKS"
-		attackAnim1 "TORSO_ATTACK_NUNCHUCKS_A"
-		attackAnim2 "TORSO_ATTACK_NUNCHUCKS_B"
-		attackAnim3 "TORSO_ATTACK_NUNCHUCKS_A"
-		attackAnim4 "TORSO_ATTACK_NUNCHUCKS_C"
+		standAnim "TORSO_STAND_NUNCHUKS"
+		attackAnim1 "TORSO_ATTACK_NUNCHUKS_A"
+		attackAnim2 "TORSO_ATTACK_NUNCHUKS_B"
+		attackAnim3 "TORSO_ATTACK_NUNCHUKS_A"
+		attackAnim4 "TORSO_ATTACK_NUNCHUKS_C"
 	}
 	primaryAnims
 	{
-		standAnim "TORSO_STAND_NUNCHUCKS1_PRIMARY"
-		attackAnim1 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A"
-		attackAnim2 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B"
-		attackAnim3 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A"
-		attackAnim4 "TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C"
+		standAnim "TORSO_STAND_NUNCHUKS1_PRIMARY"
+		attackAnim1 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_A"
+		attackAnim2 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_B"
+		attackAnim3 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_A"
+		attackAnim4 "TORSO_ATTACK_NUNCHUKS1_PRIMARY_C"
 	}
 }
 
@@ -484,7 +448,6 @@ weapon "w_axe"
 	attackDelay 2500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 12
-	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -543,7 +506,7 @@ weapongroup "wp_axe"
 //	}
 //}
 
-weapon "w_long sword"
+weapon "w_long_sword"
 {
 	weapontype WT_MELEE
 	model "models/weapons2/longsword/longsword.md3"
@@ -551,7 +514,6 @@ weapon "w_long sword"
 	attackDelay 1500
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 4
-	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -571,7 +533,7 @@ weapongroup "wp_longsword"
 	pickupName "Long Sword"
 	pickupModel "models/weapons2/longsword/longsword.md3"
 	iconName "icons/iconw_longsword"
-	weapon_primary "w_long sword"
+	weapon_primary "w_long_sword"
 
 	normalAnims
 	{
@@ -746,9 +708,10 @@ weapon "w_bamboo"
 weapongroup "wp_bamboo"
 {
 	clone "wt_bo"
+	randomSpawn 0 // FIXME: Missing models
 	itemName "weapon_bamboo"
 	pickupName "Bamboo"
-	pickupModel "models/weapons2/bamboo/bamboo_pickup.md3"
+	pickupModel "models/weapons2/bamboo/bamboo.md3"
 	iconName "icons/iconw_bamboo"
 	weapon_primary "w_bamboo"
 
@@ -789,43 +752,39 @@ weapongroup "wp_bamboo"
 //	}
 //}
 
-projectile "p_pulse"
+projectile "p_bullet"
 {
-	//model "models/ammo/pulse/pulse.md3"
-	damage 10
-	speed 100
-	//timetolive 10000
-	//trailType PT_BULLET
+	instantDamage 1
+	damage 7
+	trailType PT_BULLET
 	deathType PD_BULLET
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
-	//spread 200
-
-	instantDamage 1
-	trailType PT_RAIL
-	speed 768 // range
+	spread 200
 }
 
-weapon "w_triblaster"
+weapon "w_gun"
 {
 	weapontype "WT_GUN"
-	model "models/weapons2/triblaster/triblaster.md3"
-	attackDelay 400
-	continuousFlash 1
-	flashColor 0.8 0 1 // cc00ff
-	//flashSound0 "sound/weapons/triblaster/fire.wav"
-	projectile "p_pulse"
+	model "models/weapons2/gun/gun.md3"
+	//mod MOD_GUN
+	attackDelay 100
+	ejectBrass 1
+	//splashMod MOD_GUN
+	flashColor 1 0.75 0
+	flashSound0 "sound/weapons/machinegun/machgf1b.wav"
+	projectile "p_bullet"
 }
 
-weapongroup "wp_triblaster"
+weapongroup "wp_gun"
 {
 	clone "wt_gun"
 	itemName "weapon_gun"
-	pickupName "Tri-Blaster"
-	pickupModel "models/weapons2/triblaster/triblaster.md3"
-	iconName "icons/iconw_triblaster"
-	pickupAmmo 50
-	weapon_primary "w_triblaster"
+	pickupName "Gun"
+	pickupModel "models/weapons2/gun/gun.md3"
+	iconName "icons/iconw_gun"
+	pickupAmmo 100
+	weapon_primary "w_gun"
 
 	normalAnims
 	{
@@ -1005,11 +964,10 @@ projectile "p_grappling hook"
 	speed 800
 	timetolive 10000
 	trailType "PT_GRAPPLE"
-	deathType "PD_BULLET"
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 12
 	grappling 1
-	spinType "PS_NONE"
+	//spinType "PS_NONE"
 }
 
 weapon "w_grappling_hook"
@@ -1018,9 +976,11 @@ weapon "w_grappling_hook"
 	model "models/weapons2/grapple/grapple.md3"
 	//mod MOD_GRAPPLE
 	attackDelay 400
-	continuousFlash 1 // update chain position
+	continuousFlash 1
 	ejectSmoke 1
-	flashColor 0 0 0 // no flash
+	flashColor 0.6 0.6 1.0
+	//readySound "sound/weapons/melee/fsthum.wav"
+	//firingSound "sound/weapons/melee/fstrun.wav"
 	flashSound0 "sound/weapons/grapple/grapplef1a.wav"
 	projectile "p_grappling hook"
 }
@@ -1034,8 +994,6 @@ weapongroup "wp_grappling_hook"
 	pickupModel "models/weapons2/grapple/grapple.md3"
 	iconName "icons/iconw_grapple"
 	//pickupAmmo 1		// grappling projectiles use no ammo.
-	//readySound "sound/weapons/melee/fsthum.wav"
-	//firingSound "sound/weapons/melee/fstrun.wav"
 	weapon_primary "w_grappling_hook"
 
 	normalAnims
@@ -1050,7 +1008,7 @@ weapongroup "wp_grappling_hook"
 	}
 }
 
-// ZTM: TODO: Fall out of air after time to live.
+// TODO: Fall out of air after time to live.
 projectile "p_dart"
 {
 	model "models/ammo/rocket/rocket.md3"
@@ -1069,14 +1027,12 @@ weapon "w_dartgun"
 	model "models/weapons2/gun/gun.md3"
 	//mod MOD_GUN
 	attackDelay 400
-	flashColor 0 0 0 // no flash
 	projectile "p_dart"
 }
 
 weapongroup "wp_dartgun"
 {
 	clone "wt_gun"
-	randomSpawn 0 // unfinished weapon
 	itemName "weapon_dartgun"
 	pickupName "Dart Gun"
 	pickupModel "models/weapons2/gun/gun.md3"

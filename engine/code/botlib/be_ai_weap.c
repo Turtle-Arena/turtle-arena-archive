@@ -47,7 +47,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //#define DEBUG_AI_WEAP
 
-#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
+#ifndef TMNTWEAPSYS_2_NOCOMPAT
 //structure field offsets
 #define WEAPON_OFS(x) (size_t)&(((weaponinfo_t *)0)->x)
 #define PROJECTILE_OFS(x) (size_t)&(((projectileinfo_t *)0)->x)
@@ -549,4 +549,4 @@ void BotShutdownWeaponAI(void)
 		} //end if
 	} //end for
 } //end of the function BotShutdownWeaponAI
-#endif // !TA_WEAPSYS_NOCOMPAT
+#endif // !TMNTWEAPSYS_2_NOCOMPAT

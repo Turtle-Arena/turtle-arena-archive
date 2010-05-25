@@ -43,7 +43,7 @@ typedef struct {
   long   (*tell_func)  (void *datasource);
 } ov_callbacks;
 
-#if 0 // ZTM: Disabled
+#if 0 // Turtle Man: Disabled
 /* a few sets of convenient callbacks, especially for use under
  * Windows where ov_open_callbacks() should always be used instead of
  * ov_open() to avoid problems with incompatable crt.o version linking

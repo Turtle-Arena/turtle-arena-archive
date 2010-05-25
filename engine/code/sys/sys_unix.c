@@ -37,8 +37,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <libgen.h>
 #include <fcntl.h>
 
-qboolean stdinIsATTY;
-
 // Used to determine where to store user-specific files
 static char homePath[ MAX_OSPATH ] = { 0 };
 
@@ -56,12 +54,12 @@ char *Sys_DefaultHomePath(void)
 		if( ( p = getenv( "HOME" ) ) != NULL )
 		{
 			Q_strncpyz( homePath, p, sizeof( homePath ) );
-#ifdef TURTLEARENA
+#ifdef TMNT
 #ifdef MACOS_X
 			Q_strcat( homePath, sizeof( homePath ),
-					"/Library/Application Support/TurtleArena" );
+					"/Library/Application Support/TMNTArena" );
 #else
-			Q_strcat( homePath, sizeof( homePath ), "/.turtlearena" );
+			Q_strcat( homePath, sizeof( homePath ), "/.tmntarena" );
 #endif
 #else
 #ifdef MACOS_X
@@ -76,23 +74,6 @@ char *Sys_DefaultHomePath(void)
 
 	return homePath;
 }
-
-#ifndef MACOS_X
-/*
-================
-Sys_TempPath
-================
-*/
-const char *Sys_TempPath( void )
-{
-	const char *TMPDIR = getenv( "TMPDIR" );
-
-	if( TMPDIR == NULL || TMPDIR[ 0 ] == '\0' )
-		return "/tmp";
-	else
-		return TMPDIR;
-}
-#endif
 
 /*
 ================
@@ -382,7 +363,7 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 	}
 
 	extLen = strlen( extension );
-
+	
 	// search
 	nfiles = 0;
 
@@ -454,6 +435,35 @@ void Sys_FreeFileList( char **list )
 	Z_Free( list );
 }
 
+#ifdef MACOS_X
+/*
+=================
+Sys_StripAppBundle
+
+Discovers if passed dir is suffixed with the directory structure of a Mac OS X
+.app bundle. If it is, the .app directory structure is stripped off the end and
+the result is returned. If not, dir is returned untouched.
+=================
+*/
+char *Sys_StripAppBundle( char *dir )
+{
+	static char cwd[MAX_OSPATH];
+
+	Q_strncpyz(cwd, dir, sizeof(cwd));
+	if(strcmp(Sys_Basename(cwd), "MacOS"))
+		return dir;
+	Q_strncpyz(cwd, Sys_Dirname(cwd), sizeof(cwd));
+	if(strcmp(Sys_Basename(cwd), "Contents"))
+		return dir;
+	Q_strncpyz(cwd, Sys_Dirname(cwd), sizeof(cwd));
+	if(!strstr(Sys_Basename(cwd), ".app"))
+		return dir;
+	Q_strncpyz(cwd, Sys_Dirname(cwd), sizeof(cwd));
+	return cwd;
+}
+#endif // MACOS_X
+
+
 /*
 ==================
 Sys_Sleep
@@ -463,35 +473,24 @@ Block execution for msec or until input is recieved.
 */
 void Sys_Sleep( int msec )
 {
+	fd_set fdset;
+
 	if( msec == 0 )
 		return;
 
-	if( stdinIsATTY )
+	FD_ZERO(&fdset);
+	FD_SET(fileno(stdin), &fdset);
+	if( msec < 0 )
 	{
-		fd_set fdset;
-
-		FD_ZERO(&fdset);
-		FD_SET(STDIN_FILENO, &fdset);
-		if( msec < 0 )
-		{
-			select(STDIN_FILENO + 1, &fdset, NULL, NULL, NULL);
-		}
-		else
-		{
-			struct timeval timeout;
-
-			timeout.tv_sec = msec/1000;
-			timeout.tv_usec = (msec%1000)*1000;
-			select(STDIN_FILENO + 1, &fdset, NULL, NULL, &timeout);
-		}
+		select((fileno(stdin) + 1), &fdset, NULL, NULL, NULL);
 	}
 	else
 	{
-		// With nothing to select() on, we can't wait indefinitely
-		if( msec < 0 )
-			msec = 10;
+		struct timeval timeout;
 
-		usleep( msec * 1000 );
+		timeout.tv_sec = msec/1000;
+		timeout.tv_usec = (msec%1000)*1000;
+		select((fileno(stdin) + 1), &fdset, NULL, NULL, &timeout);
 	}
 }
 
@@ -514,195 +513,39 @@ void Sys_ErrorDialog( const char *error )
 
 	Sys_Print( va( "%s\n", error ) );
 
-#ifndef DEDICATED
-	Sys_Dialog( DT_ERROR, va( "%s. See \"%s\" for details.", error, ospath ), "Error" );
+#if defined(MACOS_X) && !DEDICATED
+	/* This function has to be in a separate file, compiled as Objective-C. */
+	extern void Cocoa_MsgBox( const char *text );
+	if (!com_dedicated || !com_dedicated->integer)
+		Cocoa_MsgBox(error);
 #endif
 
-	// Make sure the write path for the crashlog exists...
+	/* make sure the write path for the crashlog exists... */
 	if( FS_CreatePath( ospath ) ) {
 		Com_Printf( "ERROR: couldn't create path '%s' for crash log.\n", ospath );
 		return;
 	}
 
-	// We might be crashing because we maxed out the Quake MAX_FILE_HANDLES,
-	// which will come through here, so we don't want to recurse forever by
-	// calling FS_FOpenFileWrite()...use the Unix system APIs instead.
-	f = open( ospath, O_CREAT | O_TRUNC | O_WRONLY, 0640 );
+	/* we might be crashing because we maxed out the Quake MAX_FILE_HANDLES,
+	   which will come through here, so we don't want to recurse forever by
+	   calling FS_FOpenFileWrite()...use the Unix system APIs instead. */
+	f = open(ospath, O_CREAT | O_TRUNC | O_WRONLY, 0640);
 	if( f == -1 )
 	{
 		Com_Printf( "ERROR: couldn't open %s\n", fileName );
 		return;
 	}
 
-	// We're crashing, so we don't care much if write() or close() fails.
+	/* We're crashing, so we don't care much if write() or close() fails. */
 	while( ( size = CON_LogRead( buffer, sizeof( buffer ) ) ) > 0 ) {
-		if( write( f, buffer, size ) != size ) {
+		if (write( f, buffer, size ) != size) {
 			Com_Printf( "ERROR: couldn't fully write to %s\n", fileName );
 			break;
 		}
 	}
 
-	close( f );
+	close(f);
 }
-
-#ifndef MACOS_X
-/*
-==============
-Sys_ZenityCommand
-==============
-*/
-static int Sys_ZenityCommand( dialogType_t type, const char *message, const char *title )	
-{
-	const char *options = "";
-	char       command[ 1024 ];
-
-	switch( type )
-	{
-		default:
-		case DT_INFO:      options = "--info"; break;
-		case DT_WARNING:   options = "--warning"; break;
-		case DT_ERROR:     options = "--error"; break;
-		case DT_YES_NO:    options = "--question --ok-label=\"Yes\" --cancel-label=\"No\""; break;
-		case DT_OK_CANCEL: options = "--question --ok-label=\"OK\" --cancel-label=\"Cancel\""; break;
-	}
-
-	Com_sprintf( command, sizeof( command ), "zenity %s --text=\"%s\" --title=\"%s\"",
-		options, message, title );
-
-	return system( command );
-}
-
-/*
-==============
-Sys_KdialogCommand
-==============
-*/
-static int Sys_KdialogCommand( dialogType_t type, const char *message, const char *title )
-{
-	const char *options = "";
-	char       command[ 1024 ];
-
-	switch( type )
-	{
-		default:
-		case DT_INFO:      options = "--msgbox"; break;
-		case DT_WARNING:   options = "--sorry"; break;
-		case DT_ERROR:     options = "--error"; break;
-		case DT_YES_NO:    options = "--warningyesno"; break;
-		case DT_OK_CANCEL: options = "--warningcontinuecancel"; break;
-	}
-
-	Com_sprintf( command, sizeof( command ), "kdialog %s \"%s\" --title \"%s\"",
-		options, message, title );
-
-	return system( command );
-}
-
-/*
-==============
-Sys_XmessageCommand
-==============
-*/
-static int Sys_XmessageCommand( dialogType_t type, const char *message, const char *title )
-{
-	const char *options = "";
-	char       command[ 1024 ];
-
-	switch( type )
-	{
-		default:           options = "-buttons OK"; break;
-		case DT_YES_NO:    options = "-buttons Yes:0,No:1"; break;
-		case DT_OK_CANCEL: options = "-buttons OK:0,Cancel:1"; break;
-	}
-
-	Com_sprintf( command, sizeof( command ), "xmessage -center %s \"%s\"",
-		options, message );
-
-	return system( command );
-}
-
-/*
-==============
-Sys_Dialog
-
-Display a *nix dialog box
-==============
-*/
-dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title )
-{
-	typedef enum
-	{
-		NONE = 0,
-		ZENITY,
-		KDIALOG,
-		XMESSAGE,
-		NUM_DIALOG_PROGRAMS
-	} dialogCommandType_t;
-	typedef int (*dialogCommandBuilder_t)( dialogType_t, const char *, const char * );
-
-	const char              *session = getenv( "DESKTOP_SESSION" );
-	qboolean                tried[ NUM_DIALOG_PROGRAMS ] = { qfalse };
-	dialogCommandBuilder_t  commands[ NUM_DIALOG_PROGRAMS ] = { NULL };
-	dialogCommandType_t     preferredCommandType = NONE;
-
-	commands[ ZENITY ] = &Sys_ZenityCommand;
-	commands[ KDIALOG ] = &Sys_KdialogCommand;
-	commands[ XMESSAGE ] = &Sys_XmessageCommand;
-
-	// This may not be the best way
-	if( !Q_stricmp( session, "gnome" ) )
-		preferredCommandType = ZENITY;
-	else if( !Q_stricmp( session, "kde" ) )
-		preferredCommandType = KDIALOG;
-
-	while( 1 )
-	{
-		int i;
-		int exitCode;
-
-		for( i = NONE + 1; i < NUM_DIALOG_PROGRAMS; i++ )
-		{
-			if( preferredCommandType != NONE && preferredCommandType != i )
-				continue;
-
-			if( !tried[ i ] )
-			{
-				exitCode = commands[ i ]( type, message, title );
-
-				if( exitCode >= 0 )
-				{
-					switch( type )
-					{
-						case DT_YES_NO:    return exitCode ? DR_NO : DR_YES;
-						case DT_OK_CANCEL: return exitCode ? DR_CANCEL : DR_OK;
-						default:           return DR_OK;
-					}
-				}
-
-				tried[ i ] = qtrue;
-
-				// The preference failed, so start again in order
-				if( preferredCommandType != NONE )
-				{
-					preferredCommandType = NONE;
-					break;
-				}
-			}
-		}
-
-		for( i = NONE + 1; i < NUM_DIALOG_PROGRAMS; i++ )
-		{
-			if( !tried[ i ] )
-				continue;
-		}
-
-		break;
-	}
-
-	Com_DPrintf( S_COLOR_YELLOW "WARNING: failed to show a dialog\n" );
-	return DR_OK;
-}
-#endif
 
 /*
 ==============
@@ -737,16 +580,11 @@ Unix specific initialisation
 */
 void Sys_PlatformInit( void )
 {
-	const char* term = getenv( "TERM" );
-
 	signal( SIGHUP, Sys_SigHandler );
 	signal( SIGQUIT, Sys_SigHandler );
 	signal( SIGTRAP, Sys_SigHandler );
 	signal( SIGIOT, Sys_SigHandler );
 	signal( SIGBUS, Sys_SigHandler );
-
-	stdinIsATTY = isatty( STDIN_FILENO ) &&
-		!( term && ( !strcmp( term, "raw" ) || !strcmp( term, "dumb" ) ) );
 }
 
 /*
@@ -763,24 +601,4 @@ void Sys_SetEnv(const char *name, const char *value)
 		setenv(name, value, 1);
 	else
 		unsetenv(name);
-}
-
-/*
-==============
-Sys_PID
-==============
-*/
-int Sys_PID( void )
-{
-	return getpid( );
-}
-
-/*
-==============
-Sys_PIDIsRunning
-==============
-*/
-qboolean Sys_PIDIsRunning( int pid )
-{
-	return kill( pid, 0 ) == 0;
 }

@@ -79,7 +79,7 @@ CLIENT INFO
 =============================================================================
 */
 
-#ifndef TA_PLAYERSYS // Moved to bg_misc.c BG_ParsePlayerCFGFile
+#ifndef TMNTPLAYERSYS // Moved to bg_misc.c BG_ParsePlayerCFGFile
 /*
 ======================
 CG_ParseAnimationFile
@@ -814,7 +814,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 	}
 
 	// load the animations
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	if (!BG_LoadPlayerCFGFile(&ci->playercfg, modelName, headName))
 	{
 		return qfalse;
@@ -974,7 +974,7 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	}
 #endif
 
-#if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
+#if defined TMNTPLAYERSYS && defined TMNTWEAPSYS // DEFAULT_DEFAULT_WEAPON
 	// If it is the local client update default weapon.
 	if (clientNum == cg.predictedPlayerState.clientNum)
 	{
@@ -982,15 +982,15 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	}
 #endif
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	ci->tagInfo = 0;
 #else
 	ci->newAnims = qfalse;
 #endif
 	if ( ci->torsoModel ) {
 		orientation_t tag;
-#ifdef TA_WEAPSYS
-#ifdef TA_SUPPORTQ3
+#ifdef TMNTWEAPSYS
+#ifdef TMNT_SUPPORTQ3
 		if ( trap_R_LerpTag( &tag, ci->torsoModel, 0, 0, 1, "tag_weapon" ) ) {
 			ci->tagInfo |= TI_TAG_WEAPON;
 		}
@@ -1019,18 +1019,18 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	}
 
 	// sounds
-#ifdef TA_PLAYERSYS // SOUNDPATH
+#ifdef TMNTPLAYERSYS // SOUNDPATH
 	dir = ci->playercfg.soundpath;
-#else
-	dir = ci->modelName;
-#endif
-#ifdef TA_PLAYERSYS // Have women default to female voice
-	if (ci->playercfg.gender == GENDER_FEMALE) {
-		fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL_FEMALE : DEFAULT_MODEL_FEMALE;
-	} else {
+	/*if (ci->playercfg.gender == GENDER_FEMALE)
+	{
+		fallback = "april";
+	}
+	else*/
+	{
 		fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL : DEFAULT_MODEL;
 	}
 #else
+	dir = ci->modelName;
 	fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL : DEFAULT_MODEL;
 #endif
 
@@ -1043,7 +1043,7 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 		// if the model didn't load use the sounds of the default model
 		if (modelloaded) {
 			ci->sounds[i] = trap_S_RegisterSound( va("sound/player/%s/%s", dir, s + 1), qfalse );
-#ifdef TA_SUPPORTEF // Elite Force player sounds are in a different directory.
+#ifdef TMNT_SUPPORTQ3 // TMNT_SUPPORTEF // Elite Force player sounds are in a different directory.
 			if ( !ci->sounds[i] ) {
 				ci->sounds[i] = trap_S_RegisterSound( va("sound/voice/%s/%s", dir, s + 1), qfalse );
 			}
@@ -1072,7 +1072,7 @@ CG_CopyClientInfoModel
 ======================
 */
 static void CG_CopyClientInfoModel( clientInfo_t *from, clientInfo_t *to ) {
-#ifndef TA_PLAYERSYS
+#ifndef TMNTPLAYERSYS
 	VectorCopy( from->headOffset, to->headOffset );
 	to->footsteps = from->footsteps;
 	to->gender = from->gender;
@@ -1086,13 +1086,13 @@ static void CG_CopyClientInfoModel( clientInfo_t *from, clientInfo_t *to ) {
 	to->headSkin = from->headSkin;
 	to->modelIcon = from->modelIcon;
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	to->tagInfo = from->tagInfo;
 #else
 	to->newAnims = from->newAnims;
 #endif
 
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	memcpy( &to->playercfg, &from->playercfg, sizeof( to->playercfg ) );
 #else
 	memcpy( to->animations, from->animations, sizeof( to->animations ) );
@@ -1282,7 +1282,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// model
 	v = Info_ValueForKey( configstring, "model" );
-#ifndef TURTLEARENA // NO_CGFORCEMODLE
+#ifndef TMNT // NO_CGFORCEMODLE
 	if ( cg_forceModel.integer ) {
 		// forcemodel makes everyone use a single model
 		// to prevent load hitches
@@ -1293,7 +1293,7 @@ void CG_NewClientInfo( int clientNum ) {
 			Q_strncpyz( newInfo.modelName, DEFAULT_TEAM_MODEL, sizeof( newInfo.modelName ) );
 			Q_strncpyz( newInfo.skinName, "default", sizeof( newInfo.skinName ) );
 		} else {
-#ifdef TA_SP // SPMODEL
+#ifdef TMNTSP // SPMODEL
 			if ( cg_singlePlayerActive.integer == 1 )
 				trap_Cvar_VariableStringBuffer( "spmodel", modelStr, sizeof( modelStr ) );
 			else
@@ -1335,7 +1335,7 @@ void CG_NewClientInfo( int clientNum ) {
 
 	// head model
 	v = Info_ValueForKey( configstring, "hmodel" );
-#ifndef TURTLEARENA // NO_CGFORCEMODLE
+#ifndef TMNT // NO_CGFORCEMODLE
 	if ( cg_forceModel.integer ) {
 		// forcemodel makes everyone use a single model
 		// to prevent load hitches
@@ -1463,7 +1463,7 @@ static void CG_SetLerpFrameAnimation( clientInfo_t *ci, lerpFrame_t *lf, int new
 		CG_Error( "Bad animation number: %i", newAnimation );
 	}
 
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	anim = &ci->playercfg.animations[ newAnimation ];
 #else
 	anim = &ci->animations[ newAnimation ];
@@ -1611,7 +1611,7 @@ static void CG_PlayerAnimation( centity_t *cent, int *legsOld, int *legs, float 
 	if ( cent->pe.legs.yawing && ( cent->currentState.legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE ) {
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 		BG_RunLerpFrame( &cent->pe.legs,
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 			ci->playercfg.animations,
 #else
 			ci->animations,
@@ -1623,7 +1623,7 @@ static void CG_PlayerAnimation( centity_t *cent, int *legsOld, int *legs, float 
 	} else {
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 		BG_RunLerpFrame( &cent->pe.legs,
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 			ci->playercfg.animations,
 #else
 			ci->animations,
@@ -1640,7 +1640,7 @@ static void CG_PlayerAnimation( centity_t *cent, int *legsOld, int *legs, float 
 
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 	BG_RunLerpFrame( &cent->pe.torso,
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 		ci->playercfg.animations,
 #else
 		ci->animations,
@@ -1663,12 +1663,14 @@ PLAYER ANGLES
 =============================================================================
 */
 
-#ifndef IOQ3ZTM // BG_SWING_ANGLES
 /*
 ==================
 CG_SwingAngles
 ==================
 */
+#ifndef TMNTWEAPSYS
+static
+#endif
 void CG_SwingAngles( float destination, float swingTolerance, float clampTolerance,
 					float speed, float *angle, qboolean *swinging ) {
 	float	swing;
@@ -1724,7 +1726,6 @@ void CG_SwingAngles( float destination, float swingTolerance, float clampToleran
 		*angle = AngleMod( destination + (clampTolerance - 1) );
 	}
 }
-#endif
 
 /*
 =================
@@ -1742,7 +1743,7 @@ static void CG_AddPainTwitch( centity_t *cent, vec3_t torsoAngles ) {
 
 	f = 1.0 - (float)t / PAIN_TWITCH_TIME;
 
-#if 0 // #ifdef TA_MISC // ZTM: TEST
+#if 0 // #ifdef TMNTMISC // Turtle Man: TEST
 	if (cent->currentState.clientNum == cg.predictedPlayerEntity.currentState.clientNum)
 	{
 		Com_Printf("DEBUG: damageYaw=%d\n", cg.predictedPlayerState.damageYaw);
@@ -1813,13 +1814,8 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	torsoAngles[YAW] = headAngles[YAW] + 0.25 * movementOffsets[ dir ];
 
 	// torso
-#ifdef IOQ3ZTM // BG_SWING_ANGLES
-	BG_SwingAngles( torsoAngles[YAW], 25, 90, cg_swingSpeed.value, &cent->pe.torso.yawAngle, &cent->pe.torso.yawing, cg.frametime );
-	BG_SwingAngles( legsAngles[YAW], 40, 90, cg_swingSpeed.value, &cent->pe.legs.yawAngle, &cent->pe.legs.yawing, cg.frametime );
-#else
 	CG_SwingAngles( torsoAngles[YAW], 25, 90, cg_swingSpeed.value, &cent->pe.torso.yawAngle, &cent->pe.torso.yawing );
 	CG_SwingAngles( legsAngles[YAW], 40, 90, cg_swingSpeed.value, &cent->pe.legs.yawAngle, &cent->pe.legs.yawing );
-#endif
 
 	torsoAngles[YAW] = cent->pe.torso.yawAngle;
 	legsAngles[YAW] = cent->pe.legs.yawAngle;
@@ -1833,18 +1829,14 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	} else {
 		dest = headAngles[PITCH] * 0.75f;
 	}
-#ifdef IOQ3ZTM // BG_SWING_ANGLES
-	BG_SwingAngles( dest, 15, 30, 0.1f, &cent->pe.torso.pitchAngle, &cent->pe.torso.pitching, cg.frametime );
-#else
 	CG_SwingAngles( dest, 15, 30, 0.1f, &cent->pe.torso.pitchAngle, &cent->pe.torso.pitching );
-#endif
 	torsoAngles[PITCH] = cent->pe.torso.pitchAngle;
 
 	//
 	clientNum = cent->currentState.clientNum;
 	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
 		ci = &cgs.clientinfo[ clientNum ];
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 		if ( ci->playercfg.fixedtorso )
 #else
 		if ( ci->fixedtorso )
@@ -1878,7 +1870,7 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	clientNum = cent->currentState.clientNum;
 	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
 		ci = &cgs.clientinfo[ clientNum ];
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 		if ( ci->playercfg.fixedlegs )
 #else
 		if ( ci->fixedlegs )
@@ -1947,13 +1939,14 @@ static void CG_HasteTrail( centity_t *cent ) {
 	smoke->leType = LE_SCALE_FADE;
 }
 
-#ifdef MISSIONPACK
-#ifdef IOQ3ZTM // BUBBLES
+#ifdef MISSIONPACK // MP_TMNT_OK
+#ifdef TMNTMISC
+
 /*
 ==================
-CG_SpawnBreathBubbles
+CG_BubbleTrail
 
-Based on CG_BubbleTrail
+Bullets shot underwater
 ==================
 */
 void CG_SpawnBreathBubbles( vec3_t origin ) {
@@ -2031,7 +2024,7 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 
 	ci = &cgs.clientinfo[ cent->currentState.number ];
 
-#ifndef IOQ3ZTM // BUBBLES
+#ifndef TMNTMISC
 	if (!cg_enableBreath.integer) {
 		return;
 	}
@@ -2043,7 +2036,7 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 		return;
 	}
 	contents = trap_CM_PointContents( head->origin, 0 );
-#ifndef IOQ3ZTM // BUBBLES
+#ifndef TMNTMISC
 	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) {
 		return;
 	}
@@ -2055,7 +2048,7 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 	VectorSet( up, 0, 0, 8 );
 	VectorMA(head->origin, 8, head->axis[0], origin);
 	VectorMA(origin, -4, head->axis[2], origin);
-#ifdef IOQ3ZTM // BUBBLES // ZTM: Bubbles under water! (and slime/lava?)
+#ifdef TMNTMISC // Turtle Man: Bubbles under water! (and slime/lava?)
 	if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) {
 		CG_SpawnBreathBubbles(origin);
 	}
@@ -2064,7 +2057,7 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 		if (cg_enableBreath.integer) {
 #endif
 	CG_SmokePuff( origin, up, 16, 1, 1, 1, 0.66f, 1500, cg.time, cg.time + 400, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
-#ifdef IOQ3ZTM // BUBBLES
+#ifdef TMNTMISC
 		}
 	}
 #endif
@@ -2126,7 +2119,7 @@ static void CG_DustTrail( centity_t *cent ) {
 
 #endif
 
-#ifndef TA_DATA // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 /*
 ===============
 CG_TrailItem
@@ -2194,13 +2187,13 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	vec3_t		angles, dir;
 	int			legsAnim, flagAnim, updateangles;
 	float		angle, d;
-#ifdef TA_DATA // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	qboolean trailItem;
 #endif
 #ifdef IOQ3ZTM // FLAG
 	gitem_t *item;
 	int itemIndex;
-#ifndef TA_DATA // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 	qhandle_t hSkin = 0;
 
 	if (flagPower == PW_REDFLAG)
@@ -2214,19 +2207,19 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	item = BG_FindItemForPowerup(flagPower);
 	itemIndex = ITEM_INDEX(item);
 #endif
-#ifdef TA_DATA // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	trailItem = qtrue;
 #endif
 
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #endif
 
-#ifndef TA_DATA // FLAG_MODEL
+#ifndef TMNTDATA // FLAG_MODEL
 #ifdef IOQ3ZTM // FLAG
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	if (!(ci->tagInfo & TI_TAG_HAND_SECONDARY)
-#ifdef TA_SUPPORTQ3
+#ifdef TMNT_SUPPORTQ3
 		&& !(ci->tagInfo & TI_TAG_FLAG)
 #endif
 		)
@@ -2242,7 +2235,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 
 	// show the flag pole model
 	memset( &pole, 0, sizeof(pole) );
-#ifdef TA_DATA // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	pole.hModel = cg_items[itemIndex].models[0]; // cgs.media.flagPoleModel;
 	pole.customSkin = cg_items[itemIndex].skin;
 #else
@@ -2251,52 +2244,50 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	VectorCopy( torso->lightingOrigin, pole.lightingOrigin );
 	pole.shadowPlane = torso->shadowPlane;
 	pole.renderfx = torso->renderfx;
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 	if (ci->tagInfo & TI_TAG_HAND_SECONDARY)
 	{
 		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_hand_secondary" ))
 		{
-#ifdef TA_DATA // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 			trailItem = qfalse;
 #endif
 		}
 	}
-#ifdef TA_SUPPORTQ3
 	else if (ci->tagInfo & TI_TAG_FLAG)
 	{
 		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" ))
 		{
-#ifdef TA_DATA // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 			trailItem = qfalse;
 #endif
 		}
 	}
-#endif
-#elif defined TA_PLAYERS
+#elif defined TMNTPLAYERS
 	if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_hand_secondary" ))
 	{
-#ifdef TA_DATA // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 		trailItem = qfalse;
 #endif
 	}
 #elif defined IOQ3ZTM
 	if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" ))
 	{
-#ifdef TA_DATA // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 		trailItem = qfalse;
 #endif
 	}
 #else
 	CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" );
 #endif
-#ifdef TA_DATA // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	if (trailItem)
 	{
 		vec3_t			angles;
 		vec3_t			axis[3];
 
 #if 0 // #ifdef IOQ3ZTM // FLAG // Don't draw CTF flag for the holder in third person, blocks view.
-						// ZTM: Could we make if transparent instead?
+						// Turtle Man: Could we make if transparent instead?
 						//     RF_FORCEENTALPHA
 		if (cent->currentState.clientNum == cg.predictedPlayerState.clientNum
 			&& cg_thirdPerson.integer)
@@ -2322,7 +2313,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 
 	// show the flag model
 	memset( &flag, 0, sizeof(flag) );
-#ifdef TA_DATA // FLAG_MODEL
+#ifdef TMNTDATA // FLAG_MODEL
 	flag.hModel = cg_items[itemIndex].models[1]; // cgs.media.flagFlapModel;
 	flag.customSkin = cg_items[itemIndex].skin;
 #else
@@ -2339,8 +2330,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	legsAnim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
 	if( legsAnim == LEGS_IDLE || legsAnim == LEGS_IDLECR ) {
 		flagAnim = FLAG_STAND;
-#ifdef IOQ3ZTM // ZTM: TEST: Always update flag angle.
-		// ZTM: TODO: Have a idle timer to know if its been awile since they moved to NOT updateangles?
+#ifdef IOQ3ZTM // Turtle Man: TEST: Always update flag angle.
 		updateangles = qtrue;
 #endif
 	} else if ( legsAnim == LEGS_WALK || legsAnim == LEGS_WALKCR ) {
@@ -2389,11 +2379,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 			//vectoangles( cent->currentState.pos.trDelta, tmpangles );
 			//angles[YAW] = tmpangles[YAW] + 45 - cent->pe.torso.yawAngle;
 			// change the yaw angle
-#ifdef IOQ3ZTM // BG_SWING_ANGLES
-			BG_SwingAngles( angles[YAW], 25, 90, 0.15f, &cent->pe.flag.yawAngle, &cent->pe.flag.yawing, cg.frametime );
-#else
 			CG_SwingAngles( angles[YAW], 25, 90, 0.15f, &cent->pe.flag.yawAngle, &cent->pe.flag.yawing );
-#endif
 		}
 
 		/*
@@ -2419,7 +2405,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	// set the yaw angle
 	angles[YAW] = cent->pe.flag.yawAngle;
 	// lerp the flag animation frames
-#ifndef TA_WEAPSYS
+#ifndef TMNTWEAPSYS
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #endif
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // FLAG_ANIMATIONS
@@ -2520,7 +2506,7 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 		return;
 	}
 
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 	// Add powerup dlights
 	// If one or two powers use haste light
 	if ( (powerups & ( 1 << PW_HASTE )) &&
@@ -2674,7 +2660,7 @@ static void CG_PlayerSprites( centity_t *cent
 	// Place 16 units above top of head.
 	origin[2] += 16;
 
-	// Current client's team sprite should only be shown in mirrors.
+	// Only show current clients team sprite in mirrors.
 	if ( cent->currentState.number == cg.snap->ps.clientNum )
 	{
 		// IOQ3ZTM // RENDER_FLAGS
@@ -2693,7 +2679,7 @@ static void CG_PlayerSprites( centity_t *cent
 		return;
 	}
 
-#ifdef TA_SP // ZTM: NOTE: Must disable talk balloon in sp intermission (not co-op), because there is a menu open.
+#ifdef TMNTSP // Turtle Man: NOTE: Must disable talk balloon in sp intermission (not co-op), because there is a menu open.
 	if ( (cent->currentState.eFlags & EF_TALK)
 			&& !(cg.intermissionStarted && cg_singlePlayerActive.integer
 			&& cg.snap->ps.pm_type == PM_SPINTERMISSION) )
@@ -2715,7 +2701,7 @@ static void CG_PlayerSprites( centity_t *cent
 		|| cg_draw2D.integer == 0 )
 	{
 #endif
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 	if ( cent->currentState.eFlags & EF_AWARD_IMPRESSIVE ) {
 #ifdef IOQ3ZTM
 		CG_PlayerFloatSprite( origin, 0, cgs.media.medalImpressive );
@@ -2772,20 +2758,6 @@ static void CG_PlayerSprites( centity_t *cent
 	}
 #ifdef IOQ3ZTM
 	}
-#endif
-
-#ifdef TURTLEARENA // LOCKON
-	// Show local client's target marker over this client
-#ifdef IOQ3ZTM
-	if (cg.snap->ps.enemyEnt == cent->currentState.number)
-	{
-#ifdef IOQ3ZTM
-		CG_PlayerFloatSprite( origin, 0, cgs.media.targetShader );
-#else
-		CG_PlayerFloatSprite( cent, cgs.media.targetShader );
-#endif
-	}
-#endif
 #endif
 
 	team = cgs.clientinfo[ cent->currentState.clientNum ].team;
@@ -2971,7 +2943,7 @@ Also called by CG_Missile for quad rockets, but nobody can tell...
 ===============
 */
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
 		int alpha;
 
@@ -3007,7 +2979,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 			trap_R_AddRefEntityToScene( ent );
 		//}
 
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 		if ( state->powerups & ( 1 << PW_QUAD ) )
 		{
 			if (team == TEAM_RED)
@@ -3016,12 +2988,14 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 				ent->customShader = cgs.media.quadShader;
 			trap_R_AddRefEntityToScene( ent );
 		}
+#endif
 		if ( state->powerups & ( 1 << PW_REGEN ) ) {
 			if ( ( ( cg.time / 100 ) % 10 ) == 1 ) {
 				ent->customShader = cgs.media.regenShader;
 				trap_R_AddRefEntityToScene( ent );
 			}
 		}
+#ifndef TMNT // POWERS
 		if ( state->powerups & ( 1 << PW_BATTLESUIT ) ) {
 			ent->customShader = cgs.media.battleSuitShader;
 			trap_R_AddRefEntityToScene( ent );
@@ -3079,7 +3053,6 @@ int CG_LightVerts( vec3_t normal, int numVerts, polyVert_t *verts )
 }
 #endif
 
-
 /*
 ===============
 CG_Player
@@ -3094,19 +3067,19 @@ void CG_Player( centity_t *cent ) {
 	int				renderfx;
 	qboolean		shadow;
 	float			shadowPlane;
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 	refEntity_t		powerup;
 #endif
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	refEntity_t		skull;
 #endif
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 	refEntity_t		powerup;
 #endif
 	int				t;
 	float			c;
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	float			angle;
 	vec3_t			dir, angles;
 #else
@@ -3139,19 +3112,6 @@ void CG_Player( centity_t *cent ) {
 				return;
 			}
 		}
-#ifdef TURTLEARENA // LOCKON
-		// Show target marker for non-client entities.
-#ifdef IOQ3ZTM
-		if (cg.snap->ps.enemyEnt >= MAX_CLIENTS && cg.snap->ps.enemyEnt != ENTITYNUM_NONE)
-		{
-			vec3_t marker;
-			
-			VectorCopy(cg.snap->ps.enemyOrigin, marker);
-			marker[2] += 40;
-			CG_PlayerFloatSprite( marker, 0, cgs.media.targetShader );
-		}
-#endif
-#endif
 	}
 
 
@@ -3225,7 +3185,7 @@ void CG_Player( centity_t *cent ) {
 
 	CG_AddRefEntityWithPowerups( &torso, &cent->currentState, ci->team );
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 	if ( cent->currentState.eFlags & EF_KAMIKAZE ) {
 
 		memset( &skull, 0, sizeof(skull) );
@@ -3334,7 +3294,7 @@ void CG_Player( centity_t *cent ) {
 			trap_R_AddRefEntityToScene( &skull );
 		}
 	}
-#endif // TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#endif // TMNTHOLDABLE // NO_KAMIKAZE_ITEM
 
 #ifdef IOQ3ZTM
 	if ( !(cent->currentState.powerups & ( 1 << PW_INVIS ) ) ) {
@@ -3374,7 +3334,7 @@ void CG_Player( centity_t *cent ) {
 #ifdef IOQ3ZTM
 	}
 #endif
-#ifndef TURTLEARENA // POWERS
+#ifndef TMNT // POWERS
 	if ( cent->currentState.powerups & ( 1 << PW_INVULNERABILITY ) ) {
 		if ( !ci->invulnerabilityStartTime ) {
 			ci->invulnerabilityStartTime = cg.time;
@@ -3437,7 +3397,7 @@ void CG_Player( centity_t *cent ) {
 		trap_R_AddRefEntityToScene( &powerup );
 	}
 #endif // MISSIONPACK
-#ifdef TURTLEARENA // POWERS
+#ifdef TMNT // POWERS
 	VectorClear(angles);
 	AnglesToAxis(angles, powerup.axis);
 	VectorCopy(cent->lerpOrigin, powerup.origin);
@@ -3500,7 +3460,7 @@ void CG_Player( centity_t *cent ) {
 	CG_PlayerSprites( cent, &head );
 #endif
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // OR TMNTMISC ? // MP_TMNT_OK
 	CG_BreathPuffs(cent, &head);
 
 	CG_DustTrail(cent);
@@ -3513,19 +3473,6 @@ void CG_Player( centity_t *cent ) {
 
 	// add powerups floating behind the player
 	CG_PlayerPowerups( cent, &torso );
-
-#ifdef IOQ3ZTM // GHOST
-	if ((cent->currentState.powerups & ( 1 << PW_HASTE )
-		|| cent->currentState.powerups & ( 1 << PW_SCOUT ))
-		&& !(cent->currentState.powerups & ( 1 << PW_INVIS ))
-		&& cg.time - ci->ghostTime >= 10)
-	{
-		ci->ghostTime = cg.time;
-		CG_GhostRefEntity(&legs, 50, legs.shaderRGBA[3]);
-		CG_GhostRefEntity(&torso, 50, torso.shaderRGBA[3]);
-		CG_GhostRefEntity(&head, 50, head.shaderRGBA[3]);
-	}
-#endif
 }
 
 
@@ -3543,7 +3490,7 @@ void CG_ResetPlayerEntity( centity_t *cent ) {
 	cent->extrapolated = qfalse;	
 
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
-#ifdef TA_PLAYERSYS
+#ifdef TMNTPLAYERSYS
 	BG_ClearLerpFrame( &cent->pe.legs, cgs.clientinfo[ cent->currentState.clientNum ].playercfg.animations, cent->currentState.legsAnim, cg.time );
 	BG_ClearLerpFrame( &cent->pe.torso, cgs.clientinfo[ cent->currentState.clientNum ].playercfg.animations, cent->currentState.torsoAnim, cg.time );
 #else

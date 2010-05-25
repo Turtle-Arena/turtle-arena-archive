@@ -273,7 +273,8 @@ quakefile_t *FindQuakeFilesInZip(char *zipfile, char *filter)
 			strcpy(qf->filename, zipfile);
 			strcpy(qf->origname, filename_inzip);
 			qf->zipfile = true;
-			qf->zinfo = uf;
+			//memcpy( &buildBuffer[i].zipfileinfo, (unz_s*)uf, sizeof(unz_s));
+			memcpy(&qf->zipinfo, (unz_s*)uf, sizeof(unz_s));
 			qf->offset = 0;
 			qf->length = file_info.uncompressed_size;
 			qf->type = QuakeFileType(filename_inzip);
@@ -580,16 +581,16 @@ int LoadQuakeFile(quakefile_t *qf, void **bufferptr)
 		//open the zip file
 		zf = unzOpen(qf->pakfile);
 		//set the file pointer
-		qf->zinfo = zf;
+		qf->zipinfo.file = ((unz_s *) zf)->file;
 		//open the Quake file in the zip file
-		unzOpenCurrentFile(qf->zinfo);
+		unzOpenCurrentFile(&qf->zipinfo);
 		//allocate memory for the buffer
 		length = qf->length;
 		buffer = GetMemory(length+1);
 		//read the Quake file from the zip file
-		length = unzReadCurrentFile(qf->zinfo, buffer, length);
+		length = unzReadCurrentFile(&qf->zipinfo, buffer, length);
 		//close the Quake file in the zip file
-		unzCloseCurrentFile(qf->zinfo);
+		unzCloseCurrentFile(&qf->zipinfo);
 		//close the zip file
 		unzClose(zf);
 
@@ -629,21 +630,21 @@ int ReadQuakeFile(quakefile_t *qf, void *buffer, int offset, int length)
 		//open the zip file
 		zf = unzOpen(qf->pakfile);
 		//set the file pointer
-		qf->zinfo = zf;
+		qf->zipinfo.file = ((unz_s *) zf)->file;
 		//open the Quake file in the zip file
-		unzOpenCurrentFile(qf->zinfo);
+		unzOpenCurrentFile(&qf->zipinfo);
 		//
 		while(offset > 0)
 		{
 			read = offset;
 			if (read > sizeof(tmpbuf)) read = sizeof(tmpbuf);
-			unzReadCurrentFile(qf->zinfo, tmpbuf, read);
+			unzReadCurrentFile(&qf->zipinfo, tmpbuf, read);
 			offset -= read;
 		} //end while
 		//read the Quake file from the zip file
-		length = unzReadCurrentFile(qf->zinfo, buffer, length);
+		length = unzReadCurrentFile(&qf->zipinfo, buffer, length);
 		//close the Quake file in the zip file
-		unzCloseCurrentFile(qf->zinfo);
+		unzCloseCurrentFile(&qf->zipinfo);
 		//close the zip file
 		unzClose(zf);
 

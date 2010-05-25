@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
-#ifndef TURTLEARENA // NO_AMMO_WARNINGS
+#ifndef TMNTWEAPONS // NO_AMMO_WARNINGS
 /*
 ==============
 CG_CheckAmmo
@@ -39,41 +39,41 @@ void CG_CheckAmmo( void ) {
 	int		i;
 	int		total;
 	int		previous;
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 	int		weapons;
 #endif
 
 	// see about how many seconds of ammo we have remaining
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 	weapons = cg.snap->ps.stats[ STAT_WEAPONS ];
 #endif
 	total = 0;
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 	i = cg.snap->ps.weapon;
 #else
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 	for ( i = 1 ; i < BG_NumWeaponGroups() ; i++ )
 #else
 	for ( i = WP_MACHINEGUN ; i < WP_NUM_WEAPONS ; i++ )
 #endif
 #endif
 	{
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS
 		if (!BG_WeapUseAmmo(i)) {
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 			continue;
 #endif
 		}
-#ifdef TA_WEAPSYS_EX
+#ifdef TMNTWEAPSYS2
 		else
 #endif
 #endif
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 		if ( ! ( weapons & ( 1 << i ) ) ) {
 			continue;
 		}
 #endif
-#ifdef TA_WEAPSYS
+#ifdef TMNTWEAPSYS_2
 		total += cg.snap->ps.ammo[i] * bg_weapongroupinfo[i].weapon[0]->attackDelay;
 #else
 		switch ( i ) {
@@ -223,14 +223,14 @@ void CG_Respawn( void ) {
 	// no error decay on player movement
 	cg.thisFrameTeleport = qtrue;
 
-#ifndef TA_WEAPSYS_EX
+#ifndef TMNTWEAPSYS2
 	// display weapons available
 	cg.weaponSelectTime = cg.time;
 
 	// select the weapon the server says we are using
 	cg.weaponSelect = cg.snap->ps.weapon;
 #endif
-#ifdef TA_HOLDSYS/*2*/
+#ifdef TMNTHOLDSYS/*2*/
 	cg.holdableSelect = cg.snap->ps.holdableIndex;
 #endif
 }
@@ -331,12 +331,12 @@ CG_CheckLocalSounds
 ==================
 */
 void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
-#ifdef TURTLEARENA // NOARMOR
-	int			highScore, reward;
+#ifdef TMNT // NOARMOR
+	int			highScore, health, reward;
 #else
 	int			highScore, health, armor, reward;
 #endif
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 	sfxHandle_t sfx;
 #endif
 
@@ -347,11 +347,14 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 
 	// hit changes
 	if ( ps->persistant[PERS_HITS] > ops->persistant[PERS_HITS] ) {
-#ifndef TURTLEARENA // NOARMOR
+#ifdef TMNT // NOARMOR
+		//armor  = 0;
+		health = ps->persistant[PERS_ATTACKEE_HEALTH];
+#else
 		armor  = ps->persistant[PERS_ATTACKEE_ARMOR] & 0xff;
 		health = ps->persistant[PERS_ATTACKEE_ARMOR] >> 8;
 #endif
-#if defined MISSIONPACK && !defined TURTLEARENA // NOARMOR
+#if defined MISSIONPACK && !defined TMNT // NOARMOR
 		if (armor > 50 ) {
 			trap_S_StartLocalSound( cgs.media.hitSoundHighArmor, CHAN_LOCAL_SOUND );
 		} else if (armor || health > 100) {
@@ -386,7 +389,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("capture\n");
 	}
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTWEAPONS
 	if (ps->persistant[PERS_IMPRESSIVE_COUNT] != ops->persistant[PERS_IMPRESSIVE_COUNT]) {
 #ifdef MISSIONPACK
 		if (ps->persistant[PERS_IMPRESSIVE_COUNT] == 1) {
@@ -440,14 +443,17 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		reward = qtrue;
 		//Com_Printf("assist\n");
 	}
-#if !defined NOTRATEDM || !defined TURTLEARENA // AWARDS
+#if !defined TMNTMISC || !defined TMNTWEAPONS || !defined NOTRATEDM
 	// if any of the player event bits changed
 	if (ps->persistant[PERS_PLAYEREVENTS] != ops->persistant[PERS_PLAYEREVENTS]) {
-#ifndef TURTLEARENA // AWARDS
+#ifndef TMNTMISC
 		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD)) {
 			trap_S_StartLocalSound( cgs.media.deniedSound, CHAN_ANNOUNCER );
-		} else if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) !=
+		}
+#endif
+#ifndef TMNTWEAPONS
+		else if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD)) {
 			trap_S_StartLocalSound( cgs.media.humiliationSound, CHAN_ANNOUNCER );
 		}
@@ -562,7 +568,7 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 		CG_CheckLocalSounds( ps, ops );
 	}
 
-#ifndef TA_WEAPSYS // ZTM: No ammo warnings.
+#ifndef TMNTWEAPSYS // Turtle Man: No ammo warnings.
 	// check for going low on ammo
 	CG_CheckAmmo();
 #endif
