@@ -1096,7 +1096,7 @@ static void CG_Missile( centity_t *cent ) {
 			case PS_PITCH:
 				// spin pitch!
 				if ( s1->pos.trType != TR_STATIONARY ) {
-				cent->lerpAngles[0] = cg.autoAngles[1]; // Spin pitch!
+					cent->lerpAngles[0] = cg.autoAngles[1]; // Spin pitch!
 				}
 				AnglesToAxis( cent->lerpAngles, ent.axis );
 				break;
