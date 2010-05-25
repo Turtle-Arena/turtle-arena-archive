@@ -199,6 +199,8 @@ Most of the mapobjects should be damageable.
     * Traffic barrel-thingy? Traffic "saw-horse"-thingy
     * Firehydroant, lightpole,
     * street-signs (one-way, 3rd street, Stop, Yield, people crossing, speed limit)
+    * Torch Flame, wall torchs, etc et
+    * Lamps and other light things
 
 == Testing! ==
   * DONE(untested)?: Melee combo system, with different animations for each attack? (TA_WEAPSYS)
