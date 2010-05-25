@@ -1,0 +1,19 @@
+//custom surfaceParms file (for 'q3map2 -custinfoparms')
+//  Turtle Man: Haven't finished writing the material code yet, so these aren't very useful.
+
+//custom CONTENTS_ flags
+{
+
+}
+
+//custom SURF_ flags
+{
+  dirt    0x80000
+  grass   0x100000
+  wood    0x200000
+  stone   0x400000
+  metal   0x1000
+  sparks  0x800000
+  glass   0x1000000
+}
+

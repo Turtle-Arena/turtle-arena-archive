@@ -1,0 +1,4 @@
+h_head,$(dir)/head
+h_neck,$(dir)/head
+h_hair,$(dir)/hair_red
+tag_head,

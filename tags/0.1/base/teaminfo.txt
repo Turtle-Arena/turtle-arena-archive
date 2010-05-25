@@ -1,0 +1,74 @@
+/*
+===========================================================================
+Copyright (C) 2009 by Turtle Man
+
+This file is part of TMNT Arena.
+
+TMNT Arena is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
+
+TMNT Arena is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with TMNT Arena; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+===========================================================================
+*/
+
+// Turtle Man: Bot names can be characters or aliases (or bots.txt names?)
+// Beside the "asset" there is two images loaded based on it,
+//    "asset_metal" (metal version of asset) and "asset_name" (image of the name).
+teams {
+	// name of team, asset, bot1, bot2, bot3, bot4, bot5
+
+	{ "Sais"  "ui/assets/sais" "Raph" "Raph" "Raph" "Raph" "Raph" }
+	{ "Katanas" "ui/assets/katanas" "Raph" "Raph" "Raph" "Raph" "Raph" }
+	{ "Dummy" "ui/assets/katanas" "Raph" "Raph" "Raph" "Raph" "Raph" }
+
+	// The "ideal" teams/characters.
+	// Blades: Leo, Karai, Miyamoto Usagi, Faraji Ngala, ?
+	// Tech: Don, April, Leatherhead, Adam McKay, Fugatiod?
+	// Hotheads: Raph, Casey, Traximus, Joi Reynard, ?
+	// Outcasts: Mikey, Nobody, Zog, Tora Yoshida, RatKing?
+	// ???: Splinter, Hamato Yoshi?, Mortu, Ancient One, ?
+	// Foot: Shredder, Foot, Foot Tech, Foot Mech, ?
+	// Dragons: Hun, Two Ton?, Dragon1, Dragon2, Dragon3
+
+// Turtle Man: ...yeah 36 characters WAY to many for me to plan on making.
+//             The way it is currently, it may be better to have teams of 4, instead of 5.
+//             I shouldn't be wasting time on this right now anyway...
+}
+
+// character name ( used for display and head derivation ), base model (male=James, female=Janet, else uses text)
+characters {
+	// name (display and head model), base model (torso/legs)
+
+	// Turtle Man: Example Players
+	{ "Casey"  "casey" }
+	{ "April"  "april" }
+
+	// Turtle Man: Characters
+	{ "Raph"   "raph" }
+}
+
+// three tokens per line,
+// character name, bot alias (in bots.txt), and preferred action (a - all purpose, d - defense, o - offense)
+aliases {
+	// Turtle Man: Example Players
+	{ "Casey"			"casey"			"a"	}
+	{ "John"			"casey"			"d"	}
+	{ "Jimmy"			"casey"			"o"	}
+
+	{ "April"			"april"			"a"	}
+	{ "Amy"				"april"			"d"	}
+	{ "Jane"			"april"			"o"	}
+
+	// Turtle Man: Aliases
+	{ "Raph"			"raph",			"o" }
+}
+

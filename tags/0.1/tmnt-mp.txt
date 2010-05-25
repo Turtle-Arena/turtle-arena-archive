@@ -1,0 +1,37 @@
+What MISSIONPACK adds to TMNT, the plan is to remove and intagrate all parts of the MP into base TMNT.
+
+== Supported/used ==
+
+* One Flag CTF gametype: Take the center flag to the other team's base.
+* Overload gametype: Defend object at base and attack other teams base object.
+
+* Persistant Powerups (For Team gametypes)
+** Scout (Incressed speed, and no armor? (armor is removed in TMNT Arena) ) (speed is 1.5, haste speed is 1.3)
+***  Turtle Man: NOTE: I cut start health and pickup health in half.
+
+** Guard (Incressed health, and Health regen)           (2x health, PW_BATTLESUIT is .5 damage receive)
+***  Turtle Man: NOTE: I disabled Health regen (Seems overpowered) and give 2x health from pickup items.
+
+** Doubler (Player weapons do double damage.)           (Like Q3 PW_QUAD, as I set it 2x damage)
+** Ammo Regen (Player ammo/shuriken counts slowly increment)
+
+* Chaingun --Supported by TMNTWEAPSYS_2 (Weapon scripting)
+* Nailgun --Supported by TMNTWEAPSYS_2 (Weapon scripting)
+* Prox Launcher --Partly supported, will never fully support, by TMNTWEAPSYS_2 (Weapon scripting)
+
+* Voice chats for bots and humans
+* Per-team skins for players
+
+* Portal holdable item (Not used in final version of Team Arena)
+** I did some fixing to the code and added models and an icon, it is usable.
+
+== Disabled/unused Code ==
+
+* Scriptable UI/HUD
+** (UI only) Teams: 5 bots, team-name, and logo-gfxs.
+* Harvester --Removed (!defined MISSIONPACK_HARVESTER)
+** kill people, then a skull (of the attacker's team color) will spawn at the center object, then attacker's team must take the skull to the other team's base, if killee's team touch it [object that spawned at center], it is removed.)
+* Kamikaze holdable item (Removed)
+* Invul holdable item (Removed)
+* Prox Launcher --Partly supported
+

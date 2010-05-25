@@ -1,0 +1,34 @@
+// TODO: TMNT Arena HUD
+
+#include "ui/menudef.h"
+
+{
+	assetGlobalDef {
+		font "fonts/font" 16
+		smallFont "fonts/smallfont" 12
+		bigFont "fonts/bigfont" 20
+
+		gradientBar "ui/assets/gradientbar2.tga"
+
+		//menuEnterSound "sounds/menu/enter.wav"
+		//menuExitSound "sounds/menu/exit.wav"
+		//itemFocusSound "sounds/menu/item_focus.wav"
+		//menuBuzzSound "sounds/menu/buzz.wav"
+
+		cursor "ui/assets/3_cursor2"
+
+		fadeClamp 1.0
+		fadeCycle 1
+		fadeAmount 0.1
+
+		shadowX  5
+		shadowY  5
+		shadowColor 0.1 0.1 0.1 0.25
+	}
+
+	menudef {
+
+	}
+
+}
+
