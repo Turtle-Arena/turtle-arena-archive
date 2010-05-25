@@ -89,13 +89,13 @@ do
 	if [ "$ARG" = "--apply-patch" ]
 	then
 		APPLY_PATCH=1
-		break
+		continue
 	fi
 
 	if [ "$ARG" = "--no-log" ]
 	then
 		SAVE_LOG=0
-		break
+		continue
 	fi
 
 

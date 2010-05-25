@@ -59,6 +59,105 @@ fi
 # Platform as in 'engine/build/release-linux-x86_64/base/vm'
 PLATFORM=linux-$ARCH
 
+# Vars for command line handling
+USAGE=0
+NEXT_ARG=""
+
+#
+# Read command line arguments
+#
+for ARG in `echo $*`
+do
+
+	#
+	# Single argument options
+	#
+
+	if [ "$ARG" = "--help" ] || [ "$ARG" = "-help" ] || [ "$ARG" = "-h" ]
+	then
+		USAGE=1
+		break
+	fi
+
+	if [ "$ARG" = "--no-deb" ]
+	then
+		MAKEDEB=0
+		continue
+	fi
+
+	if [ "$ARG" = "--no-zip" ]
+	then
+		MAKEZIP=0
+		continue
+	fi
+
+	if [ "$ARG" = "--no-data" ]
+	then
+		DATAFILES=0
+		continue
+	fi
+
+
+	#
+	# Arguments that have a token after it
+	#
+
+	if [ "$ARG" = "--packager" ] || [ "$ARG" = "--installdir" ]
+	then
+		NEXT_ARG="$ARG"
+		continue
+	fi
+
+	case "$NEXT_ARG" in
+		--packager)
+			NAME_AND_EMAIL="$ARG"
+			;;
+		--installdir)
+			INSTALLDIR="$ARG"
+			;;
+		*)
+			echo "Unknown argument '$ARG'"
+			USAGE=2
+			;;
+	esac
+	NEXT_ARG=""
+
+done
+
+#
+# Show usage, the user asked to see it.
+#
+if [ $USAGE -eq 1 ]
+then
+	echo "Usage: $0 OPTIONS..."
+	echo "  Package Turtle Arena for release. Creates assets0.pk3, compiles"
+	echo "    and copies binaries into installdir and creates Debian client"
+	echo "    and data packages"
+	echo ""
+	echo "  OPTIONS"
+	echo "    --help         Show this help"
+	echo "           -help"
+	echo "           -h"
+	echo "    --no-deb            don't create debian packages"
+	echo "    --no-zip            don't copy files for zip install to installdir"
+	echo "    --no-data           don't create assests0.pk3"
+	echo "    --packager [text]   Packager's name and e-mail address"
+	echo "                          (example: \"John Smith <address@example.com>\")"
+	echo "    --installdir [dir]  directory to copy files to for zip install"
+	echo "                          and create debian packages in"
+	echo "                          (default: \"install\")"
+	exit 1
+fi
+
+#
+# Mini usage message for miss formated command.
+#
+if [ $USAGE -eq 2 ]
+then
+	echo "Try \`$0 --help' for more information."
+	exit 1
+fi
+
 #
 # Make sure everything is built
 #
@@ -140,6 +239,10 @@ then
 	rm $INSTALLDIR/base_svn/*.so
 	rm $INSTALLDIR/base_svn/*.dll
 
+	# Remove files sometimes used for testing
+	rm $INSTALLDIR/base_svn/*.pk3
+	rm $INSTALLDIR/base_svn/*.zip
+
 	# Copy QVMs to $INSTALLDIR/base_svn
 	echo "  Coping QVMs..."
 	rm $INSTALLDIR/base_svn/vm/*.qvm
@@ -190,7 +293,7 @@ then
 	cp CREDITS.txt $INSTALLDIR
 
 	# Convert to dos line ending
-	unix2dos $INSTALLDIR/*.txt
+	todos $INSTALLDIR/*.txt
 
 	# Copy all of the files other than base/ into turtlearena-src/ and zip it.
 	echo "Warning: You need to manually copy the source into $INSTALLDIR !"

@@ -86,6 +86,8 @@ Weapons (and attacking)
     * Have it be more like in Team Arena then Q3, using ".game" files instead of cvars in config.
     * Or one single data file with all of the sp data (Or SP data files -like SRB2 2.0)
 
+  * TODO: Mouser NPC, or call it ABMT? (A Better Mouse Trap)
+
 == Single Player (NiGHTS) ==
   * TODO: Chet into Dreams...  (A boy dreams of his lost turtles.)
     * NiGHTS would replaced with a Ninja Turtle?
@@ -108,8 +110,6 @@ Weapons (and attacking)
 
   * TODO (STARTED): Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
     * sp_complete and sp_gameover
-
-  * TODO: Mouser NPC, or call it ABMT? (A Better Mouse Trap)
 
 == Teamplay ==
   * TODO: Data: Team skins for players
