@@ -50,7 +50,9 @@ void SP_info_player_deathmatch( gentity_t *ent ) {
 }
 
 /*QUAKED info_player_start (1 0 0) (-16 -16 -24) (16 16 32)
+#ifndef TA_SP
 equivelant to info_player_deathmatch
+#endif
 */
 void SP_info_player_start(gentity_t *ent) {
 #ifndef TA_SP
@@ -126,6 +128,14 @@ qboolean SpotWouldTelefrag( gentity_t *spot
 
 	return qfalse;
 }
+
+#ifdef TA_SP
+gentity_t *SelectSinglePlayerSpawnPoint(
+#ifdef TA_PLAYERSYS
+	gentity_t *ent,
+#endif
+	int clientnum, vec3_t origin, vec3_t angles, qboolean isbot );
+#endif
 
 #ifndef IOQ3ZTM // ZTM: unused
 /*
@@ -291,6 +301,23 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 	{
 		spot = G_Find(NULL, FOFS(classname), "info_player_deathmatch");
 
+#ifdef TA_SP
+		// Check for info_player_start if we haven't checked already
+		if (!spot && g_gametype.integer != GT_SINGLE_PLAYER)
+		{
+			spot = SelectSinglePlayerSpawnPoint(
+#ifdef TA_PLAYERSYS
+							ent,
+#endif
+							ent - g_entities, origin, angles,
+							!!(ent->r.svFlags & SVF_BOT));
+
+			if (spot) {
+				return spot;
+			}
+		}
+#endif
+
 		if (!spot)
 			G_Error( "Couldn't find a spawn point" );
 
@@ -387,7 +414,7 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 		if (spot->count == 0) {
 			spot0 = spot;
 		}
-		if ( clientnum < 0 || spot->count == clientnum ) {
+		if ( spot->count == clientnum ) {
 			break;
 		}
 #endif
@@ -404,7 +431,14 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 	{
 		G_Printf("Warning: Map missing info_player_start atemping to use deathmacth spawn.\n");
 
-		while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL) {
+		while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
+		{
+			if(((spot->flags & FL_NO_BOTS) && isbot) ||
+			   ((spot->flags & FL_NO_HUMANS) && !isbot))
+			{
+				continue;
+			}
+
 			if ( spot->spawnflags & 1 ) {
 				break;
 			}
