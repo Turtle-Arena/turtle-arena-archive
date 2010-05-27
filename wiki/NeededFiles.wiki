@@ -203,7 +203,7 @@ NOTE: Currently I have the cursors point to the normal q3 cursor image.
 While replacing stuff I was deleting what I had replaced or was no longer used in the demoq3 pak0.pk3
 the following were not removed from the pk3; (I have a list so I can delete the pk3)
 
-  * models/gibs							--unused by turtlearena
+  * models/gibs/						--unused by turtlearena
   * models/powerups/					--replaced/unused by turtlearena
   * models/weapons2/					--replaced/unused by turtlearena
   * models/weaphits/
@@ -219,11 +219,11 @@ Replaced in base_ioq3ztm
   * TEMP: menu/medals/medal_impressive.tga	--unused by turtlearena --Kill two (or more) players with one railgun shot.
   * TEMP: menu/medals/medal_excellent.tga	--unused by turtlearena --Kill two players close together
   * TEMP: menu/medals/medal_accuracy.tga	--unused by turtlearena
-  * TEMP: menu/medals/medal_gauntlet.tga		--unused by turtlearena
+  * TEMP: menu/medals/medal_gauntlet.tga	--unused by turtlearena
   * TEMP: menu/medals/medal_victory.tga		--unused by turtlearena
 
 == Demo TA pak0.pk3 ==
 There is (or maybe) more, I didn't delete stuff as I replaced stuff.
 
-  * models/powerups/?  --replaced/unused by turtlearena
+  * models/powerups/  --replaced/unused by turtlearena
   * models/powerups/pop.md3 --unused by turtlearena --Just copy models/misc/telep.md3 and move it so its offset correctly?

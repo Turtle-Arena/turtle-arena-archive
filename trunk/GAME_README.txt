@@ -1,4 +1,4 @@
-Turtle Arena is a work-in-progress Ninja Turtle fangame based on the ioquake3 engine.
+Turtle Arena is a open-source cross-platform Ninja Turtle fangame using a modified version of the ioquake3 engine.
 
 == Installing ==
 Extract Turtle Arena into a directory. It can be placed anywhere, but suggestions below
@@ -26,6 +26,7 @@ id software, ioquake3 developers, Thilo Schulz, Open Arena, Xreal project, Smoki
 
 See CREDITS.txt for details.
 
-== Website ==
-* [http://code.google.com/p/turtlearena/ Project page at Google code]
+== Internet Links ==
+* http://ztm.x10hosting.com/ Turtle Arena website
+* http://turtlearena.googlecode.com/ Turtle Arena on Google Code
 

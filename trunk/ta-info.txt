@@ -1,4 +1,4 @@
-'''Turtle Arena''' is a 3D Ninja Turtle fangame being made by ZTurtleMan based on the ioquake3 engine.
+'''Turtle Arena''' is a open-source cross-platform Ninja Turtle fangame using a modified version of the ioquake3 engine.
 
 == Current Features ==
 * Five playable characters (Leo, Don, Raph, Mike and Casey)
@@ -9,20 +9,21 @@
 
 == Credits ==
 * id software
-* ioquake3 devoplers
-* ZTurtleMan
-
-=== ...with things from ===
-* io Star Trek Voyager Elite Force (ioSTVEF)
+* ioquake3 developers
+* Thilo Schulz
 * Open Arena
 * Xreal project
 * Smokin' Guns
-* GNU FreeFonts
 * Mercenaries Guild Client for Tremulous
+* GNU FreeFonts
+* rfactory.org
+* "inolan.com"
+* ZTurtleMan
 
 === Special Thanks ===
-* Sonic Team Jr. - for making Sonic Robo Blast 2 which caused ZTurtleMan to start this project.
+* Sonic Team Jr. - for making Sonic Robo Blast 2 which inspired ZTurtleMan to make a Ninja Turtle fangame.
 
 == External Links ==
+* [http://ztm.x10hosting.com/ Turtle Arena website]
 * [http://code.google.com/p/turtlearena/ Turtle Arena on Google Code]
 
