@@ -82,18 +82,21 @@ do
 	if [ "$ARG" = "--no-deb" ]
 	then
 		MAKEDEB=0
+		NEXT_ARG=""
 		continue
 	fi
 
 	if [ "$ARG" = "--no-zip" ]
 	then
 		MAKEZIP=0
+		NEXT_ARG=""
 		continue
 	fi
 
 	if [ "$ARG" = "--no-data" ]
 	then
 		DATAFILES=0
+		NEXT_ARG=""
 		continue
 	fi
 
@@ -110,17 +113,24 @@ do
 
 	case "$NEXT_ARG" in
 		--packager)
-			NAME_AND_EMAIL="$ARG"
+			if [ "$NAME_AND_EMAIL" = "" ]
+			then
+				NAME_AND_EMAIL="$ARG"
+			else
+				NAME_AND_EMAIL="$NAME_AND_EMAIL $ARG"
+			fi
+			continue
 			;;
 		--installdir)
 			INSTALLDIR="$ARG"
+			NEXT_ARG=""
 			;;
 		*)
 			echo "Unknown argument '$ARG'"
 			USAGE=2
+			NEXT_ARG=""
 			;;
 	esac
-	NEXT_ARG=""
 
 done
 
