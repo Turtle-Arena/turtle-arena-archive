@@ -13,7 +13,7 @@ INSTALLDIR=install
 
 # Version (Current Turtle Arena version)
 VERSION=0.2
-# For deb only fixes update DEB_VERSION "turtlearena_$VERSION-$*DEB_VERSION"
+# For deb only fixes/changes update DEB_VERSION "turtlearena_$VERSION-$*DEB_VERSION"
 CLIENT_DEB_VERSION=1
 DATA_DEB_VERSION=1
 
@@ -38,7 +38,7 @@ MAKEDEB=1
 	GAMENAME="turtlearena"
 
 	# Long Title
-	LONGTITLE="Third-person arena game"
+	LONGTITLE="3D third-person arena combat game"
 
 	# Description
 	DESC="Turtle Arena is a Ninja Turtle fangame based on ioquake3."
@@ -169,6 +169,16 @@ then
 fi
 
 #
+# Disable binary building if not zip and not deb
+#
+if [ $MAKEZIP -eq 0 ] && [ $MAKEDEB -eq 0 ]
+then
+	LINUX=0
+	WIN32=0
+fi
+
+
+#
 # Make sure everything is built
 #
 
@@ -213,19 +223,19 @@ then
 	if [ $LINUX -eq 1 ]
 	then
 		cp engine/build/release-$PLATFORM/turtlearena.$ARCH $INSTALLDIR
-		cp engine/build/release-$PLATFORM/turtlearena-ded.$ARCH $INSTALLDIR
+		cp engine/build/release-$PLATFORM/turtlearena-server.$ARCH $INSTALLDIR
 
 		if [ $ARCH = "x86_64" ]
 		then
 			cp engine/build/release-linux-i386/turtlearena.i386 $INSTALLDIR
-			cp engine/build/release-linux-i386/turtlearena-ded.i386 $INSTALLDIR
+			cp engine/build/release-linux-i386/turtlearena-server.i386 $INSTALLDIR
 		fi
 	fi
 
 	if [ $WIN32 -eq 1 ]
 	then
 		cp engine/build/release-mingw32-x86/turtlearena.x86.exe $INSTALLDIR
-		cp engine/build/release-mingw32-x86/turtlearena-ded.x86.exe $INSTALLDIR
+		cp engine/build/release-mingw32-x86/turtlearena-server.x86.exe $INSTALLDIR
 
 		echo "  Warning: You need to manually copy SDL.dll version 1.2.14 into \"$INSTALLDIR\"!"
 	fi
@@ -274,7 +284,9 @@ then
 	fi
 
 	cd $INSTALLDIR/base_svn/
-	zip -r ../../$INSTALLDIR/base/assets0.pk3 * | grep -v "adding"
+	zip -r assets0.pk3 * | grep -v "adding"
+	cd $STARTDIR
+	mv $INSTALLDIR/base_svn/assets0.pk3 $INSTALLDIR/base
 	cd $STARTDIR
 
 	# Remove base_svn

@@ -1,0 +1,9 @@
+
+[Desktop Entry]
+Name=Turtle Arena
+Comment=A 3D third-person arena combat game
+Exec=turtlearena
+Terminal=false
+Icon=turtlearena128
+Type=Application
+Categories=Game;ArcadeGame;
