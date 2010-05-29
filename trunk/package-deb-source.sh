@@ -76,6 +76,11 @@ if [ $MAKE_ENGINE_DEB -eq 1 ]
 then
 
 	#
+	# Change to starting directory
+	#
+	cd $STARTDIR
+
+	#
 	# Create orig engine source directory
 	#
 	ORIGDIR=$GAMENAME-$VERSION.orig
