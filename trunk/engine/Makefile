@@ -150,7 +150,7 @@ ifeq ($(QUAKE3),1)
 		USE_CODEC_VORBIS=1
 		USE_CODEC_THEORA=1
 
-		SERVERBIN=ioq3ztmded
+		SERVERBIN=ioq3ztm-server
 		CLIENTBIN=ioq3ztm
 
 		ifndef BUILD_DIR
@@ -296,7 +296,7 @@ else # END QUAKE3
 
 	# Turtle Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"
-	SERVERBIN=turtlearena-ded
+	SERVERBIN=turtlearena-server
 	CLIENTBIN=turtlearena
 	BASEGAME=base
 	BASEGAME_FLAGS = -DMISSIONPACK -DTA_HUD
