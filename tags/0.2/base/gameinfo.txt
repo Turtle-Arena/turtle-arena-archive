@@ -1,0 +1,53 @@
+/*
+===========================================================================
+Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+
+This file is part of Turtle Arena.
+
+Turtle Arena is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
+
+Turtle Arena is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Turtle Arena; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+===========================================================================
+*/
+
+// Used in MISSIONPACK "Single Player" and Start Server menus
+gametypes {
+  { "Free For All" 0 }
+  { "Duel" 1 } // Renamed from Tournament
+  { "Cooperative" 2 }
+  { "Team Deathmatch" 3 }
+  { "Capture the Flag" 4 }
+  { "One Flag CTF" 5 }
+  { "Overload" 6 }
+  //{ "Harvester" 7 }		// ZTM: Removed Harvester gametype.
+}
+
+// Used in MISSIONPACK Join Server menu
+joingametypes {
+  { "All" -1 }
+  { "Free For All" 0 }
+  { "Duel" 1 } // Renamed from Tournament
+  { "Cooperative" 2 }
+  { "Team Deathmatch" 3 }
+  { "Capture the Flag" 4 }
+  { "One Flag CTF" 5 }
+  { "Overload" 6 }
+  //{ "Harvester" 7 }		// ZTM: Removed Harvester gametype.
+}
+
+// mapName, mapLoadName, teamMembers, opponentName, gametypenum "timetobeat" gametypenum "timetobeat" ...
+maps {
+	{ "Subway" "subway" "1"		  "Raph"			0 "0" 4 "240" 5 "210" 6 "210" }
+	{ "Narrows" "team1" "1"		  "Raph"			0 "0" 4 "240" 5 "210" 6 "210" }
+}
+

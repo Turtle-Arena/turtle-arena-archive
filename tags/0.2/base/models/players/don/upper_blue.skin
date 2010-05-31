@@ -1,0 +1,11 @@
+u_torso_right,models/players/don/torso_blue.png
+u_torso_left,models/players/don/torso_blue.png
+u_torso_right_hand,models/players/don/torso_blue.png
+u_torso_left_hand,models/players/don/torso_blue.png
+u_plastron,models/players/don/plastron.png
+u_carapace,models/players/don/carapace.png
+u_belt,models/players/don/belt_blue.png
+tag_flag,
+tag_weapon,
+tag_head,
+tag_torso,

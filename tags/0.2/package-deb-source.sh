@@ -1,0 +1,144 @@
+#!/bin/sh
+#
+# Package debian source files for client/server and data
+#  (For Ubuntu PPA)
+
+# FIXME: Doesn't find secrete key automatically on my computer...
+#        If you are not Zack Middleton change/remove this
+KEY=-k587E1968
+#KEY=
+
+MAKE_DATA_DEB=1
+# engine is used for client and server
+MAKE_ENGINE_DEB=1
+
+STARTDIR=`pwd`
+INSTALLDIR=debian_source
+DATA_DEB_CONFIG=debian_main/data/debian
+ENGINE_DEB_CONFIG=debian_main/engine/debian
+
+GAMENAME="turtlearena"
+# Version (Current Turtle Arena version)
+VERSION=0.2
+# For debian only fixes/changes update DEB_VERSION "turtlearena_$VERSION-$DATA_DEB_VERSION"
+DATA_DEB_VERSION=1
+ENGINE_DEB_VERSION=1
+
+if [ $MAKE_DATA_DEB -eq 1 ]
+then
+
+	#
+	# Create orig data source directory
+	#
+	ORIGDIR=$GAMENAME-data-$VERSION.orig
+	mkdir -p $INSTALLDIR/$ORIGDIR
+
+	# First build assets0.pk3?
+	if [ -f $STARTDIR/install/base/assets0.pk3 ]
+	then
+		mkdir -p $INSTALLDIR/$ORIGDIR/base
+		cp $STARTDIR/install/base/assets0.pk3 $INSTALLDIR/$ORIGDIR/base
+	else
+		./package.sh --no-deb --no-zip --installdir $INSTALLDIR/$ORIGDIR
+	fi
+
+	cd $INSTALLDIR/$ORIGDIR
+
+	# Copy text files into $INSTALLDIR/$ORIGDIR/ like README, CREDITS, and stuff
+	cp $STARTDIR/GAME_README.txt README
+	cp $STARTDIR/CREDITS.txt CREDITS
+	cp $STARTDIR/COPYRIGHTS.txt COPYRIGHTS
+	cp $STARTDIR/COPYING.txt COPYING
+
+	#
+	# Create debian data source directory
+	#
+	cd $STARTDIR
+	DEBDIR=$GAMENAME-data-$VERSION
+	mkdir -p $INSTALLDIR/$DEBDIR/debian/
+
+	cp -r $INSTALLDIR/$ORIGDIR/* $INSTALLDIR/$DEBDIR/
+	# TODO: Add -r to be like engine?
+	cp $DATA_DEB_CONFIG/* $INSTALLDIR/$DEBDIR/debian/
+
+	#
+	# Build debian package data
+	#
+	cd $STARTDIR
+	cd $INSTALLDIR/$DEBDIR
+
+	dpkg-buildpackage -S -rfakeroot $KEY
+
+	# dput ppa:zturtleman/turtlearena turtlearena-data_0.2-1_source.changes
+fi
+
+if [ $MAKE_ENGINE_DEB -eq 1 ]
+then
+
+	#
+	# Change to starting directory
+	#
+	cd $STARTDIR
+
+	#
+	# Create orig engine source directory
+	#
+	ORIGDIR=$GAMENAME-$VERSION.orig
+	mkdir -p $INSTALLDIR/$ORIGDIR
+
+	cd $STARTDIR
+
+	# Avoid copying build directory.
+	mkdir $INSTALLDIR/$ORIGDIR/code
+	mkdir $INSTALLDIR/$ORIGDIR/misc
+	mkdir $INSTALLDIR/$ORIGDIR/ui
+	cp engine/* $INSTALLDIR/$ORIGDIR/
+	cp -r engine/code/* $INSTALLDIR/$ORIGDIR/code
+	cp -r engine/misc/* $INSTALLDIR/$ORIGDIR/misc
+	cp -r engine/ui/* $INSTALLDIR/$ORIGDIR/ui
+
+	#
+	# File cleanup
+	#
+	# Remove SVN files
+	find $INSTALLDIR/$ORIGDIR/ -type d -name '.svn' -exec rm -rf '{}' \; 2>/dev/null
+	find $INSTALLDIR/$ORIGDIR/ -type f -name '.svnignore' -exec rm -rf '{}' \; 2>/dev/null
+	find $INSTALLDIR/$ORIGDIR/ -type f -name '*~' -exec rm -rf '{}' \; 2>/dev/null
+
+	# Remave lcc as debian calls it non-free and removes it
+	rm -r $INSTALLDIR/$ORIGDIR/code/tools/lcc
+
+	# Remove non-free header
+	if [ -f $INSTALLDIR/$ORIGDIR/code/qcommon/wspiapi.h ]
+	then
+		rm $INSTALLDIR/$ORIGDIR/code/qcommon/wspiapi.h
+	fi
+
+	#
+	# Create orig.tar.gz
+	#	So that dpkg-buildpackage will make a .debian.tar.gz instead of
+	#		failing to make .diff.gz
+	#
+	cd $INSTALLDIR
+	tar -pczf ${GAMENAME}_$VERSION.orig.tar.gz $ORIGDIR
+
+	#
+	# Create debian engine source directory
+	#
+	cd $STARTDIR
+	DEBDIR=$GAMENAME-$VERSION
+	mkdir -p $INSTALLDIR/$DEBDIR/debian/
+
+	cp -r $INSTALLDIR/$ORIGDIR/* $INSTALLDIR/$DEBDIR/
+	cp -r $ENGINE_DEB_CONFIG/* $INSTALLDIR/$DEBDIR/debian/
+
+	#
+	# Build debian package data
+	#
+	cd $STARTDIR
+	cd $INSTALLDIR/$DEBDIR
+
+	dpkg-buildpackage -S -rfakeroot $KEY
+
+	# dput ppa:zturtleman/turtlearena turtlearena_0.2-1_source.changes
+fi

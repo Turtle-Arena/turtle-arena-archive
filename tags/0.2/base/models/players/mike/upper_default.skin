@@ -1,0 +1,11 @@
+u_torso_right,models/players/mike/torso.png
+u_torso_left,models/players/mike/torso.png
+u_torso_right_hand,models/players/mike/torso.png
+u_torso_left_hand,models/players/mike/torso.png
+u_plastron,models/players/mike/plastron.png
+u_carapace,models/players/mike/carapace.png
+u_belt,models/players/mike/belt.png
+tag_flag,
+tag_weapon,
+tag_head,
+tag_torso,
