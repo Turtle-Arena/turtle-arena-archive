@@ -180,7 +180,7 @@ or configs will never get loaded from disk!
 #define PAK_LEN 6
 #define NUM_DEFAULT_PAKS 1 // Maximum 10
 static const unsigned pak_checksums[NUM_DEFAULT_PAKS] = {
-	2799211236u
+	3502744120u
 };
 #else
 #if defined STANDALONE && defined IOQ3ZTM // FS_PURE
