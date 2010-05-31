@@ -279,7 +279,7 @@ else # END QUAKE3
 						-DNIGHTSMODE
 
 	# Currently Turtle Arena doesn't use camera scripts.
-	BUILD_SPLINES=1 # Adds -DCAMERASCRIPT
+	#BUILD_SPLINES=1 # Adds -DCAMERASCRIPT
 
 	# Use model tags for true melee attacking
 	DED_USE_MODELS=1
