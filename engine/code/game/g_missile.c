@@ -83,7 +83,9 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	dir[0] = dir[1] = 0;
 	dir[2] = 1;
 
+#ifndef TA_WEAPSYS // Must be after G_RadiusDamage
 	ent->s.eType = ET_GENERAL;
+#endif
 	G_AddEvent( ent, EV_MISSILE_MISS, DirToByte( dir ) );
 #ifdef TA_WEAPSYS
 	if (ent->parent)
@@ -96,11 +98,21 @@ void G_ExplodeMissile( gentity_t *ent ) {
 
 	// splash damage
 	if ( ent->splashDamage ) {
+#ifdef TA_WEAPSYS
+		if( G_RadiusDamage( ent->r.currentOrigin, ent, ent->parent, ent->splashDamage, ent->splashRadius, ent
+			, ent->splashMethodOfDeath ) )
+#else
 		if( G_RadiusDamage( ent->r.currentOrigin, ent->parent, ent->splashDamage, ent->splashRadius, ent
-			, ent->splashMethodOfDeath ) ) {
+			, ent->splashMethodOfDeath ) )
+#endif
+		{
 			g_entities[ent->r.ownerNum].client->accuracy_hits++;
 		}
 	}
+
+#ifdef TA_WEAPSYS
+	ent->s.eType = ET_GENERAL;
+#endif
 
 	trap_LinkEntity( ent );
 }
@@ -549,7 +561,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 						hitClient = LogAccuracyHit( traceEnt, self );
 
 						// Splash damage!
-						if (G_RadiusDamage(tr.endpos, self, damage, splashRadius, traceEnt, splashMod))
+						if (G_RadiusDamage(tr.endpos, self, self, damage, splashRadius, traceEnt, splashMod))
 						{
 							hitClient = qtrue;
 						}
@@ -1304,6 +1316,14 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		trap_LinkEntity( ent );
 		trap_LinkEntity( nent );
 
+#ifdef TA_WEAPSYS
+		// Don't grapple to the entity if you just killed it.
+		if (damagedOther && other->health <= 0)
+		{
+			Weapon_HookFree(ent);
+		}
+#endif
+
 		return;
 	}
 
@@ -1340,8 +1360,14 @@ missileImpact:
 
 	// splash damage (doesn't apply to person directly hit)
 	if ( ent->splashDamage ) {
+#ifdef TA_WEAPSYS
+		if( G_RadiusDamage( trace->endpos, ent, ent->parent, ent->splashDamage, ent->splashRadius, 
+			other, ent->splashMethodOfDeath ) )
+#else
 		if( G_RadiusDamage( trace->endpos, ent->parent, ent->splashDamage, ent->splashRadius, 
-			other, ent->splashMethodOfDeath ) ) {
+			other, ent->splashMethodOfDeath ) )
+#endif
+		{
 			if( !hitClient ) {
 				g_entities[ent->r.ownerNum].client->accuracy_hits++;
 			}

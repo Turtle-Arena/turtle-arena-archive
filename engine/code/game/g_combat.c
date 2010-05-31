@@ -1490,8 +1490,14 @@ qboolean CanDamage (gentity_t *targ, vec3_t origin) {
 G_RadiusDamage
 ============
 */
+#ifdef TA_WEAPSYS
+qboolean G_RadiusDamage ( vec3_t origin, gentity_t *inflictor, gentity_t *attacker, float damage,
+					float radius, gentity_t *ignore, int mod)
+#else
 qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, float radius,
-					 gentity_t *ignore, int mod) {
+					 gentity_t *ignore, int mod)
+#endif
+{
 	float		points, dist;
 	gentity_t	*ent;
 	int			entityList[MAX_GENTITIES];
@@ -1547,7 +1553,11 @@ qboolean G_RadiusDamage ( vec3_t origin, gentity_t *attacker, float damage, floa
 			// push the center of mass higher than the origin so players
 			// get knocked into the air more
 			dir[2] += 24;
+#ifdef TA_WEAPSYS
+			G_Damage (ent, inflictor, attacker, dir, origin, (int)points, DAMAGE_RADIUS, mod);
+#else
 			G_Damage (ent, NULL, attacker, dir, origin, (int)points, DAMAGE_RADIUS, mod);
+#endif
 		}
 	}
 
