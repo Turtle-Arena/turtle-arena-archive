@@ -75,6 +75,8 @@ Weapons (and attacking)
 
   * BUG: Flash origin isn't updated when missing weapon model
 
+  * BUG: ent->s.weapon doesn't always get set for MOD_PROJECTILE_EXPLOSION (... almost dodged ZTM's none)
+
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
 
@@ -102,6 +104,10 @@ Weapons (and attacking)
   * TODO: framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
 
   * TODO: When there are multiple ghost models they may not be sorted into correct order?
+
+  * BUG: Mirror-only items show sprite when cg_simpleItems is 1
+
+  * BUG: Sky doesn't render correctly in mirrors when holding CTF flag
 
 == UI ==
   * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?
