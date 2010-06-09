@@ -170,6 +170,8 @@ Weapons (and attacking)
 
   * TODO: Make a original character (In case the Ninja Turtles have to be removed at some point)
 
+  * BUG: Loading player animations using animation names doesn't work.
+
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
     * (NiGHTS: Journey of Dreams) Move camera if holding 'z' and move analog stick, can't look around while moving
