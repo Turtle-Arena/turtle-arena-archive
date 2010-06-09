@@ -2,6 +2,9 @@
 #
 # Package debian source files for client/server and data
 #  (For Ubuntu PPA)
+#
+# NOTE: You must have the .orig.tar.gz files when creating
+#  patches (0.2-2, 0.2-3, etc et) (You can download them from the Ubuntu PPA)
 
 # FIXME: Doesn't find secrete key automatically on my computer...
 #        If you are not Zack Middleton change/remove this
@@ -30,9 +33,15 @@ then
 	#
 	# Create orig data source directory
 	#
-	ORIGDIR=$GAMENAME-data-$VERSION.orig
+	if [ $DATA_DEB_VERSION -eq 1 ]
+	then
+		ORIGDIR=$GAMENAME-data-$VERSION.orig
+	else
+		ORIGDIR=$GAMENAME-data-$VERSION
+	fi
 	mkdir -p $INSTALLDIR/$ORIGDIR
 
+	# FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
 	# First build assets0.pk3?
 	if [ -f $STARTDIR/install/base/assets0.pk3 ]
 	then
@@ -57,9 +66,11 @@ then
 	DEBDIR=$GAMENAME-data-$VERSION
 	mkdir -p $INSTALLDIR/$DEBDIR/debian/
 
-	cp -r $INSTALLDIR/$ORIGDIR/* $INSTALLDIR/$DEBDIR/
-	# TODO: Add -r to be like engine?
-	cp $DATA_DEB_CONFIG/* $INSTALLDIR/$DEBDIR/debian/
+	if [ $DATA_DEB_VERSION -eq 1 ]
+	then
+		cp -r $INSTALLDIR/$ORIGDIR/* $INSTALLDIR/$DEBDIR/
+	fi
+	cp -r $DATA_DEB_CONFIG/* $INSTALLDIR/$DEBDIR/debian/
 
 	#
 	# Build debian package data
@@ -83,10 +94,13 @@ then
 	#
 	# Create orig engine source directory
 	#
-	ORIGDIR=$GAMENAME-$VERSION.orig
+	if [ $ENGINE_DEB_VERSION -eq 1 ]
+	then
+		ORIGDIR=$GAMENAME-$VERSION.orig
+	else
+		ORIGDIR=$GAMENAME-$VERSION
+	fi
 	mkdir -p $INSTALLDIR/$ORIGDIR
-
-	cd $STARTDIR
 
 	# Avoid copying build directory.
 	mkdir $INSTALLDIR/$ORIGDIR/code
@@ -119,8 +133,11 @@ then
 	#	So that dpkg-buildpackage will make a .debian.tar.gz instead of
 	#		failing to make .diff.gz
 	#
-	cd $INSTALLDIR
-	tar -pczf ${GAMENAME}_$VERSION.orig.tar.gz $ORIGDIR
+	if [ $ENGINE_DEB_VERSION -eq 1 ]
+	then
+		cd $INSTALLDIR
+		tar -pczf ${GAMENAME}_$VERSION.orig.tar.gz $ORIGDIR
+	fi
 
 	#
 	# Create debian engine source directory
@@ -129,7 +146,10 @@ then
 	DEBDIR=$GAMENAME-$VERSION
 	mkdir -p $INSTALLDIR/$DEBDIR/debian/
 
-	cp -r $INSTALLDIR/$ORIGDIR/* $INSTALLDIR/$DEBDIR/
+	if [ $ENGINE_DEB_VERSION -eq 1 ]
+	then
+		cp -r $INSTALLDIR/$ORIGDIR/* $INSTALLDIR/$DEBDIR/
+	fi
 	cp -r $ENGINE_DEB_CONFIG/* $INSTALLDIR/$DEBDIR/debian/
 
 	#
