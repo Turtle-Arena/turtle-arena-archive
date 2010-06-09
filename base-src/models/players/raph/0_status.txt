@@ -16,10 +16,73 @@ death3 (Copy of death1)
 
 ===Torso===
 Quake3 Animations
+* TORSO_STAND_GAUNTLET (copy of TORSO_STAND_SAI2)
 * Run (Doesn't look right)
 * Walk (Doesn't look right)
 MISSIONPACK Animations (done)
 Turtle Arena Animations
+* TORSO_PUTDEFAULT_* (copies of TORSO_DROP, not right)
+* TORSO_GETDEFAULT_* (copies of TORSO_RAISE, not right)
+* TORSO_STAND_GUN_PRIMARY (done)
+* TORSO_STAND_SWORD1_BOTH (done)
+* TORSO_STAND_SWORD1_PRIMARY (done)
+* TORSO_STAND_SWORD2 (copy of TORSO_STAND_SAI2)
+* TORSO_STAND_DAISHO (copy of TORSO_STAND_SAI2)
+
+* TORSO_STAND_SAI2 (done)
+* TORSO_STAND_SAI1_PRIMARY (copy of TORSO_STAND_SWORD1_PRIMARY)
+
+* TORSO_STAND_BO (missing) (copy of TORSO_STAND_SAI2)
+* TORSO_STAND_BO_PRIMARY (missing) (copy of TORSO_STAND_SAI2)
+* TORSO_STAND_HAMMER (missing) (copy of TORSO_STAND_SWORD1_BOTH)
+* TORSO_STAND_HAMMER_PRIMARY (missing) (copy of TORSO_STAND_SWORD1_PRIMARY)
+* TORSO_STAND_NUNCHUCKS (missing) (copy of TORSO_STAND_SAI2)
+* TORSO_STAND_NUNCHUCKS1_PRIMARY (missing) (copy of TORSO_STAND_SAI2)
+
+* TORSO_ATTACK_GUN_PRIMARY (missing) (copy of TORSO_STAND_SAI2)
+
+* TORSO_ATTACK_SWORD1_BOTH_A (copy of TORSO_ATTACK_GAUTLET)
+* TORSO_ATTACK_SWORD1_BOTH_B (copy of TORSO_ATTACK_GAUTLET)
+* TORSO_ATTACK_SWORD1_BOTH_C (copy of TORSO_ATTACK_GAUTLET)
+
+* TORSO_ATTACK_SWORD1_PRIMARY_A (copy of TORSO_ATTACK_GAUTLET)
+* TORSO_ATTACK_SWORD1_PRIMARY_B (copy of TORSO_ATTACK_GAUTLET)
+* TORSO_ATTACK_SWORD1_PRIMARY_C (copy of TORSO_ATTACK_GAUTLET)
+
+* TORSO_ATTACK_SWORD2_A (copy of TORSO_ATTACK_GAUTLET)
+* TORSO_ATTACK_SWORD2_B (copy of TORSO_ATTACK_GAUTLET)
+* TORSO_ATTACK_SWORD2_C (copy of TORSO_ATTACK_GAUTLET)
+
+* TORSO_ATTACK_DAISHO_A (copy of TORSO_ATTACK_GAUTLET)
+* TORSO_ATTACK_DAISHO_B (copy of TORSO_ATTACK_GAUTLET)
+* TORSO_ATTACK_DAISHO_C (copy of TORSO_ATTACK_GAUTLET)
+
+* TORSO_ATTACK_SAI2_A (test)
+* TORSO_ATTACK_SAI2_B (test)
+* TORSO_ATTACK_SAI2_C (copy of TORSO_ATTACK_GAUTLET)
+
+* TORSO_ATTACK_SAI1_PRIMARY_A (missing)
+* TORSO_ATTACK_SAI1_PRIMARY_C (missing)
+* TORSO_ATTACK_SAI1_PRIMARY_B (missing)
+
+* TORSO_ATTACK_BO_A (missing)
+* TORSO_ATTACK_BO_B (missing)
+* TORSO_ATTACK_BO_C (missing)
+
+* TORSO_ATTACK_BO_PRIMARY_A (missing)
+* TORSO_ATTACK_BO_PRIMARY_B (missing)
+* TORSO_ATTACK_BO_PRIMARY_C (missing)
+
+* TORSO_ATTACK_HAMMER_A (missing)
+
+* TORSO_ATTACK_HAMMER_PRIMARY_A (missing)
+
+* TORSO_ATTACK_NUNCHUCKS_A (missing)
+* TORSO_ATTACK_NUNCHUCKS_B (missing)
+* TORSO_ATTACK_NUNCHUCKS_C (missing)
+* TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A (missing)
+* TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B (missing)
+* TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C (missing)
 
 ===Legs===
 Jump/land B (Copy of Jump/land)
@@ -33,6 +96,8 @@ Changed head to be split into bottom, mask, and top (instead of left/right).
 == TODO ==
 Split arms from torso, it would solve some animation issues with the sholder going flat when rotated...
 : For Example: TORSO_GUARDBASE frame 4
+
+Raph's thumbs also go flat and should be fixed.
 
 raph_v9: Merge torso.png and hand.png
 
