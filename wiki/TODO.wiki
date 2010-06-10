@@ -30,6 +30,8 @@ Focus on players, map themes, and multiplayer maps
   * Remake UI with missionpack ui scripting?
   * Reduce overall number of TODOs and FIXMEs in the source
 
+  * Hopefully make it a complete (fully working) multiplayer game (Compareable to TMNT: Mutant Melee in someways...)
+ 
 == 0.6 ==
 Focus on Single Player
 
@@ -41,6 +43,7 @@ Focus on Single Player
 == 0.8 ==
 
 == 1.0 ==
+  * Local four player support (Splitscreen and/or some maps like Mutant Melee)
 
 = engine =
 == Weapons ==
