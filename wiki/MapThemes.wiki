@@ -1,0 +1,70 @@
+#summary Map themes
+#labels Phase-Implementation
+
+One of the goals for Turtle Arena 0.4 is map themes.
+
+== Overview ==
+Map themes are a combination of textures, skybox, models/objects, sounds, and music.
+
+== City ==
+Ninja Turtle New York City theme.
+
+=== Aboveground ===
+:Objects
+Vehicles (Cars, Vars, Pickup Truck)
+Fire Hydrant // All good Turtle games need one.
+Grass
+Plants
+Trees
+Manhole Cover
+Street Lights
+
+:Textures
+Buildings
+Street
+
+
+=== Underground ===
+==== Turtle Lair ====
+==== Sewer ====
+Pipes
+Ladders // To manhole
+Dirty water
+
+
+==== Underground City ====
+Textures
+
+== Country ==
+:Objects
+House
+Barn
+Corn
+Hay
+Scarecrow
+Grass
+Plants
+Trees
+
+:Textures
+Dirt
+Grass
+
+== Forest ==
+:Objects
+Grass
+Plants
+Trees
+
+:Textures
+Dirt
+Grass
+
+== Desert ==
+
+== Mountain ==
+
+== Snow ==
+
+== Space Station ==
+
