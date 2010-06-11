@@ -12,6 +12,7 @@ se_ui
 tex_base_floor
 tex_base_light
 tex_base_wall
+tex_city
 tex_common
 tex_ctf2
 tex_fog
