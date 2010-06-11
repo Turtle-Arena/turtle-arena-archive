@@ -939,12 +939,12 @@ city/road
 }
 // brush 95
 {
-( -320.7123413086 448 18.4442749023 ) ( -320.7123413086 384 18.4442749023 ) ( -384.521697998 448 13.5080566406 ) city/manhole_top 0 0 0 0.5 0.5 0 0 0
-( -320.7123413086 448 18.4442749023 ) ( -384.521697998 448 13.5080566406 ) ( -319.4782714844 448 2.4919433594 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( -320.7123413086 448 18.4442749023 ) ( -319.4782714844 448 2.4919433594 ) ( -320.7123413086 384 18.4442749023 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( -383.2876281738 384 -2.4442749023 ) ( -319.4782714844 384 2.4919433594 ) ( -383.2876281738 448 -2.4442749023 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( -383.2876281738 384 -2.4442749023 ) ( -384.521697998 384 13.5080566406 ) ( -319.4782714844 384 2.4919433594 ) common/caulk 0 0 0 0.5 0.5 0 0 0
-( -383.2876281738 384 -2.4442749023 ) ( -383.2876281738 448 -2.4442749023 ) ( -384.521697998 384 13.5080566406 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( -320.4893798828 448 17.7509765625 ) ( -320.4893798828 384 17.7509765625 ) ( -384.3921508789 448 14.2247161865 ) city/manhole_top 0 0 0 0.5 0.5 0 0 0
+( -320.4893798828 448 17.7509765625 ) ( -384.3921508789 448 14.2247161865 ) ( -319.6077880859 448 1.7752838135 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( -320.4893798828 448 17.7509765625 ) ( -319.6077880859 448 1.7752838135 ) ( -320.4893798828 384 17.7509765625 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( -383.510559082 384 -1.7509765625 ) ( -319.6077880859 384 1.7752838135 ) ( -383.510559082 448 -1.7509765625 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( -383.510559082 384 -1.7509765625 ) ( -384.3921508789 384 14.2247161865 ) ( -319.6077880859 384 1.7752838135 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( -383.510559082 384 -1.7509765625 ) ( -383.510559082 448 -1.7509765625 ) ( -384.3921508789 384 14.2247161865 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 }
 }
 // entity 1
@@ -987,30 +987,6 @@ city/road
 }
 // entity 6
 {
-"classname" "misc_model"
-"origin" "151.999924 -291.480652 4.000008"
-"model" "models/mapobjects/car/car.md3"
-"modelscale" "3.000000"
-"angles" "-0.000000 89.999992 3.722170"
-}
-// entity 7
-{
-"classname" "misc_model"
-"origin" "-464.000153 -680.000061 3.998982"
-"model" "models/mapobjects/car/car.md3"
-"modelscale" "3.000000"
-"angles" "-0.000000 -89.999992 3.722170"
-}
-// entity 8
-{
-"classname" "misc_model"
-"origin" "-463.999939 -423.999878 3.999006"
-"model" "models/mapobjects/car/car.md3"
-"modelscale" "3.000000"
-"angles" "-0.000000 -89.999992 3.722170"
-}
-// entity 9
-{
 "classname" "light"
 "origin" "104.000000 -368.000000 224.000000"
 "light" "1000"
@@ -1018,13 +994,13 @@ city/road
 "target" "target_position4"
 "radius" "300"
 }
-// entity 10
+// entity 7
 {
 "classname" "target_position"
 "origin" "24.000000 -376.000000 32.000000"
 "targetname" "target_position4"
 }
-// entity 11
+// entity 8
 {
 "classname" "light"
 "origin" "-424.000000 952.000000 224.000000"
@@ -1033,14 +1009,14 @@ city/road
 "target" "target_position1"
 "radius" "300"
 }
-// entity 12
+// entity 9
 {
 "classname" "target_position"
 "origin" "-344.000000 960.000000 32.000000"
 "targetname" "target_position1"
 "angle" "180.000000"
 }
-// entity 13
+// entity 10
 {
 "classname" "light"
 "origin" "-424.000000 408.000000 224.000000"
@@ -1049,14 +1025,14 @@ city/road
 "target" "target_position2"
 "radius" "300"
 }
-// entity 14
+// entity 11
 {
 "classname" "target_position"
 "origin" "-344.000000 416.000000 32.000000"
 "targetname" "target_position2"
 "angle" "180.000000"
 }
-// entity 15
+// entity 12
 {
 "classname" "light"
 "origin" "104.000000 16.000000 224.000000"
@@ -1065,15 +1041,39 @@ city/road
 "target" "target_position3"
 "radius" "300"
 }
-// entity 16
+// entity 13
 {
 "classname" "target_position"
 "origin" "24.000000 8.000000 32.000000"
 "targetname" "target_position3"
 }
-// entity 17
+// entity 14
 {
 "classname" "info_player_intermission"
 "origin" "48.000000 -12.000000 288.000000"
 "angle" "90.000000"
+}
+// entity 15
+{
+"classname" "misc_gamemodel"
+"origin" "151.999924 -291.480652 4.000008"
+"model" "models/mapobjects/car/car.md3"
+"modelscale" "3.000000"
+"angles" "-0.000000 89.999992 3.722170"
+}
+// entity 16
+{
+"classname" "misc_gamemodel"
+"origin" "-464.000153 -680.000061 3.998982"
+"model" "models/mapobjects/car/car.md3"
+"modelscale" "3.000000"
+"angles" "-0.000000 -89.999992 3.722170"
+}
+// entity 17
+{
+"classname" "misc_gamemodel"
+"origin" "-463.999939 -423.999878 3.999006"
+"model" "models/mapobjects/car/car.md3"
+"modelscale" "3.000000"
+"angles" "-0.000000 -89.999992 3.722170"
 }
