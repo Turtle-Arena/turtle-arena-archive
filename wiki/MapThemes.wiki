@@ -11,7 +11,10 @@ Ninja Turtle New York City theme.
 
 === Aboveground ===
 :Objects
-Vehicles (Cars, Vars, Pickup Truck)
+Vehicles
+  Car (models/mapobjects/car/car.md3)
+  Var
+  Pickup Truck
 Fire Hydrant // All good Turtle games need one.
 Grass
 Plants
