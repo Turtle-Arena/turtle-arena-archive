@@ -3191,7 +3191,7 @@ int BG_MaxAttackCombo(playerState_t *ps)
 	return max_combo;
 }
 
-#ifdef TA_ENTSYS // MISC_OBJECT // TA_NPCSYS // ZTM: NPC info loading based on weapon info loading.
+#ifdef TA_NPCSYS // ZTM: NPC info loading based on weapon info loading.
 bg_npcinfo_t bg_npcinfo[MAX_NPCS];
 static qboolean bg_npcsys_init = qfalse;
 static int bg_numNPCs = 0;
@@ -3241,70 +3241,9 @@ const char *npcDeathNames[NPCD_MAX+1] =
 	NULL
 };
 
-const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
-{
-	"OBJECT_IDLE",
-	"OBJECT_DEATH1",
-	"OBJECT_DEATH2",
-	"OBJECT_DEATH3",
-	"OBJECT_DEAD1",
-	"OBJECT_DEAD2",
-	"OBJECT_DEAD3",
-	"OBJECT_LAND",
-	"OBJECT_PAIN"
-//#ifdef TA_NPCSYS
-	,
-	"OBJECT_TAUNT",
-	"OBJECT_ATTACK_FAR",
-	"OBJECT_ATTACK_MELEE",
-	"OBJECT_STANDING_ACTIVE",
-	"OBJECT_WALK",
-	"OBJECT_RUN",
-	"OBJECT_BACKPEDAL",
-	"OBJECT_JUMP"
-//#endif
-};
+extern const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS];
 
-static qboolean Sounds_Parse(char **p, bg_npcinfo_t *npcinfo) {
-	char *token;
-	int i;
-
-	token = COM_ParseExt(p, qtrue);
-	if (token[0] != '{') {
-		return qfalse;
-	}
-
-	while ( 1 ) {
-		token = COM_ParseExt(p, qtrue);
-
-		if (Q_stricmp(token, "}") == 0) {
-			return qtrue;
-		}
-
-		if ( !token || token[0] == 0 ) {
-			return qfalse;
-		}
-
-		for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
-		{
-			if (Q_stricmp(token, misc_object_anim_names[i]) == 0) {
-				// Found anim
-				// ZTM: TODO: Load sound info
-				break;
-			}
-		}
-		// Found anim
-		if (i < MAX_MISC_OBJECT_ANIMATIONS) {
-			continue;
-		}
-
-		Com_Printf( "unknown token '%s' in sounds %s\n", token, npcinfo->classname );
-	}
-	Com_Printf( "sounds block not closed in %s\n", npcinfo->classname );
-	return qfalse;
-}
-
-static int NPC_Parse(char **p, const char *classname) {
+static qboolean NPC_Parse(char **p) {
 	char *token;
 	bg_npcinfo_t npc;
 	animation_t *animations;
@@ -3325,8 +3264,6 @@ static int NPC_Parse(char **p, const char *classname) {
 	npc.maxs[2] = 10.0f;
 
 	npc.viewheight = 5; // middle of default bounding box
-	npc.lerpframes = 1;
-	npc.scale = 1.0f;
 
 	animations = npc.animations;
 
@@ -3342,28 +3279,18 @@ static int NPC_Parse(char **p, const char *classname) {
 		animations[i].flipflop = 0;
 	}
 
-	// Force classname for misc_objects
-	if (classname)
-	{
-		Com_sprintf(npc.classname, sizeof (npc.classname), "%s", classname);
-
-		Com_sprintf( npc.model, sizeof( npc.model ), "%s.md3", classname);
+	token = COM_ParseExt(p, qtrue);
+	if ( !*token ) {
+		Com_Printf("Warning: projectile missing name\n");
+		return qfalse;
 	}
-	else
-	{
-		token = COM_ParseExt(p, qtrue);
-		if ( !*token ) {
-			Com_Printf("Warning: npc missing name\n");
-			return qfalse;
-		}
-		Com_sprintf(npc.classname, sizeof (npc.classname), "%s", token);
+	Com_sprintf(npc.classname, sizeof (npc.classname), "%s", token);
 
-		//Com_Printf("Loading npc [%s] ...\n", npc.classname);
+	//Com_Printf("Loading npc [%s] ...\n", npc.name);
 
-		// Default model name
-		Com_sprintf( npc.model, sizeof( npc.model ), "models/npc/%s/%s.md3",
-				&npc.classname[4], &npc.classname[4]);
-	}
+	// Default model name
+	Com_sprintf( npc.model, sizeof( npc.model ), "models/npc/%s/%s.md3",
+			&npc.classname[4], &npc.classname[4]);
 
 	token = COM_ParseExt(p, qtrue);
 
@@ -3384,14 +3311,14 @@ static int NPC_Parse(char **p, const char *classname) {
 
 			Com_Memcpy(&bg_npcinfo[num], &npc, sizeof (npc));
 			//Com_Printf("Loaded npc [%s]\n", npc.name);
-			return num;
+			return qtrue;
 		}
 
 		if ( !token || token[0] == 0 ) {
 			return qfalse;
 		}
 
-		if ( !Q_stricmp( token, "clone" )) {
+		if ( !Q_stricmp( token, "clone" ) ) {
 			char name[MAX_QPATH]; // Save name
 			int num;
 			token = COM_Parse( p );
@@ -3509,47 +3436,6 @@ static int NPC_Parse(char **p, const char *classname) {
 			}
 			continue;
 		}
-		else if ( !Q_stricmp( token, "wait" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			// store wait
-			npc.wait = atoi(token);
-			continue;
-		}
-		else if ( !Q_stricmp( token, "speed" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			// store speed
-			npc.speed = atof(token);
-			continue;
-		}
-		else if ( !Q_stricmp( token, "lerpframes" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			// store whether to lerpframes
-			npc.lerpframes = atoi(token);
-			continue;
-		}
-		else if ( !Q_stricmp( token, "scale" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			npc.scale = atof(token);
-			continue;
-		}
-		else if ( Q_stricmp( token, "sounds" ) == 0 ) {
-			if (Sounds_Parse(p, &npc))
-			{
-				continue;
-			}
-		}
 		else
 		{
 			qboolean animName = qfalse;
@@ -3562,7 +3448,7 @@ static int NPC_Parse(char **p, const char *classname) {
 					animName = qtrue;
 					if (BG_LoadAnimation(p, i, animations, NULL) != 1)
 					{
-						Com_Printf("NPC_Parse: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
+						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
 					}
 					break;
 				}
@@ -3614,7 +3500,8 @@ qboolean BG_ParseNpcInfoFile( const char *filename ) {
 		}
 
 		if ( Q_stricmp( token, "npc" ) == 0 ) {
-			if (!NPC_Parse(&text_p, NULL)) {
+			if (!NPC_Parse(&text_p))
+{
 				break;
 			}
 		} else {
@@ -3666,57 +3553,6 @@ void BG_InitNPCInfo(void)
 
 	// Done setting up the NPC system.
 	bg_npcsys_init = qtrue;
-}
-#endif
-
-#ifdef TA_ENTSYS // MISC_OBJECT
-bg_npcinfo_t *BG_ParseObjectCFGFile(const char *filename)
-{
-	char		*text_p;
-	int			len;
-	char		text[20000];
-	fileHandle_t	f;
-	bg_npcinfo_t *npcinfo;
-	int index;
-
-	// hack
-	if (!bg_npcsys_init)
-	{
-		// Doh!
-		BG_InitNPCInfo();
-	}
-
-	// Check if already loaded.
-	index = BG_NPCIndexForName(filename);
-	if (index != 0)
-	{
-		npcinfo = &bg_npcinfo[index];
-		return npcinfo;
-	}
-
-	// load the file
-	len = trap_FS_FOpenFile( filename, &f, FS_READ );
-	if ( len <= 0 ) {
-		return NULL;
-	}
-	if ( len >= sizeof( text ) - 1 ) {
-		Com_Printf( "File %s too long\n", filename );
-		trap_FS_FCloseFile( f );
-		return NULL;
-	}
-	trap_FS_Read( text, len, f );
-	text[len] = 0;
-	trap_FS_FCloseFile( f );
-
-	// parse the text
-	text_p = text;
-	bg_npcsys_init = qfalse; // hack
-	index = NPC_Parse(&text_p, filename);
-	bg_npcsys_init = qtrue; // hack
-
-	// Get the info
-	npcinfo = &bg_npcinfo[index];
-	return npcinfo;
 }
 #endif
 
@@ -6190,6 +6026,240 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 			playercfg->default_weapon = BG_WeaponGroupIndexForName("wp_lasergun");
 	}
 #endif
+
+	return qtrue;
+}
+#endif
+
+#ifdef TA_ENTSYS // MISC_OBJECT
+const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
+{
+	"OBJECT_IDLE",
+	"OBJECT_DEATH1",
+	"OBJECT_DEATH2",
+	"OBJECT_DEATH3",
+	"OBJECT_DEAD1",
+	"OBJECT_DEAD2",
+	"OBJECT_DEAD3",
+	"OBJECT_LAND",
+	"OBJECT_PAIN"
+#ifdef TA_NPCSYS
+	,
+	"OBJECT_TAUNT",
+	"OBJECT_ATTACK_FAR",
+	"OBJECT_ATTACK_MELEE",
+	"OBJECT_STANDING_ACTIVE",
+	"OBJECT_WALK",
+	"OBJECT_RUN",
+	"OBJECT_BACKPEDAL",
+	"OBJECT_JUMP"
+#endif
+};
+
+static qboolean Sounds_Parse(char **p, const char *name, bg_objectcfg_t *objectcfg) {
+	char *token;
+	int i;
+
+	token = COM_ParseExt(p, qtrue);
+	if (token[0] != '{') {
+		return qfalse;
+	}
+
+	while ( 1 ) {
+		token = COM_ParseExt(p, qtrue);
+
+		if (Q_stricmp(token, "}") == 0) {
+			return qtrue;
+		}
+
+		if ( !token || token[0] == 0 ) {
+			return qfalse;
+		}
+
+		for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
+		{
+			if (Q_stricmp(token, misc_object_anim_names[i]) == 0) {
+				// Found anim
+				// Load sound info
+				break;
+			}
+		}
+		// Found anim
+		if (i < MAX_MISC_OBJECT_ANIMATIONS) {
+			continue;
+		}
+
+		Com_Printf( "unknown token '%s' in sounds %s\n", token, name );
+	}
+	Com_Printf( "sounds block not closed in %s\n", name );
+	return qfalse;
+}
+
+/*
+// example file for misc_object
+boundingbox -16 -16 0 16 16 32
+health 15
+wait 0
+speed 1
+lerpframes 1
+OBJECT_IDLE 0 10 10 10
+OBJECT_DEATH1 20 10 0 10
+OBJECT_DEATH2 30 10 0 10
+OBJECT_DEATH3 40 10 0 10
+OBJECT_DEAD1 50 10 0 10
+*/
+
+/*
+===============
+BG_ParseObjectCFGFile
+===============
+*/
+qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
+{
+	char		*text_p, *prev;
+	int			len;
+	int			i;
+	char		*token;
+	char		text[20000];
+	fileHandle_t	f;
+	animation_t *animations;
+
+	if (!objectcfg) {
+		return qfalse;
+	}
+
+	// Default boundingbox
+	objectcfg->bbmins[0] = objectcfg->bbmins[1] = -5.0f;
+	objectcfg->bbmins[2] = 0.0f;
+
+	objectcfg->bbmaxs[0] = objectcfg->bbmaxs[1] = 5.0f;
+	objectcfg->bbmaxs[2] = 10.0f;
+
+	animations = objectcfg->animations;
+
+	// Use first frame for all animations.
+	for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
+	{
+		animations[i].firstFrame = 0;
+		animations[i].numFrames = 1;
+		animations[i].loopFrames = 0;
+		animations[i].frameLerp = 100; // 10 fps
+		animations[i].initialLerp = 100; // 10 fps
+		animations[i].reversed = 0;
+		animations[i].flipflop = 0;
+	}
+
+	// load the file
+	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+	if ( len <= 0 ) {
+		return qfalse;
+	}
+	if ( len >= sizeof( text ) - 1 ) {
+		Com_Printf( "File %s too long\n", filename );
+		trap_FS_FCloseFile( f );
+		return qfalse;
+	}
+	trap_FS_Read( text, len, f );
+	text[len] = 0;
+	trap_FS_FCloseFile( f );
+
+	// parse the text
+	text_p = text;
+
+	// read optional parameters
+	while ( 1 ) {
+		prev = text_p;	// so we can unget
+		token = COM_Parse( &text_p );
+		if ( !*token ) {
+			break;
+		}
+		// boundingbox -15 -15 -24 15 15 32
+		else if ( !Q_stricmp( token, "boundingbox" ) ) {
+			for ( i = 0 ; i < 3 ; i++ ) {
+				token = COM_Parse( &text_p );
+				if ( !*token ) {
+					break;
+				}
+				objectcfg->bbmins[i] = atof( token );
+			}
+			if (i == 3) // found all tokens
+			{
+				for ( i = 0 ; i < 3 ; i++ ) {
+					token = COM_Parse( &text_p );
+					if ( !*token ) {
+						break;
+					}
+					objectcfg->bbmaxs[i] = atof( token );
+				}
+			}
+			continue;
+		}
+		// spawnhealth
+		else if ( !Q_stricmp( token, "health" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			// store health
+			objectcfg->health = atoi(token);
+			continue;
+		}
+		else if ( !Q_stricmp( token, "wait" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			// store wait
+			objectcfg->wait = atoi(token);
+			continue;
+		}
+		else if ( !Q_stricmp( token, "speed" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			// store speed
+			objectcfg->speed = atof(token);
+			continue;
+			}
+		else if ( !Q_stricmp( token, "lerpframes" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+		}
+			// store whether to lerpframes
+			objectcfg->lerpframes = atoi(token);
+			continue;
+		}
+		else if ( Q_stricmp( token, "sounds" ) == 0 ) {
+			if (Sounds_Parse(&text_p, filename, objectcfg))
+			{
+			continue;
+		}
+		}
+		else
+		{
+			qboolean animName = qfalse;
+
+		// ZTM: New animation loading.
+			for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
+		{
+				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
+				{
+					animName = qtrue;
+					if (BG_LoadAnimation(&text_p, i, animations, NULL) != 1)
+					{
+						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
+					}
+					break;
+				}
+			}
+			if (animName)
+				continue;
+		}
+
+		Com_Printf( "unknown token '%s' in %s\n", token, filename );
+	}
 
 	return qtrue;
 }
