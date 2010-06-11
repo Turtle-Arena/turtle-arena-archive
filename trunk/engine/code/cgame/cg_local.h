@@ -218,7 +218,6 @@ typedef struct
 
 	// Sounds
 	int				lastSoundFrame;
-	bg_sounds_t		sounds;
 
 	int				flags; // Special flags.
 } objectEntity_t;
@@ -244,7 +243,7 @@ typedef struct centity_s {
 
 	playerEntity_t	pe;
 #ifdef TA_ENTSYS // MISC_OBJECT
-	bg_objectcfg_t	objectcfg;
+	bg_npcinfo_t	*npcinfo;
 	objectEntity_t	oe; // misc_object/NPC data
 #endif
 
