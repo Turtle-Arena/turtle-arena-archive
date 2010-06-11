@@ -1243,63 +1243,6 @@ typedef struct
 extern materialInfo_t materialInfo[NUM_MATERIAL_TYPES];
 #endif
 
-#ifdef TA_ENTSYS // MISC_OBJECT
-// TA_NPCSYS: Have Misc_Objects and NPCs use the same animations
-// Keep in sycn with CG's misc_object_anim_names
-typedef enum
-{
-	OBJECT_NONE = -1, // Just one frame, 0.
-
-	// Misc_object: Undamaged.
-	// NPC: Standing; Unaware of player(s)
-	OBJECT_IDLE,
-
-	// Misc_object: Damage levels and random dead animation
-	// NPC: Death and dead.
-	OBJECT_DEATH1,
-	OBJECT_DEATH2,
-	OBJECT_DEATH3,
-	OBJECT_DEAD1,
-	OBJECT_DEAD2,
-	OBJECT_DEAD3,
-
-	OBJECT_LAND, // ZTM: TODO: misc_object hit ground.
-	OBJECT_PAIN, // ZTM: TODO: "Pain" animation of misc_object with no health (Dead).
-
-#ifdef TA_NPCSYS
-	// Animations only used by NPCs
-	OBJECT_TAUNT,
-	OBJECT_ATTACK_FAR,
-	OBJECT_ATTACK_MELEE,
-	OBJECT_STANDING_ACTIVE,
-	OBJECT_WALK,
-	OBJECT_RUN,
-	OBJECT_BACKPEDAL,
-	OBJECT_JUMP,
-#endif
-
-	MAX_MISC_OBJECT_ANIMATIONS
-} miscObjectAnim_t;
-
-// ZTM: TODO: Sounds like Jedi Knight 2's animsounds.cfg, see Sounds_Parse
-//   Only cgame and ui need this, game doesn't use sounds.
-#define MAX_RAND_SOUNDS 5
-typedef struct
-{
-	int anim; // Such as value of BOTH_DEATH1
-	int frame;
-	int numSounds; // play sounds[rand()%numSounds]
-	sfxHandle_t sounds[MAX_RAND_SOUNDS]; // Play random sound
-	int chance; // 0 = always, 100 = never { if (rand()%100 >= chance; play sound; }
-} bg_sound_t;
-
-// Currently not used by players...
-#define MAX_BG_SOUNDS MAX_ANIMATIONS
-//#define MAX_BG_SOUNDS MAX_MISC_OBJECT_ANIMATIONS*2
-typedef bg_sound_t bg_sounds_t[MAX_BG_SOUNDS];
-#endif
-
-
 typedef struct animation_s {
 	int		firstFrame;
 	int		numFrames;
@@ -1452,31 +1395,6 @@ typedef struct bg_playercfg_s
 int BG_AnimationTime(animation_t *anim);
 int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip);
 qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, const char *headModel);
-
-#ifdef TA_ENTSYS
-typedef struct
-{
-	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
-
-	// Object's boundingbox
-	vec3_t bbmins;
-	vec3_t bbmaxs;
-	int health;
-	int wait;
-	float speed;
-	int lerpframes; // Use raw frames, don't interperate them.
-
-	// ZTM: TODO: For NPCs
-	// Speed control, some characters are faster then others.
-	//int   max_speed;
-	//float accelerate_speed; // Replaces pm_accelerate; default 10.0f
-	//float accelstart;
-
-} bg_objectcfg_t;
-
-// Use for loading misc_object animations
-qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg);
-#endif
 #endif
 
 #ifdef TA_PLAYERSYS // Moved below bg_playercfg_t
@@ -1515,6 +1433,59 @@ typedef enum {
 #endif
 } weaponstate_t;
 
+#ifdef TA_ENTSYS // MISC_OBJECT
+// TA_NPCSYS: Have Misc_Objects and NPCs use the same animations
+// Keep in sycn with CG's misc_object_anim_names
+typedef enum
+{
+	OBJECT_NONE = -1, // Just one frame, 0.
+
+	// Misc_object: Undamaged.
+	// NPC: Standing; Unaware of player(s)
+	OBJECT_IDLE,
+
+	// Misc_object: Damage levels and random dead animation
+	// NPC: Death and dead.
+	OBJECT_DEATH1,
+	OBJECT_DEATH2,
+	OBJECT_DEATH3,
+	OBJECT_DEAD1,
+	OBJECT_DEAD2,
+	OBJECT_DEAD3,
+
+	OBJECT_LAND, // ZTM: TODO: misc_object hit ground.
+	OBJECT_PAIN, // ZTM: TODO: "Pain" animation of misc_object with no health (Dead).
+
+//#ifdef TA_NPCSYS
+	// Animations only used by NPCs
+	OBJECT_TAUNT,
+	OBJECT_ATTACK_FAR,
+	OBJECT_ATTACK_MELEE,
+	OBJECT_STANDING_ACTIVE,
+	OBJECT_WALK,
+	OBJECT_RUN,
+	OBJECT_BACKPEDAL,
+	OBJECT_JUMP,
+//#endif
+
+	MAX_MISC_OBJECT_ANIMATIONS
+} miscObjectAnim_t;
+
+// ZTM: TODO: Sounds like Jedi Knight 2's animsounds.cfg, see Sounds_Parse
+//   Only cgame and ui need this, game doesn't use sounds.
+#define MAX_RAND_SOUNDS 5
+typedef struct
+{
+	int anim; // Such as value of BOTH_DEATH1
+	int frame;
+	int numSounds; // play sounds[rand()%numSounds]
+	sfxHandle_t sounds[MAX_RAND_SOUNDS]; // Play random sound
+	int chance; // 0 = always, 100 = never { if (rand()%100 >= chance; play sound; }
+} bg_sound_t;
+
+#define MAX_BG_SOUNDS MAX_MISC_OBJECT_ANIMATIONS*2
+typedef bg_sound_t bg_sounds_t[MAX_BG_SOUNDS];
+
 #ifdef TA_NPCSYS
 // ZTM: Flags for general NPC effects.
 typedef enum
@@ -1530,6 +1501,7 @@ typedef enum
 	NPCF_LAST // dummy flag
 
 } npcflag_e;
+#endif
 
 // ZTM: General death types.
 typedef enum
@@ -1542,19 +1514,31 @@ typedef enum
 	NPCD_MAX
 } npcDeath_e;
 
-#define MAX_NPCNAME 32
+#define MAX_NPCNAME MAX_QPATH // TA_ENTSYS needs full path for misc_object
 typedef struct
 {
+	// misc_object and NPCs
 	char classname[MAX_NPCNAME];
-	char model[MAX_QPATH];
-	int weaponGroup; // ZTM: weapon group to hold/use
-	int flags; // see npcflag_e
 	int deathType; // see npcDeath_e
 	int health;
-	int viewheight;
 	vec3_t mins, maxs;
 	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
+	int lerpframes; // if 0; use raw frames, don't interperate them.
+	bg_sounds_t		sounds;
+	float scale; // Uniform scale
+
+	// ZTM: TODO: Use for NPCs too?
+	int wait; // Respawn time
+	float speed; // Speed increase
+
+//#ifdef TA_NPCSYS
+	// NPC-only
+	char model[MAX_QPATH];
+	int flags; // see npcflag_e
+	int weaponGroup; // ZTM: weapon group to hold/use
+	int viewheight;
 	int handSide[MAX_HANDS];
+//#endif
 
 } bg_npcinfo_t;
 
@@ -1564,6 +1548,7 @@ int BG_NPCIndexForName(const char *name);
 int BG_NumNPCs(void);
 void BG_InitNPCInfo(void);
 
+#ifdef TA_NPCSYS
 typedef enum
 {
 	NACT_IDLE,
@@ -1587,6 +1572,10 @@ typedef struct
 	vec3_t		actionPos; // Position used by action
 
 } bg_npc_t;
+#endif
+
+// MISC_OBJECT
+bg_npcinfo_t *BG_ParseObjectCFGFile(const char *filename);
 #endif
 
 // pmove->pm_flags

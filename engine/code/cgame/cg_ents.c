@@ -272,11 +272,11 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 
 #if 0
 			// Do we need to clear it?
-			BG_ClearLerpFrame( &cent->oe.lerp, cent->objectcfg.animations, cent->oe.anim, cg.time);
+			BG_ClearLerpFrame( &cent->oe.lerp, cent->npcinfo->animations, cent->oe.anim, cg.time);
 #endif
 		}
 
-		BG_RunLerpFrame( &cent->oe.lerp, cent->objectcfg.animations, cent->oe.anim,
+		BG_RunLerpFrame( &cent->oe.lerp, cent->npcinfo->animations, cent->oe.anim,
 			cg.time, cent->oe.speed );
 
 		// If we didn't play a sound this frame
@@ -290,31 +290,31 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 			// Check if we need to play a sound.
 			for (i = 0; i < MAX_BG_SOUNDS; i++)
 			{
-				if (!cent->oe.sounds[i].numSounds)
+				if (!cent->npcinfo->sounds[i].numSounds)
 					continue;
-				if (cent->oe.sounds[i].anim != cent->oe.anim)
+				if (cent->npcinfo->sounds[i].anim != cent->oe.anim)
 					continue;
-				if ((cent->objectcfg.animations[cent->oe.anim].firstFrame +
-					cent->oe.sounds[i].frame) != cent->oe.lerp.frame)
+				if ((cent->npcinfo->animations[cent->oe.anim].firstFrame +
+					cent->npcinfo->sounds[i].frame) != cent->oe.lerp.frame)
 				{
 					continue;
 				}
 				//
-				if (rand()%100 < cent->oe.sounds[i].chance)
+				if (rand()%100 < cent->npcinfo->sounds[i].chance)
 				{
 					continue;
 				}
 
 				// Found sound to play
-				snd = rand() % cent->oe.sounds[i].numSounds;
-				trap_S_StartSound(NULL, cent->currentState.number, CHAN_BODY, cent->oe.sounds[i].sounds[snd]);
+				snd = rand() % cent->npcinfo->sounds[i].numSounds;
+				trap_S_StartSound(NULL, cent->currentState.number, CHAN_BODY, cent->npcinfo->sounds[i].sounds[snd]);
 				cent->oe.lastSoundFrame = cent->oe.lerp.frame;
 				break;
 			}
 		}
 
 		*frame = cent->oe.lerp.frame;
-		if (cent->objectcfg.lerpframes == 0)
+		if (cent->npcinfo->lerpframes == 0)
 		{
 			*oldframe = *frame;
 			*backlerp = 0;
@@ -323,8 +323,8 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 		{
 			*oldframe = cent->oe.lerp.oldFrame;
 			*backlerp = cent->oe.lerp.backlerp;
+		}
 	}
-}
 }
 
 // TODO: Make this / G_SetFileExt be Com_SetFileExt ?
@@ -395,11 +395,11 @@ static void CG_MiscObject( centity_t *cent ) {
 
 		CG_SetFileExt(filename, ".cfg");
 
-		if (BG_ParseObjectCFGFile(filename, &cent->objectcfg))
+		if ((cent->npcinfo = BG_ParseObjectCFGFile(filename)) != NULL)
 		{
 			// Loaded file.
 			cent->oe.anim = 0;
-			BG_ClearLerpFrame( &cent->oe.lerp, cent->objectcfg.animations, cent->oe.anim, cg.time);
+			BG_ClearLerpFrame( &cent->oe.lerp, cent->npcinfo->animations, cent->oe.anim, cg.time);
 		}
 		else
 		{
@@ -409,13 +409,15 @@ static void CG_MiscObject( centity_t *cent ) {
 		}
 	}
 
+	scale = cent->npcinfo->scale;
+
 #if 0 // Sprite misc_objects and NPCs?
 	if ( isNPC && !cg_npcs[ s1->modelindex ].model )
 	{
 		memset( &ent, 0, sizeof( ent ) );
 		ent.reType = RT_SPRITE;
 		VectorCopy( cent->lerpOrigin, ent.origin );
-		ent.radius = 14;
+		ent.radius = 14*scale;
 		ent.customShader = cg_npcs[ es->modelindex ].sprite;
 		ent.shaderRGBA[0] = 255;
 		ent.shaderRGBA[1] = 255;
