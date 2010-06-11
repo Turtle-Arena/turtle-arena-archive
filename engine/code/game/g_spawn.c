@@ -302,6 +302,7 @@ spawn_t	spawns[] = {
 	{"misc_teleporter_dest", SP_misc_teleporter_dest},
 	{"misc_model", SP_misc_model},
 #ifdef TA_ENTSYS // MISC_OBJECT
+	{"misc_gamemodel", SP_misc_object}, // Shows model in NetRadiant
 	{"misc_object", SP_misc_object},
 #endif
 	{"misc_portal_surface", SP_misc_portal_surface},
