@@ -910,47 +910,48 @@ void SP_misc_object( gentity_t *ent ) {
 	// Use a animation config file!
 	{
 		char filename[MAX_QPATH];
-		bg_npcinfo_t *npcinfo = NULL; // ZTM: TODO: Move to gentity_s ?
+		bg_objectcfg_t objectcfg; // ZTM: TODO: Move to gentity_s ?
 
+		Com_Memset(&objectcfg, 0, sizeof (objectcfg));
+
+		// !! It took forever to find why bounding box wasn't loaded, there was
+		//    no config filename !!
 		trap_GetConfigstring( CS_MODELS + G_ModelIndex( ent->model ), filename, sizeof(filename));
 
-		if (filename[0] == '\0') {
+		if (filename[0] == '\0')
+		{
 			G_Printf("DEBUG: Missing filename for misc_object model!\n");
-		} else {
+		}
+		else
+		{
 			G_SetFileExt(filename, ".cfg");
 		}
 
-		npcinfo = BG_ParseObjectCFGFile(filename);
-
-		if (!npcinfo)
-		{
-			G_Printf("DEBUG: npcinfo is NULL!\n");
-			return;
-		}
+		BG_ParseObjectCFGFile(filename, &objectcfg);
 
 		// The data in this entity over-rides the cfg file.
 		if (!entHealth)
 		{
 			// Use health from cfg.
-			ent->health = npcinfo->health;
+			ent->health = objectcfg.health;
 		}
 		if (!entWait)
 		{
 			// Use wait from cfg.
-			ent->wait = npcinfo->wait;
+			ent->wait = objectcfg.wait;
 		}
 		if (!entSpeed)
 		{
 			// Use speed from cfg.
-			ent->speed = npcinfo->speed;
+			ent->speed = objectcfg.speed;
 		}
 		if (!entMins)
 		{
-			VectorCopy(npcinfo->mins, ent->r.mins);
+			VectorCopy(objectcfg.bbmins, ent->r.mins);
 		}
 		if (!entMaxs)
 		{
-			VectorCopy(npcinfo->maxs, ent->r.maxs);
+			VectorCopy(objectcfg.bbmaxs, ent->r.maxs);
 		}
 
 		if (ent->speed < 1.0f)
