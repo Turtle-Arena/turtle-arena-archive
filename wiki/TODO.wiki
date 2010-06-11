@@ -175,6 +175,9 @@ Weapons (and attacking)
 
   * BUG: Loading player animations using animation names doesn't work.
 
+  * TODO: Add new entity to take damage and give it to a targeted entity.
+    * Allow bushes to be used for cars (and other others) oddly shaped collision box
+
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
     * (NiGHTS: Journey of Dreams) Move camera if holding 'z' and move analog stick, can't look around while moving
