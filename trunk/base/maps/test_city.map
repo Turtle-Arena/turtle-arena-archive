@@ -1058,7 +1058,6 @@ city/road
 "classname" "misc_gamemodel"
 "origin" "151.999924 -291.480652 4.000008"
 "model" "models/mapobjects/car/car.md3"
-"modelscale" "3.000000"
 "angles" "-0.000000 89.999992 3.722170"
 }
 // entity 16
@@ -1066,7 +1065,6 @@ city/road
 "classname" "misc_gamemodel"
 "origin" "-464.000153 -680.000061 3.998982"
 "model" "models/mapobjects/car/car.md3"
-"modelscale" "3.000000"
 "angles" "-0.000000 -89.999992 3.722170"
 }
 // entity 17
@@ -1074,6 +1072,5 @@ city/road
 "classname" "misc_gamemodel"
 "origin" "-463.999939 -423.999878 3.999006"
 "model" "models/mapobjects/car/car.md3"
-"modelscale" "3.000000"
 "angles" "-0.000000 -89.999992 3.722170"
 }
