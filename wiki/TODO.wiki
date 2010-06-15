@@ -4,7 +4,7 @@
 *Turtle Arena TODO and BUGS*
 
 = Roadmap =
-== 0.2 ==
+== 0.2 (Completed) ==
 First stable playable release.
 
   * Standalone from Quake III: Arena
@@ -177,6 +177,10 @@ Weapons (and attacking)
 
   * TODO: Add new entity to take damage and give it to a targeted entity.
     * Allow bushes to be used for cars (and other others) oddly shaped collision box
+
+  * TODO: Improve misc object physics. (Use code from Q3Rally? bg_physics.c/h)
+
+  * TODO: Driveable vehicles. (Base on Q3Rally)
 
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
