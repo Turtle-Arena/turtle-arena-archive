@@ -625,6 +625,16 @@ static void CG_Item( centity_t *cent ) {
 #endif
 	{
 		memset( &ent, 0, sizeof( ent ) );
+
+#ifdef IOQ3ZTM // RENDERFLAGS
+		// Flags for only drawing or not drawing a object in mirrors
+		if (cent->currentState.eFlags & EF_ONLY_MIRROR) {
+			ent.renderfx |= RF_ONLY_MIRROR;
+		} else if (cent->currentState.eFlags & EF_NOT_MIRROR) {
+			ent.renderfx |= RF_NOT_MIRROR;
+		}
+#endif
+
 		ent.reType = RT_SPRITE;
 		VectorCopy( cent->lerpOrigin, ent.origin );
 		ent.radius = 14;
@@ -765,15 +775,14 @@ static void CG_Item( centity_t *cent ) {
 	}
 #endif
 
+#ifdef IOQ3ZTM // RENDERFLAGS
 	// Flags for only drawing or not drawing a object in mirrors
-	if (cent->currentState.eFlags & EF_ONLY_MIRROR)
-	{
+	if (cent->currentState.eFlags & EF_ONLY_MIRROR) {
 		ent.renderfx |= RF_ONLY_MIRROR;
-	}
-	else if (cent->currentState.eFlags & EF_NOT_MIRROR)
-	{
+	} else if (cent->currentState.eFlags & EF_NOT_MIRROR) {
 		ent.renderfx |= RF_NOT_MIRROR;
 	}
+#endif
 
 	// increase the size of the weapons when they are presented as items
 	if ( item->giType == IT_WEAPON ) {
