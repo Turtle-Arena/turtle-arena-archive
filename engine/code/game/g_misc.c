@@ -848,9 +848,8 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 			G_SetOrigin( ent, tr.endpos );
 		}
 
-		// ZTM: TODO: Have gravity/pushable spawnflag?
-		//ent->s.pos.trType = TR_GRAVITY;
-		//ent->s.pos.trTime = level.time;
+		ent->s.pos.trType = TR_GRAVITY;
+		ent->s.pos.trTime = level.time;
 	}
 
 	ent->activator = owner;
