@@ -5,7 +5,7 @@
 The weapon system used in Turtle Arena;
 
   * *TA_WEAPSYS define*
-  * Loads weapons from external text files ([http://turtlearena.googlecode.com/svn/trunk/base/scripts/weaponinfo.txt scripts/weaponinfo.txt] and scripts/?.weap files)
+  * Loads weapons from external text files (`[http://turtlearena.googlecode.com/svn/trunk/base/scripts/weaponinfo.txt scripts/weaponinfo.txt]` and `scripts/*.weap` files)
   * Supports melee and projectile weapons
   * Per-player default weapon (Set in player's animation.cfg)
   * Allows for easy modification and custom default weapons, or new weapons for custom maps.
@@ -24,7 +24,7 @@ The weapon system used in Turtle Arena;
 = Definitions =
 There are weapon groups, weapons, and projectiles.
 
-  * *Weapon Groups* contain the item, ammo, and player animation info and points to 1 or 2 weapon infos (for the primary and secodary hands).
+  * *Weapon Groups* contain the item, ammo, and player animation info and points to one to two weapon infos (for the primary and secodary hands).
   * *Weapons* contain the weapon type, model, wall mark, blades or projectile, and other settings.
   * *Projectiles* contain damage, trail type, wall mark, and other settings. Projectiles are only used by guns.
 
