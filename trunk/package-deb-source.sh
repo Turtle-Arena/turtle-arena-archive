@@ -22,7 +22,7 @@ ENGINE_DEB_CONFIG=debian_main/engine/debian
 
 GAMENAME="turtlearena"
 # Version (Current Turtle Arena version)
-VERSION=0.2
+VERSION=0.3
 # For debian only fixes/changes update DEB_VERSION "turtlearena_$VERSION-$DATA_DEB_VERSION"
 DATA_DEB_VERSION=1
 ENGINE_DEB_VERSION=1

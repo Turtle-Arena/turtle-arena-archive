@@ -12,7 +12,7 @@ STARTDIR=`pwd`
 INSTALLDIR=install
 
 # Version (Current Turtle Arena version)
-VERSION=0.2
+VERSION=0.3
 # For deb only fixes/changes update DEB_VERSION "turtlearena_$VERSION-$*DEB_VERSION"
 CLIENT_DEB_VERSION=1
 DATA_DEB_VERSION=1
