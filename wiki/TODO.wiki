@@ -108,8 +108,6 @@ Weapons (and attacking)
 
   * TODO: When there are multiple ghost models they may not be sorted into correct order?
 
-  * BUG: Sky doesn't render correctly in mirrors when holding CTF flag
-
 == UI ==
   * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?
 

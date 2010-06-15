@@ -402,6 +402,7 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean fo
 		qhandle_t		skin;
 
 		VectorClear( angles );
+		angles[YAW] = 60 * sin( cg.time / 2000.0 );
 
 		model = cg_items[ itemIndex ].models[0];
 		skin = cg_items[ itemIndex ].skin;
@@ -421,9 +422,6 @@ void CG_DrawFlagModel( float x, float y, float w, float h, int team, qboolean fo
 
 		// Draw flag flap
 		model = cg_items[ itemIndex ].models[1];
-		skin = cg_items[ itemIndex ].skin;
-
-		angles[YAW] = 60 * sin( cg.time / 2000.0 );
 
 		CG_Draw3DModel( x, y, w, h, model, skin, origin, angles );
 	}
@@ -736,8 +734,6 @@ static void CG_DrawStatusBar( void ) {
 
 	VectorClear( angles );
 
-	CG_DrawStatusBarHead( x + HUD_HEAD_OFFSET_X);
-
 	if( cg.predictedPlayerState.powerups[PW_REDFLAG] ) {
 		CG_DrawStatusBarFlag( x + HUD_WIDTH + TEXT_ICON_SPACE, TEAM_RED );
 	} else if( cg.predictedPlayerState.powerups[PW_BLUEFLAG] ) {
@@ -745,6 +741,8 @@ static void CG_DrawStatusBar( void ) {
 	} else if( cg.predictedPlayerState.powerups[PW_NEUTRALFLAG] ) {
 		CG_DrawStatusBarFlag( x + HUD_WIDTH + TEXT_ICON_SPACE, TEAM_FREE );
 	}
+
+	CG_DrawStatusBarHead( x + HUD_HEAD_OFFSET_X);
 
 	y += 2;
 
