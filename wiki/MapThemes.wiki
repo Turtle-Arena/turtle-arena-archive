@@ -12,19 +12,21 @@ Ninja Turtle New York City theme.
 === Aboveground ===
 :Objects
 Vehicles
-  Car (models/mapobjects/car/car.md3)
+  Car (`models/mapobjects/car/car.md3`)
   Var
   Pickup Truck
 Fire Hydrant // All good Turtle games need one.
 Grass
 Plants
 Trees
-Manhole Cover
+
 Street Lights
+Traffic Cone (`models/mapobjects/traffic_cone/traffic_cone*md3`)
 
 :Textures
 Buildings
-Street
+Street (`textures/city/road.png`)
+Manhole Cover (`textures/city/manhole_*.png`)
 
 
 === Underground ===

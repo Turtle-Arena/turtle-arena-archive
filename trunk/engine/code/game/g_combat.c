@@ -1191,7 +1191,11 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		vec3_t	kvel;
 		float	mass;
 
+#ifdef TURTLEARENA // WEAPONS
+		mass = 100;
+#else
 		mass = 200;
+#endif
 
 		VectorScale (dir, g_knockback.value * (float)knockback / mass, kvel);
 		VectorAdd (targ->client->ps.velocity, kvel, targ->client->ps.velocity);
@@ -1218,11 +1222,35 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		vec3_t	kvel;
 		float	mass;
 
+		// Increase knockback with melee weapons
+		if (inflictor == attacker) {
+			knockback *= 2;
+			if (knockback > 200) {
+				knockback = 200;
+			}
+		}
+
+#ifdef TURTLEARENA // WEAPONS
+		mass = 100;
+#else
 		mass = 200;
+#endif
 
 		VectorScale (dir, g_knockback.value * (float)knockback / mass, kvel);
+		kvel[2]  += g_knockback.value * (float)knockback / mass;// Fly into the air
 		VectorAdd (targ->s.pos.trDelta, kvel, targ->s.pos.trDelta);
 		targ->s.pos.trTime = level.time;
+
+		if (targ->s.pos.trType == TR_STATIONARY) {
+			targ->s.pos.trType = TR_GRAVITY;
+		}
+
+#if 0 // ZTM: TODO: Spin angles
+		targ->s.apos.trType = TR_LINEAR_STOP;
+		targ->s.apos.trTime = level.time;
+		targ->s.angles[YAW] += 180.0f*crandom();
+		VectorCopy(targ->s.angles, targ->s.apos.trDelta);
+#endif
 	}
 #endif
 

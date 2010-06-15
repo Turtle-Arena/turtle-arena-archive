@@ -2231,6 +2231,13 @@ int start, end;
 
 #ifdef TA_ENTSYS // MISC_OBJECT
 		if ( ent->s.eType == ET_MISCOBJECT ) {
+#if 0
+			vec3_t angles;
+
+			// get current angles
+			BG_EvaluateTrajectory( &ent->s.apos, level.time, angles );
+			VectorCopy( angles, ent->r.currentAngles );
+#endif
 			G_RunItem( ent );
 			continue;
 		}
