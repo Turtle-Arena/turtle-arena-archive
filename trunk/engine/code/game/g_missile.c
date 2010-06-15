@@ -1352,7 +1352,9 @@ missileImpact:
 	ent->freeAfterEvent = qtrue;
 
 	// change over to a normal entity right at the point of impact
+#ifndef TA_WEAPSYS // Must be after G_RadiusDamage
 	ent->s.eType = ET_GENERAL;
+#endif
 
 	SnapVectorTowards( trace->endpos, ent->s.pos.trBase );	// save net bandwidth
 
@@ -1373,6 +1375,10 @@ missileImpact:
 			}
 		}
 	}
+
+#ifdef TA_WEAPSYS
+	ent->s.eType = ET_GENERAL;
+#endif
 
 	trap_LinkEntity( ent );
 }

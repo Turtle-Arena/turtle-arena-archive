@@ -78,8 +78,6 @@ Weapons (and attacking)
 
   * BUG: Flash origin isn't updated when missing weapon model
 
-  * BUG: ent->s.weapon doesn't always get set for MOD_PROJECTILE_EXPLOSION (... almost dodged ZTM's none)
-
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
 
