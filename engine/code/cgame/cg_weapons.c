@@ -2057,25 +2057,18 @@ localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive, int alpha)
 	re->shaderTime = cg.time / 1000.0f;
 
 	re->radius = 5;
-	//re->customShader = 0;
 	re->shaderRGBA[0] = 0xff;
 	re->shaderRGBA[1] = 0xff;
 	re->shaderRGBA[2] = 0xff;
 	re->shaderRGBA[3] = alpha;
 	re->renderfx |= RF_FORCE_ENT_ALPHA | RF_NOSHADOW;
 
-	le->color[0] = le->color[1] = le->color[2] = 1.0f;
-
-	// ZTM: FIXME: Use alpha?
-	le->color[3] = 1.0f; // (float)((float)alpha / 255.0f);
+	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0f;
 
 	le->pos.trType = TR_LINEAR;
 	le->pos.trTime = cg.time;
 	VectorCopy( refEnt->origin, le->pos.trBase );
 	VectorClear(le->pos.trDelta);
-	//le->pos.trDelta[0] = crandom()*5;
-	//le->pos.trDelta[1] = crandom()*5;
-	//le->pos.trDelta[2] = crandom()*5 + 6;
 
 	return le;
 }
@@ -3049,7 +3042,11 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	}
 
 	hand.hModel = weapon->handsModel;
+#ifdef IOQ3ZTM // RENDERFLAGS
+	hand.renderfx = RF_DEPTHHACK | RF_NOT_MIRROR | RF_MINLIGHT;
+#else
 	hand.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON | RF_MINLIGHT;
+#endif
 
 	// add everything onto the hand
 	CG_AddPlayerWeapon( &hand, ps, &cg.predictedPlayerEntity, ps->persistant[PERS_TEAM] );

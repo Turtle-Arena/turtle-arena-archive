@@ -120,10 +120,6 @@ static void SpecifyServer_Event( void* ptr, int event )
 			if (s_specifyserver.domain.field.buffer[0])
 			{
 				strcpy(buff,s_specifyserver.domain.field.buffer);
-#if 0 // ZTM: FIXME?: Support port? It can't be in fav server address?
-				if (s_specifyserver.port.field.buffer[0])
-					Com_sprintf( buff+strlen(buff), 128, ":%s", s_specifyserver.port.field.buffer );
-#endif
 
 				// From serverinfo
 				{

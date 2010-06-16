@@ -1300,7 +1300,14 @@ void R_AddEntitySurfaces (void) {
 		//
 		// Check the flags to see if we should draw the model.
 		//
-		if ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
+
+		// Skip entities that are only draw in mirrors when not rendering mirror/portal
+		// Don't skip player model when "cg_shadows" is 3 as the shadow can be 
+
+		// If only mirror and not rendering mirror
+		//   and not (player model and shadows 3)
+		if (((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
+			&& !(ent->e.reType == RT_MODEL && (ent->e.renderfx & RF_SHADOW_PLANE)))
 		{
 			continue;
 		}
@@ -1312,9 +1319,7 @@ void R_AddEntitySurfaces (void) {
 		// mirrors, because the true body position will already be drawn
 		//
 #ifdef IOQ3ZTM // RENDERFLAGS
-		if (((ent->e.renderfx & RF_NOT_MIRROR) || (ent->e.renderfx & RF_FIRST_PERSON))
-				&& tr.viewParms.isPortal)
-		{
+		if ((ent->e.renderfx & RF_NOT_MIRROR) && tr.viewParms.isPortal) {
 			continue;
 		}
 #else
@@ -1332,12 +1337,14 @@ void R_AddEntitySurfaces (void) {
 		case RT_LIGHTNING:
 		case RT_RAIL_CORE:
 		case RT_RAIL_RINGS:
+#ifndef IOQ3ZTM // RENDERFLAGS
 			// self blood sprites, talk balloons, etc should not be drawn in the primary
 			// view.  We can't just do this check for all entities, because md3
 			// entities may still want to cast shadows from them
 			if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
 				continue;
 			}
+#endif
 			shader = R_GetShaderByHandle( ent->e.customShader );
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 			R_AddDrawSurf( &entitySurface, shader, R_SpriteFogNum( ent ), 0, R_SortOrder(ent) );
@@ -1363,6 +1370,11 @@ void R_AddEntitySurfaces (void) {
 					R_AddMD3Surfaces( ent );
 					break;
 				case MOD_MD4:
+#ifdef IOQ3ZTM // RENDERFLAGS
+					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
+						break;
+					}
+#endif
 					R_AddAnimSurfaces( ent );
 					break;
 #ifdef RAVENMD4
@@ -1371,12 +1383,23 @@ void R_AddEntitySurfaces (void) {
 					break;
 #endif
 				case MOD_BRUSH:
+#ifdef IOQ3ZTM // RENDERFLAGS
+					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
+						break;
+					}
+#endif
 					R_AddBrushModelSurfaces( ent );
 					break;
 				case MOD_BAD:		// null model axis
+#ifdef IOQ3ZTM // RENDERFLAGS
+					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
+						break;
+					}
+#else
 					if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
 						break;
 					}
+#endif
 					shader = R_GetShaderByHandle( ent->e.customShader );
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 					R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0, R_SortOrder(ent) );
