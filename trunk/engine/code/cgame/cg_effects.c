@@ -588,7 +588,11 @@ void CG_Bleed( vec3_t origin, int entityNum ) {
 
 	// don't show player's own blood in view
 	if ( entityNum == cg.snap->ps.clientNum ) {
+#ifdef IOQ3ZTM // RENDERFLAGS
+		ex->refEntity.renderfx |= RF_ONLY_MIRROR;
+#else
 		ex->refEntity.renderfx |= RF_THIRD_PERSON;
+#endif
 	}
 }
 #endif

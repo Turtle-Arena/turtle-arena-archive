@@ -250,9 +250,16 @@ LogLight
 static void LogLight( trRefEntity_t *ent ) {
 	int	max1, max2;
 
+#ifdef IOQ3ZTM // RENDERFLAGS
+	// Only first person weapon
+	if (!(ent->e.renderfx & RF_DEPTHHACK) || !(ent->e.renderfx & RF_NOT_MIRROR)) {
+		return;
+	}
+#else
 	if ( !(ent->e.renderfx & RF_FIRST_PERSON ) ) {
 		return;
 	}
+#endif
 
 	max1 = ent->ambientLight[0];
 	if ( ent->ambientLight[1] > max1 ) {

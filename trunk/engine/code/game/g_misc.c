@@ -658,18 +658,7 @@ void misc_object_respawn(gentity_t *self)
 	}
 
 	//G_Printf("misc_object_respawn: respawning...\n");
-	if (self->activator->spawnflags & MOBJF_KNOCKBACK)
-	{
-		// ZTM: FIXME: Not right if "self" moved from origin.
-
-		// MOBJ_KNOCKBACK doesn't work with respawning if...
-		//  clone spawning or on train? (or other moving brush?)
-		misc_object_spawn(self->activator, self->activator->s.origin, self->activator->s.angles);
-	}
-	else
-	{
-		misc_object_spawn(self->activator, self->s.origin, self->s.angles);
-	}
+	misc_object_spawn(self->activator, self->activator->s.origin, self->activator->s.angles);
 
 	G_FreeEntity(self);
 }

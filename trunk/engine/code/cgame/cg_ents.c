@@ -221,7 +221,11 @@ static void CG_General( centity_t *cent ) {
 
 	// player model
 	if (s1->number == cg.snap->ps.clientNum) {
+#ifdef IOQ3ZTM // RENDERFLAGS
+		ent.renderfx |= RF_ONLY_MIRROR;
+#else
 		ent.renderfx |= RF_THIRD_PERSON;	// only draw from mirrors
+#endif
 	}
 
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Rotate Team Arena protals.
@@ -457,12 +461,9 @@ static void CG_MiscObject( centity_t *cent ) {
 	}
 
 	// Flags for only drawing or not drawing a object in mirrors
-	if (cent->currentState.eFlags & EF_ONLY_MIRROR)
-	{
+	if (cent->currentState.eFlags & EF_ONLY_MIRROR) {
 		ent.renderfx |= RF_ONLY_MIRROR;
-	}
-	else if (cent->currentState.eFlags & EF_NOT_MIRROR)
-	{
+	} else if (cent->currentState.eFlags & EF_NOT_MIRROR) {
 		ent.renderfx |= RF_NOT_MIRROR;
 	}
 
