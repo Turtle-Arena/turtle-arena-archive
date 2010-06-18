@@ -399,10 +399,6 @@ struct gclient_s {
 	char		*areabits;
 };
 
-#ifdef TA_CAMERA
-void G_ClientCameraThink(gclient_s *client);
-void G_ClientCameraReset(gclient_s *client);
-#endif
 
 //
 // this structure is cleared as each map is entered

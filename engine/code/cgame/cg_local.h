@@ -865,6 +865,16 @@ typedef struct {
 	float		xyspeed;
 	int     nextOrbitTime;
 
+#ifdef IOQ3ZTM // NEW_CAM
+	float camRotDir;
+	qboolean camLeft;
+	qboolean camRight;
+	qboolean camReseting;
+#ifdef TA_CAMERA
+	float camDistance; // Distance from client to put camera
+#endif
+#endif
+
 #ifdef CAMERASCRIPT
 	qboolean cameraMode;		// if rendering from a loaded camera
 	qboolean cameraEndBlack;	// go black after camera ends.

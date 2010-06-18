@@ -214,6 +214,95 @@ static void CG_CalcVrect (void) {
 
 //==============================================================================
 
+#ifdef IOQ3ZTM // NEW_CAM
+void CG_CamUpdate(void)
+{
+	if (cg.camReseting)
+	{
+		float speed = 5.0f;
+		if (cg_thirdPersonAngle.value >= 360-speed || cg_thirdPersonAngle.value <= speed)
+		{
+			cg_thirdPersonAngle.value = 0;
+			cg.camRotDir = 0;
+			cg.camReseting = qfalse;
+		}
+		else if (cg_thirdPersonAngle.value > 180)
+			cg_thirdPersonAngle.value += speed;
+		else if (cg_thirdPersonAngle.value > speed)
+			cg_thirdPersonAngle.value -= speed;
+	}
+	else
+	{
+		if (cg.camLeft)
+			cg.camRotDir += 0.2f;
+		else if (cg.camRotDir >= 0.1f)
+			cg.camRotDir -= 0.1f;
+
+		if (cg.camRight)
+			cg.camRotDir -= 0.2f;
+		else if (cg.camRotDir <= -0.1f)
+			cg.camRotDir += 0.1f;
+
+		if (!cg.camLeft && !cg.camRight && cg.camRotDir >= -0.2f && cg.camRotDir <= 0.2f)
+			cg.camRotDir = 0;
+
+		if (cg.camRotDir > 3)
+			cg.camRotDir = 3;
+		else if (cg.camRotDir < -3)
+			cg.camRotDir = -3;
+
+		cg_thirdPersonAngle.value = cg_thirdPersonAngle.value+cg.camRotDir;
+	}
+
+	if (cg_thirdPersonAngle.value > 360)
+		cg_thirdPersonAngle.value -= 360;
+	if (cg_thirdPersonAngle.value < 0)
+		cg_thirdPersonAngle.value += 360;
+
+	// Update the cvar...
+	if (cg_thirdPersonAngle.integer != (int)cg_thirdPersonAngle.value)
+		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", cg_thirdPersonAngle.value));
+
+#ifdef TA_CAMERA
+	// NiGHTS: Journey of Dreams Visitor style camera distance.
+	//  When next to a wall the camera is closer (like Quake3),
+	//  but only zooms back out when the player is moving
+
+	// First person
+	if (!cg_thirdPerson.integer)
+	{
+		// cg.camDistance is unused by first person
+		cg.camDistance = cg_thirdPersonRange.value;
+	}
+	else
+	{
+		if (cg.camDistance == 0) {
+			cg.camDistance = cg_thirdPersonRange.value;
+		}
+
+		// Third person range was made shorter, zoom in
+		if (cg.camDistance > cg_thirdPersonRange.value+2.0f)
+			cg.camDistance -= 2.0f;
+		else if (cg.camDistance > cg_thirdPersonRange.value)
+			cg.camDistance = cg_thirdPersonRange.value;
+		// Zoom back out
+		else if (cg.camDistance < cg_thirdPersonRange.value)
+		{
+			// If player is moving on xy zoom out a little
+			if (cg.xyspeed != 0)
+			{
+				if (cg.camDistance < cg_thirdPersonRange.value-1.0f)
+					cg.camDistance += 1.0f;
+				else
+					cg.camDistance = cg_thirdPersonRange.value;
+			}
+
+		}
+	}
+#endif
+}
+#endif
+
 
 /*
 ===============
@@ -241,7 +330,11 @@ static void CG_OffsetThirdPersonView( void ) {
 
 	cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
+#ifdef TA_CAMERA
+	distance = cg.camDistance;
+#else
 	distance = cg_thirdPersonRange.value;
+#endif
 #endif
 
 #ifdef TURTLEARENA // LOCKON
@@ -276,7 +369,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 		if (cg.lockedOn || !completedMove ) {
 			// Move camera back
-			distance += cg_thirdPersonRange.value*0.3f*f;
+			distance += distance*0.3f*f;
 
 			// Get view angles to look at target
 			VectorSubtract( cg.snap->ps.enemyOrigin, cg.snap->ps.origin, dir );
@@ -378,12 +471,19 @@ static void CG_OffsetThirdPersonView( void ) {
 
 		if ( trace.fraction != 1.0 ) {
 			VectorCopy( trace.endpos, view );
+#ifdef TA_CAMERA
+			cg.camDistance = cg.camDistance * trace.fraction;
+			if (cg.camDistance < 1) {
+				cg.camDistance = 1;
+			}
+#else
 			view[2] += (1.0 - trace.fraction) * 32;
 			// try another trace to this position, because a tunnel may have the ceiling
 			// close enogh that this is poking out
 
 			CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
 			VectorCopy( trace.endpos, view );
+#endif
 		}
 	}
 
@@ -820,22 +920,6 @@ static int CG_CalcViewValues( void ) {
 	}
 */
 #endif
-#ifdef TA_CAMERA
-	// If not a Q3 camera use new camera code.
-	if (ps->camera.mode != CAM_FIRSTPERSON && ps->camera.mode != CAM_Q3THIRDPERSON)
-	{
-		if ( cg.hyperspace ) {
-			cg.refdef.rdflags |= RDF_NOWORLDMODEL | RDF_HYPERSPACE;
-		}
-
-		// ZTM: TODO?: Perdiction.
-		VectorCopy(ps->camera.angles, cg.refdefViewAngles);
-		VectorCopy(ps->camera.pos, cg.refdef.vieworg);
-		AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
-
-		return CG_CalcFov();
-	}
-#endif
 	// intermission view
 	if ( ps->pm_type == PM_INTERMISSION
 #ifdef TA_SP
@@ -866,7 +950,6 @@ static int CG_CalcViewValues( void ) {
 #ifdef IOQ3ZTM // NEW_CAM
 	else
 	{
-		extern void CG_CamUpdate(void);
 		CG_CamUpdate();
 	}
 #endif

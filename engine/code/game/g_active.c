@@ -1807,10 +1807,6 @@ void ClientThink_real( gentity_t *ent ) {
 	client->buttons = ucmd->buttons;
 	client->latched_buttons |= client->buttons & ~client->oldbuttons;
 
-#ifdef TA_CAMERA
-	G_ClientCameraThink(client);
-#endif
-
 	// check for respawning
 	if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
 #ifdef TA_SP // ZTM: Single player death think
