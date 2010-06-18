@@ -126,6 +126,14 @@ Weapons (and attacking)
 
   * TODO: Have a extra team (Needed for mp_ui), like (Purple) Dragon, or Guardian
 
+== New Entities ==
+  * TODO: Add misc_bubbles entity.
+
+  * TODO: Add misc_dripper entity.
+
+  * TODO: Add new entity to take damage and give it to a targeted entity.
+    * Allow bushes to be used for cars (and other others) oddly shaped collision box
+
 == Misc ==
   * TODO: Add optional run animations for torso
 
@@ -141,10 +149,6 @@ Weapons (and attacking)
 
   * BUG: When players have PW_FLASHING they can walk though Obelisks/misc_objects.
     * When PW_FLASHING wears off while in a solid, they are killed. Otherwise they would be stuck.
-
-  * TODO: Add misc_bubbles entity.
-
-  * TODO: Add misc_dripper entity.
 
   * STARTED (NIGHTSMODE): NiGHTS into Dreams mode
     * Maybe instead of NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...
@@ -169,12 +173,11 @@ Weapons (and attacking)
 
   * BUG: Loading player animations using animation names doesn't work.
 
-  * TODO: Add new entity to take damage and give it to a targeted entity.
-    * Allow bushes to be used for cars (and other others) oddly shaped collision box
-
   * TODO: Improve misc object physics. (Use code from Q3Rally? bg_physics.c/h)
 
-  * TODO: Driveable vehicles. (Base on Q3Rally)
+  * TODO: Driveable vehicles? (Base on Q3Rally)
+
+  * TODO: Button to drop held CTF flag like in SRB2?
 
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
@@ -187,7 +190,7 @@ Weapons (and attacking)
   * TODO: Merge Quake3 bot chat and Team Arena voice chat systems?
     * base/botfiles/bots/raph_t.c hold the "Q3 bot chats" for non-teamplay (Team-only Team Arena players have dummy files)
     * base/botfiles/teamplay.h holds the "Q3 bot chats" for teamplay
-    * base/scripts/male1.voice Team Arena added voice chats that are only used in teamplay (Some are usable by humans and bots)
+    * base/scripts/male1.voice Team Arena added voice chats that are only used in teamplay (Some are usable by both humans and bots)
     * Have everywhere that starts a "Q3 bot chat" use voice chats instead?
       * (Unless it uses vars and can't be a voice chat, like "whois")
     * TeamPlayIsOn() is used to check if in teamplay for which chats to use and stuff
@@ -215,8 +218,6 @@ Most of the mapobjects should be damageable.
     * Lamps and other light things
 
 == Testing! ==
-  * DONE(untested)?: Melee combo system, with different animations for each attack? (TA_WEAPSYS)
-
   * TODO: Test/use the "noise" and "random" waveforms that I copied from IOSTVEF
 
   * TODO: Check if "TA_WEAPSYS // BOT_ITEM_INFOS" breaks compatibility with q3 mods.
@@ -246,16 +247,12 @@ Most of the mapobjects should be damageable.
     * Using a special model for collision we could use group names to set what part of player is hit,
     * so shell takes less damage, banndana takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
 
-  * TODO: Backport TA_WEAPSYS_EX's weapon dropping to TA_WEAPSYS?
-
-  * TODO: Have shurikens do damage while they are in the wall/ground?
-
 == Done? ==
   * DONE?: TA_WEAPSYS weapon_random entity that spawns a random weapon each time the weapon respawns
     * Only spawn weapons with a classname, have flags for melee and gun weapon spawning.
   * TODO: ...also allow list of weapons in message field?
 
-  * DONE-ish?: Use freetype for TTF rendering, instead of q3font.exe's output files of a TTF. (Almost completed in Xreal)
+  * DONE-ish?: Use freetype for TTF rendering, instead of q3font.exe's output files of a TTF. (Almost completed in Xreal?)
     * Well I no longer need q3font.exe, as copied/fixed the freetype code (Also support in console and hud consoles lines)
     * But most in game text does not support TTF.
 
