@@ -79,9 +79,21 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	SnapVector( origin );
 	G_SetOrigin( ent, origin );
 
+#ifdef TA_WEAPSYS
+	// Missile impacted a surface
+	if (ent->count & 2)
+	{
+		VectorCopy(ent->s.angles2, dir);
+	}
+	else
+	{
+#endif
 	// we don't have a valid direction, so just point straight up
 	dir[0] = dir[1] = 0;
 	dir[2] = 1;
+#ifdef TA_WEAPSYS
+	}
+#endif
 
 #ifndef TA_WEAPSYS // Must be after G_RadiusDamage
 	ent->s.eType = ET_GENERAL;
@@ -1115,10 +1127,6 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	if (bg_projectileinfo[ent->s.weapon].stickOnImpact) {
 		vec3_t dir;
 
-		if (ent->count & 2) // Already stuck to wall
-			return;
-		ent->count |= 2;
-
 #if 0
 		// if it's a player, stick it on to them (flag them and remove this entity)
 		if( bg_projectileinfo[ent->s.weapon].explosionType == PE_PROX &&
@@ -1128,6 +1136,12 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			return;
 		}
 #endif
+
+		if (ent->count & 2) {
+			// Already stuck to wall
+			return;
+		}
+		ent->count |= 2;
 
 		// Don't stick to players or obelisk
 		if (other->s.eType == ET_PLAYER
@@ -1185,6 +1199,9 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			VectorCopy(trace->plane.normal, dir);
 #endif
 		}
+
+		// Save direction
+		VectorCopy(dir, ent->s.angles2);
 
 		ent->s.pos.trType = TR_STATIONARY;
 		VectorClear( ent->s.pos.trDelta );
