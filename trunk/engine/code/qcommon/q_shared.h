@@ -1053,34 +1053,6 @@ typedef struct {
 
 #define PS_PMOVEFRAMECOUNTBITS	6
 
-#ifdef TA_CAMERA
-typedef enum
-{
-	CAM_FIRSTPERSON, ///< Q3 default
-	CAM_Q3THIRDPERSON, ///< Q3 optional camera
-	CAM_THIRDPERSON, ///<
-	CAM_OVERHEAD,	 ///< Camera is above player, good for analog control.
-	CAM_LOCALOVERHEAD,///< One camera for all of the local players
-	CAM_ALLOVERHEAD, ///< Try to watch all players, not just local.
-
-	CAM_MAXMODES
-} cameraMode_e;
-
-// This would only be needed for cgame, but game will use it for analog input.
-typedef struct
-{
-	cameraMode_e mode;
-	vec3_t angles;
-	vec3_t pos;
-
-	cameraMode_e last_mode; // mode that was used for the last thinker
-	vec3_t last_angles;
-	vec3_t last_pos;
-	int last_time; // Last time that the camera thinker was run.
-
-} camera_t;
-#endif
-
 // playerState_t is the information needed by both the client and server
 // to predict player motion and actions
 // nothing outside of pmove should modify these, or some degree of prediction error
@@ -1144,12 +1116,8 @@ typedef struct playerState_s {
 	int			holdableTime;  // Like weaponTime, but for shurikens.
 #endif
 
-#ifdef TA_CAMERA
-	camera_t	camera;
-#else
 	vec3_t		viewangles;		// for fixed views
 	int			viewheight;
-#endif
 
 	// damage feedback
 	int			damageEvent;	// when it changes, latch the other parms
