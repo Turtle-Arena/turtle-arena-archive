@@ -516,27 +516,24 @@ void CG_Letterbox(void)
 #endif
 
 #ifdef IOQ3ZTM // NEW_CAM
-float camRotDir = 0;
-qboolean camleft = qfalse;
-qboolean camright = qfalse;
-qboolean camreseting = qfalse;
 void CG_CamMoveLeft(qboolean down)
 {
-	camleft = down;
+	cg.camLeft = down;
 	if (down) {
-		camRotDir += 1.0f;
-		camreseting = qfalse;
+		cg.camRotDir += 1.0f;
+		cg.camReseting = qfalse;
 	}
 }
 
 void CG_CamMoveRight(qboolean down)
 {
-	camright = down;
+	cg.camRight = down;
 	if (down) {
-		camRotDir -= 1.0f;
-		camreseting = qfalse;
+		cg.camRotDir -= 1.0f;
+		cg.camReseting = qfalse;
 	}
 }
+
 
 void CG_CamLeftDown_f(void)
 {
@@ -558,59 +555,10 @@ void CG_CamRightUp_f(void)
 	CG_CamMoveRight(qfalse);
 }
 
-void CG_CamUpdate(void)
-{
-	if (camreseting)
-	{
-		float speed = 5.0f;
-		if (cg_thirdPersonAngle.value >= 360-speed || cg_thirdPersonAngle.value <= speed)
-		{
-			cg_thirdPersonAngle.value = 0;
-			camRotDir = 0;
-			camreseting = qfalse;
-		}
-		else if (cg_thirdPersonAngle.value > 180)
-			cg_thirdPersonAngle.value += speed;
-		else if (cg_thirdPersonAngle.value > speed)
-			cg_thirdPersonAngle.value -= speed;
-	}
-	else
-	{
-		if (camleft)
-			camRotDir += 0.2f;
-		else if (camRotDir >= 0.1f)
-			camRotDir -= 0.1f;
-
-		if (camright)
-			camRotDir -= 0.2f;
-		else if (camRotDir <= -0.1f)
-			camRotDir += 0.1f;
-
-		if (!camleft && !camright && camRotDir >= -0.2f && camRotDir <= 0.2f)
-			camRotDir = 0;
-
-		if (camRotDir > 3)
-			camRotDir = 3;
-		else if (camRotDir < -3)
-			camRotDir = -3;
-
-		cg_thirdPersonAngle.value = cg_thirdPersonAngle.value+camRotDir;
-	}
-
-	if (cg_thirdPersonAngle.value > 360)
-		cg_thirdPersonAngle.value -= 360;
-	if (cg_thirdPersonAngle.value < 0)
-		cg_thirdPersonAngle.value += 360;
-
-	// Update the cvar...
-	if (cg_thirdPersonAngle.integer != (int)cg_thirdPersonAngle.value)
-		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", cg_thirdPersonAngle.value));
-}
-
 void CG_CamReset_f(void)
 {
-	camreseting = qtrue;
-	camRotDir = 0;
+	cg.camReseting = qtrue;
+	cg.camRotDir = 0;
 }
 #endif
 

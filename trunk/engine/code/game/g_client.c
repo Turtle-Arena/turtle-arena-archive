@@ -1631,10 +1631,6 @@ void ClientSpawn(gentity_t *ent) {
 
 	client->ps.clientNum = index;
 
-#ifdef TA_CAMERA
-	G_ClientCameraReset(client);
-#endif
-
 #ifdef TA_HOLDSYS
 #ifdef TA_HOLDABLE // Start with 10 shurikens!
 #ifdef IOQ3ZTM // LASERTAG
