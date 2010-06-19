@@ -88,8 +88,14 @@ Turtle Arena Animations
 Jump/land B (Copy of Jump/land)
 
 
+== Note ==
+raph_v9.mm3d doesn't have raph_v9.wings's new h_head_bottom and torso/arm.
+
+raph_v9.wings has WIP split arms from torso. raph_v9.mm3d will need to be update when its finished.
+
 == TODO ==
-Split arms from torso, it would solve some animation issues with the sholder going flat when rotated...
+STARTED: Split arms from torso, it would solve some animation issues with the sholder going flat when rotated...
+TODO: The ends of the arms/shoulders needs to be rounded and skinned.
 : For Example: TORSO_GUARDBASE frame 4
 
 Raph's thumbs also go flat and should be fixed.
