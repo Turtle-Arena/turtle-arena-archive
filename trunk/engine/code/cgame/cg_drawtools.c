@@ -716,7 +716,11 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 			fwidth = (float)propMapB[ch][2] / 256.0f;
 			fheight = (float)PROPB_HEIGHT / 256.0f;
 			aw = (float)propMapB[ch][2] * cgs.screenXScale;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Does this cause a problem?
+			ah = (float)PROPB_HEIGHT * cgs.screenYScale;
+#else
 			ah = (float)PROPB_HEIGHT * cgs.screenXScale;
+#endif
 			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, cgs.media.charsetPropB );
 			ax += (aw + (float)PROPB_GAP_WIDTH * cgs.screenXScale);
 		}
@@ -824,7 +828,11 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 			fwidth = (float)propMap[ch][2] / 256.0f;
 			fheight = (float)PROP_HEIGHT / 256.0f;
 			aw = (float)propMap[ch][2] * cgs.screenXScale * sizeScale;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Does this cause a problem?
+			ah = (float)PROP_HEIGHT * cgs.screenYScale * sizeScale;
+#else
 			ah = (float)PROP_HEIGHT * cgs.screenXScale * sizeScale;
+#endif
 			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, charset );
 		} else {
 			aw = 0;
