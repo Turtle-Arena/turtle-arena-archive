@@ -85,7 +85,7 @@ static fielddef_t projectileinfo_fields[] =
 {
 {"name", PROJECTILE_OFS(name), FT_STRING},					//name of the projectile
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Loading model string would overwrite wrong memory
-{"model", PROJECTILE_OFS(model), FT_STRING},				//model of the projectile
+{"model", PROJECTILE_OFS(model), FT_STRING},					//model of the projectile
 #else
 {"model", WEAPON_OFS(model), FT_STRING},						//model of the projectile
 #endif

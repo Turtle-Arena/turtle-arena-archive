@@ -333,4 +333,4 @@ void CG_AddMarks( void ) {
 
 		trap_R_AddPolyToScene( mp->markShader, mp->poly.numVerts, mp->verts );
 	}
-	}
+}
