@@ -35,7 +35,7 @@
 
 #if defined MDR_LOAD || defined MDR_EXPORT
 #define MDR_GENERAL // Stuff for load and export
-#define MDR_VERSION	2
+#define MDR_VERSION 2
 #endif
 
 
@@ -174,7 +174,7 @@ class Md3Filter : public ModelFilter
       bool     animInSection( std::string animName, MeshSectionE section );
       bool     groupInSection( std::string groupName, MeshSectionE section );
 #ifdef MDR_EXPORT
-      bool boneJointInSection( std::string jointName, MeshSectionE section );
+      bool     boneJointInSection( std::string jointName, MeshSectionE section );
 #endif
       bool     tagInSection( std::string tagName, MeshSectionE section );
       bool     tagIsSectionRoot( std::string tagName, MeshSectionE section );
@@ -223,5 +223,11 @@ class Md3Filter : public ModelFilter
       bool getExportAnimData( int modelAnim,
             int & fileFrame, int & frameCount, int & fps );
 
+#ifdef MDR_LOAD
+      void MC_UnCompress(float mat[3][4],const unsigned char * comp);
+#endif
+#ifdef MDR_EXPORT
+      void MC_Compress(const float mat[3][4],unsigned char * comp);
+#endif
 };
 #endif // __MD3FILTER_H
