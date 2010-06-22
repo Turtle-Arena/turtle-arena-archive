@@ -3351,6 +3351,17 @@ bool Md3Filter::writeAnimations()
 
       char warning[] = " (MUST NOT CHANGE -- hand animation is synced to this)";
       size_t animCount = m_model->getAnimCount( m_animationMode );
+
+      size_t longestName = 16; // minimum name length for spacing
+      for ( size_t anim = 0; anim < animCount; anim++ )
+      {
+         std::string name = getSafeName( anim );
+         size_t len = name.length();
+         if (len > longestName) {
+            longestName = len;
+         }
+      }
+
       for ( size_t anim = 0; anim < animCount; anim++ )
       {
          int animFrame = 0;
@@ -3387,11 +3398,13 @@ bool Md3Filter::writeAnimations()
 
          if (animKeyword)
          {
-            // Aline animFrame
-            char spaces[23] = {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','\0','\0'};
-            int numSpaces = (20 - name.length() > 0) ? (20 - name.length()) : 0;
+            // Align animFrame
+            const size_t MAX_SPACES = 40;
+            char spaces[MAX_SPACES+2] = {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',
+                                 ' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','\0'};
+            size_t maxSpaces = (longestName+6 > MAX_SPACES) ? MAX_SPACES : longestName+6;
 
-            spaces[numSpaces] = spaces[numSpaces+1] = '\0';
+            spaces[((name.length() < maxSpaces) ? (maxSpaces - name.length()) : 0)] = '\0';
 
             if (animSyncWarning(name))
                fprintf( fp, "%s%s\t%d\t%d\t%d\t%d\t\t// %s\r\n", 
