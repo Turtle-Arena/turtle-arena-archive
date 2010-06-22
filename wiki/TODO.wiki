@@ -171,8 +171,6 @@ Weapons (and attacking)
 
   * TODO: Make a original character (In case the Ninja Turtles have to be removed at some point)
 
-  * BUG: Loading player animations using animation names doesn't work.
-
   * TODO: Improve misc object physics. (Use code from Q3Rally? bg_physics.c/h)
 
   * TODO: Driveable vehicles? (Base on Q3Rally)
