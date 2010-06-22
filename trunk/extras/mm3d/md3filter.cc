@@ -72,6 +72,8 @@ const int MDR_FRAME_SIZE = MD3_FRAME_SIZE; // NOTE: must add (numBones * MDR_BON
 const int MDR_BONE_SIZE = (4 * (3 * 4) );
 const int MDR_LOD_SIZE = (3 * 4);
 //const int MDR_TAG_SIZE = 32 + 4; // unused
+const int MDR_COMP_FRAME_SIZE = ( 3 * ( 3 * 4 ) + 4); // NOTE: must add (numBones * MDR_COMP_BONE_SIZE)
+const int MDR_COMP_BONE_SIZE = (2 * (3 * 4) );
 #endif
 
 
@@ -231,7 +233,7 @@ Model::ModelErrorE Md3Filter::readFile( Model * model, const char * const filena
          if ( file_exists( lowerFileMDR.c_str() ) )
          {
             fd.type = MT_MDR;
-         	fd.modelBaseName = "lower.mdr";
+            fd.modelBaseName = "lower.mdr";
          }
          else
          {
@@ -257,7 +259,7 @@ Model::ModelErrorE Md3Filter::readFile( Model * model, const char * const filena
          if ( file_exists( upperFileMDR.c_str() ) )
          {
             fd.type = MT_MDR;
-         	fd.modelBaseName = "upper.mdr";
+            fd.modelBaseName = "upper.mdr";
          }
          else
          {
@@ -276,12 +278,12 @@ Model::ModelErrorE Md3Filter::readFile( Model * model, const char * const filena
          if ( file_exists( headFileMDR.c_str() ) )
          {
             fd.type = MT_MDR;
-         	fd.modelBaseName = "head.mdr";
+            fd.modelBaseName = "head.mdr";
          }
          else
          {
             fd.type = MT_MD3;
-         	fd.modelBaseName = "head.md3";
+            fd.modelBaseName = "head.md3";
          }
 #else
          fd.modelBaseName = "head.md3";
@@ -741,24 +743,24 @@ bool Md3Filter::readAnimations( bool create )
             int fcount = 0;
             int loop   = 0;
             int fps    = 0;
-			char comment[128] = { 0 }; // May hold "//" or "//BOTH_x..."
-			char fname[128] = { 0 }; // May hold "BOTH_x..."
+            char comment[128] = { 0 }; // May hold "//" or "//BOTH_x..."
+            char fname[128] = { 0 }; // May hold "BOTH_x..."
 
-			// Loads the following types
-			// "0 5 5 15"
-			// "0 5 5 15 //"
-			// "0 5 5 15 //BOTH_DEATH1"
-			// "0 5 5 15 // BOTH_DEATH1"
-			// "0 5 5 15 //         BOTH_DEATH1"
-			// "BOTH_DEATH1 0 5 5 15" (Elite Force Single Player style)
-			// If EF SP style, must check if valid animation name
-			//   (or metadata could be loaded as animation)
+            // Loads the following types
+            // "0 5 5 15"
+            // "0 5 5 15 //"
+            // "0 5 5 15 //BOTH_DEATH1"
+            // "0 5 5 15 // BOTH_DEATH1"
+            // "0 5 5 15 //         BOTH_DEATH1"
+            // "BOTH_DEATH1 0 5 5 15" (Elite Force Single Player style)
+            // If EF SP style, must check if valid animation name
+            //   (or metadata could be loaded as animation)
 
             if ( sscanf( line, "%d %d %d %d %s %s",
                    &first, &fcount, &loop, &fps, comment, fname ) >= 4
-			    || (sscanf( line, "%s %d %d %d %d",
+                || (sscanf( line, "%s %d %d %d %d",
                       fname, &first, &fcount, &loop, &fps ) == 5
-				    && (strncasecmp(fname, "both_", 5) == 0 || strncasecmp(fname, "torso_", 6) == 0
+                    && (strncasecmp(fname, "both_", 5) == 0 || strncasecmp(fname, "torso_", 6) == 0
                       || strncasecmp(fname, "legs_", 5) == 0) && (animKeyword || (animKeyword = 1)) ))
             {
                log_debug( "got anim frame details\n" );
@@ -888,11 +890,11 @@ bool Md3Filter::readAnimations( bool create )
                      m_idleFrame = first;
                   }
                }
-				else
-				{
-					// Unknown animation
-					log_debug( "unknown animation type-prefix '%s'\n", name );
-				}
+               else
+               {
+                  // Unknown animation
+                  log_debug( "unknown animation type-prefix '%s'\n", name );
+               }
 
                m_animStartFrame.push_back( first );
 
@@ -2003,20 +2005,20 @@ Model::ModelErrorE Md3Filter::writeFile( Model * model, const char * const filen
             }
             else
             {
-		        char answer = msg_info_prompt( transll( QT_TRANSLATE_NOOP( "LowLevel", "This looks like a player model.\nDo you want to save all sections?")).c_str(), "Ync" );
-		        if ( answer == 'Y' )
-		        {
-		           model->addMetaData( "MD3_composite", "1" );
-		        }
-		        else if ( answer == 'N' )
-		        {
-		           model->addMetaData( "MD3_composite", "0" );
-		           saveAsPlayer = false;
-		        }
-		        else
-		        {
-		           return Model::ERROR_CANCEL;
-		        }
+               char answer = msg_info_prompt( transll( QT_TRANSLATE_NOOP( "LowLevel", "This looks like a player model.\nDo you want to save all sections?")).c_str(), "Ync" );
+               if ( answer == 'Y' )
+               {
+                  model->addMetaData( "MD3_composite", "1" );
+               }
+               else if ( answer == 'N' )
+               {
+                  model->addMetaData( "MD3_composite", "0" );
+                  saveAsPlayer = false;
+               }
+               else
+               {
+                  return Model::ERROR_CANCEL;
+               }
             }
          }
          else
@@ -2269,12 +2271,27 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
    int32_t offsetTags = 0;
    int32_t offsetMeshes = 0; // MD3
    int32_t offsetEnd = 0;
-   int32_t compress = 0; // MDR
+   bool compress = true; // MDR
    unsigned bcount = 0; // MDR
    unsigned bonesRemap[1024]; // Remap MM3D's bone indexes to the local model
                               // ZTM: FIXME: What should be max be? (ioquake3 defines MDR_MAX_BONES to 128, but never uses it)
    if (type == MT_MDR)
    {
+      char value[20];
+      if ( m_model->getMetaData( "MDR_compressed", value, sizeof( value ) ) )
+      {
+         if ( atoi( value ) == 0 )
+         {
+            log_debug( "model is explicitly not compressed\n" );
+            compress = false;
+         }
+         else if ( atoi( value ) == 1 )
+         {
+            log_debug( "model is explicitly compressed\n" );
+            compress = true;
+         }
+      }
+
       bcount = m_model->getBoneJointCount();
       memset(bonesRemap, 0, sizeof (bonesRemap));
       if (section == MS_Head || section == MS_Lower || section == MS_Upper)
@@ -2296,7 +2313,10 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 
       offsetFrames = MDR_HEADER_SIZE;
       numLODs = 1;
-      offsetLODs = offsetFrames + numFrames * (MDR_FRAME_SIZE + numBones * MDR_BONE_SIZE);
+      if (compress)
+          offsetLODs = offsetFrames + numFrames * (MDR_COMP_FRAME_SIZE + numBones * MDR_COMP_BONE_SIZE);
+      else
+         offsetLODs = offsetFrames + numFrames * (MDR_FRAME_SIZE + numBones * MDR_BONE_SIZE);
       offsetMeshes = offsetLODs + numLODs * MDR_LOD_SIZE; // First LOD's meshes
       offsetTags = offsetMeshes; // Note: Plus size of meshes!
       offsetEnd = offsetTags;
@@ -2472,14 +2492,14 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
             //log_debug( "Frame radius: %f\n", ( (float) radius ) );
             m_dst->write( (float) radius );
 #ifdef MDR_EXPORT // Compressed MDRs don't save frame name
-			if (type != MT_MDR || (type == MT_MDR && !compress))
-			{
+            if (type != MT_MDR || (type == MT_MDR && !compress))
+            {
 #endif
             char name[16] = "Misfit Model 3D"; // this is what other exporters do
             PORT_snprintf( name, sizeof(name), "%s%02d", animName.c_str(), t);
             m_dst->writeBytes( (uint8_t*) name, sizeof(name) );
 #ifdef MDR_EXPORT
-			}
+            }
 #endif
 
 #ifdef MDR_EXPORT
@@ -2502,55 +2522,75 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 
                   saveMatrix.apply( origin );
 
-                  if (compress)
+                  // Seems whenver we have a nan its from a identity matrix
+                  if ( rotVector[0] != rotVector[0] || rotVector[1] != rotVector[1] || rotVector[2] != rotVector[2] )
                   {
-					uint8_t data[24];
-
-                     // ZTM: TODO: Compressed MDR bone matrix and origin
-
-					m_dst->writeBytes( (uint8_t *)data, 24 );
+                     // writeIdentity();
+                     float z = 0.0;
+                     float o = 1.0;
+                     for ( int i = 0; i < 3; i++ )
+                     {
+                        for ( int j = 0; j < 3; j++ )
+                        {
+                           if ( i == j )
+                           {
+                              rotMatrix.set(i, j, o);
+                           }
+                           else
+                           {
+                              rotMatrix.set(i, j, z);
+                           }
+                        }
+                     }
                   }
                   else
                   {
-                     // Seems whenver we have a nan its from a identity matrix
-                     if ( rotVector[0] != rotVector[0] || rotVector[1] != rotVector[1] || rotVector[2] != rotVector[2] )
-                     {
-                        // writeIdentity();
-                        size_t count = 0;
-                        float z = 0.0;
-                        float o = 1.0;
-                        for ( int i = 0; i < 3; i++ )
-                        {
-                           for ( int j = 0; j < 3; j++ )
-                           {
-                              if ( i == j )
-	                         {
-	                        	count += m_dst->write( o );
-	                         }
-	                         else
-	                         {
-	                        	count += m_dst->write( z );
-	                         }
-                           }
+                     rotMatrix.setRotation( rotVector );
+                     rotMatrix = rotMatrix*saveMatrix;
+                  }
 
-                           m_dst->write( (float) origin[i] );
+                  // Compress MDR bone matrix and origin!
+                  if (compress)
+                  {
+                     uint16_t data[12];
+                     float mat[3][4];
+
+                     for ( int m = 0; m < 3; m++ )
+                     {
+                        for ( int n = 0; n < 3; n++ )
+                        {
+                           mat[m][n] = (float)rotMatrix.get(m, n);
+                        }
+
+                        mat[m][3] = origin[m];
+
+                        if (origin[m] < -512 || origin[m] > 511)
+                        {
+                           // Can't compress, origin out of range
+                           log_error( "Compressed MDR Bone joint(%d) is out side bounds (valid range is -512 to 511).\n", j );
+                           m_model->setFilterSpecificError( transll( QT_TRANSLATE_NOOP( "LowLevel", "Compressed MDR Bone joint origin out of range (valid range is -512 to 511)." ) ).c_str() );
+                           return Model::ERROR_FILTER_SPECIFIC;
                         }
                      }
-                     else
+
+                     MC_Compress(mat, (unsigned char*)data);
+
+                     for (int i = 0; i < 12; i++)
                      {
-                        rotMatrix.setRotation( rotVector );
-                        rotMatrix = rotMatrix*saveMatrix;
-
-                        // orientation and origin
-                        for ( int m = 0; m < 3; m++ )
+                        m_dst->write( (uint16_t )data[i] );
+                     }
+                  }
+                  else
+                  {
+                     // orientation and origin
+                     for ( int m = 0; m < 3; m++ )
+                     {
+                        for ( int n = 0; n < 3; n++ )
                         {
-                           for ( int n = 0; n < 3; n++ )
-                           {
-                              m_dst->write( (float) rotMatrix.get( m, n ) );
-                           }
-
-                           m_dst->write( (float) origin[m] );
+                           m_dst->write( (float) rotMatrix.get( m, n ) );
                         }
+
+                        m_dst->write( (float) origin[m] );
                      }
                   }
                }
@@ -2662,7 +2702,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
          for ( mlit = meshes.begin(); mlit != meshes.end(); mlit++ )
          {
             if ( (*mlit).group >= 0 && groupInSection( m_model->getGroupName( (*mlit).group ), section )
-				/* && groupInLOD( (*mlit).group ), i ) */)
+               /* && groupInLOD( (*mlit).group ), i ) */)
             {
                log_debug( "writing mdr mesh header at %d\n", m_dst->offset() );
 
@@ -2701,7 +2741,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                {
                   Model::InfluenceList ilist;
 
-				  m_model->getVertexInfluences( (*vit).v, ilist );
+                  m_model->getVertexInfluences( (*vit).v, ilist );
 
                   mOffBoneRefs += ilist.size() * BONE_WEIGHT_SIZE;
                }
@@ -2843,7 +2883,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                   Model::InfluenceList ilist;
                   Model::InfluenceList::iterator it;
 
-				  m_model->getVertexInfluences( (*vit).v, ilist );
+                  m_model->getVertexInfluences( (*vit).v, ilist );
 
                   int32_t numWeights = ilist.size();
                   m_dst->write( numWeights );
@@ -3204,7 +3244,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
          if ( tagInSection( m_model->getPointName( j ), section ) )
          {
             int32_t boneIndex = bonesRemap[m_model->getPointBoneJoint(j)];
-			m_dst->write(boneIndex);
+            m_dst->write(boneIndex);
 
             char tName[32];
             memset( tName, 0, sizeof( tName ) );
@@ -3277,7 +3317,7 @@ bool Md3Filter::writeAnimations()
                fprintf( fp, "%s\r\n", &keyword[8] );
          }
          // Support old keywords
-	 	 else if (strncasecmp(keyword, "MD3_sex", 7) == 0
+         else if (strncasecmp(keyword, "MD3_sex", 7) == 0
            || strncasecmp(keyword, "MD3_footsteps", 13) == 0
            || strncasecmp(keyword, "MD3_headoffset", 14) == 0
            || strncasecmp(keyword, "MD3_fixedtorso", 14) == 0
@@ -3324,7 +3364,7 @@ bool Md3Filter::writeAnimations()
          int loop = count; // loop by default
 
          std::string name = getSafeName( anim );
-		 size_t len = name.length();
+         size_t len = name.length();
          for ( size_t n = 0; n < len; n++ )
          {
             name[n] = std::toupper(name[n]);
@@ -3454,14 +3494,14 @@ bool Md3Filter::getExportAnimData( int modelAnim,
                fps = 15;
             }
 
-			if (section == MS_Lower)
-			{
-				// Must still count torso animations after this for fileFrame
-			}
-			else
-			{
-			   return true;
-			}
+            if (section == MS_Lower)
+            {
+               // Must still count torso animations after this for fileFrame
+            }
+            else
+            {
+               return true;
+            }
          }
          // All torso frames from go before leg frames, all legs go after tosro
          else if (section == MS_None || (section == MS_Lower && (a < (size_t)modelAnim || strncasecmp(name.c_str(), "legs_", 5) != 0))
@@ -3617,6 +3657,181 @@ bool Md3Filter::getVertexNormal( Model * model, int groupId, int vertexId, float
    return false;
 }
 
+#ifdef MDR_GENERAL
+//
+#define MC_BITS_X (16)
+#define MC_BITS_Y (16)
+#define MC_BITS_Z (16)
+#define MC_BITS_VECT (16)
+
+#define MC_SCALE_X (1.0f/64)
+#define MC_SCALE_Y (1.0f/64)
+#define MC_SCALE_Z (1.0f/64)
+
+//
+#define MC_MASK_X ((1<<(MC_BITS_X))-1)
+#define MC_MASK_Y ((1<<(MC_BITS_Y))-1)
+#define MC_MASK_Z ((1<<(MC_BITS_Z))-1)
+#define MC_MASK_VECT ((1<<(MC_BITS_VECT))-1)
+
+#define MC_SCALE_VECT (1.0f/(float)((1<<(MC_BITS_VECT-1))-2))
+
+#define MC_POS_X (0)
+#define MC_SHIFT_X (0)
+
+#define MC_POS_Y ((((MC_BITS_X))/8))
+#define MC_SHIFT_Y ((((MC_BITS_X)%8)))
+
+#define MC_POS_Z ((((MC_BITS_X+MC_BITS_Y))/8))
+#define MC_SHIFT_Z ((((MC_BITS_X+MC_BITS_Y)%8)))
+
+#define MC_POS_V11 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z))/8))
+#define MC_SHIFT_V11 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z)%8)))
+
+#define MC_POS_V12 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT))/8))
+#define MC_SHIFT_V12 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT)%8)))
+
+#define MC_POS_V13 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*2))/8))
+#define MC_SHIFT_V13 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*2)%8)))
+
+#define MC_POS_V21 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*3))/8))
+#define MC_SHIFT_V21 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*3)%8)))
+
+#define MC_POS_V22 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*4))/8))
+#define MC_SHIFT_V22 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*4)%8)))
+
+#define MC_POS_V23 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*5))/8))
+#define MC_SHIFT_V23 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*5)%8)))
+
+#define MC_POS_V31 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*6))/8))
+#define MC_SHIFT_V31 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*6)%8)))
+
+#define MC_POS_V32 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*7))/8))
+#define MC_SHIFT_V32 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*7)%8)))
+
+#define MC_POS_V33 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*8))/8))
+#define MC_SHIFT_V33 ((((MC_BITS_X+MC_BITS_Y+MC_BITS_Z+MC_BITS_VECT*8)%8)))
+
+#ifdef MDR_LOAD
+// NOTE: Copied from ioquake3
+void Md3Filter::MC_UnCompress(float mat[3][4],const unsigned char * comp)
+{
+   int val;
+
+   val=(int)((unsigned short *)(comp))[0];
+   val-=1<<(MC_BITS_X-1);
+   mat[0][3]=((float)(val))*MC_SCALE_X;
+
+   val=(int)((unsigned short *)(comp))[1];
+   val-=1<<(MC_BITS_Y-1);
+   mat[1][3]=((float)(val))*MC_SCALE_Y;
+
+   val=(int)((unsigned short *)(comp))[2];
+   val-=1<<(MC_BITS_Z-1);
+   mat[2][3]=((float)(val))*MC_SCALE_Z;
+
+
+   val=(int)((unsigned short *)(comp))[3];
+   val-=1<<(MC_BITS_VECT-1);
+   mat[0][0]=((float)(val))*MC_SCALE_VECT;
+
+   val=(int)((unsigned short *)(comp))[4];
+   val-=1<<(MC_BITS_VECT-1);
+   mat[0][1]=((float)(val))*MC_SCALE_VECT;
+
+   val=(int)((unsigned short *)(comp))[5];
+   val-=1<<(MC_BITS_VECT-1);
+   mat[0][2]=((float)(val))*MC_SCALE_VECT;
+
+
+   val=(int)((unsigned short *)(comp))[6];
+   val-=1<<(MC_BITS_VECT-1);
+   mat[1][0]=((float)(val))*MC_SCALE_VECT;
+
+   val=(int)((unsigned short *)(comp))[7];
+   val-=1<<(MC_BITS_VECT-1);
+   mat[1][1]=((float)(val))*MC_SCALE_VECT;
+
+   val=(int)((unsigned short *)(comp))[8];
+   val-=1<<(MC_BITS_VECT-1);
+   mat[1][2]=((float)(val))*MC_SCALE_VECT;
+
+
+   val=(int)((unsigned short *)(comp))[9];
+   val-=1<<(MC_BITS_VECT-1);
+   mat[2][0]=((float)(val))*MC_SCALE_VECT;
+
+   val=(int)((unsigned short *)(comp))[10];
+   val-=1<<(MC_BITS_VECT-1);
+   mat[2][1]=((float)(val))*MC_SCALE_VECT;
+
+   val=(int)((unsigned short *)(comp))[11];
+   val-=1<<(MC_BITS_VECT-1);
+   mat[2][2]=((float)(val))*MC_SCALE_VECT;
+}
+#endif
+
+#ifdef MDR_EXPORT
+// Based on MC_UnCompress from ioquake3
+// NOTE: mat[0,1,2][0,1,2] can only be -1 to 1, mat[0,1,2][3] can only be -512 to 511
+void Md3Filter::MC_Compress(const float mat[3][4],unsigned char * comp)
+{
+   float val;
+
+   val=((float)(mat[0][3]))/MC_SCALE_X;
+   val+=1<<(MC_BITS_X-1);
+   ((unsigned short *)(comp))[0]=(unsigned short)(val);
+
+   val=((float)(mat[1][3]))/MC_SCALE_Y;
+   val+=1<<(MC_BITS_Y-1);
+   ((unsigned short *)(comp))[1]=(unsigned short)(val);
+
+   val=((float)(mat[2][3]))/MC_SCALE_Z;
+   val+=1<<(MC_BITS_Z-1);
+   ((unsigned short *)(comp))[2]=(unsigned short)(val);
+
+
+   val=((float)(mat[0][0]))/MC_SCALE_VECT;
+   val+=1<<(MC_BITS_VECT-1);
+   ((unsigned short *)(comp))[3]= (unsigned short)(val);
+
+   val=((float)(mat[0][1]))/MC_SCALE_VECT;
+   val+=1<<(MC_BITS_VECT-1);
+   ((unsigned short *)(comp))[4]= (unsigned short)(val);
+
+   val=((float)(mat[0][2]))/MC_SCALE_VECT;
+   val+=1<<(MC_BITS_VECT-1);
+   ((unsigned short *)(comp))[5]=(int)(val);
+
+
+   val=((float)(mat[1][0]))/MC_SCALE_VECT;
+   val+=1<<(MC_BITS_VECT-1);
+   ((unsigned short *)(comp))[6]=(int)(val);
+
+   val=((float)(mat[1][1]))/MC_SCALE_VECT;
+   val+=1<<(MC_BITS_VECT-1);
+   ((unsigned short *)(comp))[7]=(int)(val);
+
+   val=((float)(mat[1][2]))/MC_SCALE_VECT;
+   val+=1<<(MC_BITS_VECT-1);
+   ((unsigned short *)(comp))[8]=(int)(val);
+
+
+   val=((float)(mat[2][0]))/MC_SCALE_VECT;
+   val+=1<<(MC_BITS_VECT-1);
+   ((unsigned short *)(comp))[9]=(int)(val);
+
+   val=((float)(mat[2][1]))/MC_SCALE_VECT;
+   val+=1<<(MC_BITS_VECT-1);
+   ((unsigned short *)(comp))[10]=(int)(val);
+
+   val=((float)(mat[2][2]))/MC_SCALE_VECT;
+   val+=1<<(MC_BITS_VECT-1);
+   ((unsigned short *)(comp))[11]=(int)(val);
+}
+#endif
+#endif
+
 //MM3D internal stuff
 
 bool Md3Filter::canRead( const char * filename )
@@ -3647,7 +3862,7 @@ bool Md3Filter::isSupported( const char * filename )
 
 #ifdef MDR_GENERAL
    if ( len >= 4 && ( strcasecmp( &filename[len-4], ".md3" ) == 0
-		|| strcasecmp( &filename[len-4], ".mdr" ) == 0 ) )
+      || strcasecmp( &filename[len-4], ".mdr" ) == 0 ) )
 #else
    if ( len >= 4 && strcasecmp( &filename[len-4], ".md3" ) == 0 )
 #endif
