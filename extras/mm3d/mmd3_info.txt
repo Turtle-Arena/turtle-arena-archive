@@ -1,5 +1,5 @@
 md3filter.cc/h are from Misfit Model 3D, they have been modified by ZTurtleMan to add support for non-quake3 md3 players.
-mm3d_changes.diff contains changes for md3filter.cc/h and other MM3D files.
+mm3d_changes.diff contains changes for other files that have been changed.
 
 Adds support for Quake III: Team Arena and others mods (like Turtle Arena).
 
@@ -10,6 +10,9 @@ Incomplete list of changes.
 
 == MDR ==
 Unfinished support for MDR models. MDR model are basically skeleton animated MD3 models.
+
+Compressed MDR models only allow bone joints in the range of -512 to 511.
+If your model is bigger set MDR_compressed to 0.
 
 == Animation Looping ==
 * "Loop" in the Animation Mode is now per-animation (with undo support)
@@ -30,4 +33,6 @@ If MD3_EliteLoop value is 1 uses STV: Elite Force Single Player style loopframes
 
 If MD3_AnimKeyword value is 1 uses Elite Force Single Player style animation list
 Example: "BOTH_DEATH1 0 5 5 15"
+
+If MDR_compressed value is 0 does not compress the MDR model(s).
 
