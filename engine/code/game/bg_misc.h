@@ -1051,7 +1051,7 @@ typedef enum {
 #ifdef TA_PLAYERS
 // NOTE: In animation.cfg I call some animations by other names;
 // * TORSO_ATTACK_GUN is TORSO_ATTACK
-// * TORSO_ATTACK_GUNTLET is TORSO_ATTACK2
+// * TORSO_ATTACK_GAUNTLET is TORSO_ATTACK2
 // * TORSO_STAND_GUN is TORSO_STAND
 // * TORSO_STAND_GAUNTLET is TORSO_STAND2
 #endif
@@ -1116,7 +1116,7 @@ typedef enum {
 	// TORSO_GET_SECONDARY,
 
 	// Gun-type standing animations
-	//TORSO_STAND_GUNTLET, // Would be the same as TORSO_STAND2...
+	//TORSO_STAND_GAUNTLET, // Would be the same as TORSO_STAND2...
     //TORSO_STAND_GUN, // Would be the same as TORSO_STAND...
     TORSO_STAND_GUN_PRIMARY, // I could reuse TORSO_STAND2 even though its for the gauntlet...
 
@@ -1140,7 +1140,7 @@ typedef enum {
     TORSO_STAND_NUNCHUCKS1_PRIMARY,
 
 	// Gun attacks
-    //TORSO_ATTACK_GUNTLET, // Would be the same as TORSO_ATTACK2...
+    //TORSO_ATTACK_GAUNTLET, // Would be the same as TORSO_ATTACK2...
     //TORSO_ATTACK_GUN, // Would be the same as TORSO_ATTACK...
     TORSO_ATTACK_GUN_PRIMARY, // Can't reuse TORSO_ATTACK2 needs a new animation.
 

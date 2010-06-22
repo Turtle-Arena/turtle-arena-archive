@@ -1403,9 +1403,9 @@ playerAnimationDef_t playerAnimationDefs[] = {
 
 	// Fake animations (Different names for real animations)
 	{ TORSO_STAND, "TORSO_STAND_GUN" },
-	{ TORSO_STAND2, "TORSO_STAND_GUNTLET" },
+	{ TORSO_STAND2, "TORSO_STAND_GAUNTLET" },
 	{ TORSO_ATTACK, "TORSO_ATTACK_GUN" },
-	{ TORSO_ATTACK2, "TORSO_ATTACK_GUNTLET" },
+	{ TORSO_ATTACK2, "TORSO_ATTACK_GAUNTLET" },
 
 	// End of List
 	{ 0, NULL }
@@ -5713,11 +5713,13 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 
 		if (!headConfig) // skip animations
 		{
+			qboolean found = qfalse;
+
 			// ZTM: New animation loading.
 			for (i = 0; playerAnimationDefs[i].name != NULL; i++)
 			{
 				if ( !Q_stricmp( token, playerAnimationDefs[i].name ) ) {
-					foundAnim = qtrue;
+					found = foundAnim = qtrue;
 					rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip);
 					if (rtn == -1)
 					{
@@ -5732,6 +5734,10 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 					}
 					break;
 				}
+			}
+
+			if (found) {
+				continue;
 			}
 		}
 
