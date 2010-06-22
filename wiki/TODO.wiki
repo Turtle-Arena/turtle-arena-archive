@@ -306,7 +306,10 @@ Stuff I'd like to do to the MD3 part of MM3D...
 
   * BUG: After exporting a player I have to open, touch, and save the upper and head models (with no change) to fix model lighting.
 
-  * TODO: Finish MDR support for Misfit Model 3D.
+  * TODO: Finish MDR export support for Misfit Model 3D.
+    * TODO: Check if Elite Force supports uncompressed MDR models.
+
+  * TODO: MDR import support for Misfit Model 3D.
 
   * TODO: Export lower LODs of MD3 models (head_1.md3, head_2.md3), and include lower LODs in MDR models
     * Maybe use gts.sourceforge.net to generate lower LODs? The gallery shows its possible. Somehow.
