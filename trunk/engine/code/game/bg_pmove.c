@@ -2291,8 +2291,13 @@ static void PM_Weapon( void ) {
 
 	// check for dead player
 	if ( pm->ps->stats[STAT_HEALTH] <= 0 ) {
-#ifdef TA_WEAPSYS // ZTM: FIXME: Shouldn't be done if player died in NODROP...
+#ifdef TA_WEAPSYS 
 		qboolean nodrop = qfalse;
+
+		// ZTM: FIXME: Shouldn't be done if player died in NODROP...
+		//if (contents & CONTENTS_NODROP) {
+		//	nodrop = qtrue;
+		//}
 
 		// Player should let go of the dropped weapon.
 		if (!nodrop && pm->ps->weapon != pm->ps->stats[STAT_DEFAULTWEAPON])

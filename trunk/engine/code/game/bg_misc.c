@@ -2814,7 +2814,7 @@ qboolean BG_ParseWeaponInfoFile( const char *filename ) {
 	char		*text_p;
 	int			len;
 	char		*token;
-	char		text[30000]; // ZTM: FIXME: was 20000, but the file became too long...
+	char		text[30000]; // ZTM: NOTE: Was 20000, but the file became too long...
 	fileHandle_t	f;
 
 	// load the file
@@ -5062,6 +5062,12 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 	qboolean flipflop;
 	int i;
 
+	if (loadedAnim == NULL)
+	{
+		Com_Printf("Error: loadedAnim is NULL in BG_SetDefaultAnimation\n");
+		return qfalse;
+	}
+
 	memset(anim, -1, MAX_DEFAULT_ANIMATIONS * sizeof (int));
 	reversed = qfalse;
 	flipflop = qfalse;
@@ -5267,29 +5273,21 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 		if (anim[i] == -1)
 			break;
 
-		// ZTM: FIXME: Can't use a animation for this one,
-		//    if it hasn't loaded it. I could "flag" it and load it
-		//    after all the animtions have loaded...
-		if (!loadedAnim && index <= anim[i])
-		{
-			Com_Printf("BG_SetDefaultAnimation: Failed. (index=%i, anim=%i)\n", index, anim[i]);
+		// Check if the animation has been loaded
+		if (loadedAnim[anim[i]] == qfalse) {
 			continue;
 		}
 
-		if (!loadedAnim || (loadedAnim && loadedAnim[anim[i]] == qtrue))
-		{
-			//Com_Printf("BG_SetDefaultAnimation: Copy (index=%i, anim=%i)\n", index, anim[i]);
-			memcpy(&animations[index], &animations[anim[i]], sizeof (animation_t));
-			if (reversed) {
-				animations[index].reversed = !animations[index].reversed;
-			}
-			//animations[i].flipflop = flipflop;
-			return qtrue;
+		memcpy(&animations[index], &animations[anim[i]], sizeof (animation_t));
+		if (reversed) {
+			animations[index].reversed = !animations[index].reversed;
 		}
+		//animations[i].flipflop = flipflop;
+		return qtrue;
 	}
 
 	//Com_Printf("BG_SetDefaultAnimation: Failed to set default animation for index %i.\n", index);
-		return qfalse;
+	return qfalse;
 #undef MAX_DEFAULT_ANIMATIONS
 }
 
@@ -5789,8 +5787,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			} else if (rtn == 0) {
 				Com_Printf("BG_ParsePlayerCFGFile: Animation %d: Failed loading.\n", i);
 				break;
-			}
-			else {
+			} else {
 				loadedAnim[i] = qtrue;
 			}
 		}
