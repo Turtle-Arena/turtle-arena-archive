@@ -119,6 +119,9 @@ typedef enum {
 	IMPACTSOUND_DEFAULT,
 	IMPACTSOUND_METAL,
 	IMPACTSOUND_FLESH
+#ifdef TA_WEAPSYS
+	,IMPACTSOUND_LIGHTNING_PREDICT
+#endif
 } impactSound_t;
 
 #ifdef TA_MISC // MATERIALS
@@ -1162,9 +1165,11 @@ typedef struct {
 	sfxHandle_t	useNothingSound;
 	sfxHandle_t	wearOffSound;
 	sfxHandle_t	footsteps[FOOTSTEP_TOTAL][4];
+#ifndef TA_WEAPSYS
 	sfxHandle_t	sfx_lghit1;
 	sfxHandle_t	sfx_lghit2;
 	sfxHandle_t	sfx_lghit3;
+#endif
 	sfxHandle_t	sfx_ric1;
 	sfxHandle_t	sfx_ric2;
 	sfxHandle_t	sfx_ric3;

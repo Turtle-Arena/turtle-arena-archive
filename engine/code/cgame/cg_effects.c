@@ -509,6 +509,11 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 	}
 
 	// skew the time a bit so they aren't all in sync
+#ifdef TA_WEAPSYS
+	if (msec < 63)
+		offset = rand() & 3;
+	else
+#endif
 	offset = rand() & 63;
 
 	ex = CG_AllocLocalEntity();

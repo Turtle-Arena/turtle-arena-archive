@@ -1119,9 +1119,6 @@ void CG_RegisterProjectile( int projectileNum )
 			break;
 		case PD_LIGHTNING:
 			cgs.media.lightningExplosionModel = trap_R_RegisterModel( "models/weaphits/crackle.md3" );
-			cgs.media.sfx_lghit1 = trap_S_RegisterSound( "sound/weapons/lightning/lg_hit.wav", qfalse );
-			cgs.media.sfx_lghit2 = trap_S_RegisterSound( "sound/weapons/lightning/lg_hit2.wav", qfalse );
-			cgs.media.sfx_lghit3 = trap_S_RegisterSound( "sound/weapons/lightning/lg_hit3.wav", qfalse );
 			break;
 	}
 }
@@ -1744,7 +1741,7 @@ angle)
 */
 static void CG_LightningBolt( centity_t *cent, vec3_t origin
 #ifdef TA_WEAPSYS
-	, int range
+	, int projnum
 #endif
 	)
 {
@@ -1754,6 +1751,16 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 	vec3_t   muzzlePoint, endPoint;
 #ifdef IOQ3ZTM
 	int anim;
+#endif
+#ifdef TA_WEAPSYS
+	int range;
+
+	if (projnum < 0 || projnum >= BG_NumProjectiles())
+	{
+		return;
+	}
+
+	range = bg_projectileinfo[projnum].speed;
 #endif
 
 #ifndef TA_WEAPSYS
@@ -1834,9 +1841,16 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 
 	// add the impact flare if it hit something
 	if ( trace.fraction < 1.0 ) {
-#ifdef TA_WEAPSYS // ZTM: FIXME: Support Q3 lightning gun
-		// PT_LIGHTNING
-		// CG_MissileHitWall (Exposion only, no sounds or wallmarks.)
+#ifdef TA_WEAPSYS // PT_LIGHTNING
+		vec3_t	dir;
+		vec3_t origin;
+
+		VectorSubtract( beam.oldorigin, beam.origin, dir );
+		VectorNormalize( dir );
+
+		VectorMA( trace.endpos, -16, dir, origin );
+
+		CG_MissileHitWall(projnum, cent->currentState.number, origin, dir, IMPACTSOUND_LIGHTNING_PREDICT);
 #else
 		vec3_t	angles;
 		vec3_t	dir;
@@ -2868,7 +2882,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 			{
 				// add lightning bolt
-				CG_LightningBolt( nonPredictedCent, flash.origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->speed );
+				CG_LightningBolt( nonPredictedCent, flash.origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->projnum );
 			}
 
 #ifndef IOQ3ZTM // Unused-rail
@@ -2973,7 +2987,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 				if (bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->trailType == PT_LIGHTNING
 					&& bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->instantDamage)
 				{
-					CG_LightningBolt( cent, origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->proj->speed);
+					CG_LightningBolt( cent, origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->projnum);
 				}
 			}
 #else
@@ -3719,9 +3733,12 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	int				duration;
 	vec3_t			sprOrg;
 	vec3_t			sprVel;
-#ifdef TA_WEAPSYS // SPR_EXP_SCALE
+#ifdef TA_WEAPSYS
+	// SPR_EXP_SCALE
 	int exp_base;
 	int exp_add;
+	qboolean instantLightningBeam;
+	qboolean instantLightningImpact;
 #endif
 
 #ifdef IOQ3ZTM // LASERTAG
@@ -3753,109 +3770,128 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #endif
 
 #ifdef TA_WEAPSYS
-	if (bg_projectileinfo[weapon].trailType != PT_LIGHTNING)
+	// Predicted instant lightning, explosion only (no wallmarks or sounds)
+	instantLightningBeam = (soundType == IMPACTSOUND_LIGHTNING_PREDICT);
+
+	// Instant lightning impact, no explosion
+	instantLightningImpact = (bg_projectileinfo[weapon].trailType == PT_LIGHTNING
+		&& bg_projectileinfo[weapon].instantDamage) && !instantLightningBeam;
+
+	switch (bg_projectileinfo[weapon].deathType)
 	{
-		switch (bg_projectileinfo[weapon].deathType)
-		{
-			default:
-			case PD_NONE:
-				break;
-			case PD_PLASMA:
-				mod = cgs.media.ringFlashModel;
-				shader = cgs.media.plasmaExplosionShader;
-				sfx = cgs.media.sfx_plasmaexp;
-				break;
-			case PD_ROCKET:
-				mod = cgs.media.dishFlashModel;
-				shader = cgs.media.rocketExplosionShader;
-				sfx = cgs.media.sfx_rockexp;
-				//mark = cgs.media.burnMarkShader;
-				//radius = 64;
-				light = 300;
-				isSprite = qtrue;
-				duration = 1000;
-				lightColor[0] = 1;
-				lightColor[1] = 0.75;
-				lightColor[2] = 0.0;
-				if (cg_oldRocket.integer == 0) {
-					// explosion sprite animation
-					VectorMA( origin, 24, dir, sprOrg );
-					VectorScale( dir, 64, sprVel );
+		default:
+		case PD_NONE:
+			break;
+		case PD_PLASMA:
+			mod = cgs.media.ringFlashModel;
+			shader = cgs.media.plasmaExplosionShader;
+			sfx = cgs.media.sfx_plasmaexp;
+			break;
+		case PD_ROCKET:
+			mod = cgs.media.dishFlashModel;
+			shader = cgs.media.rocketExplosionShader;
+			sfx = cgs.media.sfx_rockexp;
+			light = 300;
+			isSprite = qtrue;
+			duration = 1000;
+			lightColor[0] = 1;
+			lightColor[1] = 0.75;
+			lightColor[2] = 0.0;
+			if (cg_oldRocket.integer == 0
+				&& !instantLightningImpact) {
+				// explosion sprite animation
+				VectorMA( origin, 24, dir, sprOrg );
+				VectorScale( dir, 64, sprVel );
 
-					CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
-				}
-				break;
-			case PD_ROCKET_SMALL: // Smaller explosion
-				exp_base = 30 / 2;
-				exp_add = 42 / 2;
-				VectorScale( dir, 0.5f, dir );
+				CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
+			}
+			break;
+		case PD_ROCKET_SMALL: // Smaller explosion
+			exp_base = 30 / 2;
+			exp_add = 42 / 2;
+			VectorScale( dir, 0.5f, dir );
 
-				mod = cgs.media.dishFlashModel;
-				shader = cgs.media.rocketExplosionShader;
-				sfx = cgs.media.sfx_rockexp;
-				//mark = cgs.media.burnMarkShader;
-				//radius = 64 / 2;
-				light = 300 / 2;
-				isSprite = qtrue;
-				duration = 1000;
-				lightColor[0] = 1;
-				lightColor[1] = 0.75;
-				lightColor[2] = 0.0;
-				/*
-				if (cg_oldRocket.integer == 0) {
-					// explosion sprite animation
-					VectorMA( origin, 24, dir, sprOrg );
-					VectorScale( dir, 64, sprVel );
+			mod = cgs.media.dishFlashModel;
+			shader = cgs.media.rocketExplosionShader;
+			sfx = cgs.media.sfx_rockexp;
+			light = 300 / 2;
+			isSprite = qtrue;
+			duration = 1000;
+			lightColor[0] = 1;
+			lightColor[1] = 0.75;
+			lightColor[2] = 0.0;
+			break;
+		case PD_GRENADE:
+			mod = cgs.media.dishFlashModel;
+#ifdef TA_DATA
+			shader = cgs.media.rocketExplosionShader;
+#else
+			shader = cgs.media.grenadeExplosionShader;
+#endif
+			sfx = cgs.media.sfx_rockexp;
+			light = 300;
+			isSprite = qtrue;
+			break;
+		case PD_BULLET:
+			mod = cgs.media.bulletFlashModel;
+			shader = cgs.media.bulletExplosionShader;
+			r = rand() & 3;
+			if ( r == 0 ) {
+				sfx = cgs.media.sfx_ric1;
+			} else if ( r == 1 ) {
+				sfx = cgs.media.sfx_ric2;
+			} else {
+				sfx = cgs.media.sfx_ric3;
+			}
+			break;
+		case PD_RAIL:
+			mod = cgs.media.ringFlashModel;
+#ifdef TA_DATA
+			shader = cgs.media.plasmaExplosionShader;
+#else
+			shader = cgs.media.railExplosionShader;
+#endif
+			sfx = cgs.media.sfx_plasmaexp;
+			break;
+		case PD_BFG:
+			mod = cgs.media.dishFlashModel;
+#ifdef TA_DATA
+			shader = cgs.media.rocketExplosionShader;
+#else
+			shader = cgs.media.bfgExplosionShader;
+#endif
+			sfx = cgs.media.sfx_rockexp;
+			break;
+		case PD_LIGHTNING:
+			if (!instantLightningBeam) {
+				mod = cgs.media.lightningExplosionModel;
+			} else {
+				refEntity_t  beam;
+				vec3_t	angles;
 
-					CG_ParticleExplosion( "explode1", sprOrg, sprVel, 1400, 20, 30 );
-				}
-				*/
-				break;
-			case PD_GRENADE:
-				mod = cgs.media.dishFlashModel;
-#ifdef TA_DATA
-				shader = cgs.media.rocketExplosionShader;
-#else
-				shader = cgs.media.grenadeExplosionShader;
-#endif
-				sfx = cgs.media.sfx_rockexp;
-				light = 300;
-				isSprite = qtrue;
-				break;
-			case PD_BULLET:
-				mod = cgs.media.bulletFlashModel;
-				shader = cgs.media.bulletExplosionShader;
-				r = rand() & 3;
-				if ( r == 0 ) {
-					sfx = cgs.media.sfx_ric1;
-				} else if ( r == 1 ) {
-					sfx = cgs.media.sfx_ric2;
-				} else {
-					sfx = cgs.media.sfx_ric3;
-				}
-				break;
-			case PD_RAIL:
-				mod = cgs.media.ringFlashModel;
-#ifdef TA_DATA
-				shader = cgs.media.plasmaExplosionShader;
-#else
-				shader = cgs.media.railExplosionShader;
-#endif
-				sfx = cgs.media.sfx_plasmaexp;
-				break;
-			case PD_BFG:
-				mod = cgs.media.dishFlashModel;
-#ifdef TA_DATA
-				shader = cgs.media.rocketExplosionShader;
-#else
-				shader = cgs.media.bfgExplosionShader;
-#endif
-				sfx = cgs.media.sfx_rockexp;
-				break;
-			case PD_LIGHTNING:
-				//
-				break;
-		}
+				memset( &beam, 0, sizeof( beam ) );
+				beam.hModel = cgs.media.lightningExplosionModel;
+
+				VectorCopy( origin, beam.origin );
+
+				// make a random orientation
+				angles[0] = rand() % 360;
+				angles[1] = rand() % 360;
+				angles[2] = rand() % 360;
+				AnglesToAxis( angles, beam.axis );
+				trap_R_AddRefEntityToScene( &beam );
+			}
+			break;
+	}
+
+	if (instantLightningBeam) {
+		duration /= 10; // Shorten time
+		light = 0; // No light
+	}
+
+	if (instantLightningImpact) {
+		// No explosion
+		mod = shader = light = 0;
 	}
 
 	// play sound
@@ -3882,12 +3918,13 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		}
 	}
 
+	if (instantLightningBeam) {
+		// No sound
+		sfx = 0;
+	}
 /*
 	switch ( weapon ) {
 	default:
-	case WP_LIGHTNING:
-		// no explosion at LG impact, it is added with the beam
-		break;
 #ifndef TURTLEARENA // WEAPONS
 	case WP_SHOTGUN:
 		sfx = 0;
@@ -4071,6 +4108,11 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	}
 
 #ifdef TA_WEAPSYS
+	if (instantLightningBeam) {
+		// No wallmark
+		return;
+	}
+
 	mark = cg_projectiles[weapon].wallmarkShader;
 	radius = cg_projectiles[weapon].wallmarkRadius;
 
