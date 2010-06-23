@@ -245,15 +245,15 @@ weapongroup "wp_rocket_launcher"
 }
 
 //
-// Lightning (Not done, has no explosion, does't draw in third person, [is that all?])
+// Lightning (Done)
 //
 
 projectile "p_lightning"
 {
 	instantDamage 1
 	damage 8
-	trailType PT_LIGHTNING // not finished?
-	deathType PD_LIGHTNING // PT_LIGHTNING currently doesn't "die"
+	trailType PT_LIGHTNING
+	deathType PD_LIGHTNING
 	wallmarkName "gfx/damage/hole_lg_mrk"
 	wallmarkRadius 12
 	speed 768 // range of instantDamage
@@ -274,7 +274,6 @@ weapon "w_lightning"
 	projectile "p_lightning"
 }
 
-// done
 weapongroup "wp_lightning"
 {
 	itemName "weapon_lightning"
@@ -501,7 +500,6 @@ weapongroup "wp_nailgun"
 
 //
 // Prox Mine Launcher (Can't be remade yet.)
-//               Need to be able to damage owner in G_RunMissile
 //               Need to generlize prox stuff (tigger, and stick sounds)
 //               WONTFIX?: Stick mines to players.
 //
@@ -561,6 +559,7 @@ projectile "p_chaingun"
 	spread 600
 
 	// In vanilla Quake III: Team Arena, Chaingun sounds were overriden with normal bullet sounds.
+	//  "normal bullet sounds" are done in the engine by PD_BULLET
 	//hitPlayerSound "sound/weapons/vulcan/wvulimpl.wav"
 	//hitMetalSound "sound/weapons/vulcan/wvulimpm.wav"
 	//hitSound0 "sound/weapons/vulcan/wvulimpd.wav"

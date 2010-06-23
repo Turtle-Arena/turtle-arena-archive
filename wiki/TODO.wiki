@@ -51,7 +51,7 @@ Weapons (and attacking)
 
   * TODO: Add code so that Nunchuk can spin when standing? When not spining have gravity, like MISSIONPACK held CTF flag?
 
-  * STARTED ( TA_WEAPSYS ): TODO: Support Quake III: Team Arena weapon features via weapon scripting
+  * STARTED ( TA_WEAPSYS ): TODO: Support Quake III: Team Arena proxy mine launcher via weapon scripting
 
   * TODO: Spawn Ammo items from weaponinfo.txt
     * If I make it so weapon/ammo items are in text files, should I have all items in iteminfo.txt (and `*.item`) too?...
