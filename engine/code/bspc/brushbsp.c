@@ -928,7 +928,7 @@ void LeafNode(node_t *node, bspbrush_t *brushes)
 //===========================================================================
 void CheckPlaneAgainstParents (int pnum, node_t *node)
 {
-#if 0 // ZTM: FIXME: This causes some of my map to fail. Why is this done? What is it doing?
+#if 0 // ZTM: FIXME: This causes some of my maps to fail. Why is this done? What is it doing?
 	node_t	*p;
 
 	for (p = node->parent; p; p = p->parent)
