@@ -3461,7 +3461,7 @@ void CG_FireWeapon( centity_t *cent ) {
 	// append the flash to the weapon model
 	cent->muzzleFlashTime = cg.time;
 
-#ifdef TA_WEAPSYS // ZTM: FIXME: Add a flag for this?
+#ifdef TA_WEAPSYS // ZTM: TODO: Add a flag for this?
 						// The flag would make it so that when holding the attack
 						//   button the flash sound and brass ecj would happen only on
 						//   the first press.

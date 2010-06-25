@@ -2991,10 +2991,10 @@ void CL_SetModel_f( void ) {
 	if (arg[0]) {
 #if 0 //#ifdef IOQ3ZTM // Only change headmodel if its the same as model.
 /* ZTM: TODO: See below;
-May breaks compatiblity with Quake III: Team Arena?
+May break compatibility with Quake III: Team Arena?
 	But Team Arena use team_headmodel not headmodel.
 
-It's rather hacky, special case, and may cause comfusion.
+It's rather hacky, special case, and may cause confusion.
 	But only if you've been messing with headmodel in the console.
 	(Or if IOQ3ZTM_NO_TEAM_MODEL is defined in Team Arena...)
 

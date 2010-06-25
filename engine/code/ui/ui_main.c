@@ -3065,7 +3065,7 @@ static void UI_StartSkirmish(qboolean next) {
 
 	k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
 
-#ifdef TA_SP // ZTM: TODO: Custom Game (skirmish) uses 2 while Single Player uses 1.
+#ifdef TA_SP // ZTM: NOTE: Custom Game (skirmish) uses 2 while Single Player uses 1.
 	trap_Cvar_Set("ui_singlePlayerActive", "2");
 #else
 	trap_Cvar_Set("ui_singlePlayerActive", "1");
