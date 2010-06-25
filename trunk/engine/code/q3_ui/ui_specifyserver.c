@@ -153,7 +153,9 @@ static void SpecifyServer_Event( void* ptr, int event )
 					}
 					else
 					{
-						// ZTM: TODO: Show message. ("Can't add, all fav slots full.")
+						trap_Cvar_Set( "com_errorMessage", "Can't add fav, all fav slots full.");
+						UI_MainMenu();
+						return;
 					}
 				}
 			}

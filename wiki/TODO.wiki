@@ -20,12 +20,13 @@ First stable playable release.
 Focus on players, map themes, and multiplayer maps
 
   * Map Themes (textures, models, misc_objects, and maybe music?)
-  * Improve player models; each player should have their own animations, etc et
+  * Improve player models; each player should have their own animations, etc
   * Player Abilities
   * Have player models be MDR (Finish Misfit Model 3D MDR exporting)
   * Multiple levels of detail for players and other models
   * Bring back player effect colors?
-    * (Like to control Turtle mask color and/or melee trail color?)
+    * Readd to ui and q3_ui
+    * (Control Turtle mask color and/or melee trail color?)
   * Add more players (Mirage or 2003 based?); Shredder, Foot, etc
   * Remake UI with missionpack ui scripting?
   * Reduce overall number of TODOs and FIXMEs in the source

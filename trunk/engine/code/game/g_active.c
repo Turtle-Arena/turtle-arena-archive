@@ -618,7 +618,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			w = weapList[i];
 #endif
 
-#ifdef TA_WEAPSYS // ZTM: FIXME: Make ammo regen less-hacky, have it make sense.
+#ifdef TA_WEAPSYS // ZTM: TODO: Make ammo regen less-hacky, have it make sense.
 			// NOTE: max is wrong for WP_BFG: max should be 10 instead of 20
 			//                        WP_MACHINEGUN: max should be 50 instead of 40
 			//       inc is wrong for WP_MACHINEGUN: inc should be 4 instead of 5
