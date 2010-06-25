@@ -218,7 +218,7 @@ void Cmd_Give_f (gentity_t *ent)
 	gentity_t		*it_ent;
 	trace_t		trace;
 #ifdef TA_WEAPSYS
-	int weaponGroup;
+	int weapGroup;
 #endif
 
 	if ( !CheatsOk( ent ) ) {
