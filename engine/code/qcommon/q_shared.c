@@ -123,6 +123,21 @@ void COM_DefaultExtension (char *path, int maxSize, const char *extension ) {
 	Com_sprintf( path, maxSize, "%s%s", oldPath, extension );
 }
 
+#ifdef IOQ3ZTM
+void Com_SetExt(char *filename, char *ext)
+{
+	int i;
+
+	for (i = 0; filename[i] && filename[i] != '.'; i++)
+	{
+		// just increase i.
+	}
+	filename[i] = 0;
+
+	Q_strcat(filename, MAX_QPATH, ext);
+}
+#endif
+
 /*
 ============================================================================
 
