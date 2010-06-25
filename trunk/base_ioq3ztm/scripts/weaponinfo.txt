@@ -205,7 +205,7 @@ weapongroup "wp_grenade_launcher"
 // Rocket Launcher (Done)
 //
 
-projectile "p_rocket_launcher"
+projectile "p_rocket"
 {
 	model "models/ammo/rocket/rocket.md3"
 	damage 100
@@ -231,7 +231,7 @@ weapon "w_rocket_launcher"
 	splashMod MOD_ROCKET_SPLASH
 	flashColor 1 0.75 0
 	flashSound0 "sound/weapons/rocket/rocklf1a.wav"
-	projectile "p_rocket_launcher"
+	projectile "p_rocket"
 }
 
 weapongroup "wp_rocket_launcher"
@@ -248,7 +248,7 @@ weapongroup "wp_rocket_launcher"
 // Lightning (Done)
 //
 
-projectile "p_lightning"
+projectile "p_lightning bolt"
 {
 	instantDamage 1
 	damage 8
@@ -271,7 +271,7 @@ weapon "w_lightning"
 	flashColor 0.6 0.6 1
 	continuousFlash 1
 	flashSound0 "sound/weapons/lightning/lg_fire.wav"
-	projectile "p_lightning"
+	projectile "p_lightning bolt"
 }
 
 weapongroup "wp_lightning"
@@ -328,7 +328,7 @@ weapongroup "wp_railgun"
 // Plasma Gun (Done)
 //
 
-projectile "p_plasma"
+projectile "p_plasma ball"
 {
 	sprite "sprites/plasma1"
 	spriteRadius 16
@@ -354,7 +354,7 @@ weapon "w_plasmagun"
 	splashMod MOD_PLASMA_SPLASH
 	flashColor 0.6 0.6 1.0
 	flashSound0 "sound/weapons/plasma/hyprbf1a.wav"
-	projectile "p_plasma"
+	projectile "p_plasma ball"
 }
 
 weapongroup "wp_plasmagun"
@@ -412,7 +412,7 @@ weapongroup "wp_bfg"
 //
 // Grappling Hook (Done)
 //
-projectile "p_grappling_hook"
+projectile "p_grappling hook"
 {
 	model "models/ammo/rocket/rocket.md3"
 	damage 10
@@ -434,7 +434,7 @@ weapon "w_grappling_hook"
 	attackDelay 400
 	continuousFlash 1
 	flashColor 0.6 0.6 1.0
-	projectile "p_grappling_hook"
+	projectile "p_grappling hook"
 }
 
 weapongroup "wp_grappling_hook"
@@ -499,12 +499,12 @@ weapongroup "wp_nailgun"
 }
 
 //
-// Prox Mine Launcher (Can't be remade yet.)
-//               Need to generlize prox stuff (tigger, and stick sounds)
+// Prox Mine Launcher (Can't be fully remade yet.)
+//               Need to finish generlizing prox stuff (Player and metal stick sounds)
 //               WONTFIX?: Stick mines to players.
 //
 
-projectile "p_prox_mine"
+projectile "p_prox mine"
 {
 	model "models/weaphits/proxmine.md3"
 	modelBlue "models/weaphits/proxmineb.md3"
@@ -519,6 +519,14 @@ projectile "p_prox_mine"
 	useGravity 1
 	stickOnImpact 3
 	hitSound0 "sound/weapons/proxmine/wstbexpl.wav"
+
+	// stick sounds
+	bounceSound0 "sound/weapons/proxmine/wstbimpd.wav"
+	// metal sound/weapons/proxmine/wstbimpm.wav
+	// player sound/weapons/proxmine/wstbimpl.wav
+
+	// trigger sound
+	bounceSound1 "sound/weapons/proxmine/wstbactv.wav"
 }
 
 weapon "w_prox_launcher"
@@ -529,7 +537,7 @@ weapon "w_prox_launcher"
 	attackDelay 800
 	flashColor 1 0.7 0
 	flashSound0 "sound/weapons/proxmine/wstbfire.wav"
-	projectile "p_prox_mine"
+	projectile "p_prox mine"
 }
 
 // done
