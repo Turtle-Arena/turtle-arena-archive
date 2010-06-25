@@ -1677,7 +1677,7 @@ void ClientSpawn(gentity_t *ent) {
 			}
 			else
 			{
-				// If its not a gun, no ammo.
+				// Doesn't use ammo
 				client->ps.ammo[i] = -1;
 			}
 		}
