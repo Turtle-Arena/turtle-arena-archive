@@ -504,8 +504,8 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 				client->ps.meleeAttack = 0;
 				client->ps.meleeLinkTime = 0;
 			}
-			}
 		}
+	}
 
 	if (client->ps.chainTime > 0)
 	{

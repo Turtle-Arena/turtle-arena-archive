@@ -217,6 +217,9 @@ void Cmd_Give_f (gentity_t *ent)
 	qboolean	give_all;
 	gentity_t		*it_ent;
 	trace_t		trace;
+#ifdef TA_WEAPSYS
+	int weaponGroup;
+#endif
 
 	if ( !CheatsOk( ent ) ) {
 		return;
@@ -237,8 +240,9 @@ void Cmd_Give_f (gentity_t *ent)
 			ent->client->ps.holdable[i] = MAX_SHURIKENS;
 		}
 		// Change to first holdable.
-		if (!ent->client->ps.holdableIndex)
-		ent->client->ps.holdableIndex = 1;
+		if (!ent->client->ps.holdableIndex) {
+			ent->client->ps.holdableIndex = 1;
+		}
 		if (!give_all)
 			return;
 	}
@@ -251,10 +255,18 @@ void Cmd_Give_f (gentity_t *ent)
 			return;
 	}
 
+#ifdef TA_WEAPSYS
+	// \give wp_bo
+	weapGroup = BG_WeaponGroupIndexForName(name);
+	if (weapGroup) {
+		ent->client->ps.stats[STAT_PENDING_WEAPON] = weapGroup;
+	}
+#endif
+
 #ifdef TA_WEAPSYS_EX
 	// \give weapon1
 	// The above will give WP_KATANAS
-	if (Q_strncmp(name, "weapon", 6) == 0)
+	if (Q_strncmp(name, "weapon", 6) == 0 && isdigit(name[6]))
 	{
 		int w;
 		w = atoi(&name[6]);

@@ -51,7 +51,7 @@ Weapons (and attacking)
 
   * TODO: Add code so that Nunchuk can spin when standing? When not spining have gravity, like MISSIONPACK held CTF flag?
 
-  * TODO: Spawn Ammo items from weaponinfo.txt
+  * IOQ3ZTM: TODO: Spawn Ammo items from weaponinfo.txt
     * If I make it so weapon/ammo items are in text files, should I have all items in iteminfo.txt (and `*.item`) too?...
 
   * TODO: Have weapons be seperate entities (ET_WEAPON) from the player,
@@ -75,6 +75,8 @@ Weapons (and attacking)
     * (So they can be totally configured from .weap, and add new ones)
 
   * BUG: Flash origin isn't updated when missing weapon model
+
+  * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
 
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
