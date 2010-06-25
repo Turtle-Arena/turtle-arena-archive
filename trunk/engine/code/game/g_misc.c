@@ -848,20 +848,6 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 	return ent;
 }
 
-// TODO: Make this / CG_SetFileExt be Com_SetFileExt ?
-void G_SetFileExt(char *filename, char *ext)
-{
-	int i;
-
-	for (i = 0; filename[i] && filename[i] != '.'; i++)
-	{
-		// just increase i.
-	}
-	filename[i] = 0;
-
-	Q_strcat(filename, MAX_QPATH, ext);
-}
-
 // Based on SP_misc_model and SP_team_redobelisk
 // The passed "ent" is the misc_object controler.
 void SP_misc_object( gentity_t *ent ) {
@@ -912,7 +898,7 @@ void SP_misc_object( gentity_t *ent ) {
 		}
 		else
 		{
-			G_SetFileExt(filename, ".cfg");
+			Com_SetExt(filename, ".cfg");
 		}
 
 		BG_ParseObjectCFGFile(filename, &objectcfg);

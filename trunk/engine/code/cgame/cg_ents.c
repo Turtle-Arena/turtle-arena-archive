@@ -327,22 +327,8 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 		{
 			*oldframe = cent->oe.lerp.oldFrame;
 			*backlerp = cent->oe.lerp.backlerp;
+		}
 	}
-}
-}
-
-// TODO: Make this / G_SetFileExt be Com_SetFileExt ?
-void CG_SetFileExt(char *filename, char *ext)
-{
-	int i;
-
-	for (i = 0; filename[i] && filename[i] != '.'; i++)
-	{
-		// just increase i.
-	}
-	filename[i] = 0;
-
-	Q_strcat(filename, MAX_QPATH, ext);
 }
 
 static void CG_MiscObject( centity_t *cent ) {
@@ -397,7 +383,7 @@ static void CG_MiscObject( centity_t *cent ) {
 
 		Q_strncpyz(filename, modelName, MAX_QPATH);
 
-		CG_SetFileExt(filename, ".cfg");
+		Com_SetExt(filename, ".cfg");
 
 		if (BG_ParseObjectCFGFile(filename, &cent->objectcfg))
 		{
