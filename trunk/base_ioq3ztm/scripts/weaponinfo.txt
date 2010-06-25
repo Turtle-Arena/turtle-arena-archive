@@ -175,8 +175,8 @@ projectile "p_grenade"
 	wallmarkRadius 64
 	bounceType "PB_HALF"
 	useGravity 1
-	bounceSound0 "sound/weapons/grenade/hgrenb1a.wav"
-	bounceSound1 "sound/weapons/grenade/hgrenb2a.wav"
+	impactSound0 "sound/weapons/grenade/hgrenb1a.wav"
+	impactSound1 "sound/weapons/grenade/hgrenb2a.wav"
 }
 
 weapon "w_grenadel"
@@ -499,9 +499,8 @@ weapongroup "wp_nailgun"
 }
 
 //
-// Prox Mine Launcher (Can't be fully remade yet.)
-//               Need to finish generlizing prox stuff (Player and metal stick sounds)
-//               WONTFIX?: Stick mines to players.
+// Prox Mine Launcher (Done)
+// WONTFIX?: Stick mines to players.
 //
 
 projectile "p_prox mine"
@@ -521,12 +520,12 @@ projectile "p_prox mine"
 	hitSound0 "sound/weapons/proxmine/wstbexpl.wav"
 
 	// stick sounds
-	bounceSound0 "sound/weapons/proxmine/wstbimpd.wav"
-	// metal sound/weapons/proxmine/wstbimpm.wav
-	// player sound/weapons/proxmine/wstbimpl.wav
+	impactPlayerSound "sound/weapons/proxmine/wstbimpl.wav"
+	impactMetalSound "sound/weapons/proxmine/wstbimpm.wav"
+	impactSound0 "sound/weapons/proxmine/wstbimpd.wav"
 
 	// trigger sound
-	bounceSound1 "sound/weapons/proxmine/wstbactv.wav"
+	triggerSound "sound/weapons/proxmine/wstbactv.wav"
 }
 
 weapon "w_prox_launcher"
@@ -540,7 +539,6 @@ weapon "w_prox_launcher"
 	projectile "p_prox mine"
 }
 
-// done
 weapongroup "wp_prox_launcher"
 {
 	itemName "weapon_prox_launcher"

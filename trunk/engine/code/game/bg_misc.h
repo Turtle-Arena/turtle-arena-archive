@@ -615,22 +615,38 @@ typedef enum
 #define PF_WALLMARK_FADE_ALPHA 1
 #define PF_WALLMARK_COLORIZE 2
 #define PF_USE_GRAVITY 4
+#define PF_IMPACTMARK_FADE_ALPHA 8
+#define PF_IMPACTMARK_COLORIZE 16
 // missile stuff (func, model, etc)
 typedef struct
 {
 	char name[MAX_QPATH];
-	char model[MAX_QPATH];
-	char modelBlue[MAX_QPATH];
-	char modelRed[MAX_QPATH];
 	int damage;
 	int splashDamage;
 	int splashRadius;
-	int speed;
-	int timetolive;
-	qboolean shootable;
+	int speed; // range for instant damage projectiles
+	int flags;
 	int trailType;
 	int deathType;
+	// fire_nail nailgun
+	int spdRndAdd; // Speed random add
+	int spread;
+	int numProjectiles;
+
+	// Hit marks and sounds
+	char wallmarkName[MAX_QPATH];
+	int wallmarkRadius;
+	char hitSoundName[3][MAX_QPATH];
+	char hitPlayerSoundName[MAX_QPATH];
+	char hitMetalSoundName[MAX_QPATH];
+
+	// Missile (non-instant) only variables
+	char model[MAX_QPATH];
+	char modelBlue[MAX_QPATH];
+	char modelRed[MAX_QPATH];
+	int timetolive;
 	int explosionType;
+	qboolean shootable;
 	int missileDlight;
 	vec3_t missileDlightColor;
 	char missileSoundName[MAX_QPATH];
@@ -639,32 +655,25 @@ typedef struct
 	int spinType;
 	int bounceType;
 	int maxBounces;
-	char wallmarkName[MAX_QPATH];
-	int wallmarkRadius;
-	int flags;
-
-	// Added for nerfgun
 	int stickOnImpact;
 	int falltoground;
-
-	// fire_nail nailgun
-	int spdRndAdd; // Speed random add
-	int spread;
-	int numProjectiles;
-
+	int grappling;
 	int homing;
 	// if "homing" > 0 then projectile is a homing missile,
 	//   homing is also used as the delay (in msec) before homing in on a player.
 
-	int grappling;
+	char triggerSoundName[MAX_QPATH]; // PE_PROX trigger sound
+
+	// Impact mark and sounds
+	char impactMarkName[MAX_QPATH];
+	int impactMarkRadius;
+	char impactSoundName[3][MAX_QPATH];
+	char impactPlayerSoundName[MAX_QPATH];
+	char impactMetalSoundName[MAX_QPATH];
+
+	// Instant damage and imstant only variables
 	int instantDamage;
 	int maxHits; // Projectiles can go through players... currently instantDamage only
-
-	// Hit sounds
-	char hitSoundName[3][MAX_QPATH];
-	char hitPlayerSoundName[MAX_QPATH];
-	char hitMetalSoundName[MAX_QPATH];
-	char bounceSoundName[2][MAX_QPATH];
 
 } bg_projectileinfo_t;
 

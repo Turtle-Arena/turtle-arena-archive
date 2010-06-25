@@ -1117,6 +1117,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			}
 		}
 		G_AddEvent( ent, EV_PROJECTILE_BOUNCE, DirToByte( trace->plane.normal ) );
+		ent->s.time2 = trace->surfaceFlags; // surface
 #else
 		G_AddEvent( ent, EV_GRENADE_BOUNCE, 0 );
 #endif
@@ -1207,9 +1208,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		VectorClear( ent->s.pos.trDelta );
 
 		G_AddEvent( ent, EV_PROJECTILE_STICK, DirToByte(trace->plane.normal) );
-		ent->s.otherEntityNum = 0; // radius 0=default
 		ent->s.time2 = trace->surfaceFlags; // surface
-		//ent->s.number
 
 		if (bg_projectileinfo[ent->s.weapon].explosionType == PE_PROX)
 		{

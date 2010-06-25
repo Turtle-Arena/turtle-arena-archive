@@ -976,6 +976,12 @@ void CG_RegisterProjectile( int projectileNum )
 
 	if (bgProj->missileSoundName[0] != '\0')
 		projectileInfo->missileSound = trap_S_RegisterSound( bgProj->missileSoundName, qfalse );
+
+	// Hit mark and sounds
+	if (bgProj->wallmarkName[0] != '\0')
+		projectileInfo->wallmarkShader = trap_R_RegisterShader(bgProj->wallmarkName);
+	projectileInfo->wallmarkRadius = bgProj->wallmarkRadius;
+
 	for (i = 0; i< 3; i++)
 	{
 		if (bgProj->hitSoundName[i][0] != '\0')
@@ -985,11 +991,25 @@ void CG_RegisterProjectile( int projectileNum )
 		projectileInfo->hitPlayerSound = trap_S_RegisterSound( bgProj->hitPlayerSoundName, qfalse );
 	if (bgProj->hitMetalSoundName[0] != '\0')
 		projectileInfo->hitMetalSound = trap_S_RegisterSound( bgProj->hitMetalSoundName, qfalse );
-	for (i = 0; i< 2; i++)
+
+	// Impact mark and sounds
+	if (bgProj->impactMarkName[0] != '\0')
+		projectileInfo->impactMarkShader = trap_R_RegisterShader(bgProj->impactMarkName);
+	projectileInfo->impactMarkRadius = bgProj->impactMarkRadius;
+
+	for (i = 0; i< 3; i++)
 	{
-		if (bgProj->bounceSoundName[i][0] != '\0')
-			projectileInfo->bounceSound[i] = trap_S_RegisterSound( bgProj->bounceSoundName[i], qfalse );
+		if (bgProj->impactSoundName[i][0] != '\0')
+			projectileInfo->impactSound[i] = trap_S_RegisterSound( bgProj->impactSoundName[i], qfalse );
 	}
+	if (bgProj->impactPlayerSoundName[0] != '\0')
+		projectileInfo->impactPlayerSound = trap_S_RegisterSound( bgProj->impactPlayerSoundName, qfalse );
+	if (bgProj->impactMetalSoundName[0] != '\0')
+		projectileInfo->impactMetalSound = trap_S_RegisterSound( bgProj->impactMetalSoundName, qfalse );
+
+	if (bgProj->triggerSoundName[0] != '\0')
+		projectileInfo->triggerSound = trap_S_RegisterSound( bgProj->triggerSoundName, qfalse );
+
 
 	if (bgProj->model[0] != '\0')
 	{
@@ -1005,9 +1025,6 @@ void CG_RegisterProjectile( int projectileNum )
 	if (bgProj->sprite[0] != '\0')
 		projectileInfo->spriteShader = trap_R_RegisterShader(bgProj->sprite);
 	projectileInfo->spriteRadius = bgProj->spriteRadius;
-	if (bgProj->wallmarkName[0] != '\0')
-		projectileInfo->wallmarkShader = trap_R_RegisterShader(bgProj->wallmarkName);
-	projectileInfo->wallmarkRadius = bgProj->wallmarkRadius;
 	switch (bgProj->trailType)
 	{
 		default:
@@ -4196,6 +4213,82 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 }
 
 #ifdef TA_WEAPSYS
+/*
+=================
+CG_MissileImpact
+
+Projectile hit something and did not die/explode
+caused by an EV_PROJECTILE_BOUNCE or EV_PROJECTILE_STICK event.
+=================
+*/
+void CG_MissileImpact( int projnum, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
+{
+	qhandle_t		mark;
+	float			radius;
+	qboolean		alphaFade;
+	sfxHandle_t		sfx;
+	int				r;
+
+	sfx = 0;
+
+	// play sound
+	if( soundType == IMPACTSOUND_FLESH && cg_projectiles[projnum].impactPlayerSound ) {
+		sfx = cg_projectiles[projnum].impactPlayerSound;
+	} else if( soundType == IMPACTSOUND_METAL && cg_projectiles[projnum].impactMetalSound ) {
+		sfx = cg_projectiles[projnum].impactMetalSound;
+	} else {
+		for ( r = 0 ; r < 3 ; r++ ) {
+			if ( !cg_projectiles[projnum].impactSound[r] )
+			{
+				break;
+			}
+		}
+		if ( r > 0 ) {
+			r = rand() & 3;
+			if ( r < 2 ) {
+				sfx = cg_projectiles[projnum].impactSound[1];
+			} else if ( r == 2 ) {
+				sfx = cg_projectiles[projnum].impactSound[0];
+			} else {
+				sfx = cg_projectiles[projnum].impactSound[2];
+			}
+		}
+	}
+
+	mark = cg_projectiles[projnum].impactMarkShader;
+	radius = cg_projectiles[projnum].impactMarkRadius;
+
+	if (!mark || radius <= 0)
+	{
+		// No mark or radius.
+		return;
+	}
+
+	//
+	// impact mark
+	//
+	// plasma fades alpha, all others fade color
+	alphaFade = (bg_projectileinfo[projnum].flags & PF_IMPACTMARK_FADE_ALPHA);
+
+	if (bg_projectileinfo[projnum].flags & PF_IMPACTMARK_COLORIZE)
+	{
+		float	*color;
+
+		// colorize with client color
+		color = cgs.clientinfo[clientNum].color2;
+		if (!CG_ImpactMark( mark, origin, dir, random()*360, color[0],color[1], color[2],1, alphaFade, radius, qfalse ))
+			return;
+	} else {
+		if (!CG_ImpactMark( mark, origin, dir, random()*360, 1,1,1,1, alphaFade, radius, qfalse ))
+			return;
+	}
+
+#ifdef TA_MISC // MATERIALS
+	// ZTM: TODO: There should be little to no particles here
+	//CG_ImpactParticles(origin, dir, radius, -1, clientNum);
+#endif
+}
+
 /*
 =================
 CG_WeaponHitWall

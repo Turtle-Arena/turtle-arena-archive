@@ -1921,41 +1921,6 @@ static qboolean Projectile_Parse(char **p) {
 			}
 			projectile.maxBounces = atoi(token);
 			continue;
-		} else if ( !Q_stricmp( token, "wallmarkName" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.wallmarkName, sizeof (projectile.wallmarkName), "%s", token);
-			} else {
-				projectile.wallmarkName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "wallmarkRadius" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.wallmarkRadius = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "wallmarkFadeAlpha" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				projectile.flags |= PF_WALLMARK_FADE_ALPHA;
-			else
-				projectile.flags &= ~PF_WALLMARK_FADE_ALPHA;
-			continue;
-		} else if ( !Q_stricmp( token, "wallmarkColorize" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				projectile.flags |= PF_WALLMARK_COLORIZE;
-			else
-				projectile.flags &= ~PF_WALLMARK_COLORIZE;
-			continue;
 		} else if ( !Q_stricmp( token, "useGravity" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
@@ -2029,6 +1994,41 @@ static qboolean Projectile_Parse(char **p) {
 			}
 			projectile.maxHits = atoi(token);
 			continue;
+		} else if ( !Q_stricmp( token, "wallmarkFadeAlpha" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			if (atoi(token) == 1)
+				projectile.flags |= PF_WALLMARK_FADE_ALPHA;
+			else
+				projectile.flags &= ~PF_WALLMARK_FADE_ALPHA;
+			continue;
+		} else if ( !Q_stricmp( token, "wallmarkColorize" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			if (atoi(token) == 1)
+				projectile.flags |= PF_WALLMARK_COLORIZE;
+			else
+				projectile.flags &= ~PF_WALLMARK_COLORIZE;
+			continue;
+		} else if ( !Q_stricmp( token, "wallmarkName" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.wallmarkName, sizeof (projectile.wallmarkName), "%s", token);
+			} else {
+				projectile.wallmarkName[0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "wallmarkRadius" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			projectile.wallmarkRadius = atoi(token);
+			continue;
 		} else if ( !Q_stricmp( token, "hitSound0" ) ) {
 			token = COM_Parse( p );
 			if ( *token ) {
@@ -2069,23 +2069,90 @@ static qboolean Projectile_Parse(char **p) {
 				projectile.hitMetalSoundName[0] = '\0';
 			}
 			continue;
-		} else if ( !Q_stricmp( token, "bounceSound0" ) ) {
+		} else if ( !Q_stricmp( token, "impactMarkFadeAlpha" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			if (atoi(token) == 1)
+				projectile.flags |= PF_IMPACTMARK_FADE_ALPHA;
+			else
+				projectile.flags &= ~PF_IMPACTMARK_FADE_ALPHA;
+			continue;
+		} else if ( !Q_stricmp( token, "impactMarkColorize" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			if (atoi(token) == 1)
+				projectile.flags |= PF_IMPACTMARK_COLORIZE;
+			else
+				projectile.flags &= ~PF_IMPACTMARK_COLORIZE;
+			continue;
+		} else if ( !Q_stricmp( token, "impactMarkName" ) ) {
 			token = COM_Parse( p );
 			if ( *token ) {
-				Com_sprintf(projectile.bounceSoundName[0], sizeof (projectile.bounceSoundName[0]), "%s", token);
+				Com_sprintf(projectile.impactMarkName, sizeof (projectile.impactMarkName), "%s", token);
 			} else {
-				projectile.bounceSoundName[0][0] = '\0';
+				projectile.impactMarkName[0] = '\0';
 			}
 			continue;
-		} else if ( !Q_stricmp( token, "bounceSound1" ) ) {
+		} else if ( !Q_stricmp( token, "impactMarkRadius" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			projectile.impactMarkRadius = atoi(token);
+			continue;
+		} else if ( !Q_stricmp( token, "impactSound0" ) ) {
 			token = COM_Parse( p );
 			if ( *token ) {
-				Com_sprintf(projectile.bounceSoundName[1], sizeof (projectile.bounceSoundName[1]), "%s", token);
+				Com_sprintf(projectile.impactSoundName[0], sizeof (projectile.impactSoundName[0]), "%s", token);
 			} else {
-				projectile.bounceSoundName[1][0] = '\0';
+				projectile.impactSoundName[0][0] = '\0';
 			}
 			continue;
-		}
+		} else if ( !Q_stricmp( token, "impactSound1" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.impactSoundName[1], sizeof (projectile.impactSoundName[1]), "%s", token);
+			} else {
+				projectile.impactSoundName[1][0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "impactSound2" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.hitSoundName[2], sizeof (projectile.hitSoundName[2]), "%s", token);
+			} else {
+				projectile.impactSoundName[2][0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "impactPlayerSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.impactPlayerSoundName, sizeof (projectile.impactPlayerSoundName), "%s", token);
+			} else {
+				projectile.impactPlayerSoundName[0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "impactMetalSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.impactMetalSoundName, sizeof (projectile.impactMetalSoundName), "%s", token);
+			} else {
+				projectile.impactMetalSoundName[0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "triggerSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.triggerSoundName, sizeof (projectile.triggerSoundName), "%s", token);
+			} else {
+				projectile.triggerSoundName[0] = '\0';
+			}
+			continue;
+		} 
 
 		Com_Printf( "unknown token '%s' in projectile %s\n", token, projectile.name );
 	}
@@ -2915,11 +2982,6 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tspinType %d\r\n", projectile->spinType);
 		FS_Printf2("\tbounceType %d\r\n", projectile->bounceType);
 		FS_Printf2("\tmaxBounces %d\r\n", projectile->maxBounces);
-		FS_Printf2("\twallmarkName \"%s\"\r\n", projectile->wallmarkName);
-		FS_Printf2("\twallmarkRadius %d\r\n", projectile->wallmarkRadius);
-
-		FS_Printf2("\twallmarkFadeAlpha %d\r\n", (projectile->flags & PF_WALLMARK_FADE_ALPHA));
-		FS_Printf2("\twallmarkColorize %d\r\n", (projectile->flags & PF_WALLMARK_COLORIZE));
 		FS_Printf2("\tuseGravity %d\r\n", (projectile->flags & PF_USE_GRAVITY));
 
 		FS_Printf2("\tstickOnImpact %d\r\n", projectile->stickOnImpact);
@@ -2930,16 +2992,32 @@ void BG_DumpWeaponInfo(void)
 
 		FS_Printf2("\thoming %d\r\n", projectile->homing);
 		FS_Printf2("\tgrappling %d\r\n", projectile->grappling);
+
+
 		FS_Printf2("\tinstantDamage %d\r\n", projectile->instantDamage);
 		FS_Printf2("\tmaxHits %d\r\n", projectile->maxHits);
 
+		FS_Printf2("\twallmarkFadeAlpha %d\r\n", (projectile->flags & PF_WALLMARK_FADE_ALPHA));
+		FS_Printf2("\twallmarkColorize %d\r\n", (projectile->flags & PF_WALLMARK_COLORIZE));
+		FS_Printf2("\twallmarkName \"%s\"\r\n", projectile->wallmarkName);
+		FS_Printf2("\twallmarkRadius %d\r\n", projectile->wallmarkRadius);
 		FS_Printf2("\thitSound0 \"%s\"\r\n", projectile->hitSoundName[0]);
 		FS_Printf2("\thitSound1 \"%s\"\r\n", projectile->hitSoundName[1]);
 		FS_Printf2("\thitSound2 \"%s\"\r\n", projectile->hitSoundName[2]);
 		FS_Printf2("\thitPlayerSound \"%s\"\r\n", projectile->hitPlayerSoundName);
 		FS_Printf2("\thitMetalSound \"%s\"\r\n", projectile->hitMetalSoundName);
-		FS_Printf2("\tbounceSound0 \"%s\"\r\n", projectile->bounceSoundName[0]);
-		FS_Printf2("\tbounceSound1 \"%s\"\r\n", projectile->bounceSoundName[1]);
+
+		FS_Printf2("\timpactMarkFadeAlpha %d\r\n", (projectile->flags & PF_IMPACTMARK_FADE_ALPHA));
+		FS_Printf2("\timpactMarkColorize %d\r\n", (projectile->flags & PF_IMPACTMARK_COLORIZE));
+		FS_Printf2("\timpactMarkName \"%s\"\r\n", projectile->impactMarkName);
+		FS_Printf2("\timpactMarkRadius %d\r\n", projectile->impactMarkRadius);
+		FS_Printf2("\timpactSound0 \"%s\"\r\n", projectile->impactSoundName[0]);
+		FS_Printf2("\timpactSound1 \"%s\"\r\n", projectile->impactSoundName[1]);
+		FS_Printf2("\timpactSound2 \"%s\"\r\n", projectile->impactSoundName[2]);
+		FS_Printf2("\timpactPlayerSound \"%s\"\r\n", projectile->impactPlayerSoundName);
+		FS_Printf2("\timpactMetalSound \"%s\"\r\n", projectile->impactMetalSoundName);
+
+		FS_Printf2("\ttriggerSound \"%s\"\r\n", projectile->triggerSoundName);
 
 		FS_Printf1("}\r\n\r\n");
 	}
