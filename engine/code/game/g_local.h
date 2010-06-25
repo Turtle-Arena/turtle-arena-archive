@@ -328,7 +328,9 @@ struct gclient_s {
 	vec3_t		damage_from;		// origin for vector calculation
 	qboolean	damage_fromWorld;	// if true, don't use the damage_from vector
 
+#ifndef TURTLEARENA // AWARDS
 	int			accurateCount;		// for "impressive" reward sound
+#endif
 
 	int			accuracy_shots;		// total number of shots
 	int			accuracy_hits;		// total number of hits
