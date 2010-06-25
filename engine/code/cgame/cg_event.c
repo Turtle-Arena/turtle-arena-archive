@@ -686,6 +686,25 @@ void CG_DebugOrigin(centity_t *cent)
 extern char *eventnames[];
 #endif
 
+#ifdef TA_WEAPSYS
+/*
+================
+CG_ImpactSoundForSurf
+
+Return the proper impact sound for surfaceflags
+================
+*/
+impactSound_t CG_ImpactSoundForSurf(int surfaceflags)
+{
+	if (surfaceflags & SURF_FLESH)
+		return IMPACTSOUND_FLESH;
+	else if (surfaceflags & SURF_METALSTEPS)
+		return IMPACTSOUND_METAL;
+	else
+		return IMPACTSOUND_DEFAULT;
+}
+#endif
+
 /*
 ==============
 CG_EntityEvent
@@ -1123,44 +1142,21 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 
 #ifdef TA_WEAPSYS
-	case EV_PROJECTILE_BOUNCE:
+	case EV_PROJECTILE_BOUNCE: // EV_GRENADE_BOUNCE
 		DEBUGNAME("EV_PROJECTILE_BOUNCE");
-		if ((rand() & 1) && cg_projectiles[es->weapon].bounceSound[1]) {
-			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].bounceSound[1] );
-		} else {
-			trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].bounceSound[0] );
-		}
-
-		// For Laser Shuriken, not Grenade.
-		if (bg_projectileinfo[es->weapon].bounceType != PB_HALF) {
-			if (es->eventParm == 255) {
-				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
-			} else {
-				ByteToDir( es->eventParm, dir );
-				CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
-			}
-		}
+		ByteToDir( es->eventParm, dir );
+		CG_MissileImpact( es->weapon, es->clientNum, position, dir, CG_ImpactSoundForSurf(es->time2) );
 		break;
 
 	case EV_PROJECTILE_STICK: // EV_PROXIMITY_MINE_STICK
 		DEBUGNAME("EV_PROJECTILE_STICK");
-		// es->time2 is the surfaceflags
-		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].bounceSound[0] );
-
-#ifdef TA_MISC // MATERIALS
-		if (es->eventParm != 255)
-			ByteToDir( es->eventParm, dir );
-		else
-			VectorSet(dir, 0, 0, 1);
-
-		CG_ImpactParticles(position, dir, es->otherEntityNum ? es->otherEntityNum : 8, es->time2, es->number);
-#endif
+		ByteToDir( es->eventParm, dir );
+		CG_MissileImpact( es->weapon, es->clientNum, position, dir, CG_ImpactSoundForSurf(es->time2) );
 		break;
 
 	case EV_PROJECTILE_TRIGGER: // EV_PROXIMITY_MINE_TRIGGER
 		DEBUGNAME("EV_PROJECTILE_TRIGGER");
-		// play sound
-		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].bounceSound[1] );
+		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cg_projectiles[es->weapon].triggerSound );
 		break;
 #else
 	case EV_GRENADE_BOUNCE:

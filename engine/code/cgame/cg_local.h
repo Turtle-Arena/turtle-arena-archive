@@ -512,14 +512,24 @@ typedef struct projectileInfo_s {
 	qhandle_t		missileModelRed;
 	qhandle_t		spriteShader;
 	int				spriteRadius;
+
+
+	// Hit mark and sounds
 	qhandle_t		wallmarkShader;
 	int				wallmarkRadius;
-
-	// Sounds
 	sfxHandle_t		hitSound[3]; // Normal hit sounds, random select
 	sfxHandle_t		hitPlayerSound;
 	sfxHandle_t		hitMetalSound;
-	sfxHandle_t		bounceSound[2]; // Bounce sounds, random select
+
+	// Impact mark and sounds
+	qhandle_t		impactMarkShader;
+	int				impactMarkRadius;
+	sfxHandle_t		impactSound[3]; // Impact sounds, random select
+	sfxHandle_t		impactPlayerSound;
+	sfxHandle_t		impactMetalSound;
+
+	// PE_PROX trigger sound
+	sfxHandle_t		triggerSound;
 
 	// ZTM: TODO: missileTrailShader (and missile vars 1 and 2 ?)
 
@@ -1345,8 +1355,6 @@ typedef struct {
 #ifndef TA_WEAPSYS
 	sfxHandle_t	hgrenb1aSound;
 	sfxHandle_t	hgrenb2aSound;
-#endif
-#ifndef TURTLEARENA // WEAPONS
 	sfxHandle_t	wstbimplSound;
 	sfxHandle_t	wstbimpmSound;
 	sfxHandle_t	wstbimpdSound;
@@ -1824,6 +1832,7 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
 #ifdef TA_WEAPSYS
+void CG_MissileImpact( int projnum, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
 void CG_WeaponHitPlayer( int weaponGroup, int hand, vec3_t origin, vec3_t dir, int entityNum );
 #else

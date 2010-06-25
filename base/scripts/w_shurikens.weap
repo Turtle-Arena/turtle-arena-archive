@@ -102,10 +102,14 @@ projectile "p_lasershuriken"
 	spinType "PS_PITCH"
 	bounceType "PB_FULL"
 	maxBounces 10
-	bounceSound0 "sound/items/lasershuriken_bounce.ogg"
 	wallmarkName "gfx/damage/plasma_mrk"
 	wallmarkRadius 8
 	wallmarkFadeAlpha 1
+
+	impactSound0 "sound/items/lasershuriken_bounce.ogg"
+	impactMarkName "gfx/damage/plasma_mrk"
+	impactMarkRadius 8
+	impactMarkFadeAlpha 1
 
 	trailType "PT_SPARKS"
 	missileDlight 100
