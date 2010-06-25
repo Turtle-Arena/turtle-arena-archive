@@ -3764,8 +3764,8 @@ qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt)
 
 qboolean BG_WeapUseAmmo(weapon_t w)
 {
-	// Guns use ammo, but grappling hook gun does not.
-	return (BG_WeaponHasType(w, WT_GUN) && !bg_weapongroupinfo[w].weapon[0]->proj->grappling);
+	// Check if the weapon group uses ammo
+	return (bg_weapongroupinfo[w].item.quantity > 0);
 }
 
 qboolean BG_PlayerAttackAnim(int a)

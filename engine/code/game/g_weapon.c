@@ -1578,7 +1578,7 @@ void FireWeapon( gentity_t *ent ) {
 		if (bg_weapongroupinfo[ent->s.weapon].weapon[i]->weapontype == WT_GUN)
 		{
 			// track shots taken for accuracy tracking.
-			if (BG_WeapUseAmmo(ent->s.weapon)) {
+			if (!bg_weapongroupinfo[ent->s.weapon].weapon[i]->proj->grappling) {
 				ent->client->accuracy_shots += bg_weapongroupinfo[ent->s.weapon].weapon[i]->proj->numProjectiles;
 			}
 

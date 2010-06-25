@@ -2618,7 +2618,10 @@ static void PM_Weapon( void ) {
 #ifdef TA_WEAPSYS
 	if (BG_WeaponHasType(pm->ps->weapon, WT_MELEE))
 	{
-		pm->ps->weaponTime = pm->ps->meleeDelay;
+		if (pm->ps->meleeTime)
+			pm->ps->weaponTime = pm->ps->meleeTime;
+		else
+			pm->ps->weaponTime = pm->ps->meleeDelay;
 		return;
 	}
 
