@@ -89,7 +89,9 @@ Jump/land B (Copy of Jump/land)
 
 
 == Note ==
-raph_v9.mm3d doesn't have raph_v9.wings's new h_head_bottom and (seperated) torso and arms.
+raph_v9.mm3d doesn't have raph_v9.wings's new h_hand_right and h_hand_left.
+	It just removes triangles on the end that connect to the arm.
+	Replacing it in the mm3d requires it to be reconnected to the skeleton.
 
 == TODO ==
 Raph's thumbs also go flat and should be fixed.
