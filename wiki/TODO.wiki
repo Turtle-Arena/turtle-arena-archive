@@ -16,6 +16,11 @@ First stable playable release.
   * Shurikens (holdable items)
   * Maps for all gametypes
 
+== 0.2.1? ==
+0.4 may take will take more than 6 months, so it might be a good idea to release a bug fix release.
+
+  * Bug fixes
+
 == 0.4 ==
 Focus on players, map themes, and multiplayer maps
 

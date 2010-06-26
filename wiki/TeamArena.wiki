@@ -17,7 +17,7 @@ Additions from Quake III: Team Arena, the plan is to remove and integrate all pa
 
   * Chaingun (Supported)
   * Nailgun (Supported)
-  * Prox Launcher (Partly supported)
+  * Prox Launcher (Support everything but sticking mines to players)
 
   * Voice chats for bots and humans
   * Per-team skins for players (Supported, but not currently used)
@@ -32,4 +32,4 @@ Additions from Quake III: Team Arena, the plan is to remove and integrate all pa
     * kill people, then a skull (of the attacker's team color) will spawn at the center object, then attacker's team must take the skull to the other team's base, if killee's team touch it (object that spawned at center), it is removed.)
   * Kamikaze holdable item (Disabled)
   * Invul holdable item (Disabled)
-  * Prox Launcher (Partly unsupported)
+  * Prox Launcher (Sticking mines to players is unsupported)
