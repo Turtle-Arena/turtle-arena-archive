@@ -819,6 +819,9 @@ static void CG_Item( centity_t *cent ) {
 		VectorCopy( ent.lightingOrigin, barrel.lightingOrigin );
 		barrel.shadowPlane = ent.shadowPlane;
 		barrel.renderfx = ent.renderfx;
+#ifdef TURTLEARENA // Have items fade in
+		barrel.shaderRGBA[3] = ent.shaderRGBA[3];
+#endif
 
 #ifdef TA_WEAPSYS
 		if (CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], "tag_barrel" ))
@@ -860,6 +863,9 @@ static void CG_Item( centity_t *cent ) {
 		VectorCopy( ent.lightingOrigin, flap.lightingOrigin );
 		flap.shadowPlane = ent.shadowPlane;
 		flap.renderfx = ent.renderfx;
+#ifdef TURTLEARENA // Have items fade in
+		flap.shaderRGBA[3] = ent.shaderRGBA[3];
+#endif
 
 		CG_PositionRotatedEntityOnTag( &flap, &ent, cg_items[es->modelindex].models[0], "tag_flag" );
 
