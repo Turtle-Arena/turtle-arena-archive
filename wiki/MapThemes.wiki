@@ -4,7 +4,7 @@
 One of the goals for Turtle Arena 0.4 is map themes.
 
 == Overview ==
-Map themes are a combination of textures, skybox, models/objects, sounds, and music.
+Map themes are a combination of textures, skies, models/objects, sounds, and music.
 
 == City ==
 Ninja Turtle New York City theme.
@@ -13,7 +13,7 @@ Ninja Turtle New York City theme.
 :Objects
 Vehicles
   Car (`models/mapobjects/car/car.md3`)
-  Var
+  Van
   Pickup Truck
 Fire Hydrant // All good Turtle games need one.
 Grass

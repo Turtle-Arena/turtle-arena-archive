@@ -25,15 +25,14 @@ First stable playable release.
 Focus on players, map themes, and multiplayer maps
 
   * Map Themes (textures, models, misc_objects, and maybe music?)
+  * New multiplayer maps using the new map themes
   * Improve player models; each player should have their own animations, etc
-  * Player Abilities
   * Have player models be MDR (Finish Misfit Model 3D MDR exporting)
   * Multiple levels of detail for players and other models
   * Bring back player effect colors?
     * Readd to ui and q3_ui
     * (Control Turtle mask color and/or melee trail color?)
   * Add more players (Mirage or 2003 based?); Shredder, Foot, etc
-  * Remake UI with missionpack ui scripting?
   * Reduce overall number of TODOs and FIXMEs in the source
 
   * Hopefully make it a complete (fully working) multiplayer game (Compareable to TMNT: Mutant Melee in someways...)
@@ -45,6 +44,8 @@ Focus on Single Player
   * Single Player Maps
   * Gimmicks
   * Savegames
+  * Player Abilities
+  * Remake UI with missionpack ui scripting?
 
 == 0.8 ==
 
