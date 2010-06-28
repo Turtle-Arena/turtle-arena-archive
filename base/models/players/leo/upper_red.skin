@@ -5,6 +5,7 @@ u_torso_left_hand,models/players/leo/torso_red.png
 u_plastron,models/players/leo/plastron.png
 u_carapace,models/players/leo/carapace.png
 u_belt,models/players/leo/belt_red.png
+u_belt_sholder,models/players/leo/belt_red.png
 tag_flag,
 tag_weapon,
 tag_head,
