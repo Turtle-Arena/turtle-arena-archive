@@ -1112,26 +1112,26 @@ void CG_RegisterProjectile( int projectileNum )
 			break;
 		case PD_GRENADE:
 			cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
-#ifdef TA_DATA
-			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
-#else
 			cgs.media.grenadeExplosionShader = trap_R_RegisterShader( "grenadeExplosion" );
+#ifdef TA_DATA
+			if (!cgs.media.grenadeExplosionShader)
+				cgs.media.grenadeExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 #endif
 			break;
 		case PD_RAIL:
 			cgs.media.ringFlashModel = trap_R_RegisterModel("models/weaphits/ring02.md3");
-#ifdef TA_DATA
-			cgs.media.plasmaExplosionShader = trap_R_RegisterShader( "plasmaExplosion" );
-#else
 			cgs.media.railExplosionShader = trap_R_RegisterShader( "railExplosion" );
+#ifdef TA_DATA
+			if (!cgs.media.railExplosionShader)
+				cgs.media.railExplosionShader = trap_R_RegisterShader( "plasmaExplosion" );
 #endif
 			break;
 		case PD_BFG:
 			cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
-#ifdef TA_DATA
-			cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
-#else
 			cgs.media.bfgExplosionShader = trap_R_RegisterShader( "bfgExplosion" );
+#ifdef TA_DATA
+			if (!cgs.media.bfgExplosionShader)
+				cgs.media.bfgExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
 #endif
 			break;
 		case PD_LIGHTNING:
@@ -3840,11 +3840,7 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			break;
 		case PD_GRENADE:
 			mod = cgs.media.dishFlashModel;
-#ifdef TA_DATA
-			shader = cgs.media.rocketExplosionShader;
-#else
 			shader = cgs.media.grenadeExplosionShader;
-#endif
 			sfx = cgs.media.sfx_rockexp;
 			light = 300;
 			isSprite = qtrue;
@@ -3863,20 +3859,12 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			break;
 		case PD_RAIL:
 			mod = cgs.media.ringFlashModel;
-#ifdef TA_DATA
-			shader = cgs.media.plasmaExplosionShader;
-#else
 			shader = cgs.media.railExplosionShader;
-#endif
 			sfx = cgs.media.sfx_plasmaexp;
 			break;
 		case PD_BFG:
 			mod = cgs.media.dishFlashModel;
-#ifdef TA_DATA
-			shader = cgs.media.rocketExplosionShader;
-#else
 			shader = cgs.media.bfgExplosionShader;
-#endif
 			sfx = cgs.media.sfx_rockexp;
 			break;
 		case PD_LIGHTNING:
