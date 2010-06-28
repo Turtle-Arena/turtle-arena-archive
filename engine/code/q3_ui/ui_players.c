@@ -1025,7 +1025,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #ifdef TA_SUPPORTQ3
 		if (!UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary"))
 		{
-		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
+			UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
 		}
 #elif defined TA_PLAYERS
 		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary");
