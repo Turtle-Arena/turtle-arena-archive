@@ -2906,7 +2906,7 @@ static void FS_Startup( const char *gameName )
 		&& !FS_BaseFileExists("pak0.pk3") && !FS_BaseFileExists("assets0.pk3"))
 	{
 		// Required files are missing, use location of the Deb package data
-#ifdef TURTLEARENA
+#ifdef TA_MOD
 		Cvar_Set("fs_basepath", "/usr/share/games/turtlearena" );
 #else
 		Cvar_Set("fs_basepath", "/usr/share/games/ioquake3" );

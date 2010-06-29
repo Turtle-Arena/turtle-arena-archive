@@ -2499,7 +2499,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	int					i;
 	clientInfo_t		*ci;
 	qboolean			foundModel;
+#ifdef TA_PLAYERS
 	char *newTagNames[3] = { "tag_hand_primary", "tag_hand_secondary", NULL };
+#endif
 	char *originalTagNames[3] = { "tag_weapon", "tag_flag", NULL };
 
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];

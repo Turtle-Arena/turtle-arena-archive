@@ -259,7 +259,11 @@ void Cmd_Give_f (gentity_t *ent)
 	// \give wp_bo
 	weapGroup = BG_WeaponGroupIndexForName(name);
 	if (weapGroup) {
+#ifdef TA_WEAPSYS_EX
 		ent->client->ps.stats[STAT_PENDING_WEAPON] = weapGroup;
+#else
+		ent->client->ps.stats[STAT_WEAPONS] |= (1<<weapGroup);
+#endif
 	}
 #endif
 

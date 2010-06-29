@@ -985,7 +985,12 @@ static void ProximityMine_Player( gentity_t *mine, gentity_t *player ) {
 		return;
 	}
 
+#ifdef TA_WEAPSYS
+	G_AddEvent( mine, EV_PROJECTILE_STICK, 255 );
+	mine->s.time2 = SURF_FLESH; // surfaceflags
+#else
 	G_AddEvent( mine, EV_PROXIMITY_MINE_STICK, 0 );
+#endif
 
 	if( player->s.eFlags & EF_TICKING ) {
 		player->activator->splashDamage += mine->splashDamage;
@@ -1128,7 +1133,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	if (bg_projectileinfo[ent->s.weapon].stickOnImpact) {
 		vec3_t dir;
 
-#if 0
+#ifndef TURTLEARENA
 		// if it's a player, stick it on to them (flag them and remove this entity)
 		if( bg_projectileinfo[ent->s.weapon].explosionType == PE_PROX &&
 			other->s.eType == ET_PLAYER && other->health > 0 )

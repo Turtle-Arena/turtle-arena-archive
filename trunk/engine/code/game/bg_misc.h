@@ -1001,7 +1001,7 @@ typedef enum {
 #endif
 
 //#ifdef MISSIONPACK
-#if !defined TA_WEAPSYS || defined NET_COMPAT
+#ifndef TA_WEAPSYS
 	EV_PROXIMITY_MINE_STICK,
 	EV_PROXIMITY_MINE_TRIGGER,
 #endif
@@ -1859,10 +1859,10 @@ typedef enum {
 	ET_INVISIBLE,
 	ET_GRAPPLE,				// grapple hooked on wall
 	ET_TEAM,
-#ifdef TA_ENTSYS // MISC_OBJECT
+#if defined TA_ENTSYS || defined NET_COMPAT // MISC_OBJECT
 	ET_MISCOBJECT,
 #endif
-#ifdef TA_NPCSYS
+#if defined TA_NPCSYS || defined NET_COMPAT
 	ET_NPC,
 #endif
 

@@ -59,7 +59,9 @@ UI_PlayerInfo_SetWeapon
 ===============
 */
 static void UI_PlayerInfo_SetWeapon( playerInfo_t *pi, weapon_t weaponNum ) {
-#ifndef TA_WEAPSYS
+#ifdef TA_WEAPSYS
+	int			i;
+#else
 	gitem_t *	item;
 #endif
 	char		path[MAX_QPATH];
@@ -69,13 +71,18 @@ static void UI_PlayerInfo_SetWeapon( playerInfo_t *pi, weapon_t weaponNum ) {
 tryagain:
 #endif
 	pi->realWeapon = weaponNum;
+
+#ifdef TA_WEAPSYS
+	for (i = 0; i < MAX_HANDS; i++)
+	{
+		pi->weaponModel[i] = 0;
+		pi->barrelModel[i] = 0;
+		pi->flashModel[i] = 0;
+	}
+#else
 	pi->weaponModel = 0;
 	pi->barrelModel = 0;
 	pi->flashModel = 0;
-#ifdef TA_WEAPSYS
-	pi->weaponModel2 = 0;
-	pi->barrelModel2 = 0;
-	pi->flashModel2 = 0;
 #endif
 
 	if ( weaponNum == WP_NONE ) {
@@ -83,44 +90,27 @@ tryagain:
 	}
 
 #ifdef TA_WEAPSYS
-	if (bg_weapongroupinfo[weaponNum].weapon[0]->model[0] != '\0')
+	for (i = 0; i < MAX_HANDS; i++)
 	{
-		pi->weaponModel = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[0]->model);
+		if (bg_weapongroupinfo[weaponNum].weapon[i]->model[0] == '\0')
+			continue;
 
-		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[0]->model );
+		pi->weaponModel[i] = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[i]->model);
+
+		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[i]->model );
 		COM_StripExtension(path, path, sizeof(path));
 		strcat( path, "_barrel.md3" );
-		pi->barrelModel = trap_R_RegisterModel( path );
+		pi->barrelModel[i] = trap_R_RegisterModel( path );
 
-		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[0]->model );
+		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[i]->model );
 		COM_StripExtension(path, path, sizeof(path));
 		strcat( path, "_flash.md3" );
-		pi->flashModel = trap_R_RegisterModel( path );
+		pi->flashModel[i] = trap_R_RegisterModel( path );
 
-		MAKERGB( pi->flashDlightColor,
-				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[0],
-				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[1],
-				bg_weapongroupinfo[weaponNum].weapon[0]->flashColor[2] );
-	}
-
-	if (bg_weapongroupinfo[weaponNum].weapon[1]->model[0] != '\0')
-	{
-		pi->weaponModel2 = trap_R_RegisterModel(bg_weapongroupinfo[weaponNum].weapon[1]->model);
-
-		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[1]->model );
-		COM_StripExtension(path, path, sizeof(path));
-		strcat( path, "_barrel.md3" );
-		pi->barrelModel2 = trap_R_RegisterModel( path );
-
-		strcpy( path, bg_weapongroupinfo[weaponNum].weapon[1]->model );
-		COM_StripExtension(path, path, sizeof(path));
-		strcat( path, "_flash.md3" );
-		pi->flashModel2 = trap_R_RegisterModel( path );
-
-		MAKERGB( pi->flashDlightColor2,
-				bg_weapongroupinfo[weaponNum].weapon[1]->flashColor[0],
-				bg_weapongroupinfo[weaponNum].weapon[1]->flashColor[1],
-				bg_weapongroupinfo[weaponNum].weapon[1]->flashColor[2] );
+		MAKERGB( pi->flashDlightColor[i],
+				bg_weapongroupinfo[weaponNum].weapon[i]->flashColor[0],
+				bg_weapongroupinfo[weaponNum].weapon[i]->flashColor[1],
+				bg_weapongroupinfo[weaponNum].weapon[i]->flashColor[2] );
 	}
 #else
 	for ( item = bg_itemlist + 1; item->classname ; item++ ) {
@@ -879,9 +869,10 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	refEntity_t		legs;
 	refEntity_t		torso;
 	refEntity_t		head;
-	refEntity_t		gun;
 #ifdef TA_WEAPSYS
-	refEntity_t		gun_left;
+	refEntity_t		gun[MAX_HANDS];
+#else
+	refEntity_t		gun;
 #endif
 	refEntity_t		barrel;
 	refEntity_t		flash;
@@ -893,8 +884,11 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	float			xx;
 #ifdef TA_WEAPSYS
 	int				i;
-	qhandle_t		barrelModel;
 	vec3_t			angles;
+#ifdef TA_PLAYERS
+	char *newTagNames[3] = { "tag_hand_primary", "tag_hand_secondary", NULL };
+#endif
+	char *originalTagNames[3] = { "tag_weapon", "tag_flag", NULL };
 #endif
 
 	if ( !pi->legsModel || !pi->torsoModel || !pi->headModel
@@ -1019,42 +1013,47 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	// add the gun
 	//
 	if ( pi->currentWeapon != WP_NONE ) {
+#ifdef TA_WEAPSYS
+		// get hands from cent
+		for (i = 0; i < MAX_HANDS; i++)
+		{
+			memset( &gun[i], 0, sizeof(gun[i]) );
+			gun[i].hModel = pi->weaponModel[i];
+			VectorCopy( origin, gun[i].lightingOrigin );
+			gun[i].renderfx = renderfx;
+
+			if (!originalTagNames[i]
+#ifdef TA_PLAYERS
+				|| !newTagNames[i]
+#endif
+				)
+			{
+				break;
+			}
+
+			if (!gun[i].hModel) {
+				continue;
+			}
+
+			if (
+#ifdef TA_PLAYERS
+				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, newTagNames[i]) &&
+#endif
+				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, originalTagNames[i]))
+			{
+				// Failed to find tag
+				continue;
+			}
+
+			trap_R_AddRefEntityToScene( &gun[i] );
+		}
+#else
 		memset( &gun, 0, sizeof(gun) );
 		gun.hModel = pi->weaponModel;
 		VectorCopy( origin, gun.lightingOrigin );
-#ifdef TA_SUPPORTQ3
-		if (!UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary"))
-		{
-			UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
-		}
-#elif defined TA_PLAYERS
-		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_hand_primary");
-#else
 		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
-#endif
 		gun.renderfx = renderfx;
 		trap_R_AddRefEntityToScene( &gun );
-#ifdef TA_WEAPSYS
-		// Secondary weapon
-		memset( &gun_left, 0, sizeof(gun_left) );
-		gun_left.hModel = pi->weaponModel2;
-		VectorCopy( origin, gun_left.lightingOrigin );
-
-		if (gun_left.hModel)
-		{
-#ifdef TA_SUPPORTQ3
-			if (!UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_hand_primary"))
-			{
-				UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_flag");
-			}
-#elif defined TA_PLAYERS
-			UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_hand_primary");
-#else
-			UI_PositionEntityOnTag( &gun_left, &torso, pi->torsoModel, "tag_flag");
-#endif
-			gun_left.renderfx = renderfx;
-			trap_R_AddRefEntityToScene( &gun_left );
-		}
 #endif
 	}
 
@@ -1068,12 +1067,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #endif
 	{
 #ifdef TA_WEAPSYS
-		if (i == 1)
-			barrelModel = pi->barrelModel2;
-		else
-			barrelModel = pi->barrelModel;
-
-		if (!barrelModel)
+		if (!pi->barrelModel[i])
 			continue;
 #else
 		vec3_t	angles;
@@ -1084,11 +1078,11 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		barrel.renderfx = renderfx;
 
 #ifdef TA_WEAPSYS
-		barrel.hModel = barrelModel;
+		barrel.hModel = pi->barrelModel[i];
 		VectorClear(angles);
 		if (bg_weapongroupinfo[pi->realWeapon].weapon[i]->barrelSpin != BS_NONE)
 		{
-			if (i == 1)
+			if (i & 1)
 				angles[bg_weapongroupinfo[pi->realWeapon].weapon[i]->barrelSpin]
 						= 360-UI_MachinegunSpinAngle( pi );
 			else
@@ -1108,11 +1102,10 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		AnglesToAxis( angles, barrel.axis );
 
 #ifdef TA_WEAPSYS
-		if (i == 1)
-			UI_PositionRotatedEntityOnTag( &barrel, &gun_left, pi->weaponModel2, "tag_barrel");
-		else
-#endif
+		UI_PositionRotatedEntityOnTag( &barrel, &gun[i], pi->weaponModel[i], "tag_barrel");
+#else
 		UI_PositionRotatedEntityOnTag( &barrel, &gun, pi->weaponModel, "tag_barrel");
+#endif
 
 		trap_R_AddRefEntityToScene( &barrel );
 	}
@@ -1127,22 +1120,14 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		for (i = 0; i < MAX_HANDS; i++)
 		{
 			memset( &flash, 0, sizeof(flash) );
-			if (i == 1) {
-				flash.hModel = pi->flashModel2;
-				flashDlightColor = &pi->flashDlightColor2;
-			} else {
-				flash.hModel = pi->flashModel;
-				flashDlightColor = &pi->flashDlightColor;
-			}
+			flash.hModel = pi->flashModel[i];
+			flashDlightColor = &pi->flashDlightColor[i];
 
 			if (!flash.hModel)
 				continue;
 
 			VectorCopy( origin, flash.lightingOrigin );
-			if (i == 1)
-				UI_PositionEntityOnTag( &flash, &gun_left, pi->weaponModel2, "tag_flash");
-			else
-				UI_PositionEntityOnTag( &flash, &gun, pi->weaponModel, "tag_flash");
+			UI_PositionEntityOnTag( &flash, &gun[i], pi->weaponModel[i], "tag_flash");
 			flash.renderfx = renderfx;
 			trap_R_AddRefEntityToScene( &flash );
 

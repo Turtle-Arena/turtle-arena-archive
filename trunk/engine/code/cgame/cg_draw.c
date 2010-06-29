@@ -1908,8 +1908,8 @@ static void CG_DrawTeamInfo( void ) {
 CG_DrawHoldableItem
 ===================
 */
-#ifndef TA_HUD
 #ifndef MISSIONPACK_HUD
+#ifndef TA_HUD
 static void CG_DrawHoldableItem( void ) { 
 	int		value;
 
@@ -1924,8 +1924,8 @@ static void CG_DrawHoldableItem( void ) {
 	}
 
 }
-#endif // MISSIONPACK_HUD
 #endif
+#endif // MISSIONPACK_HUD
 
 #ifdef MISSIONPACK
 /*
@@ -3286,13 +3286,13 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 #ifndef TA_WEAPSYS_EX
 			CG_DrawWeaponSelect();
 #endif
-
-#ifndef MISSIONPACK
+#ifndef MISSIONPACK_HUD
 #ifndef TA_HUD
 			CG_DrawHoldableItem();
 #endif
-#elif !defined MISSIONPACK_HUD // IOQ3ZTM // ZTM: For playing MISSIONPACK without new HUD.
+#ifdef MISSIONPACK // IOQ3ZTM // ZTM: For playing MISSIONPACK without new HUD.
 			CG_DrawPersistantPowerup();
+#endif
 #endif
 			CG_DrawReward();
 
