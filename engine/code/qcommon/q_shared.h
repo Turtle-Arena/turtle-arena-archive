@@ -1095,7 +1095,7 @@ typedef struct playerState_s {
 								// used to twist the legs during strafing
 
 	vec3_t		grapplePoint;	// location of grapple to pull towards if PMF_GRAPPLE_PULL
-#ifdef NIGHTSMODE
+#if defined NIGHTSMODE || defined NET_COMPAT
 	vec3_t		grapplePoint2;	// NiGHTS next point // ZTM: TODO: Secondary grapple (like LOZ_TP)?
 #endif
 

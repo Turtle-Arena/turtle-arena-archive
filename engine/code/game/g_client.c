@@ -1687,7 +1687,7 @@ void ClientSpawn(gentity_t *ent) {
 	{
 		// ZTM: Start with default weapon.
 #ifndef TA_WEAPSYS_EX
-		gitem_t *item;
+		gitem_t *item = NULL;
 #endif
 		weapon_t weapon;
 

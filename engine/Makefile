@@ -74,6 +74,9 @@ IOQ3_REVISION = 1787
 #
 # Start build type
 #
+ifeq ($(BUILD_IOQ3TURTLE),1)
+QUAKE3=1
+endif
 ifeq ($(BUILD_IOQ3ZTM),1)
 QUAKE3=1
 endif
@@ -82,52 +85,60 @@ QUAKE3=1
 endif
 ifeq ($(QUAKE3),1)
 
-	ifeq ($(BUILD_IOQ3ZTM),1)
+	# Build ioq3ztm for running in Turtle Arena
+	ifeq ($(BUILD_IOQ3TURTLE),1)
+		ifneq ($(BUILD_CLIENT),1)
+		  BUILD_CLIENT     =0
+		endif
+		ifneq ($(BUILD_CLIENT_SMP),1)
+		  BUILD_CLIENT_SMP =0
+		endif
+		ifneq ($(BUILD_SERVER),1)
+		  BUILD_SERVER     =0
+		endif
 
-		# Build ioq3ztm for running in Turtle Arena
-		IOQ3TURTLE=1
+		# Copied from Turtle Arena BUILD_DEFINES
+		ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 \
+							-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
+							-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
+							-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
+							-DTA_WEAPSYS -DTA_PLAYERSYS \
+							-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
+							-DTA_WEAPSYS_EX_COMPAT \
+							-DOA_BLOOM -DTA_MOD
 
-		ifeq ($(IOQ3TURTLE),1)
-			ifneq ($(BUILD_CLIENT),1)
-			  BUILD_CLIENT     =0
-			endif
-			ifneq ($(BUILD_CLIENT_SMP),1)
-			  BUILD_CLIENT_SMP =0
-			endif
-			ifneq ($(BUILD_SERVER),1)
-			  BUILD_SERVER     =0
-			endif
-			ifneq ($(BUILD_GAME_SO),1)
-			  BUILD_GAME_SO    =0
-			endif
+		QUAKE3_CFLAGS =
 
-			# Copied from Turtle Arena BUILD_DEFINES
-			ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 \
-								-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
-								-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-								-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
-								-DTA_WEAPSYS -DTA_PLAYERSYS \
-								-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
-								-DTA_WEAPSYS_EX_COMPAT \
-								-DOA_BLOOM
+		# Use model tags for "true" melee attacking (Gauntlet)
+		#  Can't be used as a quake3 mod, as it uses new VM-to-server calls.
+		DED_USE_MODELS=1
+		ENGINE_CFLAGS += -DTA_GAME_MODELS
+		QUAKE3_CFLAGS += -DTA_GAME_MODELS
 
-			QUAKE3_CFLAGS =
+		VERSION=1.36turtle
+		BASEGAME=baseq3
+		# Enable most of the MISSIONPACK in 'baseq3'
+		BASEGAME_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) -DMISSIONPACK
+		MISSIONPACK_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) \
+					-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+		ifndef COPYDIR
+			COPYDIR="/usr/local/games/turtlearena"
+		endif
 
-			# Use model tags for "true" melee attacking (Gauntlet)
-			#  Can't be used as a quake3 mod, as it uses new VM-to-server calls.
-			DED_USE_MODELS=1
-			ENGINE_CFLAGS += -DTA_GAME_MODELS
-			QUAKE3_CFLAGS += -DTA_GAME_MODELS
+		#
+		# Server/Client-Only
+		#
+		USE_CODEC_VORBIS=1
+		USE_CODEC_THEORA=1
 
-			VERSION=1.36turtle
-			BASEGAME=baseq3
-			BASEGAME_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS)
-			MISSIONPACK_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) \
-						-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
-			ifndef COPYDIR
-				COPYDIR="/usr/local/games/turtlearena"
-			endif
-		else
+		SERVERBIN=turtlearena-server
+		CLIENTBIN=turtlearena
+
+		ifndef BUILD_DIR
+			BUILD_DIR=build-ioq3turtle
+		endif
+	else
+		ifeq ($(BUILD_IOQ3ZTM),1)
 			# Build modified ioquake3, it only runs using its own sever/client binaries
 			#   and currently doesn't support Q3 mods.
 			BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
@@ -142,43 +153,40 @@ ifeq ($(QUAKE3),1)
 			ifndef COPYDIR
 				COPYDIR="/usr/local/games/quake3"
 			endif
+
+			#
+			# Server/Client-Only
+			#
+			USE_CODEC_VORBIS=1
+			USE_CODEC_THEORA=1
+
+			SERVERBIN=ioq3ztm-server
+			CLIENTBIN=ioq3ztm
+
+			ifndef BUILD_DIR
+				BUILD_DIR=build-ioq3ztm
+			endif
+		else
+			# Build unmodified ioquake3.
+			BUILD_DEFINES=-DIOQUAKE3
+
+			SERVERBIN=ioq3ded
+			CLIENTBIN=ioquake3
+
+			ifndef BUILD_DIR
+				BUILD_DIR=build-ioq3
+			endif
+
+			VERSION=1.36
+
+			BASEGAME=baseq3
+			BASEGAME_FLAGS =
+			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+
+			ifndef COPYDIR
+				COPYDIR="/usr/local/games/quake3"
+			endif
 		endif
-
-		#
-		# Server/Client-Only
-		#
-		USE_CODEC_VORBIS=1
-		USE_CODEC_THEORA=1
-
-		SERVERBIN=ioq3ztm-server
-		CLIENTBIN=ioq3ztm
-
-		ifndef BUILD_DIR
-			BUILD_DIR=build-ioq3ztm
-		endif
-
-	else
-
-		# Build unmodified ioquake3.
-		BUILD_DEFINES=-DIOQUAKE3
-
-		SERVERBIN=ioq3ded
-		CLIENTBIN=ioquake3
-
-		ifndef BUILD_DIR
-			BUILD_DIR=build-ioq3
-		endif
-
-		VERSION=1.36
-
-		BASEGAME=baseq3
-		BASEGAME_FLAGS =
-		MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
-
-		ifndef COPYDIR
-			COPYDIR="/usr/local/games/quake3"
-		endif
-
 	endif
 
 else # END QUAKE3
@@ -191,13 +199,12 @@ else # END QUAKE3
 	# Some of the defines aren't as independent as they should be, TA_WEAPSYS requires TA_PLAYERSYS, etc
 	# Please note: TA_*SYS defines are general system changes, not 'totally' specifiy for Turtle Arena
 
-	# USE_FREETYPE Currently doesn't work when using pk3 files
-	#                 instead of using unzipped files?
+	# USE_FREETYPE Currently doesn't work when using pk3 files instead of using unzipped files?
 
 	##### ioquake3 defines
 	# STANDALONE			ioquake3 define to disable quake3 code for authicating, and stuff.
 	# RAVENMD4				Enable support for loading MDR models when atempting to load *.mdr.
-	#							It isn't ever used as ioq3 only asks for .md3 (However, IOQ3ZTM checks for mdr before loading md3)
+	#							It isn't ever used, as ioq3 only asks for .md3 (However, IOQ3ZTM checks for mdr before loading md3)
 	# MISSIONPACK			Quake3 expansion pack, Team Arena.
 	##### "new ioquake3 defines"
 	# IOQUAKE3				Enables CD key check and punkbuster ui code
@@ -228,14 +235,14 @@ else # END QUAKE3
 	#							bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
 	#							ZTM: TODO: Rename this define to ...?
 	# NOBLOOD				Removes blood. If this is defined, NOTRATEDM must also be defined.
-	# ANALOG				Allows players to rotate the camera and move based on the camera angles
+	# ANALOG				Allows players to rotate the camera and move based on the camera angles, not full analog control yet
 	# NET_COMPAT			Working on having Turtle Arena and ioq3ztm run on the same engine.
 	# THIRD_PERSON			Game defaults to third person instead of first person
 	#####
 	# TA_WEAPSYS			This is the core changes to the weapon system
 	#							loads the weapons from a text file, allowing for easy modifing,
 	#							and new custom default weapons for players.
-	# TA_WEAPSYS_NOCOMPAT	Removes botlib weapon weight code because when WEAP_SCRIPT is define
+	# TA_WEAPSYS_NOCOMPAT	Removes botlib weapon weight code because when TA_WEAPSYS is define
 	#  							"game" does its own weapon weight stuff.
 	# TA_WEAPSYS_EX			Changes from holding multiple weapons to only one default and one pickup.
 	# TA_WEAPSYS_EX_COMPAT	Keeps compatiblity with mods not using TA_WEAPSYS_EX
@@ -259,9 +266,9 @@ else # END QUAKE3
 	#							(Like a NiGHTS into Dreams clone or Sonic Robo Blast Arena...)
 	# TA_SP
 	# TA_HOLDABLE			Turtle Arena holdable items. Shurikens and Pizza-to-Go.
-	# TA_PLAYERS			Turtle Arena player stuff?
+	# TA_PLAYERS			Turtle Arena player animations and tags
 	# TA_DATA				Changes for Turtle Arena data.
-	# TA_HUD				Replaces Quake3 HUD, with one for Turtle Arena...
+	# TA_HUD				Replaces Quake3 HUD with one for Turtle Arena.
 	#####
 	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
 
@@ -272,7 +279,7 @@ else # END QUAKE3
 						-DTA_WEAPSYS -DTA_PLAYERSYS \
 						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 						-DTA_WEAPSYS_EX_COMPAT \
-						-DOA_BLOOM
+						-DOA_BLOOM -DTA_MOD
 
 	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
 						-DTA_WEAPSYS_EX -DTA_PLAYERS -DTA_DATA \

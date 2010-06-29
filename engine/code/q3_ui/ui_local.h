@@ -544,15 +544,16 @@ typedef struct {
 	animation_t		animations[MAX_ANIMATIONS];
 #endif
 
+#ifdef TA_WEAPSYS
+	qhandle_t		weaponModel[2];
+	qhandle_t		barrelModel[2];
+	qhandle_t		flashModel[2];
+	vec3_t			flashDlightColor[2];
+#else
 	qhandle_t		weaponModel;
 	qhandle_t		barrelModel;
 	qhandle_t		flashModel;
 	vec3_t			flashDlightColor;
-#ifdef TA_WEAPSYS
-	qhandle_t		weaponModel2;
-	qhandle_t		barrelModel2;
-	qhandle_t		flashModel2;
-	vec3_t			flashDlightColor2;
 #endif
 	int				muzzleFlashTime;
 

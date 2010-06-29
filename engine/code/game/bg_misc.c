@@ -4603,7 +4603,7 @@ char *eventnames[] = {
 #endif
 
 //#ifdef MISSIONPACK
-#if !defined TA_WEAPSYS || defined NET_COMPAT
+#ifndef TA_WEAPSYS
 	"EV_PROXIMITY_MINE_STICK",
 	"EV_PROXIMITY_MINE_TRIGGER",
 #endif
