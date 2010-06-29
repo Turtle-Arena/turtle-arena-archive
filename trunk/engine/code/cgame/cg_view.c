@@ -264,15 +264,13 @@ void CG_CamUpdate(void)
 		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", cg_thirdPersonAngle.value));
 
 #ifdef TA_CAMERA
-	// NiGHTS: Journey of Dreams Visitor style camera distance.
-	//  When next to a wall the camera is closer (like Quake3),
-	//  but only zooms back out when the player is moving
-
 	// First person
 	if (!cg_thirdPerson.integer)
 	{
-		// cg.camDistance is unused by first person
-		cg.camDistance = cg_thirdPersonRange.value;
+		if (cg.camDistance > 11)
+			cg.camDistance -= 2;
+		else
+			cg.camDistance = 10;
 	}
 	else
 	{
@@ -288,8 +286,14 @@ void CG_CamUpdate(void)
 		// Zoom back out
 		else if (cg.camDistance < cg_thirdPersonRange.value)
 		{
+#if 0
+			// NiGHTS: Journey of Dreams Visitor style camera distance.
+			//  When next to a wall the camera is closer (like Quake3),
+			//  but only zooms back out when the player is moving
+
 			// If player is moving on xy zoom out a little
 			if (cg.xyspeed != 0)
+#endif
 			{
 				if (cg.camDistance < cg_thirdPersonRange.value-1.0f)
 					cg.camDistance += 1.0f;
@@ -473,8 +477,8 @@ static void CG_OffsetThirdPersonView( void ) {
 			VectorCopy( trace.endpos, view );
 #ifdef TA_CAMERA
 			cg.camDistance = cg.camDistance * trace.fraction;
-			if (cg.camDistance < 1) {
-				cg.camDistance = 1;
+			if (cg.camDistance < 10) {
+				cg.camDistance = 10;
 			}
 #else
 			view[2] += (1.0 - trace.fraction) * 32;
@@ -1137,7 +1141,11 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	// decide on third person view
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, if spectator always be in first person.
 	cg.renderingThirdPerson = (cg_thirdPerson.integer && cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR)
-								|| (cg.snap->ps.stats[STAT_HEALTH] <= 0);
+								|| (cg.snap->ps.stats[STAT_HEALTH] <= 0)
+#ifdef TA_CAMERA
+								|| (cg.camDistance > 10)
+#endif
+								;
 #else
 	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
 #endif
