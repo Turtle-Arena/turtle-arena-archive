@@ -1,8 +1,6 @@
-h_head_left,models/players/don/head
-h_head_right,models/players/don/head
+h_head_top,models/players/don/head
+h_head_bottom,models/players/don/head
 h_eye_left,models/players/raph/white
 h_eye_right,models/players/raph/white
-h_mouth_left,models/players/raph/white
-h_mouth_right,models/players/raph/white
 h_bandana,models/players/don/head
 tag_head,
