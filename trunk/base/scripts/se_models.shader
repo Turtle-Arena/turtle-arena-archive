@@ -5,10 +5,9 @@
 //
 
 // Raph's eyes/mouth should be lighter then normal textures
-//   and TODO: the brightness should change base on how close we are, I think they are whiter farer away.
+//   and TODO: the brightness should change base on how close we are, I think they are whiter farther away.
 models/players/raph/white
 {
-	//cull disable
 	{
 		map $whiteimage
 		rgbGen const ( 0.9 0.9 0.9 )
@@ -207,7 +206,7 @@ models/shurikens/shurikenelectric
 	}
 }
 
-models/shurikens/shurikenlaser_1
+models/shurikens/shurikenlaser
 {
 	{
 		map models/powerups/holdable/shurikenlaser_1.png
@@ -228,10 +227,8 @@ models/shurikens/laserglow
 	}
 }
 
-// Must disable culling else the model can't be seen.
 models/mapobjects/traffic_cone/traffic_cone
 {
-	cull disable
 	{
 		map models/mapobjects/traffic_cone/traffic_cone.jpg
 		rgbGen lightingDiffuse
@@ -374,12 +371,12 @@ models/weapons2/katana_leo/w_katana
 		blendFunc GL_ONE GL_ZERO
 		rgbGen lightingDiffuse
 	}
-	{
-		map models/weapons2/katana_leo/w_katana_spec.png
-		blendFunc GL_SRC_ALPHA GL_ONE
-		detail
-		alphaGen lightingSpecular
-	}
+	//{
+	//	map models/weapons2/katana_leo/w_katana_spec.png
+	//	blendFunc GL_SRC_ALPHA GL_ONE
+	//	detail
+	//	alphaGen lightingSpecular
+	//}
 	//{
 	//	map models/weapons2/blade_enviro.jpg
 	//	blendFunc GL_DST_COLOR GL_SRC_COLOR
@@ -552,7 +549,7 @@ models/materials/glass
 
 
 // CTF FLAGS / MISSIONPACK CTF FLAGS
-// Below CTF flay shaders from MISSIONPACK demo pak0.pk3/scripts/models.shader
+// Below CTF flag shaders are from MISSIONPACK demo pak0.pk3/scripts/models.shader
 models/flags/pole
 {
 	{
