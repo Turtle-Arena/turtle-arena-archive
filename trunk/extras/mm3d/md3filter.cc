@@ -2274,6 +2274,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
    bool compress = true; // MDR
    unsigned bcount = 0; // MDR
    unsigned bonesRemap[1024]; // Remap MM3D's bone indexes to the local model
+   unsigned bonesRemap2[1024]; // Remap local bone indexes to the MM3D model
                               // ZTM: FIXME: What should be max be? (ioquake3 defines MDR_MAX_BONES to 128, but never uses it)
    if (type == MT_MDR)
    {
@@ -2294,6 +2295,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 
       bcount = m_model->getBoneJointCount();
       memset(bonesRemap, 0, sizeof (bonesRemap));
+      memset(bonesRemap2, 0, sizeof (bonesRemap2));
       if (section == MS_Head || section == MS_Lower || section == MS_Upper)
       {
          numBones = 0;
@@ -2301,7 +2303,8 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
          {
             if ( boneJointInSection( m_model->getBoneJointName( j ), section ) )
             {
-               bonesRemap[j] = numBones;
+               bonesRemap[j] = numBones; // MM3D joint to fake joint
+               bonesRemap2[numBones] = j; // fake joint to MM3D joint
                numBones++;
             }
          }
@@ -2505,22 +2508,27 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 #ifdef MDR_EXPORT
             if (type == MT_MDR)
             {
+               if (a == 0 && t == 0)
+                  log_debug("Anim0: Frame0: bones joints in section = %d, total bones joints = %d\n", numBones, bcount);
+
                // Write MDR bones
-               for ( unsigned j = 0; j < bcount; j++ )
+               for ( int b = 0; b < numBones; b++ )
                {
-                  if ( !boneJointInSection( m_model->getBoneJointName( j ), section ) )
-                     continue;
+                  int joint = bonesRemap2[b]; // Get real bone joint
 
                   Matrix rotMatrix;
-                  double rotVector[3];
+                  double rotVector[3] = { 0, 0, 0 };
                   bool m_animationLoop = m_model->isAnimationLooping( m_animationMode, a );
-                  m_model->interpSkelAnimKeyframe( a, t, m_animationLoop, j, true, rotVector[0], rotVector[1], rotVector[2] );
+                  m_model->interpSkelAnimKeyframe( a, t, m_animationLoop, joint, true, rotVector[0], rotVector[1], rotVector[2] );
 
                   // origin
                   double origin[4] = { 0, 0, 0, 1 };
-                  m_model->interpSkelAnimKeyframe( a, t, m_animationLoop, j, false, origin[0], origin[1], origin[2] );
+                  m_model->interpSkelAnimKeyframe( a, t, m_animationLoop, joint, false, origin[0], origin[1], origin[2] );
 
                   saveMatrix.apply( origin );
+
+                  if (a == 0 && t == 0)
+                     log_debug("joint(%d) %s, origin=%f %f %f\n", joint, m_model->getBoneJointName( joint ), origin[0], origin[1], origin[2]);
 
                   // Seems whenver we have a nan its from a identity matrix
                   if ( rotVector[0] != rotVector[0] || rotVector[1] != rotVector[1] || rotVector[2] != rotVector[2] )
@@ -2567,7 +2575,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                         if (origin[m] < -512 || origin[m] > 511)
                         {
                            // Can't compress, origin out of range
-                           log_error( "Compressed MDR Bone joint(%d) is out side bounds (valid range is -512 to 511).\n", j );
+                           log_error( "Compressed MDR Bone joint(%d) is out side bounds (valid range is -512 to 511).\n", joint );
                            m_model->setFilterSpecificError( transll( QT_TRANSLATE_NOOP( "LowLevel", "Compressed MDR Bone joint origin out of range (valid range is -512 to 511)." ) ).c_str() );
                            return Model::ERROR_FILTER_SPECIFIC;
                         }
@@ -2889,36 +2897,19 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                   m_dst->write( numWeights );
 
                   // ZTM: FIXME: I have no idea if this is right
+                  // Model::setCurrentAnimationTime may help?
                   for ( it = ilist.begin(); it != ilist.end(); it++ )
                   {
                      float     boneWeight = 1.0f / numWeights; //(*it).m_weight;
-                     float     offset[3] = {0.0f, 0.0f, 10.0f};
+                     float     offset[3] = {0.0f, 0.0f, 0.0f};
                      // MD4: offset gives the direction vector of the weight's influence.
 
-// VectorLength
-#define Length(v) (sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]))
-
-/*
-            // get the bone scaling
-            tm = bone->GetNodeTM( interfaceptr->GetTime() );
-
-            // scale the offset and store it in our vertex
-            p = v->GetOffsetVector( i );
-            offset[ 0 ] = p.x * Length( tm.GetRow( 0 ) );
-            offset[ 1 ] = p.y * Length( tm.GetRow( 1 ) );
-            offset[ 2 ] = p.z * Length( tm.GetRow( 2 ) );
-
-// GetOffsetVector() will return the coordinates of the vertex
-// in the local coordinates of associated INode pointer from GetNode
-// this is NOT THE SAME as the .vph file coordinates. (It is simpler)
-// the world coordinates of the vertex have been transformed by the Inverse of the INode pointer.
-*/
-
                      Matrix rotMatrix;
-                     double forward[3], right[3], up[3];
+                     Vector forward, right, up;
 
-                     m_model->getBoneJointFinalMatrix((*it).m_boneId, rotMatrix);
-                     rotMatrix = rotMatrix*saveMatrix;
+                     m_model->getBoneJointAbsoluteMatrix((*it).m_boneId, rotMatrix);
+                     rotMatrix = rotMatrix*saveMatrix; // FIXME?: Should be 'bone.transform as matrix3'
+                     //rotMatrix.setTranslation(0,0,0);
 
                      forward[0] = rotMatrix.get(0,0);
                      forward[1] = rotMatrix.get(0,1);
@@ -2932,16 +2923,23 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                      up[1] = rotMatrix.get(2,1);
                      up[2] = rotMatrix.get(2,2);
 
+#if 1
+                     rotMatrix.inverseTranslateVector(meshVec);
+
+                     Vector offsetVec;
+                     offsetVec.setAll(meshVec);
+#else
                      Matrix InvMatrix;
                      Vector offsetVec;
 
                      InvMatrix = rotMatrix.getInverse();
                      offsetVec.setAll(meshVec);
                      offsetVec.transform3(InvMatrix);
+#endif
 
-                     offset[0] = offsetVec[0] * Length(forward);
-                     offset[1] = offsetVec[1] * Length(right);
-                     offset[2] = offsetVec[2] * Length(up);
+                     offset[0] = offsetVec[0] * forward.mag3();
+                     offset[1] = offsetVec[1] * right.mag3();
+                     offset[2] = offsetVec[2] * up.mag3();
 
                      //log_debug("offset=%f,%f,%f\n", offset[0], offset[1], offset[2]);
 
@@ -3159,11 +3157,15 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                }
                for ( unsigned t = 0; t < aFrameCount; t++ )
                {
-                  Matrix saveMatrix = getMatrixFromPoint( a, t, rootTag ).getInverse();
+                  Matrix saveMatrix;
 
                   if ( section == MS_Head )
                   {
                      saveMatrix = getMatrixFromPoint( -1, -1, rootTag ).getInverse();
+                  }
+                  else
+                  {
+                     saveMatrix = getMatrixFromPoint( a, t, rootTag ).getInverse();
                   }
 
                   for ( vit = (*mlit).vertices.begin(); vit != (*mlit).vertices.end(); vit++ )
@@ -3243,6 +3245,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
       {
          if ( tagInSection( m_model->getPointName( j ), section ) )
          {
+            // Get and write MDR bone joint index
             int32_t boneIndex = bonesRemap[m_model->getPointBoneJoint(j)];
             m_dst->write(boneIndex);
 
