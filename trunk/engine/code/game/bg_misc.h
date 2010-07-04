@@ -1448,6 +1448,7 @@ typedef struct bg_playercfg_s
 	// Player's boundingbox
 	vec3_t bbmins;
 	vec3_t bbmaxs;
+	int deadmax; // Use deathmax instead of bbmax[2] when dead
 
 	// Speed control, some characters are faster then others.
 	int   max_speed;
@@ -1562,6 +1563,7 @@ typedef struct
 	int health;
 	int viewheight;
 	vec3_t mins, maxs;
+	int deadmax; // Use deathmax instead of max[2] when dead
 	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
 	int handSide[MAX_HANDS];
 

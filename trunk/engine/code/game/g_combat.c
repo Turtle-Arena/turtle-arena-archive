@@ -789,7 +789,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	self->s.loopSound = 0;
 
-#if 0 //#ifdef TA_PLAYERSYS // ZTM: FIXME: Use per-player bounding box!
+#ifdef TA_PLAYERSYS // Use per-player bounding box
+	self->r.maxs[2] = self->client->pers.playercfg.deadmax;
 #else
 	self->r.maxs[2] = -8;
 #endif

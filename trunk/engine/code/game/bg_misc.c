@@ -3340,6 +3340,7 @@ static qboolean NPC_Parse(char **p) {
 
 	npc.maxs[0] = npc.maxs[1] = 5.0f;
 	npc.maxs[2] = 10.0f;
+	npc.deadmax = 5;
 
 	npc.viewheight = 5; // middle of default bounding box
 
@@ -3498,6 +3499,12 @@ static qboolean NPC_Parse(char **p) {
 				}
 			}
 			continue;
+		} else if ( !Q_stricmp( token, "deadmax" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			npc.deadmax = atoi(token);
 		} else if ( !Q_stricmp( token, "primaryHand" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
@@ -5699,6 +5706,16 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			}
 			continue;
 		}
+		else if ( !Q_stricmp( token, "deadmax" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			if (headConfig) // skip speed
+				continue;
+			playercfg->deadmax = atoi( token );
+			continue;
+		}
 
 		// ZTM: TODO: Jump Percent 1-100 ?
 		//else if ( !Q_stricmp( token, "jumpheight" ) ) {
@@ -5969,6 +5986,7 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	// Default to Q3 bounding box (If changed update game's SpotWouldTelefrag)
 	VectorSet(playercfg->bbmins,-15, -15, -24); // playerMins
 	VectorSet(playercfg->bbmaxs, 15,  15,  32); // playerMaxs
+	playercfg->deadmax = -8;
 
 	playercfg->max_speed = 320;
 	playercfg->accelerate_speed = 10.0f;
