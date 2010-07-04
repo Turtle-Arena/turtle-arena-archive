@@ -181,6 +181,9 @@ void TossClientItems( gentity_t *self ) {
 #endif
 
 			drop->count = ammo;
+
+			// Don't have corpse hold dropped weapon
+			self->s.weapon = self->client->ps.weapon = WP_NONE;
 		}
 #else
 		Drop_Item( self, item, 0 );
@@ -772,7 +775,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	self->takedamage = qtrue;	// can still be gibbed
 
-#ifndef TA_WEAPSYS // Players don't let go of default weapon.
+#ifndef TA_WEAPSYS // Players don't always let go of weapon. (Set by TossClientItems if needed)
 	self->s.weapon = WP_NONE;
 #endif
 	self->s.powerups = 0;
