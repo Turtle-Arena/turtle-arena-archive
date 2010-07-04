@@ -1630,11 +1630,11 @@ static void PM_CheckDuck (void)
 	{
 #ifdef TA_NPCSYS
 		if (pm->npc) {
-			pm->maxs[2] = (pm->npc->info->maxs[2] / 4) * -1;
+			pm->maxs[2] = pm->npc->info->deadmax;
 		} else
 #endif
 #ifdef TA_PLAYERSYS // BOUNDINGBOX
-		pm->maxs[2] = (pm->playercfg->bbmaxs[2] / 4) * -1;
+		pm->maxs[2] = pm->playercfg->deadmax;
 #else
 		pm->maxs[2] = -8;
 #endif
