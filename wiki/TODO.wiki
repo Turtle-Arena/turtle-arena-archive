@@ -32,7 +32,7 @@ Focus on players, map themes, and multiplayer maps
   * Bring back player effect colors?
     * Readd to ui and q3_ui
     * (Control Turtle mask color and/or melee trail color?)
-  * Add more players (Mirage or 2003 based?); Shredder, Foot, etc
+  * Add more players (Mirage comic based); Foot Ninja, Foot Elite, and The Shredder
   * Reduce overall number of TODOs and FIXMEs in the source
 
   * Hopefully make it a complete (fully working) multiplayer game (Compareable to TMNT: Mutant Melee in someways...)
@@ -84,6 +84,9 @@ Weapons (and attacking)
   * BUG: Flash origin isn't updated when missing weapon model
 
   * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
+
+  * TODO: Option for weapon flashColor to use player's color1 or color2
+    * Have Tri-Blaster use color1 as flashColor
 
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
@@ -183,6 +186,10 @@ Weapons (and attacking)
   * TODO: Driveable vehicles? (Base on Q3Rally)
 
   * TODO: Button to drop held CTF flag like in SRB2?
+
+  * TODO: Add Jump/Land animations specificly for backflip, fallback to 'Jump/Land B' (jump backward)
+    * For jumping backward in lock-on mode, like in LoZ:TP
+    * (Should Turtle Arena players just have 'Jump/Land B' be a backflip?)
 
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
@@ -294,16 +301,31 @@ BSPC is the map .bsp to .aas (Arena Awareness System) compiler. The aas file is 
   * TODO: Raph and Casey really need to /swing/ the melee weapons.
     * Casey's swinging isn't that bad, but Raph's swinging sure is.
 
-  * TODO: Set looping in leo, don, raph, mike, and casey mm3d models and re-export
+  * TODO: Set looping in don, raph, mike, and casey mm3d models and re-export
+
+  * TODO: Add Leo, Don, Mike, and Casey bot chats.
 
 === Raph ====
   * TODO: Finish animating raph_v9.mm3d
 
+  * TODO: Reskin raph_v9's torso and remake the torso textures.
+    * Needs to be done to fix lighting
+
+  * TODO: Reskin raph_v9's legs and remake the leg textures.
+    * Needs to be done to fix lighting
+
+=== Other Turtles ===
+  * TODO: Finish Turtle player models
+    * After Raph is finished:
+    * Leo/Don/Mike: Finish head (model/skin), reanimate raph_v9.mm3d for Turtle
+    * Raph-Mouth `<==>--<==>` (DONE)
+    * Leo--Mouth ` -----<==>` (easy to do)
+    * Don--Mouth ` -------- ` (DONE?)
+    * Mike-Mouth ` ------.' ` (easy to do)
+
 === Casey ====
   * TODO: Finish Casey Jones model mesh
      * Casey's feet look ugly (fix them), and allow the toes to bend.
-
-  * TODO: Add Leo, Don, Mike, and Casey bot chats.
 
 
 = Misfit Model 3D =
