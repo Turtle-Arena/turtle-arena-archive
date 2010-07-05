@@ -2340,7 +2340,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	if( legsAnim == LEGS_IDLE || legsAnim == LEGS_IDLECR ) {
 		flagAnim = FLAG_STAND;
 #ifdef IOQ3ZTM // ZTM: TEST: Always update flag angle.
-		// ZTM: TODO: Have a idle timer to know if its been awile since they moved to NOT updateangles?
+		// ZTM: TODO: Have a idle timer to know if its been awhile since they moved, to NOT updateangles?
 		updateangles = qtrue;
 #endif
 	} else if ( legsAnim == LEGS_WALK || legsAnim == LEGS_WALKCR ) {
