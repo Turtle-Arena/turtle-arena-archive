@@ -93,9 +93,9 @@ raph_v9.mm3d doesn't have raph_v9.wings's new h_hand_right and h_hand_left.
 	It just removes triangles on the end that connect to the arm.
 	Replacing it in the mm3d requires it to be reconnected to the skeleton.
 
-h_mouth_right and h_mouth_left need to be deleted from raph_v9.wings
-	(mouth is now just a different material on the h_head_bottom mesh
-	that is renamed to h_mouth in raph_v9.mm3d)
+=== Wings3D to MM3D ===
+Raph's mouth is now just a different material on the h_head_bottom mesh
+	when exported it needs to be renamed to h_mouth_right and h_mouth_left in raph_v9.mm3d
 
 == TODO ==
 Raph's thumbs also go flat and should be fixed.

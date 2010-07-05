@@ -67,7 +67,7 @@ chat "casey"
 	type "level_end_lose"
 	{
 		"Gaaa";
-		"Aww come on that guy musta' cheated.";
+		"Aww come on, that guy musta' cheated.";
 	}
 
 	type "hit_talking"
