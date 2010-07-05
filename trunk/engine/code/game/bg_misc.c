@@ -5726,7 +5726,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			// Like color1
 		//}
 		//else if ( !Q_stricmp( token, "prefcolor2" ) ) {
-		//	// Like color2
+			// Like color2
 		//}
 		else if ( !Q_stricmp( token, "ability" ) ) {
 			token = COM_Parse( &text_p );
