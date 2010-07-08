@@ -928,14 +928,19 @@ void LeafNode(node_t *node, bspbrush_t *brushes)
 //===========================================================================
 void CheckPlaneAgainstParents (int pnum, node_t *node)
 {
-#if 0 // ZTM: FIXME: This causes some of my maps to fail. Why is this done? What is it doing?
 	node_t	*p;
 
 	for (p = node->parent; p; p = p->parent)
 	{
-		if (p->planenum == pnum) Error("Tried parent");
-	} //end for
+		if (p->planenum == pnum)
+		{
+#if 1 // ZTM: FIXME?: This causes some of my maps to fail. Why is this done? What is it doing?
+			qprintf("Warning in CheckPlaneAgainstParents: Tried parent\n");
+#else
+			Error("Tried parent");
 #endif
+		}
+	} //end for
 } //end of the function CheckPlaneAgainstParants
 //===========================================================================
 //
