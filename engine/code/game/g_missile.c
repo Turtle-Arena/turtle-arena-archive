@@ -626,7 +626,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 				// set player number for custom colors on the railtrail
 				tent->s.clientNum = self->s.clientNum;
 
-				// ZTM: FIXME: Hacky way to find hand?
+				// ZTM: NOTE: This could be a problem if multiple hands use the same handSide.
 				tent->s.weaponHands = MAX_HANDS;
 				if (self->client) {
 					for (i = 0; i < MAX_HANDS; i++)
