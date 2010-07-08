@@ -89,17 +89,15 @@ Jump/land B (Copy of Jump/land)
 
 
 == Note ==
-raph_v9.mm3d doesn't have raph_v9.wings's new h_hand_right and h_hand_left.
-	It just removes triangles on the end that connect to the arm.
-	Replacing it in the mm3d requires it to be reconnected to the skeleton.
+cg_shadows 2 doesn't not work due to the holes in the meshes.
 
-=== Wings3D to MM3D ===
-Raph's mouth is now just a different material on the h_head_bottom mesh
-	when exported it needs to be renamed to h_mouth_right and h_mouth_left in raph_v9.mm3d
+
+== Converting Wings3D to MM3D ==
+Export the model from wings3d into an .obj model. Import the .obj into MisfitModel3D.
+
+Raph's mouth is just a different material on the h_head_bottom mesh
+	when exported it needs to be renamed to h_mouth_right and h_mouth_left in the mm3d model
 
 == TODO ==
-Raph's thumbs also go flat and should be fixed.
+Raph's thumb goes flat when rotated and should be fixed.
 
-raph_v9: Merge torso.png and hand.png
-
-Merge torso.png and legs.png?
