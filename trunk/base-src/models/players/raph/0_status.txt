@@ -89,7 +89,8 @@ Jump/land B (Copy of Jump/land)
 
 
 == Note ==
-cg_shadows 2 doesn't not work due to the holes in the meshes.
+cg_shadows 2 doesn't not work correctly with the model for some reason.
+Is it due to the holds in the meshes?
 
 
 == Converting Wings3D to MM3D ==
@@ -99,5 +100,5 @@ Raph's mouth is just a different material on the h_head_bottom mesh
 	when exported it needs to be renamed to h_mouth_right and h_mouth_left in the mm3d model
 
 == TODO ==
-Raph's thumb goes flat when rotated and should be fixed.
+Raph's thumb get weird when rotated and should be fixed?
 
