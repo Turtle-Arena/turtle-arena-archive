@@ -308,12 +308,6 @@ BSPC is the map .bsp to .aas (Arena Awareness System) compiler. The aas file is 
 === Raph ====
   * TODO: Finish animating raph_v9.mm3d
 
-  * TODO: Reskin raph_v9's torso and remake the torso textures.
-    * Needs to be done to fix lighting
-
-  * TODO: Reskin raph_v9's legs and remake the leg textures.
-    * Needs to be done to fix lighting
-
 === Other Turtles ===
   * TODO: Finish Turtle player models
     * After Raph is finished:
