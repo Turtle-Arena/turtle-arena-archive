@@ -141,7 +141,7 @@ qboolean S_TheCheckExtension(char *filename)
 	char *extptr;
 
 	strncpy(fn, filename, stringlen+1);
-	extptr = strrchr(fn, '.');
+	extptr = Q_strrchr(fn, '.');
 
 	if(!extptr)
 	{
