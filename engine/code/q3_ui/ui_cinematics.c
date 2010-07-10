@@ -117,7 +117,7 @@ qboolean UI_CanShowVideo(const char *video)
 	char filename[MAX_QPATH];
 	int len;
 
-	Q_snprintf(filename, MAX_QPATH, "video/%s.roq", video);
+	Q_snprintf(filename, MAX_QPATH, "video/%s.RoQ", video);
 
 	len = trap_FS_FOpenFile( filename, &f, FS_READ );
 	if ( len <= 0 ) {

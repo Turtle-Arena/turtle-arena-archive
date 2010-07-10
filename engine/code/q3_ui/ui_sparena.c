@@ -520,8 +520,6 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_cinematics.string					= "Cinematics";
 	spMenuInfo.sp_cinematics.color					= text_big_color;
 	spMenuInfo.sp_cinematics.style					= UI_CENTER;
-	// Disabled for now.
-	spMenuInfo.sp_cinematics.generic.flags |= QMF_GRAYED;
 
 /*
 	if (UI_TeamArenaExists()) {
