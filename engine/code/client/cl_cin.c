@@ -1522,6 +1522,99 @@ e_status CIN_RunCinematic (int handle)
 
 char *S_FileExtension(const char *fni);
 
+#ifdef IOQ3ZTM
+// Also see S_TheCheckExtension
+qboolean CIN_TheCheckExtension(char *filename)
+{
+	enum
+	{
+		CIN_RoQ,
+		CIN_roq,
+#if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
+		CIN_ogm,
+		CIN_ogv,
+#endif
+		CIN_MAX
+	};
+	const char cin_ext[CIN_MAX][4] = { "RoQ\0", "roq\0"
+#if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
+		, "ogm\0", "ogv\0"
+#endif
+	}	;
+	qboolean skipCin[CIN_MAX] = { qfalse, qfalse
+#if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
+		, qfalse, qfalse
+#endif
+		};
+	fileHandle_t hnd;
+	char fn[MAX_QPATH];
+	int stringlen = strlen(filename);
+	char *extptr;
+	int i;
+
+	strncpy(fn, filename, stringlen+1);
+	extptr = Q_strrchr(fn, '.');
+
+	if(!extptr)
+	{
+		extptr = &fn[stringlen];
+
+		extptr[0] = '.';
+		extptr[1] = 'R';
+		extptr[2] = 'o';
+		extptr[3] = 'Q';
+		extptr[4] = '\0';
+
+		stringlen += 4;
+
+		skipCin[CIN_RoQ] = qtrue;
+	}
+
+	FS_FOpenFileRead(fn, &hnd, qtrue);
+
+	if (!hnd)
+	{
+		extptr++;
+
+		for (i = 0; i < CIN_MAX; i++)
+		{
+			if (!strcmp(extptr, cin_ext[i]))
+			{
+				skipCin[i] = qtrue;
+				break;
+			}
+		}
+
+		for (i = 0; i < CIN_MAX; i++)
+		{
+			if (skipCin[i]) {
+				continue;
+			}
+
+			extptr[0] = cin_ext[i][0];
+			extptr[1] = cin_ext[i][1];
+			extptr[2] = cin_ext[i][2];
+			extptr[3] = '\0';
+
+			FS_FOpenFileRead(fn, &hnd, qtrue);
+
+			if (hnd) {
+				break;
+			}
+		}
+
+		if(!hnd) {
+			return qfalse;
+		}
+	}
+
+	FS_FCloseFile(hnd);
+	strcpy(filename, fn);
+
+	return qtrue;
+}
+#endif
+
 /*
 ==================
 CIN_PlayCinematic
@@ -1538,6 +1631,14 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	} else {
 		Com_sprintf (name, sizeof(name), "%s", arg);
 	}
+
+#ifdef IOQ3ZTM
+	if (!CIN_TheCheckExtension(name))
+	{
+		// Can't find video
+		return -1;
+	}
+#endif
 
 	if (!(systemBits & CIN_system)) {
 		for ( i = 0 ; i < MAX_VIDEO_HANDLES ; i++ ) {

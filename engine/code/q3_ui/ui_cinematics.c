@@ -111,19 +111,71 @@ static void UI_CinematicsMenu_Event( void *ptr, int event ) {
 }
 
 #ifdef IOQ3ZTM
+// Also see CIN_TheCheckExtension
 qboolean UI_CanShowVideo(const char *video)
 {
-	fileHandle_t f;
+	enum
+	{
+		CIN_RoQ,
+		CIN_roq,
+		CIN_ogm,
+		CIN_ogv,
+		CIN_MAX
+	};
+	const char cin_ext[CIN_MAX][4] = { "RoQ\0", "roq\0", "ogm\0", "ogv\0" };
+	qboolean skipCin[CIN_MAX] = { qfalse, qfalse , qfalse, qfalse };
+	fileHandle_t hnd;
 	char filename[MAX_QPATH];
+	char fn[MAX_QPATH];
+	int stringlen;
+	char *extptr;
+	int i;
 	int len;
 
 	Q_snprintf(filename, MAX_QPATH, "video/%s.RoQ", video);
+	stringlen = strlen(filename);
 
-	len = trap_FS_FOpenFile( filename, &f, FS_READ );
-	if ( len <= 0 ) {
-		return qfalse;
+	strncpy(fn, filename, stringlen+1);
+	extptr = Q_strrchr(fn, '.');
+
+	len = trap_FS_FOpenFile( fn, &hnd, FS_READ );
+
+	if (len <= 0)
+	{
+		extptr++;
+		for (i = 0; i < CIN_MAX; i++)
+		{
+			if (!strcmp(extptr, cin_ext[i]))
+			{
+				skipCin[i] = qtrue;
+				break;
+			}
+		}
+
+		for (i = 0; i < CIN_MAX; i++)
+		{
+			if (skipCin[i]) {
+				continue;
+			}
+
+			extptr[0] = cin_ext[i][0];
+			extptr[1] = cin_ext[i][1];
+			extptr[2] = cin_ext[i][2];
+			extptr[3] = '\0';
+
+			len = trap_FS_FOpenFile( fn, &hnd, FS_READ );
+
+			if (len > 0) {
+				break;
+			}
+		}
+
+		if (len <= 0) {
+			return qfalse;
+		}
 	}
-	trap_FS_FCloseFile(f);
+
+	trap_FS_FCloseFile(hnd);
 	return qtrue;
 }
 #endif
