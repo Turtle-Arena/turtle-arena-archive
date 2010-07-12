@@ -467,7 +467,12 @@ static void UI_SetLerpFrameAnimation( playerInfo_t *ci, lerpFrame_t *lf, int new
 	lf->animationNumber = newAnimation;
 	newAnimation &= ~ANIM_TOGGLEBIT;
 
-	if ( newAnimation < 0 || newAnimation >= MAX_ANIMATIONS ) {
+#ifdef TA_PLAYERSYS
+	if ( newAnimation < 0 || newAnimation >= MAX_TOTALANIMATIONS )
+#else
+	if ( newAnimation < 0 || newAnimation >= MAX_ANIMATIONS )
+#endif
+	{
 		trap_Error( va("Bad animation number: %i", newAnimation) );
 	}
 

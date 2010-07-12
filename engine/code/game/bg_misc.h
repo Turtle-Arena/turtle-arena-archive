@@ -1303,7 +1303,7 @@ typedef struct
 } bg_sound_t;
 
 // Currently not used by players...
-#define MAX_BG_SOUNDS MAX_ANIMATIONS
+#define MAX_BG_SOUNDS MAX_TOTALANIMATIONS
 //#define MAX_BG_SOUNDS MAX_MISC_OBJECT_ANIMATIONS*2
 typedef bg_sound_t bg_sounds_t[MAX_BG_SOUNDS];
 #endif
@@ -1459,8 +1459,14 @@ typedef struct bg_playercfg_s
 
 } bg_playercfg_t;
 
+typedef struct
+{
+	int legSkip;
+	int firstTorsoFrame;
+} frameSkip_t;
+
 int BG_AnimationTime(animation_t *anim);
-int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip);
+int BG_LoadAnimation(char **text_p, int i, animation_t *animations, frameSkip_t *skip);
 qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, const char *headModel);
 
 #ifdef TA_ENTSYS

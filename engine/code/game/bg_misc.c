@@ -5127,14 +5127,8 @@ void	trap_FS_FCloseFile( fileHandle_t f );
 ===============
 BG_SetDefaultAnimation
 
-loadedAnim maybe NULL here, if it is,
-	we assum all animations up to LEGS_TURN were loaded.
-	(As that is how many there are
-
-Now players only "need" four animations
-	(BOTH_DEATH1, BOTH_DEAD1 LEGS_IDLE, and TORSO_STAND)
-	Well I think players still need LEGS_WALKCR to set the
-		legs frame skip correctly.
+Players only "need" four animations
+	(BOTH_DEATH1, BOTH_DEAD1, TORSO_STAND, and LEGS_IDLE)
 
 Returns qtrue if the animation has a default which could be set.
 ===============
@@ -5284,17 +5278,21 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 	// default weapon, put away
 	if (index >= TORSO_PUTDEFAULT_BOTH && index <= TORSO_PUTDEFAULT_SECONDARY)
 	{
-		anim[0] = TORSO_DROP;
-		anim[1] = TORSO_STAND2;
-		anim[2] = TORSO_STAND;
+		reversed = qtrue;
+		anim[0] = TORSO_GETDEFAULT_BOTH+(index-TORSO_PUTDEFAULT_BOTH);
+		anim[1] = TORSO_RAISE; // correct would be TORSO_DROP, but must reverse GETDEFAULT
+		anim[2] = TORSO_STAND2;
+		anim[3] = TORSO_STAND;
 	}
 
 	// default weapon, get out
 	if (index >= TORSO_GETDEFAULT_BOTH && index <= TORSO_GETDEFAULT_SECONDARY)
 	{
-		anim[0] = TORSO_RAISE;
-		anim[1] = TORSO_STAND2;
-		anim[2] = TORSO_STAND;
+		reversed = qtrue;
+		anim[0] = TORSO_PUTDEFAULT_BOTH+(index-TORSO_GETDEFAULT_BOTH);
+		anim[1] = TORSO_DROP; // correct would be TORSO_RAISE, but must reverse PUTDEFAULT
+		anim[2] = TORSO_STAND2;
+		anim[3] = TORSO_STAND;
 	}
 
 	// standing defaults
@@ -5368,6 +5366,10 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 			animations[index].reversed = !animations[index].reversed;
 		}
 		//animations[i].flipflop = flipflop;
+
+		// Animation is now valid
+		loadedAnim[anim[i]] = qtrue;
+
 		return qtrue;
 	}
 
@@ -5383,7 +5385,7 @@ BG_LoadAnimation
 Returns qtrue if the animation loaded with out error.
 ===============
 */
-int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip)
+int BG_LoadAnimation(char **text_p, int i, animation_t *animations, frameSkip_t *skip)
 {
 	char		*token;
 	float		fps;
@@ -5395,16 +5397,20 @@ int BG_LoadAnimation(char **text_p, int i, animation_t *animations, int *skip)
 	}
 	animations[i].firstFrame = atoi( token );
 
-	// This is odd with how the models are setup.
-	// Why not just say the frame you want? --still here for compatibility.
 	if (skip != NULL)
 	{
-		// leg only frames are adjusted to not count the upper body only frames
-		if ( i == LEGS_WALKCR ) {
-			*skip = animations[LEGS_WALKCR].firstFrame - animations[TORSO_GESTURE].firstFrame;
-		}
+		// leg only frames must be adjusted to not count the upper body only frames
 		if ( i >= LEGS_WALKCR && i <= LEGS_TURN) {
-			animations[i].firstFrame -= *skip;
+			if (skip->legSkip == -1) {
+				skip->legSkip = animations[i].firstFrame - skip->firstTorsoFrame;
+			}
+			animations[i].firstFrame -= skip->legSkip;
+		}
+		else if ( !(i >= BOTH_DEATH1 && i <= BOTH_DEAD3) )
+		{
+			if (skip->firstTorsoFrame == -1) {
+				skip->firstTorsoFrame = animations[i].firstFrame;
+			}
 		}
 	}
 
@@ -5543,7 +5549,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 	int			len;
 	int			i;
 	char		*token;
-	int			skip;
+	frameSkip_t	skip;
 	char		text[20000];
 	fileHandle_t	f;
 	animation_t *animations;
@@ -5573,7 +5579,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 
 	// parse the text
 	text_p = text;
-	skip = 0;	// quite the compiler warning
+	skip.legSkip = skip.firstTorsoFrame = -1;
 
 	// read optional parameters
 	while ( 1 ) {
@@ -5806,18 +5812,17 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 
 		if (!headConfig) // skip animations
 		{
-			qboolean found = qfalse;
+			qboolean animName = qfalse;
 
-			// ZTM: New animation loading.
+			// Load animations by name.
 			for (i = 0; playerAnimationDefs[i].name != NULL; i++)
 			{
 				if ( !Q_stricmp( token, playerAnimationDefs[i].name ) ) {
-					found = foundAnim = qtrue;
+					animName = foundAnim = qtrue;
 					rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip);
 					if (rtn == -1)
 					{
 						BG_SetDefaultAnimation(loadedAnim, playerAnimationDefs[i].num, animations);
-						loadedAnim[playerAnimationDefs[i].num] = qtrue;
 					} else if (rtn == 0) {
 						Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n",
 								playerAnimationDefs[i].name);
@@ -5829,7 +5834,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 				}
 			}
 
-			if (found) {
+			if (animName) {
 				continue;
 			}
 		}
@@ -5850,7 +5855,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 		return qtrue;
 	}
 
-	// Found an Elite Foce (SP) style animation.
+	// Found an Elite Force (SP) style animation.
 	if (foundAnim)
 	{
 		// Check for missing animations and load there defaults.
@@ -5863,22 +5868,17 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			}
 		}
 	}
-#if !defined TURTLEARENA || defined TA_SUPPORTQ3 // animation.cfg
 	else
 	{
+#if !defined TURTLEARENA || defined TA_SUPPORTQ3 // animation.cfg
 		// Assume Quake3 (or Elite Force MP) player.
 		// read information for each frame
-#if 0 // #ifdef IOQ3ZTM // now could load LEGS_BACKCR and LEGS_BACKWALK
-		for ( i = 0 ; i < MAX_TOTALANIMATIONS ; i++ )
-#else
 		for ( i = 0 ; i < MAX_ANIMATIONS ; i++ )
-#endif
 		{
 			rtn = BG_LoadAnimation(&text_p, i, animations, &skip);
 			if (rtn == -1)
 			{
 				BG_SetDefaultAnimation(loadedAnim, i, animations);
-				loadedAnim[i] = qtrue;
 			} else if (rtn == 0) {
 				Com_Printf("BG_ParsePlayerCFGFile: Animation %d: Failed loading.\n", i);
 				break;
@@ -5887,15 +5887,11 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			}
 		}
 
-#if 0 // #ifdef IOQ3ZTM
-		if ( i != MAX_TOTALANIMATIONS )
-#else
 		// These are not loaded from quake3 players.
 		BG_SetDefaultAnimation(loadedAnim, LEGS_BACKCR, animations);
 		BG_SetDefaultAnimation(loadedAnim, LEGS_BACKWALK, animations);
 
 		if ( i != MAX_ANIMATIONS )
-#endif
 		{
 #ifdef TA_SUPPORTEF
 			BG_ConvertEFAnimationsToQ3(animations, MAX_TOTALANIMATIONS);
@@ -5903,15 +5899,12 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			Com_Printf( "Error parsing animation file: %s", filename );
 			return qfalse;
 		}
-	}
 #else
-	// Didn't find any animations.
-	if (foundAnim == qfalse)
-	{
+		// Didn't find any animations.
 		Com_Printf( "Error: No animations in file: %s", filename );
 		return qfalse;
-	}
 #endif
+	}
 
 #ifdef TA_SUPPORTEF
 	BG_ConvertEFAnimationsToQ3(animations, MAX_TOTALANIMATIONS);
@@ -6320,12 +6313,12 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 			// store speed
 			objectcfg->speed = atof(token);
 			continue;
-			}
+		}
 		else if ( !Q_stricmp( token, "lerpframes" ) ) {
 			token = COM_Parse( &text_p );
 			if ( !*token ) {
 				break;
-		}
+			}
 			// store whether to lerpframes
 			objectcfg->lerpframes = atoi(token);
 			continue;
@@ -6333,16 +6326,16 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 		else if ( Q_stricmp( token, "sounds" ) == 0 ) {
 			if (Sounds_Parse(&text_p, filename, objectcfg))
 			{
-			continue;
-		}
+				continue;
+			}
 		}
 		else
 		{
 			qboolean animName = qfalse;
 
-		// ZTM: New animation loading.
+			// Load animations by name.
 			for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
-		{
+			{
 				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
 				{
 					animName = qtrue;
