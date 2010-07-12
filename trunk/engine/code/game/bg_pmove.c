@@ -1928,7 +1928,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 	{
 		animNumber_t anim = TORSO_DROP;
 
-		if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
+		if (pm->ps->stats[STAT_DEFAULTWEAPON] == pm->ps->weapon)
 		{
 			if (pm->ps->weaponHands & HB_BOTH)
 			{
@@ -1942,9 +1942,13 @@ static void PM_BeginWeaponChange( int weapon ) {
 			{
 				anim = TORSO_PUTDEFAULT_SECONDARY;
 			}
+			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim])/2;
+		}
+		else
+		{
+			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
 		}
 
-		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
 		PM_StartTorsoAnim( anim );
 	}
 #else
@@ -1996,7 +2000,7 @@ static void PM_FinishWeaponChange( void ) {
 #endif
 #ifdef TA_PLAYERS // WEAPONS // PLAYERCFG_ANIMATION_TIMES
 	{
-		int anim = TORSO_RAISE;
+		animNumber_t anim = TORSO_RAISE;
 
 		if (pm->ps->stats[STAT_DEFAULTWEAPON] == weapon)
 		{
@@ -2012,6 +2016,15 @@ static void PM_FinishWeaponChange( void ) {
 			{
 				anim = TORSO_GETDEFAULT_SECONDARY;
 			}
+		}
+
+		// If started a animation, continue it.
+		if ( ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) >= TORSO_PUTDEFAULT_BOTH
+			&& ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) <= TORSO_GETDEFAULT_SECONDARY)
+		{
+			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
+			PM_ContinueTorsoAnim( anim );
+			return;
 		}
 
 		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
@@ -2190,14 +2203,14 @@ static void PM_FinishWeaponHandsChange( void ) {
 			anim = TORSO_GETDEFAULT_SECONDARY;
 		}
 
-		// Just let the animation run.
-		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
 		// If started a animation, continue it.
 		if ( ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) >= TORSO_PUTDEFAULT_BOTH
-			&& ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) <= TORSO_GETDEFAULT_SECONDARY) {
+			&& ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) <= TORSO_GETDEFAULT_SECONDARY)
+		{
+			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
 			PM_ContinueTorsoAnim( anim );
+			return;
 		}
-		return;
 	}
 
 	pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
