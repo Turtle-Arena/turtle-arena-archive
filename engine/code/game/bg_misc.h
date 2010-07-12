@@ -144,99 +144,7 @@ typedef enum {
 
 typedef enum { GENDER_MALE, GENDER_FEMALE, GENDER_NEUTER } gender_t;
 
-#ifndef TA_PLAYERSYS // Moved below bg_playercfg_t
-/*
-===================================================================================
-
-PMOVE MODULE
-
-The pmove code takes a player_state_t and a usercmd_t and generates a new player_state_t
-and some other output data.  Used for local prediction on the client game and true
-movement on the server game.
-===================================================================================
-*/
-
-typedef enum {
-	PM_NORMAL,		// can accelerate and turn
-	PM_NOCLIP,		// noclip movement
-	PM_SPECTATOR,	// still run into walls
-	PM_DEAD,		// no acceleration or turning, but free falling
-	PM_FREEZE,		// stuck in place with no control
-	PM_INTERMISSION,	// no movement or status bar
-	PM_SPINTERMISSION	// no movement or status bar
-} pmtype_t;
-
-typedef enum {
-	WEAPON_READY,
-	WEAPON_RAISING,
-	WEAPON_DROPPING,
-	WEAPON_FIRING
-} weaponstate_t;
-
-// pmove->pm_flags
-#define	PMF_DUCKED			1
-#define	PMF_JUMP_HELD		2
-#ifdef IOQ3ZTM
-#define PMF_FIRE_HELD		4		// set when attack has been started
-#endif
-#define	PMF_BACKWARDS_JUMP	8		// go into backwards land
-#define	PMF_BACKWARDS_RUN	16		// coast down to backwards run
-#define	PMF_TIME_LAND		32		// pm_time is time before rejump
-#define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
-#define	PMF_TIME_WATERJUMP	256		// pm_time is waterjump
-#define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
-#define	PMF_USE_ITEM_HELD	1024
-#define PMF_GRAPPLE_PULL	2048	// pull towards grapple location
-#define PMF_FOLLOW			4096	// spectate following another player
-#define PMF_SCOREBOARD		8192	// spectate as a scoreboard
-#define PMF_INVULEXPAND		16384	// invulnerability sphere set to full size
-
-#define	PMF_ALL_TIMES	(PMF_TIME_WATERJUMP|PMF_TIME_LAND|PMF_TIME_KNOCKBACK)
-
-#define	MAXTOUCH	32
-typedef struct {
-	// state (in / out)
-	playerState_t	*ps;
-#ifdef TA_NPCSYS
-	bg_npc_t		*npc;
-#endif
-
-	// command (in)
-	usercmd_t	cmd;
-	int			tracemask;			// collide against these types of surfaces
-	int			debugLevel;			// if set, diagnostic output will be printed
-	qboolean	noFootsteps;		// if the game is setup for no footsteps by the server
-	qboolean	gauntletHit;		// true if a gauntlet attack would actually hit something
-
-	int			framecount;
-
-	// results (out)
-	int			numtouch;
-	int			touchents[MAXTOUCH];
-
-	vec3_t		mins, maxs;			// bounding box size
-
-	int			watertype;
-	int			waterlevel;
-
-	float		xyspeed;
-
-	// for fixed msec Pmove
-	int			pmove_fixed;
-	int			pmove_msec;
-
-	// callbacks to test the world
-	// these will be different functions during game and cgame
-	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
-	int			(*pointcontents)( const vec3_t point, int passEntityNum );
-} pmove_t;
-
-// if a full pmove isn't done on the client, you can just update the angles
-void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd );
-void Pmove (pmove_t *pmove);
-
 //===================================================================================
-#endif
 
 // player_state->stats[] indexes
 // NOTE: may not have more than 16
@@ -1495,7 +1403,6 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg);
 #endif
 #endif
 
-#ifdef TA_PLAYERSYS // Moved below bg_playercfg_t
 /*
 ===================================================================================
 
@@ -1674,7 +1581,6 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd );
 void Pmove (pmove_t *pmove);
 
 //===================================================================================
-#endif
 
 typedef enum {
 	TEAM_FREE,
