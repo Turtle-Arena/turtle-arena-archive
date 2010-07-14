@@ -2969,7 +2969,11 @@ static void UI_LoadMovies( void ) {
 	char	*moviename;
 	int		i, len;
 
+#ifdef IOQ3ZTM_NO_COMPAT // VIDEOLIST
+	uiInfo.movieCount = trap_FS_GetFileList( "$videolist", "", movielist, 4096 );
+#else
 	uiInfo.movieCount = trap_FS_GetFileList( "video", "roq", movielist, 4096 );
+#endif
 
 	if (uiInfo.movieCount) {
 		if (uiInfo.movieCount > MAX_MOVIES) {
@@ -2978,10 +2982,14 @@ static void UI_LoadMovies( void ) {
 		moviename = movielist;
 		for ( i = 0; i < uiInfo.movieCount; i++ ) {
 			len = strlen( moviename );
+#ifndef IOQ3ZTM_NO_COMPAT // VIDEOLIST
 			if (!Q_stricmp(moviename +  len - 4,".roq")) {
 				moviename[len-4] = '\0';
 			}
+#endif
+#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 			Q_strupr(moviename);
+#endif
 			uiInfo.movieList[i] = String_Alloc(moviename);
 			moviename += len + 1;
 		}
@@ -3018,7 +3026,9 @@ static void UI_LoadDemos( void ) {
 			if (!Q_stricmp(demoname +  len - strlen(demoExt), demoExt)) {
 				demoname[len-strlen(demoExt)] = '\0';
 			}
+#ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 			Q_strupr(demoname);
+#endif
 			uiInfo.demoList[i] = String_Alloc(demoname);
 			demoname += len + 1;
 		}
