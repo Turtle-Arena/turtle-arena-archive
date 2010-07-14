@@ -254,7 +254,7 @@ static void UI_CalcPostGameStats( void ) {
 	newInfo.excellents = atoi(UI_Argv(5));
 	newInfo.defends = atoi(UI_Argv(6));
 	newInfo.assists = atoi(UI_Argv(7));
-#ifndef TURTLEARENA // WEAPONS
+#ifdef TURTLEARENA // WEAPONS
 	// NOTE: I pass 0 as argv 8 so I don't have to change numbers...
 #else
 	newInfo.gauntlets = atoi(UI_Argv(8));
