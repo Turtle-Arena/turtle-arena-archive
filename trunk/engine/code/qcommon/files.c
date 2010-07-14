@@ -2046,6 +2046,58 @@ char **FS_ListFiles( const char *path, const char *extension, int *numfiles ) {
 	return FS_ListFilteredFiles( path, extension, NULL, numfiles );
 }
 
+#ifdef IOQ3ZTM // VIDEOLIST
+void FS_SortFileList(char **filelist, int numfiles);
+
+/*
+=================
+FS_ListFiles
+
+Create a list of files using multiple file extensions
+=================
+*/
+char **FS_ListFilesEx( const char *path, const char **extensions, int numExts, int *numfiles ) {
+	int		nfiles;
+	char	**listCopy;
+	char	*list[MAX_FOUND_FILES];
+	char	**sysFiles = NULL;
+	int		numSysFiles;
+	char	*name;
+	int		i;
+	int		j;
+
+	nfiles = 0;
+
+	for (i = 0; i < numExts; i++)
+	{
+		sysFiles = FS_ListFilteredFiles( path, extensions[i], NULL, &numSysFiles );
+		for ( j = 0 ; j < numSysFiles ; j++ ) {
+			// unique the match
+			name = sysFiles[j];
+			nfiles = FS_AddFileToList( name, list, nfiles );
+		}
+		Sys_FreeFileList( sysFiles );
+	}
+
+	// return a copy of the list
+	*numfiles = nfiles;
+
+	if ( !nfiles ) {
+		return NULL;
+	}
+
+	FS_SortFileList((char **)&list, nfiles);
+
+	listCopy = Z_Malloc( ( nfiles + 1 ) * sizeof( *listCopy ) );
+	for ( i = 0 ; i < nfiles ; i++ ) {
+		listCopy[i] = list[i];
+	}
+	listCopy[i] = NULL;
+
+	return listCopy;
+}
+#endif
+
 /*
 =================
 FS_FreeFileList
@@ -2087,6 +2139,71 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 		return FS_GetModList(listbuf, bufsize);
 	}
 
+#ifdef IOQ3ZTM // VIDEOLIST
+	if (Q_stricmp(path, "$videolist") == 0
+#ifndef IOQ3ZTM_NO_COMPAT // Q3: Team Arena Mod compatibilty
+		|| Q_strncmp(extension, "roq", 3) == 0
+#endif
+		)
+	{
+		const char *extensions[4] = { "RoQ", "roq", "ogm", "ogv" };
+		pFiles = FS_ListFilesEx("video", extensions, 4, &nFiles);
+
+		// Remove file extensions
+		for (i = 0; i < nFiles; i++) {
+			nLen = strlen(pFiles[i]);
+			pFiles[i][nLen-4] = '\0';
+		}
+	}
+	// Allow extension to be a list
+	// Example "RoQ;roq;ogv;ogm"
+	else if (strstr(extension, ";"))
+	{
+		char extensions[MAX_QPATH][MAX_QPATH];
+		int numExts;
+		int len;
+		const char *s1;
+		const char *s2;
+
+		numExts = 0;
+
+		s1 = extension;
+		s2 = strchr(s1, ';') - 1;
+
+		len = s2-s1+1;
+		if (len > 0)
+		{
+			Q_strncpyz(extensions[numExts], s1, len);
+			numExts++;
+		}
+
+		for (i = 0; i < MAX_QPATH-1; i++)
+		{
+			s1 = strchr(s1, ';');
+			if (!s1) {
+				break;
+			}
+			s1++;
+
+			s2 = strchr(s1, ';');
+			if (s2) {
+				s2--;
+				len = s2-s1+1;
+			} else {
+				len = strlen(s1);
+			}
+
+			if (len > 0)
+			{
+				Q_strncpyz(extensions[numExts], s1, len);
+				numExts++;
+			}
+		}
+
+		pFiles = FS_ListFilesEx(path, (const char **)&extensions, numExts, &nFiles);
+	}
+	else
+#endif
 	pFiles = FS_ListFiles(path, extension, &nFiles);
 
 	for (i =0; i < nFiles; i++) {
