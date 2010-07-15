@@ -2147,8 +2147,13 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 #endif
 		)
 	{
-		const char *extensions[4] = { "RoQ", "roq", "ogm", "ogv" };
-		pFiles = FS_ListFilesEx(path, extensions, 4, &nFiles);
+		const char *extensions[] = { "RoQ", "roq"
+#if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
+			, "ogm", "ogv"
+#endif
+			};
+		int extNamesSize = sizeof( extensions ) / sizeof( extensions[0] );
+		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles);
 
 #ifndef IOQ3ZTM_NO_COMPAT // Q3: Team Arena Mod compatibilty
 		if (Q_strncmp(extension, "roq", 3) == 0)
@@ -2164,13 +2169,15 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 	// SUPPORT_ALL_FORMAT_SKIN_ICONS
 	else if (Q_stricmp(extension, "$images") == 0)
 	{
-		const char *extensions[6] = { "png", "tga", "jpg", "jpeg", "pcx", "bmp" };
-		pFiles = FS_ListFilesEx(path, extensions, 6, &nFiles);
+		const char *extensions[] = { "png", "tga", "jpg", "jpeg", "pcx", "bmp" };
+		int extNamesSize = sizeof( extensions ) / sizeof( extensions[0] );
+		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles);
 	}
 	else if (Q_stricmp(extension, "$sounds") == 0)
 	{
-		const char *extensions[2] = { "wav", "ogg" };
-		pFiles = FS_ListFilesEx(path, extensions, 2, &nFiles);
+		const char *extensions[] = { "wav", "ogg" };
+		int extNamesSize = sizeof( extensions ) / sizeof( extensions[0] );
+		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles);
 	}
 	// Allow extension to be a list
 	// Example "RoQ;roq;ogv;ogm"

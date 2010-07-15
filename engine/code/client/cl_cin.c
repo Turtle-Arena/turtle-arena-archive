@@ -1623,7 +1623,9 @@ CIN_PlayCinematic
 int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBits ) {
 	unsigned short RoQID;
 	char	name[MAX_OSPATH];
+#if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
 	char	*fileextPtr;
+#endif
 	int		i;
 
 	if (strstr(arg, "/") == NULL && strstr(arg, "\\") == NULL) {
@@ -1659,6 +1661,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 
 	strcpy(cinTable[currentHandle].fileName, name);
 
+#if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
 	fileextPtr = S_FileExtension(name);
 	if (!Q_stricmp(fileextPtr, ".ogm") || !Q_stricmp(fileextPtr, ".ogv"))
 	{
@@ -1708,6 +1711,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 
 		return currentHandle;
 	}
+#endif
 
 	cinTable[currentHandle].ROQSize = 0;
 	cinTable[currentHandle].ROQSize = FS_FOpenFileRead (cinTable[currentHandle].fileName, &cinTable[currentHandle].iFile, qtrue);
