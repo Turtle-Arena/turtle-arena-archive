@@ -510,7 +510,7 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 				Com_sprintf( filename, length, "%s/%s/%s/%s_%s.%s", headsFolder, headModelName, headSkinName, base, team, ext );
 			}
 			// SUPPORT_ALL_FORMAT_SKIN_ICONS
-			if (Q_stricmpn(ext, "*image", 6) == 0)
+			if (Q_stricmpn(ext, "$image", 6) == 0)
 			{
 				filename[strlen(filename)-strlen(ext)-1] = 0;
 				if (trap_R_RegisterShaderNoMip(filename))
@@ -538,7 +538,7 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 				}
 			}
 			// SUPPORT_ALL_FORMAT_SKIN_ICONS
-			if (Q_stricmpn(ext, "*image", 6) == 0)
+			if (Q_stricmpn(ext, "$image", 6) == 0)
 			{
 				filename[strlen(filename)-strlen(ext)-1] = 0;
 				if (trap_R_RegisterShaderNoMip(filename))
@@ -831,7 +831,7 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 #endif
 
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
-	if ( CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "*image" ) ) {
+	if ( CG_FindClientHeadFile( filename, sizeof(filename), ci, teamName, headName, headSkinName, "icon", "$image" ) ) {
 		ci->modelIcon = trap_R_RegisterShaderNoMip( filename );
 	}
 #else

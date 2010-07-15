@@ -2051,7 +2051,7 @@ void FS_SortFileList(char **filelist, int numfiles);
 
 /*
 =================
-FS_ListFiles
+FS_ListFilesEx
 
 Create a list of files using multiple file extensions
 =================
