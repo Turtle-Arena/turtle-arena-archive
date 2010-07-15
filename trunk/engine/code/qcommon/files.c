@@ -2139,21 +2139,38 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 		return FS_GetModList(listbuf, bufsize);
 	}
 
-#ifdef IOQ3ZTM // VIDEOLIST
-	if (Q_stricmp(path, "$videolist") == 0
+#ifdef IOQ3ZTM
+	// VIDEOLIST
+	if (Q_stricmp(extension, "$videos") == 0
 #ifndef IOQ3ZTM_NO_COMPAT // Q3: Team Arena Mod compatibilty
 		|| Q_strncmp(extension, "roq", 3) == 0
 #endif
 		)
 	{
 		const char *extensions[4] = { "RoQ", "roq", "ogm", "ogv" };
-		pFiles = FS_ListFilesEx("video", extensions, 4, &nFiles);
+		pFiles = FS_ListFilesEx(path, extensions, 4, &nFiles);
 
-		// Remove file extensions
-		for (i = 0; i < nFiles; i++) {
-			nLen = strlen(pFiles[i]);
-			pFiles[i][nLen-4] = '\0';
+#ifndef IOQ3ZTM_NO_COMPAT // Q3: Team Arena Mod compatibilty
+		if (Q_strncmp(extension, "roq", 3) == 0)
+		{
+			// Remove file extensions, Team Arena only removes .roq
+			for (i = 0; i < nFiles; i++) {
+				nLen = strlen(pFiles[i]);
+				pFiles[i][nLen-4] = '\0';
+			}
 		}
+#endif
+	}
+	// SUPPORT_ALL_FORMAT_SKIN_ICONS
+	else if (Q_stricmp(extension, "$images") == 0)
+	{
+		const char *extensions[6] = { "png", "tga", "jpg", "jpeg", "pcx", "bmp" };
+		pFiles = FS_ListFilesEx(path, extensions, 6, &nFiles);
+	}
+	else if (Q_stricmp(extension, "$sounds") == 0)
+	{
+		const char *extensions[2] = { "wav", "ogg" };
+		pFiles = FS_ListFilesEx(path, extensions, 2, &nFiles);
 	}
 	// Allow extension to be a list
 	// Example "RoQ;roq;ogv;ogm"

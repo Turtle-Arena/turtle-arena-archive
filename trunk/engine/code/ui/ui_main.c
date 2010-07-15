@@ -2970,7 +2970,7 @@ static void UI_LoadMovies( void ) {
 	int		i, len;
 
 #ifdef IOQ3ZTM_NO_COMPAT // VIDEOLIST
-	uiInfo.movieCount = trap_FS_GetFileList( "$videolist", "", movielist, 4096 );
+	uiInfo.movieCount = trap_FS_GetFileList( "video", "$videos", movielist, 4096 );
 #else
 	uiInfo.movieCount = trap_FS_GetFileList( "video", "roq", movielist, 4096 );
 #endif
@@ -2982,7 +2982,12 @@ static void UI_LoadMovies( void ) {
 		moviename = movielist;
 		for ( i = 0; i < uiInfo.movieCount; i++ ) {
 			len = strlen( moviename );
-#ifndef IOQ3ZTM_NO_COMPAT // VIDEOLIST
+#ifdef IOQ3ZTM_NO_COMPAT // VIDEOLIST
+			// Remove extension, it could be .RoQ, .roq, .ogm, or .ogv
+			if (moviename[len-4] == '.') {
+				moviename[len-4] = '\0';
+			}
+#else
 			if (!Q_stricmp(moviename +  len - 4,".roq")) {
 				moviename[len-4] = '\0';
 			}
@@ -5156,13 +5161,13 @@ static void UI_BuildQ3Model_List( void )
 		// iterate all skin files in directory
 #ifdef TA_SUPPORTEF
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
-		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "", filelist, 2048 );
+		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "$images", filelist, 2048 );
 #else
 		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "tga", filelist, 2048 );
 #endif
 #else
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
-		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "", filelist, 2048 );
+		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "$images", filelist, 2048 );
 #else
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );
 #endif

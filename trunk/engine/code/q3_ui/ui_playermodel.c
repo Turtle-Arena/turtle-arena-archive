@@ -453,13 +453,13 @@ static void PlayerModel_BuildList( void )
 		// iterate all skin files in directory
 #ifdef TA_SUPPORTEF
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
-		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "", filelist, 2048 );
+		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "$images", filelist, 2048 );
 #else
 		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "tga", filelist, 2048 );
 #endif
 #else
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
-		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "", filelist, 2048 );
+		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "$images", filelist, 2048 );
 #else
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );
 #endif
