@@ -1540,7 +1540,7 @@ qboolean CIN_TheCheckExtension(char *filename)
 #if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
 		, "ogm\0", "ogv\0"
 #endif
-	}	;
+		};
 	qboolean skipCin[CIN_MAX] = { qfalse, qfalse
 #if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
 		, qfalse, qfalse
