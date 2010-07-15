@@ -2159,48 +2159,55 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 	// Example "RoQ;roq;ogv;ogm"
 	else if (strstr(extension, ";"))
 	{
-		char extensions[MAX_QPATH][MAX_QPATH];
+		#define MAX_EXTS 8
+		char buffer[MAX_QPATH];
+		const char *extensions[MAX_EXTS];
 		int numExts;
 		int len;
-		const char *s1;
-		const char *s2;
+		char *s1;
+		char *s2;
 
 		numExts = 0;
 
-		s1 = extension;
-		s2 = strchr(s1, ';') - 1;
+		Q_strncpyz(buffer, extension, MAX_QPATH);
 
-		len = s2-s1+1;
+		s1 = buffer;
+		s2 = strchr(s1, ';');
+
+		len = s2 - s1 + 1;
 		if (len > 0)
 		{
-			Q_strncpyz(extensions[numExts], s1, len);
+			extensions[numExts] = s1;
 			numExts++;
 		}
 
-		for (i = 0; i < MAX_QPATH-1; i++)
+		while ( 1 )
 		{
-			s1 = strchr(s1, ';');
+			s1 = s2;
 			if (!s1) {
 				break;
 			}
+			*s1 = 0; // Change ';' to '\0'
 			s1++;
 
 			s2 = strchr(s1, ';');
 			if (s2) {
-				s2--;
-				len = s2-s1+1;
+				len = s2 - s1 + 1;
 			} else {
-				len = strlen(s1);
+				len = strlen(s1) + 1;
 			}
 
 			if (len > 0)
 			{
-				Q_strncpyz(extensions[numExts], s1, len);
+				extensions[numExts] = s1;
 				numExts++;
+				if (numExts == MAX_EXTS) {
+					break;
+				}
 			}
 		}
 
-		pFiles = FS_ListFilesEx(path, (const char **)&extensions, numExts, &nFiles);
+		pFiles = FS_ListFilesEx(path, extensions, numExts, &nFiles);
 	}
 	else
 #endif
