@@ -23,4 +23,5 @@ tex_singleplayer
 tex_skies
 tex_tech
 tex_terrain
+tex_video
 
