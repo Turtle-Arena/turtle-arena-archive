@@ -6045,9 +6045,9 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 #else
 	// load animation.cfg
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/animation.cfg", model );
-	if ( !BG_ParsePlayerCFGFile(filename, playercfg) ) {
+	if ( !BG_ParsePlayerCFGFile(filename, playercfg, qfalse) ) {
 		Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/animation.cfg", model );
-		if ( !BG_ParsePlayerCFGFile(filename, playercfg) ) {
+		if ( !BG_ParsePlayerCFGFile(filename, playercfg, qfalse) ) {
 			Com_Printf( "Failed to load animation.cfg for %s\n", model );
 			return qfalse;
 		}
