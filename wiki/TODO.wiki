@@ -297,6 +297,9 @@ BSPC is the map .bsp to .aas (Arena Awareness System) compiler. The aas file is 
 
   * TODO: Have shurikens in all multi-player maps? (Having them be part of standard gameplay?)
 
+  * TODO: Get free scenery objects from the Internet. Make most damageable.
+    * http://virtualworlds.wikia.com
+
 == Players ==
   * TODO: Raph and Casey really need to /swing/ the melee weapons.
     * Casey's swinging isn't that bad, but Raph's swinging sure is.
