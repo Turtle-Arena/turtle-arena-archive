@@ -3085,6 +3085,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	CG_AddPlayerWeapon( &hand, ps, &cg.predictedPlayerEntity, ps->persistant[PERS_TEAM] );
 }
 
+#ifndef TA_WEAPSYS_EX
 /*
 ==============================================================================
 
@@ -3093,7 +3094,6 @@ WEAPON SELECTION
 ==============================================================================
 */
 
-#ifndef TA_WEAPSYS_EX
 /*
 ===================
 CG_DrawWeaponSelect
@@ -3334,11 +3334,6 @@ The current weapon has just run out of ammo
 ===================
 */
 void CG_OutOfAmmoChange( void ) {
-#ifdef TA_WEAPSYS_EX
-	// Change to default weapon
-	cg.weaponSelectTime = cg.time;
-	cg.weaponSelect = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
-#else
 	int		i;
 
 	cg.weaponSelectTime = cg.time;
@@ -3349,7 +3344,6 @@ void CG_OutOfAmmoChange( void ) {
 			break;
 		}
 	}
-#endif
 }
 #endif // TA_WEAPSYS_EX
 

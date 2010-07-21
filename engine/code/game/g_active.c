@@ -874,13 +874,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				ent->client->ps.stats[STAT_DROP_WEAPON] = WP_NONE;
 				ent->client->ps.stats[STAT_DROP_AMMO] = 0;
 
-				if (weapon == WP_NONE) {
-					break;
-				}
-
-				// Don't drop weapon in no drop areas.
-				contents = trap_PointContents( ent->r.currentOrigin, -1 );
-				if ( ( contents & CONTENTS_NODROP )) {
+				if (weapon <= WP_NONE) {
 					break;
 				}
 
@@ -888,6 +882,12 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				{
 					// Gun with no ammo. if someone picks it up, they will get default ammo.
 					// ZTM: TODO: Throw the weapon and have it fade alpha? (and can't pickup)
+					break;
+				}
+
+				// Don't drop weapon in no drop areas.
+				contents = trap_PointContents( ent->r.currentOrigin, -1 );
+				if ( ( contents & CONTENTS_NODROP )) {
 					break;
 				}
 

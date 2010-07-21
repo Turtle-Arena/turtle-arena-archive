@@ -553,11 +553,7 @@ static void CG_ItemPickup( int itemNum ) {
 #endif
 		{
 #ifdef TA_WEAPSYS_EX // The weapon "should" be selected in game and sent in the next snap too
-#ifdef TA_WEAPSYS
 			cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
-#else
-			cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = bg_itemlist[itemNum].giTag;
-#endif
 #else
 			cg.weaponSelectTime = cg.time;
 #ifdef TA_WEAPSYS
