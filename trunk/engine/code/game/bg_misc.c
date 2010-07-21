@@ -5270,7 +5270,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 			anim[2] = TORSO_STAND;
 			flipflop = qtrue;
 			break;
-		}
+	}
 
 
 #ifdef TA_PLAYERS
@@ -5295,12 +5295,77 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 		anim[3] = TORSO_STAND;
 	}
 
+
 	// standing defaults
-	if (index >= TORSO_STAND_GUN_PRIMARY && index <= TORSO_STAND_NUNCHUCKS1_PRIMARY)
+	if (index == TORSO_STAND_GUN_PRIMARY)
 	{
 		anim[0] = TORSO_STAND2;
 		anim[1] = TORSO_STAND;
 	}
+
+	if (index == TORSO_STAND_SWORD1_BOTH)
+	{
+		anim[0] = TORSO_STAND;
+	}
+
+	if (index == TORSO_STAND_SWORD1_PRIMARY)
+	{
+		anim[0] = TORSO_STAND_SAI1_PRIMARY;
+		anim[1] = TORSO_STAND2;
+		anim[2] = TORSO_STAND;
+	}
+
+	if (index == TORSO_STAND_SAI1_PRIMARY)
+	{
+		anim[0] = TORSO_STAND_SWORD1_PRIMARY;
+		anim[1] = TORSO_STAND2;
+		anim[2] = TORSO_STAND;
+	}
+
+	if (index == TORSO_STAND_SWORD2)
+	{
+		anim[0] = TORSO_STAND_SAI2;
+		anim[1] = TORSO_STAND2;
+		anim[2] = TORSO_STAND;
+	}
+
+	if (index == TORSO_STAND_DAISHO || index == TORSO_STAND_SAI2)
+	{
+		anim[0] = TORSO_STAND_SWORD2;
+		anim[1] = TORSO_STAND2;
+		anim[2] = TORSO_STAND;
+	}
+
+	if (index == TORSO_STAND_BO)
+	{
+		anim[0] = TORSO_STAND_SWORD1_BOTH;
+		anim[1] = TORSO_STAND;
+	}
+
+	if (index == TORSO_STAND_BO_PRIMARY)
+	{
+		anim[0] = TORSO_STAND_SWORD1_PRIMARY;
+		anim[1] = TORSO_STAND_SAI1_PRIMARY;
+		anim[2] = TORSO_STAND2;
+		anim[3] = TORSO_STAND;
+	}
+
+	// default to TORSO_STAND_SWORD1_*
+	if (index == TORSO_STAND_HAMMER || index == TORSO_STAND_HAMMER_PRIMARY)
+	{
+		anim[0] = TORSO_STAND_SWORD1_BOTH+(index-TORSO_STAND_HAMMER);
+		anim[1] = TORSO_STAND2;
+		anim[2] = TORSO_STAND;
+	}
+
+	// default to TORSO_STAND_SAI*
+	if (index == TORSO_STAND_NUNCHUCKS || index == TORSO_STAND_NUNCHUCKS1_PRIMARY)
+	{
+		anim[0] = TORSO_STAND_SAI2+(index-TORSO_STAND_NUNCHUCKS);
+		anim[1] = TORSO_STAND2;
+		anim[2] = TORSO_STAND;
+	}
+
 
 	// attacking defaults
 	if (index == TORSO_ATTACK_GUN_PRIMARY
