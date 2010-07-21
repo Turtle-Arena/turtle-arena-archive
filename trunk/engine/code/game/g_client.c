@@ -1017,11 +1017,6 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 
 	g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON] = playercfg->default_weapon;
 
-#ifndef TA_WEAPSYS_EX
-	// Set the ammo value.
-	g_entities[clientNum].client->ps.ammo[playercfg->default_weapon] = -1;
-#endif
-
 #ifdef TA_WEAPSYS_EX
 	// If not holding new default, change to it.
 	if (g_entities[clientNum].client->ps.weapon != g_entities[clientNum].client->ps.stats[STAT_DEFAULTWEAPON])
@@ -1041,7 +1036,10 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 		// Only update "ammo"
 		g_entities[clientNum].client->ps.stats[STAT_AMMO] = -1;
 	}
-#endif // TA_WEAPSYS_EX
+#else
+	// Set the ammo value.
+	g_entities[clientNum].client->ps.ammo[playercfg->default_weapon] = -1;
+#endif
 #endif // TA_WEAPSYS
 }
 #endif
@@ -1811,7 +1809,7 @@ void ClientSpawn(gentity_t *ent) {
 		// fire the targets of the spawn point
 		G_UseTargets( spawnPoint, ent );
 
-#ifndef TA_WEAPSYS_EX // don't select any weapon after spawning
+#ifndef TA_WEAPSYS_EX
 		// select the highest weapon number available, after any
 		// spawn given items have fired
 #ifdef TA_WEAPSYS

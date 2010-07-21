@@ -268,7 +268,7 @@ void Add_Ammo (gentity_t *ent, int weapon, int count)
 			stat = STAT_DROP_AMMO;
 		}
 		else {
-			G_Printf("DEBUG: Add_Ammo: Player got ammo for a weapon they don't own! weaponNum=%1, ammo_count=%i\n", weapon, count);
+			G_Printf("DEBUG: Add_Ammo: Player got ammo for a weapon they don't own! weaponNum=%d, ammo_count=%d\n", weapon, count);
 			return;
 		}
 	}

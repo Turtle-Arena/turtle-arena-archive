@@ -276,11 +276,7 @@ void Cmd_Give_f (gentity_t *ent)
 		w = atoi(&name[6]);
 		if (w == WP_DEFAULT)
 			w = ent->client->ps.stats[STAT_DEFAULTWEAPON];
-#ifdef TA_WEAPSYS
 		if (w < WP_NONE || w >= BG_NumWeaponGroups())
-#else
-		if (w < WP_NONE || w >= WP_NUM_WEAPONS)
-#endif
 			return;
 
 		ent->client->ps.stats[STAT_PENDING_WEAPON] = w;
