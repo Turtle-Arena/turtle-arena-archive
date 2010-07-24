@@ -1081,7 +1081,7 @@ void InitMover( gentity_t *ent ) {
 			ent->noise_index = G_SoundIndex( sound );
 		} else {
 			// EV_SPAWN_DEBRIS will select sound based on surfaceFlags (ent->s.time2)
-			ent->noise_index = -1;
+			ent->noise_index = MAX_SOUNDS-1;
 		}
 
 		ent->s.time2 = -1; // auto surfaceFlags
