@@ -129,6 +129,8 @@ Target this entity with a misc_model to have the model attached to the entity (s
 <group name="func_button" color="0 .5 .8">
 When a button is touched by a player, it moves in the direction set by the "angle" key, triggers all its targets, stays pressed by an amount of time set by the "wait" key, then returns to it's original position where it can be operated again.
 -------- KEYS --------
+<sound key="noiseStart" name="Start Sound">path/name of .wav file to play on start button press (default sound/movers/switches/butn2.wav)</sound>
+<sound key="noiseEnd" name="End Sound">path/name of .wav file to play on end button press (default none)</sound>
 <direction key="angle" name="Direction">determines the direction in which the button will move (up = -1, down = -2).</direction>
 <target key="target" name="Target">all entities with a matching targetname will be triggered.</target>
 <real key="speed" name="Move Speed">speed of button's displacement (default 40).</real>
@@ -263,6 +265,8 @@ Target this entity with a misc_model to have the model attached to the entity (s
 <group name="func_plat" color="0 .5 .8">
 Rising platform the player can ride to reach higher places. Plats must always be drawn in the raised position, so they will operate and be lighted correctly but they spawn in the lowered position. The plat will stay in the raised position until the player steps off. There are no proper sounds for this entity, only beep noises. It will spawn in the game and work properly but it sounds silly (see Notes).
 -------- KEYS --------
+<sound key="noiseStart" name="Start Sound">path/name of .wav file to play on start move (default sound/movers/plats/pt1_strt.wav)</sound>
+<sound key="noiseEnd" name="End Sound">path/name of .wav file to play on end move (default sound/movers/plats/pt1_end.wav)</sound>
 <real key="speed" name="Move Speed">determines how fast the plat moves (default 150).</real>
 <real key="lip" name="Lip">lip remaining at end of move (default 16). Has no effect if "height" is set.</real>
 <real key="height" name="Vertical Travel">if set, this will determine the total amount of vertical travel of the plat.</real>
@@ -1667,6 +1671,7 @@ This will print a message on the center of the screen when triggered. By default
 <point name="target_push" color=".5 .5 .5" box="-8 -8 -8 8 8 8">
 This can be used to create jump pads and launch ramps. The direction of push can be set by the "angles" key or pointing to a target_position or info_notnull entity. Unlike trigger_push, this is NOT client side predicted and must be activated by a trigger.
 -------- KEYS --------
+<sound key="noise" name="Sound File">path/name of .wav file to play (default sound/misc/windfly.wav - see Spawnflags).</sound>
 <angles key="angles" name="Pitch Yaw Roll">this sets the pitch and yaw aiming angles of push entity (default 0 0). The roll angle does not apply.</angles>
 <real key="speed" name="Push Speed">speed of push (default 1000). Has no effect if entity targets an aiming entity.</real>
 <targetname key="targetname" name="Target Name">the activating trigger points to this. Push originates from the location of the trigger.</targetname>
@@ -1911,6 +1916,7 @@ Automatic trigger. It will fire the entities it targets as soon as it spawns in 
 <group name="trigger_hurt" color=".5 .5 .5">
 Any player that touches this will be hurt by "dmg" points of damage once per server frame (very fast). A sizzling sound is also played while the player is being hurt.
 -------- KEYS --------
+<sound key="noise" name="Sound File">path/name of .wav file to play (default sound/world/electro.wav).</sound>
 <integer key="dmg" name="Damage Inflicted">number of points of damage inflicted to player per server frame (default 5 - integer values only).</integer>
 <boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
 <boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>

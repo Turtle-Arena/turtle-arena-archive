@@ -1452,8 +1452,18 @@ Plats are always drawn in the extended position so they will light correctly.
 void SP_func_plat (gentity_t *ent) {
 	float		lip, height;
 
+#ifdef IOQ3ZTM // Allow per-entity plat sounds
+	char *sound;
+
+	G_SpawnString( "noiseStart", "sound/movers/plats/pt1_strt.wav", &sound );
+	ent->sound1to2 = ent->sound2to1 = G_SoundIndex(sound);
+
+	G_SpawnString( "noiseEnd", "sound/movers/plats/pt1_end.wav", &sound );
+	ent->soundPos1 = ent->soundPos2 = G_SoundIndex(sound);
+#else
 	ent->sound1to2 = ent->sound2to1 = G_SoundIndex("sound/movers/plats/pt1_strt.wav");
 	ent->soundPos1 = ent->soundPos2 = G_SoundIndex("sound/movers/plats/pt1_end.wav");
+#endif
 
 	VectorClear (ent->s.angles);
 
@@ -1537,7 +1547,19 @@ void SP_func_button( gentity_t *ent ) {
 	vec3_t		size;
 	float		lip;
 
+#ifdef IOQ3ZTM // Allow per-entity button sounds
+	char *sound;
+
+	G_SpawnString( "noiseStart", "sound/movers/switches/butn2.wav", &sound );
+	ent->sound1to2 = G_SoundIndex(sound);
+
+	// Optional, no default
+	if ( G_SpawnString( "noiseEnd", "100", &sound ) ) {
+		ent->soundPos2 = G_SoundIndex(sound);
+	}
+#else
 	ent->sound1to2 = G_SoundIndex("sound/movers/switches/butn2.wav");
+#endif
 	
 	if ( !ent->speed ) {
 		ent->speed = 40;

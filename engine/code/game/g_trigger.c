@@ -246,12 +246,27 @@ Pushes the activator in the direction.of angle, or towards a target apex.
 if "bouncepad", play bounce noise instead of windfly
 */
 void SP_target_push( gentity_t *self ) {
+#ifdef IOQ3ZTM
+	char buffer[MAX_QPATH];
+	char *s;
+#endif
 	if (!self->speed) {
 		self->speed = 1000;
 	}
 	G_SetMovedir (self->s.angles, self->s.origin2);
 	VectorScale (self->s.origin2, self->speed, self->s.origin2);
 
+#ifdef IOQ3ZTM // Allow each trigger_hunt to have its own noise_index
+	if ( G_SpawnString( "noise", "NOSOUND", &s ) ) {
+		if (!strstr( s, ".wav" )) {
+			Com_sprintf (buffer, sizeof(buffer), "%s.wav", s );
+		} else {
+			Q_strncpyz( buffer, s, sizeof(buffer) );
+		}
+		self->noise_index = G_SoundIndex(buffer);
+	}
+	else
+#endif
 	if ( self->spawnflags & 1 ) {
 		self->noise_index = G_SoundIndex("sound/world/jumppad.wav");
 	} else {
@@ -387,8 +402,23 @@ void hurt_touch( gentity_t *self, gentity_t *other, trace_t *trace ) {
 }
 
 void SP_trigger_hurt( gentity_t *self ) {
+#ifdef IOQ3ZTM
+	char buffer[MAX_QPATH];
+	char *s;
+#endif
 	InitTrigger (self);
 
+#ifdef IOQ3ZTM // Allow each trigger_hunt to have its own noise_index
+	if ( G_SpawnString( "noise", "NOSOUND", &s ) ) {
+		if (!strstr( s, ".wav" )) {
+			Com_sprintf (buffer, sizeof(buffer), "%s.wav", s );
+		} else {
+			Q_strncpyz( buffer, s, sizeof(buffer) );
+		}
+		self->noise_index = G_SoundIndex(buffer);
+	}
+	else
+#endif
 	self->noise_index = G_SoundIndex( "sound/world/electro.wav" );
 	self->touch = hurt_touch;
 
