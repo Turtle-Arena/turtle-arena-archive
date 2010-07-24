@@ -921,7 +921,10 @@ static void ProximityMine_Activate( gentity_t *ent ) {
 	ent->health = 1;
 	ent->die = ProximityMine_Die;
 
+#if 0 // #ifdef TA_WEAPSYS // ZTM: FIXME: Per-projectile tick sound name
+#else
 	ent->s.loopSound = G_SoundIndex( "sound/weapons/proxmine/wstbtick.wav" );
+#endif
 
 	// build the proximity trigger
 	trigger = G_Spawn ();

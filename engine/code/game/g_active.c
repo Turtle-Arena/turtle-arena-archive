@@ -150,7 +150,10 @@ void P_WorldEffects( gentity_t *ent ) {
 				if (ent->health <= ent->damage) {
 					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
 				} else if (rand()&1) {
+#if 0 // #ifdef IOQ3ZTM // ZTM: TODO: Allow gurp1/2 to be per-player? (Example: *gurp1.wav), fallback to normal gurp sounds
+#else
 					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
+#endif
 				} else {
 					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
 				}
@@ -209,7 +212,10 @@ G_SetClientSound
 void G_SetClientSound( gentity_t *ent ) {
 #if defined MISSIONPACK && !defined TURTLEARENA // WEAPONS
 	if( ent->s.eFlags & EF_TICKING ) {
+#if 0 // #ifdef TA_WEAPSYS // ZTM: FIXME: Per-projectile tick sound name
+#else
 		ent->client->ps.loopSound = G_SoundIndex( "sound/weapons/proxmine/wstbtick.wav");
+#endif
 	}
 	else
 #endif
