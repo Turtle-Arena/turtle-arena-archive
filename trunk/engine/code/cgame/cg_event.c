@@ -1234,14 +1234,25 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		{
 			int sfx;
 
-			// ZTM: TODO: Select sound using surfaceFlags (es->time2)
-			// Use CG_ImpactSoundForSurf?
-			if (es->time2 & SURF_FLESH)
-				sfx = 0; // yuck
-			else if (es->time2 & SURF_METAL)
-				sfx = 0; // metal exploding
-			else
-				sfx = 0; // Generic 'exploding'
+			// Select sound using surfaceFlags (es->time2)
+			if (es->time2 & SURF_GLASS) {
+				sfx = cgs.media.matExplode[MT_GLASS];
+			} else if (es->time2 & SURF_WOOD) {
+				sfx = cgs.media.matExplode[MT_WOOD];
+			} else if (es->time2 & SURF_METAL) {
+				sfx = cgs.media.matExplode[MT_METAL];
+			} else if (es->time2 & SURF_STONE) {
+				sfx = cgs.media.matExplode[MT_STONE];
+			} else if (es->time2 & SURF_DIRT) {
+				sfx = cgs.media.matExplode[MT_DIRT];
+			} else if (es->time2 & SURF_GRASS) {
+				sfx = cgs.media.matExplode[MT_GRASS];
+			} else if (es->time2 & SURF_SPARKS) {
+				sfx = cgs.media.matExplode[MT_SPARKS];
+			} else {
+				// Generic exploding sound
+				sfx = cgs.media.matExplode[MT_NONE];
+			}
 
 			if (sfx) {
 				trap_S_StartSound (NULL, es->number, CHAN_AUTO, sfx );

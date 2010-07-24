@@ -867,6 +867,15 @@ static void CG_RegisterSounds( void ) {
 		cgs.media.footsteps[FOOTSTEP_METAL][i] = trap_S_RegisterSound (name, qfalse);
 	}
 
+#ifdef TA_MISC // MATERIALS
+	// Load sounds for materials
+	for (i = 0; i < NUM_MATERIAL_TYPES; i++)
+	{
+		Com_sprintf (name, sizeof(name), "sound/materials/%s_explode.wav", materialInfo[i].name);
+		cgs.media.matExplode[i] = trap_R_RegisterModel(name);
+	}
+#endif
+
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
 
