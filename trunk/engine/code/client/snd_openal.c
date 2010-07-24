@@ -468,6 +468,12 @@ sfxHandle_t S_AL_RegisterSound( const char *sample, qboolean compressed )
 		S_AL_BufferLoad(sfx);
 	knownSfx[sfx].lastUsedTime = Com_Milliseconds();
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fixes "WARNING: unhandled AL error: invalid value" messages! (Also S_Base_RegisterSound returns 0 when default is used, also allow cgame to check if sound loaded)
+	if (knownSfx[sfx].isDefault) {
+		return 0;
+	}
+#endif
+
 	return sfx;
 }
 

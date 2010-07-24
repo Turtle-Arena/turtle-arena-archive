@@ -869,10 +869,16 @@ static void CG_RegisterSounds( void ) {
 
 #ifdef TA_MISC // MATERIALS
 	// Load sounds for materials
-	for (i = 0; i < NUM_MATERIAL_TYPES; i++)
+	Com_sprintf (name, sizeof(name), "sound/weapons/rocket/rocklf1a.wav");
+	cgs.media.matExplode[MT_NONE] = trap_S_RegisterSound(name, qfalse);
+
+	for (i = 1; i < NUM_MATERIAL_TYPES; i++)
 	{
 		Com_sprintf (name, sizeof(name), "sound/materials/%s_explode.wav", materialInfo[i].name);
-		cgs.media.matExplode[i] = trap_R_RegisterModel(name);
+		cgs.media.matExplode[i] = trap_S_RegisterSound(name, qfalse);
+		if (!cgs.media.matExplode[i]) {
+			cgs.media.matExplode[i] = cgs.media.matExplode[MT_NONE];
+		}
 	}
 #endif
 

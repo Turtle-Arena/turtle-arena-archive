@@ -1222,7 +1222,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_SPAWN_DEBRIS");
 
 		// Check for (explosion) sound
-		if (es->generic1 > 0)
+		if (es->generic1 > 0 && es->generic1 < MAX_SOUNDS-1)
 		{
 			// Play sound
 			if ( cgs.gameSounds[ es->generic1 ] ) {
@@ -1230,9 +1230,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			}
 		}
 		// Auto select explosion sound
-		else if (es->generic1 == -1)
+		else if (es->generic1 == MAX_SOUNDS-1)
 		{
 			int sfx;
+
+			sfx = 0;
 
 			// Select sound using surfaceFlags (es->time2)
 			if (es->time2 & SURF_GLASS) {
@@ -1249,7 +1251,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				sfx = cgs.media.matExplode[MT_GRASS];
 			} else if (es->time2 & SURF_SPARKS) {
 				sfx = cgs.media.matExplode[MT_SPARKS];
-			} else {
+			}
+
+			if (!sfx) {
 				// Generic exploding sound
 				sfx = cgs.media.matExplode[MT_NONE];
 			}
@@ -1274,7 +1278,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			VectorSet(dir, 0, 0, 1);
 		}
 #ifdef TA_MISC // MATERIALS
-		CG_ImpactParticles(position, dir, es->otherEntityNum, es->time2, es->number);
+		CG_ImpactParticles(position, dir, es->otherEntityNum, es->time2, es->otherEntityNum2);
 #endif
 		break;
 #endif
