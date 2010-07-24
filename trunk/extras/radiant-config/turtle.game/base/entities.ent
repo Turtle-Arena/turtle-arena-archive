@@ -87,6 +87,7 @@ Target this entity with a misc_model to have the model attached to the entity (s
 <group name="func_breakable" color="0 .5 .8">
 When destroyed, it triggers all its targets and disappears.
 -------- KEYS --------
+<sound key="deathSound" name="Death Sound">path/name of .wav file to play on death (defaults to a sound based on Material)</sound>
 <target key="target" name="Target">all entities with a matching targetname will be triggered.</target>
 <target key="paintarget" name="Pain Target">damaging the object will trigger the entity this points to.</target>
 <targetname key="targetname" name="Target Name">if set a trigger can be used to break the brush</targetname>

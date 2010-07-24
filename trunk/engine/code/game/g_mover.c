@@ -867,7 +867,7 @@ qboolean G_SeenByHumans( gentity_t *ent )
 		}
 	}
 
-	// now while nobody can see it respawn the breakable
+	// now while nobody can see it, respawn the breakable
 	return qfalse;
 }
 
@@ -928,6 +928,8 @@ void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 			target->s.pos.trTime = level.time;
 		}
 	}
+
+	// ZTM: NOTE: Death sound is sent to cgame by EV_SPAWN_DEBRIS in G_BreakableDebris
 
 	G_UseTargets(self, attacker);
 
@@ -1074,10 +1076,18 @@ void InitMover( gentity_t *ent ) {
 		ent->die = G_BreakableDie;
 		// ZTM: TODO: Set damage?
 
+		// Per-entity explosion sound
+		if ( G_SpawnString( "deathSound", "100", &sound ) ) {
+			ent->noise_index = G_SoundIndex( sound );
+		} else {
+			// EV_SPAWN_DEBRIS will select sound based on surfaceFlags (ent->s.time2)
+			ent->noise_index = -1;
+		}
+
 		ent->s.time2 = -1; // auto surfaceFlags
 
 #ifdef TA_MISC // MATERIALS
-		if( G_SpawnString( "material", NULL, &mat ) && mat && strlen(mat)) {
+		if( G_SpawnString( "material", "none", &mat ) ) {
 			ent->s.time2 = 0;
 			for ( i = 1; i < NUM_MATERIAL_TYPES; i++)
 			{
