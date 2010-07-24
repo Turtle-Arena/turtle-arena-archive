@@ -1220,6 +1220,34 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifdef TA_ENTSYS // BREAKABLE
 	case EV_SPAWN_DEBRIS:
 		DEBUGNAME("EV_SPAWN_DEBRIS");
+
+		// Check for (explosion) sound
+		if (es->generic1 > 0)
+		{
+			// Play sound
+			if ( cgs.gameSounds[ es->generic1 ] ) {
+				trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.gameSounds[ es->generic1 ] );
+			}
+		}
+		// Auto select explosion sound
+		else if (es->generic1 == -1)
+		{
+			int sfx;
+
+			// ZTM: TODO: Select sound using surfaceFlags (es->time2)
+			// Use CG_ImpactSoundForSurf?
+			if (es->time2 & SURF_FLESH)
+				sfx = 0; // yuck
+			else if (es->time2 & SURF_METAL)
+				sfx = 0; // metal exploding
+			else
+				sfx = 0; // Generic 'exploding'
+
+			if (sfx) {
+				trap_S_StartSound (NULL, es->number, CHAN_AUTO, sfx );
+			}
+		}
+
 		if ( es->eventParm != 255 ) {
 			ByteToDir( es->eventParm, dir );
 		} else {

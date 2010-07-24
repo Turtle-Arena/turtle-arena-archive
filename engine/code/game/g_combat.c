@@ -1006,6 +1006,12 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 		tent = G_TempEntity( center, EV_SPAWN_DEBRIS );
 		tent->s.eventParm = 255;
 
+		if (targ->health <= 0)
+		{
+			// Play explosion sound
+			tent->s.generic1 = targ->noise_index;
+		}
+
 		tent->s.time2 = targ->s.time2; // surfaceFlags
 	}
 	else
