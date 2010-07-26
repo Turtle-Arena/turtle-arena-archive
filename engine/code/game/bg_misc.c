@@ -2523,7 +2523,22 @@ static qboolean Weapon_Parse(char **p) {
 				if ( !*token ) {
 					break;
 				}
-				weapon.flashColor[i] = atof( token );
+				if ( !Q_stricmp( token, "color1" ) ) {
+					weapon.flashColor[0] = (float)'c';
+					weapon.flashColor[1] = 1.0f;
+					weapon.flashColor[2] = 0.0f;
+					break;
+				} else if ( !Q_stricmp( token, "color2" ) ) {
+					weapon.flashColor[0] = (float)'c';
+					weapon.flashColor[1] = 2.0f;
+					weapon.flashColor[2] = 0.0f;
+					break;
+				} else if ( !Q_stricmp( token, "none" ) ) {
+					weapon.flashColor[0] = weapon.flashColor[1] = weapon.flashColor[2] = 0.0f;
+					break;
+				} else {
+					weapon.flashColor[i] = atof( token );
+				}
 			}
 			continue;
 		} else if ( !Q_stricmp( token, "projectile" ) ) {
@@ -3050,7 +3065,14 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tejectSmoke2 %d\r\n", (weapon->flags & WIF_EJECT_SMOKE2));
 
 		FS_Printf2("\tsplashMod %s\r\n", modNames[weapon->splashMod]);
-		FS_Printf4("\tflashColor %f %f %f\r\n", weapon->flashColor[0], weapon->flashColor[1], weapon->flashColor[2]);
+		if (weapon->flashColor[0] == (float)'c' && weapon->flashColor[1] == 1.0f && weapon->flashColor[2] == 0)
+			FS_Printf1("\tflashColor color1\r\n");
+		else if (weapon->flashColor[0] == (float)'c' && weapon->flashColor[1] == 2.0f && weapon->flashColor[2] == 0)
+			FS_Printf1("\tflashColor color2\r\n");
+		else if (weapon->flashColor[0] == (0 && weapon->flashColor[1] == 0 && weapon->flashColor[2] == 0)
+			FS_Printf1("\tflashColor none\r\n");
+		else
+			FS_Printf4("\tflashColor %f %f %f\r\n", weapon->flashColor[0], weapon->flashColor[1], weapon->flashColor[2]);
 		FS_Printf2("\tflashSound0 \"%s\"\r\n", weapon->flashSoundName[0]);
 		FS_Printf2("\tflashSound1 \"%s\"\r\n", weapon->flashSoundName[1]);
 		FS_Printf2("\tflashSound2 \"%s\"\r\n", weapon->flashSoundName[2]);
