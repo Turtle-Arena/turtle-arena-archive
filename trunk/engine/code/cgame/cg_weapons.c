@@ -2865,10 +2865,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 #ifdef TA_WEAPSYS // ZTM: Do it for all weapons...
 		// colorize the flash
+		flash.shaderRGBA[0] = 255 * ci->color1[0];
+		flash.shaderRGBA[1] = 255 * ci->color1[1];
+		flash.shaderRGBA[2] = 255 * ci->color1[2];
 #else
 		// colorize the railgun blast
 		if ( weaponNum == WP_RAILGUN )
-#endif
 		{
 			clientInfo_t	*ci;
 
@@ -2877,6 +2879,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			flash.shaderRGBA[1] = 255 * ci->color1[1];
 			flash.shaderRGBA[2] = 255 * ci->color1[2];
 		}
+#endif
 
 
 #ifdef TA_WEAPSYS
@@ -2925,7 +2928,23 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			flashDLight = 300 + (rand()&31);
 #endif
 #ifdef TA_WEAPSYS
-			if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0]
+			// color1
+			if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0] == (float)'c'
+				&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1] == 1.0f
+				&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2] == 0.0f)
+			{
+				trap_R_AddLightToScene( flash.origin, flashDLight,
+					ci->color1[0], ci->color1[1], ci->color1[2] );
+			}
+			//color2
+			else if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0] == (float)'c'
+				&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1] == 2.0f
+				&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2] == 0.0f)
+			{
+				trap_R_AddLightToScene( flash.origin, flashDLight,
+					ci->color2[0], ci->color2[1], ci->color2[2] );
+			}
+			else if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0]
 				|| cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1]
 				|| cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2])
 			{

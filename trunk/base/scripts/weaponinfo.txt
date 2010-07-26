@@ -812,7 +812,7 @@ weapon "w_triblaster"
 	model "models/weapons2/triblaster/triblaster.md3"
 	attackDelay 400
 	continuousFlash 1
-	flashColor 0.8 0 1 // cc00ff
+	flashColor color1 // 0.8 0 1 // cc00ff
 	//flashSound0 "sound/weapons/triblaster/fire.wav"
 	projectile "p_pulse"
 }

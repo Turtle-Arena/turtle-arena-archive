@@ -85,9 +85,6 @@ Weapons (and attacking)
 
   * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
 
-  * TODO: Option for weapon flashColor to use player's color1 or color2
-    * Have Tri-Blaster use color1 as flashColor
-
   * TODO: Add PD_CUSTOM projectile death type
     * pdModel <string>, pdShader <string>, pdSprite <boolean>, pdDuration <integer>, pdLight <int> <vec3>, pdExpBase <int>, pdExpAdd <int>
 
