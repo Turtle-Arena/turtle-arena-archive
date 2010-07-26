@@ -1110,6 +1110,15 @@ void CG_RegisterProjectile( int projectileNum )
 			cgs.media.sfx_ric2 = trap_S_RegisterSound ("sound/weapons/machinegun/ric2.wav", qfalse);
 			cgs.media.sfx_ric3 = trap_S_RegisterSound ("sound/weapons/machinegun/ric3.wav", qfalse);
 			break;
+		case PD_BULLET_COLORIZE:
+			cgs.media.bulletFlashModel = trap_R_RegisterModel("models/weaphits/bullet.md3");
+			cgs.media.bulletExplosionColorizeShader = trap_R_RegisterShader( "bulletExplosionColorize" );
+			if (!cgs.media.bulletExplosionColorizeShader)
+				cgs.media.bulletExplosionColorizeShader = trap_R_RegisterShader( "bulletExplosion" );
+			cgs.media.sfx_ric1 = trap_S_RegisterSound ("sound/weapons/machinegun/ric1.wav", qfalse);
+			cgs.media.sfx_ric2 = trap_S_RegisterSound ("sound/weapons/machinegun/ric2.wav", qfalse);
+			cgs.media.sfx_ric3 = trap_S_RegisterSound ("sound/weapons/machinegun/ric3.wav", qfalse);
+			break;
 		case PD_GRENADE:
 			cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
 			cgs.media.grenadeExplosionShader = trap_R_RegisterShader( "grenadeExplosion" );
@@ -3842,8 +3851,13 @@ void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			isSprite = qtrue;
 			break;
 		case PD_BULLET:
+		case PD_BULLET_COLORIZE:
 			mod = cgs.media.bulletFlashModel;
-			shader = cgs.media.bulletExplosionShader;
+			if (bg_projectileinfo[weapon].deathType == PD_BULLET_COLORIZE) {
+				shader = cgs.media.bulletExplosionColorizeShader;
+			} else {
+				shader = cgs.media.bulletExplosionShader;
+			}
 			r = rand() & 3;
 			if ( r == 0 ) {
 				sfx = cgs.media.sfx_ric1;
