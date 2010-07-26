@@ -506,6 +506,7 @@ typedef enum
 #define PD_BFG 6
 #define PD_LIGHTNING 7
 #define PD_ROCKET_SMALL 8
+#define PD_BULLET_COLORIZE 9
 //projectile explosion types
 #define PE_NORMAL 0 // default (explode after timetolive)
 #define PE_NONE 1

@@ -1106,6 +1106,9 @@ typedef struct {
 	qhandle_t	railExplosionShader;
 	qhandle_t	plasmaExplosionShader;
 	qhandle_t	bulletExplosionShader;
+#ifdef TA_WEAPSYS
+	qhandle_t	bulletExplosionColorizeShader;
+#endif
 	qhandle_t	rocketExplosionShader;
 	qhandle_t	grenadeExplosionShader;
 	qhandle_t	bfgExplosionShader;

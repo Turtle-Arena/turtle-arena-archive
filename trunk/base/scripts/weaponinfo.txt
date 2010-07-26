@@ -796,7 +796,7 @@ projectile "p_pulse"
 	speed 100
 	//timetolive 10000
 	//trailType PT_BULLET
-	deathType PD_BULLET
+	deathType PD_BULLET_COLORIZE
 	wallmarkName "gfx/damage/bullet_mrk"
 	wallmarkRadius 8
 	//spread 200

@@ -88,6 +88,11 @@ Weapons (and attacking)
   * TODO: Option for weapon flashColor to use player's color1 or color2
     * Have Tri-Blaster use color1 as flashColor
 
+  * TODO: Add PD_CUSTOM projectile death type
+    * pdModel <string>, pdShader <string>, pdSprite <boolean>, pdDuration <integer>, pdLight <int> <vec3>, pdExpBase <int>, pdExpAdd <int>
+
+  * TODO: Add PT_CUSTOM projectile trail type
+
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
 
