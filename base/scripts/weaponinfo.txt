@@ -677,14 +677,14 @@ weapon "w_bo"
 	{
 		damage 10
 		origin 0 0 0
-		tip 0 0 48
+		tip 0 0 37
 		trailStyle default
 	}
 	blade 1
 	{
 		damage 10
 		origin 0 0 0
-		tip 0 0 -48
+		tip 0 0 -37
 		trailStyle default
 	}
 }
