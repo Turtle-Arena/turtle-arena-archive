@@ -211,12 +211,19 @@ G_SetClientSound
 */
 void G_SetClientSound( gentity_t *ent ) {
 #if defined MISSIONPACK && !defined TURTLEARENA // WEAPONS
-	if( ent->s.eFlags & EF_TICKING ) {
-#if 0 // #ifdef TA_WEAPSYS // ZTM: FIXME: Per-projectile tick sound name
-#else
-		ent->client->ps.loopSound = G_SoundIndex( "sound/weapons/proxmine/wstbtick.wav");
-#endif
+#ifdef TA_WEAPSYS // Per-projectile tick sound name
+	if ((ent->s.eFlags & EF_TICKING) && ent->activator
+		&& ent->activator->s.weapon > 0 && ent->activator->s.weapon < BG_NumProjectiles()
+		&& bg_projectileinfo[ent->activator->s.weapon].explosionType == PE_PROX
+		&& bg_projectileinfo[ent->activator->s.weapon].tickSoundName[0])
+	{
+		ent->client->ps.loopSound = G_SoundIndex(bg_projectileinfo[ent->activator->s.weapon].tickSoundName);
 	}
+#else
+	if( ent->s.eFlags & EF_TICKING ) {
+		ent->client->ps.loopSound = G_SoundIndex( "sound/weapons/proxmine/wstbtick.wav");
+	}
+#endif
 	else
 #endif
 	if (ent->waterlevel && (ent->watertype&(CONTENTS_LAVA|CONTENTS_SLIME)) ) {

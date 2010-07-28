@@ -2153,7 +2153,16 @@ static qboolean Projectile_Parse(char **p) {
 				projectile.triggerSoundName[0] = '\0';
 			}
 			continue;
-		} 
+		} else if ( !Q_stricmp( token, "tickSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(projectile.tickSoundName, sizeof (projectile.tickSoundName), "%s", token);
+			} else {
+				projectile.tickSoundName[0] = '\0';
+			}
+			continue;
+		}
+		
 
 		Com_Printf( "unknown token '%s' in projectile %s\n", token, projectile.name );
 	}
@@ -3034,6 +3043,7 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\timpactMetalSound \"%s\"\r\n", projectile->impactMetalSoundName);
 
 		FS_Printf2("\ttriggerSound \"%s\"\r\n", projectile->triggerSoundName);
+		FS_Printf2("\ttickSound \"%s\"\r\n", projectile->tickSoundName);
 
 		FS_Printf1("}\r\n\r\n");
 	}

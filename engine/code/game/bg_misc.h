@@ -572,6 +572,7 @@ typedef struct
 	//   homing is also used as the delay (in msec) before homing in on a player.
 
 	char triggerSoundName[MAX_QPATH]; // PE_PROX trigger sound
+	char tickSoundName[MAX_QPATH]; // PE_PROX tick sound
 
 	// Impact mark and sounds
 	char impactMarkName[MAX_QPATH];
