@@ -20,8 +20,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-// TODO: Finish remaking Prox Mine Launcher weapon info.
-
 //
 // Gauntlet (Done; but need to check blade)
 //
@@ -524,8 +522,9 @@ projectile "p_prox mine"
 	impactMetalSound "sound/weapons/proxmine/wstbimpm.wav"
 	impactSound0 "sound/weapons/proxmine/wstbimpd.wav"
 
-	// trigger sound
+	// PE_PROX sounds
 	triggerSound "sound/weapons/proxmine/wstbactv.wav"
+	tickSound "sound/weapons/proxmine/wstbtick.wav"
 }
 
 weapon "w_prox_launcher"
