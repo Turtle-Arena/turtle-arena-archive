@@ -867,10 +867,11 @@ void BotInterbreedEndMatch( void );
 
 #ifdef TA_SP // Load/save
 //
-// g_savestate.c
+// g_save.c
 //
-void G_LoadGame(fileHandle_t f);
 qboolean G_SaveGame(fileHandle_t f);
+void G_LoadGame(fileHandle_t f);
+void G_LoadGameClient(int client);
 #endif
 
 #ifdef TA_PATHSYS

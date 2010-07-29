@@ -1832,6 +1832,7 @@ void ClientSpawn(gentity_t *ent) {
 	// Load persistant data
 	//
 	G_LoadPersistant(client->ps.clientNum);
+	G_LoadGameClient(client->ps.clientNum);
 #endif
 
 	// run a client frame to drop exactly to the floor,

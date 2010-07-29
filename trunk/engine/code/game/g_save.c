@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // NOTE: Make sure BG_SAVE_VERSIONS and BG_SAVE_TYPES stay up to date
 //         with current save code.
 
-#define	SAVE_VERSION 3 // current version of save/load routines
+#define	SAVE_VERSION 4 // current version of save/load routines
 
 #define MAX_SAVE_CLIENTS 8
 
@@ -38,6 +38,7 @@ typedef struct
 	char model[MAX_QPATH];
 	char headModel[MAX_QPATH];
 	byte holdable[MAX_HOLDABLE];
+	int score;
 	byte lives;
 	byte continues;
 } save_client_t;
@@ -56,6 +57,9 @@ typedef struct
     save_client_t clients[MAX_SAVE_CLIENTS];
 
 } save_t;
+
+save_t loadData;
+qboolean clientLoad[MAX_CLIENTS];
 
 /*
 ============
@@ -101,6 +105,7 @@ qboolean G_SaveGame(fileHandle_t f)
 		{
 			saveData.clients[client].holdable[j] = level.clients[client].ps.holdable[j];
 		}
+		saveData.clients[client].score = level.clients[client].ps.persistant[PERS_SCORE];
 		saveData.clients[client].lives = level.clients[client].ps.persistant[PERS_LIVES];
 		saveData.clients[client].continues = level.clients[client].ps.persistant[PERS_CONTINUES];
 	}
@@ -114,40 +119,54 @@ qboolean G_SaveGame(fileHandle_t f)
 // Called after level is loaded.
 void G_LoadGame(fileHandle_t f)
 {
-	save_t saveData;
-	int j;
-	int client;
-
 	// Read saveData
-	trap_FS_Read(&saveData, sizeof (save_t), f);
+	trap_FS_Read(&loadData, sizeof (save_t), f);
+
+	memset(clientLoad, qfalse, MAX_CLIENTS * sizeof (qboolean));
 
 	// The server should check but just in case...
-	if (saveData.version != SAVE_VERSION)
-	{
-	    G_Printf( "Error: Unsupported savegame version, %i\n", saveData.version);
+	if (loadData.version != SAVE_VERSION) {
+	    G_Printf( "Error: Unsupported savegame version, %i\n", loadData.version);
         return;
 	}
 
     // Server sets skill and maxclients before loading the level.
+}
 
-	for (client = 0; client < saveData.maxclients; client++)
-	{
-		if (saveData.clients[client].connected != CON_CONNECTED)
-			continue;
-		if (g_entities[client].r.svFlags & SVF_BOT)
-			continue;
-		//if (level.clients[client].pers.connected != CON_CONNECTED)
-			//continue;
+void G_LoadGameClient(int client)
+{
+	int j;
 
-		//trap_SendServerCommand( client, va("spmodel %s; spheadmodel %s\n", saveData.clients[client].model, saveData.clients[client].headModel) );
-		//trap_SendServerCommand( client, va("model %s; headmodel %s\n", saveData.clients[client].model, saveData.clients[client].headModel) );
-
-		for (j = 0; j < MAX_HOLDABLE; j++)
-		{
-			level.clients[client].ps.holdable[j] = saveData.clients[client].holdable[j];
-		}
-		level.clients[client].ps.persistant[PERS_LIVES] = saveData.clients[client].lives;
-		level.clients[client].ps.persistant[PERS_CONTINUES] = saveData.clients[client].continues;
+	if (loadData.version != SAVE_VERSION) {
+        return;
 	}
+
+	if (clientLoad[client]) {
+		return;
+	}
+	clientLoad[client] = qtrue;
+
+	if (client >= loadData.maxclients) {
+		return;
+	}
+	
+	if (loadData.clients[client].connected != CON_CONNECTED)
+		return;
+	if (g_entities[client].r.svFlags & SVF_BOT)
+		return;
+	if (level.clients[client].pers.connected != CON_CONNECTED)
+		return;
+
+	// ZTM: FIXME: Set player model
+	//trap_SendServerCommand( client, va("spmodel %s; spheadmodel %s\n", loadData.clients[client].model, loadData.clients[client].headModel) );
+	//trap_SendServerCommand( client, va("model %s; headmodel %s\n", loadData.clients[client].model, loadData.clients[client].headModel) );
+
+	for (j = 0; j < MAX_HOLDABLE; j++)
+	{
+		level.clients[client].ps.holdable[j] = loadData.clients[client].holdable[j];
+	}
+	level.clients[client].ps.persistant[PERS_SCORE] = loadData.clients[client].score;
+	level.clients[client].ps.persistant[PERS_LIVES] = loadData.clients[client].lives;
+	level.clients[client].ps.persistant[PERS_CONTINUES] = loadData.clients[client].continues;
 }
 #endif // TA_SP
