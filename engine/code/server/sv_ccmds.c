@@ -1292,11 +1292,13 @@ Return value
 2 - no map loaded or wrong map loaded.
 ==================
 */
-int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *skill, byte *maxclients)
+int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *pSkill, byte *pMaxclients)
 {
 	char buffer[MAX_QPATH];
 	//char s[MAX_QPATH];
 	byte version;
+	byte skill;
+	byte maxclients;
 
 	FS_Read2 (&version, 1, f); // version
 	//Cvar_VariableStringBuffer( "g_saveVersions", buffer, sizeof(buffer) );
@@ -1308,19 +1310,16 @@ int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *skill, 
 	//}
 
 	FS_Read2 (loadmap, MAX_QPATH, f); // map name
+	FS_Read2 (&skill, 1, f); // skill
+	FS_Read2 (&maxclients, 1, f); // maxclients
 
-	if (skill)
-	{
-		FS_Read2 (skill, 1, f); // skill
-	}
-	
-	if (maxclients)
-	{
-		FS_Read2 (maxclients, 1, f); // maxclients
-	}
+	Com_Printf("DEBUG: map=%s, skill=%d, maxclients=%d\n", loadmap, skill, maxclients);
 
-	if (skill && maxclients) {
-		Com_Printf("DEBUG: map=%s, skill=%d, maxclients=%d\n", loadmap, *skill, *maxclients);
+	if (pSkill) {
+		*pSkill = skill;
+	}
+	if (pMaxclients) {
+		*pMaxclients = maxclients;
 	}
 
 	Cvar_VariableStringBuffer( "mapname", buffer, sizeof(buffer) );
@@ -1395,13 +1394,11 @@ static void SV_LoadGame_f(void) {
 		Cvar_SetValue("g_spSkill", skill);
 		Cvar_SetValue("sv_maxclients", maxclients);
 
-		if (load == 1 || !gvm) {
-			FS_FCloseFile( f );
-			// "loadgame" is called in SV_SpawnServer
-			Q_strncpyz(svs.loadgame, savegame, sizeof (svs.loadgame));
-			Cbuf_ExecuteText(EXEC_APPEND, va("spmap %s\n", loadmap));
-			return;
-		}
+		FS_FCloseFile( f );
+		// "loadgame" is called in SV_SpawnServer
+		Q_strncpyz(svs.loadgame, savegame, sizeof (svs.loadgame));
+		Cbuf_ExecuteText(EXEC_APPEND, va("spmap %s\n", loadmap));
+		return;
 	}
 	else
 	{
