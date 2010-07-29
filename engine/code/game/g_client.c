@@ -2123,41 +2123,41 @@ void G_LoadPersistant(int clientnum)
 		G_Printf(S_COLOR_YELLOW "Warning: SP skill mismatch, is %i should be %i.\n", trap_Cvar_VariableValue( "g_spSkill" ), skill);
 	}
 
-		memset(savedata, 0, sizeof(savedata));
+	memset(savedata, 0, sizeof(savedata));
 	trap_Cvar_VariableStringBuffer(va("g_spSaveData%i", clientnum), savedata, sizeof(savedata));
-		config = savedata;
+	config = savedata;
 
-		if (strlen(savedata) < 1) {
+	if (strlen(savedata) < 1) {
 		return; // nothing to load.
-		}
+	}
 
-		client = &level.clients[clientnum];
+	client = &level.clients[clientnum];
 
 	//G_Printf("DEBUG: Loading SP data for %s\n", client->pers.netname);
 
-			// Found client.
-			client->ps.persistant[PERS_LIVES] = atoi(Info_ValueForKey(config, "livs"));
-			if (!g_singlePlayer.integer && !client->ps.persistant[PERS_LIVES]) {
-				client->ps.persistant[PERS_LIVES] = 3;
-			}
-			client->ps.persistant[PERS_CONTINUES] = atoi(Info_ValueForKey(config, "ctns"));
-			client->ps.persistant[PERS_SCORE] = atoi(Info_ValueForKey(config, "scr"));
+	// Found client.
+	client->ps.persistant[PERS_LIVES] = atoi(Info_ValueForKey(config, "livs"));
+	if (!g_singlePlayer.integer && !client->ps.persistant[PERS_LIVES]) {
+		client->ps.persistant[PERS_LIVES] = 3;
+	}
+	client->ps.persistant[PERS_CONTINUES] = atoi(Info_ValueForKey(config, "ctns"));
+	client->ps.persistant[PERS_SCORE] = atoi(Info_ValueForKey(config, "scr"));
 #ifdef TA_HOLDSYS
-			client->ps.holdableIndex = atoi(Info_ValueForKey(config, "hi"));
+	client->ps.holdableIndex = atoi(Info_ValueForKey(config, "hi"));
 
-			// Read array
-			array_data[2] = 0;
-			s = Info_ValueForKey(config, "hd");
-			array_len = strlen(s) / 2;
-			for (j = 0; j < array_len && j < MAX_HOLDABLE; j++)
-			{
-				array_data[0] = s[j*2];
-				array_data[1] = s[(j*2)+1];
-				client->ps.holdable[j+1] = atoi(array_data);
-			}
+	// Read array
+	array_data[2] = 0;
+	s = Info_ValueForKey(config, "hd");
+	array_len = strlen(s) / 2;
+	for (j = 0; j < array_len && j < MAX_HOLDABLE; j++)
+	{
+		array_data[0] = s[j*2];
+		array_data[1] = s[(j*2)+1];
+		client->ps.holdable[j+1] = atoi(array_data);
+	}
 #endif
 
-		// Don't ever load this data again.
+	// Don't ever load this data again.
 	trap_Cvar_Set(va("g_spSaveData%i", clientnum),"");
 
 #if 0 // CLIENTNUM // Need it so can load all clients.

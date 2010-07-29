@@ -20,21 +20,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-/*
-There are three reason I moved shurikens to there own file.
-1. So that if I replace the weaponinfo.txt with Q3 weapons I can still use shurikens...
-2. weaponinfo.txt is used by botlib to find out how many weapons there are (shurikens don't count).
-3. I added support for ".weap" files so I might as well use it...
-
-NOTE: Shurikens currently can't use "grappling 1" the projectile is removed.
-			This is due to checking if attack is pressed...
-*/
+// There are two reason I moved shurikens to their own file.
+// 1. So that if weaponinfo.txt are replaced with Q3 weapons, shurikens can still be used.
+// 2. weaponinfo.txt is used by botlib to find out how many weapons their are, shurikens shouldn't be counted by botlib.
 
 //
 // Shurikens!
 //
 
-// NOTE: The shuriken names are hardcoded.
+// NOTE: The projectile names are currently hardcoded.
 
 projectile "p_shuriken"
 {

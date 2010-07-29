@@ -1,5 +1,5 @@
 //
-// Laser Gun for Laser Tag! (g_laserTag)
+// Laser Gun for Laser Tag! (set g_laserTag to 1 or 2)
 //
 
 projectile "p_laser"
