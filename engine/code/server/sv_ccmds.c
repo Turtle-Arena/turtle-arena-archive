@@ -1250,6 +1250,7 @@ static void SV_SaveGame_f(void) {
 	char filename[MAX_QPATH];
 	fileHandle_t f;
 	char *curpos;
+	qboolean savedGame;
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -1275,10 +1276,21 @@ static void SV_SaveGame_f(void) {
     // Open file
 	f = FS_SV_FOpenFileWrite(filename);
 
-	VM_Call( gvm, GAME_SAVEGAME, f );
+	savedGame = VM_Call( gvm, GAME_SAVEGAME, f );
 
 	// Close file
 	FS_FCloseFile( f );
+
+	// If we just created a empty savefile, it should be deleted now.
+	if (!savedGame)
+	{
+		char *ospath;
+
+		ospath = FS_BuildOSPath(Cvar_VariableString("fs_homepath"), filename, "");
+		ospath[strlen(ospath)-1] = '\0';
+
+		FS_Remove(ospath);
+	}
 }
 
 /*
