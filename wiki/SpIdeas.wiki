@@ -32,7 +32,7 @@ Enemy:		Environment:		Story stuff.
 
 Mousers:	Underground:		The Turtles are attacked near their lair by Mousers
 Foot:		Streets/Rooftops:	and head for the rooftops. After battling the Foot,
-PD:			Country/Forest:		they head to Casey's Grandmother's farmhouse. While exploring the Forest, they find something and
+PD:		Country/Forest:		they head to Casey's Grandmother's farmhouse. While exploring the Forest, they find something and
 ???:		Water?:			fall into a underground river (with mutant monsters?), and
 EPF:		Desert/Mountain:	end up in a Desert. They climb the mountain (for some reason) and
 ???:		Snow:			at the top of the Mountain is a transmat which teleports them to a space station.
@@ -41,12 +41,12 @@ Foot:		Space:			Shredders on the space station. He must be stopped.
 
 == Enemy Ideas ==
   * Mousers, A Better Mouse Trap
-	* Giant Mouser
+    * Boss: Giant Mouser
   * The Foot, Evil Ninja
-    * Kari?
+    * Boss: Kari?
   * The Purple Dragons, Thugs
-    * Hun
+    * Boss: Hun
   * The Earth Protection Force (EPF), Black Ops
-    * Agent Bishop
+    * Boss: Agent Bishop
   * The Foot in Space
-    * Shedder
+    * Boss: Shedder
