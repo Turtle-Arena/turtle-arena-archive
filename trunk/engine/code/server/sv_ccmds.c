@@ -1295,25 +1295,23 @@ Return value
 int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *pSkill, byte *pMaxclients)
 {
 	char buffer[MAX_QPATH];
-	//char s[MAX_QPATH];
+	char s[MAX_QPATH];
 	byte version;
 	byte skill;
 	byte maxclients;
 
 	FS_Read2 (&version, 1, f); // version
-	//Cvar_VariableStringBuffer( "g_saveVersions", buffer, sizeof(buffer) );
-	//sprintf(s, "%d", version);
-	//if (!strstr(s, buffer))
-	//{
+	Cvar_VariableStringBuffer( "g_saveVersions", buffer, sizeof(buffer) );
+	sprintf(s, "%d", version);
+	if (!strstr(s, buffer))
+	{
 		// Didn't find version
-		//return -1;
-	//}
+		return -1;
+	}
 
 	FS_Read2 (loadmap, MAX_QPATH, f); // map name
 	FS_Read2 (&skill, 1, f); // skill
 	FS_Read2 (&maxclients, 1, f); // maxclients
-
-	Com_Printf("DEBUG: map=%s, skill=%d, maxclients=%d\n", loadmap, skill, maxclients);
 
 	if (pSkill) {
 		*pSkill = skill;
@@ -1381,7 +1379,7 @@ static void SV_LoadGame_f(void) {
 	if (load_atemp == 0)
 	{
 		int load = SP_LoadGame(f, filename, loadmap, &skill, &maxclients);
-		Com_Printf("DEBUG: load=%d\n", load);
+
 		if (load == -1)
 		{
 			FS_FCloseFile( f );

@@ -1837,8 +1837,7 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define KAMI_SHOCKWAVE2_MAXRADIUS		704
 
 #ifdef TA_SP
-// Set as defaults for g_saveVersions and g_saveTypes so server can tell if can load savefile.
+// Set as defaults for g_saveVersions so server can tell if can load savefile.
 // They are setup in q3_ui/ui and game
-#define BG_SAVE_VERSIONS "1" // Example: "0;1;2;3"
-#define BG_SAVE_TYPES "0" // Example: "0;1;2;3"
+#define BG_SAVE_VERSIONS "4" // Example: "0;1;2;3"
 #endif

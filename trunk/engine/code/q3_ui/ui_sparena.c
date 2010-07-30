@@ -469,8 +469,6 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.string				= "Load Game";
 	spMenuInfo.sp_loadgame.color				= text_big_color;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
-	// Disabled for now.
-	spMenuInfo.sp_loadgame.generic.flags |= QMF_GRAYED;
 
 	// Extra space between, "single player" and the others
 	y += VERTICAL_SPACING;

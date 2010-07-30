@@ -96,6 +96,10 @@ Weapons (and attacking)
   * TODO: Lua Scripting for NPCs? http://xreal.svn.sourceforge.net/viewvc/xreal/trunk/xreal/base/code/game/g_lua.c?view=markup
 
   * TODO: Finish savegames for single player
+    * Make savemap cvar read-only (Should init in game)
+    * Disable saving if savemap is not set
+    * When startig single player have user pick save slot, and/or enter name. (Like SRB2 2.0) (No save option would use "autosave.sav"?)
+    * Add read-only cvar g_savename to hold the name of the file to auto-save to at the end of each level.
 
   * TODO: Rewrite single player post-game data saving.
     * Have it be more like in Team Arena then Q3, using ".game" files instead of cvars in config.

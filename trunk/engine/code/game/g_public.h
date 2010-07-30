@@ -438,13 +438,13 @@ typedef enum {
 	// The game can issue trap_argc() / trap_argv() commands to get the command
 	// and parameters.  Return qfalse if the game doesn't recognize it as a command.
 
-#ifdef TA_SP // Save/load
-	GAME_SAVEGAME, // ( fileHandle_t f );
-
-	GAME_LOADGAME, // ( fileHandle_t f );
-#endif
-
 	BOTAI_START_FRAME				// ( int time );
+
+#ifdef TA_SP // Save/load
+	,GAME_SAVEGAME, // ( fileHandle_t f );
+
+	GAME_LOADGAME // ( fileHandle_t f );
+#endif
 
 } gameExport_t;
 
