@@ -73,7 +73,7 @@ qboolean G_SaveGame(fileHandle_t f)
 	int i;
 	int j;
 
-	if (!g_singlePlayer.integer || !g_gametype.integer == GT_SINGLE_PLAYER) {
+	if (!g_singlePlayer.integer || g_gametype.integer != GT_SINGLE_PLAYER) {
 		G_Printf("Can't savegame, saving is for single player only!\n");
 		return qfalse;
 	}
@@ -83,10 +83,16 @@ qboolean G_SaveGame(fileHandle_t f)
 	saveData.version = SAVE_VERSION;
 
 	// If savemap is set to the name of the next map we can save before level change
-	trap_Cvar_VariableStringBuffer( "savemap", saveData.mapname, MAX_QPATH );
-	trap_Cvar_Set("savemap", "");
+	trap_Cvar_VariableStringBuffer( "g_saveMapname", saveData.mapname, MAX_QPATH );
+	trap_Cvar_Set("g_saveMapname", "");
 
 	if (!saveData.mapname[0]) {
+		if (!g_cheats.integer) {
+			// Most likely a user trying to save, which can be used to cheat.
+			G_Printf("The game autosaves, complete the level to save.\n");
+			return qfalse;
+		}
+
 		trap_Cvar_VariableStringBuffer( "mapname", saveData.mapname, MAX_QPATH );
 	}
 

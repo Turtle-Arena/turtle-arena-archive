@@ -1981,7 +1981,7 @@ void G_SavePersistant(char *nextmap)
 
 		trap_Cvar_VariableStringBuffer("g_saveFilename", filename, sizeof(filename) );
 
-		trap_Cvar_Set("savemap", nextmap);
+		trap_Cvar_Set("g_saveMapname", nextmap);
 		trap_SendConsoleCommand( EXEC_APPEND, va("savegame %s", filename) );
 	}
 	skill = trap_Cvar_VariableValue( "g_spSkill" );
