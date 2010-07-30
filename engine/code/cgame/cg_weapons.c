@@ -1291,6 +1291,17 @@ void CG_RegisterWeapon( int weaponNum )
 
 		// calc midpoint for rotation
 		trap_R_ModelBounds( weaponInfo->weaponModel, mins, maxs );
+
+		// Move low weapons like the Bo Staff out of the ground.
+		if (mins[2] < -4) {
+			float heightOffset = fabs(mins[2]);
+
+			mins[2] -= heightOffset;
+			maxs[2] -= heightOffset;
+
+			//CG_Printf("DEBUG: %s: Low weapon, offset=%f\n", bg_weapongroupinfo[weaponNum].name, heightOffset);
+		}
+
 		for ( i = 0 ; i < 3 ; i++ ) {
 			weaponInfo->weaponMidpoint[i] = mins[i] + 0.5 * ( maxs[i] - mins[i] );
 		}
