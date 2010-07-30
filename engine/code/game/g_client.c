@@ -1977,8 +1977,12 @@ void G_SavePersistant(char *nextmap)
 
 	// If real single player, auto-save at level end, but not end of the game.
 	if (g_singlePlayer.integer && Q_stricmp(nextmap, "sp_end") != 0) {
+		char filename[MAX_STRING_CHARS];
+
+		trap_Cvar_VariableStringBuffer("g_saveFilename", filename, sizeof(filename) );
+
 		trap_Cvar_Set("savemap", nextmap);
-		trap_SendConsoleCommand( EXEC_APPEND, "savegame autosave" );
+		trap_SendConsoleCommand( EXEC_APPEND, va("savegame %s", filename) );
 	}
 	skill = trap_Cvar_VariableValue( "g_spSkill" );
 

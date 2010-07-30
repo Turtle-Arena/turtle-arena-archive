@@ -145,6 +145,7 @@ vmCvar_t	ui_spSkill;
 #ifdef TA_SP
 vmCvar_t	ui_singlePlayerActive;
 vmCvar_t	ui_saveVersions;
+vmCvar_t	ui_saveFilename;
 #endif
 vmCvar_t	ui_spSelection;
 
@@ -240,6 +241,7 @@ static cvarTable_t		cvarTable[] = {
 #ifdef TA_SP
 	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
 	{ &ui_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM },
+	{ &ui_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO },
 #endif
 	{ &ui_spSelection, "ui_spSelection", "", CVAR_ROM },
 
