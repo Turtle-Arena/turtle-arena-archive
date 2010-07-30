@@ -10,36 +10,44 @@ l_legs_control	Legs can rotate just the legs
 
 ==Missing animations for raph_v9==
 
+Needs (32) torso attack animations,
+LEGS_RUN doesn't look quite done,
+I want to modify four torso standing animations, see (copy of ..., the animation it defaults to)
+
+The 'shared' (used by all weapons) torso animations should be modfied so Bo Staff doesn't go into the ground...
+  gesture, raise, drop, getflag, gaurdbase, patrol, followme, affirmative, negative
+
 ===Both===
-death2 (Copy of death1)
-death3 (Copy of death1)
+BOTH_DEATH2 (defaults to BOTH_DEATH1)
+BOTH_DEAD2 (defaults to BOTH_DEAD1)
+BOTH_DEATH3 (defaults to BOTH_DEATH2)
+BOTH_DEAD3 (defaults to BOTH_DEAD2)
 
 ===Torso===
 Quake3 Animations
 * TORSO_STAND_GAUNTLET (copy of TORSO_STAND_SAI2)
-* Run (Doesn't look right)
-* Walk (Doesn't look right)
+* LEGS_RUN (Doesn't look quite right)
 MISSIONPACK Animations (done)
 Turtle Arena Animations
-* TORSO_PUTDEFAULT_* (copies of TORSO_DROP, not right)
-* TORSO_GETDEFAULT_* (copies of TORSO_RAISE, not right)
+* TORSO_PUTDEFAULT_* (defaults to reversed TORSO_GETDEFAULT_*)
+* TORSO_GETDEFAULT_* (done)
 * TORSO_STAND_GUN_PRIMARY (done)
 * TORSO_STAND_SWORD1_BOTH (done)
 * TORSO_STAND_SWORD1_PRIMARY (done)
-* TORSO_STAND_SWORD2 (copy of TORSO_STAND_SAI2)
-* TORSO_STAND_DAISHO (copy of TORSO_STAND_SAI2)
+* TORSO_STAND_SWORD2 (copy of TORSO_STAND_SAI2, the same animation it defaults to)
+* TORSO_STAND_DAISHO (defaults to TORSO_STAND_SWORD2)
 
 * TORSO_STAND_SAI2 (done)
-* TORSO_STAND_SAI1_PRIMARY (copy of TORSO_STAND_SWORD1_PRIMARY)
+* TORSO_STAND_SAI1_PRIMARY (copy of TORSO_STAND_SWORD1_PRIMARY, the same animation it defaults to)
 
-* TORSO_STAND_BO (missing) (copy of TORSO_STAND_SAI2)
-* TORSO_STAND_BO_PRIMARY (missing) (copy of TORSO_STAND_SAI2)
-* TORSO_STAND_HAMMER (missing) (copy of TORSO_STAND_SWORD1_BOTH)
-* TORSO_STAND_HAMMER_PRIMARY (missing) (copy of TORSO_STAND_SWORD1_PRIMARY)
-* TORSO_STAND_NUNCHUCKS (missing) (copy of TORSO_STAND_SAI2)
-* TORSO_STAND_NUNCHUCKS1_PRIMARY (missing) (copy of TORSO_STAND_SAI2)
+* TORSO_STAND_BO (done)
+* TORSO_STAND_BO_PRIMARY (done?)
+* TORSO_STAND_HAMMER (defaults to TORSO_STAND_SWORD1_BOTH)
+* TORSO_STAND_HAMMER_PRIMARY (defaults to TORSO_STAND_SWORD1_PRIMARY)
+* TORSO_STAND_NUNCHUCKS (copy of TORSO_STAND_SAI2, the same animation it defaults to)
+* TORSO_STAND_NUNCHUCKS1_PRIMARY (copy of TORSO_STAND_SAI1_PRIMARY, the same animation it defaults to)
 
-* TORSO_ATTACK_GUN_PRIMARY (missing) (copy of TORSO_STAND_SAI2)
+* TORSO_ATTACK_GUN_PRIMARY (done)
 
 * TORSO_ATTACK_SWORD1_BOTH_A (missing)
 * TORSO_ATTACK_SWORD1_BOTH_B (missing)
@@ -74,7 +82,6 @@ Turtle Arena Animations
 * TORSO_ATTACK_BO_PRIMARY_C (missing)
 
 * TORSO_ATTACK_HAMMER_A (missing)
-
 * TORSO_ATTACK_HAMMER_PRIMARY_A (missing)
 
 * TORSO_ATTACK_NUNCHUCKS_A (missing)
@@ -85,12 +92,13 @@ Turtle Arena Animations
 * TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C (missing)
 
 ===Legs===
-Jump/land B (Copy of Jump/land)
+* LEGS_JUMPB (Defaults to LEGS_JUMP)
+* LEGS_LANDB (Defaults to LEGS_LAND)
 
 
 == Note ==
 cg_shadows 2 doesn't not work correctly with the model for some reason.
-Is it due to the holds in the meshes?
+Is it due to the holes in the meshes?
 
 
 == Converting Wings3D to MM3D ==
@@ -100,5 +108,5 @@ Raph's mouth is just a different material on the h_head_bottom mesh
 	when exported it needs to be renamed to h_mouth_right and h_mouth_left in the mm3d model
 
 == TODO ==
-Raph's thumb get weird when rotated and should be fixed?
+Raph's thumb get a little weird when rotated, should it be fixed?
 
