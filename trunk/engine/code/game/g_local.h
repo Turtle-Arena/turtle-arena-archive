@@ -986,6 +986,9 @@ extern	vmCvar_t	g_enableBreath;
 extern	vmCvar_t	g_singlePlayer;
 #ifdef TA_SP
 extern	vmCvar_t	g_spSaveData;
+extern	vmCvar_t	g_saveVersions;
+extern	vmCvar_t	g_saveFilename;
+extern	vmCvar_t	g_saveMapname;
 #endif
 extern	vmCvar_t	g_proxMineTimeout;
 #ifdef TURTLEARENA // POWERS // PW_FLASHING

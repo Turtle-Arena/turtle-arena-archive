@@ -96,8 +96,6 @@ Weapons (and attacking)
   * TODO: Lua Scripting for NPCs? http://xreal.svn.sourceforge.net/viewvc/xreal/trunk/xreal/base/code/game/g_lua.c?view=markup
 
   * TODO: Finish savegames for single player
-    * Make savemap cvar read-only (Should init in game)
-    * Disable saving if savemap is not set
     * When starting single player have user pick save slot and/or enter name to set g_saveFilename. (Like SRB2 2.0)
       * (No save option would use "" which defaults to "autosave")
 

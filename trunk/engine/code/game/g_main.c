@@ -110,6 +110,7 @@ vmCvar_t	g_spSaveData; // Used to save data between levels.
 //vmCvar_t	g_spSaveDataNet[MAX_CLIENTS]; // Save data for all clients
 vmCvar_t	g_saveVersions;
 vmCvar_t	g_saveFilename;
+vmCvar_t	g_saveMapname;
 #endif
 #ifdef TURTLEARENA // POWERS // PW_FLASHING
 vmCvar_t	g_teleportFluxTime;
@@ -227,6 +228,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_spSaveData, "g_spSaveData", "", CVAR_SYSTEMINFO, 0, qfalse, qfalse  },
 	{ &g_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM, 0, 0, qfalse },
 	{ &g_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO, 0, 0, qfalse },
+	{ &g_saveMapname, "g_saveMapname", "", CVAR_ROM, 0, 0, qfalse },
 #endif
 #ifdef IOQ3ZTM
 #ifdef TURTLEARENA // DEFAULT_TEAMS
