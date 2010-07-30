@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef TA_SP // Save/load
 
-// NOTE: Make sure BG_SAVE_VERSIONS and BG_SAVE_TYPES stay up to date
+// NOTE: Make sure BG_SAVE_VERSIONS stays up to date
 //         with current save code.
 
 #define	SAVE_VERSION 4 // current version of save/load routines
@@ -70,6 +70,7 @@ qboolean G_SaveGame(fileHandle_t f)
 {
 	save_t saveData;
 	int client;
+	int i;
 	int j;
 
 	if (!g_singlePlayer.integer || !g_gametype.integer == GT_SINGLE_PLAYER) {
@@ -80,34 +81,50 @@ qboolean G_SaveGame(fileHandle_t f)
 	// Setup header
     memset(&saveData, 0, sizeof (save_t));
 	saveData.version = SAVE_VERSION;
-	// ZTM: FIXME: Use next_map? So we can save before loading map?
-	trap_Cvar_VariableStringBuffer( "mapname", saveData.mapname, MAX_QPATH );
+
+	// If savemap is set to the name of the next map we can save before level change
+	trap_Cvar_VariableStringBuffer( "savemap", saveData.mapname, MAX_QPATH );
+	trap_Cvar_Set("savemap", "");
+
+	if (!saveData.mapname[0]) {
+		trap_Cvar_VariableStringBuffer( "mapname", saveData.mapname, MAX_QPATH );
+	}
+
 	saveData.skill = trap_Cvar_VariableIntegerValue("g_spSkill");
 	saveData.maxclients = level.maxclients;
 	if (saveData.maxclients > MAX_SAVE_CLIENTS)
 		saveData.maxclients = MAX_SAVE_CLIENTS;
 
-	for (client = 0; client < saveData.maxclients; client++)
+	client = 0;
+	for (i = 0; i < level.maxclients; i++)
 	{
-		if (g_entities[client].r.svFlags & SVF_BOT)
+		if (g_entities[i].r.svFlags & SVF_BOT) {
+			// Don't save bots
 			continue;
-		saveData.clients[client].connected = level.clients[client].pers.connected;
-		if (level.clients[client].pers.connected != CON_CONNECTED)
+		}
+		if (level.clients[i].pers.connected != CON_CONNECTED)  {
 			continue;
+		}
+
+		saveData.clients[client].connected = level.clients[i].pers.connected;
 
 		// model/skin
-		Q_strncpyz(saveData.clients[client].model, level.clients[client].pers.playercfg.model, MAX_QPATH);
+		Q_strncpyz(saveData.clients[client].model, level.clients[i].pers.playercfg.model, MAX_QPATH);
 		// headmodel/skin
-		Q_strncpyz(saveData.clients[client].model, level.clients[client].pers.playercfg.headModel, MAX_QPATH);
+		Q_strncpyz(saveData.clients[client].headModel, level.clients[i].pers.playercfg.headModel, MAX_QPATH);
 
 		// holdable items
 		for (j = 0; j < MAX_HOLDABLE; j++)
 		{
-			saveData.clients[client].holdable[j] = level.clients[client].ps.holdable[j];
+			saveData.clients[client].holdable[j] = level.clients[i].ps.holdable[j];
 		}
-		saveData.clients[client].score = level.clients[client].ps.persistant[PERS_SCORE];
-		saveData.clients[client].lives = level.clients[client].ps.persistant[PERS_LIVES];
-		saveData.clients[client].continues = level.clients[client].ps.persistant[PERS_CONTINUES];
+		saveData.clients[client].score = level.clients[i].ps.persistant[PERS_SCORE];
+		saveData.clients[client].lives = level.clients[i].ps.persistant[PERS_LIVES];
+		saveData.clients[client].continues = level.clients[i].ps.persistant[PERS_CONTINUES];
+		client++;
+		if (client >= saveData.maxclients) {
+			break;
+		}
 	}
 
 	// Write saveData
@@ -133,40 +150,81 @@ void G_LoadGame(fileHandle_t f)
     // Server sets skill and maxclients before loading the level.
 }
 
-void G_LoadGameClient(int client)
+void G_LoadGameClientEx(int gameClient, int saveClient)
 {
 	int j;
+	gclient_t *client;
+	save_client_t *saved;
 
 	if (loadData.version != SAVE_VERSION) {
         return;
 	}
 
-	if (clientLoad[client]) {
+	if (clientLoad[saveClient]) {
 		return;
 	}
-	clientLoad[client] = qtrue;
+	clientLoad[saveClient] = qtrue;
 
-	if (client >= loadData.maxclients) {
+	if (saveClient >= loadData.maxclients) {
 		return;
 	}
-	
-	if (loadData.clients[client].connected != CON_CONNECTED)
-		return;
-	if (g_entities[client].r.svFlags & SVF_BOT)
-		return;
-	if (level.clients[client].pers.connected != CON_CONNECTED)
-		return;
 
-	// ZTM: FIXME: Set player model
-	//trap_SendServerCommand( client, va("spmodel %s; spheadmodel %s\n", loadData.clients[client].model, loadData.clients[client].headModel) );
-	//trap_SendServerCommand( client, va("model %s; headmodel %s\n", loadData.clients[client].model, loadData.clients[client].headModel) );
+	saved = &loadData.clients[saveClient];
+	if (saved->connected != CON_CONNECTED) {
+		return;
+	}
+
+	client = &level.clients[gameClient];
+	if (client->pers.connected != CON_CONNECTED) {
+		return;
+	}
+
+	trap_SendServerCommand( gameClient, va("spPlayer %s %s", saved->model, saved->headModel) );
 
 	for (j = 0; j < MAX_HOLDABLE; j++)
 	{
-		level.clients[client].ps.holdable[j] = loadData.clients[client].holdable[j];
+		client->ps.holdable[j] = saved->holdable[j];
 	}
-	level.clients[client].ps.persistant[PERS_SCORE] = loadData.clients[client].score;
-	level.clients[client].ps.persistant[PERS_LIVES] = loadData.clients[client].lives;
-	level.clients[client].ps.persistant[PERS_CONTINUES] = loadData.clients[client].continues;
+	client->ps.persistant[PERS_SCORE] = saved->score;
+	client->ps.persistant[PERS_LIVES] = saved->lives;
+	client->ps.persistant[PERS_CONTINUES] = saved->continues;
+}
+
+/*
+==========
+G_LoadGameClient
+
+Figure out which client data to load from save file for this gameClient
+There can be a different number of bots on different maps, the order of the clients changes sometimes,
+	so find the human(s) to get correct client.
+==========
+*/
+void G_LoadGameClient(int gameClient)
+{
+	int firstHumanGameClient;
+	int saveClient;
+	int i;
+
+	// Bots don't save data in save files.
+	if (g_entities[gameClient].r.svFlags & SVF_BOT) {
+		return;
+	}
+
+	firstHumanGameClient = 0;
+
+	for (i = 0; i < level.maxclients; i++)
+	{
+		if (g_entities[i].r.svFlags & SVF_BOT)
+			continue;
+
+		firstHumanGameClient = i;
+		break;
+	}
+
+	saveClient = gameClient - firstHumanGameClient;
+
+	//G_Printf("DEBUG: Human client (%d) in saveData slot (%d)?...\n", gameClient, saveClient);
+
+	G_LoadGameClientEx(gameClient, saveClient);
 }
 #endif // TA_SP
