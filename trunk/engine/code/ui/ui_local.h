@@ -57,6 +57,10 @@ extern vmCvar_t	ui_spAwards;
 extern vmCvar_t	ui_spVideos;
 extern vmCvar_t	ui_spSkill;
 
+#ifdef TA_SP
+extern vmCvar_t	ui_saveVersions;
+extern vmCvar_t	ui_saveFilename;
+#endif
 extern vmCvar_t	ui_spSelection;
 
 extern vmCvar_t	ui_browserMaster;
