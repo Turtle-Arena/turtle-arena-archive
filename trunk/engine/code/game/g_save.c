@@ -28,9 +28,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // NOTE: Make sure BG_SAVE_VERSIONS stays up to date
 //         with current save code.
 
-#define	SAVE_VERSION 4 // current version of save/load routines
+#define	SAVE_VERSION 5 // current version of save/load routines
 
-#define MAX_SAVE_CLIENTS 8
+#define MAX_SAVE_CLIENTS 1 // ZTM: NOTE: If splitscreen is added, support more players in single player.
 
 typedef struct
 {
@@ -38,6 +38,7 @@ typedef struct
 	char model[MAX_QPATH];
 	char headModel[MAX_QPATH];
 	byte holdable[MAX_HOLDABLE];
+	byte holdableSelected;
 	int score;
 	byte lives;
 	byte continues;
@@ -124,6 +125,7 @@ qboolean G_SaveGame(fileHandle_t f)
 		{
 			saveData.clients[client].holdable[j] = level.clients[i].ps.holdable[j];
 		}
+		saveData.clients[client].holdableSelected = level.clients[i].ps.holdableIndex;
 		saveData.clients[client].score = level.clients[i].ps.persistant[PERS_SCORE];
 		saveData.clients[client].lives = level.clients[i].ps.persistant[PERS_LIVES];
 		saveData.clients[client].continues = level.clients[i].ps.persistant[PERS_CONTINUES];
@@ -191,6 +193,7 @@ void G_LoadGameClientEx(int gameClient, int saveClient)
 	{
 		client->ps.holdable[j] = saved->holdable[j];
 	}
+	client->ps.holdableIndex = saved->holdableSelected;
 	client->ps.persistant[PERS_SCORE] = saved->score;
 	client->ps.persistant[PERS_LIVES] = saved->lives;
 	client->ps.persistant[PERS_CONTINUES] = saved->continues;
