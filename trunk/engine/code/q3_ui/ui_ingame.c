@@ -238,7 +238,7 @@ void InGame_MenuInit( void ) {
 		s_ingame.team.generic.y				= y;
 		s_ingame.team.generic.id			= ID_TEAM;
 		s_ingame.team.generic.callback		= InGame_Event;
-		s_ingame.team.string				= "START";
+		s_ingame.team.string				= "CHANGE TEAM";
 		s_ingame.team.color					= text_big_color;
 		s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 	}
