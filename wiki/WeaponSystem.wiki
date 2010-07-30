@@ -5,7 +5,7 @@
 The weapon system used in Turtle Arena;
 
   * *TA_WEAPSYS define*
-  * Loads weapons from external text files (`[http://turtlearena.googlecode.com/svn/trunk/base/scripts/weaponinfo.txt scripts/weaponinfo.txt]` and `scripts/*.weap` files)
+  * Loads weapons from external text files ([http://turtlearena.googlecode.com/svn/trunk/base/scripts/weaponinfo.txt scripts/weaponinfo.txt] and `scripts/*.weap` files)
   * Supports melee and projectile weapons
   * Per-player default weapon (Set in player's animation.cfg)
   * Allows for easy modification and custom default weapons, or new weapons for custom maps.
