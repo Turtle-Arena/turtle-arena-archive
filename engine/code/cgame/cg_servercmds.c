@@ -78,6 +78,19 @@ static void CG_ParseScores( void ) {
 	memset( cg.scores, 0, sizeof( cg.scores ) );
 	for ( i = 0 ; i < cg.numScores ; i++ ) {
 		//
+#ifdef TURTLEARENA // AWARDS
+		cg.scores[i].client = atoi( CG_Argv( i * 11 + 4 ) );
+		cg.scores[i].score = atoi( CG_Argv( i * 11 + 5 ) );
+		cg.scores[i].ping = atoi( CG_Argv( i * 11 + 6 ) );
+		cg.scores[i].time = atoi( CG_Argv( i * 11 + 7 ) );
+		cg.scores[i].scoreFlags = atoi( CG_Argv( i * 11 + 8 ) );
+		powerups = atoi( CG_Argv( i * 11 + 9 ) );
+		cg.scores[i].accuracy = atoi(CG_Argv(i * 11 + 10));
+		cg.scores[i].defendCount = atoi(CG_Argv(i * 11 + 11));
+		cg.scores[i].assistCount = atoi(CG_Argv(i * 11 + 12));
+		cg.scores[i].perfect = atoi(CG_Argv(i * 11 + 13));
+		cg.scores[i].captures = atoi(CG_Argv(i * 11 + 14));
+#else
 		cg.scores[i].client = atoi( CG_Argv( i * 14 + 4 ) );
 		cg.scores[i].score = atoi( CG_Argv( i * 14 + 5 ) );
 		cg.scores[i].ping = atoi( CG_Argv( i * 14 + 6 ) );
@@ -92,6 +105,7 @@ static void CG_ParseScores( void ) {
 		cg.scores[i].assistCount = atoi(CG_Argv(i * 14 + 15));
 		cg.scores[i].perfect = atoi(CG_Argv(i * 14 + 16));
 		cg.scores[i].captures = atoi(CG_Argv(i * 14 + 17));
+#endif
 
 		if ( cg.scores[i].client < 0 || cg.scores[i].client >= MAX_CLIENTS ) {
 			cg.scores[i].client = 0;

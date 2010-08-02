@@ -373,9 +373,11 @@ typedef struct {
 	int				scoreFlags;
 	int				powerUps;
 	int				accuracy;
+#ifndef TURTLEARENA // AWARDS
 	int				impressiveCount;
 	int				excellentCount;
 	int				guantletCount;
+#endif
 	int				defendCount;
 	int				assistCount;
 	int				captures;
