@@ -120,11 +120,13 @@ extern vmCvar_t	ui_lastServerRefresh_2;
 extern vmCvar_t	ui_lastServerRefresh_3;
 extern vmCvar_t	ui_singlePlayerActive;
 extern vmCvar_t	ui_scoreAccuracy;
+#ifndef TURTLEARENA // AWARDS
 extern vmCvar_t	ui_scoreImpressives;
 extern vmCvar_t	ui_scoreExcellents;
+#endif
 extern vmCvar_t	ui_scoreDefends;
 extern vmCvar_t	ui_scoreAssists;
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TURTLEARENA // AWARDS
 extern vmCvar_t	ui_scoreGauntlets;
 #endif
 extern vmCvar_t	ui_scoreScore;
@@ -1169,11 +1171,13 @@ typedef struct postGameInfo_s {
 	int blueScore;
 	int perfects;
 	int accuracy;
+#ifndef TURTLEARENA // AWARDS
 	int impressives;
 	int excellents;
+#endif
 	int defends;
 	int assists;
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TURTLEARENA // AWARDS
 	int gauntlets;
 #endif
 	int	captures;

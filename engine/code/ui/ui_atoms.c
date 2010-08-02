@@ -115,11 +115,13 @@ char *UI_Cvar_VariableString( const char *var_name ) {
 
 void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
 	trap_Cvar_Set("ui_scoreAccuracy",     va("%i%%", newInfo->accuracy));
+#ifndef TURTLEARENA // AWARDS
 	trap_Cvar_Set("ui_scoreImpressives",	va("%i", newInfo->impressives));
 	trap_Cvar_Set("ui_scoreExcellents", 	va("%i", newInfo->excellents));
+#endif
 	trap_Cvar_Set("ui_scoreDefends", 			va("%i", newInfo->defends));
 	trap_Cvar_Set("ui_scoreAssists", 			va("%i", newInfo->assists));
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TURTLEARENA // AWARDS
 	trap_Cvar_Set("ui_scoreGauntlets", 		va("%i", newInfo->gauntlets));
 #endif
 	trap_Cvar_Set("ui_scoreScore", 				va("%i", newInfo->score));
@@ -133,11 +135,13 @@ void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
 	trap_Cvar_Set("ui_scoreCaptures",		va("%i", newInfo->captures));
   if (postGame) {
 		trap_Cvar_Set("ui_scoreAccuracy2",     va("%i%%", newInfo->accuracy));
+#ifndef TURTLEARENA // AWARDS
 		trap_Cvar_Set("ui_scoreImpressives2",	va("%i", newInfo->impressives));
 		trap_Cvar_Set("ui_scoreExcellents2", 	va("%i", newInfo->excellents));
+#endif
 		trap_Cvar_Set("ui_scoreDefends2", 			va("%i", newInfo->defends));
 		trap_Cvar_Set("ui_scoreAssists2", 			va("%i", newInfo->assists));
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TURTLEARENA // AWARDS
 		trap_Cvar_Set("ui_scoreGauntlets2", 		va("%i", newInfo->gauntlets));
 #endif
 		trap_Cvar_Set("ui_scoreScore2", 				va("%i", newInfo->score));
@@ -250,21 +254,30 @@ static void UI_CalcPostGameStats( void ) {
 	}					 
 
 	newInfo.accuracy = atoi(UI_Argv(3));
+#ifdef TURTLEARENA // AWARDS
+	newInfo.baseScore = atoi(UI_Argv(4));
+	newInfo.perfects = atoi(UI_Argv(5));
+
+	// Extra data for missionpack
+	newInfo.defends = atoi(UI_Argv(6));
+	newInfo.assists = atoi(UI_Argv(7));
+	newInfo.redScore = atoi(UI_Argv(8));
+	newInfo.blueScore = atoi(UI_Argv(9));
+	time = atoi(UI_Argv(10));
+	newInfo.captures = atoi(UI_Argv(11));
+#else
 	newInfo.impressives = atoi(UI_Argv(4));
 	newInfo.excellents = atoi(UI_Argv(5));
 	newInfo.defends = atoi(UI_Argv(6));
 	newInfo.assists = atoi(UI_Argv(7));
-#ifdef TURTLEARENA // WEAPONS
-	// NOTE: I pass 0 as argv 8 so I don't have to change numbers...
-#else
 	newInfo.gauntlets = atoi(UI_Argv(8));
-#endif
 	newInfo.baseScore = atoi(UI_Argv(9));
 	newInfo.perfects = atoi(UI_Argv(10));
 	newInfo.redScore = atoi(UI_Argv(11));
 	newInfo.blueScore = atoi(UI_Argv(12));
 	time = atoi(UI_Argv(13));
 	newInfo.captures = atoi(UI_Argv(14));
+#endif
 
 	newInfo.time = (time - trap_Cvar_VariableValue("ui_matchStartTime")) / 1000;
 	adjustedTime = uiInfo.mapList[ui_currentMap.integer].timeToBeat[game];

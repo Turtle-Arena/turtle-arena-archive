@@ -626,14 +626,15 @@ void UI_SPPostgameMenu_f( void ) {
 	// process award stats and prepare presentation data
 	awardValues[AWARD_ACCURACY] = atoi( UI_Argv( 3 ) );
 #ifdef TURTLEARENA // AWARDS
-	// ZTM: TODO: I was lazy at removal, so 0 is passed as the AWARD_IMPRESSIVE, etc. (See UpdateTournamentInfo)
+	awardValues[AWARD_FRAGS] = atoi( UI_Argv( 4 ) );
+	awardValues[AWARD_PERFECT] = atoi( UI_Argv( 5 ) );
 #else
 	awardValues[AWARD_IMPRESSIVE] = atoi( UI_Argv( 4 ) );
 	awardValues[AWARD_EXCELLENT] = atoi( UI_Argv( 5 ) );
 	awardValues[AWARD_GAUNTLET] = atoi( UI_Argv( 6 ) );
-#endif
 	awardValues[AWARD_FRAGS] = atoi( UI_Argv( 7 ) );
 	awardValues[AWARD_PERFECT] = atoi( UI_Argv( 8 ) );
+#endif
 
 	postgameMenuInfo.numAwards = 0;
 
