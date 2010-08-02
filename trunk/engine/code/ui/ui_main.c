@@ -5882,12 +5882,14 @@ vmCvar_t	ui_lastServerRefresh_2;
 vmCvar_t	ui_lastServerRefresh_3;
 vmCvar_t	ui_singlePlayerActive;
 vmCvar_t	ui_scoreAccuracy;
+#ifndef TURTLEARENA // AWARDS
 vmCvar_t	ui_scoreImpressives;
 vmCvar_t	ui_scoreExcellents;
+#endif
 vmCvar_t	ui_scoreCaptures;
 vmCvar_t	ui_scoreDefends;
 vmCvar_t	ui_scoreAssists;
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TURTLEARENA // AWARDS
 vmCvar_t	ui_scoreGauntlets;
 #endif
 vmCvar_t	ui_scoreScore;
@@ -6040,12 +6042,14 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", 0},
 #endif
 	{ &ui_scoreAccuracy, "ui_scoreAccuracy", "0", CVAR_ARCHIVE},
+#ifndef TURTLEARENA // AWARDS
 	{ &ui_scoreImpressives, "ui_scoreImpressives", "0", CVAR_ARCHIVE},
 	{ &ui_scoreExcellents, "ui_scoreExcellents", "0", CVAR_ARCHIVE},
+#endif
 	{ &ui_scoreCaptures, "ui_scoreCaptures", "0", CVAR_ARCHIVE},
 	{ &ui_scoreDefends, "ui_scoreDefends", "0", CVAR_ARCHIVE},
 	{ &ui_scoreAssists, "ui_scoreAssists", "0", CVAR_ARCHIVE},
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TURTLEARENA // AWARDS
 	{ &ui_scoreGauntlets, "ui_scoreGauntlets", "0",CVAR_ARCHIVE},
 #endif
 	{ &ui_scoreScore, "ui_scoreScore", "0", CVAR_ARCHIVE},
