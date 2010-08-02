@@ -1010,9 +1010,7 @@ typedef struct {
 #endif
 
 	qhandle_t	machinegunBrassModel;
-#ifndef TURTLEARENA // WEAPONS
 	qhandle_t	shotgunBrassModel;
-#endif
 
 	qhandle_t	railRingsShader;
 	qhandle_t	railCoreShader;
