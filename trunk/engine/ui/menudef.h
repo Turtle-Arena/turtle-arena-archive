@@ -134,8 +134,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // this makes it much easier for the macro expansion to 
 // convert them for the designers ( from the .menu files )
 #define CG_OWNERDRAW_BASE 1
+#ifndef TURTLEARENA // NOARMOR
 #define CG_PLAYER_ARMOR_ICON 1              
 #define CG_PLAYER_ARMOR_VALUE 2
+#endif
 #define CG_PLAYER_HEAD 3
 #define CG_PLAYER_HEALTH 4
 #define CG_PLAYER_AMMO_ICON 5
@@ -190,15 +192,21 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CG_AREA_CHAT 48                 // painted with old system
 #define CG_GAME_STATUS 49
 #define CG_KILLER 50
+#ifndef TURTLEARENA // NOARMOR
 #define CG_PLAYER_ARMOR_ICON2D 51              
+#endif
 #define CG_PLAYER_AMMO_ICON2D 52
 #define CG_ACCURACY 53
 #define CG_ASSISTS 54
 #define CG_DEFEND 55
+#ifndef TURTLEARENA // AWARDS
 #define CG_EXCELLENT 56
 #define CG_IMPRESSIVE 57
+#endif
 #define CG_PERFECT 58
+#ifndef TURTLEARENA // AWARDS
 #define CG_GAUNTLET 59
+#endif
 #define CG_SPECTATORS 60
 #define CG_TEAMINFO 61
 #define CG_VOICE_HEAD 62

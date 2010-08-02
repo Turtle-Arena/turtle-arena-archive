@@ -1610,18 +1610,22 @@ void CG_DrawMedal(int ownerDraw, rectDef_t *rect, float scale, vec4_t color, qha
 		case CG_DEFEND:
 			value = score->defendCount;
 			break;
+#ifndef TURTLEARENA // AWARDS
 		case CG_EXCELLENT:
 			value = score->excellentCount;
 			break;
 		case CG_IMPRESSIVE:
 			value = score->impressiveCount;
 			break;
+#endif
 		case CG_PERFECT:
 			value = score->perfect;
 			break;
+#ifndef TURTLEARENA // AWARDS
 		case CG_GAUNTLET:
 			value = score->guantletCount;
 			break;
+#endif
 		case CG_CAPTURES:
 			value = score->captures;
 			break;
@@ -1829,10 +1833,14 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
 	case CG_ACCURACY:
 	case CG_ASSISTS:
 	case CG_DEFEND:
+#ifndef TURTLEARENA // AWARDS
 	case CG_EXCELLENT:
 	case CG_IMPRESSIVE:
+#endif
 	case CG_PERFECT:
+#ifndef TURTLEARENA // AWARDS
 	case CG_GAUNTLET:
+#endif
 	case CG_CAPTURES:
 		CG_DrawMedal(ownerDraw, &rect, scale, color, shader);
 		break;
