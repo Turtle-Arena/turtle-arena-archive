@@ -320,11 +320,7 @@ static void CG_ShotgunEjectBrass( centity_t *cent
 		VectorScale( xvelocity, waterScale, le->pos.trDelta );
 
 		AxisCopy( axisDefault, re->axis );
-#ifdef TA_DATA
-		re->hModel = cgs.media.machinegunBrassModel;
-#else
 		re->hModel = cgs.media.shotgunBrassModel;
-#endif
 		le->bounceFactor = 0.3f;
 
 		le->angles.trType = TR_LINEAR;

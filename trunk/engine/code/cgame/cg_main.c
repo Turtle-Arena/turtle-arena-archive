@@ -1285,8 +1285,11 @@ static void CG_RegisterGraphics( void ) {
 #endif
 
 	cgs.media.machinegunBrassModel = trap_R_RegisterModel( "models/weapons2/shells/m_shell.md3" );
-#ifndef TURTLEARENA // WEAPONS
 	cgs.media.shotgunBrassModel = trap_R_RegisterModel( "models/weapons2/shells/s_shell.md3" );
+#ifdef TA_DATA // Fall back to machinegun shell.
+	if (!cgs.media.shotgunBrassModel) {
+		cgs.media.shotgunBrassModel = cgs.media.machinegunBrassModel;
+	}
 #endif
 
 #ifndef NOTRATEDM // No gibs.
