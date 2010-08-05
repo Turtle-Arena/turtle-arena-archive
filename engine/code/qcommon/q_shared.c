@@ -294,10 +294,22 @@ int COM_GetCurrentParseLine( void )
 	return com_lines;
 }
 
+#ifdef IOQ3ZTM // PARSE_SKINS
+char *COM_Parse( char **data_p )
+{
+	return COM_ParseExt2(data_p, qtrue, 0);
+}
+
+char *COM_ParseExt( char **data_p, qboolean allowLineBreaks )
+{
+	return COM_ParseExt2(data_p, allowLineBreaks, 0);
+}
+#else
 char *COM_Parse( char **data_p )
 {
 	return COM_ParseExt( data_p, qtrue );
 }
+#endif
 
 void COM_ParseError( char *format, ... )
 {
@@ -420,7 +432,11 @@ int COM_Compress( char *data_p ) {
 	return out - data_p;
 }
 
+#ifdef IOQ3ZTM // PARSE_SKINS
+char *COM_ParseExt2( char **data_p, qboolean allowLineBreaks, char delimiter )
+#else
 char *COM_ParseExt( char **data_p, qboolean allowLineBreaks )
+#endif
 {
 	int c = 0, len;
 	qboolean hasNewLines = qfalse;
@@ -514,7 +530,12 @@ char *COM_ParseExt( char **data_p, qboolean allowLineBreaks )
 		c = *data;
 		if ( c == '\n' )
 			com_lines++;
-	} while (c>32);
+	}
+#ifdef IOQ3ZTM // PARSE_SKINS
+	while (c>32 && c != delimiter);
+#else
+	while (c>32);
+#endif
 
 	com_token[len] = 0;
 

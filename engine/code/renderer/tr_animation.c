@@ -411,7 +411,21 @@ void R_MDRAddAnimSurfaces( trRefEntity_t *ent ) {
 			{
 				if (!strcmp(skin->surfaces[j]->name, surface->name))
 				{
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+					int index;
+
+					if (ent->e.skinFraction == 1.0f) {
+						index = skin->surfaces[j]->numShaders-1;
+					} else if (ent->e.skinFraction == 0.0f) {
+						index = 0;
+					} else { // >= 0 && < 1
+						index = (ent->e.skinFraction * skin->surfaces[j]->numShaders);
+					}
+
+					shader = skin->surfaces[j]->shaders[index];
+#else
 					shader = skin->surfaces[j]->shader;
+#endif
 					break;
 				}
 			}

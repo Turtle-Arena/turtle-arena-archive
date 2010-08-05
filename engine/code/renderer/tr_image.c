@@ -2024,6 +2024,7 @@ SKINS
 ============================================================================
 */
 
+#ifndef IOQ3ZTM // PARSE_SKINS
 /*
 ==================
 CommaParse
@@ -2130,6 +2131,7 @@ static char *CommaParse( char **data_p ) {
 	*data_p = ( char * ) data;
 	return com_token;
 }
+#endif
 
 
 /*
@@ -2195,7 +2197,12 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	if ( strcmp( name + strlen( name ) - 5, ".skin" ) ) {
 		skin->numSurfaces = 1;
 		skin->surfaces[0] = ri.Hunk_Alloc( sizeof(skin->surfaces[0]), h_low );
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+		skin->surfaces[0]->shaders[0] = R_FindShader( name, LIGHTMAP_NONE, qtrue );
+		skin->surfaces[0]->numShaders = 1;
+#else
 		skin->surfaces[0]->shader = R_FindShader( name, LIGHTMAP_NONE, qtrue );
+#endif
 		return hSkin;
 	}
 
@@ -2224,7 +2231,11 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	text_p = text.c;
 	while ( text_p && *text_p ) {
 		// get surface name
+#ifdef IOQ3ZTM // PARSE_SKINS
+		token = COM_ParseExt2( &text_p, qtrue, ',' );
+#else
 		token = CommaParse( &text_p );
+#endif
 		Q_strncpyz( surfName, token, sizeof( surfName ) );
 
 		if ( !token[0] ) {
@@ -2241,11 +2252,49 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 			continue;
 		}
 		
+#ifndef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
 		// parse the shader name
+#ifdef IOQ3ZTM // PARSE_SKINS
+		token = COM_ParseExt2( &text_p, qfalse, ',' );
+#else
 		token = CommaParse( &text_p );
+#endif
+#endif
 
 		surf = skin->surfaces[ skin->numSurfaces ] = ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low );
 		Q_strncpyz( surf->name, surfName, sizeof( surf->name ) );
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+		for (surf->numShaders = 0; surf->numShaders < MAX_SKIN_SURFACE_SHADERS; surf->numShaders++)
+		{
+			if ( *text_p == ',' ) {
+				text_p++;
+			}
+
+			token = COM_ParseExt2( &text_p, qfalse, ',' );
+
+			if (!token[0]) {
+				// End of line
+				break;
+			}
+
+#ifdef IOQ3ZTM // $DIR_IN_SKIN
+			// Lengths "$(dir)"=6, PATH_SEPERATOR=1, path=1 or more
+			//  $(dir)/torso.png
+			if (strlen(token) > 6 && Q_stricmpn("$(dir)", token, 6) == 0)
+			{
+				Q_strncpyz(shaderName, path, MAX_QPATH);
+				Q_strcat(shaderName, MAX_QPATH, &token[6]); // skip "$(dir)"
+
+				surf->shaders[surf->numShaders] = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
+			}
+			else {
+				surf->shaders[surf->numShaders] = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+			}
+#else
+			surf->shaders[surf->numShaders] = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+#endif
+		}
+#else
 #ifdef IOQ3ZTM // $DIR_IN_SKIN
 		// Lengths "$(dir)"=6, PATH_SEPERATOR=1, path=1 or more
 		//  $(dir)/torso.png
@@ -2261,6 +2310,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		}
 #else
 		surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+#endif
 #endif
 		skin->numSurfaces++;
 	}
@@ -2292,7 +2342,12 @@ void	R_InitSkins( void ) {
 	Q_strncpyz( skin->name, "<default skin>", sizeof( skin->name )  );
 	skin->numSurfaces = 1;
 	skin->surfaces[0] = ri.Hunk_Alloc( sizeof( *skin->surfaces ), h_low );
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	skin->surfaces[0]->shaders[0] = tr.defaultShader;
+	skin->surfaces[0]->numShaders = 1;
+#else
 	skin->surfaces[0]->shader = tr.defaultShader;
+#endif
 }
 
 /*
@@ -2313,7 +2368,11 @@ R_SkinList_f
 ===============
 */
 void	R_SkinList_f( void ) {
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	int			i, j, k;
+#else
 	int			i, j;
+#endif
 	skin_t		*skin;
 
 	ri.Printf (PRINT_ALL, "------------------\n");
@@ -2323,8 +2382,18 @@ void	R_SkinList_f( void ) {
 
 		ri.Printf( PRINT_ALL, "%3i:%s\n", i, skin->name );
 		for ( j = 0 ; j < skin->numSurfaces ; j++ ) {
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+			ri.Printf( PRINT_ALL, "       %s =", skin->surfaces[j]->name );
+
+			for ( k = 0 ; k < skin->surfaces[j]->numShaders ; k++ ) {
+				ri.Printf( PRINT_ALL, " %s", skin->surfaces[j]->shaders[k]->name );
+			}
+
+			ri.Printf( PRINT_ALL, "\n" );
+#else
 			ri.Printf( PRINT_ALL, "       %s = %s\n", 
 				skin->surfaces[j]->name, skin->surfaces[j]->shader->name );
+#endif
 		}
 	}
 	ri.Printf (PRINT_ALL, "------------------\n");

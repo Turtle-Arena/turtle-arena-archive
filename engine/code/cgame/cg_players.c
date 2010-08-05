@@ -3195,6 +3195,9 @@ void CG_Player( centity_t *cent ) {
 	//
 	legs.hModel = ci->legsModel;
 	legs.customSkin = ci->legsSkin;
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	legs.skinFraction = cent->currentState.skinFraction;
+#endif
 
 	VectorCopy( cent->lerpOrigin, legs.origin );
 
@@ -3219,6 +3222,9 @@ void CG_Player( centity_t *cent ) {
 	}
 
 	torso.customSkin = ci->torsoSkin;
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	torso.skinFraction = cent->currentState.skinFraction;
+#endif
 
 	VectorCopy( cent->lerpOrigin, torso.lightingOrigin );
 
@@ -3497,6 +3503,9 @@ void CG_Player( centity_t *cent ) {
 		return;
 	}
 	head.customSkin = ci->headSkin;
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	head.skinFraction = cent->currentState.skinFraction;
+#endif
 
 	VectorCopy( cent->lerpOrigin, head.lightingOrigin );
 
