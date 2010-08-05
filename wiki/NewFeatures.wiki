@@ -72,7 +72,7 @@ tag_torso,
 Player model config file.
 
 === soundpath ===
-_Added by define TA_PLAYERSYS in engine._
+_Search for "soundpath" in the code to see implantation, it is added by the define TA_PLAYERSYS._
 
 By placing "soundpath NAME" in animation.cfg the client will use sounds from "sound/NAME/" instead of "sound/HEADMODELNAME/". Soundpath defaults to the client's headmodel name (which is usually the player model directory name).
 
