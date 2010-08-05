@@ -51,6 +51,22 @@ l_leg_left,$(dir)/legs.png
 tag_torso,
 }}}
 
+=== Damage Shaders ===
+_Search for "IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS" in the code to see implantation._
+
+Player skins can have extra shaders that are used when the player is damaged. There can be up to 10 shaders.
+
+If there are 3 shaders, the first is used when health is 66-100, the second is used when health is 33-66, the last is used when health is 0-33. If there are 4 shaders, the first is 75-100, the second is 50-75, the third is 25-50, the last is 0-25. This continues for up to 10 shaders.
+
+Each mesh can have a different number of shaders.
+
+Example skin:
+{{{
+l_legs,players/raph/legs,players/raph/legs_damaged1,players/raph/legs_damaged2
+l_mesh,players/raph/mesh,players/raph/mesh_damaged
+l_static_mesh,players/raph/show_no_damage
+tag_torso,
+}}}
 
 == animations.cfg ==
 Player model config file.

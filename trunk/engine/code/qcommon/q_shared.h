@@ -677,7 +677,10 @@ int		COM_GetCurrentParseLine( void );
 #ifndef BSPC // ZTM: BSP2
 char	*COM_Parse( char **data_p );
 #endif
-char	*COM_ParseExt( char **data_p, qboolean allowLineBreak );
+char	*COM_ParseExt( char **data_p, qboolean allowLineBreaks );
+#ifdef IOQ3ZTM // PARSE_SKINS
+char	*COM_ParseExt2( char **data_p, qboolean allowLineBreaks, char delimiter );
+#endif
 int		COM_Compress( char *data_p );
 void	COM_ParseError( char *format, ... ) __attribute__ ((format (printf, 1, 2)));
 void	COM_ParseWarning( char *format, ... ) __attribute__ ((format (printf, 1, 2)));
@@ -1297,6 +1300,9 @@ typedef struct entityState_s {
 	int		torsoAnim;		// mask off ANIM_TOGGLEBIT
 #ifdef TA_WEAPSYS
 	int		weaponHands;
+#endif
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	float	skinFraction;
 #endif
 
 	int		generic1;

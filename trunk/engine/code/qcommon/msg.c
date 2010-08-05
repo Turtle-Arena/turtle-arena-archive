@@ -905,6 +905,9 @@ netField_t	entityStateFields[] =
 #ifdef TA_WEAPSYS
 ,{ NETF(weaponHands), 4 }
 #endif
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+,{ NETF(skinFraction), 0 }
+#endif
 };
 
 

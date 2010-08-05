@@ -492,9 +492,17 @@ typedef struct {
 //=================================================================================
 
 // skins allow models to be retextured without modifying the model file
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+#define MAX_SKIN_SURFACE_SHADERS 10
+#endif
 typedef struct {
 	char		name[MAX_QPATH];
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	shader_t	*shaders[MAX_SKIN_SURFACE_SHADERS];
+	int			numShaders;
+#else
 	shader_t	*shader;
+#endif
 } skinSurface_t;
 
 typedef struct skin_s {

@@ -278,7 +278,17 @@ CG_Draw3DModel
 
 ================
 */
-void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles ) {
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles )
+{
+	CG_Draw3DModelExt(x, y, w, h, model, skin, origin, angles, 0.0f);
+}
+
+void CG_Draw3DModelExt( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, float skinFraction )
+#else
+void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles )
+#endif
+{
 	refdef_t		refdef;
 	refEntity_t		ent;
 
@@ -295,6 +305,9 @@ void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandl
 	VectorCopy( origin, ent.origin );
 	ent.hModel = model;
 	ent.customSkin = skin;
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	ent.skinFraction = skinFraction;
+#endif
 	ent.renderfx = RF_NOSHADOW;		// no stencil shadows
 
 	refdef.rdflags = RDF_NOWORLDMODEL;
@@ -356,7 +369,11 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 		VectorAdd( origin, ci->headOffset, origin );
 #endif
 
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+		CG_Draw3DModelExt( x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles, cg_entities[clientNum].currentState.skinFraction );
+#else
 		CG_Draw3DModel( x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles );
+#endif
 	} else if ( cg_drawIcons.integer ) {
 		CG_DrawPic( x, y, w, h, ci->modelIcon );
 	}
