@@ -220,6 +220,9 @@ Weapons (and attacking)
     * multiple animations can animate at the same time
   * TODO-after-above: Re-rig and reanimate players in Blender for MD5? (or add MD5 export to MM3D?)
 
+  * TODO: Add an alphaGen function for the inverse of the entity's skinFraction
+  * TODO: Rename skinFraction ...
+
 == Objects ==
 Most of the mapobjects should be damageable.
 
