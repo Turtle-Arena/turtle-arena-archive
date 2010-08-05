@@ -214,7 +214,7 @@ else # END QUAKE3
 
 	# Turtle Arena "general" defines
 	#####
-	# IOQ3ZTM				ZTurtleMan's misc changes and fixes to IOQuake3
+	# IOQ3ZTM				ZTurtleMan's misc changes and fixes to IOQuake3 (Should be q3 mod compatible)
 	# IOQ3ZTM_NO_COMPAT		Changes that are not compatible with quake3 mods
 	#
 	#   1. EAR_IN_ENTITY; It fixes checking if we are in first person in sound code.
@@ -225,6 +225,8 @@ else # END QUAKE3
 	#   3. EFLAG_FIX; Fix playerState not geting some higher eflag bits,
 	#                    entities sent 19 eflag bits, and playerState sent 16; Send 32 bits!
 	#       May cause problems with Quake3, not sure and untested...
+    #   4. DAMAGE_SKINS; Allows player skins to have shaders to use when damaged.
+    #       Adds a new var "skinFraction" to entityState_t and refEntity_t
 	#
 	# IOQ3ZTM_NO_TEAM_MODEL	Removes team_model and team_headmodel cvars. (Could break Quake III: Team Arena and other mods?)
 	#####
