@@ -1029,7 +1029,7 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 	if (targ->health > 0 && inflictor->s.weapon != WP_NONE)
 	{
 		if (inflictor->s.eType == ET_MISSILE)
-			tent->s.otherEntityNum = bg_projectileinfo[inflictor->s.weapon].wallmarkRadius;
+			tent->s.otherEntityNum = bg_projectileinfo[inflictor->s.weapon].hitMarkRadius;
 		else if (inflictor == attacker && inflictor->client) // Melee damage
 			tent->s.otherEntityNum = bg_weapongroupinfo[inflictor->s.weapon].weapon[0]->impactMarkRadius;
 	}

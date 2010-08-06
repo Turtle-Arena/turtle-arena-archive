@@ -517,8 +517,8 @@ typedef struct projectileInfo_s {
 
 
 	// Hit mark and sounds
-	qhandle_t		wallmarkShader;
-	int				wallmarkRadius;
+	qhandle_t		hitMarkShader;
+	int				hitMarkRadius;
 	sfxHandle_t		hitSound[3]; // Normal hit sounds, random select
 	sfxHandle_t		hitPlayerSound;
 	sfxHandle_t		hitMetalSound;

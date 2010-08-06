@@ -8,9 +8,9 @@ projectile "p_rail"
 	damage 100
 	trailType PT_RAIL
 	deathType PD_RAIL
-	wallmarkName "gfx/damage/plasma_mrk"
-	wallmarkRadius 24
-	wallmarkColorize 1
+	hitMarkName "gfx/damage/plasma_mrk"
+	hitMarkRadius 24
+	hitMarkColorize 1
 	maxHits 4
 }
 

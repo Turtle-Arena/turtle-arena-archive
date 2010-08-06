@@ -1995,40 +1995,40 @@ static qboolean Projectile_Parse(char **p) {
 			}
 			projectile.maxHits = atoi(token);
 			continue;
-		} else if ( !Q_stricmp( token, "wallmarkFadeAlpha" ) ) {
+		} else if ( !Q_stricmp( token, "hitMarkFadeAlpha" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
 			if (atoi(token) == 1)
-				projectile.flags |= PF_WALLMARK_FADE_ALPHA;
+				projectile.flags |= PF_HITMARK_FADE_ALPHA;
 			else
-				projectile.flags &= ~PF_WALLMARK_FADE_ALPHA;
+				projectile.flags &= ~PF_HITMARK_FADE_ALPHA;
 			continue;
-		} else if ( !Q_stricmp( token, "wallmarkColorize" ) ) {
+		} else if ( !Q_stricmp( token, "hitMarkColorize" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
 			if (atoi(token) == 1)
-				projectile.flags |= PF_WALLMARK_COLORIZE;
+				projectile.flags |= PF_HITMARK_COLORIZE;
 			else
-				projectile.flags &= ~PF_WALLMARK_COLORIZE;
+				projectile.flags &= ~PF_HITMARK_COLORIZE;
 			continue;
-		} else if ( !Q_stricmp( token, "wallmarkName" ) ) {
+		} else if ( !Q_stricmp( token, "hitMarkName" ) ) {
 			token = COM_Parse( p );
 			if ( *token ) {
-				Com_sprintf(projectile.wallmarkName, sizeof (projectile.wallmarkName), "%s", token);
+				Com_sprintf(projectile.hitMarkName, sizeof (projectile.hitMarkName), "%s", token);
 			} else {
-				projectile.wallmarkName[0] = '\0';
+				projectile.hitMarkName[0] = '\0';
 			}
 			continue;
-		} else if ( !Q_stricmp( token, "wallmarkRadius" ) ) {
+		} else if ( !Q_stricmp( token, "hitMarkRadius" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
-			projectile.wallmarkRadius = atoi(token);
+			projectile.hitMarkRadius = atoi(token);
 			continue;
 		} else if ( !Q_stricmp( token, "hitSound0" ) ) {
 			token = COM_Parse( p );
@@ -3062,10 +3062,10 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tinstantDamage %d\r\n", projectile->instantDamage);
 		FS_Printf2("\tmaxHits %d\r\n", projectile->maxHits);
 
-		FS_Printf2("\twallmarkFadeAlpha %d\r\n", (projectile->flags & PF_WALLMARK_FADE_ALPHA));
-		FS_Printf2("\twallmarkColorize %d\r\n", (projectile->flags & PF_WALLMARK_COLORIZE));
-		FS_Printf2("\twallmarkName \"%s\"\r\n", projectile->wallmarkName);
-		FS_Printf2("\twallmarkRadius %d\r\n", projectile->wallmarkRadius);
+		FS_Printf2("\thitMarkFadeAlpha %d\r\n", (projectile->flags & PF_HITMARK_FADE_ALPHA));
+		FS_Printf2("\thitMarkColorize %d\r\n", (projectile->flags & PF_HITMARK_COLORIZE));
+		FS_Printf2("\thitMarkName \"%s\"\r\n", projectile->hitMarkName);
+		FS_Printf2("\thitMarkRadius %d\r\n", projectile->hitMarkRadius);
 		FS_Printf2("\thitSound0 \"%s\"\r\n", projectile->hitSoundName[0]);
 		FS_Printf2("\thitSound1 \"%s\"\r\n", projectile->hitSoundName[1]);
 		FS_Printf2("\thitSound2 \"%s\"\r\n", projectile->hitSoundName[2]);
