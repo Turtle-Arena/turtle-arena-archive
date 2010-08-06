@@ -1317,9 +1317,10 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.bloodExplosionShader = trap_R_RegisterShader( "bloodExplosion" );
 #endif
 #ifdef TURTLEARENA // WEAPONS
-	cgs.media.meleeHit1Shader = trap_R_RegisterShader( "meleeHit1" );
-	cgs.media.meleeHit2Shader = trap_R_RegisterShader( "meleeHit2" );
-	cgs.media.meleeHit3Shader = trap_R_RegisterShader( "meleeHit3" );
+	cgs.media.meleeHitShader[0] = trap_R_RegisterShader( "meleeHit1" );
+	cgs.media.meleeHitShader[1] = trap_R_RegisterShader( "meleeHit2" );
+	cgs.media.missileHitShader[0] = trap_R_RegisterShader( "missileHit1" );
+	cgs.media.missileHitShader[1] = trap_R_RegisterShader( "missileHit2" );
 #endif
 
 #ifdef TA_WEAPSYS
