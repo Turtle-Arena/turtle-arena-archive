@@ -3575,17 +3575,27 @@ void CG_FireWeapon( centity_t *cent ) {
 #endif
 }
 
-#ifdef TURTLEARENA // WEAPONS
+#ifdef TA_WEAPSYS
 /*
 =================
-CG_MeleeHit
+CG_PlayerHitEffect
 
-Spawn "hit marker", based on CG_Bleed
+Spawn hit marker, based on CG_Bleed
 =================
 */
-void CG_MeleeHit( vec3_t origin ) {
+void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 	localEntity_t	*ex;
-	int r = rand()%3;
+	int r;
+
+#ifndef NOBLOOD
+#ifndef TURTLEARENA // WEAPONS
+	if ( !cg_blood.integer ) {
+		return;
+	}
+#endif
+#endif
+
+	r = rand()%3;
 
 	ex = CG_AllocLocalEntity();
 	ex->leType = LE_EXPLOSION;
@@ -3598,12 +3608,52 @@ void CG_MeleeHit( vec3_t origin ) {
 	ex->refEntity.rotation = rand() % 360;
 	ex->refEntity.radius = 24;
 
-	if (r < 1)
-		ex->refEntity.customShader = cgs.media.meleeHit1Shader;
-	else if (r < 2)
-		ex->refEntity.customShader = cgs.media.meleeHit2Shader;
+#ifndef NOBLOOD
+	if (cg_blood.integer)
+	{
+		ex->refEntity.customShader = cgs.media.bloodExplosionShader;
+	}
 	else
-		ex->refEntity.customShader = cgs.media.meleeHit3Shader;
+#endif
+	{
+#ifdef TURTLEARENA // WEAPONS
+		//if (meleeDamage)
+		//{
+			if (r < 1)
+				ex->refEntity.customShader = cgs.media.meleeHit1Shader;
+			else if (r < 2)
+				ex->refEntity.customShader = cgs.media.meleeHit2Shader;
+			else
+				ex->refEntity.customShader = cgs.media.meleeHit3Shader;
+		/*}
+		else
+		{
+#if 0
+			// missile damage
+			if (r < 1)
+				ex->refEntity.customShader = cgs.media.missileHit1Shader;
+			else if (r < 2)
+				ex->refEntity.customShader = cgs.media.missileHit2Shader;
+			else
+				ex->refEntity.customShader = cgs.media.missileHit3Shader;
+#endif
+		}*/
+#endif
+	}
+
+	// don't show player's own blood in view
+	if ( entityNum == cg.snap->ps.clientNum
+#ifdef IOQ3ZTM // Show player their own blood in third person
+		&& !cg.renderingThirdPerson
+#endif
+		)
+	{
+#ifdef IOQ3ZTM // RENDERFLAGS
+		ex->refEntity.renderfx |= RF_ONLY_MIRROR;
+#else
+		ex->refEntity.renderfx |= RF_THIRD_PERSON;
+#endif
+	}
 }
 #endif
 
@@ -4223,8 +4273,12 @@ CG_MissileHitPlayer
 =================
 */
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum ) {
+#ifdef TA_WEAPSYS
+	CG_PlayerHitEffect( origin, entityNum, qtrue );
+#else
 #ifndef NOBLOOD
 	CG_Bleed( origin, entityNum );
+#endif
 #endif
 
 	// some weapons will make an explosion with the blood, while
@@ -4388,8 +4442,6 @@ void CG_WeaponImpact( int weaponGroup, int hand, int clientNum, vec3_t origin, v
 	exp_base = 30;
 	exp_add = 42;
 
-	//CG_MeleeHit(origin);
-
 #if 0 // #ifdef TURTLEARENA // WEAPONS // ZTM: TODO: Only when hit entity that take_damage and not client.
 	if (soundType != IMPACTSOUND_FLESH)
 	{
@@ -4499,14 +4551,9 @@ Melee weapon hit player
 */
 void CG_WeaponHitPlayer( int weaponGroup, int hand, vec3_t origin, vec3_t dir, int entityNum )
 {
-#ifndef NOBLOOD
-	if ((bg_weapongroupinfo[weaponGroup].weapon[hand]->flags & WIF_CUTS) || (rand()&20 > 15)) {
-		CG_Bleed( origin, entityNum );
+	if ((bg_weapongroupinfo[weaponGroup].weapon[hand]->flags & WIF_CUTS) || ((rand()&20) > 15)) {
+		CG_PlayerHitEffect(origin, entityNum, qtrue);
 	}
-#endif
-#ifdef TURTLEARENA // WEAPONS
-	CG_MeleeHit(origin);
-#endif
 }
 #endif
 
