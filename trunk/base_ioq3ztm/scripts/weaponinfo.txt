@@ -464,11 +464,12 @@ projectile "p_nail"
 	speed 555
 	spdRndAdd 1800
 	timetolive 10000
-	trailType "PT_NAIL"
-	hitMarkName "gfx/damage/hole_lg_mrk"
-	hitMarkRadius 12
 	spread 500
 	numProjectiles 15
+	trailType "PT_NAIL"
+	deathType "PD_NONE_EXP_PLAYER"
+	hitMarkName "gfx/damage/hole_lg_mrk"
+	hitMarkRadius 12
 	hitPlayerSound "sound/weapons/nailgun/wnalimpl.wav"
 	hitMetalSound "sound/weapons/nailgun/wnalimpm.wav"
 	hitSound0 "sound/weapons/nailgun/wnalimpd.wav"
