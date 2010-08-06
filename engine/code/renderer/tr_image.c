@@ -2284,12 +2284,12 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 			{
 				Q_strncpyz(shaderName, path, MAX_QPATH);
 				Q_strcat(shaderName, MAX_QPATH, &token[6]); // skip "$(dir)"
-
-				surf->shaders[surf->numShaders] = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
 			}
 			else {
-				surf->shaders[surf->numShaders] = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+				Q_strncpyz(shaderName, token, MAX_QPATH);
 			}
+
+			surf->shaders[surf->numShaders] = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
 #else
 			surf->shaders[surf->numShaders] = R_FindShader( token, LIGHTMAP_NONE, qtrue );
 #endif
