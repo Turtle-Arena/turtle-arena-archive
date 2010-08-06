@@ -1162,7 +1162,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 #endif
 			)
 		{
-			goto missileImpact;
+			goto missileExplode;
 		}
 
 		// Don't stick to the entity that this missile just killed.
@@ -1177,7 +1177,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 			}
 			else
 			{
-				goto missileImpact;
+				goto missileExplode;
 			}
 		}
 
@@ -1355,7 +1355,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	}
 
 #ifdef TA_WEAPSYS
-missileImpact:
+missileExplode:
 #endif
 
 	// is it cheaper in bandwidth to just remove this ent and create a new
