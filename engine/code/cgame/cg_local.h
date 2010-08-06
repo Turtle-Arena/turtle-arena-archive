@@ -1841,11 +1841,7 @@ void CG_FireWeapon( centity_t *cent );
 #ifdef TA_MISC // MATERIALS
 void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFlags, int skipNum );
 #endif
-#ifdef TA_WEAPSYS
 void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
-#else
-void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );
-#endif
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum );
 #ifdef TA_WEAPSYS
 void CG_MissileImpact( int projnum, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType );

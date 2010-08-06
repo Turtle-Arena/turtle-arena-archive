@@ -3772,16 +3772,14 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 
 /*
 =================
-CG_MissileHitWall
+CG_MissileExplode
+
+Formerly known as CG_MissileHitWall
 
 Caused by an EV_MISSILE_MISS event, or directly by local bullet tracing
 =================
 */
-#ifdef TA_WEAPSYS
 void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
-#else
-void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
-#endif
 {
 	qhandle_t		mod;
 	qhandle_t		mark;
@@ -4244,7 +4242,7 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 	case WP_CHAINGUN:
 	case WP_PROX_LAUNCHER:
 #endif
-		CG_MissileHitWall( weapon, 0, origin, dir, IMPACTSOUND_FLESH );
+		CG_MissileExplode( weapon, 0, origin, dir, IMPACTSOUND_FLESH );
 		break;
 	default:
 		break;
@@ -4561,9 +4559,9 @@ static void CG_ShotgunPellet( vec3_t start, vec3_t end, int skipNum ) {
 			return;
 		}
 		if ( tr.surfaceFlags & SURF_METALSTEPS ) {
-			CG_MissileHitWall( WP_SHOTGUN, 0, tr.endpos, tr.plane.normal, IMPACTSOUND_METAL );
+			CG_MissileExplode( WP_SHOTGUN, 0, tr.endpos, tr.plane.normal, IMPACTSOUND_METAL );
 		} else {
-			CG_MissileHitWall( WP_SHOTGUN, 0, tr.endpos, tr.plane.normal, IMPACTSOUND_DEFAULT );
+			CG_MissileExplode( WP_SHOTGUN, 0, tr.endpos, tr.plane.normal, IMPACTSOUND_DEFAULT );
 		}
 	}
 }
@@ -4834,7 +4832,7 @@ void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, 
 #ifdef TA_WEAPSYS
 		CG_MissileExplode( projnum, 0, end, normal, IMPACTSOUND_DEFAULT );
 #else
-		CG_MissileHitWall( WP_MACHINEGUN, 0, end, normal, IMPACTSOUND_DEFAULT );
+		CG_MissileExplode( WP_MACHINEGUN, 0, end, normal, IMPACTSOUND_DEFAULT );
 #endif
 	}
 
