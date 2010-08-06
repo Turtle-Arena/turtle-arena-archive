@@ -3595,7 +3595,7 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 #endif
 #endif
 
-	r = rand()%3;
+	r = rand()%2;
 
 	ex = CG_AllocLocalEntity();
 	ex->leType = LE_EXPLOSION;
@@ -3617,27 +3617,21 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 #endif
 	{
 #ifdef TURTLEARENA // WEAPONS
-		//if (meleeDamage)
-		//{
-			if (r < 1)
-				ex->refEntity.customShader = cgs.media.meleeHit1Shader;
-			else if (r < 2)
-				ex->refEntity.customShader = cgs.media.meleeHit2Shader;
+		if (meleeDamage)
+		{
+			if (r >= 1 && cgs.media.meleeHitShader[1])
+				ex->refEntity.customShader = cgs.media.meleeHitShader[1];
 			else
-				ex->refEntity.customShader = cgs.media.meleeHit3Shader;
-		/*}
+				ex->refEntity.customShader = cgs.media.meleeHitShader[0];
+		}
 		else
 		{
-#if 0
 			// missile damage
-			if (r < 1)
-				ex->refEntity.customShader = cgs.media.missileHit1Shader;
-			else if (r < 2)
-				ex->refEntity.customShader = cgs.media.missileHit2Shader;
+			if (r >= 1 && cgs.media.missileHitShader[1])
+				ex->refEntity.customShader = cgs.media.missileHitShader[1];
 			else
-				ex->refEntity.customShader = cgs.media.missileHit3Shader;
-#endif
-		}*/
+				ex->refEntity.customShader = cgs.media.missileHitShader[0];
+		}
 #endif
 	}
 
@@ -4274,7 +4268,7 @@ CG_MissileHitPlayer
 */
 void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum ) {
 #ifdef TA_WEAPSYS
-	CG_PlayerHitEffect( origin, entityNum, qtrue );
+	CG_PlayerHitEffect( origin, entityNum, qfalse );
 #else
 #ifndef NOBLOOD
 	CG_Bleed( origin, entityNum );
@@ -4451,13 +4445,11 @@ void CG_WeaponImpact( int weaponGroup, int hand, int clientNum, vec3_t origin, v
 		exp_base = 30 / 3;
 		exp_add = 42 / 4;
 
-		r = rand() & 3;
-		if (r < 1)
-			shader = cgs.media.meleeHit1Shader;
-		else if (r < 2)
-			shader = cgs.media.meleeHit2Shader;
+		r = rand() & 2;
+		if (r >= 1 && cgs.media.meleeHitShader[1])
+			shader = cgs.media.meleeHitShader[1];
 		else
-			shader = cgs.media.meleeHit3Shader;
+			shader = cgs.media.meleeHitShader[0];
 	}
 #endif
 

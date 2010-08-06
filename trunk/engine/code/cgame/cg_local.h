@@ -1119,9 +1119,8 @@ typedef struct {
 	qhandle_t	bloodExplosionShader;
 #endif
 #ifdef TURTLEARENA // WEAPONS
-	qhandle_t	meleeHit1Shader;
-	qhandle_t	meleeHit2Shader;
-	qhandle_t	meleeHit3Shader;
+	qhandle_t	meleeHitShader[2];
+	qhandle_t	missileHitShader[2];
 #endif
 
 	// special effects models
