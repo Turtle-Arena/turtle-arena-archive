@@ -521,8 +521,8 @@ typedef enum
 #define PB_HALF 1
 #define PB_FULL 2
 //projectile flags
-#define PF_WALLMARK_FADE_ALPHA 1
-#define PF_WALLMARK_COLORIZE 2
+#define PF_HITMARK_FADE_ALPHA 1
+#define PF_HITMARK_COLORIZE 2
 #define PF_USE_GRAVITY 4
 #define PF_IMPACTMARK_FADE_ALPHA 8
 #define PF_IMPACTMARK_COLORIZE 16
@@ -543,8 +543,8 @@ typedef struct
 	int numProjectiles;
 
 	// Hit marks and sounds
-	char wallmarkName[MAX_QPATH];
-	int wallmarkRadius;
+	char hitMarkName[MAX_QPATH];
+	int  hitMarkRadius;
 	char hitSoundName[3][MAX_QPATH];
 	char hitPlayerSoundName[MAX_QPATH];
 	char hitMetalSoundName[MAX_QPATH];

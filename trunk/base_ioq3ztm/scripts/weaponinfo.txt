@@ -30,9 +30,9 @@ weapon "w_gauntlet"
 	model "models/weapons2/gauntlet/gauntlet.md3"
 	mod MOD_GAUNTLET
 	attackDelay 400
-	// In Q3 it didn't leave a wallmark
-	//wallmarkName "gfx/damage/hole_lg_mrk"
-	//wallmarkRadius 12
+	// In Quake III Arena the Gauntlet didn't leave a wallmark
+	//impactMarkName "gfx/damage/hole_lg_mrk"
+	//impactMarkRadius 12
 	continuousFlash 1
 	flashColor 0.6 0.6 1.0
 	flashSound0 "sound/weapons/melee/fstatck.wav"
@@ -82,8 +82,8 @@ projectile "p_machinegun"
 	trailType PT_BULLET
 	deathType PD_BULLET
 	explosionType "PE_NONE"
-	wallmarkName "gfx/damage/bullet_mrk"
-	wallmarkRadius 8
+	hitMarkName "gfx/damage/bullet_mrk"
+	hitMarkRadius 8
 	spread 200
 }
 
@@ -123,8 +123,8 @@ projectile "p_shotgun"
 	damage 10
 	deathType PD_BULLET
 	explosionType "PE_NONE"
-	wallmarkName "gfx/damage/bullet_mrk"
-	wallmarkRadius 8
+	hitMarkName "gfx/damage/bullet_mrk"
+	hitMarkRadius 8
 	spread 700
 	numprojectiles 11
 }
@@ -169,8 +169,8 @@ projectile "p_grenade"
 	trailType PT_GRENADE
 	deathType PD_GRENADE
 	spinType PS_ROLL
-	wallmarkName "gfx/damage/burn_med_mrk"
-	wallmarkRadius 64
+	hitMarkName "gfx/damage/burn_med_mrk"
+	hitMarkRadius 64
 	bounceType "PB_HALF"
 	useGravity 1
 	impactSound0 "sound/weapons/grenade/hgrenb1a.wav"
@@ -216,8 +216,8 @@ projectile "p_rocket"
 	missileSound "sound/weapons/rocket/rockfly.wav"
 	missileDlight 200
 	missileDlightColor 1 .75 0
-	wallmarkName "gfx/damage/burn_med_mrk"
-	wallmarkRadius 64
+	hitMarkName "gfx/damage/burn_med_mrk"
+	hitMarkRadius 64
 }
 
 weapon "w_rocket_launcher"
@@ -252,8 +252,8 @@ projectile "p_lightning bolt"
 	damage 8
 	trailType PT_LIGHTNING
 	deathType PD_LIGHTNING
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 12
+	hitMarkName "gfx/damage/hole_lg_mrk"
+	hitMarkRadius 12
 	speed 768 // range of instantDamage
 	hitSound0 "sound/weapons/lightning/lg_hit.wav"
 	hitSound1 "sound/weapons/lightning/lg_hit2.wav"
@@ -294,9 +294,9 @@ projectile "p_rail"
 	damage 100
 	trailType PT_RAIL
 	deathType PD_RAIL
-	wallmarkName "gfx/damage/plasma_mrk"
-	wallmarkRadius 24
-	wallmarkColorize 1
+	hitMarkName "gfx/damage/plasma_mrk"
+	hitMarkRadius 24
+	hitMarkColorize 1
 	maxHits 4
 }
 
@@ -338,9 +338,9 @@ projectile "p_plasma ball"
 	trailType PT_PLASMA
 	deathType PD_PLASMA
 	missileSound "sound/weapons/plasma/lasfly.wav"
-	wallmarkName "gfx/damage/plasma_mrk"
-	wallmarkRadius 16
-	wallmarkFadeAlpha 1
+	hitMarkName "gfx/damage/plasma_mrk"
+	hitMarkRadius 16
+	hitMarkFadeAlpha 1
 }
 
 weapon "w_plasmagun"
@@ -379,8 +379,8 @@ projectile "p_bfg"
 	timetolive 10000
 	deathType PD_BFG
 	missileSound "sound/weapons/rocket/rockfly.wav"
-	wallmarkName "gfx/damage/burn_med_mrk"
-	wallmarkRadius 32
+	hitMarkName "gfx/damage/burn_med_mrk"
+	hitMarkRadius 32
 }
 
 weapon "w_bfg"
@@ -419,8 +419,8 @@ projectile "p_grappling hook"
 	trailType "PT_LIGHTNING"
 	missileDlight 200
 	missileDlightColor 1 .75 0
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 12
+	hitMarkName "gfx/damage/hole_lg_mrk"
+	hitMarkRadius 12
 	grappling 1
 }
 
@@ -465,8 +465,8 @@ projectile "p_nail"
 	spdRndAdd 1800
 	timetolive 10000
 	trailType "PT_NAIL"
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 12
+	hitMarkName "gfx/damage/hole_lg_mrk"
+	hitMarkRadius 12
 	spread 500
 	numProjectiles 15
 	hitPlayerSound "sound/weapons/nailgun/wnalimpl.wav"
@@ -559,8 +559,8 @@ projectile "p_chaingun"
 	trailType "PT_BULLET"
 	deathType "PD_BULLET"
 	explosionType "PE_NONE"
-	wallmarkName "gfx/damage/bullet_mrk"
-	wallmarkRadius 8
+	hitMarkName "gfx/damage/bullet_mrk"
+	hitMarkRadius 8
 	spread 600
 
 	// In vanilla Quake III: Team Arena, Chaingun sounds were overriden with normal bullet sounds.

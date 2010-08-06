@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //  Blade origin and tip are "forward, right, up" (Values of less then 0 are backward, left, down)
 //  Speed is range for instantDamage weapons (Lightning gun uses 768)
 
-// wallmarkName/impactMarkName (Quake3 uses the following, but any image/shader can be used)
+// hitMarkName/impactMarkName (Quake3 uses the following, but any image/shader can be used)
 // 	cgs.media.bulletMarkShader = trap_R_RegisterShader( "gfx/damage/bullet_mrk" );
 //	cgs.media.burnMarkShader = trap_R_RegisterShader( "gfx/damage/burn_med_mrk" );
 //	cgs.media.holeMarkShader = trap_R_RegisterShader( "gfx/damage/hole_lg_mrk" );
@@ -264,7 +264,7 @@ weapon "w_sai"
 		tip 0 0 16
 		trailStyle default
 	}
-	// I have these mostly for wallmarks.
+	// I have these mostly for impact marks.
 	blade 1
 	{
 		damage 1
@@ -797,8 +797,8 @@ projectile "p_pulse"
 	//timetolive 10000
 	//trailType PT_BULLET
 	deathType PD_BULLET_COLORIZE
-	wallmarkName "gfx/damage/bullet_mrk"
-	wallmarkRadius 8
+	hitMarkName "gfx/damage/bullet_mrk"
+	hitMarkRadius 8
 	//spread 200
 
 	instantDamage 1
@@ -851,9 +851,9 @@ projectile "p_energy ball"
 	trailType PT_PLASMA
 	deathType PD_PLASMA
 	missileSound "sound/weapons/plasma/lasfly.wav"
-	wallmarkName "gfx/damage/plasma_mrk"
-	wallmarkRadius 16
-	wallmarkFadeAlpha 1
+	hitMarkName "gfx/damage/plasma_mrk"
+	hitMarkRadius 16
+	hitMarkFadeAlpha 1
 }
 
 weapon "w_electric_launcher"
@@ -904,8 +904,8 @@ projectile "p_rocket"
 	missileSound "sound/weapons/rocket/rockfly.wav"
 	missileDlight 200
 	missileDlightColor 1 .75 0
-	wallmarkName "gfx/damage/burn_med_mrk"
-	wallmarkRadius 64
+	hitMarkName "gfx/damage/burn_med_mrk"
+	hitMarkRadius 64
 }
 
 weapon "w_rocket_launcher"
@@ -957,8 +957,8 @@ projectile "p_homing rocket"
 	missileSound "sound/weapons/rocket/rockfly.wav"
 	missileDlight 100
 	missileDlightColor 1 .75 0
-	wallmarkName "gfx/damage/burn_med_mrk"
-	wallmarkRadius 32
+	hitMarkName "gfx/damage/burn_med_mrk"
+	hitMarkRadius 32
 	homing 600
 }
 
@@ -1006,8 +1006,8 @@ projectile "p_grappling hook"
 	timetolive 10000
 	trailType "PT_GRAPPLE"
 	deathType "PD_BULLET"
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 12
+	hitMarkName "gfx/damage/hole_lg_mrk"
+	hitMarkRadius 12
 	grappling 1
 	spinType "PS_NONE"
 }

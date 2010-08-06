@@ -974,9 +974,9 @@ void CG_RegisterProjectile( int projectileNum )
 		projectileInfo->missileSound = trap_S_RegisterSound( bgProj->missileSoundName, qfalse );
 
 	// Hit mark and sounds
-	if (bgProj->wallmarkName[0] != '\0')
-		projectileInfo->wallmarkShader = trap_R_RegisterShader(bgProj->wallmarkName);
-	projectileInfo->wallmarkRadius = bgProj->wallmarkRadius;
+	if (bgProj->hitMarkName[0] != '\0')
+		projectileInfo->hitMarkShader = trap_R_RegisterShader(bgProj->hitMarkName);
+	projectileInfo->hitMarkRadius = bgProj->hitMarkRadius;
 
 	for (i = 0; i< 3; i++)
 	{
@@ -1178,7 +1178,7 @@ void CG_RegisterWeapon( int weaponNum )
 
 	VectorCopy(weap->flashColor, weaponInfo->flashDlightColor);
 
-	// wallmark
+	// Impact mark
 	if (weap->impactMarkName[0] != '\0')
 		weaponInfo->impactMarkShader = trap_R_RegisterShader(weap->impactMarkName);
 	weaponInfo->impactMarkRadius = weap->impactMarkRadius;
@@ -3832,7 +3832,7 @@ void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #endif
 
 #ifdef TA_WEAPSYS
-	// Predicted instant lightning, explosion only (no wallmarks or sounds)
+	// Predicted instant lightning, explosion only (no wallmark or sounds)
 	instantLightningBeam = (soundType == IMPACTSOUND_LIGHTNING_PREDICT);
 
 	// Instant lightning impact, no explosion
@@ -4168,8 +4168,8 @@ void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		return;
 	}
 
-	mark = cg_projectiles[weapon].wallmarkShader;
-	radius = cg_projectiles[weapon].wallmarkRadius;
+	mark = cg_projectiles[weapon].hitMarkShader;
+	radius = cg_projectiles[weapon].hitMarkRadius;
 
 	if (!mark || radius <= 0)
 	{
@@ -4179,13 +4179,13 @@ void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 #endif
 
 	//
-	// impact mark
+	// explosion mark
 	//
 #ifdef TA_WEAPSYS
 	// plasma fades alpha, all others fade color
-	alphaFade = (bg_projectileinfo[weapon].flags & PF_WALLMARK_FADE_ALPHA);
+	alphaFade = (bg_projectileinfo[weapon].flags & PF_HITMARK_FADE_ALPHA);
 
-	if (bg_projectileinfo[weapon].flags & PF_WALLMARK_COLORIZE)
+	if (bg_projectileinfo[weapon].flags & PF_HITMARK_COLORIZE)
 #else
 	alphaFade = (mark == cgs.media.energyMarkShader);	// plasma fades alpha, all others fade color
 	if ( weapon == WP_RAILGUN )
