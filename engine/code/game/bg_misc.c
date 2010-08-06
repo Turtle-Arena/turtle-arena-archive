@@ -2298,7 +2298,7 @@ static qboolean Weapon_Parse(char **p) {
 	weapon.flashColor[0] = 1.0f;
 	weapon.flashColor[1] = 1.0f;
 	weapon.flashColor[2] = 1.0f;
-	weapon.wallmarkRadius = 16;
+	weapon.impactMarkRadius = 16;
 	weapon.barrelSpin = BS_ROLL;
 	// fire_projectile and G_MeleeDamageSingle will use the
 	//     correct default mod (MOD_PORJECTILE or MOD_WEAPON_*)
@@ -2393,42 +2393,42 @@ static qboolean Weapon_Parse(char **p) {
 			}
 			weapon.attackDelay = atoi( token );
 			continue;
-		} else if ( !Q_stricmp( token, "wallmarkName" ) ) {
+		} else if ( !Q_stricmp( token, "impactMarkName" ) ) {
 			token = COM_Parse( p );
 			if ( *token ) {
-				Com_sprintf(weapon.wallmarkName, sizeof (weapon.wallmarkName), "%s", token);
+				Com_sprintf(weapon.impactMarkName, sizeof (weapon.impactMarkName), "%s", token);
 			}
 			else
 			{
-				weapon.wallmarkName[0] = '\0';
+				weapon.impactMarkName[0] = '\0';
 			}
 			continue;
-		} else if ( !Q_stricmp( token, "wallmarkRadius" ) ) {
+		} else if ( !Q_stricmp( token, "impactMarkRadius" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
-			weapon.wallmarkRadius = atoi( token );
+			weapon.impactMarkRadius = atoi( token );
 			continue;
-		} else if ( !Q_stricmp( token, "wallmarkFadeAlpha" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_WALLMARK_FADE_ALPHA;
-			else
-				weapon.flags &= ~WIF_WALLMARK_FADE_ALPHA;
-			continue;
-		} else if ( !Q_stricmp( token, "wallmarkColorize" ) ) {
+		} else if ( !Q_stricmp( token, "impactMarkFadeAlpha" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
 			if (atoi(token) == 1)
-				weapon.flags |= WIF_WALLMARK_COLORIZE;
+				weapon.flags |= WIF_IMPACTMARK_FADE_ALPHA;
 			else
-				weapon.flags &= ~WIF_WALLMARK_COLORIZE;
+				weapon.flags &= ~WIF_IMPACTMARK_FADE_ALPHA;
+			continue;
+		} else if ( !Q_stricmp( token, "impactMarkColorize" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			if (atoi(token) == 1)
+				weapon.flags |= WIF_IMPACTMARK_COLORIZE;
+			else
+				weapon.flags &= ~WIF_IMPACTMARK_COLORIZE;
 			continue;
 		} else if ( !Q_stricmp( token, "alwaysDamage" ) ) {
 			token = COM_Parse( p );
@@ -3101,11 +3101,11 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tweapontype %s\r\n", weapontypeNames[weapon->weapontype]);
 		FS_Printf2("\tmod %s\r\n", modNames[weapon->mod]);
 		FS_Printf2("\tattackDelay %d\r\n", weapon->attackDelay);
-		FS_Printf2("\twallmarkName \"%s\"\r\n", weapon->wallmarkName);
-		FS_Printf2("\twallmarkRadius %d\r\n", weapon->wallmarkRadius);
+		FS_Printf2("\timpactMarkName \"%s\"\r\n", weapon->impactMarkName);
+		FS_Printf2("\timpactMarkRadius %d\r\n", weapon->impactMarkRadius);
 
-		FS_Printf2("\twallmarkFadeAlpha %d\r\n", (weapon->flags & WIF_WALLMARK_FADE_ALPHA));
-		FS_Printf2("\twallmarkColorize %d\r\n", (weapon->flags & WIF_WALLMARK_COLORIZE));
+		FS_Printf2("\timpactMarkFadeAlpha %d\r\n", (weapon->flags & WIF_IMPACTMARK_FADE_ALPHA));
+		FS_Printf2("\timpactMarkColorize %d\r\n", (weapon->flags & WIF_IMPACTMARK_COLORIZE));
 		FS_Printf2("\talwaysDamage %d\r\n", (weapon->flags & WIF_ALWAYS_DAMAGE));
 		FS_Printf2("\tcuts %d\r\n", (weapon->flags & WIF_CUTS));
 		FS_Printf2("\tcontinuousFlash %d\r\n", (weapon->flags & WIF_CONTINUOUS_FLASH));
@@ -3239,7 +3239,7 @@ void BG_InitWeaponInfo(void)
 	bg_weaponinfo[0].flashColor[0] = 1.0f;
 	bg_weaponinfo[0].flashColor[1] = 1.0f;
 	bg_weaponinfo[0].flashColor[2] = 1.0f;
-	bg_weaponinfo[0].wallmarkRadius = 16;
+	bg_weaponinfo[0].impactMarkRadius = 16;
 	bg_weaponinfo[0].projnum = 0;
 	bg_weaponinfo[0].proj = &bg_projectileinfo[0];
 
@@ -3279,7 +3279,6 @@ void BG_InitWeaponInfo(void)
 		bg_weaponinfo[1].flashColor[0] = 1.0f;
 		bg_weaponinfo[1].flashColor[1] = 1.0f;
 		bg_weaponinfo[1].flashColor[2] = 1.0f;
-		bg_weaponinfo[1].wallmarkRadius = 16;
 		bg_weaponinfo[1].projnum = 1;
 		bg_weaponinfo[1].proj = &bg_projectileinfo[1];
 		bg_numweapons++;

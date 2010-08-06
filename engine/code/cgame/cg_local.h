@@ -550,9 +550,9 @@ typedef struct weaponInfo_s {
 
 	void			(*ejectBrassFunc)( centity_t * );
 
-	// wall mark and impact sounds for melee weapons
-	qhandle_t		wallmarkShader;
-	int				wallmarkRadius;
+	// Impact mark and impact sounds for melee weapons
+	qhandle_t		impactMarkShader;
+	int				impactMarkRadius;
 	sfxHandle_t		impactSound[3]; // Impact sounds, random select
 	sfxHandle_t		impactPlayerSound;
 	sfxHandle_t		impactMetalSound;

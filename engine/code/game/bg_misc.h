@@ -597,19 +597,18 @@ typedef struct
 	int trailStyle;		///< TRAIL_* defines
 } bg_bladeinfo_t;
 
-// Non-specific
-#define WIF_WALLMARK_FADE_ALPHA	1
-#define WIF_WALLMARK_COLORIZE	2
 // Melee-specific
-#define WIF_ALWAYS_DAMAGE		4 // Do damage even while not attacking, like a lightsaber.
-#define WIF_CUTS				8 // Swords can cuts things that a bo, nunchunk, and sai can not.
+#define WIF_IMPACTMARK_FADE_ALPHA	1
+#define WIF_IMPACTMARK_COLORIZE		2
+#define WIF_ALWAYS_DAMAGE			4 // Do damage even while not attacking, like a lightsaber.
+#define WIF_CUTS					8 // Swords can cuts things that a bo, nunchunk, and sai can not.
 // Guns-specific
-#define WIF_CONTINUOUS_FLASH	16
+#define WIF_CONTINUOUS_FLASH		16
 // Non-specific, Eject "brass" functions
-#define WIF_EJECT_BRASS			32		// CG_MachineGunEjectBrass
-#define WIF_EJECT_BRASS2		64		// CG_ShotgunEjectBrass
-#define WIF_EJECT_SMOKE			128		// CG_NailgunEjectBrass
-#define WIF_EJECT_SMOKE2		256		// Shotgun smoke
+#define WIF_EJECT_BRASS				32		// CG_MachineGunEjectBrass
+#define WIF_EJECT_BRASS2			64		// CG_ShotgunEjectBrass
+#define WIF_EJECT_SMOKE				128		// CG_NailgunEjectBrass
+#define WIF_EJECT_SMOKE2			256		// Shotgun smoke
 
 // Barrel Spin
 #define BS_PITCH PITCH // 0
@@ -645,10 +644,9 @@ typedef struct
 	int barrelSpin; // BS_*
 
 	// melee only
-	char wallmarkName[MAX_QPATH];
-	int wallmarkRadius;
 	bg_bladeinfo_t blades[MAX_WEAPON_BLADES];
-	// wall hit sound names
+	char impactMarkName[MAX_QPATH];
+	int  impactMarkRadius;
 	char impactSoundName[3][MAX_QPATH];
 	char impactPlayerSoundName[MAX_QPATH];
 	char impactMetalSoundName[MAX_QPATH];
