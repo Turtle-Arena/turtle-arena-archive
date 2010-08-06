@@ -649,6 +649,9 @@ typedef struct
 	int wallmarkRadius;
 	bg_bladeinfo_t blades[MAX_WEAPON_BLADES];
 	// wall hit sound names
+	char impactSoundName[3][MAX_QPATH];
+	char impactPlayerSoundName[MAX_QPATH];
+	char impactMetalSoundName[MAX_QPATH];
 
 } bg_weaponinfo_t;
 

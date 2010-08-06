@@ -2124,7 +2124,7 @@ static qboolean Projectile_Parse(char **p) {
 		} else if ( !Q_stricmp( token, "impactSound2" ) ) {
 			token = COM_Parse( p );
 			if ( *token ) {
-				Com_sprintf(projectile.hitSoundName[2], sizeof (projectile.hitSoundName[2]), "%s", token);
+				Com_sprintf(projectile.impactSoundName[2], sizeof (projectile.impactSoundName[2]), "%s", token);
 			} else {
 				projectile.impactSoundName[2][0] = '\0';
 			}
@@ -2603,6 +2603,46 @@ static qboolean Weapon_Parse(char **p) {
 					weapon.barrelSpin = i;
 					break;
 				}
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "impactSound0" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(weapon.impactSoundName[0], sizeof (weapon.impactSoundName[0]), "%s", token);
+			} else {
+				weapon.impactSoundName[0][0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "impactSound1" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(weapon.impactSoundName[1], sizeof (weapon.impactSoundName[1]), "%s", token);
+			} else {
+				weapon.impactSoundName[1][0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "impactSound2" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(weapon.impactSoundName[2], sizeof (weapon.impactSoundName[2]), "%s", token);
+			} else {
+				weapon.impactSoundName[2][0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "impactPlayerSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(weapon.impactPlayerSoundName, sizeof (weapon.impactPlayerSoundName), "%s", token);
+			} else {
+				weapon.impactPlayerSoundName[0] = '\0';
+			}
+			continue;
+		} else if ( !Q_stricmp( token, "impactMetalSound" ) ) {
+			token = COM_Parse( p );
+			if ( *token ) {
+				Com_sprintf(weapon.impactMetalSoundName, sizeof (weapon.impactMetalSoundName), "%s", token);
+			} else {
+				weapon.impactMetalSoundName[0] = '\0';
 			}
 			continue;
 		}
@@ -3087,6 +3127,11 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tflashSound1 \"%s\"\r\n", weapon->flashSoundName[1]);
 		FS_Printf2("\tflashSound2 \"%s\"\r\n", weapon->flashSoundName[2]);
 		FS_Printf2("\tflashSound3 \"%s\"\r\n", weapon->flashSoundName[3]);
+		FS_Printf2("\timpactSound0 \"%s\"\r\n", weapon->impactSoundName[0]);
+		FS_Printf2("\timpactSound1 \"%s\"\r\n", weapon->impactSoundName[1]);
+		FS_Printf2("\timpactSound2 \"%s\"\r\n", weapon->impactSoundName[2]);
+		FS_Printf2("\timpactPlayerSound \"%s\"\r\n", weapon->impactPlayerSoundName);
+		FS_Printf2("\timpactMetalSound \"%s\"\r\n", weapon->impactMetalSoundName);
 		FS_Printf2("\tprojectile \"%s\"\r\n", weapon->proj->name);
 
 		// Dump blades
