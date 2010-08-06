@@ -1310,7 +1310,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 		CG_MissileExplode( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
 #else
-		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
+		CG_MissileExplode( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 #endif
 		break;
 
@@ -1325,7 +1325,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 		CG_MissileExplode( es->weapon, es->clientNum, position, dir, IMPACTSOUND_METAL );
 #else
-		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_METAL );
+		CG_MissileExplode( es->weapon, 0, position, dir, IMPACTSOUND_METAL );
 #endif
 		break;
 
@@ -1361,11 +1361,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		// if the end was on a nomark surface, don't make an explosion
 		if ( es->eventParm != 255 ) {
 			ByteToDir( es->eventParm, dir );
-#ifdef TA_WEAPSYS
 			CG_MissileExplode( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
-#else
-			CG_MissileHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
-#endif
 		}
 		break;
 
