@@ -1308,7 +1308,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			CG_Bullet( es->pos.trBase, es->clientNum, dir, qfalse, es->otherEntityNum, es->weapon );
 			break;
 		}
-		CG_MissileHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
+		CG_MissileExplode( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
 #else
 		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_DEFAULT );
 #endif
@@ -1323,7 +1323,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			CG_Bullet( es->pos.trBase, es->clientNum, dir, qfalse, es->otherEntityNum, es->weapon );
 			break;
 		}
-		CG_MissileHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_METAL );
+		CG_MissileExplode( es->weapon, es->clientNum, position, dir, IMPACTSOUND_METAL );
 #else
 		CG_MissileHitWall( es->weapon, 0, position, dir, IMPACTSOUND_METAL );
 #endif
@@ -1361,7 +1361,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		// if the end was on a nomark surface, don't make an explosion
 		if ( es->eventParm != 255 ) {
 			ByteToDir( es->eventParm, dir );
+#ifdef TA_WEAPSYS
+			CG_MissileExplode( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
+#else
 			CG_MissileHitWall( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
+#endif
 		}
 		break;
 
@@ -1399,13 +1403,13 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_WEAPON_MISS:
 		DEBUGNAME("EV_WEAPON_MISS");
 		ByteToDir( es->eventParm, dir );
-		CG_WeaponHitWall( es->weapon, es->weaponHands, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
+		CG_WeaponImpact( es->weapon, es->weaponHands, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
 		break;
 
 	case EV_WEAPON_MISS_METAL:
 		DEBUGNAME("EV_WEAPON_MISS_METAL");
 		ByteToDir( es->eventParm, dir );
-		CG_WeaponHitWall( es->weapon, es->weaponHands, es->clientNum, position, dir, IMPACTSOUND_METAL );
+		CG_WeaponImpact( es->weapon, es->weaponHands, es->clientNum, position, dir, IMPACTSOUND_METAL );
 		break;
 #endif
 

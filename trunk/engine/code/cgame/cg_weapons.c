@@ -1150,6 +1150,7 @@ void CG_RegisterWeapon( int weaponNum )
 	weaponInfo_t *weaponInfo;
 	bg_weaponinfo_t *weap;
 	char			path[MAX_QPATH];
+	int i;
 
 	weaponInfo = &cg_weapons[weaponNum];
 	weap = &bg_weaponinfo[weaponNum];
@@ -1191,6 +1192,16 @@ void CG_RegisterWeapon( int weaponNum )
 		weaponInfo->flashSound[2] = trap_S_RegisterSound( weap->flashSoundName[2], qfalse );
 	if (weap->flashSoundName[3][0] != '\0')
 		weaponInfo->flashSound[3] = trap_S_RegisterSound( weap->flashSoundName[3], qfalse );
+
+	for (i = 0; i< 3; i++)
+	{
+		if (weap->impactSoundName[i][0] != '\0')
+			weaponInfo->impactSound[i] = trap_S_RegisterSound( weap->impactSoundName[i], qfalse );
+	}
+	if (weap->impactPlayerSoundName[0] != '\0')
+		weaponInfo->impactPlayerSound = trap_S_RegisterSound( weap->impactPlayerSoundName, qfalse );
+	if (weap->impactMetalSoundName[0] != '\0')
+		weaponInfo->impactMetalSound = trap_S_RegisterSound( weap->impactMetalSoundName, qfalse );
 
 	// \unused
 	//weaponInfo->ejectBrassFunc = NULL;
@@ -1883,7 +1894,8 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 
 		VectorMA( trace.endpos, -16, dir, origin );
 
-		CG_MissileHitWall(projnum, cent->currentState.number, origin, dir, IMPACTSOUND_LIGHTNING_PREDICT);
+		// Lightning has to create the explosion each frame
+		CG_MissileExplode(projnum, cent->currentState.number, origin, dir, IMPACTSOUND_LIGHTNING_PREDICT);
 #else
 		vec3_t	angles;
 		vec3_t	dir;
@@ -3765,7 +3777,11 @@ CG_MissileHitWall
 Caused by an EV_MISSILE_MISS event, or directly by local bullet tracing
 =================
 */
+#ifdef TA_WEAPSYS
+void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
+#else
 void CG_MissileHitWall( int weapon, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
+#endif
 {
 	qhandle_t		mod;
 	qhandle_t		mark;
@@ -4217,7 +4233,7 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 	// ZTM: TODO: Check explosionType != PE_NONE instead of deathType?
 	if (bg_projectileinfo[weapon].deathType != PD_NONE)
 	{
-		CG_MissileHitWall( weapon, 0, origin, dir, IMPACTSOUND_FLESH );
+		CG_MissileExplode( weapon, 0, origin, dir, IMPACTSOUND_FLESH );
 	}
 #else
 	switch ( weapon ) {
@@ -4315,12 +4331,12 @@ void CG_MissileImpact( int projnum, int clientNum, vec3_t origin, vec3_t dir, im
 
 /*
 =================
-CG_WeaponHitWall
+CG_WeaponImpact
 
 Melee weapon hit wall, caused by an EV_WEAPON_MISS event.
 =================
 */
-void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
+void CG_WeaponImpact( int weaponGroup, int hand, int clientNum, vec3_t origin, vec3_t dir, impactSound_t soundType )
 {
 	qhandle_t		mod;
 	qhandle_t		mark;
@@ -4330,12 +4346,13 @@ void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, 
 	float			light;
 	vec3_t			lightColor;
 	localEntity_t	*le;
-	//int				r;
+	int				r;
 	qboolean		alphaFade;
 	qboolean		isSprite;
 	int				duration;
 	int				exp_base;
 	int				exp_add;
+	int				weaponnum;
 
 #ifdef IOQ3ZTM // LASERTAG
 	if (cg_laserTag.integer)
@@ -4343,6 +4360,8 @@ void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, 
 		return;
 	}
 #endif
+
+	weaponnum = bg_weapongroupinfo[weaponGroup].weaponnum[hand];
 
 	mark = 0;
 	radius = 32;
@@ -4384,15 +4403,29 @@ void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, 
 	}
 #endif
 
-#if 0 // ZTM: TODO: Per-weapon melee hit sounds
-	if( soundType == IMPACTSOUND_FLESH ) {
-		sfx = cgs.media.sfx_meleehit; // sfx_meleehitflesh
-	} else if( soundType == IMPACTSOUND_METAL ) {
-		sfx = cgs.media.sfx_meleehitmetal;
+	// play sound
+	if( soundType == IMPACTSOUND_FLESH && cg_weapons[weaponnum].impactPlayerSound ) {
+		sfx = cg_weapons[weaponnum].impactPlayerSound;
+	} else if( soundType == IMPACTSOUND_METAL && cg_weapons[weaponnum].impactMetalSound ) {
+		sfx = cg_weapons[weaponnum].impactMetalSound;
 	} else {
-		sfx = cgs.media.sfx_meleehit;
+		for ( r = 0 ; r < 3 ; r++ ) {
+			if ( !cg_weapons[weaponnum].impactSound[r] )
+			{
+				break;
+			}
+		}
+		if ( r > 0 ) {
+			r = rand() & 3;
+			if ( r < 2 ) {
+				sfx = cg_weapons[weaponnum].impactSound[1];
+			} else if ( r == 2 ) {
+				sfx = cg_weapons[weaponnum].impactSound[0];
+			} else {
+				sfx = cg_weapons[weaponnum].impactSound[2];
+			}
+		}
 	}
-#endif
 
 	if ( sfx ) {
 		trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
@@ -4418,8 +4451,8 @@ void CG_WeaponHitWall( int weaponGroup, int hand, int clientNum, vec3_t origin, 
 		le->refEntity.radius = exp_add;
 	}
 
-	mark = cg_weapons[bg_weapongroupinfo[weaponGroup].weaponnum[hand]].wallmarkShader;
-	radius = cg_weapons[bg_weapongroupinfo[weaponGroup].weaponnum[hand]].wallmarkRadius;
+	mark = cg_weapons[weaponnum].wallmarkShader;
+	radius = cg_weapons[weaponnum].wallmarkRadius;
 
 	if (!mark || radius <= 0)
 	{
@@ -4799,7 +4832,7 @@ void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, 
 #endif
 	} else {
 #ifdef TA_WEAPSYS
-		CG_MissileHitWall( projnum, 0, end, normal, IMPACTSOUND_DEFAULT );
+		CG_MissileExplode( projnum, 0, end, normal, IMPACTSOUND_DEFAULT );
 #else
 		CG_MissileHitWall( WP_MACHINEGUN, 0, end, normal, IMPACTSOUND_DEFAULT );
 #endif
