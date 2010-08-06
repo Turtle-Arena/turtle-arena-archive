@@ -507,6 +507,7 @@ typedef enum
 #define PD_LIGHTNING 7
 #define PD_ROCKET_SMALL 8
 #define PD_BULLET_COLORIZE 9
+#define PD_NONE_EXP_PLAYER 10 // ZTM: NOTE: hacky fix to allow nailgun to explode on players in CG_MissileHitPlayer
 //projectile explosion types
 #define PE_NORMAL 0 // default (explode after timetolive)
 #define PE_NONE 1

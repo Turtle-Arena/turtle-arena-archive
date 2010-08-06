@@ -1656,6 +1656,7 @@ const char *pd_names[] =
 	"PD_LIGHTNING",
 	"PD_ROCKET_SMALL",
 	"PD_BULLET_COLORIZE",
+	"PD_NONE_EXP_PLAYER",
 	NULL
 };
 

@@ -1087,6 +1087,7 @@ void CG_RegisterProjectile( int projectileNum )
 	{
 		default:
 		case PD_NONE:
+		case PD_NONE_EXP_PLAYER:
 			break;
 		case PD_PLASMA:
 			cgs.media.ringFlashModel = trap_R_RegisterModel("models/weaphits/ring02.md3");
@@ -3843,6 +3844,7 @@ void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 	{
 		default:
 		case PD_NONE:
+		case PD_NONE_EXP_PLAYER:
 			break;
 		case PD_PLASMA:
 			mod = cgs.media.ringFlashModel;
@@ -4228,10 +4230,16 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 	// some weapons will make an explosion with the blood, while
 	// others will just make the blood
 #ifdef TA_WEAPSYS
-	// ZTM: TODO: Check explosionType != PE_NONE instead of deathType?
-	if (bg_projectileinfo[weapon].deathType != PD_NONE)
+	switch (bg_projectileinfo[weapon].deathType)
 	{
+	case PD_GRENADE:
+	case PD_ROCKET:
+	case PD_ROCKET_SMALL:
+	case PD_NONE_EXP_PLAYER:
 		CG_MissileExplode( weapon, 0, origin, dir, IMPACTSOUND_FLESH );
+		break;
+	default:
+		break;
 	}
 #else
 	switch ( weapon ) {
@@ -4825,8 +4833,12 @@ void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, 
 
 	// impact splash and mark
 	if ( flesh ) {
+#ifdef TA_WEAPSYS
+		CG_MissileHitPlayer(projnum, end, normal, fleshEntityNum );
+#else
 #ifndef NOBLOOD
 		CG_Bleed( end, fleshEntityNum );
+#endif
 #endif
 	} else {
 #ifdef TA_WEAPSYS
@@ -4835,5 +4847,6 @@ void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, 
 		CG_MissileExplode( WP_MACHINEGUN, 0, end, normal, IMPACTSOUND_DEFAULT );
 #endif
 	}
+#endif
 
 }
