@@ -1179,9 +1179,9 @@ void CG_RegisterWeapon( int weaponNum )
 	VectorCopy(weap->flashColor, weaponInfo->flashDlightColor);
 
 	// wallmark
-	if (weap->wallmarkName[0] != '\0')
-		weaponInfo->wallmarkShader = trap_R_RegisterShader(weap->wallmarkName);
-	weaponInfo->wallmarkRadius = weap->wallmarkRadius;
+	if (weap->impactMarkName[0] != '\0')
+		weaponInfo->impactMarkShader = trap_R_RegisterShader(weap->impactMarkName);
+	weaponInfo->impactMarkRadius = weap->impactMarkRadius;
 
 	// Sounds
 	if (weap->flashSoundName[0][0] != '\0')
@@ -4449,8 +4449,8 @@ void CG_WeaponImpact( int weaponGroup, int hand, int clientNum, vec3_t origin, v
 		le->refEntity.radius = exp_add;
 	}
 
-	mark = cg_weapons[weaponnum].wallmarkShader;
-	radius = cg_weapons[weaponnum].wallmarkRadius;
+	mark = cg_weapons[weaponnum].impactMarkShader;
+	radius = cg_weapons[weaponnum].impactMarkRadius;
 
 	if (!mark || radius <= 0)
 	{
@@ -4462,9 +4462,9 @@ void CG_WeaponImpact( int weaponGroup, int hand, int clientNum, vec3_t origin, v
 	// impact mark
 	//
 	// plasma fades alpha, all others fade color
-	alphaFade = (bg_weapongroupinfo[weaponGroup].weapon[hand]->flags & WIF_WALLMARK_FADE_ALPHA);
+	alphaFade = (bg_weaponinfo[weaponnum].flags & WIF_IMPACTMARK_FADE_ALPHA);
 
-	if (bg_weapongroupinfo[weaponGroup].weapon[hand]->flags & WIF_WALLMARK_COLORIZE)
+	if (bg_weaponinfo[weaponnum].flags & WIF_IMPACTMARK_COLORIZE)
 	{
 		float	*color;
 

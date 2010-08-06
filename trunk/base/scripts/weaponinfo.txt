@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //  Blade origin and tip are "forward, right, up" (Values of less then 0 are backward, left, down)
 //  Speed is range for instantDamage weapons (Lightning gun uses 768)
 
-// wallmarkName (Quake3 uses the following, but any image/shader can be used)
+// wallmarkName/impactMarkName (Quake3 uses the following, but any image/shader can be used)
 // 	cgs.media.bulletMarkShader = trap_R_RegisterShader( "gfx/damage/bullet_mrk" );
 //	cgs.media.burnMarkShader = trap_R_RegisterShader( "gfx/damage/burn_med_mrk" );
 //	cgs.media.holeMarkShader = trap_R_RegisterShader( "gfx/damage/hole_lg_mrk" );
@@ -50,8 +50,8 @@ weapon "w_fist"
 	//model ""
 	//mod MOD_FIST
 	attackDelay 400
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 12
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 12
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -106,8 +106,8 @@ weapon "w_straight katana"
 	model "models/weapons2/katana_leo/katana_leo.md3"
 	//mod MOD_KATANA
 	attackDelay 1500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 4
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 4
 	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
@@ -158,8 +158,8 @@ weapon "w_wakizashi"
 	model "models/weapons2/wakizashi/wakizashi.md3"
 	//mod MOD_WAKIZASHI
 	attackDelay 1500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 2
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 2
 	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
@@ -180,8 +180,8 @@ weapon "w_katana"
 	model "models/weapons2/katana/katana.md3"
 	//mod MOD_KATANA
 	attackDelay 1500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 4
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 4
 	cuts 1
 
 	blade 0
@@ -252,8 +252,8 @@ weapon "w_sai"
 	model "models/weapons2/sai/sai.md3"
 	//mod MOD_SAI
 	attackDelay 1500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 4
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 4
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -340,8 +340,8 @@ weapon "w_nunchuck"
 	model "models/weapons2/nunchuck/nunchuck.md3"
 	//mod MOD_NUNCHUCK
 	attackDelay 1500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 4
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 4
 	barrelSpin BS_YAW
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
@@ -441,8 +441,8 @@ weapon "w_hammer"
 	model "models/weapons2/hammer/hammer.md3"
 	//mod MOD_HAMMER
 	attackDelay 2500
-	wallmarkName "gfx/damage/hammer_mrk"
-	wallmarkRadius 8
+	impactMarkName "gfx/damage/hammer_mrk"
+	impactMarkRadius 8
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -482,8 +482,8 @@ weapon "w_axe"
 	model "models/weapons2/axe/axe.md3"
 	//mod MOD_AXE
 	attackDelay 2500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 12
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 12
 	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
@@ -549,8 +549,8 @@ weapon "w_long sword"
 	model "models/weapons2/longsword/longsword.md3"
 	//mod MOD_SWORD
 	attackDelay 1500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 4
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 4
 	cuts 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
@@ -597,8 +597,8 @@ weapon "w_bat"
 	model "models/weapons2/bat/bat.md3"
 	//mod MOD_BAT
 	attackDelay 1500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 8
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 8
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -668,8 +668,8 @@ weapon "w_bo"
 	model "models/weapons2/bo/bo.md3"
 	//mod MOD_BO
 	attackDelay 1500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 8
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 8
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
@@ -722,8 +722,8 @@ weapon "w_bamboo"
 	model "models/weapons2/bamboo/bamboo.md3"
 	//mod MOD_BAMBOO
 	attackDelay 1500
-	wallmarkName "gfx/damage/hole_lg_mrk"
-	wallmarkRadius 8
+	impactMarkName "gfx/damage/hole_lg_mrk"
+	impactMarkRadius 8
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
