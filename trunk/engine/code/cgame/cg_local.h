@@ -1937,8 +1937,10 @@ void CG_GibPlayer( vec3_t playerOrigin );
 void CG_BigExplode( vec3_t playerOrigin );
 #endif
 
+#ifndef TA_WEAPSYS
 #ifndef NOBLOOD
 void CG_Bleed( vec3_t origin, int entityNum );
+#endif
 #endif
 
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,

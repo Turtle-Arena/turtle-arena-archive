@@ -563,6 +563,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 }
 
 
+#ifndef TA_WEAPSYS
 #ifndef NOBLOOD
 /*
 =================
@@ -592,7 +593,12 @@ void CG_Bleed( vec3_t origin, int entityNum ) {
 	ex->refEntity.customShader = cgs.media.bloodExplosionShader;
 
 	// don't show player's own blood in view
-	if ( entityNum == cg.snap->ps.clientNum ) {
+	if ( entityNum == cg.snap->ps.clientNum
+#ifdef IOQ3ZTM // Show player their own blood in third person
+		&& !cg.renderingThirdPerson
+#endif
+		)
+	{
 #ifdef IOQ3ZTM // RENDERFLAGS
 		ex->refEntity.renderfx |= RF_ONLY_MIRROR;
 #else
@@ -600,6 +606,7 @@ void CG_Bleed( vec3_t origin, int entityNum ) {
 #endif
 	}
 }
+#endif
 #endif
 
 

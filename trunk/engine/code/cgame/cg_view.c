@@ -805,7 +805,7 @@ static void CG_DamageBlendBlob( void ) {
 	int			maxTime;
 	refEntity_t		ent;
 
-#ifdef NOTRATEDM // Only if blood is enabled
+#ifdef IOQ3ZTM // Only if blood is enabled
 	if (!cg_blood.integer) {
 		return;
 	}
