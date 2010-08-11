@@ -105,6 +105,11 @@ PM_StartTorsoAnim
 ===================
 */
 static void PM_StartTorsoAnim( int anim ) {
+#ifdef IOQ3ZTM // Needed for TA_WEAPSYS
+	if (anim < 0) {
+		return;
+	}
+#endif
 	if ( pm->ps->pm_type >= PM_DEAD ) {
 		return;
 	}
@@ -112,6 +117,11 @@ static void PM_StartTorsoAnim( int anim ) {
 		| anim;
 }
 static void PM_StartLegsAnim( int anim ) {
+#ifdef IOQ3ZTM // Needed for TA_WEAPSYS
+	if (anim < 0) {
+		return;
+	}
+#endif
 	if ( pm->ps->pm_type >= PM_DEAD ) {
 		return;
 	}
@@ -123,6 +133,11 @@ static void PM_StartLegsAnim( int anim ) {
 }
 
 static void PM_ContinueLegsAnim( int anim ) {
+#ifdef IOQ3ZTM // Needed for TA_WEAPSYS
+	if (anim < 0) {
+		return;
+	}
+#endif
 	if ( ( pm->ps->legsAnim & ~ANIM_TOGGLEBIT ) == anim ) {
 		return;
 	}
@@ -133,6 +148,11 @@ static void PM_ContinueLegsAnim( int anim ) {
 }
 
 static void PM_ContinueTorsoAnim( int anim ) {
+#ifdef IOQ3ZTM // Needed for TA_WEAPSYS
+	if (anim < 0) {
+		return;
+	}
+#endif
 	if ( ( pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) == anim ) {
 		return;
 	}
@@ -1754,7 +1774,23 @@ static void PM_Footsteps( void ) {
 			if ( pm->ps->pm_flags & PMF_DUCKED ) {
 				PM_ContinueLegsAnim( LEGS_IDLECR );
 			} else {
+#ifdef TA_WEAPSYS
+				int anim = -1;
+
+				// if melee attacking or firing gun
+				if (pm->ps->weaponstate == WEAPON_FIRING) {
+					anim = BG_LegsAttackForPlayerState(pm->ps, pm->playercfg);
+				}
+
+				// if not attacking or no attack animation
+				if (anim < 0) {
+					anim = BG_LegsStandForPlayerState(pm->ps, pm->playercfg);
+				}
+
+				PM_ContinueLegsAnim( anim );
+#else
 				PM_ContinueLegsAnim( LEGS_IDLE );
+#endif
 			}
 #ifdef IOQ3ZTM // ZTM: TEST
 			return;
@@ -2456,6 +2492,7 @@ static void PM_Weapon( void ) {
 #ifdef TA_WEAPSYS
 		pm->ps->weaponstate = WEAPON_READY;
 		PM_StartTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
+		PM_StartLegsAnim( BG_LegsStandForPlayerState(pm->ps, pm->playercfg) );
 #else
 		pm->ps->weaponstate = WEAPON_READY;
 		if ( pm->ps->weapon == WP_GAUNTLET ) {
@@ -2595,9 +2632,11 @@ static void PM_Weapon( void ) {
 
 		anim = BG_TorsoAttackForPlayerState(pm->ps);
 
+		// If this isn't the current animation, start it
 		if ((pm->ps->torsoAnim & ~ANIM_TOGGLEBIT ) != anim)
 		{
 			PM_StartTorsoAnim( anim );
+			PM_StartLegsAnim( BG_LegsAttackForPlayerState(pm->ps, pm->playercfg) );
 
 			// fire weapon
 			PM_AddEvent( EV_FIRE_WEAPON );
@@ -2606,6 +2645,7 @@ static void PM_Weapon( void ) {
 	else
 	{
 		PM_StartTorsoAnim( BG_TorsoAttackForPlayerState(pm->ps) );
+		PM_StartLegsAnim( BG_LegsAttackForPlayerState(pm->ps, pm->playercfg) );
 
 		// fire weapon
 		PM_AddEvent( EV_FIRE_WEAPON );

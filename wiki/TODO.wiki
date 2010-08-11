@@ -31,7 +31,7 @@ Focus on players, map themes, and multiplayer maps
   * Multiple levels of detail for players and other models
   * Bring back player effect colors?
     * Readd to ui and q3_ui
-    * (Control Turtle mask color and/or melee trail color?)
+    * (Control melee trail color?)
   * Add more players (Mirage comic based); Foot Ninja, Foot Elite, and The Shredder
   * Reduce overall number of TODOs and FIXMEs in the source
 
@@ -90,6 +90,10 @@ Weapons (and attacking)
     * pdExpOnPlayer would set whether or not to explode on players in CG_MissileHitPlayer
 
   * TODO: Add PT_CUSTOM projectile trail type
+
+  * TODO: Per-weapon run animations (Support LEGS_* and BOTH_*)
+
+  * TODO: Support BOTH_* attacks (not just TORSO_*) in ui/q3_ui
 
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.

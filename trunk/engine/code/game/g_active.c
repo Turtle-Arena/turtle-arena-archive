@@ -496,13 +496,9 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			weap_delay /= 2;
 
 			// ZTM: if running "weap_delay = 0"; like in LoZ:TP
+			if (BG_PlayerRunning(client->ps.velocity))
 			{
-				vec_t xyspeed = sqrt( client->ps.velocity[0] * client->ps.velocity[0] +
-					client->ps.velocity[1] * client->ps.velocity[1] );
-				if (xyspeed > 200)
-				{
-					weap_delay = 0;
-				}
+				weap_delay = 0;
 			}
 
 			client->ps.meleeTime = 0;

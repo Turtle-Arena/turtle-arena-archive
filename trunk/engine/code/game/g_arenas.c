@@ -180,13 +180,14 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 	body->s.event = 0;
 	body->s.pos.trType = TR_STATIONARY;
 	body->s.groundEntityNum = ENTITYNUM_WORLD;
-	body->s.legsAnim = LEGS_IDLE;
 #ifdef TA_WEAPSYS
+	body->s.legsAnim = BG_LegsStandForPlayerState(&ent->client->ps, &ent->client->playercfg);
+	body->s.torsoAnim = BG_TorsoStandForPlayerState(&ent->client->ps);
 	if( body->s.weapon == WP_NONE || body->s.weapon == WP_DEFAULT) {
 		body->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
 	}
-	body->s.torsoAnim = BG_TorsoStandForPlayerState(&ent->client->ps);
 #else
+	body->s.legsAnim = LEGS_IDLE;
 	body->s.torsoAnim = TORSO_STAND;
 	if( body->s.weapon == WP_NONE ) {
 		body->s.weapon = WP_MACHINEGUN;
