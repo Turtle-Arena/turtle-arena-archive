@@ -1407,6 +1407,18 @@ playerAnimationDef_t playerAnimationDefs[] = {
 	{ TORSO_ATTACK, "TORSO_ATTACK_GUN" },
 	{ TORSO_ATTACK2, "TORSO_ATTACK_GAUNTLET" },
 
+#if 0 // ZTM: NOTE: This is unneeded as we load undefined animations
+	// Fake animations (BOTH_* version of TORSO_* animations)
+	{ TORSO_ATTACK, "BOTH_ATTACK" },
+	{ TORSO_ATTACK2, "BOTH_ATTACK2" },
+	{ TORSO_STAND, "BOTH_STAND" },
+	{ TORSO_STAND2, "BOTH_STAND2" },
+	{ TORSO_STAND, "BOTH_STAND_GUN" },
+	{ TORSO_STAND2, "BOTH_STAND_GAUNTLET" },
+	{ TORSO_ATTACK, "BOTH_ATTACK_GUN" },
+	{ TORSO_ATTACK2, "BOTH_ATTACK_GAUNTLET" },
+#endif
+
 	// End of List
 	{ 0, NULL }
 };
@@ -3017,10 +3029,10 @@ void BG_DumpWeaponInfo(void)
 		return;
 	}
 
-#define FS_Printf1(x) { text[0] = 0; trap_FS_Write(x, strlen(x+1), f); }
-#define FS_Printf2(x, y) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y); trap_FS_Write(text, strlen(text+1), f); }
-#define FS_Printf3(x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y, z); trap_FS_Write(text, strlen(text+1), f); }
-#define FS_Printf4(w, x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), w, x, y, z); trap_FS_Write(text, strlen(text+1), f); }
+#define FS_Printf1(x) { text[0] = 0; trap_FS_Write(x, strlen(x)+1, f); }
+#define FS_Printf2(x, y) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf3(x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf4(w, x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), w, x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
 
 	// Dump projectiles
 	for (i = 0; i < MAX_BG_PROJ; i++)
@@ -3305,6 +3317,20 @@ void BG_InitWeaponInfo(void)
 #endif
 }
 
+/*
+=================
+BG_PlayerRunning
+
+Returns qtrue if player is not standing.
+=================
+*/
+qboolean BG_PlayerRunning(vec3_t velocity)
+{
+	vec_t xyspeed = sqrt( velocity[0] * velocity[0] +
+		velocity[1] * velocity[1] );
+
+	return (xyspeed > 200);
+}
 
 /*
 =================
@@ -3331,13 +3357,9 @@ int BG_MaxAttackCombo(playerState_t *ps)
 	}
 
 	// ZTM: if running "max_combo /= 2"; like in LoZ:TP
+	if (BG_PlayerRunning(ps->velocity))
 	{
-		vec_t xyspeed = sqrt( ps->velocity[0] * ps->velocity[0] +
-			ps->velocity[1] * ps->velocity[1] );
-		if (xyspeed > 200)
-		{
-			max_combo /= 2;
-		}
+		max_combo /= 2;
 	}
 
 	if (max_combo < 1) {
@@ -3609,7 +3631,7 @@ static qboolean NPC_Parse(char **p) {
 				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
 				{
 					animName = qtrue;
-					if (BG_LoadAnimation(p, i, animations, NULL) != 1)
+					if (BG_LoadAnimation(p, i, animations, NULL, AP_ANIM) != 1)
 					{
 						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
 					}
@@ -3663,8 +3685,7 @@ qboolean BG_ParseNpcInfoFile( const char *filename ) {
 		}
 
 		if ( Q_stricmp( token, "npc" ) == 0 ) {
-			if (!NPC_Parse(&text_p))
-{
+			if (!NPC_Parse(&text_p)) {
 				break;
 			}
 		} else {
@@ -3719,8 +3740,6 @@ void BG_InitNPCInfo(void)
 }
 #endif
 
-// The below two functions should make adding more weapon types easier.
-
 /*
 ==============
 BG_TorsoStandForPlayerState
@@ -3747,7 +3766,7 @@ BG_TorsoAttackForPlayerState
 */
 animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps)
 {
-	int atkIndex = 0;
+	int atkIndex;
 
 	if (ps == NULL || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
 	{
@@ -3761,6 +3780,74 @@ animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps)
 		return (animNumber_t)bg_weapongroupinfo[ps->weapon].primaryAnims.attackAnim[atkIndex];
 	}
 	return (animNumber_t)bg_weapongroupinfo[ps->weapon].normalAnims.attackAnim[atkIndex];
+}
+
+/*
+==============
+BG_LegsStandForPlayerState
+==============
+*/
+animNumber_t BG_LegsStandForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg)
+{
+	animNumber_t anim;
+
+	if (!ps) {
+		return LEGS_IDLE;
+	}
+
+	if (ps->pm_flags & PMF_DUCKED)
+	{
+		return LEGS_IDLECR;
+	}
+
+	if ((ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups()) || !playercfg)
+	{
+		return LEGS_IDLE;
+	}
+
+	if (ps->eFlags & EF_PRIMARY_HAND) {
+		anim = bg_weapongroupinfo[ps->weapon].primaryAnims.standAnim;
+	} else {
+		anim = bg_weapongroupinfo[ps->weapon].normalAnims.standAnim;
+	}
+
+	if (playercfg->animations[anim].prefixType & AP_LEGS) {
+		return anim;
+	} else {
+		return LEGS_IDLE;
+	}
+}
+
+/*
+==============
+BG_LegsAttackForPlayerState
+==============
+*/
+animNumber_t BG_LegsAttackForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg)
+{
+	animNumber_t anim;
+	int atkIndex;
+
+	if (!ps || !playercfg || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups()
+		|| (ps->pm_flags & PMF_DUCKED)
+		|| BG_PlayerRunning(ps->velocity))
+	{
+		return -1; // no change
+	}
+
+	atkIndex = ps->meleeAttack % BG_MaxAttackCombo(ps);
+
+	if (ps->eFlags & EF_PRIMARY_HAND) {
+		anim = bg_weapongroupinfo[ps->weapon].primaryAnims.attackAnim[atkIndex];
+	} else {
+		anim = bg_weapongroupinfo[ps->weapon].normalAnims.attackAnim[atkIndex];
+	}
+
+	if (playercfg->animations[anim].prefixType & AP_LEGS) {
+		return anim;
+	} else {
+		return -1;
+	}
 }
 
 /*
@@ -5546,10 +5633,12 @@ BG_LoadAnimation
 Returns qtrue if the animation loaded with out error.
 ===============
 */
-int BG_LoadAnimation(char **text_p, int i, animation_t *animations, frameSkip_t *skip)
+int BG_LoadAnimation(char **text_p, int i, animation_t *animations, frameSkip_t *skip, int prefixType)
 {
 	char		*token;
 	float		fps;
+
+	animations[i].prefixType = prefixType;
 
 	token = COM_Parse( text_p );
 	if ( !*token ) {
@@ -5561,13 +5650,13 @@ int BG_LoadAnimation(char **text_p, int i, animation_t *animations, frameSkip_t 
 	if (skip != NULL)
 	{
 		// leg only frames must be adjusted to not count the upper body only frames
-		if ( i >= LEGS_WALKCR && i <= LEGS_TURN) {
+		if (prefixType == AP_LEGS) {
 			if (skip->legSkip == -1) {
 				skip->legSkip = animations[i].firstFrame - skip->firstTorsoFrame;
 			}
 			animations[i].firstFrame -= skip->legSkip;
 		}
-		else if ( !(i >= BOTH_DEATH1 && i <= BOTH_DEAD3) )
+		else if (prefixType == AP_TORSO)
 		{
 			if (skip->firstTorsoFrame == -1) {
 				skip->firstTorsoFrame = animations[i].firstFrame;
@@ -5633,7 +5722,7 @@ static void BG_ConvertEFAnimationsToQ3(animation_t *animations, int numanims)
 	{
 		if (animations[i].loopFrames == -1)
 		{
-			// No quake3 skins should have this, only Elite Force.
+			// No Quake3 players should have this, only Elite Force.
 			ef_style = qtrue;
 		}
 		else if (animations[i].loopFrames == 0)
@@ -5667,6 +5756,68 @@ static void BG_ConvertEFAnimationsToQ3(animation_t *animations, int numanims)
 }
 #endif
 
+#ifdef TA_PLAYERSYS
+/*
+======================
+BG_AnimPrefixTypeForAnimIndex
+
+Only supports player animations, not NPCs or misc_objects
+======================
+*/
+int BG_AnimPrefixTypeForAnimIndex(animNumber_t anim)
+{
+	if (anim >= BOTH_DEATH1 && anim <= BOTH_DEAD3)
+		return AP_BOTH;
+	else if (anim >= TORSO_GESTURE && anim <= TORSO_STAND2)
+		return AP_TORSO;
+	else if (anim >= LEGS_WALKCR && anim <= LEGS_TURN)
+		return AP_LEGS;
+	else if (anim >= TORSO_GETFLAG && anim <= TORSO_NEGATIVE)
+		return AP_TORSO;
+
+	return 0;
+}
+
+/*
+======================
+BG_AnimPrefixTypeForName
+
+Returns the prefixType for the animation name.
+======================
+*/
+int BG_AnimPrefixTypeForName(const char *name)
+{
+	if (Q_stricmpn(name, "TORSO_", 6) == 0)
+		return AP_TORSO;
+	else if (Q_stricmpn(name, "LEGS_", 5) == 0)
+		return AP_LEGS;
+	else if (Q_stricmpn(name, "BOTH_", 5) == 0)
+		return AP_BOTH;
+	else if (Q_stricmpn(name, "ANIM_", 5) == 0)
+		return AP_ANIM;
+
+	return 0;
+}
+
+/*
+======================
+BG_AnimName
+
+Returns a pointer to the animations name, skipping the prefix (BOTH_, TORSO_, LEGS_, or ANIM_)
+======================
+*/
+const char *BG_AnimName(const char *nameWithPrefix)
+{
+	char *r;
+
+	r = strstr(nameWithPrefix, "_");
+	if (r != NULL) {
+		r++;
+	}
+
+	return r;
+}
+#endif
 
 /*
 ======================
@@ -5717,6 +5868,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 	qboolean foundAnim;
 	qboolean loadedAnim[MAX_TOTALANIMATIONS];
 	int rtn = 0;
+	int prefixType;
 
 	animations = playercfg->animations;
 	foundAnim = qfalse;
@@ -5971,24 +6123,23 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 		}
 #endif
 
-		if (!headConfig) // skip animations
+		// head config currently skips animations
+		if (!headConfig && (prefixType = BG_AnimPrefixTypeForName(token)))
 		{
 			qboolean animName = qfalse;
+			const char *name;
 
 			// Load animations by name.
 			for (i = 0; playerAnimationDefs[i].name != NULL; i++)
 			{
 				if ( !Q_stricmp( token, playerAnimationDefs[i].name ) ) {
 					animName = foundAnim = qtrue;
-					rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip);
-					if (rtn == -1)
-					{
+					rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip, prefixType);
+					if (rtn == -1) {
 						BG_SetDefaultAnimation(loadedAnim, playerAnimationDefs[i].num, animations);
 					} else if (rtn == 0) {
-						Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n",
-								playerAnimationDefs[i].name);
-					}
-					else {
+						Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n", token);
+					} else {
 						loadedAnim[playerAnimationDefs[i].num] = qtrue;
 					}
 					break;
@@ -5998,6 +6149,35 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			if (animName) {
 				continue;
 			}
+
+			// Check undefined animations (some are actually supported...)
+			name = BG_AnimName(token);
+
+			for (i = 0; playerAnimationDefs[i].name != NULL; i++)
+			{
+				// if the token and animation i have the same base name,
+				//   but with different prefixes, load it but use token's prefix...
+				if (!Q_stricmp( name, BG_AnimName(playerAnimationDefs[i].name) ) )
+				{
+					animName = foundAnim = qtrue;
+					rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip, prefixType);
+					if (rtn == -1) {
+						BG_SetDefaultAnimation(loadedAnim, playerAnimationDefs[i].num, animations);
+					} else if (rtn == 0) {
+						Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n", token);
+					} else {
+						loadedAnim[playerAnimationDefs[i].num] = qtrue;
+					}
+					break;
+				}
+			}
+
+			if (animName) {
+				continue;
+			}
+
+			Com_Printf( "unknown animation '%s' in %s\n", token, filename );
+			continue;
 		}
 
 #if !defined TURTLEARENA || defined TA_SUPPORTQ3 // animation.cfg
@@ -6036,9 +6216,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 		// read information for each frame
 		for ( i = 0 ; i < MAX_ANIMATIONS ; i++ )
 		{
-			rtn = BG_LoadAnimation(&text_p, i, animations, &skip);
-			if (rtn == -1)
-			{
+			rtn = BG_LoadAnimation(&text_p, i, animations, &skip, BG_AnimPrefixTypeForAnimIndex(i));
+			if (rtn == -1) {
 				BG_SetDefaultAnimation(loadedAnim, i, animations);
 			} else if (rtn == 0) {
 				Com_Printf("BG_ParsePlayerCFGFile: Animation %d: Failed loading.\n", i);
@@ -6500,7 +6679,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
 				{
 					animName = qtrue;
-					if (BG_LoadAnimation(&text_p, i, animations, NULL) != 1)
+					if (BG_LoadAnimation(&text_p, i, animations, NULL, AP_ANIM) != 1)
 					{
 						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
 					}

@@ -758,6 +758,7 @@ int BG_NumProjectiles(void);
 int BG_NumWeapons(void);
 int BG_NumWeaponGroups(void);
 void BG_InitWeaponInfo(void);
+qboolean BG_PlayerRunning(vec3_t velocity);
 int BG_MaxAttackCombo(playerState_t *ps);
 
 int BG_WeaponHandsForPlayerState(playerState_t *ps);
@@ -970,11 +971,15 @@ typedef enum {
 
 // animations
 #ifdef TA_PLAYERS
-// NOTE: In animation.cfg I call some animations by other names;
+// ZTM: NOTE: In animation.cfg I call some animations by other names;
 // * TORSO_ATTACK_GUN is TORSO_ATTACK
 // * TORSO_ATTACK_GAUNTLET is TORSO_ATTACK2
 // * TORSO_STAND_GUN is TORSO_STAND
 // * TORSO_STAND_GAUNTLET is TORSO_STAND2
+#endif
+#ifdef TA_WEAPSYS
+// ZTM: NOTE: All of the STAND and ATTACK animations can be TORSO_* or BOTH_*.
+//            Attacking while running only animates torso.
 #endif
 typedef enum {
 	BOTH_DEATH1,
@@ -1066,8 +1071,8 @@ typedef enum {
     TORSO_ATTACK_GUN_PRIMARY, // Can't reuse TORSO_ATTACK2 needs a new animation.
 
 	// Melee attacks
-	// * Standing? attacks A B A C
-	// * Running? attacks D E
+	// * Standing attacks A B A C
+	// * Running attacks A B (repeat)
 
     TORSO_ATTACK_SWORD1_BOTH_A,
     TORSO_ATTACK_SWORD1_BOTH_B,
@@ -1128,15 +1133,6 @@ typedef enum {
 
 	MAX_TOTALANIMATIONS
 } animNumber_t;
-
-#ifdef TA_WEAPSYS
-// For bg/game/cgame
-animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps);
-animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps);
-// For ui/q3_ui
-animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum);
-animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
-#endif
 
 
 #ifdef TA_MISC // MATERIALS
@@ -1221,6 +1217,17 @@ typedef bg_sound_t bg_sounds_t[MAX_BG_SOUNDS];
 #endif
 
 
+#ifdef TA_PLAYERSYS
+typedef enum
+{
+	AP_NONE = 0,
+	AP_TORSO = 1,
+	AP_LEGS = 2,
+	AP_BOTH = (AP_TORSO|AP_LEGS),
+	AP_ANIM = 4 // NPCs and misc_objects
+} prefixType_e;
+#endif
+
 typedef struct animation_s {
 	int		firstFrame;
 	int		numFrames;
@@ -1229,6 +1236,9 @@ typedef struct animation_s {
 	int		initialLerp;		// msec to get to first frame
 	int		reversed;			// true if animation is reversed
 	int		flipflop;			// true if animation should flipflop back to base
+#ifdef TA_PLAYERSYS
+	int		prefixType;
+#endif
 } animation_t;
 
 // flip the togglebit every time an animation
@@ -1378,8 +1388,19 @@ typedef struct
 } frameSkip_t;
 
 int BG_AnimationTime(animation_t *anim);
-int BG_LoadAnimation(char **text_p, int i, animation_t *animations, frameSkip_t *skip);
+int BG_LoadAnimation(char **text_p, int i, animation_t *animations, frameSkip_t *skip, int prefixType);
 qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, const char *headModel);
+
+#ifdef TA_WEAPSYS
+// For bg/game/cgame
+animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps);
+animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps);
+animNumber_t BG_LegsStandForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
+animNumber_t BG_LegsAttackForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
+// For ui/q3_ui
+animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum);
+animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
+#endif
 
 #ifdef TA_ENTSYS
 typedef struct
