@@ -1041,7 +1041,9 @@ static sfxHandle_t Controls_MenuKey( int key )
 				key = -1;
 				break;
 		
+#ifndef TA_MISC // MENU: Right Mouse button = left arrow
 			case K_MOUSE2:
+#endif
 			case K_ESCAPE:
 				if (s_controls.changesmade)
 					Controls_SetConfig();
