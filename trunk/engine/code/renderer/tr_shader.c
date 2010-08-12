@@ -1418,7 +1418,7 @@ static void ParseSurfaceParm( char **text ) {
 ===============
 ParseIf
 
-Based on Elite Force 2
+Based on Elite Force 2, support "if cvar" and "if !cvar"
 
 shader/name/etc
 {
@@ -1435,6 +1435,9 @@ endif
 static qboolean ParseIf( char **text, int *ifIndent ) {
 	char	*token;
 	int		indent;
+	char	*var;
+	qboolean wantValue;
+	int value;
 
 	indent = 1;
 
@@ -1447,20 +1450,52 @@ static qboolean ParseIf( char **text, int *ifIndent ) {
 		return qtrue;
 	}
 
-	if ( !Q_stricmp( token, "novertexlight" ) ) {
-		if (!r_vertexLight->integer) {
-			return qtrue;
-		}
-		// else skip if-block
-	} else if ( !Q_stricmp( token, "vertexlight" ) ) {
-		if (r_vertexLight->integer) {
-			return qtrue;
-		}
-		// else skip if-block
-	} else {
-		ri.Printf( PRINT_WARNING, "WARNING: unknown parm '%s' for 'if' keyword in shader '%s'\n", token, shader.name );
-		// skip if-block
+	// support nozzz and !zzz
+	if ( !Q_stricmpn(token, "no", 2) )
+	{
+		wantValue = qfalse;
+		var = token+2;
 	}
+	else if (!Q_stricmpn(token, "!", 1) )
+	{
+		wantValue = qfalse;
+		var = token+1;
+	}
+	else
+	{
+		wantValue = qtrue;
+		var = token;
+	}
+
+	// Support EF2
+	if ( !Q_stricmp( var, "vertexlight" ) )
+	{
+		value = r_vertexLight->integer;
+	}
+	// Support NOBLOOD define
+	else if ( !Q_stricmp( var, "blood" ) )
+	{
+#ifdef NOBLOOD
+		value = 0;
+#else
+		value = com_blood->integer;
+#endif
+	}
+	else
+	{
+		value = Cvar_VariableIntegerValue(var);
+	}
+
+	if (!wantValue && !value)
+	{
+		return qtrue;
+	}
+	else if (wantValue && value)
+	{
+		return qtrue;
+	}
+
+	// skip if-block
 
 	// Skip tokens inside of if-block
 	while ( 1 )

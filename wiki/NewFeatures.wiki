@@ -5,16 +5,16 @@ Incomplete list of editing information for new features not found in ioquake3.
 
 == Shaders ==
 
-=== vextexlight/novertexlight ===
+=== if ===
 _Search for "IOQ3ZTM // EF2_SHADERS" in the code to see implantation._
 
-Support for Star Trek Elite Force 2 if no/vextexlight shaders.
+Support for "if zzz ... endif" shader keywords. Any console variable can be used, but there are some hardcoded options; vextexlight/novertexlight and blood/noblood. (Note: Blood is currently completely disabled in Turtle Arena)
 
 Example shader:
 {{{
 textures/name
 {
-if novertexlight
+if novertexlight // Or if !r_vertexlight // ! means not
 	{
 		map textures/name_novertexlight
 	}
@@ -26,8 +26,14 @@ if novertexlight
 		map textures/name_2
 		blendFunc BLEND
 	}
+if blood
+	{
+		map textures/name_bloody
+		blendFunc BLEND
+	}
 endif
-if vertexlight
+endif
+if vertexlight // Or if r_vertexlight
 	{
 		map textures/name_vertexlight
 	}
