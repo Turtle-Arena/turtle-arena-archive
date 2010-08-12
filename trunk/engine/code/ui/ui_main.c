@@ -2396,7 +2396,7 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
   if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_ENTER || key == K_KP_ENTER) {
 		int oldCount = UI_MapCountByGameType(qtrue);
 
-#ifdef TURTLEARENA // Don't skip FFA
+		// hard coded mess here
 		if (key == K_MOUSE2) {
 			ui_gameType.integer--;
 #ifndef TA_SP // Don't skip SP
@@ -2404,13 +2404,24 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
 				ui_gameType.integer = 1;
 			} else
 #endif
-			if (ui_gameType.integer < 0) {
+#ifdef TURTLEARENA // Don't skip FFA
+			if (ui_gameType.integer < 0)
+#elif defined TA_SP // Don't skip dual (Needed because of above TA_SP ifdef)
+			if (ui_gameType.integer < 1)
+#else
+			if (ui_gameType.integer < 2)
+#endif
+			{
 				ui_gameType.integer = uiInfo.numGameTypes - 1;
 			}
 		} else {
 			ui_gameType.integer++;
 			if (ui_gameType.integer >= uiInfo.numGameTypes) {
+#ifdef TURTLEARENA // Don't skip FFA
 				ui_gameType.integer = 0;
+#else
+				ui_gameType.integer = 1;
+#endif
 			}
 #ifndef TA_SP // Don't skip SP
 			else if (ui_gameType.integer == 2) {
@@ -2419,35 +2430,16 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
 #endif
 		}
 
-		if (uiInfo.gameTypes[ui_gameType.integer].gtEnum < GT_TEAM) {
-			trap_Cvar_Set("ui_Q3Model", "1");
-		} else {
-			trap_Cvar_Set("ui_Q3Model", "0");
-		}
+#ifdef IOQ3ZTM
+		if (uiInfo.gameTypes[ui_gameType.integer].gtEnum < GT_TEAM)
 #else
-		// hard coded mess here
-		if (key == K_MOUSE2) {
-			ui_gameType.integer--;
-			if (ui_gameType.integer == 2) {
-				ui_gameType.integer = 1;
-			} else if (ui_gameType.integer < 2) {
-				ui_gameType.integer = uiInfo.numGameTypes - 1;
-			}
-		} else {
-			ui_gameType.integer++;
-			if (ui_gameType.integer >= uiInfo.numGameTypes) {
-				ui_gameType.integer = 1;
-			} else if (ui_gameType.integer == 2) {
-				ui_gameType.integer = 3;
-			}
-		}
-    
-		if (uiInfo.gameTypes[ui_gameType.integer].gtEnum == GT_TOURNAMENT) {
+		if (uiInfo.gameTypes[ui_gameType.integer].gtEnum == GT_TOURNAMENT)
+#endif
+		{
 			trap_Cvar_Set("ui_Q3Model", "1");
 		} else {
 			trap_Cvar_Set("ui_Q3Model", "0");
 		}
-#endif
 
 		trap_Cvar_Set("ui_gameType", va("%d", ui_gameType.integer));
 		UI_SetCapFragLimits(qtrue);
