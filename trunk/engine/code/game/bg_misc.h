@@ -1222,7 +1222,7 @@ typedef enum
 	AP_TORSO = 1,
 	AP_LEGS = 2,
 	AP_BOTH = (AP_TORSO|AP_LEGS),
-	AP_ANIM = 4 // NPCs and misc_objects
+	AP_OBJECT = 4 // NPCs and misc_objects
 } prefixType_e;
 #endif
 
