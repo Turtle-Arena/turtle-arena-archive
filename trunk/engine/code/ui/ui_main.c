@@ -1356,7 +1356,8 @@ static void UI_DrawPlayerModel(rectDef_t *rect) {
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info, model, head, team);
 #ifdef TA_WEAPSYS
-    UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info.weapon, qfalse );
+    UI_PlayerInfo_SetInfo( &info, BG_LegsStandForWeapon(&info.playercfg, info.weapon), BG_TorsoStandForWeapon(info.weapon), viewangles,
+			vec3_origin, info.weapon, qfalse );
 #else
     UI_PlayerInfo_SetInfo( &info, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
 #endif
@@ -1556,7 +1557,8 @@ static void UI_DrawOpponent(rectDef_t *rect) {
   	VectorClear( moveangles );
     UI_PlayerInfo_SetModel( &info2, model, headmodel, "");
 #ifdef TA_WEAPSYS
-    UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, info2.weapon, qfalse );
+    UI_PlayerInfo_SetInfo( &info2, BG_LegsStandForWeapon(&info2.playercfg, info2.weapon), BG_TorsoStandForWeapon(info2.weapon),
+			viewangles, vec3_origin, info2.weapon, qfalse );
 #else
     UI_PlayerInfo_SetInfo( &info2, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
 #endif

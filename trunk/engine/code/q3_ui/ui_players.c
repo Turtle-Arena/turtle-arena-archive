@@ -360,7 +360,11 @@ static void UI_LegsSequencing( playerInfo_t *pi ) {
 	}
 
 	if ( currentAnim == LEGS_LAND ) {
+#ifdef TA_WEAPSYS
+		UI_SetLegsAnim( pi, BG_LegsStandForWeapon(&pi->playercfg, pi->realWeapon) );
+#else
 		UI_SetLegsAnim( pi, LEGS_IDLE );
+#endif
 		return;
 	}
 }
@@ -566,7 +570,14 @@ static void UI_PlayerAnimation( playerInfo_t *pi, int *legsOld, int *legs, float
 
 	UI_LegsSequencing( pi );
 
-	if ( pi->legs.yawing && ( pi->legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE ) {
+	if ( pi->legs.yawing &&
+#ifdef TA_WEAPSYS
+		BG_PlayerStandAnim(&pi->playercfg, AP_LEGS, pi->legsAnim)
+#else
+		( pi->legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE
+#endif
+		)
+	{
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 		BG_RunLerpFrame( &pi->legs,
 #ifdef TA_PLAYERSYS
@@ -746,14 +757,13 @@ static void UI_PlayerAngles( playerInfo_t *pi, vec3_t legs[3], vec3_t torso[3], 
 	// --------- yaw -------------
 
 	// allow yaw to drift a bit
-	if ( ( pi->legsAnim & ~ANIM_TOGGLEBIT ) != LEGS_IDLE 
-		|| ( pi->torsoAnim & ~ANIM_TOGGLEBIT ) !=
 #ifdef TA_WEAPSYS
-		BG_TorsoStandForWeapon(pi->realWeapon)
+	if (!BG_PlayerStandAnim(&pi->playercfg, AP_LEGS, pi->legsAnim)
+		|| !BG_PlayerStandAnim(&pi->playercfg, AP_TORSO, pi->torsoAnim))
 #else
-		TORSO_STAND
+	if ( ( pi->legsAnim & ~ANIM_TOGGLEBIT ) != LEGS_IDLE 
+		|| ( pi->torsoAnim & ~ANIM_TOGGLEBIT ) != TORSO_STAND )
 #endif
-		)
 	{
 		// if not standing still, always point all in the same direction
 		pi->torso.yawing = qtrue;	// always center
@@ -1609,7 +1619,7 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 
 	// torso animation
 #ifdef TA_WEAPSYS
-	if (BG_PlayerStandAnim(torsoAnim))
+	if (BG_PlayerStandAnim(&pi->playercfg, AP_TORSO, torsoAnim))
 	{
 		torsoAnim = BG_TorsoStandForWeapon(weaponNum);
 	}

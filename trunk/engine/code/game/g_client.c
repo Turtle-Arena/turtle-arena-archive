@@ -1804,8 +1804,13 @@ void ClientSpawn(gentity_t *ent) {
 	client->latched_buttons = 0;
 
 	// set default animations
+#ifdef TA_WEAPSYS
+	client->ps.torsoAnim = BG_TorsoStandForPlayerState(&client->ps);
+	client->ps.legsAnim = BG_LegsStandForPlayerState(&client->ps, &client->pers.playercfg);
+#else
 	client->ps.torsoAnim = TORSO_STAND;
 	client->ps.legsAnim = LEGS_IDLE;
+#endif
 
 	if ( level.intermissiontime ) {
 		MoveClientToIntermission( ent );

@@ -91,7 +91,7 @@ Weapons (and attacking)
 
   * TODO: Add PT_CUSTOM projectile trail type
 
-  * TODO: Per-weapon run animations (Support LEGS_* and BOTH_*)
+  * TODO: Per-weapon run animations (Support LEGS_* and BOTH_*. Should TORSO_* be supported too?)
 
   * TODO: Support BOTH_* attacks (not just TORSO_*) in ui/q3_ui
 

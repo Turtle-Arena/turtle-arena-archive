@@ -767,8 +767,6 @@ qboolean BG_WeapTypeIsMelee(weapontype_t wt);
 qboolean BG_WeaponHasMelee(weapon_t weaponnum);
 qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt);
 qboolean BG_WeapUseAmmo(weapon_t w);
-qboolean BG_PlayerAttackAnim(int a);
-qboolean BG_PlayerStandAnim(int a);
 int BG_WeaponGroupTotalDamage(int weaponGroup);
 #endif
 #ifdef TA_HOLDSYS
@@ -1400,6 +1398,10 @@ animNumber_t BG_LegsAttackForPlayerState(playerState_t *ps, bg_playercfg_t *play
 // For ui/q3_ui
 animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum);
 animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
+animNumber_t BG_LegsStandForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum);
+
+qboolean BG_PlayerAttackAnim(animNumber_t aa);
+qboolean BG_PlayerStandAnim(bg_playercfg_t *playercfg, int prefixBit, animNumber_t aa);
 #endif
 
 #ifdef TA_ENTSYS

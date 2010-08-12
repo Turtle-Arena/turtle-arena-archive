@@ -743,7 +743,11 @@ static void PM_NightsMove( void ) {
 
 	PM_StepSlideMove( qfalse );
 
+#ifdef TA_WEAPSYS
+	PM_ContinueLegsAnim( BG_LegsStandForPlayerState(pm->ps, pm->playercfg) );
+#else
 	PM_ContinueLegsAnim( LEGS_IDLE );
+#endif
 }
 #endif
 
@@ -791,12 +795,12 @@ static void PM_FlyMove( void ) {
 	if (pm->npc) {
 		// Flying animation for flying NPCs
 		PM_ContinueLegsAnim( OBJECT_WALK );
+		return;
 	}
-#ifdef IOQ3ZTM
-	else
 #endif
-#endif
-#ifdef IOQ3ZTM // Don't use whatever random leg animation the player was in
+#ifdef TA_WEAPSYS
+	PM_ContinueLegsAnim( BG_LegsStandForPlayerState(pm->ps, pm->playercfg) );
+#elif defined IOQ3ZTM // Don't use whatever random leg animation the player was in
 	PM_ContinueLegsAnim( LEGS_IDLE );
 #endif
 }

@@ -516,10 +516,12 @@ static void Controls_UpdateModel( int anim ) {
 	VectorClear( s_controls.playerMoveangles );
 	s_controls.playerViewangles[YAW] = 180 - 30;
 	s_controls.playerMoveangles[YAW] = s_controls.playerViewangles[YAW];
-	s_controls.playerLegs		     = LEGS_IDLE;
 #ifdef TA_WEAPSYS
+	s_controls.playerLegs		     = BG_LegsStandForWeapon(&s_controls.playerinfo.playercfg,
+												s_controls.playerinfo.playercfg.default_weapon);
 	s_controls.playerTorso			 = BG_TorsoStandForWeapon(s_controls.playerinfo.playercfg.default_weapon);
 #else
+	s_controls.playerLegs		     = LEGS_IDLE;
 	s_controls.playerTorso			 = TORSO_STAND;
 #endif
 	s_controls.playerWeapon			 = -1;
