@@ -3631,7 +3631,7 @@ static qboolean NPC_Parse(char **p) {
 				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
 				{
 					animName = qtrue;
-					if (BG_LoadAnimation(p, i, animations, NULL, AP_ANIM) != 1)
+					if (BG_LoadAnimation(p, i, animations, NULL, AP_OBJECT) != 1)
 					{
 						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
 					}
@@ -5825,8 +5825,8 @@ int BG_AnimPrefixTypeForName(const char *name)
 		return AP_LEGS;
 	else if (Q_stricmpn(name, "BOTH_", 5) == 0)
 		return AP_BOTH;
-	else if (Q_stricmpn(name, "ANIM_", 5) == 0)
-		return AP_ANIM;
+	else if (Q_stricmpn(name, "OBJECT_", 7) == 0)
+		return AP_OBJECT;
 
 	return 0;
 }
@@ -6711,7 +6711,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
 				{
 					animName = qtrue;
-					if (BG_LoadAnimation(&text_p, i, animations, NULL, AP_ANIM) != 1)
+					if (BG_LoadAnimation(&text_p, i, animations, NULL, AP_OBJECT) != 1)
 					{
 						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
 					}
