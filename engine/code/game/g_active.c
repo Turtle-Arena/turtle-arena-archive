@@ -1931,8 +1931,14 @@ void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t hea
 	// --------- yaw -------------
 
 	// allow yaw to drift a bit
+#ifdef TA_WEAPSYS
+	if (!BG_PlayerStandAnim(&ent->client->pers.playercfg, AP_LEGS, ent->client->ps.legsAnim)
+		|| !BG_PlayerStandAnim(&ent->client->pers.playercfg, AP_TORSO, ent->client->ps.torsoAnim))
+#else
 	if ( ( ent->client->ps.legsAnim & ~ANIM_TOGGLEBIT ) != LEGS_IDLE
-		|| ( ent->client->ps.torsoAnim & ~ANIM_TOGGLEBIT ) != TORSO_STAND  ) {
+		|| ( ent->client->ps.torsoAnim & ~ANIM_TOGGLEBIT ) != TORSO_STAND  )
+#endif
+	{
 		// if not standing still, always point all in the same direction
 		ent->client->pers.torso.yawing = qtrue;	// always center
 		ent->client->pers.torso.pitching = qtrue;	// always center
@@ -2029,7 +2035,13 @@ void G_PlayerAnimation( gentity_t *ent )
 {
 	int legsAnim;
 
-	if ( ent->client->pers.legs.yawing && ( ent->client->ps.legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE )
+	if ( ent->client->pers.legs.yawing &&
+#ifdef TA_WEAPSYS
+		BG_PlayerStandAnim(&ent->client->pers.playercfg, AP_LEGS, ent->client->ps.legsAnim)
+#else
+		( ent->client->ps.legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE
+#endif
+		)
 		legsAnim = LEGS_TURN;
 	else
 		legsAnim = ent->client->ps.legsAnim;

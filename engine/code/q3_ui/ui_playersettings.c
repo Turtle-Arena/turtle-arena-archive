@@ -254,7 +254,10 @@ static void PlayerSettings_DrawPlayer( void *self ) {
 		viewangles[PITCH] = 0;
 		viewangles[ROLL]  = 0;
 #ifdef TA_WEAPSYS
-		UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playersettings.playerinfo.weapon), viewangles, vec3_origin, s_playersettings.playerinfo.weapon, qfalse );
+		UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo,
+				BG_LegsStandForWeapon(&s_playersettings.playerinfo.playercfg, s_playersettings.playerinfo.weapon),
+				BG_TorsoStandForWeapon(s_playersettings.playerinfo.weapon), viewangles, vec3_origin,
+				s_playersettings.playerinfo.weapon, qfalse );
 #else
 		UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
 #endif
@@ -334,7 +337,10 @@ static void PlayerSettings_SetMenuItems( void ) {
 
 	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, UI_Cvar_VariableString( "model" ) );
 #ifdef TA_WEAPSYS
-	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playersettings.playerinfo.weapon), viewangles, vec3_origin, s_playersettings.playerinfo.weapon, qfalse );
+	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo,
+			BG_LegsStandForWeapon(&s_playersettings.playerinfo.playercfg, s_playersettings.playerinfo.weapon),
+			BG_TorsoStandForWeapon(s_playersettings.playerinfo.weapon), viewangles, vec3_origin,
+			s_playersettings.playerinfo.weapon, qfalse );
 #else
 	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, vec3_origin, WP_MACHINEGUN, qfalse );
 #endif

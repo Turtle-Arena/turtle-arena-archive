@@ -3876,6 +3876,80 @@ animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum)
 
 /*
 ==============
+BG_LegsStandForWeapon
+
+For ui/q3_ui
+==============
+*/
+animNumber_t BG_LegsStandForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum)
+{
+	if (playercfg && playercfg->animations[bg_weapongroupinfo[weaponnum].normalAnims.standAnim].prefixType & AP_LEGS) {
+		return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.standAnim;
+	}
+
+	return LEGS_IDLE;
+}
+
+qboolean BG_PlayerAttackAnim(animNumber_t aa)
+{
+	animNumber_t a = (aa & ~ANIM_TOGGLEBIT);
+#if 0
+	int i;
+	for (i = 0; i < WT_MAX; i++)
+	{
+		if (bg_weapontypeinfo[i].attackAnim == a)
+		{
+			return qtrue;
+		}
+	}
+	return qfalse;
+#else
+	return (a == TORSO_ATTACK || a == TORSO_ATTACK2
+#ifdef TA_PLAYERS
+	|| (a >= TORSO_ATTACK_GUN_PRIMARY && a <= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C)
+#endif
+	);
+#endif
+}
+
+/*
+==============
+BG_PlayerStandAnim
+
+For bg/game/game and ui/q3_ui
+
+Returns true if aa is a valid standing/idle animation based on playercfg and prefixBit
+==============
+*/
+qboolean BG_PlayerStandAnim(bg_playercfg_t *playercfg, int prefixBit, animNumber_t aa)
+{
+	animNumber_t a = (aa & ~ANIM_TOGGLEBIT);
+#if 0
+	int i;
+
+	for (i = 0; i < WT_MAX; i++) {
+		if (bg_weapontypeinfo[i].standAnim == a) {
+			return (playercfg->animations[a].prefixType & prefixBit);
+		}
+	}
+
+	if (prefixBit & AP_LEGS) {
+		return (a == LEGS_IDLE);
+	}
+
+	return (a == TORSO_STAND || a == TORSO_STAND2);
+#else
+	return (((((prefixBit & AP_TORSO) && (a == TORSO_STAND || a == TORSO_STAND2))
+			|| ((prefixBit & AP_LEGS) && a == LEGS_IDLE))
+#ifdef TA_PLAYERS
+		|| (a >= TORSO_STAND_GUN_PRIMARY && a <= TORSO_STAND_NUNCHUCKS1_PRIMARY)
+#endif
+		) && (playercfg->animations[a].prefixType & prefixBit));
+#endif
+}
+
+/*
+==============
 BG_WeaponHandsForPlayerState
 ==============
 */
@@ -3938,48 +4012,6 @@ qboolean BG_WeapUseAmmo(weapon_t w)
 {
 	// Check if the weapon group uses ammo
 	return (bg_weapongroupinfo[w].item.quantity > 0);
-}
-
-qboolean BG_PlayerAttackAnim(int a)
-{
-#if 0
-	int i;
-	for (i = 0; i < WT_MAX; i++)
-	{
-		if (bg_weapontypeinfo[i].attackAnim == a)
-		{
-			return qtrue;
-		}
-	}
-	return qfalse;
-#else
-	return (a == TORSO_ATTACK || a == TORSO_ATTACK2
-#ifdef TA_PLAYERS
-	|| (a >= TORSO_ATTACK_GUN_PRIMARY && a <= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C)
-#endif
-	);
-#endif
-}
-
-qboolean BG_PlayerStandAnim(int a)
-{
-#if 0
-	int i;
-	for (i = 0; i < WT_MAX; i++)
-	{
-		if (bg_weapontypeinfo[i].standAnim == a)
-		{
-			return qtrue;
-		}
-	}
-	return qfalse;
-#else
-	return (a == TORSO_STAND || a == TORSO_STAND2
-#ifdef TA_PLAYERS
-	|| (a >= TORSO_STAND_GUN_PRIMARY && a <= TORSO_STAND_NUNCHUCKS1_PRIMARY)
-#endif
-	);
-#endif
 }
 
 /*

@@ -191,7 +191,10 @@ static void PlayerModel_UpdateModel( void )
 
 	UI_PlayerInfo_SetModel( &s_playermodel.playerinfo, s_playermodel.modelskin );
 #ifdef TA_WEAPSYS
-	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, BG_TorsoStandForWeapon(s_playermodel.playerinfo.weapon), viewangles, moveangles, s_playermodel.playerinfo.weapon, qfalse );
+	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo,
+			BG_LegsStandForWeapon(&s_playermodel.playerinfo.playercfg, s_playermodel.playerinfo.weapon),
+			BG_TorsoStandForWeapon(s_playermodel.playerinfo.weapon), viewangles, moveangles,
+			s_playermodel.playerinfo.weapon, qfalse );
 #else
 	UI_PlayerInfo_SetInfo( &s_playermodel.playerinfo, LEGS_IDLE, TORSO_STAND, viewangles, moveangles, WP_MACHINEGUN, qfalse );
 #endif

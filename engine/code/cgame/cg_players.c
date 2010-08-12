@@ -1608,7 +1608,14 @@ static void CG_PlayerAnimation( centity_t *cent, int *legsOld, int *legs, float 
 	ci = &cgs.clientinfo[ clientNum ];
 
 	// do the shuffle turn frames locally
-	if ( cent->pe.legs.yawing && ( cent->currentState.legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE ) {
+	if ( cent->pe.legs.yawing &&
+#ifdef TA_WEAPSYS
+		BG_PlayerStandAnim(&ci->playercfg, AP_LEGS, cent->currentState.legsAnim)
+#else
+		( cent->currentState.legsAnim & ~ANIM_TOGGLEBIT ) == LEGS_IDLE
+#endif
+		)
+	{
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 		BG_RunLerpFrame( &cent->pe.legs,
 #ifdef TA_PLAYERSYS
@@ -1788,11 +1795,26 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	VectorClear( legsAngles );
 	VectorClear( torsoAngles );
 
+#ifdef IOQ3ZTM
+	clientNum = cent->currentState.clientNum;
+	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
+		ci = &cgs.clientinfo[ clientNum ];
+	} else {
+		ci = NULL;
+	}
+#endif
+
 	// --------- yaw -------------
 
 	// allow yaw to drift a bit
-	if ( ( cent->currentState.legsAnim & ~ANIM_TOGGLEBIT ) != LEGS_IDLE 
-		|| ( cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT ) != TORSO_STAND  ) {
+#ifdef TA_WEAPSYS
+	if (ci && (!BG_PlayerStandAnim(&ci->playercfg, AP_LEGS, cent->currentState.legsAnim)
+		|| !BG_PlayerStandAnim(&ci->playercfg, AP_TORSO, cent->currentState.torsoAnim)))
+#else
+	if (( cent->currentState.legsAnim & ~ANIM_TOGGLEBIT ) != LEGS_IDLE 
+		|| ( cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT ) != TORSO_STAND  )
+#endif
+	{
 		// if not standing still, always point all in the same direction
 		cent->pe.torso.yawing = qtrue;	// always center
 		cent->pe.torso.pitching = qtrue;	// always center
@@ -1841,18 +1863,22 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	torsoAngles[PITCH] = cent->pe.torso.pitchAngle;
 
 	//
+#ifndef IOQ3ZTM
 	clientNum = cent->currentState.clientNum;
 	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
 		ci = &cgs.clientinfo[ clientNum ];
+#endif
 #ifdef TA_PLAYERSYS
-		if ( ci->playercfg.fixedtorso )
+		if ( ci && ci->playercfg.fixedtorso )
 #else
 		if ( ci->fixedtorso )
 #endif
 		{
 			torsoAngles[PITCH] = 0.0f;
 		}
+#ifndef IOQ3ZTM
 	}
+#endif
 
 	// --------- roll -------------
 
@@ -1875,11 +1901,13 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 	}
 
 	//
+#ifndef IOQ3ZTM
 	clientNum = cent->currentState.clientNum;
 	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
 		ci = &cgs.clientinfo[ clientNum ];
+#endif
 #ifdef TA_PLAYERSYS
-		if ( ci->playercfg.fixedlegs )
+		if ( ci && ci->playercfg.fixedlegs )
 #else
 		if ( ci->fixedlegs )
 #endif
@@ -1888,7 +1916,9 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 			legsAngles[PITCH] = 0.0f;
 			legsAngles[ROLL] = 0.0f;
 		}
+#ifndef IOQ3ZTM
 	}
+#endif
 
 	// pain twitch
 	CG_AddPainTwitch( cent, torsoAngles );
@@ -2337,7 +2367,14 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 
 	updateangles = qfalse;
 	legsAnim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
-	if( legsAnim == LEGS_IDLE || legsAnim == LEGS_IDLECR ) {
+	if(
+#ifdef TA_WEAPSYS
+		BG_PlayerStandAnim(&ci->playercfg, AP_LEGS, legsAnim)
+#else
+		legsAnim == LEGS_IDLE
+#endif
+		|| legsAnim == LEGS_IDLECR )
+	{
 		flagAnim = FLAG_STAND;
 #ifdef IOQ3ZTM // ZTM: TEST: Always update flag angle.
 		// ZTM: TODO: Have a idle timer to know if its been awhile since they moved, to NOT updateangles?
