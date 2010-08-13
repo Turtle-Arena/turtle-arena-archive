@@ -27,6 +27,6 @@ id software, ioquake3 developers, Thilo Schulz, Open Arena, Xreal project, Smoki
 See CREDITS.txt for details.
 
 == Internet Links ==
-* http://ztm.x10hosting.com/ Turtle Arena website
+* http://ztm.x10hosting.com/ta/ Turtle Arena website
 * http://turtlearena.googlecode.com/ Turtle Arena on Google Code
 
