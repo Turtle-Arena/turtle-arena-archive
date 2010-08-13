@@ -38,6 +38,9 @@ typedef enum {
 	SF_GRID,
 	SF_TRIANGLES,
 	SF_POLY,
+#ifdef WOLFET
+	SF_POLYBUFFER,
+#endif
 	SF_MD3,
 	SF_MD4,
 #ifdef RAVENMD4

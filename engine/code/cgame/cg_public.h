@@ -167,7 +167,7 @@ typedef enum {
 	// 1.32
 	CG_FS_SEEK,
 
-#if defined CAMERASCRIPT || defined TA_WEAPSYS
+#if 1 // #if defined CAMERASCRIPT || defined TA_WEAPSYS
 	CG_LOADCAMERA,
 	CG_STARTCAMERA,
 	CG_GETCAMERAINFO,
@@ -179,9 +179,13 @@ typedef enum {
 */
 #endif
 
-#ifdef TA_WEAPSYS
+//#ifdef TA_WEAPSYS
 	CG_FS_GETFILELIST,
-#endif
+//#endif
+
+//#ifdef WOLFET
+	CG_R_ADDPOLYBUFFERTOSCENE,
+//#endif
 
 	CG_MEMSET = 100,
 	CG_MEMCPY,

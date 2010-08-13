@@ -1,10 +1,10 @@
 /*
 ===========================================================================
-
 Wolfenstein: Enemy Territory GPL Source Code
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company. 
+Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Wolfenstein: Enemy Territory GPL Source Code (Wolf ET Source Code).  
+This file is part of the Wolfenstein: Enemy Territory GPL Source Code
+("Wolf ET Source Code").
 
 Wolf ET Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,14 +19,19 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wolf ET Source Code.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, the Wolf: ET Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Wolf ET Source Code.  If not, please request a copy in writing from id Software at the address below.
+In addition, the Wolf: ET Source Code is also subject to certain
+additional terms. You should have received a copy of these additional
+terms immediately following the terms and conditions of the GNU General
+Public License which accompanied the Wolf ET Source Code.  If not,
+please request a copy in writing from id Software at the address below.
 
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
+If you have questions concerning this license or the applicable
+additional terms, you may contact in writing id Software LLC,
+c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 ===========================================================================
 */
 
-#ifdef CGAMEDLL
+#ifdef CGAME
 #include "../cgame/cg_local.h"
 #else
 #include "g_local.h"
@@ -35,6 +40,8 @@ If you have questions concerning this license or the applicable additional terms
 /*
 **  Map tracemap view generation
 */
+
+#define	myftol(x) ((int)(x))
 
 #define MAX_WORLD_HEIGHT            MAX_MAP_SIZE    // maximum world height
 #define MIN_WORLD_HEIGHT            -MAX_MAP_SIZE   // minimum world height
@@ -57,8 +64,8 @@ static vec2_t one_over_mapgrid_factor;
 
 void etpro_FinalizeTracemapClamp( int *x, int *y );
 
-#ifdef CGAMEDLL
-void CG_GenerateTracemap( void ) {
+// Currently only used by CGAME
+void BG_GenerateTracemap(const char *mapname, vec3_t mapcoordsMins, vec3_t mapcoordsMaxs, bgGenTracemap_t *gen) {
 	trace_t tr;
 	vec3_t start, end;
 	int i, j;
@@ -72,24 +79,25 @@ void CG_GenerateTracemap( void ) {
 	static int lastDraw = 0;
 	static int tracecount = 0;
 	int ms;
+	char rawmapname[MAX_QPATH];
+	char dev[MAX_TOKEN_CHARS];
 
-	if ( !developer.integer ) {
-		CG_Printf( "Can only generate a tracemap in developer mode.\n" );
+	trap_Cvar_VariableStringBuffer( "developer", dev, sizeof( dev ) );
+	if ( !atoi(dev) )
+	{
+		Com_Printf( "Can only generate a tracemap in developer mode.\n" );
 		return;
 	}
 
-	if ( !cg.mapcoordsValid ) {
-		CG_Printf( "Need valid mapcoords in the worldspawn to be able to generate a tracemap.\n" );
+	if ( ( mapcoordsMaxs[0] - mapcoordsMins[0] ) != ( mapcoordsMins[1] - mapcoordsMaxs[1] ) ) {
+		Com_Printf( "Mapcoords need to be square.\n" );
 		return;
 	}
 
-	if ( ( cg.mapcoordsMaxs[0] - cg.mapcoordsMins[0] ) != ( cg.mapcoordsMins[1] - cg.mapcoordsMaxs[1] ) ) {
-		CG_Printf( "Mapcoords need to be square.\n" );
-		return;
-	}
+	strcpy(rawmapname, mapname);
 
 	// Topdown tracing
-	CG_Printf( "Generating level heightmap and level mask...\n" );
+	Com_Printf( "Generating level heightmap and level mask...\n" );
 
 	memset( &tracemap, 0, sizeof( tracemap ) );
 
@@ -98,18 +106,18 @@ void CG_GenerateTracemap( void ) {
 
 	// calculate the size of the level
 	// ok, i'm lazy. Hijack commandmap extends for now and default to a TRACEMAP_SIZE by TRACEMAP_SIZE datablock
-	x_step = ( cg.mapcoordsMaxs[0] - cg.mapcoordsMins[0] ) / (float)TRACEMAP_SIZE;
-	y_step = ( cg.mapcoordsMaxs[1] - cg.mapcoordsMins[1] ) / (float)TRACEMAP_SIZE;
+	x_step = ( mapcoordsMaxs[0] - mapcoordsMins[0] ) / (float)TRACEMAP_SIZE;
+	y_step = ( mapcoordsMaxs[1] - mapcoordsMins[1] ) / (float)TRACEMAP_SIZE;
 
 	for ( i = 0; i < TRACEMAP_SIZE; i++ ) {
-		start[0] = end[0] = cg.mapcoordsMins[0] + i * x_step;
+		start[0] = end[0] = mapcoordsMins[0] + i * x_step;
 		for ( j = 0; j < TRACEMAP_SIZE; j++ ) {
-			start[1] = end[1] = cg.mapcoordsMins[1] + j * y_step;
+			start[1] = end[1] = mapcoordsMins[1] + j * y_step;
 			start[2] = MAX_WORLD_HEIGHT;
 			end[2] = MIN_WORLD_HEIGHT;
 
 			// Find the ceiling
-			CG_Trace( &tr, start, NULL, NULL, end, ENTITYNUM_NONE, MASK_SOLID | MASK_WATER );
+			gen->trace( &tr, start, NULL, NULL, end, ENTITYNUM_NONE, MASK_SOLID | MASK_WATER );
 			start[2] = tr.endpos[2] - 1;
 			tracecount++;
 
@@ -126,7 +134,7 @@ void CG_GenerateTracemap( void ) {
 				if ( end[2] <= MIN_WORLD_HEIGHT ) {
 					end[2] = MIN_WORLD_HEIGHT + 1;
 				}
-				CG_Trace( &tr, start, NULL, NULL, end, ENTITYNUM_NONE, ( MASK_SOLID | MASK_WATER ) );
+				gen->trace( &tr, start, NULL, NULL, end, ENTITYNUM_NONE, ( MASK_SOLID | MASK_WATER ) );
 				tracecount++;
 				if ( tr.startsolid ) {           // Stuck in something, skip over it.
 					start[2] -= 64;
@@ -152,24 +160,24 @@ void CG_GenerateTracemap( void ) {
 			if ( !( ( lastDraw <= ms ) && ( lastDraw > ms - 500 ) ) ) {
 				lastDraw = ms;
 
-				CG_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE + j, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE + j ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
-				trap_UpdateScreen();
+				Com_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE + j, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE + j ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
+				//trap_UpdateScreen();
 			}
 		}
 	}
-	CG_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
-	trap_UpdateScreen();
+	Com_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
+	//trap_UpdateScreen();
 
 	// Sky tracing
-	CG_Printf( "Generating sky heightmap and sky mask...\n" );
+	Com_Printf( "Generating sky heightmap and sky mask...\n" );
 
 	max = MIN_WORLD_HEIGHT;
 	min = MAX_WORLD_HEIGHT;
 
 	for ( i = 0; i < TRACEMAP_SIZE; i++ ) {
-		start[0] = end[0] = cg.mapcoordsMins[0] + i * x_step;
+		start[0] = end[0] = mapcoordsMins[0] + i * x_step;
 		for ( j = 0; j < TRACEMAP_SIZE; j++ ) {
-			start[1] = end[1] = cg.mapcoordsMins[1] + j * y_step;
+			start[1] = end[1] = mapcoordsMins[1] + j * y_step;
 			//start[2] = MIN_WORLD_HEIGHT;
 			start[2] = tracemap.ground[j][i];
 			end[2] = MAX_WORLD_HEIGHT;
@@ -191,13 +199,13 @@ void CG_GenerateTracemap( void ) {
 					if ( end[2] >= MAX_WORLD_HEIGHT ) {
 						end[2] = MAX_WORLD_HEIGHT - 1;
 					}
-					CG_Trace( &tr, start, NULL, NULL, end, ENTITYNUM_NONE, MASK_SOLID );
+					gen->trace( &tr, start, NULL, NULL, end, ENTITYNUM_NONE, MASK_SOLID );
 					tracecount++;
 					if ( tr.startsolid ) {           // Stuck in something, skip over it.
 						// can happen, tr.endpos still is valid even if we're starting in a solid but trace out of it hitting the next surface
 						if ( tr.surfaceFlags & SURF_SKY ) {
 							// are we in a solid?
-							if ( !( CG_PointContents( tr.endpos, ENTITYNUM_NONE ) & ( MASK_SOLID | MASK_WATER ) ) ) {
+							if ( !( gen->pointcontents( tr.endpos, ENTITYNUM_NONE ) & ( MASK_SOLID | MASK_WATER ) ) ) {
 								tracemap.sky[j][i] = tr.endpos[2];
 								if ( tracemap.sky[j][i] > max ) {
 									max = tracemap.sky[j][i];
@@ -237,30 +245,30 @@ void CG_GenerateTracemap( void ) {
 			if ( !( ( lastDraw <= ms ) && ( lastDraw > ms - 500 ) ) ) {
 				lastDraw = ms;
 
-				CG_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE + j, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE + j ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
-				trap_UpdateScreen();
+				Com_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE + j, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE + j ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
+				//trap_UpdateScreen();
 			}
 		}
 	}
-	CG_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
-	trap_UpdateScreen();
+	Com_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
+	//trap_UpdateScreen();
 
 	// More groundtrace, find ceilings for areas where we don't have ground
-	CG_Printf( "Generating sky groundmap...\n" );
+	Com_Printf( "Generating sky groundmap...\n" );
 
 	skygroundmin = MAX_WORLD_HEIGHT;
 	skygroundmax = MIN_WORLD_HEIGHT;
 
 	for ( i = 0; i < TRACEMAP_SIZE; i++ ) {
-		start[0] = end[0] = cg.mapcoordsMins[0] + i * x_step;
+		start[0] = end[0] = mapcoordsMins[0] + i * x_step;
 		for ( j = 0; j < TRACEMAP_SIZE; j++ ) {
-			start[1] = end[1] = cg.mapcoordsMins[1] + j * y_step;
+			start[1] = end[1] = mapcoordsMins[1] + j * y_step;
 			start[2] = MAX_WORLD_HEIGHT;
 			end[2] = MIN_WORLD_HEIGHT;
 
 			if ( tracemap.sky[j][i] == MAX_WORLD_HEIGHT && tracemap.ground[j][i] != MIN_WORLD_HEIGHT ) {
 				// Find the ceiling
-				CG_Trace( &tr, start, NULL, NULL, end, ENTITYNUM_NONE, MASK_SOLID | MASK_WATER );
+				gen->trace( &tr, start, NULL, NULL, end, ENTITYNUM_NONE, MASK_SOLID | MASK_WATER );
 				tracecount++;
 				if ( tr.fraction == 1 ) {        // Didn't hit anything, we're (probably) outside the world
 					tracemap.skyground[j][i] = MIN_WORLD_HEIGHT;
@@ -285,13 +293,13 @@ void CG_GenerateTracemap( void ) {
 			if ( !( ( lastDraw <= ms ) && ( lastDraw > ms - 500 ) ) ) {
 				lastDraw = ms;
 
-				CG_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE + j, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE + j ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
-				trap_UpdateScreen();
+				Com_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE + j, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE + j ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
+				//trap_UpdateScreen();
 			}
 		}
 	}
-	CG_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
-	trap_UpdateScreen();
+	Com_Printf( "%i of %i gridpoints calculated (%.2f%%), %i total traces\n", i * TRACEMAP_SIZE, TRACEMAP_SIZE * TRACEMAP_SIZE, ( ( i * TRACEMAP_SIZE ) / (float)( TRACEMAP_SIZE * TRACEMAP_SIZE ) ) * 100.f, tracecount );
+	//trap_UpdateScreen();
 
 	// R: topdown mask
 	// G: there is sky here yes/no mask
@@ -372,7 +380,7 @@ void CG_GenerateTracemap( void ) {
 	}
 
 	// write tga
-	trap_FS_FOpenFile( va( "maps/%s_tracemap.tga", Q_strlwr( cgs.rawmapname ) ), &f, FS_WRITE );
+	trap_FS_FOpenFile( va( "%s_tracemap.tga", Q_strlwr( rawmapname ) ), &f, FS_WRITE );
 
 	// header
 	data = 0; trap_FS_Write( &data, sizeof( data ), f );  // 0
@@ -436,7 +444,6 @@ void CG_GenerateTracemap( void ) {
 
 	trap_FS_FCloseFile( f );
 }
-#endif // CGAMEDLL
 
 qboolean BG_LoadTraceMap( char *rawmapname, vec2_t world_mins, vec2_t world_maxs ) {
 	int i, j;
@@ -452,7 +459,7 @@ qboolean BG_LoadTraceMap( char *rawmapname, vec2_t world_mins, vec2_t world_maxs
 	skyground_min = skyground_max = MAX_WORLD_HEIGHT;
 	sky_min = sky_max = MAX_WORLD_HEIGHT;
 
-	if ( trap_FS_FOpenFile( va( "maps/%s_tracemap.tga", Q_strlwr( rawmapname ) ), &f, FS_READ ) >= 0 ) {
+	if ( trap_FS_FOpenFile( va( "%s_tracemap.tga", Q_strlwr( rawmapname ) ), &f, FS_READ ) >= 0 ) {
 		// skip over header
 		for ( i = 0; i < 18; i++ ) {
 			trap_FS_Read( &data, 1, f );
@@ -597,6 +604,7 @@ qboolean BG_LoadTraceMap( char *rawmapname, vec2_t world_mins, vec2_t world_maxs
 			}
 		}
 	} else {
+		Com_Printf("DEBUG: Failed to open tracemap %s\n", va( "%s_tracemap.tga", Q_strlwr( rawmapname ) ));
 		return( tracemap.loaded = qfalse );
 	}
 

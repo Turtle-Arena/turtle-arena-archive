@@ -164,6 +164,10 @@ cvar_t	*r_maxpolys;
 int		max_polys;
 cvar_t	*r_maxpolyverts;
 int		max_polyverts;
+#ifdef WOLFET // ZTM: New
+cvar_t	*r_maxpolybuffers;
+int		max_polybuffers;
+#endif
 
 /*
 ** InitOpenGL
@@ -1132,6 +1136,9 @@ void R_Register( void )
 
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);
+#ifdef WOLFET // ZTM: New
+	r_maxpolybuffers = ri.Cvar_Get( "r_maxpolybuffers", va("%d", MAX_POLYS), 0);
+#endif
 
 	// make sure all the commands added here are also
 	// removed in R_Shutdown
@@ -1228,15 +1235,37 @@ void R_Init( void ) {
 	if (max_polyverts < MAX_POLYVERTS)
 		max_polyverts = MAX_POLYVERTS;
 
+#ifdef WOLFET // ZTM: New
+	max_polybuffers = r_maxpolybuffers->integer;
+	if (max_polybuffers < MAX_POLYS)
+		max_polybuffers = MAX_POLYS;
+
+	ptr = ri.Hunk_Alloc( sizeof( *backEndData[0] ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts
+			+ sizeof(srfPolyBuffer_t) * max_polybuffers, h_low);
+#else
 	ptr = ri.Hunk_Alloc( sizeof( *backEndData[0] ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts, h_low);
+#endif
 	backEndData[0] = (backEndData_t *) ptr;
 	backEndData[0]->polys = (srfPoly_t *) ((char *) ptr + sizeof( *backEndData[0] ));
 	backEndData[0]->polyVerts = (polyVert_t *) ((char *) ptr + sizeof( *backEndData[0] ) + sizeof(srfPoly_t) * max_polys);
+#ifdef WOLFET // ZTM: New
+	backEndData[0]->polybuffers = (srfPolyBuffer_t *) ((char *) ptr + sizeof( *backEndData[0] ) + sizeof(srfPoly_t) * max_polys
+			+ sizeof(polyVert_t) * max_polyverts);
+#endif
 	if ( r_smp->integer ) {
+#ifdef WOLFET // ZTM: New
+		ptr = ri.Hunk_Alloc( sizeof( *backEndData[1] ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts
+				+ sizeof(srfPolyBuffer_t) * max_polybuffers, h_low);
+#else
 		ptr = ri.Hunk_Alloc( sizeof( *backEndData[1] ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts, h_low);
+#endif
 		backEndData[1] = (backEndData_t *) ptr;
 		backEndData[1]->polys = (srfPoly_t *) ((char *) ptr + sizeof( *backEndData[1] ));
 		backEndData[1]->polyVerts = (polyVert_t *) ((char *) ptr + sizeof( *backEndData[1] ) + sizeof(srfPoly_t) * max_polys);
+#ifdef WOLFET // ZTM: New
+		backEndData[1]->polybuffers = (srfPolyBuffer_t *) ((char *) ptr + sizeof( *backEndData[1] ) + sizeof(srfPoly_t) * max_polys
+				+ sizeof(polyVert_t) * max_polyverts);
+#endif
 	} else {
 		backEndData[1] = NULL;
 	}
@@ -1356,6 +1385,9 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.ClearScene = RE_ClearScene;
 	re.AddRefEntityToScene = RE_AddRefEntityToScene;
 	re.AddPolyToScene = RE_AddPolyToScene;
+#ifdef WOLFET
+	re.AddPolyBufferToScene = RE_AddPolyBufferToScene;
+#endif
 	re.LightForPoint = R_LightForPoint;
 	re.AddLightToScene = RE_AddLightToScene;
 	re.AddAdditiveLightToScene = RE_AddAdditiveLightToScene;

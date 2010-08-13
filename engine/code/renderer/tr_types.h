@@ -73,6 +73,30 @@ typedef struct poly_s {
 	polyVert_t			*verts;
 } poly_t;
 
+#ifdef WOLFET
+// =========================================
+// Gordon, these MUST NOT exceed the values for SHADER_MAX_VERTEXES/SHADER_MAX_INDEXES
+#if 1 // ZTM: FIXME: Use 1025?
+#define MAX_PB_VERTS    1000
+#else
+#define MAX_PB_VERTS    1025
+#endif
+#define MAX_PB_INDICIES ( MAX_PB_VERTS * 6 )
+
+typedef struct polyBuffer_s {
+	vec4_t xyz[MAX_PB_VERTS];
+	vec2_t st[MAX_PB_VERTS];
+	byte color[MAX_PB_VERTS][4];
+	int numVerts;
+
+	int indicies[MAX_PB_INDICIES];
+	int numIndicies;
+
+	qhandle_t shader;
+} polyBuffer_t;
+// =========================================
+#endif
+
 typedef enum {
 	RT_MODEL,
 	RT_POLY,

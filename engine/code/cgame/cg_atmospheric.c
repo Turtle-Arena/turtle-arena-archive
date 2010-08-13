@@ -1,10 +1,10 @@
 /*
 ===========================================================================
-
 Wolfenstein: Enemy Territory GPL Source Code
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company. 
+Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Wolfenstein: Enemy Territory GPL Source Code (Wolf ET Source Code).  
+This file is part of the Wolfenstein: Enemy Territory GPL Source Code
+("Wolf ET Source Code").
 
 Wolf ET Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,10 +19,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wolf ET Source Code.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, the Wolf: ET Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Wolf ET Source Code.  If not, please request a copy in writing from id Software at the address below.
+In addition, the Wolf: ET Source Code is also subject to certain
+additional terms. You should have received a copy of these additional
+terms immediately following the terms and conditions of the GNU General
+Public License which accompanied the Wolf ET Source Code.  If not,
+please request a copy in writing from id Software at the address below.
 
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
+If you have questions concerning this license or the applicable
+additional terms, you may contact in writing id Software LLC,
+c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 ===========================================================================
 */
 
@@ -36,17 +41,16 @@ If you have questions concerning this license or the applicable additional terms
 **
 */
 
-#define ATM_NEW
-
 #include "cg_local.h"
+
+#ifdef WOLFET
+#define ATM_NEW // Use PolyBuffer
 
 #define MAX_ATMOSPHERIC_HEIGHT          MAX_MAP_SIZE    // maximum world height
 #define MIN_ATMOSPHERIC_HEIGHT          -MAX_MAP_SIZE   // minimum world height
 
 //int getgroundtime, getskytime, rendertime, checkvisibletime, generatetime;
 //int n_getgroundtime, n_getskytime, n_rendertime, n_checkvisibletime, n_generatetime;
-
-//static qboolean CG_LoadTraceMap( void );
 
 #define MAX_ATMOSPHERIC_PARTICLES       4000    // maximum # of particles
 #define MAX_ATMOSPHERIC_DISTANCE        1000    // maximum distance from refdef origin that particles are visible
@@ -137,7 +141,7 @@ static void CG_AddPolyToPool( qhandle_t shader, const polyVert_t *verts ) {
 */
 
 static qboolean kludgeChecked, kludgeResult;
-qboolean CG_AtmosphericKludge() {
+qboolean CG_AtmosphericKludge(void) {
 	// Activate rain for specified kludge maps that don't
 	// have it specified for them.
 
@@ -645,7 +649,7 @@ static void CG_SnowParticleRender( cg_atmosphericParticle_t *particle ) {
 **	Set up gust parameters.
 */
 
-static void CG_EffectGust() {
+static void CG_EffectGust(void) {
 	// Generate random values for the next gust
 
 	int diff;
@@ -820,9 +824,9 @@ void CG_EffectParse( const char *effectstr ) {
 		startptr = endptr;
 	}
 
-	if ( atmFXType == ATM_NONE || !BG_LoadTraceMap( cgs.rawmapname, cg.mapcoordsMins, cg.mapcoordsMaxs ) ) {
+	if ( atmFXType == ATM_NONE || !BG_LoadTraceMap( cgs.mapname, cg.mapcoordsMins, cg.mapcoordsMaxs ) ) {
 		// No effects
-
+		CG_Printf("DEBUG: No atm effects\n");
 		cg_atmFx.numDrops = -1;
 		return;
 	}
@@ -876,7 +880,7 @@ void CG_EffectParse( const char *effectstr ) {
 ** Main render loop
 */
 
-void CG_AddAtmosphericEffects() {
+void CG_AddAtmosphericEffects(void) {
 	// Add atmospheric effects (e.g. rain, snow etc.) to view
 
 	int curr, max, currnum;
@@ -930,8 +934,7 @@ void CG_AddAtmosphericEffects() {
 				// 'clumping' when there's only a small sky area available.
 				particle->nextDropTime = cg.time + ATMOSPHERIC_DROPDELAY;
 				continue;
-			} else
-			{
+			} else {
 				cg_atmFx.dropsCreated++;
 			}
 		}
@@ -949,3 +952,4 @@ void CG_AddAtmosphericEffects() {
 //	CG_Printf( "gg: %i gs: %i rt: %i cv: %i ge: %i\n", getgroundtime, getskytime, rendertime, checkvisibletime, generatetime );
 //	CG_Printf( "\\-> %i \\-> %i \\-> %i \\-> %i \\-> %i\n", n_getgroundtime, n_getskytime, n_rendertime, n_checkvisibletime, n_generatetime );
 }
+#endif // WOLFET

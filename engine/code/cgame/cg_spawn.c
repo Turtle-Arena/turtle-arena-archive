@@ -1,10 +1,10 @@
 /*
 ===========================================================================
-
 Wolfenstein: Enemy Territory GPL Source Code
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company. 
+Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
 
-This file is part of the Wolfenstein: Enemy Territory GPL Source Code (Wolf ET Source Code).  
+This file is part of the Wolfenstein: Enemy Territory GPL Source Code
+("Wolf ET Source Code").
 
 Wolf ET Source Code is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,10 +19,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Wolf ET Source Code.  If not, see <http://www.gnu.org/licenses/>.
 
-In addition, the Wolf: ET Source Code is also subject to certain additional terms. You should have received a copy of these additional terms immediately following the terms and conditions of the GNU General Public License which accompanied the Wolf ET Source Code.  If not, please request a copy in writing from id Software at the address below.
+In addition, the Wolf: ET Source Code is also subject to certain
+additional terms. You should have received a copy of these additional
+terms immediately following the terms and conditions of the GNU General
+Public License which accompanied the Wolf ET Source Code.  If not,
+please request a copy in writing from id Software at the address below.
 
-If you have questions concerning this license or the applicable additional terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
-
+If you have questions concerning this license or the applicable
+additional terms, you may contact in writing id Software LLC,
+c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 ===========================================================================
 */
 
@@ -33,6 +38,8 @@ If you have questions concerning this license or the applicable additional terms
 */
 
 #include "cg_local.h"
+
+#ifdef WOLFET
 
 qboolean CG_SpawnString( const char *key, const char *defaultString, char **out ) {
 	int i;
@@ -111,62 +118,7 @@ char    *vtos( const vec3_t v ) {
 	return s;
 }
 
-void SP_path_corner_2( void ) {
-	char* targetname;
-	vec3_t origin;
-
-	CG_SpawnString( "targetname", "", &targetname );
-	CG_SpawnVector( "origin", "0 0 0", origin );
-
-	if ( !*targetname ) {
-		CG_Error( "path_corner_2 with no targetname at %s\n", vtos( origin ) );
-		return;
-	}
-
-	if ( numPathCorners >= MAX_PATH_CORNERS ) {
-		CG_Error( "Maximum path_corners hit\n" );
-		return;
-	}
-
-	BG_AddPathCorner( targetname, origin );
-}
-
-void SP_info_train_spline_main( void ) {
-	char* targetname;
-	char* target;
-	char* control;
-	vec3_t origin;
-	int i;
-	char* end;
-	splinePath_t* spline;
-
-	if ( !CG_SpawnVector( "origin", "0 0 0", origin ) ) {
-		CG_Error( "info_train_spline_main with no origin\n" );
-	}
-
-	if ( !CG_SpawnString( "targetname", "", &targetname ) ) {
-		CG_Error( "info_train_spline_main with no targetname at %s\n", vtos( origin ) );
-	}
-
-	CG_SpawnString( "target", "", &target );
-
-	spline = BG_AddSplinePath( targetname, target, origin );
-
-	if ( CG_SpawnString( "end", "", &end ) ) {
-		spline->isEnd = qtrue;
-	} else if ( CG_SpawnString( "start", "", &end ) ) {
-		spline->isStart = qtrue;
-	}
-
-	for ( i = 1;; i++ ) {
-		if ( !CG_SpawnString( i == 1 ? va( "control" ) : va( "control%i", i ), "", &control ) ) {
-			break;
-		}
-
-		BG_AddSplineControl( spline, control );
-	}
-}
-
+#if 0
 void SP_misc_gamemodel( void ) {
 	char* model;
 	vec_t angle;
@@ -229,18 +181,7 @@ void SP_misc_gamemodel( void ) {
 		gamemodel->radius = 0;
 	}
 }
-
-void SP_trigger_objective_info( void ) {
-	char* temp;
-
-	CG_SpawnString( "infoAllied", "^1No Text Supplied", &temp );
-	Q_strncpyz( cg.oidTriggerInfoAllies[cg.numOIDtriggers2], temp, 256 );
-
-	CG_SpawnString( "infoAxis", "^1No Text Supplied", &temp );
-	Q_strncpyz( cg.oidTriggerInfoAxis[cg.numOIDtriggers2], temp, 256 );
-
-	cg.numOIDtriggers2++;
-}
+#endif
 
 typedef struct {
 	char    *name;
@@ -249,12 +190,9 @@ typedef struct {
 
 spawn_t spawns[] = {
 	{0, 0},
-	{"path_corner_2",                SP_path_corner_2},
-	{"info_train_spline_main",       SP_info_train_spline_main},
-	{"info_train_spline_control",    SP_path_corner_2},
-
-	{"trigger_objective_info",       SP_trigger_objective_info},
+#if 0
 	{"misc_gamemodel",               SP_misc_gamemodel},
+#endif
 };
 
 #define NUMSPAWNS   ( sizeof( spawns ) / sizeof( spawn_t ) )
@@ -271,11 +209,13 @@ void CG_ParseEntityFromSpawnVars( void ) {
 	int i;
 	char    *classname;
 
+#if 0
 	// check for "notteam" / "notfree" flags
 	CG_SpawnInt( "notteam", "0", &i );
 	if ( i ) {
 		return;
 	}
+#endif
 
 	if ( CG_SpawnString( "classname", "", &classname ) ) {
 		for ( i = 0; i < NUMSPAWNS; i++ ) {
@@ -368,14 +308,11 @@ qboolean CG_ParseSpawnVars( void ) {
 
 void SP_worldspawn( void ) {
 	char    *s;
-	int i;
 
 	CG_SpawnString( "classname", "", &s );
 	if ( Q_stricmp( s, "worldspawn" ) ) {
 		CG_Error( "SP_worldspawn: The first entity isn't 'worldspawn'" );
 	}
-
-	cgs.ccLayers = 0;
 
 	if ( CG_SpawnVector2D( "mapcoordsmins", "-128 128", cg.mapcoordsMins ) &&  // top left
 		 CG_SpawnVector2D( "mapcoordsmaxs", "128 -128", cg.mapcoordsMaxs ) ) { // bottom right
@@ -384,99 +321,17 @@ void SP_worldspawn( void ) {
 		cg.mapcoordsValid = qfalse;
 	}
 
+#if 0
 	CG_ParseSpawns();
-
-	CG_SpawnString( "cclayers", "0", &s );
-	cgs.ccLayers = atoi( s );
-
-	for ( i = 0; i < cgs.ccLayers; i++ ) {
-		CG_SpawnString( va( "cclayerceil%i",i ), "0", &s );
-		cgs.ccLayerCeils[i] = atoi( s );
-	}
 
 	cg.mapcoordsScale[0] = 1 / ( cg.mapcoordsMaxs[0] - cg.mapcoordsMins[0] );
 	cg.mapcoordsScale[1] = 1 / ( cg.mapcoordsMaxs[1] - cg.mapcoordsMins[1] );
 
 	BG_InitLocations( cg.mapcoordsMins, cg.mapcoordsMaxs );
+#endif
 
 	CG_SpawnString( "atmosphere", "", &s );
 	CG_EffectParse( s );
-
-	cg.fiveMinuteSound_g[0] = \
-		cg.fiveMinuteSound_a[0] = \
-			cg.twoMinuteSound_g[0] = \
-				cg.twoMinuteSound_a[0] = \
-					cg.thirtySecondSound_g[0] =	\
-						cg.thirtySecondSound_a[0] = '\0';
-
-	CG_SpawnString( "twoMinuteSound_axis", "axis_hq_5minutes", &s );
-	Q_strncpyz( cg.fiveMinuteSound_g, s, sizeof( cg.fiveMinuteSound_g ) );
-	CG_SpawnString( "twoMinuteSound_allied", "allies_hq_5minutes", &s );
-	Q_strncpyz( cg.fiveMinuteSound_a, s, sizeof( cg.fiveMinuteSound_a ) );
-
-	CG_SpawnString( "twoMinuteSound_axis", "axis_hq_2minutes", &s );
-	Q_strncpyz( cg.twoMinuteSound_g, s, sizeof( cg.twoMinuteSound_g ) );
-	CG_SpawnString( "twoMinuteSound_allied", "allies_hq_2minutes", &s );
-	Q_strncpyz( cg.twoMinuteSound_a, s, sizeof( cg.twoMinuteSound_a ) );
-
-	CG_SpawnString( "thirtySecondSound_axis", "axis_hq_30seconds", &s );
-	Q_strncpyz( cg.thirtySecondSound_g, s, sizeof( cg.thirtySecondSound_g ) );
-	CG_SpawnString( "thirtySecondSound_allied", "allies_hq_30seconds", &s );
-	Q_strncpyz( cg.thirtySecondSound_a, s, sizeof( cg.thirtySecondSound_a ) );
-
-	// 5 minute axis
-	if ( !*cg.fiveMinuteSound_g ) {
-		cgs.media.fiveMinuteSound_g = 0;
-	} else if ( strstr( cg.fiveMinuteSound_g, ".wav" ) ) {
-		cgs.media.fiveMinuteSound_g = trap_S_RegisterSound( cg.fiveMinuteSound_g, qtrue );
-	} else {
-		cgs.media.fiveMinuteSound_g = -1;
-	}
-
-	// 5 minute allied
-	if ( !*cg.fiveMinuteSound_a ) {
-		cgs.media.fiveMinuteSound_a = 0;
-	} else if ( strstr( cg.fiveMinuteSound_a, ".wav" ) ) {
-		cgs.media.fiveMinuteSound_a = trap_S_RegisterSound( cg.fiveMinuteSound_a, qtrue );
-	} else {
-		cgs.media.fiveMinuteSound_a = -1;
-	}
-
-	// 2 minute axis
-	if ( !*cg.twoMinuteSound_g ) {
-		cgs.media.twoMinuteSound_g = 0;
-	} else if ( strstr( cg.twoMinuteSound_g, ".wav" ) ) {
-		cgs.media.twoMinuteSound_g = trap_S_RegisterSound( cg.twoMinuteSound_g, qtrue );
-	} else {
-		cgs.media.twoMinuteSound_g = -1;
-	}
-
-	// 2 minute allied
-	if ( !*cg.twoMinuteSound_a ) {
-		cgs.media.twoMinuteSound_a = 0;
-	} else if ( strstr( cg.twoMinuteSound_a, ".wav" ) ) {
-		cgs.media.twoMinuteSound_a = trap_S_RegisterSound( cg.twoMinuteSound_a, qtrue );
-	} else {
-		cgs.media.twoMinuteSound_a = -1;
-	}
-
-	// 30 seconds axis
-	if ( !*cg.thirtySecondSound_g ) {
-		cgs.media.thirtySecondSound_g = 0;
-	} else if ( strstr( cg.thirtySecondSound_g, ".wav" ) ) {
-		cgs.media.thirtySecondSound_g = trap_S_RegisterSound( cg.thirtySecondSound_g, qtrue );
-	} else {
-		cgs.media.thirtySecondSound_g = -1;
-	}
-
-	// 30 seconds allied
-	if ( !*cg.thirtySecondSound_a ) {
-		cgs.media.thirtySecondSound_a = 0;
-	} else if ( strstr( cg.thirtySecondSound_a, ".wav" ) ) {
-		cgs.media.thirtySecondSound_a = trap_S_RegisterSound( cg.thirtySecondSound_a, qtrue );
-	} else {
-		cgs.media.thirtySecondSound_a = -1;
-	}
 }
 
 /*
@@ -490,7 +345,9 @@ void CG_ParseEntitiesFromString( void ) {
 	// allow calls to CG_Spawn*()
 	cg.spawning = qtrue;
 	cg.numSpawnVars = 0;
+#if 0
 	cg.numMiscGameModels = 0;
+#endif
 
 	// the worldspawn is not an actual entity, but it still
 	// has a "spawn" function to perform any global setup
@@ -507,3 +364,4 @@ void CG_ParseEntitiesFromString( void ) {
 
 	cg.spawning = qfalse;           // any future calls to CG_Spawn*() will be errors
 }
+#endif // WOLFET

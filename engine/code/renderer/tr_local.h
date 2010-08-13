@@ -482,6 +482,11 @@ typedef struct {
 	int			numPolys;
 	struct srfPoly_s	*polys;
 
+#ifdef WOLFET
+	int numPolyBuffers;
+	struct srfPolyBuffer_s  *polybuffers;
+#endif
+
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
 
@@ -560,6 +565,9 @@ typedef enum {
 	SF_GRID,
 	SF_TRIANGLES,
 	SF_POLY,
+#ifdef WOLFET
+	SF_POLYBUFFER,
+#endif
 	SF_MD3,
 	SF_MD4,
 #ifdef RAVENMD4
@@ -586,6 +594,22 @@ typedef struct drawSurf_s {
 #define	MAX_PATCH_SIZE		32			// max dimensions of a patch mesh in map file
 #define	MAX_GRID_SIZE		65			// max dimensions of a grid mesh in memory
 
+#ifdef WOLFET // ZTM: FIXME: Remove
+typedef byte color4ub_t[4];
+
+typedef struct color4ubhack_s {
+	color4ub_t v;
+} color4ubhack_t;
+
+typedef struct vec4hack_s {
+	vec4_t v;
+} vec4hack_t;
+
+typedef struct vec2hack_s {
+	vec2_t v;
+} vec2hack_t;
+#endif
+
 // when cgame directly specifies a polygon, it becomes a srfPoly_t
 // as soon as it is called
 typedef struct srfPoly_s {
@@ -595,6 +619,14 @@ typedef struct srfPoly_s {
 	int				numVerts;
 	polyVert_t		*verts;
 } srfPoly_t;
+
+#ifdef WOLFET
+typedef struct srfPolyBuffer_s {
+	surfaceType_t surfaceType;
+	int fogIndex;
+	polyBuffer_t *pPolyBuffer;
+} srfPolyBuffer_t;
+#endif
 
 typedef struct srfDisplayList_s {
 	surfaceType_t	surfaceType;
@@ -1187,6 +1219,9 @@ void R_AddRailSurfaces( trRefEntity_t *e, qboolean isUnderwater );
 void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
 void R_AddPolygonSurfaces( void );
+#ifdef WOLFET
+void R_AddPolygonBufferSurfaces( void );
+#endif
 
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 void R_ComposeSort( drawSurf_t *drawSurf, int entityNum, shader_t *shader, 
@@ -1355,7 +1390,9 @@ TESSELATOR/SHADER DECLARATIONS
 
 ====================================================================
 */
+#ifndef WOLFET
 typedef byte color4ub_t[4];
+#endif
 
 typedef struct stageVars
 {
@@ -1518,6 +1555,9 @@ void R_ToggleSmpFrame( void );
 void RE_ClearScene( void );
 void RE_AddRefEntityToScene( const refEntity_t *ent );
 void RE_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
+#ifdef WOLFET
+void RE_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer );
+#endif
 void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_RenderScene( const refdef_t *fd );
@@ -1734,11 +1774,17 @@ typedef struct {
 	trRefEntity_t	entities[MAX_ENTITIES];
 	srfPoly_t	*polys;//[MAX_POLYS];
 	polyVert_t	*polyVerts;//[MAX_POLYVERTS];
+#ifdef WOLFET // ZTM: Modified to fit with source
+	srfPolyBuffer_t *polybuffers;//[MAX_POLYS];
+#endif
 	renderCommandList_t	commands;
 } backEndData_t;
 
 extern	int		max_polys;
 extern	int		max_polyverts;
+#ifdef WOLFET
+extern	int		max_polybuffers;
+#endif
 
 extern	backEndData_t	*backEndData[SMP_FRAMES];	// the second one may not be allocated
 
