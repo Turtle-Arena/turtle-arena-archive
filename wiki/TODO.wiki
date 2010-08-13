@@ -228,6 +228,11 @@ Weapons (and attacking)
   * TODO: Add an alphaGen function for the inverse of the entity's skinFraction
   * TODO: Rename skinFraction ...
 
+  * FIXME: Turtle Arena uses code from Wolf-ET (GPLv3 or later).
+    * I need to change the licensing on the effected files to GPLv3 (or later).
+    * Should I change the whole source to GPLv3 (or later)? (and the data too?)
+      * If I change the whole source it could cause issues with submitting patches to ioq3 (and more difficult for other q3 mods to use my code?)
+
 == Objects ==
 Most of the mapobjects should be damageable.
 
