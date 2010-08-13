@@ -744,6 +744,14 @@ void SP_worldspawn( void ) {
 	G_SpawnString( "enableBreath", "0", &s );
 	trap_Cvar_Set( "g_enableBreath", s );
 
+#if 0 //#ifdef WOLFET // ZTM: Currently game doesn't need the tracemap
+	level.mapcoordsValid = qfalse;
+	if ( G_SpawnVector2D( "mapcoordsmins", "-128 128", level.mapcoordsMins ) &&  // top left
+		 G_SpawnVector2D( "mapcoordsmaxs", "128 -128", level.mapcoordsMaxs ) ) { // bottom right
+		level.mapcoordsValid = qtrue;
+	}
+#endif
+
 	g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
 	g_entities[ENTITYNUM_WORLD].classname = "worldspawn";
 

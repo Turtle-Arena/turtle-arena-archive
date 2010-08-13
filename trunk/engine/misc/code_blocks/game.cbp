@@ -126,6 +126,9 @@
 		<Unit filename="../../code/game/bg_slidemove.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/game/bg_tracemap.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/game/chars.h" />
 		<Unit filename="../../code/game/g_active.c">
 			<Option compilerVar="CC" />

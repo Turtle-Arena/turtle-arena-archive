@@ -676,6 +676,11 @@ typedef struct {
 
 #define MAX_PREDICTED_EVENTS	16
  
+#ifdef WOLFET
+#define MAX_SPAWN_VARS          64
+#define MAX_SPAWN_VARS_CHARS    2048
+#endif
+ 
 typedef struct {
 	int			clientFrame;		// incremented each frame
 
@@ -752,6 +757,20 @@ typedef struct {
 	// view rendering
 	refdef_t	refdef;
 	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
+#ifdef WOLFET
+	refdef_t	*refdef_current;
+
+	// spawn variables
+	qboolean spawning;                  // the CG_Spawn*() functions are valid
+	int numSpawnVars;
+	char        *spawnVars[MAX_SPAWN_VARS][2];  // key / value pairs
+	int numSpawnVarChars;
+	char spawnVarChars[MAX_SPAWN_VARS_CHARS];
+
+	vec2_t mapcoordsMins;
+	vec2_t mapcoordsMaxs;
+	qboolean mapcoordsValid;
+#endif
 
 #ifdef TURTLEARENA // LOCKON
 	// lockon key
@@ -1626,6 +1645,9 @@ extern	vmCvar_t		cg_drawMeleeWeaponTrails;
 #ifdef IOQ3ZTM // LASERTAG
 extern	vmCvar_t		cg_laserTag;
 #endif
+#ifdef WOLFET
+extern vmCvar_t cg_atmosphericEffects;
+#endif
 
 //
 // cg_main.c
@@ -1666,6 +1688,12 @@ void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
 #endif
 void CG_AddBufferedSound( sfxHandle_t sfx);
+
+#ifdef WOLFET
+void CG_SetupFrustum( void );
+qboolean CG_CullPoint( vec3_t pt );
+qboolean CG_CullPointAndRadius( const vec3_t pt, vec_t radius );
+#endif
 
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
 
@@ -1959,6 +1987,18 @@ void CG_DrawLetterbox(void);
 //
 void CG_ProcessSnapshots( void );
 
+#ifdef WOLFET
+//
+// cg_spawn.c
+//
+qboolean    CG_SpawnString( const char *key, const char *defaultString, char **out );
+// spawn string returns a temporary reference, you must CopyString() if you want to keep it
+qboolean    CG_SpawnFloat( const char *key, const char *defaultString, float *out );
+qboolean    CG_SpawnInt( const char *key, const char *defaultString, int *out );
+qboolean    CG_SpawnVector( const char *key, const char *defaultString, float *out );
+void        CG_ParseEntitiesFromString( void );
+#endif
+
 //
 // cg_info.c
 //
@@ -2003,6 +2043,21 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps );
 //
 void CG_NPC( centity_t *cent );
 void CG_RegisterNPCVisuals( int npcNum );
+#endif
+
+#ifdef WOLFET
+//
+// cg_atmospheric.c
+//
+void CG_EffectParse(const char *effectstr);
+void CG_AddAtmosphericEffects(void);
+
+//
+// cg_polybus.c
+//
+polyBuffer_t* CG_PB_FindFreePolyBuffer( qhandle_t shader, int numVerts, int numIndicies );
+void CG_PB_ClearPolyBuffers( void );
+void CG_PB_RenderPolyBuffers( void );
 #endif
 
 //===============================================
@@ -2118,6 +2173,9 @@ void		trap_R_AddRefEntityToScene( const refEntity_t *re );
 // polys are intended for simple wall marks, not really for doing
 // significant construction
 void		trap_R_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts );
+#ifdef WOLFET
+void        trap_R_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer );
+#endif
 void		trap_R_AddPolysToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int numPolys );
 void		trap_R_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 int			trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );

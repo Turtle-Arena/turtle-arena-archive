@@ -562,6 +562,23 @@ void CG_CamReset_f(void)
 }
 #endif
 
+#ifdef WOLFET
+void CG_GenerateTracemap(void)
+{
+	bgGenTracemap_t gen;
+
+	if ( !cg.mapcoordsValid ) {
+		CG_Printf( "Need valid mapcoords in the worldspawn to be able to generate a tracemap.\n" );
+		return;
+	}
+
+	gen.trace = CG_Trace;
+	gen.pointcontents = CG_PointContents;
+
+	BG_GenerateTracemap(cgs.mapname, cg.mapcoordsMins, cg.mapcoordsMaxs, &gen);
+}
+#endif
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -646,7 +663,10 @@ static consoleCommand_t	commands[] = {
 #ifdef IOQ3ZTM // LETTERBOX
 	{ "letterbox", CG_Letterbox },
 #endif
-	{ "loaddeferred", CG_LoadDeferredPlayers }	
+#ifdef WOLFET
+	{ "generateTracemap", CG_GenerateTracemap },
+#endif
+	{ "loaddeferred", CG_LoadDeferredPlayers } 
 };
 
 
