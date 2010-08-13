@@ -51,12 +51,15 @@ GAME OPTIONS MENU
 #define ID_DRAWTEAMOVERLAY		136
 #define ID_ALLOWDOWNLOAD			137
 #define ID_BACK					138
+#ifdef WOLFET
+#define ID_ATMEFFECTS			139
+#endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
-#define ID_SHOWBLOOD			139
+#define ID_SHOWBLOOD			140
 #endif
 #ifndef NOTRATEDM
-#define ID_SHOWGIBS				140
+#define ID_SHOWGIBS				141
 #endif
 #endif
 
@@ -85,6 +88,9 @@ typedef struct {
 	menuradiobutton_s	forcemodel;
 	menulist_s			drawteamoverlay;
 	menuradiobutton_s	allowdownload;
+#ifdef WOLFET
+	menulist_s			atmeffects;
+#endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 	menuradiobutton_s	showblood;
@@ -109,6 +115,16 @@ static const char *teamoverlay_names[] =
 	NULL
 };
 
+#ifdef WOLFET
+static const char *atmeffects_names[] =
+{
+	"off",
+	"low",
+	"high",
+	NULL
+};
+#endif
+
 static void Preferences_SetMenuItems( void ) {
 	s_preferences.crosshair.curvalue		= (int)trap_Cvar_VariableValue( "cg_drawCrosshair" ) % NUM_CROSSHAIRS;
 	s_preferences.simpleitems.curvalue		= trap_Cvar_VariableValue( "cg_simpleItems" ) != 0;
@@ -125,6 +141,13 @@ static void Preferences_SetMenuItems( void ) {
 #endif
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
+#ifdef WOLFET
+	s_preferences.atmeffects.curvalue		= 2*trap_Cvar_VariableValue( "cg_atmosphericEffects" );
+	if (s_preferences.atmeffects.curvalue < 0)
+		s_preferences.atmeffects.curvalue = 0;
+	else if (s_preferences.atmeffects.curvalue > 2)
+		s_preferences.atmeffects.curvalue = 2;
+#endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 	s_preferences.showblood.curvalue	= trap_Cvar_VariableValue( "com_blood" ) != 0;
@@ -199,6 +222,12 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "cl_allowDownload", s_preferences.allowdownload.curvalue );
 		trap_Cvar_SetValue( "sv_allowDownload", s_preferences.allowdownload.curvalue );
 		break;
+
+#ifdef WOLFET
+	case ID_ATMEFFECTS:
+		trap_Cvar_SetValue( "cg_atmosphericEffects", (float)s_preferences.atmeffects.curvalue/2.0f );
+		break;
+#endif
 
 #ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
@@ -418,6 +447,18 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.allowdownload.generic.x	       = PREFERENCES_X_POS;
 	s_preferences.allowdownload.generic.y	       = y;
 
+#ifdef WOLFET
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences.atmeffects.generic.type		= MTYPE_SPINCONTROL;
+	s_preferences.atmeffects.generic.name		= "Snow/Rain:";
+	s_preferences.atmeffects.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences.atmeffects.generic.callback	= Preferences_Event;
+	s_preferences.atmeffects.generic.id			= ID_ATMEFFECTS;
+	s_preferences.atmeffects.generic.x			= PREFERENCES_X_POS;
+	s_preferences.atmeffects.generic.y			= y;
+	s_preferences.atmeffects.itemnames			= atmeffects_names;
+#endif
+
 #ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 	y += BIGCHAR_HEIGHT+2;
@@ -468,6 +509,9 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.forcemodel );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
+#ifdef WOLFET
+	Menu_AddItem( &s_preferences.menu, &s_preferences.atmeffects );
+#endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 	Menu_AddItem( &s_preferences.menu, &s_preferences.showblood );
