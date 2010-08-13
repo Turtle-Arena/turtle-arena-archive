@@ -356,7 +356,7 @@ Stuff I'd like to do to the MD3 part of MM3D...
     * Maybe use gts.sourceforge.net to generate lower LODs? The gallery shows its possible. Somehow.
 
 = Website =
-Current Location: http://ztm.x10hosting.com/
+Current Location: http://ztm.x10hosting.com/ta/
 
   * TODO: Find a new host?
 
@@ -370,4 +370,3 @@ Current Location: http://ztm.x10hosting.com/
   * TODO: Update Features page?
 
   * TODO: Add button (well really a image) instead of just text download link?
-
