@@ -2444,6 +2444,9 @@ Only used for the world.
 <real key="_ambient;ambient" name="Ambient Intensity">Adds a constant value to overall lighting. Use is not recommended. Ambient light will have a tendency to flatten out variations in light and shade.</real>
 <color key="color" name="Ambient Color">RGB value for ambient light color (default is 0 0 0).</color>
 <real key="gravity" name="Gravity">gravity of level (default is normal gravity: 800).</real>
+<string key="mapcoordsmins" name="Map Mins">sets the minimum x and y for the map. Used to generate tracemap for snow/rain effects. (default -128 128)</string>
+<string key="mapcoordsmaxs" name="Map Maxs">sets the maximum x and y for the map. Used to generate tracemap for snow/rain effects. (default 128 -128)</string>
+<string key="atmosphere" name="Atmosphere">add snow or rain to a map. Must set map mins and maxs, and generate tracemap.</string>
 <integer3 key="gridsize" name="Dynamic Light Granularity">granularity of the lightgrid created by q3map. Value is three integers separated by spaces, representing number of units between grid points in X Y Z. Default gridsize value is 128 128 256. Use larger powers of 2 to reduce BSP size and compile time on very large maps.</integer3>
 <integer key="_blocksize" name="BSP Block Size">q3map always splits the BSP tree along the planes X=_blocksize*n and Y=_blocksize*n. Default _blocksize value is 1024. Increase the blocksize using larger powers of 2 to reduce compile times on very large maps with a low structural brush density.</integer>
 -------- Q3MAP2 KEYS --------
