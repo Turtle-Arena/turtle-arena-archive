@@ -826,7 +826,6 @@ void CG_EffectParse( const char *effectstr ) {
 
 	if ( atmFXType == ATM_NONE || !BG_LoadTraceMap( cgs.mapname, cg.mapcoordsMins, cg.mapcoordsMaxs ) ) {
 		// No effects
-		CG_Printf("DEBUG: No atm effects\n");
 		cg_atmFx.numDrops = -1;
 		return;
 	}
