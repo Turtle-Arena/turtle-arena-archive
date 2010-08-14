@@ -18,8 +18,6 @@ The 'shared' (used by all weapons) torso animations should be modfied so Bo Staf
   gesture, raise, drop, getflag, gaurdbase, patrol, followme, affirmative, negative
 
 ===Both===
-BOTH_DEATH2 (defaults to BOTH_DEATH1)
-BOTH_DEAD2 (defaults to BOTH_DEAD1)
 BOTH_DEATH3 (defaults to BOTH_DEATH2)
 BOTH_DEAD3 (defaults to BOTH_DEAD2)
 
