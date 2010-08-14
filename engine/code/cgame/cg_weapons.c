@@ -2029,6 +2029,20 @@ static float	CG_MachinegunSpinAngle( centity_t *cent ) {
 
 		speed = 0.5 * ( SPIN_SPEED + (float)( COAST_TIME - delta ) / COAST_TIME );
 		angle = cent->pe.barrelAngle + delta * speed;
+
+#ifdef TA_WEAPSYS
+		if ((cg.time - cent->pe.barrelTime) <= COAST_TIME)
+		{
+			int i;
+
+			// Update yawAngles so if the barrel uses gravity it won't jump around
+			for (i = 0; i < MAX_HANDS; i++)
+			{
+				cent->pe.barrel[i].yawAngle = angle;
+				cent->pe.barrel[i].yawing = qtrue;
+			}
+		}
+#endif
 	}
 
 	if ( cent->pe.barrelSpinning == !(cent->currentState.eFlags & EF_FIRING) ) {
@@ -2052,6 +2066,69 @@ static float	CG_MachinegunSpinAngle( centity_t *cent ) {
 	return angle;
 }
 
+#ifdef TA_WEAPSYS
+/*
+========================
+CG_BarrelGravityAngle
+========================
+*/
+float CG_BarrelGravityAngle(centity_t *cent, refEntity_t *gun, lerpFrame_t *lerp)
+{
+	//qboolean updateangles;
+	float ang, d;
+	vec3_t angles;
+	vec3_t dir;
+
+	//updateangles = qtrue;
+	
+	//if ( !updateangles ) {
+	//	return;
+	//}
+
+	VectorCopy( cent->currentState.pos.trDelta, dir );
+	// add gravity
+	dir[2] += 100;
+	VectorNormalize( dir );
+	d = DotProduct(gun->axis[2], dir);
+	// if there is anough movement orthogonal to the flag pole
+	if (fabs(d) < 0.9) {
+		//
+		d = DotProduct(gun->axis[0], dir);
+		if (d > 1.0f) {
+			d = 1.0f;
+		}
+		else if (d < -1.0f) {
+			d = -1.0f;
+		}
+#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
+		ang = Q_acos(d);
+#else
+		ang = acos(d);
+#endif
+
+		d = DotProduct(gun->axis[1], dir);
+		if (d < 0) {
+			angles[YAW] = 360 - ang * 180 / M_PI;
+		}
+		else {
+			angles[YAW] = ang * 180 / M_PI;
+		}
+		if (angles[YAW] < 0)
+			angles[YAW] += 360;
+		if (angles[YAW] > 360)
+			angles[YAW] -= 360;
+
+		// change the yaw angle
+#ifdef IOQ3ZTM // BG_SWING_ANGLES
+		BG_SwingAngles( angles[YAW], 40, 90, BG_SWINGSPEED, &lerp->yawAngle, &lerp->yawing, cg.frametime );
+#else
+		CG_SwingAngles( angles[YAW], 40, 90, 0.3f, &lerp->yawAngle, &lerp->yawing );
+#endif
+	}
+
+	return lerp->yawAngle;
+}
+#endif
 
 /*
 ========================
@@ -2781,7 +2858,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		VectorClear(angles);
 		if (weaponGroup->weapon[i]->barrelSpin != BS_NONE)
 		{
-			if (i & 1) // Spin other direction
+			if ((weaponGroup->weapon[i]->flags & WIF_BARREL_IDLE_USE_GRAVITY) && !cent->pe.barrelSpinning
+				&& (cg.time - cent->pe.barrelTime) > COAST_TIME)
+			{
+				angles[weaponGroup->weapon[i]->barrelSpin] = CG_BarrelGravityAngle(cent, &gun[i], &cent->pe.barrel[i]);
+			}
+			else if (i & 1) // Spin other direction
 				angles[weaponGroup->weapon[i]->barrelSpin] = 360-barrelSpinAngle;
 			else
 				angles[weaponGroup->weapon[i]->barrelSpin] = barrelSpinAngle;

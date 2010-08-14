@@ -605,11 +605,14 @@ typedef struct
 #define WIF_CUTS					8 // Swords can cuts things that a bo, nunchunk, and sai can not.
 // Guns-specific
 #define WIF_CONTINUOUS_FLASH		16
-// Non-specific, Eject "brass" functions
+// Non-specific
+// Eject "brass" functions
 #define WIF_EJECT_BRASS				32		// CG_MachineGunEjectBrass
 #define WIF_EJECT_BRASS2			64		// CG_ShotgunEjectBrass
 #define WIF_EJECT_SMOKE				128		// CG_NailgunEjectBrass
 #define WIF_EJECT_SMOKE2			256		// Shotgun smoke
+//
+#define WIF_BARREL_IDLE_USE_GRAVITY	512
 
 // Barrel Spin
 #define BS_PITCH PITCH // 0

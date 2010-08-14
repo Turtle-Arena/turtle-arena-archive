@@ -175,6 +175,9 @@ typedef struct
 
 typedef struct {
 	lerpFrame_t		legs, torso, flag;
+#ifdef TA_WEAPSYS
+	lerpFrame_t		barrel[MAX_HANDS];
+#endif
 	int				painTime;
 	int				painDirection;	// flip from 0 to 1
 	int				lightningFiring;
