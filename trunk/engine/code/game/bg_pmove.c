@@ -2064,11 +2064,12 @@ static void PM_FinishWeaponChange( void ) {
 		{
 			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]) / 2;
 			PM_ContinueTorsoAnim( anim );
-			return;
 		}
-
-		pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
-		PM_StartTorsoAnim( anim );
+		else
+		{
+			pm->ps->weaponTime += BG_AnimationTime(&pm->playercfg->animations[anim]);
+			PM_StartTorsoAnim( anim );
+		}
 	}
 #else
 	pm->ps->weaponTime += 250;
