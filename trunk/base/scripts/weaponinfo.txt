@@ -343,6 +343,7 @@ weapon "w_nunchuck"
 	impactMarkName "gfx/damage/hole_lg_mrk"
 	impactMarkRadius 4
 	barrelSpin BS_YAW
+	barrelIdleUseGravity 1
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 

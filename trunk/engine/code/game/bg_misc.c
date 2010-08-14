@@ -2618,6 +2618,16 @@ static qboolean Weapon_Parse(char **p) {
 				}
 			}
 			continue;
+		} else if ( !Q_stricmp( token, "barrelIdleUseGravity" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			if (atoi(token) == 1)
+				weapon.flags |= WIF_BARREL_IDLE_USE_GRAVITY;
+			else
+				weapon.flags &= ~WIF_BARREL_IDLE_USE_GRAVITY;
+			continue;
 		} else if ( !Q_stricmp( token, "impactSound0" ) ) {
 			token = COM_Parse( p );
 			if ( *token ) {
@@ -3126,6 +3136,7 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tejectBrass2 %d\r\n", (weapon->flags & WIF_EJECT_BRASS2));
 		FS_Printf2("\tejectSmoke %d\r\n", (weapon->flags & WIF_EJECT_SMOKE));
 		FS_Printf2("\tejectSmoke2 %d\r\n", (weapon->flags & WIF_EJECT_SMOKE2));
+		FS_Printf2("\tbarrelIdleUseGravity %d\r\n", (weapon->flags & WIF_BARREL_IDLE_USE_GRAVITY));
 
 		FS_Printf2("\tsplashMod %s\r\n", modNames[weapon->splashMod]);
 		if (weapon->flashColor[0] == (float)'c' && weapon->flashColor[1] == 1.0f && weapon->flashColor[2] == 0)

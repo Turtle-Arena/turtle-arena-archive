@@ -56,8 +56,6 @@ Focus on Single Player
 == Weapons ==
 Weapons (and attacking)
 
-  * TODO: Add code so that Nunchuk can spin when standing? When not spining have gravity, like MISSIONPACK held CTF flag?
-
   * IOQ3ZTM: TODO: Spawn Ammo items from weaponinfo.txt
     * If I make it so weapon/ammo items are in text files, should I have all items in iteminfo.txt (and `*.item`) too?...
 
@@ -115,7 +113,7 @@ Weapons (and attacking)
     * NiGHTS would replaced with a Ninja Turtle?
     * The level could be set inside an aquarium (With the aquarium at very large scale)
     * Before the dream Chet could be replaying the events of how he lost his turtles
-       * After the people around him, and the TCRI truck, could turn into nightmarens. (The truck could turn into the boss)
+       * Afterword the people around him, and the TCRI truck, could turn into nightmarens. (The truck could turn into the boss)
     * After the dream Chet would see the Turtles outside his window.
 
 == Render ==

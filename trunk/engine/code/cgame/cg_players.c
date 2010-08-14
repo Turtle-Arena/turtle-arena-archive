@@ -2327,7 +2327,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 
 #if 0 // #ifdef IOQ3ZTM // FLAG // Don't draw CTF flag for the holder in third person, blocks view.
 						// ZTM: Could we make if transparent instead?
-						//     RF_FORCEENTALPHA
+						//     RF_FORCE_ENT_ALPHA
 		if (cent->currentState.clientNum == cg.predictedPlayerState.clientNum
 			&& cg_thirdPerson.integer)
 		{
