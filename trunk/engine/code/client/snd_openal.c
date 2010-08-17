@@ -126,7 +126,10 @@ typedef struct alSfx_s
 	ALuint		buffer;					// OpenAL buffer
 	snd_info_t	info;					// information for this sound like rate, sample count..
 
-	qboolean	isDefault;			// Couldn't be loaded - use default FX
+	qboolean	isDefault;				// Couldn't be loaded - use default FX
+#ifdef IOQ3ZTM // IOQ3BUGFIX: DEFAULT_PRECACHE_FIX
+	qboolean	isDefaultChecked;		// Sound has been check if it isDefault
+#endif
 	qboolean	inMemory;				// Sound is stored in memory
 	qboolean	isLocked;				// Sound is locked (can not be unloaded)
 	int				lastUsedTime;		// Time last used
@@ -291,7 +294,11 @@ static qboolean S_AL_BufferEvict( void )
 S_AL_BufferLoad
 =================
 */
+#ifdef IOQ3ZTM // IOQ3BUGFIX: DEFAULT_PRECACHE_FIX
+static void S_AL_BufferLoad(sfxHandle_t sfx, qboolean cache)
+#else
 static void S_AL_BufferLoad(sfxHandle_t sfx)
+#endif
 {
 	ALenum error;
 	ALuint format;
@@ -300,6 +307,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx)
 	snd_info_t info;
 	alSfx_t *curSfx = &knownSfx[sfx];
 
+#ifndef IOQ3ZTM // IOQ3BUGFIX: Use default sound! (Check if already done first)
 	// Nothing?
 	if(curSfx->filename[0] == '\0')
 		return;
@@ -307,10 +315,30 @@ static void S_AL_BufferLoad(sfxHandle_t sfx)
 	// Player SFX
 	if(curSfx->filename[0] == '*')
 		return;
+#endif
 
 	// Already done?
+#ifdef IOQ3ZTM // IOQ3BUGFIX: DEFAULT_PRECACHE_FIX
+	if((curSfx->inMemory) || (curSfx->isDefault) || (!cache && curSfx->isDefaultChecked))
+#else
 	if((curSfx->inMemory) || (curSfx->isDefault))
+#endif
 		return;
+
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use default sound!
+	// Nothing?
+	if(curSfx->filename[0] == '\0') {
+		S_AL_BufferUseDefault(sfx);
+		return;
+	}
+
+	// player specific sounds are never directly loaded
+	if(curSfx->filename[0] == '*')
+	{
+		S_AL_BufferUseDefault(sfx);
+		return;
+	}
+#endif
 
 	// Try to load
 	data = S_CodecLoad(curSfx->filename, &info);
@@ -319,6 +347,17 @@ static void S_AL_BufferLoad(sfxHandle_t sfx)
 		S_AL_BufferUseDefault(sfx);
 		return;
 	}
+
+#ifdef IOQ3ZTM // IOQ3BUGFIX: DEFAULT_PRECACHE_FIX
+	curSfx->isDefaultChecked = qtrue;
+
+	if (!cache)
+	{
+		// Don't create AL cache
+		Z_Free(data);
+		return;
+	}
+#endif
 
 	format = S_AL_Format(info.width, info.channels);
 
@@ -393,8 +432,13 @@ void S_AL_BufferUse(sfxHandle_t sfx)
 	if(knownSfx[sfx].filename[0] == '\0')
 		return;
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: DEFAULT_PRECACHE_FIX
+	if((!knownSfx[sfx].inMemory) && (!knownSfx[sfx].isDefault))
+		S_AL_BufferLoad(sfx, qtrue);
+#else
 	if((!knownSfx[sfx].inMemory) && (!knownSfx[sfx].isDefault))
 		S_AL_BufferLoad(sfx);
+#endif
 	knownSfx[sfx].lastUsedTime = Sys_Milliseconds();
 }
 
@@ -464,8 +508,13 @@ sfxHandle_t S_AL_RegisterSound( const char *sample, qboolean compressed )
 {
 	sfxHandle_t sfx = S_AL_BufferFind(sample);
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: DEFAULT_PRECACHE_FIX
+	if((!knownSfx[sfx].inMemory) && (!knownSfx[sfx].isDefault))
+		S_AL_BufferLoad(sfx, s_alPrecache->integer);
+#else
 	if( s_alPrecache->integer && (!knownSfx[sfx].inMemory) && (!knownSfx[sfx].isDefault))
 		S_AL_BufferLoad(sfx);
+#endif
 	knownSfx[sfx].lastUsedTime = Com_Milliseconds();
 
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Fixes "WARNING: unhandled AL error: invalid value" messages! (Also S_Base_RegisterSound returns 0 when default is used, also allow cgame to check if sound loaded)
