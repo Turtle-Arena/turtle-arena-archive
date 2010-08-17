@@ -202,6 +202,13 @@ qboolean S_LoadSound( sfx_t *sfx )
 	snd_info_t	info;
 //	int		size;
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Match OpenAL code
+	// Nothing?
+	if ( sfx->soundName[0] == '\0' ) {
+		return qfalse;
+	}
+#endif
+
 	// player specific sounds are never directly loaded
 	if ( sfx->soundName[0] == '*') {
 		return qfalse;
