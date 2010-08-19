@@ -9,13 +9,8 @@ l_legs_control	Legs can rotate just the legs
 
 
 ==Missing animations for raph_v9==
-
-Needs (32) torso attack animations,
-LEGS_RUN doesn't look quite done,
-I want to modify four torso standing animations, see (copy of ..., the animation it defaults to)
-
-The 'shared' (used by all weapons) torso animations should be modfied so Bo Staff doesn't go into the ground...
-  gesture, raise, drop, getflag, gaurdbase, patrol, followme, affirmative, negative
+Note: Bo Staff goes in the floor during the raise and drop torso animations.
+  * wontfix: The animations are very short (~1/5 second and ~1/4 second), who will see and care?
 
 ===Both===
 BOTH_DEATH3 (defaults to BOTH_DEATH2)
@@ -28,24 +23,13 @@ Quake3 Animations
 MISSIONPACK Animations (done)
 Turtle Arena Animations
 * TORSO_PUTDEFAULT_* (defaults to reversed TORSO_GETDEFAULT_*)
-* TORSO_GETDEFAULT_* (done)
-* TORSO_STAND_GUN_PRIMARY (done)
-* TORSO_STAND_SWORD1_BOTH (done)
-* TORSO_STAND_SWORD1_PRIMARY (done)
-* TORSO_STAND_SWORD2 (copy of TORSO_STAND_SAI2, the same animation it defaults to)
 * TORSO_STAND_DAISHO (defaults to TORSO_STAND_SWORD2)
 
-* TORSO_STAND_SAI2 (done)
-* TORSO_STAND_SAI1_PRIMARY (copy of TORSO_STAND_SWORD1_PRIMARY, the same animation it defaults to)
-
-* TORSO_STAND_BO (done)
 * TORSO_STAND_BO_PRIMARY (done?)
 * TORSO_STAND_HAMMER (defaults to TORSO_STAND_SWORD1_BOTH)
 * TORSO_STAND_HAMMER_PRIMARY (defaults to TORSO_STAND_SWORD1_PRIMARY)
-* TORSO_STAND_NUNCHUCKS (copy of TORSO_STAND_SAI2, the same animation it defaults to)
-* TORSO_STAND_NUNCHUCKS1_PRIMARY (copy of TORSO_STAND_SAI1_PRIMARY, the same animation it defaults to)
-
-* TORSO_ATTACK_GUN_PRIMARY (done)
+* TORSO_STAND_NUNCHUCKS (defaults to TORSO_STAND_SAI2)
+* TORSO_STAND_NUNCHUCKS1_PRIMARY (defaults to TORSO_STAND_SAI1_PRIMARY)
 
 * TORSO_ATTACK_SWORD1_BOTH_A (missing)
 * TORSO_ATTACK_SWORD1_BOTH_B (missing)
@@ -65,7 +49,7 @@ Turtle Arena Animations
 
 * TORSO_ATTACK_SAI2_A (test)
 * TORSO_ATTACK_SAI2_B (test)
-* TORSO_ATTACK_SAI2_C (copy of TORSO_ATTACK_GAUTLET)
+* TORSO_ATTACK_SAI2_C (test)
 
 * TORSO_ATTACK_SAI1_PRIMARY_A (missing)
 * TORSO_ATTACK_SAI1_PRIMARY_C (missing)
