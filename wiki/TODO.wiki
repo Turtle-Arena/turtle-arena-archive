@@ -50,7 +50,7 @@ Focus on Single Player
 == 0.8 ==
 
 == 1.0 ==
-  * Local four player support (Splitscreen and/or some maps like Mutant Melee)
+  * Local four player support (Splitscreen and/or a single camera mode)
 
 = engine =
 == Weapons ==
@@ -230,6 +230,8 @@ Weapons (and attacking)
     * I need to change the licensing on the effected files to GPLv3 (or later).
     * Should I change the whole source to GPLv3 (or later)? (and the data too?)
       * If I change the whole source it could cause issues with submitting patches to ioq3 (and more difficult for other q3 mods to use my code?)
+
+	* TODO: Add orange effect color (For color1 and color2 cvars).
 
 == Objects ==
 Most of the mapobjects should be damageable.
