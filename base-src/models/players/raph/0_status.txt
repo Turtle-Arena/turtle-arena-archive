@@ -9,23 +9,20 @@ l_legs_control	Legs can rotate just the legs
 
 
 ==Missing animations for raph_v9==
-Note: Bo Staff goes in the floor during the raise and drop torso animations.
-  * wontfix: The animations are very short (~1/5 second and ~1/4 second), who will see and care?
-
-===Both===
-BOTH_DEATH3 (defaults to BOTH_DEATH2)
-BOTH_DEAD3 (defaults to BOTH_DEAD2)
-
-===Torso===
 Quake3 Animations
+: TODO: Have death3 be fall to knees? (but don't grab neck like quake3's doom player)
+* BOTH_DEATH3 (defaults to BOTH_DEATH2)
+* BOTH_DEAD3 (defaults to BOTH_DEAD2)
 * TORSO_STAND_GAUNTLET (copy of TORSO_STAND_SAI2)
-* LEGS_RUN (Doesn't look quite right)
+* LEGS_RUN (doesn't look quite right)
+* LEGS_JUMPB (defaults to LEGS_JUMP)
+* LEGS_LANDB (defaults to LEGS_LAND)
+
 MISSIONPACK Animations (done)
+
 Turtle Arena Animations
 * TORSO_PUTDEFAULT_* (defaults to reversed TORSO_GETDEFAULT_*)
 * TORSO_STAND_DAISHO (defaults to TORSO_STAND_SWORD2)
-
-* TORSO_STAND_BO_PRIMARY (done?)
 * TORSO_STAND_HAMMER (defaults to TORSO_STAND_SWORD1_BOTH)
 * TORSO_STAND_HAMMER_PRIMARY (defaults to TORSO_STAND_SWORD1_PRIMARY)
 * TORSO_STAND_NUNCHUCKS (defaults to TORSO_STAND_SAI2)
@@ -73,22 +70,18 @@ Turtle Arena Animations
 * TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B (missing)
 * TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C (missing)
 
-===Legs===
-* LEGS_JUMPB (Defaults to LEGS_JUMP)
-* LEGS_LANDB (Defaults to LEGS_LAND)
-
-
-== Note ==
+== Notes ==
 cg_shadows 2 doesn't not work correctly with the model for some reason.
 Is it due to the holes in the meshes?
 
+Bo Staff goes in the floor during the raise and drop torso animations.
+  * wontfix: The animations are very short (~1/5 second and ~1/4 second), who will see and care?
+
+Raph's thumb get a little weird when rotated, should it be fixed?
 
 == Converting Wings3D to MM3D ==
 Export the model from wings3d into an .obj model. Import the .obj into MisfitModel3D.
 
 Raph's mouth is just a different material on the h_head_bottom mesh
 	when exported it needs to be renamed to h_mouth_right and h_mouth_left in the mm3d model
-
-== TODO ==
-Raph's thumb get a little weird when rotated, should it be fixed?
 
