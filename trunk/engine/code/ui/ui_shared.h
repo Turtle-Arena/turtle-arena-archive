@@ -80,16 +80,22 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_SCRIPT_ARGS 12
 #define MAX_EDITFIELD 256
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
 #define ART_FX_BASE			"menu/art/fx_base"
 #define ART_FX_BLUE			"menu/art/fx_blue"
-#define ART_FX_CYAN			"menu/art/fx_cyan"
+#ifdef TA_DATA
+#define ART_FX_MAGENTA		"menu/art/fx_magenta"
+#else
+#define ART_FX_MAGENTA		"menu/art/fx_cyan"
+#endif
 #define ART_FX_GREEN		"menu/art/fx_grn"
 #define ART_FX_RED			"menu/art/fx_red"
-#define ART_FX_TEAL			"menu/art/fx_teal"
+#ifdef TA_DATA
+#define ART_FX_CYAN			"menu/art/fx_cyan"
+#else
+#define ART_FX_CYAN			"menu/art/fx_teal"
+#endif
 #define ART_FX_WHITE		"menu/art/fx_white"
 #define ART_FX_YELLOW		"menu/art/fx_yel"
-#endif
 
 #define ASSET_GRADIENTBAR "ui/assets/gradientbar2.tga"
 #define ASSET_SCROLLBAR             "ui/assets/scrollbar.tga"
@@ -310,11 +316,9 @@ typedef struct {
   qboolean fontRegistered;
 
   // player settings
-#ifndef TURTLEARENA // NO_COLOR_BAR
-	qhandle_t fxBasePic;
+  qhandle_t fxBasePic;
   qhandle_t fxPic[7];
-#endif
-	qhandle_t	crosshairShader[NUM_CROSSHAIRS];
+  qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 
 } cachedAssets_t;
 

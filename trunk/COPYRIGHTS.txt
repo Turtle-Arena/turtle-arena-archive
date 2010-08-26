@@ -44,6 +44,7 @@ base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
 base/gfx/damage/shadow.tga
 base/gfx/misc/flare.tga
+base/menu/art/fx_base.tga
 
 base/textures/sfx/flame1.tga
 base/textures/sfx/flame2.tga
