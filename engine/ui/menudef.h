@@ -226,7 +226,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define UI_OWNERDRAW_BASE 200
 #define UI_HANDICAP 200
-#define UI_EFFECTS 201			// ZTM: "TURTLEARENA // NO_COLOR_BAR" Disables this.
+#define UI_EFFECTS 201
 #define UI_PLAYERMODEL 202
 #define UI_CLANNAME 203
 #define UI_CLANLOGO 204

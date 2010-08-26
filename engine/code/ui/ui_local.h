@@ -877,9 +877,7 @@ typedef struct {
 	qhandle_t	q3HeadIcons[MAX_PLAYERMODELS];
 	int				q3SelectedHead;
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
 	int effectsColor;
-#endif
 
 	qboolean inGameLoad;
 

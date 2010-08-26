@@ -28,16 +28,22 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ART_MODEL1			"menu/art/model_1"
 #define ART_BACK0			"menu/art/back_0"
 #define ART_BACK1			"menu/art/back_1"
-#ifndef TURTLEARENA // NO_COLOR_BAR
 #define ART_FX_BASE			"menu/art/fx_base"
 #define ART_FX_BLUE			"menu/art/fx_blue"
-#define ART_FX_CYAN			"menu/art/fx_cyan"
+#ifdef TA_DATA
+#define ART_FX_MAGENTA		"menu/art/fx_magenta"
+#else
+#define ART_FX_MAGENTA		"menu/art/fx_cyan"
+#endif
 #define ART_FX_GREEN		"menu/art/fx_grn"
 #define ART_FX_RED			"menu/art/fx_red"
-#define ART_FX_TEAL			"menu/art/fx_teal"
+#ifdef TA_DATA
+#define ART_FX_CYAN			"menu/art/fx_cyan"
+#else
+#define ART_FX_CYAN			"menu/art/fx_teal"
+#endif
 #define ART_FX_WHITE		"menu/art/fx_white"
 #define ART_FX_YELLOW		"menu/art/fx_yel"
-#endif
 
 #define ID_NAME			10
 #define ID_HANDICAP		11
@@ -58,18 +64,14 @@ typedef struct {
 
 	menufield_s			name;
 	menulist_s			handicap;
-#ifndef TURTLEARENA // NO_COLOR_BAR
 	menulist_s			effects;
-#endif
 
 	menubitmap_s		back;
 	menubitmap_s		model;
 	menubitmap_s		item_null;
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
 	qhandle_t			fxBasePic;
 	qhandle_t			fxPic[7];
-#endif
 	playerInfo_t		playerinfo;
 	int					current_fx;
 	char				playerModel[MAX_QPATH];
@@ -77,10 +79,8 @@ typedef struct {
 
 static playersettings_t	s_playersettings;
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
 static int gamecodetoui[] = {4,2,3,0,5,1,6};
 static int uitogamecode[] = {4,6,2,3,1,5,7};
-#endif
 
 static const char *handicap_items[] = {
 	"None",
@@ -205,7 +205,6 @@ static void PlayerSettings_DrawHandicap( void *self ) {
 }
 
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
 /*
 =================
 PlayerSettings_DrawEffects
@@ -232,7 +231,6 @@ static void PlayerSettings_DrawEffects( void *self ) {
 	UI_DrawHandlePic( item->generic.x + 64, item->generic.y + PROP_HEIGHT + 8, 128, 8, s_playersettings.fxBasePic );
 	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * 16 + 8, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
 }
-#endif
 
 
 /*
@@ -280,10 +278,8 @@ static void PlayerSettings_SaveChanges( void ) {
 	// handicap
 	trap_Cvar_SetValue( "handicap", 100 - s_playersettings.handicap.curvalue * 5 );
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
 	// effects color
 	trap_Cvar_SetValue( "color1", uitogamecode[s_playersettings.effects.curvalue] );
-#endif
 }
 
 
@@ -311,22 +307,18 @@ PlayerSettings_SetMenuItems
 */
 static void PlayerSettings_SetMenuItems( void ) {
 	vec3_t	viewangles;
-#ifndef TURTLEARENA // NO_COLOR_BAR
 	int		c;
-#endif
 	int		h;
 
 	// name
 	Q_strncpyz( s_playersettings.name.field.buffer, UI_Cvar_VariableString("name"), sizeof(s_playersettings.name.field.buffer) );
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
 	// effects color
 	c = trap_Cvar_VariableValue( "color1" ) - 1;
 	if( c < 0 || c > 6 ) {
 		c = 6;
 	}
 	s_playersettings.effects.curvalue = gamecodetoui[c];
-#endif
 
 	// model/skin
 	memset( &s_playersettings.playerinfo, 0, sizeof(playerInfo_t) );
@@ -444,7 +436,6 @@ static void PlayerSettings_MenuInit( void ) {
 	s_playersettings.handicap.generic.bottom	= y + 2 * PROP_HEIGHT;
 	s_playersettings.handicap.numitems			= 20;
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
 	y += 3 * PROP_HEIGHT;
 	s_playersettings.effects.generic.type		= MTYPE_SPINCONTROL;
 	s_playersettings.effects.generic.flags		= QMF_NODEFAULTINIT;
@@ -457,7 +448,6 @@ static void PlayerSettings_MenuInit( void ) {
 	s_playersettings.effects.generic.right		= 192 + 200;
 	s_playersettings.effects.generic.bottom		= y + 2* PROP_HEIGHT;
 	s_playersettings.effects.numitems			= 7;
-#endif
 
 	s_playersettings.model.generic.type			= MTYPE_BITMAP;
 	s_playersettings.model.generic.name			= ART_MODEL0;
@@ -502,9 +492,7 @@ static void PlayerSettings_MenuInit( void ) {
 
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.name );
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.handicap );
-#ifndef TURTLEARENA // NO_COLOR_BAR
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.effects );
-#endif
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.model );
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.back );
 
@@ -529,16 +517,14 @@ void PlayerSettings_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_BACK0 );
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
 
-#ifndef TURTLEARENA // NO_COLOR_BAR
 	s_playersettings.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
 	s_playersettings.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	s_playersettings.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
 	s_playersettings.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
-	s_playersettings.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_TEAL );
+	s_playersettings.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
 	s_playersettings.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
-	s_playersettings.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
+	s_playersettings.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_MAGENTA );
 	s_playersettings.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
-#endif
 }
 
 
