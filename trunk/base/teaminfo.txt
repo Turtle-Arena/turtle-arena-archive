@@ -46,6 +46,9 @@ teams {
 
 // character name ( used for display and head derivation ), base model (male=James, female=Janet, else uses text)
 characters {
+	// Character for "Random" bot (Works in start server menu, but doesn't work ingame)
+	//{ "Random Bot"	"male" }
+
 	// name (display and head model), base model (torso/legs)
 	{ "leo"    "leo" }
 	{ "don"    "don" }
@@ -56,6 +59,9 @@ characters {
 
 // character name, bot alias (in bots.txt), and preferred action (a - all purpose, d - defense, o - offense)
 aliases {
+	// Alias for "Random" bot (Works in start server menu, but doesn't work ingame)
+	//{ "Random Bot"		"Random"		"a" }
+
 	{ "Leo"				"leo"			"a" }
 	{ "Don"				"don"			"a" }
 	{ "Raph"			"raph"			"o" }
