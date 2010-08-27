@@ -541,6 +541,31 @@ qboolean PC_Script_Parse(int handle, const char **out) {
 // display, window, menu, item code
 // 
 
+int UI_SelectForKey(int key)
+{
+	if (key == K_MOUSE1 || key == K_ENTER || key == K_KP_ENTER
+#ifdef IOQ3ZTM // ARROWS
+			|| key == K_MOUSE3 || key == K_RIGHTARROW || key == K_KP_RIGHTARROW
+#endif
+			)
+	{
+		// Next
+		return 1;
+	}
+	else if (key == K_MOUSE2
+#ifdef IOQ3ZTM // ARROWS
+			|| key == K_LEFTARROW || key == K_KP_LEFTARROW
+#endif
+			)
+	{
+		// Previous
+		return -1;
+	}
+
+	// No change
+	return 0;
+}
+
 /*
 ==================
 Init_Display
@@ -1732,12 +1757,15 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 	int count = DC->feederCount(item->special);
 	int max, viewmax;
 
-	if (force || (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) && item->window.flags & WINDOW_HASFOCUS)) {
+#ifndef IOQ3ZTM // ARROWS // ZTM: NOTE: Force is unused now...
+	if (force || (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) && item->window.flags & WINDOW_HASFOCUS))
+#endif
+	{
 		max = Item_ListBox_MaxScroll(item);
 		if (item->window.flags & WINDOW_HORIZONTAL) {
 			viewmax = (item->window.rect.w / listPtr->elementWidth);
 			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW
-#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+#if 0 //#ifdef TA_MISC // MENU: Right Mouse button = left arrow // not here
 				|| key == K_MOUSE2
 #endif
 			)
@@ -1940,15 +1968,26 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 
 qboolean Item_YesNo_HandleKey(itemDef_t *item, int key) {
 
-  if (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) && item->window.flags & WINDOW_HASFOCUS && item->cvar) {
-		if (key == K_MOUSE1 || key == K_ENTER || key == K_MOUSE2 || key == K_MOUSE3) {
-	    DC->setCVar(item->cvar, va("%i", !DC->getCVarValue(item->cvar)));
-		  return qtrue;
+#ifdef IOQ3ZTM // ARROWS // This changes the behavor... now it is the same as all of the ownerdraw
+	if (item->cvar)
+	{
+		int select = UI_SelectForKey(key);
+		if (select != 0)
+		{
+			DC->setCVar(item->cvar, va("%i", !DC->getCVarValue(item->cvar)));
+			return qtrue;
 		}
-  }
+	}
+#else
+	if (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) && item->window.flags & WINDOW_HASFOCUS && item->cvar) {
+		if (key == K_MOUSE1 || key == K_ENTER || key == K_MOUSE2 || key == K_MOUSE3) {
+			DC->setCVar(item->cvar, va("%i", !DC->getCVarValue(item->cvar)));
+			return qtrue;
+		}
+	}
+#endif
 
-  return qfalse;
-
+	return qfalse;
 }
 
 int Item_Multi_CountSettings(itemDef_t *item) {
@@ -2014,13 +2053,29 @@ const char *Item_Multi_Setting(itemDef_t *item) {
 qboolean Item_Multi_HandleKey(itemDef_t *item, int key) {
 	multiDef_t *multiPtr = (multiDef_t*)item->typeData;
 	if (multiPtr) {
+#ifdef IOQ3ZTM // ARROWS // This changes the behavor... now it is the same as all of the ownerdraw
+		if (item->cvar)
+		{
+			int select = UI_SelectForKey(key);
+			if (select != 0) {
+				int current = Item_Multi_FindCvarByValue(item) + select;
+#else
 	  if (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) && item->window.flags & WINDOW_HASFOCUS && item->cvar) {
 			if (key == K_MOUSE1 || key == K_ENTER || key == K_MOUSE2 || key == K_MOUSE3) {
 				int current = Item_Multi_FindCvarByValue(item) + 1;
+#endif
 				int max = Item_Multi_CountSettings(item);
+#ifdef IOQ3ZTM // ARROWS
+				if ( current < 0 ) {
+					current = max-1;
+				} else if ( current >= max ) {
+					current = 0;
+				}
+#else
 				if ( current < 0 || current >= max ) {
 					current = 0;
 				}
+#endif
 				if (multiPtr->strDef) {
 					DC->setCVar(item->cvar, multiPtr->cvarStr[current]);
 				} else {
@@ -2036,7 +2091,7 @@ qboolean Item_Multi_HandleKey(itemDef_t *item, int key) {
 			}
 		}
 	}
-  return qfalse;
+	return qfalse;
 }
 
 qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
@@ -2378,7 +2433,31 @@ qboolean Item_Slider_HandleKey(itemDef_t *item, int key, qboolean down) {
 			}
 		}
 	}
+
+#ifdef IOQ3ZTM // ARROWS // This changes the behavor... now arrows are supported
+	if (item->cvar)
+	{
+		int select = UI_SelectForKey(key);
+		if (select != 0)
+		{
+			editFieldDef_t *editDef = item->typeData;
+			if (editDef) {
+				// 20 is number of steps
+				value = DC->getCVarValue(item->cvar) + (((editDef->maxVal - editDef->minVal)/20) * select);
+
+				if (value < editDef->minVal)
+					value = editDef->minVal;
+				else if (value > editDef->maxVal)
+					value = editDef->maxVal;
+
+				DC->setCVar(item->cvar, va("%f", value));
+				return qtrue;
+			}
+		}
+	}
+#else
 	DC->Print("slider handle key exit\n");
+#endif
 	return qfalse;
 }
 
