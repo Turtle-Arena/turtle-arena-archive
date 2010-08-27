@@ -588,8 +588,13 @@ static void SVC_Status( netadr_t from ) {
 		cl = &svs.clients[i];
 		if ( cl->state >= CS_CONNECTED ) {
 			ps = SV_GameClientNum( i );
+#ifdef IOQ3ZTM // Addon for G_HUMANPLAYERS // Tell which players are bots (hopefully, without breaking compatiblity... tested/working in Q3:Team Arena)
+			Com_sprintf (player, sizeof(player), "%i %i \"%s\"%s\n", 
+				ps->persistant[PERS_SCORE], cl->ping, cl->name, (cl->netchan.remoteAddress.type == NA_BOT) ? " [bot]" : "");
+#else
 			Com_sprintf (player, sizeof(player), "%i %i \"%s\"\n", 
 				ps->persistant[PERS_SCORE], cl->ping, cl->name);
+#endif
 			playerLength = strlen(player);
 			if (statusLength + playerLength >= sizeof(status) ) {
 				break;		// can't hold any more
@@ -611,7 +616,11 @@ if a user is interested in a server to do a full status
 ================
 */
 void SVC_Info( netadr_t from ) {
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+	int		i, count, humans;
+#else
 	int		i, count;
+#endif
 	char	*gamedir;
 	char	infostring[MAX_INFO_STRING];
 
@@ -634,10 +643,19 @@ void SVC_Info( netadr_t from ) {
 		return;
 
 	// don't count privateclients
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+	count = humans = 0;
+#else
 	count = 0;
+#endif
 	for ( i = sv_privateClients->integer ; i < sv_maxclients->integer ; i++ ) {
 		if ( svs.clients[i].state >= CS_CONNECTED ) {
 			count++;
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+			if (svs.clients[i].netchan.remoteAddress.type != NA_BOT) {
+				humans++;
+			}
+#endif
 		}
 	}
 
@@ -651,6 +669,9 @@ void SVC_Info( netadr_t from ) {
 	Info_SetValueForKey( infostring, "hostname", sv_hostname->string );
 	Info_SetValueForKey( infostring, "mapname", sv_mapname->string );
 	Info_SetValueForKey( infostring, "clients", va("%i", count) );
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+	Info_SetValueForKey( infostring, "g_humanplayers", va("%i", humans ) );
+#endif
 	Info_SetValueForKey( infostring, "sv_maxclients", 
 		va("%i", sv_maxclients->integer - sv_privateClients->integer ) );
 	Info_SetValueForKey( infostring, "gametype", va("%i", sv_gametype->integer ) );
