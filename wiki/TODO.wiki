@@ -131,8 +131,6 @@ Weapons (and attacking)
   * TODO (STARTED): Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
     * sp_complete and sp_gameover
 
-  * TODO: Allow left and right arrows to change effect color in UI_Effects_HandleKey
-
 == Teamplay ==
   * TODO: Data: Team skins for players
 
