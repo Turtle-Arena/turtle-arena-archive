@@ -1895,4 +1895,3 @@ int BG_GetTracemapGroundFloor( void );
 int BG_GetTracemapGroundCeil( void );
 void etpro_FinalizeTracemapClamp( int *x, int *y );
 #endif
-
