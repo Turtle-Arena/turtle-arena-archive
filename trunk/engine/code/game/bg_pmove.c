@@ -724,7 +724,7 @@ static void PM_NightsMove( void ) {
 		VectorAdd(pm->ps->grapplePoint, v, v);
 	} else {
 		move = pm->cmd.forwardmove;
-		VectorAdd(pm->ps->grapplePoint2, v, v);
+		VectorAdd(pm->ps->nextPoint, v, v);
 	}
 	v[2] = pm->ps->origin[2];
 	VectorSubtract(v, pm->ps->origin, vel);

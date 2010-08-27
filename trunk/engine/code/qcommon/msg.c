@@ -1228,10 +1228,10 @@ netField_t	playerStateFields[] =
 { PSF(grapplePoint[0]), 0 },
 { PSF(grapplePoint[1]), 0 },
 { PSF(grapplePoint[2]), 0 },
-#ifdef NIGHTSMODE
-{ PSF(grapplePoint2[0]), 0 },
-{ PSF(grapplePoint2[1]), 0 },
-{ PSF(grapplePoint2[2]), 0 },
+#if defined NIGHTSMODE || defined NET_COMPAT
+{ PSF(nextPoint[0]), 0 },
+{ PSF(nextPoint[1]), 0 },
+{ PSF(nextPoint[2]), 0 },
 #endif
 { PSF(jumppad_ent), GENTITYNUM_BITS },
 { PSF(loopSound), 16 }
