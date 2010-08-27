@@ -3444,6 +3444,9 @@ static void CL_SetServerInfo(serverInfo_t *server, const char *info, int ping) {
 	if (server) {
 		if (info) {
 			server->clients = atoi(Info_ValueForKey(info, "clients"));
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+			server->g_humanplayers = atoi(Info_ValueForKey(info, "g_humanplayers"));
+#endif
 			Q_strncpyz(server->hostName,Info_ValueForKey(info, "hostname"), MAX_NAME_LENGTH);
 			Q_strncpyz(server->mapName, Info_ValueForKey(info, "mapname"), MAX_NAME_LENGTH);
 			server->maxClients = atoi(Info_ValueForKey(info, "sv_maxclients"));
@@ -3563,6 +3566,9 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.numlocalservers = i+1;
 	cls.localServers[i].adr = from;
 	cls.localServers[i].clients = 0;
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+	cls.localServers[i].g_humanplayers = 0;
+#endif
 	cls.localServers[i].hostName[0] = '\0';
 	cls.localServers[i].mapName[0] = '\0';
 	cls.localServers[i].maxClients = 0;

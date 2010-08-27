@@ -295,6 +295,9 @@ typedef struct {
 	int			netType;
 	int			gameType;
 	int		  	clients;
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+	int			g_humanplayers;
+#endif
 	int		  	maxClients;
 	int			minPing;
 	int			maxPing;
