@@ -3911,6 +3911,12 @@ static void UI_BuildServerDisplayList(qboolean force) {
 
 			trap_LAN_GetServerInfo(ui_netSource.integer, i, info, MAX_STRING_CHARS);
 
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+			if (ui_browserShowBots.integer == 0) {
+				clients = atoi(Info_ValueForKey(info, "g_humanplayers"));
+			}
+			else
+#endif
 			clients = atoi(Info_ValueForKey(info, "clients"));
 			uiInfo.serverStatus.numPlayersOnServers += clients;
 
@@ -4456,6 +4462,12 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 					}
 				case SORT_MAP : return Info_ValueForKey(info, "mapname");
 				case SORT_CLIENTS : 
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+					if (ui_browserShowBots.integer == 0) {
+						Com_sprintf( clientBuff, sizeof(clientBuff), "%s (%s)", Info_ValueForKey(info, "g_humanplayers"), Info_ValueForKey(info, "sv_maxclients"));
+					}
+					else
+#endif
 					Com_sprintf( clientBuff, sizeof(clientBuff), "%s (%s)", Info_ValueForKey(info, "clients"), Info_ValueForKey(info, "sv_maxclients"));
 					return clientBuff;
 				case SORT_GAME : 
@@ -5793,6 +5805,9 @@ vmCvar_t	ui_browserGameType;
 vmCvar_t	ui_browserSortKey;
 vmCvar_t	ui_browserShowFull;
 vmCvar_t	ui_browserShowEmpty;
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+vmCvar_t	ui_browserShowBots;
+#endif
 
 vmCvar_t	ui_brassTime;
 vmCvar_t	ui_drawCrosshair;
@@ -5938,6 +5953,9 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_browserSortKey, "ui_browserSortKey", "4", CVAR_ARCHIVE },
 	{ &ui_browserShowFull, "ui_browserShowFull", "1", CVAR_ARCHIVE },
 	{ &ui_browserShowEmpty, "ui_browserShowEmpty", "1", CVAR_ARCHIVE },
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+	{ &ui_browserShowBots, "ui_browserShowBots", "1", CVAR_ARCHIVE },
+#endif
 
 	{ &ui_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
 #ifdef TA_DATA
