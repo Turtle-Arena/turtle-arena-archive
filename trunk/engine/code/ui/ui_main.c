@@ -148,8 +148,13 @@ static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community,
 #endif
 #endif
 
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+static int gamecodetoui[] = {8,4,6,0,10,2,12,1,3,5,7,9,11};
+static int uitogamecode[] = {4,8,6,9,2,10,3,11,1,12,5,13,7};
+#else
 static int gamecodetoui[] = {4,2,3,0,5,1,6};
 static int uitogamecode[] = {4,6,2,3,1,5,7};
+#endif
 
 
 static void UI_StartServerRefresh(qboolean full);
@@ -247,6 +252,21 @@ void AssetCache( void ) {
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
 	uiInfo.uiDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
 	uiInfo.uiDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+	uiInfo.uiDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
+	uiInfo.uiDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_ORANGE );
+	uiInfo.uiDC.Assets.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
+	uiInfo.uiDC.Assets.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_LIME );
+	uiInfo.uiDC.Assets.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
+	uiInfo.uiDC.Assets.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_VIVIDGREEN );
+	uiInfo.uiDC.Assets.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
+	uiInfo.uiDC.Assets.fxPic[7] = trap_R_RegisterShaderNoMip( ART_FX_LIGHTBLUE );
+	uiInfo.uiDC.Assets.fxPic[8] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
+	uiInfo.uiDC.Assets.fxPic[9] = trap_R_RegisterShaderNoMip( ART_FX_PURPLE );
+	uiInfo.uiDC.Assets.fxPic[10] = trap_R_RegisterShaderNoMip( ART_FX_MAGENTA );
+	uiInfo.uiDC.Assets.fxPic[11] = trap_R_RegisterShaderNoMip( ART_FX_PINK );
+	uiInfo.uiDC.Assets.fxPic[12] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
+#else
 	uiInfo.uiDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	uiInfo.uiDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
 	uiInfo.uiDC.Assets.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
@@ -254,6 +274,7 @@ void AssetCache( void ) {
 	uiInfo.uiDC.Assets.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
 	uiInfo.uiDC.Assets.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_MAGENTA );
 	uiInfo.uiDC.Assets.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
+#endif
 	uiInfo.uiDC.Assets.scrollBar = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR );
 	uiInfo.uiDC.Assets.scrollBarArrowDown = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWDOWN );
 	uiInfo.uiDC.Assets.scrollBarArrowUp = trap_R_RegisterShaderNoMip( ASSET_SCROLLBAR_ARROWUP );
@@ -1231,7 +1252,11 @@ static void UI_DrawTeamMember(rectDef_t *rect, float scale, vec4_t color, qboole
 
 static void UI_DrawEffects(rectDef_t *rect, float scale, vec4_t color) {
 	UI_DrawHandlePic( rect->x, rect->y - 14, 128, 8, uiInfo.uiDC.Assets.fxBasePic );
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+	UI_DrawHandlePic( rect->x + uiInfo.effectsColor * 9 + 4, rect->y - 16, 16, 12, uiInfo.uiDC.Assets.fxPic[uiInfo.effectsColor] );
+#else
 	UI_DrawHandlePic( rect->x + uiInfo.effectsColor * 16 + 8, rect->y - 16, 16, 12, uiInfo.uiDC.Assets.fxPic[uiInfo.effectsColor] );
+#endif
 }
 
 static void UI_DrawMapPreview(rectDef_t *rect, float scale, vec4_t color, qboolean net) {
@@ -2343,10 +2368,10 @@ static qboolean UI_Effects_HandleKey(int flags, float *special, int key) {
 	    uiInfo.effectsColor++;
 		}
 
-    if( uiInfo.effectsColor > 6 ) {
+    if( uiInfo.effectsColor > NUM_COLOR_EFFECTS-1 ) {
 	  	uiInfo.effectsColor = 0;
 		} else if (uiInfo.effectsColor < 0) {
-	  	uiInfo.effectsColor = 6;
+	  	uiInfo.effectsColor = NUM_COLOR_EFFECTS-1;
 		}
 
 	  trap_Cvar_SetValue( "color1", uitogamecode[uiInfo.effectsColor] );

@@ -30,7 +30,7 @@ Focus on players, map themes, and multiplayer maps
   * Have player models be MDR (Finish Misfit Model 3D MDR exporting)
   * Multiple levels of detail for players and other models
   * Bring back player effect colors?
-    * Readd to ui and q3_ui
+    * DONE: Readd to ui and q3_ui
     * (Control melee trail color?)
   * Add more players (Mirage comic based); Foot Ninja, Foot Elite, and The Shredder
   * Reduce overall number of TODOs and FIXMEs in the source
@@ -131,6 +131,8 @@ Weapons (and attacking)
   * TODO (STARTED): Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
     * sp_complete and sp_gameover
 
+  * TODO: Allow left and right arrows to change effect color in UI_Effects_HandleKey
+
 == Teamplay ==
   * TODO: Data: Team skins for players
 
@@ -230,8 +232,6 @@ Weapons (and attacking)
     * I need to change the licensing on the effected files to GPLv3 (or later).
     * Should I change the whole source to GPLv3 (or later)? (and the data too?)
       * If I change the whole source it could cause issues with submitting patches to ioq3 (and more difficult for other q3 mods to use my code?)
-
-	* TODO: Add orange effect color (For color1 and color2 cvars).
 
 == Objects ==
 Most of the mapobjects should be damageable.

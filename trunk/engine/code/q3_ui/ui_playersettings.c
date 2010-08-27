@@ -44,6 +44,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 #define ART_FX_WHITE		"menu/art/fx_white"
 #define ART_FX_YELLOW		"menu/art/fx_yel"
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+#define ART_FX_ORANGE		"menu/art/fx_orange"
+#define ART_FX_LIME			"menu/art/fx_lime"
+#define ART_FX_VIVIDGREEN	"menu/art/fx_vividgreen"
+#define ART_FX_LIGHTBLUE	"menu/art/fx_lightblue"
+#define ART_FX_PURPLE		"menu/art/fx_purple"
+#define ART_FX_PINK			"menu/art/fx_pink"
+#endif
 
 #define ID_NAME			10
 #define ID_HANDICAP		11
@@ -52,6 +60,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ID_MODEL		14
 
 #define MAX_NAMELENGTH	20
+
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+#define NUM_COLOR_EFFECTS 13
+#else
+#define NUM_COLOR_EFFECTS 7
+#endif
 
 
 typedef struct {
@@ -71,7 +85,7 @@ typedef struct {
 	menubitmap_s		item_null;
 
 	qhandle_t			fxBasePic;
-	qhandle_t			fxPic[7];
+	qhandle_t			fxPic[NUM_COLOR_EFFECTS];
 	playerInfo_t		playerinfo;
 	int					current_fx;
 	char				playerModel[MAX_QPATH];
@@ -79,8 +93,13 @@ typedef struct {
 
 static playersettings_t	s_playersettings;
 
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+static int gamecodetoui[] = {8,4,6,0,10,2,12,1,3,5,7,9,11};
+static int uitogamecode[] = {4,8,6,9,2,10,3,11,1,12,5,13,7};
+#else
 static int gamecodetoui[] = {4,2,3,0,5,1,6};
 static int uitogamecode[] = {4,6,2,3,1,5,7};
+#endif
 
 static const char *handicap_items[] = {
 	"None",
@@ -229,7 +248,11 @@ static void PlayerSettings_DrawEffects( void *self ) {
 	UI_DrawProportionalString( item->generic.x, item->generic.y, "Effects", style, color );
 
 	UI_DrawHandlePic( item->generic.x + 64, item->generic.y + PROP_HEIGHT + 8, 128, 8, s_playersettings.fxBasePic );
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * 9 + 4, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
+#else
 	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * 16 + 8, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
+#endif
 }
 
 
@@ -315,8 +338,8 @@ static void PlayerSettings_SetMenuItems( void ) {
 
 	// effects color
 	c = trap_Cvar_VariableValue( "color1" ) - 1;
-	if( c < 0 || c > 6 ) {
-		c = 6;
+	if( c < 0 || c > NUM_COLOR_EFFECTS-1 ) {
+		c = NUM_COLOR_EFFECTS-1;
 	}
 	s_playersettings.effects.curvalue = gamecodetoui[c];
 
@@ -447,7 +470,7 @@ static void PlayerSettings_MenuInit( void ) {
 	s_playersettings.effects.generic.top		= y - 8;
 	s_playersettings.effects.generic.right		= 192 + 200;
 	s_playersettings.effects.generic.bottom		= y + 2* PROP_HEIGHT;
-	s_playersettings.effects.numitems			= 7;
+	s_playersettings.effects.numitems			= NUM_COLOR_EFFECTS;
 
 	s_playersettings.model.generic.type			= MTYPE_BITMAP;
 	s_playersettings.model.generic.name			= ART_MODEL0;
@@ -518,6 +541,21 @@ void PlayerSettings_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
 
 	s_playersettings.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+	s_playersettings.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
+	s_playersettings.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_ORANGE );
+	s_playersettings.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
+	s_playersettings.fxPic[3] = trap_R_RegisterShaderNoMip( ART_FX_LIME );
+	s_playersettings.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
+	s_playersettings.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_VIVIDGREEN );
+	s_playersettings.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_CYAN );
+	s_playersettings.fxPic[7] = trap_R_RegisterShaderNoMip( ART_FX_LIGHTBLUE );
+	s_playersettings.fxPic[8] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
+	s_playersettings.fxPic[9] = trap_R_RegisterShaderNoMip( ART_FX_PURPLE );
+	s_playersettings.fxPic[10] = trap_R_RegisterShaderNoMip( ART_FX_MAGENTA );
+	s_playersettings.fxPic[11] = trap_R_RegisterShaderNoMip( ART_FX_PINK );
+	s_playersettings.fxPic[12] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
+#else
 	s_playersettings.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	s_playersettings.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
 	s_playersettings.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_GREEN );
@@ -525,6 +563,7 @@ void PlayerSettings_Cache( void ) {
 	s_playersettings.fxPic[4] = trap_R_RegisterShaderNoMip( ART_FX_BLUE );
 	s_playersettings.fxPic[5] = trap_R_RegisterShaderNoMip( ART_FX_MAGENTA );
 	s_playersettings.fxPic[6] = trap_R_RegisterShaderNoMip( ART_FX_WHITE );
+#endif
 }
 
 

@@ -862,6 +862,51 @@ static void CG_ColorFromString( const char *v, vec3_t color ) {
 
 	val = atoi( v );
 
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+	switch (val)
+	{
+		case 1: // blue
+		case 2: // green
+		case 3: // cyen
+		case 4: // red
+		case 5: // magenta
+		case 6: // yellow
+		case 7: // white
+			if ( val & 1 ) {
+				color[2] = 1.0f;
+			}
+			if ( val & 2 ) {
+				color[1] = 1.0f;
+			}
+			if ( val & 4 ) {
+				color[0] = 1.0f;
+			}
+			break;
+
+		case 8: // orange
+			VectorSet( color, 1, 0.5f, 0 );
+			break;
+		case 9: // Lime
+			VectorSet( color, 0.5f, 1, 0 );
+			break;
+		case 10: // Vivid green
+			VectorSet( color, 0, 1, 0.5f );
+			break;
+		case 11: // light blue
+			VectorSet( color, 0, 0.5f, 1 );
+			break;
+		case 12: // purple
+			VectorSet( color, 0.5f, 0, 1 );
+			break;
+		case 13: // pink
+			VectorSet( color, 1, 0, 0.5f );
+			break;
+
+		default: // fall back to white
+			VectorSet( color, 1, 1, 1 );
+			break;
+	}
+#else
 	if ( val < 1 || val > 7 ) {
 		VectorSet( color, 1, 1, 1 );
 		return;
@@ -876,6 +921,7 @@ static void CG_ColorFromString( const char *v, vec3_t color ) {
 	if ( val & 4 ) {
 		color[0] = 1.0f;
 	}
+#endif
 }
 
 /*

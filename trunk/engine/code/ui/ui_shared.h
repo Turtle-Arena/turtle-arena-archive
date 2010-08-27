@@ -96,6 +96,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 #define ART_FX_WHITE		"menu/art/fx_white"
 #define ART_FX_YELLOW		"menu/art/fx_yel"
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+#define ART_FX_ORANGE		"menu/art/fx_orange"
+#define ART_FX_LIME			"menu/art/fx_lime"
+#define ART_FX_VIVIDGREEN	"menu/art/fx_vividgreen"
+#define ART_FX_LIGHTBLUE	"menu/art/fx_lightblue"
+#define ART_FX_PURPLE		"menu/art/fx_purple"
+#define ART_FX_PINK			"menu/art/fx_pink"
+#endif
 
 #define ASSET_GRADIENTBAR "ui/assets/gradientbar2.tga"
 #define ASSET_SCROLLBAR             "ui/assets/scrollbar.tga"
@@ -115,6 +123,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	NUM_CROSSHAIRS			4
 #else
 #define	NUM_CROSSHAIRS			10
+#endif
+#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+#define NUM_COLOR_EFFECTS 13
+#else
+#define NUM_COLOR_EFFECTS 7
 #endif
 
 typedef struct {
@@ -317,7 +330,7 @@ typedef struct {
 
   // player settings
   qhandle_t fxBasePic;
-  qhandle_t fxPic[7];
+  qhandle_t fxPic[NUM_COLOR_EFFECTS];
   qhandle_t	crosshairShader[NUM_CROSSHAIRS];
 
 } cachedAssets_t;
