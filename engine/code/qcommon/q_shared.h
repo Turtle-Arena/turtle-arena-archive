@@ -1099,7 +1099,8 @@ typedef struct playerState_s {
 
 	vec3_t		grapplePoint;	// location of grapple to pull towards if PMF_GRAPPLE_PULL
 #if defined NIGHTSMODE || defined NET_COMPAT
-	vec3_t		grapplePoint2;	// NiGHTS next point // ZTM: TODO: Secondary grapple (like LOZ_TP)?
+	// grapplePoint is NiGHTS mode previous point
+	vec3_t		nextPoint;	// NiGHTS mode next point
 #endif
 
 	int			eFlags;			// copied to entityState_t->eFlags

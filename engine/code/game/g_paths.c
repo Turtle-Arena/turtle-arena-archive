@@ -448,7 +448,7 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		vec3_t viewAngles;
 
 		VectorCopy( ent->pos1, ent->client->ps.grapplePoint );
-		VectorCopy( ent->pos2, ent->client->ps.grapplePoint2 );
+		VectorCopy( ent->pos2, ent->client->ps.nextPoint );
 
 		if (backward)
 			VectorSubtract( ent->pos1, ent->client->ps.origin, dir );
