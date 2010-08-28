@@ -222,6 +222,9 @@ static char* netnames[] = {
 	"UDP6",
 	NULL
 };
+#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
+static const int numNetnames = sizeof(netnames) / sizeof(char*) - 1;
+#endif
 
 #ifdef TURTLEARENA // ZTM: Website
 static char quake3worldMessage[] = "Visit turtlearena.googlecode.com for News and Updates";
@@ -684,7 +687,7 @@ static void ArenaServers_UpdateMenu( void ) {
 
 #ifdef IOQUAKE3 // ZTM: punkbuster
 #ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
-		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s%s%3d " S_COLOR_YELLOW "%s",
+		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %4s%s%3d " S_COLOR_YELLOW "%s",
 #else
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s %s%3d " S_COLOR_YELLOW "%s", 
 #endif
@@ -693,7 +696,7 @@ static void ArenaServers_UpdateMenu( void ) {
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime, servernodeptr->bPB ? "Yes" : "No" );
 #else // ZTM: No punkbuster
 #ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
-		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s%s%3d " S_COLOR_YELLOW "",
+		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %4s%s%3d " S_COLOR_YELLOW "",
 #else
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s %s%3d " S_COLOR_YELLOW "",
 #endif
@@ -844,6 +847,11 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	}
 	*/
 	servernodeptr->nettype = atoi(Info_ValueForKey(info, "nettype"));
+#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
+	if (servernodeptr->nettype < 0 || servernodeptr->nettype >= numNetnames) {
+		servernodeptr->nettype = 0;
+	}
+#endif
 
 	s = Info_ValueForKey( info, "game");
 	i = atoi( Info_ValueForKey( info, "gametype") );
