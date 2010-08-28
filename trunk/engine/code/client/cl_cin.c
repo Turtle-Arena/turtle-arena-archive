@@ -1809,8 +1809,7 @@ CIN_ResampleCinematic
 Resample cinematic to 256x256 and store in buf2
 ==================
 */
-void CIN_ResampleCinematic(int handle, int *buf2)
-{
+void CIN_ResampleCinematic(int handle, int *buf2) {
 	int ix, iy, *buf3, xm, ym, ll;
 	byte	*buf;
 
@@ -1974,8 +1973,7 @@ void CIN_UploadCinematic(int handle) {
 
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Support non-256x256 videos in shaders
 		// Resample the video if needed
-		if (cinTable[handle].dirty && (cinTable[handle].CIN_WIDTH != cinTable[handle].drawX || cinTable[handle].CIN_HEIGHT != cinTable[handle].drawY)) 
-		{
+		if (cinTable[handle].dirty && (cinTable[handle].CIN_WIDTH != cinTable[handle].drawX || cinTable[handle].CIN_HEIGHT != cinTable[handle].drawY))  {
 			int *buf2;
 
 			buf2 = Hunk_AllocateTempMemory( 256*256*4 );
@@ -1985,9 +1983,7 @@ void CIN_UploadCinematic(int handle) {
 			re.UploadCinematic( cinTable[handle].CIN_WIDTH, cinTable[handle].CIN_HEIGHT, 256, 256, (byte *)buf2, handle, qtrue);
 			cinTable[handle].dirty = qfalse;
 			Hunk_FreeTempMemory(buf2);
-		}
-		else
-		{
+		} else {
 			// Upload video at normal resolution
 			re.UploadCinematic( cinTable[handle].CIN_WIDTH, cinTable[handle].CIN_HEIGHT, cinTable[handle].drawX, cinTable[handle].drawY,
 					cinTable[handle].buf, handle, cinTable[handle].dirty);
@@ -1996,6 +1992,7 @@ void CIN_UploadCinematic(int handle) {
 #else
 		re.UploadCinematic( 256, 256, 256, 256, cinTable[handle].buf, handle, cinTable[handle].dirty);
 #endif
+
 		if (cl_inGameVideo->integer == 0 && cinTable[handle].playonwalls == 1) {
 			cinTable[handle].playonwalls--;
 		}
