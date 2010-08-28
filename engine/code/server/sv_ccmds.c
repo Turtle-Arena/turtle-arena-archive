@@ -186,11 +186,10 @@ static void SV_Map_f( void ) {
 		} else {
 			cheat = qfalse;
 		}
-		killBots = qtrue;
 #else
 		cheat = qfalse;
-		killBots = qtrue;
 #endif
+		killBots = qtrue;
 	}
 	else {
 		if ( !Q_stricmp( cmd, "devmap" )
