@@ -137,8 +137,15 @@ static const int numSortKeys = sizeof(sortKeys) / sizeof(const char*);
 static char* netnames[] = {
 	"???",
 	"UDP",
+#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
+	"UDP6"
+#else
 	NULL
+#endif
 };
+#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
+static const int numNetnames = sizeof(netnames) / sizeof(char*);
+#endif
 
 #ifndef MISSIONPACK
 #ifdef TURTLEARENA // BRANDING
@@ -4450,9 +4457,17 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 						return Info_ValueForKey(info, "addr");
 					} else {
 						if ( ui_netSource.integer == AS_LOCAL ) {
+							int nettype = atoi(Info_ValueForKey(info, "nettype"));
+
+#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
+							if (nettype < 0 || nettype >= numNetnames) {
+								nettype = 0;
+							}
+#endif
+
 							Com_sprintf( hostname, sizeof(hostname), "%s [%s]",
 											Info_ValueForKey(info, "hostname"),
-											netnames[atoi(Info_ValueForKey(info, "nettype"))] );
+											netnames[nettype] );
 							return hostname;
 						}
 						else {
