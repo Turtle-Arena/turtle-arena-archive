@@ -2242,6 +2242,9 @@ CL_InitServerInfo
 void CL_InitServerInfo( serverInfo_t *server, netadr_t *address ) {
 	server->adr = *address;
 	server->clients = 0;
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+	server->g_humanplayers = 0;
+#endif
 	server->hostName[0] = '\0';
 	server->mapName[0] = '\0';
 	server->maxClients = 0;

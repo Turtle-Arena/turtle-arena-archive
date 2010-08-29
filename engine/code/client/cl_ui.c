@@ -398,6 +398,30 @@ static int LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int
 			res = Q_stricmp( server1->mapName, server2->mapName );
 			break;
 		case SORT_CLIENTS:
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+			{
+				int clients1, clients2;
+
+				if (!Cvar_VariableIntegerValue("ui_browserShowBots")) {
+					clients1 = server1->g_humanplayers;
+					clients2 = server2->g_humanplayers;
+				}
+				else {
+					clients1 = server1->clients;
+					clients2 = server2->clients;
+				}
+
+				if (clients1 < clients2) {
+					res = -1;
+				}
+				else if (clients1 > clients2) {
+					res = 1;
+				}
+				else {
+					res = 0;
+				}
+			}
+#else
 			if (server1->clients < server2->clients) {
 				res = -1;
 			}
@@ -407,6 +431,7 @@ static int LAN_CompareServers( int source, int sortKey, int sortDir, int s1, int
 			else {
 				res = 0;
 			}
+#endif
 			break;
 		case SORT_GAME:
 			if (server1->gameType < server2->gameType) {
