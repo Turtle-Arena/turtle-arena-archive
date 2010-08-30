@@ -567,7 +567,11 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.gametype.itemnames		= gametype_items;
 #ifdef TA_MISC
 	if (inGame)
-		s_startserver.gametype.curvalue		= trap_Cvar_VariableValue("g_gameType");
+#ifdef MISSIONPACK
+		s_startserver.gametype.curvalue		= (int)Com_Clamp( 0, GT_MAX_GAME_TYPE-1, trap_Cvar_VariableValue( "g_gametype" ) );
+#else
+		s_startserver.gametype.curvalue		= (int)Com_Clamp( 0, 4, trap_Cvar_VariableValue( "g_gametype" ) );
+#endif
 #endif
 
 	for (i=0; i<MAX_MAPSPERPAGE; i++)
