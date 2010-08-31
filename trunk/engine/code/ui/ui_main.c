@@ -137,15 +137,8 @@ static const int numSortKeys = sizeof(sortKeys) / sizeof(const char*);
 static char* netnames[] = {
 	"???",
 	"UDP",
-#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
 	"UDP6"
-#else
-	NULL
-#endif
 };
-#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
-static const int numNetnames = sizeof(netnames) / sizeof(char*);
-#endif
 
 #ifndef MISSIONPACK
 #ifdef TURTLEARENA // BRANDING
@@ -1000,11 +993,7 @@ void UI_LoadMenus(const char *menuFile, qboolean reset) {
 
 	handle = trap_PC_LoadSource( menuFile );
 	if (!handle) {
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Can't try default if we error first...
 		Com_Printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
-#else
-		trap_Error( va( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile ) );
-#endif
 		handle = trap_PC_LoadSource( "ui/menus.txt" );
 		if (!handle) {
 			trap_Error( va( S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!\n") );
@@ -2356,13 +2345,7 @@ static qboolean UI_Handicap_HandleKey(int flags, float *special, int key) {
 
 		if (h > 100) {
 			h = 5;
-		}
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fixed wraping around backward
-		else if (h < 5)
-#else
-		else if (h < 0)
-#endif
-		{
+		} else if (h < 5) {
 			h = 100;
 		}
 
@@ -4459,11 +4442,9 @@ static const char *UI_FeederItemText(float feederID, int index, int column, qhan
 						if ( ui_netSource.integer == AS_LOCAL ) {
 							int nettype = atoi(Info_ValueForKey(info, "nettype"));
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
-							if (nettype < 0 || nettype >= numNetnames) {
+							if (nettype < 0 || nettype >= ARRAY_LEN(netnames)) {
 								nettype = 0;
 							}
-#endif
 
 							Com_sprintf( hostname, sizeof(hostname), "%s [%s]",
 											Info_ValueForKey(info, "hostname"),

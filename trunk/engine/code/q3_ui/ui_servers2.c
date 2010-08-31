@@ -212,19 +212,11 @@ int numNetGametypes = (sizeof( gamenames ) / sizeof( gamenames[0] )) - 1; // gam
 #endif
 
 static char* netnames[] = {
-#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
 	"??? ",
 	"UDP ",
-#else
-	"???",
-	"UDP",
-#endif
 	"UDP6",
 	NULL
 };
-#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
-static const int numNetnames = sizeof(netnames) / sizeof(char*) - 1;
-#endif
 
 #ifdef TURTLEARENA // ZTM: Website
 static char quake3worldMessage[] = "Visit turtlearena.googlecode.com for News and Updates";
@@ -686,20 +678,12 @@ static void ArenaServers_UpdateMenu( void ) {
 		}
 
 #ifdef IOQUAKE3 // ZTM: punkbuster
-#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %4s%s%3d " S_COLOR_YELLOW "%s",
-#else
-		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s %s%3d " S_COLOR_YELLOW "%s", 
-#endif
 			servernodeptr->hostname, servernodeptr->mapname, clients,
  			servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime, servernodeptr->bPB ? "Yes" : "No" );
 #else // ZTM: No punkbuster
-#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %4s%s%3d " S_COLOR_YELLOW "",
-#else
-		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %3s %s%3d " S_COLOR_YELLOW "",
-#endif
 			servernodeptr->hostname, servernodeptr->mapname, clients,
  			servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime);
@@ -848,10 +832,13 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	*/
 	servernodeptr->nettype = atoi(Info_ValueForKey(info, "nettype"));
 #ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
-	if (servernodeptr->nettype < 0 || servernodeptr->nettype >= numNetnames) {
+	if (servernodeptr->nettype < 0 || servernodeptr->nettype >= ARRAY_LEN(netnames)-1)
+#else
+	if (servernodeptr->nettype < 0 || servernodeptr->nettype >= ARRAY_LEN(netnames))
+#endif
+	{
 		servernodeptr->nettype = 0;
 	}
-#endif
 
 	s = Info_ValueForKey( info, "game");
 	i = atoi( Info_ValueForKey( info, "gametype") );

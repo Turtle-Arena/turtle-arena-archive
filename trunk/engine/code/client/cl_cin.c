@@ -1996,11 +1996,9 @@ void CIN_UploadCinematic(int handle) {
 		if (cl_inGameVideo->integer == 0 && cinTable[handle].playonwalls == 1) {
 			cinTable[handle].playonwalls--;
 		}
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Allow ingame videos to be re-enabled
 		else if (cl_inGameVideo->integer != 0 && cinTable[handle].playonwalls != 1) {
 			cinTable[handle].playonwalls = 1;
 		}
-#endif
 	}
 }
 

@@ -567,10 +567,10 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.gametype.itemnames		= gametype_items;
 #ifdef TA_MISC
 	if (inGame)
-#ifdef MISSIONPACK
-		s_startserver.gametype.curvalue		= (int)Com_Clamp( 0, GT_MAX_GAME_TYPE-1, trap_Cvar_VariableValue( "g_gametype" ) );
-#else
+#if defined IOQ3ZTM && !defined MISSIONPACK
 		s_startserver.gametype.curvalue		= (int)Com_Clamp( 0, 4, trap_Cvar_VariableValue( "g_gametype" ) );
+#else
+		s_startserver.gametype.curvalue		= (int)Com_Clamp( 0, GT_MAX_GAME_TYPE - 1, trap_Cvar_VariableValue( "g_gametype" ) );
 #endif
 #endif
 
@@ -973,25 +973,13 @@ static void ServerOptions_Start( void ) {
 		trap_Cvar_SetValue( "ui_team_fraglimit", fraglimit );
 #endif
 		trap_Cvar_SetValue( "ui_team_timelimit", timelimit );
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Miss named cvar
 		trap_Cvar_SetValue( "ui_team_friendly", friendlyfire );
-#else
-		trap_Cvar_SetValue( "ui_team_friendlt", friendlyfire );
-#endif
 		break;
 
 	case GT_CTF:
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Wrong name used for Cvar "ui_ctf_fraglimit", also used fRaglimit not fLaglimit
 		trap_Cvar_SetValue( "ui_ctf_capturelimit", flaglimit );
-#else
-		trap_Cvar_SetValue( "ui_ctf_fraglimit", fraglimit );
-#endif
 		trap_Cvar_SetValue( "ui_ctf_timelimit", timelimit );
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Miss named cvar
 		trap_Cvar_SetValue( "ui_ctf_friendly", friendlyfire );
-#else
-		trap_Cvar_SetValue( "ui_ctf_friendlt", friendlyfire );
-#endif
 		break;
 
 #ifdef MISSIONPACK // MP_GAMETYPES
@@ -1619,12 +1607,10 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 
 	memset( &s_serveroptions, 0 ,sizeof(serveroptions_t) );
 	s_serveroptions.multiplayer = multiplayer;
-#ifdef MISSIONPACK // ZTM: Allow all game types.
-	s_serveroptions.gametype = (int)Com_Clamp( 0, GT_MAX_GAME_TYPE-1, trap_Cvar_VariableValue( "g_gametype" ) );
-#elif defined IOQ3ZTM // IOQ3BUGFIX: Quake3 only had 4 gametypes
-	s_serveroptions.gametype = (int)Com_Clamp( 0, 4, trap_Cvar_VariableValue( "g_gametype" ) );
+#if defined IOQ3ZTM && !defined MISSIONPACK // IOQ3BUGFIX: Quake3 only had 4 gametypes
+	s_serveroptions.gametype = (int)Com_Clamp( 0, 4, trap_Cvar_VariableValue( "g_gameType" ) );
 #else
-	s_serveroptions.gametype = (int)Com_Clamp( 0, 5, trap_Cvar_VariableValue( "g_gameType" ) );
+	s_serveroptions.gametype = (int)Com_Clamp( 0, GT_MAX_GAME_TYPE - 1, trap_Cvar_VariableValue( "g_gameType" ) );
 #endif
 #ifdef IOQUAKE3 // ZTM: punkbuster
 	s_serveroptions.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_punkbuster" ) );
