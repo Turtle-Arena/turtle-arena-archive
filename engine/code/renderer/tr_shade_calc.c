@@ -368,21 +368,12 @@ static void AutospriteDeform( void ) {
 	vec3_t	left, up;
 	vec3_t	leftDir, upDir;
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Add '\n'
 	if ( tess.numVertexes & 3 ) {
 		ri.Printf( PRINT_WARNING, "Autosprite shader %s had odd vertex count\n", tess.shader->name );
 	}
 	if ( tess.numIndexes != ( tess.numVertexes >> 2 ) * 6 ) {
 		ri.Printf( PRINT_WARNING, "Autosprite shader %s had odd index count\n", tess.shader->name );
 	}
-#else
-	if ( tess.numVertexes & 3 ) {
-		ri.Printf( PRINT_WARNING, "Autosprite shader %s had odd vertex count", tess.shader->name );
-	}
-	if ( tess.numIndexes != ( tess.numVertexes >> 2 ) * 6 ) {
-		ri.Printf( PRINT_WARNING, "Autosprite shader %s had odd index count", tess.shader->name );
-	}
-#endif
 
 	oldVerts = tess.numVertexes;
 	tess.numVertexes = 0;

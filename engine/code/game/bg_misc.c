@@ -4826,9 +4826,7 @@ char *eventnames[] = {
 	"EV_KAMIKAZE",			// kamikaze explodes
 #endif
 	"EV_OBELISKEXPLODE",		// obelisk explodes
-#ifdef IOQ3ZTM // IOQ3BUGFIX: EV_OBELISKPAIN was missing here!
 	"EV_OBELISKPAIN",		// obelisk pain
-#endif
 #if !defined TURTLEARENA || defined NET_COMPAT  // POWERS
 	"EV_INVUL_IMPACT",		// invulnerability sphere impact
 	"EV_JUICED",				// invulnerability juiced effect
@@ -4841,15 +4839,13 @@ char *eventnames[] = {
 	"EV_DEBUG_ORIGIN",
 #endif
 	"EV_STOPLOOPINGSOUND",
-	"EV_TAUNT"
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Missing strings
-	,"EV_TAUNT_YES",
+	"EV_TAUNT",
+	"EV_TAUNT_YES",
 	"EV_TAUNT_NO",
 	"EV_TAUNT_FOLLOWME",
 	"EV_TAUNT_GETFLAG",
 	"EV_TAUNT_GUARDBASE",
 	"EV_TAUNT_PATROL"
-#endif
 
 };
 

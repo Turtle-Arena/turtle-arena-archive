@@ -785,11 +785,7 @@ int BotChat_EnemySuicide(bot_state_t *bs) {
 	if (bs->lastchat_time > FloatTime() - TIME_BETWEENCHATTING) return qfalse;
 	if (BotNumActivePlayers() <= 1) return qfalse;
 	//
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Use correct chat characteristic
 	rnd = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_ENEMYSUICIDE, 0, 1);
-#else
-	rnd = trap_Characteristic_BFloat(bs->character, CHARACTERISTIC_CHAT_KILL, 0, 1);
-#endif
 	//don't chat in teamplay
 	if (TeamPlayIsOn()) return qfalse;
 	// don't chat in tournament mode
@@ -841,12 +837,8 @@ int BotChat_HitTalking(bot_state_t *bs) {
 	if (!BotValidChatPosition(bs)) return qfalse;
 	//
 	ClientName(g_entities[bs->client].client->lasthurt_client, name, sizeof(name));
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Typo, should be MOD
 	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_mod,
 				g_entities[bs->client].client->lasthurt_weapon);
-#else
-	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->client].client->lasthurt_client);
-#endif
 	//
 	BotAI_BotInitialChat(bs, "hit_talking", name, weap, NULL);
 	bs->lastchat_time = FloatTime();
@@ -931,7 +923,7 @@ int BotChat_HitNoKill(bot_state_t *bs) {
 	//
 	ClientName(bs->enemy, name, sizeof(name));
 	weap = BotWeaponNameForMeansOfDeath(g_entities[bs->enemy].client->lasthurt_mod,
-				g_entities[bs->client].client->lasthurt_weapon);
+				g_entities[bs->enemy].client->lasthurt_weapon);
 	//
 	BotAI_BotInitialChat(bs, "hit_nokill", name, weap, NULL);
 	bs->lastchat_time = FloatTime();

@@ -2937,13 +2937,7 @@ int BotWantsToCamp(bot_state_t *bs) {
 	}
 #else
 	//the bot should have at least have the rocket launcher, the railgun or the bfg10k with some ammo
-	if ((bs->inventory[INVENTORY_ROCKETLAUNCHER] <= 0 ||
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Typo
-		bs->inventory[INVENTORY_ROCKETS] < 10
-#else
-		bs->inventory[INVENTORY_ROCKETS < 10]
-#endif
-		) &&
+	if ((bs->inventory[INVENTORY_ROCKETLAUNCHER] <= 0 || bs->inventory[INVENTORY_ROCKETS] < 10) &&
 		(bs->inventory[INVENTORY_RAILGUN] <= 0 || bs->inventory[INVENTORY_SLUGS] < 10) &&
 		(bs->inventory[INVENTORY_BFG10K] <= 0 || bs->inventory[INVENTORY_BFGAMMO] < 10)) {
 		return qfalse;

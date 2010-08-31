@@ -180,23 +180,15 @@ static void SV_Map_f( void ) {
 		// may not set sv_maxclients directly, always set latched
 		Cvar_SetLatched( "sv_maxclients", "8" );
 		cmd += 2;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix spdevmap
 		if (!Q_stricmp( cmd, "devmap" ) ) {
 			cheat = qtrue;
 		} else {
 			cheat = qfalse;
 		}
-#else
-		cheat = qfalse;
-#endif
 		killBots = qtrue;
 	}
 	else {
-		if ( !Q_stricmp( cmd, "devmap" )
-#ifndef IOQ3ZTM // IOQ3BUGFIX: Fix spdevmap
-		|| !Q_stricmp( cmd, "spdevmap" )
-#endif
-		) {
+		if ( !Q_stricmp( cmd, "devmap" ) ) {
 			cheat = qtrue;
 			killBots = qtrue;
 		} else {
