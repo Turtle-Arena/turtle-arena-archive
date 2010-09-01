@@ -102,7 +102,7 @@ typedef struct {
 static startserver_t s_startserver;
 
 #ifdef TURTLEARENA
-// Gametype names
+// Names of gametypes in "gametype select list", can be any gametypes in any order
 static const char *gametype_items[] = {
 	"Free For All",
 	"Duel", // tornament to duel // "Tournament",
@@ -119,19 +119,23 @@ static const char *gametype_items[] = {
 	NULL
 };
 
-// Order of gametypes in "gametype select list"
-static int gametype_remap[] = {GT_FFA, GT_TOURNAMENT, GT_SINGLE_PLAYER, GT_TEAM, GT_CTF
+// Order of gametypes in "gametype select list", must match gametype_items
+static int gametype_remap[] = {
+	GT_FFA,
+	GT_TOURNAMENT,
+	GT_SINGLE_PLAYER,
+	GT_TEAM,
+	GT_CTF
 #ifdef MISSIONPACK
-,GT_1FCTF,GT_OBELISK
+	,GT_1FCTF
+	,GT_OBELISK
 #ifdef MISSIONPACK_HARVESTER
-,GT_HARVESTER
+	,GT_HARVESTER
 #endif
 #endif
 };
 
-/*
-// Order of gametype_items, must
-// ZTM: NOTE: Why does this need to be seperate from gametype_remap?
+// Order of gametype_items, convert GT_* to gametype_items index
 static int gametype_remap2[] = {
 	0,		// Free For All
 	1,		// Duel
@@ -146,7 +150,6 @@ static int gametype_remap2[] = {
 #endif
 #endif
 };
-*/
 #else
 static const char *gametype_items[] = {
 	"Free For All",
@@ -567,11 +570,7 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.gametype.itemnames		= gametype_items;
 #ifdef TA_MISC
 	if (inGame)
-#if defined IOQ3ZTM && !defined MISSIONPACK
-		s_startserver.gametype.curvalue		= (int)Com_Clamp( 0, 4, trap_Cvar_VariableValue( "g_gametype" ) );
-#else
-		s_startserver.gametype.curvalue		= (int)Com_Clamp( 0, GT_MAX_GAME_TYPE - 1, trap_Cvar_VariableValue( "g_gametype" ) );
-#endif
+		s_startserver.gametype.curvalue		= (int)Com_Clamp( 0, ARRAY_LEN(gametype_remap) - 1, trap_Cvar_VariableValue( "g_gametype" ) );
 #endif
 
 	for (i=0; i<MAX_MAPSPERPAGE; i++)
@@ -1298,11 +1297,7 @@ static void ServerOptions_LevelshotDraw( void *self ) {
 	UI_DrawString( x, y, s_serveroptions.mapnamebuffer, UI_CENTER|UI_SMALLFONT, color_orange );
 
 	y += SMALLCHAR_HEIGHT;
-#ifdef TURTLEARENA
-	UI_DrawString( x, y, gametype_items[gametype_remap[s_serveroptions.gametype]], UI_CENTER|UI_SMALLFONT, color_orange );
-#else
 	UI_DrawString( x, y, gametype_items[gametype_remap2[s_serveroptions.gametype]], UI_CENTER|UI_SMALLFONT, color_orange );
-#endif
 }
 
 
@@ -1607,8 +1602,8 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 
 	memset( &s_serveroptions, 0 ,sizeof(serveroptions_t) );
 	s_serveroptions.multiplayer = multiplayer;
-#if defined IOQ3ZTM && !defined MISSIONPACK // IOQ3BUGFIX: Quake3 only had 4 gametypes
-	s_serveroptions.gametype = (int)Com_Clamp( 0, 4, trap_Cvar_VariableValue( "g_gameType" ) );
+#if defined IOQ3ZTM // IOQ3BUGFIX: Clamp to gametype_remap2 array
+	s_serveroptions.gametype = (int)Com_Clamp( 0, ARRAY_LEN(gametype_remap2) - 1, trap_Cvar_VariableValue( "g_gameType" ) );
 #else
 	s_serveroptions.gametype = (int)Com_Clamp( 0, GT_MAX_GAME_TYPE - 1, trap_Cvar_VariableValue( "g_gameType" ) );
 #endif
