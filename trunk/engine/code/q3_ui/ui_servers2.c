@@ -831,11 +831,7 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	}
 	*/
 	servernodeptr->nettype = atoi(Info_ValueForKey(info, "nettype"));
-#ifdef IOQ3ZTM // IOQ3BUGFIX: UDP6
 	if (servernodeptr->nettype < 0 || servernodeptr->nettype >= ARRAY_LEN(netnames)-1)
-#else
-	if (servernodeptr->nettype < 0 || servernodeptr->nettype >= ARRAY_LEN(netnames))
-#endif
 	{
 		servernodeptr->nettype = 0;
 	}
