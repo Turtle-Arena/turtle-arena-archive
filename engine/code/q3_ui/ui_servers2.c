@@ -831,8 +831,7 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	}
 	*/
 	servernodeptr->nettype = atoi(Info_ValueForKey(info, "nettype"));
-	if (servernodeptr->nettype < 0 || servernodeptr->nettype >= ARRAY_LEN(netnames)-1)
-	{
+	if (servernodeptr->nettype < 0 || servernodeptr->nettype >= ARRAY_LEN(netnames)-1) {
 		servernodeptr->nettype = 0;
 	}
 
