@@ -69,7 +69,7 @@ Weapons (and attacking)
   * TODO: Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
     * Logic-wise `tag_hand_*` make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
 
-  * TODO: Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder }
+  * TODO: Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder when in aim mode }
     * ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
 
   * BUG: CreateFuzzyWeight doesn't setup inventory weight correctly, causes SIGBUS in FuzzyWeightUndecided_r
@@ -119,9 +119,11 @@ Weapons (and attacking)
 == Render ==
   * TODO: NPRQuake has some awesome rendering options... (If I wanted it to look like a comic book it might help.)
 
-  * TODO: framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
+  * TODO: Framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
 
   * TODO: When there are multiple ghost models they may not be sorted into correct order?
+
+  * TODO: Add Vertex Buffer Object (VBO) support?
 
 == UI ==
   * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?
@@ -148,7 +150,7 @@ Weapons (and attacking)
 
   * TODO: Add misc_dripper entity.
 
-  * TODO: Add new entity to take damage and give it to a targeted entity.
+  * TODO: Add new entity to take damage and give it to a targeted entity. (func_voodoodoll)
     * Allow bushes to be used for cars (and other others) oddly shaped collision box
 
 == Misc ==
@@ -222,9 +224,6 @@ Weapons (and attacking)
     * the animations can move any part of the model
     * multiple animations can animate at the same time
   * TODO-after-above: Re-rig and reanimate players in Blender for MD5? (or add MD5 export to MM3D?)
-
-  * TODO: Add an alphaGen function for the inverse of the entity's skinFraction
-  * TODO: Rename skinFraction ...
 
   * FIXME: Turtle Arena uses code from Wolf-ET (GPLv3 or later).
     * I need to change the licensing on the effected files to GPLv3 (or later).

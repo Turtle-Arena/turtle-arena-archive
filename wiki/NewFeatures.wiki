@@ -74,6 +74,31 @@ l_static_mesh,players/raph/show_no_damage
 tag_torso,
 }}}
 
+== Damage AlphaGen ==
+_Search for "IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS_AGEN" in the code to see implantation._
+
+Instead of having separate player damage shaders you can have a single shader and have one image become more (or less) visible as damaged.
+
+"alphaGen damage" causes image to become more visible as damaged. There is also "alphaGen oneMinusDamage", which is the inverse of "alphaGen damage", becomes less visible as damaged.
+
+Example shader:
+{{{
+models/players/raph/body
+{
+	{
+		map models/players/raph/body
+		rgbGen lightingDiffuse
+	}
+if blood // Blood is currently always disabled in Turtle Arena, so you will want to remove this check.
+	{
+		map models/players/raph/body_blood.png
+		blendFunc GL_SRC_ALPHA GL_ONE
+		alphaGen damage
+	}
+endif
+}
+}}}
+
 == animations.cfg ==
 Player model config file.
 
