@@ -187,6 +187,10 @@ typedef enum {
 	AGEN_WAVEFORM,
 	AGEN_PORTAL,
 	AGEN_CONST
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS_AGEN
+	,AGEN_DAMAGE
+	,AGEN_ONE_MINUS_DAMAGE
+#endif
 } alphaGen_t;
 
 typedef enum {
