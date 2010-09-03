@@ -296,7 +296,7 @@ char *BotWeaponNameForMeansOfDeath(int mod, int weapon) {
 #else
 // ZTM: Support not defining TA_WEAPSYS (Define missing vars, and add int unused to function)
 #define botdeathweapon botdeathtype
-#define lasthurt_weapon botdeathtype
+#define lasthurt_weapon lasthurt_mod
 char *BotWeaponNameForMeansOfDeath(int mod, int unused) {
 	(void)unused;
 

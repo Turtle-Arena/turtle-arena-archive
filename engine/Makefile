@@ -141,7 +141,7 @@ ifeq ($(QUAKE3),1)
 		ifeq ($(BUILD_IOQ3ZTM),1)
 			# Build modified ioquake3, it only runs using its own sever/client binaries
 			#   and currently doesn't support Q3 mods.
-			BUILD_DEFINES = -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
+			BUILD_DEFINES = -DIOQUAKE3 -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
 								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
 								-DTA_WEAPSYS -DOA_BLOOM
 

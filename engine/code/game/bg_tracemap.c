@@ -37,6 +37,7 @@ c/o ZeniMax Media Inc., Suite 120, Rockville, Maryland 20850 USA.
 #include "g_local.h"
 #endif
 
+#ifdef WOLFET
 /*
 **  Map tracemap view generation
 */
@@ -747,3 +748,5 @@ void etpro_FinalizeTracemapClamp( int *x, int *y ) {
 		*y = TRACEMAP_SIZE - 1;
 	}
 }
+
+#endif // WOLFET

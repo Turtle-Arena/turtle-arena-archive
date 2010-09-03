@@ -572,12 +572,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		killerName = "<world>";
 	}
 
-#ifdef TA_WEAPSYS
-	if ( meansOfDeath < 0 || meansOfDeath >= modNamesSize )
-#else
-	if ( meansOfDeath < 0 || meansOfDeath >= sizeof( modNames ) / sizeof( modNames[0] ) )
-#endif
-	{
+	if ( meansOfDeath < 0 || meansOfDeath >= modNamesSize ) {
 		obit = "<bad obituary>";
 	} else {
 		obit = modNames[meansOfDeath];

@@ -1229,6 +1229,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.gameSounds[ es->generic1 ] );
 			}
 		}
+#ifdef TA_MISC // MATERIALS
 		// Auto select explosion sound
 		else if (es->generic1 == MAX_SOUNDS-1)
 		{
@@ -1262,6 +1263,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				trap_S_StartSound (NULL, es->number, CHAN_AUTO, sfx );
 			}
 		}
+#endif
 
 		if ( es->eventParm != 255 ) {
 			ByteToDir( es->eventParm, dir );

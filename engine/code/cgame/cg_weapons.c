@@ -3015,7 +3015,11 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 			{
 				// add lightning bolt
+#ifdef TA_WEAPSYS
 				CG_LightningBolt( nonPredictedCent, flash.origin, bg_weapongroupinfo[cent->currentState.weapon].weapon[i]->projnum );
+#else
+				CG_LightningBolt( nonPredictedCent, flash.origin );
+#endif
 			}
 
 #ifndef IOQ3ZTM // Unused-rail
