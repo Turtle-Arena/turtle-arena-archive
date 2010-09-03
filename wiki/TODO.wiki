@@ -199,8 +199,6 @@ Weapons (and attacking)
 
   * TODO: Make a original character (In case the Ninja Turtles have to be removed at some point)
 
-  * TODO: Button to drop held CTF flag like in SRB2?
-
   * TODO: Add Jump/Land animations specificly for backflip, fallback to 'Jump/Land B' (jump backward)
     * For jumping backward in lock-on mode, like in LoZ:TP
     * (Should Turtle Arena players just have 'Jump/Land B' be a backflip?)
