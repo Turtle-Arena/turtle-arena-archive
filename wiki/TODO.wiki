@@ -125,6 +125,8 @@ Weapons (and attacking)
 
   * TODO: Add Vertex Buffer Object (VBO) support?
 
+  * BUG: Bloom in windowed mode only effecting the top 480 (or is it 640?) pixels?
+
 == UI ==
   * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?
 
@@ -153,6 +155,21 @@ Weapons (and attacking)
   * TODO: Add new entity to take damage and give it to a targeted entity. (func_voodoodoll)
     * Allow bushes to be used for cars (and other others) oddly shaped collision box
 
+== Code Cleanup ==
+  * TODO: Reduce overall number of TODOs and FIXMEs in the source
+
+  * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
+
+== Bots ==
+  * TODO: Support bots using func_use (use via holdable item button)
+
+== Entities ==
+  * TODO: Allow func_breakable and misc_object to be pushable.
+
+  * TODO: Improve misc object physics. (Use code from Q3Rally? bg_physics.c/h)
+
+  * TODO: Driveable vehicles? (Base on Q3Rally)
+
 == Misc ==
   * TODO: Add optional run animations for torso
 
@@ -180,19 +197,7 @@ Weapons (and attacking)
 
   * TODO: Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
 
-  * TODO: Support bots using func_use (use via holdable item button)
-
-  * TODO: Allow func_breakable and misc_object to be pushable.
-
-  * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
-
-  * BUG: Bloom in windowed mode only effecting the top 480 (or is it 640?) pixels?
-
   * TODO: Make a original character (In case the Ninja Turtles have to be removed at some point)
-
-  * TODO: Improve misc object physics. (Use code from Q3Rally? bg_physics.c/h)
-
-  * TODO: Driveable vehicles? (Base on Q3Rally)
 
   * TODO: Button to drop held CTF flag like in SRB2?
 
