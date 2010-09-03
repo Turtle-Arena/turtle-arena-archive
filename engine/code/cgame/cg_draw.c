@@ -1066,7 +1066,7 @@ void CG_DrawMiddleLeft(void)
 	}
 
 	if (cg.snap->ps.chain > 0) {
-		CG_DrawSmallString( SCREEN_WIDTH/32, y, va("Attack Chain %d", cg.snap->ps.chain), 1.0F );
+		CG_DrawSmallString( SCREEN_WIDTH/32, y, va("Score Chain: %d", cg.snap->ps.chain), 1.0F );
 		y += SMALLCHAR_HEIGHT;
 	}
 

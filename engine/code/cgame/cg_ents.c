@@ -574,6 +574,9 @@ static void CG_Item( centity_t *cent ) {
 #else
 	weaponInfo_t	*wi;
 #endif
+#ifdef IOQ3ZTM
+	qboolean		itemBob;
+#endif
 
 	es = &cent->currentState;
 #ifdef TA_WEAPSYS
@@ -599,10 +602,20 @@ static void CG_Item( centity_t *cent ) {
 #else
 	item = &bg_itemlist[ es->modelindex ];
 #endif
+
 #ifdef IOQ3ZTM // move icons as well as models.
-	// items bob up and down continuously
-	scale = 0.005 + cent->currentState.number * 0.00001;
-	cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	if (item->giType == IT_SCORE)
+		itemBob = qfalse;
+	else
+#endif
+		itemBob = qtrue;
+
+	if (itemBob) {
+		// items bob up and down continuously
+		scale = 0.005 + cent->currentState.number * 0.00001;
+		cent->lerpOrigin[2] += 4 + cos( ( cg.time + 1000 ) *  scale ) * 4;
+	}
 #endif
 #ifdef IOQ3ZTM // If missing item model, use item sprite.
 	// ZTM: Not all of the items have models yet, so use the sprite!

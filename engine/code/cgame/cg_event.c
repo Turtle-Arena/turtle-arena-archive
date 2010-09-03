@@ -600,7 +600,7 @@ void CG_PainEvent( centity_t *cent, int health ) {
 }
 
 #ifdef IOQ3ZTM // DEBUG_ORIGIN
-// Based on CG_Item, used to be game model tags working ( TA_WEAPSYS )
+// Based on CG_Item, used to get game model tags working ( TA_WEAPSYS )
 void CG_DebugOrigin(centity_t *cent)
 {
 	entityState_t	*es;

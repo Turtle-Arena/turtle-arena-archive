@@ -1253,6 +1253,40 @@ Only in One Flag CTF games
 	},
 #endif
 
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+/*QUAKED item_star (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"item_star",
+		"sound/misc/i_pkup.wav",
+        { "models/powerups/score/star.md3",
+		NULL, NULL, NULL},
+/* icon */		"icons/iconi_star",
+/* pickup */	"Star",
+		10,
+		IT_SCORE,
+		0, // normal
+/* precache */ "",
+/* sounds */ ""
+	},
+
+/*QUAKED item_sphere (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
+*/
+	{
+		"item_sphere",
+		"sound/misc/i_pkup.wav",
+        { "models/powerups/score/sphere.md3",
+		NULL, NULL, NULL},
+/* icon */		"icons/iconi_sphere",
+/* pickup */	"Sphere",
+		10,
+		IT_SCORE,
+		1, // blue chip
+/* precache */ "",
+/* sounds */ ""
+	},
+#endif
+
 	// end of list marker
 	{NULL}
 };
@@ -4445,6 +4479,11 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #endif
 		return qtrue;
 
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	case IT_SCORE:
+        return qtrue;
+#endif
+
 #ifndef TURTLEARENA // NOARMOR
 	case IT_ARMOR:
 #ifdef MISSIONPACK
@@ -4606,15 +4645,16 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #endif
 		return qtrue;
 
-        case IT_BAD:
-            Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
-        default:
+
+	case IT_BAD:
+		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );
+	default:
 #ifndef Q3_VM
 #ifndef NDEBUG
-          Com_Printf("BG_CanItemBeGrabbed: unknown enum %d\n", item->giType );
+		Com_Printf("BG_CanItemBeGrabbed: unknown enum %d\n", item->giType );
 #endif
 #endif
-         break;
+		break;
 	}
 
 	return qfalse;

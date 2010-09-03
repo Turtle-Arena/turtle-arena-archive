@@ -2179,6 +2179,83 @@ void G_LoadPersistant(int clientnum)
 }
 #endif
 
+#ifdef TA_SP
+qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap)
+{
+	char buf[MAX_QPATH];
+
+	if (g_gametype.integer != GT_SINGLE_PLAYER) {
+		// Only exit in single player.
+		return qfalse;
+	}
+
+	// If trigered by a client, that isn't a spectator or boss,
+	//  and that hasn't finished the level.
+	if (!(activator && activator->client
+		&& activator->client->sess.sessionTeam == TEAM_FREE
+		&& !activator->client->finishTime))
+	{
+		// Not a valid client.
+		return qfalse;
+	}
+
+	// Set finish time.
+	activator->client->finishTime = level.time;
+	activator->client->ps.eFlags = EF_FINISHED;
+	activator->s.eFlags |= EF_FINISHED;
+
+	// Print message
+	if (!g_singlePlayer.integer)
+	{
+		G_Printf("%s finished the level.\n", activator->client->pers.netname );
+	}
+
+	if (nextMap == NULL || *nextMap == '\0')
+	{
+		trap_Cvar_Set("nextmap", "map_restart");
+		return qtrue;
+	}
+
+	// Save client data for next level.
+	G_SavePersistant(nextMap);
+
+	// Reached the end of the single player levels
+	if (Q_stricmp(nextMap, "sp_end") == 0)
+	{
+		if (g_singlePlayer.integer == 1)
+		{
+			// Return to the title screen.
+			trap_Cvar_Set("nextmap", "disconnect; sp_complete");
+			return qtrue;
+		}
+		else
+		{
+			const char *info;
+
+			nextMap = NULL;
+
+#ifdef IOQ3ZTM // MAP_ROTATION
+			info = G_GetMapRotationInfoByGametype(GT_SINGLE_PLAYER);
+			if (info) {
+				nextMap = Info_ValueForKey(info, "m1");
+			}
+#endif
+
+			if (!nextMap || !strlen(nextMap))
+			{
+				// Default to sp1a1
+				nextMap = "sp1a1";
+			}
+		}
+	}
+
+	// Set cvar for level change.
+	Com_sprintf(buf, MAX_QPATH, "spmap %s", nextMap);
+	trap_Cvar_Set("nextmap", buf);
+	return qtrue;
+}
+#endif
+
 #ifdef NIGHTSMODE
 /*
 ===========
@@ -2194,15 +2271,23 @@ void G_DeNiGHTSizePlayer( gentity_t *ent )
 	if (!ent || !ent->client)
 		return;
 
+	if (ent->client->ps.eFlags & EF_NIGHTSMODE) {
+		// Clear score
+		ent->client->ps.persistant[PERS_SCORE] = 0;
+	}
+
 	ent->client->mare = 0;
 	ent->client->ps.powerups[PW_FLIGHT] = 0;
 	ent->client->ps.eFlags &= ~EF_NIGHTSMODE;
+	ent->client->ps.eFlags &= ~EF_BONUS;
 }
 
 int G_NumMares(void)
 {
-	int mare = 0;
+	int mare;
 	int i;
+
+	mare = 0;
 
 	for (i = 1; i < MAX_MARES; i++)
 	{
@@ -2216,7 +2301,7 @@ int G_NumMares(void)
 }
 
 // Go into Nights mode
-void G_NiGHTSizePlayer( gentity_t *ent )
+void G_NiGHTSizePlayer( gentity_t *ent, gentity_t *drone )
 {
 	int mare;
 	gentity_t *target;
@@ -2238,32 +2323,21 @@ void G_NiGHTSizePlayer( gentity_t *ent )
 
 	if (mare == MAX_MARES)
 	{
-		if (g_gametype.integer == GT_SINGLE_PLAYER)
-		{
-			// No targets left, do level end.
-			ent->client->finishTime = level.time;
-			return;
-		}
-		else
-		{
-			// ZTM: TODO: Fix gametype != GT_SINGLE_PLAYER mare switching when all the nights_target are dead.
-			//				Avoid changing mare when player hasn't left nights_start
+		// Use targets when all nights_target are destroyed
+		G_UseTargets2(drone, ent, drone->paintarget);
 
-			// Just loop around the mares.
-			if (ent->client->ps.eFlags & EF_TRAINBACKWARD)
-				mare = ent->client->mare-1;
-			else
-				mare = ent->client->mare+1;
-
-			if (mare < 1)
-				mare = G_NumMares();
-			else if (mare > G_NumMares())
-				mare = 1;
+		// No nights_targets left, do level end.
+		if (!G_ClientCompletedLevel(ent, drone->message)) {
+			G_DeNiGHTSizePlayer(ent);
 		}
+		return;
 	}
 
 	if (mare == ent->client->mare)
 		return;
+
+	// Use targets
+	G_UseTargets2(target, ent, target->paintarget);
 
 	ent->client->mare = mare;
 
@@ -2289,7 +2363,16 @@ void G_NiGHTSizePlayer( gentity_t *ent )
 
 void Drone_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
 {
-	G_NiGHTSizePlayer(other);
+	if (!other->client)
+		return;
+
+	if (!(other->client->ps.eFlags & EF_NIGHTSMODE)) {
+		// Use targets first time a player NiGHTSizes
+		G_UseTargets(self, other);
+	}
+
+	other->client->ps.eFlags &= ~EF_BONUS;
+	G_NiGHTSizePlayer(other, self);
 }
 
 // Ideya Drone
@@ -2306,6 +2389,13 @@ void SP_nights_start( gentity_t *ent )
 	ent->r.contents = CONTENTS_TRIGGER;
 	ent->touch = Drone_Touch;
 
+	// Check for invalid map name on spawn, easier to find bugs in maps.
+	if (ent->message == NULL || *ent->message == '\0')
+	{
+		// Invalid map name.
+		G_Printf("nights_start: Missing map name.\n");
+	}
+
 	// ZTM: TODO: In Single Player remove model when player is NiGHTS, and put it back when they lose NiGHTS mode
 	ent->s.modelindex = G_ModelIndex(BG_FindItemForPowerup(PW_FLIGHT)->world_model[0]);
 
@@ -2316,17 +2406,33 @@ void SP_nights_start( gentity_t *ent )
 
 void Capture_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
 {
-	int amount = other->health; //other->count
-	
+	int amount;
+
+	if (!other->client)
+		return;
+
+	amount = other->health; //other->count
 	if (amount > self->health)
 		amount = self->health;
-	
+
 	self->health -= amount;
 	other->health -= amount; //other->count
+
+	if (self->health <= 0)
+	{
+		if (other->client->ps.eFlags & EF_NIGHTSMODE)
+		{
+			// Bonus time!
+			other->client->ps.eFlags |= EF_BONUS;
+		}
+
+		// Use targets
+		G_UseTargets2(self, other, self->paintarget);
+	}
 }
 
 // Ideya Capture
-// Touch go use collected Blue Chips to damage Ideya Capture
+// ZTM: TODO: Touch to use collected Blue Chips to damage Ideya Capture
 void SP_nights_target( gentity_t *ent )
 {
 	VectorSet( ent->r.mins, -15, -15, -15 );
@@ -2340,6 +2446,9 @@ void SP_nights_target( gentity_t *ent )
 	if (!ent->health) {
 		ent->health = 20;
 	}
+
+	// Tempory model
+	ent->s.modelindex = G_ModelIndex(BG_FindItemForPowerup(PW_INVUL)->world_model[0]);
 
 	G_SetOrigin( ent, ent->s.origin );
 

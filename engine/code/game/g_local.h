@@ -736,9 +736,11 @@ qboolean SpotWouldTelefrag( gentity_t *spot, gentity_t *ent );
 #else
 qboolean SpotWouldTelefrag( gentity_t *spot );
 #endif
+#ifdef TA_SP
+qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap);
+#endif
 #ifdef NIGHTSMODE
 void G_DeNiGHTSizePlayer( gentity_t *ent );
-void G_NiGHTSizePlayer( gentity_t *ent );
 #endif
 
 //

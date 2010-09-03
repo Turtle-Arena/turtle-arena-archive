@@ -218,6 +218,9 @@ typedef enum {
 
 // entityState_t->eFlags
 #define	EF_DEAD				0x00000001		// don't draw a foe marker over players with EF_DEAD
+#ifdef NIGHTSMODE
+#define	EF_BONUS			0x00000002		// NiGHTS mode overtime
+#endif
 #if (defined MISSIONPACK || defined TA_WEAPSYS) && !defined TURTLEARENA // WEAPONS
 #define EF_TICKING			0x00000002		// used to make players play the prox mine ticking sound
 #endif
@@ -671,6 +674,9 @@ typedef enum {
 	IT_BAD,
 	IT_WEAPON,				// EFX: rotate + upscale + minlight
 	IT_AMMO,				// EFX: rotate
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	IT_SCORE,				// EFX: rotate + no bob
+#endif
 #ifndef TURTLEARENA // NOARMOR
 	IT_ARMOR,				// EFX: rotate + minlight
 #endif
