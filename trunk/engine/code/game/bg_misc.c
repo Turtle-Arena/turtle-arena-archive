@@ -4372,6 +4372,14 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	item = &bg_itemlist[ent->modelindex];
 #endif
 
+#ifdef IOQ3ZTM // DROP_ITEM_FIX
+	// If it was dropped by this player and is still in their Bounding Box
+	if (ent->modelindex2 == 1 && ent->generic1-1 == ps->clientNum) {
+		//Com_Printf("DEBUG: Player touched item they can't pickup!\n");
+		return qfalse;
+	}
+#endif
+
 	switch( item->giType ) {
 	case IT_WEAPON:
 #ifdef TA_WEAPSYS_EX
@@ -4387,11 +4395,8 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		//	return qfalse;
 		//}
 
-		// DROP_WEAPON_FIX
 		// If using/dropping/picking up a weapon
-		// or it was dropped by this player and is still in there Bounding Box
-		if (ps->weaponTime || ps->meleeTime ||
-			(ent->modelindex2 == 1 && ent->generic1-1 == ps->clientNum)) {
+		if (ps->weaponTime || ps->meleeTime) {
 			//Com_Printf("DEBUG: Player touched weapon they can't pickup!\n");
 			return qfalse;
 		}

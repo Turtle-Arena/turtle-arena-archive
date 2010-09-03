@@ -844,6 +844,7 @@ Spawns an item and tosses it forward
 gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
 	vec3_t	velocity;
 	vec3_t	angles;
+	gentity_t *drop;
 
 	VectorCopy( ent->s.apos.trBase, angles );
 	angles[YAW] += angle;
@@ -852,8 +853,18 @@ gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
 	AngleVectors( angles, velocity, NULL, NULL );
 	VectorScale( velocity, 150, velocity );
 	velocity[2] += 200 + crandom() * 50;
-	
-	return LaunchItem( item, ent->s.pos.trBase, velocity );
+
+	drop = LaunchItem( item, ent->s.pos.trBase, velocity );
+
+#ifdef IOQ3ZTM // DROP_ITEM_FIX
+	// Save the player who drop the item, so we can wait till the
+	//  player isn't touching it to allow them to pick it up.
+	//  Becuase otherwise they pickup the item as soon as they drop it.
+	drop->s.generic1 = ent->client->ps.clientNum+1;
+	drop->s.time2 = level.time + 1000;
+#endif
+
+	return drop;
 }
 
 
@@ -1371,11 +1382,10 @@ void G_RunItem( gentity_t *ent ) {
 	int			contents;
 	int			mask;
 
-#ifdef TA_WEAPSYS_EX // DROP_WEAPON_FIX
-	// if the dropped weapon wasn't yet outside the player body
-	//  AND it was drop more then 3 seconds ago
-	// Based on MISSIONPACK prox mine dropping code
-	if (ent->item && ent->item->giType == IT_WEAPON
+#ifdef IOQ3ZTM // DROP_ITEM_FIX
+	// If the dropped item wasn't yet outside the player body
+	//  AND it was waited the delay time
+	if (ent->item && ent->item->giType != IT_BAD
 		&& (ent->flags & FL_DROPPED_ITEM) && ent->s.generic1 > 0
 		&& ent->s.time2 < level.time)
 	{
@@ -1383,7 +1393,7 @@ void G_RunItem( gentity_t *ent ) {
 		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, ENTITYNUM_NONE, ent->clipmask );
 		if (!tr.startsolid || tr.entityNum != ent->s.generic1-1/*ent->r.ownerNum*/) {
 			ent->s.generic1 = 0;
-			//G_Printf("DEBUG: Dropped weapon is not inside owner player!\n");
+			//G_Printf("DEBUG: Dropped item is not inside owner player!\n");
 		}
 	}
 #endif
