@@ -129,6 +129,9 @@ enum {
 	ID_NEXTITEM,
 	ID_PREVITEM,
 #endif
+#ifdef TA_MISC // DROP_FLAG
+	ID_DROPFLAG,
+#endif
 	ID_FREELOOK,
 	ID_INVERTMOUSE,
 #ifndef TURTLEARENA // ALWAYS_RUN
@@ -236,6 +239,9 @@ typedef struct
 #ifndef TA_WEAPSYS_EX
 	menuradiobutton_s	autoswitch;
 #endif
+#ifdef TA_MISC // DROP_FLAG
+	menuaction_s		dropflag;
+#endif
 	menuaction_s		useitem;
 #ifdef TA_HOLDSYS/*2*/
 	menuaction_s		nextitem;
@@ -325,8 +331,11 @@ static bind_t g_bindings[] =
 	{"messagemode3", 	"chat - target",	ID_CHAT3,		ANIM_CHAT,		-1,				-1,		-1, -1},
 	{"messagemode4", 	"chat - attacker",	ID_CHAT4,		ANIM_CHAT,		-1,				-1,		-1, -1},
 #ifdef TA_HOLDSYS/*2*/
-	{"holdnext",		"next item",		ID_NEXTITEM,	ANIM_IDLE,		K_MWHEELUP,		'\'',	-1, -1},
-	{"holdprev",		"prev item",		ID_PREVITEM,	ANIM_IDLE,		K_MWHEELDOWN,	-1,		-1, -1},
+	{"holdnext",		"next item",		ID_NEXTITEM,	ANIM_IDLE,		K_MWHEELUP,		']',	-1, -1},
+	{"holdprev",		"prev item",		ID_PREVITEM,	ANIM_IDLE,		K_MWHEELDOWN,	'[',	-1, -1},
+#endif
+#ifdef TA_MISC // DROP_FLAG
+	{"dropflag",		"drop flag",		ID_DROPFLAG,	ANIM_IDLE,		'f',			'\'',	-1, -1},
 #endif
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
 };
@@ -411,6 +420,9 @@ static menucommon_s *g_looking_controls[] = {
 
 static menucommon_s *g_misc_controls[] = {
 	(menucommon_s *)&s_controls.showscores, 
+#ifdef TA_MISC // DROP_FLAG
+	(menucommon_s *)&s_controls.dropflag,
+#endif
 	(menucommon_s *)&s_controls.useitem,
 #ifdef TA_HOLDSYS/*2*/
 	(menucommon_s *)&s_controls.nextitem,
@@ -1629,6 +1641,14 @@ static void Controls_MenuInit( void )
 	s_controls.zoomview.generic.id        = ID_ZOOMVIEW;
 #endif
 
+#ifdef TA_MISC // DROP_FLAG
+	s_controls.dropflag.generic.type		= MTYPE_ACTION;
+	s_controls.dropflag.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.dropflag.generic.callback	= Controls_ActionEvent;
+	s_controls.dropflag.generic.ownerdraw	= Controls_DrawKeyBinding;
+	s_controls.dropflag.generic.id			= ID_DROPFLAG;
+#endif
+
 	s_controls.useitem.generic.type	     = MTYPE_ACTION;
 	s_controls.useitem.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
 	s_controls.useitem.generic.callback  = Controls_ActionEvent;
@@ -1820,6 +1840,9 @@ static void Controls_MenuInit( void )
 #endif
 
 	Menu_AddItem( &s_controls.menu, &s_controls.showscores );
+#ifdef TA_MISC // DROP_FLAG
+	Menu_AddItem( &s_controls.menu, &s_controls.dropflag );
+#endif
 	Menu_AddItem( &s_controls.menu, &s_controls.useitem );
 #ifdef TA_HOLDSYS/*2*/
 	Menu_AddItem( &s_controls.menu, &s_controls.nextitem );

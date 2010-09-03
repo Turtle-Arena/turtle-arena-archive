@@ -739,6 +739,9 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("callteamvote");
 	trap_AddCommand ("teamvote");
 	trap_AddCommand ("stats");
+#ifdef TA_MISC // DROP_FLAG
+	trap_AddCommand ("dropflag");
+#endif
 	trap_AddCommand ("teamtask");
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Why hasn't this been corrected?
 	trap_AddCommand ("loaddeferred");

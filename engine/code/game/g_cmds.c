@@ -1769,6 +1769,25 @@ void Cmd_Stats_f( gentity_t *ent ) {
 */
 }
 
+#ifdef TA_MISC // DROP_FLAG
+/*
+=================
+Cmd_DropFlag_f
+
+Drop CTF Flag and/or other gametype specific items
+=================
+*/
+void Cmd_DropFlag_f( gentity_t *ent ) {
+	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+		return;
+	}
+	if (ent->health <= 0) {
+		return;
+	}
+	TossClientGametypeItems(ent);
+}
+#endif
+
 /*
 =================
 ClientCommand
@@ -1875,6 +1894,10 @@ void ClientCommand( int clientNum ) {
 		Cmd_SetViewpos_f( ent );
 	else if (Q_stricmp (cmd, "stats") == 0)
 		Cmd_Stats_f( ent );
+#ifdef TA_MISC // DROP_FLAG
+	else if (Q_stricmp (cmd, "dropflag") == 0)
+		Cmd_DropFlag_f( ent );
+#endif
 	else
 		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
 }
