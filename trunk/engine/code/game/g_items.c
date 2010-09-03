@@ -38,6 +38,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	RESPAWN_ARMOR		25
 #define	RESPAWN_HEALTH		35
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+#define	RESPAWN_SCORE		25
+#endif
 #define	RESPAWN_AMMO		40
 #ifdef TA_HOLDABLE
 #define	RESPAWN_HOLDABLE	35
@@ -533,6 +536,40 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
 }
 #endif
 
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+//======================================================================
+
+int Pickup_Score( gentity_t *ent, gentity_t *other ) {
+	int score;
+	int mult;
+
+	// Increase score chain
+	other->client->ps.chain++;
+	other->client->ps.chainTime = 2000;
+
+	// Max multipler of 10
+	mult = other->client->ps.chain;
+	if (mult > 10) {
+		mult = 10;
+	}
+
+	if (ent->count) {
+		score = ent->count * mult;
+	} else {
+		score = ent->item->quantity * mult;
+	}
+
+	// Blue Chip (item_sphere) in overtime
+	if (ent->item->giTag == 1 && (other->client->ps.eFlags & EF_BONUS)) {
+		score *= 5;
+	}
+
+	AddScore(other, ent->r.currentOrigin, score);
+
+	return RESPAWN_SCORE;
+}
+#endif
+
 //======================================================================
 
 /*
@@ -663,6 +700,11 @@ void Touch_Item (gentity_t *ent, gentity_t *other, trace_t *trace) {
 		respawn = Pickup_Ammo(ent, other);
 //		predict = qfalse;
 		break;
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	case IT_SCORE:
+		respawn = Pickup_Score(ent, other);
+		break;
+#endif
 #ifndef TURTLEARENA // NOARMOR
 	case IT_ARMOR:
 		respawn = Pickup_Armor(ent, other);

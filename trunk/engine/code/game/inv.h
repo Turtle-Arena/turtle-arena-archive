@@ -136,6 +136,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define MODELINDEX_DEFAULTWEAPON	24 // weapon index -1
 
+// NIGHTS_ITEMS
+#define MODELINDEX_STAR				25
+#define MODELINDEX_SPHERE			26
+
 #ifdef TA_WEAPSYS
 
 // In botfiles setup WEAPONINDEX_*s and INVENTORY_*s for weapons?

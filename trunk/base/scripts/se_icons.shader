@@ -385,6 +385,25 @@ icons/iconf_neutral3
 	}
 }
 
+// SCORE ICONS
+icons/iconi_star
+{
+	nopicmip
+	{
+		map icons/iconi_star.png
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+icons/iconi_sphere
+{
+	nopicmip
+	{
+		map icons/iconi_sphere.png
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
 
 scoreboardName
 {

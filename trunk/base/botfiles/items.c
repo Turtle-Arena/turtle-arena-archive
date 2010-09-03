@@ -31,7 +31,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define AMMOI		1
 #define WEAPONI		2
 #define HEALTHI		3
-#define ARMORI		4
+#define SCOREI		4
+//#define ARMORI		4
 #define POWERI		5
 #define FLAGI		6
 #define ROAMI		7
@@ -40,6 +41,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	RESPAWN_ARMOR		25
 #define	RESPAWN_HEALTH		35
 #define	RESPAWN_AMMO		40
+//#ifdef TURTLEARENA
+#define	RESPAWN_SCORE		25
+//#endif
 //#ifdef TA_HOLDABLE
 #define RESPAWN_HOLDABLE	35
 //#else
@@ -618,6 +622,28 @@ mins		{-13,-13,-13}
 maxs		{13,13,13}
 }
 */
+
+iteminfo "item_star"
+{
+name		"Star"
+model		"models/powerups/score/star.md3"
+modelindex	MODELINDEX_STAR
+type		SCOREI
+index		0
+mins		{-13,-13,-13}
+maxs		{13,13,13}
+}
+
+iteminfo "item_sphere"
+{
+name		"Sphere"
+model		"models/powerups/score/sphere.md3"
+modelindex	MODELINDEX_SPHERE
+type		SCOREI
+index		0
+mins		{-13,-13,-13}
+maxs		{13,13,13}
+}
 
 iteminfo "item_botroam"
 {
