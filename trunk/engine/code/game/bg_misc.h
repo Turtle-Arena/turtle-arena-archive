@@ -1683,17 +1683,17 @@ typedef enum {
 	MOD_JUICED,
 #endif
 #endif
-	MOD_GRAPPLE
+	MOD_GRAPPLE,
 #ifdef TA_WEAPSYS
-	,MOD_PROJECTILE,
+	MOD_PROJECTILE,
 	MOD_PROJECTILE_EXPLOSION,
 	MOD_WEAPON_PRIMARY,
 	MOD_WEAPON_SECONDARY,
-	MOD_MAX
 #endif
+	MOD_MAX
 } meansOfDeath_t;
 
-extern char	*modNames[];
+extern char	*modNames[MOD_MAX];
 extern int modNamesSize;
 
 //---------------------------------------------------------

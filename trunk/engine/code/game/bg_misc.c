@@ -1259,6 +1259,58 @@ Only in One Flag CTF games
 
 int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
 
+char	*modNames[MOD_MAX] = {
+	"MOD_UNKNOWN",
+#ifndef TURTLEARENA // MOD
+	"MOD_SHOTGUN",
+	"MOD_GAUNTLET",
+	"MOD_MACHINEGUN",
+	"MOD_GRENADE",
+	"MOD_GRENADE_SPLASH",
+	"MOD_ROCKET",
+	"MOD_ROCKET_SPLASH",
+	"MOD_PLASMA",
+	"MOD_PLASMA_SPLASH",
+	"MOD_RAILGUN",
+	"MOD_LIGHTNING",
+	"MOD_BFG",
+	"MOD_BFG_SPLASH",
+#endif
+	"MOD_WATER",
+	"MOD_SLIME",
+	"MOD_LAVA",
+	"MOD_CRUSH",
+	"MOD_TELEFRAG",
+	"MOD_FALLING",
+	"MOD_SUICIDE",
+	"MOD_TARGET_LASER",
+	"MOD_TRIGGER_HURT",
+#ifdef TA_ENTSYS
+	"MOD_EXPLOSION",
+#endif
+#ifdef MISSIONPACK
+#ifndef TURTLEARENA // MOD
+	"MOD_NAIL",
+	"MOD_CHAINGUN",
+	"MOD_PROXIMITY_MINE",
+#endif
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+	"MOD_KAMIKAZE",
+#endif
+#ifndef TURTLEARENA // POWERS
+	"MOD_JUICED",
+#endif
+#endif
+	"MOD_GRAPPLE",
+#ifdef TA_WEAPSYS
+	"MOD_PROJECTILE",
+	"MOD_PROJECTILE_EXPLOSION",
+	"MOD_WEAPON_PRIMARY",
+	"MOD_WEAPON_SECONDARY"
+#endif
+};
+int modNamesSize = sizeof( modNames ) / sizeof( modNames[0] );
+
 #if defined TA_WEAPSYS || defined TA_PLAYERSYS
 typedef struct
 {
@@ -1423,56 +1475,6 @@ playerAnimationDef_t playerAnimationDefs[] = {
 	{ 0, NULL }
 };
 #endif
-
-char	*modNames[] = {
-	"MOD_UNKNOWN",
-#ifndef TURTLEARENA // MOD
-	"MOD_SHOTGUN",
-	"MOD_GAUNTLET",
-	"MOD_MACHINEGUN",
-	"MOD_GRENADE",
-	"MOD_GRENADE_SPLASH",
-	"MOD_ROCKET",
-	"MOD_ROCKET_SPLASH",
-	"MOD_PLASMA",
-	"MOD_PLASMA_SPLASH",
-	"MOD_RAILGUN",
-	"MOD_LIGHTNING",
-	"MOD_BFG",
-	"MOD_BFG_SPLASH",
-#endif
-	"MOD_WATER",
-	"MOD_SLIME",
-	"MOD_LAVA",
-	"MOD_CRUSH",
-	"MOD_TELEFRAG",
-	"MOD_FALLING",
-	"MOD_SUICIDE",
-	"MOD_TARGET_LASER",
-	"MOD_TRIGGER_HURT",
-#ifdef TA_ENTSYS
-	"MOD_EXPLOSION",
-#endif
-#ifdef MISSIONPACK
-#ifndef TURTLEARENA // MOD
-	"MOD_NAIL",
-	"MOD_CHAINGUN",
-	"MOD_PROXIMITY_MINE",
-#endif
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
-	"MOD_KAMIKAZE",
-#endif
-#ifndef TURTLEARENA // POWERS
-	"MOD_JUICED",
-#endif
-#endif
-	"MOD_GRAPPLE",
-	"MOD_PROJECTILE",
-	"MOD_PROJECTILE_EXPLOSION",
-	"MOD_WEAPON_PRIMARY",
-	"MOD_WEAPON_SECONDARY",
-};
-int modNamesSize = sizeof( modNames ) / sizeof( modNames[0] );
 
 #ifdef TA_MISC // MATERIALS
 materialInfo_t materialInfo[NUM_MATERIAL_TYPES] = {
