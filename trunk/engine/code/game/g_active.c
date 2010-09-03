@@ -821,11 +821,7 @@ but any server game effects are handled here
 ================
 */
 void ClientEvents( gentity_t *ent, int oldEventSequence ) {
-#ifdef TA_HOLDABLE // no q3 teleporter
 	int		i;
-#else
-	int		i, j;
-#endif
 	int		event;
 	gclient_t *client;
 	int		damage;
@@ -834,8 +830,10 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 	vec3_t	origin, angles;
 #endif
 //	qboolean	fired;
+#ifdef TA_WEAPSYS_EX
 	gitem_t *item;
 	gentity_t *drop;
+#endif
 #ifdef TA_HOLDSYS
 	int itemNum;
 #endif
@@ -906,13 +904,6 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				drop = Drop_Item(ent, item, 0);
 				drop->count = ammo;
 
-				/// DROP_WEAPON_FIX
-				// Save the player who drop the weapon, so we can wait till the
-				//  player isn't touching it to allow them to pick it up.
-				//  Becuase otherwise they pickup the weapon as soon as they drop it.
-				drop->s.generic1 = ent->client->ps.clientNum+1;
-				drop->s.time2 = level.time + 3000;
-
 				// Override weapon removal time.
 				drop->nextthink = level.time + 15000;
 			}
@@ -955,54 +946,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 #else
 		case EV_USE_ITEM1:		// teleporter
 #endif // TA_HOLDSYS
-			// drop flags in CTF
-			item = NULL;
-			j = 0;
-
-			if ( ent->client->ps.powerups[ PW_REDFLAG ] ) {
-				item = BG_FindItemForPowerup( PW_REDFLAG );
-				j = PW_REDFLAG;
-			} else if ( ent->client->ps.powerups[ PW_BLUEFLAG ] ) {
-				item = BG_FindItemForPowerup( PW_BLUEFLAG );
-				j = PW_BLUEFLAG;
-			} else if ( ent->client->ps.powerups[ PW_NEUTRALFLAG ] ) {
-				item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
-				j = PW_NEUTRALFLAG;
-			}
-
-			if ( item ) {
-				drop = Drop_Item( ent, item, 0 );
-				// decide how many seconds it has left
-				drop->count = ( ent->client->ps.powerups[ j ] - level.time ) / 1000;
-				if ( drop->count < 1 ) {
-					drop->count = 1;
-				}
-
-				ent->client->ps.powerups[ j ] = 0;
-			}
-
-#ifdef MISSIONPACK_HARVESTER
-			if ( g_gametype.integer == GT_HARVESTER ) {
-				if ( ent->client->ps.generic1 > 0 ) {
-					if ( ent->client->sess.sessionTeam == TEAM_RED ) {
-						item = BG_FindItem( "Blue Cube" );
-					} else {
-						item = BG_FindItem( "Red Cube" );
-					}
-					if ( item ) {
-						for ( j = 0; j < ent->client->ps.generic1; j++ ) {
-							drop = Drop_Item( ent, item, 0 );
-							if ( ent->client->sess.sessionTeam == TEAM_RED ) {
-								drop->spawnflags = TEAM_BLUE;
-							} else {
-								drop->spawnflags = TEAM_RED;
-							}
-						}
-					}
-					ent->client->ps.generic1 = 0;
-				}
-			}
-#endif
+			TossClientGametypeItems(ent);
 #ifdef TA_PLAYERSYS
 			SelectSpawnPoint( ent, origin, angles, qfalse );
 #else

@@ -231,6 +231,75 @@ void TossClientItems( gentity_t *self ) {
 #endif
 }
 
+/*
+===========
+TossClientGametypeItems
+
+Drop Flag in CTF, other gametypes could drop gametype specific items as well.
+===========
+*/
+void TossClientGametypeItems(gentity_t *ent)
+{
+	int j;
+	gitem_t *item;
+	gentity_t *drop;
+	int angle = 0;
+
+	// drop flags in CTF
+	item = NULL;
+	j = 0;
+
+	if ( ent->client->ps.powerups[ PW_REDFLAG ] ) {
+		item = BG_FindItemForPowerup( PW_REDFLAG );
+		j = PW_REDFLAG;
+	} else if ( ent->client->ps.powerups[ PW_BLUEFLAG ] ) {
+		item = BG_FindItemForPowerup( PW_BLUEFLAG );
+		j = PW_BLUEFLAG;
+	} else if ( ent->client->ps.powerups[ PW_NEUTRALFLAG ] ) {
+		item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
+		j = PW_NEUTRALFLAG;
+	}
+
+	if ( item ) {
+		drop = Drop_Item( ent, item, angle );
+#ifdef IOQ3ZTM
+		angle += 45;
+#endif
+		// decide how many seconds it has left
+		drop->count = ( ent->client->ps.powerups[ j ] - level.time ) / 1000;
+		if ( drop->count < 1 ) {
+			drop->count = 1;
+		}
+		ent->client->ps.powerups[ j ] = 0;
+	}
+
+#ifdef MISSIONPACK_HARVESTER
+	if ( g_gametype.integer == GT_HARVESTER ) {
+		if ( ent->client->ps.generic1 > 0 ) {
+			if ( ent->client->sess.sessionTeam == TEAM_RED ) {
+				item = BG_FindItem( "Blue Cube" );
+			} else {
+				item = BG_FindItem( "Red Cube" );
+			}
+			if ( item ) {
+				for ( j = 0; j < ent->client->ps.generic1; j++ ) {
+					drop = Drop_Item( ent, item, angle );
+#ifdef IOQ3ZTM
+					angle += 45;
+#endif
+					if ( ent->client->sess.sessionTeam == TEAM_RED ) {
+						drop->spawnflags = TEAM_BLUE;
+					} else {
+						drop->spawnflags = TEAM_RED;
+					}
+				}
+			}
+			ent->client->ps.generic1 = 0;
+		}
+	}
+#endif
+}
+
 #ifdef MISSIONPACK
 
 /*
