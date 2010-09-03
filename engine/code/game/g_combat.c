@@ -62,6 +62,12 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 		return;
 	}
 #endif
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	// NiGHTS mode bonus time
+	if (ent->client->ps.eFlags & EF_BONUS) {
+		score *= 2;
+	}
+#endif
 	// show score plum
 	ScorePlum(ent, origin, score);
 	//

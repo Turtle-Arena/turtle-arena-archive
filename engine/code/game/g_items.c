@@ -540,8 +540,9 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
 //======================================================================
 
 int Pickup_Score( gentity_t *ent, gentity_t *other ) {
-	int score;
 	int mult;
+	int count;
+	int score;
 
 	// Increase score chain
 	other->client->ps.chain++;
@@ -554,17 +555,24 @@ int Pickup_Score( gentity_t *ent, gentity_t *other ) {
 	}
 
 	if (ent->count) {
-		score = ent->count * mult;
+		count = ent->count;
 	} else {
-		score = ent->item->quantity * mult;
+		count = ent->item->quantity;
 	}
 
-	// Blue Chip (item_sphere) in overtime
-	if (ent->item->giTag == 1 && (other->client->ps.eFlags & EF_BONUS)) {
-		score *= 5;
-	}
+	score = count * mult;
 
 	AddScore(other, ent->r.currentOrigin, score);
+
+#if 0
+	if (ent->item->giTag == 1) {
+		// Spheres
+		other->client->ps.spheres += count;
+	} else if (ent->item->giTag == 0) {
+		// Stars
+		other->client->ps.stars += count;
+	}
+#endif
 
 	return RESPAWN_SCORE;
 }
