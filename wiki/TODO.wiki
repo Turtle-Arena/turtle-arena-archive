@@ -180,6 +180,12 @@ Weapons (and attacking)
 
   * Data: TODO: Add models for sphere and star items
 
+== 2Dish mode ==
+  * TODO: Add a "2D mode" (sideview on rails)
+
+  * TODO: Add entities that enable and disable "2D mode", use paths like NiGHTS mode.
+    * Most of what I want in 2D mode are already added for NiGHTS mode.
+
 == Misc ==
   * TODO: Add optional run animations for torso
 
