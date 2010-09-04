@@ -2411,15 +2411,17 @@ void Capture_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
 	if (!other->client)
 		return;
 
-	amount = other->health; //other->count
+	amount = other->client->ps.stats[STAT_SPHERES];
 	if (amount > self->health)
 		amount = self->health;
 
 	self->health -= amount;
-	other->health -= amount; //other->count
+	other->client->ps.stats[STAT_SPHERES] -= amount;
 
 	if (self->health <= 0)
 	{
+		self->s.modelindex = 0; // remove model to show it is dead.
+
 		if (other->client->ps.eFlags & EF_NIGHTSMODE)
 		{
 			// Bonus time!
@@ -2432,7 +2434,7 @@ void Capture_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
 }
 
 // Ideya Capture
-// ZTM: TODO: Touch to use collected Blue Chips to damage Ideya Capture
+// Touch to use collected Spheres to damage Ideya Capture
 void SP_nights_target( gentity_t *ent )
 {
 	VectorSet( ent->r.mins, -15, -15, -15 );
@@ -2444,7 +2446,7 @@ void SP_nights_target( gentity_t *ent )
 	ent->touch = Capture_Touch;
 
 	if (!ent->health) {
-		ent->health = 20;
+		ent->health = 3; // ZTM: FIXME: Should be 20, changed to 3 as the test map only has 3 spheres per-mare
 	}
 
 	// Tempory model

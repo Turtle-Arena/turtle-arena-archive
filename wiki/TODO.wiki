@@ -170,6 +170,16 @@ Weapons (and attacking)
 
   * TODO: Driveable vehicles? (Base on Q3Rally)
 
+== NiGHTS mode ==
+  * STARTED (NIGHTSMODE): NiGHTS into Dreams mode
+    * Maybe instead of NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...
+
+  * TODO: NiGHTS HUD mode, in check for nights_start to see if level is a NiGHTS level to use NiGHTS HUD.
+
+  * TODO: When player is in bonus time, change blue sphere to golden (change model/skin and icon)
+
+  * Data: TODO: Add models for sphere and star items
+
 == Misc ==
   * TODO: Add optional run animations for torso
 
@@ -185,9 +195,6 @@ Weapons (and attacking)
 
   * BUG: When players have PW_FLASHING they can walk though Obelisks/misc_objects.
     * When PW_FLASHING wears off while in a solid, they are killed. Otherwise they would be stuck.
-
-  * STARTED (NIGHTSMODE): NiGHTS into Dreams mode
-    * Maybe instead of NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...
 
   * TODO: New gametypes; Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
 
