@@ -670,9 +670,26 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 
 	if (traceHit)
 	{
-		// Extend combo,
-		ent->client->ps.chain++;
+		//int mult;
+		//int score;
+
+		// Increase score chain
+		if (ent->client->ps.chain < 999) {
+			ent->client->ps.chain++;
+		}
 		ent->client->ps.chainTime = MELEE_CHAINTIME;
+
+#if 0
+		// Max multipler of 10
+		mult = ent->client->ps.chain;
+		if (mult > 10) {
+			mult = 10;
+		}
+
+		score = 1;
+
+		AddScore(ent, tr.endpos, score * mult);
+#endif
 
 		if (hand == HAND_PRIMARY)
 			ent->client->melee_debounce = level.time + 200;

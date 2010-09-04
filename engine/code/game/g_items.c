@@ -545,7 +545,9 @@ int Pickup_Score( gentity_t *ent, gentity_t *other ) {
 	int score;
 
 	// Increase score chain
-	other->client->ps.chain++;
+	if (other->client->ps.chain < 999) {
+		other->client->ps.chain++;
+	}
 	other->client->ps.chainTime = 2000;
 
 	// Max multipler of 10
@@ -564,15 +566,13 @@ int Pickup_Score( gentity_t *ent, gentity_t *other ) {
 
 	AddScore(other, ent->r.currentOrigin, score);
 
-#if 0
-	if (ent->item->giTag == 1) {
+	if (ent->item->giTag == 2) {
 		// Spheres
-		other->client->ps.spheres += count;
-	} else if (ent->item->giTag == 0) {
+		other->client->ps.stats[STAT_SPHERES] += 1;
+	} else if (ent->item->giTag == 1) {
 		// Stars
-		other->client->ps.stars += count;
+		other->client->ps.stats[STAT_STARS] += 1;
 	}
-#endif
 
 	return RESPAWN_SCORE;
 }

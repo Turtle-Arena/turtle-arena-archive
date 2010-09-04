@@ -1265,7 +1265,7 @@ Only in One Flag CTF games
 /* pickup */	"Star",
 		10,
 		IT_SCORE,
-		0, // normal
+		1, // star
 /* precache */ "",
 /* sounds */ ""
 	},
@@ -1281,7 +1281,7 @@ Only in One Flag CTF games
 /* pickup */	"Sphere",
 		10,
 		IT_SCORE,
-		1, // blue chip
+		2, // sphere
 /* precache */ "",
 /* sounds */ ""
 	},
