@@ -228,6 +228,9 @@ void SP_weapon_random( gentity_t *ent );
 void SP_nights_start( gentity_t *ent ); // Ideya Drone
 void SP_nights_target( gentity_t *ent ); // Ideya Capture
 #endif
+#ifdef TA_PATHSYS
+void SP_target_setpath( gentity_t *ent );
+#endif
 
 
 spawn_t	spawns[] = {
@@ -337,6 +340,9 @@ spawn_t	spawns[] = {
 #ifdef NIGHTSMODE
 	{"nights_start", SP_nights_start},
 	{"nights_target", SP_nights_target},
+#endif
+#ifdef TA_PATHSYS
+	{"target_setpath", SP_target_setpath},
 #endif
 
 	{NULL, 0}

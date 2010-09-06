@@ -424,6 +424,85 @@ static void PM_SetMovementDir( void ) {
 	}
 }
 
+#ifdef TA_PATHSYS // 2DMODE
+// Nights Move style
+enum
+{
+	NM_SIDE, // normal (only working move type)
+	NM_TOP,
+	NM_BACK
+};
+
+static void PM_PathMoveInital( void ) {
+	int style;
+	//vec3_t angles;
+
+	if (!(pm->ps->eFlags & EF_PATHMODE)) {
+		return;
+	}
+
+	// default...
+	style = NM_SIDE;
+	//VectorClear(angles);
+
+	// if on axis, instead of a line {
+	//   angle = angle between axis point and player point + 90;
+	//   if going "backward"
+	//      angles -= 180;
+	// } else {
+	//   angles = angle between point1 and point2
+	// }
+
+	// Controls
+	if (style == NM_TOP)
+	{
+		pm->cmd.upmove = 0;
+	}
+	else if (style == NM_BACK)
+	{
+		pm->cmd.upmove = pm->cmd.forwardmove;
+		pm->cmd.forwardmove = 0;
+	}
+	else // NM_SIDE
+	{
+		// If 2D side view mode
+		pm->cmd.upmove = pm->cmd.forwardmove;
+		pm->cmd.forwardmove = pm->cmd.rightmove;
+		pm->cmd.rightmove = 0;
+		//pm->cmd.angles[YAW] = angles[YAW];
+		//self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw ( dir );
+	}
+}
+
+// Sets wishdir, based on PM_GrappleMove
+void PM_SetupPathWishVel(vec3_t wishvel, const vec3_t wishdir) {
+	vec3_t v, vel;
+	int move;
+
+	if (!(pm->ps->eFlags & EF_PATHMODE)) {
+		return;
+	}
+
+	VectorScale(pml.forward, -16, v);
+	if (pm->ps->eFlags & EF_TRAINBACKWARD) {
+		move = -pm->cmd.forwardmove;
+		VectorAdd(pm->ps->grapplePoint, v, v);
+	} else {
+		move = pm->cmd.forwardmove;
+		VectorAdd(pm->ps->nextPoint, v, v);
+	}
+	v[2] = pm->ps->origin[2];
+	VectorSubtract(v, pm->ps->origin, vel);
+	VectorNormalize( vel );
+
+	VectorScale(vel, move, vel);
+	vel[2] = wishvel[2];
+
+	// Okay now set output
+	VectorCopy(vel, wishvel);
+}
+#endif
+
 
 /*
 =============
@@ -461,8 +540,8 @@ static qboolean PM_CheckJump( void ) {
 	PM_AddEvent( EV_JUMP );
 
 	if ( pm->cmd.forwardmove >= 0
-#ifdef NIGHTSMODE
-			|| (pm->ps->eFlags & EF_NIGHTSMODE)
+#ifdef TA_PATHSYS // 2DMODE
+			|| (pm->ps->eFlags & EF_PATHMODE)
 #endif
 	 ) {
 #ifdef TA_NPCSYS
@@ -604,6 +683,10 @@ static void PM_WaterMove( void ) {
 		wishvel[2] += scale * pm->cmd.upmove;
 	}
 
+#ifdef TA_PATHSYS // 2DMODE
+	PM_SetupPathWishVel(wishvel, wishdir);
+#endif
+
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
 
@@ -645,112 +728,6 @@ static void PM_InvulnerabilityMove( void ) {
 #endif
 #endif
 
-#ifdef NIGHTSMODE
-// Nights Move style
-enum
-{
-	NM_SIDE, // normal (only working move type)
-	NM_TOP,
-	NM_BACK
-};
-
-static void PM_NightsMove( void ) {
-	int		i;
-	vec3_t	wishvel;
-	float	wishspeed;
-	vec3_t	wishdir;
-	float	scale;
-	int style;
-	vec3_t vel, v;
-	float vlen;
-	int move;
-	//vec3_t angles;
-
-	// default...
-	style = NM_SIDE;
-	//VectorClear(angles);
-
-	// if on axis, instead of a line {
-	//   angle = angle between axis point and player point + 90;
-	//   if going "backward"
-	//      angles -= 180;
-	// } else
-	{
-		// angles = angle between point1 and point2
-	}
-
-	// Controls
-	if (style == NM_TOP)
-	{
-		pm->cmd.upmove = 0;
-	}
-	else if (style == NM_BACK)
-	{
-		pm->cmd.upmove = pm->cmd.forwardmove;
-		pm->cmd.forwardmove = 0;
-	}
-	else // NM_SIDE
-	{
-		// If 2D side view mode
-		pm->cmd.upmove = pm->cmd.forwardmove;
-		pm->cmd.forwardmove = pm->cmd.rightmove;
-		pm->cmd.rightmove = 0;
-		//pm->cmd.angles[YAW] = angles[YAW];
-		//self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw ( dir );
-	}
-
-	// normal slowdown
-	PM_Friction ();
-
-	scale = PM_CmdScale( &pm->cmd );
-	//
-	// user intentions
-	//
-	if ( !scale ) {
-		wishvel[0] = 0;
-		wishvel[1] = 0;
-		wishvel[2] = -20;
-	} else {
-		for (i=0 ; i<3 ; i++) {
-			wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
-		}
-
-		wishvel[2] += scale * pm->cmd.upmove;
-	}
-
-	VectorScale(pml.forward, -16, v);
-	if (pm->ps->eFlags & EF_TRAINBACKWARD) {
-		move = -pm->cmd.forwardmove;
-		VectorAdd(pm->ps->grapplePoint, v, v);
-	} else {
-		move = pm->cmd.forwardmove;
-		VectorAdd(pm->ps->nextPoint, v, v);
-	}
-	v[2] = pm->ps->origin[2];
-	VectorSubtract(v, pm->ps->origin, vel);
-	vlen = VectorLength(vel);
-	VectorNormalize( vel );
-
-	VectorScale(vel, move, vel);
-	vel[2] = wishvel[2];
-
-	VectorCopy (vel, wishdir);
-	wishspeed = VectorNormalize(wishdir);
-	
-	PM_Accelerate (wishdir, wishspeed, pm_flyaccelerate);
-
-	pml.groundPlane = qfalse;
-
-	PM_StepSlideMove( qfalse );
-
-#ifdef TA_WEAPSYS
-	PM_ContinueLegsAnim( BG_LegsStandForPlayerState(pm->ps, pm->playercfg) );
-#else
-	PM_ContinueLegsAnim( LEGS_IDLE );
-#endif
-}
-#endif
-
 /*
 ===================
 PM_FlyMove
@@ -775,7 +752,11 @@ static void PM_FlyMove( void ) {
 	if ( !scale ) {
 		wishvel[0] = 0;
 		wishvel[1] = 0;
+#ifdef NIGHTSMODE
+		wishvel[2] = -20;
+#else
 		wishvel[2] = 0;
+#endif
 	} else {
 		for (i=0 ; i<3 ; i++) {
 			wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
@@ -783,6 +764,10 @@ static void PM_FlyMove( void ) {
 
 		wishvel[2] += scale * pm->cmd.upmove;
 	}
+
+#ifdef TA_PATHSYS // 2DMODE
+	PM_SetupPathWishVel(wishvel, wishdir);
+#endif
 
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
@@ -842,6 +827,10 @@ static void PM_AirMove( void ) {
 		wishvel[i] = pml.forward[i]*fmove + pml.right[i]*smove;
 	}
 	wishvel[2] = 0;
+
+#ifdef TA_PATHSYS // 2DMODE
+	PM_SetupPathWishVel(wishvel, wishdir);
+#endif
 
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
@@ -963,6 +952,10 @@ static void PM_WalkMove( void ) {
 	}
 	// when going up or down slopes the wish velocity should Not be zero
 //	wishvel[2] = 0;
+
+#ifdef TA_PATHSYS // 2DMODE
+	PM_SetupPathWishVel(wishvel, wishdir);
+#endif
 
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
@@ -1349,8 +1342,8 @@ static void PM_GroundTraceMissed( void ) {
 		pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, point, pm->ps->clientNum, pm->tracemask);
 		if ( trace.fraction == 1.0 ) {
 			if ( pm->cmd.forwardmove >= 0 
-#ifdef NIGHTSMODE
-			|| (pm->ps->eFlags & EF_NIGHTSMODE)
+#ifdef TA_PATHSYS // 2DMODE
+			|| (pm->ps->eFlags & EF_PATHMODE)
 #endif
 			) {
 #ifdef TA_NPCSYS
@@ -1417,8 +1410,8 @@ static void PM_GroundTrace( void ) {
 		}
 		// go into jump animation
 		if ( pm->cmd.forwardmove >= 0 
-#ifdef NIGHTSMODE
-			|| (pm->ps->eFlags & EF_NIGHTSMODE)
+#ifdef TA_PATHSYS // 2DMODE
+			|| (pm->ps->eFlags & EF_PATHMODE)
 #endif
 		) {
 #ifdef TA_NPCSYS
@@ -2881,8 +2874,8 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 
 	// circularly clamp the angles with deltas
 	for (i=0 ; i<3 ; i++) {
-#ifdef NIGHTSMODE
-		if ((pm->ps->eFlags & EF_NIGHTSMODE) && i == YAW)
+#ifdef TA_PATHSYS // 2DMODE
+		if ((pm->ps->eFlags & EF_PATHMODE) && i == YAW)
 			continue;
 #endif
 		temp = cmd->angles[i] + ps->delta_angles[i];
@@ -3038,8 +3031,8 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	// decide if backpedaling animations should be used
-#ifdef NIGHTSMODE
-	if ( pm->ps->eFlags & EF_NIGHTSMODE ) {
+#ifdef TA_PATHSYS // 2DMODE
+	if (pm->ps->eFlags & EF_PATHMODE) {
 		pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
 	} else
 #endif
@@ -3056,6 +3049,9 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	if ( pm->ps->pm_type == PM_SPECTATOR ) {
+#ifdef TA_PATHSYS
+		PM_PathMoveInital();
+#endif
 #ifdef IOQ3ZTM // set pml.groundPlane before PM_CheckDuck
 		// set pml.groundPlane
 		PM_GroundTrace();
@@ -3084,6 +3080,11 @@ void PmoveSingle (pmove_t *pmove) {
 	{
 		return;		// no movement at all
 	}
+
+#ifdef TA_PATHSYS
+	// Inital path movement
+	PM_PathMoveInital();
+#endif
 
 	// set watertype, and waterlevel
 	PM_SetWaterLevel();
@@ -3126,11 +3127,6 @@ void PmoveSingle (pmove_t *pmove) {
 		PM_InvulnerabilityMove();
 	} else
 #endif
-#endif
-#ifdef NIGHTSMODE
-	if ( pm->ps->powerups[PW_FLIGHT] && (pm->ps->eFlags & EF_NIGHTSMODE) ) {
-		PM_NightsMove();
-	} else
 #endif
 	if ( pm->ps->powerups[PW_FLIGHT] ) {
 #ifdef IOQ3ZTM // Use grapple while flying

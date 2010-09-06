@@ -1228,7 +1228,7 @@ netField_t	playerStateFields[] =
 { PSF(grapplePoint[0]), 0 },
 { PSF(grapplePoint[1]), 0 },
 { PSF(grapplePoint[2]), 0 },
-#if defined NIGHTSMODE || defined NET_COMPAT
+#if defined TA_PATHSYS || defined NET_COMPAT
 { PSF(nextPoint[0]), 0 },
 { PSF(nextPoint[1]), 0 },
 { PSF(nextPoint[2]), 0 },

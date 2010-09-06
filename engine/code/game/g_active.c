@@ -1456,8 +1456,8 @@ void ClientThink_real( gentity_t *ent ) {
 		SetClientViewAngle(ent, viewAngles);
 	}
 #endif
-#ifdef NIGHTSMODE
-	if (client->ps.eFlags & EF_NIGHTSMODE)
+#ifdef TA_PATHSYS
+	if (client->ps.eFlags & EF_PATHMODE)
 	{
 		// A_FaceTarget!
 		if (ent->client->pers.cmd.rightmove != 0)

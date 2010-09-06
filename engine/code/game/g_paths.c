@@ -93,7 +93,7 @@ This function also supports pervTrain, so that paths can be two way.
 Based on Q3's g_mover.c's Think_SetupTrainTargets
 ===========
 */
-gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
+static gpathtype_e G_SetupPath2(gentity_t *ent, const char *target)
 {
 	gentity_t		*path, *next, *start;
 	int 			i = 0, prev_flags = 0;
@@ -105,6 +105,12 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 
 	ent->prevTrain = NULL;
 	ent->nextTrain = NULL;
+
+	if (!target || target[0] == '\0') {
+		// This is supported, so its not really an error...
+		return PATH_ERROR;
+	}
+
 	// Only start path on a path entity not just the first one we find,
 	//    also support PATHF_BEGIN
 	do {
@@ -248,6 +254,33 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 	return PATH_CIRCIT;
 }
 
+// ZTM: NOTE: G_SetupPath had too many return statement, so moved EF_PATHMODE bit to a seperate function.
+gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
+{
+	gpathtype_e type;
+
+	type = G_SetupPath2(ent, target);
+
+	if (type == PATH_ERROR)
+	{
+		// Disable path mode
+		if (ent->client) {
+			ent->client->ps.eFlags &= ~EF_PATHMODE;
+		}
+		ent->s.eFlags &= ~EF_PATHMODE;
+	}
+	else
+	{
+		// Enable path mode
+		if (ent->client) {
+			ent->client->ps.eFlags |= EF_PATHMODE;
+		}
+		ent->s.eFlags |= EF_PATHMODE;
+	}
+
+	return type;
+}
+
 // g_mover.c
 void Think_BeginMoving( gentity_t *ent );
 void SetMoverState( gentity_t *ent, moverState_t moverState, int time );
@@ -262,10 +295,10 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 	gentity_t	*point;
 	qboolean	backward;
 
-#ifdef NIGHTSMODE
 	if (ent->client)
 	{
-		if (ent->client->ps.eFlags & EF_NIGHTSMODE)
+		// ZTM: FIXME: Is the !EF_PATHMODE check ever going to be used?
+		if (ent->client->ps.eFlags & EF_PATHMODE)
 		{
 			backward = (ent->client->ps.eFlags & EF_TRAINBACKWARD);
 		}
@@ -277,7 +310,6 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		}
 	}
 	else
-#endif
 	{
 		backward = (ent->s.eFlags & EF_TRAINBACKWARD);
 	}
@@ -316,11 +348,11 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		else
 			VectorCopy(ent->s.origin, origin);
 
-#ifdef NIGHTSMODE
-		if (ent->client && (ent->client->ps.eFlags & EF_NIGHTSMODE)) {
+		// Client paths are "2D"
+		if (ent->client) {
 			origin[2] = targetPos[2] = 0; // Don't compare Z
 		}
-#endif
+
 		dist = Distance(origin, targetPos);
 
 		if (dist > 20.0f)
@@ -441,8 +473,7 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 			ent->s.pos.trType = TR_STATIONARY;
 		}
 	}
-#ifdef NIGHTSMODE
-	else if (ent->client && (ent->client->ps.eFlags & EF_NIGHTSMODE))
+	else if (ent->client)
 	{
 		vec3_t dir;
 		vec3_t viewAngles;
@@ -465,7 +496,6 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		else
 			ent->client->ps.stats[STAT_DEAD_YAW] = viewAngles[YAW]+90;
 	}
-#endif
 
 	return qtrue;
 }

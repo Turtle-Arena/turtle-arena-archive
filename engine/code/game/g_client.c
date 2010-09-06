@@ -2271,15 +2271,16 @@ void G_DeNiGHTSizePlayer( gentity_t *ent )
 	if (!ent || !ent->client)
 		return;
 
-	if (ent->client->ps.eFlags & EF_NIGHTSMODE) {
+	if (ent->client->ps.powerups[PW_FLIGHT]) {
 		// Clear score
 		ent->client->ps.persistant[PERS_SCORE] = 0;
 	}
 
 	ent->client->mare = 0;
 	ent->client->ps.powerups[PW_FLIGHT] = 0;
-	ent->client->ps.eFlags &= ~EF_NIGHTSMODE;
 	ent->client->ps.eFlags &= ~EF_BONUS;
+
+	G_SetupPath(ent, NULL);
 }
 
 int G_NumMares(void)
@@ -2356,7 +2357,6 @@ void G_NiGHTSizePlayer( gentity_t *ent, gentity_t *drone )
 		}
 	}
 
-	ent->client->ps.eFlags |= EF_NIGHTSMODE;
 	ent->client->ps.powerups[PW_FLIGHT] = level.time + 120 * 1000;
 	G_ReachedPath(ent, qfalse);
 }
@@ -2366,7 +2366,7 @@ void Drone_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
 	if (!other->client)
 		return;
 
-	if (!(other->client->ps.eFlags & EF_NIGHTSMODE)) {
+	if (!other->client->ps.powerups[PW_FLIGHT]) {
 		// Use targets first time a player NiGHTSizes
 		G_UseTargets(self, other);
 	}
@@ -2422,7 +2422,7 @@ void Capture_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
 	{
 		self->s.modelindex = 0; // remove model to show it is dead.
 
-		if (other->client->ps.eFlags & EF_NIGHTSMODE)
+		if (other->client->ps.powerups[PW_FLIGHT])
 		{
 			// Bonus time!
 			other->client->ps.eFlags |= EF_BONUS;
