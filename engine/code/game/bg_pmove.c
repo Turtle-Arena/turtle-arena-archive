@@ -753,10 +753,11 @@ static void PM_FlyMove( void ) {
 		wishvel[0] = 0;
 		wishvel[1] = 0;
 #ifdef NIGHTSMODE
-		wishvel[2] = -20;
-#else
-		wishvel[2] = 0;
+		if (pm->ps->powerups[PW_FLIGHT])
+			wishvel[2] = -20;
+		else
 #endif
+		wishvel[2] = 0;
 	} else {
 		for (i=0 ; i<3 ; i++) {
 			wishvel[i] = scale * pml.forward[i]*pm->cmd.forwardmove + scale * pml.right[i]*pm->cmd.rightmove;
