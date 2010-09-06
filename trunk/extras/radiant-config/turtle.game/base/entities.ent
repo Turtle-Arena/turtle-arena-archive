@@ -1776,10 +1776,24 @@ This takes away any and all item_* type powerups from player except health and a
 -->
 
 <point name="target_score" color="0 .5 0" box="-8 -8 -8 8 8 8">
-This is used to automatically give frag points to the player who activates this. A spawn location entity like info_player_* or CTF respawn points can target this entity to give points to the player when he spawns in the game. Or a trigger can also be used to activate this. The activator of the trigger will get the points.
+This is used to automatically give points to the player who activates this. A spawn location entity like info_player_* or CTF respawn points can target this entity to give points to the player when he spawns in the game. Or a trigger can also be used to activate this. The activator of the trigger will get the points.
 -------- KEYS --------
 <targetname key="targetname" name="Target Name">ativating entity points to this.</targetname>
-<integer key="count" name="Frags Given">number of frag points to give to player (default 1).</integer>
+<integer key="count" name="Point Given">number of points to give to player (default 1).</integer>
+<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
+<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
+<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+</point>
+
+<!--
+=============================================================================
+-->
+
+<point name="target_setpath" color="0 .5 0" box="-8 -8 -8 8 8 8">
+This is used to set the (2Dish sideview) path used by a player. A spawn location entity like info_player_* or CTF respawn points can target this entity to set path of the player when he spawns in the game. Or a trigger can also be used to activate this. The activator of the trigger will change path.
+-------- KEYS --------
+<targetname key="targetname" name="Target Name">ativating entity points to this.</targetname>
+<target key="target" name="Target">point to path entity, no target with disable using a path.</target>
 <boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
 <boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
 <boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>

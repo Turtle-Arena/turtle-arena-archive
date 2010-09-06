@@ -407,8 +407,8 @@ static void CG_OffsetThirdPersonView( void ) {
 		focusAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
 		cg.refdefViewAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
 	}
-#ifdef NIGHTSMODE
-	else if (cg.snap->ps.eFlags & EF_NIGHTSMODE)
+#ifdef TA_PATHSYS // 2DMODE
+	else if (cg.snap->ps.eFlags & EF_PATHMODE)
 	{
 		focusAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
 		cg.refdefViewAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];

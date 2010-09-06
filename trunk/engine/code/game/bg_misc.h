@@ -243,8 +243,8 @@ typedef enum {
 #ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 #define	EF_KAMIKAZE			0x00000200
 #endif
-#ifdef NIGHTSMODE
-#define	EF_NIGHTSMODE		0x00000200 // EF_KAMIKAZE
+#ifdef TA_PATHSYS // 2DMODE
+#define	EF_PATHMODE			0x00000200		// EF_KAMIKAZE
 #endif
 #define	EF_MOVER_STOP		0x00000400		// will push otherwise
 #define EF_AWARD_CAP		0x00000800		// draw the capture sprite

@@ -1100,7 +1100,7 @@ typedef struct playerState_s {
 								// used to twist the legs during strafing
 
 	vec3_t		grapplePoint;	// location of grapple to pull towards if PMF_GRAPPLE_PULL
-#if defined NIGHTSMODE || defined NET_COMPAT
+#if defined TA_PATHSYS || defined NET_COMPAT
 	// grapplePoint is NiGHTS mode previous point
 	vec3_t		nextPoint;	// NiGHTS mode next point
 #endif

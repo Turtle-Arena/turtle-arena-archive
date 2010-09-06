@@ -180,18 +180,13 @@ Weapons (and attacking)
 
   * Data: TODO: Add models for sphere and star items
 
-== 2Dish mode ==
-  * TODO: Add a "2D mode" (sideview on rails)
-
-  * TODO: Add entities that enable and disable "2D mode", use paths like NiGHTS mode.
-    * Most of what I want in 2D mode are already added for NiGHTS mode.
-
 == Misc ==
   * TODO: Add optional run animations for torso
 
-  * STARTED (TA_PATHSYS): Finish new path system "g_paths.c" for NPCs (and players not in NiGHTS mode?).
+  * STARTED (TA_PATHSYS): Finish new path system "g_paths.c" for NPCs
   * TODO: Support path_axis (orbit around ent), use TR_SINE?
-  * TODO: Make sure players support PATH_LINE
+
+  * TODO (TA_PATHSYS): Allow PATH_LINE paths to be started from either end
 
   * TODO: Support models/players/NAME/animsounds.cfg used in STV:Elite Force (SP) (Also used in Jedi Knight 2) ?
     * Started see bg_sound_t and Sounds_Parse; it is similar to animsounds, but different.

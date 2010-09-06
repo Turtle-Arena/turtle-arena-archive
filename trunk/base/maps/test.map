@@ -356,6 +356,24 @@
 ( 944 880 -192 ) ( 944 880 -176 ) ( 784 880 -192 ) base_wall/concrete 0 0 0 0.5 0.5 0 0 0
 ( 944 880 -192 ) ( 944 848 -192 ) ( 944 880 -176 ) base_wall/concrete 0 0 0 0.5 0.5 0 0 0
 }
+// brush 39
+{
+( 1472 -384 -192 ) ( 1472 -448 -192 ) ( 1408 -384 -192 ) base_wall/crate_metal -0 -0 0 0.25 0.25 0 0 0
+( 1472 -384 -200 ) ( 1408 -384 -200 ) ( 1472 -384 -208 ) city/shadow 0 0 0 0.5 0.5 0 0 0
+( 1472 -384 -200 ) ( 1472 -384 -208 ) ( 1472 -448 -200 ) city/shadow 0 0 0 0.5 0.5 0 0 0
+( 1408 -448 -208 ) ( 1472 -448 -208 ) ( 1408 -384 -208 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1408 -448 -208 ) ( 1408 -448 -200 ) ( 1472 -448 -208 ) city/shadow 0 0 0 0.5 0.5 0 0 0
+( 1408 -448 -208 ) ( 1408 -384 -208 ) ( 1408 -448 -200 ) city/shadow 0 0 0 0.5 0.5 0 0 0
+}
+// brush 40
+{
+( 1472 -128 -192 ) ( 1472 -192 -192 ) ( 1408 -128 -192 ) base_wall/crate_metal -0 -0 0 0.25 0.25 0 0 0
+( 1472 -128 -200 ) ( 1408 -128 -200 ) ( 1472 -128 -208 ) city/shadow 0 0 0 0.5 0.5 0 0 0
+( 1472 -128 -200 ) ( 1472 -128 -208 ) ( 1472 -192 -200 ) city/shadow 0 0 0 0.5 0.5 0 0 0
+( 1408 -192 -208 ) ( 1472 -192 -208 ) ( 1408 -128 -208 ) common/caulk 0 0 0 0.5 0.5 0 0 0
+( 1408 -192 -208 ) ( 1408 -192 -200 ) ( 1472 -192 -208 ) city/shadow 0 0 0 0.5 0.5 0 0 0
+( 1408 -192 -208 ) ( 1408 -128 -208 ) ( 1408 -192 -200 ) city/shadow 0 0 0 0.5 0.5 0 0 0
+}
 }
 // entity 1
 {
@@ -2114,13 +2132,6 @@
 }
 // entity 70
 {
-"classname" "path_corner"
-"origin" "576.000000 -896.000000 -160.000000"
-"targetname" "train4_doh"
-"target" "train1_doh"
-}
-// entity 71
-{
 "classname" "func_train"
 "target" "train1"
 "spawnflags" "1"
@@ -2144,90 +2155,152 @@
 ( 464 -856 -88 ) ( 464 -792 -88 ) ( 464 -856 -56 ) common/origin 16 16 0 0.5 0.5 0 0 0
 }
 }
-// entity 72
+// entity 71
 {
 "classname" "path_end"
 "origin" "384.000000 -832.000000 -160.000000"
 "targetname" "train3"
 "target" "train4"
 }
-// entity 73
+// entity 72
 {
 "classname" "path_start"
 "origin" "544.000000 -800.000000 -160.000000"
 "targetname" "train1"
 "target" "train2"
 }
-// entity 74
+// entity 73
 {
 "classname" "nights_start"
 "origin" "1248.000000 -736.000000 -168.000000"
 }
-// entity 75
+// entity 74
 {
 "classname" "item_star"
 "origin" "1240.000000 -696.000000 -120.000000"
 }
-// entity 76
+// entity 75
 {
 "classname" "item_star"
 "origin" "1256.000000 -832.000000 -120.000000"
 }
-// entity 77
+// entity 76
 {
 "classname" "item_star"
 "origin" "1256.000000 -880.000000 -120.000000"
 }
-// entity 78
+// entity 77
 {
 "classname" "item_sphere"
 "origin" "1208.000000 -536.000000 -120.000000"
 }
-// entity 79
+// entity 78
 {
 "classname" "item_sphere"
 "origin" "1344.000000 -936.000000 -120.000000"
 }
-// entity 80
+// entity 79
 {
 "classname" "item_sphere"
 "origin" "1408.000000 -936.000000 -120.000000"
 }
-// entity 81
+// entity 80
 {
 "classname" "item_sphere"
 "origin" "1296.000000 -936.000000 -120.000000"
 }
-// entity 82
+// entity 81
 {
 "classname" "item_sphere"
 "origin" "1152.000000 -536.000000 -120.000000"
 }
-// entity 83
+// entity 82
 {
 "classname" "item_sphere"
 "origin" "1096.000000 -536.000000 -120.000000"
 }
-// entity 84
+// entity 83
 {
 "classname" "item_star"
 "origin" "1256.000000 -784.000000 -120.000000"
 }
-// entity 85
+// entity 84
 {
 "classname" "item_star"
 "origin" "1240.000000 -640.000000 -120.000000"
 "mirrorType" "2"
 }
-// entity 86
+// entity 85
 {
 "classname" "item_star"
 "origin" "1240.000000 -576.000000 -120.000000"
 "mirrorType" "1"
 }
-// entity 87
+// entity 86
 {
 "classname" "misc_portal_surface"
 "origin" "856.000000 824.000000 -96.000000"
 "angle" "90.000000"
+}
+// entity 87
+{
+"classname" "trigger_multiple"
+"target" "trigger_2dpath_start"
+// brush 0
+{
+( 1464 -384 -64 ) ( 1464 -448 -64 ) ( 1400 -384 -64 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1472 -384 -176 ) ( 1408 -384 -176 ) ( 1472 -384 -192 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1472 -384 -176 ) ( 1472 -384 -192 ) ( 1472 -448 -176 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1408 -448 -192 ) ( 1472 -448 -192 ) ( 1408 -384 -192 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1408 -448 -192 ) ( 1408 -448 -176 ) ( 1472 -448 -192 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1408 -448 -192 ) ( 1408 -384 -192 ) ( 1408 -448 -176 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+}
+}
+// entity 88
+{
+"classname" "path_start"
+"origin" "1440.000000 -416.000000 -160.000000"
+"targetname" "2dpath_start"
+"target" "2dpath_1"
+}
+// entity 89
+{
+"classname" "path_corner"
+"origin" "1440.000000 -288.000000 -160.000000"
+"targetname" "2dpath_1"
+"target" "2dpath_end"
+}
+// entity 90
+{
+"classname" "path_end"
+"origin" "1440.000000 -152.000000 -160.000000"
+"targetname" "2dpath_end"
+}
+// entity 91
+{
+"classname" "trigger_multiple"
+"target" "trigger_2dpath_end"
+// brush 0
+{
+( 1464 -128 -64 ) ( 1464 -192 -64 ) ( 1400 -128 -64 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1472 -128 -176 ) ( 1408 -128 -176 ) ( 1472 -128 -192 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1472 -128 -176 ) ( 1472 -128 -192 ) ( 1472 -192 -176 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1408 -192 -192 ) ( 1472 -192 -192 ) ( 1408 -128 -192 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1408 -192 -192 ) ( 1408 -192 -176 ) ( 1472 -192 -192 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+( 1408 -192 -192 ) ( 1408 -128 -192 ) ( 1408 -192 -176 ) common/trigger 0 0 0 0.5 0.5 0 0 0
+}
+}
+// entity 92
+{
+"classname" "target_setpath"
+"origin" "1352.000000 -160.000000 -160.000000"
+"targetname" "trigger_2dpath_end"
+"target" "2dpath_end"
+}
+// entity 93
+{
+"classname" "target_setpath"
+"origin" "1352.000000 -416.000000 -160.000000"
+"targetname" "trigger_2dpath_start"
+"target" "2dpath_start"
 }

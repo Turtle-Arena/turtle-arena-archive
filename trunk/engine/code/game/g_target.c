@@ -366,6 +366,26 @@ void SP_target_teleporter( gentity_t *self ) {
 	self->use = target_teleporter_use;
 }
 
+#ifdef TA_PATHSYS
+/*QUAKED target_setpath (.5 .5 .5) (-8 -8 -8) (8 8 8)
+"target" is the name of path to use, if blank stops using path mode.
+*/
+void target_setpath_use( gentity_t *self, gentity_t *other, gentity_t *activator ) {
+	if (G_SetupPath(activator, self->target) != PATH_ERROR) {
+		G_ReachedPath(activator, qfalse);
+	}
+}
+
+void SP_target_setpath( gentity_t *self )
+{
+	if (!self->targetname)
+		G_Printf("untargeted %s at %s\n", self->classname, vtos(self->s.origin));
+
+	self->use = target_setpath_use;
+}
+#endif
+
+
 //==========================================================
 
 
