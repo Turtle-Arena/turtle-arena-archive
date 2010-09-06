@@ -954,7 +954,11 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	refdef.width = w;
 	refdef.height = h;
 
+#ifdef TURTLEARENA // FOV
+	refdef.fov_x = (int)((float)refdef.width / 640.0f * 70.0f);
+#else
 	refdef.fov_x = (int)((float)refdef.width / 640.0f * 90.0f);
+#endif
 	xx = refdef.width / tan( refdef.fov_x / 360 * M_PI );
 	refdef.fov_y = atan2( refdef.height, xx );
 	refdef.fov_y *= ( 360 / (float)M_PI );
