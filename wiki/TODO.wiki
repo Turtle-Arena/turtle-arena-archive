@@ -72,14 +72,10 @@ Weapons (and attacking)
   * TODO: Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder when in aim mode }
     * ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
 
-  * BUG: CreateFuzzyWeight doesn't setup inventory weight correctly, causes SIGBUS in FuzzyWeightUndecided_r
-
   * TODO: Draw the secondary pickup weapon somewhere on the player when single handed
 
   * STARTED (TA_HOLDABLE): Make shurikens/holdable-projectiles general like weapons groups.
     * (So they can be totally configured from .weap, and add new ones)
-
-  * BUG: Flash origin isn't updated when missing weapon model
 
   * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
 
@@ -124,8 +120,6 @@ Weapons (and attacking)
   * TODO: When there are multiple ghost models they may not be sorted into correct order?
 
   * TODO: Add Vertex Buffer Object (VBO) support?
-
-  * BUG: Bloom in windowed mode only effecting the top 480 (or is it 640?) pixels?
 
 == UI ==
   * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?
@@ -194,9 +188,6 @@ Weapons (and attacking)
     * It currently doesn't load sounds and is for NPC and misc objects only.
 
   * TODO: Pull grapple back to player before removing entity like LoZ: TP?
-
-  * BUG: When players have PW_FLASHING they can walk though Obelisks/misc_objects.
-    * When PW_FLASHING wears off while in a solid, they are killed. Otherwise they would be stuck.
 
   * TODO: New gametypes; Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
 
