@@ -1166,8 +1166,8 @@ typedef struct playerState_s {
 	int		meleeDelay; // Time before player can use a melee attack
 	int		meleeLinkTime; // Time left till will be unable to continue meleeAttack
 
-	// Melee damage hits, add more points for higher chain?
-	//    ZTM: TODO: Use for NiGHTS links count too?
+	// Score chain, used for melee damage hits too.
+	// ZTM: TODO: Give points (based on chain) for melee damage?
 	int		chain;
 	int		chainTime;
 
