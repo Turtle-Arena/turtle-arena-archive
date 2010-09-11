@@ -97,6 +97,8 @@ BSPCDIR=$(MOUNT_DIR)/bspc
 CMDIR=$(MOUNT_DIR)/qcommon
 ZDIR=$(MOUNT_DIR)/zlib
 
+bin_path=$(shell which $(1) 2> /dev/null)
+
 ifeq ($(V),1)
 echo_cmd=@:
 Q=
@@ -112,11 +114,13 @@ endef
 
 ifeq ($(USE_INTERNAL_ZLIB),1)
   BASE_CFLAGS += -DNO_GZIP
-  ifneq ($(USE_LOCAL_HEADERS),1)
-    BASE_CFLAGS += -I$(ZDIR)
-  endif
+  BASE_CFLAGS += -I$(ZDIR)
 else
   LIBS += -lz
+endif
+
+ifeq ($(USE_LOCAL_HEADERS),1)
+  BASE_CFLAGS += -DUSE_LOCAL_HEADERS
 endif
 
 TARGETS=$(B)/bspc.$(ARCH)$(BINEXT)
@@ -133,7 +137,7 @@ MKDIR=mkdir
 
 ifeq ($(PLATFORM),linux)
 
-  BASE_CFLAGS= -Dstricmp=strcasecmp -DLINUX -DBSPC
+  BASE_CFLAGS+= -Dstricmp=strcasecmp -DLINUX -DBSPC
 
   ifeq ($(ARCH),alpha)
     ARCH=axp
@@ -181,16 +185,25 @@ ifeq ($(PLATFORM),mingw32)
     CC=gcc
   endif
 
+  ifndef WINDRES
+    WINDRES=windres
+  endif
+
   ARCH=x86
   BINEXT=.exe
 
-  BASE_CFLAGS= -DBSPC
-  CFLAGS=$(BASE_CFLAGS)
-
+  BASE_CFLAGS+= -DBSPC
   ifeq ($(ARCH),x86)
     # build 32bit
     BASE_CFLAGS += -m32
   endif
+
+  # In the absence of wspiapi.h, require Windows XP or later
+  ifeq ($(shell test -e $(CMDIR)/wspiapi.h; echo $$?),1)
+    BASE_CFLAGS += -DWINVER=0x501
+  endif
+
+  CFLAGS=$(BASE_CFLAGS)
 
   LDFLAGS=-lws2_32 -lwinmm -mwindows
 

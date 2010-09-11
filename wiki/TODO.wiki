@@ -291,12 +291,6 @@ Most of the mapobjects should be damageable.
     * Does it look good?
 
 
-= BSPC =
-BSPC is the map .bsp to .aas (Arena Awareness System) compiler. The aas file is used by bots.
-
-  * BUG: Fix compiling with cross-make-mingw.sh
-
-
 = Master Server =
   * NOTE: dpmaster is a open source master server that should support Turtle Arena
 
