@@ -189,13 +189,14 @@ ifeq ($(PLATFORM),mingw32)
     WINDRES=windres
   endif
 
-  ARCH=x86
   BINEXT=.exe
 
   BASE_CFLAGS+= -DBSPC
   ifeq ($(ARCH),x86)
     # build 32bit
     BASE_CFLAGS += -m32
+  else
+    BASE_CFLAGS += -m64
   endif
 
   # In the absence of wspiapi.h, require Windows XP or later
