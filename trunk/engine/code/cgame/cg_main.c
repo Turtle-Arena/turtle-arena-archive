@@ -805,7 +805,9 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.noAmmoSound = trap_S_RegisterSound( "sound/weapons/noammo.wav", qfalse );
 
 	cgs.media.talkSound = trap_S_RegisterSound( "sound/player/talk.wav", qfalse );
+#ifndef IOQ3ZTM // MORE_PLAYER_SOUNDS
 	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav", qfalse);
+#endif
 
 #ifdef IOQ3ZTM // LETTERBOX
 	cgs.media.letterBoxOnSound = trap_S_RegisterSound( "sound/misc/letterboxon.wav", qfalse );

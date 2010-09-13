@@ -783,7 +783,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 	case EV_FALL_SHORT:
 		DEBUGNAME("EV_FALL_SHORT");
+#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
+		trap_S_StartSound( NULL, es->number, CHAN_VOICE, CG_CustomSound( es->number, "*land1.wav" ) );
+#else
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landSound );
+#endif
 		if ( clientNum == cg.predictedPlayerState.clientNum ) {
 			// smooth landing z changes
 			cg.landChange = -8;

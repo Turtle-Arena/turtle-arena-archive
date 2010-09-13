@@ -1261,8 +1261,10 @@ typedef struct {
 	sfxHandle_t	noAmmoSound;
 	sfxHandle_t	respawnSound;
 	sfxHandle_t talkSound;
+#ifndef IOQ3ZTM // MORE_PLAYER_SOUNDS
 	sfxHandle_t landSound;
 	sfxHandle_t fallSound;
+#endif
 	sfxHandle_t jumpPadSound;
 
 #ifdef IOQ3ZTM // LETTERBOX
