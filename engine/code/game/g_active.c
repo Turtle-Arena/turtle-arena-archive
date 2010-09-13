@@ -150,12 +150,17 @@ void P_WorldEffects( gentity_t *ent ) {
 				if (ent->health <= ent->damage) {
 					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
 				} else if (rand()&1) {
-#if 0 // #ifdef IOQ3ZTM // ZTM: TODO: Allow gurp1/2 to be per-player? (Example: *gurp1.wav), fallback to normal gurp sounds
+#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
+					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp1.wav"));
 #else
 					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
 #endif
 				} else {
+#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
+					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp2.wav"));
+#else
 					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
+#endif
 				}
 
 				// don't play a normal pain sound

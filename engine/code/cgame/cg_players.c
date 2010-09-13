@@ -37,6 +37,12 @@ char	*cg_customSoundNames[MAX_CUSTOM_SOUNDS] = {
 	"*drown.wav",
 	"*fall1.wav",
 	"*taunt.wav"
+#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
+	,
+	"*gurp1.wav",
+	"*gurp2.wav",
+	"*land1.wav"
+#endif
 };
 
 
@@ -1098,6 +1104,11 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 		if ( !ci->sounds[i] ) {
 			ci->sounds[i] = trap_S_RegisterSound( va("sound/player/%s/%s", fallback, s + 1), qfalse );
 		}
+#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
+		if ( !ci->sounds[i] ) {
+			ci->sounds[i] = trap_S_RegisterSound( va("sound/player/%s", s + 1), qfalse );
+		}
+#endif
 	}
 
 	ci->deferred = qfalse;

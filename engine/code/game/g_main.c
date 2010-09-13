@@ -750,8 +750,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 #ifndef TA_SP
 		G_ModelIndex( SP_PODIUM_MODEL );
 #endif
+#ifndef IOQ3ZTM // MORE_PLAYER_SOUNDS
 		G_SoundIndex( "sound/player/gurp1.wav" );
 		G_SoundIndex( "sound/player/gurp2.wav" );
+#endif
 	}
 
 	if ( trap_Cvar_VariableIntegerValue( "bot_enable" ) ) {
