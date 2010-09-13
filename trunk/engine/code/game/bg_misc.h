@@ -1388,6 +1388,8 @@ typedef struct bg_playercfg_s
 	float accelerate_speed; // Replaces pm_accelerate; default 10.0f
 	float accelstart;
 
+	float jumpMult; // Jump velocity multiplier
+
 	ablitiy_t ability;
 
 } bg_playercfg_t;

@@ -69,6 +69,9 @@ animation.cfg contains the animations and other settings. The animation.cfg is n
 == soundpath ==
 By placing "soundpath NAME" in animation.cfg the client will use sounds from "sound/NAME/" instead of "sound/HEADMODELNAME/". Soundpath defaults to the client's headmodel name (which is usally the player model directory name).
 
+== jumpMult ==
+By placing "jumpMult 1.5" in animation.cfg, the players jump velocity will be multiplied by what ever "jumpMult" was set to.
+
 = Documentation =
 == Tags ==
 List of player tags by models.
@@ -100,6 +103,8 @@ Based on http://rfactory.org/idteam.html#appendh with the changes I've made to i
 Note: "raph/fugitoid" is a example; raph is the model, fugitoid is the skin.
 
 === Head ===
+Note: If headmodel starts with `*` ("`*`raph/fugitoid") the "heads" directory is checked before the "players" directory is checked.
+
 ==== Team play ====
   * headmodel = raph/fugitoid
   * team = red
@@ -114,8 +119,6 @@ Note: "raph/fugitoid" is a example; raph is the model, fugitoid is the skin.
 
   # models/players/raph/head_fugitoid.skin
   # models/players/heads/raph/head_fugitoid.skin
-
-Note: If headmodel starts with `*` ("`*`raph/fugitoid") the "heads" directory is checked before the "players" directory is checked.
 
 === Body (lower/upper) ===
 ==== Team play ====
