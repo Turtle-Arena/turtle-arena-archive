@@ -6122,9 +6122,17 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			continue;
 		}
 
-		// ZTM: TODO: Jump Percent 1-100 ?
-		//else if ( !Q_stricmp( token, "jumpheight" ) ) {
-		//}
+		// Jump velocity multiplier
+		else if ( !Q_stricmp( token, "jumpMult" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			if (headConfig) // skip jumpMult
+				continue;
+			playercfg->jumpMult = atof( token );
+			continue;
+		}
 		// ZTM: TODO?: Hud color in SP (and non-team gametypes? or use "color1" in non-team?)
 		// color1 and color2 are used for the railgun blast color
 		//else if ( !Q_stricmp( token, "prefcolor1" ) ) {
@@ -6410,6 +6418,8 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	playercfg->max_speed = 320;
 	playercfg->accelerate_speed = 10.0f;
 	playercfg->accelstart = 50.0f;
+
+	playercfg->jumpMult = 1.0f;
 
 	playercfg->ability = ABILITY_NONE;
 

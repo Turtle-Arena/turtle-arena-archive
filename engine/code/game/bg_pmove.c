@@ -536,7 +536,11 @@ static qboolean PM_CheckJump( void ) {
 		pm->ps->velocity[2] = pm->cmd.upmove*8;
 	} else
 #endif
+#ifdef TA_PLAYERSYS
+	pm->ps->velocity[2] = JUMP_VELOCITY * pm->playercfg->jumpMult;
+#else
 	pm->ps->velocity[2] = JUMP_VELOCITY;
+#endif
 	PM_AddEvent( EV_JUMP );
 
 	if ( pm->cmd.forwardmove >= 0
@@ -603,7 +607,11 @@ static qboolean	PM_CheckWaterJump( void ) {
 
 	// jump out of water
 	VectorScale (pml.forward, 200, pm->ps->velocity);
+#ifdef TA_PLAYERSYS
+	pm->ps->velocity[2] = 350 * pm->playercfg->jumpMult;
+#else
 	pm->ps->velocity[2] = 350;
+#endif
 
 	pm->ps->pm_flags |= PMF_TIME_WATERJUMP;
 	pm->ps->pm_time = 2000;
