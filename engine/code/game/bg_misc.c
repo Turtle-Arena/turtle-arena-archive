@@ -3320,7 +3320,7 @@ void BG_InitWeaponInfo(void)
 		BG_ParseWeaponInfoFile(filename);
 	}
 
-	// ZTM: TODO: Missing weapon info, try to avoid crash!
+	// Missing weapon info, avoid crashing or other errors.
 	if (!bg_projectileinfo[1].name[0])
 	{
 		strcpy(bg_projectileinfo[1].name, "p_gun");
@@ -3328,7 +3328,7 @@ void BG_InitWeaponInfo(void)
 		bg_projectileinfo[1].maxHits = 1;
 		bg_projectileinfo[1].instantDamage = 1;
 		bg_projectileinfo[1].damage = 10;
-		bg_numprojectiles++;
+		bg_numprojectiles = 2;
 	}
 
 	if (!bg_weaponinfo[1].name[0])
@@ -3341,7 +3341,7 @@ void BG_InitWeaponInfo(void)
 		bg_weaponinfo[1].flashColor[2] = 1.0f;
 		bg_weaponinfo[1].projnum = 1;
 		bg_weaponinfo[1].proj = &bg_projectileinfo[1];
-		bg_numweapons++;
+		bg_numweapons = 2;
 	}
 
 	if (!bg_weapongroupinfo[1].name[0])
@@ -3352,7 +3352,7 @@ void BG_InitWeaponInfo(void)
 		bg_weapongroupinfo[1].item.quantity = 10; // ammo
 		bg_weapongroupinfo[1].weaponnum[0] = 1;
 		bg_weapongroupinfo[1].weapon[0] = &bg_weaponinfo[1];
-		bg_numweapongroups++;
+		bg_numweapongroups = 2;
 	}
 
 	// Done setting up the weapon system.
