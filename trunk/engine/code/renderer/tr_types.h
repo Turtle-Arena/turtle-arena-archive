@@ -76,11 +76,8 @@ typedef struct poly_s {
 #ifdef WOLFET
 // =========================================
 // Gordon, these MUST NOT exceed the values for SHADER_MAX_VERTEXES/SHADER_MAX_INDEXES
-#if 1 // ZTM: FIXME: Use 1025?
-#define MAX_PB_VERTS    1000
-#else
-#define MAX_PB_VERTS    1025
-#endif
+// ZTM: NOTE: WolfET's SHADER_MAX_VERTEXES is 1025, quake3's is only 1000.
+#define MAX_PB_VERTS    SHADER_MAX_VERTEXES
 #define MAX_PB_INDICIES ( MAX_PB_VERTS * 6 )
 
 typedef struct polyBuffer_s {

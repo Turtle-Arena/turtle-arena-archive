@@ -1228,46 +1228,11 @@ static void RB_SurfaceDisplayList( srfDisplayList_t *surf ) {
 
 #ifdef WOLFET
 void RB_SurfacePolyBuffer( srfPolyBuffer_t *surf ) {
-	//vec4hack_t* oldXYZ;
-	//vec2hack_t* oldST;
-	//glIndex_t*  oldIndicies;
-	//color4ubhack_t* oldColor;
-	//int oldMaxVerts;
-	//int oldMaxIndicies;
 	int i;
 
-#if 0 // ZTM: FIXME: Why do this, others don't?
-	RB_EndSurface();
-
-	RB_BeginSurface( tess.shader, tess.fogNum );
-
-#if 0
-	memcpy(tess.xyz, oldXYZ, sizeof (tess.xyz));
-#else
-
-#if 1
-	oldXYZ =            (vec4hack_t*)tess.xyz;
-	oldST  =            (vec2hack_t*)tess.texCoords[0];
-#else
-	oldXYZ =            tess.xyz;
-	oldST =             tess.texCoords0;
-#endif
-	oldIndicies =       tess.indexes;
-#if 1
-//#warning: Missing tess.maxShaderVerts
-#else
-	oldMaxVerts =       tess.maxShaderVerts;
-	oldMaxIndicies =    tess.maxShaderIndicies;
-#endif
-	oldColor =          (color4ubhack_t*)tess.vertexColors;
-#endif
-#endif
-
-	// ===================================================
 	tess.numIndexes =   surf->pPolyBuffer->numIndicies;
 	tess.numVertexes =  surf->pPolyBuffer->numVerts;
 
-#if 1
 	for (i = 0; i < tess.numVertexes; i++)
 	{
 		tess.xyz[i][0] = surf->pPolyBuffer->xyz[i][0];
@@ -1288,44 +1253,6 @@ void RB_SurfacePolyBuffer( srfPolyBuffer_t *surf ) {
 	{
 		tess.indexes[i] = (glIndex_t)surf->pPolyBuffer->indicies[i];
 	}
-#else
-	tess.xyz =          (vec4hack_t*)surf->pPolyBuffer->xyz;
-	tess.texCoords0 =   (vec2hack_t*)surf->pPolyBuffer->st;
-	tess.indexes =      surf->pPolyBuffer->indicies;
-	tess.vertexColors = (color4ubhack_t*)surf->pPolyBuffer->color;
-#endif
-
-
-#if 1
-//#warning: Missing tess.maxShaderVerts
-#else
-	tess.maxShaderIndicies =    MAX_PB_INDICIES;
-	tess.maxShaderVerts =       MAX_PB_VERTS;
-#endif
-	// ===================================================
-
-#if 0 // ZTM: FIXME: Why do this, others don't?
-	RB_EndSurface();
-
-#if 1
-	memcpy(tess.xyz, oldXYZ, sizeof (tess.xyz));
-	memcpy(tess.texCoords[0], oldST, sizeof (tess.texCoords[0]));
-	memcpy(tess.indexes, oldIndicies, sizeof (tess.indexes));
-	memcpy(tess.vertexColors, oldColor, sizeof (tess.vertexColors));
-#else
-	tess.xyz = oldXYZ;
-	tess.texCoords0 = oldST;
-	tess.indexes = oldIndicies;
-	tess.vertexColors =         (color4ub_t*)oldColor;
-#endif
-#if 1
-//#warning: Missing tess.maxShaderVerts
-#else
-	tess.maxShaderVerts =       oldMaxVerts;
-	tess.maxShaderIndicies =    oldMaxIndicies;
-#endif
-#endif
-
 }
 #endif
 

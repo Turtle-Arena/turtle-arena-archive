@@ -598,22 +598,6 @@ typedef struct drawSurf_s {
 #define	MAX_PATCH_SIZE		32			// max dimensions of a patch mesh in map file
 #define	MAX_GRID_SIZE		65			// max dimensions of a grid mesh in memory
 
-#ifdef WOLFET // ZTM: FIXME: Remove
-typedef byte color4ub_t[4];
-
-typedef struct color4ubhack_s {
-	color4ub_t v;
-} color4ubhack_t;
-
-typedef struct vec4hack_s {
-	vec4_t v;
-} vec4hack_t;
-
-typedef struct vec2hack_s {
-	vec2_t v;
-} vec2hack_t;
-#endif
-
 // when cgame directly specifies a polygon, it becomes a srfPoly_t
 // as soon as it is called
 typedef struct srfPoly_s {
@@ -1394,9 +1378,7 @@ TESSELATOR/SHADER DECLARATIONS
 
 ====================================================================
 */
-#ifndef WOLFET
 typedef byte color4ub_t[4];
-#endif
 
 typedef struct stageVars
 {
