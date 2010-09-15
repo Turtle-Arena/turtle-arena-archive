@@ -10,9 +10,6 @@ l_legs_control	Legs can rotate just the legs
 
 ==Missing animations for raph_v9==
 Quake3 Animations
-: TODO: Have death3 be fall to knees? (but don't grab neck like quake3's doom player)
-* BOTH_DEATH3 (defaults to BOTH_DEATH2)
-* BOTH_DEAD3 (defaults to BOTH_DEAD2)
 * LEGS_RUN (doesn't look quite right)
 * LEGS_JUMPB (defaults to LEGS_JUMP)
 * LEGS_LANDB (defaults to LEGS_LAND)
