@@ -13,7 +13,6 @@ Quake3 Animations
 : TODO: Have death3 be fall to knees? (but don't grab neck like quake3's doom player)
 * BOTH_DEATH3 (defaults to BOTH_DEATH2)
 * BOTH_DEAD3 (defaults to BOTH_DEAD2)
-* TORSO_STAND_GAUNTLET (copy of TORSO_STAND_SAI2)
 * LEGS_RUN (doesn't look quite right)
 * LEGS_JUMPB (defaults to LEGS_JUMP)
 * LEGS_LANDB (defaults to LEGS_LAND)
