@@ -11,8 +11,6 @@ l_legs_control	Legs can rotate just the legs
 ==Missing animations for raph_v9==
 Quake3 Animations
 * LEGS_RUN (doesn't look quite right)
-* LEGS_JUMPB (defaults to LEGS_JUMP)
-* LEGS_LANDB (defaults to LEGS_LAND)
 
 MISSIONPACK Animations (done)
 
