@@ -688,6 +688,7 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 
 		score = 1;
 
+		// ZTM: TODO: Give points (based on chain) for melee damage?
 		AddScore(ent, tr.endpos, score * mult);
 #endif
 

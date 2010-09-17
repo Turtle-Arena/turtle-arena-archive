@@ -1158,18 +1158,14 @@ typedef struct playerState_s {
 	//
 	// Melee weapons
 	//
-	//  Melee weapons have three attacks (3 attack combo)
-	//  Allow each weapon to have a different combo length?
-	int		meleeAttack; // Attack Combo number, this is for attacks and
-						 //  doesn't count damage hits.
-	int		meleeTime; // Time left in the current attack.
-	int		meleeDelay; // Time before player can use a melee attack
-	int		meleeLinkTime; // Time left till will be unable to continue meleeAttack
+	int			meleeAttack; // Attack Combo number, this is for attacks and doesn't count damage hits.
+	int			meleeTime; // Time left in the current attack.
+	int			meleeDelay; // Time before player can use a melee attack
+	int			meleeLinkTime; // Time left till will be unable to continue meleeAttack
 
 	// Score chain, used for melee damage hits too.
-	// ZTM: TODO: Give points (based on chain) for melee damage?
-	int		chain;
-	int		chainTime;
+	int			chain;
+	int			chainTime;
 
 	int			weaponHands;	// HB_NONE, HB_PRIMARY, HB_SECONDARY, or HB_BOTH
 #endif
