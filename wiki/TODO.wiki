@@ -174,6 +174,9 @@ Weapons (and attacking)
 
   * Data: TODO: Add models for sphere and star items
 
+  * TODO: Have NiGHTS-like link score plums? or just use floating numbers like quake3?
+    * Supported by game, just needs cgame code and graphics.
+
 == Misc ==
   * TODO: Add optional run animations for torso
 

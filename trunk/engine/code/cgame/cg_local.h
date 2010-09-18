@@ -296,6 +296,9 @@ typedef enum {
 	LE_FADE_RGB,
 	LE_SCALE_FADE,
 	LE_SCOREPLUM,
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	LE_CHAINPLUM,
+#endif
 #ifdef IOQ3ZTM // BUBBLES
 	LE_BUBBLE,
 #endif
@@ -1970,6 +1973,9 @@ void CG_LightningBoltBeam( vec3_t start, vec3_t end );
 #endif
 #endif
 void CG_ScorePlum( int client, vec3_t org, int score );
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+void CG_ChainPlum( int client, vec3_t org, int score, int chain, qboolean bonus );
+#endif
 
 #ifndef NOTRATEDM // No gibs.
 void CG_GibPlayer( vec3_t playerOrigin );

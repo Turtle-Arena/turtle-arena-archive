@@ -42,6 +42,27 @@ void ScorePlum( gentity_t *ent, vec3_t origin, int score ) {
 	plum->s.time = score;
 }
 
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+/*
+============
+ChainPlum
+============
+*/
+void ChainPlum( gentity_t *ent, vec3_t origin, int score, int chain) {
+	gentity_t *plum;
+
+	plum = G_TempEntity( origin, EV_CHAINPLUM );
+	// only send this temp entity to a single client
+	plum->r.svFlags |= SVF_SINGLECLIENT;
+	plum->r.singleClient = ent->s.number;
+	//
+	plum->s.otherEntityNum = ent->s.number;
+	plum->s.time = score;
+	plum->s.generic1 = chain;
+	plum->s.time2 = (ent->client->ps.eFlags & EF_BONUS);
+}
+#endif
+
 /*
 ============
 AddScore
@@ -49,7 +70,12 @@ AddScore
 Adds score to both the client and his team
 ============
 */
-void AddScore( gentity_t *ent, vec3_t origin, int score ) {
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+void AddScoreEx( gentity_t *ent, vec3_t origin, int score, int chain)
+#else
+void AddScore( gentity_t *ent, vec3_t origin, int score )
+#endif
+{
 	if ( !ent->client ) {
 		return;
 	}
@@ -67,6 +93,10 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 	if (ent->client->ps.eFlags & EF_BONUS) {
 		score *= 2;
 	}
+
+	if (chain > 0) {
+		ChainPlum(ent, origin, score, chain);
+	} else
 #endif
 	// show score plum
 	ScorePlum(ent, origin, score);
@@ -85,6 +115,12 @@ void AddScore( gentity_t *ent, vec3_t origin, int score ) {
 #endif
 	CalculateRanks();
 }
+
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+void AddScore( gentity_t *ent, vec3_t origin, int score) {
+	AddScoreEx(ent, origin, score, 0);
+}
+#endif
 
 /*
 =================
