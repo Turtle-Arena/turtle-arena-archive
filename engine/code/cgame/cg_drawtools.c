@@ -438,17 +438,14 @@ float *CG_FadeColor( int startMsec, int totalMsec ) {
 CG_ColorForChain
 ================
 */
-void CG_ColorForChain(int val, vec3_t color)
+void CG_ColorForChain(int chain, vec3_t color)
 {
 	int index;
 
-	//if (val > 0 && val < 6)
-	//	index = 0;
-	//else if (val > 5 && val < 11)
-
-	// 5 numbers in a row are the same color, add one to skip 0 so that 1,2,3,4,5 are one color, instead of 5 being a different color
+	// Minus one to skip 0 so that 1,2,3,4,5 are one color, instead of 5 being a different color
+	//  5 numbers in a row are the same color,
 	//  limit to colors 0 though 11
-	index = (val / 5) % 12;
+	index = ((chain-1) / 5) % 12;
 
 	VectorClear(color);
 
