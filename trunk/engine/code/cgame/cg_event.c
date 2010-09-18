@@ -505,7 +505,7 @@ A new item was picked up this frame
 ================
 */
 static void CG_ItemPickup( int itemNum ) {
-#if defined TA_WEAPSYS || defined TA_HOLDSYS
+#if defined TA_WEAPSYS || defined TA_HOLDSYS || defined TURTLEARENA // NIGTHS_ITEMS
 	gitem_t *item;
 
 #ifdef TA_WEAPSYS
@@ -513,6 +513,12 @@ static void CG_ItemPickup( int itemNum ) {
 #else
 	item = &bg_itemlist[itemNum];
 #endif
+#endif
+#ifdef TURTLEARENA // NIGTHS_ITEMS
+	if (item->giType == IT_SCORE) {
+		cg.scorePickupTime = cg.time;
+		return; // Do not count as a pickup item
+	}
 #endif
 	cg.itemPickup = itemNum;
 	cg.itemPickupTime = cg.time;

@@ -1065,15 +1065,51 @@ void CG_DrawMiddleLeft(void)
 		y += SMALLCHAR_HEIGHT;
 	}
 
-	if (cg.snap->ps.chain > 0) {
-		CG_DrawSmallString( SCREEN_WIDTH/32, y, va("Score Chain: %d", cg.snap->ps.chain), 1.0F );
-		y += SMALLCHAR_HEIGHT;
-	}
-
 	// Index of the attack animation, not how many things we've hit.
 	//if (cg.snap->ps.meleeAttack > 0) {
 	//	CG_DrawSmallString( SCREEN_WIDTH/32, y, va("meleeAttack %d", cg.snap->ps.meleeAttack), 1.0F );
+	//	y += SMALLCHAR_HEIGHT;
 	//}
+}
+#endif
+
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+/*
+================
+CG_DrawScoreChain
+
+Draw NiGHTS Link (score chain) count
+================
+*/
+void CG_DrawScoreChain(void)
+{
+	float	*fadeColor;
+	float	frac;
+	float	color[4];
+	int		charWidth, charHeight;
+	char	*s;
+	int		w;
+
+	if (cg.snap->ps.chain <= 1) {
+		return;
+	}
+
+	CG_HudPlacement(HUD_CENTER);
+
+	fadeColor = CG_FadeColor( cg.scorePickupTime, 2000 );
+	frac = fadeColor[3];
+
+	CG_ColorForChain(cg.snap->ps.chain, color);
+	color[3] = fadeColor[3];
+
+	charWidth = frac*BIGCHAR_WIDTH*2;
+	charHeight = frac*BIGCHAR_HEIGHT*2;
+
+	s = va("%d Link", cg.snap->ps.chain); // ZTM: FIXME: Should be cg.snap->ps.chain-1 ?
+	w = CG_DrawStrlen(s) * charWidth;
+
+	CG_DrawStringExt( SCREEN_WIDTH/2 - w/2, SCREEN_HEIGHT-20-charHeight, s, color,
+			qfalse, qfalse, charWidth, charHeight, 0 );
 }
 #endif
 
@@ -3290,6 +3326,10 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
       
 #if defined TA_WEAPSYS || defined IOQ3ZTM // SHOW_SPEED
 			CG_DrawMiddleLeft();
+#endif
+
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+			CG_DrawScoreChain();
 #endif
 
 #ifndef TURTLEARENA // NO_AMMO_WARNINGS
