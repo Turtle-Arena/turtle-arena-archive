@@ -790,6 +790,16 @@ void CG_AddScorePlum( localEntity_t *le ) {
 		re->shaderRGBA[2] = 0x11;
 	}
 	else {
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+		vec3_t color;
+
+		// ZTM: FIXME: if EF_BONUS this could be wrong
+		CG_ColorForChain(score/10, color);
+
+		re->shaderRGBA[0] = 0xff * color[0];
+		re->shaderRGBA[1] = 0xff * color[1];
+		re->shaderRGBA[2] = 0xff * color[2];
+#else
 		re->shaderRGBA[0] = 0xff;
 		re->shaderRGBA[1] = 0xff;
 		re->shaderRGBA[2] = 0xff;
@@ -802,6 +812,7 @@ void CG_AddScorePlum( localEntity_t *le ) {
 		} else if (score >= 2) {
 			re->shaderRGBA[0] = re->shaderRGBA[2] = 0;
 		}
+#endif
 
 	}
 	if (c < 0.25)

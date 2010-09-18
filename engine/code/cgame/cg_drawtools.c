@@ -432,6 +432,75 @@ float *CG_FadeColor( int startMsec, int totalMsec ) {
 	return color;
 }
 
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+/*
+================
+CG_ColorForChain
+================
+*/
+void CG_ColorForChain(int val, vec3_t color)
+{
+	int index;
+
+	//if (val > 0 && val < 6)
+	//	index = 0;
+	//else if (val > 5 && val < 11)
+
+	// 5 numbers in a row are the same color, add one to skip 0 so that 1,2,3,4,5 are one color, instead of 5 being a different color
+	//  limit to colors 0 though 11
+	index = (val / 5) % 12;
+
+	VectorClear(color);
+
+	switch (index)
+	{
+		case 3: // blue
+			VectorSet( color, 0, 0, 1 );
+			break;
+		case 7: // green
+			VectorSet( color, 0, 1, 0 );
+			break;
+		case 5: // cyen
+			VectorSet( color, 0, 1, 1 );
+			break;
+		case 11: // red
+			VectorSet( color, 1, 0, 0 );
+			break;
+		case 1: // magenta
+			VectorSet( color, 1, 0, 1 );
+			break;
+		case 9: // yellow
+			VectorSet( color, 1, 1, 0 );
+			break;
+		//case 12: // white
+		//	VectorSet( color, 1, 1, 1 );
+		//	break;
+
+		case 10: // orange
+			VectorSet( color, 1, 0.5f, 0 );
+			break;
+		case 8: // Lime
+			VectorSet( color, 0.5f, 1, 0 );
+			break;
+		case 6: // Vivid green
+			VectorSet( color, 0, 1, 0.5f );
+			break;
+		case 4: // light blue
+			VectorSet( color, 0, 0.5f, 1 );
+			break;
+		case 2: // purple
+			VectorSet( color, 0.5f, 0, 1 );
+			break;
+		case 0: // pink
+			VectorSet( color, 1, 0, 0.5f );
+			break;
+
+		//default: // fall back to white
+		//	VectorSet( color, 1, 1, 1 );
+		//	break;
+	}
+}
+#endif
 
 /*
 ================

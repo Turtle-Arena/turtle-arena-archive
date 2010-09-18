@@ -872,6 +872,10 @@ typedef struct {
 	int			itemPickupTime;
 	int			itemPickupBlendTime;	// the pulse around the crosshair is timed seperately
 
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	int			scorePickupTime;
+#endif
+
 #ifndef TA_WEAPSYS_EX
 	int			weaponSelectTime;
 #endif
@@ -1732,6 +1736,9 @@ void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color );
 int CG_DrawStrlen( const char *str );
 
 float	*CG_FadeColor( int startMsec, int totalMsec );
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+void	CG_ColorForChain(int val, vec3_t color);
+#endif
 float *CG_TeamColor( int team );
 void CG_TileClear( void );
 void CG_ColorForHealth( vec4_t hcolor );

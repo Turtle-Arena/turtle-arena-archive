@@ -679,7 +679,7 @@ typedef enum {
 	IT_WEAPON,				// EFX: rotate + upscale + minlight
 	IT_AMMO,				// EFX: rotate
 #ifdef TURTLEARENA // NIGHTS_ITEMS
-	IT_SCORE,				// EFX: rotate + no bob
+	IT_SCORE,				// EFX: rotate + no bob + no pickup message
 #endif
 #ifndef TURTLEARENA // NOARMOR
 	IT_ARMOR,				// EFX: rotate + minlight
