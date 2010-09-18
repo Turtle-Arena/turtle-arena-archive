@@ -920,6 +920,9 @@ typedef enum {
 	EV_GIB_PLAYER,			// gib a previously living player
 #endif
 	EV_SCOREPLUM,			// score plum
+#if defined TURTLEARENA || defined NET_COMPAT// NIGHTS_ITEMS
+	EV_CHAINPLUM,
+#endif
 #ifdef TA_ENTSYS // BREAKABLE
 	EV_SPAWN_DEBRIS,
 #endif

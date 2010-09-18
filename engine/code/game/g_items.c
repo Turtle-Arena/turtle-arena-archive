@@ -564,7 +564,7 @@ int Pickup_Score( gentity_t *ent, gentity_t *other ) {
 
 	score = count * mult;
 
-	AddScore(other, ent->r.currentOrigin, score);
+	AddScoreEx(other, ent->r.currentOrigin, score, other->client->ps.chain);
 
 	if (ent->item->giTag == 2) {
 		// Spheres

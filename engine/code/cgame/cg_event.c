@@ -1226,6 +1226,13 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_SCOREPLUM");
 		CG_ScorePlum( cent->currentState.otherEntityNum, cent->lerpOrigin, cent->currentState.time );
 		break;
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	case EV_CHAINPLUM:
+		DEBUGNAME("EV_CHAINPLUM");
+		CG_ChainPlum( cent->currentState.otherEntityNum, cent->lerpOrigin, cent->currentState.time,
+				cent->currentState.generic1, cent->currentState.time2 );
+		break;
+#endif
 
 #ifdef TA_ENTSYS // BREAKABLE
 	case EV_SPAWN_DEBRIS:

@@ -792,9 +792,17 @@ void CG_AddScorePlum( localEntity_t *le ) {
 	else {
 #ifdef TURTLEARENA // NIGHTS_ITEMS
 		vec3_t color;
+		int chainValue;
 
-		// ZTM: FIXME: if EF_BONUS this could be wrong
-		CG_ColorForChain(score/10, color);
+		if (le->leType == LE_CHAINPLUM) {
+			// Use real chain value
+			chainValue = le->bounceFactor;
+		} else {
+			// Fake chain value
+			chainValue = score/10;
+		}
+
+		CG_ColorForChain(chainValue, color);
 
 		re->shaderRGBA[0] = 0xff * color[0];
 		re->shaderRGBA[1] = 0xff * color[1];
@@ -941,6 +949,9 @@ void CG_AddLocalEntities( void ) {
 			break;
 
 		case LE_SCOREPLUM:
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+		case LE_CHAINPLUM:
+#endif
 			CG_AddScorePlum( le );
 			break;
 
