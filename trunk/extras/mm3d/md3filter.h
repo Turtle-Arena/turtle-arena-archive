@@ -30,7 +30,7 @@
 
 #define TURTLE_ARENA // Enable special tag support for my ioquake3 mod, Turtle Arena, that should not be in mm3d
 
-//#define MDR_LOAD // Unfinished
+#define MDR_LOAD // Unfinished
 #define MDR_EXPORT // Unfinished
 
 #if defined MDR_LOAD || defined MDR_EXPORT
@@ -158,6 +158,10 @@ class Md3Filter : public ModelFilter
 
       bool     readAnimations( bool create );
 
+#ifdef MDR_LOAD
+      void     MDRsetPoints(MeshSectionE section, int32_t offsetTags, int32_t numTags);
+      void     MDRsetBoneJoints(MeshSectionE section, bool compressed, int32_t offsetFrames, int32_t numFrames, int32_t numBones, int32_t parentTag, int32_t animIndex);
+#endif
       void     setMeshes( MeshSectionE section, int32_t offsetMeshes, int32_t numMeshes, int32_t parentTag, int32_t animIndex);
       int32_t  setSkins(char *meshName);
       void     setPoints(MeshSectionE section, int32_t offsetTags, int32_t numTags, int32_t numFrames, int32_t parentTag, int32_t animIndex);

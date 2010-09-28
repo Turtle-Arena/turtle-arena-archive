@@ -386,12 +386,18 @@ Model::ModelErrorE Md3Filter::readFile( Model * model, const char * const filena
          //int32_t numTags = 0;
          //int32_t offsetTags = 0;
          //int32_t offsetEnd = 0;
+         bool compressed = false;
 
          if ((*it).type == MT_MDR)
          {
             numFrames = m_src->readI32();
             numBones = m_src->readI32();
             offsetFrames = m_src->readI32();
+            // check if compressed
+			if (offsetFrames < 0) {
+				offsetFrames = -offsetFrames;
+                compressed = true;
+            }
             numLODs = m_src->readI32();
             offsetLODs = m_src->readI32();
             numTags = m_src->readI32();
@@ -400,6 +406,7 @@ Model::ModelErrorE Md3Filter::readFile( Model * model, const char * const filena
 
             log_debug( "Magic: %c%c%c%c\n", magic[0], magic[1], magic[2], magic[3] );
             log_debug( "Version: %d\n",     version );
+            log_debug( "Compressed: %d\n",    compressed );
             log_debug( "PK3 Name: %s\n",    pk3Name );
             log_debug( "Frames: %d\n",      numFrames );
             log_debug( "Bones: %d\n",    numBones );
@@ -421,6 +428,8 @@ Model::ModelErrorE Md3Filter::readFile( Model * model, const char * const filena
             {
                return Model::ERROR_UNSUPPORTED_VERSION;
             }
+
+            model->addMetaData( "MDR_compressed", compressed ? "1" : "0" );
          }
          else // MT_MD3
          {
@@ -558,7 +567,14 @@ Model::ModelErrorE Md3Filter::readFile( Model * model, const char * const filena
          }
 
 #ifdef MDR_LOAD
-         if ((*it).type == MT_MD3)
+         if ((*it).type == MT_MDR)
+         {
+            // Add bone joints
+            MDRsetBoneJoints( (*it).section, compressed, offsetFrames, numFrames, numBones, (*it).tagPoint, -1 );
+            // Add tags and connected to bone joints
+            MDRsetPoints( (*it).section, offsetTags, numTags );
+         }
+         else
          {
 #endif
          m_meshVecInfos = new MeshVectorInfoT*[numMeshes];
@@ -1657,6 +1673,147 @@ void Md3Filter::setPoints( MeshSectionE section, int32_t offsetTags, int32_t num
 
    return;
 }
+
+#ifdef MDR_LOAD
+void Md3Filter::MDRsetPoints( MeshSectionE section, int32_t offsetTags, int32_t numTags )
+{
+   //const int MDR_TAG_SIZE = (4 + 32);
+
+   m_src->seek( offsetTags );
+
+   for (int tag = 0; tag < numTags; tag++)
+   {
+      //m_src->seek( offsetTags + (tag * MDR_TAG_SIZE) );
+
+      int32_t boneJointIndex = m_src->readI32();
+
+      char tagName[32];
+      readString( tagName, sizeof( tagName ) );
+
+      // Only add the point if we don't already have one of the same name
+      int p = m_model->getPointByName( tagName );
+      if ( p < 0 )
+      {
+         // ZTM: FIXME: Remap boneJointIndex
+         boneJointIndex = -1;
+         // ZTM: FIXME: Set posVector and rotVector to the same as the bone?
+         // ZTM: FIXME: Does the exporter save the the correct rot vector for the tag in the bone?
+         double posVector[3] = {0,0,0};
+         double rotVector[3] = {0,0,0};
+         m_model->addPoint( tagName, posVector[0], posVector[1], posVector[2],
+               rotVector[0], rotVector[1], rotVector[2], boneJointIndex );
+      }
+   }
+}
+
+void Md3Filter::MDRsetBoneJoints(MeshSectionE section, bool compressed, int32_t offsetFrames, int32_t numFrames,
+   int32_t numBones, int32_t parentTag, int32_t animIndex)
+{
+   Matrix loadMatrix;
+
+   loadMatrix.setRotationInDegrees( -90, -90, 0 );
+   double pos[3] = { 0,0,0 };
+   double rot[3] = { 0,0,0 };
+   int *jointIndex;
+
+   if ( parentTag >= 0 )
+   {
+      m_model->getPointCoords( parentTag, pos );
+      m_model->getPointOrientation( parentTag, rot );
+
+      loadMatrix.loadIdentity();
+      loadMatrix.setRotation( rot );
+      loadMatrix.setTranslation( pos[0], pos[1], pos[2] );
+   }
+
+   jointIndex = new int[numBones];
+
+   // Add bone joints (There is no bone parent or name saved in the model...)
+   for (int i = 0; i < numBones; i++)
+   {
+      char boneName[32];
+      snprintf(boneName, sizeof (boneName), "sec%d_bone%d", section, i);
+      jointIndex[i] = m_model->addBoneJoint( boneName, 0, 0, 0, 0, 0, 0, -1 );
+   }
+
+   int frameSize;
+   int frameSkip;
+
+   if (compressed) {
+      frameSize = (MDR_COMP_FRAME_SIZE + numBones * MDR_COMP_BONE_SIZE);
+      frameSkip = (4 * 3 * 2) + (4 * 3) + 4;
+   } else {
+      frameSize = (MDR_FRAME_SIZE + numBones * MDR_BONE_SIZE);
+      frameSkip = (4 * 3 * 2) + (4 * 3) + 4 + 16;
+   }
+
+   int animCount = m_model->getAnimCount( Model::ANIMMODE_SKELETAL );
+   //if ( animIndex < 0 )
+   //{
+   //   animCount = 0;
+   //}
+
+   // Set bone joint pos and rot for each frame
+   for (int animIndex = 0; animIndex < animCount; animIndex++)
+   {
+      int frameCount = m_model->getAnimFrameCount( Model::ANIMMODE_SKELETAL, animIndex );
+      //if ( animIndex < 0 )
+      //{
+      //   frameCount = 1;
+      //}
+
+      for (int f = 0; frameCount; f++)
+      {
+         int fileFrame = animToFrame( section, animIndex, f );
+         //if ( animIndex < 0 )
+         //{
+         //   log_debug( "Using frame %d as default for tag section %d\n", fileFrame, section );
+         //}
+         if ( fileFrame >= numFrames )
+         {
+            log_error( "tag section appears to be missing frame %d for anim %d, using frame %d instead\n", fileFrame, animIndex, numFrames - 1 );
+            fileFrame = numFrames - 1;
+         }
+
+         m_src->seek( offsetFrames + (fileFrame * frameSize) + frameSkip );
+
+         for (int bone = 0; bone < numBones; bone++)
+         {
+            // Read bone info
+            float mat[3][4];
+
+            if (compressed) {
+               int16_t data[12];
+
+               for (int i = 0; i < 12; i++)
+               {
+                  data[i] = m_src->readI16();
+               }
+               MC_UnCompress(mat, (unsigned char*)data);
+            }
+            else
+            {
+               // orientation and origin
+               for ( int m = 0; m < 3; m++ )
+               {
+                  for ( int n = 0; n < 4; n++ )
+                  {
+                     mat[m][n] = m_src->readF32();
+                  }
+               }
+            }
+
+			int boneIndex = jointIndex[bone]; // Remap bone
+            m_model->setSkelAnimKeyframe(animIndex, f, boneIndex, false, mat[0][3], mat[1][3], mat[2][3]);
+            // ZTM: TODO: set rotation
+            //m_model->setSkelAnimKeyframe(animIndex, f, boneIndex, true, xrot, yrot, zrot);
+         }
+      }
+   }
+
+   delete[] jointIndex;
+}
+#endif
 
 int Md3Filter::animToFrame( MeshSectionE section, int anim, int frame )
 {
