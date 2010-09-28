@@ -217,7 +217,7 @@ the following were not removed from the pk3; (I have a list so I can delete the 
 Replaced in base_ioq3ztm
 
   * TEMP: menu/medals/medal_impressive.tga	--unused by turtlearena --Kill two (or more) players with one railgun shot.
-  * TEMP: menu/medals/medal_excellent.tga	--unused by turtlearena --Kill two players close together
+  * TEMP: menu/medals/medal_excellent.tga	--unused by turtlearena --Kill two players close together (time wise)
   * TEMP: menu/medals/medal_accuracy.tga	--unused by turtlearena
   * TEMP: menu/medals/medal_gauntlet.tga	--unused by turtlearena
   * TEMP: menu/medals/medal_victory.tga		--unused by turtlearena

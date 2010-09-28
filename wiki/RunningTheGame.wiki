@@ -5,21 +5,24 @@
 
 *Building the game* from source is split into four parts.
 
-  * Getting the Libaries
+  * Getting the Libraries
   * Getting the source
   * Compiling the source
   * Final setup and execution
 
-== Getting the Libaries (Linux, Mac) ==
+== Getting the Libraries (Linux, Mac) ==
 You will need the following development libraries; SDL, GL, GLU, Ogg, Vorbis, and Theora.
 
-In Debian and Debian based distros (Such as Ubuntu) you can run the below in the terminal.
+In Debian and Debian based distributions (such as Ubuntu) you can run the below in the terminal.
   sudo apt-get install libsdl1.2-dev libgl1-mesa-dev libglu1-mesa-dev libogg-dev libvorbis-dev libtheora-dev
 
-== Getting the source ==
-You can get the lastest development source from the SVN or use the source from a released version.
+== Getting the Libraries (Windows) ==
+All of the need libraries are included in the source.
 
-=== SVN ===
+== Getting the source ==
+You can get the latest development source from the subversion repository or use the source from a released version.
+
+=== Subversion ===
 You will need a subversion client to get the source, such as [http://tortoisesvn.tigris.org/ TortoiseSVN] (Windows), [http://www.rabbitvcs.org RabbitVCS] (Linux), or the command line program "svn"
 
 In Debian/Ubuntu you can install the command line program using
@@ -38,19 +41,22 @@ Currently the best way to compile Turtle Arena is from a terminal using "make".
 
 === Linux - Make ===
   # In a terminal change to the engine/ directory and run "make"
-  # Output will be in engine/build/*dir*/ (Where *dir* is something like "release-linux-x86")
+  # Output will be in engine/build/*dir*/ (Where *dir* is something like "release-linux-i386")
 
 === Windows - Mingw ===
 See [http://wiki.ioquake3.org/Building_ioquake3_on_Windows_-_mingw_and_msys Building ioquake3 on Windows - mingw and msys]
 
 === Windows/Linux - Code::Blocks ===
-NOTE: Compiling is only supported on Windows and Linux currently. However it can be used to view and edit the source on all platforms Code::Blocks supports.
+Currently compiling using Code::Blocks is only supported on Windows and Linux. However it can be used to view and edit the source on all platforms Code::Blocks supports.
+
   # Open engine/misc/code_blocks/ioq3.workspace
   # Select Platform
   # Rebuild workspace
   # Output will be in engine/build/
 
 === Mac [http://wiki.ioquake3.org/Building_ioquake3_on_Mac 1]===
+Compiling Turtle Arena on Mac OS has not been tested. It is known to work with ioquake3, but may need changes to compile Turtle Arena.
+
 ====Snow Leopard - Mac OS X 10.6.2====
   # In a terminal change to the engine/ directory and run "CC=gcc-4.0 ./make-macosx-ub.sh"
   # Output will be in engine/build/

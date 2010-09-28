@@ -11,15 +11,15 @@ The weapon system used in Turtle Arena;
   * Allows for easy modification and custom default weapons, or new weapons for custom maps.
 
   * *TA_WEAPSYS_EX define*
-  * Removes (works around) ioquake3 16 weapon group limit.
+  * Removes (works around) ioquake3 16 weapon group limit
   * Each client is limited to holding 2 weapons (default and pickup), unlike 16 in ioquake3
   * If holding a pickup weapon the default weapon can't be used
   * Pickup weapon can be drop via a button to use default weapon
-  * Automaticly drops picked up guns when they run out of ammo (When player doesn't have PW_AMMOREGEN)
+  * Automaticly drops picked up guns when they run out of ammo (when player doesn't have PW_AMMOREGEN)
 
   * *TA_GAME_MODELS*
-  * Game QVM loads player models to get tag origin and angles (Allowing for better melee attacking)
-  * Note: The polygons (etc) are loaded as well, but currently unused. (Turtle Arena dedicated server will use more RAM then ioquake3 dedicated server.)
+  * Game QVM loads player models to get tag origin and angles. This allows for better melee attacking.
+  * Note: The polygons (etc) are loaded as well, but currently unused. (This means Turtle Arena dedicated server will use more RAM then ioquake3 dedicated server.)
 
 = Definitions =
 There are weapon groups, weapons, and projectiles.
@@ -30,4 +30,4 @@ There are weapon groups, weapons, and projectiles.
 
 = Formating =
 
-TODO: Document the weapon script keywords and values.
+TODO: Document the weapon script keywords and values. For now you can look at scripts/weaponinfo.txt and the functions WeaponGroup_Parse, Weapon_Parse, and Projectile_Parse in bg_misc.c to see all of the keywords.

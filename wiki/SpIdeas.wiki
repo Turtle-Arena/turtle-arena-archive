@@ -4,10 +4,10 @@
 Turtle Arena Single Player Ideas.
 
 == Single Player Design/Story ==
-  * Standalone, with inspation from the TMNT 2003 TV series?
+  * Standalone, with inspiration from the TMNT 2003 TV series?
 
   * Something like "Turtles In Time" or maybe somewhat more like "The Hyperstone Heist"
-    * Each stage has its own "total different" environment
+    * Each stage has its own "totally different" environment
     * Per-level gimmick or two
     * Light on story (Meaning no long cutscenes between or in the middle of levels)
     * Have each "stage" contain multiple levels (Have all/most contain the same number).
@@ -36,7 +36,7 @@ PD:		Country/Forest:		they head to Casey's Grandmother's farmhouse. While explor
 ???:		Water?:			fall into a underground river (with mutant monsters?), and
 EPF:		Desert/Mountain:	end up in a Desert. They climb the mountain (for some reason) and
 ???:		Snow:			at the top of the Mountain is a transmat which teleports them to a space station.
-Foot:		Space:			Shredders on the space station. He must be stopped.
+Foot:		Space:			Shredder is on the space station. He must be stopped.
 }}}
 
 == Enemy Ideas ==
