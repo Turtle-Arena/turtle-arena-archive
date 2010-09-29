@@ -179,6 +179,385 @@ void UI_LerpColor(vec4_t a, vec4_t b, vec4_t c, float t)
 	}
 }
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+/*
+=================
+UI_DrawBannerString
+=================
+*/
+void UI_DrawFontBannerString( font_t *font, int x, int y, const char* str, int style, vec4_t color ) {
+	vec4_t			drawcolor;
+	int				width;
+
+	switch( style & UI_FORMATMASK ) {
+		case UI_CENTER:
+			width = Com_FontStringWidth(font, str, strlen(str));
+			x -= width / 2;
+			break;
+
+		case UI_RIGHT:
+			width = Com_FontStringWidth(font, str, strlen(str));
+			x -= width;
+			break;
+
+		case UI_LEFT:
+		default:
+			break;
+	}
+
+	if ( style & UI_DROPSHADOW ) {
+		drawcolor[0] = drawcolor[1] = drawcolor[2] = 0;
+		drawcolor[3] = color[3];
+		UI_DrawFontStringColor( font, x+2, y+2, str, drawcolor );
+	}
+
+	UI_DrawFontStringColor( font, x, y, str, color );
+}
+
+/*
+=================
+UI_DrawProportionalString
+=================
+*/
+void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color ) {
+	vec4_t	drawcolor;
+	int		width;
+	font_t *font;
+
+	if (style & UI_SMALLFONT)
+		font = &uis.fontPropSmall;
+	else
+		font = &uis.fontPropBig;
+
+	switch( style & UI_FORMATMASK ) {
+		case UI_CENTER:
+			width = Com_FontStringWidth(font, str, strlen(str));
+			x -= width / 2;
+			break;
+
+		case UI_RIGHT:
+			width = Com_FontStringWidth(font, str, strlen(str));
+			x -= width;
+			break;
+
+		case UI_LEFT:
+		default:
+			break;
+	}
+
+	if ( style & UI_DROPSHADOW ) {
+		drawcolor[0] = drawcolor[1] = drawcolor[2] = 0;
+		drawcolor[3] = color[3];
+		UI_DrawFontStringColor( font, x+2, y+2, str, drawcolor );
+	}
+
+	if ( style & UI_INVERSE ) {
+		drawcolor[0] = color[0] * 0.8;
+		drawcolor[1] = color[1] * 0.8;
+		drawcolor[2] = color[2] * 0.8;
+		drawcolor[3] = color[3];
+		UI_DrawFontStringColor( font, x, y, str, drawcolor );
+		return;
+	}
+
+	if ( style & UI_PULSE ) {
+		drawcolor[0] = color[0] * 0.8;
+		drawcolor[1] = color[1] * 0.8;
+		drawcolor[2] = color[2] * 0.8;
+		drawcolor[3] = color[3];
+		UI_DrawFontStringColor( font, x, y, str, color );
+
+#ifdef TURTLEARENA // ZTM: This is like the UI Main menu text drawing, but its not.
+        // ZTM: hack-ish thing to do?...
+        // text_color_highlight is UI local...
+		drawcolor[0] = 1.00f;//text_color_highlight[0];
+		drawcolor[1] = 0.43f;//text_color_highlight[1];
+		drawcolor[2] = 0.00f;//text_color_highlight[2];
+#else
+		drawcolor[0] = color[0];
+		drawcolor[1] = color[1];
+		drawcolor[2] = color[2];
+#endif
+		drawcolor[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
+//#ifdef TA_DATA
+		UI_DrawFontStringColor( font, x, y, str, drawcolor );
+//#else
+//		CG_DrawFontStringColor( fontGlow, x, y, str, drawcolor );
+//#endif
+		return;
+	}
+
+	UI_DrawFontStringColor( font, x, y, str, color );
+}
+
+/*
+=================
+UI_DrawString
+=================
+*/
+void UI_DrawString( int x, int y, const char* str, int style, vec4_t color )
+{
+	vec4_t	newcolor;
+	vec4_t	lowlight;
+	float	*drawcolor;
+	vec4_t	dropcolor;
+	float	width;
+	font_t	*font;
+
+	if( !str ) {
+		return;
+	}
+
+	if ((style & UI_BLINK) && ((uis.realtime/BLINK_DIVISOR) & 1))
+		return;
+
+	if (style & UI_SMALLFONT)
+		font = &uis.fontSmall;
+	else if (style & UI_GIANTFONT)
+		font = &uis.fontGiant;
+	else
+		font = &uis.fontBig;
+
+	if (style & UI_PULSE)
+	{
+		lowlight[0] = 0.8*color[0];
+		lowlight[1] = 0.8*color[1];
+		lowlight[2] = 0.8*color[2];
+		lowlight[3] = 0.8*color[3];
+		UI_LerpColor(color,lowlight,newcolor,0.5+0.5*sin(uis.realtime/PULSE_DIVISOR));
+		drawcolor = newcolor;
+	}	
+	else
+		drawcolor = color;
+
+	switch( style & UI_FORMATMASK ) {
+		case UI_CENTER:
+			width = Com_FontStringWidth(font, str, strlen(str));
+			x -= width / 2;
+			break;
+
+		case UI_RIGHT:
+			width = Com_FontStringWidth(font, str, strlen(str));
+			x -= width;
+			break;
+
+		case UI_LEFT:
+		default:
+			break;
+	}
+
+	if ( style & UI_DROPSHADOW )
+	{
+		dropcolor[0] = dropcolor[1] = dropcolor[2] = 0;
+		dropcolor[3] = drawcolor[3];
+		UI_DrawFontStringColor( font, x+2, y+2, str, dropcolor );
+	}
+
+	UI_DrawFontStringColor( font, x, y, str, drawcolor );
+}
+
+qboolean UI_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
+			int shaderCharWidth, float fontKerning)
+{
+	font->pointSize = pointSize;
+	font->kerning = fontKerning;
+
+	font->shaderCharWidth = shaderCharWidth;
+
+	if (ttfName[0] != '\0')
+	{
+		trap_R_RegisterFont(ttfName, pointSize, &font->fontInfo);
+
+		if (font->fontInfo.name[0]) {
+			return qtrue;
+		}
+	}
+
+	if (shaderName[0] != '\0')
+	{
+		font->fontShader = trap_R_RegisterShaderNoMip(shaderName);
+
+		if (font->fontShader) {
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
+/*
+** UI_DrawFontChar
+** Characters are drawn at native screen resolution, unless adjustFrom640 is set to qtrue
+*/
+void UI_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFrom640 )
+{
+	float	ax, ay, aw, ah;
+
+	if (!font) {
+		return;
+	}
+
+	ch &= 0xff;
+
+    if (ch == ' ') {
+		return;
+	}
+
+#if 0 // SCR_DrawChar
+	if ( y < -font->pointSize ) {
+		return;
+	}
+#endif
+
+    if (font->fontInfo.name[0]) {
+		glyphInfo_t *glyph;
+		float yadj;
+		float xadj;
+
+		y += Com_FontCharHeight(font);
+
+		glyph = &font->fontInfo.glyphs[ch];
+
+		yadj = glyph->top;
+		xadj = (Com_FontCharWidth( font, ch ) - glyph->xSkip) / 2.0;
+
+		ax = x+xadj;
+		ay = y-yadj;
+		aw = glyph->imageWidth;
+		ah = glyph->imageHeight;
+
+		if (adjustFrom640) {
+			UI_AdjustFrom640( &ax, &ay, &aw, &ah );
+		}
+
+		trap_R_DrawStretchPic( ax, ay, aw, ah,
+						   glyph->s, glyph->t,
+						   glyph->s2, glyph->t2,
+						   glyph->glyph );
+    } else {
+		int row, col;
+		float frow, fcol;
+		float size;
+
+#if 1 // SCR_DrawChar
+		if ( y < -font->pointSize ) {
+			return;
+		}
+#endif
+
+		size = font->pointSize;
+
+		ax = x;
+		ay = y;
+		aw = size;
+		ah = size;
+
+		if (adjustFrom640) {
+			UI_AdjustFrom640( &ax, &ay, &aw, &ah );
+		}
+
+		row = ch>>4;
+		col = ch&15;
+
+		frow = row*0.0625;
+		fcol = col*0.0625;
+		size = 0.0625;
+
+		trap_R_DrawStretchPic( ax, ay, aw, ah,
+						   fcol, frow,
+						   fcol + size, frow + size,
+						   font->fontShader );
+    }
+}
+
+/*
+==================
+CG_DrawFontStringExt
+
+Draws a multi-colored string with a optional drop shadow, optionally forcing
+to a fixed color.
+==================
+*/
+void UI_DrawFontStringExt( font_t *font, float x, float y, const char *string, const float *setColor, qboolean forceColor,
+		qboolean noColorEscape, qboolean drawShadow, qboolean adjustFrom640, int maxChars )
+{
+	vec4_t		color;
+	const char	*s;
+	float		xx;
+	int			cnt;
+
+	if (maxChars <= 0)
+		maxChars = 32767; // do them all!
+
+	if (drawShadow) // ZTM: Should this be in font_t? It is not in SCR_DrawSmallStringExt, but is in SCR_Draw(Big)StringExt
+	{
+		// draw the drop shadow
+		color[0] = color[1] = color[2] = 0;
+		color[3] = setColor[3];
+		trap_R_SetColor( color );
+		s = string;
+		xx = x;
+		while ( *s ) {
+			if ( !noColorEscape && Q_IsColorString( s ) ) {
+				s += 2;
+				continue;
+			}
+			UI_DrawFontChar( font, xx+2, y+2, *s, adjustFrom640 );
+			xx += Com_FontCharWidth( font, *s );
+			s++;
+		}
+	}
+
+	// draw the colored text
+	s = string;
+	xx = x;
+	cnt = 0;
+	trap_R_SetColor( setColor );
+	while ( *s && cnt < maxChars) {
+#if 1 // SCR_DrawStringExt // Is one way better then the other? Do they do the same thing?
+		if ( !noColorEscape && Q_IsColorString( s ) ) {
+			if ( !forceColor ) {
+				Com_Memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
+				color[3] = setColor[3];
+				trap_R_SetColor( color );
+			}
+			s += 2;
+			continue;
+		}
+#else // SCR_DrawSmallStringExt
+		if ( Q_IsColorString( s ) ) {
+			if ( !forceColor ) {
+				Com_Memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
+				color[3] = setColor[3];
+				trap_R_SetColor( color );
+			}
+			if ( !noColorEscape ) {
+				s += 2;
+				continue;
+			}
+		}
+#endif
+        UI_DrawFontChar( font, xx, y, *s, adjustFrom640 );
+        xx += Com_FontCharWidth( font, *s );
+        cnt++;
+		s++;
+	}
+	trap_R_SetColor( NULL );
+}
+
+void UI_DrawFontString( font_t *font, int x, int y, const char *s, float alpha ) {
+	float	color[4];
+
+	color[0] = color[1] = color[2] = 1.0;
+	color[3] = alpha;
+	UI_DrawFontStringExt( font, x, y, s, color, qfalse, qfalse, qtrue, qtrue, 0 );
+}
+
+void UI_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color ) {
+	UI_DrawFontStringExt( font, x, y, s, color, qtrue, qfalse, qtrue, qtrue, 0 );
+}
+#endif
+
 /*
 =================
 UI_DrawProportionalString2
@@ -369,7 +748,11 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 			fheight = (float)PROPB_HEIGHT / 256.0f;
 			aw = (float)propMapB[ch][2] * uis.xscale;
 			ah = (float)PROPB_HEIGHT * uis.yscale;
+#ifdef IOQ3ZTM // FONT_REWRITE
+			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, uis.fontBanner.fontShader );
+#else
 			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, uis.charsetPropB );
+#endif
 			ax += (aw + (float)PROPB_GAP_WIDTH * uis.xscale);
 		}
 		s++;
@@ -383,6 +766,14 @@ void UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color
 	int				ch;
 	int				width;
 	vec4_t			drawcolor;
+
+#ifdef IOQ3ZTM // FONT_REWRITE
+	if (uis.fontBanner.fontInfo.name[0])
+	{
+		UI_DrawFontBannerString(&uis.fontBanner, x, y, str, style, color);
+		return;
+	}
+#endif
 
 	// find the width of the drawn text
 	s = str;
@@ -423,11 +814,47 @@ void UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color
 }
 
 
-int UI_ProportionalStringWidth( const char* str ) {
+/*
+=================
+UI_ProportionalSizeScale
+=================
+*/
+float UI_ProportionalSizeScale( int style ) {
+#ifdef IOQ3ZTM // FONT_REWRITE
+	if (style & UI_SMALLFONT) {
+		return uis.fontBig.pointSize / uis.fontGiant.pointSize;
+	}
+#else
+	if(  style & UI_SMALLFONT ) {
+		return PROP_SMALL_SIZE_SCALE;
+	}
+#endif
+
+	return 1.00;
+}
+
+/*
+=================
+UI_ProportionalStringWidth
+=================
+*/
+int UI_ProportionalStringWidth( const char* str, int style ) {
 	const char *	s;
 	int				ch;
 	int				charWidth;
 	int				width;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t *font;
+
+	if (style & UI_SMALLFONT)
+		font = &uis.fontBig;
+	else
+		font = &uis.fontGiant;
+
+	if (font->fontInfo.name[0]) {
+		return Com_FontStringWidth(font, str, strlen(str));
+	}
+#endif
 
 	s = str;
 	width = 0;
@@ -442,9 +869,10 @@ int UI_ProportionalStringWidth( const char* str ) {
 	}
 
 	width -= PROP_GAP_WIDTH;
-	return width;
+	return width * UI_ProportionalSizeScale(style);
 }
 
+#ifndef IOQ3ZTM // FONT_REWRITE
 static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t color, float sizeScale, qhandle_t charset )
 {
 	const char* s;
@@ -490,20 +918,6 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 
 /*
 =================
-UI_ProportionalSizeScale
-=================
-*/
-float UI_ProportionalSizeScale( int style ) {
-	if(  style & UI_SMALLFONT ) {
-		return PROP_SMALL_SIZE_SCALE;
-	}
-
-	return 1.00;
-}
-
-
-/*
-=================
 UI_DrawProportionalString
 =================
 */
@@ -516,12 +930,12 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 
 	switch( style & UI_FORMATMASK ) {
 		case UI_CENTER:
-			width = UI_ProportionalStringWidth( str ) * sizeScale;
+			width = UI_ProportionalStringWidth( str, style );
 			x -= width / 2;
 			break;
 
 		case UI_RIGHT:
-			width = UI_ProportionalStringWidth( str ) * sizeScale;
+			width = UI_ProportionalStringWidth( str, style );
 			x -= width;
 			break;
 
@@ -573,6 +987,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 
 	UI_DrawProportionalString2( x, y, str, color, sizeScale, uis.charsetProp );
 }
+#endif
 
 /*
 =================
@@ -584,12 +999,9 @@ void UI_DrawProportionalString_AutoWrapped( int x, int y, int xmax, int ystep, c
 	char *s1,*s2,*s3;
 	char c_bcp;
 	char buf[1024];
-	float   sizeScale;
 
 	if (!str || str[0]=='\0')
 		return;
-	
-	sizeScale = UI_ProportionalSizeScale( style );
 	
 	Q_strncpyz(buf, str, sizeof(buf));
 	s1 = s2 = s3 = buf;
@@ -600,7 +1012,7 @@ void UI_DrawProportionalString_AutoWrapped( int x, int y, int xmax, int ystep, c
 		} while (*s3!=' ' && *s3!='\0');
 		c_bcp = *s3;
 		*s3 = '\0';
-		width = UI_ProportionalStringWidth(s1) * sizeScale;
+		width = UI_ProportionalStringWidth(s1, style);
 		*s3 = c_bcp;
 		if (width > xmax) {
 			if (s1==s2)
@@ -638,6 +1050,7 @@ void UI_DrawProportionalString_AutoWrapped( int x, int y, int xmax, int ystep, c
 	}
 }
 
+#ifndef IOQ3ZTM // FONT_REWRITE
 /*
 =================
 UI_DrawString2
@@ -776,6 +1189,7 @@ void UI_DrawString( int x, int y, const char* str, int style, vec4_t color )
 
 	UI_DrawString2(x,y,str,drawcolor,charw,charh);
 }
+#endif
 
 /*
 =================
