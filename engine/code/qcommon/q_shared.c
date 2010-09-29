@@ -1431,3 +1431,71 @@ char *Com_SkipTokens( char *s, int numTokens, char *sep )
 	else
 		return s;
 }
+
+
+#ifdef IOQ3ZTM // FONT_REWRITE
+/*
+=====================================================================
+
+  FONT HANDLING
+
+=====================================================================
+*/
+
+// ZTM: TODO: Redo all of the font code. Allow different size font to use the same functions for drawing, getting width, etc et.
+//            Remove using defines to get size of font in q3_ui?
+// Replace client SCR_* text functions (see SCR_DrawSmallChar), add font support for all cgame text drawing (see CG_DrawChar).
+//    Redo q3_ui font stuff too? (Including all of the usage of the font size defines in ALL of the menus?...)
+
+float Com_FontCharWidth( font_t *font, int ch )
+{
+    float width;
+
+	if (font && font->fontInfo.name[0]) {
+    	width = font->fontInfo.glyphs[ch & 0xff].xSkip;
+	} else if (font) {
+		width = font->shaderCharWidth;
+    } else {
+    	width = SMALLCHAR_WIDTH;
+	}
+
+	if (font) {
+		 width += font->kerning;
+	}
+
+    return width;
+}
+
+float Com_FontCharHeight( font_t *font )
+{
+    float height;
+
+	if (font && font->fontInfo.name[0]) {
+    	float vpadding = 0.3f * font->pointSize;
+
+    	height = (font->fontInfo.glyphs['I' & 0xff].imageHeight + vpadding);
+	} else if (font) {
+		height = font->pointSize;
+    } else {
+		height = SMALLCHAR_HEIGHT;
+	}
+
+    return height;
+}
+
+float Com_FontStringWidth( font_t *font, const char *s, int len )
+{
+    float	width;
+	int		ch;
+    int		i;
+
+	width = 0;
+
+    for (i = 0; i < len; i++) {
+		ch = s[i] & 0xff;
+		width += Com_FontCharWidth(font, ch);
+	}
+
+    return width;
+}
+#endif
