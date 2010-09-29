@@ -1349,6 +1349,26 @@ typedef struct {
   char name[MAX_QPATH];
 } fontInfo_t;
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+// General font structure to easily support bitmap fonts and true type fonts
+typedef struct
+{
+	// True Type Fonts
+	fontInfo_t	fontInfo;	// true type font data
+	int			pointSize;	// point-size / height
+	float		kerning;	// add extra space between characters
+
+	// Bitmap Fonts
+	qhandle_t	fontShader;	// font shader/image
+	int			shaderCharWidth; // point size for width, only used by fontShader
+} font_t;
+
+// Drawing functions must be in each specific module
+float Com_FontCharWidth( font_t *font, int ch );
+float Com_FontCharHeight( font_t *font );
+float Com_FontStringWidth( font_t *font, const char *s, int len );
+#endif
+
 #define Square(x) ((x)*(x))
 
 // real time

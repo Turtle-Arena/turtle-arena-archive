@@ -2923,9 +2923,13 @@ static qboolean CG_DrawFollow( void ) {
 
 	name = cgs.clientinfo[ cg.snap->ps.clientNum ].name;
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+	x = 0.5 * ( 640 - Com_FontStringWidth(&cgs.media.fontGiant, name, strlen(name)));
+#else
 	x = 0.5 * ( 640 - GIANT_WIDTH * CG_DrawStrlen( name ) );
+#endif
 
-	CG_DrawStringExt( x, 40, name, color, qtrue, qtrue, GIANT_WIDTH, GIANT_HEIGHT, 0 );
+	CG_DrawGiantString(x, 40, name, 1.0F );
 
 	return qtrue;
 }
@@ -2942,27 +2946,32 @@ static qboolean CG_DrawUseEntity(void)
 	float		w;
 	float		x;
 	float		y;
-	vec4_t		color;
+	float		height;
 
 	if (!(cg.snap->ps.eFlags & EF_USE_ENT))
 		return qfalse;
-
-	color[0] = 1;
-	color[1] = 1;
-	color[2] = 1;
-	color[3] = 1;
 
 	CG_HudPlacement(HUD_CENTER);
 
 	s = "Use Entity!";
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+	height = Com_FontCharHeight(&cgs.media.fontBig);
+
+	w = Com_FontStringWidth(&cgs.media.fontBig, s, strlen(s));
+	x = 0.5 * ( 640 - w );
+	y = 480-height-12;
+
+	CG_DrawTeamBackground(x - 6, y - 6, w + 6*2, height + 6*2, 0.33f, cg.snap->ps.persistant[PERS_TEAM]);
+#else
 	w = BIGCHAR_WIDTH * CG_DrawStrlen( s );
 	x = 0.5 * ( 640 - w );
 	y = 480-BIGCHAR_HEIGHT-12;
 
 	CG_DrawTeamBackground(x - 6, y - 6, w + 6*2, BIGCHAR_HEIGHT + 6*2, 0.33f, cg.snap->ps.persistant[PERS_TEAM]);
+#endif
 
-	CG_DrawStringExt( x, y, s, color, qtrue, qtrue, BIGCHAR_WIDTH, BIGCHAR_HEIGHT, 0 );
+	CG_DrawBigString(x, y, s, 1);
 
 	return qtrue;
 }

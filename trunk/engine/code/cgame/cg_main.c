@@ -2356,6 +2356,13 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	cgs.serverCommandSequence = serverCommandSequence;
 
 	// load a few needed things before we do any screen updates
+#ifdef IOQ3ZTM // FONT_REWRITE
+	CG_LoadFont(&cgs.media.fontTiny, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 8, 8, 0);
+	CG_LoadFont(&cgs.media.fontSmall, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 8, 0);
+	CG_LoadFont(&cgs.media.fontBig, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 16, 0);
+	CG_LoadFont(&cgs.media.fontGiant, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 48, 32, 0);
+	cgs.media.whiteShader		= trap_R_RegisterShader( "white" );
+#else
 	cgs.media.charsetShader		= trap_R_RegisterShader( "gfx/2d/bigchars" );
 	cgs.media.whiteShader		= trap_R_RegisterShader( "white" );
 	cgs.media.charsetProp		= trap_R_RegisterShaderNoMip( "menu/art/font1_prop.tga" );
@@ -2363,6 +2370,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	cgs.media.charsetPropGlow	= trap_R_RegisterShaderNoMip( "menu/art/font1_prop_glo.tga" );
 #endif
 	cgs.media.charsetPropB		= trap_R_RegisterShaderNoMip( "menu/art/font2_prop.tga" );
+#endif
 
 	CG_RegisterCvars();
 

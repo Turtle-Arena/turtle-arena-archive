@@ -1403,6 +1403,13 @@ typedef struct {
 	qhandle_t	weaponTrailShader;
 #endif
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t fontGiant;
+	font_t fontBig;
+	font_t fontSmall;
+	font_t fontTiny;
+#endif
+
 } cgMedia_t;
 
 
@@ -1729,12 +1736,26 @@ void CG_DrawString( float x, float y, const char *string,
 				   float charWidth, float charHeight, const float *modulate );
 
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
+			int shaderCharWidth, float fontKerning);
+void CG_DrawFontStringExt( font_t *font, float x, float y, const char *string, const float *setColor, qboolean forceColor,
+		qboolean noColorEscape, qboolean drawShadow, qboolean adjustFrom640, int maxChars );
+
+void CG_DrawFontString( font_t *font, int x, int y, const char *s, float alpha );
+void CG_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color );
+#endif
 void CG_DrawStringExt( int x, int y, const char *string, const float *setColor, 
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars );
+
+void CG_DrawGiantString( int x, int y, const char *s, float alpha );
+void CG_DrawGiantStringColor( int x, int y, const char *s, vec4_t color );
 void CG_DrawBigString( int x, int y, const char *s, float alpha );
 void CG_DrawBigStringColor( int x, int y, const char *s, vec4_t color );
 void CG_DrawSmallString( int x, int y, const char *s, float alpha );
 void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color );
+void CG_DrawTinyString( int x, int y, const char *s, float alpha );
+void CG_DrawTinyStringColor( int x, int y, const char *s, vec4_t color );
 
 int CG_DrawStrlen( const char *str );
 
