@@ -274,8 +274,6 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
 			int shaderCharWidth, float fontKerning)
 {
-	//Com_Memset(font, 0, sizeof (font_t)); // ZTM: NOTE: Shouldn't be done here?...
-
 	font->pointSize = pointSize;
 	font->kerning = fontKerning;
 

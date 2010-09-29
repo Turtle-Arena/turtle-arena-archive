@@ -961,12 +961,19 @@ typedef enum
 // Other media that can be tied to clients, weapons, or items are
 // stored in the clientInfo_t, itemInfo_t, weaponInfo_t, and powerupInfo_t
 typedef struct {
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t fontGiant;
+	font_t fontBig;
+	font_t fontSmall;
+	font_t fontTiny;
+#else
 	qhandle_t	charsetShader;
 	qhandle_t	charsetProp;
 #ifndef TA_DATA
 	qhandle_t	charsetPropGlow;
 #endif
 	qhandle_t	charsetPropB;
+#endif
 	qhandle_t	whiteShader;
 
 #ifdef MISSIONPACK // IOQ3BUGFIX: This is MISSIONPACK stuff but it didn't have a #ifdef.
@@ -1401,13 +1408,6 @@ typedef struct {
 #endif
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 	qhandle_t	weaponTrailShader;
-#endif
-
-#ifdef IOQ3ZTM // FONT_REWRITE
-	font_t fontGiant;
-	font_t fontBig;
-	font_t fontSmall;
-	font_t fontTiny;
 #endif
 
 } cgMedia_t;

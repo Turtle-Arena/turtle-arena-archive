@@ -613,12 +613,21 @@ typedef struct {
 #ifndef TA_DATA
 	qhandle_t			menuBackNoLogoShader;
 #endif
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t				fontSmall;
+	font_t				fontBig;
+	font_t				fontGiant;
+	font_t				fontPropSmall;
+	font_t				fontPropBig;
+	font_t				fontBanner;
+#else
 	qhandle_t			charset;
 	qhandle_t			charsetProp;
 #ifndef TA_DATA
 	qhandle_t			charsetPropGlow;
 #endif
 	qhandle_t			charsetPropB;
+#endif
 	qhandle_t			cursor;
 	qhandle_t			rb_on;
 	qhandle_t			rb_off;
@@ -643,11 +652,18 @@ extern void			UI_DrawRect( float x, float y, float width, float height, const fl
 extern void			UI_UpdateScreen( void );
 extern void			UI_SetColor( const float *rgba );
 extern void			UI_LerpColor(vec4_t a, vec4_t b, vec4_t c, float t);
+#ifdef IOQ3ZTM // FONT_REWRITE
+extern qboolean		UI_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
+							int shaderCharWidth, float fontKerning);
+extern void			UI_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFrom640 );
+extern void			UI_DrawFontString( font_t *font, int x, int y, const char *s, float alpha );
+extern void			UI_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color );
+#endif
 extern void			UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color );
 extern float		UI_ProportionalSizeScale( int style );
 extern void			UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color );
 extern void			UI_DrawProportionalString_AutoWrapped( int x, int ystart, int xmax, int ystep, const char* str, int style, vec4_t color );
-extern int			UI_ProportionalStringWidth( const char* str );
+extern int			UI_ProportionalStringWidth( const char* str, int style );
 extern void			UI_DrawString( int x, int y, const char* str, int style, vec4_t color );
 extern void			UI_DrawChar( int x, int y, int ch, int style, vec4_t color );
 extern qboolean 	UI_CursorInRect (int x, int y, int width, int height);
@@ -743,6 +759,7 @@ void			trap_R_SetColor( const float *rgba );
 void			trap_R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader );
 void			trap_UpdateScreen( void );
 int				trap_CM_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, float frac, const char *tagName );
+void			trap_R_RegisterFont(const char *pFontname, int pointSize, fontInfo_t *font);
 void			trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum );
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed );
 void			trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen );

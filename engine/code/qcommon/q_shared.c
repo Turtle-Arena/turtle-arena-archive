@@ -1496,6 +1496,10 @@ float Com_FontStringWidth( font_t *font, const char *s, int len )
 		width += Com_FontCharWidth(font, ch);
 	}
 
+	if (font) {
+		 width -= font->kerning;
+	}
+
     return width;
 }
 #endif

@@ -196,8 +196,12 @@ static void PText_Init( menutext_s *t )
 
 	x = t->generic.x;
 	y = t->generic.y;
-	w = UI_ProportionalStringWidth( t->string ) * sizeScale;
+	w = UI_ProportionalStringWidth( t->string, t->style );
+#ifdef IOQ3ZTM // FONT_REWRITE
+	h =	Com_FontCharHeight( (t->style & UI_SMALLFONT) ? &uis.fontPropSmall : &uis.fontPropBig );
+#else
 	h =	PROP_HEIGHT * sizeScale;
+#endif
 
 	if( t->generic.flags & QMF_RIGHT_JUSTIFY ) {
 		x -= w;
@@ -1762,12 +1766,28 @@ Menu_Cache
 */
 void Menu_Cache( void )
 {
+#ifdef IOQ3ZTM // FONT_REWRITE
+	UI_LoadFont(&uis.fontSmall, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 8, 0);
+	UI_LoadFont(&uis.fontBig, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 16, 0);
+	UI_LoadFont(&uis.fontGiant, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 48, 32, 0);
+
+#if 1
+	UI_LoadFont(&uis.fontPropSmall, "fonts/FreeSansBold.ttf", "gfx/2d/bigchars", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
+	UI_LoadFont(&uis.fontPropBig, "fonts/FreeSansBold.ttf", "gfx/2d/bigchars", PROP_HEIGHT, 22*0.66f, 0);
+#else // ZTM: FIXME: Support old menu/art/font1_prop font
+	UI_LoadFont(&uis.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
+	UI_LoadFont(&uis.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, 0);
+#endif
+
+	UI_LoadFont(&uis.fontBanner, "fonts/FreeSerif.ttf", "menu/art/font2_prop.tga", 48, 32, 0);
+#else
 	uis.charset			= trap_R_RegisterShaderNoMip( "gfx/2d/bigchars" );
 	uis.charsetProp		= trap_R_RegisterShaderNoMip( "menu/art/font1_prop.tga" );
 #ifndef TA_DATA
 	uis.charsetPropGlow	= trap_R_RegisterShaderNoMip( "menu/art/font1_prop_glo.tga" );
 #endif
 	uis.charsetPropB	= trap_R_RegisterShaderNoMip( "menu/art/font2_prop.tga" );
+#endif
 	uis.cursor          = trap_R_RegisterShaderNoMip( "menu/art/3_cursor2" );
 	uis.rb_on           = trap_R_RegisterShaderNoMip( "menu/art/switch_on" );
 	uis.rb_off          = trap_R_RegisterShaderNoMip( "menu/art/switch_off" );
