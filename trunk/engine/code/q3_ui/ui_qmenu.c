@@ -1771,13 +1771,8 @@ void Menu_Cache( void )
 	UI_LoadFont(&uis.fontBig, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 16, 0);
 	UI_LoadFont(&uis.fontGiant, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 48, 32, 0);
 
-#if 1
-	UI_LoadFont(&uis.fontPropSmall, "fonts/FreeSansBold.ttf", "gfx/2d/bigchars", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
-	UI_LoadFont(&uis.fontPropBig, "fonts/FreeSansBold.ttf", "gfx/2d/bigchars", PROP_HEIGHT, 22*0.66f, 0);
-#else // ZTM: FIXME: Support old menu/art/font1_prop font
 	UI_LoadFont(&uis.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
 	UI_LoadFont(&uis.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, 0);
-#endif
 
 	UI_LoadFont(&uis.fontBanner, "fonts/FreeSerif.ttf", "menu/art/font2_prop.tga", 48, 32, 0);
 #else

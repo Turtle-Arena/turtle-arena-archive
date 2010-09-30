@@ -238,7 +238,8 @@ Weapons (and attacking)
 
   * STARTED (IOQ3ZTM // FONT_REWRITE): Support ttf fonts everywhere!
     * Status: client, cgame, and q3_ui now support ttfs everywhere, but broke support for a old font to q3_ui.
-    * FIXME: Add support for old font1_prop in q3_ui
+    * TODO: Add support for font1_prop and font2_prop into *_DrawFontStringExt?
+    * FIXME: Add support for font1_prop in cgame's UI_DrawProportionalString
     * TODO: Clean up new font code in q3_ui, cgame, and client
     * TODO: Merge new font code with missionpack font code?
 
