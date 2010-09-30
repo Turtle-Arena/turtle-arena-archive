@@ -1205,14 +1205,61 @@ void UI_DrawString( int x, int y, const char* str, int style, vec4_t color )
 UI_DrawChar
 =================
 */
-void UI_DrawChar( int x, int y, int ch, int style, vec4_t color )
+int UI_DrawChar( int x, int y, int ch, int style, vec4_t color )
 {
 	char	buff[2];
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t *font;
+
+	if (style & UI_SMALLFONT)
+		font = &uis.fontSmall;
+	else if (style & UI_GIANTFONT)
+		font = &uis.fontGiant;
+	else
+		font = &uis.fontBig;
+
+	// Remap bitmap font symbols
+	if (font->fontInfo.name[0])
+	{
+		switch (ch)
+		{
+			case 0:
+				break; // ignore
+			case 10: // Insert text
+				ch = '|';
+				break;
+			case 11: // Overwrite text
+				ch = '[';
+				break;
+			case 13: // Select marker
+				ch = '>';
+				break;
+			// Old slider symbols
+			case 128: // Left end
+			case 129: // Intervolt
+			case 130: // Right end
+			case 130: // Slider cursor
+			default:
+				break;
+		}
+	}
+#endif
 
 	buff[0] = ch;
 	buff[1] = '\0';
 
 	UI_DrawString( x, y, buff, style, color );
+
+#ifdef IOQ3ZTM // FONT_REWRITE
+	return Com_FontStringWidth(font, buff, strlen(buff));
+#else
+	if (style & UI_SMALLFONT)
+		return SMALLCHAR_WIDTH;
+	else if (style & UI_GIANTFONT)
+		return GIANTCHAR_WIDTH;
+	else
+		return BIGCHAR_WIDTH;
+#endif
 }
 
 qboolean UI_IsFullscreen( void ) {

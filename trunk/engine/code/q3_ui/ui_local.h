@@ -665,7 +665,7 @@ extern void			UI_DrawProportionalString( int x, int y, const char* str, int styl
 extern void			UI_DrawProportionalString_AutoWrapped( int x, int ystart, int xmax, int ystep, const char* str, int style, vec4_t color );
 extern int			UI_ProportionalStringWidth( const char* str, int style );
 extern void			UI_DrawString( int x, int y, const char* str, int style, vec4_t color );
-extern void			UI_DrawChar( int x, int y, int ch, int style, vec4_t color );
+extern int			UI_DrawChar( int x, int y, int ch, int style, vec4_t color );
 extern qboolean 	UI_CursorInRect (int x, int y, int width, int height);
 extern void			UI_AdjustFrom640( float *x, float *y, float *w, float *h );
 extern void			UI_DrawTextBox (int x, int y, int width, int lines);

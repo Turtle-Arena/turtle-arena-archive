@@ -141,6 +141,7 @@ static void PlayerSettings_DrawName( void *self ) {
 	int				n;
 	int				basex, x, y;
 	char			name[32];
+	int				i;
 
 	f = (menufield_s*)self;
 	basex = f->generic.x;
@@ -162,21 +163,36 @@ static void PlayerSettings_DrawName( void *self ) {
 	txt = f->field.buffer;
 	color = g_color_table[ColorIndex(COLOR_WHITE)];
 	x = basex;
-	while ( (c = *txt) != 0 ) {
-		if ( !focus && Q_IsColorString( txt ) ) {
-			n = ColorIndex( *(txt+1) );
-			if( n == 0 ) {
-				n = 7;
+	for (i = 0; i < strlen(f->field.buffer)+1; i++) {
+		if ( (c = *txt) != 0 ) {
+			if ( !focus && Q_IsColorString( txt ) ) {
+				n = ColorIndex( *(txt+1) );
+				if( n == 0 ) {
+					n = 7;
+				}
+				color = g_color_table[n];
+				txt += 2;
+				continue;
 			}
-			color = g_color_table[n];
-			txt += 2;
-			continue;
+			x += UI_DrawChar( x, y, c, style, color );
+			txt++;
 		}
-		UI_DrawChar( x, y, c, style, color );
-		txt++;
-		x += SMALLCHAR_WIDTH;
+#ifdef IOQ3ZTM // FONT_REWITE
+		// draw cursor if we have focus
+		if( focus && f->field.cursor == i) {
+			if ( trap_Key_GetOverstrikeMode() ) {
+				c = 11;
+			} else {
+				c = 10;
+			}
+
+			UI_DrawChar( basex, y, c, (style & ~UI_PULSE) | UI_BLINK, color_white );
+		}
+		basex = x;
+#endif
 	}
 
+#ifndef IOQ3ZTM // FONT_REWITE
 	// draw cursor if we have focus
 	if( focus ) {
 		if ( trap_Key_GetOverstrikeMode() ) {
@@ -190,6 +206,7 @@ static void PlayerSettings_DrawName( void *self ) {
 
 		UI_DrawChar( basex + f->field.cursor * SMALLCHAR_WIDTH, y, c, style, color_white );
 	}
+#endif
 
 	// draw at bottom also using proportional font
 	Q_strncpyz( name, f->field.buffer, sizeof(name) );

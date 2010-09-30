@@ -137,6 +137,9 @@ static void UI_CDKeyMenu_DrawKey( void *self ) {
 	float			*color;
 	int				x, y;
 	int				val;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	int				basex;
+#endif
 
 	f = (menufield_s *)self;
 
@@ -153,6 +156,28 @@ static void UI_CDKeyMenu_DrawKey( void *self ) {
 	x = 320 - 8 * BIGCHAR_WIDTH;
 	y = 240 - BIGCHAR_HEIGHT / 2;
 	UI_FillRect( x, y, 16 * BIGCHAR_WIDTH, BIGCHAR_HEIGHT, listbar_color );
+#ifdef IOQ3ZTM // FONT_REWRITE
+	basex = x;
+	for (val = 0; val < strlen(f->field.buffer)+1; val++)
+	{
+		if (f->field.buffer[val] != '\0') {
+			x += UI_DrawChar( x, y, f->field.buffer[val], style, color );
+		}
+
+		// draw cursor if we have focus
+		if (focus && val == f->field.cursor)
+		{
+			if ( trap_Key_GetOverstrikeMode() ) {
+				c = 11;
+			} else {
+				c = 10;
+			}
+
+			UI_DrawChar( basex, y, c, (style & ~UI_PULSE)|UI_BLINK, color_white );
+		}
+		basex = x;
+	}
+#else
 	UI_DrawString( x, y, f->field.buffer, style, color );
 
 	// draw cursor if we have focus
@@ -168,6 +193,7 @@ static void UI_CDKeyMenu_DrawKey( void *self ) {
 
 		UI_DrawChar( x + f->field.cursor * BIGCHAR_WIDTH, y, c, style, color_white );
 	}
+#endif
 
 	val = UI_CDKeyMenu_PreValidateKey( f->field.buffer );
 	if( val == 1 ) {

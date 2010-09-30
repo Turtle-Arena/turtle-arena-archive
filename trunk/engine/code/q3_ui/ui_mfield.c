@@ -32,7 +32,12 @@ x, y, are in pixels
 */
 void MField_Draw( mfield_t *edit, int x, int y, int style, vec4_t color ) {
 	int		len;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	int		val;
+	int		basex;
+#else
 	int		charw;
+#endif
 	int		drawLen;
 	int		prestep;
 	int		cursorChar;
@@ -65,6 +70,28 @@ void MField_Draw( mfield_t *edit, int x, int y, int style, vec4_t color ) {
 	memcpy( str, edit->buffer + prestep, drawLen );
 	str[ drawLen ] = 0;
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+	basex = x;
+	for (val = 0; val < strlen(str)+1; val++)
+	{
+		if (str[val] != '\0') {
+			x += UI_DrawChar( x, y, str[val], style, color );
+		}
+
+		// draw cursor if we have focus
+		if ((style & UI_PULSE) && val == ( edit->cursor - prestep ))
+		{
+			if ( trap_Key_GetOverstrikeMode() ) {
+				cursorChar = 11;
+			} else {
+				cursorChar = 10;
+			}
+
+			UI_DrawChar( basex, y, cursorChar, (style & ~(UI_PULSE|UI_CENTER|UI_RIGHT))|UI_BLINK, color );
+		}
+		basex = x;
+	}
+#else
 	UI_DrawString( x, y, str, style, color );
 
 	// draw the cursor
@@ -106,6 +133,7 @@ void MField_Draw( mfield_t *edit, int x, int y, int style, vec4_t color ) {
 	}
 	
 	UI_DrawChar( x + ( edit->cursor - prestep ) * charw, y, cursorChar, style & ~(UI_CENTER|UI_RIGHT), color );
+#endif
 }
 
 /*
