@@ -1238,7 +1238,7 @@ int UI_DrawChar( int x, int y, int ch, int style, vec4_t color )
 			case 128: // Left end
 			case 129: // Intervolt
 			case 130: // Right end
-			case 130: // Slider cursor
+			case 131: // Slider cursor
 			default:
 				break;
 		}
