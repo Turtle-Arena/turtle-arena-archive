@@ -1442,11 +1442,6 @@ char *Com_SkipTokens( char *s, int numTokens, char *sep )
 =====================================================================
 */
 
-// ZTM: TODO: Redo all of the font code. Allow different size font to use the same functions for drawing, getting width, etc et.
-//            Remove using defines to get size of font in q3_ui?
-// Replace client SCR_* text functions (see SCR_DrawSmallChar), add font support for all cgame text drawing (see CG_DrawChar).
-//    Redo q3_ui font stuff too? (Including all of the usage of the font size defines in ALL of the menus?...)
-
 float Com_FontCharWidth( font_t *font, int ch )
 {
     float width;

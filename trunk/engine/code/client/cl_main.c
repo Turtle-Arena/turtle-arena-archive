@@ -2831,22 +2831,14 @@ void CL_InitRenderer( void ) {
 	re.BeginRegistration( &cls.glconfig );
 
 	// load character sets
+#ifdef IOQ3ZTM // FONT_REWRITE
+	SCR_LoadFont(&cls.fontTiny, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 8, 8, 0);
+	SCR_LoadFont(&cls.fontSmall, cl_consoleFont->string, "gfx/2d/bigchars", cl_consoleFontSize->integer,
+			cl_consoleFontSize->integer*0.66f, cl_consoleFontKerning->value);
+	SCR_LoadFont(&cls.fontBig, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 16, 0);
+	//SCR_LoadFont(&cls.fontGiant, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 48, 32, 0);
+#else
 	cls.charSetShader = re.RegisterShader( "gfx/2d/bigchars" );
-#ifdef IOQ3ZTM // USE_FREETYPE
-    cls.useLegacyConsoleFont = qtrue;
-
-	// Register console font specified by cl_consoleFont, if any
-	if ( cl_consoleFont && strlen(cl_consoleFont->string) > 2 )
-	{
-		Com_Memset(&cls.consoleFont, 0, sizeof (cls.consoleFont));
-		re.RegisterFont( cl_consoleFont->string, cl_consoleFontSize->integer, &cls.consoleFont);
-		// Check if loaded font.
-		if (cls.consoleFont.name[0])
-		{
-			// Use loaded font.
-			cls.useLegacyConsoleFont = qfalse;
-		}
-	}
 #endif
 	cls.whiteShader = re.RegisterShader( "white" );
 	cls.consoleShader = re.RegisterShader( "console" );
@@ -3255,7 +3247,7 @@ void CL_Init( void ) {
 #ifdef IOQ3ZTM // USE_FREETYPE
 	cl_consoleFont = Cvar_Get ("cl_consoleFont", "fonts/FreeSansBold.ttf", CVAR_ARCHIVE | CVAR_LATCH);
 	cl_consoleFontSize = Cvar_Get ("cl_consoleFontSize", "16", CVAR_ARCHIVE | CVAR_LATCH);
-	cl_consoleFontKerning = Cvar_Get ("cl_consoleFontKerning", "0", CVAR_ARCHIVE);
+	cl_consoleFontKerning = Cvar_Get ("cl_consoleFontKerning", "0", CVAR_ARCHIVE | CVAR_LATCH);
 #endif
 
 	// userinfo

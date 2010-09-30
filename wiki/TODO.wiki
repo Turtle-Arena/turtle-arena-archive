@@ -237,11 +237,10 @@ Weapons (and attacking)
       * If I change the whole source it could cause issues with submitting patches to ioq3 (and more difficult for other q3 mods to use my code?)
 
   * STARTED (IOQ3ZTM // FONT_REWRITE): Support ttf fonts everywhere!
-    * Status: cgame and q3_ui now support ttfs everywhere, but broke support for a old font to q3_ui. Need to add support in client still.
+    * Status: client, cgame, and q3_ui now support ttfs everywhere, but broke support for a old font to q3_ui.
     * FIXME: Add support for old font1_prop in q3_ui
-    * TODO: Clean up new font code in q3_ui
-    * TODO: Clean up / merge new font code with missionpack font code?
-    * TODO: Redo client font code (for console, VoiP, demo recording, and whatnot)
+    * TODO: Clean up new font code in q3_ui, cgame, and client
+    * TODO: Merge new font code with missionpack font code?
 
 == Objects ==
 Most of the mapobjects should be damageable.

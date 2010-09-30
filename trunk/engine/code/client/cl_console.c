@@ -496,19 +496,19 @@ void Con_DrawInput (void) {
 		return;
 	}
 
-#ifdef IOQ3ZTM // USE_FREETYPE
-	y = con.vislines - ( SCR_ConsoleFontCharHeight() * 2 );
+#ifdef IOQ3ZTM // FONT_REWRITE
+	y = con.vislines - ( Com_FontCharHeight(&cls.fontSmall) * 2 );
 #else
 	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
 #endif
 
 	re.SetColor( con.color );
 
-#ifdef IOQ3ZTM // USE_FREETYPE
+#ifdef IOQ3ZTM // FONT_REWRITE
 	SCR_DrawConsoleFontChar( con.xadjust + cl_conXOffset->integer, y, ']' );
 
-	Field_Draw( &g_consoleField, con.xadjust + cl_conXOffset->integer + SCR_ConsoleFontCharWidth(']'), y,
-		SCREEN_WIDTH - 3 * SCR_ConsoleFontCharWidth(' '), qtrue, qtrue );
+	Field_Draw( &g_consoleField, con.xadjust + cl_conXOffset->integer + Com_FontCharWidth(&cls.fontSmall, ']'), y,
+		SCREEN_WIDTH - 3 * Com_FontCharWidth(&cls.fontSmall, ' '), qtrue, qtrue );
 #else
 	SCR_DrawSmallChar( con.xadjust + 1 * SMALLCHAR_WIDTH, y, ']' );
 
@@ -558,11 +558,11 @@ void Con_DrawNotify (void)
 			continue;
 		}
 
-#ifdef IOQ3ZTM // USE_FREETYPE // ZTM: I added this...
+#ifdef IOQ3ZTM // FONT_REWRITE
 		float currentWidthLocation = cl_conXOffset->integer;
 #endif
 		for (x = 0 ; x < con.linewidth ; x++) {
-#ifndef IOQ3ZTM // USE_FREETYPE // ZTM: I added this...
+#ifndef IOQ3ZTM // FONT_REWRITE
 			if ( ( text[x] & 0xff ) == ' ' ) {
 				continue;
 			}
@@ -571,16 +571,16 @@ void Con_DrawNotify (void)
 				currentColor = (text[x]>>8)&7;
 				re.SetColor( g_color_table[currentColor] );
 			}
-#ifdef IOQ3ZTM // USE_FREETYPE // ZTM: I added this...
+#ifdef IOQ3ZTM // FONT_REWRITE
 			SCR_DrawConsoleFontChar( con.xadjust + currentWidthLocation, v, text[x] & 0xff );
-			currentWidthLocation += SCR_ConsoleFontCharWidth( text[x] & 0xff );
+			currentWidthLocation += Com_FontCharWidth( &cls.fontSmall, text[x] );
 #else
 			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH, v, text[x] & 0xff );
 #endif
 		}
 
-#ifdef IOQ3ZTM // USE_FREETYPE // ZTM: I added this...
-		v += SCR_ConsoleFontCharHeight();
+#ifdef IOQ3ZTM // FONT_REWRITE
+		v += Com_FontCharHeight(&cls.fontSmall);
 #else
 		v += SMALLCHAR_HEIGHT;
 #endif
@@ -675,13 +675,13 @@ void Con_DrawSolidConsole( float frac ) {
 
 	i = strlen( Q3_VERSION );
 
-#ifdef IOQ3ZTM // USE_FREETYPE
-	float totalwidth = SCR_ConsoleFontStringWidth( Q3_VERSION, i ) + cl_conXOffset->integer;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	float totalwidth = Com_FontStringWidth( &cls.fontSmall, Q3_VERSION, i ) + cl_conXOffset->integer;
 	float currentWidthLocation = 0;
  	for (x=0 ; x<i ; x++) {
-         SCR_DrawConsoleFontChar( cls.glconfig.vidWidth - totalwidth + currentWidthLocation,
-				lines - SCR_ConsoleFontCharHeight(), Q3_VERSION[x] );
-        currentWidthLocation += SCR_ConsoleFontCharWidth( Q3_VERSION[x] );
+         SCR_DrawFontChar( &cls.fontSmall, cls.glconfig.vidWidth - totalwidth + currentWidthLocation,
+				lines - Com_FontCharHeight(&cls.fontSmall), Q3_VERSION[x], qfalse );
+        currentWidthLocation += Com_FontCharWidth( &cls.fontSmall, Q3_VERSION[x] );
  	}
 #else
 	for (x=0 ; x<i ; x++) {
@@ -693,10 +693,10 @@ void Con_DrawSolidConsole( float frac ) {
 
 	// draw the text
 	con.vislines = lines;
-#ifdef IOQ3ZTM // USE_FREETYPE
-	rows = (lines)/SCR_ConsoleFontCharHeight();		// rows of text to draw
+#ifdef IOQ3ZTM // FONT_REWRITE
+	rows = lines/Com_FontCharHeight(&cls.fontSmall);		// rows of text to draw
 
-	y = lines - (SCR_ConsoleFontCharHeight()*3);
+	y = lines - (Com_FontCharHeight(&cls.fontSmall)*3);
 #else
 	rows = (lines-SMALLCHAR_WIDTH)/SMALLCHAR_WIDTH;		// rows of text to draw
 
@@ -709,9 +709,9 @@ void Con_DrawSolidConsole( float frac ) {
 	// draw arrows to show the buffer is backscrolled
 		re.SetColor( g_color_table[ColorIndex(COLOR_RED)] );
 		for (x=0 ; x<con.linewidth ; x+=4)
-#ifdef IOQ3ZTM // USE_FREETYPE
-			SCR_DrawConsoleFontChar( con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, '^' );
-		y -= SCR_ConsoleFontCharHeight();
+#ifdef IOQ3ZTM // FONT_REWRITE
+			SCR_DrawFontChar( &cls.fontSmall, con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, '^', qfalse );
+		y -= Com_FontCharHeight(&cls.fontSmall);
 #else
 			SCR_DrawSmallChar( con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, '^' );
 		y -= SMALLCHAR_HEIGHT;
@@ -728,8 +728,8 @@ void Con_DrawSolidConsole( float frac ) {
 	currentColor = 7;
 	re.SetColor( g_color_table[currentColor] );
 
-#ifdef IOQ3ZTM // USE_FREETYPE
-	for (i=0 ; i<rows ; i++, y -= SCR_ConsoleFontCharHeight(), row--)
+#ifdef IOQ3ZTM // FONT_REWRITE
+	for (i=0 ; i<rows ; i++, y -= Com_FontCharHeight(&cls.fontSmall), row--)
 #else
 	for (i=0 ; i<rows ; i++, y -= SMALLCHAR_HEIGHT, row--)
 #endif
@@ -757,9 +757,9 @@ void Con_DrawSolidConsole( float frac ) {
 				currentColor = (text[x]>>8)&7;
 				re.SetColor( g_color_table[currentColor] );
 			}
-#ifdef IOQ3ZTM // USE_FREETYPE
-			SCR_DrawConsoleFontChar(  con.xadjust + currentWidthLocation, y, text[x] & 0xff );
-			currentWidthLocation += SCR_ConsoleFontCharWidth( text[x] & 0xff );
+#ifdef IOQ3ZTM // FONT_REWRITE
+			SCR_DrawConsoleFontChar( con.xadjust + currentWidthLocation, y, text[x] & 0xff );
+			currentWidthLocation += Com_FontCharWidth(&cls.fontSmall, text[x]);
 #else
 			SCR_DrawSmallChar(  con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, text[x] & 0xff );
 #endif
