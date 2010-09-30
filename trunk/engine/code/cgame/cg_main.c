@@ -2361,6 +2361,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	CG_LoadFont(&cgs.media.fontSmall, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 8, 0);
 	CG_LoadFont(&cgs.media.fontBig, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 16, 0);
 	CG_LoadFont(&cgs.media.fontGiant, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 48, 32, 0);
+
+	CG_LoadFont(&cgs.media.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
+	CG_LoadFont(&cgs.media.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, 0);
+
 	cgs.media.whiteShader		= trap_R_RegisterShader( "white" );
 #else
 	cgs.media.charsetShader		= trap_R_RegisterShader( "gfx/2d/bigchars" );
