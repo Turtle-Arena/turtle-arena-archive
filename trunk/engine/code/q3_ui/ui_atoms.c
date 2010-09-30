@@ -1223,22 +1223,25 @@ int UI_DrawChar( int x, int y, int ch, int style, vec4_t color )
 	{
 		switch (ch)
 		{
-			case 0:
-				break; // ignore
-			case 10: // Insert text
+			case 10: // Overwrite text
 				ch = '|';
 				break;
-			case 11: // Overwrite text
+
+			case 11: // Insert text
 				ch = '_';
 				break;
+
 			case 13: // Select marker
 				ch = '>';
 				break;
+
 			// Old slider symbols
 			case 128: // Left end
 			case 129: // Intervolt
 			case 130: // Right end
 			case 131: // Slider cursor
+				break;
+
 			default:
 				break;
 		}
