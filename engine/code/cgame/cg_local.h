@@ -962,10 +962,12 @@ typedef enum
 // stored in the clientInfo_t, itemInfo_t, weaponInfo_t, and powerupInfo_t
 typedef struct {
 #ifdef IOQ3ZTM // FONT_REWRITE
-	font_t fontGiant;
-	font_t fontBig;
-	font_t fontSmall;
-	font_t fontTiny;
+	font_t		fontGiant;
+	font_t		fontBig;
+	font_t		fontSmall;
+	font_t		fontTiny;
+	font_t		fontPropSmall;
+	font_t		fontPropBig;
 #else
 	qhandle_t	charsetShader;
 	qhandle_t	charsetProp;

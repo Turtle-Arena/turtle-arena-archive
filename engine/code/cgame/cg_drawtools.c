@@ -197,18 +197,12 @@ void CG_DrawPicFit( float x, float y, float width, float height, qhandle_t hShad
 #ifdef IOQ3ZTM // FONT_REWRITE
 /*
 =================
-UI_DrawProportionalString
+UI_DrawFontProportionalString
 =================
 */
-void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t color ) {
+void UI_DrawFontProportionalString( font_t *font, int x, int y, const char* str, int style, vec4_t color ) {
 	vec4_t	drawcolor;
 	int		width;
-	font_t *font;
-
-	if (style & UI_SMALLFONT)
-		font = &cgs.media.fontBig;
-	else
-		font = &cgs.media.fontGiant;
 
 	switch( style & UI_FORMATMASK ) {
 		case UI_CENTER:
@@ -290,7 +284,7 @@ qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, 
 	}
 
 	if (shaderName[0] != '\0') {
-		font->fontShader = trap_R_RegisterShader(shaderName);
+		font->fontShader = trap_R_RegisterShaderNoMip(shaderName);
 
 		if (font->fontShader) {
 			return qtrue;
@@ -960,7 +954,6 @@ void CG_ColorForHealth( vec4_t hcolor ) {
 }
 
 
-#ifndef IOQ3ZTM // FONT_REWRTIE
 /*
 =================
 UI_DrawProportionalString2
@@ -1076,6 +1069,7 @@ static int	propMap[128][3] = {
 {0, 0, -1}		// DEL
 };
 
+#ifndef IOQ3ZTM // FONT_REWRITE
 static int propMapB[26][3] = {
 {11, 12, 33},
 {49, 12, 31},
@@ -1211,6 +1205,7 @@ void UI_DrawBannerString( int x, int y, const char* str, int style, vec4_t color
 
 	UI_DrawBannerString2( x, y, str, color );
 }
+#endif
 
 
 int UI_ProportionalStringWidth( const char* str ) {
@@ -1306,6 +1301,24 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	vec4_t	drawcolor;
 	int		width;
 	float	sizeScale;
+	qhandle_t charsetProp;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t *font;
+
+	if (style & UI_SMALLFONT)
+		font = &cgs.media.fontPropSmall;
+	else
+		font = &cgs.media.fontPropBig;
+
+	if (font->fontInfo.name[0]) {
+		UI_DrawFontProportionalString(font, x, y, str, style, color);
+		return;
+	}
+
+	charsetProp = font->fontShader;
+#else
+	charsetProp = cgs.media.charsetProp;
+#endif
 
 	sizeScale = UI_ProportionalSizeScale( style );
 
@@ -1328,7 +1341,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	if ( style & UI_DROPSHADOW ) {
 		drawcolor[0] = drawcolor[1] = drawcolor[2] = 0;
 		drawcolor[3] = color[3];
-		UI_DrawProportionalString2( x+2, y+2, str, drawcolor, sizeScale, cgs.media.charsetProp );
+		UI_DrawProportionalString2( x+2, y+2, str, drawcolor, sizeScale, charsetProp );
 	}
 
 	if ( style & UI_INVERSE ) {
@@ -1336,7 +1349,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[1] = color[1] * 0.8;
 		drawcolor[2] = color[2] * 0.8;
 		drawcolor[3] = color[3];
-		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetProp );
+		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, charsetProp );
 		return;
 	}
 
@@ -1345,7 +1358,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[1] = color[1] * 0.8;
 		drawcolor[2] = color[2] * 0.8;
 		drawcolor[3] = color[3];
-		UI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
+		UI_DrawProportionalString2( x, y, str, color, sizeScale, charsetProp );
 
 #ifdef TURTLEARENA // ZTM: This is like the UI Main menu text drawing, but its not.
         // ZTM: hack-ish thing to do?...
@@ -1360,13 +1373,12 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( cg.time / PULSE_DIVISOR );
 #ifdef TA_DATA
-		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetProp );
+		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, charsetProp );
 #else
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow );
 #endif
 		return;
 	}
 
-	UI_DrawProportionalString2( x, y, str, color, sizeScale, cgs.media.charsetProp );
+	UI_DrawProportionalString2( x, y, str, color, sizeScale, charsetProp );
 }
-#endif
