@@ -1229,7 +1229,7 @@ int UI_DrawChar( int x, int y, int ch, int style, vec4_t color )
 				ch = '|';
 				break;
 			case 11: // Overwrite text
-				ch = '[';
+				ch = '_';
 				break;
 			case 13: // Select marker
 				ch = '>';
