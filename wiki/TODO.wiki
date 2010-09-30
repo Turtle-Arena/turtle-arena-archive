@@ -236,8 +236,8 @@ Weapons (and attacking)
     * Should I change the whole source to GPLv3 (or later)? (and the data too?)
       * If I change the whole source it could cause issues with submitting patches to ioq3 (and more difficult for other q3 mods to use my code?)
 
-  * STARTED (IOQ3ZTM // FONT_REWRITE): Support ttf fonts everywhere!
-    * Status: client, cgame, and q3_ui now support ttfs everywhere, but broke support for a old font to q3_ui.
+  * STARTED (IOQ3ZTM // FONT_REWRITE): Support true type fonts everywhere!
+    * Status: client, cgame, and q3_ui now support ttfs everywhere, but broke support for the font1_prop font in cgame.
     * TODO: Add support for font1_prop and font2_prop into *_DrawFontStringExt?
     * FIXME: Add support for font1_prop in cgame's UI_DrawProportionalString
     * TODO: Clean up new font code in q3_ui, cgame, and client
