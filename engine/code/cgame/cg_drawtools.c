@@ -274,13 +274,14 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
 			int shaderCharWidth, float fontKerning)
 {
+	font->fontInfo.name[0] = 0;
+	font->fontShader = 0;
 	font->pointSize = pointSize;
 	font->kerning = fontKerning;
 
 	font->shaderCharWidth = shaderCharWidth;
 
-	if (ttfName[0] != '\0')
-	{
+	if (ttfName[0] != '\0') {
 		trap_R_RegisterFont(ttfName, pointSize, &font->fontInfo);
 
 		if (font->fontInfo.name[0]) {
@@ -288,8 +289,7 @@ qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, 
 		}
 	}
 
-	if (shaderName[0] != '\0')
-	{
+	if (shaderName[0] != '\0') {
 		font->fontShader = trap_R_RegisterShader(shaderName);
 
 		if (font->fontShader) {

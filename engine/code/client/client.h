@@ -356,9 +356,11 @@ typedef struct {
 	qhandle_t	charSetShader;
 	qhandle_t	whiteShader;
 	qhandle_t	consoleShader;
-#ifdef IOQ3ZTM // USE_FREETYPE
-	qboolean useLegacyConsoleFont;
-	fontInfo_t  consoleFont;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t		fontTiny; // Used for demo recording and voip meter
+	font_t  	fontSmall; // Used by console
+	font_t		fontBig; // Used by "say" and "say_team" overlays
+	//font_t		fontGiant;
 #endif
 } clientStatic_t;
 
@@ -580,15 +582,21 @@ void	SCR_FillRect( float x, float y, float width, float height,
 void	SCR_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
 void	SCR_DrawNamedPic( float x, float y, float width, float height, const char *picname );
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+qboolean SCR_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
+				int shaderCharWidth, float fontKerning);
+void	SCR_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFrom640 );
+void	SCR_DrawFontStringExt( font_t *font, float x, float y, const char *string, const float *setColor, qboolean forceColor,
+				qboolean noColorEscape, qboolean drawShadow, qboolean adjustFrom640, int maxChars );
+void	SCR_DrawFontString( font_t *font, int x, int y, const char *s, float alpha );
+void	SCR_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color );
+void    SCR_DrawConsoleFontChar( float x, float y, int ch );
+#endif
 void	SCR_DrawBigString( int x, int y, const char *s, float alpha, qboolean noColorEscape );			// draws a string with embedded color control characters with fade
 void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, qboolean noColorEscape );	// ignores embedded color control characters
+#ifndef IOQ3ZTM // FONT_REWRITE
 void	SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qboolean forceColor, qboolean noColorEscape );
 void	SCR_DrawSmallChar( int x, int y, int ch );
-#ifdef IOQ3ZTM // USE_FREETYPE
-void    SCR_DrawConsoleFontChar( float x, float y, int ch );
-float   SCR_ConsoleFontCharWidth( int ch );
-float   SCR_ConsoleFontCharHeight ( void );
-float   SCR_ConsoleFontStringWidth( const char *s, int len );
 #endif
 
 
