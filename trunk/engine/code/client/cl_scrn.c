@@ -140,7 +140,7 @@ qboolean SCR_LoadFont(font_t *font, const char *ttfName, const char *shaderName,
 	}
 
 	if (shaderName[0] != '\0') {
-		font->fontShader = re.RegisterShader(shaderName);
+		font->fontShader = re.RegisterShaderNoMip(shaderName);
 
 		if (font->fontShader) {
 			return qtrue;
