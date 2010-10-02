@@ -1,0 +1,31 @@
+// MusicDefs, similar to shaders
+// Loaded from music/musiclist.txt and music/*.music files
+
+/*
+music/example_with_intro
+{
+	intro "music/example_intro.wav" // introduction for main background music
+	loop "music/example_loop.wav" // main background music
+	volume 1.0 // multiplied times music volume to adjust volume of this track
+}
+
+music/example
+{
+	intro "music/example_loop.wav" // single music file to loop
+	volume 1.0 // multiplied times music volume to adjust volume of this track
+}
+*/
+
+/* Tests
+music/menu
+{
+	intro "music/NeilCrowe_-_Gone.ogg"
+	volume 0.5
+}
+
+city
+{
+	intro "music/NeilCrowe_-_Gone.ogg"
+}
+*/
+
