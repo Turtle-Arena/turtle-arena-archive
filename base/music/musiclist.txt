@@ -16,16 +16,25 @@ music/example
 }
 */
 
-/* Tests
-music/menu
+// City music
+music/city
 {
+	// The Mulletz - Gone - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/28169
 	intro "music/NeilCrowe_-_Gone.ogg"
-	volume 0.5
 }
 
-city
+// Subway music
+music/subway
 {
-	intro "music/NeilCrowe_-_Gone.ogg"
+	// The Mulletz - Overboard Blues - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/28216
+	intro "music/NeilCrowe_-_Overboard_Blues.ogg"
 }
-*/
+
+// Use for a dojo-type level?
+//music/dojo
+music/menu
+{
+	// The Mulletz - I Fear The Fear (2.24 mix) - CC-BY-NC-SA - http://ccmixter.org/files/NeilCrowe/28003
+	intro "music/NeilCrowe_-_I_Fear_The_Fear_(2.24_mix).ogg"
+}
 
