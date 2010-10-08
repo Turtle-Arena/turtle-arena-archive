@@ -8,7 +8,7 @@ To create any of the packages you need the Turtle Arena source code and the abil
 == Windows NSIS Installer ==
 To create the Windows NSIS Installer you need to install NSIS and the Turtle Arena source code.
 
-  # Install NSIS 2.44 (2.46 doesn't create a valid installer) (NOTE: Ubuntu 10.04 (lucid) has 2.46 in its package manage so you will need to install a older 2.44 package from Ubuntu 9.10 (karmic))
+  # Install NSIS 2.44 (2.46 doesn't create a valid installer) (NOTE: Ubuntu 10.04 (lucid) has 2.46 in its package repository so you will need to install a older 2.44 package from Ubuntu 9.10 (karmic))
   # Download the Turtle Arena source code if you do not already have it
   # Copy assets0.pk3 into the engine/misc/nsis/ directory inside of the Turtle Arena source
   # Open a terminal and change to the engine/misc/nsis/ directory inside of the Turtle Arena source
