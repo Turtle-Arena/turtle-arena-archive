@@ -483,7 +483,6 @@ void S_GetMusicForIntro(char *intro, char *loop, float *volume)
 {
 	int i;
 	char name[MAX_QPATH];
-	char *ext;
 
 	if (!intro || !*intro) {
 		return;
@@ -494,11 +493,7 @@ void S_GetMusicForIntro(char *intro, char *loop, float *volume)
 	//	return;
 	//}
 
-	Q_strncpyz(name, intro, MAX_QPATH);
-	// Remove EXT
-	if ((ext = strstr(name, "."))) {
-		*ext = '\0';
-	}
+	COM_StripExtension(intro, name, sizeof(name));
 
 	for (i = 0; i < MAX_MUSICDEFS; i++)
 	{
@@ -528,7 +523,6 @@ void S_LoadMusicFile(const char *filename)
 	char *buffer;
 	char *p;
 	char *token;
-	char *ext;
 	musicDef_t *musicDef;
 	int i;
 
@@ -563,11 +557,7 @@ void S_LoadMusicFile(const char *filename)
 		}
 
 		// token is name
-		Q_strncpyz(musicDef->name, token, MAX_QPATH);
-		// Remove EXT
-		if ((ext = strstr(musicDef->name, "."))) {
-			*ext = '\0';
-		}
+		COM_StripExtension(token, musicDef->name, sizeof(musicDef->name));
 
 		token = COM_ParseExt(&p, qtrue);
 		if(token[0] != '{' && token[1] != '\0')
@@ -600,11 +590,7 @@ void S_LoadMusicFile(const char *filename)
 					break;
 				}
 
-				Q_strncpyz(musicDef->intro, token, MAX_QPATH);
-				// Remove EXT
-				if ((ext = strstr(musicDef->intro, "."))) {
-					*ext = '\0';
-				}
+				COM_StripExtension(token, musicDef->intro, sizeof(musicDef->intro));
 				continue;
 			}
 			else if ( Q_stricmp(token, "loop") == 0 ) {
@@ -614,11 +600,7 @@ void S_LoadMusicFile(const char *filename)
 					break;
 				}
 
-				Q_strncpyz(musicDef->loop, token, MAX_QPATH);
-				// Remove EXT
-				if ((ext = strstr(musicDef->loop, "."))) {
-					*ext = '\0';
-				}
+				COM_StripExtension(token, musicDef->loop, sizeof(musicDef->loop));
 				continue;
 			}
 			else if ( Q_stricmp(token, "volume") == 0 ) {
