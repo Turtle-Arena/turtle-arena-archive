@@ -67,7 +67,8 @@ OutFile "${GAME_FSNAME}-${VERSION}-${RELEASE}.x86.exe"
 ;Pages
 
 !insertmacro MULTIUSER_PAGE_INSTALLMODE
-; !insertmacro MUI_PAGE_LICENSE "../../../COPYING.txt"
+;!insertmacro MUI_PAGE_LICENSE "../../../COPYING.txt"
+!define MUI_COMPONENTSPAGE_NODESC
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -106,9 +107,11 @@ Section "${GAMENAME} (required)"
   File "../../build/release-mingw32-x86/${SERVER}"
   File "../../build/release-mingw32-x86/${CLIENT}"
   File "../../../COPYING.txt"
-  File "../../../GAME_README.txt"
-  File "../../id-readme.txt"
-  File "../../voip-readme.txt"
+  File "../../../COPYRIGHTS.txt"
+  File "../../../CREDITS.txt"
+  File "/oname=readme.txt" "../../../GAME_README.txt"
+  ;File "../../id-readme.txt"
+  ;File "../../voip-readme.txt"
 
   SetOutPath "$INSTDIR\${MODDIR}"
   File "assets0.pk3"
@@ -137,7 +140,7 @@ Section "Start Menu Shortcuts"
 
   CreateDirectory "$SMPROGRAMS\${GAMENAME}"
   CreateShortCut "$SMPROGRAMS\${GAMENAME}\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
-  CreateShortCut "$SMPROGRAMS\${GAMENAME}\turtlearena.lnk" "$INSTDIR\${CLIENT}" "" "$INSTDIR\${SERVER}" 0
+  CreateShortCut "$SMPROGRAMS\${GAMENAME}\${GAMENAME}.lnk" "$INSTDIR\${CLIENT}" "" "$INSTDIR\${SERVER}" 0
 
 SectionEnd
 
@@ -184,9 +187,13 @@ Section "Uninstall"
   Delete $INSTDIR\${SERVER}
 
   Delete $INSTDIR\COPYING.txt
-  Delete $INSTDIR\README.txt
-  Delete $INSTDIR\id-readme.txt
-  Delete $INSTDIR\voip-readme.txt
+  Delete $INSTDIR\COPYRIGHTS.txt
+  Delete $INSTDIR\CREDITS.txt
+  Delete $INSTDIR\readme.txt
+  ;Delete $INSTDIR\id-readme.txt
+  ;Delete $INSTDIR\voip-readme.txt
+
+  Delete $INSTDIR\zlib1.dll
 
   Delete $INSTDIR\SDL.dll
 
@@ -198,7 +205,7 @@ Section "Uninstall"
 
   ; Remove shortcuts, if any
   Delete "$SMPROGRAMS\${GAMENAME}\Uninstall.lnk"
-  Delete "$SMPROGRAMS\${GAMENAME}\turtlearena.lnk"
+  Delete "$SMPROGRAMS\${GAMENAME}\${GAMENAME}.lnk"
 
   ; Remove directories used
   RMDir "$SMPROGRAMS\${GAMENAME}"
