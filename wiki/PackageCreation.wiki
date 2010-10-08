@@ -1,0 +1,32 @@
+#summary Installer and packaging information
+#labels Phase-Deploy
+
+Turtle Arena is released using a few different installers/packages, this page describes how to create them.
+
+To create any of the packages you need the Turtle Arena source code and the ability to compile Turtle Arena (using 'make').
+
+== Windows NSIS Installer ==
+To create the Windows NSIS Installer you need to install NSIS and the Turtle Arena source code.
+
+  # Install NSIS 2.44 (2.46 doesn't create a valid installer) (NOTE: Ubuntu 10.04 (lucid) has 2.46 in its package manage so you will need to install a older 2.44 package from Ubuntu 9.10 (karmic))
+  # Download the Turtle Arena source code if you do not already have it
+  # Copy assets0.pk3 into the engine/misc/nsis/ directory inside of the Turtle Arena source
+  # Open a terminal and change to the engine/misc/nsis/ directory inside of the Turtle Arena source
+  # Run 'make'
+
+=== Windows NSIS Mod Installer ===
+Turtle Arena modifications (mods) can have their own Windows NSIS Installer.
+
+  # Browse to engine/misc/nsis/ directory inside of the Turtle Arena source
+  # Copy the files for the mod into the directory.
+  # Copy turtlearena-q3ctc.nsi and rename it to trutlearena-yourmodname.nsi
+  # Open the new file and modify the lines above 'no need to edit below in theory' to suit your mod
+  # Run 'makensis trutlearena-yourmodname.nsi
+
+If all went well, you should have a installer/uninstaller for your mod now.
+
+== Ubuntu PPA ==
+TODO
+
+== ZIP ==
+TODO
