@@ -2,6 +2,6 @@
 	needs="X11" \
 	section="Games/Action" \
 	title="Turtle Arena" \
-	longtitle="A 3D third-person arena combat game" \
+	longtitle="3D Third-Person Arena Combat Game" \
 	icon="/usr/share/pixmaps/turtlearena32.xpm" \
 	command="/usr/games/turtlearena"
