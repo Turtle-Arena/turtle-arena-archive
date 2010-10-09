@@ -22,7 +22,6 @@ MAKEZIP=1
 
 	# Package win32 binaries for zip install
 	WIN32=1
-	# TODO: Support 64-bit Windows? (ioquake3 does)
 
 
 # Check for x86_64
@@ -75,22 +74,13 @@ do
 	# Arguments that have a token after it
 	#
 
-	if [ "$ARG" = "--packager" ] || [ "$ARG" = "--installdir" ]
+	if [ "$ARG" = "--installdir" ]
 	then
 		NEXT_ARG="$ARG"
 		continue
 	fi
 
 	case "$NEXT_ARG" in
-		--packager)
-			if [ "$NAME_AND_EMAIL" = "" ]
-			then
-				NAME_AND_EMAIL="$ARG"
-			else
-				NAME_AND_EMAIL="$NAME_AND_EMAIL $ARG"
-			fi
-			continue
-			;;
 		--installdir)
 			INSTALLDIR="$ARG"
 			NEXT_ARG=""
@@ -216,48 +206,7 @@ if [ $DATAFILES -eq 1 ]
 then
 	echo "Data..."
 
-	echo "  Coping base data (temp files)..."
-	mkdir -p $INSTALLDIR/base_svn
-	cp -r base/* $INSTALLDIR/base_svn
-
-	# Remove shared libraries
-	rm $INSTALLDIR/base_svn/*.so
-	rm $INSTALLDIR/base_svn/*.dll
-
-	# Remove files sometimes used for testing
-	rm $INSTALLDIR/base_svn/*.pk3
-	rm $INSTALLDIR/base_svn/*.zip
-
-	# Copy QVMs to $INSTALLDIR/base_svn
-	echo "  Coping QVMs..."
-	rm $INSTALLDIR/base_svn/vm/*.qvm
-	cp engine/build/release-$PLATFORM/base/vm/*.qvm $INSTALLDIR/base_svn/vm
-
-	# Cleanup install/base_svn directory (Remove .svn files)
-	echo "  Removing svn and backup files..."
-
-	find $INSTALLDIR/base_svn/ -type d -name '.svn' -exec rm -rf '{}' \; 2>/dev/null
-	find $INSTALLDIR/base_svn/ -type f -name '.svnignore' -exec rm -rf '{}' \; 2>/dev/null
-	find $INSTALLDIR/base_svn/ -type f -name '*~' -exec rm -rf '{}' \; 2>/dev/null
-
-	# ZIP all of the files in install/base_svn into install/base/assests0.pk3
-	echo "  Zipping assets..."
-	mkdir -p $INSTALLDIR/base
-	if [ -f $INSTALLDIR/base/assets0.pk3 ]
-	then
-		rm $INSTALLDIR/base/assets0.pk3
-	fi
-
-	cd $INSTALLDIR/base_svn/
-	zip -r assets0.pk3 * | grep -v "adding"
-	cd $STARTDIR
-	mv $INSTALLDIR/base_svn/assets0.pk3 $INSTALLDIR/base
-	cd $STARTDIR
-
-	# Remove base_svn
-	echo "  Removing temp files..."
-	rm -r $INSTALLDIR/base_svn/
-
+	./package-assets.sh --installdir $INSTALLDIR
 fi
 
 #
