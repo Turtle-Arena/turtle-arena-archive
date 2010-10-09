@@ -397,6 +397,9 @@ struct gclient_s {
 	int lockonTime;
 	qboolean hadLockon;
 #endif
+#ifdef TA_SP // Save/Load
+	qboolean dontClearDataNextSpawn;
+#endif
 
 	char		*areabits;
 };

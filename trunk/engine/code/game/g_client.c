@@ -1322,6 +1322,9 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 //	areabits = client->areabits;
 
 	memset( client, 0, sizeof(*client) );
+#ifdef TA_SP // Save/Load
+	client->dontClearDataNextSpawn = qtrue; // Don't clean client again on first spawn
+#endif
 
 	client->pers.connected = CON_CONNECTING;
 
@@ -1342,6 +1345,14 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	// get and distribute relevent paramters
 	G_LogPrintf( "ClientConnect: %i\n", clientNum );
 	ClientUserinfoChanged( clientNum );
+
+#ifdef TA_SP // Save/Load
+	//
+	// Load persistant data
+	//
+	G_LoadPersistant(clientNum);
+	G_LoadGameClient(clientNum);
+#endif
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
 #ifdef TA_SP
@@ -1557,6 +1568,12 @@ void ClientSpawn(gentity_t *ent) {
 
 	// clear everything but the persistant data
 
+#ifdef TA_SP // Save/Load
+	if (client->dontClearDataNextSpawn) {
+		client->dontClearDataNextSpawn = qfalse;
+		client->lastkilled_client = -1;
+	} else {
+#endif
 	saved = client->pers;
 	savedSess = client->sess;
 	savedPing = client->ps.ping;
@@ -1582,6 +1599,10 @@ void ClientSpawn(gentity_t *ent) {
 		client->ps.persistant[i] = persistant[i];
 	}
 	client->ps.eventSequence = eventSequence;
+#ifdef TA_SP // Save/Load
+	}
+#endif
+
 	// increment the spawncount so the client will detect the respawn
 	client->ps.persistant[PERS_SPAWN_COUNT]++;
 	client->ps.persistant[PERS_TEAM] = client->sess.sessionTeam;
@@ -1835,14 +1856,6 @@ void ClientSpawn(gentity_t *ent) {
 		}
 #endif
 	}
-
-#ifdef TA_SP
-	//
-	// Load persistant data
-	//
-	G_LoadPersistant(client->ps.clientNum);
-	G_LoadGameClient(client->ps.clientNum);
-#endif
 
 	// run a client frame to drop exactly to the floor,
 	// initialize animations and other things
