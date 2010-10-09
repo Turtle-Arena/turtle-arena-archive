@@ -12,6 +12,19 @@ The data files that have other source files are included in base-src/
 	base/gfx/damage/bullet_mrk.png was drawn over OpenArena's gfx/damage/bullet_mrk
 	base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
 
+== The Mulletz ==
+The following are Copyright (C) 2010 NeilCrowe aka The Mulletz
+	and are license under the Creative Commons NonCommercial (see list for details)
+
+music/NeilCrowe_-_Gone.ogg
+		The Mulletz - Gone - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/28169
+
+music/NeilCrowe_-_Overboard_Blues.ogg
+		The Mulletz - Overboard Blues - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/28216
+
+music/NeilCrowe_-_I_Fear_The_Fear_(2.24_mix).ogg
+		The Mulletz - I Fear The Fear (2.24 mix) - CC-BY-NC-SA - http://ccmixter.org/files/NeilCrowe/28003
+
 == OpenArena ==
 The following are from OpenArena and are Copyright (C) 2006 Dmn_clown
 	and are license under the GNU General Public License; either version 2 of the License, or
