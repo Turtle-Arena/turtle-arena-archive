@@ -141,10 +141,9 @@ qboolean S_TheCheckExtension(char *filename)
 	char *extptr;
 
 	strncpy(fn, filename, stringlen+1);
-	extptr = Q_strrchr(fn, '.');
+	extptr = S_FileExtension(fn);
 
-	if(!extptr)
-	{
+	if (!extptr) {
 		extptr = &fn[stringlen];
 
 		extptr[0] = '.';
@@ -158,10 +157,8 @@ qboolean S_TheCheckExtension(char *filename)
 
 	FS_FOpenFileRead(fn, &hnd, qtrue);
 
-	if(!hnd)
-	{
-		if(!strcmp(++extptr, "wav"))
-		{
+	if (!hnd) {
+		if (!strcmp(++extptr, "wav")) {
 			extptr[0] = 'o';
 			extptr[1] = 'g';
 			extptr[2] = 'g';
@@ -169,11 +166,12 @@ qboolean S_TheCheckExtension(char *filename)
 
 			FS_FOpenFileRead(fn, &hnd, qtrue);
 
-			if(!hnd)
+			if(!hnd) {
 				return qfalse;
-		}
-		else
+			}
+		} else {
 			return qfalse;
+		}
 	}
 
 	FS_FCloseFile(hnd);
@@ -229,7 +227,19 @@ snd_stream_t *S_CodecOpenStream(const char *filename)
 	snd_codec_t *codec;
 	char fn[MAX_QPATH];
 
+#ifdef IOQ3ZTM // OPENARENA // Load Ogg sounds
+	codec = NULL;
+	strncpy(fn, filename, sizeof(fn));
+	if (!S_TheCheckExtension(fn))
+	{
+		// Didn't find file.
+		Com_Printf("Couldn't find %s\n", filename);
+		return NULL;
+	}
+	codec = S_FindCodecForFile(fn);
+#else
 	codec = S_FindCodecForFile(filename);
+#endif
 	if(!codec)
 	{
 		Com_Printf("Unknown extension for %s\n", filename);
