@@ -269,11 +269,16 @@ cp CREDITS.txt $INSTALLDIR
 # Convert to dos line ending
 todos $INSTALLDIR/*.txt
 
+# Enable portable app mode!
+mkdir -p $INSTALLDIR/settings
+echo "yes" > $INSTALLDIR/settings/portable
+
 # Copy all of the files other than base/ into turtlearena-src/ and zip it.
 echo "Warning: You need to manually copy the source into $INSTALLDIR !"
 
 # zip install?
 # base/assets0.pk3 readme.txt COPYING.txt COPYRIGHTS.txt CREDITS.txt
+# settings/portable
 # if Linux; turtlearena.sh
 # if Linux x86_64; .x86_64 and .i386 binaries
 # if Linux i386; .i386 binaries

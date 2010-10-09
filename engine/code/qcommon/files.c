@@ -3025,6 +3025,34 @@ qboolean FS_BaseFileExists( const char *file )
 	return qfalse;
 }
 
+#ifdef IOQ3ZTM // PORTABLE_APP
+/*
+================
+FS_PortableMode
+
+Save data in "setting", if there is a settings/portable file that contains "yes".
+================
+*/
+qboolean FS_PortableMode(void)
+{
+	FILE *f;
+	char *testpath;
+	char buf[4];
+
+	testpath = FS_BuildOSPath( fs_basepath->string, "settings", "portable" );
+
+	f = fopen( testpath, "rb" );
+	if (f) {
+		fread(buf, sizeof(buf), 1, f);
+		fclose( f );
+	} else {
+		return qfalse;
+	}
+
+	return (Q_stricmpn(buf, "yes", 3) == 0);
+}
+#endif
+
 /*
 ================
 FS_Startup
@@ -3041,6 +3069,18 @@ static void FS_Startup( const char *gameName )
 	fs_debug = Cvar_Get( "fs_debug", "0", 0 );
 	fs_basepath = Cvar_Get ("fs_basepath", Sys_DefaultInstallPath(), CVAR_INIT );
 	fs_basegame = Cvar_Get ("fs_basegame", "", CVAR_INIT );
+#ifdef IOQ3ZTM // PORTABLE_APP
+	if (FS_PortableMode())
+	{
+		static char settings[ MAX_OSPATH ] = { 0 };
+
+		strcpy(settings, fs_basepath->string);
+		strcat(settings, "/settings");
+
+		homePath = settings;
+	}
+	else
+#endif
 	homePath = Sys_DefaultHomePath();
 	if (!homePath || !homePath[0]) {
 		homePath = fs_basepath->string;
