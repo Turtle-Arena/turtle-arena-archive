@@ -5,7 +5,7 @@
 ; This file is used to automatically build the installers in the
 ; openSUSE build service, don't break this!
 ;
-; you have to copy assets0.pk3, SDL.dll, libcurl-4.dll, and OpenAL32.dll here manually
+; you have to copy SDL.dll, OpenAL32.dll, libcurl-4.dll, and zlib1.dll here manually
 
 !define VERSION "XXXVERSIONXXX"
 !define RELEASE "XXXRELEASEXXX"
@@ -44,7 +44,7 @@
 !define MUI_ICON "../quake3.ico"
 
 ; The name of the installer
-Name "${GAMENAME}"
+Name "${GAMENAME} ${VERSION}"
 
 ; The file to write
 OutFile "${GAME_FSNAME}-${VERSION}-${RELEASE}.x86.exe"
@@ -94,7 +94,7 @@ Function un.onInit
 FunctionEnd
 
 ; The stuff to install
-Section "${GAMENAME} (required)"
+Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
 
   SectionIn RO
 
@@ -114,7 +114,7 @@ Section "${GAMENAME} (required)"
   ;File "../../voip-readme.txt"
 
   SetOutPath "$INSTDIR\${MODDIR}"
-  File "assets0.pk3"
+  File "/oname=assets0.pk3" "XXXASSETSXXX"
   File "../../build/release-mingw32-x86/${MODDIR}/cgamex86.dll"
   File "../../build/release-mingw32-x86/${MODDIR}/qagamex86.dll"
   File "../../build/release-mingw32-x86/${MODDIR}/uix86.dll"
