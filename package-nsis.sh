@@ -81,7 +81,11 @@ fi
 # Build assets0.pk3 if not already built
 if [ ! -f $INSTALLDIR/base/assets0.pk3 ]
 then
-	./package-assets.sh --installerdir $INSTALLDIR
+	./package-assets.sh --installdir $INSTALLDIR
+
+	echo "Go run Turtle Arena and update the checksum for assets0.pk3 if"
+	echo "    needed, near the top of engine/code/qcommon/files.c!"
+	exit 1
 fi
 
 # ZTM: TODO: Automaticly copy the needed DLLs to engine/misc/nsis/ (These are not kept in subversion currently...)
@@ -92,8 +96,12 @@ then
 	exit 1
 fi
 
+# Update client and server binaries
+cd engine/
+sh cross-make-mingw.sh ARCH=x86 BUILD_GAME_SO=0
+
 # change to engine/misc/nsis/ and run make
-cd engine/misc/nsis/
+cd misc/nsis/
 
 # Clean up
 make clean
@@ -105,5 +113,8 @@ ASSETS0=`echo "../../../$INSTALLDIR/base/assets0.pk3" | sed 's:[]\[\^\$\.\*\/]:\
 make ASSETS=$ASSETS0
 
 # Move to trunk
-make install INSTALLDIR=$STARTDIR
+make install INSTALLDIR=$STARTDIR/$INSTALLDIR/nsis
+
+# Don't leave it a mess
+make clean
 

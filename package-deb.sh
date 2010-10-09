@@ -25,10 +25,8 @@ ENGINE_DEB_CONFIG=debian_main/engine/debian
 GAMENAME="turtlearena"
 
 #
-# !!Must update debian_main if version, or deb_version if changed!!
-#
-# You must update the changelogs (debian_main/engine/debian/changelog and debian_main/data/debian/changelog)
-# Optionally increase data requirement for engine in debian_main/engine/debian/control
+# NOTE: Must update changelogs if version or deb_version are changed!
+#		(debian_main/engine/debian/changelog and debian_main/data/debian/changelog)
 #
 
 # Version (Current Turtle Arena version)
@@ -36,6 +34,90 @@ VERSION=0.3
 # For debian only fixes/changes update DEB_VERSION "turtlearena_$VERSION-$DATA_DEB_VERSION"
 DATA_DEB_VERSION=1
 ENGINE_DEB_VERSION=1
+
+# Don't automaticly upload to the PPA
+UPLOAD_TO_PPA=0
+
+# Vars for command line handling
+USAGE=0
+NEXT_ARG=""
+
+#
+# Read command line arguments
+#
+for ARG in `echo $*`
+do
+
+	#
+	# Single argument options
+	#
+
+	if [ "$ARG" = "--help" ] || [ "$ARG" = "-help" ] || [ "$ARG" = "-h" ]
+	then
+		USAGE=1
+		break
+	fi
+
+	if [ "$ARG" = "--upload-to-ppa" ]
+	then
+		UPLOAD_TO_PPA=1
+		continue
+	fi
+
+	#
+	# Arguments that have a token after it
+	#
+
+	if [ "$ARG" = "--installdir" ]
+	then
+		NEXT_ARG="$ARG"
+		continue
+	fi
+
+	case "$NEXT_ARG" in
+		--installdir)
+			INSTALLDIR="$ARG"
+			NEXT_ARG=""
+			;;
+		*)
+			echo "Unknown argument '$ARG'"
+			USAGE=2
+			NEXT_ARG=""
+			;;
+	esac
+
+done
+
+#
+# Show usage, the user asked to see it.
+#
+if [ $USAGE -eq 1 ]
+then
+	echo "Usage: $0 OPTIONS..."
+	echo "  Package Turtle Arena debian source and binary packages for release"
+	echo "    into installdir"
+	echo ""
+	echo "  OPTIONS"
+	echo "    --help         Show this help"
+	echo "           -help"
+	echo "           -h"
+	echo "    --installdir [dir]  directory to put files"
+	echo "                          (default: \"debian_source\")"
+	echo "    --upload-to-ppa     Upload already created source packages to the PPA"
+	exit 1
+fi
+
+if [ $UPLOAD_TO_PPA -eq 1 ]
+then
+
+	# Upload data source to PPA
+	dput ppa:zturtleman/turtlearena ${GAMENAME}-data_${VERSION}-${DATA_DEB_VERSION}_source.changes
+
+	# Upload engine source to PPA
+	dput ppa:zturtleman/turtlearena ${GAMENAME}_${VERSION}-${ENGINE_DEB_VERSION}_source.changes
+
+	exit 0
+fi
 
 if [ $MAKE_DATA_DEB -eq 1 ]
 then
@@ -49,13 +131,16 @@ then
 	else
 		ORIGDIR=$GAMENAME-data-$VERSION
 	fi
-	mkdir -p $INSTALLDIR/$ORIGDIR
 
 	# FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
 	# Build assets0.pk3 if not already built
 	if [ ! -f $STARTDIR/install/base/assets0.pk3 ]
 	then
 		./package-assets.sh
+
+		echo "Go run Turtle Arena and update the checksum for assets0.pk3 if"
+		echo "    needed, near the top of engine/code/qcommon/files.c!"
+		exit 1
 	fi
 
 	mkdir -p $INSTALLDIR/$ORIGDIR/base
