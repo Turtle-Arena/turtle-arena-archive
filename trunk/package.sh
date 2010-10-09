@@ -2,8 +2,6 @@
 #
 # Package Turtle Arena for release.
 #
-#  Supports Zip releases.
-#
 
 # Remember where we started the script, so we can return there.
 STARTDIR=`pwd`
@@ -11,17 +9,11 @@ STARTDIR=`pwd`
 # Directory to put the files for release
 INSTALLDIR=install
 
-# Package Linux binaries
+# Package Linux deb and copy Linux binaries into installdir
 LINUX=1
 
-# Create assets0.pk3
-DATAFILES=1
-
-# TODO: Zip the files? currently they have to be zipped /after/ running the script.
-MAKEZIP=1
-
-	# Package win32 binaries for zip install
-	WIN32=1
+# Package Win32 NSIS installer and copy Win32 binaries into installdir
+WIN32=1
 
 
 # Check for x86_64
@@ -55,20 +47,17 @@ do
 		break
 	fi
 
-	if [ "$ARG" = "--no-zip" ]
+	if [ "$ARG" = "--no-linux" ]
 	then
-		MAKEZIP=0
-		NEXT_ARG=""
+		LINUX=0
 		continue
 	fi
 
-	if [ "$ARG" = "--no-data" ]
+	if [ "$ARG" = "--no-win32" ]
 	then
-		DATAFILES=0
-		NEXT_ARG=""
+		WIN32=0
 		continue
 	fi
-
 
 	#
 	# Arguments that have a token after it
@@ -107,10 +96,10 @@ then
 	echo "    --help         Show this help"
 	echo "           -help"
 	echo "           -h"
-	echo "    --no-zip            don't copy files for zip install to installdir"
-	echo "    --no-data           don't create assests0.pk3"
 	echo "    --installdir [dir]  directory to copy files to for zip install"
 	echo "                          (default: \"install\")"
+	echo "    --no-linux          Don't package Linux"
+	echo "    --no-win32          Don't package Win32"
 	exit 1
 fi
 
@@ -121,15 +110,6 @@ if [ $USAGE -eq 2 ]
 then
 	echo "Try \`$0 --help' for more information."
 	exit 1
-fi
-
-#
-# Disable binary building if not zip
-#
-if [ $MAKEZIP -eq 0 ]
-then
-	LINUX=0
-	WIN32=0
 fi
 
 
@@ -166,6 +146,7 @@ cd $STARTDIR
 
 mkdir -p $INSTALLDIR
 
+
 #
 # Copy client and server binaries
 #
@@ -192,50 +173,128 @@ then
 		cp engine/build/release-mingw32-x86/turtlearena.x86.exe $INSTALLDIR
 		cp engine/build/release-mingw32-x86/turtlearena-server.x86.exe $INSTALLDIR
 
-		echo "  Warning: You need to manually copy SDL.dll version 1.2.14 into \"$INSTALLDIR\"!"
+		if [ ! -f $INSTALLDIR/SDL.dll ]
+		then
+			echo "  Warning: You need to manually copy SDL.dll version 1.2.14 into \"$INSTALLDIR\"!"
+		fi
 	fi
 
 fi
-
 
 #
 # Create assets0.pk3
 #
 
-if [ $DATAFILES -eq 1 ]
+if [ ! -f $INSTALLDIR/base/assets0.pk3 ]
 then
 	echo "Data..."
 
 	./package-assets.sh --installdir $INSTALLDIR
+
+	if [ -f $INSTALLDIR/base/assets0.pk3 ]
+	then
+		#
+		# Must manually update checksum
+		#
+
+		# OLD
+		#echo "Go run Turtle Arena and update the checksum for assets0.pk3 near"
+		#echo "    the top of engine/code/qcommon/files.c!"
+
+		# NEW
+		EDITOR=nano
+		echo ""
+		echo "You may need to update the assets0.pk3 checksum."
+		echo " 1) Game server will run, copy checksum if shown (Ctrl+Shift+C), type quit"
+		echo " 2) $EDITOR will open engine/code/qcommon/files.c, replace the old checksum"
+		echo "  if one was shown (scroll down, paste using Ctrl+Shift+V), exit editor (Ctrl+X)"
+
+		# Wait for keypress
+		tput smso
+		echo "Press any key"
+		tput rmso
+		oldstty=`stty -g`
+		stty -icanon -echo min 1 time 0
+		dd bs=1 count=1 >/dev/null 2>&1
+		stty "$oldstty"
+		echo ""
+
+		# Run server
+		cd $INSTALLDIR
+		./turtlearena-server.$ARCH
+
+		echo ""
+		echo "Remember!"
+		echo " 2) $EDITOR will open engine/code/qcommon/files.c, replace the old checksum"
+		echo "  if one was shown (scroll down, paste using Ctrl+Shift+V), exit editor (Ctrl+X)"
+
+		# Wait for keypress
+		tput smso
+		echo "Press any key"
+		tput rmso
+		oldstty=`stty -g`
+		stty -icanon -echo min 1 time 0
+		dd bs=1 count=1 >/dev/null 2>&1
+		stty "$oldstty"
+		echo ""
+
+		# Open editor
+		cd $STARTDIR
+		$EDITOR engine/code/qcommon/files.c
+
+		# Updated checksum in source, rerun script!
+		./$0
+	fi
+
+	exit 1
 fi
 
 #
 # Copy readme, COPYING, etc for zip
 #
 
-if [ $MAKEZIP -eq 1 ]
+echo "Copying docs..."
+
+if [ $LINUX -eq 1 ]
 then
-	echo "Copying docs..."
+	# Copy Linux launcher too
+	cp extras/turtlearena.sh $INSTALLDIR
+fi
 
-	if [ $LINUX -eq 1 ]
-	then
-		# Copy linux launcher too
-		cp extras/turtlearena.sh $INSTALLDIR
-	fi
+cp GAME_README.txt $INSTALLDIR/readme.txt
+cp COPYING.txt $INSTALLDIR
+cp COPYRIGHTS.txt $INSTALLDIR
+cp CREDITS.txt $INSTALLDIR
 
-	cp GAME_README.txt $INSTALLDIR/readme.txt
-	cp COPYING.txt $INSTALLDIR
-	cp COPYRIGHTS.txt $INSTALLDIR
-	cp CREDITS.txt $INSTALLDIR
+# Convert to dos line ending
+todos $INSTALLDIR/*.txt
 
-	# Convert to dos line ending
-	todos $INSTALLDIR/*.txt
+# Copy all of the files other than base/ into turtlearena-src/ and zip it.
+echo "Warning: You need to manually copy the source into $INSTALLDIR !"
 
-	# Copy all of the files other than base/ into turtlearena-src/ and zip it.
-	echo "Warning: You need to manually copy the source into $INSTALLDIR !"
+# zip install?
+# base/assets0.pk3 readme.txt COPYING.txt COPYRIGHTS.txt CREDITS.txt
+# if Linux; turtlearena.sh
+# if Linux x86_64; .x86_64 and .i386 binaries
+# if Linux i386; .i386 binaries
+# if Win32; .x86.exe binaries
 
-	# zip install?
 
+
+#
+# Build Win32 NSIS installer
+#
+if [ $WIN32 -eq 1 ]
+then
+	./package-nsis.sh --installdir $INSTALLDIR
+fi
+
+#
+# Build DEB source and binary packages
+#
+if [ $LINUX -eq 1 ]
+then
+	./package-deb.sh --installdir $INSTALLDIR/deb
 fi
 
 echo "Done!"

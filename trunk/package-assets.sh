@@ -157,3 +157,7 @@ cd $STARTDIR
 echo "  Removing temporary files..."
 rm -r $INSTALLDIR/base_svn/
 
+#
+# You may need to update the checksum for assets0.pk3 in engine/code/qcommon/files.c
+#    to play on pure servers.
+#
