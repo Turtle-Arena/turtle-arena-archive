@@ -590,7 +590,7 @@ void S_LoadMusicFile(const char *filename)
 					break;
 				}
 
-				COM_StripExtension(token, musicDef->intro, sizeof(musicDef->intro));
+				Q_strncpyz(musicDef->intro, token, sizeof(musicDef->intro));
 				continue;
 			}
 			else if ( Q_stricmp(token, "loop") == 0 ) {
@@ -600,7 +600,7 @@ void S_LoadMusicFile(const char *filename)
 					break;
 				}
 
-				COM_StripExtension(token, musicDef->loop, sizeof(musicDef->loop));
+				Q_strncpyz(musicDef->loop, token, sizeof(musicDef->loop));
 				continue;
 			}
 			else if ( Q_stricmp(token, "volume") == 0 ) {
