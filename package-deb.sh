@@ -52,14 +52,14 @@ then
 	mkdir -p $INSTALLDIR/$ORIGDIR
 
 	# FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
-	# First build assets0.pk3?
-	if [ -f $STARTDIR/install/base/assets0.pk3 ]
+	# Build assets0.pk3 if not already built
+	if [ ! -f $STARTDIR/install/base/assets0.pk3 ]
 	then
-		mkdir -p $INSTALLDIR/$ORIGDIR/base
-		cp $STARTDIR/install/base/assets0.pk3 $INSTALLDIR/$ORIGDIR/base
-	else
-		./package.sh --no-zip --installdir $INSTALLDIR/$ORIGDIR
+		./package-assets.sh
 	fi
+
+	mkdir -p $INSTALLDIR/$ORIGDIR/base
+	cp $STARTDIR/install/base/assets0.pk3 $INSTALLDIR/$ORIGDIR/base
 
 	cd $INSTALLDIR/$ORIGDIR
 
