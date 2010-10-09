@@ -1,7 +1,7 @@
 
 [Desktop Entry]
 Name=Turtle Arena
-Comment=A 3D third-person arena combat game
+Comment=3D Third-Person Arena Combat Game
 Exec=turtlearena
 Terminal=false
 Icon=turtlearena128
