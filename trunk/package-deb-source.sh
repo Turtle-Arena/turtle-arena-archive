@@ -1,7 +1,9 @@
 #!/bin/sh
 #
-# Package debian source files for client/server and data
-#  (For Ubuntu PPA)
+# Package debian source and binary packages for client/server and data,
+#    for Ubuntu PPA and ready install.
+#
+# (Turtle Arena Ubuntu PPA: https://launchpad.net/~zturtleman/+archive/turtlearena-stable)
 #
 # NOTE: You must have the .orig.tar.gz files when creating
 #  patches (0.2-2, 0.2-3, etc et) (You can download them from the Ubuntu PPA)
@@ -21,6 +23,14 @@ DATA_DEB_CONFIG=debian_main/data/debian
 ENGINE_DEB_CONFIG=debian_main/engine/debian
 
 GAMENAME="turtlearena"
+
+#
+# !!Must update debian_main if version, or deb_version if changed!!
+#
+# You must update the changelogs (debian_main/engine/debian/changelog and debian_main/data/debian/changelog)
+# Optionally increase data requirement for engine in debian_main/engine/debian/control
+#
+
 # Version (Current Turtle Arena version)
 VERSION=0.3
 # For debian only fixes/changes update DEB_VERSION "turtlearena_$VERSION-$DATA_DEB_VERSION"
@@ -48,7 +58,7 @@ then
 		mkdir -p $INSTALLDIR/$ORIGDIR/base
 		cp $STARTDIR/install/base/assets0.pk3 $INSTALLDIR/$ORIGDIR/base
 	else
-		./package.sh --no-deb --no-zip --installdir $INSTALLDIR/$ORIGDIR
+		./package.sh --no-zip --installdir $INSTALLDIR/$ORIGDIR
 	fi
 
 	cd $INSTALLDIR/$ORIGDIR
@@ -80,7 +90,12 @@ then
 
 	dpkg-buildpackage -S -rfakeroot $KEY
 
+	# Upload source to PPA
 	# dput ppa:zturtleman/turtlearena turtlearena-data_0.2-1_source.changes
+
+	# build .deb
+	cd $GAMENAME-data-$VERSION
+	dpkg-buildpackage -rfakeroot -uc -b
 fi
 
 if [ $MAKE_ENGINE_DEB -eq 1 ]
@@ -160,5 +175,12 @@ then
 
 	dpkg-buildpackage -S -rfakeroot $KEY
 
+	# Upload source to PPA
 	# dput ppa:zturtleman/turtlearena turtlearena_0.2-1_source.changes
+
+	# build .deb
+	cd $GAMENAME-$VERSION
+	dpkg-buildpackage -rfakeroot -uc -b
+	rm -r build
 fi
+
