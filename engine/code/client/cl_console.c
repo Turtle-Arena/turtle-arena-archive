@@ -676,7 +676,7 @@ void Con_DrawSolidConsole( float frac ) {
 	i = strlen( Q3_VERSION );
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-	float totalwidth = Com_FontStringWidth( &cls.fontSmall, Q3_VERSION, i ) + cl_conXOffset->integer;
+	float totalwidth = Com_FontStringWidthExt( &cls.fontSmall, Q3_VERSION, i, qfalse ) + cl_conXOffset->integer;
 	float currentWidthLocation = 0;
  	for (x=0 ; x<i ; x++) {
          SCR_DrawFontChar( &cls.fontSmall, cls.glconfig.vidWidth - totalwidth + currentWidthLocation,

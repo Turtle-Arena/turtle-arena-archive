@@ -463,7 +463,7 @@ static void CG_CenterGiantLine( float y, const char *string ) {
 	color[3] = 1;
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-	x = 0.5 * ( 640 - Com_FontStringWidth( &cgs.media.fontGiant, string, strlen(string) ) );
+	x = 0.5 * ( SCREEN_WIDTH - Com_FontStringWidth( &cgs.media.fontGiant, string, strlen(string) ) );
 #else
 	x = 0.5 * ( 640 - GIANT_WIDTH * CG_DrawStrlen( string ) );
 #endif
