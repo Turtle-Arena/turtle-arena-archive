@@ -594,7 +594,7 @@ void SCR_DrawDemoRecording( void ) {
 	sprintf( string, "RECORDING %s: %ik", clc.demoName, pos / 1024 );
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-	SCR_DrawFontStringColor(&cls.fontTiny, 320 - Com_FontStringWidth(&cls.fontTiny, string, strlen(string)) * 0.5f,
+	SCR_DrawFontStringColor(&cls.fontTiny, 320 - Com_FontStringWidth(&cls.fontTiny, string, 0) * 0.5f,
 			20, string, g_color_table[7]);
 #else
 	SCR_DrawStringExt( 320 - strlen( string ) * 4, 20, 8, string, g_color_table[7], qtrue, qfalse );
@@ -638,7 +638,7 @@ void SCR_DrawVoipMeter( void ) {
 
 	sprintf( string, "VoIP: [%s]", buffer );
 #ifdef IOQ3ZTM // FONT_REWRITE
-	SCR_DrawFontStringColor(&cls.fontTiny, 320 - Com_FontStringWidth(&cls.fontTiny, string, strlen(string)) * 0.5f,
+	SCR_DrawFontStringColor(&cls.fontTiny, 320 - Com_FontStringWidth(&cls.fontTiny, string, 0) * 0.5f,
 			10, string, g_color_table[7]);
 #else
 	SCR_DrawStringExt( 320 - strlen( string ) * 4, 10, 8, string, g_color_table[7], qtrue, qfalse );

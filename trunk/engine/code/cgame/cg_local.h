@@ -1741,8 +1741,8 @@ void CG_DrawString( float x, float y, const char *string,
 #ifdef IOQ3ZTM // FONT_REWRITE
 qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
 			int shaderCharWidth, float fontKerning);
-void CG_DrawFontStringExt( font_t *font, float x, float y, const char *string, const float *setColor, qboolean forceColor,
-		qboolean noColorEscape, qboolean drawShadow, qboolean adjustFrom640, int maxChars );
+void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const char *string, const float *setColor, qboolean forceColor,
+		qboolean noColorEscape, int drawShadow, qboolean adjustFrom640, float adjust, int limit );
 
 void CG_DrawFontString( font_t *font, int x, int y, const char *s, float alpha );
 void CG_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color );

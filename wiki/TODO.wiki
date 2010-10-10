@@ -239,6 +239,10 @@ Weapons (and attacking)
   * STARTED (IOQ3ZTM // FONT_REWRITE): Support true type fonts everywhere!
     * Status: client, cgame, and q3_ui now support ttfs everywhere!
     * FIXME: There seems to be some issues with using old bitmap fonts, like not showing text to Player Setup menu.
+    * FIXME: A lot of places use old fixed widths, which breaks centering variable width text...
+      * Take a look at where CG_DrawStrlen is used. Most (or all?) needs to be rewritten.
+      * Add a flag to tell draw function to center instead of doing it all over the place?
+        * Look at MISSIONPACK_HUD code
     * TODO: Add support for font1_prop and font2_prop into *_DrawFontStringExt? (code could be cleaner this way?)
     * TODO: Clean up new font code in q3_ui, cgame, and client
     * TODO: Merge new font code with missionpack hud font code? (and/or load the fonts from hud script)

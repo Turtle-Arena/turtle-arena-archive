@@ -1366,7 +1366,11 @@ typedef struct
 // Drawing functions must be in each specific module
 float Com_FontCharWidth( font_t *font, int ch );
 float Com_FontCharHeight( font_t *font );
-float Com_FontStringWidth( font_t *font, const char *s, int len );
+
+float Com_FontStringWidthExt( font_t *font, const char *s, int limit, qboolean skipColors );
+float Com_FontStringWidth( font_t *font, const char *s, int limit );
+float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean skipColors );
+float Com_FontStringHeight( font_t *font, const char *s, int limit );
 #endif
 
 #define Square(x) ((x)*(x))

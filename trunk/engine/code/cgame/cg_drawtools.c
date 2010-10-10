@@ -298,7 +298,7 @@ qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, 
 ** CG_DrawFontChar
 ** Characters are drawn at native screen resolution, unless adjustFrom640 is set to qtrue
 */
-void CG_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFrom640 )
+void CG_DrawFontChar( font_t *font, float useScale, float x, float y, int ch, qboolean adjustFrom640 )
 {
 	float	ax, ay, aw, ah;
 
@@ -327,13 +327,13 @@ void CG_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFro
 
 		glyph = &font->fontInfo.glyphs[ch];
 
-		yadj = glyph->top;
+		yadj = useScale * glyph->top;
 		xadj = (Com_FontCharWidth( font, ch ) - glyph->xSkip) / 2.0;
 
 		ax = x+xadj;
 		ay = y-yadj;
-		aw = glyph->imageWidth;
-		ah = glyph->imageHeight;
+		aw = useScale * glyph->imageWidth;
+		ah = useScale * glyph->imageHeight;
 
 		if (adjustFrom640) {
 			CG_AdjustFrom640( &ax, &ay, &aw, &ah );
@@ -354,7 +354,7 @@ void CG_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFro
 		}
 #endif
 
-		size = font->pointSize;
+		size = useScale * font->pointSize;
 
 		ax = x;
 		ay = y;
@@ -387,43 +387,49 @@ Draws a multi-colored string with a optional drop shadow, optionally forcing
 to a fixed color.
 ==================
 */
-void CG_DrawFontStringExt( font_t *font, float x, float y, const char *string, const float *setColor, qboolean forceColor,
-		qboolean noColorEscape, qboolean drawShadow, qboolean adjustFrom640, int maxChars )
+void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const char *string, const float *setColor, qboolean forceColor,
+		qboolean noColorEscape, int drawShadow, qboolean adjustFrom640, float adjust, int limit )
 {
 	vec4_t		color;
+	vec4_t		black;
 	const char	*s;
 	float		xx;
 	int			cnt;
+	int			maxChars;
+	float		useScale;
+	
+	// ZTM: FIXME: How should adjust and kerning be delt with?
+	if (adjust <= 0) {
+		adjust = font->kerning;
+	}
 
-	if (maxChars <= 0)
-		maxChars = 32767; // do them all!
+	maxChars = strlen(string);
+	if (limit > 0 && maxChars > limit) {
+		maxChars = limit;
+	}
 
-	if (drawShadow) // ZTM: Should this be in font_t? It is not in SCR_DrawSmallStringExt, but is in SCR_Draw(Big)StringExt
-	{
-		// draw the drop shadow
-		color[0] = color[1] = color[2] = 0;
-		color[3] = setColor[3];
-		trap_R_SetColor( color );
-		s = string;
-		xx = x;
-		while ( *s ) {
-			if ( !noColorEscape && Q_IsColorString( s ) ) {
-				s += 2;
-				continue;
-			}
-			CG_DrawFontChar( font, xx+2, y+2, *s, adjustFrom640 );
-			xx += Com_FontCharWidth( font, *s );
-			s++;
-		}
+	if (scale <= 0) {
+		// Use auto scale based on font size
+		scale = font->pointSize / 48.0f;
+	}
+
+	if (font->fontInfo.name[0]) {
+		useScale = scale * font->fontInfo.glyphScale;
+	} else {
+		//float dpi = 72.0f;
+		//float dpiScale = 72.0f / dpi;
+
+		useScale = scale * (48.0f / font->pointSize);// * dpiScale;
 	}
 
 	// draw the colored text
 	s = string;
 	xx = x;
 	cnt = 0;
-	trap_R_SetColor( setColor );
+	Vector4Copy(setColor, color);
+	trap_R_SetColor( color );
 	while ( *s && cnt < maxChars) {
-#if 1 // SCR_DrawStringExt // Is one way better then the other? Do they do the same thing?
+#if 1 // SCR_DrawStringExt // Is one way better then the other?
 		if ( !noColorEscape && Q_IsColorString( s ) ) {
 			if ( !forceColor ) {
 				Com_Memcpy( color, g_color_table[ColorIndex(*(s+1))], sizeof( color ) );
@@ -446,8 +452,23 @@ void CG_DrawFontStringExt( font_t *font, float x, float y, const char *string, c
 			}
 		}
 #endif
-        CG_DrawFontChar( font, xx, y, *s, adjustFrom640 );
-        xx += Com_FontCharWidth( font, *s );
+
+		if (drawShadow != 0)
+		{
+			float offset = drawShadow;
+
+			// draw the drop shadow
+			black[0] = black[1] = black[2] = 0;
+			black[3] = color[3];
+			trap_R_SetColor( black );
+
+			CG_DrawFontChar( font, useScale, xx+offset, y+offset, *s, adjustFrom640 );
+
+			trap_R_SetColor( color );
+		}
+
+        CG_DrawFontChar( font, useScale, xx, y, *s, adjustFrom640 );
+        xx += (Com_FontCharWidth( font, *s ) + adjust) * useScale;
         cnt++;
 		s++;
 	}
@@ -469,8 +490,8 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 	else
 		font = &cgs.media.fontTiny;
 
-	CG_DrawFontStringExt( font, x, y, string, setColor, forceColor,
-		qfalse, shadow, qtrue, maxChars );
+	CG_DrawFontStringExt( font, 0, x, y, string, setColor, forceColor,
+		qfalse, shadow ? 2 : 0, qtrue, 0, maxChars );
 }
 
 void CG_DrawFontString( font_t *font, int x, int y, const char *s, float alpha ) {
@@ -478,11 +499,11 @@ void CG_DrawFontString( font_t *font, int x, int y, const char *s, float alpha )
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	CG_DrawFontStringExt( font, x, y, s, color, qfalse, qfalse, qtrue, qtrue, 0 );
+	CG_DrawFontStringExt( font, 0, x, y, s, color, qfalse, qfalse, 2, qtrue, 0, 0 );
 }
 
 void CG_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color ) {
-	CG_DrawFontStringExt( font, x, y, s, color, qtrue, qfalse, qtrue, qtrue, 0 );
+	CG_DrawFontStringExt( font, 0, x, y, s, color, qtrue, qfalse, 2, qtrue, 0, 0 );
 }
 
 void CG_DrawGiantString( int x, int y, const char *s, float alpha ) {
@@ -490,11 +511,11 @@ void CG_DrawGiantString( int x, int y, const char *s, float alpha ) {
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	CG_DrawFontStringExt( &cgs.media.fontGiant, x, y, s, color, qfalse, qfalse, qtrue, qtrue, 0 );
+	CG_DrawFontStringExt( &cgs.media.fontGiant, 0, x, y, s, color, qfalse, qfalse, 2, qtrue, 0, 0 );
 }
 
 void CG_DrawGiantStringColor( int x, int y, const char *s, vec4_t color ) {
-	CG_DrawFontStringExt( &cgs.media.fontGiant, x, y, s, color, qtrue, qfalse, qtrue, qtrue, 0 );
+	CG_DrawFontStringExt( &cgs.media.fontGiant, 0, x, y, s, color, qtrue, qfalse, 2, qtrue, 0, 0 );
 }
 
 // Keep big and small for compatiblity
@@ -503,11 +524,11 @@ void CG_DrawBigString( int x, int y, const char *s, float alpha ) {
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	CG_DrawFontStringExt( &cgs.media.fontBig, x, y, s, color, qfalse, qfalse, qtrue, qtrue, 0 );
+	CG_DrawFontStringExt( &cgs.media.fontBig, 0, x, y, s, color, qfalse, qfalse, 2, qtrue, 0, 0 );
 }
 
 void CG_DrawBigStringColor( int x, int y, const char *s, vec4_t color ) {
-	CG_DrawFontStringExt( &cgs.media.fontBig, x, y, s, color, qtrue, qfalse, qtrue, qtrue, 0 );
+	CG_DrawFontStringExt( &cgs.media.fontBig, 0, x, y, s, color, qtrue, qfalse, 2, qtrue, 0, 0 );
 }
 
 void CG_DrawSmallString( int x, int y, const char *s, float alpha ) {
@@ -515,11 +536,11 @@ void CG_DrawSmallString( int x, int y, const char *s, float alpha ) {
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	CG_DrawFontStringExt( &cgs.media.fontSmall, x, y, s, color, qfalse, qfalse, qfalse, qtrue, 0 );
+	CG_DrawFontStringExt( &cgs.media.fontSmall, 0, x, y, s, color, qfalse, qfalse, 0, qtrue, 0, 0 );
 }
 
 void CG_DrawSmallStringColor( int x, int y, const char *s, vec4_t color ) {
-	CG_DrawFontStringExt( &cgs.media.fontSmall, x, y, s, color, qtrue, qfalse, qfalse, qtrue, 0 );
+	CG_DrawFontStringExt( &cgs.media.fontSmall, 0, x, y, s, color, qtrue, qfalse, 0, qtrue, 0, 0 );
 }
 
 void CG_DrawTinyString( int x, int y, const char *s, float alpha ) {
@@ -527,11 +548,11 @@ void CG_DrawTinyString( int x, int y, const char *s, float alpha ) {
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	CG_DrawFontStringExt( &cgs.media.fontTiny, x, y, s, color, qfalse, qfalse, qfalse, qtrue, 0 );
+	CG_DrawFontStringExt( &cgs.media.fontTiny, 0, x, y, s, color, qfalse, qfalse, 0, qtrue, 0, 0 );
 }
 
 void CG_DrawTinyStringColor( int x, int y, const char *s, vec4_t color ) {
-	CG_DrawFontStringExt( &cgs.media.fontTiny, x, y, s, color, qtrue, qfalse, qfalse, qtrue, 0 );
+	CG_DrawFontStringExt( &cgs.media.fontTiny, 0, x, y, s, color, qtrue, qfalse, 0, qtrue, 0, 0 );
 }
 #else
 /*
