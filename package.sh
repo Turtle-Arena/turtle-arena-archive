@@ -303,7 +303,7 @@ fi
 #
 if [ $LINUX -eq 1 ]
 then
-	./package-deb.sh --installdir $INSTALLDIR/deb
+	./package-deb.sh --installdir $INSTALLDIR
 fi
 
 echo "Done!"

@@ -1,42 +1,39 @@
 #!/bin/sh
 #
 # Package debian source and binary packages for client/server and data,
-#    for Ubuntu PPA and ready install.
+#    for Ubuntu PPA and ready-to-install debs.
 #
 # (Turtle Arena Ubuntu PPA: https://launchpad.net/~zturtleman/+archive/turtlearena-stable)
 #
+# NOTE: Version is gotten from changelogs
+#		(debian_main/engine/debian/changelog and debian_main/data/debian/changelog)
+#
 # NOTE: You must have the .orig.tar.gz files when creating
 #  patches (0.2-2, 0.2-3, etc et) (You can download them from the Ubuntu PPA)
-
-# FIXME: Doesn't find secrete key automatically on my computer...
-#        If you are not Zack Middleton change/remove this
-KEY=-k587E1968
-#KEY=
+#
 
 MAKE_DATA_DEB=1
 # engine is used for client and server
 MAKE_ENGINE_DEB=1
 
 STARTDIR=`pwd`
-INSTALLDIR=debian_source
+INSTALLDIR=install
 DATA_DEB_CONFIG=debian_main/data/debian
 ENGINE_DEB_CONFIG=debian_main/engine/debian
 
 GAMENAME="turtlearena"
 
-#
-# NOTE: Must update changelogs if version or deb_version are changed!
-#		(debian_main/engine/debian/changelog and debian_main/data/debian/changelog)
-#
-
-# Version (Current Turtle Arena version)
-VERSION=0.3
-# For debian only fixes/changes update DEB_VERSION "turtlearena_$VERSION-$DATA_DEB_VERSION"
-DATA_DEB_VERSION=1
-ENGINE_DEB_VERSION=1
+# Build binary .debs, instead of just source
+BIN=1
 
 # Don't automaticly upload to the PPA
 UPLOAD_TO_PPA=0
+
+# PPA name (Only needed for --ppa)
+PPA_NAME="ppa:zturtleman/turtlearena-stable"
+
+# Key should be automatically found using name in changelog
+KEY=
 
 # Vars for command line handling
 USAGE=0
@@ -52,15 +49,31 @@ do
 	# Single argument options
 	#
 
-	if [ "$ARG" = "--help" ] || [ "$ARG" = "-help" ] || [ "$ARG" = "-h" ]
+	if [ "$ARG" = "--help" ] || [ "$ARG" = "-h" ]
 	then
 		USAGE=1
 		break
 	fi
 
-	if [ "$ARG" = "--upload-to-ppa" ]
+
+	if [ "$ARG" = "--no-bin" ] [ "$ARG" = "-n" ]
 	then
-		UPLOAD_TO_PPA=1
+		BIN=0
+		continue
+	fi
+
+	if [ "$ARG" = "--ppa" ] || [ "$ARG" = "-p" ]
+	then
+		if [ $UPLOAD_TO_PPA -eq 0 ]
+		then
+			UPLOAD_TO_PPA=1
+		fi
+		# Optionally, specify ppa
+	fi
+
+	if [ "$ARG" = "--upload-only" ] || [ "$ARG" = "-u" ]
+	then
+		UPLOAD_TO_PPA=2
 		continue
 	fi
 
@@ -68,15 +81,35 @@ do
 	# Arguments that have a token after it
 	#
 
-	if [ "$ARG" = "--installdir" ]
+	if [ "$ARG" = "--installdir" ] || [ "$ARG" = "-i" ]
 	then
-		NEXT_ARG="$ARG"
+		NEXT_ARG="--installdir"
+		continue
+	fi
+
+	if [ "$ARG" = "--ppa" ] || [ "$ARG" = "-p" ]
+	then
+		NEXT_ARG="--ppa"
+		continue
+	fi
+
+	if [ "$ARG" = "--key" ] || [ "$ARG" = "-k" ]
+	then
+		NEXT_ARG="--key"
 		continue
 	fi
 
 	case "$NEXT_ARG" in
 		--installdir)
 			INSTALLDIR="$ARG"
+			NEXT_ARG=""
+			;;
+		--ppa)
+			PPA_NAME="$ARG"
+			NEXT_ARG=""
+			;;
+		--key)
+			KEY=-k"$ARG"
 			NEXT_ARG=""
 			;;
 		*)
@@ -95,46 +128,75 @@ if [ $USAGE -eq 1 ]
 then
 	echo "Usage: $0 OPTIONS..."
 	echo "  Package Turtle Arena debian source and binary packages for release"
-	echo "    into installdir"
+	echo "    into INSTALLDIR/deb"
 	echo ""
 	echo "  OPTIONS"
-	echo "    --help         Show this help"
-	echo "           -help"
-	echo "           -h"
-	echo "    --installdir [dir]  directory to put files"
-	echo "                          (default: \"debian_source\")"
-	echo "    --upload-to-ppa     Upload already created source packages to the PPA"
+	echo " -h --help         Show this help"
+	echo " -i --installdir [dir]  directory to put files"
+	echo "                          (default: \"install\")"
+	echo " -n --no-bin            Do not build install debs, only source"
+	echo " -p --ppa [ppa]         Upload source packages to [ppa]"
+	echo "                          (default: \"ppa:zturtleman/turtlearena-stable\")"
+	echo " -u --upload-only       Only upload source to PPA, don't build anything"
+	echo " -k --key [key]         Signing key for dpkg-buildpackage"
+	echo "                          (Example: \"85E7120F\")"
+
 	exit 1
 fi
 
-if [ $UPLOAD_TO_PPA -eq 1 ]
+# Upload only
+if [ $UPLOAD_TO_PPA -eq 2 ]
 then
 
+	# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
+	versionAndSeries=`head -n 1 ${DATA_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+
 	# Upload data source to PPA
-	dput ppa:zturtleman/turtlearena ${GAMENAME}-data_${VERSION}-${DATA_DEB_VERSION}_source.changes
+	dput ${PPA_NAME} ${GAMENAME}-data_${versionAndSeries}_source.changes
+
+	# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
+	versionAndSeries=`head -n 1 ${ENGINE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
 	# Upload engine source to PPA
-	dput ppa:zturtleman/turtlearena ${GAMENAME}_${VERSION}-${ENGINE_DEB_VERSION}_source.changes
+	dput ${PPA_NAME} ${GAMENAME}_${versionAndSeries}_source.changes
 
 	exit 0
 fi
+
+DEBINSTALL=$INSTALLDIR/deb
 
 if [ $MAKE_DATA_DEB -eq 1 ]
 then
 
 	#
+	# Get version info from changelog
+	#
+
+	# Example: '0.2-1~maverick1' or '0.2-1'
+	versionAndSeries=`head -n 1 ${DATA_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+
+	# Drop '~maverick1', leaves '0.2-1'
+	versionWithDebVersion=`echo "${versionAndSeries}" | cut -s -f 1 -d '~'`
+
+	# Drop '0.2', leaves '1'
+	debVersion=`echo "${versionWithDebVersion}" | cut -s -f 2 -d '-'`
+
+	# Drop '-1', leaves '0.2'
+	version=`echo "${versionWithDebVersion}" | cut -s -f 1 -d '-'`
+
+	#
 	# Create orig data source directory
 	#
-	if [ $DATA_DEB_VERSION -eq 1 ]
+	if [ $debVersion -eq 1 ]
 	then
-		ORIGDIR=$GAMENAME-data-$VERSION.orig
+		ORIGDIR=$GAMENAME-data-$version.orig
 	else
-		ORIGDIR=$GAMENAME-data-$VERSION
+		ORIGDIR=$GAMENAME-data-$version
 	fi
 
 	# FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
 	# Build assets0.pk3 if not already built
-	if [ ! -f $STARTDIR/install/base/assets0.pk3 ]
+	if [ ! -f $INSTALLDIR/base/assets0.pk3 ]
 	then
 		./package-assets.sh
 
@@ -143,12 +205,12 @@ then
 		exit 1
 	fi
 
-	mkdir -p $INSTALLDIR/$ORIGDIR/base
-	cp $STARTDIR/install/base/assets0.pk3 $INSTALLDIR/$ORIGDIR/base
+	mkdir -p $DEBINSTALL/$ORIGDIR/base
+	cp $INSTALLDIR/base/assets0.pk3 $DEBINSTALL/$ORIGDIR/base
 
-	cd $INSTALLDIR/$ORIGDIR
+	cd $DEBINSTALL/$ORIGDIR
 
-	# Copy text files into $INSTALLDIR/$ORIGDIR/ like README, CREDITS, and stuff
+	# Copy text files into $DEBINSTALL/$ORIGDIR/ like README, CREDITS, and stuff
 	cp $STARTDIR/GAME_README.txt README
 	cp $STARTDIR/CREDITS.txt CREDITS
 	cp $STARTDIR/COPYRIGHTS.txt COPYRIGHTS
@@ -158,29 +220,34 @@ then
 	# Create debian data source directory
 	#
 	cd $STARTDIR
-	DEBDIR=$GAMENAME-data-$VERSION
-	mkdir -p $INSTALLDIR/$DEBDIR/debian/
+	DEBDIR=$GAMENAME-data-$version
+	mkdir -p $DEBINSTALL/$DEBDIR/debian/
 
-	if [ $DATA_DEB_VERSION -eq 1 ]
+	if [ $debVersion -eq 1 ]
 	then
-		cp -r $INSTALLDIR/$ORIGDIR/* $INSTALLDIR/$DEBDIR/
+		cp -r $DEBINSTALL/$ORIGDIR/* $DEBINSTALL/$DEBDIR/
 	fi
-	cp -r $DATA_DEB_CONFIG/* $INSTALLDIR/$DEBDIR/debian/
+	cp -r $DATA_DEB_CONFIG/* $DEBINSTALL/$DEBDIR/debian/
 
 	#
 	# Build debian package data
 	#
 	cd $STARTDIR
-	cd $INSTALLDIR/$DEBDIR
+	cd $DEBINSTALL/$DEBDIR
 
 	dpkg-buildpackage -S -rfakeroot $KEY
 
-	# Upload source to PPA
-	# dput ppa:zturtleman/turtlearena turtlearena-data_0.2-1_source.changes
+	if [ $UPLOAD_TO_PPA -eq 1 ]
+	then
+		# Upload source to PPA
+		dput ${PPA_NAME} ${GAMENAME}-data_${versionAndSeries}_source.changes
+	fi
 
-	# build .deb
-	cd $GAMENAME-data-$VERSION
-	dpkg-buildpackage -rfakeroot -uc -b
+	if [ $BIN -eq 1 ]
+	then
+		# build .deb
+		dpkg-buildpackage -rfakeroot -uc -b $KEY
+	fi
 fi
 
 if [ $MAKE_ENGINE_DEB -eq 1 ]
@@ -192,40 +259,56 @@ then
 	cd $STARTDIR
 
 	#
+	# Get version info from changelog
+	#
+
+	# Example: '0.2-1~maverick1' or '0.2-1'
+	versionAndSeries=`head -n 1 ${ENGINE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+
+	# Drop '~maverick1', leaves '0.2-1'
+	versionWithDebVersion=`echo "${versionAndSeries}" | cut -s -f 1 -d '~'`
+
+	# Drop '0.2', leaves '1'
+	debVersion=`echo "${versionWithDebVersion}" | cut -s -f 2 -d '-'`
+
+	# Drop '-1', leaves '0.2'
+	version=`echo "${versionWithDebVersion}" | cut -s -f 1 -d '-'`
+
+	#
 	# Create orig engine source directory
 	#
-	if [ $ENGINE_DEB_VERSION -eq 1 ]
+	if [ $debVersion -eq 1 ]
 	then
-		ORIGDIR=$GAMENAME-$VERSION.orig
+		ORIGDIR=$GAMENAME-$version.orig
 	else
-		ORIGDIR=$GAMENAME-$VERSION
+		ORIGDIR=$GAMENAME-$version
 	fi
-	mkdir -p $INSTALLDIR/$ORIGDIR
+	mkdir -p $DEBINSTALL/$ORIGDIR
 
 	# Avoid copying build directory.
-	mkdir $INSTALLDIR/$ORIGDIR/code
-	mkdir $INSTALLDIR/$ORIGDIR/misc
-	mkdir $INSTALLDIR/$ORIGDIR/ui
-	cp engine/* $INSTALLDIR/$ORIGDIR/
-	cp -r engine/code/* $INSTALLDIR/$ORIGDIR/code
-	cp -r engine/misc/* $INSTALLDIR/$ORIGDIR/misc
-	cp -r engine/ui/* $INSTALLDIR/$ORIGDIR/ui
+	mkdir $DEBINSTALL/$ORIGDIR/code
+	mkdir $DEBINSTALL/$ORIGDIR/misc
+	mkdir $DEBINSTALL/$ORIGDIR/ui
+	cp engine/* $DEBINSTALL/$ORIGDIR/
+	cp -r engine/code/* $DEBINSTALL/$ORIGDIR/code
+	cp -r engine/misc/* $DEBINSTALL/$ORIGDIR/misc
+	cp -r engine/ui/* $DEBINSTALL/$ORIGDIR/ui
 
 	#
 	# File cleanup
 	#
 	# Remove SVN files
-	find $INSTALLDIR/$ORIGDIR/ -type d -name '.svn' -exec rm -rf '{}' \; 2>/dev/null
-	find $INSTALLDIR/$ORIGDIR/ -type f -name '.svnignore' -exec rm -rf '{}' \; 2>/dev/null
-	find $INSTALLDIR/$ORIGDIR/ -type f -name '*~' -exec rm -rf '{}' \; 2>/dev/null
+	find $DEBINSTALL/$ORIGDIR/ -type d -name '.svn' -exec rm -rf '{}' \; 2>/dev/null
+	find $DEBINSTALL/$ORIGDIR/ -type f -name '.svnignore' -exec rm -rf '{}' \; 2>/dev/null
+	find $DEBINSTALL/$ORIGDIR/ -type f -name '*~' -exec rm -rf '{}' \; 2>/dev/null
 
 	# Remave lcc as debian calls it non-free and removes it
-	rm -r $INSTALLDIR/$ORIGDIR/code/tools/lcc
+	rm -r $DEBINSTALL/$ORIGDIR/code/tools/lcc
 
 	# Remove non-free header
-	if [ -f $INSTALLDIR/$ORIGDIR/code/qcommon/wspiapi.h ]
+	if [ -f $DEBINSTALL/$ORIGDIR/code/qcommon/wspiapi.h ]
 	then
-		rm $INSTALLDIR/$ORIGDIR/code/qcommon/wspiapi.h
+		rm $DEBINSTALL/$ORIGDIR/code/qcommon/wspiapi.h
 	fi
 
 	#
@@ -233,39 +316,44 @@ then
 	#	So that dpkg-buildpackage will make a .debian.tar.gz instead of
 	#		failing to make .diff.gz
 	#
-	if [ $ENGINE_DEB_VERSION -eq 1 ]
+	if [ $debVersion -eq 1 ]
 	then
-		cd $INSTALLDIR
-		tar -pczf ${GAMENAME}_$VERSION.orig.tar.gz $ORIGDIR
+		cd $DEBINSTALL
+		tar -pczf ${GAMENAME}_$version.orig.tar.gz $ORIGDIR
 	fi
 
 	#
 	# Create debian engine source directory
 	#
 	cd $STARTDIR
-	DEBDIR=$GAMENAME-$VERSION
-	mkdir -p $INSTALLDIR/$DEBDIR/debian/
+	DEBDIR=$GAMENAME-$version
+	mkdir -p $DEBINSTALL/$DEBDIR/debian/
 
-	if [ $ENGINE_DEB_VERSION -eq 1 ]
+	if [ $debVersion -eq 1 ]
 	then
-		cp -r $INSTALLDIR/$ORIGDIR/* $INSTALLDIR/$DEBDIR/
+		cp -r $DEBINSTALL/$ORIGDIR/* $DEBINSTALL/$DEBDIR/
 	fi
-	cp -r $ENGINE_DEB_CONFIG/* $INSTALLDIR/$DEBDIR/debian/
+	cp -r $ENGINE_DEB_CONFIG/* $DEBINSTALL/$DEBDIR/debian/
 
 	#
 	# Build debian package data
 	#
 	cd $STARTDIR
-	cd $INSTALLDIR/$DEBDIR
+	cd $DEBINSTALL/$DEBDIR
 
 	dpkg-buildpackage -S -rfakeroot $KEY
 
-	# Upload source to PPA
-	# dput ppa:zturtleman/turtlearena turtlearena_0.2-1_source.changes
+	if [ $UPLOAD_TO_PPA -eq 1 ]
+	then
+		# Upload source to PPA
+		dput ${PPA_NAME} ${GAMENAME}_${versionAndSeries}_source.changes
+	fi
 
-	# build .deb
-	cd $GAMENAME-$VERSION
-	dpkg-buildpackage -rfakeroot -uc -b
-	rm -r build
+	if [ $BIN -eq 1 ]
+	then
+		# build .deb
+		dpkg-buildpackage -rfakeroot -uc -b $KEY
+		rm -r build
+	fi
 fi
 
