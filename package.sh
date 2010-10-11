@@ -202,7 +202,11 @@ then
 		#echo "    the top of engine/code/qcommon/files.c!"
 
 		# NEW
-		EDITOR=nano
+		#ensure EDITOR is set
+		if [ -z "${EDITOR}"]
+		then
+			EDITOR=nano
+		fi
 		echo ""
 		echo "You may need to update the assets0.pk3 checksum."
 		echo " 1) Game server will run, copy checksum if shown (Ctrl+Shift+C), type quit"
