@@ -98,7 +98,7 @@ fi
 
 # Update client and server binaries
 cd engine/
-sh cross-make-mingw.sh ARCH=x86 BUILD_GAME_SO=0
+sh cross-make-mingw.sh ARCH=x86
 
 # change to engine/misc/nsis/ and run make
 cd misc/nsis/
