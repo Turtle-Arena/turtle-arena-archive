@@ -167,7 +167,7 @@ static void CG_spWin_f( void) {
 #endif
 	CG_AddBufferedSound(cgs.media.winnerSound);
 	//trap_S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
-#ifndef MISSIONPACK_HUD
+#ifndef MISSIONPACK_HUD2
 	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
 	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, 0);
@@ -187,7 +187,7 @@ static void CG_spLose_f( void) {
 #ifdef TA_SP
 	if (cgs.gametype != GT_SINGLE_PLAYER)
 #endif
-#ifndef MISSIONPACK_HUD
+#ifndef MISSIONPACK_HUD2
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, 0);

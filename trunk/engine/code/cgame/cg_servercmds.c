@@ -1130,7 +1130,11 @@ static void CG_ServerCommand( void ) {
 #endif
 
 	if ( !strcmp( cmd, "cp" ) ) {
+#ifndef MISSIONPACK_HUD2
 		CG_CenterPrint( CG_Argv(1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+#else
+		CG_CenterPrint( CG_Argv(1), SCREEN_HEIGHT * 0.30, 0 );
+#endif
 		return;
 	}
 
