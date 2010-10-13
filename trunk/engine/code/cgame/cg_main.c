@@ -1699,7 +1699,12 @@ qboolean CG_Asset_Parse(int handle) {
 			if (!PC_String_Parse(handle, &tempStr) || !PC_Int_Parse(handle, &pointSize)) {
 				return qfalse;
 			}
+#ifdef IOQ3ZTM // FONT_REWRITE
+			CG_LoadFont(&cgs.media.fontSmall, tempStr, "gfx/2d/bigchars", pointSize, pointSize/2, 0);
+			CG_LoadFont(&cgs.media.fontBig, tempStr, "gfx/2d/bigchars", pointSize, pointSize, 0);
+#else
 			cgDC.registerFont(tempStr, pointSize, &cgDC.Assets.textFont);
+#endif
 			continue;
 		}
 
@@ -1709,7 +1714,11 @@ qboolean CG_Asset_Parse(int handle) {
 			if (!PC_String_Parse(handle, &tempStr) || !PC_Int_Parse(handle, &pointSize)) {
 				return qfalse;
 			}
+#ifdef IOQ3ZTM // FONT_REWRITE
+			CG_LoadFont(&cgs.media.fontTiny, tempStr, "gfx/2d/bigchars", pointSize, pointSize, 0);
+#else
 			cgDC.registerFont(tempStr, pointSize, &cgDC.Assets.smallFont);
+#endif
 			continue;
 		}
 
@@ -1719,7 +1728,11 @@ qboolean CG_Asset_Parse(int handle) {
 			if (!PC_String_Parse(handle, &tempStr) || !PC_Int_Parse(handle, &pointSize)) {
 				return qfalse;
 			}
+#ifdef IOQ3ZTM // FONT_REWRITE
+			CG_LoadFont(&cgs.media.fontGiant, tempStr, "gfx/2d/bigchars", pointSize, pointSize*0.66f, 0);
+#else
 			cgDC.registerFont(tempStr, pointSize, &cgDC.Assets.bigFont);
+#endif
 			continue;
 		}
 
