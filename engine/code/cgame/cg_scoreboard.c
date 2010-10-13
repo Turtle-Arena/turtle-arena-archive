@@ -269,7 +269,7 @@ Draw the normal in-game scoreboard
 =================
 */
 qboolean CG_DrawOldScoreboard( void ) {
-	int		x, y, w, i, n1, n2;
+	int		 y, i, n1, n2;
 	float	fade;
 	float	*fadeColor;
 	char	*s;
@@ -328,10 +328,8 @@ qboolean CG_DrawOldScoreboard( void ) {
 #else
 		s = va("Fragged by %s", cg.killerName );
 #endif
-		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		x = ( SCREEN_WIDTH - w ) / 2;
 		y = 40;
-		CG_DrawBigString( x, y, s, fade );
+		CG_DrawBigString( CENTER_X, y, s, fade );
 	}
 
 	// current rank
@@ -345,10 +343,8 @@ qboolean CG_DrawOldScoreboard( void ) {
 			s = va("%s place with %i",
 				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
 				cg.snap->ps.persistant[PERS_SCORE] );
-			w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-			x = ( SCREEN_WIDTH - w ) / 2;
 			y = 60;
-			CG_DrawBigString( x, y, s, fade );
+			CG_DrawBigString( CENTER_X, y, s, fade );
 		}
 	} else {
 		if ( cg.teamScores[0] == cg.teamScores[1] ) {
@@ -359,10 +355,8 @@ qboolean CG_DrawOldScoreboard( void ) {
 			s = va("Blue leads %i to %i",cg.teamScores[1], cg.teamScores[0] );
 		}
 
-		w = CG_DrawStrlen( s ) * BIGCHAR_WIDTH;
-		x = ( SCREEN_WIDTH - w ) / 2;
 		y = 60;
-		CG_DrawBigString( x, y, s, fade );
+		CG_DrawBigString( CENTER_X, y, s, fade );
 	}
 
 	// scoreboard
@@ -454,7 +448,6 @@ CG_CenterGiantLine
 ================
 */
 static void CG_CenterGiantLine( float y, const char *string ) {
-	float		x;
 	vec4_t		color;
 
 	color[0] = 1;
@@ -462,13 +455,7 @@ static void CG_CenterGiantLine( float y, const char *string ) {
 	color[2] = 1;
 	color[3] = 1;
 
-#ifdef IOQ3ZTM // FONT_REWRITE
-	x = 0.5 * ( SCREEN_WIDTH - Com_FontStringWidth( &cgs.media.fontGiant, string, strlen(string) ) );
-#else
-	x = 0.5 * ( 640 - GIANT_WIDTH * CG_DrawStrlen( string ) );
-#endif
-
-	CG_DrawGiantStringColor(x, y, string, color);
+	CG_DrawGiantStringColor(CENTER_X, y, string, color);
 }
 
 /*

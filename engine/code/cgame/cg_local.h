@@ -25,6 +25,23 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../game/bg_misc.h"
 #include "cg_public.h"
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+//#undef TINYCHAR_WIDTH
+#undef TINYCHAR_HEIGHT
+#define TINYCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontTiny))
+
+//#undef SMALLCHAR_WIDTH
+#undef SMALLCHAR_HEIGHT
+#define SMALLCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontSmall))
+
+//#undef BIGCHAR_WIDTH
+#undef BIGCHAR_HEIGHT
+#define BIGCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontBig))
+
+//#undef GIANTCHAR_WIDTH
+#undef GIANTCHAR_HEIGHT
+#define GIANTCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontGiant))
+#endif
 
 // The entire cgame module is unloaded and reloaded on each level change,
 // so there is NO persistant data between levels on the client side.
@@ -820,7 +837,9 @@ typedef struct {
 
 	// centerprinting
 	int			centerPrintTime;
+#ifndef MISSIONPACK_HUD2
 	int			centerPrintCharWidth;
+#endif
 	int			centerPrintY;
 	char		centerPrint[1024];
 	int			centerPrintLines;
@@ -1738,6 +1757,7 @@ void CG_DrawString( float x, float y, const char *string,
 				   float charWidth, float charHeight, const float *modulate );
 
 
+#define CENTER_X -640
 #ifdef IOQ3ZTM // FONT_REWRITE
 qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
 			int shaderCharWidth, float fontKerning);

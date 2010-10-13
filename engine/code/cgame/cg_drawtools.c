@@ -397,7 +397,7 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 	int			cnt;
 	int			maxChars;
 	float		useScale;
-	
+
 	// ZTM: FIXME: How should adjust and kerning be delt with?
 	if (adjust <= 0) {
 		adjust = font->kerning;
@@ -420,6 +420,20 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 		//float dpiScale = 72.0f / dpi;
 
 		useScale = scale * (48.0f / font->pointSize);// * dpiScale;
+	}
+
+	if (x == CENTER_X) {
+		// center aligned
+		float w;
+
+		w = Com_FontStringWidthExt(font, string, limit, qtrue) * useScale;
+		x = (SCREEN_WIDTH - w) * 0.5f;
+	} else if (x < 0) {
+		// right aligned, offset by x
+		float w;
+
+		w = Com_FontStringWidthExt(font, string, limit, qtrue) * useScale;
+		x = SCREEN_WIDTH + x - w;
 	}
 
 	// draw the colored text
@@ -480,17 +494,21 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars )
 {
 	font_t *font;
+	float scale;
 
-	if (charWidth >= GIANTCHAR_WIDTH && charHeight >= GIANTCHAR_HEIGHT)
+	if (charWidth >= GIANTCHAR_WIDTH && charHeight >= GIANTCHAR_HEIGHT) {
 		font = &cgs.media.fontGiant;
-	else if (charWidth >= BIGCHAR_WIDTH && charHeight >= BIGCHAR_HEIGHT)
+	} else if (charWidth >= BIGCHAR_WIDTH && charHeight >= BIGCHAR_HEIGHT) {
 		font = &cgs.media.fontBig;
-	else if (charWidth >= SMALLCHAR_WIDTH && charHeight >= SMALLCHAR_HEIGHT)
+	} else if (charWidth >= SMALLCHAR_WIDTH && charHeight >= SMALLCHAR_HEIGHT) {
 		font = &cgs.media.fontSmall;
-	else
+	} else {
 		font = &cgs.media.fontTiny;
+	}
 
-	CG_DrawFontStringExt( font, 0, x, y, string, setColor, forceColor,
+	scale = charHeight / 48.0f;
+
+	CG_DrawFontStringExt( font, scale, x, y, string, setColor, forceColor,
 		qfalse, shadow ? 2 : 0, qtrue, 0, maxChars );
 }
 
@@ -613,6 +631,19 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 
 	if (maxChars <= 0)
 		maxChars = 32767; // do them all!
+
+	if (x == CENTER_X) {
+		float w;
+
+		w = CG_DrawStrLen(string) * charWidth;
+		x = (SCREEN_WIDTH - w) * 0.5f;
+	} else if (x < 0) {
+		// right aligned, offset by x
+		float w;
+
+		w = CG_DrawStrLen(string) * charWidth;
+		x = SCREEN_WIDTH + x - w;
+	}
 
 	// draw the drop shadow
 	if (shadow) {
