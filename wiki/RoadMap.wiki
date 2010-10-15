@@ -1,0 +1,63 @@
+#summary Plans for the future
+#labels Phase-Design
+
+= Roadmap =
+Work-in-progress plans for future Turtle Arena releases.
+
+== 0.2 (Completed) ==
+First stable playable release.
+
+  * Standalone from Quake III: Arena
+  * Bot support (botfiles based on OpenArena)
+  * All 4 Turtles (Leo, Don, Raph, and Mike)
+  * Melee weapons
+  * Reworked weapon system (Only hold 2 weapons, default and a pickup)
+  * Hold multiple holdable items
+  * Shurikens (holdable items)
+  * Maps for all gametypes
+
+== 0.4.x ==
+0.4.x series focuses on players, map themes, and multiplayer maps.
+
+=== 0.4.0 ===
+  * Fix bugs from 0.2
+  * Bring back player effect colors
+    * Readd to ui and q3_ui
+    * (Control melee trail color?)
+  * Reduce overall number of TODOs and FIXMEs in the source
+  * Begin work on 0.4.1 and 0.4.2
+
+=== 0.4.1 ===
+  * Improve player models; each player should have their own animations, etc
+  * Remodel and animate casey
+  * Add more players (Mirage comic based); Foot Ninja, Foot Elite, and The Shredder
+
+  * Have player models be MDR (Finish Misfit Model 3D MDR exporting)
+  * Multiple levels of detail for players and other models
+    * (Add a LOD converter to Misfit Model 3D?)
+
+=== 0.4.2 ===
+  * Breakable objects and brushes
+    * Pushable. (Wolf-ET has pushable code for objects, g_props.c)
+  * Map Themes (textures, models, misc_objects, and maybe music?)
+  * New multiplayer maps using the new map themes
+
+  * Hopefully make Turtle Arena a complete (fully working) multiplayer game (Compareable to TMNT: Mutant Melee in someways...)
+
+== 0.6 ==
+Focus on Single Player
+
+  * Enemies for Single Player
+  * Single Player Maps
+  * Gimmicks
+  * Savegames
+  * Player Abilities
+  * Remake UI with missionpack ui scripting?
+
+== 0.8 ==
+  * Single Player improvements
+  * Multiplayer improvements
+
+== 1.0 ==
+  * Local four player support (Splitscreen and/or a single camera mode)
+    * (Wolf-ET has multiview code in game/cgame that may help create splitscreen)
