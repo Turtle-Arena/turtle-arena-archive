@@ -1,20 +1,19 @@
 #!/bin/sh
-APPBUNDLE=ioquake3.app
-BINARY=ioquake3.ub
-DEDBIN=ioq3ded.ub
-PKGINFO=APPLIOQ3
+APPBUNDLE=turtlearena.app
+BINARY=turtlearena.ub
+DEDBIN=turtlearena-server.ub
+PKGINFO=APPLTURTLEARENA
 ICNS=misc/quake3.icns
 DESTDIR=build/release-darwin-ub
-BASEDIR=baseq3
-MPACKDIR=missionpack
+BASEDIR=base
 
 BIN_OBJ="
-	build/release-darwin-ppc/ioquake3-smp.ppc
-	build/release-darwin-i386/ioquake3-smp.i386
+	build/release-darwin-ppc/turtlearena-smp.ppc
+	build/release-darwin-i386/turtlearena-smp.i386
 "
 BIN_DEDOBJ="
-	build/release-darwin-ppc/ioq3ded.ppc
-	build/release-darwin-i386/ioq3ded.i386
+	build/release-darwin-ppc/turtlearena-server.ppc
+	build/release-darwin-i386/turtlearena-server.i386
 "
 BASE_OBJ="
 	build/release-darwin-ppc/$BASEDIR/cgameppc.dylib
@@ -24,18 +23,10 @@ BASE_OBJ="
 	build/release-darwin-ppc/$BASEDIR/qagameppc.dylib
 	build/release-darwin-i386/$BASEDIR/qagamei386.dylib
 "
-MPACK_OBJ="
-	build/release-darwin-ppc/$MPACKDIR/cgameppc.dylib
-	build/release-darwin-i386/$MPACKDIR/cgamei386.dylib
-	build/release-darwin-ppc/$MPACKDIR/uippc.dylib
-	build/release-darwin-i386/$MPACKDIR/uii386.dylib
-	build/release-darwin-ppc/$MPACKDIR/qagameppc.dylib
-	build/release-darwin-i386/$MPACKDIR/qagamei386.dylib
-"
 
 cd `dirname $0`
 if [ ! -f Makefile ]; then
-	echo "This script must be run from the ioquake3 build directory"
+	echo "This script must be run from the Turtle Arena build directory"
 	exit 1
 fi
 
@@ -133,7 +124,7 @@ fi
 if [ ! -d $DESTDIR/$APPBUNDLE/Contents/Resources ]; then
 	mkdir -p $DESTDIR/$APPBUNDLE/Contents/Resources
 fi
-cp $ICNS $DESTDIR/$APPBUNDLE/Contents/Resources/ioquake3.icns || exit 1;
+cp $ICNS $DESTDIR/$APPBUNDLE/Contents/Resources/turtlearena.icns || exit 1;
 echo $PKGINFO > $DESTDIR/$APPBUNDLE/Contents/PkgInfo
 echo "
 	<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -147,15 +138,15 @@ echo "
 		<key>CFBundleExecutable</key>
 		<string>$BINARY</string>
 		<key>CFBundleGetInfoString</key>
-		<string>ioquake3 $Q3_VERSION</string>
+		<string>Turtle Arena $Q3_VERSION</string>
 		<key>CFBundleIconFile</key>
-		<string>ioquake3.icns</string>
+		<string>turtlearena.icns</string>
 		<key>CFBundleIdentifier</key>
-		<string>org.ioquake.ioquake3</string>
+		<string>org.turtlearena.turtlearena</string>
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>ioquake3</string>
+		<string>Turtle Arena</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -175,6 +166,5 @@ echo "
 lipo -create -o $DESTDIR/$APPBUNDLE/Contents/MacOS/$BINARY $BIN_OBJ
 lipo -create -o $DESTDIR/$APPBUNDLE/Contents/MacOS/$DEDBIN $BIN_DEDOBJ
 cp $BASE_OBJ $DESTDIR/$APPBUNDLE/Contents/MacOS/$BASEDIR/
-cp $MPACK_OBJ $DESTDIR/$APPBUNDLE/Contents/MacOS/$MPACKDIR/
 cp code/libs/macosx/*.dylib $DESTDIR/$APPBUNDLE/Contents/MacOS/
 
