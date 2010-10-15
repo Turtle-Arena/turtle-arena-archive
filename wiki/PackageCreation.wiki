@@ -1,9 +1,32 @@
 #summary Installer and packaging information
 #labels Phase-Deploy
 
-Turtle Arena is released using a few different installers/packages, this page describes how to create them.
+Turtle Arena is released using a few different installers/packages, this page describes how to create them. To create any of the packages you need the Turtle Arena source code and the ability to compile Turtle Arena (using 'make').
 
-To create any of the packages you need the Turtle Arena source code and the ability to compile Turtle Arena (using 'make').
+== Types ==
+Turtle Arena is currently released using three methods; zip archive, Debian packages, and a Win32 NSIS installer.
+
+== All ==
+To create all of the packages at once, you must use Linux.
+
+  # You need to have nsis installed to build to Win32 NSIS installer
+  # If you are building a released version (as apposed to from subversion trunk), copy assests0.pk3 into install/base/
+  # Run ./package.sh (It will guide building the packages.)
+  # Packages will be in the install directory.
+
+== Zip Archive ==
+Currently the zip archive is created by running './package.sh' like in the "All" method described above and manually zipping the proper files in the 'install' directory.
+
+  # Run ./package.sh
+  # Open 'install' directory
+  # Zip the 'base' and 'setting' directories along with the files in 'install' directory.
+
+== Debian/Ubuntu Packages ==
+If you are building from subversion trunk it is recommended you use the "All" method described above.
+
+  # If you are building a released version (as apposed to from subversion trunk), copy assests0.pk3 into install/base/
+  # Run ./package-deb.sh
+  # Open 'install/deb' directory
 
 == Windows NSIS Installer ==
 To create the Windows NSIS Installer you need to install NSIS and the Turtle Arena source code.
@@ -14,19 +37,14 @@ To create the Windows NSIS Installer you need to install NSIS and the Turtle Are
   # Open a terminal and change to the engine/misc/nsis/ directory inside of the Turtle Arena source
   # Run 'make'
 
-=== Windows NSIS Mod Installer ===
+== Windows NSIS Mod Installer ==
 Turtle Arena modifications (mods) can have their own Windows NSIS Installer.
 
   # Browse to engine/misc/nsis/ directory inside of the Turtle Arena source
   # Copy the files for the mod into the directory.
   # Copy turtlearena-q3ctc.nsi and rename it to trutlearena-yourmodname.nsi
   # Open the new file and modify the lines above 'no need to edit below in theory' to suit your mod
-  # Run 'makensis trutlearena-yourmodname.nsi
+  # Run 'makensis trutlearena-yourmodname.nsi'
 
 If all went well, you should have a installer/uninstaller for your mod now.
 
-== Ubuntu PPA ==
-TODO
-
-== ZIP ==
-TODO

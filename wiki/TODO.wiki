@@ -31,14 +31,14 @@ Weapons (and attacking)
   * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
 
   * TODO: Add PD_CUSTOM projectile death type
-    * pdModel <string>, pdShader <string>, pdSprite <bool>, pdDuration <int>, pdLight <int> <vec3>, pdExpBase <int>, pdExpAdd <int>, pdExpOnPlayer <bool>
+    * pdModel (string), pdShader (string), pdSprite (bool), pdDuration (int), pdLight (int) (vec3), pdExpBase (int), pdExpAdd (int), pdExpOnPlayer (bool)
     * pdExpOnPlayer would set whether or not to explode on players in CG_MissileHitPlayer
 
   * TODO: Add PT_CUSTOM projectile trail type
 
-  * TODO: Per-weapon run animations (Support LEGS_* and BOTH_*. Should TORSO_* be supported too?)
+  * TODO: Per-weapon run animations (Support `LEGS_*` and `BOTH_*`. Should `TORSO_*` be supported too?)
 
-  * TODO: Support BOTH_* attacks (not just TORSO_*) in ui/q3_ui
+  * TODO: Support `BOTH_*` attacks (not just `TORSO_*`) in ui/q3_ui
 
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
@@ -65,11 +65,10 @@ Weapons (and attacking)
     * After the dream Chet would see the Turtles outside his window.
 
 == Render ==
-  * TODO: NPRQuake has some awesome rendering options... (If I wanted it to look like a comic book it might help.)
+  * TODO: Add real-time cel-shading, like Jet Set Redio! (Maybe add other NPR rendering options too?)
+    * Maybe NPRQuake could be of some help? it has some cool looking NPR renders.
 
-  * TODO: Framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
-
-  * TODO: When there are multiple ghost models they may not be sorted into correct order?
+  * BUG: When there are multiple ghost models they may not be sorted into correct order?
 
   * TODO: Add Vertex Buffer Object (VBO) support?
 
@@ -195,6 +194,10 @@ Weapons (and attacking)
     * TODO: Clean up new font code in q3_ui, cgame, and client
     * TODO: Merge new font code with missionpack hud font code? (and/or load the fonts from hud script)
 
+  * TODO: Move more when jumping in lock-on mode! (Currently the player doesn't really go anywhere.)
+
+  * TODO: Support using .so and .dll on pure servers? (Wolf-ET does?)
+
 == Objects ==
 Most of the mapobjects should be damageable.
 
@@ -240,6 +243,8 @@ Most of the mapobjects should be damageable.
 
   * TODO: Lua Scripting for NPCs? http://xreal.svn.sourceforge.net/viewvc/xreal/trunk/xreal/base/code/game/g_lua.c?view=markup
 
+  * TODO: Framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
+
 == Done? ==
   * DONE?: TA_WEAPSYS weapon_random entity that spawns a random weapon each time the weapon respawns
     * Only spawn weapons with a classname, have flags for melee and gun weapon spawning.
@@ -254,6 +259,19 @@ Most of the mapobjects should be damageable.
   * DONE: Have player fade out when dead instead of BodySink
     * Does it look good?
 
+= Other =
+  * TODO: Add extra library dlls from NSIS installer to zip install
+  * TODO: Add game/cgame/ui so/dll to zip install? (They are included in ioq3 NSIS installer)
+
+  * TODO: Make some sort of manual to tell how to play, control the player (using default controls). Have it be simple.
+
+  * TODO: Portable (zip): Add a note (either on the website or in the readme) that removeing settings/portable will make it use the normal user app data directory, i.e. $HOME/.turtlearena
+
+  * TODO: Portable Linux (zip): http://portablelinuxapps.org/
+	* Create portable linux app from .deb package
+      * http://www.omgubuntu.co.uk/2010/07/distro-agnostic-packaging-making.html
+    * TODO: Test Linux Portable Install on Ubuntu 10.04 (Lucid Lynx) 32-bit, OpenSUSE 11.3 (GNOME) 32-bit, and Fedora 12 (GNOME) 32-bit.
+      * And add a note to the website 'tested on X'
 
 = Master Server =
   * NOTE: dpmaster is a open source master server that should support Turtle Arena
