@@ -468,6 +468,42 @@ Target this entity with a misc_model to have the model attached to the entity (s
 
 <!--
 =============================================================================
+-->
+
+<group name="func_voodoo" color="0 .5 .8">
+Passes damage, touching, use, etc et on to the targeted entities.
+-------- KEYS --------
+<sound key="deathSound" name="Death Sound">path/name of .wav file to play on death (defaults to a sound based on Material)</sound>
+<target key="target" name="Target">all entities with a matching targetname will be damaged.</target>
+<target key="paintarget" name="Pain Target">damaging the voodoo will trigger the entity this points to.</target>
+<targetname key="targetname" name="Target Name">tiggers targeted entities.</targetname>
+<string key="material" name="Material">the valid values are dirt, grass, wood, stone, metal, sparks, glass. It will spawn the listed material(s) when destroyed. Separate materials by commas.</string>
+<integer key="mustcut" name="Must Cut">(default 0) if 1 only weapons with "cuts 1" can damage it</integer>
+<real key="light" name="Model Light Intensity">constantLight radius of .md3 model included with entity. Has no effect on the entity's brushes (default 0).</real>
+<color key="color" name="Model Light Color">constantLight color of .md3 model included with entity. Has no effect on the entity's brushes (default 1 1 1).</color>
+<model key="model2" name="Model File">path/name of model to include (eg: models/mapobjects/pipe/pipe02.md3).</model>
+<real3 key="origin" name="World Origin">alternate method of setting XYZ origin of .md3 model included with entity (See Notes).</real3>
+<boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
+<boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
+<boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+-------- Q3MAP2 KEYS --------
+<targetname key="_targetname" name="Target Name">Used to attach a misc_model entity to this entity.</targetname>
+<real key="_lightmapscale" name="Lightmap Scale">Floating point value scaling the resolution of lightmaps on brushes/patches in this entity (default 1.0).</real>
+<integer key="_castshadows;_cs" name="Shadow Caster Level">Allows per-entity control over shadow casting. Defaults to 0 on entities, 1 on world. 0 = no shadow casting. 1 = cast shadows on world. > 1 = cast shadows on entities with _rs (or _receiveshadows) with the corresponding value, AND world. Negative values imply same, but DO NOT cast shadows on world.</integer>
+<integer key="_receiveshadows;_rs" name="Shadow Reciever Level">Allows per-entity control over shadow reception. Defaults to 1 on everything (world shadows). 0 = receives NO shadows. > 1 = receive shadows only from corresponding keyed entities (see above) and world. &lt; 1 = receive shadows ONLY from corresponding keyed entities.</integer>
+<texture key="_celshader" name="Cel Shader">Sets the cel shader used for this geometry. Note: omit the "textures/" prefix.</texture>
+-------- Q3MAP2 TERRAIN KEYS --------
+<texture key="_indexmap;alphamap" name="Terrain Blending Map">Path/name for the art file used to guide the mapping of textures on the terrain surface.</texture>
+<integer key="_layers;layers" name="Terrain Layers">Integer value is the number unique root shaders that will be use on the terrain.</integer>
+<texture key="_shader;shader" name="Terrain MetaShader">Path to the metashader used to assign textures to the terrain entity. Note: Omit the "textures/" prefix.</texture>
+-------- NOTES --------
+Setting the origin key is simply an alternate method to using an origin brush. When using the model2 key, the origin point of the model will correspond to the origin point defined by either the origin brush or the origin coordinate value.
+
+Target this entity with a misc_model to have the model attached to the entity (set the model's "target" key to the same value as this entity's "targetname").
+</group>
+
+<!--
+=============================================================================
 
 HOLDABLE_* ENTITIES
 
@@ -1234,14 +1270,15 @@ Generic placeholder for inserting MD3 models in game. Requires compilation of ma
 -->
 
 <point name="misc_object" color="1 .5 .25" box="-16 -16 -16 16 16 16">
-Generic placeholder for inserting animated MD3/MDR models in game.
+Inserting animated MD3/MDR models in game, can be interactive and/or damageable.
 -------- KEYS --------
 <angle key="angle" name="Yaw Angle">direction in which model will be oriented.</angle>
 <model key="model" name="Model File">path/name of model to use (eg: models/mapobjects/teleporter/teleporter.md3).</model>
+<string key="config" name="Config File">path/name of config file to use (eg: models/mapobjects/teleporter/teleporter.cfg).</model>
 <mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <targetname key="targetname" name="Target Name">kills this entity when triggered</targetname>
 <integer key="health" name="Health">object's health, if 0 can't be damaged or killed. (default 0)</integer>
-<integer key="wait" name="Respawn Delay">number of seconds before the entity respawns (default 0, 0 = never respawn).</integer>
+<integer key="wait" name="Death Delay">number of seconds before the entity respawns, or if less than 0 number of seconds before the entity is removed (default 0, 0 = never respawn).</integer>
 <string key="message" name="Item">item to spawn on death</string>
 <target key="target" name="Target">killing (or touching if spawn health is 0) the object will trigger the entity this points to.</target>
 <target key="paintarget" name="Pain Target">damaging the object will trigger the entity this points to.</target>
@@ -1249,6 +1286,8 @@ Generic placeholder for inserting animated MD3/MDR models in game.
 <flag key="SUSPENDED" name="No Drop To Floor" bit="0">object will spawn where it was placed in map and won't drop to the floor.</flag>
 <flag key="KNOCKBACK" name="Allow Knockback" bit="1">model can move when damaged.</flag>
 <flag key="UNSOLIDDEATH" name="Unsolid on Death" bit="2">makes the object non-solid when killed.</flag>
+<flag key="INVISDEATH" name="Unlink on Death" bit="3">makes the object invisible and non-solid when killed.</flag>
+<flag key="PUSHABLE" name="Pushable" bit="4">makes the object pushable.</flag>
 <flag key="MELEE" name="Spawn Melee Weapons" bit="6">spawn melee weapons (Default on - see weapon_random Notes).</flag>
 <flag key="GUNS" name="Spawn Guns" bit="7">spawn guns (Default on - see weapon_random Notes).</flag>
 <flag key="CONSTANT" name="Select Weapon Once" bit="8">don't change weapon each respawn (see weapon_random Notes).</flag>

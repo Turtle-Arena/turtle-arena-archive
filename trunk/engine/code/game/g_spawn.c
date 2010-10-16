@@ -155,6 +155,9 @@ void SP_func_breakable (gentity_t *self);
 #ifdef TA_ENTSYS // FUNC_USE
 void SP_func_use (gentity_t *ent);
 #endif
+#ifdef TA_ENTSYS // FUNC_VOODOO
+void SP_func_voodoo (gentity_t *ent);
+#endif
 
 void SP_trigger_always (gentity_t *ent);
 void SP_trigger_multiple (gentity_t *ent);
@@ -258,6 +261,9 @@ spawn_t	spawns[] = {
 #endif
 #ifdef TA_ENTSYS // FUNC_USE
 	{"func_use", SP_func_use},
+#endif
+#ifdef TA_ENTSYS // FUNC_VOODOO
+	{"func_voodoo", SP_func_voodoo},
 #endif
 
 	// Triggers are brush objects that cause an effect when contacted

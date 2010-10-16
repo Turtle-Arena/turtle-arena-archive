@@ -1230,7 +1230,8 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	}
 #ifdef TA_ENTSYS // BREAKABLE
 	// Allow breakable movers
-	if ( targ->s.eType == ET_MOVER && targ->health > 0 )
+	if ( targ->s.eType == ET_MOVER && targ->health > 0
+		&& Q_stricmp(targ->classname, "func_voodoo"))
 	{
 		targ->health -= damage;
 		if (targ->health < 0)
@@ -1238,8 +1239,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 		G_BreakableDebris(targ, inflictor, attacker, dir, point);
 
-		if (targ->health <= 0 && targ->die)
-		{
+		if (targ->health <= 0 && targ->die) {
 			targ->die (targ, inflictor, attacker, damage, mod);
 		}
 		return qtrue;
@@ -1539,6 +1539,16 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	// do the damage
 	if (take) {
+#ifdef TA_ENTSYS // FUNC_VOODOO
+		// Voodoo gives damage to others
+		if (Q_stricmp(targ->classname, "func_voodoo") == 0) {
+			//G_BreakableDebris(targ, inflictor, attacker, dir, point);
+
+			if (targ->die) {
+				targ->die (targ, inflictor, attacker, damage, mod);
+			}
+		} else {
+#endif
 		targ->health = targ->health - take;
 		if ( targ->client ) {
 			targ->client->ps.stats[STAT_HEALTH] = targ->health;
@@ -1556,6 +1566,9 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		} else if ( targ->pain ) {
 			targ->pain (targ, attacker, take);
 		}
+#ifdef TA_ENTSYS // FUNC_VOODOO
+		}
+#endif
 
 #ifdef TA_ENTSYS
 		// Trigger entity's paintarget

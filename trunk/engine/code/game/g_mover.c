@@ -934,6 +934,7 @@ void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 	G_UseTargets(self, attacker);
 
 	// Spawn item
+	self->enemy = NULL;
 	if (self->message)
 	{
 		vec3_t origin, pos1, pos2;
@@ -954,21 +955,16 @@ void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 
 		if (self->item) {
 			self->enemy = LaunchItem(self->item, origin, vec3_origin);
-		} else {
-			self->enemy = NULL;
 		}
 	}
 
 	// if respawn
-	if (self->wait > 0)
-	{
+	if (self->wait > 0) {
 		// Respawn after X seconds
 		self->nextthink = level.time + (self->wait * 1000);
 		self->think = G_BreakableRespawn;
 		trap_UnlinkEntity(self);
-	}
-	else
-	{
+	} else {
 		// Good bye!
 		G_FreeEntity(self);
 	}
@@ -1074,7 +1070,6 @@ void InitMover( gentity_t *ent ) {
 
 		ent->takedamage = qtrue;
 		ent->die = G_BreakableDie;
-		// ZTM: TODO: Set damage?
 
 		// Per-entity explosion sound
 		if ( G_SpawnString( "deathSound", "100", &sound ) ) {
@@ -2084,7 +2079,7 @@ void SP_func_use( gentity_t *ent ) {
 
 	if ( ent->random >= ent->wait && ent->wait >= 0 ) {
 		ent->random = ent->wait - FRAMETIME;
-		G_Printf( "trigger_multiple has random >= wait\n" );
+		G_Printf( "func_use has random >= wait\n" );
 	}
 
 	trap_SetBrushModel( ent, ent->model );
@@ -2094,5 +2089,255 @@ void SP_func_use( gentity_t *ent ) {
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 
 	ent->use = Use_FuncUse;
+}
+#endif
+
+#ifdef TA_ENTSYS // FUNC_VOODOO
+void FuncVooodooThink(gentity_t *self)
+{
+	self->nextthink = level.time + FRAMETIME;
+
+	if (self->count > 0) {
+		if (self->target_ent) {
+			// Update single target mode
+
+			// If entity become solid
+			if ((self->target_ent->r.contents & (CONTENTS_BODY|CONTENTS_SOLID)) && !(self->r.contents & CONTENTS_SOLID)) {
+				self->r.contents |= CONTENTS_SOLID;
+				G_KillBox(self);
+				trap_LinkEntity(self);
+			} else if (!self->r.linked && self->target_ent->r.linked) {
+				trap_LinkEntity(self);
+			}
+		} else {
+			// Update multiple target mode
+		}
+	} else {
+		gentity_t *ent = NULL;
+
+		while(1)
+		{
+			ent = G_Find (ent, FOFS(targetname), self->target);
+			if (!ent)
+				break;
+
+			// Count targets
+			self->count++;
+		}
+
+		if (self->count > 1) {
+			// Multiple targets
+			self->target_ent = NULL;
+		} else if (self->count == 1) {
+			// Single target
+			self->target_ent = G_PickTarget(self->target);
+		} else if (Q_stricmpn(self->target, "client", 6) == 0 && self->target[6] >= '0' && self->target[6] <= '9')
+			// Voodoo doll
+			int client = atoi(&self->target[6]);
+
+			if (client >= 0 && client < MAX_CLIENTS) {
+				self->target_ent = &g_entities[client];
+			}
+
+			if (self->target_ent && self->target_ent->client) {
+				self->client = self->target_ent->client;
+			}
+		} else {
+			// No targets
+			G_FreeEntity(self);
+		}
+	}
+}
+
+void VoodooReached(gentity_t *self)	// movers call this when hitting endpoint
+{
+	if (self->target_ent) {
+		if (self->target_ent->reached) {
+			self->target_ent->reached(self->target_ent);
+		}
+	} else {
+		gentity_t *ent = NULL;
+
+		while(1)
+		{
+			ent = G_Find (ent, FOFS(targetname), self->target);
+			if (!ent)
+				break;
+
+			if (ent->reached) {
+				ent->reached(ent);
+			}
+		}
+	}
+}
+
+void VoodooBlocked(gentity_t *self, gentity_t *other)
+{
+	if (self->target_ent) {
+		if (self->target_ent->blocked) {
+			self->target_ent->blocked(self->target_ent, other);
+		}
+	} else {
+		gentity_t *ent = NULL;
+
+		while(1)
+		{
+			ent = G_Find (ent, FOFS(targetname), self->target);
+			if (!ent)
+				break;
+
+			if (ent->blocked) {
+				ent->blocked(ent, other);
+			}
+		}
+	}
+}
+
+void VoodooTouch(gentity_t *self, gentity_t *other, trace_t *trace)
+{
+	if (self->target_ent) {
+		if (self->target_ent->touch) {
+			self->target_ent->touch(self->target_ent, other, trace);
+		}
+	} else {
+		gentity_t *ent = NULL;
+
+		while(1)
+		{
+			ent = G_Find (ent, FOFS(targetname), self->target);
+			if (!ent)
+				break;
+
+			if (ent->touch) {
+				ent->touch(ent, other, trace);
+			}
+		}
+	}
+}
+
+void VoodooUse(gentity_t *self, gentity_t *other, gentity_t *activator)
+{
+	if (self->target_ent) {
+		if (self->target_ent->use) {
+			self->target_ent->use(self->target_ent, other, activator);
+		}
+	} else {
+		gentity_t *ent = NULL;
+
+		while(1)
+		{
+			ent = G_Find (ent, FOFS(targetname), self->target);
+			if (!ent)
+				break;
+
+			if (ent->use) {
+				ent->use(ent, other, activator);
+			}
+		}
+	}
+}
+
+void VoodooDamage(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
+{
+	if (self->target_ent) {
+
+		self->target_ent->health = self->target_ent->health - damage;
+		if ( self->target_ent->client ) {
+			self->target_ent->client->ps.stats[STAT_HEALTH] = self->target_ent->health;
+		}
+
+		if ( self->target_ent->health <= 0 ) {
+			if ( self->target_ent->client )
+				self->target_ent->flags |= FL_NO_KNOCKBACK;
+
+			if (self->target_ent->health < -999)
+				self->target_ent->health = -999;
+
+			self->target_ent->enemy = attacker;
+			if (self->target_ent->die) {
+				self->target_ent->die(self->target_ent, inflictor, attacker, damage, mod);
+			}
+
+			//G_BreakableDie?
+
+			// If entity become non-solid
+			if (!(self->target_ent->r.contents & (CONTENTS_BODY|CONTENTS_SOLID))) {
+				self->r.contents &= ~CONTENTS_SOLID;
+			}
+
+			if (self->r.linked && !self->target_ent->r.linked) {
+				trap_UnlinkEntity(self);
+			} else {
+				trap_LinkEntity(self);
+			}
+		} else if ( self->target_ent->pain ) {
+			self->target_ent->pain (self->target_ent, attacker, damage);
+		}
+	} else {
+		gentity_t *ent = NULL;
+
+		while(1)
+		{
+			ent = G_Find (ent, FOFS(targetname), self->target);
+			if (!ent)
+				break;
+
+			ent->health = ent->health - damage;
+			if ( ent->client ) {
+				ent->client->ps.stats[STAT_HEALTH] = ent->health;
+			}
+
+			if ( ent->health <= 0 ) {
+				if ( ent->client )
+					ent->flags |= FL_NO_KNOCKBACK;
+
+				if (ent->health < -999)
+					ent->health = -999;
+
+				ent->enemy = attacker;
+				ent->die (ent, inflictor, attacker, damage, mod);
+			} else if ( ent->pain ) {
+				ent->pain (ent, attacker, damage);
+			}
+		}
+	}
+}
+
+// I don't think this is used...
+void VoodooPain(gentity_t *self, gentity_t *attacker, int damage)
+{
+	// Restore voodoo health
+	self->health = 10000;
+
+	VoodooDamage(self, NULL, attacker, damage, MOD_UNKNOWN);
+}
+
+void SP_func_voodoo( gentity_t *ent ) {
+
+	if (!ent->target || !*ent->target) {
+		G_Printf("func_voodoo missing target!\n");
+	}
+
+	trap_SetBrushModel( ent, ent->model );
+	ent->r.contents = CONTENTS_SOLID;		// replaces the -1 from trap_SetBrushModel
+	ent->health = 10000; // Force setup of 'breakable'
+	InitMover( ent );
+	VectorCopy( ent->s.origin, ent->s.pos.trBase );
+	VectorCopy( ent->s.origin, ent->r.currentOrigin );
+
+	ent->flags |= FL_NO_KNOCKBACK;
+
+	// some movers spawn on the second frame, so delay thinking
+	// until the third frame
+	ent->nextthink = level.time + FRAMETIME * 2;
+	ent->think = FuncVooodooThink;
+	ent->count = 0;
+
+	ent->reached = VoodooReached;
+	ent->blocked = VoodooBlocked;
+	ent->touch = VoodooTouch;
+	ent->use = VoodooUse;
+	ent->pain = VoodooPain;
+	ent->die = VoodooDamage;
 }
 #endif

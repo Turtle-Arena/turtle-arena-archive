@@ -582,56 +582,44 @@ void DropPortalSource( gentity_t *player ) {
 }
 #endif
 #ifdef TA_ENTSYS // MISC_OBJECT
-/*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath
+/*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath invisdeath
 "model"		arbitrary .md3 file to display
-
-: TODO: Animated objects!
-: "*_anim" "first   count   looping   fps"
-"normal_anim"	Start on spawn
-"d1_anim"		Play/change to on damage (level 1)
-"d2_anim"		Play/change to on damage (level 2)
-"d3_anim"		Play/change to on damage (level 3)
-"dead_anim"		Play/change to on death  (level 4)
-
+"config"	config filename (defaults to model with .cfg extension)
 "health"	if health > 0 object can be damaged and killed. (default 0)
-"mins"		object's min bounds (default "-16 -16 0")
-"maxs"		object's max bounds (default "16 16 32")
-"targetname" TODO: Kill (or damage?) when triggered.
+"targetname" Kills object when triggered.
 "target"    if inital health > 0, trigger targets on death, else trigger targets on touch.
 "paintarget" Called on pain (if health > 0)
-"wait"      Time in seconds before respawning (default 0)
+"wait"      Time in seconds before respawning (default 0, no respawn)
 */
 
-// misc_object spawn flags
+// object spawn flags
 #define MOBJF_SUSPENDED 1
 #define MOBJF_KNOCKBACK 2
 #define MOBJF_UNSOLIDDEATH 4
+#define MOBJF_INVISDEATH 8
+#define MOBJF_PUSHABLE 16
 
-void misc_object_pain(gentity_t *self, gentity_t *attacker, int damage)
+void ObjectPain(gentity_t *self, gentity_t *attacker, int damage)
 {
-	//G_Printf("misc_object_pain: damaging...\n");
+	int health;
+
+	// Default health
+	health = self->splashRadius;
 
 	// Change to damge animation at X health
-	if (self->health < (self->activator->health/5) * 2)
-	{
+	if (self->health < (health/5) * 2) {
 		G_SetMiscAnim(self, OBJECT_DEATH3);
-		//G_Printf("    anim = OBJECT_DEATH3\n");
-	}
-	else if (self->health < (self->activator->health/5) * 3)
-	{
+	} else if (self->health < (health/5) * 3) {
 		G_SetMiscAnim(self, OBJECT_DEATH2);
-		//G_Printf("    anim = OBJECT_DEATH2\n");
-	}
-	else if (self->health < (self->activator->health/5) * 4)
-	{
+	} else if (self->health < (health/5) * 4) {
 		G_SetMiscAnim(self, OBJECT_DEATH1);
-		//G_Printf("    anim = OBJECT_DEATH1\n");
 	}
 }
 
-gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles);
+gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles);
 
-void misc_object_respawn(gentity_t *self)
+// Based on G_BreakableRespawn
+void ObjectRespawn(gentity_t *self)
 {
 	// Don't let the humans see it respawn
 	if (G_SeenByHumans(self))
@@ -643,7 +631,7 @@ void misc_object_respawn(gentity_t *self)
 
 			// Try again later
 			self->nextthink = level.time + 1000;
-			self->think = misc_object_respawn;
+			self->think = ObjectRespawn;
 			return;
 		}
 	}
@@ -657,51 +645,61 @@ void misc_object_respawn(gentity_t *self)
 		G_FreeEntity(self->enemy);
 	}
 
-	//G_Printf("misc_object_respawn: respawning...\n");
-	misc_object_spawn(self->activator, self->activator->s.origin, self->activator->s.angles);
+	// Restore settings
+	ObjectSpawn(self, self->splashRadius, self->pos1, self->s.angles2);
+}
 
+void ObjectRemove(gentity_t *self)
+{
+	// Don't let the humans see it be removed
+	if (G_SeenByHumans(self))
+	{
+		// Defer for a max of the total delay time
+		if (self->random < self->wait)
+		{
+			self->random++;
+
+			// Try again later
+			self->nextthink = level.time + 1000;
+			self->think = ObjectRemove;
+			return;
+		}
+	}
+	self->random = 0; // clear defer count
+
+	// Good bye!
 	G_FreeEntity(self);
 }
 
-void misc_object_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
+void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
 {
 	int anim;
 
-	if (!self->takedamage)
+	if (!self->takedamage) {
 		return;
+	}
 	self->takedamage = qfalse;
 
 	// Pick one of the 3 dead animations.
 	anim = OBJECT_DEAD1+rand()%3;
 
 	// Change to dead animation.
-	if (!(self->s.modelindex2 & ANIM_TOGGLEBIT))
+	if (!(self->s.modelindex2 & ANIM_TOGGLEBIT)) {
 		self->s.modelindex2 = (anim|ANIM_TOGGLEBIT);
-	else
+	} else {
 		self->s.modelindex2 = anim;
-
-	//G_Printf("misc_object_die: killed object.\n");
-
-	if (self->activator->spawnflags & MOBJF_UNSOLIDDEATH)
-	{
-		self->r.contents = 0;
-		trap_LinkEntity( self );
-		//G_Printf("    unsolid misc_object\n");
 	}
 
-	// if respawn
-	if (self->wait > 0)
-	{
-		// Respawn after X seconds
-		self->nextthink = level.time + (self->wait * 1000);
-		self->think = misc_object_respawn;
+	if (self->spawnflags & MOBJF_UNSOLIDDEATH) {
+		self->r.contents = 0;
+		trap_LinkEntity( self );
 	}
 
 	G_UseTargets(self, attacker);
 
 	// Spawn item
-	if (self->message)
-	{
+	self->enemy = NULL;
+	if (self->message) {
 		vec3_t origin, pos1, pos2;
 
 		// Tequila comment: set breakable center as origin for G_BreakableRespawn needs
@@ -720,43 +718,101 @@ void misc_object_die(gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 
 		if (self->item) {
 			self->enemy = LaunchItem(self->item, origin, vec3_origin);
-		} else {
-			self->enemy = NULL;
 		}
+	}
+
+	// if respawn
+	if (self->wait > 0) {
+		// Respawn after X seconds
+		self->nextthink = level.time + (self->wait * 1000);
+		self->think = ObjectRespawn;
+		if (self->spawnflags & MOBJF_INVISDEATH) {
+			// Invisible non-solid
+			trap_UnlinkEntity(self);
+		}
+	} else if (self->wait < 0) {
+		// Remove after X seconds
+		self->wait = abs(self->wait);
+		self->nextthink = level.time + (self->wait * 1000);
+		self->think = ObjectRemove;
 	}
 }
 
-#if 0
-void misc_object_think(gentity_t *self)
+void ObjectUse(gentity_t *self, gentity_t *other, gentity_t *activator)
 {
-	self->nextthink = level.time + 1000;
-
-	// Do once per-second thinking code.
-	// Such as animation (but that should be in cgame...)
-}
-#endif
-
-void Use_MiscObject(gentity_t *self, gentity_t *other, gentity_t *activator)
-{
-	misc_object_die(self, NULL, activator, 10000, MOD_UNKNOWN);
+	ObjectDie(self, NULL, activator, 10000, MOD_UNKNOWN);
 }
 
-void misc_object_touch(gentity_t *self, gentity_t *activator, trace_t *trace)
+void ObjectTouchTrigger(gentity_t *self, gentity_t *activator, trace_t *trace)
 {
-	//G_Printf("misc_object_touch: touched\n");
 	G_UseTargets(self, activator);
 }
 
-// Basd on SpawnObelisk
-// Use info in owner to spawn object at origin with angles.
-//  should allow "clone" spawning of misc_objects and easy respawning
-gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
+#ifdef WOLFET
+// From Wolf-ET's game/g_props.c: GPLv3 or later
+void moveit( gentity_t *ent, float yaw, float dist ) {
+	vec3_t move;
+	vec3_t origin;
+	trace_t tr;
+	vec3_t mins, maxs;
+
+	yaw = yaw * M_PI * 2 / 360;
+
+	move[0] = cos( yaw ) * dist;
+	move[1] = sin( yaw ) * dist;
+	move[2] = 0;
+
+	VectorAdd( ent->r.currentOrigin, move, origin );
+
+	mins[0] = ent->r.mins[0];
+	mins[1] = ent->r.mins[1];
+	mins[2] = ent->r.mins[2] + .01;
+
+	maxs[0] = ent->r.maxs[0];
+	maxs[1] = ent->r.maxs[1];
+	maxs[2] = ent->r.maxs[2] - .01;
+
+	trap_Trace( &tr, ent->r.currentOrigin, mins, maxs, origin, ent->s.number, MASK_SHOT );
+
+	if ( ( tr.endpos[0] != origin[0] ) || ( tr.endpos[1] != origin[1] ) ) {
+		mins[0] = ent->r.mins[0] - 2.0;
+		mins[1] = ent->r.mins[1] - 2.0;
+		maxs[0] = ent->r.maxs[0] + 2.0;
+		maxs[1] = ent->r.maxs[1] + 2.0;
+
+		trap_Trace( &tr, ent->r.currentOrigin, mins, maxs, origin, ent->s.number, MASK_SHOT );
+	}
+
+	VectorCopy( tr.endpos, ent->r.currentOrigin );
+
+	VectorCopy( ent->r.currentOrigin, ent->s.pos.trBase );
+
+	trap_LinkEntity( ent );
+
+	//DropToFloor( ent );
+}
+#endif
+
+void ObjectTouchPush(gentity_t *self, gentity_t *other, trace_t *trace)
+{
+#ifdef WOLFET
+	float ratio;
+	vec3_t v;
+
+	if ( other->r.currentOrigin[2] + other->r.mins[2] > ( self->r.currentOrigin[2] + self->r.mins[2] + self->r.maxs[2]*0.4f ) ) {
+		return;
+	}
+
+	ratio = 2.5;
+	VectorSubtract( self->r.currentOrigin, other->r.currentOrigin, v );
+	moveit( self, vectoyaw( v ), ( 20 * ratio * FRAMETIME ) * .001 );
+#endif
+}
+
+gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles)
 {
 	trace_t		tr;
 	vec3_t		dest;
-	gentity_t	*ent;
-
-	ent = G_Spawn();
 
 	VectorCopy( origin, ent->s.origin );
 	VectorCopy( origin, ent->s.pos.trBase );
@@ -765,27 +821,19 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 	VectorCopy( angles, ent->s.angles );
 	VectorCopy( ent->s.angles, ent->s.apos.trBase );
 
-	VectorCopy(owner->r.mins, ent->r.mins);
-	VectorCopy(owner->r.maxs, ent->r.maxs);
-	ent->target = owner->target;
-	ent->wait = owner->wait;
-	ent->message = owner->message;
-	ent->spawnflags = owner->spawnflags;
-
 	// No not constant random weapon...
-	if (!(ent->spawnflags & 8<<7))
-	{
+	if (!(ent->spawnflags & 8<<7)) {
 		// Change weapons on respawn
 		ent->s.eFlags |= EF_VOTED;
 	}
 
 	ent->s.eType = ET_MISCOBJECT;
-	if (!(owner->spawnflags & MOBJF_KNOCKBACK)) {
+	if (!(ent->spawnflags & MOBJF_KNOCKBACK)) {
 		ent->flags = FL_NO_KNOCKBACK;
 	}
 
 	// Setup stuff.
-	ent->s.modelindex = G_ModelIndex( owner->model );
+	ent->s.modelindex = G_ModelIndex( ent->model );
 
 	// undamaged animation
 	if (!(ent->s.modelindex2 & ANIM_TOGGLEBIT))
@@ -793,30 +841,31 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 	else
 		ent->s.modelindex2 = OBJECT_IDLE;
 
-	if (owner->health > 0) {
-		//G_Printf("misc_object_spawn: animated damagable\n");
+	if (health > 0) {
+		//G_Printf("ObjectSpawn: animated damagable\n");
 		ent->r.contents = CONTENTS_BODY;
-		ent->health = owner->health;
+		ent->health = health;
 		ent->takedamage = qtrue;
-		ent->die = misc_object_die;
-		ent->pain = misc_object_pain;
-		ent->use = Use_MiscObject;
-		//ent->think = misc_object_think;
-		//ent->nextthink = level.time + 1000;
+		ent->die = ObjectDie;
+		ent->pain = ObjectPain;
+		ent->use = ObjectUse;
+		if ( ent->spawnflags & MOBJF_PUSHABLE ) {
+			ent->touch = ObjectTouchPush;
+		}
 	} else if ( ent->target ) {
-		//G_Printf("misc_object_spawn: animated touchable\n");
+		//G_Printf("ObjectSpawn: animated touchable\n");
 		ent->r.contents = CONTENTS_TRIGGER;
-		ent->touch = misc_object_touch;
+		ent->touch = ObjectTouchTrigger;
 	} else {
-		//G_Printf("misc_object_spawn: animated scenery\n");
+		//G_Printf("ObjectSpawn: animated scenery\n");
 	}
 
-	if ( owner->spawnflags & MOBJF_SUSPENDED ) {
-		//G_Printf("misc_object_spawn: no gravity\n");
+	if ( ent->spawnflags & MOBJF_SUSPENDED ) {
+		//G_Printf("ObjectSpawn: no gravity\n");
 		// suspended
 		G_SetOrigin( ent, ent->s.origin );
 	} else {
-		//G_Printf("misc_object_spawn: dropped to ground\n");
+		//G_Printf("ObjectSpawn: dropped to ground\n");
 		// mappers like to put them exactly on the floor, but being coplanar
 		// will sometimes show up as starting in solid, so lif it up one pixel
 		ent->s.origin[2] += 1;
@@ -830,8 +879,7 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 
 			ent->s.groundEntityNum = ENTITYNUM_NONE;
 			G_SetOrigin( ent, ent->s.origin );
-		}
-		else {
+		} else {
 			// allow to ride movers
 			ent->s.groundEntityNum = tr.entityNum;
 			G_SetOrigin( ent, tr.endpos );
@@ -841,20 +889,46 @@ gentity_t *misc_object_spawn(gentity_t *owner, vec3_t origin, vec3_t angles)
 		ent->s.pos.trTime = level.time;
 	}
 
-	ent->activator = owner;
+	ent->enemy = NULL;
 
 	trap_LinkEntity( ent );
 
 	return ent;
 }
 
+#if 0
+// Based on SpawnObelisk
+// Use info in owner to spawn object at origin with angles.
+//  should allow "clone" spawning of misc_objects and easy respawning
+gentity_t *misc_object_clone(gentity_t *owner, int health, vec3_t origin, vec3_t angles)
+{
+	gentity_t *ent;
+
+	ent = G_Spaw();
+
+	ent->activator = owner;
+	VectorCopy(owner->r.mins, ent->r.mins);
+	VectorCopy(owner->r.maxs, ent->r.maxs);
+	ent->target = owner->target;
+	ent->wait = owner->wait;
+	ent->message = owner->message;
+	ent->spawnflags = owner->spawnflags;
+	ent->model = owner->model;
+
+	// Save settings for respawning
+	ent->splashRadius = ent->health;
+	VectorCopy(ent->s.origin, ent->pos1);
+	VectorCopy(ent->s.angles, ent->s.angles2);
+
+	ObjectSpawn(ent, owner->health, owner->origin, owner->angles);
+}
+#endif
+
 // Based on SP_misc_model and SP_team_redobelisk
-// The passed "ent" is the misc_object controler.
 void SP_misc_object( gentity_t *ent ) {
 	qboolean entHealth;
 	qboolean entWait;
 	qboolean entSpeed;
-	qboolean entMins, entMaxs;
 #ifdef IOQ3ZTM // RENDERFLAGS
 	int mirrorType;
 #endif
@@ -871,71 +945,59 @@ void SP_misc_object( gentity_t *ent ) {
 		ent->s.eFlags |= EF_NOT_MIRROR;
 #endif
 
-#if 1
-	entMins = entMaxs = qfalse;
-#else
-	entMins = G_SpawnVector( "mins", "-16 -16 0", ent->r.mins );
-	entMaxs = G_SpawnVector( "maxs", "16 16 32", ent->r.maxs );
-#endif
-
 	G_SetOrigin( ent, ent->s.origin );
 	VectorCopy( ent->s.angles, ent->s.apos.trBase );
 
 	// Use a animation config file!
 	{
 		char filename[MAX_QPATH];
+		char *config;
 		bg_objectcfg_t objectcfg; // ZTM: TODO: Move to gentity_s ?
 
 		Com_Memset(&objectcfg, 0, sizeof (objectcfg));
 
-		// !! It took forever to find why bounding box wasn't loaded, there was
-		//    no config filename !!
-		trap_GetConfigstring( CS_MODELS + G_ModelIndex( ent->model ), filename, sizeof(filename));
+		filename[0] = '\0';
 
-		if (filename[0] == '\0')
-		{
-			G_Printf("DEBUG: Missing filename for misc_object model!\n");
-		}
-		else
-		{
+		if (G_SpawnString( "config", "", &config) && *config) {
+			Q_stricmpn(filename, config, sizeof (filename));
+		} else {
+			trap_GetConfigstring( CS_MODELS + G_ModelIndex( ent->model ), filename, sizeof(filename));
 			Com_SetExt(filename, ".cfg");
+		}
+
+		if (filename[0] == '\0') {
+			G_Printf("DEBUG: Missing config filename for misc_object!\n");
 		}
 
 		BG_ParseObjectCFGFile(filename, &objectcfg);
 
+		VectorCopy(objectcfg.bbmins, ent->r.mins);
+		VectorCopy(objectcfg.bbmaxs, ent->r.maxs);
+
 		// The data in this entity over-rides the cfg file.
-		if (!entHealth)
-		{
+		if (!entHealth) {
 			// Use health from cfg.
 			ent->health = objectcfg.health;
 		}
-		if (!entWait)
-		{
+		if (!entWait) {
 			// Use wait from cfg.
 			ent->wait = objectcfg.wait;
 		}
-		if (!entSpeed)
-		{
+		if (!entSpeed) {
 			// Use speed from cfg.
 			ent->speed = objectcfg.speed;
 		}
-		if (!entMins)
-		{
-			VectorCopy(objectcfg.bbmins, ent->r.mins);
-		}
-		if (!entMaxs)
-		{
-			VectorCopy(objectcfg.bbmaxs, ent->r.maxs);
-		}
 
-		if (ent->speed < 1.0f)
-		{
+		if (ent->speed < 1.0f) {
 			ent->speed = 1.0f;
 		}
 	}
 
-	//trap_LinkEntity (ent);
+	// Save settings for respawning
+	ent->splashRadius = ent->health;
+	VectorCopy(ent->s.origin, ent->pos1);
+	VectorCopy(ent->s.angles, ent->s.angles2);
 
-	misc_object_spawn(ent, ent->s.origin, ent->s.angles);
+	ObjectSpawn(ent, ent->splashRadius, ent->pos1, ent->s.angles2);
 }
 #endif
