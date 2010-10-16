@@ -2131,7 +2131,7 @@ void FuncVooodooThink(gentity_t *self)
 		} else if (self->count == 1) {
 			// Single target
 			self->target_ent = G_PickTarget(self->target);
-		} else if (Q_stricmpn(self->target, "client", 6) == 0 && self->target[6] >= '0' && self->target[6] <= '9')
+		} else if (Q_stricmpn(self->target, "client", 6) == 0 && self->target[6] >= '0' && self->target[6] <= '9') {
 			// Voodoo doll
 			int client = atoi(&self->target[6]);
 
