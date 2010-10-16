@@ -235,6 +235,22 @@ models/mapobjects/traffic_cone/traffic_cone
 	}
 }
 
+models/mapobjects/vent/vent_grid
+{
+	surfaceparm trans
+	cull none
+
+	// A GRATE OR GRILL THAT CAN BE SEEN FROM BOTH SIDES
+	{
+		map textures/base_floor/grate.png
+		//map models/mapobjects/vent/vent_grid.png
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		alphaFunc GT0
+		depthWrite
+		rgbGen lightingDiffuse
+	}
+}
+
 models/powerups/health/health
 {
 	{
