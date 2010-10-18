@@ -1274,7 +1274,7 @@ Inserting animated MD3/MDR models in game, can be interactive and/or damageable.
 -------- KEYS --------
 <angle key="angle" name="Yaw Angle">direction in which model will be oriented.</angle>
 <model key="model" name="Model File">path/name of model to use (eg: models/mapobjects/teleporter/teleporter.md3).</model>
-<string key="config" name="Config File">path/name of config file to use (eg: models/mapobjects/teleporter/teleporter.cfg).</model>
+<string key="config" name="Config File">path/name of config file to use (eg: models/mapobjects/teleporter/teleporter.cfg).</string>
 <mirrorType key="mirrorType" name="Mirror/Portal View">if 1 only renders in mirrors, if 2 doesn't render in mirrors</mirrorType>
 <targetname key="targetname" name="Target Name">kills this entity when triggered</targetname>
 <integer key="health" name="Health">object's health, if 0 can't be damaged or killed. (default 0)</integer>
