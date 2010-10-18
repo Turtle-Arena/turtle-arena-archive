@@ -1075,21 +1075,35 @@ void InitMover( gentity_t *ent ) {
 		if ( G_SpawnString( "deathSound", "100", &sound ) ) {
 			ent->noise_index = G_SoundIndex( sound );
 		} else {
-			// EV_SPAWN_DEBRIS will select sound based on surfaceFlags (ent->s.time2)
+			// EV_SPAWN_DEBRIS will select sound based on surfaceFlags (ent->deathMaterial)
 			ent->noise_index = MAX_SOUNDS-1;
 		}
 
-		ent->s.time2 = -1; // auto surfaceFlags
-
 #ifdef TA_MISC // MATERIALS
+		ent->deathMaterial = -1; // auto surfaceFlags
 		if( G_SpawnString( "material", "none", &mat ) ) {
-			ent->s.time2 = 0;
+			ent->deathMaterial = 0;
 			for ( i = 1; i < NUM_MATERIAL_TYPES; i++)
 			{
 				if ( strstr( mat, materialInfo[i].name ) != NULL ) {
-					ent->s.time2 |= materialInfo[i].surfaceFlag;
+					ent->deathMaterial |= materialInfo[i].surfaceFlag;
 				}
 			}
+		}
+
+		ent->damageMaterial = -1; // auto surfaceFlags
+		if( G_SpawnString( "damage_material", "none", &mat ) ) {
+			ent->damageMaterial = 0;
+			for ( i = 1; i < NUM_MATERIAL_TYPES; i++)
+			{
+				if ( strstr( mat, materialInfo[i].name ) != NULL ) {
+					ent->damageMaterial |= materialInfo[i].surfaceFlag;
+				}
+			}
+		}
+
+		if (ent->deathMaterial == -1 && ent->damageMaterial > 0) {
+			ent->deathMaterial = ent->damageMaterial;
 		}
 #endif
 	}
@@ -2338,10 +2352,15 @@ void SP_func_voodoo( gentity_t *ent ) {
 
 	trap_SetBrushModel( ent, ent->model );
 	ent->r.contents = CONTENTS_SOLID;		// replaces the -1 from trap_SetBrushModel
-	ent->health = 10000; // Force setup of 'breakable'
+	ent->health = 10000; // Give health to force setup of breakable in InitMover
 	InitMover( ent );
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
+
+	if (ent->damageMaterial == -1) {
+		// Default to no damage debris
+		ent->damageMaterial = 0;
+	}
 
 	ent->flags |= FL_NO_KNOCKBACK;
 

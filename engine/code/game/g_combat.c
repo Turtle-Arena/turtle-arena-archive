@@ -1095,6 +1095,7 @@ Spawn debris from breakable, the debris itself is not beakable.
 */
 void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker, vec3_t dir, vec3_t point)
 {
+	int surfaceFlags;
 	gentity_t   *tent;
 	vec3_t      size;
  
@@ -1105,6 +1106,11 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 	if (targ->health <= 0 || !dir || VectorLength(dir) == 0)
 	{
 		vec3_t      center;
+
+		surfaceFlags = targ->deathMaterial;
+		if (surfaceFlags == 0) {
+			return;
+		}
 
 		// Find the center of the brush
 		VectorAdd(targ->r.mins, size, center);
@@ -1118,14 +1124,19 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 			tent->s.generic1 = targ->noise_index;
 		}
 
-		tent->s.time2 = targ->s.time2; // surfaceFlags
+		tent->s.time2 = surfaceFlags;
 	}
 	else
 	{
+		surfaceFlags = targ->damageMaterial;
+		if (surfaceFlags == 0) {
+			return;
+		}
+
 		tent = G_TempEntity( point, EV_SPAWN_DEBRIS );
 		VectorInverse(dir);
 		tent->s.eventParm = DirToByte(dir);
-		tent->s.time2 = -1; // surfaceFlags
+		tent->s.time2 = surfaceFlags;
 	}
 
 	tent->s.number = targ->s.number;
@@ -1542,7 +1553,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 #ifdef TA_ENTSYS // FUNC_VOODOO
 		// Voodoo gives damage to others
 		if (Q_stricmp(targ->classname, "func_voodoo") == 0) {
-			//G_BreakableDebris(targ, inflictor, attacker, dir, point);
+			G_BreakableDebris(targ, inflictor, attacker, dir, point);
 
 			if (targ->die) {
 				targ->die (targ, inflictor, attacker, damage, mod);
