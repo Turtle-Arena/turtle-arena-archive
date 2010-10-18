@@ -177,6 +177,11 @@ struct gentity_s {
 	int			kamikazeShockTime;
 #endif
 
+#ifdef TA_MISC // MATERIALS
+	int			deathMaterial; // death material
+	int			damageMaterial; // damage material
+#endif
+
 	int			watertype;
 	int			waterlevel;
 
