@@ -1292,6 +1292,7 @@ Inserting animated MD3/MDR models in game, can be interactive and/or damageable.
 <flag key="UNSOLIDDEATH" name="Unsolid on Death" bit="2">makes the object non-solid when killed.</flag>
 <flag key="INVISDEATH" name="Unlink on Death" bit="3">makes the object invisible and non-solid when killed.</flag>
 <flag key="PUSHABLE" name="Pushable" bit="4">makes the object pushable.</flag>
+<flag key="NO_BBOX" name="No Bounding Box" bit="5">do not use bounding box from config (for entities that use func_voodoo for their bounding box)</flag>
 <flag key="MELEE" name="Spawn Melee Weapons" bit="6">spawn melee weapons (Default on - see weapon_random Notes).</flag>
 <flag key="GUNS" name="Spawn Guns" bit="7">spawn guns (Default on - see weapon_random Notes).</flag>
 <flag key="CONSTANT" name="Select Weapon Once" bit="8">don't change weapon each respawn (see weapon_random Notes).</flag>

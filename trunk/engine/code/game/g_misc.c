@@ -582,7 +582,7 @@ void DropPortalSource( gentity_t *player ) {
 }
 #endif
 #ifdef TA_ENTSYS // MISC_OBJECT
-/*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath invisdeath
+/*QUAKED misc_object (1 0 0) (-16 -16 -16) (16 16 16) suspended knockback unsoliddeath invisdeath no_bbox
 "model"		arbitrary .md3 file to display
 "config"	config filename (defaults to model with .cfg extension)
 "health"	if health > 0 object can be damaged and killed. (default 0)
@@ -594,10 +594,11 @@ void DropPortalSource( gentity_t *player ) {
 
 // object spawn flags
 #define MOBJF_SUSPENDED 1
-#define MOBJF_KNOCKBACK 2
-#define MOBJF_UNSOLIDDEATH 4
-#define MOBJF_INVISDEATH 8
-#define MOBJF_PUSHABLE 16
+#define MOBJF_KNOCKBACK 2 // TODO: Optionally have in config file
+#define MOBJF_UNSOLIDDEATH 4 // TODO: Move to config file
+#define MOBJF_INVISDEATH 8 // TODO: Move to config file
+#define MOBJF_PUSHABLE 16 // TODO: Optionally have in config file
+#define MOBJF_NO_BBOX 32
 
 void ObjectPain(gentity_t *self, gentity_t *attacker, int damage)
 {
@@ -882,7 +883,15 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles)
 		} else {
 			// allow to ride movers
 			ent->s.groundEntityNum = tr.entityNum;
-			G_SetOrigin( ent, tr.endpos );
+			if (ent->spawnflags & MOBJF_NO_BBOX) {
+				// no bbox, so assume mins is ground
+				ent->r.mins[2] = ent->s.origin[2] - tr.endpos[2];
+				ent->r.mins[0] = ent->r.mins[1] = -1;
+				ent->r.maxs[0] = ent->r.maxs[1] = 1;
+				G_SetOrigin( ent, ent->s.origin );
+			} else {
+				G_SetOrigin( ent, tr.endpos );
+			}
 		}
 
 		ent->s.pos.trType = TR_GRAVITY;
@@ -991,6 +1000,11 @@ void SP_misc_object( gentity_t *ent ) {
 		if (ent->speed < 1.0f) {
 			ent->speed = 1.0f;
 		}
+	}
+
+	if (ent->spawnflags & MOBJF_NO_BBOX) {
+		VectorCopy(vec3_origin, ent->r.mins);
+		VectorCopy(vec3_origin, ent->r.maxs);
 	}
 
 	// Save settings for respawning
