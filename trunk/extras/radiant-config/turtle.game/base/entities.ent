@@ -471,7 +471,7 @@ Target this entity with a misc_model to have the model attached to the entity (s
 -->
 
 <group name="func_voodoo" color="0 .5 .8">
-Passes damage, touching, use, etc et on to the targeted entities.
+Passes damage, touching, use, etc et on to the targeted entities. Used to create complex bounding boxes for misc_objects.
 -------- KEYS --------
 <sound key="deathSound" name="Death Sound">path/name of .wav file to play on death (defaults to a sound based on Material)</sound>
 <target key="target" name="Target">all entities with a matching targetname will be damaged.</target>
@@ -496,7 +496,11 @@ Passes damage, touching, use, etc et on to the targeted entities.
 <texture key="_indexmap;alphamap" name="Terrain Blending Map">Path/name for the art file used to guide the mapping of textures on the terrain surface.</texture>
 <integer key="_layers;layers" name="Terrain Layers">Integer value is the number unique root shaders that will be use on the terrain.</integer>
 <texture key="_shader;shader" name="Terrain MetaShader">Path to the metashader used to assign textures to the terrain entity. Note: Omit the "textures/" prefix.</texture>
+-------- SPAWNFLAGS --------
+<flag key="STAY_SOLID" name="Stay solid" bit="0">Do not act like bounding box for target (only works with one target).</flag>
 -------- NOTES --------
+If the entity is not being used as a damageable bounding box for a model, you probably want to set STAY_SOLID.
+
 Setting the origin key is simply an alternate method to using an origin brush. When using the model2 key, the origin point of the model will correspond to the origin point defined by either the origin brush or the origin coordinate value.
 
 Target this entity with a misc_model to have the model attached to the entity (set the model's "target" key to the same value as this entity's "targetname").
