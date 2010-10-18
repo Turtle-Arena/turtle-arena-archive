@@ -2093,24 +2093,45 @@ void SP_func_use( gentity_t *ent ) {
 #endif
 
 #ifdef TA_ENTSYS // FUNC_VOODOO
+/*QUAKED func_voodoo (.5 .5 .5) ? STAY_SOLID
+"target"  Entities to target.
+
+If only one target and not STAY_SOLID, attemps to act as a bounding box for the target.
+*/
+#define VOODOO_STAY_SOLID 1
+
 void FuncVooodooThink(gentity_t *self)
 {
 	self->nextthink = level.time + FRAMETIME;
 
+	// Check if we did the initial count
 	if (self->count > 0) {
-		if (self->target_ent) {
-			// Update single target mode
+		gentity_t *ent = self->target_ent;
+
+		// If target was set, using single target mode
+		if (ent) {
+			// Check if we should change the solidness of self
+			if ((self->spawnflags & VOODOO_STAY_SOLID)) {
+				return;
+			}
+
+			// Check if object was removed
+			if (ent-g_entities >= MAX_CLIENTS && !ent->inuse) {
+				//G_Printf("DEBUG: func_voodoo: target removed.\n");
+				self->target_ent = NULL;
+				G_FreeEntity(self);
+				return;
+			}
 
 			// If entity become solid
-			if ((self->target_ent->r.contents & (CONTENTS_BODY|CONTENTS_SOLID)) && !(self->r.contents & CONTENTS_SOLID)) {
+			if ((ent->r.contents & (CONTENTS_BODY|CONTENTS_SOLID)) && !(self->r.contents & CONTENTS_SOLID)) {
+				//G_Printf("DEBUG: func_voodoo's target became solid!\n");
 				self->r.contents |= CONTENTS_SOLID;
 				G_KillBox(self);
 				trap_LinkEntity(self);
-			} else if (!self->r.linked && self->target_ent->r.linked) {
-				trap_LinkEntity(self);
 			}
 		} else {
-			// Update multiple target mode
+			// multiple target mode currently does nothing.
 		}
 	} else {
 		gentity_t *ent = NULL;
@@ -2261,14 +2282,11 @@ void VoodooDamage(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, in
 			//G_BreakableDie?
 
 			// If entity become non-solid
-			if (!(self->target_ent->r.contents & (CONTENTS_BODY|CONTENTS_SOLID))) {
+			if (!(self->spawnflags & VOODOO_STAY_SOLID) && (self->r.contents & CONTENTS_SOLID)
+				&& !(self->target_ent->r.contents & (CONTENTS_BODY|CONTENTS_SOLID))) {
+				//G_Printf("DEBUG: func_voodoo's target went non-solid\n");
 				self->r.contents &= ~CONTENTS_SOLID;
-			}
-
-			if (self->r.linked && !self->target_ent->r.linked) {
 				trap_UnlinkEntity(self);
-			} else {
-				trap_LinkEntity(self);
 			}
 		} else if ( self->target_ent->pain ) {
 			self->target_ent->pain (self->target_ent, attacker, damage);
@@ -2303,7 +2321,7 @@ void VoodooDamage(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, in
 	}
 }
 
-// I don't think this is used...
+// ZTM: NOTE: I don't think this is used...
 void VoodooPain(gentity_t *self, gentity_t *attacker, int damage)
 {
 	// Restore voodoo health
@@ -2315,7 +2333,7 @@ void VoodooPain(gentity_t *self, gentity_t *attacker, int damage)
 void SP_func_voodoo( gentity_t *ent ) {
 
 	if (!ent->target || !*ent->target) {
-		G_Printf("func_voodoo missing target!\n");
+		G_Printf("func_voodoo: target not set!\n");
 	}
 
 	trap_SetBrushModel( ent, ent->model );
