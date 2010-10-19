@@ -1283,15 +1283,13 @@ Inserting animated MD3/MDR models in game, can be interactive and/or damageable.
 <targetname key="targetname" name="Target Name">kills this entity when triggered</targetname>
 <integer key="health" name="Health">object's health, if 0 can't be damaged or killed. (default 0)</integer>
 <integer key="wait" name="Death Delay">number of seconds before the entity respawns, or if less than 0 number of seconds before the entity is removed (default 0, 0 = never respawn).</integer>
+<boolean key="knockback" name="Knockback">when set to 1, entity will receive knockback when damaged (defaults to value from config).</boolean>
+<boolean key="pushable" name="Pushable">when set to 1, entity will be pushable (defaults to value from config).</boolean>
 <string key="message" name="Item">item to spawn on death</string>
 <target key="target" name="Target">killing (or touching if spawn health is 0) the object will trigger the entity this points to.</target>
 <target key="paintarget" name="Pain Target">damaging the object will trigger the entity this points to.</target>
 -------- SPAWNFLAGS --------
 <flag key="SUSPENDED" name="No Drop To Floor" bit="0">object will spawn where it was placed in map and won't drop to the floor.</flag>
-<flag key="KNOCKBACK" name="Allow Knockback" bit="1">model can move when damaged.</flag>
-<flag key="UNSOLIDDEATH" name="Unsolid on Death" bit="2">makes the object non-solid when killed.</flag>
-<flag key="INVISDEATH" name="Unlink on Death" bit="3">makes the object invisible and non-solid when killed.</flag>
-<flag key="PUSHABLE" name="Pushable" bit="4">makes the object pushable.</flag>
 <flag key="NO_BBOX" name="No Bounding Box" bit="5">do not use bounding box from config (for entities that use func_voodoo for their bounding box)</flag>
 <flag key="MELEE" name="Spawn Melee Weapons" bit="6">spawn melee weapons (Default on - see weapon_random Notes).</flag>
 <flag key="GUNS" name="Spawn Guns" bit="7">spawn guns (Default on - see weapon_random Notes).</flag>

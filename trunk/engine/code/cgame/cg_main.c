@@ -2467,6 +2467,12 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	BG_InitWeaponInfo();
 #endif
 
+#ifdef TA_ENTSYS // MISC_OBJECT
+	CG_LoadingString( "objects" );
+
+	BG_InitObjectConfig();
+#endif
+
 #ifdef TA_NPCSYS
 	CG_LoadingString( "npcs" );
 

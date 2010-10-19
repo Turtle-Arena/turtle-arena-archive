@@ -276,11 +276,11 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 
 #if 0
 			// Do we need to clear it?
-			BG_ClearLerpFrame( &cent->oe.lerp, cent->objectcfg.animations, cent->oe.anim, cg.time);
+			BG_ClearLerpFrame( &cent->oe.lerp, cent->objectcfg->animations, cent->oe.anim, cg.time);
 #endif
 		}
 
-		BG_RunLerpFrame( &cent->oe.lerp, cent->objectcfg.animations, cent->oe.anim,
+		BG_RunLerpFrame( &cent->oe.lerp, cent->objectcfg->animations, cent->oe.anim,
 			cg.time, cent->oe.speed );
 
 		// If we didn't play a sound this frame
@@ -298,7 +298,7 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 					continue;
 				if (cent->oe.sounds[i].anim != cent->oe.anim)
 					continue;
-				if ((cent->objectcfg.animations[cent->oe.anim].firstFrame +
+				if ((cent->objectcfg->animations[cent->oe.anim].firstFrame +
 					cent->oe.sounds[i].frame) != cent->oe.lerp.frame)
 				{
 					continue;
@@ -318,7 +318,7 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 		}
 
 		*frame = cent->oe.lerp.frame;
-		if (cent->objectcfg.lerpframes == 0)
+		if (!cent->objectcfg->lerpframes)
 		{
 			*oldframe = *frame;
 			*backlerp = 0;
@@ -338,8 +338,6 @@ static void CG_MiscObject( centity_t *cent ) {
 	qboolean		isNPC;
 #endif
 	float			scale;
-
-	scale = 1.0f;
 
 	s1 = &cent->currentState;
 
@@ -385,19 +383,19 @@ static void CG_MiscObject( centity_t *cent ) {
 
 		Com_SetExt(filename, ".cfg");
 
-		if (BG_ParseObjectCFGFile(filename, &cent->objectcfg))
-		{
+		if ((cent->objectcfg = BG_ParseObjectCFGFile(filename)) != NULL) {
 			// Loaded file.
 			cent->oe.anim = 0;
-			BG_ClearLerpFrame( &cent->oe.lerp, cent->objectcfg.animations, cent->oe.anim, cg.time);
-		}
-		else
-		{
+			BG_ClearLerpFrame( &cent->oe.lerp, cent->objectcfg->animations, cent->oe.anim, cg.time);
+		} else {
 			// No config file or failed to load cfg file,
 			// so disable animation.
 			cent->oe.anim = OBJECT_NONE;
+			cent->objectcfg = BG_DefaultObjectCFG();
 		}
 	}
+
+	scale = cent->objectcfg->scale;
 
 #if 0 // Sprite misc_objects and NPCs?
 	if ( isNPC && !cg_npcs[ s1->modelindex ].model )
@@ -405,7 +403,7 @@ static void CG_MiscObject( centity_t *cent ) {
 		memset( &ent, 0, sizeof( ent ) );
 		ent.reType = RT_SPRITE;
 		VectorCopy( cent->lerpOrigin, ent.origin );
-		ent.radius = 14;
+		ent.radius = 14*scale;
 		ent.customShader = cg_npcs[ es->modelindex ].sprite;
 		ent.shaderRGBA[0] = 255;
 		ent.shaderRGBA[1] = 255;
