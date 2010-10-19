@@ -573,7 +573,6 @@
 "classname" "misc_object"
 "origin" "432.000000 728.000000 -192.000000"
 "model" "models/mapobjects/pots/pot1.md3"
-"spawnflags" "4"
 "wait" "5"
 "message" "item_health"
 }
@@ -2308,6 +2307,8 @@
 {
 "classname" "func_voodoo"
 "target" "misc_object_car"
+"damage_material" "stone"
+"material" "stone"
 // brush 0
 {
 ( 837.5 -849.25 -143.875 ) ( 774.375 -798.625 -143.25 ) ( 836.25 -798.625 -143.75 ) common/invisible 0 0 0 0.5 0.5 0 0 0
@@ -2333,5 +2334,27 @@
 "origin" "808.000000 -824.000000 -208.000000"
 "model" "models/mapobjects/car/car.md3"
 "targetname" "misc_object_car"
-"spawnflags" "5"
+"spawnflags" "2"
+}
+// entity 96
+{
+"classname" "func_voodoo"
+"target" "misc_gamemodel1"
+"spawnflags" "1"
+// brush 0
+{
+( 760 -712 -168 ) ( 760 -744 -168 ) ( 696 -712 -168 ) base_floor/sewer_dirt 0 0 0 0.5 0.5 0 0 0
+( 760 -712 -200 ) ( 696 -712 -200 ) ( 760 -712 -208 ) base_floor/sewer_dirt 0 0 0 0.5 0.5 0 0 0
+( 760 -712 -200 ) ( 760 -712 -208 ) ( 760 -744 -200 ) base_floor/sewer_dirt 0 0 0 0.5 0.5 0 0 0
+( 696 -744 -208 ) ( 760 -744 -208 ) ( 696 -712 -208 ) base_floor/sewer_dirt 0 0 0 0.5 0.5 0 0 0
+( 696 -744 -208 ) ( 696 -744 -200 ) ( 760 -744 -208 ) base_floor/sewer_dirt 0 0 0 0.5 0.5 0 0 0
+( 696 -744 -208 ) ( 696 -712 -208 ) ( 696 -744 -200 ) base_floor/sewer_dirt 0 0 0 0.5 0.5 0 0 0
+}
+}
+// entity 97
+{
+"classname" "misc_gamemodel"
+"origin" "744.000000 -728.000000 -168.000000"
+"model" "models/mapobjects/vent/vent.md3"
+"targetname" "misc_gamemodel1"
 }

@@ -1418,20 +1418,25 @@ city/road
 "classname" "misc_gamemodel"
 "origin" "216.000000 -544.000000 8.000000"
 "model" "models/mapobjects/traffic_cone/traffic_cone.solid.md3"
-"spawnflags" "2"
 }
 // entity 19
+{
+"classname" "misc_gamemodel"
+"origin" "272.000000 -504.000000 8.000000"
+"model" "models/mapobjects/traffic_cone/traffic_cone.solid.md3"
+}
+// entity 20
 {
 "classname" "misc_gamemodel"
 "origin" "271.999969 -559.999756 16.999989"
 "model" "models/mapobjects/traffic_cone/traffic_cone.md3"
 "angles" "69.058159 -151.118362 -179.970947"
-"spawnflags" "3"
+"spawnflags" "1"
 }
-// entity 20
+// entity 21
 {
 "classname" "misc_gamemodel"
-"origin" "272.000000 -504.000000 8.000000"
-"model" "models/mapobjects/traffic_cone/traffic_cone.solid.md3"
-"spawnflags" "2"
+"origin" "416.000000 -248.000000 416.000000"
+"model" "models/mapobjects/vent/vent.md3"
+"angles" "-0.000000 -89.999992 -0.000001"
 }

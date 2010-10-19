@@ -1290,7 +1290,7 @@ Inserting animated MD3/MDR models in game, can be interactive and/or damageable.
 <target key="paintarget" name="Pain Target">damaging the object will trigger the entity this points to.</target>
 -------- SPAWNFLAGS --------
 <flag key="SUSPENDED" name="No Drop To Floor" bit="0">object will spawn where it was placed in map and won't drop to the floor.</flag>
-<flag key="NO_BBOX" name="No Bounding Box" bit="5">do not use bounding box from config (for entities that use func_voodoo for their bounding box)</flag>
+<flag key="NO_BBOX" name="No Bounding Box" bit="1">do not use bounding box from config (for entities that use func_voodoo for their bounding box)</flag>
 <flag key="MELEE" name="Spawn Melee Weapons" bit="6">spawn melee weapons (Default on - see weapon_random Notes).</flag>
 <flag key="GUNS" name="Spawn Guns" bit="7">spawn guns (Default on - see weapon_random Notes).</flag>
 <flag key="CONSTANT" name="Select Weapon Once" bit="8">don't change weapon each respawn (see weapon_random Notes).</flag>

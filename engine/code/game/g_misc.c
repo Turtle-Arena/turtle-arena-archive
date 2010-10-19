@@ -590,18 +590,14 @@ void DropPortalSource( gentity_t *player ) {
 "target"    if inital health > 0, trigger targets on death, else trigger targets on touch.
 "paintarget" Called on pain (if health > 0)
 "wait"      Time in seconds before respawning (default 0, no respawn)
+"message"	Item to drop on death.
+"knockback" Whether the object takes knockback (defaults to value from config)
+"pushable"	Whether the object is pushable (defaults to value from config)
 */
 
 // object spawn flags
 #define MOBJF_SUSPENDED 1
-// OLD
-//#define MOBJF_KNOCKBACK 2
-//#define MOBJF_UNSOLIDDEATH 4
-//#define MOBJF_INVISDEATH 8
-//#define MOBJF_PUSHABLE 16
-//#define MOBJF_NO_BBOX 32
-// NEW
-#define MOBJF_NO_BBOX 32 // ZTM: TODO: Change to 2
+#define MOBJF_NO_BBOX 2
 
 
 void ObjectPain(gentity_t *self, gentity_t *attacker, int damage)
