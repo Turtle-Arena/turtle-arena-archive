@@ -1425,15 +1425,25 @@ qboolean BG_PlayerStandAnim(bg_playercfg_t *playercfg, int prefixBit, animNumber
 #ifdef TA_ENTSYS
 typedef struct
 {
-	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
+	char filename[MAX_QPATH];
 
-	// Object's boundingbox
+	// Object's boundingbox (some objects use func_voodoo instead)
 	vec3_t bbmins;
 	vec3_t bbmaxs;
+
+	// Read from entity as well as config
 	int health;
 	int wait;
 	float speed;
-	int lerpframes; // Use raw frames, don't interperate them.
+	qboolean knockback;
+	qboolean pushable;
+
+	// config only
+	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
+	qboolean unsolidOnDeath;
+	qboolean invisibleUnsolidDeath;
+	qboolean lerpframes; // Use raw frames, don't interperate them.
+	float scale; // Uniform scale
 
 	// ZTM: TODO: For NPCs
 	// Speed control, some characters are faster then others.
@@ -1443,8 +1453,9 @@ typedef struct
 
 } bg_objectcfg_t;
 
-// Use for loading misc_object animations
-qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg);
+void BG_InitObjectConfig(void);
+bg_objectcfg_t *BG_DefaultObjectCFG(void);
+bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename);
 #endif
 #endif
 

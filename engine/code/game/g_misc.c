@@ -594,11 +594,15 @@ void DropPortalSource( gentity_t *player ) {
 
 // object spawn flags
 #define MOBJF_SUSPENDED 1
-#define MOBJF_KNOCKBACK 2 // TODO: Optionally have in config file
-#define MOBJF_UNSOLIDDEATH 4 // TODO: Move to config file
-#define MOBJF_INVISDEATH 8 // TODO: Move to config file
-#define MOBJF_PUSHABLE 16 // TODO: Optionally have in config file
-#define MOBJF_NO_BBOX 32
+// OLD
+//#define MOBJF_KNOCKBACK 2
+//#define MOBJF_UNSOLIDDEATH 4
+//#define MOBJF_INVISDEATH 8
+//#define MOBJF_PUSHABLE 16
+//#define MOBJF_NO_BBOX 32
+// NEW
+#define MOBJF_NO_BBOX 32 // ZTM: TODO: Change to 2
+
 
 void ObjectPain(gentity_t *self, gentity_t *attacker, int damage)
 {
@@ -617,7 +621,7 @@ void ObjectPain(gentity_t *self, gentity_t *attacker, int damage)
 	}
 }
 
-gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles);
+gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles, int flags);
 
 // Based on G_BreakableRespawn
 void ObjectRespawn(gentity_t *self)
@@ -647,7 +651,7 @@ void ObjectRespawn(gentity_t *self)
 	}
 
 	// Restore settings
-	ObjectSpawn(self, self->splashRadius, self->pos1, self->s.angles2);
+	ObjectSpawn(self, self->splashRadius, self->pos1, self->s.angles2, self->flags);
 }
 
 void ObjectRemove(gentity_t *self)
@@ -691,7 +695,7 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 		self->s.modelindex2 = anim;
 	}
 
-	if (self->spawnflags & MOBJF_UNSOLIDDEATH) {
+	if (self->objectcfg->unsolidOnDeath && !self->objectcfg->invisibleUnsolidDeath) {
 		self->r.contents = 0;
 		trap_LinkEntity( self );
 	}
@@ -727,8 +731,9 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 		// Respawn after X seconds
 		self->nextthink = level.time + (self->wait * 1000);
 		self->think = ObjectRespawn;
-		if (self->spawnflags & MOBJF_INVISDEATH) {
+		if (self->objectcfg->invisibleUnsolidDeath) {
 			// Invisible non-solid
+			self->r.contents = 0;
 			trap_UnlinkEntity(self);
 		}
 	} else if (self->wait < 0) {
@@ -810,7 +815,7 @@ void ObjectTouchPush(gentity_t *self, gentity_t *other, trace_t *trace)
 #endif
 }
 
-gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles)
+gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles, int flags)
 {
 	trace_t		tr;
 	vec3_t		dest;
@@ -829,18 +834,12 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles)
 	}
 
 	ent->s.eType = ET_MISCOBJECT;
-	if (!(ent->spawnflags & MOBJF_KNOCKBACK)) {
-		ent->flags = FL_NO_KNOCKBACK;
-	}
+	ent->flags = flags;
 
-	// Setup stuff.
 	ent->s.modelindex = G_ModelIndex( ent->model );
 
 	// undamaged animation
-	if (!(ent->s.modelindex2 & ANIM_TOGGLEBIT))
-		ent->s.modelindex2 = (OBJECT_IDLE|ANIM_TOGGLEBIT);
-	else
-		ent->s.modelindex2 = OBJECT_IDLE;
+	ent->s.modelindex2 = ( ( ent->s.modelindex2 & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | OBJECT_IDLE;
 
 	if (health > 0) {
 		//G_Printf("ObjectSpawn: animated damagable\n");
@@ -850,7 +849,7 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles)
 		ent->die = ObjectDie;
 		ent->pain = ObjectPain;
 		ent->use = ObjectUse;
-		if ( ent->spawnflags & MOBJF_PUSHABLE ) {
+		if ( ent->flags & FL_PUSHABLE ) {
 			ent->touch = ObjectTouchPush;
 		}
 	} else if ( ent->target ) {
@@ -923,13 +922,14 @@ gentity_t *misc_object_clone(gentity_t *owner, int health, vec3_t origin, vec3_t
 	ent->message = owner->message;
 	ent->spawnflags = owner->spawnflags;
 	ent->model = owner->model;
+	ent->objectcfg = owner->objectcfg;
 
 	// Save settings for respawning
 	ent->splashRadius = ent->health;
 	VectorCopy(ent->s.origin, ent->pos1);
 	VectorCopy(ent->s.angles, ent->s.angles2);
 
-	ObjectSpawn(ent, owner->health, owner->origin, owner->angles);
+	ObjectSpawn(ent, owner->health, owner->origin, owner->angles, owner->flags);
 }
 #endif
 
@@ -938,6 +938,10 @@ void SP_misc_object( gentity_t *ent ) {
 	qboolean entHealth;
 	qboolean entWait;
 	qboolean entSpeed;
+	int knockback;
+	qboolean entKnockback;
+	int pushable;
+	qboolean entPushable;
 #ifdef IOQ3ZTM // RENDERFLAGS
 	int mirrorType;
 #endif
@@ -945,6 +949,8 @@ void SP_misc_object( gentity_t *ent ) {
 	entHealth = G_SpawnInt( "health", "0", &ent->health);
 	entWait = G_SpawnFloat( "wait", "0", &ent->wait);
 	entSpeed = G_SpawnFloat( "speed", "0", &ent->speed);
+	entKnockback = G_SpawnInt( "knockback", "0", &knockback);
+	entPushable = G_SpawnInt( "pushable", "0", &pushable);
 #ifdef IOQ3ZTM // RENDERFLAGS
 	G_SpawnInt("mirrorType", "0", &mirrorType );
 
@@ -961,9 +967,6 @@ void SP_misc_object( gentity_t *ent ) {
 	{
 		char filename[MAX_QPATH];
 		char *config;
-		bg_objectcfg_t objectcfg; // ZTM: TODO: Move to gentity_s ?
-
-		Com_Memset(&objectcfg, 0, sizeof (objectcfg));
 
 		filename[0] = '\0';
 
@@ -974,27 +977,33 @@ void SP_misc_object( gentity_t *ent ) {
 			Com_SetExt(filename, ".cfg");
 		}
 
-		if (filename[0] == '\0') {
-			G_Printf("DEBUG: Missing config filename for misc_object!\n");
+		if (!(ent->objectcfg = BG_ParseObjectCFGFile(filename))) {
+			ent->objectcfg = BG_DefaultObjectCFG();
 		}
 
-		BG_ParseObjectCFGFile(filename, &objectcfg);
-
-		VectorCopy(objectcfg.bbmins, ent->r.mins);
-		VectorCopy(objectcfg.bbmaxs, ent->r.maxs);
+		VectorCopy(ent->objectcfg->bbmins, ent->r.mins);
+		VectorCopy(ent->objectcfg->bbmaxs, ent->r.maxs);
 
 		// The data in this entity over-rides the cfg file.
 		if (!entHealth) {
 			// Use health from cfg.
-			ent->health = objectcfg.health;
+			ent->health = ent->objectcfg->health;
 		}
 		if (!entWait) {
 			// Use wait from cfg.
-			ent->wait = objectcfg.wait;
+			ent->wait = ent->objectcfg->wait;
 		}
 		if (!entSpeed) {
 			// Use speed from cfg.
-			ent->speed = objectcfg.speed;
+			ent->speed = ent->objectcfg->speed;
+		}
+		if (!entKnockback) {
+			// Use knockback from cfg.
+			knockback = ent->objectcfg->knockback;
+		}
+		if (!entPushable) {
+			// Use pushable from cfg.
+			pushable = ent->objectcfg->pushable;
 		}
 
 		if (ent->speed < 1.0f) {
@@ -1007,11 +1016,19 @@ void SP_misc_object( gentity_t *ent ) {
 		VectorCopy(vec3_origin, ent->r.maxs);
 	}
 
+	ent->flags = 0;
+	if (!knockback) {
+		ent->flags |= FL_NO_KNOCKBACK;
+	}
+	if (pushable) {
+		ent->flags |= FL_PUSHABLE;
+	}
+
 	// Save settings for respawning
 	ent->splashRadius = ent->health;
 	VectorCopy(ent->s.origin, ent->pos1);
 	VectorCopy(ent->s.angles, ent->s.angles2);
 
-	ObjectSpawn(ent, ent->splashRadius, ent->pos1, ent->s.angles2);
+	ObjectSpawn(ent, ent->splashRadius, ent->pos1, ent->s.angles2, ent->flags);
 }
 #endif

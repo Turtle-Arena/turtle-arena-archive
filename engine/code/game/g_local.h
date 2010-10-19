@@ -51,6 +51,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define FL_NO_BOTS				0x00002000	// spawn point not for bot use
 #define FL_NO_HUMANS			0x00004000	// spawn point just for bots
 #define FL_FORCE_GESTURE		0x00008000	// force gesture on client
+#ifdef TA_ENTSYS // MISC_OBJECT
+#define FL_PUSHABLE				0x00010000	// make misc_object pushable
+#endif
 
 // movers are things like doors, plats, buttons, etc
 typedef enum {
@@ -193,6 +196,9 @@ struct gentity_s {
 
 	gitem_t		*item;			// for bonus items
 
+#ifdef TA_ENTSYS // MISC_OBJECT
+	bg_objectcfg_t *objectcfg;
+#endif
 #ifdef TA_NPCSYS
 	bg_npc_t	bgNPC;
 #endif

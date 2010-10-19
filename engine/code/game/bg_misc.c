@@ -3680,7 +3680,7 @@ static qboolean NPC_Parse(char **p) {
 					animName = qtrue;
 					if (BG_LoadAnimation(p, i, animations, NULL, AP_OBJECT) != 1)
 					{
-						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
+						Com_Printf("NPC_Parse: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
 					}
 					break;
 				}
@@ -6563,6 +6563,65 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 #endif
 
 #ifdef TA_ENTSYS // MISC_OBJECT
+#define MAX_LEVEL_OBJECT_TYPES 128 // currently there is like 10, so 128 per level should be more than enough
+bg_objectcfg_t	bg_objectcfgs[MAX_LEVEL_OBJECT_TYPES];
+static int		numObjectConfigs;
+
+bg_objectcfg_t *BG_NewObjectCfg(void) {
+	bg_objectcfg_t *objectcfg;
+	animation_t *animations;
+	int i;
+
+	objectcfg = &bg_objectcfgs[numObjectConfigs];
+	numObjectConfigs++;
+
+	// Default boundingbox
+	objectcfg->bbmins[0] = objectcfg->bbmins[1] = -5.0f;
+	objectcfg->bbmins[2] = 0.0f;
+
+	objectcfg->bbmaxs[0] = objectcfg->bbmaxs[1] = 5.0f;
+	objectcfg->bbmaxs[2] = 10.0f;
+
+	objectcfg->health = 50;
+	objectcfg->wait = 25; // Wait 25 seconds before respawning
+	objectcfg->speed = 1.0f;
+	objectcfg->knockback = qfalse;
+	objectcfg->pushable = qfalse;
+
+	objectcfg->unsolidOnDeath = qtrue;
+	objectcfg->invisibleUnsolidDeath = qfalse;
+	objectcfg->lerpframes = qfalse;
+	objectcfg->scale = 1.0f;
+
+	animations = objectcfg->animations;
+
+	// Use first frame for all animations.
+	for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
+	{
+		animations[i].firstFrame = 0;
+		animations[i].numFrames = 1;
+		animations[i].loopFrames = 0;
+		animations[i].frameLerp = 100; // 10 fps
+		animations[i].initialLerp = 100; // 10 fps
+		animations[i].reversed = 0;
+		animations[i].flipflop = 0;
+	}
+
+	return objectcfg;
+}
+
+void BG_InitObjectConfig(void)
+{
+	Com_Memset(&bg_objectcfgs, 0, sizeof (bg_objectcfgs));
+	numObjectConfigs = 0;
+	BG_NewObjectCfg(); // Reserve bg_objectcfgs[0]
+}
+
+bg_objectcfg_t *BG_DefaultObjectCFG(void)
+{
+	return &bg_objectcfgs[0];
+}
+
 const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
 {
 	"OBJECT_IDLE",
@@ -6645,7 +6704,7 @@ OBJECT_DEAD1 50 10 0 10
 BG_ParseObjectCFGFile
 ===============
 */
-qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
+bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 {
 	char		*text_p, *prev;
 	int			len;
@@ -6653,42 +6712,40 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 	char		*token;
 	char		text[20000];
 	fileHandle_t	f;
-	animation_t *animations;
+	bg_objectcfg_t	*objectcfg;
+	animation_t	*animations;
 
-	if (!objectcfg) {
-		return qfalse;
+	if (filename[0] == '\0') {
+		Com_Printf("DEBUG: Missing config filename for misc_object!\n");
+		return NULL;
 	}
 
-	// Default boundingbox
-	objectcfg->bbmins[0] = objectcfg->bbmins[1] = -5.0f;
-	objectcfg->bbmins[2] = 0.0f;
+	// Check file was already loaded
+	for (i = 1; i < numObjectConfigs; i++) {
+		if (Q_stricmp(bg_objectcfgs[i].filename, filename) == 0) {
+			//Com_Printf("DEBUG: Reusing objectcfg %s\n", bg_objectcfgs[i].filename);
+			return &bg_objectcfgs[i];
+		}
+	}
 
-	objectcfg->bbmaxs[0] = objectcfg->bbmaxs[1] = 5.0f;
-	objectcfg->bbmaxs[2] = 10.0f;
+	if (numObjectConfigs >= MAX_LEVEL_OBJECT_TYPES) {
+		Com_Printf("Warning: BG_ParseObjectCFGFile reached MAX_LEVEL_OBJECT_TYPES (%d)\n", MAX_LEVEL_OBJECT_TYPES);
+		return NULL;
+	}
 
+	objectcfg = BG_NewObjectCfg();
+	Q_strncpyz(objectcfg->filename, filename, MAX_QPATH);
 	animations = objectcfg->animations;
-
-	// Use first frame for all animations.
-	for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
-	{
-		animations[i].firstFrame = 0;
-		animations[i].numFrames = 1;
-		animations[i].loopFrames = 0;
-		animations[i].frameLerp = 100; // 10 fps
-		animations[i].initialLerp = 100; // 10 fps
-		animations[i].reversed = 0;
-		animations[i].flipflop = 0;
-	}
 
 	// load the file
 	len = trap_FS_FOpenFile( filename, &f, FS_READ );
 	if ( len <= 0 ) {
-		return qfalse;
+		return NULL;
 	}
 	if ( len >= sizeof( text ) - 1 ) {
 		Com_Printf( "File %s too long\n", filename );
 		trap_FS_FCloseFile( f );
-		return qfalse;
+		return NULL;
 	}
 	trap_FS_Read( text, len, f );
 	text[len] = 0;
@@ -6731,7 +6788,6 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 			if ( !*token ) {
 				break;
 			}
-			// store health
 			objectcfg->health = atoi(token);
 			continue;
 		}
@@ -6740,7 +6796,6 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 			if ( !*token ) {
 				break;
 			}
-			// store wait
 			objectcfg->wait = atoi(token);
 			continue;
 		}
@@ -6749,8 +6804,39 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 			if ( !*token ) {
 				break;
 			}
-			// store speed
 			objectcfg->speed = atof(token);
+			continue;
+		}
+		else if ( !Q_stricmp( token, "knockback" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			objectcfg->knockback = atoi(token);
+			continue;
+		}
+		else if ( !Q_stricmp( token, "pushable" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			objectcfg->pushable = atoi(token);
+			continue;
+		}
+		else if ( !Q_stricmp( token, "unsolidOnDeath" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			objectcfg->unsolidOnDeath = atoi(token);
+			continue;
+		}
+		else if ( !Q_stricmp( token, "invisibleUnsolidDeath" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			objectcfg->invisibleUnsolidDeath = atoi(token);
 			continue;
 		}
 		else if ( !Q_stricmp( token, "lerpframes" ) ) {
@@ -6758,13 +6844,19 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 			if ( !*token ) {
 				break;
 			}
-			// store whether to lerpframes
 			objectcfg->lerpframes = atoi(token);
 			continue;
 		}
+		else if ( !Q_stricmp( token, "scale" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			objectcfg->scale = atof(token);
+			continue;
+		}
 		else if ( Q_stricmp( token, "sounds" ) == 0 ) {
-			if (Sounds_Parse(&text_p, filename, objectcfg))
-			{
+			if (Sounds_Parse(&text_p, filename, objectcfg)) {
 				continue;
 			}
 		}
@@ -6778,8 +6870,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
 				{
 					animName = qtrue;
-					if (BG_LoadAnimation(&text_p, i, animations, NULL, AP_OBJECT) != 1)
-					{
+					if (BG_LoadAnimation(&text_p, i, animations, NULL, AP_OBJECT) != 1) {
 						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
 					}
 					break;
@@ -6792,7 +6883,7 @@ qboolean BG_ParseObjectCFGFile(const char *filename, bg_objectcfg_t *objectcfg)
 		Com_Printf( "unknown token '%s' in %s\n", token, filename );
 	}
 
-	return qtrue;
+	return objectcfg;
 }
 #endif
 

@@ -721,6 +721,9 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 #ifdef TA_WEAPSYS
 	BG_InitWeaponInfo();
 #endif
+#ifdef TA_ENTSYS // MISC_OBJECT
+	BG_InitObjectConfig();
+#endif
 #ifdef TA_NPCSYS
 	BG_InitNPCInfo();
 #endif
