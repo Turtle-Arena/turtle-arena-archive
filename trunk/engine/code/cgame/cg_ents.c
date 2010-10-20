@@ -370,7 +370,7 @@ static void CG_MiscObject( centity_t *cent ) {
 
 		// Check if modelindex2 is config filename
 		if (s1->modelindex2 < 0) {
-			Q_strncpyz(filename, CG_ConfigString( CS_STRINGS + ((s1->modelindex*-1)+1 ), MAX_QPATH);
+			Q_strncpyz(filename, CG_ConfigString( CS_STRINGS + ((s1->modelindex2*-1)+1) ), MAX_QPATH);
 		} else {
 			// Use modelName with .cfg extension
 #ifdef TA_NPCSYS
@@ -395,6 +395,17 @@ static void CG_MiscObject( centity_t *cent ) {
 			// so disable animation.
 			cent->oe.anim = OBJECT_NONE;
 			cent->objectcfg = BG_DefaultObjectCFG();
+		}
+
+#ifdef TA_NPCSYS
+		if (isNPC) {
+			cent->oe.model = cg_npcs[ s1->modelindex ].model;
+			cent->oe.skin = cg_npcs[ s1->modelindex ].skin;
+		} else
+#endif
+		{
+			cent->oe.model = cgs.gameModels[s1->modelindex];
+			cent->oe.skin = 0;
 		}
 	}
 
@@ -435,17 +446,8 @@ static void CG_MiscObject( centity_t *cent ) {
 	VectorCopy( cent->lerpOrigin, ent.origin);
 	VectorCopy( cent->lerpOrigin, ent.oldorigin);
 
-#ifdef TA_NPCSYS
-	if (isNPC)
-	{
-		ent.hModel = cg_npcs[ s1->modelindex ].model;
-		ent.customSkin = cg_npcs[ s1->modelindex ].skin;
-	}
-	else
-#endif
-	{
-		ent.hModel = cgs.gameModels[s1->modelindex];
-	}
+	ent.hModel = cent->oe.model;
+	ent.customSkin = cent->oe.skin;
 
 	// Flags for only drawing or not drawing a object in mirrors
 	if (cent->currentState.eFlags & EF_ONLY_MIRROR) {

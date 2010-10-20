@@ -685,7 +685,7 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 	anim = OBJECT_DEAD1+rand()%3;
 
 	// Change to dead animation.
-	G_SetMiscAnim(ent, anim);
+	G_SetMiscAnim(self, anim);
 
 	if (self->objectcfg->unsolidOnDeath && !self->objectcfg->invisibleUnsolidDeath) {
 		self->r.contents = 0;
@@ -828,8 +828,6 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 	ent->s.eType = ET_MISCOBJECT;
 	ent->flags = flags;
 
-	ent->s.modelindex = owner->s.modelindex;
-
 	// undamaged animation
 	G_SetMiscAnim(ent, OBJECT_IDLE);
 
@@ -915,6 +913,7 @@ gentity_t *misc_object_clone(gentity_t *owner, int health, vec3_t origin, vec3_t
 	ent->spawnflags = owner->spawnflags;
 	ent->model = owner->model;
 	ent->objectcfg = owner->objectcfg;
+	ent->s.modelindex = owner->s.modelindex;
 
 	// Save settings for respawning
 	ent->splashRadius = ent->health;
@@ -962,14 +961,14 @@ void SP_misc_object( gentity_t *ent ) {
 
 		filename[0] = '\0';
 
-		ent->modelindex = G_ModelIndex( ent->model );
-		trap_GetConfigstring( CS_MODELS + ent->modelindex, filename, sizeof(filename));
+		ent->s.modelindex = G_ModelIndex( ent->model );
+		trap_GetConfigstring( CS_MODELS + ent->s.modelindex, filename, sizeof(filename));
 		Com_SetExt(filename, ".cfg");
 
 		if (G_SpawnString( "config", "", &config) && *config) {
-			ent->modelindex2 = G_StringIndex( config );
-			trap_GetConfigstring( CS_STRINGS + ent->modelindex2, filename, sizeof(filename));
-			ent->modelindex2 = (ent->modelindex*-1)-1; // Tell cgame modelindex2 is string
+			ent->s.modelindex2 = G_StringIndex( config );
+			trap_GetConfigstring( CS_STRINGS + ent->s.modelindex2, filename, sizeof(filename));
+			ent->s.modelindex2 = (ent->s.modelindex2*-1)-1; // Tell cgame modelindex2 is string
 		}
 
 		if (!(ent->objectcfg = BG_ParseObjectCFGFile(filename))) {
