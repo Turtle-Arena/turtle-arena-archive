@@ -685,11 +685,7 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 	anim = OBJECT_DEAD1+rand()%3;
 
 	// Change to dead animation.
-	if (!(self->s.modelindex2 & ANIM_TOGGLEBIT)) {
-		self->s.modelindex2 = (anim|ANIM_TOGGLEBIT);
-	} else {
-		self->s.modelindex2 = anim;
-	}
+	G_SetMiscAnim(ent, anim);
 
 	if (self->objectcfg->unsolidOnDeath && !self->objectcfg->invisibleUnsolidDeath) {
 		self->r.contents = 0;
@@ -832,10 +828,10 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 	ent->s.eType = ET_MISCOBJECT;
 	ent->flags = flags;
 
-	ent->s.modelindex = G_ModelIndex( ent->model );
+	ent->s.modelindex = owner->s.modelindex;
 
 	// undamaged animation
-	ent->s.modelindex2 = ( ( ent->s.modelindex2 & ANIM_TOGGLEBIT ) ^ ANIM_TOGGLEBIT ) | OBJECT_IDLE;
+	G_SetMiscAnim(ent, OBJECT_IDLE);
 
 	if (health > 0) {
 		//G_Printf("ObjectSpawn: animated damagable\n");
@@ -966,11 +962,14 @@ void SP_misc_object( gentity_t *ent ) {
 
 		filename[0] = '\0';
 
+		ent->modelindex = G_ModelIndex( ent->model );
+		trap_GetConfigstring( CS_MODELS + ent->modelindex, filename, sizeof(filename));
+		Com_SetExt(filename, ".cfg");
+
 		if (G_SpawnString( "config", "", &config) && *config) {
-			Q_stricmpn(filename, config, sizeof (filename));
-		} else {
-			trap_GetConfigstring( CS_MODELS + G_ModelIndex( ent->model ), filename, sizeof(filename));
-			Com_SetExt(filename, ".cfg");
+			ent->modelindex2 = G_StringIndex( config );
+			trap_GetConfigstring( CS_STRINGS + ent->modelindex2, filename, sizeof(filename));
+			ent->modelindex2 = (ent->modelindex*-1)-1; // Tell cgame modelindex2 is string
 		}
 
 		if (!(ent->objectcfg = BG_ParseObjectCFGFile(filename))) {

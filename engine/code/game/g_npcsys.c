@@ -23,14 +23,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "g_local.h"
 
 #ifdef TA_ENTSYS
-// Misc_object uses modelindex2
+// Misc_object uses s.legsAnim
 // NPC uses ps.legsAnim due to Pmove currently.
-//    But it is copied to ent->s.modelindex2 after Pmove.
+//    But it is copied to ent->s.legsAnim after Pmove.
 void G_SetMiscAnim(gentity_t *ent, int anim)
 {
-	ent->s.modelindex2 = ((ent->s.modelindex2 & ANIM_TOGGLEBIT)^ANIM_TOGGLEBIT) | anim;
+	ent->s.legsAnim = ((ent->s.legsAnim & ANIM_TOGGLEBIT)^ANIM_TOGGLEBIT) | anim;
 #ifdef TA_NPCSYS
-	ent->bgNPC.npc_ps.legsAnim = ent->s.modelindex2;
+	ent->bgNPC.npc_ps.legsAnim = ent->s.legsAnim;
 #endif
 }
 #endif
@@ -107,7 +107,7 @@ void NPC_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean
 	BG_PlayerStateToEntityState(ps, s, snap);
 
 	s->eType = ET_NPC;
-	s->modelindex2 = ps->legsAnim;
+	s->legsAnim = ps->legsAnim;
 }
 
 #ifndef TA_PATHSYS

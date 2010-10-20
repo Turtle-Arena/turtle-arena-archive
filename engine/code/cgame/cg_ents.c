@@ -258,11 +258,11 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 		// Animated misc_object
 
 		// Check for animation change
-		if (s1->modelindex2 != cent->oe.anim)
+		if (s1->legsAnim != cent->oe.anim)
 		{
 #if 0 // DEBUG: Debug misc_object/NPC
 			int from = (cent->oe.anim & ~ANIM_TOGGLEBIT);
-			int to = (s1->modelindex2 & ~ANIM_TOGGLEBIT);
+			int to = (s1->legsAnim & ~ANIM_TOGGLEBIT);
 			if (to == from) // reset anim
 			{
 				CG_Printf("Object animation reset (%d)\n", to);
@@ -272,7 +272,7 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 				CG_Printf("Object animation changed to %d from %d\n", to, from);
 			}
 #endif
-			cent->oe.anim = s1->modelindex2;
+			cent->oe.anim = s1->legsAnim;
 
 #if 0
 			// Do we need to clear it?
@@ -368,20 +368,23 @@ static void CG_MiscObject( centity_t *cent ) {
 		// Set defaults
 		cent->oe.speed = 1.0f;
 
+		// Check if modelindex2 is config filename
+		if (s1->modelindex2 < 0) {
+			Q_strncpyz(filename, CG_ConfigString( CS_STRINGS + ((s1->modelindex*-1)+1 ), MAX_QPATH);
+		} else {
+			// Use modelName with .cfg extension
 #ifdef TA_NPCSYS
-		if (isNPC)
-		{
-			modelName = bg_npcinfo[s1->modelindex].model;
-		}
-		else
+			if (isNPC) {
+				modelName = bg_npcinfo[s1->modelindex].model;
+			} else
 #endif
-		{
-			modelName = CG_ConfigString( CS_MODELS + s1->modelindex );
+			{
+				modelName = CG_ConfigString( CS_MODELS + s1->modelindex );
+			}
+
+			Q_strncpyz(filename, modelName, MAX_QPATH);
+			Com_SetExt(filename, ".cfg");
 		}
-
-		Q_strncpyz(filename, modelName, MAX_QPATH);
-
-		Com_SetExt(filename, ".cfg");
 
 		if ((cent->objectcfg = BG_ParseObjectCFGFile(filename)) != NULL) {
 			// Loaded file.
