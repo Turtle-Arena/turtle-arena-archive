@@ -235,6 +235,9 @@ enum
 
 typedef struct
 {
+	qhandle_t		model;
+	qhandle_t		skin;
+
 	lerpFrame_t		lerp;
 	int				anim; // current animation ( may have ANIM_TOGGLEBIT )
 	float			speed; // Allow speeding up the animations?
