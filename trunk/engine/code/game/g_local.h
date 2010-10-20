@@ -559,10 +559,13 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags );
 //
 // g_utils.c
 //
-int G_ModelIndex( char *name );
+int		G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
 #ifdef IOQ3TM // Particles
 int		G_ParticleAreaIndex( char *str );
+#endif
+#ifdef TA_ENTSYS // MISC_OBJECT
+int		G_StringIndex( char *name );
 #endif
 void	G_TeamCommand( team_t team, char *cmd );
 void	G_KillBox (gentity_t *ent);

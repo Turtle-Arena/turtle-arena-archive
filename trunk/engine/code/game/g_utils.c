@@ -134,6 +134,12 @@ int G_ParticleAreaIndex( char *str ) {
 }
 #endif
 
+#ifdef TA_ENTSYS // MISC_OBJECT
+int G_StringIndex( char *name ) {
+	return G_FindConfigstringIndex (name, CS_STRINGS, MAX_STRINGS, qtrue);
+}
+#endif
+
 //=====================================================================
 
 

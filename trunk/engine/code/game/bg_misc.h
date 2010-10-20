@@ -101,8 +101,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CS_PLAYERS				(CS_SOUNDS+MAX_SOUNDS)
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
 #define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
-
+#ifdef TA_ENTSYS // MISC_OBJECT
+#define MAX_STRINGS 128
 #ifdef IOQ3ZTM // Particles
+#define CS_STRINGS				(CS_PARTICLES+MAX_PARTICLES_AREAS)
+#else
+#define CS_STRINGS				(CS_LOCATIONS+MAX_LOCATIONS)
+#endif
+#endif
+
+#ifdef TA_ENTSYS // MISC_OBJECT
+#define CS_MAX					(CS_STRINGS+MAX_STRINGS)
+#elif defined IOQ3ZTM // Particles
 #define CS_MAX					(CS_PARTICLES+MAX_PARTICLES_AREAS)
 #else
 #define CS_MAX					(CS_PARTICLES+MAX_LOCATIONS)
