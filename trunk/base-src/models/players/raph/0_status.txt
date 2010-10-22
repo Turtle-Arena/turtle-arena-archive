@@ -11,6 +11,7 @@ l_legs_control	Legs can rotate just the legs
 ==Missing animations for raph_v9==
 Quake3 Animations
 * LEGS_RUN (doesn't look quite right)
+* LEGS_JUMPB and LEGS_LANDB (don't look quite right)
 
 MISSIONPACK Animations (done)
 
@@ -34,17 +35,17 @@ Turtle Arena Animations
 * TORSO_ATTACK_SWORD2_B (missing)
 * TORSO_ATTACK_SWORD2_C (missing)
 
-* TORSO_ATTACK_DAISHO_A (missing)
-* TORSO_ATTACK_DAISHO_B (missing)
-* TORSO_ATTACK_DAISHO_C (missing)
+* TORSO_ATTACK_DAISHO_A (defaults to TORSO_ATTACK_SWORD2_A)
+* TORSO_ATTACK_DAISHO_B (defaults to TORSO_ATTACK_SWORD2_B)
+* TORSO_ATTACK_DAISHO_C (defaults to TORSO_ATTACK_SWORD2_C)
 
-* TORSO_ATTACK_SAI2_A (test)
-* TORSO_ATTACK_SAI2_B (test)
-* TORSO_ATTACK_SAI2_C (test)
+* TORSO_ATTACK_SAI2_A (copy of TORSO_ATTACK_SAI1_PRIMARY_A)
+* TORSO_ATTACK_SAI2_B (copy of TORSO_ATTACK_SAI1_PRIMARY_B)
+* TORSO_ATTACK_SAI2_C (done)
 
-* TORSO_ATTACK_SAI1_PRIMARY_A (missing)
-* TORSO_ATTACK_SAI1_PRIMARY_C (missing)
-* TORSO_ATTACK_SAI1_PRIMARY_B (missing)
+* TORSO_ATTACK_SAI1_PRIMARY_A (done)
+* TORSO_ATTACK_SAI1_PRIMARY_B (done)
+* TORSO_ATTACK_SAI1_PRIMARY_C (done)
 
 * TORSO_ATTACK_BO_A (missing)
 * TORSO_ATTACK_BO_B (missing)
@@ -63,6 +64,21 @@ Turtle Arena Animations
 * TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A (missing)
 * TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B (missing)
 * TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C (missing)
+
+== Attack animations ==
+  * A - swing right to left, cutting motion
+  * B - swing left to right, cutting motion
+  * C - raise weapon in air and swing to the ground, attacking directly infront on player
+
+  * Running - only torso animates A B ...(continues without delay)
+    * BOTH_ATTACK_*_A
+    * BOTH_ATTACK_*_B
+
+  * Standing - torso and legs can animate A B A C (attack delay)
+    * BOTH_ATTACK_*_A
+    * BOTH_ATTACK_*_B
+    * BOTH_ATTACK_*_A
+    * BOTH_ATTACK_*_C
 
 == Notes ==
 cg_shadows 2 doesn't not work correctly with the model for some reason.
