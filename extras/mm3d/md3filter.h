@@ -159,8 +159,8 @@ class Md3Filter : public ModelFilter
       bool     readAnimations( bool create );
 
 #ifdef MDR_LOAD
-      void     MDRsetPoints(MeshSectionE section, int32_t offsetTags, int32_t numTags);
-      void     MDRsetBoneJoints(MeshSectionE section, bool compressed, int32_t offsetFrames, int32_t numFrames, int32_t numBones, int32_t parentTag, int32_t animIndex);
+      void MDRsetBoneJoints(MeshSectionE section, bool compressed, int32_t offsetFrames, int32_t numFrames,
+            int32_t numBones, int32_t offsetTags, int32_t numTags, int32_t parentTag, int32_t animIndex);
 #endif
       void     setMeshes( MeshSectionE section, int32_t offsetMeshes, int32_t numMeshes, int32_t parentTag, int32_t animIndex);
       int32_t  setSkins(char *meshName);
