@@ -91,15 +91,31 @@ Index: src/libmm3d/model_anim.cc
                 anim->m_validNormals = false;
  
                 MU_AddAnimation * undo = new MU_AddAnimation();
-@@ -914,6 +916,7 @@
+@@ -582,6 +584,7 @@
+             {
+                setAnimFrameCount( mode, num, getAnimFrameCount( mode, anim ) );
+                setAnimFPS( mode, num, getAnimFPS( mode, anim ) );
++               setAnimationLooping( mode, num, getAnimationLooping( mode, anim ) );
+ 
+                SkelAnim * sa = m_skelAnims[anim];
+ 
+@@ -606,6 +609,7 @@
+             {
+                setAnimFrameCount( mode, num, getAnimFrameCount( mode, anim ) );
+                setAnimFPS( mode, num, getAnimFPS( mode, anim ) );
++               setAnimationLooping( mode, num, getAnimationLooping( mode, anim ) );
+ 
+                FrameAnim * fa = m_frameAnims[anim];
+ 
+@@ -914,6 +918,7 @@
              if ( num >= 0 )
              {
                 setAnimFrameCount( ANIMMODE_FRAME, num, frameCount );
-+               setAnimationLooping( ANIMMODE_FRAME, num, isAnimationLooping( ANIMMODE_SKELETAL, anim ) );
++               setAnimationLooping( ANIMMODE_FRAME, num, getAnimationLooping( ANIMMODE_SKELETAL, anim ) );
  
                 if ( frameCount > 0 )
                 {
-@@ -1694,7 +1697,7 @@
+@@ -1694,7 +1699,7 @@
           double totalTime = spf * m_frameAnims[m_currentAnim]->m_frameData.size();
           while ( frameTime >= totalTime )
           {
@@ -108,7 +124,7 @@ Index: src/libmm3d/model_anim.cc
              {
                 return false;
              }
-@@ -1723,7 +1726,7 @@
+@@ -1723,7 +1728,7 @@
           double totalTime = sa->m_spf * sa->m_frameCount;
           while ( frameTime > totalTime )
           {
@@ -117,7 +133,7 @@ Index: src/libmm3d/model_anim.cc
              {
                 return false;
              }
-@@ -1741,7 +1744,7 @@
+@@ -1741,7 +1746,7 @@
        {
           Matrix transform;
           interpSkelAnimKeyframeTime( m_currentAnim, frameTime,
@@ -126,7 +142,7 @@ Index: src/libmm3d/model_anim.cc
  
           Matrix relativeFinal( m_joints[j]->m_relative );
           relativeFinal = transform * relativeFinal;
-@@ -2039,14 +2042,57 @@
+@@ -2039,14 +2044,57 @@
     return m_currentTime;
  }
  
@@ -162,7 +178,7 @@ Index: src/libmm3d/model_anim.cc
  }
  
 -bool Model::isAnimationLooping() const
-+bool Model::isAnimationLooping( AnimationModeE mode, unsigned anim ) const
++bool Model::getAnimationLooping( AnimationModeE mode, unsigned anim ) const
  {
 -   return m_animationLoop;
 +   switch ( mode )
@@ -280,7 +296,7 @@ Index: src/libmm3d/model.h
 -      void setAnimationLooping( bool o );
 -      bool isAnimationLooping() const;
 +      void setAnimationLooping( AnimationModeE mode, unsigned anim, bool loop );
-+      bool isAnimationLooping( AnimationModeE mode, unsigned anim ) const;
++      bool getAnimationLooping( AnimationModeE mode, unsigned anim ) const;
  
        // Stop animation mode, go back to standard pose editing.
        void setNoAnimation();
@@ -368,7 +384,7 @@ Index: src/implui/animwidget.cc
  
 -   m_doLoop = m_model->isAnimationLooping();
 -   m_loop->setChecked( m_doLoop );
-+   m_loop->setChecked( m_model->isAnimationLooping(m_model->getAnimationMode(), m_model->getCurrentAnimation()) );
++   m_loop->setChecked( m_model->getAnimationLooping(m_model->getAnimationMode(), m_model->getCurrentAnimation()) );
  
     m_skelAnimCount = m_model->getAnimCount( Model::ANIMMODE_SKELETAL );
     m_frameAnimCount = m_model->getAnimCount( Model::ANIMMODE_FRAME );
@@ -396,7 +412,7 @@ Index: src/implui/animwidget.cc
           m_ignoreChange = true;  // Qt alerts us even if we're responsible
           m_frameCount->setValue( count );
           m_fps->setText( QString::number(m_model->getAnimFPS( mode, index ) ) );
-+         m_loop->setChecked( m_model->isAnimationLooping( mode, index ) );
++         m_loop->setChecked( m_model->getAnimationLooping( mode, index ) );
           m_ignoreChange = false;
  
           m_countSlider->setMinimum( 1 );

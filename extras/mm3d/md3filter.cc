@@ -2759,7 +2759,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                      // both rotation and translation for each keyframe. If we have one
                      // and the other is missing, we must do interpolation here.
                      Matrix relativeFinal;
-                     bool m_animationLoop = m_model->isAnimationLooping( m_animationMode, a );
+                     bool m_animationLoop = m_model->getAnimationLooping( m_animationMode, a );
                      m_model->interpSkelAnimKeyframeTime( a, frameTime, m_animationLoop, joint, relativeFinal );
 
                      Matrix rm;
@@ -2772,7 +2772,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                      final.getRotation( rotVector );
                      final.getTranslation( origin );
 #else // ZTM: FIXME: This is wrong! It doesn't return absolute origin!
-                     bool m_animationLoop = m_model->isAnimationLooping( m_animationMode, a );
+                     bool m_animationLoop = m_model->getAnimationLooping( m_animationMode, a );
                      m_model->interpSkelAnimKeyframe( a, t, m_animationLoop, joint, true, rotVector[0], rotVector[1], rotVector[2] );
 
                      // origin
@@ -3654,7 +3654,7 @@ bool Md3Filter::writeAnimations()
          }
 
          // disable looping on non-looping anims
-         if ( count <= 1 || !m_model->isAnimationLooping( m_animationMode, anim ) )
+         if ( count <= 1 || !m_model->getAnimationLooping( m_animationMode, anim ) )
          {
             loop = 0;
          }
