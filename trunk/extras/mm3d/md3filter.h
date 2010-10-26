@@ -201,8 +201,9 @@ class Md3Filter : public ModelFilter
       string    m_modelPath;
       string    m_modelBaseName;
       std::vector<int> m_animStartFrame;
-      int              m_standFrame;
-      int              m_idleFrame;
+      int              m_standFrame; // torso
+      int              m_idleFrame; // legs
+      int              m_headFrame; // head
       std::string      m_lastMd3Path;
       Md3PathList      m_pathList;
       Model::AnimationModeE m_animationMode;

@@ -729,6 +729,7 @@ bool Md3Filter::readAnimations( bool create )
    m_animStartFrame.clear();
    m_standFrame = 0;
    m_idleFrame = 0;
+   m_headFrame = 0;
 
    int bothStart = -1;
    int bothEnd = -1;
@@ -1807,15 +1808,17 @@ void Md3Filter::MDRsetBoneJoints(MeshSectionE section, bool compressed, int32_t 
             matrix.getRotation(rot[0], rot[1], rot[2]);
             m_model->setSkelAnimKeyframe(animIndex, f, boneIndex, true, rot[0], rot[1], rot[2]);
 
-            //if (animIndex == 0 && f == 15) // HACK
+            /*if (animIndex == 0 && f == 15) // HACK
             {
                m_model->setBoneJointRotation(boneIndex, rot);
                m_model->setBoneJointTranslation(boneIndex, trans);
                log_debug("Anim%d Frame%d joint(%d) origin=%f %f %f\n", animIndex, f, boneIndex, trans[0], trans[1], trans[2]);
-            }
+            }*/
          }
       }
    }
+
+   // ZTM: FIXME: Should 'm_model->setupJoints();' be run here?
 
    m_src->seek( offsetTags );
 
@@ -1869,34 +1872,17 @@ void Md3Filter::MDRsetBoneJoints(MeshSectionE section, bool compressed, int32_t 
 
 int Md3Filter::animToFrame( MeshSectionE section, int anim, int frame )
 {
-   if ( anim < 0 )
-   {
-      // Not an animation, use 'default' frame
-      switch ( section )
-      {
-         case MS_Lower:
-            return m_idleFrame;
-            break;
-         case MS_Upper:
-            return m_standFrame;
-            break;
-         default:
-            break;
-      }
-      return 0;
-   }
-
-   if ( !animInSection( getSafeName( anim ), section ) )
+   if ( anim < 0 || !animInSection( getSafeName( anim ), section ) )
    {
       // Not valid for this section, use 'default' frame
       switch ( section )
       {
          case MS_Lower:
             return m_idleFrame;
-            break;
          case MS_Upper:
             return m_standFrame;
-            break;
+         case MS_Head:
+            return m_headFrame;
          default:
             break;
       }
@@ -1913,17 +1899,14 @@ int Md3Filter::animToFrame( MeshSectionE section, int anim, int frame )
    switch ( section )
    {
       case MS_None:
+      default:
          // Not a multi-MD3 model, use specified frame
          return frame;
 
       case MS_Lower:
       case MS_Upper:
-         return fileFrame;
-
       case MS_Head:
-      default:
-         // No head animations, use first frame
-         return 0;
+         return fileFrame;
    }
    return frame;
 }
@@ -2012,7 +1995,7 @@ bool Md3Filter::boneJointInSection( std::string jointName, MeshSectionE section 
 
    if ( strncasecmp( jointName.c_str(), "joint_tag", 9) == 0 )
    {
-      return tagInSection(&jointName[5], section);
+      return tagInSection(&jointName[6], section);
    }
    if ( strcasecmp( jointName.c_str(), "root_joint") == 0 )
    {
@@ -2391,6 +2374,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 
    int32_t flags = 0;
    int32_t numFrames = 0;
+   int32_t numAnims = 0;
    //We are making all the anims be one anim.
    unsigned animCount = m_model->getAnimCount( m_animationMode );
    for ( unsigned i = 0; i < animCount; i++ )
@@ -2399,6 +2383,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
       std::string name = getSafeName( i );
       if ( animInSection( name, section ) )
       {
+         numAnims++;
          numFrames += m_model->getAnimFrameCount( m_animationMode, i );
       }
    }
@@ -2634,17 +2619,30 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
    for ( a = 0; a < animCount; a++ )
    {
       if ( animInSection( getSafeName( a ), section ) 
-            || (section == MS_Head && a == 0) )
+            || (numAnims == 0 && a == 0) )
       {
          unsigned aFrameCount = m_model->getAnimFrameCount( m_animationMode, a );
          if ( (aFrameCount == 0 && animCount == 1 )
-               || (section == MS_Head) )
+               || (numAnims == 0) )
          {
             aFrameCount = 1;
          }
+
+         if (m_animationMode == Model::ANIMMODE_SKELETAL)
+         {
+            // Set current animation, needed for some ANIMMODE_SKELETAL functions (search TIME_FUNC in this file)
+            m_model->setCurrentAnimation(m_animationMode, a);
+         }
+
          std::string animName = getSafeName( a );
          for ( unsigned t = 0; t < aFrameCount; t++ )
          {
+            if (m_animationMode == Model::ANIMMODE_SKELETAL)
+            {
+               // Set current animation frame, needed for some ANIMMODE_SKELETAL functions (search TIME_FUNC in this file)
+               m_model->setCurrentAnimationFrame(t);
+            }
+
             Matrix saveMatrix = getMatrixFromPoint( a, t, rootTag ).getInverse();
             list<int>::iterator vit;
             double dmax[4] = { DBL_MIN, DBL_MIN, DBL_MIN, 1 };
@@ -2663,7 +2661,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                         int vertex = m_model->getTriangleVertex( *it, n );
                         double cords[3];
                         if (m_animationMode == Model::ANIMMODE_SKELETAL)
-                           m_model->getVertexCoords(vertex, cords); // ZTM: FIXME: Get cords for this frame!
+                           m_model->getVertexCoords(vertex, cords); // TIME_FUNC
                         else
                            m_model->getFrameAnimVertexCoords( a, t, vertex, cords[0], cords[1], cords[2] );
                         dmax[0] = greater( dmax[0], cords[0] );
@@ -2728,27 +2726,61 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                   double rotVector[3] = { 0, 0, 0 };
                   double origin[3] = { 0, 0, 0 };
 
-                  // ZTM: FIXME: Does the exporter save the the correct rot vector for tags in the boneJoint?
-                  /*int point = -1;
-                  for (int tag = 0; tag < pcount; tag++)
+                  // Save the rotation of the point
+                  int point = -1;
+                  for (unsigned p = 0; p < pcount; p++)
                   {
-                     if ( !tagInSection( m_model->getPointName( tag ), section ) )
+                     if ( !tagInSection( m_model->getPointName( p ), section ) )
                         continue;
-                     
-                     if (m_model->getPointBoneJoint(tag) == joint)
+
+                     if (m_model->getPointBoneJoint(p) == (int)joint)
                      {
-                        point = tag;
+                        point = p;
                         break;
                      }
                   }
 
+                  // ZTM: FIXME: Set correct bone origin and rotation (bone joint and 'bone point'?)
                   if (point >= 0)
                   {
-                     // Use rot from point
+                     //Matrix invMatrix;
+                     //invMatrix.loadIdentity();
+
+                     if (t == 0) // only show first frame
+                        log_debug("boneJoint %d %s using point %d %s\n", joint, m_model->getBoneJointName( joint ), point, m_model->getPointName( point ));
+
+                     // Use rotation and origin from point
+                     m_model->getPointCoords( point, origin ); // TIME_FUNC
+                     m_model->getPointOrientation( point, rotVector ); // TIME_FUNC
+
+                     //invMatrix.setRotation( rotVector );
+                     //invMatrix.setTranslation( origin );
+
+                     //invMatrix = invMatrix.getInverse();
+
+                     //invMatrix.getRotation( rotVector );
+                     //invMatrix.getTranslation( origin );
                   }
-                  else*/
+                  else
                   {
 #if 1
+                     //vector<Model::Joint *> jointList = getJointList( m_model );
+                     //rotVector[0] = jointList[joint]->m_localRotation[0];
+                     //rotVector[1] = jointList[joint]->m_localRotation[1];
+                     //rotVector[2] = jointList[joint]->m_localRotation[2];
+
+                     // ZTM: FIXME: Set rotVector (use getBoneVector?)
+                     //double coords[3] = {0,0,0};
+                     //m_model->getBoneVector( joint, rotVector, coords);
+
+                     // Works: m_model->getBoneJointCoords( joint, origin ); // TIME_FUNC
+
+                     Matrix fm;
+                     m_model->getBoneJointFinalMatrix( joint, fm ); // TIME_FUNC
+
+                     fm.getRotation( rotVector );
+                     fm.getTranslation( origin );
+#elif 1
                      double spf = (1.0 / m_model->getAnimFPS( Model::ANIMMODE_SKELETAL, a ));
                      unsigned int frameCount = m_model->getAnimFrameCount( Model::ANIMMODE_SKELETAL, a );
                      double totalTime = spf * frameCount;
@@ -2771,7 +2803,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 
                      final.getRotation( rotVector );
                      final.getTranslation( origin );
-#else // ZTM: FIXME: This is wrong! It doesn't return absolute origin!
+#else
                      bool m_animationLoop = m_model->getAnimationLooping( m_animationMode, a );
                      m_model->interpSkelAnimKeyframe( a, t, m_animationLoop, joint, true, rotVector[0], rotVector[1], rotVector[2] );
 
@@ -2829,6 +2861,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 
                         if (origin[m] < -512 || origin[m] > 511)
                         {
+                           m_model->setNoAnimation();
                            // Can't compress, origin out of range
                            log_error( "Compressed MDR Bone joint(%d) is out side bounds (valid range is -512 to 511).\n", joint );
                            m_model->setFilterSpecificError( transll( QT_TRANSLATE_NOOP( "LowLevel", "Compressed MDR Bone joint origin out of range (valid range is -512 to 511)." ) ).c_str() );
@@ -2863,6 +2896,8 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
       }
    }
 
+   m_model->setNoAnimation();
+
 #ifdef MDR_EXPORT
    if (type == MT_MDR)
    {
@@ -2878,11 +2913,11 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
    for ( a = 0; a < animCount; a++ )
    {
       if ( animInSection( getSafeName( a ), section ) 
-            || (section == MS_Head && a == 0) )
+            || (numAnims == 0 && a == 0) )
       {
          unsigned aFrameCount = m_model->getAnimFrameCount( Model::ANIMMODE_FRAME, a );
          if ( (aFrameCount == 0 && animCount == 1)
-               || (section == MS_Head) )
+               || (numAnims == 0) )
          {
             aFrameCount = 1;
          }
@@ -3408,7 +3443,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
          for ( unsigned a = 0; a < animCount; a++ )
          {
             if ( animInSection( getSafeName( a ), section ) 
-                  || (section == MS_Head && a == 0) )
+                  || (numAnims == 0 && a == 0) )
             {
                // If there are no anims calculateFrameNormals will segfault
                // (in earlier versions of MM3D)
@@ -3418,7 +3453,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                }
                unsigned aFrameCount = m_model->getAnimFrameCount( Model::ANIMMODE_FRAME, a );
                if ( (aFrameCount == 0 && animCount == 1) 
-                     || (section == MS_Head) )
+                     || (numAnims == 0) )
                {
                   aFrameCount = 1;
                }
@@ -3426,7 +3461,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                {
                   Matrix saveMatrix;
 
-                  if ( section == MS_Head )
+                  if ( numAnims == 0 )
                   {
                      saveMatrix = getMatrixFromPoint( -1, -1, rootTag ).getInverse();
                   }
@@ -3440,7 +3475,7 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
                      double meshVec[4] = {0,0,0,1};
                      double meshNor[4] = {0,0,0,1};
 
-                     if ( section == MS_Head )
+                     if ( numAnims == 0 )
                      {
                         // force unanimated coordinates for head
                         m_model->getVertexCoords( (*vit).v, meshVec );
