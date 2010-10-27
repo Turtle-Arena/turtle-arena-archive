@@ -723,6 +723,7 @@ bool Md3Filter::readAnimations( bool create )
    std::vector<std::string> animNames;
    int last_fcount = 0;
    bool eliteLoop = false;
+   std::vector<int> animLoop;
    int animKeyword = 0;
 
    m_animStartFrame.clear();
@@ -790,6 +791,7 @@ bool Md3Filter::readAnimations( bool create )
                   fcount = abs(fcount);
                }
 
+               animLoop.push_back(loop);
                if (create && loop == -1 && !eliteLoop)
                {
                   m_model->addMetaData( "MD3_EliteLoop", "1" );
@@ -953,16 +955,6 @@ bool Md3Filter::readAnimations( bool create )
                   int animIndex = m_model->addAnimation( m_animationMode, name );
                   m_model->setAnimFPS( m_animationMode, animIndex, (double) fps );
                   m_model->setAnimFrameCount( m_animationMode, animIndex, fcount );
-
-                  // Set looping
-                  if (eliteLoop)
-                  {
-                     m_model->setAnimationLooping( m_animationMode, animIndex, (loop == 0) );
-                  }
-                  else
-                  {
-                     m_model->setAnimationLooping( m_animationMode, animIndex, (loop != 0) );
-                  }
                }
 
                animCount++;
@@ -1023,6 +1015,17 @@ bool Md3Filter::readAnimations( bool create )
       }
 
       fclose( fp );
+
+      // Set looping
+      if (create)
+      {
+         int animCount = m_model->getAnimCount( m_animationMode );
+         for (int animIndex = 0; animIndex < animCount; ++animIndex)
+         {
+            bool loop = (eliteLoop) ? (animLoop[animIndex] == 0) : (animLoop[animIndex] != 0);
+            m_model->setAnimationLooping( m_animationMode, animIndex, loop );
+         }
+      }
 
       if (m_standFrame == 0 && torsoStart > 0)
       {
