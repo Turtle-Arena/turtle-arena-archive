@@ -106,7 +106,6 @@ const char s_animNames[ MD3_ANIMATIONS ][16] =
    "legs_turn",
 };
 
-// ZTM: TODO: Allow user to have any animation have sync warning? (Or at least disable?)
 const char *s_animSyncWarning[] =
 {
    "torso_attack",
@@ -737,6 +736,8 @@ bool Md3Filter::readAnimations( bool create )
    int torsoEnd = -1;
    int legsStart = -1;
    int legsEnd = -1;
+   int headStart = -1;
+   int headEnd = -1;
 
    if ( fp != NULL )
    {
@@ -775,8 +776,10 @@ bool Md3Filter::readAnimations( bool create )
                    &first, &fcount, &loop, &fps, comment, fname ) >= 4
                 || (sscanf( line, "%s %d %d %d %d",
                       fname, &first, &fcount, &loop, &fps ) == 5
-                    && (strncasecmp(fname, "both_", 5) == 0 || strncasecmp(fname, "torso_", 6) == 0
-                      || strncasecmp(fname, "legs_", 5) == 0) && (animKeyword || (animKeyword = 1)) ))
+                    && (strncasecmp(fname, "all_", 4) == 0 || strncasecmp(fname, "both_", 5) == 0
+                      || strncasecmp(fname, "torso_", 6) == 0 || strncasecmp(fname, "legs_", 5) == 0
+                      || strncasecmp(fname, "head_", 5) == 0)
+                    && (animKeyword || (animKeyword = 1)) ))
             {
                log_debug( "got anim frame details\n" );
 
@@ -802,15 +805,15 @@ bool Md3Filter::readAnimations( bool create )
                char * name = NULL;
 
                // Check if read name from file.
-               if (strlen(comment) > 7 || strlen(fname) > 5)
+               if (strlen(comment) > 6 || strlen(fname) > 4)
                {
-                  // "//BOTH_x..."
-                  if (strlen(comment) > 7)
+                  // "//ALL_x..."
+                  if (strlen(comment) > 6 && strncasecmp(comment, "//", 2) == 0)
                   {
                      name = &comment[2];
                   }
-                  // "BOTH_x..."
-                  else //if (strlen(fname) > 5)
+                  // "ALL_x..."
+                  else //if (strlen(fname) > 4)
                   {
                      name = fname;
                   }
@@ -837,10 +840,23 @@ bool Md3Filter::readAnimations( bool create )
                // Save name for offset fixing after animations are loaded.
                animNames.push_back(name);
 
-               // It's a "both_" animation
-               if ( strncasecmp( name, "both_", 5 ) == 0 )
+               if ( strncasecmp( name, "all_", 4 ) == 0 )
                {
-                  if ( first + fcount > legsEnd )
+                  // Check for single frame dead animation that use the last
+                  //   frame of the death animation
+                  if (animCount > 0 && strncasecmp(name, "all_dead", 8) == 0
+                     && strncasecmp(animNames[animCount-1].c_str(), "all_death", 9) == 0
+                     && fcount <= 1 )
+                  {
+                     if (m_animStartFrame[animCount-1] + last_fcount - 1 == first)
+                     {
+                        fcount = 0;
+                     }
+                  }
+               }
+               else if ( strncasecmp( name, "both_", 5 ) == 0 )
+               {
+                  if ( first + fcount > headEnd )
                   {
                      if ( bothStart == -1 )
                      {
@@ -903,6 +919,24 @@ bool Md3Filter::readAnimations( bool create )
                   if ( strcasecmp(name, "legs_idle") == 0 )
                   {
                      m_idleFrame = first;
+                  }
+               }
+               else if ( strncasecmp( name, "head_", 5 ) == 0 )
+               {
+                  if ( headStart == -1 )
+                  {
+                     headStart = first;
+                     headEnd = first + fcount;
+                  }
+                  else
+                  {
+                     headStart = std::min(headStart, first);
+                     headEnd = std::max(headEnd, first + fcount);
+                  }
+
+                  if ( strcasecmp(name, "head_idle") == 0 )
+                  {
+                     m_headFrame = first;
                   }
                }
                else
@@ -990,16 +1024,22 @@ bool Md3Filter::readAnimations( bool create )
 
       fclose( fp );
 
-      if (m_standFrame == 0)
+      if (m_standFrame == 0 && torsoStart > 0)
       {
          // Didn't find "torso_stand", use first torso frame
          m_standFrame = torsoStart;
       }
 
-      if (m_idleFrame == 0)
+      if (m_idleFrame == 0 && legsStart > 0)
       {
          // Didn't find "legs_idle", use first legs frame
          m_idleFrame = legsStart;
+      }
+
+      if (m_headFrame == 0 && headStart > 0)
+      {
+         // Didn't find "head_idle", use first head frame
+         m_headFrame = headStart;
       }
 
       // Some animation files have the leg frames continuously numbered 
@@ -1020,6 +1060,21 @@ bool Md3Filter::readAnimations( bool create )
          
          if ( m_idleFrame >= animOffset )
             m_idleFrame -= animOffset;
+      }
+
+      if ( headStart >= bothEnd )
+      {
+         int animOffset = headStart - bothStart;
+         for ( size_t a = 0; a < m_animStartFrame.size(); ++a )
+         {
+            if ( strncasecmp( animNames[a].c_str(), "head_", 5 ) != 0 )
+               continue;
+            if ( m_animStartFrame[a] >= animOffset )
+               m_animStartFrame[a] -= animOffset;
+         }
+         
+         if ( m_headFrame >= animOffset )
+            m_headFrame -= animOffset;
       }
       return true;
    }
@@ -1913,11 +1968,6 @@ int Md3Filter::animToFrame( MeshSectionE section, int anim, int frame )
 
 bool Md3Filter::animInSection( std::string animName, MeshSectionE section )
 {
-   if ( section == MS_Head )
-   {
-      return false;
-   }
-
    if ( section == MS_None )
    {
       // Uh... sure...
@@ -1939,11 +1989,30 @@ bool Md3Filter::animInSection( std::string animName, MeshSectionE section )
          return false;
    }
 
+   if ( strncasecmp( animName.c_str(), "head_", 5 ) == 0 )
+   {
+      if ( section == MS_Head )
+         return true;
+      else
+         return false;
+   }
+
    // It's a "both_" animation, or something weird
    if ( strncasecmp( animName.c_str(), "both_", 5 ) == 0 )
+   {
+      if ( section == MS_Lower || section == MS_Upper )
+         return true;
+      else
+         return false;
+   }
+
+   if ( strncasecmp( animName.c_str(), "all_", 4 ) == 0 )
+   {
+      // Animation for torso, legs, and head!
       return true;
-   else
-      return false;
+   }
+
+   return false;
 }
 
 bool Md3Filter::groupInSection( std::string groupName, MeshSectionE section )
@@ -3580,6 +3649,14 @@ Model::ModelErrorE Md3Filter::writeSectionFile( const char * filename, Md3Filter
 
 bool Md3Filter::animSyncWarning(std::string name)
 {
+   char value[20];
+
+   if ( m_model->getMetaData( "MD3_NoSyncWarning", value, sizeof(value) ) )
+   {
+      if ( atoi( value ) == 1 )
+         return false;
+   }
+
    for (unsigned i = 0; s_animSyncWarning[i] != NULL; i++)
    {
       if (strncasecmp(s_animSyncWarning[i], name.c_str(), name.length()) == 0)
@@ -3765,6 +3842,30 @@ Matrix Md3Filter::getMatrixFromPoint( int anim, int frame, int point )
    return m;
 }
 
+Md3Filter::MeshAnimationTypeE Md3Filter::getAnimationType(const std::string animName)
+{
+   MeshAnimationTypeE animType = MA_All;
+
+   if (strncasecmp(animName.c_str(), "both_", 5) == 0)
+   {
+      animType = MA_Both;
+   }
+   else if (strncasecmp(animName.c_str(), "torso_", 6) == 0)
+   {
+      animType = MA_Torso;
+   }
+   else if (strncasecmp(animName.c_str(), "legs_", 5) == 0)
+   {
+      animType = MA_Legs;
+   }
+   else if (strncasecmp(animName.c_str(), "head_", 5) == 0)
+   {
+      animType = MA_Head;
+   }
+
+   return animType;
+}
+
 bool Md3Filter::getExportAnimData( int modelAnim,
       int & fileFrame, int & frameCount, int & fps )
 {
@@ -3772,22 +3873,15 @@ bool Md3Filter::getExportAnimData( int modelAnim,
    frameCount = 0;
 
    size_t animCount = m_model->getAnimCount( m_animationMode );
-   MeshSectionE section = MS_None;
    std::string animName = getSafeName( modelAnim );
-
-   if (strncasecmp(animName.c_str(), "torso_", 6) == 0)
-   {
-      section = MS_Upper;
-   }
-   else if (strncasecmp(animName.c_str(), "legs_", 5) == 0)
-   {
-      section = MS_Lower;
-   }
+   MeshAnimationTypeE animType = getAnimationType(animName);
 
    // If this is a "dead" animation and its after a "death" animation
    //   and it has 0 frames, use the last frame of the death animation.
-   if (modelAnim > 0 && strncasecmp(animName.c_str(), "both_dead", 9) == 0
-      && strncasecmp(getSafeName( modelAnim - 1 ).c_str(), "both_death", 10) == 0
+   if (modelAnim > 0 && ((strncasecmp(animName.c_str(), "all_dead", 8) == 0
+         && strncasecmp(getSafeName( modelAnim - 1 ).c_str(), "all_death", 9) == 0)
+      || (strncasecmp(animName.c_str(), "both_dead", 9) == 0
+         && strncasecmp(getSafeName( modelAnim - 1 ).c_str(), "both_death", 10) == 0))
       && m_model->getAnimFrameCount( m_animationMode, modelAnim ) == 0 )
    {
       if (getExportAnimData( modelAnim - 1, fileFrame, frameCount, fps ))
@@ -3802,9 +3896,11 @@ bool Md3Filter::getExportAnimData( int modelAnim,
    {
       std::string name = getSafeName( a );
       if ( animInSection( name, MS_Upper )
-            || animInSection( name, MS_Lower ) )
+            || animInSection( name, MS_Lower )
+			|| animInSection( name, MS_Head ))
       {
-         if ( a == (size_t)modelAnim )
+         MeshAnimationTypeE type = getAnimationType(name);
+         if ( (int)a == modelAnim )
          {
             frameCount = m_model->getAnimFrameCount( m_animationMode, a );
             fps   = (int) m_model->getAnimFPS( m_animationMode, a );
@@ -3814,27 +3910,27 @@ bool Md3Filter::getExportAnimData( int modelAnim,
                fps = 15;
             }
 
-            if (section == MS_Lower)
+            if (animType > MA_Torso)
             {
                // Must still count torso animations after this for fileFrame
+               //   and in the case of 'head' we must also count legs animations
             }
             else
             {
                return true;
             }
          }
-         // All torso frames from go before leg frames, all legs go after tosro
-         else if (section == MS_None || (section == MS_Lower && (a < (size_t)modelAnim || strncasecmp(name.c_str(), "legs_", 5) != 0))
-            || (section == MS_Upper && strncasecmp(name.c_str(), "legs_", 5) != 0))
+         // All torso frames go before leg frames, all legs go after tosro
+         else if (((int)a < modelAnim && animType >= type) || ((int)a > modelAnim && animType > type))
          {
-            fileFrame += m_model->getAnimFrameCount( m_animationMode, a );
+               fileFrame += m_model->getAnimFrameCount( m_animationMode, a );
          }
       }
    }
 
-   if (section == MS_Lower && frameCount)
+   if (animType > MA_Torso && frameCount)
    {
-      // Finished adding up fileFrame for legs animations
+      // Finished adding up fileFrame for legs or head animations
       return true;
    }
 

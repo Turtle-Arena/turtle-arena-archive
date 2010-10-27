@@ -104,6 +104,17 @@ class Md3Filter : public ModelFilter
          MS_MAX
       } MeshSectionE;
 
+      typedef enum _MeshAnimationType_e
+      {
+         MA_All,
+         MA_Both,
+         MA_Torso,
+         MA_Legs,
+         // NOTE: Team Arena has extra torso animations after legs
+         MA_Head,
+         MA_MAX
+      } MeshAnimationTypeE;
+
       typedef struct _MeshVectorInfo_t
       {
          int32_t id;
@@ -225,6 +236,7 @@ class Md3Filter : public ModelFilter
       double   greater(double a, double b);
       double   smaller(double a, double b);
       Matrix   getMatrixFromPoint( int anim, int frame, int point );
+      MeshAnimationTypeE getAnimationType(const std::string animName);
       bool getExportAnimData( int modelAnim,
             int & fileFrame, int & frameCount, int & fps );
 

@@ -8,6 +8,9 @@ These changes are required to export the Turtle Arena players from mm3d to md3.
 = Changes =
 Incomplete list of changes.
 
+== Fixes ==
+* Fixed saving MD3 player models with no frame animations.
+
 == MDR ==
 Unfinished support for MDR models. MDR model are basically skeleton animated MD3 models.
 
@@ -19,14 +22,19 @@ If your model is bigger set MDR_compressed to 0.
 * Loop is read and wrote to and fro .mm3d files (compatible with current .mm3d files)
 * Per-animation loop is supported by md3filter (No more handcoded list)
 
+== Head model animations ==
+Added support for "HEAD_" (animates head model, like TORSO_ and LEGS_) and "ALL_" (animates torso, legs, and head, like BOTH_) animations.
+
 == Animations.cfg ==
-Animation name is loaded from the animations.cfg, with fallback to default q3 name, instead of just a hardcoded list.
+Animation names are loaded from the animations.cfg, with fallback to default Quake3 names, instead of just a hardcoded list.
 
 Reads/Saves all of the animations instead of just the first 25 (MD3_ANIMATIONS).
 
 == Metadata ==
 Changes add suppport for MD3_CFG_* metadata to insert data into animations.cfg
 	(Still supports hardcoded MD3_footsteps, MD3_headoffset, etc et)
+
+if MD3_NoSyncWarning value is 1 does not add sync warning to animations in animations.cfg
 
 If MD3_EliteLoop value is 1 uses STV: Elite Force Single Player style loopframes
 	(Where 0 is loop, and -1 is don't loop in animations.cfg)
