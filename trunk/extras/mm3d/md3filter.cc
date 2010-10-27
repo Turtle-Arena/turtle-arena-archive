@@ -3900,7 +3900,7 @@ bool Md3Filter::getExportAnimData( int modelAnim,
       std::string name = getSafeName( a );
       if ( animInSection( name, MS_Upper )
             || animInSection( name, MS_Lower )
-			|| animInSection( name, MS_Head ))
+            || animInSection( name, MS_Head ))
       {
          MeshAnimationTypeE type = getAnimationType(name);
          if ( (int)a == modelAnim )
