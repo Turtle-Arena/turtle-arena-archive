@@ -337,7 +337,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
 #ifdef ANALOG // cg var
-	{ &cg_thirdPersonAnalog, "cg_thirdPersonAnalog", "1", 0 },
+	{ &cg_thirdPersonAnalog, "cg_thirdPersonAnalog", "0", 0 },
 #endif
 #ifdef TURTLEARENA // FOV
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "120", 0 },
