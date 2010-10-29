@@ -2778,7 +2778,7 @@ void Com_Init( char *commandLine ) {
 #else
 	cl_thirdPersonRange = Cvar_Get ("cg_thirdPersonRange", "40", 0);
 #endif
-	cl_thirdPersonAnalog = Cvar_Get ("cg_thirdPersonAnalog", "1", 0);
+	cl_thirdPersonAnalog = Cvar_Get ("cg_thirdPersonAnalog", "0", 0);
 #endif
 
 	cl_paused = Cvar_Get ("cl_paused", "0", CVAR_ROM);
