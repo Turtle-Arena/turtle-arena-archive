@@ -94,9 +94,6 @@ Weapons (and attacking)
 
   * TODO: Add misc_dripper entity.
 
-  * TODO: Add new entity to take damage and give it to a targeted entity. (func_voodoodoll)
-    * Allow bushes to be used for cars (and other others) oddly shaped collision box
-
 == Code Cleanup ==
   * TODO: Reduce overall number of TODOs and FIXMEs in the source
 
