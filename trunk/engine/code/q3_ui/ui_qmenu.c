@@ -191,7 +191,19 @@ static void PText_Init( menutext_s *t )
 	int	w;
 	int	h;
 	float	sizeScale;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t *font;
 
+	if (t->style & UI_SMALLFONT)
+		font = &uis.fontPropSmall;
+	else
+		font = &uis.fontPropBig;
+
+	if (font->fontInfo.name[0]) {
+		sizeScale = 1.0f;
+	}
+	else
+#endif
 	sizeScale = UI_ProportionalSizeScale( t->style );
 
 	x = t->generic.x;
@@ -1771,8 +1783,8 @@ void Menu_Cache( void )
 	UI_LoadFont(&uis.fontBig, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 16, 0);
 	UI_LoadFont(&uis.fontGiant, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 48, 32, 0);
 
-	UI_LoadFont(&uis.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
-	UI_LoadFont(&uis.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, 0);
+	UI_LoadFont(&uis.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, PROP_GAP_WIDTH);
+	UI_LoadFont(&uis.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, PROP_GAP_WIDTH);
 
 	UI_LoadFont(&uis.fontBanner, "fonts/FreeSerif.ttf", "menu/art/font2_prop.tga", 48, 32, 0);
 #else
