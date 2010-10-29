@@ -487,6 +487,15 @@ models/weapons2/triblaster/flash
 	}
 }
 
+models/weapons2/longsword/blade
+{
+	{
+		map textures/sfx/detail.jpg
+		tcmod rotate 10
+		rgbGen entity
+	}
+}
+
 //
 // Projectiles
 //

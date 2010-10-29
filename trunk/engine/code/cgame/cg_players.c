@@ -3636,9 +3636,9 @@ void CG_Player( centity_t *cent ) {
 		&& cg.time - ci->ghostTime >= 10)
 	{
 		ci->ghostTime = cg.time;
-		CG_GhostRefEntity(&legs, 50, legs.shaderRGBA[3]);
-		CG_GhostRefEntity(&torso, 50, torso.shaderRGBA[3]);
-		CG_GhostRefEntity(&head, 50, head.shaderRGBA[3]);
+		CG_GhostRefEntity(&legs, 50, legs.shaderRGBA);
+		CG_GhostRefEntity(&torso, 50, torso.shaderRGBA);
+		CG_GhostRefEntity(&head, 50, head.shaderRGBA);
 	}
 #endif
 }
