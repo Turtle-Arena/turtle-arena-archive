@@ -325,9 +325,22 @@ void MenuField_Init( menufield_s* m ) {
 	int	l;
 	int	w;
 	int	h;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t *font;
+
+	if (m->generic.flags & QMF_SMALLFONT)
+		font = &uis.fontSmall;
+	else
+		font = &uis.fontBig;
+
+	w = font->shaderCharWidth;
+	h = Com_FontCharHeight(font);
+	l = Com_FontStringWidth(font, m->generic.name, 0 ) + w;
+#endif
 
 	MField_Clear( &m->field );
 
+#ifndef IOQ3ZTM // FONT_REWRITE
 	if (m->generic.flags & QMF_SMALLFONT)
 	{
 		w = SMALLCHAR_WIDTH;
@@ -345,6 +358,7 @@ void MenuField_Init( menufield_s* m ) {
 	else {
 		l = 0;
 	}
+#endif
 
 	m->generic.left   = m->generic.x - l;
 	m->generic.top    = m->generic.y;
@@ -366,10 +380,27 @@ void MenuField_Draw( menufield_s *f )
 	int		style;
 	qboolean focus;
 	float	*color;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	font_t *font;
+
+	if (f->generic.flags & QMF_SMALLFONT)
+		font = &uis.fontSmall;
+	else
+		font = &uis.fontBig;
+#endif
 
 	x =	f->generic.x;
 	y =	f->generic.y;
+#ifdef IOQ3ZTM // FONT_REWRITE
+	w = font->shaderCharWidth;
+	h = Com_FontCharHeight(font);
 
+	if (f->generic.flags & QMF_SMALLFONT) {
+		style = UI_SMALLFONT;
+	} else {
+		style = UI_BIGFONT;
+	}
+#else
 	if (f->generic.flags & QMF_SMALLFONT)
 	{
 		w = SMALLCHAR_WIDTH;
@@ -382,6 +413,8 @@ void MenuField_Draw( menufield_s *f )
 		h = BIGCHAR_HEIGHT;
 		style = UI_BIGFONT;
 	}	
+#endif
+
 
 	if (Menu_ItemAtCursor( f->generic.parent ) == f) {
 		focus = qtrue;
