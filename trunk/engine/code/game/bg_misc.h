@@ -782,7 +782,8 @@ int BG_NumWeapons(void);
 int BG_NumWeaponGroups(void);
 void BG_InitWeaponInfo(void);
 qboolean BG_PlayerRunning(vec3_t velocity);
-int BG_MaxAttackCombo(playerState_t *ps);
+int BG_MaxAttackIndex(playerState_t *ps);
+int BG_AttackIndexForPlayerState(playerState_t *ps);
 
 int BG_WeaponHandsForPlayerState(playerState_t *ps);
 int BG_WeaponHandsForWeaponNum(weapon_t weaponnum);

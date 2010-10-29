@@ -3381,10 +3381,10 @@ qboolean BG_PlayerRunning(vec3_t velocity)
 
 /*
 =================
-BG_MaxAttackCombo
+BG_MaxAttackIndex
 =================
 */
-int BG_MaxAttackCombo(playerState_t *ps)
+int BG_MaxAttackIndex(playerState_t *ps)
 {
 	bg_weapongroup_anims_t *anims;
 	int max_combo;
@@ -3403,17 +3403,42 @@ int BG_MaxAttackCombo(playerState_t *ps)
 		}
 	}
 
-	// ZTM: if running "max_combo /= 2"; like in LoZ:TP
-	if (BG_PlayerRunning(ps->velocity))
-	{
-		max_combo /= 2;
-	}
-
 	if (max_combo < 1) {
 		max_combo = 1;
 	}
 
 	return max_combo;
+}
+
+/*
+=================
+BG_AttackIndexForPlayerState
+
+Check if running or jumping and return proper attack animation index.
+=================
+*/
+int BG_AttackIndexForPlayerState(playerState_t *ps)
+{
+	int max_combo = BG_MaxAttackIndex(ps);
+	int atkIndex;
+
+	if (max_combo == 1) {
+		return 0;
+	}
+
+	if (ps->groundEntityNum == ENTITYNUM_NONE) {
+		// Jump attack only uses last attack animation
+		atkIndex = max_combo-1;
+	} else {
+		if (BG_PlayerRunning(ps->velocity)) {
+			// ZTM: if running "max_combo /= 2"; like in LoZ:TP
+			// Run attack only uses the first half of the attack animations (usually 2)
+			max_combo /= 2;
+		}
+		atkIndex = ps->meleeAttack % max_combo;
+	}
+
+	return atkIndex;
 }
 
 #ifdef TA_NPCSYS // ZTM: NPC info loading based on weapon info loading.
@@ -3820,7 +3845,7 @@ animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps)
 		return TORSO_ATTACK;
 	}
 
-	atkIndex = ps->meleeAttack % BG_MaxAttackCombo(ps);
+	atkIndex = BG_AttackIndexForPlayerState(ps);
 
 	if (ps->eFlags & EF_PRIMARY_HAND)
 	{
@@ -3876,13 +3901,13 @@ animNumber_t BG_LegsAttackForPlayerState(playerState_t *ps, bg_playercfg_t *play
 	int atkIndex;
 
 	if (!ps || !playercfg || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups()
-		|| (ps->pm_flags & PMF_DUCKED)
+		|| (ps->pm_flags & PMF_DUCKED) || (ps->groundEntityNum == ENTITYNUM_NONE)
 		|| BG_PlayerRunning(ps->velocity))
 	{
 		return -1; // no change
 	}
 
-	atkIndex = ps->meleeAttack % BG_MaxAttackCombo(ps);
+	atkIndex = BG_AttackIndexForPlayerState(ps);
 
 	if (ps->eFlags & EF_PRIMARY_HAND) {
 		anim = bg_weapongroupinfo[ps->weapon].primaryAnims.attackAnim[atkIndex];

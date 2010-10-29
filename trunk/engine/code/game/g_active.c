@@ -494,15 +494,19 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			int weap_delay;
 			int max_combo;
 
-			max_combo = BG_MaxAttackCombo(&client->ps);
+			max_combo = BG_MaxAttackIndex(&client->ps);
 			weap_delay = bg_weapongroupinfo[client->ps.weapon].weapon[0]->attackDelay;
 
 			// ZTM: TEST; with the accel changes (xyspeed) weap_delay is way too long.
 			weap_delay /= 2;
 
-			// ZTM: if running "weap_delay = 0"; like in LoZ:TP
-			if (BG_PlayerRunning(client->ps.velocity))
-			{
+			if (client->ps.groundEntityNum == ENTITYNUM_NONE) {
+				// Jump attack only uses last attack animation
+				max_combo = 1;
+				weap_delay = 0;
+			} else if (BG_PlayerRunning(client->ps.velocity)) {
+				// ZTM: if running have no attack delay and only use first half of animations, like in LoZ:TP
+				max_combo /= 2;
 				weap_delay = 0;
 			}
 
