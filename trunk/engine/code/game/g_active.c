@@ -473,7 +473,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		if (client->ps.meleeLinkTime <= 0)
 		{
 			client->ps.meleeLinkTime = 0;
-			client->ps.meleeAttack = 0;
+			client->ps.meleeAttack = -1;
 		}
 	}
 
@@ -512,14 +512,14 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 
 			client->ps.meleeTime = 0;
 
-			if (client->ps.meleeAttack == max_combo)
+			if (client->ps.meleeAttack == max_combo-1)
 			{
 				//G_Printf("DEBUG: client %i finished last combo (%i)\n", ent - g_entities, client->ps.meleeAttack);
 
 				client->ps.meleeDelay = weap_delay;
 				client->ps.weaponTime = client->ps.meleeDelay; // Don't let them use a gun...
 
-				client->ps.meleeAttack = 0;
+				client->ps.meleeAttack = -1;
 				client->ps.meleeLinkTime = 0;
 			}
 		}
@@ -1536,14 +1536,14 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 
 #ifdef TA_WEAPSYS // MELEEATTACK
-	if (client->ps.pm_type != PM_DEAD)
+	if (client->ps.pm_type < PM_DEAD && !(client->ps.pm_flags & PMF_RESPAWNED))
 	{
 		if (BG_WeaponHasType(client->ps.weapon, WT_GAUNTLET))
 		{
 			if ((ucmd->buttons & BUTTON_ATTACK) && !(ucmd->buttons & BUTTON_TALK)
 				&& client->ps.weaponTime <= 0 )
 			{
-					pm.gauntletHit = G_MeleeDamage( ent, qtrue );
+				pm.gauntletHit = G_MeleeDamage( ent, qtrue );
 			}
 			else
 			{
@@ -1554,8 +1554,8 @@ void ClientThink_real( gentity_t *ent ) {
 		else
 		{
 			if ((ucmd->buttons & BUTTON_ATTACK) && !( ucmd->buttons & BUTTON_TALK )
-				&& !client->ps.meleeDelay && !client->ps.meleeTime
-				&& !client->ps.weaponTime)
+				&& client->ps.meleeDelay <= 0 && client->ps.meleeTime <= 0
+				&& client->ps.weaponTime <= 0)
 			{
 				G_StartMeleeAttack(ent);
 			}

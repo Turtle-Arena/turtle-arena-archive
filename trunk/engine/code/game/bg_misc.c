@@ -2754,7 +2754,7 @@ static qboolean WeaponGroupAnims_Parse(char **p, bg_weapongroup_anims_t *anims) 
 		} else if (Q_stricmpn(token, "attackAnim", 9) == 0) {
 			int atkIndex = atoi(&token[10]);
 
-			// if attackAnim2, attackAnim3, ...
+			// if attackAnim1, attackAnim2, attackAnim3, ...
 			if (atkIndex > 0) {
 				atkIndex--;
 			}
@@ -2781,8 +2781,7 @@ static qboolean WeaponGroupAnims_Parse(char **p, bg_weapongroup_anims_t *anims) 
 			}
 			continue;
 		}
-		//Com_Printf( "unknown token '%s' [in animation black] in %s\n", token, filename );
-		Com_Printf( "unknown token '%s' [in animation black]\n", token );
+		Com_Printf( "unknown token '%s' [in animation block]\n", token );
 	}
 	return qfalse;
 }

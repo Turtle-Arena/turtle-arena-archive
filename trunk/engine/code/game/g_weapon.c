@@ -171,11 +171,12 @@ void G_StartMeleeAttack(gentity_t *ent)
 	client->fireHeld = qtrue;
 #endif
 
+	// Next attack animation
+	client->ps.meleeAttack++;
+
 	// ZTM: Use the animation time for the attack time!
 	client->ps.meleeTime = BG_AnimationTime(&ent->client->pers.playercfg.animations[BG_TorsoAttackForPlayerState(&ent->client->ps)]);
-	client->ps.meleeLinkTime = 3.75f * client->ps.meleeTime; // MELEE_CHAINTIME
-
-	client->ps.meleeAttack++;
+	client->ps.meleeLinkTime = 1.5f * client->ps.meleeTime; // MELEE_CHAINTIME
 
 	//G_Printf("DEBUG: client %i started new melee attack (%i)\n", ent - g_entities, client->ps.meleeAttack);
 
@@ -512,6 +513,17 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		dflags |= DAMAGE_CUTS;
 	}
 
+	if (ent->client->ps.powerups[PW_QUAD] ) {
+		s_quadFactor = g_quadfactor.value;
+	} else {
+		s_quadFactor = 1;
+	}
+#ifdef MISSIONPACK
+	if( ent->client->persistantPowerup && ent->client->persistantPowerup->item && ent->client->persistantPowerup->item->giTag == PW_DOUBLER ) {
+		s_quadFactor *= 2;
+	}
+#endif
+
 	for (i = 0; i < MAX_WEAPON_BLADES; i++)
 	{
 		if (weapon->blades[i].damage == 0)
@@ -533,20 +545,9 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 			continue;
 		}
 
-		if (ent->client->ps.powerups[PW_QUAD] ) {
-			s_quadFactor = g_quadfactor.value;
-		} else {
-			s_quadFactor = 1;
-		}
-#ifdef MISSIONPACK
-		if( ent->client->persistantPowerup && ent->client->persistantPowerup->item && ent->client->persistantPowerup->item->giTag == PW_DOUBLER ) {
-			s_quadFactor *= 2;
-		}
-#endif
-
 		damage = weapon->blades[i].damage * s_quadFactor;
 
-		if ( !checkTeamHit && (tr.startsolid || (tr.contents & CONTENTS_SOLID)) ) {
+		if ( !checkTeamHit && (tr.startsolid || (tr.contents & CONTENTS_SOLID)) && !(weapon->flags & WIF_ALWAYS_DAMAGE) ) {
 			// Push player away from trace dir!
 			// Based on code in G_Damage
 			vec3_t	kvel;
