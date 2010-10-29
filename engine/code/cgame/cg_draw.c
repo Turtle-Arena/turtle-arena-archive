@@ -2742,17 +2742,17 @@ CG_DrawSpectator
 */
 static void CG_DrawSpectator(void) {
 	CG_HudPlacement(HUD_CENTER);
-	CG_DrawBigString(320 - 9 * 8, 440, "SPECTATOR", 1.0F);
+	CG_DrawBigString(CENTER_X, 440, "SPECTATOR", 1.0F);
 	if ( cgs.gametype == GT_TOURNAMENT ) {
-		CG_DrawBigString(320 - 15 * 8, 460, "waiting to play", 1.0F);
+		CG_DrawBigString(CENTER_X, 460, "waiting to play", 1.0F);
 	}
 	else if ( cgs.gametype >= GT_TEAM ) {
 #ifdef TA_MISC // SMART_JOIN_MENU
-		CG_DrawBigString(320 - 40 * 8, 460, "press ESC and use the TEAM menu to play", 1.0F);
+		CG_DrawBigString(CENTER_X, 460, "press ESC and use the TEAM menu to play", 1.0F);
 #elif defined IOQ3ZTM
-		CG_DrawBigString(320 - 39 * 8, 460, "press ESC and use the START menu to play", 1.0F);
+		CG_DrawBigString(CENTER_X, 460, "press ESC and use the START menu to play", 1.0F);
 #else
-		CG_DrawBigString(320 - 39 * 8, 460, "press ESC and use the JOIN menu to play", 1.0F);
+		CG_DrawBigString(CENTER_X, 460, "press ESC and use the JOIN menu to play", 1.0F);
 #endif
 	}
 }

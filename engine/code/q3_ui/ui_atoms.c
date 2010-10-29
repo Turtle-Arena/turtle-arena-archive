@@ -261,12 +261,10 @@ void UI_DrawFontProportionalString( font_t *font, int x, int y, const char* str,
 		drawcolor[3] = color[3];
 		UI_DrawFontStringColor( font, x, y, str, color );
 
-#ifdef TURTLEARENA // ZTM: This is like the UI Main menu text drawing, but its not.
-        // ZTM: hack-ish thing to do?...
-        // text_color_highlight is UI local...
-		drawcolor[0] = 1.00f;//text_color_highlight[0];
-		drawcolor[1] = 0.43f;//text_color_highlight[1];
-		drawcolor[2] = 0.00f;//text_color_highlight[2];
+#ifdef TURTLEARENA
+		drawcolor[0] = text_color_highlight[0];
+		drawcolor[1] = text_color_highlight[1];
+		drawcolor[2] = text_color_highlight[2];
 #else
 		drawcolor[0] = color[0];
 		drawcolor[1] = color[1];
@@ -815,7 +813,7 @@ UI_ProportionalSizeScale
 float UI_ProportionalSizeScale( int style ) {
 #ifdef IOQ3ZTM // FONT_REWRITE
 	if (style & UI_SMALLFONT) {
-		return uis.fontBig.pointSize / uis.fontGiant.pointSize;
+		return uis.fontPropSmall.pointSize / uis.fontPropBig.pointSize;
 	}
 #else
 	if(  style & UI_SMALLFONT ) {
@@ -840,12 +838,12 @@ int UI_ProportionalStringWidth( const char* str, int style ) {
 	font_t *font;
 
 	if (style & UI_SMALLFONT)
-		font = &uis.fontBig;
+		font = &uis.fontPropSmall;
 	else
-		font = &uis.fontGiant;
+		font = &uis.fontPropBig;
 
 	if (font->fontInfo.name[0]) {
-		return Com_FontStringWidth(font, str, strlen(str));
+		return Com_FontStringWidth(font, str, 0);
 	}
 #endif
 
