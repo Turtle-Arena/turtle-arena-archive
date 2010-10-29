@@ -1958,7 +1958,7 @@ void CG_DrawWeaponSelect( void );
 void CG_OutOfAmmoChange( void );	// should this be in pmove?
 #endif
 #ifdef IOQ3ZTM // GHOST
-localEntity_t *CG_GhostRefEntity(refEntity_t *re, int timetolive, int alpha);
+localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive, byte *rgba);
 #endif
 
 //
