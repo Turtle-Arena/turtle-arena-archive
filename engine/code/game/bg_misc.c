@@ -5664,43 +5664,65 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 
 
 	// attacking defaults
-	if (index == TORSO_ATTACK_GUN_PRIMARY
-		|| index == TORSO_ATTACK_SWORD1_BOTH_A
-		|| index == TORSO_ATTACK_SWORD2_A
-		|| index == TORSO_ATTACK_SAI2_A
-		|| index == TORSO_ATTACK_BO_A
-		|| index == TORSO_ATTACK_HAMMER_A
-		|| index == TORSO_ATTACK_NUNCHUCKS_A
-		)
-	{
-		anim[0] = TORSO_ATTACK2;
-		anim[1] = TORSO_ATTACK;
+	if (index == TORSO_ATTACK_HAMMER_A) {
+		anim[0] = TORSO_ATTACK_SWORD1_BOTH_A;
+		anim[1] = TORSO_ATTACK_HAMMER_PRIMARY_A;
+		anim[2] = TORSO_ATTACK2;
+		anim[3] = TORSO_ATTACK;
 	}
-	if ((index > TORSO_ATTACK_SWORD1_BOTH_A &&
-		index <= TORSO_ATTACK_SWORD1_BOTH_C)
-		|| (index > TORSO_ATTACK_SWORD2_A &&
-			index <= TORSO_ATTACK_SWORD2_C)
-		|| (index > TORSO_ATTACK_SAI2_A &&
-			index <= TORSO_ATTACK_SAI2_C)
-		|| (index > TORSO_ATTACK_BO_A &&
-			index <= TORSO_ATTACK_BO_C)
-		|| (index == TORSO_ATTACK_HAMMER_PRIMARY_A)
-		|| (index > TORSO_ATTACK_NUNCHUCKS_A &&
-			index <= TORSO_ATTACK_NUNCHUCKS_C) )
-	{
-		anim[0] = index-1;
+	if (index == TORSO_ATTACK_HAMMER_PRIMARY_A) {
+		anim[0] = TORSO_ATTACK_SWORD1_PRIMARY_A;
 		anim[1] = TORSO_ATTACK2;
 		anim[2] = TORSO_ATTACK;
 	}
-	// 3 BOTH anims; then 3 PRIMARY anims. So PRIMARY can default to BOTH.
+
+	if (index >= TORSO_ATTACK_BO_A && index <= TORSO_ATTACK_BO_C) {
+		anim[0] = TORSO_ATTACK_SWORD1_BOTH_A + index - TORSO_ATTACK_BO_A;
+		anim[1] = index+3;
+		anim[2] = TORSO_ATTACK2;
+		anim[3] = TORSO_ATTACK;
+	}
+	if (index >= TORSO_ATTACK_BO_PRIMARY_A && index <= TORSO_ATTACK_BO_PRIMARY_C) {
+		anim[0] = TORSO_ATTACK_SWORD1_PRIMARY_A + index - TORSO_ATTACK_BO_PRIMARY_A;
+		anim[1] = TORSO_ATTACK2;
+		anim[2] = TORSO_ATTACK;
+	}
+
+	if (index >= TORSO_ATTACK_NUNCHUCKS_A && index <= TORSO_ATTACK_NUNCHUCKS_C) {
+		anim[0] = TORSO_ATTACK_SAI2_A + index - TORSO_ATTACK_NUNCHUCKS_A;
+		anim[1] = index+3;
+		anim[2] = TORSO_ATTACK2;
+		anim[3] = TORSO_ATTACK;
+	}
+	if (index >= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A && index <= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C) {
+		anim[0] = TORSO_ATTACK_SAI1_PRIMARY_A + index - TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A;
+		anim[1] = TORSO_ATTACK2;
+		anim[2] = TORSO_ATTACK;
+	}
+
+	// BOTH can default to PRIMARY.
+	if (   (index >= TORSO_ATTACK_SWORD1_BOTH_A &&
+			index <= TORSO_ATTACK_SWORD1_BOTH_C)
+		|| (index >= TORSO_ATTACK_SAI2_A &&
+			index <= TORSO_ATTACK_SAI2_C)
+		// SWORD2 defaults to Daisho
+		|| (index >= TORSO_ATTACK_SWORD2_A &&
+			index <= TORSO_ATTACK_SWORD2_C)
+		)
+	{
+		anim[0] = index+3;
+		anim[1] = TORSO_ATTACK2;
+		anim[2] = TORSO_ATTACK;
+	}
+
+	// PRIMARY can default to BOTH.
 	if (   (index >= TORSO_ATTACK_SWORD1_PRIMARY_A &&
 			index <= TORSO_ATTACK_SWORD1_PRIMARY_C)
 		|| (index >= TORSO_ATTACK_SAI1_PRIMARY_A &&
 			index <= TORSO_ATTACK_SAI1_PRIMARY_C)
-		|| (index >= TORSO_ATTACK_BO_PRIMARY_A &&
-			index <= TORSO_ATTACK_BO_PRIMARY_C)
-		|| (index >= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A &&
-			index <= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C)
+		// SWORD2 defaults to SWORD1_PRIMARY
+		|| (index >= TORSO_ATTACK_SWORD2_A &&
+			index <= TORSO_ATTACK_SWORD2_C)
 		// Daisho defaults to SWORD2
 		|| (index >= TORSO_ATTACK_DAISHO_A &&
 			index <= TORSO_ATTACK_DAISHO_C)
@@ -5729,7 +5751,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 		//animations[i].flipflop = flipflop;
 
 		// Animation is now valid
-		loadedAnim[anim[i]] = qtrue;
+		loadedAnim[index] = qtrue;
 
 		return qtrue;
 	}
@@ -6317,20 +6339,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 		return qtrue;
 	}
 
-	// Found an Elite Force (SP) style animation.
-	if (foundAnim)
-	{
-		// Check for missing animations and load there defaults.
-		for ( i = 0 ; i < MAX_TOTALANIMATIONS ; i++ )
-		{
-			if (loadedAnim[i] == qfalse)
-			{
-				// Load the default for this animation.
-				BG_SetDefaultAnimation(loadedAnim, i, animations);
-			}
-		}
-	}
-	else
+	// Didn't find an Elite Force (SP) style animation.
+	if (!foundAnim)
 	{
 #if !defined TURTLEARENA || defined TA_SUPPORTQ3 // animation.cfg
 		// Assume Quake3 (or Elite Force MP) player.
@@ -6341,22 +6351,15 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			if (rtn == -1) {
 				BG_SetDefaultAnimation(loadedAnim, i, animations);
 			} else if (rtn == 0) {
-				Com_Printf("BG_ParsePlayerCFGFile: Animation %d: Failed loading.\n", i);
+				Com_Printf("BG_ParsePlayerCFGFile: Animation %d failed loading.\n", i);
 				break;
 			} else {
 				loadedAnim[i] = qtrue;
 			}
 		}
 
-		// These are not loaded from quake3 players.
-		BG_SetDefaultAnimation(loadedAnim, LEGS_BACKCR, animations);
-		BG_SetDefaultAnimation(loadedAnim, LEGS_BACKWALK, animations);
-
-		if ( i != MAX_ANIMATIONS )
+		if (i != MAX_ANIMATIONS)
 		{
-#ifdef TA_SUPPORTEF
-			BG_ConvertEFAnimationsToQ3(animations, MAX_TOTALANIMATIONS);
-#endif
 			Com_Printf( "Error parsing animation file: %s", filename );
 			return qfalse;
 		}
@@ -6365,6 +6368,16 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 		Com_Printf( "Error: No animations in file: %s", filename );
 		return qfalse;
 #endif
+	}
+
+	// Check for missing animations and load there defaults.
+	for ( i = 0 ; i < MAX_TOTALANIMATIONS ; i++ )
+	{
+		if (loadedAnim[i] == qfalse)
+		{
+			// Load the default for this animation.
+			BG_SetDefaultAnimation(loadedAnim, i, animations);
+		}
 	}
 
 #ifdef TA_SUPPORTEF
