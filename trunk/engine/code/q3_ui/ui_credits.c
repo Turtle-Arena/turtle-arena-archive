@@ -34,15 +34,12 @@ CREDITS
 
 typedef struct {
 	menuframework_s	menu;
-#ifndef TURTLEARENA
 	int frame;
-#endif
 } creditsmenu_t;
 
 static creditsmenu_t	s_credits;
 
 
-#ifndef TURTLEARENA
 /*
 ===============
 UI_CreditMenu_Draw_ioq3
@@ -70,7 +67,11 @@ static void UI_CreditMenu_Draw_ioq3( void ) {
 		NULL
 	};
 
+#ifdef IOQ3ZTM // Center text verticly on screen!
+	y = (SCREEN_HEIGHT - ARRAY_LEN(names) * (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE)) / 2;
+#else
 	y = 12;
+#endif
 	UI_DrawProportionalString( 320, y, "ioquake3 contributors:", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 
@@ -81,7 +82,6 @@ static void UI_CreditMenu_Draw_ioq3( void ) {
 
 	UI_DrawString( 320, 459, "http://www.ioquake3.org/", UI_CENTER|UI_SMALLFONT, color_red );
 }
-#endif
 
 
 /*
@@ -106,6 +106,36 @@ static sfxHandle_t UI_CreditMenu_Key( int key ) {
 	return 0;
 }
 
+#ifdef TURTLEARENA
+/*
+===============
+UI_CreditMenu_Draw_Legal
+===============
+*/
+static void UI_CreditMenu_Draw_Legal( void ) {
+	int		y;
+	int		numItems = 6; // 5 text lines, 1 blank line
+
+	y = (SCREEN_HEIGHT - numItems * (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE)) / 2;
+
+	// This is a unoffial game
+	UI_DrawProportionalString( 320, y, "Turtle Arena developer(s) are in", UI_CENTER|UI_SMALLFONT, color_white );
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "no way affiliated with", UI_CENTER|UI_SMALLFONT, color_white );
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "Viacom, Mirage Studios, 4KidsTV, or Ubisoft.", UI_CENTER|UI_SMALLFONT, color_white );
+
+	// Copyright
+	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
+	UI_DrawProportionalString( 320, y, "TMNT(c) 2010 Viacom", UI_CENTER|UI_SMALLFONT, color_white );
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "Turtle Arena(c) 2009-2010 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
+
+	// Website
+	UI_DrawString( 320, 459, "http://turtlearena.googlecode.com/", UI_CENTER|UI_SMALLFONT, color_red );
+}
+#endif
+
 
 /*
 ===============
@@ -117,36 +147,42 @@ static void UI_CreditMenu_Draw( void ) {
 
 #ifdef TURTLEARENA
 	// Credit id software and ioquake3, and legal stuff.
-	y = 72;
-	UI_DrawProportionalString( 320, y, "Credits", UI_CENTER|UI_SMALLFONT, color_white );
+	y = 12;
 
+	UI_DrawProportionalString( 320, y, "Credits", UI_CENTER, color_white );
+	y += 1.42 * PROP_HEIGHT;
+
+	UI_DrawProportionalString( 320, y, "Code", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "id Software - www.idsoftware.com", UI_CENTER|UI_SMALLFONT, color_white );
-
+	UI_DrawProportionalString( 320, y, "id Software, ioquake3, ioSTVEF, OpenArena,", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "ioquake3 - www.ioquake3.org", UI_CENTER|UI_SMALLFONT, color_white );
-
+	UI_DrawProportionalString( 320, y, "Xreal, Smokin' Guns, Mercenaries Guild,", UI_CENTER|UI_SMALLFONT, color_white );
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, " Wolf-ET, The Reaction Factory, \"inolan.com\",", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "Zack \"ZTurtleMan\" Middleton", UI_CENTER|UI_SMALLFONT, color_white );
 
-	// Gap.
-	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
+	y += (PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
 
-	// This is a unoffial game.
+	UI_DrawProportionalString( 320, y, "Data / Art", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Copyright", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "OpenArena", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Turtle Arena developer(s) are in", UI_CENTER|UI_SMALLFONT, color_white );
-	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "no way affiliated with", UI_CENTER|UI_SMALLFONT, color_white );
-	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Viacom, Mirage Studios, 4KidsTV, or Ubisoft.", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "Zack \"ZTurtleMan\" Middleton", UI_CENTER|UI_SMALLFONT, color_white );
 
-	// Copyright.
-	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
-	UI_DrawProportionalString( 320, y, "TMNT(c) 2010 Viacom", UI_CENTER|UI_SMALLFONT, color_white );
+	y += (PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
+
+	UI_DrawProportionalString( 320, y, "Music", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Turtle Arena(c) 2009-2010 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "The Mulletz (Neil Crowe)", UI_CENTER|UI_SMALLFONT, color_white );
+	y += PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "http://ccmixter.org/people/NeilCrowe/", UI_CENTER|UI_SMALLFONT, color_white );
+
+	y += (PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
+
+	UI_DrawProportionalString( 320, y, "Fonts", UI_CENTER|UI_SMALLFONT, color_white );
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "GNU FreeFonts", UI_CENTER|UI_SMALLFONT, color_white );
 #else
 	y = 12;
 	UI_DrawProportionalString( 320, y, "id Software is:", UI_CENTER|UI_SMALLFONT, color_white );
@@ -204,6 +240,8 @@ static void UI_CreditMenu_Draw( void ) {
 /*
 ===============
 UI_CreditMenu
+
+Exit game credits
 ===============
 */
 void UI_CreditMenu( void ) {
@@ -215,8 +253,58 @@ void UI_CreditMenu( void ) {
 
 	memset( &s_credits, 0 ,sizeof(s_credits) );
 
+#ifdef TURTLEARENA
+	s_credits.menu.draw = UI_CreditMenu_Draw_Legal;
+#else
 	s_credits.menu.draw = UI_CreditMenu_Draw;
+#endif
 	s_credits.menu.key = UI_CreditMenu_Key;
 	s_credits.menu.fullscreen = qtrue;
 	UI_PushMenu ( &s_credits.menu );
 }
+
+#ifdef TURTLEARENA // LONG_CREDITS
+
+
+/*
+=================
+UI_LongCreditMenu_Key
+=================
+*/
+static sfxHandle_t UI_LongCreditMenu_Key( int key ) {
+	if( key & K_CHAR_FLAG ) {
+		return 0;
+	}
+
+	switch (++s_credits.frame)
+	{
+		case 1:
+			s_credits.menu.draw = UI_CreditMenu_Draw_ioq3;
+			break;
+		case 2:
+			s_credits.menu.draw = UI_CreditMenu_Draw_Legal;
+			break;
+		default:
+			UI_PopMenu();
+			break;
+	}
+	return 0;
+}
+
+/*
+===============
+UI_LongCreditMenu
+
+Long credit screen
+===============
+*/
+void UI_LongCreditMenu( void )
+{
+	memset( &s_credits, 0 ,sizeof(s_credits) );
+
+	s_credits.menu.draw = UI_CreditMenu_Draw;
+	s_credits.menu.key = UI_LongCreditMenu_Key;
+	s_credits.menu.fullscreen = qtrue;
+	UI_PushMenu ( &s_credits.menu );
+}
+#endif
