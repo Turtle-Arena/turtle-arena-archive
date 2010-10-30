@@ -10,12 +10,16 @@ Turtle Arena credits.
 * Smokin' Guns			(For some breakable respawn code and a minor animation time fix)
 * GNU FreeFonts			(For FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf)
 * Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)
+* The Mulletz			(For music)
 * Zack "ZTurtleMan" Middleton
 
 
 == License ==
-The Turtle Arena source code and data are licensed under the GNU General Public License version 2 or later.
-	(See COPYING file for full license)
+Most of the Turtle Arena source code is licensed under the GNU General Public License version 2 or later.
+	(See COPYING file for full license) The code in the WOLFET ifdefs is licensed under the GNU GPLv3 or later.
+
+Most of the data is licensed under the GNU GPLv2 or later, but some is license under the Creative Commons,
+	see COPYRIGHTS file full details.
 
 
 == Data ==
@@ -52,11 +56,12 @@ Turtle Arena uses code directly or based on the following.
 === GPLv3 or later ===
 * Wolf-ET (WOLFET)
 ** Adds snow and rain atmospheric effects
+** Adds pushable objects (misc_object)
 
 === Other ===
 Code based on guides, etc.
 
-* rfactory: http://www.rfactory.org/
+* The Reaction Factory: http://www.rfactory.org/
 ** The Dark Conjunction (via rfactory): http://tdc.planetquake.gamespy.com/news.htm
 
 * "inolan.com", basic breakable brush code: http://www.quake3hut.co.uk/q3coding/Breakable%20Glass.htm

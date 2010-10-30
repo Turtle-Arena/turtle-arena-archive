@@ -48,6 +48,9 @@ SETUP MENU
 #define ID_SAVE					16
 #define ID_DEFAULTS				17
 #define ID_BACK					18
+#ifdef TURTLEARENA // LONG_CREDITS
+#define ID_CREDITS				19
+#endif
 
 
 typedef struct {
@@ -63,6 +66,9 @@ typedef struct {
 	menutext_s		setupsystem;
 	menutext_s		game;
 	menutext_s		cdkey;
+#ifdef TURTLEARENA // LONG_CREDITS
+	menutext_s		credits;
+#endif
 //	menutext_s		load;
 //	menutext_s		save;
 	menutext_s		defaults;
@@ -130,6 +136,12 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 #ifdef IOQUAKE3 // ZTM: CDKEY
 	case ID_CDKEY:
 		UI_CDKeyMenu();
+		break;
+#endif
+
+#ifdef TURTLEARENA // LONG_CREDITS
+	case ID_CREDITS:
+		UI_LongCreditMenu();
 		break;
 #endif
 
@@ -252,6 +264,19 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.cdkey.style						= UI_CENTER;
 #endif
 
+#ifdef TURTLEARENA // LONG_CREDITS
+	y += SETUP_MENU_VERTICAL_SPACING;
+	setupMenuInfo.credits.generic.type				= MTYPE_PTEXT;
+	setupMenuInfo.credits.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	setupMenuInfo.credits.generic.x					= 320;
+	setupMenuInfo.credits.generic.y					= y;
+	setupMenuInfo.credits.generic.id				= ID_CREDITS;
+	setupMenuInfo.credits.generic.callback			= UI_SetupMenu_Event; 
+	setupMenuInfo.credits.string					= "CREDITS";
+	setupMenuInfo.credits.color						= text_big_color;
+	setupMenuInfo.credits.style						= UI_CENTER;
+#endif
+
 	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
 #if 0
 		y += SETUP_MENU_VERTICAL_SPACING;
@@ -312,9 +337,12 @@ static void UI_SetupMenu_Init( void ) {
 #ifdef IOQUAKE3 // ZTM: CDKEY
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.cdkey );
 #endif
-//	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.load );
-//	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.save );
+#ifdef TURTLEARENA // LONG_CREDITS
+	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.credits );
+#endif
 	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
+//		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.load );
+//		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.save );
 		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.defaults );
 	}
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.back );

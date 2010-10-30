@@ -358,6 +358,9 @@ extern void UI_UpdateCvars( void );
 // ui_credits.c
 //
 extern void UI_CreditMenu( void );
+#ifdef TURTLEARENA // LONG_CREDITS
+extern void UI_LongCreditMenu( void );
+#endif
 
 //
 // ui_ingame.c
