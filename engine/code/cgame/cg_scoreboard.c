@@ -168,6 +168,8 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		}
 	}
 #endif
+
+#ifndef IOQ3ZTM // FONT_REWRITE
 	// draw the score line
 	if ( score->ping == -1 ) {
 		Com_sprintf(string, sizeof(string),
@@ -179,6 +181,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		Com_sprintf(string, sizeof(string),
 			"%5i %4i %4i %s", score->score, score->ping, score->time, ci->name);
 	}
+#endif
 
 	// highlight your position
 	if ( score->client == cg.snap->ps.clientNum ) {
@@ -221,7 +224,29 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 #endif
 	}
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+	// draw the score line
+	if ( score->ping == -1 ) {
+		Com_sprintf(string, sizeof(string), "connecting");
+	} else if ( ci->team == TEAM_SPECTATOR ) {
+		Com_sprintf(string, sizeof(string), "SPECT");
+	} else {
+		Com_sprintf(string, sizeof(string), "%5i", score->score);
+	}
+	CG_DrawBigString( SB_SCORE_X + (SB_RATING_WIDTH / 2), y, string, fade );
+
+	if ( score->ping != -1 ) {
+		Com_sprintf(string, sizeof(string), "%4i", score->ping);
+		CG_DrawBigString( SB_PING_X - (SB_RATING_WIDTH / 2), y, string, fade );
+
+		Com_sprintf(string, sizeof(string), "%4i", score->time);
+		CG_DrawBigString( SB_TIME_X - (SB_RATING_WIDTH / 2), y, string, fade );
+	}
+
+	CG_DrawBigString( SB_NAME_X - (SB_RATING_WIDTH / 2), y, ci->name, fade );
+#else
 	CG_DrawBigString( SB_SCORELINE_X + (SB_RATING_WIDTH / 2), y, string, fade );
+#endif
 
 	// add the "ready" marker for intermission exiting
 	if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << score->client ) ) {
