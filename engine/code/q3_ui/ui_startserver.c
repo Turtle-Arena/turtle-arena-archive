@@ -426,18 +426,20 @@ static void StartServer_MenuEvent( void* ptr, int event ) {
 		break;
 
 	case ID_STARTSERVERNEXT:
-		trap_Cvar_SetValue( "g_gameType", gametype_remap[s_startserver.gametype.curvalue] );
 #ifdef TA_MISC
 		// If ingame, don't go to server options
 		if (trap_Cvar_VariableValue("sv_running"))
 		{
 			// the wait commands will allow the dedicated to take effect
 			const char *info = UI_GetArenaInfoByNumber( s_startserver.maplist[ s_startserver.currentmap ]);
-			trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", Info_ValueForKey( info, "map" )));
-		}
-		else
+			trap_Cmd_ExecuteText( EXEC_APPEND, va( "g_gametype %d ; wait ; wait ;  map %s\n", gametype_remap[s_startserver.gametype.curvalue], Info_ValueForKey( info, "map" )));
+		} else {
 #endif
+		trap_Cvar_SetValue( "g_gameType", gametype_remap[s_startserver.gametype.curvalue] );
 		UI_ServerOptionsMenu( s_startserver.multiplayer );
+#ifdef TA_MISC
+		}
+#endif
 		break;
 
 	case ID_STARTSERVERBACK:
@@ -1602,8 +1604,8 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 
 	memset( &s_serveroptions, 0 ,sizeof(serveroptions_t) );
 	s_serveroptions.multiplayer = multiplayer;
-#if defined IOQ3ZTM // IOQ3BUGFIX: Clamp to gametype_remap2 array
-	s_serveroptions.gametype = (int)Com_Clamp( 0, ARRAY_LEN(gametype_remap2) - 1, trap_Cvar_VariableValue( "g_gameType" ) );
+#if defined IOQ3ZTM // IOQ3BUGFIX: Clamp to gametype_remap2 array (and use proper g_gametype name)
+	s_serveroptions.gametype = (int)Com_Clamp( 0, ARRAY_LEN(gametype_remap2) - 1, trap_Cvar_VariableValue( "g_gametype" ) );
 #else
 	s_serveroptions.gametype = (int)Com_Clamp( 0, GT_MAX_GAME_TYPE - 1, trap_Cvar_VariableValue( "g_gameType" ) );
 #endif
