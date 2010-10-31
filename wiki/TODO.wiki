@@ -221,10 +221,9 @@ Most of the mapobjects should be damageable.
     *   OR Just use misc_object as they use vertex lighting.
     * Misc_model is a way to insert a *static* model, so lightmap like the level.
 
-  * WONTFIX?: First Person weapon doesn't draw correctly (It draws too near to the screen)
-			This happens due to changing the field of view to 70 (Q3 uses 90)
-
   * TODO: Have Announcer use "voice chats" so that the text is printed as well as playing a sound.
+    * TODO: Add option to disable Announcer voice and/or text
+    * TODO: Have Announcer text shown in a comic-style naration box
   * TODO: Allow multiple Announcers? Have a cg_announcer cvar { "none", "male", "female", etc } to control voice chat file.
 
   * TODO-after-adding-ET_WEAPON: "Weapon Surface flags" so metal rubbing on metal makes sparks and stuff?
@@ -247,14 +246,7 @@ Most of the mapobjects should be damageable.
     * Only spawn weapons with a classname, have flags for melee and gun weapon spawning.
   * TODO: ...also allow list of weapons in message field?
 
-  * DONE-ish?: Use freetype for TTF rendering, instead of q3font.exe's output files of a TTF. (Almost completed in Xreal?)
-    * Well I no longer need q3font.exe, as copied/fixed the freetype code (Also support in console and hud consoles lines)
-    * But most in game text does not support TTF.
-
   * WORKING(NotDone?): Have bots use shurikens. (They are used *to much* now.)
-
-  * DONE: Have player fade out when dead instead of BodySink
-    * Does it look good?
 
 = Other =
   * TODO: Add extra library dlls from NSIS installer to zip install
@@ -292,7 +284,7 @@ Most of the mapobjects should be damageable.
 
 == Players ==
   * TODO: Raph and Casey really need to /swing/ the melee weapons.
-    * Casey's swinging isn't that bad, but Raph's swinging sure is.
+    * Casey's swinging isn't that bad, but raph_v8's swinging sure is.
 
   * TODO: Set looping in don, raph, mike, and casey mm3d models and re-export
 
@@ -309,6 +301,9 @@ Most of the mapobjects should be damageable.
     * Leo--Mouth ` -----<==>` (easy to do)
     * Don--Mouth ` -------- ` (DONE?)
     * Mike-Mouth ` ------.' ` (easy to do)
+
+  * TODO: Add a holder onto the back of Don's belt to hold his Bo when it is not in use
+    * Similar to the action figures.
 
 === Casey ====
   * TODO: Finish Casey Jones model mesh
