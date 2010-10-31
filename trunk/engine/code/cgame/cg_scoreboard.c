@@ -479,10 +479,12 @@ void CG_DrawOldTourneyScoreboard( void ) {
 		trap_SendClientCommand( "score" );
 	}
 
+#ifndef IOQ3ZTM // IOQ3BUGFIX: Show text!
 	color[0] = 1;
 	color[1] = 1;
 	color[2] = 1;
 	color[3] = 1;
+#endif
 
 	// draw the dialog background
 	color[0] = color[1] = color[2] = 0;
@@ -491,6 +493,13 @@ void CG_DrawOldTourneyScoreboard( void ) {
 	CG_FillRectFit( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
 #else
 	CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
+#endif
+
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Show text!
+	color[0] = 1;
+	color[1] = 1;
+	color[2] = 1;
+	color[3] = 1;
 #endif
 
 	// print the mesage of the day
@@ -523,7 +532,7 @@ void CG_DrawOldTourneyScoreboard( void ) {
 		CG_DrawGiantStringColor(8, y, "Red Team", color);
 		s = va("%i", cg.teamScores[0] );
 #ifdef IOQ3ZTM // FONT_REWRITE
-		CG_DrawGiantStringColor( 632 - Com_FontStringWidth(&cgs.media.fontGiant, s, strlen(s)), y, s, color);
+		CG_DrawGiantStringColor( 632 - Com_FontStringWidth(&cgs.media.fontGiant, s, 0), y, s, color);
 #else
 		CG_DrawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, qtrue, qtrue, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 #endif
@@ -533,7 +542,7 @@ void CG_DrawOldTourneyScoreboard( void ) {
 		CG_DrawGiantStringColor(8, y, "Blue Team", color);
 		s = va("%i", cg.teamScores[1] );
 #ifdef IOQ3ZTM // FONT_REWRITE
-		CG_DrawGiantStringColor( 632 - Com_FontStringWidth(&cgs.media.fontGiant, s, strlen(s)), y, s, color);
+		CG_DrawGiantStringColor( 632 - Com_FontStringWidth(&cgs.media.fontGiant, s, 0), y, s, color);
 #else
 		CG_DrawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, qtrue, qtrue, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 #endif
@@ -553,7 +562,7 @@ void CG_DrawOldTourneyScoreboard( void ) {
 			CG_DrawGiantStringColor(8, y, ci->name, color);
 			s = va("%i", ci->score );
 #ifdef IOQ3ZTM // FONT_REWRITE
-			CG_DrawGiantStringColor( 632 - Com_FontStringWidth(&cgs.media.fontGiant, s, strlen(s)), y, s, color);
+			CG_DrawGiantStringColor( 632 - Com_FontStringWidth(&cgs.media.fontGiant, s, 0), y, s, color);
 #else
 			CG_DrawStringExt( 632 - GIANT_WIDTH * strlen(s), y, s, color, qtrue, qtrue, GIANT_WIDTH, GIANT_HEIGHT, 0 );
 #endif
