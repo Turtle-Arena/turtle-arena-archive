@@ -81,18 +81,31 @@ base/sound/player/footsteps/step2.wav
 base/sound/player/footsteps/step3.wav
 base/sound/player/footsteps/step4.wav
 
+== DejaVu Sans Bold Oblique ==
+The following use DejaVu Sans Bold Oblique, for font license see http://dejavu-fonts.org/wiki/License
+
+base/icons/iconf_blu2.png
+base/icons/iconf_blu3.png
+base/icons/iconf_neutral3.png
+base/icons/iconf_red2.png
+base/icons/iconf_red3.png
+
 == GNU FreeFonts ==
 The following files were created using the GNU Freefonts,
 	and are license under the GNU General Public License; either version 2 of the License, or
 	(at your option) any later version.
 
-The 60 images listed below were created with GIMP.
+The 64 images listed below were created with GIMP.
 base/menu/art/level_complete[1-5].png				FreeMono.ttf
 base/menu/art/skill[1-5].png						FreeMono.ttf
 base/menu/art/randombot_icon.png					FreeMono.ttf
 base/menu/art/unknownmap.png						FreeMono.ttf
 base/menu/art/*_0.png [15 images]					FreeSansBold.ttf
 base/menu/art/*_1.png [15 images]					FreeSansBold.ttf
+base/icons/ammo_regen.png							FreeSansBold.ttf
+base/icons/doubler.png								FreeSansBold.ttf
+base/icons/guard.png								FreeSansBold.ttf
+base/icons/scout.png								FreeSansBold.ttf
 base/gfx/2d/numbers/*.png 0 - 9 and '-' [11 images]	FreeSansBold.ttf
 base/gfx/2d/crosshaira.png							FreeSans.ttf
 base/textures/common/alpha* [6 images]				FreeSans.ttf
