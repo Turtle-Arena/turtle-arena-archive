@@ -202,27 +202,29 @@ void TossClientItems( gentity_t *self ) {
 		// find the item type for this weapon
 		item = BG_FindItemForWeapon( weapon );
 
-		// spawn the item
+		if (item) {
+			// spawn the item
 #ifdef TA_WEAPSYS
-		drop = Drop_Item( self, item, 0 );
-		if (drop) {
-			int ammo;
+			drop = Drop_Item( self, item, 0 );
+			if (drop) {
+				int ammo;
 #ifdef TA_WEAPSYS_EX
-			if (statAmmo != -1)
-			{
-				ammo = self->client->ps.stats[statAmmo];
-				self->client->ps.stats[statAmmo] = 0;
-			}
-			else
-			{
-				// Give default weapon ammo on pickup
-				ammo = 0;
-			}
+				if (statAmmo != -1)
+				{
+					ammo = self->client->ps.stats[statAmmo];
+					self->client->ps.stats[statAmmo] = 0;
+				}
+				else
+				{
+					// Give default weapon ammo on pickup
+					ammo = 0;
+				}
 #else
-			ammo = self->client->ps.ammo[weapon];
+				ammo = self->client->ps.ammo[weapon];
 #endif
 
-			drop->count = ammo;
+				drop->count = ammo;
+			}
 
 			// Don't have corpse hold dropped weapon
 			self->s.weapon = self->client->ps.weapon = WP_NONE;
@@ -258,7 +260,7 @@ void TossClientItems( gentity_t *self ) {
 	}
 #ifdef TA_HOLDSYS
 	// drop all the holdable items
-	for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
+	for ( i = 1 ; i < BG_NumHoldableItems() ; i++ ) {
 		if ( self->client->ps.holdable[ i ] != 0 ) {
 			item = BG_FindItemForHoldable( i );
 			if ( !item ) {

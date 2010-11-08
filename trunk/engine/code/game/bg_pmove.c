@@ -2293,9 +2293,9 @@ static void PM_NextHoldable(void)
 	// Change to the next valid holdable item.
 	original = pm->ps->holdableIndex;
 
-	for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
+	for ( i = 1 ; i < BG_NumHoldableItems() ; i++ ) {
 		pm->ps->holdableIndex++;
-		if ( pm->ps->holdableIndex == HI_NUM_HOLDABLE ) {
+		if ( pm->ps->holdableIndex == BG_NumHoldableItems() ) {
 			pm->ps->holdableIndex = 1;
 		}
 
@@ -2317,7 +2317,7 @@ static void PM_NextHoldable(void)
 			break;
 		}
 	}
-	if ( i == HI_NUM_HOLDABLE ) {
+	if ( i == BG_NumHoldableItems() ) {
 		//pm->ps->holdableIndex = original;
 		// None are valid so use none.
 		pm->ps->holdableIndex = HI_NONE;
@@ -2357,7 +2357,7 @@ static void PM_Weapon( void ) {
 	// Check if valid, in cgame we have to
 	//   pass HI_NO_SELECT (255)
 	//   so bg can change to the next holdable.
-	if (pm->cmd.holdable < HI_NUM_HOLDABLE)
+	if (pm->cmd.holdable < BG_NumHoldableItems())
 	{
 		pm->ps->holdableIndex = pm->cmd.holdable;
 	}

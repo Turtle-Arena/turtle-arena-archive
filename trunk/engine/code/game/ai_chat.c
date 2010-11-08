@@ -341,7 +341,7 @@ char *BotRandomWeaponName(void) {
 	rnd = random() * (float)(BG_NumWeaponGroups() + 0.9f);
 	if (rnd >= BG_NumWeaponGroups())
 		rnd = BG_NumWeaponGroups()-1;
-	return bg_weapongroupinfo[rnd].pickupName;
+	return bg_weapongroupinfo[rnd].item->pickup_name;
 #else
 #ifdef MISSIONPACK
 	rnd = random() * 11.9;

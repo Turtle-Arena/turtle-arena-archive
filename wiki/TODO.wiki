@@ -7,8 +7,7 @@
 == Weapons ==
 Weapons (and attacking)
 
-  * IOQ3ZTM: TODO: Spawn Ammo items from weaponinfo.txt
-    * If I make it so weapon/ammo items are in text files, should I have all items in iteminfo.txt (and `*.item`) too?...
+  * IOQ3ZTM: TODO: Add Q3 Ammo items to quake3 base_ioq3ztm/scripts/weaponinfo.txt
 
   * TODO: Have weapons be seperate entities (ET_WEAPON) from the player,
 		allowing one rendering function that can be use for all weapons,
@@ -25,9 +24,6 @@ Weapons (and attacking)
 
   * TODO: Draw the secondary pickup weapon somewhere on the player when single handed
 
-  * STARTED (TA_HOLDABLE): Make shurikens/holdable-projectiles general like weapons groups.
-    * (So they can be totally configured from .weap, and add new ones)
-
   * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
 
   * TODO: Add PD_CUSTOM projectile death type
@@ -39,6 +35,8 @@ Weapons (and attacking)
   * TODO: Per-weapon run animations (Support `LEGS_*` and `BOTH_*`. Should `TORSO_*` be supported too?)
 
   * TODO: Support `BOTH_*` attacks (not just `TORSO_*`) in ui/q3_ui
+
+  * TODO: Split "TA_WEAPSYS // TA_ITEMSYS" from "TA_WEAPSYS"? (Allow scriptable item without scriptable weapons and vise versa?)
 
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
@@ -182,12 +180,9 @@ Weapons (and attacking)
       * If I change the whole source it could cause issues with submitting patches to ioq3 (and more difficult for other q3 mods to use my code?)
 
   * STARTED (IOQ3ZTM // FONT_REWRITE): Support true type fonts everywhere!
-    * Status: client, cgame, and q3_ui now support ttfs everywhere!
-    * FIXME: There seems to be some issues with using old bitmap fonts, like not showing text to Player Setup menu.
-    * FIXME: A lot of places use old fixed widths, which breaks centering variable width text...
-      * Take a look at where CG_DrawStrlen is used. Most (or all?) needs to be rewritten.
-    * TODO: Add support for font1_prop and font2_prop into *_DrawFontStringExt? (code could be cleaner this way?)
-    * TODO: Clean up new font code in q3_ui, cgame, and client
+    * Status: client, cgame, and q3_ui now support ttfs everywhere! (but does fully support the old fonts)
+    * IOQ3ZTM: FIXME: There seems to be some issues with using old bitmap fonts, like not showing text to Player Setup menu.
+    * IOQ3ZTM: TODO: Add support for font1_prop and font2_prop into *_DrawFontStringExt? (code could be cleaner this way?)
 
   * TODO: Move more when jumping in lock-on mode! (Currently the player doesn't really go anywhere.)
 
@@ -210,6 +205,9 @@ Most of the mapobjects should be damageable.
   * TODO: Test/use the "noise" and "random" waveforms that I copied from IOSTVEF
 
   * TODO: Check if "TA_WEAPSYS // BOT_ITEM_INFOS" breaks compatibility with q3 mods.
+
+  * STARTED (TA_HOLDABLE): Make shurikens/holdable-projectiles general like weapons groups.
+    * (So they can be totally configured from .weap, and add new ones)
 
 == Don't do? (Dead Ideas?) ==
   * TODO: Feet tags, for attack checking? And/or for attaching hoverboard to player?
@@ -252,7 +250,7 @@ Most of the mapobjects should be damageable.
 
   * TODO: Make some sort of manual to tell how to play, control the player (using default controls). Have it be simple.
 
-  * TODO: Portable (zip): Add a note (either on the website or in the readme) that removeing settings/portable will make it use the normal user app data directory, i.e. $HOME/.turtlearena
+  * TODO: Portable (zip): Add a note (either on the website or in the readme) that removeing the "settings/portable" file will make it use the normal user app data directory, i.e. $HOME/.turtlearena
 
   * TODO: Portable Linux (zip): http://portablelinuxapps.org/
 	* Create portable linux app from .deb package

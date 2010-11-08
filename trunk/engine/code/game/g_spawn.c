@@ -375,33 +375,6 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	}
 
 
-
-#ifdef TA_WEAPSYS
-#ifdef IOQ3ZTM // LASERTAG
-	if (g_laserTag.integer)
-	{
-		if ( !strcmp("weapon_random", ent->classname) ) {
-			return qfalse;
-		}
-	}
-
-	if (!g_laserTag.integer)
-	{
-#endif
-	// ZTM: NOTE: Placed before items so if weapon is on both list
-	//                    uses external item.
-	// check weapon item spawn functions
-	for ( i = 1; i < BG_NumWeaponGroups(); i++ ) {
-		if ( !strcmp(bg_weapongroupinfo[i].itemName, ent->classname) ) {
-			G_SpawnItem( ent, &bg_weapongroupinfo[i].item );
-			return qtrue;
-		}
-	}
-#ifdef IOQ3ZTM // LASERTAG
-	}
-#endif
-#endif
-
 #ifdef TA_NPCSYS
 	// check NPC spawn functions
 	for ( i = 1; i < BG_NumNPCs(); i++ ) {
@@ -413,9 +386,39 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 #endif
 
 #ifdef IOQ3ZTM // LASERTAG
-	if (!g_laserTag.integer)
-	{
+	if (g_laserTag.integer) {
+		if ( !strcmp("weapon_random", ent->classname) ) {
+			return qfalse;
+		}
+	} else {
 #endif
+#ifdef TA_WEAPSYS // TA_ITEMSYS
+	// Spawn external items (including weaponGroup items)
+	for ( i = 1; i < BG_NumItems(); i++ ) {
+		item = &bg_iteminfo[i];
+		if ( item->classname[0] == '\0' ) {
+			continue;
+		}
+		if ( !strcmp(item->classname, ent->classname) ) {
+			G_SpawnItem( ent, item );
+			return qtrue;
+		}
+	}
+	
+	// ZTM: TODO: Readd internal bg_itemlist?
+#else
+#ifdef TA_WEAPSYS
+	// ZTM: NOTE: Placed before items so if weapon is on both list
+	//                    uses external item.
+	// check weapon item spawn functions
+	for ( i = 1; i < BG_NumWeaponGroups(); i++ ) {
+		if ( !strcmp(bg_weapongroupinfo[i].item->classname, ent->classname) ) {
+			G_SpawnItem( ent, bg_weapongroupinfo[i].item );
+			return qtrue;
+		}
+	}
+#endif
+
 	// check item spawn functions
 	for ( item=bg_itemlist+1 ; item->classname ; item++ ) {
 		if ( !strcmp(item->classname, ent->classname) ) {
@@ -423,6 +426,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
+#endif
 #ifdef IOQ3ZTM // LASERTAG
 	}
 #endif
@@ -440,14 +444,9 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	// Unknown weapon, spawn weapon_random
 	if (Q_stricmpn(ent->classname, "weapon_", 7) == 0)
 	{
-		for ( s=spawns ; s->name ; s++ ) {
-			if ( !strcmp(s->name, "weapon_random") ) {
-				// found it
-				G_Printf ("%s doesn't have a spawn function, using weapon_random instead\n", ent->classname);
-				s->spawn(ent);
-				return qtrue;
-			}
-		}
+		G_Printf ("%s doesn't have a spawn function, using weapon_random instead\n", ent->classname);
+		SP_weapon_random(ent);
+		return qtrue;
 	}
 #endif
 	G_Printf ("%s doesn't have a spawn function\n", ent->classname);

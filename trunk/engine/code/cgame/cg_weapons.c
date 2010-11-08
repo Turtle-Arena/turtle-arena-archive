@@ -49,9 +49,9 @@ void CG_NextHoldable_f( void ) {
 		cg.holdableSelect = cg.snap->ps.holdableIndex;
 	}
 
-	for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
+	for ( i = 1 ; i < BG_NumHoldableItems() ; i++ ) {
 		cg.holdableSelect++;
-		if ( cg.holdableSelect == HI_NUM_HOLDABLE ) {
+		if ( cg.holdableSelect == BG_NumHoldableItems() ) {
 			cg.holdableSelect = 1;
 		}
 
@@ -73,7 +73,7 @@ void CG_NextHoldable_f( void ) {
 			break;
 		}
 	}
-	if ( i == HI_NUM_HOLDABLE ) {
+	if ( i == BG_NumHoldableItems() ) {
 		cg.holdableSelect = original;
 	}
 }
@@ -103,10 +103,10 @@ void CG_PrevHoldable_f( void ) {
 		cg.holdableSelect = cg.snap->ps.holdableIndex;
 	}
 
-	for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
+	for ( i = 1 ; i < BG_NumHoldableItems() ; i++ ) {
 		cg.holdableSelect--;
 		if ( cg.holdableSelect == 0 ) {
-			cg.holdableSelect = HI_NUM_HOLDABLE - 1;
+			cg.holdableSelect = BG_NumHoldableItems() - 1;
 		}
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
@@ -127,7 +127,7 @@ void CG_PrevHoldable_f( void ) {
 			break;
 		}
 	}
-	if ( i == HI_NUM_HOLDABLE ) {
+	if ( i == BG_NumHoldableItems() ) {
 		cg.holdableSelect = original;
 	}
 }
@@ -150,7 +150,7 @@ void CG_Holdable_f( void ) {
 
 	num = atoi( CG_Argv( 1 ) );
 
-	if ( num < 0 || num >= HI_NUM_HOLDABLE ) {
+	if ( num < 0 || num >= BG_NumHoldableItems() ) {
 		return;
 	}
 
@@ -1332,7 +1332,7 @@ void CG_RegisterWeapon( int weaponNum )
 #endif
 
 #ifdef TA_WEAPSYS
-	weaponInfo->weaponIcon = trap_R_RegisterShader( bg_weapongroupinfo[weaponNum].iconName );
+	weaponInfo->weaponIcon = trap_R_RegisterShader( bg_weapongroupinfo[weaponNum].item->icon );
 #else
 	weaponInfo->weaponIcon = trap_R_RegisterShader( item->icon );
 #endif

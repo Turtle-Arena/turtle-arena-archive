@@ -1418,34 +1418,39 @@ int BotAILoadMap( int restart ) {
 
 	if (!restart) {
 #ifdef TA_WEAPSYS // BOT_ITEM_INFOS
-		static bot_shareditem_t itemInfos[MAX_BG_WEAPON_GROUPS];
+		static bot_shareditem_t itemInfos[MAX_ITEMS];
 		int i;
 		int item;
 
 		Com_Memset(&itemInfos, 0, sizeof(itemInfos));
 
 		// Setup weapon item info.
-		for (i = 1, item = 0; i < BG_NumWeaponGroups(); i++)
+		for (i = 1, item = 0; i < BG_NumItems(); i++)
 		{
-			if (!bg_weapongroupinfo[i].item.classname)
+			if (!bg_iteminfo[i].classname[0])
 				continue;
 
-			Q_strncpyz(itemInfos[item].classname, bg_weapongroupinfo[i].item.classname, 32);
-			Q_strncpyz(itemInfos[item].name, bg_weapongroupinfo[i].name, MAX_QPATH);
-			Q_strncpyz(itemInfos[item].model, bg_weapongroupinfo[i].pickupModel, MAX_QPATH);
-			itemInfos[item].modelindex = BG_ItemNumForItem(BG_FindItemForWeapon(i));
+			Q_strncpyz(itemInfos[item].classname, bg_iteminfo[i].classname, sizeof (bg_iteminfo[i].classname));
+			Q_strncpyz(itemInfos[item].name, bg_iteminfo[i].pickup_name, sizeof (bg_iteminfo[i].pickup_name));
+			Q_strncpyz(itemInfos[item].model, bg_iteminfo[i].world_model[0], sizeof (bg_iteminfo[i].world_model[0]));
+			itemInfos[item].modelindex = i;
 
-			if ( gametype == GT_TEAM  )
-			{
-				itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponTeamRespawn");
-			}
-			else
-			{
-				itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponrespawn");
-			}
+			if (bg_iteminfo[i].giType == IT_WEAPON) {
+				if ( gametype == GT_TEAM  ) {
+					itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponTeamRespawn");
+				} else {
+					itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponrespawn");
+				}
 
-			itemInfos[item].defaultWeight = BotWeaponWeight(i);
-			itemInfos[item].inventory = INVENTORY_WEAPON_START+i-1;
+				itemInfos[item].defaultWeight = BotWeaponWeight(i);
+				itemInfos[item].inventory = INVENTORY_WEAPON_START+i-1;
+			} else {
+				// ZTM: NOTE: Currently auto weight is only supported for weapons,
+				//              so other weights must be added to base/botfiles/fuzi.c
+				itemInfos[item].respawntime = 35;
+				itemInfos[item].defaultWeight = 0;
+				itemInfos[item].inventory = 0;
+			}
 
 			item++;
 		}

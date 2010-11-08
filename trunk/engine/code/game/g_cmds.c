@@ -237,7 +237,7 @@ void Cmd_Give_f (gentity_t *ent)
 	if (give_all || Q_stricmp( name, "holdable") == 0)
 	{
 		// Skip HI_NONE
-		for ( i = 1 ; i < HI_NUM_HOLDABLE ; i++ ) {
+		for ( i = 1 ; i < BG_NumHoldableItems() ; i++ ) {
 			ent->client->ps.holdable[i] = MAX_SHURIKENS;
 		}
 		// Change to first holdable.

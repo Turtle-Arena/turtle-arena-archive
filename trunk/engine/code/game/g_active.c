@@ -640,7 +640,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			// NOTE: max is wrong for WP_BFG: max should be 10 instead of 20
 			//                        WP_MACHINEGUN: max should be 50 instead of 40
 			//       inc is wrong for WP_MACHINEGUN: inc should be 4 instead of 5
-			max = bg_weapongroupinfo[w].item.quantity;
+			max = bg_weapongroupinfo[w].item->quantity;
 
 			if (max <= 25)
 				inc = 1;
@@ -755,19 +755,19 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #ifdef TA_HOLDABLE // REGEN_SHURIKENS
 		// Team Arena Ammo Regen for Shurikens
 		{
-			int h, /*max, inc, t,*/ i;
-			int holdableList[]={HI_SHURIKEN, HI_ELECTRICSHURIKEN, HI_FIRESHURIKEN, HI_LASERSHURIKEN};
-			int holdableCount = sizeof(holdableList) / sizeof(int);
+			int h;
 
-			for (i = 0; i < holdableCount; i++) {
-				h = holdableList[i];
+			for (h = 0; h < MAX_HOLDABLE; h++) {
+				if (!BG_ProjectileIndexForHoldable(h)) {
+					continue;
+				}
 				switch(h) {
 					// Only weapons that use ammo.
 					case HI_SHURIKEN: max = 20; inc = 1; t = 1500; break;
 					case HI_ELECTRICSHURIKEN: max = 20; inc = 1; t = 2000; break;
 					case HI_FIRESHURIKEN: max = 20; inc = 1; t = 3000; break;
 					case HI_LASERSHURIKEN: max = 20; inc = 1; t = 2500; break;
-					default: max = 0; inc = 0; t = 1000; break;
+					default: max = 20; inc = 1; t = 2000; break;
 				}
 				client->holdableTimes[h] += msec;
 				if ( client->ps.holdable[h] >= max ) {
@@ -910,11 +910,13 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 				// find the item type for this weapon
 				item = BG_FindItemForWeapon(weapon);
 
-				drop = Drop_Item(ent, item, 0);
-				drop->count = ammo;
+				if (item) {
+					drop = Drop_Item(ent, item, 0);
+					drop->count = ammo;
 
-				// Override weapon removal time.
-				drop->nextthink = level.time + 15000;
+					// Override weapon removal time.
+					drop->nextthink = level.time + 15000;
+				}
 			}
 			break;
 #endif

@@ -183,7 +183,9 @@ static void G_NPC_Die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 		&& !(self->bgNPC.info->flags & NPCF_NODROPWEAPON))
 	{
 		gitem_t *item = BG_FindItemForWeapon( self->s.weapon );
-		Drop_Item(self, item, 0);
+		if (item) {
+			Drop_Item(self, item, 0);
+		}
 	}
 
 	// Death types

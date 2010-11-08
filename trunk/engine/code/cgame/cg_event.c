@@ -427,7 +427,12 @@ static void CG_UseItem( centity_t *cent ) {
 	es = &cent->currentState;
 	
 	itemNum = (es->event & ~EV_EVENT_BITS) - EV_USE_ITEM0;
-	if ( itemNum < 0 || itemNum > HI_NUM_HOLDABLE ) {
+#ifdef TA_WEAPSYS // TA_ITEMSYS
+	if ( itemNum < 0 || itemNum > BG_NumHoldableItems() )
+#else
+	if ( itemNum < 0 || itemNum > HI_NUM_HOLDABLE )
+#endif
+	{
 		itemNum = 0;
 	}
 
@@ -441,14 +446,14 @@ static void CG_UseItem( centity_t *cent ) {
 #endif
 		{
 			item = BG_FindItemForHoldable( itemNum );
+			if (item) {
 #ifdef TA_DATA // Eat pizza, don't "use" it.
-			if (itemNum == HI_MEDKIT)
-			{
-				CG_CenterPrint( va("Ate %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
-			}
-			else
+				if (itemNum == HI_MEDKIT) {
+					CG_CenterPrint( va("Ate %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+				} else
 #endif
-			CG_CenterPrint( va("Use %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+				CG_CenterPrint( va("Use %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+			}
 		}
 	}
 

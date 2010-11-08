@@ -2391,6 +2391,8 @@ void Drone_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
 // Ideya Drone
 void SP_nights_start( gentity_t *ent )
 {
+	gitem_t *item;
+
 	// Touch this to go into NiGHTS mode
 	//    and go to current mare.
 
@@ -2410,7 +2412,10 @@ void SP_nights_start( gentity_t *ent )
 	}
 
 	// ZTM: TODO: In Single Player remove model when player is NiGHTS, and put it back when they lose NiGHTS mode
-	ent->s.modelindex = G_ModelIndex(BG_FindItemForPowerup(PW_FLIGHT)->world_model[0]);
+	item = BG_FindItemForPowerup(PW_FLIGHT);
+	if (item) {
+		ent->s.modelindex = G_ModelIndex(item->world_model[0]);
+	}
 
 	G_SetOrigin( ent, ent->s.origin );
 
@@ -2450,6 +2455,8 @@ void Capture_Touch(gentity_t *self, gentity_t *other, trace_t *trace )
 // Touch to use collected Spheres to damage Ideya Capture
 void SP_nights_target( gentity_t *ent )
 {
+	gitem_t *item;
+
 	VectorSet( ent->r.mins, -15, -15, -15 );
 	VectorSet( ent->r.maxs, 15, 15, 15 );
 
@@ -2463,7 +2470,10 @@ void SP_nights_target( gentity_t *ent )
 	}
 
 	// Tempory model
-	ent->s.modelindex = G_ModelIndex(BG_FindItemForPowerup(PW_INVUL)->world_model[0]);
+	item = BG_FindItemForPowerup(PW_INVUL);
+	if (item) {
+		ent->s.modelindex = G_ModelIndex(item->world_model[0]);
+	}
 
 	G_SetOrigin( ent, ent->s.origin );
 

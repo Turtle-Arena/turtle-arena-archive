@@ -394,7 +394,7 @@ struct gclient_s {
 	int			ammoTimes[WP_NUM_WEAPONS];
 #endif
 #ifdef TA_HOLDABLE // REGEN_SHURIKENS
-	int			holdableTimes[HI_NUM_HOLDABLE];
+	int			holdableTimes[MAX_HOLDABLE];
 #endif
 #ifndef TURTLEARENA // POWERS
 	int			invulnerabilityTime;

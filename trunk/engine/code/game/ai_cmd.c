@@ -1597,7 +1597,7 @@ void BotMatch_WhereAreYou(bot_state_t *bs, bot_match_t *match) {
 #ifdef TA_WEAPSYS
 	// Check weapons
 	for (i = 1; i < BG_NumWeaponGroups(); i++) {
-		dist = BotNearestVisibleItem(bs, bg_weapongroupinfo[i].pickupName, &goal);
+		dist = BotNearestVisibleItem(bs, bg_weapongroupinfo[i].item->pickup_name, &goal);
 		if (dist < bestdist) {
 			bestdist = dist;
 			bestitem = i;
