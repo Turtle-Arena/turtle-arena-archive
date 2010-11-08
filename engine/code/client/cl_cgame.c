@@ -174,7 +174,7 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 CL_SetUserCmdValue
 =====================
 */
-#if defined TA_HOLDSYS/*2*/
+#ifdef TA_HOLDSYS/*2*/
 void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int holdableValue ) {
 	cl.cgameUserCmdValue = userCmdValue;
 	cl.cgameSensitivity = sensitivityScale;
