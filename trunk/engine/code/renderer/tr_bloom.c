@@ -91,7 +91,7 @@ static struct {
 } bloom;
 
 
-static void ID_INLINE R_Bloom_Quad( int width, int height, float texX, float texY, float texWidth, float texHeight ) {
+static ID_INLINE void R_Bloom_Quad( int width, int height, float texX, float texY, float texWidth, float texHeight ) {
 	int x = 0;
 	int y = 0;
 	x = 0;

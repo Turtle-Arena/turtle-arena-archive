@@ -35,7 +35,10 @@ typedef signed short int16_t;
 typedef unsigned short uint16_t;
 typedef signed int int32_t;
 typedef unsigned int uint32_t;
+#ifndef _SIZE_T_DEFINED_
+#define _SIZE_T_DEFINED_
 typedef unsigned int size_t;
+#endif
 typedef unsigned long uintptr_t;
 
 /* Enable the dummy audio driver (src/audio/dummy/\*.c) */

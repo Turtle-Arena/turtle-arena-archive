@@ -33,7 +33,7 @@ x, y, are in pixels
 void MField_Draw( mfield_t *edit, int x, int y, int style, vec4_t color ) {
 	int		len;
 #ifdef IOQ3ZTM // FONT_REWRITE
-	int		val;
+	size_t	val;
 	int		basex;
 #else
 	int		charw;

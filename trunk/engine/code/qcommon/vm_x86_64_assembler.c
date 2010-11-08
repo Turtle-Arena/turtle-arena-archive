@@ -216,7 +216,7 @@ typedef struct {
 /* ************************* */
 
 static unsigned hashkey(const char *string, unsigned len) {
-	unsigned register hash, i;
+	register unsigned hash, i;
 
 	hash = 0;
 	for (i = 0; i < len && string[i] != '\0'; ++i) {
@@ -1371,7 +1371,9 @@ void assemble_line(const char* input, size_t len)
 		}
 		o->func(opn, arg1, arg2, o->data);
 		if(assembler_pass)
+		{
 			debug("   - %s%s", cur_line, cur_line[strlen(cur_line)-1]=='\n'?"":"\n");
+		}
 	}
 }
 

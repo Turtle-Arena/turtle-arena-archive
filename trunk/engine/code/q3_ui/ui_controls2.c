@@ -1314,7 +1314,7 @@ Controls_InitWeapons
 =================
 */
 static void Controls_InitWeapons( void ) {
-#ifndef TA_WEAPSYS_EX // We don't change weapons in controls menu...
+#ifndef TA_WEAPSYS_EX // Don't pre-load weapons in controls menu, there could be a lot that are not seen in menu...
 	gitem_t *	item;
 
 	for ( item = bg_itemlist + 1 ; item->classname ; item++ ) {
