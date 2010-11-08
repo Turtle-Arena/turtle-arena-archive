@@ -1167,10 +1167,14 @@ void RegisterItem( gitem_t *item ) {
 	int itemNum;
 #endif
 	if ( !item ) {
+#ifdef TA_WEAPSYS // TA_ITEMSYS
+		return;
+#else
 		G_Error( "RegisterItem: NULL" );
+#endif
 	}
 #ifdef TA_WEAPSYS
-	itemNum = BG_ItemNumForItem(item);
+	itemNum = ITEM_INDEX(item);
 	if (itemNum < 0 || itemNum >= MAX_ITEMS)
 	{
 		G_Error( "RegisterItem: itemNum %d out of range [0-%d]\n", itemNum, MAX_ITEMS-1);
@@ -1298,7 +1302,7 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags ) {
 
 	for (i = 1; i < BG_NumWeaponGroups(); i++)
 	{
-		if (!bg_weapongroupinfo[i].item.classname || !bg_weapongroupinfo[i].item.classname[0]) {
+		if (!bg_weapongroupinfo[i].item->classname[0]) {
 			continue;
 		}
 		if (!bg_weapongroupinfo[i].randomSpawn) {
@@ -1316,13 +1320,13 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags ) {
 				continue;
 			}
 		}
-		if ( G_ItemDisabled(&bg_weapongroupinfo[i].item) ) {
+		if ( G_ItemDisabled(bg_weapongroupinfo[i].item) ) {
 			continue;
 		}
 
 		validWeapons[numweapons++] = i;
 		// Hmm... I have to cache all of the weapons that it may spawn...
-		RegisterItem( &bg_weapongroupinfo[i].item );
+		RegisterItem( bg_weapongroupinfo[i].item );
 		//Com_Printf("DEBUG: G_RandomWeaponItem: %s\n", bg_weapongroupinfo[i].item.classname);
 	}
 
@@ -1332,7 +1336,7 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags ) {
 	}
 
 	// Random weapon item
-	return &bg_weapongroupinfo[validWeapons[rand() % numweapons]].item;
+	return bg_weapongroupinfo[validWeapons[rand() % numweapons]].item;
 }
 
 /*QUAKED weapon_random (1 0 0) (-16 -16 -16) (16 16 16) SUPSPENDED MELEE GUNS CONSTANT

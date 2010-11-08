@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "bg_misc.h"
 
+#ifndef TA_WEAPSYS // TA_ITEMSYS
 /*QUAKED item_***** ( 0 0 0 ) (-16 -16 -16) (16 16 16) suspended
 DO NOT USE THIS CLASS, IT JUST HOLDS GENERAL INFORMATION.
 The suspended flag will allow items to hang in the air, otherwise they are dropped to the next surface.
@@ -1292,6 +1293,7 @@ Only in One Flag CTF games
 };
 
 int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
+#endif
 
 char	*modNames[MOD_MAX] = {
 	"MOD_UNKNOWN",
@@ -1524,13 +1526,17 @@ materialInfo_t materialInfo[NUM_MATERIAL_TYPES] = {
 #endif
 
 #ifdef TA_WEAPSYS
+bg_iteminfo_t bg_iteminfo[MAX_ITEMS];
 bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
 static qboolean bg_weaponsys_init = qfalse;
+static int bg_numitems = 0; // NOTE: Not bg_numItems
 static int bg_numprojectiles = 0;
 static int bg_numweapons = 0;
 static int bg_numweapongroups = 0;
+
+static int bg_numholdables = 0;
 
 // These are in game, cgame, and ui, but not in bg - so its okay to use here...
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
@@ -1542,6 +1548,11 @@ int		trap_FS_GetFileList( const char *path, const char *extension, char *listbuf
 //#endif
 
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
+int BG_NumHoldableItems(void)
+{
+	return bg_numholdables;
+}
+
 int BG_ProjectileIndexForHoldable(int holdable)
 {
 	int projnum;
@@ -1568,6 +1579,20 @@ int BG_ProjectileIndexForHoldable(int holdable)
 	return projnum;
 }
 #endif
+
+int BG_ItemIndexForName(const char *classname)
+{
+	int i;
+	for (i = 0; i < MAX_ITEMS; i++)
+	{
+		if ( !Q_stricmp( bg_iteminfo[i].classname, classname))
+		{
+			return i;
+		}
+	}
+
+	return 0;
+}
 
 int BG_ProjectileIndexForName(const char *name)
 {
@@ -1609,6 +1634,27 @@ int BG_WeaponGroupIndexForName(const char *name)
 	}
 
 	return 0;
+}
+
+int BG_NumItems(void)
+{
+	if (bg_weaponsys_init)
+	{
+		return bg_numitems;
+	}
+	else
+	{
+		// BG_GetFreeItemNum
+		int i;
+		for (i = 0; i < MAX_ITEMS; i++)
+		{
+			if ( bg_iteminfo[i].classname[0] != '\0' )
+				continue;
+			break;
+		}
+		bg_numitems = i+1;
+		return i;
+	}
 }
 
 int BG_NumProjectiles(void)
@@ -1673,6 +1719,301 @@ int BG_NumWeaponGroups(void)
 		bg_numweapongroups = i+1;
 		return i;
 	}
+}
+
+#define PARSE_STRING(_token, _name, _out) \
+		if ( !Q_stricmp( _token, _name ) ) { \
+			_token = COM_Parse( p ); \
+			if ( *_token ) { \
+				Com_sprintf(_out, sizeof (_out), "%s", _token); \
+			} else { \
+				_out[0] = '\0'; \
+			} \
+			continue; \
+		}
+
+#define PARSE_INTEGER(_token, _name, _out) \
+		if ( !Q_stricmp( _token, _name ) ) { \
+			_token = COM_Parse( p ); \
+			if ( *_token ) { \
+				_out = atoi(_token); \
+			} else { \
+				break; \
+			} \
+			continue; \
+		}
+
+#define PARSE_FLOAT(_token, _name, _out) \
+		if ( !Q_stricmp( _token, _name ) ) { \
+			_token = COM_Parse( p ); \
+			if ( *_token ) { \
+				_out = atof(_token); \
+			} else { \
+				break; \
+			} \
+			continue; \
+		}
+
+#define PARSE_LIST(_token, _name, _out, _list) \
+		if ( !Q_stricmp( _token, _name ) ) { \
+			_token = COM_Parse( p ); \
+			if ( *_token ) { \
+				for (i = 0; _list[i] != NULL; i++) { \
+					if ( !Q_stricmp( _token, _list[i] ) ) { \
+						_out = i; \
+						break; \
+					} \
+				} \
+				if (_list[i] == NULL) { \
+					Com_Printf("Unknown token %s: valid options for \'%s\' are", _token, _name); \
+					for (i = 0; _list[i] != NULL; i++) \
+					{ \
+						if (i == 0) Com_Printf(" %s", _list[i]); \
+						else Com_Printf(", %s", _list[i]); \
+					} \
+					Com_Printf("\n"); \
+					return qfalse; \
+				} \
+			} else { \
+				Com_Printf("Missing token for %s\n", _name); \
+				_out = 0; \
+			} \
+			continue; \
+		}
+
+const char *it_names[] =
+{
+	"IT_BAD",
+	"IT_WEAPON",
+	"IT_AMMO",
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	"IT_SCORE",
+#endif
+#ifndef TURTLEARENA // NOARMOR
+	"IT_ARMOR",
+#endif
+	"IT_HEALTH",
+	"IT_POWERUP",
+	"IT_HOLDABLE",
+	"IT_PERSISTANT_POWERUP",
+	"IT_TEAM",
+	NULL
+};
+
+// ZTM: Hmm... I believe this shows my insanity quite well.
+const char *holdable_names[HI_NUM_HOLDABLE+1] =
+{
+	"HI_NONE",
+#ifndef TA_HOLDABLE // no q3 teleprter
+	"HI_TELEPORTER",
+#elif !defined TA_HOLDSYS
+	"HI_TELEPORTER_REMOVED", // do not use
+#endif
+	"HI_MEDKIT",
+#ifndef TA_HOLDABLE // no q3 teleprter
+	"HI_KAMIKAZE",
+#elif !defined TA_HOLDSYS
+	"HI_KAMIKAZE_REMOVED", // do not use
+#endif
+#ifndef TA_HOLDSYS
+	"HI_PORTAL",
+#endif
+#ifndef TURTLEARENA // POWERS
+	"HI_INVULNERABILITY",
+#elif !defined TA_HOLDSYS
+	"HI_INVULNERABILITY_REMOVED", // do not use
+#endif
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+	// Shurikens
+	"HI_SHURIKEN",
+	"HI_ELECTRICSHURIKEN",
+	"HI_FIRESHURIKEN",
+	"HI_LASERSHURIKEN",
+#endif
+#ifdef TA_HOLDSYS // ZTM: Moved "out of the way"
+	"HI_PORTAL",
+#endif
+
+	NULL
+};
+
+const char *powerup_names[PW_NUM_POWERUPS+1] =
+{
+	"PW_NONE",
+#ifdef TURTLEARENA // POWERS
+	"PW_QUAD",
+	"PW_BATTLESUIT",
+	"PW_HASTE",
+	"PW_INVIS",
+
+	"PW_FLIGHT",
+
+	"PW_INVUL",
+	"PW_FLASHING",
+
+	"PW_REDFLAG",
+	"PW_BLUEFLAG",
+	"PW_NEUTRALFLAG",
+
+	"PW_SCOUT",
+	"PW_GUARD",
+	"PW_DOUBLER",
+	"PW_AMMOREGEN",
+#else
+	"PW_QUAD",
+	"PW_BATTLESUIT",
+	"PW_HASTE",
+	"PW_INVIS",
+	"PW_REGEN",
+	"PW_FLIGHT",
+
+	"PW_REDFLAG",
+	"PW_BLUEFLAG",
+	"PW_NEUTRALFLAG",
+
+	"PW_SCOUT",
+	"PW_GUARD",
+	"PW_DOUBLER",
+	"PW_AMMOREGEN",
+	"PW_INVULNERABILITY",
+#endif
+	NULL
+};
+
+static qboolean Item_Parse(char **p) {
+	char *token;
+	bg_iteminfo_t item;
+	int i;
+	int num;
+
+	memset(&item, 0, sizeof(item));
+
+	token = COM_ParseExt(p, qtrue);
+	if ( !*token ) {
+		Com_Printf("Warning: item missing classname\n");
+		return qfalse;
+	}
+	Com_sprintf(item.classname, sizeof (item.classname), "%s", token);
+
+	//Com_Printf("Loading item [%s] ...\n", item.classname);
+
+	token = COM_ParseExt(p, qtrue);
+
+	if (token[0] != '{') {
+		return qfalse;
+	}
+
+	while ( 1 ) {
+		token = COM_ParseExt(p, qtrue);
+
+		if (Q_stricmp(token, "}") == 0) {
+			num = BG_ItemIndexForName(item.classname);
+			if (!num)
+			{
+				// Use free slot
+				num = BG_NumItems();
+			}
+
+			Com_Memcpy(&bg_iteminfo[num], &item, sizeof (item));
+			//Com_Printf("Loaded item [%s]\n", item.classname);
+			return qtrue;
+		}
+
+		if ( !token || token[0] == 0 ) {
+			return qfalse;
+		}
+
+		if ( !Q_stricmp( token, "clone" ) ) {
+			char classname[MAX_QPATH]; // Save name
+			int num;
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			num = BG_ItemIndexForName(token);
+			if (num) {
+				Q_strncpyz(classname, item.classname, sizeof (classname)); // backup name
+				memcpy(&item, &bg_iteminfo[num], sizeof (item));
+				Q_strncpyz(item.classname, classname, sizeof (classname)); // use backed up name
+			}
+			continue;
+		}
+		else PARSE_STRING(token, "model", item.world_model[0])
+		else PARSE_STRING(token, "pickupModel", item.world_model[0]) // Be compatible with weaponGroup
+		else PARSE_STRING(token, "model0", item.world_model[0])
+		else PARSE_STRING(token, "model1", item.world_model[1])
+		else PARSE_STRING(token, "model2", item.world_model[2])
+		else PARSE_STRING(token, "model3", item.world_model[3])
+		else PARSE_STRING(token, "pickupSound", item.pickup_sound)
+		else PARSE_STRING(token, "iconName", item.icon)
+		else PARSE_STRING(token, "pickupName", item.pickup_name)
+		else PARSE_INTEGER(token, "quantity", item.quantity)
+		else PARSE_INTEGER(token, "pickupAmmo", item.quantity) // Be compatible with weaponGroup
+		else PARSE_LIST(token, "type", item.giType, it_names)
+		else if ( !Q_stricmp( token, "tag" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+
+			switch (item.giType)
+			{
+				case IT_WEAPON:
+				case IT_AMMO:
+					num = BG_WeaponGroupIndexForName(token);
+					if (num) {
+						item.giTag = num;
+						continue;
+					}
+					break;
+
+				case IT_HOLDABLE:
+					num = -1;
+					for (i = 0; holdable_names[i] != NULL; i++)
+					{
+						if ( !Q_stricmp( token, holdable_names[i] ) ) {
+							num = i;
+							break;
+						}
+					}
+					if (num != -1) {
+						item.giTag = num;
+						continue;
+					}
+					break;
+
+				case IT_POWERUP:
+				case IT_PERSISTANT_POWERUP:
+				case IT_TEAM:
+					num = -1;
+					for (i = 0; powerup_names[i] != NULL; i++)
+					{
+						if ( !Q_stricmp( token, powerup_names[i] ) ) {
+							num = i;
+							break;
+						}
+					}
+					if (num != -1) {
+						item.giTag = num;
+						continue;
+					}
+					break;
+
+				default:
+					// Just use integer
+					break;
+			}
+
+			item.giTag = atoi(token);
+			continue;
+		}
+		else PARSE_STRING(token, "skin", item.skin)
+		//else PARSE_STRING(token, "precaches", item.precaches)
+		else PARSE_STRING(token, "sounds", item.sounds)
+
+		Com_Printf( "unknown token '%s' in item %s\n", token, item.classname );
+	}
+	return qfalse;
 }
 
 //projectile trail types
@@ -2786,47 +3127,42 @@ static qboolean WeaponGroupAnims_Parse(char **p, bg_weapongroup_anims_t *anims) 
 	return qfalse;
 }
 
-static void BG_SetupWeaponGroup(bg_weapongroupinfo_t *weaponGroup, const char *name, int num)
+static void BG_SetupWeaponGroup(bg_weapongroupinfo_t *weaponGroup, bg_iteminfo_t *weaponItem, const char *name, int num)
 {
-	if (!weaponGroup) {
-		return;
+	if (weaponGroup) {
+		// Set name
+		Com_sprintf(weaponGroup->name, sizeof (weaponGroup->name), "%s", name);
+
+		// Set randomSpawn
+		weaponGroup->randomSpawn = qtrue;
+
+		// Setup Animations
+		weaponGroup->normalAnims.standAnim = TORSO_STAND;
+		weaponGroup->normalAnims.attackAnim[0] = TORSO_ATTACK;
+		weaponGroup->primaryAnims.standAnim = TORSO_STAND2;
+		weaponGroup->primaryAnims.attackAnim[0] = TORSO_ATTACK2;
+
+		// Set item pointer to non-NULL
+		weaponGroup->item = &bg_iteminfo[0];
+
+		// Set weapon pointers (so I don't always have to check if it is NULL).
+		weaponGroup->weapon[0] = &bg_weaponinfo[0];
+		weaponGroup->weapon[1] = &bg_weaponinfo[0];
 	}
 
-	// Set name
-	Com_sprintf(weaponGroup->name, sizeof (weaponGroup->name), "%s", name);
-
-	// Set randomSpawn
-	weaponGroup->randomSpawn = qtrue;
-
-	// Set default sound names
-	Com_sprintf(weaponGroup->pickupSound, sizeof (weaponGroup->pickupSound), "sound/misc/w_pkup.wav");
-
-	// Setup Animations
-	weaponGroup->normalAnims.standAnim = TORSO_STAND;
-	weaponGroup->normalAnims.attackAnim[0] = TORSO_ATTACK;
-	weaponGroup->primaryAnims.standAnim = TORSO_STAND2;
-	weaponGroup->primaryAnims.attackAnim[0] = TORSO_ATTACK2;
-
-	// Setup item integers
-	weaponGroup->item.quantity = 0; // ammo
-	weaponGroup->item.giType = IT_WEAPON;
-	weaponGroup->item.giTag = num;
-
-	// Setup item pointers
-	weaponGroup->item.classname = weaponGroup->itemName;
-	weaponGroup->item.pickup_sound = weaponGroup->pickupSound;
-	weaponGroup->item.world_model[0] = weaponGroup->pickupModel;
-	weaponGroup->item.icon = weaponGroup->iconName;
-	weaponGroup->item.pickup_name = weaponGroup->pickupName;
-
-	// Set weapon pointers (so I don't always have to check if it is NULL).
-	weaponGroup->weapon[0] = &bg_weaponinfo[0];
-	weaponGroup->weapon[1] = &bg_weaponinfo[0];
+	if (weaponItem) {
+		// Setup item
+		Com_sprintf(weaponItem->pickup_sound, sizeof (weaponItem->pickup_sound), "sound/misc/w_pkup.wav");
+		weaponItem->quantity = 0; // ammo
+		weaponItem->giType = IT_WEAPON;
+		weaponItem->giTag = num;
+	}
 }
 
 static qboolean WeaponGroup_Parse(char **p) {
 	char *token;
 	bg_weapongroupinfo_t weaponGroup;
+	bg_iteminfo_t weaponItem;
 
 	token = COM_ParseExt(p, qtrue);
 	if ( !*token ) {
@@ -2835,7 +3171,9 @@ static qboolean WeaponGroup_Parse(char **p) {
 	}
 
 	Com_Memset(&weaponGroup, 0, sizeof (weaponGroup));
-	BG_SetupWeaponGroup(&weaponGroup, token, -1);
+	Com_Memset(&weaponItem, 0, sizeof (weaponItem));
+
+	BG_SetupWeaponGroup(&weaponGroup, &weaponItem, token, -1);
 
 	token = COM_ParseExt(p, qtrue);
 	if (token[0] != '{') {
@@ -2853,18 +3191,34 @@ static qboolean WeaponGroup_Parse(char **p) {
 				num = BG_NumWeaponGroups();
 			}
 
-			// Set item number
-			weaponGroup.item.giTag = num;
-
 			// Copy to weapon group info
 			Com_Memcpy(&bg_weapongroupinfo[num], &weaponGroup, sizeof (weaponGroup));
 
+#ifdef TA_WEAPSYS // TA_ITEMSYS
+			// Set weapon group number
+			weaponItem.giTag = num;
+
+			// Setup pickup item
+			num = BG_ItemIndexForName(weaponItem.classname);
+			if (!num)
+			{
+				// Use free slot.
+				num = BG_NumItems();
+			}
+
+			// Save pointer to item
+			bg_weapongroupinfo[weaponItem.giTag].item = &bg_iteminfo[num];
+
+			// Copy to weapon group info
+			Com_Memcpy(&bg_iteminfo[num], &weaponItem, sizeof (weaponItem));
+#else
 			// Setup item pointers (Must do after copy to bg_weapongroupinfo)
 			bg_weapongroupinfo[num].item.classname = bg_weapongroupinfo[num].itemName;
 			bg_weapongroupinfo[num].item.pickup_sound = bg_weapongroupinfo[num].pickupSound;
 			bg_weapongroupinfo[num].item.world_model[0] = bg_weapongroupinfo[num].pickupModel;
 			bg_weapongroupinfo[num].item.icon = bg_weapongroupinfo[num].iconName;
 			bg_weapongroupinfo[num].item.pickup_name = bg_weapongroupinfo[num].pickupName;
+#endif
 
 			//Com_Printf("Loaded weapon group [%s]\n", weaponGroup.name);
 			return qtrue;
@@ -2905,48 +3259,50 @@ static qboolean WeaponGroup_Parse(char **p) {
 			}
 			weaponGroup.randomSpawn = atoi( token );
 			continue;
+		// ITEM START: ZTM: TODO: Use Item_Parse?
 		} else if ( !Q_stricmp( token, "itemName" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
-			Com_sprintf(weaponGroup.itemName, sizeof (weaponGroup.itemName), "%s", token);
+			Com_sprintf(weaponItem.classname, sizeof (weaponItem.classname), "%s", token);
 			continue;
 		} else if ( !Q_stricmp( token, "pickupSound" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
-			Com_sprintf(weaponGroup.pickupSound, sizeof (weaponGroup.pickupSound), "%s", token);
+			Com_sprintf(weaponItem.pickup_sound, sizeof (weaponItem.pickup_sound), "%s", token);
 			continue;
 		} else if ( !Q_stricmp( token, "pickupModel" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
-			Com_sprintf(weaponGroup.pickupModel, sizeof (weaponGroup.pickupModel), "%s", token);
+			Com_sprintf(weaponItem.world_model[0], sizeof (weaponItem.world_model[0]), "%s", token);
 			continue;
 		} else if ( !Q_stricmp( token, "iconName" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
-			Com_sprintf(weaponGroup.iconName, sizeof (weaponGroup.iconName), "%s", token);
+			Com_sprintf(weaponItem.icon, sizeof (weaponItem.icon), "%s", token);
 			continue;
 		} else if ( !Q_stricmp( token, "pickupName" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
-			Com_sprintf(weaponGroup.pickupName, sizeof (weaponGroup.pickupName), "%s", token);
+			Com_sprintf(weaponItem.pickup_name, sizeof (weaponItem.pickup_name), "%s", token);
 			continue;
 		} else if ( !Q_stricmp( token, "pickupAmmo" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
 				break;
 			}
-			weaponGroup.item.quantity = atoi(token);
+			weaponItem.quantity = atoi(token);
 			continue;
+		// ITEM END
 		} else if ( !Q_stricmp( token, "readySound" ) ) {
 			token = COM_Parse( p );
 			if ( *token ) {
@@ -3012,7 +3368,7 @@ qboolean BG_ParseWeaponInfoFile( const char *filename ) {
 	if ( len <= 0 ) {
 		return qfalse;
 	}
-	if ( len >= sizeof( text ) - 1 ) {
+	if ( (unsigned)len >= sizeof( text ) - 1 ) {
 		Com_Printf( "File %s too long\n", filename );
 		trap_FS_FCloseFile( f );
 		return qfalse;
@@ -3032,7 +3388,12 @@ qboolean BG_ParseWeaponInfoFile( const char *filename ) {
 			break;
 		}
 
-		if ( Q_stricmp( token, "projectile" ) == 0 ) {
+		if ( Q_stricmp( token, "item" ) == 0 ) {
+			if (!Item_Parse(&text_p))
+			{
+				break;
+			}
+		} else if ( Q_stricmp( token, "projectile" ) == 0 ) {
 			if (!Projectile_Parse(&text_p))
 			{
 				break;
@@ -3078,6 +3439,8 @@ void BG_DumpWeaponInfo(void)
 #define FS_Printf2(x, y) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y); trap_FS_Write(text, strlen(text)+1, f); }
 #define FS_Printf3(x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
 #define FS_Printf4(w, x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), w, x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
+
+	FS_Printf1("// ZTM: TODO: Dump items\n\n");
 
 	// Dump projectiles
 	for (i = 0; i < MAX_BG_PROJ; i++)
@@ -3217,12 +3580,15 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("weapongroup \"%s\"\r\n", weaponGroup->name);
 		FS_Printf1("{\r\n");
 		FS_Printf2("\trandomSpawn %d\r\n", weaponGroup->randomSpawn);
-		FS_Printf2("\titemName \"%s\"\r\n", weaponGroup->itemName);
-		FS_Printf2("\tpickupSound \"%s\"\r\n", weaponGroup->pickupSound);
-		FS_Printf2("\tpickupModel \"%s\"\r\n", weaponGroup->pickupModel);
-		FS_Printf2("\ticonName \"%s\"\r\n", weaponGroup->iconName);
-		FS_Printf2("\tpickupName \"%s\"\r\n", weaponGroup->pickupName);
-		FS_Printf2("\tpickupAmmo %i\r\n", weaponGroup->item.quantity);
+
+		// item settings
+		FS_Printf2("\titemName \"%s\"\r\n", weaponGroup->item->classame);
+		FS_Printf2("\tpickupSound \"%s\"\r\n", weaponGroup->item->pickup_sound);
+		FS_Printf2("\tpickupModel \"%s\"\r\n", weaponGroup->item->world_model[0]);
+		FS_Printf2("\ticonName \"%s\"\r\n", weaponGroup->item->icon);
+		FS_Printf2("\tpickupName \"%s\"\r\n", weaponGroup->item->pickup_name);
+		FS_Printf2("\tpickupAmmo %i\r\n", weaponGroup->item->quantity);
+
 		FS_Printf2("\treadySound \"%s\"\r\n", weaponGroup->readySoundName);
 		FS_Printf2("\tfiringSound \"%s\"\r\n", weaponGroup->firingSoundName);
 		FS_Printf2("\tfiringStoppedSound \"%s\"\r\n", weaponGroup->firingStoppedSoundName);
@@ -3283,11 +3649,14 @@ void BG_InitWeaponInfo(void)
 		return;
 
 	// Clear Data
+	Com_Memset(bg_iteminfo, 0, sizeof (bg_iteminfo));
 	Com_Memset(bg_projectileinfo, 0, sizeof (bg_projectileinfo));
 	Com_Memset(bg_weaponinfo, 0, sizeof (bg_weaponinfo));
 	Com_Memset(bg_weapongroupinfo, 0, sizeof (bg_weapongroupinfo));
 
 	// Setup dummys (0 means not valid or not found)
+	strcpy(bg_iteminfo[0].classname, "item_none");
+
 	strcpy(bg_projectileinfo[0].name, "p_none");
 	bg_projectileinfo[0].numProjectiles = 1;
 	bg_projectileinfo[0].maxHits = 1;
@@ -3303,11 +3672,22 @@ void BG_InitWeaponInfo(void)
 	bg_weaponinfo[0].proj = &bg_projectileinfo[0];
 
 	// WP_NONE
-	BG_SetupWeaponGroup(&bg_weapongroupinfo[0], "wp_none", 0);
-	strcpy(bg_weapongroupinfo[0].pickupName, "None");
+	BG_SetupWeaponGroup(&bg_weapongroupinfo[0], &bg_iteminfo[0], "wp_none", 0);
+	strcpy(bg_iteminfo[0].pickup_name, "None");
 
-	// Load main data file
+	// Load main data files
+	BG_ParseWeaponInfoFile("scripts/iteminfo.txt");
 	BG_ParseWeaponInfoFile("scripts/weaponinfo.txt");
+
+	// Load all weapons from .item files
+	numdirs = trap_FS_GetFileList("scripts", ".item", dirlist, 1024 );
+	dirptr  = dirlist;
+	for (i = 0; i < numdirs; i++, dirptr += dirlen+1) {
+		dirlen = strlen(dirptr);
+		strcpy(filename, "scripts/");
+		strcat(filename, dirptr);
+		BG_ParseWeaponInfoFile(filename);
+	}
 
 	// Load all weapons from .weap files
 	numdirs = trap_FS_GetFileList("scripts", ".weap", dirlist, 1024 );
@@ -3345,10 +3725,11 @@ void BG_InitWeaponInfo(void)
 
 	if (!bg_weapongroupinfo[1].name[0])
 	{
-		BG_SetupWeaponGroup(&bg_weapongroupinfo[1], "wp_gun", 1);
-		strcpy(bg_weapongroupinfo[1].pickupName, "Dummy Weapon");
-		strcpy(bg_weapongroupinfo[1].itemName, "weapon_gun");
-		bg_weapongroupinfo[1].item.quantity = 10; // ammo
+		BG_SetupWeaponGroup(&bg_weapongroupinfo[1], &bg_iteminfo[bg_numitems], "wp_gun", 1);
+		bg_numitems++;
+		strcpy(bg_weapongroupinfo[1].item->pickup_name, "Dummy Weapon");
+		strcpy(bg_weapongroupinfo[1].item->classname, "weapon_gun");
+		bg_weapongroupinfo[1].item->quantity = 10; // ammo
 		bg_weapongroupinfo[1].weaponnum[0] = 1;
 		bg_weapongroupinfo[1].weapon[0] = &bg_weaponinfo[1];
 		bg_numweapongroups = 2;
@@ -3361,6 +3742,14 @@ void BG_InitWeaponInfo(void)
 	// So I can see if it is loading correctly.
 	BG_DumpWeaponInfo();
 #endif
+
+	// Count holdable items
+	for (i = 1; i < BG_NumItems(); i++)
+	{
+		if (bg_iteminfo[i].giType == IT_HOLDABLE) {
+			bg_numholdables++;
+		}
+	}
 }
 
 /*
@@ -3735,7 +4124,7 @@ qboolean BG_ParseNpcInfoFile( const char *filename ) {
 	if ( len <= 0 ) {
 		return qfalse;
 	}
-	if ( len >= sizeof( text ) - 1 ) {
+	if ( (unsigned)len >= sizeof( text ) - 1 ) {
 		Com_Printf( "File %s too long\n", filename );
 		trap_FS_FCloseFile( f );
 		return qfalse;
@@ -4082,7 +4471,7 @@ qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt)
 qboolean BG_WeapUseAmmo(weapon_t w)
 {
 	// Check if the weapon group uses ammo
-	return (bg_weapongroupinfo[w].item.quantity > 0);
+	return (bg_weapongroupinfo[w].item->quantity > 0);
 }
 
 /*
@@ -4133,7 +4522,7 @@ int BG_ItemNumForHoldableNum(holdable_t holdablenum)
 	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
-		if (!it->classname)
+		if (!it->classname[0])
 			continue;
 		if ( it->giType == IT_HOLDABLE
 			&& it->giTag == holdablenum )
@@ -4169,7 +4558,7 @@ gitem_t	*BG_FindItemForPowerup( powerup_t pw ) {
 	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
-		if (!it->classname)
+		if (!it->classname[0])
 			continue;
 		if ( (it->giType == IT_POWERUP
 				|| it->giType == IT_TEAM
@@ -4209,7 +4598,7 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
 	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
-		if (!it->classname)
+		if (!it->classname[0])
 			continue;
 		if ( it->giType == IT_HOLDABLE && it->giTag == pw ) {
 			return it;
@@ -4225,7 +4614,9 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
 	}
 #endif
 
+#ifndef TA_WEAPSYS // TA_ITEMSYS
 	Com_Error( ERR_DROP, "HoldableItem not found" );
+#endif
 
 	return NULL;
 }
@@ -4245,7 +4636,7 @@ gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
 	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
-		if (!it->classname)
+		if (!it->classname[0])
 			continue;
 #else
 	gitem_t	*it;
@@ -4257,7 +4648,9 @@ gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
 		}
 	}
 
+#ifndef TA_WEAPSYS // TA_ITEMSYS
 	Com_Error( ERR_DROP, "Couldn't find item for weapon %i", weapon);
+#endif
 	return NULL;
 }
 
@@ -4275,7 +4668,7 @@ gitem_t	*BG_FindItem( const char *pickupName ) {
 	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
-		if (!it->classname)
+		if (!it->classname[0])
 			continue;
 #else
 	gitem_t	*it;
@@ -4303,7 +4696,7 @@ gitem_t	*BG_FindItemForClassname( const char *classname ) {
 	for (i = BG_NumItems()-1; i > 0; i--)
 	{
 		it = BG_ItemForItemNum(i);
-		if (!it->classname)
+		if (!it->classname[0])
 			continue;
 #else
 	gitem_t	*it;
@@ -4319,7 +4712,7 @@ gitem_t	*BG_FindItemForClassname( const char *classname ) {
 #endif
 
 #ifdef TA_WEAPSYS
-int BG_ItemNumForItem( gitem_t *item )
+int BG_ItemNumForItem( bg_iteminfo_t *item )
 {
 	if (!item)
 	{
@@ -4327,27 +4720,12 @@ int BG_ItemNumForItem( gitem_t *item )
 		return 0;
 	}
 
-	if (item->giType == IT_WEAPON)
+	// If address is in bg_iteminfo
+	if ((item - bg_iteminfo) < bg_numitems
+		&& (item - bg_iteminfo) >= 0)
 	{
-		int weaponNum;
-
-		weaponNum = item->giTag;
-
-		// ZTM: Check weapon item address
-		if (weaponNum >= 0 && weaponNum < BG_NumWeaponGroups()
-			&& (gitem_t*)&bg_weapongroupinfo[weaponNum].item == item)
-		{
-			//Com_Printf("DEBUG: Returning type:weapon itemNum:%d\n", bg_numItems+weaponNum);
-			return bg_numItems+weaponNum;
-		}
-	}
-
-	// If address is in bg_itemlist
-	if ((item - bg_itemlist) < bg_numItems
-		&& (item - bg_itemlist) >= 0)
-	{
-		//Com_Printf("DEBUG: Returning type:gitem itemNum:%d\n", (item - bg_itemlist));
-		return (int)(item - bg_itemlist);
+		//Com_Printf("DEBUG: Returning type:gitem itemNum:%d\n", (item - bg_iteminfo));
+		return (int)(item - bg_iteminfo);
 	}
 
 	// Failed
@@ -4355,21 +4733,12 @@ int BG_ItemNumForItem( gitem_t *item )
 	return 0;
 }
 
-gitem_t *BG_ItemForItemNum( int itemnum )
+bg_iteminfo_t *BG_ItemForItemNum( int itemnum )
 {
-	if (itemnum >= 0 && itemnum < bg_numItems)
-		return &bg_itemlist[itemnum];
+	if (itemnum >= 0 && itemnum < bg_numitems)
+		return &bg_iteminfo[itemnum];
 
-	// It isn't in list must be weapon item,
-	if ((itemnum-bg_numItems) >= 0 && (itemnum-bg_numItems) < MAX_BG_WEAPON_GROUPS)
-		return &bg_weapongroupinfo[(itemnum-bg_numItems)].item;
-
-	return &bg_itemlist[0]; // Can't return NULL.
-}
-
-int BG_NumItems(void)
-{
-	return (bg_numItems+BG_NumWeaponGroups());
+	return &bg_iteminfo[0]; // Can't return NULL.
 }
 #endif
 
@@ -4415,8 +4784,8 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	int		upperBound;
 #endif
 
-#ifdef TA_WEAPSYS
-	if ( ent->modelindex < 1 || ent->modelindex >= BG_NumItems() )
+#ifdef TA_WEAPSYS // TA_ITEMSYS
+	if ( ent->modelindex < 0 || ent->modelindex >= BG_NumItems() )
 #else
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems )
 #endif
@@ -4659,7 +5028,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		// Check use limit.
 		if (ps->holdable[item->giTag] >= upperBound)
 		{
-				return qfalse;
+			return qfalse;
 		}
 #else
 		// can only hold one item at a time
@@ -5901,7 +6270,8 @@ Only supports player animations, not NPCs or misc_objects
 */
 int BG_AnimPrefixTypeForAnimIndex(animNumber_t anim)
 {
-	if (anim >= BOTH_DEATH1 && anim <= BOTH_DEAD3)
+	// ZTM: NOTE: anim is unsigned, don't check for >= 0
+	if (/*anim >= BOTH_DEATH1 && */anim <= BOTH_DEAD3)
 		return AP_BOTH;
 	else if (anim >= TORSO_GESTURE && anim <= TORSO_STAND2)
 		return AP_TORSO;
@@ -6016,7 +6386,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 	if ( len <= 0 ) {
 		return qfalse;
 	}
-	if ( len >= sizeof( text ) - 1 ) {
+	if ( (unsigned)len >= sizeof( text ) - 1 ) {
 		Com_Printf( "File %s too long\n", filename );
 		trap_FS_FCloseFile( f );
 		return qfalse;
@@ -6779,7 +7149,7 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 	if ( len <= 0 ) {
 		return NULL;
 	}
-	if ( len >= sizeof( text ) - 1 ) {
+	if ( (unsigned)len >= sizeof( text ) - 1 ) {
 		Com_Printf( "File %s too long\n", filename );
 		trap_FS_FCloseFile( f );
 		return NULL;

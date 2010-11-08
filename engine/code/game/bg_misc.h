@@ -464,6 +464,82 @@ typedef enum {
 } weapon_t;
 #endif
 
+// gitem_t->type
+typedef enum {
+	IT_BAD,
+	IT_WEAPON,				// EFX: rotate + upscale + minlight
+	IT_AMMO,				// EFX: rotate
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	IT_SCORE,				// EFX: rotate + no bob + no pickup message
+#endif
+#ifndef TURTLEARENA // NOARMOR
+	IT_ARMOR,				// EFX: rotate + minlight
+#endif
+	IT_HEALTH,				// EFX: static external sphere + rotating internal
+	IT_POWERUP,				// instant on, timer based
+							// EFX: rotate + external ring that rotates
+	IT_HOLDABLE,			// single use, holdable item
+							// EFX: rotate + bob
+	IT_PERSISTANT_POWERUP,
+	IT_TEAM
+} itemType_t;
+
+#define MAX_ITEM_MODELS 4
+
+#ifdef TA_WEAPSYS // TA_ITEMSYS
+// ZTM: TODO: Replace gitem_t
+typedef struct bg_iteminfo_s {
+	char		classname[MAX_QPATH];	// spawning name
+	char		pickup_sound[MAX_QPATH];
+	char		world_model[MAX_ITEM_MODELS][MAX_QPATH];
+
+	char		icon[MAX_QPATH];
+	char		pickup_name[MAX_QPATH];	// for printing on pickup
+
+	int			quantity;		// for ammo how much, or duration of powerup
+	itemType_t  giType;			// IT_* flags
+
+	int			giTag;
+
+#ifdef IOQ3ZTM // FLAG_MODEL
+	char		skin[MAX_QPATH];			// So flags don't need multiple models.
+#endif
+
+	// ZTM: NOTE: precaches is unused
+	//char		precaches[MAX_STRING_CHARS];		// string of all models and images this item will use
+
+	char		sounds[MAX_STRING_CHARS];		// string of all sounds this item will use
+} bg_iteminfo_t;
+
+extern bg_iteminfo_t bg_iteminfo[MAX_ITEMS];
+int BG_ItemIndexForName(const char *classname);
+int BG_NumItems(void);
+
+#define gitem_s bg_iteminfo_s
+#define gitem_t bg_iteminfo_t
+#else
+typedef struct gitem_s {
+	char		*classname;	// spawning name
+	char		*pickup_sound;
+	char		*world_model[MAX_ITEM_MODELS];
+
+	char		*icon;
+	char		*pickup_name;	// for printing on pickup
+
+	int			quantity;		// for ammo how much, or duration of powerup
+	itemType_t  giType;			// IT_* flags
+
+	int			giTag;
+
+#ifdef IOQ3ZTM // FLAG_MODEL
+	char		*skin;			// So flags don't need multiple models.
+#else
+	char		*precaches;		// string of all models and images this item will use
+#endif
+	char		*sounds;		// string of all sounds this item will use
+} gitem_t;
+#endif
+
 #ifdef TA_WEAPSYS
 // Currently only support two hands
 typedef enum
@@ -682,51 +758,6 @@ typedef struct
 	int attackAnim[MAX_WG_ATK_ANIMS];
 } bg_weapongroup_anims_t;
 
-///< =============================
-// gitem_t->type
-typedef enum {
-	IT_BAD,
-	IT_WEAPON,				// EFX: rotate + upscale + minlight
-	IT_AMMO,				// EFX: rotate
-#ifdef TURTLEARENA // NIGHTS_ITEMS
-	IT_SCORE,				// EFX: rotate + no bob + no pickup message
-#endif
-#ifndef TURTLEARENA // NOARMOR
-	IT_ARMOR,				// EFX: rotate + minlight
-#endif
-	IT_HEALTH,				// EFX: static external sphere + rotating internal
-	IT_POWERUP,				// instant on, timer based
-							// EFX: rotate + external ring that rotates
-	IT_HOLDABLE,			// single use, holdable item
-							// EFX: rotate + bob
-	IT_PERSISTANT_POWERUP,
-	IT_TEAM
-} itemType_t;
-
-#define MAX_ITEM_MODELS 4
-
-typedef struct gitem_s {
-	char		*classname;	// spawning name
-	char		*pickup_sound;
-	char		*world_model[MAX_ITEM_MODELS];
-
-	char		*icon;
-	char		*pickup_name;	// for printing on pickup
-
-	int			quantity;		// for ammo how much, or duration of powerup
-	itemType_t  giType;			// IT_* flags
-
-	int			giTag;
-
-#ifdef IOQ3ZTM // FLAG_MODEL
-	char		*skin;			// So flags don't need multiple models.
-#else
-	char		*precaches;		// string of all models and images this item will use
-#endif
-	char		*sounds;		// string of all sounds this item will use
-} gitem_t;
-///< =============================
-
 // cgame "_hands.md3"
 typedef struct
 {
@@ -735,13 +766,7 @@ typedef struct
 	qboolean randomSpawn; // If qtrue (default) spawn in weapon_random
 
 	// Item info
-	gitem_t item;
-	char itemName[MAX_QPATH]; // Example; "weapon_sais"
-	char pickupSound[MAX_QPATH]; // Example; "sound/misc/w_pkup.wav"
-	char pickupModel[MAX_QPATH];
-	char iconName[MAX_QPATH];
-	char pickupName[MAX_QPATH]; // Example; "Sais"
-	// pickupAmmo is stored in "item.quantity"
+	bg_iteminfo_t *item;
 
 	// Sounds
 	char readySoundName[MAX_QPATH];
@@ -772,6 +797,7 @@ extern bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 extern bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 extern bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
+int BG_NumHoldableItems(void);
 int BG_ProjectileIndexForHoldable(int holdable);
 #endif
 int BG_ProjectileIndexForName(const char *name);
@@ -1735,51 +1761,11 @@ extern int modNamesSize;
 
 //---------------------------------------------------------
 
-#ifndef TA_WEAPSYS
-// gitem_t->type
-typedef enum {
-	IT_BAD,
-	IT_WEAPON,				// EFX: rotate + upscale + minlight
-	IT_AMMO,				// EFX: rotate
-#ifndef TURTLEARENA // NOARMOR
-	IT_ARMOR,				// EFX: rotate + minlight
-#endif
-	IT_HEALTH,				// EFX: static external sphere + rotating internal
-	IT_POWERUP,				// instant on, timer based
-							// EFX: rotate + external ring that rotates
-	IT_HOLDABLE,			// single use, holdable item
-							// EFX: rotate + bob
-	IT_PERSISTANT_POWERUP,
-	IT_TEAM
-} itemType_t;
-
-#define MAX_ITEM_MODELS 4
-
-typedef struct gitem_s {
-	char		*classname;	// spawning name
-	char		*pickup_sound;
-	char		*world_model[MAX_ITEM_MODELS];
-
-	char		*icon;
-	char		*pickup_name;	// for printing on pickup
-
-	int			quantity;		// for ammo how much, or duration of powerup
-	itemType_t  giType;			// IT_* flags
-
-	int			giTag;
-
-#ifdef IOQ3ZTM // FLAG_MODEL
-	char		*skin;			// So flags don't need multiple models.
-#else
-	char		*precaches;		// string of all models and images this item will use
-#endif
-	char		*sounds;		// string of all sounds this item will use
-} gitem_t;
-#endif
-
+#ifndef TA_WEAPSYS // TA_ITEMSYS
 // included in both the game dll and the client
 extern	gitem_t	bg_itemlist[];
 extern	int		bg_numItems;
+#endif
 
 gitem_t	*BG_FindItem( const char *pickupName );
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon );
@@ -1788,10 +1774,9 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw );
 #ifdef IOQ3ZTM
 gitem_t	*BG_FindItemForClassname( const char *classname );
 #endif
-#ifdef TA_WEAPSYS
-int BG_ItemNumForItem( gitem_t *item );
-gitem_t	*BG_ItemForItemNum( int itemNum );
-int BG_NumItems(void);
+#ifdef TA_WEAPSYS // TA_ITEMSYS
+int BG_ItemNumForItem( bg_iteminfo_t *item );
+bg_iteminfo_t *BG_ItemForItemNum( int itemNum );
 #define	ITEM_INDEX(x) (BG_ItemNumForItem(x))
 #else
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)

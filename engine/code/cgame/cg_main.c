@@ -2462,7 +2462,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	cg.loading = qtrue;		// force players to load instead of defer
 
 #ifdef TA_WEAPSYS
-	CG_LoadingString( "weapons" );
+	CG_LoadingString( "items" );
 
 	BG_InitWeaponInfo();
 #endif

@@ -451,7 +451,7 @@ int *ItemWeightIndex(weightconfig_t *iwc, itemconfig_t *ic)
 	{
 		index[i] = FindFuzzyWeight(iwc, ic->iteminfo[i].classname);
 #ifdef TA_WEAPSYS // BOT_ITEM_INFOS
-		if (index[i] < 0)
+		if (index[i] < 0 && ic->iteminfo[i].defaultWeight > 0)
 		{
 			index[i] = CreateFuzzyWeight(iwc, &ic->iteminfo[i]);
 		}
@@ -667,8 +667,7 @@ void BotInitLevelItems(void)
 	// Add the new items.
 	if (itemInfos != NULL)
 	{
-		//bot_goalstate_t *gs;
-		int j;//, k;
+		int j;
 		int max_iteminfo;
 
 		max_iteminfo = (int) LibVarValue("max_iteminfo", "256");
