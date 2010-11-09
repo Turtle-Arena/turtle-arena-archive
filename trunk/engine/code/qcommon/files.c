@@ -174,7 +174,7 @@ or configs will never get loaded from disk!
 
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
-#if defined STANDALONE && defined IOQ3ZTM /* && defined TURTLEARENA */ // FS_PURE
+#if defined STANDALONE && defined IOQ3ZTM && defined TA_MAIN // FS_PURE
 // Turtle Arena and ioq3turtle
 #define PAK "assets"
 #define PAK_LEN 6
@@ -3094,7 +3094,7 @@ static void FS_Startup( const char *gameName )
 		&& !FS_BaseFileExists("pak0.pk3") && !FS_BaseFileExists("assets0.pk3"))
 	{
 		// Required files are missing, use location of the Deb package data
-#ifdef TA_MOD
+#ifdef TA_MAIN
 		Cvar_Set("fs_basepath", "/usr/share/games/turtlearena" );
 #else
 		Cvar_Set("fs_basepath", "/usr/share/games/ioquake3" );

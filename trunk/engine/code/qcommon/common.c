@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <winsock.h>
 #endif
 
-#ifdef TA_MOD
+#ifdef TA_MAIN
 int demo_protocols[] =
 { PROTOCOL_VERSION, 0 };
 #else
@@ -41,7 +41,7 @@ int demo_protocols[] =
 
 #define MAX_NUM_ARGVS	50
 
-#ifdef TA_MOD // ZTM: Turtle Arena uses more memory.
+#ifdef TA_MAIN // ZTM: Turtle Arena uses more memory.
 #define MIN_DEDICATED_COMHUNKMEGS 16
 #define MIN_COMHUNKMEGS		64
 #define DEF_COMHUNKMEGS		128

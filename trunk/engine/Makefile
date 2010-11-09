@@ -98,14 +98,14 @@ ifeq ($(QUAKE3),1)
 		endif
 
 		# Copied from Turtle Arena BUILD_DEFINES
-		ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 \
-							-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
+		ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
+							-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DANALOG -DNET_COMPAT \
 							-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 							-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
 							-DTA_WEAPSYS -DTA_PLAYERSYS \
 							-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 							-DTA_WEAPSYS_EX_COMPAT \
-							-DOA_BLOOM -DTA_MOD
+							-DOA_BLOOM 
 
 		QUAKE3_CFLAGS =
 
@@ -120,7 +120,7 @@ ifeq ($(QUAKE3),1)
 		# Enable most of the MISSIONPACK in 'baseq3'
 		BASEGAME_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) -DMISSIONPACK
 		MISSIONPACK_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) \
-					-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+					-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD -DMISSIONPACK_HUD2
 		ifndef COPYDIR
 			COPYDIR="/usr/local/games/turtlearena"
 		endif
@@ -149,7 +149,7 @@ ifeq ($(QUAKE3),1)
 
 			BASEGAME=baseq3
 			BASEGAME_FLAGS =
-			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD -DMISSIONPACK_HUD2
 			ifndef COPYDIR
 				COPYDIR="/usr/local/games/quake3"
 			endif
@@ -181,7 +181,7 @@ ifeq ($(QUAKE3),1)
 
 			BASEGAME=baseq3
 			BASEGAME_FLAGS =
-			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD -DMISSIONPACK_HUD2
 
 			ifndef COPYDIR
 				COPYDIR="/usr/local/games/quake3"
@@ -210,6 +210,8 @@ else # END QUAKE3
 	# IOQUAKE3				Enables CD key check and punkbuster ui code
 	# MISSIONPACK_HUD		Use MISSIONPACK ui scripting in cgame for hud and menus. (ZTM: Split from MISSIONPACK define)
 	# MISSIONPACK_HARVESTER	Enable MISSIONPACK harevester gametype (ZTM: Split from MISSIONPACK define)
+	# MISSIONPACK_HUD2		Use MISSIONPACK text drawing in cgame. (ZTM: Split from MISSIONPACK_HUD define)
+	#							Requires MISSIONPACK_HUD or IOQ3ZTM
 
 
 	# Turtle Arena "general" defines
@@ -238,7 +240,7 @@ else # END QUAKE3
 	#							ZTM: TODO: Rename this define to ...?
 	# NOBLOOD				Removes blood. If this is defined, NOTRATEDM must also be defined.
 	# ANALOG				Allows players to rotate the camera and move based on the camera angles, not full analog control yet
-	# NET_COMPAT			Working on having Turtle Arena and ioq3ztm run on the same engine.
+	# NET_COMPAT			Working on having Turtle Arena and ioq3turtle run on the same engine.
 	# THIRD_PERSON			Game defaults to third person instead of first person
 	#####
 	# TA_WEAPSYS			This is the core changes to the weapon system
@@ -258,15 +260,17 @@ else # END QUAKE3
 	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
 	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
 	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
-	#							Kinda pointless. (Note: TA_PLAYERSYS adds support for Elite Force soundpath keyword in animations.cfg)
+	#							Kinda pointless. (Note: TA_PLAYERSYS adds support for Elite Force soundpath keyword in animations.cfg,
+	#													must also define RAVENMD4 and IOQ3ZTM)
 
 
-	# Turtle Arena "specific" defines
+	# Turtle Arena specific defines
 	#####
 	# TURTLEARENA			Turtle Arena branding, version, file/directory name, and more
-	# TA_MISC				This is stuff that I don't want in ioq3ztm, but would use in another standalone mod
+	# TA_MAIN				Must be defined for Turtle Arena and Turtle Arena mods
+	# TA_MISC				Stuff that I don't want in ioq3ztm, but would use in another standalone mod
 	#							(Like a NiGHTS into Dreams clone or Sonic Robo Blast Arena...)
-	# TA_SP
+	# TA_SP					Single player mode code
 	# TA_HOLDABLE			Turtle Arena holdable items. Shurikens and Pizza-to-Go.
 	# TA_PLAYERS			Turtle Arena player animations and tags
 	# TA_DATA				Changes for Turtle Arena data.
@@ -274,14 +278,14 @@ else # END QUAKE3
 	#####
 	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
 
-	BUILD_DEFINES = -DSTANDALONE -DRAVENMD4 \
-						-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
+	BUILD_DEFINES = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
+						-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DANALOG -DNET_COMPAT \
 						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
 						-DTA_WEAPSYS -DTA_PLAYERSYS \
 						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 						-DTA_WEAPSYS_EX_COMPAT \
-						-DOA_BLOOM -DTA_MOD
+						-DOA_BLOOM
 
 	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
 						-DTA_WEAPSYS_EX -DTA_PLAYERS -DTA_DATA \

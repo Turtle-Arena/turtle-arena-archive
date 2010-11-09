@@ -2232,7 +2232,26 @@ void VoodooTouch(gentity_t *self, gentity_t *other, trace_t *trace)
 {
 	if (self->target_ent) {
 		if (self->target_ent->touch) {
+#if 0 // ZTM: TODO: Make voodoo bush move...
+			vec3_t start;
+
+			VectorCopy(self->target_ent->s.origin, start);
+
 			self->target_ent->touch(self->target_ent, other, trace);
+
+			if (!(self->spawnflags & VOODOO_STAY_SOLID) && self->target_ent->flags & FL_PUSHABLE) {
+				vec3_t move;
+
+				VectorSubtract(start, self->target_ent->s.origin, move);
+				VectorAdd(self->s.pos.trBase, move, self->r.currentOrigin);
+
+				VectorCopy(self->r.currentOrigin, self->s.origin);
+				VectorCopy(self->r.currentOrigin, self->s.pos.trBase);
+				trap_LinkEntity (self);
+			}
+#else
+			self->target_ent->touch(self->target_ent, other, trace);
+#endif
 		}
 	} else {
 		gentity_t *ent = NULL;

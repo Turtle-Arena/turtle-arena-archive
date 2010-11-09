@@ -125,7 +125,7 @@ static void UI_Mods_LoadMods( void ) {
 
 	// always start off with BASEGAME
 	s_mods.list.numitems = 1;
-#if defined TURTLEARENA || (defined STANDALONE && defined IOQ3ZTM)
+#ifdef TA_MAIN
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Turtle Arena";
 #else
 	s_mods.list.itemnames[0] = s_mods.descriptionList[0] = "Quake III Arena";
