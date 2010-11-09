@@ -6,7 +6,7 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Release TA_UI Win32">
+			<Target title="Release TA_UI">
 				<Option output="../../build/ui_release_ta/uix86" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/ui_release_ta" />
 				<Option type="3" />
@@ -29,7 +29,7 @@
 					<Add library="odbccp32" />
 				</Linker>
 			</Target>
-			<Target title="Debug TA_UI Win32">
+			<Target title="Debug TA_UI">
 				<Option output="../../build/ui_debug_ta/uix86" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/ui_debug_ta" />
 				<Option type="3" />

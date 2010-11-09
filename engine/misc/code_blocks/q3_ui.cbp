@@ -6,7 +6,7 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Release Win32">
+			<Target title="Release">
 				<Option output="../../build/q3_ui_release/uix86" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/q3_ui_release" />
 				<Option type="3" />
@@ -25,7 +25,7 @@
 					<Add option="-DMISSIONPACK" />
 				</Compiler>
 			</Target>
-			<Target title="Debug Win32">
+			<Target title="Debug">
 				<Option output="../../build/q3_ui_debug/uix86" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/q3_ui_debug" />
 				<Option type="3" />
