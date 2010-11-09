@@ -532,6 +532,20 @@ qboolean G_AllowPeaking(void);
 //
 // g_items.c
 //
+#define	RESPAWN_ARMOR		25
+#define	RESPAWN_HEALTH		35
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+#define	RESPAWN_SCORE		25
+#endif
+#define	RESPAWN_AMMO		40
+#ifdef TA_HOLDABLE
+#define	RESPAWN_HOLDABLE	35
+#else
+#define	RESPAWN_HOLDABLE	60
+#endif
+#define	RESPAWN_MEGAHEALTH	35//120
+#define	RESPAWN_POWERUP		120
+
 void G_CheckTeamItems( void );
 void G_RunItem( gentity_t *ent );
 void RespawnItem( gentity_t *ent );

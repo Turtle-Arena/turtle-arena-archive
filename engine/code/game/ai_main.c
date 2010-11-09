@@ -1435,21 +1435,58 @@ int BotAILoadMap( int restart ) {
 			Q_strncpyz(itemInfos[item].model, bg_iteminfo[i].world_model[0], sizeof (bg_iteminfo[i].world_model[0]));
 			itemInfos[item].modelindex = i;
 
-			if (bg_iteminfo[i].giType == IT_WEAPON) {
-				if ( gametype == GT_TEAM  ) {
-					itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponTeamRespawn");
-				} else {
-					itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponrespawn");
-				}
+			// ZTM: NOTE: Currently auto weight is only supported for weapons,
+			//              so other weights must be added to base/botfiles/fuzi.c
+			itemInfos[item].defaultWeight = 0;
+			itemInfos[item].inventory = 0;
 
-				itemInfos[item].defaultWeight = BotWeaponWeight(i);
-				itemInfos[item].inventory = INVENTORY_WEAPON_START+i-1;
-			} else {
-				// ZTM: NOTE: Currently auto weight is only supported for weapons,
-				//              so other weights must be added to base/botfiles/fuzi.c
-				itemInfos[item].respawntime = 35;
-				itemInfos[item].defaultWeight = 0;
-				itemInfos[item].inventory = 0;
+			switch (bg_iteminfo[i].giType)
+			{
+				case IT_WEAPON:
+					if ( gametype == GT_TEAM  ) {
+						itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponTeamRespawn");
+					} else {
+						itemInfos[item].respawntime = trap_Cvar_VariableIntegerValue("g_weaponrespawn");
+					}
+
+					itemInfos[item].defaultWeight = BotWeaponWeight(i);
+					itemInfos[item].inventory = INVENTORY_WEAPON_START+i-1;
+					break;
+
+				case IT_AMMO:
+					itemInfos[item].respawntime = RESPAWN_AMMO;
+					break;
+
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+				case IT_SCORE:
+					itemInfos[item].respawntime = RESPAWN_SCORE;
+					break;
+#endif
+
+#ifndef TURTLEARENA // NOARMOR
+				case IT_ARMOR:
+					itemInfos[item].respawntime = RESPAWN_ARMOR;
+					break;
+#endif
+
+				case IT_HEALTH:
+					if (bg_iteminfo[i].quantity == 100)
+						itemInfos[item].respawntime = RESPAWN_MEGAHEALTH;
+					else
+						itemInfos[item].respawntime = RESPAWN_HEALTH;
+					break;
+
+				case IT_POWERUP:
+					itemInfos[item].respawntime = RESPAWN_POWERUP;
+					break;
+
+				case IT_HOLDABLE:
+					itemInfos[item].respawntime = RESPAWN_HOLDABLE;
+					break;
+
+				default:
+					itemInfos[item].respawntime = 35;
+					break;
 			}
 
 			item++;
