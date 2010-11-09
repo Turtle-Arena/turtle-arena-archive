@@ -143,7 +143,7 @@ item item_speed
 	tag PW_HASTE
 }
 
-item item_speed
+item item_invis
 {
 	pickupSound "sound/items/powerup_pickup.ogg"
 	model "models/powerups/instant/invis.md3"
@@ -336,7 +336,7 @@ item item_quad
 
 item item_enviro
 {
-	clone "item_strength"
+	clone "item_defense"
 }
 
 item item_haste
