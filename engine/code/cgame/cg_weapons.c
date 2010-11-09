@@ -2602,7 +2602,6 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 	centity_t	*nonPredictedCent;
 #ifdef TA_WEAPSYS
-	qboolean			drawFlash;
 	float				barrelSpinAngle;
 	bg_weapongroupinfo_t *weaponGroup;
 	refEntity_t			gun[MAX_HANDS];
@@ -2690,6 +2689,11 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 #endif
 
+#ifdef IOQ3ZTM
+	// make sure we aren't looking at cg.predictedPlayerEntity for LG
+	nonPredictedCent = &cg_entities[cent->currentState.clientNum];
+#endif
+
 #ifdef TA_WEAPSYS
 	foundModel = qfalse;
 
@@ -2750,12 +2754,27 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		if (gun[i].hModel) {
 			foundModel = qtrue;
 		}
+
+		// set default flashOrigin
+		if (!gun[i].hModel || !cg_weapons[weaponGroup->weaponnum[i]].flashModel) {
+			// Use default flash origin when no flash model.
+			VectorCopy(cent->lerpOrigin, nonPredictedCent->pe.flashOrigin[i]);
+			nonPredictedCent->pe.flashOrigin[i][2] += DEFAULT_VIEWHEIGHT - 6;
+		}
 	}
 
 	if (!foundModel) {
 		return;
 	}
 #else
+#ifdef IOQ3ZTM
+	if (!weapon->weaponModel || !weapon->flashModel) {
+		// Use default flash origin when no flash model.
+		VectorCopy(cent->lerpOrigin, nonPredictedCent->pe.flashOrigin);
+		nonPredictedCent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
+	}
+#endif
+
 	gun.hModel = weapon->weaponModel;
 	if (!gun.hModel) {
 		return;
@@ -2916,25 +2935,25 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 	}
 
+#ifndef IOQ3ZTM // Moved up so it can be used for fallback flashOrigin
 	// make sure we aren't looking at cg.predictedPlayerEntity for LG
 	nonPredictedCent = &cg_entities[cent->currentState.clientNum];
+#endif
 
+#ifndef IOQ3ZTM // ZTM: NOTE: How could this even happen? pointer = array + num; if (pointer - array != num) unused code;
 	// if the index of the nonPredictedCent is not the same as the clientNum
 	// then this is a fake player (like on teh single player podiums), so
 	// go ahead and use the cent
 	if( ( nonPredictedCent - cg_entities ) != cent->currentState.clientNum ) {
 		nonPredictedCent = cent;
 	}
+#endif
 
 	// add the flash
 #ifdef TA_WEAPSYS
 	for (i = 0; i < MAX_HANDS; i++)
 #endif
 	{
-#ifdef TA_WEAPSYS
-		drawFlash = qtrue;
-#endif
-
 		if (
 #ifdef TA_WEAPSYS
 			( weaponGroup->weapon[i]->flags & WIF_CONTINUOUS_FLASH )
@@ -2952,12 +2971,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 				)
 			{
-#ifdef TA_WEAPSYS
-				// Don't draw flash, but update flashOrigin
-				drawFlash = qfalse;
-#else
 				return;
-#endif
 			}
 		}
 
@@ -2973,15 +2987,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 		if (!flash.hModel) {
 #ifdef TA_WEAPSYS
-			// Use default flash origin when no flash model.
-			VectorCopy(nonPredictedCent->lerpOrigin, nonPredictedCent->pe.flashOrigin[i]);
-			nonPredictedCent->pe.flashOrigin[i][2] += DEFAULT_VIEWHEIGHT - 6;
 			continue;
-#elif defined IOQ3ZTM
-			// Use default flash origin when no flash model.
-			VectorCopy(nonPredictedCent->lerpOrigin, nonPredictedCent->pe.flashOrigin);
-			nonPredictedCent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
-			return;
 #else
 			return;
 #endif
@@ -3015,13 +3021,8 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #else
 		CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, "tag_flash");
 #endif
-#ifdef TA_WEAPSYS
-		if (drawFlash) {
-#endif
-			trap_R_AddRefEntityToScene( &flash );
-#ifdef TA_WEAPSYS
-		}
-#endif
+		trap_R_AddRefEntityToScene( &flash );
+
 
 		if ( ps || cg.renderingThirdPerson ||
 			cent->currentState.number != cg.predictedPlayerState.clientNum ) {
@@ -3032,10 +3033,6 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 
 #ifdef TA_WEAPSYS
-			if (!drawFlash) {
-				continue;
-			}
- 
 			if (weaponGroup->weapon[i]->proj->trailType == PT_LIGHTNING
 				&& weaponGroup->weapon[i]->proj->instantDamage)
 #endif
