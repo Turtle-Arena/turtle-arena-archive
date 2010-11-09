@@ -898,8 +898,8 @@ void G_BreakableRespawn( gentity_t *self )
 	G_KillBox(self);
 
 	// Remove dropped item
-	if (self->enemy) {
-		G_FreeEntity(self->enemy);
+	if (self->chain) {
+		G_FreeEntity(self->chain);
 	}
 
 	self->health = self->splashRadius;
@@ -934,7 +934,7 @@ void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 	G_UseTargets(self, attacker);
 
 	// Spawn item
-	self->enemy = NULL;
+	self->chain = NULL;
 	if (self->message)
 	{
 		vec3_t origin, pos1, pos2;
@@ -954,7 +954,7 @@ void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 		}
 
 		if (self->item) {
-			self->enemy = LaunchItem(self->item, origin, vec3_origin);
+			self->chain = LaunchItem(self->item, origin, vec3_origin);
 		}
 	}
 

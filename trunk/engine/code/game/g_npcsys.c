@@ -143,7 +143,7 @@ void G_NPC_StartAction(gentity_t *self, gentity_t *other, npcAction_e action)
 
 	self->bgNPC.action = action;
 	self->bgNPC.actionTime = level.time;
-	self->enemy = other;
+	self->chain = other;
 	if (other) {
 		VectorCopy(other->r.currentOrigin, self->bgNPC.actionPos);
 	}

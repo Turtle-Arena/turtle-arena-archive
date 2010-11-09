@@ -642,8 +642,8 @@ void ObjectRespawn(gentity_t *self)
 	G_KillBox(self);
 
 	// Remove dropped item
-	if (self->enemy) {
-		G_FreeEntity(self->enemy);
+	if (self->chain) {
+		G_FreeEntity(self->chain);
 	}
 
 	// Restore settings
@@ -695,7 +695,7 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 	G_UseTargets(self, attacker);
 
 	// Spawn item
-	self->enemy = NULL;
+	self->chain = NULL;
 	if (self->message) {
 		vec3_t origin, pos1, pos2;
 
@@ -714,7 +714,7 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 		}
 
 		if (self->item) {
-			self->enemy = LaunchItem(self->item, origin, vec3_origin);
+			self->chain = LaunchItem(self->item, origin, vec3_origin);
 		}
 	}
 

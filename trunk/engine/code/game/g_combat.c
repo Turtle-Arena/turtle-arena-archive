@@ -1558,7 +1558,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			G_BreakableDebris(targ, inflictor, attacker, dir, point);
 
 			if (targ->die) {
-				targ->die (targ, inflictor, attacker, damage, mod);
+				targ->die (targ, inflictor, attacker, take, mod);
 			}
 		} else {
 #endif
