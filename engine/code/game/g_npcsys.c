@@ -308,36 +308,6 @@ void FinishSpawningNPC( gentity_t *ent ) {
 			// Path is okay to use.
 			G_NPC_StartAction(ent, ent->nextTrain, NACT_GO_TO);
 		}
-#else // TDC_NPC
-		gentity_t		*path, *next, *start;
-
-		ent->nextTrain = G_Find( NULL, FOFS(targetname), ent->target );
-		if ( !ent->nextTrain ) {
-			G_Printf( "npc with paths at %s with an unfound target\n",
-				vtos(ent->r.absmin) );
-			return;
-		}
-
-		start = NULL;
-		for ( path = ent->nextTrain ; path != start && !end_way; path = next ) {
-			if ( !start ) {
-				start = path;
-			}
-
-			path->nextTrain = NULL;
-			next = NULL;
-			do {
-				next = G_Find( next, FOFS(targetname), path->target );
-				if ( !next )
-				{
-					break;
-				}
-			} while ( strcmp( next->classname, "npcpath" ) );
-
-			path->nextTrain = next;
-		}
-		// Path is okay to use.
-		G_NPC_StartAction(ent, ent->nextTrain, NACT_GO_TO);
 #endif
 	}
 
