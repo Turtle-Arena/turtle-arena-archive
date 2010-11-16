@@ -796,8 +796,8 @@ typedef struct
 extern bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 extern bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 extern bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 int BG_NumHoldableItems(void);
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 int BG_ProjectileIndexForHoldable(int holdable);
 #endif
 int BG_ProjectileIndexForName(const char *name);

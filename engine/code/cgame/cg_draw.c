@@ -3176,6 +3176,9 @@ static void CG_DrawWarmup( void ) {
 	int			i;
 	float scale;
 	clientInfo_t	*ci1, *ci2;
+#ifndef MISSIONPACK_HUD2
+	int			w;
+#endif
 	int			cw;
 	const char	*s;
 

@@ -3354,7 +3354,7 @@ void CG_DrawWeaponSelect( void ) {
 
 	// draw the selected name
 #ifdef TA_WEAPSYS
-		name = bg_weapongroupinfo[ cg.weaponSelect ].pickupName;
+		name = bg_weapongroupinfo[ cg.weaponSelect ].item->pickup_name;
 #else
 	if ( cg_weapons[ cg.weaponSelect ].item ) {
 		name = cg_weapons[ cg.weaponSelect ].item->pickup_name;
