@@ -3067,7 +3067,9 @@ Also called by CG_Missile for quad rockets, but nobody can tell...
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
 #ifdef TURTLEARENA // POWERS
 	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
-#if 1 // don't force alpha
+#if 1 // ZTM: Don't have player be transparent
+		trap_R_AddRefEntityToScene( ent );
+
 		ent->customShader = cgs.media.playerTeleportShader;
 		trap_R_AddRefEntityToScene( ent );
 #else

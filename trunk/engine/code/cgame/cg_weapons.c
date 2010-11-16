@@ -2140,7 +2140,9 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, entityState_t *state )
 	// add powerup effects
 #ifdef TURTLEARENA // POWERS
 	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
-#if 1 // don't force alpha
+#if 1 // ZTM: Don't have player be transparent
+		trap_R_AddRefEntityToScene( gun );
+
 		gun->customShader = cgs.media.playerTeleportShader;
 		trap_R_AddRefEntityToScene( gun );
 #else
