@@ -529,7 +529,7 @@ void S_LoadMusicFile(const char *filename)
 	FS_ReadFile( filename, (void **)&buffer );
 
 	if ( !buffer ) {
-		Com_Error( ERR_DROP, "Couldn't load %s", filename );
+		Com_Printf("Warning: Couldn't load %s", filename );
 		return;
 	}
 
