@@ -426,9 +426,10 @@ static void PM_SetMovementDir( void ) {
 
 #ifdef TA_PATHSYS // 2DMODE
 // Nights Move style
+// ZTM: FIXME: Make this selectable by map path (instead of hardcoded to side view)
 enum
 {
-	NM_SIDE, // normal (only working move type)
+	NM_SIDE,
 	NM_TOP,
 	NM_BACK
 };
@@ -2388,7 +2389,7 @@ static void PM_Weapon( void ) {
 			if (
 #ifdef TA_HOLDSYS
 			pm->ps->holdableIndex == HI_MEDKIT
-#elif defined TA_WEAPSYS
+#elif defined TA_ITEMSYS
 			BG_ItemForItemNum(pm->ps->stats[STAT_HOLDABLE_ITEM])->giTag == HI_MEDKIT
 #else
 			bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag == HI_MEDKIT
@@ -2403,7 +2404,7 @@ static void PM_Weapon( void ) {
 #endif
 #ifdef TA_HOLDSYS
 				PM_AddEvent( EV_USE_ITEM0 + pm->ps->holdableIndex );
-#elif defined TA_WEAPSYS
+#elif defined TA_ITEMSYS
 				PM_AddEvent( EV_USE_ITEM0 + BG_ItemForItemNum(pm->ps->stats[STAT_HOLDABLE_ITEM])->giTag );
 #else
 				PM_AddEvent( EV_USE_ITEM0 + bg_itemlist[pm->ps->stats[STAT_HOLDABLE_ITEM]].giTag );
@@ -2721,7 +2722,7 @@ static void PM_Weapon( void ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -2730,7 +2731,7 @@ static void PM_Weapon( void ) {
 		addTime /= 1.5;
 	}
 	else
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( BG_ItemForItemNum(pm->ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
 #else
 	if( bg_itemlist[pm->ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )

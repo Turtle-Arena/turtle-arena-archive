@@ -101,7 +101,7 @@ ifeq ($(QUAKE3),1)
 		ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
 							-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DANALOG -DNET_COMPAT \
 							-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-							-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
+							-DTA_HOLDSYS -DTA_ITEMSYS -DTA_WEAPSYS_NOCOMPAT \
 							-DTA_WEAPSYS -DTA_PLAYERSYS \
 							-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 							-DTA_WEAPSYS_EX_COMPAT \
@@ -143,7 +143,7 @@ ifeq ($(QUAKE3),1)
 			#   and currently doesn't support Q3 mods.
 			BUILD_DEFINES = -DIOQUAKE3 -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
 								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
-								-DTA_WEAPSYS -DOA_BLOOM
+								-DTA_ITEMSYS -DTA_WEAPSYS -DOA_BLOOM
 
 			VERSION=1.36ztm
 
@@ -243,6 +243,7 @@ else # END QUAKE3
 	# NET_COMPAT			Working on having Turtle Arena and ioq3turtle run on the same engine.
 	# THIRD_PERSON			Game defaults to third person instead of first person
 	#####
+	# TA_ITEMSYS			Load items from external text files. Required for TA_WEAPSYS.
 	# TA_WEAPSYS			This is the core changes to the weapon system
 	#							loads the weapons from a text file, allowing for easy modifing,
 	#							and new custom default weapons for players.
@@ -281,7 +282,7 @@ else # END QUAKE3
 	BUILD_DEFINES = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
 						-DRANDOMBOT -DCELSHADING -DNOTRATEDM -DANALOG -DNET_COMPAT \
 						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-						-DTA_HOLDSYS -DTA_WEAPSYS_NOCOMPAT \
+						-DTA_HOLDSYS -DTA_ITEMSYS -DTA_WEAPSYS_NOCOMPAT \
 						-DTA_WEAPSYS -DTA_PLAYERSYS \
 						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 						-DTA_WEAPSYS_EX_COMPAT \

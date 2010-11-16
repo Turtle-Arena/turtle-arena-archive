@@ -79,7 +79,7 @@ CG_LoadingItem
 void CG_LoadingItem( int itemNum ) {
 	gitem_t		*item;
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[itemNum];

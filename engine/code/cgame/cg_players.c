@@ -2305,7 +2305,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	trailItem = qtrue;
 #endif
 
-#ifdef TA_WEAPSYS
+#ifdef IOQ3ZTM // FLAG
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #endif
 

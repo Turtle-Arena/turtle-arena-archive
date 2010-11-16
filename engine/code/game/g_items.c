@@ -424,7 +424,7 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 
 	// small and mega healths will go over the max
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -452,7 +452,7 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 
 #ifdef TURTLEARENA // Guards having health regen makes them pretty much unkillable.
 			// So get 2x health from pickups!
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -462,7 +462,7 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	}
 	else
 	// And cut health that scout gets?
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -495,7 +495,7 @@ int Pickup_Armor( gentity_t *ent, gentity_t *other ) {
 
 	other->client->ps.stats[STAT_ARMOR] += ent->item->quantity;
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -1152,7 +1152,7 @@ void RegisterItem( gitem_t *item ) {
 	int itemNum;
 #endif
 	if ( !item ) {
-#ifdef TA_WEAPSYS // TA_ITEMSYS
+#ifdef TA_ITEMSYS
 		return;
 #else
 		G_Error( "RegisterItem: NULL" );
@@ -1186,7 +1186,7 @@ void SaveRegisteredItems( void ) {
 	int		count;
 
 	count = 0;
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	for ( i = 0 ; i < BG_NumItems() ; i++ )
 #else
 	for ( i = 0 ; i < bg_numItems ; i++ )
@@ -1199,7 +1199,7 @@ void SaveRegisteredItems( void ) {
 			string[i] = '0';
 		}
 	}
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	string[ BG_NumItems() ] = 0;
 #else
 	string[ bg_numItems ] = 0;

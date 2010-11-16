@@ -582,13 +582,13 @@ static void CG_Item( centity_t *cent ) {
 #endif
 
 	es = &cent->currentState;
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if ( es->modelindex >= BG_NumItems() )
 #else
 	if ( es->modelindex >= bg_numItems )
 #endif
 	{
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 		CG_Error( "Bad item index %i on entity (max is %i)", es->modelindex, BG_NumItems() );
 #else
 		CG_Error( "Bad item index %i on entity", es->modelindex );
@@ -600,7 +600,7 @@ static void CG_Item( centity_t *cent ) {
 		return;
 	}
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(es->modelindex);
 #else
 	item = &bg_itemlist[ es->modelindex ];

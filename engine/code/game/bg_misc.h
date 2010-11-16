@@ -486,8 +486,7 @@ typedef enum {
 
 #define MAX_ITEM_MODELS 4
 
-#ifdef TA_WEAPSYS // TA_ITEMSYS
-// ZTM: TODO: Replace gitem_t
+#ifdef TA_ITEMSYS
 typedef struct bg_iteminfo_s {
 	char		classname[MAX_QPATH];	// spawning name
 	char		pickup_sound[MAX_QPATH];
@@ -512,8 +511,14 @@ typedef struct bg_iteminfo_s {
 } bg_iteminfo_t;
 
 extern bg_iteminfo_t bg_iteminfo[MAX_ITEMS];
+
+int BG_ItemNumForItem( bg_iteminfo_t *item );
+bg_iteminfo_t *BG_ItemForItemNum( int itemNum );
 int BG_ItemIndexForName(const char *classname);
 int BG_NumItems(void);
+int BG_NumHoldableItems(void);
+
+void BG_InitItemInfo(void);
 
 #define gitem_s bg_iteminfo_s
 #define gitem_t bg_iteminfo_t
@@ -796,7 +801,6 @@ typedef struct
 extern bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 extern bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 extern bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
-int BG_NumHoldableItems(void);
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
 int BG_ProjectileIndexForHoldable(int holdable);
 #endif
@@ -806,7 +810,7 @@ int BG_WeaponGroupIndexForName(const char *name);
 int BG_NumProjectiles(void);
 int BG_NumWeapons(void);
 int BG_NumWeaponGroups(void);
-void BG_InitWeaponInfo(void);
+
 qboolean BG_PlayerRunning(vec3_t velocity);
 int BG_MaxAttackIndex(playerState_t *ps);
 int BG_AttackIndexForPlayerState(playerState_t *ps);
@@ -1761,7 +1765,7 @@ extern int modNamesSize;
 
 //---------------------------------------------------------
 
-#ifndef TA_WEAPSYS // TA_ITEMSYS
+#ifndef TA_ITEMSYS
 // included in both the game dll and the client
 extern	gitem_t	bg_itemlist[];
 extern	int		bg_numItems;
@@ -1774,9 +1778,7 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw );
 #ifdef IOQ3ZTM
 gitem_t	*BG_FindItemForClassname( const char *classname );
 #endif
-#ifdef TA_WEAPSYS // TA_ITEMSYS
-int BG_ItemNumForItem( bg_iteminfo_t *item );
-bg_iteminfo_t *BG_ItemForItemNum( int itemNum );
+#ifdef TA_ITEMSYS
 #define	ITEM_INDEX(x) (BG_ItemNumForItem(x))
 #else
 #define	ITEM_INDEX(x) ((x)-bg_itemlist)

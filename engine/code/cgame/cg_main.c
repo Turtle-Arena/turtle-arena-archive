@@ -637,7 +637,7 @@ static void CG_RegisterItemSounds( int itemNum ) {
 	char			*s, *start;
 	int				len;
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[ itemNum ];
@@ -893,7 +893,7 @@ static void CG_RegisterSounds( void ) {
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	for ( i = 1 ; i < BG_NumItems() ; i++ )
 #else
 	for ( i = 1 ; i < bg_numItems ; i++ )
@@ -1427,7 +1427,7 @@ static void CG_RegisterGraphics( void ) {
 	// only register the items that the server says we need
 	Q_strncpyz(items, CG_ConfigString(CS_ITEMS), sizeof(items));
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	for ( i = 1 ; i < BG_NumItems() ; i++ )
 #else
 	for ( i = 1 ; i < bg_numItems ; i++ )
@@ -2461,10 +2461,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	cg.loading = qtrue;		// force players to load instead of defer
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	CG_LoadingString( "items" );
 
-	BG_InitWeaponInfo();
+	BG_InitItemInfo();
 #endif
 
 #ifdef TA_ENTSYS // MISC_OBJECT

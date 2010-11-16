@@ -915,8 +915,8 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	vec4_t	drawcolor;
 	int		width;
 	float	sizeScale;
-#ifdef IOQ3ZTM // FONT_REWRITE
 	qhandle_t charsetProp;
+#ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
 	if (style & UI_SMALLFONT)
@@ -986,7 +986,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[2] = color[2];
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
-#ifdef TA_DATA
+#if defined TA_DATA || defined IOQ3ZTM // ZTM: FIXME: IOQ3ZTM: Add glow font for quake3?
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, charsetProp );
 #else
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, uis.charsetPropGlow );

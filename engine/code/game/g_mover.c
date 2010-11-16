@@ -944,12 +944,15 @@ void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 		VectorScale(pos1, 0.5f, pos2);
 		VectorAdd(pos2, self->r.absmin, origin);
 
+#ifdef TA_WEAPSYS
 		if (Q_stricmp(self->message, "weapon_random") == 0) {
 			// weapon_random: Change item!
 			if (!(self->s.eFlags & EF_VOTED) && !self->item) {
 				self->item = G_RandomWeaponItem(self, self->spawnflags>>7);
 			}
-		} else {
+		} else
+#endif
+		{
 			self->item = BG_FindItemForClassname(self->message);
 		}
 
@@ -2376,10 +2379,12 @@ void SP_func_voodoo( gentity_t *ent ) {
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 
+#ifdef TA_MISC // MATERIALS
 	if (ent->damageMaterial == -1) {
 		// Default to no damage debris
 		ent->damageMaterial = 0;
 	}
+#endif
 
 	ent->flags |= FL_NO_KNOCKBACK;
 

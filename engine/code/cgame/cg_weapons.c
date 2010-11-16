@@ -1261,7 +1261,7 @@ void CG_RegisterWeapon( int weaponNum )
 	memset( weaponInfo, 0, sizeof( *weaponInfo ) );
 	weaponInfo->registered = qtrue;
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(0);
 	for (i = BG_NumItems()-1; i > 0; i--)
 	{
@@ -1339,7 +1339,7 @@ void CG_RegisterWeapon( int weaponNum )
 #ifndef TURTLEARENA // WEAPONS
 	weaponInfo->ammoIcon = trap_R_RegisterShader( item->icon );
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	ammo = NULL; // stop warning
 	for (i = BG_NumItems()-1; i > 0; i--)
 	{
@@ -1359,7 +1359,7 @@ void CG_RegisterWeapon( int weaponNum )
 #endif
 
 	if (
-#ifdef TA_WEAPSYS // stop warning
+#ifdef TA_ITEMSYS // stop warning
 	ammo &&
 #endif
 	ammo->classname && ammo->world_model[0] ) {
@@ -1581,7 +1581,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 	itemInfo_t		*itemInfo;
 	gitem_t			*item;
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if ( itemNum < 0 || itemNum >= BG_NumItems() ) {
 		CG_Error( "CG_RegisterItemVisuals: itemNum %d out of range [0-%d]", itemNum, BG_NumItems()-1 );
 	}
@@ -1596,7 +1596,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 		return;
 	}
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[ itemNum ];
@@ -3187,6 +3187,8 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 			}
 #else
 #ifdef IOQ3ZTM
+			cent = &cg_entities[ps->clientNum];
+
 			// Use default flashOrigin when no flash model.
 			VectorCopy(cent->lerpOrigin, cent->pe.flashOrigin);
 			cent->pe.flashOrigin[2] += DEFAULT_VIEWHEIGHT - 6;
@@ -3291,7 +3293,7 @@ void CG_DrawWeaponSelect( void ) {
 	int		i;
 	int		bits;
 	int		count;
-	int		x, y, w;
+	int		x, y;
 	char	*name;
 	float	*color;
 
