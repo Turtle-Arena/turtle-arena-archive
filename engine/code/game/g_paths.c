@@ -254,7 +254,7 @@ static gpathtype_e G_SetupPath2(gentity_t *ent, const char *target)
 	return PATH_CIRCIT;
 }
 
-// ZTM: NOTE: G_SetupPath had too many return statement, so moved EF_PATHMODE bit to a seperate function.
+// ZTM: NOTE: G_SetupPath had too many return statements, so moved EF_PATHMODE bit to a seperate function.
 gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 {
 	gpathtype_e type;
@@ -295,22 +295,13 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 	gentity_t	*point;
 	qboolean	backward;
 
-	if (ent->client)
-	{
-		// ZTM: FIXME: Is the !EF_PATHMODE check ever going to be used?
-		if (ent->client->ps.eFlags & EF_PATHMODE)
-		{
-			backward = (ent->client->ps.eFlags & EF_TRAINBACKWARD);
-		}
-		else
-		{
-			// ZTM: NOTE: Should work for now, but should check if moving away from nextTrain
-			//              (In case they were shoot and knocked back)
-			backward = (ent->client->ps.pm_flags & PMF_BACKWARDS_RUN);
-		}
+	if (!(ent->s.eFlags & EF_PATHMODE)) {
+		return qfalse;
 	}
-	else
-	{
+
+	if (ent->client) {
+		backward = (ent->client->ps.eFlags & EF_TRAINBACKWARD);
+	} else {
 		backward = (ent->s.eFlags & EF_TRAINBACKWARD);
 	}
 
