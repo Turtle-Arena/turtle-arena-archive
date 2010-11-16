@@ -143,7 +143,7 @@ ifeq ($(QUAKE3),1)
 			#   and currently doesn't support Q3 mods.
 			BUILD_DEFINES = -DIOQUAKE3 -DRANDOMBOT -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
 								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
-								-DTA_ITEMSYS -DTA_WEAPSYS -DOA_BLOOM
+								-DTA_ITEMSYS -DTA_ITEMSYS_USE_INTERNAL -DTA_WEAPSYS -DOA_BLOOM
 
 			VERSION=1.36ztm
 
@@ -244,6 +244,7 @@ else # END QUAKE3
 	# THIRD_PERSON			Game defaults to third person instead of first person
 	#####
 	# TA_ITEMSYS			Load items from external text files. Required for TA_WEAPSYS.
+	# TA_ITEMSYS_USE_INTERNAL Use the internal item data. The data can be overriden by external items.
 	# TA_WEAPSYS			This is the core changes to the weapon system
 	#							loads the weapons from a text file, allowing for easy modifing,
 	#							and new custom default weapons for players.

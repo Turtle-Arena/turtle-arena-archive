@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "bg_misc.h"
 
-#ifndef TA_ITEMSYS
+#if !defined TA_ITEMSYS || defined TA_ITEMSYS_USE_INTERNAL
 /*QUAKED item_***** ( 0 0 0 ) (-16 -16 -16) (16 16 16) suspended
 DO NOT USE THIS CLASS, IT JUST HOLDS GENERAL INFORMATION.
 The suspended flag will allow items to hang in the air, otherwise they are dropped to the next surface.
@@ -57,7 +57,32 @@ An item fires all of its targets when it is picked up.  If the toucher can't car
 		""
 #endif
 
+#ifdef TA_ITEMSYS_USE_INTERNAL
+typedef struct oldgitem_s {
+	char		*classname;	// spawning name
+	char		*pickup_sound;
+	char		*world_model[MAX_ITEM_MODELS];
+
+	char		*icon;
+	char		*pickup_name;	// for printing on pickup
+
+	int			quantity;		// for ammo how much, or duration of powerup
+	itemType_t  giType;			// IT_* flags
+
+	int			giTag;
+
+#ifdef IOQ3ZTM // FLAG_MODEL
+	char		*skin;			// So flags don't need multiple models.
+#else
+	char		*precaches;		// string of all models and images this item will use
+#endif
+	char		*sounds;		// string of all sounds this item will use
+} oldgitem_t;
+
+oldgitem_t bg_itemlist[] = 
+#else
 gitem_t	bg_itemlist[] = 
+#endif
 {
 	{
 		NULL,
@@ -3713,6 +3738,10 @@ void BG_InitItemInfo(void)
 	char*		dirptr;
 	int			i;
 	int			dirlen;
+#ifdef TA_ITEMSYS_USE_INTERNAL
+	int num;
+	int j;
+#endif
 
 	if (bg_itemsys_init)
 		return;
@@ -3726,8 +3755,6 @@ void BG_InitItemInfo(void)
 	Com_Memset(bg_weapongroupinfo, 0, sizeof (bg_weapongroupinfo));
 
 	// Setup dummys (0 means not valid or not found)
-	strcpy(bg_iteminfo[0].classname, "item_none");
-
 	strcpy(bg_projectileinfo[0].name, "p_none");
 	bg_projectileinfo[0].numProjectiles = 1;
 	bg_projectileinfo[0].maxHits = 1;
@@ -3745,6 +3772,42 @@ void BG_InitItemInfo(void)
 	// WP_NONE
 	BG_SetupWeaponGroup(&bg_weapongroupinfo[0], &bg_iteminfo[0], "wp_none", 0);
 	strcpy(bg_iteminfo[0].pickup_name, "None");
+#endif
+
+#ifdef TA_ITEMSYS_USE_INTERNAL
+	// Load internal items
+	for (i = 0; bg_itemlist[i].classname; i++)
+	{
+		num = BG_ItemIndexForName(bg_itemlist[i].classname);
+		if (!num)
+		{
+			// Use free slot
+			num = BG_NumItems();
+		}
+
+		strcpy(bg_iteminfo[num].classname, bg_itemlist[i].classname);
+		strcpy(bg_iteminfo[num].pickup_sound, bg_itemlist[i].pickup_sound);
+
+		for (j = 0; j < MAX_ITEM_MODELS; j++) {
+			if (bg_itemlist[i].world_model[j] != NULL) {
+				strcpy(bg_iteminfo[num].world_model[j], bg_itemlist[i].world_model[j]);
+			}
+		}
+
+		strcpy(bg_iteminfo[num].icon, bg_itemlist[i].icon);
+		strcpy(bg_iteminfo[num].pickup_name, bg_itemlist[i].pickup_name);
+
+		bg_iteminfo[num].quantity = bg_itemlist[i].quantity;
+		bg_iteminfo[num].giType = bg_itemlist[i].giType;
+		bg_iteminfo[num].giTag = bg_itemlist[i].giTag;
+
+#ifdef IOQ3ZTM // FLAG_MODEL
+		strcpy(bg_iteminfo[num].skin, bg_itemlist[i].skin);
+#else
+		strcpy(bg_iteminfo[num].precaches, bg_itemlist[i].precaches);
+#endif
+		strcpy(bg_iteminfo[num].sounds, bg_itemlist[i].sounds);
+	}
 #endif
 
 	// Load main data files
