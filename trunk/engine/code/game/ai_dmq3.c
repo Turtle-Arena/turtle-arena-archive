@@ -1945,16 +1945,16 @@ void BotUpdateInventory(bot_state_t *bs) {
 #endif // TURTLEARENA // POWERS
 #endif
 #else
-#ifdef TA_WEAPSYS // TA_ITEMSYS
-	bs->inventory[INVENTORY_TELEPORTER] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_PERSISTANT_POWERUP])->giTag == HI_TELEPORTER;
-	bs->inventory[INVENTORY_MEDKIT] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_PERSISTANT_POWERUP])->giTag == HI_MEDKIT;
+#ifdef TA_ITEMSYS
+	bs->inventory[INVENTORY_TELEPORTER] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_HOLDABLE_ITEM])->giTag == HI_TELEPORTER;
+	bs->inventory[INVENTORY_MEDKIT] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_HOLDABLE_ITEM])->giTag == HI_MEDKIT;
 #ifdef MISSIONPACK
 #ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
-	bs->inventory[INVENTORY_KAMIKAZE] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_PERSISTANT_POWERUP])->giTag == HI_KAMIKAZE;
+	bs->inventory[INVENTORY_KAMIKAZE] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_HOLDABLE_ITEM])->giTag == HI_KAMIKAZE;
 #endif
-	bs->inventory[INVENTORY_PORTAL] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_PERSISTANT_POWERUP])->giTag == HI_PORTAL;
+	bs->inventory[INVENTORY_PORTAL] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_HOLDABLE_ITEM])->giTag == HI_PORTAL;
 #ifndef TURTLEARENA // POWERS
-	bs->inventory[INVENTORY_INVULNERABILITY] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_PERSISTANT_POWERUP])->giTag == HI_INVULNERABILITY;
+	bs->inventory[INVENTORY_INVULNERABILITY] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_HOLDABLE_ITEM])->giTag == HI_INVULNERABILITY;
 #endif // TURTLEARENA // POWERS
 #endif
 #else
@@ -1969,7 +1969,7 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_INVULNERABILITY] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_INVULNERABILITY;
 #endif
 #endif // MISSIONPACK
-#endif // !TA_WEAPSYS // TA_ITEMSYS
+#endif // !TA_ITEMSYS
 #endif // !TA_HOLDSYS
 	bs->inventory[INVENTORY_QUAD] = bs->cur_ps.powerups[PW_QUAD] != 0;
 	bs->inventory[INVENTORY_ENVIRONMENTSUIT] = bs->cur_ps.powerups[PW_BATTLESUIT] != 0;
@@ -1986,7 +1986,7 @@ void BotUpdateInventory(bot_state_t *bs) {
 #ifdef TURTLEARENA
 	bs->inventory[INVENTORY_PERSISTANT_POWER] = (bs->cur_ps.stats[STAT_PERSISTANT_POWERUP] != 0);
 #endif
-#ifdef TA_WEAPSYS // TA_ITEMSYS
+#ifdef TA_ITEMSYS
 	bs->inventory[INVENTORY_SCOUT] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT;
 	bs->inventory[INVENTORY_GUARD] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD;
 	bs->inventory[INVENTORY_DOUBLER] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_DOUBLER;

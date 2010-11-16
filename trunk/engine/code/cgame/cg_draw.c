@@ -108,7 +108,13 @@ void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text
 		shadowofs = 0;
 	}
 
-	CG_DrawFontStringExt( font, scale, x, y, text, color, qfalse, qfalse, shadowofs, qtrue, adjust, limit );
+	CG_DrawFontStringExt( font, scale, x, y, text, color, qfalse, qfalse, shadowofs, qtrue, adjust, limit, NULL );
+}
+
+void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t color, const char* text, float adjust, int limit) {
+	font_t *font = CG_FontForScale(scale);
+
+	CG_DrawFontStringExt( font, scale, x, y, text, color, qfalse, qfalse, 0, qtrue, adjust, limit, maxX );
 }
 #else
 int CG_Text_Width(const char *text, float scale, int limit) {
@@ -211,13 +217,13 @@ void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text
 		// center aligned
 		float w;
 
-		w = CG_Text_Width(string, scale, limit);
+		w = CG_Text_Width(text, scale, limit);
 		x = (SCREEN_WIDTH - w) * 0.5f;
 	} else if (x < 0) {
 		// right aligned, offset by x
 		float w;
 
-		w = CG_Text_Width(string, scale, limit);
+		w = CG_Text_Width(text, scale, limit);
 		x = SCREEN_WIDTH + x - w;
 	}
   if (text) {
@@ -983,7 +989,7 @@ static void CG_DrawStatusBar( void ) {
 		if (!bg_projectileinfo[BG_ProjectileIndexForHoldable(cg.snap->ps.holdableIndex)].grappling)
 #endif
 		{
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 			int giveQuantity = BG_ItemForItemNum(value)->quantity;
 #else
 			int giveQuantity = bg_itemlist[ value ].quantity;
@@ -1952,7 +1958,7 @@ CG_DrawPickupItem
 static int CG_DrawPickupItem( int y ) {
 	int		value;
 	float	*fadeColor;
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	gitem_t *item;
 #endif
 
@@ -1963,8 +1969,10 @@ static int CG_DrawPickupItem( int y ) {
 	y -= ICON_SIZE;
 
 	value = cg.itemPickup;
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(value);
+#endif
+#ifdef TA_WEAPSYS
 	if (item && item->giType == IT_WEAPON
 		&& item->giTag == WP_DEFAULT)
 	{
@@ -1978,7 +1986,7 @@ static int CG_DrawPickupItem( int y ) {
 			CG_RegisterItemVisuals( value );
 			trap_R_SetColor( fadeColor );
 			CG_DrawPic( 8, y, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 			CG_DrawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), item->pickup_name, fadeColor[0] );
 #else
 			CG_DrawBigString( ICON_SIZE + 16, y + (ICON_SIZE/2 - BIGCHAR_HEIGHT/2), bg_itemlist[ value ].pickup_name, fadeColor[0] );

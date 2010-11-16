@@ -1765,7 +1765,9 @@ void CG_DrawString( float x, float y, const char *string,
 qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
 			int shaderCharWidth, float fontKerning);
 void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const char *string, const float *setColor, qboolean forceColor,
-		qboolean noColorEscape, int drawShadow, qboolean adjustFrom640, float adjust, int limit );
+		qboolean noColorEscape, int drawShadow, qboolean adjustFrom640, float adjust, int limit, float *maxX );
+
+void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t color, const char* text, float adjust, int limit);
 
 void CG_DrawFontString( font_t *font, int x, int y, const char *s, float alpha );
 void CG_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color );
@@ -1839,7 +1841,9 @@ void CG_Draw3DModel(float x, float y, float w, float h, qhandle_t model, qhandle
 #if defined IOQ3ZTM || defined IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
 void CG_Draw3DHeadModel( int clientNum, float x, float y, float w, float h, vec3_t origin, vec3_t angles );
 #endif
+#ifndef IOQ3ZTM // FONT_REWRITE
 void CG_Text_PaintChar(float x, float y, float width, float height, float scale, float s, float t, float s2, float t2, qhandle_t hShader);
+#endif
 void CG_CheckOrderPending( void );
 const char *CG_GameTypeString( void );
 qboolean CG_YourTeamHasFlag( void );

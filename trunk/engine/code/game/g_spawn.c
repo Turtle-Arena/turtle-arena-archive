@@ -365,7 +365,7 @@ returning qfalse if not found
 qboolean G_CallSpawn( gentity_t *ent ) {
 	spawn_t	*s;
 	gitem_t	*item;
-#if defined TA_WEAPSYS || defined TA_NPCSYS
+#if defined TA_ITEMSYS || defined TA_NPCSYS
 	int i;
 #endif
 
@@ -392,7 +392,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 		}
 	} else {
 #endif
-#ifdef TA_WEAPSYS // TA_ITEMSYS
+#ifdef TA_ITEMSYS
 	// Spawn external items (including weaponGroup items)
 	for ( i = 1; i < BG_NumItems(); i++ ) {
 		item = &bg_iteminfo[i];
@@ -404,7 +404,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
-	
+
 	// ZTM: TODO: Readd internal bg_itemlist?
 #else
 #ifdef TA_WEAPSYS

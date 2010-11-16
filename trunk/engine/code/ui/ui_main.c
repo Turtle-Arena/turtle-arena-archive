@@ -5210,8 +5210,8 @@ void _UI_Init( qboolean inGameLoad ) {
 
 	UI_RegisterCvars();
 	UI_InitMemory();
-#ifdef TA_WEAPSYS
-	BG_InitWeaponInfo();
+#ifdef TA_ITEMSYS
+	BG_InitItemInfo();
 #endif
 
 	// cache redundant calulations

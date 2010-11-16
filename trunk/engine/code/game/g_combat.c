@@ -186,7 +186,7 @@ void TossClientItems( gentity_t *self ) {
 			weapon = WP_NONE;
 		}
 	}
-#endif // TA_WEWAPONS3
+#endif // !TA_WEAPSYS_EX
 
 #ifdef TA_WEAPSYS_EX
 	// ZTM: Drop valid selected weapon to drop
@@ -228,10 +228,10 @@ void TossClientItems( gentity_t *self ) {
 
 			// Don't have corpse hold dropped weapon
 			self->s.weapon = self->client->ps.weapon = WP_NONE;
-		}
 #else
-		Drop_Item( self, item, 0 );
+			Drop_Item( self, item, 0 );
 #endif
+		}
 	}
 
 #ifdef TA_HOLDSYS
@@ -1109,10 +1109,14 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 	{
 		vec3_t      center;
 
+#ifdef TA_MISC // MATERIALS
 		surfaceFlags = targ->deathMaterial;
 		if (surfaceFlags == 0) {
 			return;
 		}
+#else
+		surfaceFlags = -1;
+#endif
 
 		// Find the center of the brush
 		VectorAdd(targ->r.mins, size, center);
@@ -1130,10 +1134,14 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 	}
 	else
 	{
+#ifdef TA_MISC // MATERIALS
 		surfaceFlags = targ->damageMaterial;
 		if (surfaceFlags == 0) {
 			return;
 		}
+#else
+		surfaceFlags = -1;
+#endif
 
 		tent = G_TempEntity( point, EV_SPAWN_DEBRIS );
 		VectorInverse(dir);
@@ -1147,10 +1155,14 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 	// only use small size debris if not exploding
 	if (targ->health > 0 && inflictor->s.weapon != WP_NONE)
 	{
+#ifdef TA_WEAPSYS
 		if (inflictor->s.eType == ET_MISSILE)
 			tent->s.otherEntityNum = bg_projectileinfo[inflictor->s.weapon].hitMarkRadius;
 		else if (inflictor == attacker && inflictor->client) // Melee damage
 			tent->s.otherEntityNum = bg_weapongroupinfo[inflictor->s.weapon].weapon[0]->impactMarkRadius;
+#else
+		// ZTM: TODO: Support non-TA_WEAPSYS weapons here?
+#endif
 	}
 
 	if (!tent->s.otherEntityNum)
@@ -1269,7 +1281,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	if ( attacker->client && attacker != targ ) {
 		max = attacker->client->ps.stats[STAT_MAX_HEALTH];
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 		if( BG_ItemForItemNum(attacker->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[attacker->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )

@@ -1350,6 +1350,7 @@ static void CG_DrawGameType(rectDef_t *rect, float scale, vec4_t color, qhandle_
 	CG_Text_Paint(rect->x, rect->y + rect->h, scale, color, CG_GameTypeString(), 0, 0, textStyle);
 }
 
+#ifndef IOQ3ZTM // FONT_REWRITE
 static void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t color, const char* text, float adjust, int limit) {
   int len, count;
 	vec4_t newColor;
@@ -1404,6 +1405,7 @@ static void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4
   }
 
 }
+#endif
 
 
 

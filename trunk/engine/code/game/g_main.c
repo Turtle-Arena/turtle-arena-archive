@@ -718,8 +718,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 #ifdef TA_NPCSYS
 	ClearRegisteredNPCs();
 #endif
-#ifdef TA_WEAPSYS
-	BG_InitWeaponInfo();
+#ifdef TA_ITEMSYS
+	BG_InitItemInfo();
 #endif
 #ifdef TA_ENTSYS // MISC_OBJECT
 	BG_InitObjectConfig();

@@ -704,12 +704,15 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 		VectorScale(pos1, 0.5f, pos2);
 		VectorAdd(pos2, self->r.absmin, origin);
 
+#ifdef TA_WEAPSYS
 		if (Q_stricmp(self->message, "weapon_random") == 0) {
 			// weapon_random: Change item!
 			if (!(self->s.eFlags & EF_VOTED) && !self->item) {
 				self->item = G_RandomWeaponItem(self, self->spawnflags>>7);
 			}
-		} else {
+		} else
+#endif
+		{
 			self->item = BG_FindItemForClassname(self->message);
 		}
 

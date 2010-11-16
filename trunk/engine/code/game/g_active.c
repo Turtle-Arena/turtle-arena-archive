@@ -542,7 +542,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #ifndef TURTLEARENA // POWERS // Guards having health regen makes them pretty much unkillable, and removed regen powerup.
 		// regenerate
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 		if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -603,7 +603,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #endif
 	}
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
 #else
 	if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )
@@ -1356,7 +1356,7 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( BG_ItemForItemNum(client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( bg_itemlist[client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -2176,7 +2176,7 @@ void ClientEndFrame( gentity_t *ent ) {
 
 #ifdef MISSIONPACK
 	// set powerup for player animation
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -2184,7 +2184,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_GUARD] = level.time;
 	}
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -2192,7 +2192,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_SCOUT] = level.time;
 	}
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_DOUBLER )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_DOUBLER )
@@ -2200,7 +2200,7 @@ void ClientEndFrame( gentity_t *ent ) {
 	{
 		ent->client->ps.powerups[PW_DOUBLER] = level.time;
 	}
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if( BG_ItemForItemNum(ent->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_AMMOREGEN )
 #else
 	if( bg_itemlist[ent->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_AMMOREGEN )

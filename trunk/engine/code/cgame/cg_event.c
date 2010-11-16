@@ -427,7 +427,7 @@ static void CG_UseItem( centity_t *cent ) {
 	es = &cent->currentState;
 	
 	itemNum = (es->event & ~EV_EVENT_BITS) - EV_USE_ITEM0;
-#ifdef TA_WEAPSYS // TA_ITEMSYS
+#ifdef TA_ITEMSYS
 	if ( itemNum < 0 || itemNum > BG_NumHoldableItems() )
 #else
 	if ( itemNum < 0 || itemNum > HI_NUM_HOLDABLE )
@@ -510,10 +510,10 @@ A new item was picked up this frame
 ================
 */
 static void CG_ItemPickup( int itemNum ) {
-#if defined TA_WEAPSYS || defined TA_HOLDSYS || defined TURTLEARENA // NIGTHS_ITEMS
+#if defined TA_ITEMSYS || defined TA_HOLDSYS || defined TURTLEARENA // NIGTHS_ITEMS
 	gitem_t *item;
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
 	item = &bg_itemlist[itemNum];
@@ -548,7 +548,7 @@ static void CG_ItemPickup( int itemNum ) {
 	}
 #endif
 	// see if it should be the grabbed weapon
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	if ( item->giType == IT_WEAPON )
 #else
 	if ( bg_itemlist[itemNum].giType == IT_WEAPON )
@@ -559,6 +559,8 @@ static void CG_ItemPickup( int itemNum ) {
 		// always switch
 #elif defined TA_WEAPSYS || defined IOQ3ZTM
 		if ( cg_autoswitch.integer )
+#elif defined TA_ITEMSYS
+		if ( cg_autoswitch.integer && item->giTag != WP_MACHINEGUN )
 #else
 		if ( cg_autoswitch.integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN )
 #endif
@@ -567,7 +569,7 @@ static void CG_ItemPickup( int itemNum ) {
 			cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
 #else
 			cg.weaponSelectTime = cg.time;
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 			cg.weaponSelect = item->giTag;
 #else
 			cg.weaponSelect = bg_itemlist[itemNum].giTag;
@@ -943,7 +945,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 			if ( index < 1 || index >= BG_NumItems() )
 #else
 			if ( index < 1 || index >= bg_numItems )
@@ -951,7 +953,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			{
 				break;
 			}
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 			item = BG_ItemForItemNum(index);
 #else
 			item = &bg_itemlist[ index ];
@@ -1004,7 +1006,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			index = es->eventParm;		// player predicted
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 			if ( index < 1 || index >= BG_NumItems() )
 #else
 			if ( index < 1 || index >= bg_numItems )
@@ -1012,7 +1014,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			{
 				break;
 			}
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 			item = BG_ItemForItemNum(index);
 #else
 			item = &bg_itemlist[ index ];
@@ -1376,7 +1378,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		}
 #elif defined IOQ3ZTM // ATTACH_RAIL_TO_FLASH
 		if (es->clientNum < MAX_CLIENTS && es->generic1 == 1) {
-			VectorCopy(cg_entities[es->clientNum].pe.flashOrigin, es->origin2)
+			VectorCopy(cg_entities[es->clientNum].pe.flashOrigin, es->origin2);
 			es->origin2[2] += 4;
 		}
 #endif

@@ -277,7 +277,7 @@ static void CG_TouchItem( centity_t *cent ) {
 		return;		// can't hold it
 	}
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(cent->currentState.modelindex);
 #else
 	item = &bg_itemlist[ cent->currentState.modelindex ];

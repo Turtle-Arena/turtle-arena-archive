@@ -558,7 +558,7 @@ static void Prepname( int index ) {
 	Q_CleanStr( name );
 	len = strlen( name );
 
-	while( len && UI_ProportionalStringWidth( name ) > 256 ) {
+	while( len && UI_ProportionalStringWidth( name, 0 ) > 256 ) {
 		len--;
 		name[len] = 0;
 	}

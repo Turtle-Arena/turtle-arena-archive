@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "bg_misc.h"
 
-#ifndef TA_WEAPSYS // TA_ITEMSYS
+#ifndef TA_ITEMSYS
 /*QUAKED item_***** ( 0 0 0 ) (-16 -16 -16) (16 16 16) suspended
 DO NOT USE THIS CLASS, IT JUST HOLDS GENERAL INFORMATION.
 The suspended flag will allow items to hang in the air, otherwise they are dropped to the next surface.
@@ -1525,18 +1525,21 @@ materialInfo_t materialInfo[NUM_MATERIAL_TYPES] = {
 };
 #endif
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
+static qboolean bg_itemsys_init = qfalse;
+
 bg_iteminfo_t bg_iteminfo[MAX_ITEMS];
+static int bg_numitems = 0;
+static int bg_numholdables = 0;
+
+#ifdef TA_WEAPSYS
 bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
-static qboolean bg_weaponsys_init = qfalse;
-static int bg_numitems = 0; // NOTE: Not bg_numItems
 static int bg_numprojectiles = 0;
 static int bg_numweapons = 0;
 static int bg_numweapongroups = 0;
-
-static int bg_numholdables = 0;
+#endif
 
 // These are in game, cgame, and ui, but not in bg - so its okay to use here...
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
@@ -1546,6 +1549,70 @@ void	trap_FS_FCloseFile( fileHandle_t f );
 //#ifndef CGAME // FIXME
 int		trap_FS_GetFileList( const char *path, const char *extension, char *listbuf, int bufsize );
 //#endif
+
+int BG_ItemNumForItem( bg_iteminfo_t *item )
+{
+	if (!item)
+	{
+		//Com_Printf("DEBUG: Returning type:NULL itemNum:0\n");
+		return 0;
+	}
+
+	// If address is in bg_iteminfo
+	if ((item - bg_iteminfo) < bg_numitems
+		&& (item - bg_iteminfo) >= 0)
+	{
+		//Com_Printf("DEBUG: Returning type:gitem itemNum:%d\n", (item - bg_iteminfo));
+		return (int)(item - bg_iteminfo);
+	}
+
+	// Failed
+	//Com_Printf("DEBUG: Returning type:unknown itemNum:0\n");
+	return 0;
+}
+
+bg_iteminfo_t *BG_ItemForItemNum( int itemnum )
+{
+	if (itemnum >= 0 && itemnum < bg_numitems)
+		return &bg_iteminfo[itemnum];
+
+	return &bg_iteminfo[0]; // Can't return NULL.
+}
+
+int BG_ItemIndexForName(const char *classname)
+{
+	int i;
+	for (i = 0; i < MAX_ITEMS; i++)
+	{
+		if ( !Q_stricmp( bg_iteminfo[i].classname, classname))
+		{
+			return i;
+		}
+	}
+
+	return 0;
+}
+
+int BG_NumItems(void)
+{
+	if (bg_itemsys_init)
+	{
+		return bg_numitems;
+	}
+	else
+	{
+		// BG_GetFreeItemNum
+		int i;
+		for (i = 0; i < MAX_ITEMS; i++)
+		{
+			if ( bg_iteminfo[i].classname[0] != '\0' )
+				continue;
+			break;
+		}
+		bg_numitems = i+1;
+		return i;
+	}
+}
 
 int BG_NumHoldableItems(void)
 {
@@ -1580,20 +1647,7 @@ int BG_ProjectileIndexForHoldable(int holdable)
 }
 #endif
 
-int BG_ItemIndexForName(const char *classname)
-{
-	int i;
-	for (i = 0; i < MAX_ITEMS; i++)
-	{
-		if ( !Q_stricmp( bg_iteminfo[i].classname, classname))
-		{
-			return i;
-		}
-	}
-
-	return 0;
-}
-
+#ifdef TA_WEAPSYS
 int BG_ProjectileIndexForName(const char *name)
 {
 	int i;
@@ -1636,30 +1690,9 @@ int BG_WeaponGroupIndexForName(const char *name)
 	return 0;
 }
 
-int BG_NumItems(void)
-{
-	if (bg_weaponsys_init)
-	{
-		return bg_numitems;
-	}
-	else
-	{
-		// BG_GetFreeItemNum
-		int i;
-		for (i = 0; i < MAX_ITEMS; i++)
-		{
-			if ( bg_iteminfo[i].classname[0] != '\0' )
-				continue;
-			break;
-		}
-		bg_numitems = i+1;
-		return i;
-	}
-}
-
 int BG_NumProjectiles(void)
 {
-	if (bg_weaponsys_init)
+	if (bg_itemsys_init)
 	{
 		return bg_numprojectiles;
 	}
@@ -1681,7 +1714,7 @@ int BG_NumProjectiles(void)
 
 int BG_NumWeapons(void)
 {
-	if (bg_weaponsys_init)
+	if (bg_itemsys_init)
 	{
 		return bg_numweapons;
 	}
@@ -1702,7 +1735,7 @@ int BG_NumWeapons(void)
 
 int BG_NumWeaponGroups(void)
 {
-	if (bg_weaponsys_init)
+	if (bg_itemsys_init)
 	{
 		return bg_numweapongroups;
 	}
@@ -1720,6 +1753,7 @@ int BG_NumWeaponGroups(void)
 		return i;
 	}
 }
+#endif
 
 #define PARSE_STRING(_token, _name, _out) \
 		if ( !Q_stricmp( _token, _name ) ) { \
@@ -1799,6 +1833,31 @@ const char *it_names[] =
 	"IT_TEAM",
 	NULL
 };
+
+#ifndef TA_WEAPSYS
+const char *weapon_names[WP_NUM_WEAPONS+1] =
+{
+	"WP_NONE",
+
+	"WP_GAUNTLET",
+	"WP_MACHINEGUN",
+	"WP_SHOTGUN",
+	"WP_GRENADE_LAUNCHER",
+	"WP_ROCKET_LAUNCHER",
+	"WP_LIGHTNING",
+	"WP_RAILGUN",
+	"WP_PLASMAGUN",
+	"WP_BFG",
+	"WP_GRAPPLING_HOOK",
+#ifdef MISSIONPACK
+	"WP_NAILGUN",
+	"WP_PROX_LAUNCHER",
+	"WP_CHAINGUN",
+#endif
+
+	NULL
+};
+#endif
 
 // ZTM: Hmm... I believe this shows my insanity quite well.
 const char *holdable_names[HI_NUM_HOLDABLE+1] =
@@ -1880,7 +1939,7 @@ const char *powerup_names[PW_NUM_POWERUPS+1] =
 	NULL
 };
 
-static qboolean Item_Parse(char **p) {
+static qboolean ItemInfo_Parse(char **p) {
 	char *token;
 	bg_iteminfo_t item;
 	int i;
@@ -1960,11 +2019,26 @@ static qboolean Item_Parse(char **p) {
 			{
 				case IT_WEAPON:
 				case IT_AMMO:
+#ifdef TA_WEAPSYS
 					num = BG_WeaponGroupIndexForName(token);
 					if (num) {
 						item.giTag = num;
 						continue;
 					}
+#else
+					num = -1;
+					for (i = 0; weapon_names[i] != NULL; i++)
+					{
+						if ( !Q_stricmp( token, weapon_names[i] ) ) {
+							num = i;
+							break;
+						}
+					}
+					if (num != -1) {
+						item.giTag = num;
+						continue;
+					}
+#endif
 					break;
 
 				case IT_HOLDABLE:
@@ -2016,6 +2090,7 @@ static qboolean Item_Parse(char **p) {
 	return qfalse;
 }
 
+#ifdef TA_WEAPSYS
 //projectile trail types
 const char *pt_names[] =
 {
@@ -3194,7 +3269,6 @@ static qboolean WeaponGroup_Parse(char **p) {
 			// Copy to weapon group info
 			Com_Memcpy(&bg_weapongroupinfo[num], &weaponGroup, sizeof (weaponGroup));
 
-#ifdef TA_WEAPSYS // TA_ITEMSYS
 			// Set weapon group number
 			weaponItem.giTag = num;
 
@@ -3211,14 +3285,6 @@ static qboolean WeaponGroup_Parse(char **p) {
 
 			// Copy to weapon group info
 			Com_Memcpy(&bg_iteminfo[num], &weaponItem, sizeof (weaponItem));
-#else
-			// Setup item pointers (Must do after copy to bg_weapongroupinfo)
-			bg_weapongroupinfo[num].item.classname = bg_weapongroupinfo[num].itemName;
-			bg_weapongroupinfo[num].item.pickup_sound = bg_weapongroupinfo[num].pickupSound;
-			bg_weapongroupinfo[num].item.world_model[0] = bg_weapongroupinfo[num].pickupModel;
-			bg_weapongroupinfo[num].item.icon = bg_weapongroupinfo[num].iconName;
-			bg_weapongroupinfo[num].item.pickup_name = bg_weapongroupinfo[num].pickupName;
-#endif
 
 			//Com_Printf("Loaded weapon group [%s]\n", weaponGroup.name);
 			return qtrue;
@@ -3259,7 +3325,7 @@ static qboolean WeaponGroup_Parse(char **p) {
 			}
 			weaponGroup.randomSpawn = atoi( token );
 			continue;
-		// ITEM START: ZTM: TODO: Use Item_Parse?
+		// ITEM START: ZTM: TODO: Use ItemInfo_Parse?
 		} else if ( !Q_stricmp( token, "itemName" ) ) {
 			token = COM_Parse( p );
 			if ( !*token ) {
@@ -3350,13 +3416,14 @@ static qboolean WeaponGroup_Parse(char **p) {
 	}
 	return qfalse;
 }
+#endif
 
 /*
 ======================
-BG_ParseWeaponInfoFile
+BG_ParseItemInfoFile
 ======================
 */
-qboolean BG_ParseWeaponInfoFile( const char *filename ) {
+qboolean BG_ParseItemInfoFile( const char *filename ) {
 	char		*text_p;
 	int			len;
 	char		*token;
@@ -3389,10 +3456,11 @@ qboolean BG_ParseWeaponInfoFile( const char *filename ) {
 		}
 
 		if ( Q_stricmp( token, "item" ) == 0 ) {
-			if (!Item_Parse(&text_p))
+			if (!ItemInfo_Parse(&text_p))
 			{
 				break;
 			}
+#ifdef TA_WEAPSYS
 		} else if ( Q_stricmp( token, "projectile" ) == 0 ) {
 			if (!Projectile_Parse(&text_p))
 			{
@@ -3408,6 +3476,7 @@ qboolean BG_ParseWeaponInfoFile( const char *filename ) {
 			{
 				break;
 			}
+#endif
 		} else {
 			Com_Printf( "unknown token '%s' in %s\n", token, filename );
 		}
@@ -3416,7 +3485,7 @@ qboolean BG_ParseWeaponInfoFile( const char *filename ) {
 	return qtrue;
 }
 
-#if 0
+#if 0 // TA_WEAPSYS
 // ZTM: Weapon info debuging tool
 void BG_DumpWeaponInfo(void)
 {
@@ -3633,10 +3702,10 @@ void BG_DumpWeaponInfo(void)
 
 /*
 =========
-BG_InitWeaponInfo
+BG_InitItemInfo
 =========
 */
-void BG_InitWeaponInfo(void)
+void BG_InitItemInfo(void)
 {
 	int			numdirs;
 	char		filename[128];
@@ -3645,11 +3714,13 @@ void BG_InitWeaponInfo(void)
 	int			i;
 	int			dirlen;
 
-	if (bg_weaponsys_init)
+	if (bg_itemsys_init)
 		return;
 
 	// Clear Data
 	Com_Memset(bg_iteminfo, 0, sizeof (bg_iteminfo));
+
+#ifdef TA_WEAPSYS
 	Com_Memset(bg_projectileinfo, 0, sizeof (bg_projectileinfo));
 	Com_Memset(bg_weaponinfo, 0, sizeof (bg_weaponinfo));
 	Com_Memset(bg_weapongroupinfo, 0, sizeof (bg_weapongroupinfo));
@@ -3674,10 +3745,13 @@ void BG_InitWeaponInfo(void)
 	// WP_NONE
 	BG_SetupWeaponGroup(&bg_weapongroupinfo[0], &bg_iteminfo[0], "wp_none", 0);
 	strcpy(bg_iteminfo[0].pickup_name, "None");
+#endif
 
 	// Load main data files
-	BG_ParseWeaponInfoFile("scripts/iteminfo.txt");
-	BG_ParseWeaponInfoFile("scripts/weaponinfo.txt");
+	BG_ParseItemInfoFile("scripts/iteminfo.txt");
+#ifdef TA_WEAPSYS
+	BG_ParseItemInfoFile("scripts/weaponinfo.txt");
+#endif
 
 	// Load all weapons from .item files
 	numdirs = trap_FS_GetFileList("scripts", ".item", dirlist, 1024 );
@@ -3686,9 +3760,10 @@ void BG_InitWeaponInfo(void)
 		dirlen = strlen(dirptr);
 		strcpy(filename, "scripts/");
 		strcat(filename, dirptr);
-		BG_ParseWeaponInfoFile(filename);
+		BG_ParseItemInfoFile(filename);
 	}
 
+#ifdef TA_WEAPSYS
 	// Load all weapons from .weap files
 	numdirs = trap_FS_GetFileList("scripts", ".weap", dirlist, 1024 );
 	dirptr  = dirlist;
@@ -3696,7 +3771,7 @@ void BG_InitWeaponInfo(void)
 		dirlen = strlen(dirptr);
 		strcpy(filename, "scripts/");
 		strcat(filename, dirptr);
-		BG_ParseWeaponInfoFile(filename);
+		BG_ParseItemInfoFile(filename);
 	}
 
 	// Missing weapon info, avoid crashing or other errors.
@@ -3734,11 +3809,12 @@ void BG_InitWeaponInfo(void)
 		bg_weapongroupinfo[1].weapon[0] = &bg_weaponinfo[1];
 		bg_numweapongroups = 2;
 	}
+#endif
 
-	// Done setting up the weapon system.
-	bg_weaponsys_init = qtrue;
+	// Done setting up the item system.
+	bg_itemsys_init = qtrue;
 
-#if 0
+#if 0 // TA_WEAPSYS
 	// So I can see if it is loading correctly.
 	BG_DumpWeaponInfo();
 #endif
@@ -3751,7 +3827,9 @@ void BG_InitWeaponInfo(void)
 		}
 	}
 }
+#endif
 
+#ifdef TA_WEAPSYS
 /*
 =================
 BG_PlayerRunning
@@ -4515,7 +4593,7 @@ Returns 0 if not found.
 */
 int BG_ItemNumForHoldableNum(holdable_t holdablenum)
 {
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	gitem_t	*it;
 	int i;
 
@@ -4551,7 +4629,7 @@ BG_FindItemForPowerup
 ==============
 */
 gitem_t	*BG_FindItemForPowerup( powerup_t pw ) {
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	gitem_t	*it;
 	int i;
 
@@ -4591,7 +4669,7 @@ BG_FindItemForHoldable
 ==============
 */
 gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	gitem_t	*it;
 	int i;
 
@@ -4614,7 +4692,7 @@ gitem_t	*BG_FindItemForHoldable( holdable_t pw ) {
 	}
 #endif
 
-#ifndef TA_WEAPSYS // TA_ITEMSYS
+#ifndef TA_ITEMSYS
 	Com_Error( ERR_DROP, "HoldableItem not found" );
 #endif
 
@@ -4629,7 +4707,7 @@ BG_FindItemForWeapon
 ===============
 */
 gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	gitem_t	*it;
 	int i;
 
@@ -4648,7 +4726,7 @@ gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
 		}
 	}
 
-#ifndef TA_WEAPSYS // TA_ITEMSYS
+#ifndef TA_ITEMSYS
 	Com_Error( ERR_DROP, "Couldn't find item for weapon %i", weapon);
 #endif
 	return NULL;
@@ -4661,7 +4739,7 @@ BG_FindItem
 ===============
 */
 gitem_t	*BG_FindItem( const char *pickupName ) {
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	gitem_t	*it;
 	int i;
 
@@ -4689,7 +4767,7 @@ BG_FindItemForClassname
 ===============
 */
 gitem_t	*BG_FindItemForClassname( const char *classname ) {
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	gitem_t	*it;
 	int i;
 
@@ -4708,37 +4786,6 @@ gitem_t	*BG_FindItemForClassname( const char *classname ) {
 	}
 
 	return NULL;
-}
-#endif
-
-#ifdef TA_WEAPSYS
-int BG_ItemNumForItem( bg_iteminfo_t *item )
-{
-	if (!item)
-	{
-		//Com_Printf("DEBUG: Returning type:NULL itemNum:0\n");
-		return 0;
-	}
-
-	// If address is in bg_iteminfo
-	if ((item - bg_iteminfo) < bg_numitems
-		&& (item - bg_iteminfo) >= 0)
-	{
-		//Com_Printf("DEBUG: Returning type:gitem itemNum:%d\n", (item - bg_iteminfo));
-		return (int)(item - bg_iteminfo);
-	}
-
-	// Failed
-	//Com_Printf("DEBUG: Returning type:unknown itemNum:0\n");
-	return 0;
-}
-
-bg_iteminfo_t *BG_ItemForItemNum( int itemnum )
-{
-	if (itemnum >= 0 && itemnum < bg_numitems)
-		return &bg_iteminfo[itemnum];
-
-	return &bg_iteminfo[0]; // Can't return NULL.
 }
 #endif
 
@@ -4784,7 +4831,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	int		upperBound;
 #endif
 
-#ifdef TA_WEAPSYS // TA_ITEMSYS
+#ifdef TA_ITEMSYS
 	if ( ent->modelindex < 0 || ent->modelindex >= BG_NumItems() )
 #else
 	if ( ent->modelindex < 1 || ent->modelindex >= bg_numItems )
@@ -4793,7 +4840,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: index out of range" );
 	}
 
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(ent->modelindex);
 #else
 	item = &bg_itemlist[ent->modelindex];
@@ -4880,7 +4927,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 #ifndef TURTLEARENA // NOARMOR
 	case IT_ARMOR:
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 		if( BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT )
 #else
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT )
@@ -4890,7 +4937,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		}
 
 		// we also clamp armor to the maxhealth for handicapping
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 		if( BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -4917,7 +4964,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 		// small and mega healths will go over the max, otherwise
 		// don't pick up if already at max
 #ifdef MISSIONPACK
-#ifdef TA_WEAPSYS
+#ifdef TA_ITEMSYS
 		if( BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
 		if( bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
@@ -4944,8 +4991,13 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 
 	case IT_POWERUP:
 #if defined IOQ3ZTM && defined MISSIONPACK // Scout overrides haste, so don't pick it up.
-		if (BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT
-			&& item->giTag == PW_HASTE)
+		if (item->giTag == PW_HASTE &&
+#ifdef TA_ITEMSYS
+			BG_ItemForItemNum(ps->stats[STAT_PERSISTANT_POWERUP])->giTag == PW_SCOUT
+#else
+			bg_itemlist[ps->stats[STAT_PERSISTANT_POWERUP]].giTag == PW_SCOUT
+#endif
+			)
 		{
 			return qfalse;
 		}
@@ -6470,7 +6522,9 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 				continue;
 			playercfg->fixedtorso = qtrue;
 			continue;
-		} else if ( !Q_stricmp( token, "primaryHand" ) ) {
+		}
+#ifdef TA_WEAPSYS
+		else if ( !Q_stricmp( token, "primaryHand" ) ) {
 			token = COM_Parse( &text_p );
 			if ( !*token ) {
 				break;
@@ -6488,6 +6542,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			}
 			continue;
 		}
+#endif
 
 		//
 		// Support Elite Force soundpath keyword
@@ -6952,7 +7007,7 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 		}
 	}
 
-#if defined IOQ3ZTM && (defined QAGAME || defined CGAME) // LASERTAG
+#if defined IOQ3ZTM && defined TA_WEAPSYS && (defined QAGAME || defined CGAME) // LASERTAG
 	{
 #ifdef QAGAME
 		extern vmCvar_t g_laserTag;
