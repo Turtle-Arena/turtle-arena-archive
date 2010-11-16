@@ -2609,6 +2609,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	int					i;
 	clientInfo_t		*ci;
 	qboolean			foundModel;
+	vec3_t				flashColor;
 #ifdef TA_PLAYERS
 	char *newTagNames[3] = { "tag_hand_primary", "tag_hand_secondary", NULL };
 #endif
@@ -2997,11 +2998,30 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		angles[ROLL] = crandom() * 10;
 		AnglesToAxis( angles, flash.axis );
 
-#ifdef TA_WEAPSYS // ZTM: Do it for all weapons...
-		// colorize the flash
-		flash.shaderRGBA[0] = 255 * ci->color1[0];
-		flash.shaderRGBA[1] = 255 * ci->color1[1];
-		flash.shaderRGBA[2] = 255 * ci->color1[2];
+#ifdef TA_WEAPSYS
+		// color1
+		if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0] == (float)'c'
+			&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1] == 1.0f
+			&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2] == 0.0f)
+		{
+			VectorCopy(ci->color1, flashColor);
+		}
+		//color2
+		else if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0] == (float)'c'
+			&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1] == 2.0f
+			&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2] == 0.0f)
+		{
+			VectorCopy(ci->color2, flashColor);
+		}
+		else
+		{
+			VectorCopy(cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor, flashColor);
+		}
+
+		// colorize the flash, using color of the flash dlight!
+		flash.shaderRGBA[0] = 255 * flashColor[0];
+		flash.shaderRGBA[1] = 255 * flashColor[1];
+		flash.shaderRGBA[2] = 255 * flashColor[2];
 #else
 		// colorize the railgun blast
 		if ( weaponNum == WP_RAILGUN )
@@ -3057,30 +3077,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			flashDLight = 300 + (rand()&31);
 #endif
 #ifdef TA_WEAPSYS
-			// color1
-			if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0] == (float)'c'
-				&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1] == 1.0f
-				&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2] == 0.0f)
-			{
+			if ( flashColor[0] || flashColor[1] || flashColor[2] ) {
 				trap_R_AddLightToScene( flash.origin, flashDLight,
-					ci->color1[0], ci->color1[1], ci->color1[2] );
-			}
-			//color2
-			else if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0] == (float)'c'
-				&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1] == 2.0f
-				&& cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2] == 0.0f)
-			{
-				trap_R_AddLightToScene( flash.origin, flashDLight,
-					ci->color2[0], ci->color2[1], ci->color2[2] );
-			}
-			else if (cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0]
-				|| cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1]
-				|| cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2])
-			{
-				trap_R_AddLightToScene( flash.origin, flashDLight,
-					cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[0],
-					cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[1],
-					cg_weapons[weaponGroup->weaponnum[i]].flashDlightColor[2] );
+					flashColor[0], flashColor[1], flashColor[2] );
 			}
 #else
 			if ( weapon->flashDlightColor[0] || weapon->flashDlightColor[1] || weapon->flashDlightColor[2] ) {
