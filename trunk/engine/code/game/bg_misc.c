@@ -1547,12 +1547,12 @@ void	trap_FS_FCloseFile( fileHandle_t f );
 int		trap_FS_GetFileList( const char *path, const char *extension, char *listbuf, int bufsize );
 //#endif
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 int BG_NumHoldableItems(void)
 {
 	return bg_numholdables;
 }
 
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 int BG_ProjectileIndexForHoldable(int holdable)
 {
 	int projnum;
