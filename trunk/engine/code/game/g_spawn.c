@@ -393,7 +393,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 	} else {
 #endif
 #ifdef TA_ITEMSYS
-	// Spawn external items (including weaponGroup items)
+	// check item spawn functions
 	for ( i = 1; i < BG_NumItems(); i++ ) {
 		item = &bg_iteminfo[i];
 		if ( item->classname[0] == '\0' ) {
@@ -404,21 +404,7 @@ qboolean G_CallSpawn( gentity_t *ent ) {
 			return qtrue;
 		}
 	}
-
-	// ZTM: TODO: Readd internal bg_itemlist?
 #else
-#ifdef TA_WEAPSYS
-	// ZTM: NOTE: Placed before items so if weapon is on both list
-	//                    uses external item.
-	// check weapon item spawn functions
-	for ( i = 1; i < BG_NumWeaponGroups(); i++ ) {
-		if ( !strcmp(bg_weapongroupinfo[i].item->classname, ent->classname) ) {
-			G_SpawnItem( ent, bg_weapongroupinfo[i].item );
-			return qtrue;
-		}
-	}
-#endif
-
 	// check item spawn functions
 	for ( item=bg_itemlist+1 ; item->classname ; item++ ) {
 		if ( !strcmp(item->classname, ent->classname) ) {
