@@ -186,7 +186,7 @@ Note: There are more announcer files with the per-gametype sounds.
     * TEMP: invul.md3  Invulnerability - TODO: White sphere?
 
 == MISSIONPACK CTF flags ==
-  * Animations Need Work: models/flag2/flagflap3.md3
+  * DONE: models/flag2/flagflap3.md3
   * TEMP: models/mapobjects/flagbase/red_base.md3
   * TEMP: models/mapobjects/flagbase/blue_base.md3
   * TEMP: models/mapobjects/flagbase/ntrl_base.md3

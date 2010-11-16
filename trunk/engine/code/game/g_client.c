@@ -2466,7 +2466,7 @@ void SP_nights_target( gentity_t *ent )
 	ent->touch = Capture_Touch;
 
 	if (!ent->health) {
-		ent->health = 3; // ZTM: FIXME: Should be 20, changed to 3 as the test map only has 3 spheres per-mare
+		ent->health = 20;
 	}
 
 	// Tempory model

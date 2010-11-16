@@ -279,8 +279,7 @@ Most of the mapobjects should be damageable.
     * http://virtualworlds.wikia.com
 
 == Players ==
-  * TODO: Raph and Casey really need to /swing/ the melee weapons.
-    * Casey's swinging isn't that bad, but raph_v8's swinging sure is.
+  * TODO: Casey really needs to /swing/ the melee weapons.
 
   * TODO: Set looping in don, raph, mike, and casey mm3d models and re-export
 
