@@ -351,16 +351,7 @@ CG_Draw3DModel
 
 ================
 */
-#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
 void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles )
-{
-	CG_Draw3DModelExt(x, y, w, h, model, skin, origin, angles, 0.0f);
-}
-
-void CG_Draw3DModelExt( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles, float skinFraction )
-#else
-void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles )
-#endif
 {
 	refdef_t		refdef;
 	refEntity_t		ent;
@@ -378,9 +369,6 @@ void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandl
 	VectorCopy( origin, ent.origin );
 	ent.hModel = model;
 	ent.customSkin = skin;
-#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-	ent.skinFraction = skinFraction;
-#endif
 	ent.renderfx = RF_NOSHADOW;		// no stencil shadows
 
 	refdef.rdflags = RDF_NOWORLDMODEL;
@@ -401,6 +389,63 @@ void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandl
 	trap_R_AddRefEntityToScene( &ent );
 	trap_R_RenderScene( &refdef );
 }
+
+#if defined IOQ3ZTM || defined IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+/*
+================
+CG_Draw3DHeadModel
+================
+*/
+void CG_Draw3DHeadModel( int clientNum, float x, float y, float w, float h, vec3_t origin, vec3_t angles )
+{
+	refdef_t		refdef;
+	refEntity_t		ent;
+	clientInfo_t	*ci;
+	qhandle_t		model;
+	qhandle_t		skin;
+
+	ci = &cgs.clientinfo[ clientNum ];
+
+	model = ci->headModel;
+	skin = ci->headSkin;
+
+	CG_AdjustFrom640( &x, &y, &w, &h );
+
+	memset( &refdef, 0, sizeof( refdef ) );
+
+	memset( &ent, 0, sizeof( ent ) );
+	AnglesToAxis( angles, ent.axis );
+	VectorCopy( origin, ent.origin );
+	ent.hModel = model;
+	ent.customSkin = skin;
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	ent.skinFraction = cg_entities[clientNum].currentState.skinFraction;
+#endif
+	ent.renderfx = RF_NOSHADOW;		// no stencil shadows
+
+	refdef.rdflags = RDF_NOWORLDMODEL;
+
+	AxisClear( refdef.viewaxis );
+
+	refdef.fov_x = 30;
+	refdef.fov_y = 30;
+
+	refdef.x = x;
+	refdef.y = y;
+	refdef.width = w;
+	refdef.height = h;
+
+	refdef.time = cg.time;
+
+	trap_R_ClearScene();
+#ifdef IOQ3ZTM // ZTM: Show powerups on statusbar/scoreboard head models!
+	CG_AddRefEntityWithPowerups( &ent, &cg_entities[clientNum].currentState, ci->team );
+#else
+	trap_R_AddRefEntityToScene( &ent );
+#endif
+	trap_R_RenderScene( &refdef );
+}
+#endif
 
 /*
 ================
@@ -442,11 +487,12 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 		VectorAdd( origin, ci->headOffset, origin );
 #endif
 
-#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-		CG_Draw3DModelExt( x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles, cg_entities[clientNum].currentState.skinFraction );
+#if defined IOQ3ZTM || defined IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+		CG_Draw3DHeadModel( clientNum, x, y, w, h, origin, headAngles );
 #else
 		CG_Draw3DModel( x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles );
 #endif
+
 	} else if ( cg_drawIcons.integer ) {
 		CG_DrawPic( x, y, w, h, ci->modelIcon );
 	}

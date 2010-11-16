@@ -674,8 +674,8 @@ static void CG_DrawSelectedPlayerHead( rectDef_t *rect, qboolean draw2D, qboolea
     	angles[YAW] = 180;
     	angles[ROLL] = 0;
   	
-#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-      CG_Draw3DModelExt( rect->x, rect->y, rect->w, rect->h, ci->headModel, ci->headSkin, origin, angles, cg_entities[ci-cgs.clientinfo].currentState.skinFraction );
+#if defined IOQ3ZTM || defined IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+      CG_Draw3DHeadModel( ci - cgs.clientinfo, rect->x, rect->y, rect->w, rect->h, origin, angles );
 #else
       CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h, ci->headModel, ci->headSkin, origin, angles );
 #endif
