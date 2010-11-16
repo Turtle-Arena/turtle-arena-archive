@@ -3067,6 +3067,10 @@ Also called by CG_Missile for quad rockets, but nobody can tell...
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
 #ifdef TURTLEARENA // POWERS
 	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
+#if 1 // don't force alpha
+		ent->customShader = cgs.media.playerTeleportShader;
+		trap_R_AddRefEntityToScene( ent );
+#else
 		int alpha;
 
 		if (state->otherEntityNum2 > 0) {
@@ -3083,6 +3087,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 		ent->shaderRGBA[3] = alpha;
 		ent->customShader = cgs.media.playerTeleportShader;
 		trap_R_AddRefEntityToScene( ent );
+#endif
 	} else
 #endif
 	if ( state->powerups & ( 1 << PW_INVIS ) ) {

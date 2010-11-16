@@ -2135,32 +2135,46 @@ float CG_BarrelGravityAngle(centity_t *cent, refEntity_t *gun, lerpFrame_t *lerp
 CG_AddWeaponWithPowerups
 ========================
 */
-static void CG_AddWeaponWithPowerups( refEntity_t *gun, int powerups )
+static void CG_AddWeaponWithPowerups( refEntity_t *gun, entityState_t *state )
 {
 	// add powerup effects
 #ifdef TURTLEARENA // POWERS
-	if ( powerups & ( 1 << PW_FLASHING ) ) {
-		gun->renderfx |= RF_FORCE_ENT_ALPHA;
-		gun->shaderRGBA[3] = 32;
-		trap_R_AddRefEntityToScene( gun );
-
-		gun->shaderRGBA[3] = 64;
+	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
+#if 1 // don't force alpha
 		gun->customShader = cgs.media.playerTeleportShader;
 		trap_R_AddRefEntityToScene( gun );
+#else
+		int alpha;
+
+		if (state->otherEntityNum2 > 0) {
+			// Body fad-out alpha (When dead)
+			alpha = state->otherEntityNum2;
+		} else {
+			alpha = 64;
+		}
+
+		gun->renderfx |= RF_FORCE_ENT_ALPHA;
+		gun->shaderRGBA[3] = alpha/2;
+		trap_R_AddRefEntityToScene( gun );
+
+		gun->shaderRGBA[3] = alpha;
+		gun->customShader = cgs.media.playerTeleportShader;
+		trap_R_AddRefEntityToScene( gun );
+#endif
 	} else
 #endif
-	if ( powerups & ( 1 << PW_INVIS ) ) {
+	if ( state->powerups & ( 1 << PW_INVIS ) ) {
 		gun->customShader = cgs.media.invisShader;
 		trap_R_AddRefEntityToScene( gun );
 	} else {
 		trap_R_AddRefEntityToScene( gun );
 
 #ifndef TURTLEARENA // POWERS
-		if ( powerups & ( 1 << PW_BATTLESUIT ) ) {
+		if ( state->powerups & ( 1 << PW_BATTLESUIT ) ) {
 			gun->customShader = cgs.media.battleWeaponShader;
 			trap_R_AddRefEntityToScene( gun );
 		}
-		if ( powerups & ( 1 << PW_QUAD ) ) {
+		if ( state->powerups & ( 1 << PW_QUAD ) ) {
 			gun->customShader = cgs.media.quadWeaponShader;
 			trap_R_AddRefEntityToScene( gun );
 		}
@@ -2544,7 +2558,7 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
 				// no weapon tag
 				drawWeapon[i] = qfalse;
 			} else {
-				CG_AddWeaponWithPowerups( &gun[i], cent->currentState.powerups );
+				CG_AddWeaponWithPowerups( &gun[i], &cent->currentState );
 			}
 		}
 	}
@@ -2574,7 +2588,7 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
 			cg_weapons[weaponGroup->weaponnum[i]].weaponModel,
 			"tag_barrel" );
 
-		CG_AddWeaponWithPowerups( &barrel, cent->currentState.powerups );
+		CG_AddWeaponWithPowerups( &barrel, &cent->currentState );
 	}
 }
 #endif
@@ -2846,7 +2860,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 				continue;
 			}
 
-			CG_AddWeaponWithPowerups( &gun[i], cent->currentState.powerups );
+			CG_AddWeaponWithPowerups( &gun[i], &cent->currentState );
 
 			// MELEE_TRAIL
 			CG_AddWeaponTrail(cent, &gun[i], HAND_PRIMARY, qfalse);
@@ -2873,7 +2887,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	MatrixMultiply(lerped.axis, ((refEntity_t *)parent)->axis, gun.axis);
 	gun.backlerp = parent->backlerp;
 
-	CG_AddWeaponWithPowerups( &gun, cent->currentState.powerups );
+	CG_AddWeaponWithPowerups( &gun, &cent->currentState );
 #endif
 
 	// add the spinning barrel
@@ -2929,7 +2943,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, "tag_barrel" );
 #endif
 
-		CG_AddWeaponWithPowerups( &barrel, cent->currentState.powerups );
+		CG_AddWeaponWithPowerups( &barrel, &cent->currentState );
 
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 		CG_AddWeaponTrail(cent, &barrel, i, qtrue);
