@@ -382,3 +382,20 @@ textures/common/lightgrid
 	surfaceparm trans
 	surfaceparm lightgrid
 }
+
+
+//
+// Ladder shader (Based on shader from Smokin' Guns)
+//
+textures/common/ladder
+{
+	qer_editorimage textures/common/ladder.png
+	surfaceparm nodraw
+	surfaceparm nonsolid
+	surfaceparm nomarks
+	surfaceparm ladder
+	surfaceparm playerclip
+	qer_trans 0.40
+	surfaceparm nolightmap
+	surfaceparm noimpact
+}

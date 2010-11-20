@@ -49,6 +49,9 @@ typedef struct {
 	qboolean	walking;
 	qboolean	groundPlane;
 	trace_t		groundTrace;
+#ifdef IOQ3ZTM // LADDER
+	qboolean	ladder; // We'll use this to tell when the player is on a ladder
+#endif
 
 	float		impactSpeed;
 

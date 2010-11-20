@@ -1080,6 +1080,9 @@ typedef enum {
 	TORSO_NEGATIVE,
 
 #ifdef TA_PLAYERS // New Turtle Arena player animations
+	BOTH_LADDER,
+	BOTH_LADDER_STAND,
+
 	// Place default weapons somewhere on there person while there not used.
 	// TORSO_***DEFAULT_SECONDARY for Don should be
 	//  switching to/from two handed Bo to using one hand.
