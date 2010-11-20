@@ -1923,6 +1923,12 @@ void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t hea
 
 	// --------- pitch -------------
 
+#ifdef TA_PLAYERSYS // ZTM: If both animation don't have torso or head pitch
+	if (ent->client->pers.playercfg.animations[ ent->client->ps.torsoAnim & ~ANIM_TOGGLEBIT ].prefixType == AP_BOTH) {
+		dest = 0;
+		headAngles[PITCH] = 0;
+	} else
+#endif
 	// only show a fraction of the pitch angle in the torso
 	if ( headAngles[PITCH] > 180 ) {
 		dest = (-360 + headAngles[PITCH]) * 0.75f;

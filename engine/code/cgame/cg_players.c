@@ -1906,6 +1906,12 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 
 	// --------- pitch -------------
 
+#ifdef TA_PLAYERSYS // ZTM: If both animation don't have torso or head pitch
+	if (ci && ci->playercfg.animations[ cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT ].prefixType == AP_BOTH) {
+		dest = 0;
+		headAngles[PITCH] = 0;
+	} else
+#endif
 	// only show a fraction of the pitch angle in the torso
 	if ( headAngles[PITCH] > 180 ) {
 		dest = (-360 + headAngles[PITCH]) * 0.75f;

@@ -40,11 +40,17 @@ float	pm_stopspeed = 100.0f;
 float	pm_duckScale = 0.25f;
 float	pm_swimScale = 0.50f;
 float	pm_wadeScale = 0.70f;
+#ifdef IOQ3ZTM // LADDER
+float	pm_ladderScale = 0.80f;  // Set the max movement speed to 80% of normal
+#endif
 
 float	pm_accelerate = 10.0f;
 float	pm_airaccelerate = 1.0f;
 float	pm_wateraccelerate = 4.0f;
 float	pm_flyaccelerate = 8.0f;
+#ifdef IOQ3ZTM // LADDER
+float	pm_ladderAccelerate = 3000;  // The acceleration to friction ratio is 1:1
+#endif
 
 float	pm_friction = 6.0f;
 float	pm_waterfriction = 1.0f;
@@ -53,6 +59,9 @@ float	pm_watergroundfriction = 7.0f;
 #endif
 float	pm_flightfriction = 3.0f;
 float	pm_spectatorfriction = 5.0f;
+#ifdef IOQ3ZTM // LADDER
+float	pm_ladderfriction = 3000;  // Friction is high enough so you don't slip down
+#endif
 
 int		c_pmove = 0;
 
@@ -167,6 +176,37 @@ static void PM_ForceLegsAnim( int anim ) {
 	PM_StartLegsAnim( anim );
 }
 
+#ifdef TA_PLAYERSYS
+#if 0 // ZTM: To be used in the future
+static void PM_StartAnim( int anim ) {
+#ifdef IOQ3ZTM // Needed for TA_WEAPSYS
+	if (anim < 0) {
+		return;
+	}
+#endif
+	if (!pm->playercfg || pm->playercfg->animations[anim].prefixType & AP_TORSO) {
+		PM_StartTorsoAnim(anim);
+	}
+	if (!pm->playercfg || pm->playercfg->animations[anim].prefixType & AP_LEGS) {
+		PM_StartLegsAnim(anim);
+	}
+}
+#endif
+
+static void PM_ContinueAnim( int anim ) {
+#ifdef IOQ3ZTM // Needed for TA_WEAPSYS
+	if (anim < 0) {
+		return;
+	}
+#endif
+	if (!pm->playercfg || pm->playercfg->animations[anim].prefixType & AP_TORSO) {
+		PM_ContinueTorsoAnim(anim);
+	}
+	if (!pm->playercfg || pm->playercfg->animations[anim].prefixType & AP_LEGS) {
+		PM_ContinueLegsAnim(anim);
+	}
+}
+#endif
 
 /*
 ==================
@@ -279,6 +319,11 @@ static void PM_Friction( void ) {
 	if ( pm->ps->powerups[PW_FLIGHT]) {
 		drop += speed*pm_flightfriction*pml.frametime;
 	}
+#ifdef IOQ3ZTM // LADDER
+	else if ( pml.ladder ) {
+		drop += speed*pm_ladderfriction*pml.frametime;  // Add ladder friction!
+	}
+#endif
 
 	if ( pm->ps->pm_type == PM_SPECTATOR) {
 		drop += speed*pm_spectatorfriction*pml.frametime;
@@ -1753,6 +1798,9 @@ static void PM_Footsteps( void ) {
 #ifdef IOQ3ZTM // Swimming and flying animation fix?
 		&& !pml.groundPlane
 #endif
+#ifdef IOQ3ZTM // LADDER
+		&& !pml.ladder
+#endif
 	) {
 
 #ifndef TURTLEARENA // POWERS
@@ -1768,6 +1816,14 @@ static void PM_Footsteps( void ) {
 	}
 
 	// if not trying to move
+#if defined TA_PLAYERS && defined IOQ3ZTM // LADDER
+	if( pml.ladder) {
+		if ( !pm->cmd.forwardmove && !pm->cmd.upmove && !pm->cmd.rightmove ) {
+			PM_ContinueAnim( BOTH_LADDER_STAND );
+			return;
+		}
+	} else
+#endif
 	if ( !pm->cmd.forwardmove && !pm->cmd.rightmove ) {
 		if (  pm->xyspeed < 5 ) {
 			pm->ps->bobCycle = 0;	// start at beginning of cycle again
@@ -1811,6 +1867,12 @@ static void PM_Footsteps( void ) {
 
 	footstep = qfalse;
 
+#if defined TA_PLAYERS && defined IOQ3ZTM // LADDER
+	if(pml.ladder) {
+		bobmove = 0.3f;	// walking bobs slow
+		PM_ContinueAnim( BOTH_LADDER );
+	} else
+#endif
 	if ( pm->ps->pm_flags & PMF_DUCKED ) {
 		bobmove = 0.5;	// ducked characters bob much faster
 		if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
@@ -2905,6 +2967,135 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 }
 
 
+#ifdef IOQ3ZTM // LADDER
+/*
+===================
+PM_LadderMove()
+by: Calrathan [Arthur Tomlin]
+
+Right now all I know is that this works for VERTICAL ladders.
+Ladders with angles on them (urban2 for AQ2) haven't been tested.
+===================
+*/
+static void PM_LadderMove( void ) {
+	int i;
+	vec3_t wishvel;
+	float wishspeed;
+	vec3_t wishdir;
+	float scale;
+	float vel;
+
+	//
+	// FIRST CHECK IF THE PLAYER HAS TO BE ABLE TO WALK BACKWARDS
+	//
+	trace_t trace;
+	vec3_t origin;
+	qboolean backwards =  qfalse;
+
+	VectorCopy(pm->ps->origin, origin);
+	origin[2] -= 20;
+
+	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, origin,
+		pm->ps->clientNum, MASK_PLAYERSOLID);
+
+	if(trace.fraction < 1)
+		backwards = qtrue;
+	// CHECK END
+
+	PM_Friction ();
+
+	scale = PM_CmdScale( &pm->cmd );
+
+	// user intentions [what the user is attempting to do]
+	if ( !scale ) {
+		wishvel[0] = 0;
+		wishvel[1] = 0;
+		wishvel[2] = 0;
+	}
+	else {   // if they're trying to move... lets calculate it
+		for (i=0 ; i<3 ; i++){
+			float fw = pm->cmd.forwardmove, rt = pm->cmd.rightmove;
+			if(fw < 0 && !backwards)
+				fw = 0;
+
+			wishvel[i] = scale * pml.forward[i]*fw +
+				     scale * pml.right[i]*rt;
+		}
+		wishvel[2] = scale * (pm->cmd.forwardmove + pm->cmd.upmove);
+	}
+
+	VectorCopy (wishvel, wishdir);
+	wishspeed = VectorNormalize(wishdir);
+
+	if ( wishspeed > pm->ps->speed * pm_ladderScale ) {
+		wishspeed = pm->ps->speed * pm_ladderScale;
+	}
+
+	PM_Accelerate (wishdir, wishspeed, pm_ladderAccelerate);
+
+	// This SHOULD help us with sloped ladders, but it remains untested.
+	if ( pml.groundPlane && DotProduct( pm->ps->velocity,
+		pml.groundTrace.plane.normal ) < 0 ) {
+		vel = VectorLength(pm->ps->velocity);
+		// slide along the ground plane [the ladder section under our feet]
+		PM_ClipVelocity (pm->ps->velocity, pml.groundTrace.plane.normal,
+			pm->ps->velocity, OVERCLIP );
+
+		VectorNormalize(pm->ps->velocity);
+		VectorScale(pm->ps->velocity, vel, pm->ps->velocity);
+	}
+
+	PM_SlideMove( qfalse ); // move without gravity
+}
+
+
+/*
+=============
+CheckLadder [ ARTHUR TOMLIN ]
+=============
+*/
+void CheckLadder( void )
+{
+	vec3_t flatforward,spot;
+	vec3_t origin;
+	trace_t trace;
+
+	// check if we should be backwards walking down the ladder
+	qboolean backwards = qfalse;
+
+	VectorCopy(pm->ps->origin, origin);
+	origin[2] -= 30;
+
+	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, origin,
+		pm->ps->clientNum, MASK_PLAYERSOLID);
+
+	if(trace.fraction == 1)
+		backwards = qtrue;
+	// check end
+
+	VectorCopy(pm->ps->origin, origin);
+	if(backwards)
+		origin[2] -= 20;
+
+	// check for ladder
+	flatforward[0] = pml.forward[0];
+	flatforward[1] = pml.forward[1];
+	flatforward[2] = 0;
+
+	VectorNormalize (flatforward);
+	VectorMA (origin, 2, flatforward, spot);
+
+	pm->trace (&trace, origin, pm->mins, pm->maxs, spot,
+		pm->ps->clientNum, MASK_PLAYERSOLID);
+
+	if ((trace.fraction < 1) && (trace.surfaceFlags & SURF_LADDER)){
+		pml.ladder = qtrue;
+	} else {
+		pml.ladder = qfalse;
+	}
+}
+#endif
+
 /*
 ================
 PmoveSingle
@@ -3115,6 +3306,9 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	PM_DropTimers();
+#ifdef IOQ3ZTM // LADDER
+	CheckLadder();  // check and see if we're on a ladder
+#endif
 
 #ifdef TA_PLAYERSYS
     // Setup accelerates based on the per-player one.
@@ -3164,6 +3358,10 @@ void PmoveSingle (pmove_t *pmove) {
 #endif
 		// swimming
 		PM_WaterMove();
+#ifdef IOQ3ZTM // LADDER // ZTM: Check ladder before water?
+	} else if (pml.ladder) {
+		PM_LadderMove();
+#endif
 	} else if ( pml.walking ) {
 		// walking on ground
 		PM_WalkMove();

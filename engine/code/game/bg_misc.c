@@ -1428,6 +1428,9 @@ playerAnimationDef_t playerAnimationDefs[] = {
 
 	// TURTLEARENA
 #ifdef TA_PLAYERS // New TURTLEARENA player animations
+	ANIMDEF(BOTH_LADDER),
+	ANIMDEF(BOTH_LADDER_STAND),
+
 	// Place default weapons somewhere on there person while there not used.
 	ANIMDEF(TORSO_PUTDEFAULT_BOTH),
 	ANIMDEF(TORSO_PUTDEFAULT_PRIMARY),
@@ -6050,6 +6053,16 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 			anim[2] = TORSO_STAND;
 			flipflop = qtrue;
 			break;
+
+#ifdef TA_PLAYERS
+		case BOTH_LADDER:
+			anim[0] = LEGS_WALK;
+			break;
+
+		case BOTH_LADDER_STAND:
+			anim[0] = LEGS_IDLE;
+			break;
+#endif
 	}
 
 
