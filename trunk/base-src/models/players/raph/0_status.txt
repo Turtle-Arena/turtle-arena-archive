@@ -22,6 +22,9 @@ Quake3 Animations
 MISSIONPACK Animations (done)
 
 Turtle Arena Animations
+* BOTH_LADDER (defaults to LEDS_WALK)
+* BOTH_LADDER_STAND (defaults to LEDS_IDLE)
+
 * TORSO_PUTDEFAULT_* (don't care) (defaults to reversed TORSO_GETDEFAULT_*)
 * TORSO_STAND_DAISHO (don't care) (defaults to TORSO_STAND_SWORD2)
 * TORSO_STAND_HAMMER (defaults to TORSO_STAND_SWORD1_BOTH)
