@@ -1557,7 +1557,7 @@ materialInfo_t materialInfo[NUM_MATERIAL_TYPES] = {
 static qboolean bg_itemsys_init = qfalse;
 
 bg_iteminfo_t bg_iteminfo[MAX_ITEMS];
-static int bg_numitems = 0;
+static int bg_numitems = 1;
 static int bg_numholdables = 0;
 
 #ifdef TA_WEAPSYS
@@ -1631,7 +1631,7 @@ int BG_NumItems(void)
 	{
 		// BG_GetFreeItemNum
 		int i;
-		for (i = 0; i < MAX_ITEMS; i++)
+		for (i = 1; i < MAX_ITEMS; i++)
 		{
 			if ( bg_iteminfo[i].classname[0] != '\0' )
 				continue;
@@ -6731,14 +6731,24 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			playercfg->jumpMult = atof( token );
 			continue;
 		}
-		// ZTM: TODO?: Hud color in SP (and non-team gametypes? or use "color1" in non-team?)
-		// color1 and color2 are used for the railgun blast color
-		//else if ( !Q_stricmp( token, "prefcolor1" ) ) {
-			// Like color1
-		//}
-		//else if ( !Q_stricmp( token, "prefcolor2" ) ) {
-			// Like color2
-		//}
+		// prefcolor1/prefcolor2 are used as color1/color2 in single player
+		// ZTM: TODO?: Use as hud color in SP (and non-team gametypes? or use "color1" in non-team?)
+		else if ( !Q_stricmp( token, "prefcolor1" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			playercfg->prefcolor1 = atoi( token );
+			continue;
+		}
+		else if ( !Q_stricmp( token, "prefcolor2" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			playercfg->prefcolor2 = atoi( token );
+			continue;
+		}
 		else if ( !Q_stricmp( token, "ability" ) ) {
 			token = COM_Parse( &text_p );
 			if ( !*token ) {
@@ -6967,6 +6977,8 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	playercfg->gender = GENDER_MALE;
 	playercfg->fixedlegs = qfalse;
 	playercfg->fixedtorso = qfalse;
+	playercfg->prefcolor1 = 5;
+	playercfg->prefcolor2 = 4;
 
 	// Use the model name for the default soundpath.
 	Q_strncpyz(playercfg->soundpath, model, sizeof (playercfg->soundpath));

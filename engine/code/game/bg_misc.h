@@ -1442,6 +1442,10 @@ typedef struct bg_playercfg_s
 
 	ablitiy_t ability;
 
+	// Character's color preference
+	unsigned int prefcolor1;
+	unsigned int prefcolor2;
+
 } bg_playercfg_t;
 
 typedef struct
