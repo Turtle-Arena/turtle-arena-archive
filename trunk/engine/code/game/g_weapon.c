@@ -154,7 +154,8 @@ void G_StartMeleeAttack(gentity_t *ent)
 	gclient_t *client = ent->client;
 
 	// Make sure it is a melee weapon.
-	if ( !BG_WeaponHasMelee(ent->client->ps.weapon) ) {
+	if ( !BG_WeaponHasMelee(ent->client->ps.weapon)
+		|| ent->client->ps.weaponHands == HB_NONE) {
 		return;
 	}
 
@@ -1288,7 +1289,11 @@ void Weapon_GrapplingHook_Fire (gentity_t *ent)
 void Weapon_HookFree (gentity_t *ent)
 {
 #ifdef IOQ3ZTM // Better grapple.
-	if (ent->parent->client->ps.pm_type != PM_DEAD)
+	if (ent->parent->client->ps.pm_type != PM_DEAD
+#ifdef TA_PLAYERSYS // LADDER
+		&& !(ent->parent->client->ps.eFlags & EF_LADDER)
+#endif
+		)
 	{
 		// ZTM: TODO: Pull grapple back to player before removing entity, like LoZ: TP?
 	}

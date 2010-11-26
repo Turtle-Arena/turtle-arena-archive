@@ -1906,10 +1906,10 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 
 	// --------- pitch -------------
 
-#ifdef TA_PLAYERSYS // ZTM: If both animation don't have torso or head pitch
-	if (ci && ci->playercfg.animations[ cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT ].prefixType == AP_BOTH) {
+#ifdef TA_PLAYERSYS // ZTM: If BOTH_* animation, don't have torso pitch
+	if (( ci && ci->playercfg.fixedtorso ) || (cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT) == (cent->currentState.legsAnim & ~ANIM_TOGGLEBIT)) {
 		dest = 0;
-		headAngles[PITCH] = 0;
+		headAngles[PITCH] = Com_Clamp( -65, 20, headAngles[PITCH] );
 	} else
 #endif
 	// only show a fraction of the pitch angle in the torso
@@ -1925,22 +1925,20 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 #endif
 	torsoAngles[PITCH] = cent->pe.torso.pitchAngle;
 
+#ifndef TA_PLAYERSYS
 	//
 #ifndef IOQ3ZTM
 	clientNum = cent->currentState.clientNum;
 	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
 		ci = &cgs.clientinfo[ clientNum ];
 #endif
-#ifdef TA_PLAYERSYS
-		if ( ci && ci->playercfg.fixedtorso )
-#else
 		if ( ci->fixedtorso )
-#endif
 		{
 			torsoAngles[PITCH] = 0.0f;
 		}
 #ifndef IOQ3ZTM
 	}
+#endif
 #endif
 
 	// --------- roll -------------
@@ -1980,6 +1978,20 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 			legsAngles[ROLL] = 0.0f;
 		}
 #ifndef IOQ3ZTM
+	}
+#endif
+
+#ifdef TA_PLAYERSYS // LADDER
+	if (cent->currentState.eFlags & EF_LADDER) {
+		// Ladder dir, plaver legs should always face dir
+		vectoangles(cent->currentState.origin2, legsAngles);
+		// If BOTH_* animation, have torso face ladder too
+		if ((cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT) == (cent->currentState.legsAnim & ~ANIM_TOGGLEBIT)) {
+			VectorCopy(legsAngles, torsoAngles);
+			headAngles[0] += torsoAngles[0];
+			headAngles[1] += torsoAngles[1];
+			headAngles[2] += torsoAngles[2];
+		}
 	}
 #endif
 

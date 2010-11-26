@@ -2447,6 +2447,9 @@ static void PM_Weapon( void ) {
 #ifdef TA_ENTSYS // FUNC_USE
 			&& !(pm->ps->eFlags & EF_USE_ENT)
 #endif
+#ifdef TA_PLAYERSYS // LADDER // Don't allow haldable items to be used while on a ladder (mainly don't want shurikens to be used)
+			&& !(pm->ps->eFlags & EF_LADDER)
+#endif
 		) {
 			if (
 #ifdef TA_HOLDSYS
@@ -2611,7 +2614,12 @@ static void PM_Weapon( void ) {
 	if ( BG_WeaponHasMelee(pm->ps->weapon) )
 	{
 		// check for fire (Melee weapons can do damage while not holding attack)
-		if ( !pm->ps->meleeTime && !pm->ps->meleeDelay ) {
+		if ( (!pm->ps->meleeTime && !pm->ps->meleeDelay)
+#ifdef TA_PLAYERSYS // LADDER // Don't allow weapons to be used while on ladders
+			|| (pm->ps->eFlags & EF_LADDER)
+#endif
+			)
+		{
 			pm->ps->weaponTime = 0;
 			pm->ps->weaponstate = WEAPON_READY;
 			return;
@@ -2620,7 +2628,12 @@ static void PM_Weapon( void ) {
 	else
 	{
 		// check for fire
-		if ( ! (pm->cmd.buttons & BUTTON_ATTACK) ) {
+		if ( !(pm->cmd.buttons & BUTTON_ATTACK) || pm->ps->weaponHands == HB_NONE
+#ifdef TA_PLAYERSYS // LADDER // Don't allow weapons to be used while on ladders
+			|| (pm->ps->eFlags & EF_LADDER)
+#endif
+			)
+		{
 			pm->ps->weaponTime = 0;
 			pm->ps->weaponstate = WEAPON_READY;
 			return;
@@ -3088,10 +3101,25 @@ void CheckLadder( void )
 	pm->trace (&trace, origin, pm->mins, pm->maxs, spot,
 		pm->ps->clientNum, MASK_PLAYERSOLID);
 
-	if ((trace.fraction < 1) && (trace.surfaceFlags & SURF_LADDER)){
+	if ((trace.fraction < 1) && (trace.surfaceFlags & SURF_LADDER)) {
 		pml.ladder = qtrue;
+
+#ifdef TA_PLAYERSYS // LADDER
+		pm->ps->eFlags |= EF_LADDER;
+		// Save ladder dir, inv of trace.plane.normal
+		VectorCopy(trace.plane.normal, pm->ps->origin2);
+		VectorInverse(pm->ps->origin2);
+#endif
 	} else {
 		pml.ladder = qfalse;
+
+#ifdef TA_PLAYERSYS // LADDER
+		if (pm->ps->eFlags & EF_LADDER) {
+			pm->ps->eFlags &= ~EF_LADDER;
+			// Clear ladder dir
+			VectorClear(pm->ps->origin2);
+		}
+#endif
 	}
 }
 #endif
