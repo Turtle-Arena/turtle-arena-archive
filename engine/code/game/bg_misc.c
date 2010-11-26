@@ -6599,14 +6599,52 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			}
 			continue;
 		} else if ( !Q_stricmp( token, "fixedlegs" ) ) {
+			token = COM_Parse( &text_p );
+#ifndef TA_SUPPORTQ3
+			if ( !*token ) {
+				break;
+			}
+#endif
 			if (headConfig) // skip fixedlegs
 				continue;
-			playercfg->fixedlegs = qtrue;
+			if (!Q_stricmp( token, "false" ) || !Q_stricmp( token, "0" )) {
+				playercfg->fixedlegs = qfalse;
+			} else if (!Q_stricmp( token, "true" ) || !Q_stricmp( token, "1" )) {
+				playercfg->fixedlegs = qtrue;
+			} else {
+#ifdef TA_SUPPORTQ3
+				if ( *token ) {
+					Com_Printf( "Bad fixedlegs parm in %s: %s\n", filename, token );
+				}
+				playercfg->fixedlegs = qtrue;
+#else
+				Com_Printf( "Bad fixedlegs parm in %s: %s\n", filename, token );
+#endif
+			}
 			continue;
 		} else if ( !Q_stricmp( token, "fixedtorso" ) ) {
+			token = COM_Parse( &text_p );
+#ifndef TA_SUPPORTQ3
+			if ( !*token ) {
+				break;
+			}
+#endif
 			if (headConfig) // skip fixedtorso
 				continue;
-			playercfg->fixedtorso = qtrue;
+			if (!Q_stricmp( token, "false" ) || !Q_stricmp( token, "0" )) {
+				playercfg->fixedtorso = qfalse;
+			} else if (!Q_stricmp( token, "true" ) || !Q_stricmp( token, "1" )) {
+				playercfg->fixedtorso = qtrue;
+			} else {
+#ifdef TA_SUPPORTQ3
+				if ( *token ) {
+					Com_Printf( "Bad fixedtorso parm in %s: %s\n", filename, token );
+				}
+				playercfg->fixedtorso = qtrue;
+#else
+				Com_Printf( "Bad fixedtorso parm in %s: %s\n", filename, token );
+#endif
+			}
 			continue;
 		}
 #ifdef TA_WEAPSYS
@@ -6676,7 +6714,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			if ( !*token ) {
 				break;
 			}
-			if (headConfig) // skip speed
+			if (headConfig) // skip deadmax
 				continue;
 			playercfg->deadmax = atoi( token );
 			continue;
