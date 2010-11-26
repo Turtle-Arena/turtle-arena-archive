@@ -289,6 +289,9 @@ typedef enum {
 #ifdef TA_PATHSYS
 #define EF_TRAINBACKWARD	0x02000000
 #endif
+#ifdef TA_PLAYERSYS // LADDER
+#define EF_LADDER			0x04000000 // On ladder
+#endif
 
 #ifdef IOQ3ZTM
 #ifdef TURTLEARENA // AWARDS

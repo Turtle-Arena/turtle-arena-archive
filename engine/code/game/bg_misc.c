@@ -4559,8 +4559,12 @@ BG_WeaponHandsForPlayerState
 */
 int BG_WeaponHandsForPlayerState(playerState_t *ps)
 {
-	if (ps->eFlags & EF_PRIMARY_HAND)
-	{
+#ifdef TA_PLAYERSYS // LADDER
+	if ((ps->eFlags & EF_LADDER) && ps->weapon == ps->stats[STAT_DEFAULTWEAPON]) {
+		return HB_NONE;
+	}
+#endif
+	if (ps->eFlags & EF_PRIMARY_HAND) {
 		return HB_PRIMARY;
 	}
 
@@ -5569,6 +5573,9 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 		s->skinFraction = 1.0f - ((float)ps->stats[STAT_HEALTH] / (float)ps->stats[STAT_MAX_HEALTH]);
 	}
 #endif
+#ifdef TA_PLAYERSYS // LADDER
+	VectorCopy( ps->origin2, s->origin2 );
+#endif
 }
 
 /*
@@ -5663,6 +5670,9 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	} else {
 		s->skinFraction = 1.0f - ((float)ps->stats[STAT_HEALTH] / (float)ps->stats[STAT_MAX_HEALTH]);
 	}
+#endif
+#ifdef TA_PLAYERSYS // LADDER
+	VectorCopy( ps->origin2, s->origin2 );
 #endif
 }
 

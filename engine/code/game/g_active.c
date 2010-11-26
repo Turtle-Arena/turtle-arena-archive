@@ -1734,6 +1734,13 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 	}
 
+#ifdef TA_PLAYERSYS // LADDER
+	// Stop grappling if grappled to a ladder
+	if ((ent->client->ps.eFlags & EF_LADDER) && ent->client->hook) {
+		Weapon_HookFree(ent->client->hook);
+	}
+#endif
+
 	// use the snapped origin for linking so it matches client predicted versions
 	VectorCopy( ent->s.pos.trBase, ent->r.currentOrigin );
 
@@ -1923,10 +1930,10 @@ void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t hea
 
 	// --------- pitch -------------
 
-#ifdef TA_PLAYERSYS // ZTM: If both animation don't have torso or head pitch
-	if (ent->client->pers.playercfg.animations[ ent->client->ps.torsoAnim & ~ANIM_TOGGLEBIT ].prefixType == AP_BOTH) {
+#ifdef TA_PLAYERSYS // ZTM: If BOTH_* animation, don't have torso pitch
+	if (ent->client->pers.playercfg.fixedtorso || (ent->client->ps.torsoAnim & ~ANIM_TOGGLEBIT) == (ent->client->ps.legsAnim & ~ANIM_TOGGLEBIT)) {
 		dest = 0;
-		headAngles[PITCH] = 0;
+		headAngles[PITCH] = Com_Clamp( -65, 20, headAngles[PITCH] );
 	} else
 #endif
 	// only show a fraction of the pitch angle in the torso
@@ -1938,15 +1945,13 @@ void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t hea
 	BG_SwingAngles( dest, 15, 30, 0.1f, &ent->client->pers.torso.pitchAngle, &ent->client->pers.torso.pitching, frametime );
 	torsoAngles[PITCH] = ent->client->pers.torso.pitchAngle;
 
+#ifndef TA_PLAYERSYS
 	//
-#ifdef TA_PLAYERSYS
-	if ( ent->client->pers.playercfg.fixedtorso )
-#else
 	if ( qfalse )
-#endif
 	{
 		torsoAngles[PITCH] = 0.0f;
 	}
+#endif
 
 	// --------- roll -------------
 
@@ -1979,6 +1984,20 @@ void G_PlayerAngles( gentity_t *ent, vec3_t legs[3], vec3_t torso[3], vec3_t hea
 		legsAngles[PITCH] = 0.0f;
 		legsAngles[ROLL] = 0.0f;
 	}
+
+#ifdef TA_PLAYERSYS // LADDER
+	if (ent->client->ps.eFlags & EF_LADDER) {
+		// Ladder dir, plaver legs should always face dir
+		vectoangles(ent->client->ps.origin2, legsAngles);
+		// If BOTH_* animation, have torso face ladder too
+		if ((ent->client->ps.torsoAnim & ~ANIM_TOGGLEBIT) == (ent->client->ps.legsAnim & ~ANIM_TOGGLEBIT)) {
+			VectorCopy(legsAngles, torsoAngles);
+			headAngles[0] += torsoAngles[0];
+			headAngles[1] += torsoAngles[1];
+			headAngles[2] += torsoAngles[2];
+		}
+	}
+#endif
 
 	// ZTM: TODO: Add pain twitch ?
 	//CG_AddPainTwitch( cent, torsoAngles );

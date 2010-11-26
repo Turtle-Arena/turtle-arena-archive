@@ -1170,6 +1170,10 @@ typedef struct playerState_s {
 	int			weaponHands;	// HB_NONE, HB_PRIMARY, HB_SECONDARY, or HB_BOTH
 #endif
 
+#ifdef TA_PLAYERSYS // LADDER
+	vec3_t		origin2;
+#endif
+
 	// not communicated over the net at all
 	int			ping;			// server to game info for scoreboard
 	int			pmove_framecount;	// FIXME: don't transmit over the network
