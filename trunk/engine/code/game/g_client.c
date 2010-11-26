@@ -1134,7 +1134,7 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	// set model
 #ifdef TA_SP // SPMODEL
-	if ( g_singlePlayer.integer == 1 /* && g_gametype.integer == GT_SINGLE_PLAYER*/ ) {
+	if ( g_singlePlayer.integer == 1 ) {
 		Q_strncpyz( model, Info_ValueForKey (userinfo, "spmodel"), sizeof( model ) );
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "spheadmodel"), sizeof( headModel ) );
 	} else
@@ -1235,6 +1235,14 @@ void ClientUserinfoChanged( int clientNum ) {
 	// colors
 	strcpy(c1, Info_ValueForKey( userinfo, "color1" ));
 	strcpy(c2, Info_ValueForKey( userinfo, "color2" ));
+
+#ifdef TA_PLAYERSYS
+	// In single player use player model's prefcolors
+	if (g_singlePlayer.integer == 1) {
+		Q_snprintf(c1, sizeof (c1), "%d", client->pers.playercfg.prefcolor1);
+		Q_snprintf(c2, sizeof (c2), "%d", client->pers.playercfg.prefcolor2);
+	}
+#endif
 
 	strcpy(redTeam, Info_ValueForKey( userinfo, "g_redteam" ));
 	strcpy(blueTeam, Info_ValueForKey( userinfo, "g_blueteam" ));
