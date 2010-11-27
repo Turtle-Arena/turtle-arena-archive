@@ -110,16 +110,15 @@ console
 	nomipmaps
 	{
 		map gfx/misc/console01.png
-		blendFunc GL_ONE GL_ZERO
-		tcMod scroll .02  0
-		tcmod scale 2 1
+		blendFunc blend
+		tcMod scroll -0.01 0
 	}
 	{
-		map gfx/misc/console02.png
-		blendFunc add
-		tcMod turb 0 .1 0 .1
-		tcMod scale 2 1
-		tcmod scroll 0.2  .1
+		map menu/art/menuback2.png
+		blendFunc blend
+		tcMod scale 1 1
+		tcMod scroll -0.02 -0.01
+		alphaGen const 0.4
 	}
 }
 
