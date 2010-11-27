@@ -614,6 +614,45 @@ void Con_DrawNotify (void)
 
 }
 
+#ifdef IOQ3ZTM
+/*
+==========
+SCR_DrawPicFullWidth
+==========
+*/
+void SCR_DrawPicFullWidth(int h480, qhandle_t hShader)
+{
+	float yfrac = (float)h480 / (float)SCREEN_HEIGHT;
+	float x = 0, y = 0, w = cls.glconfig.vidWidth, h = cls.glconfig.vidHeight;
+	const float picX = SCREEN_WIDTH;
+	const float picY = SCREEN_HEIGHT;
+	float yscale = h / picY; // scale shader to fit vertically
+	float xscale = yscale; // w / picX;
+	float s1, t1, s2, t2;
+	float sDelta, tDelta;
+
+	yscale /= yfrac;
+
+	// Get aspect correct coords
+	s1 = x/(picX * xscale);
+	t1 = y/(picY * yscale);
+	s2 = (x+w)/(picX * xscale);
+	t2 = (y+h)/(picY * yscale);
+
+	// Center X
+	sDelta = (1.0f - s2) / 2.0f;
+	s1 += sDelta;
+	s2 += sDelta;
+
+	// Scroll so bottom of image is always at the bottom of the console
+	tDelta = (1.0f - t2);
+	t1 += tDelta;
+	t2 += tDelta;
+
+	re.DrawStretchPic( x, y, w, h * yfrac, s1, t1, s2, t2, hShader );
+}
+#endif
+
 /*
 ================
 Con_DrawSolidConsole
@@ -648,7 +687,11 @@ void Con_DrawSolidConsole( float frac ) {
 		y = 0;
 	}
 	else {
+#ifdef IOQ3ZTM
+		SCR_DrawPicFullWidth(y, cls.consoleShader );
+#else
 		SCR_DrawPic( 0, 0, SCREEN_WIDTH, y, cls.consoleShader );
+#endif
 	}
 
 #ifdef TURTLEARENA // Console edge color
