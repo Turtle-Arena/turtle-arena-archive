@@ -1669,6 +1669,41 @@ void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
 }
 
 /*
+==========
+UI_DrawPicFullScreen
+==========
+*/
+void UI_DrawPicFullScreen(qhandle_t hShader)
+{
+#ifdef IOQ3ZTM // IOQ3BUGFIX: In widescreen fill whole screen not just 4:3 area.
+	float x = 0, y = 0, w = uis.glconfig.vidWidth, h = uis.glconfig.vidHeight;
+	const float picX = SCREEN_WIDTH;
+	const float picY = SCREEN_HEIGHT;
+	float scale = h / picY; // scale shader to fit vertically
+	float s1, t1, s2, t2;
+	float sDelta, tDelta;
+
+	// Get aspect correct coords
+	s1 = x/(picX * scale);
+	t1 = y/(picY * scale);
+	s2 = (x+w)/(picX * scale);
+	t2 = (y+h)/(picY * scale);
+
+	// Center pic
+	sDelta = (1.0f - s2) / 2.0f;
+	tDelta = (1.0f - t2) / 2.0f;
+	s1 += sDelta;
+	s2 += sDelta;
+	t1 += tDelta;
+	t2 += tDelta;
+
+	trap_R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
+#else
+	UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hShader );
+#endif
+}
+
+/*
 ================
 UI_FillRect
 
@@ -1710,41 +1745,6 @@ void UI_SetColor( const float *rgba ) {
 
 void UI_UpdateScreen( void ) {
 	trap_UpdateScreen();
-}
-
-/*
-==========
-UI_DrawPicFullScreen
-==========
-*/
-void UI_DrawPicFullScreen(qhandle_t hShader)
-{
-#ifdef IOQ3ZTM // IOQ3BUGFIX: In widescreen fill whole screen not just 4:3 area.
-	float x = 0, y = 0, w = uis.glconfig.vidWidth, h = uis.glconfig.vidHeight;
-	const float picX = SCREEN_WIDTH;
-	const float picY = SCREEN_HEIGHT;
-	float scale = h / picY; // scale shader to fit vertically
-	float s1, t1, s2, t2;
-	float sDelta, tDelta;
-
-	// Get aspect correct coords
-	s1 = x/(picX * scale);
-	t1 = y/(picY * scale);
-	s2 = (x+w)/(picX * scale);
-	t2 = (y+h)/(picY * scale);
-
-	// Center pic
-	sDelta = (1.0f - s2) / 2.0f;
-	tDelta = (1.0f - t2) / 2.0f;
-	s1 += sDelta;
-	s2 += sDelta;
-	t1 += tDelta;
-	t2 += tDelta;
-
-	trap_R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
-#else
-	UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hShader );
-#endif
 }
 
 /*
