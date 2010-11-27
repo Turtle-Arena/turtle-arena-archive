@@ -1366,10 +1366,17 @@ void UI_MouseEvent( int dx, int dy )
 
 	// update mouse screen position
 	uis.cursorx += dx;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Allow cursor to go to real edge of screen in widescreen, it just looks better.
+	if (uis.cursorx < -uis.bias)
+		uis.cursorx = -uis.bias;
+	else if (uis.cursorx > SCREEN_WIDTH+uis.bias)
+		uis.cursorx = SCREEN_WIDTH+uis.bias;
+#else
 	if (uis.cursorx < 0)
 		uis.cursorx = 0;
 	else if (uis.cursorx > SCREEN_WIDTH)
 		uis.cursorx = SCREEN_WIDTH;
+#endif
 
 	uis.cursory += dy;
 	if (uis.cursory < 0)
