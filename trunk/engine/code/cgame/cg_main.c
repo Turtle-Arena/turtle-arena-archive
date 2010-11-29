@@ -483,10 +483,14 @@ void CG_RegisterCvars( void ) {
 
 #ifdef TA_SP // SPMODEL
 	trap_Cvar_Register(NULL, "spmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
-	trap_Cvar_Register(NULL, "spheadmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
+	trap_Cvar_Register(NULL, "spheadmodel", "", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
 #endif
 	trap_Cvar_Register(NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register(NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+	trap_Cvar_Register(NULL, "headmodel", "", CVAR_USERINFO | CVAR_ARCHIVE );
+#else
+	trap_Cvar_Register(NULL, "headmodel", DEFAULT_HEADMODEL, CVAR_USERINFO | CVAR_ARCHIVE );
+#endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
 	trap_Cvar_Register(NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 	trap_Cvar_Register(NULL, "team_headmodel", DEFAULT_TEAM_HEAD, CVAR_USERINFO | CVAR_ARCHIVE );

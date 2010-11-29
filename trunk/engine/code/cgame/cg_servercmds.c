@@ -1252,25 +1252,20 @@ static void CG_ServerCommand( void ) {
 			if (cg_singlePlayerActive.integer)
 			{
 				trap_Cvar_Set("spmodel", CG_Argv(1));
-				if (cmdArgc == 2) {
-					trap_Cvar_Set("spheadmodel", CG_Argv(1));
+				if (cmdArgc > 2) {
+					trap_Cvar_Set("spheadmodel", CG_Argv(2));
+				} else {
+					trap_Cvar_Set("spheadmodel", "");
 				}
 			}
 			else if (cgs.gametype == GT_SINGLE_PLAYER)
 			{
 				trap_Cvar_Set("model", CG_Argv(1));
-				if (cmdArgc == 2) {
-					trap_Cvar_Set("headmodel", CG_Argv(1));
+				if (cmdArgc > 2) {
+					trap_Cvar_Set("headmodel", CG_Argv(2));
+				} else {
+					trap_Cvar_Set("headmodel", "");
 				}
-			}
-		}
-
-		if (cmdArgc > 2)
-		{
-			if (cg_singlePlayerActive.integer) {
-				trap_Cvar_Set("spheadmodel", CG_Argv(2));
-			} else if (cgs.gametype == GT_SINGLE_PLAYER) {
-				trap_Cvar_Set("headmodel", CG_Argv(2));
 			}
 		}
 		return;
