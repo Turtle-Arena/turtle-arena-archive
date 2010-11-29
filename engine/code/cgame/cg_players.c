@@ -1400,10 +1400,19 @@ void CG_NewClientInfo( int clientNum ) {
 		char *skin;
 
 		if( cgs.gametype >= GT_TEAM ) {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use the head define
+			Q_strncpyz( newInfo.headModelName, DEFAULT_TEAM_HEAD, sizeof( newInfo.headModelName ) );
+#else
 			Q_strncpyz( newInfo.headModelName, DEFAULT_TEAM_MODEL, sizeof( newInfo.headModelName ) );
+#endif
 			Q_strncpyz( newInfo.headSkinName, "default", sizeof( newInfo.headSkinName ) );
 		} else {
 			trap_Cvar_VariableStringBuffer( "headmodel", modelStr, sizeof( modelStr ) );
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+			if (!modelStr[0]) {
+				trap_Cvar_VariableStringBuffer( "model", modelStr, sizeof( modelStr ) );
+			}
+#endif
 			if ( ( skin = strchr( modelStr, '/' ) ) == NULL) {
 				skin = "default";
 			} else {

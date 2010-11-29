@@ -1150,6 +1150,12 @@ void ClientUserinfoChanged( int clientNum ) {
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "headmodel"), sizeof( headModel ) );
 	}
 
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+	if (!headModel[0]) {
+		Q_strncpyz( headModel, model, sizeof( headModel ) );
+	}
+#endif
+
 #ifdef TA_PLAYERSYS
     G_LoadPlayer(clientNum, model, headModel);
 #endif
