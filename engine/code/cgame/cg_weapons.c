@@ -2988,6 +2988,36 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 				)
 			{
+#ifdef IOQ3ZTM // GRAPPLE_RETURN // Always update flash origin
+				if ( ps || cg.renderingThirdPerson ||
+						cent->currentState.number != cg.predictedPlayerState.clientNum ) {
+					memset( &flash, 0, sizeof( flash ) );
+#ifdef TA_WEAPSYS
+					flash.hModel = cg_weapons[weaponGroup->weaponnum[i]].flashModel;
+#else
+					flash.hModel = weapon->flashModel;
+#endif
+					if (!flash.hModel) {
+#ifdef TA_WEAPSYS
+						continue;
+#else
+						return;
+#endif
+					}
+
+#ifdef TA_WEAPSYS
+					CG_PositionRotatedEntityOnTag( &flash, &gun[i], gun[i].hModel, "tag_flash");
+#else
+					CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, "tag_flash");
+#endif
+
+#ifdef TA_WEAPSYS
+					VectorCopy(flash.origin, nonPredictedCent->pe.flashOrigin[i]);
+#elif defined IOQ3ZTM
+					VectorCopy(flash.origin, nonPredictedCent->pe.flashOrigin);
+#endif
+				}
+#endif
 				return;
 			}
 		}

@@ -1286,21 +1286,110 @@ void Weapon_GrapplingHook_Fire (gentity_t *ent)
 }
 #endif
 
+#ifdef IOQ3ZTM // GRAPPLE_RETURN
+void Weapon_ForceHookFree (gentity_t *ent)
+{
+	ent->parent->client->hook = NULL;
+	ent->parent->client->ps.pm_flags &= ~PMF_GRAPPLE_PULL;
+	G_FreeEntity( ent );
+}
+
+void G_SetMissileVelocity(gentity_t *bolt, vec3_t dir, int projnum);
+
+#define HOOK_RETURN_THINK_TIME 100
+// Grappling hook returning to parent
+void G_GrapplingHookReturnThink (gentity_t *ent)
+{
+	vec3_t dir;
+	vec3_t target;
+
+	if (!ent->parent) {
+		Weapon_ForceHookFree(ent);
+		return;
+	}
+
+	if (ent->parent->client) {
+		vec3_t muzzle;
+		vec3_t forward, right, up;
+
+		AngleVectors (ent->parent->client->ps.viewangles, forward, right, up);
+		CalcMuzzlePoint ( ent->parent, forward, right, up, muzzle );
+		// Offset using handSide in ent->s.weaponHands
+		if (ent->s.weaponHands == HS_RIGHT)
+			VectorMA (muzzle, 4, right, muzzle);
+		else if (ent->s.weaponHands == HS_LEFT)
+			VectorMA (muzzle, -4, right, muzzle);
+		VectorCopy(muzzle, target);
+	} else {
+		VectorCopy(ent->parent->r.currentOrigin, target);
+	}
+
+	// get dir to ent->parent
+	VectorSubtract(target, ent->r.currentOrigin, dir);
+
+	if (VectorLength(dir) < 64)
+	{
+		Weapon_ForceHookFree(ent);
+		return;
+	}
+
+	// Pervent player from firing, it doesn't effect game's grappling hook but does cgame does fire effects.
+	ent->parent->client->ps.weaponTime = HOOK_RETURN_THINK_TIME + 50;
+
+	// for exact trajectory calculation, set current point to base.
+	VectorCopy(ent->r.currentOrigin, ent->s.pos.trBase);
+
+	VectorNormalize(dir);
+#if 0
+	// 0.5 is swing rate.
+	//VectorScale(dir, 0.5, dir);
+	VectorAdd(dir, ent->r.currentAngles, dir);
+
+	// turn nozzle to target angle
+	VectorNormalize(dir);
+	VectorCopy(dir, ent->r.currentAngles);
+#endif
+
+	ent->s.pos.trTime = level.time;
+	VectorScale(dir, 1.5f, dir); // go back to player faster
+	G_SetMissileVelocity(ent, dir, ent->s.weapon);
+
+	ent->nextthink = level.time + HOOK_RETURN_THINK_TIME;	// decrease this value also makes fast swing
+	ent->think = G_GrapplingHookReturnThink;
+}
+#endif
+
 void Weapon_HookFree (gentity_t *ent)
 {
-#ifdef IOQ3ZTM // Better grapple.
+#ifdef IOQ3ZTM // GRAPPLE_RETURN
 	if (ent->parent->client->ps.pm_type != PM_DEAD
 #ifdef TA_PLAYERSYS // LADDER
 		&& !(ent->parent->client->ps.eFlags & EF_LADDER)
 #endif
 		)
 	{
-		// ZTM: TODO: Pull grapple back to player before removing entity, like LoZ: TP?
+		// Pull grapple back to player before removing entity, like LoZ: TP
+		ent->parent->client->ps.pm_flags &= ~PMF_GRAPPLE_PULL;
+		ent->s.eType = ET_MISSILE; // If ET_GRAPPLE change to missile
+
+#ifdef TA_WEAPSYS
+		// Don't damage parent
+		ent->count &= ~1;
+		ent->flags |= FL_MISSILE_NO_DAMAGE_PARENT;
+#endif
+
+		ent->s.eFlags |= EF_TRAINBACKWARD;
+		G_GrapplingHookReturnThink(ent);
+		return;
 	}
 #endif
+#ifdef IOQ3ZTM // GRAPPLE_RETURN
+	Weapon_ForceHookFree ( ent );
+#else
 	ent->parent->client->hook = NULL;
 	ent->parent->client->ps.pm_flags &= ~PMF_GRAPPLE_PULL;
 	G_FreeEntity( ent );
+#endif
 }
 
 void Weapon_HookThink (gentity_t *ent)

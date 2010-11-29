@@ -54,6 +54,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef TA_ENTSYS // MISC_OBJECT
 #define FL_PUSHABLE				0x00010000	// make misc_object pushable
 #endif
+#ifdef TA_WEAPSYS
+#define FL_MISSILE_NO_DAMAGE_PARENT	0x00020000
+#endif
 
 // movers are things like doors, plats, buttons, etc
 typedef enum {
@@ -732,6 +735,9 @@ qboolean G_MeleeDamage( gentity_t *ent, qboolean attacking );
 void G_StartMeleeAttack(gentity_t *ent);
 #else
 qboolean CheckGauntletAttack( gentity_t *ent );
+#endif
+#ifdef IOQ3ZTM // GRAPPLE_RETURN
+void Weapon_ForceHookFree (gentity_t *ent);
 #endif
 void Weapon_HookFree (gentity_t *ent);
 void Weapon_HookThink (gentity_t *ent);
