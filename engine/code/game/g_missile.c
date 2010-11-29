@@ -716,6 +716,10 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		// grapple
 		bolt->s.otherEntityNum = self->s.number; // use to match beam in client
 
+		if (!bg_projectileinfo[projnum].damageAttacker) {
+			bolt->flags |= FL_MISSILE_NO_DAMAGE_PARENT;
+		}
+
 		bolt->damage = damage;
 		bolt->splashDamage = splashDamage;
 		bolt->splashRadius = splashRadius;
