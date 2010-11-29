@@ -825,6 +825,12 @@ void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi )
 #endif
 	VectorCopy( origin, beam.oldorigin );
 
+#ifdef TA_DATA
+	// Switch points so chain pulls out of gun not projectile
+	VectorCopy(beam.origin, beam.oldorigin);
+	VectorCopy(origin, beam.origin);
+#endif
+
 #ifndef IOQ3ZTM
 	if (Distance( beam.origin, beam.oldorigin ) < 64 )
 		return; // Don't draw if close
