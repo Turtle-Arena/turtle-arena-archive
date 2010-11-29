@@ -1091,7 +1091,6 @@ typedef enum {
 	// TORSO_***DEFAULT_SECONDARY for Don should be
 	//  switching to/from two handed Bo to using one hand.
 	// ZTM: NOTE: Currently first half to going to weapon spot, second half is moving back.
-	// ZTM: TODO: Should I split into 2 animations?
 	TORSO_PUTDEFAULT_BOTH,
 	TORSO_PUTDEFAULT_PRIMARY,
 	TORSO_PUTDEFAULT_SECONDARY,

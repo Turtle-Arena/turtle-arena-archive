@@ -510,6 +510,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 {
 	font_t *font;
 	float scale;
+	float maxX = x + maxChars * charWidth;
 
 	if (charWidth >= GIANTCHAR_WIDTH && charHeight >= GIANTCHAR_HEIGHT) {
 		font = &cgs.media.fontGiant;
@@ -524,7 +525,7 @@ void CG_DrawStringExt( int x, int y, const char *string, const float *setColor,
 	scale = charHeight / 48.0f;
 
 	CG_DrawFontStringExt( font, scale, x, y, string, setColor, forceColor,
-		qfalse, shadow ? 2 : 0, qtrue, 0, maxChars, NULL );
+		qfalse, shadow ? 2 : 0, qtrue, 0, maxChars, maxX > x ? &maxX : NULL );
 }
 
 void CG_DrawFontString( font_t *font, int x, int y, const char *s, float alpha ) {

@@ -293,9 +293,6 @@ static void CG_Obituary( entityState_t *ent ) {
 
 	if ( attacker != ENTITYNUM_WORLD ) {
 #ifdef TA_WEAPSYS
-		// ZTM: TODO: Stop this &name[2] stuff, add a MOD name or use the whole name.
-		//                      Both require changing weaponinfo.txt.
-		//            If this is changed update BotWeaponNameForMeansOfDeath
 		if (mod == MOD_PROJECTILE || mod == MOD_PROJECTILE_EXPLOSION)
 		{
 			if (mod == MOD_PROJECTILE_EXPLOSION)
