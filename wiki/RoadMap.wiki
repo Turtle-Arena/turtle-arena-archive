@@ -23,7 +23,6 @@ First stable playable release.
   * Fix bugs from 0.2
   * Bring back player effect colors
     * Readd to ui and q3_ui
-    * (Control melee trail color?)
   * Reduce overall number of TODOs and FIXMEs in the source
   * Begin work on 0.4.1 and 0.4.2
 

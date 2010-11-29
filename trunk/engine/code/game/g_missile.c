@@ -68,6 +68,12 @@ void G_ExplodeMissile( gentity_t *ent ) {
 	vec3_t		origin;
 
 #ifdef TA_WEAPSYS
+	if (bg_projectileinfo[ent->s.weapon].grappling)
+	{
+		Weapon_HookFree(ent);
+		return;
+	}
+
 	if (bg_projectileinfo[ent->s.weapon].explosionType == PE_NONE)
 	{
 		G_FreeEntity(ent);
@@ -753,6 +759,9 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			else
 				bolt->die = G_Missile_Die;
 		}
+
+		// Save handSide in missile
+		bolt->s.weaponHands = handSide;
 
 		// Taken from Q3's fire_prox;
 		// ZTM: Used by prox mines so that if that player changes teams the mines
@@ -1479,8 +1488,8 @@ void G_RunMissile( gentity_t *ent ) {
 	}
 #if defined MISSIONPACK || defined TA_WEAPSYS
 	// if the prox mine wasn't yet outside the player body
-#ifdef TA_WEAPSYS // ZTM: TODO: Add a option not to damage owner?
-	if (!(ent->count & 1))
+#ifdef TA_WEAPSYS
+	if (!(ent->count & 1) && !(ent->flags & FL_MISSILE_NO_DAMAGE_PARENT))
 #else
 	if (ent->s.weapon == WP_PROX_LAUNCHER && !ent->count)
 #endif

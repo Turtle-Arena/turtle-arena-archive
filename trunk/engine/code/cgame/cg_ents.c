@@ -1089,8 +1089,17 @@ static void CG_Missile( centity_t *cent ) {
 	}
 	else
 	{
+		vec3_t ang_dir;
+
+		// Missile traveling backward
+		if (s1->eFlags & EF_TRAINBACKWARD) {
+			VectorScale(s1->pos.trDelta, -1, ang_dir);
+		} else {
+			VectorCopy(s1->pos.trDelta, ang_dir);
+		}
+
 		// convert direction of travel into axis
-		if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
+		if ( VectorNormalize2( ang_dir, ent.axis[0] ) == 0 ) {
 			ent.axis[0][2] = 1;
 		}
 
@@ -1128,10 +1137,28 @@ static void CG_Missile( centity_t *cent ) {
 		}
 	}
 #else
+#ifdef IOQ3ZTM // GRAPPLE_RETURN
+	{
+		vec3_t ang_dir;
+
+		// Missile traveling backward
+		if (s1->eFlags & EF_TRAINBACKWARD) {
+			VectorScale(s1->pos.trDelta, -1, ang_dir);
+		} else {
+			VectorCopy(s1->pos.trDelta, ang_dir);
+		}
+
+		// convert direction of travel into axis
+		if ( VectorNormalize2( ang_dir, ent.axis[0] ) == 0 ) {
+			ent.axis[0][2] = 1;
+		}
+	}
+#else
 	// convert direction of travel into axis
 	if ( VectorNormalize2( s1->pos.trDelta, ent.axis[0] ) == 0 ) {
 		ent.axis[0][2] = 1;
 	}
+#endif
 
 	// spin as it moves
 	if ( s1->pos.trType != TR_STATIONARY ) {
