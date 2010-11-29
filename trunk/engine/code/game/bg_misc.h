@@ -672,6 +672,7 @@ typedef struct
 	int homing;
 	// if "homing" > 0 then projectile is a homing missile,
 	//   homing is also used as the delay (in msec) before homing in on a player.
+	qboolean damageAttacker; // If true, the missile can damage the player who fired it
 
 	char triggerSoundName[MAX_QPATH]; // PE_PROX trigger sound
 	char tickSoundName[MAX_QPATH]; // PE_PROX tick sound

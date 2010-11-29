@@ -2188,6 +2188,7 @@ static qboolean Projectile_Parse(char **p) {
 	memset(&projectile, 0, sizeof(projectile));
 	projectile.numProjectiles = 1;
 	projectile.maxHits = 1;
+	projectile.damageAttacker = qtrue;
 
 	token = COM_ParseExt(p, qtrue);
 	if ( !*token ) {
@@ -2261,6 +2262,13 @@ static qboolean Projectile_Parse(char **p) {
 			} else {
 				projectile.modelRed[0] = '\0';
 			}
+			continue;
+		} else if ( !Q_stricmp( token, "damageAttacker" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				break;
+			}
+			projectile.damageAttacker = atoi(token);
 			continue;
 		} else if ( !Q_stricmp( token, "damage" ) ) {
 			token = COM_Parse( p );
@@ -3548,6 +3556,7 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("projectile \"%s\"\r\n", projectile->name);
 		FS_Printf1("{\r\n");
 		FS_Printf2("\tmodel \"%s\"\r\n", projectile->model);
+		FS_Printf2("\tdamageAttacker %d\r\n", projectile->damageAttacker);
 		FS_Printf2("\tdamage %d\r\n", projectile->damage);
 		FS_Printf2("\tsplashdamage %d\r\n", projectile->splashDamage);
 		FS_Printf2("\tsplashRadius %d\r\n", projectile->splashRadius);
