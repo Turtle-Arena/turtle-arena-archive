@@ -68,7 +68,7 @@ vmCvar_t	g_doWarmup;
 vmCvar_t	g_restarted;
 vmCvar_t	g_logfile;
 vmCvar_t	g_logfileSync;
-#ifndef NOBLOOD
+#ifndef NOTRATEDM
 vmCvar_t	g_blood;
 #endif
 vmCvar_t	g_podiumDist;
@@ -182,12 +182,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_debugDamage, "g_debugDamage", "0", 0, 0, qfalse },
 	{ &g_debugAlloc, "g_debugAlloc", "0", 0, 0, qfalse },
 	{ &g_motd, "g_motd", "", 0, 0, qfalse },
-#ifndef NOBLOOD
-#ifdef NOTRATEDM // ZTM: Default to no blood.
-	{ &g_blood, "com_blood", "0", 0, 0, qfalse },
-#else
+#ifndef NOTRATEDM
 	{ &g_blood, "com_blood", "1", 0, 0, qfalse },
-#endif
 #endif
 
 	{ &g_podiumDist, "g_podiumDist", "80", 0, 0, qfalse },
