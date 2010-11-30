@@ -1244,7 +1244,12 @@ void ClientUserinfoChanged( int clientNum ) {
 
 #ifdef TA_PLAYERSYS
 	// In single player use player model's prefcolors
-	if (g_singlePlayer.integer == 1) {
+#ifdef TA_SP
+	if (g_singlePlayer.integer == 1)
+#else
+	if (g_gametype.integer == GT_SINGLE_PLAYER)
+#endif
+	{
 		Q_snprintf(c1, sizeof (c1), "%d", client->pers.playercfg.prefcolor1);
 		Q_snprintf(c2, sizeof (c2), "%d", client->pers.playercfg.prefcolor2);
 	}
