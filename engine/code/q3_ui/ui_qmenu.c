@@ -1742,7 +1742,7 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 #ifdef IOQ3ZTM
 			if (uis.activemenu->noEscape)
 			{
-				return 0;
+				return sound;
 			}
 			else
 			{
