@@ -470,9 +470,6 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.color				= text_big_color;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
 
-	// Extra space between, "single player" and the others
-	y += VERTICAL_SPACING;
-
 	y += VERTICAL_SPACING;
 	spMenuInfo.sp_levelselect.generic.type		= MTYPE_PTEXT;
 	spMenuInfo.sp_levelselect.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -484,6 +481,9 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_levelselect.color				= text_big_color;
 	spMenuInfo.sp_levelselect.style				= UI_CENTER;
 
+	// Extra space between, "single player" and the others
+	y += VERTICAL_SPACING;
+
 	// Moved here from SP arena select
 	y += VERTICAL_SPACING;
 	spMenuInfo.sp_custom.generic.type				= MTYPE_PTEXT;
@@ -492,7 +492,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_custom.generic.y					= y;
 	spMenuInfo.sp_custom.generic.id					= ID_SP_CUSTOM;
 	spMenuInfo.sp_custom.generic.callback			= UI_SPMenu_Event;
-	spMenuInfo.sp_custom.string						= "Custom Game"; // Skirmish
+	spMenuInfo.sp_custom.string						= "Vs. Bots"; // Custom Game // Skirmish
 	spMenuInfo.sp_custom.color						= text_big_color;
 	spMenuInfo.sp_custom.style						= UI_CENTER;
 
