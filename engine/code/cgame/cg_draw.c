@@ -3003,9 +3003,9 @@ static void CG_DrawSPIntermission( void ) {
 	Q_snprintf(str, sizeof (str), "%s got though the level", name);
 
 #ifdef MISSIONPACK_HUD2
-	CG_Text_Paint( CENTER_X, 190, 0.3f, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
+	CG_Text_Paint( CENTER_X, 210, 0.3f, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
 #else
-	CG_DrawBigString( CENTER_X, 170, str, color[3] );
+	CG_DrawBigString( CENTER_X, 210, str, color[3] );
 #endif
 	trap_R_SetColor( NULL );
 }
