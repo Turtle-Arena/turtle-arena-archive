@@ -1149,7 +1149,6 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 		tent->s.time2 = surfaceFlags;
 	}
 
-	tent->s.number = targ->s.number;
 	tent->s.otherEntityNum2 = inflictor->s.number;
 
 	// only use small size debris if not exploding
