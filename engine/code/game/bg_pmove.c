@@ -193,6 +193,7 @@ static void PM_StartAnim( int anim ) {
 }
 #endif
 
+#ifdef TA_PLAYERS // LADDER
 static void PM_ContinueAnim( int anim ) {
 #ifdef IOQ3ZTM // Needed for TA_WEAPSYS
 	if (anim < 0) {
@@ -206,6 +207,7 @@ static void PM_ContinueAnim( int anim ) {
 		PM_ContinueLegsAnim(anim);
 	}
 }
+#endif
 #endif
 
 /*
