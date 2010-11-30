@@ -799,6 +799,9 @@ typedef struct {
 	menubitmap_s		picframe;
 
 	menulist_s			dedicated;
+#ifdef IOQ3ZTM // RECORD_SP_DEMO
+	menuradiobutton_s	recorddemo;
+#endif
 	menufield_s			timelimit;
 	menufield_s			fraglimit;
 	menufield_s			flaglimit;
@@ -1026,6 +1029,24 @@ static void ServerOptions_Start( void ) {
 	// the wait commands will allow the dedicated to take effect
 	info = UI_GetArenaInfoByNumber( s_startserver.maplist[ s_startserver.currentmap ]);
 	trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", Info_ValueForKey( info, "map" )));
+
+#ifdef IOQ3ZTM // RECORD_SP_DEMO
+	trap_Cvar_SetValue( "ui_recordSPDemo", s_serveroptions.recorddemo.curvalue );
+	if (s_serveroptions.recorddemo.curvalue) {
+		char buff[MAX_STRING_CHARS];
+
+		Com_sprintf(buff, MAX_STRING_CHARS, "%s_%i", Info_ValueForKey( info, "map" ), s_serveroptions.gametype);
+		trap_Cvar_Set("ui_recordSPDemoName", buff);
+
+#ifdef MISSIONPACK
+		// If not going to do a warmup and then map_restart, tell client to run demo record command
+		if (!trap_Cvar_VariableValue("g_doWarmup"))
+#endif
+		{
+			trap_Cvar_Set("activeAction", va("set g_synchronousclients 1 ; record %s \n", buff));
+		}
+	}
+#endif
 
 	// add bots
 	trap_Cmd_ExecuteText( EXEC_APPEND, "wait 3\n" );
@@ -1734,6 +1755,18 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.dedicated.generic.name		= "Dedicated:";
 		s_serveroptions.dedicated.itemnames			= dedicated_list;
 	}
+#ifdef IOQ3ZTM // RECORD_SP_DEMO
+	else
+	{
+		// Record demo option
+		y += BIGCHAR_HEIGHT+2;
+		s_serveroptions.recorddemo.generic.type		= MTYPE_RADIOBUTTON;
+		s_serveroptions.recorddemo.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+		s_serveroptions.recorddemo.generic.x		= OPTIONS_X;
+		s_serveroptions.recorddemo.generic.y		= y;
+		s_serveroptions.recorddemo.generic.name		= "Record Game:";
+	}
+#endif
 
 	if( s_serveroptions.multiplayer ) {
 		y += BIGCHAR_HEIGHT+2;
@@ -1884,6 +1917,11 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	if( s_serveroptions.multiplayer ) {
 		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.dedicated );
 	}
+#ifdef IOQ3ZTM // RECORD_SP_DEMO
+	else {
+		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.recorddemo);
+	}
+#endif
 	if( s_serveroptions.multiplayer ) {
 		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.hostname );
 	}
