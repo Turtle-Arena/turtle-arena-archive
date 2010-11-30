@@ -196,6 +196,9 @@ static void UI_LoadArenas( void ) {
 		strcat(filename, dirptr);
 		UI_LoadArenasFromFile(filename);
 	}
+#ifdef IOQ3ZTM // LESS_PRINT
+	if (uis.debug)
+#endif
 	trap_Print( va( "%i arenas parsed\n", ui_numArenas ) );
 	if (outOfMemory) trap_Print(S_COLOR_YELLOW"WARNING: not anough memory in pool to load all arenas\n");
 
@@ -397,6 +400,9 @@ static void UI_LoadBots( void ) {
 		strcat(filename, dirptr);
 		UI_LoadBotsFromFile(filename);
 	}
+#ifdef IOQ3ZTM // LESS_PRINT
+	if (uis.debug)
+#endif
 	trap_Print( va( "%i bots parsed\n", ui_numBots ) );
 }
 
