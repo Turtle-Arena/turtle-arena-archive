@@ -2756,6 +2756,16 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 	// default handling
 	switch ( key ) {
 
+#ifdef TA_MAIN // Changed to fit with default config, F11 is binded to screenshot. Also enable real dev-mode.
+		case K_F10:
+			debugMode ^= 1;
+			DC->setCVar("developer", va("%d", debugMode));
+			break;
+
+		case K_F11:
+			DC->executeText(EXEC_APPEND, "screenshot\n");
+			break;
+#else
 		case K_F11:
 			if (DC->getCVarValue("developer")) {
 				debugMode ^= 1;
@@ -2767,6 +2777,7 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 				DC->executeText(EXEC_APPEND, "screenshot\n");
 			}
 			break;
+#endif
 		case K_KP_UPARROW:
 		case K_UPARROW:
 			Menu_SetPrevCursorItem(menu);
