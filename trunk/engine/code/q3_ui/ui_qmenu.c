@@ -1794,11 +1794,20 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 	switch ( key )
 	{
 #ifndef NDEBUG
+#ifdef TA_MAIN // Changed to fit with default config, F11 is binded to screenshot. Also enable real dev-mode.
+		case K_F10:
+			uis.debug ^= 1;
+			trap_Cvar_SetValue("developer", uis.debug);
+			break;
+
+		case K_F11:
+#else
 		case K_F11:
 			uis.debug ^= 1;
 			break;
 
 		case K_F12:
+#endif
 			trap_Cmd_ExecuteText(EXEC_APPEND, "screenshot\n");
 			break;
 #endif
