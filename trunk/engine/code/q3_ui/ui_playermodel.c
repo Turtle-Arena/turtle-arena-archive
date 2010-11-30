@@ -589,7 +589,11 @@ static void PlayerModel_MenuInit( void )
 
 	s_playermodel.banner.generic.type  = MTYPE_BTEXT;
 	s_playermodel.banner.generic.x     = 320;
+#if defined TA_DATA && IOQ3ZTM // FONT_REWRITE // ZTM: HACK?: Text is too low, goes behind model select grid
+	s_playermodel.banner.generic.y     = 8;
+#else
 	s_playermodel.banner.generic.y     = 16;
+#endif
 	s_playermodel.banner.string        = "PLAYER MODEL";
 	s_playermodel.banner.color         = text_banner_color;
 	s_playermodel.banner.style         = UI_CENTER;
