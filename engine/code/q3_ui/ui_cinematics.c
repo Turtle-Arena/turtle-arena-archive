@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ID_BACK			10
 #define ID_CIN_IDLOGO	11
 #define ID_CIN_INTRO	12
+#ifndef TA_SP // LESS_VIDEOS
 #define ID_CIN_TIER1	13
 #define ID_CIN_TIER2	14
 #define ID_CIN_TIER3	15
@@ -41,6 +42,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ID_CIN_TIER6	18
 #define ID_CIN_TIER7	19
 #define ID_CIN_END		20
+#endif
 
 
 typedef struct {
@@ -50,6 +52,7 @@ typedef struct {
 	menubitmap_s	framer;
 	menutext_s		cin_idlogo;
 	menutext_s		cin_intro;
+#ifndef TA_SP // LESS_VIDEOS
 	menutext_s		cin_tier1;
 	menutext_s		cin_tier2;
 	menutext_s		cin_tier3;
@@ -58,6 +61,7 @@ typedef struct {
 	menutext_s		cin_tier6;
 	menutext_s		cin_tier7;
 	menutext_s		cin_end;
+#endif
 	menubitmap_s	back;
 } cinematicsMenuInfo_t;
 
@@ -66,6 +70,7 @@ static cinematicsMenuInfo_t	cinematicsMenuInfo;
 static char *cinematics[] = {
 	"idlogo",
 	"intro",
+#ifndef TA_SP // LESS_VIDEOS
 	"tier1",
 	"tier2",
 	"tier3",
@@ -74,6 +79,7 @@ static char *cinematics[] = {
 	"tier6",
 	"tier7",
 	"end"
+#endif
 };
 
 /*
@@ -102,10 +108,13 @@ static void UI_CinematicsMenu_Event( void *ptr, int event ) {
 
 	n = ((menucommon_s*)ptr)->id - ID_CIN_IDLOGO;
 	trap_Cvar_Set( "nextmap", va( "ui_cinematics %i", n ) );
+#ifndef TA_SP // LESS_VIDEOS
 	if( uis.demoversion && ((menucommon_s*)ptr)->id == ID_CIN_END ) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; cinematic demoEnd.RoQ 1\n" );
 	}
-	else {
+	else
+#endif
+	{
 		trap_Cmd_ExecuteText( EXEC_APPEND, va( "disconnect; cinematic %s.RoQ\n", cinematics[n] ) );
 	}
 }
@@ -216,7 +225,11 @@ static void UI_CinematicsMenu_Init( void ) {
 	cinematicsMenuInfo.framer.width  			= 256;
 	cinematicsMenuInfo.framer.height  			= 334;
 
+#ifdef TA_SP // LESS_VIDEOS
+	y = 100 + 4 * VERTICAL_SPACING;
+#else
 	y = 100;
+#endif
 	cinematicsMenuInfo.cin_idlogo.generic.type		= MTYPE_PTEXT;
 	cinematicsMenuInfo.cin_idlogo.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	cinematicsMenuInfo.cin_idlogo.generic.x			= 320;
@@ -224,7 +237,7 @@ static void UI_CinematicsMenu_Init( void ) {
 	cinematicsMenuInfo.cin_idlogo.generic.id		= ID_CIN_IDLOGO;
 	cinematicsMenuInfo.cin_idlogo.generic.callback	= UI_CinematicsMenu_Event; 
 #ifdef TA_MISC
-	cinematicsMenuInfo.cin_idlogo.string			= "MAIN";
+	cinematicsMenuInfo.cin_idlogo.string			= "LOGO";
 #else
 	cinematicsMenuInfo.cin_idlogo.string			= "ID LOGO";
 #endif
@@ -258,6 +271,7 @@ static void UI_CinematicsMenu_Init( void ) {
 	}
 #endif
 
+#ifndef TA_SP // LESS_VIDEOS
 	y += VERTICAL_SPACING;
 	cinematicsMenuInfo.cin_tier1.generic.type		= MTYPE_PTEXT;
 	cinematicsMenuInfo.cin_tier1.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -417,6 +431,7 @@ static void UI_CinematicsMenu_Init( void ) {
 		cinematicsMenuInfo.cin_end.generic.flags |= QMF_GRAYED;
     }
 #endif
+#endif
 
 	cinematicsMenuInfo.back.generic.type		= MTYPE_BITMAP;
 	cinematicsMenuInfo.back.generic.name		= ART_BACK0;
@@ -434,6 +449,7 @@ static void UI_CinematicsMenu_Init( void ) {
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.framer );
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.cin_idlogo );
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.cin_intro );
+#ifndef TA_SP // LESS_VIDEOS
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.cin_tier1 );
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.cin_tier2 );
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.cin_tier3 );
@@ -442,6 +458,7 @@ static void UI_CinematicsMenu_Init( void ) {
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.cin_tier6 );
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.cin_tier7 );
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.cin_end );
+#endif
 	Menu_AddItem( &cinematicsMenuInfo.menu, &cinematicsMenuInfo.back );
 }
 
