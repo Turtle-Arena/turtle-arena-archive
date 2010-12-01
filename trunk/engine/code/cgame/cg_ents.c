@@ -292,26 +292,26 @@ void CG_MiscObjectAnimate( centity_t *cent, int *oldframe, int *frame, float *ba
 			cent->oe.lastSoundFrame = -1;
 
 			// Check if we need to play a sound.
-			for (i = 0; i < MAX_BG_SOUNDS; i++)
+			for (i = 0; i < cent->oe.sounds.numSounds; i++)
 			{
-				if (!cent->oe.sounds[i].numSounds)
+				if (!cent->oe.sounds.sounddefs[i].numSounds)
 					continue;
-				if (cent->oe.sounds[i].anim != cent->oe.anim)
+				if (cent->oe.sounds.sounddefs[i].anim != cent->oe.anim)
 					continue;
 				if ((cent->objectcfg->animations[cent->oe.anim].firstFrame +
-					cent->oe.sounds[i].frame) != cent->oe.lerp.frame)
+					cent->oe.sounds.sounddefs[i].frame) != cent->oe.lerp.frame)
 				{
 					continue;
 				}
 				//
-				if (rand()%100 < cent->oe.sounds[i].chance)
+				if (rand()%100 < cent->oe.sounds.sounddefs[i].chance)
 				{
 					continue;
 				}
 
 				// Found sound to play
-				snd = rand() % cent->oe.sounds[i].numSounds;
-				trap_S_StartSound(NULL, cent->currentState.number, CHAN_BODY, cent->oe.sounds[i].sounds[snd]);
+				snd = rand() % cent->oe.sounds.sounddefs[i].numSounds;
+				trap_S_StartSound(NULL, cent->currentState.number, CHAN_BODY, cent->oe.sounds.sounddefs[i].sounds[snd]);
 				cent->oe.lastSoundFrame = cent->oe.lerp.frame;
 				break;
 			}

@@ -1372,16 +1372,18 @@ char	*modNames[MOD_MAX] = {
 };
 int modNamesSize = sizeof( modNames ) / sizeof( modNames[0] );
 
-#if defined TA_WEAPSYS || defined TA_PLAYERSYS
+#if defined TA_WEAPSYS || defined TA_PLAYERSYS || defined TA_ENTSYS
 typedef struct
 {
 	int num;
 	char *name;
-} playerAnimationDef_t;
+} strAnimationDef_t;
 
 #define ANIMDEF(x) {x, #x }
+#endif
 
-playerAnimationDef_t playerAnimationDefs[] = {
+#if defined TA_WEAPSYS || defined TA_PLAYERSYS
+strAnimationDef_t playerAnimationDefs[] = {
 	// Quake3
 	ANIMDEF(BOTH_DEATH1),
 	ANIMDEF(BOTH_DEAD1),
@@ -4032,7 +4034,7 @@ const char *npcDeathNames[NPCD_MAX+1] =
 	NULL
 };
 
-extern const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS];
+strAnimationDef_t objectAnimationDefs[];
 
 static qboolean NPC_Parse(char **p) {
 	char *token;
@@ -4239,14 +4241,14 @@ static qboolean NPC_Parse(char **p) {
 			qboolean animName = qfalse;
 
 			// ZTM: New animation loading.
-			for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
+			for (i = 0; objectAnimationDefs[i].name != NULL; i++)
 			{
-				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
+				if ( !Q_stricmp( token, objectAnimationDefs[i].name ) )
 				{
 					animName = qtrue;
-					if (BG_LoadAnimation(p, i, animations, NULL, AP_OBJECT) != 1)
+					if (BG_LoadAnimation(p, objectAnimationDefs[i].num, animations, NULL, AP_OBJECT) != 1)
 					{
-						Com_Printf("NPC_Parse: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
+						Com_Printf("NPC_Parse: Anim %s: Failed loading.\n", objectAnimationDefs[i].name);
 					}
 					break;
 				}
@@ -7229,33 +7231,49 @@ bg_objectcfg_t *BG_DefaultObjectCFG(void)
 	return &bg_objectcfgs[0];
 }
 
-const char *misc_object_anim_names[MAX_MISC_OBJECT_ANIMATIONS] =
-{
-	"OBJECT_IDLE",
-	"OBJECT_DEATH1",
-	"OBJECT_DEATH2",
-	"OBJECT_DEATH3",
-	"OBJECT_DEAD1",
-	"OBJECT_DEAD2",
-	"OBJECT_DEAD3",
-	"OBJECT_LAND",
-	"OBJECT_PAIN"
+strAnimationDef_t objectAnimationDefs[] = {
+	ANIMDEF(OBJECT_IDLE),
+	ANIMDEF(OBJECT_DEATH1),
+	ANIMDEF(OBJECT_DEATH2),
+	ANIMDEF(OBJECT_DEATH3),
+	ANIMDEF(OBJECT_DEAD1),
+	ANIMDEF(OBJECT_DEAD2),
+	ANIMDEF(OBJECT_DEAD3),
+	ANIMDEF(OBJECT_LAND),
+	ANIMDEF(OBJECT_PAIN)
 #ifdef TA_NPCSYS
 	,
-	"OBJECT_TAUNT",
-	"OBJECT_ATTACK_FAR",
-	"OBJECT_ATTACK_MELEE",
-	"OBJECT_STANDING_ACTIVE",
-	"OBJECT_WALK",
-	"OBJECT_RUN",
-	"OBJECT_BACKPEDAL",
-	"OBJECT_JUMP"
+	ANIMDEF(OBJECT_TAUNT),
+	ANIMDEF(OBJECT_ATTACK_FAR),
+	ANIMDEF(OBJECT_ATTACK_MELEE),
+	ANIMDEF(OBJECT_STANDING_ACTIVE),
+	ANIMDEF(OBJECT_WALK),
+	ANIMDEF(OBJECT_RUN),
+	ANIMDEF(OBJECT_BACKPEDAL),
+	ANIMDEF(OBJECT_JUMP),
 #endif
+
+	// End of List
+	{ 0, NULL }
 };
 
-static qboolean Sounds_Parse(char **p, const char *name, bg_objectcfg_t *objectcfg) {
+#ifndef QAGAME
+sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed );
+#endif
+
+/* Load sounds example:
+{
+	OBJECT_IDLE 3 sounds/object/idle%d.wav 1 3 30
+	OBJECT_PAIN 0 sounds/object/pain.wav 0 0 0
+}
+*/
+static qboolean Sounds_Parse(char **p, const char *name, bg_sounds_t *sounds, prefixType_e prefixType, strAnimationDef_t *animDefs) {
+	bg_sounddef_t *sounddef;
 	char *token;
 	int i;
+#ifndef QAGAME
+	int j;
+#endif
 
 	token = COM_ParseExt(p, qtrue);
 	if (token[0] != '{') {
@@ -7273,16 +7291,76 @@ static qboolean Sounds_Parse(char **p, const char *name, bg_objectcfg_t *objectc
 			return qfalse;
 		}
 
-		for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
-		{
-			if (Q_stricmp(token, misc_object_anim_names[i]) == 0) {
-				// Found anim
-				// Load sound info
+		for (i = 0; animDefs[i].name != NULL; i++) {
+			if (Q_stricmp(token, animDefs[i].name) == 0) {
+				// Found anim, load sound info
+				sounddef = &sounds->sounddefs[sounds->numSounds];
+				sounddef->prefixType = prefixType;
+				sounddef->anim = animDefs[i].num;
+
+				token = COM_Parse(p);
+				if ( !token || token[0] == 0 ) {
+					i = -1;
+					break;
+				}
+				sounddef->frame = atoi(token);
+
+				token = COM_Parse(p);
+				if ( !token || token[0] == 0 ) {
+					i = -1;
+					break;
+				}
+				Q_strncpyz(sounddef->name, token, MAX_QPATH);
+
+				token = COM_Parse(p);
+				if ( !token || token[0] == 0 ) {
+					i = -1;
+					break;
+				}
+				sounddef->start = atoi(token);
+
+				token = COM_Parse(p);
+				if ( !token || token[0] == 0 ) {
+					i = -1;
+					break;
+				}
+				sounddef->end = atoi(token);
+
+				token = COM_Parse(p);
+				if ( !token || token[0] == 0 ) {
+					i = -1;
+					break;
+				}
+				sounddef->chance = atoi(token);
+
+				if (sounddef->end - sounddef->start > MAX_RAND_SOUNDS)
+				{
+					Com_Printf("Warning: Too many random sound indexes in sounddef, only using first %d\n", MAX_RAND_SOUNDS);
+					sounddef->end = sounddef->start + MAX_RAND_SOUNDS;
+				}
+
+#ifndef QAGAME
+				// Load sounds
+				for (j = sounddef->start; j < sounddef->end; j++) {
+					sounddef->sounds[j-sounddef->start] = trap_S_RegisterSound(va(token, j), qfalse);
+				}
+#endif
+
+				// Check if there is a open slot
+				if (sounds->numSounds == MAX_BG_SOUNDS) {
+					Com_Printf("Warning out of free slots for new sounddef, over writing last. (In %s)\n", name);
+				} else {
+					sounds->numSounds++;
+				}
 				break;
 			}
 		}
+		if (i == -1) {
+			Com_Printf( "skipping malformed sounddef line in sounds (In %s)\n", name );
+			continue;
+		}
 		// Found anim
-		if (i < MAX_MISC_OBJECT_ANIMATIONS) {
+		if (animDefs[i].name != NULL) {
 			continue;
 		}
 
@@ -7463,7 +7541,7 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 			continue;
 		}
 		else if ( Q_stricmp( token, "sounds" ) == 0 ) {
-			if (Sounds_Parse(&text_p, filename, objectcfg)) {
+			if (Sounds_Parse(&text_p, filename, &objectcfg->sounds, AP_OBJECT, objectAnimationDefs)) {
 				continue;
 			}
 		}
@@ -7472,13 +7550,13 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 			qboolean animName = qfalse;
 
 			// Load animations by name.
-			for (i = 0; i < MAX_MISC_OBJECT_ANIMATIONS; i++)
+			for (i = 0; objectAnimationDefs[i].name != NULL; i++)
 			{
-				if ( !Q_stricmp( token, misc_object_anim_names[i] ) )
+				if ( !Q_stricmp( token, objectAnimationDefs[i].name ) )
 				{
 					animName = qtrue;
-					if (BG_LoadAnimation(&text_p, i, animations, NULL, AP_OBJECT) != 1) {
-						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", misc_object_anim_names[i]);
+					if (BG_LoadAnimation(&text_p, objectAnimationDefs[i].num, animations, NULL, AP_OBJECT) != 1) {
+						Com_Printf("BG_ParseObjectCFGFile: Anim %s: Failed loading.\n", objectAnimationDefs[i].name);
 					}
 					break;
 				}
