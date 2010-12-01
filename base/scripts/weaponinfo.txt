@@ -1060,7 +1060,7 @@ projectile "p_dart"
 	speed 500
 	timetolive 10000
 	//shootable 1
-	stickOnImpact 2
+	stickOnImpact PSOI_ANGLE_180
 	//falltoground 1
 	spinType PS_ROLL
 }

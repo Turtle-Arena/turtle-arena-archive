@@ -628,6 +628,13 @@ typedef enum
 #define PF_USE_GRAVITY 4
 #define PF_IMPACTMARK_FADE_ALPHA 8
 #define PF_IMPACTMARK_COLORIZE 16
+//projectile stickOnImpact
+#define PSOI_NONE 0
+#define PSOI_KEEP_ANGLES 1 // Used by shurikens
+#define PSOI_ANGLE_180 2
+#define PSOI_ANGLE_90 3
+#define PSOI_ANGLE_0 4
+#define PSOI_ANGLE_270 5
 // missile stuff (func, model, etc)
 typedef struct
 {
@@ -667,8 +674,8 @@ typedef struct
 	int bounceType;
 	int maxBounces;
 	int stickOnImpact;
-	int falltoground;
-	int grappling;
+	qboolean fallToGround;
+	qboolean grappling;
 	int homing;
 	// if "homing" > 0 then projectile is a homing missile,
 	//   homing is also used as the delay (in msec) before homing in on a player.
@@ -684,8 +691,8 @@ typedef struct
 	char impactPlayerSoundName[MAX_QPATH];
 	char impactMetalSoundName[MAX_QPATH];
 
-	// Instant damage and imstant only variables
-	int instantDamage;
+	// Instant damage and instant only variables
+	qboolean instantDamage;
 	int maxHits; // Projectiles can go through players... currently instantDamage only
 
 } bg_projectileinfo_t;
