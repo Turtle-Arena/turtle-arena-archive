@@ -2,7 +2,7 @@
 // entity 0
 {
 "classname" "worldspawn"
-"music" "space"
+"music" "music/space"
 "gravity" "600"
 // brush 0
 {
