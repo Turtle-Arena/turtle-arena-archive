@@ -317,15 +317,12 @@ Stuff I'd like to do to the MD3 part of MM3D...
 = Website =
 Current Location: http://ztm.x10hosting.com/ta/
 
-  * TODO: Find a new host?
+  * TODO: Upgrade x10hosting?
 
-  * TODO: Get a domain name
+  * TODO: Get a domain name for Turtle Arena?
 
-  * TODO (STARTED): Updating website for Turtle Arena 0.2
+  * TODO: Update for Turtle Arena 0.4
 
-  * TODO: Add a screenshot to the main page?
-    * See 'Note to software creators' at the bottom of http://www.opensourcewindows.org/
+  * TODO: Add a phpbb fourm
 
-  * TODO: Update Features page?
-
-  * TODO: Add button (well really a image) instead of just text download link?
+  * TODO: Add MediaWiki to website? (and use the same database as phpbb)

@@ -131,7 +131,7 @@ G_ThrowShuriken
 
 Spawns shuriken missile based on holdable number.
 
-ZTM: TODO: Player animation for throw shuriken and use origin of tag_hand_* (primary or secondary)?
+ZTM: TODO: Player animation for throw shuriken?
 ================
 */
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable)
