@@ -515,7 +515,7 @@ projectile "p_prox mine"
 	deathType "PD_GRENADE"
 	explosionType "PE_PROX"
 	useGravity 1
-	stickOnImpact 3
+	stickOnImpact PSOI_ANGLE_90
 	hitSound0 "sound/weapons/proxmine/wstbexpl.wav"
 
 	// stick sounds

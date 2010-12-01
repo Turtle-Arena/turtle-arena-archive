@@ -40,7 +40,7 @@ projectile "p_shuriken"
 	explosionType "PE_NONE"
 	impactMarkName "gfx/damage/bullet_mrk"
 	impactMarkRadius 8
-	stickOnImpact 1
+	stickOnImpact PSOI_KEEP_ANGLES
 }
 
 // Still work-in-progress...
@@ -88,7 +88,7 @@ projectile "p_fireshuriken"
 	spinType "PS_PITCH"
 	hitMarkName "gfx/damage/burn_med_mrk"
 	hitMarkRadius 32
-	stickOnImpact 1
+	stickOnImpact PSOI_KEEP_ANGLES
 	impactMarkName "gfx/damage/bullet_mrk"
 	impactMarkRadius 8
 }

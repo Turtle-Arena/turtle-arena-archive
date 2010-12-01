@@ -699,7 +699,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			else
 				bolt->nextthink = level.time + bg_projectileinfo[projnum].timetolive;
 
-			if (bg_projectileinfo[projnum].falltoground)
+			if (bg_projectileinfo[projnum].fallToGround)
 				bolt->think = G_MissileFall; // Just fall out of air.
 			else
 				bolt->think = G_ExplodeMissile;
@@ -758,7 +758,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			bolt->takedamage = qtrue;
 			bolt->health = bg_projectileinfo[projnum].damage;
 
-			if (bg_projectileinfo[projnum].falltoground)
+			if (bg_projectileinfo[projnum].fallToGround)
 				bolt->die = G_MissileFall_Die;
 			else
 				bolt->die = G_Missile_Die;
@@ -1149,7 +1149,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 	}
 
 #ifdef TA_WEAPSYS
-	if (bg_projectileinfo[ent->s.weapon].stickOnImpact) {
+	if (bg_projectileinfo[ent->s.weapon].stickOnImpact != PSOI_NONE) {
 		vec3_t dir;
 
 #ifndef TURTLEARENA
@@ -1200,18 +1200,7 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		SnapVectorTowards( trace->endpos, ent->s.pos.trBase );
 		G_SetOrigin( ent, trace->endpos );
 
-		if (bg_projectileinfo[ent->s.weapon].stickOnImpact >= 2) {
-			VectorCopy(trace->plane.normal, dir);
-			vectoangles( dir, ent->s.angles );
-
-			if (bg_projectileinfo[ent->s.weapon].stickOnImpact == 2) {
-				ent->s.angles[0] += 180;
-			} else if (bg_projectileinfo[ent->s.weapon].stickOnImpact == 3) {
-				// Maybe this is good for prox mines, but doesn't look good on my
-				//   rocket or shuirkens...
-				ent->s.angles[0] += 90;
-			}
-		} else {
+		if (bg_projectileinfo[ent->s.weapon].stickOnImpact == PSOI_KEEP_ANGLES) {
 #if 0
 			// convert direction of travel into axis
 			if ( VectorNormalize2( ent->s.pos.trDelta, dir ) == 0 ) {
@@ -1223,6 +1212,26 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 #else
 			VectorCopy(trace->plane.normal, dir);
 #endif
+		} else {
+			VectorCopy(trace->plane.normal, dir);
+			vectoangles( dir, ent->s.angles );
+
+			switch (bg_projectileinfo[ent->s.weapon].stickOnImpact)
+			{
+				case PSOI_ANGLE_270:
+					ent->s.angles[0] += 270;
+					break;
+				case PSOI_ANGLE_180:
+					ent->s.angles[0] += 180;
+					break;
+				case PSOI_ANGLE_90:
+					// Maybe this is good for prox mines, but doesn't look good on my
+					//   rocket or shuirkens...
+					ent->s.angles[0] += 90;
+					break;
+				case PSOI_ANGLE_0:
+					break;
+			}
 		}
 
 		// Save direction

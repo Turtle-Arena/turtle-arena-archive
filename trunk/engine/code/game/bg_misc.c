@@ -1802,7 +1802,7 @@ int BG_NumWeaponGroups(void)
 			if ( *_token ) { \
 				_out = atoi(_token); \
 			} else { \
-				break; \
+				Com_Printf("Missing token for %s\n", _name); \
 			} \
 			continue; \
 		}
@@ -1813,7 +1813,26 @@ int BG_NumWeaponGroups(void)
 			if ( *_token ) { \
 				_out = atof(_token); \
 			} else { \
-				break; \
+				Com_Printf("Missing token for %s\n", _name); \
+			} \
+			continue; \
+		}
+
+// Some q3 code uses ( 1 1 1 ), so it is supported here too.
+#define PARSE_FLOAT3(_token, _name, _out) \
+		if ( !Q_stricmp( _token, _name ) ) { \
+			for (i = 0; i < 3; i++) { \
+				_token = COM_Parse( p ); \
+				if ( _token[0] == '(' || _token[0] == ')') { \
+					i--; \
+					continue; \
+				} \
+				if ( *_token ) { \
+					_out[i] = atof(_token); \
+				} else { \
+					Com_Printf("Missing token for %s\n", _name); \
+					break; \
+				} \
 			} \
 			continue; \
 		}
@@ -1840,7 +1859,42 @@ int BG_NumWeaponGroups(void)
 				} \
 			} else { \
 				Com_Printf("Missing token for %s\n", _name); \
-				_out = 0; \
+			} \
+			continue; \
+		}
+
+#define PARSE_BOOL(_token, _name, _out) \
+		if ( !Q_stricmp( _token, _name ) ) { \
+			_token = COM_Parse( p ); \
+			if ( *_token ) { \
+				if ( !Q_stricmp( _token, "true" ) || !Q_stricmp( _token, "qtrue" ) || !Q_stricmp( _token, "1" )) \
+					_out = qtrue; \
+				else if ( !Q_stricmp( _token, "false" ) || !Q_stricmp( _token, "qfalse" ) || !Q_stricmp( _token, "0" )) \
+					_out = qfalse; \
+				else { \
+					Com_Printf("Unknown token %s: valid options for \'%s\' are true and false\n", _token, _name); \
+					return qfalse; \
+				} \
+			} else { \
+				Com_Printf("Missing token for %s\n", _name); \
+			} \
+			continue; \
+		}
+
+#define PARSE_BIT(_token, _name, _out, _bit) \
+		if ( !Q_stricmp( _token, _name ) ) { \
+			_token = COM_Parse( p ); \
+			if ( *_token ) { \
+				if ( !Q_stricmp( _token, "true" ) || !Q_stricmp( _token, "qtrue" ) || !Q_stricmp( _token, "1" )) \
+					_out |= _bit; \
+				else if ( !Q_stricmp( _token, "false" ) || !Q_stricmp( _token, "qfalse" ) || !Q_stricmp( _token, "0" )) \
+					_out &= ~_bit; \
+				else { \
+					Com_Printf("Unknown token %s: valid options for \'%s\' are true and false\n", _token, _name); \
+					return qfalse; \
+				} \
+			} else { \
+				Com_Printf("Missing token for %s\n", _name); \
 			} \
 			continue; \
 		}
@@ -2182,6 +2236,18 @@ const char *pb_names[] =
 	NULL
 };
 
+//projectile stickOnImpact
+const char *psoi_names[] =
+{
+	"PSOI_NONE",
+	"PSOI_KEEP_ANGLES",
+	"PSOI_ANGLE_180",
+	"PSOI_ANGLE_90",
+	"PSOI_ANGLE_0",
+	"PSOI_ANGLE_270",
+	NULL
+};
+
 static qboolean Projectile_Parse(char **p) {
 	char *token;
 	bg_projectileinfo_t projectile;
@@ -2241,431 +2307,58 @@ static qboolean Projectile_Parse(char **p) {
 				Q_strncpyz(projectile.name, name, MAX_QPATH); // use backed up name
 			}
 			continue;
-		} else if ( !Q_stricmp( token, "model" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.model, sizeof (projectile.model), "%s", token);
-			} else {
-				projectile.model[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "modelBlue" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.modelBlue, sizeof (projectile.modelBlue), "%s", token);
-			} else {
-				projectile.modelBlue[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "modelRed" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.modelRed, sizeof (projectile.modelRed), "%s", token);
-			} else {
-				projectile.modelRed[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "damageAttacker" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.damageAttacker = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "damage" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.damage = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "splashdamage" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.splashDamage = atoi( token );
-			continue;
-		} else if ( !Q_stricmp( token, "splashRadius" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.splashRadius = atof(token);
-			continue;
-		} else if ( !Q_stricmp( token, "speed" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.speed = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "timetolive" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.timetolive = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "shootable" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.shootable = (atoi(token) != 0);
-			continue;
-		} else if ( !Q_stricmp( token, "trailType" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			for (i = 0; pt_names[i] != NULL; i++)
-			{
-				if ( !Q_stricmp( token, pt_names[i] ) ) {
-					projectile.trailType = i;
-					break;
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "deathType" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			for (i = 0; pd_names[i] != NULL; i++)
-			{
-				if ( !Q_stricmp( token, pd_names[i] ) ) {
-					projectile.deathType = i;
-					break;
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "explosionType" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			for (i = 0; pe_names[i] != NULL; i++)
-			{
-				if ( !Q_stricmp( token, pe_names[i] ) ) {
-					projectile.explosionType = i;
-					break;
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "missileDlight" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.missileDlight = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "missileSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.missileSoundName, sizeof (projectile.missileSoundName), "%s", token);
-			} else {
-				projectile.missileSoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "missileDlightColor" ) ) {
-			for ( i = 0 ; i < 3 ; i++ ) {
-				token = COM_Parse( p );
-				if ( !*token ) {
-					break;
-				}
-				projectile.missileDlightColor[i] = atof( token );
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "sprite" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.sprite, sizeof (projectile.sprite), "%s", token);
-			} else {
-				projectile.sprite[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "spriteRadius" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.spriteRadius = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "spinType" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			for (i = 0; ps_names[i] != NULL; i++)
-			{
-				if ( !Q_stricmp( token, ps_names[i] ) ) {
-					projectile.spinType = i;
-					break;
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "bounceType" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			for (i = 0; pb_names[i] != NULL; i++)
-			{
-				if ( !Q_stricmp( token, pb_names[i] ) ) {
-					projectile.bounceType = i;
-					break;
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "maxBounces" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.maxBounces = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "useGravity" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				projectile.flags |= PF_USE_GRAVITY;
-			else
-				projectile.flags &= ~PF_USE_GRAVITY;
-			continue;
-		} else if ( !Q_stricmp( token, "stickOnImpact" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.stickOnImpact = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "falltoground" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.falltoground = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "spdRndAdd" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.spdRndAdd = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "spread" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.spread = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "numProjectiles" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.numProjectiles = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "homing" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.homing = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "grappling" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.grappling = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "instantDamage" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.instantDamage = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "maxHits" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.maxHits = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "hitMarkFadeAlpha" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				projectile.flags |= PF_HITMARK_FADE_ALPHA;
-			else
-				projectile.flags &= ~PF_HITMARK_FADE_ALPHA;
-			continue;
-		} else if ( !Q_stricmp( token, "hitMarkColorize" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				projectile.flags |= PF_HITMARK_COLORIZE;
-			else
-				projectile.flags &= ~PF_HITMARK_COLORIZE;
-			continue;
-		} else if ( !Q_stricmp( token, "hitMarkName" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.hitMarkName, sizeof (projectile.hitMarkName), "%s", token);
-			} else {
-				projectile.hitMarkName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "hitMarkRadius" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.hitMarkRadius = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "hitSound0" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.hitSoundName[0], sizeof (projectile.hitSoundName[0]), "%s", token);
-			} else {
-				projectile.hitSoundName[0][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "hitSound1" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.hitSoundName[1], sizeof (projectile.hitSoundName[1]), "%s", token);
-			} else {
-				projectile.hitSoundName[1][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "hitSound2" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.hitSoundName[2], sizeof (projectile.hitSoundName[2]), "%s", token);
-			} else {
-				projectile.hitSoundName[2][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "hitPlayerSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.hitPlayerSoundName, sizeof (projectile.hitPlayerSoundName), "%s", token);
-			} else {
-				projectile.hitPlayerSoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "hitMetalSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.hitMetalSoundName, sizeof (projectile.hitMetalSoundName), "%s", token);
-			} else {
-				projectile.hitMetalSoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactMarkFadeAlpha" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				projectile.flags |= PF_IMPACTMARK_FADE_ALPHA;
-			else
-				projectile.flags &= ~PF_IMPACTMARK_FADE_ALPHA;
-			continue;
-		} else if ( !Q_stricmp( token, "impactMarkColorize" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				projectile.flags |= PF_IMPACTMARK_COLORIZE;
-			else
-				projectile.flags &= ~PF_IMPACTMARK_COLORIZE;
-			continue;
-		} else if ( !Q_stricmp( token, "impactMarkName" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.impactMarkName, sizeof (projectile.impactMarkName), "%s", token);
-			} else {
-				projectile.impactMarkName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactMarkRadius" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			projectile.impactMarkRadius = atoi(token);
-			continue;
-		} else if ( !Q_stricmp( token, "impactSound0" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.impactSoundName[0], sizeof (projectile.impactSoundName[0]), "%s", token);
-			} else {
-				projectile.impactSoundName[0][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactSound1" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.impactSoundName[1], sizeof (projectile.impactSoundName[1]), "%s", token);
-			} else {
-				projectile.impactSoundName[1][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactSound2" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.impactSoundName[2], sizeof (projectile.impactSoundName[2]), "%s", token);
-			} else {
-				projectile.impactSoundName[2][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactPlayerSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.impactPlayerSoundName, sizeof (projectile.impactPlayerSoundName), "%s", token);
-			} else {
-				projectile.impactPlayerSoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactMetalSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.impactMetalSoundName, sizeof (projectile.impactMetalSoundName), "%s", token);
-			} else {
-				projectile.impactMetalSoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "triggerSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.triggerSoundName, sizeof (projectile.triggerSoundName), "%s", token);
-			} else {
-				projectile.triggerSoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "tickSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(projectile.tickSoundName, sizeof (projectile.tickSoundName), "%s", token);
-			} else {
-				projectile.tickSoundName[0] = '\0';
-			}
-			continue;
 		}
-		
+		else PARSE_STRING(token, "model", projectile.model)
+		else PARSE_STRING(token, "modelBlue", projectile.modelBlue)
+		else PARSE_STRING(token, "modelRed", projectile.modelRed)
+		else PARSE_INTEGER(token, "damageAttacker", projectile.damageAttacker)
+		else PARSE_INTEGER(token, "damage", projectile.damage)
+		else PARSE_INTEGER(token, "splashDamage", projectile.splashDamage)
+		else PARSE_FLOAT(token, "splashRadius", projectile.splashRadius)
+		else PARSE_INTEGER(token, "speed", projectile.speed)
+		else PARSE_INTEGER(token, "timetolive", projectile.timetolive)
+		else PARSE_BOOL(token, "shootable", projectile.shootable)
+		else PARSE_LIST(token, "trailType", projectile.trailType, pt_names)
+		else PARSE_LIST(token, "deathType", projectile.deathType, pd_names)
+		else PARSE_LIST(token, "explosionType", projectile.explosionType, pe_names)
+		else PARSE_INTEGER(token, "missileDlight", projectile.missileDlight)
+		else PARSE_STRING(token, "missileSound", projectile.missileSoundName)
+		else PARSE_FLOAT3(token, "missileDlightColor", projectile.missileDlightColor)
+		else PARSE_STRING(token, "sprite", projectile.sprite)
+		else PARSE_INTEGER(token, "spriteRadius", projectile.spriteRadius)
+		else PARSE_LIST(token, "spinType", projectile.spinType, ps_names)
+		else PARSE_LIST(token, "bounceType", projectile.bounceType, pb_names)
+		else PARSE_INTEGER(token, "maxBounces", projectile.maxBounces)
+		else PARSE_BIT(token, "useGravity", projectile.flags, PF_USE_GRAVITY)
+		else PARSE_LIST(token, "stickOnImpact", projectile.stickOnImpact, psoi_names)
+		else PARSE_BOOL(token, "fallToGround", projectile.fallToGround)
+		else PARSE_INTEGER(token, "spdRndAdd", projectile.spdRndAdd)
+		else PARSE_INTEGER(token, "spread", projectile.spread)
+		else PARSE_INTEGER(token, "numProjectiles", projectile.numProjectiles)
+		else PARSE_INTEGER(token, "homing", projectile.homing)
+		else PARSE_BOOL(token, "grappling", projectile.grappling)
+		else PARSE_BOOL(token, "instantDamage", projectile.instantDamage)
+		else PARSE_INTEGER(token, "maxHits", projectile.maxHits)
+		else PARSE_BIT(token, "hitMarkFadeAlpha", projectile.flags, PF_HITMARK_FADE_ALPHA)
+		else PARSE_BIT(token, "hitMarkColorize", projectile.flags, PF_HITMARK_COLORIZE)
+		else PARSE_STRING(token, "hitMarkName", projectile.hitMarkName)
+		else PARSE_INTEGER(token, "hitMarkRadius", projectile.hitMarkRadius)
+		else PARSE_STRING(token, "hitSound0", projectile.hitSoundName[0])
+		else PARSE_STRING(token, "hitSound1", projectile.hitSoundName[1])
+		else PARSE_STRING(token, "hitSound2", projectile.hitSoundName[2])
+		else PARSE_STRING(token, "hitPlayerSound", projectile.hitPlayerSoundName)
+		else PARSE_STRING(token, "hitMetalSound", projectile.hitMetalSoundName)
+		else PARSE_BIT(token, "impactMarkFadeAlpha", projectile.flags, PF_IMPACTMARK_FADE_ALPHA)
+		else PARSE_BIT(token, "impactMarkColorize", projectile.flags, PF_IMPACTMARK_COLORIZE)
+		else PARSE_STRING(token, "impactMarkName", projectile.impactMarkName)
+		else PARSE_INTEGER(token, "impactMarkRadius", projectile.impactMarkRadius)
+		else PARSE_STRING(token, "impactSound0", projectile.impactSoundName[0])
+		else PARSE_STRING(token, "impactSound1", projectile.impactSoundName[1])
+		else PARSE_STRING(token, "impactSound2", projectile.impactSoundName[2])
+		else PARSE_STRING(token, "impactPlayerSound", projectile.impactPlayerSoundName)
+		else PARSE_STRING(token, "impactMetalSound", projectile.impactMetalSoundName)
+		else PARSE_STRING(token, "triggerSound", projectile.triggerSoundName)
+		else PARSE_STRING(token, "tickSound", projectile.tickSoundName)
 
 		Com_Printf( "unknown token '%s' in projectile %s\n", token, projectile.name );
 	}
@@ -3579,7 +3272,7 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tuseGravity %d\r\n", (projectile->flags & PF_USE_GRAVITY));
 
 		FS_Printf2("\tstickOnImpact %d\r\n", projectile->stickOnImpact);
-		FS_Printf2("\tfalltoground %d\r\n", projectile->falltoground);
+		FS_Printf2("\tfallToGround %d\r\n", projectile->fallToGround);
 		FS_Printf2("\tspdRndAdd %d\r\n", projectile->spdRndAdd);
 		FS_Printf2("\tspread %d\r\n", projectile->spread);
 		FS_Printf2("\tnumProjectiles %d\r\n", projectile->numProjectiles);
@@ -3857,7 +3550,7 @@ void BG_InitItemInfo(void)
 		strcpy(bg_projectileinfo[1].name, "p_gun");
 		bg_projectileinfo[1].numProjectiles = 1;
 		bg_projectileinfo[1].maxHits = 1;
-		bg_projectileinfo[1].instantDamage = 1;
+		bg_projectileinfo[1].instantDamage = qtrue;
 		bg_projectileinfo[1].damage = 10;
 		bg_numprojectiles = 2;
 	}
