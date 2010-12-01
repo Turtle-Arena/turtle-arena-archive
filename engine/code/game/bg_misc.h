@@ -1223,7 +1223,7 @@ extern materialInfo_t materialInfo[NUM_MATERIAL_TYPES];
 
 #ifdef TA_ENTSYS // MISC_OBJECT
 // TA_NPCSYS: Have Misc_Objects and NPCs use the same animations
-// Keep in sycn with CG's misc_object_anim_names
+// Keep in sycn with bg_misc's objectAnimationDefs
 typedef enum
 {
 	OBJECT_NONE = -1, // Just one frame, 0.
@@ -1259,22 +1259,30 @@ typedef enum
 	MAX_MISC_OBJECT_ANIMATIONS
 } miscObjectAnim_t;
 
-// ZTM: TODO: Sounds like Jedi Knight 2's animsounds.cfg, see Sounds_Parse
-//   Only cgame and ui need this, game doesn't use sounds.
+// Only cgame and ui need this, game doesn't use sounds. (See Sounds_Parse)
 #define MAX_RAND_SOUNDS 5
 typedef struct
 {
 	int anim; // Such as value of BOTH_DEATH1
-	int frame;
+	int frame; // frame in the animation
 	int numSounds; // play sounds[rand()%numSounds]
-	sfxHandle_t sounds[MAX_RAND_SOUNDS]; // Play random sound
+	char name[MAX_QPATH]; // base name of sound(s), if it has a "%d" it will be replaced for rand
+	int start; // random sound index start number
+	int end; // random sound index end number
 	int chance; // 0 = always, 100 = never { if (rand()%100 >= chance; play sound; }
-} bg_sound_t;
+
+	int prefixType; // prefixType_e
+	sfxHandle_t sounds[MAX_RAND_SOUNDS]; // Play random sound
+} bg_sounddef_t;
 
 // Currently not used by players...
 #define MAX_BG_SOUNDS MAX_TOTALANIMATIONS
 //#define MAX_BG_SOUNDS MAX_MISC_OBJECT_ANIMATIONS*2
-typedef bg_sound_t bg_sounds_t[MAX_BG_SOUNDS];
+typedef struct
+{
+	int numSounds;
+	bg_sounddef_t sounddefs[MAX_BG_SOUNDS];
+} bg_sounds_t;
 #endif
 
 
@@ -1495,6 +1503,7 @@ typedef struct
 	qboolean invisibleUnsolidDeath;
 	qboolean lerpframes; // Use raw frames, don't interperate them.
 	float scale; // Uniform scale
+	bg_sounds_t sounds;
 
 	// ZTM: TODO: For NPCs
 	// Speed control, some characters are faster then others.
