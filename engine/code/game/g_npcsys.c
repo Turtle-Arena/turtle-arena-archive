@@ -380,7 +380,7 @@ void G_RunNPC( gentity_t *ent )
 	Com_Memset(&ucmd, 0, sizeof (ucmd));
 	ucmd.serverTime = level.time;
 
-	// ZTM: TODO: Think here (setup ucmd).
+	// Think here (setup ucmd)
 	switch (ent->bgNPC.action)
 	{
 		case NACT_IDLE:

@@ -1593,7 +1593,7 @@ int BotSynonymContext(bot_state_t *bs) {
 }
 
 #ifdef TA_WEAPSYS // BOT_WEAP_WEIGHTS
-// ZTM: TODO: Use attackDelay?
+// ZTM: TODO: Use attackDelay as a factor?
 // Weight is total damage of the weapon (plus 100).
 int BotWeaponWeight(weapon_t w)
 {
