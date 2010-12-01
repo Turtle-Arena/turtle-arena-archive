@@ -1837,6 +1837,39 @@ int BG_NumWeaponGroups(void)
 			continue; \
 		}
 
+typedef struct
+{
+	vec3_t value;
+	const char *name;
+} strVec3_t;
+
+#define PARSE_FLOAT3_LIST(_token, _name, _out, _list) \
+		if ( !Q_stricmp( _token, _name ) ) { \
+			for (i = 0; i < 3; i++) { \
+				_token = COM_Parse( p ); \
+				if ( _token[0] == '(' || _token[0] == ')') { \
+					i--; \
+					continue; \
+				} \
+				if ( *_token ) { \
+					int j; \
+					for (j = 0; _list[j].name != NULL; j++) { \
+						if ( !Q_stricmp( _token, _list[j].name )) { \
+							VectorCopy(_list[j].value, _out); \
+							break; \
+						} \
+					} \
+					if (_list[j].name != NULL) \
+						break; \
+					_out[i] = atof(_token); \
+				} else { \
+					Com_Printf("Missing token for %s\n", _name); \
+					break; \
+				} \
+			} \
+			continue; \
+		}
+
 #define PARSE_LIST(_token, _name, _out, _list) \
 		if ( !Q_stricmp( _token, _name ) ) { \
 			_token = COM_Parse( p ); \
@@ -1848,6 +1881,33 @@ int BG_NumWeaponGroups(void)
 					} \
 				} \
 				if (_list[i] == NULL) { \
+					Com_Printf("Unknown token %s: valid options for \'%s\' are", _token, _name); \
+					for (i = 0; _list[i] != NULL; i++) \
+					{ \
+						if (i == 0) Com_Printf(" %s", _list[i]); \
+						else Com_Printf(", %s", _list[i]); \
+					} \
+					Com_Printf("\n"); \
+					return qfalse; \
+				} \
+			} else { \
+				Com_Printf("Missing token for %s\n", _name); \
+			} \
+			continue; \
+		}
+
+// Manual limit for when _list doesn't end with NULL.
+#define PARSE_LIST2(_token, _name, _out, _list, _limit) \
+		if ( !Q_stricmp( _token, _name ) ) { \
+			_token = COM_Parse( p ); \
+			if ( *_token ) { \
+				for (i = 0; i < _limit; i++) { \
+					if ( !Q_stricmp( _token, _list[i] ) ) { \
+						_out = i; \
+						break; \
+					} \
+				} \
+				if (i == _limit) { \
 					Com_Printf("Unknown token %s: valid options for \'%s\' are", _token, _name); \
 					for (i = 0; _list[i] != NULL; i++) \
 					{ \
@@ -2365,6 +2425,12 @@ static qboolean Projectile_Parse(char **p) {
 	return qfalse;
 }
 
+const char *trailtype_names[] = {
+	"none", // TRAIL_NONE
+	"normal", // TRAIL_NORMAL
+	NULL
+};
+
 static qboolean WeaponBlade_Parse(char **p, bg_weaponinfo_t *weapon) {
 	char *token;
 	int bladeNum = 0;
@@ -2424,63 +2490,39 @@ static qboolean WeaponBlade_Parse(char **p, bg_weaponinfo_t *weapon) {
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "origin" ) ) {
-			for ( i = 0 ; i < 3 ; i++ ) {
-				token = COM_Parse( p );
-				if ( !*token ) {
-					break;
-				}
-				blade->origin[i] = atof( token );
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "tip" ) ) {
-			for ( i = 0 ; i < 3 ; i++ ) {
-				token = COM_Parse( p );
-				if ( !*token ) {
-					break;
-				}
-				blade->tip[i] = atof( token );
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "damage" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			blade->damage = atoi( token );
-			continue;
-		} else if ( !Q_stricmp( token, "trailStyle" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
+		PARSE_FLOAT3(token, "origin", blade->origin)
+		else PARSE_FLOAT3(token, "tip", blade->tip)
+		else PARSE_INTEGER(token, "damage", blade->damage)
+		else PARSE_LIST(token, "trailStyle", blade->trailStyle, trailtype_names)
 
-			if (Q_stricmp(token, "none") == 0) {
-				blade->trailStyle = TRAIL_NONE;
-			}
-			else if (Q_stricmp(token, "normal") == 0) {
-				blade->trailStyle = TRAIL_NORMAL;
-			}
-			continue;
-		}
 		//Com_Printf( "unknown token '%s' [in blade] in %s\n", token, filename );
 		Com_Printf( "unknown token '%s' [in blade]\n", token );
 	}
 	return qfalse;
 }
 
-const char *weapontypeNames[WT_MAX] = {
+const char *weapontypeNames[WT_MAX+1] = {
 	"WT_NONE",
 	"WT_GAUNTLET",
 	"WT_GUN",
-	"WT_MELEE"
+	"WT_MELEE",
+	NULL
 };
 
-const char *barrelSpinNames[BS_MAX] = {
+const char *barrelSpinNames[BS_MAX+1] = {
 	"BS_PITCH",
 	"BS_YAW",
 	"BS_ROLL",
-	"BS_NONE"
+	"BS_NONE",
+	NULL
+};
+
+const strVec3_t flashColor_list[] = {
+	{{0,0,0}, "none"},
+	{{(float)'c',1.0f,0}, "color1"},
+	{{(float)'c',2.0f,0}, "color2"},
+
+	{{0,0,0}, NULL},
 };
 
 static qboolean Weapon_Parse(char **p) {
@@ -2545,6 +2587,16 @@ static qboolean Weapon_Parse(char **p) {
 				continue;
 			else
 				break;
+		} else if ( !Q_stricmp( token, "projectile" ) ) {
+			token = COM_Parse( p );
+			if ( !*token ) {
+				weapon.projnum = 0;
+				weapon.proj = &bg_projectileinfo[weapon.projnum];
+				continue;
+			}
+			weapon.projnum = BG_ProjectileIndexForName(token);
+			weapon.proj = &bg_projectileinfo[weapon.projnum];
+			continue;
 		} else if ( !Q_stricmp( token, "clone" ) ) {
 			char name[MAX_QPATH]; // Save name
 			int num;
@@ -2559,299 +2611,35 @@ static qboolean Weapon_Parse(char **p) {
 				Q_strncpyz(weapon.name, name, MAX_QPATH); // use backed up name
 			}
 			continue;
-		} else if ( !Q_stricmp( token, "model" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.model, sizeof (weapon.model), "%s", token);
-			}
-			else
-			{
-				weapon.model[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "weapontype" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			for (i = 0; i < WT_MAX; i++)
-			{
-				if ( !Q_stricmp( token, weapontypeNames[i] ) ) {
-					weapon.weapontype = i;
-					break;
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "attackDelay" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			weapon.attackDelay = atoi( token );
-			continue;
-		} else if ( !Q_stricmp( token, "impactMarkName" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.impactMarkName, sizeof (weapon.impactMarkName), "%s", token);
-			}
-			else
-			{
-				weapon.impactMarkName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactMarkRadius" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			weapon.impactMarkRadius = atoi( token );
-			continue;
-		} else if ( !Q_stricmp( token, "impactMarkFadeAlpha" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_IMPACTMARK_FADE_ALPHA;
-			else
-				weapon.flags &= ~WIF_IMPACTMARK_FADE_ALPHA;
-			continue;
-		} else if ( !Q_stricmp( token, "impactMarkColorize" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_IMPACTMARK_COLORIZE;
-			else
-				weapon.flags &= ~WIF_IMPACTMARK_COLORIZE;
-			continue;
-		} else if ( !Q_stricmp( token, "alwaysDamage" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_ALWAYS_DAMAGE;
-			else
-				weapon.flags &= ~WIF_ALWAYS_DAMAGE;
-			continue;
-		} else if ( !Q_stricmp( token, "cuts" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_CUTS;
-			else
-				weapon.flags &= ~WIF_CUTS;
-			continue;
-		} else if ( !Q_stricmp( token, "continuousFlash" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_CONTINUOUS_FLASH;
-			else
-				weapon.flags &= ~WIF_CONTINUOUS_FLASH;
-			continue;
-		} else if ( !Q_stricmp( token, "ejectBrass" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_EJECT_BRASS;
-			else
-				weapon.flags &= ~WIF_EJECT_BRASS;
-			continue;
-		} else if ( !Q_stricmp( token, "ejectBrass2" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_EJECT_BRASS2;
-			else
-				weapon.flags &= ~WIF_EJECT_BRASS2;
-			continue;
-		} else if ( !Q_stricmp( token, "ejectSmoke" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_EJECT_SMOKE;
-			else
-				weapon.flags &= ~WIF_EJECT_SMOKE;
-			continue;
-		} else if ( !Q_stricmp( token, "ejectSmoke2" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_EJECT_SMOKE2;
-			else
-				weapon.flags &= ~WIF_EJECT_SMOKE2;
-			continue;
-		} else if ( !Q_stricmp( token, "mod" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			for (i = 0; i < MOD_MAX; i++)
-			{
-				if ( !Q_stricmp( token, modNames[i] ) ) {
-					weapon.mod = i;
-					break;
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "splashMod" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			for (i = 0; i < MOD_MAX; i++)
-			{
-				if ( !Q_stricmp( token, modNames[i] ) ) {
-					weapon.splashMod = i;
-					break;
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "flashColor" ) ) {
-			for ( i = 0 ; i < 3 ; i++ ) {
-				token = COM_Parse( p );
-				if ( !*token ) {
-					break;
-				}
-				if ( !Q_stricmp( token, "color1" ) ) {
-					weapon.flashColor[0] = (float)'c';
-					weapon.flashColor[1] = 1.0f;
-					weapon.flashColor[2] = 0.0f;
-					break;
-				} else if ( !Q_stricmp( token, "color2" ) ) {
-					weapon.flashColor[0] = (float)'c';
-					weapon.flashColor[1] = 2.0f;
-					weapon.flashColor[2] = 0.0f;
-					break;
-				} else if ( !Q_stricmp( token, "none" ) ) {
-					weapon.flashColor[0] = weapon.flashColor[1] = weapon.flashColor[2] = 0.0f;
-					break;
-				} else {
-					weapon.flashColor[i] = atof( token );
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "projectile" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				weapon.projnum = 0;
-				weapon.proj = &bg_projectileinfo[weapon.projnum];
-				continue;
-			}
-			weapon.projnum = BG_ProjectileIndexForName(token);
-			weapon.proj = &bg_projectileinfo[weapon.projnum];
-			continue;
-		} else if ( !Q_stricmp( token, "flashSound0" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.flashSoundName[0], sizeof (weapon.flashSoundName[0]), "%s", token);
-			} else {
-				weapon.flashSoundName[0][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "flashSound1" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.flashSoundName[1], sizeof (weapon.flashSoundName[1]), "%s", token);
-			} else {
-				weapon.flashSoundName[1][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "flashSound2" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.flashSoundName[2], sizeof (weapon.flashSoundName[2]), "%s", token);
-			} else {
-				weapon.flashSoundName[2][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "flashSound3" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.flashSoundName[3], sizeof (weapon.flashSoundName[3]), "%s", token);
-			} else {
-				weapon.flashSoundName[3][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "barrelSpin" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			for (i = 0; i < BS_MAX; i++)
-			{
-				if ( !Q_stricmp( token, barrelSpinNames[i] ) ) {
-					weapon.barrelSpin = i;
-					break;
-				}
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "barrelIdleUseGravity" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			if (atoi(token) == 1)
-				weapon.flags |= WIF_BARREL_IDLE_USE_GRAVITY;
-			else
-				weapon.flags &= ~WIF_BARREL_IDLE_USE_GRAVITY;
-			continue;
-		} else if ( !Q_stricmp( token, "impactSound0" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.impactSoundName[0], sizeof (weapon.impactSoundName[0]), "%s", token);
-			} else {
-				weapon.impactSoundName[0][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactSound1" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.impactSoundName[1], sizeof (weapon.impactSoundName[1]), "%s", token);
-			} else {
-				weapon.impactSoundName[1][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactSound2" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.impactSoundName[2], sizeof (weapon.impactSoundName[2]), "%s", token);
-			} else {
-				weapon.impactSoundName[2][0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactPlayerSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.impactPlayerSoundName, sizeof (weapon.impactPlayerSoundName), "%s", token);
-			} else {
-				weapon.impactPlayerSoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "impactMetalSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weapon.impactMetalSoundName, sizeof (weapon.impactMetalSoundName), "%s", token);
-			} else {
-				weapon.impactMetalSoundName[0] = '\0';
-			}
-			continue;
 		}
+		else PARSE_STRING(token, "model", weapon.model)
+		else PARSE_LIST(token, "weapontype", weapon.weapontype, weapontypeNames)
+		else PARSE_INTEGER(token, "attackDelay", weapon.attackDelay)
+		else PARSE_STRING(token, "impactMarkName", weapon.impactMarkName)
+		else PARSE_INTEGER(token, "impactMarkRadius", weapon.impactMarkRadius)
+		else PARSE_BIT(token, "impactMarkFadeAlpha", weapon.flags, WIF_IMPACTMARK_FADE_ALPHA)
+		else PARSE_BIT(token, "impactMarkColorize", weapon.flags, WIF_IMPACTMARK_COLORIZE)
+		else PARSE_BIT(token, "alwaysDamage", weapon.flags, WIF_ALWAYS_DAMAGE)
+		else PARSE_BIT(token, "cuts", weapon.flags, WIF_CUTS)
+		else PARSE_BIT(token, "continuousFlash", weapon.flags, WIF_CONTINUOUS_FLASH)
+		else PARSE_BIT(token, "ejectBrass", weapon.flags, WIF_EJECT_BRASS)
+		else PARSE_BIT(token, "ejectBrass2", weapon.flags, WIF_EJECT_BRASS2)
+		else PARSE_BIT(token, "ejectSmoke", weapon.flags, WIF_EJECT_SMOKE)
+		else PARSE_BIT(token, "ejectSmoke2", weapon.flags, WIF_EJECT_SMOKE2)
+		else PARSE_LIST2(token, "mod", weapon.mod, modNames, MOD_MAX)
+		else PARSE_LIST2(token, "splashMod", weapon.splashMod, modNames, MOD_MAX)
+		else PARSE_FLOAT3_LIST(token, "flashColor", weapon.flashColor, flashColor_list)
+		else PARSE_STRING(token, "flashSound0", weapon.flashSoundName[0])
+		else PARSE_STRING(token, "flashSound1", weapon.flashSoundName[1])
+		else PARSE_STRING(token, "flashSound2", weapon.flashSoundName[2])
+		else PARSE_STRING(token, "flashSound3", weapon.flashSoundName[3])
+		else PARSE_LIST(token, "barrelSpin", weapon.barrelSpin, barrelSpinNames)
+		else PARSE_BIT(token, "barrelIdleUseGravity", weapon.flags, WIF_BARREL_IDLE_USE_GRAVITY)
+		else PARSE_STRING(token, "impactSound0", weapon.impactSoundName[0])
+		else PARSE_STRING(token, "impactSound1", weapon.impactSoundName[1])
+		else PARSE_STRING(token, "impactSound2", weapon.impactSoundName[2])
+		else PARSE_STRING(token, "impactPlayerSound", weapon.impactPlayerSoundName)
+		else PARSE_STRING(token, "impactMetalSound", weapon.impactMetalSoundName)
 
 		Com_Printf( "unknown token '%s' in weapon %s\n", token, weapon.name );
 	}
