@@ -698,7 +698,7 @@ typedef struct
 } bg_projectileinfo_t;
 
 #define TRAIL_NONE 0
-#define TRAIL_NORMAL 1
+#define TRAIL_DEFAULT 1
 typedef struct
 {
 	int damage;			///< Damage to give

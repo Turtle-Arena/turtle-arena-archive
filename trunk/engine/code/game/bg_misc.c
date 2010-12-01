@@ -2427,7 +2427,7 @@ static qboolean Projectile_Parse(char **p) {
 
 const char *trailtype_names[] = {
 	"none", // TRAIL_NONE
-	"normal", // TRAIL_NORMAL
+	"default", // TRAIL_DEFAULT
 	NULL
 };
 
