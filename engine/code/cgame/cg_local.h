@@ -532,6 +532,7 @@ typedef struct projectileInfo_s {
 	vec3_t			missileDlightColor;
 	int				missileRenderfx;
 
+	qhandle_t		trailShader[2];
 	float			trailRadius;
 	float			wiTrailTime;
 
@@ -558,8 +559,6 @@ typedef struct projectileInfo_s {
 
 	// PE_PROX trigger sound
 	sfxHandle_t		triggerSound;
-
-	// ZTM: TODO: missileTrailShader (and missile vars 1 and 2 ?)
 
 } projectileInfo_t;
 
@@ -1075,13 +1074,11 @@ typedef struct {
 	qhandle_t	machinegunBrassModel;
 	qhandle_t	shotgunBrassModel;
 
+#ifndef TA_WEAPSYS
 	qhandle_t	railRingsShader;
 	qhandle_t	railCoreShader;
 
 	qhandle_t	lightningShader;
-#ifdef TA_WEAPSYS
-	qhandle_t	grappleCableShader;
-	qhandle_t	sparkTrailShader;
 #endif
 
 #ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
@@ -1116,8 +1113,8 @@ typedef struct {
 	qhandle_t	bloodTrailShader;
 #endif
 #ifdef MISSIONPACK
-	qhandle_t	nailPuffShader;
 #ifndef TA_WEAPSYS
+	qhandle_t	nailPuffShader;
 	qhandle_t	blueProxMine;
 #endif
 #endif
@@ -1948,10 +1945,11 @@ void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, 
 void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, int fleshEntityNum);
 #endif
 
-void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end );
 #ifdef TA_WEAPSYS
+void CG_RailTrail( clientInfo_t *ci, const projectileInfo_t *wi, vec3_t start, vec3_t end );
 void CG_GrappleTrail( centity_t *ent, const projectileInfo_t *wi );
 #else
+void CG_RailTrail( clientInfo_t *ci, vec3_t start, vec3_t end );
 void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi );
 #endif
 void CG_AddViewWeapon (playerState_t *ps);
@@ -2019,7 +2017,11 @@ void CG_ObeliskPain( vec3_t org );
 #ifndef TURTLEARENA // POWERS
 void CG_InvulnerabilityImpact( vec3_t org, vec3_t angles );
 void CG_InvulnerabilityJuiced( vec3_t org );
+#ifdef TA_WEAPSYS
+void CG_LightningBoltBeam( projectileInfo_t *wi, vec3_t start, vec3_t end );
+#else
 void CG_LightningBoltBeam( vec3_t start, vec3_t end );
+#endif
 #endif
 #endif
 void CG_ScorePlum( int client, vec3_t org, int score );

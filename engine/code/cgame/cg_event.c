@@ -1379,6 +1379,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			es->origin2[2] += 4;
 		}
 #endif
+#ifdef TA_WEAPSYS
+		CG_RailTrail(ci, &cg_projectiles[es->weapon], es->origin2, es->pos.trBase);
+#else
 		CG_RailTrail(ci, es->origin2, es->pos.trBase);
 
 		// if the end was on a nomark surface, don't make an explosion
@@ -1386,6 +1389,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			ByteToDir( es->eventParm, dir );
 			CG_MissileExplode( es->weapon, es->clientNum, position, dir, IMPACTSOUND_DEFAULT );
 		}
+#endif
 		break;
 
 #ifndef TA_WEAPSYS
