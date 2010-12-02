@@ -939,7 +939,7 @@ static void CG_DrawCTFPowerUp(rectDef_t *rect) {
 
 
 static void CG_DrawTeamColor(rectDef_t *rect, vec4_t color) {
-	CG_DrawTeamBackground(rect->x, rect->y, rect->w, rect->h, color[3], cg.snap->ps.persistant[PERS_TEAM]);
+	CG_DrawTeamBackground(rect->x, rect->y, rect->w, rect->h, color[3], cg.snap->ps.persistant[PERS_TEAM], cg.snap->ps.clientNum);
 }
 
 static void CG_DrawAreaPowerUp(rectDef_t *rect, int align, float special, float scale, vec4_t color) {

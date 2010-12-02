@@ -38,7 +38,7 @@ First stable playable release.
 === 0.4.2 ===
   * Breakable objects and brushes
     * Pushable. (Wolf-ET has pushable code for objects, g_props.c)
-  * Map Themes (textures, models, misc_objects, and maybe music?)
+  * Map Themes (textures, models, misc_objects, music)
   * New multiplayer maps using the new map themes
 
   * Hopefully make Turtle Arena a complete (fully working) multiplayer game (Compareable to TMNT: Mutant Melee in someways...)

@@ -394,7 +394,7 @@ typedef enum {
 	HI_FIRESHURIKEN,
 	HI_LASERSHURIKEN,
 
-	// ZTM: TODO: Make the grapple a holdable item?
+	// ZTM: TODO?: Make the grapple a holdable item?
 	//       So that players can use the grapple and a weapon at the same time?
 	// 20090316: Have the grapple in the player's secondary hand like the flag?
 	// 20090409:   and use "use item" to fire?

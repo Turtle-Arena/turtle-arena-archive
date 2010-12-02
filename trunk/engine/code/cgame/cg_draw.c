@@ -712,7 +712,7 @@ CG_DrawTeamBackground
 
 ================
 */
-void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
+void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, int clientNum )
 {
 	vec4_t		hcolor;
 
@@ -726,10 +726,12 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team )
 		hcolor[1] = 0;
 		hcolor[2] = 1;
 	} else {
-#ifdef TA_HUD // ZTM: TODO?: Use player's effects color?
-		hcolor[0] = 0;
-		hcolor[1] = 1;
-		hcolor[2] = 0;
+#ifdef TA_HUD
+		if (clientNum < 0 || clientNum >= MAX_CLIENTS) {
+			clientNum = 0;
+		}
+		// Use client's effect color1
+		VectorCopy(cgs.clientinfo[clientNum].color1, hcolor);
 #else
 		return;
 #endif
@@ -869,7 +871,7 @@ static void CG_DrawStatusBar( void ) {
 	y = HUD_Y;
 
 	// draw hud background
-	CG_DrawTeamBackground( x, y, HUD_WIDTH, HUD_HEIGHT, 0.33f, cg.snap->ps.persistant[PERS_TEAM] );
+	CG_DrawTeamBackground( x, y, HUD_WIDTH, HUD_HEIGHT, 0.33f, cg.snap->ps.persistant[PERS_TEAM], cg.snap->ps.clientNum );
 
 	cent = &cg_entities[cg.snap->ps.clientNum];
 	ps = &cg.snap->ps;
@@ -1046,7 +1048,7 @@ static void CG_DrawStatusBar( void ) {
 	CG_HudPlacement(HUD_CENTER);
 
 	// draw the team background
-	CG_DrawTeamBackground( 0, 420, 640, 60, 0.33f, cg.snap->ps.persistant[PERS_TEAM] );
+	CG_DrawTeamBackground( 0, 420, 640, 60, 0.33f, cg.snap->ps.persistant[PERS_TEAM], cg.snap->ps.clientNum );
 
 	cent = &cg_entities[cg.snap->ps.clientNum];
 	ps = &cg.snap->ps;
@@ -3095,7 +3097,7 @@ static qboolean CG_DrawUseEntity(void)
 	x = ( SCREEN_WIDTH - w ) * 0.5f;
 	y = SCREEN_HEIGHT-h-12;
 
-	CG_DrawTeamBackground(x - 6, y - 6, w + 6*2, h + 6*2, 0.33f, cg.snap->ps.persistant[PERS_TEAM]);
+	CG_DrawTeamBackground(x - 6, y - 6, w + 6*2, h + 6*2, 0.33f, cg.snap->ps.persistant[PERS_TEAM], cg.snap->ps.clientNum);
 
 	CG_DrawBigString(x, y, s, 1);
 
