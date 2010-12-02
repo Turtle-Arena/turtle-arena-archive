@@ -1026,6 +1026,10 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	}
 #endif
 
+#ifdef TA_PLAYERSYS
+	CG_ColorFromString( va("%d", ci->playercfg.prefcolor2), ci->prefcolor2 );
+#endif
+
 #if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
 	// If it is the local client update default weapon.
 	if (clientNum == cg.predictedPlayerState.clientNum)

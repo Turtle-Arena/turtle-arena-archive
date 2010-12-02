@@ -6169,7 +6169,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			continue;
 		}
 		// prefcolor1/prefcolor2 are used as color1/color2 in single player
-		// ZTM: TODO?: Use as hud color in SP (and non-team gametypes? or use "color1" in non-team?)
+		// prefcolor2 is used as the status bar background color in non-team
 		else if ( !Q_stricmp( token, "prefcolor1" ) ) {
 			token = COM_Parse( &text_p );
 			if ( !*token ) {
@@ -6414,8 +6414,8 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	playercfg->gender = GENDER_MALE;
 	playercfg->fixedlegs = qfalse;
 	playercfg->fixedtorso = qfalse;
-	playercfg->prefcolor1 = 5;
-	playercfg->prefcolor2 = 4;
+	playercfg->prefcolor1 = 2; // green
+	playercfg->prefcolor2 = 9; // lime
 
 	// Use the model name for the default soundpath.
 	Q_strncpyz(playercfg->soundpath, model, sizeof (playercfg->soundpath));
