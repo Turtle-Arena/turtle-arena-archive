@@ -2684,8 +2684,10 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	vec3_t				flashColor;
 #ifdef TA_PLAYERS
 	char *newTagNames[3] = { "tag_hand_primary", "tag_hand_secondary", NULL };
+	int newTagInfo[3] = {TI_TAG_HAND_PRIMARY, TI_TAG_HAND_SECONDARY, 0};
 #endif
 	char *originalTagNames[3] = { "tag_weapon", "tag_flag", NULL };
+	int originalTagInfo[3] = {TI_TAG_WEAPON, TI_TAG_FLAG, 0};
 
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #else
@@ -2907,12 +2909,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 		if (drawWeapon[i])
 		{
-			// ZTM: TODO: Use ci->tagInfo to speed up tests?
+			// Use ci->tagInfo to speed up tests
 			if (
 #ifdef TA_PLAYERS
-				!CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, newTagNames[i]) &&
+				(!(ci->tagInfo & newTagInfo[i]) || !CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, newTagNames[i])) &&
 #endif
-				!CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, originalTagNames[i]))
+				(!(ci->tagInfo & originalTagInfo[i]) || !CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, originalTagNames[i])))
 			{
 				// Failed to find tag
 				continue;
@@ -4604,8 +4606,8 @@ void CG_MissileImpact( int projnum, int clientNum, vec3_t origin, vec3_t dir, im
 	}
 
 #ifdef TA_MISC // MATERIALS
-	// ZTM: TODO: There should be little to no particles here
-	//CG_ImpactParticles(origin, dir, radius, -1, clientNum);
+	// Spawn a few particles
+	CG_ImpactParticles(origin, dir, radius * 0.3f, -1, clientNum);
 #endif
 }
 
