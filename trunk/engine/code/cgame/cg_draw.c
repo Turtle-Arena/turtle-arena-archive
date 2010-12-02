@@ -731,7 +731,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, i
 			clientNum = 0;
 		}
 		// Use client's effect color1
-		VectorCopy(cgs.clientinfo[clientNum].color1, hcolor);
+		VectorCopy(cgs.clientinfo[clientNum].prefcolor2, hcolor);
 #else
 		return;
 #endif
