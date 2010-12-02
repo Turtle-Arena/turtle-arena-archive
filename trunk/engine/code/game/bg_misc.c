@@ -2837,97 +2837,34 @@ static qboolean WeaponGroup_Parse(char **p) {
 				Q_strncpyz(weaponGroup.name, name, MAX_QPATH); // use backed up name
 			}
 			continue;
-		} else if ( !Q_stricmp( token, "randomSpawn" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			weaponGroup.randomSpawn = atoi( token );
-			continue;
-		// ITEM START: ZTM: TODO: Use ItemInfo_Parse?
-		} else if ( !Q_stricmp( token, "itemName" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			Com_sprintf(weaponItem.classname, sizeof (weaponItem.classname), "%s", token);
-			continue;
-		} else if ( !Q_stricmp( token, "pickupSound" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			Com_sprintf(weaponItem.pickup_sound, sizeof (weaponItem.pickup_sound), "%s", token);
-			continue;
-		} else if ( !Q_stricmp( token, "pickupModel" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			Com_sprintf(weaponItem.world_model[0], sizeof (weaponItem.world_model[0]), "%s", token);
-			continue;
-		} else if ( !Q_stricmp( token, "iconName" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			Com_sprintf(weaponItem.icon, sizeof (weaponItem.icon), "%s", token);
-			continue;
-		} else if ( !Q_stricmp( token, "pickupName" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			Com_sprintf(weaponItem.pickup_name, sizeof (weaponItem.pickup_name), "%s", token);
-			continue;
-		} else if ( !Q_stricmp( token, "pickupAmmo" ) ) {
-			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			weaponItem.quantity = atoi(token);
-			continue;
+		}
+		// ITEM START
+		else PARSE_STRING(token, "itemName", weaponItem.classname)
+		else PARSE_STRING(token, "pickupSound", weaponItem.pickup_sound)
+		else PARSE_STRING(token, "pickupModel", weaponItem.world_model[0])
+		else PARSE_STRING(token, "iconName", weaponItem.icon)
+		else PARSE_STRING(token, "pickupName", weaponItem.pickup_name)
+		else PARSE_INTEGER(token, "pickupAmmo", weaponItem.quantity)
 		// ITEM END
-		} else if ( !Q_stricmp( token, "readySound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weaponGroup.readySoundName, sizeof (weaponGroup.readySoundName), "%s", token);
-			} else {
-				weaponGroup.readySoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "firingSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weaponGroup.firingSoundName, sizeof (weaponGroup.firingSoundName), "%s", token);
-			} else {
-				weaponGroup.firingSoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "firingStoppedSound" ) ) {
-			token = COM_Parse( p );
-			if ( *token ) {
-				Com_sprintf(weaponGroup.firingStoppedSoundName, sizeof (weaponGroup.firingStoppedSoundName), "%s", token);
-			} else {
-				weaponGroup.firingStoppedSoundName[0] = '\0';
-			}
-			continue;
-		} else if ( !Q_stricmp( token, "weapon_primary" )
+		else PARSE_INTEGER(token, "randomSpawn", weaponGroup.randomSpawn)
+		else PARSE_STRING(token, "readySound", weaponGroup.readySoundName)
+		else PARSE_STRING(token, "firingSound", weaponGroup.firingSoundName)
+		else PARSE_STRING(token, "firingStoppedSound", weaponGroup.firingStoppedSoundName)
+		else if ( !Q_stricmp( token, "weapon_primary" )
 			|| !Q_stricmp( token, "weapon_secondary" ) )
 		{
-			int w;
-			int hand = !Q_stricmp( token, "weapon_secondary" );
+			int hand = !Q_stricmp( token, "weapon_secondary" ) ? HAND_SECONDARY : HAND_PRIMARY;
 			token = COM_Parse( p );
-			if ( !*token ) {
-				break;
-			}
-			w = BG_WeaponIndexForName(token);
-			weaponGroup.weapon[hand] = &bg_weaponinfo[w];
-			weaponGroup.weaponnum[hand] = w;
+			if ( *token ) {
+				int w = BG_WeaponIndexForName(token);
+				weaponGroup.weapon[hand] = &bg_weaponinfo[w];
+				weaponGroup.weaponnum[hand] = w;
 
-			if (!w)
-			{
-				Com_Printf("Can't find weapon [%s] for [%s]\n", token, weaponGroup.name);
+				if (!w) {
+					Com_Printf("Can't find weapon [%s] for [%s]\n", token, weaponGroup.name);
+				}
+			} else {
+				Com_Printf("Missing token for %s\n", hand == HAND_SECONDARY ? "weapon_secondary" : "weapon_primary");
 			}
 			continue;
 		}
