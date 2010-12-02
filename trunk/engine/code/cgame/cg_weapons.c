@@ -390,7 +390,12 @@ static void CG_NailgunEjectBrass( centity_t *cent
 CG_RailTrail
 ==========================
 */
-void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
+#ifdef TA_WEAPSYS
+void CG_RailTrail (clientInfo_t *ci, const projectileInfo_t *wi, vec3_t start, vec3_t end)
+#else
+void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end)
+#endif
+{
 	vec3_t axis[36], move, move2, next_move, vec, temp;
 	float  len;
 	int    i, j, skip;
@@ -414,7 +419,11 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
  
 	re->shaderTime = cg.time / 1000.0f;
 	re->reType = RT_RAIL_CORE;
+#ifdef TA_WEAPSYS
+	re->customShader = wi->trailShader[0];
+#else
 	re->customShader = cgs.media.railCoreShader;
+#endif
  
 	VectorCopy(start, re->origin);
 	VectorCopy(end, re->oldorigin);
@@ -477,7 +486,11 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end) {
 			re->shaderTime = cg.time / 1000.0f;
 			re->reType = RT_SPRITE;
 			re->radius = 1.1f;
+#ifdef TA_WEAPSYS
+			re->customShader = wi->trailShader[1];
+#else
 			re->customShader = cgs.media.railRingsShader;
+#endif
 
 			re->shaderRGBA[0] = ci->color2[0] * 255;
 			re->shaderRGBA[1] = ci->color2[1] * 255;
@@ -645,7 +658,12 @@ static void CG_NailTrail( centity_t *ent, const weaponInfo_t *wi )
 					  t,
 					  0,
 					  0, 
-					  cgs.media.nailPuffShader );
+#ifdef TA_WEAPSYS
+					  wi->trailShader[0]
+#else
+					  cgs.media.nailPuffShader
+#endif
+					  );
 		// use the optimized local entity add
 		smoke->leType = LE_SCALE_FADE;
 	}
@@ -730,7 +748,11 @@ static void CG_PlasmaTrail( centity_t *cent, const weaponInfo_t *wi )
     re->shaderTime = cg.time / 1000.0f;
     re->reType = RT_SPRITE;
     re->radius = 0.25f;
+#ifdef TA_WEAPSYS
+	re->customShader = wi->trailShader[0];
+#else
 	re->customShader = cgs.media.railRingsShader;
+#endif
 	le->bounceFactor = 0.3f;
 
 #ifdef TA_WEAPSYS
@@ -838,11 +860,7 @@ void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi )
 
 	beam.reType = RT_LIGHTNING;
 #ifdef TA_WEAPSYS
-	if (bg_projectileinfo[wi-cg_projectiles].trailType == PT_LIGHTNING) {
-		beam.customShader = cgs.media.lightningShader;
-	} else {
-		beam.customShader = cgs.media.grappleCableShader;
-	}
+	beam.customShader = wi->trailShader[0];
 #else
 	beam.customShader = cgs.media.lightningShader;
 #endif
@@ -931,7 +949,7 @@ static void CG_SparkTrail( centity_t *ent, const projectileInfo_t *wi )
 					  t,
 					  0,
 					  0,
-					  cgs.media.sparkTrailShader );
+					  wi->trailShader[0] );
 		// use the optimized local entity add
 		smoke->leType = LE_SCALE_FADE;
 
@@ -999,7 +1017,7 @@ void CG_RegisterProjectile( int projectileNum )
 		projectileInfo->impactMarkShader = trap_R_RegisterShader(bgProj->impactMarkName);
 	projectileInfo->impactMarkRadius = bgProj->impactMarkRadius;
 
-	for (i = 0; i< 3; i++)
+	for (i = 0; i < 3; i++)
 	{
 		if (bgProj->impactSoundName[i][0] != '\0')
 			projectileInfo->impactSound[i] = trap_S_RegisterSound( bgProj->impactSoundName[i], qfalse );
@@ -1034,12 +1052,13 @@ void CG_RegisterProjectile( int projectileNum )
 			break;
 
 		case PT_PLASMA:
-			cgs.media.railRingsShader = trap_R_RegisterShader( "railDisc" );
+			projectileInfo->trailShader[0] = trap_R_RegisterShader( "railDisc" );
 			projectileInfo->missileTrailFunc = CG_PlasmaTrail;
 			break;
 		case PT_ROCKET:
 			// Uses cgs.media.smokePuffShader but it is used by other
 			//    stuff so it is always loaded.
+			projectileInfo->trailShader[0] = cgs.media.smokePuffShader;
 			projectileInfo->missileTrailFunc = CG_RocketTrail;
 			projectileInfo->wiTrailTime = 2000;
 			projectileInfo->trailRadius = 64;
@@ -1047,46 +1066,62 @@ void CG_RegisterProjectile( int projectileNum )
 		case PT_GRENADE:
 			// Uses CG_RocketTrail ... so don't need to load
 			//    cgs.media.smokePuffShader
+			projectileInfo->trailShader[0] = cgs.media.smokePuffShader;
 			projectileInfo->missileTrailFunc = CG_GrenadeTrail;
 			projectileInfo->wiTrailTime = 700;
 			projectileInfo->trailRadius = 32;
 			break;
 		case PT_GRAPPLE:
 			projectileInfo->missileTrailFunc = CG_GrappleTrail;
-			cgs.media.grappleCableShader = trap_R_RegisterShader( "GrappleCable");
+			projectileInfo->trailShader[0] = trap_R_RegisterShader( "GrappleCable" );
 #if !defined TURTLEARENA || defined TA_SUPPORTQ3
-			if (!cgs.media.grappleCableShader)
-				cgs.media.grappleCableShader = trap_R_RegisterShader( "lightningBoltNew");
+			if (!projectileInfo->trailShader[0])
+				projectileInfo->trailShader[0] = trap_R_RegisterShader( "lightningBoltNew" );
 #endif
 			break;
 		case PT_NAIL:
 #ifdef MISSIONPACK
-			cgs.media.nailPuffShader = trap_R_RegisterShader( "nailtrail" );
+			projectileInfo->trailShader[0] = trap_R_RegisterShader( "nailtrail" );
 			projectileInfo->missileTrailFunc = CG_NailTrail;
 			projectileInfo->trailRadius = 16;
 			projectileInfo->wiTrailTime = 250;
 #else // Quake3 can use rocket trail instead...
+			// Uses CG_RocketTrail ... so don't need to load
+			//    cgs.media.smokePuffShader
+			projectileInfo->trailShader[0] = cgs.media.smokePuffShader;
 			projectileInfo->missileTrailFunc = CG_RocketTrail;
 			projectileInfo->trailRadius = 16;
 			projectileInfo->wiTrailTime = 250;
 #endif
 			break;
 		case PT_LIGHTNING:
-			cgs.media.lightningShader = trap_R_RegisterShader( "lightningBoltNew");
+			projectileInfo->trailShader[0] = trap_R_RegisterShader( "lightningBoltNew");
 			projectileInfo->missileTrailFunc = CG_GrappleTrail;
 			break;
 		case PT_RAIL:
-			cgs.media.railRingsShader = trap_R_RegisterShader( "railDisc" );
-			cgs.media.railCoreShader = trap_R_RegisterShader( "railCore" );
+			projectileInfo->trailShader[0] = trap_R_RegisterShader( "railCore" );
+			projectileInfo->trailShader[1] = trap_R_RegisterShader( "railDisc" );
 			break;
 		case PT_BULLET:
 			break;
 		case PT_SPARKS:
-			cgs.media.sparkTrailShader = trap_R_RegisterShader( "sparkTrail" );
+			projectileInfo->trailShader[0] = trap_R_RegisterShader( "sparkTrail" );
 			projectileInfo->missileTrailFunc = CG_SparkTrail;
 			projectileInfo->wiTrailTime = 300;
 			projectileInfo->trailRadius = 16;
 			break;
+	}
+
+	for (i = 0; i < 2; i++) {
+		if (bgProj->trailShaderName[i][0] != '\0') {
+			projectileInfo->trailShader[i] = trap_R_RegisterShader( bgProj->trailShaderName[i] );
+		}
+	}
+	if (bgProj->trailRadius > 0) {
+		projectileInfo->trailRadius = bgProj->trailRadius;
+	}
+	if (bgProj->trailTime > 0) {
+		projectileInfo->wiTrailTime = bgProj->trailTime;
 	}
 
 	switch (bgProj->deathType)
@@ -1887,7 +1922,11 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 	VectorCopy( origin, beam.origin );
 
 	beam.reType = RT_LIGHTNING;
+#ifdef TA_WEAPSYS
+	beam.customShader = cg_projectiles[projnum].trailShader[0];
+#else
 	beam.customShader = cgs.media.lightningShader;
+#endif
 	trap_R_AddRefEntityToScene( &beam );
 
 	// add the impact flare if it hit something

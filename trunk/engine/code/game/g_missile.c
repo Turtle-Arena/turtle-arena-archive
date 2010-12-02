@@ -463,6 +463,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 					// the first lightning bolt is a cgame only visual
 					//
 					tent = G_TempEntity( start, EV_LIGHTNINGBOLT );
+					tent->s.weapon = projnum;
 					VectorCopy( tr.endpos, end );
 					SnapVector( end );
 					VectorCopy( end, tent->s.origin2 );
@@ -483,11 +484,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 				// snap the endpos to integers, but nudged towards the line
 				SnapVectorTowards( tr.endpos, start );
 
-				if ( !(tr.surfaceFlags & SURF_NOIMPACT)
-#if 0 // RAIL
-					&& bg_projectileinfo[projnum].trailType != PT_RAIL
-#endif
-					)
+				if ( !(tr.surfaceFlags & SURF_NOIMPACT) )
 				{
 					// send bullet impact
 					if ( traceEnt->takedamage && (traceEnt->client
@@ -507,9 +504,11 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 						tent->s.otherEntityNum = self->s.number;
 #endif
 						tent->s.weapon = projnum;
-						if( LogAccuracyHit( traceEnt, self ) ) {
-							self->client->accuracy_hits++;
-						}
+					} else if (tr.surfaceFlags & SURF_METALSTEPS) {
+						tent = G_TempEntity( tr.endpos, EV_MISSILE_MISS_METAL );
+						tent->s.clientNum = self->s.number;
+						tent->s.weapon = projnum;
+						tent->s.eventParm = DirToByte( tr.plane.normal );
 					} else {
 #if 1 // lightning
 						tent = G_TempEntity( tr.endpos, EV_MISSILE_MISS );
@@ -539,6 +538,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 								tent = G_TempEntity( tr.endpos, EV_RAILTRAIL );
 								// set player number for custom colors on the railtrail
 								tent->s.clientNum = self->s.clientNum;
+								tent->s.weapon = projnum;
 								tent->s.weaponHands = MAX_HANDS; // Don't attach to client's gun
 								VectorCopy( start, tent->s.origin2 );
 								// move origin a bit to come closer to the drawn gun muzzle
@@ -579,8 +579,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 						hitClient = LogAccuracyHit( traceEnt, self );
 
 						// Splash damage!
-						if (G_RadiusDamage(tr.endpos, self, self, damage, splashRadius, traceEnt, splashMod))
-						{
+						if (G_RadiusDamage(tr.endpos, self, self, damage, splashRadius, traceEnt, splashMod)) {
 							hitClient = qtrue;
 						}
 
@@ -591,8 +590,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 				}
 
 				// weapon_railgun_fire
-				if (bg_projectileinfo[projnum].maxHits > 1)
-				{
+				if (bg_projectileinfo[projnum].maxHits > 1) {
 					if ( tr.contents & CONTENTS_SOLID ) {
 						break;		// we hit something solid enough to stop the beam
 					}
@@ -602,8 +600,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 					unlinkedEntities[unlinked] = traceEnt;
 					unlinked++;
 
-					if (i+1 >= bg_projectileinfo[projnum].maxHits)
-					{
+					if (i+1 >= bg_projectileinfo[projnum].maxHits) {
 						break;
 					}
 				} else {
@@ -631,6 +628,9 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 
 				// set player number for custom colors on the railtrail
 				tent->s.clientNum = self->s.clientNum;
+
+				// Set projectile number
+				tent->s.weapon = projnum;
 
 				// ZTM: NOTE: This could be a problem if multiple hands use the same handSide.
 				tent->s.weaponHands = MAX_HANDS;
@@ -663,13 +663,6 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 				else if (handSide == HS_LEFT)
 					VectorMA( tent->s.origin2, -4, right, tent->s.origin2 );
 				VectorMA( tent->s.origin2, -1, up, tent->s.origin2 );
-
-				// no explosion at end if SURF_NOIMPACT, but still make the trail
-				if ( tr.surfaceFlags & SURF_NOIMPACT ) {
-					tent->s.eventParm = 255;	// don't make the explosion at the end
-				} else {
-					tent->s.eventParm = DirToByte( tr.plane.normal );
-				}
 			}
 			continue;
 		}

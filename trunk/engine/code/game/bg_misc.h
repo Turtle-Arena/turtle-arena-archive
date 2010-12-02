@@ -645,6 +645,9 @@ typedef struct
 	int speed; // range for instant damage projectiles
 	int flags;
 	int trailType;
+	char trailShaderName[2][MAX_QPATH]; // PT_RAIL uses two shaders.
+	int trailRadius;
+	int trailTime;
 	int deathType;
 	// fire_nail nailgun
 	int spdRndAdd; // Speed random add

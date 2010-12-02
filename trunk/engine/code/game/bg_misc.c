@@ -2379,6 +2379,10 @@ static qboolean Projectile_Parse(char **p) {
 		else PARSE_INTEGER(token, "timetolive", projectile.timetolive)
 		else PARSE_BOOL(token, "shootable", projectile.shootable)
 		else PARSE_LIST(token, "trailType", projectile.trailType, pt_names)
+		else PARSE_STRING(token, "trailShader0", projectile.trailShaderName[0])
+		else PARSE_STRING(token, "trailShader1", projectile.trailShaderName[1])
+		else PARSE_INTEGER(token, "trailRadius", projectile.trailRadius)
+		else PARSE_INTEGER(token, "trailTime", projectile.trailTime)
 		else PARSE_LIST(token, "deathType", projectile.deathType, pd_names)
 		else PARSE_LIST(token, "explosionType", projectile.explosionType, pe_names)
 		else PARSE_INTEGER(token, "missileDlight", projectile.missileDlight)
@@ -2984,6 +2988,10 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\ttimetolive %d\r\n", projectile->timetolive);
 		FS_Printf2("\tshootable %d\r\n", projectile->shootable);
 		FS_Printf2("\ttrailType %d\r\n", projectile->trailType);
+		FS_Printf2("\ttrailShader0 \"%s\"\r\n", projectile->trailShaderName[0]);
+		FS_Printf2("\ttrailShader1 \"%s\"\r\n", projectile->trailShaderName[1]);
+		FS_Printf2("\ttrailRadius %d\r\n", projectile->trailRadius);
+		FS_Printf2("\ttrailTime %d\r\n", projectile->trailTime);
 		FS_Printf2("\tdeathType %d\r\n", projectile->deathType);
 		FS_Printf2("\texplosionType %d\r\n", projectile->explosionType);
 		FS_Printf2("\tmissileDlight %d\r\n", projectile->missileDlight);
