@@ -2375,7 +2375,6 @@ void CG_AddWeaponTrailOld(centity_t *cent, refEntity_t *gun, int weaponHand)
 	// show the trail model
 	memset( &trail, 0, sizeof(trail) );
 	trail.hModel = cgs.media.flagFlapModel;
-	// ZTM: TODO?: Per-weapon trail shader?
 	trail.customShader = cgs.media.weaponTrailShader;
 	VectorCopy( gun->lightingOrigin, trail.lightingOrigin );
 	trail.shadowPlane = gun->shadowPlane;
