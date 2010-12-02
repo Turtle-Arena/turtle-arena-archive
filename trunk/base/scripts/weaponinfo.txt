@@ -806,6 +806,7 @@ projectile "p_pulse"
 	instantDamage 1
 	trailType PT_RAIL
 	speed 768 // range
+	trailTime 200
 }
 
 weapon "w_triblaster"

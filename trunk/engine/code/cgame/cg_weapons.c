@@ -414,13 +414,18 @@ void CG_RailTrail (clientInfo_t *ci, vec3_t start, vec3_t end)
  
 	le->leType = LE_FADE_RGB;
 	le->startTime = cg.time;
+#ifdef TA_WEAPSYS
+	le->endTime = cg.time + (cg_railTrailTime.value / 400.0f) * wi->wiTrailTime;
+#else
 	le->endTime = cg.time + cg_railTrailTime.value;
+#endif
 	le->lifeRate = 1.0 / (le->endTime - le->startTime);
  
 	re->shaderTime = cg.time / 1000.0f;
 	re->reType = RT_RAIL_CORE;
 #ifdef TA_WEAPSYS
 	re->customShader = wi->trailShader[0];
+	re->radius = wi->trailRadius;
 #else
 	re->customShader = cgs.media.railCoreShader;
 #endif
@@ -861,6 +866,7 @@ void CG_GrappleTrail( centity_t *ent, const weaponInfo_t *wi )
 	beam.reType = RT_LIGHTNING;
 #ifdef TA_WEAPSYS
 	beam.customShader = wi->trailShader[0];
+	beam.radius = wi->trailRadius;
 #else
 	beam.customShader = cgs.media.lightningShader;
 #endif
@@ -1078,6 +1084,7 @@ void CG_RegisterProjectile( int projectileNum )
 			if (!projectileInfo->trailShader[0])
 				projectileInfo->trailShader[0] = trap_R_RegisterShader( "lightningBoltNew" );
 #endif
+			projectileInfo->trailRadius = 8;
 			break;
 		case PT_NAIL:
 #ifdef MISSIONPACK
@@ -1097,10 +1104,13 @@ void CG_RegisterProjectile( int projectileNum )
 		case PT_LIGHTNING:
 			projectileInfo->trailShader[0] = trap_R_RegisterShader( "lightningBoltNew");
 			projectileInfo->missileTrailFunc = CG_GrappleTrail;
+			projectileInfo->trailRadius = 8;
 			break;
 		case PT_RAIL:
 			projectileInfo->trailShader[0] = trap_R_RegisterShader( "railCore" );
 			projectileInfo->trailShader[1] = trap_R_RegisterShader( "railDisc" );
+			projectileInfo->wiTrailTime = 400;
+			projectileInfo->trailRadius = 6;
 			break;
 		case PT_BULLET:
 			break;
@@ -1924,6 +1934,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 	beam.reType = RT_LIGHTNING;
 #ifdef TA_WEAPSYS
 	beam.customShader = cg_projectiles[projnum].trailShader[0];
+	beam.radius = cg_projectiles[projnum].trailRadius;
 #else
 	beam.customShader = cgs.media.lightningShader;
 #endif

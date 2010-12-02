@@ -491,6 +491,9 @@ static void RB_SurfaceRailCore( void ) {
 	vec3_t		vec;
 	vec3_t		start, end;
 	vec3_t		v1, v2;
+#ifdef TA_WEAPSYS
+	float		spanWidth;
+#endif
 
 	e = &backEnd.currentEntity->e;
 
@@ -508,7 +511,17 @@ static void RB_SurfaceRailCore( void ) {
 	CrossProduct( v1, v2, right );
 	VectorNormalize( right );
 
+#ifdef TA_WEAPSYS // Allow entity to control lightning width
+	if (e->radius) {
+		spanWidth = (r_railCoreWidth->value / 6.0f) * e->radius;
+	} else {
+		spanWidth = r_railCoreWidth->integer;
+	}
+
+	DoRailCore( start, end, right, len, spanWidth );
+#else
 	DoRailCore( start, end, right, len, r_railCoreWidth->integer );
+#endif
 }
 
 /*
@@ -522,6 +535,9 @@ static void RB_SurfaceLightningBolt( void ) {
 	vec3_t		start, end;
 	vec3_t		v1, v2;
 	int			i;
+#ifdef TA_WEAPSYS
+	float		spanWidth;
+#endif
 
 	e = &backEnd.currentEntity->e;
 
@@ -540,10 +556,22 @@ static void RB_SurfaceLightningBolt( void ) {
 	CrossProduct( v1, v2, right );
 	VectorNormalize( right );
 
+#ifdef TA_WEAPSYS // Allow entity to control lightning width
+	if (backEnd.currentEntity->e.radius) {
+		spanWidth = backEnd.currentEntity->e.radius;
+	} else {
+		spanWidth = 8;
+	}
+#endif
+
 	for ( i = 0 ; i < 4 ; i++ ) {
 		vec3_t	temp;
 
+#ifdef TA_WEAPSYS
+		DoRailCore( start, end, right, len, spanWidth );
+#else
 		DoRailCore( start, end, right, len, 8 );
+#endif
 		RotatePointAroundVector( temp, vec, right, 45 );
 		VectorCopy( temp, right );
 	}

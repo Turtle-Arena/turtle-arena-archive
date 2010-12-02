@@ -270,7 +270,12 @@ void CG_SpawnEffect( vec3_t org ) {
 CG_LightningBoltBeam
 ===============
 */
-void CG_LightningBoltBeam( vec3_t start, vec3_t end ) {
+#ifdef TA_WEAPSYS
+void CG_LightningBoltBeam( projectileInfo_t *wi, vec3_t start, vec3_t end )
+#else
+void CG_LightningBoltBeam( vec3_t start, vec3_t end )
+#endif
+{
 	localEntity_t	*le;
 	refEntity_t		*beam;
 
@@ -287,7 +292,12 @@ void CG_LightningBoltBeam( vec3_t start, vec3_t end ) {
 	VectorCopy( end, beam->oldorigin );
 
 	beam->reType = RT_LIGHTNING;
+#ifdef TA_WEAPSYS
+	beam->customShader = wi->trailShader[0];
+	beam->radius = wi->trailRadius;
+#else
 	beam->customShader = cgs.media.lightningShader;
+#endif
 }
 #endif
 
