@@ -155,7 +155,12 @@ void G_StartMeleeAttack(gentity_t *ent)
 
 	// Make sure it is a melee weapon.
 	if ( !BG_WeaponHasMelee(ent->client->ps.weapon)
-		|| ent->client->ps.weaponHands == HB_NONE) {
+		|| ent->client->ps.weaponHands == HB_NONE
+#ifdef TA_PLAYERSYS // LADDER
+		|| (ent->client->ps.eFlags & EF_LADDER)
+#endif
+		)
+	{
 		return;
 	}
 
