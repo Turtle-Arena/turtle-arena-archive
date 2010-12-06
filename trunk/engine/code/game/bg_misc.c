@@ -1430,9 +1430,6 @@ strAnimationDef_t playerAnimationDefs[] = {
 
 	// TURTLEARENA
 #ifdef TA_PLAYERS // New TURTLEARENA player animations
-	ANIMDEF(BOTH_LADDER),
-	ANIMDEF(BOTH_LADDER_STAND),
-
 	// Place default weapons somewhere on there person while there not used.
 	ANIMDEF(TORSO_PUTDEFAULT_BOTH),
 	ANIMDEF(TORSO_PUTDEFAULT_PRIMARY),
@@ -1508,6 +1505,9 @@ strAnimationDef_t playerAnimationDefs[] = {
     ANIMDEF(TORSO_ATTACK_NUNCHUCKS1_PRIMARY_A),
     ANIMDEF(TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B),
     ANIMDEF(TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C),
+
+	ANIMDEF(BOTH_LADDER),
+	ANIMDEF(BOTH_LADDER_STAND),
 #endif
 
 	// Quake3, not loaded from file
