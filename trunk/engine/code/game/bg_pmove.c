@@ -2221,11 +2221,11 @@ static void PM_BeginWeaponHandsChange( int hands ) {
 			anim = TORSO_GETDEFAULT_BOTH;
 		}
 		// primary hand
-		else if (last_hands == HB_BOTH && hands == HB_SECONDARY)
+		else if ((last_hands == HB_BOTH && hands == HB_SECONDARY) || (last_hands == HB_PRIMARY && hands == HB_NONE))
 		{
 			anim = TORSO_PUTDEFAULT_PRIMARY;
 		}
-		else if (last_hands == HB_SECONDARY && hands == HB_BOTH)
+		else if ((last_hands == HB_SECONDARY && hands == HB_BOTH) || (last_hands == HB_NONE && hands == HB_PRIMARY))
 		{
 			anim = TORSO_GETDEFAULT_PRIMARY;
 		}
