@@ -1094,9 +1094,6 @@ typedef enum {
 	TORSO_NEGATIVE,
 
 #ifdef TA_PLAYERS // New Turtle Arena player animations
-	BOTH_LADDER,
-	BOTH_LADDER_STAND,
-
 	// Place default weapons somewhere on there person while there not used.
 	// TORSO_***DEFAULT_SECONDARY for Don should be
 	//  switching to/from two handed Bo to using one hand.
@@ -1186,6 +1183,9 @@ typedef enum {
     TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B,
     TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C,
     // NOTE: If more animations are added update BG_PlayerAttackAnim
+
+	BOTH_LADDER,
+	BOTH_LADDER_STAND,
 #endif
 
 	MAX_ANIMATIONS,
