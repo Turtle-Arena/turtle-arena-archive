@@ -14,15 +14,16 @@ Weapons (and attacking)
   * TODO: Have weapons be seperate entities (ET_WEAPON) from the player,
 		allowing one rendering function that can be use for all weapons,
 		and do collision so that weapons don't go into the wall. (And bounce back if you hit the wall?)
-  * TODO-after-above: Add a option to weapon group info to hold a weapon upside-down.
+  * TODO: Add a option to weapon group info to hold a weapon upside-down?
 
   * TODO: Attack movement flags. Stop, cut speed in half, double speed, turn right?, etc.
 
   * TODO: Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
     * Logic-wise `tag_hand_*` make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
 
-  * TODO: Add Bow and Arrow? (Like LoZ:TP) { Camera looks over player's shoulder when in aim mode }
+  * TODO: Add Bow and Arrow? (Like LoZ:TP)
     * ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
+  * TODO: Aiming mode for third-person, camera looks over player's shoulder (Like LoZ:TP)
 
   * TODO: Draw the secondary pickup weapon somewhere on the player when single handed
 
@@ -32,7 +33,10 @@ Weapons (and attacking)
 
   * TODO: Add PT_CUSTOM projectile trail type
 
-  * TODO: Per-weapon run animations (Support `LEGS_*` and `BOTH_*`. Should `TORSO_*` be supported too?)
+  * TODO: Per-weapon run animations (Support `LEGS_*`, `BOTH_*`, and `TORSO_*`)
+    * Idea for supporting `TORSO_*`
+      * PM_ContinueAnim(run);
+      * If (!(animations[run].prefixType & AP_LEGS)) PM_ContinueAnim(LEGS_RUN);
 
   * TODO: Support `BOTH_*` attacks (not just `TORSO_*`) in ui/q3_ui
 
@@ -47,9 +51,9 @@ Weapons (and attacking)
     * Have it be more like in Team Arena then Q3, using ".game" files instead of cvars in config.
     * Or one single data file with all of the sp data (Or SP data files -like SRB2 2.0)
 
-  * TODO: Mouser NPC, or call it ABMT? (A Better Mouse Trap)
+  * TODO: Mouser NPC, or call it 'A Better Mouse Trap' (and/or ABMT)?
 
-  * TODO (STARTED): Have a completed game menu/screen (Instead of just dropping the player back to the main menu with no message, it could leaving the player wondering why.)
+  * TODO (STARTED): Have a completed game menu/screen
     * sp_complete and sp_gameover
 
 == Single Player (NiGHTS) ==
@@ -109,7 +113,7 @@ Weapons (and attacking)
   * STARTED (NIGHTSMODE): NiGHTS into Dreams mode
     * Maybe instead of NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...
 
-  * TODO: NiGHTS HUD mode, in check for nights_start to see if level is a NiGHTS level to use NiGHTS HUD.
+  * TODO: NiGHTS HUD mode, check for nights_start to see if level is a NiGHTS level to use NiGHTS HUD.
 
   * TODO: When player is in bonus time, change blue sphere to golden (change model/skin and icon)
 
@@ -125,7 +129,7 @@ Weapons (and attacking)
   * TODO: Support path_axis (orbit around ent), use TR_SINE?
 
   * TODO (TA_PATHSYS): Modify G_SetupPath to allow starting at either end and in the middle of any path.
-    * (if there is a super smash bros. level, we need to be able to spawn players in the middle of path.)
+    * (If there is a super smash bros. level, we need to be able to spawn players in the middle of path.)
 
   * TODO: Support models/players/NAME/animsounds.cfg used in STV:Elite Force (SP) (Also used in Jedi Knight 2) ?
     * Started see bg_sound_t and Sounds_Parse; it is similar to animsounds, but different.
@@ -178,7 +182,7 @@ Weapons (and attacking)
   * STARTED (IOQ3ZTM // FONT_REWRITE): Support true type fonts everywhere!
     * Status: client, cgame, and q3_ui now support ttfs everywhere! (but does fully support the old fonts)
     * IOQ3ZTM: FIXME: There seems to be some issues with using old bitmap fonts, like not showing text to Player Setup menu.
-    * IOQ3ZTM: TODO: Add support for font1_prop and font2_prop into *_DrawFontStringExt? (code could be cleaner this way?)
+    * IOQ3ZTM: TODO: Add support for font1_prop and font2_prop into `*_DrawFontStringExt`? (code could be cleaner this way?)
 
   * TODO: Move more when jumping in lock-on mode! (Currently the player doesn't really go anywhere.)
 
@@ -280,9 +284,6 @@ Most of the mapobjects should be damageable.
   * TODO: Set looping in don, raph, mike, and casey mm3d models and re-export
 
   * TODO: Add Leo, Don, Mike, and Casey bot chats.
-
-  * BUG: After adding ladder animations to players, the animation list in animation.cfg is not right. Need update leo, don, raph, mike, and casey.
-    * If changed to use animation keywords, they will be fine.
 
 === Raph ====
   * TODO: Finish animating raph_v9.mm3d
