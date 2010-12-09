@@ -268,6 +268,10 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 			ent->touch( ent, other, &trace );
 		}
 
+#ifdef TA_ENTSYS // PUSHABLE
+		G_PlayerPushEntity(other, ent);
+#endif
+
 		if ( !other->touch ) {
 			continue;
 		}
