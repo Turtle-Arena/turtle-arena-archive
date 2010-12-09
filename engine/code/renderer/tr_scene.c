@@ -37,8 +37,8 @@ int			r_numpolyverts;
 
 #ifdef WOLFET
 // Gordon: TESTING
-int r_firstScenePolybuffer;
-int r_numpolybuffers;
+int			r_firstScenePolybuffer;
+int			r_numpolybuffers;
 #endif
 
 

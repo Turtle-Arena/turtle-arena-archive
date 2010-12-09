@@ -1690,7 +1690,7 @@ extern	vmCvar_t		cg_drawMeleeWeaponTrails;
 extern	vmCvar_t		cg_laserTag;
 #endif
 #ifdef WOLFET
-extern vmCvar_t cg_atmosphericEffects;
+extern vmCvar_t			cg_atmosphericEffects;
 #endif
 
 //

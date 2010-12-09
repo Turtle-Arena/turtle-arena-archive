@@ -487,8 +487,8 @@ typedef struct {
 	struct srfPoly_s	*polys;
 
 #ifdef WOLFET
-	int numPolyBuffers;
-	struct srfPolyBuffer_s  *polybuffers;
+	int			numPolyBuffers;
+	struct srfPolyBuffer_s	*polybuffers;
 #endif
 
 	int			numDrawSurfs;
