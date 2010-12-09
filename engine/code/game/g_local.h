@@ -700,6 +700,9 @@ void Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace );
 #ifdef TA_ENTSYS // BREAKABLE
 qboolean G_SeenByHumans( gentity_t *ent );
 #endif
+#ifdef TA_ENTSYS // PUSHABLE
+qboolean G_PlayerPushEntity(gentity_t *self, gentity_t *other);
+#endif
 
 //
 // g_trigger.c
