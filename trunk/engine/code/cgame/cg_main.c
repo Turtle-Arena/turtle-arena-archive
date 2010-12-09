@@ -489,7 +489,7 @@ void CG_RegisterCvars( void ) {
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
 	trap_Cvar_Register(NULL, "headmodel", "", CVAR_USERINFO | CVAR_ARCHIVE );
 #else
-	trap_Cvar_Register(NULL, "headmodel", DEFAULT_HEADMODEL, CVAR_USERINFO | CVAR_ARCHIVE );
+	trap_Cvar_Register(NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 #endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
 	trap_Cvar_Register(NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
