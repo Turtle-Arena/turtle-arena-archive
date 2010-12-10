@@ -3040,7 +3040,7 @@ static void PM_LadderMove( void ) {
 			wishvel[i] = scale * pml.forward[i]*fw +
 				     scale * pml.right[i]*rt;
 		}
-		wishvel[2] = scale * (pm->cmd.forwardmove + pm->cmd.upmove);
+		wishvel[2] = scale * pm->cmd.forwardmove;
 	}
 
 	if (wishvel[2] < 0) {
@@ -3084,9 +3084,86 @@ void CheckLadder( void )
 	vec3_t flatforward,spot;
 	vec3_t origin;
 	trace_t trace;
+	qboolean backwards;
+
+	// Don't climb ladder while ducking, if on ladder player will fall down
+	if (pm->cmd.upmove < 0) {
+		if (pm->ps->eFlags & EF_LADDER) {
+			// Jump away from ladder
+			VectorMA(pm->ps->velocity, (JUMP_VELOCITY * pm->playercfg->jumpMult) * -0.2f, pml.forward, pm->ps->velocity);
+
+			pml.groundPlane = qfalse;		// jumping away
+			pml.walking = qfalse;
+
+			pm->ps->groundEntityNum = ENTITYNUM_NONE;
+#ifdef TA_NPCSYS // TDC_NPC
+			if (pm->npc) {
+				pm->ps->velocity[2] = pm->cmd.upmove*8;
+			} else
+#endif
+#ifdef TA_PLAYERSYS
+			pm->ps->velocity[2] = (JUMP_VELOCITY * pm->playercfg->jumpMult) * 0.6f;
+#else
+			pm->ps->velocity[2] = JUMP_VELOCITY;
+#endif
+			PM_AddEvent( EV_JUMP );
+
+#ifdef TA_NPCSYS
+			if (pm->npc) {
+				PM_ForceLegsAnim( OBJECT_JUMP );
+			} else
+#endif
+			PM_ForceLegsAnim( LEGS_JUMP );
+			pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
+		}
+		goto notOnLadder;
+	} else if (pm->cmd.upmove > 0) {
+		// must wait for jump to be released
+		if ( pm->ps->pm_flags & PMF_JUMP_HELD ) {
+			// clear upmove so cmdscale doesn't lower running speed
+			pm->cmd.upmove = 0;
+		}
+		// Jump off ladder
+		else if (!(pm->ps->pm_flags & PMF_RESPAWNED) && (pm->cmd.upmove >= 10) && (pm->ps->eFlags & EF_LADDER)) {
+			// Turn around
+			pm->ps->delta_angles[YAW] += ANGLE2SHORT(180);
+
+			// Jump away from ladder
+			VectorMA(pm->ps->velocity, (JUMP_VELOCITY * pm->playercfg->jumpMult) * -0.4f, pml.forward, pm->ps->velocity);
+
+			pml.groundPlane = qfalse;		// jumping away
+			pml.walking = qfalse;
+			pm->ps->pm_flags |= PMF_JUMP_HELD;
+
+			pm->ps->groundEntityNum = ENTITYNUM_NONE;
+#ifdef TA_NPCSYS // TDC_NPC
+			if (pm->npc) {
+				pm->ps->velocity[2] = pm->cmd.upmove*8;
+			} else
+#endif
+#ifdef TA_PLAYERSYS
+			pm->ps->velocity[2] = (JUMP_VELOCITY * pm->playercfg->jumpMult) * 0.6f;
+#else
+			pm->ps->velocity[2] = JUMP_VELOCITY;
+#endif
+			PM_AddEvent( EV_JUMP );
+
+#ifdef TA_NPCSYS
+			if (pm->npc) {
+				PM_ForceLegsAnim( OBJECT_JUMP );
+			} else
+#endif
+			PM_ForceLegsAnim( LEGS_JUMP );
+			pm->ps->pm_flags &= ~PMF_BACKWARDS_JUMP;
+
+			goto notOnLadder;
+		} else {
+			goto notOnLadder;
+		}
+	}
 
 	// check if we should be backwards walking down the ladder
-	qboolean backwards = qfalse;
+	backwards = qfalse;
 
 	VectorCopy(pm->ps->origin, origin);
 	origin[2] -= 30;
@@ -3123,6 +3200,7 @@ void CheckLadder( void )
 		VectorInverse(pm->ps->origin2);
 #endif
 	} else {
+notOnLadder:
 		pml.ladder = qfalse;
 
 #ifdef TA_PLAYERSYS // LADDER
