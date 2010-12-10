@@ -225,7 +225,7 @@ item item_scout
 {
 	pickupSound "sound/items/powerup_pickup.ogg"
 	model "models/powerups/scout.md3"
-	iconName "icons/portal"
+	iconName "icons/scout"
 	pickupName "Scout"
 	quantity 30
 	type IT_PERSISTANT_POWERUP
