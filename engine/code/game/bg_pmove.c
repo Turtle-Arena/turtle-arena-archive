@@ -1857,11 +1857,11 @@ static void PM_Footsteps( void ) {
 				PM_ContinueLegsAnim( LEGS_IDLE );
 #endif
 			}
-#ifdef IOQ3ZTM // ZTM: TEST
+#ifdef IOQ3ZTM // ZTM: Only return if started an animation
 			return;
 #endif
 		}
-#ifndef IOQ3ZTM // ZTM: TEST
+#ifndef IOQ3ZTM
 		return;
 #endif
 	}
