@@ -3030,8 +3030,28 @@ static void PM_LadderMove( void ) {
 		wishvel[0] = 0;
 		wishvel[1] = 0;
 		wishvel[2] = 0;
-	}
-	else {   // if they're trying to move... lets calculate it
+
+		// Snap to 8 unit grid, so player always holds onto ladder correctly!
+		//  (But only if not moving and if on a verticle ladder)
+		if (!VectorLength(pm->ps->velocity) && pm->ps->origin2[2] == 0)
+		{
+			float baseZ = (pm->ps->origin[2] + pm->mins[2]);
+			int baseZint = (int)baseZ;
+			int offset = baseZint % 8;
+
+			if (offset) {
+				// Snap in the direction the player was moving
+				if (pm->ps->pm_flags & PMF_BACKWARDS_RUN) {
+					// Do nothing
+				} else {
+					offset = 8 - abs(offset);
+				}
+
+				//Com_Printf("DEBUG: Snap ladder origin %f (%d) %s to %d (ofs=%d)\n", baseZ, baseZint, (pm->ps->pm_flags & PMF_BACKWARDS_RUN) ? "down" : "up", baseZint + offset - (int)pm->mins[2], offset);
+				pm->ps->origin[2] = baseZint + offset - (int)pm->mins[2];
+			}
+		}
+	} else {   // if they're trying to move... lets calculate it
 		for (i=0 ; i<3 ; i++){
 			float fw = pm->cmd.forwardmove, rt = pm->cmd.rightmove;
 			if(fw < 0 && !backwards)
@@ -3041,12 +3061,12 @@ static void PM_LadderMove( void ) {
 				     scale * pml.right[i]*rt;
 		}
 		wishvel[2] = scale * pm->cmd.forwardmove;
-	}
 
-	if (wishvel[2] < 0) {
-		pm->ps->pm_flags |= PMF_BACKWARDS_RUN;
-	} else {
-		pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
+		if (wishvel[2] < 0) {
+			pm->ps->pm_flags |= PMF_BACKWARDS_RUN;
+		} else {
+			pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
+		}
 	}
 
 	VectorCopy (wishvel, wishdir);
@@ -3068,6 +3088,12 @@ static void PM_LadderMove( void ) {
 
 		VectorNormalize(pm->ps->velocity);
 		VectorScale(pm->ps->velocity, vel, pm->ps->velocity);
+
+#ifdef TA_PLAYERSYS // LADDER
+		// Save ladder dir, inv of trace.plane.normal
+		VectorCopy(pml.groundTrace.plane.normal, pm->ps->origin2);
+		VectorInverse(pm->ps->origin2);
+#endif
 	}
 
 	PM_SlideMove( qfalse ); // move without gravity
