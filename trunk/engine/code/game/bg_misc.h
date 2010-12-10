@@ -1184,8 +1184,9 @@ typedef enum {
     TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C,
     // NOTE: If more animations are added update BG_PlayerAttackAnim
 
-	BOTH_LADDER,
 	BOTH_LADDER_STAND,
+	BOTH_LADDER_UP,
+	BOTH_LADDER_DOWN,
 #endif
 
 	MAX_ANIMATIONS,

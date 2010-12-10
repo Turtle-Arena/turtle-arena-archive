@@ -1506,8 +1506,9 @@ strAnimationDef_t playerAnimationDefs[] = {
     ANIMDEF(TORSO_ATTACK_NUNCHUCKS1_PRIMARY_B),
     ANIMDEF(TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C),
 
-	ANIMDEF(BOTH_LADDER),
 	ANIMDEF(BOTH_LADDER_STAND),
+	ANIMDEF(BOTH_LADDER_UP),
+	ANIMDEF(BOTH_LADDER_DOWN),
 #endif
 
 	// Quake3, not loaded from file
@@ -1524,6 +1525,10 @@ strAnimationDef_t playerAnimationDefs[] = {
 	{ TORSO_STAND2, "TORSO_STAND_GAUNTLET" },
 	{ TORSO_ATTACK, "TORSO_ATTACK_GUN" },
 	{ TORSO_ATTACK2, "TORSO_ATTACK_GAUNTLET" },
+
+#ifdef TA_PLAYERS
+	{ BOTH_LADDER_UP, "BOTH_LADDER" },
+#endif
 
 #if 0 // ZTM: NOTE: This is unneeded as we load undefined animations
 	// Fake animations (BOTH_* version of TORSO_* animations)
@@ -5502,12 +5507,17 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 			break;
 
 #ifdef TA_PLAYERS
-		case BOTH_LADDER:
+		case BOTH_LADDER_STAND:
+			anim[0] = LEGS_IDLE;
+			break;
+
+		case BOTH_LADDER_UP:
 			anim[0] = LEGS_WALK;
 			break;
 
-		case BOTH_LADDER_STAND:
-			anim[0] = LEGS_IDLE;
+		case BOTH_LADDER_DOWN:
+			anim[0] = BOTH_LADDER_UP;
+			reversed = qtrue;
 			break;
 #endif
 	}
