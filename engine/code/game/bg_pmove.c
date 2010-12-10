@@ -1872,7 +1872,11 @@ static void PM_Footsteps( void ) {
 #if defined TA_PLAYERS && defined IOQ3ZTM // LADDER
 	if(pml.ladder) {
 		bobmove = 0.3f;	// walking bobs slow
-		PM_ContinueAnim( BOTH_LADDER );
+		if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
+			PM_ContinueAnim( BOTH_LADDER_DOWN );
+		} else {
+			PM_ContinueAnim( BOTH_LADDER_UP );
+		}
 	} else
 #endif
 	if ( pm->ps->pm_flags & PMF_DUCKED ) {
@@ -3037,6 +3041,12 @@ static void PM_LadderMove( void ) {
 				     scale * pml.right[i]*rt;
 		}
 		wishvel[2] = scale * (pm->cmd.forwardmove + pm->cmd.upmove);
+	}
+
+	if (wishvel[2] < 0) {
+		pm->ps->pm_flags |= PMF_BACKWARDS_RUN;
+	} else {
+		pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
 	}
 
 	VectorCopy (wishvel, wishdir);
