@@ -347,10 +347,12 @@ weapon "w_nunchuck"
 
 	flashSound0 "sound/weapons/melee_swing.wav" // TEST
 
+	// Currently cannot do damage based on location of barrel,
+	//  so attack all around...
 	// up
 	blade 0
 	{
-		damage 10
+		damage 1
 		origin 0 0 0
 		tip 0 0 8
 		trailStyle none
@@ -358,7 +360,7 @@ weapon "w_nunchuck"
 	// forward
 	blade 1
 	{
-		damage 10
+		damage 3
 		origin 0 0 8
 		tip 0 12 8
 		trailStyle default
@@ -366,7 +368,7 @@ weapon "w_nunchuck"
 	// left
 	blade 2
 	{
-		damage 10
+		damage 3
 		origin 0 0 8
 		tip 12 0 8
 		trailStyle default
@@ -374,7 +376,7 @@ weapon "w_nunchuck"
 	// right
 	blade 3
 	{
-		damage 10
+		damage 3
 		origin 0 0 8
 		tip -12 0 8
 		trailStyle default
@@ -382,7 +384,7 @@ weapon "w_nunchuck"
 	// back
 	blade 4
 	{
-		damage 10
+		damage 3
 		origin 0 0 8
 		tip 0 -12 8
 		trailStyle default
