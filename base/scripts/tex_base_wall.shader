@@ -145,9 +145,9 @@ textures/base_wall/pipe
 	}
 }
 
-textures/base_wall/wood_ladder
+textures/base_wall/ladder_wood
 {
-	qer_editorimage textures/base_wall/wood_ladder.png
+	qer_editorimage textures/base_wall/ladder_wood.png
 	surfaceparm trans
 	surfaceparm alphashadow
 	surfaceparm nonsolid
@@ -156,7 +156,32 @@ textures/base_wall/wood_ladder
 	nopicmip
 
 	{
-		map textures/base_wall/wood_ladder.png
+		map textures/base_wall/ladder_wood.png
+		blendFunc GL_ONE GL_ZERO
+		alphaFunc GE128
+		depthWrite
+		rgbGen identity
+	}
+	{
+		map $lightmap
+		rgbGen identity
+		blendFunc GL_DST_COLOR GL_ZERO
+		depthFunc equal
+	}
+}
+
+textures/base_wall/ladder_metal
+{
+	qer_editorimage textures/base_wall/ladder_metal.png
+	surfaceparm trans
+	surfaceparm alphashadow
+	surfaceparm nonsolid
+	surfaceparm metal
+	cull none
+	nopicmip
+
+	{
+		map textures/base_wall/ladder_metal.png
 		blendFunc GL_ONE GL_ZERO
 		alphaFunc GE128
 		depthWrite
