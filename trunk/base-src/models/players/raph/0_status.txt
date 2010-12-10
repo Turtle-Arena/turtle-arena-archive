@@ -22,8 +22,8 @@ Quake3 Animations
 MISSIONPACK Animations (done)
 
 Turtle Arena Animations
-* BOTH_LADDER_STAND (defaults to LEDS_IDLE)
-* BOTH_LADDER_UP (defaults to LEDS_WALK)
+* BOTH_LADDER_STAND (done)
+* BOTH_LADDER_UP (copy of BOTH_LADDER_STAND)
 * BOTH_LADDER_DOWN (don't care) (defaults to reversed BOTH_LADDER_UP)
 
 * TORSO_PUTDEFAULT_* (don't care) (defaults to reversed TORSO_GETDEFAULT_*)
