@@ -144,6 +144,8 @@ Weapons (and attacking)
   * TODO: Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
 
   * TODO: Make a original character (In case the Ninja Turtles have to be removed at some point)
+    * Name the character "Goy"? (Character name ZTurtleMan made up.)
+    * NOTE: It turns out Goy is Modern Hebrew for non-Jew / gentile. (Which is pretty generic, which fits the propose of the character.)
 
   * TODO: Add Jump/Land animations specificly for backflip, fallback to 'Jump/Land B' (jump backward)
     * For jumping backward in lock-on mode, like in LoZ:TP
@@ -330,3 +332,11 @@ Current Location: http://ztm.x10hosting.com/ta/
   * TODO: Add a phpbb fourm
 
   * TODO: Add MediaWiki to website? (and use the same database as phpbb)
+
+= Packaging =
+  * TODO: Add more options to the Win32 NSIS installer
+	* Allow install path to be set?
+	* Allow desktop shortcut to be created?
+	* Allow Start Menu shortcuts not be created?
+	* Allow  Start Menu folder name to be set?
+

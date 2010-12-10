@@ -5954,7 +5954,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 	frameSkip_t	skip;
 	char		text[20000];
 	fileHandle_t	f;
-	animation_t *animations;
+	animation_t *animations, dummyAnimation;
 	qboolean foundAnim;
 	qboolean loadedAnim[MAX_TOTALANIMATIONS];
 	int rtn = 0;
@@ -6272,8 +6272,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 		}
 #endif
 
-		// head config currently skips animations
-		if (!headConfig && (prefixType = BG_AnimPrefixTypeForName(token)))
+		if ((prefixType = BG_AnimPrefixTypeForName(token)))
 		{
 			qboolean animName = qfalse;
 			const char *name;
@@ -6283,13 +6282,18 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 			{
 				if ( !Q_stricmp( token, playerAnimationDefs[i].name ) ) {
 					animName = foundAnim = qtrue;
-					rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip, prefixType);
-					if (rtn == -1) {
-						BG_SetDefaultAnimation(loadedAnim, playerAnimationDefs[i].num, animations);
-					} else if (rtn == 0) {
-						Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n", token);
+					if (headConfig) {
+						// head config skips body animations
+						rtn = BG_LoadAnimation(&text_p, 0, &dummyAnimation, &skip, prefixType);
 					} else {
-						loadedAnim[playerAnimationDefs[i].num] = qtrue;
+						rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip, prefixType);
+						if (rtn == -1) {
+							BG_SetDefaultAnimation(loadedAnim, playerAnimationDefs[i].num, animations);
+						} else if (rtn == 0) {
+							Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n", token);
+						} else {
+							loadedAnim[playerAnimationDefs[i].num] = qtrue;
+						}
 					}
 					break;
 				}
@@ -6309,13 +6313,18 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 				if (!Q_stricmp( name, BG_AnimName(playerAnimationDefs[i].name) ) )
 				{
 					animName = foundAnim = qtrue;
-					rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip, prefixType);
-					if (rtn == -1) {
-						BG_SetDefaultAnimation(loadedAnim, playerAnimationDefs[i].num, animations);
-					} else if (rtn == 0) {
-						Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n", token);
+					if (headConfig) {
+						// head config skips body animations
+						rtn = BG_LoadAnimation(&text_p, 0, &dummyAnimation, &skip, prefixType);
 					} else {
-						loadedAnim[playerAnimationDefs[i].num] = qtrue;
+						rtn = BG_LoadAnimation(&text_p, playerAnimationDefs[i].num, animations, &skip, prefixType);
+						if (rtn == -1) {
+							BG_SetDefaultAnimation(loadedAnim, playerAnimationDefs[i].num, animations);
+						} else if (rtn == 0) {
+							Com_Printf("BG_ParsePlayerCFGFile: Anim %s: Failed loading.\n", token);
+						} else {
+							loadedAnim[playerAnimationDefs[i].num] = qtrue;
+						}
 					}
 					break;
 				}
