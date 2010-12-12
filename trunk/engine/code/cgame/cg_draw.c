@@ -3002,7 +3002,7 @@ static void CG_DrawSPIntermission( void ) {
 		name = cgs.clientinfo[ cg.snap->ps.clientNum ].name;
 	}
 
-	Q_snprintf(str, sizeof (str), "%s got though the level", name);
+	Q_snprintf(str, sizeof (str), "%s got through the level", name);
 
 #ifdef MISSIONPACK_HUD2
 	CG_Text_Paint( CENTER_X, 210, 0.3f, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
