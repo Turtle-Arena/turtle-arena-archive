@@ -247,7 +247,11 @@ static void CG_Obituary( entityState_t *ent ) {
 	}
 
 	// check for kill messages from the current clientNum
-	if ( attacker == cg.snap->ps.clientNum ) {
+	if (
+#ifdef TA_SP // Don't show in single player
+		cgs.gametype != GT_SINGLE_PLAYER &&
+#endif
+		attacker == cg.snap->ps.clientNum ) {
 		char	*s;
 
 #ifdef NOTRATEDM // frag to KO
