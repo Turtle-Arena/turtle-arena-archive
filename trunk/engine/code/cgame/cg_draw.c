@@ -2981,8 +2981,7 @@ static void CG_DrawSPIntermission( void ) {
 	char		*name;
 	vec4_t		color;
 
-	if (!cg.snap->ps.persistant[PERS_LIVES] && !cg.snap->ps.persistant[PERS_CONTINUES])
-	{
+	if (!cg.snap->ps.persistant[PERS_LIVES] && !cg.snap->ps.persistant[PERS_CONTINUES]) {
 		return;
 	}
 

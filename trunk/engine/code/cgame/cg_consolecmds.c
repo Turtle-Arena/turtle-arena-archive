@@ -184,9 +184,6 @@ static void CG_spLose_f( void) {
 #endif
 	CG_AddBufferedSound(cgs.media.loserSound);
 	//trap_S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
-#ifdef TA_SP
-	if (cgs.gametype != GT_SINGLE_PLAYER)
-#endif
 #ifndef MISSIONPACK_HUD2
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
