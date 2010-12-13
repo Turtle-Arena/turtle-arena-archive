@@ -1462,7 +1462,11 @@ void LogExit( const char *string ) {
 	}
 
 #ifdef MISSIONPACK
-	if (g_singlePlayer.integer) {
+	if (g_singlePlayer.integer
+#ifdef TA_SP // ZTM: NOTE: Custom Game (skirmish) uses 2 while Single Player uses 1.
+		== 2
+#endif
+		) {
 		if (g_gametype.integer >= GT_CTF) {
 			if (team == TEAM_BLUE)
 				won = level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED];
