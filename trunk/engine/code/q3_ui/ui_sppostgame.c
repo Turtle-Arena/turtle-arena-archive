@@ -704,8 +704,11 @@ void UI_SPPostgameMenu_f( void ) {
 #ifdef TA_SP
 	Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_again );
 
-	postgameMenuInfo.winnerSound = trap_S_RegisterSound( "sound/player/announce/youwin.wav", qfalse );
-	trap_Cmd_ExecuteText( EXEC_APPEND, "music music/win\n" );
+	if (trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER && playerGameRank != 1) {
+		trap_Cmd_ExecuteText( EXEC_APPEND, "music music/loss\n" );
+	} else {
+		trap_Cmd_ExecuteText( EXEC_APPEND, "music music/win\n" );
+	}
 #else
 	if ( playerGameRank == 1 ) {
 		Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_next );
