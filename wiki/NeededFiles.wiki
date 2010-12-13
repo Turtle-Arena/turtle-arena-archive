@@ -45,36 +45,72 @@ Lock-on sounds like in LOZ:TP
   * pain25_1.wav
   * taunt.wav
 
-== Announcer ==
-Note: There are more announcer files with the per-gametype sounds.
+== Announcer / Feedback ==
 
-  * TEMP: sound/feedback/1_minute.wav - Gyoji: "One minute remaining" ?
-  * TEMP: sound/feedback/5_minute.wav - Gyoji: "Five minutes remaining" ?
-  * TEMP: sound/feedback/sudden_death.wav - Gyoji: "Sudden Death."
-  * TEMP: sound/feedback/1_frag.wav - Gyoji: "One knockout remaining" ?
-  * TEMP: sound/feedback/2_frags.wav - Gyoji: "Two knockouts remaining" ?
-  * TEMP: sound/feedback/3_frags.wav - Gyoji: "Three knockouts remaining" ?
-  * TEMP: sound/feedback/three.wav - Gyoji: "Three"
-  * TEMP: sound/feedback/two.wav - Gyoji: "Two"
-  * TEMP: sound/feedback/one.wav - Gyoji: "One"
-  * TEMP: sound/feedback/fight.wav - Gyoji: "Fight" or "Begin" ?
-  * TEMP: sound/feedback/prepare.wav - Gyoji: "Prepare Your Selfs"
-  * TEMP: sound/feedback/prepare_team.wav - Gyoji: "Prepare Your Team"
+  * TEMP: sound/feedback/1_minute.wav - Announcer: "One minute remaining" ?
+  * TEMP: sound/feedback/5_minute.wav - Announcer: "Five minutes remaining" ?
+  * TEMP: sound/feedback/sudden_death.wav - Announcer: "Sudden Death."
+  * TEMP: sound/feedback/1_frag.wav - Announcer: "One knockout remaining" ?
+  * TEMP: sound/feedback/2_frags.wav - Announcer: "Two knockouts remaining" ?
+  * TEMP: sound/feedback/3_frags.wav - Announcer: "Three knockouts remaining" ?
+  * TEMP: sound/feedback/three.wav - Announcer: "Three"
+  * TEMP: sound/feedback/two.wav - Announcer: "Two"
+  * TEMP: sound/feedback/one.wav - Announcer: "One"
+  * TEMP: sound/feedback/fight.wav - Announcer: "Begin" // Should there be "Fight" and "Begin"? Non-battle gametypes would use "Begin".
+  * TEMP: sound/feedback/prepare.wav - Announcer: "Prepare Your Selfs."
+  * TEMP: sound/feedback/prepare_team.wav - Announcer: "Prepare Your Team."
 
-  * TEMP: sound/feedback/vote_now.wav - Gyoji: "Voting has begun."
+  * TEMP: sound/feedback/vote_now.wav - Announcer: "Voting has begun."
 
-  * TEMP: sound/feedback/vote_passed.wav - Gyoji: "Vote passed."
-  * TEMP: sound/feedback/vote_failed.wav - Gyoji: "Vote failed."
+  * TEMP: sound/feedback/vote_passed.wav - Announcer: "Vote passed."
+  * TEMP: sound/feedback/vote_failed.wav - Announcer: "Vote failed."
 
-  * TEMP: sound/feedback/takenlead.wav - Gyoji: "You have taken the lead."
-  * TEMP: sound/feedback/tiedlead.wav - Gyoji: "Your tied for the lead."
-  * TEMP: sound/feedback/lostlead.wav - Gyoji: "You lost the lead."
+  * TEMP: sound/feedback/takenlead.wav - Announcer: "You have taken the lead."
+  * TEMP: sound/feedback/tiedlead.wav - Announcer: "Your tied for the lead."
+  * TEMP: sound/feedback/lostlead.wav - Announcer: "You lost the lead."
 
-  * TEMP: sound/feedback/assist.wav - Gyoji: "Assist."
-  * TEMP: sound/feedback/defense.wav - Gyoji: "Defense."
+  * TEMP: sound/feedback/assist.wav - Announcer: "Assist."
+  * TEMP: sound/feedback/defense.wav - Announcer: "Defense."
 
+=== Single Player Skirmish (aka Custom Game, aka Vs. Bots) ===
+  * sound/feedback/voc_youwin.wav - Announcer: "You win."
+  * sound/feedback/voc_youlose.wav - Announcer: "You lose."
 
-== Misc ==
+=== TEAM/CTF/1FCTF/Overload ===
+  * TEMP: sound/feedback/redleads.wav - Announcer: "Red leads."
+  * TEMP: sound/feedback/blueleads.wav - Announcer: "Blue leads."
+  * TEMP: sound/feedback/teamstied.wav - Announcer: "Teams are tied."
+  * sound/feedback/hit_teammate.wav - sfx
+
+  * sound/teamplay/voc_red_scores.wav - Announcer: "Red scores."
+  * sound/teamplay/voc_blue_scores.wav - Announcer: "Blue scores."
+
+  * sound/teamplay/flagcapture_yourteam.wav - sfx
+  * sound/teamplay/flagcapture_opponent.wav - sfx
+
+  * sound/teamplay/flagreturn_yourteam.wav - sfx
+  * sound/teamplay/flagreturn_opponent.wav - sfx
+
+  * sound/teamplay/flagtaken_yourteam.wav - sfx 'alarm'
+  * sound/teamplay/flagtaken_opponent.wav - sfx 'different alarm'
+
+=== CTF ===
+  * sound/teamplay/voc_red_returned.wav - Announcer: "Red flag return."
+  * sound/teamplay/voc_blue_returned.wav - Announcer: "Blue flag return."
+  * sound/teamplay/voc_enemy_flag.wav - Announcer: "Thee enemy has your flag."
+  * sound/teamplay/voc_team_flag.wav - Announcer: "Your team has the enemy flag."
+
+=== 1 Flag CTF ===
+  * sound/teamplay/voc_team_1flag.wav - Announcer: "Your team has the flag."
+  * sound/teamplay/voc_enemy_1flag.wav - Announcer: "Thee enemy has the flag."
+
+=== CTF and 1FCTF ===
+  * sound/teamplay/voc_you_flag.wav - Announcer: "You have the flag!"
+
+=== Overload ===
+  * TEMP: sound/teamplay/voc_base_attack.wav - Announcer: "Your base is under attack!"
+
+== Sound Effects ==
   * TEMP:	cgs.media.tracerSound = trap_S_RegisterSound( "sound/weapons/machinegun/buletby1.wav", qfalse );
   * TEMP:	cgs.media.selectSound = trap_S_RegisterSound( "sound/weapons/change.wav", qfalse );
 
@@ -116,54 +152,19 @@ Note: There are more announcer files with the per-gametype sounds.
   * TEMP: cgs.media.sfx_rockexp = trap_S_RegisterSound ("sound/weapons/rocket/rocklx1a.wav", qfalse);
 #ifdef MISSIONPACK
   * cgs.media.weaponHoverSound = trap_S_RegisterSound( "sound/weapons/weapon_hover.wav", qfalse );
-  * cgs.media.winnerSound = trap_S_RegisterSound( "sound/feedback/voc_youwin.wav", qfalse );
-  * cgs.media.loserSound = trap_S_RegisterSound( "sound/feedback/voc_youlose.wav", qfalse );
 #endif
 
   * cgs.media.protectSound = trap_S_RegisterSound("sound/items/protect3.wav", qfalse);
 
 == Footstep sounds ==
+Footsteps sounds are in sound/player/footsteps/
+NOTE: %d is replaced with 1 through 4. (i.e. sound/player/footsteps/step1.wav, sound/player/footsteps/step2.wav, ...)
+
   * OA: step%d (default)
   * boot%d
   * DONE: clank%d
   * DONE: flesh%d
   * OA: splash%d
-
-== TEAM/CTF/1FCTF/Overload ==
-  * TEMP: sound/feedback/redleads.wav - "Red leads"
-  * TEMP: sound/feedback/blueleads.wav - "Blue leads"
-  * TEMP: sound/feedback/teamstied.wav - "Teams are tied"
-  * sound/feedback/hit_teammate.wav - sfx
-
-  * sound/teamplay/voc_red_scores.wav
-  * sound/teamplay/voc_blue_scores.wav
-
-  * sound/teamplay/flagcapture_yourteam.wav
-  * sound/teamplay/flagcapture_opponent.wav
-
-  * sound/teamplay/flagreturn_yourteam.wav
-  * sound/teamplay/flagreturn_opponent.wav
-
-  * sound/teamplay/flagtaken_yourteam.wav
-  * sound/teamplay/flagtaken_opponent.wav
-
-== CTF ==
-  * sound/teamplay/voc_red_returned.wav
-  * sound/teamplay/voc_blue_returned.wav
-  * sound/teamplay/voc_enemy_flag.wav
-  * sound/teamplay/voc_team_flag.wav
-
-== 1 Flag CTF ==
-// id software: FIXME: get a replacement for this sound ?
-  * cgs.media.neutralFlagReturnedSound = trap_S_RegisterSound( "sound/teamplay/flagreturn_opponent.wav", qtrue );
-  * sound/teamplay/voc_team_1flag.wav
-  * sound/teamplay/voc_enemy_1flag.wav
-
-== CTF and 1FCTF ==
-  * sound/teamplay/voc_you_flag.wav - "You have the flag!"
-
-== Overload ==
-  * TEMP: sound/teamplay/voc_base_attack.wav - "Your base is under attack!"
 
 
 = Models =
