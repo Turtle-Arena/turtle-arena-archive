@@ -473,7 +473,11 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 	}
 
 	// lead changes
-	if (!reward) {
+	if (!reward
+#ifdef TA_SP // Don't talk about lead changes in single player/co-op
+		&& cgs.gametype != GT_SINGLE_PLAYER
+#endif
+		) {
 		//
 		if ( !cg.warmup ) {
 			// never play lead changes during warmup
