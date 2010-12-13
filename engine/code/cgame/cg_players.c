@@ -2950,8 +2950,17 @@ Returns the Z component of the surface being shadowed
 ===============
 */
 #define	SHADOW_DISTANCE		128
-static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane ) {
+#ifdef IOQ3ZTM // SHADOW
+static qboolean CG_PlayerShadow( centity_t *cent, vec3_t start, float *shadowPlane )
+#else
+static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane )
+#endif
+{
+#ifdef IOQ3ZTM // LADDER // SHADOW // When using torso origin on a ladder, trace starts in ladder. For raph_v9 it was like one unit too big.
+	vec3_t		end, mins = {-8, -8, 0}, maxs = {8, 8, 2};
+#else
 	vec3_t		end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
+#endif
 	trace_t		trace;
 	float		alpha;
 
@@ -2967,10 +2976,17 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane ) {
 	}
 
 	// send a trace down from the player to the ground
+#ifdef IOQ3ZTM // SHADOW
+	VectorCopy( start, end );
+	end[2] -= SHADOW_DISTANCE;
+
+	trap_CM_BoxTrace( &trace, start, end, mins, maxs, 0, MASK_PLAYERSOLID );
+#else
 	VectorCopy( cent->lerpOrigin, end );
 	end[2] -= SHADOW_DISTANCE;
 
 	trap_CM_BoxTrace( &trace, cent->lerpOrigin, end, mins, maxs, 0, MASK_PLAYERSOLID );
+#endif
 
 	// no shadow if too high
 	if ( trace.fraction == 1.0 || trace.startsolid || trace.allsolid ) {
@@ -3226,6 +3242,10 @@ void CG_Player( centity_t *cent ) {
 	int				renderfx;
 	qboolean		shadow;
 	float			shadowPlane;
+#ifdef IOQ3ZTM // SHADOW
+	refEntity_t		shadowRef;
+	vec3_t			shadowOrigin;
+#endif
 #ifdef TURTLEARENA // POWERS
 	refEntity_t		powerup;
 #endif
@@ -3308,7 +3328,21 @@ void CG_Player( centity_t *cent ) {
 #endif
 
 	// add the shadow
+#ifdef IOQ3ZTM // SHADOW
+	memcpy(&shadowRef, &torso, sizeof(shadowRef));
+	shadowRef.hModel = ci->torsoModel;
+	VectorCopy(cent->lerpOrigin, legs.origin);
+
+	// Shadow from the torso origin
+	if (CG_PositionRotatedEntityOnTag(&shadowRef, &legs, ci->legsModel, "tag_torso")) {
+		VectorCopy(shadowRef.origin, shadowOrigin);
+	} else {
+		VectorCopy(cent->lerpOrigin, shadowOrigin);
+	}
+	shadow = CG_PlayerShadow( cent, shadowOrigin, &shadowPlane );
+#else
 	shadow = CG_PlayerShadow( cent, &shadowPlane );
+#endif
 
 	// add a water splash if partially in and out of water
 	CG_PlayerSplash( cent );
