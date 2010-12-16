@@ -1,4 +1,5 @@
 #summary How to compile Turtle Arena from source code
+#labels Phase-Deploy
 
 = Introduction =
 
