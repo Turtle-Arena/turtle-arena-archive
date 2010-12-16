@@ -1,4 +1,4 @@
-#summary How to compile Turtle Arena from source code
+#summary How to build Turtle Arena from source code
 #labels Phase-Deploy
 
 = Introduction =
@@ -37,7 +37,5 @@ Should also work on other Unix-like operating systems, like FreeBSD, but have no
 See [BuildingSourceOnLinux Building source on Linux].
 
 = Mac OS X =
-
-Mac OS X is currently unsupported as the developer does not have a Mac computer. However, the engine Turtle Arena is based on, ioquake3, does support Mac OS X. The following is untested.
 
 See [BuildingSourceOnMacOXS Building source on Mac OS X].
