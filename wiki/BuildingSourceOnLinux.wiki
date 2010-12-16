@@ -72,7 +72,12 @@ Code::Blocks does not build the game logic '.qvm', only the game logic '.so'. So
 To allow sv_pure to be enable you should download the assets0.pk3 included with the stable release. You could try zipping it yourself but it is likely that the checksum will be different.
 
 If you want to try it anyway, run the package-assets.sh script.
-  ./package-assets.sh --installdir base
+  # ./package-assets.sh
+  # Copy assets0.pk3 from ./install/base to ./base
 
 ===== Development release =====
-TODO: Write this section.
+For the development release you need to create assets0.pk3, but also set the checksum in the engine.
+
+The script package.sh has a helper function for setting the checksum, but currently must be manually done.
+  # ./package.sh --no-win32 --no-linux
+  # Copy assets0.pk3 from ./install/base to ./base
