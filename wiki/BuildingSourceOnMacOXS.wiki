@@ -1,0 +1,14 @@
+#summary How to build Turtle Arena on Mac OS X
+#labels Phase-Deploy
+
+NOTE: This page is unfinished.
+
+You first need to get the source code as described [BuildingSource here].
+
+= Introduction =
+
+Mac OS X is currently unsupported as the developer does not have a Mac computer. However, the engine Turtle Arena is based on, ioquake3, does support Mac OS X. The following is untested. 
+
+= Getting the Libraries =
+
+You will need the following development libraries; SDL, GL, GLU, Ogg, Vorbis, and Theora.
