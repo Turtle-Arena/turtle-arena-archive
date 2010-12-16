@@ -1,0 +1,42 @@
+#summary How to compile Turtle Arena from source code
+
+= Introduction =
+
+This is the main page for how to compile and run Turtle Arena. It may seem a little complex at first, but it should be fairly easy.
+
+= All Platforms =
+
+For all platforms the first step is to get the source code.
+
+  * If you are using the source zip from the Turtle Arena zip releases, you can simply unzip the source.
+  * Otherwise you can get the source code for a stable release or the current development version from the subversion repository.
+
+== Get the Source ==
+=== Zipped ===
+A zip file containing the source is included with the zipped releases, simply unzip it.
+
+=== Subversion ===
+You will need a subversion client to get the source, such as [http://tortoisesvn.tigris.org/ TortoiseSVN] (Windows), [http://www.rabbitvcs.org RabbitVCS] (Linux), or the command line program "svn"
+
+In Debian/Ubuntu you can install the command line program using
+	sudo apt-get install subversion
+
+Next you will need to do a source checkout, this varies by program.
+
+Using the command line program you can use the following
+	svn checkout http://turtlearena.googlecode.com/svn/trunk/ turtlearena-read-only
+
+= Windows =
+
+See [BuildingSourceOnWindows Building source on Windows].
+
+= Linux =
+Should also work on other Unix-like operating systems, like FreeBSD, but have not been untested.
+
+See [BuildingSourceOnLinux Building source on Linux].
+
+= Mac OS X =
+
+Mac OS X is currently unsupported as the developer does not have a Mac computer. However, the engine Turtle Arena is based on, ioquake3, does support Mac OS X. The following is untested.
+
+See [BuildingSourceOnMacOXS Building source on Mac OS X].
