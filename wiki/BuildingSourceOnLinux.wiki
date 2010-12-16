@@ -1,0 +1,19 @@
+#summary How to build Turtle Arena on Linux
+#labels Phase-Deploy
+
+NOTE: This page is unfinished.
+
+You first need to get the source code as described [BuildingSource here].
+
+= Introduction =
+
+Add your content here.
+
+
+= Getting the Libraries =
+
+You will need the following development libraries; SDL, GL, GLU, Ogg, Vorbis, and Theora.
+
+In Debian and Debian based distributions (such as Ubuntu) you can run the below in the terminal.
+
+    sudo apt-get install libsdl1.2-dev libgl1-mesa-dev libglu1-mesa-dev libogg-dev libvorbis-dev libtheora-dev 
