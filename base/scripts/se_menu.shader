@@ -49,7 +49,7 @@ menuback
 	}
 }
 
-// menu background with out blending
+// menu background without blending
 menubackRagePro
 {
 	nomipmaps

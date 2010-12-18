@@ -69,7 +69,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CS_MESSAGE				3		// from the map worldspawn's message field
 #define	CS_MOTD					4		// g_motd string for server message of the day
 /* bg_public.h
-	ZTM: NOTE: Server exspects CS_WARMUP as 5.
+	ZTM: NOTE: Server expects CS_WARMUP as 5.
 */
 #define	CS_WARMUP				5		// server time when the match will be restarted
 #define	CS_SCORES1				6
@@ -1548,7 +1548,7 @@ typedef enum {
 	PM_DEAD,		// no acceleration or turning, but free falling
 	PM_FREEZE,		// stuck in place with no control
 	/* bg_public.h
-		ZTM: NOTE: Client (not cgame) exspects PM_INTERMISSION as 5 and
+		ZTM: NOTE: Client (not cgame) expects PM_INTERMISSION as 5 and
 			PM_SPINTERMISSION as 6.
 	*/
 	PM_INTERMISSION,	// no movement or status bar
@@ -1841,7 +1841,7 @@ qboolean	BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 //
 typedef enum {
 	/* bg_public.h
-		ZTM: NOTE: Botlib exspects theses five in this order.
+		ZTM: NOTE: Botlib expects theses five in this order.
 	*/
 	ET_GENERAL,
 	ET_PLAYER,
