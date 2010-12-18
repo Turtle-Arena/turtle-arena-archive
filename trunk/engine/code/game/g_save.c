@@ -46,7 +46,7 @@ typedef struct
 
 typedef struct
 {
-	// server exspects these in this order!
+	// server expects these in this order!
 	//
     byte version; // Save file version.
     char mapname[MAX_QPATH];
