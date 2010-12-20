@@ -1,6 +1,8 @@
 Turtle Arena data copyrights.
 
-All of the data (unless otherwised noted) is license under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
+Most of the data is license under the GNU General Public License;
+		either version 2 of the License, or (at your option) any later version.
+The music the license under the Creative Commons, most is Non Commercial.
 
 == ZTM ==
 All data, unless otherwise noted, is Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
@@ -9,8 +11,31 @@ All data, unless otherwise noted, is Copyright (C) 2009-2010 Zack "ZTurtleMan" M
 
 The data files that have other source files are included in base-src/
 
-	base/gfx/damage/bullet_mrk.png was drawn over OpenArena's gfx/damage/bullet_mrk
-	base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
+The following use DejaVu Sans Bold Oblique, for font license see http://dejavu-fonts.org/wiki/License
+base/icons/iconf_blu2.png
+base/icons/iconf_blu3.png
+base/icons/iconf_neutral3.png
+base/icons/iconf_red2.png
+base/icons/iconf_red3.png
+
+The 64 images listed below were created with GIMP using GNU FreeFonts, for the font license see the bottom of this file.
+base/menu/art/level_complete[1-5].png				FreeMono.ttf
+base/menu/art/skill[1-5].png						FreeMono.ttf
+base/menu/art/randombot_icon.png					FreeMono.ttf
+base/menu/art/unknownmap.png						FreeMono.ttf
+base/menu/art/*_0.png [15 images]					FreeSansBold.ttf
+base/menu/art/*_1.png [15 images]					FreeSansBold.ttf
+base/icons/ammo_regen.png							FreeSansBold.ttf
+base/icons/doubler.png								FreeSansBold.ttf
+base/icons/guard.png								FreeSansBold.ttf
+base/icons/scout.png								FreeSansBold.ttf
+base/gfx/2d/numbers/*.png 0 - 9 and '-' [11 images]	FreeSansBold.ttf
+base/gfx/2d/crosshaira.png							FreeSans.ttf
+base/textures/common/alpha* [6 images]				FreeSans.ttf
+
+Based on OpenArena images.
+base/gfx/damage/bullet_mrk.png was drawn over OpenArena's gfx/damage/bullet_mrk
+base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
 
 == The Mulletz ==
 The following are Copyright (C) 2010 NeilCrowe aka The Mulletz
@@ -79,7 +104,6 @@ base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
 base/gfx/damage/shadow.tga
 base/gfx/misc/flare.tga
-base/menu/art/fx_base.tga
 
 base/textures/sfx/flame1.tga
 base/textures/sfx/flame2.tga
@@ -103,34 +127,10 @@ base/sound/player/footsteps/step2.wav
 base/sound/player/footsteps/step3.wav
 base/sound/player/footsteps/step4.wav
 
-== DejaVu Sans Bold Oblique ==
-The following use DejaVu Sans Bold Oblique, for font license see http://dejavu-fonts.org/wiki/License
-
-base/icons/iconf_blu2.png
-base/icons/iconf_blu3.png
-base/icons/iconf_neutral3.png
-base/icons/iconf_red2.png
-base/icons/iconf_red3.png
-
 == GNU FreeFonts ==
 The following files were created using the GNU Freefonts,
 	and are license under the GNU General Public License; either version 2 of the License, or
 	(at your option) any later version.
-
-The 64 images listed below were created with GIMP.
-base/menu/art/level_complete[1-5].png				FreeMono.ttf
-base/menu/art/skill[1-5].png						FreeMono.ttf
-base/menu/art/randombot_icon.png					FreeMono.ttf
-base/menu/art/unknownmap.png						FreeMono.ttf
-base/menu/art/*_0.png [15 images]					FreeSansBold.ttf
-base/menu/art/*_1.png [15 images]					FreeSansBold.ttf
-base/icons/ammo_regen.png							FreeSansBold.ttf
-base/icons/doubler.png								FreeSansBold.ttf
-base/icons/guard.png								FreeSansBold.ttf
-base/icons/scout.png								FreeSansBold.ttf
-base/gfx/2d/numbers/*.png 0 - 9 and '-' [11 images]	FreeSansBold.ttf
-base/gfx/2d/crosshaira.png							FreeSans.ttf
-base/textures/common/alpha* [6 images]				FreeSans.ttf
 
 Below were created by Turtle Arena, using freetype2	FreeSans.ttf
 base/fonts/FreeSans_0_12.tga
