@@ -12,3 +12,10 @@ Mac OS X is currently unsupported as the developer does not have a Mac computer.
 = Getting the Libraries =
 
 You will need the following development libraries; SDL, GL, GLU, Ogg, Vorbis, and Theora.
+
+= Compiling =
+Compiling Turtle Arena on Mac OS has not been tested. It is known to work with ioquake3, but may need changes to compile Turtle Arena. See [http://wiki.ioquake3.org/Building_ioquake3_on_Mac Building ioquake3 on Mac].
+
+== Snow Leopard - Mac OS X 10.6.2 ==
+  # In a terminal change to the engine/ directory and run "CC=gcc-4.0 ./make-macosx-ub.sh"
+  # Output will be in engine/build/
