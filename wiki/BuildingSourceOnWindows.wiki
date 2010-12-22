@@ -20,21 +20,21 @@ See [http://wiki.ioquake3.org/Building_ioquake3_on_Windows_-_mingw_and_msys Buil
 == Windows - Microsoft Visual C++ ==
 Currently unsupported. There are project files for ioquake3 in engine/misc/msvc/.
 
-Below are changes that ''should'' make the ioquake3 projects compile Turtle Arena. This is untested.
+Below are changes that ''should'' make the ioquake3 projects compile Turtle Arena. This is untested and may not be up-to-date.
 
 Workspace:
-Add below to workspace
-engine/code/splines/Splines.vcproj
+Add file listed below to workspace
+  * engine/code/splines/Splines.vcproj
 
 Quake3 project:
-Link to the output library of Splines project.
+  * Link to the output library of Splines project.
 
 Cgame project:
-Add below to project
+Add file listed below to project
   * engine/code/cgame/cg_npcs.c
 
 Game project:
-Add below to project
+Add files listed below to project
   * engine/code/game/g_npc.c
   * engine/code/game/g_npcmove.c
   * engine/code/game/g_npcthink.c
@@ -47,7 +47,7 @@ Add below to project
 
 Copy the defines from the Turtle Arena config section of the engine/Makefile into all projects (Except Splines and BSPC).
 
-== Windows - Visual Studio 2005 and 2008 ==
+== Windows - Microsoft Visual Studio 2005 and 2008 ==
 Currently unsupported. See Building ioquake3 on Windows - Visual Studio [http://wiki.ioquake3.org/Building_ioquake3_on_Windows_-_Visual_Studio_2005 2005] and [http://wiki.ioquake3.org/Building_ioquake3_on_Windows_-_Visual_Studio_2008 2008]. Like Microsoft Visual C++ you will need to add files and such.
 
 
@@ -61,19 +61,10 @@ Currently unsupported. See Building ioquake3 on Windows - Visual Studio [http://
 3. Run in the command prompt: engine\build\release-mingw32-x86\turtlearena.x86 +set fs_basepath "."
 
 == Windows (Other) ==
-Other being Code::Blocks or Microsoft Visual C++.
+Other being Code::Blocks, Microsoft Visual C++, or Microsoft Visual Studio 2005/2008.
 
-The Code::Blocks and Microsoft Visual C++ projects do not compile QVMs, only DLLs.
-The DLLs are used for testing/debugging, while QVMs are used for release. Mingw also compiles DLLs as well as QVMs.
+The projects do not compile QVMs, only DLLs. The DLLs are used for testing/debugging, while QVMs are used for release. Make also compiles DLLs as well as QVMs.
 
-1. Copy the DLLs files from
-
-  * engine\build\cgame_release\cgamex86.dll
-  * engine\build\game_release\qagamex86.dll
-  * engine\build\q3_ui_release\uix86.dll
-
-to base\
-
-2. In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TurtleArena\svn\"
-
-3. Run in the command prompt: engine\build\release-mingw32-x86\turtlearena.x86 +set fs_basepath "." +set vm_game 0 +set vm_cgame 0 +set vm_ui 0
+  # Copy the DLLs files (engine\build\cgame_release\cgamex86.dll, engine\build\game_release\qagamex86.dll, engine\build\q3_ui_release\uix86.dll) into base\
+  # In the command prompt change to the directory where you did the checkout. Example: cd "C:\\Program Files\TurtleArena\svn\"
+  # Run in the command prompt: engine\build\release-mingw32-x86\turtlearena.x86 +set fs_basepath "." +set sv_pure 0 +set vm_game 0 +set vm_cgame 0 +set vm_ui 0
