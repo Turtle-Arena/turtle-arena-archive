@@ -3257,7 +3257,7 @@ void CL_Init( void ) {
 	Cvar_Get ("team_headmodel", "", CVAR_USERINFO | CVAR_ARCHIVE );
 #endif
 	// DEFAULT_TEAMS
-	Cvar_Get ("g_redTeam", "Sais", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	Cvar_Get ("g_redTeam", "Foot", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	Cvar_Get ("g_blueTeam", "Katanas", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #else
 	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );

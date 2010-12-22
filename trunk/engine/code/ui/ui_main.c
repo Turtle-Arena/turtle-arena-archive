@@ -5985,9 +5985,9 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_debug, "ui_debug", "0", CVAR_TEMP },
 	{ &ui_initialized, "ui_initialized", "0", CVAR_TEMP },
 #ifdef TURTLEARENA // DEFAULT_TEAMS
-	{ &ui_teamName, "ui_teamName", "Sais", CVAR_ARCHIVE },
+	{ &ui_teamName, "ui_teamName", "Foot", CVAR_ARCHIVE },
 	{ &ui_opponentName, "ui_opponentName", "Katanas", CVAR_ARCHIVE },
-	{ &ui_redteam, "ui_redteam", "Sais", CVAR_ARCHIVE },
+	{ &ui_redteam, "ui_redteam", "Foot", CVAR_ARCHIVE },
 	{ &ui_blueteam, "ui_blueteam", "Katanas", CVAR_ARCHIVE },
 #else
 	{ &ui_teamName, "ui_teamName", "Pagans", CVAR_ARCHIVE },
