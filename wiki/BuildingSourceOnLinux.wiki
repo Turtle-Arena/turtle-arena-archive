@@ -50,20 +50,15 @@ If you checked out a stable release, you will not be able to play multiplayer on
 
 ==== Make ====
   # Create a link to each of the 3 .qvm files in `engine/build/release-*/base/vm/*.qvm` in base/vm/ This way you don't have to copy the qvms after each compile.
-
-OR Copy the qvms files instead, to allow them to be used in Windows as well.
-
+    # OR Copy the qvms files instead, to allow them to be used in Windows as well.
   # In the terminal change to the directory where you did the checkout. Example: cd /home/$USER/!TurtleArena/svn/
-
   # Run in the terminal; (Example) ./engine/build/release-linux-i386/turtlearena.i386 +set fs_basepath "."
 
 ==== Code::Blocks ====
 Code::Blocks does not build the game logic '.qvm', only the game logic '.so'. So it is slightly different from the instructions for "Make"
 
   # Create a link to each of the 3 .so files in `engine/build/release-*/base/*.so` in base/ This way you don't have to copy the .so files after each compile.
-
   # In the terminal change to the directory where you did the checkout. Example: cd /home/$USER/!TurtleArena/svn/
-
   # Run in the terminal; (Example) ./engine/build/release-linux-i386/turtlearena.i386 +set fs_basepath "." +set vm_game 0 +set vm_cgame 0 +set vm_ui 0
     * Setting vm_game/vm_cgame/vm_ui to 0 tells the game to use the '.so' files.
 
