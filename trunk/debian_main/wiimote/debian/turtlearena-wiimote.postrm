@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+# Undo postinst
+sed -i -e 's/uinput # Added by turtlearena-wiimote package//g' /etc/modules
+
+# Automatically added by dh_installmenu
+if [ -x "`which update-menus 2>/dev/null`" ]; then update-menus ; fi
+# End automatically added section
