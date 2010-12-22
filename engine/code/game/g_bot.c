@@ -231,7 +231,7 @@ static void PlayerIntroSound( const char *modelAndSkin ) {
 }
 
 
-#ifdef RANDOMBOT
+#ifdef IOQ3ZTM // RANDOMBOT
 /*
 ===============
 G_SelectRandomBotForAdd
@@ -248,7 +248,7 @@ void G_AddRandomBot( int team )
 #endif
 {
 	int		i, n, num;
-#ifdef RANDOMBOT
+#ifdef IOQ3ZTM // RANDOMBOT
 	char	*value;
 #else
 	float	skill;
@@ -259,7 +259,7 @@ void G_AddRandomBot( int team )
 	num = 0;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
-#ifdef RANDOMBOT // ZTM: Random bot
+#ifdef IOQ3ZTM // RANDOMBOT
 		// Skip random bot.
 		if ( !Q_stricmp( value, "Random" ) ) {
 			continue;
@@ -288,7 +288,7 @@ void G_AddRandomBot( int team )
 	num = random() * num;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
-#ifdef RANDOMBOT // ZTM: Random bot
+#ifdef IOQ3ZTM // RANDOMBOT
 		// Skip random bot.
 		if ( !Q_stricmp( value, "Random" ) ) {
 			continue;
@@ -313,7 +313,7 @@ void G_AddRandomBot( int team )
 		if (i >= g_maxclients.integer) {
 			num--;
 			if (num <= 0) {
-#ifdef RANDOMBOT
+#ifdef IOQ3ZTM // RANDOMBOT
 				return n;
 #else
 				skill = trap_Cvar_VariableValue( "g_spSkill" );
@@ -329,7 +329,7 @@ void G_AddRandomBot( int team )
 			}
 		}
 	}
-#ifdef RANDOMBOT
+#ifdef IOQ3ZTM // RANDOMBOT
 	// If we made it here all of the bot types are used in this team (or game if non-team)
 	//  Happens when there isn't enough bots types.
 
@@ -338,7 +338,7 @@ void G_AddRandomBot( int team )
 #endif
 }
 
-#ifdef RANDOMBOT
+#ifdef IOQ3ZTM // RANDOMBOT
 /*
 ===============
 G_AddRandomBot
@@ -637,7 +637,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	char			*headmodel;
 	char			userinfo[MAX_INFO_STRING];
 
-#ifdef RANDOMBOT // ZTM: Random bot
+#ifdef IOQ3ZTM // RANDOMBOT
     // ZTM: Check for random bot.
     if (Q_stricmp(name, "Random") == 0)
     {

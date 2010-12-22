@@ -155,13 +155,18 @@ static void PlayerIcon( const char *modelAndSkin, char *iconName, int iconNameMa
 	qboolean headmodel;
 #endif
 
-#ifdef RANDOMBOT // ZTM: Random bot
+#ifdef IOQ3ZTM // RANDOMBOT
     // ZTM: Random bot's icon is in a different spot then a normal player.
     if (Q_stricmp(modelAndSkin, "Random") == 0)
     {
         Com_sprintf(iconName, iconNameMaxSize, "menu/art/randombot_icon.tga");
 
-        trap_R_RegisterShaderNoMip( iconName );
+        if (!trap_R_RegisterShaderNoMip( iconName ))
+        {
+        	// If missing random bot icon fallback to unknown map icon
+			Com_sprintf(iconName, iconNameMaxSize, "menu/art/unknownmap.tga");
+			trap_R_RegisterShaderNoMip( iconName )
+        }
         return;
     }
 #endif
