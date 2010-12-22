@@ -201,7 +201,7 @@ static int QDECL UI_AddBotsMenu_SortCompare( const void *arg1, const void *arg2 
 	name1 = Info_ValueForKey( info1, "name" );
 	name2 = Info_ValueForKey( info2, "name" );
 
-#ifdef RANDOMBOT // ZTM: Random bot
+#ifdef IOQ3ZTM // RANDOMBOT
     // ZTM: Random bot comes first on the list.
     if (Q_stricmp(name1, "Random") == 0 || Q_stricmp(name2, "Random") == 0)
     {

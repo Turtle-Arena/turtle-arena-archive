@@ -1057,7 +1057,7 @@ static void ServerOptions_Start( void ) {
 		if( s_serveroptions.playerNameBuffers[n][0] == 0 ) {
 			continue;
 		}
-#ifndef RANDOMBOT
+#ifndef IOQ3ZTM // RANDOMBOT
 		if( s_serveroptions.playerNameBuffers[n][0] == '-' ) {
 			continue;
 		}
@@ -1337,14 +1337,14 @@ static void ServerOptions_InitBotNames( void ) {
 #ifdef IOQ3ZTM
 		// set the rest of the bot slots to "---"
 		for( n = 1; n < PLAYER_SLOTS; n++ ) {
-#ifdef RANDOMBOT
+#ifdef IOQ3ZTM // RANDOMBOT
 			strcpy( s_serveroptions.playerNameBuffers[n], "Random" );
 #else
 			strcpy( s_serveroptions.playerNameBuffers[n], "--------" );
 #endif
 		}
 #endif
-#ifdef RANDOMBOT // DEFAULT_PLAYER
+#ifdef IOQ3ZTM // RANDOMBOT
 		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "Random", 16 ); // RaphBlue
 		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "Random", 16 ); // RaphBlue
 		if( s_serveroptions.gametype == GT_TEAM ) {
@@ -1363,7 +1363,7 @@ static void ServerOptions_InitBotNames( void ) {
 		s_serveroptions.playerType[4].curvalue = 2;
 		s_serveroptions.playerType[5].curvalue = 2;
 
-#ifdef RANDOMBOT // DEFAULT_PLAYER
+#ifdef IOQ3ZTM // RANDOMBOT
 		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "Random", 16 ); // RaphRed
 		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "Random", 16 ); // RaphRed
@@ -1428,14 +1428,14 @@ static void ServerOptions_InitBotNames( void ) {
 
 	// set the rest of the bot slots to "---"
 	for( n = count; n < PLAYER_SLOTS; n++ ) {
-#ifdef RANDOMBOT
+#ifdef IOQ3ZTM // RANDOMBOT
 		strcpy( s_serveroptions.playerNameBuffers[n], "Random" );
 #else
 		strcpy( s_serveroptions.playerNameBuffers[n], "--------" );
 #endif
 	}
 
-#ifdef RANDOMBOT
+#ifdef IOQ3ZTM // RANDOMBOT
 	// If no bots, open 3 Random bots.
 	if (count == 1)
 	{
@@ -2043,7 +2043,7 @@ static int QDECL UI_BotSelectMenu_SortCompare( const void *arg1, const void *arg
 	name1 = Info_ValueForKey( info1, "name" );
 	name2 = Info_ValueForKey( info2, "name" );
 
-#ifdef RANDOMBOT // ZTM: Random bot
+#ifdef IOQ3ZTM // RANDOMBOT
     // ZTM: Random bot comes first on the list.
     if (Q_stricmp(name1, "Random") == 0 || Q_stricmp(name2, "Random") == 0)
     {
@@ -2092,13 +2092,18 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
 	qboolean headmodel;
 #endif
 
-#ifdef RANDOMBOT // ZTM: Random bot
+#ifdef IOQ3ZTM // RANDOMBOT
     // ZTM: Random bot's icon is in a different spot then a normal player.
     if (Q_stricmp(modelAndSkin, "Random") == 0)
     {
         Com_sprintf(iconName, iconNameMaxSize, "menu/art/randombot_icon.tga");
 
-        trap_R_RegisterShaderNoMip( iconName );
+        if (!trap_R_RegisterShaderNoMip( iconName ))
+        {
+        	// If missing random bot icon fallback to unknown map icon
+			Com_sprintf(iconName, iconNameMaxSize, "menu/art/unknownmap.tga");
+			trap_R_RegisterShaderNoMip( iconName )
+        }
         return;
     }
 #endif
