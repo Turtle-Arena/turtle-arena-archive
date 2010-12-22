@@ -13,7 +13,7 @@ Either use the same image for both sides or copy-edit one side from the other.
   * 3. Select the face where the objects will connect. In the object explorer? right click "_hole_" click apply to selected. 
   * 4. Select the object, deselect the face where the objects will connect. UV map the selected faces of the object
   * 5. Select the face where the objects will connect.
-  * 6. Create a virtual mirror (Tools -> Virtual Mirror -> Freeze)
+  * 6. Create a virtual mirror (Tools -> Virtual Mirror -> Create)
 
 Both sides now use the same texture and UV mapping. You may wish to split into 2 object.
 
