@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+# Load uinput
+modprobe uinput
+# Automaticly load when restarting
+echo "uinput # Added by turtlearena-wiimote package" | tee -a /etc/modules
+
+# Automatically added by dh_installmenu
+if [ "$1" = "configure" ] && [ -x "`which update-menus 2>/dev/null`" ]; then
+	update-menus
+fi
+# End automatically added section

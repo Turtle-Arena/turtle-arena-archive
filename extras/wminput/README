@@ -1,0 +1,6 @@
+Turtle Arena Wiimote support.
+
+Wiimote support is currently external from Turtle Arena, using wminput which uses the cwiid library.
+
+Launch the game using turtlearena-wiimote, turtlearena-wiimote-side, or turtlearena-wiimote-nun.
+
