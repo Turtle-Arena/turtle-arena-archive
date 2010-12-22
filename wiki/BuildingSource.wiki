@@ -1,5 +1,5 @@
 #summary How to build Turtle Arena from source code
-#labels Phase-Deploy
+#labels Phase-Deploy,Featured
 
 = Introduction =
 
