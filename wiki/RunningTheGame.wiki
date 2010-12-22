@@ -1,5 +1,7 @@
 #summary How to build the game
-#labels Featured,Phase-Deploy
+#labels Deprecated,Phase-Deploy
+
+See the new building guide [BuildingSource here]
 
 = Introduction =
 
