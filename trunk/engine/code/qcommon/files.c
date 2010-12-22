@@ -174,20 +174,42 @@ or configs will never get loaded from disk!
 
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
-#if defined STANDALONE && defined IOQ3ZTM && defined TA_MAIN // FS_PURE
-// Turtle Arena and ioq3turtle
-#define PAK "assets"
-#define PAK_LEN 6
-#define NUM_DEFAULT_PAKS 1 // Maximum 10
-static const unsigned pak_checksums[NUM_DEFAULT_PAKS] = {
-	3502744120u
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+#define PAK_REQUIRED 0
+#define PAK_OPTIONAL 1 // ZTM: TODO: Allow Language paks and/or other net-safe paks
+#define PAK_DEMOQ3 2 // Overrides missing required paks
+
+typedef struct
+{
+	char *gamename;
+	char *pakname;
+	unsigned checksum;
+	int status;
+} purePak_t;
+
+const purePak_t com_purePaks[] =
+{
+#ifdef TA_MAIN // Turtle Arena and ioq3turtle use assets0.pk3
+	{BASEGAME, "assets0", 3502744120u, PAK_REQUIRED},
+	//{BASEGAME, "assets1-cc-by-nc", 0, PAK_OPTIONAL},
+#else
+	{"baseq3", "pak0", 1566731103u, PAK_REQUIRED},
+	{"baseq3", "pak1", 298122907u, PAK_REQUIRED},
+	{"baseq3", "pak2", 412165236u, PAK_REQUIRED},
+	{"baseq3", "pak3", 2991495316u, PAK_REQUIRED},
+	{"baseq3", "pak4", 1197932710u, PAK_REQUIRED},
+	{"baseq3", "pak5", 4087071573u, PAK_REQUIRED},
+	{"baseq3", "pak6", 3709064859u, PAK_REQUIRED},
+	{"baseq3", "pak7", 908855077u, PAK_REQUIRED},
+	{"baseq3", "pak8", 977125798u, PAK_REQUIRED},
+
+	#define	DEMO_PAK0_CHECKSUM	2985612116u
+	{"demoq3", "pak0", DEMO_PAK0_CHECKSUM, PAK_DEMOQ3},
+#endif
+
+	{NULL, 0, qtrue}
 };
 #else
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-#define PAK "pak"
-#define PAK_LEN 3
-#define NUM_DEFAULT_PAKS NUM_ID_PAKS // 9
-#endif
 #define	DEMO_PAK0_CHECKSUM	2985612116u
 static const unsigned pak_checksums[] = {
 	1566731103u,
@@ -2752,13 +2774,10 @@ FS_DefaultPak
 qboolean FS_DefaultPak( char *pak, char *base ) {
 	int i;
 
-	for (i = 0; i < NUM_DEFAULT_PAKS; i++) {
-		if ( !FS_FilenameCompare(pak, va("%s/%s%d", base, PAK, i)) ) {
-			break;
+	for (i = 0; com_purePaks[i].pakname != NULL; i++) {
+		if ( !FS_FilenameCompare(pak, va("%s/%s", base, com_purePaks[i].pakname)) ) {
+			return qtrue;
 		}
-	}
-	if (i < NUM_DEFAULT_PAKS) {
-		return qtrue;
 	}
 	return qfalse;
 }
@@ -3043,13 +3062,16 @@ qboolean FS_PortableMode(void)
 
 	f = fopen( testpath, "rb" );
 	if (f) {
-		fread(buf, sizeof(buf), 1, f);
+		if (fread(buf, sizeof(buf), 1, f) != 1) {
+			// Read error
+			buf[0] = '\0';
+		}
 		fclose( f );
 	} else {
 		return qfalse;
 	}
 
-	return (Q_stricmpn(buf, "yes", 3) == 0);
+	return (buf[0] && Q_stricmpn(buf, "yes", 3) == 0);
 }
 #endif
 
@@ -3290,7 +3312,7 @@ static void FS_CheckPak0( void )
 ===================
 FS_CheckPaks
 
-Checks that assets0.pk3 is present and its checksum is correct
+Checks that default pk3s are present and their checksums are correct
 ===================
 */
 static void FS_CheckPaks( void )
@@ -3299,11 +3321,19 @@ static void FS_CheckPaks( void )
 	unsigned foundPak = 0;
 	unsigned invalidPak = 0;
 	qboolean hasPakFile = qfalse;
-	int i, total = 0;
+	int pak, total = 0;
 
 	// If we're not pure don't check
 	if (com_fs_pure && !com_fs_pure->integer)
 		return;
+
+	// Add up total value of foundPak
+	for (pak = 0; com_purePaks[pak].pakname != NULL; pak++) {
+		if (com_purePaks[pak].status != PAK_REQUIRED) {
+			continue;
+		}
+		total += 1<<pak;
+	}
 
 	for( path = fs_searchpaths; path; path = path->next )
 	{
@@ -3314,31 +3344,33 @@ static void FS_CheckPaks( void )
 
 		hasPakFile = qtrue;
 
-		if(!Q_stricmpn( path->pack->pakGamename, BASEGAME, MAX_OSPATH )
-			&& strlen(pakBasename) == PAK_LEN+1 && !Q_stricmpn( pakBasename, PAK, PAK_LEN )
-			&& pakBasename[PAK_LEN] >= '0' && pakBasename[PAK_LEN] < '0'+NUM_DEFAULT_PAKS)
+		for (pak = 0; com_purePaks[pak].pakname != NULL; pak++)
 		{
-			if( path->pack->checksum != pak_checksums[pakBasename[PAK_LEN]-'0'] )
+			if (!Q_stricmpn( path->pack->pakGamename, com_purePaks[pak].gamename, MAX_OSPATH )
+				&& !Q_stricmpn( pakBasename, com_purePaks[pak].pakname, MAX_OSPATH ))
 			{
-				Com_Printf("\n\n"
-					"**********************************************************************\n"
-					"WARNING: %s%d.pk3 is present but its checksum (%u) is not correct.\n"
-					"**********************************************************************\n\n\n",
-					PAK, pakBasename[PAK_LEN]-'0', path->pack->checksum );
+				if( path->pack->checksum != com_purePaks[pak].checksum )
+				{
+					Com_Printf("\n\n"
+						"**********************************************************************\n"
+						"WARNING: %s.pk3 is present but its checksum (%u) is not correct.\n"
+						"**********************************************************************\n\n\n",
+						com_purePaks[pak].pakname, path->pack->checksum );
 
-				invalidPak |= 1<<(pakBasename[PAK_LEN]-'0');
-			}
-			else
-			{
-				// Found pk3 AND its checksum matches.
-				foundPak |= 1<<(pakBasename[PAK_LEN]-'0');
+					invalidPak |= 1<<pak;
+				}
+				else
+				{
+					// Found pk3 AND its checksum matches.
+					if (com_purePaks[pak].status == PAK_DEMOQ3) {
+						// Demo only needs the single pk3
+						return;
+					} else {
+						foundPak |= 1<<pak;
+					}
+				}
 			}
 		}
-	}
-
-	// Add up total value of foundPak
-	for (i = 0; i < NUM_DEFAULT_PAKS; i++) {
-		total += 1<<i;
 	}
 
 	if (((foundPak & total) != total) || invalidPak)
