@@ -1,8 +1,6 @@
 #summary How to build Turtle Arena on Windows
 #labels Phase-Deploy
 
-NOTE: This page is unfinished.
-
 You first need to get the source code as described [BuildingSource here].
 
 = Compiling the source =
