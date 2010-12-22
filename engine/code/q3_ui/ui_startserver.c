@@ -2102,7 +2102,7 @@ static void ServerPlayerIcon( const char *modelAndSkin, char *iconName, int icon
         {
         	// If missing random bot icon fallback to unknown map icon
 			Com_sprintf(iconName, iconNameMaxSize, "menu/art/unknownmap.tga");
-			trap_R_RegisterShaderNoMip( iconName )
+			trap_R_RegisterShaderNoMip( iconName );
         }
         return;
     }
