@@ -12,14 +12,18 @@
 #  patches (0.2-2, 0.2-3, etc et) (You can download them from the Ubuntu PPA)
 #
 
+# data package contains the game assets used by the client and server
 MAKE_DATA_DEB=1
 # engine is used for client and server
 MAKE_ENGINE_DEB=1
+# Wiimote support for client
+MAKE_WIIMOTE_DEB=1
 
 STARTDIR=`pwd`
 INSTALLDIR=install
 DATA_DEB_CONFIG=debian_main/data/debian
 ENGINE_DEB_CONFIG=debian_main/engine/debian
+WIIMOTE_DEB_CONFIG=debian_main/wiimote/debian
 
 GAMENAME="turtlearena"
 
@@ -159,6 +163,12 @@ then
 
 	# Upload engine source to PPA
 	dput ${PPA_NAME} ${GAMENAME}_${versionAndSeries}_source.changes
+
+	# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
+	versionAndSeries=`head -n 1 ${WIIMOTE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+
+	# Upload engine source to PPA
+	dput ${PPA_NAME} ${GAMENAME}-wiimote_${versionAndSeries}_source.changes
 
 	exit 0
 fi
@@ -311,6 +321,11 @@ then
 		rm $DEBINSTALL/$ORIGDIR/code/qcommon/wspiapi.h
 	fi
 
+	# ZTM: Some of the music is non-commercial (CC-BY-NC and CC-BY-NC-SA)
+	#        which is considered non-free by the Debian project.
+	#      Should the "non-free" music be packaged in a separate deb (turtlearena-data-non-free)?
+	#        (and in its own assets1.pk3?)
+
 	#
 	# Create orig.tar.gz
 	#	So that dpkg-buildpackage will make a .debian.tar.gz instead of
@@ -357,3 +372,91 @@ then
 	fi
 fi
 
+if [ $MAKE_WIIMOTE_DEB -eq 1 ]
+then
+
+	#
+	# Change to starting directory
+	#
+	cd $STARTDIR
+
+	#
+	# Get version info from changelog
+	#
+
+	# Example: '0.2-1~maverick1' or '0.2-1'
+	versionAndSeries=`head -n 1 ${WIIMOTE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+
+	# Drop '~maverick1', leaves '0.2-1'
+	versionWithDebVersion=`echo "${versionAndSeries}" | cut -s -f 1 -d '~'`
+
+	# Drop '0.2', leaves '1'
+	debVersion=`echo "${versionWithDebVersion}" | cut -s -f 2 -d '-'`
+
+	# Drop '-1', leaves '0.2'
+	version=`echo "${versionWithDebVersion}" | cut -s -f 1 -d '-'`
+
+	#
+	# Create orig wiimote source directory
+	#
+	if [ $debVersion -eq 1 ]
+	then
+		ORIGDIR=$GAMENAME-wiimote-$version.orig
+	else
+		ORIGDIR=$GAMENAME-wiimote-$version
+	fi
+	mkdir -p $DEBINSTALL/$ORIGDIR
+
+	# Copy files
+	cp extras/wminput/config/* $DEBINSTALL/$ORIGDIR/
+	cp extras/wminput/launchers/* $DEBINSTALL/$ORIGDIR/
+	cp extras/wminput/README $DEBINSTALL/$ORIGDIR/
+
+	# Create files
+	echo "# Allow users to use uinput" > $DEBINSTALL/$ORIGDIR/50_turtlearena-wiimote.conf
+	echo "KERNEL==\"uinput\", MODE=\"0666\"" >> $DEBINSTALL/$ORIGDIR/50_turtlearena-wiimote.conf
+
+	#
+	# Create orig.tar.gz
+	#	So that dpkg-buildpackage will make a .debian.tar.gz instead of
+	#		failing to make .diff.gz
+	#
+	if [ $debVersion -eq 1 ]
+	then
+		cd $DEBINSTALL
+		tar -pczf ${GAMENAME}-wiimote_$version.orig.tar.gz $ORIGDIR
+	fi
+
+	#
+	# Create debian wiimote source directory
+	#
+	cd $STARTDIR
+	DEBDIR=${GAMENAME}-wiimote-$version
+	mkdir -p $DEBINSTALL/$DEBDIR/debian/
+
+	if [ $debVersion -eq 1 ]
+	then
+		cp -r $DEBINSTALL/$ORIGDIR/* $DEBINSTALL/$DEBDIR/
+	fi
+	cp -r $WIIMOTE_DEB_CONFIG/* $DEBINSTALL/$DEBDIR/debian/
+
+	#
+	# Build debian package data
+	#
+	cd $STARTDIR
+	cd $DEBINSTALL/$DEBDIR
+
+	dpkg-buildpackage -S -rfakeroot $KEY
+
+	if [ $UPLOAD_TO_PPA -eq 1 ]
+	then
+		# Upload source to PPA
+		dput ${PPA_NAME} ${GAMENAME}-wiimote_${versionAndSeries}_source.changes
+	fi
+
+	if [ $BIN -eq 1 ]
+	then
+		# build .deb
+		dpkg-buildpackage -rfakeroot -uc -b $KEY
+	fi
+fi
