@@ -40,6 +40,9 @@ START SERVER MENU *****
 #define GAMESERVER_FRAMER		"menu/art/frame1_r"
 #define GAMESERVER_SELECT		"menu/art/maps_select"
 #define GAMESERVER_SELECTED		"menu/art/maps_selected"
+#ifdef TA_DATA // MAPS_SELECT_SAME_AS_MAPS_SELECTED
+#define GAMESERVER_SELECTED_PULSE "menu/art/maps_selected_pulse"
+#endif
 #ifdef TA_MISC // NO_MENU_FIGHT
 #define GAMESERVER_FIGHT0		"menu/art/play_0"
 #define GAMESERVER_FIGHT1		"menu/art/play_1"
@@ -595,15 +598,26 @@ static void StartServer_MenuInit( void ) {
 		s_startserver.mapbuttons[i].generic.flags    = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_NODEFAULTINIT;
 		s_startserver.mapbuttons[i].generic.id       = ID_PICTURES+i;
 		s_startserver.mapbuttons[i].generic.callback = StartServer_MapEvent;
+#ifdef TA_DATA // MAPS_SELECT_SAME_AS_MAPS_SELECTED
+		s_startserver.mapbuttons[i].generic.x	     = x;
+		s_startserver.mapbuttons[i].generic.y	     = y;
+		s_startserver.mapbuttons[i].width  		     = 128;
+		s_startserver.mapbuttons[i].height  	     = 124;
+#else
 		s_startserver.mapbuttons[i].generic.x	     = x - 30;
 		s_startserver.mapbuttons[i].generic.y	     = y - 32;
 		s_startserver.mapbuttons[i].width  		     = 256;
 		s_startserver.mapbuttons[i].height  	     = 248;
+#endif
 		s_startserver.mapbuttons[i].generic.left     = x;
 		s_startserver.mapbuttons[i].generic.top  	 = y;
 		s_startserver.mapbuttons[i].generic.right    = x + 128;
 		s_startserver.mapbuttons[i].generic.bottom   = y + 128;
+#ifdef TA_DATA // MAPS_SELECT_SAME_AS_MAPS_SELECTED
+		s_startserver.mapbuttons[i].focuspic         = GAMESERVER_SELECTED_PULSE;
+#else
 		s_startserver.mapbuttons[i].focuspic         = GAMESERVER_SELECT;
+#endif
 	}
 
 	s_startserver.arrows.generic.type  = MTYPE_BITMAP;
@@ -732,7 +746,11 @@ void StartServer_Cache( void )
 	trap_R_RegisterShaderNoMip( GAMESERVER_NEXT1 );	
 	trap_R_RegisterShaderNoMip( GAMESERVER_FRAMEL );	
 	trap_R_RegisterShaderNoMip( GAMESERVER_FRAMER );	
+#ifdef TA_DATA // MAPS_SELECT_SAME_AS_MAPS_SELECTED
+	trap_R_RegisterShaderNoMip( GAMESERVER_SELECTED_PULSE );	
+#else
 	trap_R_RegisterShaderNoMip( GAMESERVER_SELECT );	
+#endif
 	trap_R_RegisterShaderNoMip( GAMESERVER_SELECTED );	
 	trap_R_RegisterShaderNoMip( GAMESERVER_UNKNOWNMAP );
 	trap_R_RegisterShaderNoMip( GAMESERVER_ARROWS );
