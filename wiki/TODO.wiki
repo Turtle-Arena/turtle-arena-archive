@@ -283,7 +283,7 @@ Most of the mapobjects should be damageable.
 == Players ==
   * TODO: Casey really needs to /swing/ the melee weapons.
 
-  * TODO: Set looping in don, raph, mike, and casey mm3d models and re-export
+  * TODO: Set looping in casey mm3d models and re-export
 
   * TODO: Add Leo, Don, Mike, and Casey bot chats.
 
@@ -293,11 +293,7 @@ Most of the mapobjects should be damageable.
 === Other Turtles ===
   * TODO: Finish Turtle player models
     * After Raph is finished:
-    * Leo/Don/Mike: Finish head (model/skin), reanimate raph_v9.mm3d for Turtle
-    * Raph-Mouth `<==>--<==>` (DONE)
-    * Leo--Mouth ` -----<==>` (easy to do)
-    * Don--Mouth ` -------- ` (DONE?)
-    * Mike-Mouth ` ------.' ` (easy to do)
+    * Reanimate raph_v9.mm3d for each Turtle? (Just a few of the animations...)
 
   * TODO: Add a holder onto the back of Don's belt to hold his Bo when it is not in use
     * Similar to the action figures.
