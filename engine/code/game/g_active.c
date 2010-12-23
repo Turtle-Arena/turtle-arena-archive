@@ -1434,7 +1434,7 @@ void ClientThink_real( gentity_t *ent ) {
 			client->ps.enemyOrigin[2] += ent->enemy->client->ps.viewheight;
 		} else {
 			VectorCopy(ent->enemy->r.currentOrigin, client->ps.enemyOrigin);
-			client->ps.enemyOrigin[2] += (ent->enemy->r.mins[2] + ent->enemy->r.maxs[2])/2;
+			client->ps.enemyOrigin[2] += ent->enemy->r.maxs[2] * 0.8f;
 		}
 		client->ps.enemyEnt = ent->enemy-g_entities;
 	}
@@ -1456,12 +1456,12 @@ void ClientThink_real( gentity_t *ent ) {
 	{
 		vec3_t dir;
 		vec3_t viewAngles;
+		vec3_t origin;
 
-		if (ent->enemy->client) {
-			VectorSubtract( ent->enemy->client->ps.origin, client->ps.origin, dir );
-		} else {
-			VectorSubtract( ent->enemy->r.currentOrigin, client->ps.origin, dir );
-		}
+		VectorCopy(client->ps.origin, origin);
+		origin[2] += client->ps.viewheight;
+
+		VectorSubtract( client->ps.enemyOrigin, origin, dir );
 
 		vectoangles( dir, viewAngles );
 
