@@ -157,7 +157,6 @@ Weapons (and attacking)
     * BETTER(not done?): When moving the camera around the player, focus on the player. (Like in NiGHTS: Journey of Dreams)
 
   * TODO: STARTED(TURTLEARENA // LOCKON): When attacking a player (or NPC) focus on them?  (Like LoZ:TP 'z' target lock-on)
-    * BUG: When higher then target to focus on it gets all messed up.
 
   * TODO: Merge Quake3 bot chat and Team Arena voice chat systems?
     * base/botfiles/bots/raph_t.c hold the "Q3 bot chats" for non-teamplay (Team-only Team Arena players have dummy files)

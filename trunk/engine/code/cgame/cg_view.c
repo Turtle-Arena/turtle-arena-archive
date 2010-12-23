@@ -380,6 +380,10 @@ static void CG_OffsetThirdPersonView( void ) {
 			vectoangles( dir, targetAngles );
 
 			if ( completedMove ) {
+				for (i = 0; i < 3; i++) {
+					targetAngles[i] = AngleNormalize180(targetAngles[i]);
+				}
+
 				VectorCopy(targetAngles, cg.refdefViewAngles);
 			} else {
 				// get diff of normal and target view angles.
