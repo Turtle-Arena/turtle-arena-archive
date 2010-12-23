@@ -579,6 +579,38 @@ static qboolean PM_CheckJump( void ) {
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
+#ifdef TURTLEARENA // LOCKON
+	if (pm->ps->eFlags & EF_LOCKON)
+	{
+		float force;
+
+		// Don't allow players to use multiple jumps to gain velocity
+		VectorClear(pm->ps->velocity);
+
+		// If going forward/backward and right/left, only use half jump force for each.
+		if (pm->cmd.forwardmove != 0 && pm->cmd.rightmove != 0) {
+			force = (JUMP_VELOCITY * pm->playercfg->jumpMult) * 0.6f;
+		} else {
+			force = (JUMP_VELOCITY * pm->playercfg->jumpMult) * 1.2f;
+		}
+
+		if (pm->cmd.forwardmove > 0) {
+			// Jump forward
+			VectorMA(pm->ps->velocity, force, pml.forward, pm->ps->velocity);
+		} else if (pm->cmd.forwardmove < 0) {
+			// Jump backward
+			VectorMA(pm->ps->velocity, -force, pml.forward, pm->ps->velocity);
+		}
+
+		if (pm->cmd.rightmove < 0) {
+			// Jump left
+			VectorMA(pm->ps->velocity, -force, pml.right, pm->ps->velocity);
+		} else if (pm->cmd.rightmove > 0) {
+			// Jump right
+			VectorMA(pm->ps->velocity, force, pml.right, pm->ps->velocity);
+		}
+	}
+#endif
 #ifdef TA_NPCSYS // TDC_NPC
 	if (pm->npc) {
 		pm->ps->velocity[2] = pm->cmd.upmove*8;
