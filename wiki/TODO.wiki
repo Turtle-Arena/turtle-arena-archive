@@ -186,8 +186,6 @@ Weapons (and attacking)
     * IOQ3ZTM: FIXME: There seems to be some issues with using old bitmap fonts, like not showing text to Player Setup menu.
     * IOQ3ZTM: TODO: Add support for font1_prop and font2_prop into `*_DrawFontStringExt`? (code could be cleaner this way?)
 
-  * TODO: Move more when jumping in lock-on mode! (Currently the player doesn't really go anywhere.)
-
   * TODO: Support using .so and .dll on pure servers? (Wolf-ET does?)
 
 == Objects ==
