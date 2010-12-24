@@ -58,6 +58,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ID_EFFECTS		12
 #define ID_BACK			13
 #define ID_MODEL		14
+#ifdef IOQ3ZTM // UI_COLOR2
+#define ID_EFFECTS2		15
+#endif
 
 #define MAX_NAMELENGTH	20
 
@@ -79,6 +82,9 @@ typedef struct {
 	menufield_s			name;
 	menulist_s			handicap;
 	menulist_s			effects;
+#ifdef IOQ3ZTM // UI_COLOR2
+	menulist_s			effects2;
+#endif
 
 	menubitmap_s		back;
 	menubitmap_s		model;
@@ -152,7 +158,9 @@ static void PlayerSettings_DrawName( void *self ) {
 	color = text_color_normal;
 	if( focus ) {
 		style |= UI_PULSE;
+#ifndef TURTLEARENA
 		color = text_color_highlight;
+#endif
 	}
 
 	UI_DrawProportionalString( basex, y, "Name", style, color );
@@ -233,7 +241,9 @@ static void PlayerSettings_DrawHandicap( void *self ) {
 	color = text_color_normal;
 	if( focus ) {
 		style |= UI_PULSE;
+#ifndef TURTLEARENA
 		color = text_color_highlight;
+#endif
 	}
 
 	UI_DrawProportionalString( item->generic.x, item->generic.y, "Handicap", style, color );
@@ -257,11 +267,23 @@ static void PlayerSettings_DrawEffects( void *self ) {
 
 	style = UI_LEFT|UI_SMALLFONT;
 	color = text_color_normal;
-	if( focus ) {
+	if( focus
+#ifdef IOQ3ZTM // UI_COLOR2
+		// ZTM: Hacky: Have effects focus if effects2 is selected (they share the same header)
+		|| (item->generic.id == ID_EFFECTS && ((menulist_s *)item->generic.parent->items[item->generic.parent->cursor])->generic.id == ID_EFFECTS2)
+#endif
+		)
+	{
 		style |= UI_PULSE;
+#ifndef TURTLEARENA
 		color = text_color_highlight;
+#endif
 	}
 
+#ifdef IOQ3ZTM // UI_COLOR2
+	// Effects2 doesn't need it's own header.
+	if (item->generic.id != ID_EFFECTS2)
+#endif
 	UI_DrawProportionalString( item->generic.x, item->generic.y, "Effects", style, color );
 
 	UI_DrawHandlePic( item->generic.x + 64, item->generic.y + PROP_HEIGHT + 8, 128, 8, s_playersettings.fxBasePic );
@@ -269,6 +291,31 @@ static void PlayerSettings_DrawEffects( void *self ) {
 	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * 9 + 4, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
 #else
 	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * 16 + 8, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
+#endif
+#ifdef IOQ3ZTM // UI_COLOR2
+	if (focus) {
+		float color[4];
+
+		if (item->curvalue == 1) {
+			// In Turtle Arena, don't draw orange on orange. In Quake3 don't draw yellow on yellow.
+			color[0] = color[1] = color[2] = 1.0f; // white
+		} else {
+			VectorCopy(text_color_highlight, color); // orange
+		}
+
+		color[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
+
+		// MORE_COLOR_EFFECTS
+		// UI_DrawRect, but width and height are 2.
+		// top
+		UI_FillRect( item->generic.x + 64 + item->curvalue * 9 + 4, item->generic.y + PROP_HEIGHT + 6, 16, 2, color );
+		// bottom
+		UI_FillRect( item->generic.x + 64 + item->curvalue * 9 + 4, item->generic.y + PROP_HEIGHT + 6 + 10, 16, 2, color );
+		// left
+		UI_FillRect( item->generic.x + 64 + item->curvalue * 9 + 4, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 10, color );
+		// right
+		UI_FillRect( item->generic.x + 64 + item->curvalue * 9 + 4 + 14, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 10, color );
+	}
 #endif
 }
 
@@ -320,6 +367,9 @@ static void PlayerSettings_SaveChanges( void ) {
 
 	// effects color
 	trap_Cvar_SetValue( "color1", uitogamecode[s_playersettings.effects.curvalue] );
+#ifdef IOQ3ZTM // UI_COLOR2
+	trap_Cvar_SetValue( "color2", uitogamecode[s_playersettings.effects2.curvalue] );
+#endif
 }
 
 
@@ -359,6 +409,14 @@ static void PlayerSettings_SetMenuItems( void ) {
 		c = NUM_COLOR_EFFECTS-1;
 	}
 	s_playersettings.effects.curvalue = gamecodetoui[c];
+
+#ifdef IOQ3ZTM // UI_COLOR2
+	c = trap_Cvar_VariableValue( "color2" ) - 1;
+	if( c < 0 || c > NUM_COLOR_EFFECTS-1 ) {
+		c = NUM_COLOR_EFFECTS-1;
+	}
+	s_playersettings.effects2.curvalue = gamecodetoui[c];
+#endif
 
 	// model/skin
 	memset( &s_playersettings.playerinfo, 0, sizeof(playerInfo_t) );
@@ -489,6 +547,21 @@ static void PlayerSettings_MenuInit( void ) {
 	s_playersettings.effects.generic.bottom		= y + 2* PROP_HEIGHT;
 	s_playersettings.effects.numitems			= NUM_COLOR_EFFECTS;
 
+#ifdef IOQ3ZTM // UI_COLOR2
+	y += 1 * PROP_HEIGHT;
+	s_playersettings.effects2.generic.type		= MTYPE_SPINCONTROL;
+	s_playersettings.effects2.generic.flags		= QMF_NODEFAULTINIT;
+	s_playersettings.effects2.generic.id		= ID_EFFECTS2;
+	s_playersettings.effects2.generic.ownerdraw	= PlayerSettings_DrawEffects;
+	s_playersettings.effects2.generic.x			= 192;
+	s_playersettings.effects2.generic.y			= y;
+	s_playersettings.effects2.generic.left		= 192 - 8;
+	s_playersettings.effects2.generic.top		= y - 8;
+	s_playersettings.effects2.generic.right		= 192 + 200;
+	s_playersettings.effects2.generic.bottom	= y + 2* PROP_HEIGHT;
+	s_playersettings.effects2.numitems			= NUM_COLOR_EFFECTS;
+#endif
+
 	s_playersettings.model.generic.type			= MTYPE_BITMAP;
 	s_playersettings.model.generic.name			= ART_MODEL0;
 	s_playersettings.model.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -533,6 +606,9 @@ static void PlayerSettings_MenuInit( void ) {
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.name );
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.handicap );
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.effects );
+#ifdef IOQ3ZTM // UI_COLOR2
+	Menu_AddItem( &s_playersettings.menu, &s_playersettings.effects2 );
+#endif
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.model );
 	Menu_AddItem( &s_playersettings.menu, &s_playersettings.back );
 
