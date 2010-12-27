@@ -10,6 +10,24 @@ gfx/misc/snow
 	}
 }
 
+gfx/misc/snow1
+{
+	cull disable
+	{
+		map gfx/misc/snow1
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+gfx/misc/snow2
+{
+	cull disable
+	{
+		map gfx/misc/snow2
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
 // raindrop
 gfx/misc/raindrop
 {
