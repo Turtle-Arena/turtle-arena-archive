@@ -299,8 +299,12 @@ static qboolean CG_RainParticleGenerate( cg_atmosphericParticle_t *particle, vec
 	VectorNormalizeFast( particle->deltaNormalized );
 	particle->height = ATMOSPHERIC_RAIN_HEIGHT + crandom() * 100;
 	particle->weight = currweight;
-	particle->effectshader = &cg_atmFx.effectshaders[0];
-//	particle->effectshader = &cg_atmFx.effectshaders[ (int) (random() * ( cg_atmFx.numEffectShaders - 1 )) ];
+
+	if (cg_atmFx.numEffectShaders > 1) {
+		particle->effectshader = &cg_atmFx.effectshaders[ rand()%cg_atmFx.numEffectShaders ];
+	} else {
+		particle->effectshader = &cg_atmFx.effectshaders[0];
+	}
 
 //	generatetime += trap_Milliseconds() - msec;
 	return( qtrue );
@@ -491,8 +495,12 @@ static qboolean CG_SnowParticleGenerate( cg_atmosphericParticle_t *particle, vec
 	VectorNormalizeFast( particle->deltaNormalized );
 	particle->height = ATMOSPHERIC_SNOW_HEIGHT + random() * 2;
 	particle->weight = particle->height * 0.5f;
-	particle->effectshader = &cg_atmFx.effectshaders[0];
-//	particle->effectshader = &cg_atmFx.effectshaders[ (int) (random() * ( cg_atmFx.numEffectShaders - 1 )) ];
+
+	if (cg_atmFx.numEffectShaders > 1) {
+		particle->effectshader = &cg_atmFx.effectshaders[ rand()%cg_atmFx.numEffectShaders ];
+	} else {
+		particle->effectshader = &cg_atmFx.effectshaders[0];
+	}
 
 //	generatetime += trap_Milliseconds() - msec;
 	return( qtrue );
@@ -740,6 +748,7 @@ void CG_EffectParse( const char *effectstr ) {
 	char *startptr, *eqptr, *endptr;
 	char workbuff[128];
 	atmFXType_t atmFXType = ATM_NONE;
+	int i;
 
 	if ( CG_AtmosphericKludge() ) {
 		return;
@@ -847,24 +856,43 @@ void CG_EffectParse( const char *effectstr ) {
 	if ( cg_atmFx.numDrops > MAX_ATMOSPHERIC_PARTICLES ) {
 		cg_atmFx.numDrops = MAX_ATMOSPHERIC_PARTICLES;
 	}
+
 	// Load graphics
-
-	// Rain
 	if ( atmFXType == ATM_RAIN ) {
-		cg_atmFx.numEffectShaders = 1;
+		// Rain
 		cg_atmFx.effectshaders[0] = trap_R_RegisterShader( "gfx/misc/raindrop" );
-		if ( !( cg_atmFx.effectshaders[0] ) ) {
-			cg_atmFx.effectshaders[0] = -1;
-			cg_atmFx.numEffectShaders = 0;
-		}
-
-		// Snow
-	} else if ( atmFXType == ATM_SNOW ) {
 		cg_atmFx.numEffectShaders = 1;
-		cg_atmFx.effectshaders[0] = trap_R_RegisterShader( "gfx/misc/snow" );
 
-		// This really should never happen
+		for (i = 1; i < MAX_ATMOSPHERIC_EFFECTSHADERS; i++)
+		{
+			cg_atmFx.effectshaders[i] = trap_R_RegisterShader( va("gfx/misc/raindrop%d", i) );
+			if (cg_atmFx.effectshaders[i]) {
+				cg_atmFx.numEffectShaders++;
+			} else {
+				break;
+			}
+		}
+	} else if ( atmFXType == ATM_SNOW ) {
+		// Snow
+		cg_atmFx.effectshaders[0] = trap_R_RegisterShader( "gfx/misc/snow" );
+		cg_atmFx.numEffectShaders = 1;
+
+		for (i = 1; i < MAX_ATMOSPHERIC_EFFECTSHADERS; i++)
+		{
+			cg_atmFx.effectshaders[i] = trap_R_RegisterShader( va("gfx/misc/snow%d", i) );
+			if (cg_atmFx.effectshaders[i]) {
+				cg_atmFx.numEffectShaders++;
+			} else {
+				break;
+			}
+		}
 	} else {
+		// This really should never happen
+		cg_atmFx.numEffectShaders = 0;
+	}
+
+	if ( !( cg_atmFx.effectshaders[0] ) ) {
+		cg_atmFx.effectshaders[0] = -1;
 		cg_atmFx.numEffectShaders = 0;
 	}
 
