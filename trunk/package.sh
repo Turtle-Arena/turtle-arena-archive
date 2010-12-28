@@ -144,7 +144,9 @@ cd $STARTDIR
 # Create install directory
 #
 
-mkdir -p $INSTALLDIR
+ZIPDIR=$INSTALLDIR/zip
+
+mkdir -p $ZIPDIR
 
 
 #
@@ -158,24 +160,24 @@ then
 
 	if [ $LINUX -eq 1 ]
 	then
-		cp engine/build/release-$PLATFORM/turtlearena.$ARCH $INSTALLDIR
-		cp engine/build/release-$PLATFORM/turtlearena-server.$ARCH $INSTALLDIR
+		cp engine/build/release-$PLATFORM/turtlearena.$ARCH $ZIPDIR
+		cp engine/build/release-$PLATFORM/turtlearena-server.$ARCH $ZIPDIR
 
 		if [ $ARCH = "x86_64" ]
 		then
-			cp engine/build/release-linux-i386/turtlearena.i386 $INSTALLDIR
-			cp engine/build/release-linux-i386/turtlearena-server.i386 $INSTALLDIR
+			cp engine/build/release-linux-i386/turtlearena.i386 $ZIPDIR
+			cp engine/build/release-linux-i386/turtlearena-server.i386 $ZIPDIR
 		fi
 	fi
 
 	if [ $WIN32 -eq 1 ]
 	then
-		cp engine/build/release-mingw32-x86/turtlearena.x86.exe $INSTALLDIR
-		cp engine/build/release-mingw32-x86/turtlearena-server.x86.exe $INSTALLDIR
+		cp engine/build/release-mingw32-x86/turtlearena.x86.exe $ZIPDIR
+		cp engine/build/release-mingw32-x86/turtlearena-server.x86.exe $ZIPDIR
 
-		if [ ! -f $INSTALLDIR/SDL.dll ]
+		if [ ! -f $ZIPDIR/SDL.dll ]
 		then
-			echo "  Warning: You need to manually copy SDL.dll version 1.2.14 into \"$INSTALLDIR\"!"
+			echo "  Warning: You need to manually copy SDL.dll version 1.2.14 into \"$ZIPDIR\"!"
 		fi
 	fi
 
@@ -185,13 +187,13 @@ fi
 # Create assets0.pk3
 #
 
-if [ ! -f $INSTALLDIR/base/assets0.pk3 ]
+if [ ! -f $ZIPDIR/base/assets0.pk3 ]
 then
 	echo "Data..."
 
-	./package-assets.sh --installdir $INSTALLDIR
+	./package-assets.sh --installdir $ZIPDIR
 
-	if [ -f $INSTALLDIR/base/assets0.pk3 ]
+	if [ -f $ZIPDIR/base/assets0.pk3 ]
 	then
 		#
 		# Must manually update checksum
@@ -224,7 +226,7 @@ then
 		echo ""
 
 		# Run server
-		cd $INSTALLDIR
+		cd $ZIPDIR
 		./turtlearena-server.$ARCH
 
 		echo ""
@@ -262,23 +264,23 @@ echo "Copying docs..."
 if [ $LINUX -eq 1 ]
 then
 	# Copy Linux launcher too
-	cp extras/turtlearena.sh $INSTALLDIR
+	cp extras/turtlearena.sh $ZIPDIR
 fi
 
-cp GAME_README.txt $INSTALLDIR/readme.txt
-cp COPYING.txt $INSTALLDIR
-cp COPYRIGHTS.txt $INSTALLDIR
-cp CREDITS.txt $INSTALLDIR
+cp GAME_README.txt $ZIPDIR/readme.txt
+cp COPYING.txt $ZIPDIR
+cp COPYRIGHTS.txt $ZIPDIR
+cp CREDITS.txt $ZIPDIR
 
 # Convert to dos line ending
-todos $INSTALLDIR/*.txt
+todos $ZIPDIR/*.txt
 
 # Enable portable app mode!
-mkdir -p $INSTALLDIR/settings
-echo "yes" > $INSTALLDIR/settings/portable
+mkdir -p $ZIPDIR/settings
+echo "yes" > $ZIPDIR/settings/portable
 
 # Copy all of the files other than base/ into turtlearena-src/ and zip it.
-echo "Warning: You need to manually copy the source into $INSTALLDIR !"
+echo "Warning: You need to manually copy the source into $ZIPDIR !"
 
 # zip install?
 # base/assets0.pk3 readme.txt COPYING.txt COPYRIGHTS.txt CREDITS.txt
