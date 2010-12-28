@@ -162,7 +162,13 @@ qboolean Sys_WritePIDFile( void )
 		char  pidBuffer[ 64 ] = { 0 };
 		int   pid;
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Shut up warning
+		if (fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f ) != sizeof( pidBuffer ) - 1) {
+			// ZTM: Read error, but we don't care?
+		}
+#else
 		fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f );
+#endif
 		fclose( f );
 
 		pid = atoi( pidBuffer );
