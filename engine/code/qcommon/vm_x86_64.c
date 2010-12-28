@@ -975,11 +975,19 @@ emit_do_syscall:
 		{
 			struct timeval tvdone =  {0, 0};
 			struct timeval dur =  {0, 0};
+#ifdef IOQ3ZTM // LESS_VERBOSE
+			Com_DPrintf( "VM file %s compiled to %i bytes of code (%p - %p)\n", vm->name, vm->codeLength, vm->codeBase, vm->codeBase+vm->codeLength );
+#else
 			Com_Printf( "VM file %s compiled to %i bytes of code (%p - %p)\n", vm->name, vm->codeLength, vm->codeBase, vm->codeBase+vm->codeLength );
+#endif
 
 			gettimeofday(&tvdone, NULL);
 			timersub(&tvdone, &tvstart, &dur);
+#ifdef IOQ3ZTM // LESS_VERBOSE
+			Com_DPrintf( "compilation took %"PRIu64".%06"PRIu64" seconds\n", dur.tv_sec, dur.tv_usec );
+#else
 			Com_Printf( "compilation took %"PRIu64".%06"PRIu64" seconds\n", dur.tv_sec, dur.tv_usec );
+#endif
 		}
 	#endif
 }

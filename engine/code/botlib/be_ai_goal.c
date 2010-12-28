@@ -326,6 +326,9 @@ itemconfig_t *LoadItemConfig(char *filename)
 	FreeSource(source);
 	//
 	if (!ic->numiteminfo) botimport.Print(PRT_WARNING, "no item info loaded\n");
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
 	return ic;
 } //end of the function LoadItemConfig
@@ -810,6 +813,9 @@ void BotInitLevelItems(void)
 		//
 		AddLevelItemToList(li);
 	} //end for
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "found %d level items\n", numlevelitems);
 } //end of the function BotInitLevelItems
 //===========================================================================

@@ -568,6 +568,25 @@ int CG_LastAttacker( void ) {
 	return cg.snap->ps.persistant[PERS_ATTACKER];
 }
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+void QDECL CG_DPrintf( const char *msg, ... ) {
+	va_list		argptr;
+	char		text[1024];
+	char		var[MAX_TOKEN_CHARS];
+
+	trap_Cvar_VariableStringBuffer( "developer", var, sizeof( var ) );
+	if ( !atoi(var) ) {
+		return;
+	}
+
+	va_start (argptr, msg);
+	Q_vsnprintf (text, sizeof(text), msg, argptr);
+	va_end (argptr);
+
+	trap_Print( text );
+}
+#endif
+
 void QDECL CG_Printf( const char *msg, ... ) {
 	va_list		argptr;
 	char		text[1024];

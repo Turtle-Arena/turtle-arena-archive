@@ -1162,7 +1162,11 @@ void R_Init( void ) {
 	int i;
 	byte *ptr;
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	ri.Printf( PRINT_DEVELOPER, "----- R_Init -----\n" );
+#else
 	ri.Printf( PRINT_ALL, "----- R_Init -----\n" );
+#endif
 
 	// clear all our internal state
 	Com_Memset( &tr, 0, sizeof( tr ) );
@@ -1288,7 +1292,11 @@ void R_Init( void ) {
 	if ( err != GL_NO_ERROR )
 		ri.Printf (PRINT_ALL, "glGetError() = 0x%x\n", err);
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	ri.Printf( PRINT_DEVELOPER, "----- finished R_Init -----\n" );
+#else
 	ri.Printf( PRINT_ALL, "----- finished R_Init -----\n" );
+#endif
 }
 
 /*
@@ -1298,7 +1306,11 @@ RE_Shutdown
 */
 void RE_Shutdown( qboolean destroyWindow ) {	
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	ri.Printf( PRINT_DEVELOPER, "RE_Shutdown( %i )\n", destroyWindow );
+#else
 	ri.Printf( PRINT_ALL, "RE_Shutdown( %i )\n", destroyWindow );
+#endif
 
 	ri.Cmd_RemoveCommand ("modellist");
 	ri.Cmd_RemoveCommand ("screenshotJPEG");

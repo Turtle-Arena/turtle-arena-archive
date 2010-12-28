@@ -20,6 +20,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+#include "vm_local.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -284,7 +287,11 @@ static void labelhash_free(void)
 		min = MIN(min, n);
 		max = MAX(max, n);
 	}
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf("total %u, hsize %"PRIu64", zero %u, min %u, max %u\n", t, sizeof(labelhash)/sizeof(labelhash[0]), z, min, max);
+#else
 	printf("total %u, hsize %"PRIu64", zero %u, min %u, max %u\n", t, sizeof(labelhash)/sizeof(labelhash[0]), z, min, max);
+#endif
 	memset(labelhash, 0, sizeof(labelhash));
 }
 

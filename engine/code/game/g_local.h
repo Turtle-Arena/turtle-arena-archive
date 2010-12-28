@@ -841,6 +841,9 @@ void CheckTeamLeader( int team );
 void G_RunThink (gentity_t *ent);
 void QDECL G_LogPrintf( const char *fmt, ... );
 void SendScoreboardMessageToAllClients( void );
+#ifdef IOQ3ZTM // LESS_VERBOSE
+void QDECL G_DPrintf( const char *fmt, ... );
+#endif
 void QDECL G_Printf( const char *fmt, ... );
 void QDECL G_Error( const char *fmt, ... );
 #ifdef IOQ3ZTM // MAP_ROTATION

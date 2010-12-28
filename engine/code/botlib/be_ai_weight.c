@@ -427,6 +427,9 @@ weightconfig_t *ReadWeightConfig(char *filename)
 	//free the source at the end of a pass
 	FreeSource(source);
 	//if the file was located in a pak file
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
 #ifdef DEBUG
 	if (botDeveloper)

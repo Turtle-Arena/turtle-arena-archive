@@ -376,16 +376,31 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc ) {
 
 	// load the image
 	Com_sprintf( filename, sizeof(filename), "vm/%s.qvm", vm->name );
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf( "Loading vm file %s...\n", filename );
+#else
 	Com_Printf( "Loading vm file %s...\n", filename );
+#endif
 	length = FS_ReadFile( filename, &header.v );
 	if ( !header.h ) {
+#ifdef IOQ3ZTM // LESS_VERBOSE
+		if (!com_developer || !com_developer->integer)
+			Com_Printf( "Loading vm file %s failed.\n", filename );
+		else
+			Com_DPrintf( "Failed.\n" );
+#else
 		Com_Printf( "Failed.\n" );
+#endif
 		VM_Free( vm );
 		return NULL;
 	}
 
 	if( LittleLong( header.h->vmMagic ) == VM_MAGIC_VER2 ) {
+#ifdef IOQ3ZTM // LESS_VERBOSE
+		Com_DPrintf( "...which has vmMagic VM_MAGIC_VER2\n" );
+#else
 		Com_Printf( "...which has vmMagic VM_MAGIC_VER2\n" );
+#endif
 
 		// byte swap the header
 		for ( i = 0 ; i < sizeof( vmHeader_t ) / 4 ; i++ ) {
@@ -450,7 +465,11 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc ) {
 
 	if( header.h->vmMagic == VM_MAGIC_VER2 ) {
 		vm->numJumpTableTargets = header.h->jtrgLength >> 2;
+#ifdef IOQ3ZTM // LESS_VERBOSE
+		Com_DPrintf( "Loading %d jump table targets\n", vm->numJumpTableTargets );
+#else
 		Com_Printf( "Loading %d jump table targets\n", vm->numJumpTableTargets );
+#endif
 
 		if( alloc ) {
 			vm->jumpTableTargets = Hunk_Alloc( header.h->jtrgLength, h_high );
@@ -555,7 +574,11 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 
 	if ( interpret == VMI_NATIVE ) {
 		// try to load as a system dll
+#ifdef IOQ3ZTM // LESS_VERBOSE
+		Com_DPrintf( "Loading dll file %s.\n", vm->name );
+#else
 		Com_Printf( "Loading dll file %s.\n", vm->name );
+#endif
 		vm->dllHandle = Sys_LoadDll( module, vm->fqpath , &vm->entryPoint, VM_DllSyscall );
 		if ( vm->dllHandle ) {
 			return vm;
@@ -606,7 +629,11 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 	vm->programStack = vm->dataMask + 1;
 	vm->stackBottom = vm->programStack - PROGRAM_STACK_SIZE;
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
+#else
 	Com_Printf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
+#endif
 
 	return vm;
 }

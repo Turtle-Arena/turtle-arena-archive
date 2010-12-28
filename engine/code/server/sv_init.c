@@ -413,8 +413,14 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	// shut down the existing game if it is running
 	SV_ShutdownGameProgs();
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_Printf ("Loading map %s...\n", server);
+	Com_DPrintf ("------ Server Initialization ------\n");
+	Com_DPrintf ("Server: %s\n",server);
+#else
 	Com_Printf ("------ Server Initialization ------\n");
 	Com_Printf ("Server: %s\n",server);
+#endif
 
 	// if not running a dedicated server CL_MapLoading will connect the client to the server
 	// also print some status stuff
@@ -675,7 +681,11 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 
 	Hunk_SetMark();
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf ("-----------------------------------\n");
+#else
 	Com_Printf ("-----------------------------------\n");
+#endif
 }
 
 /*

@@ -94,7 +94,7 @@ void SaveRegisteredNPCs( void ) {
 	}
 	string[ MAX_NPCS ] = 0;
 
-	G_Printf( "%i NPCs registered\n", count );
+	G_DPrintf( "%i NPCs registered\n", count );
 	trap_SetConfigstring(CS_NPCS, string);
 }
 
