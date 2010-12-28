@@ -1114,7 +1114,11 @@ void VM_Compile( vm_t *vm, vmHeader_t *header ) {
 
 	Z_Free( buf );
 	Z_Free( jused );
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf( "VM file %s compiled to %i bytes of code\n", vm->name, compiledOfs );
+#else
 	Com_Printf( "VM file %s compiled to %i bytes of code\n", vm->name, compiledOfs );
+#endif
 
 	vm->destroy = VM_Destroy_Compiled;
 
