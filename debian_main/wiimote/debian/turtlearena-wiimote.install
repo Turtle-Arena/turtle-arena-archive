@@ -4,7 +4,6 @@ turtlearena_nun etc/cwiid/wminput
 turtlearena-wiimote usr/games
 turtlearena-wiimote-side usr/games
 turtlearena-wiimote-nun usr/games
-50_turtlearena-wiimote.conf /etc/udev/rules.d
 debian/turtlearena-wiimote.desktop usr/share/applications
 debian/turtlearena-wiimote-side.desktop usr/share/applications
 debian/turtlearena-wiimote-nun.desktop usr/share/applications
