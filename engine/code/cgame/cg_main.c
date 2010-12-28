@@ -662,13 +662,17 @@ static void CG_RegisterItemSounds( int itemNum ) {
 
 #ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(itemNum);
+
+	if( item->pickup_sound[0] ) {
+		trap_S_RegisterSound( item->pickup_sound, qfalse );
+	}
 #else
 	item = &bg_itemlist[ itemNum ];
-#endif
 
 	if( item->pickup_sound ) {
 		trap_S_RegisterSound( item->pickup_sound, qfalse );
 	}
+#endif
 
 	// parse the space seperated precache string for other media
 	s = item->sounds;
