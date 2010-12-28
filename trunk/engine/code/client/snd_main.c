@@ -617,7 +617,7 @@ void S_LoadMusicFile(const char *filename)
 
 			Com_Printf("%s:%s Unknown token %s!\n", filename, musicDef->name, token);
 		}
-		Com_Printf("Loaded %s from %s!\n",  musicDef->name, filename);
+		Com_DPrintf("Loaded %s from %s!\n",  musicDef->name, filename);
 	}
 }
 

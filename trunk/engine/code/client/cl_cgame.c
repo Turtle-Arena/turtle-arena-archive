@@ -800,7 +800,11 @@ void CL_InitCGame( void ) {
 
 	t2 = Sys_Milliseconds();
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf( "CL_InitCGame: %5.2f seconds\n", (t2-t1)/1000.0 );
+#else
 	Com_Printf( "CL_InitCGame: %5.2f seconds\n", (t2-t1)/1000.0 );
+#endif
 
 	// have the renderer touch all its images, so they are present
 	// on the card even if the driver does deferred loading

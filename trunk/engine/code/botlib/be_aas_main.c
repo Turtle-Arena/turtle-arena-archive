@@ -183,6 +183,9 @@ int AAS_Initialized(void)
 void AAS_SetInitialized(void)
 {
 	aasworld.initialized = qtrue;
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "AAS initialized.\n");
 #ifdef DEBUG
 	//create all the routing cache
@@ -327,6 +330,9 @@ int AAS_LoadFiles(const char *mapname)
 	if (errnum != BLERR_NOERROR)
 		return errnum;
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", aasfile);
 	strncpy(aasworld.filename, aasfile, MAX_PATH);
 	return BLERR_NOERROR;
@@ -425,5 +431,8 @@ void AAS_Shutdown(void)
 	//NOTE: as soon as a new .bsp file is loaded the .bsp file memory is
 	// freed an reallocated, so there's no need to free that memory here
 	//print shutdown
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "AAS shutdown.\n");
 } //end of the function AAS_Shutdown

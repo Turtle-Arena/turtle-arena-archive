@@ -761,6 +761,9 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 			return NULL;
 		} //end if
 	} //end for
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
 	//
 	//BotDumpSynonymList(synlist);
@@ -1052,6 +1055,9 @@ bot_randomlist_t *BotLoadRandomStrings(char *filename)
 		//free the source after one pass
 		FreeSource(source);
 	} //end for
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
 	//
 #ifdef DEBUG
@@ -1364,6 +1370,9 @@ bot_matchtemplate_t *BotLoadMatchTemplates(char *matchfile)
 	} //end while
 	//free the source
 	FreeSource(source);
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", matchfile);
 	//
 	//BotDumpMatchTemplates(matches);
@@ -1989,6 +1998,9 @@ bot_replychat_t *BotLoadReplyChat(char *filename)
 		} //end while
 	} //end while
 	FreeSource(source);
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
 	//
 	//BotDumpReplyChat(replychatlist);

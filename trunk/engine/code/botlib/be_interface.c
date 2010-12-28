@@ -163,6 +163,9 @@ int Export_BotLibSetup(void)
 		Log_Open(logfilename);
 	}
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "------- BotLib Initialization -------\n");
 
 	botlibglobals.maxclients = (int) LibVarValue("maxclients", "128");
@@ -289,6 +292,9 @@ int Export_BotLibLoadMap(const char *mapname)
 
 	if (!BotLibSetup("BotLoadMap")) return BLERR_LIBRARYNOTSETUP;
 	//
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "------------ Map Loading ------------\n");
 	//startup AAS for the current map, model and sound index
 	errnum = AAS_LoadMap(mapname);
@@ -301,6 +307,9 @@ int Export_BotLibLoadMap(const char *mapname)
 #endif
 	BotSetBrushModelTypes();	//be_ai_move.h
 	//
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "-------------------------------------\n");
 #ifdef DEBUG
 	botimport.Print(PRT_MESSAGE, "map loaded in %d msec\n", Sys_MilliSeconds() - starttime);
