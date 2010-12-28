@@ -719,32 +719,32 @@
 // entity 2
 {
 "classname" "item_health"
-"origin" "-1344.000000 0.000000 -96.000000"
+"origin" "-1344.000000 0.000000 -64.000000"
 }
 // entity 3
 {
 "classname" "item_health"
-"origin" "-1344.000000 -512.000000 -96.000000"
+"origin" "-1344.000000 -512.000000 -64.000000"
 }
 // entity 4
 {
 "classname" "item_health"
-"origin" "-1344.000000 512.000000 -96.000000"
+"origin" "-1344.000000 512.000000 -64.000000"
 }
 // entity 5
 {
 "classname" "item_health"
-"origin" "1344.000000 -512.000000 -96.000000"
+"origin" "1344.000000 -512.000000 -64.000000"
 }
 // entity 6
 {
 "classname" "item_health"
-"origin" "1344.000000 0.000000 -96.000000"
+"origin" "1344.000000 0.000000 -64.000000"
 }
 // entity 7
 {
 "classname" "item_health"
-"origin" "1344.000000 512.000000 -96.000000"
+"origin" "1344.000000 512.000000 -64.000000"
 }
 // entity 8
 {
@@ -770,7 +770,7 @@
 {
 "classname" "target_kill"
 "origin" "288.000000 0.000000 -496.000000"
-"target" "pit1_kill"
+"targetname" "pit1_kill"
 }
 // entity 11
 {
