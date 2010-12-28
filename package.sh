@@ -175,9 +175,21 @@ then
 		cp engine/build/release-mingw32-x86/turtlearena.x86.exe $ZIPDIR
 		cp engine/build/release-mingw32-x86/turtlearena-server.x86.exe $ZIPDIR
 
+		if [ ! -f $ZIPDIR/libcurl-4.dll ]
+		then
+			echo "  Warning: You need to manually copy libcurl-4.dll into \"$ZIPDIR\"!"
+		fi
+		if [ ! -f $ZIPDIR/OpenAL32.dll ]
+		then
+			echo "  Warning: You need to manually copy OpenAL32.dll into \"$ZIPDIR\"!"
+		fi
 		if [ ! -f $ZIPDIR/SDL.dll ]
 		then
 			echo "  Warning: You need to manually copy SDL.dll version 1.2.14 into \"$ZIPDIR\"!"
+		fi
+		if [ ! -f $ZIPDIR/zlib1.dll ]
+		then
+			echo "  Warning: You need to manually copy zlib1.dll into \"$ZIPDIR\"!"
 		fi
 	fi
 
