@@ -237,9 +237,9 @@ then
 
 	# ZTM: FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
 	# Build assets0.pk3 if not already built
-	if [ ! -f $INSTALLDIR/base/assets0.pk3 ]
+	if [ ! -f $INSTALLDIR/zip/base/assets0.pk3 ]
 	then
-		./package-assets.sh
+		./package-assets.sh --installdir $INSTALLDIR/zip
 
 		echo "Go run Turtle Arena and update the checksum for assets0.pk3 if"
 		echo "    needed, near the top of engine/code/qcommon/files.c"
@@ -247,7 +247,7 @@ then
 	fi
 
 	mkdir -p $DEBINSTALL/$ORIGDIR/base
-	cp $INSTALLDIR/base/assets0.pk3 $DEBINSTALL/$ORIGDIR/base
+	cp $INSTALLDIR/zip/base/assets0.pk3 $DEBINSTALL/$ORIGDIR/base
 
 	cd $DEBINSTALL/$ORIGDIR
 
