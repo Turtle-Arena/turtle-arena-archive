@@ -1,6 +1,19 @@
-Turtle Arena Wiimote support.
+Turtle Arena Wiimote support for GNU/Linux.
 
 Wiimote support is currently external from Turtle Arena, using wminput which uses the cwiid library.
 
+== USAGE ==
 Launch the game using turtlearena-wiimote, turtlearena-wiimote-side, or turtlearena-wiimote-nun.
 
+== SETUP ==
+To use wminput you need to change /dev/uinput to be readable by all, and load uinput.
+
+	sudo chmod 0666 /dev/uinput
+	sudo modprobe uinput
+	echo "uinput # Added for turtlearena-wiimote package" | tee -a /etc/modules
+
+== UNSETUP ==
+Stop auto loading of uinput. Revert permissions of /dev/uinput
+
+	sudo sed -i -e 's/uinput # Added by turtlearena-wiimote package//g' /etc/modules
+	sudo chmod 0640 /dev/uinput
