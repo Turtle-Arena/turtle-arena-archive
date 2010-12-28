@@ -3221,7 +3221,7 @@ void BG_InitItemInfo(void)
 
 #ifdef TA_ITEMSYS_USE_INTERNAL
 	// Load internal items
-	for (i = 0; bg_itemlist[i].classname; i++)
+	for (i = 1; bg_itemlist[i].classname; i++)
 	{
 		num = BG_ItemIndexForName(bg_itemlist[i].classname);
 		if (!num)
