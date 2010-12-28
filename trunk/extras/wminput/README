@@ -20,4 +20,5 @@ Revert permissions of /dev/uinput. Stop auto loading of uinput.
 
 	sudo chmod 0640 /dev/uinput
 	sudo rm /etc/udev/rules.d/50_turtlearena-wiimote.conf
-	sudo sed -i -e 's/uinput # Added by turtlearena-wiimote package//g' /etc/modules
+	sudo sed -i -e 's/uinput # Added for turtlearena-wiimote package//g' /etc/modules
+
