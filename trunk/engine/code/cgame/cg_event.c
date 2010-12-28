@@ -961,7 +961,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
 
 #ifdef TURTLEARENA // POWERS
-			if ( item->pickup_sound ) {
+#ifdef TA_ITEMSYS
+			if ( item->pickup_sound[0] )
+#else
+			if ( item->pickup_sound )
+#endif
+			{
 				trap_S_StartSound (NULL, es->number, CHAN_AUTO,	trap_S_RegisterSound( item->pickup_sound, qfalse ) );
 			}
 #else
@@ -1017,13 +1022,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			}
 #ifdef TA_ITEMSYS
 			item = BG_ItemForItemNum(index);
+
+			// powerup pickups are global
+			if( item->pickup_sound[0] ) {
+				trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
+			}
 #else
 			item = &bg_itemlist[ index ];
-#endif
+
 			// powerup pickups are global
 			if( item->pickup_sound ) {
 				trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
 			}
+#endif
 
 			// show icon and name on status bar
 			if ( es->number == cg.snap->ps.clientNum ) {
