@@ -1299,7 +1299,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			return qfalse;
 		}
 #ifdef TURTLEARENA // POWERS
-		if ( client->ps.powerups[PW_FLASHING] ) {
+		if ( client->ps.powerups[PW_FLASHING] && !(dflags & DAMAGE_NO_PROTECTION)) {
 			return qfalse;
 		}
 #endif
@@ -1436,6 +1436,14 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 #endif
 #endif
 
+#ifdef TURTLEARENA // POWERS
+		// never take any damage.
+		if ( client && client->ps.powerups[PW_INVUL] ) {
+			G_AddEvent( targ, EV_POWERUP_INVUL, 0 );
+			return qfalse;
+		}
+#endif
+
 		// check for godmode
 		if ( targ->flags & FL_GODMODE ) {
 			return qfalse;
@@ -1453,13 +1461,6 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 #endif
 		damage *= 0.5;
 	}
-#ifdef TURTLEARENA // POWERS
-	// never take any damage.
-	if ( client && client->ps.powerups[PW_INVUL] ) {
-		G_AddEvent( targ, EV_POWERUP_INVUL, 0 );
-		return qfalse;
-	}
-#endif
 
 	// add to the attacker's hit counter (if the target isn't a general entity like a prox mine)
 	if ( attacker->client && client
