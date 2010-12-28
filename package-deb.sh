@@ -1,12 +1,13 @@
 #!/bin/sh
 #
-# Package debian source and binary packages for client/server and data,
+# Package debian source and binary packages for client/server, data, and wiimote
 #    for Ubuntu PPA and ready-to-install debs.
 #
 # (Turtle Arena Ubuntu PPA: https://launchpad.net/~zturtleman/+archive/turtlearena-stable)
 #
 # NOTE: Version is gotten from changelogs
-#		(debian_main/engine/debian/changelog and debian_main/data/debian/changelog)
+#		(debian_main/engine/debian/changelog, debian_main/data/debian/changelog,
+#			and debian_main/wiimote/debian/changelog)
 #
 # NOTE: You must have the .orig.tar.gz files when creating
 #  patches (0.2-2, 0.2-3, etc et) (You can download them from the Ubuntu PPA)
@@ -60,7 +61,25 @@ do
 	fi
 
 
-	if [ "$ARG" = "--no-bin" ] [ "$ARG" = "-n" ]
+	if [ "$ARG" = "--no-data" ]
+	then
+		MAKE_DATA_DEB=0
+		continue
+	fi
+
+	if [ "$ARG" = "--no-engine" ]
+	then
+		MAKE_ENGINE_DEB=0
+		continue
+	fi
+
+	if [ "$ARG" = "--no-wiimote" ]
+	then
+		MAKE_WIIMOTE_DEB=0
+		continue
+	fi
+
+	if [ "$ARG" = "--no-bin" ] || [ "$ARG" = "-n" ]
 	then
 		BIN=0
 		continue
@@ -125,6 +144,8 @@ do
 
 done
 
+DEBINSTALL=$INSTALLDIR/deb
+
 #
 # Show usage, the user asked to see it.
 #
@@ -138,6 +159,9 @@ then
 	echo " -h --help         Show this help"
 	echo " -i --installdir [dir]  directory to put files"
 	echo "                          (default: \"install\")"
+	echo "    --no-data           Do not create data deb"
+	echo "    --no-engine         Do not create engine debs"
+	echo "    --no-wiimote        Do not create wiimote deb"
 	echo " -n --no-bin            Do not build install debs, only source"
 	echo " -p --ppa [ppa]         Upload source packages to [ppa]"
 	echo "                          (default: \"ppa:zturtleman/turtlearena-stable\")"
@@ -152,28 +176,35 @@ fi
 if [ $UPLOAD_TO_PPA -eq 2 ]
 then
 
-	# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
-	versionAndSeries=`head -n 1 ${DATA_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+	if [ $MAKE_DATA_DEB -eq 1 ]
+	then
+		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
+		versionAndSeries=`head -n 1 ${DATA_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
-	# Upload data source to PPA
-	dput ${PPA_NAME} ${GAMENAME}-data_${versionAndSeries}_source.changes
+		# Upload data source to PPA
+		dput ${PPA_NAME} ${GAMENAME}-data_${versionAndSeries}_source.changes
+	fi
 
-	# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
-	versionAndSeries=`head -n 1 ${ENGINE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+	if [ $MAKE_ENGINE_DEB -eq 1 ]
+	then
+		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
+		versionAndSeries=`head -n 1 ${ENGINE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
-	# Upload engine source to PPA
-	dput ${PPA_NAME} ${GAMENAME}_${versionAndSeries}_source.changes
+		# Upload engine source to PPA
+		dput ${PPA_NAME} ${GAMENAME}_${versionAndSeries}_source.changes
+	fi
 
-	# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
-	versionAndSeries=`head -n 1 ${WIIMOTE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+	if [ $MAKE_WIIMOTE_DEB -eq 1 ]
+	then
+		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
+		versionAndSeries=`head -n 1 ${WIIMOTE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
-	# Upload engine source to PPA
-	dput ${PPA_NAME} ${GAMENAME}-wiimote_${versionAndSeries}_source.changes
+		# Upload engine source to PPA
+		dput ${PPA_NAME} ${GAMENAME}-wiimote_${versionAndSeries}_source.changes
+	fi
 
 	exit 0
 fi
-
-DEBINSTALL=$INSTALLDIR/deb
 
 if [ $MAKE_DATA_DEB -eq 1 ]
 then
@@ -204,14 +235,14 @@ then
 		ORIGDIR=$GAMENAME-data-$version
 	fi
 
-	# FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
+	# ZTM: FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
 	# Build assets0.pk3 if not already built
 	if [ ! -f $INSTALLDIR/base/assets0.pk3 ]
 	then
 		./package-assets.sh
 
 		echo "Go run Turtle Arena and update the checksum for assets0.pk3 if"
-		echo "    needed, near the top of engine/code/qcommon/files.c!"
+		echo "    needed, near the top of engine/code/qcommon/files.c"
 		exit 1
 	fi
 
@@ -307,7 +338,7 @@ then
 	#
 	# File cleanup
 	#
-	# Remove SVN files
+	# Remove SVN and backup files
 	find $DEBINSTALL/$ORIGDIR/ -type d -name '.svn' -exec rm -rf '{}' \; 2>/dev/null
 	find $DEBINSTALL/$ORIGDIR/ -type f -name '.svnignore' -exec rm -rf '{}' \; 2>/dev/null
 	find $DEBINSTALL/$ORIGDIR/ -type f -name '*~' -exec rm -rf '{}' \; 2>/dev/null
@@ -315,7 +346,7 @@ then
 	# Remave lcc as debian calls it non-free and removes it
 	rm -r $DEBINSTALL/$ORIGDIR/code/tools/lcc
 
-	# Remove non-free header
+	# Remove non-free windows header
 	if [ -f $DEBINSTALL/$ORIGDIR/code/qcommon/wspiapi.h ]
 	then
 		rm $DEBINSTALL/$ORIGDIR/code/qcommon/wspiapi.h
@@ -411,10 +442,6 @@ then
 	cp extras/wminput/config/* $DEBINSTALL/$ORIGDIR/
 	cp extras/wminput/launchers/* $DEBINSTALL/$ORIGDIR/
 	cp extras/wminput/README $DEBINSTALL/$ORIGDIR/
-
-	# Create files
-	echo "# Allow users to use uinput" > $DEBINSTALL/$ORIGDIR/50_turtlearena-wiimote.conf
-	echo "KERNEL==\"uinput\", MODE=\"0666\"" >> $DEBINSTALL/$ORIGDIR/50_turtlearena-wiimote.conf
 
 	#
 	# Create orig.tar.gz

@@ -9,11 +9,15 @@ Launch the game using turtlearena-wiimote, turtlearena-wiimote-side, or turtlear
 To use wminput you need to change /dev/uinput to be readable by all, and load uinput.
 
 	sudo chmod 0666 /dev/uinput
+	echo "# Allow users to use uinput" | sudo tee /etc/udev/rules.d/50_turtlearena-wiimote.conf
+	echo "KERNEL==\"uinput\", MODE=\"0666\"" | sudo tee -a /etc/udev/rules.d/50_turtlearena-wiimote.conf
+
 	sudo modprobe uinput
-	echo "uinput # Added for turtlearena-wiimote package" | tee -a /etc/modules
+	echo "uinput # Added for turtlearena-wiimote package" | sudo tee -a /etc/modules
 
 == UNSETUP ==
-Stop auto loading of uinput. Revert permissions of /dev/uinput
+Revert permissions of /dev/uinput. Stop auto loading of uinput.
 
-	sudo sed -i -e 's/uinput # Added by turtlearena-wiimote package//g' /etc/modules
 	sudo chmod 0640 /dev/uinput
+	sudo rm /etc/udev/rules.d/50_turtlearena-wiimote.conf
+	sudo sed -i -e 's/uinput # Added by turtlearena-wiimote package//g' /etc/modules
