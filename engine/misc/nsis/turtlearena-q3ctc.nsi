@@ -1,12 +1,12 @@
 ; sample NSIS description file for a Turtle Arena mod installer
 
 !define NAME "Catch the Chicken"
-!define FSNAME "ioquake3-q3ctc"
+!define FSNAME "turtlearena-q3ctc"
 !define VERSION "1.4"
 !define RELEASE "1"
 !define MODDIR "q3ctc"
-!define PUBLISHER "The ioquake3 Team"
-!define URL "http://ioquake3.org/"
+!define PUBLISHER "The Turtle Arena Team"
+!define URL "http://turtlearena.googlecode.com/"
 
 !define MUI_ICON "../quake3.ico"
 
