@@ -24,8 +24,9 @@ else
 	ARCH=i386
 fi
 
-# Platform as in 'engine/build/release-linux-x86_64/base/vm'
-PLATFORM=linux-$ARCH
+OS=linux
+# Platform as in 'linux-x86_64' ('engine/build/release-linux-x86_64/base/vm')
+PLATFORM=$OS-$ARCH
 
 # Vars for command line handling
 USAGE=0
@@ -121,12 +122,12 @@ cd engine
 
 if [ $LINUX -eq 1 ]
 then
-	make BUILD_GAME_SO=0 BUILD_GAME_QVM=1
+	make ARCH=$ARCH BUILD_GAME_QVM=1
 
 	# If running x86_64, compile i386 too.
 	if [ $ARCH = "x86_64" ]
 	then
-		make ARCH=i386 BUILD_GAME_SO=0
+		make ARCH=i386
 	fi
 else
 	# We need to at least build the QVMs!
@@ -135,7 +136,7 @@ fi
 
 if [ $WIN32 -eq 1 ]
 then
-	sh cross-make-mingw.sh ARCH=x86 BUILD_GAME_SO=0
+	sh cross-make-mingw.sh
 fi
 
 cd $STARTDIR
@@ -146,7 +147,7 @@ cd $STARTDIR
 
 ZIPDIR=$INSTALLDIR/zip
 
-mkdir -p $ZIPDIR
+mkdir -p $ZIPDIR/base
 
 
 #
@@ -162,11 +163,17 @@ then
 	then
 		cp engine/build/release-$PLATFORM/turtlearena.$ARCH $ZIPDIR
 		cp engine/build/release-$PLATFORM/turtlearena-server.$ARCH $ZIPDIR
+		cp engine/build/release-$PLATFORM/base/cgame$ARCH.so $ZIPDIR/base
+		cp engine/build/release-$PLATFORM/base/qagame$ARCH.so $ZIPDIR/base
+		cp engine/build/release-$PLATFORM/base/ui$ARCH.so $ZIPDIR/base
 
 		if [ $ARCH = "x86_64" ]
 		then
-			cp engine/build/release-linux-i386/turtlearena.i386 $ZIPDIR
-			cp engine/build/release-linux-i386/turtlearena-server.i386 $ZIPDIR
+			cp engine/build/release-$OS-i386/turtlearena.i386 $ZIPDIR
+			cp engine/build/release-$OS-i386/turtlearena-server.i386 $ZIPDIR
+			cp engine/build/release-$OS-i386/base/cgamei386.so $ZIPDIR/base
+			cp engine/build/release-$OS-i386/base/qagamei386.so $ZIPDIR/base
+			cp engine/build/release-$OS-i386/base/uii386.so $ZIPDIR/base
 		fi
 	fi
 
@@ -174,6 +181,9 @@ then
 	then
 		cp engine/build/release-mingw32-x86/turtlearena.x86.exe $ZIPDIR
 		cp engine/build/release-mingw32-x86/turtlearena-server.x86.exe $ZIPDIR
+		cp engine/build/release-mingw32-x86/base/cgamex86.dll $ZIPDIR/base
+		cp engine/build/release-mingw32-x86/base/qagamex86.dll $ZIPDIR/base
+		cp engine/build/release-mingw32-x86/base/uix86.dll $ZIPDIR/base
 
 		if [ ! -f $ZIPDIR/libcurl-4.dll ]
 		then
@@ -268,7 +278,7 @@ then
 fi
 
 #
-# Copy readme, COPYING, etc for zip
+# Copy README, COPYING, etc for zip
 #
 
 echo "Copying docs..."
@@ -279,7 +289,7 @@ then
 	cp extras/turtlearena.sh $ZIPDIR
 fi
 
-cp GAME_README.txt $ZIPDIR/readme.txt
+cp GAME_README.txt $ZIPDIR/README.txt
 cp COPYING.txt $ZIPDIR
 cp COPYRIGHTS.txt $ZIPDIR
 cp CREDITS.txt $ZIPDIR
@@ -288,14 +298,14 @@ cp CREDITS.txt $ZIPDIR
 todos $ZIPDIR/*.txt
 
 # Enable portable app mode!
-mkdir -p $ZIPDIR/settings
+mkdir $ZIPDIR/settings
 echo "yes" > $ZIPDIR/settings/portable
 
 # Copy all of the files other than base/ into turtlearena-src/ and zip it.
 echo "Warning: You need to manually copy the source into $ZIPDIR !"
 
 # zip install?
-# base/assets0.pk3 readme.txt COPYING.txt COPYRIGHTS.txt CREDITS.txt
+# base/assets0.pk3 README.txt COPYING.txt COPYRIGHTS.txt CREDITS.txt
 # settings/portable
 # if Linux; turtlearena.sh
 # if Linux x86_64; .x86_64 and .i386 binaries
@@ -318,6 +328,18 @@ fi
 if [ $LINUX -eq 1 ]
 then
 	./package-deb.sh --installdir $INSTALLDIR
+fi
+
+#
+# Build Loki setup .run
+#
+if [ $LINUX -eq 1 ]
+then
+	cd engine
+	make installer
+	cd ..
+	mkdir $INSTALLDIR/run
+	mv engine/misc/setup/*.run $INSTALLDIR/run
 fi
 
 echo "Done!"

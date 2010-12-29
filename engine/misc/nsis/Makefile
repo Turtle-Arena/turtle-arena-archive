@@ -19,14 +19,12 @@ turtlearena-$(VERSION)-$(RELEASE).$(ARCH).exe: turtlearena.nsi
 	cp "../../../COPYING.txt" .
 	cp "../../../COPYRIGHTS.txt" .
 	cp "../../../CREDITS.txt" .
-	cp "../../../GAME_README.txt" "readme.txt"
-#	cp "../../id-readme.txt" .
-#   cp "../../voip-readme.txt" .
+	cp "../../../GAME_README.txt" "README.txt"
 	todos "*.txt"
 	makensis turtlearena.nsi
 
 clean:
-	rm -rf *.exe turtlearena.nsi COPYING.txt COPYRIGHTS.txt CREDITS.txt readme.txt
+	rm -rf *.exe turtlearena.nsi COPYING.txt COPYRIGHTS.txt CREDITS.txt README.txt
 
 .PHONY: all clean
 
