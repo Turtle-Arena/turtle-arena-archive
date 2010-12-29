@@ -70,7 +70,8 @@ ifelse(HAVE_PPC64,yes,dnl
 	base/assets0.pk3
 	turtlearena.png
 	COPYING
-	<!-- voip-readme.txt -->
+	COPYRIGHTS
+	CREDITS
       </files>
     </option>
   </component>

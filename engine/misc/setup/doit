@@ -86,9 +86,10 @@ install -m 755 /usr/bin/xdg-desktop-menu image/xdg-desktop-menu
 install -m 644 turtlearena.desktop image/turtlearena.desktop.in
 
 ### README, COPYING and EULA
-#install -m 644 $topdir/voip-readme.txt image/voip-readme.txt
 install -m 644 ../$topdir/GAME_README.txt image/README
 install -m 644 ../$topdir/COPYING.txt image/COPYING
+install -m 644 ../$topdir/COPYRIGHTS.txt image/COPYRIGHTS
+install -m 644 ../$topdir/CREDITS.txt image/CREDITS
 mkdir image/base
 install -m 644 ../$topdir/install/zip/base/assets0.pk3 image/base/assets0.pk3
 
