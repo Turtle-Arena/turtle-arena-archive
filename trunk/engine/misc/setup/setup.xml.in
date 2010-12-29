@@ -17,7 +17,7 @@
 ifelse(HAVE_X86_64,yes,dnl
     <option install="true" arch="x86_64">
      Turtle Arena x86_64 binaries
-     <binary libc="any" symlink="turtlearena" icon="turtlearena.png" name="turtlearena">Turtle Arena</binary>
+     <binary libc="any" symlink="turtlearena" icon="turtlearena.png" name="turtlearena">turtlearena</binary>
      <files>
        turtlearena.x86_64.tar
      </files>
@@ -27,7 +27,7 @@ ifelse(HAVE_X86_64,yes,dnl
 ifelse(HAVE_I386,yes,dnl
     <option install="true" if="|(x86,x86_64)">
      Turtle Arena x86 (32 bit) binaries
-     <binary libc="any" symlink="turtlearena" icon="turtlearena.png" name="turtlearena">Turtle Arena</binary>
+     <binary libc="any" symlink="turtlearena" icon="turtlearena.png" name="turtlearena">turtlearena</binary>
      <files>
        turtlearena.i386.tar
      </files>
@@ -36,7 +36,7 @@ ifelse(HAVE_I386,yes,dnl
 )dnl
 ifelse(HAVE_PPC,yes,dnl
     <option install="true" if="|(ppc,ppc64)">
-     <binary libc="any" symlink="turtlearena" icon="turtlearena.png" name="turtlearena">Turtle Arena</binary>
+     <binary libc="any" symlink="turtlearena" icon="turtlearena.png" name="turtlearena">turtlearena</binary>
      Turtle Arena ppc binaries
      <files>
        turtlearena.ppc.tar
@@ -46,7 +46,7 @@ ifelse(HAVE_PPC,yes,dnl
 )dnl
 ifelse(HAVE_PPC64,yes,dnl
     <option install="true" arch="ppc64">
-     <binary libc="any" symlink="turtlearena" icon="turtlearena.png" name="turtlearena">Turtle Arena</binary>
+     <binary libc="any" symlink="turtlearena" icon="turtlearena.png" name="turtlearena">turtlearena</binary>
      Turtle Arena ppc64 binaries
      <files>
        turtlearena.ppc64.tar
@@ -70,7 +70,7 @@ ifelse(HAVE_PPC64,yes,dnl
 	base/assets0.pk3
 	turtlearena.png
 	COPYING
-	voip-readme.txt
+	<!-- voip-readme.txt -->
       </files>
     </option>
   </component>
