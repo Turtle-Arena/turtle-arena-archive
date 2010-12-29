@@ -52,6 +52,9 @@ ifneq ($(PLATFORM),darwin)
   BUILD_CLIENT_SMP = 0
 endif
 
+ifndef BUILD_FINAL
+  BUILD_FINAL=0
+endif
 ifndef USE_FREETYPE
   USE_FREETYPE=0
 endif
@@ -489,25 +492,27 @@ ifneq ($(BUILD_CLIENT),0)
   endif
 endif
 
-# Add svn version info
-USE_SVN=
-ifeq ($(wildcard .svn),.svn)
-  SVN_REV=$(shell LANG=C svnversion .)
-  ifneq ($(SVN_REV),)
-    VERSION:=$(VERSION)_SVN$(SVN_REV)
-    USE_SVN=1
-  endif
-else
-ifeq ($(wildcard .git/svn/.metadata),.git/svn/.metadata)
-  SVN_REV=$(shell LANG=C git svn info | awk '$$1 == "Revision:" {print $$2; exit 0}')
-  ifneq ($(SVN_REV),)
-    VERSION:=$(VERSION)_SVN$(SVN_REV)
-  endif
-endif
-endif
+ifneq ($(BUILD_FINAL),1)
+	# Add svn version info
+	USE_SVN=
+	ifeq ($(wildcard .svn),.svn)
+	  SVN_REV=$(shell LANG=C svnversion .)
+	  ifneq ($(SVN_REV),)
+		VERSION:=$(VERSION)_SVN$(SVN_REV)
+		USE_SVN=1
+	  endif
+	else
+	ifeq ($(wildcard .git/svn/.metadata),.git/svn/.metadata)
+	  SVN_REV=$(shell LANG=C git svn info | awk '$$1 == "Revision:" {print $$2; exit 0}')
+	  ifneq ($(SVN_REV),)
+		VERSION:=$(VERSION)_SVN$(SVN_REV)
+	  endif
+	endif
+	endif
 
-ifdef IOQ3_REVISION
-  VERSION:=$(VERSION)_IOQ3r$(IOQ3_REVISION)
+	ifdef IOQ3_REVISION
+	  VERSION:=$(VERSION)_IOQ3r$(IOQ3_REVISION)
+	endif
 endif
 
 #############################################################################
@@ -1419,7 +1424,7 @@ else
 	@echo "Building Turtle Arena in $(B):"
 endif
 ifdef IOQ3_REVISION
-# IOQ3_REVISION can be defined to keep trace of the ioquake3 supported revision
+# IOQ3_REVISION can be defined to keep track of the ioquake3 supported revision
 	@echo "  IOQ3_REVISION: $(IOQ3_REVISION)"
 endif
 	@echo "  PLATFORM: $(PLATFORM)"
