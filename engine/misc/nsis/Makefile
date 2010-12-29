@@ -1,5 +1,9 @@
+ifndef VERSION
 VERSION=0.3
+endif
+ifndef RELEASE
 RELEASE=0
+endif
 ifndef ARCH
 ARCH=x86
 endif
