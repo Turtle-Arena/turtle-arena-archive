@@ -15,6 +15,11 @@ LINUX=1
 # Package Win32 NSIS installer and copy Win32 binaries into installdir
 WIN32=1
 
+# Extra args for make.
+MAKE=
+
+# Found clean arg, delete package files.
+CLEAN=0
 
 # Check for x86_64
 if [ `uname -m` = "x86_64" ]
@@ -42,7 +47,7 @@ do
 	# Single argument options
 	#
 
-	if [ "$ARG" = "--help" ] || [ "$ARG" = "-help" ] || [ "$ARG" = "-h" ]
+	if [ "$ARG" = "--help" ] || [ "$ARG" = "-h" ]
 	then
 		USAGE=1
 		break
@@ -57,6 +62,18 @@ do
 	if [ "$ARG" = "--no-win32" ]
 	then
 		WIN32=0
+		continue
+	fi
+
+	if [ "$ARG" = "--final" ] || [ "$ARG" = "-f" ]
+	then
+		MAKE="BUILD_FINAL=1"
+		continue
+	fi
+
+	if [ "$ARG" = "clean" ]
+	then
+		CLEAN=1
 		continue
 	fi
 
@@ -89,18 +106,19 @@ done
 #
 if [ $USAGE -eq 1 ]
 then
-	echo "Usage: $0 OPTIONS..."
+	echo "Usage: $0 OPTIONS... [clean]"
 	echo "  Package Turtle Arena for release. Creates assets0.pk3, compiles"
 	echo "    and copies binaries into installdir"
 	echo ""
 	echo "  OPTIONS"
 	echo "    --help         Show this help"
-	echo "           -help"
 	echo "           -h"
 	echo "    --installdir [dir]  directory to copy files to for zip install"
 	echo "                          (default: \"install\")"
 	echo "    --no-linux          Don't package Linux"
 	echo "    --no-win32          Don't package Win32"
+	echo "    --final             Don't include svn or ioq3 revision in version"
+	echo "           -f"
 	exit 1
 fi
 
@@ -113,6 +131,31 @@ then
 	exit 1
 fi
 
+#
+# Clean everything up
+#
+if [ $CLEAN -eq 1 ]
+then
+	rm -r $INSTALLDIR
+
+	cd engine
+
+	if [ $LINUX -eq 1 ]
+	then
+		make clean ARCH=$ARCH
+		if [ $ARCH = "x86_64" ]
+		then
+			make clean ARCH=i386
+		fi
+	fi
+
+	if [ $WIN32 -eq 1 ]
+	then
+		sh cross-make-mingw.sh clean
+	fi
+
+	exit 1
+fi
 
 #
 # Make sure everything is built
@@ -122,21 +165,21 @@ cd engine
 
 if [ $LINUX -eq 1 ]
 then
-	make ARCH=$ARCH BUILD_GAME_QVM=1
+	make $MAKE ARCH=$ARCH BUILD_GAME_QVM=1
 
 	# If running x86_64, compile i386 too.
 	if [ $ARCH = "x86_64" ]
 	then
-		make ARCH=i386
+		make $MAKE ARCH=i386
 	fi
 else
 	# We need to at least build the QVMs!
-	make BUILD_CLIENT=0 BUILD_CLIENT_SMP=0 BUILD_SERVER=0 BUILD_GAME_SO=0 BUILD_GAME_QVM=1
+	make $MAKE BUILD_CLIENT=0 BUILD_CLIENT_SMP=0 BUILD_SERVER=0 BUILD_GAME_SO=0 BUILD_GAME_QVM=1
 fi
 
 if [ $WIN32 -eq 1 ]
 then
-	sh cross-make-mingw.sh
+	sh cross-make-mingw.sh $MAKE
 fi
 
 cd $STARTDIR
@@ -145,7 +188,8 @@ cd $STARTDIR
 # Create install directory
 #
 
-ZIPDIR=$INSTALLDIR/zip
+ZIPNAME=turtlearena-0.3
+ZIPDIR=$INSTALLDIR/$ZIPNAME
 
 mkdir -p $ZIPDIR/base
 
@@ -304,14 +348,8 @@ echo "yes" > $ZIPDIR/settings/portable
 # Copy all of the files other than base/ into turtlearena-src/ and zip it.
 echo "Warning: You need to manually copy the source into $ZIPDIR !"
 
-# zip install?
-# base/assets0.pk3 README.txt COPYING.txt COPYRIGHTS.txt CREDITS.txt
-# settings/portable
-# if Linux; turtlearena.sh
-# if Linux x86_64; .x86_64 and .i386 binaries
-# if Linux i386; .i386 binaries
-# if Win32; .x86.exe binaries
-
+# Create zip
+zip -r $ZIPNAME.zip $ZIPNAME
 
 
 #
@@ -336,7 +374,7 @@ fi
 if [ $LINUX -eq 1 ]
 then
 	cd engine
-	make installer
+	make installer $MAKE
 	cd ..
 	mkdir $INSTALLDIR/run
 	mv engine/misc/setup/*.run $INSTALLDIR/run
