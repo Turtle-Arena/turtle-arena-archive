@@ -33,6 +33,9 @@ OS=linux
 # Platform as in 'linux-x86_64' ('engine/build/release-linux-x86_64/base/vm')
 PLATFORM=$OS-$ARCH
 
+# Set to 1 if there is a reason to not create zip
+ZIPERROR=0
+
 # Vars for command line handling
 USAGE=0
 NEXT_ARG=""
@@ -231,19 +234,43 @@ then
 
 		if [ ! -f $ZIPDIR/libcurl-4.dll ]
 		then
-			echo "  Warning: You need to manually copy libcurl-4.dll into \"$ZIPDIR\"!"
+			if [ -f engine/misc/nsis/libcurl-4.dll ]
+			then
+				cp engine/misc/nsis/libcurl-4.dll $ZIPDIR
+			else
+				echo "  Warning: You need to manually copy libcurl-4.dll into \"$ZIPDIR\"!"
+				ZIPERROR=1
+			fi
 		fi
 		if [ ! -f $ZIPDIR/OpenAL32.dll ]
 		then
-			echo "  Warning: You need to manually copy OpenAL32.dll into \"$ZIPDIR\"!"
+			if [ -f engine/misc/nsis/OpenAL32.dll ]
+			then
+				cp engine/misc/nsis/OpenAL32.dll $ZIPDIR
+			else
+				echo "  Warning: You need to manually copy OpenAL32.dll into \"$ZIPDIR\"!"
+				ZIPERROR=1
+			fi
 		fi
 		if [ ! -f $ZIPDIR/SDL.dll ]
 		then
-			echo "  Warning: You need to manually copy SDL.dll version 1.2.14 into \"$ZIPDIR\"!"
+			if [ -f engine/misc/nsis/SDL.dll ]
+			then
+				cp engine/misc/nsis/SDL.dll $ZIPDIR
+			else
+				echo "  Warning: You need to manually copy SDL.dll version 1.2.14 into \"$ZIPDIR\"!"
+				ZIPERROR=1
+			fi
 		fi
 		if [ ! -f $ZIPDIR/zlib1.dll ]
 		then
-			echo "  Warning: You need to manually copy zlib1.dll into \"$ZIPDIR\"!"
+			if [ -f engine/misc/nsis/zlib1.dll ]
+			then
+				cp engine/misc/nsis/zlib1.dll $ZIPDIR
+			else
+				echo "  Warning: You need to manually copy zlib1.dll into \"$ZIPDIR\"!"
+				ZIPERROR=1
+			fi
 		fi
 	fi
 
@@ -253,13 +280,13 @@ fi
 # Create assets0.pk3
 #
 
-if [ ! -f $ZIPDIR/base/assets0.pk3 ]
+if [ ! -f $INSTALLDIR/base/assets0.pk3 ]
 then
 	echo "Data..."
 
-	./package-assets.sh --installdir $ZIPDIR
+	./package-assets.sh --installdir $INSTALLDIR
 
-	if [ -f $ZIPDIR/base/assets0.pk3 ]
+	if [ -f $INSTALLDIR/base/assets0.pk3 ]
 	then
 		#
 		# Must manually update checksum
@@ -271,7 +298,7 @@ then
 
 		# NEW
 		#ensure EDITOR is set
-		if [ -z "${EDITOR}"]
+		if [ -z "${EDITOR}" ]
 		then
 			EDITOR=nano
 		fi
@@ -325,7 +352,10 @@ fi
 # Copy README, COPYING, etc for zip
 #
 
-echo "Copying docs..."
+echo "Copying files for zip..."
+
+mkdir $ZIPDIR/base
+cp $INSTALLDIR/base/assets0.pk3 $ZIPDIR/base
 
 if [ $LINUX -eq 1 ]
 then
@@ -349,8 +379,39 @@ echo "yes" > $ZIPDIR/settings/portable
 echo "Warning: You need to manually copy the source into $ZIPDIR !"
 
 # Create zip
-zip -r $ZIPNAME.zip $ZIPNAME
+if [ $ZIPERROR -eq 0 ]
+then
+	cd $INSTALLDIR
+	if [ ! -f $ZIPNAME.zip ]
+	then
+		zip -r $ZIPNAME.zip $ZIPNAME
+	fi
+	cd $STARTDIR
+fi
 
+#
+# Package tarball
+#
+if [ $LINUX -eq 1 ]
+then
+	cd engine
+	make dist $MAKE
+	cd ..
+	mkdir $INSTALLDIR/tarball
+	mv engine/*.tar.bz2 $INSTALLDIR/tarball
+fi
+
+#
+# Build Loki setup .run
+#
+if [ $LINUX -eq 1 ]
+then
+	cd engine
+	make installer $MAKE
+	cd ..
+	mkdir $INSTALLDIR/run
+	mv engine/misc/setup/*.run $INSTALLDIR/run
+fi
 
 #
 # Build Win32 NSIS installer
@@ -366,18 +427,6 @@ fi
 if [ $LINUX -eq 1 ]
 then
 	./package-deb.sh --installdir $INSTALLDIR
-fi
-
-#
-# Build Loki setup .run
-#
-if [ $LINUX -eq 1 ]
-then
-	cd engine
-	make installer $MAKE
-	cd ..
-	mkdir $INSTALLDIR/run
-	mv engine/misc/setup/*.run $INSTALLDIR/run
 fi
 
 echo "Done!"
