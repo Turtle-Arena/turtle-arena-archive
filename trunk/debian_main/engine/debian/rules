@@ -28,6 +28,7 @@ build-stamp:
 			BUILD_GAME_SO=0 \
 			BUILD_GAME_QVM=0 \
 			USE_LOCAL_HEADERS=0 \
+			BUILD_FINAL=1 \
 			DEFAULT_BASEDIR=/usr/share/games/turtlearena \
 			ARCH=$(Q3ARCH) \
 			PLATFORM=$(Q3PLATFORM) \

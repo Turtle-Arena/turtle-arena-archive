@@ -11,6 +11,9 @@ STARTDIR=`pwd`
 # Directory to put the files for release
 INSTALLDIR=install
 
+# Directory containing base/assets0.pk3
+DATADIR=install
+
 # Vars for command line handling
 USAGE=0
 NEXT_ARG=""
@@ -25,7 +28,7 @@ do
 	# Single argument options
 	#
 
-	if [ "$ARG" = "--help" ] || [ "$ARG" = "-help" ] || [ "$ARG" = "-h" ]
+	if [ "$ARG" = "--help" ] || [ "$ARG" = "-h" ]
 	then
 		USAGE=1
 		break
@@ -35,15 +38,25 @@ do
 	# Arguments that have a token after it
 	#
 
-	if [ "$ARG" = "--installdir" ]
+	if [ "$ARG" = "--installdir" ] || [ "$ARG" = "-i" ]
 	then
-		NEXT_ARG="$ARG"
+		NEXT_ARG="--installdir"
+		continue
+	fi
+
+	if [ "$ARG" = "--datadir" ] || [ "$ARG" = "-d" ]
+	then
+		NEXT_ARG="--datadir"
 		continue
 	fi
 
 	case "$NEXT_ARG" in
 		--installdir)
 			INSTALLDIR="$ARG"
+			NEXT_ARG=""
+			;;
+		--datadir)
+			DATADIR="$ARG"
 			NEXT_ARG=""
 			;;
 		*)
@@ -65,10 +78,10 @@ then
 	echo "    and copies binary into installdir"
 	echo ""
 	echo "  OPTIONS"
-	echo "    --help         Show this help"
-	echo "           -help"
-	echo "           -h"
-	echo "    --installdir [dir]  directory where \"zip/base/assets0.pk3\" is located"
+	echo " -h --help         Show this help"
+	echo " -i --installdir [dir]  directory where to put installer"
+	echo "                          (default: \"install\")"
+	echo " -d --datadir [dir]  directory where \"base/assets0.pk3\" is located"
 	echo "                          (default: \"install\")"
 	exit 1
 fi
@@ -79,9 +92,9 @@ fi
 #
 
 # Build assets0.pk3 if not already built
-if [ ! -f $INSTALLDIR/zip/base/assets0.pk3 ]
+if [ ! -f $DATADIR/base/assets0.pk3 ]
 then
-	./package-assets.sh --installdir $INSTALLDIR/zip
+	./package-assets.sh --installdir $DATADIR
 
 	echo "Go run Turtle Arena and update the checksum for assets0.pk3 if"
 	echo "    needed, near the top of engine/code/qcommon/files.c!"
@@ -107,7 +120,7 @@ cd misc/nsis/
 make clean
 
 # Change filename so it is okay for sed... ZTM: FIXME: Do this in engine/misc/nsis/Makefile
-ASSETS0=`echo "../../../$INSTALLDIR/zip/base/assets0.pk3" | sed 's:[]\[\^\$\.\*\/]:\\\\&:g'`
+ASSETS0=`echo "../../../$DATADIR/base/assets0.pk3" | sed 's:[]\[\^\$\.\*\/]:\\\\&:g'`
 
 # Build installer
 make ASSETS=$ASSETS0

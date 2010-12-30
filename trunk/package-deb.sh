@@ -20,8 +20,15 @@ MAKE_ENGINE_DEB=1
 # Wiimote support for client
 MAKE_WIIMOTE_DEB=1
 
+# Remember where we started the script, so we can return there.
 STARTDIR=`pwd`
+
+# Directory to put the files for release
 INSTALLDIR=install
+
+# Directory containing base/assets0.pk3
+DATADIR=install
+
 DATA_DEB_CONFIG=debian_main/data/debian
 ENGINE_DEB_CONFIG=debian_main/engine/debian
 WIIMOTE_DEB_CONFIG=debian_main/wiimote/debian
@@ -110,6 +117,12 @@ do
 		continue
 	fi
 
+	if [ "$ARG" = "--datadir" ] || [ "$ARG" = "-d" ]
+	then
+		NEXT_ARG="--datadir"
+		continue
+	fi
+
 	if [ "$ARG" = "--ppa" ] || [ "$ARG" = "-p" ]
 	then
 		NEXT_ARG="--ppa"
@@ -124,6 +137,10 @@ do
 
 	case "$NEXT_ARG" in
 		--installdir)
+			INSTALLDIR="$ARG"
+			NEXT_ARG=""
+			;;
+		--datadir)
 			INSTALLDIR="$ARG"
 			NEXT_ARG=""
 			;;
@@ -158,6 +175,8 @@ then
 	echo "  OPTIONS"
 	echo " -h --help         Show this help"
 	echo " -i --installdir [dir]  directory to put files"
+	echo "                          (default: \"install\")"
+	echo "    --datadir [dir]  directory where \"base/assets0.pk3\" is located"
 	echo "                          (default: \"install\")"
 	echo "    --no-data           Do not create data deb"
 	echo "    --no-engine         Do not create engine debs"
@@ -237,9 +256,9 @@ then
 
 	# ZTM: FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
 	# Build assets0.pk3 if not already built
-	if [ ! -f $INSTALLDIR/zip/base/assets0.pk3 ]
+	if [ ! -f $DATADIR/base/assets0.pk3 ]
 	then
-		./package-assets.sh --installdir $INSTALLDIR/zip
+		./package-assets.sh --installdir $DATADIR
 
 		echo "Go run Turtle Arena and update the checksum for assets0.pk3 if"
 		echo "    needed, near the top of engine/code/qcommon/files.c"
@@ -247,7 +266,7 @@ then
 	fi
 
 	mkdir -p $DEBINSTALL/$ORIGDIR/base
-	cp $INSTALLDIR/zip/base/assets0.pk3 $DEBINSTALL/$ORIGDIR/base
+	cp $DATADIR/base/assets0.pk3 $DEBINSTALL/$ORIGDIR/base
 
 	cd $DEBINSTALL/$ORIGDIR
 
