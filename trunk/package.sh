@@ -16,7 +16,7 @@ LINUX=1
 WIN32=1
 
 # Extra args for make.
-MAKE=
+BUILD_FINAL=0
 
 # Found clean arg, delete package files.
 CLEAN=0
@@ -70,7 +70,7 @@ do
 
 	if [ "$ARG" = "--final" ] || [ "$ARG" = "-f" ]
 	then
-		MAKE="BUILD_FINAL=1"
+		BUILD_FINAL=1
 		continue
 	fi
 
@@ -168,21 +168,21 @@ cd engine
 
 if [ $LINUX -eq 1 ]
 then
-	make $MAKE ARCH=$ARCH BUILD_GAME_QVM=1
+	make BUILD_FINAL=$BUILD_FINAL ARCH=$ARCH BUILD_GAME_QVM=1
 
 	# If running x86_64, compile i386 too.
 	if [ $ARCH = "x86_64" ]
 	then
-		make $MAKE ARCH=i386
+		make BUILD_FINAL=$BUILD_FINAL ARCH=i386
 	fi
 else
 	# We need to at least build the QVMs!
-	make $MAKE BUILD_CLIENT=0 BUILD_CLIENT_SMP=0 BUILD_SERVER=0 BUILD_GAME_SO=0 BUILD_GAME_QVM=1
+	make BUILD_FINAL=$BUILD_FINAL BUILD_CLIENT=0 BUILD_CLIENT_SMP=0 BUILD_SERVER=0 BUILD_GAME_SO=0 BUILD_GAME_QVM=1
 fi
 
 if [ $WIN32 -eq 1 ]
 then
-	sh cross-make-mingw.sh $MAKE
+	sh cross-make-mingw.sh BUILD_FINAL=$BUILD_FINAL
 fi
 
 cd $STARTDIR
@@ -191,7 +191,7 @@ cd $STARTDIR
 # Create install directory
 #
 
-ZIPNAME=turtlearena-0.3
+ZIPNAME=turtlearena-0.4
 ZIPDIR=$INSTALLDIR/$ZIPNAME
 
 mkdir -p $ZIPDIR/base
@@ -354,7 +354,14 @@ fi
 
 echo "Copying files for zip..."
 
-mkdir $ZIPDIR/base
+if [ ! -d $ZIPDIR/base ]
+then
+	mkdir $ZIPDIR/base
+fi
+if [ -f $ZIPDIR/base/assets0.pk3 ]
+then
+	rm $ZIPDIR/base/assets0.pk3
+fi
 cp $INSTALLDIR/base/assets0.pk3 $ZIPDIR/base
 
 if [ $LINUX -eq 1 ]
@@ -395,7 +402,7 @@ fi
 if [ $LINUX -eq 1 ]
 then
 	cd engine
-	make dist $MAKE
+	make dist BUILD_FINAL=$BUILD_FINAL
 	cd ..
 	mkdir $INSTALLDIR/tarball
 	mv engine/*.tar.bz2 $INSTALLDIR/tarball
@@ -407,7 +414,7 @@ fi
 if [ $LINUX -eq 1 ]
 then
 	cd engine
-	make installer $MAKE
+	make installer BUILD_FINAL=$BUILD_FINAL
 	cd ..
 	mkdir $INSTALLDIR/run
 	mv engine/misc/setup/*.run $INSTALLDIR/run
