@@ -1,0 +1,71 @@
+/*
+===========================================================================
+Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+
+This file is part of Turtle Arena.
+
+Turtle Arena is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
+
+Turtle Arena is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Turtle Arena; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+===========================================================================
+*/
+
+// ZTM: Bot names can be characters or aliases (or bots.txt names?)
+// Beside the "asset" there is two images loaded based on it,
+//    "asset_metal" (metal version of asset) and "asset_name" (image of the name).
+teams {
+	// name of team, asset, bot1, bot2, bot3, bot4, bot5
+
+	{ "Sais"  "ui/assets/sais" "Leo" "Don" "Raph" "Mike" "Casey" }
+	{ "Katanas" "ui/assets/katanas" "Leo" "Don" "Raph" "Mike" "Casey" }
+	{ "Foot" "ui/assets/foot" "Leo" "Don" "Raph" "Mike" "Casey" }
+
+	// The "ideal" teams/characters?
+	// Blades: Leo, Karai, Miyamoto Usagi, Faraji Ngala, ?
+	// Tech: Don, April, Leatherhead, Adam McKay, Fugatiod?
+	// Hotheads: Raph, Casey, Traximus, Joi Reynard, ?
+	// Outcasts: Mikey, Nobody, Zog, Tora Yoshida, RatKing?
+	// ???: Splinter, Hamato Yoshi?, Mortu, Ancient One, ?
+	// Foot: Shredder, Foot, Foot Tech, Foot Mech, ?
+	// Dragons: Hun, Two Ton?, Dragon1, Dragon2, Dragon3
+
+// ZTM: ...yeah 36 characters WAY to many for me to plan on making.
+//             The way it is currently, it may be better to have teams of 4, instead of 5.
+//             I shouldn't be wasting time on this right now anyway...
+}
+
+// character name ( used for display and head derivation ), base model (male=James, female=Janet, else uses text)
+characters {
+	// Character for "Random" bot (Works in start server menu, but doesn't work ingame)
+	//{ "Random Bot"	"male" }
+
+	// name (display and head model), base model (torso/legs)
+	{ "leo"    "leo" }
+	{ "don"    "don" }
+	{ "raph"   "raph" }
+	{ "mike"   "mike" }
+	{ "casey"  "casey" }
+}
+
+// character name, bot alias (in bots.txt), and preferred action (a - all purpose, d - defense, o - offense)
+aliases {
+	// Alias for "Random" bot (Works in start server menu, but doesn't work ingame)
+	//{ "Random Bot"		"Random"		"a" }
+
+	{ "Leo"				"leo"			"a" }
+	{ "Don"				"don"			"a" }
+	{ "Raph"			"raph"			"o" }
+	{ "Mike"			"mike"			"d" }
+	{ "Casey"			"casey"			"o"	}
+}
+

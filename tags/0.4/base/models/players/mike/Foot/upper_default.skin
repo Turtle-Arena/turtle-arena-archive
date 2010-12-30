@@ -1,0 +1,11 @@
+u_carapace,models/players/raph/Foot/carapace.png
+u_torso,models/players/raph/Foot/carapace.png
+u_plastron,models/players/raph/Foot/plastron_red.png
+u_arm_right,models/players/mike/arm_red.png
+u_arm_left,models/players/mike/arm_red.png
+u_belt,models/players/raph/belt_red.png
+u_belt_buckle,models/players/raph/belt_red.png
+tag_flag,
+tag_weapon,
+tag_head,
+tag_torso,

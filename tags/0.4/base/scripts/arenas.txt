@@ -1,0 +1,75 @@
+// Single Player
+
+// Stage 1
+{
+map			"sp1a1"
+longname	"Stage 1: Area 1"
+type		"single"
+}
+
+{
+map			"sp1boss"
+longname	"Stage 1: Boss"
+type		"single"
+bots		"FugiTurtle"
+//allies		"leo don mike"
+}
+
+// Special Stage keywords
+// special		"Training" (First level, in a Tier by its self)
+// special		"Final" (Last level, in a Tier by its self)
+//{
+//map			"sp0a1"
+//longname	"Introduction"
+//type		"single"
+//}
+
+//{
+//map			"sp13a5"
+//longname	"Final Battle"
+//type		"single tourney"
+//}
+
+// Free For All (Some also support Dual and Team Deathmatch)
+{
+map			"dm1"
+longname	"Leaks"
+type		"ffa tourney team"
+}
+
+{
+map			"dm2"
+longname	"Space"
+type		"ffa tourney team"
+}
+
+// Team (Support all team gametypes)
+{
+map			"team1"
+longname	"Narrows"
+type		"ctf oneflag overload harvester"
+}
+
+//Subway level set
+//textures; tan wall, tiled floor, subway tracks
+//models; Subway car?
+//ceiling lights
+{
+map			"subway"
+longname	"Subway"
+type		"ctf oneflag overload harvester"
+}
+
+// Test maps
+{
+map			"test"
+longname	"Item Test map"
+type		"ffa tourney team ctf oneflag overload harvester"
+}
+
+{
+map			"test_city"
+longname	"City theme test map"
+type		"ffa tourney team ctf oneflag overload harvester"
+}
+
