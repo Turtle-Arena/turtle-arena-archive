@@ -206,12 +206,12 @@ void UI_DrawFontProportionalString( font_t *font, int x, int y, const char* str,
 
 	switch( style & UI_FORMATMASK ) {
 		case UI_CENTER:
-			width = Com_FontStringWidth(font, str, strlen(str));
+			width = Com_FontStringWidth(font, str, 0);
 			x -= width / 2;
 			break;
 
 		case UI_RIGHT:
-			width = Com_FontStringWidth(font, str, strlen(str));
+			width = Com_FontStringWidth(font, str, 0);
 			x -= width;
 			break;
 
@@ -399,6 +399,10 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 	float		useScale;
 	float		max;
 
+	if (!font || !string || !*string) {
+		return;
+	}
+
 	if (maxX) {
 		max = *maxX;
 	} else {
@@ -495,7 +499,7 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 
         CG_DrawFontChar( font, useScale, xx, y, *s, adjustFrom640 );
         xx += (Com_FontCharWidth( font, *s ) + adjust) * useScale;
-        if (*maxX) {
+        if (maxX) {
 			*maxX = xx;
         }
         cnt++;
