@@ -409,7 +409,6 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 
 	while ((spot = G_Find (spot, FOFS(classname), "info_player_start")) != NULL) {
 		spotlast = spot;
-#ifdef TA_SP
 		// Save spot 0 as it will be the default there isn't one for this client.
 		if (spot->count == 0) {
 			spot0 = spot;
@@ -417,17 +416,15 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 		if ( spot->count == clientnum ) {
 			break;
 		}
-#endif
 	}
 	if (!spot && spot0) {
 		spot = spot0;
 	}
-	if (!spot && spotlast) {
+	else if (!spot && spotlast) {
 		spot = spotlast;
 	}
-
 	// There are no info_player_start, use a deathmatch start.
-	if (!spot)
+	else if (!spot)
 	{
 		G_Printf("Warning: Map missing info_player_start atemping to use deathmacth spawn.\n");
 
@@ -445,17 +442,26 @@ gentity_t *SelectSinglePlayerSpawnPoint(
 		}
 	}
 
+	if (spot) {
+		VectorCopy (spot->s.origin, origin);
+		origin[2] += 9;
+		VectorCopy (spot->s.angles, angles);
+
+		return spot;
+	}
+
+	// Fall back to deathmatch starts in co-op,
+	// other gametypes have already tried deathmatch at this point.
 #ifdef TA_PLAYERSYS
-	if ( !spot || SpotWouldTelefrag( spot, ent ) )
-		return SelectSpawnPoint( ent, origin, angles, isbot );
+	if ( !spot && g_gametype.integer == GT_SINGLE_PLAYER )
+		spot = SelectSpawnPoint( ent, origin, angles, isbot );
 #else
-	if ( !spot || SpotWouldTelefrag( spot ) )
-		return SelectSpawnPoint( vec3_origin, origin, angles, isbot );
+	if ( !spot && g_gametype.integer == GT_SINGLE_PLAYER )
+		spot = SelectSpawnPoint( vec3_origin, origin, angles, isbot );
 #endif
 
-	VectorCopy (spot->s.origin, origin);
-	origin[2] += 9;
-	VectorCopy (spot->s.angles, angles);
+	if (!spot)
+		G_Error("SelectSinglePlayerSpawnPoint: Failed to find player start\n");
 
 	return spot;
 }
