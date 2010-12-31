@@ -201,7 +201,7 @@ then
 		versionAndSeries=`head -n 1 ${DATA_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
 		# Upload data source to PPA
-		dput ${PPA_NAME} ${GAMENAME}-data_${versionAndSeries}_source.changes
+		dput ${PPA_NAME} $DEBINSTALL/${GAMENAME}-data_${versionAndSeries}_source.changes
 	fi
 
 	if [ $MAKE_ENGINE_DEB -eq 1 ]
@@ -210,7 +210,7 @@ then
 		versionAndSeries=`head -n 1 ${ENGINE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
 		# Upload engine source to PPA
-		dput ${PPA_NAME} ${GAMENAME}_${versionAndSeries}_source.changes
+		dput ${PPA_NAME} $DEBINSTALL/${GAMENAME}_${versionAndSeries}_source.changes
 	fi
 
 	if [ $MAKE_WIIMOTE_DEB -eq 1 ]
@@ -218,8 +218,8 @@ then
 		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
 		versionAndSeries=`head -n 1 ${WIIMOTE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
-		# Upload engine source to PPA
-		dput ${PPA_NAME} ${GAMENAME}-wiimote_${versionAndSeries}_source.changes
+		# Upload wiimote source to PPA
+		dput ${PPA_NAME} $DEBINSTALL/${GAMENAME}-wiimote_${versionAndSeries}_source.changes
 	fi
 
 	exit 0
