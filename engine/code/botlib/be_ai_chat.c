@@ -2200,6 +2200,9 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname)
 		} //end if
 	} //end for
 	//
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (botDeveloper)
+#endif
 	botimport.Print(PRT_MESSAGE, "loaded %s from %s\n", chatname, chatfile);
 	//
 	//BotDumpInitialChat(chat);

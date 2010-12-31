@@ -402,6 +402,9 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload)
 		cachedhandle = BotFindCachedCharacter(charfile, skill);
 		if (cachedhandle)
 		{
+#ifdef IOQ3ZTM // LESS_VERBOSE
+			if (botDeveloper)
+#endif
 			botimport.Print(PRT_MESSAGE, "loaded cached skill %f from %s\n", skill, charfile);
 			return cachedhandle;
 		} //end if
@@ -414,6 +417,9 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload)
 	{
 		botcharacters[handle] = ch;
 		//
+#ifdef IOQ3ZTM // LESS_VERBOSE
+		if (botDeveloper)
+#endif
 		botimport.Print(PRT_MESSAGE, "loaded skill %d from %s\n", intskill, charfile);
 #ifdef DEBUG
 		if (botDeveloper)
@@ -460,6 +466,9 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload)
 	if (ch)
 	{
 		botcharacters[handle] = ch;
+#ifdef IOQ3ZTM // LESS_VERBOSE
+		if (botDeveloper)
+#endif
 		botimport.Print(PRT_MESSAGE, "loaded skill %f from %s\n", ch->skill, charfile);
 		return handle;
 	} //end if
@@ -581,6 +590,9 @@ int BotLoadCharacter(char *charfile, float skill)
 	handle = BotFindCachedCharacter(charfile, skill);
 	if (handle)
 	{
+#ifdef IOQ3ZTM // LESS_VERBOSE
+		if (botDeveloper)
+#endif
 		botimport.Print(PRT_MESSAGE, "loaded cached skill %f from %s\n", skill, charfile);
 		return handle;
 	} //end if
