@@ -1485,13 +1485,16 @@ float Com_FontStringWidthExt( font_t *font, const char *s, int limit, qboolean s
 	int		ch;
     int		i;
 
-	width = 0;
+	if (!font || !s || !*s) {
+		return 0;
+	}
 
 	len = strlen(s);
 	if (limit > 0 && len > limit) {
 		len = limit;
 	}
 
+	width = 0;
     for (i = 0; i < len; i++) {
 		if ( skipColors && Q_IsColorString(&s[i]) ) {
 			i++;
