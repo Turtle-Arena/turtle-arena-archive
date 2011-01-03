@@ -1407,6 +1407,9 @@ static void ServerOptions_InitBotNames( void ) {
 
 	count = 1;	// skip the first slot, reserved for a human
 
+#ifdef TA_SP
+	if (s_serveroptions.gametype != GT_SINGLE_PLAYER) {
+#endif
 	// get info for this map
 	arenaInfo = UI_GetArenaInfoByMap( s_serveroptions.mapnamebuffer );
 
@@ -1444,6 +1447,19 @@ static void ServerOptions_InitBotNames( void ) {
 		count++;
 	}
 
+#ifdef IOQ3ZTM // RANDOMBOT
+	// If no bots, open 3 Random bots.
+	if (count == 1) {
+		for( ;count < 4; count++ ) {
+			s_serveroptions.playerType[count].curvalue = 1;
+			strcpy( s_serveroptions.playerNameBuffers[count], "Random" );
+		}
+	}
+#endif
+#ifdef TA_SP
+	}
+#endif
+
 	// set the rest of the bot slots to "---"
 	for( n = count; n < PLAYER_SLOTS; n++ ) {
 #ifdef IOQ3ZTM // RANDOMBOT
@@ -1452,16 +1468,6 @@ static void ServerOptions_InitBotNames( void ) {
 		strcpy( s_serveroptions.playerNameBuffers[n], "--------" );
 #endif
 	}
-
-#ifdef IOQ3ZTM // RANDOMBOT
-	// If no bots, open 3 Random bots.
-	if (count == 1)
-	{
-		for( ;count < 4; count++ ) {
-			s_serveroptions.playerType[count].curvalue = 1;
-		}
-	}
-#endif
 
 	// pad up to #8 as open slots
 	for( ;count < 8; count++ ) {
