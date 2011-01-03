@@ -2998,7 +2998,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 	// circularly clamp the angles with deltas
 	for (i=0 ; i<3 ; i++) {
 #ifdef TA_PATHSYS // 2DMODE
-		if ((pm->ps->eFlags & EF_PATHMODE) && i == YAW)
+		if ((ps->eFlags & EF_PATHMODE) && i == YAW)
 			continue;
 #endif
 		temp = cmd->angles[i] + ps->delta_angles[i];
