@@ -1223,6 +1223,10 @@ void CG_DrawScoreChain(void)
 	CG_HudPlacement(HUD_CENTER);
 
 	fadeColor = CG_FadeColor( cg.scorePickupTime, 2000 );
+	if (!fadeColor) {
+		return;
+	}
+
 	frac = fadeColor[3];
 
 	CG_ColorForChain(cg.snap->ps.chain, color);
