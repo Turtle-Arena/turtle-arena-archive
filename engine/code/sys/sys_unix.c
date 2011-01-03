@@ -508,7 +508,11 @@ void Sys_ErrorDialog( const char *error )
 	unsigned int size;
 	int f = -1;
 	const char *homepath = Cvar_VariableString( "fs_homepath" );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use correct variable name
+	const char *gamedir = Cvar_VariableString( "fs_game" );
+#else
 	const char *gamedir = Cvar_VariableString( "fs_gamedir" );
+#endif
 	const char *fileName = "crashlog.txt";
 	char *ospath = FS_BuildOSPath( homepath, gamedir, fileName );
 
