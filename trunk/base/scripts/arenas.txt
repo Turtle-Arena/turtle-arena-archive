@@ -70,6 +70,6 @@ type		"ffa tourney team ctf oneflag overload harvester"
 {
 map			"test_city"
 longname	"City theme test map"
-type		"ffa tourney team ctf oneflag overload harvester"
+type		"ffa tourney team"
 }
 
