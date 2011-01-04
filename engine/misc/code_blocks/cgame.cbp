@@ -123,9 +123,6 @@
 			<Add library="odbccp32" />
 			<Add library="SDL" />
 		</Linker>
-		<Unit filename="../../code/cgame/cg_atmospheric.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../code/cgame/cg_consolecmds.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -169,9 +166,6 @@
 		<Unit filename="../../code/cgame/cg_playerstate.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/cgame/cg_polybus.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../code/cgame/cg_predict.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -183,9 +177,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/cgame/cg_snapshot.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../code/cgame/cg_spawn.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/cgame/cg_syscalls.c">
@@ -209,9 +200,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/game/bg_slidemove.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../code/game/bg_tracemap.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/qcommon/q_math.c">
