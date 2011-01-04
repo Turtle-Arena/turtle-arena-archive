@@ -579,7 +579,7 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags );
 //
 int		G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
-#ifdef IOQ3TM // Particles
+#ifdef IOQ3ZTM // Particles
 int		G_ParticleAreaIndex( char *str );
 #endif
 #ifdef TA_ENTSYS // MISC_OBJECT
