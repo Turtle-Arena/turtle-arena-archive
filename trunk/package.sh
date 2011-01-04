@@ -382,9 +382,6 @@ todos $ZIPDIR/*.txt
 mkdir $ZIPDIR/settings
 echo "yes" > $ZIPDIR/settings/portable
 
-# Copy all of the files other than base/ into turtlearena-src/ and zip it.
-echo "Warning: You need to manually copy the source into $ZIPDIR !"
-
 # Create zip
 if [ $ZIPERROR -eq 0 ]
 then
