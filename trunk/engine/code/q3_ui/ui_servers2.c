@@ -493,6 +493,9 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.sortkey.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.showempty.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.showfull.generic.flags	&= ~QMF_GRAYED;
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+			g_arenaservers.showbots.generic.flags	&= ~QMF_GRAYED;
+#endif
 			g_arenaservers.list.generic.flags		&= ~QMF_GRAYED;
 			g_arenaservers.refresh.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.go.generic.flags			&= ~QMF_GRAYED;
@@ -522,6 +525,9 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.sortkey.generic.flags	|= QMF_GRAYED;
 			g_arenaservers.showempty.generic.flags	|= QMF_GRAYED;
 			g_arenaservers.showfull.generic.flags	|= QMF_GRAYED;
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+			g_arenaservers.showbots.generic.flags	|= QMF_GRAYED;
+#endif
 			g_arenaservers.list.generic.flags		|= QMF_GRAYED;
 			g_arenaservers.refresh.generic.flags	|= QMF_GRAYED;
 			g_arenaservers.go.generic.flags			|= QMF_GRAYED;
@@ -551,6 +557,9 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.sortkey.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.showempty.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.showfull.generic.flags	&= ~QMF_GRAYED;
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+			g_arenaservers.showbots.generic.flags	&= ~QMF_GRAYED;
+#endif
 			g_arenaservers.list.generic.flags		|= QMF_GRAYED;
 			g_arenaservers.refresh.generic.flags	&= ~QMF_GRAYED;
 			g_arenaservers.go.generic.flags			|= QMF_GRAYED;
