@@ -262,6 +262,7 @@ else # END QUAKE3
 	# TA_PATHSYS			General path system using entities like path_corner
 	# TA_ENTSYS				Adds new entities and allows all ET_MOVER entities to be breakable.
 	# TA_NPCSYS   			WIP NPC system, based on TDC_NPC system and code in Quake3
+	# TA_ATMEFFECTS			TODO Atmospheric fffects.
 	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
 	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
 	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
@@ -294,7 +295,7 @@ else # END QUAKE3
 
 	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
 						-DTA_WEAPSYS_EX -DTA_PLAYERS -DTA_DATA \
-						-DNIGHTSMODE -DTA_CAMERA -DWOLFET -DMISSIONPACK_HUD2
+						-DNIGHTSMODE -DTA_CAMERA -DMISSIONPACK_HUD2
 
 	# Currently Turtle Arena doesn't use camera scripts.
 	#BUILD_SPLINES=1 # Adds -DCAMERASCRIPT
@@ -2234,8 +2235,6 @@ Q3CGOBJ_ = \
   $(B)/$(BASEGAME)/cgame/bg_pmove.o \
   $(B)/$(BASEGAME)/cgame/bg_slidemove.o \
   $(B)/$(BASEGAME)/cgame/bg_lib.o \
-  $(B)/$(BASEGAME)/cgame/bg_tracemap.o \
-  $(B)/$(BASEGAME)/cgame/cg_atmospheric.o \
   $(B)/$(BASEGAME)/cgame/cg_consolecmds.o \
   $(B)/$(BASEGAME)/cgame/cg_newdraw.o \
   $(B)/$(BASEGAME)/cgame/cg_draw.o \
@@ -2249,12 +2248,10 @@ Q3CGOBJ_ = \
   $(B)/$(BASEGAME)/cgame/cg_particles.o \
   $(B)/$(BASEGAME)/cgame/cg_players.o \
   $(B)/$(BASEGAME)/cgame/cg_playerstate.o \
-  $(B)/$(BASEGAME)/cgame/cg_polybus.o \
   $(B)/$(BASEGAME)/cgame/cg_predict.o \
   $(B)/$(BASEGAME)/cgame/cg_scoreboard.o \
   $(B)/$(BASEGAME)/cgame/cg_servercmds.o \
   $(B)/$(BASEGAME)/cgame/cg_snapshot.o \
-  $(B)/$(BASEGAME)/cgame/cg_spawn.o \
   $(B)/$(BASEGAME)/cgame/cg_view.o \
   $(B)/$(BASEGAME)/cgame/cg_weapons.o \
   \
@@ -2282,8 +2279,6 @@ MPCGOBJ_ = \
   $(B)/missionpack/cgame/bg_pmove.o \
   $(B)/missionpack/cgame/bg_slidemove.o \
   $(B)/missionpack/cgame/bg_lib.o \
-  $(B)/missionpack/cgame/bg_tracemap.o \
-  $(B)/missionpack/cgame/cg_atmospheric.o \
   $(B)/missionpack/cgame/cg_consolecmds.o \
   $(B)/missionpack/cgame/cg_newdraw.o \
   $(B)/missionpack/cgame/cg_draw.o \
@@ -2297,12 +2292,10 @@ MPCGOBJ_ = \
   $(B)/missionpack/cgame/cg_particles.o \
   $(B)/missionpack/cgame/cg_players.o \
   $(B)/missionpack/cgame/cg_playerstate.o \
-  $(B)/missionpack/cgame/cg_polybus.o \
   $(B)/missionpack/cgame/cg_predict.o \
   $(B)/missionpack/cgame/cg_scoreboard.o \
   $(B)/missionpack/cgame/cg_servercmds.o \
   $(B)/missionpack/cgame/cg_snapshot.o \
-  $(B)/missionpack/cgame/cg_spawn.o \
   $(B)/missionpack/cgame/cg_view.o \
   $(B)/missionpack/cgame/cg_weapons.o \
   $(B)/missionpack/ui/ui_shared.o \
@@ -2340,7 +2333,6 @@ Q3GOBJ_ = \
   $(B)/$(BASEGAME)/game/bg_pmove.o \
   $(B)/$(BASEGAME)/game/bg_slidemove.o \
   $(B)/$(BASEGAME)/game/bg_lib.o \
-  $(B)/$(BASEGAME)/game/bg_tracemap.o \
   $(B)/$(BASEGAME)/game/g_active.o \
   $(B)/$(BASEGAME)/game/g_arenas.o \
   $(B)/$(BASEGAME)/game/g_bot.o \
@@ -2397,7 +2389,6 @@ MPGOBJ_ = \
   $(B)/missionpack/game/bg_pmove.o \
   $(B)/missionpack/game/bg_slidemove.o \
   $(B)/missionpack/game/bg_lib.o \
-  $(B)/missionpack/game/bg_tracemap.o \
   $(B)/missionpack/game/g_active.o \
   $(B)/missionpack/game/g_arenas.o \
   $(B)/missionpack/game/g_bot.o \

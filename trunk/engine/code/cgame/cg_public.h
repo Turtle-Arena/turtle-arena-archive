@@ -183,10 +183,6 @@ typedef enum {
 	CG_FS_GETFILELIST,
 //#endif
 
-//#ifdef WOLFET
-	CG_R_ADDPOLYBUFFERTOSCENE,
-//#endif
-
 	CG_MEMSET = 100,
 	CG_MEMCPY,
 	CG_STRNCPY,

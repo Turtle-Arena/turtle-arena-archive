@@ -2,9 +2,6 @@
 // entity 0
 {
 "classname" "worldspawn"
-"mapcoordsmins" "-1600 1600"
-"mapcoordsmaxs" "1600 -1600"
-"atmosphere" "T=SNOW,B=5 10,C=0.5,G=0.3 2,BV=20 30,GV=25 40,W=3 5,D=2000"
 "music" "music/snow"
 // brush 0
 {

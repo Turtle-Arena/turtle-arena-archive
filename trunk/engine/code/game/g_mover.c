@@ -975,69 +975,14 @@ void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 #endif
 
 #ifdef TA_ENTSYS // PUSHABLE
-#ifdef WOLFET
-// From Wolf-ET's game/g_props.c: GPLv3 or later
-void moveit( gentity_t *ent, float yaw, float dist ) {
-	vec3_t move;
-	vec3_t origin;
-	trace_t tr;
-	vec3_t mins, maxs;
-	vec3_t currentOrigin;
-
-	if (ent->client) {
-		VectorCopy(ent->client->ps.origin, currentOrigin);
-	} else {
-		VectorCopy(ent->r.currentOrigin, currentOrigin);
-	}
-
-	yaw = yaw * M_PI * 2 / 360;
-
-	move[0] = cos( yaw ) * dist;
-	move[1] = sin( yaw ) * dist;
-	move[2] = 0;
-
-	VectorAdd( currentOrigin, move, origin );
-
-	mins[0] = ent->r.mins[0];
-	mins[1] = ent->r.mins[1];
-	mins[2] = ent->r.mins[2] + .01;
-
-	maxs[0] = ent->r.maxs[0];
-	maxs[1] = ent->r.maxs[1];
-	maxs[2] = ent->r.maxs[2] - .01;
-
-	trap_Trace( &tr, currentOrigin, mins, maxs, origin, ent->s.number, MASK_SHOT );
-
-	if ( ( tr.endpos[0] != origin[0] ) || ( tr.endpos[1] != origin[1] ) ) {
-		mins[0] = ent->r.mins[0] - 2.0;
-		mins[1] = ent->r.mins[1] - 2.0;
-		maxs[0] = ent->r.maxs[0] + 2.0;
-		maxs[1] = ent->r.maxs[1] + 2.0;
-
-		trap_Trace( &tr, currentOrigin, mins, maxs, origin, ent->s.number, MASK_SHOT );
-	}
-
-	VectorCopy( tr.endpos, ent->r.currentOrigin );
-	if (ent->client) {
-		VectorCopy( currentOrigin, ent->client->ps.origin );
-	}
-
-	VectorCopy( currentOrigin, ent->s.pos.trBase );
-
-	trap_LinkEntity( ent );
-
-	//DropToFloor( ent );
-}
-#endif
-
 // other is the pusher, should be a player
 // ZTM: TODO: Look at G_MoverPush
 qboolean G_PlayerPushEntity(gentity_t *self, gentity_t *other) {
 
 	if ( /*self->s.eType != ET_ITEM && self->s.eType != ET_PLAYER && */
-#ifdef TA_ENTSYS // PUSHABLE
+//#ifdef TA_ENTSYS // PUSHABLE
 		!(self->flags & FL_PUSHABLE) &&
-#endif
+//#endif
 #ifdef TA_NPCSYS
 		self->s.eType != ET_NPC &&
 #endif
@@ -1054,19 +999,8 @@ qboolean G_PlayerPushEntity(gentity_t *self, gentity_t *other) {
 		// ZTM: TODO: Support pushing brushes
 		return qfalse;
 	} else {
-#ifdef WOLFET
-		float ratio;
-		vec3_t v;
-
-		if ( other->r.currentOrigin[2] + other->r.mins[2] > ( self->r.currentOrigin[2] + self->r.mins[2] + self->r.maxs[2]*0.4f ) ) {
-			return qfalse;
-		}
-
-		ratio = 2.5;
-		VectorSubtract( self->r.currentOrigin, other->r.currentOrigin, v );
-		moveit( self, vectoyaw( v ), ( 20 * ratio * FRAMETIME ) * .001);
-		return qtrue;
-#endif
+		// ZTM: TODO: Push entity if not standing on it.
+		return qfalse;
 	}
 }
 #endif
