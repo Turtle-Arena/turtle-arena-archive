@@ -164,7 +164,7 @@ static void UI_CreditMenu_Draw( void ) {
 
 	y += (PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
 
-	UI_DrawProportionalString( 320, y, "Data / Art", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "Data", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "OpenArena", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
@@ -174,9 +174,9 @@ static void UI_CreditMenu_Draw( void ) {
 
 	UI_DrawProportionalString( 320, y, "Music", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "The Mulletz (Neil Crowe)", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "The Mulletz - ccmixter.org/people/NeilCrowe/", UI_CENTER|UI_SMALLFONT, color_white );
 	y += PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "http://ccmixter.org/people/NeilCrowe/", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "zero-project - zero-project.gr", UI_CENTER|UI_SMALLFONT, color_white );
 
 	y += (PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
 
