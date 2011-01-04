@@ -244,7 +244,7 @@ vmCvar_t	cg_drawMeleeWeaponTrails;
 #ifdef IOQ3ZTM // LASERTAG
 vmCvar_t	cg_laserTag;
 #endif
-#ifdef WOLFET
+#ifdef TA_ATMEFFECTSYS
 vmCvar_t	cg_atmosphericEffects;
 #endif
 
@@ -451,7 +451,7 @@ static cvarTable_t cvarTable[] = {
 #ifdef IOQ3ZTM // LASERTAG
 	,{ &cg_laserTag, "g_laserTag", "0", CVAR_SERVERINFO }
 #endif
-#ifdef WOLFET
+#ifdef TA_ATMEFFECTSYS
 	,{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE }
 #endif
 };
@@ -1072,12 +1072,6 @@ static void CG_RegisterGraphics( void ) {
 	CG_LoadingString( cgs.mapname );
 
 	trap_R_LoadWorldMap( cgs.mapname );
-
-#ifdef WOLFET
-	CG_LoadingString( "entities" );
-
-	CG_ParseEntitiesFromString();
-#endif
 
 	// precache status bar pics
 	CG_LoadingString( "game media" );

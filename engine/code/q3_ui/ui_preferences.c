@@ -51,7 +51,7 @@ GAME OPTIONS MENU
 #define ID_DRAWTEAMOVERLAY		136
 #define ID_ALLOWDOWNLOAD			137
 #define ID_BACK					138
-#ifdef WOLFET
+#ifdef TA_ATMEFFECTSYS
 #define ID_ATMEFFECTS			139
 #endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING
@@ -88,7 +88,7 @@ typedef struct {
 	menuradiobutton_s	forcemodel;
 	menulist_s			drawteamoverlay;
 	menuradiobutton_s	allowdownload;
-#ifdef WOLFET
+#ifdef TA_ATMEFFECTSYS
 	menulist_s			atmeffects;
 #endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING
@@ -115,7 +115,7 @@ static const char *teamoverlay_names[] =
 	NULL
 };
 
-#ifdef WOLFET
+#ifdef TA_ATMEFFECTSYS
 static const char *atmeffects_names[] =
 {
 	"off",
@@ -141,7 +141,7 @@ static void Preferences_SetMenuItems( void ) {
 #endif
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
-#ifdef WOLFET
+#ifdef TA_ATMEFFECTSYS
 	s_preferences.atmeffects.curvalue		= 2*trap_Cvar_VariableValue( "cg_atmosphericEffects" );
 	if (s_preferences.atmeffects.curvalue < 0)
 		s_preferences.atmeffects.curvalue = 0;
@@ -223,7 +223,7 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "sv_allowDownload", s_preferences.allowdownload.curvalue );
 		break;
 
-#ifdef WOLFET
+#ifdef TA_ATMEFFECTSYS
 	case ID_ATMEFFECTS:
 		trap_Cvar_SetValue( "cg_atmosphericEffects", (float)s_preferences.atmeffects.curvalue/2.0f );
 		break;
@@ -447,7 +447,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.allowdownload.generic.x	       = PREFERENCES_X_POS;
 	s_preferences.allowdownload.generic.y	       = y;
 
-#ifdef WOLFET
+#ifdef TA_ATMEFFECTSYS
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.atmeffects.generic.type		= MTYPE_SPINCONTROL;
 	s_preferences.atmeffects.generic.name		= "Snow/Rain:";
@@ -509,7 +509,7 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.forcemodel );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
-#ifdef WOLFET
+#ifdef TA_ATMEFFECTSYS
 	Menu_AddItem( &s_preferences.menu, &s_preferences.atmeffects );
 #endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING

@@ -73,27 +73,6 @@ typedef struct poly_s {
 	polyVert_t			*verts;
 } poly_t;
 
-#ifdef WOLFET
-// =========================================
-// Gordon, these MUST NOT exceed the values for SHADER_MAX_VERTEXES/SHADER_MAX_INDEXES
-// ZTM: NOTE: WolfET's SHADER_MAX_VERTEXES is 1025, quake3's is only 1000.
-#define MAX_PB_VERTS    1000 // SHADER_MAX_VERTEXES
-#define MAX_PB_INDICIES ( MAX_PB_VERTS * 6 )
-
-typedef struct polyBuffer_s {
-	vec4_t xyz[MAX_PB_VERTS];
-	vec2_t st[MAX_PB_VERTS];
-	byte color[MAX_PB_VERTS][4];
-	int numVerts;
-
-	int indicies[MAX_PB_INDICIES];
-	int numIndicies;
-
-	qhandle_t shader;
-} polyBuffer_t;
-// =========================================
-#endif
-
 typedef enum {
 	RT_MODEL,
 	RT_POLY,
