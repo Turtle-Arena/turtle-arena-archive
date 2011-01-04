@@ -123,13 +123,13 @@ static void UI_CreditMenu_Draw_Legal( void ) {
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "no way affiliated with", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Viacom, Mirage Studios, 4KidsTV, or Ubisoft.", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "Viacom, Ubisoft, or Mirage Studios.", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Copyright
 	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
-	UI_DrawProportionalString( 320, y, "TMNT(c) 2010 Viacom", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "TMNT(c) Viacom", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Turtle Arena(c) 2009-2010 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "Turtle Arena(c) 2009-2011 ZTurtleMan", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Website
 	UI_DrawString( 320, 459, "http://turtlearena.googlecode.com/", UI_CENTER|UI_SMALLFONT, color_red );
@@ -245,11 +245,13 @@ Exit game credits
 ===============
 */
 void UI_CreditMenu( void ) {
+#ifndef IOQ3ZTM // I fixed widescreen background, hack no longer needed.
 	/* This UI_FillRect() hack will blank the borders if you're in widescreen,
 	   so you get a completely black background instead of stripes from the
 	   previous frame on each side of the credits.. */
 	const float black[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	UI_FillRect(0 - uis.bias, 0, (640.0f / uis.xscale) * 2.0f, 480.0f / uis.yscale, black);
+#endif
 
 	memset( &s_credits, 0 ,sizeof(s_credits) );
 

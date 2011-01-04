@@ -5,7 +5,7 @@ Most of the data is license under the GNU General Public License;
 The music the license under the Creative Commons, most is Non Commercial.
 
 == ZTM ==
-All data, unless otherwise noted, is Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+All data, unless otherwise noted, is Copyright (C) 2009-2011 Zack "ZTurtleMan" Middleton
 	and are license under the GNU General Public License; either version 2 of the License, or
 	(at your option) any later version.
 
