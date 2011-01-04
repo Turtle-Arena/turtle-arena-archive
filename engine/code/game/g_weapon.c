@@ -529,6 +529,11 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		s_quadFactor *= 2;
 	}
 #endif
+#ifdef TA_PLAYERSYS
+	if (ent->client->pers.playercfg.ability == ABILITY_STRENGTH) {
+		s_quadFactor *= 1.3f;
+	}
+#endif
 
 	for (i = 0; i < MAX_WEAPON_BLADES; i++)
 	{

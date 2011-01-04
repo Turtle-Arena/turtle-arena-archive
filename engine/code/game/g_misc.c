@@ -872,6 +872,8 @@ void SP_misc_object( gentity_t *ent ) {
 	qboolean entKnockback;
 	int pushable;
 	qboolean entPushable;
+	int heavy;
+	qboolean entHeavy;
 #ifdef IOQ3ZTM // RENDERFLAGS
 	int mirrorType;
 #endif
@@ -881,6 +883,7 @@ void SP_misc_object( gentity_t *ent ) {
 	entSpeed = G_SpawnFloat( "speed", "0", &ent->speed);
 	entKnockback = G_SpawnInt( "knockback", "0", &knockback);
 	entPushable = G_SpawnInt( "pushable", "0", &pushable);
+	entHeavy = G_SpawnInt( "heavy", "0", &heavy);
 #ifdef IOQ3ZTM // RENDERFLAGS
 	G_SpawnInt("mirrorType", "0", &mirrorType );
 
@@ -938,6 +941,10 @@ void SP_misc_object( gentity_t *ent ) {
 			// Use pushable from cfg.
 			pushable = ent->objectcfg->pushable;
 		}
+		if (!entHeavy) {
+			// Use heavy from cfg.
+			heavy = ent->objectcfg->heavy;
+		}
 
 		if (ent->speed < 1.0f) {
 			ent->speed = 1.0f;
@@ -955,6 +962,9 @@ void SP_misc_object( gentity_t *ent ) {
 	}
 	if (pushable) {
 		ent->flags |= FL_PUSHABLE;
+	}
+	if (heavy) {
+		ent->flags |= FL_HEAVY;
 	}
 
 	// Save settings for respawning

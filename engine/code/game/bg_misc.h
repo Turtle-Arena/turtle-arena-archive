@@ -1418,7 +1418,7 @@ typedef enum {
 typedef enum {
 	ABILITY_NONE,
 	ABILITY_TECH,
-//	ABILITY_STRENGTH,
+	ABILITY_STRENGTH,
 	ABILITY_MAX
 } ablitiy_t;
 
@@ -1507,6 +1507,7 @@ typedef struct
 	float speed;
 	qboolean knockback;
 	qboolean pushable;
+	qboolean heavy;
 
 	// config only
 	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];

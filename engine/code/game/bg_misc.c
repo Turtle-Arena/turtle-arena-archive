@@ -6207,6 +6207,8 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 				playercfg->ability = ABILITY_NONE;
 			} else if ( !Q_stricmp( token, "tech" ) ) {
 				playercfg->ability = ABILITY_TECH;
+			} else if ( !Q_stricmp( token, "strength" ) ) {
+				playercfg->ability = ABILITY_STRENGTH;
 			} else {
 				Com_Printf( "Bad ability parm in %s: %s\n", filename, token );
 			}
@@ -6641,6 +6643,7 @@ bg_objectcfg_t *BG_NewObjectCfg(void) {
 	objectcfg->speed = 1.0f;
 	objectcfg->knockback = qfalse;
 	objectcfg->pushable = qfalse;
+	objectcfg->heavy = qfalse;
 
 	objectcfg->unsolidOnDeath = qtrue;
 	objectcfg->invisibleUnsolidDeath = qfalse;
@@ -6951,6 +6954,14 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 				break;
 			}
 			objectcfg->pushable = atoi(token);
+			continue;
+		}
+		else if ( !Q_stricmp( token, "heavy" ) ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			objectcfg->heavy = atoi(token);
 			continue;
 		}
 		else if ( !Q_stricmp( token, "unsolidOnDeath" ) ) {
