@@ -243,7 +243,7 @@ PROTOCOL
 */
 
 #ifdef TA_MAIN
-#define	PROTOCOL_VERSION	4
+#define	PROTOCOL_VERSION	5
 #else
 #define	PROTOCOL_VERSION	68
 // 1.31 - 67

@@ -1,5 +1,5 @@
 ifndef VERSION
-VERSION=0.4
+VERSION=0.4.1
 endif
 ifndef RELEASE
 RELEASE=0
