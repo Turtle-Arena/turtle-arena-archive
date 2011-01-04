@@ -1,0 +1,46 @@
+Character abilities ideas
+
+== Player Ideas ==
+Leo: ???
+Don / Tech: Operate computers to open doors and stuff
+Raph / Strength: Break rocks, lift/push heavy objects
+Mike / ???: Jump higher to access other areas?
+
+== Weapon Ideals ==
+Katanas / (all swords and axes): Cut objects no one else can
+Bo (Longer ranged, and usable to jump higher)
+Sais (Climb and/or stick to walls)
+Nunchucks: (???)
+
+== Leo ==
+Player Ability: ???
+Weapon: Katanas
+Stats
+	Speed: Normal (320)
+	Accel: Normal (10)
+SRB2-ish: ???
+
+== Don ==
+Player Ability: Tech
+Weapon Ability: Bo (Longer ranged, and usable to jump higher)
+Stats
+	Speed: Slow (300)
+	Accel: Fast (12)
+SRB2-ish: Tails
+
+== Raph ==
+Player Ability: Strength
+Weapon Ability: Sais (Climb and/or stick to walls)
+Stats
+	Speed: Normal (320)
+	Accel: Normal (10)
+SRB2-ish: Knuckles
+
+== Mike ==
+Player Ability: High Jump?
+Weapon Ability: Nunchucks (???)
+Stats:
+	Speed: Fast (340)
+	Accel: Normal (10)
+SRB2-ish: Sonic
+

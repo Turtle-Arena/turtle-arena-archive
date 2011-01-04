@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="640"
+   height="480"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.47pre4 r22446"
+   sodipodi:docname="playerSelectedMock.svg">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective3762"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3990"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4049"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4108"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4835"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2882"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2959"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective2959-5"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3154"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.85913474"
+     inkscape:cx="312.69922"
+     inkscape:cy="236.97777"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     inkscape:window-width="1152"
+     inkscape:window-height="789"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Background"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <rect
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       id="rect2816"
+       width="640"
+       height="480"
+       x="0"
+       y="2.220446e-15"
+       ry="0" />
+    <image
+       y="416"
+       x="0"
+       id="image3992"
+       height="64"
+       width="128"
+       xlink:href="file:///home/zack/Turtle_Arena_svn/trunk/base/menu/art/back_0.png" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#eeeeec;fill-opacity:1;stroke:none;font-family:FreeSerif;-inkscape-font-specification:FreeSerif"
+       x="169.86848"
+       y="47.592537"
+       id="text4017"><tspan
+         sodipodi:role="line"
+         id="tspan4019"
+         x="169.86848"
+         y="47.592537">PLAYER SELECT</tspan></text>
+    <image
+       y="416"
+       x="512"
+       id="image3156"
+       height="64"
+       width="128"
+       xlink:href="file:///home/zack/Turtle_Arena_svn/trunk/base/menu/art/play_0.png" />
+  </g>
+  <g
+     style="display:inline"
+     id="g3012"
+     inkscape:groupmode="layer"
+     inkscape:label="Unselected">
+    <rect
+       inkscape:export-ydpi="90.256409"
+       inkscape:export-xdpi="90.256409"
+       inkscape:export-filename="/home/zack/Desktop/leo_1.png"
+       y="67.4375"
+       x="121.71875"
+       height="219.375"
+       width="168.75"
+       id="rect3024"
+       style="fill:#204a87;fill-opacity:1;stroke:none"
+       ry="84.375" />
+    <rect
+       inkscape:export-ydpi="90.256409"
+       inkscape:export-xdpi="90.256409"
+       inkscape:export-filename="/home/zack/Desktop/don_1.png"
+       y="70.365234"
+       x="298.90625"
+       height="168.75"
+       width="219.375"
+       id="rect3026"
+       style="fill:#5c3566;fill-opacity:1;stroke:none"
+       ry="84.375" />
+    <rect
+       inkscape:export-ydpi="90.256409"
+       inkscape:export-xdpi="90.256409"
+       inkscape:export-filename="/home/zack/Desktop/raph_0.png"
+       y="295.25"
+       x="121.71875"
+       height="168.75"
+       width="219.375"
+       id="rect3028"
+       style="fill:#a40000;fill-opacity:1;stroke:none"
+       ry="84.375" />
+    <rect
+       inkscape:export-ydpi="90.256409"
+       inkscape:export-xdpi="90.256409"
+       inkscape:export-filename="/home/zack/Desktop/mike_1.png"
+       y="244.625"
+       x="349.53125"
+       height="219.375"
+       width="168.75"
+       id="rect3030"
+       style="fill:#ce5c00;fill-opacity:1;stroke:none"
+       ry="84.375" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Selected"
+     style="display:none">
+    <rect
+       ry="84.375"
+       style="fill:#729fcf;fill-opacity:1;stroke:none;display:inline"
+       id="rect3590-1"
+       width="168.75"
+       height="219.375"
+       x="121.719"
+       y="67.4375"
+       inkscape:export-filename="/home/zack/Desktop/leo_1.png"
+       inkscape:export-xdpi="90.256409"
+       inkscape:export-ydpi="90.256409" />
+    <rect
+       ry="84.375"
+       style="fill:#ad7fa8;fill-opacity:1;stroke:none;display:inline"
+       id="rect3592-5"
+       width="219.375"
+       height="168.75"
+       x="298.90649"
+       y="70.365234"
+       inkscape:export-filename="/home/zack/Desktop/don_1.png"
+       inkscape:export-xdpi="90.256409"
+       inkscape:export-ydpi="90.256409" />
+    <rect
+       ry="84.375"
+       style="fill:#ef2929;fill-opacity:1;stroke:none;display:inline"
+       id="rect3594-9"
+       width="219.375"
+       height="168.75"
+       x="121.719"
+       y="295.25"
+       inkscape:export-filename="/home/zack/Desktop/raph_1.png"
+       inkscape:export-xdpi="90.256409"
+       inkscape:export-ydpi="90.256409" />
+    <rect
+       ry="84.375"
+       style="fill:#fcaf3e;fill-opacity:1;stroke:none;display:inline"
+       id="rect3596-9"
+       width="168.75"
+       height="219.375"
+       x="349.53149"
+       y="244.625"
+       inkscape:export-filename="/home/zack/Desktop/mike_1.png"
+       inkscape:export-xdpi="90.256409"
+       inkscape:export-ydpi="90.256409" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="raph_eyes"
+     style="display:none">
+    <g
+       transform="translate(-8e-5,-4.3111541e-4)"
+       style="display:inline"
+       id="g4035-1-8">
+      <path
+         sodipodi:nodetypes="ccccsc"
+         d="m 324.39338,350.94781 0,0 c -0.0173,0.10421 -0.0347,0.20841 -0.052,0.31261 -17.32363,32.67849 -58.31144,28.13339 -83.70368,6.94853 2.38837,-0.0253 8.20425,0.83935 15.96527,-1.17434 21.79681,-5.65544 55.91816,-12.43178 67.79041,-6.0868 z"
+         id="path4029-6-2"
+         style="fill:#eeeeec;fill-opacity:1;stroke:none" />
+      <path
+         sodipodi:nodetypes="cccc"
+         d="m 206.50217,361.6515 c -12.46968,28.06081 -47.79821,8.09216 -66.8457,-1.75402 2.37314,-1.54209 1.41217,-11.61265 68.08997,-1.57568 -0.11715,0.9263 -0.80343,2.51098 -1.24427,3.3297 z"
+         id="path4031-2-2"
+         style="fill:#eeeeec;fill-opacity:1;stroke:none" />
+      <path
+         sodipodi:nodetypes="ccccc"
+         d="m 216.6324,352.59769 c -0.74724,3.04291 -4.08921,4.0375 -6.56776,5.38936 -23.60795,6.922 -48.13438,-7.93665 -71.76256,2.4797 14.02955,-15.82778 60.15961,1.31209 78.33032,-7.86789 l 0,-10e-4 z"
+         id="path4027-1-0"
+         style="fill:#000000;fill-opacity:1;stroke:none" />
+      <path
+         sodipodi:nodetypes="ccsccccccc"
+         d="m 238.43285,334.68196 c 0,0 -0.0858,2.28479 -0.0797,3.42805 1.21808,9.94713 -1.56937,15.64508 4.66059,16.59816 21.2731,3.25444 82.24828,-16.65206 84.37199,-2.20089 -11.58,-8.98729 -76.02403,12.13426 -87.42007,5.49274 -0.77821,-0.24005 -1.53882,-0.55307 -2.22695,-0.99335 -0.76785,-0.51806 -1.45053,-1.15869 -2.00249,-1.90482 -3.21883,-5.32394 -1.75348,-12.05047 -2.02619,-18.0136 0,0 4.72284,-2.40641 4.72284,-2.40641 l -2e-5,1.2e-4 z"
+         id="path4025-0-6"
+         style="fill:#000000;fill-opacity:1;stroke:none" />
+    </g>
+  </g>
+</svg>
