@@ -53,9 +53,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define FL_FORCE_GESTURE		0x00008000	// force gesture on client
 #ifdef TA_ENTSYS // MISC_OBJECT
 #define FL_PUSHABLE				0x00010000	// make misc_object pushable
+#define FL_HEAVY				0x00020000  // only pushable by characters with ABILITY_STRENGTH
 #endif
 #ifdef TA_WEAPSYS
-#define FL_MISSILE_NO_DAMAGE_PARENT	0x00020000
+#define FL_MISSILE_NO_DAMAGE_PARENT	0x00040000
 #endif
 
 // movers are things like doors, plats, buttons, etc

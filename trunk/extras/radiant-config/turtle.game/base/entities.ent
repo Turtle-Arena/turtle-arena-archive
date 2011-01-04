@@ -1285,6 +1285,7 @@ Inserting animated MD3/MDR models in game, can be interactive and/or damageable.
 <integer key="wait" name="Death Delay">number of seconds before the entity respawns, or if less than 0 number of seconds before the entity is removed (default 0, 0 = never respawn).</integer>
 <boolean key="knockback" name="Knockback">when set to 1, entity will receive knockback when damaged (defaults to value from config).</boolean>
 <boolean key="pushable" name="Pushable">when set to 1, entity will be pushable (defaults to value from config).</boolean>
+<boolean key="heavy" name="Heavy">when set to 1, entity can only be pushed by players with abilty strength (defaults to value from config).</boolean>
 <string key="message" name="Item">item to spawn on death</string>
 <target key="target" name="Target">killing (or touching if spawn health is 0) the object will trigger the entity this points to.</target>
 <target key="paintarget" name="Pain Target">damaging the object will trigger the entity this points to.</target>

@@ -1045,6 +1045,11 @@ qboolean G_PlayerPushEntity(gentity_t *self, gentity_t *other) {
 		return qfalse;
 	}
 
+	// If object is heavy must have strength to push it.
+	if ((self->flags & FL_HEAVY) && (!other->client || other->client->pers.playercfg.ability != ABILITY_STRENGTH)) {
+		return qfalse;
+	}
+
 	if (self->s.solid == SOLID_BMODEL) {
 		// ZTM: TODO: Support pushing brushes
 		return qfalse;
@@ -1084,6 +1089,7 @@ void InitMover( gentity_t *ent ) {
 	char		*sound;
 #ifdef TA_ENTSYS // PUSHABLE
 	int			pushable;
+	int			heavy;
 #endif
 
 	// if the "model2" key is set, use a seperate model
@@ -1214,6 +1220,10 @@ void InitMover( gentity_t *ent ) {
 		{
 			G_Printf("Warning: Pushable brush entity %d doesn't look like it has an origin set! Try adding an origin brush.\n", ent->s.number);
 		}
+	}
+	G_SpawnInt( "heavy", "0", &heavy );
+	if (heavy) {
+		ent->flags |= FL_HEAVY;
 	}
 #endif
 }
