@@ -1914,12 +1914,12 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 */
 void SP_func_static( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
-#ifdef IOQ3TM // BREAKABLE
+#ifdef IOQ3ZTM // BREAKABLE
 	VectorCopy( ent->s.origin, ent->pos1);
 	VectorCopy( ent->s.origin, ent->pos2);
 #endif
 	InitMover( ent );
-#ifdef IOQ3TM // BREAKABLE
+#ifdef IOQ3ZTM // BREAKABLE
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 #endif
