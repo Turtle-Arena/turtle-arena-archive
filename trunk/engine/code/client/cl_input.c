@@ -288,7 +288,11 @@ void IN_ButtonUp (void) {
 	IN_KeyUp(&in_buttons[1]);}
 
 void IN_CenterView (void) {
+#ifdef TA_SPLITVIEW // Should this effect all clients? or have a cmd for each client?
+	cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.pss[0].delta_angles[PITCH]);
+#else
 	cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
+#endif
 }
 
 

@@ -555,17 +555,31 @@ void CG_UpdateCvars( void ) {
 }
 
 int CG_CrosshairPlayer( void ) {
-	if ( cg.time > ( cg.crosshairClientTime + 1000 ) ) {
+#ifdef TA_SPLITVIEW
+	if ( cg.time > ( cg.localClients[0].crosshairClientTime + 1000 ) ) {
 		return -1;
 	}
-	return cg.crosshairClientNum;
+	return cg.localClients[0].crosshairClientNum;
+#else
+	if ( cg.time > ( cg.localClient.crosshairClientTime + 1000 ) ) {
+		return -1;
+	}
+	return cg.localClient.crosshairClientNum;
+#endif
 }
 
 int CG_LastAttacker( void ) {
-	if ( !cg.attackerTime ) {
+#ifdef TA_SPLITVIEW
+	if ( !cg.localClients[0].attackerTime ) {
+		return -1;
+	}
+	return cg.snap->pss[0].persistant[PERS_ATTACKER];
+#else
+	if ( !cg.localClient.attackerTime ) {
 		return -1;
 	}
 	return cg.snap->ps.persistant[PERS_ATTACKER];
+#endif
 }
 
 #ifdef IOQ3ZTM // LESS_VERBOSE
@@ -1613,16 +1627,36 @@ CG_RegisterClients
 */
 static void CG_RegisterClients( void ) {
 	int		i;
+#ifdef TA_SPLITVIEW
+	int		j;
+	int		numLocalClients = 1; // cg.snap->numPSs; ZTM: FIXME?: cg.snap is NULL here, how can we get number?
 
-	CG_LoadingClient(cg.clientNum);
-	CG_NewClientInfo(cg.clientNum);
+	for (i = 0; i < numLocalClients; i++) {
+		CG_LoadingClient(cg.localClients[i].clientNum);
+		CG_NewClientInfo(cg.localClients[i].clientNum);
+	}
+#else
+	CG_LoadingClient(cg.localClient.clientNum);
+	CG_NewClientInfo(cg.localClient.clientNum);
+#endif
 
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
 		const char		*clientInfo;
 
-		if (cg.clientNum == i) {
+#ifdef TA_SPLITVIEW
+		for (j = 0; j < numLocalClients; j++) {
+			if (cg.localClients[0].clientNum == i) {
+				break;
+			}
+		}
+		if (j != numLocalClients) {
 			continue;
 		}
+#else
+		if (cg.localClient.clientNum == i) {
+			continue;
+		}
+#endif
 
 		clientInfo = CG_ConfigString( CS_PLAYERS+i );
 		if ( !clientInfo[0]) {
@@ -2367,6 +2401,9 @@ Will perform callbacks to make the loading info screen update.
 */
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	const char	*s;
+#ifdef TA_SPLITVIEW
+	int			i;
+#endif
 
 	// clear everything
 	memset( &cgs, 0, sizeof( cgs ) );
@@ -2384,7 +2421,16 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( cg_npcs, 0, sizeof(cg_npcs) );
 #endif
 
-	cg.clientNum = clientNum;
+#ifdef TA_SPLITVIEW
+	cg.numViewports = 1;
+	cg.viewVerticle = qfalse;
+
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		cg.localClients[i].clientNum = clientNum;
+	}
+#else
+	cg.localClient.clientNum = clientNum;
+#endif
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;
@@ -2414,20 +2460,39 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_InitConsoleCommands();
 
+#ifdef TA_SPLITVIEW
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
 #ifdef TA_HOLDSYS/*2*/
-	cg.holdableSelect = HI_NO_SELECT;
+		cg.localClients[i].holdableSelect = HI_NO_SELECT;
+#endif
+#if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
+		// Select our default weapon.
+		cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[cg.localClients[i].clientNum].playercfg.default_weapon;
+#ifdef TA_WEAPSYS_EX
+		cg.localClients[i].predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+#else
+		cg.localClients[i].weaponSelect = cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+#endif
+#else
+		cg.localClients[i].weaponSelect = WP_MACHINEGUN;
+#endif
+	}
+#else // !TA_SPLITVIEW
+#ifdef TA_HOLDSYS/*2*/
+	cg.localClient.holdableSelect = HI_NO_SELECT;
 #endif
 #if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
 	// Select our default weapon.
-	cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
+	cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
 #ifdef TA_WEAPSYS_EX
-	cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+	cg.localClient.predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #else
-	cg.weaponSelect = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+	cg.localClient.weaponSelect = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #endif
 #else
-	cg.weaponSelect = WP_MACHINEGUN;
+	cg.localClient.weaponSelect = WP_MACHINEGUN;
 #endif
+#endif // !TA_SPLITVIEW
 
 	cgs.redflag = cgs.blueflag = -1; // For compatibily, default to unset for
 	cgs.flagStatus = -1;

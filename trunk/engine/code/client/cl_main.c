@@ -164,11 +164,19 @@ void CL_UpdateMumble(void)
 		return;
 
 	// !!! FIXME: not sure if this is even close to correct.
+#ifdef TA_SPLITVIEW
+	AngleVectors( cl.snap.pss[0].viewangles, forward, NULL, up);
+
+	pos[0] = cl.snap.pss[0].origin[0] * scale;
+	pos[1] = cl.snap.pss[0].origin[2] * scale;
+	pos[2] = cl.snap.pss[0].origin[1] * scale;
+#else
 	AngleVectors( cl.snap.ps.viewangles, forward, NULL, up);
 
 	pos[0] = cl.snap.ps.origin[0] * scale;
 	pos[1] = cl.snap.ps.origin[2] * scale;
 	pos[2] = cl.snap.ps.origin[1] * scale;
+#endif
 
 	tmp = forward[1];
 	forward[1] = forward[2];

@@ -187,7 +187,7 @@ static void CG_CalcVrect (void) {
 	int		size;
 
 	// the intermission should allways be full screen
-	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
+	if ( cg.cur_ps->pm_type == PM_INTERMISSION ) {
 		size = 100;
 	} else {
 		// bound normal viewsize
@@ -200,8 +200,8 @@ static void CG_CalcVrect (void) {
 		} else {
 			size = cg_viewsize.integer;
 		}
-
 	}
+
 	cg.refdef.width = cgs.glconfig.vidWidth*size/100;
 	cg.refdef.width &= ~1;
 
@@ -210,6 +210,54 @@ static void CG_CalcVrect (void) {
 
 	cg.refdef.x = (cgs.glconfig.vidWidth - cg.refdef.width)/2;
 	cg.refdef.y = (cgs.glconfig.vidHeight - cg.refdef.height)/2;
+#ifdef TA_SPLITVIEW
+	if (cg.numViewports == 2) {
+		if (cg.viewVerticle) {
+			cg.refdef.width /= 2;
+
+			if (cg.viewport == 1) {
+				cg.refdef.x += cg.refdef.width;
+			}
+		} else {
+			cg.refdef.height /= 2;
+
+			if (cg.viewport == 1) {
+				cg.refdef.y += cg.refdef.height;
+			}
+		}
+	} else if (cg.numViewports == 3 && cg.viewport == 2) {
+		cg.refdef.height /= 2;
+		cg.refdef.y += cg.refdef.height;
+	} else if (cg.numViewports > 1 && cg.numViewports <= 4) {
+		cg.refdef.width /= 2;
+		cg.refdef.height /= 2;
+
+		if (cg.viewport == 1 || cg.viewport == 3) {
+			cg.refdef.x += cg.refdef.width;
+		}
+
+		if (cg.viewport == 2 || cg.viewport == 3) {
+			cg.refdef.y += cg.refdef.height;
+		}
+	}
+
+	cgs.screenXScaleFit = cg.refdef.width * (1.0/640.0);
+	cgs.screenYScaleFit = cg.refdef.height * (1.0/480.0);
+	if ( (cg.numViewports == 1 || (cg.numViewports == 2 && !cg.viewVerticle) || (cg.numViewports == 3 && cg.viewport == 2)) &&
+		cg.refdef.width * 480 > cg.refdef.height * 640 )
+	{
+		cgs.screenXScale = cg.refdef.width * (1.0/640.0);
+		cgs.screenYScale = cg.refdef.height * (1.0/480.0);
+		// wide screen
+		cgs.screenXBias = 0.5 * ( cg.refdef.width - ( cg.refdef.height * (640.0/480.0) ) );
+		cgs.screenXScale = cgs.screenYScale;
+	} else {
+		cgs.screenXScale = cgs.screenXScaleFit;
+		cgs.screenYScale = cgs.screenYScaleFit;
+		// no wide screen
+		cgs.screenXBias = 0;
+	}
+#endif
 }
 
 //==============================================================================
@@ -217,14 +265,14 @@ static void CG_CalcVrect (void) {
 #ifdef IOQ3ZTM // NEW_CAM
 void CG_CamUpdate(void)
 {
-	if (cg.camReseting)
+	if (cg.cur_lc->camReseting)
 	{
 		float speed = 5.0f;
 		if (cg_thirdPersonAngle.value >= 360-speed || cg_thirdPersonAngle.value <= speed)
 		{
 			cg_thirdPersonAngle.value = 0;
-			cg.camRotDir = 0;
-			cg.camReseting = qfalse;
+			cg.cur_lc->camRotDir = 0;
+			cg.cur_lc->camReseting = qfalse;
 		}
 		else if (cg_thirdPersonAngle.value > 180)
 			cg_thirdPersonAngle.value += speed;
@@ -233,25 +281,26 @@ void CG_CamUpdate(void)
 	}
 	else
 	{
-		if (cg.camLeft)
-			cg.camRotDir += 0.2f;
-		else if (cg.camRotDir >= 0.1f)
-			cg.camRotDir -= 0.1f;
+		if (cg.cur_lc->camLeft)
+			cg.cur_lc->camRotDir += 0.2f;
+		else if (cg.cur_lc->camRotDir >= 0.1f)
+			cg.cur_lc->camRotDir -= 0.1f;
 
-		if (cg.camRight)
-			cg.camRotDir -= 0.2f;
-		else if (cg.camRotDir <= -0.1f)
-			cg.camRotDir += 0.1f;
+		if (cg.cur_lc->camRight)
+			cg.cur_lc->camRotDir -= 0.2f;
+		else if (cg.cur_lc->camRotDir <= -0.1f)
+			cg.cur_lc->camRotDir += 0.1f;
 
-		if (!cg.camLeft && !cg.camRight && cg.camRotDir >= -0.2f && cg.camRotDir <= 0.2f)
-			cg.camRotDir = 0;
+		if (!cg.cur_lc->camLeft && !cg.cur_lc->camRight &&
+				cg.cur_lc->camRotDir >= -0.2f && cg.cur_lc->camRotDir <= 0.2f)
+			cg.cur_lc->camRotDir = 0;
 
-		if (cg.camRotDir > 3)
-			cg.camRotDir = 3;
-		else if (cg.camRotDir < -3)
-			cg.camRotDir = -3;
+		if (cg.cur_lc->camRotDir > 3)
+			cg.cur_lc->camRotDir = 3;
+		else if (cg.cur_lc->camRotDir < -3)
+			cg.cur_lc->camRotDir = -3;
 
-		cg_thirdPersonAngle.value = cg_thirdPersonAngle.value+cg.camRotDir;
+		cg_thirdPersonAngle.value = cg_thirdPersonAngle.value+cg.cur_lc->camRotDir;
 	}
 
 	if (cg_thirdPersonAngle.value > 360)
@@ -267,24 +316,24 @@ void CG_CamUpdate(void)
 	// First person
 	if (!cg_thirdPerson.integer)
 	{
-		if (cg.camDistance > 11)
-			cg.camDistance -= 2;
+		if (cg.cur_lc->camDistance > 11)
+			cg.cur_lc->camDistance -= 2;
 		else
-			cg.camDistance = 10;
+			cg.cur_lc->camDistance = 10;
 	}
 	else
 	{
-		if (cg.camDistance == 0) {
-			cg.camDistance = cg_thirdPersonRange.value;
+		if (cg.cur_lc->camDistance == 0) {
+			cg.cur_lc->camDistance = cg_thirdPersonRange.value;
 		}
 
 		// Third person range was made shorter, zoom in
-		if (cg.camDistance > cg_thirdPersonRange.value+2.0f)
-			cg.camDistance -= 2.0f;
-		else if (cg.camDistance > cg_thirdPersonRange.value)
-			cg.camDistance = cg_thirdPersonRange.value;
+		if (cg.cur_lc->camDistance > cg_thirdPersonRange.value+2.0f)
+			cg.cur_lc->camDistance -= 2.0f;
+		else if (cg.cur_lc->camDistance > cg_thirdPersonRange.value)
+			cg.cur_lc->camDistance = cg_thirdPersonRange.value;
 		// Zoom back out
-		else if (cg.camDistance < cg_thirdPersonRange.value)
+		else if (cg.cur_lc->camDistance < cg_thirdPersonRange.value)
 		{
 #if 0
 			// NiGHTS: Journey of Dreams Visitor style camera distance.
@@ -295,10 +344,10 @@ void CG_CamUpdate(void)
 			if (cg.xyspeed != 0)
 #endif
 			{
-				if (cg.camDistance < cg_thirdPersonRange.value-1.0f)
-					cg.camDistance += 1.0f;
+				if (cg.cur_lc->camDistance < cg_thirdPersonRange.value-1.0f)
+					cg.cur_lc->camDistance += 1.0f;
 				else
-					cg.camDistance = cg_thirdPersonRange.value;
+					cg.cur_lc->camDistance = cg_thirdPersonRange.value;
 			}
 
 		}
@@ -332,17 +381,17 @@ static void CG_OffsetThirdPersonView( void ) {
 	float		forwardScale, sideScale;
 #endif
 
-	cg.refdef.vieworg[2] += cg.predictedPlayerState.viewheight;
+	cg.refdef.vieworg[2] += cg.cur_lc->predictedPlayerState.viewheight;
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
 #ifdef TA_CAMERA
-	distance = cg.camDistance;
+	distance = cg.cur_lc->camDistance;
 #else
 	distance = cg_thirdPersonRange.value;
 #endif
 #endif
 
 #ifdef TURTLEARENA // LOCKON
-	if (cg.snap && cg.snap->ps.enemyEnt != ENTITYNUM_NONE) {
+	if (cg.snap && cg.cur_ps->enemyEnt != ENTITYNUM_NONE) {
 		int i;
 		vec3_t dir;
 		vec3_t targetAngles;
@@ -353,11 +402,11 @@ static void CG_OffsetThirdPersonView( void ) {
 		static float max_fraction = 1.0f;
 
 		time = LOCKON_TIME;
-		if (!cg.lockedOn)
+		if (!cg.cur_lc->lockedOn)
 			time *= max_fraction;
 
 		// Setup fraction
-		f = ( cg.time - cg.lockonTime ) / time;
+		f = ( cg.time - cg.cur_lc->lockonTime ) / time;
 		if (f > 1.0f) {
 			f = 1.0f;
 			completedMove = qtrue;
@@ -365,18 +414,18 @@ static void CG_OffsetThirdPersonView( void ) {
 			completedMove = qfalse;
 		}
 
-		if (cg.lockedOn) {
+		if (cg.cur_lc->lockedOn) {
 			max_fraction = f;
 		} else {
 			f = max_fraction - f * max_fraction;
 		}
 
-		if (cg.lockedOn || !completedMove ) {
+		if (cg.cur_lc->lockedOn || !completedMove ) {
 			// Move camera back
 			distance += distance*0.3f*f;
 
 			// Get view angles to look at target
-			VectorSubtract( cg.snap->ps.enemyOrigin, cg.snap->ps.origin, dir );
+			VectorSubtract( cg.cur_ps->enemyOrigin, cg.cur_ps->origin, dir );
 			vectoangles( dir, targetAngles );
 
 			if ( completedMove ) {
@@ -407,15 +456,15 @@ static void CG_OffsetThirdPersonView( void ) {
 	VectorCopy( cg.refdefViewAngles, focusAngles );
 
 	// if dead, look at killer
-	if ( cg.predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
-		focusAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
-		cg.refdefViewAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
+	if ( cg.cur_lc->predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
+		focusAngles[YAW] = cg.cur_lc->predictedPlayerState.stats[STAT_DEAD_YAW];
+		cg.refdefViewAngles[YAW] = cg.cur_lc->predictedPlayerState.stats[STAT_DEAD_YAW];
 	}
 #ifdef TA_PATHSYS // 2DMODE
-	else if (cg.snap->ps.eFlags & EF_PATHMODE)
+	else if (cg.cur_ps->eFlags & EF_PATHMODE)
 	{
-		focusAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
-		cg.refdefViewAngles[YAW] = cg.predictedPlayerState.stats[STAT_DEAD_YAW];
+		focusAngles[YAW] = cg.cur_lc->predictedPlayerState.stats[STAT_DEAD_YAW];
+		cg.refdefViewAngles[YAW] = cg.cur_lc->predictedPlayerState.stats[STAT_DEAD_YAW];
 	}
 #endif
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
@@ -468,21 +517,21 @@ static void CG_OffsetThirdPersonView( void ) {
 			int		timeDelta;
 
 			// smooth out stair climbing
-			timeDelta = cg.time - cg.stepTime;
+			timeDelta = cg.time - cg.cur_lc->stepTime;
 			if ( timeDelta < STEP_TIME ) {
-				view[2] -= cg.stepChange
+				view[2] -= cg.cur_lc->stepChange
 					* (STEP_TIME - timeDelta) / STEP_TIME;
 			}
 		}
 #endif
-		CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+		CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, view, cg.cur_lc->predictedPlayerState.clientNum, MASK_SOLID );
 
 		if ( trace.fraction != 1.0 ) {
 			VectorCopy( trace.endpos, view );
 #ifdef TA_CAMERA
-			cg.camDistance = cg.camDistance * trace.fraction;
-			if (cg.camDistance < 10) {
-				cg.camDistance = 10;
+			cg.cur_lc->camDistance = cg.cur_lc->camDistance * trace.fraction;
+			if (cg.cur_lc->camDistance < 10) {
+				cg.cur_lc->camDistance = 10;
 			}
 #else
 			view[2] += (1.0 - trace.fraction) * 32;
@@ -516,9 +565,9 @@ static void CG_StepOffset( void )
 	int		timeDelta;
 	
 	// smooth out stair climbing
-	timeDelta = cg.time - cg.stepTime;
+	timeDelta = cg.time - cg.cur_lc->stepTime;
 	if ( timeDelta < STEP_TIME ) {
-		cg.refdef.vieworg[2] -= cg.stepChange 
+		cg.refdef.vieworg[2] -= cg.cur_lc->stepChange 
 			* (STEP_TIME - timeDelta) / STEP_TIME;
 	}
 }
@@ -540,7 +589,7 @@ static void CG_OffsetFirstPersonView( void ) {
 	vec3_t			predictedVelocity;
 	int				timeDelta;
 	
-	if ( cg.snap->ps.pm_type == PM_INTERMISSION ) {
+	if ( cg.cur_ps->pm_type == PM_INTERMISSION ) {
 		return;
 	}
 
@@ -548,43 +597,43 @@ static void CG_OffsetFirstPersonView( void ) {
 	angles = cg.refdefViewAngles;
 
 	// if dead, fix the angle and don't add any kick
-	if ( cg.snap->ps.stats[STAT_HEALTH] <= 0 ) {
+	if ( cg.cur_ps->stats[STAT_HEALTH] <= 0 ) {
 		angles[ROLL] = 40;
 		angles[PITCH] = -15;
-		angles[YAW] = cg.snap->ps.stats[STAT_DEAD_YAW];
-		origin[2] += cg.predictedPlayerState.viewheight;
+		angles[YAW] = cg.cur_ps->stats[STAT_DEAD_YAW];
+		origin[2] += cg.cur_lc->predictedPlayerState.viewheight;
 		return;
 	}
 
 	// add angles based on weapon kick
-	VectorAdd (angles, cg.kick_angles, angles);
+	VectorAdd (angles, cg.cur_lc->kick_angles, angles);
 
 	// add angles based on damage kick
-	if ( cg.damageTime ) {
-		ratio = cg.time - cg.damageTime;
+	if ( cg.cur_lc->damageTime ) {
+		ratio = cg.time - cg.cur_lc->damageTime;
 		if ( ratio < DAMAGE_DEFLECT_TIME ) {
 			ratio /= DAMAGE_DEFLECT_TIME;
-			angles[PITCH] += ratio * cg.v_dmg_pitch;
-			angles[ROLL] += ratio * cg.v_dmg_roll;
+			angles[PITCH] += ratio * cg.cur_lc->v_dmg_pitch;
+			angles[ROLL] += ratio * cg.cur_lc->v_dmg_roll;
 		} else {
 			ratio = 1.0 - ( ratio - DAMAGE_DEFLECT_TIME ) / DAMAGE_RETURN_TIME;
 			if ( ratio > 0 ) {
-				angles[PITCH] += ratio * cg.v_dmg_pitch;
-				angles[ROLL] += ratio * cg.v_dmg_roll;
+				angles[PITCH] += ratio * cg.cur_lc->v_dmg_pitch;
+				angles[ROLL] += ratio * cg.cur_lc->v_dmg_roll;
 			}
 		}
 	}
 
 	// add pitch based on fall kick
 #if 0
-	ratio = ( cg.time - cg.landTime) / FALL_TIME;
+	ratio = ( cg.time - cg.cur_lc->landTime) / FALL_TIME;
 	if (ratio < 0)
 		ratio = 0;
 	angles[PITCH] += ratio * cg.fall_value;
 #endif
 
 	// add angles based on velocity
-	VectorCopy( cg.predictedPlayerState.velocity, predictedVelocity );
+	VectorCopy( cg.cur_lc->predictedPlayerState.velocity, predictedVelocity );
 
 	delta = DotProduct ( predictedVelocity, cg.refdef.viewaxis[0]);
 	angles[PITCH] += delta * cg_runpitch.value;
@@ -598,11 +647,11 @@ static void CG_OffsetFirstPersonView( void ) {
 	speed = cg.xyspeed > 200 ? cg.xyspeed : 200;
 
 	delta = cg.bobfracsin * cg_bobpitch.value * speed;
-	if (cg.predictedPlayerState.pm_flags & PMF_DUCKED)
+	if (cg.cur_lc->predictedPlayerState.pm_flags & PMF_DUCKED)
 		delta *= 3;		// crouching
 	angles[PITCH] += delta;
 	delta = cg.bobfracsin * cg_bobroll.value * speed;
-	if (cg.predictedPlayerState.pm_flags & PMF_DUCKED)
+	if (cg.cur_lc->predictedPlayerState.pm_flags & PMF_DUCKED)
 		delta *= 3;		// crouching accentuates roll
 	if (cg.bobcycle & 1)
 		delta = -delta;
@@ -611,12 +660,12 @@ static void CG_OffsetFirstPersonView( void ) {
 //===================================
 
 	// add view height
-	origin[2] += cg.predictedPlayerState.viewheight;
+	origin[2] += cg.cur_lc->predictedPlayerState.viewheight;
 
 	// smooth out duck height changes
-	timeDelta = cg.time - cg.duckTime;
+	timeDelta = cg.time - cg.cur_lc->duckTime;
 	if ( timeDelta < DUCK_TIME) {
-		cg.refdef.vieworg[2] -= cg.duckChange 
+		cg.refdef.vieworg[2] -= cg.cur_lc->duckChange 
 			* (DUCK_TIME - timeDelta) / DUCK_TIME;
 	}
 
@@ -630,14 +679,14 @@ static void CG_OffsetFirstPersonView( void ) {
 
 
 	// add fall height
-	delta = cg.time - cg.landTime;
+	delta = cg.time - cg.cur_lc->landTime;
 	if ( delta < LAND_DEFLECT_TIME ) {
 		f = delta / LAND_DEFLECT_TIME;
-		cg.refdef.vieworg[2] += cg.landChange * f;
+		cg.refdef.vieworg[2] += cg.cur_lc->landChange * f;
 	} else if ( delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME ) {
 		delta -= LAND_DEFLECT_TIME;
 		f = 1.0 - ( delta / LAND_RETURN_TIME );
-		cg.refdef.vieworg[2] += cg.landChange * f;
+		cg.refdef.vieworg[2] += cg.cur_lc->landChange * f;
 	}
 
 	// add step offset
@@ -645,7 +694,7 @@ static void CG_OffsetFirstPersonView( void ) {
 
 	// add kick offset
 
-	VectorAdd (origin, cg.kick_origin, origin);
+	VectorAdd (origin, cg.cur_lc->kick_origin, origin);
 
 	// pivot the eye based on a neck length
 #if 0
@@ -671,6 +720,7 @@ void CG_ZoomDown_f( void ) {
 	cg.zoomed = qtrue;
 	cg.zoomTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
+	cg.cur_lc = &cg.localClients[0];
 	CG_ToggleLetterbox(qtrue, qfalse);
 #endif
 }
@@ -682,6 +732,7 @@ void CG_ZoomUp_f( void ) {
 	cg.zoomed = qfalse;
 	cg.zoomTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
+	cg.cur_lc = &cg.localClients[0];
 	CG_ToggleLetterbox(qfalse, qfalse);
 #endif
 }
@@ -710,7 +761,7 @@ static int CG_CalcFov( void ) {
 #endif
 	int		inwater;
 
-	if ( cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
+	if ( cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		// if in intermission, use a fixed value
 #ifdef TURTLEARENA // FOV
 		fov_x = 70;
@@ -883,7 +934,7 @@ static int CG_CalcViewValues( void ) {
 	// calculate size of 3D view
 	CG_CalcVrect();
 
-	ps = &cg.predictedPlayerState;
+	ps = &cg.cur_lc->predictedPlayerState;
 #ifdef CAMERASCRIPT
 	if (cg.cameraMode) {
 		vec3_t origin, angles;
@@ -966,12 +1017,12 @@ static int CG_CalcViewValues( void ) {
 		int		t;
 		float	f;
 
-		t = cg.time - cg.predictedErrorTime;
+		t = cg.time - cg.cur_lc->predictedErrorTime;
 		f = ( cg_errorDecay.value - t ) / cg_errorDecay.value;
 		if ( f > 0 && f < 1 ) {
-			VectorMA( cg.refdef.vieworg, f, cg.predictedError, cg.refdef.vieworg );
+			VectorMA( cg.refdef.vieworg, f, cg.cur_lc->predictedError, cg.refdef.vieworg );
 		} else {
-			cg.predictedErrorTime = 0;
+			cg.cur_lc->predictedErrorTime = 0;
 		}
 	}
 
@@ -986,7 +1037,7 @@ static int CG_CalcViewValues( void ) {
 	// position eye reletive to origin
 	AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
 
-	if ( cg.hyperspace ) {
+	if ( cg.cur_lc->hyperspace ) {
 		cg.refdef.rdflags |= RDF_NOWORLDMODEL | RDF_HYPERSPACE;
 	}
 
@@ -1006,7 +1057,7 @@ static void CG_PowerupTimerSounds( void ) {
 
 	// powerup timers going away
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {
-		t = cg.snap->ps.powerups[i];
+		t = cg.cur_ps->powerups[i];
 #ifdef TURTLEARENA // POWERS
 		if (i == PW_FLASHING)
 		{
@@ -1020,7 +1071,7 @@ static void CG_PowerupTimerSounds( void ) {
 			continue;
 		}
 		if ( ( t - cg.time ) / POWERUP_BLINK_TIME != ( t - cg.oldTime ) / POWERUP_BLINK_TIME ) {
-			trap_S_StartSound( NULL, cg.snap->ps.clientNum, CHAN_ITEM, cgs.media.wearOffSound );
+			trap_S_StartSound( NULL, cg.cur_ps->clientNum, CHAN_ITEM, cgs.media.wearOffSound );
 		}
 	}
 }
@@ -1069,6 +1120,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	int		inwater;
 	float	mouseSensitivity;
 	int		weaponSelect;
+#ifdef TA_SPLITVIEW
+	int		i;
+#endif
 
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
@@ -1100,42 +1154,52 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		return;
 	}
 
+	// this counter will be bumped for every valid scene we generate
+	cg.clientFrame++;
+
+#ifdef TA_SPLITVIEW
+	for (i = 0; i < cg.numViewports; i++) {
+		cg.viewport = i;
+		cg.cur_lc = &cg.localClients[i];
+		cg.cur_ps = &cg.snap->pss[i];
+#else
+	cg.cur_lc = &cg.localClient;
+	cg.cur_ps = &cg.snap->ps;
+#endif
+
 	// let the client system know what our weapon and zoom settings are
 #ifdef TURTLEARENA // NOZOOM
 	mouseSensitivity = 1;
 #else
-	mouseSensitivity = cg.zoomSensitivity;
+	mouseSensitivity = cg.cur_lc->zoomSensitivity;
 #endif
 #ifdef TA_WEAPSYS_EX
 	weaponSelect = 0;
 #else
-	weaponSelect = cg.weaponSelect;
+	weaponSelect = cg.cur_lc->weaponSelect;
 #endif
 #ifdef TA_HOLDSYS/*2*/
-	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.holdableSelect );
+	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_lc->holdableSelect );
 #else
 	trap_SetUserCmdValue( weaponSelect, mouseSensitivity );
 #endif
-
-	// this counter will be bumped for every valid scene we generate
-	cg.clientFrame++;
 
 	// update cg.predictedPlayerState
 	CG_PredictPlayerState();
 
 #ifdef TURTLEARENA // LOCKON
-	if (!cg.lockedOn && (cg.predictedPlayerState.eFlags & EF_LOCKON))
+	if (!cg.cur_lc->lockedOn && (cg.cur_lc->predictedPlayerState.eFlags & EF_LOCKON))
 	{
-		cg.lockedOn = qtrue;
-		cg.lockonTime = cg.time;
+		cg.cur_lc->lockedOn = qtrue;
+		cg.cur_lc->lockonTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
 		CG_ToggleLetterbox(qtrue, qfalse);
 #endif
 	}
-	else if (cg.lockedOn && !(cg.predictedPlayerState.eFlags & EF_LOCKON))
+	else if (cg.cur_lc->lockedOn && !(cg.cur_lc->predictedPlayerState.eFlags & EF_LOCKON))
 	{
-		cg.lockedOn = qfalse;
-		cg.lockonTime = cg.time;
+		cg.cur_lc->lockedOn = qfalse;
+		cg.cur_lc->lockonTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
 		CG_ToggleLetterbox(qfalse, qfalse);
 #endif
@@ -1144,14 +1208,14 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// decide on third person view
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, if spectator always be in first person.
-	cg.renderingThirdPerson = cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR
-							&& (cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0)
+	cg.renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
+							&& (cg_thirdPerson.integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
 #ifdef TA_CAMERA // When switching to first person, zoom the camera in
-								|| (!cg_thirdPerson.integer && cg.camDistance > 10)
+								|| (!cg_thirdPerson.integer && cg.cur_lc->camDistance > 10)
 #endif
 								);
 #else
-	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.snap->ps.stats[STAT_HEALTH] <= 0);
+	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0);
 #endif
 
 	// build cg.refdef
@@ -1165,13 +1229,13 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #endif
 
 	// build the render lists
-	if ( !cg.hyperspace ) {
+	if ( !cg.cur_lc->hyperspace ) {
 		CG_AddPacketEntities();			// adter calcViewValues, so predicted player state is correct
 		CG_AddMarks();
 		CG_AddParticles ();
 		CG_AddLocalEntities();
 	}
-	CG_AddViewWeapon( &cg.predictedPlayerState );
+	CG_AddViewWeapon( &cg.cur_lc->predictedPlayerState );
 
 	// add buffered sounds
 	CG_PlayBufferedSounds();
@@ -1190,7 +1254,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	CG_PowerupTimerSounds();
 
 	// update audio positions
-	trap_S_Respatialize( cg.snap->ps.clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater );
+	trap_S_Respatialize( cg.cur_ps->clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater );
 
 	// make sure the lagometerSample and frame timing isn't done twice when in stereo
 	if ( stereoView != STEREO_RIGHT ) {
@@ -1219,6 +1283,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	// actually issue the rendering calls
 	CG_DrawActive( stereoView );
+#ifdef TA_SPLITVIEW
+	}
+#endif
 
 	if ( cg_stats.integer ) {
 		CG_Printf( "cg.clientFrame:%i\n", cg.clientFrame );

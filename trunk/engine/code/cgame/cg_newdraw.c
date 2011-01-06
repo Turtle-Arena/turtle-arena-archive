@@ -108,7 +108,12 @@ void CG_CheckOrderPending(void) {
 			trap_SendConsoleCommand(va("cmd vsay_team %s\n", p2));
 		} else {
 			// for the player self
-			if (sortedTeamPlayers[cg_currentSelectedPlayer.integer] == cg.snap->ps.clientNum && p1) {
+#ifdef TA_SPLITVIEW
+			if (sortedTeamPlayers[cg_currentSelectedPlayer.integer] == cg.snap->pss[0].clientNum && p1)
+#else
+			if (sortedTeamPlayers[cg_currentSelectedPlayer.integer] == cg.snap->ps.clientNum && p1)
+#endif
+			{
 				trap_SendConsoleCommand(va("teamtask %i\n", cgs.currentOrder));
 				//trap_SendConsoleCommand(va("cmd say_team %s\n", p2));
 				trap_SendConsoleCommand(va("cmd vsay_team %s\n", p1));
@@ -339,8 +344,8 @@ static void CG_DrawPlayerHead(rectDef_t *rect, qboolean draw2D) {
 
 	VectorClear( angles );
 
-	if ( cg.damageTime && cg.time - cg.damageTime < DAMAGE_TIME ) {
-		frac = (float)(cg.time - cg.damageTime ) / DAMAGE_TIME;
+	if ( cg.cur_lc->damageTime && cg.time - cg.cur_lc->damageTime < DAMAGE_TIME ) {
+		frac = (float)(cg.time - cg.cur_lc->damageTime ) / DAMAGE_TIME;
 		size = rect->w * 1.25 * ( 1.5 - frac * 0.5 );
 
 		stretch = size - rect->w * 1.25;
@@ -1083,7 +1088,11 @@ float CG_GetValue(int ownerDraw) {
 
 qboolean CG_OtherTeamHasFlag(void) {
 	if (cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF) {
+#ifdef TA_SPLITVIEW
+		int team = cg.snap->pss[0].persistant[PERS_TEAM];
+#else
 		int team = cg.snap->ps.persistant[PERS_TEAM];
+#endif
 		if (cgs.gametype == GT_1FCTF) {
 			if (team == TEAM_RED && cgs.flagStatus == FLAG_TAKEN_BLUE) {
 				return qtrue;
@@ -1107,7 +1116,11 @@ qboolean CG_OtherTeamHasFlag(void) {
 
 qboolean CG_YourTeamHasFlag(void) {
 	if (cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF) {
+#ifdef TA_SPLITVIEW
+		int team = cg.snap->pss[0].persistant[PERS_TEAM];
+#else
 		int team = cg.snap->ps.persistant[PERS_TEAM];
+#endif
 		if (cgs.gametype == GT_1FCTF) {
 			if (team == TEAM_RED && cgs.flagStatus == FLAG_TAKEN_RED) {
 				return qtrue;
@@ -1267,11 +1280,11 @@ static void CG_DrawAreaChat(rectDef_t *rect, float scale, vec4_t color, qhandle_
 
 const char *CG_GetKillerText(void) {
 	const char *s = "";
-	if ( cg.killerName[0] ) {
+	if ( cg.cur_lc->killerName[0] ) {
 #ifdef NOTRATEDM // frag to KO
-		s = va("Knocked out by %s", cg.killerName );
+		s = va("Knocked out by %s", cg.cur_lc->killerName );
 #else
-		s = va("Fragged by %s", cg.killerName );
+		s = va("Fragged by %s", cg.cur_lc->killerName );
 #endif
 	}
 	return s;
@@ -2009,11 +2022,22 @@ void CG_RunMenuScript(char **args) {
 
 
 void CG_GetTeamColor(vec4_t *color) {
-  if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED) {
+#ifdef TA_SPLITVIEW
+  if (cg.snap->pss[cg.viewport].persistant[PERS_TEAM] == TEAM_RED)
+#else
+  if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_RED)
+#endif
+  {
     (*color)[0] = 1.0f;
     (*color)[3] = 0.25f;
     (*color)[1] = (*color)[2] = 0.0f;
-  } else if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE) {
+  }
+#ifdef TA_SPLITVIEW
+  else if (cg.snap->pss[cg.viewport].persistant[PERS_TEAM] == TEAM_BLUE)
+#else
+  else if (cg.snap->ps.persistant[PERS_TEAM] == TEAM_BLUE)
+#endif
+  {
     (*color)[0] = (*color)[1] = 0.0f;
     (*color)[2] = 1.0f;
     (*color)[3] = 0.25f;

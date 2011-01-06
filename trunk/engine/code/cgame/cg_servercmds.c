@@ -942,7 +942,12 @@ void CG_PlayVoiceChat( bufferedVoiceChat_t *vchat ) {
 
 	if ( !cg_noVoiceChats.integer ) {
 		trap_S_StartLocalSound( vchat->snd, CHAN_VOICE);
-		if (vchat->clientNum != cg.snap->ps.clientNum) {
+#ifdef TA_SPLITVIEW
+		if (vchat->clientNum != cg.snap->pss[0].clientNum)
+#else
+		if (vchat->clientNum != cg.snap->ps.clientNum)
+#endif
+		{
 			int orderTask = CG_ValidOrder(vchat->cmd);
 			if (orderTask > 0) {
 				cgs.acceptOrderTime = cg.time + 5000;

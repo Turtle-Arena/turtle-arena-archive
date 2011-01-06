@@ -19,7 +19,7 @@ First stable playable release.
 == 0.4.x ==
 0.4.x series focuses on players, map themes, and multiplayer maps.
 
-=== 0.4.0 ===
+=== 0.4.0 (Completed) ===
   * Fix bugs from 0.2
   * Music
   * Bring back player effect colors
@@ -27,7 +27,12 @@ First stable playable release.
   * Reduce overall number of TODOs and FIXMEs in the source
   * Begin work on 0.4.1 and 0.4.2
 
-=== 0.4.1 ===
+=== 0.4.1 (Completed) ===
+  * Bug fix release
+
+=== 0.4.x ===
+: Haven't decide what order these will be done in, but hopefully they will all get done in the 0.4.x series.
+
   * Improve player models; each player should have their own animations, etc
   * Remodel and animate casey
   * Add more players (Mirage comic based); Foot Ninja, Foot Elite, and The Shredder
@@ -36,11 +41,12 @@ First stable playable release.
   * Multiple levels of detail for players and other models
     * (Add a LOD converter to Misfit Model 3D?)
 
-=== 0.4.2 ===
   * Breakable objects and brushes
-    * Pushable. (Wolf-ET has pushable code for objects, g_props.c)
+    * Pushable.
   * Map Themes (textures, sky, models, misc_objects, and music)
   * New multiplayer maps using the new map themes
+
+  * Local four player support (Splitscreen, possibly a single camera mode for 2D levels)
 
   * Hopefully make Turtle Arena a complete (fully working) multiplayer game (Compareable to TMNT: Mutant Melee in someways...)
 
@@ -59,5 +65,5 @@ Focus on Single Player
   * Multiplayer improvements
 
 == 1.0 ==
-  * Local four player support (Splitscreen and/or a single camera mode)
-    * (Wolf-ET has multiview code in game/cgame that may help create splitscreen)
+  * Polish overall game?
+

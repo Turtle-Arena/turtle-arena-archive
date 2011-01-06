@@ -268,7 +268,7 @@ void CG_AddParticleToScene (cparticle_t *p, vec3_t org, float alpha)
 		}
 		
 		// Ridah, had to do this or MAX_POLYS is being exceeded in village1.bsp
-		if (Distance( cg.snap->ps.origin, org ) > 1024) {
+		if (Distance( cg.cur_ps->origin, org ) > 1024) {
 			return;
 		}
 		// done.
@@ -425,7 +425,7 @@ void CG_AddParticleToScene (cparticle_t *p, vec3_t org, float alpha)
 	else if (p->type == P_SMOKE || p->type == P_SMOKE_IMPACT)
 	{// create a front rotating facing polygon
 
-		if ( p->type == P_SMOKE_IMPACT && Distance( cg.snap->ps.origin, org ) > 1024) {
+		if ( p->type == P_SMOKE_IMPACT && Distance( cg.cur_ps->origin, org ) > 1024) {
 			return;
 		}
 
@@ -436,7 +436,7 @@ void CG_AddParticleToScene (cparticle_t *p, vec3_t org, float alpha)
 			float	len;
 			float	greyit;
 			float	val;
-			len = Distance (cg.snap->ps.origin, org);
+			len = Distance (cg.cur_ps->origin, org);
 			if (!len)
 				len = 1;
 
@@ -759,7 +759,7 @@ void CG_AddParticleToScene (cparticle_t *p, vec3_t org, float alpha)
 		height = p->height + ( ratio * ( p->endheight - p->height) );
 
 		// if we are "inside" this sprite, don't draw
-		if (Distance( cg.snap->ps.origin, org ) < width/1.5) {
+		if (Distance( cg.cur_ps->origin, org ) < width/1.5) {
 			return;
 		}
 

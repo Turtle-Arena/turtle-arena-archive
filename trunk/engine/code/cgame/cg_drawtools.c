@@ -66,6 +66,47 @@ Adjusted for resolution and screen aspect ratio
 ================
 */
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
+#ifdef TA_SPLITVIEW
+	if (cg.numViewports != 1 && cg.snap) {
+		if (cg.numViewports == 2) {
+			/*if (cg.viewVerticle) {
+				*w /= 2;
+				*x /= 2;
+			} else {
+				*h /= 2;
+				*y /= 2;
+			}*/
+
+			if (cg.viewport == 1) {
+				if (cg.viewVerticle) {
+					*x += SCREEN_WIDTH;
+				} else {
+					*y += SCREEN_HEIGHT;
+				}
+			}
+		}
+		else if (cg.numViewports == 3 && cg.viewport == 2) {
+			//*h /= 2;
+			//*y /= 2;
+
+			*y += SCREEN_HEIGHT;
+		}
+		else if (cg.numViewports <= 4) {
+			//*w /= 2;
+			//*h /= 2;
+			//*x /= 2;
+			//*y /= 2;
+
+			if (cg.viewport == 1 || cg.viewport == 3) {
+				*x += SCREEN_WIDTH;
+			}
+
+			if (cg.viewport == 2 || cg.viewport == 3) {
+				*y += SCREEN_HEIGHT;
+			}
+		}
+	}
+#endif
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
 	if (cg_hudPlacement == HUD_LEFT)
 		*x = *x * cgs.screenXScale;
@@ -814,10 +855,16 @@ void CG_TileClear( void ) {
 	w = cgs.glconfig.vidWidth;
 	h = cgs.glconfig.vidHeight;
 
+#ifdef TA_SPLITVIEW
+	if (cg.cur_ps->pm_type == PM_INTERMISSION || cg_viewsize.integer >= 100 || cg.viewport != 0) {
+		return;		// full screen rendering
+	}
+#else
 	if ( cg.refdef.x == 0 && cg.refdef.y == 0 && 
 		cg.refdef.width == w && cg.refdef.height == h ) {
 		return;		// full screen rendering
 	}
+#endif
 
 	top = cg.refdef.y;
 	bottom = top + cg.refdef.height-1;
@@ -1018,10 +1065,10 @@ CG_ColorForHealth
 void CG_ColorForHealth( vec4_t hcolor ) {
 
 #ifdef TURTLEARENA // NOARMOR
-	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], hcolor );
+	CG_GetColorForHealth( cg.cur_ps->stats[STAT_HEALTH], hcolor );
 #else
-	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], 
-		cg.snap->ps.stats[STAT_ARMOR], hcolor );
+	CG_GetColorForHealth( cg.cur_ps->stats[STAT_HEALTH], 
+		cg.cur_ps->stats[STAT_ARMOR], hcolor );
 #endif
 }
 

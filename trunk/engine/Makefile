@@ -108,7 +108,7 @@ ifeq ($(QUAKE3),1)
 							-DTA_WEAPSYS -DTA_PLAYERSYS \
 							-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 							-DTA_WEAPSYS_EX_COMPAT \
-							-DOA_BLOOM 
+							-DOA_BLOOM -DTA_SPLITVIEW
 
 		QUAKE3_CFLAGS =
 
@@ -268,6 +268,8 @@ else # END QUAKE3
 	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
 	#							Kinda pointless. (Note: TA_PLAYERSYS adds support for Elite Force soundpath keyword in animations.cfg,
 	#													must also define RAVENMD4 and IOQ3ZTM)
+	# TA_SPLITVIEW			WIP Local splitscreen and split view system for viewing multiple clients at once.
+	#							It is currently not network compatible with non-TA_SPLITVIEW builds.
 
 
 	# Turtle Arena specific defines
@@ -291,7 +293,7 @@ else # END QUAKE3
 						-DTA_WEAPSYS -DTA_PLAYERSYS \
 						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 						-DTA_WEAPSYS_EX_COMPAT \
-						-DOA_BLOOM
+						-DOA_BLOOM -DTA_SPLITVIEW
 
 	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
 						-DTA_WEAPSYS_EX -DTA_PLAYERS -DTA_DATA \

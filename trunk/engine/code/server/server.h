@@ -98,7 +98,12 @@ typedef struct {
 typedef struct {
 	int				areabytes;
 	byte			areabits[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
+#ifdef TA_SPLITVIEW
+	int				numPSs;
+	playerState_t	pss[MAX_SPLITVIEW];
+#else
 	playerState_t	ps;
+#endif
 	int				num_entities;
 	int				first_entity;		// into the circular sv_packet_entities[]
 										// the entities MUST be in increasing state number

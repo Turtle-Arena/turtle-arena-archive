@@ -187,6 +187,16 @@ Weapons (and attacking)
 
   * TODO: Support using .so and .dll on pure servers? (Wolf-ET does?)
 
+  * STARTED: Splitscreen (for local multiplayer) and splitview mode for viewing other clients in multiplayer.
+    * Need someway for client to tell server how many local client they want.
+      * Need to create multiple clients from one connection
+    * Need someway to tell server which clients we want in splitview.
+      * Probably a use a command, list clientNums, client names, or team. (Like "splitview 1 john blue" for three splitview clients)
+        * If teams are supported add a command for changing to next team member.
+    * Need controls, commands, and cvars for local clients.
+    * Need a way to differeniate between local clients (which we control and predict), and clients we are following.
+      * (Oh yeah, use PMF_FOLLOW flag.)
+
 == Objects ==
 Most of the mapobjects should be damageable.
 

@@ -273,11 +273,26 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	// read playerinfo
 	SHOWNET( msg, "playerstate" );
+#ifdef TA_SPLITVIEW
+	newSnap.numPSs = MSG_ReadByte( msg );
+	if (newSnap.numPSs > MAX_SPLITVIEW) {
+		Com_Printf("Warning: Got numPSs as %d (max=%d)\n", newSnap.numPSs, MAX_SPLITVIEW);
+		newSnap.numPSs = MAX_SPLITVIEW;
+	}
+	for (i = 0; i < newSnap.numPSs; i++) {
+		if ( old && old->numPSs > i) {
+			MSG_ReadDeltaPlayerstate( msg, &old->pss[i], &newSnap.pss[i] );
+		} else {
+			MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.pss[i] );
+		}
+	}
+#else
 	if ( old ) {
 		MSG_ReadDeltaPlayerstate( msg, &old->ps, &newSnap.ps );
 	} else {
 		MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.ps );
 	}
+#endif
 
 	// read packet entities
 	SHOWNET( msg, "packet entities" );
@@ -308,7 +323,12 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// calculate ping time
 	for ( i = 0 ; i < PACKET_BACKUP ; i++ ) {
 		packetNum = ( clc.netchan.outgoingSequence - 1 - i ) & PACKET_MASK;
-		if ( cl.snap.ps.commandTime >= cl.outPackets[ packetNum ].p_serverTime ) {
+#ifdef TA_SPLITVIEW
+		if ( cl.snap.pss[0].commandTime >= cl.outPackets[ packetNum ].p_serverTime )
+#else
+		if ( cl.snap.ps.commandTime >= cl.outPackets[ packetNum ].p_serverTime )
+#endif
+		{
 			cl.snap.ping = cls.realtime - cl.outPackets[ packetNum ].p_realtime;
 			break;
 		}

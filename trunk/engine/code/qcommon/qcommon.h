@@ -189,8 +189,13 @@ void		NET_LeaveMulticast6(void);
 void		NET_Sleep(int msec);
 
 
+#ifdef TA_SPLITVIEW // Doubled MAX_MSGLEN, three playerstates was too much for old size.
+#define	MAX_MSGLEN				32768		// max length of a message, which may
+											// be fragmented into multiple packets
+#else
 #define	MAX_MSGLEN				16384		// max length of a message, which may
 											// be fragmented into multiple packets
+#endif
 
 #define MAX_DOWNLOAD_WINDOW			8		// max of eight download frames
 #define MAX_DOWNLOAD_BLKSIZE		2048	// 2048 byte block chunks

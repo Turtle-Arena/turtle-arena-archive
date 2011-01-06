@@ -220,7 +220,7 @@ static void CG_General( centity_t *cent ) {
 	ent.hModel = cgs.gameModels[s1->modelindex];
 
 	// player model
-	if (s1->number == cg.snap->ps.clientNum) {
+	if (s1->number == cg.cur_ps->clientNum) {
 #ifdef IOQ3ZTM // RENDERFLAGS
 		ent.renderfx |= RF_ONLY_MIRROR;
 #else
@@ -1496,7 +1496,9 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	// adjust for riding a mover if it wasn't rolled into the predicted
 	// player state
-	if ( cent != &cg.predictedPlayerEntity ) {
+#ifdef TA_SPLITVIEW // ZTM: Should check all local clients?
+#endif
+	if ( cent != &cg.cur_lc->predictedPlayerEntity ) {
 		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
 		cg.snap->serverTime, cg.time, cent->lerpOrigin );
 	}
@@ -1814,12 +1816,23 @@ void CG_AddPacketEntities( void ) {
 	AnglesToAxis( cg.autoAnglesFast, cg.autoAxisFast );
 
 	// generate and add the entity from the playerstate
-	ps = &cg.predictedPlayerState;
-	BG_PlayerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, qfalse );
-	CG_AddCEntity( &cg.predictedPlayerEntity );
+#ifdef TA_SPLITVIEW
+	for ( num = 0 ; num < cg.snap->numPSs ; num++ ) {
+		ps = &cg.localClients[num].predictedPlayerState;
+		BG_PlayerStateToEntityState( ps, &cg.localClients[num].predictedPlayerEntity.currentState, qfalse );
+		CG_AddCEntity( &cg.localClients[num].predictedPlayerEntity );
+
+		// lerp the non-predicted value for lightning gun origins
+		CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->pss[num].clientNum ] );
+	}
+#else
+	ps = &cg.cur_lc->predictedPlayerState;
+	BG_PlayerStateToEntityState( ps, &cg.cur_lc->predictedPlayerEntity.currentState, qfalse );
+	CG_AddCEntity( &cg.cur_lc->predictedPlayerEntity );
 
 	// lerp the non-predicted value for lightning gun origins
-	CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->ps.clientNum ] );
+	CG_CalcEntityLerpPositions( &cg_entities[ cg.cur_ps->clientNum ] );
+#endif
 
 	// add each entity sent over by the server
 	for ( num = 0 ; num < cg.snap->numEntities ; num++ ) {
