@@ -3,7 +3,6 @@ Turtle Arena credits.
 == Credits ==
 * id software			(For making and releasing Quake III Arena's source code)
 * ioquake3 devoplers	(For improving, fixing, and cleaning up Quake 3's source code)
-* Wolf-ET				(For snow and rain atmospheric effects)
 * ioSTVEF				(For "noise" and "random" waveform keywords, and RF_FORCE_ENT_ALPHA render flag)
 * Open Arena			(For botfiles, images, shaders, ...)
 * Xreal project			(For homing rockets and shootable rockets)
@@ -52,11 +51,6 @@ Turtle Arena uses code directly or based on the following.
 
 * Mercenaries Guild Client 1.011 for Tremulous: http://projects.mercenariesguild.net/projects/mgclient
 ** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some parts, ...)
-
-=== GPLv3 or later ===
-* Wolf-ET (WOLFET)
-** Adds snow and rain atmospheric effects
-** Adds pushable objects (misc_object)
 
 === Other ===
 Code based on guides, etc.
