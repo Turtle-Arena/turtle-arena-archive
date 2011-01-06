@@ -981,6 +981,42 @@ void CL_WritePacket( void ) {
 			MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
 			oldcmd = cmd;
 		}
+
+#ifdef TA_SPLITVIEW
+		{
+			int lc;
+
+			for (lc = 1; lc < MAX_SPLITVIEW; lc++) {
+
+				MSG_WriteByte (&buf, clc_EOF);  // placate legacy servers.
+				MSG_WriteByte (&buf, clc_extension);
+
+				// begin a client move command
+				if ( cl_nodelta->integer || !cl.snap.valid || clc.demowaiting
+					|| clc.serverMessageSequence != cl.snap.messageNum ) {
+					MSG_WriteByte (&buf, clc_moveLocalNoDelta);
+				} else {
+					MSG_WriteByte (&buf, clc_moveLocal);
+				}
+
+				MSG_WriteByte (&buf, lc-1); // localClient-1
+
+				// write the command count
+				MSG_WriteByte( &buf, count );
+
+				Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
+				oldcmd = &nullcmd;
+
+				// write all the commands, including the predicted command
+				for ( i = 0 ; i < count ; i++ ) {
+					j = (cl.cmdNumber - count + i + 1) & CMD_MASK;
+					cmd = &cl.cmds[j];
+					MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
+					oldcmd = cmd;
+				}
+			}
+		}
+#endif
 	}
 
 	//

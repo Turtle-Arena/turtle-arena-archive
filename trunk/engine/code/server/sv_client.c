@@ -399,6 +399,25 @@ void SV_DirectConnect( netadr_t from ) {
 	newcl = &temp;
 	Com_Memset (newcl, 0, sizeof(client_t));
 
+	// find a client slot
+	// if "sv_privateClients" is set > 0, then that number
+	// of client slots will be reserved for connections that
+	// have "password" set to the value of "sv_privatePassword"
+	// Info requests will report the maxclients as if the private
+	// slots didn't exist, to prevent people from trying to connect
+	// to a full server.
+	// This is to allow us to reserve a couple slots here on our
+	// servers so we can play without having to kick people.
+
+	// check for privateClient password
+	password = Info_ValueForKey( userinfo, "password" );
+	if ( !strcmp( password, sv_privatePassword->string ) ) {
+		startIndex = 0;
+	} else {
+		// skip past the reserved slots
+		startIndex = sv_privateClients->integer;
+	}
+
 	// if there is already a slot for this ip, reuse it
 	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
 		if ( cl->state == CS_FREE ) {
@@ -418,25 +437,6 @@ void SV_DirectConnect( netadr_t from ) {
 			//
 			goto gotnewcl;
 		}
-	}
-
-	// find a client slot
-	// if "sv_privateClients" is set > 0, then that number
-	// of client slots will be reserved for connections that
-	// have "password" set to the value of "sv_privatePassword"
-	// Info requests will report the maxclients as if the private
-	// slots didn't exist, to prevent people from trying to connect
-	// to a full server.
-	// This is to allow us to reserve a couple slots here on our
-	// servers so we can play without having to kick people.
-
-	// check for privateClient password
-	password = Info_ValueForKey( userinfo, "password" );
-	if ( !strcmp( password, sv_privatePassword->string ) ) {
-		startIndex = 0;
-	} else {
-		// skip past the reserved slots
-		startIndex = sv_privateClients->integer;
 	}
 
 	newcl = NULL;
@@ -486,6 +486,13 @@ gotnewcl:
 	clientNum = newcl - svs.clients;
 	ent = SV_GentityNum( clientNum );
 	newcl->gentity = ent;
+#ifdef TA_SPLITVIEW
+	newcl->owner = -1;
+	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+		newcl->local_clients[i] = -1;
+		newcl->gentity->r.viewclients[i] = -1;
+	}
+#endif
 
 	// save the challenge
 	newcl->challenge = challenge;
@@ -525,6 +532,89 @@ gotnewcl:
 	// notice that it is from a different serverid and that the
 	// gamestate message was not just sent, forcing a retransmit
 	newcl->gamestateMessageNum = -1;
+
+#ifdef TA_SPLITVIEW
+	{
+		// Client sends a userinfo string for each client they want.
+		int wantClients = Com_Clamp(1, MAX_SPLITVIEW, Cmd_Argc()-1);
+		int lc; // local client
+		client_t *owner = newcl;
+
+		Com_Printf("DEBUG: Attempting to add %d extra local clients\n", wantClients-1);
+
+		for (lc = 1; lc < wantClients; lc++) {
+			newcl = NULL;
+			for ( i = startIndex; i < sv_maxclients->integer ; i++ ) {
+				cl = &svs.clients[i];
+				if (cl->state == CS_FREE) {
+					newcl = cl;
+					break;
+				}
+			}
+
+			if (!newcl) {
+				Com_Printf("DEBUG: No free slot for local client %d\n", lc);
+				break;
+			}
+
+			Com_Printf("DEBUG: Attempting to add local client %d\n", lc);
+
+			Q_strncpyz( userinfo, Cmd_Argv(lc+1), sizeof(userinfo) );
+
+			Com_Printf("DEBUG: userinfo (%d): %s\n", lc, userinfo);
+
+			// build a new connection
+			// accept the new client
+			// this is the only place a client_t is ever initialized
+			*newcl = *owner;
+			clientNum = newcl - svs.clients;
+			ent = SV_GentityNum( clientNum );
+			newcl->gentity = ent;
+
+			// save the challenge
+			//newcl->challenge = challenge;
+
+			// save the address
+			Netchan_Setup (NS_SERVER, &newcl->netchan , from, qport);
+			// init the netchan queue
+			newcl->netchan_end_queue = &newcl->netchan_start_queue;
+
+			// save the userinfo
+			Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
+
+			newcl->owner = owner - svs.clients;
+			owner->local_clients[lc-1] = i;
+
+			// get the game a chance to reject this connection or modify the userinfo
+			denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue
+			if ( denied ) {
+				// we can't just use VM_ArgPtr, because that is only valid inside a VM_Call
+				char *str = VM_ExplicitArgPtr( gvm, denied );
+
+				NET_OutOfBandPrint( NS_SERVER, from, "print\n%s\n", str );
+				Com_DPrintf ("Game rejected a connection: %s.\n", str);
+				break;
+			}
+
+			SV_UserinfoChanged( newcl );
+
+			// send the connect packet to the client
+			//NET_OutOfBandPrint( NS_SERVER, from, "connectResponse" );
+
+			Com_DPrintf( "Going from CS_FREE to CS_CONNECTED for %s\n", newcl->name );
+
+			newcl->state = CS_CONNECTED;
+			newcl->nextSnapshotTime = svs.time;
+			newcl->lastPacketTime = svs.time;
+			newcl->lastConnectTime = svs.time;
+			
+			// when we receive the first packet from the client, we will
+			// notice that it is from a different serverid and that the
+			// gamestate message was not just sent, forcing a retransmit
+			newcl->gamestateMessageNum = -1;
+		}
+	}
+#endif
 
 	// if this was the first client on the server, or the last client
 	// the server can hold, send a heartbeat to the master.
@@ -635,6 +725,10 @@ static void SV_SendClientGameState( client_t *client ) {
 	entityState_t	*base, nullstate;
 	msg_t		msg;
 	byte		msgBuffer[MAX_MSGLEN];
+#ifdef TA_SPLITVIEW // TEST2
+	int			i;
+	client_t	*lc;
+#endif
 
  	Com_DPrintf ("SV_SendClientGameState() for %s\n", client->name);
 	Com_DPrintf( "Going from CS_CONNECTED to CS_PRIMED for %s\n", client->name );
@@ -647,6 +741,30 @@ static void SV_SendClientGameState( client_t *client ) {
 	// gamestate message was not just sent, forcing a retransmit
 	client->gamestateMessageNum = client->netchan.outgoingSequence;
 
+#ifdef TA_SPLITVIEW // TEST2
+	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+		if (client->local_clients[i] == -1) {
+			continue;
+		}
+
+		lc = &svs.clients[client->local_clients[i]];
+
+		Com_DPrintf ("SV_SendClientGameState() for %s\n", lc->name);
+		Com_DPrintf( "Going from CS_CONNECTED to CS_PRIMED for %s\n", lc->name );
+		lc->state = CS_PRIMED;
+		lc->pureAuthentic = 0;
+		lc->gotCP = qfalse;
+
+		// ZTM: FIXME: Is this needed?
+		//lc->netchan.outgoingSequence = client->netchan.outgoingSequence;
+
+		// when we receive the first packet from the client, we will
+		// notice that it is from a different serverid and that the
+		// gamestate message was not just sent, forcing a retransmit
+		lc->gamestateMessageNum = lc->netchan.outgoingSequence;
+	}
+#endif
+
 	MSG_Init( &msg, msgBuffer, sizeof( msgBuffer ) );
 
 	// NOTE, MRE: all server->client messages now acknowledge
@@ -658,6 +776,18 @@ static void SV_SendClientGameState( client_t *client ) {
 	// with a gamestate and it sets the clc.serverCommandSequence at
 	// the client side
 	SV_UpdateServerCommandsToClient( client, &msg );
+
+#if 0 // #ifdef TA_SPLITVIEW // TEST2 // FIXME?
+	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+		if (client->local_clients[i] == -1) {
+			continue;
+		}
+
+		lc = &svs.clients[client->local_clients[i]];
+
+		SV_UpdateServerCommandsToClient( lc, &msg );
+	}
+#endif
 
 	// send the gamestate
 	MSG_WriteByte( &msg, svc_gamestate );
@@ -1419,6 +1549,50 @@ static void SV_UpdateUserinfo_f( client_t *cl ) {
 	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
 }
 
+#ifdef TA_SPLITVIEW
+static void SV_UpdateUserinfo2_f( client_t *cl ) {
+	if (cl->local_clients[0] != -1) {
+		return;
+	}
+
+	cl = &svs.clients[cl->local_clients[0]];
+
+	Q_strncpyz( cl->userinfo, Cmd_Argv(1), sizeof(cl->userinfo) );
+
+	SV_UserinfoChanged( cl );
+	// call prog code to allow overrides
+	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
+}
+
+static void SV_UpdateUserinfo3_f( client_t *cl ) {
+	if (cl->local_clients[1] != -1) {
+		return;
+	}
+
+	cl = &svs.clients[cl->local_clients[1]];
+
+	Q_strncpyz( cl->userinfo, Cmd_Argv(1), sizeof(cl->userinfo) );
+
+	SV_UserinfoChanged( cl );
+	// call prog code to allow overrides
+	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
+}
+
+static void SV_UpdateUserinfo4_f( client_t *cl ) {
+	if (cl->local_clients[2] != -1) {
+		return;
+	}
+
+	cl = &svs.clients[cl->local_clients[2]];
+
+	Q_strncpyz( cl->userinfo, Cmd_Argv(1), sizeof(cl->userinfo) );
+
+	SV_UserinfoChanged( cl );
+	// call prog code to allow overrides
+	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
+}
+#endif
+
 
 #ifdef USE_VOIP
 static
@@ -1459,6 +1633,11 @@ typedef struct {
 
 static ucmd_t ucmds[] = {
 	{"userinfo", SV_UpdateUserinfo_f},
+#ifdef TA_SPLITVIEW
+	{"userinfo2", SV_UpdateUserinfo2_f},
+	{"userinfo3", SV_UpdateUserinfo3_f},
+	{"userinfo4", SV_UpdateUserinfo4_f},
+#endif
 	{"disconnect", SV_Disconnect_f},
 	{"cp", SV_VerifyPaks_f},
 	{"vdr", SV_ResetPureClient_f},
@@ -1595,7 +1774,7 @@ On very fast clients, there may be multiple usercmd packed into
 each of the backup packets.
 ==================
 */
-static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
+static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, client_t *encoder) {
 	int			i, key;
 	int			cmdCount;
 	usercmd_t	nullcmd;
@@ -1623,9 +1802,9 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
 	// use the checksum feed in the key
 	key = sv.checksumFeed;
 	// also use the message acknowledge
-	key ^= cl->messageAcknowledge;
+	key ^= encoder->messageAcknowledge;
 	// also use the last acknowledged server command in the key
-	key ^= MSG_HashKey(cl->reliableCommands[ cl->reliableAcknowledge & (MAX_RELIABLE_COMMANDS-1) ], 32);
+	key ^= MSG_HashKey(encoder->reliableCommands[ encoder->reliableAcknowledge & (MAX_RELIABLE_COMMANDS-1) ], 32);
 
 	Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
 	oldcmd = &nullcmd;
@@ -1658,7 +1837,7 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta ) {
 		SV_ClientEnterWorld( cl, &cmds[0] );
 		// the moves can be processed normaly
 	}
-	
+
 	// a bad cp command was sent, drop the client
 	if (sv_pure->integer != 0 && cl->pureAuthentic == 0) {		
 		SV_DropClient( cl, "Cannot validate pure client!");
@@ -1851,6 +2030,17 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 		cl->reliableAcknowledge = cl->reliableSequence;
 		return;
 	}
+#if 0 //#ifdef TA_SPLITVIEW // TEST2
+	for (c = 0; c < MAX_SPLITVIEW-1; c++) {
+		if (cl->local_clients[c] == -1) {
+			continue;
+		}
+
+		svs.clients[cl->local_clients[c]].messageAcknowledge = cl->messageAcknowledge;
+		svs.clients[cl->local_clients[c]].reliableAcknowledge = cl->reliableAcknowledge;
+		svs.clients[cl->local_clients[c]].reliableSequence = cl->reliableSequence;
+	}
+#endif
 	// if this is a usercmd from a previous gamestate,
 	// ignore it or retransmit the current gamestate
 	// 
@@ -1873,6 +2063,11 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 		// gamestate we sent them, resend it
 		if ( cl->messageAcknowledge > cl->gamestateMessageNum ) {
 			Com_DPrintf( "%s : dropped gamestate, resending\n", cl->name );
+#ifdef TA_SPLITVIEW
+			Com_DPrintf( "client=%d\n", (int)(cl - svs.clients));
+			Com_DPrintf( "gamestateMessageNum=%d\n", cl->gamestateMessageNum );
+			Com_DPrintf( "messageAcknowledge=%d\n", cl->messageAcknowledge );
+#endif
 			SV_SendClientGameState( cl );
 		}
 		return;
@@ -1918,17 +2113,93 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 
 	// read the usercmd_t
 	if ( c == clc_move ) {
-		SV_UserMove( cl, msg, qtrue );
+		SV_UserMove( cl, msg, qtrue, cl );
 	} else if ( c == clc_moveNoDelta ) {
-		SV_UserMove( cl, msg, qfalse );
+		SV_UserMove( cl, msg, qfalse, cl );
 	} else if ( c == clc_voip ) {
 #ifdef USE_VOIP
 		SV_UserVoip( cl, msg );
 #endif
+//#ifdef TA_SPLITVIEW
+	} else if ( c == clc_moveLocal ) {
+#ifdef TA_SPLITVIEW
+		c = MSG_ReadByte( msg ); // localClient
+		Com_Printf("DEBUG: Got delta usercmd for localClient %d\n", c);
+		if (c < 0 || c >= MAX_SPLITVIEW-1 || cl->local_clients[c] == -1) {
+			Com_Printf( "WARNING: bad localClient byte for client %i\n", (int) (cl - svs.clients) );
+		} else {
+			SV_UserMove( &svs.clients[cl->local_clients[c]], msg, qtrue, cl );
+		}
+#endif
+	} else if ( c == clc_moveLocalNoDelta ) {
+#ifdef TA_SPLITVIEW
+		c = MSG_ReadByte( msg ); // localClient
+		Com_Printf("DEBUG: Got usercmd for localClient %d\n", c);
+		if (c < 0 || c >= MAX_SPLITVIEW-1 || cl->local_clients[c] == -1) {
+			Com_Printf( "WARNING: bad localClient byte for client %i\n", (int) (cl - svs.clients) );
+		} else {
+			SV_UserMove( &svs.clients[cl->local_clients[c]], msg, qfalse, cl );
+		}
+#endif
+//#endif
 	} else if ( c != clc_EOF ) {
 		Com_Printf( "WARNING: bad command byte for client %i\n", (int) (cl - svs.clients) );
 	}
 //	if ( msg->readcount != msg->cursize ) {
 //		Com_Printf( "WARNING: Junk at end of packet for client %i\n", cl - svs.clients );
 //	}
+
+#ifdef TA_SPLITVIEW
+	// LocalClient move test is packed after normal move
+	if ( c != clc_EOF ) {
+		int i;
+
+		for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+			c = MSG_ReadByte( msg );
+
+			// See if this is an extension command after the EOF, which means we
+			//  got data that a legacy server should ignore.
+			if ((c == clc_EOF) && (MSG_LookaheadByte( msg ) == clc_extension)) {
+				MSG_ReadByte( msg );  // throw the clc_extension byte away.
+				c = MSG_ReadByte( msg );  // something legacy servers can't do!
+				// sometimes you get a clc_extension at end of stream...dangling
+				//  bits in the huffman decoder giving a bogus value?
+				if (c == -1) {
+					c = clc_EOF;
+				}
+			}
+
+			if ( c == clc_EOF ) {
+				break;
+			}
+
+			if ( c == clc_moveLocal ) {
+				c = MSG_ReadByte( msg ); // localClient-1
+				//Com_Printf("DEBUG: Got delta usercmd for localClient %d\n", c);
+				if (c < 0 || c >= MAX_SPLITVIEW-1) {
+					if (cl->local_clients[c] != -1) {
+						Com_Printf( "WARNING: bad delta localClient byte for client %i\n", (int) (cl - svs.clients) );
+					}
+				} else {
+					SV_UserMove( &svs.clients[cl->local_clients[c]], msg, qtrue, cl );
+				}
+			} else if ( c == clc_moveLocalNoDelta ) {
+				c = MSG_ReadByte( msg ); // localClient-1
+				//Com_Printf("DEBUG: Got usercmd for localClient %d\n", c);
+				if (c < 0 || c >= MAX_SPLITVIEW-1 || cl->local_clients[c] == -1) {
+					if (cl->local_clients[c] != -1) {
+						Com_Printf( "WARNING: bad localClient byte for client %i\n", (int) (cl - svs.clients) );
+					}
+				} else {
+					SV_UserMove( &svs.clients[cl->local_clients[c]], msg, qfalse, cl );
+				}
+			}
+			else if ( c == clc_voip ) {
+#ifdef USE_VOIP
+				SV_UserVoip( cl, msg );
+#endif
+			}
+		}
+	}
+#endif
 }

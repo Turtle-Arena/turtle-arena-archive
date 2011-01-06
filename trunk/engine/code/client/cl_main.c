@@ -2113,6 +2113,12 @@ Resend a connect message if the last one has timed out
 */
 void CL_CheckForResend( void ) {
 	int		port, i;
+#ifdef TA_SPLITVIEW
+	int		size, j;
+	int		cvarflag[MAX_SPLITVIEW] = {CVAR_USERINFO, CVAR_USERINFO2, CVAR_USERINFO3, CVAR_USERINFO4};
+	int		localClients;
+	int		rate, snaps;
+#endif
 	char	info[MAX_INFO_STRING];
 	char	data[MAX_INFO_STRING];
 
@@ -2152,12 +2158,58 @@ void CL_CheckForResend( void ) {
 		// sending back the challenge
 		port = Cvar_VariableValue ("net_qport");
 
+#ifndef TA_SPLITVIEW
 		Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
 		Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
 		Info_SetValueForKey( info, "qport", va("%i", port ) );
 		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
+#endif
 		
 		strcpy(data, "connect ");
+#ifdef TA_SPLITVIEW
+		size = 8;
+
+		rate = Cvar_VariableValue ("rate");
+		snaps = Cvar_VariableValue ("snaps");
+
+		// Check how many local client user wants
+		localClients = Com_Clamp(1, MAX_SPLITVIEW, Cvar_VariableIntegerValue("cl_localClients"));
+
+		for (i = 0; i < localClients; i++) {
+			Q_strncpyz( info, Cvar_InfoString( cvarflag[i] ), sizeof( info ) );
+
+			// ZTM: Do we need to set these for more than the first client?
+			Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
+			Info_SetValueForKey( info, "qport", va("%i", port ) );
+			Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
+
+			if (i > 0) {
+				Info_SetValueForKey( info, "rate", va("%i", rate ) );
+				Info_SetValueForKey( info, "snaps", va("%i", snaps ) );
+			}
+
+			// TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
+			//   (Com_TokenizeString tokenizes around spaces)
+			data[size] = '"'; size++;
+			for(j = 0; j < strlen(info); j++) {
+				data[size+j] = info[j];	// + (clc.challenge)&0x3;
+			}
+			size += j;
+			data[size] = '"'; size++;
+
+			// Add space between info strings.
+			if (i != localClients-1) {
+				data[size] = ' '; size++;
+			}
+		}
+		data[size] = 0;
+
+		// NOTE TTimo don't forget to set the right data length!
+		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (byte *) &data[0], size );
+		// the most current userinfo has been sent, so watch for any
+		// newer changes to userinfo variables
+		cvar_modifiedFlags &= ~(CVAR_USERINFO|CVAR_USERINFO2|CVAR_USERINFO3|CVAR_USERINFO4);
+#else
     // TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
     //   (Com_TokenizeString tokenizes around spaces)
     data[8] = '"';
@@ -2173,6 +2225,7 @@ void CL_CheckForResend( void ) {
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
+#endif
 		break;
 
 	default:
@@ -2638,6 +2691,23 @@ void CL_CheckUserinfo( void ) {
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
 		CL_AddReliableCommand(va("userinfo \"%s\"", Cvar_InfoString( CVAR_USERINFO ) ), qfalse);
 	}
+#ifdef TA_SPLITVIEW
+	if(cvar_modifiedFlags & CVAR_USERINFO2)
+	{
+		cvar_modifiedFlags &= ~CVAR_USERINFO2;
+		CL_AddReliableCommand(va("userinfo2 \"%s\"", Cvar_InfoString( CVAR_USERINFO2 ) ), qfalse);
+	}
+	if(cvar_modifiedFlags & CVAR_USERINFO3)
+	{
+		cvar_modifiedFlags &= ~CVAR_USERINFO3;
+		CL_AddReliableCommand(va("userinfo3 \"%s\"", Cvar_InfoString( CVAR_USERINFO3 ) ), qfalse);
+	}
+	if(cvar_modifiedFlags & CVAR_USERINFO4)
+	{
+		cvar_modifiedFlags &= ~CVAR_USERINFO4;
+		CL_AddReliableCommand(va("userinfo4 \"%s\"", Cvar_InfoString( CVAR_USERINFO4 ) ), qfalse);
+	}
+#endif
 }
 
 /*
@@ -3248,6 +3318,10 @@ void CL_Init( void ) {
 	cl_consoleFontKerning = Cvar_Get ("cl_consoleFontKerning", "0", CVAR_ARCHIVE | CVAR_LATCH);
 #endif
 
+#ifdef TA_SPLITVIEW
+	Cvar_Get ("cl_localclients", "1", 0 );
+#endif
+
 	// userinfo
 	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("rate", "25000", CVAR_USERINFO | CVAR_ARCHIVE );
@@ -3295,6 +3369,101 @@ void CL_Init( void ) {
 
 	Cvar_Get ("password", "", CVAR_USERINFO);
 	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );
+
+#ifdef TA_SPLITVIEW
+	// Second local client
+	Cvar_Get ("2_name", "UnnamedPlayer2", CVAR_USERINFO2 | CVAR_ARCHIVE );
+#ifdef TA_SP // SPMODEL
+	Cvar_Get ("2_spmodel", "mike", CVAR_USERINFO2 | CVAR_ROM );
+	Cvar_Get ("2_spheadmodel", "", CVAR_USERINFO2 | CVAR_ROM );
+#endif
+#ifdef TURTLEARENA
+	Cvar_Get ("2_model", "mike", CVAR_USERINFO2 | CVAR_ARCHIVE );
+#else
+	Cvar_Get ("2_model", "crash", CVAR_USERINFO2 | CVAR_ARCHIVE );
+#endif
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+	Cvar_Get ("2_headmodel", "", CVAR_USERINFO2 | CVAR_ARCHIVE );
+#else
+	Cvar_Get ("2_headmodel", "crash", CVAR_USERINFO2 | CVAR_ARCHIVE );
+#endif
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
+	Cvar_Get ("2_team_model", "janet", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2_team_headmodel", "*janet", CVAR_USERINFO2 | CVAR_ARCHIVE );
+#endif
+#ifdef TURTLEARENA
+	Cvar_Get ("2_color1", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2_color2", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
+#else
+	Cvar_Get ("2_color1", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2_color2", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
+#endif
+	Cvar_Get ("2_handicap", "100", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2_teamtask", "0", CVAR_USERINFO2 );
+	Cvar_Get ("2_sex", "male", CVAR_USERINFO2 | CVAR_ARCHIVE );
+
+	// Third local client
+	Cvar_Get ("3_name", "UnnamedPlayer3", CVAR_USERINFO3 | CVAR_ARCHIVE );
+#ifdef TA_SP // SPMODEL
+	Cvar_Get ("3_spmodel", "leo", CVAR_USERINFO3 | CVAR_ROM );
+	Cvar_Get ("3_spheadmodel", "", CVAR_USERINFO3 | CVAR_ROM );
+#endif
+#ifdef TURTLEARENA
+	Cvar_Get ("3_model", "leo", CVAR_USERINFO3 | CVAR_ARCHIVE );
+#else
+	Cvar_Get ("3_model", "visor", CVAR_USERINFO3 | CVAR_ARCHIVE );
+#endif
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+	Cvar_Get ("3_headmodel", "", CVAR_USERINFO3 | CVAR_ARCHIVE );
+#else
+	Cvar_Get ("3_headmodel", "visor", CVAR_USERINFO3 | CVAR_ARCHIVE );
+#endif
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
+	Cvar_Get ("3_team_model", "james", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3_team_headmodel", "*james", CVAR_USERINFO3 | CVAR_ARCHIVE );
+#endif
+#ifdef TURTLEARENA
+	Cvar_Get ("3_color1", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3_color2", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
+#else
+	Cvar_Get ("3_color1", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3_color2", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
+#endif
+	Cvar_Get ("3_handicap", "100", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3_teamtask", "0", CVAR_USERINFO3 );
+	Cvar_Get ("3_sex", "male", CVAR_USERINFO3 | CVAR_ARCHIVE );
+
+	// Fourth local client
+	Cvar_Get ("4_name", "UnnamedPlayer4", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#ifdef TA_SP // SPMODEL
+	Cvar_Get ("4_spmodel", "don", CVAR_USERINFO4 | CVAR_ROM );
+	Cvar_Get ("4_spheadmodel", "", CVAR_USERINFO4 | CVAR_ROM );
+#endif
+#ifdef TURTLEARENA
+	Cvar_Get ("4_model", "don", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#else
+	Cvar_Get ("4_model", "doom", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#endif
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+	Cvar_Get ("4_headmodel", "", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#else
+	Cvar_Get ("4_headmodel", "doom", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#endif
+#ifndef IOQ3ZTM_NO_TEAM_MODEL
+	Cvar_Get ("4_team_model", "james", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4_team_headmodel", "*james", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#endif
+#ifdef TURTLEARENA
+	Cvar_Get ("4_color1", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4_color2", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#else
+	Cvar_Get ("4_color1", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4_color2", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#endif
+	Cvar_Get ("4_handicap", "100", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4_teamtask", "0", CVAR_USERINFO4 );
+	Cvar_Get ("4_sex", "male", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#endif
 
 #ifdef USE_MUMBLE
 	cl_useMumble = Cvar_Get ("cl_useMumble", "0", CVAR_ARCHIVE | CVAR_LATCH);

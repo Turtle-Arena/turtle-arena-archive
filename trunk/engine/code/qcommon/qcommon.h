@@ -326,6 +326,10 @@ enum clc_ops_e {
 	//  this keeps legacy servers compatible.
 	clc_extension,
 	clc_voip,   // not wrapped in USE_VOIP, so this value is reserved.
+//#ifdef TA_SPLITVIEW
+	clc_moveLocal,			// [[usercmd_t] for extra local clients
+	clc_moveLocalNoDelta,	// [[usercmd_t] for extra local clients
+//#endif
 };
 
 /*
