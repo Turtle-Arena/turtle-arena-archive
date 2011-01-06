@@ -2066,7 +2066,7 @@ static int CG_FeederCount(float feederID) {
 
 void CG_SetScoreSelection(void *p) {
 	menuDef_t *menu = (menuDef_t*)p;
-	playerState_t *ps = &cg.snap->ps;
+	playerState_t *ps = cg.cur_ps;
 	int i, red, blue;
 	red = blue = 0;
 	for (i = 0; i < cg.numScores; i++) {
@@ -2163,7 +2163,7 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 				}
 		  break;
 			case 2:
-				if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << sp->client ) ) {
+				if ( cg.cur_ps->stats[ STAT_CLIENTS_READY ] & ( 1 << sp->client ) ) {
 					return "Ready";
 				}
 				if (team == -1) {
@@ -2487,7 +2487,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 #ifdef TA_WEAPSYS_EX
 	cg.localClient.predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #else
-	cg.localClient.weaponSelect = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+	cg.localClient.weaponSelect = cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #endif
 #else
 	cg.localClient.weaponSelect = WP_MACHINEGUN;
