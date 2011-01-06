@@ -190,6 +190,12 @@ typedef struct client_s {
 	int queuedVoipPackets;
 #endif
 
+#ifdef TA_SPLITVIEW
+	int	owner; // If not -1 this client is splitscreen with owner
+	int local_clients[MAX_SPLITVIEW-1]; // If any are not -1 this client is splitscreen main client,
+										// local_clients are there splitscreen players.
+#endif
+
 	int				oldServerTime;
 	qboolean			csUpdated[MAX_CONFIGSTRINGS+1];	
 } client_t;

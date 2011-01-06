@@ -1103,7 +1103,17 @@ char *Cvar_InfoString(int bit)
 	for(var = cvar_vars; var; var = var->next)
 	{
 		if(var->name && (var->flags & bit))
+#ifdef TA_SPLITVIEW
+		{
+			// If extra local client, remove "#_" from the beginning of each var.
+			if (bit & (CVAR_USERINFO2|CVAR_USERINFO3|CVAR_USERINFO4))
+				Info_SetValueForKey (info, &var->name[2], var->string);
+			else
+				Info_SetValueForKey (info, var->name, var->string);
+		}
+#else
 			Info_SetValueForKey (info, var->name, var->string);
+#endif
 	}
 
 	return info;

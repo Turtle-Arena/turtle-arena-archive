@@ -499,6 +499,9 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	clientSnapshot_t			*frame;
 	snapshotEntityNumbers_t		entityNumbers;
 	int							i;
+#if 0 //#ifdef TA_SPLITVIEW
+	int							j;
+#endif
 	sharedEntity_t				*ent;
 	entityState_t				*state;
 	svEntity_t					*svEnt;
@@ -530,11 +533,18 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	frame->pss[0] = *ps;
 	frame->numPSs = 1;
 
-#if 1 // ZTM: TEST: Splitscreen with other clients!
+	// Add splitscreen clients
 	for (i = 1; i < MAX_SPLITVIEW; i++) {
-		clent->r.viewclients[i-1] = client - svs.clients;
+		if (client->local_clients[i-1] == -1) {
+			break;
+		}
+		ps = SV_GameClientNum( client->local_clients[i-1] );
+		frame->pss[frame->numPSs] = *ps;
+		frame->numPSs++;
 	}
 
+#if 0 // ZTM: Set viewclients, should be done in game?
+	j = 1;
 	for (i = 0; i < sv_maxclients->integer; i++)
 	{
 		if (i == client - svs.clients) {
@@ -544,24 +554,36 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 			continue;
 		}
 
-		clent->r.viewclients[frame->numPSs-1] = i;
-		frame->numPSs++;
-		if (frame->numPSs == MAX_SPLITVIEW) {
+		for (j = 1; j < MAX_SPLITVIEW; j++) {
+			if (client->local_clients[j-1] == clent->r.viewclients[i-1]) {
+				break;
+			}
+		}
+		if (j != MAX_SPLITVIEW) {
+			continue;
+		}
+
+		clent->r.viewclients[j-1] = i;
+		j++;
+		if (j >= MAX_SPLITVIEW) {
 			break;
 		}
 	}
-	frame->numPSs = 1;
 #endif
 
+#if 0
+	// Add viewclients
 	for (i = 1; i < MAX_SPLITVIEW; i++) {
-		if ((clent->r.viewclients[i-1] < 0 || clent->r.viewclients[i-1] >= MAX_CLIENTS)
-			|| clent->r.viewclients[i-1] == client - svs.clients) {
+		if ((clent->r.viewclients[i-1] < 0 || clent->r.viewclients[i-1] >= MAX_CLIENTS)) {
 			break;
 		}
 		ps = SV_GameClientNum( clent->r.viewclients[i-1] );
-		frame->pss[i] = *ps;
+		frame->pss[frame->numPSs] = *ps;
 		frame->numPSs++;
+		if (frame->numPSs >= MAX_SPLITVIEW)
+			break;
 	}
+#endif
 
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		// never send client's own entity, because it can
