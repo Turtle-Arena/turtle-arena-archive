@@ -3001,6 +3001,7 @@ static void CG_DrawSPIntermission( void ) {
 		if (name[0] == '*') {
 			name++;
 		}
+		name[0] = toupper(name[0]);
 	} else {
 		name = cgs.clientinfo[ cg.snap->ps.clientNum ].name;
 	}
