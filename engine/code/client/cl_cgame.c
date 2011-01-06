@@ -152,7 +152,14 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 	snapshot->ping = clSnap->ping;
 	snapshot->serverTime = clSnap->serverTime;
 	Com_Memcpy( snapshot->areamask, clSnap->areamask, sizeof( snapshot->areamask ) );
+#ifdef TA_SPLITVIEW
+	snapshot->numPSs = clSnap->numPSs;
+	for (i = 0; i < snapshot->numPSs; i++) {
+		snapshot->pss[i] = clSnap->pss[i];
+	}
+#else
 	snapshot->ps = clSnap->ps;
+#endif
 	count = clSnap->numEntities;
 	if ( count > MAX_ENTITIES_IN_SNAPSHOT ) {
 		Com_DPrintf( "CL_GetSnapshot: truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT );

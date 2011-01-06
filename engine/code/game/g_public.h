@@ -86,6 +86,10 @@ typedef struct {
 	// ent->s.ownerNum = passEntityNum	(don't interact with your own missiles)
 	// entity[ent->s.ownerNum].ownerNum = passEntityNum	(don't interact with other missiles from owner)
 	int			ownerNum;
+
+#ifdef TA_SPLITVIEW
+	int			viewclients[MAX_SPLITVIEW-1]; // Extra view clients for splitscreen
+#endif
 } entityShared_t;
 
 

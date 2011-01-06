@@ -265,12 +265,21 @@ static void CG_PrevTeamMember_f( void ) {
 // ASS U ME's enumeration order as far as task specific orders, OFFENSE is zero, CAMP is last
 //
 static void CG_NextOrder_f( void ) {
+#ifdef TA_SPLITVIEW
+	clientInfo_t *ci = cgs.clientinfo + cg.snap->pss[0].clientNum;
+	if (ci) {
+		if (!ci->teamLeader && sortedTeamPlayers[cg_currentSelectedPlayer.integer] != cg.snap->pss[0].clientNum) {
+			return;
+		}
+	}
+#else
 	clientInfo_t *ci = cgs.clientinfo + cg.snap->ps.clientNum;
 	if (ci) {
 		if (!ci->teamLeader && sortedTeamPlayers[cg_currentSelectedPlayer.integer] != cg.snap->ps.clientNum) {
 			return;
 		}
 	}
+#endif
 	if (cgs.currentOrder < TEAMTASK_CAMP) {
 		cgs.currentOrder++;
 
@@ -513,49 +522,68 @@ void CG_Letterbox(void)
 #endif
 
 #ifdef IOQ3ZTM // NEW_CAM
-void CG_CamMoveLeft(qboolean down)
+void CG_CamLeft(int localClient, qboolean down)
 {
-	cg.camLeft = down;
+#ifdef TA_SPLITVIEW
+	cglc_t *lc = &cg.localClients[localClient];
+#else
+	cglc_t *lc = &cg.localClient;
+#endif
+	lc->camLeft = down;
 	if (down) {
-		cg.camRotDir += 1.0f;
-		cg.camReseting = qfalse;
+		lc->camRotDir += 1.0f;
+		lc->camReseting = qfalse;
 	}
 }
 
-void CG_CamMoveRight(qboolean down)
+void CG_CamRight(int localClient, qboolean down)
 {
-	cg.camRight = down;
+#ifdef TA_SPLITVIEW
+	cglc_t *lc = &cg.localClients[localClient];
+#else
+	cglc_t *lc = &cg.localClient;
+#endif
+	lc->camRight = down;
 	if (down) {
-		cg.camRotDir -= 1.0f;
-		cg.camReseting = qfalse;
+		lc->camRotDir -= 1.0f;
+		lc->camReseting = qfalse;
 	}
 }
 
+void CG_CamReset(int localClient)
+{
+#ifdef TA_SPLITVIEW
+	cglc_t *lc = &cg.localClients[localClient];
+#else
+	cglc_t *lc = &cg.localClient;
+#endif
+	lc->camReseting = qtrue;
+	lc->camRotDir = 0;
+}
 
 void CG_CamLeftDown_f(void)
 {
-	CG_CamMoveLeft(qtrue);
+	CG_CamLeft(0, qtrue);
 }
 
 void CG_CamLeftUp_f(void)
 {
-	CG_CamMoveLeft(qfalse);
+	CG_CamLeft(0, qfalse);
 }
 
 void CG_CamRightDown_f(void)
 {
-	CG_CamMoveRight(qtrue);
+	CG_CamRight(0, qtrue);
 }
 
 void CG_CamRightUp_f(void)
 {
-	CG_CamMoveRight(qfalse);
+	CG_CamRight(0, qfalse);
 }
 
 void CG_CamReset_f(void)
 {
-	cg.camReseting = qtrue;
-	cg.camRotDir = 0;
+	CG_CamReset(0);
 }
 #endif
 

@@ -1032,10 +1032,17 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 
 #if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
 	// If it is the local client update default weapon.
-	if (clientNum == cg.predictedPlayerState.clientNum)
-	{
-		cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
+#ifdef TA_SPLITVIEW
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (clientNum == cg.localClients[i].predictedPlayerState.clientNum) {
+			cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
+		}
 	}
+#else
+	if (clientNum == cg.localClient.predictedPlayerState.clientNum) {
+		cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
+	}
+#endif
 #endif
 
 #ifdef TA_WEAPSYS
@@ -1820,12 +1827,12 @@ static void CG_AddPainTwitch( centity_t *cent, vec3_t torsoAngles ) {
 	f = 1.0 - (float)t / PAIN_TWITCH_TIME;
 
 #if 0 // #ifdef TA_MISC // ZTM: TEST
-	if (cent->currentState.clientNum == cg.predictedPlayerEntity.currentState.clientNum)
+	if (cent->currentState.clientNum == cg.cur_lc->predictedPlayerEntity.currentState.clientNum)
 	{
-		Com_Printf("DEBUG: damageYaw=%d\n", cg.predictedPlayerState.damageYaw);
+		Com_Printf("DEBUG: damageYaw=%d\n", cg.cur_lc->predictedPlayerState.damageYaw);
 
-		//torsoAngles[PITCH] += cg.predictedPlayerState.damagePitch * f;
-		torsoAngles[YAW] -= cg.predictedPlayerState.damageYaw * f;
+		//torsoAngles[PITCH] += cg.cur_lc->predictedPlayerState.damagePitch * f;
+		torsoAngles[YAW] -= cg.cur_lc->predictedPlayerState.damageYaw * f;
 	}
 	else
 #endif
@@ -2154,7 +2161,7 @@ static void CG_BreathPuffs( centity_t *cent, refEntity_t *head) {
 		return;
 	}
 #endif
-	if ( cent->currentState.number == cg.snap->ps.clientNum && !cg.renderingThirdPerson) {
+	if ( cent->currentState.number == cg.cur_ps->clientNum && !cg.renderingThirdPerson) {
 		return;
 	}
 	if ( cent->currentState.eFlags & EF_DEAD ) {
@@ -2261,7 +2268,7 @@ static void CG_TrailItem( centity_t *cent, qhandle_t hModel )
 	vec3_t			axis[3];
 
 #ifdef IOQ3ZTM // FLAG // Don't draw CTF flag for the holder in third person, blocks view.
-	if (cent->currentState.clientNum == cg.predictedPlayerState.clientNum
+	if (cent->currentState.clientNum == cg.cur_lc->predictedPlayerState.clientNum
 		&& cg_thirdPerson.integer)
 	{
 		// if its the current player and their in third person view,
@@ -2416,7 +2423,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #if 0 // #ifdef IOQ3ZTM // FLAG // Don't draw CTF flag for the holder in third person, blocks view.
 						// ZTM: Could we make if transparent instead?
 						//     RF_FORCE_ENT_ALPHA
-		if (cent->currentState.clientNum == cg.predictedPlayerState.clientNum
+		if (cent->currentState.clientNum == cg.cur_lc->predictedPlayerState.clientNum
 			&& cg_thirdPerson.integer)
 		{
 			// if its the current player and their in third person view,
@@ -2800,7 +2807,7 @@ static void CG_PlayerSprites( centity_t *cent
 	origin[2] += 16;
 
 	// Current client's team sprite should only be shown in mirrors.
-	if ( cent->currentState.number == cg.snap->ps.clientNum )
+	if ( cent->currentState.number == cg.cur_ps->clientNum )
 	{
 		// IOQ3ZTM // RENDER_FLAGS
 		mirrorFlag = RF_ONLY_MIRROR;		// only show in mirrors
@@ -2821,7 +2828,7 @@ static void CG_PlayerSprites( centity_t *cent
 #ifdef TA_SP // ZTM: NOTE: Must disable talk balloon in sp intermission (not co-op), because there is a menu open.
 	if ( (cent->currentState.eFlags & EF_TALK)
 			&& !(cg.intermissionStarted && cg_singlePlayerActive.integer
-			&& cg.snap->ps.pm_type == PM_SPINTERMISSION) )
+			&& cg.cur_ps->pm_type == PM_SPINTERMISSION) )
 #else
 	if ( cent->currentState.eFlags & EF_TALK )
 #endif
@@ -2836,7 +2843,7 @@ static void CG_PlayerSprites( centity_t *cent
 
 #ifdef IOQ3ZTM
 	// Don't draw award if they are drawn on the HUD.
-	if ( cent->currentState.number != cg.snap->ps.clientNum
+	if ( cent->currentState.number != cg.cur_ps->clientNum
 		|| cg_draw2D.integer == 0 )
 	{
 #endif
@@ -2902,7 +2909,7 @@ static void CG_PlayerSprites( centity_t *cent
 #ifdef TURTLEARENA // LOCKON
 	// Show local client's target marker over this client
 #ifdef IOQ3ZTM
-	if (cg.snap->ps.enemyEnt == cent->currentState.number)
+	if (cg.cur_ps->enemyEnt == cent->currentState.number)
 	{
 #ifdef IOQ3ZTM
 		CG_PlayerFloatSprite( origin, 0, cgs.media.targetShader );
@@ -2916,10 +2923,10 @@ static void CG_PlayerSprites( centity_t *cent
 	team = cgs.clientinfo[ cent->currentState.clientNum ].team;
 	if ( !(cent->currentState.eFlags & EF_DEAD) && 
 #ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
-		((cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR && cgs.media.blueFriendShader)
-			|| cg.snap->ps.persistant[PERS_TEAM] == team) &&
+		((cg.cur_ps->persistant[PERS_TEAM] == TEAM_SPECTATOR && cgs.media.blueFriendShader)
+			|| cg.cur_ps->persistant[PERS_TEAM] == team) &&
 #else
-		cg.snap->ps.persistant[PERS_TEAM] == team &&
+		cg.cur_ps->persistant[PERS_TEAM] == team &&
 #endif
 		cgs.gametype >= GT_TEAM) {
 		if (cg_drawFriend.integer) {
@@ -3281,9 +3288,19 @@ void CG_Player( centity_t *cent ) {
 		return;
 	}
 
+#ifdef TA_SPLITVIEW
+	// For somereason we have to manually check for (and not render)
+	//  non-predicted entities for clients other than the main one.
+	for (t = 1; t < cg.snap->numPSs; t++) {
+		if (cent - cg_entities == cg.snap->pss[t].clientNum) {
+			return;
+		}
+	}
+#endif
+
 	// get the player model information
 	renderfx = 0;
-	if ( cent->currentState.number == cg.snap->ps.clientNum) {
+	if ( cent->currentState.number == cg.cur_ps->clientNum) {
 		if (!cg.renderingThirdPerson) {
 #ifdef IOQ3ZTM // RENDERFLAGS
 			renderfx = RF_ONLY_MIRROR;
@@ -3298,11 +3315,11 @@ void CG_Player( centity_t *cent ) {
 #ifdef TURTLEARENA // LOCKON
 		// Show target marker for non-client entities.
 #ifdef IOQ3ZTM
-		if (cg.snap->ps.enemyEnt >= MAX_CLIENTS && cg.snap->ps.enemyEnt != ENTITYNUM_NONE)
+		if (cg.cur_ps->enemyEnt >= MAX_CLIENTS && cg.cur_ps->enemyEnt != ENTITYNUM_NONE)
 		{
 			vec3_t marker;
 			
-			VectorCopy(cg.snap->ps.enemyOrigin, marker);
+			VectorCopy(cg.cur_ps->enemyOrigin, marker);
 			marker[2] += 40;
 			CG_PlayerFloatSprite( marker, 0, cgs.media.targetShader );
 		}

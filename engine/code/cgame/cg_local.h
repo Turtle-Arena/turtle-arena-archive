@@ -705,44 +705,10 @@ typedef struct {
 
 #define MAX_PREDICTED_EVENTS	16
  
-typedef struct {
-	int			clientFrame;		// incremented each frame
+ // ZTM: data that use to be in cg_t but is needed for each local client
+ typedef struct {
 
 	int			clientNum;
-	
-	qboolean	demoPlayback;
-	qboolean	levelShot;			// taking a level menu screenshot
-	int			deferredPlayerLoading;
-	qboolean	loading;			// don't defer players at initial startup
-	qboolean	intermissionStarted;	// don't play voice rewards, because game will end shortly
-
-	// there are only one or two snapshot_t that are relevent at a time
-	int			latestSnapshotNum;	// the number of snapshots the client system has received
-	int			latestSnapshotTime;	// the time from latestSnapshotNum, so we don't need to read the snapshot yet
-
-	snapshot_t	*snap;				// cg.snap->serverTime <= cg.time
-	snapshot_t	*nextSnap;			// cg.nextSnap->serverTime > cg.time, or NULL
-	snapshot_t	activeSnapshots[2];
-
-	float		frameInterpolation;	// (float)( cg.time - cg.frame->serverTime ) / (cg.nextFrame->serverTime - cg.frame->serverTime)
-
-	qboolean	thisFrameTeleport;
-	qboolean	nextFrameTeleport;
-
-	int			frametime;		// cg.time - cg.oldTime
-
-	int			time;			// this is the time value that the client
-								// is rendering at.
-	int			oldTime;		// time at last frame, used for missile trails and prediction checking
-
-	int			physicsTime;	// either cg.snap->time or cg.nextSnap->time
-
-	int			timelimitWarnings;	// 5 min, 1 min, overtime
-	int			fraglimitWarnings;
-
-	qboolean	mapRestart;			// set on a map restart to set back the weapon
-
-	qboolean	renderingThirdPerson;		// during deaths, chasecams, etc
 
 	// prediction state
 	qboolean	hyperspace;				// true if prediction has hit a trigger_teleport
@@ -772,50 +738,6 @@ typedef struct {
 	int			holdableSelect;
 #endif
 
-	// auto rotating items
-	vec3_t		autoAngles;
-	vec3_t		autoAxis[3];
-	vec3_t		autoAnglesFast;
-	vec3_t		autoAxisFast[3];
-
-	// view rendering
-	refdef_t	refdef;
-	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
-
-#ifdef TURTLEARENA // LOCKON
-	// lockon key
-	qboolean	lockedOn;
-	int			lockonTime;
-#endif
-
-#ifndef TURTLEARENA // NOZOOM
-	// zoom key
-	qboolean	zoomed;
-	int			zoomTime;
-	float		zoomSensitivity;
-#endif
-
-	// information screen text during loading
-	char		infoScreenText[MAX_STRING_CHARS];
-
-	// scoreboard
-	int			scoresRequestTime;
-	int			numScores;
-	int			selectedScore;
-	int			teamScores[2];
-	score_t		scores[MAX_CLIENTS];
-	qboolean	showScores;
-	qboolean	scoreBoardShowing;
-	int			scoreFadeTime;
-	char		killerName[MAX_NAME_LENGTH];
-	char			spectatorList[MAX_STRING_CHARS];		// list of names
-	int				spectatorLen;												// length of list
-	float			spectatorWidth;											// width in device units
-	int				spectatorTime;											// next time to offset
-	int				spectatorPaintX;										// current paint x
-	int				spectatorPaintX2;										// current paint x
-	int				spectatorOffset;										// current offset from start
-	int				spectatorPaintLen; 									// current offset from start
 
 #ifdef MISSIONPACK_HARVESTER
 	// skull trails
@@ -860,22 +782,18 @@ typedef struct {
 	qhandle_t	rewardShader[MAX_REWARDSTACK];
 	qhandle_t	rewardSound[MAX_REWARDSTACK];
 
-	// sound buffer mainly for announcer sounds
-	int			soundBufferIn;
-	int			soundBufferOut;
-	int			soundTime;
-	qhandle_t	soundBuffer[MAX_SOUNDBUFFER];
+#ifdef TURTLEARENA // LOCKON
+	// lockon key
+	qboolean	lockedOn;
+	int			lockonTime;
+#endif
 
-	// for voice chat buffer
-	int			voiceChatTime;
-	int			voiceChatBufferIn;
-	int			voiceChatBufferOut;
-
-	// warmup countdown
-	int			warmup;
-	int			warmupCount;
-
-	//==========================
+#ifndef TURTLEARENA // NOZOOM
+	// zoom key
+	qboolean	zoomed;
+	int			zoomTime;
+	float		zoomSensitivity;
+#endif
 
 	int			itemPickup;
 	int			itemPickupTime;
@@ -912,12 +830,6 @@ typedef struct {
 	vec3_t		kick_angles;	// weapon kicks
 	vec3_t		kick_origin;
 
-	// temp working variables for player view
-	float		bobfracsin;
-	int			bobcycle;
-	float		xyspeed;
-	int     nextOrbitTime;
-
 #ifdef IOQ3ZTM // NEW_CAM
 	float camRotDir;
 	qboolean camLeft;
@@ -941,11 +853,121 @@ typedef struct {
 	int		letterboxTime; // Time that the letter box move was started, or -1 if instant.
 #endif
 
+	char		killerName[MAX_NAME_LENGTH];
+
+ } cglc_t;
+ 
+typedef struct {
+	int			clientFrame;		// incremented each frame
+
+	qboolean	demoPlayback;
+	qboolean	levelShot;			// taking a level menu screenshot
+	int			deferredPlayerLoading;
+	qboolean	loading;			// don't defer players at initial startup
+	qboolean	intermissionStarted;	// don't play voice rewards, because game will end shortly
+
+	// there are only one or two snapshot_t that are relevent at a time
+	int			latestSnapshotNum;	// the number of snapshots the client system has received
+	int			latestSnapshotTime;	// the time from latestSnapshotNum, so we don't need to read the snapshot yet
+
+	snapshot_t	*snap;				// cg.snap->serverTime <= cg.time
+	snapshot_t	*nextSnap;			// cg.nextSnap->serverTime > cg.time, or NULL
+	snapshot_t	activeSnapshots[2];
+
+	float		frameInterpolation;	// (float)( cg.time - cg.frame->serverTime ) / (cg.nextFrame->serverTime - cg.frame->serverTime)
+
+	qboolean	thisFrameTeleport;
+	qboolean	nextFrameTeleport;
+
+	int			frametime;		// cg.time - cg.oldTime
+
+	int			time;			// this is the time value that the client
+								// is rendering at.
+	int			oldTime;		// time at last frame, used for missile trails and prediction checking
+
+	int			physicsTime;	// either cg.snap->time or cg.nextSnap->time
+
+	int			timelimitWarnings;	// 5 min, 1 min, overtime
+	int			fraglimitWarnings;
+
+	qboolean	mapRestart;			// set on a map restart to set back the weapon
+
+	qboolean	renderingThirdPerson;		// during deaths, chasecams, etc
+
+	// auto rotating items
+	vec3_t		autoAngles;
+	vec3_t		autoAxis[3];
+	vec3_t		autoAnglesFast;
+	vec3_t		autoAxisFast[3];
+
+	// view rendering
+	refdef_t	refdef;
+	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
+
+#ifdef TA_SPLITVIEW
+	int numViewports;
+	int viewport;
+	int viewVerticle; // Use verticle split view instead of horizontal
+#endif
+
+	// information screen text during loading
+	char		infoScreenText[MAX_STRING_CHARS];
+
+	// scoreboard
+	int			scoresRequestTime;
+	int			numScores;
+	int			selectedScore;
+	int			teamScores[2];
+	score_t		scores[MAX_CLIENTS];
+	qboolean	showScores;
+	qboolean	scoreBoardShowing;
+	int			scoreFadeTime;
+	char			spectatorList[MAX_STRING_CHARS];		// list of names
+	int				spectatorLen;												// length of list
+	float			spectatorWidth;											// width in device units
+	int				spectatorTime;											// next time to offset
+	int				spectatorPaintX;										// current paint x
+	int				spectatorPaintX2;										// current paint x
+	int				spectatorOffset;										// current offset from start
+	int				spectatorPaintLen; 									// current offset from start
+
+	// sound buffer mainly for announcer sounds
+	int			soundBufferIn;
+	int			soundBufferOut;
+	int			soundTime;
+	qhandle_t	soundBuffer[MAX_SOUNDBUFFER];
+
+	// for voice chat buffer
+	int			voiceChatTime;
+	int			voiceChatBufferIn;
+	int			voiceChatBufferOut;
+
+	// warmup countdown
+	int			warmup;
+	int			warmupCount;
+
+	//==========================
+
+	// temp working variables for player view
+	float		bobfracsin;
+	int			bobcycle;
+	float		xyspeed;
+	int     nextOrbitTime;
 
 	// development tool
 	refEntity_t		testModelEntity;
 	char			testModelName[MAX_QPATH];
 	qboolean		testGun;
+
+	// Local client data, from events and such
+	cglc_t			*cur_lc;	// Current local client data we are working with
+	playerState_t	*cur_ps; // Like cur_lc, but for player state
+#ifdef TA_SPLITVIEW
+	cglc_t			localClients[MAX_SPLITVIEW];
+#else
+	cglc_t			localClient;
+#endif
+
 
 } cg_t;
 
@@ -2073,7 +2095,11 @@ void CG_PlayBufferedVoiceChats( void );
 //
 // cg_playerstate.c
 //
+#ifdef TA_SPLITVIEW
+void CG_Respawn( int clientNum );
+#else
 void CG_Respawn( void );
+#endif
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void CG_CheckChangedPredictableEvents( playerState_t *ps );
 

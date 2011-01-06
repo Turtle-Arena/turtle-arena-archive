@@ -1181,6 +1181,9 @@ typedef struct playerState_s {
 	int			entityEventSequence;
 } playerState_t;
 
+#ifdef TA_SPLITVIEW
+#define MAX_SPLITVIEW 4
+#endif
 
 //====================================================================
 

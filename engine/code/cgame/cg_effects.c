@@ -464,12 +464,29 @@ void CG_ScorePlum( int client, vec3_t org, int score ) {
 	localEntity_t	*le;
 	refEntity_t		*re;
 	vec3_t			angles;
+#ifdef TA_SPLITVIEW
+	int				i;
+#endif
 	static vec3_t lastPos;
 
 	// only visualize for the client that scored
-	if (client != cg.predictedPlayerState.clientNum || cg_scorePlum.integer == 0) {
+	if (
+#ifndef TA_SPLITVIEW
+		client != cg.localClient.predictedPlayerState.clientNum ||
+#endif
+		cg_scorePlum.integer == 0) {
 		return;
 	}
+#ifdef TA_SPLITVIEW // ZTM: FIXME: Local players can see each other's scores.
+	for (i = 0; i < cg.snap->numPSs; i++) {
+		if (client == cg.localClients[i].predictedPlayerState.clientNum) {
+			break;
+		}
+	}
+	if (i == cg.snap->numPSs) {
+		return;
+	}
+#endif
 
 	le = CG_AllocLocalEntity();
 	le->leFlags = 0;
@@ -512,8 +529,7 @@ void CG_ChainPlum( int client, vec3_t org, int score, int chain, qboolean bonus 
 	vec3_t			angles;
 	static vec3_t lastPos;
 
-	// only visualize for the client that scored
-	if (client != cg.predictedPlayerState.clientNum || cg_scorePlum.integer == 0) {
+	if (cg_scorePlum.integer == 0) {
 		return;
 	}
 

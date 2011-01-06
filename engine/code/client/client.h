@@ -58,7 +58,12 @@ typedef struct {
 	byte			areamask[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
 
 	int				cmdNum;			// the next cmdNum the server is expecting
+#ifdef TA_SPLITVIEW
+	int				numPSs;
+	playerState_t	pss[MAX_SPLITVIEW];		// complete information about the current player at this time
+#else
 	playerState_t	ps;						// complete information about the current player at this time
+#endif
 
 	int				numEntities;			// all of the entities that need to be presented
 	int				parseEntitiesNum;		// at the time of this snapshot
