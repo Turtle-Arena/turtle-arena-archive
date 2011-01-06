@@ -2942,7 +2942,7 @@ static qboolean CG_DrawScoreboard( void ) {
 		fade = 1.0;
 		fadeColor = colorWhite;
 	} else {
-		fadeColor = CG_FadeColor( cg.cur_lc->scoreFadeTime, FADE_TIME );
+		fadeColor = CG_FadeColor( cg.scoreFadeTime, FADE_TIME );
 		if ( !fadeColor ) {
 			// next time scoreboard comes up, don't print killer
 			cg.deferredPlayerLoading = 0;
@@ -3338,8 +3338,8 @@ CG_DrawTimedMenus
 =================
 */
 void CG_DrawTimedMenus( void ) {
-	if (cg.voiceTime) {
-		int t = cg.time - cg.voiceTime;
+	if (cg.cur_lc->voiceTime) {
+		int t = cg.time - cg.cur_lc->voiceTime;
 		if ( t > 2500 ) {
 			Menus_CloseByName("voiceMenu");
 #ifdef IOQ3ZTM // USE_FREETYPE
@@ -3347,7 +3347,7 @@ void CG_DrawTimedMenus( void ) {
 #else
 			trap_Cvar_Set("cl_conXOffset", "0");
 #endif
-			cg.voiceTime = 0;
+			cg.cur_lc->voiceTime = 0;
 		}
 	}
 }
