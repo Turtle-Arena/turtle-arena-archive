@@ -482,8 +482,8 @@ void CG_RegisterCvars( void ) {
 #endif
 
 #ifdef TA_SP // SPMODEL
-	trap_Cvar_Register(NULL, "spmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
-	trap_Cvar_Register(NULL, "spheadmodel", "", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
+	trap_Cvar_Register(NULL, "spmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ROM );
+	trap_Cvar_Register(NULL, "spheadmodel", "", CVAR_USERINFO | CVAR_ROM );
 #endif
 	trap_Cvar_Register(NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
