@@ -376,6 +376,12 @@ static void SV_Kick_f( void ) {
 	}
 
 	cl = SV_GetPlayerByHandle();
+#ifdef TA_SPLITVIEW
+	// If a splitscreen client, kick their owner and other splitscreen clients too.
+	if (cl && cl->owner != -1) {
+		cl = &svs.clients[cl->owner];
+	}
+#endif
 	if ( !cl ) {
 		if ( !Q_stricmp(Cmd_Argv(1), "all") ) {
 			for ( i=0, cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++ ) {
@@ -407,6 +413,16 @@ static void SV_Kick_f( void ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
+
+#ifdef TA_SPLITVIEW // ZTM: TODO: If a splitscreen client is kick what should happen?
+	// Kick client's splitscreen clients
+	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+		if (cl->local_clients[i] != -1) {
+			SV_DropClient( &svs.clients[cl->local_clients[i]], "was kicked" );
+			svs.clients[cl->local_clients[i]].lastPacketTime = svs.time;	// in case there is a funny zombie
+		}
+	}
+#endif
 
 	SV_DropClient( cl, "was kicked" );
 	cl->lastPacketTime = svs.time;	// in case there is a funny zombie
@@ -1033,6 +1049,9 @@ Kick a user off of the server  FIXME: move to game
 */
 static void SV_KickNum_f( void ) {
 	client_t	*cl;
+#ifdef TA_SPLITVIEW
+	int			i;
+#endif
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -1049,10 +1068,26 @@ static void SV_KickNum_f( void ) {
 	if ( !cl ) {
 		return;
 	}
+#ifdef TA_SPLITVIEW
+	// If a splitscreen client, kick their owner and other splitscreen clients too.
+	if (cl->owner != -1) {
+		cl = &svs.clients[cl->owner];
+	}
+#endif
 	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
+
+#ifdef TA_SPLITVIEW
+	// Kick client's splitscreen clients
+	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+		if (cl->local_clients[i] != -1) {
+			SV_DropClient( &svs.clients[cl->local_clients[i]], "was kicked" );
+			svs.clients[cl->local_clients[i]].lastPacketTime = svs.time;	// in case there is a funny zombie
+		}
+	}
+#endif
 
 	SV_DropClient( cl, "was kicked" );
 	cl->lastPacketTime = svs.time;	// in case there is a funny zombie

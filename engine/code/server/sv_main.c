@@ -844,6 +844,9 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 	int			i;
 	client_t	*cl;
 	int			qport;
+#ifdef TA_SPLITVIEW
+	int			j;
+#endif
 
 	// check for connectionless packet (0xffffffff) first
 	if ( msg->cursize >= 4 && *(int *)msg->data == -1) {
@@ -886,6 +889,13 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 			// reliable message, but they don't do any other processing
 			if (cl->state != CS_ZOMBIE) {
 				cl->lastPacketTime = svs.time;	// don't timeout
+#ifdef TA_SPLITVIEW
+				for (j = 0; j < MAX_SPLITVIEW-1; j++) {
+					if (cl->local_clients[j] != -1) {
+						svs.clients[cl->local_clients[j]].lastPacketTime = svs.time;	// don't timeout
+					}
+				}
+#endif
 				SV_ExecuteClientMessage( cl, msg );
 			}
 		}
@@ -914,6 +924,12 @@ static void SV_CalcPings( void ) {
 
 	for (i=0 ; i < sv_maxclients->integer ; i++) {
 		cl = &svs.clients[i];
+#ifdef TA_SPLITVIEW
+		// Splitscreen client's ping is set by main client.
+		if (cl->owner != -1) {
+			continue;
+		}
+#endif
 		if ( cl->state != CS_ACTIVE ) {
 			cl->ping = 999;
 			continue;
@@ -949,6 +965,18 @@ static void SV_CalcPings( void ) {
 		// let the game dll know about the ping
 		ps = SV_GameClientNum( i );
 		ps->ping = cl->ping;
+
+#ifdef TA_SPLITVIEW
+		// Splitscreen client's ping is set by main client.
+		for ( j = 0 ; j < MAX_SPLITVIEW-1 ; j++ ) {
+			if ( cl->local_clients[j] == -1 ) {
+				continue;
+			}
+
+			ps = SV_GameClientNum( cl->local_clients[j] );
+			ps->ping = cl->ping;
+		}
+#endif
 	}
 }
 

@@ -274,11 +274,16 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// read playerinfo
 	SHOWNET( msg, "playerstate" );
 #ifdef TA_SPLITVIEW
-	newSnap.numPSs = MSG_ReadByte( msg );
-	if (newSnap.numPSs > MAX_SPLITVIEW) {
-		Com_Printf("Warning: Got numPSs as %d (max=%d)\n", newSnap.numPSs, MAX_SPLITVIEW);
-		newSnap.numPSs = MAX_SPLITVIEW;
+	if (newSnap.snapFlags & SNAPFLAG_MULTIPLE_PSS) {
+		newSnap.numPSs = MSG_ReadByte( msg );
+		if (newSnap.numPSs > MAX_SPLITVIEW) {
+			Com_Printf("Warning: Got numPSs as %d (max=%d)\n", newSnap.numPSs, MAX_SPLITVIEW);
+			newSnap.numPSs = MAX_SPLITVIEW;
+		}
+	} else {
+		newSnap.numPSs = 1;
 	}
+
 	for (i = 0; i < newSnap.numPSs; i++) {
 		if ( old && old->numPSs > i) {
 			MSG_ReadDeltaPlayerstate( msg, &old->pss[i], &newSnap.pss[i] );

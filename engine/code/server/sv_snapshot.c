@@ -187,6 +187,11 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg ) {
 	if ( client->state != CS_ACTIVE ) {
 		snapFlags |= SNAPFLAG_NOT_ACTIVE;
 	}
+#ifdef TA_SPLITVIEW
+	if (frame->numPSs > 1) {
+		snapFlags |= SNAPFLAG_MULTIPLE_PSS;
+	}
+#endif
 
 	MSG_WriteByte (msg, snapFlags);
 
@@ -200,7 +205,9 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg ) {
 		Com_Printf("Warning: Almost sent numPSs as %d (max=%d)\n", frame->numPSs, MAX_SPLITVIEW);
 		frame->numPSs = MAX_SPLITVIEW;
 	}
-	MSG_WriteByte (msg, frame->numPSs);
+	if (snapFlags & SNAPFLAG_MULTIPLE_PSS) {
+		MSG_WriteByte (msg, frame->numPSs);
+	}
 	for (i = 0; i < frame->numPSs; i++) {
 		if ( oldframe && oldframe->numPSs > i) {
 			MSG_WriteDeltaPlayerstate( msg, &oldframe->pss[i], &frame->pss[i] );

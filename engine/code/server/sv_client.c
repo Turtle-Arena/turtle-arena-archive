@@ -1272,6 +1272,16 @@ The client is going to disconnect, so remove the connection immediately  FIXME: 
 =================
 */
 static void SV_Disconnect_f( client_t *cl ) {
+#ifdef TA_SPLITVIEW
+	int i;
+
+	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+		if (cl->local_clients[i] != -1) {
+			SV_DropClient( &svs.clients[cl->local_clients[i]], "disconnected" );
+		}
+	}
+#endif
+
 	SV_DropClient( cl, "disconnected" );
 }
 
