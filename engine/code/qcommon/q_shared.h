@@ -861,6 +861,12 @@ default values.
 #endif
 #define CVAR_NONEXISTENT	0xFFFFFFFF	// Cvar doesn't exist.
 
+#ifdef TA_SPLITVIEW
+#define CVAR_USERINFO_ALL	(CVAR_USERINFO|CVAR_USERINFO2|CVAR_USERINFO3|CVAR_USERINFO4)
+#else
+#define CVAR_USERINFO_ALL	(CVAR_USERINFO)
+#endif
+
 // nothing outside the Cvar_*() functions should modify these fields!
 typedef struct cvar_s cvar_t;
 

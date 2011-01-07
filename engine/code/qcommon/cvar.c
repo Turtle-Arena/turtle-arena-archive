@@ -931,6 +931,23 @@ void Cvar_List_f( void ) {
 		} else {
 			Com_Printf(" ");
 		}
+#ifdef TA_SPLITVIEW
+		if (var->flags & CVAR_USERINFO2) {
+			Com_Printf("2");
+		} else {
+			Com_Printf(" ");
+		}
+		if (var->flags & CVAR_USERINFO3) {
+			Com_Printf("3");
+		} else {
+			Com_Printf(" ");
+		}
+		if (var->flags & CVAR_USERINFO4) {
+			Com_Printf("4");
+		} else {
+			Com_Printf(" ");
+		}
+#endif
 		if (var->flags & CVAR_ROM) {
 			Com_Printf("R");
 		} else {
@@ -1106,7 +1123,7 @@ char *Cvar_InfoString(int bit)
 #ifdef TA_SPLITVIEW
 		{
 			// If extra local client, remove "#_" from the beginning of each var.
-			if (bit & (CVAR_USERINFO2|CVAR_USERINFO3|CVAR_USERINFO4))
+			if ((bit & (CVAR_USERINFO2|CVAR_USERINFO3|CVAR_USERINFO4)) && isdigit(var->name[0]) && var->name[1] == '_')
 				Info_SetValueForKey (info, &var->name[2], var->string);
 			else
 				Info_SetValueForKey (info, var->name, var->string);
