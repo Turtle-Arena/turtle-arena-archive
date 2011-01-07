@@ -2117,7 +2117,6 @@ void CL_CheckForResend( void ) {
 	int		size, j;
 	int		cvarflag[MAX_SPLITVIEW] = {CVAR_USERINFO, CVAR_USERINFO2, CVAR_USERINFO3, CVAR_USERINFO4};
 	int		localClients;
-	int		rate, snaps;
 #endif
 	char	info[MAX_INFO_STRING];
 	char	data[MAX_INFO_STRING];
@@ -2169,11 +2168,11 @@ void CL_CheckForResend( void ) {
 #ifdef TA_SPLITVIEW
 		size = 8;
 
-		rate = Cvar_VariableValue ("rate");
-		snaps = Cvar_VariableValue ("snaps");
-
 		// Check how many local client user wants
 		localClients = Com_Clamp(1, MAX_SPLITVIEW, Cvar_VariableIntegerValue("cl_localClients"));
+
+		// Reset cl_localClients (Must set before each inital join)
+		Cvar_Set("cl_localClients", "1");
 
 		for (i = 0; i < localClients; i++) {
 			Q_strncpyz( info, Cvar_InfoString( cvarflag[i] ), sizeof( info ) );
@@ -2182,11 +2181,6 @@ void CL_CheckForResend( void ) {
 			Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
 			Info_SetValueForKey( info, "qport", va("%i", port ) );
 			Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
-
-			if (i > 0) {
-				Info_SetValueForKey( info, "rate", va("%i", rate ) );
-				Info_SetValueForKey( info, "snaps", va("%i", snaps ) );
-			}
 
 			// TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
 			//   (Com_TokenizeString tokenizes around spaces)
@@ -2208,7 +2202,7 @@ void CL_CheckForResend( void ) {
 		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (byte *) &data[0], size );
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
-		cvar_modifiedFlags &= ~(CVAR_USERINFO|CVAR_USERINFO2|CVAR_USERINFO3|CVAR_USERINFO4);
+		cvar_modifiedFlags &= ~CVAR_USERINFO_ALL;
 #else
     // TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
     //   (Com_TokenizeString tokenizes around spaces)
@@ -3319,13 +3313,13 @@ void CL_Init( void ) {
 #endif
 
 #ifdef TA_SPLITVIEW
-	Cvar_Get ("cl_localclients", "1", 0 );
+	Cvar_Get ("cl_localClients", "1", 0 );
 #endif
 
 	// userinfo
 	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("rate", "25000", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("snaps", "20", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("rate", "25000", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
+	Cvar_Get ("snaps", "20", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
 #ifdef TURTLEARENA
 	// DEFAULT_PLAYER
 #ifdef TA_SP // SPMODEL
@@ -3365,10 +3359,10 @@ void CL_Init( void ) {
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("teamtask", "0", CVAR_USERINFO );
 	Cvar_Get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
 
-	Cvar_Get ("password", "", CVAR_USERINFO);
-	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("password", "", CVAR_USERINFO_ALL);
+	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
 
 #ifdef TA_SPLITVIEW
 	// Second local client

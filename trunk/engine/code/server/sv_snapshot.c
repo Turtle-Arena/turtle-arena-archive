@@ -766,7 +766,7 @@ void SV_SendClientSnapshot( client_t *client ) {
 	msg_t		msg;
 
 #ifdef TA_SPLITVIEW
-	// Splitscreen client are sent with main client.
+	// Splitscreen clients are sent with main client.
 	if (client->owner != -1) {
 		return;
 	}
