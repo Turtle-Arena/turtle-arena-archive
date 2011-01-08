@@ -1162,6 +1162,7 @@ static void CG_CopyClientInfoModel( clientInfo_t *from, clientInfo_t *to ) {
 
 #ifdef TA_PLAYERSYS
 	memcpy( &to->playercfg, &from->playercfg, sizeof( to->playercfg ) );
+	VectorCopy(from->prefcolor2, to->prefcolor2);
 #else
 	memcpy( to->animations, from->animations, sizeof( to->animations ) );
 #endif

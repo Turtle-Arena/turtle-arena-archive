@@ -730,7 +730,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, i
 		if (clientNum < 0 || clientNum >= MAX_CLIENTS) {
 			clientNum = 0;
 		}
-		// Use client's effect color1
+		// Use client's effect color2
 		VectorCopy(cgs.clientinfo[clientNum].prefcolor2, hcolor);
 #else
 		return;
