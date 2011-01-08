@@ -929,8 +929,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		return;
 	}
 
-	// ZTM: TODO: Use font->fontShader
-	charsetProp = uis.fontPropBig.fontShader;
+	charsetProp = font->fontShader;
 #else
 	charsetProp = uis.charsetProp;
 #endif
