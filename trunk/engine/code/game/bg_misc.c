@@ -3231,7 +3231,9 @@ void BG_InitItemInfo(void)
 		}
 
 		strcpy(bg_iteminfo[num].classname, bg_itemlist[i].classname);
-		strcpy(bg_iteminfo[num].pickup_sound, bg_itemlist[i].pickup_sound);
+		if (bg_itemlist[i].pickup_sound != NULL) {
+			strcpy(bg_iteminfo[num].pickup_sound, bg_itemlist[i].pickup_sound);
+		}
 
 		for (j = 0; j < MAX_ITEM_MODELS; j++) {
 			if (bg_itemlist[i].world_model[j] != NULL) {
@@ -3239,8 +3241,12 @@ void BG_InitItemInfo(void)
 			}
 		}
 
-		strcpy(bg_iteminfo[num].icon, bg_itemlist[i].icon);
-		strcpy(bg_iteminfo[num].pickup_name, bg_itemlist[i].pickup_name);
+		if (bg_itemlist[i].icon != NULL) {
+			strcpy(bg_iteminfo[num].icon, bg_itemlist[i].icon);
+		}
+		if (bg_itemlist[i].pickup_name != NULL) {
+			strcpy(bg_iteminfo[num].pickup_name, bg_itemlist[i].pickup_name);
+		}
 
 		bg_iteminfo[num].quantity = bg_itemlist[i].quantity;
 		bg_iteminfo[num].giType = bg_itemlist[i].giType;
