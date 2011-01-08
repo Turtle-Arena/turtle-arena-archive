@@ -1689,6 +1689,9 @@ extern	vmCvar_t		cg_obeliskRespawnDelay;
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 extern	vmCvar_t		cg_drawMeleeWeaponTrails;
 #endif
+#ifdef TA_MISC // MATERIALS 
+extern	vmCvar_t		cg_impactDebris;
+#endif
 #ifdef IOQ3ZTM // LASERTAG
 extern	vmCvar_t		cg_laserTag;
 #endif
