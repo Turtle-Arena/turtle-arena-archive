@@ -92,21 +92,21 @@ void CG_CheckAmmo( void ) {
 		}
 #endif
 		if ( total >= 5000 ) {
-			cg.lowAmmoWarning = 0;
+			cg.cur_lc->lowAmmoWarning = 0;
 			return;
 		}
 	}
 
-	previous = cg.lowAmmoWarning;
+	previous = cg.cur_lc->lowAmmoWarning;
 
 	if ( total == 0 ) {
-		cg.lowAmmoWarning = 2;
+		cg.cur_lc->lowAmmoWarning = 2;
 	} else {
-		cg.lowAmmoWarning = 1;
+		cg.cur_lc->lowAmmoWarning = 1;
 	}
 
 	// play a sound on transitions
-	if ( cg.lowAmmoWarning != previous ) {
+	if ( cg.cur_lc->lowAmmoWarning != previous ) {
 		trap_S_StartLocalSound( cgs.media.noAmmoSound, CHAN_LOCAL_SOUND );
 	}
 }

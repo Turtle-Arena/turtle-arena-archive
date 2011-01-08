@@ -181,7 +181,7 @@ static void CG_DrawPlayerArmorIcon( rectDef_t *rect, qboolean draw2D ) {
 	}
 
 	cent = &cg_entities[cg.cur_ps->clientNum];
-	ps = &cg.snap->ps;
+	ps = cg.cur_ps;
 
 	if ( draw2D || ( !cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 		CG_DrawPic( rect->x, rect->y + rect->h/2 + 1, rect->w, rect->h, cgs.media.armorIcon );
@@ -204,7 +204,7 @@ static void CG_DrawPlayerArmorValue(rectDef_t *rect, float scale, vec4_t color, 
 	playerState_t	*ps;
 
   cent = &cg_entities[cg.cur_ps->clientNum];
-	ps = &cg.snap->ps;
+	ps = cg.cur_ps;
 
 	value = ps->stats[STAT_ARMOR];
   

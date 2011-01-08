@@ -3272,6 +3272,9 @@ void CG_Player( centity_t *cent ) {
 	vec3_t			angles;
 #endif
 #endif
+#ifdef TA_SPLITVIEW
+	int				lc;
+#endif
 
 	// the client number is stored in clientNum.  It can't be derived
 	// from the entity number, because a single client may have
@@ -3289,10 +3292,10 @@ void CG_Player( centity_t *cent ) {
 	}
 
 #ifdef TA_SPLITVIEW
-	// For somereason we have to manually check for (and not render)
+	// ZTM: FIXME: For somereason we have to manually check for (and not render)
 	//  non-predicted entities for clients other than the main one.
-	for (t = 1; t < cg.snap->numPSs; t++) {
-		if (cent - cg_entities == cg.snap->pss[t].clientNum) {
+	for (lc = 1; lc < cg.snap->numPSs; lc++) {
+		if (cent - cg_entities == cg.snap->pss[lc].clientNum) {
 			return;
 		}
 	}
