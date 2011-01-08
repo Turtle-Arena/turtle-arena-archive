@@ -3131,13 +3131,13 @@ static void CG_DrawAmmoWarning( void ) {
 		return;
 	}
 
-	if ( !cg.lowAmmoWarning ) {
+	if ( !cg.cur_lc->lowAmmoWarning ) {
 		return;
 	}
 
 	CG_HudPlacement(HUD_CENTER);
 
-	if ( cg.lowAmmoWarning == 2 ) {
+	if ( cg.cur_lc->lowAmmoWarning == 2 ) {
 		s = "OUT OF AMMO";
 	} else {
 		s = "LOW AMMO WARNING";

@@ -1187,9 +1187,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_NOAMMO:
 		DEBUGNAME("EV_NOAMMO");
 //		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.noAmmoSound );
+#ifdef TA_SPLITVIEW
+		for (i = 0; i < cg.snap->numPSs; i++) {
+			if ( es->number == cg.snap->pss[i].clientNum ) {
+				cg.cur_lc = &cg.localClients[i];
+				CG_OutOfAmmoChange();
+			}
+		}
+		cg.cur_lc = &cg.localClients[cg.viewport];
+#else
 		if ( es->number == cg.snap->ps.clientNum ) {
 			CG_OutOfAmmoChange();
 		}
+#endif
 		break;
 #endif
 	case EV_CHANGE_WEAPON:
@@ -1369,7 +1379,13 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 	case EV_LIGHTNINGBOLT:
 		DEBUGNAME("EV_LIGHTNINGBOLT");
+#ifdef TA_WEAPSYS
+		if (es->weapon >= 0 && es->weapon < BG_NumProjectiles()) {
+			CG_LightningBoltBeam(&cg_projectiles[es->weapon], es->origin2, es->pos.trBase);
+		}
+#else
 		CG_LightningBoltBeam(es->origin2, es->pos.trBase);
+#endif
 		break;
 #endif
 #endif

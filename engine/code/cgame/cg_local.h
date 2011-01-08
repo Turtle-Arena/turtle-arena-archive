@@ -739,11 +739,6 @@ typedef struct {
 #endif
 
 
-#ifdef MISSIONPACK_HARVESTER
-	// skull trails
-	skulltrail_t	skulltrails[MAX_CLIENTS];
-#endif
-
 	// centerprinting
 	int			centerPrintTime;
 #ifndef MISSIONPACK_HUD2
@@ -947,6 +942,11 @@ typedef struct {
 	int			warmupCount;
 
 	//==========================
+
+#ifdef MISSIONPACK_HARVESTER
+	// skull trails
+	skulltrail_t	skulltrails[MAX_CLIENTS];
+#endif
 
 	// temp working variables for player view
 	float		bobfracsin;

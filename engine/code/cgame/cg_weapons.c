@@ -2791,6 +2791,8 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	// add the weapon
 	memset( &gun, 0, sizeof( gun ) );
 
+#ifdef TA_SPLITVIEW // ZTM: TODO: We should check and use weaponTime of all of the local clients.
+#endif
 #ifndef TA_WEAPSYS
 	VectorCopy( parent->lightingOrigin, gun.lightingOrigin );
 	gun.shadowPlane = parent->shadowPlane;
@@ -2798,13 +2800,13 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	// set custom shading for railgun refire rate
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black. (and use correct glow in third person)
-	if ( ( ps || cent->currentState.clientNum == cg.predictedPlayerState.clientNum ) &&
-		cg.predictedPlayerState.weapon == WP_RAILGUN && 
-		cg.predictedPlayerState.weaponstate == WEAPON_FIRING )
+	if ( ( ps || cent->currentState.clientNum == cg.cur_lc->predictedPlayerState.clientNum ) &&
+		cg.cur_lc->predictedPlayerState.weapon == WP_RAILGUN && 
+		cg.cur_lc->predictedPlayerState.weaponstate == WEAPON_FIRING )
 	{
 		float	f;
 
-		f = (float)cg.predictedPlayerState.weaponTime / 1500;
+		f = (float)cg.cur_lc->predictedPlayerState.weaponTime / 1500;
 		gun.shaderRGBA[1] = 0;
 		gun.shaderRGBA[0] = 
 		gun.shaderRGBA[2] = 255 * ( 1.0 - f );
@@ -2816,12 +2818,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	}
 #else
 	if ( ps ) {
-		if ( cg.predictedPlayerState.weapon == WP_RAILGUN &&
-			cg.predictedPlayerState.weaponstate == WEAPON_FIRING )
+		if ( cg.cur_lc->predictedPlayerState.weapon == WP_RAILGUN &&
+			cg.cur_lc->predictedPlayerState.weaponstate == WEAPON_FIRING )
 		{
 			float	f;
 
-			f = (float)cg.predictedPlayerState.weaponTime / 1500;
+			f = (float)cg.cur_lc->predictedPlayerState.weaponTime / 1500;
 			gun.shaderRGBA[1] = 0;
 			gun.shaderRGBA[0] = 
 			gun.shaderRGBA[2] = 255 * ( 1.0 - f );
@@ -3458,21 +3460,21 @@ void CG_DrawWeaponSelect( void ) {
 	float	*color;
 
 	// don't display if dead
-	if ( cg.predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
+	if ( cg.cur_lc->predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
 		return;
 	}
 
-	color = CG_FadeColor( cg.weaponSelectTime, WEAPON_SELECT_TIME );
+	color = CG_FadeColor( cg.cur_lc->weaponSelectTime, WEAPON_SELECT_TIME );
 	if ( !color ) {
 		return;
 	}
 	trap_R_SetColor( color );
 
 	// showing weapon select clears pickup item display, but not the blend blob
-	cg.itemPickupTime = 0;
+	cg.cur_lc->itemPickupTime = 0;
 
 	// count the number of weapons owned
-	bits = cg.snap->ps.stats[ STAT_WEAPONS ];
+	bits = cg.cur_ps->stats[ STAT_WEAPONS ];
 	count = 0;
 	for ( i = 1 ; i < MAX_WEAPONS ; i++ ) {
 		if ( bits & ( 1 << i ) ) {
@@ -3502,12 +3504,12 @@ void CG_DrawWeaponSelect( void ) {
 #endif
 
 		// draw selection marker
-		if ( i == cg.weaponSelect ) {
+		if ( i == cg.cur_lc->weaponSelect ) {
 			CG_DrawPic( x-4, y-4, 40, 40, cgs.media.selectShader );
 		}
 
 		// no ammo cross on top
-		if ( !cg.snap->ps.ammo[ i ] ) {
+		if ( !cg.cur_ps->ammo[ i ] ) {
 			CG_DrawPic( x, y, 32, 32, cgs.media.noammoShader );
 		}
 
@@ -3516,10 +3518,10 @@ void CG_DrawWeaponSelect( void ) {
 
 	// draw the selected name
 #ifdef TA_WEAPSYS
-		name = bg_weapongroupinfo[ cg.weaponSelect ].item->pickup_name;
+		name = bg_weapongroupinfo[ cg.cur_lc->weaponSelect ].item->pickup_name;
 #else
-	if ( cg_weapons[ cg.weaponSelect ].item ) {
-		name = cg_weapons[ cg.weaponSelect ].item->pickup_name;
+	if ( cg_weapons[ cg.cur_lc->weaponSelect ].item ) {
+		name = cg_weapons[ cg.cur_lc->weaponSelect ].item->pickup_name;
 #endif
 		if ( name ) {
 			CG_DrawBigStringColor(CENTER_X, y - 22, name, color);
@@ -3538,10 +3540,10 @@ CG_WeaponSelectable
 ===============
 */
 static qboolean CG_WeaponSelectable( int i ) {
-	if ( !cg.snap->ps.ammo[i] ) {
+	if ( !cg.cur_ps->ammo[i] ) {
 		return qfalse;
 	}
-	if ( ! (cg.snap->ps.stats[ STAT_WEAPONS ] & ( 1 << i ) ) ) {
+	if ( ! (cg.cur_ps->stats[ STAT_WEAPONS ] & ( 1 << i ) ) ) {
 		return qfalse;
 	}
 
@@ -3553,42 +3555,61 @@ static qboolean CG_WeaponSelectable( int i ) {
 CG_NextWeapon_f
 ===============
 */
-void CG_NextWeapon_f( void ) {
+#ifdef TA_SPLITVIEW
+void CG_NextWeapon( int localClient )
+#else
+void CG_NextWeapon_f( void )
+#endif
+{
 	int		i;
 	int		original;
+	playerState_t	*ps;
+	cglc_t			*lc;
 
 	if ( !cg.snap ) {
 		return;
 	}
-	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+#ifdef TA_SPLITVIEW
+	if (localClient >= cg.snap->numPSs) {
 		return;
 	}
 
-	cg.weaponSelectTime = cg.time;
-	original = cg.weaponSelect;
+	ps = &cg.snap->pss[localClient];
+	lc = &cg.localClients[localClient];
+#else
+	ps = &cg.snap->ps;
+	lc = &cg.localClient;
+#endif
+
+	if ( ps->pm_flags & PMF_FOLLOW ) {
+		return;
+	}
+
+	lc->weaponSelectTime = cg.time;
+	original = lc->weaponSelect;
 
 	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
-		cg.weaponSelect++;
-		if ( cg.weaponSelect == MAX_WEAPONS ) {
-			cg.weaponSelect = 0;
+		lc->weaponSelect++;
+		if ( lc->weaponSelect == MAX_WEAPONS ) {
+			lc->weaponSelect = 0;
 		}
 #ifndef TURTLEARENA // WEAPONS
 #ifdef TA_WEAPSYS
-		if ( cg.weaponSelect == cg.snap->ps.stats[STAT_DEFAULTWEAPON] ) {
+		if ( lc->weaponSelect == ps->stats[STAT_DEFAULTWEAPON] ) {
 			continue;		// never cycle to gauntlet
 		}
 #else
-		if ( cg.weaponSelect == WP_GAUNTLET ) {
+		if ( lc->weaponSelect == WP_GAUNTLET ) {
 			continue;		// never cycle to gauntlet
 		}
 #endif
 #endif
-		if ( CG_WeaponSelectable( cg.weaponSelect ) ) {
+		if ( CG_WeaponSelectable( lc->weaponSelect ) ) {
 			break;
 		}
 	}
 	if ( i == MAX_WEAPONS ) {
-		cg.weaponSelect = original;
+		lc->weaponSelect = original;
 	}
 }
 
@@ -3597,42 +3618,61 @@ void CG_NextWeapon_f( void ) {
 CG_PrevWeapon_f
 ===============
 */
-void CG_PrevWeapon_f( void ) {
+#ifdef TA_SPLITVIEW
+void CG_PrevWeapon( int localClient )
+#else
+void CG_PrevWeapon_f( void )
+#endif
+{
 	int		i;
 	int		original;
+	playerState_t	*ps;
+	cglc_t			*lc;
 
 	if ( !cg.snap ) {
 		return;
 	}
-	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+#ifdef TA_SPLITVIEW
+	if (localClient >= cg.snap->numPSs) {
 		return;
 	}
 
-	cg.weaponSelectTime = cg.time;
-	original = cg.weaponSelect;
+	ps = &cg.snap->pss[localClient];
+	lc = &cg.localClients[localClient];
+#else
+	ps = &cg.snap->ps;
+	lc = &cg.localClient;
+#endif
+
+	if ( ps->pm_flags & PMF_FOLLOW ) {
+		return;
+	}
+
+	lc->weaponSelectTime = cg.time;
+	original = lc->weaponSelect;
 
 	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
-		cg.weaponSelect--;
-		if ( cg.weaponSelect == -1 ) {
-			cg.weaponSelect = MAX_WEAPONS - 1;
+		lc->weaponSelect--;
+		if ( lc->weaponSelect == -1 ) {
+			lc->weaponSelect = MAX_WEAPONS - 1;
 		}
 #ifndef TURTLEARENA // WEAPONS
 #ifdef TA_WEAPSYS
-		if ( cg.weaponSelect == cg.snap->ps.stats[STAT_DEFAULTWEAPON] ) {
+		if ( lc->weaponSelect == ps->stats[STAT_DEFAULTWEAPON] ) {
 			continue;		// never cycle to gauntlet
 		}
 #else
-		if ( cg.weaponSelect == WP_GAUNTLET ) {
+		if ( lc->weaponSelect == WP_GAUNTLET ) {
 			continue;		// never cycle to gauntlet
 		}
 #endif
 #endif
-		if ( CG_WeaponSelectable( cg.weaponSelect ) ) {
+		if ( CG_WeaponSelectable( lc->weaponSelect ) ) {
 			break;
 		}
 	}
 	if ( i == MAX_WEAPONS ) {
-		cg.weaponSelect = original;
+		lc->weaponSelect = original;
 	}
 }
 
@@ -3641,13 +3681,33 @@ void CG_PrevWeapon_f( void ) {
 CG_Weapon_f
 ===============
 */
-void CG_Weapon_f( void ) {
+#ifdef TA_SPLITVIEW
+void CG_Weapon( int localClient )
+#else
+void CG_Weapon_f( void )
+#endif
+{
 	int		num;
+	playerState_t	*ps;
+	cglc_t			*lc;
 
 	if ( !cg.snap ) {
 		return;
 	}
-	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
+
+#ifdef TA_SPLITVIEW
+	if (localClient >= cg.snap->numPSs) {
+		return;
+	}
+
+	ps = &cg.snap->pss[localClient];
+	lc = &cg.localClients[localClient];
+#else
+	ps = &cg.snap->ps;
+	lc = &cg.localClient;
+#endif
+
+	if ( ps->pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
@@ -3655,9 +3715,8 @@ void CG_Weapon_f( void ) {
 
 #ifdef TA_WEAPSYS
 	// Special case for WP_DEFAULT
-	if (num == WP_DEFAULT)
-	{
-		num = cg.snap->ps.stats[STAT_DEFAULTWEAPON];
+	if (num == WP_DEFAULT) {
+		num = ps->stats[STAT_DEFAULTWEAPON];
 	}
 #endif
 
@@ -3665,14 +3724,31 @@ void CG_Weapon_f( void ) {
 		return;
 	}
 
-	cg.weaponSelectTime = cg.time;
+	lc->weaponSelectTime = cg.time;
 
-	if ( ! ( cg.snap->ps.stats[STAT_WEAPONS] & ( 1 << num ) ) ) {
+	if ( ! ( ps->stats[STAT_WEAPONS] & ( 1 << num ) ) ) {
 		return;		// don't have the weapon
 	}
 
-	cg.weaponSelect = num;
+	lc->weaponSelect = num;
 }
+
+#ifdef TA_SPLITVIEW
+void CG_NextWeapon_f( void )
+{
+	CG_NextWeapon( 0 );
+}
+
+void CG_PrevWeapon_f( void )
+{
+	CG_PrevWeapon( 0 );
+}
+
+void CG_Weapon_f( void )
+{
+	CG_Weapon( 0 );
+}
+#endif
 
 /*
 ===================
@@ -3684,11 +3760,11 @@ The current weapon has just run out of ammo
 void CG_OutOfAmmoChange( void ) {
 	int		i;
 
-	cg.weaponSelectTime = cg.time;
+	cg.cur_lc->weaponSelectTime = cg.time;
 
 	for ( i = MAX_WEAPONS-1 ; i > 0 ; i-- ) {
 		if ( CG_WeaponSelectable( i ) ) {
-			cg.weaponSelect = i;
+			cg.cur_lc->weaponSelect = i;
 			break;
 		}
 	}

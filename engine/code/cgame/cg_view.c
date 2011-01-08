@@ -538,7 +538,7 @@ static void CG_OffsetThirdPersonView( void ) {
 			// try another trace to this position, because a tunnel may have the ceiling
 			// close enogh that this is poking out
 
-			CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, view, cg.predictedPlayerState.clientNum, MASK_SOLID );
+			CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, view, cg.cur_lc->predictedPlayerState.clientNum, MASK_SOLID );
 			VectorCopy( trace.endpos, view );
 #endif
 		}
@@ -713,29 +713,59 @@ static void CG_OffsetFirstPersonView( void ) {
 //======================================================================
 
 #ifndef TURTLEARENA // NOZOOM
-void CG_ZoomDown_f( void ) { 
-	if ( cg.zoomed ) {
+#ifdef TA_SPLITVIEW
+void CG_ZoomDown( int localClient )
+#else
+void CG_ZoomDown_f( void )
+#endif
+{ 
+#ifdef TA_SPLITVIEW
+	cg.cur_lc = &cg.localClients[localClient];
+#else
+	cg.cur_lc = &cg.localClient;
+#endif
+
+	if ( cg.cur_lc->zoomed ) {
 		return;
 	}
-	cg.zoomed = qtrue;
-	cg.zoomTime = cg.time;
+
+	cg.cur_lc->zoomed = qtrue;
+	cg.cur_lc->zoomTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
-	cg.cur_lc = &cg.localClients[0];
 	CG_ToggleLetterbox(qtrue, qfalse);
 #endif
 }
 
-void CG_ZoomUp_f( void ) { 
-	if ( !cg.zoomed ) {
+#ifdef TA_SPLITVIEW
+void CG_ZoomUp( int localClient )
+#else
+void CG_ZoomUp_f( void )
+#endif
+{ 
+#ifdef TA_SPLITVIEW
+	cg.cur_lc = &cg.localClients[localClient];
+#else
+	cg.cur_lc = &cg.localClient;
+#endif
+	if ( !cg.cur_lc->zoomed ) {
 		return;
 	}
-	cg.zoomed = qfalse;
-	cg.zoomTime = cg.time;
+	cg.cur_lc->zoomed = qfalse;
+	cg.cur_lc->zoomTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
-	cg.cur_lc = &cg.localClients[0];
 	CG_ToggleLetterbox(qfalse, qfalse);
 #endif
 }
+
+#ifdef TA_SPLITVIEW
+void CG_ZoomDown_f( void ) { 
+	CG_ZoomDown(0);
+}
+
+void CG_ZoomUp_f( void ) { 
+	CG_ZoomUp(0);
+}
+#endif
 #endif
 
 
@@ -795,15 +825,15 @@ static int CG_CalcFov( void ) {
 			zoomFov = 160;
 		}
 
-		if ( cg.zoomed ) {
-			f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
+		if ( cg.cur_lc->zoomed ) {
+			f = ( cg.time - cg.cur_lc->zoomTime ) / (float)ZOOM_TIME;
 			if ( f > 1.0 ) {
 				fov_x = zoomFov;
 			} else {
 				fov_x = fov_x + f * ( zoomFov - fov_x );
 			}
 		} else {
-			f = ( cg.time - cg.zoomTime ) / (float)ZOOM_TIME;
+			f = ( cg.time - cg.cur_lc->zoomTime ) / (float)ZOOM_TIME;
 			if ( f > 1.0 ) {
 				fov_x = fov_x;
 			} else {
@@ -836,10 +866,10 @@ static int CG_CalcFov( void ) {
 	cg.refdef.fov_y = fov_y;
 
 #ifndef TURTLEARENA // NOZOOM
-	if ( !cg.zoomed ) {
-		cg.zoomSensitivity = 1;
+	if ( !cg.cur_lc->zoomed ) {
+		cg.cur_lc->zoomSensitivity = 1;
 	} else {
-		cg.zoomSensitivity = cg.refdef.fov_y / 75.0;
+		cg.cur_lc->zoomSensitivity = cg.refdef.fov_y / 75.0;
 	}
 #endif
 
@@ -866,7 +896,7 @@ static void CG_DamageBlendBlob( void ) {
 	}
 #endif
 
-	if ( !cg.damageValue ) {
+	if ( !cg.cur_lc->damageValue ) {
 		return;
 	}
 
@@ -886,7 +916,7 @@ static void CG_DamageBlendBlob( void ) {
 	}
 
 	maxTime = DAMAGE_TIME;
-	t = cg.time - cg.damageTime;
+	t = cg.time - cg.cur_lc->damageTime;
 	if ( t <= 0 || t >= maxTime ) {
 		return;
 	}
@@ -901,10 +931,10 @@ static void CG_DamageBlendBlob( void ) {
 #endif
 
 	VectorMA( cg.refdef.vieworg, 8, cg.refdef.viewaxis[0], ent.origin );
-	VectorMA( ent.origin, cg.damageX * -8, cg.refdef.viewaxis[1], ent.origin );
-	VectorMA( ent.origin, cg.damageY * 8, cg.refdef.viewaxis[2], ent.origin );
+	VectorMA( ent.origin, cg.cur_lc->damageX * -8, cg.refdef.viewaxis[1], ent.origin );
+	VectorMA( ent.origin, cg.cur_lc->damageY * 8, cg.refdef.viewaxis[2], ent.origin );
 
-	ent.radius = cg.damageValue * 3;
+	ent.radius = cg.cur_lc->damageValue * 3;
 	ent.customShader = cgs.media.viewBloodShader;
 	ent.shaderRGBA[0] = 255;
 	ent.shaderRGBA[1] = 255;
