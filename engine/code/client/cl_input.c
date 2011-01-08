@@ -987,6 +987,9 @@ void CL_WritePacket( void ) {
 			int lc;
 
 			for (lc = 1; lc < MAX_SPLITVIEW; lc++) {
+				if (cl.snap.valid && lc >= cl.snap.numPSs) {
+					break;
+				}
 
 				MSG_WriteByte (&buf, clc_EOF);  // placate legacy servers.
 				MSG_WriteByte (&buf, clc_extension);
