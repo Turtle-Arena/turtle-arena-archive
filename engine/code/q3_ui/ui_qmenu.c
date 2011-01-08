@@ -198,11 +198,6 @@ static void PText_Init( menutext_s *t )
 		font = &uis.fontPropSmall;
 	else
 		font = &uis.fontPropBig;
-
-	if (font->fontInfo.name[0]) {
-		sizeScale = 1.0f;
-	}
-	else
 #endif
 	sizeScale = UI_ProportionalSizeScale( t->style );
 
