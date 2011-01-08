@@ -540,8 +540,6 @@ gotnewcl:
 		int lc; // local client
 		client_t *owner = newcl;
 
-		Com_Printf("DEBUG: Attempting to add %d extra local clients\n", wantClients-1);
-
 		for (lc = 1; lc < wantClients; lc++) {
 			newcl = NULL;
 			for ( i = startIndex; i < sv_maxclients->integer ; i++ ) {
@@ -553,15 +551,10 @@ gotnewcl:
 			}
 
 			if (!newcl) {
-				Com_Printf("DEBUG: No free slot for local client %d\n", lc);
 				break;
 			}
 
-			Com_Printf("DEBUG: Attempting to add local client %d\n", lc);
-
 			Q_strncpyz( userinfo, Cmd_Argv(lc+1), sizeof(userinfo) );
-
-			Com_Printf("DEBUG: userinfo (%d): %s\n", lc, userinfo);
 
 			// build a new connection
 			// accept the new client
@@ -2136,28 +2129,6 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 #ifdef USE_VOIP
 		SV_UserVoip( cl, msg );
 #endif
-//#ifdef TA_SPLITVIEW
-	} else if ( c == clc_moveLocal ) {
-#ifdef TA_SPLITVIEW
-		c = MSG_ReadByte( msg ); // localClient
-		Com_Printf("DEBUG: Got delta usercmd for localClient %d\n", c);
-		if (c < 0 || c >= MAX_SPLITVIEW-1 || cl->local_clients[c] == -1) {
-			Com_Printf( "WARNING: bad localClient byte for client %i\n", (int) (cl - svs.clients) );
-		} else {
-			SV_UserMove( &svs.clients[cl->local_clients[c]], msg, qtrue, cl );
-		}
-#endif
-	} else if ( c == clc_moveLocalNoDelta ) {
-#ifdef TA_SPLITVIEW
-		c = MSG_ReadByte( msg ); // localClient
-		Com_Printf("DEBUG: Got usercmd for localClient %d\n", c);
-		if (c < 0 || c >= MAX_SPLITVIEW-1 || cl->local_clients[c] == -1) {
-			Com_Printf( "WARNING: bad localClient byte for client %i\n", (int) (cl - svs.clients) );
-		} else {
-			SV_UserMove( &svs.clients[cl->local_clients[c]], msg, qfalse, cl );
-		}
-#endif
-//#endif
 	} else if ( c != clc_EOF ) {
 		Com_Printf( "WARNING: bad command byte for client %i\n", (int) (cl - svs.clients) );
 	}
@@ -2166,7 +2137,7 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 //	}
 
 #ifdef TA_SPLITVIEW
-	// LocalClient move test is packed after normal move
+	// LocalClient move is included after normal move
 	if ( c != clc_EOF ) {
 		int i;
 
@@ -2189,31 +2160,22 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 				break;
 			}
 
-			if ( c == clc_moveLocal ) {
-				c = MSG_ReadByte( msg ); // localClient-1
-				//Com_Printf("DEBUG: Got delta usercmd for localClient %d\n", c);
-				if (c < 0 || c >= MAX_SPLITVIEW-1) {
-					if (cl->local_clients[c] != -1) {
-						Com_Printf( "WARNING: bad delta localClient byte for client %i\n", (int) (cl - svs.clients) );
-					}
-				} else {
-					SV_UserMove( &svs.clients[cl->local_clients[c]], msg, qtrue, cl );
-				}
-			} else if ( c == clc_moveLocalNoDelta ) {
-				c = MSG_ReadByte( msg ); // localClient-1
-				//Com_Printf("DEBUG: Got usercmd for localClient %d\n", c);
-				if (c < 0 || c >= MAX_SPLITVIEW-1 || cl->local_clients[c] == -1) {
-					if (cl->local_clients[c] != -1) {
-						Com_Printf( "WARNING: bad localClient byte for client %i\n", (int) (cl - svs.clients) );
-					}
-				} else {
-					SV_UserMove( &svs.clients[cl->local_clients[c]], msg, qfalse, cl );
-				}
-			}
-			else if ( c == clc_voip ) {
-#ifdef USE_VOIP
-				SV_UserVoip( cl, msg );
+			if ( c == clc_moveLocal || c == clc_moveLocalNoDelta) {
+				int localClient = MSG_ReadByte( msg ); // localClient-1
+
+				if (localClient < 0 || localClient >= MAX_SPLITVIEW-1) {
+#ifndef NDEBUG
+					Com_Printf( "WARNING: localClient byte out of range for client %i\n", (int) (cl - svs.clients) );
 #endif
+					break;
+				} else if (cl->local_clients[localClient] == -1) {
+#ifndef NDEBUG
+					Com_Printf( "WARNING: localClient move for non-existant local client %d from client %i\n", localClient, (int) (cl - svs.clients) );
+#endif
+					break;
+				} else {
+					SV_UserMove( &svs.clients[cl->local_clients[localClient]], msg, (c == clc_moveLocal), cl );
+				}
 			}
 		}
 	}
