@@ -180,11 +180,6 @@ Weapons (and attacking)
     * Should I change the whole source to GPLv3 (or later)? (and the data too?)
       * If I change the whole source it could cause issues with submitting patches to ioq3 (and more difficult for other q3 mods to use my code?)
 
-  * STARTED (IOQ3ZTM // FONT_REWRITE): Support true type fonts everywhere!
-    * Status: client, cgame, and q3_ui now support ttfs everywhere! (but does fully support the old fonts)
-    * IOQ3ZTM: FIXME: There seems to be some issues with using old bitmap fonts, like not showing text to Player Setup menu.
-    * IOQ3ZTM: TODO: Add support for font1_prop and font2_prop into `*_DrawFontStringExt`? (code could be cleaner this way?)
-
   * TODO: Support using .so and .dll on pure servers? (Wolf-ET does?)
 
   * STARTED: Splitscreen (for local multiplayer) and splitview mode for viewing other clients in multiplayer.

@@ -813,7 +813,7 @@ UI_ProportionalSizeScale
 float UI_ProportionalSizeScale( int style ) {
 #ifdef IOQ3ZTM // FONT_REWRITE
 	if (style & UI_SMALLFONT) {
-		return uis.fontPropSmall.pointSize / uis.fontPropBig.pointSize;
+		return (float)uis.fontPropSmall.pointSize / (float)uis.fontPropBig.pointSize;
 	}
 #else
 	if(  style & UI_SMALLFONT ) {
