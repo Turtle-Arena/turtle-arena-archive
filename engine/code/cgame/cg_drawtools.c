@@ -32,6 +32,30 @@ Adjusted for resolution, doesn't keep screen aspect ratio
 ================
 */
 void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
+#ifdef TA_SPLITVIEW
+	if (cg.numViewports != 1 && cg.snap) {
+		if (cg.numViewports == 2) {
+			if (cg.viewport == 1) {
+				if (cg.viewVerticle) {
+					*x += SCREEN_WIDTH;
+				} else {
+					*y += SCREEN_HEIGHT;
+				}
+			}
+		}
+		else if (cg.numViewports == 3 && cg.viewport == 2) {
+			*y += SCREEN_HEIGHT;
+		}
+		else if (cg.numViewports <= 4) {
+			if (cg.viewport == 1 || cg.viewport == 3) {
+				*x += SCREEN_WIDTH;
+			}
+			if (cg.viewport == 2 || cg.viewport == 3) {
+				*y += SCREEN_HEIGHT;
+			}
+		}
+	}
+#endif
 	// scale for screen sizes
 	*x *= cgs.screenXScaleFit;
 	*y *= cgs.screenYScaleFit;
@@ -69,14 +93,6 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 #ifdef TA_SPLITVIEW
 	if (cg.numViewports != 1 && cg.snap) {
 		if (cg.numViewports == 2) {
-			/*if (cg.viewVerticle) {
-				*w /= 2;
-				*x /= 2;
-			} else {
-				*h /= 2;
-				*y /= 2;
-			}*/
-
 			if (cg.viewport == 1) {
 				if (cg.viewVerticle) {
 					*x += SCREEN_WIDTH;
@@ -86,21 +102,12 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 			}
 		}
 		else if (cg.numViewports == 3 && cg.viewport == 2) {
-			//*h /= 2;
-			//*y /= 2;
-
 			*y += SCREEN_HEIGHT;
 		}
 		else if (cg.numViewports <= 4) {
-			//*w /= 2;
-			//*h /= 2;
-			//*x /= 2;
-			//*y /= 2;
-
 			if (cg.viewport == 1 || cg.viewport == 3) {
 				*x += SCREEN_WIDTH;
 			}
-
 			if (cg.viewport == 2 || cg.viewport == 3) {
 				*y += SCREEN_HEIGHT;
 			}
