@@ -2151,9 +2151,11 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	char		*text_p;
 	char		*token;
 	char		surfName[MAX_QPATH];
+#ifdef IOQ3ZTM // PARSE_SKINS
+	char		shaderName[MAX_QPATH];
+#endif
 #ifdef IOQ3ZTM // $DIR_IN_SKIN
 	char		path[MAX_QPATH];
-	char		shaderName[MAX_QPATH];
 	int			i;
 #endif
 
@@ -2256,6 +2258,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		// parse the shader name
 #ifdef IOQ3ZTM // PARSE_SKINS
 		token = COM_ParseExt2( &text_p, qfalse, ',' );
+		Q_strncpyz( shaderName, token, sizeof( shaderName ) );
 #else
 		token = CommaParse( &text_p );
 #endif
@@ -2306,7 +2309,8 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 			surf->shader = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
 		}
 		else {
-			surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+			// IOQ3ZTM // PARSE_SKIN // Use shaderName instead of token
+			surf->shader = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
 		}
 #else
 		surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );
