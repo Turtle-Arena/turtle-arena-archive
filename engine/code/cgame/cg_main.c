@@ -241,6 +241,9 @@ vmCvar_t	cg_obeliskRespawnDelay;
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 vmCvar_t	cg_drawMeleeWeaponTrails;
 #endif
+#ifdef TA_MISC // MATERIALS 
+vmCvar_t	cg_impactDebris;
+#endif
 #ifdef IOQ3ZTM // LASERTAG
 vmCvar_t	cg_laserTag;
 #endif
@@ -447,6 +450,9 @@ static cvarTable_t cvarTable[] = {
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 	,{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "1", CVAR_ARCHIVE}
+#endif
+#ifdef TA_MISC // MATERIALS 
+	,{ &cg_impactDebris, "cg_impactDebris", "1", CVAR_ARCHIVE}
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 	,{ &cg_laserTag, "g_laserTag", "0", CVAR_SERVERINFO }

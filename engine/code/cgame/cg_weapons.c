@@ -4105,6 +4105,10 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 	vec3_t newOrigin;
 	trace_t trace;
 
+	if (cg_impactDebris.integer <= 0) {
+		return;
+	}
+
 #ifdef IOQ3ZTM // LASERTAG
 	if ( cg_laserTag.integer ) {
 		return;
@@ -4145,6 +4149,8 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 		numParticles = 12;
 	else
 		numParticles = 24;
+
+	numParticles *= cg_impactDebris.value;
 
 	for (i = 1; i < NUM_MATERIAL_TYPES; i++)
 	{
