@@ -1410,9 +1410,15 @@ UI_ProportionalSizeScale
 =================
 */
 float UI_ProportionalSizeScale( int style ) {
+#ifdef IOQ3ZTM // FONT_REWRITE
+	if (style & UI_SMALLFONT) {
+		return (float)cgs.media.fontPropSmall.pointSize / (float)cgs.media.fontPropBig.pointSize;
+	}
+#else
 	if(  style & UI_SMALLFONT ) {
 		return 0.75;
 	}
+#endif
 
 	return 1.00;
 }
