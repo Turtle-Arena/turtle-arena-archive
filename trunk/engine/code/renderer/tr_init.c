@@ -1130,8 +1130,13 @@ void R_Register( void )
 	r_marksOnTriangleMeshes = ri.Cvar_Get("r_marksOnTriangleMeshes", "0", CVAR_ARCHIVE);
 #endif
 
+#ifdef TA_SPLITVIEW // Need more polys when there are more views.
+	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS*2), 0);
+	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS*2), 0);
+#else
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);
+#endif
 
 	// make sure all the commands added here are also
 	// removed in R_Shutdown
