@@ -1561,45 +1561,51 @@ static void SV_UpdateUserinfo_f( client_t *cl ) {
 
 #ifdef TA_SPLITVIEW
 static void SV_UpdateUserinfo2_f( client_t *cl ) {
-	if (cl->local_clients[0] != -1) {
+	client_t *lc;
+
+	if (cl->local_clients[0] == -1) {
 		return;
 	}
 
-	cl = &svs.clients[cl->local_clients[0]];
+	lc = &svs.clients[cl->local_clients[0]];
 
-	Q_strncpyz( cl->userinfo, Cmd_Argv(1), sizeof(cl->userinfo) );
+	Q_strncpyz( lc->userinfo, Cmd_Argv(1), sizeof(lc->userinfo) );
 
-	SV_UserinfoChanged( cl );
+	SV_UserinfoChanged( lc );
 	// call prog code to allow overrides
-	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
+	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, lc - svs.clients );
 }
 
 static void SV_UpdateUserinfo3_f( client_t *cl ) {
-	if (cl->local_clients[1] != -1) {
+	client_t *lc;
+
+	if (cl->local_clients[1] == -1) {
 		return;
 	}
 
-	cl = &svs.clients[cl->local_clients[1]];
+	lc = &svs.clients[cl->local_clients[1]];
 
-	Q_strncpyz( cl->userinfo, Cmd_Argv(1), sizeof(cl->userinfo) );
+	Q_strncpyz( lc->userinfo, Cmd_Argv(1), sizeof(lc->userinfo) );
 
-	SV_UserinfoChanged( cl );
+	SV_UserinfoChanged( lc );
 	// call prog code to allow overrides
-	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
+	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, lc - svs.clients );
 }
 
 static void SV_UpdateUserinfo4_f( client_t *cl ) {
-	if (cl->local_clients[2] != -1) {
+	client_t *lc;
+
+	if (cl->local_clients[2] == -1) {
 		return;
 	}
 
-	cl = &svs.clients[cl->local_clients[2]];
+	lc = &svs.clients[cl->local_clients[2]];
 
-	Q_strncpyz( cl->userinfo, Cmd_Argv(1), sizeof(cl->userinfo) );
+	Q_strncpyz( lc->userinfo, Cmd_Argv(1), sizeof(lc->userinfo) );
 
-	SV_UserinfoChanged( cl );
+	SV_UserinfoChanged( lc );
 	// call prog code to allow overrides
-	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
+	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, lc - svs.clients );
 }
 #endif
 
