@@ -1393,14 +1393,6 @@ void SP_func_door (gentity_t *ent) {
 	ent->nextthink = level.time + FRAMETIME;
 
 	if ( ! (ent->flags & FL_TEAMSLAVE ) ) {
-#ifdef TA_ENTSYS // BREAKABLE // Doors are not killable...
-		if (ent->health)
-		{
-			ent->takedamage = qtrue;
-			ent->health = -1;
-		}
-		if ( ent->targetname || ent->takedamage )
-#else
 		int health;
 
 		G_SpawnInt( "health", "0", &health );
@@ -1408,7 +1400,6 @@ void SP_func_door (gentity_t *ent) {
 			ent->takedamage = qtrue;
 		}
 		if ( ent->targetname || health )
-#endif
 		{
 			// non touch/shoot doors
 			ent->think = Think_MatchTeam;
@@ -1416,6 +1407,9 @@ void SP_func_door (gentity_t *ent) {
 			ent->think = Think_SpawnNewDoorTrigger;
 		}
 	}
+#ifdef TA_ENTSYS // BREAKABLE // Doors are not killable...
+	ent->health = -1;
+#endif
 
 
 }
