@@ -1131,12 +1131,6 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 #endif
-#ifdef IOQ3ZTM // LETTERBOX
-	if ( !strcmp( cmd, "letterbox" ) ) {
-		CG_ToggleLetterbox( atoi(CG_Argv(1)), atoi(CG_Argv(2)) );
-		return;
-	}
-#endif
 
 	if ( !strcmp( cmd, "cp" ) ) {
 #ifndef MISSIONPACK_HUD2
