@@ -506,21 +506,6 @@ static void CG_Camera_f( void ) {
 */
 #endif
 
-#ifdef IOQ3ZTM // LETTERBOX
-void CG_Letterbox(void)
-{
-	qboolean onscreen, instant;
-	char name[MAX_QPATH];
-
-	trap_Argv( 1, name, sizeof(name));
-	onscreen = atoi(name);
-	trap_Argv( 2, name, sizeof(name));
-	instant = atoi(name);
-
-	CG_ToggleLetterbox( onscreen, instant );
-}
-#endif
-
 #ifdef IOQ3ZTM // NEW_CAM
 void CG_CamLeft(int localClient, qboolean down)
 {
@@ -770,9 +755,6 @@ static consoleCommand_t	commands[] = {
 #else
 	//{ "camera", CG_Camera_f },
 #endif
-#ifdef IOQ3ZTM // LETTERBOX
-	{ "letterbox", CG_Letterbox },
-#endif
 	{ "loaddeferred", CG_LoadDeferredPlayers } 
 };
 
@@ -854,8 +836,5 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("loaddeferred");
 #else
 	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
-#endif
-#ifdef IOQ3ZTM // LETTERBOX
-	trap_AddCommand ("letterbox" );
 #endif
 }
