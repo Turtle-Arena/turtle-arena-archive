@@ -2269,14 +2269,26 @@ qboolean	trap_GetServerCommand( int serverCommandNumber );
 // a lagged connection
 int			trap_GetCurrentCmdNumber( void );	
 
+#ifdef TA_SPLITVIEW // CONTROLS
+qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClient );
+
+#if defined TA_HOLDSYS/*2*/
+// used for the weapon select, holdable select, and zoom
+void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue, int localClientNum );
+#else
+// used for the weapon select and zoom
+void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int localClientNum );
+#endif
+#else
 qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
 
 #if defined TA_HOLDSYS/*2*/
 // used for the weapon select, holdable select, and zoom
-void		trap_SetUserCmdValue( int holdableValue, float sensitivityScale, int weaponValue );
+void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue );
 #else
 // used for the weapon select and zoom
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale );
+#endif
 #endif
 
 // aids for VM testing

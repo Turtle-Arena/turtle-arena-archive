@@ -1208,10 +1208,18 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #else
 	weaponSelect = cg.cur_lc->weaponSelect;
 #endif
+#ifdef TA_SPLITVIEW // CONTROLS
+#ifdef TA_HOLDSYS/*2*/
+	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_lc->holdableSelect, cg.viewport );
+#else
+	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.viewport );
+#endif
+#else
 #ifdef TA_HOLDSYS/*2*/
 	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_lc->holdableSelect );
 #else
 	trap_SetUserCmdValue( weaponSelect, mouseSensitivity );
+#endif
 #endif
 
 	// update cg.predictedPlayerState
