@@ -514,7 +514,7 @@ void CG_PredictPlayerState( void ) {
 
 	// get the latest command so we can know which commands are from previous map_restarts
 #ifdef TA_SPLITVIEW // CONTROLS
-	trap_GetUserCmd( current, &oldestCmd, cg.viewport );
+	trap_GetUserCmd( current, &latestCmd, cg.viewport );
 #else
 	trap_GetUserCmd( current, &latestCmd );
 #endif
