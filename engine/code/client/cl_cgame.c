@@ -61,7 +61,12 @@ void CL_GetGlconfig( glconfig_t *glconfig ) {
 CL_GetUserCmd
 ====================
 */
-qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
+#ifdef TA_SPLITVIEW // CONTROLS
+qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClient )
+#else
+qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd )
+#endif
+{
 	// cmds[cmdNumber] is the last properly generated command
 
 	// can't return anything that we haven't created yet
@@ -75,7 +80,11 @@ qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 		return qfalse;
 	}
 
+#ifdef TA_SPLITVIEW // CONTROLS
+	*ucmd = cl.cmdss[localClient][ cmdNumber & CMD_MASK ];
+#else
 	*ucmd = cl.cmds[ cmdNumber & CMD_MASK ];
+#endif
 
 	return qtrue;
 }
@@ -181,17 +190,32 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 CL_SetUserCmdValue
 =====================
 */
+#ifdef TA_SPLITVIEW // CONTROLS
+#ifdef TA_HOLDSYS/*2*/
+void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int holdableValue, int localClientNum ) {
+	cl.localClients[localClientNum].cgameUserCmdValue = userCmdValue;
+	cl.localClients[localClientNum].cgameSensitivity = sensitivityScale;
+	cl.localClients[localClientNum].cgameHoldableValue = holdableValue;
+}
+#else
+void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int localClientNum ) {
+	cl.localClients[localClientNum].cgameUserCmdValue = userCmdValue;
+	cl.localClients[localClientNum].cgameSensitivity = sensitivityScale;
+}
+#endif
+#else
 #ifdef TA_HOLDSYS/*2*/
 void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int holdableValue ) {
-	cl.cgameUserCmdValue = userCmdValue;
-	cl.cgameSensitivity = sensitivityScale;
-	cl.cgameHoldableValue = holdableValue;
+	cl.localClient.cgameUserCmdValue = userCmdValue;
+	cl.localClient.cgameSensitivity = sensitivityScale;
+	cl.localClient.cgameHoldableValue = holdableValue;
 }
 #else
 void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) {
-	cl.cgameUserCmdValue = userCmdValue;
-	cl.cgameSensitivity = sensitivityScale;
+	cl.localClient.cgameUserCmdValue = userCmdValue;
+	cl.localClient.cgameSensitivity = sensitivityScale;
 }
+#endif
 #endif
 
 /*
@@ -360,7 +384,11 @@ rescan:
 		Con_ClearNotify();
 		// reparse the string, because Con_ClearNotify() may have done another Cmd_TokenizeString()
 		Cmd_TokenizeString( s );
+#ifdef TA_SPLITVIEW // CONTROLS
+		Com_Memset( cl.cmdss, 0, sizeof( cl.cmdss ) );
+#else
 		Com_Memset( cl.cmds, 0, sizeof( cl.cmds ) );
+#endif
 		return qtrue;
 	}
 
@@ -621,12 +649,22 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_GETCURRENTCMDNUMBER:
 		return CL_GetCurrentCmdNumber();
 	case CG_GETUSERCMD:
+#ifdef TA_SPLITVIEW // CONTROLS
+		return CL_GetUserCmd( args[1], VMA(2), args[3] );
+	case CG_SETUSERCMDVALUE:
+#if defined TA_HOLDSYS/*2*/
+		CL_SetUserCmdValue( args[1], VMF(2), args[3], args[4] );
+#else
+		CL_SetUserCmdValue( args[1], VMF(2), args[3] );
+#endif
+#else
 		return CL_GetUserCmd( args[1], VMA(2) );
 	case CG_SETUSERCMDVALUE:
 #if defined TA_HOLDSYS/*2*/
 		CL_SetUserCmdValue( args[1], VMF(2), args[3] );
 #else
 		CL_SetUserCmdValue( args[1], VMF(2) );
+#endif
 #endif
 		return 0;
 	case CG_MEMORY_REMAINING:

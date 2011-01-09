@@ -96,6 +96,32 @@ typedef struct {
 
 extern int g_console_field_width;
 
+#ifdef TA_SPLITVIEW // CONTROLS
+// Client Active Local Client
+typedef struct {
+	int			mouseDx[2], mouseDy[2];	// added to by mouse events
+	int			mouseIndex;
+	int			joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
+
+	// cgame communicates a few values to the client system
+#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
+	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
+#endif
+#ifdef TA_HOLDSYS/*2*/
+	int			cgameHoldableValue;	// current holdable to add to usercmd_t
+#endif
+	float		cgameSensitivity;
+
+	// the client maintains its own idea of view angles, which are
+	// sent to the server each frame.  It is cleared to 0 upon entering each level.
+	// the server sends a delta each frame which is added to the locally
+	// tracked view angles to account for standing on rotating objects,
+	// and teleport direction changes
+	vec3_t		viewangles;
+
+} calc_t;
+#endif
+
 typedef struct {
 	int			timeoutcount;		// it requres several frames in a timeout condition
 									// to disconnect, preventing debugging breaks from
@@ -116,33 +142,23 @@ typedef struct {
 
 	int			parseEntitiesNum;	// index (not anded off) into cl_parse_entities[]
 
-	int			mouseDx[2], mouseDy[2];	// added to by mouse events
-	int			mouseIndex;
-	int			joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
-
-	// cgame communicates a few values to the client system
-#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
-	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
+#ifdef TA_SPLITVIEW
+	calc_t		localClients[MAX_SPLITVIEW];
+#else
+	calc_t		localClient;
 #endif
-#ifdef TA_HOLDSYS/*2*/
-	int			cgameHoldableValue;	// current holdable to add to usercmd_t
-#endif
-	float		cgameSensitivity;
 
 	// cmds[cmdNumber] is the predicted command, [cmdNumber-1] is the last
 	// properly generated command
+#ifdef TA_SPLITVIEW
+	usercmd_t	cmdss[MAX_SPLITVIEW][CMD_BACKUP];	// each mesage will send several old cmds
+#else
 	usercmd_t	cmds[CMD_BACKUP];	// each mesage will send several old cmds
+#endif
 	int			cmdNumber;			// incremented each frame, because multiple
 									// frames may need to be packed into a single packet
 
 	outPacket_t	outPackets[PACKET_BACKUP];	// information about each packet we have sent out
-
-	// the client maintains its own idea of view angles, which are
-	// sent to the server each frame.  It is cleared to 0 upon entering each level.
-	// the server sends a delta each frame which is added to the locally
-	// tracked view angles to account for standing on rotating objects,
-	// and teleport direction changes
-	vec3_t		viewangles;
 
 	int			serverId;			// included in each client message so the server
 												// can tell if it is for a prior map_restart
@@ -503,9 +519,11 @@ typedef struct {
 	qboolean	wasPressed;		// set when down, not cleared when up
 } kbutton_t;
 
+#if 0
 extern	kbutton_t	in_mlook, in_klook;
 extern 	kbutton_t 	in_strafe;
 extern 	kbutton_t 	in_speed;
+#endif
 
 #ifdef USE_VOIP
 extern 	kbutton_t 	in_voiprecord;

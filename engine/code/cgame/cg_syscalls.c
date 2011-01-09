@@ -331,6 +331,21 @@ int			trap_GetCurrentCmdNumber( void ) {
 	return syscall( CG_GETCURRENTCMDNUMBER );
 }
 
+#ifdef TA_SPLITVIEW // CONTROLS
+qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClient ) {
+	return syscall( CG_GETUSERCMD, cmdNumber, ucmd, localClient );
+}
+
+#if defined TA_HOLDSYS/*2*/
+void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue, int localClientNum ) {
+	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale), holdableValue, localClientNum );
+}
+#else
+void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int localClientNum ) {
+	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale), localClientNum );
+}
+#endif
+#else
 qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return syscall( CG_GETUSERCMD, cmdNumber, ucmd );
 }

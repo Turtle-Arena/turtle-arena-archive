@@ -2321,7 +2321,11 @@ static void CG_DrawDisconnect( void ) {
 
 	// draw the phone jack if we are completely past our buffers
 	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
+#ifdef TA_SPLITVIEW // CONTROLS
+	trap_GetUserCmd( cmdNum, &cmd, cg.viewport );
+#else
 	trap_GetUserCmd( cmdNum, &cmd );
+#endif
 	if ( cmd.serverTime <= cg.cur_ps->commandTime
 		|| cmd.serverTime > cg.time ) {	// special check for map_restart
 		return;
