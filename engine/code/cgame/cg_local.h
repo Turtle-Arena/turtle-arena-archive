@@ -1739,6 +1739,14 @@ void CG_TestModelPrevSkin_f (void);
 #ifndef TURTLEARENA // NOZOOM
 void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
+#ifdef TA_SPLITVIEW
+void CG_2ZoomDown_f( void );
+void CG_2ZoomUp_f( void );
+void CG_3ZoomDown_f( void );
+void CG_3ZoomUp_f( void );
+void CG_4ZoomDown_f( void );
+void CG_4ZoomUp_f( void );
+#endif
 #endif
 void CG_AddBufferedSound( sfxHandle_t sfx);
 
@@ -1914,11 +1922,35 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 void CG_NextHoldable_f( void );
 void CG_PrevHoldable_f( void );
 void CG_Holdable_f( void );
+#ifdef TA_SPLITVIEW
+void CG_2NextHoldable_f( void );
+void CG_2PrevHoldable_f( void );
+void CG_2Holdable_f( void );
+void CG_3NextHoldable_f( void );
+void CG_3PrevHoldable_f( void );
+void CG_3Holdable_f( void );
+void CG_4NextHoldable_f( void );
+void CG_4PrevHoldable_f( void );
+void CG_4Holdable_f( void );
+#endif
 #endif
 #ifndef TA_WEAPSYS_EX
 void CG_NextWeapon_f( void );
 void CG_PrevWeapon_f( void );
 void CG_Weapon_f( void );
+#ifdef TA_SPLITVIEW
+void CG_2NextWeapon_f( void );
+void CG_2PrevWeapon_f( void );
+void CG_2Weapon_f( void );
+
+void CG_3NextWeapon_f( void );
+void CG_3PrevWeapon_f( void );
+void CG_3Weapon_f( void );
+
+void CG_4NextWeapon_f( void );
+void CG_4PrevWeapon_f( void );
+void CG_4Weapon_f( void );
+#endif
 #endif
 
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN

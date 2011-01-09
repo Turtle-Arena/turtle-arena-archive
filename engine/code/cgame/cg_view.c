@@ -765,6 +765,30 @@ void CG_ZoomDown_f( void ) {
 void CG_ZoomUp_f( void ) { 
 	CG_ZoomUp(0);
 }
+
+void CG_2ZoomDown_f( void ) { 
+	CG_ZoomDown(1);
+}
+
+void CG_2ZoomUp_f( void ) { 
+	CG_ZoomUp(1);
+}
+
+void CG_3ZoomDown_f( void ) { 
+	CG_ZoomDown(2);
+}
+
+void CG_3ZoomUp_f( void ) { 
+	CG_ZoomUp(2);
+}
+
+void CG_4ZoomDown_f( void ) { 
+	CG_ZoomDown(3);
+}
+
+void CG_4ZoomUp_f( void ) { 
+	CG_ZoomUp(3);
+}
 #endif
 #endif
 

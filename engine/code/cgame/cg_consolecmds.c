@@ -561,29 +561,84 @@ void CG_CamReset(int localClient)
 	lc->camRotDir = 0;
 }
 
-void CG_CamLeftDown_f(void)
-{
+void CG_CamLeftDown_f(void) {
 	CG_CamLeft(0, qtrue);
 }
 
-void CG_CamLeftUp_f(void)
-{
+void CG_CamLeftUp_f(void) {
 	CG_CamLeft(0, qfalse);
 }
 
-void CG_CamRightDown_f(void)
-{
+void CG_CamRightDown_f(void) {
 	CG_CamRight(0, qtrue);
 }
 
-void CG_CamRightUp_f(void)
-{
+void CG_CamRightUp_f(void) {
 	CG_CamRight(0, qfalse);
 }
 
-void CG_CamReset_f(void)
-{
+void CG_CamReset_f(void) {
 	CG_CamReset(0);
+}
+
+void CG_2CamLeftDown_f(void) {
+	CG_CamLeft(1, qtrue);
+}
+
+void CG_2CamLeftUp_f(void) {
+	CG_CamLeft(1, qfalse);
+}
+
+void CG_2CamRightDown_f(void) {
+	CG_CamRight(1, qtrue);
+}
+
+void CG_2CamRightUp_f(void) {
+	CG_CamRight(1, qfalse);
+}
+
+void CG_2CamReset_f(void) {
+	CG_CamReset(1);
+}
+
+void CG_3CamLeftDown_f(void) {
+	CG_CamLeft(2, qtrue);
+}
+
+void CG_3CamLeftUp_f(void) {
+	CG_CamLeft(2, qfalse);
+}
+
+void CG_3CamRightDown_f(void) {
+	CG_CamRight(2, qtrue);
+}
+
+void CG_3CamRightUp_f(void) {
+	CG_CamRight(2, qfalse);
+}
+
+void CG_3CamReset_f(void) {
+	CG_CamReset(2);
+}
+
+void CG_4CamLeftDown_f(void) {
+	CG_CamLeft(3, qtrue);
+}
+
+void CG_4CamLeftUp_f(void) {
+	CG_CamLeft(3, qfalse);
+}
+
+void CG_4CamRightDown_f(void) {
+	CG_CamRight(3, qtrue);
+}
+
+void CG_4CamRightUp_f(void) {
+	CG_CamRight(3, qfalse);
+}
+
+void CG_4CamReset_f(void) {
+	CG_CamReset(3);
 }
 #endif
 
@@ -605,6 +660,14 @@ static consoleCommand_t	commands[] = {
 #ifndef TURTLEARENA // NOZOOM
 	{ "+zoom", CG_ZoomDown_f },
 	{ "-zoom", CG_ZoomUp_f },
+#ifdef TA_SPLITVIEW
+	{ "+2zoom", CG_2ZoomDown_f },
+	{ "-2zoom", CG_2ZoomUp_f },
+	{ "+3zoom", CG_3ZoomDown_f },
+	{ "-3zoom", CG_3ZoomUp_f },
+	{ "+4zoom", CG_4ZoomDown_f },
+	{ "-4zoom", CG_4ZoomUp_f },
+#endif
 #endif
 #ifdef IOQ3ZTM // NEW_CAM
 	{ "camreset", CG_CamReset_f },
@@ -612,6 +675,23 @@ static consoleCommand_t	commands[] = {
 	{ "-camleft", CG_CamLeftUp_f },
 	{ "+camright", CG_CamRightDown_f },
 	{ "-camright", CG_CamRightUp_f },
+#ifdef TA_SPLITVIEW
+	{ "2camreset", CG_2CamReset_f },
+	{ "+2camleft", CG_2CamLeftDown_f },
+	{ "-2camleft", CG_2CamLeftUp_f },
+	{ "+2camright", CG_2CamRightDown_f },
+	{ "-2camright", CG_2CamRightUp_f },
+	{ "3camreset", CG_3CamReset_f },
+	{ "+3camleft", CG_3CamLeftDown_f },
+	{ "-3camleft", CG_3CamLeftUp_f },
+	{ "+3camright", CG_3CamRightDown_f },
+	{ "-3camright", CG_3CamRightUp_f },
+	{ "4camreset", CG_4CamReset_f },
+	{ "+4camleft", CG_4CamLeftDown_f },
+	{ "-4camleft", CG_4CamLeftUp_f },
+	{ "+4camright", CG_4CamRightDown_f },
+	{ "-4camright", CG_4CamRightUp_f },
+#endif
 #endif
 	{ "sizeup", CG_SizeUp_f },
 	{ "sizedown", CG_SizeDown_f },
@@ -619,11 +699,33 @@ static consoleCommand_t	commands[] = {
 	{ "weapnext", CG_NextWeapon_f },
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },
+#ifdef TA_SPLITVIEW
+	{ "2weapnext", CG_2NextWeapon_f },
+	{ "2weapprev", CG_2PrevWeapon_f },
+	{ "2weapon", CG_2Weapon_f },
+	{ "3weapnext", CG_3NextWeapon_f },
+	{ "3weapprev", CG_3PrevWeapon_f },
+	{ "3weapon", CG_3Weapon_f },
+	{ "4weapnext", CG_4NextWeapon_f },
+	{ "4weapprev", CG_4PrevWeapon_f },
+	{ "4weapon", CG_4Weapon_f },
+#endif
 #endif
 #ifdef TA_HOLDSYS/*2*/
 	{ "holdnext", CG_NextHoldable_f },
 	{ "holdprev", CG_PrevHoldable_f },
 	{ "holdable", CG_Holdable_f },
+#ifdef TA_SPLITVIEW
+	{ "2holdnext", CG_2NextHoldable_f },
+	{ "2holdprev", CG_2PrevHoldable_f },
+	{ "2holdable", CG_2Holdable_f },
+	{ "3holdnext", CG_3NextHoldable_f },
+	{ "3holdprev", CG_3PrevHoldable_f },
+	{ "3holdable", CG_3Holdable_f },
+	{ "4holdnext", CG_4NextHoldable_f },
+	{ "4holdprev", CG_4PrevHoldable_f },
+	{ "4holdable", CG_4Holdable_f },
+#endif
 #endif
 	{ "tell_target", CG_TellTarget_f },
 	{ "tell_attacker", CG_TellAttacker_f },
