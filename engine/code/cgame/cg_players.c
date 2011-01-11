@@ -2270,7 +2270,12 @@ static void CG_TrailItem( centity_t *cent, qhandle_t hModel )
 
 #ifdef IOQ3ZTM // FLAG // Don't draw CTF flag for the holder in third person, blocks view.
 	if (cent->currentState.clientNum == cg.cur_lc->predictedPlayerState.clientNum
-		&& cg_thirdPerson.integer)
+#ifdef TA_SPLITVIEW
+		&& cg_thirdPerson[cg.viewport].integer
+#else
+		&& cg_thirdPerson.integer
+#endif
+		)
 	{
 		// if its the current player and their in third person view,
 		//  don't draw the flag, it blocks their view.
