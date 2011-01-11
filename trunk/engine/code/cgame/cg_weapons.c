@@ -4027,6 +4027,7 @@ Spawn hit marker, based on CG_Bleed
 */
 void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 	localEntity_t	*ex;
+	qhandle_t		hShader;
 	int r;
 
 #ifndef NOBLOOD
@@ -4039,6 +4040,40 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 
 	r = rand()%2;
 
+#ifndef NOBLOOD
+	if (cg_blood.integer)
+	{
+		hShader = cgs.media.bloodExplosionShader;
+	}
+	else
+#endif
+	{
+#ifdef TURTLEARENA // WEAPONS
+		if (meleeDamage)
+		{
+			if (r >= 1 && cgs.media.meleeHitShader[1])
+				hShader = cgs.media.meleeHitShader[1];
+			else
+				hShader = cgs.media.meleeHitShader[0];
+		}
+		else
+		{
+			// missile damage
+			if (r >= 1 && cgs.media.missileHitShader[1])
+				hShader = cgs.media.missileHitShader[1];
+			else
+				hShader = cgs.media.missileHitShader[0];
+		}
+#else
+		// quake3 has no non-blood hit effect.
+		hShader = 0;
+#endif
+	}
+
+	if (!hShader) {
+		return;
+	}
+
 	ex = CG_AllocLocalEntity();
 	ex->leType = LE_EXPLOSION;
 
@@ -4050,32 +4085,7 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 	ex->refEntity.rotation = rand() % 360;
 	ex->refEntity.radius = 24;
 
-#ifndef NOBLOOD
-	if (cg_blood.integer)
-	{
-		ex->refEntity.customShader = cgs.media.bloodExplosionShader;
-	}
-	else
-#endif
-	{
-#ifdef TURTLEARENA // WEAPONS
-		if (meleeDamage)
-		{
-			if (r >= 1 && cgs.media.meleeHitShader[1])
-				ex->refEntity.customShader = cgs.media.meleeHitShader[1];
-			else
-				ex->refEntity.customShader = cgs.media.meleeHitShader[0];
-		}
-		else
-		{
-			// missile damage
-			if (r >= 1 && cgs.media.missileHitShader[1])
-				ex->refEntity.customShader = cgs.media.missileHitShader[1];
-			else
-				ex->refEntity.customShader = cgs.media.missileHitShader[0];
-		}
-#endif
-	}
+	ex->refEntity.customShader = hShader;
 
 	// don't show player's own blood in view
 	if ( entityNum == cg.cur_ps->clientNum
