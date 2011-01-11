@@ -43,14 +43,14 @@ An item fires all of its targets when it is picked up.  If the toucher can't car
 */
 
 #ifdef TA_WEAPSYS
-#define EMPTY_GITEM "item_health_small", \
+#define EMPTY_GITEM "item_dummy", \
 		"sound/items/s_health.wav", \
-        { "models/powerups/health/small.md3", \
+        { "models/powerups/holdable/medkit.md3", \
 		NULL, \
 		NULL, NULL }, \
-		"icons/iconh_small", \
-		"5 Health", \
-		5, \
+		"icons/iconh_mega", \
+		"Dummy", \
+		1, \
 		IT_HEALTH, \
 		0, \
 		"", \
