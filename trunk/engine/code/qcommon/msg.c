@@ -1254,12 +1254,12 @@ netField_t	playerStateFields[] =
 { PSF(meleeLinkTime), 16 },
 { PSF(chain), 16 },
 { PSF(chainTime), 16 },
-{ PSF(weaponHands), 4 },
+{ PSF(weaponHands), 4 }
 #endif
 #ifdef TA_PLAYERSYS // LADDER
-{ PSF(origin2[2]), 0 },
+,{ PSF(origin2[2]), 0 },
 { PSF(origin2[0]), 0 },
-{ PSF(origin2[1]), 0 },
+{ PSF(origin2[1]), 0 }
 #endif
 };
 
