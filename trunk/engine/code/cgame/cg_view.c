@@ -428,7 +428,11 @@ static void CG_OffsetThirdPersonView( void ) {
 #ifdef TA_CAMERA
 	distance = cg.cur_lc->camDistance;
 #else
+#ifdef TA_SPLITVIEW
+	distance = cg_thirdPersonRange[cg.viewport].value;
+#else
 	distance = cg_thirdPersonRange.value;
+#endif
 #endif
 #endif
 
