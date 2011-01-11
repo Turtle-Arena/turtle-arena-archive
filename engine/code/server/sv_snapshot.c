@@ -592,9 +592,9 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	}
 #endif
 
+	// never send client's own entity, because it can
+	// be regenerated from the playerstate
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		// never send client's own entity, because it can
-		// be regenerated from the playerstate
 		clientNum = frame->pss[i].clientNum;
 		if ( clientNum < 0 || clientNum >= MAX_GENTITIES ) {
 			Com_Error( ERR_DROP, "SV_SvEntityForGentity: bad gEnt" );
@@ -602,7 +602,10 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 		svEnt = &sv.svEntities[ clientNum ];
 
 		svEnt->snapshotCounter = sv.snapshotCounter;
+	}
 
+	// Now that local clients have been marked as no send, add visible entities.
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		// find the client's viewpoint
 		VectorCopy( frame->pss[i].origin, org );
 		org[2] += frame->pss[i].viewheight;
