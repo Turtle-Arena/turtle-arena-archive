@@ -873,7 +873,6 @@ extern	cvar_t	*com_altivec;
 #ifdef ANALOG // cl vars
 extern	cvar_t	*cl_thirdPerson;
 extern	cvar_t	*cl_thirdPersonAngle;
-extern	cvar_t	*cl_thirdPersonRange;
 extern	cvar_t	*cl_thirdPersonAnalog;
 #endif
 

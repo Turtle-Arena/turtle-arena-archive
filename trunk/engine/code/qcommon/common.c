@@ -103,7 +103,6 @@ cvar_t	*com_standalone;
 #ifdef ANALOG // cl vars
 cvar_t	*cl_thirdPerson;
 cvar_t	*cl_thirdPersonAngle;
-cvar_t	*cl_thirdPersonRange;
 cvar_t	*cl_thirdPersonAnalog;
 #endif
 
@@ -2781,11 +2780,6 @@ void Com_Init( char *commandLine ) {
 	// Get client game vars.
 	cl_thirdPerson = Cvar_Get ("cg_thirdPerson", "1", 0);
 	cl_thirdPersonAngle = Cvar_Get ("cg_thirdPersonAngle", "0", 0);
-#ifdef TURTLEARENA // FOV
-	cl_thirdPersonRange = Cvar_Get ("cg_thirdPersonRange", "120", 0);
-#else
-	cl_thirdPersonRange = Cvar_Get ("cg_thirdPersonRange", "40", 0);
-#endif
 	cl_thirdPersonAnalog = Cvar_Get ("cg_thirdPersonAnalog", "0", 0);
 #endif
 
