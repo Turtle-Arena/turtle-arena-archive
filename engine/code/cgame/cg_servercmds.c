@@ -501,6 +501,11 @@ require a reload of all the media
 ===============
 */
 static void CG_MapRestart( void ) {
+#ifdef TA_SPLITVIEW
+	int lc;
+	char buf[64];
+#endif
+
 	if ( cg_showmiss.integer ) {
 		CG_Printf( "CG_MapRestart\n" );
 	}
@@ -544,6 +549,28 @@ static void CG_MapRestart( void ) {
 		}
 	}
 #endif
+#ifdef TA_SPLITVIEW
+	for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
+		if (lc == 0) {
+			buf[0] = '\0';
+		} else {
+			Q_snprintf(buf, sizeof (buf), "%d", lc+1);
+		}
+#ifdef THIRD_PERSON
+#ifdef IOQ3ZTM // LASERTAG
+		if (cg_laserTag.integer)
+			trap_Cvar_Set(va("%scg_thirdPerson", buf), "0");
+		else
+#endif
+		trap_Cvar_Set(va("%scg_thirdPerson", buf), "1");
+#else
+		trap_Cvar_Set(va("%scg_thirdPerson", buf), "0");
+#endif
+#ifdef IOQ3ZTM
+		cg_thirdPersonAngle[lc].value = 0;
+#endif
+	}
+#else
 #ifdef THIRD_PERSON
 #ifdef IOQ3ZTM // LASERTAG
 	if (cg_laserTag.integer)
@@ -556,6 +583,7 @@ static void CG_MapRestart( void ) {
 #endif
 #ifdef IOQ3ZTM
 	cg_thirdPersonAngle.value = 0;
+#endif
 #endif
 }
 

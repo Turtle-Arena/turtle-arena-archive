@@ -654,25 +654,20 @@ S_AL_HearingThroughEntity
 */
 static qboolean S_AL_HearingThroughEntity( int entityNum )
 {
-#ifndef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
+#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
+	// ZTM: I changed the cgame API so that this doesn't have to be a hack.
+	if (VM_Call(cgvm, CG_VIEW_TYPE, entityNum) == 0) {
+		//we're the player and in first person
+		return qtrue;
+	} else {
+		//not the player or in third person
+		return qfalse;
+	}
+#else
 	float	distanceSq;
-#endif
 
 	if( clc.clientNum == entityNum )
 	{
-#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
-		// ZTM: I changed the cgame API so that this doesn't have to be a hack.
-		if (VM_Call(cgvm, CG_VIEW_TYPE) == 0)
-		{
-			//we're the player
-			return qtrue;
-		}
-		else
-		{
-			//we're the player, but third person
-			return qfalse;
-		}
-#else
 		// FIXME: <tim@ngus.net> 28/02/06 This is an outrageous hack to detect
 		// whether or not the player is rendering in third person or not. We can't
 		// ask the renderer because the renderer has no notion of entities and we
@@ -687,10 +682,10 @@ static qboolean S_AL_HearingThroughEntity( int entityNum )
 			return qfalse; //we're the player, but third person
 		else
 			return qtrue;  //we're the player
-#endif
 	}
 	else
 		return qfalse; //not the player
+#endif
 }
 
 /*

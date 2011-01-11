@@ -265,19 +265,34 @@ static void CG_CalcVrect (void) {
 #ifdef IOQ3ZTM // NEW_CAM
 void CG_CamUpdate(void)
 {
+	float angle;
+
+#ifdef TA_SPLITVIEW
+	angle = cg_thirdPersonAngle[cg.viewport].value;
+#else
+	angle = cg_thirdPersonAngle.value;
+#endif
+
+	if (cg_cameraOrbit.integer) {
+		if (cg.time > cg.nextOrbitTime) {
+			cg.nextOrbitTime = cg.time + cg_cameraOrbitDelay.integer;
+			angle += cg_cameraOrbit.value;
+		}
+	}
+
 	if (cg.cur_lc->camReseting)
 	{
 		float speed = 5.0f;
-		if (cg_thirdPersonAngle.value >= 360-speed || cg_thirdPersonAngle.value <= speed)
+		if (angle >= 360-speed || angle <= speed)
 		{
-			cg_thirdPersonAngle.value = 0;
+			angle = 0;
 			cg.cur_lc->camRotDir = 0;
 			cg.cur_lc->camReseting = qfalse;
 		}
-		else if (cg_thirdPersonAngle.value > 180)
-			cg_thirdPersonAngle.value += speed;
-		else if (cg_thirdPersonAngle.value > speed)
-			cg_thirdPersonAngle.value -= speed;
+		else if (angle > 180)
+			angle += speed;
+		else if (angle > speed)
+			angle -= speed;
 	}
 	else
 	{
@@ -300,21 +315,40 @@ void CG_CamUpdate(void)
 		else if (cg.cur_lc->camRotDir < -3)
 			cg.cur_lc->camRotDir = -3;
 
-		cg_thirdPersonAngle.value = cg_thirdPersonAngle.value+cg.cur_lc->camRotDir;
+		angle += cg.cur_lc->camRotDir;
 	}
 
-	if (cg_thirdPersonAngle.value > 360)
-		cg_thirdPersonAngle.value -= 360;
-	if (cg_thirdPersonAngle.value < 0)
-		cg_thirdPersonAngle.value += 360;
+	if (angle > 360)
+		angle -= 360;
+	if (angle < 0)
+		angle += 360;
 
 	// Update the cvar...
-	if (cg_thirdPersonAngle.integer != (int)cg_thirdPersonAngle.value)
-		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", cg_thirdPersonAngle.value));
+#ifdef TA_SPLITVIEW
+	if (cg_thirdPersonAngle[cg.viewport].integer != (int)angle) {
+		if (cg.viewport == 0) {
+			trap_Cvar_Set("cg_thirdPersonAngle", va("%f", angle));
+		} else {
+			char buf[MAX_CVAR_VALUE_STRING];
+
+			Q_snprintf(buf, sizeof (buf), "%dcg_thirdPersonAngle", cg.viewport+1);
+
+			trap_Cvar_Set(buf, va("%f", angle));
+		}
+	}
+#else
+	if (cg_thirdPersonAngle.integer != (int)angle) {
+		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", angle));
+	}
+#endif
 
 #ifdef TA_CAMERA
 	// First person
+#ifdef TA_SPLITVIEW
+	if (!cg_thirdPerson[cg.viewport].integer)
+#else
 	if (!cg_thirdPerson.integer)
+#endif
 	{
 		if (cg.cur_lc->camDistance > 11)
 			cg.cur_lc->camDistance -= 2;
@@ -323,19 +357,27 @@ void CG_CamUpdate(void)
 	}
 	else
 	{
+		float range;
+
+#ifdef TA_SPLITVIEW
+		range = cg_thirdPersonRange[cg.viewport].value;
+#else
+		range = cg_thirdPersonRange.value;
+#endif
+
 		if (cg.cur_lc->camDistance == 0) {
-			cg.cur_lc->camDistance = cg_thirdPersonRange.value;
+			cg.cur_lc->camDistance = range;
 		}
 
 		// Third person range was made shorter, zoom in
-		if (cg.cur_lc->camDistance > cg_thirdPersonRange.value+2.0f)
+		if (cg.cur_lc->camDistance > range+2.0f)
 			cg.cur_lc->camDistance -= 2.0f;
-		else if (cg.cur_lc->camDistance > cg_thirdPersonRange.value)
-			cg.cur_lc->camDistance = cg_thirdPersonRange.value;
+		else if (cg.cur_lc->camDistance > range)
+			cg.cur_lc->camDistance = range;
 		// Zoom back out
-		else if (cg.cur_lc->camDistance < cg_thirdPersonRange.value)
+		else if (cg.cur_lc->camDistance < range)
 		{
-#if 0
+#if 1
 			// NiGHTS: Journey of Dreams Visitor style camera distance.
 			//  When next to a wall the camera is closer (like Quake3),
 			//  but only zooms back out when the player is moving
@@ -344,10 +386,10 @@ void CG_CamUpdate(void)
 			if (cg.xyspeed != 0)
 #endif
 			{
-				if (cg.cur_lc->camDistance < cg_thirdPersonRange.value-1.0f)
+				if (cg.cur_lc->camDistance < range-1.0f)
 					cg.cur_lc->camDistance += 1.0f;
 				else
-					cg.cur_lc->camDistance = cg_thirdPersonRange.value;
+					cg.cur_lc->camDistance = range;
 			}
 
 		}
@@ -470,8 +512,13 @@ static void CG_OffsetThirdPersonView( void ) {
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
 	else
 	{
+#ifdef TA_SPLITVIEW
+		focusAngles[YAW] -= cg_thirdPersonAngle[cg.viewport].value;
+		cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle[cg.viewport].value;
+#else
 		focusAngles[YAW] -= cg_thirdPersonAngle.value;
 		cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle.value;
+#endif
 	}
 #endif
 
@@ -1054,16 +1101,15 @@ static int CG_CalcViewValues( void ) {
 	VectorCopy( ps->origin, cg.refdef.vieworg );
 	VectorCopy( ps->viewangles, cg.refdefViewAngles );
 
+#ifdef IOQ3ZTM // NEW_CAM
+	// Update player's camera
+	CG_CamUpdate();
+#else
 	if (cg_cameraOrbit.integer) {
 		if (cg.time > cg.nextOrbitTime) {
 			cg.nextOrbitTime = cg.time + cg_cameraOrbitDelay.integer;
 			cg_thirdPersonAngle.value += cg_cameraOrbit.value;
 		}
-	}
-#ifdef IOQ3ZTM // NEW_CAM
-	else
-	{
-		CG_CamUpdate();
 	}
 #endif
 	// add error decay
@@ -1271,9 +1317,16 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	// decide on third person view
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, if spectator always be in first person.
 	cg.renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
+#ifdef TA_SPLITVIEW
+							&& (cg_thirdPerson[cg.viewport].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
+#ifdef TA_CAMERA // When switching to first person, zoom the camera in
+								|| (!cg_thirdPerson[cg.viewport].integer && cg.cur_lc->camDistance > 10)
+#endif
+#else
 							&& (cg_thirdPerson.integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
 #ifdef TA_CAMERA // When switching to first person, zoom the camera in
 								|| (!cg_thirdPerson.integer && cg.cur_lc->camDistance > 10)
+#endif
 #endif
 								);
 #else
