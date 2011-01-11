@@ -208,10 +208,18 @@ PlayerModel_SaveChanges
 static void PlayerModel_SaveChanges( void )
 {
 	trap_Cvar_Set( "model", s_playermodel.modelskin );
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+	trap_Cvar_Set( "headmodel", "" );
+#else
 	trap_Cvar_Set( "headmodel", s_playermodel.modelskin );
+#endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
 	trap_Cvar_Set( "team_model", s_playermodel.modelskin );
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+	trap_Cvar_Set( "team_headmodel", "" );
+#else
 	trap_Cvar_Set( "team_headmodel", s_playermodel.modelskin );
+#endif
 #endif
 }
 
