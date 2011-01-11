@@ -2631,9 +2631,7 @@ static void CG_DrawCrosshair(void)
 
 	x = cg_crosshairX.integer;
 	y = cg_crosshairY.integer;
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	CG_AdjustFrom640Fit( &x, &y, &w, &h );
-#else
+#ifndef IOQ3ZTM // HUD_ASPECT_CORRECT
 	CG_AdjustFrom640( &x, &y, &w, &h );
 #endif
 
@@ -2643,9 +2641,13 @@ static void CG_DrawCrosshair(void)
 	}
 	hShader = cgs.media.crosshairShader[ ca % NUM_CROSSHAIRS ];
 
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	CG_DrawPic( ((SCREEN_WIDTH-w)*0.5f)+x, ((SCREEN_HEIGHT-h)*0.5f)+y, w, h, hShader );
+#else
 	trap_R_DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
 		y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
 		w, h, 0, 0, 1, 1, hShader );
+#endif
 }
 
 /*
@@ -2782,6 +2784,8 @@ static void CG_DrawCrosshairNames( void ) {
 	if ( cg.renderingThirdPerson ) {
 		return;
 	}
+
+	CG_HudPlacement(HUD_CENTER);
 
 	// scan the known entities to see if the crosshair is sighted on one
 	CG_ScanForCrosshairEntity();
