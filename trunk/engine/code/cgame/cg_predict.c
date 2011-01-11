@@ -30,7 +30,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 static	pmove_t		cg_pmove;
 
 static	int			cg_numSolidEntities;
+#ifdef TA_SPLITVIEW
+static	centity_t	*cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT+MAX_SPLITVIEW];
+#elif defined IOQ3ZTM
+static	centity_t	*cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT+1];
+#else
 static	centity_t	*cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT];
+#endif
 static	int			cg_numTriggerEntities;
 static	centity_t	*cg_triggerEntities[MAX_ENTITIES_IN_SNAPSHOT];
 
@@ -68,12 +74,37 @@ void CG_BuildSolidList( void ) {
 			continue;
 		}
 
-		if ( cent->nextState.solid ) {
+#ifdef IOQ3ZTM
+		if ( ent->solid )
+#else
+		if ( cent->nextState.solid )
+#endif
+		{
 			cg_solidEntities[cg_numSolidEntities] = cent;
 			cg_numSolidEntities++;
 			continue;
 		}
 	}
+
+#ifdef TA_SPLITVIEW
+	// Add local clients to solid entity list
+	for ( i = 0 ; i < snap->numPSs ; i++ ) {
+		cent = &cg_entities[ snap->pss[i].clientNum ];
+		ent = &cent->currentState;
+		if ( ent->solid ) {
+			cg_solidEntities[cg_numSolidEntities] = cent;
+			cg_numSolidEntities++;
+		}
+	}
+#elif IOQ3ZTM
+	// Add client to solid entity list
+	cent = &cg_entities[ snap->ps.clientNum ];
+	ent = &cent->currentState;
+	if ( ent->solid ) {
+		cg_solidEntities[cg_numSolidEntities] = cent;
+		cg_numSolidEntities++;
+	}
+#endif
 }
 
 /*

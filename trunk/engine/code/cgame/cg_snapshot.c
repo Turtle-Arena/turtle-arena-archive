@@ -71,6 +71,64 @@ static void CG_TransitionEntity( centity_t *cent ) {
 	CG_CheckEvents( cent );
 }
 
+#ifdef TA_SPLITVIEW
+// Client side prediction of player solid.
+// Must set for local client perdiction to work correctly
+//  and so local clients can be found by CG_ScanForCrosshairEntity
+void CG_SetPlayerSolid(playerState_t *ps, entityState_t *s
+#ifdef TA_PLAYERSYS
+					, bg_playercfg_t *playercfg
+#endif
+					)
+{
+	if (ps->stats[STAT_HEALTH] > 0 && !(ps->pm_flags & PM_DEAD)
+		&& ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
+#ifdef TURTLEARENA // POWERS
+		&& !ps->powerups[PW_FLASHING]
+#endif
+		)
+	{
+		int i, j, k;
+
+		// assume that x/y are equal and symetric
+#ifdef TA_PLAYERSYS
+		i = playercfg->bbmaxs[0];
+#else
+		i = 15;
+#endif
+		if (i<1)
+			i = 1;
+		if (i>255)
+			i = 255;
+
+		// z is not symetric
+#ifdef TA_PLAYERSYS
+		j = (-playercfg->bbmins[2]);
+#else
+		j = 24;
+#endif
+		if (j<1)
+			j = 1;
+		if (j>255)
+			j = 255;
+
+		// and z maxs can be negative...
+#ifdef TA_PLAYERSYS
+		k = (playercfg->bbmaxs[2]+32);
+#else
+		k = 32+32;
+#endif
+		if (k<1)
+			k = 1;
+		if (k>255)
+			k = 255;
+
+		s->solid = (k<<16) | (j<<8) | i;
+	} else {
+		s->solid = 0;
+	}
+}
+#endif
 
 /*
 ==================
@@ -95,6 +153,11 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 
 	for (i = 0; i < cg.snap->numPSs; i++) {
 		BG_PlayerStateToEntityState( &snap->pss[i], &cg_entities[ snap->pss[i].clientNum ].currentState, qfalse );
+		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState
+#ifdef TA_PLAYERSYS
+				, &cgs.clientinfo[cg.localClients[i].clientNum].playercfg
+#endif
+				);
 	}
 #else
 	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].currentState, qfalse );
@@ -171,6 +234,11 @@ static void CG_TransitionSnapshot( void ) {
 
 	for (i = 0; i < cg.snap->numPSs; i++) {
 		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState, qfalse );
+		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState
+#ifdef TA_PLAYERSYS
+				, &cgs.clientinfo[cg.localClients[i].clientNum].playercfg
+#endif
+				);
 		cg_entities[ cg.snap->pss[i].clientNum ].interpolate = qfalse;
 	}
 #else
@@ -246,6 +314,11 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 #ifdef TA_SPLITVIEW
 	for (i = 0; i < cg.snap->numPSs; i++) {
 		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].nextState, qfalse );
+		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].nextState
+#ifdef TA_PLAYERSYS
+				, &cgs.clientinfo[cg.localClients[i].clientNum].playercfg
+#endif
+				);
 		cg_entities[ cg.snap->pss[i].clientNum ].interpolate = qtrue;
 	}
 #else
