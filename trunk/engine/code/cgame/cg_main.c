@@ -36,7 +36,7 @@ int forceModelModificationCount = -1;
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
 #ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
-int CG_ViewType(void);
+int CG_ViewType( int entityNum );
 #endif
 
 
@@ -81,7 +81,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		return 0;
 #ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 	case CG_VIEW_TYPE:
-		return CG_ViewType();
+		return CG_ViewType(arg0);
 #endif
 	default:
 		CG_Error( "vmMain: unknown command %i", command );
@@ -169,11 +169,20 @@ vmCvar_t	cg_fov;
 #ifndef TURTLEARENA // NOZOOM
 vmCvar_t	cg_zoomFov;
 #endif
+#ifdef TA_SPLITVIEW
+vmCvar_t	cg_thirdPerson[MAX_SPLITVIEW];
+vmCvar_t	cg_thirdPersonRange[MAX_SPLITVIEW];
+vmCvar_t	cg_thirdPersonAngle[MAX_SPLITVIEW];
+#ifdef ANALOG // cg var
+vmCvar_t	cg_thirdPersonAnalog[MAX_SPLITVIEW];
+#endif
+#else
 vmCvar_t	cg_thirdPerson;
 vmCvar_t	cg_thirdPersonRange;
 vmCvar_t	cg_thirdPersonAngle;
 #ifdef ANALOG // cg var
 vmCvar_t	cg_thirdPersonAnalog;
+#endif
 #endif
 vmCvar_t	cg_lagometer;
 vmCvar_t	cg_drawAttacker;
@@ -340,19 +349,62 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
 #ifdef ANALOG // cg var
+#ifdef TA_SPLITVIEW
+	{ &cg_thirdPersonAnalog[0], "cg_thirdPersonAnalog", "0", 0 },
+	{ &cg_thirdPersonAnalog[1], "2cg_thirdPersonAnalog", "0", 0 },
+	{ &cg_thirdPersonAnalog[2], "3cg_thirdPersonAnalog", "0", 0 },
+	{ &cg_thirdPersonAnalog[3], "4cg_thirdPersonAnalog", "0", 0 },
+#else
 	{ &cg_thirdPersonAnalog, "cg_thirdPersonAnalog", "0", 0 },
 #endif
+#endif
 #ifdef TURTLEARENA // FOV
+#ifdef TA_SPLITVIEW
+	{ &cg_thirdPersonRange[0], "cg_thirdPersonRange", "120", 0 },
+	{ &cg_thirdPersonAngle[0], "cg_thirdPersonAngle", "0", 0 },
+	{ &cg_thirdPersonRange[1], "2cg_thirdPersonRange", "120", 0 },
+	{ &cg_thirdPersonAngle[1], "2cg_thirdPersonAngle", "0", 0 },
+	{ &cg_thirdPersonRange[2], "3cg_thirdPersonRange", "120", 0 },
+	{ &cg_thirdPersonAngle[2], "3cg_thirdPersonAngle", "0", 0 },
+	{ &cg_thirdPersonRange[3], "4cg_thirdPersonRange", "120", 0 },
+	{ &cg_thirdPersonAngle[3], "4cg_thirdPersonAngle", "0", 0 },
+#else
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "120", 0 },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", 0 },
+#endif
+#else
+#ifdef TA_SPLITVIEW
+	{ &cg_thirdPersonRange[0], "cg_thirdPersonRange", "40", CVAR_CHEAT },
+	{ &cg_thirdPersonAngle[0], "cg_thirdPersonAngle", "0", CVAR_CHEAT },
+	{ &cg_thirdPersonRange[1], "2cg_thirdPersonRange", "40", CVAR_CHEAT },
+	{ &cg_thirdPersonAngle[1], "2cg_thirdPersonAngle", "0", CVAR_CHEAT },
+	{ &cg_thirdPersonRange[2], "3cg_thirdPersonRange", "40", CVAR_CHEAT },
+	{ &cg_thirdPersonAngle[2], "3cg_thirdPersonAngle", "0", CVAR_CHEAT },
+	{ &cg_thirdPersonRange[3], "4cg_thirdPersonRange", "40", CVAR_CHEAT },
+	{ &cg_thirdPersonAngle[3], "4cg_thirdPersonAngle", "0", CVAR_CHEAT },
 #else
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 #endif
+#endif
+#ifdef TA_SPLITVIEW
+#ifdef THIRD_PERSON
+	{ &cg_thirdPerson[0], "cg_thirdPerson", "1", 0 },
+	{ &cg_thirdPerson[1], "2cg_thirdPerson", "1", 0 },
+	{ &cg_thirdPerson[2], "3cg_thirdPerson", "1", 0 },
+	{ &cg_thirdPerson[3], "4cg_thirdPerson", "1", 0 },
+#else
+	{ &cg_thirdPerson[0], "cg_thirdPerson", "0", 0 },
+	{ &cg_thirdPerson[1], "2cg_thirdPerson", "0", 0 },
+	{ &cg_thirdPerson[2], "3cg_thirdPerson", "0", 0 },
+	{ &cg_thirdPerson[3], "4cg_thirdPerson", "0", 0 },
+#endif
+#else
 #ifdef THIRD_PERSON
 	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },
 #else
 	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
+#endif
 #endif
 #ifdef IOQ3ZTM // TEAM_CHAT_CON // con_notifytime
 	{ &cg_teamChatTime, "cg_teamChatTime", "5", CVAR_ARCHIVE  },
@@ -2627,25 +2679,33 @@ CG_ViewType
 
 Called by CG_VIEW_TYPE.
 
+Return -1 if not our client.
 Return 0 if in first person.
 Return 1 if in third person.
-Return 2 if in third person using analog control.
 =================
 */
-int CG_ViewType(void)
-{
-#ifdef ANALOG
-	if (cg.renderingThirdPerson)
-	{
-		// ZTM: Check if analog is on
-		if (cg_thirdPersonAnalog.integer)
-		{
-			return 2;
+int CG_ViewType( int entityNum ) {
+#ifdef TA_SPLITVIEW
+	int lc;
+
+	if (!cg.snap) {
+		return -1;
+	}
+
+	for (lc = 0; lc < cg.snap->numPSs; lc++) {
+		if (cg.snap->pss[lc].clientNum == entityNum) {
+			return cg_thirdPerson[lc].integer;
 		}
 	}
-#endif
+
+	return -1;
+#else
+	if (cg.snap && cg.snap->ps.clientNum != entityNum) {
+		return -1;
+	}
 
 	return cg.renderingThirdPerson;
+#endif
 }
 #endif
 
