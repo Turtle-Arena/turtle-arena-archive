@@ -183,7 +183,11 @@ void InGame_Event( void *ptr, int notification ) {
 
 #ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
+#ifdef TA_SPLITVIEW
+		UI_PlayerSettingsMenu(0);
+#else
 		UI_PlayerSettingsMenu();
+#endif
 		break;
 #endif
 

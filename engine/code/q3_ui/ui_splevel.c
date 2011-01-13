@@ -529,7 +529,11 @@ static void UI_SPLevelMenu_PlayerEvent( void* ptr, int notification ) {
 		return;
 	}
 
+#ifdef TA_SPLITVIEW
+	UI_PlayerSettingsMenu(0);
+#else
 	UI_PlayerSettingsMenu();
+#endif
 }
 #endif
 
