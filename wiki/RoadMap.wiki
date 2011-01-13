@@ -17,7 +17,7 @@ First stable playable release.
   * Maps for all gametypes
 
 == 0.4.x ==
-0.4.x series focuses on players, map themes, and multiplayer maps.
+0.4.x series focuses on players, map themes, and multiplayer maps. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game (Comparable to TMNT: Mutant Melee and TMNT Smash-up in someways.)
 
 === 0.4.0 (Completed) ===
   * Fix bugs from 0.2
@@ -30,33 +30,37 @@ First stable playable release.
 === 0.4.1 (Completed) ===
   * Bug fix release
 
-=== 0.4.x ===
-: Haven't decide what order these will be done in, but hopefully they will all get done in the 0.4.x series.
+=== 0.4.2 ====
+  * Four player splitscreen
+  * Finished '2D mode' path system for players
+  * Single camera mode for '2D maps' (always in splitscreen, optionally for everyone)
+  * (Haven't decided other goals, see 0.4.x for ideas)
 
-  * Improve player models; each player should have their own animations, etc
+=== 0.4.x ===
+Haven't decide what order these will be done in, but hopefully they will all get done in the 0.4.x series.
+
+==== Likely ====
+  * Improve player models; each player should have some unique animations, etc
   * Remodel and animate casey
   * Add more players (Mirage comic based); Foot Ninja, Foot Elite, and The Shredder
 
+  * Breakable objects and brushes
+  * Pushable objects and brushes
+  * Map Themes (textures, sky, models, misc_objects, and music)
+  * New multiplayer maps using the new map themes
+
+==== Unlikely ====
   * Have player models be MDR (Finish Misfit Model 3D MDR exporting)
   * Multiple levels of detail for players and other models
     * (Add a LOD converter to Misfit Model 3D?)
 
-  * Breakable objects and brushes
-    * Pushable.
-  * Map Themes (textures, sky, models, misc_objects, and music)
-  * New multiplayer maps using the new map themes
-
-  * Local four player support (Splitscreen, possibly a single camera mode for 2D levels)
-
-  * Hopefully make Turtle Arena a complete (fully working) multiplayer game (Compareable to TMNT: Mutant Melee in someways...)
-
 == 0.6 ==
-Focus on Single Player
+Focus on Single Player / Co-op.
 
   * Enemies for Single Player
   * Single Player Maps
   * Gimmicks
-  * Savegames
+  * Save game system
   * Player Abilities
   * Remake UI with missionpack ui scripting?
 
@@ -65,5 +69,4 @@ Focus on Single Player
   * Multiplayer improvements
 
 == 1.0 ==
-  * Polish overall game?
-
+  * polish overall game?
