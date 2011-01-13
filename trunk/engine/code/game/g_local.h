@@ -1052,6 +1052,9 @@ extern	vmCvar_t	g_teleportFluxTime;
 #ifdef IOQ3ZTM // LASERTAG
 extern	vmCvar_t	g_laserTag;
 #endif
+#ifdef TA_PATHSYS // 2DMODE
+extern	vmCvar_t	g_2dmode;
+#endif
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );

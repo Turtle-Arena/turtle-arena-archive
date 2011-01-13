@@ -1261,6 +1261,9 @@ netField_t	playerStateFields[] =
 { PSF(origin2[0]), 0 },
 { PSF(origin2[1]), 0 }
 #endif
+#ifdef TA_PATHSYS // 2DMODE
+,{ PSF(pathMode), 8 }
+#endif
 };
 
 /*

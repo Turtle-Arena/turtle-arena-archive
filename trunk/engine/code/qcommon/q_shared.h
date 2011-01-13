@@ -1187,6 +1187,9 @@ typedef struct playerState_s {
 #ifdef TA_PLAYERSYS // LADDER
 	vec3_t		origin2;
 #endif
+#ifdef TA_PATHSYS // 2DMODE
+	int			pathMode;
+#endif
 
 	// not communicated over the net at all
 	int			ping;			// server to game info for scoreboard
@@ -1194,6 +1197,13 @@ typedef struct playerState_s {
 	int			jumppad_frame;
 	int			entityEventSequence;
 } playerState_t;
+
+#ifdef TA_PATHSYS // 2DMODE
+#define PATHMODE_NONE 0
+#define PATHMODE_SIDE 1
+#define PATHMODE_TOP 2
+#define PATHMODE_BACK 3
+#endif
 
 #ifdef TA_SPLITVIEW
 #define MAX_SPLITVIEW 4

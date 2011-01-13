@@ -1528,6 +1528,7 @@ Setting the wait key to -1 will not make the train stop on the entity, it will s
 
 <point name="path_end" color=".5 .3 0" box="-8 -8 -8 8 8 8">
 Path end marker entity that func_trains will stop at, unless DONT_STOP spawnflag in func_train is set.
+Players stop following path and return to normal.
 -------- KEYS --------
 <target key="target" name="Target">point to next path entity in the path.</target>
 <targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
@@ -1536,6 +1537,8 @@ Path end marker entity that func_trains will stop at, unless DONT_STOP spawnflag
 <boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
 <boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
 <boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
+-------- SPAWNFLAGS --------
+<flag key="DONT_STOP" name="Don't Stop" bit="0">player following path will turn around instead of exiting path mode.</flag>
 -------- NOTES --------
 Setting the wait key to -1 will not make the train stop on the entity, it will simply default to 0.
 </point>

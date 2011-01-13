@@ -741,6 +741,11 @@ void SP_worldspawn( void ) {
 	G_SpawnString( "enableBreath", "0", &s );
 	trap_Cvar_Set( "g_enableBreath", s );
 
+#ifdef TA_PATHSYS // 2DMODE
+	G_SpawnString( "2dmode", "0", &s );
+	trap_Cvar_Set( "g_2dmode", s );
+#endif
+
 	g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
 	g_entities[ENTITYNUM_WORLD].classname = "worldspawn";
 

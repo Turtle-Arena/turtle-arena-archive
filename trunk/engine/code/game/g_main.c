@@ -118,6 +118,9 @@ vmCvar_t	g_teleportFluxTime;
 #ifdef IOQ3ZTM // LASERTAG
 vmCvar_t	g_laserTag;
 #endif
+#ifdef TA_PATHSYS // 2DMODE
+vmCvar_t	g_2dmode;
+#endif
 
 static cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -240,6 +243,9 @@ static cvarTable_t		gameCvarTable[] = {
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 	{ &g_laserTag, "g_laserTag", "0", CVAR_SERVERINFO, qtrue, qfalse},
+#endif
+#ifdef TA_PATHSYS // 2DMODE
+	{ &g_2dmode, "g_2dmode", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
 #endif
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},
