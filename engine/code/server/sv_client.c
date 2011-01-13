@@ -718,7 +718,7 @@ static void SV_SendClientGameState( client_t *client ) {
 	entityState_t	*base, nullstate;
 	msg_t		msg;
 	byte		msgBuffer[MAX_MSGLEN];
-#ifdef TA_SPLITVIEW // TEST2
+#ifdef TA_SPLITVIEW
 	int			i;
 	client_t	*lc;
 #endif
@@ -734,7 +734,7 @@ static void SV_SendClientGameState( client_t *client ) {
 	// gamestate message was not just sent, forcing a retransmit
 	client->gamestateMessageNum = client->netchan.outgoingSequence;
 
-#ifdef TA_SPLITVIEW // TEST2
+#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 		if (client->local_clients[i] == -1) {
 			continue;
@@ -747,9 +747,6 @@ static void SV_SendClientGameState( client_t *client ) {
 		lc->state = CS_PRIMED;
 		lc->pureAuthentic = 0;
 		lc->gotCP = qfalse;
-
-		// ZTM: FIXME: Is this needed?
-		//lc->netchan.outgoingSequence = client->netchan.outgoingSequence;
 
 		// when we receive the first packet from the client, we will
 		// notice that it is from a different serverid and that the
@@ -769,18 +766,6 @@ static void SV_SendClientGameState( client_t *client ) {
 	// with a gamestate and it sets the clc.serverCommandSequence at
 	// the client side
 	SV_UpdateServerCommandsToClient( client, &msg );
-
-#if 0 // #ifdef TA_SPLITVIEW // TEST2 // FIXME?
-	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
-		if (client->local_clients[i] == -1) {
-			continue;
-		}
-
-		lc = &svs.clients[client->local_clients[i]];
-
-		SV_UpdateServerCommandsToClient( lc, &msg );
-	}
-#endif
 
 	// send the gamestate
 	MSG_WriteByte( &msg, svc_gamestate );
@@ -2039,17 +2024,6 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 		cl->reliableAcknowledge = cl->reliableSequence;
 		return;
 	}
-#if 0 //#ifdef TA_SPLITVIEW // TEST2
-	for (c = 0; c < MAX_SPLITVIEW-1; c++) {
-		if (cl->local_clients[c] == -1) {
-			continue;
-		}
-
-		svs.clients[cl->local_clients[c]].messageAcknowledge = cl->messageAcknowledge;
-		svs.clients[cl->local_clients[c]].reliableAcknowledge = cl->reliableAcknowledge;
-		svs.clients[cl->local_clients[c]].reliableSequence = cl->reliableSequence;
-	}
-#endif
 	// if this is a usercmd from a previous gamestate,
 	// ignore it or retransmit the current gamestate
 	// 

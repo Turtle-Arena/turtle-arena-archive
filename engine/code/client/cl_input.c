@@ -878,7 +878,7 @@ void CL_FinishMove( calc_t *lc, usercmd_t *cmd ) {
 CL_CreateCmd
 =================
 */
-#ifdef TA_SPLITVIEW // CONTROLS // ZTM: FIXME:
+#ifdef TA_SPLITVIEW // CONTROLS
 usercmd_t CL_CreateCmd( int localClientNum )
 #else
 usercmd_t CL_CreateCmd( void )
@@ -888,7 +888,7 @@ usercmd_t CL_CreateCmd( void )
 	vec3_t		oldAngles;
 	calc_t		*lc;
 	clientInput_t *ci;
-#ifdef TA_SPLITVIEW // CONTROLS // ZTM: FIXME:
+#ifdef TA_SPLITVIEW // CONTROLS
 	lc = &cl.localClients[localClientNum];
 	ci = &cis[localClientNum];
 #else
