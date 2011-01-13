@@ -34,6 +34,9 @@ First stable playable release.
   * Four player splitscreen
   * Finished '2D mode' path system for players
   * Single camera mode for '2D maps' (always in splitscreen, optionally for everyone)
+    * Like the camera in Super Smash Bros. and TMNT Smash-up
+    * Basically have "2dmode" "1" in world spawn to tell game to tell cgame to only use one viewport in 'splitscreen' (for co-op in 2dmode), set "2dmode" "2" to focus on everyone (for Smash Bros. like maps).
+    * May also add a cvar to override single viewport in splitscreen.
   * (Haven't decided other goals, see 0.4.x for ideas)
 
 === 0.4.x ===
