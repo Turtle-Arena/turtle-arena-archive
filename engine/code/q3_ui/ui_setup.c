@@ -133,6 +133,7 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 #ifndef TA_MISC
+	case ID_CUSTOMIZEPLAYER:
 #ifdef TA_SPLITVIEW
 	case ID_CUSTOMIZEPLAYER2:
 	case ID_CUSTOMIZEPLAYER3:
@@ -140,7 +141,6 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 		lc = ((menucommon_s*)ptr)->id - ID_CUSTOMIZEPLAYER;
 		UI_PlayerSettingsMenu(lc);
 #else
-	case ID_CUSTOMIZEPLAYER:
 		UI_PlayerSettingsMenu();
 #endif
 		break;
@@ -230,7 +230,11 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.framer.width  					= 256;
 	setupMenuInfo.framer.height  					= 334;
 
+#ifdef TA_SPLITVIEW 
+	y = 94;
+#else
 	y = 134;
+#endif
 #ifndef TA_MISC
 	setupMenuInfo.setupplayer.generic.type			= MTYPE_PTEXT;
 	setupMenuInfo.setupplayer.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
