@@ -867,6 +867,22 @@ static const char *playerType_list[] = {
 	NULL
 };
 
+#define PT_OPEN 0
+#define PT_BOT 1
+#define PT_CLOSED 2
+
+#ifdef TA_SPLITVIEW
+static const char *humanPlayerType_list[] = {
+	"Open",
+	"Bot",
+	"----",
+	"Human",
+	NULL
+};
+
+#define PT_HUMAN 3
+#endif
+
 static const char *playerTeam_list[] = {
 	"Blue",
 	"Red",
@@ -901,7 +917,7 @@ static qboolean BotAlreadySelected( const char *checkName ) {
 	int		n;
 
 	for( n = 1; n < PLAYER_SLOTS; n++ ) {
-		if( s_serveroptions.playerType[n].curvalue != 1 ) {
+		if( s_serveroptions.playerType[n].curvalue != PT_BOT ) {
 			continue;
 		}
 		if( (s_serveroptions.gametype >= GT_TEAM) &&
@@ -926,6 +942,9 @@ static void ServerOptions_Start( void ) {
 	int		timelimit;
 	int		fraglimit;
 	int		maxclients;
+#ifdef TA_SPLITVIEW
+	int		localClients;
+#endif
 	int		dedicated;
 	int		friendlyfire;
 	int		flaglimit;
@@ -945,14 +964,25 @@ static void ServerOptions_Start( void ) {
 
 	//set maxclients
 	for( n = 0, maxclients = 0; n < PLAYER_SLOTS; n++ ) {
-		if( s_serveroptions.playerType[n].curvalue == 2 ) {
+		if( s_serveroptions.playerType[n].curvalue == PT_CLOSED ) {
 			continue;
 		}
-		if( (s_serveroptions.playerType[n].curvalue == 1) && (s_serveroptions.playerNameBuffers[n][0] == 0) ) {
+		if( (s_serveroptions.playerType[n].curvalue == PT_BOT) && (s_serveroptions.playerNameBuffers[n][0] == 0) ) {
 			continue;
 		}
 		maxclients++;
 	}
+#ifdef TA_SPLITVIEW
+	for( n = 0, localClients = 1; n < MAX_SPLITVIEW; n++ ) {
+		if( s_serveroptions.playerType[n].curvalue != PT_HUMAN ) {
+			continue;
+		}
+		localClients++;
+	}
+
+	// Set the number of local clients
+	trap_Cvar_SetValue( "cl_localClients", localClients );
+#endif
 
 #ifdef TA_SP
 	// Don't allow clients to join in non-multiplayer.
@@ -1069,7 +1099,7 @@ static void ServerOptions_Start( void ) {
 	// add bots
 	trap_Cmd_ExecuteText( EXEC_APPEND, "wait 3\n" );
 	for( n = 1; n < PLAYER_SLOTS; n++ ) {
-		if( s_serveroptions.playerType[n].curvalue != 1 ) {
+		if( s_serveroptions.playerType[n].curvalue != PT_BOT ) {
 			continue;
 		}
 		if( s_serveroptions.playerNameBuffers[n][0] == 0 ) {
@@ -1108,10 +1138,10 @@ static void ServerOptions_InitPlayerItems( void ) {
 
 	// init types
 	if( s_serveroptions.multiplayer ) {
-		v = 0;	// open
+		v = PT_OPEN;	// open
 	}
 	else {
-		v = 1;	// bot
+		v = PT_BOT;		// bot
 	}
 	
 	for( n = 0; n < PLAYER_SLOTS; n++ ) {
@@ -1120,7 +1150,7 @@ static void ServerOptions_InitPlayerItems( void ) {
 
 	if( s_serveroptions.multiplayer && (s_serveroptions.gametype < GT_TEAM) ) {
 		for( n = 8; n < PLAYER_SLOTS; n++ ) {
-			s_serveroptions.playerType[n].curvalue = 2;
+			s_serveroptions.playerType[n].curvalue = PT_CLOSED;
 		}
 	}
 
@@ -1128,7 +1158,7 @@ static void ServerOptions_InitPlayerItems( void ) {
 	if( s_serveroptions.dedicated.curvalue == 0 ) {
 		// human
 #ifdef TA_SP // SPMODEL
-		s_serveroptions.playerType[0].curvalue = 0;
+		s_serveroptions.playerType[0].curvalue = PT_OPEN;
 		if (!s_serveroptions.multiplayer)
 		{
 			trap_Cvar_VariableStringBuffer( "spmodel", s_serveroptions.playerNameBuffers[0], sizeof(s_serveroptions.playerNameBuffers[0]) );
@@ -1141,10 +1171,15 @@ static void ServerOptions_InitPlayerItems( void ) {
 		}
 #else
 		s_serveroptions.playerType[0].generic.flags |= QMF_INACTIVE;
-		s_serveroptions.playerType[0].curvalue = 0;
+		s_serveroptions.playerType[0].curvalue = PT_OPEN;
 		trap_Cvar_VariableStringBuffer( "name", s_serveroptions.playerNameBuffers[0], sizeof(s_serveroptions.playerNameBuffers[0]) );
 #endif
 		Q_CleanStr( s_serveroptions.playerNameBuffers[0] );
+#ifdef TA_SPLITVIEW
+		for (n = 1; n < MAX_SPLITVIEW; n++) {
+			s_serveroptions.playerType[n].curvalue = PT_CLOSED;
+		}
+#endif
 	}
 
 	// init teams
@@ -1176,7 +1211,7 @@ static void ServerOptions_SetPlayerItems( void ) {
 	// types
 //	for( n = 0; n < PLAYER_SLOTS; n++ ) {
 //		if( (!s_serveroptions.multiplayer) && (n > 0) && (s_serveroptions.playerType[n].curvalue == 0) ) {
-//			s_serveroptions.playerType[n].curvalue = 1;
+//			s_serveroptions.playerType[n].curvalue = PT_BOT;
 //		}
 //	}
 
@@ -1190,14 +1225,27 @@ static void ServerOptions_SetPlayerItems( void ) {
 #endif
 		s_serveroptions.playerName[0].generic.flags &= ~QMF_HIDDEN;
 
+#ifdef TA_SPLITVIEW
+		start = MAX_SPLITVIEW;
+
+		for( n = 0; n < start; n++ ) {
+			if( s_serveroptions.playerType[n].curvalue == PT_HUMAN ) {
+				s_serveroptions.playerName[n].generic.flags &= ~(QMF_INACTIVE|QMF_HIDDEN);
+			}
+			else {
+				s_serveroptions.playerName[n].generic.flags |= (QMF_INACTIVE|QMF_HIDDEN);
+			}
+		}
+#else
 		start = 1;
+#endif
 	}
 	else {
 		s_serveroptions.player0.string = "Open";
 		start = 0;
 	}
 	for( n = start; n < PLAYER_SLOTS; n++ ) {
-		if( s_serveroptions.playerType[n].curvalue == 1 ) {
+		if( s_serveroptions.playerType[n].curvalue == PT_BOT ) {
 			s_serveroptions.playerName[n].generic.flags &= ~(QMF_INACTIVE|QMF_HIDDEN);
 		}
 		else {
@@ -1210,7 +1258,7 @@ static void ServerOptions_SetPlayerItems( void ) {
 		return;
 	}
 	for( n = start; n < PLAYER_SLOTS; n++ ) {
-		if( s_serveroptions.playerType[n].curvalue == 2 ) {
+		if( s_serveroptions.playerType[n].curvalue == PT_CLOSED ) {
 			s_serveroptions.playerTeam[n].generic.flags |= (QMF_INACTIVE|QMF_HIDDEN);
 		}
 		else {
@@ -1344,6 +1392,7 @@ static void ServerOptions_LevelshotDraw( void *self ) {
 
 static void ServerOptions_InitBotNames( void ) {
 	int			count;
+	int			start;
 	int			n;
 	const char	*arenaInfo;
 	const char	*botInfo;
@@ -1362,50 +1411,47 @@ static void ServerOptions_InitBotNames( void ) {
 #endif
 		}
 #endif
-#ifdef IOQ3ZTM // RANDOMBOT
-		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "Random", 16 ); // RaphBlue
-		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "Random", 16 ); // RaphBlue
-		if( s_serveroptions.gametype == GT_TEAM ) {
-			Q_strncpyz( s_serveroptions.playerNameBuffers[3], "Random", 16 ); // RaphBlue
-		}
-#else
+#ifndef IOQ3ZTM // RANDOMBOT
 		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "grunt", 16 );
 		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "major", 16 );
 		if( s_serveroptions.gametype == GT_TEAM ) {
 			Q_strncpyz( s_serveroptions.playerNameBuffers[3], "visor", 16 );
 		}
-#endif
-		else {
-			s_serveroptions.playerType[3].curvalue = 2;
-		}
-		s_serveroptions.playerType[4].curvalue = 2;
-		s_serveroptions.playerType[5].curvalue = 2;
-
-#ifdef IOQ3ZTM // RANDOMBOT
-		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "Random", 16 ); // RaphRed
-		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "Random", 16 ); // RaphRed
-		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "Random", 16 ); // RaphRed
-		if( s_serveroptions.gametype == GT_TEAM ) {
-			Q_strncpyz( s_serveroptions.playerNameBuffers[9], "Random", 16 ); // RaphRed
-		}
+		else
 #else
+		if( s_serveroptions.gametype != GT_TEAM )
+#endif
+		{
+			s_serveroptions.playerType[3].curvalue = PT_CLOSED;
+		}
+		s_serveroptions.playerType[4].curvalue = PT_CLOSED;
+		s_serveroptions.playerType[5].curvalue = PT_CLOSED;
+
+#ifndef IOQ3ZTM // RANDOMBOT
 		Q_strncpyz( s_serveroptions.playerNameBuffers[6], "sarge", 16 );
 		Q_strncpyz( s_serveroptions.playerNameBuffers[7], "grunt", 16 );
 		Q_strncpyz( s_serveroptions.playerNameBuffers[8], "major", 16 );
 		if( s_serveroptions.gametype == GT_TEAM ) {
 			Q_strncpyz( s_serveroptions.playerNameBuffers[9], "visor", 16 );
 		}
+		else
+#else
+		if( s_serveroptions.gametype != GT_TEAM )
 #endif
-		else {
-			s_serveroptions.playerType[9].curvalue = 2;
+		{
+			s_serveroptions.playerType[9].curvalue = PT_CLOSED;
 		}
-		s_serveroptions.playerType[10].curvalue = 2;
-		s_serveroptions.playerType[11].curvalue = 2;
+		s_serveroptions.playerType[10].curvalue = PT_CLOSED;
+		s_serveroptions.playerType[11].curvalue = PT_CLOSED;
 
 		return;
 	}
 
-	count = 1;	// skip the first slot, reserved for a human
+#ifdef TA_SPLITVIEW
+	start = count = MAX_SPLITVIEW;	// skip the first few slots, reserved for humans
+#else
+	start = count = 1;	// skip the first slot, reserved for a human
+#endif
 
 #ifdef TA_SP
 	if (s_serveroptions.gametype != GT_SINGLE_PLAYER) {
@@ -1449,9 +1495,9 @@ static void ServerOptions_InitBotNames( void ) {
 
 #ifdef IOQ3ZTM // RANDOMBOT
 	// If no bots, open 3 Random bots.
-	if (count == 1) {
-		for( ;count < 4; count++ ) {
-			s_serveroptions.playerType[count].curvalue = 1;
+	if (count == start) {
+		for( ;count < start+3; count++ ) {
+			s_serveroptions.playerType[count].curvalue = PT_BOT;
 			strcpy( s_serveroptions.playerNameBuffers[count], "Random" );
 		}
 	}
@@ -1470,14 +1516,14 @@ static void ServerOptions_InitBotNames( void ) {
 	}
 
 	// pad up to #8 as open slots
-	for( ;count < 8; count++ ) {
-		s_serveroptions.playerType[count].curvalue = 0;
+	for( ;count < start+7; count++ ) {
+		s_serveroptions.playerType[count].curvalue = PT_OPEN;
 	}
 
 	// close off the rest by default
 	for( ;count < PLAYER_SLOTS; count++ ) {
-		if( s_serveroptions.playerType[count].curvalue == 1 ) {
-			s_serveroptions.playerType[count].curvalue = 2;
+		if( s_serveroptions.playerType[count].curvalue == PT_BOT ) {
+			s_serveroptions.playerType[count].curvalue = PT_CLOSED;
 		}
 	}
 }
@@ -1838,6 +1884,11 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.playerType[n].generic.callback	= ServerOptions_Event;
 		s_serveroptions.playerType[n].generic.x			= 32;
 		s_serveroptions.playerType[n].generic.y			= y;
+#ifdef TA_SPLITVIEW
+		if (n < MAX_SPLITVIEW)
+			s_serveroptions.playerType[n].itemnames			= humanPlayerType_list;
+		else
+#endif
 		s_serveroptions.playerType[n].itemnames			= playerType_list;
 
 		s_serveroptions.playerName[n].generic.type		= MTYPE_TEXT;
