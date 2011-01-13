@@ -656,7 +656,7 @@ void CL_JoystickEvent( int axis, int value, int time ) {
 CL_JoystickMove
 =================
 */
-void CL_JoystickMove( clientInput_t *ci, usercmd_t *cmd ) {
+void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 	int		movespeed;
 	float	anglespeed;
 
@@ -684,18 +684,18 @@ void CL_JoystickMove( clientInput_t *ci, usercmd_t *cmd ) {
 	}
 
 	if ( !ci->in_strafe.active ) {
-		cl.localClients[0].viewangles[YAW] += anglespeed * cl_yawspeed->value * cl.localClients[0].joystickAxis[AXIS_SIDE];
+		lc->viewangles[YAW] += anglespeed * cl_yawspeed->value * lc->joystickAxis[AXIS_SIDE];
 	} else {
-		cmd->rightmove = ClampChar( cmd->rightmove + cl.localClients[0].joystickAxis[AXIS_SIDE] );
+		cmd->rightmove = ClampChar( cmd->rightmove + lc->joystickAxis[AXIS_SIDE] );
 	}
 
 	if ( in_mlooking ) {
-		cl.localClients[0].viewangles[PITCH] += anglespeed * cl_pitchspeed->value * cl.localClients[0].joystickAxis[AXIS_FORWARD];
+		lc->viewangles[PITCH] += anglespeed * cl_pitchspeed->value * lc->joystickAxis[AXIS_FORWARD];
 	} else {
-		cmd->forwardmove = ClampChar( cmd->forwardmove + cl.localClients[0].joystickAxis[AXIS_FORWARD] );
+		cmd->forwardmove = ClampChar( cmd->forwardmove + lc->joystickAxis[AXIS_FORWARD] );
 	}
 
-	cmd->upmove = ClampChar( cmd->upmove + cl.localClients[0].joystickAxis[AXIS_UP] );
+	cmd->upmove = ClampChar( cmd->upmove + lc->joystickAxis[AXIS_UP] );
 }
 
 /*
@@ -908,18 +908,11 @@ usercmd_t CL_CreateCmd( void )
 	// get basic movement from keyboard
 	CL_KeyMove( ci, &cmd );
 
-#ifdef TA_SPLITVIEW
-	// ZTM: Splitscreen clients currently don't use mouse or joysticks.
-	if (localClientNum == 0) {
-#endif
 	// get basic movement from mouse
 	CL_MouseMove( lc, ci, &cmd );
 
 	// get basic movement from joystick
-	CL_JoystickMove( ci, &cmd );
-#ifdef TA_SPLITVIEW
-	}
-#endif
+	CL_JoystickMove( lc, ci, &cmd );
 
 	// check to make sure the angles haven't wrapped
 	if ( lc->viewangles[PITCH] - oldAngles[PITCH] > 90 ) {

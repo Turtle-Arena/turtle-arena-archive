@@ -96,7 +96,6 @@ typedef struct {
 
 extern int g_console_field_width;
 
-#ifdef TA_SPLITVIEW // CONTROLS
 // Client Active Local Client
 typedef struct {
 	int			mouseDx[2], mouseDy[2];	// added to by mouse events
@@ -120,7 +119,6 @@ typedef struct {
 	vec3_t		viewangles;
 
 } calc_t;
-#endif
 
 typedef struct {
 	int			timeoutcount;		// it requres several frames in a timeout condition
