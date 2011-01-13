@@ -279,12 +279,14 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 {
 	gpathtype_e type;
 
+	// ZTM: TODO: Don't setup path if client is already following it.
 	type = G_SetupPath2(ent, target);
 
 	if (type == PATH_ERROR) {
 		// Disable path mode
 		if (ent->client) {
 			ent->client->ps.pathMode = PATHMODE_NONE;
+			ent->client->ps.eFlags &= ~EF_PATHMODE;
 		}
 		ent->s.eFlags &= ~EF_PATHMODE;
 	} else {
@@ -292,6 +294,7 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 		if (ent->client) {
 			// Set pathMode to the mode of the first entity in the path
 			ent->client->ps.pathMode = ent->nextTrain->moverState;
+			ent->client->ps.eFlags |= EF_PATHMODE;
 		}
 		ent->s.eFlags |= EF_PATHMODE;
 	}
@@ -329,10 +332,18 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		point = ent->nextTrain;
 	}
 
-	if (!point)
-	{
+	if (!point && ent->client) {
+		// Previous point
+		if (backward)
+			point = ent->nextTrain;
+		else
+			point = ent->prevTrain;
+
+		// Stop train
+		return qfalse;
+	} else if (!point && !ent->client) {
 		// end of path
-		if (!ent->client && !(ent->spawnflags & 1)) {
+		if (!(ent->spawnflags & 1)) {
 			// Stop train
 			return qfalse;
 		}
@@ -342,12 +353,6 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 			point = ent->nextTrain;
 		else
 			point = ent->prevTrain;
-
-		// end of path
-		if (ent->client && !(point->spawnflags & 1)) {
-			// Stop the train
-			return qfalse;
-		}
 
 		// Go back the way you came
 		backward = !backward;
@@ -364,8 +369,7 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		}
 	}
 
-	if ((!backward && point == point->nextTrain) || (backward && point == point->prevTrain))
-	{
+	if ((!backward && point == point->nextTrain) || (backward && point == point->prevTrain)) {
 		// Entity points to self...
 		G_Printf("DEBUG: Entity points to self!\n");
 		return qfalse;
@@ -388,15 +392,14 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 
 		if (ent->client && ent->client->ps.pathMode == PATHMODE_SIDE) {
 			// "2D" path
-			if (ent->client) {
-				origin[2] = targetPos[2] = 0; // Don't compare Z
-			}
+			origin[2] = targetPos[2] = 0; // Don't compare Z
 		}
 
 		dist = Distance(origin, targetPos);
 
-		if (dist > 20.0f)
+		if (dist > 20.0f) {
 			return qfalse;
+		}
 	}
 
 	// fire all other targets
