@@ -123,8 +123,10 @@ UI_SetupMenu_Event
 ===============
 */
 static void UI_SetupMenu_Event( void *ptr, int event ) {
+#ifndef TA_MISC
 #ifdef TA_SPLITVIEW
 	int		lc;
+#endif
 #endif
 
 	if( event != QM_ACTIVATED ) {
