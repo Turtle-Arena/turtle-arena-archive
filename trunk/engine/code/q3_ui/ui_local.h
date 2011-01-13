@@ -446,13 +446,21 @@ extern void UI_CDKeyMenu_f( void );
 //
 // ui_playermodel.c
 //
+#ifdef TA_SPLITVIEW
+extern void UI_PlayerModelMenu( int localClient );
+#else
 extern void UI_PlayerModelMenu( void );
+#endif
 extern void PlayerModel_Cache( void );
 
 //
 // ui_playersettings.c
 //
+#ifdef TA_SPLITVIEW
+extern void UI_PlayerSettingsMenu( int localClient );
+#else
 extern void UI_PlayerSettingsMenu( void );
+#endif
 extern void PlayerSettings_Cache( void );
 
 //

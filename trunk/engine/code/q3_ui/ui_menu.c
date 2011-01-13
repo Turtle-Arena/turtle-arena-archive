@@ -156,7 +156,11 @@ void Main_MenuEvent (void* ptr, int event) {
 #endif
 
 	case ID_EXIT:
+#ifdef TA_MISC
+		UI_ConfirmMenu( "Exit Game?", 0, MainMenu_ExitAction );
+#else
 		UI_ConfirmMenu( "EXIT GAME?", 0, MainMenu_ExitAction );
+#endif
 		break;
 	}
 }
@@ -415,7 +419,7 @@ void UI_MainMenu( void ) {
 	s_main.singleplayer.generic.id			= ID_SINGLEPLAYER;
 	s_main.singleplayer.generic.callback	= Main_MenuEvent; 
 #ifdef TA_SP // Moved to PLAY Menu.
-	s_main.singleplayer.string				= "PLAY";
+	s_main.singleplayer.string				= "Play";
 #else
 	s_main.singleplayer.string				= "SINGLE PLAYER";
 #endif
@@ -429,7 +433,11 @@ void UI_MainMenu( void ) {
 	s_main.multiplayer.generic.y			= y;
 	s_main.multiplayer.generic.id			= ID_MULTIPLAYER;
 	s_main.multiplayer.generic.callback		= Main_MenuEvent; 
+#ifdef TA_MISC
+	s_main.multiplayer.string				= "Multiplayer";
+#else
 	s_main.multiplayer.string				= "MULTIPLAYER";
+#endif
 	s_main.multiplayer.color				= text_big_color;
 	s_main.multiplayer.style				= style;
 
@@ -441,7 +449,7 @@ void UI_MainMenu( void ) {
 	s_main.setup.generic.id					= ID_SETUP;
 	s_main.setup.generic.callback			= Main_MenuEvent; 
 #ifdef TA_SP // Moved to OPTIONS Menu.
-	s_main.setup.string						= "OPTIONS";
+	s_main.setup.string						= "Options";
 #else
 	s_main.setup.string						= "SETUP";
 #endif
@@ -504,7 +512,11 @@ void UI_MainMenu( void ) {
 	s_main.exit.generic.y					= y;
 	s_main.exit.generic.id					= ID_EXIT;
 	s_main.exit.generic.callback			= Main_MenuEvent; 
+#ifdef TA_MISC
+	s_main.exit.string						= "Exit";
+#else
 	s_main.exit.string						= "EXIT";
+#endif
 	s_main.exit.color						= text_big_color;
 	s_main.exit.style						= style;
 

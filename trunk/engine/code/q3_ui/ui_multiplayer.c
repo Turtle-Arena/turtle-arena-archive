@@ -42,8 +42,13 @@ MULTIPLAYER MENU
 #define ID_CREATEGAME			10
 #define ID_JOINSEARCH			11
 #define ID_JOINSPECIFY			12
+#ifdef TA_SPLITVIEW
 #define ID_CUSTOMIZEPLAYER		13
-#define ID_BACK					14
+#define ID_CUSTOMIZEPLAYER2		14
+#define ID_CUSTOMIZEPLAYER3		15
+#define ID_CUSTOMIZEPLAYER4		16
+#endif
+#define ID_BACK					17
 
 
 typedef struct {
@@ -57,6 +62,11 @@ typedef struct {
 	menutext_s		joinsearch;
 	menutext_s		joinspecify;
 	menutext_s		setupplayer;
+#ifdef TA_SPLITVIEW
+	menutext_s		setupplayer2;
+	menutext_s		setupplayer3;
+	menutext_s		setupplayer4;
+#endif
 
 	menubitmap_s	back;
 } multiplayerMenu_t;
@@ -70,6 +80,10 @@ UI_MultiplayerMenu_Event
 ===============
 */
 static void UI_MultiplayerMenu_Event( void *ptr, int event ) {
+#ifdef TA_SPLITVIEW
+	int lc;
+#endif
+
 	if( event != QM_ACTIVATED ) {
 		return;
 	}
@@ -89,7 +103,15 @@ static void UI_MultiplayerMenu_Event( void *ptr, int event ) {
 		break;
 
 	case ID_CUSTOMIZEPLAYER:
+#ifdef TA_SPLITVIEW
+	case ID_CUSTOMIZEPLAYER2:
+	case ID_CUSTOMIZEPLAYER3:
+	case ID_CUSTOMIZEPLAYER4:
+		lc = ((menucommon_s*)ptr)->id - ID_CUSTOMIZEPLAYER;
+		UI_PlayerSettingsMenu(lc);
+#else
 		UI_PlayerSettingsMenu();
+#endif
 		break;
 
 	case ID_BACK:
@@ -136,7 +158,11 @@ static void UI_Multiplayer_MenuInit( void ) {
 	multiplayerMenu.framer.width  					= 256;
 	multiplayerMenu.framer.height  					= 334;
 
-	y = 640/2 - 4*SETUP_MENU_VERTICAL_SPACING;
+#ifdef TA_SPLITVIEW
+	y = (SCREEN_HEIGHT - 7*SETUP_MENU_VERTICAL_SPACING) * 0.5f;
+#else
+	y = (SCREEN_HEIGHT - 4*SETUP_MENU_VERTICAL_SPACING) * 0.5f;
+#endif
 	multiplayerMenu.creategame.generic.type			= MTYPE_PTEXT;
 	multiplayerMenu.creategame.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	multiplayerMenu.creategame.generic.x			= 320;
@@ -169,17 +195,59 @@ static void UI_Multiplayer_MenuInit( void ) {
 	multiplayerMenu.joinspecify.color				= text_big_color;
 	multiplayerMenu.joinspecify.style				= UI_CENTER;
 
+#ifdef TA_SPLITVIEW
+	y += 2*SETUP_MENU_VERTICAL_SPACING;
+#else
 	y += SETUP_MENU_VERTICAL_SPACING;
+#endif
 	multiplayerMenu.setupplayer.generic.type		= MTYPE_PTEXT;
 	multiplayerMenu.setupplayer.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	multiplayerMenu.setupplayer.generic.x			= 320;
 	multiplayerMenu.setupplayer.generic.y			= y;
 	multiplayerMenu.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
 	multiplayerMenu.setupplayer.generic.callback	= UI_MultiplayerMenu_Event;
-	multiplayerMenu.setupplayer.string				= "Player";
+#ifdef TA_SPLITVIEW
+	multiplayerMenu.setupplayer.string				= "Setup Player 1";
+#else
+	multiplayerMenu.setupplayer.string				= "Setup Player";
+#endif
 	multiplayerMenu.setupplayer.color				= text_big_color;
 	multiplayerMenu.setupplayer.style				= UI_CENTER;
 
+#ifdef TA_SPLITVIEW
+	y += SETUP_MENU_VERTICAL_SPACING;
+	multiplayerMenu.setupplayer2.generic.type		= MTYPE_PTEXT;
+	multiplayerMenu.setupplayer2.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	multiplayerMenu.setupplayer2.generic.x			= 320;
+	multiplayerMenu.setupplayer2.generic.y			= y;
+	multiplayerMenu.setupplayer2.generic.id			= ID_CUSTOMIZEPLAYER2;
+	multiplayerMenu.setupplayer2.generic.callback	= UI_MultiplayerMenu_Event;
+	multiplayerMenu.setupplayer2.string				= "Setup Player 2";
+	multiplayerMenu.setupplayer2.color				= text_big_color;
+	multiplayerMenu.setupplayer2.style				= UI_CENTER;
+
+	y += SETUP_MENU_VERTICAL_SPACING;
+	multiplayerMenu.setupplayer3.generic.type		= MTYPE_PTEXT;
+	multiplayerMenu.setupplayer3.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	multiplayerMenu.setupplayer3.generic.x			= 320;
+	multiplayerMenu.setupplayer3.generic.y			= y;
+	multiplayerMenu.setupplayer3.generic.id			= ID_CUSTOMIZEPLAYER3;
+	multiplayerMenu.setupplayer3.generic.callback	= UI_MultiplayerMenu_Event;
+	multiplayerMenu.setupplayer3.string				= "Setup Player 3";
+	multiplayerMenu.setupplayer3.color				= text_big_color;
+	multiplayerMenu.setupplayer3.style				= UI_CENTER;
+
+	y += SETUP_MENU_VERTICAL_SPACING;
+	multiplayerMenu.setupplayer4.generic.type		= MTYPE_PTEXT;
+	multiplayerMenu.setupplayer4.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	multiplayerMenu.setupplayer4.generic.x			= 320;
+	multiplayerMenu.setupplayer4.generic.y			= y;
+	multiplayerMenu.setupplayer4.generic.id			= ID_CUSTOMIZEPLAYER4;
+	multiplayerMenu.setupplayer4.generic.callback	= UI_MultiplayerMenu_Event;
+	multiplayerMenu.setupplayer4.string				= "Setup Player 4";
+	multiplayerMenu.setupplayer4.color				= text_big_color;
+	multiplayerMenu.setupplayer4.style				= UI_CENTER;
+#endif
 
 	multiplayerMenu.back.generic.type				= MTYPE_BITMAP;
 	multiplayerMenu.back.generic.name				= ART_BACK0;
@@ -200,6 +268,11 @@ static void UI_Multiplayer_MenuInit( void ) {
 	Menu_AddItem( &multiplayerMenu.menu, &multiplayerMenu.joinsearch );
 	Menu_AddItem( &multiplayerMenu.menu, &multiplayerMenu.joinspecify );
 	Menu_AddItem( &multiplayerMenu.menu, &multiplayerMenu.setupplayer );
+#ifdef TA_SPLITVIEW
+	Menu_AddItem( &multiplayerMenu.menu, &multiplayerMenu.setupplayer2 );
+	Menu_AddItem( &multiplayerMenu.menu, &multiplayerMenu.setupplayer3 );
+	Menu_AddItem( &multiplayerMenu.menu, &multiplayerMenu.setupplayer4 );
+#endif
 
 	Menu_AddItem( &multiplayerMenu.menu, &multiplayerMenu.back );
 }
