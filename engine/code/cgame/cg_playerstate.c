@@ -239,6 +239,15 @@ void CG_Respawn( int clientNum ) {
 #ifdef TA_HOLDSYS/*2*/
 		cg.localClients[i].holdableSelect = cg.snap->pss[i].holdableIndex;
 #endif
+#ifdef IOQ3ZTM // NEW_CAM
+		cg.localClients[i].camRotDir = 0;
+		cg.localClients[i].camLeft = qfalse;
+		cg.localClients[i].camRight = qfalse;
+		cg.localClients[i].camReseting = qfalse;
+#ifdef TA_CAMERA
+		cg.localClients[i].camDistance = 0;
+#endif
+#endif
 	}
 }
 #else
@@ -255,6 +264,15 @@ void CG_Respawn( void ) {
 #endif
 #ifdef TA_HOLDSYS/*2*/
 	cg.localClient.holdableSelect = cg.snap->ps.holdableIndex;
+#endif
+#ifdef IOQ3ZTM // NEW_CAM
+	cg.localClient.camRotDir = 0;
+	cg.localClient.camLeft = qfalse;
+	cg.localClient.camRight = qfalse;
+	cg.localClient.camReseting = qfalse;
+#ifdef TA_CAMERA
+	cg.localClient.camDistance = 0;
+#endif
 #endif
 }
 #endif
