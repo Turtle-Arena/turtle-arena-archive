@@ -1472,7 +1472,7 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 #endif
 #ifdef TA_PATHSYS
-	if (client->ps.eFlags & EF_PATHMODE)
+	if (client->ps.pathMode == PATHMODE_SIDE || client->ps.pathMode == PATHMODE_BACK)
 	{
 		// A_FaceTarget!
 		if (ent->client->pers.cmd.rightmove != 0)

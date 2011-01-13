@@ -259,6 +259,10 @@ vmCvar_t	cg_laserTag;
 #ifdef TA_ATMEFFECTSYS
 vmCvar_t	cg_atmosphericEffects;
 #endif
+#ifdef TA_PATHSYS // 2DMODE
+vmCvar_t	cg_2dmode;
+vmCvar_t	cg_2dmodeOverride;
+#endif
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -511,6 +515,10 @@ static cvarTable_t cvarTable[] = {
 #endif
 #ifdef TA_ATMEFFECTSYS
 	,{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE }
+#endif
+#ifdef TA_PATHSYS // 2DMODE
+	,{ &cg_2dmode, "g_2dmode", "0", CVAR_SERVERINFO}
+	,{ &cg_2dmodeOverride, "cg_2dmodeOverride", "0", 0}
 #endif
 };
 

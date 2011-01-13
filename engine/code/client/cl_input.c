@@ -551,7 +551,16 @@ void CL_AdjustAngles( calc_t *lc, clientInput_t *ci ) {
 		speed = 0.001 * cls.frametime;
 	}
 
-	if ( !ci->in_strafe.active ) {
+	if ( !ci->in_strafe.active
+#ifdef TA_PATHSYS // 2DMODE
+#ifdef TA_SPLITVIEW
+		&& cl.snap.pss[ci-cis].pathMode != PATHMODE_SIDE && cl.snap.pss[ci-cis].pathMode != PATHMODE_BACK
+#else
+		&& cl.snap.ps.pathMode != PATHMODE_SIDE && cl.snap.ps.pathMode != PATHMODE_BACK
+#endif
+#endif
+		)
+	{
 		lc->viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&ci->in_right);
 		lc->viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&ci->in_left);
 	}
@@ -592,7 +601,16 @@ void CL_KeyMove( clientInput_t *ci, usercmd_t *cmd ) {
 	forward = 0;
 	side = 0;
 	up = 0;
-	if ( ci->in_strafe.active ) {
+	if ( ci->in_strafe.active
+#ifdef TA_PATHSYS // 2DMODE
+#ifdef TA_SPLITVIEW
+		|| cl.snap.pss[ci-cis].pathMode == PATHMODE_SIDE || cl.snap.pss[ci-cis].pathMode == PATHMODE_BACK
+#else
+		|| cl.snap.ps.pathMode == PATHMODE_SIDE || cl.snap.ps.pathMode == PATHMODE_BACK
+#endif
+#endif
+		)
+	{
 		side += movespeed * CL_KeyState (&ci->in_right);
 		side -= movespeed * CL_KeyState (&ci->in_left);
 	}
@@ -683,7 +701,16 @@ void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 		anglespeed = 0.001 * cls.frametime;
 	}
 
-	if ( !ci->in_strafe.active ) {
+	if ( !ci->in_strafe.active
+#ifdef TA_PATHSYS // 2DMODE
+#ifdef TA_SPLITVIEW
+		&& cl.snap.pss[ci-cis].pathMode != PATHMODE_SIDE && cl.snap.pss[ci-cis].pathMode != PATHMODE_BACK
+#else
+		&& cl.snap.ps.pathMode != PATHMODE_SIDE && cl.snap.ps.pathMode != PATHMODE_BACK
+#endif
+#endif
+		)
+	{
 		lc->viewangles[YAW] += anglespeed * cl_yawspeed->value * lc->joystickAxis[AXIS_SIDE];
 	} else {
 		cmd->rightmove = ClampChar( cmd->rightmove + lc->joystickAxis[AXIS_SIDE] );
@@ -776,7 +803,16 @@ void CL_MouseMove(calc_t *lc, clientInput_t *ci, usercmd_t *cmd)
 	my *= lc->cgameSensitivity;
 
 	// add mouse X/Y movement to cmd
-	if(ci->in_strafe.active) {
+	if(ci->in_strafe.active
+#ifdef TA_PATHSYS // 2DMODE
+#ifdef TA_SPLITVIEW
+		|| cl.snap.pss[ci-cis].pathMode == PATHMODE_SIDE || cl.snap.pss[ci-cis].pathMode == PATHMODE_BACK
+#else
+		|| cl.snap.ps.pathMode == PATHMODE_SIDE || cl.snap.ps.pathMode == PATHMODE_BACK
+#endif
+#endif
+		)
+	{
 		cmd->rightmove = ClampChar(cmd->rightmove + m_side->value * mx);
 #ifdef TURTLEARENA // LOCKON
 		// if walking, don't go over 64 side move
@@ -797,6 +833,13 @@ void CL_MouseMove(calc_t *lc, clientInput_t *ci, usercmd_t *cmd)
 		&& (ci->in_lockon.active || !ci->in_strafe.active)
 #else
 		&& !ci->in_strafe.active
+#endif
+#ifdef TA_PATHSYS // 2DMODE
+#ifdef TA_SPLITVIEW
+		&& cl.snap.pss[ci-cis].pathMode != PATHMODE_SIDE && cl.snap.pss[ci-cis].pathMode != PATHMODE_BACK
+#else
+		&& cl.snap.ps.pathMode != PATHMODE_SIDE && cl.snap.ps.pathMode != PATHMODE_BACK
+#endif
 #endif
 		)
 		lc->viewangles[PITCH] += m_pitch->value * my;

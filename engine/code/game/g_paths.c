@@ -78,6 +78,26 @@ gpathinfo_t gpathinfo[] =
 
 void SP_path_start( gentity_t *ent )
 {
+	const char *styles[] = {"none","side","top","back", NULL}; // PATHMODE_*
+	char *s;
+	int i;
+
+	// Set default path movement style
+	ent->moverState = PATHMODE_SIDE;
+
+	G_SpawnString("style", NULL, &s);
+	if (s && *s) {
+		for (i = 0; styles[i] != NULL; i++) {
+			if (Q_stricmpn(s, styles[i], strlen(styles[i])) == 0) {
+				ent->moverState = i;
+				break;
+			}
+		}
+		if (styles[i] == NULL) {
+			Com_Printf("Warning: Unknown path style %s\n", s);
+		}
+	}
+
 	// Setup path to avoid freeze in game?
 }
 
@@ -261,19 +281,17 @@ gpathtype_e G_SetupPath(gentity_t *ent, const char *target)
 
 	type = G_SetupPath2(ent, target);
 
-	if (type == PATH_ERROR)
-	{
+	if (type == PATH_ERROR) {
 		// Disable path mode
 		if (ent->client) {
-			ent->client->ps.eFlags &= ~EF_PATHMODE;
+			ent->client->ps.pathMode = PATHMODE_NONE;
 		}
 		ent->s.eFlags &= ~EF_PATHMODE;
-	}
-	else
-	{
+	} else {
 		// Enable path mode
 		if (ent->client) {
-			ent->client->ps.eFlags |= EF_PATHMODE;
+			// Set pathMode to the mode of the first entity in the path
+			ent->client->ps.pathMode = ent->nextTrain->moverState;
 		}
 		ent->s.eFlags |= EF_PATHMODE;
 	}
@@ -313,8 +331,37 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 
 	if (!point)
 	{
-		// no current point, nothing to do.
-		return qfalse;
+		// end of path
+		if (!ent->client && !(ent->spawnflags & 1)) {
+			// Stop train
+			return qfalse;
+		}
+
+		// Previous point
+		if (backward)
+			point = ent->nextTrain;
+		else
+			point = ent->prevTrain;
+
+		// end of path
+		if (ent->client && !(point->spawnflags & 1)) {
+			// Stop the train
+			return qfalse;
+		}
+
+		// Go back the way you came
+		backward = !backward;
+		ent->s.eFlags ^= EF_TRAINBACKWARD;
+
+		// Next point
+		if (backward)
+			point = ent->prevTrain;
+		else
+			point = ent->nextTrain;
+
+		if (!point) {
+			return qfalse;
+		}
 	}
 
 	if ((!backward && point == point->nextTrain) || (backward && point == point->prevTrain))
@@ -339,9 +386,11 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		else
 			VectorCopy(ent->s.origin, origin);
 
-		// Client paths are "2D"
-		if (ent->client) {
-			origin[2] = targetPos[2] = 0; // Don't compare Z
+		if (ent->client && ent->client->ps.pathMode == PATHMODE_SIDE) {
+			// "2D" path
+			if (ent->client) {
+				origin[2] = targetPos[2] = 0; // Don't compare Z
+			}
 		}
 
 		dist = Distance(origin, targetPos);
@@ -379,38 +428,6 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		float			speed;
 		vec3_t			move;
 		float			length;
-
-		// Next point
-		if (backward)
-			point = ent->prevTrain;
-		else
-			point = ent->nextTrain;
-
-		if (!point)
-		{
-			// end of path
-			if (!(ent->spawnflags & 1))
-			{
-				// Stop train
-				return qfalse;
-			}
-
-			// Go back the way you came
-			backward = !backward;
-			ent->s.eFlags ^= EF_TRAINBACKWARD;
-
-			// Next point
-			if (backward)
-				point = ent->prevTrain;
-			else
-				point = ent->nextTrain;
-
-			if (!point)
-			{
-				// Stop train
-				return qfalse;
-			}
-		}
 
 		// if the path_corner has a speed, use that
 		if ( point->speed ) {
@@ -468,6 +485,15 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 	{
 		vec3_t dir;
 		vec3_t viewAngles;
+		int mode;
+
+		// Set path movement style
+		mode = point->moverState;
+
+		// Unset style means use pervious style.
+		if (!mode) {
+			mode = ent->client->ps.pathMode;
+		}
 
 		VectorCopy( ent->pos1, ent->client->ps.grapplePoint );
 		VectorCopy( ent->pos2, ent->client->ps.nextPoint );
@@ -482,10 +508,20 @@ qboolean G_ReachedPath(gentity_t *ent, qboolean check)
 		viewAngles[PITCH] = ent->client->ps.viewangles[PITCH];
 		SetClientViewAngle(ent, viewAngles);
 
-		if (backward)
-			ent->client->ps.stats[STAT_DEAD_YAW] = viewAngles[YAW]-90;
-		else
-			ent->client->ps.stats[STAT_DEAD_YAW] = viewAngles[YAW]+90;
+		if (mode == PATHMODE_SIDE) {
+			if (backward) {
+				ent->client->ps.stats[STAT_DEAD_YAW] = viewAngles[YAW]-90;
+			} else {
+				ent->client->ps.stats[STAT_DEAD_YAW] = viewAngles[YAW]+90;
+			}
+		} else {
+			ent->client->ps.stats[STAT_DEAD_YAW] = viewAngles[YAW];
+		}
+
+		if (mode != ent->client->ps.pathMode) {
+			// ZTM: Do we need to do anything when the mode changes?
+			ent->client->ps.pathMode = mode;
+		}
 	}
 
 	return qtrue;

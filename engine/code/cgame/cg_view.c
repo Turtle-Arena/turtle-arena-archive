@@ -436,6 +436,13 @@ static void CG_OffsetThirdPersonView( void ) {
 #endif
 #endif
 
+#ifdef TA_PATHSYS
+	// Move farther away when using a path
+	if (cg.cur_ps->pathMode) {
+		distance *= 1.3f;
+	}
+#endif
+
 #ifdef TURTLEARENA // LOCKON
 	if (cg.snap && cg.cur_ps->enemyEnt != ENTITYNUM_NONE) {
 		int i;
@@ -507,7 +514,7 @@ static void CG_OffsetThirdPersonView( void ) {
 		cg.refdefViewAngles[YAW] = cg.cur_lc->predictedPlayerState.stats[STAT_DEAD_YAW];
 	}
 #ifdef TA_PATHSYS // 2DMODE
-	else if (cg.cur_ps->eFlags & EF_PATHMODE)
+	else if (cg.cur_ps->pathMode == PATHMODE_SIDE || cg.cur_ps->pathMode == PATHMODE_BACK)
 	{
 		focusAngles[YAW] = cg.cur_lc->predictedPlayerState.stats[STAT_DEAD_YAW];
 		cg.refdefViewAngles[YAW] = cg.cur_lc->predictedPlayerState.stats[STAT_DEAD_YAW];
@@ -760,6 +767,13 @@ static void CG_OffsetFirstPersonView( void ) {
 	}
 #endif
 }
+
+#ifdef TA_PATHSYS // 2DMODE
+static void CG_OffsetMultiple2dModeView(qboolean everyone) {
+	// ZTM: TODO: Focus on all players, assume all players are on the same plane.
+	CG_OffsetThirdPersonView();
+}
+#endif
 
 //======================================================================
 
@@ -1130,6 +1144,17 @@ static int CG_CalcViewValues( void ) {
 		}
 	}
 
+#ifdef TA_PATHSYS // 2DMODE
+	if (cg.singleCamera) {
+		if (cg_2dmode.integer == 2) {
+			// Focus on all clients
+			CG_OffsetMultiple2dModeView(qtrue);
+		} else if (cg_2dmode.integer) {
+			// Focus on all local clients
+			CG_OffsetMultiple2dModeView(qfalse);
+		}
+	} else
+#endif
 	if ( cg.renderingThirdPerson ) {
 		// back away from character
 		CG_OffsetThirdPersonView();
@@ -1262,7 +1287,16 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.clientFrame++;
 
 #ifdef TA_SPLITVIEW
-	for (i = 0; i < cg.numViewports; i++) {
+	if (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2)) {
+		// Single camera mode
+		cg.numViewports = 1;
+		cg.singleCamera = qtrue;
+	} else {
+		cg.numViewports = cg.snap->numPSs;
+		cg.singleCamera = qfalse;
+	}
+
+	for (i = 0; i < cg.snap->numPSs; i++) {
 		cg.viewport = i;
 		cg.cur_lc = &cg.localClients[i];
 		cg.cur_ps = &cg.snap->pss[i];
@@ -1316,6 +1350,15 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		CG_ToggleLetterbox(qfalse, qfalse);
 #endif
 	}
+#endif
+
+#ifdef TA_SPLITVIEW
+	}
+
+	for (i = 0; i < cg.numViewports; i++) {
+		cg.viewport = i;
+		cg.cur_lc = &cg.localClients[i];
+		cg.cur_ps = &cg.snap->pss[i];
 #endif
 
 	// decide on third person view

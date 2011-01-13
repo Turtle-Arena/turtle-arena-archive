@@ -904,6 +904,9 @@ typedef struct {
 	int viewport;
 	int viewVerticle; // Use verticle split view instead of horizontal
 #endif
+#ifdef TA_PATHSYS // 2DMODE
+	qboolean singleCamera; // Rending multiple clients using one viewport
+#endif
 
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
@@ -1706,6 +1709,10 @@ extern	vmCvar_t		cg_laserTag;
 #endif
 #ifdef TA_ATMEFFECTSYS
 extern vmCvar_t			cg_atmosphericEffects;
+#endif
+#ifdef TA_PATHSYS // 2DMODE
+extern vmCvar_t			cg_2dmode;
+extern vmCvar_t			cg_2dmodeOverride;
 #endif
 
 //

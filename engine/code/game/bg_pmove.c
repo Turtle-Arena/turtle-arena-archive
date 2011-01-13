@@ -472,25 +472,13 @@ static void PM_SetMovementDir( void ) {
 }
 
 #ifdef TA_PATHSYS // 2DMODE
-// Nights Move style
-// ZTM: FIXME: Make this selectable by map path (instead of hardcoded to side view)
-enum
-{
-	NM_SIDE,
-	NM_TOP,
-	NM_BACK
-};
-
 static void PM_PathMoveInital( void ) {
-	int style;
 	//vec3_t angles;
 
-	if (!(pm->ps->eFlags & EF_PATHMODE)) {
+	if (!pm->ps->pathMode) {
 		return;
 	}
 
-	// default...
-	style = NM_SIDE;
 	//VectorClear(angles);
 
 	// if on axis, instead of a line {
@@ -502,17 +490,12 @@ static void PM_PathMoveInital( void ) {
 	// }
 
 	// Controls
-	if (style == NM_TOP)
-	{
+	if (pm->ps->pathMode == PATHMODE_TOP) {
 		pm->cmd.upmove = 0;
-	}
-	else if (style == NM_BACK)
-	{
+	} else if (pm->ps->pathMode == PATHMODE_BACK) {
 		pm->cmd.upmove = pm->cmd.forwardmove;
 		pm->cmd.forwardmove = 0;
-	}
-	else // NM_SIDE
-	{
+	} else { // PATHMODE_SIDE
 		// If 2D side view mode
 		pm->cmd.upmove = pm->cmd.forwardmove;
 		pm->cmd.forwardmove = pm->cmd.rightmove;
@@ -527,7 +510,7 @@ void PM_SetupPathWishVel(vec3_t wishvel, const vec3_t wishdir) {
 	vec3_t v, vel;
 	int move;
 
-	if (!(pm->ps->eFlags & EF_PATHMODE)) {
+	if (!pm->ps->pathMode) {
 		return;
 	}
 
@@ -625,7 +608,7 @@ static qboolean PM_CheckJump( void ) {
 
 	if ( pm->cmd.forwardmove >= 0
 #ifdef TA_PATHSYS // 2DMODE
-			|| (pm->ps->eFlags & EF_PATHMODE)
+			|| pm->ps->pathMode == PATHMODE_SIDE
 #endif
 	 ) {
 #ifdef TA_NPCSYS
@@ -1432,7 +1415,7 @@ static void PM_GroundTraceMissed( void ) {
 		if ( trace.fraction == 1.0 ) {
 			if ( pm->cmd.forwardmove >= 0 
 #ifdef TA_PATHSYS // 2DMODE
-			|| (pm->ps->eFlags & EF_PATHMODE)
+			|| pm->ps->pathMode == PATHMODE_SIDE
 #endif
 			) {
 #ifdef TA_NPCSYS
@@ -1500,7 +1483,7 @@ static void PM_GroundTrace( void ) {
 		// go into jump animation
 		if ( pm->cmd.forwardmove >= 0 
 #ifdef TA_PATHSYS // 2DMODE
-			|| (pm->ps->eFlags & EF_PATHMODE)
+			|| pm->ps->pathMode == PATHMODE_SIDE
 #endif
 		) {
 #ifdef TA_NPCSYS
@@ -2996,7 +2979,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 	// circularly clamp the angles with deltas
 	for (i=0 ; i<3 ; i++) {
 #ifdef TA_PATHSYS // 2DMODE
-		if ((ps->eFlags & EF_PATHMODE) && i == YAW)
+		if (ps->pathMode == PATHMODE_SIDE && i == YAW)
 			continue;
 #endif
 		temp = cmd->angles[i] + ps->delta_angles[i];
@@ -3407,7 +3390,7 @@ void PmoveSingle (pmove_t *pmove) {
 
 	// decide if backpedaling animations should be used
 #ifdef TA_PATHSYS // 2DMODE
-	if (pm->ps->eFlags & EF_PATHMODE) {
+	if (pm->ps->pathMode == PATHMODE_SIDE) {
 		pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
 	} else
 #endif
