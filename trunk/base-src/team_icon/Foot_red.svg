@@ -7,42 +7,12 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
    width="256"
    height="256"
-   id="svg2"
-   version="1.1"
-   inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="foot.svg">
+   id="svg2">
   <defs
-     id="defs4">
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 526.18109 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="744.09448 : 526.18109 : 1"
-       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
-       id="perspective10" />
-  </defs>
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="147.6706"
-     inkscape:cy="127.14098"
-     inkscape:document-units="px"
-     inkscape:current-layer="svg2"
-     showgrid="false"
-     inkscape:window-width="1152"
-     inkscape:window-height="789"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1" />
+     id="defs4" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -56,12 +26,9 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
      id="layer1" />
   <path
-     style="fill:#cc0000;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     d="m 234.40616,140.87235 c -0.57903,-37.55721 -29.46031,-64.478318 -53.08377,-94.479003 -2.41637,27.793348 14.64198,61.359953 5.05076,87.883273 -14.63034,3.2327 -31.57559,2.28185 -46.97209,-0.50508 -11.53077,-2.7114 -11.29869,-77.357095 -13.63706,-113.642159 -0.4258,-1.713069 -1.40049,-0.648715 -2.02031,0.505076 C 104.9784,51.47168 99.386405,94.728913 97.479716,129.73093 c 0,0.16836 0.11905,0.38603 0,0.50508 -0.11904,0.11905 -0.33671,0 -0.50507,0 -6.679253,1.96477 -40.429739,9.03521 -44.95179,-1.51523 C 44.676508,105.74392 48.992398,80.618711 48.992398,57.505025 33.610328,77.359638 11.495156,109.24295 11.616754,136.29693 31.210216,272.14428 208.42147,273.60407 234.40616,140.87235 z"
+     d="m 241.54902,141.58664 c -0.57903,-37.55721 -29.46031,-64.478322 -53.08377,-94.479007 -2.41637,27.793348 14.64198,61.359957 5.05076,87.883277 -14.63034,3.2327 -31.57559,2.28185 -46.97209,-0.50508 -11.53077,-2.7114 -11.29869,-77.357099 -13.63706,-113.642163 -0.4258,-1.713069 -1.40049,-0.648715 -2.02031,0.505076 -18.76529,30.837223 -24.35729,74.094456 -26.26398,109.096477 0,0.16836 0.11905,0.38603 0,0.50508 -0.11904,0.11905 -0.33671,0 -0.50507,0 -6.67925,1.96477 -40.429736,9.03521 -44.951787,-1.51523 C 51.819365,106.45821 56.135255,81.332997 56.135255,58.219311 40.753185,78.073924 18.638013,109.95724 18.759611,137.01122 38.353073,272.85857 215.56433,274.31836 241.54902,141.58664 z"
      id="path2818"
-     sodipodi:nodetypes="cccccccsccccc" />
+     style="fill:#a40000;stroke:#000000;stroke-width:7.69500017;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
 </svg>
