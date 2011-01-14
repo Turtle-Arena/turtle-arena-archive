@@ -1396,7 +1396,7 @@ extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 
 #ifdef TURTLEARENA // DEFAULT_TEAMS
 #define DEFAULT_REDTEAM_NAME		"Foot"
-#define DEFAULT_BLUETEAM_NAME		"Katanas"
+#define DEFAULT_BLUETEAM_NAME		"Shell"
 #else
 #define DEFAULT_REDTEAM_NAME		"Stroggs"
 #define DEFAULT_BLUETEAM_NAME		"Pagans"
