@@ -102,8 +102,6 @@ base/models/weapons2/triblaster/triblaster_hand.md3 (Copied from OA's base/model
 
 base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
-base/gfx/damage/shadow.tga
-base/gfx/misc/flare.tga
 
 base/textures/sfx/flame1.tga
 base/textures/sfx/flame2.tga

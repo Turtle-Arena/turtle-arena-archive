@@ -537,7 +537,7 @@ bloodExplosion		// spurt of blood at point of impact
 {
 	cull disable
 	{
-		animmap 5 models/weaphits/blood201.tga models/weaphits/blood202.tga models/weaphits/blood203.tga models/weaphits/blood204.tga models/weaphits/blood205.tga
+		animmap 5 models/weaphits/blood201.png models/weaphits/blood202.png models/weaphits/blood203.png models/weaphits/blood204.png models/weaphits/blood205.png
 		blendfunc blend
 	}
 }
