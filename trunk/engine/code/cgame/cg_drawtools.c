@@ -475,10 +475,7 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 	if (font->fontInfo.name[0]) {
 		useScale = scale * font->fontInfo.glyphScale;
 	} else {
-		//float dpi = 72.0f;
-		//float dpiScale = 72.0f / dpi;
-
-		useScale = scale * (48.0f / font->pointSize);// * dpiScale;
+		useScale = scale * (48.0f / font->pointSize);
 	}
 
 	if (x == CENTER_X) {

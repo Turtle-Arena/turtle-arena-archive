@@ -73,10 +73,7 @@ int CG_Text_Width(const char *text, float scale, int limit) {
 	if (font->fontInfo.name[0]) {
 		useScale = scale * font->fontInfo.glyphScale;
 	} else {
-		//float dpi = 72.0f;
-		//float dpiScale = 72.0f / dpi;
-
-		useScale = scale * (48.0f / font->pointSize);// * dpiScale;
+		useScale = scale * (48.0f / font->pointSize);
 	}
 
 	return Com_FontStringWidthExt(font, text, limit, qtrue) * useScale;
@@ -89,10 +86,7 @@ int CG_Text_Height(const char *text, float scale, int limit) {
 	if (font->fontInfo.name[0]) {
 		useScale = scale * font->fontInfo.glyphScale;
 	} else {
-		//float dpi = 72.0f;
-		//float dpiScale = 72.0f / dpi;
-
-		useScale = scale * (48.0f / font->pointSize);// * dpiScale;
+		useScale = scale * (48.0f / font->pointSize);
 	}
 
 	return Com_FontStringHeight(font, text, limit) * useScale;
