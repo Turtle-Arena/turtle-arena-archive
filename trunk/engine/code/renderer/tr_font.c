@@ -207,7 +207,7 @@ void WriteTGA (char *filename, byte *data, int width, int height)
 	Z_Free (buffer);
 }
 
-static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, int *yOut, int *maxHeight, FT_Face face, const unsigned char c, qboolean calcHeight) {
+static glyphInfo_t *RE_ConstructGlyphInfo(int imageSize, unsigned char *imageOut, int *xOut, int *yOut, int *maxHeight, FT_Face face, const unsigned char c, qboolean calcHeight) {
   int i;
   static glyphInfo_t glyph;
   unsigned char *src, *dst;
@@ -248,8 +248,8 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
     scaled_height = glyph.height;
 
     // we need to make sure we fit
-    if (*xOut + scaled_width + 1 >= 255) {
-      if (*yOut + *maxHeight + 1 >= 255) {
+    if (*xOut + scaled_width + 1 >= imageSize-1) {
+      if (*yOut + *maxHeight + 1 >= imageSize-1) {
         *yOut = -1;
         *xOut = -1;
         Z_Free(bitmap->buffer);
@@ -259,7 +259,11 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
         *xOut = 0;
         *yOut += *maxHeight + 1;
       }
-    } else if (*yOut + *maxHeight + 1 >= 255) {
+    }
+#ifndef IOQ3ZTM // IOQ3BUGFIX: Need to check height after end of line change
+	else
+#endif
+    if (*yOut + *maxHeight + 1 >= imageSize-1) {
       *yOut = -1;
       *xOut = -1;
       Z_Free(bitmap->buffer);
@@ -269,7 +273,7 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 
 
     src = bitmap->buffer;
-    dst = imageOut + (*yOut * 256) + *xOut;
+    dst = imageOut + (*yOut * imageSize) + *xOut;
 
 		if (bitmap->pixel_mode == ft_pixel_mode_mono) {
 			for (i = 0; i < glyph.height; i++) {
@@ -294,14 +298,14 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 				}
 
 				src += glyph.pitch;
-				dst += 256;
+				dst += imageSize;
 
 			}
 		} else {
 	    for (i = 0; i < glyph.height; i++) {
 		    Com_Memcpy(dst, src, glyph.pitch);
 			  src += glyph.pitch;
-				dst += 256;
+				dst += imageSize;
 	    }
 		}
 
@@ -310,10 +314,10 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 
     glyph.imageHeight = scaled_height;
     glyph.imageWidth = scaled_width;
-    glyph.s = (float)*xOut / 256;
-    glyph.t = (float)*yOut / 256;
-    glyph.s2 = glyph.s + (float)scaled_width / 256;
-    glyph.t2 = glyph.t + (float)scaled_height / 256;
+    glyph.s = (float)*xOut / imageSize;
+    glyph.t = (float)*yOut / imageSize;
+    glyph.s2 = glyph.s + (float)scaled_width / imageSize;
+    glyph.t2 = glyph.t + (float)scaled_height / imageSize;
 
     *xOut += scaled_width + 1;
   }
@@ -375,18 +379,34 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 #else
   char name[1024];
 #endif
-	float dpi = 72;											//
-	float glyphScale =  72.0f / dpi; 		// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
+#ifdef TA_DATA // ZTM: This only effects creating font images, not loading them.
+	int imageSize = 512;
+	float dpi = 144.0f;
+#else
+	int imageSize = 256;
+	float dpi = 72.0f;
+#endif
+	float dpiScale = 72.0f / dpi; // change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
+	float glyphScale = 1.0f;
 
-
-  if (!fontName) {
-    ri.Printf(PRINT_ALL, "RE_RegisterFont: called with empty name\n");
-    return;
-  }
+	if (!fontName) {
+		ri.Printf(PRINT_ALL, "RE_RegisterFont: called with empty name\n");
+		return;
+	}
 
 	if (pointSize <= 0) {
 		pointSize = 12;
 	}
+
+#ifdef TA_DATA // ZTM: This only effects creating font images, not loading them.
+	// Use smaller or large size images to more effectively use space/shaders.
+	if (pointSize <= 10) {
+		imageSize = 256;
+	} else if (pointSize > 27) {
+		imageSize = 1024;
+	}
+#endif
+
 	// we also need to adjust the scale based on point size relative to 48 points as the ui scaling is based on a 48 point font
 	glyphScale *= 48.0f / pointSize;
 
@@ -458,7 +478,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
 #ifdef IOQ3ZTM // USE_FREETYPE
 	//Compatibility: This is loading one of the legacy fonts
-	if(!Q_stricmpn(strippedName, "fonts/fontImage", strlen(fontName)))
+	if(!Q_stricmpn(strippedName, "fonts/fontImage", 15))
 		Q_strncpyz(name, "fonts/FreeSans.ttf", sizeof (name));
 	else
 		Com_sprintf(name, sizeof(name), "%s", fontName);
@@ -495,17 +515,17 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
   // make a 256x256 image buffer, once it is full, register it, clean it and keep going 
   // until all glyphs are rendered
 
-  out = Z_Malloc(1024*1024);
+  out = Z_Malloc(imageSize*imageSize*4);
   if (out == NULL) {
     ri.Printf(PRINT_ALL, "RE_RegisterFont: Z_Malloc failure during output image creation.\n");
     return;
   }
-  Com_Memset(out, 0, 1024*1024);
+  Com_Memset(out, 0, imageSize*imageSize*4);
 
   maxHeight = 0;
 
   for (i = GLYPH_START; i < GLYPH_END; i++) {
-    glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qtrue);
+    glyph = RE_ConstructGlyphInfo(imageSize, out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qtrue);
   }
 
   xOut = 0;
@@ -516,14 +536,20 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
   while ( i <= GLYPH_END ) {
 
-    glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qfalse);
+    glyph = RE_ConstructGlyphInfo(imageSize, out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qfalse);
+
+	// Scale to compensate for DPI
+	glyph->top *= dpiScale;
+	glyph->xSkip *= dpiScale;
+	glyph->imageHeight *= dpiScale;
+	glyph->imageWidth *= dpiScale;
 
     if (xOut == -1 || yOut == -1 || i == GLYPH_END)  {
       // ran out of room
       // we need to create an image from the bitmap, set all the handles in the glyphs to this point
       // 
 
-      scaledSize = 256*256;
+      scaledSize = imageSize*imageSize;
       newSize = scaledSize * 4;
       imageBuff = Z_Malloc(newSize);
       left = 0;
@@ -555,17 +581,17 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 			if (r_saveFontData->integer)
 #endif
 			{
-			  WriteTGA(name, imageBuff, 256, 256);
+			  WriteTGA(name, imageBuff, imageSize, imageSize);
 			}
 
 #ifdef IOQ3ZTM // USE_FREETYPE
 			/*`image = R_CreateImage(name, imageBuff, 256, 256, IF_NOPICMIP, FT_LINEAR, WT_CLAMP);`*/
-            image = R_CreateImage(name, imageBuff, 256, 256, qfalse, qfalse, GL_CLAMP_TO_EDGE);
+            image = R_CreateImage(name, imageBuff, imageSize, imageSize, qfalse, qfalse, GL_CLAMP_TO_EDGE);
             /*`h = RE_RegisterShaderFromImage(name, image, qfalse);`*/
             h = RE_RegisterShaderFromImage(name, LIGHTMAP_2D, image, qfalse);
 #else
     	//Com_sprintf (name, sizeof(name), "fonts/fontImage_%i_%i", imageNumber++, pointSize);
-      image = R_CreateImage(name, imageBuff, 256, 256, qfalse, qfalse, GL_CLAMP_TO_EDGE);
+      image = R_CreateImage(name, imageBuff, imageSize, imageSize, qfalse, qfalse, GL_CLAMP_TO_EDGE);
       h = RE_RegisterShaderFromImage(name, LIGHTMAP_2D, image, qfalse);
       for (j = lastStart; j < i; j++) {
         font->glyphs[j].glyph = h;
@@ -573,7 +599,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
       }
       lastStart = i;
 #endif
-		  Com_Memset(out, 0, 1024*1024);
+		  Com_Memset(out, 0, imageSize*imageSize*4);
       xOut = 0;
       yOut = 0;
       Z_Free(imageBuff);
