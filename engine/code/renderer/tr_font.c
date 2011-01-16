@@ -379,6 +379,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 #else
   char name[1024];
 #endif
+#ifdef BUILD_FREETYPE
 #ifdef TA_DATA // ZTM: This only effects creating font images, not loading them.
 	int imageSize = 512;
 	float dpi = 144.0f;
@@ -388,6 +389,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 #endif
 	float dpiScale = 72.0f / dpi; // change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
 	float glyphScale = 1.0f;
+#endif
 
 	if (!fontName) {
 		ri.Printf(PRINT_ALL, "RE_RegisterFont: called with empty name\n");
@@ -398,6 +400,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 		pointSize = 12;
 	}
 
+#ifdef BUILD_FREETYPE
 #ifdef TA_DATA // ZTM: This only effects creating font images, not loading them.
 	// Use smaller or large size images to more effectively use space/shaders.
 	if (pointSize <= 10) {
@@ -409,6 +412,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
 
 	// we also need to adjust the scale based on point size relative to 48 points as the ui scaling is based on a 48 point font
 	glyphScale *= 48.0f / pointSize;
+#endif
 
 	// make sure the render thread is stopped
 	R_SyncRenderThread();
