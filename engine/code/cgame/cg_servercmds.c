@@ -1161,10 +1161,19 @@ static void CG_ServerCommand( void ) {
 #endif
 
 	if ( !strcmp( cmd, "cp" ) ) {
+#ifdef TA_SPLITVIEW
+		for (cg.viewport = 0; cg.viewport < MAX_SPLITVIEW; cg.viewport++) {
+			cg.cur_lc = &cg.localClients[cg.viewport];
+#else
+		cg.cur_lc = &cg.localClient;
+#endif
 #ifndef MISSIONPACK_HUD2
 		CG_CenterPrint( CG_Argv(1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 #else
 		CG_CenterPrint( CG_Argv(1), SCREEN_HEIGHT * 0.30, 0 );
+#endif
+#ifdef TA_SPLITVIEW
+		}
 #endif
 		return;
 	}
