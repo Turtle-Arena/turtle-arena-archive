@@ -139,6 +139,13 @@ not have future snapshot_t executed before it is executed
 void SV_AddServerCommand( client_t *client, const char *cmd ) {
 	int		index, i;
 
+#ifdef TA_SPLITVIEW
+	// Don't send to extra local client.
+	if (client->owner != -1) {
+		return;
+	}
+#endif
+
 	// this is very ugly but it's also a waste to for instance send multiple config string updates
 	// for the same config string index in one snapshot
 //	if ( SV_ReplacePendingServerCommands( client, cmd ) ) {
