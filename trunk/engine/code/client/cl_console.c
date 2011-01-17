@@ -395,10 +395,9 @@ void CL_ConsolePrint( char *txt ) {
 	qboolean skipnotify = qfalse;		// NERVE - SMF
 	int prev;							// NERVE - SMF
 #ifdef IOQ3ZTM // FONT_REWRITE
-	float lineWidth;
-	float wordWidth;
+	float	lineWidth;
+	float	wordWidth;
 	int		i;
-	char	*gap = NULL;
 #endif
 
 	// TTimo - prefix for text that shows up in console but not in notify
