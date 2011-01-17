@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009-2011 Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena.
 
@@ -29,6 +29,7 @@ teams {
 	{ "Sais"  "ui/assets/sais" "Leo" "Don" "Raph" "Mike" "Casey" }
 	{ "Katanas" "ui/assets/katanas" "Leo" "Don" "Raph" "Mike" "Casey" }
 	{ "Foot" "ui/assets/foot" "Leo" "Don" "Raph" "Mike" "Casey" }
+	{ "Shell" "ui/assets/shell" "Leo" "Don" "Raph" "Mike" "Casey" }
 
 	// The "ideal" teams/characters?
 	// Blades: Leo, Karai, Miyamoto Usagi, Faraji Ngala, ?
