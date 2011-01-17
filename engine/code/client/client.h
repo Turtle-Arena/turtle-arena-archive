@@ -611,7 +611,6 @@ void	SCR_DrawFontStringExt( font_t *font, float x, float y, const char *string, 
 				qboolean noColorEscape, qboolean drawShadow, qboolean adjustFrom640, int maxChars );
 void	SCR_DrawFontString( font_t *font, int x, int y, const char *s, float alpha );
 void	SCR_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color );
-void    SCR_DrawConsoleFontChar( float x, float y, int ch );
 #endif
 void	SCR_DrawBigString( int x, int y, const char *s, float alpha, qboolean noColorEscape );			// draws a string with embedded color control characters with fade
 void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, qboolean noColorEscape );	// ignores embedded color control characters

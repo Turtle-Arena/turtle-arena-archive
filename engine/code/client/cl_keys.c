@@ -399,9 +399,9 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 		float strWidth = 0;
 		int id;
 		for (id = 0; id < (edit->cursor - prestep - i); i++) {
-			strWidth += Com_FontCharWidth( &cls.fontSmall, str[i] );
+			strWidth += Com_FontCharWidth( font, str[i] );
 		}
-		SCR_DrawConsoleFontChar( x + strWidth, y, cursorChar );
+		SCR_DrawFontChar(font, x + strWidth, y, cursorChar, qfalse);
 #else
 		if ( size == SMALLCHAR_WIDTH ) {
 			SCR_DrawSmallChar( x + ( edit->cursor - prestep - i ) * size, y, cursorChar );
