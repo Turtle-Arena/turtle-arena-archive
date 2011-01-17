@@ -461,6 +461,8 @@ hide the scoreboard, and take a special screenshot
 ==================
 */
 void Cmd_LevelShot_f( gentity_t *ent ) {
+#ifdef IOQ3ZTM // ZTM: TODO: Only allow if ent is a loopback player
+#endif
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
@@ -479,12 +481,7 @@ void Cmd_LevelShot_f( gentity_t *ent ) {
 
 /*
 ==================
-Cmd_LevelShot_f
-
-This is just to help generate the level pictures
-for the menus.  It goes to the intermission immediately
-and sends over a command to the client to resize the view,
-hide the scoreboard, and take a special screenshot
+Cmd_TeamTask_f
 ==================
 */
 void Cmd_TeamTask_f( gentity_t *ent ) {
@@ -1795,7 +1792,12 @@ ClientCommand
 */
 void ClientCommand( int clientNum ) {
 	gentity_t *ent;
+#ifdef TA_SPLITVIEW
+	char	*cmd;
+	char	buf[MAX_TOKEN_CHARS];
+#else
 	char	cmd[MAX_TOKEN_CHARS];
+#endif
 
 	ent = g_entities + clientNum;
 	if ( !ent->client ) {
@@ -1803,7 +1805,29 @@ void ClientCommand( int clientNum ) {
 	}
 
 
+#ifdef TA_SPLITVIEW
+	trap_Argv( 0, buf, sizeof( buf ) );
+	
+	cmd = &buf[0];
+
+	// Commands for extra local clients.
+	// 2team, 2give, 2teamtask, ...
+	if (cmd[0] >= '2' && cmd[0] <= '0'+MAX_SPLITVIEW) {
+		int vc;
+
+		vc = cmd[0]-'2';
+
+		cmd++;
+
+		if (ent->r.local_clients[vc] == -1) {
+			//G_Printf("Local client %d not connected.\n", vc+1);
+			return;
+		}
+		ent = g_entities + ent->r.local_clients[vc];
+	}
+#else
 	trap_Argv( 0, cmd, sizeof( cmd ) );
+#endif
 
 	if (Q_stricmp (cmd, "say") == 0) {
 		Cmd_Say_f (ent, SAY_ALL, qfalse);
@@ -1899,5 +1923,9 @@ void ClientCommand( int clientNum ) {
 		Cmd_DropFlag_f( ent );
 #endif
 	else
+#ifdef TA_SPLITVIEW
+		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", buf ) );
+#else
 		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
+#endif
 }

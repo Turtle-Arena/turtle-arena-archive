@@ -490,7 +490,7 @@ gotnewcl:
 	newcl->owner = -1;
 	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 		newcl->local_clients[i] = -1;
-		newcl->gentity->r.viewclients[i] = -1;
+		newcl->gentity->r.local_clients[i] = -1;
 	}
 #endif
 
@@ -554,7 +554,7 @@ gotnewcl:
 				break;
 			}
 
-			Q_strncpyz( userinfo, Cmd_Argv(lc+1), sizeof(userinfo) );
+			Q_strncpyz( userinfo, Cmd_Argv(1+lc), sizeof(userinfo) );
 
 			// build a new connection
 			// accept the new client
@@ -576,7 +576,8 @@ gotnewcl:
 			Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
 
 			newcl->owner = owner - svs.clients;
-			owner->local_clients[lc-1] = i;
+			owner->local_clients[lc-1] = clientNum;
+			owner->gentity->r.local_clients[lc-1] = clientNum;
 
 			// get the game a chance to reject this connection or modify the userinfo
 			denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue

@@ -88,7 +88,7 @@ typedef struct {
 	int			ownerNum;
 
 #ifdef TA_SPLITVIEW
-	int			viewclients[MAX_SPLITVIEW-1]; // Extra view clients for splitscreen
+	int			local_clients[MAX_SPLITVIEW-1]; // Extra local clients for splitscreen, allows game to access local_clients.
 #endif
 } entityShared_t;
 
