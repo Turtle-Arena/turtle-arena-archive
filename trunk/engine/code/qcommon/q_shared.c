@@ -1505,7 +1505,7 @@ float Com_FontStringWidthExt( font_t *font, const char *s, int limit, qboolean s
 		width += Com_FontCharWidth(font, ch);
 	}
 
-	if (font) {
+	if (font && width > 0) {
 		 width -= font->kerning;
 	}
 
