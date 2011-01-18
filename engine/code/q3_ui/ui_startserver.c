@@ -1225,20 +1225,7 @@ static void ServerOptions_SetPlayerItems( void ) {
 #endif
 		s_serveroptions.playerName[0].generic.flags &= ~QMF_HIDDEN;
 
-#ifdef TA_SPLITVIEW
-		start = MAX_SPLITVIEW;
-
-		for( n = 0; n < start; n++ ) {
-			if( s_serveroptions.playerType[n].curvalue == PT_HUMAN ) {
-				s_serveroptions.playerName[n].generic.flags &= ~(QMF_INACTIVE|QMF_HIDDEN);
-			}
-			else {
-				s_serveroptions.playerName[n].generic.flags |= (QMF_INACTIVE|QMF_HIDDEN);
-			}
-		}
-#else
 		start = 1;
-#endif
 	}
 	else {
 		s_serveroptions.player0.string = "Open";
@@ -1400,17 +1387,18 @@ static void ServerOptions_InitBotNames( void ) {
 	char		*bot;
 	char		bots[MAX_INFO_STRING];
 
-	if( s_serveroptions.gametype >= GT_TEAM ) {
 #ifdef IOQ3ZTM
-		// set the rest of the bot slots to "---"
-		for( n = 1; n < PLAYER_SLOTS; n++ ) {
+	// set the rest of the bot slots to "---"
+	for( n = 1; n < PLAYER_SLOTS; n++ ) {
 #ifdef IOQ3ZTM // RANDOMBOT
-			strcpy( s_serveroptions.playerNameBuffers[n], "Random" );
+		strcpy( s_serveroptions.playerNameBuffers[n], "Random" );
 #else
-			strcpy( s_serveroptions.playerNameBuffers[n], "--------" );
+		strcpy( s_serveroptions.playerNameBuffers[n], "--------" );
 #endif
-		}
+	}
 #endif
+
+	if( s_serveroptions.gametype >= GT_TEAM ) {
 #ifndef IOQ3ZTM // RANDOMBOT
 		Q_strncpyz( s_serveroptions.playerNameBuffers[1], "grunt", 16 );
 		Q_strncpyz( s_serveroptions.playerNameBuffers[2], "major", 16 );
@@ -1498,7 +1486,6 @@ static void ServerOptions_InitBotNames( void ) {
 	if (count == start) {
 		for( ;count < start+3; count++ ) {
 			s_serveroptions.playerType[count].curvalue = PT_BOT;
-			strcpy( s_serveroptions.playerNameBuffers[count], "Random" );
 		}
 	}
 #endif
@@ -1506,14 +1493,12 @@ static void ServerOptions_InitBotNames( void ) {
 	}
 #endif
 
+#ifndef IOQ3ZTM
 	// set the rest of the bot slots to "---"
 	for( n = count; n < PLAYER_SLOTS; n++ ) {
-#ifdef IOQ3ZTM // RANDOMBOT
-		strcpy( s_serveroptions.playerNameBuffers[n], "Random" );
-#else
 		strcpy( s_serveroptions.playerNameBuffers[n], "--------" );
-#endif
 	}
+#endif
 
 	// pad up to #8 as open slots
 	for( ;count < start+7; count++ ) {
