@@ -401,10 +401,22 @@ extern void TeamMain_Cache( void );
 //
 extern void UI_DrawConnectScreen( qboolean overlay );
 
+#if defined TA_MISC || defined TA_SPLITVIEW
+//
+// ui_controls.c
+//
+extern void UI_ControlsMainMenu( void );
+extern void UI_ControlsMain_Cache( void );
+#endif
+
 //
 // ui_controls2.c
 //
+#ifdef TA_SPLITVIEW
+extern void UI_ControlsMenu( int localClient );
+#else
 extern void UI_ControlsMenu( void );
+#endif
 extern void Controls_Cache( void );
 
 //

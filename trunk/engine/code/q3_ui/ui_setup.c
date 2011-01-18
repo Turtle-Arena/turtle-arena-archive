@@ -149,7 +149,11 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 #endif
 
 	case ID_CUSTOMIZECONTROLS:
+#if defined TA_MISC || defined TA_SPLITVIEW
+		UI_ControlsMainMenu();
+#else
 		UI_ControlsMenu();
+#endif
 		break;
 
 	case ID_SYSTEMCONFIG:
@@ -232,7 +236,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.framer.width  					= 256;
 	setupMenuInfo.framer.height  					= 334;
 
-#ifdef TA_SPLITVIEW 
+#if !defined TA_MISC && defined TA_SPLITVIEW 
 	y = 94;
 #else
 	y = 134;
