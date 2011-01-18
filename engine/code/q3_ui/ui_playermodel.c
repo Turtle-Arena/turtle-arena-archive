@@ -549,21 +549,19 @@ static void PlayerModel_SetMenuItems( void )
 	char*			pdest;
 
 	// name
-#ifdef TA_SPLITVIEW // #_name
-	if (s_playermodel.localClient != 0) {
-		trap_Cvar_VariableStringBuffer( va("%d_name", s_playermodel.localClient+1), s_playermodel.playername.string, 16 );
-	} else
-#endif
+#ifdef TA_SPLITVIEW
+	trap_Cvar_VariableStringBuffer( UI_LocalClientCvarName(s_playermodel.localClient, "name"), s_playermodel.playername.string, 16 );
+#else
 	trap_Cvar_VariableStringBuffer( "name", s_playermodel.playername.string, 16 );
+#endif
 	Q_CleanStr( s_playermodel.playername.string );
 
 	// model
-#ifdef TA_SPLITVIEW // #_model
-	if (s_playermodel.localClient != 0) {
-		trap_Cvar_VariableStringBuffer( va("%d_model", s_playermodel.localClient+1), s_playermodel.modelskin, 64 );
-	} else
-#endif
+#ifdef TA_SPLITVIEW
+	trap_Cvar_VariableStringBuffer( UI_LocalClientCvarName(s_playermodel.localClient, "model"), s_playermodel.modelskin, 64 );
+#else
 	trap_Cvar_VariableStringBuffer( "model", s_playermodel.modelskin, 64 );
+#endif
 
 #ifdef IOQ3ZTM
 	// Add "/default" if no skin is set.

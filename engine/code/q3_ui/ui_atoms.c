@@ -52,6 +52,51 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	trap_Print( va("%s", text) );
 }
 
+#ifdef TA_SPLITVIEW
+/*
+=================
+UI_LocalClientCvarName
+=================
+*/
+char *UI_LocalClientCvarName(int localClient, char *in_cvarName) {
+	static char localClientCvarName[MAX_CVAR_VALUE_STRING];
+
+	if (localClient == 0) {
+		Q_strncpyz(localClientCvarName, in_cvarName, MAX_CVAR_VALUE_STRING);
+	} else {
+		char prefix[2];
+		char character[2];
+		char *cvarName;
+
+		prefix[1] = character[1] = '\0';
+
+		cvarName = in_cvarName;
+
+		if (cvarName[0] == '+' || cvarName[0] == '-') {
+			prefix[0] = cvarName[0];
+			cvarName++;
+		} else {
+			prefix[0] = '\0';
+		}
+
+		// ZTM: TODO: Rename the cvars named #_cvarname to #cvarname
+		if (Q_stricmp(in_cvarName, "model") == 0 ||
+			Q_stricmp(in_cvarName, "name") == 0 ||
+			Q_stricmp(in_cvarName, "color1") == 0 ||
+			Q_stricmp(in_cvarName, "color2") == 0 ||
+			Q_stricmp(in_cvarName, "handicap") == 0) {
+			character[0] = '_';
+		} else {
+			character[0] = '\0';
+		}
+
+		Q_snprintf(localClientCvarName, MAX_CVAR_VALUE_STRING, "%s%d%s%s", prefix, localClient+1, character, cvarName);
+	}
+
+	return localClientCvarName;
+}
+#endif
+
 /*
 =================
 UI_ClampCvar
