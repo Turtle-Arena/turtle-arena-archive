@@ -3366,97 +3366,97 @@ void CL_Init( void ) {
 
 #ifdef TA_SPLITVIEW
 	// Second local client
-	Cvar_Get ("2_name", "UnnamedPlayer2", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2name", "UnnamedPlayer2", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
-	Cvar_Get ("2_spmodel", "mike", CVAR_USERINFO2 | CVAR_ROM );
-	Cvar_Get ("2_spheadmodel", "", CVAR_USERINFO2 | CVAR_ROM );
+	Cvar_Get ("2spmodel", "mike", CVAR_USERINFO2 | CVAR_ROM );
+	Cvar_Get ("2spheadmodel", "", CVAR_USERINFO2 | CVAR_ROM );
 #endif
 #ifdef TURTLEARENA
-	Cvar_Get ("2_model", "mike", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2model", "mike", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("2_model", "grunt", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2model", "grunt", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #endif
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("2_headmodel", "", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2headmodel", "", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("2_headmodel", "grunt", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2headmodel", "grunt", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("2_team_model", "james", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2_team_headmodel", "*james", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2team_model", "james", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2team_headmodel", "*james", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #endif
 #ifdef TURTLEARENA
-	Cvar_Get ("2_color1", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2_color2", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2color1", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2color2", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("2_color1", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2_color2", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2color1", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2color2", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #endif
-	Cvar_Get ("2_handicap", "100", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2_teamtask", "0", CVAR_USERINFO2 );
-	Cvar_Get ("2_sex", "male", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2handicap", "100", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2teamtask", "0", CVAR_USERINFO2 );
+	Cvar_Get ("2sex", "male", CVAR_USERINFO2 | CVAR_ARCHIVE );
 
 	// Third local client
-	Cvar_Get ("3_name", "UnnamedPlayer3", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3name", "UnnamedPlayer3", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
-	Cvar_Get ("3_spmodel", "leo", CVAR_USERINFO3 | CVAR_ROM );
-	Cvar_Get ("3_spheadmodel", "", CVAR_USERINFO3 | CVAR_ROM );
+	Cvar_Get ("3spmodel", "leo", CVAR_USERINFO3 | CVAR_ROM );
+	Cvar_Get ("3spheadmodel", "", CVAR_USERINFO3 | CVAR_ROM );
 #endif
 #ifdef TURTLEARENA
-	Cvar_Get ("3_model", "leo", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3model", "leo", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("3_model", "crash", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3model", "crash", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #endif
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("3_headmodel", "", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3headmodel", "", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("3_headmodel", "crash", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3headmodel", "crash", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("3_team_model", "janet", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3_team_headmodel", "*janet", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3team_model", "janet", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3team_headmodel", "*janet", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #endif
 #ifdef TURTLEARENA
-	Cvar_Get ("3_color1", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3_color2", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3color1", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3color2", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("3_color1", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3_color2", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3color1", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3color2", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #endif
-	Cvar_Get ("3_handicap", "100", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3_teamtask", "0", CVAR_USERINFO3 );
-	Cvar_Get ("3_sex", "male", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3handicap", "100", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3teamtask", "0", CVAR_USERINFO3 );
+	Cvar_Get ("3sex", "male", CVAR_USERINFO3 | CVAR_ARCHIVE );
 
 	// Fourth local client
-	Cvar_Get ("4_name", "UnnamedPlayer4", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4name", "UnnamedPlayer4", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
-	Cvar_Get ("4_spmodel", "don", CVAR_USERINFO4 | CVAR_ROM );
-	Cvar_Get ("4_spheadmodel", "", CVAR_USERINFO4 | CVAR_ROM );
+	Cvar_Get ("4spmodel", "don", CVAR_USERINFO4 | CVAR_ROM );
+	Cvar_Get ("4spheadmodel", "", CVAR_USERINFO4 | CVAR_ROM );
 #endif
 #ifdef TURTLEARENA
-	Cvar_Get ("4_model", "don", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4model", "don", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("4_model", "visor", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4model", "visor", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #endif
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("4_headmodel", "", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4headmodel", "", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("4_headmodel", "visor", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4headmodel", "visor", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("4_team_model", "janet", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4_team_headmodel", "*janet", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4team_model", "janet", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4team_headmodel", "*janet", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #endif
 #ifdef TURTLEARENA
-	Cvar_Get ("4_color1", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4_color2", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4color1", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4color2", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("4_color1", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4_color2", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4color1", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4color2", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #endif
-	Cvar_Get ("4_handicap", "100", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4_teamtask", "0", CVAR_USERINFO4 );
-	Cvar_Get ("4_sex", "male", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4handicap", "100", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4teamtask", "0", CVAR_USERINFO4 );
+	Cvar_Get ("4sex", "male", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #endif
 
 #ifdef USE_MUMBLE
