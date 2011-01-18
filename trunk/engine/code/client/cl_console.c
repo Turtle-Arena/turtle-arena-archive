@@ -255,6 +255,7 @@ void Con_CheckResize (void)
 #ifdef IOQ3ZTM // FONT_REWRITE
 	if (cls.glconfig.vidWidth > 0)
 		width = (cls.glconfig.vidWidth / Com_FontCharWidth(&cls.fontSmall, '.')) - 2;
+	else
 #endif
 	width = (SCREEN_WIDTH / SMALLCHAR_WIDTH) - 2;
 
@@ -455,16 +456,8 @@ void CL_ConsolePrint( char *txt ) {
 			wordWidth = Com_FontStringWidth(&cls.fontSmall, txt, l+1);
 
 			if (l != con.linewidth && (con.x + l >= con.linewidth)) {
-				char tmp = txt[l];
-				txt[l] = 0;
-				printf("**DEBUG: Spliting line at %d [%s], reached limit (%d/%d).\n", l, txt, con.x + l, con.linewidth);
-				txt[l] = tmp;
 				Con_Linefeed(skipnotify);
 			} else if (lineWidth + wordWidth >= screenWidth) {
-				char tmp = txt[l];
-				txt[l] = 0;
-				printf("**DEBUG: Spliting line at %d [%s], reached width (%f/%d).\n", l, txt, lineWidth + wordWidth, screenWidth);
-				txt[l] = tmp;
 				Con_Linefeed(skipnotify);
 			}
 		}
