@@ -109,6 +109,9 @@
 		<Unit filename="../../code/q3_ui/ui_connect.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/q3_ui/ui_controls.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/q3_ui/ui_controls2.c">
 			<Option compilerVar="CC" />
 		</Unit>
