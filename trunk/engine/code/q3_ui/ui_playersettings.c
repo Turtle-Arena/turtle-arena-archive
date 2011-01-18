@@ -333,12 +333,11 @@ static void PlayerSettings_DrawPlayer( void *self ) {
 	vec3_t			viewangles;
 	char			buf[MAX_QPATH];
 
-#ifdef TA_SPLITVIEW // #_model
-	if (s_playersettings.localClient != 0) {
-		trap_Cvar_VariableStringBuffer( va("%d_model", s_playersettings.localClient+1), buf, sizeof( buf ) );
-	} else
-#endif
+#ifdef TA_SPLITVIEW
+	trap_Cvar_VariableStringBuffer( UI_LocalClientCvarName(s_playersettings.localClient, "model"), buf, sizeof( buf ) );
+#else
 	trap_Cvar_VariableStringBuffer( "model", buf, sizeof( buf ) );
+#endif
 	if ( strcmp( buf, s_playersettings.playerModel ) != 0 ) {
 		UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, buf );
 		strcpy( s_playersettings.playerModel, buf );
@@ -367,33 +366,34 @@ PlayerSettings_SaveChanges
 =================
 */
 static void PlayerSettings_SaveChanges( void ) {
-#ifdef TA_SPLITVIEW // #_name, #_handicap, #_color1, #_color2
-	if (s_playersettings.localClient != 0) {
-		// name
-		trap_Cvar_Set( va("%d_name", s_playersettings.localClient+1), s_playersettings.name.field.buffer );
-
-		// handicap
-		trap_Cvar_SetValue( va("%d_handicap", s_playersettings.localClient+1), 100 - s_playersettings.handicap.curvalue * 5 );
-
-		// effects color
-		trap_Cvar_SetValue( va("%d_color1", s_playersettings.localClient+1), uitogamecode[s_playersettings.effects.curvalue] );
-#ifdef IOQ3ZTM // UI_COLOR2
-		trap_Cvar_SetValue( va("%d_color2", s_playersettings.localClient+1), uitogamecode[s_playersettings.effects2.curvalue] );
-#endif
-		return;
-	}
-#endif
-
 	// name
+#ifdef TA_SPLITVIEW
+	trap_Cvar_Set( UI_LocalClientCvarName(s_playersettings.localClient, "name"), s_playersettings.name.field.buffer );
+#else
 	trap_Cvar_Set( "name", s_playersettings.name.field.buffer );
+#endif
 
 	// handicap
+#ifdef TA_SPLITVIEW
+	trap_Cvar_SetValue( UI_LocalClientCvarName(s_playersettings.localClient, "handicap"),
+			100 - s_playersettings.handicap.curvalue * 5 );
+#else
 	trap_Cvar_SetValue( "handicap", 100 - s_playersettings.handicap.curvalue * 5 );
+#endif
 
 	// effects color
+#ifdef TA_SPLITVIEW
+	trap_Cvar_SetValue( UI_LocalClientCvarName(s_playersettings.localClient, "color1"),
+			uitogamecode[s_playersettings.effects.curvalue] );
+#ifdef IOQ3ZTM // UI_COLOR2
+	trap_Cvar_SetValue( UI_LocalClientCvarName(s_playersettings.localClient, "color2"),
+			uitogamecode[s_playersettings.effects2.curvalue] );
+#endif
+#else
 	trap_Cvar_SetValue( "color1", uitogamecode[s_playersettings.effects.curvalue] );
 #ifdef IOQ3ZTM // UI_COLOR2
 	trap_Cvar_SetValue( "color2", uitogamecode[s_playersettings.effects2.curvalue] );
+#endif
 #endif
 }
 
@@ -424,40 +424,33 @@ static void PlayerSettings_SetMenuItems( void ) {
 	vec3_t	viewangles;
 	int		c;
 	int		h;
-#ifdef TA_SPLITVIEW
-	char	buf[64];
-#endif
 
 	// name
-#ifdef TA_SPLITVIEW // #_name
-	if (s_playersettings.localClient != 0) {
-		Q_snprintf(buf, sizeof (buf), "%d_name", s_playersettings.localClient+1);
-		Q_strncpyz( s_playersettings.name.field.buffer, UI_Cvar_VariableString(buf), sizeof(s_playersettings.name.field.buffer) );
-	} else
-#endif
+#ifdef TA_SPLITVIEW
+	Q_strncpyz( s_playersettings.name.field.buffer, UI_Cvar_VariableString(
+			UI_LocalClientCvarName(s_playersettings.localClient, "name")), sizeof(s_playersettings.name.field.buffer) );
+#else
 	Q_strncpyz( s_playersettings.name.field.buffer, UI_Cvar_VariableString("name"), sizeof(s_playersettings.name.field.buffer) );
+#endif
+
 
 	// effects color
-#ifdef TA_SPLITVIEW // #_color1
-	if (s_playersettings.localClient != 0) {
-		Q_snprintf(buf, sizeof (buf), "%d_color1", s_playersettings.localClient+1);
-		c = trap_Cvar_VariableValue( buf ) - 1;
-	} else
-#endif
+#ifdef TA_SPLITVIEW
+	c = trap_Cvar_VariableValue( UI_LocalClientCvarName(s_playersettings.localClient, "color1") ) - 1;
+#else
 	c = trap_Cvar_VariableValue( "color1" ) - 1;
+#endif
 	if( c < 0 || c > NUM_COLOR_EFFECTS-1 ) {
 		c = NUM_COLOR_EFFECTS-1;
 	}
 	s_playersettings.effects.curvalue = gamecodetoui[c];
 
 #ifdef IOQ3ZTM // UI_COLOR2
-#ifdef TA_SPLITVIEW // #_color2
-	if (s_playersettings.localClient != 0) {
-		Q_snprintf(buf, sizeof (buf), "%d_color2", s_playersettings.localClient+1);
-		c = trap_Cvar_VariableValue( buf ) - 1;
-	} else
-#endif
+#ifdef TA_SPLITVIEW
+	c = trap_Cvar_VariableValue( UI_LocalClientCvarName(s_playersettings.localClient, "color2") ) - 1;
+#else
 	c = trap_Cvar_VariableValue( "color2" ) - 1;
+#endif
 	if( c < 0 || c > NUM_COLOR_EFFECTS-1 ) {
 		c = NUM_COLOR_EFFECTS-1;
 	}
@@ -471,13 +464,12 @@ static void PlayerSettings_SetMenuItems( void ) {
 	viewangles[PITCH] = 0;
 	viewangles[ROLL]  = 0;
 
-#ifdef TA_SPLITVIEW // #_model
-	if (s_playersettings.localClient != 0) {
-		Q_snprintf(buf, sizeof (buf), "%d_model", s_playersettings.localClient+1);
-		UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, UI_Cvar_VariableString( buf ) );
-	} else
-#endif
+#ifdef TA_SPLITVIEW
+	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo,
+			UI_Cvar_VariableString( UI_LocalClientCvarName(s_playersettings.localClient, "model") ) );
+#else
 	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, UI_Cvar_VariableString( "model" ) );
+#endif
 #ifdef TA_WEAPSYS
 	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo,
 			BG_LegsStandForWeapon(&s_playersettings.playerinfo.playercfg, s_playersettings.playerinfo.weapon),
@@ -488,13 +480,11 @@ static void PlayerSettings_SetMenuItems( void ) {
 #endif
 
 	// handicap
-#ifdef TA_SPLITVIEW // #_handicap
-	if (s_playersettings.localClient != 0) {
-		Q_snprintf(buf, sizeof (buf), "%d_handicap", s_playersettings.localClient+1);
-		h = Com_Clamp( 5, 100, trap_Cvar_VariableValue(buf) );
-	} else
-#endif
+#ifdef TA_SPLITVIEW
+	h = Com_Clamp( 5, 100, trap_Cvar_VariableValue(UI_LocalClientCvarName(s_playersettings.localClient, "handicap")) );
+#else
 	h = Com_Clamp( 5, 100, trap_Cvar_VariableValue("handicap") );
+#endif
 	s_playersettings.handicap.curvalue = 20 - h / 5;
 }
 
@@ -505,23 +495,18 @@ PlayerSettings_MenuEvent
 =================
 */
 static void PlayerSettings_MenuEvent( void* ptr, int event ) {
-#ifdef TA_SPLITVIEW
-	char	buf[64];
-#endif
-
 	if( event != QM_ACTIVATED ) {
 		return;
 	}
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_HANDICAP:
-#ifdef TA_SPLITVIEW // #_handicap
-		if (s_playersettings.localClient != 0) {
-			Q_snprintf(buf, sizeof (buf), "%d_handicap", s_playersettings.localClient+1);
-			trap_Cvar_Set( "buf", va( "%i", 100 - 25 * s_playersettings.handicap.curvalue ) );
-		} else
-#endif
+#ifdef TA_SPLITVIEW
+		trap_Cvar_Set( UI_LocalClientCvarName(s_playersettings.localClient, "handicap"),
+				va( "%i", 100 - 25 * s_playersettings.handicap.curvalue ) );
+#else
 		trap_Cvar_Set( "handicap", va( "%i", 100 - 25 * s_playersettings.handicap.curvalue ) );
+#endif
 		break;
 
 	case ID_MODEL:
