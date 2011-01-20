@@ -461,7 +461,13 @@ hide the scoreboard, and take a special screenshot
 ==================
 */
 void Cmd_LevelShot_f( gentity_t *ent ) {
-#ifdef IOQ3ZTM // ZTM: TODO: Only allow if ent is a loopback player
+#ifdef IOQ3ZTM
+	// Only allow if ent is on the localhost
+	if (!ent->client->pers.localClient) {
+		trap_SendServerCommand( ent-g_entities,
+			"print \"levelshot command is for local clients only\n\"" );
+		return;
+	}
 #endif
 	if ( !CheatsOk( ent ) ) {
 		return;
@@ -1807,23 +1813,27 @@ void ClientCommand( int clientNum ) {
 
 #ifdef TA_SPLITVIEW
 	trap_Argv( 0, buf, sizeof( buf ) );
-	
+
 	cmd = &buf[0];
 
 	// Commands for extra local clients.
 	// 2team, 2give, 2teamtask, ...
 	if (cmd[0] >= '2' && cmd[0] <= '0'+MAX_SPLITVIEW) {
-		int vc;
+		int lc;
 
-		vc = cmd[0]-'2';
+		lc = cmd[0]-'2';
 
 		cmd++;
 
-		if (ent->r.local_clients[vc] == -1) {
-			//G_Printf("Local client %d not connected.\n", vc+1);
+		if (ent->r.local_clients[lc] == -1) {
+			//G_Printf("Local client %d not connected.\n", lc+1);
 			return;
 		}
-		ent = g_entities + ent->r.local_clients[vc];
+
+		ent = g_entities + ent->r.local_clients[lc];
+		if ( !ent->client ) {
+			return;		// not fully in game yet
+		}
 	}
 #else
 	trap_Argv( 0, cmd, sizeof( cmd ) );
