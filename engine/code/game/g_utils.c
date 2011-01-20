@@ -810,6 +810,9 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 	if (target == source)
 		return qfalse;
 
+	if (target->flags & FL_NOTARGET)
+		return qfalse;
+
 	// ZTM: Target players, overload base, and NPCs.
 	if (!target->client// && !target->takedamage
 #ifdef MISSIONPACK
