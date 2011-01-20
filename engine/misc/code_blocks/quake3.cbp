@@ -441,6 +441,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/client/client.h" />
+		<Unit filename="../../code/client/keycodes.h" />
 		<Unit filename="../../code/client/keys.h" />
 		<Unit filename="../../code/client/qal.c">
 			<Option compilerVar="CC" />
