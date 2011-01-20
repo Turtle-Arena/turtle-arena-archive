@@ -1617,7 +1617,11 @@ extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
 extern	vmCvar_t		cg_tracerLength;
 #ifndef TA_WEAPSYS_EX
+#ifdef TA_SPLITVIEW
+extern	vmCvar_t		cg_autoswitch[MAX_SPLITVIEW];
+#else
 extern	vmCvar_t		cg_autoswitch;
+#endif
 #endif
 extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;

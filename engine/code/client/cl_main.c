@@ -3194,12 +3194,50 @@ static void CL_GenerateQKey(void)
 	}
 } 
 
+#ifdef TA_SPLITVIEW
+/*
+=================
+UI_LocalClientCvarName
+=================
+*/
+char *CL_LocalClientCvarName(int localClient, char *in_cvarName) {
+	static char localClientCvarName[MAX_CVAR_VALUE_STRING];
+
+	if (localClient == 0) {
+		Q_strncpyz(localClientCvarName, in_cvarName, MAX_CVAR_VALUE_STRING);
+	} else {
+		char prefix[2];
+		char *cvarName;
+
+		prefix[1] = '\0';
+
+		cvarName = in_cvarName;
+
+		if (cvarName[0] == '+' || cvarName[0] == '-') {
+			prefix[0] = cvarName[0];
+			cvarName++;
+		} else {
+			prefix[0] = '\0';
+		}
+
+		Q_snprintf(localClientCvarName, MAX_CVAR_VALUE_STRING, "%s%d%s", prefix, localClient+1, cvarName);
+	}
+
+	return localClientCvarName;
+}
+#endif
+
 /*
 ====================
 CL_Init
 ====================
 */
 void CL_Init( void ) {
+#if !defined TA_WEAPSYS_EX && !defined TURTLEARENA // ALWAYS_RUN
+#ifdef TA_SPLITVIEW
+	int		i;
+#endif
+#endif
 	Com_Printf( "----- Client Initialization -----\n" );
 
 	Con_Init ();
@@ -3245,7 +3283,13 @@ void CL_Init( void ) {
 	cl_packetdup = Cvar_Get ("cl_packetdup", "1", CVAR_ARCHIVE );
 
 #ifndef TURTLEARENA // ALWAYS_RUN
+#ifdef TA_SPLITVIEW
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		cl_run[i] = Cvar_Get (CL_LocalClientCvarName(i, "cl_run"), "1", CVAR_ARCHIVE);
+	}
+#else
 	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE);
+#endif
 #endif
 	cl_sensitivity = Cvar_Get ("sensitivity", "5", CVAR_ARCHIVE);
 	cl_mouseAccel = Cvar_Get ("cl_mouseAccel", "0", CVAR_ARCHIVE);
@@ -3282,7 +3326,13 @@ void CL_Init( void ) {
 #ifndef TA_WEAPSYS_EX
 	// init autoswitch so the ui will have it correctly even
 	// if the cgame hasn't been started
+#ifdef TA_SPLITVIEW
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		Cvar_Get (CL_LocalClientCvarName(i, "cg_autoswitch"), "1", CVAR_ARCHIVE);
+	}
+#else
 	Cvar_Get ("cg_autoswitch", "1", CVAR_ARCHIVE);
+#endif
 #endif
 
 	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);

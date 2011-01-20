@@ -524,7 +524,11 @@ cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 
 #ifndef TURTLEARENA // ALWAYS_RUN
+#ifdef TA_SPLITVIEW
+cvar_t	*cl_run[MAX_SPLITVIEW];
+#else
 cvar_t	*cl_run;
+#endif
 #endif
 
 cvar_t	*cl_anglespeedkey;
@@ -588,7 +592,11 @@ void CL_KeyMove( clientInput_t *ci, usercmd_t *cmd ) {
 #ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
 	if (!ci->in_lockon.active)
 #else
+#ifdef TA_SPLITVIEW
+	if ( ci->in_speed.active ^ cl_run[ci-cis]->integer )
+#else
 	if ( ci->in_speed.active ^ cl_run->integer )
+#endif
 #endif
 	{
 		movespeed = 127;
@@ -681,7 +689,11 @@ void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 #ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
 	if (!ci->in_lockon.active)
 #else
+#ifdef TA_SPLITVIEW
+	if ( ci->in_speed.active ^ cl_run[ci-cis]->integer )
+#else
 	if ( ci->in_speed.active ^ cl_run->integer )
+#endif
 #endif
 	{
 		movespeed = 2;

@@ -619,6 +619,14 @@ static void CG_ItemPickup( int itemNum ) {
 		// select it immediately
 #ifdef TA_WEAPSYS_EX
 		// always switch
+#elif defined TA_SPLITVIEW
+#if defined TA_WEAPSYS || defined IOQ3ZTM
+		if ( cg_autoswitch[cg.cur_lc-cg.localClients].integer )
+#elif defined TA_ITEMSYS
+		if ( cg_autoswitch[cg.cur_lc-cg.localClients].integer && item->giTag != WP_MACHINEGUN )
+#else
+		if ( cg_autoswitch[cg.cur_lc-cg.localClients].integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN )
+#endif
 #elif defined TA_WEAPSYS || defined IOQ3ZTM
 		if ( cg_autoswitch.integer )
 #elif defined TA_ITEMSYS
