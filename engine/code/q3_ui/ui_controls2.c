@@ -357,12 +357,10 @@ static bind_t g_bindings2[] =
 {
 	MINIBIND(ID_SHOWSCORES, -1, -1),
 	MINIBIND(ID_USEITEM, -1, -1),
-#ifdef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
-	MINIBIND(ID_FORWARD, -1, -1),
-#else
+#ifndef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
 	MINIBIND(ID_SPEED, -1, -1),
-	MINIBIND(ID_FORWARD, -1, -1),
 #endif
+	MINIBIND(ID_FORWARD, -1, -1),
 	MINIBIND(ID_BACKPEDAL, -1, -1),
 	MINIBIND(ID_MOVELEFT, -1, -1),
 	MINIBIND(ID_MOVERIGHT, -1, -1),
@@ -401,11 +399,7 @@ static bind_t g_bindings2[] =
 #endif
 	MINIBIND(ID_GESTURE, -1, -1),
 	MINIBIND(ID_CHAT, -1, -1),
-#ifdef TA_MISC // team chat
 	MINIBIND(ID_CHAT2, -1, -1),
-#else
-	MINIBIND(ID_CHAT2, -1, -1),
-#endif
 	MINIBIND(ID_CHAT3, -1, -1),
 	MINIBIND(ID_CHAT4, -1, -1),
 #ifdef TA_HOLDSYS/*2*/
@@ -422,12 +416,10 @@ static bind_t g_bindings3[] =
 {
 	MINIBIND(ID_SHOWSCORES, -1, -1),
 	MINIBIND(ID_USEITEM, -1, -1),
-#ifdef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
-	MINIBIND(ID_FORWARD, -1, -1),
-#else
+#ifndef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
 	MINIBIND(ID_SPEED, -1, -1),
-	MINIBIND(ID_FORWARD, -1, -1),
 #endif
+	MINIBIND(ID_FORWARD, -1, -1),
 	MINIBIND(ID_BACKPEDAL, -1, -1),
 	MINIBIND(ID_MOVELEFT, -1, -1),
 	MINIBIND(ID_MOVERIGHT, -1, -1),
@@ -466,11 +458,7 @@ static bind_t g_bindings3[] =
 #endif
 	MINIBIND(ID_GESTURE, -1, -1),
 	MINIBIND(ID_CHAT, -1, -1),
-#ifdef TA_MISC // team chat
 	MINIBIND(ID_CHAT2, -1, -1),
-#else
-	MINIBIND(ID_CHAT2, -1, -1),
-#endif
 	MINIBIND(ID_CHAT3, -1, -1),
 	MINIBIND(ID_CHAT4, -1, -1),
 #ifdef TA_HOLDSYS/*2*/
@@ -487,12 +475,10 @@ static bind_t g_bindings4[] =
 {
 	MINIBIND(ID_SHOWSCORES, -1, -1),
 	MINIBIND(ID_USEITEM, -1, -1),
-#ifdef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
-	MINIBIND(ID_FORWARD, -1, -1),
-#else
+#ifndef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
 	MINIBIND(ID_SPEED, -1, -1),
-	MINIBIND(ID_FORWARD, -1, -1),
 #endif
+	MINIBIND(ID_FORWARD, -1, -1),
 	MINIBIND(ID_BACKPEDAL, -1, -1),
 	MINIBIND(ID_MOVELEFT, -1, -1),
 	MINIBIND(ID_MOVERIGHT, -1, -1),
@@ -531,11 +517,7 @@ static bind_t g_bindings4[] =
 #endif
 	MINIBIND(ID_GESTURE, -1, -1),
 	MINIBIND(ID_CHAT, -1, -1),
-#ifdef TA_MISC // team chat
 	MINIBIND(ID_CHAT2, -1, -1),
-#else
-	MINIBIND(ID_CHAT2, -1, -1),
-#endif
 	MINIBIND(ID_CHAT3, -1, -1),
 	MINIBIND(ID_CHAT4, -1, -1),
 #ifdef TA_HOLDSYS/*2*/
