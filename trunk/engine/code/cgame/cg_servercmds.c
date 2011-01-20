@@ -1145,48 +1145,75 @@ Cmd_Argc() / Cmd_Argv()
 static void CG_ServerCommand( void ) {
 	const char	*cmd;
 	char		text[MAX_SAY_TEXT];
+	int			start = 0;
+#ifdef TA_SPLITVIEW
+	int			lc = 0;
+#endif
 
-	cmd = CG_Argv(0);
+	cmd = CG_Argv(start);
 
 	if ( !cmd[0] ) {
 		// server claimed the command
 		return;
 	}
 
+#ifdef TA_SPLITVIEW
+	// lc#
+	if (cmd[0] == 'l' && cmd[1] =='c' && isdigit(cmd[2])) {
+		lc = atoi(&cmd[2]);
+
+		if (lc > MAX_SPLITVIEW) {
+			return;
+		}
+
+		start++;
+		cmd = CG_Argv(start);
+	}
+#endif
+
 #ifdef CAMERASCRIPT
 	if ( !strcmp( cmd, "startCam" ) ) {
-		CG_StartCamera( CG_Argv(1), atoi(CG_Argv(2)), atoi(CG_Argv(3)) );
+#ifdef TA_SPLITVIEW // ZTM: FIXME: Add support for multiple local clients.
+#endif
+		CG_StartCamera( CG_Argv(start+1), atoi(CG_Argv(start+2)), atoi(CG_Argv(start+3)) );
 		return;
 	}
 #endif
 
 	if ( !strcmp( cmd, "cp" ) ) {
 #ifdef TA_SPLITVIEW
-		for (cg.viewport = 0; cg.viewport < MAX_SPLITVIEW; cg.viewport++) {
-			cg.cur_lc = &cg.localClients[cg.viewport];
+		cg.cur_lc = &cg.localClients[lc];
 #else
 		cg.cur_lc = &cg.localClient;
 #endif
 #ifndef MISSIONPACK_HUD2
-		CG_CenterPrint( CG_Argv(1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+		CG_CenterPrint( CG_Argv(start+1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 #else
-		CG_CenterPrint( CG_Argv(1), SCREEN_HEIGHT * 0.30, 0 );
-#endif
-#ifdef TA_SPLITVIEW
-		}
+		CG_CenterPrint( CG_Argv(start+1), SCREEN_HEIGHT * 0.30, 0 );
 #endif
 		return;
 	}
 
 	if ( !strcmp( cmd, "cs" ) ) {
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
 		CG_ConfigStringModified();
 		return;
 	}
 
 	if ( !strcmp( cmd, "print" ) ) {
-		CG_Printf( "%s", CG_Argv(1) );
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			// Show which client this is for.
+			CG_Printf("(For Local Client %d): ", lc+1);
+		}
+#endif
+		CG_Printf( "%s", CG_Argv(start+1) );
 #ifdef MISSIONPACK
-		cmd = CG_Argv(1);			// yes, this is obviously a hack, but so is the way we hear about
+		cmd = CG_Argv(start+1);			// yes, this is obviously a hack, but so is the way we hear about
 									// votes passing or failing
 		if ( !Q_stricmpn( cmd, "vote failed", 11 ) || !Q_stricmpn( cmd, "team vote failed", 16 )) {
 			trap_S_StartLocalSound( cgs.media.voteFailed, CHAN_ANNOUNCER );
@@ -1198,9 +1225,22 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "chat" ) ) {
+#ifdef TA_SPLITVIEW
+		// ZTM: FIXME: Have to return otherwise all chats are printed for each local client,
+		//  side effect is extra local cleints don't support receiving tell.
+		if (lc != 0) {
+			return;
+		}
+#endif
 		if ( !cg_teamChatsOnly.integer ) {
 			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-			Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
+#if 0 //#ifdef TA_SPLITVIEW
+			if (lc != 0) {
+				// Show which client this is for.
+				Q_snprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
+			} else
+#endif
+			Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
 			CG_RemoveChatEscapeChar( text );
 			CG_Printf( "%s\n", text );
 		}
@@ -1208,8 +1248,13 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
 		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-		Q_strncpyz( text, CG_Argv(1), MAX_SAY_TEXT );
+		Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );
 #ifndef IOQ3ZTM // TEAM_CHAT_CON
@@ -1218,46 +1263,81 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 	if ( !strcmp( cmd, "vchat" ) ) {
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
 		CG_VoiceChat( SAY_ALL );
 		return;
 	}
 
 	if ( !strcmp( cmd, "vtchat" ) ) {
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
 		CG_VoiceChat( SAY_TEAM );
 		return;
 	}
 
 	if ( !strcmp( cmd, "vtell" ) ) {
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
 		CG_VoiceChat( SAY_TELL );
 		return;
 	}
 
 	if ( !strcmp( cmd, "scores" ) ) {
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
 		CG_ParseScores();
 		return;
 	}
 
 	if ( !strcmp( cmd, "tinfo" ) ) {
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
 		CG_ParseTeamInfo();
 		return;
 	}
 
 	if ( !strcmp( cmd, "map_restart" ) ) {
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
 		CG_MapRestart();
 		return;
 	}
 
 	if ( Q_stricmp (cmd, "remapShader") == 0 )
 	{
-		if (trap_Argc() == 4)
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
+		if (trap_Argc() == start+4)
 		{
 			char shader1[MAX_QPATH];
 			char shader2[MAX_QPATH];
 			char shader3[MAX_QPATH];
 
-			Q_strncpyz(shader1, CG_Argv(1), sizeof(shader1));
-			Q_strncpyz(shader2, CG_Argv(2), sizeof(shader2));
-			Q_strncpyz(shader3, CG_Argv(3), sizeof(shader3));
+			Q_strncpyz(shader1, CG_Argv(start+1), sizeof(shader1));
+			Q_strncpyz(shader2, CG_Argv(start+2), sizeof(shader2));
+			Q_strncpyz(shader3, CG_Argv(start+3), sizeof(shader3));
 
 			trap_R_RemapShader(shader1, shader2, shader3);
 		}
@@ -1272,6 +1352,11 @@ static void CG_ServerCommand( void ) {
 	if ( !strcmp( cmd, "loaddefered" ) ) 	// FIXME: spelled wrong, but not changing for demo
 #endif
 	{
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			return;
+		}
+#endif
 		CG_LoadDeferredPlayers();
 		return;
 	}
@@ -1287,22 +1372,22 @@ static void CG_ServerCommand( void ) {
 	if ( !strcmp( cmd, "spPlayer" ) ) {
 		int cmdArgc = trap_Argc();
 
-		if (cmdArgc > 1)
+		if (cmdArgc > start+1)
 		{
 			if (cg_singlePlayerActive.integer)
 			{
-				trap_Cvar_Set("spmodel", CG_Argv(1));
-				if (cmdArgc > 2) {
-					trap_Cvar_Set("spheadmodel", CG_Argv(2));
+				trap_Cvar_Set("spmodel", CG_Argv(start+1));
+				if (cmdArgc > start+2) {
+					trap_Cvar_Set("spheadmodel", CG_Argv(start+2));
 				} else {
 					trap_Cvar_Set("spheadmodel", "");
 				}
 			}
 			else if (cgs.gametype == GT_SINGLE_PLAYER)
 			{
-				trap_Cvar_Set("model", CG_Argv(1));
-				if (cmdArgc > 2) {
-					trap_Cvar_Set("headmodel", CG_Argv(2));
+				trap_Cvar_Set("model", CG_Argv(start+1));
+				if (cmdArgc > start+2) {
+					trap_Cvar_Set("headmodel", CG_Argv(start+2));
 				} else {
 					trap_Cvar_Set("headmodel", "");
 				}

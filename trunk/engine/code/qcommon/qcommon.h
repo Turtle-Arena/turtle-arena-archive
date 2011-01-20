@@ -138,7 +138,11 @@ NET
 
 #define	PORT_ANY			-1
 
+#ifdef TA_SPLITVIEW
+#define	MAX_RELIABLE_COMMANDS	128			// max string commands buffered for restransmit
+#else
 #define	MAX_RELIABLE_COMMANDS	64			// max string commands buffered for restransmit
+#endif
 
 typedef enum {
 	NA_BAD = 0,					// an address lookup failed

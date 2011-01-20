@@ -138,11 +138,21 @@ not have future snapshot_t executed before it is executed
 */
 void SV_AddServerCommand( client_t *client, const char *cmd ) {
 	int		index, i;
-
 #ifdef TA_SPLITVIEW
-	// Don't send to extra local client.
+	int 	lc = 0;
+
+	// Send command to owner, but prepend it with "lc# "
 	if (client->owner != -1) {
-		return;
+		int clientNum = client - svs.clients;
+
+		client = svs.clients + client->owner;
+
+		for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+			if (client->local_clients[i] == clientNum) {
+				lc = i+1;
+				break;
+			}
+		}
 	}
 #endif
 
@@ -166,11 +176,21 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 		for ( i = client->reliableAcknowledge + 1 ; i <= client->reliableSequence ; i++ ) {
 			Com_Printf( "cmd %5d: %s\n", i, client->reliableCommands[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 		}
+#ifdef TA_SPLITVIEW
+		if (lc != 0) {
+			Com_Printf( "cmd %5d: lc%d %s\n", i, lc, cmd );
+		} else
+#endif
 		Com_Printf( "cmd %5d: %s\n", i, cmd );
 		SV_DropClient( client, "Server command overflow" );
 		return;
 	}
 	index = client->reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
+#ifdef TA_SPLITVIEW
+	if (lc != 0) {
+		Q_snprintf(client->reliableCommands[ index ], sizeof( client->reliableCommands[ index ] ), "lc%d %s", lc, cmd);
+	} else
+#endif
 	Q_strncpyz( client->reliableCommands[ index ], cmd, sizeof( client->reliableCommands[ index ] ) );
 }
 
@@ -214,6 +234,12 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 
 	// send the data to all relevent clients
 	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
+#ifdef TA_SPLITVIEW
+		// Don't sent print for each local client
+		if (client->owner != -1 && !strncmp( (char *)message, "print", 5)) {
+			continue;
+		}
+#endif
 		SV_AddServerCommand( client, (char *)message );
 	}
 }
