@@ -1237,21 +1237,27 @@ static void Controls_GetConfig( void )
 #endif
 	}
 
-#ifndef TURTLEARENA // ALWAYS_RUN
-	s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ) ) );
-#endif
-#ifndef TA_WEAPSYS_EX
-	s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) ) );
-#endif
-
 #ifdef TA_SPLITVIEW
 	if (s_controls.localClient != 0) {
+#ifndef TURTLEARENA // ALWAYS_RUN
+		s_controls.alwaysrun.curvalue = UI_ClampCvar( 0, 1, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ) ) );
+#endif
+#ifndef TA_WEAPSYS_EX
+		s_controls.autoswitch.curvalue = UI_ClampCvar( 0, 1, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) ) );
+#endif
+
 		return;
 	}
 #endif
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarValue( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "m_filter" ) );
+#ifndef TURTLEARENA // ALWAYS_RUN
+	s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_run" ) );
+#endif
+#ifndef TA_WEAPSYS_EX
+	s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cg_autoswitch" ) );
+#endif
 	s_controls.sensitivity.curvalue  = UI_ClampCvar( 2, 30, Controls_GetCvarValue( "sensitivity" ) );
 	s_controls.joyenable.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "in_joystick" ) );
 	s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( "joy_threshold" ) );
@@ -1301,15 +1307,15 @@ static void Controls_SetConfig( void )
 #endif
 	}
 
-#ifndef TURTLEARENA // ALWAYS_RUN
-	trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ), s_controls.alwaysrun.curvalue );
-#endif
-#ifndef TA_WEAPSYS_EX
-	trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ), s_controls.autoswitch.curvalue );
-#endif
-
 #ifdef TA_SPLITVIEW
 	if (s_controls.localClient != 0) {
+#ifndef TURTLEARENA // ALWAYS_RUN
+		trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ), s_controls.alwaysrun.curvalue );
+#endif
+#ifndef TA_WEAPSYS_EX
+		trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ), s_controls.autoswitch.curvalue );
+#endif
+
 		trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
 		return;
 	}
@@ -1321,6 +1327,12 @@ static void Controls_SetConfig( void )
 		trap_Cvar_SetValue( "m_pitch", fabs( trap_Cvar_VariableValue( "m_pitch" ) ) );
 
 	trap_Cvar_SetValue( "m_filter", s_controls.smoothmouse.curvalue );
+#ifndef TURTLEARENA // ALWAYS_RUN
+	trap_Cvar_SetValue( "cl_run", s_controls.alwaysrun.curvalue );
+#endif
+#ifndef TA_WEAPSYS_EX
+	trap_Cvar_SetValue( "cg_autoswitch", s_controls.autoswitch.curvalue );
+#endif
 	trap_Cvar_SetValue( "sensitivity", s_controls.sensitivity.curvalue );
 	trap_Cvar_SetValue( "in_joystick", s_controls.joyenable.curvalue );
 	trap_Cvar_SetValue( "joy_threshold", s_controls.joythreshold.curvalue );
@@ -1369,21 +1381,27 @@ static void Controls_SetDefaults( void )
 		bindptr->bind2 = bindptr->defaultbind2;
 	}
 
-#ifndef TURTLEARENA // ALWAYS_RUN
-	s_controls.alwaysrun.curvalue    = Controls_GetCvarDefault( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ) );
-#endif
-#ifndef TA_WEAPSYS_EX
-	s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) );
-#endif
-
 #ifdef TA_SPLITVIEW
 	if (s_controls.localClient != 0) {
+#ifndef TURTLEARENA // ALWAYS_RUN
+		s_controls.alwaysrun.curvalue = Controls_GetCvarDefault( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ) );
+#endif
+#ifndef TA_WEAPSYS_EX
+		s_controls.autoswitch.curvalue = Controls_GetCvarDefault( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) );
+#endif
+
 		return;
 	}
 #endif
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarDefault( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = Controls_GetCvarDefault( "m_filter" );
+#ifndef TURTLEARENA // ALWAYS_RUN
+	s_controls.alwaysrun.curvalue    = Controls_GetCvarDefault( "cl_run" );
+#endif
+#ifndef TA_WEAPSYS_EX
+	s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( "cg_autoswitch" );
+#endif
 	s_controls.sensitivity.curvalue  = Controls_GetCvarDefault( "sensitivity" );
 	s_controls.joyenable.curvalue    = Controls_GetCvarDefault( "in_joystick" );
 	s_controls.joythreshold.curvalue = Controls_GetCvarDefault( "joy_threshold" );
