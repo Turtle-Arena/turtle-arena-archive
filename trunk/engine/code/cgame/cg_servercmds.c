@@ -64,47 +64,55 @@ CG_ParseScores
 
 =================
 */
-static void CG_ParseScores( void ) {
+#ifdef TA_SPLITVIEW
+static void CG_ParseScores( int start )
+#else
+static void CG_ParseScores( void )
+#endif
+{
+#ifndef TA_SPLITVIEW
+	const int	start = 0;
+#endif
 	int		i, powerups;
 
-	cg.numScores = atoi( CG_Argv( 1 ) );
+	cg.numScores = atoi( CG_Argv( 1 + start) );
 	if ( cg.numScores > MAX_CLIENTS ) {
 		cg.numScores = MAX_CLIENTS;
 	}
 
-	cg.teamScores[0] = atoi( CG_Argv( 2 ) );
-	cg.teamScores[1] = atoi( CG_Argv( 3 ) );
+	cg.teamScores[0] = atoi( CG_Argv( 2 + start) );
+	cg.teamScores[1] = atoi( CG_Argv( 3 + start) );
 
 	memset( cg.scores, 0, sizeof( cg.scores ) );
 	for ( i = 0 ; i < cg.numScores ; i++ ) {
 		//
 #ifdef TURTLEARENA // AWARDS
-		cg.scores[i].client = atoi( CG_Argv( i * 11 + 4 ) );
-		cg.scores[i].score = atoi( CG_Argv( i * 11 + 5 ) );
-		cg.scores[i].ping = atoi( CG_Argv( i * 11 + 6 ) );
-		cg.scores[i].time = atoi( CG_Argv( i * 11 + 7 ) );
-		cg.scores[i].scoreFlags = atoi( CG_Argv( i * 11 + 8 ) );
-		powerups = atoi( CG_Argv( i * 11 + 9 ) );
-		cg.scores[i].accuracy = atoi(CG_Argv(i * 11 + 10));
-		cg.scores[i].defendCount = atoi(CG_Argv(i * 11 + 11));
-		cg.scores[i].assistCount = atoi(CG_Argv(i * 11 + 12));
-		cg.scores[i].perfect = atoi(CG_Argv(i * 11 + 13));
-		cg.scores[i].captures = atoi(CG_Argv(i * 11 + 14));
+		cg.scores[i].client = atoi( CG_Argv( i * 11 + 4 + start) );
+		cg.scores[i].score = atoi( CG_Argv( i * 11 + 5 + start) );
+		cg.scores[i].ping = atoi( CG_Argv( i * 11 + 6 + start) );
+		cg.scores[i].time = atoi( CG_Argv( i * 11 + 7 + start) );
+		cg.scores[i].scoreFlags = atoi( CG_Argv( i * 11 + 8 + start) );
+		powerups = atoi( CG_Argv( i * 11 + 9 + start) );
+		cg.scores[i].accuracy = atoi(CG_Argv(i * 11 + 10 + start));
+		cg.scores[i].defendCount = atoi(CG_Argv(i * 11 + 11 + start));
+		cg.scores[i].assistCount = atoi(CG_Argv(i * 11 + 12 + start));
+		cg.scores[i].perfect = atoi(CG_Argv(i * 11 + 13 + start));
+		cg.scores[i].captures = atoi(CG_Argv(i * 11 + 14 + start));
 #else
-		cg.scores[i].client = atoi( CG_Argv( i * 14 + 4 ) );
-		cg.scores[i].score = atoi( CG_Argv( i * 14 + 5 ) );
-		cg.scores[i].ping = atoi( CG_Argv( i * 14 + 6 ) );
-		cg.scores[i].time = atoi( CG_Argv( i * 14 + 7 ) );
-		cg.scores[i].scoreFlags = atoi( CG_Argv( i * 14 + 8 ) );
-		powerups = atoi( CG_Argv( i * 14 + 9 ) );
-		cg.scores[i].accuracy = atoi(CG_Argv(i * 14 + 10));
-		cg.scores[i].impressiveCount = atoi(CG_Argv(i * 14 + 11));
-		cg.scores[i].excellentCount = atoi(CG_Argv(i * 14 + 12));
-		cg.scores[i].guantletCount = atoi(CG_Argv(i * 14 + 13));
-		cg.scores[i].defendCount = atoi(CG_Argv(i * 14 + 14));
-		cg.scores[i].assistCount = atoi(CG_Argv(i * 14 + 15));
-		cg.scores[i].perfect = atoi(CG_Argv(i * 14 + 16));
-		cg.scores[i].captures = atoi(CG_Argv(i * 14 + 17));
+		cg.scores[i].client = atoi( CG_Argv( i * 14 + 4 + start) );
+		cg.scores[i].score = atoi( CG_Argv( i * 14 + 5 + start) );
+		cg.scores[i].ping = atoi( CG_Argv( i * 14 + 6 + start) );
+		cg.scores[i].time = atoi( CG_Argv( i * 14 + 7 + start) );
+		cg.scores[i].scoreFlags = atoi( CG_Argv( i * 14 + 8 + start) );
+		powerups = atoi( CG_Argv( i * 14 + 9 + start) );
+		cg.scores[i].accuracy = atoi(CG_Argv(i * 14 + 10 + start));
+		cg.scores[i].impressiveCount = atoi(CG_Argv(i * 14 + 11 + start));
+		cg.scores[i].excellentCount = atoi(CG_Argv(i * 14 + 12 + start));
+		cg.scores[i].guantletCount = atoi(CG_Argv(i * 14 + 13 + start));
+		cg.scores[i].defendCount = atoi(CG_Argv(i * 14 + 14 + start));
+		cg.scores[i].assistCount = atoi(CG_Argv(i * 14 + 15 + start));
+		cg.scores[i].perfect = atoi(CG_Argv(i * 14 + 16 + start));
+		cg.scores[i].captures = atoi(CG_Argv(i * 14 + 17 + start));
 #endif
 
 		if ( cg.scores[i].client < 0 || cg.scores[i].client >= MAX_CLIENTS ) {
@@ -1294,11 +1302,10 @@ static void CG_ServerCommand( void ) {
 
 	if ( !strcmp( cmd, "scores" ) ) {
 #ifdef TA_SPLITVIEW
-		if (lc != 0) {
-			return;
-		}
-#endif
+		CG_ParseScores(start);
+#else
 		CG_ParseScores();
+#endif
 		return;
 	}
 
