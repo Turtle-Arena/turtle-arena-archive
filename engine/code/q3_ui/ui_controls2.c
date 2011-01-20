@@ -646,7 +646,47 @@ static menucommon_s **g_controls[] = {
 };
 
 #ifdef TA_SPLITVIEW
-static menucommon_s *g_looking_nomouse_nojoy_controls[] = {
+static menucommon_s *g_movement_mini_controls[] =
+{
+#ifdef TURTLEARENA // LOCKON
+	(menucommon_s *)&s_controls.lockon,
+#endif
+#ifndef TURTLEARENA // NO_SPEED_KEY
+	(menucommon_s *)&s_controls.run,
+#endif
+	(menucommon_s *)&s_controls.walkforward,
+	(menucommon_s *)&s_controls.backpedal,
+	(menucommon_s *)&s_controls.stepleft,
+	(menucommon_s *)&s_controls.stepright,
+	(menucommon_s *)&s_controls.moveup,
+	(menucommon_s *)&s_controls.movedown,
+	(menucommon_s *)&s_controls.turnleft,
+	(menucommon_s *)&s_controls.turnright,
+	(menucommon_s *)&s_controls.sidestep,
+	NULL
+};
+
+static menucommon_s *g_weapons_mini_controls[] = {
+	(menucommon_s *)&s_controls.attack,
+#ifdef TA_WEAPSYS_EX
+	(menucommon_s *)&s_controls.dropweapon,
+#else
+	(menucommon_s *)&s_controls.nextweapon,
+	(menucommon_s *)&s_controls.prevweapon,
+	(menucommon_s *)&s_controls.chainsaw,
+	(menucommon_s *)&s_controls.machinegun,
+	(menucommon_s *)&s_controls.shotgun,
+	(menucommon_s *)&s_controls.grenadelauncher,
+	(menucommon_s *)&s_controls.rocketlauncher,
+	(menucommon_s *)&s_controls.lightning,
+	(menucommon_s *)&s_controls.railgun,
+	(menucommon_s *)&s_controls.plasma,
+	(menucommon_s *)&s_controls.bfg,
+#endif
+	NULL,
+};
+
+static menucommon_s *g_looking_mini_controls[] = {
 	(menucommon_s *)&s_controls.lookup,
 	(menucommon_s *)&s_controls.lookdown,
 	(menucommon_s *)&s_controls.centerview,
@@ -656,7 +696,31 @@ static menucommon_s *g_looking_nomouse_nojoy_controls[] = {
 	NULL,
 };
 
+static menucommon_s *g_misc_mini_controls[] = {
+#ifdef TA_MISC // DROP_FLAG
+	(menucommon_s *)&s_controls.dropflag,
+#endif
+	(menucommon_s *)&s_controls.useitem,
+#ifdef TA_HOLDSYS/*2*/
+	(menucommon_s *)&s_controls.nextitem,
+	(menucommon_s *)&s_controls.previtem,
+#endif
+	(menucommon_s *)&s_controls.gesture,
+	NULL,
+};
+
 static menucommon_s *g_unused_controls[] = {
+	// movement
+#ifndef TURTLEARENA // ALWAYS_RUN
+	(menucommon_s *)&s_controls.alwaysrun,
+#endif
+
+	// weapons
+#ifndef TA_WEAPSYS_EX
+	(menucommon_s *)&s_controls.autoswitch,
+#endif
+
+	// looking
 	(menucommon_s *)&s_controls.sensitivity,
 	(menucommon_s *)&s_controls.smoothmouse,
 	(menucommon_s *)&s_controls.invertmouse,
@@ -664,14 +728,21 @@ static menucommon_s *g_unused_controls[] = {
 	(menucommon_s *)&s_controls.freelook,
 	(menucommon_s *)&s_controls.joyenable,
 	(menucommon_s *)&s_controls.joythreshold,
+
+	// misc
+	(menucommon_s *)&s_controls.showscores,
+	(menucommon_s *)&s_controls.chat,
+	(menucommon_s *)&s_controls.chat2,
+	(menucommon_s *)&s_controls.chat3,
+	(menucommon_s *)&s_controls.chat4,
 	NULL,
 };
 
-static menucommon_s **g_nomouse_nojoy_controls[] = {
-	g_movement_controls,
-	g_looking_nomouse_nojoy_controls,
-	g_weapons_controls,
-	g_misc_controls,
+static menucommon_s **g_mini_controls[] = {
+	g_movement_mini_controls,
+	g_looking_mini_controls,
+	g_weapons_mini_controls,
+	g_misc_mini_controls,
 	g_unused_controls, // dummy controls that are not used but are disabled so they are not seen.
 	NULL
 };
@@ -1720,7 +1791,7 @@ static void Controls_MenuInit( void )
 		s_controls.controls = g_controls;
 		s_controls.bindings = g_bindings;
 	} else {
-		s_controls.controls = g_nomouse_nojoy_controls;
+		s_controls.controls = g_mini_controls;
 
 		if (s_controls.localClient == 1) {
 			s_controls.bindings = g_bindings2;
