@@ -161,7 +161,11 @@ vmCvar_t	cg_tracerChance;
 vmCvar_t	cg_tracerWidth;
 vmCvar_t	cg_tracerLength;
 #ifndef TA_WEAPSYS_EX
+#ifdef TA_SPLITVIEW
+vmCvar_t	cg_autoswitch[MAX_SPLITVIEW];
+#else
 vmCvar_t	cg_autoswitch;
+#endif
 #endif
 vmCvar_t	cg_ignore;
 vmCvar_t	cg_simpleItems;
@@ -274,7 +278,14 @@ typedef struct {
 static cvarTable_t cvarTable[] = {
 	{ &cg_ignore, "cg_ignore", "0", 0 },	// used for debugging
 #ifndef TA_WEAPSYS_EX
+#ifdef TA_SPLITVIEW
+	{ &cg_autoswitch[0], "cg_autoswitch", "1", CVAR_ARCHIVE },
+	{ &cg_autoswitch[1], "2cg_autoswitch", "1", CVAR_ARCHIVE },
+	{ &cg_autoswitch[2], "3cg_autoswitch", "1", CVAR_ARCHIVE },
+	{ &cg_autoswitch[3], "4cg_autoswitch", "1", CVAR_ARCHIVE },
+#else
 	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
+#endif
 #endif
 #ifdef TURTLEARENA // First person weapons are currently unsupported.
 	{ &cg_drawGun, "cg_drawGun", "0", CVAR_ARCHIVE },

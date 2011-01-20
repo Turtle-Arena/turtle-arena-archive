@@ -542,11 +542,25 @@ bind_t *g_bindings_list[MAX_SPLITVIEW] =
 static configcvar_t g_configcvars[] =
 {
 #ifndef TURTLEARENA // ALWAYS_RUN
+#ifdef TA_SPLITVIEW
 	{"cl_run",			0,					0},
+	{"2cl_run",			0,					0},
+	{"3cl_run",			0,					0},
+	{"4cl_run",			0,					0},
+#else
+	{"cl_run",			0,					0},
+#endif
 #endif
 	{"m_pitch",			0,					0},
 #ifndef TA_WEAPSYS_EX
+#ifdef TA_SPLITVIEW
 	{"cg_autoswitch",	0,					0},
+	{"2cg_autoswitch",	0,					0},
+	{"3cg_autoswitch",	0,					0},
+	{"4cg_autoswitch",	0,					0},
+#else
+	{"cg_autoswitch",	0,					0},
+#endif
 #endif
 	{"sensitivity",		0,					0},
 	{"in_joystick",		0,					0},
@@ -646,46 +660,6 @@ static menucommon_s **g_controls[] = {
 };
 
 #ifdef TA_SPLITVIEW
-static menucommon_s *g_movement_mini_controls[] =
-{
-#ifdef TURTLEARENA // LOCKON
-	(menucommon_s *)&s_controls.lockon,
-#endif
-#ifndef TURTLEARENA // NO_SPEED_KEY
-	(menucommon_s *)&s_controls.run,
-#endif
-	(menucommon_s *)&s_controls.walkforward,
-	(menucommon_s *)&s_controls.backpedal,
-	(menucommon_s *)&s_controls.stepleft,
-	(menucommon_s *)&s_controls.stepright,
-	(menucommon_s *)&s_controls.moveup,
-	(menucommon_s *)&s_controls.movedown,
-	(menucommon_s *)&s_controls.turnleft,
-	(menucommon_s *)&s_controls.turnright,
-	(menucommon_s *)&s_controls.sidestep,
-	NULL
-};
-
-static menucommon_s *g_weapons_mini_controls[] = {
-	(menucommon_s *)&s_controls.attack,
-#ifdef TA_WEAPSYS_EX
-	(menucommon_s *)&s_controls.dropweapon,
-#else
-	(menucommon_s *)&s_controls.nextweapon,
-	(menucommon_s *)&s_controls.prevweapon,
-	(menucommon_s *)&s_controls.chainsaw,
-	(menucommon_s *)&s_controls.machinegun,
-	(menucommon_s *)&s_controls.shotgun,
-	(menucommon_s *)&s_controls.grenadelauncher,
-	(menucommon_s *)&s_controls.rocketlauncher,
-	(menucommon_s *)&s_controls.lightning,
-	(menucommon_s *)&s_controls.railgun,
-	(menucommon_s *)&s_controls.plasma,
-	(menucommon_s *)&s_controls.bfg,
-#endif
-	NULL,
-};
-
 static menucommon_s *g_looking_mini_controls[] = {
 	(menucommon_s *)&s_controls.lookup,
 	(menucommon_s *)&s_controls.lookdown,
@@ -710,16 +684,6 @@ static menucommon_s *g_misc_mini_controls[] = {
 };
 
 static menucommon_s *g_unused_controls[] = {
-	// movement
-#ifndef TURTLEARENA // ALWAYS_RUN
-	(menucommon_s *)&s_controls.alwaysrun,
-#endif
-
-	// weapons
-#ifndef TA_WEAPSYS_EX
-	(menucommon_s *)&s_controls.autoswitch,
-#endif
-
 	// looking
 	(menucommon_s *)&s_controls.sensitivity,
 	(menucommon_s *)&s_controls.smoothmouse,
@@ -739,9 +703,9 @@ static menucommon_s *g_unused_controls[] = {
 };
 
 static menucommon_s **g_mini_controls[] = {
-	g_movement_mini_controls,
+	g_movement_controls,
 	g_looking_mini_controls,
-	g_weapons_mini_controls,
+	g_weapons_controls,
 	g_misc_mini_controls,
 	g_unused_controls, // dummy controls that are not used but are disabled so they are not seen.
 	NULL
@@ -1273,6 +1237,13 @@ static void Controls_GetConfig( void )
 #endif
 	}
 
+#ifndef TURTLEARENA // ALWAYS_RUN
+	s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ) ) );
+#endif
+#ifndef TA_WEAPSYS_EX
+	s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) ) );
+#endif
+
 #ifdef TA_SPLITVIEW
 	if (s_controls.localClient != 0) {
 		return;
@@ -1281,12 +1252,6 @@ static void Controls_GetConfig( void )
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarValue( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "m_filter" ) );
-#ifndef TURTLEARENA // ALWAYS_RUN
-	s_controls.alwaysrun.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_run" ) );
-#endif
-#ifndef TA_WEAPSYS_EX
-	s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cg_autoswitch" ) );
-#endif
 	s_controls.sensitivity.curvalue  = UI_ClampCvar( 2, 30, Controls_GetCvarValue( "sensitivity" ) );
 	s_controls.joyenable.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "in_joystick" ) );
 	s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( "joy_threshold" ) );
@@ -1336,6 +1301,13 @@ static void Controls_SetConfig( void )
 #endif
 	}
 
+#ifndef TURTLEARENA // ALWAYS_RUN
+	trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ), s_controls.alwaysrun.curvalue );
+#endif
+#ifndef TA_WEAPSYS_EX
+	trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ), s_controls.autoswitch.curvalue );
+#endif
+
 #ifdef TA_SPLITVIEW
 	if (s_controls.localClient != 0) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
@@ -1349,12 +1321,6 @@ static void Controls_SetConfig( void )
 		trap_Cvar_SetValue( "m_pitch", fabs( trap_Cvar_VariableValue( "m_pitch" ) ) );
 
 	trap_Cvar_SetValue( "m_filter", s_controls.smoothmouse.curvalue );
-#ifndef TURTLEARENA // ALWAYS_RUN
-	trap_Cvar_SetValue( "cl_run", s_controls.alwaysrun.curvalue );
-#endif
-#ifndef TA_WEAPSYS_EX
-	trap_Cvar_SetValue( "cg_autoswitch", s_controls.autoswitch.curvalue );
-#endif
 	trap_Cvar_SetValue( "sensitivity", s_controls.sensitivity.curvalue );
 	trap_Cvar_SetValue( "in_joystick", s_controls.joyenable.curvalue );
 	trap_Cvar_SetValue( "joy_threshold", s_controls.joythreshold.curvalue );
@@ -1403,6 +1369,13 @@ static void Controls_SetDefaults( void )
 		bindptr->bind2 = bindptr->defaultbind2;
 	}
 
+#ifndef TURTLEARENA // ALWAYS_RUN
+	s_controls.alwaysrun.curvalue    = Controls_GetCvarDefault( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ) );
+#endif
+#ifndef TA_WEAPSYS_EX
+	s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) );
+#endif
+
 #ifdef TA_SPLITVIEW
 	if (s_controls.localClient != 0) {
 		return;
@@ -1411,12 +1384,6 @@ static void Controls_SetDefaults( void )
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarDefault( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = Controls_GetCvarDefault( "m_filter" );
-#ifndef TURTLEARENA // ALWAYS_RUN
-	s_controls.alwaysrun.curvalue    = Controls_GetCvarDefault( "cl_run" );
-#endif
-#ifndef TA_WEAPSYS_EX
-	s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( "cg_autoswitch" );
-#endif
 	s_controls.sensitivity.curvalue  = Controls_GetCvarDefault( "sensitivity" );
 	s_controls.joyenable.curvalue    = Controls_GetCvarDefault( "in_joystick" );
 	s_controls.joythreshold.curvalue = Controls_GetCvarDefault( "joy_threshold" );
@@ -1877,7 +1844,7 @@ static void Controls_MenuInit( void )
 	s_controls.misc.style			= UI_RIGHT;
 	s_controls.misc.color			= text_big_color;
 
-#ifdef TA_MISC
+#ifdef IOQ3ZTM
 	s_controls.defaults.generic.type		= MTYPE_PTEXT;
 	s_controls.defaults.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_controls.defaults.generic.id			= ID_DEFAULTS;

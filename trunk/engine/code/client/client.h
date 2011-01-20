@@ -409,7 +409,13 @@ extern	cvar_t	*cl_freezeDemo;
 
 extern	cvar_t	*cl_yawspeed;
 extern	cvar_t	*cl_pitchspeed;
+#ifndef TURTLEARENA // ALWAYS_RUN
+#ifdef TA_SPLITVIEW
+extern	cvar_t	*cl_run[MAX_SPLITVIEW];
+#else
 extern	cvar_t	*cl_run;
+#endif
+#endif
 extern	cvar_t	*cl_anglespeedkey;
 
 extern	cvar_t	*cl_sensitivity;
