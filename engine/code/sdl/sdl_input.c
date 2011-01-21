@@ -599,6 +599,14 @@ static int joy_keys[MAX_SPLITVIEW][16] = {
 static int joy_keys[16] = {
 	K_LEFTARROW, K_RIGHTARROW,
 	K_UPARROW, K_DOWNARROW,
+#ifdef IOQ3ZTM // ZTM: Starting at 16 seemed odd after looking at hat_keys.
+	K_JOY17, K_JOY18,
+	K_JOY19, K_JOY20,
+	K_JOY21, K_JOY22,
+	K_JOY23, K_JOY24,
+	K_JOY25, K_JOY26,
+	K_JOY27, K_JOY28
+#else
 	K_JOY16, K_JOY17,
 	K_JOY18, K_JOY19,
 	K_JOY20, K_JOY21,
@@ -606,6 +614,7 @@ static int joy_keys[16] = {
 
 	K_JOY24, K_JOY25,
 	K_JOY26, K_JOY27
+#endif
 };
 #endif
 
