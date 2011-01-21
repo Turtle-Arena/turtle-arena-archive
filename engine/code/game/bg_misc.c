@@ -4067,7 +4067,7 @@ qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt)
 qboolean BG_WeapUseAmmo(weapon_t w)
 {
 	// Check if the weapon group uses ammo
-	return (bg_weapongroupinfo[w].item->quantity > 0);
+	return (bg_weapongroupinfo[w].item && bg_weapongroupinfo[w].item->quantity > 0);
 }
 
 /*
