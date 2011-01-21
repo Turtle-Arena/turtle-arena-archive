@@ -57,8 +57,11 @@ typedef struct {
 
 	menubitmap_s	back;
 
-	char joystickNames[ MAX_JOYSTICKS ][ 61 ];
-	int numJoysticks;
+	char			joystickNames[ MAX_JOYSTICKS ][ 61 ];
+	int				numJoysticks;
+
+	int				originalJoystick;
+	qboolean		changed;
 
 #ifdef TA_SPLITVIEW
 	int localClient;
@@ -101,12 +104,18 @@ static void UI_JoystickMenu_Event( void *ptr, int event ) {
 		// Select joystick.
 		((menucommon_s*)ptr)->flags &= ~QMF_PULSEIFFOCUS;
 		((menucommon_s*)ptr)->flags |= (QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
+
+		joystickMenu.changed = (joystick != joystickMenu.originalJoystick);
 		return;
 	}
 
 	switch( ((menucommon_s*)ptr)->id ) {
 
 	case ID_BACK:
+		if (joystickMenu.changed) {
+			trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
+		}
+
 		UI_PopMenu();
 		break;
 	}
@@ -313,7 +322,7 @@ static void UI_Joystick_MenuInit( void )
 {
 	int				y;
 	int				i;
-	int				joystick, joystickNo;
+	int				joystick;
 
 	UI_Joystick_Cache();
 
@@ -392,21 +401,22 @@ static void UI_Joystick_MenuInit( void )
 
 	Menu_AddItem( &joystickMenu.menu, &joystickMenu.back );
 
-	// Select joystick
-	joystick = (int)trap_Cvar_VariableValue(UI_LocalClientCvarName(joystickMenu.localClient, "in_joystick"));
-
-	if (!joystick) {
-		joystickNo = 0;
+	// Store original joystick
+	if (trap_Cvar_VariableValue(UI_LocalClientCvarName(joystickMenu.localClient, "in_joystick")) == 0) {
+		joystick = 0;
 	} else {
-		joystickNo = 1+(int)trap_Cvar_VariableValue(UI_LocalClientCvarName(joystickMenu.localClient, "in_joystickNo"));
+		joystick = 1+(int)trap_Cvar_VariableValue(UI_LocalClientCvarName(joystickMenu.localClient, "in_joystickNo"));
 	}
 
-	if (joystickNo < 0 || joystickNo >= MAX_JOYSTICKS) {
-		joystickNo = 0;
+	if (joystick < 0 || joystick >= MAX_JOYSTICKS) {
+		joystick = 0;
 	}
 
-	joystickMenu.joysticks[joystickNo].generic.flags &= ~QMF_PULSEIFFOCUS;
-	joystickMenu.joysticks[joystickNo].generic.flags |= (QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
+	joystickMenu.originalJoystick = joystick;
+
+	// Select joystick
+	joystickMenu.joysticks[joystick].generic.flags &= ~QMF_PULSEIFFOCUS;
+	joystickMenu.joysticks[joystick].generic.flags |= (QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
 }
 
 /*

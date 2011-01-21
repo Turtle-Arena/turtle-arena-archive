@@ -571,10 +571,19 @@ static configcvar_t g_configcvars[] =
 #endif
 #endif
 	{"sensitivity",		0,					0},
-#ifndef IOQ3ZTM // SELECT_JOYSTICK
-	{"in_joystick",		0,					0},
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+#ifdef TA_SPLITVIEW
+	{"in_joystickThreshold",	0,			0},
+	{"2in_joystickThreshold",	0,			0},
+	{"3in_joystickThreshold",	0,			0},
+	{"4in_joystickThreshold",	0,			0},
+#else
+	{"in_joystickThreshold",	0,			0},
 #endif
+#else
+	{"in_joystick",		0,					0},
 	{"joy_threshold",	0,					0},
+#endif
 	{"m_filter",		0,					0},
 	{"cl_freelook",		0,					0},
 	{NULL,				0,					0}
@@ -1304,7 +1313,11 @@ static void Controls_GetConfig( void )
 #ifndef TA_WEAPSYS_EX
 		s_controls.autoswitch.curvalue = UI_ClampCvar( 0, 1, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) ) );
 #endif
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+		s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ) ) );
+#else
 		s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "joy_threshold" ) ) );
+#endif
 
 		return;
 	}
@@ -1319,10 +1332,12 @@ static void Controls_GetConfig( void )
 	s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cg_autoswitch" ) );
 #endif
 	s_controls.sensitivity.curvalue  = UI_ClampCvar( 2, 30, Controls_GetCvarValue( "sensitivity" ) );
-#ifndef IOQ3ZTM // SELECT_JOYSTICK
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+	s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( "in_joystickThreshold" ) );
+#else
 	s_controls.joyenable.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "in_joystick" ) );
-#endif
 	s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( "joy_threshold" ) );
+#endif
 	s_controls.freelook.curvalue     = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_freelook" ) );
 }
 
@@ -1377,9 +1392,13 @@ static void Controls_SetConfig( void )
 #ifndef TA_WEAPSYS_EX
 		trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ), s_controls.autoswitch.curvalue );
 #endif
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+		trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ), s_controls.joythreshold.curvalue );
+#else
 		trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "joy_threshold" ), s_controls.joythreshold.curvalue );
 
 		trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
+#endif
 		return;
 	}
 #endif
@@ -1397,12 +1416,16 @@ static void Controls_SetConfig( void )
 	trap_Cvar_SetValue( "cg_autoswitch", s_controls.autoswitch.curvalue );
 #endif
 	trap_Cvar_SetValue( "sensitivity", s_controls.sensitivity.curvalue );
-#ifndef IOQ3ZTM // SELECT_JOYSTICK
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+	trap_Cvar_SetValue( "in_joystickThreshold", s_controls.joythreshold.curvalue );
+#else
 	trap_Cvar_SetValue( "in_joystick", s_controls.joyenable.curvalue );
-#endif
 	trap_Cvar_SetValue( "joy_threshold", s_controls.joythreshold.curvalue );
+#endif
 	trap_Cvar_SetValue( "cl_freelook", s_controls.freelook.curvalue );
+#ifndef IOQ3ZTM // SELECT_JOYSTICK
 	trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
+#endif
 }
 
 /*
