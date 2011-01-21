@@ -543,60 +543,56 @@ static void IN_DeactivateMouse( void )
 	}
 }
 
-#ifdef TA_SPLITVIEW // ZTM: TODO: Change keys for extra local clients (K_2JOY1, K_3JOY1, K_4JOY1)
-static int joyKeyStart[MAX_SPLITVIEW] = {K_JOY1, K_JOY1, K_JOY1, K_JOY1};
+#ifdef TA_SPLITVIEW
+static int joyKeyStart[MAX_SPLITVIEW] = {K_JOY1, K_2JOY1, K_3JOY1, K_4JOY1};
 #endif
 
 // We translate axes movement into keypresses
-#ifdef TA_SPLITVIEW // ZTM: TODO: Change keys for extra local clients
+#ifdef TA_SPLITVIEW
 static int joy_keys[MAX_SPLITVIEW][16] = {
 	// Client 1
 	{
 		K_LEFTARROW, K_RIGHTARROW,
 		K_UPARROW, K_DOWNARROW,
-		K_JOY16, K_JOY17,
-		K_JOY18, K_JOY19,
-		K_JOY20, K_JOY21,
-		K_JOY22, K_JOY23,
-
-		K_JOY24, K_JOY25,
-		K_JOY26, K_JOY27
+		K_JOY17, K_JOY18,
+		K_JOY19, K_JOY20,
+		K_JOY21, K_JOY22,
+		K_JOY23, K_JOY24,
+		K_JOY25, K_JOY26,
+		K_JOY27, K_JOY28
 	},
 	// Client 2
 	{
-		K_LEFTARROW, K_RIGHTARROW,
-		K_UPARROW, K_DOWNARROW,
-		K_JOY16, K_JOY17,
-		K_JOY18, K_JOY19,
-		K_JOY20, K_JOY21,
-		K_JOY22, K_JOY23,
-
-		K_JOY24, K_JOY25,
-		K_JOY26, K_JOY27
+		K_2JOY17, K_2JOY18,
+		K_2JOY19, K_2JOY20,
+		K_2JOY21, K_2JOY22,
+		K_2JOY23, K_2JOY24,
+		K_2JOY25, K_2JOY26,
+		K_2JOY27, K_2JOY28,
+		K_2JOY29, K_2JOY30,
+		K_2JOY31, K_2JOY32
 	},
 	// Client 3
 	{
-		K_LEFTARROW, K_RIGHTARROW,
-		K_UPARROW, K_DOWNARROW,
-		K_JOY16, K_JOY17,
-		K_JOY18, K_JOY19,
-		K_JOY20, K_JOY21,
-		K_JOY22, K_JOY23,
-
-		K_JOY24, K_JOY25,
-		K_JOY26, K_JOY27
+		K_3JOY17, K_3JOY18,
+		K_3JOY19, K_3JOY20,
+		K_3JOY21, K_3JOY22,
+		K_3JOY23, K_3JOY24,
+		K_3JOY25, K_3JOY26,
+		K_3JOY27, K_3JOY28,
+		K_3JOY29, K_3JOY30,
+		K_3JOY31, K_3JOY32
 	},
 	// Client 4
 	{
-		K_LEFTARROW, K_RIGHTARROW,
-		K_UPARROW, K_DOWNARROW,
-		K_JOY16, K_JOY17,
-		K_JOY18, K_JOY19,
-		K_JOY20, K_JOY21,
-		K_JOY22, K_JOY23,
-
-		K_JOY24, K_JOY25,
-		K_JOY26, K_JOY27
+		K_4JOY17, K_4JOY18,
+		K_4JOY19, K_4JOY20,
+		K_4JOY21, K_4JOY22,
+		K_4JOY23, K_4JOY24,
+		K_4JOY25, K_4JOY26,
+		K_4JOY27, K_4JOY28,
+		K_4JOY29, K_4JOY30,
+		K_4JOY31, K_4JOY32
 	}
 };
 #else
@@ -615,7 +611,7 @@ static int joy_keys[16] = {
 
 // translate hat events into keypresses
 // the 4 highest buttons are used for the first hat ...
-#ifdef TA_SPLITVIEW // ZTM: TODO: Change keys for extra local clients
+#ifdef TA_SPLITVIEW
 static int hat_keys[MAX_SPLITVIEW][16] = {
 	// Client 1
 	{
@@ -630,36 +626,36 @@ static int hat_keys[MAX_SPLITVIEW][16] = {
 	},
 	// Client 2
 	{
-		K_JOY29, K_JOY30,
-		K_JOY31, K_JOY32,
-		K_JOY25, K_JOY26,
-		K_JOY27, K_JOY28,
-		K_JOY21, K_JOY22,
-		K_JOY23, K_JOY24,
-		K_JOY17, K_JOY18,
-		K_JOY19, K_JOY20
+		K_2JOY29, K_2JOY30,
+		K_2JOY31, K_2JOY32,
+		K_2JOY25, K_2JOY26,
+		K_2JOY27, K_2JOY28,
+		K_2JOY21, K_2JOY22,
+		K_2JOY23, K_2JOY24,
+		K_2JOY17, K_2JOY18,
+		K_2JOY19, K_2JOY20
 	},
 	// Client 3
 	{
-		K_JOY29, K_JOY30,
-		K_JOY31, K_JOY32,
-		K_JOY25, K_JOY26,
-		K_JOY27, K_JOY28,
-		K_JOY21, K_JOY22,
-		K_JOY23, K_JOY24,
-		K_JOY17, K_JOY18,
-		K_JOY19, K_JOY20
+		K_3JOY29, K_3JOY30,
+		K_3JOY31, K_3JOY32,
+		K_3JOY25, K_3JOY26,
+		K_3JOY27, K_3JOY28,
+		K_3JOY21, K_3JOY22,
+		K_3JOY23, K_3JOY24,
+		K_3JOY17, K_3JOY18,
+		K_3JOY19, K_3JOY20
 	},
 	// Client 4
 	{
-		K_JOY29, K_JOY30,
-		K_JOY31, K_JOY32,
-		K_JOY25, K_JOY26,
-		K_JOY27, K_JOY28,
-		K_JOY21, K_JOY22,
-		K_JOY23, K_JOY24,
-		K_JOY17, K_JOY18,
-		K_JOY19, K_JOY20
+		K_4JOY29, K_4JOY30,
+		K_4JOY31, K_4JOY32,
+		K_4JOY25, K_4JOY26,
+		K_4JOY27, K_4JOY28,
+		K_4JOY21, K_4JOY22,
+		K_4JOY23, K_4JOY24,
+		K_4JOY17, K_4JOY18,
+		K_4JOY19, K_4JOY20
 	}
 };
 #else
