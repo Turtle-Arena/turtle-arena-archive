@@ -698,9 +698,12 @@ static void IN_InitJoystick( void )
 {
 	int i = 0;
 	int total = 0;
-#ifdef TA_SPLITVIEW
 	qboolean joyEnabled = qfalse;
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+	char buf[ MAX_STRING_CHARS ] = { 0 };
+#endif
 
+#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		if (stick[i] != NULL)
 			SDL_JoystickClose(stick[i]);
@@ -712,11 +715,6 @@ static void IN_InitJoystick( void )
 			joyEnabled = qtrue;
 		}
 	}
-
-	if (!joyEnabled) {
-		Com_DPrintf( "Joystick is not active.\n" );
-		return;
-	}
 #else
 	if (stick != NULL)
 		SDL_JoystickClose(stick);
@@ -724,7 +722,13 @@ static void IN_InitJoystick( void )
 	stick = NULL;
 	memset(&stick_state, '\0', sizeof (stick_state));
 
-	if( !in_joystick->integer ) {
+	if( in_joystick->integer ) {
+		joyEnabled = qtrue;
+	}
+#endif
+
+#ifndef IOQ3ZTM // SELECT_JOYSTICK // ZTM: Init joystick and set in_availableJoysticks even if joysticks are currently disabled.
+	if (!joyEnabled) {
 		Com_DPrintf( "Joystick is not active.\n" );
 		return;
 	}
@@ -743,8 +747,35 @@ static void IN_InitJoystick( void )
 
 	total = SDL_NumJoysticks();
 	Com_DPrintf("%d possible joysticks\n", total);
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+	// Print list and build cvar to allow ui to select joystick.
+	for (i = 0; i < total; i++) {
+		const char *newJoystickString = va( "\"%.61s\" ", SDL_JoystickName(i) );
+
+		Com_DPrintf("[%d] %s\n", i, SDL_JoystickName(i));
+
+		if( strlen( newJoystickString ) < (int)sizeof( buf ) - strlen( buf ) )
+			Q_strcat( buf, sizeof( buf ), newJoystickString );
+		else
+			Com_DPrintf( "Skipping joystick %s, buffer too small\n", SDL_JoystickName(i) );
+	}
+
+	if (*buf) {
+		// Remove space at the end of the string
+		buf[ strlen( buf ) - 1 ] = 0;
+	}
+
+	Cvar_Get( "in_availableJoysticks", buf, CVAR_ROM );
+
+	if (!joyEnabled) {
+		Com_DPrintf( "Joystick is not active.\n" );
+		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+		return;
+	}
+#else
 	for (i = 0; i < total; i++)
 		Com_DPrintf("[%d] %s\n", i, SDL_JoystickName(i));
+#endif
 
 #ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
@@ -763,7 +794,7 @@ static void IN_InitJoystick( void )
 			return;
 		}
 
-		Com_DPrintf( "Joystick %d opened\n", in_joystickNo[i]->integer );
+		Com_DPrintf( "Joystick %d opened for player %d\n", in_joystickNo[i]->integer, i+1 );
 		Com_DPrintf( "Name:    %s\n", SDL_JoystickName(in_joystickNo[i]->integer) );
 		Com_DPrintf( "Axes:    %d\n", SDL_JoystickNumAxes(stick[i]) );
 		Com_DPrintf( "Hats:    %d\n", SDL_JoystickNumHats(stick[i]) );

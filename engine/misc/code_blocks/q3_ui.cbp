@@ -133,6 +133,9 @@
 		<Unit filename="../../code/q3_ui/ui_ingame_server.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/q3_ui/ui_joystick.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/q3_ui/ui_loadconfig.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
