@@ -3045,7 +3045,7 @@ static void PM_LadderMove( void ) {
 		wishvel[2] = 0;
 
 		// Snap to 8 unit grid, so player always holds onto ladder correctly!
-		//  (But only if not moving and if on a verticle ladder)
+		//  (But only if not moving and if on a vertical ladder)
 		if (!VectorLength(pm->ps->velocity) && pm->ps->origin2[2] == 0)
 		{
 			float baseZ = (pm->ps->origin[2] + pm->mins[2]);

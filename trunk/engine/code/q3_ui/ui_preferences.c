@@ -63,7 +63,7 @@ GAME OPTIONS MENU
 #endif
 #endif
 #ifdef TA_SPLITVIEW
-#define ID_SPLITVERTICLE		142
+#define ID_SPLITVERTICAL		142
 #endif
 
 #ifdef TA_DATA
@@ -242,7 +242,7 @@ static void Preferences_Event( void* ptr, int notification ) {
 		break;
 
 #ifdef TA_SPLITVIEW
-	case ID_SPLITVERTICLE:
+	case ID_SPLITVERTICAL:
 		trap_Cvar_SetValue( "cg_splitviewVertical", s_preferences.splitvertical.curvalue );
 		break;
 #endif
@@ -477,7 +477,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.splitvertical.generic.name		= "Splitview Mode:";
 	s_preferences.splitvertical.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	s_preferences.splitvertical.generic.callback	= Preferences_Event;
-	s_preferences.splitvertical.generic.id			= ID_SPLITVERTICLE;
+	s_preferences.splitvertical.generic.id			= ID_SPLITVERTICAL;
 	s_preferences.splitvertical.generic.x			= PREFERENCES_X_POS;
 	s_preferences.splitvertical.generic.y			= y;
 	s_preferences.splitvertical.itemnames			= splitvertical_names;
