@@ -793,6 +793,38 @@ qboolean CG_ConsoleCommand( void ) {
 	return qfalse;
 }
 
+#ifdef TA_SPLITVIEW
+/*
+=================
+UI_LocalClientCvarName
+=================
+*/
+char *CG_LocalClientCvarName(int localClient, char *in_cvarName) {
+	static char localClientCvarName[MAX_CVAR_VALUE_STRING];
+
+	if (localClient == 0) {
+		Q_strncpyz(localClientCvarName, in_cvarName, MAX_CVAR_VALUE_STRING);
+	} else {
+		char prefix[2];
+		char *cvarName;
+
+		prefix[1] = '\0';
+
+		cvarName = in_cvarName;
+
+		if (cvarName[0] == '+' || cvarName[0] == '-') {
+			prefix[0] = cvarName[0];
+			cvarName++;
+		} else {
+			prefix[0] = '\0';
+		}
+
+		Q_snprintf(localClientCvarName, MAX_CVAR_VALUE_STRING, "%s%d%s", prefix, localClient+1, cvarName);
+	}
+
+	return localClientCvarName;
+}
+#endif
 
 /*
 =================
@@ -813,6 +845,42 @@ void CG_InitConsoleCommands( void ) {
 	// the game server will interpret these commands, which will be automatically
 	// forwarded to the server after they are not recognized locally
 	//
+#ifdef TA_SPLITVIEW
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		trap_AddCommand(CG_LocalClientCvarName(i, "say"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "say_team"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "tell"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "vsay"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "vsay_team"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "vtell"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "vosay"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "vosay_team"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "votell"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "vtaunt"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "give"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "god"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "notarget"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "noclip"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "kill"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "teamtask"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "levelshot"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "follow"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "follownext"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "followprev"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "team"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "callvote"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "vote"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "callteamvote"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "teamvote"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "setviewpos"));
+		trap_AddCommand(CG_LocalClientCvarName(i, "stats"));
+#ifdef TA_MISC // DROP_FLAG
+		trap_AddCommand(CG_LocalClientCvarName(i, "dropflag"));
+#endif
+	}
+
+	trap_AddCommand ("addbot");
+#else
 	trap_AddCommand ("kill");
 	trap_AddCommand ("say");
 	trap_AddCommand ("say_team");
@@ -842,6 +910,7 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("dropflag");
 #endif
 	trap_AddCommand ("teamtask");
+#endif
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Why hasn't this been corrected?
 	trap_AddCommand ("loaddeferred");
 #else
