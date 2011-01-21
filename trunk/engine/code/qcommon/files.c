@@ -2027,10 +2027,11 @@ char **FS_ListFilteredFiles( const char *path, const char *extension, char *filt
 			char	**sysFiles;
 			char	*name;
 
-			// don't scan directories for files if we are pure or restricted
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Autocomplete exec and condump filenames
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Autocomplete exec and condump filenames when on pure server
+			// don't scan directories for files if we are pure or restricted, unless auto completing exec or condump commands.
 			if ( fs_numServerPaks && !(pathLength == 0 && (!Q_strncmp(extension, "cfg", 3) || !Q_strncmp(extension, "txt", 3))))
 #else
+			// don't scan directories for files if we are pure or restricted
 			if ( fs_numServerPaks )
 #endif
 			{
