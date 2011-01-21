@@ -902,7 +902,6 @@ typedef struct {
 #ifdef TA_SPLITVIEW
 	int numViewports;
 	int viewport;
-	int viewVerticle; // Use verticle split view instead of horizontal
 #endif
 #ifdef TA_PATHSYS // 2DMODE
 	qboolean singleCamera; // Rending multiple clients using one viewport
@@ -1636,6 +1635,7 @@ extern	vmCvar_t		cg_thirdPerson[MAX_SPLITVIEW];
 #ifdef ANALOG // cg var
 extern	vmCvar_t		cg_thirdPersonAnalog[MAX_SPLITVIEW];
 #endif
+extern	vmCvar_t		cg_splitviewVertical;
 #else
 extern	vmCvar_t		cg_thirdPersonRange;
 extern	vmCvar_t		cg_thirdPersonAngle;

@@ -180,6 +180,7 @@ vmCvar_t	cg_thirdPersonAngle[MAX_SPLITVIEW];
 #ifdef ANALOG // cg var
 vmCvar_t	cg_thirdPersonAnalog[MAX_SPLITVIEW];
 #endif
+vmCvar_t	cg_splitviewVertical;
 #else
 vmCvar_t	cg_thirdPerson;
 vmCvar_t	cg_thirdPersonRange;
@@ -414,6 +415,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_thirdPerson[2], "3cg_thirdPerson", "0", 0 },
 	{ &cg_thirdPerson[3], "4cg_thirdPerson", "0", 0 },
 #endif
+	{ &cg_splitviewVertical, "cg_splitviewVertical", "0", CVAR_ARCHIVE },
 #else
 #ifdef THIRD_PERSON
 	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },
@@ -2500,7 +2502,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 #ifdef TA_SPLITVIEW
 	cg.numViewports = 1;
-	cg.viewVerticle = qfalse;
 
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		cg.localClients[i].clientNum = clientNum;
