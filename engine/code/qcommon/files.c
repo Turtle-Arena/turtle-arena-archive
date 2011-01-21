@@ -2028,7 +2028,12 @@ char **FS_ListFilteredFiles( const char *path, const char *extension, char *filt
 			char	*name;
 
 			// don't scan directories for files if we are pure or restricted
-			if ( fs_numServerPaks ) {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Autocomplete exec and condump filenames
+			if ( fs_numServerPaks && !(pathLength == 0 && (!Q_strncmp(extension, "cfg", 3) || !Q_strncmp(extension, "txt", 3))))
+#else
+			if ( fs_numServerPaks )
+#endif
+			{
 		        continue;
 		    } else {
 				netpath = FS_BuildOSPath( search->dir->path, search->dir->gamedir, path );
