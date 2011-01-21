@@ -36,7 +36,7 @@ void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
 	if (cg.numViewports != 1 && cg.snap) {
 		if (cg.numViewports == 2) {
 			if (cg.viewport == 1) {
-				if (cg.viewVerticle) {
+				if (cg_splitviewVertical.integer) {
 					*x += SCREEN_WIDTH;
 				} else {
 					*y += SCREEN_HEIGHT;
@@ -94,7 +94,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	if (cg.numViewports != 1 && cg.snap) {
 		if (cg.numViewports == 2) {
 			if (cg.viewport == 1) {
-				if (cg.viewVerticle) {
+				if (cg_splitviewVertical.integer) {
 					*x += SCREEN_WIDTH;
 				} else {
 					*y += SCREEN_HEIGHT;

@@ -212,7 +212,7 @@ static void CG_CalcVrect (void) {
 	cg.refdef.y = (cgs.glconfig.vidHeight - cg.refdef.height)/2;
 #ifdef TA_SPLITVIEW
 	if (cg.numViewports == 2) {
-		if (cg.viewVerticle) {
+		if (cg_splitviewVertical.integer) {
 			cg.refdef.width /= 2;
 
 			if (cg.viewport == 1) {
@@ -243,7 +243,7 @@ static void CG_CalcVrect (void) {
 
 	cgs.screenXScaleFit = cg.refdef.width * (1.0/640.0);
 	cgs.screenYScaleFit = cg.refdef.height * (1.0/480.0);
-	if ( (cg.numViewports == 1 || (cg.numViewports == 2 && !cg.viewVerticle) || (cg.numViewports == 3 && cg.viewport == 2)) &&
+	if ( (cg.numViewports == 1 || (cg.numViewports == 2 && !cg_splitviewVertical.integer) || (cg.numViewports == 3 && cg.viewport == 2)) &&
 		cg.refdef.width * 480 > cg.refdef.height * 640 )
 	{
 		cgs.screenXScale = cg.refdef.width * (1.0/640.0);

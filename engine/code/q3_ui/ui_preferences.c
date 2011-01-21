@@ -62,6 +62,9 @@ GAME OPTIONS MENU
 #define ID_SHOWGIBS				141
 #endif
 #endif
+#ifdef TA_SPLITVIEW
+#define ID_SPLITVERTICLE		142
+#endif
 
 #ifdef TA_DATA
 #define	NUM_CROSSHAIRS			4
@@ -88,6 +91,9 @@ typedef struct {
 	menuradiobutton_s	forcemodel;
 	menulist_s			drawteamoverlay;
 	menuradiobutton_s	allowdownload;
+#ifdef TA_SPLITVIEW
+	menulist_s			splitvertical;
+#endif
 #ifdef TA_ATMEFFECTSYS
 	menulist_s			atmeffects;
 #endif
@@ -115,6 +121,15 @@ static const char *teamoverlay_names[] =
 	NULL
 };
 
+#ifdef TA_SPLITVIEW
+static const char *splitvertical_names[] =
+{
+	"horizontal",
+	"vertical",
+	NULL
+};
+#endif
+
 #ifdef TA_ATMEFFECTSYS
 static const char *atmeffects_names[] =
 {
@@ -141,6 +156,9 @@ static void Preferences_SetMenuItems( void ) {
 #endif
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
+#ifdef TA_SPLITVIEW
+	s_preferences.splitvertical.curvalue	= trap_Cvar_VariableValue( "cg_splitviewVertical" ) != 0;
+#endif
 #ifdef TA_ATMEFFECTSYS
 	s_preferences.atmeffects.curvalue		= 2*trap_Cvar_VariableValue( "cg_atmosphericEffects" );
 	if (s_preferences.atmeffects.curvalue < 0)
@@ -222,6 +240,12 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "cl_allowDownload", s_preferences.allowdownload.curvalue );
 		trap_Cvar_SetValue( "sv_allowDownload", s_preferences.allowdownload.curvalue );
 		break;
+
+#ifdef TA_SPLITVIEW
+	case ID_SPLITVERTICLE:
+		trap_Cvar_SetValue( "cg_splitviewVertical", s_preferences.splitvertical.curvalue );
+		break;
+#endif
 
 #ifdef TA_ATMEFFECTSYS
 	case ID_ATMEFFECTS:
@@ -447,6 +471,18 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.allowdownload.generic.x	       = PREFERENCES_X_POS;
 	s_preferences.allowdownload.generic.y	       = y;
 
+#ifdef TA_SPLITVIEW
+	y += BIGCHAR_HEIGHT+2;
+	s_preferences.splitvertical.generic.type		= MTYPE_SPINCONTROL;
+	s_preferences.splitvertical.generic.name		= "Splitview Mode:";
+	s_preferences.splitvertical.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_preferences.splitvertical.generic.callback	= Preferences_Event;
+	s_preferences.splitvertical.generic.id			= ID_SPLITVERTICLE;
+	s_preferences.splitvertical.generic.x			= PREFERENCES_X_POS;
+	s_preferences.splitvertical.generic.y			= y;
+	s_preferences.splitvertical.itemnames			= splitvertical_names;
+#endif
+
 #ifdef TA_ATMEFFECTSYS
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.atmeffects.generic.type		= MTYPE_SPINCONTROL;
@@ -509,6 +545,9 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.forcemodel );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
+#ifdef TA_SPLITVIEW
+	Menu_AddItem( &s_preferences.menu, &s_preferences.splitvertical );
+#endif
 #ifdef TA_ATMEFFECTSYS
 	Menu_AddItem( &s_preferences.menu, &s_preferences.atmeffects );
 #endif
