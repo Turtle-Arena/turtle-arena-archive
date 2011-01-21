@@ -419,6 +419,18 @@ extern void UI_ControlsMenu( void );
 #endif
 extern void Controls_Cache( void );
 
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+//
+// ui_joystick.c
+//
+#ifdef TA_SPLITVIEW
+void UI_JoystickMenu( int localClient );
+#else
+void UI_JoystickMenu( void );
+#endif
+void UI_Joystick_Cache( void );
+#endif
+
 //
 // ui_demo2.c
 //
