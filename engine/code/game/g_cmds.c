@@ -1379,6 +1379,9 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	int		i;
 	char	arg1[MAX_STRING_TOKENS];
 	char	arg2[MAX_STRING_TOKENS];
+#ifdef IOQ3ZTM // CALLVOTE_TEST_INT
+	qboolean arg2IsInteger = qfalse;
+#endif
 
 	if ( !g_allowVote.integer ) {
 		trap_SendServerCommand( ent-g_entities, "print \"Voting not allowed here.\n\"" );
@@ -1402,6 +1405,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	trap_Argv( 1, arg1, sizeof( arg1 ) );
 	trap_Argv( 2, arg2, sizeof( arg2 ) );
 
+#ifndef IOQ3ZTM // CALLVOTE_TEST_INT
 	// check for command separators in arg2
 	for( c = arg2; *c; ++c) {
 		switch(*c) {
@@ -1413,19 +1417,35 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 			break;
 		}
 	}
+#endif
 
 	if ( !Q_stricmp( arg1, "map_restart" ) ) {
 	} else if ( !Q_stricmp( arg1, "nextmap" ) ) {
 	} else if ( !Q_stricmp( arg1, "map" ) ) {
 	} else if ( !Q_stricmp( arg1, "g_gametype" ) ) {
+#ifdef IOQ3ZTM // CALLVOTE_TEST_INT
+		arg2IsInteger = qtrue;
+#endif
 	} else if ( !Q_stricmp( arg1, "kick" ) ) {
 	} else if ( !Q_stricmp( arg1, "clientkick" ) ) {
+#ifdef IOQ3ZTM // CALLVOTE_TEST_INT
+		arg2IsInteger = qtrue;
+#endif
 	} else if ( !Q_stricmp( arg1, "g_doWarmup" ) ) {
+#ifdef IOQ3ZTM // CALLVOTE_TEST_INT
+		arg2IsInteger = qtrue;
+#endif
 	} else if ( !Q_stricmp( arg1, "timelimit" ) ) {
+#ifdef IOQ3ZTM // CALLVOTE_TEST_INT
+		arg2IsInteger = qtrue;
+#endif
 #ifdef NOTRATEDM // frag to score
 	} else if ( !Q_stricmp( arg1, "scorelimit" ) ) {
 #else
 	} else if ( !Q_stricmp( arg1, "fraglimit" ) ) {
+#endif
+#ifdef IOQ3ZTM // CALLVOTE_TEST_INT
+		arg2IsInteger = qtrue;
 #endif
 	} else {
 		trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
@@ -1436,6 +1456,24 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 #endif
 		return;
 	}
+
+#ifdef IOQ3ZTM // CALLVOTE_TEST_INT
+	// check for command separators in arg2 and non-digits in integer strings
+	for( c = arg2; *c; ++c) {
+		if (arg2IsInteger && !isdigit(*c)) {
+			trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string (requires integer).\n\"" );
+			return;
+		}
+		switch(*c) {
+			case '\n':
+			case '\r':
+			case ';':
+				trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
+				return;
+			break;
+		}
+	}
+#endif
 
 	// if there is still a vote to be executed
 	if ( level.voteExecuteTime ) {
