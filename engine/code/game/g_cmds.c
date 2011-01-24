@@ -1047,6 +1047,12 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	// send it to all the apropriate clients
 	for (j = 0; j < level.maxclients; j++) {
 		other = &g_entities[j];
+#ifdef TA_SPLITVIEW
+		// Don't send to extra local clients, would be printed multiple times.
+		if (other->r.owner != -1) {
+			continue;
+		}
+#endif
 		G_SayTo( ent, other, mode, color, name, text );
 	}
 }
