@@ -1233,16 +1233,9 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "chat" ) ) {
-#ifdef TA_SPLITVIEW
-		// ZTM: FIXME: Have to return otherwise all chats are printed for each local client,
-		//  side effect is extra local cleints don't support receiving tell.
-		if (lc != 0) {
-			return;
-		}
-#endif
 		if ( !cg_teamChatsOnly.integer ) {
 			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-#if 0 //#ifdef TA_SPLITVIEW
+#ifdef TA_SPLITVIEW
 			if (lc != 0) {
 				// Show which client this is for.
 				Q_snprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
@@ -1256,12 +1249,13 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "tchat" ) ) {
+		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 #ifdef TA_SPLITVIEW
 		if (lc != 0) {
-			return;
-		}
+			// Show which client this is for.
+			Q_snprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
+		} else
 #endif
-		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
 		Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );

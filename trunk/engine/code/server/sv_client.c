@@ -487,10 +487,9 @@ gotnewcl:
 	ent = SV_GentityNum( clientNum );
 	newcl->gentity = ent;
 #ifdef TA_SPLITVIEW
-	newcl->owner = -1;
+	newcl->owner = newcl->gentity->r.owner = -1;
 	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
-		newcl->local_clients[i] = -1;
-		newcl->gentity->r.local_clients[i] = -1;
+		newcl->local_clients[i] = newcl->gentity->r.local_clients[i] = -1;
 	}
 #endif
 
@@ -575,9 +574,8 @@ gotnewcl:
 			// save the userinfo
 			Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
 
-			newcl->owner = owner - svs.clients;
-			owner->local_clients[lc-1] = clientNum;
-			owner->gentity->r.local_clients[lc-1] = clientNum;
+			newcl->owner = newcl->gentity->r.owner = owner - svs.clients;
+			owner->local_clients[lc-1] = owner->gentity->r.local_clients[lc-1] = clientNum;
 
 			// get the game a chance to reject this connection or modify the userinfo
 			denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue
