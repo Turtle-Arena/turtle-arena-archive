@@ -1079,6 +1079,11 @@ static qboolean SV_CheckPaused( void ) {
 	// only pause if there is just a single client connected
 	count = 0;
 	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
+#ifdef TA_SPLITVIEW // Don't count extra local clients, fixes pause so it works in splitscreen.
+		if ( cl->owner != -1) {
+			continue;
+		}
+#endif
 		if ( cl->state >= CS_CONNECTED && cl->netchan.remoteAddress.type != NA_BOT ) {
 			count++;
 		}
