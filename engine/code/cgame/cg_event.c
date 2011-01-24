@@ -957,11 +957,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 		// if we are interpolating, we don't need to smooth steps
 		if ( cg.demoPlayback || (ps->pm_flags & PMF_FOLLOW) ||
-			cg_nopredict.integer || cg_synchronousClients.integer
-#ifdef TA_SPLITVIEW // Currently only the first client has controls...
-			|| i != 0
-#endif
-			) {
+			cg_nopredict.integer || cg_synchronousClients.integer ) {
 			break;
 		}
 		// check for stepping up before a previous step is completed

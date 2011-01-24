@@ -488,11 +488,7 @@ void CG_PredictPlayerState( void ) {
 
 
 	// demo playback just copies the moves
-	if ( cg.demoPlayback || (cg.cur_ps->pm_flags & PMF_FOLLOW)
-#ifdef TA_SPLITVIEW // Currently only the first client has controls...
-		|| cg.viewport != 0
-#endif
-		) {
+	if ( cg.demoPlayback || (cg.cur_ps->pm_flags & PMF_FOLLOW) ) {
 		CG_InterpolatePlayerState( qfalse );
 		return;
 	}

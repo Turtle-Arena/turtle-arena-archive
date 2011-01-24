@@ -279,11 +279,7 @@ static void CG_TransitionSnapshot( void ) {
 		// if we are not doing client side movement prediction for any
 		// reason, then the client events and view changes will be issued now
 		if ( cg.demoPlayback || (ps->pm_flags & PMF_FOLLOW)
-			|| cg_nopredict.integer || cg_synchronousClients.integer
-#ifdef TA_SPLITVIEW // Currently only the first client has controls...
-			|| i != 0
-#endif
-			) {
+			|| cg_nopredict.integer || cg_synchronousClients.integer ) {
 			CG_TransitionPlayerState( ps, ops );
 		}
 #ifdef TA_SPLITVIEW
