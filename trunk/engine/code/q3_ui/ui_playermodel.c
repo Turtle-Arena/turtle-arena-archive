@@ -110,6 +110,7 @@ typedef struct
 	int				selectedmodel;
 #ifdef TA_SPLITVIEW
 	int				localClient;
+	char			bannerString[32];
 #endif
 } playermodel_t;
 
@@ -211,25 +212,21 @@ PlayerModel_SaveChanges
 static void PlayerModel_SaveChanges( void )
 {
 #ifdef TA_SPLITVIEW
-	if (s_playermodel.localClient != 0) {
-		trap_Cvar_Set( va("%d_model", s_playermodel.localClient+1), s_playermodel.modelskin );
+	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "model"), s_playermodel.modelskin );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
-		trap_Cvar_Set( va("%d_headmodel", s_playermodel.localClient+1), "" );
+	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "headmodel"), "" );
 #else
-		trap_Cvar_Set( va("%d_headmodel", s_playermodel.localClient+1), s_playermodel.modelskin );
+	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "headmodel"), s_playermodel.modelskin );
 #endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
-		trap_Cvar_Set( va("%d_team_model", s_playermodel.localClient+1), s_playermodel.modelskin );
+	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "team_model"), s_playermodel.modelskin );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
-		trap_Cvar_Set( va("%d_team_headmodel", s_playermodel.localClient+1), "" );
+	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "team_headmodel"), "" );
 #else
-		trap_Cvar_Set( va("%d_team_headmodel", s_playermodel.localClient+1), s_playermodel.modelskin );
+	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "team_headmodel"), s_playermodel.modelskin );
 #endif
 #endif
-		return;
-	}
-#endif
-
+#else
 	trap_Cvar_Set( "model", s_playermodel.modelskin );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
 	trap_Cvar_Set( "headmodel", "" );
@@ -242,6 +239,7 @@ static void PlayerModel_SaveChanges( void )
 	trap_Cvar_Set( "team_headmodel", "" );
 #else
 	trap_Cvar_Set( "team_headmodel", s_playermodel.modelskin );
+#endif
 #endif
 #endif
 }
@@ -648,7 +646,12 @@ static void PlayerModel_MenuInit( void )
 #else
 	s_playermodel.banner.generic.y     = 16;
 #endif
+#ifdef TA_SPLITVIEW
+	Q_snprintf(s_playermodel.bannerString, sizeof (s_playermodel.bannerString), "PLAYER %d MODEL", s_playermodel.localClient+1);
+	s_playermodel.banner.string = s_playermodel.bannerString;
+#else
 	s_playermodel.banner.string        = "PLAYER MODEL";
+#endif
 	s_playermodel.banner.color         = text_banner_color;
 	s_playermodel.banner.style         = UI_CENTER;
 

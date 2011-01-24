@@ -97,6 +97,7 @@ typedef struct {
 	char				playerModel[MAX_QPATH];
 #ifdef TA_SPLITVIEW
 	int					localClient;
+	char				bannerString[32];
 #endif
 } playersettings_t;
 
@@ -555,24 +556,8 @@ static void PlayerSettings_MenuInit( void )
 	s_playersettings.banner.generic.x     = 320;
 	s_playersettings.banner.generic.y     = 16;
 #ifdef TA_SPLITVIEW
-	switch (s_playersettings.localClient)
-	{
-		case 0:
-			s_playersettings.banner.string        = "PLAYER 1 SETTINGS";
-			break;
-		case 1:
-			s_playersettings.banner.string        = "PLAYER 2 SETTINGS";
-			break;
-		case 2:
-			s_playersettings.banner.string        = "PLAYER 3 SETTINGS";
-			break;
-		case 3:
-			s_playersettings.banner.string        = "PLAYER 4 SETTINGS";
-			break;
-		default:
-			s_playersettings.banner.string        = "PLAYER SETTINGS";
-			break;
-	}
+	Q_snprintf(s_playersettings.bannerString, sizeof (s_playersettings.bannerString), "PLAYER %d SETTINGS", s_playersettings.localClient+1);
+	s_playersettings.banner.string = s_playersettings.bannerString;
 #else
 	s_playersettings.banner.string        = "PLAYER SETTINGS";
 #endif
