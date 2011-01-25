@@ -131,7 +131,7 @@ void InGame_Event( void *ptr, int notification ) {
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_TEAM:
 #ifdef TA_SPLITVIEW
-		UI_SetupPlayersMenu(UI_TeamMainMenu);
+		UI_SetupPlayersMenu(UI_TeamMainMenu, "CHANGE TEAM");
 #else
 		UI_TeamMainMenu();
 #endif
@@ -188,7 +188,7 @@ void InGame_Event( void *ptr, int notification ) {
 #ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
 #ifdef TA_SPLITVIEW
-		UI_SetupPlayersMenu(UI_PlayerSettingsMenu);
+		UI_SetupPlayersMenu(UI_PlayerSettingsMenu, "SETUP PLAYER");
 #else
 		UI_PlayerSettingsMenu();
 #endif
@@ -266,6 +266,11 @@ void InGame_MenuInit( void ) {
 		s_ingame.team.generic.y				= y;
 		s_ingame.team.generic.id			= ID_TEAM;
 		s_ingame.team.generic.callback		= InGame_Event;
+#ifdef TA_SPLITVIEW
+		if (cs.numLocalClients > 1)
+			s_ingame.team.string			= "Change Teams";
+		else
+#endif
 		s_ingame.team.string				= "Change Team";
 		s_ingame.team.color					= text_big_color;
 		s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;

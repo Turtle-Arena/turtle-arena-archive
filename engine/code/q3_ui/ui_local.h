@@ -381,7 +381,7 @@ extern void UI_InServerMenu(void);
 // ui_ingame_setupplayers.c
 //
 extern void SetupPlayers_Cache( void );
-extern void UI_SetupPlayersMenu( void (*playerfunc)(int) );
+extern void UI_SetupPlayersMenu( void (*playerfunc)(int), const char *banner );
 #endif
 
 //
