@@ -75,10 +75,6 @@ UI_ControlsMainMenu_Event
 ===============
 */
 static void UI_ControlsMainMenu_Event( void *ptr, int event ) {
-#ifdef TA_SPLITVIEW
-	int lc;
-#endif
-
 	if( event != QM_ACTIVATED ) {
 		return;
 	}
@@ -90,8 +86,7 @@ static void UI_ControlsMainMenu_Event( void *ptr, int event ) {
 	case ID_CUSTOMIZECONTROLS2:
 	case ID_CUSTOMIZECONTROLS3:
 	case ID_CUSTOMIZECONTROLS4:
-		lc = ((menucommon_s*)ptr)->id - ID_CUSTOMIZECONTROLS;
-		UI_ControlsMenu(lc);
+		UI_ControlsMenu(((menucommon_s*)ptr)->id - ID_CUSTOMIZECONTROLS);
 #else
 		UI_ControlsMenu();
 #endif

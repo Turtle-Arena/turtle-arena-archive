@@ -1,21 +1,22 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
+Copyright (C) 2010-2011 by Zack "ZTurtleMan" Middleton
 
-This file is part of Quake III Arena source code.
+This file is part of Turtle Arena source code.
 
-Quake III Arena source code is free software; you can redistribute it
+Turtle Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Quake III Arena source code is distributed in the hope that it will be
+Turtle Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Quake III Arena source code; if not, write to the Free Software
+along with Turtle Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -39,7 +40,7 @@ Server only controls
 #define INGAME_FRAME					"menu/art/cut_frame"
 #define INGAME_MENU_VERTICAL_SPACING	28
 
-#define ID_CHANGEMAP					10
+#define ID_CHANGEMAP			10
 #define ID_ADDBOTS				11
 #define ID_REMOVEBOTS			12
 #define ID_RESTART				13
@@ -240,17 +241,10 @@ void InServer_Cache( void ) {
 
 /*
 =================
-UI_InGameMenu
+UI_InServerMenu
 =================
 */
 void UI_InServerMenu( void ) {
-	// force as top level menu
-	//uis.menusp = 0;  
-
-	// set menu cursor to a nice location
-	//uis.cursorx = 319;
-	//uis.cursory = 80;
-
 	InServer_MenuInit();
 	UI_PushMenu( &s_inserver.menu );
 }
