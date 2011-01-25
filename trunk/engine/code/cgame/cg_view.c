@@ -225,9 +225,32 @@ static void CG_CalcVrect (void) {
 				cg.refdef.y += cg.refdef.height;
 			}
 		}
-	} else if (cg.numViewports == 3 && cg.viewport == 2) {
-		cg.refdef.height /= 2;
-		cg.refdef.y += cg.refdef.height;
+	} else if (cg.numViewports == 3) {
+		if (cg_splitviewVertical.integer) {
+			if (cg.viewport == 2) {
+				cg.refdef.width /= 2;
+				cg.refdef.x += cg.refdef.width;
+			} else {
+				cg.refdef.width /= 2;
+				cg.refdef.height /= 2;
+
+				if (cg.viewport == 1) {
+					cg.refdef.y += cg.refdef.height;
+				}
+			}
+		} else {
+			if (cg.viewport == 2) {
+				cg.refdef.height /= 2;
+				cg.refdef.y += cg.refdef.height;
+			} else {
+				cg.refdef.width /= 2;
+				cg.refdef.height /= 2;
+
+				if (cg.viewport == 1) {
+					cg.refdef.x += cg.refdef.width;
+				}
+			}
+		}
 	} else if (cg.numViewports > 1 && cg.numViewports <= 4) {
 		cg.refdef.width /= 2;
 		cg.refdef.height /= 2;
