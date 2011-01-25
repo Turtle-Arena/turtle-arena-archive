@@ -184,7 +184,7 @@ void InGame_Event( void *ptr, int notification ) {
 #ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
 #ifdef TA_SPLITVIEW
-		UI_PlayerSettingsMenu(0);
+		UI_SetupPlayersMenu();
 #else
 		UI_PlayerSettingsMenu();
 #endif
@@ -390,7 +390,11 @@ void InGame_MenuInit( void ) {
 	s_ingame.setupplayer.generic.y			= y;
 	s_ingame.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
 	s_ingame.setupplayer.generic.callback	= InGame_Event; 
-	s_ingame.setupplayer.string				= "Player";
+#ifdef TA_SPLITVIEW
+	s_ingame.setupplayer.string				= "Setup Players";
+#else
+	s_ingame.setupplayer.string				= "Setup Player";
+#endif
 	s_ingame.setupplayer.color				= text_big_color;
 	s_ingame.setupplayer.style				= UI_CENTER|UI_SMALLFONT;
 #endif

@@ -1483,6 +1483,9 @@ void UI_Cache_f( void ) {
 #ifdef TA_MISC // INGAME_SERVER_MENU
 	InServer_Cache();
 #endif
+#if defined TA_MISC && defined TA_SPLITVIEW
+	SetupPlayers_Cache();
+#endif
 	ConfirmMenu_Cache();
 	PlayerModel_Cache();
 	PlayerSettings_Cache();

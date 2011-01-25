@@ -376,6 +376,14 @@ extern void InServer_Cache( void );
 extern void UI_InServerMenu(void);
 #endif
 
+#if defined TA_MISC && defined TA_SPLITVIEW
+//
+// ui_ingame_setupplayers.c
+//
+extern void SetupPlayers_Cache( void );
+extern void UI_SetupPlayersMenu(void);
+#endif
+
 //
 // ui_confirm.c
 //
