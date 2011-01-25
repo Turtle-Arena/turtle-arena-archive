@@ -687,6 +687,11 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.back.focuspic         = GAMESERVER_BACK1;
 
 	s_startserver.next.generic.type	    = MTYPE_BITMAP;
+#ifdef TA_MISC
+	if (inGame) {
+		s_startserver.next.generic.name = GAMESERVER_FIGHT0;
+	} else
+#endif
 	s_startserver.next.generic.name     = GAMESERVER_NEXT0;
 	s_startserver.next.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_startserver.next.generic.callback = StartServer_MenuEvent;
@@ -695,6 +700,11 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.next.generic.y		= 480-64;
 	s_startserver.next.width  		    = 128;
 	s_startserver.next.height  		    = 64;
+#ifdef TA_MISC
+	if (inGame) {
+		s_startserver.next.focuspic     = GAMESERVER_FIGHT1;
+	} else
+#endif
 	s_startserver.next.focuspic         = GAMESERVER_NEXT1;
 
 	s_startserver.item_null.generic.type	= MTYPE_BITMAP;
@@ -742,8 +752,16 @@ void StartServer_Cache( void )
 
 	trap_R_RegisterShaderNoMip( GAMESERVER_BACK0 );	
 	trap_R_RegisterShaderNoMip( GAMESERVER_BACK1 );	
-	trap_R_RegisterShaderNoMip( GAMESERVER_NEXT0 );	
-	trap_R_RegisterShaderNoMip( GAMESERVER_NEXT1 );	
+#ifdef TA_MISC
+	if (trap_Cvar_VariableValue("sv_running")) {
+		trap_R_RegisterShaderNoMip( GAMESERVER_FIGHT0 );	
+		trap_R_RegisterShaderNoMip( GAMESERVER_FIGHT1 );	
+	} else
+#endif
+	{
+		trap_R_RegisterShaderNoMip( GAMESERVER_NEXT0 );	
+		trap_R_RegisterShaderNoMip( GAMESERVER_NEXT1 );	
+	}
 	trap_R_RegisterShaderNoMip( GAMESERVER_FRAMEL );	
 	trap_R_RegisterShaderNoMip( GAMESERVER_FRAMER );	
 #ifdef TA_DATA // MAPS_SELECT_SAME_AS_MAPS_SELECTED
