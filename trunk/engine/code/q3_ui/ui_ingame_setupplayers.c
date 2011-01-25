@@ -86,7 +86,7 @@ void SetupPlayers_Event( void *ptr, int notification ) {
 SetupPlayers_MenuInit
 =================
 */
-void SetupPlayers_MenuInit( void ) {
+void SetupPlayers_MenuInit( int numLocalClients ) {
 	int		y;
 	int		i;
 
@@ -123,9 +123,9 @@ void SetupPlayers_MenuInit( void ) {
 		s_setupplayers.player[i].color				= text_big_color;
 		s_setupplayers.player[i].style				= UI_CENTER|UI_SMALLFONT;
 
-		//if( i > 0 && !localClientInGame[i-1] ) {
-		//	s_setupplayers.player[i].generic.flags |= QMF_GRAYED;
-		//}
+		//if( i > 0 && !localClientInGame[i-1] )
+		if (i >= numLocalClients)
+			s_setupplayers.player[i].generic.flags |= QMF_GRAYED;
 
 		y += INGAME_MENU_VERTICAL_SPACING;
 	}
@@ -167,7 +167,17 @@ UI_SetupPlayersMenu
 =================
 */
 void UI_SetupPlayersMenu( void (*playerfunc)(int) ) {
-	SetupPlayers_MenuInit();
+	uiClientState_t	cs;
+
+	trap_GetClientState( &cs );
+
+	// If there is only one local client skip this menu.
+	if (cs.numLocalClients <= 1) {
+		playerfunc(0);
+		return;
+	}
+
+	SetupPlayers_MenuInit( cs.numLocalClients );
 	s_setupplayers.playerfunc = playerfunc;
 	UI_PushMenu( &s_setupplayers.menu );
 }

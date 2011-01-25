@@ -32,6 +32,9 @@ typedef struct {
 	char			servername[MAX_STRING_CHARS];
 	char			updateInfoString[MAX_STRING_CHARS];
 	char			messageString[MAX_STRING_CHARS];
+#ifdef TA_SPLITVIEW
+	int				numLocalClients;
+#endif
 } uiClientState_t;
 
 typedef enum {
