@@ -44,6 +44,9 @@ static void GetClientState( uiClientState_t *state ) {
 #else
 	state->clientNum = cl.snap.ps.clientNum;
 #endif
+#ifdef TA_SPLITVIEW
+	state->numLocalClients = cl.snap.numPSs;
+#endif
 }
 
 /*

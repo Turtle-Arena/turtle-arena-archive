@@ -252,9 +252,12 @@ void InGame_MenuInit( void ) {
 	y += INGAME_MENU_VERTICAL_SPACING;
 #endif
 #ifdef TA_MISC // SMART_JOIN_MENU
+	trap_GetClientState( &cs );
+	trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
+
 	if(
-#ifdef TA_SPLITVIEW // ZTM: TODO: Only force if more than one local client
-		qtrue ||
+#ifdef TA_SPLITVIEW // Force if more than one local client
+		cs.numLocalClients > 1 ||
 #endif
 		(trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
 		s_ingame.team.generic.type			= MTYPE_PTEXT;
@@ -268,8 +271,6 @@ void InGame_MenuInit( void ) {
 		s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 	}
 	else {
-		trap_GetClientState( &cs );
-		trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
 		team = atoi( Info_ValueForKey( info, "t" ) );
 		if( team == TEAM_SPECTATOR ) {
 			s_ingame.team.generic.type			= MTYPE_PTEXT;
@@ -367,8 +368,10 @@ void InGame_MenuInit( void ) {
 		s_ingame.teamorders.generic.flags |= QMF_GRAYED;
 	}
 	else {
+#ifndef TA_MISC // SMART_JOIN_MENU
 		trap_GetClientState( &cs );
 		trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
+#endif
 		team = atoi( Info_ValueForKey( info, "t" ) );
 		if( team == TEAM_SPECTATOR ) {
 			s_ingame.teamorders.generic.flags |= QMF_GRAYED;
@@ -399,10 +402,11 @@ void InGame_MenuInit( void ) {
 	s_ingame.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
 	s_ingame.setupplayer.generic.callback	= InGame_Event; 
 #ifdef TA_SPLITVIEW
-	s_ingame.setupplayer.string				= "Setup Players";
-#else
-	s_ingame.setupplayer.string				= "Setup Player";
+	if (cs.numLocalClients > 1)
+		s_ingame.setupplayer.string			= "Setup Players";
+	else
 #endif
+	s_ingame.setupplayer.string				= "Setup Player";
 	s_ingame.setupplayer.color				= text_big_color;
 	s_ingame.setupplayer.style				= UI_CENTER|UI_SMALLFONT;
 #endif
