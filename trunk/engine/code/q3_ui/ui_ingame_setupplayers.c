@@ -51,6 +51,7 @@ typedef struct {
 
 	menutext_s		back;
 
+	char			bannerString[32];
 	char			playerString[MAX_SPLITVIEW][12];
 	void 			(*playerfunc)(int);
 } setupplayersmenu_t;
@@ -83,10 +84,23 @@ void SetupPlayers_Event( void *ptr, int notification ) {
 
 /*
 =================
+UI_SetupPlayersMenu_Draw
+=================
+*/
+static void UI_SetupPlayersMenu_Draw( void ) {
+	UI_DrawBannerString( 320, 16, s_setupplayers.bannerString, UI_CENTER, text_banner_color );
+
+	// standard menu drawing
+	Menu_Draw( &s_setupplayers.menu );
+}
+
+
+/*
+=================
 SetupPlayers_MenuInit
 =================
 */
-void SetupPlayers_MenuInit( int numLocalClients ) {
+void SetupPlayers_MenuInit( int numLocalClients, const char *banner ) {
 	int		y;
 	int		i;
 
@@ -94,6 +108,8 @@ void SetupPlayers_MenuInit( int numLocalClients ) {
 
 	SetupPlayers_Cache();
 
+	Q_strncpyz(s_setupplayers.bannerString, banner, sizeof (s_setupplayers.bannerString));
+	s_setupplayers.menu.draw = UI_SetupPlayersMenu_Draw;
 	s_setupplayers.menu.wrapAround = qtrue;
 	s_setupplayers.menu.fullscreen = qfalse;
 
@@ -166,7 +182,7 @@ void SetupPlayers_Cache( void ) {
 UI_SetupPlayersMenu
 =================
 */
-void UI_SetupPlayersMenu( void (*playerfunc)(int) ) {
+void UI_SetupPlayersMenu( void (*playerfunc)(int), const char *banner ) {
 	uiClientState_t	cs;
 
 	trap_GetClientState( &cs );
@@ -177,7 +193,7 @@ void UI_SetupPlayersMenu( void (*playerfunc)(int) ) {
 		return;
 	}
 
-	SetupPlayers_MenuInit( cs.numLocalClients );
+	SetupPlayers_MenuInit( cs.numLocalClients, banner );
 	s_setupplayers.playerfunc = playerfunc;
 	UI_PushMenu( &s_setupplayers.menu );
 }
