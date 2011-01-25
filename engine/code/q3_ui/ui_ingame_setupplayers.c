@@ -26,13 +26,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 SETUP PLAYERS MENU
 
+This is a general select local client menu. Used for accessing menus for a specific local client.
+It runs a function, passing the selected client to the function.
+Automaticly disables players not in the game, so the function can expect that the client is ingame.
+If there is only one local client simply runs the function.
+
 =======================================================================
 */
 
 
 #include "ui_local.h"
 
-#if defined TA_MISC && defined TA_SPLITVIEW
+#ifdef TA_SPLITVIEW
 
 //#define INGAME_FRAME					"menu/art/addbotframe"
 #define INGAME_FRAME					"menu/art/cut_frame"
