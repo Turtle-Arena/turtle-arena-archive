@@ -411,8 +411,8 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 	else if ( ( client->buttons & BUTTON_USE_HOLDABLE ) && ! ( client->oldbuttons & BUTTON_USE_HOLDABLE ) ) {
 		Cmd_FollowCycle_f( ent, -1 );
 	}
-	// Jump out of followed client
-	else if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW && ucmd->upmove > 0 ) {
+	// Stop following client when jump or crouch is pressed.
+	else if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW && ucmd->upmove != 0 ) {
 		StopFollowing(ent);
 	}
 #endif
