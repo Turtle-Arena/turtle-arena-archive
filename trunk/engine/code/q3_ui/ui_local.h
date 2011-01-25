@@ -376,7 +376,7 @@ extern void InServer_Cache( void );
 extern void UI_InServerMenu(void);
 #endif
 
-#if defined TA_MISC && defined TA_SPLITVIEW
+#ifdef TA_SPLITVIEW
 //
 // ui_ingame_setupplayers.c
 //
