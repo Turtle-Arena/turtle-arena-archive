@@ -130,7 +130,11 @@ void InGame_Event( void *ptr, int notification ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_TEAM:
+#ifdef TA_SPLITVIEW
+		UI_SetupPlayersMenu(UI_TeamMainMenu);
+#else
 		UI_TeamMainMenu();
+#endif
 		break;
 
 #ifdef TA_MISC // SMART_JOIN_MENU
@@ -184,7 +188,7 @@ void InGame_Event( void *ptr, int notification ) {
 #ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
 #ifdef TA_SPLITVIEW
-		UI_SetupPlayersMenu();
+		UI_SetupPlayersMenu(UI_PlayerSettingsMenu);
 #else
 		UI_PlayerSettingsMenu();
 #endif
@@ -248,7 +252,11 @@ void InGame_MenuInit( void ) {
 	y += INGAME_MENU_VERTICAL_SPACING;
 #endif
 #ifdef TA_MISC // SMART_JOIN_MENU
-	if( (trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
+	if(
+#ifdef TA_SPLITVIEW // ZTM: TODO: Only force if more than one local client
+		qtrue ||
+#endif
+		(trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
 		s_ingame.team.generic.type			= MTYPE_PTEXT;
 		s_ingame.team.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 		s_ingame.team.generic.x				= 320;
