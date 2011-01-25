@@ -91,10 +91,13 @@ Adjusted for resolution and screen aspect ratio
 */
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 #ifdef TA_SPLITVIEW
+	int viewXBias = 0;
+
 	if (cg.numViewports != 1 && cg.snap) {
 		if (cg.numViewports == 2) {
 			if (cg.viewport == 1) {
 				if (cg_splitviewVertical.integer) {
+					viewXBias = 2;
 					*x += SCREEN_WIDTH;
 				} else {
 					*y += SCREEN_HEIGHT;
@@ -106,6 +109,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 		}
 		else if (cg.numViewports <= 4) {
 			if (cg.viewport == 1 || cg.viewport == 3) {
+				viewXBias = 2;
 				*x += SCREEN_WIDTH;
 			}
 			if (cg.viewport == 2 || cg.viewport == 3) {
@@ -134,6 +138,11 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	*y *= cgs.screenYScale;
 	*w *= cgs.screenXScale;
 	*h *= cgs.screenYScale;
+
+#ifdef TA_SPLITVIEW
+	// Offset for widescreen
+	*x += cgs.screenXBias*(viewXBias);
+#endif
 }
 
 /*
