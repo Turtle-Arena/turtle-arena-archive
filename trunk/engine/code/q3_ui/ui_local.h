@@ -381,7 +381,7 @@ extern void UI_InServerMenu(void);
 // ui_ingame_setupplayers.c
 //
 extern void SetupPlayers_Cache( void );
-extern void UI_SetupPlayersMenu(void);
+extern void UI_SetupPlayersMenu( void (*playerfunc)(int) );
 #endif
 
 //
@@ -401,7 +401,11 @@ extern void UI_SetupMenu(void);
 //
 // ui_team.c
 //
+#ifdef TA_SPLITVIEW
+extern void UI_TeamMainMenu( int localClient );
+#else
 extern void UI_TeamMainMenu( void );
+#endif
 extern void TeamMain_Cache( void );
 
 //

@@ -43,6 +43,10 @@ typedef struct
 	menutext_s		joinblue;
 	menutext_s		joingame;
 	menutext_s		spectate;
+
+#ifdef TA_SPLITVIEW
+	int				localClient;
+#endif
 } teammain_t;
 
 static teammain_t	s_teammain;
@@ -53,28 +57,52 @@ TeamMain_MenuEvent
 ===============
 */
 static void TeamMain_MenuEvent( void* ptr, int event ) {
+#ifdef TA_SPLITVIEW
+	char *teamCmd;
+#endif
+
 	if( event != QM_ACTIVATED ) {
 		return;
 	}
 
+#ifdef TA_SPLITVIEW
+	teamCmd = UI_LocalClientCvarName(s_teammain.localClient, "team");
+#endif
+
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_JOINRED:
+#ifdef TA_SPLITVIEW
+		trap_Cmd_ExecuteText( EXEC_APPEND, va("cmd %s red\n", teamCmd) );
+#else
 		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team red\n" );
+#endif
 		UI_ForceMenuOff();
 		break;
 
 	case ID_JOINBLUE:
+#ifdef TA_SPLITVIEW
+		trap_Cmd_ExecuteText( EXEC_APPEND, va("cmd %s blue\n", teamCmd) );
+#else
 		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team blue\n" );
+#endif
 		UI_ForceMenuOff();
 		break;
 
 	case ID_JOINGAME:
+#ifdef TA_SPLITVIEW
+		trap_Cmd_ExecuteText( EXEC_APPEND, va("cmd %s free\n", teamCmd) );
+#else
 		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team free\n" );
+#endif
 		UI_ForceMenuOff();
 		break;
 
 	case ID_SPECTATE:
+#ifdef TA_SPLITVIEW
+		trap_Cmd_ExecuteText( EXEC_APPEND, va("cmd %s spectator\n", teamCmd) );
+#else
 		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team spectator\n" );
+#endif
 		UI_ForceMenuOff();
 		break;
 	}
@@ -86,12 +114,21 @@ static void TeamMain_MenuEvent( void* ptr, int event ) {
 TeamMain_MenuInit
 ===============
 */
-void TeamMain_MenuInit( void ) {
+#ifdef TA_SPLITVIEW
+void TeamMain_MenuInit( int localClient )
+#else
+void TeamMain_MenuInit( void )
+#endif
+{
 	int		y;
 	int		gametype;
 	char	info[MAX_INFO_STRING];
 
 	memset( &s_teammain, 0, sizeof(s_teammain) );
+
+#ifdef TA_SPLITVIEW
+	s_teammain.localClient = localClient;
+#endif
 
 	TeamMain_Cache();
 
@@ -194,7 +231,16 @@ void TeamMain_Cache( void ) {
 UI_TeamMainMenu
 ===============
 */
-void UI_TeamMainMenu( void ) {
+#ifdef TA_SPLITVIEW
+void UI_TeamMainMenu( int localClient )
+#else
+void UI_TeamMainMenu( void )
+#endif
+{
+#ifdef TA_SPLITVIEW
+	TeamMain_MenuInit(localClient);
+#else
 	TeamMain_MenuInit();
+#endif
 	UI_PushMenu ( &s_teammain.menu );
 }

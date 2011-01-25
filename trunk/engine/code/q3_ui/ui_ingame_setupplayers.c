@@ -52,6 +52,7 @@ typedef struct {
 	menutext_s		back;
 
 	char			playerString[MAX_SPLITVIEW][12];
+	void 			(*playerfunc)(int);
 } setupplayersmenu_t;
 
 static setupplayersmenu_t	s_setupplayers;
@@ -68,7 +69,7 @@ void SetupPlayers_Event( void *ptr, int notification ) {
 	}
 
 	if (((menucommon_s*)ptr)->id >= ID_CUSTOMIZEPLAYER && ((menucommon_s*)ptr)->id < ID_CUSTOMIZEPLAYER+MAX_SPLITVIEW) {
-		UI_PlayerSettingsMenu( ((menucommon_s*)ptr)->id - ID_CUSTOMIZEPLAYER );
+		s_setupplayers.playerfunc( ((menucommon_s*)ptr)->id - ID_CUSTOMIZEPLAYER );
 		return;
 	}
 
@@ -165,8 +166,9 @@ void SetupPlayers_Cache( void ) {
 UI_SetupPlayersMenu
 =================
 */
-void UI_SetupPlayersMenu( void ) {
+void UI_SetupPlayersMenu( void (*playerfunc)(int) ) {
 	SetupPlayers_MenuInit();
+	s_setupplayers.playerfunc = playerfunc;
 	UI_PushMenu( &s_setupplayers.menu );
 }
 #endif
