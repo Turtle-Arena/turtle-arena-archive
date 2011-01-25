@@ -118,6 +118,18 @@ void InServer_Event( void *ptr, int notification ) {
 
 /*
 =================
+UI_InServerMenu_Draw
+=================
+*/
+static void UI_InServerMenu_Draw( void ) {
+	UI_DrawBannerString( 320, 16, "SERVER", UI_CENTER, text_banner_color );
+
+	// standard menu drawing
+	Menu_Draw( &s_inserver.menu );
+}
+
+/*
+=================
 InServer_MenuInit
 =================
 */
@@ -128,6 +140,7 @@ void InServer_MenuInit( void ) {
 
 	InServer_Cache();
 
+	s_inserver.menu.draw = UI_InServerMenu_Draw;
 	s_inserver.menu.wrapAround = qtrue;
 	s_inserver.menu.fullscreen = qfalse;
 
