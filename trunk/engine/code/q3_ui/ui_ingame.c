@@ -234,6 +234,19 @@ void InGame_MenuInit( void ) {
 	//y = 96;
 	y = 88;
 #endif
+#ifdef TA_MISC
+	s_ingame.resume.generic.type			= MTYPE_PTEXT;
+	s_ingame.resume.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_ingame.resume.generic.x				= 320;
+	s_ingame.resume.generic.y				= y;
+	s_ingame.resume.generic.id				= ID_RESUME;
+	s_ingame.resume.generic.callback		= InGame_Event; 
+	s_ingame.resume.string					= "Resume Game";
+	s_ingame.resume.color					= text_big_color;
+	s_ingame.resume.style					= UI_CENTER|UI_SMALLFONT;
+
+	y += INGAME_MENU_VERTICAL_SPACING;
+#endif
 #ifdef TA_MISC // SMART_JOIN_MENU
 	if( (trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
 		s_ingame.team.generic.type			= MTYPE_PTEXT;
@@ -242,7 +255,7 @@ void InGame_MenuInit( void ) {
 		s_ingame.team.generic.y				= y;
 		s_ingame.team.generic.id			= ID_TEAM;
 		s_ingame.team.generic.callback		= InGame_Event;
-		s_ingame.team.string				= "CHANGE TEAM";
+		s_ingame.team.string				= "Change Team";
 		s_ingame.team.color					= text_big_color;
 		s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 	}
@@ -257,7 +270,7 @@ void InGame_MenuInit( void ) {
 			s_ingame.team.generic.y				= y;
 			s_ingame.team.generic.id			= ID_JOINGAME;
 			s_ingame.team.generic.callback		= InGame_Event;
-			s_ingame.team.string				= "JOIN GAME";
+			s_ingame.team.string				= "Join Game";
 			s_ingame.team.color					= text_big_color;
 			s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 		}
@@ -269,7 +282,7 @@ void InGame_MenuInit( void ) {
 			s_ingame.team.generic.y				= y;
 			s_ingame.team.generic.id			= ID_SPECTATE;
 			s_ingame.team.generic.callback		= InGame_Event;
-			s_ingame.team.string				= "SPECTATE";
+			s_ingame.team.string				= "Spectate";
 			s_ingame.team.color					= text_big_color;
 			s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 		}
@@ -335,7 +348,11 @@ void InGame_MenuInit( void ) {
 	s_ingame.teamorders.generic.y			= y;
 	s_ingame.teamorders.generic.id			= ID_TEAMORDERS;
 	s_ingame.teamorders.generic.callback	= InGame_Event; 
+#ifdef TA_MISC
+	s_ingame.teamorders.string				= "Team Orders";
+#else
 	s_ingame.teamorders.string				= "TEAM ORDERS";
+#endif
 	s_ingame.teamorders.color				= text_big_color;
 	s_ingame.teamorders.style				= UI_CENTER|UI_SMALLFONT;
 	if( !(trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
@@ -358,7 +375,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.setup.generic.id			= ID_SETUP;
 	s_ingame.setup.generic.callback		= InGame_Event; 
 #ifdef TA_SP // New menus
-	s_ingame.setup.string				= "OPTIONS";
+	s_ingame.setup.string				= "Options";
 #else
 	s_ingame.setup.string				= "SETUP";
 #endif
@@ -373,7 +390,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.setupplayer.generic.y			= y;
 	s_ingame.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
 	s_ingame.setupplayer.generic.callback	= InGame_Event; 
-	s_ingame.setupplayer.string				= "PLAYER";
+	s_ingame.setupplayer.string				= "Player";
 	s_ingame.setupplayer.color				= text_big_color;
 	s_ingame.setupplayer.style				= UI_CENTER|UI_SMALLFONT;
 #endif
@@ -386,7 +403,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.inserver.generic.y			= y;
 	s_ingame.inserver.generic.id		= ID_SERVER;
 	s_ingame.inserver.generic.callback	= InGame_Event; 
-	s_ingame.inserver.string			= "SERVER";
+	s_ingame.inserver.string			= "Server";
 	s_ingame.inserver.color				= text_big_color;
 	s_ingame.inserver.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) ) {
@@ -401,7 +418,11 @@ void InGame_MenuInit( void ) {
 	s_ingame.server.generic.y			= y;
 	s_ingame.server.generic.id			= ID_SERVERINFO;
 	s_ingame.server.generic.callback	= InGame_Event; 
+#ifdef TA_MISC
+	s_ingame.server.string				= "Server Info";
+#else
 	s_ingame.server.string				= "SERVER INFO";
+#endif
 	s_ingame.server.color				= text_big_color;
 	s_ingame.server.style				= UI_CENTER|UI_SMALLFONT;
 
@@ -421,6 +442,7 @@ void InGame_MenuInit( void ) {
 	}
 #endif
 
+#ifndef TA_MISC
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.resume.generic.type			= MTYPE_PTEXT;
 	s_ingame.resume.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -431,6 +453,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.resume.string					= "RESUME GAME";
 	s_ingame.resume.color					= text_big_color;
 	s_ingame.resume.style					= UI_CENTER|UI_SMALLFONT;
+#endif
 
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.leave.generic.type			= MTYPE_PTEXT;
@@ -439,7 +462,11 @@ void InGame_MenuInit( void ) {
 	s_ingame.leave.generic.y			= y;
 	s_ingame.leave.generic.id			= ID_LEAVEARENA;
 	s_ingame.leave.generic.callback		= InGame_Event; 
+#ifdef TA_MISC
+	s_ingame.leave.string				= "Leave Game";
+#else
 	s_ingame.leave.string				= "LEAVE ARENA";
+#endif
 	s_ingame.leave.color				= text_big_color;
 	s_ingame.leave.style				= UI_CENTER|UI_SMALLFONT;
 
@@ -450,11 +477,18 @@ void InGame_MenuInit( void ) {
 	s_ingame.quit.generic.y				= y;
 	s_ingame.quit.generic.id			= ID_QUIT;
 	s_ingame.quit.generic.callback		= InGame_Event; 
+#ifdef TA_MISC
+	s_ingame.quit.string				= "Exit";
+#else
 	s_ingame.quit.string				= "EXIT GAME";
+#endif
 	s_ingame.quit.color					= text_big_color;
 	s_ingame.quit.style					= UI_CENTER|UI_SMALLFONT;
 
 	Menu_AddItem( &s_ingame.menu, &s_ingame.frame );
+#ifdef TA_MISC
+	Menu_AddItem( &s_ingame.menu, &s_ingame.resume );
+#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.team );
 #ifndef TA_MISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.addbots );
@@ -472,7 +506,9 @@ void InGame_MenuInit( void ) {
 #ifndef TA_MISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.restart );
 #endif
+#ifndef TA_MISC
 	Menu_AddItem( &s_ingame.menu, &s_ingame.resume );
+#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.leave );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.quit );
 }

@@ -1,11 +1,11 @@
 Turtle Arena's new WIP menu idea, for when I make the menu using Team Arena menu scripting.
 		...or if stick with quake3's ui.
 
-TODO: Finished doing this to the q3 ui so I can remove this file.
+TODO: Finished doing this to the q3_ui so I can remove this file.
 
 :MAIN
 PLAY
-MULTIPLAYER - or NETWORK GAME?
+MULTIPLAYER
 OPTIONS
 QUIT
 
@@ -25,13 +25,13 @@ Load savegame.
 Show a list of demos, start a demo, ect.
 
 === CINEMATICS ===
-Currently don't have any. Disable for now.
+List cinematics (either auto list or use predefined list).
+	If using predefined list, disable cinematic if video file doesn't exist.
 
 === MODS ===
 List Mods, load Mod.
 
 == MULTIPLAYER ==
-:Or Network Game?
 
 === Create Game ===
 :Or Host Game?
@@ -40,8 +40,13 @@ List Mods, load Mod.
 
 === Join Game (Specify IP) ===
 
-=== Setup Player ===
+=== Setup Player 1 ===
 
+=== Setup Player 2 ===
+
+=== Setup Player 3 ===
+
+=== Setup Player 4 ===
 
 == OPTIONS ==
 :Like the Q3 SETUP menu, less player setup.
@@ -49,10 +54,13 @@ List Mods, load Mod.
 === CONTROLS ===
 
 ==== Player 1 ====
-//==== Player 2 ====
-//==== Player 3 ====
-//==== Player 4 ====
-==== Game Controls ==== --Just list controls here in "CONTROLS" menu.
+==== Player 2 ====
+==== Player 3 ====
+==== Player 4 ====
+==== Game Controls ====
+TODO: Just list controls here in "CONTROLS" menu?
+Note: Currenly with Player 1 controls.
+
 * Show scores
 * Chat
 * Chat - Team
@@ -60,7 +68,6 @@ List Mods, load Mod.
 * Chat - Attacker
 
 === CREDITS ===
-:Not needed at all?
 
 
 == EXIT ==
@@ -76,29 +83,29 @@ Join Game
 :: else
 Spectate
 : else
-Team Select --Was "Join", but new name still isn't lot more good-er.'
+Change Team
 : end if
-Add/Remove Bots --server/admin only?
-Player
-Vote --Like in missionpack
+TODO: Vote --Like in missionpack
 Options
-Server Info -- Put in options or do players want to see it a lot?
+Player
+Server
+Server Info
+Leave Game (to be removed?)
 Exit
 
 :INGAMESP
 Resume Game
-Save Game
+Save Game?
 Load Game?
 Options
+Leave Game (to be removed?)
 Exit
 
 == Resume Game ==
 Close ingame menu.
 
-== Join ==
+== Change Team ==
 Open menu with teams.
-
-== Add/Remove Bot ==
 
 == Player ==
 Change player model [and headmodel?] and player skin and colors.
@@ -117,19 +124,28 @@ Load savegame.
 == Options ==
 Like the out_options only not fullscreen.
 
+== Server ==
+: Server-only admin menu
+
+=== Change Map ===
+
+=== Add Bot ===
+
+=== Remove Bot ===
+
+=== Restart Level ===
+
 == Server Info ==
 Open [message] box with info.
 
 == Leave Game ==
+: To be removed?
 Ask for confirm.
 Exit back to main menu.
 
 == Exit ==
-=== Restart Game ===
-: Not in Single Player (or Co-op?), don't have in any menu? -- Not something that seems needed, to me that is.
-
 === Main Menu ===
-:Leave Arena
+:Replace Level Game
 
 === Exit Game ===
 Ask for confirm.
