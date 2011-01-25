@@ -34,25 +34,36 @@ Adjusted for resolution, doesn't keep screen aspect ratio
 void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
 #ifdef TA_SPLITVIEW
 	if (cg.numViewports != 1 && cg.snap) {
+		qboolean right = qfalse;
+		qboolean down = qfalse;
+
 		if (cg.numViewports == 2) {
 			if (cg.viewport == 1) {
-				if (cg_splitviewVertical.integer) {
-					*x += SCREEN_WIDTH;
-				} else {
-					*y += SCREEN_HEIGHT;
-				}
+				down = qtrue;
 			}
 		}
 		else if (cg.numViewports == 3 && cg.viewport == 2) {
-			*y += SCREEN_HEIGHT;
+			down = qtrue;
 		}
 		else if (cg.numViewports <= 4) {
 			if (cg.viewport == 1 || cg.viewport == 3) {
-				*x += SCREEN_WIDTH;
+				right = qtrue;
 			}
 			if (cg.viewport == 2 || cg.viewport == 3) {
-				*y += SCREEN_HEIGHT;
+				down = qtrue;
 			}
+		}
+
+		if (cg.viewport > 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
+			right = !right;
+			down = !down;
+		}
+
+		if (right) {
+			*x += SCREEN_WIDTH;
+		}
+		if (down) {
+			*y += SCREEN_HEIGHT;
 		}
 	}
 #endif
@@ -94,27 +105,37 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	int viewXBias = 0;
 
 	if (cg.numViewports != 1 && cg.snap) {
+		qboolean right = qfalse;
+		qboolean down = qfalse;
+
 		if (cg.numViewports == 2) {
 			if (cg.viewport == 1) {
-				if (cg_splitviewVertical.integer) {
-					viewXBias = 2;
-					*x += SCREEN_WIDTH;
-				} else {
-					*y += SCREEN_HEIGHT;
-				}
+				down = qtrue;
 			}
 		}
 		else if (cg.numViewports == 3 && cg.viewport == 2) {
-			*y += SCREEN_HEIGHT;
+			down = qtrue;
 		}
 		else if (cg.numViewports <= 4) {
 			if (cg.viewport == 1 || cg.viewport == 3) {
-				viewXBias = 2;
-				*x += SCREEN_WIDTH;
+				right = qtrue;
 			}
 			if (cg.viewport == 2 || cg.viewport == 3) {
-				*y += SCREEN_HEIGHT;
+				down = qtrue;
 			}
+		}
+
+		if (cg.viewport > 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
+			right = !right;
+			down = !down;
+		}
+
+		if (right) {
+			viewXBias = 2;
+			*x += SCREEN_WIDTH;
+		}
+		if (down) {
+			*y += SCREEN_HEIGHT;
 		}
 	}
 #endif
