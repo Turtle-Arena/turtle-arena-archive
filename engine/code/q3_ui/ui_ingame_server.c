@@ -96,7 +96,7 @@ void InServer_Event( void *ptr, int notification ) {
 		break;
 
 	case ID_RESTART:
-		UI_ConfirmMenu( "RESTART ARENA?", 0, InServer_RestartAction );
+		UI_ConfirmMenu( "Restart Level?", 0, InServer_RestartAction );
 		break;
 
 	case ID_ADDBOTS:
@@ -149,7 +149,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.map.generic.y			= y;
 	s_inserver.map.generic.id			= ID_CHANGEMAP;
 	s_inserver.map.generic.callback		= InServer_Event;
-	s_inserver.map.string				= "CHANGE MAP";
+	s_inserver.map.string				= "Change Map";
 	s_inserver.map.color				= text_big_color;
 	s_inserver.map.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) ) {
@@ -163,7 +163,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.addbots.generic.y			= y;
 	s_inserver.addbots.generic.id			= ID_ADDBOTS;
 	s_inserver.addbots.generic.callback		= InServer_Event; 
-	s_inserver.addbots.string				= "ADD BOTS";
+	s_inserver.addbots.string				= "Add Bots";
 	s_inserver.addbots.color				= text_big_color;
 	s_inserver.addbots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
@@ -183,7 +183,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.removebots.generic.y			= y;
 	s_inserver.removebots.generic.id		= ID_REMOVEBOTS;
 	s_inserver.removebots.generic.callback	= InServer_Event; 
-	s_inserver.removebots.string			= "REMOVE BOTS";
+	s_inserver.removebots.string			= "Remove Bots";
 	s_inserver.removebots.color				= text_big_color;
 	s_inserver.removebots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
@@ -203,7 +203,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.restart.generic.y			= y;
 	s_inserver.restart.generic.id			= ID_RESTART;
 	s_inserver.restart.generic.callback		= InServer_Event; 
-	s_inserver.restart.string				= "RESTART ARENA";
+	s_inserver.restart.string				= "Restart Level";
 	s_inserver.restart.color				= text_big_color;
 	s_inserver.restart.style				= UI_CENTER|UI_SMALLFONT;
 
@@ -215,7 +215,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.back.generic.y			= y;
 	s_inserver.back.generic.id			= ID_BACK;
 	s_inserver.back.generic.callback	= InServer_Event; 
-	s_inserver.back.string				= "BACK";
+	s_inserver.back.string				= "Back";
 	s_inserver.back.color				= text_big_color;
 	s_inserver.back.style				= UI_CENTER|UI_SMALLFONT;
 
