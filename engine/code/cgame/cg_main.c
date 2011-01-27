@@ -1724,7 +1724,7 @@ static void CG_RegisterClients( void ) {
 
 #ifdef TA_SPLITVIEW
 		for (j = 0; j < numLocalClients; j++) {
-			if (cg.localClients[0].clientNum == i) {
+			if (cg.localClients[j].clientNum == i) {
 				break;
 			}
 		}
@@ -2706,15 +2706,15 @@ Return 1 if in third person.
 */
 int CG_ViewType( int entityNum ) {
 #ifdef TA_SPLITVIEW
-	int lc;
+	int i;
 
 	if (!cg.snap) {
 		return -1;
 	}
 
-	for (lc = 0; lc < cg.snap->numPSs; lc++) {
-		if (cg.snap->pss[lc].clientNum == entityNum) {
-			return cg_thirdPerson[lc].integer;
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[cg.snap->lcIndex[i]].clientNum == entityNum) {
+			return cg_thirdPerson[cg.snap->lcIndex[i]].integer;
 		}
 	}
 

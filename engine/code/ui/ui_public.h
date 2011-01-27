@@ -34,6 +34,7 @@ typedef struct {
 	char			messageString[MAX_STRING_CHARS];
 #ifdef TA_SPLITVIEW
 	int				numLocalClients;
+	int				lcIndex[MAX_SPLITVIEW];
 #endif
 } uiClientState_t;
 

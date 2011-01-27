@@ -163,6 +163,9 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 	Com_Memcpy( snapshot->areamask, clSnap->areamask, sizeof( snapshot->areamask ) );
 #ifdef TA_SPLITVIEW
 	snapshot->numPSs = clSnap->numPSs;
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		snapshot->lcIndex[i] = clSnap->lcIndex[i];
+	}
 	for (i = 0; i < snapshot->numPSs; i++) {
 		snapshot->pss[i] = clSnap->pss[i];
 	}

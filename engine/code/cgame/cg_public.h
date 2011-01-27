@@ -47,6 +47,7 @@ typedef struct {
 #ifdef TA_SPLITVIEW
 	int				numPSs;
 	playerState_t	pss[MAX_SPLITVIEW];		// complete information about the current player at this time
+	int				lcIndex[MAX_SPLITVIEW];		// Local Client Indexes
 #else
 	playerState_t	ps;						// complete information about the current player at this time
 #endif

@@ -1312,10 +1312,14 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		cg.numViewports = 0;
 	}
 
-	for (i = 0; i < cg.snap->numPSs; i++) {
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (cg.snap->lcIndex[i] == -1) {
+			renderClientViewport[i] = qfalse;
+			continue;
+		}
 		cg.cur_localClientNum = i;
 		cg.cur_lc = &cg.localClients[i];
-		cg.cur_ps = &cg.snap->pss[i];
+		cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[i]];
 
 		// Check if viewport should be drawn.
 		if (cg.singleCamera || (cg.cur_ps->persistant[PERS_TEAM] == TEAM_SPECTATOR && (cg.cur_ps->pm_flags & PMF_LOCAL_HIDE))) {
@@ -1385,14 +1389,14 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		renderClientViewport[0] = qtrue;
 	}
 
-	for (i = 0, cg.viewport = -1; i < cg.snap->numPSs; i++) {
+	for (i = 0, cg.viewport = -1; i < MAX_SPLITVIEW; i++) {
 		if (!renderClientViewport[i]) {
 			continue;
 		}
 		cg.viewport++;
 		cg.cur_localClientNum = i;
 		cg.cur_lc = &cg.localClients[i];
-		cg.cur_ps = &cg.snap->pss[i];
+		cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[i]];
 #endif
 
 	// decide on third person view

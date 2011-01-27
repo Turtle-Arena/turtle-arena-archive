@@ -226,18 +226,20 @@ void CG_Respawn( int clientNum ) {
 	// no error decay on player movement
 	cg.thisFrameTeleport = qtrue;
 
-	for (i = 0; i < cg.snap->numPSs; i++) {
-		if (clientNum != -1 && cg.snap->pss[i].clientNum != clientNum)
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (clientNum != -1 && (cg.snap->lcIndex[i] == -1 || cg.snap->pss[cg.snap->lcIndex[i]].clientNum != clientNum)) {
 			continue;
+		}
+
 #ifndef TA_WEAPSYS_EX
 		// display weapons available
 		cg.localClients[i].weaponSelectTime = cg.time;
 
 		// select the weapon the server says we are using
-		cg.localClients[i].weaponSelect = cg.snap->pss[i].weapon;
+		cg.localClients[i].weaponSelect = cg.snap->pss[cg.snap->lcIndex[i]].weapon;
 #endif
 #ifdef TA_HOLDSYS/*2*/
-		cg.localClients[i].holdableSelect = cg.snap->pss[i].holdableIndex;
+		cg.localClients[i].holdableSelect = cg.snap->pss[cg.snap->lcIndex[i]].holdableIndex;
 #endif
 #ifdef IOQ3ZTM // NEW_CAM
 		cg.localClients[i].camRotDir = 0;

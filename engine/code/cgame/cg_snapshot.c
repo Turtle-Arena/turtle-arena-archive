@@ -149,11 +149,18 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	cg.snap = snap;
 
 #ifdef TA_SPLITVIEW
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (cg.snap->lcIndex[i] != -1) {
+			// Set clientNum as extra local client don't have it yet.
+			cg.localClients[i].clientNum = cg.snap->pss[cg.snap->lcIndex[i]].clientNum;
+		}
+	}
+
 	for (i = 0; i < cg.snap->numPSs; i++) {
-		BG_PlayerStateToEntityState( &snap->pss[i], &cg_entities[ snap->pss[i].clientNum ].currentState, qfalse );
+		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState, qfalse );
 		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState
 #ifdef TA_PLAYERSYS
-				, &cgs.clientinfo[cg.localClients[i].clientNum].playercfg
+				, &cgs.clientinfo[ cg.snap->pss[i].clientNum ].playercfg
 #endif
 				);
 	}
@@ -232,7 +239,7 @@ static void CG_TransitionSnapshot( void ) {
 		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState, qfalse );
 		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState
 #ifdef TA_PLAYERSYS
-				, &cgs.clientinfo[cg.localClients[i].clientNum].playercfg
+				, &cgs.clientinfo[ cg.snap->pss[i].clientNum ].playercfg
 #endif
 				);
 		cg_entities[ cg.snap->pss[i].clientNum ].interpolate = qfalse;
@@ -257,12 +264,16 @@ static void CG_TransitionSnapshot( void ) {
 		playerState_t	*ops, *ps;
 
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if (oldFrame->lcIndex[i] == -1 || cg.snap->lcIndex[i] == -1) {
+				continue;
+			}
+
 			cg.cur_localClientNum = i;
 			cg.cur_lc = &cg.localClients[i];
 
-			ops = &oldFrame->pss[i];
-			ps = &cg.snap->pss[i];
+			ops = &oldFrame->pss[oldFrame->lcIndex[i]];
+			ps = &cg.snap->pss[cg.snap->lcIndex[i]];
 #else
 		ops = &oldFrame->ps;
 		ps = &cg.snap->ps;
@@ -308,7 +319,7 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].nextState, qfalse );
 		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].nextState
 #ifdef TA_PLAYERSYS
-				, &cgs.clientinfo[cg.localClients[i].clientNum].playercfg
+				, &cgs.clientinfo[ cg.snap->pss[i].clientNum ].playercfg
 #endif
 				);
 		cg_entities[ cg.snap->pss[i].clientNum ].interpolate = qtrue;
@@ -345,7 +356,7 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 		}
 
 		// if changing follow mode, don't interpolate
-		if ( cg.nextSnap->pss[0].clientNum != cg.snap->pss[0].clientNum ) {
+		if ( cg.nextSnap->pss[i].clientNum != cg.snap->pss[i].clientNum ) {
 			cg.nextFrameTeleport = qtrue;
 		}
 	}

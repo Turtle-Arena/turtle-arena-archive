@@ -555,6 +555,11 @@ gotnewcl:
 
 			Q_strncpyz( userinfo, Cmd_Argv(1+lc), sizeof(userinfo) );
 
+			if (strlen(userinfo) <= 0) {
+				// Ignore dummy userinfo string, used for skipping client.
+				continue;
+			}
+
 			// build a new connection
 			// accept the new client
 			// this is the only place a client_t is ever initialized
@@ -576,6 +581,10 @@ gotnewcl:
 
 			newcl->owner = newcl->gentity->r.owner = owner - svs.clients;
 			owner->local_clients[lc-1] = owner->gentity->r.local_clients[lc-1] = clientNum;
+
+			for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+				newcl->local_clients[i] = newcl->gentity->r.local_clients[i] = -1;
+			}
 
 			// get the game a chance to reject this connection or modify the userinfo
 			denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue
@@ -636,6 +645,17 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	challenge_t	*challenge;
 	const qboolean isBot = drop->netchan.remoteAddress.type == NA_BOT;
 
+#ifdef TA_SPLITVIEW
+	// Kick client's splitscreen clients
+	if (drop->owner == -1) {
+		for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+			if (drop->local_clients[i] != -1) {
+				SV_DropClient( &svs.clients[drop->local_clients[i]], reason );
+			}
+		}
+	}
+#endif
+
 	if ( drop->state == CS_ZOMBIE ) {
 		return;		// already dropped
 	}
@@ -655,11 +675,17 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	}
 
 	// Kill any download
+#ifdef TA_SPLITVIEW // Allow kicking extra local clients
+	if (drop->owner == -1)
+#endif
 	SV_CloseDownload( drop );
 
 	// tell everyone why they got dropped
 	SV_SendServerCommand( NULL, "print \"%s" S_COLOR_WHITE " %s\n\"", drop->name, reason );
 
+#ifdef TA_SPLITVIEW // Allow kicking extra local clients
+	if (drop->owner == -1)
+#endif
 	if (drop->download)	{
 		FS_FCloseFile( drop->download );
 		drop->download = 0;
@@ -670,6 +696,24 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	VM_Call( gvm, GAME_CLIENT_DISCONNECT, drop - svs.clients );
 
 	// add the disconnect command
+#ifdef TA_SPLITVIEW // Allow kicking extra local clients
+	if (drop->owner != -1)
+	{
+		// Do cleanup for extra local client kick.
+		client_t *cl = svs.clients + drop->owner;
+		int clientNum = drop - svs.clients;
+
+		for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+			if (cl->local_clients[i] == clientNum) {
+				cl->local_clients[i] = -1;
+			}
+			if (cl->gentity->r.local_clients[i] == clientNum) {
+				cl->gentity->r.local_clients[i] = -1;
+			}
+		}
+	}
+	else
+#endif
 	SV_SendServerCommand( drop, "disconnect \"%s\"", reason);
 
 	if ( isBot ) {
