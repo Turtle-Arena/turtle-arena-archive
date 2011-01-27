@@ -1499,8 +1499,7 @@ void CL_2DropOut_f( void ) {
 		Com_Printf ("Not connected to a server.\n");
 		return;
 	}
-	
-	// don't forward the first argument
+
 	CL_AddReliableCommand("dropout2", qfalse);
 }
 
@@ -1514,8 +1513,7 @@ void CL_3DropOut_f( void ) {
 		Com_Printf ("Not connected to a server.\n");
 		return;
 	}
-	
-	// don't forward the first argument
+
 	CL_AddReliableCommand("dropout3", qfalse);
 }
 
@@ -1529,9 +1527,50 @@ void CL_4DropOut_f( void ) {
 		Com_Printf ("Not connected to a server.\n");
 		return;
 	}
-	
-	// don't forward the first argument
+
 	CL_AddReliableCommand("dropout4", qfalse);
+}
+
+/*
+==================
+CL_2DropIn_f
+==================
+*/
+void CL_2DropIn_f( void ) {
+	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
+		Com_Printf ("Not connected to a server.\n");
+		return;
+	}
+
+	CL_AddReliableCommand(va("dropin2 \"%s\"", Cvar_InfoString( CVAR_USERINFO2 )), qfalse);
+}
+
+/*
+==================
+CL_3DropIn_f
+==================
+*/
+void CL_3DropIn_f( void ) {
+	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
+		Com_Printf ("Not connected to a server.\n");
+		return;
+	}
+
+	CL_AddReliableCommand(va("dropin3 \"%s\"", Cvar_InfoString( CVAR_USERINFO3 )), qfalse);
+}
+
+/*
+==================
+CL_4DropIn_f
+==================
+*/
+void CL_4DropIn_f( void ) {
+	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
+		Com_Printf ("Not connected to a server.\n");
+		return;
+	}
+
+	CL_AddReliableCommand(va("dropin4 \"%s\"", Cvar_InfoString( CVAR_USERINFO4 )), qfalse);
 }
 #endif
 
@@ -3581,6 +3620,9 @@ void CL_Init( void ) {
 	Cmd_AddCommand ("2dropout", CL_2DropOut_f);
 	Cmd_AddCommand ("3dropout", CL_3DropOut_f);
 	Cmd_AddCommand ("4dropout", CL_4DropOut_f);
+	Cmd_AddCommand ("2dropin", CL_2DropIn_f);
+	Cmd_AddCommand ("3dropin", CL_3DropIn_f);
+	Cmd_AddCommand ("4dropin", CL_4DropIn_f);
 #endif
 	Cmd_AddCommand ("configstrings", CL_Configstrings_f);
 	Cmd_AddCommand ("clientinfo", CL_Clientinfo_f);

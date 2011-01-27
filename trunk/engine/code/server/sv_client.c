@@ -270,6 +270,132 @@ static qboolean SV_IsBanned(netadr_t *from, qboolean isexception)
 	return qfalse;
 }
 
+#ifdef TA_SPLITVIEW
+/*
+==================
+SV_AddExtraLocalClient
+
+Add extra local client, either at connect or mid-game.
+==================
+*/
+void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
+	int			i;
+	client_t	*cl, *newcl;
+	client_t	temp;
+	sharedEntity_t *ent;
+	int			clientNum;
+	char		*password;
+	int			startIndex;
+	intptr_t		denied;
+
+	newcl = &temp;
+	Com_Memset (newcl, 0, sizeof(client_t));
+
+	// find a client slot
+	// if "sv_privateClients" is set > 0, then that number
+	// of client slots will be reserved for connections that
+	// have "password" set to the value of "sv_privatePassword"
+	// Info requests will report the maxclients as if the private
+	// slots didn't exist, to prevent people from trying to connect
+	// to a full server.
+	// This is to allow us to reserve a couple slots here on our
+	// servers so we can play without having to kick people.
+
+	// check for privateClient password
+	password = Info_ValueForKey( userinfo, "password" );
+	if ( !strcmp( password, sv_privatePassword->string ) ) {
+		startIndex = 0;
+	} else {
+		// skip past the reserved slots
+		startIndex = sv_privateClients->integer;
+	}
+
+	newcl = NULL;
+	for ( i = startIndex; i < sv_maxclients->integer ; i++ ) {
+		cl = &svs.clients[i];
+		if (cl->state == CS_FREE) {
+			newcl = cl;
+			break;
+		}
+	}
+
+	if (!newcl) {
+		return;
+	}
+
+	if ( strlen(userinfo) <= 0 ) {
+		// Ignore dummy userinfo string.
+		return;
+	}
+
+	// build a new connection
+	// accept the new client
+	// this is the only place a client_t is ever initialized
+	//*newcl = temp;
+	*newcl = *owner;
+	clientNum = newcl - svs.clients;
+	ent = SV_GentityNum( clientNum );
+	newcl->gentity = ent;
+
+	// save the challenge
+	newcl->challenge = owner->challenge;
+
+	// save the address
+	Netchan_Setup (NS_SERVER, &newcl->netchan , owner->netchan.remoteAddress, owner->netchan.qport);
+	// init the netchan queue
+	newcl->netchan_end_queue = &newcl->netchan_start_queue;
+
+	// save the userinfo
+	Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
+
+	newcl->owner = newcl->gentity->r.owner = owner - svs.clients;
+	owner->local_clients[lc-1] = owner->gentity->r.local_clients[lc-1] = clientNum;
+
+	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+		newcl->local_clients[i] = newcl->gentity->r.local_clients[i] = -1;
+	}
+
+	// get the game a chance to reject this connection or modify the userinfo
+	denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue
+	if ( denied ) {
+		// we can't just use VM_ArgPtr, because that is only valid inside a VM_Call
+		char *str = VM_ExplicitArgPtr( gvm, denied );
+
+		NET_OutOfBandPrint( NS_SERVER, owner->netchan.remoteAddress, "print\n%s\n", str );
+		Com_DPrintf ("Game rejected a connection: %s.\n", str);
+		return;
+	}
+
+	SV_UserinfoChanged( newcl );
+
+	// send the connect packet to the client
+	//NET_OutOfBandPrint( NS_SERVER, from, "connectResponse" );
+
+	if (owner->state >= CS_PRIMED) {
+		Com_DPrintf( "Going from CS_FREE to CS_PRIMED for %s\n", newcl->name );
+		newcl->state = CS_PRIMED;
+		newcl->pureAuthentic = owner->pureAuthentic;
+		newcl->gotCP = owner->gotCP;
+
+		// when we receive the first packet from the client, we will
+		// notice that it is from a different serverid and that the
+		// gamestate message was not just sent, forcing a retransmit
+		newcl->gamestateMessageNum = newcl->netchan.outgoingSequence;
+	} else {
+		Com_DPrintf( "Going from CS_FREE to CS_CONNECTED for %s\n", newcl->name );
+		newcl->state = CS_CONNECTED;
+	}
+	newcl->nextSnapshotTime = svs.time;
+	newcl->lastPacketTime = svs.time;
+	newcl->lastConnectTime = svs.time;
+
+	// when we receive the first packet from the client, we will
+	// notice that it is from a different serverid and that the
+	// gamestate message was not just sent, forcing a retransmit
+	newcl->gamestateMessageNum = -1;
+}
+#endif
+
 /*
 ==================
 SV_DirectConnect
@@ -533,87 +659,11 @@ gotnewcl:
 	newcl->gamestateMessageNum = -1;
 
 #ifdef TA_SPLITVIEW
-	{
-		// Client sends a userinfo string for each client they want.
-		int wantClients = Com_Clamp(1, MAX_SPLITVIEW, Cmd_Argc()-1);
-		int lc; // local client
-		client_t *owner = newcl;
+	// Client sends a userinfo string for each client they want.
+	count = Com_Clamp(1, MAX_SPLITVIEW, Cmd_Argc()-1);
 
-		for (lc = 1; lc < wantClients; lc++) {
-			newcl = NULL;
-			for ( i = startIndex; i < sv_maxclients->integer ; i++ ) {
-				cl = &svs.clients[i];
-				if (cl->state == CS_FREE) {
-					newcl = cl;
-					break;
-				}
-			}
-
-			if (!newcl) {
-				break;
-			}
-
-			Q_strncpyz( userinfo, Cmd_Argv(1+lc), sizeof(userinfo) );
-
-			if ( strlen(userinfo) <= 0 ) {
-				// Ignore dummy userinfo string, used for skipping client.
-				continue;
-			}
-
-			// build a new connection
-			// accept the new client
-			// this is the only place a client_t is ever initialized
-			*newcl = *owner;
-			clientNum = newcl - svs.clients;
-			ent = SV_GentityNum( clientNum );
-			newcl->gentity = ent;
-
-			// save the challenge
-			//newcl->challenge = challenge;
-
-			// save the address
-			Netchan_Setup (NS_SERVER, &newcl->netchan , from, qport);
-			// init the netchan queue
-			newcl->netchan_end_queue = &newcl->netchan_start_queue;
-
-			// save the userinfo
-			Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
-
-			newcl->owner = newcl->gentity->r.owner = owner - svs.clients;
-			owner->local_clients[lc-1] = owner->gentity->r.local_clients[lc-1] = clientNum;
-
-			for (i = 0; i < MAX_SPLITVIEW-1; i++) {
-				newcl->local_clients[i] = newcl->gentity->r.local_clients[i] = -1;
-			}
-
-			// get the game a chance to reject this connection or modify the userinfo
-			denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue
-			if ( denied ) {
-				// we can't just use VM_ArgPtr, because that is only valid inside a VM_Call
-				char *str = VM_ExplicitArgPtr( gvm, denied );
-
-				NET_OutOfBandPrint( NS_SERVER, from, "print\n%s\n", str );
-				Com_DPrintf ("Game rejected a connection: %s.\n", str);
-				break;
-			}
-
-			SV_UserinfoChanged( newcl );
-
-			// send the connect packet to the client
-			//NET_OutOfBandPrint( NS_SERVER, from, "connectResponse" );
-
-			Com_DPrintf( "Going from CS_FREE to CS_CONNECTED for %s\n", newcl->name );
-
-			newcl->state = CS_CONNECTED;
-			newcl->nextSnapshotTime = svs.time;
-			newcl->lastPacketTime = svs.time;
-			newcl->lastConnectTime = svs.time;
-			
-			// when we receive the first packet from the client, we will
-			// notice that it is from a different serverid and that the
-			// gamestate message was not just sent, forcing a retransmit
-			newcl->gamestateMessageNum = -1;
-		}
+	for (i = 1; i < count; i++) {
+		SV_AddExtraLocalClient(newcl, i, Cmd_Argv(1+i));
 	}
 #endif
 
@@ -1664,6 +1714,30 @@ void SV_DropOut4_f( client_t *cl ) {
 
 	SV_DropClient(lc, "dropped out");
 }
+
+void SV_DropIn2_f( client_t *cl ) {
+	if (cl->local_clients[0] != -1) {
+		return;
+	}
+
+	SV_AddExtraLocalClient(cl, 1, Cmd_Argv(1));
+}
+
+void SV_DropIn3_f( client_t *cl ) {
+	if (cl->local_clients[1] != -1) {
+		return;
+	}
+
+	SV_AddExtraLocalClient(cl, 2, Cmd_Argv(1));
+}
+
+void SV_DropIn4_f( client_t *cl ) {
+	if (cl->local_clients[2] != -1) {
+		return;
+	}
+
+	SV_AddExtraLocalClient(cl, 3, Cmd_Argv(1));
+}
 #endif
 
 
@@ -1713,6 +1787,9 @@ static ucmd_t ucmds[] = {
 	{"dropout2", SV_DropOut2_f},
 	{"dropout3", SV_DropOut3_f},
 	{"dropout4", SV_DropOut4_f},
+	{"dropin2", SV_DropIn2_f},
+	{"dropin3", SV_DropIn3_f},
+	{"dropin4", SV_DropIn4_f},
 #endif
 	{"disconnect", SV_Disconnect_f},
 	{"cp", SV_VerifyPaks_f},
