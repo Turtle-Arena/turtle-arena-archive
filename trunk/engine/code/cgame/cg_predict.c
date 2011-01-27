@@ -243,8 +243,8 @@ static void CG_InterpolatePlayerState( qboolean grabAngles ) {
 	prev = cg.snap;
 	next = cg.nextSnap;
 #ifdef TA_SPLITVIEW
-	prevPS = &cg.snap->pss[cg.viewport];
-	nextPS = &cg.nextSnap->pss[cg.viewport];
+	prevPS = &cg.snap->pss[cg.cur_localClientNum];
+	nextPS = &cg.nextSnap->pss[cg.cur_localClientNum];
 #else
 	prevPS = &cg.snap->ps;
 	nextPS = &cg.nextSnap->ps;
@@ -259,7 +259,7 @@ static void CG_InterpolatePlayerState( qboolean grabAngles ) {
 
 		cmdNum = trap_GetCurrentCmdNumber();
 #ifdef TA_SPLITVIEW // CONTROLS
-		trap_GetUserCmd( cmdNum, &cmd, cg.viewport );
+		trap_GetUserCmd( cmdNum, &cmd, cg.cur_localClientNum );
 #else
 		trap_GetUserCmd( cmdNum, &cmd );
 #endif
@@ -527,7 +527,7 @@ void CG_PredictPlayerState( void ) {
 	// the last good position we had
 	cmdNum = current - CMD_BACKUP + 1;
 #ifdef TA_SPLITVIEW // CONTROLS
-	trap_GetUserCmd( cmdNum, &oldestCmd, cg.viewport );
+	trap_GetUserCmd( cmdNum, &oldestCmd, cg.cur_localClientNum );
 #else
 	trap_GetUserCmd( cmdNum, &oldestCmd );
 #endif
@@ -541,7 +541,7 @@ void CG_PredictPlayerState( void ) {
 
 	// get the latest command so we can know which commands are from previous map_restarts
 #ifdef TA_SPLITVIEW // CONTROLS
-	trap_GetUserCmd( current, &latestCmd, cg.viewport );
+	trap_GetUserCmd( current, &latestCmd, cg.cur_localClientNum );
 #else
 	trap_GetUserCmd( current, &latestCmd );
 #endif
@@ -552,7 +552,7 @@ void CG_PredictPlayerState( void ) {
 	// be ahead of everything else anyway
 	if ( cg.nextSnap && !cg.nextFrameTeleport && !cg.thisFrameTeleport ) {
 #ifdef TA_SPLITVIEW
-		cg.cur_lc->predictedPlayerState = cg.nextSnap->pss[cg.viewport];
+		cg.cur_lc->predictedPlayerState = cg.nextSnap->pss[cg.cur_localClientNum];
 #else
 		cg.cur_lc->predictedPlayerState = cg.nextSnap->ps;
 #endif
@@ -577,7 +577,7 @@ void CG_PredictPlayerState( void ) {
 	for ( cmdNum = current - CMD_BACKUP + 1 ; cmdNum <= current ; cmdNum++ ) {
 		// get the command
 #ifdef TA_SPLITVIEW // CONTROLS
-		trap_GetUserCmd( cmdNum, &cg_pmove.cmd, cg.viewport );
+		trap_GetUserCmd( cmdNum, &cg_pmove.cmd, cg.cur_localClientNum );
 #else
 		trap_GetUserCmd( cmdNum, &cg_pmove.cmd );
 #endif

@@ -149,8 +149,6 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	cg.snap = snap;
 
 #ifdef TA_SPLITVIEW
-	cg.numViewports = cg.snap->numPSs;
-
 	for (i = 0; i < cg.snap->numPSs; i++) {
 		BG_PlayerStateToEntityState( &snap->pss[i], &cg_entities[ snap->pss[i].clientNum ].currentState, qfalse );
 		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState
@@ -230,8 +228,6 @@ static void CG_TransitionSnapshot( void ) {
 	cg.snap = cg.nextSnap;
 
 #ifdef TA_SPLITVIEW
-	cg.numViewports = cg.snap->numPSs;
-
 	for (i = 0; i < cg.snap->numPSs; i++) {
 		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState, qfalse );
 		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState
@@ -262,7 +258,7 @@ static void CG_TransitionSnapshot( void ) {
 
 #ifdef TA_SPLITVIEW
 		for (i = 0; i < cg.snap->numPSs; i++) {
-			cg.viewport = i;
+			cg.cur_localClientNum = i;
 			cg.cur_lc = &cg.localClients[i];
 
 			ops = &oldFrame->pss[i];

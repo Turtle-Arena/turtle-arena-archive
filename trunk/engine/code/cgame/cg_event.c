@@ -313,7 +313,7 @@ static void CG_Obituary( entityState_t *ent ) {
 #endif
 #ifdef TA_SPLITVIEW
 		}
-		cg.cur_lc = &cg.localClients[cg.viewport];
+		cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 #endif
 
 		// print the text message as well
@@ -516,7 +516,7 @@ static void CG_UseItem( centity_t *cent ) {
 		}
 	}
 #ifdef TA_SPLITVIEW
-	cg.cur_lc = &cg.localClients[cg.viewport];
+	cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 #endif
 
 	switch ( itemNum ) {
@@ -1121,7 +1121,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					CG_ItemPickup( index );
 				}
 			}
-			cg.cur_lc = &cg.localClients[cg.viewport];
+			cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 #else
 			if ( es->number == cg.snap->ps.clientNum ) {
 				CG_ItemPickup( index );
@@ -1170,7 +1170,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					CG_ItemPickup( index );
 				}
 			}
-			cg.cur_lc = &cg.localClients[cg.viewport];
+			cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 #else
 			if ( es->number == cg.snap->ps.clientNum ) {
 				CG_ItemPickup( index );
@@ -1198,7 +1198,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				CG_OutOfAmmoChange();
 			}
 		}
-		cg.cur_lc = &cg.localClients[cg.viewport];
+		cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 #else
 		if ( es->number == cg.snap->ps.clientNum ) {
 			CG_OutOfAmmoChange();

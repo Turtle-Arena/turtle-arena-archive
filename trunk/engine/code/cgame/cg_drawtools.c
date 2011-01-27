@@ -54,7 +54,7 @@ void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
 			}
 		}
 
-		if (cg.viewport > 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
+		if (cg.viewport != 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
 			right = !right;
 			down = !down;
 		}
@@ -125,7 +125,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 			}
 		}
 
-		if (cg.viewport > 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
+		if (cg.viewport != 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
 			right = !right;
 			down = !down;
 		}

@@ -1321,7 +1321,9 @@ static float CG_DrawFPS( float y ) {
 	int		t, frameTime;
 
 #ifdef TA_SPLITVIEW
-	if (cg.viewport == 0) {
+	if (cg.viewport != 0) {
+		return y;
+	}
 #endif
 	// don't use serverTime, because that will be drifting to
 	// correct for internet lag changes, timescales, timedemos, etc
@@ -1331,9 +1333,6 @@ static float CG_DrawFPS( float y ) {
 
 	previousTimes[index % FPS_FRAMES] = frameTime;
 	index++;
-#ifdef TA_SPLITVIEW
-	}
-#endif
 	if ( index > FPS_FRAMES ) {
 		// average multiple frames together to smooth changes out a bit
 		total = 0;
@@ -2316,7 +2315,7 @@ static void CG_DrawDisconnect( void ) {
 	// draw the phone jack if we are completely past our buffers
 	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
 #ifdef TA_SPLITVIEW // CONTROLS
-	trap_GetUserCmd( cmdNum, &cmd, cg.viewport );
+	trap_GetUserCmd( cmdNum, &cmd, cg.cur_localClientNum );
 #else
 	trap_GetUserCmd( cmdNum, &cmd );
 #endif

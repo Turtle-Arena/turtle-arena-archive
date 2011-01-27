@@ -1651,6 +1651,9 @@ typedef struct
 #define	PMF_BACKWARDS_RUN	16		// coast down to backwards run
 #define	PMF_TIME_LAND		32		// pm_time is time before rejump
 #define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
+#ifdef TA_SPLITVIEW
+#define PMF_LOCAL_HIDE		128
+#endif
 #define	PMF_TIME_WATERJUMP	256		// pm_time is waterjump
 #define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
 #define	PMF_USE_ITEM_HELD	1024

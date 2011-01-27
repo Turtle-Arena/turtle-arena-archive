@@ -592,6 +592,11 @@ void SetTeam( gentity_t *ent, char *s ) {
 	} else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) ) {
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FREE;
+#ifdef TA_SPLITVIEW
+	} else if ( !Q_stricmp( s, "hide" ) || !Q_stricmp( s, "h" ) ) {
+		team = TEAM_SPECTATOR;
+		specState = SPECTATOR_LOCAL_HIDE;
+#endif
 	} else if ( g_gametype.integer >= GT_TEAM
 #ifdef TA_SP // SP_BOSS
 			|| (g_gametype.integer == GT_SINGLE_PLAYER && (ent->r.svFlags & SVF_BOT))
