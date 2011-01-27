@@ -1556,3 +1556,40 @@ float Com_FontStringHeight( font_t *font, const char *s, int limit )
 	return Com_FontStringHeightExt(font, s, limit, qtrue);
 }
 #endif
+
+#ifdef TA_SPLITVIEW
+#ifndef QAGAME
+/*
+=================
+Com_LocalClientCvarName
+
+Used by client, cgame, and q3_ui. (In the future ui will probably use it too.)
+=================
+*/
+char *Com_LocalClientCvarName(int localClient, char *in_cvarName) {
+	static char localClientCvarName[MAX_CVAR_VALUE_STRING];
+
+	if (localClient == 0) {
+		Q_strncpyz(localClientCvarName, in_cvarName, MAX_CVAR_VALUE_STRING);
+	} else {
+		char prefix[2];
+		char *cvarName;
+
+		prefix[1] = '\0';
+
+		cvarName = in_cvarName;
+
+		if (cvarName[0] == '+' || cvarName[0] == '-') {
+			prefix[0] = cvarName[0];
+			cvarName++;
+		} else {
+			prefix[0] = '\0';
+		}
+
+		Q_snprintf(localClientCvarName, MAX_CVAR_VALUE_STRING, "%s%d%s", prefix, localClient+1, cvarName);
+	}
+
+	return localClientCvarName;
+}
+#endif
+#endif

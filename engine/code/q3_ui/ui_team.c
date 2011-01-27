@@ -66,7 +66,7 @@ static void TeamMain_MenuEvent( void* ptr, int event ) {
 	}
 
 #ifdef TA_SPLITVIEW
-	teamCmd = UI_LocalClientCvarName(s_teammain.localClient, "team");
+	teamCmd = Com_LocalClientCvarName(s_teammain.localClient, "team");
 #endif
 
 	switch( ((menucommon_s*)ptr)->id ) {

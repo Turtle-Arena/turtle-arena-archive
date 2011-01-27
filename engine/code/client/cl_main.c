@@ -3194,38 +3194,6 @@ static void CL_GenerateQKey(void)
 	}
 } 
 
-#ifdef TA_SPLITVIEW
-/*
-=================
-UI_LocalClientCvarName
-=================
-*/
-char *CL_LocalClientCvarName(int localClient, char *in_cvarName) {
-	static char localClientCvarName[MAX_CVAR_VALUE_STRING];
-
-	if (localClient == 0) {
-		Q_strncpyz(localClientCvarName, in_cvarName, MAX_CVAR_VALUE_STRING);
-	} else {
-		char prefix[2];
-		char *cvarName;
-
-		prefix[1] = '\0';
-
-		cvarName = in_cvarName;
-
-		if (cvarName[0] == '+' || cvarName[0] == '-') {
-			prefix[0] = cvarName[0];
-			cvarName++;
-		} else {
-			prefix[0] = '\0';
-		}
-
-		Q_snprintf(localClientCvarName, MAX_CVAR_VALUE_STRING, "%s%d%s", prefix, localClient+1, cvarName);
-	}
-
-	return localClientCvarName;
-}
-#endif
 
 /*
 ====================
@@ -3285,7 +3253,7 @@ void CL_Init( void ) {
 #ifndef TURTLEARENA // ALWAYS_RUN
 #ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		cl_run[i] = Cvar_Get (CL_LocalClientCvarName(i, "cl_run"), "1", CVAR_ARCHIVE);
+		cl_run[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_run"), "1", CVAR_ARCHIVE);
 	}
 #else
 	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE);
@@ -3328,7 +3296,7 @@ void CL_Init( void ) {
 	// if the cgame hasn't been started
 #ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		Cvar_Get (CL_LocalClientCvarName(i, "cg_autoswitch"), "1", CVAR_ARCHIVE);
+		Cvar_Get (Com_LocalClientCvarName(i, "cg_autoswitch"), "1", CVAR_ARCHIVE);
 	}
 #else
 	Cvar_Get ("cg_autoswitch", "1", CVAR_ARCHIVE);

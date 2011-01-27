@@ -335,7 +335,7 @@ static void PlayerSettings_DrawPlayer( void *self ) {
 	char			buf[MAX_QPATH];
 
 #ifdef TA_SPLITVIEW
-	trap_Cvar_VariableStringBuffer( UI_LocalClientCvarName(s_playersettings.localClient, "model"), buf, sizeof( buf ) );
+	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_playersettings.localClient, "model"), buf, sizeof( buf ) );
 #else
 	trap_Cvar_VariableStringBuffer( "model", buf, sizeof( buf ) );
 #endif
@@ -369,14 +369,14 @@ PlayerSettings_SaveChanges
 static void PlayerSettings_SaveChanges( void ) {
 	// name
 #ifdef TA_SPLITVIEW
-	trap_Cvar_Set( UI_LocalClientCvarName(s_playersettings.localClient, "name"), s_playersettings.name.field.buffer );
+	trap_Cvar_Set( Com_LocalClientCvarName(s_playersettings.localClient, "name"), s_playersettings.name.field.buffer );
 #else
 	trap_Cvar_Set( "name", s_playersettings.name.field.buffer );
 #endif
 
 	// handicap
 #ifdef TA_SPLITVIEW
-	trap_Cvar_SetValue( UI_LocalClientCvarName(s_playersettings.localClient, "handicap"),
+	trap_Cvar_SetValue( Com_LocalClientCvarName(s_playersettings.localClient, "handicap"),
 			100 - s_playersettings.handicap.curvalue * 5 );
 #else
 	trap_Cvar_SetValue( "handicap", 100 - s_playersettings.handicap.curvalue * 5 );
@@ -384,10 +384,10 @@ static void PlayerSettings_SaveChanges( void ) {
 
 	// effects color
 #ifdef TA_SPLITVIEW
-	trap_Cvar_SetValue( UI_LocalClientCvarName(s_playersettings.localClient, "color1"),
+	trap_Cvar_SetValue( Com_LocalClientCvarName(s_playersettings.localClient, "color1"),
 			uitogamecode[s_playersettings.effects.curvalue] );
 #ifdef IOQ3ZTM // UI_COLOR2
-	trap_Cvar_SetValue( UI_LocalClientCvarName(s_playersettings.localClient, "color2"),
+	trap_Cvar_SetValue( Com_LocalClientCvarName(s_playersettings.localClient, "color2"),
 			uitogamecode[s_playersettings.effects2.curvalue] );
 #endif
 #else
@@ -429,7 +429,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 	// name
 #ifdef TA_SPLITVIEW
 	Q_strncpyz( s_playersettings.name.field.buffer, UI_Cvar_VariableString(
-			UI_LocalClientCvarName(s_playersettings.localClient, "name")), sizeof(s_playersettings.name.field.buffer) );
+			Com_LocalClientCvarName(s_playersettings.localClient, "name")), sizeof(s_playersettings.name.field.buffer) );
 #else
 	Q_strncpyz( s_playersettings.name.field.buffer, UI_Cvar_VariableString("name"), sizeof(s_playersettings.name.field.buffer) );
 #endif
@@ -437,7 +437,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 
 	// effects color
 #ifdef TA_SPLITVIEW
-	c = trap_Cvar_VariableValue( UI_LocalClientCvarName(s_playersettings.localClient, "color1") ) - 1;
+	c = trap_Cvar_VariableValue( Com_LocalClientCvarName(s_playersettings.localClient, "color1") ) - 1;
 #else
 	c = trap_Cvar_VariableValue( "color1" ) - 1;
 #endif
@@ -448,7 +448,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 
 #ifdef IOQ3ZTM // UI_COLOR2
 #ifdef TA_SPLITVIEW
-	c = trap_Cvar_VariableValue( UI_LocalClientCvarName(s_playersettings.localClient, "color2") ) - 1;
+	c = trap_Cvar_VariableValue( Com_LocalClientCvarName(s_playersettings.localClient, "color2") ) - 1;
 #else
 	c = trap_Cvar_VariableValue( "color2" ) - 1;
 #endif
@@ -467,7 +467,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 
 #ifdef TA_SPLITVIEW
 	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo,
-			UI_Cvar_VariableString( UI_LocalClientCvarName(s_playersettings.localClient, "model") ) );
+			UI_Cvar_VariableString( Com_LocalClientCvarName(s_playersettings.localClient, "model") ) );
 #else
 	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, UI_Cvar_VariableString( "model" ) );
 #endif
@@ -482,7 +482,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 
 	// handicap
 #ifdef TA_SPLITVIEW
-	h = Com_Clamp( 5, 100, trap_Cvar_VariableValue(UI_LocalClientCvarName(s_playersettings.localClient, "handicap")) );
+	h = Com_Clamp( 5, 100, trap_Cvar_VariableValue(Com_LocalClientCvarName(s_playersettings.localClient, "handicap")) );
 #else
 	h = Com_Clamp( 5, 100, trap_Cvar_VariableValue("handicap") );
 #endif
@@ -503,7 +503,7 @@ static void PlayerSettings_MenuEvent( void* ptr, int event ) {
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_HANDICAP:
 #ifdef TA_SPLITVIEW
-		trap_Cvar_Set( UI_LocalClientCvarName(s_playersettings.localClient, "handicap"),
+		trap_Cvar_Set( Com_LocalClientCvarName(s_playersettings.localClient, "handicap"),
 				va( "%i", 100 - 25 * s_playersettings.handicap.curvalue ) );
 #else
 		trap_Cvar_Set( "handicap", va( "%i", 100 - 25 * s_playersettings.handicap.curvalue ) );

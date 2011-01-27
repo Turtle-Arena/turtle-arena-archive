@@ -1223,7 +1223,7 @@ static void Controls_DrawPlayer( void *self ) {
 	char			buf[MAX_QPATH];
 
 #ifdef TA_SPLITVIEW
-	trap_Cvar_VariableStringBuffer( UI_LocalClientCvarName(s_controls.localClient, "model"), buf, sizeof( buf ) );
+	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_controls.localClient, "model"), buf, sizeof( buf ) );
 #else
 	trap_Cvar_VariableStringBuffer( "model", buf, sizeof( buf ) );
 #endif
@@ -1292,7 +1292,7 @@ static void Controls_GetConfig( void )
 
 #ifdef TA_SPLITVIEW
 		for (j = 0; j < MAX_SPLITVIEW; j++) {
-			Controls_GetKeyAssignment(UI_LocalClientCvarName(j, bindptr->command), twokeys);
+			Controls_GetKeyAssignment(Com_LocalClientCvarName(j, bindptr->command), twokeys);
 
 			g_bindings_list[j][i].bind1 = twokeys[0];
 			g_bindings_list[j][i].bind2 = twokeys[1];
@@ -1308,15 +1308,15 @@ static void Controls_GetConfig( void )
 #ifdef TA_SPLITVIEW
 	if (s_controls.localClient != 0) {
 #ifndef TURTLEARENA // ALWAYS_RUN
-		s_controls.alwaysrun.curvalue = UI_ClampCvar( 0, 1, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ) ) );
+		s_controls.alwaysrun.curvalue = UI_ClampCvar( 0, 1, Controls_GetCvarValue( Com_LocalClientCvarName(s_controls.localClient, "cl_run" ) ) );
 #endif
 #ifndef TA_WEAPSYS_EX
-		s_controls.autoswitch.curvalue = UI_ClampCvar( 0, 1, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) ) );
+		s_controls.autoswitch.curvalue = UI_ClampCvar( 0, 1, Controls_GetCvarValue( Com_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) ) );
 #endif
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-		s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ) ) );
+		s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( Com_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ) ) );
 #else
-		s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( UI_LocalClientCvarName(s_controls.localClient, "joy_threshold" ) ) );
+		s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( Com_LocalClientCvarName(s_controls.localClient, "joy_threshold" ) ) );
 #endif
 
 		return;
@@ -1367,10 +1367,10 @@ static void Controls_SetConfig( void )
 		for (j = 0; j < MAX_SPLITVIEW; j++) {
 			if (g_bindings_list[j][i].bind1 != -1)
 			{
-				trap_Key_SetBinding( g_bindings_list[j][i].bind1, UI_LocalClientCvarName(j, bindptr->command) );
+				trap_Key_SetBinding( g_bindings_list[j][i].bind1, Com_LocalClientCvarName(j, bindptr->command) );
 
 				if (g_bindings_list[j][i].bind2 != -1)
-					trap_Key_SetBinding( g_bindings_list[j][i].bind2, UI_LocalClientCvarName(j, bindptr->command) );
+					trap_Key_SetBinding( g_bindings_list[j][i].bind2, Com_LocalClientCvarName(j, bindptr->command) );
 			}
 		}
 #else
@@ -1387,15 +1387,15 @@ static void Controls_SetConfig( void )
 #ifdef TA_SPLITVIEW
 	if (s_controls.localClient != 0) {
 #ifndef TURTLEARENA // ALWAYS_RUN
-		trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ), s_controls.alwaysrun.curvalue );
+		trap_Cvar_SetValue( Com_LocalClientCvarName(s_controls.localClient, "cl_run" ), s_controls.alwaysrun.curvalue );
 #endif
 #ifndef TA_WEAPSYS_EX
-		trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ), s_controls.autoswitch.curvalue );
+		trap_Cvar_SetValue( Com_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ), s_controls.autoswitch.curvalue );
 #endif
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-		trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ), s_controls.joythreshold.curvalue );
+		trap_Cvar_SetValue( Com_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ), s_controls.joythreshold.curvalue );
 #else
-		trap_Cvar_SetValue( UI_LocalClientCvarName(s_controls.localClient, "joy_threshold" ), s_controls.joythreshold.curvalue );
+		trap_Cvar_SetValue( Com_LocalClientCvarName(s_controls.localClient, "joy_threshold" ), s_controls.joythreshold.curvalue );
 
 		trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
 #endif
@@ -1472,15 +1472,15 @@ static void Controls_SetDefaults( void )
 #ifdef TA_SPLITVIEW
 	if (s_controls.localClient != 0) {
 #ifndef TURTLEARENA // ALWAYS_RUN
-		s_controls.alwaysrun.curvalue = Controls_GetCvarDefault( UI_LocalClientCvarName(s_controls.localClient, "cl_run" ) );
+		s_controls.alwaysrun.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "cl_run" ) );
 #endif
 #ifndef TA_WEAPSYS_EX
-		s_controls.autoswitch.curvalue = Controls_GetCvarDefault( UI_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) );
+		s_controls.autoswitch.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) );
 #endif
-		s_controls.joythreshold.curvalue = Controls_GetCvarDefault( UI_LocalClientCvarName(s_controls.localClient, "joy_threshold" ) );
+		s_controls.joythreshold.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "joy_threshold" ) );
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-		trap_Cvar_SetValue(UI_LocalClientCvarName(s_controls.localClient, "in_joystick"), 0);
-		trap_Cvar_SetValue(UI_LocalClientCvarName(s_controls.localClient, "in_joystickNo"), 0);
+		trap_Cvar_SetValue(Com_LocalClientCvarName(s_controls.localClient, "in_joystick"), 0);
+		trap_Cvar_SetValue(Com_LocalClientCvarName(s_controls.localClient, "in_joystickNo"), 0);
 #endif
 
 		return;
@@ -2430,7 +2430,7 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.back );
 
 #ifdef TA_SPLITVIEW
-	trap_Cvar_VariableStringBuffer( UI_LocalClientCvarName(s_controls.localClient, "name"), s_controls.name.string, 16 );
+	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_controls.localClient, "name"), s_controls.name.string, 16 );
 #else
 	trap_Cvar_VariableStringBuffer( "name", s_controls.name.string, 16 );
 #endif

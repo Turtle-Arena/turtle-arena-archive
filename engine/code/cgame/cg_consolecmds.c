@@ -793,39 +793,6 @@ qboolean CG_ConsoleCommand( void ) {
 	return qfalse;
 }
 
-#ifdef TA_SPLITVIEW
-/*
-=================
-UI_LocalClientCvarName
-=================
-*/
-char *CG_LocalClientCvarName(int localClient, char *in_cvarName) {
-	static char localClientCvarName[MAX_CVAR_VALUE_STRING];
-
-	if (localClient == 0) {
-		Q_strncpyz(localClientCvarName, in_cvarName, MAX_CVAR_VALUE_STRING);
-	} else {
-		char prefix[2];
-		char *cvarName;
-
-		prefix[1] = '\0';
-
-		cvarName = in_cvarName;
-
-		if (cvarName[0] == '+' || cvarName[0] == '-') {
-			prefix[0] = cvarName[0];
-			cvarName++;
-		} else {
-			prefix[0] = '\0';
-		}
-
-		Q_snprintf(localClientCvarName, MAX_CVAR_VALUE_STRING, "%s%d%s", prefix, localClient+1, cvarName);
-	}
-
-	return localClientCvarName;
-}
-#endif
-
 /*
 =================
 CG_InitConsoleCommands
@@ -847,35 +814,35 @@ void CG_InitConsoleCommands( void ) {
 	//
 #ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		trap_AddCommand(CG_LocalClientCvarName(i, "say"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "say_team"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "tell"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "vsay"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "vsay_team"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "vtell"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "vosay"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "vosay_team"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "votell"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "vtaunt"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "give"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "god"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "notarget"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "noclip"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "kill"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "teamtask"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "levelshot"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "follow"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "follownext"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "followprev"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "team"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "callvote"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "vote"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "callteamvote"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "teamvote"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "setviewpos"));
-		trap_AddCommand(CG_LocalClientCvarName(i, "stats"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "say"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "say_team"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "tell"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "vsay"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "vsay_team"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "vtell"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "vosay"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "vosay_team"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "votell"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "vtaunt"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "give"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "god"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "notarget"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "noclip"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "kill"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "teamtask"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "levelshot"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "follow"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "follownext"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "followprev"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "team"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "callvote"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "vote"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "callteamvote"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "teamvote"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "setviewpos"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "stats"));
 #ifdef TA_MISC // DROP_FLAG
-		trap_AddCommand(CG_LocalClientCvarName(i, "dropflag"));
+		trap_AddCommand(Com_LocalClientCvarName(i, "dropflag"));
 #endif
 	}
 

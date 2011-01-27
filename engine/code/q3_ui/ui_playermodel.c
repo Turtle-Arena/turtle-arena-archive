@@ -212,18 +212,18 @@ PlayerModel_SaveChanges
 static void PlayerModel_SaveChanges( void )
 {
 #ifdef TA_SPLITVIEW
-	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "model"), s_playermodel.modelskin );
+	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "model"), s_playermodel.modelskin );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
-	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "headmodel"), "" );
+	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "headmodel"), "" );
 #else
-	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "headmodel"), s_playermodel.modelskin );
+	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "headmodel"), s_playermodel.modelskin );
 #endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
-	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "team_model"), s_playermodel.modelskin );
+	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "team_model"), s_playermodel.modelskin );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
-	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "team_headmodel"), "" );
+	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "team_headmodel"), "" );
 #else
-	trap_Cvar_Set( UI_LocalClientCvarName(s_playermodel.localClient, "team_headmodel"), s_playermodel.modelskin );
+	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "team_headmodel"), s_playermodel.modelskin );
 #endif
 #endif
 #else
@@ -548,7 +548,7 @@ static void PlayerModel_SetMenuItems( void )
 
 	// name
 #ifdef TA_SPLITVIEW
-	trap_Cvar_VariableStringBuffer( UI_LocalClientCvarName(s_playermodel.localClient, "name"), s_playermodel.playername.string, 16 );
+	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_playermodel.localClient, "name"), s_playermodel.playername.string, 16 );
 #else
 	trap_Cvar_VariableStringBuffer( "name", s_playermodel.playername.string, 16 );
 #endif
@@ -556,7 +556,7 @@ static void PlayerModel_SetMenuItems( void )
 
 	// model
 #ifdef TA_SPLITVIEW
-	trap_Cvar_VariableStringBuffer( UI_LocalClientCvarName(s_playermodel.localClient, "model"), s_playermodel.modelskin, 64 );
+	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_playermodel.localClient, "model"), s_playermodel.modelskin, 64 );
 #else
 	trap_Cvar_VariableStringBuffer( "model", s_playermodel.modelskin, 64 );
 #endif
