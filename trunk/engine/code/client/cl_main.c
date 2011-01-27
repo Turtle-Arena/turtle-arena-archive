@@ -1488,6 +1488,53 @@ void CL_ForwardToServer_f( void ) {
 	}
 }
 
+#ifdef TA_SPLITVIEW
+/*
+==================
+CL_2DropOut_f
+==================
+*/
+void CL_2DropOut_f( void ) {
+	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
+		Com_Printf ("Not connected to a server.\n");
+		return;
+	}
+	
+	// don't forward the first argument
+	CL_AddReliableCommand("dropout2", qfalse);
+}
+
+/*
+==================
+CL_3DropOut_f
+==================
+*/
+void CL_3DropOut_f( void ) {
+	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
+		Com_Printf ("Not connected to a server.\n");
+		return;
+	}
+	
+	// don't forward the first argument
+	CL_AddReliableCommand("dropout3", qfalse);
+}
+
+/*
+==================
+CL_4DropOut_f
+==================
+*/
+void CL_4DropOut_f( void ) {
+	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
+		Com_Printf ("Not connected to a server.\n");
+		return;
+	}
+	
+	// don't forward the first argument
+	CL_AddReliableCommand("dropout4", qfalse);
+}
+#endif
+
 /*
 ==================
 CL_Disconnect_f
@@ -3530,6 +3577,11 @@ void CL_Init( void ) {
 	// register our commands
 	//
 	Cmd_AddCommand ("cmd", CL_ForwardToServer_f);
+#ifdef TA_SPLITVIEW
+	Cmd_AddCommand ("2dropout", CL_2DropOut_f);
+	Cmd_AddCommand ("3dropout", CL_3DropOut_f);
+	Cmd_AddCommand ("4dropout", CL_4DropOut_f);
+#endif
 	Cmd_AddCommand ("configstrings", CL_Configstrings_f);
 	Cmd_AddCommand ("clientinfo", CL_Clientinfo_f);
 	Cmd_AddCommand ("snd_restart", CL_Snd_Restart_f);
