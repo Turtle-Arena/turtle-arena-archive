@@ -817,7 +817,11 @@ SERVER OPTIONS MENU *****
 =============================================================================
 */
 
+#ifdef TA_SPLITVIEW
+#define ID_PLAYER_TYPE			25 // Goes up to ID_PLAYER_TYPE+PLAYER_SLOTS
+#else
 #define ID_PLAYER_TYPE			20
+#endif
 #define ID_MAXCLIENTS			21
 #define ID_DEDICATED			22
 #define ID_GO					23
@@ -995,7 +999,7 @@ static void ServerOptions_Start( void ) {
 		if( s_serveroptions.playerType[n].curvalue != PT_HUMAN ) {
 			continue;
 		}
-		localClients++;
+		localClients |= (1<<n);
 	}
 
 	// Set the number of local clients
@@ -1222,7 +1226,12 @@ static void ServerOptions_InitPlayerItems( void ) {
 ServerOptions_SetPlayerItems
 =================
 */
-static void ServerOptions_SetPlayerItems( void ) {
+#ifdef TA_SPLITVIEW
+static void ServerOptions_SetPlayerItems( int playerType )
+#else
+static void ServerOptions_SetPlayerItems( void )
+#endif
+{
 	int		start;
 	int		n;
 
@@ -1243,6 +1252,27 @@ static void ServerOptions_SetPlayerItems( void ) {
 #endif
 		s_serveroptions.playerName[0].generic.flags &= ~QMF_HIDDEN;
 
+#ifdef TA_SPLITVIEW
+		for (n = 1; n < MAX_SPLITVIEW; n++) {
+			if (playerType != n && playerType != -1) {
+				continue;
+			}
+
+			if (s_serveroptions.playerType[n].curvalue != PT_HUMAN) {
+				Q_strncpyz(s_serveroptions.playerNameBuffers[n], "Random", sizeof(s_serveroptions.playerNameBuffers[n]));
+				continue;
+			}
+
+#ifdef TA_SP // SPMODEL
+			if (!s_serveroptions.multiplayer) {
+				trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(n, "spmodel"), s_serveroptions.playerNameBuffers[n], sizeof(s_serveroptions.playerNameBuffers[n]) );
+				s_serveroptions.playerNameBuffers[n][0] = toupper(s_serveroptions.playerNameBuffers[n][0]);
+			} else
+#endif
+			trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(n, "name"), s_serveroptions.playerNameBuffers[n], sizeof(s_serveroptions.playerNameBuffers[n]) );
+
+		}
+#endif
 		start = 1;
 	}
 	else {
@@ -1250,6 +1280,12 @@ static void ServerOptions_SetPlayerItems( void ) {
 		start = 0;
 	}
 	for( n = start; n < PLAYER_SLOTS; n++ ) {
+#ifdef TA_SPLITVIEW
+		if( s_serveroptions.playerType[n].curvalue == PT_HUMAN ) {
+			s_serveroptions.playerName[n].generic.flags |= QMF_INACTIVE;
+			s_serveroptions.playerName[n].generic.flags &= ~QMF_HIDDEN;
+		} else
+#endif
 		if( s_serveroptions.playerType[n].curvalue == PT_BOT ) {
 			s_serveroptions.playerName[n].generic.flags &= ~(QMF_INACTIVE|QMF_HIDDEN);
 		}
@@ -1279,21 +1315,37 @@ ServerOptions_Event
 =================
 */
 static void ServerOptions_Event( void* ptr, int event ) {
+#ifdef TA_SPLITVIEW
+	if (((menucommon_s*)ptr)->id >= ID_PLAYER_TYPE && ((menucommon_s*)ptr)->id < ID_PLAYER_TYPE+PLAYER_SLOTS) {
+		if( event != QM_ACTIVATED ) {
+			return;
+		}
+		ServerOptions_SetPlayerItems(((menucommon_s*)ptr)->id -ID_PLAYER_TYPE);
+		return;
+	}
+#endif
 	switch( ((menucommon_s*)ptr)->id ) {
 	
 	//if( event != QM_ACTIVATED && event != QM_LOSTFOCUS) {
 	//	return;
 	//}
+
+#ifndef TA_SPLITVIEW
 	case ID_PLAYER_TYPE:
 		if( event != QM_ACTIVATED ) {
 			break;
 		}
 		ServerOptions_SetPlayerItems();
 		break;
+#endif
 
 	case ID_MAXCLIENTS:
 	case ID_DEDICATED:
+#ifdef TA_SPLITVIEW
+		ServerOptions_SetPlayerItems(-2);
+#else
 		ServerOptions_SetPlayerItems();
+#endif
 		break;
 	case ID_GO:
 		if( event != QM_ACTIVATED ) {
@@ -1631,11 +1683,19 @@ static void ServerOptions_SetMenuItems( void ) {
 
 	// get the player selections initialized
 	ServerOptions_InitPlayerItems();
+#ifdef TA_SPLITVIEW
+	ServerOptions_SetPlayerItems(-1);
+#else
 	ServerOptions_SetPlayerItems();
+#endif
 
 	// seed bot names
 	ServerOptions_InitBotNames();
+#ifdef TA_SPLITVIEW
+	ServerOptions_SetPlayerItems(-1);
+#else
 	ServerOptions_SetPlayerItems();
+#endif
 }
 
 /*
@@ -1883,7 +1943,11 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	for( n = 0; n < PLAYER_SLOTS; n++ ) {
 		s_serveroptions.playerType[n].generic.type		= MTYPE_SPINCONTROL;
 		s_serveroptions.playerType[n].generic.flags		= QMF_SMALLFONT;
+#ifdef TA_SPLITVIEW
+		s_serveroptions.playerType[n].generic.id		= ID_PLAYER_TYPE+n;
+#else
 		s_serveroptions.playerType[n].generic.id		= ID_PLAYER_TYPE;
+#endif
 		s_serveroptions.playerType[n].generic.callback	= ServerOptions_Event;
 		s_serveroptions.playerType[n].generic.x			= 32;
 		s_serveroptions.playerType[n].generic.y			= y;
