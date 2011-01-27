@@ -694,9 +694,6 @@ stick_state;
 #endif
 
 
-#ifdef TA_SPLITVIEW
-extern char *CL_LocalClientCvarName(int localClient, char *in_cvarName);
-#endif
 
 /*
 ===============
@@ -792,9 +789,9 @@ static void IN_InitJoystick( void )
 			continue;
 		}
 
-		in_joystickNo[i] = Cvar_Get( CL_LocalClientCvarName(i, "in_joystickNo"), "0", CVAR_ARCHIVE );
+		in_joystickNo[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystickNo"), "0", CVAR_ARCHIVE );
 		if( in_joystickNo[i]->integer < 0 || in_joystickNo[i]->integer >= total )
-			Cvar_Set( CL_LocalClientCvarName(i, "in_joystickNo"), "0" );
+			Cvar_Set( Com_LocalClientCvarName(i, "in_joystickNo"), "0" );
 
 		stick[i] = SDL_JoystickOpen( in_joystickNo[i]->integer );
 
@@ -1329,9 +1326,9 @@ void IN_Init( void )
 
 #ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		in_joystick[i] = Cvar_Get( CL_LocalClientCvarName(i, "in_joystick"), "0", CVAR_ARCHIVE|CVAR_LATCH );
-		in_joystickDebug[i] = Cvar_Get( CL_LocalClientCvarName(i, "in_joystickDebug"), "0", CVAR_TEMP );
-		in_joystickThreshold[i] = Cvar_Get( CL_LocalClientCvarName(i, "in_joystickThreshold"), "0.15", CVAR_ARCHIVE );
+		in_joystick[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystick"), "0", CVAR_ARCHIVE|CVAR_LATCH );
+		in_joystickDebug[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystickDebug"), "0", CVAR_TEMP );
+		in_joystickThreshold[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystickThreshold"), "0.15", CVAR_ARCHIVE );
 	}
 #else
 	in_joystick = Cvar_Get( "in_joystick", "0", CVAR_ARCHIVE|CVAR_LATCH );

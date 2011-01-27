@@ -1408,6 +1408,12 @@ float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean 
 float Com_FontStringHeight( font_t *font, const char *s, int limit );
 #endif
 
+#ifdef TA_SPLITVIEW
+#ifndef QAGAME
+char *Com_LocalClientCvarName(int localClient, char *in_cvarName);
+#endif
+#endif
+
 #define Square(x) ((x)*(x))
 
 // real time
