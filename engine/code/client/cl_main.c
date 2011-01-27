@@ -2169,12 +2169,24 @@ void CL_CheckForResend( void ) {
 		size = 8;
 
 		// Check how many local client user wants
-		localClients = Com_Clamp(1, MAX_SPLITVIEW, Cvar_VariableIntegerValue("cl_localClients"));
+		localClients = Com_Clamp(1, (1<<MAX_SPLITVIEW)-1, Cvar_VariableIntegerValue("cl_localClients"));
 
-		// Reset cl_localClients (Must set before each inital join)
+		// Reset cl_localClients (Set before each join)
 		Cvar_Set("cl_localClients", "1");
 
-		for (i = 0; i < localClients; i++) {
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if (!(localClients & (1<<(i)))) {
+				// Dummy string.
+				data[size] = '"'; size++;
+				data[size] = '"'; size++;
+
+				// Add space between info strings.
+				if (i != MAX_SPLITVIEW-1) {
+					data[size] = ' '; size++;
+				}
+				continue;
+			}
+
 			Q_strncpyz( info, Cvar_InfoString( cvarflag[i] ), sizeof( info ) );
 
 			// ZTM: Do we need to set these for more than the first client?
@@ -2192,7 +2204,7 @@ void CL_CheckForResend( void ) {
 			data[size] = '"'; size++;
 
 			// Add space between info strings.
-			if (i != localClients-1) {
+			if (i != MAX_SPLITVIEW-1) {
 				data[size] = ' '; size++;
 			}
 		}

@@ -555,7 +555,7 @@ gotnewcl:
 
 			Q_strncpyz( userinfo, Cmd_Argv(1+lc), sizeof(userinfo) );
 
-			if (strlen(userinfo) <= 0) {
+			if ( strlen(userinfo) <= 0 ) {
 				// Ignore dummy userinfo string, used for skipping client.
 				continue;
 			}
