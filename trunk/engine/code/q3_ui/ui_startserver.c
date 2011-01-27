@@ -1282,8 +1282,15 @@ static void ServerOptions_SetPlayerItems( void )
 	for( n = start; n < PLAYER_SLOTS; n++ ) {
 #ifdef TA_SPLITVIEW
 		if( s_serveroptions.playerType[n].curvalue == PT_HUMAN ) {
-			s_serveroptions.playerName[n].generic.flags |= QMF_INACTIVE;
-			s_serveroptions.playerName[n].generic.flags &= ~QMF_HIDDEN;
+#ifdef TA_SP
+			if (!s_serveroptions.multiplayer)
+				s_serveroptions.playerName[n].generic.flags &= ~(QMF_INACTIVE|QMF_HIDDEN);
+			else
+#endif
+			{
+				s_serveroptions.playerName[n].generic.flags |= QMF_INACTIVE;
+				s_serveroptions.playerName[n].generic.flags &= ~QMF_HIDDEN;
+			}
 		} else
 #endif
 		if( s_serveroptions.playerType[n].curvalue == PT_BOT ) {
@@ -1377,21 +1384,31 @@ static void ServerOptions_PlayerNameEvent( void* ptr, int event ) {
 	}
 	n = ((menutext_s*)ptr)->generic.id;
 #ifdef TA_SP
-	if (s_serveroptions.dedicated.curvalue == 0 && n == 0)
+	if (s_serveroptions.dedicated.curvalue == 0 &&
+#ifdef TA_SPLITVIEW
+		n < MAX_SPLITVIEW
+#else
+		n == 0
+#endif
+		)
 	{
-		int i;
+		int i, j;
 
 		for (i = 0; i < NUM_SPPLAYERS; i++)
 		{
-			if (Q_stricmp(s_serveroptions.playerNameBuffers[0], spPlayerNames[i]) == 0)
+			if (Q_stricmp(s_serveroptions.playerNameBuffers[n], spPlayerNames[i]) == 0)
 			{
-				n = (i+1)%NUM_SPPLAYERS; // next model
+				j = (i+1)%NUM_SPPLAYERS; // next model
 			}
 		}
 
-		trap_Cvar_Set("spmodel", spPlayerNames[n]);
-		strcpy(s_serveroptions.playerNameBuffers[0], spPlayerNames[n]);
-		s_serveroptions.playerNameBuffers[0][0] = toupper(spPlayerNames[n][0]);
+#ifdef TA_SPLITVIEW
+		trap_Cvar_Set(Com_LocalClientCvarName(n, "spmodel"), spPlayerNames[j]);
+#else
+		trap_Cvar_Set("spmodel", spPlayerNames[j]);
+#endif
+		strcpy(s_serveroptions.playerNameBuffers[n], spPlayerNames[j]);
+		s_serveroptions.playerNameBuffers[n][0] = toupper(spPlayerNames[j][0]);
 		return;
 	}
 #endif
