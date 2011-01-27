@@ -290,7 +290,7 @@ void CG_CamUpdate(void)
 	float angle;
 
 #ifdef TA_SPLITVIEW
-	angle = cg_thirdPersonAngle[cg.viewport].value;
+	angle = cg_thirdPersonAngle[cg.cur_localClientNum].value;
 #else
 	angle = cg_thirdPersonAngle.value;
 #endif
@@ -347,16 +347,8 @@ void CG_CamUpdate(void)
 
 	// Update the cvar...
 #ifdef TA_SPLITVIEW
-	if (cg_thirdPersonAngle[cg.viewport].integer != (int)angle) {
-		if (cg.viewport == 0) {
-			trap_Cvar_Set("cg_thirdPersonAngle", va("%f", angle));
-		} else {
-			char buf[MAX_CVAR_VALUE_STRING];
-
-			Q_snprintf(buf, sizeof (buf), "%dcg_thirdPersonAngle", cg.viewport+1);
-
-			trap_Cvar_Set(buf, va("%f", angle));
-		}
+	if (cg_thirdPersonAngle[cg.cur_localClientNum].integer != (int)angle) {
+		trap_Cvar_Set(Com_LocalClientCvarName(cg.cur_localClientNum, "cg_thirdPersonAngle"), va("%f", angle));
 	}
 #else
 	if (cg_thirdPersonAngle.integer != (int)angle) {
@@ -367,7 +359,7 @@ void CG_CamUpdate(void)
 #ifdef TA_CAMERA
 	// First person
 #ifdef TA_SPLITVIEW
-	if (!cg_thirdPerson[cg.viewport].integer)
+	if (!cg_thirdPerson[cg.cur_localClientNum].integer)
 #else
 	if (!cg_thirdPerson.integer)
 #endif
@@ -382,7 +374,7 @@ void CG_CamUpdate(void)
 		float range;
 
 #ifdef TA_SPLITVIEW
-		range = cg_thirdPersonRange[cg.viewport].value;
+		range = cg_thirdPersonRange[cg.cur_localClientNum].value;
 #else
 		range = cg_thirdPersonRange.value;
 #endif
@@ -451,7 +443,7 @@ static void CG_OffsetThirdPersonView( void ) {
 	distance = cg.cur_lc->camDistance;
 #else
 #ifdef TA_SPLITVIEW
-	distance = cg_thirdPersonRange[cg.viewport].value;
+	distance = cg_thirdPersonRange[cg.cur_localClientNum].value;
 #else
 	distance = cg_thirdPersonRange.value;
 #endif
@@ -546,8 +538,8 @@ static void CG_OffsetThirdPersonView( void ) {
 	else
 	{
 #ifdef TA_SPLITVIEW
-		focusAngles[YAW] -= cg_thirdPersonAngle[cg.viewport].value;
-		cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle[cg.viewport].value;
+		focusAngles[YAW] -= cg_thirdPersonAngle[cg.cur_localClientNum].value;
+		cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle[cg.cur_localClientNum].value;
 #else
 		focusAngles[YAW] -= cg_thirdPersonAngle.value;
 		cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle.value;
@@ -1272,6 +1264,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	float	mouseSensitivity;
 	int		weaponSelect;
 #ifdef TA_SPLITVIEW
+	qboolean renderClientViewport[MAX_SPLITVIEW];
 	int		i;
 #endif
 
@@ -1311,17 +1304,26 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #ifdef TA_SPLITVIEW
 	if (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2)) {
 		// Single camera mode
-		cg.numViewports = 1;
 		cg.singleCamera = qtrue;
+		cg.numViewports = 1;
 	} else {
-		cg.numViewports = cg.snap->numPSs;
+		// Number of viewports is counted below.
 		cg.singleCamera = qfalse;
+		cg.numViewports = 0;
 	}
 
 	for (i = 0; i < cg.snap->numPSs; i++) {
-		cg.viewport = i;
+		cg.cur_localClientNum = i;
 		cg.cur_lc = &cg.localClients[i];
 		cg.cur_ps = &cg.snap->pss[i];
+
+		// Check if viewport should be drawn.
+		if (cg.singleCamera || (cg.cur_ps->persistant[PERS_TEAM] == TEAM_SPECTATOR && (cg.cur_ps->pm_flags & PMF_LOCAL_HIDE))) {
+			renderClientViewport[i] = qfalse;
+		} else {
+			cg.numViewports++;
+			renderClientViewport[i] = qtrue;
+		}
 #else
 	cg.cur_lc = &cg.localClient;
 	cg.cur_ps = &cg.snap->ps;
@@ -1340,9 +1342,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #endif
 #ifdef TA_SPLITVIEW // CONTROLS
 #ifdef TA_HOLDSYS/*2*/
-	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_lc->holdableSelect, cg.viewport );
+	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_lc->holdableSelect, cg.cur_localClientNum );
 #else
-	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.viewport );
+	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_localClientNum );
 #endif
 #else
 #ifdef TA_HOLDSYS/*2*/
@@ -1377,8 +1379,18 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #ifdef TA_SPLITVIEW
 	}
 
-	for (i = 0; i < cg.numViewports; i++) {
-		cg.viewport = i;
+	// If all local clients dropped out from playing still draw main local client.
+	if (cg.numViewports == 0) {
+		cg.numViewports = 1;
+		renderClientViewport[0] = qtrue;
+	}
+
+	for (i = 0, cg.viewport = -1; i < cg.snap->numPSs; i++) {
+		if (!renderClientViewport[i]) {
+			continue;
+		}
+		cg.viewport++;
+		cg.cur_localClientNum = i;
 		cg.cur_lc = &cg.localClients[i];
 		cg.cur_ps = &cg.snap->pss[i];
 #endif
@@ -1387,9 +1399,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, if spectator always be in first person.
 	cg.renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
 #ifdef TA_SPLITVIEW
-							&& (cg_thirdPerson[cg.viewport].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
+							&& (cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
 #ifdef TA_CAMERA // When switching to first person, zoom the camera in
-								|| (!cg_thirdPerson[cg.viewport].integer && cg.cur_lc->camDistance > 10)
+								|| (!cg_thirdPerson[cg.cur_localClientNum].integer && cg.cur_lc->camDistance > 10)
 #endif
 #else
 							&& (cg_thirdPerson.integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)

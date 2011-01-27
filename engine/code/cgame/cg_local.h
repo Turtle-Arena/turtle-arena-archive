@@ -965,6 +965,7 @@ typedef struct {
 	cglc_t			*cur_lc;	// Current local client data we are working with
 	playerState_t	*cur_ps; // Like cur_lc, but for player state
 #ifdef TA_SPLITVIEW
+	int				cur_localClientNum;
 	cglc_t			localClients[MAX_SPLITVIEW];
 #else
 	cglc_t			localClient;

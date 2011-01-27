@@ -223,6 +223,9 @@ typedef enum {
 	SPECTATOR_FREE,
 	SPECTATOR_FOLLOW,
 	SPECTATOR_SCOREBOARD
+#ifdef TA_SPLITVIEW
+	,SPECTATOR_LOCAL_HIDE
+#endif
 } spectatorState_t;
 
 typedef enum {
