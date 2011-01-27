@@ -1321,13 +1321,11 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 		)
 	{
-		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD
-#ifdef TA_SPLITVIEW
-			|| client->sess.spectatorState == SPECTATOR_LOCAL_HIDE
-#endif
-			) {
+#ifndef IOQ3ZTM
+		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD) {
 			return;
 		}
+#endif
 		SpectatorThink( ent, ucmd );
 		return;
 	}
