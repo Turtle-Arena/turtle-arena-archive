@@ -1628,6 +1628,42 @@ static void SV_UpdateUserinfo4_f( client_t *cl ) {
 	// call prog code to allow overrides
 	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, lc - svs.clients );
 }
+
+void SV_DropOut2_f( client_t *cl ) {
+	client_t *lc;
+
+	if (cl->local_clients[0] == -1) {
+		return;
+	}
+
+	lc = &svs.clients[cl->local_clients[0]];
+
+	SV_DropClient(lc, "dropped out");
+}
+
+void SV_DropOut3_f( client_t *cl ) {
+	client_t *lc;
+
+	if (cl->local_clients[1] == -1) {
+		return;
+	}
+
+	lc = &svs.clients[cl->local_clients[1]];
+
+	SV_DropClient(lc, "dropped out");
+}
+
+void SV_DropOut4_f( client_t *cl ) {
+	client_t *lc;
+
+	if (cl->local_clients[2] == -1) {
+		return;
+	}
+
+	lc = &svs.clients[cl->local_clients[2]];
+
+	SV_DropClient(lc, "dropped out");
+}
 #endif
 
 
@@ -1674,6 +1710,9 @@ static ucmd_t ucmds[] = {
 	{"userinfo2", SV_UpdateUserinfo2_f},
 	{"userinfo3", SV_UpdateUserinfo3_f},
 	{"userinfo4", SV_UpdateUserinfo4_f},
+	{"dropout2", SV_DropOut2_f},
+	{"dropout3", SV_DropOut3_f},
+	{"dropout4", SV_DropOut4_f},
 #endif
 	{"disconnect", SV_Disconnect_f},
 	{"cp", SV_VerifyPaks_f},
