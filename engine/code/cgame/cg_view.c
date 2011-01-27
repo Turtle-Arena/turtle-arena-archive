@@ -946,6 +946,18 @@ static int CG_CalcFov( void ) {
 #endif
 	}
 
+#ifdef TA_SPLITVIEW
+	// Do FOV Correction for some viewports
+	if ((cg.numViewports == 2) || (cg.numViewports == 3 && cg.viewport == 2)) {
+		if (cg_splitviewVertical.integer == 1) {
+			// Tall/narrow view
+			fov_x *= 0.6f; // 0.5 would be correct, but fov gets real small.
+		} else {
+			// Short/wide view
+			fov_x *= 1.4f; // 1.5 would be correct, but fov gets real big.
+		}
+	}
+#endif
 	x = cg.refdef.width / tan( fov_x / 360 * M_PI );
 	fov_y = atan2( cg.refdef.height, x );
 	fov_y = fov_y * 360 / M_PI;
