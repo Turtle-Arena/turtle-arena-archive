@@ -284,15 +284,30 @@ void CL_ParseSnapshot( msg_t *msg ) {
 			Com_Printf("Warning: Got numPSs as %d (max=%d)\n", newSnap.numPSs, MAX_SPLITVIEW);
 			newSnap.numPSs = MAX_SPLITVIEW;
 		}
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			newSnap.lcIndex[i] = MSG_ReadByte( msg );
+
+			// -1 gets converted to 255 should be set to -1 (and so should all invalid values) 
+			if (newSnap.lcIndex[i] >= newSnap.numPSs) {
+				newSnap.lcIndex[i] = -1;
+			}
+		}
 	} else {
 		newSnap.numPSs = 1;
+		newSnap.lcIndex[0] = 0;
+		for (i = 1; i < MAX_SPLITVIEW; i++) {
+			newSnap.lcIndex[i] = -1;
+		}
 	}
 
-	for (i = 0; i < newSnap.numPSs; i++) {
-		if ( old && old->numPSs > i) {
-			MSG_ReadDeltaPlayerstate( msg, &old->pss[i], &newSnap.pss[i] );
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (newSnap.lcIndex[i] == -1) {
+			continue;
+		}
+		if ( old && old->lcIndex[i] != -1) {
+			MSG_ReadDeltaPlayerstate( msg, &old->pss[old->lcIndex[i]], &newSnap.pss[newSnap.lcIndex[i]] );
 		} else {
-			MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.pss[i] );
+			MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.pss[newSnap.lcIndex[i]] );
 		}
 	}
 #else

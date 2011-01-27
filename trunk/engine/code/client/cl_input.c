@@ -64,6 +64,10 @@ typedef struct
 
 	kbutton_t	in_buttons[16];
 
+#ifdef TA_PATHSYS // 2DMODE
+	int pathMode;
+#endif
+
 	// NOTE: in_mlooking should be moved here if multiple mice are supported.
 } clientInput_t;
 
@@ -492,20 +496,27 @@ void IN_4Button15Up(void) {IN_KeyUp(&cis[3].in_buttons[15]);}
 #endif
 
 #ifdef TA_SPLITVIEW
+void IN_CenterView_Main(int localClientNum) {
+	if (localClientNum >= MAX_SPLITVIEW || cl.snap.lcIndex[localClientNum] == -1) {
+		return;
+	}
+	cl.localClients[localClientNum].viewangles[PITCH] = -SHORT2ANGLE(cl.snap.pss[cl.snap.lcIndex[localClientNum]].delta_angles[PITCH]);
+}
+
 void IN_CenterView (void) {
-	cl.localClients[0].viewangles[PITCH] = -SHORT2ANGLE(cl.snap.pss[0].delta_angles[PITCH]);
+	IN_CenterView_Main(0);
 }
 
 void IN_2CenterView (void) {
-	cl.localClients[1].viewangles[PITCH] = -SHORT2ANGLE(cl.snap.pss[1].delta_angles[PITCH]);
+	IN_CenterView_Main(1);
 }
 
 void IN_3CenterView (void) {
-	cl.localClients[2].viewangles[PITCH] = -SHORT2ANGLE(cl.snap.pss[2].delta_angles[PITCH]);
+	IN_CenterView_Main(2);
 }
 
 void IN_4CenterView (void) {
-	cl.localClients[3].viewangles[PITCH] = -SHORT2ANGLE(cl.snap.pss[3].delta_angles[PITCH]);
+	IN_CenterView_Main(3);
 }
 #else
 void IN_CenterView (void) {
@@ -557,11 +568,7 @@ void CL_AdjustAngles( calc_t *lc, clientInput_t *ci ) {
 
 	if ( !ci->in_strafe.active
 #ifdef TA_PATHSYS // 2DMODE
-#ifdef TA_SPLITVIEW
-		&& cl.snap.pss[ci-cis].pathMode != PATHMODE_SIDE && cl.snap.pss[ci-cis].pathMode != PATHMODE_BACK
-#else
-		&& cl.snap.ps.pathMode != PATHMODE_SIDE && cl.snap.ps.pathMode != PATHMODE_BACK
-#endif
+		&& ci->pathMode != PATHMODE_SIDE && ci->pathMode != PATHMODE_BACK
 #endif
 		)
 	{
@@ -611,11 +618,7 @@ void CL_KeyMove( clientInput_t *ci, usercmd_t *cmd ) {
 	up = 0;
 	if ( ci->in_strafe.active
 #ifdef TA_PATHSYS // 2DMODE
-#ifdef TA_SPLITVIEW
-		|| cl.snap.pss[ci-cis].pathMode == PATHMODE_SIDE || cl.snap.pss[ci-cis].pathMode == PATHMODE_BACK
-#else
-		|| cl.snap.ps.pathMode == PATHMODE_SIDE || cl.snap.ps.pathMode == PATHMODE_BACK
-#endif
+		|| ci->pathMode == PATHMODE_SIDE || ci->pathMode == PATHMODE_BACK
 #endif
 		)
 	{
@@ -715,11 +718,7 @@ void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 
 	if ( !ci->in_strafe.active
 #ifdef TA_PATHSYS // 2DMODE
-#ifdef TA_SPLITVIEW
-		&& cl.snap.pss[ci-cis].pathMode != PATHMODE_SIDE && cl.snap.pss[ci-cis].pathMode != PATHMODE_BACK
-#else
-		&& cl.snap.ps.pathMode != PATHMODE_SIDE && cl.snap.ps.pathMode != PATHMODE_BACK
-#endif
+		&& ci->pathMode != PATHMODE_SIDE && ci->pathMode != PATHMODE_BACK
 #endif
 		)
 	{
@@ -817,11 +816,7 @@ void CL_MouseMove(calc_t *lc, clientInput_t *ci, usercmd_t *cmd)
 	// add mouse X/Y movement to cmd
 	if(ci->in_strafe.active
 #ifdef TA_PATHSYS // 2DMODE
-#ifdef TA_SPLITVIEW
-		|| cl.snap.pss[ci-cis].pathMode == PATHMODE_SIDE || cl.snap.pss[ci-cis].pathMode == PATHMODE_BACK
-#else
-		|| cl.snap.ps.pathMode == PATHMODE_SIDE || cl.snap.ps.pathMode == PATHMODE_BACK
-#endif
+		|| ci->pathMode == PATHMODE_SIDE || ci->pathMode == PATHMODE_BACK
 #endif
 		)
 	{
@@ -847,11 +842,7 @@ void CL_MouseMove(calc_t *lc, clientInput_t *ci, usercmd_t *cmd)
 		&& !ci->in_strafe.active
 #endif
 #ifdef TA_PATHSYS // 2DMODE
-#ifdef TA_SPLITVIEW
-		&& cl.snap.pss[ci-cis].pathMode != PATHMODE_SIDE && cl.snap.pss[ci-cis].pathMode != PATHMODE_BACK
-#else
-		&& cl.snap.ps.pathMode != PATHMODE_SIDE && cl.snap.ps.pathMode != PATHMODE_BACK
-#endif
+		&& ci->pathMode != PATHMODE_SIDE && ci->pathMode != PATHMODE_BACK
 #endif
 		)
 		lc->viewangles[PITCH] += m_pitch->value * my;
@@ -951,6 +942,14 @@ usercmd_t CL_CreateCmd( void )
 	ci = &cis[0];
 #endif
 
+#ifdef TA_PATHSYS // 2DMODE
+#ifdef TA_SPLITVIEW
+	ci->pathMode = cl.snap.pss[cl.snap.lcIndex[localClientNum]].pathMode;
+#else
+	ci->pathMode = cl.snap.ps.pathMode;
+#endif
+#endif
+
 	VectorCopy( lc->viewangles, oldAngles );
 
 	// keyboard angle adjustment
@@ -1028,8 +1027,8 @@ void CL_CreateNewCommands( void ) {
 	cmdNum = cl.cmdNumber & CMD_MASK;
 #ifdef TA_SPLITVIEW // CONTROLS
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (cl.snap.valid && i >= cl.snap.numPSs) {
-			break;
+		if (cl.snap.valid && cl.snap.lcIndex[i] == -1) {
+			continue;
 		}
 		cl.cmdss[i][cmdNum] = CL_CreateCmd(i);
 	}
@@ -1300,8 +1299,8 @@ void CL_WritePacket( void ) {
 			int lc;
 
 			for (lc = 1; lc < MAX_SPLITVIEW; lc++) {
-				if (cl.snap.valid && lc >= cl.snap.numPSs) {
-					break;
+				if (cl.snap.valid && cl.snap.lcIndex[lc] == -1) {
+					continue;
 				}
 
 				MSG_WriteByte (&buf, clc_EOF);  // placate legacy servers.

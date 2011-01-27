@@ -60,7 +60,8 @@ typedef struct {
 	int				cmdNum;			// the next cmdNum the server is expecting
 #ifdef TA_SPLITVIEW
 	int				numPSs;
-	playerState_t	pss[MAX_SPLITVIEW];		// complete information about the current player at this time
+	playerState_t	pss[MAX_SPLITVIEW];		// complete information about the current players at this time
+	int				lcIndex[MAX_SPLITVIEW];
 #else
 	playerState_t	ps;						// complete information about the current player at this time
 #endif

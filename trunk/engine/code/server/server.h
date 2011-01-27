@@ -101,6 +101,7 @@ typedef struct {
 #ifdef TA_SPLITVIEW
 	int				numPSs;
 	playerState_t	pss[MAX_SPLITVIEW];
+	int				lcIndex[MAX_SPLITVIEW];
 #else
 	playerState_t	ps;
 #endif

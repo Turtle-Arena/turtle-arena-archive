@@ -1817,13 +1817,16 @@ void CG_AddPacketEntities( void ) {
 
 	// generate and add the entity from the playerstate
 #ifdef TA_SPLITVIEW
-	for ( num = 0 ; num < cg.snap->numPSs ; num++ ) {
+	for ( num = 0 ; num < MAX_SPLITVIEW ; num++ ) {
+		if (cg.snap->lcIndex[num] == -1) {
+			continue;
+		}
 		ps = &cg.localClients[num].predictedPlayerState;
 		BG_PlayerStateToEntityState( ps, &cg.localClients[num].predictedPlayerEntity.currentState, qfalse );
 		CG_AddCEntity( &cg.localClients[num].predictedPlayerEntity );
 
 		// lerp the non-predicted value for lightning gun origins
-		CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->pss[num].clientNum ] );
+		CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->pss[cg.snap->lcIndex[num]].clientNum ] );
 	}
 #else
 	ps = &cg.cur_lc->predictedPlayerState;

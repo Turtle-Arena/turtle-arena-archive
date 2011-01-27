@@ -45,11 +45,11 @@ void CG_NextHoldable_f( void )
 		return;
 	}
 #ifdef TA_SPLITVIEW
-	if (localClient >= cg.snap->numPSs) {
+	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
-	ps = &cg.snap->pss[localClient];
+	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
 #else
 	ps = &cg.snap->ps;
@@ -117,11 +117,11 @@ void CG_PrevHoldable_f( void )
 		return;
 	}
 #ifdef TA_SPLITVIEW
-	if (localClient >= cg.snap->numPSs) {
+	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
-	ps = &cg.snap->pss[localClient];
+	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
 #else
 	ps = &cg.snap->ps;
@@ -189,11 +189,11 @@ void CG_Holdable_f( void )
 	}
 
 #ifdef TA_SPLITVIEW
-	if (localClient >= cg.snap->numPSs) {
+	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
-	ps = &cg.snap->pss[localClient];
+	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
 #else
 	ps = &cg.snap->ps;
@@ -3602,12 +3602,13 @@ void CG_NextWeapon_f( void )
 	if ( !cg.snap ) {
 		return;
 	}
+
 #ifdef TA_SPLITVIEW
-	if (localClient >= cg.snap->numPSs) {
+	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
-	ps = &cg.snap->pss[localClient];
+	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
 #else
 	ps = &cg.snap->ps;
@@ -3665,12 +3666,13 @@ void CG_PrevWeapon_f( void )
 	if ( !cg.snap ) {
 		return;
 	}
+
 #ifdef TA_SPLITVIEW
-	if (localClient >= cg.snap->numPSs) {
+	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
-	ps = &cg.snap->pss[localClient];
+	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
 #else
 	ps = &cg.snap->ps;
@@ -3729,11 +3731,11 @@ void CG_Weapon_f( void )
 	}
 
 #ifdef TA_SPLITVIEW
-	if (localClient >= cg.snap->numPSs) {
+	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
-	ps = &cg.snap->pss[localClient];
+	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
 #else
 	ps = &cg.snap->ps;

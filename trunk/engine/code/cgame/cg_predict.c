@@ -242,13 +242,6 @@ static void CG_InterpolatePlayerState( qboolean grabAngles ) {
 	out = &cg.cur_lc->predictedPlayerState;
 	prev = cg.snap;
 	next = cg.nextSnap;
-#ifdef TA_SPLITVIEW
-	prevPS = &cg.snap->pss[cg.cur_localClientNum];
-	nextPS = &cg.nextSnap->pss[cg.cur_localClientNum];
-#else
-	prevPS = &cg.snap->ps;
-	nextPS = &cg.nextSnap->ps;
-#endif
 
 	*out = *cg.cur_ps;
 
@@ -275,6 +268,19 @@ static void CG_InterpolatePlayerState( qboolean grabAngles ) {
 	if ( !next || next->serverTime <= prev->serverTime ) {
 		return;
 	}
+
+#ifdef TA_SPLITVIEW
+	if (prev->lcIndex[cg.cur_localClientNum] == -1 ||
+		next->lcIndex[cg.cur_localClientNum] == -1) {
+		return;
+	}
+
+	prevPS = &prev->pss[prev->lcIndex[cg.cur_localClientNum]];
+	nextPS = &next->pss[next->lcIndex[cg.cur_localClientNum]];
+#else
+	prevPS = &prev->ps;
+	nextPS = &next->ps;
+#endif
 
 	f = (float)( cg.time - prev->serverTime ) / ( next->serverTime - prev->serverTime );
 
@@ -550,9 +556,13 @@ void CG_PredictPlayerState( void ) {
 	// the server time is beyond our current cg.time,
 	// because predicted player positions are going to 
 	// be ahead of everything else anyway
-	if ( cg.nextSnap && !cg.nextFrameTeleport && !cg.thisFrameTeleport ) {
+	if ( cg.nextSnap && !cg.nextFrameTeleport && !cg.thisFrameTeleport
 #ifdef TA_SPLITVIEW
-		cg.cur_lc->predictedPlayerState = cg.nextSnap->pss[cg.cur_localClientNum];
+		&& cg.nextSnap->lcIndex[cg.cur_localClientNum] != -1
+#endif
+		) {
+#ifdef TA_SPLITVIEW
+		cg.cur_lc->predictedPlayerState = cg.nextSnap->pss[cg.nextSnap->lcIndex[cg.cur_localClientNum]];
 #else
 		cg.cur_lc->predictedPlayerState = cg.nextSnap->ps;
 #endif

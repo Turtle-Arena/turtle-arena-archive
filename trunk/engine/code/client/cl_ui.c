@@ -34,6 +34,10 @@ GetClientState
 ====================
 */
 static void GetClientState( uiClientState_t *state ) {
+#ifdef TA_SPLITVIEW
+	int		i;
+#endif
+
 	state->connectPacketCount = clc.connectPacketCount;
 	state->connState = cls.state;
 	Q_strncpyz( state->servername, cls.servername, sizeof( state->servername ) );
@@ -44,8 +48,15 @@ static void GetClientState( uiClientState_t *state ) {
 #else
 	state->clientNum = cl.snap.ps.clientNum;
 #endif
+
 #ifdef TA_SPLITVIEW
-	state->numLocalClients = cl.snap.numPSs;
+	state->numLocalClients = 0;
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		state->lcIndex[i] = cl.snap.lcIndex[i];
+		if (state->lcIndex[i] != -1) {
+			state->numLocalClients++;
+		}
+	}
 #endif
 }
 

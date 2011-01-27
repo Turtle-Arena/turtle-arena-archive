@@ -78,8 +78,8 @@ const char	*CG_PlaceString( int rank ) {
 int CG_LocalClient(int clientNum) {
 	int i;
 
-	for (i = 0; i < cg.snap->numPSs; i++) {
-		if (cg.snap->pss[i].clientNum == clientNum) {
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[cg.snap->lcIndex[i]].clientNum == clientNum) {
 			return i;
 		}
 	}
@@ -279,11 +279,11 @@ static void CG_Obituary( entityState_t *ent ) {
 		playerState_t	*ps;
 
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if (attacker != cg.snap->pss[i].clientNum)
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if (cg.snap->lcIndex[i] == -1 || attacker != cg.snap->pss[cg.snap->lcIndex[i]].clientNum)
 				continue;
 			cg.cur_lc = &cg.localClients[i];
-			ps = &cg.snap->pss[i];
+			ps = &cg.snap->pss[cg.snap->lcIndex[i]];
 #else
 			ps = &cg.snap->ps;
 #endif
@@ -328,8 +328,8 @@ static void CG_Obituary( entityState_t *ent ) {
 		strcat( attackerName, S_COLOR_WHITE );
 		// check for kill messages about the current clientNum
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( target == cg.snap->pss[i].clientNum ) {
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && target == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
 				Q_strncpyz( cg.localClients[i].killerName, attackerName, sizeof( cg.localClients[i].killerName ) );
 			}
 		}
@@ -487,13 +487,13 @@ static void CG_UseItem( centity_t *cent ) {
 
 	// print a message if the local player
 #ifdef TA_SPLITVIEW
-	for (i = 0; i < cg.snap->numPSs; i++)
+	for (i = 0; i < MAX_SPLITVIEW; i++)
 #else
 	if ( es->number == cg.snap->ps.clientNum )
 #endif
 	{
 #ifdef TA_SPLITVIEW
-		if ( es->number != cg.snap->pss[i].clientNum )
+		if ( cg.snap->lcIndex[i] == -1 || es->number != cg.snap->pss[cg.snap->lcIndex[i]].clientNum )
 			continue;
 		cg.cur_lc = &cg.localClients[i];
 #endif
@@ -875,8 +875,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landSound );
 #endif
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( clientNum == cg.localClients[i].predictedPlayerState.clientNum ) {
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && clientNum == cg.localClients[i].predictedPlayerState.clientNum ) {
 				// smooth landing z changes
 				cg.localClients[i].landChange = -8;
 				cg.localClients[i].landTime = cg.time;
@@ -895,8 +895,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		// use normal pain sound
 		trap_S_StartSound( NULL, es->number, CHAN_VOICE, CG_CustomSound( es->number, "*pain100_1.wav" ) );
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( clientNum == cg.localClients[i].predictedPlayerState.clientNum ) {
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && clientNum == cg.localClients[i].predictedPlayerState.clientNum ) {
 				// smooth landing z changes
 				cg.localClients[i].landChange = -16;
 				cg.localClients[i].landTime = cg.time;
@@ -915,8 +915,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, CG_CustomSound( es->number, "*fall1.wav" ) );
 		cent->pe.painTime = cg.time;	// don't play a pain sound right after this
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( clientNum == cg.localClients[i].predictedPlayerState.clientNum ) {
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && clientNum == cg.localClients[i].predictedPlayerState.clientNum ) {
 				// smooth landing z changes
 				cg.localClients[i].landChange = -24;
 				cg.localClients[i].landTime = cg.time;
@@ -944,9 +944,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		playerState_t *ps;
 
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if (cg.snap->lcIndex[i] == -1) {
+				continue;
+			}
 			lc = &cg.localClients[i];
-			ps = &cg.snap->pss[i];
+			ps = &cg.snap->pss[cg.snap->lcIndex[i]];
 #else
 		lc = &cg.localClient;
 		ps = &cg.snap->ps;
@@ -1115,8 +1118,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			// show icon and name on status bar
 #ifdef TA_SPLITVIEW
-			for (i = 0; i < cg.snap->numPSs; i++) {
-				if ( es->number == cg.snap->pss[i].clientNum ) {
+			for (i = 0; i < MAX_SPLITVIEW; i++) {
+				if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
 					cg.cur_lc = &cg.localClients[i];
 					CG_ItemPickup( index );
 				}
@@ -1164,8 +1167,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			// show icon and name on status bar
 #ifdef TA_SPLITVIEW
-			for (i = 0; i < cg.snap->numPSs; i++) {
-				if ( es->number == cg.snap->pss[i].clientNum ) {
+			for (i = 0; i < MAX_SPLITVIEW; i++) {
+				if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
 					cg.cur_lc = &cg.localClients[i];
 					CG_ItemPickup( index );
 				}
@@ -1192,8 +1195,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_NOAMMO");
 //		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.noAmmoSound );
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( es->number == cg.snap->pss[i].clientNum ) {
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
 				cg.cur_lc = &cg.localClients[i];
 				CG_OutOfAmmoChange();
 			}
@@ -1750,8 +1753,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		// so ignore events on the player
 		DEBUGNAME("EV_PAIN");
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( cent->currentState.number != cg.snap->pss[i].clientNum ) {
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && cent->currentState.number != cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
 				CG_PainEvent( cent, es->eventParm );
 			}
 		}
@@ -1791,10 +1794,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_POWERUP_QUAD:
 		DEBUGNAME("EV_POWERUP_QUAD");
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( es->number == cg.snap->pss[i].clientNum ) {
-				cg.localClients[i].powerupActive = PW_QUAD;
-				cg.localClients[i].powerupTime = cg.time;
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
+				cg.localClients[cg.snap->lcIndex[i]].powerupActive = PW_QUAD;
+				cg.localClients[cg.snap->lcIndex[i]].powerupTime = cg.time;
 			}
 		}
 #else
@@ -1808,10 +1811,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_POWERUP_BATTLESUIT:
 		DEBUGNAME("EV_POWERUP_BATTLESUIT");
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( es->number == cg.snap->pss[i].clientNum ) {
-				cg.localClients[i].powerupActive = PW_BATTLESUIT;
-				cg.localClients[i].powerupTime = cg.time;
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
+				cg.localClients[cg.snap->lcIndex[i]].powerupActive = PW_BATTLESUIT;
+				cg.localClients[cg.snap->lcIndex[i]].powerupTime = cg.time;
 			}
 		}
 #else
@@ -1826,10 +1829,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_POWERUP_REGEN");
 #ifndef TURTLEARENA // POWERS
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( es->number == cg.snap->pss[i].clientNum ) {
-				cg.localClients[i].powerupActive = PW_REGEN;
-				cg.localClients[i].powerupTime = cg.time;
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
+				cg.localClients[cg.snap->lcIndex[i]].powerupActive = PW_REGEN;
+				cg.localClients[cg.snap->lcIndex[i]].powerupTime = cg.time;
 			}
 		}
 #else
@@ -1845,10 +1848,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_POWERUP_INVUL:
 		DEBUGNAME("EV_POWERUP_INVUL");
 #ifdef TA_SPLITVIEW
-		for (i = 0; i < cg.snap->numPSs; i++) {
-			if ( es->number == cg.snap->pss[i].clientNum ) {
-				cg.localClients[i].powerupActive = PW_INVUL;
-				cg.localClients[i].powerupTime = cg.time;
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
+				cg.localClients[cg.snap->lcIndex[i]].powerupActive = PW_INVUL;
+				cg.localClients[cg.snap->lcIndex[i]].powerupTime = cg.time;
 			}
 		}
 #else

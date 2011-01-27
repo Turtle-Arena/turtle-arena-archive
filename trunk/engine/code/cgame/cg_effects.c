@@ -478,12 +478,12 @@ void CG_ScorePlum( int client, vec3_t org, int score ) {
 		return;
 	}
 #ifdef TA_SPLITVIEW // ZTM: FIXME: Local players can see each other's scores.
-	for (i = 0; i < cg.snap->numPSs; i++) {
-		if (client == cg.localClients[i].predictedPlayerState.clientNum) {
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (cg.snap->lcIndex[i] != -1 && client == cg.localClients[i].predictedPlayerState.clientNum) {
 			break;
 		}
 	}
-	if (i == cg.snap->numPSs) {
+	if (i == MAX_SPLITVIEW) {
 		return;
 	}
 #endif

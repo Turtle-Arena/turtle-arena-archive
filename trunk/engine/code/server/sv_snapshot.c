@@ -188,7 +188,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg ) {
 		snapFlags |= SNAPFLAG_NOT_ACTIVE;
 	}
 #ifdef TA_SPLITVIEW
-	if (frame->numPSs > 1) {
+	if (frame->numPSs > 1 || frame->lcIndex[0] != 0) {
 		snapFlags |= SNAPFLAG_MULTIPLE_PSS;
 	}
 #endif
@@ -205,14 +205,23 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg ) {
 		Com_Printf("Warning: Almost sent numPSs as %d (max=%d)\n", frame->numPSs, MAX_SPLITVIEW);
 		frame->numPSs = MAX_SPLITVIEW;
 	}
+
 	if (snapFlags & SNAPFLAG_MULTIPLE_PSS) {
 		MSG_WriteByte (msg, frame->numPSs);
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			MSG_WriteByte (msg, frame->lcIndex[i]);
+		}
 	}
-	for (i = 0; i < frame->numPSs; i++) {
-		if ( oldframe && oldframe->numPSs > i) {
-			MSG_WriteDeltaPlayerstate( msg, &oldframe->pss[i], &frame->pss[i] );
+
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (frame->lcIndex[i] == -1) {
+			continue;
+		}
+
+		if ( oldframe && oldframe->lcIndex[i] != -1) {
+			MSG_WriteDeltaPlayerstate( msg, &oldframe->pss[oldframe->lcIndex[i]], &frame->pss[frame->lcIndex[i]] );
 		} else {
-			MSG_WriteDeltaPlayerstate( msg, NULL, &frame->pss[i] );
+			MSG_WriteDeltaPlayerstate( msg, NULL, &frame->pss[frame->lcIndex[i]] );
 		}
 	}
 #else
@@ -539,14 +548,17 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 #ifdef TA_SPLITVIEW
 	frame->pss[0] = *ps;
 	frame->numPSs = 1;
+	frame->lcIndex[0] = 0;
 
 	// Add splitscreen clients
 	for (i = 1; i < MAX_SPLITVIEW; i++) {
 		if (client->local_clients[i-1] == -1) {
-			break;
+			frame->lcIndex[i] = -1;
+			continue;
 		}
 		ps = SV_GameClientNum( client->local_clients[i-1] );
 		frame->pss[frame->numPSs] = *ps;
+		frame->lcIndex[i] = frame->numPSs;
 		frame->numPSs++;
 	}
 
@@ -586,6 +598,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 		}
 		ps = SV_GameClientNum( clent->r.viewclients[i-1] );
 		frame->pss[frame->numPSs] = *ps;
+		frame->lcIndex[i] = frame->numPSs;
 		frame->numPSs++;
 		if (frame->numPSs >= MAX_SPLITVIEW)
 			break;
@@ -594,7 +607,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 
 	// never send client's own entity, because it can
 	// be regenerated from the playerstate
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < frame->numPSs; i++) {
 		clientNum = frame->pss[i].clientNum;
 		if ( clientNum < 0 || clientNum >= MAX_GENTITIES ) {
 			Com_Error( ERR_DROP, "SV_SvEntityForGentity: bad gEnt" );
@@ -605,7 +618,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	}
 
 	// Now that local clients have been marked as no send, add visible entities.
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < frame->numPSs; i++) {
 		// find the client's viewpoint
 		VectorCopy( frame->pss[i].origin, org );
 		org[2] += frame->pss[i].viewheight;

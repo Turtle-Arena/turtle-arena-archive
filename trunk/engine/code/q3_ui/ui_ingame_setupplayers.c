@@ -105,7 +105,7 @@ static void UI_SetupPlayersMenu_Draw( void ) {
 SetupPlayers_MenuInit
 =================
 */
-void SetupPlayers_MenuInit( int numLocalClients, const char *banner ) {
+void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner ) {
 	int		y;
 	int		i;
 
@@ -144,9 +144,9 @@ void SetupPlayers_MenuInit( int numLocalClients, const char *banner ) {
 		s_setupplayers.player[i].color				= text_big_color;
 		s_setupplayers.player[i].style				= UI_CENTER|UI_SMALLFONT;
 
-		//if( i > 0 && !localClientInGame[i-1] )
-		if (i >= numLocalClients)
+		if (cs->lcIndex[i] == -1) {
 			s_setupplayers.player[i].generic.flags |= QMF_GRAYED;
+		}
 
 		y += INGAME_MENU_VERTICAL_SPACING;
 	}
@@ -198,7 +198,7 @@ void UI_SetupPlayersMenu( void (*playerfunc)(int), const char *banner ) {
 		return;
 	}
 
-	SetupPlayers_MenuInit( cs.numLocalClients, banner );
+	SetupPlayers_MenuInit( &cs, banner );
 	s_setupplayers.playerfunc = playerfunc;
 	UI_PushMenu( &s_setupplayers.menu );
 }
