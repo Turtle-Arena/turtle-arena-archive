@@ -418,16 +418,28 @@ static void* Sys_TryLibraryLoad(const char* base, const char* gamedir, const cha
 	*fqpath = 0;
 
 	fn = FS_BuildOSPath( base, gamedir, fname );
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf( "Sys_LoadDll(%s)... \n", fn );
+#else
 	Com_Printf( "Sys_LoadDll(%s)... \n", fn );
+#endif
 
 	libHandle = Sys_LoadLibrary(fn);
 
 	if(!libHandle) {
+#ifdef IOQ3ZTM // LESS_VERBOSE
+		Com_DPrintf( "Sys_LoadDll(%s) failed:\n\"%s\"\n", fn, Sys_LibraryError() );
+#else
 		Com_Printf( "Sys_LoadDll(%s) failed:\n\"%s\"\n", fn, Sys_LibraryError() );
+#endif
 		return NULL;
 	}
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf ( "Sys_LoadDll(%s): succeeded ...\n", fn );
+#else
 	Com_Printf ( "Sys_LoadDll(%s): succeeded ...\n", fn );
+#endif
 	Q_strncpyz ( fqpath , fn , MAX_QPATH ) ;
 
 	return libHandle;
@@ -483,7 +495,11 @@ void *Sys_LoadDll( const char *name, char *fqpath ,
 		return NULL;
 	}
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf ( "Sys_LoadDll(%s) found vmMain function at %p\n", name, *entryPoint );
+#else
 	Com_Printf ( "Sys_LoadDll(%s) found vmMain function at %p\n", name, *entryPoint );
+#endif
 	dllEntry( systemcalls );
 
 	return libHandle;
