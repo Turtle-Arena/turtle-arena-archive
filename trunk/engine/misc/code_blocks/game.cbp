@@ -84,10 +84,6 @@
 			<Add option="-DMISSIONPACK_HUD2" />
 			<Add option="-DTA_GAME_MODELS" />
 		</Compiler>
-		<Linker>
-			<Add library="winmm" />
-			<Add library="SDL" />
-		</Linker>
 		<Unit filename="../../code/game/ai_chat.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -118,11 +118,6 @@
 			<Add option="-DMISSIONPACK_HUD2" />
 			<Add option="-DTA_GAME_MODELS" />
 		</Compiler>
-		<Linker>
-			<Add library="odbc32" />
-			<Add library="odbccp32" />
-			<Add library="SDL" />
-		</Linker>
 		<Unit filename="../../code/cgame/cg_consolecmds.c">
 			<Option compilerVar="CC" />
 		</Unit>
