@@ -6,8 +6,8 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Release TA_UI">
-				<Option output="../../build/ui_release_ta/uix86" prefix_auto="1" extension_auto="1" />
+			<Target title="Release TA_UI Win32">
+				<Option output="../../build/ui_release_ta/uix86.exe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/ui_release_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -29,8 +29,8 @@
 					<Add library="odbccp32" />
 				</Linker>
 			</Target>
-			<Target title="Debug TA_UI">
-				<Option output="../../build/ui_debug_ta/uix86" prefix_auto="1" extension_auto="1" />
+			<Target title="Debug TA_UI Win32">
+				<Option output="../../build/ui_debug_ta/uix86.exe" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/ui_debug_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -91,6 +91,7 @@
 			<Add option="-DMISSIONPACK_HUD2" />
 			<Add option="-DTA_GAME_MODELS" />
 		</Compiler>
+		<Unit filename="../../code/client/keycodes.h" />
 		<Unit filename="../../code/game/bg_lib.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
@@ -105,6 +106,7 @@
 		<Unit filename="../../code/qcommon/q_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/qcommon/q_shared.h" />
 		<Unit filename="../../code/ui/ui_atoms.c">
 			<Option compilerVar="CC" />
 		</Unit>
