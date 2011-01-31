@@ -95,9 +95,9 @@
 					<Add directory="../../code/libs/win32" />
 				</Linker>
 			</Target>
-			<Target title="Release Linux x86">
-				<Option platforms="Unix;Mac;" />
-				<Option output="../../build/turtlearena_release/turtlearena.x86" prefix_auto="0" extension_auto="0" />
+			<Target title="Release Linux">
+				<Option platforms="Unix;" />
+				<Option output="../../build/turtlearena_release/turtlearena" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/turtlearena_release" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -123,66 +123,9 @@
 					<Add library="GL" />
 				</Linker>
 			</Target>
-			<Target title="Debug Linux x86">
-				<Option platforms="Unix;Mac;" />
-				<Option output="../../build/turtlearena_debug/turtlearena.x86" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/turtlearena_debug" />
-				<Option type="0" />
-				<Option compiler="gcc" />
-				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
-				<Compiler>
-					<Add option="-W" />
-					<Add option="-g" />
-					<Add option="-O0" />
-					<Add option="-D_DEBUG" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DBOTLIB" />
-					<Add option="-DUSE_ICON" />
-					<Add option="-DUSE_CURL" />
-					<Add option="-DUSE_CURL_DLOPEN" />
-					<Add option="-DUSE_LOCAL_HEADERS" />
-					<Add option="-DUSE_VOIP" />
-					<Add option="-DUSE_CODEC_VORBIS" />
-					<Add option="-DUSE_CIN_THEORA" />
-					<Add option="-DFLOATING_POINT" />
-					<Add option="-DUSE_ALLOCA" />
-				</Compiler>
-				<Linker>
-					<Add library="../../build/splines_debug/libsplines.a" />
-					<Add library="GL" />
-				</Linker>
-			</Target>
-			<Target title="Release Linux x86_64">
-				<Option platforms="Unix;Mac;" />
-				<Option output="../../build/turtlearena_release/turtlearena.x86_64" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/turtlearena_release" />
-				<Option type="0" />
-				<Option compiler="gcc" />
-				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-Wall" />
-					<Add option="-DNDEBUG" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DBOTLIB" />
-					<Add option="-DUSE_ICON" />
-					<Add option="-DUSE_CURL" />
-					<Add option="-DUSE_CURL_DLOPEN" />
-					<Add option="-DUSE_LOCAL_HEADERS" />
-					<Add option="-DUSE_VOIP" />
-					<Add option="-DUSE_CODEC_VORBIS" />
-					<Add option="-DUSE_CIN_THEORA" />
-					<Add option="-DFLOATING_POINT" />
-					<Add option="-DUSE_ALLOCA" />
-				</Compiler>
-				<Linker>
-					<Add library="../../build/splines_release/libsplines.a" />
-					<Add library="GL" />
-				</Linker>
-			</Target>
-			<Target title="Debug Linux x86_64">
-				<Option platforms="Unix;Mac;" />
-				<Option output="../../build/turtlearena_debug/turtlearena.x86_64" prefix_auto="0" extension_auto="0" />
+			<Target title="Debug Linux">
+				<Option platforms="Unix;" />
+				<Option output="../../build/turtlearena_debug/turtlearena" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/turtlearena_debug" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -399,7 +342,6 @@
 		<Unit filename="../../code/botlib/l_struct.h" />
 		<Unit filename="../../code/botlib/l_utils.h" />
 		<Unit filename="../../code/cgame/cg_public.h" />
-		<Unit filename="../../code/cgame/tr_types.h" />
 		<Unit filename="../../code/client/cl_avi.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -847,10 +789,6 @@
 		<Unit filename="../../code/qcommon/vm_local.h" />
 		<Unit filename="../../code/qcommon/vm_x86.c">
 			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-			<Option target="Release Linux x86" />
-			<Option target="Debug Linux x86" />
 		</Unit>
 		<Unit filename="../../code/qcommon/vm_x86_64.c">
 			<Option compilerVar="CC" />
@@ -1005,10 +943,6 @@
 		</Unit>
 		<Unit filename="../../code/sys/sys_unix.c">
 			<Option compilerVar="CC" />
-			<Option target="Release Linux x86" />
-			<Option target="Debug Linux x86" />
-			<Option target="Release Linux x86_64" />
-			<Option target="Debug Linux x86_64" />
 		</Unit>
 		<Unit filename="../../code/sys/sys_win32.c">
 			<Option compilerVar="CC" />
