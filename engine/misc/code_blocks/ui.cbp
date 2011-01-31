@@ -24,10 +24,6 @@
 					<Add option="-DMISSIONPACK" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
 				</Compiler>
-				<Linker>
-					<Add library="odbc32" />
-					<Add library="odbccp32" />
-				</Linker>
 			</Target>
 			<Target title="Debug TA_UI Win32">
 				<Option output="../../build/ui_debug_ta/uix86.exe" prefix_auto="0" extension_auto="0" />
@@ -37,6 +33,9 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-g" />
+					<Add option="-W" />
+					<Add option="-O0" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -44,14 +43,7 @@
 					<Add option="-DUI_EXPORTS" />
 					<Add option="-DMISSIONPACK" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-W" />
-					<Add option="-g" />
-					<Add option="-O0" />
 				</Compiler>
-				<Linker>
-					<Add library="odbc32" />
-					<Add library="odbccp32" />
-				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
