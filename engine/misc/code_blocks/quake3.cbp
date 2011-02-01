@@ -212,6 +212,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-static" />
+			<Add option="-DRELATIVE_WIN32_ICON_PATH" />
 			<Add option="-DSTANDALONE" />
 			<Add option="-DRAVENMD4" />
 			<Add option="-DTA_MAIN" />
@@ -1015,7 +1016,7 @@
 			<Option target="Debug Win32" />
 		</Unit>
 		<Unit filename="../../code/sys/win_resource.h" />
-		<Unit filename="../../code/sys/win_resource_codeblocks.rc">
+		<Unit filename="../../code/sys/win_resource.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="Release Win32" />
 			<Option target="Debug Win32" />
