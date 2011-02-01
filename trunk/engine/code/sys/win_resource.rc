@@ -53,7 +53,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-#ifndef __MINGW32__
+#if !defined __MINGW32__ || defined RELATIVE_WIN32_ICON_PATH
 IDI_ICON1               ICON    DISCARDABLE     "../quake3.ico"
 #else
 IDI_ICON1               ICON    DISCARDABLE     "misc/quake3.ico"
