@@ -7,6 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release Win32">
+				<Option platforms="Windows;" />
 				<Option output="../../build/splines_release/libsplines" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="../../build/splines_release/" />
@@ -22,6 +23,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Debug Win32">
+				<Option platforms="Windows;" />
 				<Option output="../../build/splines_debug/libsplines" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="../../build/splines_debug/" />
@@ -38,6 +40,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release Linux">
+				<Option platforms="Unix;" />
 				<Option output="../../build/splines_release/libsplines" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="../../build/splines_release/" />
@@ -53,6 +56,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Debug Linux">
+				<Option platforms="Unix;" />
 				<Option output="../../build/splines_debug/libsplines" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="../../build/splines_debug/" />
