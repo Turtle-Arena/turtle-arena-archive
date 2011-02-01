@@ -954,7 +954,9 @@ typedef struct {
 	float		bobfracsin;
 	int			bobcycle;
 	float		xyspeed;
+#ifndef IOQ3ZTM // NEW_CAM
 	int     nextOrbitTime;
+#endif
 
 	// development tool
 	refEntity_t		testModelEntity;
@@ -1671,7 +1673,9 @@ extern	vmCvar_t		pmove_fixed;
 extern	vmCvar_t		pmove_msec;
 //extern	vmCvar_t		cg_pmove_fixed;
 extern	vmCvar_t		cg_cameraOrbit;
+#ifdef IOQ3ZTM // NEW_CAM
 extern	vmCvar_t		cg_cameraOrbitDelay;
+#endif
 extern	vmCvar_t		cg_timescaleFadeEnd;
 extern	vmCvar_t		cg_timescaleFadeSpeed;
 extern	vmCvar_t		cg_timescale;

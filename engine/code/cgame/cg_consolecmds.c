@@ -158,8 +158,12 @@ static void CG_scrollScoresUp_f( void) {
 
 #ifdef MISSIONPACK
 static void CG_spWin_f( void) {
+#ifdef IOQ3ZTM // NEW_CAM
+	trap_Cvar_Set("cg_cameraOrbit", "60");
+#else
 	trap_Cvar_Set("cg_cameraOrbit", "2");
 	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
+#endif
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
 #ifndef THIRD_PERSON
@@ -180,8 +184,12 @@ static void CG_spWin_f( void) {
 }
 
 static void CG_spLose_f( void) {
+#ifdef IOQ3ZTM // NEW_CAM
+	trap_Cvar_Set("cg_cameraOrbit", "60");
+#else
 	trap_Cvar_Set("cg_cameraOrbit", "2");
 	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
+#endif
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
 #ifndef THIRD_PERSON

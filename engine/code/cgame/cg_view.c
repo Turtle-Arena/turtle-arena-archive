@@ -285,9 +285,17 @@ static void CG_CalcVrect (void) {
 //==============================================================================
 
 #ifdef IOQ3ZTM // NEW_CAM
+/*
+=================
+CG_CamUpdate
+
+Update camera.
+=================
+*/
 void CG_CamUpdate(void)
 {
 	float angle;
+	float f = ((float)cg.frametime) / 1000;
 
 #ifdef TA_SPLITVIEW
 	angle = cg_thirdPersonAngle[cg.cur_localClientNum].value;
@@ -296,16 +304,15 @@ void CG_CamUpdate(void)
 #endif
 
 	if (cg_cameraOrbit.integer) {
-		if (cg.time > cg.nextOrbitTime) {
-			cg.nextOrbitTime = cg.time + cg_cameraOrbitDelay.integer;
-			angle += cg_cameraOrbit.value;
-		}
+		// cg_cameraOrbit holds angle to move in one second
+		angle += cg_cameraOrbit.value * f;
 	}
 
 	if (cg.cur_lc->camReseting)
 	{
-		float speed = 5.0f;
-		if (angle >= 360-speed || angle <= speed)
+		float speed = 120.0f * f;
+
+		if (angle >= 360 - speed || angle <= speed)
 		{
 			angle = 0;
 			cg.cur_lc->camRotDir = 0;
@@ -318,26 +325,29 @@ void CG_CamUpdate(void)
 	}
 	else
 	{
+		float speed1x = 30.0f * f;
+		float speed2x = speed1x * 2.0f;
+
 		if (cg.cur_lc->camLeft)
-			cg.cur_lc->camRotDir += 0.2f;
-		else if (cg.cur_lc->camRotDir >= 0.1f)
-			cg.cur_lc->camRotDir -= 0.1f;
+			cg.cur_lc->camRotDir += speed2x;
+		else if (cg.cur_lc->camRotDir >= speed1x)
+			cg.cur_lc->camRotDir -= speed1x;
 
 		if (cg.cur_lc->camRight)
-			cg.cur_lc->camRotDir -= 0.2f;
-		else if (cg.cur_lc->camRotDir <= -0.1f)
-			cg.cur_lc->camRotDir += 0.1f;
+			cg.cur_lc->camRotDir -= speed2x;
+		else if (cg.cur_lc->camRotDir <= -speed1x)
+			cg.cur_lc->camRotDir += speed1x;
 
 		if (!cg.cur_lc->camLeft && !cg.cur_lc->camRight &&
-				cg.cur_lc->camRotDir >= -0.2f && cg.cur_lc->camRotDir <= 0.2f)
+				cg.cur_lc->camRotDir >= -speed2x && cg.cur_lc->camRotDir <= speed2x)
 			cg.cur_lc->camRotDir = 0;
 
-		if (cg.cur_lc->camRotDir > 3)
-			cg.cur_lc->camRotDir = 3;
-		else if (cg.cur_lc->camRotDir < -3)
-			cg.cur_lc->camRotDir = -3;
+		if (cg.cur_lc->camRotDir > 100)
+			cg.cur_lc->camRotDir = 100;
+		else if (cg.cur_lc->camRotDir < -100)
+			cg.cur_lc->camRotDir = -100;
 
-		angle += cg.cur_lc->camRotDir;
+		angle += cg.cur_lc->camRotDir * f;
 	}
 
 	if (angle > 360)
@@ -347,11 +357,11 @@ void CG_CamUpdate(void)
 
 	// Update the cvar...
 #ifdef TA_SPLITVIEW
-	if (cg_thirdPersonAngle[cg.cur_localClientNum].integer != (int)angle) {
+	if (cg_thirdPersonAngle[cg.cur_localClientNum].value != angle) {
 		trap_Cvar_Set(Com_LocalClientCvarName(cg.cur_localClientNum, "cg_thirdPersonAngle"), va("%f", angle));
 	}
 #else
-	if (cg_thirdPersonAngle.integer != (int)angle) {
+	if (cg_thirdPersonAngle.value != angle) {
 		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", angle));
 	}
 #endif
@@ -372,6 +382,8 @@ void CG_CamUpdate(void)
 	else
 	{
 		float range;
+		float speed1x = 20.0f * f;
+		float speed2x = speed1x * 2.0f;
 
 #ifdef TA_SPLITVIEW
 		range = cg_thirdPersonRange[cg.cur_localClientNum].value;
@@ -384,14 +396,14 @@ void CG_CamUpdate(void)
 		}
 
 		// Third person range was made shorter, zoom in
-		if (cg.cur_lc->camDistance > range+2.0f)
-			cg.cur_lc->camDistance -= 2.0f;
+		if (cg.cur_lc->camDistance > range + speed2x)
+			cg.cur_lc->camDistance -= speed2x;
 		else if (cg.cur_lc->camDistance > range)
 			cg.cur_lc->camDistance = range;
 		// Zoom back out
 		else if (cg.cur_lc->camDistance < range)
 		{
-#if 1
+#if 0
 			// NiGHTS: Journey of Dreams Visitor style camera distance.
 			//  When next to a wall the camera is closer (like Quake3),
 			//  but only zooms back out when the player is moving
@@ -400,8 +412,8 @@ void CG_CamUpdate(void)
 			if (cg.xyspeed != 0)
 #endif
 			{
-				if (cg.cur_lc->camDistance < range-1.0f)
-					cg.cur_lc->camDistance += 1.0f;
+				if (cg.cur_lc->camDistance < range - speed1x)
+					cg.cur_lc->camDistance += speed1x;
 				else
 					cg.cur_lc->camDistance = range;
 			}
@@ -1469,7 +1481,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	trap_S_Respatialize( cg.cur_ps->clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater );
 
 	// make sure the lagometerSample and frame timing isn't done twice when in stereo
-	if ( stereoView != STEREO_RIGHT ) {
+	if ( stereoView != STEREO_RIGHT
+#ifdef TA_SPLITVIEW
+		&& cg.viewport == 0
+#endif
+		)
+	{
 		cg.frametime = cg.time - cg.oldTime;
 		if ( cg.frametime < 0 ) {
 			cg.frametime = 0;
