@@ -43,10 +43,10 @@ Foot:		Space:			Shredder is on the space station. He must be stopped.
   * Mousers, A Better Mouse Trap
     * Boss: Giant Mouser
   * The Foot, Evil Ninja
-    * Boss: Kari?
+    * Boss: Elite Foot Ninjas?
   * The Purple Dragons, Thugs
     * Boss: Hun
   * The Earth Protection Force (EPF), Black Ops
     * Boss: Agent Bishop
   * The Foot in Space
-    * Boss: Shedder
+    * Boss: Shredder

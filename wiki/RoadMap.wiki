@@ -46,11 +46,14 @@ Haven't decide what order these will be done in, but hopefully they will all get
   * Improve player models; each player should have some unique animations, etc
   * Remodel and animate casey
   * Add more players (Mirage comic based); Foot Ninja, Foot Elite, and The Shredder
+    * Room for originality, give different names? Evil Ninja, Elite Evil Ninja, and The Slayer?
 
   * Breakable objects and brushes
   * Pushable objects and brushes
-  * Map Themes (textures, sky, models, misc_objects, and music)
+  * Map Themes (Sets of textures, sky, models, misc_objects, and music)
   * New multiplayer maps using the new map themes
+
+  * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution. (Many are already 2x or 4x quake3 resolution.)
 
 ==== Unlikely ====
   * Have player models be MDR (Finish Misfit Model 3D MDR exporting)
@@ -72,4 +75,4 @@ Focus on Single Player / Co-op.
   * Multiplayer improvements
 
 == 1.0 ==
-  * polish overall game?
+  * Polish overall game?
