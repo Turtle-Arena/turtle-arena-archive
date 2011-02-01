@@ -1394,7 +1394,7 @@ static void ServerOptions_PlayerNameEvent( void* ptr, int event ) {
 	{
 		int i, j;
 
-		for (i = 0; i < NUM_SPPLAYERS; i++)
+		for (i = 0, j = 0; i < NUM_SPPLAYERS; i++)
 		{
 			if (Q_stricmp(s_serveroptions.playerNameBuffers[n], spPlayerNames[i]) == 0)
 			{

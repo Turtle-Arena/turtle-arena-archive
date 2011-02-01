@@ -4090,12 +4090,12 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 	ex->refEntity.customShader = hShader;
 
 	// don't show player's own blood in view
-	if ( entityNum == cg.cur_ps->clientNum
+	if ( (cg.cur_ps && entityNum == cg.cur_ps->clientNum)
 #ifdef IOQ3ZTM // Show player their own blood in third person
 		&& !cg.renderingThirdPerson
 #endif
 #ifdef TA_SPLITVIEW
-		&& cg.snap->numPSs <= 1
+		&& (!cg.snap || cg.snap->numPSs <= 1)
 #endif
 		)
 	{
