@@ -812,21 +812,18 @@ models/flag2/w_flag2
 	}
 }
 
-//
-// Below are from missionpack's models2.shader
-//
 
 // overload_base.md3
 models/powerups/ob2_1
 {
 	{
-		//map models/powerups/overload_map.tga
-		//blendFunc GL_ONE GL_ZERO`
-		//tcGen environment
-		//rgbGen identity
-
 		map models/powerups/overload_base.png
-		//rgbGen lightingDiffuse
+		rgbGen identity
+	}
+	{
+		map models/powerups/overload_base_glow.png
+		blendfunc add
+		rgbGen wave sin 0.8 0.1 0 0.8
 	}
 }
 
@@ -834,20 +831,11 @@ models/powerups/ob2_1
 models/powerups/ob2_2
 {
 	{
-		//map models/powerups/overload_mapbw.tga
-		map textures/effects/tinfx.png
-		//blendFunc GL_ONE GL_ZERO
-	//	tcGen environment
+		map models/powerups/overload_lights.png
 		rgbGen entity
-
-		// ZTM: Invul powerup shader
-		//map models/powerups/instant/invul.png
-		blendfunc GL_ONE GL_ONE
-		//rgbGen lightingDiffuse
-		//tcMod turb 0 0.15 0 0.25
-		tcMod scroll .3 .3
-		//tcGen environment
-		alphaGen wave sin .6 .2 0 .6
+		tcMod scroll 0.3 0.3
+		blendfunc blend
+		alphaGen wave sin 0.6 0.2 0 0.8
 	}
 }
 
@@ -856,24 +844,28 @@ models/powerups/ob2_3
 {
 	{
 		map models/powerups/overload_lights.png
-		tcmod scroll 1 1
+		tcMod rotate 36
 		rgbGen entity
+		//rgbGen wave sin 1 0.2 0 0.8
 	}
 }
+
+//
+// Below is from missionpack's models2.shader
+//
 
 // overload_energy.md3
 models/powerups/ob2_4
 {
-	cull disable
 	{
 		// ZTM: Don't have pop_bw
 		//map models/powerups/pop_bw.tga
-		map textures/effects/tinfx.png
+		map models/powerups/overload_energy.png
 		tcMod turb 0 0.1 0 0.1
 		tcmod rotate 311
 		tcmod scroll 1 1
-		blendfunc Add
-		rgbGen entity
+		blendfunc blend
+		alphaGen wave sin 1 0.1 0 0.8
 	}
 }
 
