@@ -15,9 +15,9 @@ Turtle Arena credits.
 
 == License ==
 Most of the Turtle Arena source code is licensed under the GNU General Public License version 2 or later.
-	(See COPYING file for full license) The code in the WOLFET ifdefs is licensed under the GNU GPLv3 or later.
+	(See COPYING file for full license)
 
-Most of the data is licensed under the GNU GPLv2 or later, but some is license under the Creative Commons,
+Most of the data is licensed under the GNU GPLv2 or later and/or licensed under the Creative Commons ShareAlike 3.0,
 	see COPYRIGHTS file full details.
 
 
@@ -28,9 +28,12 @@ See COPYRIGHTS file for data per-file copyrights.
 == Code ==
 Turtle Arena uses code directly or based on the following.
 
-=== GPLv2 or later ===
-* ioquake3 (Base engine): http://ioquake3.org/
+=== Mixed ===
+ioq3 is mostly GPLv2 or later, but also includes code under other licenses.
 
+* ioquake3: http://ioquake3.org/
+
+=== GPLv2 or later ===
 * ioSTVEF (IOSTVEF): http://thilo.kickchat.com/efport-progress/
 ** (IOSTVEF_NOISE) Adds support for "noise" and "random" waveform keywords
 ** RF_FORCE_ENT_ALPHA, it will be used so items/weapons fad out when dispearing.
@@ -47,7 +50,7 @@ Turtle Arena uses code directly or based on the following.
 
 * Smokin' Guns (SMOKIN_GUNS): http://www.smokin-guns.net/
 ** Fixed animation timing based on PM_AnimLength from Smokin' Guns' bg_pmove.c
-** Used some of Smokin' Guns' breakable respawn code for my breakables
+** Used some of Smokin' Guns' breakable respawn code
 
 * Mercenaries Guild Client 1.011 for Tremulous: http://projects.mercenariesguild.net/projects/mgclient
 ** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some parts, ...)
