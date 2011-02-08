@@ -460,38 +460,28 @@ and sends over a command to the client to resize the view,
 hide the scoreboard, and take a special screenshot
 ==================
 */
-void Cmd_LevelShot_f( gentity_t *ent ) {
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't allow remote levelshot as it ends the game.
-	// Only allow if ent is localhost
-	if (!ent->client->pers.localClient) {
-		trap_SendServerCommand( ent-g_entities,
-			"print \"levelshot command is for local client only\n\"" );
-		return;
-	}
-#endif
-
-	if ( !CheatsOk( ent ) ) {
+void Cmd_LevelShot_f(gentity_t *ent)
+{
+	if(!ent->client->pers.localClient)
+	{
+		trap_SendServerCommand(ent-g_entities,
+			"print \"The levelshot command must be executed by a local client\n\"");
 		return;
 	}
 
-#ifdef IOQ3ZTM
+	if(!CheatsOk(ent))
+		return;
+
 	// doesn't work in single player
-	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
-		trap_SendServerCommand( ent-g_entities, 
-			va("print \"Must not be in g_gametype %d for levelshot\n\"", GT_SINGLE_PLAYER) );
+	if(g_gametype.integer == GT_SINGLE_PLAYER)
+	{
+		trap_SendServerCommand(ent-g_entities,
+			"print \"Must not be in singleplayer mode for levelshot\n\"" );
 		return;
 	}
-#else
-	// doesn't work in single player
-	if ( g_gametype.integer != 0 ) {
-		trap_SendServerCommand( ent-g_entities, 
-			"print \"Must be in g_gametype 0 for levelshot\n\"" );
-		return;
-	}
-#endif
 
 	BeginIntermission();
-	trap_SendServerCommand( ent-g_entities, "clientLevelShot" );
+	trap_SendServerCommand(ent-g_entities, "clientLevelShot");
 }
 
 
@@ -517,7 +507,6 @@ void Cmd_TeamTask_f( gentity_t *ent ) {
 	trap_SetUserinfo(client, userinfo);
 	ClientUserinfoChanged(client);
 }
-
 
 
 /*

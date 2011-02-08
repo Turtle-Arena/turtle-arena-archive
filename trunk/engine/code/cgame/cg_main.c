@@ -1253,27 +1253,17 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.playerTeleportShader = trap_R_RegisterShader("playerTeleportEffect" );
 #endif
 
-#ifdef MISSIONPACK_HARVESTER // ZTM: THIS IS MISSIONPACK STUFF.
-#ifdef IOQ3ZTM
+#ifdef MISSIONPACK_HARVESTER
 	if ( cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
-#elif defined MISSIONPACK
-	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
-#else
-	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
-#endif
 		cgs.media.redCubeModel = trap_R_RegisterModel( "models/powerups/orb/r_orb.md3" );
 		cgs.media.blueCubeModel = trap_R_RegisterModel( "models/powerups/orb/b_orb.md3" );
 		cgs.media.redCubeIcon = trap_R_RegisterShader( "icons/skull_red" );
 		cgs.media.blueCubeIcon = trap_R_RegisterShader( "icons/skull_blue" );
 	}
-#endif
 
-#ifdef MISSIONPACK
-	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF
-#ifdef MISSIONPACK_HARVESTER
-	|| cgs.gametype == GT_HARVESTER
-#endif
-	|| cg_buildScript.integer ) {
+ 	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
+#elif defined MISSIONPACK
+	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cg_buildScript.integer ) {
 #else
 	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
 #endif
@@ -2058,11 +2048,7 @@ void CG_LoadMenus(const char *menuFile) {
 
 	len = trap_FS_FOpenFile( menuFile, &f, FS_READ );
 	if ( !f ) {
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Can't try default if we error first...
 		Com_Printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
-#else
-		trap_Error( va( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile ) );
-#endif
 		len = trap_FS_FOpenFile( "ui/hud.txt", &f, FS_READ );
 		if (!f) {
 			trap_Error( va( S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n") );

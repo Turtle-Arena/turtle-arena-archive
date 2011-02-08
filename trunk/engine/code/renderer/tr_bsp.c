@@ -186,134 +186,8 @@ static int QDECL LightmapNameCompare(const void *a, const void *b)
 	// strings are equal
 	return 0;
 }
+#endif
 
-#define	LIGHTMAP_SIZE	128
-static void R_LoadLightmaps(lump_t * l/*, const char *bspName*/)
-{
-	byte           *buf, *buf_p;
-	int             len;
-	int             i, j;
-	char            mapName[MAX_QPATH];
-	char          **lightmapFiles;
-	int             numLightmaps;
-	const char *bspName = s_worldData.name; // ZTM: Get map .bsp filename
-
-	len = l->filelen;
-
-	Q_strncpyz(mapName, bspName, sizeof(mapName));
-	COM_StripExtension(mapName, mapName, sizeof(mapName));
-	//strcat(mapName, "/lightmaps"); //HACK: Loads external lightmaps inside mapName/lightmaps/lm_0000.tga etc etc
-	lightmapFiles = ri.FS_ListFiles(mapName, ".tga", &numLightmaps);
-
-	if(!lightmapFiles || !numLightmaps)
-	{
-		lightmapFiles = ri.FS_ListFiles(mapName, ".tga", &numLightmaps);
-
-		if(!lightmapFiles || !numLightmaps){
-			byte	oldimage[LIGHTMAP_SIZE*LIGHTMAP_SIZE*4];
-			float maxIntensity = 0;
-			double sumIntensity = 0;
-
-			//ri.Printf(PRINT_WARNING, "WARNING: no External lightmap files found Falling back to Quake3 Lightmapping\n");
-
-			if ( !len ) {
-				return;
-			}
-
-			buf = fileBase + l->fileofs;
-
-			// we are about to upload textures
-			R_SyncRenderThread();
-
-			// create all the lightmaps
-			tr.numLightmaps = len / (LIGHTMAP_SIZE * LIGHTMAP_SIZE * 3);
-			if ( tr.numLightmaps == 1 ) {
-				//FIXME: HACK: maps with only one lightmap turn up fullbright for some reason.
-				//this avoids this, but isn't the correct solution.
-				tr.numLightmaps++;
-			} else if ( tr.numLightmaps >= MAX_LIGHTMAPS ) { // 20051020 misantropia
-				ri.Printf( PRINT_WARNING, "WARNING: number of lightmaps > MAX_LIGHTMAPS\n" );
-				tr.numLightmaps = MAX_LIGHTMAPS;
-			}
-
-			// if we are in r_vertexLight mode, we don't need the lightmaps at all
-			if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
-				return;
-			}
-
-			for ( i = 0 ; i < tr.numLightmaps ; i++ ) {
-				// expand the 24 bit on-disk to 32 bit
-				buf_p = buf + i * LIGHTMAP_SIZE*LIGHTMAP_SIZE * 3;
-
-				if ( r_lightmap->integer == 2 )
-				{	// color code by intensity as development tool	(FIXME: check range)
-					for ( j = 0; j < LIGHTMAP_SIZE * LIGHTMAP_SIZE; j++ )
-					{
-						float r = buf_p[j*3+0];
-						float g = buf_p[j*3+1];
-						float b = buf_p[j*3+2];
-						float intensity;
-						float out[3] = {0.0, 0.0, 0.0};
-
-						intensity = 0.33f * r + 0.685f * g + 0.063f * b;
-
-						if ( intensity > 255 )
-							intensity = 1.0f;
-						else
-							intensity /= 255.0f;
-
-						if ( intensity > maxIntensity )
-							maxIntensity = intensity;
-
-						HSVtoRGB( intensity, 1.00, 0.50, out );
-
-						oldimage[j*4+0] = out[0] * 255;
-						oldimage[j*4+1] = out[1] * 255;
-						oldimage[j*4+2] = out[2] * 255;
-						oldimage[j*4+3] = 255;
-
-						sumIntensity += intensity;
-					}
-				} else {
-					for ( j = 0 ; j < LIGHTMAP_SIZE * LIGHTMAP_SIZE; j++ ) {
-						R_ColorShiftLightingBytes( &buf_p[j*3], &oldimage[j*4] );
-						oldimage[j*4+3] = 255;
-					}
-				}
-				tr.lightmaps[i] = R_CreateImage( va("*lightmap%d",i), oldimage,
-					LIGHTMAP_SIZE, LIGHTMAP_SIZE, qfalse, qfalse, GL_CLAMP_TO_EDGE );
-			}
-
-			if ( r_lightmap->integer == 2 )	{
-				ri.Printf( PRINT_ALL, "Brightest lightmap value: %d\n", ( int ) ( maxIntensity * 255 ) );
-			}
-
-			return;
-		}
-	}
-
-	qsort(lightmapFiles, numLightmaps, sizeof(char *), LightmapNameCompare);
-
-	if(numLightmaps > MAX_LIGHTMAPS)
-	{
-		ri.Error(ERR_DROP, "R_LoadLightmaps: too many lightmaps for %s", bspName);
-		numLightmaps = MAX_LIGHTMAPS;
-	}
-
-	tr.numLightmaps = numLightmaps;
-	ri.Printf(PRINT_DEVELOPER, "...loading %i external lightmaps\n", tr.numLightmaps);
-
-	// we are about to upload textures
-	R_SyncRenderThread();
-
-	for(i = 0; i < numLightmaps; i++)
-	{
-		ri.Printf(PRINT_DEVELOPER, "...loading external lightmap '%s/%s'\n", mapName, lightmapFiles[i]);
-
-		tr.lightmaps[i] = R_FindImageFile(va("%s/%s", mapName, lightmapFiles[i]),qfalse,qfalse, GL_CLAMP_TO_EDGE);
-	}
-}
-#else // IOQUAKE3 // ioquake3 only loads internal lightmaps, not internal/external ones.
 /*
 ===============
 R_LoadLightmaps
@@ -321,13 +195,49 @@ R_LoadLightmaps
 ===============
 */
 #define	LIGHTMAP_SIZE	128
-static	void R_LoadLightmaps( lump_t *l ) {
+static void R_LoadLightmaps(lump_t * l)
+{
 	byte		*buf, *buf_p;
 	int			len;
 	byte		image[LIGHTMAP_SIZE*LIGHTMAP_SIZE*4];
 	int			i, j;
 	float maxIntensity = 0;
 	double sumIntensity = 0;
+#ifdef IOQ3ZTM // EXTERNAL_LIGHTMAPS
+	qboolean vextexOnly;
+
+	// if we are in r_vertexLight mode, we don't need the lightmaps at all
+	vextexOnly = ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 );
+
+	if (!vextexOnly) {
+		char	mapName[MAX_QPATH];
+		char	**lightmapFiles;
+
+		COM_StripExtension(mapName, s_worldData.name, sizeof(mapName)); // ZTM: Get map .bsp filename
+		//strcat(mapName, "/lightmaps"); //HACK: Loads external lightmaps inside mapName/lightmaps/lm_0000.tga etc
+		lightmapFiles = ri.FS_ListFiles(mapName, ".tga", &tr.numLightmaps);
+
+		if (lightmapFiles && tr.numLightmaps)
+		{
+			qsort(lightmapFiles, tr.numLightmaps, sizeof(char *), LightmapNameCompare);
+
+			ri.Printf(PRINT_DEVELOPER, "...loading %i external lightmaps\n", tr.numLightmaps);
+
+			// we are about to upload textures
+			R_SyncRenderThread();
+
+			tr.lightmaps = ri.Hunk_Alloc( tr.numLightmaps * sizeof(image_t *), h_low );
+			for(i = 0; i < tr.numLightmaps; i++)
+			{
+				ri.Printf(PRINT_DEVELOPER, "...loading external lightmap '%s/%s'\n", mapName, lightmapFiles[i]);
+
+				tr.lightmaps[i] = R_FindImageFile(va("%s/%s", mapName, lightmapFiles[i]),qfalse,qfalse, GL_CLAMP_TO_EDGE);
+			}
+
+			return;
+		}
+	}
+#endif
 
 	len = l->filelen;
 	if ( !len ) {
@@ -344,16 +254,20 @@ static	void R_LoadLightmaps( lump_t *l ) {
 		//FIXME: HACK: maps with only one lightmap turn up fullbright for some reason.
 		//this avoids this, but isn't the correct solution.
 		tr.numLightmaps++;
-	} else if ( tr.numLightmaps >= MAX_LIGHTMAPS ) { // 20051020 misantropia
-		ri.Printf( PRINT_WARNING, "WARNING: number of lightmaps > MAX_LIGHTMAPS\n" );
-		tr.numLightmaps = MAX_LIGHTMAPS;
 	}
 
 	// if we are in r_vertexLight mode, we don't need the lightmaps at all
+#ifdef IOQ3ZTM // EXTERNAL_LIGHTMAPS
+	if ( vextexOnly ) {
+		return;
+	}
+#else
 	if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
 		return;
 	}
+#endif
 
+	tr.lightmaps = ri.Hunk_Alloc( tr.numLightmaps * sizeof(image_t *), h_low );
 	for ( i = 0 ; i < tr.numLightmaps ; i++ ) {
 		// expand the 24 bit on-disk to 32 bit
 		buf_p = buf + i * LIGHTMAP_SIZE*LIGHTMAP_SIZE * 3;
@@ -401,7 +315,6 @@ static	void R_LoadLightmaps( lump_t *l ) {
 		ri.Printf( PRINT_ALL, "Brightest lightmap value: %d\n", ( int ) ( maxIntensity * 255 ) );
 	}
 }
-#endif
 
 
 /*

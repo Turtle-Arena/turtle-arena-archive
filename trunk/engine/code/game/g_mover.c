@@ -1912,11 +1912,15 @@ void SP_func_static( gentity_t *ent ) {
 	VectorCopy( ent->s.origin, ent->pos1);
 	VectorCopy( ent->s.origin, ent->pos2);
 #endif
+	
 	InitMover( ent );
+	
 #ifdef IOQ3ZTM // BREAKABLE
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 #endif
+	
+	trap_LinkEntity(ent);
 }
 
 
@@ -1950,7 +1954,10 @@ void SP_func_breakable( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
 	VectorCopy( ent->s.origin, ent->pos1);
 	VectorCopy( ent->s.origin, ent->pos2);
+
 	InitMover( ent );
+
+	trap_LinkEntity(ent);
 }
 #endif
 

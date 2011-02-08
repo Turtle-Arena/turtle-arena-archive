@@ -1775,11 +1775,8 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 
 	memset( &s_serveroptions, 0 ,sizeof(serveroptions_t) );
 	s_serveroptions.multiplayer = multiplayer;
-#if defined IOQ3ZTM // IOQ3BUGFIX: Clamp to gametype_remap2 array (and use proper g_gametype name)
-	s_serveroptions.gametype = (int)Com_Clamp( 0, ARRAY_LEN(gametype_remap2) - 1, trap_Cvar_VariableValue( "g_gametype" ) );
-#else
-	s_serveroptions.gametype = (int)Com_Clamp( 0, GT_MAX_GAME_TYPE - 1, trap_Cvar_VariableValue( "g_gameType" ) );
-#endif
+	s_serveroptions.gametype = (int) Com_Clamp(0, ARRAY_LEN(gametype_remap2) - 1,
+						trap_Cvar_VariableValue("g_gametype"));
 #ifdef IOQUAKE3 // ZTM: punkbuster
 	s_serveroptions.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_punkbuster" ) );
 #endif

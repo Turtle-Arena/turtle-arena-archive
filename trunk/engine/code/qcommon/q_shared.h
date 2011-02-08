@@ -26,6 +26,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
+#define BASETA						"missionpack"
+
 #ifdef STANDALONE
   #ifdef TURTLEARENA
     #define PRODUCT_NAME			"Turtle Arena"
@@ -33,6 +35,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     #define CLIENT_WINDOW_TITLE     "Turtle Arena"
     #define CLIENT_WINDOW_MIN_TITLE "Turtle Arena"
     #define GAMENAME_FOR_MASTER		"TurtleArena"
+    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER
+    #define FLATLINE_FOR_MASTER		HEARTBEAT_FOR_MASTER "dead"
   #elif defined IOQ3ZTM
 	// Standalone IOQ3ZTM is a mod for Turtle Arena
     #define PRODUCT_NAME			"ioq3turtle"
@@ -40,12 +44,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     #define CLIENT_WINDOW_TITLE     "ioquake3turtle"
     #define CLIENT_WINDOW_MIN_TITLE "ioq3turtle"
     #define GAMENAME_FOR_MASTER		"TurtleArena"
+    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER
+    #define FLATLINE_FOR_MASTER		HEARTBEAT_FOR_MASTER "dead"
   #else
     #define PRODUCT_NAME			"iofoo3"
     #define BASEGAME			"foobar"
     #define CLIENT_WINDOW_TITLE     	"changeme"
     #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
-    #define GAMENAME_FOR_MASTER		"iofoo3"	// must NOT contain whitespaces
+    #define GAMENAME_FOR_MASTER		"iofoo3"		// must NOT contain whitespaces
+    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER
+    #define FLATLINE_FOR_MASTER		GAMENAME_FOR_MASTER "dead"
   #endif
 #else
   #define PRODUCT_NAME			"ioq3"
@@ -53,6 +61,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define CLIENT_WINDOW_TITLE     	"ioquake3"
   #define CLIENT_WINDOW_MIN_TITLE 	"ioq3"
   #define GAMENAME_FOR_MASTER		"Quake3Arena"
+  #define HEARTBEAT_FOR_MASTER		"QuakeArena-1"
+  #define FLATLINE_FOR_MASTER		HEARTBEAT_FOR_MASTER
 #endif
 
 #ifdef TA_SP
@@ -70,7 +80,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define Q3_VERSION PRODUCT_NAME " " PRODUCT_VERSION
 
-#define MAX_TEAMNAME 32
+#define MAX_TEAMNAME		32
+#define MAX_MASTER_SERVERS      5	// number of supported master servers
 
 #ifdef _MSC_VER
 
@@ -199,9 +210,9 @@ typedef int		clipHandle_t;
 #define PAD(x,y) (((x)+(y)-1) & ~((y)-1))
 
 #ifdef __GNUC__
-#define ALIGN(x) __attribute__((aligned(x)))
+#define QALIGN(x) __attribute__((aligned(x)))
 #else
-#define ALIGN(x)
+#define QALIGN(x)
 #endif
 
 #ifndef NULL
@@ -1475,5 +1486,8 @@ typedef enum _flag_status {
 #define CDKEY_LEN 16
 #define CDCHKSUM_LEN 2
 #endif
+
+#define LERP( a, b, w ) ( ( a ) * ( 1.0f - ( w ) ) + ( b ) * ( w ) )
+#define LUMA( red, green, blue ) ( 0.2126f * ( red ) + 0.7152f * ( green ) + 0.0722f * ( blue ) )
 
 #endif	// __Q_SHARED_H

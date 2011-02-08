@@ -705,8 +705,8 @@ typedef struct {
 
 #define MAX_PREDICTED_EVENTS	16
  
- // ZTM: data that use to be in cg_t but is needed for each local client
- typedef struct {
+// ZTM: data that use to be in cg_t but is needed for each local client
+typedef struct {
 
 	int			clientNum;
 
@@ -751,11 +751,6 @@ typedef struct {
 #ifndef TURTLEARENA // NO_AMMO_WARNINGS
 	// low ammo warning state
 	int			lowAmmoWarning;		// 1 = low, 2 = empty
-#endif
-
-#ifndef IOQ3ZTM // IOQ3BUGFIX: unused in the source code.
-	// kill timers for carnage reward
-	int			lastKillTime;
 #endif
 
 	// crosshair client ID
@@ -850,7 +845,7 @@ typedef struct {
 
 	char		killerName[MAX_NAME_LENGTH];
 
- } cglc_t;
+} cglc_t;
  
 typedef struct {
 	int			clientFrame;		// incremented each frame
@@ -1011,7 +1006,7 @@ typedef struct {
 #endif
 	qhandle_t	whiteShader;
 
-#ifdef MISSIONPACK // IOQ3BUGFIX: This is MISSIONPACK stuff but it didn't have a #ifdef.
+#ifdef MISSIONPACK
 	qhandle_t	redCubeModel;
 	qhandle_t	blueCubeModel;
 	qhandle_t	redCubeIcon;
