@@ -1131,8 +1131,8 @@ void R_Register( void )
 #endif
 
 #ifdef TA_SPLITVIEW // Need more polys when there are more views.
-	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS*2), 0);
-	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS*2), 0);
+	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS*MAX_SPLITVIEW), 0);
+	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS*MAX_SPLITVIEW), 0);
 #else
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);
