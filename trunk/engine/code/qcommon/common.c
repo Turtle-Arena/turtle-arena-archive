@@ -2857,7 +2857,7 @@ Writes key bindings and archived cvars to config file if modified
 ===============
 */
 void Com_WriteConfiguration( void ) {
-#ifndef DEDICATED
+#if !defined(DEDICATED) && !defined(STANDALONE)
 	cvar_t	*fs;
 #endif
 	// if we are quiting without fully initializing, make sure
@@ -2873,11 +2873,11 @@ void Com_WriteConfiguration( void ) {
 
 	Com_WriteConfigToFile( Q3CONFIG_CFG );
 
-	// not needed for dedicated
-#ifndef DEDICATED
-	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 #ifdef IOQUAKE3 // ZTM: CDKEY
-#ifndef STANDALONE
+	// not needed for dedicated or standalone
+#if !defined(DEDICATED) && !defined(STANDALONE)
+	fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
+
 	if(!com_standalone->integer)
 	{
 		if (UI_usesUniqueCDKey() && fs && fs->string[0] != 0) {
@@ -2888,7 +2888,6 @@ void Com_WriteConfiguration( void ) {
 	}
 #endif
 #endif // IOQUAKE3 // ZTM: CDKEY
-#endif
 }
 
 

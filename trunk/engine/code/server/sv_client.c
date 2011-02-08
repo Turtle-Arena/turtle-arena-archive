@@ -1052,10 +1052,7 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 	int curindex;
 	int rate;
 	int blockspersnap;
-	int idPack = 0, missionPack = 0, unreferenced = 1;
-#ifdef STANDALONE // IOQ3ZTM
-	int basePack = 0;
-#endif
+	int unreferenced = 1;
 	char errorMessage[1024];
 	char pakbuf[MAX_QPATH], *pakptr;
 	int numRefPaks;
@@ -1063,7 +1060,16 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 	if (!*cl->downloadName)
 		return;	// Nothing being downloaded
 
-	if (!cl->download) {
+	if(!cl->download)
+	{
+		qboolean idPack = qfalse;
+		#ifndef STANDALONE
+		qboolean missionPack = qfalse;
+		#endif
+#if defined STANDALONE && defined IOQ3ZTM
+		qboolean basePack = qfalse;
+#endif
+	
  		// Chop off filename extension.
 		Com_sprintf(pakbuf, sizeof(pakbuf), "%s", cl->downloadName);
 		pakptr = Q_strrchr(pakbuf, '.');
@@ -1090,10 +1096,15 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 
 						// now that we know the file is referenced,
 						// check whether it's legal to download it.
-						missionPack = FS_idPak(pakbuf, BASETA, NUM_TA_PAKS);
-						idPack = missionPack || FS_idPak(pakbuf, BASEQ3, NUM_ID_PAKS);
-#ifdef STANDALONE // IOQ3ZTM
+#if defined STANDALONE && defined IOQ3ZTM
+						idPack = FS_idPak(pakbuf, BASETA, NUM_TA_PAKS) || FS_idPak(pakbuf, BASEQ3, NUM_ID_PAKS);
 						basePack = FS_DefaultPak(pakbuf);
+#else
+#ifndef STANDALONE
+						missionPack = FS_idPak(pakbuf, BASETA, NUM_TA_PAKS);
+						idPack = missionPack;
+#endif
+						idPack = idPack || FS_idPak(pakbuf, BASEGAME, NUM_ID_PAKS);
 #endif
 
 						break;
@@ -1117,11 +1128,15 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 			}
 			else if (idPack) {
 				Com_Printf("clientDownload: %d : \"%s\" cannot download id pk3 files\n", (int) (cl - svs.clients), cl->downloadName);
-				if (missionPack) {
+#ifndef STANDALONE
+				if(missionPack)
+				{
 					Com_sprintf(errorMessage, sizeof(errorMessage), "Cannot autodownload Team Arena file \"%s\"\n"
 									"The Team Arena mission pack can be found in your local game store.", cl->downloadName);
 				}
-				else {
+				else
+#endif
+				{
 					Com_sprintf(errorMessage, sizeof(errorMessage), "Cannot autodownload id pk3 file \"%s\"", cl->downloadName);
 				}
 			}
