@@ -1091,11 +1091,9 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 						// now that we know the file is referenced,
 						// check whether it's legal to download it.
 						missionPack = FS_idPak(pakbuf, BASETA, NUM_TA_PAKS);
+						idPack = missionPack || FS_idPak(pakbuf, BASEQ3, NUM_ID_PAKS);
 #ifdef STANDALONE // IOQ3ZTM
-						idPack = missionPack || FS_idPak(pakbuf, "baseq3", NUM_ID_PAKS);
-						basePack = FS_idPak(pakbuf, BASEGAME, NUM_ID_PAKS);
-#else
-						idPack = missionPack || FS_idPak(pakbuf, BASEGAME, NUM_ID_PAKS);
+						basePack = FS_DefaultPak(pakbuf);
 #endif
 
 						break;
@@ -1130,9 +1128,9 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 #ifdef STANDALONE // IOQ3ZTM
 			else if (basePack)
 			{
-				// Don't auto download assets0.pk3
-				Com_Printf("clientDownload: %d : \"%s\" cannot download \"" BASEGAME "/\" pk3 files\n", (int) (cl - svs.clients), cl->downloadName);
-				Com_sprintf(errorMessage, sizeof(errorMessage), "Cannot autodownload \"" BASEGAME "/\" pk3 file \"%s\"", cl->downloadName);
+				// Don't auto download default pk3s
+				Com_Printf("clientDownload: %d : \"%s\" cannot download default pk3 files\n", (int) (cl - svs.clients), cl->downloadName);
+				Com_sprintf(errorMessage, sizeof(errorMessage), "Cannot autodownload default pk3 file \"%s\"", cl->downloadName);
 			}
 #endif
 			else if ( !(sv_allowDownload->integer & DLF_ENABLE) ||

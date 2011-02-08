@@ -743,6 +743,9 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames );
 
 qboolean FS_CheckDirTraversal(const char *checkdir);
 qboolean FS_idPak(char *pak, char *base, int numPaks);
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+qboolean FS_DefaultPak( char *pak );
+#endif
 qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring );
 
 void FS_Rename( const char *from, const char *to );
