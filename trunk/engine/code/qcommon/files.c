@@ -177,7 +177,6 @@ or configs will never get loaded from disk!
 #if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 #define PAK_REQUIRED 0
 #define PAK_OPTIONAL 1 // ZTM: TODO: Allow Language paks and/or other net-safe paks
-#define PAK_DEMOQ3 2 // Overrides missing required paks
 
 typedef struct
 {
@@ -193,18 +192,23 @@ const purePak_t com_purePaks[] =
 	{BASEGAME, "assets0", 4075197396u, PAK_REQUIRED},
 	//{BASEGAME, "assets1-cc-by-nc", 0, PAK_OPTIONAL},
 #else
-	{"baseq3", "pak0", 1566731103u, PAK_REQUIRED},
-	{"baseq3", "pak1", 298122907u, PAK_REQUIRED},
-	{"baseq3", "pak2", 412165236u, PAK_REQUIRED},
-	{"baseq3", "pak3", 2991495316u, PAK_REQUIRED},
-	{"baseq3", "pak4", 1197932710u, PAK_REQUIRED},
-	{"baseq3", "pak5", 4087071573u, PAK_REQUIRED},
-	{"baseq3", "pak6", 3709064859u, PAK_REQUIRED},
-	{"baseq3", "pak7", 908855077u, PAK_REQUIRED},
-	{"baseq3", "pak8", 977125798u, PAK_REQUIRED},
+	{BASEQ3, "pak0", 1566731103u, PAK_REQUIRED},
+	{BASEQ3, "pak1", 298122907u, PAK_REQUIRED},
+	{BASEQ3, "pak2", 412165236u, PAK_REQUIRED},
+	{BASEQ3, "pak3", 2991495316u, PAK_REQUIRED},
+	{BASEQ3, "pak4", 1197932710u, PAK_REQUIRED},
+	{BASEQ3, "pak5", 4087071573u, PAK_REQUIRED},
+	{BASEQ3, "pak6", 3709064859u, PAK_REQUIRED},
+	{BASEQ3, "pak7", 908855077u, PAK_REQUIRED},
+	{BASEQ3, "pak8", 977125798u, PAK_REQUIRED},
 
 	#define	DEMO_PAK0_CHECKSUM	2985612116u
-	{"demoq3", "pak0", DEMO_PAK0_CHECKSUM, PAK_DEMOQ3},
+	{"demoq3", "pak0", DEMO_PAK0_CHECKSUM, PAK_REQUIRED},
+
+	{BASETA, "pak0", 2430342401u, PAK_REQUIRED},
+	{BASETA, "pak1", 511014160u, PAK_REQUIRED},
+	{BASETA, "pak2", 2662638993u, PAK_REQUIRED},
+	{BASETA, "pak3", 1438664554u, PAK_REQUIRED},
 #endif
 
 	{NULL, 0, qtrue}
@@ -3082,7 +3086,7 @@ qboolean FS_BaseFileExists( const char *file )
 	FILE *f;
 	char *testpath;
 
-	testpath = FS_BuildOSPath( fs_basepath->string, BASEGAME, file );
+	testpath = FS_BuildOSPath( fs_basepath->string, com_basegame->string, file );
 
 	f = fopen( testpath, "rb" );
 	if (f) {
@@ -3489,6 +3493,15 @@ static void FS_CheckPaks( void )
 		if (com_purePaks[pak].status != PAK_REQUIRED) {
 			continue;
 		}
+
+		// Only require paks that will be used
+		if (!!Q_stricmpn( com_basegame->string, com_purePaks[pak].gamename, MAX_OSPATH )
+			&& !(fs_basegame->string[0] && !Q_stricmpn( fs_basegame->string, com_purePaks[pak].gamename, MAX_OSPATH ))
+			&& !(fs_gamedirvar->string[0] && !Q_stricmpn( fs_gamedirvar->string, com_purePaks[pak].gamename, MAX_OSPATH )))
+		{
+			continue;
+		}
+
 		total += 1<<pak;
 	}
 
@@ -3510,21 +3523,16 @@ static void FS_CheckPaks( void )
 				{
 					Com_Printf("\n\n"
 						"**********************************************************************\n"
-						"WARNING: %s.pk3 is present but its checksum (%u) is not correct.\n"
+						"WARNING: %s/%s.pk3 is present but its checksum (%u) is not correct.\n"
 						"**********************************************************************\n\n\n",
-						com_purePaks[pak].pakname, path->pack->checksum );
+						com_purePaks[pak].gamename, com_purePaks[pak].pakname, path->pack->checksum );
 
 					invalidPak |= 1<<pak;
 				}
 				else
 				{
-					// Found pk3 AND its checksum matches.
-					if (com_purePaks[pak].status == PAK_DEMOQ3) {
-						// Demo only needs the single pk3
-						return;
-					} else {
-						foundPak |= 1<<pak;
-					}
+					// Found pk3 and its checksum matches.
+					foundPak |= 1<<pak;
 				}
 			}
 		}
