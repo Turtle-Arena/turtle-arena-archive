@@ -461,24 +461,34 @@ hide the scoreboard, and take a special screenshot
 ==================
 */
 void Cmd_LevelShot_f( gentity_t *ent ) {
-#ifdef IOQ3ZTM
-	// Only allow if ent is on the localhost
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't allow remote levelshot as it ends the game.
+	// Only allow if ent is localhost
 	if (!ent->client->pers.localClient) {
 		trap_SendServerCommand( ent-g_entities,
-			"print \"levelshot command is for local clients only\n\"" );
+			"print \"levelshot command is for local client only\n\"" );
 		return;
 	}
 #endif
+
 	if ( !CheatsOk( ent ) ) {
 		return;
 	}
 
+#ifdef IOQ3ZTM
+	// doesn't work in single player
+	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
+		trap_SendServerCommand( ent-g_entities, 
+			va("print \"Must not be in g_gametype %d for levelshot\n\"", GT_SINGLE_PLAYER) );
+		return;
+	}
+#else
 	// doesn't work in single player
 	if ( g_gametype.integer != 0 ) {
 		trap_SendServerCommand( ent-g_entities, 
 			"print \"Must be in g_gametype 0 for levelshot\n\"" );
 		return;
 	}
+#endif
 
 	BeginIntermission();
 	trap_SendServerCommand( ent-g_entities, "clientLevelShot" );
