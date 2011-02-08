@@ -2884,15 +2884,22 @@ qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring ) {
 		badchecksum = qfalse;
 		havepak = qfalse;
 
-		// never autodownload any of the id paks
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+		// never autodownload any of the id or default paks
 		if ( FS_idPak(fs_serverReferencedPakNames[i], BASEQ3, NUM_ID_PAKS)
-		|| FS_idPak(fs_serverReferencedPakNames[i], BASETA, NUM_TA_PAKS) ) {
+			|| FS_idPak(fs_serverReferencedPakNames[i], BASETA, NUM_TA_PAKS)
+			|| FS_DefaultPak(fs_serverReferencedPakNames[i]) )
+		{
 			continue;
 		}
-
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-		// never autodownload any of the default paks
-		if ( FS_DefaultPak(fs_serverReferencedPakNames[i]) ) {
+#else
+		// never autodownload any of the id paks
+		if(FS_idPak(fs_serverReferencedPakNames[i], BASEGAME, NUM_ID_PAKS)
+#ifndef STANDALONE
+	           || FS_idPak(fs_serverReferencedPakNames[i], BASETA, NUM_TA_PAKS)
+#endif
+		  )
+		{
 			continue;
 		}
 #endif
