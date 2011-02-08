@@ -579,7 +579,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 #else
 		Com_Printf( "Loading dll file %s.\n", vm->name );
 #endif
-		vm->dllHandle = Sys_LoadDll( module, vm->fqpath , &vm->entryPoint, VM_DllSyscall );
+		vm->dllHandle = Sys_LoadDll( module, &vm->entryPoint, VM_DllSyscall );
 		if ( vm->dllHandle ) {
 			return vm;
 		}

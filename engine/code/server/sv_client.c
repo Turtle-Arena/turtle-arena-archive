@@ -101,7 +101,7 @@ void SV_GetChallenge(netadr_t from)
 #ifndef STANDALONE
 	// Drop the authorize stuff if this client is coming in via v6 as the auth server does not support ipv6.
 	// Drop also for addresses coming in on local LAN and for stand-alone games independent from id's assets.
-	if(challenge->adr.type == NA_IP && !Cvar_VariableIntegerValue("com_standalone") && !Sys_IsLANAddress(from))
+	if(challenge->adr.type == NA_IP && !com_standalone->integer && !Sys_IsLANAddress(from))
 	{
 		// look up the authorize server's IP
 		if (svs.authorizeAddress.type == NA_BAD)
@@ -920,7 +920,11 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 
 	client->deltaMessage = -1;
 	client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
-	client->lastUsercmd = *cmd;
+
+	if(cmd)
+		memcpy(&client->lastUsercmd, cmd, sizeof(client->lastUsercmd));
+	else
+		memset(&client->lastUsercmd, '\0', sizeof(client->lastUsercmd));
 
 	// call the game begin function
 	VM_Call( gvm, GAME_CLIENT_BEGIN, client - svs.clients );
@@ -1086,12 +1090,12 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 
 						// now that we know the file is referenced,
 						// check whether it's legal to download it.
-						missionPack = FS_idPak(pakbuf, "missionpack");
+						missionPack = FS_idPak(pakbuf, BASETA, NUM_TA_PAKS);
 #ifdef STANDALONE // IOQ3ZTM
-						idPack = missionPack || FS_idPak(pakbuf, "baseq3");
-						basePack = FS_idPak(pakbuf, BASEGAME);
+						idPack = missionPack || FS_idPak(pakbuf, "baseq3", NUM_ID_PAKS);
+						basePack = FS_idPak(pakbuf, BASEGAME, NUM_ID_PAKS);
 #else
-						idPack = missionPack || FS_idPak(pakbuf, BASEGAME);
+						idPack = missionPack || FS_idPak(pakbuf, BASEGAME, NUM_ID_PAKS);
 #endif
 
 						break;
@@ -1830,7 +1834,7 @@ void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK ) {
 
 	if (clientOK) {
 		// pass unknown strings to the game
-		if (!u->name && sv.state == SS_GAME) {
+		if (!u->name && sv.state == SS_GAME && (cl->state == CS_ACTIVE || cl->state == CS_PRIMED)) {
 			Cmd_Args_Sanitize();
 			VM_Call( gvm, GAME_CLIENT_COMMAND, cl - svs.clients );
 		}

@@ -601,8 +601,9 @@ issues.
 #define FS_UI_REF		0x02
 #define FS_CGAME_REF	0x04
 #define FS_QAGAME_REF	0x08
-// number of id paks that will never be autodownloaded from baseq3
+// number of id paks that will never be autodownloaded from baseq3/missionpack
 #define NUM_ID_PAKS		9
+#define NUM_TA_PAKS		4
 
 #define	MAX_FILE_HANDLES	64
 
@@ -641,6 +642,9 @@ void	FS_FreeFileList( char **list );
 qboolean FS_FileExists( const char *file );
 
 qboolean FS_CreatePath (char *OSPath);
+
+char *FS_FindDll( const char *filename );
+
 char   *FS_BuildOSPath( const char *base, const char *game, const char *qpath );
 qboolean FS_CompareZipChecksum(const char *zipfile);
 
@@ -738,7 +742,7 @@ void FS_PureServerSetLoadedPaks( const char *pakSums, const char *pakNames );
 // sole exception of .cfg files.
 
 qboolean FS_CheckDirTraversal(const char *checkdir);
-qboolean FS_idPak( char *pak, char *base );
+qboolean FS_idPak(char *pak, char *base, int numPaks);
 qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring );
 
 void FS_Rename( const char *from, const char *to );
@@ -748,6 +752,8 @@ void FS_HomeRemove( const char *homePath );
 
 void	FS_FilenameCompletion( const char *dir, const char *ext,
 		qboolean stripExt, void(*callback)(const char *s) );
+
+const char *FS_GetCurrentGameDir(void);
 
 /*
 ==============================================================
@@ -806,13 +812,12 @@ typedef enum
 
 typedef enum {
 	// SE_NONE must be zero
-	SE_NONE = 0,	// evTime is still valid
-	SE_KEY,		// evValue is a key code, evValue2 is the down flag
-	SE_CHAR,	// evValue is an ascii char
-	SE_MOUSE,	// evValue and evValue2 are reletive signed x / y moves
+	SE_NONE = 0,		// evTime is still valid
+	SE_KEY,			// evValue is a key code, evValue2 is the down flag
+	SE_CHAR,		// evValue is an ascii char
+	SE_MOUSE,		// evValue and evValue2 are reletive signed x / y moves
 	SE_JOYSTICK_AXIS,	// evValue is an axis number and evValue2 is the current state (-127 to 127)
-	SE_CONSOLE,	// evPtr is a char*
-	SE_PACKET	// evPtr is a netadr_t followed by data bytes to evPtrLength
+	SE_CONSOLE		// evPtr is a char*
 } sysEventType_t;
 
 typedef struct {
@@ -845,6 +850,7 @@ int			Com_Filter(char *filter, char *name, int casesensitive);
 int			Com_FilterPath(char *filter, char *name, int casesensitive);
 int			Com_RealTime(qtime_t *qtime);
 qboolean	Com_SafeMode( void );
+void		Com_RunAndTimeServerPacket(netadr_t *evFrom, msg_t *buf);
 
 void		Com_StartupVariable( const char *match );
 // checks for and removes command line "+set var arg" constructs
@@ -874,6 +880,10 @@ extern	cvar_t	*com_maxfpsUnfocused;
 extern	cvar_t	*com_minimized;
 extern	cvar_t	*com_maxfpsMinimized;
 extern	cvar_t	*com_altivec;
+extern	cvar_t	*com_standalone;
+extern	cvar_t	*com_basegame;
+extern	cvar_t	*com_homepath;
+
 #ifdef ANALOG // cl vars
 extern	cvar_t	*cl_thirdPerson;
 extern	cvar_t	*cl_thirdPersonAngle;
@@ -893,7 +903,6 @@ extern	int		time_frontend;
 extern	int		time_backend;		// renderer backend time
 
 extern	int		com_frameTime;
-extern	int		com_frameMsec;
 
 extern	qboolean	com_errorEntered;
 
@@ -1047,6 +1056,7 @@ void SV_Init( void );
 void SV_Shutdown( char *finalmsg );
 void SV_Frame( int msec );
 void SV_PacketEvent( netadr_t from, msg_t *msg );
+int SV_FrameMsec(void);
 qboolean SV_GameCommand( void );
 
 
@@ -1079,7 +1089,7 @@ typedef enum {
 void	Sys_Init (void);
 
 // general development dll loading for virtual machine testing
-void	* QDECL Sys_LoadDll( const char *name, char *fqpath , intptr_t (QDECL **entryPoint)(int, ...),
+void	* QDECL Sys_LoadDll( const char *name, intptr_t (QDECL **entryPoint)(int, ...),
 				  intptr_t (QDECL *systemcalls)(intptr_t, ...) );
 void	Sys_UnloadDll( void *dllHandle );
 
@@ -1120,7 +1130,6 @@ cpuFeatures_t Sys_GetProcessorFeatures( void );
 void	Sys_SetErrorText( const char *text );
 
 void	Sys_SendPacket( int length, const void *data, netadr_t to );
-qboolean Sys_GetPacket( netadr_t *net_from, msg_t *net_message );
 
 qboolean	Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family );
 //Does NOT parse port numbers, only base addresses.

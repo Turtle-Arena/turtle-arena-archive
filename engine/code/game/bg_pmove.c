@@ -39,7 +39,6 @@ pml_t		pml;
 float	pm_stopspeed = 100.0f;
 float	pm_duckScale = 0.25f;
 float	pm_swimScale = 0.50f;
-float	pm_wadeScale = 0.70f;
 #ifdef IOQ3ZTM // LADDER
 float	pm_ladderScale = 0.80f;  // Set the max movement speed to 80% of normal
 #endif
