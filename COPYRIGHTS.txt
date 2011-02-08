@@ -44,35 +44,35 @@ The following are Copyright (C) 2010 NeilCrowe aka The Mulletz
 	and are licensed under the Creative Commons NonCommercial (Some are also ShareAlike, see list for details)
 
 music/NeilCrowe_-_I_Fear_The_Fear_(2.24_mix).ogg
-		The Mulletz - I Fear The Fear (2.24 mix) - CC-BY-NC-SA - http://ccmixter.org/files/NeilCrowe/28003
+		The Mulletz - I Fear The Fear (2.24 mix) - CC-BY-NC-SA-2.5 - http://ccmixter.org/files/NeilCrowe/28003
 
 music/NeilCrowe_-_Dark_Inside.ogg
-		The Mulletz - Dark Inside - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/27786
+		The Mulletz - Dark Inside - CC-BY-NC-SA-2.5 - http://ccmixter.org/files/NeilCrowe/27786
 
 music/NeilCrowe_-_I_Can_t_take_you_there.ogg
-		The Mulletz - I Can't take you there - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/27760
+		The Mulletz - I Can't take you there - CC-BY-NC-2.5 - http://ccmixter.org/files/NeilCrowe/27760
 
 music/NeilCrowe_-_Gone.ogg
-		The Mulletz - Gone - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/28169
+		The Mulletz - Gone - CC-BY-NC-3.0 - http://ccmixter.org/files/NeilCrowe/28169
 
 music/NeilCrowe_-_Something_Special.ogg
-		The Mulletz - Something Special - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/28594
+		The Mulletz - Something Special - CC-BY-NC-3.0 - http://ccmixter.org/files/NeilCrowe/28594
 
 music/NeilCrowe_-_The_Future_Is_Underwater.ogg
-		The Mulletz - The Future Is Underwater - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/27922
+		The Mulletz - The Future Is Underwater - CC-BY-NC-3.0 - http://ccmixter.org/files/NeilCrowe/27922
 
 music/NeilCrowe_-_Reborn.ogg
-		The Mulletz - Reborn - CC-BY-NC-SA - http://ccmixter.org/files/NeilCrowe/28065
+		The Mulletz - Reborn - CC-BY-NC-SA-3.0 - http://ccmixter.org/files/NeilCrowe/28065
 
 music/NeilCrowe_-_Only_I_Know.ogg
-		The Mulletz - Only I Know - CC-BY-NC - http://ccmixter.org/files/NeilCrowe/27880
+		The Mulletz - Only I Know - CC-BY-NC-3.0 - http://ccmixter.org/files/NeilCrowe/27880
 
 == zero-project.gr ==
 The following is Copyright (C) 2010 zero-project
 	and is licensed under the Creative Commons ShareAlike 3.0.
 
 music/zero-project_-_Whispering_Wind.ogg
-		zero-project - Whispering Wind - CC-BY-SA - http://www.jamendo.com/en/track/682363
+		zero-project - Whispering Wind - CC-BY-SA-3.0 - http://www.jamendo.com/en/track/682363
 
 == OpenArena ==
 The following are from OpenArena and are Copyright (C) 2006 Dmn_clown
