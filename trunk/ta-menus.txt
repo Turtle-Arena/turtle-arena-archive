@@ -1,7 +1,4 @@
-Turtle Arena's new WIP menu idea, for when I make the menu using Team Arena menu scripting.
-		...or if stick with quake3's ui.
-
-TODO: Finished doing this to the q3_ui so I can remove this file.
+Turtle Arena menu design. Somethings are done, others have not.
 
 :MAIN
 PLAY
@@ -49,7 +46,7 @@ List Mods, load Mod.
 === Setup Player 4 ===
 
 == OPTIONS ==
-:Like the Q3 SETUP menu, less player setup.
+:Quake3 SETUP menu, less player setup.
 
 === CONTROLS ===
 
@@ -77,17 +74,18 @@ Ask for confirm, exit program.
 
 :INGAME
 Resume Game
-: if gametype < GT_TEAM
+: if only one local client and gametype < GT_TEAM
 :: if spectator
 Join Game
 :: else
 Spectate
 : else
-Change Team
+Change Team(s)
 : end if
 TODO: Vote --Like in missionpack
+Local Players --Add and drop local clients!
 Options
-Player
+Player Setup(s)
 Server
 Server Info
 Leave Game (to be removed?)
@@ -97,6 +95,7 @@ Exit
 Resume Game
 Save Game?
 Load Game?
+Local Players --Add and drop local clients!
 Options
 Leave Game (to be removed?)
 Exit

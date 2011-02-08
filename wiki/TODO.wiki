@@ -182,7 +182,11 @@ Weapons (and attacking)
     * Should I change the whole source to GPLv3 (or later)? (and the data too?)
       * If I change the whole source it could cause issues with submitting patches to ioq3 (and more difficult for other q3 mods to use my code?)
 
-  * TODO: Support using .so and .dll on pure servers? (Wolf-ET does?)
+  * TODO: Support using .so, .dll, and .dylib, on pure servers? (Wolf-ET does?)
+  * TODO: Have qvms in a separate pk3 and have it be optional.
+    * (Debian considers non-free, so don't included in debs)
+    * If so/dll/dylib are supported on pure servers is there any reason to included them in any installers?
+      * Is there a reason to include in Linux/Win32 zip that comes with so/dll? (For other ports? such as Android/iPhone?)
 
   * STARTED: Splitscreen (for local multiplayer) and splitview mode for viewing other clients in multiplayer.
     * DONE: Need someway for client to tell server how many local client they want.

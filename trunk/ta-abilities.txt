@@ -3,10 +3,10 @@ Character abilities ideas
 == Player Ideas ==
 Leo: ???
 Don / Tech: Operate computers to open doors and stuff
-Raph / Strength: Break rocks, lift/push heavy objects
+Raph / Strength: Break rocks, lift/push heavy objects, do greater melee damage
 Mike / ???: Jump higher to access other areas?
 
-== Weapon Ideals ==
+== Weapon Ideas ==
 Katanas / (all swords and axes): Cut objects no one else can
 Bo (Longer ranged, and usable to jump higher)
 Sais (Climb and/or stick to walls)
