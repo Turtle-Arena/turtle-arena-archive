@@ -26,8 +26,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#define BASETA						"missionpack"
-
 #ifdef STANDALONE
   #ifdef TURTLEARENA
     #define PRODUCT_NAME			"Turtle Arena"
@@ -64,6 +62,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define HEARTBEAT_FOR_MASTER		"QuakeArena-1"
   #define FLATLINE_FOR_MASTER		HEARTBEAT_FOR_MASTER
 #endif
+
+// ZTM: id software basegames to not auto download
+#define BASEQ3						"baseq3"
+#define BASETA						"missionpack"
 
 #ifdef TA_SP
   // Its really "fs_game\\saves", so each mod has its own saves dir.

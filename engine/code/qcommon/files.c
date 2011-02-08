@@ -222,7 +222,6 @@ static const unsigned int pak_checksums[] = {
 	908855077u,
 	977125798u
 };
-#endif
 
 static const unsigned int missionpak_checksums[] =
 {
@@ -231,6 +230,7 @@ static const unsigned int missionpak_checksums[] =
 	2662638993u,
 	1438664554u
 };
+#endif
 
 // if this is defined, the executable positively won't work with any paks other
 // than the demo pak, even if productid is present.  This is only used for our
@@ -2812,11 +2812,11 @@ qboolean FS_idPak(char *pak, char *base, int numPaks)
 FS_DefaultPak
 ================
 */
-qboolean FS_DefaultPak( char *pak, char *base ) {
+qboolean FS_DefaultPak( char *pak ) {
 	int i;
 
 	for (i = 0; com_purePaks[i].pakname != NULL; i++) {
-		if ( !FS_FilenameCompare(pak, va("%s/%s", base, com_purePaks[i].pakname)) ) {
+		if ( !FS_FilenameCompare(pak, va("%s/%s", com_purePaks[i].gamename, com_purePaks[i].pakname)) ) {
 			return qtrue;
 		}
 	}
@@ -2885,14 +2885,14 @@ qboolean FS_ComparePaks( char *neededpaks, int len, qboolean dlstring ) {
 		havepak = qfalse;
 
 		// never autodownload any of the id paks
-		if ( FS_idPak(fs_serverReferencedPakNames[i], BASEGAME, NUM_ID_PAKS)
+		if ( FS_idPak(fs_serverReferencedPakNames[i], BASEQ3, NUM_ID_PAKS)
 		|| FS_idPak(fs_serverReferencedPakNames[i], BASETA, NUM_TA_PAKS) ) {
 			continue;
 		}
 
 #if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 		// never autodownload any of the default paks
-		if ( FS_DefaultPak(fs_serverReferencedPakNames[i], BASEGAME) ) {
+		if ( FS_DefaultPak(fs_serverReferencedPakNames[i]) ) {
 			continue;
 		}
 #endif
