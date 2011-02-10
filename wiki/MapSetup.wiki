@@ -16,7 +16,7 @@ After downloading extract NetRadiant to a directory such as "C:\Program Files\Ne
 
 = Setup the Turtle Arena config =
 
-Copy the files inside of the source "extras/radiant-cfg/" directory (Ether from tmntarena-src.zip in the alpha or from the subversion repository) into the directory were you install NetRadiant (i.e. "C:\Program Files\NetRadiant")
+Copy the files inside of the source "extras/radiant-config/" directory (Either from tmntarena-src.zip in the alpha or from the subversion repository) into the directory were you install NetRadiant (i.e. "C:\Program Files\NetRadiant")
 
 When you start NetRadiant select "Turtle Arena" in the drop-down list of games. You can also set "Show Global Preferences" to unchecked to always go into Turtle Arena mapping, skipping the game select if you are not going to edit maps for other games (This can be changed later in the Edit -> Preferences -> Global -> Game).
 
