@@ -22,12 +22,25 @@ BASE_OBJ="
 	build/release-darwin-i386/$BASEDIR/uii386.dylib
 	build/release-darwin-ppc/$BASEDIR/qagameppc.dylib
 	build/release-darwin-i386/$BASEDIR/qagamei386.dylib
+	../install/$BASEDIR/assets0.pk3
 "
 
 cd `dirname $0`
 if [ ! -f Makefile ]; then
 	echo "This script must be run from the Turtle Arena build directory"
 	exit 1
+fi
+
+# ZTM: Build assets0.pk3 if needed.
+if [ ! -f ../install/$BASEDIR/assets0.pk3 ]; then
+	echo "Building ../install/$BASEDIR/assest0.pk3..."
+	cd ..
+	sh package.sh --no-win32 --no-linux
+	cd engine
+	if [ ! -f ../install/$BASEDIR/assets0.pk3 ]; then
+		echo "Error: Failed to build ../install/$BASEDIR/assest0.pk3"
+		exit 1
+	fi
 fi
 
 Q3_VERSION=`grep '^VERSION=' Makefile | sed -e 's/.*=\(.*\)/\1/'`
