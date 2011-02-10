@@ -160,6 +160,11 @@ cvar_t	*r_saveFontData;
 
 cvar_t	*r_marksOnTriangleMeshes;
 
+#ifdef IOQ3ZTM // JPEG_QUALITY
+cvar_t	*r_aviMotionJpegQuality;
+cvar_t	*r_screenshotJpegQuality;
+#endif
+
 cvar_t	*r_maxpolys;
 int		max_polys;
 cvar_t	*r_maxpolyverts;
@@ -422,7 +427,11 @@ void RB_TakeScreenshotJPEG( int x, int y, int width, int height, char *fileName 
 	}
 
 	ri.FS_WriteFile( fileName, buffer, 1 );		// create path
+#ifdef IOQ3ZTM // JPEG_QUALITY
+	SaveJPG( fileName, r_screenshotJpegQuality->integer, glConfig.vidWidth, glConfig.vidHeight, buffer);
+#else
 	SaveJPG( fileName, 90, glConfig.vidWidth, glConfig.vidHeight, buffer);
+#endif
 
 	ri.Hunk_FreeTempMemory( buffer );
 }
@@ -808,7 +817,11 @@ const void *RB_TakeVideoFrameCmd( const void *data )
 
 	if( cmd->motionJpeg )
 	{
+#ifdef IOQ3ZTM // JPEG_QUALITY
+		frameSize = SaveJPGToBuffer( cmd->encodeBuffer, r_aviMotionJpegQuality->integer,
+#else
 		frameSize = SaveJPGToBuffer( cmd->encodeBuffer, 90,
+#endif
 				cmd->width, cmd->height, cmd->captureBuffer );
 		ri.CL_WriteAVIVideoFrame( cmd->encodeBuffer, frameSize );
 	}
@@ -1129,6 +1142,11 @@ void R_Register( void )
 	r_marksOnTriangleMeshes = ri.Cvar_Get("r_marksOnTriangleMeshes", "1", CVAR_ARCHIVE);
 #else
 	r_marksOnTriangleMeshes = ri.Cvar_Get("r_marksOnTriangleMeshes", "0", CVAR_ARCHIVE);
+#endif
+
+#ifdef IOQ3ZTM // JPEG_QUALITY
+	r_aviMotionJpegQuality = ri.Cvar_Get("r_aviMotionJpegQuality", "90", CVAR_ARCHIVE);
+	r_screenshotJpegQuality = ri.Cvar_Get("r_screenshotJpegQuality", "90", CVAR_ARCHIVE);
 #endif
 
 #ifdef TA_SPLITVIEW // Need more polys when there are more views.
