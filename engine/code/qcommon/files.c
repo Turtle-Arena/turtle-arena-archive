@@ -1970,7 +1970,7 @@ Returns a uniqued list of files that match the given criteria
 from all search paths
 ===============
 */
-char **FS_ListFilteredFiles( const char *path, const char *extension, char *filter, int *numfiles ) {
+char **FS_ListFilteredFiles( const char *path, const char *extension, char *filter, int *numfiles, qboolean allowNonPureFilesOnDisk ) {
 	int				nfiles;
 	char			**listCopy;
 	char			*list[MAX_FOUND_FILES];
@@ -2065,11 +2065,10 @@ char **FS_ListFilteredFiles( const char *path, const char *extension, char *filt
 			char	**sysFiles;
 			char	*name;
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Autocomplete exec and condump filenames when on pure server
-			// don't scan directories for files if we are pure or restricted, unless auto completing exec or condump commands.
-			if ( fs_numServerPaks && !(pathLength == 0 && (!Q_strncmp(extension, "cfg", 3) || !Q_strncmp(extension, "txt", 3))))
-#else
 			// don't scan directories for files if we are pure or restricted
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Autocomplete exec and condump filenames when on pure server
+			if ( fs_numServerPaks && !allowNonPureFilesOnDisk )
+#else
 			if ( fs_numServerPaks )
 #endif
 			{
@@ -2109,7 +2108,7 @@ FS_ListFiles
 =================
 */
 char **FS_ListFiles( const char *path, const char *extension, int *numfiles ) {
-	return FS_ListFilteredFiles( path, extension, NULL, numfiles );
+	return FS_ListFilteredFiles( path, extension, NULL, numfiles, qfalse );
 }
 
 #ifdef IOQ3ZTM // VIDEOLIST
@@ -2648,7 +2647,7 @@ void FS_NewDir_f( void ) {
 
 	Com_Printf( "---------------\n" );
 
-	dirnames = FS_ListFilteredFiles( "", "", filter, &ndirs );
+	dirnames = FS_ListFilteredFiles( "", "", filter, &ndirs, qfalse );
 
 	FS_SortFileList(dirnames, ndirs);
 
@@ -4105,13 +4104,13 @@ void	FS_Flush( fileHandle_t f ) {
 }
 
 void	FS_FilenameCompletion( const char *dir, const char *ext,
-		qboolean stripExt, void(*callback)(const char *s) ) {
+		qboolean stripExt, void(*callback)(const char *s), qboolean allowNonPureFilesOnDisk ) {
 	char	**filenames;
 	int		nfiles;
 	int		i;
 	char	filename[ MAX_STRING_CHARS ];
 
-	filenames = FS_ListFilteredFiles( dir, ext, NULL, &nfiles );
+	filenames = FS_ListFilteredFiles( dir, ext, NULL, &nfiles, allowNonPureFilesOnDisk );
 
 	FS_SortFileList( filenames, nfiles );
 
