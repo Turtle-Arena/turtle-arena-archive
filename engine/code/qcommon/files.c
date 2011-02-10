@@ -2121,7 +2121,7 @@ FS_ListFilesEx
 Create a list of files using multiple file extensions
 =================
 */
-char **FS_ListFilesEx( const char *path, const char **extensions, int numExts, int *numfiles ) {
+char **FS_ListFilesEx( const char *path, const char **extensions, int numExts, int *numfiles, qboolean allowNonPureFilesOnDisk ) {
 	int		nfiles;
 	char	**listCopy;
 	char	*list[MAX_FOUND_FILES];
@@ -2135,7 +2135,7 @@ char **FS_ListFilesEx( const char *path, const char **extensions, int numExts, i
 
 	for (i = 0; i < numExts; i++)
 	{
-		sysFiles = FS_ListFilteredFiles( path, extensions[i], NULL, &numSysFiles );
+		sysFiles = FS_ListFilteredFiles( path, extensions[i], NULL, &numSysFiles, allowNonPureFilesOnDisk );
 		for ( j = 0 ; j < numSysFiles ; j++ ) {
 			// unique the match
 			name = sysFiles[j];
@@ -2218,7 +2218,7 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 #endif
 			};
 		int extNamesSize = sizeof( extensions ) / sizeof( extensions[0] );
-		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles);
+		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
 
 #ifndef IOQ3ZTM_NO_COMPAT // Q3: Team Arena Mod compatibilty
 		if (Q_strncmp(extension, "roq", 3) == 0)
@@ -2236,13 +2236,13 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 	{
 		const char *extensions[] = { "png", "tga", "jpg", "jpeg", "pcx", "bmp" };
 		int extNamesSize = sizeof( extensions ) / sizeof( extensions[0] );
-		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles);
+		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
 	}
 	else if (Q_stricmp(extension, "$sounds") == 0)
 	{
 		const char *extensions[] = { "wav", "ogg" };
 		int extNamesSize = sizeof( extensions ) / sizeof( extensions[0] );
-		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles);
+		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
 	}
 	// Allow extension to be a list
 	// Example "RoQ;roq;ogv;ogm"
@@ -2296,7 +2296,7 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 			}
 		}
 
-		pFiles = FS_ListFilesEx(path, extensions, numExts, &nFiles);
+		pFiles = FS_ListFilesEx(path, extensions, numExts, &nFiles, qfalse);
 	}
 	else
 #endif
