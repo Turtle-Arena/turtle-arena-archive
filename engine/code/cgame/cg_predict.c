@@ -365,7 +365,7 @@ static void CG_TouchItem( centity_t *cent ) {
 	// don't touch it again this prediction
 	cent->miscTime = cg.time;
 
-	// if its a weapon, give them some predicted ammo so the autoswitch will work
+	// if it's a weapon, give them some predicted ammo so the autoswitch will work
 	if ( item->giType == IT_WEAPON ) {
 #ifdef TA_WEAPSYS_EX
 		cg.cur_lc->predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
