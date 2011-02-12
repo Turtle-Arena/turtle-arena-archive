@@ -40,6 +40,39 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // Turtle Arena loads iteminfo.txt and weaponinfo.txt in 'game' and gives itemInfos to server to setup the items.
 // (itemInfos could still be here, they would over-ride the automaticly created items)
 
+iteminfo "team_redobelisk"
+{
+name		"Red Obelisk"
+model		"models/powerups/obelisk/obelisk.md3"
+modelindex	0
+type		NOITEM
+index		0
+mins		{-14, -14, 1}
+maxs		{14, 14, 87}
+}
+
+iteminfo "team_blueobelisk"
+{
+name		"Blue Obelisk"
+model		"models/powerups/obelisk/obelisk.md3"
+modelindex	0
+type		NOITEM
+index		0
+mins		{-14, -14, 1}
+maxs		{14, 14, 87}
+}
+
+iteminfo "team_neutralobelisk"
+{
+name		"Neutral Obelisk"
+model		"models/powerups/obelisk/obelisk.md3"
+modelindex	0
+type		NOITEM
+index		0
+mins		{-14, -14, 1}
+maxs		{14, 14, 87}
+}
+
 iteminfo "item_botroam"
 {
 name		"Bot Roam Goal"
