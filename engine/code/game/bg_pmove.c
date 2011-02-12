@@ -558,6 +558,9 @@ static qboolean PM_CheckJump( void ) {
 
 	pml.groundPlane = qfalse;		// jumping away
 	pml.walking = qfalse;
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+	if (pm->waterlevel < 3)
+#endif
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
