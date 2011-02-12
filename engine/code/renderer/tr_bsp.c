@@ -213,7 +213,7 @@ static void R_LoadLightmaps(lump_t * l)
 		char	mapName[MAX_QPATH];
 		char	**lightmapFiles;
 
-		COM_StripExtension(mapName, s_worldData.name, sizeof(mapName)); // ZTM: Get map .bsp filename
+		COM_StripExtension(s_worldData.name, mapName, sizeof(mapName)); // ZTM: Get map .bsp filename
 		//strcat(mapName, "/lightmaps"); //HACK: Loads external lightmaps inside mapName/lightmaps/lm_0000.tga etc
 		lightmapFiles = ri.FS_ListFiles(mapName, ".tga", &tr.numLightmaps);
 
