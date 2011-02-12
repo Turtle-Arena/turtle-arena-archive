@@ -202,7 +202,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg ) {
 	// delta encode the playerstate
 #ifdef TA_SPLITVIEW
 	if (frame->numPSs > MAX_SPLITVIEW) {
-		Com_Printf("Warning: Almost sent numPSs as %d (max=%d)\n", frame->numPSs, MAX_SPLITVIEW);
+		Com_DPrintf(S_COLOR_YELLOW "Warning: Almost sent numPSs as %d (max=%d)\n", frame->numPSs, MAX_SPLITVIEW);
 		frame->numPSs = MAX_SPLITVIEW;
 	}
 

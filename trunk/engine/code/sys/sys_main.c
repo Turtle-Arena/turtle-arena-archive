@@ -434,7 +434,11 @@ void *Sys_LoadDll( const char *name,
 		return NULL;
 	}
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf( "Loading DLL file: %s\n", netpath);
+#else
 	Com_Printf( "Loading DLL file: %s\n", netpath);
+#endif
 	libHandle = Sys_LoadLibrary(netpath);
 
 	if(!libHandle) {

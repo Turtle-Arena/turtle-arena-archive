@@ -281,7 +281,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	if (newSnap.snapFlags & SNAPFLAG_MULTIPLE_PSS) {
 		newSnap.numPSs = MSG_ReadByte( msg );
 		if (newSnap.numPSs > MAX_SPLITVIEW) {
-			Com_Printf("Warning: Got numPSs as %d (max=%d)\n", newSnap.numPSs, MAX_SPLITVIEW);
+			Com_DPrintf(S_COLOR_YELLOW "Warning: Got numPSs as %d (max=%d)\n", newSnap.numPSs, MAX_SPLITVIEW);
 			newSnap.numPSs = MAX_SPLITVIEW;
 		}
 		for (i = 0; i < MAX_SPLITVIEW; i++) {
