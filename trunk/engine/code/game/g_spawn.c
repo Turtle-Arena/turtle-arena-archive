@@ -733,16 +733,28 @@ void SP_worldspawn( void ) {
 
 	G_SpawnString( "gravity", "800", &s );
 	trap_Cvar_Set( "g_gravity", s );
+#ifdef IOQ3ZTM // Don't print message about map changing gravity.
+	G_CvarClearModification(&g_gravity);
+#endif
 
 	G_SpawnString( "enableDust", "0", &s );
 	trap_Cvar_Set( "g_enableDust", s );
+#ifdef IOQ3ZTM // Don't print message about map changing dust.
+	G_CvarClearModification(&g_enableDust);
+#endif
 
 	G_SpawnString( "enableBreath", "0", &s );
 	trap_Cvar_Set( "g_enableBreath", s );
+#ifdef IOQ3ZTM // Don't print message about map changing breath.
+	G_CvarClearModification(&g_enableBreath);
+#endif
 
 #ifdef TA_PATHSYS // 2DMODE
 	G_SpawnString( "2dmode", "0", &s );
 	trap_Cvar_Set( "g_2dmode", s );
+#ifdef IOQ3ZTM // Don't print message about map changing 2d mode.
+	G_CvarClearModification(&g_2dmode);
+#endif
 #endif
 
 	g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;

@@ -509,6 +509,35 @@ void G_UpdateCvars( void ) {
 	}
 }
 
+#ifdef IOQ3ZTM
+/*
+=================
+G_CvarClearModification
+
+Useful for disabling "Server: $cvarNmae changed to $value" messaged caused by vmCvar_t::trackChange.
+=================
+*/
+void G_CvarClearModification( vmCvar_t *vmCvar ) {
+	int			i;
+	cvarTable_t	*cv;
+
+	if (!vmCvar) {
+		return;
+	}
+
+	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
+		if ( cv->vmCvar == vmCvar ) {
+			trap_Cvar_Update( cv->vmCvar );
+
+			if ( cv->modificationCount != cv->vmCvar->modificationCount ) {
+				cv->modificationCount = cv->vmCvar->modificationCount;
+				break;
+			}
+		}
+	}
+}
+#endif
+
 #ifdef IOQ3ZTM // MAP_ROTATION
 #define MAX_MAPS_PER_ROTATION	32
 #define MAX_MAPROTATIONS		16 // MAX_ARENAS // 1024
