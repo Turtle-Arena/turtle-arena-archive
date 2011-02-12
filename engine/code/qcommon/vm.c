@@ -395,6 +395,9 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc ) {
 		return NULL;
 	}
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	if (com_developer->integer)
+#endif
 	// show where the qvm was loaded from
 	Cmd_ExecuteString( va( "which %s\n", filename ) );
 

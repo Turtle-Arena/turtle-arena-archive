@@ -2314,14 +2314,10 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 				int localClient = MSG_ReadByte( msg ); // localClient-1
 
 				if (localClient < 0 || localClient >= MAX_SPLITVIEW-1) {
-#ifndef NDEBUG
-					Com_Printf( "WARNING: localClient byte out of range for client %i\n", (int) (cl - svs.clients) );
-#endif
+					Com_DPrintf( S_COLOR_YELLOW "WARNING: localClient byte out of range for client %i\n", (int) (cl - svs.clients) );
 					break;
 				} else if (cl->local_clients[localClient] == -1) {
-#ifndef NDEBUG
-					Com_Printf( "WARNING: localClient move for non-existant local client %d from client %i\n", localClient, (int) (cl - svs.clients) );
-#endif
+					Com_DPrintf( S_COLOR_YELLOW "WARNING: localClient move for non-existant local client %d from client %i\n", localClient, (int) (cl - svs.clients) );
 					break;
 				} else {
 					SV_UserMove( &svs.clients[cl->local_clients[localClient]], msg, (c == clc_moveLocal), cl );
