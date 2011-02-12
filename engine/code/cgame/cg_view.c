@@ -788,9 +788,198 @@ static void CG_OffsetFirstPersonView( void ) {
 }
 
 #ifdef TA_PATHSYS // 2DMODE
+/*
+===============
+CG_OffsetMultiple2dModeView
+
+Based on SRB2FLAME's P_SSBSSCamera
+ZTM: TODO: Support focusing on all players if everyone is qtrue.
+===============
+*/
 static void CG_OffsetMultiple2dModeView(qboolean everyone) {
-	// ZTM: TODO: Focus on all players, assume all players are on the same plane.
-	CG_OffsetThirdPersonView();
+	const int		ORG_X = 0;
+	const int		ORG_Y = 1;
+	const int		ORG_Z = 2;
+	static vec3_t	org = {0,0,0}; // camera current origin
+	static vec3_t	mins = { -4, -4, -4 };
+	static vec3_t	maxs = { 4, 4, 4 };
+	vec3_t			center = {0, 0, 0};
+	size_t			i, numPlayers;
+	float			farthestplayerX, farthestplayerZ;
+	float			dist;
+	float			newDist;
+	float			f;
+	float			maxMove;
+	vec3_t			focusAngles = {0, 0, 0};
+	int				numYaw;
+	trace_t			trace;
+#if 0
+	mobj_t *cammin = P_GetMobjForType(MT_CAMMIN);
+	mobj_t *cammax = P_GetMobjForType(MT_CAMMAX);
+#endif
+
+	f = ((float)cg.frametime) / 1000;
+	maxMove = 340.0f * f;
+
+	// Find the center of all of the players and use that as the focus point.
+	// Calculate central X, Y, and Z
+	for (i = 0, numPlayers = 0; i < cg.snap->numPSs; i++) {
+		if (cg.snap->pss[i].persistant[PERS_TEAM] == TEAM_SPECTATOR || cg.snap->pss[i].stats[STAT_HEALTH] <= 0) {
+			continue;
+		}
+
+		numPlayers++;
+
+		center[ORG_X] += cg.snap->pss[i].origin[ORG_X];
+		center[ORG_Y] += cg.snap->pss[i].origin[ORG_Y];
+		center[ORG_Z] += cg.snap->pss[i].origin[ORG_Z];
+
+		if (cg.cur_lc->predictedPlayerState.stats[STAT_HEALTH] > 0
+#ifdef TA_PATHSYS // 2DMODE
+			&& (cg.cur_ps->pathMode == PATHMODE_SIDE || cg.cur_ps->pathMode == PATHMODE_BACK)
+#endif
+			)
+		{
+			focusAngles[YAW] += cg.cur_lc->predictedPlayerState.stats[STAT_DEAD_YAW];
+			numYaw++;
+		}
+	}
+
+	// Don't move the camera when all of the players are dead.
+	if (numPlayers == 0) {
+		return;
+	}
+
+	center[ORG_X] /= numPlayers;
+	center[ORG_Y] /= numPlayers;
+	center[ORG_Z] /= numPlayers;
+	focusAngles[YAW] /= numPlayers;
+
+	// Move the camera's X
+	dist = center[ORG_X]-org[ORG_X];
+
+	if (dist > 0)
+	{
+		if (dist > maxMove)
+			org[ORG_X] += maxMove;
+		else
+			org[ORG_X] += dist;
+	}
+	else if (dist < 0)
+	{
+		if (dist < -maxMove)
+			org[ORG_X] += -maxMove;
+		else
+			org[ORG_X] += dist;
+	}
+
+#if 0
+	if (cammin && org[ORG_X] < cammin->x)
+		org[ORG_X] = cammin->x;
+	else if (cammax && org[ORG_X] > cammax->x)
+		org[ORG_X] = cammax->x;
+#endif
+
+	// Move the camera's Z
+	//centerZ += cv_cam_height.value;
+	dist = center[ORG_Z]-org[ORG_Z];
+
+	if (dist > 0)
+	{
+		if (dist > maxMove)
+			org[ORG_Z] += maxMove;
+		else
+			org[ORG_Z] += dist;
+	}
+	else if (dist < 0)
+	{
+		if (dist < -maxMove)
+			org[ORG_Z] += -maxMove;
+		else
+			org[ORG_Z] += dist;
+	}
+
+#if 0
+	if (cammin && org[ORG_Z] < cammin->z) {
+		org[ORG_Z] = cammin->z;
+	} else if (cammax && org[ORG_Z] > cammax->z) {
+		org[ORG_Z] = cammax->z;
+	}
+#endif
+
+	// Calculate farthest players
+	farthestplayerX = farthestplayerZ = 0;
+	for (i = 0; i < cg.snap->numPSs; i++)
+	{
+		if (cg.snap->pss[i].persistant[PERS_TEAM] == TEAM_SPECTATOR || cg.snap->pss[i].stats[STAT_HEALTH] <= 0)
+			continue;
+
+		dist = abs(cg.snap->pss[i].origin[ORG_X] - center[ORG_X]);
+
+		if (dist > farthestplayerX)
+			farthestplayerX = dist;
+
+		dist = abs(cg.snap->pss[i].origin[ORG_Z] - center[ORG_Z]);
+
+		if (dist > farthestplayerZ)
+			farthestplayerZ = dist;
+	}
+
+	// Subtract a little so the player isn't right on the edge of the camera.
+	newDist = center[ORG_Y] - (farthestplayerX + farthestplayerZ + 256);
+
+	// Move the camera's Y
+	dist = newDist - org[ORG_Y];
+
+	if (dist > 0)
+	{
+		if (dist > maxMove)
+			org[ORG_Y] += maxMove;
+		else
+			org[ORG_Y] += dist;
+	}
+	else if (dist < 0)
+	{
+		if (dist < -maxMove)
+			org[ORG_Y] += -maxMove;
+		else
+			org[ORG_Y] += dist;
+	}
+
+#if 0
+	// This may seem backward but its not.
+	if (cammin && org[ORG_Y] > cammin->y)
+	{
+		org[ORG_Y] = cammin->y;
+	}
+	else if (cammax && org[ORG_Y] < cammax->y)
+	{
+		org[ORG_Y] = cammax->y;
+	}
+#endif
+
+	// Position camera
+	VectorCopy(focusAngles, cg.refdefViewAngles);
+
+	// trace a ray from the origin to the viewpoint to make sure the view isn't
+	// in a solid block.  Use an 8 by 8 block to prevent the view from near clipping anything
+	if (!cg_cameraMode.integer) {
+		VectorCopy(center, cg.refdef.vieworg);
+
+		CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, org, -1, MASK_SOLID );
+
+		if ( trace.fraction != 1.0 ) {
+			VectorCopy( trace.endpos, org );
+			org[2] += (1.0 - trace.fraction) * 32;
+			// try another trace to this position, because a tunnel may have the ceiling
+			// close enogh that this is poking out
+
+			CG_Trace( &trace, cg.refdef.vieworg, mins, maxs, org, -1, MASK_SOLID );
+			VectorCopy( trace.endpos, org );
+		}
+	}
+
+	VectorCopy( org, cg.refdef.vieworg );
 }
 #endif
 
