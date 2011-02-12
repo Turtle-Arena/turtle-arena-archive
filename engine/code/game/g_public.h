@@ -54,7 +54,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 typedef struct {
+#if !defined STANDALONE && !defined IOQ3ZTM // Unused
 	entityState_t	s;				// communicated by server to clients
+#endif
 
 	qboolean	linked;				// qfalse if not in any good cluster
 	int			linkcount;
