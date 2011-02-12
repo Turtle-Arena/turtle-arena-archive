@@ -231,7 +231,7 @@ static void R_LoadLightmaps(lump_t * l)
 			{
 				ri.Printf(PRINT_DEVELOPER, "...loading external lightmap '%s/%s'\n", mapName, lightmapFiles[i]);
 
-				tr.lightmaps[i] = R_FindImageFile(va("%s/%s", mapName, lightmapFiles[i]),qfalse,qfalse, GL_CLAMP_TO_EDGE);
+				tr.lightmaps[i] = R_FindImageFile(va("%s/%s", mapName, lightmapFiles[i]), qfalse, qfalse, GL_CLAMP_TO_EDGE);
 			}
 
 			return;
