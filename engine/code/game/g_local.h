@@ -850,6 +850,9 @@ void QDECL G_DPrintf( const char *fmt, ... );
 #endif
 void QDECL G_Printf( const char *fmt, ... );
 void QDECL G_Error( const char *fmt, ... );
+#ifdef IOQ3ZTM
+void G_CvarClearModification( vmCvar_t *vmCvar );
+#endif
 #ifdef IOQ3ZTM // MAP_ROTATION
 const char *G_GetMapRotationInfoByGametype( int gametype );
 #endif
