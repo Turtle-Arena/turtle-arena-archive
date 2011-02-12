@@ -141,7 +141,16 @@ void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner, qboolean di
 		s_setupplayers.player[i].generic.id			= ID_CUSTOMIZEPLAYER + i;
 		s_setupplayers.player[i].generic.callback	= SetupPlayers_Event;
 		s_setupplayers.player[i].string				= s_setupplayers.playerString[i];
-		s_setupplayers.player[i].color				= text_big_color;
+		if (!disableMissingPlayers) {
+			// Have players in game be green and not ingame be red.
+			if (cs->lcIndex[i] == -1) {
+				s_setupplayers.player[i].color		= color_red;
+			} else {
+				s_setupplayers.player[i].color		= color_green;
+			}
+		} else {
+			s_setupplayers.player[i].color			= text_big_color;
+		}
 		s_setupplayers.player[i].style				= UI_CENTER|UI_SMALLFONT;
 
 		if (disableMissingPlayers && cs->lcIndex[i] == -1) {
