@@ -105,7 +105,7 @@ static void UI_SetupPlayersMenu_Draw( void ) {
 SetupPlayers_MenuInit
 =================
 */
-void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner ) {
+void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner, qboolean disableMissingPlayers ) {
 	int		y;
 	int		i;
 
@@ -144,7 +144,7 @@ void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner ) {
 		s_setupplayers.player[i].color				= text_big_color;
 		s_setupplayers.player[i].style				= UI_CENTER|UI_SMALLFONT;
 
-		if (cs->lcIndex[i] == -1) {
+		if (disableMissingPlayers && cs->lcIndex[i] == -1) {
 			s_setupplayers.player[i].generic.flags |= QMF_GRAYED;
 		}
 
@@ -187,18 +187,18 @@ void SetupPlayers_Cache( void ) {
 UI_SetupPlayersMenu
 =================
 */
-void UI_SetupPlayersMenu( void (*playerfunc)(int), const char *banner ) {
+void UI_SetupPlayersMenu( void (*playerfunc)(int), const char *banner, qboolean disableMissingPlayers ) {
 	uiClientState_t	cs;
 
 	trap_GetClientState( &cs );
 
 	// If there is only one local client skip this menu.
-	if (cs.numLocalClients <= 1) {
+	if (cs.numLocalClients <= 1 && disableMissingPlayers) {
 		playerfunc(0);
 		return;
 	}
 
-	SetupPlayers_MenuInit( &cs, banner );
+	SetupPlayers_MenuInit( &cs, banner, disableMissingPlayers );
 	s_setupplayers.playerfunc = playerfunc;
 	UI_PushMenu( &s_setupplayers.menu );
 }

@@ -59,6 +59,9 @@ INGAME MENU
 #ifdef TA_MISC
 #define ID_CUSTOMIZEPLAYER		22
 #endif
+#ifdef TA_SPLITVIEW
+#define ID_LOCALPLAYERS			23
+#endif
 
 
 typedef struct {
@@ -82,6 +85,9 @@ typedef struct {
 	menutext_s		teamorders;
 	menutext_s		quit;
 	menutext_s		resume;
+#ifdef TA_SPLITVIEW
+	menutext_s		localPlayers;
+#endif
 } ingamemenu_t;
 
 static ingamemenu_t	s_ingame;
@@ -118,6 +124,40 @@ static void InGame_QuitAction( qboolean result ) {
 }
 
 
+#ifdef TA_SPLITVIEW
+/*
+=================
+UI_TogglePlayerIngame
+=================
+*/
+void UI_TogglePlayerIngame(int localClientNum)
+{
+	uiClientState_t	cs;
+	char	info[MAX_INFO_STRING];
+	int		team;
+
+	trap_GetClientState( &cs );
+
+	if (localClientNum == 0) {
+		trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
+
+		team = atoi( Info_ValueForKey( info, "t" ) );
+		if( team == TEAM_SPECTATOR ) {
+			// ZTM: FIXME: There is no way to know if client is hiding or just spectating.
+			trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team auto\n" );
+		} else {
+			trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team hide\n" );
+		}
+	} else if (cs.lcIndex[localClientNum] == -1) {
+		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", Com_LocalClientCvarName(localClientNum, "dropin")) );
+	} else {
+		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", Com_LocalClientCvarName(localClientNum, "dropout")) );
+	}
+
+	UI_ForceMenuOff ();
+}
+#endif
+
 /*
 =================
 InGame_Event
@@ -131,7 +171,7 @@ void InGame_Event( void *ptr, int notification ) {
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_TEAM:
 #ifdef TA_SPLITVIEW
-		UI_SetupPlayersMenu(UI_TeamMainMenu, "CHANGE TEAM");
+		UI_SetupPlayersMenu(UI_TeamMainMenu, "CHANGE TEAM", qtrue);
 #else
 		UI_TeamMainMenu();
 #endif
@@ -188,7 +228,7 @@ void InGame_Event( void *ptr, int notification ) {
 #ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
 #ifdef TA_SPLITVIEW
-		UI_SetupPlayersMenu(UI_PlayerSettingsMenu, "SETUP PLAYER");
+		UI_SetupPlayersMenu(UI_PlayerSettingsMenu, "SETUP PLAYER", qtrue);
 #else
 		UI_PlayerSettingsMenu();
 #endif
@@ -202,6 +242,12 @@ void InGame_Event( void *ptr, int notification ) {
 	case ID_RESUME:
 		UI_PopMenu();
 		break;
+
+#ifdef TA_SPLITVIEW
+	case ID_LOCALPLAYERS:
+		UI_SetupPlayersMenu(UI_TogglePlayerIngame, "Add/Drop", qfalse);
+		break;
+#endif
 	}
 }
 
@@ -383,6 +429,19 @@ void InGame_MenuInit( void ) {
 		}
 	}
 
+#ifdef TA_SPLITVIEW
+	y += INGAME_MENU_VERTICAL_SPACING;
+	s_ingame.localPlayers.generic.type		= MTYPE_PTEXT;
+	s_ingame.localPlayers.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_ingame.localPlayers.generic.x			= 320;
+	s_ingame.localPlayers.generic.y			= y;
+	s_ingame.localPlayers.generic.id		= ID_LOCALPLAYERS;
+	s_ingame.localPlayers.generic.callback	= InGame_Event;
+	s_ingame.localPlayers.string			= "Local Players";
+	s_ingame.localPlayers.color				= text_big_color;
+	s_ingame.localPlayers.style				= UI_CENTER|UI_SMALLFONT;
+#endif
+
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.setup.generic.type			= MTYPE_PTEXT;
 	s_ingame.setup.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -516,6 +575,9 @@ void InGame_MenuInit( void ) {
 	Menu_AddItem( &s_ingame.menu, &s_ingame.removebots );
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.teamorders );
+#ifdef TA_SPLITVIEW
+	Menu_AddItem( &s_ingame.menu, &s_ingame.localPlayers);
+#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setup );
 #ifdef TA_MISC
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setupplayer );
