@@ -22,6 +22,13 @@ There are two options for compiling Turtle Arena on Linux; make and Code::Blocks
   # In a terminal change to the Turtle Arena engine directory and run "make"
   # Output will be in engine/build/dir/ (Where dir is something like "release-linux-i386")
 
+=== Make 32 bit on 64 bit host ===
+To compile i386 binaries for 32 bit system on a 64 bit computer do the following; (Note: Only tested on Ubuntu 10.10)
+  # sudo apt-get install libc6-dev-i386
+  # sudo ln -s /usr/lib32/libSDL-1.2.so.0 /usr/lib32/libSDL.so
+  # In a terminal change to the Turtle Arena engine directory and run "make ARCH=i386"
+  # Output will be in engine/build/release-linux-i386/
+
 == Code::Blocks ==
 Using Code::Block for compiling is not recommenced as it is often out dated from the Makefile (used by "make"), but should be up-to-date for stable releases. It creates the game binary and game logic '.so' files, but not the cross-platform game logic '.qvm' files.
 
