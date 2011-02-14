@@ -3211,11 +3211,19 @@ void CL_Video_f( void )
   char  filename[ MAX_OSPATH ];
   int   i, last;
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: It can record the main menu, so allow and tell user how.
+  if (!clc.demoplaying && !cl_forceavidemo->integer)
+  {
+    Com_Printf( "The video command can only be used when playing back demos or cl_forceavidemo is enabled\n" );
+    return;
+  }
+#else
   if( !clc.demoplaying )
   {
     Com_Printf( "The video command can only be used when playing back demos\n" );
     return;
   }
+#endif
 
   if( Cmd_Argc( ) == 2 )
   {
