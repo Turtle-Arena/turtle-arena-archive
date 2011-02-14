@@ -1832,7 +1832,12 @@ void ClientThink_real( gentity_t *ent ) {
 			}
 		
 			// pressing attack or use is the normal respawn method
-			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) {
+#ifdef TA_MISC
+			if ( ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) || ucmd->upmove > 0 )
+#else
+			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) )
+#endif
+			{
 				respawn( ent );
 			}
 		}
