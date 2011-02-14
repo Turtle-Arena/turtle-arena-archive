@@ -3415,6 +3415,11 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 		return;
 	}
 
+#ifdef IOQ3ZTM // LETTERBOX
+	// Draw black bars if needed.
+	CG_DrawLetterbox();
+#endif
+
 	if ( cg.cur_ps->pm_type == PM_INTERMISSION
 #ifdef TA_SP
 		|| cg.cur_ps->pm_type == PM_SPINTERMISSION
@@ -3577,11 +3582,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// draw status bar and other floating elements
  	CG_Draw2D(stereoView);
-
-#ifdef IOQ3ZTM // LETTERBOX
-	// Draw black bars if needed.
-	CG_DrawLetterbox();
-#endif
 }
 
 #ifdef CAMERASCRIPT
