@@ -211,7 +211,7 @@ const purePak_t com_purePaks[] =
 	{BASETA, "pak3", 1438664554u, PAK_REQUIRED},
 #endif
 
-	{NULL, 0, qtrue}
+	{NULL, NULL, 0, 0}
 };
 #else
 #define	DEMO_PAK0_CHECKSUM	2985612116u
