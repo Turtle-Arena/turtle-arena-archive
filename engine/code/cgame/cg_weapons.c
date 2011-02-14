@@ -3572,11 +3572,11 @@ void CG_DrawWeaponSelect( void ) {
 CG_WeaponSelectable
 ===============
 */
-static qboolean CG_WeaponSelectable( int i ) {
-	if ( !cg.cur_ps->ammo[i] ) {
+static qboolean CG_WeaponSelectable( playerState_t *ps, int i ) {
+	if ( !ps->ammo[i] ) {
 		return qfalse;
 	}
-	if ( ! (cg.cur_ps->stats[ STAT_WEAPONS ] & ( 1 << i ) ) ) {
+	if ( ! (ps->stats[ STAT_WEAPONS ] & ( 1 << i ) ) ) {
 		return qfalse;
 	}
 
@@ -3638,7 +3638,7 @@ void CG_NextWeapon_f( void )
 		}
 #endif
 #endif
-		if ( CG_WeaponSelectable( lc->weaponSelect ) ) {
+		if ( CG_WeaponSelectable( ps, lc->weaponSelect ) ) {
 			break;
 		}
 	}
@@ -3702,7 +3702,7 @@ void CG_PrevWeapon_f( void )
 		}
 #endif
 #endif
-		if ( CG_WeaponSelectable( lc->weaponSelect ) ) {
+		if ( CG_WeaponSelectable( ps, lc->weaponSelect ) ) {
 			break;
 		}
 	}
@@ -3831,7 +3831,7 @@ void CG_OutOfAmmoChange( void ) {
 	cg.cur_lc->weaponSelectTime = cg.time;
 
 	for ( i = MAX_WEAPONS-1 ; i > 0 ; i-- ) {
-		if ( CG_WeaponSelectable( i ) ) {
+		if ( CG_WeaponSelectable( cg.cur_ps, i ) ) {
 			cg.cur_lc->weaponSelect = i;
 			break;
 		}
