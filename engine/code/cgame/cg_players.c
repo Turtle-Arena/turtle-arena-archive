@@ -2009,9 +2009,6 @@ static void CG_PlayerAngles( centity_t *cent, vec3_t legs[3], vec3_t torso[3], v
 		// If BOTH_* animation, have torso face ladder too
 		if ((cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT) == (cent->currentState.legsAnim & ~ANIM_TOGGLEBIT)) {
 			VectorCopy(legsAngles, torsoAngles);
-			headAngles[0] += torsoAngles[0];
-			headAngles[1] += torsoAngles[1];
-			headAngles[2] += torsoAngles[2];
 		}
 	}
 #endif
