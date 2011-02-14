@@ -279,7 +279,11 @@ void InGame_MenuInit( void ) {
 	s_ingame.frame.height				= 332;//256;
 
 #ifdef TA_MISC // INGAME_SERVER_MENU
+#ifdef TA_SPLITVIEW
+	y = 88+INGAME_MENU_VERTICAL_SPACING/2;
+#else
 	y = 88+INGAME_MENU_VERTICAL_SPACING;
+#endif
 #else
 	//y = 96;
 	y = 88;
@@ -437,7 +441,11 @@ void InGame_MenuInit( void ) {
 	s_ingame.localPlayers.generic.y			= y;
 	s_ingame.localPlayers.generic.id		= ID_LOCALPLAYERS;
 	s_ingame.localPlayers.generic.callback	= InGame_Event;
+#ifdef TA_MISC
 	s_ingame.localPlayers.string			= "Local Players";
+#else
+	s_ingame.localPlayers.string			= "LOCAL PLAYERS";
+#endif
 	s_ingame.localPlayers.color				= text_big_color;
 	s_ingame.localPlayers.style				= UI_CENTER|UI_SMALLFONT;
 #endif
