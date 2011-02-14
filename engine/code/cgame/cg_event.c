@@ -1198,10 +1198,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		for (i = 0; i < MAX_SPLITVIEW; i++) {
 			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
 				cg.cur_lc = &cg.localClients[i];
+				cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[i]];
 				CG_OutOfAmmoChange();
 			}
 		}
 		cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
+		cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[cg.cur_localClientNum]];
 #else
 		if ( es->number == cg.snap->ps.clientNum ) {
 			CG_OutOfAmmoChange();
