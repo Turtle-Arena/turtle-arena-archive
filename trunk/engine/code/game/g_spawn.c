@@ -737,6 +737,7 @@ void SP_worldspawn( void ) {
 	G_CvarClearModification(&g_gravity);
 #endif
 
+#ifdef MISSIONPACK
 	G_SpawnString( "enableDust", "0", &s );
 	trap_Cvar_Set( "g_enableDust", s );
 #ifdef IOQ3ZTM // Don't print message about map changing dust.
@@ -747,6 +748,7 @@ void SP_worldspawn( void ) {
 	trap_Cvar_Set( "g_enableBreath", s );
 #ifdef IOQ3ZTM // Don't print message about map changing breath.
 	G_CvarClearModification(&g_enableBreath);
+#endif
 #endif
 
 #ifdef TA_PATHSYS // 2DMODE
