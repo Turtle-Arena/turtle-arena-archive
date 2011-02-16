@@ -20,23 +20,25 @@ First stable playable release.
 0.4.x series focuses on players, map themes, and multiplayer maps. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game (Comparable to TMNT: Mutant Melee and TMNT Smash-up in someways.)
 
 === 0.4.0 (Completed) ===
-  * Fix bugs from 0.2
-  * Music
-  * Bring back player effect colors
-    * Readd to ui and q3_ui
-  * Reduce overall number of TODOs and FIXMEs in the source
-  * Begin work on 0.4.1 and 0.4.2
+  * Fixed bugs from 0.2
+  * Added music
+  * Readded player effect colors
+    * Readded to ui and q3_ui
+  * Reduced overall number of TODOs and FIXMEs in the source
+  * Begun work on 0.4.1 and 0.4.2
 
 === 0.4.1 (Completed) ===
   * Bug fix release
 
-=== 0.4.2 ====
+=== 0.4.2 (Pending Release) ===
   * Four player splitscreen
   * Finished '2D mode' path system for players
-  * Single camera mode for '2D maps' (always in splitscreen, optionally for everyone)
-    * Like the camera in Super Smash Bros. and TMNT Smash-up
-    * Basically have "2dmode" "1" in world spawn to tell game to tell cgame to only use one viewport in 'splitscreen' (for co-op in 2dmode), set "2dmode" "2" to focus on everyone (for Smash Bros. like maps).
-    * May also add a cvar to override single viewport in splitscreen.
+  * Single camera mode for '2D maps' (set "2dmode" "1" in worldspawn to focus on local players), like the camera in Super Smash Bros. and TMNT Smash-up
+
+=== 0.4.3 ===
+  * Added support for single camera mode focusing on all players (set "2dmode" "2" in worldspawn for local clients or "2" for everyone)
+  * Remodel and animate Casey
+  * Finish breakable/pushable objects and brushes code
   * (Haven't decided other goals, see 0.4.x for ideas)
 
 === 0.4.x ===
@@ -44,12 +46,10 @@ Haven't decide what order these will be done in, but hopefully they will all get
 
 ==== Likely ====
   * Improve player models; each player should have some unique animations, etc
-  * Remodel and animate casey
   * Add more players (Mirage comic based); Foot Ninja, Foot Elite, and The Shredder
     * Room for originality, give different names? Evil Ninja, Elite Evil Ninja, and The Slayer?
 
-  * Breakable objects and brushes
-  * Pushable objects and brushes
+  * Create scenery objects and brushes
   * Map Themes (Sets of textures, sky, models, misc_objects, and music)
   * New multiplayer maps using the new map themes
 
