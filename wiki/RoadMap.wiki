@@ -36,7 +36,7 @@ First stable playable release.
   * Single camera mode for '2D maps' (set "2dmode" "1" in worldspawn to focus on local players), like the camera in Super Smash Bros. and TMNT Smash-up
 
 === 0.4.3 ===
-  * Added support for single camera mode focusing on all players (set "2dmode" "2" in worldspawn for local clients or "2" for everyone)
+  * Add support for single camera mode focusing on all players (set "2dmode" "2" in worldspawn for local clients or "2" for everyone)
   * Remodel and animate Casey
   * Finish breakable/pushable objects and brushes code
   * (Haven't decided other goals, see 0.4.x for ideas)
