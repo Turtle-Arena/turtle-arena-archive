@@ -1342,7 +1342,7 @@ void S_Base_StartBackgroundTrack( const char *intro, const char *loop )
 	strncpy(intro, _intro, MAX_QPATH);
 	strncpy(loop, _loop, MAX_QPATH);
 
-	S_GetMusicForIntro(intro, loop, NULL);
+	S_GetMusicForIntro(intro, loop, &s_backgroundVolume);
 #else
 	if ( !intro ) {
 		intro = "";
