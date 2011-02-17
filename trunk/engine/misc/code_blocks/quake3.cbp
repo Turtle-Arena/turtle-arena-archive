@@ -18,6 +18,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DWIN32" />
+					<Add option="-DWIN32_MISC_ICON_PATH" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
@@ -39,6 +40,7 @@
 					<Add library="user32" />
 					<Add library="advapi32" />
 					<Add library="winmm" />
+					<Add library="Psapi" />
 					<Add library="ws2_32" />
 					<Add library="SDLmain" />
 					<Add library="SDL" />
@@ -63,6 +65,7 @@
 					<Add option="-g" />
 					<Add option="-O0" />
 					<Add option="-DWIN32" />
+					<Add option="-DWIN32_MISC_ICON_PATH" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
@@ -84,6 +87,7 @@
 					<Add library="user32" />
 					<Add library="advapi32" />
 					<Add library="winmm" />
+					<Add library="Psapi" />
 					<Add library="ws2_32" />
 					<Add library="SDLmain" />
 					<Add library="SDL" />
@@ -248,6 +252,7 @@
 			<Add option="-DWOLFET" />
 			<Add option="-DMISSIONPACK_HUD2" />
 			<Add option="-DTA_GAME_MODELS" />
+			<Add option="-DTA_SPLITVIEW" />
 			<Add directory="../../code/SDL12/include" />
 			<Add directory="../../code/libcurl" />
 			<Add directory="../../code/AL" />

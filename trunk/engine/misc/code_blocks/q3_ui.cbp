@@ -164,6 +164,7 @@
 			<Add option="-DWOLFET" />
 			<Add option="-DMISSIONPACK_HUD2" />
 			<Add option="-DTA_GAME_MODELS" />
+			<Add option="-DTA_SPLITVIEW" />
 		</Compiler>
 		<Unit filename="../../code/client/keycodes.h" />
 		<Unit filename="../../code/game/bg_lib.c">
