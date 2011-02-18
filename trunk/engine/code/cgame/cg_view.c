@@ -185,6 +185,9 @@ Sets the coordinates of the rendered window
 */
 static void CG_CalcVrect (void) {
 	int		size;
+#ifdef TA_SPLITVIEW
+	int		width, height;
+#endif
 
 	// the intermission should allways be full screen
 	if ( cg.cur_ps->pm_type == PM_INTERMISSION ) {
@@ -213,13 +216,13 @@ static void CG_CalcVrect (void) {
 #ifdef TA_SPLITVIEW
 	if (cg.numViewports == 2) {
 		if (cg_splitviewVertical.integer) {
-			cg.refdef.width /= 2;
+			cg.refdef.width *= 0.5f;
 
 			if (cg.viewport == 1) {
 				cg.refdef.x += cg.refdef.width;
 			}
 		} else {
-			cg.refdef.height /= 2;
+			cg.refdef.height *= 0.5f;
 
 			if (cg.viewport == 1) {
 				cg.refdef.y += cg.refdef.height;
@@ -228,11 +231,11 @@ static void CG_CalcVrect (void) {
 	} else if (cg.numViewports == 3) {
 		if (cg_splitviewVertical.integer) {
 			if (cg.viewport == 2) {
-				cg.refdef.width /= 2;
+				cg.refdef.width *= 0.5f;
 				cg.refdef.x += cg.refdef.width;
 			} else {
-				cg.refdef.width /= 2;
-				cg.refdef.height /= 2;
+				cg.refdef.width *= 0.5f;
+				cg.refdef.height *= 0.5f;
 
 				if (cg.viewport == 1) {
 					cg.refdef.y += cg.refdef.height;
@@ -240,11 +243,11 @@ static void CG_CalcVrect (void) {
 			}
 		} else {
 			if (cg.viewport == 2) {
-				cg.refdef.height /= 2;
+				cg.refdef.height *= 0.5f;
 				cg.refdef.y += cg.refdef.height;
 			} else {
-				cg.refdef.width /= 2;
-				cg.refdef.height /= 2;
+				cg.refdef.width *= 0.5f;
+				cg.refdef.height *= 0.5f;
 
 				if (cg.viewport == 1) {
 					cg.refdef.x += cg.refdef.width;
@@ -252,8 +255,8 @@ static void CG_CalcVrect (void) {
 			}
 		}
 	} else if (cg.numViewports > 1 && cg.numViewports <= 4) {
-		cg.refdef.width /= 2;
-		cg.refdef.height /= 2;
+		cg.refdef.width *= 0.5f;
+		cg.refdef.height *= 0.5f;
 
 		if (cg.viewport == 1 || cg.viewport == 3) {
 			cg.refdef.x += cg.refdef.width;
@@ -264,14 +267,16 @@ static void CG_CalcVrect (void) {
 		}
 	}
 
-	cgs.screenXScaleFit = cg.refdef.width * (1.0/640.0);
-	cgs.screenYScaleFit = cg.refdef.height * (1.0/480.0);
-	if ( cg.refdef.width * 480 > cg.refdef.height * 640 )
-	{
-		cgs.screenXScale = cg.refdef.width * (1.0/640.0);
-		cgs.screenYScale = cg.refdef.height * (1.0/480.0);
+	height = cg.refdef.height * 100/size;
+	width = cg.refdef.width * 100/size;
+
+	cgs.screenXScaleFit = width * (1.0/640.0);
+	cgs.screenYScaleFit = height * (1.0/480.0);
+	if ( width * 480 > height * 640 ) {
+		cgs.screenXScale = width * (1.0/640.0);
+		cgs.screenYScale = height * (1.0/480.0);
 		// wide screen
-		cgs.screenXBias = 0.5 * ( cg.refdef.width - ( cg.refdef.height * (640.0/480.0) ) );
+		cgs.screenXBias = 0.5 * ( width - ( height * (640.0/480.0) ) );
 		cgs.screenXScale = cgs.screenYScale;
 	} else {
 		cgs.screenXScale = cgs.screenXScaleFit;
