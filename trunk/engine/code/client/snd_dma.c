@@ -63,9 +63,23 @@ static		qboolean	s_soundMuted;
 
 dma_t		dma;
 
+#ifdef TA_SPLITVIEW
+typedef struct
+{
+	int			number;
+	vec3_t		origin;
+	vec3_t		axis[3];
+} listener_t;
+
+#define MAX_LISTENERS		MAX_SPLITVIEW // Currently only listeners are local client, maybe in the future allow listening through portal?
+static listener_t listeners[MAX_LISTENERS];
+static unsigned int numListeners = 0;
+static qboolean respatialize = qfalse;
+#else
 static int			listener_number;
 static vec3_t		listener_origin;
 static vec3_t		listener_axis[3];
+#endif
 
 int			s_soundtime;		// sample PAIRS
 int   		s_paintedtime; 		// sample PAIRS
@@ -444,11 +458,24 @@ void S_SpatializeOrigin (vec3_t origin, int master_vol, int *left_vol, int *righ
     vec_t		lscale, rscale, scale;
     vec3_t		source_vec;
     vec3_t		vec;
+#ifdef TA_SPLITVIEW
+	int i;
+#endif
 
 	const float dist_mult = SOUND_ATTENUATE;
 	
+#ifdef TA_SPLITVIEW
+	*right_vol = 0;
+	*left_vol = 0;
+
+	for (i = 0; i < numListeners; i++) {
+#endif
 	// calculate stereo seperation and distance attenuation
+#ifdef TA_SPLITVIEW
+	VectorSubtract(origin, listeners[i].origin, source_vec);
+#else
 	VectorSubtract(origin, listener_origin, source_vec);
+#endif
 
 	dist = VectorNormalize(source_vec);
 	dist -= SOUND_FULLVOLUME;
@@ -456,7 +483,11 @@ void S_SpatializeOrigin (vec3_t origin, int master_vol, int *left_vol, int *righ
 		dist = 0;			// close enough to be at full volume
 	dist *= dist_mult;		// different attenuation levels
 	
+#ifdef TA_SPLITVIEW
+	VectorRotate( source_vec, listeners[i].axis, vec );
+#else
 	VectorRotate( source_vec, listener_axis, vec );
+#endif
 
 	dot = -vec[1];
 
@@ -479,19 +510,48 @@ void S_SpatializeOrigin (vec3_t origin, int master_vol, int *left_vol, int *righ
 
 	// add in distance effect
 	scale = (1.0 - dist) * rscale;
+#ifdef TA_SPLITVIEW
+	*right_vol += (master_vol * scale);
+#else
 	*right_vol = (master_vol * scale);
+#endif
 	if (*right_vol < 0)
 		*right_vol = 0;
 
 	scale = (1.0 - dist) * lscale;
+#ifdef TA_SPLITVIEW
+	*left_vol += (master_vol * scale);
+#else
 	*left_vol = (master_vol * scale);
+#endif
 	if (*left_vol < 0)
 		*left_vol = 0;
+#ifdef TA_SPLITVIEW
+	}
+#endif
 }
 
 // =======================================================================
 // Start a sound effect
 // =======================================================================
+
+#ifdef TA_SPLITVIEW
+qboolean S_EntityIsListener(int entityNum) {
+	int i;
+
+	for (i = 0; i < numListeners; i++) {
+		if (entityNum == listeners[i].number) {
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+#else
+inline qboolean S_EntityIsListener(int entityNum) {
+	return (listener_number == entityNum);
+}
+#endif
 
 /*
 ====================
@@ -537,9 +597,18 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 	// pick a channel to play on
 
 	allowed = 4;
+#ifdef TA_SPLITVIEW
+	for (i = 0; i < numListeners; i++) {
+		if (entityNum == listeners[i].number) {
+			allowed = 8;
+			break;
+		}
+	}
+#else
 	if (entityNum == listener_number) {
 		allowed = 8;
 	}
+#endif
 
 	ch = s_channels;
 	inplay = 0;
@@ -568,7 +637,7 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 		oldest = sfx->lastTimeUsed;
 		chosen = -1;
 		for ( i = 0 ; i < MAX_CHANNELS ; i++, ch++ ) {
-			if (ch->entnum != listener_number && ch->entnum == entityNum && ch->allocTime<oldest && ch->entchannel != CHAN_ANNOUNCER) {
+			if (!S_EntityIsListener(ch->entnum) && ch->entnum == entityNum && ch->allocTime<oldest && ch->entchannel != CHAN_ANNOUNCER) {
 				oldest = ch->allocTime;
 				chosen = i;
 			}
@@ -576,14 +645,14 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 		if (chosen == -1) {
 			ch = s_channels;
 			for ( i = 0 ; i < MAX_CHANNELS ; i++, ch++ ) {
-				if (ch->entnum != listener_number && ch->allocTime<oldest && ch->entchannel != CHAN_ANNOUNCER) {
+				if (!S_EntityIsListener(ch->entnum) && ch->allocTime<oldest && ch->entchannel != CHAN_ANNOUNCER) {
 					oldest = ch->allocTime;
 					chosen = i;
 				}
 			}
 			if (chosen == -1) {
 				ch = s_channels;
-				if (ch->entnum == listener_number) {
+				if (S_EntityIsListener(ch->entnum)) {
 					for ( i = 0 ; i < MAX_CHANNELS ; i++, ch++ ) {
 						if (ch->allocTime<oldest) {
 							oldest = ch->allocTime;
@@ -634,7 +703,11 @@ void S_Base_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) {
 		return;
 	}
 
+#ifdef TA_SPLITVIEW // ZTM: FIXME: Use listener who caused sound? Why isn't StartLocalSound done in cgame? I think it can safely be done in cgame with correct entityNum.
+	S_Base_StartSound (NULL, listeners[0].number, channelNum, sfxHandle );
+#else
 	S_Base_StartSound (NULL, listener_number, channelNum, sfxHandle );
+#endif
 }
 
 
@@ -763,9 +836,17 @@ void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ve
 		float	lena, lenb;
 
 		loopSounds[entityNum].doppler = qtrue;
+#ifdef TA_SPLITVIEW // ZTM: FIXME: Support doppler effect for all listeners
+		lena = DistanceSquared(loopSounds[listeners[0].number].origin, loopSounds[entityNum].origin);
+#else
 		lena = DistanceSquared(loopSounds[listener_number].origin, loopSounds[entityNum].origin);
+#endif
 		VectorAdd(loopSounds[entityNum].origin, loopSounds[entityNum].velocity, out);
+#ifdef TA_SPLITVIEW
+		lenb = DistanceSquared(loopSounds[listeners[0].number].origin, out);
+#else
 		lenb = DistanceSquared(loopSounds[listener_number].origin, out);
+#endif
 		if ((loopSounds[entityNum].framenum+1) != cls.framecount) {
 			loopSounds[entityNum].oldDopplerScale = 1.0;
 		} else {
@@ -1065,15 +1146,37 @@ S_Respatialize
 Change the volumes of all the playing sounds for changes in their positions
 ============
 */
-void S_Base_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwater ) {
+void S_Base_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int inwater
+#ifdef TA_SPLITVIEW
+		, int listener
+#endif
+		)
+{
+#ifdef TA_SPLITVIEW
+	(void)listener; // ZTM: Currently unused
+#else
 	int			i;
 	channel_t	*ch;
 	vec3_t		origin;
+#endif
 
 	if ( !s_soundStarted || s_soundMuted ) {
 		return;
 	}
 
+#ifdef TA_SPLITVIEW
+	if (numListeners >= MAX_LISTENERS-1) {
+		return;
+	}
+
+	respatialize = qtrue;
+	listeners[numListeners].number = entityNum;
+	VectorCopy(head, listeners[numListeners].origin);
+	VectorCopy(axis[0], listeners[numListeners].axis[0]);
+	VectorCopy(axis[1], listeners[numListeners].axis[1]);
+	VectorCopy(axis[2], listeners[numListeners].axis[2]);
+	numListeners++;
+#else
 	listener_number = entityNum;
 	VectorCopy(head, listener_origin);
 	VectorCopy(axis[0], listener_axis[0]);
@@ -1103,6 +1206,7 @@ void S_Base_Respatialize( int entityNum, const vec3_t head, vec3_t axis[3], int 
 
 	// add loopsounds
 	S_AddLoopSounds ();
+#endif
 }
 
 
@@ -1152,6 +1256,10 @@ Called once each time through the main loop
 */
 void S_Base_Update( void ) {
 	int			i;
+#ifdef TA_SPLITVIEW
+	int			j;
+	vec3_t		origin;
+#endif
 	int			total;
 	channel_t	*ch;
 
@@ -1159,6 +1267,43 @@ void S_Base_Update( void ) {
 //		Com_DPrintf ("not started or muted\n");
 		return;
 	}
+
+#ifdef TA_SPLITVIEW
+	// update spatialization for dynamic sounds
+	if (respatialize) {
+		respatialize = qfalse;
+
+		ch = s_channels;
+		for ( i = 0 ; i < MAX_CHANNELS ; i++, ch++ ) {
+			if ( !ch->thesfx ) {
+				continue;
+			}
+
+			// anything coming from the view entity will always be full volume
+			for (j = 0; j < numListeners; j++) {
+				if (ch->entnum == listeners[j].number) {
+					break;
+				}
+			}
+
+			if (j != numListeners) {
+				ch->leftvol = ch->master_vol;
+				ch->rightvol = ch->master_vol;
+			} else {
+				if (ch->fixed_origin) {
+					VectorCopy( ch->origin, origin );
+				} else {
+					VectorCopy( loopSounds[ ch->entnum ].origin, origin );
+				}
+
+				S_SpatializeOrigin (origin, ch->master_vol, &ch->leftvol, &ch->rightvol);
+			}
+		}
+
+		// add loopsounds
+		S_AddLoopSounds ();
+	}
+#endif
 
 	//
 	// debugging output
@@ -1181,6 +1326,11 @@ void S_Base_Update( void ) {
 
 	// mix some sound
 	S_Update_();
+
+#ifdef TA_SPLITVIEW
+	// Reset numListeners for nextFrame
+	numListeners = 0;
+#endif
 }
 
 void S_GetSoundtime(void)

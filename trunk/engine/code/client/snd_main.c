@@ -204,10 +204,18 @@ S_Respatialize
 =================
 */
 void S_Respatialize( int entityNum, const vec3_t origin,
-		vec3_t axis[3], int inwater )
+		vec3_t axis[3], int inwater
+#ifdef TA_SPLITVIEW
+		, int listener
+#endif
+		)
 {
 	if( si.Respatialize ) {
-		si.Respatialize( entityNum, origin, axis, inwater );
+		si.Respatialize( entityNum, origin, axis, inwater
+#ifdef TA_SPLITVIEW
+					, listener
+#endif
+					);
 	}
 }
 
