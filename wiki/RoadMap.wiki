@@ -30,8 +30,9 @@ First stable playable release.
 === 0.4.1 (Completed) ===
   * Bug fix release
 
-=== 0.4.2 (Pending Release) ===
+=== 0.4.2 ===
   * Four player splitscreen
+    * Support multiple listeners, play sounds relative to all players.
   * Finished '2D mode' path system for players
   * Single camera mode for '2D maps' (set "2dmode" "1" in worldspawn to focus on local players), like the camera in Super Smash Bros. and TMNT Smash-up
 
