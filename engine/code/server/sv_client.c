@@ -757,7 +757,7 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 			if (cl->local_clients[i] == clientNum) {
 				cl->local_clients[i] = -1;
 			}
-			if (cl->gentity->r.local_clients[i] == clientNum) {
+			if (cl->gentity && cl->gentity->r.local_clients[i] == clientNum) {
 				cl->gentity->r.local_clients[i] = -1;
 			}
 		}
