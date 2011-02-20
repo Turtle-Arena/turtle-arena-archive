@@ -529,11 +529,18 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 				if ( cgs.gametype < GT_TEAM) {
 					if (  ps->persistant[PERS_RANK] == 0 ) {
 						CG_AddBufferedSound(cgs.media.takenLeadSound);
-					} else if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
+					} else
+#ifdef TA_SPLITVIEW // ZTM: Don't play tied or lost lead when there are multiple local clients, multiple sounds play and its annoying.
+					if (cg.snap->numPSs <= 1) {
+#endif
+					if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
 						CG_AddBufferedSound(cgs.media.tiedLeadSound);
 					} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
 						CG_AddBufferedSound(cgs.media.lostLeadSound);
 					}
+#ifdef TA_SPLITVIEW
+					}
+#endif
 				}
 			}
 		}
