@@ -316,7 +316,11 @@ static void UI_SoundOptionsMenu_Init( void ) {
 	soundOptionsInfo.network.style				= UI_RIGHT;
 	soundOptionsInfo.network.color				= text_big_color;
 
+#ifdef IOQ3ZTM
+	y = 240 - 2 * (BIGCHAR_HEIGHT + 2);
+#else
 	y = 240 - 1.5 * (BIGCHAR_HEIGHT + 2);
+#endif
 	soundOptionsInfo.sfxvolume.generic.type		= MTYPE_SLIDER;
 	soundOptionsInfo.sfxvolume.generic.name		= "Effects Volume:";
 	soundOptionsInfo.sfxvolume.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
