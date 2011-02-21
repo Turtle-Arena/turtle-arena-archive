@@ -192,7 +192,7 @@ static void UI_SoundOptionsMenu_Event( void* ptr, int event ) {
 #ifdef IOQ3ZTM
 /*
 =================
-GraphicsOptions_UpdateMenuItems
+SoundOptions_UpdateMenuItems
 =================
 */
 static void SoundOptions_UpdateMenuItems( void )
@@ -388,7 +388,7 @@ static void UI_SoundOptionsMenu_Init( void ) {
 #ifdef IOQ3ZTM
 	soundOptionsInfo.apply.generic.type			= MTYPE_BITMAP;
 	soundOptionsInfo.apply.generic.name			= ART_ACCEPT0;
-	soundOptionsInfo.apply.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;//|QMF_HIDDEN|QMF_INACTIVE;
+	soundOptionsInfo.apply.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_HIDDEN|QMF_INACTIVE;
 	soundOptionsInfo.apply.generic.callback		= UI_SoundOptionsMenu_Event;
 	soundOptionsInfo.apply.generic.id			= ID_APPLY;
 	soundOptionsInfo.apply.generic.x			= 640;
