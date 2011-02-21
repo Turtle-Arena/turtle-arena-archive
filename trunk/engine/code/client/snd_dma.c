@@ -95,7 +95,9 @@ int			s_numSfx = 0;
 static	sfx_t		*sfxHash[LOOP_HASH];
 
 cvar_t		*s_testsound;
+#ifndef IOQ3ZTM
 cvar_t		*s_khz;
+#endif
 cvar_t		*s_show;
 cvar_t		*s_mixahead;
 cvar_t		*s_mixPreStep;
@@ -1695,7 +1697,9 @@ qboolean S_Base_Init( soundInterface_t *si ) {
 		return qfalse;
 	}
 
+#ifndef IOQ3ZTM
 	s_khz = Cvar_Get ("s_khz", "22", CVAR_ARCHIVE);
+#endif
 	s_mixahead = Cvar_Get ("s_mixahead", "0.2", CVAR_ARCHIVE);
 	s_mixPreStep = Cvar_Get ("s_mixPreStep", "0.05", CVAR_ARCHIVE);
 	s_show = Cvar_Get ("s_show", "0", CVAR_CHEAT);
