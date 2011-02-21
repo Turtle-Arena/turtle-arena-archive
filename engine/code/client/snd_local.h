@@ -102,6 +102,9 @@ typedef struct
 	qboolean	fixed_origin;	// use origin instead of fetching entnum's origin
 	sfx_t		*thesfx;		// sfx structure
 	qboolean	doppler;
+#ifdef TA_SPLITVIEW
+	qboolean	fullVolume;
+#endif
 } channel_t;
 
 

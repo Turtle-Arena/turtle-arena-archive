@@ -71,10 +71,11 @@ typedef struct
 	vec3_t		axis[3];
 } listener_t;
 
-#define MAX_LISTENERS		MAX_SPLITVIEW // Currently only listeners are local client, maybe in the future allow listening through portal?
+#define MAX_LISTENERS		MAX_SPLITVIEW // Currently the only listeners are local client, maybe increase and in the future allow listening through portals?
 static listener_t listeners[MAX_LISTENERS];
-static unsigned int numListeners = 0;
-static qboolean respatialize = qfalse;
+static unsigned int numListeners;
+static unsigned int numListenersPrevious;
+static qboolean respatialize;
 #else
 static int			listener_number;
 static vec3_t		listener_origin;
@@ -539,7 +540,8 @@ void S_SpatializeOrigin (vec3_t origin, int master_vol, int *left_vol, int *righ
 qboolean S_EntityIsListener(int entityNum) {
 	int i;
 
-	for (i = 0; i < numListeners; i++) {
+	// ZTM: NOTE: Listeners/numListenersPrevious may not one frame out of date.
+	for (i = 0; i < numListenersPrevious; i++) {
 		if (entityNum == listeners[i].number) {
 			return qtrue;
 		}
@@ -567,6 +569,9 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 	sfx_t		*sfx;
   int i, oldest, chosen, time;
   int	inplay, allowed;
+#ifdef TA_SPLITVIEW
+	qboolean	fullVolume;
+#endif
 
 	if ( !s_soundStarted || s_soundMuted ) {
 		return;
@@ -596,15 +601,20 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 //	Com_Printf("playing %s\n", sfx->soundName);
 	// pick a channel to play on
 
-	allowed = 4;
 #ifdef TA_SPLITVIEW
-	for (i = 0; i < numListeners; i++) {
-		if (entityNum == listeners[i].number) {
-			allowed = 8;
-			break;
-		}
+	if (entityNum == MAX_GENTITIES) {
+		// Special case for sounds started using StartLocalSound
+		allowed = 4 * MAX_SPLITVIEW;
+		fullVolume = qtrue;
+	} else if (S_EntityIsListener(entityNum)) {
+		allowed = 8;
+		fullVolume = qtrue;
+	} else {
+		allowed = 4;
+		fullVolume = qfalse;
 	}
 #else
+	allowed = 4;
 	if (entityNum == listener_number) {
 		allowed = 8;
 	}
@@ -685,6 +695,9 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 	ch->leftvol = ch->master_vol;		// these will get calced at next spatialize
 	ch->rightvol = ch->master_vol;		// unless the game isn't running
 	ch->doppler = qfalse;
+#ifdef TA_SPLITVIEW
+	ch->fullVolume = fullVolume;
+#endif
 }
 
 
@@ -703,8 +716,8 @@ void S_Base_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) {
 		return;
 	}
 
-#ifdef TA_SPLITVIEW // ZTM: FIXME: Use listener who caused sound? Why isn't StartLocalSound done in cgame? I think it can safely be done in cgame with correct entityNum.
-	S_Base_StartSound (NULL, listeners[0].number, channelNum, sfxHandle );
+#ifdef TA_SPLITVIEW
+	S_Base_StartSound (NULL, MAX_GENTITIES, channelNum, sfxHandle );
 #else
 	S_Base_StartSound (NULL, listener_number, channelNum, sfxHandle );
 #endif
@@ -976,6 +989,9 @@ void S_AddLoopSounds (void) {
 		ch->doppler = loop->doppler;
 		ch->dopplerScale = loop->dopplerScale;
 		ch->oldDopplerScale = loop->oldDopplerScale;
+#ifdef TA_SPLITVIEW
+		ch->fullVolume = qfalse;
+#endif
 		numLoopChannels++;
 		if (numLoopChannels == MAX_CHANNELS) {
 			return;
@@ -1257,7 +1273,6 @@ Called once each time through the main loop
 void S_Base_Update( void ) {
 	int			i;
 #ifdef TA_SPLITVIEW
-	int			j;
 	vec3_t		origin;
 #endif
 	int			total;
@@ -1280,13 +1295,7 @@ void S_Base_Update( void ) {
 			}
 
 			// anything coming from the view entity will always be full volume
-			for (j = 0; j < numListeners; j++) {
-				if (ch->entnum == listeners[j].number) {
-					break;
-				}
-			}
-
-			if (j != numListeners) {
+			if (ch->fullVolume) {
 				ch->leftvol = ch->master_vol;
 				ch->rightvol = ch->master_vol;
 			} else {
@@ -1329,6 +1338,7 @@ void S_Base_Update( void ) {
 
 #ifdef TA_SPLITVIEW
 	// Reset numListeners for nextFrame
+	numListenersPrevious = numListeners;
 	numListeners = 0;
 #endif
 }
@@ -1702,6 +1712,11 @@ qboolean S_Base_Init( soundInterface_t *si ) {
 
 		s_soundtime = 0;
 		s_paintedtime = 0;
+
+#ifdef TA_SPLITVIEW
+		Com_Memset(listeners, 0, sizeof(listeners));
+		numListeners = numListenersPrevious = respatialize = 0;
+#endif
 
 		S_Base_StopAllSounds( );
 	} else {
