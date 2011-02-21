@@ -730,10 +730,8 @@ static void CG_Item( centity_t *cent ) {
 #ifdef IOQ3ZTM // ITEMS_DISAPPEAR
 	if (cent->currentState.modelindex2 != 0) // This is non-zero is it's a dropped item
 	{
-		if (cent->currentState.time2 > 0) // Dropped weapon by keypress
-			msec = (cg.time - cent->miscTime - 15000) * -1;
-		else
-			msec = (cg.time - cent->miscTime - 30000) * -1;
+		// cent->currentState.frame is the msec till entity will be removed
+		msec = (cg.time - cent->miscTime - cent->currentState.frame) * -1;
 	}
 	else
 #endif

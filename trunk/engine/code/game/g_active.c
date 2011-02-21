@@ -920,6 +920,9 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 					// Override weapon removal time.
 					drop->nextthink = level.time + 15000;
+#ifdef IOQ3ZTM // ITEMS_DISAPPEAR
+					drop->s.frame = 15000;
+#endif
 				}
 			}
 			break;

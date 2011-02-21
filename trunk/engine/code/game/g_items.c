@@ -857,6 +857,10 @@ gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity ) {
 		dropped->nextthink = level.time + 30000;
 	}
 
+#ifdef IOQ3ZTM // ITEMS_DISAPPEAR
+	dropped->s.frame = 30000;
+#endif
+
 	dropped->flags = FL_DROPPED_ITEM;
 
 	trap_LinkEntity (dropped);
