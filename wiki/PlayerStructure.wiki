@@ -44,7 +44,7 @@ Skins are made up of three ".skin" files and a icon image (.png/.tga/.jpg). The 
   * legs_SKINNAME.skin - Shaders for legs
 
 == Teamplay skins ==
-In teamplay gametypes, there can be per-team skins stored in "models/players/PLAYERNAME/TEAMNAME/". TEAMNAME is set to g_blueTeam (default:Katanas) or g_redTeam (default:Sais).
+In teamplay gametypes, there can be per-team skins stored in "models/players/PLAYERNAME/TEAMNAME/". TEAMNAME is set to cvar g_blueTeam (default: Shell) or cvar g_redTeam (default: Foot).
 
 == .skin Format ==
 *.skin* files set the shaders used by the model. MD3 models contain "meshes" (Groups of triangles), each must have a shader listed. The "tags" (points where other models are attached) are also listed.
@@ -67,7 +67,7 @@ Example: "$(dir)/head" instead of "models/players/raph/head".
 animation.cfg contains the animations and other settings. The animation.cfg is normally created when exporting a player model to MD3.
 
 == soundpath ==
-By placing "soundpath NAME" in animation.cfg the client will use sounds from "sound/NAME/" instead of "sound/HEADMODELNAME/". Soundpath defaults to the client's headmodel name (which is usally the player model directory name).
+By placing "soundpath NAME" in animation.cfg the client will use sounds from "sound/NAME/" instead of "sound/HEADMODELNAME/". Soundpath defaults to the client's headmodel name (which is usually the player model directory name).
 
 == jumpMult ==
 By placing "jumpMult 1.5" in animation.cfg, the players jump velocity will be multiplied by what ever "jumpMult" was set to.
@@ -87,16 +87,15 @@ List of player tags by models.
   * // Hold default weapon of the player when not in use.
   * tag_wp_away_primary
   * tag_wp_away_secondary
-  * // Currently I just use tag_weapon / tag_flag for capatibility to and fro quake3 and MD3 model exporters...
+  * // Currently I just use tag_weapon / tag_flag for compatibility to and from quake3 and MD3 model exporters...
   * tag_weapon (for Quake 3 capatibility) -- Use like tag_hand_primary
   * tag_flag   (for Team Arena capatibility) -- Use like tag_hand_secondary
-  * // What tag(s) does Elite Force use?
 
 === lower.md3 ===
   * tag_torso
 
 == Full skin search info ==
-Below is the seach order for ".skin" files in Turtle Arena. It uses code from Quake III: Team Arena to allow per-team skins. So Team Arena Players work in Team gametypes as well as Quake 3 players.
+Below is the search order for ".skin" files in Turtle Arena. It uses code from Quake III: Team Arena to allow per-team skins. So Team Arena Players work in team gametypes as well as Quake 3 players.
 
 Based on http://rfactory.org/idteam.html#appendh with the changes I've made to ioquake3.
 
@@ -114,7 +113,7 @@ Note: If headmodel starts with `*` ("`*`raph/fugitoid") the "heads" directory is
   # models/players/heads/raph/fugitoid/head_red.skin
   # models/players/heads/raph/head_red.skin
 
-==== Non-Team play ====
+==== Non-team play ====
   * headmodel = raph/fugitoid
 
   # models/players/raph/head_fugitoid.skin
@@ -124,18 +123,18 @@ Note: If headmodel starts with `*` ("`*`raph/fugitoid") the "heads" directory is
 ==== Team play ====
   * model = raph/fugitoid
   * team = red
-  * g_redTeam = Sais
+  * g_redTeam = Foot
 
-  # models/players/raph/Sais/lower_fugitoid_red.skin
-  # models/players/raph/Sais/lower_red.skin
+  # models/players/raph/Foot/lower_fugitoid_red.skin
+  # models/players/raph/Foot/lower_red.skin
   # models/players/raph/lower_fugitoid_red.skin
   # models/players/raph/lower_red.skin
-  # models/players/characters/raph/Sais/lower_fugitoid_red.skin
-  # models/players/characters/raph/Sais/lower_red.skin
+  # models/players/characters/raph/Foot/lower_fugitoid_red.skin
+  # models/players/characters/raph/Foot/lower_red.skin
   # models/players/characters/raph/lower_fugitoid_red.skin
   # models/players/characters/raph/lower_red.skin
 
-==== Non-Team play ====
+==== Non-team play ====
   * model = raph/fugitoid
 
   # models/players/raph/lower_fugitoid.skin
