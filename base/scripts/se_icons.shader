@@ -281,6 +281,15 @@ icons/iconw_grapple
 	}
 }
 
+icons/iconw_railgun
+{
+	nopicmip
+	{
+		map icons/iconw_railgun.png
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
 // HEALTH ICONS
 icons/iconh_small
 {
