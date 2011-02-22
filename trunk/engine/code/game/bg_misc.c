@@ -2669,6 +2669,17 @@ static qboolean WeaponGroupAnims_Parse(char **p, bg_weapongroup_anims_t *anims) 
 		token = COM_ParseExt(p, qtrue);
 
 		if (Q_stricmp(token, "}") == 0) {
+			// Count the number of valid attack animations
+			for (anims->numAttackAnims = 0; anims->numAttackAnims < MAX_WG_ATK_ANIMS; anims->numAttackAnims++) {
+				if (anims->attackAnim[anims->numAttackAnims] == 0) {
+					break;
+				}
+			}
+			if (anims->numAttackAnims < 1) {
+				anims->attackAnim[0] = TORSO_ATTACK;
+				anims->numAttackAnims = 1;
+			}
+
 			return qtrue;
 		}
 
@@ -3367,7 +3378,6 @@ BG_MaxAttackIndex
 int BG_MaxAttackIndex(playerState_t *ps)
 {
 	bg_weapongroup_anims_t *anims;
-	int max_combo;
 
 	// Select animations to count
 	if (ps->eFlags & EF_PRIMARY_HAND) {
@@ -3376,18 +3386,7 @@ int BG_MaxAttackIndex(playerState_t *ps)
 		anims = &bg_weapongroupinfo[ps->weapon].normalAnims;
 	}
 
-	// Count the number of valid attack animations
-	for (max_combo = 0; max_combo < MAX_WG_ATK_ANIMS; max_combo++) {
-		if (anims->attackAnim[max_combo] == 0) {
-			break;
-		}
-	}
-
-	if (max_combo < 1) {
-		max_combo = 1;
-	}
-
-	return max_combo;
+	return anims->numAttackAnims;
 }
 
 /*
@@ -3904,35 +3903,6 @@ animNumber_t BG_LegsAttackForPlayerState(playerState_t *ps, bg_playercfg_t *play
 
 /*
 ==============
-BG_MaxAttackIndex_NoPS
-
-For ui/q3_ui
-==============
-*/
-int BG_MaxAttackIndex_NoPS(weapon_t weaponnum)
-{
-	bg_weapongroup_anims_t *anims;
-	int max_combo;
-
-	// Select animations to count
-	anims = &bg_weapongroupinfo[weaponnum].normalAnims;
-
-	// Count the number of valid attack animations
-	for (max_combo = 0; max_combo < MAX_WG_ATK_ANIMS; max_combo++) {
-		if (anims->attackAnim[max_combo] == 0) {
-			break;
-		}
-	}
-
-	if (max_combo < 1) {
-		max_combo = 1;
-	}
-
-	return max_combo;
-}
-
-/*
-==============
 BG_TorsoStandForWeapon
 
 For ui/q3_ui
@@ -3952,7 +3922,7 @@ For ui/q3_ui
 */
 animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum, unsigned int atkIndex)
 {
-	atkIndex = atkIndex%BG_MaxAttackIndex_NoPS(weaponnum);
+	atkIndex = atkIndex % bg_weapongroupinfo[weaponnum].normalAnims.numAttackAnims;
 	return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[atkIndex];
 }
 
@@ -3981,7 +3951,7 @@ For ui/q3_ui
 */
 animNumber_t BG_LegsAttackForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum, unsigned int atkIndex)
 {
-	atkIndex = atkIndex%BG_MaxAttackIndex_NoPS(weaponnum);
+	atkIndex = atkIndex % bg_weapongroupinfo[weaponnum].normalAnims.numAttackAnims;
 	if (playercfg && playercfg->animations[bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[atkIndex]].prefixType & AP_LEGS) {
 		return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[atkIndex];
 	}
