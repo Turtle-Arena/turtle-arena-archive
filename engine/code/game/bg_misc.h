@@ -1485,8 +1485,9 @@ animNumber_t BG_LegsStandForPlayerState(playerState_t *ps, bg_playercfg_t *playe
 animNumber_t BG_LegsAttackForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
 // For ui/q3_ui
 animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum);
-animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
+animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum, unsigned int atkIndex);
 animNumber_t BG_LegsStandForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum);
+animNumber_t BG_LegsAttackForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum, unsigned int atkIndex);
 
 qboolean BG_PlayerAttackAnim(animNumber_t aa);
 qboolean BG_PlayerStandAnim(bg_playercfg_t *playercfg, int prefixBit, animNumber_t aa);
