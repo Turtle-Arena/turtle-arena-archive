@@ -655,6 +655,7 @@ S_AL_HearingThroughEntity
 static qboolean S_AL_HearingThroughEntity( int entityNum )
 {
 #ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
+	// ZTM: FIXME: Have (boolean)firstPerson option for Respatialize so we don't need a vm call?
 	// ZTM: I changed the cgame API so that this doesn't have to be a hack.
 	if (VM_Call(cgvm, CG_VIEW_TYPE, entityNum) == 0) {
 		//we're the player and in first person
@@ -1233,8 +1234,8 @@ static void S_AL_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandl
 			return;
 		}
 		
-			VectorCopy( entityList[ entnum ].origin, sorigin );
-		}
+		VectorCopy( entityList[ entnum ].origin, sorigin );
+	}
 	
 	S_AL_SanitiseVector(sorigin);
 	
@@ -1365,7 +1366,7 @@ static void S_AL_SrcLoop( alSrcPriority_t priority, sfxHandle_t sfx,
 		{
 			VectorCopy(velocity, svelocity);
 			S_AL_SanitiseVector(svelocity);
-	}
+		}
 		else
 			VectorClear(svelocity);
 

@@ -464,7 +464,7 @@ static void CG_MiscObject( centity_t *cent ) {
 
 #ifdef TA_NPCSYS
 	// Add NPC's weapon
-	// ZTM: TODO: Can I reuse the player weapon drawing code?
+	// ZTM: TODO: Reuse the player weapon drawing code?
 	// ZTM: TODO: Support secondary weapon model.
 	if (isNPC && s1->weapon > WP_NONE && s1->weapon < BG_NumWeaponGroups())
 	{

@@ -657,21 +657,12 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			} else {
 				t = bg_weapongroupinfo[w].weapon[0]->attackDelay;
 			}
-			if (t < 400)
-			{
+
+			if (t < 400) {
 				t += t * 0.01f;
 			}
 
 			t += bg_weapongroupinfo[w].weapon[0]->proj->damage * 0.01f;
-
-			if (t < 1000)
-			{
-				t = 1000;
-			}
-			else if (t > 4000)
-			{
-				t = 4000;
-			}
 #else
 			// Ugly, but supports; machinegun, shotgun, lightning. railgun, plasma
 			// rocket is close to Q3, 50 msec longer
@@ -685,23 +676,20 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			}
 
 			// shotgun/plasmagun hack, other wise would be 1000.
-			if (t == 1000
-				&& bg_weapongroupinfo[w].weapon[0]->proj->damage >= 10)
-			{
+			if (t == 1000 && bg_weapongroupinfo[w].weapon[0]->proj->damage >= 10) {
 				t = 1500;
 			}
 
 			if (t < 1000) {
-				if (bg_weapongroupinfo[w].weapon[0]->proj->instantDamage)
+				if (bg_weapongroupinfo[w].weapon[0]->proj->instantDamage) {
 					t += 1000;
-				else
+				} else {
 					t += bg_weapongroupinfo[w].weapon[0]->proj->speed;
-			}
-			// Just in case...
-			if (t > 4000) {
-				t = 4000;
+				}
 			}
 #endif
+
+			t = Com_Clamp(1000, 4000, t);
 #else
 			switch(w) {
 				case WP_MACHINEGUN: max = 50; inc = 4; t = 1000; break;
