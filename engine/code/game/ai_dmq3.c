@@ -4259,8 +4259,8 @@ void BotCheckAttack(bot_state_t *bs) {
 #endif
 	//if fire has to be release to activate weapon
 #ifdef TA_WEAPSYS
-	// Melee and grappling hook must be release and pressed again to fire.
-	if (!bgProj || bgProj->grappling)
+	// Grappling hook must be release and pressed again to fire.
+	if (bgProj && bgProj->grappling)
 #else
 	if (wi.flags & WFL_FIRERELEASED)
 #endif

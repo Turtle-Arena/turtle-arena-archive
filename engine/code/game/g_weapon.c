@@ -164,19 +164,6 @@ void G_StartMeleeAttack(gentity_t *ent)
 		return;
 	}
 
-	// Must press the button each time to attack...
-#ifdef IOQ3ZTM
-	if (client->ps.pm_flags & PMF_FIRE_HELD) {
-		return;
-	}
-	client->ps.pm_flags |= PMF_FIRE_HELD;
-#else
-	if (client->fireHeld) {
-		return;
-	}
-	client->fireHeld = qtrue;
-#endif
-
 	// Next attack animation
 	client->ps.meleeAttack++;
 
