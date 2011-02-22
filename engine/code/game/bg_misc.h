@@ -775,6 +775,7 @@ typedef struct
 	// todo string
 	int standAnim;
 	int attackAnim[MAX_WG_ATK_ANIMS];
+	unsigned int numAttackAnims;
 } bg_weapongroup_anims_t;
 
 // cgame "_hands.md3"
