@@ -1548,13 +1548,11 @@ void CG_RegisterWeapon( int weaponNum )
 	}
 #endif
 
+#ifndef TA_MISC // USE_REAL_TAGS_FOR_VIEW
 	if ( !weaponInfo->handsModel ) {
-#ifdef TA_DATA
-		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/triblaster/triblaster_hand.md3" );
-#else
 		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/shotgun/shotgun_hand.md3" );
-#endif
 	}
+#endif
 
 #ifndef IOQ3ZTM // unused
 	weaponInfo->loopFireSound = qfalse;
@@ -3434,6 +3432,13 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	// set up gun position
 	CG_CalculateWeaponPosition( hand.origin, angles );
 
+#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
+	if (!weapon->handsModel) {
+		fovOffset[0] += 5;
+		fovOffset[2] -= 20;
+	}
+#endif
+
 #ifdef IOQ3ZTM // FOV
 	VectorMA( hand.origin, (cg_gun_x.value+fovOffset[0]), cg.refdef.viewaxis[0], hand.origin );
 	VectorMA( hand.origin, (cg_gun_y.value+fovOffset[1]), cg.refdef.viewaxis[1], hand.origin );
@@ -3454,12 +3459,26 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	} else {
 		// get clientinfo for animation map
 		ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
+		if (!weapon->handsModel) {
+			hand.frame = cent->pe.torso.frame;
+			hand.oldframe = cent->pe.torso.oldFrame;
+		} else {
+#endif
 		hand.frame = CG_MapTorsoToWeaponFrame( ci, cent->pe.torso.frame );
 		hand.oldframe = CG_MapTorsoToWeaponFrame( ci, cent->pe.torso.oldFrame );
+#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
+		}
+#endif
 		hand.backlerp = cent->pe.torso.backlerp;
 	}
 
 	hand.hModel = weapon->handsModel;
+#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
+	if (!hand.hModel) {
+		hand.hModel = ci->torsoModel;
+	}
+#endif
 #ifdef IOQ3ZTM // RENDERFLAGS
 	hand.renderfx = RF_DEPTHHACK | RF_NOT_MIRROR | RF_MINLIGHT;
 #else

@@ -290,8 +290,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
 #endif
 #endif
-#ifdef TURTLEARENA // First person weapons are currently unsupported.
-	{ &cg_drawGun, "cg_drawGun", "0", CVAR_ARCHIVE },
+#ifdef TURTLEARENA
+	{ &cg_drawGun, "cg_drawViewWeapons", "1", CVAR_ARCHIVE },
 #else
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 #endif
