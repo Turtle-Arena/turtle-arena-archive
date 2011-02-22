@@ -4,15 +4,10 @@
 *Turtle Arena TODO and BUGS*
 
 = engine =
-== Weapons ==
-Weapons (and attacking)
-
+== Weapons (and attacking) ==
   * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
 
-  * TODO: Have weapons be seperate entities (ET_WEAPON) from the player,
-		allowing one rendering function that can be use for all weapons,
-		and do collision so that weapons don't go into the wall. (And bounce back if you hit the wall?)
-  * TODO: Add a option to weapon group info to hold a weapon upside-down?
+  * TODO: Add a option to weapon group info to hold a weapon upside-down? (effect rendering and damaging)
 
   * TODO: Attack movement flags. Stop, cut speed in half, double speed, turn right?, etc.
 
@@ -23,7 +18,7 @@ Weapons (and attacking)
     * ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
   * TODO: Aiming mode for third-person, camera looks over player's shoulder (Like LoZ:TP)
 
-  * TODO: Draw the secondary pickup weapon somewhere on the player when single handed
+  * TODO: Render the secondary pickup weapon somewhere on the player when single handed
 
   * TODO: Add PD_CUSTOM projectile death type
     * pdModel (string), pdShader (string), pdSprite (bool), pdDuration (int), pdLight (int) (vec3), pdExpBase (int), pdExpAdd (int), pdExpOnPlayer (bool)
@@ -35,8 +30,6 @@ Weapons (and attacking)
     * Idea for supporting `TORSO_*`
       * PM_ContinueAnim(run);
       * If (!(animations[run].prefixType & AP_LEGS)) PM_ContinueAnim(LEGS_RUN);
-
-  * TODO: Support `BOTH_*` attacks (not just `TORSO_*`) in ui/q3_ui
 
 == Single Player ==
   * TODO: True Single Player mode with NPCs and all that.
