@@ -7,8 +7,6 @@
 == Weapons ==
 Weapons (and attacking)
 
-  * IOQ3ZTM: TODO: Add Q3 Ammo items to quake3 base_ioq3ztm/scripts/weaponinfo.txt
-
   * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
 
   * TODO: Have weapons be seperate entities (ET_WEAPON) from the player,
@@ -68,9 +66,10 @@ Weapons (and attacking)
   * TODO: Add real-time cel-shading, like Jet Set Redio! (Maybe add other NPR rendering options too?)
     * Maybe NPRQuake could be of some help? it has some cool looking NPR renders.
 
-  * BUG: When there are multiple ghost models they may not be sorted into correct order?
+  * BUG: When there are multiple ghost models they may not be sorted into correct order
+    * Requires depth sorting to fix
 
-  * TODO: Add Vertex Buffer Object (VBO) support?
+  * TODO: Add Vertex Buffer Object (VBO) support? (patch is in ioq3 bugzilla, wait till its added in ioq3?)
 
   * BUG: At the beginning of q3dm0 the portal can be seen though the mirror
 
@@ -80,14 +79,12 @@ Weapons (and attacking)
   * TODO: Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161
 
 == Teamplay ==
-  * TODO: Data: Team skins for players
+  * TODO: Data: Create team skins for players (for Foot at least)
 
-  * TODO: Per-team flag skins?... (Team icon is on flag skin)
+  * TODO: Data: Update flag skins for new default teams (Red: Foot, Blue: Shell)
+
+  * TODO: Per-team flag skins? (Team icon is on flag skin)
      * Would a shader remap work?
-
-  * TODO: Have Foot be the default red team (Update flag skin)
-
-  * TODO: Have Shell be the default blue team? (Base Shell icon on game icon)
 
   * TODO: Have a extra team (Needed for mp_ui), like (Purple) Dragon, or Guardian
 
@@ -104,6 +101,8 @@ Weapons (and attacking)
 == Bots ==
   * TODO: Support bots using func_use (use via holdable item button)
 
+  * FIXME: Have bots attack func_brakeable when they are in the way, currently bots just walk into them (and keep walking into them even though they are not going anywhere).
+
 == Entities ==
   * TODO: Allow func_breakable and misc_object to be pushable.
 
@@ -113,6 +112,8 @@ Weapons (and attacking)
 
 == NiGHTS mode ==
   * STARTED (NIGHTSMODE): NiGHTS into Dreams mode
+
+  * TODO: Use different model for player when in NiGHTS mode
     * Maybe instead of NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...
 
   * TODO: NiGHTS HUD mode, check for nights_start to see if level is a NiGHTS level to use NiGHTS HUD.
@@ -173,14 +174,9 @@ Weapons (and attacking)
 
   * TODO: Add MD5 model support
     * MD5 use single model and skeleton
-    * the animations can move any part of the model
-    * multiple animations can animate at the same time
+    * The animations can move any part of the model
+    * Multiple animations can animate at the same time
   * TODO-after-above: Re-rig and reanimate players in Blender for MD5? (or add MD5 export to MM3D?)
-
-  * FIXME: Turtle Arena uses code from Wolf-ET (GPLv3 or later).
-    * I need to change the licensing on the effected files to GPLv3 (or later).
-    * Should I change the whole source to GPLv3 (or later)? (and the data too?)
-      * If I change the whole source it could cause issues with submitting patches to ioq3 (and more difficult for other q3 mods to use my code?)
 
   * TODO: Support using .so, .dll, and .dylib, on pure servers? (Wolf-ET does?)
   * TODO: Have qvms in a separate pk3 and have it be optional.
@@ -243,7 +239,7 @@ Most of the mapobjects should be damageable.
 
   * TODO: Per-triangle collision for player damage, use lowest LOD model or have a model special for collision?
     * Using a special model for collision we could use group names to set what part of player is hit,
-    * so shell takes less damage, banndana takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
+    * so shell takes less damage, banndana tails takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
 
   * TODO: Lua Scripting for NPCs? http://xreal.svn.sourceforge.net/viewvc/xreal/trunk/xreal/base/code/game/g_lua.c?view=markup
 
@@ -257,9 +253,6 @@ Most of the mapobjects should be damageable.
   * WORKING(NotDone?): Have bots use shurikens. (They are used *to much* now.)
 
 = Other =
-  * TODO: Add extra library dlls from NSIS installer to zip install
-  * TODO: Add game/cgame/ui so/dll to zip install? (They are included in ioq3 NSIS installer)
-
   * TODO: Make some sort of manual to tell how to play, control the player (using default controls). Have it be simple.
 
   * TODO: Portable (zip): Add a note (either on the website or in the readme) that removeing the "settings/portable" file will make it use the normal user app data directory, i.e. $HOME/.turtlearena
@@ -271,7 +264,7 @@ Most of the mapobjects should be damageable.
       * And add a note to the website 'tested on X'
 
 = Master Server =
-  * NOTE: dpmaster is a open source master server that should support Turtle Arena
+  * NOTE: dpmaster is a open source master server that supports quake3
 
 
 = Data =
@@ -291,10 +284,6 @@ Most of the mapobjects should be damageable.
     * http://virtualworlds.wikia.com
 
 == Players ==
-  * TODO: Casey really needs to /swing/ the melee weapons.
-
-  * TODO: Set looping in casey mm3d models and re-export
-
   * TODO: Add Leo, Don, Mike, and Casey bot chats.
 
 === Raph ====
@@ -309,8 +298,7 @@ Most of the mapobjects should be damageable.
     * Similar to the action figures.
 
 === Casey ====
-  * TODO: Finish Casey Jones model mesh
-     * Casey's feet look ugly (fix them), and allow the toes to bend.
+  * TODO: Remake Casey Jones model
 
 
 = Misfit Model 3D =
@@ -335,8 +323,6 @@ Current Location: http://ztm.x10hosting.com/ta/
 
   * TODO: Update for Turtle Arena 0.4
 
-  * TODO: Add a phpbb fourm
-
   * TODO: Add MediaWiki to website? (and use the same database as phpbb)
 
 = Packaging =
@@ -344,5 +330,5 @@ Current Location: http://ztm.x10hosting.com/ta/
 	* Allow install path to be set?
 	* Allow desktop shortcut to be created?
 	* Allow Start Menu shortcuts not be created?
-	* Allow  Start Menu folder name to be set?
+	* Allow Start Menu folder name to be set?
 
