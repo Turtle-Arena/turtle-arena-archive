@@ -2753,8 +2753,10 @@ static void BG_SetupWeaponGroup(bg_weapongroupinfo_t *weaponGroup, bg_iteminfo_t
 		// Setup Animations
 		weaponGroup->normalAnims.standAnim = TORSO_STAND;
 		weaponGroup->normalAnims.attackAnim[0] = TORSO_ATTACK;
+		weaponGroup->normalAnims.numAttackAnims = 1;
 		weaponGroup->primaryAnims.standAnim = TORSO_STAND2;
 		weaponGroup->primaryAnims.attackAnim[0] = TORSO_ATTACK2;
+		weaponGroup->primaryAnims.numAttackAnims = 1;
 
 		// Set item pointer to non-NULL
 		weaponGroup->item = &bg_iteminfo[0];
@@ -3401,7 +3403,7 @@ int BG_AttackIndexForPlayerState(playerState_t *ps)
 	int max_combo = BG_MaxAttackIndex(ps);
 	int atkIndex;
 
-	if (max_combo == 1) {
+	if (max_combo <= 1) {
 		return 0;
 	}
 
