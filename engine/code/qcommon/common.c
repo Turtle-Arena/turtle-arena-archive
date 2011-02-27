@@ -2972,7 +2972,7 @@ void Com_Frame( void ) {
 
 	int		msec, minMsec;
 	int		timeVal;
-	static int	lastTime = 0;
+	static int	lastTime = 0, bias = 0;
  
 	int		timeBeforeFirstEvents;
 	int		timeBeforeServer;
@@ -3018,18 +3018,14 @@ void Com_Frame( void ) {
 				minMsec = 1;
 			
 			timeVal = com_frameTime - lastTime;
-			if(timeVal > minMsec)
-			{
-				// Adjust minMsec if previous frame took too long to render so
-				// that framerate is stable at the requested value.
-				timeVal -= minMsec;
-
-				if(timeVal > minMsec)
-					minMsec = 0;
-				else
-					minMsec -= timeVal;
-			}
+			bias += timeVal - minMsec;
 			
+			if(bias > minMsec)
+				bias = minMsec;
+			
+			// Adjust minMsec if previous frame took too long to render so
+			// that framerate is stable at the requested value.
+			minMsec -= bias;
 		}
 	}
 	else
@@ -3038,10 +3034,11 @@ void Com_Frame( void ) {
 	timeVal = 0;
 	do
 	{
-		if(com_busyWait->integer)
+		// Busy sleep the last millisecond for better timeout precision
+		if(com_busyWait->integer || timeVal < 2)
 			NET_Sleep(0);
 		else
-			NET_Sleep(timeVal);
+			NET_Sleep(timeVal - 1);
 
 		msec = Sys_Milliseconds() - com_frameTime;
 		
