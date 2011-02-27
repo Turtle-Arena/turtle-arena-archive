@@ -2606,7 +2606,7 @@ static void PM_Weapon( void ) {
 #endif
 
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
+#ifdef IOQ3ZTM
 	// Handle grapple
 #ifdef TA_WEAPSYS
 	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0]->proj->grappling)

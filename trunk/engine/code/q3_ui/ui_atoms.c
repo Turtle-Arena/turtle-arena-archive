@@ -1679,6 +1679,7 @@ UI_DrawPicFullScreen
 void UI_DrawPicFullScreen(qhandle_t hShader)
 {
 #ifdef IOQ3ZTM // IOQ3BUGFIX: In widescreen fill whole screen not just 4:3 area.
+#ifdef TA_DATA // Repeat image horizontally without changing the aspect (as normal scaling would).
 	float x = 0, y = 0, w = uis.glconfig.vidWidth, h = uis.glconfig.vidHeight;
 	const float picX = SCREEN_WIDTH;
 	const float picY = SCREEN_HEIGHT;
@@ -1701,6 +1702,9 @@ void UI_DrawPicFullScreen(qhandle_t hShader)
 	t2 += tDelta;
 
 	trap_R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
+#else
+	trap_R_DrawStretchPic( 0, 0, uis.glconfig.vidWidth, uis.glconfig.vidHeight, 0, 0, 1, 1, hShader );
+#endif
 #else
 	UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hShader );
 #endif
