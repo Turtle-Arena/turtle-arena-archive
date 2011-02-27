@@ -1606,7 +1606,7 @@ char *Com_LocalClientCvarName(int localClient, char *in_cvarName) {
 			prefix[0] = '\0';
 		}
 
-		Q_snprintf(localClientCvarName, MAX_CVAR_VALUE_STRING, "%s%d%s", prefix, localClient+1, cvarName);
+		Com_sprintf(localClientCvarName, MAX_CVAR_VALUE_STRING, "%s%d%s", prefix, localClient+1, cvarName);
 	}
 
 	return localClientCvarName;

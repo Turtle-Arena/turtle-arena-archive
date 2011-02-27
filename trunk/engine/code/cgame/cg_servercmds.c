@@ -567,7 +567,7 @@ static void CG_MapRestart( void ) {
 		if (lc == 0) {
 			buf[0] = '\0';
 		} else {
-			Q_snprintf(buf, sizeof (buf), "%d", lc+1);
+			Com_sprintf(buf, sizeof (buf), "%d", lc+1);
 		}
 #ifdef THIRD_PERSON
 #ifdef IOQ3ZTM // LASERTAG
@@ -1243,7 +1243,7 @@ static void CG_ServerCommand( void ) {
 #ifdef TA_SPLITVIEW
 			if (lc != 0) {
 				// Show which client this is for.
-				Q_snprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
+				Com_sprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
 			} else
 #endif
 			Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
@@ -1258,7 +1258,7 @@ static void CG_ServerCommand( void ) {
 #ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			// Show which client this is for.
-			Q_snprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
+			Com_sprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
 		} else
 #endif
 		Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
