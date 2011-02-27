@@ -410,7 +410,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 #ifdef TA_SPLITVIEW
 			for (i = 0; i < frame->numPSs; i++) {
 				if (frame->pss[i].clientNum >= 32)
-					Com_Error( ERR_DROP, "SVF_CLIENTMASK: cientNum > 32\n" );
+					Com_Error( ERR_DROP, "SVF_CLIENTMASK: clientNum >= 32\n" );
 				if (~ent->r.singleClient & (1 << frame->pss[i].clientNum))
 					break;
 			}
@@ -419,7 +419,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			}
 #else
 			if (frame->ps.clientNum >= 32)
-				Com_Error( ERR_DROP, "SVF_CLIENTMASK: cientNum >= 32\n" );
+				Com_Error( ERR_DROP, "SVF_CLIENTMASK: clientNum >= 32\n" );
 			if (~ent->r.singleClient & (1 << frame->ps.clientNum))
 				continue;
 #endif
