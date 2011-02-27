@@ -647,7 +647,7 @@ static void PlayerModel_MenuInit( void )
 	s_playermodel.banner.generic.y     = 16;
 #endif
 #ifdef TA_SPLITVIEW
-	Q_snprintf(s_playermodel.bannerString, sizeof (s_playermodel.bannerString), "PLAYER %d MODEL", s_playermodel.localClient+1);
+	Com_sprintf(s_playermodel.bannerString, sizeof (s_playermodel.bannerString), "PLAYER %d MODEL", s_playermodel.localClient+1);
 	s_playermodel.banner.string = s_playermodel.bannerString;
 #else
 	s_playermodel.banner.string        = "PLAYER MODEL";

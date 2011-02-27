@@ -1255,8 +1255,8 @@ void ClientUserinfoChanged( int clientNum ) {
 	if (g_gametype.integer == GT_SINGLE_PLAYER)
 #endif
 	{
-		Q_snprintf(c1, sizeof (c1), "%d", client->pers.playercfg.prefcolor1);
-		Q_snprintf(c2, sizeof (c2), "%d", client->pers.playercfg.prefcolor2);
+		Com_sprintf(c1, sizeof (c1), "%d", client->pers.playercfg.prefcolor1);
+		Com_sprintf(c2, sizeof (c2), "%d", client->pers.playercfg.prefcolor2);
 	}
 #endif
 

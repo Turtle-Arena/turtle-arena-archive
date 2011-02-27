@@ -132,7 +132,7 @@ void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner, qboolean di
 	y += INGAME_MENU_VERTICAL_SPACING*2;
 
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		Q_snprintf(s_setupplayers.playerString[i], sizeof (s_setupplayers.playerString[i]), "Player %d", i+1);
+		Com_sprintf(s_setupplayers.playerString[i], sizeof (s_setupplayers.playerString[i]), "Player %d", i+1);
 
 		s_setupplayers.player[i].generic.type		= MTYPE_PTEXT;
 		s_setupplayers.player[i].generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;

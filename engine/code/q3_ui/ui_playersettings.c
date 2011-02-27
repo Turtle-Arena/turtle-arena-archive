@@ -556,7 +556,7 @@ static void PlayerSettings_MenuInit( void )
 	s_playersettings.banner.generic.x     = 320;
 	s_playersettings.banner.generic.y     = 16;
 #ifdef TA_SPLITVIEW
-	Q_snprintf(s_playersettings.bannerString, sizeof (s_playersettings.bannerString), "PLAYER %d SETTINGS", s_playersettings.localClient+1);
+	Com_sprintf(s_playersettings.bannerString, sizeof (s_playersettings.bannerString), "PLAYER %d SETTINGS", s_playersettings.localClient+1);
 	s_playersettings.banner.string = s_playersettings.bannerString;
 #else
 	s_playersettings.banner.string        = "PLAYER SETTINGS";

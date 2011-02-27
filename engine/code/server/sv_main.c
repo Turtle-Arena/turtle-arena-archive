@@ -191,7 +191,7 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 	index = client->reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
 #ifdef TA_SPLITVIEW
 	if (lc != 0) {
-		Q_snprintf(client->reliableCommands[ index ], sizeof( client->reliableCommands[ index ] ), "lc%d %s", lc, cmd);
+		Com_sprintf(client->reliableCommands[ index ], sizeof( client->reliableCommands[ index ] ), "lc%d %s", lc, cmd);
 	} else
 #endif
 	Q_strncpyz( client->reliableCommands[ index ], cmd, sizeof( client->reliableCommands[ index ] ) );

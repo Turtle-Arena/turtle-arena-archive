@@ -53,16 +53,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define NODELIST
 #define SIN
 
-#if 1 // ZTM(IOQ3): From ioquake3/code/qcommon/q_shared.c
-// vsnprintf is ISO/IEC 9899:1999
-// abstracting this to make it portable
-#ifdef _WIN32
-  #define Q_vsnprintf _vsnprintf
-  #define Q_snprintf _snprintf
+#ifdef _MSC_VER
+  // vsnprintf is ISO/IEC 9899:1999
+  // abstracting this to make it portable
+  int Q_vsnprintf(char *str, size_t size, const char *format, va_list ap);
 #else
   #define Q_vsnprintf vsnprintf
-  #define Q_snprintf snprintf
-#endif
 #endif
 
 #define MAX_BRUSH_SIDES		128		//maximum number of sides per brush

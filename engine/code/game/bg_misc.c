@@ -2983,9 +2983,9 @@ void BG_DumpWeaponInfo(void)
 	}
 
 #define FS_Printf1(x) { text[0] = 0; trap_FS_Write(x, strlen(x)+1, f); }
-#define FS_Printf2(x, y) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y); trap_FS_Write(text, strlen(text)+1, f); }
-#define FS_Printf3(x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
-#define FS_Printf4(w, x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), w, x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf2(x, y) { text[0] = 0; Com_sprintf(text, sizeof (text), x, y); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf3(x, y, z) { text[0] = 0; Com_sprintf(text, sizeof (text), x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf4(w, x, y, z) { text[0] = 0; Com_sprintf(text, sizeof (text), w, x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
 
 	FS_Printf1("// ZTM: TODO: Dump items\n\n");
 
