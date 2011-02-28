@@ -33,8 +33,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     #define CLIENT_WINDOW_TITLE     "Turtle Arena"
     #define CLIENT_WINDOW_MIN_TITLE "Turtle Arena"
     #define GAMENAME_FOR_MASTER		"TurtleArena"
-    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER
-    #define FLATLINE_FOR_MASTER		HEARTBEAT_FOR_MASTER "dead"
+    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER "-1"
+    #define FLATLINE_FOR_MASTER		GAMENAME_FOR_MASTER "Flatline-1"
   #elif defined IOQ3ZTM
 	// Standalone IOQ3ZTM is a mod for Turtle Arena
     #define PRODUCT_NAME			"ioq3turtle"
@@ -42,8 +42,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     #define CLIENT_WINDOW_TITLE     "ioquake3turtle"
     #define CLIENT_WINDOW_MIN_TITLE "ioq3turtle"
     #define GAMENAME_FOR_MASTER		"TurtleArena"
-    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER
-    #define FLATLINE_FOR_MASTER		HEARTBEAT_FOR_MASTER "dead"
+    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER "-1"
+    #define FLATLINE_FOR_MASTER		GAMENAME_FOR_MASTER "Flatline-1"
   #else
     #define PRODUCT_NAME			"iofoo3"
     #define BASEGAME			"foobar"
