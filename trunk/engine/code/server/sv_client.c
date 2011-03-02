@@ -58,6 +58,13 @@ void SV_GetChallenge(netadr_t from)
 	const char *clientChallenge = Cmd_Argv(1);
 	challenge_t	*challenge;
 
+#ifdef IOQ3ZTM // SV_PUBLIC
+	// Don't allow players to connect if sv_public is -2
+	if ( sv_public->integer == -2 ) {
+		return;
+	}
+#endif
+
 	// ignore if we are in single player
 	if (
 #ifndef TA_SP

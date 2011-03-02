@@ -598,6 +598,13 @@ static void SVC_Status( netadr_t from ) {
 	char	infostring[MAX_INFO_STRING];
 	static leakyBucket_t bucket;
 
+#ifdef IOQ3ZTM // SV_PUBLIC
+	// Don't reply if sv_public is -1 or lower
+	if ( sv_public->integer <= -1 ) {
+		return;
+	}
+#endif
+
 	// ignore if we are in single player
 #ifdef TA_SP
 	if ( Cvar_VariableValue("ui_singlePlayerActive") )
@@ -670,6 +677,13 @@ void SVC_Info( netadr_t from ) {
 #endif
 	char	*gamedir;
 	char	infostring[MAX_INFO_STRING];
+
+#ifdef IOQ3ZTM // SV_PUBLIC
+	// Don't reply if sv_public is -1 or lower
+	if ( sv_public->integer <= -1 ) {
+		return;
+	}
+#endif
 
 	// ignore if we are in single player
 	if (
