@@ -3263,6 +3263,9 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cvar_Set("cg_cameraOrbit", "0");
 			trap_Cvar_Set("ui_singlePlayerActive", "0");
 			trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, ui_dedicated.integer ) );
+#ifdef IOQ3ZTM // SV_PUBLIC
+			trap_Cvar_SetValue( "sv_public", (ui_dedicated.integer == 2) );
+#endif
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Clamp to correct number of gametypes
 			trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, GT_MAX_GAME_TYPE-1, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
 #else

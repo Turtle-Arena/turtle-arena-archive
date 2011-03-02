@@ -292,6 +292,10 @@ extern	cvar_t	*sv_banFile;
 extern	cvar_t	*sv_heartbeat;
 extern	cvar_t	*sv_flatline;
 
+#ifdef IOQ3ZTM // SV_PUBLIC
+extern	cvar_t	*sv_public;
+#endif
+
 extern	serverBan_t serverBans[SERVER_MAXBANS];
 extern	int serverBansCount;
 
