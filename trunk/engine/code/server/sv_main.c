@@ -62,6 +62,10 @@ cvar_t  *sv_heartbeat;			// Heartbeat string that is sent to the master
 cvar_t  *sv_flatline;			// If the master server supports it we can send a flatline
 					// when server is killed
 
+#ifdef IOQ3ZTM // SV_PUBLIC
+cvar_t  *sv_public;
+#endif
+
 serverBan_t serverBans[SERVER_MAXBANS];
 int serverBansCount = 0;
 
@@ -277,9 +281,15 @@ void SV_MasterHeartbeat(const char *message)
 
 	netenabled = Cvar_VariableIntegerValue("net_enabled");
 
+#ifdef IOQ3ZTM // SV_PUBLIC
+	// "sv_public 0" is for lan play, "sv_public 1" is for inet public play
+	if (!sv_public || !sv_public->integer || !(netenabled & (NET_ENABLEV4 | NET_ENABLEV6)))
+		return;		// only puplic servers send heartbeats
+#else
 	// "dedicated 1" is for lan play, "dedicated 2" is for inet public play
 	if (!com_dedicated || com_dedicated->integer != 2 || !(netenabled & (NET_ENABLEV4 | NET_ENABLEV6)))
 		return;		// only dedicated servers send heartbeats
+#endif
 
 	// if not time yet, don't send anything
 	if ( svs.time < svs.nextHeartbeatTime )

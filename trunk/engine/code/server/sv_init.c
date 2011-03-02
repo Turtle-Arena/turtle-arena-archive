@@ -766,6 +766,10 @@ void SV_Init (void)
 	sv_heartbeat = Cvar_Get("sv_heartbeat", HEARTBEAT_FOR_MASTER, CVAR_INIT);
 	sv_flatline = Cvar_Get("sv_flatline", FLATLINE_FOR_MASTER, CVAR_INIT);
 
+#ifdef IOQ3ZTM // SV_PUBLIC
+	sv_public = Cvar_Get("sv_public", (com_dedicated->integer == 2) ? "1" : "0", 0 );
+#endif
+
 	// initialize bot cvars so they are listed and can be set before loading the botlib
 	SV_BotInitCvars();
 
