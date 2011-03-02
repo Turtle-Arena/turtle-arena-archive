@@ -2426,7 +2426,11 @@ void CL_ServersResponsePacket( const netadr_t* from, msg_t *msg, qboolean extend
 	byte*			buffptr;
 	byte*			buffend;
 	
+#ifdef IOQ3ZTM
+	Com_DPrintf("CL_ServersResponsePacket\n");
+#else
 	Com_Printf("CL_ServersResponsePacket\n");
+#endif
 
 	if (cls.numglobalservers == -1) {
 		// state to detect lack of servers or lack of response
@@ -4204,7 +4208,12 @@ void CL_GlobalServers_f( void ) {
 		//       request IPv6 servers only by appending " ipv6" to the command
 	}
 	else
+#if defined STANDALONE && defined IOQ3ZTM // All standalone games use dpmaster, right? So we can use gamename instead of having dpmaster guess based on protocol?
+		Com_sprintf(command, sizeof(command), "getserversExt %s %s",
+			cl_gamename->string, Cmd_Argv(2));
+#else
 		Com_sprintf(command, sizeof(command), "getservers %s", Cmd_Argv(2));
+#endif
 
 	for (i=3; i < count; i++)
 	{
