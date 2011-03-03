@@ -4209,7 +4209,7 @@ void CL_GlobalServers_f( void ) {
 	}
 	else
 #if defined STANDALONE && defined IOQ3ZTM // All standalone games use dpmaster, right? So we can use gamename instead of having dpmaster guess based on protocol?
-		Com_sprintf(command, sizeof(command), "getserversExt %s %s",
+		Com_sprintf(command, sizeof(command), "getservers %s %s",
 			cl_gamename->string, Cmd_Argv(2));
 #else
 		Com_sprintf(command, sizeof(command), "getservers %s", Cmd_Argv(2));
