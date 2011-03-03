@@ -1062,10 +1062,15 @@ static void PM_WalkMove( void ) {
 		pm->xyspeed = sqrt( pm->ps->velocity[0] * pm->ps->velocity[0]
 			+  pm->ps->velocity[1] * pm->ps->velocity[1] );
 
-		// if !running AND melee attacking; based on LoZ:TP
-		if (pm->xyspeed < 200 && (pm->ps->meleeTime || pm->ps->meleeDelay))
-		{
-			accelerate = pm_accelerate/4;
+		// if not running, less movement while melee attacking, based on LoZ:TP
+		if (pm->xyspeed < 200) {
+			if (BG_MaxAttackIndex(pm->ps)-1 == BG_AttackIndexForPlayerState(pm->ps) && pm->ps->meleeDelay) {
+				accelerate = 0;
+			} else if (pm->ps->meleeTime) {
+				accelerate = pm_accelerate/4;
+			} else {
+				accelerate = pm_accelerate;
+			}
 		}
 		else
 #endif
