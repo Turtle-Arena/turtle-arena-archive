@@ -3451,19 +3451,25 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 
 	AnglesToAxis( angles, hand.axis );
 
+#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
+	// get clientinfo
+	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+#endif
+
 	// map torso animations to weapon animations
 	if ( cg_gun_frame.integer ) {
 		// development tool
 		hand.frame = hand.oldframe = cg_gun_frame.integer;
 		hand.backlerp = 0;
 	} else {
-		// get clientinfo for animation map
-		ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
 		if (!weapon->handsModel) {
 			hand.frame = cent->pe.torso.frame;
 			hand.oldframe = cent->pe.torso.oldFrame;
 		} else {
+#else
+		// get clientinfo for animation map
+		ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #endif
 		hand.frame = CG_MapTorsoToWeaponFrame( ci, cent->pe.torso.frame );
 		hand.oldframe = CG_MapTorsoToWeaponFrame( ci, cent->pe.torso.oldFrame );
