@@ -54,8 +54,8 @@
 		{
 			name titlebanner
 			style WINDOW_STYLE_SHADER
-			rect 192 12 256 128
-			background "ui/assets/titlebanner"
+			rect 64 32 512 256
+			background "menu/art/titlebanner"
 			visible MENU_TRUE
 			decoration
 		}
