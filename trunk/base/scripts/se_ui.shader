@@ -42,6 +42,7 @@ ui/assets/3_cursor2
 	nomipmaps
 	{
 		map menu/art/3_cursor2.png
+		blendfunc blend
 	}
 }
 
@@ -50,6 +51,7 @@ ui/assets/3_cursor3
 	nomipmaps
 	{
 		map menu/art/3_cursor2.png
+		blendfunc blend
 	}
 }
 
@@ -59,6 +61,7 @@ ui/assets/selectcursor
 	nomipmaps
 	{
 		map menu/art/3_cursor2.png
+		blendfunc blend
 	}
 }
 
@@ -68,6 +71,7 @@ ui/assets/sizecursor
 	{
 		// TODO: Add the correct image.
 		map menu/art/3_cursor2.png
+		blendfunc blend
 	}
 }
 
