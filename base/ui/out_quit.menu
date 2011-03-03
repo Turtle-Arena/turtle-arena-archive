@@ -7,7 +7,7 @@
 	menuDef
 	{
 		name "quit"
-		rect 145 165 350 150
+		rect 142 118 359 256
 		focusColor 1 0.43 0 1.25
 		popup
 
@@ -23,10 +23,8 @@
 		{
 			name background
 			style WINDOW_STYLE_SHADER
-			rect 0 0 350 150
+			rect 0 0 359 256
 			background "ui/assets/dialog_back"
-			//border WINDOW_BORDER_FULL
-			//bordercolor .5 .5 .5 1
 			visible MENU_TRUE
 			decoration
 		}
@@ -38,11 +36,9 @@
 		{
 			name quit_title
 			text "Quit Turtle Arena?"
-			//style WINDOW_STYLE_SHADER
-			//background "ui/assets/dialog_headerback"
-			rect 5 20 340 30
+			rect 5 80 340 30
 			textstyle ITEM_TEXTSTYLE_SHADOWED
-			textscale 0.3
+			textscale 0.5
 			textalign ITEM_ALIGN_CENTER
 			textalignx 170
 			textaligny 22
@@ -56,21 +52,11 @@
 		//
 		itemDef 
 		{
-			name acceptbutton_glow
-			style WINDOW_STYLE_SHADER
-			rect 40 100 130 24
-			background "ui/assets/menu_buttonback"
-			visible MENU_FALSE
-			decoration
-		}
-
-		itemDef 
-		{
 			name acceptbutton
 			text "YES"
 			type ITEM_TYPE_BUTTON
-			rect 40 100 130 24
-			textscale 0.33
+			rect 40 130 130 24
+			textscale 0.5
 			textaligny 20
 			textalign ITEM_ALIGN_CENTER
 			textstyle ITEM_TEXTSTYLE_SHADOWED 
@@ -78,14 +64,6 @@
 			forecolor 0.9 0.9 0.9 1
 			visible MENU_TRUE
 
-			mouseEnter 
-			{ 
-				show acceptbutton_glow;
-			}
-			mouseExit 
-			{ 
-				hide acceptbutton_glow;
-			}
 			action
 			{
 				uiScript "quit"
@@ -97,21 +75,11 @@
 		//
 		itemDef 
 		{
-			name cancelbutton_glow
-			style WINDOW_STYLE_SHADER
-			rect 170 100 130 24
-			background "ui/assets/menu_buttonback"
-			visible MENU_FALSE
-			decoration
-		}
-
-		itemDef 
-		{
 			name cancelbutton
 			text "NO"
 			type ITEM_TYPE_BUTTON
-			rect 170 100 130 24
-			textscale 0.33
+			rect 170 130 130 24
+			textscale 0.5
 			textaligny 20
 			textalign ITEM_ALIGN_CENTER
 			textstyle ITEM_TEXTSTYLE_SHADOWED 
@@ -119,14 +87,6 @@
 			forecolor 0.9 0.9 0.9 1
 			visible MENU_TRUE
 
-			mouseEnter
-			{ 
-				show cancelbutton_glow;
-			}
-			mouseExit 
-			{ 
-				hide cancelbutton_glow;
-			}
 			action
 			{
 				close quit
