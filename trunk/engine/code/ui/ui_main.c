@@ -2843,11 +2843,7 @@ static void UI_StartSinglePlayer(void) {
 	}
 
  	trap_Cvar_SetValue( "singleplayer", 1 );
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Clamp to correct number of gametypes
  	trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, GT_MAX_GAME_TYPE-1, tierList[i].gameTypes[j] ) );
-#else
- 	trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, 7, tierList[i].gameTypes[j] ) );
-#endif
 	trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", tierList[i].maps[j] ) );
 	skill = trap_Cvar_VariableValue( "g_spSkill" );
 
@@ -3266,11 +3262,7 @@ static void UI_RunMenuScript(char **args) {
 #ifdef IOQ3ZTM // SV_PUBLIC
 			trap_Cvar_SetValue( "sv_public", (ui_dedicated.integer == 2) );
 #endif
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Clamp to correct number of gametypes
 			trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, GT_MAX_GAME_TYPE-1, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
-#else
-			trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, 8, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
-#endif
 			trap_Cvar_Set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
 			trap_Cvar_Set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
 			trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName ) );

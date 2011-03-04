@@ -1949,11 +1949,9 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 	refEntity_t  beam;
 	vec3_t   forward;
 	vec3_t   muzzlePoint, endPoint;
-#ifdef IOQ3ZTM
-	int anim;
-#endif
+	int      anim;
 #ifdef TA_WEAPSYS
-	int range;
+	int      range;
 
 	if (projnum < 0 || projnum >= BG_NumProjectiles())
 	{
@@ -2003,17 +2001,12 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 		VectorCopy(cent->lerpOrigin, muzzlePoint );
 	}
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Copied from CG_CalcMuzzlePoint
 	anim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
 	if ( anim == LEGS_WALKCR || anim == LEGS_IDLECR ) {
 		muzzlePoint[2] += CROUCH_VIEWHEIGHT;
 	} else {
 		muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
 	}
-#else
-	// FIXME: crouch
-	muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
-#endif
 
 	VectorMA( muzzlePoint, 14, forward, muzzlePoint );
 

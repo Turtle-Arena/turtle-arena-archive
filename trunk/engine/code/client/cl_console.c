@@ -482,12 +482,8 @@ void CL_ConsolePrint( char *txt ) {
 			y = con.current % con.totallines;
 			con.text[y*con.linewidth+con.x] = (color << 8) | c;
 			con.x++;
-			if (con.x >= con.linewidth) {
+			if(con.x >= con.linewidth)
 				Con_Linefeed(skipnotify);
-#ifndef IOQ3ZTM // IOQ3BUGFIX: Done in Con_Linefeed
-				con.x = 0;
-#endif
-			}
 			break;
 		}
 	}
