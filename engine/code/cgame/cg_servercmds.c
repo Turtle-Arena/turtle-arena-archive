@@ -530,10 +530,6 @@ static void CG_MapRestart( void ) {
 	cg.intermissionStarted = qfalse;
 	cg.levelShot = qfalse;
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Restore HUD after levelshot command
-	cg.levelShot = qfalse;
-#endif
-
 	cgs.voteTime = 0;
 
 	cg.mapRestart = qtrue;
