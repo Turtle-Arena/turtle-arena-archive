@@ -1668,7 +1668,7 @@ extern	vmCvar_t		pmove_fixed;
 extern	vmCvar_t		pmove_msec;
 //extern	vmCvar_t		cg_pmove_fixed;
 extern	vmCvar_t		cg_cameraOrbit;
-#ifdef IOQ3ZTM // NEW_CAM
+#ifndef IOQ3ZTM // NEW_CAM
 extern	vmCvar_t		cg_cameraOrbitDelay;
 #endif
 extern	vmCvar_t		cg_timescaleFadeEnd;
