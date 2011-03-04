@@ -35,7 +35,7 @@ JOYSTICK SELECT MENU
 
 #define MAX_JOYSTICKS 16
 
-#define SETUP_MENU_VERTICAL_SPACING		16 // 34
+#define JOY_MENU_VERTICAL_SPACING		16
 
 #define ART_BACK0		"menu/art/back_0"
 #define ART_BACK1		"menu/art/back_1"
@@ -325,7 +325,7 @@ static void UI_Joystick_MenuInit( void )
 	joystickMenu.framer.width  					= 256;
 	joystickMenu.framer.height  				= 334;
 
-	y = (SCREEN_HEIGHT - MAX_JOYSTICKS * SETUP_MENU_VERTICAL_SPACING) * 0.5f;
+	y = (SCREEN_HEIGHT - MAX_JOYSTICKS * JOY_MENU_VERTICAL_SPACING) * 0.5f;
 
 	for (i = 0; i < MAX_JOYSTICKS; i++) {
 		joystickMenu.joysticks[i].generic.type		= MTYPE_PTEXT;
@@ -342,7 +342,7 @@ static void UI_Joystick_MenuInit( void )
 			joystickMenu.joysticks[i].generic.flags |= QMF_GRAYED;
 		}
 
-		y += SETUP_MENU_VERTICAL_SPACING;
+		y += JOY_MENU_VERTICAL_SPACING;
 	}
 
 	joystickMenu.back.generic.type				= MTYPE_BITMAP;
@@ -371,13 +371,13 @@ static void UI_Joystick_MenuInit( void )
 	if (trap_Cvar_VariableValue(Com_LocalClientCvarName(joystickMenu.localClient, "in_joystick")) == 0) {
 		joystick = 0;
 	} else {
-		joystick = 1+(int)trap_Cvar_VariableValue(Com_LocalClientCvarName(joystickMenu.localClient, "in_joystickNo"));
+		joystick = 1 + (int)trap_Cvar_VariableValue(Com_LocalClientCvarName(joystickMenu.localClient, "in_joystickNo"));
 	}
 #else
 	if (trap_Cvar_VariableValue("in_joystick") == 0) {
 		joystick = 0;
 	} else {
-		joystick = 1+(int)trap_Cvar_VariableValue("in_joystickNo");
+		joystick = 1 + (int)trap_Cvar_VariableValue("in_joystickNo");
 	}
 #endif
 
