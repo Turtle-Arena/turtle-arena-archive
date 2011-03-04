@@ -133,68 +133,31 @@ static void UI_JoystickMenu_Event( void *ptr, int event ) {
 	}
 }
 
-#if 1 // ZTM: Sadly this isn't available to the qvms...
-static	int			cmd_argc;
-static	char		*cmd_argv[MAX_STRING_TOKENS];		// points into cmd_tokenized
-static	char		cmd_tokenized[BIG_INFO_STRING+MAX_STRING_TOKENS];	// will have 0 bytes inserted
-static	char		cmd_cmd[BIG_INFO_STRING]; // the original command we received (no token processing)
-
 /*
 ============
-Cmd_Argc
+UI_TokenizeString
+
+Clone of Cmd_TokenizeString that doesn't use global variables.
 ============
 */
-int		Cmd_Argc( void ) {
-	return cmd_argc;
-}
-
-/*
-============
-Cmd_Argv
-============
-*/
-char	*Cmd_Argv( int arg ) {
-	if ( (unsigned)arg >= cmd_argc ) {
-		return "";
-	}
-	return cmd_argv[arg];	
-}
-
-/*
-============
-Cmd_TokenizeString
-
-Parses the given string into command line tokens.
-The text is copied to a seperate buffer and 0 characters
-are inserted in the apropriate place, The argv array
-will point into this temporary buffer.
-============
-*/
-// NOTE TTimo define that to track tokenization issues
-//#define TKN_DBG
-static void Cmd_TokenizeString2( const char *text_in, qboolean ignoreQuotes ) {
+static void UI_TokenizeString( const char *text_in, char *cmd_tokenized,
+					int *cmd_argc, char **cmd_argv, qboolean ignoreQuotes )
+{
 	const char	*text;
 	char	*textOut;
 
-#ifdef TKN_DBG
-  // FIXME TTimo blunt hook to try to find the tokenization of userinfo
-  Com_DPrintf("Cmd_TokenizeString: %s\n", text_in);
-#endif
-
 	// clear previous args
-	cmd_argc = 0;
+	*cmd_argc = 0;
 
 	if ( !text_in ) {
 		return;
 	}
-	
-	Q_strncpyz( cmd_cmd, text_in, sizeof(cmd_cmd) );
 
 	text = text_in;
 	textOut = cmd_tokenized;
 
 	while ( 1 ) {
-		if ( cmd_argc == MAX_STRING_TOKENS ) {
+		if ( *cmd_argc == MAX_STRING_TOKENS ) {
 			return;			// this is usually something malicious
 		}
 
@@ -227,10 +190,10 @@ static void Cmd_TokenizeString2( const char *text_in, qboolean ignoreQuotes ) {
 		}
 
 		// handle quoted strings
-    // NOTE TTimo this doesn't handle \" escaping
+		// NOTE TTimo this doesn't handle \" escaping
 		if ( !ignoreQuotes && *text == '"' ) {
-			cmd_argv[cmd_argc] = textOut;
-			cmd_argc++;
+			cmd_argv[*cmd_argc] = textOut;
+			(*cmd_argc)++;
 			text++;
 			while ( *text && *text != '"' ) {
 				*textOut++ = *text++;
@@ -244,8 +207,8 @@ static void Cmd_TokenizeString2( const char *text_in, qboolean ignoreQuotes ) {
 		}
 
 		// regular token
-		cmd_argv[cmd_argc] = textOut;
-		cmd_argc++;
+		cmd_argv[*cmd_argc] = textOut;
+		(*cmd_argc)++;
 
 		// skip until whitespace, quote, or command
 		while ( *text > ' ' ) {
@@ -271,18 +234,7 @@ static void Cmd_TokenizeString2( const char *text_in, qboolean ignoreQuotes ) {
 			return;		// all tokens parsed
 		}
 	}
-	
 }
-
-/*
-============
-Cmd_TokenizeString
-============
-*/
-void Cmd_TokenizeString( const char *text_in ) {
-	Cmd_TokenizeString2( text_in, qfalse );
-}
-#endif
 
 /*
 ===============
@@ -292,6 +244,8 @@ UI_Joystick_GetNames
 static void UI_Joystick_GetNames( void ) {
 	char	joybuf[ MAX_STRING_CHARS ];
 	int		i;
+	char	*cmd_argv[MAX_STRING_TOKENS];		// points into cmd_tokenized
+	char	cmd_tokenized[BIG_INFO_STRING+MAX_STRING_TOKENS];	// will have 0 bytes inserted
 
 	// Get quoted string of joystick names.
 	Q_strncpyz(joybuf, UI_Cvar_VariableString("in_availableJoysticks"), sizeof(joybuf));
@@ -299,25 +253,24 @@ static void UI_Joystick_GetNames( void ) {
 	// Option to disable joystick
 	Q_strncpyz(joystickMenu.joystickNames[0], "None", sizeof (joystickMenu.joystickNames[0]));
 
-	if (*joybuf)
-	{
+	if (*joybuf) {
 		// Seperate joystick names
-		Cmd_TokenizeString(joybuf);
+		UI_TokenizeString( joybuf, cmd_tokenized, &joystickMenu.numJoysticks, cmd_argv, qfalse );
 
 		// Joysticks plus disable option
-		joystickMenu.numJoysticks = Cmd_Argc()+1;
+		joystickMenu.numJoysticks += 1;
 
 		// Get names of joysticks
 		for (i = 1; i < joystickMenu.numJoysticks; i++) {
-			Q_strncpyz(joystickMenu.joystickNames[i], Cmd_Argv(i-1), sizeof (joystickMenu.joystickNames[i]));
-		}
-
-		// Set default text for empty slots.
-		for ( ; i < MAX_JOYSTICKS; i++) {
-			Q_strncpyz(joystickMenu.joystickNames[i], "Unavailable", sizeof (joystickMenu.joystickNames[i]));
+			Q_strncpyz(joystickMenu.joystickNames[i], cmd_argv[i-1], sizeof (joystickMenu.joystickNames[i]));
 		}
 	} else {
-		joystickMenu.numJoysticks = 1;
+		joystickMenu.numJoysticks = i = 1;
+	}
+
+	// Set default text for empty slots.
+	for ( ; i < MAX_JOYSTICKS; i++) {
+		Q_strncpyz(joystickMenu.joystickNames[i], "Unavailable", sizeof (joystickMenu.joystickNames[i]));
 	}
 }
 
@@ -428,7 +381,7 @@ static void UI_Joystick_MenuInit( void )
 	}
 #endif
 
-	if (joystick < 0 || joystick >= MAX_JOYSTICKS) {
+	if (joystick < 0 || joystick >= joystickMenu.numJoysticks) {
 		joystick = 0;
 	}
 
