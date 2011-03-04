@@ -3234,9 +3234,6 @@ void Item_Multi_Paint(itemDef_t *item) {
 
 typedef struct {
 	char	*command;
-#ifndef IOQ3ZTM // IOQ3BUGFIX: There are no ids in ui's g_bindings.
-	int		id;
-#endif
 	int		defaultbind1;
 	int		defaultbind2;
 	int		bind1;
