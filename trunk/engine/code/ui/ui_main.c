@@ -3330,6 +3330,9 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cmd_ExecuteText( EXEC_APPEND, "exec default.cfg\n");
 			trap_Cmd_ExecuteText( EXEC_APPEND, "cvar_restart\n");
 			Controls_SetDefaults();
+#ifdef IOQ3ZTM // ZTM: Defaults were set but not saved.
+			Controls_SetConfig(qtrue);
+#endif
 			trap_Cvar_Set("com_introPlayed", "1" );
 			trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 #ifdef IOQUAKE3 // ZTM: CDKEY
@@ -3373,6 +3376,11 @@ static void UI_RunMenuScript(char **args) {
 			Controls_SetConfig(qtrue);
 		} else if (Q_stricmp(name, "loadControls") == 0) {
 			Controls_GetConfig();
+#ifdef IOQ3ZTM // ZTM: Added reset controls option
+		} else if (Q_stricmp(name, "resetControls") == 0) {
+			Controls_SetDefaults();
+			Controls_SetConfig(qtrue);
+#endif
 		} else if (Q_stricmp(name, "clearError") == 0) {
 			trap_Cvar_Set("com_errorMessage", "");
 		} else if (Q_stricmp(name, "loadGameInfo") == 0) {
