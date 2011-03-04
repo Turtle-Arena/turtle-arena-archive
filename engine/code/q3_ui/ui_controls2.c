@@ -142,7 +142,7 @@ enum {
 	ID_AUTOSWITCH,
 	ID_MOUSESPEED,
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-	ID_SELECTJOYSTICK,
+	ID_SELECTJOY,
 #else
 	ID_JOYENABLE,
 #endif
@@ -263,7 +263,7 @@ typedef struct
 	menuaction_s		chat3;
 	menuaction_s		chat4;
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-	menutext_s			selectjoystick;
+	menutext_s			selectjoy;
 #else
 	menuradiobutton_s	joyenable;
 #endif
@@ -646,7 +646,7 @@ static menucommon_s *g_looking_controls[] = {
 	(menucommon_s *)&s_controls.zoomview,
 #endif
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-	(menucommon_s *)&s_controls.selectjoystick,
+	(menucommon_s *)&s_controls.selectjoy,
 #else
 	(menucommon_s *)&s_controls.joyenable,
 #endif
@@ -691,7 +691,7 @@ static menucommon_s *g_looking_mini_controls[] = {
 	(menucommon_s *)&s_controls.zoomview,
 #endif
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-	(menucommon_s *)&s_controls.selectjoystick,
+	(menucommon_s *)&s_controls.selectjoy,
 #else
 	(menucommon_s *)&s_controls.joyenable,
 #endif
@@ -1161,7 +1161,7 @@ static void Controls_DrawKeyBinding( void *self )
 	}
 }
 
-#ifdef IOQ3ZTM
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
 /*
 =================
 Controls_DrawSmallText
@@ -1477,10 +1477,13 @@ static void Controls_SetDefaults( void )
 #ifndef TA_WEAPSYS_EX
 		s_controls.autoswitch.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) );
 #endif
-		s_controls.joythreshold.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "joy_threshold" ) );
+
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
 		trap_Cvar_SetValue(Com_LocalClientCvarName(s_controls.localClient, "in_joystick"), 0);
 		trap_Cvar_SetValue(Com_LocalClientCvarName(s_controls.localClient, "in_joystickNo"), 0);
+		s_controls.joythreshold.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ) );
+#else
+		s_controls.joythreshold.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "joy_threshold" ) );
 #endif
 
 		return;
@@ -1496,10 +1499,14 @@ static void Controls_SetDefaults( void )
 	s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( "cg_autoswitch" );
 #endif
 	s_controls.sensitivity.curvalue  = Controls_GetCvarDefault( "sensitivity" );
-#ifndef IOQ3ZTM // SELECT_JOYSTICK
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+	trap_Cvar_SetValue("in_joystick", 0);
+	trap_Cvar_SetValue("in_joystickNo", 0);
+	s_controls.joythreshold.curvalue = Controls_GetCvarDefault( "in_joystickThreshold" );
+#else
 	s_controls.joyenable.curvalue    = Controls_GetCvarDefault( "in_joystick" );
-#endif
 	s_controls.joythreshold.curvalue = Controls_GetCvarDefault( "joy_threshold" );
+#endif
 	s_controls.freelook.curvalue     = Controls_GetCvarDefault( "cl_freelook" );
 }
 
@@ -1768,7 +1775,7 @@ static void Controls_MenuEvent( void* ptr, int event )
 			break;		
 
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-		case ID_SELECTJOYSTICK:
+		case ID_SELECTJOY:
 			if (event == QM_ACTIVATED)
 			{
 #ifdef TA_SPLITVIEW
@@ -2306,15 +2313,15 @@ static void Controls_MenuInit( void )
 	s_controls.chat4.generic.id        = ID_CHAT4;
 
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-	s_controls.selectjoystick.generic.type		= MTYPE_PTEXT;
-	s_controls.selectjoystick.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_controls.selectjoystick.generic.x			= SCREEN_WIDTH/2;
-	s_controls.selectjoystick.generic.id		= ID_SELECTJOYSTICK;
-	s_controls.selectjoystick.generic.callback	= Controls_MenuEvent;
-	s_controls.selectjoystick.generic.ownerdraw = Controls_DrawSmallText;
-	s_controls.selectjoystick.string			= "select joystick...";
-	s_controls.selectjoystick.color				= text_color_normal;
-	s_controls.selectjoystick.style				= UI_RIGHT|UI_SMALLFONT;
+	s_controls.selectjoy.generic.type		= MTYPE_PTEXT;
+	s_controls.selectjoy.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_controls.selectjoy.generic.x			= SCREEN_WIDTH/2;
+	s_controls.selectjoy.generic.id			= ID_SELECTJOY;
+	s_controls.selectjoy.generic.callback	= Controls_MenuEvent;
+	s_controls.selectjoy.generic.ownerdraw	= Controls_DrawSmallText;
+	s_controls.selectjoy.string				= "select joystick...";
+	s_controls.selectjoy.color				= text_color_normal;
+	s_controls.selectjoy.style				= UI_RIGHT|UI_SMALLFONT;
 #else
 	s_controls.joyenable.generic.type      = MTYPE_RADIOBUTTON;
 	s_controls.joyenable.generic.flags	   = QMF_SMALLFONT;
@@ -2372,7 +2379,7 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.zoomview );
 #endif
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
-	Menu_AddItem( &s_controls.menu, &s_controls.selectjoystick);
+	Menu_AddItem( &s_controls.menu, &s_controls.selectjoy );
 #else
 	Menu_AddItem( &s_controls.menu, &s_controls.joyenable );
 #endif
