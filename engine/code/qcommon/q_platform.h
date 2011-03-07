@@ -74,7 +74,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //================================================================= WIN64/32 ===
 
-#if defined(_WIN64) || defined(__WIN64__)
+#ifdef __WIN64__
 
 #undef QDECL
 #define QDECL __cdecl
@@ -98,7 +98,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define DLL_EXT ".dll"
 
-#elif defined(_WIN32) || defined(__WIN32__)
+#elif __WIN32__
 
 #undef QDECL
 #define QDECL __cdecl
@@ -154,16 +154,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //================================================================= LINUX ===
 
-#if defined(__linux__) || defined(__FreeBSD_kernel__)
+#ifdef __linux__
 
 #include <endian.h>
 
-#if defined(__linux__)
 #define OS_STRING "linux"
-#else
-#define OS_STRING "kFreeBSD"
-#endif
-
 #define ID_INLINE inline
 #define PATH_SEP '/'
 

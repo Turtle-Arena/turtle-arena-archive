@@ -643,10 +643,10 @@ static void LerpMeshVertexes_altivec(md3Surface_t *surf, float backlerp)
 {
 	short	*oldXyz, *newXyz, *oldNormals, *newNormals;
 	float	*outXyz, *outNormal;
-	float	oldXyzScale QALIGN(16);
-	float   newXyzScale QALIGN(16);
-	float	oldNormalScale QALIGN(16);
-	float newNormalScale QALIGN(16);
+	float	oldXyzScale ALIGN(16);
+	float   newXyzScale ALIGN(16);
+	float	oldNormalScale ALIGN(16);
+	float newNormalScale ALIGN(16);
 	int		vertNum;
 	unsigned lat, lng;
 	int		numVerts;
@@ -1254,6 +1254,36 @@ static void RB_SurfaceDisplayList( srfDisplayList_t *surf ) {
 	qglCallList( surf->listNum );
 }
 
+#ifdef WOLFET
+void RB_SurfacePolyBuffer( srfPolyBuffer_t *surf ) {
+	int i;
+
+	tess.numIndexes =   surf->pPolyBuffer->numIndicies;
+	tess.numVertexes =  surf->pPolyBuffer->numVerts;
+
+	for (i = 0; i < tess.numVertexes; i++)
+	{
+		tess.xyz[i][0] = surf->pPolyBuffer->xyz[i][0];
+		tess.xyz[i][1] = surf->pPolyBuffer->xyz[i][1];
+		tess.xyz[i][2] = surf->pPolyBuffer->xyz[i][2];
+		tess.xyz[i][3] = surf->pPolyBuffer->xyz[i][3];
+
+		tess.texCoords[i][0][0] = surf->pPolyBuffer->st[i][0];
+		tess.texCoords[i][0][1] = surf->pPolyBuffer->st[i][1];
+		
+		tess.vertexColors[i][0] = surf->pPolyBuffer->color[i][0];
+		tess.vertexColors[i][1] = surf->pPolyBuffer->color[i][1];
+		tess.vertexColors[i][2] = surf->pPolyBuffer->color[i][2];
+		tess.vertexColors[i][3] = surf->pPolyBuffer->color[i][3];
+	}
+
+	for (i = 0; i < tess.numIndexes; i++)
+	{
+		tess.indexes[i] = (glIndex_t)surf->pPolyBuffer->indicies[i];
+	}
+}
+#endif
+
 static void RB_SurfaceSkip( void *surf ) {
 }
 
@@ -1265,6 +1295,9 @@ void (*rb_surfaceTable[SF_NUM_SURFACE_TYPES])( void *) = {
 	(void(*)(void*))RB_SurfaceGrid,			// SF_GRID,
 	(void(*)(void*))RB_SurfaceTriangles,		// SF_TRIANGLES,
 	(void(*)(void*))RB_SurfacePolychain,		// SF_POLY,
+#ifdef WOLFET
+	(void(*)(void*))RB_SurfacePolyBuffer,		// SF_POLYBUFFER,
+#endif
 	(void(*)(void*))RB_SurfaceMesh,			// SF_MD3,
 	(void(*)(void*))RB_SurfaceAnim,			// SF_MD4,
 #ifdef RAVENMD4

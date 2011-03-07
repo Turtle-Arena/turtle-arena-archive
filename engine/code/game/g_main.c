@@ -118,9 +118,6 @@ vmCvar_t	g_teleportFluxTime;
 #ifdef IOQ3ZTM // LASERTAG
 vmCvar_t	g_laserTag;
 #endif
-#ifdef TA_PATHSYS // 2DMODE
-vmCvar_t	g_2dmode;
-#endif
 
 static cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -232,7 +229,7 @@ static cvarTable_t		gameCvarTable[] = {
 #ifdef IOQ3ZTM
 #ifdef TURTLEARENA // DEFAULT_TEAMS
 	{ &g_redteam, "g_redteam", "Foot", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
-	{ &g_blueteam, "g_blueteam", "Shell", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
+	{ &g_blueteam, "g_blueteam", "Katanas", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #else
 	{ &g_redteam, "g_redteam", "Stroggs", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
 	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
@@ -243,9 +240,6 @@ static cvarTable_t		gameCvarTable[] = {
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 	{ &g_laserTag, "g_laserTag", "0", CVAR_SERVERINFO, qtrue, qfalse},
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-	{ &g_2dmode, "g_2dmode", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
 #endif
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},
@@ -508,35 +502,6 @@ void G_UpdateCvars( void ) {
 		G_RemapTeamShaders();
 	}
 }
-
-#ifdef IOQ3ZTM
-/*
-=================
-G_CvarClearModification
-
-Useful for disabling "Server: $cvarNmae changed to $value" messaged caused by vmCvar_t::trackChange.
-=================
-*/
-void G_CvarClearModification( vmCvar_t *vmCvar ) {
-	int			i;
-	cvarTable_t	*cv;
-
-	if (!vmCvar) {
-		return;
-	}
-
-	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
-		if ( cv->vmCvar == vmCvar ) {
-			trap_Cvar_Update( cv->vmCvar );
-
-			if ( cv->modificationCount != cv->vmCvar->modificationCount ) {
-				cv->modificationCount = cv->vmCvar->modificationCount;
-				break;
-			}
-		}
-	}
-}
-#endif
 
 #ifdef IOQ3ZTM // MAP_ROTATION
 #define MAX_MAPS_PER_ROTATION	32
@@ -927,9 +892,6 @@ void AddTournamentPlayer( void ) {
 		}
 		// never select the dedicated follow or scoreboard clients
 		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD || 
-#ifdef TA_SPLITVIEW
-			client->sess.spectatorState == SPECTATOR_LOCAL_HIDE || 
-#endif
 			client->sess.spectatorClient < 0  ) {
 			continue;
 		}
@@ -1097,10 +1059,9 @@ void CalculateRanks( void ) {
 	level.numNonSpectatorClients = 0;
 	level.numPlayingClients = 0;
 	level.numVotingClients = 0;		// don't count bots
-
-	for (i = 0; i < ARRAY_LEN(level.numteamVotingClients); i++)
+	for ( i = 0; i < TEAM_NUM_TEAMS; i++ ) {
 		level.numteamVotingClients[i] = 0;
-
+	}
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		if ( level.clients[i].pers.connected != CON_DISCONNECTED ) {
 			level.sortedClients[level.numConnectedClients] = i;

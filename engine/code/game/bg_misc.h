@@ -775,7 +775,6 @@ typedef struct
 	// todo string
 	int standAnim;
 	int attackAnim[MAX_WG_ATK_ANIMS];
-	unsigned int numAttackAnims;
 } bg_weapongroup_anims_t;
 
 // cgame "_hands.md3"
@@ -1397,7 +1396,7 @@ extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 
 #ifdef TURTLEARENA // DEFAULT_TEAMS
 #define DEFAULT_REDTEAM_NAME		"Foot"
-#define DEFAULT_BLUETEAM_NAME		"Shell"
+#define DEFAULT_BLUETEAM_NAME		"Katanas"
 #else
 #define DEFAULT_REDTEAM_NAME		"Stroggs"
 #define DEFAULT_BLUETEAM_NAME		"Pagans"
@@ -1486,9 +1485,8 @@ animNumber_t BG_LegsStandForPlayerState(playerState_t *ps, bg_playercfg_t *playe
 animNumber_t BG_LegsAttackForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
 // For ui/q3_ui
 animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum);
-animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum, unsigned int atkIndex);
+animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
 animNumber_t BG_LegsStandForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum);
-animNumber_t BG_LegsAttackForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum, unsigned int atkIndex);
 
 qboolean BG_PlayerAttackAnim(animNumber_t aa);
 qboolean BG_PlayerStandAnim(bg_playercfg_t *playercfg, int prefixBit, animNumber_t aa);
@@ -1653,9 +1651,6 @@ typedef struct
 #define	PMF_BACKWARDS_RUN	16		// coast down to backwards run
 #define	PMF_TIME_LAND		32		// pm_time is time before rejump
 #define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
-#ifdef TA_SPLITVIEW
-#define PMF_LOCAL_HIDE		128
-#endif
 #define	PMF_TIME_WATERJUMP	256		// pm_time is waterjump
 #define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
 #define	PMF_USE_ITEM_HELD	1024
@@ -1928,4 +1923,30 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 // Set as defaults for g_saveVersions so server can tell if can load savefile.
 // They are setup in q3_ui/ui and game
 #define BG_SAVE_VERSIONS "5" // Example: "0;1;2;3"
+#endif
+
+#ifdef WOLFET
+#define MAX_MAP_SIZE 65536
+
+//
+// bg_tracemap.c
+//
+// ZTM: Add sturcture based on pmove_t to properly call trace and pointcontents
+typedef struct
+{
+	// callbacks to test the world
+	// these will be different functions during game and cgame
+	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
+	int			(*pointcontents)( const vec3_t point, int passEntityNum );
+} bgGenTracemap_t;
+
+void BG_GenerateTracemap(const char *mapname, vec3_t mapcoordsMins, vec3_t mapcoordsMaxs, bgGenTracemap_t *gen);
+
+qboolean BG_LoadTraceMap( char *rawmapname, vec2_t world_mins, vec2_t world_maxs );
+float BG_GetSkyHeightAtPoint( vec3_t pos );
+float BG_GetSkyGroundHeightAtPoint( vec3_t pos );
+float BG_GetGroundHeightAtPoint( vec3_t pos );
+int BG_GetTracemapGroundFloor( void );
+int BG_GetTracemapGroundCeil( void );
+void etpro_FinalizeTracemapClamp( int *x, int *y );
 #endif

@@ -43,14 +43,14 @@ An item fires all of its targets when it is picked up.  If the toucher can't car
 */
 
 #ifdef TA_WEAPSYS
-#define EMPTY_GITEM "item_dummy", \
+#define EMPTY_GITEM "item_health_small", \
 		"sound/items/s_health.wav", \
-        { "models/powerups/holdable/medkit.md3", \
+        { "models/powerups/health/small.md3", \
 		NULL, \
 		NULL, NULL }, \
-		"icons/iconh_mega", \
-		"Dummy", \
-		1, \
+		"icons/iconh_small", \
+		"5 Health", \
+		5, \
 		IT_HEALTH, \
 		0, \
 		"", \
@@ -2669,17 +2669,6 @@ static qboolean WeaponGroupAnims_Parse(char **p, bg_weapongroup_anims_t *anims) 
 		token = COM_ParseExt(p, qtrue);
 
 		if (Q_stricmp(token, "}") == 0) {
-			// Count the number of valid attack animations
-			for (anims->numAttackAnims = 0; anims->numAttackAnims < MAX_WG_ATK_ANIMS; anims->numAttackAnims++) {
-				if (anims->attackAnim[anims->numAttackAnims] == 0) {
-					break;
-				}
-			}
-			if (anims->numAttackAnims < 1) {
-				anims->attackAnim[0] = TORSO_ATTACK;
-				anims->numAttackAnims = 1;
-			}
-
 			return qtrue;
 		}
 
@@ -2753,10 +2742,8 @@ static void BG_SetupWeaponGroup(bg_weapongroupinfo_t *weaponGroup, bg_iteminfo_t
 		// Setup Animations
 		weaponGroup->normalAnims.standAnim = TORSO_STAND;
 		weaponGroup->normalAnims.attackAnim[0] = TORSO_ATTACK;
-		weaponGroup->normalAnims.numAttackAnims = 1;
 		weaponGroup->primaryAnims.standAnim = TORSO_STAND2;
 		weaponGroup->primaryAnims.attackAnim[0] = TORSO_ATTACK2;
-		weaponGroup->primaryAnims.numAttackAnims = 1;
 
 		// Set item pointer to non-NULL
 		weaponGroup->item = &bg_iteminfo[0];
@@ -2983,9 +2970,9 @@ void BG_DumpWeaponInfo(void)
 	}
 
 #define FS_Printf1(x) { text[0] = 0; trap_FS_Write(x, strlen(x)+1, f); }
-#define FS_Printf2(x, y) { text[0] = 0; Com_sprintf(text, sizeof (text), x, y); trap_FS_Write(text, strlen(text)+1, f); }
-#define FS_Printf3(x, y, z) { text[0] = 0; Com_sprintf(text, sizeof (text), x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
-#define FS_Printf4(w, x, y, z) { text[0] = 0; Com_sprintf(text, sizeof (text), w, x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf2(x, y) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf3(x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf4(w, x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), w, x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
 
 	FS_Printf1("// ZTM: TODO: Dump items\n\n");
 
@@ -3244,9 +3231,7 @@ void BG_InitItemInfo(void)
 		}
 
 		strcpy(bg_iteminfo[num].classname, bg_itemlist[i].classname);
-		if (bg_itemlist[i].pickup_sound != NULL) {
-			strcpy(bg_iteminfo[num].pickup_sound, bg_itemlist[i].pickup_sound);
-		}
+		strcpy(bg_iteminfo[num].pickup_sound, bg_itemlist[i].pickup_sound);
 
 		for (j = 0; j < MAX_ITEM_MODELS; j++) {
 			if (bg_itemlist[i].world_model[j] != NULL) {
@@ -3254,12 +3239,8 @@ void BG_InitItemInfo(void)
 			}
 		}
 
-		if (bg_itemlist[i].icon != NULL) {
-			strcpy(bg_iteminfo[num].icon, bg_itemlist[i].icon);
-		}
-		if (bg_itemlist[i].pickup_name != NULL) {
-			strcpy(bg_iteminfo[num].pickup_name, bg_itemlist[i].pickup_name);
-		}
+		strcpy(bg_iteminfo[num].icon, bg_itemlist[i].icon);
+		strcpy(bg_iteminfo[num].pickup_name, bg_itemlist[i].pickup_name);
 
 		bg_iteminfo[num].quantity = bg_itemlist[i].quantity;
 		bg_iteminfo[num].giType = bg_itemlist[i].giType;
@@ -3380,6 +3361,7 @@ BG_MaxAttackIndex
 int BG_MaxAttackIndex(playerState_t *ps)
 {
 	bg_weapongroup_anims_t *anims;
+	int max_combo;
 
 	// Select animations to count
 	if (ps->eFlags & EF_PRIMARY_HAND) {
@@ -3388,7 +3370,18 @@ int BG_MaxAttackIndex(playerState_t *ps)
 		anims = &bg_weapongroupinfo[ps->weapon].normalAnims;
 	}
 
-	return anims->numAttackAnims;
+	// Count the number of valid attack animations
+	for (max_combo = 0; max_combo < MAX_WG_ATK_ANIMS; max_combo++) {
+		if (anims->attackAnim[max_combo] == 0) {
+			break;
+		}
+	}
+
+	if (max_combo < 1) {
+		max_combo = 1;
+	}
+
+	return max_combo;
 }
 
 /*
@@ -3403,7 +3396,7 @@ int BG_AttackIndexForPlayerState(playerState_t *ps)
 	int max_combo = BG_MaxAttackIndex(ps);
 	int atkIndex;
 
-	if (max_combo <= 1) {
+	if (max_combo == 1) {
 		return 0;
 	}
 
@@ -3922,10 +3915,9 @@ BG_TorsoAttackForWeapon
 For ui/q3_ui
 ==============
 */
-animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum, unsigned int atkIndex)
+animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum)
 {
-	atkIndex = atkIndex % bg_weapongroupinfo[weaponnum].normalAnims.numAttackAnims;
-	return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[atkIndex];
+	return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[0];
 }
 
 /*
@@ -3942,23 +3934,6 @@ animNumber_t BG_LegsStandForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum
 	}
 
 	return LEGS_IDLE;
-}
-
-/*
-==============
-BG_LegsAttackForWeapon
-
-For ui/q3_ui
-==============
-*/
-animNumber_t BG_LegsAttackForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum, unsigned int atkIndex)
-{
-	atkIndex = atkIndex % bg_weapongroupinfo[weaponnum].normalAnims.numAttackAnims;
-	if (playercfg && playercfg->animations[bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[atkIndex]].prefixType & AP_LEGS) {
-		return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[atkIndex];
-	}
-
-	return -1;
 }
 
 qboolean BG_PlayerAttackAnim(animNumber_t aa)
@@ -4086,7 +4061,7 @@ qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt)
 qboolean BG_WeapUseAmmo(weapon_t w)
 {
 	// Check if the weapon group uses ammo
-	return (bg_weapongroupinfo[w].item && bg_weapongroupinfo[w].item->quantity > 0);
+	return (bg_weapongroupinfo[w].item->quantity > 0);
 }
 
 /*
@@ -6713,8 +6688,9 @@ strAnimationDef_t objectAnimationDefs[] = {
 	ANIMDEF(OBJECT_DEAD2),
 	ANIMDEF(OBJECT_DEAD3),
 	ANIMDEF(OBJECT_LAND),
-	ANIMDEF(OBJECT_PAIN),
+	ANIMDEF(OBJECT_PAIN)
 #ifdef TA_NPCSYS
+	,
 	ANIMDEF(OBJECT_TAUNT),
 	ANIMDEF(OBJECT_ATTACK_FAR),
 	ANIMDEF(OBJECT_ATTACK_MELEE),

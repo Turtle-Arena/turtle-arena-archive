@@ -14,12 +14,12 @@
    height="256"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.0 r9654"
+   inkscape:version="0.47 r22583"
    style="display:inline;enable-background:new"
-   sodipodi:docname="titlebanner.svg"
-   inkscape:export-filename="/home/zack/Turtle_Arena_svn/trunk/base-src/menu/art/titlebanner.png"
-   inkscape:export-xdpi="180"
-   inkscape:export-ydpi="180">
+   sodipodi:docname="logo.svg"
+   inkscape:export-filename="/home/zack/Turtle_Arena_svn/trunk/base-src/logo.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs4">
     <linearGradient
@@ -249,9 +249,9 @@
      inkscape:current-layer="layer3"
      showgrid="false"
      inkscape:window-width="1152"
-     inkscape:window-height="790"
+     inkscape:window-height="789"
      inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-y="25"
      inkscape:window-maximized="1"
      showborder="true"
      inkscape:showpageshadow="true" />
@@ -263,7 +263,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>

@@ -65,9 +65,7 @@ typedef struct
 #define C_LOOKING		1
 #define C_WEAPONS		2
 #define C_MISC			3
-#ifndef TA_SPLITVIEW
 #define C_MAX			4
-#endif
 
 #define ID_MOVEMENT		100
 #define ID_LOOKING		101
@@ -141,11 +139,7 @@ enum {
 #endif
 	ID_AUTOSWITCH,
 	ID_MOUSESPEED,
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	ID_SELECTJOY,
-#else
 	ID_JOYENABLE,
-#endif
 	ID_JOYTHRESHOLD,
 	ID_SMOOTHMOUSE
 };
@@ -192,9 +186,6 @@ typedef struct
 	menutext_s			looking;
 	menutext_s			weapons;
 	menutext_s			misc;
-#ifdef IOQ3ZTM
-	menutext_s			defaults;
-#endif
 
 	menuaction_s		walkforward;
 	menuaction_s		backpedal;
@@ -262,11 +253,7 @@ typedef struct
 	menuaction_s		chat2;
 	menuaction_s		chat3;
 	menuaction_s		chat4;
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	menutext_s			selectjoy;
-#else
 	menuradiobutton_s	joyenable;
-#endif
 	menuslider_s		joythreshold;
 	int					section;
 	qboolean			waitingforkey;
@@ -280,11 +267,6 @@ typedef struct
 
 	menubitmap_s		back;
 	menutext_s			name;
-#ifdef TA_SPLITVIEW
-	int					localClient;
-	menucommon_s		***controls;
-	bind_t				*bindings;
-#endif
 } controls_t; 	
 
 static controls_t s_controls;
@@ -358,232 +340,18 @@ static bind_t g_bindings[] =
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
 };
 
-#ifdef TA_SPLITVIEW
-#define MINIBIND(id, d1,d2) {(char*)NULL, (char*)NULL, (id), 0, (d1), (d2), -1, -1}
-
-static bind_t g_bindings2[] =
-{
-	MINIBIND(ID_SHOWSCORES, -1, -1),
-	MINIBIND(ID_USEITEM, -1, -1),
-#ifndef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
-	MINIBIND(ID_SPEED, -1, -1),
-#endif
-	MINIBIND(ID_FORWARD, -1, -1),
-	MINIBIND(ID_BACKPEDAL, -1, -1),
-	MINIBIND(ID_MOVELEFT, -1, -1),
-	MINIBIND(ID_MOVERIGHT, -1, -1),
-	MINIBIND(ID_MOVEUP, -1, -1),
-	MINIBIND(ID_MOVEDOWN, -1, -1),
-	MINIBIND(ID_LEFT, -1, -1),
-	MINIBIND(ID_RIGHT, -1, -1),
-	MINIBIND(ID_STRAFE, -1, -1),
-	MINIBIND(ID_LOOKUP, -1, -1),
-	MINIBIND(ID_LOOKDOWN, -1, -1),
-	MINIBIND(ID_MOUSELOOK, -1, -1),
-	MINIBIND(ID_CENTERVIEW, -1, -1),
-#ifdef TURTLEARENA // LOCKON
-	MINIBIND(ID_LOCKON, -1, -1),
-#endif
-#ifndef TURTLEARENA // NOZOOM
-	MINIBIND(ID_ZOOMVIEW, -1, -1),
-#endif
-#ifndef TA_WEAPSYS_EX
-	MINIBIND(ID_WEAPON1, -1, -1),
-	MINIBIND(ID_WEAPON2, -1, -1),
-	MINIBIND(ID_WEAPON3, -1, -1),
-	MINIBIND(ID_WEAPON4, -1, -1),
-	MINIBIND(ID_WEAPON5, -1, -1),
-	MINIBIND(ID_WEAPON6, -1, -1),
-	MINIBIND(ID_WEAPON7, -1, -1),
-	MINIBIND(ID_WEAPON8, -1, -1),
-	MINIBIND(ID_WEAPON9, -1, -1),
-#endif
-	MINIBIND(ID_ATTACK, -1, -1),
-#ifdef TA_WEAPSYS_EX
-	MINIBIND(ID_WEAPDROP, -1, -1),
-#else
-	MINIBIND(ID_WEAPPREV, -1, -1),
-	MINIBIND(ID_WEAPNEXT, -1, -1),
-#endif
-	MINIBIND(ID_GESTURE, -1, -1),
-	MINIBIND(ID_CHAT, -1, -1),
-	MINIBIND(ID_CHAT2, -1, -1),
-	MINIBIND(ID_CHAT3, -1, -1),
-	MINIBIND(ID_CHAT4, -1, -1),
-#ifdef TA_HOLDSYS/*2*/
-	MINIBIND(ID_NEXTITEM, -1, -1),
-	MINIBIND(ID_PREVITEM, -1, -1),
-#endif
-#ifdef TA_MISC // DROP_FLAG
-	MINIBIND(ID_DROPFLAG, -1, -1),
-#endif
-	MINIBIND(0, -1, -1),
-};
-
-static bind_t g_bindings3[] =
-{
-	MINIBIND(ID_SHOWSCORES, -1, -1),
-	MINIBIND(ID_USEITEM, -1, -1),
-#ifndef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
-	MINIBIND(ID_SPEED, -1, -1),
-#endif
-	MINIBIND(ID_FORWARD, -1, -1),
-	MINIBIND(ID_BACKPEDAL, -1, -1),
-	MINIBIND(ID_MOVELEFT, -1, -1),
-	MINIBIND(ID_MOVERIGHT, -1, -1),
-	MINIBIND(ID_MOVEUP, -1, -1),
-	MINIBIND(ID_MOVEDOWN, -1, -1),
-	MINIBIND(ID_LEFT, -1, -1),
-	MINIBIND(ID_RIGHT, -1, -1),
-	MINIBIND(ID_STRAFE, -1, -1),
-	MINIBIND(ID_LOOKUP, -1, -1),
-	MINIBIND(ID_LOOKDOWN, -1, -1),
-	MINIBIND(ID_MOUSELOOK, -1, -1),
-	MINIBIND(ID_CENTERVIEW, -1, -1),
-#ifdef TURTLEARENA // LOCKON
-	MINIBIND(ID_LOCKON, -1, -1),
-#endif
-#ifndef TURTLEARENA // NOZOOM
-	MINIBIND(ID_ZOOMVIEW, -1, -1),
-#endif
-#ifndef TA_WEAPSYS_EX
-	MINIBIND(ID_WEAPON1, -1, -1),
-	MINIBIND(ID_WEAPON2, -1, -1),
-	MINIBIND(ID_WEAPON3, -1, -1),
-	MINIBIND(ID_WEAPON4, -1, -1),
-	MINIBIND(ID_WEAPON5, -1, -1),
-	MINIBIND(ID_WEAPON6, -1, -1),
-	MINIBIND(ID_WEAPON7, -1, -1),
-	MINIBIND(ID_WEAPON8, -1, -1),
-	MINIBIND(ID_WEAPON9, -1, -1),
-#endif
-	MINIBIND(ID_ATTACK, -1, -1),
-#ifdef TA_WEAPSYS_EX
-	MINIBIND(ID_WEAPDROP, -1, -1),
-#else
-	MINIBIND(ID_WEAPPREV, -1, -1),
-	MINIBIND(ID_WEAPNEXT, -1, -1),
-#endif
-	MINIBIND(ID_GESTURE, -1, -1),
-	MINIBIND(ID_CHAT, -1, -1),
-	MINIBIND(ID_CHAT2, -1, -1),
-	MINIBIND(ID_CHAT3, -1, -1),
-	MINIBIND(ID_CHAT4, -1, -1),
-#ifdef TA_HOLDSYS/*2*/
-	MINIBIND(ID_NEXTITEM, -1, -1),
-	MINIBIND(ID_PREVITEM, -1, -1),
-#endif
-#ifdef TA_MISC // DROP_FLAG
-	MINIBIND(ID_DROPFLAG, -1, -1),
-#endif
-	MINIBIND(0, -1, -1),
-};
-
-static bind_t g_bindings4[] =
-{
-	MINIBIND(ID_SHOWSCORES, -1, -1),
-	MINIBIND(ID_USEITEM, -1, -1),
-#ifndef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
-	MINIBIND(ID_SPEED, -1, -1),
-#endif
-	MINIBIND(ID_FORWARD, -1, -1),
-	MINIBIND(ID_BACKPEDAL, -1, -1),
-	MINIBIND(ID_MOVELEFT, -1, -1),
-	MINIBIND(ID_MOVERIGHT, -1, -1),
-	MINIBIND(ID_MOVEUP, -1, -1),
-	MINIBIND(ID_MOVEDOWN, -1, -1),
-	MINIBIND(ID_LEFT, -1, -1),
-	MINIBIND(ID_RIGHT, -1, -1),
-	MINIBIND(ID_STRAFE, -1, -1),
-	MINIBIND(ID_LOOKUP, -1, -1),
-	MINIBIND(ID_LOOKDOWN, -1, -1),
-	MINIBIND(ID_MOUSELOOK, -1, -1),
-	MINIBIND(ID_CENTERVIEW, -1, -1),
-#ifdef TURTLEARENA // LOCKON
-	MINIBIND(ID_LOCKON, -1, -1),
-#endif
-#ifndef TURTLEARENA // NOZOOM
-	MINIBIND(ID_ZOOMVIEW, -1, -1),
-#endif
-#ifndef TA_WEAPSYS_EX
-	MINIBIND(ID_WEAPON1, -1, -1),
-	MINIBIND(ID_WEAPON2, -1, -1),
-	MINIBIND(ID_WEAPON3, -1, -1),
-	MINIBIND(ID_WEAPON4, -1, -1),
-	MINIBIND(ID_WEAPON5, -1, -1),
-	MINIBIND(ID_WEAPON6, -1, -1),
-	MINIBIND(ID_WEAPON7, -1, -1),
-	MINIBIND(ID_WEAPON8, -1, -1),
-	MINIBIND(ID_WEAPON9, -1, -1),
-#endif
-	MINIBIND(ID_ATTACK, -1, -1),
-#ifdef TA_WEAPSYS_EX
-	MINIBIND(ID_WEAPDROP, -1, -1),
-#else
-	MINIBIND(ID_WEAPPREV, -1, -1),
-	MINIBIND(ID_WEAPNEXT, -1, -1),
-#endif
-	MINIBIND(ID_GESTURE, -1, -1),
-	MINIBIND(ID_CHAT, -1, -1),
-	MINIBIND(ID_CHAT2, -1, -1),
-	MINIBIND(ID_CHAT3, -1, -1),
-	MINIBIND(ID_CHAT4, -1, -1),
-#ifdef TA_HOLDSYS/*2*/
-	MINIBIND(ID_NEXTITEM, -1, -1),
-	MINIBIND(ID_PREVITEM, -1, -1),
-#endif
-#ifdef TA_MISC // DROP_FLAG
-	MINIBIND(ID_DROPFLAG, -1, -1),
-#endif
-	MINIBIND(0, -1, -1),
-};
-
-bind_t *g_bindings_list[MAX_SPLITVIEW] =
-{
-	g_bindings,
-	g_bindings2,
-	g_bindings3,
-	g_bindings4
-};
-#endif
-
 static configcvar_t g_configcvars[] =
 {
 #ifndef TURTLEARENA // ALWAYS_RUN
-#ifdef TA_SPLITVIEW
 	{"cl_run",			0,					0},
-	{"2cl_run",			0,					0},
-	{"3cl_run",			0,					0},
-	{"4cl_run",			0,					0},
-#else
-	{"cl_run",			0,					0},
-#endif
 #endif
 	{"m_pitch",			0,					0},
 #ifndef TA_WEAPSYS_EX
-#ifdef TA_SPLITVIEW
 	{"cg_autoswitch",	0,					0},
-	{"2cg_autoswitch",	0,					0},
-	{"3cg_autoswitch",	0,					0},
-	{"4cg_autoswitch",	0,					0},
-#else
-	{"cg_autoswitch",	0,					0},
-#endif
 #endif
 	{"sensitivity",		0,					0},
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-#ifdef TA_SPLITVIEW
-	{"in_joystickThreshold",	0,			0},
-	{"2in_joystickThreshold",	0,			0},
-	{"3in_joystickThreshold",	0,			0},
-	{"4in_joystickThreshold",	0,			0},
-#else
-	{"in_joystickThreshold",	0,			0},
-#endif
-#else
 	{"in_joystick",		0,					0},
 	{"joy_threshold",	0,					0},
-#endif
 	{"m_filter",		0,					0},
 	{"cl_freelook",		0,					0},
 	{NULL,				0,					0}
@@ -645,11 +413,7 @@ static menucommon_s *g_looking_controls[] = {
 #ifndef TURTLEARENA // NOZOOM
 	(menucommon_s *)&s_controls.zoomview,
 #endif
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	(menucommon_s *)&s_controls.selectjoy,
-#else
 	(menucommon_s *)&s_controls.joyenable,
-#endif
 	(menucommon_s *)&s_controls.joythreshold,
 	NULL,
 };
@@ -677,67 +441,7 @@ static menucommon_s **g_controls[] = {
 	g_looking_controls,
 	g_weapons_controls,
 	g_misc_controls,
-#ifdef TA_SPLITVIEW
-	NULL,
-#endif
 };
-
-#ifdef TA_SPLITVIEW
-static menucommon_s *g_looking_mini_controls[] = {
-	(menucommon_s *)&s_controls.lookup,
-	(menucommon_s *)&s_controls.lookdown,
-	(menucommon_s *)&s_controls.centerview,
-#ifndef TURTLEARENA // NOZOOM
-	(menucommon_s *)&s_controls.zoomview,
-#endif
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	(menucommon_s *)&s_controls.selectjoy,
-#else
-	(menucommon_s *)&s_controls.joyenable,
-#endif
-	(menucommon_s *)&s_controls.joythreshold,
-	NULL,
-};
-
-static menucommon_s *g_misc_mini_controls[] = {
-#ifdef TA_MISC // DROP_FLAG
-	(menucommon_s *)&s_controls.dropflag,
-#endif
-	(menucommon_s *)&s_controls.useitem,
-#ifdef TA_HOLDSYS/*2*/
-	(menucommon_s *)&s_controls.nextitem,
-	(menucommon_s *)&s_controls.previtem,
-#endif
-	(menucommon_s *)&s_controls.gesture,
-	NULL,
-};
-
-static menucommon_s *g_unused_controls[] = {
-	// looking
-	(menucommon_s *)&s_controls.sensitivity,
-	(menucommon_s *)&s_controls.smoothmouse,
-	(menucommon_s *)&s_controls.invertmouse,
-	(menucommon_s *)&s_controls.mouselook,
-	(menucommon_s *)&s_controls.freelook,
-
-	// misc
-	(menucommon_s *)&s_controls.showscores,
-	(menucommon_s *)&s_controls.chat,
-	(menucommon_s *)&s_controls.chat2,
-	(menucommon_s *)&s_controls.chat3,
-	(menucommon_s *)&s_controls.chat4,
-	NULL,
-};
-
-static menucommon_s **g_mini_controls[] = {
-	g_movement_controls,
-	g_looking_mini_controls,
-	g_weapons_controls,
-	g_misc_mini_controls,
-	g_unused_controls, // dummy controls that are not used but are disabled so they are not seen.
-	NULL
-};
-#endif
 
 /*
 =================
@@ -979,27 +683,14 @@ static void Controls_Update( void ) {
 	menucommon_s	*control;
 
 	// disable all controls in all groups
-#ifdef TA_SPLITVIEW
-	for( i = 0; s_controls.controls[i] != NULL; i++ )
-#else
-	for( i = 0; i < C_MAX; i++ )
-#endif
-	{
-#ifdef TA_SPLITVIEW
-		controls = s_controls.controls[i];
-#else
+	for( i = 0; i < C_MAX; i++ ) {
 		controls = g_controls[i];
-#endif
 		for( j = 0;  (control = controls[j]) ; j++ ) {
 			control->flags |= (QMF_HIDDEN|QMF_INACTIVE);
 		}
 	}
 
-#ifdef TA_SPLITVIEW
-	controls = s_controls.controls[s_controls.section];
-#else
 	controls = g_controls[s_controls.section];
-#endif
 
 	// enable controls in active group (and count number of items for vertical centering)
 	for( j = 0;  (control = controls[j]) ; j++ ) {
@@ -1088,7 +779,6 @@ static void Controls_DrawKeyBinding( void *self )
 	qboolean		c;
 	char			name[32];
 	char			name2[32];
-	bind_t			*bindptr;
 
 	a = (menuaction_s*) self;
 
@@ -1097,13 +787,7 @@ static void Controls_DrawKeyBinding( void *self )
 
 	c = (Menu_ItemAtCursor( a->generic.parent ) == a);
 
-#ifdef TA_SPLITVIEW
-	bindptr = &s_controls.bindings[a->generic.id];
-#else
-	bindptr = &g_bindings[a->generic.id];
-#endif
-
-	b1 = bindptr->bind1;
+	b1 = g_bindings[a->generic.id].bind1;
 	if (b1 == -1)
 		strcpy(name,"???");
 	else
@@ -1111,7 +795,7 @@ static void Controls_DrawKeyBinding( void *self )
 		trap_Key_KeynumToStringBuf( b1, name, 32 );
 		Q_strupr(name);
 
-		b2 = bindptr->bind2;
+		b2 = g_bindings[a->generic.id].bind2;
 		if (b2 != -1)
 		{
 			trap_Key_KeynumToStringBuf( b2, name2, 32 );
@@ -1161,47 +845,6 @@ static void Controls_DrawKeyBinding( void *self )
 	}
 }
 
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-/*
-=================
-Controls_DrawSmallText
-=================
-*/
-static void Controls_DrawSmallText( void *self )
-{
-	menutext_s *text;
-	int x, y;
-	qboolean c;
-
-	text = (menutext_s*) self;
-
-	c = (Menu_ItemAtCursor( text->generic.parent ) == text);
-
-	x =	text->generic.x;
-	y = text->generic.y;
-
-	if (c)
-	{
-		UI_FillRect( text->generic.left, text->generic.top, text->generic.right-text->generic.left+1, text->generic.bottom-text->generic.top+1, listbar_color ); 
-
-		UI_DrawString( x - SMALLCHAR_WIDTH, y, text->string, UI_RIGHT|UI_SMALLFONT, text_color_highlight );
-
-		UI_DrawString(SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.80, "CLICK to change", UI_SMALLFONT|UI_CENTER, colorWhite );
-	}
-	else
-	{
-		if (text->generic.flags & QMF_GRAYED)
-		{
-			UI_DrawString( x - SMALLCHAR_WIDTH, y, text->string, UI_RIGHT|UI_SMALLFONT, text_color_disabled );
-		}
-		else
-		{
-			UI_DrawString( x - SMALLCHAR_WIDTH, y, text->string, UI_RIGHT|UI_SMALLFONT, text_color_normal );
-		}
-	}
-}
-#endif
-
 /*
 =================
 Controls_StatusBar
@@ -1222,11 +865,7 @@ static void Controls_DrawPlayer( void *self ) {
 	menubitmap_s	*b;
 	char			buf[MAX_QPATH];
 
-#ifdef TA_SPLITVIEW
-	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_controls.localClient, "model"), buf, sizeof( buf ) );
-#else
 	trap_Cvar_VariableStringBuffer( "model", buf, sizeof( buf ) );
-#endif
 	if ( strcmp( buf, s_controls.playerModel ) != 0 ) {
 		UI_PlayerInfo_SetModel( &s_controls.playerinfo, buf );
 		strcpy( s_controls.playerModel, buf );
@@ -1275,9 +914,6 @@ Controls_GetConfig
 static void Controls_GetConfig( void )
 {
 	int		i;
-#ifdef TA_SPLITVIEW
-	int		j;
-#endif
 	int		twokeys[2];
 	bind_t*	bindptr;
 
@@ -1290,38 +926,11 @@ static void Controls_GetConfig( void )
 		if (!bindptr->label)
 			break;
 
-#ifdef TA_SPLITVIEW
-		for (j = 0; j < MAX_SPLITVIEW; j++) {
-			Controls_GetKeyAssignment(Com_LocalClientCvarName(j, bindptr->command), twokeys);
-
-			g_bindings_list[j][i].bind1 = twokeys[0];
-			g_bindings_list[j][i].bind2 = twokeys[1];
-		}
-#else
 		Controls_GetKeyAssignment(bindptr->command, twokeys);
 
 		bindptr->bind1 = twokeys[0];
 		bindptr->bind2 = twokeys[1];
-#endif
 	}
-
-#ifdef TA_SPLITVIEW
-	if (s_controls.localClient != 0) {
-#ifndef TURTLEARENA // ALWAYS_RUN
-		s_controls.alwaysrun.curvalue = UI_ClampCvar( 0, 1, Controls_GetCvarValue( Com_LocalClientCvarName(s_controls.localClient, "cl_run" ) ) );
-#endif
-#ifndef TA_WEAPSYS_EX
-		s_controls.autoswitch.curvalue = UI_ClampCvar( 0, 1, Controls_GetCvarValue( Com_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) ) );
-#endif
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-		s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( Com_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ) ) );
-#else
-		s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( Com_LocalClientCvarName(s_controls.localClient, "joy_threshold" ) ) );
-#endif
-
-		return;
-	}
-#endif
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarValue( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "m_filter" ) );
@@ -1332,12 +941,8 @@ static void Controls_GetConfig( void )
 	s_controls.autoswitch.curvalue   = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cg_autoswitch" ) );
 #endif
 	s_controls.sensitivity.curvalue  = UI_ClampCvar( 2, 30, Controls_GetCvarValue( "sensitivity" ) );
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( "in_joystickThreshold" ) );
-#else
 	s_controls.joyenable.curvalue    = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "in_joystick" ) );
 	s_controls.joythreshold.curvalue = UI_ClampCvar( 0.05f, 0.75f, Controls_GetCvarValue( "joy_threshold" ) );
-#endif
 	s_controls.freelook.curvalue     = UI_ClampCvar( 0, 1, Controls_GetCvarValue( "cl_freelook" ) );
 }
 
@@ -1349,9 +954,6 @@ Controls_SetConfig
 static void Controls_SetConfig( void )
 {
 	int		i;
-#ifdef TA_SPLITVIEW
-	int		j;
-#endif
 	bind_t*	bindptr;
 
 	// set the bindings from the local store
@@ -1363,45 +965,14 @@ static void Controls_SetConfig( void )
 		if (!bindptr->label)
 			break;
 
-#ifdef TA_SPLITVIEW
-		for (j = 0; j < MAX_SPLITVIEW; j++) {
-			if (g_bindings_list[j][i].bind1 != -1)
-			{
-				trap_Key_SetBinding( g_bindings_list[j][i].bind1, Com_LocalClientCvarName(j, bindptr->command) );
-
-				if (g_bindings_list[j][i].bind2 != -1)
-					trap_Key_SetBinding( g_bindings_list[j][i].bind2, Com_LocalClientCvarName(j, bindptr->command) );
-			}
-		}
-#else
 		if (bindptr->bind1 != -1)
-		{
+		{	
 			trap_Key_SetBinding( bindptr->bind1, bindptr->command );
 
 			if (bindptr->bind2 != -1)
 				trap_Key_SetBinding( bindptr->bind2, bindptr->command );
 		}
-#endif
 	}
-
-#ifdef TA_SPLITVIEW
-	if (s_controls.localClient != 0) {
-#ifndef TURTLEARENA // ALWAYS_RUN
-		trap_Cvar_SetValue( Com_LocalClientCvarName(s_controls.localClient, "cl_run" ), s_controls.alwaysrun.curvalue );
-#endif
-#ifndef TA_WEAPSYS_EX
-		trap_Cvar_SetValue( Com_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ), s_controls.autoswitch.curvalue );
-#endif
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-		trap_Cvar_SetValue( Com_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ), s_controls.joythreshold.curvalue );
-#else
-		trap_Cvar_SetValue( Com_LocalClientCvarName(s_controls.localClient, "joy_threshold" ), s_controls.joythreshold.curvalue );
-
-		trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
-#endif
-		return;
-	}
-#endif
 
 	if ( s_controls.invertmouse.curvalue )
 		trap_Cvar_SetValue( "m_pitch", -fabs( trap_Cvar_VariableValue( "m_pitch" ) ) );
@@ -1416,16 +987,10 @@ static void Controls_SetConfig( void )
 	trap_Cvar_SetValue( "cg_autoswitch", s_controls.autoswitch.curvalue );
 #endif
 	trap_Cvar_SetValue( "sensitivity", s_controls.sensitivity.curvalue );
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	trap_Cvar_SetValue( "in_joystickThreshold", s_controls.joythreshold.curvalue );
-#else
 	trap_Cvar_SetValue( "in_joystick", s_controls.joyenable.curvalue );
 	trap_Cvar_SetValue( "joy_threshold", s_controls.joythreshold.curvalue );
-#endif
 	trap_Cvar_SetValue( "cl_freelook", s_controls.freelook.curvalue );
-#ifndef IOQ3ZTM // SELECT_JOYSTICK
 	trap_Cmd_ExecuteText( EXEC_APPEND, "in_restart\n" );
-#endif
 }
 
 /*
@@ -1439,56 +1004,17 @@ static void Controls_SetDefaults( void )
 	bind_t*	bindptr;
 
 	// set the bindings from the local store
-#ifdef TA_SPLITVIEW
-	bindptr = s_controls.bindings;
-#else
 	bindptr = g_bindings;
-#endif
 
 	// iterate each command, set its default binding
 	for (i=0; ;i++,bindptr++)
 	{
-#ifdef TA_SPLITVIEW
-		if (!g_bindings[i].label)
-#else
 		if (!bindptr->label)
-#endif
 			break;
 
-#ifdef IOQ3ZTM
-		if ( bindptr->defaultbind1 == -1 && bindptr->bind1 != -1 ) {
-			trap_Key_SetBinding( bindptr->bind1, "" );
-			bindptr->bind1 = -1;
-		}
-		if ( bindptr->defaultbind2 == -1 && bindptr->bind2 != -1 ) {
-			trap_Key_SetBinding( bindptr->bind2, "" );
-			bindptr->bind2 = -1;
-		}
-#endif
 		bindptr->bind1 = bindptr->defaultbind1;
 		bindptr->bind2 = bindptr->defaultbind2;
 	}
-
-#ifdef TA_SPLITVIEW
-	if (s_controls.localClient != 0) {
-#ifndef TURTLEARENA // ALWAYS_RUN
-		s_controls.alwaysrun.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "cl_run" ) );
-#endif
-#ifndef TA_WEAPSYS_EX
-		s_controls.autoswitch.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "cg_autoswitch" ) );
-#endif
-
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-		trap_Cvar_SetValue(Com_LocalClientCvarName(s_controls.localClient, "in_joystick"), 0);
-		trap_Cvar_SetValue(Com_LocalClientCvarName(s_controls.localClient, "in_joystickNo"), 0);
-		s_controls.joythreshold.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "in_joystickThreshold" ) );
-#else
-		s_controls.joythreshold.curvalue = Controls_GetCvarDefault( Com_LocalClientCvarName(s_controls.localClient, "joy_threshold" ) );
-#endif
-
-		return;
-	}
-#endif
 
 	s_controls.invertmouse.curvalue  = Controls_GetCvarDefault( "m_pitch" ) < 0;
 	s_controls.smoothmouse.curvalue  = Controls_GetCvarDefault( "m_filter" );
@@ -1499,14 +1025,8 @@ static void Controls_SetDefaults( void )
 	s_controls.autoswitch.curvalue   = Controls_GetCvarDefault( "cg_autoswitch" );
 #endif
 	s_controls.sensitivity.curvalue  = Controls_GetCvarDefault( "sensitivity" );
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	trap_Cvar_SetValue("in_joystick", 0);
-	trap_Cvar_SetValue("in_joystickNo", 0);
-	s_controls.joythreshold.curvalue = Controls_GetCvarDefault( "in_joystickThreshold" );
-#else
 	s_controls.joyenable.curvalue    = Controls_GetCvarDefault( "in_joystick" );
 	s_controls.joythreshold.curvalue = Controls_GetCvarDefault( "joy_threshold" );
-#endif
 	s_controls.freelook.curvalue     = Controls_GetCvarDefault( "cl_freelook" );
 }
 
@@ -1567,21 +1087,10 @@ static sfxHandle_t Controls_MenuKey( int key )
 	if (key != -1)
 	{
 		// remove from any other bind
-#ifdef TA_SPLITVIEW
-		int j;
-
-		for (j = 0; j < MAX_SPLITVIEW; j++) {
-			bindptr = g_bindings_list[j];
-#else
 		bindptr = g_bindings;
-#endif
 		for (i=0; ;i++,bindptr++)
 		{
-#ifdef TA_SPLITVIEW
-			if (!g_bindings[i].label)
-#else
-			if (!bindptr->label)
-#endif
+			if (!bindptr->label)	
 				break;
 
 			if (bindptr->bind2 == key)
@@ -1593,25 +1102,14 @@ static sfxHandle_t Controls_MenuKey( int key )
 				bindptr->bind2 = -1;
 			}
 		}
-#ifdef TA_SPLITVIEW
-		}
-#endif
 	}
 
 	// assign key to local store
 	id      = ((menucommon_s*)(s_controls.menu.items[s_controls.menu.cursor]))->id;
-#ifdef TA_SPLITVIEW
-	bindptr = s_controls.bindings;
-#else
 	bindptr = g_bindings;
-#endif
 	for (i=0; ;i++,bindptr++)
 	{
-#ifdef TA_SPLITVIEW
-		if (!g_bindings[i].label)
-#else
-		if (!bindptr->label)
-#endif
+		if (!bindptr->label)	
 			break;
 		
 		if (bindptr->id == id)
@@ -1764,28 +1262,13 @@ static void Controls_MenuEvent( void* ptr, int event )
 #ifndef TA_WEAPSYS_EX
 		case ID_AUTOSWITCH:
 #endif
-#ifndef IOQ3ZTM // SELECT_JOYSTICK
 		case ID_JOYENABLE:
-#endif
 		case ID_JOYTHRESHOLD:
 			if (event == QM_ACTIVATED)
 			{
 				s_controls.changesmade = qtrue;
 			}
 			break;		
-
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-		case ID_SELECTJOY:
-			if (event == QM_ACTIVATED)
-			{
-#ifdef TA_SPLITVIEW
-				UI_JoystickMenu(s_controls.localClient);
-#else
-				UI_JoystickMenu();
-#endif
-			}
-			break;
-#endif
 	}
 }
 
@@ -1875,35 +1358,12 @@ static void Controls_InitWeapons( void ) {
 Controls_MenuInit
 =================
 */
-#ifdef TA_SPLITVIEW
-static void Controls_MenuInit( int localClient )
-#else
 static void Controls_MenuInit( void )
-#endif
 {
 	static char playername[32];
 
 	// zero set all our globals
 	memset( &s_controls, 0 ,sizeof(controls_t) );
-
-#ifdef TA_SPLITVIEW
-	s_controls.localClient = localClient;
-
-	if (s_controls.localClient == 0) {
-		s_controls.controls = g_controls;
-		s_controls.bindings = g_bindings;
-	} else {
-		s_controls.controls = g_mini_controls;
-
-		if (s_controls.localClient == 1) {
-			s_controls.bindings = g_bindings2;
-		} else if (s_controls.localClient == 2) {
-			s_controls.bindings = g_bindings3;
-		} else {
-			s_controls.bindings = g_bindings4;
-		}
-	}
-#endif
 
 	Controls_Cache();
 
@@ -1978,18 +1438,6 @@ static void Controls_MenuInit( void )
 	s_controls.misc.string			= "MISC";
 	s_controls.misc.style			= UI_RIGHT;
 	s_controls.misc.color			= text_big_color;
-
-#ifdef IOQ3ZTM
-	s_controls.defaults.generic.type		= MTYPE_PTEXT;
-	s_controls.defaults.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
-	s_controls.defaults.generic.id			= ID_DEFAULTS;
-	s_controls.defaults.generic.callback	= Controls_MenuEvent;
-	s_controls.defaults.generic.x			= 152;
-	s_controls.defaults.generic.y			= 240 + 2*PROP_HEIGHT;
-	s_controls.defaults.string				= "RESET";
-	s_controls.defaults.style				= UI_RIGHT;
-	s_controls.defaults.color				= text_big_color;
-#endif
 
 	s_controls.back.generic.type	 = MTYPE_BITMAP;
 	s_controls.back.generic.name     = ART_BACK0;
@@ -2312,17 +1760,6 @@ static void Controls_MenuInit( void )
 	s_controls.chat4.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.chat4.generic.id        = ID_CHAT4;
 
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	s_controls.selectjoy.generic.type		= MTYPE_PTEXT;
-	s_controls.selectjoy.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_controls.selectjoy.generic.x			= SCREEN_WIDTH/2;
-	s_controls.selectjoy.generic.id			= ID_SELECTJOY;
-	s_controls.selectjoy.generic.callback	= Controls_MenuEvent;
-	s_controls.selectjoy.generic.ownerdraw	= Controls_DrawSmallText;
-	s_controls.selectjoy.string				= "select joystick...";
-	s_controls.selectjoy.color				= text_color_normal;
-	s_controls.selectjoy.style				= UI_RIGHT|UI_SMALLFONT;
-#else
 	s_controls.joyenable.generic.type      = MTYPE_RADIOBUTTON;
 	s_controls.joyenable.generic.flags	   = QMF_SMALLFONT;
 	s_controls.joyenable.generic.x	       = SCREEN_WIDTH/2;
@@ -2330,7 +1767,6 @@ static void Controls_MenuInit( void )
 	s_controls.joyenable.generic.id        = ID_JOYENABLE;
 	s_controls.joyenable.generic.callback  = Controls_MenuEvent;
 	s_controls.joyenable.generic.statusbar = Controls_StatusBar;
-#endif
 
 	s_controls.joythreshold.generic.type	  = MTYPE_SLIDER;
 	s_controls.joythreshold.generic.x		  = SCREEN_WIDTH/2;
@@ -2360,9 +1796,6 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.movement );
 	Menu_AddItem( &s_controls.menu, &s_controls.weapons );
 	Menu_AddItem( &s_controls.menu, &s_controls.misc );
-#ifdef IOQ3ZTM
-	Menu_AddItem( &s_controls.menu, &s_controls.defaults );
-#endif
 
 	Menu_AddItem( &s_controls.menu, &s_controls.sensitivity );
 	Menu_AddItem( &s_controls.menu, &s_controls.smoothmouse );
@@ -2378,11 +1811,7 @@ static void Controls_MenuInit( void )
 #ifndef TURTLEARENA // NOZOOM
 	Menu_AddItem( &s_controls.menu, &s_controls.zoomview );
 #endif
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	Menu_AddItem( &s_controls.menu, &s_controls.selectjoy );
-#else
 	Menu_AddItem( &s_controls.menu, &s_controls.joyenable );
-#endif
 	Menu_AddItem( &s_controls.menu, &s_controls.joythreshold );
 
 #ifndef TURTLEARENA // ALWAYS_RUN
@@ -2436,11 +1865,7 @@ static void Controls_MenuInit( void )
 
 	Menu_AddItem( &s_controls.menu, &s_controls.back );
 
-#ifdef TA_SPLITVIEW
-	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_controls.localClient, "name"), s_controls.name.string, 16 );
-#else
 	trap_Cvar_VariableStringBuffer( "name", s_controls.name.string, 16 );
-#endif
 	Q_CleanStr( s_controls.name.string );
 
 	// initialize the configurable cvars
@@ -2481,16 +1906,7 @@ void Controls_Cache( void ) {
 UI_ControlsMenu
 =================
 */
-#ifdef TA_SPLITVIEW
-void UI_ControlsMenu( int localClient )
-#else
-void UI_ControlsMenu( void )
-#endif
-{
-#ifdef TA_SPLITVIEW
-	Controls_MenuInit(localClient);
-#else
+void UI_ControlsMenu( void ) {
 	Controls_MenuInit();
-#endif
 	UI_PushMenu( &s_controls.menu );
 }

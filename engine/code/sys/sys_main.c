@@ -162,16 +162,17 @@ qboolean Sys_WritePIDFile( void )
 		char  pidBuffer[ 64 ] = { 0 };
 		int   pid;
 
-		pid = fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Shut up warning
+		if (fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f ) != sizeof( pidBuffer ) - 1) {
+			// ZTM: Read error, but we don't care?
+		}
+#else
+		fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f );
+#endif
 		fclose( f );
 
-		if(pid > 0)
-		{
-			pid = atoi( pidBuffer );
-			if( !Sys_PIDIsRunning( pid ) )
-				stale = qtrue;
-		}
-		else
+		pid = atoi( pidBuffer );
+		if( !Sys_PIDIsRunning( pid ) )
 			stale = qtrue;
 	}
 
@@ -407,6 +408,34 @@ void Sys_UnloadDll( void *dllHandle )
 
 /*
 =================
+Sys_TryLibraryLoad
+=================
+*/
+static void* Sys_TryLibraryLoad(const char* base, const char* gamedir, const char* fname, char* fqpath )
+{
+	void* libHandle;
+	char* fn;
+
+	*fqpath = 0;
+
+	fn = FS_BuildOSPath( base, gamedir, fname );
+	Com_Printf( "Sys_LoadDll(%s)... \n", fn );
+
+	libHandle = Sys_LoadLibrary(fn);
+
+	if(!libHandle) {
+		Com_Printf( "Sys_LoadDll(%s) failed:\n\"%s\"\n", fn, Sys_LibraryError() );
+		return NULL;
+	}
+
+	Com_Printf ( "Sys_LoadDll(%s): succeeded ...\n", fn );
+	Q_strncpyz ( fqpath , fn , MAX_QPATH ) ;
+
+	return libHandle;
+}
+
+/*
+=================
 Sys_LoadDll
 
 Used to load a development dll instead of a virtual machine
@@ -414,35 +443,33 @@ Used to load a development dll instead of a virtual machine
 #2 look in fs_basepath
 =================
 */
-void *Sys_LoadDll( const char *name,
+void *Sys_LoadDll( const char *name, char *fqpath ,
 	intptr_t (**entryPoint)(int, ...),
 	intptr_t (*systemcalls)(intptr_t, ...) )
 {
 	void  *libHandle;
 	void  (*dllEntry)( intptr_t (*syscallptr)(intptr_t, ...) );
 	char  fname[MAX_OSPATH];
-	char  *netpath;
+	char  *basepath;
+	char  *homepath;
+	char  *gamedir;
 
 	assert( name );
 
-	Com_sprintf(fname, sizeof(fname), "%s" ARCH_STRING DLL_EXT, name);
+	Q_snprintf (fname, sizeof(fname), "%s" ARCH_STRING DLL_EXT, name);
 
-	netpath = FS_FindDll(fname);
+	// TODO: use fs_searchpaths from files.c
+	basepath = Cvar_VariableString( "fs_basepath" );
+	homepath = Cvar_VariableString( "fs_homepath" );
+	gamedir = Cvar_VariableString( "fs_game" );
 
-	if(!netpath) {
-		Com_Printf( "Sys_LoadDll(%s) could not find it\n", fname );
-		return NULL;
-	}
+	libHandle = Sys_TryLibraryLoad(homepath, gamedir, fname, fqpath);
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	Com_DPrintf( "Loading DLL file: %s\n", netpath);
-#else
-	Com_Printf( "Loading DLL file: %s\n", netpath);
-#endif
-	libHandle = Sys_LoadLibrary(netpath);
+	if(!libHandle && basepath)
+		libHandle = Sys_TryLibraryLoad(basepath, gamedir, fname, fqpath);
 
 	if(!libHandle) {
-		Com_Printf( "Sys_LoadDll(%s) failed:\n\"%s\"\n", netpath, Sys_LibraryError() );
+		Com_Printf ( "Sys_LoadDll(%s) failed to load library\n", name );
 		return NULL;
 	}
 
@@ -457,11 +484,7 @@ void *Sys_LoadDll( const char *name,
 		return NULL;
 	}
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	Com_DPrintf ( "Sys_LoadDll(%s) found vmMain function at %p\n", name, *entryPoint );
-#else
 	Com_Printf ( "Sys_LoadDll(%s) found vmMain function at %p\n", name, *entryPoint );
-#endif
 	dllEntry( systemcalls );
 
 	return libHandle;

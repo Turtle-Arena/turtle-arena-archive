@@ -51,7 +51,7 @@ GAME OPTIONS MENU
 #define ID_DRAWTEAMOVERLAY		136
 #define ID_ALLOWDOWNLOAD			137
 #define ID_BACK					138
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 #define ID_ATMEFFECTS			139
 #endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING
@@ -61,9 +61,6 @@ GAME OPTIONS MENU
 #ifndef NOTRATEDM
 #define ID_SHOWGIBS				141
 #endif
-#endif
-#ifdef TA_SPLITVIEW
-#define ID_SPLITVERTICAL		142
 #endif
 
 #ifdef TA_DATA
@@ -91,10 +88,7 @@ typedef struct {
 	menuradiobutton_s	forcemodel;
 	menulist_s			drawteamoverlay;
 	menuradiobutton_s	allowdownload;
-#ifdef TA_SPLITVIEW
-	menulist_s			splitvertical;
-#endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	menulist_s			atmeffects;
 #endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING
@@ -121,16 +115,7 @@ static const char *teamoverlay_names[] =
 	NULL
 };
 
-#ifdef TA_SPLITVIEW
-static const char *splitvertical_names[] =
-{
-	"horizontal",
-	"vertical",
-	NULL
-};
-#endif
-
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 static const char *atmeffects_names[] =
 {
 	"off",
@@ -156,10 +141,7 @@ static void Preferences_SetMenuItems( void ) {
 #endif
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
-#ifdef TA_SPLITVIEW
-	s_preferences.splitvertical.curvalue	= trap_Cvar_VariableValue( "cg_splitviewVertical" ) != 0;
-#endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	s_preferences.atmeffects.curvalue		= 2*trap_Cvar_VariableValue( "cg_atmosphericEffects" );
 	if (s_preferences.atmeffects.curvalue < 0)
 		s_preferences.atmeffects.curvalue = 0;
@@ -241,13 +223,7 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "sv_allowDownload", s_preferences.allowdownload.curvalue );
 		break;
 
-#ifdef TA_SPLITVIEW
-	case ID_SPLITVERTICAL:
-		trap_Cvar_SetValue( "cg_splitviewVertical", s_preferences.splitvertical.curvalue );
-		break;
-#endif
-
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	case ID_ATMEFFECTS:
 		trap_Cvar_SetValue( "cg_atmosphericEffects", (float)s_preferences.atmeffects.curvalue/2.0f );
 		break;
@@ -471,19 +447,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.allowdownload.generic.x	       = PREFERENCES_X_POS;
 	s_preferences.allowdownload.generic.y	       = y;
 
-#ifdef TA_SPLITVIEW
-	y += BIGCHAR_HEIGHT+2;
-	s_preferences.splitvertical.generic.type		= MTYPE_SPINCONTROL;
-	s_preferences.splitvertical.generic.name		= "Splitview Mode:";
-	s_preferences.splitvertical.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_preferences.splitvertical.generic.callback	= Preferences_Event;
-	s_preferences.splitvertical.generic.id			= ID_SPLITVERTICAL;
-	s_preferences.splitvertical.generic.x			= PREFERENCES_X_POS;
-	s_preferences.splitvertical.generic.y			= y;
-	s_preferences.splitvertical.itemnames			= splitvertical_names;
-#endif
-
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.atmeffects.generic.type		= MTYPE_SPINCONTROL;
 	s_preferences.atmeffects.generic.name		= "Snow/Rain:";
@@ -545,10 +509,7 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.forcemodel );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
-#ifdef TA_SPLITVIEW
-	Menu_AddItem( &s_preferences.menu, &s_preferences.splitvertical );
-#endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	Menu_AddItem( &s_preferences.menu, &s_preferences.atmeffects );
 #endif
 #ifdef IOQ3ZTM // CONTANT_FILTERING

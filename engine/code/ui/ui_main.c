@@ -2843,7 +2843,7 @@ static void UI_StartSinglePlayer(void) {
 	}
 
  	trap_Cvar_SetValue( "singleplayer", 1 );
- 	trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, GT_MAX_GAME_TYPE-1, tierList[i].gameTypes[j] ) );
+ 	trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, 7, tierList[i].gameTypes[j] ) );
 	trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", tierList[i].maps[j] ) );
 	skill = trap_Cvar_VariableValue( "g_spSkill" );
 
@@ -3259,10 +3259,7 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cvar_Set("cg_cameraOrbit", "0");
 			trap_Cvar_Set("ui_singlePlayerActive", "0");
 			trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, ui_dedicated.integer ) );
-#ifdef IOQ3ZTM // SV_PUBLIC
-			trap_Cvar_SetValue( "sv_public", (ui_dedicated.integer == 2) );
-#endif
-			trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, GT_MAX_GAME_TYPE-1, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
+			trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, 8, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
 			trap_Cvar_Set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
 			trap_Cvar_Set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
 			trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName ) );
@@ -3322,9 +3319,6 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cmd_ExecuteText( EXEC_APPEND, "exec default.cfg\n");
 			trap_Cmd_ExecuteText( EXEC_APPEND, "cvar_restart\n");
 			Controls_SetDefaults();
-#ifdef IOQ3ZTM // ZTM: Defaults were set but not saved.
-			Controls_SetConfig(qtrue);
-#endif
 			trap_Cvar_Set("com_introPlayed", "1" );
 			trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 #ifdef IOQUAKE3 // ZTM: CDKEY
@@ -3368,11 +3362,6 @@ static void UI_RunMenuScript(char **args) {
 			Controls_SetConfig(qtrue);
 		} else if (Q_stricmp(name, "loadControls") == 0) {
 			Controls_GetConfig();
-#ifdef IOQ3ZTM // ZTM: Added reset controls option
-		} else if (Q_stricmp(name, "resetControls") == 0) {
-			Controls_SetDefaults();
-			Controls_SetConfig(qtrue);
-#endif
 		} else if (Q_stricmp(name, "clearError") == 0) {
 			trap_Cvar_Set("com_errorMessage", "");
 		} else if (Q_stricmp(name, "loadGameInfo") == 0) {
@@ -5997,9 +5986,9 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_initialized, "ui_initialized", "0", CVAR_TEMP },
 #ifdef TURTLEARENA // DEFAULT_TEAMS
 	{ &ui_teamName, "ui_teamName", "Foot", CVAR_ARCHIVE },
-	{ &ui_opponentName, "ui_opponentName", "Shell", CVAR_ARCHIVE },
+	{ &ui_opponentName, "ui_opponentName", "Katanas", CVAR_ARCHIVE },
 	{ &ui_redteam, "ui_redteam", "Foot", CVAR_ARCHIVE },
-	{ &ui_blueteam, "ui_blueteam", "Shell", CVAR_ARCHIVE },
+	{ &ui_blueteam, "ui_blueteam", "Katanas", CVAR_ARCHIVE },
 #else
 	{ &ui_teamName, "ui_teamName", "Pagans", CVAR_ARCHIVE },
 	{ &ui_opponentName, "ui_opponentName", "Stroggs", CVAR_ARCHIVE },

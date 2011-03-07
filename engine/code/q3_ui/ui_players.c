@@ -51,9 +51,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static int			dp_realtime;
 static float		jumpHeight;
-#ifdef TA_WEAPSYS
-static int			atkAnim;
-#endif
 
 
 /*
@@ -1573,9 +1570,6 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	if ( pi->newModel ) {
 		pi->newModel = qfalse;
 
-#ifdef TA_WEAPSYS
-		atkAnim = 0;
-#endif
 		jumpHeight = 0;
 		pi->pendingLegsAnim = 0;
 		UI_ForceLegsAnim( pi, legsAnim );
@@ -1627,17 +1621,6 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	}
 
 	// leg animation
-#ifdef TA_WEAPSYS
-	if (BG_PlayerAttackAnim(torsoAnim))
-	{
-		// if torso is attacking, possibly need to animate legs too.
-		currentAnim = BG_LegsAttackForWeapon(&pi->playercfg, weaponNum, atkAnim);
-		if (currentAnim != -1) {
-			legsAnim = currentAnim;
-		}
-	}
-#endif
-
 	currentAnim = pi->legsAnim & ~ANIM_TOGGLEBIT;
 	if ( legsAnim != LEGS_JUMP && ( currentAnim == LEGS_JUMP || currentAnim == LEGS_LAND ) ) {
 		pi->pendingLegsAnim = legsAnim;
@@ -1668,14 +1651,12 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 #ifdef TA_WEAPSYS
 	if (BG_PlayerAttackAnim(torsoAnim))
 	{
-		torsoAnim = BG_TorsoAttackForWeapon(weaponNum, atkAnim);
+		torsoAnim = BG_TorsoAttackForWeapon(weaponNum);
 		if (!BG_WeaponHasMelee(weaponNum))
 		{
 			pi->muzzleFlashTime = dp_realtime + UI_TIMER_MUZZLE_FLASH;
 		}
 		//FIXME play firing sound here
-
-		atkAnim++;
 	}
 #else
 	if ( torsoAnim == TORSO_ATTACK || torsoAnim == TORSO_ATTACK2 ) {

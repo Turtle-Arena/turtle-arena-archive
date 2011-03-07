@@ -1498,20 +1498,11 @@ PATH_* ENTITIES
 =============================================================================
 -->
 
-<!-- Use by all path_* entities -->
-<list name="pathMode">
-  <item name="Default" value="none"/>
-  <item name="Side" value="side"/>
-  <item name="Top" value="top"/>
-  <item name="Behind" value="back"/>
-</list>
-
 <point name="path_axis" color=".5 .3 0" box="-8 -8 -8 8 8 8">
-TODO: Path axis entity that func_trains and players can be made to orbit around.
+TODO: Path axis entity that func_trains can be made to orbit around.
 -------- KEYS --------
-<pathMode key="style" name="Path mode">sets how a player is viewed and controled on the path.</pathMode>
 <target key="target" name="Target">point to next path entity in the path.</target>
-<targetname key="targetname" name="Target Name">the previous path entity in the path points to this.</targetname>
+<targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
 <real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
 <real key="wait" name="Delay">number of seconds func_train will pause on entity before moving to next path entity (default 0 - see Notes).</real>
 <boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
@@ -1524,7 +1515,6 @@ Setting the wait key to -1 will not make the train stop on the entity, it will s
 <point name="path_corner" color=".5 .3 0" box="-8 -8 -8 8 8 8">
 Path corner entity that func_trains can be made to follow.
 -------- KEYS --------
-<pathMode key="style" name="Path mode">sets how a player is viewed and controled on the path.</pathMode>
 <target key="target" name="Target">point to next path entity in the path.</target>
 <targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
 <real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
@@ -1539,7 +1529,6 @@ Setting the wait key to -1 will not make the train stop on the entity, it will s
 <point name="path_end" color=".5 .3 0" box="-8 -8 -8 8 8 8">
 Path end marker entity that func_trains will stop at, unless DONT_STOP spawnflag in func_train is set.
 -------- KEYS --------
-<pathMode key="style" name="Path mode">sets how a player is viewed and controled on the path.</pathMode>
 <target key="target" name="Target">point to next path entity in the path.</target>
 <targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
 <real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
@@ -1556,7 +1545,6 @@ Setting the wait key to -1 will not make the train stop on the entity, it will s
 <point name="path_start" color=".5 .3 0" box="-8 -8 -8 8 8 8">
 Path start entity that func_trains can be made to follow.
 -------- KEYS --------
-<pathMode key="style" name="Path mode">sets how a player is viewed and controled on the path.</pathMode>
 <target key="target" name="Target">point to next path entity in the path.</target>
 <targetname key="targetname" name="Target Name">the train following the path or the previous path entity in the path points to this.</targetname>
 <real key="speed" name="Move Speed">speed of func_train while moving to the next path entity. This will override the speed value of the train.</real>
@@ -1845,15 +1833,13 @@ This is used to automatically give points to the player who activates this. A sp
 -->
 
 <point name="target_setpath" color="0 .5 0" box="-8 -8 -8 8 8 8">
-This is used to set the path used by a player or train entity. A spawn location entity like info_player_* or CTF respawn points can target this entity to set path of the player when he spawns in the game or a trigger can also be used to activate this. The activator of the trigger will change path.
+This is used to set the (2Dish sideview) path used by a player. A spawn location entity like info_player_* or CTF respawn points can target this entity to set path of the player when he spawns in the game. Or a trigger can also be used to activate this. The activator of the trigger will change path.
 -------- KEYS --------
 <targetname key="targetname" name="Target Name">ativating entity points to this.</targetname>
-<target key="target" name="Target">point to path_start entity, if no target is set disables using paths.</target>
+<target key="target" name="Target">point to path entity, no target with disable using a path.</target>
 <boolean key="notfree" name="Hidden For FFA">when set to 1, entity will not spawn in "Free for all" and "Tournament" modes.</boolean>
 <boolean key="notteam" name="Hidden For Teamplay">when set to 1, entity will not spawn in "Teamplay" and "CTF" modes.</boolean>
 <boolean key="notsingle" name="Hidden For SP">when set to 1, entity will not spawn in Single Player mode (bot play mode).</boolean>
--------- NOTES --------
-By not setting a target you can disable using paths, so players can exit a path.
 </point>
 
 <!--

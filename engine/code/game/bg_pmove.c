@@ -39,6 +39,7 @@ pml_t		pml;
 float	pm_stopspeed = 100.0f;
 float	pm_duckScale = 0.25f;
 float	pm_swimScale = 0.50f;
+float	pm_wadeScale = 0.70f;
 #ifdef IOQ3ZTM // LADDER
 float	pm_ladderScale = 0.80f;  // Set the max movement speed to 80% of normal
 #endif
@@ -471,13 +472,25 @@ static void PM_SetMovementDir( void ) {
 }
 
 #ifdef TA_PATHSYS // 2DMODE
+// Nights Move style
+// ZTM: FIXME: Make this selectable by map path (instead of hardcoded to side view)
+enum
+{
+	NM_SIDE,
+	NM_TOP,
+	NM_BACK
+};
+
 static void PM_PathMoveInital( void ) {
+	int style;
 	//vec3_t angles;
 
-	if (!pm->ps->pathMode) {
+	if (!(pm->ps->eFlags & EF_PATHMODE)) {
 		return;
 	}
 
+	// default...
+	style = NM_SIDE;
 	//VectorClear(angles);
 
 	// if on axis, instead of a line {
@@ -489,12 +502,17 @@ static void PM_PathMoveInital( void ) {
 	// }
 
 	// Controls
-	if (pm->ps->pathMode == PATHMODE_TOP) {
+	if (style == NM_TOP)
+	{
 		pm->cmd.upmove = 0;
-	} else if (pm->ps->pathMode == PATHMODE_BACK) {
+	}
+	else if (style == NM_BACK)
+	{
 		pm->cmd.upmove = pm->cmd.forwardmove;
 		pm->cmd.forwardmove = 0;
-	} else { // PATHMODE_SIDE
+	}
+	else // NM_SIDE
+	{
 		// If 2D side view mode
 		pm->cmd.upmove = pm->cmd.forwardmove;
 		pm->cmd.forwardmove = pm->cmd.rightmove;
@@ -509,7 +527,7 @@ void PM_SetupPathWishVel(vec3_t wishvel, const vec3_t wishdir) {
 	vec3_t v, vel;
 	int move;
 
-	if (!pm->ps->pathMode) {
+	if (!(pm->ps->eFlags & EF_PATHMODE)) {
 		return;
 	}
 
@@ -558,9 +576,6 @@ static qboolean PM_CheckJump( void ) {
 
 	pml.groundPlane = qfalse;		// jumping away
 	pml.walking = qfalse;
-#ifdef IOQ3ZTM // WALK_UNDERWATER
-	if (pm->waterlevel < 3)
-#endif
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
@@ -610,7 +625,7 @@ static qboolean PM_CheckJump( void ) {
 
 	if ( pm->cmd.forwardmove >= 0
 #ifdef TA_PATHSYS // 2DMODE
-			|| pm->ps->pathMode == PATHMODE_SIDE
+			|| (pm->ps->eFlags & EF_PATHMODE)
 #endif
 	 ) {
 #ifdef TA_NPCSYS
@@ -1062,15 +1077,10 @@ static void PM_WalkMove( void ) {
 		pm->xyspeed = sqrt( pm->ps->velocity[0] * pm->ps->velocity[0]
 			+  pm->ps->velocity[1] * pm->ps->velocity[1] );
 
-		// if not running, less movement while melee attacking, based on LoZ:TP
-		if (pm->xyspeed < 200) {
-			if (BG_MaxAttackIndex(pm->ps)-1 == BG_AttackIndexForPlayerState(pm->ps) && pm->ps->meleeDelay) {
-				accelerate = 0;
-			} else if (pm->ps->meleeTime) {
-				accelerate = pm_accelerate/4;
-			} else {
-				accelerate = pm_accelerate;
-			}
+		// if !running AND melee attacking; based on LoZ:TP
+		if (pm->xyspeed < 200 && (pm->ps->meleeTime || pm->ps->meleeDelay))
+		{
+			accelerate = pm_accelerate/4;
 		}
 		else
 #endif
@@ -1422,7 +1432,7 @@ static void PM_GroundTraceMissed( void ) {
 		if ( trace.fraction == 1.0 ) {
 			if ( pm->cmd.forwardmove >= 0 
 #ifdef TA_PATHSYS // 2DMODE
-			|| pm->ps->pathMode == PATHMODE_SIDE
+			|| (pm->ps->eFlags & EF_PATHMODE)
 #endif
 			) {
 #ifdef TA_NPCSYS
@@ -1490,7 +1500,7 @@ static void PM_GroundTrace( void ) {
 		// go into jump animation
 		if ( pm->cmd.forwardmove >= 0 
 #ifdef TA_PATHSYS // 2DMODE
-			|| pm->ps->pathMode == PATHMODE_SIDE
+			|| (pm->ps->eFlags & EF_PATHMODE)
 #endif
 		) {
 #ifdef TA_NPCSYS
@@ -2611,7 +2621,7 @@ static void PM_Weapon( void ) {
 #endif
 
 
-#ifdef IOQ3ZTM
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
 	// Handle grapple
 #ifdef TA_WEAPSYS
 	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0]->proj->grappling)
@@ -2986,7 +2996,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 	// circularly clamp the angles with deltas
 	for (i=0 ; i<3 ; i++) {
 #ifdef TA_PATHSYS // 2DMODE
-		if (ps->pathMode == PATHMODE_SIDE && i == YAW)
+		if ((ps->eFlags & EF_PATHMODE) && i == YAW)
 			continue;
 #endif
 		temp = cmd->angles[i] + ps->delta_angles[i];
@@ -3052,7 +3062,7 @@ static void PM_LadderMove( void ) {
 		wishvel[2] = 0;
 
 		// Snap to 8 unit grid, so player always holds onto ladder correctly!
-		//  (But only if not moving and if on a vertical ladder)
+		//  (But only if not moving and if on a verticle ladder)
 		if (!VectorLength(pm->ps->velocity) && pm->ps->origin2[2] == 0)
 		{
 			float baseZ = (pm->ps->origin[2] + pm->mins[2]);
@@ -3397,7 +3407,7 @@ void PmoveSingle (pmove_t *pmove) {
 
 	// decide if backpedaling animations should be used
 #ifdef TA_PATHSYS // 2DMODE
-	if (pm->ps->pathMode == PATHMODE_SIDE) {
+	if (pm->ps->eFlags & EF_PATHMODE) {
 		pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
 	} else
 #endif

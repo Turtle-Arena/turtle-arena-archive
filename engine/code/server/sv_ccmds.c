@@ -340,15 +340,9 @@ static void SV_MapRestart_f( void ) {
 			continue;
 		}
 
-		if(client->state == CS_ACTIVE)
-			SV_ClientEnterWorld(client, &client->lastUsercmd);
-		else
-		{
-			// If we don't reset client->lastUsercmd and are restarting during map load,
-			// the client will hang because we'll use the last Usercmd from the previous map,
-			// which is wrong obviously.
-			SV_ClientEnterWorld(client, NULL);
-		}
+		client->state = CS_ACTIVE;
+
+		SV_ClientEnterWorld( client, &client->lastUsercmd );
 	}	
 
 	// run another frame to allow things to look at all the players
@@ -388,12 +382,7 @@ static void SV_Kick_f( void ) {
 				if ( !cl->state ) {
 					continue;
 				}
-				if( cl->netchan.remoteAddress.type == NA_LOOPBACK
-#ifdef TA_SPLITVIEW // Allow kicking extra local clients
-					&& cl->owner == -1
-#endif
-					)
-				{
+				if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 					continue;
 				}
 				SV_DropClient( cl, "was kicked" );
@@ -414,12 +403,7 @@ static void SV_Kick_f( void ) {
 		}
 		return;
 	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK
-#ifdef TA_SPLITVIEW // Allow kicking extra local clients
-		&& cl->owner == -1
-#endif
-		)
-	{
+	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
@@ -561,7 +545,10 @@ static void SV_RehashBans_f(void)
 	if(!sv_banFile->string || !*sv_banFile->string)
 		return;
 
-	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FS_GetCurrentGameDir(), sv_banFile->string);
+	if(!(curpos = Cvar_VariableString("fs_game")) || !*curpos)
+		curpos = BASEGAME;
+	
+	Com_sprintf(filepath, sizeof(filepath), "%s/%s", curpos, sv_banFile->string);
 
 	if((filelen = FS_SV_FOpenFileRead(filepath, &readfrom)) >= 0)
 	{
@@ -635,12 +622,15 @@ static void SV_WriteBans(void)
 {
 	int index;
 	fileHandle_t writeto;
-	char filepath[MAX_QPATH];
+	char *curpos, filepath[MAX_QPATH];
 	
 	if(!sv_banFile->string || !*sv_banFile->string)
 		return;
 	
-	Com_sprintf(filepath, sizeof(filepath), "%s/%s", FS_GetCurrentGameDir(), sv_banFile->string);
+	if(!(curpos = Cvar_VariableString("fs_game")) || !*curpos)
+		curpos = BASEGAME;
+	
+	Com_sprintf(filepath, sizeof(filepath), "%s/%s", curpos, sv_banFile->string);
 
 	if((writeto = FS_SV_FOpenFileWrite(filepath)))
 	{
@@ -1059,12 +1049,7 @@ static void SV_KickNum_f( void ) {
 	if ( !cl ) {
 		return;
 	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK
-#ifdef TA_SPLITVIEW // Allow kicking extra local clients
-		&& cl->owner == -1
-#endif
-		)
-	{
+	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
@@ -1114,31 +1099,20 @@ static void SV_Status_f( void ) {
 		}
 
 		Com_Printf ("%s", cl->name);
-		
-		// TTimo adding a ^7 to reset the color
-		// NOTE: colored names in status breaks the padding (WONTFIX)
-		Com_Printf ("^7");
-		l = 14 - strlen(cl->name);
-		j = 0;
-		
-		do
-		{
+    // TTimo adding a ^7 to reset the color
+    // NOTE: colored names in status breaks the padding (WONTFIX)
+    Com_Printf ("^7");
+		l = 16 - strlen(cl->name);
+		for (j=0 ; j<l ; j++)
 			Com_Printf (" ");
-			j++;
-		} while(j < l);
 
 		Com_Printf ("%7i ", svs.time - cl->lastPacketTime );
 
 		s = NET_AdrToString( cl->netchan.remoteAddress );
 		Com_Printf ("%s", s);
 		l = 22 - strlen(s);
-		j = 0;
-		
-		do
-		{
-			Com_Printf(" ");
-			j++;
-		} while(j < l);
+		for (j=0 ; j<l ; j++)
+			Com_Printf (" ");
 		
 		Com_Printf ("%5i", cl->netchan.qport);
 
@@ -1458,7 +1432,7 @@ SV_CompleteMapName
 */
 static void SV_CompleteMapName( char *args, int argNum ) {
 	if( argNum == 2 ) {
-		Field_CompleteFilename( "maps", "bsp", qtrue, qfalse );
+		Field_CompleteFilename( "maps", "bsp", qtrue );
 	}
 }
 
@@ -1478,7 +1452,7 @@ void SV_AddOperatorCommands( void ) {
 	Cmd_AddCommand ("heartbeat", SV_Heartbeat_f);
 	Cmd_AddCommand ("kick", SV_Kick_f);
 #ifndef STANDALONE
-	if(!com_standalone->integer)
+	if(!Cvar_VariableIntegerValue("com_standalone"))
 	{
 		Cmd_AddCommand ("banUser", SV_Ban_f);
 		Cmd_AddCommand ("banClient", SV_BanNum_f);

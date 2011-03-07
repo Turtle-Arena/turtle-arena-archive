@@ -217,16 +217,8 @@ void	trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin ) {
 	syscall( CG_S_UPDATEENTITYPOSITION, entityNum, origin );
 }
 
-void	trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater
-#ifdef TA_SPLITVIEW
-		, int listener
-#endif
-		) {
-	syscall( CG_S_RESPATIALIZE, entityNum, origin, axis, inwater
-#ifdef TA_SPLITVIEW
-			, listener
-#endif
-			);
+void	trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater ) {
+	syscall( CG_S_RESPATIALIZE, entityNum, origin, axis, inwater );
 }
 
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {
@@ -276,6 +268,12 @@ void	trap_R_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *
 void	trap_R_AddPolysToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num ) {
 	syscall( CG_R_ADDPOLYSTOSCENE, hShader, numVerts, verts, num );
 }
+
+#ifdef WOLFET
+void    trap_R_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer ) {
+	syscall( CG_R_ADDPOLYBUFFERTOSCENE, pPolyBuffer );
+}
+#endif
 
 int		trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir ) {
 	return syscall( CG_R_LIGHTFORPOINT, point, ambientLight, directedLight, lightDir );
@@ -339,21 +337,6 @@ int			trap_GetCurrentCmdNumber( void ) {
 	return syscall( CG_GETCURRENTCMDNUMBER );
 }
 
-#ifdef TA_SPLITVIEW // CONTROLS
-qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClient ) {
-	return syscall( CG_GETUSERCMD, cmdNumber, ucmd, localClient );
-}
-
-#if defined TA_HOLDSYS/*2*/
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue, int localClientNum ) {
-	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale), holdableValue, localClientNum );
-}
-#else
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int localClientNum ) {
-	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale), localClientNum );
-}
-#endif
-#else
 qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	return syscall( CG_GETUSERCMD, cmdNumber, ucmd );
 }
@@ -366,7 +349,6 @@ void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdable
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale ) {
 	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale) );
 }
-#endif
 #endif
 
 void		testPrintInt( char *string, int i ) {

@@ -30,69 +30,51 @@ CG_NextHoldable_f
 Based on CG_NextWeapon_f
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_NextHoldable( int localClient )
-#else
-void CG_NextHoldable_f( void )
-#endif
-{
+void CG_NextHoldable_f( void ) {
 	int		i;
 	int		original;
-	playerState_t	*ps;
-	cglc_t			*lc;
 
 	if ( !cg.snap ) {
 		return;
 	}
-#ifdef TA_SPLITVIEW
-	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
-	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
-	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
+	//cg.weaponSelectTime = cg.time;
+	original = cg.holdableSelect;
 
-	if ( ps->pm_flags & PMF_FOLLOW ) {
-		return;
-	}
-
-	//lc->weaponSelectTime = cg.time;
-	original = lc->holdableSelect;
-
-	if (lc->holdableSelect == HI_NO_SELECT) {
-		lc->holdableSelect = ps->holdableIndex;
+	if (cg.holdableSelect == HI_NO_SELECT)
+	{
+		cg.holdableSelect = cg.snap->ps.holdableIndex;
 	}
 
 	for ( i = 1 ; i < BG_NumHoldableItems() ; i++ ) {
-		lc->holdableSelect++;
-		if ( lc->holdableSelect == BG_NumHoldableItems() ) {
-			lc->holdableSelect = 1;
+		cg.holdableSelect++;
+		if ( cg.holdableSelect == BG_NumHoldableItems() ) {
+			cg.holdableSelect = 1;
 		}
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
 		if (
 #ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
-		lc->holdableSelect == HI_KAMIKAZE ||
+		cg.holdableSelect == HI_KAMIKAZE ||
 #endif
-		lc->holdableSelect == HI_PORTAL
+		cg.holdableSelect == HI_PORTAL
 #ifndef TURTLEARENA // POWERS
-			|| lc->holdableSelect == HI_INVULNERABILITY
+			|| cg.holdableSelect == HI_INVULNERABILITY
 #endif
 			) {
 			continue;
 		}
 #endif
 
-		if ( ps->holdable[lc->holdableSelect] != 0 ) {
+		if ( cg.snap->ps.holdable[cg.holdableSelect] != 0 ) {
 			break;
 		}
 	}
 	if ( i == BG_NumHoldableItems() ) {
-		lc->holdableSelect = original;
+		cg.holdableSelect = original;
 	}
 }
 
@@ -102,69 +84,51 @@ CG_PrevHoldable_f
 Based on CG_PrevWeapon_f
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_PrevHoldable( int localClient )
-#else
-void CG_PrevHoldable_f( void )
-#endif
-{
+void CG_PrevHoldable_f( void ) {
 	int		i;
 	int		original;
-	playerState_t	*ps;
-	cglc_t			*lc;
 
 	if ( !cg.snap ) {
 		return;
 	}
-#ifdef TA_SPLITVIEW
-	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
-	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
-	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
+	//cg.weaponSelectTime = cg.time;
+	original = cg.holdableSelect;
 
-	if ( ps->pm_flags & PMF_FOLLOW ) {
-		return;
-	}
-
-	//lc->weaponSelectTime = cg.time;
-	original = lc->holdableSelect;
-
-	if (lc->holdableSelect == HI_NO_SELECT) {
-		lc->holdableSelect = ps->holdableIndex;
+	if (cg.holdableSelect == HI_NO_SELECT)
+	{
+		cg.holdableSelect = cg.snap->ps.holdableIndex;
 	}
 
 	for ( i = 1 ; i < BG_NumHoldableItems() ; i++ ) {
-		lc->holdableSelect--;
-		if ( lc->holdableSelect == 0 ) {
-			lc->holdableSelect = BG_NumHoldableItems() - 1;
+		cg.holdableSelect--;
+		if ( cg.holdableSelect == 0 ) {
+			cg.holdableSelect = BG_NumHoldableItems() - 1;
 		}
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
 		if (
 #ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
-		lc->holdableSelect == HI_KAMIKAZE ||
+		cg.holdableSelect == HI_KAMIKAZE ||
 #endif
-		lc->holdableSelect == HI_PORTAL
+		cg.holdableSelect == HI_PORTAL
 #ifndef TURTLEARENA // POWERS
-			|| lc->holdableSelect == HI_INVULNERABILITY
+			|| cg.holdableSelect == HI_INVULNERABILITY
 #endif
 			) {
 			continue;
 		}
 #endif
 
-		if ( ps->holdable[lc->holdableSelect] != 0 ) {
+		if ( cg.snap->ps.holdable[cg.holdableSelect] != 0 ) {
 			break;
 		}
 	}
 	if ( i == BG_NumHoldableItems() ) {
-		lc->holdableSelect = original;
+		cg.holdableSelect = original;
 	}
 }
 
@@ -174,33 +138,13 @@ CG_Holdable_f
 Based on CG_Weapon_f
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_Holdable( int localClient )
-#else
-void CG_Holdable_f( void )
-#endif
-{
+void CG_Holdable_f( void ) {
 	int		num;
-	playerState_t	*ps;
-	cglc_t			*lc;
 
 	if ( !cg.snap ) {
 		return;
 	}
-
-#ifdef TA_SPLITVIEW
-	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
-		return;
-	}
-
-	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
-	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
-
-	if ( ps->pm_flags & PMF_FOLLOW ) {
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
@@ -210,62 +154,12 @@ void CG_Holdable_f( void )
 		return;
 	}
 
-	//if (num != 0 && ps->holdable[num] == 0) {
+	//if (num != 0 && cg.snap->ps.holdable[num] == 0) {
 	//	return;		// don't have the holdable item
 	//}
 
-	lc->holdableSelect = num;
+	cg.holdableSelect = num;
 }
-
-#ifdef TA_SPLITVIEW
-void CG_NextHoldable_f( void ) {
-	CG_NextHoldable( 0 );
-}
-
-void CG_PrevHoldable_f( void ) {
-	CG_PrevHoldable( 0 );
-}
-
-void CG_Holdable_f( void ) {
-	CG_Holdable( 0 );
-}
-
-void CG_2NextHoldable_f( void ) {
-	CG_NextHoldable( 1 );
-}
-
-void CG_2PrevHoldable_f( void ) {
-	CG_PrevHoldable( 1 );
-}
-
-void CG_2Holdable_f( void ) {
-	CG_Holdable( 1 );
-}
-
-void CG_3NextHoldable_f( void ) {
-	CG_NextHoldable( 2 );
-}
-
-void CG_3PrevHoldable_f( void ) {
-	CG_PrevHoldable( 2 );
-}
-
-void CG_3Holdable_f( void ) {
-	CG_Holdable( 2 );
-}
-
-void CG_4NextHoldable_f( void ) {
-	CG_NextHoldable( 3 );
-}
-
-void CG_4PrevHoldable_f( void ) {
-	CG_PrevHoldable( 3 );
-}
-
-void CG_4Holdable_f( void ) {
-	CG_Holdable( 3 );
-}
-#endif
 #endif
 
 /*
@@ -1548,11 +1442,13 @@ void CG_RegisterWeapon( int weaponNum )
 	}
 #endif
 
-#ifndef TA_MISC // USE_REAL_TAGS_FOR_VIEW
 	if ( !weaponInfo->handsModel ) {
+#ifdef TA_DATA
+		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/triblaster/triblaster_hand.md3" );
+#else
 		weaponInfo->handsModel = trap_R_RegisterModel( "models/weapons2/shotgun/shotgun_hand.md3" );
-	}
 #endif
+	}
 
 #ifndef IOQ3ZTM // unused
 	weaponInfo->loopFireSound = qfalse;
@@ -1901,11 +1797,11 @@ static void CG_CalculateWeaponPosition( vec3_t origin, vec3_t angles ) {
 	angles[PITCH] += cg.xyspeed * cg.bobfracsin * 0.005;
 
 	// drop the weapon when landing
-	delta = cg.time - cg.cur_lc->landTime;
+	delta = cg.time - cg.landTime;
 	if ( delta < LAND_DEFLECT_TIME ) {
-		origin[2] += cg.cur_lc->landChange*0.25 * delta / LAND_DEFLECT_TIME;
+		origin[2] += cg.landChange*0.25 * delta / LAND_DEFLECT_TIME;
 	} else if ( delta < LAND_DEFLECT_TIME + LAND_RETURN_TIME ) {
-		origin[2] += cg.cur_lc->landChange*0.25 * 
+		origin[2] += cg.landChange*0.25 * 
 			(LAND_DEFLECT_TIME + LAND_RETURN_TIME - delta) / LAND_RETURN_TIME;
 	}
 
@@ -1949,9 +1845,11 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 	refEntity_t  beam;
 	vec3_t   forward;
 	vec3_t   muzzlePoint, endPoint;
-	int      anim;
+#ifdef IOQ3ZTM
+	int anim;
+#endif
 #ifdef TA_WEAPSYS
-	int      range;
+	int range;
 
 	if (projnum < 0 || projnum >= BG_NumProjectiles())
 	{
@@ -1970,7 +1868,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 	memset( &beam, 0, sizeof( beam ) );
 
 	// CPMA  "true" lightning
-	if ((cent->currentState.number == cg.cur_lc->predictedPlayerState.clientNum) && (cg_trueLightning.value != 0)) {
+	if ((cent->currentState.number == cg.predictedPlayerState.clientNum) && (cg_trueLightning.value != 0)) {
 		vec3_t angle;
 		int i;
 
@@ -2001,12 +1899,17 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin
 		VectorCopy(cent->lerpOrigin, muzzlePoint );
 	}
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Copied from CG_CalcMuzzlePoint
 	anim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
 	if ( anim == LEGS_WALKCR || anim == LEGS_IDLECR ) {
 		muzzlePoint[2] += CROUCH_VIEWHEIGHT;
 	} else {
 		muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
 	}
+#else
+	// FIXME: crouch
+	muzzlePoint[2] += DEFAULT_VIEWHEIGHT;
+#endif
 
 	VectorMA( muzzlePoint, 14, forward, muzzlePoint );
 
@@ -2815,8 +2718,6 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	// add the weapon
 	memset( &gun, 0, sizeof( gun ) );
 
-#ifdef TA_SPLITVIEW // ZTM: TODO: We should check and use weaponTime of all of the local clients.
-#endif
 #ifndef TA_WEAPSYS
 	VectorCopy( parent->lightingOrigin, gun.lightingOrigin );
 	gun.shadowPlane = parent->shadowPlane;
@@ -2824,13 +2725,13 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 	// set custom shading for railgun refire rate
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black. (and use correct glow in third person)
-	if ( ( ps || cent->currentState.clientNum == cg.cur_lc->predictedPlayerState.clientNum ) &&
-		cg.cur_lc->predictedPlayerState.weapon == WP_RAILGUN && 
-		cg.cur_lc->predictedPlayerState.weaponstate == WEAPON_FIRING )
+	if ( ( ps || cent->currentState.clientNum == cg.predictedPlayerState.clientNum ) &&
+		cg.predictedPlayerState.weapon == WP_RAILGUN && 
+		cg.predictedPlayerState.weaponstate == WEAPON_FIRING )
 	{
 		float	f;
 
-		f = (float)cg.cur_lc->predictedPlayerState.weaponTime / 1500;
+		f = (float)cg.predictedPlayerState.weaponTime / 1500;
 		gun.shaderRGBA[1] = 0;
 		gun.shaderRGBA[0] = 
 		gun.shaderRGBA[2] = 255 * ( 1.0 - f );
@@ -2842,12 +2743,12 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	}
 #else
 	if ( ps ) {
-		if ( cg.cur_lc->predictedPlayerState.weapon == WP_RAILGUN &&
-			cg.cur_lc->predictedPlayerState.weaponstate == WEAPON_FIRING )
+		if ( cg.predictedPlayerState.weapon == WP_RAILGUN &&
+			cg.predictedPlayerState.weaponstate == WEAPON_FIRING )
 		{
 			float	f;
 
-			f = (float)cg.cur_lc->predictedPlayerState.weaponTime / 1500;
+			f = (float)cg.predictedPlayerState.weaponTime / 1500;
 			gun.shaderRGBA[1] = 0;
 			gun.shaderRGBA[0] = 
 			gun.shaderRGBA[2] = 255 * ( 1.0 - f );
@@ -2863,7 +2764,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #endif
 
 #ifdef IOQ3ZTM
-	// make sure we aren't looking at cg.cur_lc->predictedPlayerEntity for LG
+	// make sure we aren't looking at cg.predictedPlayerEntity for LG
 	nonPredictedCent = &cg_entities[cent->currentState.clientNum];
 #endif
 
@@ -2878,14 +2779,14 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		gun[i].renderfx = parent->renderfx;
 
 		// set custom shading for railgun refire rate
-		if ( ( ps || cent->currentState.clientNum == cg.cur_lc->predictedPlayerState.clientNum )
-			&& ((weaponGroup->weapon[i]->weapontype == WT_GUN && cg.cur_lc->predictedPlayerState.weaponstate == WEAPON_FIRING
+		if ( ( ps || cent->currentState.clientNum == cg.predictedPlayerState.clientNum )
+			&& ((weaponGroup->weapon[i]->weapontype == WT_GUN && cg.predictedPlayerState.weaponstate == WEAPON_FIRING
 			&& weaponGroup->weapon[i]->attackDelay > 0) || weaponGroup->weapon[i]->weapontype != WT_GUN))
 		{
 			float	f;
 
 			if (weaponGroup->weapon[i]->weapontype == WT_GUN) {
-				f = (float)cg.cur_lc->predictedPlayerState.weaponTime / weaponGroup->weapon[i]->attackDelay;
+				f = (float)cg.predictedPlayerState.weaponTime / weaponGroup->weapon[i]->attackDelay;
 
 #if 1 // Use color2
 				// color2 is secondary color (primary is trail)
@@ -2898,7 +2799,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 				gun[i].shaderRGBA[2] = 255 * ( 1.0 - f );
 #endif
 			} else {
-				f = (float)cg.cur_lc->predictedPlayerState.meleeTime / ((float)cg.cur_lc->predictedPlayerState.meleeLinkTime*0.66f);
+				f = (float)cg.predictedPlayerState.meleeTime / ((float)cg.predictedPlayerState.meleeLinkTime*0.66f);
 
 				if ((weaponGroup->weapon[i]->flags & WIF_ALWAYS_DAMAGE)) {
 					float scale;
@@ -3109,7 +3010,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	}
 
 #ifndef IOQ3ZTM // Moved up so it can be used for fallback flashOrigin
-	// make sure we aren't looking at cg.cur_lc->predictedPlayerEntity for LG
+	// make sure we aren't looking at cg.predictedPlayerEntity for LG
 	nonPredictedCent = &cg_entities[cent->currentState.clientNum];
 #endif
 
@@ -3146,7 +3047,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			{
 #ifdef IOQ3ZTM // GRAPPLE_RETURN // Always update flash origin
 				if ( ps || cg.renderingThirdPerson ||
-						cent->currentState.number != cg.cur_lc->predictedPlayerState.clientNum ) {
+						cent->currentState.number != cg.predictedPlayerState.clientNum ) {
 					memset( &flash, 0, sizeof( flash ) );
 #ifdef TA_WEAPSYS
 					flash.hModel = cg_weapons[weaponGroup->weaponnum[i]].flashModel;
@@ -3247,7 +3148,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 
 		if ( ps || cg.renderingThirdPerson ||
-			cent->currentState.number != cg.cur_lc->predictedPlayerState.clientNum ) {
+			cent->currentState.number != cg.predictedPlayerState.clientNum ) {
 #ifdef TA_WEAPSYS
 			VectorCopy(flash.origin, nonPredictedCent->pe.flashOrigin[i]);
 #elif defined IOQ3ZTM
@@ -3339,7 +3240,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	if ( !cg_drawGun.integer ) {
 		vec3_t		origin;
 
-		if ( cg.cur_lc->predictedPlayerState.eFlags & EF_FIRING ) {
+		if ( cg.predictedPlayerState.eFlags & EF_FIRING ) {
 			// special hack for lightning gun...
 #ifdef TA_WEAPSYS
 			int i;
@@ -3411,7 +3312,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	}
 #endif
 
-	cent = &cg.cur_lc->predictedPlayerEntity;	// &cg_entities[cg.snap->ps.clientNum];
+	cent = &cg.predictedPlayerEntity;	// &cg_entities[cg.snap->ps.clientNum];
 #ifdef TA_WEAPSYS
 	CG_RegisterWeaponGroup( ps->weapon );
 	weapon = &cg_weapongroups[ ps->weapon ];
@@ -3425,13 +3326,6 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	// set up gun position
 	CG_CalculateWeaponPosition( hand.origin, angles );
 
-#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
-	if (!weapon->handsModel) {
-		fovOffset[0] += 5;
-		fovOffset[2] -= 20;
-	}
-#endif
-
 #ifdef IOQ3ZTM // FOV
 	VectorMA( hand.origin, (cg_gun_x.value+fovOffset[0]), cg.refdef.viewaxis[0], hand.origin );
 	VectorMA( hand.origin, (cg_gun_y.value+fovOffset[1]), cg.refdef.viewaxis[1], hand.origin );
@@ -3444,40 +3338,20 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 
 	AnglesToAxis( angles, hand.axis );
 
-#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
-	// get clientinfo
-	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-#endif
-
 	// map torso animations to weapon animations
 	if ( cg_gun_frame.integer ) {
 		// development tool
 		hand.frame = hand.oldframe = cg_gun_frame.integer;
 		hand.backlerp = 0;
 	} else {
-#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
-		if (!weapon->handsModel) {
-			hand.frame = cent->pe.torso.frame;
-			hand.oldframe = cent->pe.torso.oldFrame;
-		} else {
-#else
 		// get clientinfo for animation map
 		ci = &cgs.clientinfo[ cent->currentState.clientNum ];
-#endif
 		hand.frame = CG_MapTorsoToWeaponFrame( ci, cent->pe.torso.frame );
 		hand.oldframe = CG_MapTorsoToWeaponFrame( ci, cent->pe.torso.oldFrame );
-#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
-		}
-#endif
 		hand.backlerp = cent->pe.torso.backlerp;
 	}
 
 	hand.hModel = weapon->handsModel;
-#ifdef TA_MISC // USE_REAL_TAGS_FOR_VIEW
-	if (!hand.hModel) {
-		hand.hModel = ci->torsoModel;
-	}
-#endif
 #ifdef IOQ3ZTM // RENDERFLAGS
 	hand.renderfx = RF_DEPTHHACK | RF_NOT_MIRROR | RF_MINLIGHT;
 #else
@@ -3485,7 +3359,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 #endif
 
 	// add everything onto the hand
-	CG_AddPlayerWeapon( &hand, ps, &cg.cur_lc->predictedPlayerEntity, ps->persistant[PERS_TEAM] );
+	CG_AddPlayerWeapon( &hand, ps, &cg.predictedPlayerEntity, ps->persistant[PERS_TEAM] );
 }
 
 #ifndef TA_WEAPSYS_EX
@@ -3511,21 +3385,21 @@ void CG_DrawWeaponSelect( void ) {
 	float	*color;
 
 	// don't display if dead
-	if ( cg.cur_lc->predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
+	if ( cg.predictedPlayerState.stats[STAT_HEALTH] <= 0 ) {
 		return;
 	}
 
-	color = CG_FadeColor( cg.cur_lc->weaponSelectTime, WEAPON_SELECT_TIME );
+	color = CG_FadeColor( cg.weaponSelectTime, WEAPON_SELECT_TIME );
 	if ( !color ) {
 		return;
 	}
 	trap_R_SetColor( color );
 
 	// showing weapon select clears pickup item display, but not the blend blob
-	cg.cur_lc->itemPickupTime = 0;
+	cg.itemPickupTime = 0;
 
 	// count the number of weapons owned
-	bits = cg.cur_ps->stats[ STAT_WEAPONS ];
+	bits = cg.snap->ps.stats[ STAT_WEAPONS ];
 	count = 0;
 	for ( i = 1 ; i < MAX_WEAPONS ; i++ ) {
 		if ( bits & ( 1 << i ) ) {
@@ -3555,12 +3429,12 @@ void CG_DrawWeaponSelect( void ) {
 #endif
 
 		// draw selection marker
-		if ( i == cg.cur_lc->weaponSelect ) {
+		if ( i == cg.weaponSelect ) {
 			CG_DrawPic( x-4, y-4, 40, 40, cgs.media.selectShader );
 		}
 
 		// no ammo cross on top
-		if ( !cg.cur_ps->ammo[ i ] ) {
+		if ( !cg.snap->ps.ammo[ i ] ) {
 			CG_DrawPic( x, y, 32, 32, cgs.media.noammoShader );
 		}
 
@@ -3569,10 +3443,10 @@ void CG_DrawWeaponSelect( void ) {
 
 	// draw the selected name
 #ifdef TA_WEAPSYS
-		name = bg_weapongroupinfo[ cg.cur_lc->weaponSelect ].item->pickup_name;
+		name = bg_weapongroupinfo[ cg.weaponSelect ].item->pickup_name;
 #else
-	if ( cg_weapons[ cg.cur_lc->weaponSelect ].item ) {
-		name = cg_weapons[ cg.cur_lc->weaponSelect ].item->pickup_name;
+	if ( cg_weapons[ cg.weaponSelect ].item ) {
+		name = cg_weapons[ cg.weaponSelect ].item->pickup_name;
 #endif
 		if ( name ) {
 			CG_DrawBigStringColor(CENTER_X, y - 22, name, color);
@@ -3590,11 +3464,11 @@ void CG_DrawWeaponSelect( void ) {
 CG_WeaponSelectable
 ===============
 */
-static qboolean CG_WeaponSelectable( playerState_t *ps, int i ) {
-	if ( !ps->ammo[i] ) {
+static qboolean CG_WeaponSelectable( int i ) {
+	if ( !cg.snap->ps.ammo[i] ) {
 		return qfalse;
 	}
-	if ( ! (ps->stats[ STAT_WEAPONS ] & ( 1 << i ) ) ) {
+	if ( ! (cg.snap->ps.stats[ STAT_WEAPONS ] & ( 1 << i ) ) ) {
 		return qfalse;
 	}
 
@@ -3606,62 +3480,42 @@ static qboolean CG_WeaponSelectable( playerState_t *ps, int i ) {
 CG_NextWeapon_f
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_NextWeapon( int localClient )
-#else
-void CG_NextWeapon_f( void )
-#endif
-{
+void CG_NextWeapon_f( void ) {
 	int		i;
 	int		original;
-	playerState_t	*ps;
-	cglc_t			*lc;
 
 	if ( !cg.snap ) {
 		return;
 	}
-
-#ifdef TA_SPLITVIEW
-	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
-	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
-	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
-
-	if ( ps->pm_flags & PMF_FOLLOW ) {
-		return;
-	}
-
-	lc->weaponSelectTime = cg.time;
-	original = lc->weaponSelect;
+	cg.weaponSelectTime = cg.time;
+	original = cg.weaponSelect;
 
 	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
-		lc->weaponSelect++;
-		if ( lc->weaponSelect == MAX_WEAPONS ) {
-			lc->weaponSelect = 0;
+		cg.weaponSelect++;
+		if ( cg.weaponSelect == MAX_WEAPONS ) {
+			cg.weaponSelect = 0;
 		}
 #ifndef TURTLEARENA // WEAPONS
 #ifdef TA_WEAPSYS
-		if ( lc->weaponSelect == ps->stats[STAT_DEFAULTWEAPON] ) {
+		if ( cg.weaponSelect == cg.snap->ps.stats[STAT_DEFAULTWEAPON] ) {
 			continue;		// never cycle to gauntlet
 		}
 #else
-		if ( lc->weaponSelect == WP_GAUNTLET ) {
+		if ( cg.weaponSelect == WP_GAUNTLET ) {
 			continue;		// never cycle to gauntlet
 		}
 #endif
 #endif
-		if ( CG_WeaponSelectable( ps, lc->weaponSelect ) ) {
+		if ( CG_WeaponSelectable( cg.weaponSelect ) ) {
 			break;
 		}
 	}
 	if ( i == MAX_WEAPONS ) {
-		lc->weaponSelect = original;
+		cg.weaponSelect = original;
 	}
 }
 
@@ -3670,62 +3524,42 @@ void CG_NextWeapon_f( void )
 CG_PrevWeapon_f
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_PrevWeapon( int localClient )
-#else
-void CG_PrevWeapon_f( void )
-#endif
-{
+void CG_PrevWeapon_f( void ) {
 	int		i;
 	int		original;
-	playerState_t	*ps;
-	cglc_t			*lc;
 
 	if ( !cg.snap ) {
 		return;
 	}
-
-#ifdef TA_SPLITVIEW
-	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
-	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
-	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
-
-	if ( ps->pm_flags & PMF_FOLLOW ) {
-		return;
-	}
-
-	lc->weaponSelectTime = cg.time;
-	original = lc->weaponSelect;
+	cg.weaponSelectTime = cg.time;
+	original = cg.weaponSelect;
 
 	for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
-		lc->weaponSelect--;
-		if ( lc->weaponSelect == -1 ) {
-			lc->weaponSelect = MAX_WEAPONS - 1;
+		cg.weaponSelect--;
+		if ( cg.weaponSelect == -1 ) {
+			cg.weaponSelect = MAX_WEAPONS - 1;
 		}
 #ifndef TURTLEARENA // WEAPONS
 #ifdef TA_WEAPSYS
-		if ( lc->weaponSelect == ps->stats[STAT_DEFAULTWEAPON] ) {
+		if ( cg.weaponSelect == cg.snap->ps.stats[STAT_DEFAULTWEAPON] ) {
 			continue;		// never cycle to gauntlet
 		}
 #else
-		if ( lc->weaponSelect == WP_GAUNTLET ) {
+		if ( cg.weaponSelect == WP_GAUNTLET ) {
 			continue;		// never cycle to gauntlet
 		}
 #endif
 #endif
-		if ( CG_WeaponSelectable( ps, lc->weaponSelect ) ) {
+		if ( CG_WeaponSelectable( cg.weaponSelect ) ) {
 			break;
 		}
 	}
 	if ( i == MAX_WEAPONS ) {
-		lc->weaponSelect = original;
+		cg.weaponSelect = original;
 	}
 }
 
@@ -3734,33 +3568,13 @@ void CG_PrevWeapon_f( void )
 CG_Weapon_f
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_Weapon( int localClient )
-#else
-void CG_Weapon_f( void )
-#endif
-{
+void CG_Weapon_f( void ) {
 	int		num;
-	playerState_t	*ps;
-	cglc_t			*lc;
 
 	if ( !cg.snap ) {
 		return;
 	}
-
-#ifdef TA_SPLITVIEW
-	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
-		return;
-	}
-
-	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
-	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
-
-	if ( ps->pm_flags & PMF_FOLLOW ) {
+	if ( cg.snap->ps.pm_flags & PMF_FOLLOW ) {
 		return;
 	}
 
@@ -3768,8 +3582,9 @@ void CG_Weapon_f( void )
 
 #ifdef TA_WEAPSYS
 	// Special case for WP_DEFAULT
-	if (num == WP_DEFAULT) {
-		num = ps->stats[STAT_DEFAULTWEAPON];
+	if (num == WP_DEFAULT)
+	{
+		num = cg.snap->ps.stats[STAT_DEFAULTWEAPON];
 	}
 #endif
 
@@ -3777,64 +3592,14 @@ void CG_Weapon_f( void )
 		return;
 	}
 
-	lc->weaponSelectTime = cg.time;
+	cg.weaponSelectTime = cg.time;
 
-	if ( ! ( ps->stats[STAT_WEAPONS] & ( 1 << num ) ) ) {
+	if ( ! ( cg.snap->ps.stats[STAT_WEAPONS] & ( 1 << num ) ) ) {
 		return;		// don't have the weapon
 	}
 
-	lc->weaponSelect = num;
+	cg.weaponSelect = num;
 }
-
-#ifdef TA_SPLITVIEW
-void CG_NextWeapon_f( void ) {
-	CG_NextWeapon( 0 );
-}
-
-void CG_PrevWeapon_f( void ) {
-	CG_PrevWeapon( 0 );
-}
-
-void CG_Weapon_f( void ) {
-	CG_Weapon( 0 );
-}
-
-void CG_2NextWeapon_f( void ) {
-	CG_NextWeapon( 1 );
-}
-
-void CG_2PrevWeapon_f( void ) {
-	CG_PrevWeapon( 1 );
-}
-
-void CG_2Weapon_f( void ) {
-	CG_Weapon( 1 );
-}
-
-void CG_3NextWeapon_f( void ) {
-	CG_NextWeapon( 2 );
-}
-
-void CG_3PrevWeapon_f( void ) {
-	CG_PrevWeapon( 2 );
-}
-
-void CG_3Weapon_f( void ) {
-	CG_Weapon( 2 );
-}
-
-void CG_4NextWeapon_f( void ) {
-	CG_NextWeapon( 3 );
-}
-
-void CG_4PrevWeapon_f( void ) {
-	CG_PrevWeapon( 3 );
-}
-
-void CG_4Weapon_f( void ) {
-	CG_Weapon( 3 );
-}
-#endif
 
 /*
 ===================
@@ -3846,11 +3611,11 @@ The current weapon has just run out of ammo
 void CG_OutOfAmmoChange( void ) {
 	int		i;
 
-	cg.cur_lc->weaponSelectTime = cg.time;
+	cg.weaponSelectTime = cg.time;
 
 	for ( i = MAX_WEAPONS-1 ; i > 0 ; i-- ) {
-		if ( CG_WeaponSelectable( cg.cur_ps, i ) ) {
-			cg.cur_lc->weaponSelect = i;
+		if ( CG_WeaponSelectable( i ) ) {
+			cg.weaponSelect = i;
 			break;
 		}
 	}
@@ -4047,7 +3812,6 @@ Spawn hit marker, based on CG_Bleed
 */
 void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 	localEntity_t	*ex;
-	qhandle_t		hShader;
 	int r;
 
 #ifndef NOBLOOD
@@ -4060,40 +3824,6 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 
 	r = rand()%2;
 
-#ifndef NOBLOOD
-	if (cg_blood.integer)
-	{
-		hShader = cgs.media.bloodExplosionShader;
-	}
-	else
-#endif
-	{
-#ifdef TURTLEARENA // WEAPONS
-		if (meleeDamage)
-		{
-			if (r >= 1 && cgs.media.meleeHitShader[1])
-				hShader = cgs.media.meleeHitShader[1];
-			else
-				hShader = cgs.media.meleeHitShader[0];
-		}
-		else
-		{
-			// missile damage
-			if (r >= 1 && cgs.media.missileHitShader[1])
-				hShader = cgs.media.missileHitShader[1];
-			else
-				hShader = cgs.media.missileHitShader[0];
-		}
-#else
-		// quake3 has no non-blood hit effect.
-		hShader = 0;
-#endif
-	}
-
-	if (!hShader) {
-		return;
-	}
-
 	ex = CG_AllocLocalEntity();
 	ex->leType = LE_EXPLOSION;
 
@@ -4105,15 +3835,37 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 	ex->refEntity.rotation = rand() % 360;
 	ex->refEntity.radius = 24;
 
-	ex->refEntity.customShader = hShader;
+#ifndef NOBLOOD
+	if (cg_blood.integer)
+	{
+		ex->refEntity.customShader = cgs.media.bloodExplosionShader;
+	}
+	else
+#endif
+	{
+#ifdef TURTLEARENA // WEAPONS
+		if (meleeDamage)
+		{
+			if (r >= 1 && cgs.media.meleeHitShader[1])
+				ex->refEntity.customShader = cgs.media.meleeHitShader[1];
+			else
+				ex->refEntity.customShader = cgs.media.meleeHitShader[0];
+		}
+		else
+		{
+			// missile damage
+			if (r >= 1 && cgs.media.missileHitShader[1])
+				ex->refEntity.customShader = cgs.media.missileHitShader[1];
+			else
+				ex->refEntity.customShader = cgs.media.missileHitShader[0];
+		}
+#endif
+	}
 
 	// don't show player's own blood in view
-	if ( (cg.cur_ps && entityNum == cg.cur_ps->clientNum)
+	if ( entityNum == cg.snap->ps.clientNum
 #ifdef IOQ3ZTM // Show player their own blood in third person
 		&& !cg.renderingThirdPerson
-#endif
-#ifdef TA_SPLITVIEW
-		&& (!cg.snap || cg.snap->numPSs <= 1)
 #endif
 		)
 	{
@@ -4201,10 +3953,6 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 	vec3_t newOrigin;
 	trace_t trace;
 
-	if (cg_impactDebris.integer <= 0) {
-		return;
-	}
-
 #ifdef IOQ3ZTM // LASERTAG
 	if ( cg_laserTag.integer ) {
 		return;
@@ -4245,8 +3993,6 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 		numParticles = 12;
 	else
 		numParticles = 24;
-
-	numParticles *= cg_impactDebris.value;
 
 	for (i = 1; i < NUM_MATERIAL_TYPES; i++)
 	{
@@ -5292,10 +5038,10 @@ static qboolean	CG_CalcMuzzlePoint( int entityNum, vec3_t muzzle ) {
 	centity_t	*cent;
 	int			anim;
 
-	if ( entityNum == cg.cur_ps->clientNum ) {
-		VectorCopy( cg.cur_ps->origin, muzzle );
-		muzzle[2] += cg.cur_ps->viewheight;
-		AngleVectors( cg.cur_ps->viewangles, forward, NULL, NULL );
+	if ( entityNum == cg.snap->ps.clientNum ) {
+		VectorCopy( cg.snap->ps.origin, muzzle );
+		muzzle[2] += cg.snap->ps.viewheight;
+		AngleVectors( cg.snap->ps.viewangles, forward, NULL, NULL );
 		VectorMA( muzzle, 14, forward, muzzle );
 		return qtrue;
 	}

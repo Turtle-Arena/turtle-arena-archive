@@ -52,7 +52,6 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	trap_Print( va("%s", text) );
 }
 
-
 /*
 =================
 UI_ClampCvar
@@ -814,7 +813,7 @@ UI_ProportionalSizeScale
 float UI_ProportionalSizeScale( int style ) {
 #ifdef IOQ3ZTM // FONT_REWRITE
 	if (style & UI_SMALLFONT) {
-		return (float)uis.fontPropSmall.pointSize / (float)uis.fontPropBig.pointSize;
+		return uis.fontPropSmall.pointSize / uis.fontPropBig.pointSize;
 	}
 #else
 	if(  style & UI_SMALLFONT ) {
@@ -930,7 +929,8 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		return;
 	}
 
-	charsetProp = font->fontShader;
+	// ZTM: TODO: Use font->fontShader
+	charsetProp = uis.fontPropBig.fontShader;
 #else
 	charsetProp = uis.charsetProp;
 #endif
@@ -1451,16 +1451,10 @@ void UI_Cache_f( void ) {
 #ifdef TA_MISC // INGAME_SERVER_MENU
 	InServer_Cache();
 #endif
-#if defined TA_MISC && defined TA_SPLITVIEW
-	SetupPlayers_Cache();
-#endif
 	ConfirmMenu_Cache();
 	PlayerModel_Cache();
 	PlayerSettings_Cache();
 	Controls_Cache();
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	UI_Joystick_Cache();
-#endif
 	Demos_Cache();
 	UI_CinematicsMenu_Cache();
 	Preferences_Cache();
@@ -1682,7 +1676,6 @@ UI_DrawPicFullScreen
 void UI_DrawPicFullScreen(qhandle_t hShader)
 {
 #ifdef IOQ3ZTM // IOQ3BUGFIX: In widescreen fill whole screen not just 4:3 area.
-#ifdef TA_DATA // Repeat image horizontally without changing the aspect (as normal scaling would).
 	float x = 0, y = 0, w = uis.glconfig.vidWidth, h = uis.glconfig.vidHeight;
 	const float picX = SCREEN_WIDTH;
 	const float picY = SCREEN_HEIGHT;
@@ -1705,9 +1698,6 @@ void UI_DrawPicFullScreen(qhandle_t hShader)
 	t2 += tDelta;
 
 	trap_R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
-#else
-	trap_R_DrawStretchPic( 0, 0, uis.glconfig.vidWidth, uis.glconfig.vidHeight, 0, 0, 1, 1, hShader );
-#endif
 #else
 	UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hShader );
 #endif

@@ -709,7 +709,7 @@ void BotCTFSeekGoals(bot_state_t *bs) {
 	if ( bs->lastgoal_ltgtype ) {
 		bs->teamgoal_time += 60;
 	}
-	// if the bot decided to do something on its own and has a last ordered goal
+	// if the bot decided to do something on it's own and has a last ordered goal
 	if ( !bs->ordered && bs->lastgoal_ltgtype ) {
 		bs->ltgtype = 0;
 	}
@@ -955,7 +955,7 @@ void Bot1FCTFSeekGoals(bot_state_t *bs) {
 	if ( bs->lastgoal_ltgtype ) {
 		bs->teamgoal_time += 60;
 	}
-	// if the bot decided to do something on its own and has a last ordered goal
+	// if the bot decided to do something on it's own and has a last ordered goal
 	if ( !bs->ordered && bs->lastgoal_ltgtype ) {
 		bs->ltgtype = 0;
 	}
@@ -1520,8 +1520,7 @@ char *EasyClientName(int client, char *buf, int size) {
 	char *str1, *str2, *ptr, c;
 	char name[128];
 
-	ClientName(client, name, sizeof(name));
-	
+	strcpy(name, ClientName(client, name, sizeof(name)));
 	for (i = 0; name[i]; i++) name[i] &= 127;
 	//remove all spaces
 	for (ptr = strstr(name, " "); ptr; ptr = strstr(name, " ")) {
@@ -4259,8 +4258,8 @@ void BotCheckAttack(bot_state_t *bs) {
 #endif
 	//if fire has to be release to activate weapon
 #ifdef TA_WEAPSYS
-	// Grappling hook must be release and pressed again to fire.
-	if (bgProj && bgProj->grappling)
+	// Melee and grappling hook must be release and pressed again to fire.
+	if (!bgProj || bgProj->grappling)
 #else
 	if (wi.flags & WFL_FIRERELEASED)
 #endif
@@ -5145,7 +5144,7 @@ BotAIPredictObstacles
 
 Predict the route towards the goal and check if the bot
 will be blocked by certain obstacles. When the bot has obstacles
-on its path the bot should figure out if they can be removed
+on it's path the bot should figure out if they can be removed
 by activating certain entities.
 ==================
 */

@@ -20,9 +20,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#define _ISOC99_SOURCE
-
+#ifdef IOQ3ZTM // LESS_VERBOSE
 #include "vm_local.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -241,15 +241,9 @@ static void hash_add_label(const char* label, unsigned address)
 {
 	struct hashentry* h;
 	unsigned i = hashkey(label, -1U);
-	int labellen;
-	
 	i %= sizeof(labelhash)/sizeof(labelhash[0]);
-	h = Z_Malloc(sizeof(struct hashentry));
-	
-	labellen = strlen(label) + 1;
-	h->label = Z_Malloc(labellen);
-	memcpy(h->label, label, labellen);
-	
+	h = malloc(sizeof(struct hashentry));
+	h->label = strdup(label);
 	h->address = address;
 	h->next = labelhash[i];
 	labelhash[i] = h;
@@ -282,8 +276,8 @@ static void labelhash_free(void)
 		while(h)
 		{
 			struct hashentry* next = h->next;
-			Z_Free(h->label);
-			Z_Free(h);
+			free(h->label);
+			free(h);
 			h = next;
 			++n;
 		}

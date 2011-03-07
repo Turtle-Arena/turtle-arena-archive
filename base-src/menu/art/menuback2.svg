@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -14,13 +13,10 @@
    height="240"
    id="svg8745"
    sodipodi:version="0.32"
-   inkscape:version="0.48.0 r9654"
+   inkscape:version="0.46"
    version="1.0"
    sodipodi:docname="menuback2.svg"
-   inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-filename="/home/zack/Turtle_Arena_svn/trunk/base-src/menu/art/menuback2.png"
-   inkscape:export-xdpi="360"
-   inkscape:export-ydpi="360">
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs8747">
     <marker
@@ -244,105 +240,6 @@
        y1="55.625"
        x2="88.073586"
        y2="3.5416651" />
-    <filter
-       id="filter6843"
-       inkscape:label="Drop shadow"
-       width="1.5"
-       height="1.5"
-       x="-.25"
-       y="-.25">
-      <feGaussianBlur
-         id="feGaussianBlur6845"
-         in="SourceAlpha"
-         stdDeviation="1.5"
-         result="blur" />
-      <feColorMatrix
-         id="feColorMatrix6847"
-         result="bluralpha"
-         type="matrix"
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 " />
-      <feOffset
-         id="feOffset6849"
-         in="bluralpha"
-         dx="0"
-         dy="0"
-         result="offsetBlur" />
-      <feMerge
-         id="feMerge6851">
-        <feMergeNode
-           id="feMergeNode6853"
-           in="offsetBlur" />
-        <feMergeNode
-           id="feMergeNode6855"
-           in="SourceGraphic" />
-      </feMerge>
-    </filter>
-    <filter
-       id="filter6857"
-       inkscape:label="Drop shadow"
-       width="1.5"
-       height="1.5"
-       x="-.25"
-       y="-.25">
-      <feGaussianBlur
-         id="feGaussianBlur6859"
-         in="SourceAlpha"
-         stdDeviation="1.5"
-         result="blur" />
-      <feColorMatrix
-         id="feColorMatrix6861"
-         result="bluralpha"
-         type="matrix"
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 " />
-      <feOffset
-         id="feOffset6863"
-         in="bluralpha"
-         dx="0"
-         dy="0"
-         result="offsetBlur" />
-      <feMerge
-         id="feMerge6865">
-        <feMergeNode
-           id="feMergeNode6867"
-           in="offsetBlur" />
-        <feMergeNode
-           id="feMergeNode6869"
-           in="SourceGraphic" />
-      </feMerge>
-    </filter>
-    <filter
-       id="filter6871"
-       inkscape:label="Drop shadow"
-       width="1.5"
-       height="1.5"
-       x="-.25"
-       y="-.25">
-      <feGaussianBlur
-         id="feGaussianBlur6873"
-         in="SourceAlpha"
-         stdDeviation="1.5"
-         result="blur" />
-      <feColorMatrix
-         id="feColorMatrix6875"
-         result="bluralpha"
-         type="matrix"
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 " />
-      <feOffset
-         id="feOffset6877"
-         in="bluralpha"
-         dx="0"
-         dy="0"
-         result="offsetBlur" />
-      <feMerge
-         id="feMerge6879">
-        <feMergeNode
-           id="feMergeNode6881"
-           in="offsetBlur" />
-        <feMergeNode
-           id="feMergeNode6883"
-           in="SourceGraphic" />
-      </feMerge>
-    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -351,19 +248,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.4"
-     inkscape:cx="188.65814"
-     inkscape:cy="117.97418"
+     inkscape:zoom="1.6970563"
+     inkscape:cx="160.56623"
+     inkscape:cy="131.03988"
      inkscape:current-layer="svg8745"
      inkscape:document-units="px"
      showgrid="false"
      inkscape:snap-global="false"
      showguides="false"
-     inkscape:window-width="1152"
-     inkscape:window-height="790"
-     inkscape:window-x="0"
-     inkscape:window-y="24"
-     inkscape:window-maximized="1">
+     inkscape:window-width="641"
+     inkscape:window-height="708"
+     inkscape:window-x="135"
+     inkscape:window-y="25">
     <inkscape:grid
        type="xygrid"
        id="grid14248" />
@@ -385,8 +281,7 @@
      inkscape:groupmode="layer" />
   <g
      id="top_left"
-     inkscape:label="#top_left"
-     style="filter:url(#filter6871)">
+     inkscape:label="#top_left">
     <path
        transform="translate(51.740243,37.875001)"
        d="M 87.794632,55.698656 L 57.63495,55.70611 L 42.548654,29.590786 L 57.622039,3.468008 L 87.781722,3.460554 L 102.86802,29.575878 L 87.794632,55.698656 z"
@@ -453,8 +348,7 @@
        sodipodi:type="star" />
   </g>
   <g
-     id="top_right"
-     style="filter:url(#filter6857)">
+     id="top_right">
     <path
        transform="translate(213.74024,37.875001)"
        d="M 87.794632,55.698656 L 57.63495,55.70611 L 42.548654,29.590786 L 57.622039,3.468008 L 87.781722,3.460554 L 102.86802,29.575878 L 87.794632,55.698656 z"
@@ -505,8 +399,7 @@
        sodipodi:type="star" />
   </g>
   <g
-     id="bottom"
-     style="filter:url(#filter6843)">
+     id="bottom">
     <path
        transform="translate(6.74024,137.875)"
        d="M 87.794632,55.698656 L 57.63495,55.70611 L 42.548654,29.590786 L 57.622039,3.468008 L 87.781722,3.460554 L 102.86802,29.575878 L 87.794632,55.698656 z"

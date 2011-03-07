@@ -1,4 +1,4 @@
-// Shaders for the missionpack based UI
+// Shaders for the new (missionpack based) UI
 
 // See menu/art/titlebanner (se_menu.shader)
 ui/assets/titlebanner
@@ -10,30 +10,13 @@ ui/assets/titlebanner
 	}
 }
 
-// See menuback (se_menu.shader)
+// Copied from se_menu.shader "menuback[RagePro]"
 ui/assets/out_menuback
 {
 	nomipmaps
 	{
 		map menu/art/menuback.png
-		tcMod scroll 0.04 0.02
-	}
-	{
-		map menu/art/menuback2.png
-		blendFunc blend
-		tcMod scale 0.5 0.5
-		tcMod scroll -0.02 -0.01
-		rgbGen const ( 0.35 0.35 0.35 )
-		alphaGen const 0.95
-	}
-}
-
-ui/assets/dialog_back
-{
-	nomipmaps
-	{
-		map menu/art/cut_frame.png
-		blendfunc blend
+		tcMod scroll .04  .02
 	}
 }
 
@@ -42,7 +25,6 @@ ui/assets/3_cursor2
 	nomipmaps
 	{
 		map menu/art/3_cursor2.png
-		blendfunc blend
 	}
 }
 
@@ -51,7 +33,6 @@ ui/assets/3_cursor3
 	nomipmaps
 	{
 		map menu/art/3_cursor2.png
-		blendfunc blend
 	}
 }
 
@@ -61,7 +42,6 @@ ui/assets/selectcursor
 	nomipmaps
 	{
 		map menu/art/3_cursor2.png
-		blendfunc blend
 	}
 }
 
@@ -71,7 +51,6 @@ ui/assets/sizecursor
 	{
 		// TODO: Add the correct image.
 		map menu/art/3_cursor2.png
-		blendfunc blend
 	}
 }
 

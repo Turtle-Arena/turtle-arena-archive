@@ -634,7 +634,7 @@ static void S_AL_ScaleGain(src_t *chksrc, vec3_t origin)
 		
 		scaleFactor *= chksrc->curGain;
 		
-		if(chksrc->scaleGain != scaleFactor)
+		if(chksrc->scaleGain != scaleFactor);
 		{
 			chksrc->scaleGain = scaleFactor;
 			S_AL_Gain(chksrc->alSource, chksrc->scaleGain);
@@ -654,21 +654,25 @@ S_AL_HearingThroughEntity
 */
 static qboolean S_AL_HearingThroughEntity( int entityNum )
 {
-#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
-	// ZTM: FIXME: Have (boolean)firstPerson option for Respatialize so we don't need a vm call?
-	// ZTM: I changed the cgame API so that this doesn't have to be a hack.
-	if (VM_Call(cgvm, CG_VIEW_TYPE, entityNum) == 0) {
-		//we're the player and in first person
-		return qtrue;
-	} else {
-		//not the player or in third person
-		return qfalse;
-	}
-#else
+#ifndef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 	float	distanceSq;
+#endif
 
 	if( clc.clientNum == entityNum )
 	{
+#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
+		// ZTM: I changed the cgame API so that this doesn't have to be a hack.
+		if (VM_Call(cgvm, CG_VIEW_TYPE) == 0)
+		{
+			//we're the player
+			return qtrue;
+		}
+		else
+		{
+			//we're the player, but third person
+			return qfalse;
+		}
+#else
 		// FIXME: <tim@ngus.net> 28/02/06 This is an outrageous hack to detect
 		// whether or not the player is rendering in third person or not. We can't
 		// ask the renderer because the renderer has no notion of entities and we
@@ -683,10 +687,10 @@ static qboolean S_AL_HearingThroughEntity( int entityNum )
 			return qfalse; //we're the player, but third person
 		else
 			return qtrue;  //we're the player
+#endif
 	}
 	else
 		return qfalse; //not the player
-#endif
 }
 
 /*
@@ -1234,8 +1238,8 @@ static void S_AL_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandl
 			return;
 		}
 		
-		VectorCopy( entityList[ entnum ].origin, sorigin );
-	}
+			VectorCopy( entityList[ entnum ].origin, sorigin );
+		}
 	
 	S_AL_SanitiseVector(sorigin);
 	
@@ -1366,7 +1370,7 @@ static void S_AL_SrcLoop( alSrcPriority_t priority, sfxHandle_t sfx,
 		{
 			VectorCopy(velocity, svelocity);
 			S_AL_SanitiseVector(svelocity);
-		}
+	}
 		else
 			VectorClear(svelocity);
 
@@ -2173,23 +2177,11 @@ S_AL_Respatialize
 =================
 */
 static
-void S_AL_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater
-#ifdef TA_SPLITVIEW
-		, int listener
-#endif
-		)
+void S_AL_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater )
 {
 	float		velocity[3] = {0.0f, 0.0f, 0.0f};
 	float		orientation[6];
 	vec3_t	sorigin;
-
-#ifdef TA_SPLITVIEW
-	if (listener != 0)
-	{
-		// ZTM: FIXME: Support multiple listeners!
-		return;
-	}
-#endif
 
 	VectorCopy( origin, sorigin );
 	S_AL_SanitiseVector( sorigin );

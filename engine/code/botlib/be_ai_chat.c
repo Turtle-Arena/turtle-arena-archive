@@ -2213,7 +2213,7 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname)
 #ifdef DEBUG
 	botimport.Print(PRT_MESSAGE, "initial chats loaded in %d msec\n", Sys_MilliSeconds() - starttime);
 #endif //DEBUG
-	//character was read successfully
+	//character was read succesfully
 	return chat;
 } //end of the function BotLoadInitialChat
 //===========================================================================

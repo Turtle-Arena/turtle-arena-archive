@@ -235,9 +235,6 @@ void G_HomingMissile(gentity_t * ent)
 		if(blip->health <= 0)
 			continue;
 
-		if(blip->flags & FL_NOTARGET)
-			continue;
-
 		if(blip->client->sess.sessionTeam >= TEAM_SPECTATOR)
 			continue;
 

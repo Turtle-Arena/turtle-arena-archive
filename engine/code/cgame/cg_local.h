@@ -705,10 +705,49 @@ typedef struct {
 
 #define MAX_PREDICTED_EVENTS	16
  
-// ZTM: data that use to be in cg_t but is needed for each local client
+#ifdef WOLFET
+#define MAX_SPAWN_VARS          64
+#define MAX_SPAWN_VARS_CHARS    2048
+#endif
+ 
 typedef struct {
+	int			clientFrame;		// incremented each frame
 
 	int			clientNum;
+	
+	qboolean	demoPlayback;
+	qboolean	levelShot;			// taking a level menu screenshot
+	int			deferredPlayerLoading;
+	qboolean	loading;			// don't defer players at initial startup
+	qboolean	intermissionStarted;	// don't play voice rewards, because game will end shortly
+
+	// there are only one or two snapshot_t that are relevent at a time
+	int			latestSnapshotNum;	// the number of snapshots the client system has received
+	int			latestSnapshotTime;	// the time from latestSnapshotNum, so we don't need to read the snapshot yet
+
+	snapshot_t	*snap;				// cg.snap->serverTime <= cg.time
+	snapshot_t	*nextSnap;			// cg.nextSnap->serverTime > cg.time, or NULL
+	snapshot_t	activeSnapshots[2];
+
+	float		frameInterpolation;	// (float)( cg.time - cg.frame->serverTime ) / (cg.nextFrame->serverTime - cg.frame->serverTime)
+
+	qboolean	thisFrameTeleport;
+	qboolean	nextFrameTeleport;
+
+	int			frametime;		// cg.time - cg.oldTime
+
+	int			time;			// this is the time value that the client
+								// is rendering at.
+	int			oldTime;		// time at last frame, used for missile trails and prediction checking
+
+	int			physicsTime;	// either cg.snap->time or cg.nextSnap->time
+
+	int			timelimitWarnings;	// 5 min, 1 min, overtime
+	int			fraglimitWarnings;
+
+	qboolean	mapRestart;			// set on a map restart to set back the weapon
+
+	qboolean	renderingThirdPerson;		// during deaths, chasecams, etc
 
 	// prediction state
 	qboolean	hyperspace;				// true if prediction has hit a trigger_teleport
@@ -738,6 +777,69 @@ typedef struct {
 	int			holdableSelect;
 #endif
 
+	// auto rotating items
+	vec3_t		autoAngles;
+	vec3_t		autoAxis[3];
+	vec3_t		autoAnglesFast;
+	vec3_t		autoAxisFast[3];
+
+	// view rendering
+	refdef_t	refdef;
+	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
+#ifdef WOLFET
+	refdef_t	*refdef_current;
+
+	// spawn variables
+	qboolean spawning;                  // the CG_Spawn*() functions are valid
+	int numSpawnVars;
+	char        *spawnVars[MAX_SPAWN_VARS][2];  // key / value pairs
+	int numSpawnVarChars;
+	char spawnVarChars[MAX_SPAWN_VARS_CHARS];
+
+	vec2_t mapcoordsMins;
+	vec2_t mapcoordsMaxs;
+	qboolean mapcoordsValid;
+#endif
+
+#ifdef TURTLEARENA // LOCKON
+	// lockon key
+	qboolean	lockedOn;
+	int			lockonTime;
+#endif
+
+#ifndef TURTLEARENA // NOZOOM
+	// zoom key
+	qboolean	zoomed;
+	int			zoomTime;
+	float		zoomSensitivity;
+#endif
+
+	// information screen text during loading
+	char		infoScreenText[MAX_STRING_CHARS];
+
+	// scoreboard
+	int			scoresRequestTime;
+	int			numScores;
+	int			selectedScore;
+	int			teamScores[2];
+	score_t		scores[MAX_CLIENTS];
+	qboolean	showScores;
+	qboolean	scoreBoardShowing;
+	int			scoreFadeTime;
+	char		killerName[MAX_NAME_LENGTH];
+	char			spectatorList[MAX_STRING_CHARS];		// list of names
+	int				spectatorLen;												// length of list
+	float			spectatorWidth;											// width in device units
+	int				spectatorTime;											// next time to offset
+	int				spectatorPaintX;										// current paint x
+	int				spectatorPaintX2;										// current paint x
+	int				spectatorOffset;										// current offset from start
+	int				spectatorPaintLen; 									// current offset from start
+
+#ifdef MISSIONPACK_HARVESTER
+	// skull trails
+	skulltrail_t	skulltrails[MAX_CLIENTS];
+#endif
 
 	// centerprinting
 	int			centerPrintTime;
@@ -751,6 +853,11 @@ typedef struct {
 #ifndef TURTLEARENA // NO_AMMO_WARNINGS
 	// low ammo warning state
 	int			lowAmmoWarning;		// 1 = low, 2 = empty
+#endif
+
+#ifndef IOQ3ZTM // IOQ3BUGFIX: unused in the source code.
+	// kill timers for carnage reward
+	int			lastKillTime;
 #endif
 
 	// crosshair client ID
@@ -772,18 +879,22 @@ typedef struct {
 	qhandle_t	rewardShader[MAX_REWARDSTACK];
 	qhandle_t	rewardSound[MAX_REWARDSTACK];
 
-#ifdef TURTLEARENA // LOCKON
-	// lockon key
-	qboolean	lockedOn;
-	int			lockonTime;
-#endif
+	// sound buffer mainly for announcer sounds
+	int			soundBufferIn;
+	int			soundBufferOut;
+	int			soundTime;
+	qhandle_t	soundBuffer[MAX_SOUNDBUFFER];
 
-#ifndef TURTLEARENA // NOZOOM
-	// zoom key
-	qboolean	zoomed;
-	int			zoomTime;
-	float		zoomSensitivity;
-#endif
+	// for voice chat buffer
+	int			voiceChatTime;
+	int			voiceChatBufferIn;
+	int			voiceChatBufferOut;
+
+	// warmup countdown
+	int			warmup;
+	int			warmupCount;
+
+	//==========================
 
 	int			itemPickup;
 	int			itemPickupTime;
@@ -820,6 +931,12 @@ typedef struct {
 	vec3_t		kick_angles;	// weapon kicks
 	vec3_t		kick_origin;
 
+	// temp working variables for player view
+	float		bobfracsin;
+	int			bobcycle;
+	float		xyspeed;
+	int     nextOrbitTime;
+
 #ifdef IOQ3ZTM // NEW_CAM
 	float camRotDir;
 	qboolean camLeft;
@@ -843,131 +960,11 @@ typedef struct {
 	int		letterboxTime; // Time that the letter box move was started, or -1 if instant.
 #endif
 
-	char		killerName[MAX_NAME_LENGTH];
-
-} cglc_t;
- 
-typedef struct {
-	int			clientFrame;		// incremented each frame
-
-	qboolean	demoPlayback;
-	qboolean	levelShot;			// taking a level menu screenshot
-	int			deferredPlayerLoading;
-	qboolean	loading;			// don't defer players at initial startup
-	qboolean	intermissionStarted;	// don't play voice rewards, because game will end shortly
-
-	// there are only one or two snapshot_t that are relevent at a time
-	int			latestSnapshotNum;	// the number of snapshots the client system has received
-	int			latestSnapshotTime;	// the time from latestSnapshotNum, so we don't need to read the snapshot yet
-
-	snapshot_t	*snap;				// cg.snap->serverTime <= cg.time
-	snapshot_t	*nextSnap;			// cg.nextSnap->serverTime > cg.time, or NULL
-	snapshot_t	activeSnapshots[2];
-
-	float		frameInterpolation;	// (float)( cg.time - cg.frame->serverTime ) / (cg.nextFrame->serverTime - cg.frame->serverTime)
-
-	qboolean	thisFrameTeleport;
-	qboolean	nextFrameTeleport;
-
-	int			frametime;		// cg.time - cg.oldTime
-
-	int			time;			// this is the time value that the client
-								// is rendering at.
-	int			oldTime;		// time at last frame, used for missile trails and prediction checking
-
-	int			physicsTime;	// either cg.snap->time or cg.nextSnap->time
-
-	int			timelimitWarnings;	// 5 min, 1 min, overtime
-	int			fraglimitWarnings;
-
-	qboolean	mapRestart;			// set on a map restart to set back the weapon
-
-	qboolean	renderingThirdPerson;		// during deaths, chasecams, etc
-
-	// auto rotating items
-	vec3_t		autoAngles;
-	vec3_t		autoAxis[3];
-	vec3_t		autoAnglesFast;
-	vec3_t		autoAxisFast[3];
-
-	// view rendering
-	refdef_t	refdef;
-	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
-
-#ifdef TA_SPLITVIEW
-	int numViewports;
-	int viewport;
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-	qboolean singleCamera; // Rending multiple clients using one viewport
-#endif
-
-	// information screen text during loading
-	char		infoScreenText[MAX_STRING_CHARS];
-
-	// scoreboard
-	int			scoresRequestTime;
-	int			numScores;
-	int			selectedScore;
-	int			teamScores[2];
-	score_t		scores[MAX_CLIENTS];
-	qboolean	showScores;
-	qboolean	scoreBoardShowing;
-	int			scoreFadeTime;
-	char			spectatorList[MAX_STRING_CHARS];		// list of names
-	int				spectatorLen;												// length of list
-	float			spectatorWidth;											// width in device units
-	int				spectatorTime;											// next time to offset
-	int				spectatorPaintX;										// current paint x
-	int				spectatorPaintX2;										// current paint x
-	int				spectatorOffset;										// current offset from start
-	int				spectatorPaintLen; 									// current offset from start
-
-	// sound buffer mainly for announcer sounds
-	int			soundBufferIn;
-	int			soundBufferOut;
-	int			soundTime;
-	qhandle_t	soundBuffer[MAX_SOUNDBUFFER];
-
-	// for voice chat buffer
-	int			voiceChatTime;
-	int			voiceChatBufferIn;
-	int			voiceChatBufferOut;
-
-	// warmup countdown
-	int			warmup;
-	int			warmupCount;
-
-	//==========================
-
-#ifdef MISSIONPACK_HARVESTER
-	// skull trails
-	skulltrail_t	skulltrails[MAX_CLIENTS];
-#endif
-
-	// temp working variables for player view
-	float		bobfracsin;
-	int			bobcycle;
-	float		xyspeed;
-#ifndef IOQ3ZTM // NEW_CAM
-	int     nextOrbitTime;
-#endif
 
 	// development tool
 	refEntity_t		testModelEntity;
 	char			testModelName[MAX_QPATH];
 	qboolean		testGun;
-
-	// Local client data, from events and such
-	cglc_t			*cur_lc;	// Current local client data we are working with
-	playerState_t	*cur_ps; // Like cur_lc, but for player state
-#ifdef TA_SPLITVIEW
-	int				cur_localClientNum;
-	cglc_t			localClients[MAX_SPLITVIEW];
-#else
-	cglc_t			localClient;
-#endif
-
 
 } cg_t;
 
@@ -1006,7 +1003,7 @@ typedef struct {
 #endif
 	qhandle_t	whiteShader;
 
-#ifdef MISSIONPACK
+#ifdef MISSIONPACK // IOQ3BUGFIX: This is MISSIONPACK stuff but it didn't have a #ifdef.
 	qhandle_t	redCubeModel;
 	qhandle_t	blueCubeModel;
 	qhandle_t	redCubeIcon;
@@ -1614,11 +1611,7 @@ extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
 extern	vmCvar_t		cg_tracerLength;
 #ifndef TA_WEAPSYS_EX
-#ifdef TA_SPLITVIEW
-extern	vmCvar_t		cg_autoswitch[MAX_SPLITVIEW];
-#else
 extern	vmCvar_t		cg_autoswitch;
-#endif
 #endif
 extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;
@@ -1626,21 +1619,11 @@ extern	vmCvar_t		cg_fov;
 #ifndef TURTLEARENA // NOZOOM
 extern	vmCvar_t		cg_zoomFov;
 #endif
-#ifdef TA_SPLITVIEW
-extern	vmCvar_t		cg_thirdPersonRange[MAX_SPLITVIEW];
-extern	vmCvar_t		cg_thirdPersonAngle[MAX_SPLITVIEW];
-extern	vmCvar_t		cg_thirdPerson[MAX_SPLITVIEW];
-#ifdef ANALOG // cg var
-extern	vmCvar_t		cg_thirdPersonAnalog[MAX_SPLITVIEW];
-#endif
-extern	vmCvar_t		cg_splitviewVertical;
-#else
 extern	vmCvar_t		cg_thirdPersonRange;
 extern	vmCvar_t		cg_thirdPersonAngle;
 extern	vmCvar_t		cg_thirdPerson;
 #ifdef ANALOG // cg var
 extern	vmCvar_t		cg_thirdPersonAnalog;
-#endif
 #endif
 extern	vmCvar_t		cg_lagometer;
 extern	vmCvar_t		cg_drawAttacker;
@@ -1668,9 +1651,7 @@ extern	vmCvar_t		pmove_fixed;
 extern	vmCvar_t		pmove_msec;
 //extern	vmCvar_t		cg_pmove_fixed;
 extern	vmCvar_t		cg_cameraOrbit;
-#ifndef IOQ3ZTM // NEW_CAM
 extern	vmCvar_t		cg_cameraOrbitDelay;
-#endif
 extern	vmCvar_t		cg_timescaleFadeEnd;
 extern	vmCvar_t		cg_timescaleFadeSpeed;
 extern	vmCvar_t		cg_timescale;
@@ -1705,18 +1686,11 @@ extern	vmCvar_t		cg_obeliskRespawnDelay;
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 extern	vmCvar_t		cg_drawMeleeWeaponTrails;
 #endif
-#ifdef TA_MISC // MATERIALS 
-extern	vmCvar_t		cg_impactDebris;
-#endif
 #ifdef IOQ3ZTM // LASERTAG
 extern	vmCvar_t		cg_laserTag;
 #endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 extern vmCvar_t			cg_atmosphericEffects;
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-extern vmCvar_t			cg_2dmode;
-extern vmCvar_t			cg_2dmodeOverride;
 #endif
 
 //
@@ -1759,16 +1733,14 @@ void CG_TestModelPrevSkin_f (void);
 #ifndef TURTLEARENA // NOZOOM
 void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
-#ifdef TA_SPLITVIEW
-void CG_2ZoomDown_f( void );
-void CG_2ZoomUp_f( void );
-void CG_3ZoomDown_f( void );
-void CG_3ZoomUp_f( void );
-void CG_4ZoomDown_f( void );
-void CG_4ZoomUp_f( void );
-#endif
 #endif
 void CG_AddBufferedSound( sfxHandle_t sfx);
+
+#ifdef WOLFET
+void CG_SetupFrustum( void );
+qboolean CG_CullPoint( vec3_t pt );
+qboolean CG_CullPointAndRadius( const vec3_t pt, vec_t radius );
+#endif
 
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
 
@@ -1942,35 +1914,11 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 void CG_NextHoldable_f( void );
 void CG_PrevHoldable_f( void );
 void CG_Holdable_f( void );
-#ifdef TA_SPLITVIEW
-void CG_2NextHoldable_f( void );
-void CG_2PrevHoldable_f( void );
-void CG_2Holdable_f( void );
-void CG_3NextHoldable_f( void );
-void CG_3PrevHoldable_f( void );
-void CG_3Holdable_f( void );
-void CG_4NextHoldable_f( void );
-void CG_4PrevHoldable_f( void );
-void CG_4Holdable_f( void );
-#endif
 #endif
 #ifndef TA_WEAPSYS_EX
 void CG_NextWeapon_f( void );
 void CG_PrevWeapon_f( void );
 void CG_Weapon_f( void );
-#ifdef TA_SPLITVIEW
-void CG_2NextWeapon_f( void );
-void CG_2PrevWeapon_f( void );
-void CG_2Weapon_f( void );
-
-void CG_3NextWeapon_f( void );
-void CG_3PrevWeapon_f( void );
-void CG_3Weapon_f( void );
-
-void CG_4NextWeapon_f( void );
-void CG_4PrevWeapon_f( void );
-void CG_4Weapon_f( void );
-#endif
 #endif
 
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
@@ -2116,6 +2064,18 @@ void CG_DrawLetterbox(void);
 //
 void CG_ProcessSnapshots( void );
 
+#ifdef WOLFET
+//
+// cg_spawn.c
+//
+qboolean    CG_SpawnString( const char *key, const char *defaultString, char **out );
+// spawn string returns a temporary reference, you must CopyString() if you want to keep it
+qboolean    CG_SpawnFloat( const char *key, const char *defaultString, float *out );
+qboolean    CG_SpawnInt( const char *key, const char *defaultString, int *out );
+qboolean    CG_SpawnVector( const char *key, const char *defaultString, float *out );
+void        CG_ParseEntitiesFromString( void );
+#endif
+
 //
 // cg_info.c
 //
@@ -2150,11 +2110,7 @@ void CG_PlayBufferedVoiceChats( void );
 //
 // cg_playerstate.c
 //
-#ifdef TA_SPLITVIEW
-void CG_Respawn( int clientNum );
-#else
 void CG_Respawn( void );
-#endif
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void CG_CheckChangedPredictableEvents( playerState_t *ps );
 
@@ -2164,6 +2120,21 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps );
 //
 void CG_NPC( centity_t *cent );
 void CG_RegisterNPCVisuals( int npcNum );
+#endif
+
+#ifdef WOLFET
+//
+// cg_atmospheric.c
+//
+void CG_EffectParse(const char *effectstr);
+void CG_AddAtmosphericEffects(void);
+
+//
+// cg_polybus.c
+//
+polyBuffer_t* CG_PB_FindFreePolyBuffer( qhandle_t shader, int numVerts, int numIndicies );
+void CG_PB_ClearPolyBuffers( void );
+void CG_PB_RenderPolyBuffers( void );
 #endif
 
 //===============================================
@@ -2256,11 +2227,7 @@ void		trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin );
 
 // respatialize recalculates the volumes of sound as they should be heard by the
 // given entityNum and position
-void		trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater
-#ifdef TA_SPLITVIEW
-		, int listener
-#endif
-		);
+void		trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater );
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed );		// returns buzz if not found
 void		trap_S_StartBackgroundTrack( const char *intro, const char *loop );	// empty name stops music
 void	trap_S_StopBackgroundTrack( void );
@@ -2283,6 +2250,9 @@ void		trap_R_AddRefEntityToScene( const refEntity_t *re );
 // polys are intended for simple wall marks, not really for doing
 // significant construction
 void		trap_R_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts );
+#ifdef WOLFET
+void        trap_R_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer );
+#endif
 void		trap_R_AddPolysToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int numPolys );
 void		trap_R_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 int			trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
@@ -2325,26 +2295,14 @@ qboolean	trap_GetServerCommand( int serverCommandNumber );
 // a lagged connection
 int			trap_GetCurrentCmdNumber( void );	
 
-#ifdef TA_SPLITVIEW // CONTROLS
-qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClient );
-
-#if defined TA_HOLDSYS/*2*/
-// used for the weapon select, holdable select, and zoom
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue, int localClientNum );
-#else
-// used for the weapon select and zoom
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int localClientNum );
-#endif
-#else
 qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
 
 #if defined TA_HOLDSYS/*2*/
 // used for the weapon select, holdable select, and zoom
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue );
+void		trap_SetUserCmdValue( int holdableValue, float sensitivityScale, int weaponValue );
 #else
 // used for the weapon select and zoom
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale );
-#endif
 #endif
 
 // aids for VM testing

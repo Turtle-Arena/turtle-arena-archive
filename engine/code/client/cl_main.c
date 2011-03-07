@@ -106,8 +106,6 @@ cvar_t  *cl_consoleFontSize;
 cvar_t  *cl_consoleFontKerning;
 #endif
 
-cvar_t  *cl_gamename;
-
 clientActive_t		cl;
 clientConnection_t	clc;
 clientStatic_t		cls;
@@ -135,7 +133,6 @@ int serverStatusCount;
 	void hA3Dg_ExportRenderGeom (refexport_t *incoming_re);
 #endif
 
-extern void GLimp_Minimize(void);
 extern void SV_BotFrame( int time );
 void CL_CheckForResend( void );
 void CL_ShowIP_f(void);
@@ -167,19 +164,11 @@ void CL_UpdateMumble(void)
 		return;
 
 	// !!! FIXME: not sure if this is even close to correct.
-#ifdef TA_SPLITVIEW
-	AngleVectors( cl.snap.pss[0].viewangles, forward, NULL, up);
-
-	pos[0] = cl.snap.pss[0].origin[0] * scale;
-	pos[1] = cl.snap.pss[0].origin[2] * scale;
-	pos[2] = cl.snap.pss[0].origin[1] * scale;
-#else
 	AngleVectors( cl.snap.ps.viewangles, forward, NULL, up);
 
 	pos[0] = cl.snap.ps.origin[0] * scale;
 	pos[1] = cl.snap.ps.origin[2] * scale;
 	pos[2] = cl.snap.ps.origin[1] * scale;
-#endif
 
 	tmp = forward[1];
 	forward[1] = forward[2];
@@ -931,7 +920,7 @@ static void CL_CompleteDemoName( char *args, int argNum )
 		char demoExt[ 16 ];
 
 		Com_sprintf( demoExt, sizeof( demoExt ), ".dm_%d", PROTOCOL_VERSION );
-		Field_CompleteFilename( "demos", demoExt, qtrue, qtrue );
+		Field_CompleteFilename( "demos", demoExt, qtrue );
 	}
 }
 
@@ -1490,92 +1479,6 @@ void CL_ForwardToServer_f( void ) {
 		CL_AddReliableCommand(Cmd_Args(), qfalse);
 	}
 }
-
-#ifdef TA_SPLITVIEW
-/*
-==================
-CL_2DropOut_f
-==================
-*/
-void CL_2DropOut_f( void ) {
-	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand("dropout2", qfalse);
-}
-
-/*
-==================
-CL_3DropOut_f
-==================
-*/
-void CL_3DropOut_f( void ) {
-	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand("dropout3", qfalse);
-}
-
-/*
-==================
-CL_4DropOut_f
-==================
-*/
-void CL_4DropOut_f( void ) {
-	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand("dropout4", qfalse);
-}
-
-/*
-==================
-CL_2DropIn_f
-==================
-*/
-void CL_2DropIn_f( void ) {
-	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand(va("dropin2 \"%s\"", Cvar_InfoString( CVAR_USERINFO2 )), qfalse);
-}
-
-/*
-==================
-CL_3DropIn_f
-==================
-*/
-void CL_3DropIn_f( void ) {
-	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand(va("dropin3 \"%s\"", Cvar_InfoString( CVAR_USERINFO3 )), qfalse);
-}
-
-/*
-==================
-CL_4DropIn_f
-==================
-*/
-void CL_4DropIn_f( void ) {
-	if ( cls.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand(va("dropin4 \"%s\"", Cvar_InfoString( CVAR_USERINFO4 )), qfalse);
-}
-#endif
 
 /*
 ==================
@@ -2202,11 +2105,6 @@ Resend a connect message if the last one has timed out
 */
 void CL_CheckForResend( void ) {
 	int		port, i;
-#ifdef TA_SPLITVIEW
-	int		size, j;
-	int		cvarflag[MAX_SPLITVIEW] = {CVAR_USERINFO, CVAR_USERINFO2, CVAR_USERINFO3, CVAR_USERINFO4};
-	int		localClients;
-#endif
 	char	info[MAX_INFO_STRING];
 	char	data[MAX_INFO_STRING];
 
@@ -2232,7 +2130,7 @@ void CL_CheckForResend( void ) {
 	case CA_CONNECTING:
 		// requesting a challenge .. IPv6 users always get in as authorize server supports no ipv6.
 #ifndef STANDALONE
-		if (!com_standalone->integer && clc.serverAddress.type == NA_IP && !Sys_IsLANAddress( clc.serverAddress ) )
+		if (!Cvar_VariableIntegerValue("com_standalone") && clc.serverAddress.type == NA_IP && !Sys_IsLANAddress( clc.serverAddress ) )
 			CL_RequestAuthorization();
 #endif
 
@@ -2246,65 +2144,12 @@ void CL_CheckForResend( void ) {
 		// sending back the challenge
 		port = Cvar_VariableValue ("net_qport");
 
-#ifndef TA_SPLITVIEW
 		Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
 		Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
 		Info_SetValueForKey( info, "qport", va("%i", port ) );
 		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
-#endif
 		
 		strcpy(data, "connect ");
-#ifdef TA_SPLITVIEW
-		size = 8;
-
-		// Check how many local client user wants
-		localClients = Com_Clamp(1, (1<<MAX_SPLITVIEW)-1, Cvar_VariableIntegerValue("cl_localClients"));
-
-		// Reset cl_localClients (Set before each join)
-		Cvar_Set("cl_localClients", "1");
-
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if (!(localClients & (1<<(i)))) {
-				// Dummy string.
-				data[size] = '"'; size++;
-				data[size] = '"'; size++;
-
-				// Add space between info strings.
-				if (i != MAX_SPLITVIEW-1) {
-					data[size] = ' '; size++;
-				}
-				continue;
-			}
-
-			Q_strncpyz( info, Cvar_InfoString( cvarflag[i] ), sizeof( info ) );
-
-			// ZTM: Do we need to set these for more than the first client?
-			Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
-			Info_SetValueForKey( info, "qport", va("%i", port ) );
-			Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
-
-			// TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
-			//   (Com_TokenizeString tokenizes around spaces)
-			data[size] = '"'; size++;
-			for(j = 0; j < strlen(info); j++) {
-				data[size+j] = info[j];	// + (clc.challenge)&0x3;
-			}
-			size += j;
-			data[size] = '"'; size++;
-
-			// Add space between info strings.
-			if (i != MAX_SPLITVIEW-1) {
-				data[size] = ' '; size++;
-			}
-		}
-		data[size] = 0;
-
-		// NOTE TTimo don't forget to set the right data length!
-		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (byte *) &data[0], size );
-		// the most current userinfo has been sent, so watch for any
-		// newer changes to userinfo variables
-		cvar_modifiedFlags &= ~CVAR_USERINFO_ALL;
-#else
     // TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
     //   (Com_TokenizeString tokenizes around spaces)
     data[8] = '"';
@@ -2320,7 +2165,6 @@ void CL_CheckForResend( void ) {
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
-#endif
 		break;
 
 	default:
@@ -2420,17 +2264,13 @@ CL_ServersResponsePacket
 ===================
 */
 void CL_ServersResponsePacket( const netadr_t* from, msg_t *msg, qboolean extended ) {
-	int				i, j, count, total;
+	int				i, count, total;
 	netadr_t addresses[MAX_SERVERSPERPACKET];
 	int				numservers;
 	byte*			buffptr;
 	byte*			buffend;
 	
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	Com_DPrintf("CL_ServersResponsePacket\n");
-#else
 	Com_Printf("CL_ServersResponsePacket\n");
-#endif
 
 	if (cls.numglobalservers == -1) {
 		// state to detect lack of servers or lack of response
@@ -2504,18 +2344,6 @@ void CL_ServersResponsePacket( const netadr_t* from, msg_t *msg, qboolean extend
 	for (i = 0; i < numservers && count < MAX_GLOBAL_SERVERS; i++) {
 		// build net address
 		serverInfo_t *server = &cls.globalServers[count];
-
-		// Tequila: It's possible to have sent many master server requests. Then
-		// we may receive many times the same addresses from the master server.
-		// We just avoid to add a server if it is still in the global servers list.
-		for (j = 0; j < count; j++)
-		{
-			if (NET_CompareAdr(cls.globalServers[j].adr, addresses[i]))
-				break;
-		}
-
-		if (j < count)
-			continue;
 
 		CL_InitServerInfo( server, &addresses[i] );
 		// advance to next slot
@@ -2802,23 +2630,6 @@ void CL_CheckUserinfo( void ) {
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
 		CL_AddReliableCommand(va("userinfo \"%s\"", Cvar_InfoString( CVAR_USERINFO ) ), qfalse);
 	}
-#ifdef TA_SPLITVIEW
-	if(cvar_modifiedFlags & CVAR_USERINFO2)
-	{
-		cvar_modifiedFlags &= ~CVAR_USERINFO2;
-		CL_AddReliableCommand(va("userinfo2 \"%s\"", Cvar_InfoString( CVAR_USERINFO2 ) ), qfalse);
-	}
-	if(cvar_modifiedFlags & CVAR_USERINFO3)
-	{
-		cvar_modifiedFlags &= ~CVAR_USERINFO3;
-		CL_AddReliableCommand(va("userinfo3 \"%s\"", Cvar_InfoString( CVAR_USERINFO3 ) ), qfalse);
-	}
-	if(cvar_modifiedFlags & CVAR_USERINFO4)
-	{
-		cvar_modifiedFlags &= ~CVAR_USERINFO4;
-		CL_AddReliableCommand(va("userinfo4 \"%s\"", Cvar_InfoString( CVAR_USERINFO4 ) ), qfalse);
-	}
-#endif
 }
 
 /*
@@ -3215,19 +3026,11 @@ void CL_Video_f( void )
   char  filename[ MAX_OSPATH ];
   int   i, last;
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: It can record the main menu, so allow and tell user how.
-  if (!clc.demoplaying && !cl_forceavidemo->integer)
-  {
-    Com_Printf( "The video command can only be used when playing back demos or cl_forceavidemo is enabled\n" );
-    return;
-  }
-#else
   if( !clc.demoplaying )
   {
     Com_Printf( "The video command can only be used when playing back demos\n" );
     return;
   }
-#endif
 
   if( Cmd_Argc( ) == 2 )
   {
@@ -3319,18 +3122,12 @@ static void CL_GenerateQKey(void)
 	}
 } 
 
-
 /*
 ====================
 CL_Init
 ====================
 */
 void CL_Init( void ) {
-#if !defined TA_WEAPSYS_EX && !defined TURTLEARENA // ALWAYS_RUN
-#ifdef TA_SPLITVIEW
-	int		i;
-#endif
-#endif
 	Com_Printf( "----- Client Initialization -----\n" );
 
 	Con_Init ();
@@ -3376,13 +3173,7 @@ void CL_Init( void ) {
 	cl_packetdup = Cvar_Get ("cl_packetdup", "1", CVAR_ARCHIVE );
 
 #ifndef TURTLEARENA // ALWAYS_RUN
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		cl_run[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_run"), "1", CVAR_ARCHIVE);
-	}
-#else
 	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE);
-#endif
 #endif
 	cl_sensitivity = Cvar_Get ("sensitivity", "5", CVAR_ARCHIVE);
 	cl_mouseAccel = Cvar_Get ("cl_mouseAccel", "0", CVAR_ARCHIVE);
@@ -3394,7 +3185,6 @@ void CL_Init( void ) {
 	// offset for the power function (for style 1, ignored otherwise)
 	// this should be set to the max rate value
 	cl_mouseAccelOffset = Cvar_Get( "cl_mouseAccelOffset", "5", CVAR_ARCHIVE );
-	Cvar_CheckRange(cl_mouseAccelOffset, 0.001f, 50000.0f, qfalse);
 
 	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 
@@ -3420,13 +3210,7 @@ void CL_Init( void ) {
 #ifndef TA_WEAPSYS_EX
 	// init autoswitch so the ui will have it correctly even
 	// if the cgame hasn't been started
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		Cvar_Get (Com_LocalClientCvarName(i, "cg_autoswitch"), "1", CVAR_ARCHIVE);
-	}
-#else
 	Cvar_Get ("cg_autoswitch", "1", CVAR_ARCHIVE);
-#endif
 #endif
 
 	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);
@@ -3456,16 +3240,10 @@ void CL_Init( void ) {
 	cl_consoleFontKerning = Cvar_Get ("cl_consoleFontKerning", "0", CVAR_ARCHIVE | CVAR_LATCH);
 #endif
 
-#ifdef TA_SPLITVIEW
-	Cvar_Get ("cl_localClients", "1", 0 );
-#endif
-
-	cl_gamename = Cvar_Get("cl_gamename", GAMENAME_FOR_MASTER, CVAR_TEMP);
-
 	// userinfo
 	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("rate", "25000", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
-	Cvar_Get ("snaps", "20", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
+	Cvar_Get ("rate", "25000", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("snaps", "20", CVAR_USERINFO | CVAR_ARCHIVE );
 #ifdef TURTLEARENA
 	// DEFAULT_PLAYER
 #ifdef TA_SP // SPMODEL
@@ -3480,7 +3258,7 @@ void CL_Init( void ) {
 #endif
 	// DEFAULT_TEAMS
 	Cvar_Get ("g_redTeam", "Foot", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	Cvar_Get ("g_blueTeam", "Shell", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	Cvar_Get ("g_blueTeam", "Katanas", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #else
 	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
@@ -3505,105 +3283,10 @@ void CL_Init( void ) {
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("teamtask", "0", CVAR_USERINFO );
 	Cvar_Get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
+	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO | CVAR_ARCHIVE );
 
-	Cvar_Get ("password", "", CVAR_USERINFO_ALL);
-	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
-
-#ifdef TA_SPLITVIEW
-	// Second local client
-	Cvar_Get ("2name", "UnnamedPlayer2", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#ifdef TA_SP // SPMODEL
-	Cvar_Get ("2spmodel", "mike", CVAR_USERINFO2 | CVAR_ROM );
-	Cvar_Get ("2spheadmodel", "", CVAR_USERINFO2 | CVAR_ROM );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("2model", "mike", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("2model", "grunt", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#endif
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("2headmodel", "", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("2headmodel", "grunt", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#endif
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("2team_model", "james", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2team_headmodel", "*james", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("2color1", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2color2", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("2color1", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2color2", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#endif
-	Cvar_Get ("2handicap", "100", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2teamtask", "0", CVAR_USERINFO2 );
-	Cvar_Get ("2sex", "male", CVAR_USERINFO2 | CVAR_ARCHIVE );
-
-	// Third local client
-	Cvar_Get ("3name", "UnnamedPlayer3", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#ifdef TA_SP // SPMODEL
-	Cvar_Get ("3spmodel", "leo", CVAR_USERINFO3 | CVAR_ROM );
-	Cvar_Get ("3spheadmodel", "", CVAR_USERINFO3 | CVAR_ROM );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("3model", "leo", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("3model", "crash", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#endif
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("3headmodel", "", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("3headmodel", "crash", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#endif
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("3team_model", "janet", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3team_headmodel", "*janet", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("3color1", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3color2", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("3color1", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3color2", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#endif
-	Cvar_Get ("3handicap", "100", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3teamtask", "0", CVAR_USERINFO3 );
-	Cvar_Get ("3sex", "male", CVAR_USERINFO3 | CVAR_ARCHIVE );
-
-	// Fourth local client
-	Cvar_Get ("4name", "UnnamedPlayer4", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#ifdef TA_SP // SPMODEL
-	Cvar_Get ("4spmodel", "don", CVAR_USERINFO4 | CVAR_ROM );
-	Cvar_Get ("4spheadmodel", "", CVAR_USERINFO4 | CVAR_ROM );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("4model", "don", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("4model", "visor", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("4headmodel", "", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("4headmodel", "visor", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("4team_model", "janet", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4team_headmodel", "*janet", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("4color1", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4color2", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("4color1", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4color2", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
-	Cvar_Get ("4handicap", "100", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4teamtask", "0", CVAR_USERINFO4 );
-	Cvar_Get ("4sex", "male", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
+	Cvar_Get ("password", "", CVAR_USERINFO);
+	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO | CVAR_ARCHIVE );
 
 #ifdef USE_MUMBLE
 	cl_useMumble = Cvar_Get ("cl_useMumble", "0", CVAR_ARCHIVE | CVAR_LATCH);
@@ -3646,14 +3329,6 @@ void CL_Init( void ) {
 	// register our commands
 	//
 	Cmd_AddCommand ("cmd", CL_ForwardToServer_f);
-#ifdef TA_SPLITVIEW
-	Cmd_AddCommand ("2dropout", CL_2DropOut_f);
-	Cmd_AddCommand ("3dropout", CL_3DropOut_f);
-	Cmd_AddCommand ("4dropout", CL_4DropOut_f);
-	Cmd_AddCommand ("2dropin", CL_2DropIn_f);
-	Cmd_AddCommand ("3dropin", CL_3DropIn_f);
-	Cmd_AddCommand ("4dropin", CL_4DropIn_f);
-#endif
 	Cmd_AddCommand ("configstrings", CL_Configstrings_f);
 	Cmd_AddCommand ("clientinfo", CL_Clientinfo_f);
 	Cmd_AddCommand ("snd_restart", CL_Snd_Restart_f);
@@ -3682,7 +3357,6 @@ void CL_Init( void ) {
 #endif
 	Cmd_AddCommand ("video", CL_Video_f );
 	Cmd_AddCommand ("stopvideo", CL_StopVideo_f );
-	Cmd_AddCommand("minimize", GLimp_Minimize);
 	CL_InitRef();
 
 	SCR_Init ();
@@ -4154,10 +3828,11 @@ void CL_GlobalServers_f( void ) {
 	netadr_t	to;
 	int			count, i, masterNum;
 	char		command[1024], *masteraddress;
+	char		*cmdname;
 	
-	if ((count = Cmd_Argc()) < 3 || (masterNum = atoi(Cmd_Argv(1))) < 0 || masterNum > MAX_MASTER_SERVERS - 1)
+	if ((count = Cmd_Argc()) < 3 || (masterNum = atoi(Cmd_Argv(1))) < 0 || masterNum > 4)
 	{
-		Com_Printf("usage: globalservers <master# 0-%d> <protocol> [keywords]\n", MAX_MASTER_SERVERS - 1);
+		Com_Printf( "usage: globalservers <master# 0-4> <protocol> [keywords]\n");
 		return;	
 	}
 
@@ -4191,29 +3866,14 @@ void CL_GlobalServers_f( void ) {
 	// Use the extended query for IPv6 masters
 	if (to.type == NA_IP6 || to.type == NA_MULTICAST6)
 	{
-		int v4enabled = Cvar_VariableIntegerValue("net_enabled") & NET_ENABLEV4;
-		
-		if(v4enabled)
-		{
-			Com_sprintf(command, sizeof(command), "getserversExt %s %s ipv6",
-				cl_gamename->string, Cmd_Argv(2));
-		}
-		else
-		{
-			Com_sprintf(command, sizeof(command), "getserversExt %s %s",
-				cl_gamename->string, Cmd_Argv(2));
-		}
+		cmdname = "getserversExt " GAMENAME_FOR_MASTER;
 
 		// TODO: test if we only have an IPv6 connection. If it's the case,
 		//       request IPv6 servers only by appending " ipv6" to the command
 	}
 	else
-#if defined STANDALONE && defined IOQ3ZTM // All standalone games use dpmaster, right? So we can use gamename instead of having dpmaster guess based on protocol?
-		Com_sprintf(command, sizeof(command), "getservers %s %s",
-			cl_gamename->string, Cmd_Argv(2));
-#else
-		Com_sprintf(command, sizeof(command), "getservers %s", Cmd_Argv(2));
-#endif
+		cmdname = "getservers";
+	Com_sprintf( command, sizeof(command), "%s %s", cmdname, Cmd_Argv(2) );
 
 	for (i=3; i < count; i++)
 	{
@@ -4236,9 +3896,9 @@ void CL_GetPing( int n, char *buf, int buflen, int *pingtime )
 	int		time;
 	int		maxPing;
 
-	if (n < 0 || n >= MAX_PINGREQUESTS || !cl_pinglist[n].adr.port)
+	if (!cl_pinglist[n].adr.port)
 	{
-		// empty or invalid slot
+		// empty slot
 		buf[0]    = '\0';
 		*pingtime = 0;
 		return;
@@ -4270,14 +3930,29 @@ void CL_GetPing( int n, char *buf, int buflen, int *pingtime )
 
 /*
 ==================
+CL_UpdateServerInfo
+==================
+*/
+void CL_UpdateServerInfo( int n )
+{
+	if (!cl_pinglist[n].adr.port)
+	{
+		return;
+	}
+
+	CL_SetServerInfoByAddress(cl_pinglist[n].adr, cl_pinglist[n].info, cl_pinglist[n].time );
+}
+
+/*
+==================
 CL_GetPingInfo
 ==================
 */
 void CL_GetPingInfo( int n, char *buf, int buflen )
 {
-	if (n < 0 || n >= MAX_PINGREQUESTS || !cl_pinglist[n].adr.port)
+	if (!cl_pinglist[n].adr.port)
 	{
-		// empty or invalid slot
+		// empty slot
 		if (buflen)
 			buf[0] = '\0';
 		return;

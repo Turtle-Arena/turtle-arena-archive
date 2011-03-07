@@ -71,64 +71,6 @@ static void CG_TransitionEntity( centity_t *cent ) {
 	CG_CheckEvents( cent );
 }
 
-#ifdef TA_SPLITVIEW
-// Client side prediction of player solid.
-// Must set for local client perdiction to work correctly
-//  and so local clients can be found by CG_ScanForCrosshairEntity
-void CG_SetPlayerSolid(playerState_t *ps, entityState_t *s
-#ifdef TA_PLAYERSYS
-					, bg_playercfg_t *playercfg
-#endif
-					)
-{
-	if (ps->stats[STAT_HEALTH] > 0 && !(ps->pm_flags & PM_DEAD)
-		&& ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
-#ifdef TURTLEARENA // POWERS
-		&& !ps->powerups[PW_FLASHING]
-#endif
-		)
-	{
-		int i, j, k;
-
-		// assume that x/y are equal and symetric
-#ifdef TA_PLAYERSYS
-		i = playercfg->bbmaxs[0];
-#else
-		i = 15;
-#endif
-		if (i<1)
-			i = 1;
-		if (i>255)
-			i = 255;
-
-		// z is not symetric
-#ifdef TA_PLAYERSYS
-		j = (-playercfg->bbmins[2]);
-#else
-		j = 24;
-#endif
-		if (j<1)
-			j = 1;
-		if (j>255)
-			j = 255;
-
-		// and z maxs can be negative...
-#ifdef TA_PLAYERSYS
-		k = (playercfg->bbmaxs[2]+32);
-#else
-		k = 32+32;
-#endif
-		if (k<1)
-			k = 1;
-		if (k>255)
-			k = 255;
-
-		s->solid = (k<<16) | (j<<8) | i;
-	} else {
-		s->solid = 0;
-	}
-}
-#endif
 
 /*
 ==================
@@ -148,25 +90,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 
 	cg.snap = snap;
 
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (cg.snap->lcIndex[i] != -1) {
-			// Set clientNum as extra local client don't have it yet.
-			cg.localClients[i].clientNum = cg.snap->pss[cg.snap->lcIndex[i]].clientNum;
-		}
-	}
-
-	for (i = 0; i < cg.snap->numPSs; i++) {
-		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState, qfalse );
-		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState
-#ifdef TA_PLAYERSYS
-				, &cgs.clientinfo[ cg.snap->pss[i].clientNum ].playercfg
-#endif
-				);
-	}
-#else
 	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].currentState, qfalse );
-#endif
 
 	// sort out solid entities
 	CG_BuildSolidList();
@@ -175,11 +99,7 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 
 	// set our local weapon selection pointer to
 	// what the server has indicated the current weapon is
-#ifdef TA_SPLITVIEW // Reset all clients
-	CG_Respawn(-1);
-#else
 	CG_Respawn();
-#endif
 
 	for ( i = 0 ; i < cg.snap->numEntities ; i++ ) {
 		state = &cg.snap->entities[ i ];
@@ -234,20 +154,8 @@ static void CG_TransitionSnapshot( void ) {
 	oldFrame = cg.snap;
 	cg.snap = cg.nextSnap;
 
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < cg.snap->numPSs; i++) {
-		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState, qfalse );
-		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState
-#ifdef TA_PLAYERSYS
-				, &cgs.clientinfo[ cg.snap->pss[i].clientNum ].playercfg
-#endif
-				);
-		cg_entities[ cg.snap->pss[i].clientNum ].interpolate = qfalse;
-	}
-#else
 	BG_PlayerStateToEntityState( &cg.snap->ps, &cg_entities[ cg.snap->ps.clientNum ].currentState, qfalse );
 	cg_entities[ cg.snap->ps.clientNum ].interpolate = qfalse;
-#endif
 
 	for ( i = 0 ; i < cg.snap->numEntities ; i++ ) {
 		cent = &cg_entities[ cg.snap->entities[ i ].number ];
@@ -263,21 +171,8 @@ static void CG_TransitionSnapshot( void ) {
 	if ( oldFrame ) {
 		playerState_t	*ops, *ps;
 
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if (oldFrame->lcIndex[i] == -1 || cg.snap->lcIndex[i] == -1) {
-				continue;
-			}
-
-			cg.cur_localClientNum = i;
-			cg.cur_lc = &cg.localClients[i];
-
-			ops = &oldFrame->pss[oldFrame->lcIndex[i]];
-			ps = &cg.snap->pss[cg.snap->lcIndex[i]];
-#else
 		ops = &oldFrame->ps;
 		ps = &cg.snap->ps;
-#endif
 		// teleporting checks are irrespective of prediction
 		if ( ( ps->eFlags ^ ops->eFlags ) & EF_TELEPORT_BIT ) {
 			cg.thisFrameTeleport = qtrue;	// will be cleared by prediction code
@@ -285,13 +180,10 @@ static void CG_TransitionSnapshot( void ) {
 
 		// if we are not doing client side movement prediction for any
 		// reason, then the client events and view changes will be issued now
-		if ( cg.demoPlayback || (ps->pm_flags & PMF_FOLLOW)
+		if ( cg.demoPlayback || (cg.snap->ps.pm_flags & PMF_FOLLOW)
 			|| cg_nopredict.integer || cg_synchronousClients.integer ) {
 			CG_TransitionPlayerState( ps, ops );
 		}
-#ifdef TA_SPLITVIEW
-		}
-#endif
 	}
 
 }
@@ -308,26 +200,11 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 	int					num;
 	entityState_t		*es;
 	centity_t			*cent;
-#ifdef TA_SPLITVIEW
-	int					i;
-#endif
 
 	cg.nextSnap = snap;
 
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < cg.snap->numPSs; i++) {
-		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].nextState, qfalse );
-		CG_SetPlayerSolid(&cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].nextState
-#ifdef TA_PLAYERSYS
-				, &cgs.clientinfo[ cg.snap->pss[i].clientNum ].playercfg
-#endif
-				);
-		cg_entities[ cg.snap->pss[i].clientNum ].interpolate = qtrue;
-	}
-#else
 	BG_PlayerStateToEntityState( &snap->ps, &cg_entities[ snap->ps.clientNum ].nextState, qfalse );
 	cg_entities[ cg.snap->ps.clientNum ].interpolate = qtrue;
-#endif
 
 	// check for extrapolation errors
 	for ( num = 0 ; num < snap->numEntities ; num++ ) {
@@ -346,21 +223,6 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 		}
 	}
 
-#ifdef TA_SPLITVIEW
-	cg.nextFrameTeleport = qfalse;
-	for (i = 0; i < cg.snap->numPSs; i++) {
-		// if the next frame is a teleport for the playerstate, we
-		// can't interpolate during demos
-		if ( cg.snap && ( ( snap->pss[i].eFlags ^ cg.snap->pss[i].eFlags ) & EF_TELEPORT_BIT ) ) {
-			cg.nextFrameTeleport = qtrue;
-		}
-
-		// if changing follow mode, don't interpolate
-		if ( cg.nextSnap->pss[i].clientNum != cg.snap->pss[i].clientNum ) {
-			cg.nextFrameTeleport = qtrue;
-		}
-	}
-#else
 	// if the next frame is a teleport for the playerstate, we
 	// can't interpolate during demos
 	if ( cg.snap && ( ( snap->ps.eFlags ^ cg.snap->ps.eFlags ) & EF_TELEPORT_BIT ) ) {
@@ -373,7 +235,6 @@ static void CG_SetNextSnap( snapshot_t *snap ) {
 	if ( cg.nextSnap->ps.clientNum != cg.snap->ps.clientNum ) {
 		cg.nextFrameTeleport = qtrue;
 	}
-#endif
 
 	// if changing server restarts, don't interpolate
 	if ( ( cg.nextSnap->snapFlags ^ cg.snap->snapFlags ) & SNAPFLAG_SERVERCOUNT ) {
@@ -400,7 +261,7 @@ static snapshot_t *CG_ReadNextSnapshot( void ) {
 	snapshot_t	*dest;
 
 	if ( cg.latestSnapshotNum > cgs.processedSnapshotNum + 1000 ) {
-		CG_Printf( "WARNING: CG_ReadNextSnapshot: way out of range, %i > %i\n", 
+		CG_Printf( "WARNING: CG_ReadNextSnapshot: way out of range, %i > %i", 
 			cg.latestSnapshotNum, cgs.processedSnapshotNum );
 	}
 

@@ -102,9 +102,6 @@ typedef struct
 	qboolean	fixed_origin;	// use origin instead of fetching entnum's origin
 	sfx_t		*thesfx;		// sfx structure
 	qboolean	doppler;
-#ifdef TA_SPLITVIEW
-	qboolean	fullVolume;
-#endif
 } channel_t;
 
 
@@ -134,11 +131,7 @@ typedef struct
 	void (*AddLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*AddRealLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*StopLoopingSound)(int entityNum );
-#ifdef TA_SPLITVIEW
-	void (*Respatialize)( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, int listener );
-#else
 	void (*Respatialize)( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater );
-#endif
 	void (*UpdateEntityPosition)( int entityNum, const vec3_t origin );
 	void (*Update)( void );
 	void (*DisableSounds)( void );

@@ -123,7 +123,7 @@ static void UI_CreditMenu_Draw_Legal( void ) {
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "no way affiliated with", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Viacom, Nickelodeon, or Ubisoft.", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "Viacom, Ubisoft, or Mirage Studios.", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Copyright
 	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
@@ -158,7 +158,7 @@ static void UI_CreditMenu_Draw( void ) {
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "Xreal, Smokin' Guns, Mercenaries Guild,", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "The Reaction Factory, \"inolan.com\",", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, " Wolf-ET, The Reaction Factory, \"inolan.com\",", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "Zack \"ZTurtleMan\" Middleton", UI_CENTER|UI_SMALLFONT, color_white );
 
