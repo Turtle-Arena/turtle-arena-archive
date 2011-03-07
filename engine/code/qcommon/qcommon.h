@@ -260,8 +260,8 @@ extern int demo_protocols[];
 #endif
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
-#if 0 // #ifdef TA_MAIN // ZTM: TODO: Use a different master server?
-#define MASTER_SERVER_NAME	""
+#ifdef TA_MAIN
+#define MASTER_SERVER_NAME	"dpmaster.splintertown.org"
 #else
 #define MASTER_SERVER_NAME	"master.quake3arena.com"
 #endif
