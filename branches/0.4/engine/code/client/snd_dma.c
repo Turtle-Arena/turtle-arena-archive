@@ -1332,11 +1332,6 @@ void S_Base_StartBackgroundTrack( const char *intro, const char *loop )
 	char intro[MAX_QPATH];
 	char loop[MAX_QPATH];
 
-	strncpy(intro, _intro, MAX_QPATH);
-	strncpy(loop, _loop, MAX_QPATH);
-#endif
-
-#ifdef IOQ3ZTM // MUSIC_SCRIPTS
 	if ( !_intro ) {
 		_intro = "";
 	}
