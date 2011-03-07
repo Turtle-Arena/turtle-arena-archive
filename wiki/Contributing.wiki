@@ -1,0 +1,20 @@
+#summary Contribution guidelines.
+#labels Featured
+
+= Data =
+Contributed data (models, images, audio, etc) are required to be licensed as CC-BY-SA-3.0 and/or GPLv2+, preferably both.
+  * Source files are required if they exist. It make it easier for others to improve/modify the data.
+    * It is recommended to free and open source software for creating the data, so anyone can download and use the program you used to create the source file.
+  * It is recommended to use multilayer images when creating all images (unless they are _very_ simple).
+  * It is recommended to use skeleton animation for animated models.
+
+It is recommended to use the software used to create most of the existing data. There are many source files for them as well.
+  * 3D Models
+    * Wings3D &mdesh; 3D modeler
+    * Misfit Model 3D &mdesh; 3D modeler and animator
+  * 2D Graphics
+    * GIMP &mdesh; Raster graphics
+    * Inkscape &mdesh; Scalable Vector Graphics
+
+= Source Code =
+Source code contributions should be licensed as GPLv2+.
