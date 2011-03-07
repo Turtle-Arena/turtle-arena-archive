@@ -1,0 +1,8 @@
+Turtle Arena for Debian
+====================
+
+The .orig.tar.gz tarball of this package was derived from the upstream's
+subversion. We're mainly only interested in the content of the
+directory "tags/0.x/base" or "trunk/base" in development releases.
+
+ -- Zack "ZTurtleMan" Middleton <ZTurtleMan@gmail.com>  Fri,  28 May 2010 13:01:28 +0500
