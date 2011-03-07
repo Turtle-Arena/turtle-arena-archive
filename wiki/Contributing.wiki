@@ -1,7 +1,7 @@
 #summary Contribution guidelines.
 #labels Featured
 
-Turtle Arena is free and open source software, contributions must also be. You can submit changes and new stuff using the [http://code.google.com/p/turtlearena/issues issue tracker]. Please state if you create the submission or who did create it; the name to be credited.
+Turtle Arena is free and open source software [Contributing#* *], contributions must also be. You can submit changes and new stuff using the [http://code.google.com/p/turtlearena/issues issue tracker]. Please state if you create the submission or who did create it; the name to be credited.
 
 = Data =
 Contributed data (models, images, audio, etc) are required to be licensed as [http://creativecommons.org/licenses/by-sa/3.0/ CC-BY-SA-3.0] and/or [http://www.gnu.org/licenses/gpl-2.0.html GPLv2 with 'or any later version' option (GPLv2+)], preferably both.
@@ -21,3 +21,6 @@ It is recommended to use the software used to create most of the existing data. 
 
 = Source Code =
 Source code contributions should be licensed as [http://www.gnu.org/licenses/gpl-2.0.html GPLv2 with 'or any later version' option (GPLv2+)].
+
+= `*` =
+Most of the music in Turtle Arena is licensed as non-commercial which is considered non-free by Debian Free Software Guidelines. No further data licensed as non-commercial will be excepted. The non-commercial music will likely be removed.
