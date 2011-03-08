@@ -1,6 +1,12 @@
 #
 # Turtle Arena Makefile
 #
+# Multiple games can be built;
+#	Turtle Arena. Use make as usual.
+#	ioq3turtle (ioq3 mode for Turtle Arena). make BUILD_IOQ3TURTLE=1
+#	ioq3ztm (Turtle Arena stuff in ioq3, not net compatible with either games). make BUILD_IOQ3ZTM=1
+#	ioquake3 (Unmodified ioq3, any changes are accidental). make BUILD_IOQ3=1
+#
 # GNU Make required
 #
 
@@ -268,8 +274,8 @@ else # END QUAKE3
 	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
 	#							Kinda pointless. (Note: TA_PLAYERSYS adds support for Elite Force soundpath keyword in animations.cfg,
 	#													must also define RAVENMD4 and IOQ3ZTM)
-	# TA_SPLITVIEW			WIP Local splitscreen and split view system for viewing multiple clients at once.
-	#							It is currently not network compatible with non-TA_SPLITVIEW builds.
+	# TA_SPLITVIEW			Allow a single game client to connect and play using multiple local clients, commonly called splitscreen.
+	#						TODO: Split view system for viewing multiple network clients at once.
 
 
 	# Turtle Arena specific defines
