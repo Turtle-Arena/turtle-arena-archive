@@ -2418,9 +2418,6 @@ CL_InitServerInfo
 void CL_InitServerInfo( serverInfo_t *server, netadr_t *address ) {
 	server->adr = *address;
 	server->clients = 0;
-#ifdef IOQ3ZTM // G_HUMANPLAYERS
-	server->g_humanplayers = 0;
-#endif
 	server->hostName[0] = '\0';
 	server->mapName[0] = '\0';
 	server->maxClients = 0;
@@ -2430,6 +2427,15 @@ void CL_InitServerInfo( serverInfo_t *server, netadr_t *address ) {
 	server->game[0] = '\0';
 	server->gameType = 0;
 	server->netType = 0;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Why aren't all fields initialized here?
+	server->clients = 0;
+	//server->visible = qfalse; // ZTM: Don't touch?
+#ifdef IOQUAKE3 // ZTM: punkbuster
+	server->punkbuster = 0;
+#endif
+	server->g_humanplayers = 0;
+	server->g_needpass = 0;
+#endif
 }
 
 #define MAX_SERVERSPERPACKET	256
@@ -3783,9 +3789,6 @@ static void CL_SetServerInfo(serverInfo_t *server, const char *info, int ping) {
 	if (server) {
 		if (info) {
 			server->clients = atoi(Info_ValueForKey(info, "clients"));
-#ifdef IOQ3ZTM // G_HUMANPLAYERS
-			server->g_humanplayers = atoi(Info_ValueForKey(info, "g_humanplayers"));
-#endif
 			Q_strncpyz(server->hostName,Info_ValueForKey(info, "hostname"), MAX_NAME_LENGTH);
 			Q_strncpyz(server->mapName, Info_ValueForKey(info, "mapname"), MAX_NAME_LENGTH);
 			server->maxClients = atoi(Info_ValueForKey(info, "sv_maxclients"));
@@ -3797,6 +3800,8 @@ static void CL_SetServerInfo(serverInfo_t *server, const char *info, int ping) {
 #ifdef IOQUAKE3 // ZTM: punkbuster
 			server->punkbuster = atoi(Info_ValueForKey(info, "punkbuster"));
 #endif
+			server->g_humanplayers = atoi(Info_ValueForKey(info, "g_humanplayers"));
+			server->g_needpass = atoi(Info_ValueForKey(info, "g_needpass"));
 		}
 		server->ping = ping;
 	}
@@ -3905,9 +3910,6 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.numlocalservers = i+1;
 	cls.localServers[i].adr = from;
 	cls.localServers[i].clients = 0;
-#ifdef IOQ3ZTM // G_HUMANPLAYERS
-	cls.localServers[i].g_humanplayers = 0;
-#endif
 	cls.localServers[i].hostName[0] = '\0';
 	cls.localServers[i].mapName[0] = '\0';
 	cls.localServers[i].maxClients = 0;
@@ -3920,6 +3922,8 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 #ifdef IOQUAKE3 // ZTM: punkbuster
 	cls.localServers[i].punkbuster = 0;
 #endif
+	cls.localServers[i].g_humanplayers = 0;
+	cls.localServers[i].g_needpass = 0;
 									 
 	Q_strncpyz( info, MSG_ReadString( msg ), MAX_INFO_STRING );
 	if (strlen(info)) {
