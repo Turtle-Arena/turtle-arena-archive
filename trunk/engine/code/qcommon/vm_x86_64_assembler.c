@@ -243,7 +243,7 @@ static void hash_add_label(const char* label, unsigned address)
 	unsigned i = hashkey(label, -1U);
 	int labellen;
 	
-	i %= sizeof(labelhash)/sizeof(labelhash[0]);
+	i %= ARRAY_LEN(labelhash);
 	h = Z_Malloc(sizeof(struct hashentry));
 	
 	labellen = strlen(label) + 1;
@@ -259,7 +259,7 @@ static unsigned lookup_label(const char* label)
 {
 	struct hashentry* h;
 	unsigned i = hashkey(label, -1U);
-	i %= sizeof(labelhash)/sizeof(labelhash[0]);
+	i %= ARRAY_LEN(labelhash);
 	for(h = labelhash[i]; h; h = h->next )
 	{
 		if(!strcmp(h->label, label))
@@ -275,7 +275,7 @@ static void labelhash_free(void)
 	struct hashentry* h;
 	unsigned i;
 	unsigned z = 0, min = -1U, max = 0, t = 0;
-	for ( i = 0; i < sizeof(labelhash)/sizeof(labelhash[0]); ++i)
+	for ( i = 0; i < ARRAY_LEN(labelhash); ++i)
 	{
 		unsigned n = 0;
 		h = labelhash[i];
@@ -294,9 +294,9 @@ static void labelhash_free(void)
 		max = MAX(max, n);
 	}
 #ifdef IOQ3ZTM // LESS_VERBOSE
-	Com_DPrintf("total %u, hsize %"PRIu64", zero %u, min %u, max %u\n", t, sizeof(labelhash)/sizeof(labelhash[0]), z, min, max);
+	Com_DPrintf("total %u, hsize %"PRIu64", zero %u, min %u, max %u\n", t, ARRAY_LEN(labelhash), z, min, max);
 #else
-	printf("total %u, hsize %"PRIu64", zero %u, min %u, max %u\n", t, sizeof(labelhash)/sizeof(labelhash[0]), z, min, max);
+	printf("total %u, hsize %"PRIu64", zero %u, min %u, max %u\n", t, ARRAY_LEN(labelhash), z, min, max);
 #endif
 	memset(labelhash, 0, sizeof(labelhash));
 }
@@ -1019,7 +1019,7 @@ static op_t* getop(const char* n)
 #else
 	unsigned m, t, b;
 	int r;
-	t = sizeof(ops)/sizeof(ops[0])-1;
+	t = ARRAY_LEN(ops)-1;
 	b = 0;
 
 	while(b <= t)
@@ -1310,7 +1310,7 @@ void assembler_init(int pass)
 	if(!ops_sorted)
 	{
 		ops_sorted = 1;
-		qsort(ops, sizeof(ops)/sizeof(ops[0])-1, sizeof(ops[0]), opsort);
+		qsort(ops, ARRAY_LEN(ops)-1, sizeof(ops[0]), opsort);
 	}
 }
 

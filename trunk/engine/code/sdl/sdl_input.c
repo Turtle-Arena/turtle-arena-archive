@@ -34,8 +34,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../client/client.h"
 #include "../sys/sys_local.h"
 
-#define ARRAYLEN(x) (sizeof(x)/sizeof(x[0]))
-
 #ifdef MACOS_X
 // Mouse acceleration needs to be disabled
 #define MACOS_X_ACCELERATION_HACK
@@ -867,9 +865,9 @@ IN_JoyMove
 static void IN_JoyMove( void )
 {
 #ifdef TA_SPLITVIEW
-	qboolean joy_pressed[ARRAYLEN(joy_keys[0])];
+	qboolean joy_pressed[ARRAY_LEN(joy_keys[0])];
 #else
-	qboolean joy_pressed[ARRAYLEN(joy_keys)];
+	qboolean joy_pressed[ARRAY_LEN(joy_keys)];
 #endif
 	unsigned int axes = 0;
 	unsigned int hats = 0;
@@ -941,11 +939,11 @@ static void IN_JoyMove( void )
 	if (total > 0)
 	{
 #ifdef TA_SPLITVIEW
-		if (total > ARRAYLEN(stick_state[joy].buttons))
-			total = ARRAYLEN(stick_state[joy].buttons);
+		if (total > ARRAY_LEN(stick_state[joy].buttons))
+			total = ARRAY_LEN(stick_state[joy].buttons);
 #else
-		if (total > ARRAYLEN(stick_state.buttons))
-			total = ARRAYLEN(stick_state.buttons);
+		if (total > ARRAY_LEN(stick_state.buttons))
+			total = ARRAY_LEN(stick_state.buttons);
 #endif
 		for (i = 0; i < total; i++)
 		{
