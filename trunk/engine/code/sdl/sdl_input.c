@@ -702,9 +702,7 @@ static void IN_InitJoystick( void )
 {
 	int i = 0;
 	int total = 0;
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	char buf[ MAX_STRING_CHARS ] = { 0 };
-#endif
+	char buf[MAX_STRING_CHARS] = "";
 #ifdef TA_SPLITVIEW
 	qboolean joyEnabled = qfalse;
 
@@ -748,23 +746,22 @@ static void IN_InitJoystick( void )
 	total = SDL_NumJoysticks();
 	Com_DPrintf("%d possible joysticks\n", total);
 
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
 	// Print list and build cvar to allow ui to select joystick.
 	for (i = 0; i < total; i++) {
-		const char *newJoystickString = va( "\"%.61s\" ", SDL_JoystickName(i) );
-
-		Com_DPrintf("[%d] %s\n", i, SDL_JoystickName(i));
-
-		if( strlen( newJoystickString ) < (int)sizeof( buf ) - strlen( buf ) )
-			Q_strcat( buf, sizeof( buf ), newJoystickString );
-		else
-			Com_DPrintf( "Skipping joystick %s, buffer too small\n", SDL_JoystickName(i) );
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
+		Q_strcat( buf, sizeof( buf ), va( "\"%.61s\" ", SDL_JoystickName(i) ) );
+#else
+		Q_strcat(buf, sizeof(buf), SDL_JoystickName(i));
+		Q_strcat(buf, sizeof(buf), "\n");
+#endif
 	}
 
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
 	if (*buf) {
 		// Remove space at the end of the string
 		buf[ strlen( buf ) - 1 ] = 0;
 	}
+#endif
 
 	Cvar_Get( "in_availableJoysticks", buf, CVAR_ROM );
 
@@ -778,10 +775,6 @@ static void IN_InitJoystick( void )
 		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 		return;
 	}
-#else
-	for (i = 0; i < total; i++)
-		Com_DPrintf("[%d] %s\n", i, SDL_JoystickName(i));
-#endif
 
 #ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
@@ -1328,12 +1321,20 @@ void IN_Init( void )
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		in_joystick[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystick"), "0", CVAR_ARCHIVE|CVAR_LATCH );
 		in_joystickDebug[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystickDebug"), "0", CVAR_TEMP );
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
 		in_joystickThreshold[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystickThreshold"), "0.15", CVAR_ARCHIVE );
+#else
+		in_joystickThreshold[i] = Cvar_Get( Com_LocalClientCvarName(i, "joy_threshold"), "0.15", CVAR_ARCHIVE );
+#endif
 	}
 #else
 	in_joystick = Cvar_Get( "in_joystick", "0", CVAR_ARCHIVE|CVAR_LATCH );
 	in_joystickDebug = Cvar_Get( "in_joystickDebug", "0", CVAR_TEMP );
+#ifdef IOQ3ZTM // SELECT_JOYSTICK
 	in_joystickThreshold = Cvar_Get( "in_joystickThreshold", "0.15", CVAR_ARCHIVE );
+#else
+	in_joystickThreshold = Cvar_Get( "joy_threshold", "0.15", CVAR_ARCHIVE );
+#endif
 #endif
 
 #ifdef MACOS_X_ACCELERATION_HACK

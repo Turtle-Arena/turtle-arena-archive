@@ -315,9 +315,6 @@ typedef struct {
 	int			netType;
 	int			gameType;
 	int		  	clients;
-#ifdef IOQ3ZTM // G_HUMANPLAYERS
-	int			g_humanplayers;
-#endif
 	int		  	maxClients;
 	int			minPing;
 	int			maxPing;
@@ -326,6 +323,8 @@ typedef struct {
 #ifdef IOQUAKE3 // ZTM: punkbuster
 	int			punkbuster;
 #endif
+	int			g_humanplayers;
+	int			g_needpass;
 } serverInfo_t;
 
 typedef struct {

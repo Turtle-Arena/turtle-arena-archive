@@ -869,10 +869,11 @@ default values.
 
 #define CVAR_SERVER_CREATED	0x0800	// cvar was created by a server the client connected to.
 #define CVAR_VM_CREATED		0x1000	// cvar was created exclusively in one of the VMs.
+#define CVAR_PROTECTED		0x2000	// prevent modifying this var from VMs or the server
 #ifdef TA_SPLITVIEW
-#define CVAR_USERINFO2		0x2000 // userinfo for second local client
-#define CVAR_USERINFO3		0x4000 // userinfo for third local client
-#define CVAR_USERINFO4		0x8000 // userinfo for fourth local client
+#define CVAR_USERINFO2		0x4000 // userinfo for second local client
+#define CVAR_USERINFO3		0x8000 // userinfo for third local client
+#define CVAR_USERINFO4		0x10000 // userinfo for fourth local client
 #endif
 #define CVAR_NONEXISTENT	0xFFFFFFFF	// Cvar doesn't exist.
 
