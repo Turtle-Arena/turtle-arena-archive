@@ -99,6 +99,7 @@ cvar_t	*com_minimized;
 cvar_t	*com_maxfpsMinimized;
 cvar_t	*com_abnormalExit;
 cvar_t	*com_standalone;
+cvar_t	*com_protocol;
 cvar_t	*com_basegame;
 cvar_t  *com_homepath;
 cvar_t	*com_busyWait;
@@ -536,8 +537,8 @@ qboolean Com_AddStartupCommands( void ) {
 //============================================================================
 
 void Info_Print( const char *s ) {
-	char	key[512];
-	char	value[512];
+	char	key[BIG_INFO_KEY];
+	char	value[BIG_INFO_VALUE];
 	char	*o;
 	int		l;
 
@@ -557,7 +558,7 @@ void Info_Print( const char *s ) {
 		}
 		else
 			*o = 0;
-		Com_Printf ("%s", key);
+		Com_Printf ("%s ", key);
 
 		if (!*s)
 		{
@@ -2764,6 +2765,7 @@ void Com_Init( char *commandLine ) {
 
 	s = va("%s %s %s", Q3_VERSION, PLATFORM_STRING, __DATE__ );
 	com_version = Cvar_Get ("version", s, CVAR_ROM | CVAR_SERVERINFO );
+	com_protocol = Cvar_Get ("protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO | CVAR_INIT);
 
 	Sys_Init();
 

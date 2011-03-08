@@ -539,7 +539,7 @@ static cvarTable_t cvarTable[] = {
 #endif
 };
 
-static int  cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
+static int  cvarTableSize = ARRAY_LEN( cvarTable );
 
 /*
 =================

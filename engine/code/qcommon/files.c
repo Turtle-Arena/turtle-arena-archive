@@ -984,6 +984,59 @@ qboolean FS_FilenameCompare( const char *s1, const char *s2 ) {
 
 /*
 ===========
+FS_IsExt
+
+Return qtrue if ext matches file extension filename
+===========
+*/
+
+qboolean FS_IsExt(const char *filename, const char *ext, int namelen)
+{
+	int extlen;
+
+	extlen = strlen(ext);
+
+	if(extlen > namelen)
+		return qfalse;
+
+	filename += namelen - extlen;
+
+	return !Q_stricmp(filename, ext);
+}
+
+/*
+===========
+FS_IsDemoExt
+
+Return qtrue if filename has a demo extension
+===========
+*/
+
+qboolean FS_IsDemoExt(const char *filename, int namelen)
+{
+	char *ext_test;
+	int index, protocol;
+
+	ext_test = Q_strrchr(filename, '.');
+	if(ext_test && !Q_stricmpn(ext_test + 1, DEMOEXT, ARRAY_LEN(DEMOEXT) - 1))
+	{
+		protocol = atoi(ext_test + ARRAY_LEN(DEMOEXT));
+
+		if(protocol == com_protocol->integer)
+			return qtrue;
+
+		for(index = 0; demo_protocols[index]; index++)
+		{
+			if(demo_protocols[index] == protocol)
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
+/*
+===========
 FS_FOpenFileRead
 
 Finds the file in the search path.
@@ -1003,7 +1056,6 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qboolean uniqueF
 	long			hash;
 	FILE			*temp;
 	int				l;
-	char demoExt[16];
 
 	hash = 0;
 
@@ -1050,7 +1102,6 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qboolean uniqueF
 		Com_Error( ERR_FATAL, "FS_FOpenFileRead: NULL 'filename' parameter passed\n" );
 	}
 
-	Com_sprintf (demoExt, sizeof(demoExt), ".dm_%d",PROTOCOL_VERSION );
 	// qpaths are not supposed to have a leading slash
 	if ( filename[0] == '/' || filename[0] == '\\' ) {
 		filename++;
@@ -1102,20 +1153,23 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qboolean uniqueF
 					// shaders, txt, arena files  by themselves do not count as a reference as 
 					// these are loaded from all pk3s 
 					// from every pk3 file.. 
-					l = strlen( filename );
-					if ( !(pak->referenced & FS_GENERAL_REF)) {
-						if ( Q_stricmp(filename + l - 7, ".shader") != 0 &&
-							Q_stricmp(filename + l - 4, ".txt") != 0 &&
-							Q_stricmp(filename + l - 4, ".cfg") != 0 &&
+					l = strlen(filename);
+					
+					if (!(pak->referenced & FS_GENERAL_REF))
+					{
+						if(!FS_IsExt(filename, ".shader", l) &&
+						   !FS_IsExt(filename, ".txt", l) &&
+						   !FS_IsExt(filename, ".cfg", l) &&
 #ifdef IOQ3ZTM // USE_FREETYPE
-							Q_stricmp( filename + l - 4, ".ttf" ) != 0 &&
-							Q_stricmp( filename + l - 4, ".otf" ) != 0 &&
+						   !FS_IsExt(filename, ".ttf", l) &&
+						   !FS_IsExt(filename, ".otf", l) &&
 #endif
-							Q_stricmp(filename + l - 7, ".config") != 0 &&
-							strstr(filename, "levelshots") == NULL &&
-							Q_stricmp(filename + l - 4, ".bot") != 0 &&
-							Q_stricmp(filename + l - 6, ".arena") != 0 &&
-							Q_stricmp(filename + l - 5, ".menu") != 0) {
+						   !FS_IsExt(filename, ".config", l) &&
+						   !FS_IsExt(filename, ".bot", l) &&
+						   !FS_IsExt(filename, ".arena", l) &&
+						   !FS_IsExt(filename, ".menu", l) &&
+						   !strstr(filename, "levelshots"))
+						{
 							pak->referenced |= FS_GENERAL_REF;
 						}
 					}
@@ -1166,17 +1220,18 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qboolean uniqueF
 			//   this test can make the search fail although the file is in the directory
 			// I had the problem on https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=8
 			// turned out I used FS_FileExists instead
-			if ( fs_numServerPaks ) {
-
-				if ( Q_stricmp( filename + l - 4, ".cfg" )		// for config files
+			if(fs_numServerPaks)
+			{
+				if(!FS_IsExt(filename, ".cfg", l) &&		// for config files
 #ifdef IOQ3ZTM // USE_FREETYPE
-					&& Q_stricmp( filename + l - 4, ".ttf" )
-					&& Q_stricmp( filename + l - 4, ".otf" )
+				   !FS_IsExt(filename, ".ttf", l) &&
+				   !FS_IsExt(filename, ".otf", l) &&
 #endif
-					&& Q_stricmp( filename + l - 5, ".menu" )	// menu files
-					&& Q_stricmp( filename + l - 5, ".game" )	// menu files
-					&& Q_stricmp( filename + l - strlen(demoExt), demoExt )	// menu files
-					&& Q_stricmp( filename + l - 4, ".dat" ) ) {	// for journal files
+				   !FS_IsExt(filename, ".menu", l) &&		// menu files
+				   !FS_IsExt(filename, ".game", l) &&		// menu files
+				   !FS_IsExt(filename, ".cfg", l) &&		// for journal files
+				   !FS_IsDemoExt(filename, l))			// demos
+				{
 					continue;
 				}
 			}
@@ -3885,7 +3940,7 @@ void FS_PureServerSetReferencedPaks( const char *pakSums, const char *pakNames )
 		fs_serverReferencedPaks[i] = atoi( Cmd_Argv( i ) );
 	}
 
-	for (i = 0 ; i < sizeof(fs_serverReferencedPakNames) / sizeof(*fs_serverReferencedPakNames); i++)
+	for (i = 0 ; i < ARRAY_LEN(fs_serverReferencedPakNames); i++)
 	{
 		if(fs_serverReferencedPakNames[i])
 			Z_Free(fs_serverReferencedPakNames[i]);

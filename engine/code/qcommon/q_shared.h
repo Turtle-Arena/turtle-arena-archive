@@ -85,6 +85,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_TEAMNAME		32
 #define MAX_MASTER_SERVERS      5	// number of supported master servers
 
+#define DEMOEXT	"dm_"			// standard demo extension
+
 #ifdef _MSC_VER
 
 #pragma warning(disable : 4018)     // signed/unsigned mismatch
@@ -224,7 +226,7 @@ typedef int		clipHandle_t;
 #define	MAX_QINT			0x7fffffff
 #define	MIN_QINT			(-MAX_QINT-1)
 
-#define ARRAY_LEN(x)			(sizeof(x) / sizeof(*x))
+#define ARRAY_LEN(x)			(sizeof(x) / sizeof(*(x)))
 
 
 // angle indexes

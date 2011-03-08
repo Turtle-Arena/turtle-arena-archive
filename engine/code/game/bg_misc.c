@@ -1317,7 +1317,7 @@ Only in One Flag CTF games
 	{NULL}
 };
 
-int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
+int		bg_numItems = ARRAY_LEN( bg_itemlist ) - 1;
 #endif
 
 char	*modNames[MOD_MAX] = {
@@ -1370,7 +1370,7 @@ char	*modNames[MOD_MAX] = {
 	"MOD_WEAPON_SECONDARY"
 #endif
 };
-int modNamesSize = sizeof( modNames ) / sizeof( modNames[0] );
+int modNamesSize = ARRAY_LEN( modNames );
 
 #if defined TA_WEAPSYS || defined TA_PLAYERSYS || defined TA_ENTSYS
 typedef struct
