@@ -1062,7 +1062,7 @@ static void CG_Missile( centity_t *cent ) {
 	} else if (s1->generic1 == TEAM_RED) {
 		ent.hModel = projectile->missileModelRed;
 	} else {
-	ent.hModel = projectile->missileModel;
+		ent.hModel = projectile->missileModel;
 	}
 	ent.renderfx = projectile->missileRenderfx | RF_NOSHADOW;
 #else
