@@ -17,20 +17,20 @@
 	+ Added Shurikens (Holdable items with multiple uses)
 	+ Disabled HI_TELEPORTER Quake3's personal teleporter
 	+ Per-player Bounding box (Stored in animation.cfg "boundingbox minX minY minZ maxX maxY maxZ")
-	+ Atemp to load MDR models before MD3, allowing any model to be a MDR model
+	+ Atempt to load MDR models before MD3, allowing any model to be a MDR model
 	+ models/players/*dir*/icon_*skin*.tga files no longer are limited to TGA,
 		now supports PNG, TGA, JPG, JPEG, PCX, and BMP
 	+ Support Elite Force "soundpath" keyword in player animation.cfg
 	+ Support voice chat files other then male[1-5].voice and female[1-3].voice
 	+ Disabled missionpack's HI_INVUL and HI_KAMIKAZE
 	+ Use item sprite when no item model is loaded
-	+ Elite Force style team firend shaders, "sprites/team_red" and "sprites/team_blue", falls back to "sprites/foe"
+	+ Elite Force style team friend shaders, "sprites/team_red" and "sprites/team_blue", falls back to "sprites/foe"
 	+ If loaded "sprites/team_blue" and a spectator draw team icon for all players.
 	+ New define MISSIONPACK_HUD, mostly renamed MISSIONPACK ifdef's
 	++ by NOT defining it, you can use the Quake3 hud in the MISSIONPACK.
 	+ Disabled blood code
-	+ Atemp to load a Ogg sound if no wave sound file.
-	+ In menus Right mouse button no longer goes to the pervious menu, now it has listboxes go left
+	+ Atempt to load a Ogg sound if no wave sound file.
+	+ In menus, right mouse button no longer goes to the previous menu. Now it has listboxes goes left.
 	+ ...and much more
 
 2008-04-04 Various contributors
