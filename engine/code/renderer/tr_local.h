@@ -486,6 +486,11 @@ typedef struct {
 	int			numPolys;
 	struct srfPoly_s	*polys;
 
+#ifdef WOLFET
+	int			numPolyBuffers;
+	struct srfPolyBuffer_s	*polybuffers;
+#endif
+
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
 
@@ -564,6 +569,9 @@ typedef enum {
 	SF_GRID,
 	SF_TRIANGLES,
 	SF_POLY,
+#ifdef WOLFET
+	SF_POLYBUFFER,
+#endif
 	SF_MD3,
 	SF_MD4,
 #ifdef RAVENMD4
@@ -599,6 +607,14 @@ typedef struct srfPoly_s {
 	int				numVerts;
 	polyVert_t		*verts;
 } srfPoly_t;
+
+#ifdef WOLFET
+typedef struct srfPolyBuffer_s {
+	surfaceType_t surfaceType;
+	int fogIndex;
+	polyBuffer_t *pPolyBuffer;
+} srfPolyBuffer_t;
+#endif
 
 typedef struct srfDisplayList_s {
 	surfaceType_t	surfaceType;
@@ -818,6 +834,7 @@ void		R_Modellist_f (void);
 extern	refimport_t		ri;
 
 #define	MAX_DRAWIMAGES			2048
+#define	MAX_LIGHTMAPS			256
 #define	MAX_SKINS				1024
 
 
@@ -962,7 +979,7 @@ typedef struct {
 	shader_t				*sunShader;
 
 	int						numLightmaps;
-	image_t					**lightmaps;
+	image_t					*lightmaps[MAX_LIGHTMAPS];
 
 	trRefEntity_t			*currentEntity;
 	trRefEntity_t			worldEntity;		// point currentEntity at this when rendering world
@@ -1112,6 +1129,7 @@ extern	cvar_t	*r_colorMipLevels;				// development aid to see texture mip usage
 extern	cvar_t	*r_picmip;						// controls picmip values
 extern	cvar_t	*r_finish;
 extern	cvar_t	*r_drawBuffer;
+extern  cvar_t  *r_glDriver;
 extern	cvar_t	*r_swapInterval;
 extern	cvar_t	*r_textureMode;
 extern	cvar_t	*r_offsetFactor;
@@ -1168,6 +1186,8 @@ extern	cvar_t	*r_saveFontData;
 
 extern cvar_t	*r_marksOnTriangleMeshes;
 
+extern	cvar_t	*r_GLlibCoolDownMsec;
+
 //====================================================================
 
 float R_NoiseGet4f( float x, float y, float z, float t );
@@ -1187,6 +1207,9 @@ void R_AddRailSurfaces( trRefEntity_t *e, qboolean isUnderwater );
 void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
 void R_AddPolygonSurfaces( void );
+#ifdef WOLFET
+void R_AddPolygonBufferSurfaces( void );
+#endif
 
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 void R_ComposeSort( drawSurf_t *drawSurf, int entityNum, shader_t *shader, 
@@ -1366,19 +1389,19 @@ typedef struct stageVars
 
 typedef struct shaderCommands_s 
 {
-	glIndex_t	indexes[SHADER_MAX_INDEXES] QALIGN(16);
-	vec4_t		xyz[SHADER_MAX_VERTEXES] QALIGN(16);
-	vec4_t		normal[SHADER_MAX_VERTEXES] QALIGN(16);
-	vec2_t		texCoords[SHADER_MAX_VERTEXES][2] QALIGN(16);
-	color4ub_t	vertexColors[SHADER_MAX_VERTEXES] QALIGN(16);
-	int			vertexDlightBits[SHADER_MAX_VERTEXES] QALIGN(16);
+	glIndex_t	indexes[SHADER_MAX_INDEXES] ALIGN(16);
+	vec4_t		xyz[SHADER_MAX_VERTEXES] ALIGN(16);
+	vec4_t		normal[SHADER_MAX_VERTEXES] ALIGN(16);
+	vec2_t		texCoords[SHADER_MAX_VERTEXES][2] ALIGN(16);
+	color4ub_t	vertexColors[SHADER_MAX_VERTEXES] ALIGN(16);
+	int			vertexDlightBits[SHADER_MAX_VERTEXES] ALIGN(16);
 
-	stageVars_t	svars QALIGN(16);
+	stageVars_t	svars ALIGN(16);
 
-	color4ub_t	constantColor255[SHADER_MAX_VERTEXES] QALIGN(16);
+	color4ub_t	constantColor255[SHADER_MAX_VERTEXES] ALIGN(16);
 
 	shader_t	*shader;
-	float		shaderTime;
+  float   shaderTime;
 	int			fogNum;
 
 	int			dlightBits;	// or together of all vertexDlightBits
@@ -1518,6 +1541,9 @@ void R_ToggleSmpFrame( void );
 void RE_ClearScene( void );
 void RE_AddRefEntityToScene( const refEntity_t *ent );
 void RE_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
+#ifdef WOLFET
+void RE_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer );
+#endif
 void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_RenderScene( const refdef_t *fd );
@@ -1734,11 +1760,17 @@ typedef struct {
 	trRefEntity_t	entities[MAX_ENTITIES];
 	srfPoly_t	*polys;//[MAX_POLYS];
 	polyVert_t	*polyVerts;//[MAX_POLYVERTS];
+#ifdef WOLFET // ZTM: Modified to fit with source
+	srfPolyBuffer_t *polybuffers;//[MAX_POLYS];
+#endif
 	renderCommandList_t	commands;
 } backEndData_t;
 
 extern	int		max_polys;
 extern	int		max_polyverts;
+#ifdef WOLFET
+extern	int		max_polybuffers;
+#endif
 
 extern	backEndData_t	*backEndData[SMP_FRAMES];	// the second one may not be allocated
 

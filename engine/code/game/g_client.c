@@ -1074,6 +1074,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	redTeam[MAX_INFO_STRING];
 	char	blueTeam[MAX_INFO_STRING];
 	char	userinfo[MAX_INFO_STRING];
+	char    guid[MAX_INFO_STRING];
 
 	ent = g_entities + clientNum;
 	client = ent->client;
@@ -1255,13 +1256,14 @@ void ClientUserinfoChanged( int clientNum ) {
 	if (g_gametype.integer == GT_SINGLE_PLAYER)
 #endif
 	{
-		Com_sprintf(c1, sizeof (c1), "%d", client->pers.playercfg.prefcolor1);
-		Com_sprintf(c2, sizeof (c2), "%d", client->pers.playercfg.prefcolor2);
+		Q_snprintf(c1, sizeof (c1), "%d", client->pers.playercfg.prefcolor1);
+		Q_snprintf(c2, sizeof (c2), "%d", client->pers.playercfg.prefcolor2);
 	}
 #endif
 
 	strcpy(redTeam, Info_ValueForKey( userinfo, "g_redteam" ));
 	strcpy(blueTeam, Info_ValueForKey( userinfo, "g_blueteam" ));
+	strcpy(guid, Info_ValueForKey(userinfo, "cl_guid"));
 	
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
@@ -1274,8 +1276,8 @@ void ClientUserinfoChanged( int clientNum ) {
 	}
 	else
 	{
-		s = va("n\\%s\\t\\%i\\model\\%s\\hmodel\\%s\\g_redteam\\%s\\g_blueteam\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d",
-			client->pers.netname, client->sess.sessionTeam, model, headModel, redTeam, blueTeam, c1, c2, 
+		s = va("n\\%s\\guid\\%s\\t\\%i\\model\\%s\\hmodel\\%s\\g_redteam\\%s\\g_blueteam\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d",
+			client->pers.netname, guid, client->sess.sessionTeam, model, headModel, redTeam, blueTeam, c1, c2, 
 			client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask, teamLeader);
 	}
 

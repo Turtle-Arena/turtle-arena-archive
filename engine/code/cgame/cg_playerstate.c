@@ -45,11 +45,11 @@ void CG_CheckAmmo( void ) {
 
 	// see about how many seconds of ammo we have remaining
 #ifndef TA_WEAPSYS_EX
-	weapons = cg.cur_ps->stats[ STAT_WEAPONS ];
+	weapons = cg.snap->ps.stats[ STAT_WEAPONS ];
 #endif
 	total = 0;
 #ifdef TA_WEAPSYS_EX
-	i = cg.cur_ps->weapon;
+	i = cg.snap->ps.weapon;
 #else
 #ifdef TA_WEAPSYS
 	for ( i = 1 ; i < BG_NumWeaponGroups() ; i++ )
@@ -74,7 +74,7 @@ void CG_CheckAmmo( void ) {
 		}
 #endif
 #ifdef TA_WEAPSYS
-		total += cg.cur_ps->ammo[i] * bg_weapongroupinfo[i].weapon[0]->attackDelay;
+		total += cg.snap->ps.ammo[i] * bg_weapongroupinfo[i].weapon[0]->attackDelay;
 #else
 		switch ( i ) {
 		case WP_ROCKET_LAUNCHER:
@@ -84,29 +84,29 @@ void CG_CheckAmmo( void ) {
 #ifdef MISSIONPACK
 		case WP_PROX_LAUNCHER:
 #endif
-			total += cg.cur_ps->ammo[i] * 1000;
+			total += cg.snap->ps.ammo[i] * 1000;
 			break;
 		default:
-			total += cg.cur_ps->ammo[i] * 200;
+			total += cg.snap->ps.ammo[i] * 200;
 			break;
 		}
 #endif
 		if ( total >= 5000 ) {
-			cg.cur_lc->lowAmmoWarning = 0;
+			cg.lowAmmoWarning = 0;
 			return;
 		}
 	}
 
-	previous = cg.cur_lc->lowAmmoWarning;
+	previous = cg.lowAmmoWarning;
 
 	if ( total == 0 ) {
-		cg.cur_lc->lowAmmoWarning = 2;
+		cg.lowAmmoWarning = 2;
 	} else {
-		cg.cur_lc->lowAmmoWarning = 1;
+		cg.lowAmmoWarning = 1;
 	}
 
 	// play a sound on transitions
-	if ( cg.cur_lc->lowAmmoWarning != previous ) {
+	if ( cg.lowAmmoWarning != previous ) {
 		trap_S_StartLocalSound( cgs.media.noAmmoSound, CHAN_LOCAL_SOUND );
 	}
 }
@@ -128,10 +128,10 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 	float		yaw, pitch;
 
 	// show the attacking player's head and name in corner
-	cg.cur_lc->attackerTime = cg.time;
+	cg.attackerTime = cg.time;
 
 	// the lower on health you are, the greater the view kick will be
-	health = cg.cur_ps->stats[STAT_HEALTH];
+	health = cg.snap->ps.stats[STAT_HEALTH];
 	if ( health < 40 ) {
 		scale = 1;
 	} else {
@@ -146,10 +146,10 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 
 	// if yaw and pitch are both 255, make the damage always centered (falling, etc)
 	if ( yawByte == 255 && pitchByte == 255 ) {
-		cg.cur_lc->damageX = 0;
-		cg.cur_lc->damageY = 0;
-		cg.cur_lc->v_dmg_roll = 0;
-		cg.cur_lc->v_dmg_pitch = -kick;
+		cg.damageX = 0;
+		cg.damageY = 0;
+		cg.v_dmg_roll = 0;
+		cg.v_dmg_pitch = -kick;
 	} else {
 		// positional
 		pitch = pitchByte / 255.0 * 360;
@@ -174,39 +174,39 @@ void CG_DamageFeedback( int yawByte, int pitchByte, int damage ) {
 			dist = 0.1f;
 		}
 
-		cg.cur_lc->v_dmg_roll = kick * left;
+		cg.v_dmg_roll = kick * left;
 		
-		cg.cur_lc->v_dmg_pitch = -kick * front;
+		cg.v_dmg_pitch = -kick * front;
 
 		if ( front <= 0.1 ) {
 			front = 0.1f;
 		}
-		cg.cur_lc->damageX = -left / front;
-		cg.cur_lc->damageY = up / dist;
+		cg.damageX = -left / front;
+		cg.damageY = up / dist;
 	}
 
 	// clamp the position
-	if ( cg.cur_lc->damageX > 1.0 ) {
-		cg.cur_lc->damageX = 1.0;
+	if ( cg.damageX > 1.0 ) {
+		cg.damageX = 1.0;
 	}
-	if ( cg.cur_lc->damageX < - 1.0 ) {
-		cg.cur_lc->damageX = -1.0;
+	if ( cg.damageX < - 1.0 ) {
+		cg.damageX = -1.0;
 	}
 
-	if ( cg.cur_lc->damageY > 1.0 ) {
-		cg.cur_lc->damageY = 1.0;
+	if ( cg.damageY > 1.0 ) {
+		cg.damageY = 1.0;
 	}
-	if ( cg.cur_lc->damageY < - 1.0 ) {
-		cg.cur_lc->damageY = -1.0;
+	if ( cg.damageY < - 1.0 ) {
+		cg.damageY = -1.0;
 	}
 
 	// don't let the screen flashes vary as much
 	if ( kick > 10 ) {
 		kick = 10;
 	}
-	cg.cur_lc->damageValue = kick;
-	cg.cur_lc->v_dmg_time = cg.time + DAMAGE_TIME;
-	cg.cur_lc->damageTime = cg.snap->serverTime;
+	cg.damageValue = kick;
+	cg.v_dmg_time = cg.time + DAMAGE_TIME;
+	cg.damageTime = cg.snap->serverTime;
 }
 
 
@@ -219,65 +219,21 @@ CG_Respawn
 A respawn happened this snapshot
 ================
 */
-#ifdef TA_SPLITVIEW
-void CG_Respawn( int clientNum ) {
-	int i;
-
-	// no error decay on player movement
-	cg.thisFrameTeleport = qtrue;
-
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (clientNum != -1 && (cg.snap->lcIndex[i] == -1 || cg.snap->pss[cg.snap->lcIndex[i]].clientNum != clientNum)) {
-			continue;
-		}
-
-#ifndef TA_WEAPSYS_EX
-		// display weapons available
-		cg.localClients[i].weaponSelectTime = cg.time;
-
-		// select the weapon the server says we are using
-		cg.localClients[i].weaponSelect = cg.snap->pss[cg.snap->lcIndex[i]].weapon;
-#endif
-#ifdef TA_HOLDSYS/*2*/
-		cg.localClients[i].holdableSelect = cg.snap->pss[cg.snap->lcIndex[i]].holdableIndex;
-#endif
-#ifdef IOQ3ZTM // NEW_CAM
-		cg.localClients[i].camRotDir = 0;
-		cg.localClients[i].camLeft = qfalse;
-		cg.localClients[i].camRight = qfalse;
-		cg.localClients[i].camReseting = qfalse;
-#ifdef TA_CAMERA
-		cg.localClients[i].camDistance = 0;
-#endif
-#endif
-	}
-}
-#else
 void CG_Respawn( void ) {
 	// no error decay on player movement
 	cg.thisFrameTeleport = qtrue;
 
 #ifndef TA_WEAPSYS_EX
 	// display weapons available
-	cg.localClient.weaponSelectTime = cg.time;
+	cg.weaponSelectTime = cg.time;
 
 	// select the weapon the server says we are using
-	cg.localClient.weaponSelect = cg.snap->ps.weapon;
+	cg.weaponSelect = cg.snap->ps.weapon;
 #endif
 #ifdef TA_HOLDSYS/*2*/
-	cg.localClient.holdableSelect = cg.snap->ps.holdableIndex;
-#endif
-#ifdef IOQ3ZTM // NEW_CAM
-	cg.localClient.camRotDir = 0;
-	cg.localClient.camLeft = qfalse;
-	cg.localClient.camRight = qfalse;
-	cg.localClient.camReseting = qfalse;
-#ifdef TA_CAMERA
-	cg.localClient.camDistance = 0;
-#endif
+	cg.holdableSelect = cg.snap->ps.holdableIndex;
 #endif
 }
-#endif
 
 extern char *eventnames[];
 
@@ -298,7 +254,7 @@ void CG_CheckPlayerstateEvents( playerState_t *ps, playerState_t *ops ) {
 		CG_EntityEvent( cent, cent->lerpOrigin );
 	}
 
-	cent = &cg.cur_lc->predictedPlayerEntity; // cg_entities[ ps->clientNum ];
+	cent = &cg.predictedPlayerEntity; // cg_entities[ ps->clientNum ];
 	// go through the predictable events buffer
 	for ( i = ps->eventSequence - MAX_PS_EVENTS ; i < ps->eventSequence ; i++ ) {
 		// if we have a new predictable event
@@ -312,9 +268,9 @@ void CG_CheckPlayerstateEvents( playerState_t *ps, playerState_t *ops ) {
 			cent->currentState.eventParm = ps->eventParms[ i & (MAX_PS_EVENTS-1) ];
 			CG_EntityEvent( cent, cent->lerpOrigin );
 
-			cg.cur_lc->predictableEvents[ i & (MAX_PREDICTED_EVENTS-1) ] = event;
+			cg.predictableEvents[ i & (MAX_PREDICTED_EVENTS-1) ] = event;
 
-			cg.cur_lc->eventSequence++;
+			cg.eventSequence++;
 		}
 	}
 }
@@ -329,23 +285,23 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 	int event;
 	centity_t	*cent;
 
-	cent = &cg.cur_lc->predictedPlayerEntity;
+	cent = &cg.predictedPlayerEntity;
 	for ( i = ps->eventSequence - MAX_PS_EVENTS ; i < ps->eventSequence ; i++ ) {
 		//
-		if (i >= cg.cur_lc->eventSequence) {
+		if (i >= cg.eventSequence) {
 			continue;
 		}
 		// if this event is not further back in than the maximum predictable events we remember
-		if (i > cg.cur_lc->eventSequence - MAX_PREDICTED_EVENTS) {
+		if (i > cg.eventSequence - MAX_PREDICTED_EVENTS) {
 			// if the new playerstate event is different from a previously predicted one
-			if ( ps->events[i & (MAX_PS_EVENTS-1)] != cg.cur_lc->predictableEvents[i & (MAX_PREDICTED_EVENTS-1) ] ) {
+			if ( ps->events[i & (MAX_PS_EVENTS-1)] != cg.predictableEvents[i & (MAX_PREDICTED_EVENTS-1) ] ) {
 
 				event = ps->events[ i & (MAX_PS_EVENTS-1) ];
 				cent->currentState.event = event;
 				cent->currentState.eventParm = ps->eventParms[ i & (MAX_PS_EVENTS-1) ];
 				CG_EntityEvent( cent, cent->lerpOrigin );
 
-				cg.cur_lc->predictableEvents[ i & (MAX_PREDICTED_EVENTS-1) ] = event;
+				cg.predictableEvents[ i & (MAX_PREDICTED_EVENTS-1) ] = event;
 
 				if ( cg_showmiss.integer ) {
 					CG_Printf("WARNING: changed predicted event\n");
@@ -361,11 +317,11 @@ pushReward
 ==================
 */
 static void pushReward(sfxHandle_t sfx, qhandle_t shader, int rewardCount) {
-	if (cg.cur_lc->rewardStack < (MAX_REWARDSTACK-1)) {
-		cg.cur_lc->rewardStack++;
-		cg.cur_lc->rewardSound[cg.cur_lc->rewardStack] = sfx;
-		cg.cur_lc->rewardShader[cg.cur_lc->rewardStack] = shader;
-		cg.cur_lc->rewardCount[cg.cur_lc->rewardStack] = rewardCount;
+	if (cg.rewardStack < (MAX_REWARDSTACK-1)) {
+		cg.rewardStack++;
+		cg.rewardSound[cg.rewardStack] = sfx;
+		cg.rewardShader[cg.rewardStack] = shader;
+		cg.rewardCount[cg.rewardStack] = rewardCount;
 	}
 }
 
@@ -413,7 +369,7 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 	// health changes of more than -1 should make pain sounds
 	if ( ps->stats[STAT_HEALTH] < ops->stats[STAT_HEALTH] - 1 ) {
 		if ( ps->stats[STAT_HEALTH] > 0 ) {
-			CG_PainEvent( &cg.cur_lc->predictedPlayerEntity, ps->stats[STAT_HEALTH] );
+			CG_PainEvent( &cg.predictedPlayerEntity, ps->stats[STAT_HEALTH] );
 		}
 	}
 
@@ -529,18 +485,11 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 				if ( cgs.gametype < GT_TEAM) {
 					if (  ps->persistant[PERS_RANK] == 0 ) {
 						CG_AddBufferedSound(cgs.media.takenLeadSound);
-					} else
-#ifdef TA_SPLITVIEW // ZTM: Don't play tied or lost lead when there are multiple local clients, multiple sounds play and its annoying.
-					if (cg.snap->numPSs <= 1) {
-#endif
-					if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
+					} else if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
 						CG_AddBufferedSound(cgs.media.tiedLeadSound);
 					} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
 						CG_AddBufferedSound(cgs.media.lostLeadSound);
 					}
-#ifdef TA_SPLITVIEW
-					}
-#endif
 				}
 			}
 		}
@@ -604,23 +553,15 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 
 	// respawning
 	if ( ps->persistant[PERS_SPAWN_COUNT] != ops->persistant[PERS_SPAWN_COUNT] ) {
-#ifdef TA_SPLITVIEW // Don't reset all clients
-		CG_Respawn(ps->clientNum);
-#else
 		CG_Respawn();
-#endif
 	}
 
 	if ( cg.mapRestart ) {
-#ifdef TA_SPLITVIEW // Reset all clients
-		CG_Respawn(-1);
-#else
 		CG_Respawn();
-#endif
 		cg.mapRestart = qfalse;
 	}
 
-	if ( cg.cur_ps->pm_type != PM_INTERMISSION 
+	if ( cg.snap->ps.pm_type != PM_INTERMISSION 
 		&& ps->persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 		CG_CheckLocalSounds( ps, ops );
 	}
@@ -635,8 +576,8 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 
 	// smooth the ducking viewheight change
 	if ( ps->viewheight != ops->viewheight ) {
-		cg.cur_lc->duckChange = ps->viewheight - ops->viewheight;
-		cg.cur_lc->duckTime = cg.time;
+		cg.duckChange = ps->viewheight - ops->viewheight;
+		cg.duckTime = cg.time;
 	}
 }
 

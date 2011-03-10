@@ -164,6 +164,19 @@ void G_StartMeleeAttack(gentity_t *ent)
 		return;
 	}
 
+	// Must press the button each time to attack...
+#ifdef IOQ3ZTM
+	if (client->ps.pm_flags & PMF_FIRE_HELD) {
+		return;
+	}
+	client->ps.pm_flags |= PMF_FIRE_HELD;
+#else
+	if (client->fireHeld) {
+		return;
+	}
+	client->fireHeld = qtrue;
+#endif
+
 	// Next attack animation
 	client->ps.meleeAttack++;
 
@@ -552,14 +565,15 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 			float	mass;
 			int knockback;
 
+			ent->client->ps.meleeTime /= 2;
+			if (ent->client->ps.meleeTime < 1)
+				ent->client->ps.meleeTime = 1;
 			knockback = 5+damage*1.5f;
 
 			mass = 200;
 
 			VectorScale (tr.plane.normal, g_knockback.value * (float)knockback / mass, kvel);
 			VectorAdd (ent->client->ps.velocity, kvel, ent->client->ps.velocity);
-
-			ent->client->ps.meleeDelay = 1000;
 
 			// set the timer so that the other client can't cancel
 			// out the movement immediately
@@ -573,6 +587,8 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 				if ( t > 200 ) {
 					t = 200;
 				}
+
+				ent->client->ps.meleeDelay = t;
 
 				ent->client->ps.pm_time = t;
 				ent->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;

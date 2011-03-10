@@ -1431,6 +1431,10 @@ void R_GenerateDrawSurfs( void ) {
 
 	R_AddPolygonSurfaces();
 
+#ifdef WOLFET
+	R_AddPolygonBufferSurfaces();
+#endif
+
 	// set the projection matrix with the minimum zfar
 	// now that we have the world bounded
 	// this needs to be done before entities are

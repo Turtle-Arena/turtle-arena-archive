@@ -1971,6 +1971,7 @@ void CIN_UploadCinematic(int handle) {
 			}
 		}
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Support non-256x256 videos in shaders
 		// Resample the video if needed
 		if (cinTable[handle].dirty && (cinTable[handle].CIN_WIDTH != cinTable[handle].drawX || cinTable[handle].CIN_HEIGHT != cinTable[handle].drawY))  {
 			int *buf2;
@@ -1988,6 +1989,9 @@ void CIN_UploadCinematic(int handle) {
 					cinTable[handle].buf, handle, cinTable[handle].dirty);
 			cinTable[handle].dirty = qfalse;
 		}
+#else
+		re.UploadCinematic( 256, 256, 256, 256, cinTable[handle].buf, handle, cinTable[handle].dirty);
+#endif
 
 		if (cl_inGameVideo->integer == 0 && cinTable[handle].playonwalls == 1) {
 			cinTable[handle].playonwalls--;

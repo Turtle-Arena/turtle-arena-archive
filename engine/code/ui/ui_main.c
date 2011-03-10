@@ -59,7 +59,7 @@ static const char *skillLevels[] = {
 #endif
 };
 
-static const int numSkillLevels = ARRAY_LEN( skillLevels );
+static const int numSkillLevels = sizeof(skillLevels) / sizeof(const char*);
 
 
 static const char *netSources[] = {
@@ -68,7 +68,7 @@ static const char *netSources[] = {
 	"Internet",
 	"Favorites"
 };
-static const int numNetSources = ARRAY_LEN( netSources );
+static const int numNetSources = sizeof(netSources) / sizeof(const char*);
 
 static const serverFilter_t serverFilters[] = {
 	{"All", "" },
@@ -84,9 +84,6 @@ static const serverFilter_t serverFilters[] = {
 	{"Weapons Factory Arena", "wfa" },
 	{"OSP", "osp" },
 };
-
-static const int numServerFilters = ARRAY_LEN( serverFilters );
-
 
 static const char *teamArenaGameTypes[] = {
 	"FFA",
@@ -104,8 +101,38 @@ static const char *teamArenaGameTypes[] = {
 	"TEAMTOURNAMENT"
 };
 
-static int const numTeamArenaGameTypes = ARRAY_LEN( teamArenaGameTypes );
+static int const numTeamArenaGameTypes = sizeof(teamArenaGameTypes) / sizeof(const char*);
 
+
+static const char *teamArenaGameNames[] = {
+	"Free For All",
+#ifdef TA_MISC // tornament to duel
+	"Duel",
+#else
+	"Tournament",
+#endif
+	"Single Player",
+	"Team Deathmatch",
+	"Capture the Flag",
+	"One Flag CTF",
+	"Overload",
+	"Harvester",
+	"Team Tournament",
+};
+
+static int const numTeamArenaGameNames = sizeof(teamArenaGameNames) / sizeof(const char*);
+
+
+static const int numServerFilters = sizeof(serverFilters) / sizeof(serverFilter_t);
+
+static const char *sortKeys[] = {
+	"Server Name",
+	"Map Name",
+	"Open Player Spots",
+	"Game Type",
+	"Ping Time"
+};
+static const int numSortKeys = sizeof(sortKeys) / sizeof(const char*);
 
 static char* netnames[] = {
 	"???",
@@ -1032,7 +1059,7 @@ void UI_Load(void) {
 
 static const char *handicapValues[] = {"None","95","90","85","80","75","70","65","60","55","50","45","40","35","30","25","20","15","10","5",NULL};
 #ifndef MISSIONPACK
-static int numHandicaps = ARRAY_LEN(handicapValues);
+static int numHandicaps = sizeof(handicapValues) / sizeof(const char*);
 #endif
 
 static void UI_DrawHandicap(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
@@ -2816,7 +2843,7 @@ static void UI_StartSinglePlayer(void) {
 	}
 
  	trap_Cvar_SetValue( "singleplayer", 1 );
- 	trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, GT_MAX_GAME_TYPE-1, tierList[i].gameTypes[j] ) );
+ 	trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, 7, tierList[i].gameTypes[j] ) );
 	trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", tierList[i].maps[j] ) );
 	skill = trap_Cvar_VariableValue( "g_spSkill" );
 
@@ -2953,11 +2980,11 @@ static void UI_LoadDemos( void ) {
 	char	*demoname;
 	int		i, len;
 
-	Com_sprintf(demoExt, sizeof(demoExt), "%s%d", DEMOEXT, (int)trap_Cvar_VariableValue("protocol"));
+	Com_sprintf(demoExt, sizeof(demoExt), "dm_%d", (int)trap_Cvar_VariableValue("protocol"));
 
 	uiInfo.demoCount = trap_FS_GetFileList( "demos", demoExt, demolist, 4096 );
 
-	Com_sprintf(demoExt, sizeof(demoExt), ".%s%d", DEMOEXT, (int)trap_Cvar_VariableValue("protocol"));
+	Com_sprintf(demoExt, sizeof(demoExt), ".dm_%d", (int)trap_Cvar_VariableValue("protocol"));
 
 	if (uiInfo.demoCount) {
 		if (uiInfo.demoCount > MAX_DEMOS) {
@@ -3232,10 +3259,7 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cvar_Set("cg_cameraOrbit", "0");
 			trap_Cvar_Set("ui_singlePlayerActive", "0");
 			trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, ui_dedicated.integer ) );
-#ifdef IOQ3ZTM // SV_PUBLIC
-			trap_Cvar_SetValue( "sv_public", (ui_dedicated.integer == 2) );
-#endif
-			trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, GT_MAX_GAME_TYPE-1, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
+			trap_Cvar_SetValue( "g_gametype", Com_Clamp( 0, 8, uiInfo.gameTypes[ui_netGameType.integer].gtEnum ) );
 			trap_Cvar_Set("g_redTeam", UI_Cvar_VariableString("ui_teamName"));
 			trap_Cvar_Set("g_blueTeam", UI_Cvar_VariableString("ui_opponentName"));
 			trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; map %s\n", uiInfo.mapList[ui_currentNetMap.integer].mapLoadName ) );
@@ -3295,9 +3319,6 @@ static void UI_RunMenuScript(char **args) {
 			trap_Cmd_ExecuteText( EXEC_APPEND, "exec default.cfg\n");
 			trap_Cmd_ExecuteText( EXEC_APPEND, "cvar_restart\n");
 			Controls_SetDefaults();
-#ifdef IOQ3ZTM // ZTM: Defaults were set but not saved.
-			Controls_SetConfig(qtrue);
-#endif
 			trap_Cvar_Set("com_introPlayed", "1" );
 			trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 #ifdef IOQUAKE3 // ZTM: CDKEY
@@ -3341,11 +3362,6 @@ static void UI_RunMenuScript(char **args) {
 			Controls_SetConfig(qtrue);
 		} else if (Q_stricmp(name, "loadControls") == 0) {
 			Controls_GetConfig();
-#ifdef IOQ3ZTM // ZTM: Added reset controls option
-		} else if (Q_stricmp(name, "resetControls") == 0) {
-			Controls_SetDefaults();
-			Controls_SetConfig(qtrue);
-#endif
 		} else if (Q_stricmp(name, "clearError") == 0) {
 			trap_Cvar_Set("com_errorMessage", "");
 		} else if (Q_stricmp(name, "loadGameInfo") == 0) {
@@ -5782,6 +5798,7 @@ vmCvar_t	ui_spSelection;
 
 vmCvar_t	ui_browserMaster;
 vmCvar_t	ui_browserGameType;
+vmCvar_t	ui_browserSortKey;
 vmCvar_t	ui_browserShowFull;
 vmCvar_t	ui_browserShowEmpty;
 #ifdef IOQ3ZTM // G_HUMANPLAYERS
@@ -5929,6 +5946,7 @@ static cvarTable_t		cvarTable[] = {
 
 	{ &ui_browserMaster, "ui_browserMaster", "0", CVAR_ARCHIVE },
 	{ &ui_browserGameType, "ui_browserGameType", "0", CVAR_ARCHIVE },
+	{ &ui_browserSortKey, "ui_browserSortKey", "4", CVAR_ARCHIVE },
 	{ &ui_browserShowFull, "ui_browserShowFull", "1", CVAR_ARCHIVE },
 	{ &ui_browserShowEmpty, "ui_browserShowEmpty", "1", CVAR_ARCHIVE },
 #ifdef IOQ3ZTM // G_HUMANPLAYERS
@@ -5968,9 +5986,9 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_initialized, "ui_initialized", "0", CVAR_TEMP },
 #ifdef TURTLEARENA // DEFAULT_TEAMS
 	{ &ui_teamName, "ui_teamName", "Foot", CVAR_ARCHIVE },
-	{ &ui_opponentName, "ui_opponentName", "Shell", CVAR_ARCHIVE },
+	{ &ui_opponentName, "ui_opponentName", "Katanas", CVAR_ARCHIVE },
 	{ &ui_redteam, "ui_redteam", "Foot", CVAR_ARCHIVE },
-	{ &ui_blueteam, "ui_blueteam", "Shell", CVAR_ARCHIVE },
+	{ &ui_blueteam, "ui_blueteam", "Katanas", CVAR_ARCHIVE },
 #else
 	{ &ui_teamName, "ui_teamName", "Pagans", CVAR_ARCHIVE },
 	{ &ui_opponentName, "ui_opponentName", "Stroggs", CVAR_ARCHIVE },
@@ -6048,7 +6066,7 @@ static cvarTable_t		cvarTable[] = {
 
 };
 
-static int		cvarTableSize = ARRAY_LEN( cvarTable );
+static int		cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
 
 
 /*

@@ -36,7 +36,7 @@ int forceModelModificationCount = -1;
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
 #ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
-int CG_ViewType( int entityNum );
+int CG_ViewType(void);
 #endif
 
 
@@ -81,7 +81,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		return 0;
 #ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 	case CG_VIEW_TYPE:
-		return CG_ViewType(arg0);
+		return CG_ViewType();
 #endif
 	default:
 		CG_Error( "vmMain: unknown command %i", command );
@@ -161,11 +161,7 @@ vmCvar_t	cg_tracerChance;
 vmCvar_t	cg_tracerWidth;
 vmCvar_t	cg_tracerLength;
 #ifndef TA_WEAPSYS_EX
-#ifdef TA_SPLITVIEW
-vmCvar_t	cg_autoswitch[MAX_SPLITVIEW];
-#else
 vmCvar_t	cg_autoswitch;
-#endif
 #endif
 vmCvar_t	cg_ignore;
 vmCvar_t	cg_simpleItems;
@@ -173,21 +169,11 @@ vmCvar_t	cg_fov;
 #ifndef TURTLEARENA // NOZOOM
 vmCvar_t	cg_zoomFov;
 #endif
-#ifdef TA_SPLITVIEW
-vmCvar_t	cg_thirdPerson[MAX_SPLITVIEW];
-vmCvar_t	cg_thirdPersonRange[MAX_SPLITVIEW];
-vmCvar_t	cg_thirdPersonAngle[MAX_SPLITVIEW];
-#ifdef ANALOG // cg var
-vmCvar_t	cg_thirdPersonAnalog[MAX_SPLITVIEW];
-#endif
-vmCvar_t	cg_splitviewVertical;
-#else
 vmCvar_t	cg_thirdPerson;
 vmCvar_t	cg_thirdPersonRange;
 vmCvar_t	cg_thirdPersonAngle;
 #ifdef ANALOG // cg var
 vmCvar_t	cg_thirdPersonAnalog;
-#endif
 #endif
 vmCvar_t	cg_lagometer;
 vmCvar_t	cg_drawAttacker;
@@ -220,9 +206,7 @@ vmCvar_t	pmove_msec;
 vmCvar_t	cg_pmove_msec;
 vmCvar_t	cg_cameraMode;
 vmCvar_t	cg_cameraOrbit;
-#ifndef IOQ3ZTM // NEW_CAM
 vmCvar_t	cg_cameraOrbitDelay;
-#endif
 vmCvar_t	cg_timescaleFadeEnd;
 vmCvar_t	cg_timescaleFadeSpeed;
 vmCvar_t	cg_timescale;
@@ -257,18 +241,11 @@ vmCvar_t	cg_obeliskRespawnDelay;
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 vmCvar_t	cg_drawMeleeWeaponTrails;
 #endif
-#ifdef TA_MISC // MATERIALS 
-vmCvar_t	cg_impactDebris;
-#endif
 #ifdef IOQ3ZTM // LASERTAG
 vmCvar_t	cg_laserTag;
 #endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 vmCvar_t	cg_atmosphericEffects;
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-vmCvar_t	cg_2dmode;
-vmCvar_t	cg_2dmodeOverride;
 #endif
 
 typedef struct {
@@ -281,17 +258,10 @@ typedef struct {
 static cvarTable_t cvarTable[] = {
 	{ &cg_ignore, "cg_ignore", "0", 0 },	// used for debugging
 #ifndef TA_WEAPSYS_EX
-#ifdef TA_SPLITVIEW
-	{ &cg_autoswitch[0], "cg_autoswitch", "1", CVAR_ARCHIVE },
-	{ &cg_autoswitch[1], "2cg_autoswitch", "1", CVAR_ARCHIVE },
-	{ &cg_autoswitch[2], "3cg_autoswitch", "1", CVAR_ARCHIVE },
-	{ &cg_autoswitch[3], "4cg_autoswitch", "1", CVAR_ARCHIVE },
-#else
 	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
 #endif
-#endif
-#ifdef TURTLEARENA
-	{ &cg_drawGun, "cg_drawViewWeapons", "1", CVAR_ARCHIVE },
+#ifdef TURTLEARENA // First person weapons are currently unsupported.
+	{ &cg_drawGun, "cg_drawGun", "0", CVAR_ARCHIVE },
 #else
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 #endif
@@ -367,63 +337,19 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
 #ifdef ANALOG // cg var
-#ifdef TA_SPLITVIEW
-	{ &cg_thirdPersonAnalog[0], "cg_thirdPersonAnalog", "0", 0 },
-	{ &cg_thirdPersonAnalog[1], "2cg_thirdPersonAnalog", "0", 0 },
-	{ &cg_thirdPersonAnalog[2], "3cg_thirdPersonAnalog", "0", 0 },
-	{ &cg_thirdPersonAnalog[3], "4cg_thirdPersonAnalog", "0", 0 },
-#else
 	{ &cg_thirdPersonAnalog, "cg_thirdPersonAnalog", "0", 0 },
 #endif
-#endif
 #ifdef TURTLEARENA // FOV
-#ifdef TA_SPLITVIEW
-	{ &cg_thirdPersonRange[0], "cg_thirdPersonRange", "120", 0 },
-	{ &cg_thirdPersonAngle[0], "cg_thirdPersonAngle", "0", 0 },
-	{ &cg_thirdPersonRange[1], "2cg_thirdPersonRange", "120", 0 },
-	{ &cg_thirdPersonAngle[1], "2cg_thirdPersonAngle", "0", 0 },
-	{ &cg_thirdPersonRange[2], "3cg_thirdPersonRange", "120", 0 },
-	{ &cg_thirdPersonAngle[2], "3cg_thirdPersonAngle", "0", 0 },
-	{ &cg_thirdPersonRange[3], "4cg_thirdPersonRange", "120", 0 },
-	{ &cg_thirdPersonAngle[3], "4cg_thirdPersonAngle", "0", 0 },
-#else
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "120", 0 },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", 0 },
-#endif
-#else
-#ifdef TA_SPLITVIEW
-	{ &cg_thirdPersonRange[0], "cg_thirdPersonRange", "40", CVAR_CHEAT },
-	{ &cg_thirdPersonAngle[0], "cg_thirdPersonAngle", "0", CVAR_CHEAT },
-	{ &cg_thirdPersonRange[1], "2cg_thirdPersonRange", "40", CVAR_CHEAT },
-	{ &cg_thirdPersonAngle[1], "2cg_thirdPersonAngle", "0", CVAR_CHEAT },
-	{ &cg_thirdPersonRange[2], "3cg_thirdPersonRange", "40", CVAR_CHEAT },
-	{ &cg_thirdPersonAngle[2], "3cg_thirdPersonAngle", "0", CVAR_CHEAT },
-	{ &cg_thirdPersonRange[3], "4cg_thirdPersonRange", "40", CVAR_CHEAT },
-	{ &cg_thirdPersonAngle[3], "4cg_thirdPersonAngle", "0", CVAR_CHEAT },
 #else
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 #endif
-#endif
-#ifdef TA_SPLITVIEW
-#ifdef THIRD_PERSON
-	{ &cg_thirdPerson[0], "cg_thirdPerson", "1", 0 },
-	{ &cg_thirdPerson[1], "2cg_thirdPerson", "1", 0 },
-	{ &cg_thirdPerson[2], "3cg_thirdPerson", "1", 0 },
-	{ &cg_thirdPerson[3], "4cg_thirdPerson", "1", 0 },
-#else
-	{ &cg_thirdPerson[0], "cg_thirdPerson", "0", 0 },
-	{ &cg_thirdPerson[1], "2cg_thirdPerson", "0", 0 },
-	{ &cg_thirdPerson[2], "3cg_thirdPerson", "0", 0 },
-	{ &cg_thirdPerson[3], "4cg_thirdPerson", "0", 0 },
-#endif
-	{ &cg_splitviewVertical, "cg_splitviewVertical", "0", CVAR_ARCHIVE },
-#else
 #ifdef THIRD_PERSON
 	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },
 #else
 	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
-#endif
 #endif
 #ifdef IOQ3ZTM // TEAM_CHAT_CON // con_notifytime
 	{ &cg_teamChatTime, "cg_teamChatTime", "5", CVAR_ARCHIVE  },
@@ -449,7 +375,7 @@ static cvarTable_t cvarTable[] = {
 #else
 	{ &cg_drawTeamOverlay, "cg_drawTeamOverlay", "0", CVAR_ARCHIVE },
 #endif
-	{ &cg_teamOverlayUserinfo, "teamoverlay", "0", CVAR_ROM | CVAR_USERINFO_ALL },
+	{ &cg_teamOverlayUserinfo, "teamoverlay", "0", CVAR_ROM | CVAR_USERINFO },
 	{ &cg_stats, "cg_stats", "0", 0 },
 	{ &cg_drawFriend, "cg_drawFriend", "1", CVAR_ARCHIVE },
 	{ &cg_teamChatsOnly, "cg_teamChatsOnly", "0", CVAR_ARCHIVE },
@@ -494,9 +420,7 @@ static cvarTable_t cvarTable[] = {
 #endif
 #endif
 	{ &cg_cameraOrbit, "cg_cameraOrbit", "0", CVAR_CHEAT},
-#ifndef IOQ3ZTM // NEW_CAM
 	{ &cg_cameraOrbitDelay, "cg_cameraOrbitDelay", "50", CVAR_ARCHIVE},
-#endif
 	{ &cg_timescaleFadeEnd, "cg_timescaleFadeEnd", "1", 0},
 	{ &cg_timescaleFadeSpeed, "cg_timescaleFadeSpeed", "0", 0},
 	{ &cg_timescale, "timescale", "1", 0},
@@ -524,22 +448,15 @@ static cvarTable_t cvarTable[] = {
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 	,{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "1", CVAR_ARCHIVE}
 #endif
-#ifdef TA_MISC // MATERIALS 
-	,{ &cg_impactDebris, "cg_impactDebris", "1", CVAR_ARCHIVE}
-#endif
 #ifdef IOQ3ZTM // LASERTAG
 	,{ &cg_laserTag, "g_laserTag", "0", CVAR_SERVERINFO }
 #endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	,{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE }
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-	,{ &cg_2dmode, "g_2dmode", "0", CVAR_SERVERINFO}
-	,{ &cg_2dmodeOverride, "cg_2dmodeOverride", "0", 0}
 #endif
 };
 
-static int  cvarTableSize = ARRAY_LEN( cvarTable );
+static int  cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
 
 /*
 =================
@@ -565,8 +482,8 @@ void CG_RegisterCvars( void ) {
 #endif
 
 #ifdef TA_SP // SPMODEL
-	trap_Cvar_Register(NULL, "spmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ROM );
-	trap_Cvar_Register(NULL, "spheadmodel", "", CVAR_USERINFO | CVAR_ROM );
+	trap_Cvar_Register(NULL, "spmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
+	trap_Cvar_Register(NULL, "spheadmodel", "", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
 #endif
 	trap_Cvar_Register(NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
@@ -616,7 +533,7 @@ void CG_UpdateCvars( void ) {
 
 	// check for modications here
 
-	// If team overlay is on, ask for updates from the server.  If it's off,
+	// If team overlay is on, ask for updates from the server.  If its off,
 	// let the server know so we don't receive it
 	if ( drawTeamOverlayModificationCount != cg_drawTeamOverlay.modificationCount ) {
 		drawTeamOverlayModificationCount = cg_drawTeamOverlay.modificationCount;
@@ -638,31 +555,17 @@ void CG_UpdateCvars( void ) {
 }
 
 int CG_CrosshairPlayer( void ) {
-#ifdef TA_SPLITVIEW
-	if ( cg.time > ( cg.localClients[0].crosshairClientTime + 1000 ) ) {
+	if ( cg.time > ( cg.crosshairClientTime + 1000 ) ) {
 		return -1;
 	}
-	return cg.localClients[0].crosshairClientNum;
-#else
-	if ( cg.time > ( cg.localClient.crosshairClientTime + 1000 ) ) {
-		return -1;
-	}
-	return cg.localClient.crosshairClientNum;
-#endif
+	return cg.crosshairClientNum;
 }
 
 int CG_LastAttacker( void ) {
-#ifdef TA_SPLITVIEW
-	if ( !cg.localClients[0].attackerTime ) {
-		return -1;
-	}
-	return cg.snap->pss[0].persistant[PERS_ATTACKER];
-#else
-	if ( !cg.localClient.attackerTime ) {
+	if ( !cg.attackerTime ) {
 		return -1;
 	}
 	return cg.snap->ps.persistant[PERS_ATTACKER];
-#endif
 }
 
 #ifdef IOQ3ZTM // LESS_VERBOSE
@@ -1170,6 +1073,12 @@ static void CG_RegisterGraphics( void ) {
 
 	trap_R_LoadWorldMap( cgs.mapname );
 
+#ifdef WOLFET
+	CG_LoadingString( "entities" );
+
+	CG_ParseEntitiesFromString();
+#endif
+
 	// precache status bar pics
 	CG_LoadingString( "game media" );
 
@@ -1253,17 +1162,27 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.playerTeleportShader = trap_R_RegisterShader("playerTeleportEffect" );
 #endif
 
-#ifdef MISSIONPACK_HARVESTER
+#ifdef MISSIONPACK_HARVESTER // ZTM: THIS IS MISSIONPACK STUFF.
+#ifdef IOQ3ZTM
 	if ( cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
+#elif defined MISSIONPACK
+	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
+#else
+	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
+#endif
 		cgs.media.redCubeModel = trap_R_RegisterModel( "models/powerups/orb/r_orb.md3" );
 		cgs.media.blueCubeModel = trap_R_RegisterModel( "models/powerups/orb/b_orb.md3" );
 		cgs.media.redCubeIcon = trap_R_RegisterShader( "icons/skull_red" );
 		cgs.media.blueCubeIcon = trap_R_RegisterShader( "icons/skull_blue" );
 	}
+#endif
 
- 	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
-#elif defined MISSIONPACK
-	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cg_buildScript.integer ) {
+#ifdef MISSIONPACK
+	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF
+#ifdef MISSIONPACK_HARVESTER
+	|| cgs.gametype == GT_HARVESTER
+#endif
+	|| cg_buildScript.integer ) {
 #else
 	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
 #endif
@@ -1700,36 +1619,16 @@ CG_RegisterClients
 */
 static void CG_RegisterClients( void ) {
 	int		i;
-#ifdef TA_SPLITVIEW
-	int		j;
-	int		numLocalClients = 1; // cg.snap->numPSs; ZTM: FIXME?: cg.snap is NULL here, how can we get number?
 
-	for (i = 0; i < numLocalClients; i++) {
-		CG_LoadingClient(cg.localClients[i].clientNum);
-		CG_NewClientInfo(cg.localClients[i].clientNum);
-	}
-#else
-	CG_LoadingClient(cg.localClient.clientNum);
-	CG_NewClientInfo(cg.localClient.clientNum);
-#endif
+	CG_LoadingClient(cg.clientNum);
+	CG_NewClientInfo(cg.clientNum);
 
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
 		const char		*clientInfo;
 
-#ifdef TA_SPLITVIEW
-		for (j = 0; j < numLocalClients; j++) {
-			if (cg.localClients[j].clientNum == i) {
-				break;
-			}
-		}
-		if (j != numLocalClients) {
+		if (cg.clientNum == i) {
 			continue;
 		}
-#else
-		if (cg.localClient.clientNum == i) {
-			continue;
-		}
-#endif
 
 		clientInfo = CG_ConfigString( CS_PLAYERS+i );
 		if ( !clientInfo[0]) {
@@ -2048,7 +1947,11 @@ void CG_LoadMenus(const char *menuFile) {
 
 	len = trap_FS_FOpenFile( menuFile, &f, FS_READ );
 	if ( !f ) {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Can't try default if we error first...
 		Com_Printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
+#else
+		trap_Error( va( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile ) );
+#endif
 		len = trap_FS_FOpenFile( "ui/hud.txt", &f, FS_READ );
 		if (!f) {
 			trap_Error( va( S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n") );
@@ -2135,7 +2038,7 @@ static int CG_FeederCount(float feederID) {
 
 void CG_SetScoreSelection(void *p) {
 	menuDef_t *menu = (menuDef_t*)p;
-	playerState_t *ps = cg.cur_ps;
+	playerState_t *ps = &cg.snap->ps;
 	int i, red, blue;
 	red = blue = 0;
 	for (i = 0; i < cg.numScores; i++) {
@@ -2232,7 +2135,7 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 				}
 		  break;
 			case 2:
-				if ( cg.cur_ps->stats[ STAT_CLIENTS_READY ] & ( 1 << sp->client ) ) {
+				if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << sp->client ) ) {
 					return "Ready";
 				}
 				if (team == -1) {
@@ -2470,9 +2373,6 @@ Will perform callbacks to make the loading info screen update.
 */
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	const char	*s;
-#ifdef TA_SPLITVIEW
-	int			i;
-#endif
 
 	// clear everything
 	memset( &cgs, 0, sizeof( cgs ) );
@@ -2490,15 +2390,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( cg_npcs, 0, sizeof(cg_npcs) );
 #endif
 
-#ifdef TA_SPLITVIEW
-	cg.numViewports = 1;
-
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		cg.localClients[i].clientNum = clientNum;
-	}
-#else
-	cg.localClient.clientNum = clientNum;
-#endif
+	cg.clientNum = clientNum;
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;
@@ -2528,39 +2420,20 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_InitConsoleCommands();
 
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
 #ifdef TA_HOLDSYS/*2*/
-		cg.localClients[i].holdableSelect = HI_NO_SELECT;
-#endif
-#if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
-		// Select our default weapon.
-		cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[cg.localClients[i].clientNum].playercfg.default_weapon;
-#ifdef TA_WEAPSYS_EX
-		cg.localClients[i].predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON];
-#else
-		cg.localClients[i].weaponSelect = cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON];
-#endif
-#else
-		cg.localClients[i].weaponSelect = WP_MACHINEGUN;
-#endif
-	}
-#else // !TA_SPLITVIEW
-#ifdef TA_HOLDSYS/*2*/
-	cg.localClient.holdableSelect = HI_NO_SELECT;
+	cg.holdableSelect = HI_NO_SELECT;
 #endif
 #if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
 	// Select our default weapon.
-	cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
+	cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
 #ifdef TA_WEAPSYS_EX
-	cg.localClient.predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+	cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #else
-	cg.localClient.weaponSelect = cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+	cg.weaponSelect = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #endif
 #else
-	cg.localClient.weaponSelect = WP_MACHINEGUN;
+	cg.weaponSelect = WP_MACHINEGUN;
 #endif
-#endif // !TA_SPLITVIEW
 
 	cgs.redflag = cgs.blueflag = -1; // For compatibily, default to unset for
 	cgs.flagStatus = -1;
@@ -2689,33 +2562,25 @@ CG_ViewType
 
 Called by CG_VIEW_TYPE.
 
-Return -1 if not our client.
 Return 0 if in first person.
 Return 1 if in third person.
+Return 2 if in third person using analog control.
 =================
 */
-int CG_ViewType( int entityNum ) {
-#ifdef TA_SPLITVIEW
-	int i;
-
-	if (!cg.snap) {
-		return -1;
-	}
-
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[cg.snap->lcIndex[i]].clientNum == entityNum) {
-			return cg_thirdPerson[cg.snap->lcIndex[i]].integer;
+int CG_ViewType(void)
+{
+#ifdef ANALOG
+	if (cg.renderingThirdPerson)
+	{
+		// ZTM: Check if analog is on
+		if (cg_thirdPersonAnalog.integer)
+		{
+			return 2;
 		}
 	}
-
-	return -1;
-#else
-	if (cg.snap && cg.snap->ps.clientNum != entityNum) {
-		return -1;
-	}
+#endif
 
 	return cg.renderingThirdPerson;
-#endif
 }
 #endif
 

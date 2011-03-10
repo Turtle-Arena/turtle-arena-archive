@@ -1,22 +1,21 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
-Copyright (C) 2010-2011 by Zack "ZTurtleMan" Middleton
 
-This file is part of Turtle Arena source code.
+This file is part of Quake III Arena source code.
 
-Turtle Arena source code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena source code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena source code; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -40,7 +39,7 @@ Server only controls
 #define INGAME_FRAME					"menu/art/cut_frame"
 #define INGAME_MENU_VERTICAL_SPACING	28
 
-#define ID_CHANGEMAP			10
+#define ID_CHANGEMAP					10
 #define ID_ADDBOTS				11
 #define ID_REMOVEBOTS			12
 #define ID_RESTART				13
@@ -97,7 +96,7 @@ void InServer_Event( void *ptr, int notification ) {
 		break;
 
 	case ID_RESTART:
-		UI_ConfirmMenu( "Restart Level?", 0, InServer_RestartAction );
+		UI_ConfirmMenu( "RESTART ARENA?", 0, InServer_RestartAction );
 		break;
 
 	case ID_ADDBOTS:
@@ -118,18 +117,6 @@ void InServer_Event( void *ptr, int notification ) {
 
 /*
 =================
-UI_InServerMenu_Draw
-=================
-*/
-static void UI_InServerMenu_Draw( void ) {
-	UI_DrawBannerString( 320, 16, "SERVER", UI_CENTER, text_banner_color );
-
-	// standard menu drawing
-	Menu_Draw( &s_inserver.menu );
-}
-
-/*
-=================
 InServer_MenuInit
 =================
 */
@@ -140,7 +127,6 @@ void InServer_MenuInit( void ) {
 
 	InServer_Cache();
 
-	s_inserver.menu.draw = UI_InServerMenu_Draw;
 	s_inserver.menu.wrapAround = qtrue;
 	s_inserver.menu.fullscreen = qfalse;
 
@@ -163,7 +149,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.map.generic.y			= y;
 	s_inserver.map.generic.id			= ID_CHANGEMAP;
 	s_inserver.map.generic.callback		= InServer_Event;
-	s_inserver.map.string				= "Change Map";
+	s_inserver.map.string				= "CHANGE MAP";
 	s_inserver.map.color				= text_big_color;
 	s_inserver.map.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) ) {
@@ -177,7 +163,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.addbots.generic.y			= y;
 	s_inserver.addbots.generic.id			= ID_ADDBOTS;
 	s_inserver.addbots.generic.callback		= InServer_Event; 
-	s_inserver.addbots.string				= "Add Bots";
+	s_inserver.addbots.string				= "ADD BOTS";
 	s_inserver.addbots.color				= text_big_color;
 	s_inserver.addbots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
@@ -197,7 +183,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.removebots.generic.y			= y;
 	s_inserver.removebots.generic.id		= ID_REMOVEBOTS;
 	s_inserver.removebots.generic.callback	= InServer_Event; 
-	s_inserver.removebots.string			= "Remove Bots";
+	s_inserver.removebots.string			= "REMOVE BOTS";
 	s_inserver.removebots.color				= text_big_color;
 	s_inserver.removebots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
@@ -217,7 +203,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.restart.generic.y			= y;
 	s_inserver.restart.generic.id			= ID_RESTART;
 	s_inserver.restart.generic.callback		= InServer_Event; 
-	s_inserver.restart.string				= "Restart Level";
+	s_inserver.restart.string				= "RESTART ARENA";
 	s_inserver.restart.color				= text_big_color;
 	s_inserver.restart.style				= UI_CENTER|UI_SMALLFONT;
 
@@ -229,7 +215,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.back.generic.y			= y;
 	s_inserver.back.generic.id			= ID_BACK;
 	s_inserver.back.generic.callback	= InServer_Event; 
-	s_inserver.back.string				= "Back";
+	s_inserver.back.string				= "BACK";
 	s_inserver.back.color				= text_big_color;
 	s_inserver.back.style				= UI_CENTER|UI_SMALLFONT;
 
@@ -254,10 +240,17 @@ void InServer_Cache( void ) {
 
 /*
 =================
-UI_InServerMenu
+UI_InGameMenu
 =================
 */
 void UI_InServerMenu( void ) {
+	// force as top level menu
+	//uis.menusp = 0;  
+
+	// set menu cursor to a nice location
+	//uis.cursorx = 319;
+	//uis.cursory = 80;
+
 	InServer_MenuInit();
 	UI_PushMenu( &s_inserver.menu );
 }

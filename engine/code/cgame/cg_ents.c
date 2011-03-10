@@ -220,7 +220,7 @@ static void CG_General( centity_t *cent ) {
 	ent.hModel = cgs.gameModels[s1->modelindex];
 
 	// player model
-	if (s1->number == cg.cur_ps->clientNum) {
+	if (s1->number == cg.snap->ps.clientNum) {
 #ifdef IOQ3ZTM // RENDERFLAGS
 		ent.renderfx |= RF_ONLY_MIRROR;
 #else
@@ -464,7 +464,7 @@ static void CG_MiscObject( centity_t *cent ) {
 
 #ifdef TA_NPCSYS
 	// Add NPC's weapon
-	// ZTM: TODO: Reuse the player weapon drawing code?
+	// ZTM: TODO: Can I reuse the player weapon drawing code?
 	// ZTM: TODO: Support secondary weapon model.
 	if (isNPC && s1->weapon > WP_NONE && s1->weapon < BG_NumWeaponGroups())
 	{
@@ -730,8 +730,10 @@ static void CG_Item( centity_t *cent ) {
 #ifdef IOQ3ZTM // ITEMS_DISAPPEAR
 	if (cent->currentState.modelindex2 != 0) // This is non-zero is it's a dropped item
 	{
-		// cent->currentState.frame is the msec till entity will be removed
-		msec = (cg.time - cent->miscTime - cent->currentState.frame) * -1;
+		if (cent->currentState.time2 > 0) // Dropped weapon by keypress
+			msec = (cg.time - cent->miscTime - 15000) * -1;
+		else
+			msec = (cg.time - cent->miscTime - 30000) * -1;
 	}
 	else
 #endif
@@ -1062,7 +1064,7 @@ static void CG_Missile( centity_t *cent ) {
 	} else if (s1->generic1 == TEAM_RED) {
 		ent.hModel = projectile->missileModelRed;
 	} else {
-		ent.hModel = projectile->missileModel;
+	ent.hModel = projectile->missileModel;
 	}
 	ent.renderfx = projectile->missileRenderfx | RF_NOSHADOW;
 #else
@@ -1494,9 +1496,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	// adjust for riding a mover if it wasn't rolled into the predicted
 	// player state
-#ifdef TA_SPLITVIEW // ZTM: Should check all local clients?
-#endif
-	if ( cent != &cg.cur_lc->predictedPlayerEntity ) {
+	if ( cent != &cg.predictedPlayerEntity ) {
 		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
 		cg.snap->serverTime, cg.time, cent->lerpOrigin );
 	}
@@ -1814,26 +1814,12 @@ void CG_AddPacketEntities( void ) {
 	AnglesToAxis( cg.autoAnglesFast, cg.autoAxisFast );
 
 	// generate and add the entity from the playerstate
-#ifdef TA_SPLITVIEW
-	for ( num = 0 ; num < MAX_SPLITVIEW ; num++ ) {
-		if (cg.snap->lcIndex[num] == -1) {
-			continue;
-		}
-		ps = &cg.localClients[num].predictedPlayerState;
-		BG_PlayerStateToEntityState( ps, &cg.localClients[num].predictedPlayerEntity.currentState, qfalse );
-		CG_AddCEntity( &cg.localClients[num].predictedPlayerEntity );
-
-		// lerp the non-predicted value for lightning gun origins
-		CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->pss[cg.snap->lcIndex[num]].clientNum ] );
-	}
-#else
-	ps = &cg.cur_lc->predictedPlayerState;
-	BG_PlayerStateToEntityState( ps, &cg.cur_lc->predictedPlayerEntity.currentState, qfalse );
-	CG_AddCEntity( &cg.cur_lc->predictedPlayerEntity );
+	ps = &cg.predictedPlayerState;
+	BG_PlayerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, qfalse );
+	CG_AddCEntity( &cg.predictedPlayerEntity );
 
 	// lerp the non-predicted value for lightning gun origins
-	CG_CalcEntityLerpPositions( &cg_entities[ cg.cur_ps->clientNum ] );
-#endif
+	CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->ps.clientNum ] );
 
 	// add each entity sent over by the server
 	for ( num = 0 ; num < cg.snap->numEntities ; num++ ) {

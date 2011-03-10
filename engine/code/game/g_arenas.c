@@ -42,6 +42,7 @@ void UpdateTournamentInfo( void ) {
 	gentity_t	*player;
 	int			playerClientNum;
 	int			n, accuracy, perfect,	msglen;
+	int			buflen;
 #ifdef MISSIONPACK
   int score1, score2;
 	qboolean won;
@@ -144,8 +145,8 @@ void UpdateTournamentInfo( void ) {
 	for( i = 0; i < level.numNonSpectatorClients; i++ ) {
 		n = level.sortedClients[i];
 		Com_sprintf( buf, sizeof(buf), " %i %i %i", n, level.clients[n].ps.persistant[PERS_RANK], level.clients[n].ps.persistant[PERS_SCORE] );
-		msglen += strlen( buf );
-		if( msglen >= sizeof(msg) ) {
+		buflen = strlen( buf );
+		if( msglen + buflen + 1 >= sizeof(msg) ) {
 			break;
 		}
 		strcat( msg, buf );

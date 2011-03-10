@@ -3,6 +3,7 @@ Turtle Arena credits.
 == Credits ==
 * id software			(For making and releasing Quake III Arena's source code)
 * ioquake3 devoplers	(For improving, fixing, and cleaning up Quake 3's source code)
+* Wolf-ET				(For snow and rain atmospheric effects)
 * ioSTVEF				(For "noise" and "random" waveform keywords, and RF_FORCE_ENT_ALPHA render flag)
 * Open Arena			(For botfiles, images, shaders, ...)
 * Xreal project			(For homing rockets and shootable rockets)
@@ -15,9 +16,9 @@ Turtle Arena credits.
 
 == License ==
 Most of the Turtle Arena source code is licensed under the GNU General Public License version 2 or later.
-	(See COPYING file for full license)
+	(See COPYING file for full license) The code in the WOLFET ifdefs is licensed under the GNU GPLv3 or later.
 
-Most of the data is licensed under the GNU GPLv2 or later and/or licensed under the Creative Commons ShareAlike 3.0,
+Most of the data is licensed under the GNU GPLv2 or later, but some is license under the Creative Commons,
 	see COPYRIGHTS file full details.
 
 
@@ -28,12 +29,9 @@ See COPYRIGHTS file for data per-file copyrights.
 == Code ==
 Turtle Arena uses code directly or based on the following.
 
-=== Mixed ===
-ioq3 is mostly GPLv2 or later, but also includes code under other licenses.
-
-* ioquake3: http://ioquake3.org/
-
 === GPLv2 or later ===
+* ioquake3 (Base engine): http://ioquake3.org/
+
 * ioSTVEF (IOSTVEF): http://thilo.kickchat.com/efport-progress/
 ** (IOSTVEF_NOISE) Adds support for "noise" and "random" waveform keywords
 ** RF_FORCE_ENT_ALPHA, it will be used so items/weapons fad out when dispearing.
@@ -50,10 +48,15 @@ ioq3 is mostly GPLv2 or later, but also includes code under other licenses.
 
 * Smokin' Guns (SMOKIN_GUNS): http://www.smokin-guns.net/
 ** Fixed animation timing based on PM_AnimLength from Smokin' Guns' bg_pmove.c
-** Used some of Smokin' Guns' breakable respawn code
+** Used some of Smokin' Guns' breakable respawn code for my breakables
 
 * Mercenaries Guild Client 1.011 for Tremulous: http://projects.mercenariesguild.net/projects/mgclient
 ** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some parts, ...)
+
+=== GPLv3 or later ===
+* Wolf-ET (WOLFET)
+** Adds snow and rain atmospheric effects
+** Adds pushable objects (misc_object)
 
 === Other ===
 Code based on guides, etc.

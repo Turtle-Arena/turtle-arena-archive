@@ -30,6 +30,7 @@ static char *s_shaderText;
 static	shaderStage_t	stages[MAX_SHADER_STAGES];		
 static	shader_t		shader;
 static	texModInfo_t	texMods[MAX_SHADER_STAGES][TR_MAX_TEXMODS];
+static	qboolean		deferLoad;
 
 #define FILE_HASH_SIZE		1024
 static	shader_t*		hashTable[FILE_HASH_SIZE];
@@ -1055,7 +1056,7 @@ static qboolean ParseStage( shaderStage_t *stage, char **text )
 	}
 
 	// decide which agens we can skip
-	if ( stage->alphaGen == AGEN_IDENTITY ) {
+	if ( stage->alphaGen == CGEN_IDENTITY ) {
 		if ( stage->rgbGen == CGEN_IDENTITY
 			|| stage->rgbGen == CGEN_LIGHTING_DIFFUSE ) {
 			stage->alphaGen = AGEN_SKIP;
@@ -1404,7 +1405,7 @@ surfaceparm <name>
 */
 static void ParseSurfaceParm( char **text ) {
 	char	*token;
-	int		numInfoParms = ARRAY_LEN( infoParms );
+	int		numInfoParms = sizeof(infoParms) / sizeof(infoParms[0]);
 	int		i;
 
 	token = COM_ParseExt( text, qfalse );
@@ -2166,7 +2167,7 @@ static qboolean CollapseMultitexture( void ) {
 			return qfalse;
 		}
 	}
-	if ( stages[0].alphaGen == AGEN_WAVEFORM )
+	if ( stages[0].alphaGen == CGEN_WAVEFORM )
 	{
 		if ( memcmp( &stages[0].alphaWave,
 					 &stages[1].alphaWave,
@@ -2681,15 +2682,11 @@ static char *FindShaderInShaderText( const char *shadername ) {
 
 	hash = generateHashValue(shadername, MAX_SHADERTEXT_HASH);
 
-	if(shaderTextHashTable[hash])
-	{
-		for (i = 0; shaderTextHashTable[hash][i]; i++)
-		{
-			p = shaderTextHashTable[hash][i];
-			token = COM_ParseExt(&p, qtrue);
-		
-			if(!Q_stricmp(token, shadername))
-				return p;
+	for (i = 0; shaderTextHashTable[hash][i]; i++) {
+		p = shaderTextHashTable[hash][i];
+		token = COM_ParseExt(&p, qtrue);
+		if ( !Q_stricmp( token, shadername ) ) {
+			return p;
 		}
 	}
 
@@ -3241,6 +3238,7 @@ void	R_ShaderList_f (void) {
 	ri.Printf (PRINT_ALL, "------------------\n");
 }
 
+
 /*
 ====================
 ScanAndLoadShaderFiles
@@ -3257,7 +3255,7 @@ static void ScanAndLoadShaderFiles( void )
 	char *p;
 	int numShaderFiles;
 	int i;
-	char *oldp, *token, *hashMem, *textEnd;
+	char *oldp, *token, *hashMem;
 	int shaderTextHashTableSizes[MAX_SHADERTEXT_HASH], hash, size;
 
 	long sum = 0, summand;
@@ -3318,21 +3316,19 @@ static void ScanAndLoadShaderFiles( void )
 	// build single large buffer
 	s_shaderText = ri.Hunk_Alloc( sum + numShaderFiles*2, h_low );
 	s_shaderText[ 0 ] = '\0';
-	textEnd = s_shaderText;
- 
+
 	// free in reverse order, so the temp files are all dumped
 	for ( i = numShaderFiles - 1; i >= 0 ; i-- )
 	{
-		if ( !buffers[i] )
-			continue;
-
-		strcat( textEnd, buffers[i] );
-		strcat( textEnd, "\n" );
-		textEnd += strlen( textEnd );
-		ri.FS_FreeFile( buffers[i] );
+		if(buffers[i])
+		{
+			p = &s_shaderText[strlen(s_shaderText)];
+			strcat( s_shaderText, buffers[i] );
+			ri.FS_FreeFile( buffers[i] );
+			COM_Compress(p);
+			strcat( s_shaderText, "\n" );
+		}
 	}
-
-	COM_Compress( s_shaderText );
 
 	// free up memory
 	ri.FS_FreeFileList( shaderFiles );
@@ -3444,6 +3440,8 @@ void R_InitShaders( void ) {
 #endif
 
 	Com_Memset(hashTable, 0, sizeof(hashTable));
+
+	deferLoad = qfalse;
 
 	CreateInternalShaders();
 

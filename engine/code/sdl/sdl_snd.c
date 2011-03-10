@@ -99,7 +99,8 @@ static struct
 	{ AUDIO_S16MSB, "AUDIO_S16MSB" }
 };
 
-static int formatToStringTableSize = ARRAY_LEN( formatToStringTable );
+static int formatToStringTableSize =
+  sizeof( formatToStringTable ) / sizeof( formatToStringTable[ 0 ] );
 
 /*
 ===============
@@ -178,11 +179,7 @@ qboolean SNDDMA_Init(void)
 		tmp = 16;
 
 	desired.freq = (int) s_sdlSpeed->value;
-#ifdef IOQ3ZTM // Use higher quility by default
-	if(!desired.freq) desired.freq = 44100;
-#else
 	if(!desired.freq) desired.freq = 22050;
-#endif
 	desired.format = ((tmp == 16) ? AUDIO_S16SYS : AUDIO_U8);
 
 	// I dunno if this is the best idea, but I'll give it a try...

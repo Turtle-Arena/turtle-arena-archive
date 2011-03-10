@@ -362,11 +362,7 @@ then
 	find $DEBINSTALL/$ORIGDIR/ -type f -name '.svnignore' -exec rm -rf '{}' \; 2>/dev/null
 	find $DEBINSTALL/$ORIGDIR/ -type f -name '*~' -exec rm -rf '{}' \; 2>/dev/null
 
-	# Remove files Code::Blocks creates
-	find $DEBINSTALL/$ORIGDIR/misc/code_blocks/ -type f -name '*.layout' -exec rm -rf '{}' \; 2>/dev/null
-	find $DEBINSTALL/$ORIGDIR/misc/code_blocks/ -type f -name '*.depend' -exec rm -rf '{}' \; 2>/dev/null
-
-	# Remove lcc as Debian calls it non-free and removes it
+	# Remave lcc as debian calls it non-free and removes it
 	rm -r $DEBINSTALL/$ORIGDIR/code/tools/lcc
 
 	# Remove non-free windows header

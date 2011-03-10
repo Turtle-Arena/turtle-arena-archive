@@ -289,7 +289,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_ioq3, "ui_ioq3", "1", CVAR_ROM }
 };
 
-static int cvarTableSize = ARRAY_LEN( cvarTable );
+static int cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
 
 
 /*

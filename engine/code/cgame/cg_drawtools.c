@@ -32,41 +32,6 @@ Adjusted for resolution, doesn't keep screen aspect ratio
 ================
 */
 void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
-#ifdef TA_SPLITVIEW
-	if (cg.numViewports != 1 && cg.snap) {
-		qboolean right = qfalse;
-		qboolean down = qfalse;
-
-		if (cg.numViewports == 2) {
-			if (cg.viewport == 1) {
-				down = qtrue;
-			}
-		}
-		else if (cg.numViewports == 3 && cg.viewport == 2) {
-			down = qtrue;
-		}
-		else if (cg.numViewports <= 4) {
-			if (cg.viewport == 1 || cg.viewport == 3) {
-				right = qtrue;
-			}
-			if (cg.viewport == 2 || cg.viewport == 3) {
-				down = qtrue;
-			}
-		}
-
-		if (cg.viewport != 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
-			right = !right;
-			down = !down;
-		}
-
-		if (right) {
-			*x += SCREEN_WIDTH;
-		}
-		if (down) {
-			*y += SCREEN_HEIGHT;
-		}
-	}
-#endif
 	// scale for screen sizes
 	*x *= cgs.screenXScaleFit;
 	*y *= cgs.screenYScaleFit;
@@ -101,44 +66,6 @@ Adjusted for resolution and screen aspect ratio
 ================
 */
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
-#ifdef TA_SPLITVIEW
-	int viewXBias = 0;
-
-	if (cg.numViewports != 1 && cg.snap) {
-		qboolean right = qfalse;
-		qboolean down = qfalse;
-
-		if (cg.numViewports == 2) {
-			if (cg.viewport == 1) {
-				down = qtrue;
-			}
-		}
-		else if (cg.numViewports == 3 && cg.viewport == 2) {
-			down = qtrue;
-		}
-		else if (cg.numViewports <= 4) {
-			if (cg.viewport == 1 || cg.viewport == 3) {
-				right = qtrue;
-			}
-			if (cg.viewport == 2 || cg.viewport == 3) {
-				down = qtrue;
-			}
-		}
-
-		if (cg.viewport != 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
-			right = !right;
-			down = !down;
-		}
-
-		if (right) {
-			viewXBias = 2;
-			*x += SCREEN_WIDTH;
-		}
-		if (down) {
-			*y += SCREEN_HEIGHT;
-		}
-	}
-#endif
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
 	if (cg_hudPlacement == HUD_LEFT)
 		*x = *x * cgs.screenXScale;
@@ -159,11 +86,6 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	*y *= cgs.screenYScale;
 	*w *= cgs.screenXScale;
 	*h *= cgs.screenYScale;
-
-#ifdef TA_SPLITVIEW
-	// Offset for widescreen
-	*x += cgs.screenXBias*(viewXBias);
-#endif
 }
 
 /*
@@ -505,7 +427,10 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 	if (font->fontInfo.name[0]) {
 		useScale = scale * font->fontInfo.glyphScale;
 	} else {
-		useScale = scale * (48.0f / font->pointSize);
+		//float dpi = 72.0f;
+		//float dpiScale = 72.0f / dpi;
+
+		useScale = scale * (48.0f / font->pointSize);// * dpiScale;
 	}
 
 	if (x == CENTER_X) {
@@ -889,16 +814,10 @@ void CG_TileClear( void ) {
 	w = cgs.glconfig.vidWidth;
 	h = cgs.glconfig.vidHeight;
 
-#ifdef TA_SPLITVIEW
-	if (cg.cur_ps->pm_type == PM_INTERMISSION || cg_viewsize.integer >= 100 || cg.viewport != 0) {
-		return;		// full screen rendering
-	}
-#else
 	if ( cg.refdef.x == 0 && cg.refdef.y == 0 && 
 		cg.refdef.width == w && cg.refdef.height == h ) {
 		return;		// full screen rendering
 	}
-#endif
 
 	top = cg.refdef.y;
 	bottom = top + cg.refdef.height-1;
@@ -1099,10 +1018,10 @@ CG_ColorForHealth
 void CG_ColorForHealth( vec4_t hcolor ) {
 
 #ifdef TURTLEARENA // NOARMOR
-	CG_GetColorForHealth( cg.cur_ps->stats[STAT_HEALTH], hcolor );
+	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], hcolor );
 #else
-	CG_GetColorForHealth( cg.cur_ps->stats[STAT_HEALTH], 
-		cg.cur_ps->stats[STAT_ARMOR], hcolor );
+	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], 
+		cg.snap->ps.stats[STAT_ARMOR], hcolor );
 #endif
 }
 
@@ -1281,7 +1200,11 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 	trap_R_SetColor( color );
 	
 	ax = x * cgs.screenXScale + cgs.screenXBias;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Does this cause a problem?
 	ay = y * cgs.screenYScale;
+#else
+	ay = y * cgs.screenXScale;
+#endif
 
 	s = str;
 	while ( *s )
@@ -1297,7 +1220,11 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 			fwidth = (float)propMapB[ch][2] / 256.0f;
 			fheight = (float)PROPB_HEIGHT / 256.0f;
 			aw = (float)propMapB[ch][2] * cgs.screenXScale;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Does this cause a problem?
 			ah = (float)PROPB_HEIGHT * cgs.screenYScale;
+#else
+			ah = (float)PROPB_HEIGHT * cgs.screenXScale;
+#endif
 			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, cgs.media.charsetPropB );
 			ax += (aw + (float)PROPB_GAP_WIDTH * cgs.screenXScale);
 		}
@@ -1406,7 +1333,11 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 			fwidth = (float)propMap[ch][2] / 256.0f;
 			fheight = (float)PROP_HEIGHT / 256.0f;
 			aw = (float)propMap[ch][2] * cgs.screenXScale * sizeScale;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Does this cause a problem?
 			ah = (float)PROP_HEIGHT * cgs.screenYScale * sizeScale;
+#else
+			ah = (float)PROP_HEIGHT * cgs.screenXScale * sizeScale;
+#endif
 			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, charset );
 		} else {
 			aw = 0;
@@ -1425,15 +1356,9 @@ UI_ProportionalSizeScale
 =================
 */
 float UI_ProportionalSizeScale( int style ) {
-#ifdef IOQ3ZTM // FONT_REWRITE
-	if (style & UI_SMALLFONT) {
-		return (float)cgs.media.fontPropSmall.pointSize / (float)cgs.media.fontPropBig.pointSize;
-	}
-#else
 	if(  style & UI_SMALLFONT ) {
 		return 0.75;
 	}
-#endif
 
 	return 1.00;
 }

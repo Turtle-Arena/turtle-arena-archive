@@ -33,9 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ID_JOINBLUE		101
 #define ID_JOINGAME		102
 #define ID_SPECTATE		103
-#ifdef TA_SPLITVIEW
-#define ID_HIDE			104
-#endif
+
 
 typedef struct
 {
@@ -45,11 +43,6 @@ typedef struct
 	menutext_s		joinblue;
 	menutext_s		joingame;
 	menutext_s		spectate;
-#ifdef TA_SPLITVIEW
-	menutext_s		hide;
-
-	int				localClient;
-#endif
 } teammain_t;
 
 static teammain_t	s_teammain;
@@ -60,61 +53,30 @@ TeamMain_MenuEvent
 ===============
 */
 static void TeamMain_MenuEvent( void* ptr, int event ) {
-#ifdef TA_SPLITVIEW
-	char *teamCmd;
-#endif
-
 	if( event != QM_ACTIVATED ) {
 		return;
 	}
 
-#ifdef TA_SPLITVIEW
-	teamCmd = Com_LocalClientCvarName(s_teammain.localClient, "team");
-#endif
-
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_JOINRED:
-#ifdef TA_SPLITVIEW
-		trap_Cmd_ExecuteText( EXEC_APPEND, va("cmd %s red\n", teamCmd) );
-#else
 		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team red\n" );
-#endif
 		UI_ForceMenuOff();
 		break;
 
 	case ID_JOINBLUE:
-#ifdef TA_SPLITVIEW
-		trap_Cmd_ExecuteText( EXEC_APPEND, va("cmd %s blue\n", teamCmd) );
-#else
 		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team blue\n" );
-#endif
 		UI_ForceMenuOff();
 		break;
 
 	case ID_JOINGAME:
-#ifdef TA_SPLITVIEW
-		trap_Cmd_ExecuteText( EXEC_APPEND, va("cmd %s free\n", teamCmd) );
-#else
 		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team free\n" );
-#endif
 		UI_ForceMenuOff();
 		break;
 
 	case ID_SPECTATE:
-#ifdef TA_SPLITVIEW
-		trap_Cmd_ExecuteText( EXEC_APPEND, va("cmd %s spectator\n", teamCmd) );
-#else
 		trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team spectator\n" );
-#endif
 		UI_ForceMenuOff();
 		break;
-
-#ifdef TA_SPLITVIEW
-	case ID_HIDE:
-		trap_Cmd_ExecuteText( EXEC_APPEND, va("cmd %s hide\n", teamCmd) );
-		UI_ForceMenuOff();
-		break;
-#endif
 	}
 }
 
@@ -124,26 +86,12 @@ static void TeamMain_MenuEvent( void* ptr, int event ) {
 TeamMain_MenuInit
 ===============
 */
-#ifdef TA_SPLITVIEW
-void TeamMain_MenuInit( int localClient )
-#else
-void TeamMain_MenuInit( void )
-#endif
-{
+void TeamMain_MenuInit( void ) {
 	int		y;
 	int		gametype;
 	char	info[MAX_INFO_STRING];
-#ifdef TA_SPLITVIEW
-	uiClientState_t	cs;
-
-	trap_GetClientState( &cs );
-#endif
 
 	memset( &s_teammain, 0, sizeof(s_teammain) );
-
-#ifdef TA_SPLITVIEW
-	s_teammain.localClient = localClient;
-#endif
 
 	TeamMain_Cache();
 
@@ -204,23 +152,6 @@ void TeamMain_MenuInit( void )
 	s_teammain.spectate.color            = colorRed;
 	y += 20;
 
-#ifdef TA_SPLITVIEW
-	s_teammain.hide.generic.type     = MTYPE_PTEXT;
-	s_teammain.hide.generic.flags    = QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	s_teammain.hide.generic.id       = ID_HIDE;
-	s_teammain.hide.generic.callback = TeamMain_MenuEvent;
-	s_teammain.hide.generic.x        = 320;
-	s_teammain.hide.generic.y        = y;
-	s_teammain.hide.string           = "HIDE";
-	s_teammain.hide.style            = UI_CENTER|UI_SMALLFONT;
-	s_teammain.hide.color            = colorRed;
-	y += 20;
-
-	if (cs.numLocalClients <= 1) {
-		s_teammain.hide.generic.flags  |= QMF_GRAYED;
-	}
-#endif
-
 	trap_GetConfigString(CS_SERVERINFO, info, MAX_INFO_STRING);   
 	gametype = atoi( Info_ValueForKey( info,"g_gametype" ) );
 			      
@@ -245,9 +176,6 @@ void TeamMain_MenuInit( void )
 	Menu_AddItem( &s_teammain.menu, (void*) &s_teammain.joinblue );
 	Menu_AddItem( &s_teammain.menu, (void*) &s_teammain.joingame );
 	Menu_AddItem( &s_teammain.menu, (void*) &s_teammain.spectate );
-#ifdef TA_SPLITVIEW
-	Menu_AddItem( &s_teammain.menu, (void*) &s_teammain.hide );
-#endif
 }
 
 
@@ -266,16 +194,7 @@ void TeamMain_Cache( void ) {
 UI_TeamMainMenu
 ===============
 */
-#ifdef TA_SPLITVIEW
-void UI_TeamMainMenu( int localClient )
-#else
-void UI_TeamMainMenu( void )
-#endif
-{
-#ifdef TA_SPLITVIEW
-	TeamMain_MenuInit(localClient);
-#else
+void UI_TeamMainMenu( void ) {
 	TeamMain_MenuInit();
-#endif
 	UI_PushMenu ( &s_teammain.menu );
 }

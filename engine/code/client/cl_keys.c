@@ -139,107 +139,6 @@ keyname_t keynames[] =
 	{"JOY31", K_JOY31},
 	{"JOY32", K_JOY32},
 
-#ifdef TA_SPLITVIEW
-	{"2JOY1", K_2JOY1},
-	{"2JOY2", K_2JOY2},
-	{"2JOY3", K_2JOY3},
-	{"2JOY4", K_2JOY4},
-	{"2JOY5", K_2JOY5},
-	{"2JOY6", K_2JOY6},
-	{"2JOY7", K_2JOY7},
-	{"2JOY8", K_2JOY8},
-	{"2JOY9", K_2JOY9},
-	{"2JOY10", K_2JOY10},
-	{"2JOY11", K_2JOY11},
-	{"2JOY12", K_2JOY12},
-	{"2JOY13", K_2JOY13},
-	{"2JOY14", K_2JOY14},
-	{"2JOY15", K_2JOY15},
-	{"2JOY16", K_2JOY16},
-	{"2JOY17", K_2JOY17},
-	{"2JOY18", K_2JOY18},
-	{"2JOY19", K_2JOY19},
-	{"2JOY20", K_2JOY20},
-	{"2JOY21", K_2JOY21},
-	{"2JOY22", K_2JOY22},
-	{"2JOY23", K_2JOY23},
-	{"2JOY24", K_2JOY24},
-	{"2JOY25", K_2JOY25},
-	{"2JOY26", K_2JOY26},
-	{"2JOY27", K_2JOY27},
-	{"2JOY28", K_2JOY28},
-	{"2JOY29", K_2JOY29},
-	{"2JOY30", K_2JOY30},
-	{"2JOY31", K_2JOY31},
-	{"2JOY32", K_2JOY32},
-
-	{"3JOY1", K_3JOY1},
-	{"3JOY2", K_3JOY2},
-	{"3JOY3", K_3JOY3},
-	{"3JOY4", K_3JOY4},
-	{"3JOY5", K_3JOY5},
-	{"3JOY6", K_3JOY6},
-	{"3JOY7", K_3JOY7},
-	{"3JOY8", K_3JOY8},
-	{"3JOY9", K_3JOY9},
-	{"3JOY10", K_3JOY10},
-	{"3JOY11", K_3JOY11},
-	{"3JOY12", K_3JOY12},
-	{"3JOY13", K_3JOY13},
-	{"3JOY14", K_3JOY14},
-	{"3JOY15", K_3JOY15},
-	{"3JOY16", K_3JOY16},
-	{"3JOY17", K_3JOY17},
-	{"3JOY18", K_3JOY18},
-	{"3JOY19", K_3JOY19},
-	{"3JOY20", K_3JOY20},
-	{"3JOY21", K_3JOY21},
-	{"3JOY22", K_3JOY22},
-	{"3JOY23", K_3JOY23},
-	{"3JOY24", K_3JOY24},
-	{"3JOY25", K_3JOY25},
-	{"3JOY26", K_3JOY26},
-	{"3JOY27", K_3JOY27},
-	{"3JOY28", K_3JOY28},
-	{"3JOY29", K_3JOY29},
-	{"3JOY30", K_3JOY30},
-	{"3JOY31", K_3JOY31},
-	{"3JOY32", K_3JOY32},
-
-	{"4JOY1", K_4JOY1},
-	{"4JOY2", K_4JOY2},
-	{"4JOY3", K_4JOY3},
-	{"4JOY4", K_4JOY4},
-	{"4JOY5", K_4JOY5},
-	{"4JOY6", K_4JOY6},
-	{"4JOY7", K_4JOY7},
-	{"4JOY8", K_4JOY8},
-	{"4JOY9", K_4JOY9},
-	{"4JOY10", K_4JOY10},
-	{"4JOY11", K_4JOY11},
-	{"4JOY12", K_4JOY12},
-	{"4JOY13", K_4JOY13},
-	{"4JOY14", K_4JOY14},
-	{"4JOY15", K_4JOY15},
-	{"4JOY16", K_4JOY16},
-	{"4JOY17", K_4JOY17},
-	{"4JOY18", K_4JOY18},
-	{"4JOY19", K_4JOY19},
-	{"4JOY20", K_4JOY20},
-	{"4JOY21", K_4JOY21},
-	{"4JOY22", K_4JOY22},
-	{"4JOY23", K_4JOY23},
-	{"4JOY24", K_4JOY24},
-	{"4JOY25", K_4JOY25},
-	{"4JOY26", K_4JOY26},
-	{"4JOY27", K_4JOY27},
-	{"4JOY28", K_4JOY28},
-	{"4JOY29", K_4JOY29},
-	{"4JOY30", K_4JOY30},
-	{"4JOY31", K_4JOY31},
-	{"4JOY32", K_4JOY32},
-#endif
-
 	{"AUX1", K_AUX1},
 	{"AUX2", K_AUX2},
 	{"AUX3", K_AUX3},
@@ -500,9 +399,9 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 		float strWidth = 0;
 		int id;
 		for (id = 0; id < (edit->cursor - prestep - i); i++) {
-			strWidth += Com_FontCharWidth( font, str[i] );
+			strWidth += Com_FontCharWidth( &cls.fontSmall, str[i] );
 		}
-		SCR_DrawFontChar(font, x + strWidth, y, cursorChar, qfalse);
+		SCR_DrawConsoleFontChar( x + strWidth, y, cursorChar );
 #else
 		if ( size == SMALLCHAR_WIDTH ) {
 			SCR_DrawSmallChar( x + ( edit->cursor - prestep - i ) * size, y, cursorChar );
@@ -668,14 +567,12 @@ void Field_CharEvent( field_t *edit, int ch ) {
 	}
 
 	if ( key_overstrikeMode ) {	
-		// - 2 to leave room for the leading slash and trailing \0
-		if ( edit->cursor == MAX_EDIT_LINE - 2 )
+		if ( edit->cursor == MAX_EDIT_LINE - 1 )
 			return;
 		edit->buffer[edit->cursor] = ch;
 		edit->cursor++;
 	} else {	// insert mode
-		// - 2 to leave room for the leading slash and trailing \0
-		if ( len == MAX_EDIT_LINE - 2 ) {
+		if ( len == MAX_EDIT_LINE - 1 ) {
 			return; // all full
 		}
 		memmove( edit->buffer + edit->cursor + 1, 
@@ -719,10 +616,8 @@ void Console_Key (int key) {
 	// enter finishes the line
 	if ( key == K_ENTER || key == K_KP_ENTER ) {
 		// if not in the game explicitly prepend a slash if needed
-		if ( cls.state != CA_ACTIVE &&
-				g_consoleField.buffer[0] &&
-				g_consoleField.buffer[0] != '\\' &&
-				g_consoleField.buffer[0] != '/' ) {
+		if ( cls.state != CA_ACTIVE && g_consoleField.buffer[0] != '\\' 
+			&& g_consoleField.buffer[0] != '/' ) {
 			char	temp[MAX_EDIT_LINE-1];
 
 			Q_strncpyz( temp, g_consoleField.buffer, sizeof( temp ) );

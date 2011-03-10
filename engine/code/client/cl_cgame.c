@@ -61,12 +61,7 @@ void CL_GetGlconfig( glconfig_t *glconfig ) {
 CL_GetUserCmd
 ====================
 */
-#ifdef TA_SPLITVIEW // CONTROLS
-qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClient )
-#else
-qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd )
-#endif
-{
+qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	// cmds[cmdNumber] is the last properly generated command
 
 	// can't return anything that we haven't created yet
@@ -80,11 +75,7 @@ qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd )
 		return qfalse;
 	}
 
-#ifdef TA_SPLITVIEW // CONTROLS
-	*ucmd = cl.cmdss[localClient][ cmdNumber & CMD_MASK ];
-#else
 	*ucmd = cl.cmds[ cmdNumber & CMD_MASK ];
-#endif
 
 	return qtrue;
 }
@@ -161,17 +152,7 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 	snapshot->ping = clSnap->ping;
 	snapshot->serverTime = clSnap->serverTime;
 	Com_Memcpy( snapshot->areamask, clSnap->areamask, sizeof( snapshot->areamask ) );
-#ifdef TA_SPLITVIEW
-	snapshot->numPSs = clSnap->numPSs;
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		snapshot->lcIndex[i] = clSnap->lcIndex[i];
-	}
-	for (i = 0; i < snapshot->numPSs; i++) {
-		snapshot->pss[i] = clSnap->pss[i];
-	}
-#else
 	snapshot->ps = clSnap->ps;
-#endif
 	count = clSnap->numEntities;
 	if ( count > MAX_ENTITIES_IN_SNAPSHOT ) {
 		Com_DPrintf( "CL_GetSnapshot: truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT );
@@ -193,32 +174,17 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 CL_SetUserCmdValue
 =====================
 */
-#ifdef TA_SPLITVIEW // CONTROLS
-#ifdef TA_HOLDSYS/*2*/
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int holdableValue, int localClientNum ) {
-	cl.localClients[localClientNum].cgameUserCmdValue = userCmdValue;
-	cl.localClients[localClientNum].cgameSensitivity = sensitivityScale;
-	cl.localClients[localClientNum].cgameHoldableValue = holdableValue;
-}
-#else
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int localClientNum ) {
-	cl.localClients[localClientNum].cgameUserCmdValue = userCmdValue;
-	cl.localClients[localClientNum].cgameSensitivity = sensitivityScale;
-}
-#endif
-#else
 #ifdef TA_HOLDSYS/*2*/
 void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int holdableValue ) {
-	cl.localClient.cgameUserCmdValue = userCmdValue;
-	cl.localClient.cgameSensitivity = sensitivityScale;
-	cl.localClient.cgameHoldableValue = holdableValue;
+	cl.cgameUserCmdValue = userCmdValue;
+	cl.cgameSensitivity = sensitivityScale;
+	cl.cgameHoldableValue = holdableValue;
 }
 #else
 void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) {
-	cl.localClient.cgameUserCmdValue = userCmdValue;
-	cl.localClient.cgameSensitivity = sensitivityScale;
+	cl.cgameUserCmdValue = userCmdValue;
+	cl.cgameSensitivity = sensitivityScale;
 }
-#endif
 #endif
 
 /*
@@ -387,11 +353,7 @@ rescan:
 		Con_ClearNotify();
 		// reparse the string, because Con_ClearNotify() may have done another Cmd_TokenizeString()
 		Cmd_TokenizeString( s );
-#ifdef TA_SPLITVIEW // CONTROLS
-		Com_Memset( cl.cmdss, 0, sizeof( cl.cmdss ) );
-#else
 		Com_Memset( cl.cmds, 0, sizeof( cl.cmds ) );
-#endif
 		return qtrue;
 	}
 
@@ -481,7 +443,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		Cvar_Update( VMA(1) );
 		return 0;
 	case CG_CVAR_SET:
-		Cvar_SetSafe( VMA(1), VMA(2) );
+		Cvar_Set( VMA(1), VMA(2) );
 		return 0;
 	case CG_CVAR_VARIABLESTRINGBUFFER:
 		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
@@ -518,7 +480,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		CL_AddCgameCommand( VMA(1) );
 		return 0;
 	case CG_REMOVECOMMAND:
-		Cmd_RemoveCommandSafe( VMA(1) );
+		Cmd_RemoveCommand( VMA(1) );
 		return 0;
 	case CG_SENDCLIENTCOMMAND:
 		CL_AddReliableCommand(VMA(1), qfalse);
@@ -582,11 +544,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		S_UpdateEntityPosition( args[1], VMA(2) );
 		return 0;
 	case CG_S_RESPATIALIZE:
-		S_Respatialize( args[1], VMA(2), VMA(3), args[4]
-#ifdef TA_SPLITVIEW
-			, args[5]
-#endif
-			);
+		S_Respatialize( args[1], VMA(2), VMA(3), args[4] );
 		return 0;
 	case CG_S_REGISTERSOUND:
 		return S_RegisterSound( VMA(1), args[2] );
@@ -618,6 +576,11 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_R_ADDPOLYSTOSCENE:
 		re.AddPolyToScene( args[1], args[2], VMA(3), args[4] );
 		return 0;
+#ifdef WOLFET
+	case CG_R_ADDPOLYBUFFERTOSCENE:
+		re.AddPolyBufferToScene( VMA( 1 ) );
+		break;
+#endif
 	case CG_R_LIGHTFORPOINT:
 		return re.LightForPoint( VMA(1), VMA(2), VMA(3), VMA(4) );
 	case CG_R_ADDLIGHTTOSCENE:
@@ -656,22 +619,12 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_GETCURRENTCMDNUMBER:
 		return CL_GetCurrentCmdNumber();
 	case CG_GETUSERCMD:
-#ifdef TA_SPLITVIEW // CONTROLS
-		return CL_GetUserCmd( args[1], VMA(2), args[3] );
-	case CG_SETUSERCMDVALUE:
-#if defined TA_HOLDSYS/*2*/
-		CL_SetUserCmdValue( args[1], VMF(2), args[3], args[4] );
-#else
-		CL_SetUserCmdValue( args[1], VMF(2), args[3] );
-#endif
-#else
 		return CL_GetUserCmd( args[1], VMA(2) );
 	case CG_SETUSERCMDVALUE:
 #if defined TA_HOLDSYS/*2*/
 		CL_SetUserCmdValue( args[1], VMF(2), args[3] );
 #else
 		CL_SetUserCmdValue( args[1], VMF(2) );
-#endif
 #endif
 		return 0;
 	case CG_MEMORY_REMAINING:

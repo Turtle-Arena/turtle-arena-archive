@@ -1,16 +1,10 @@
 #
 # Turtle Arena Makefile
 #
-# Multiple games can be built;
-#	Turtle Arena. Use make as usual.
-#	ioq3turtle (ioq3 mode for Turtle Arena). make BUILD_IOQ3TURTLE=1
-#	ioq3ztm (Turtle Arena stuff in ioq3, not net compatible with either games). make BUILD_IOQ3ZTM=1
-#	ioquake3 (Unmodified ioq3, any changes are accidental). make BUILD_IOQ3=1
-#
 # GNU Make required
 #
 
-COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
+COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]')
 
 COMPILE_ARCH=$(shell uname -m | sed -e s/i.86/i386/)
 
@@ -78,7 +72,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 1917
+IOQ3_REVISION = 1795
 
 #
 # Start build type
@@ -114,7 +108,7 @@ ifeq ($(QUAKE3),1)
 							-DTA_WEAPSYS -DTA_PLAYERSYS \
 							-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 							-DTA_WEAPSYS_EX_COMPAT \
-							-DOA_BLOOM -DTA_SPLITVIEW
+							-DOA_BLOOM 
 
 		QUAKE3_CFLAGS =
 
@@ -152,7 +146,7 @@ ifeq ($(QUAKE3),1)
 			#   and currently doesn't support Q3 mods.
 			BUILD_DEFINES = -DIOQUAKE3 -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
 								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
-								-DTA_ITEMSYS -DTA_ITEMSYS_USE_INTERNAL -DTA_WEAPSYS -DOA_BLOOM -DTA_SPLITVIEW
+								-DTA_ITEMSYS -DTA_ITEMSYS_USE_INTERNAL -DTA_WEAPSYS -DOA_BLOOM
 
 			VERSION=1.36ztm
 
@@ -268,14 +262,11 @@ else # END QUAKE3
 	# TA_PATHSYS			General path system using entities like path_corner
 	# TA_ENTSYS				Adds new entities and allows all ET_MOVER entities to be breakable.
 	# TA_NPCSYS   			WIP NPC system, based on TDC_NPC system and code in Quake3
-	# TA_ATMEFFECTS			TODO Atmospheric fffects.
 	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
 	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
 	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
 	#							Kinda pointless. (Note: TA_PLAYERSYS adds support for Elite Force soundpath keyword in animations.cfg,
 	#													must also define RAVENMD4 and IOQ3ZTM)
-	# TA_SPLITVIEW			Allow a single game client to connect and play using multiple local clients, commonly called splitscreen.
-	#						TODO: Split view system for viewing multiple network clients at once.
 
 
 	# Turtle Arena specific defines
@@ -299,11 +290,11 @@ else # END QUAKE3
 						-DTA_WEAPSYS -DTA_PLAYERSYS \
 						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 						-DTA_WEAPSYS_EX_COMPAT \
-						-DOA_BLOOM -DTA_SPLITVIEW
+						-DOA_BLOOM
 
 	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
 						-DTA_WEAPSYS_EX -DTA_PLAYERS -DTA_DATA \
-						-DNIGHTSMODE -DTA_CAMERA -DMISSIONPACK_HUD2
+						-DNIGHTSMODE -DTA_CAMERA -DWOLFET -DMISSIONPACK_HUD2
 
 	# Currently Turtle Arena doesn't use camera scripts.
 	#BUILD_SPLINES=1 # Adds -DCAMERASCRIPT
@@ -319,7 +310,7 @@ else # END QUAKE3
 	USE_CODEC_THEORA=1
 
 	# Turtle Arena version
-	VERSION=0.5.0
+	VERSION=0.4.2
 
 	# Turtle Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"
@@ -388,10 +379,6 @@ endif
 
 ifndef MOUNT_DIR
 MOUNT_DIR=code
-endif
-
-ifndef TEMPDIR
-TEMPDIR=/tmp
 endif
 
 ifndef GENERATE_DEPENDENCIES
@@ -479,6 +466,7 @@ LOKISETUPDIR=misc/setup
 NSISDIR=misc/nsis
 SDLHDIR=$(MOUNT_DIR)/SDL12
 LIBSDIR=$(MOUNT_DIR)/libs
+TEMPDIR=/tmp
 SPLNDIR=$(MOUNT_DIR)/splines
 
 bin_path=$(shell which $(1) 2> /dev/null)
@@ -537,10 +525,10 @@ LIB=lib
 INSTALL=install
 MKDIR=mkdir
 
-ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
+ifeq ($(PLATFORM),linux)
 
-  ifeq ($(ARCH),axp)
-    ARCH=alpha
+  ifeq ($(ARCH),alpha)
+    ARCH=axp
   else
   ifeq ($(ARCH),x86_64)
     LIB=lib64
@@ -614,11 +602,6 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
     OPTIMIZE += -mtune=ultrasparc3 -mv8plus
     OPTIMIZEVM += -mtune=ultrasparc3 -mv8plus
     HAVE_VM_COMPILED=true
-  endif
-  ifeq ($(ARCH),alpha)
-    # According to http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=410555
-    # -ffast-math will cause the client to die with SIGFPE on Alpha
-    OPTIMIZE = $(OPTIMIZEVM)
   endif
   endif
   endif
@@ -943,8 +926,8 @@ ifeq ($(PLATFORM),freebsd)
   SERVER_CFLAGS = 
   HAVE_VM_COMPILED = true
 
-  OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer
-  OPTIMIZE = $(OPTIMIZEVM) -ffast-math
+  OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer -ffast-math
+  OPTIMIZE = $(OPTIMIZEVM)
 
   SHLIBEXT=so
   SHLIBCFLAGS=-fPIC
@@ -1410,7 +1393,7 @@ endef
 
 define DO_WINDRES
 $(echo_cmd) "WINDRES $<"
-$(Q)$(WINDRES) -DWIN32_MISC_ICON_PATH -i $< -o $@
+$(Q)$(WINDRES) -i $< -o $@
 endef
 
 
@@ -2251,6 +2234,8 @@ Q3CGOBJ_ = \
   $(B)/$(BASEGAME)/cgame/bg_pmove.o \
   $(B)/$(BASEGAME)/cgame/bg_slidemove.o \
   $(B)/$(BASEGAME)/cgame/bg_lib.o \
+  $(B)/$(BASEGAME)/cgame/bg_tracemap.o \
+  $(B)/$(BASEGAME)/cgame/cg_atmospheric.o \
   $(B)/$(BASEGAME)/cgame/cg_consolecmds.o \
   $(B)/$(BASEGAME)/cgame/cg_newdraw.o \
   $(B)/$(BASEGAME)/cgame/cg_draw.o \
@@ -2264,10 +2249,12 @@ Q3CGOBJ_ = \
   $(B)/$(BASEGAME)/cgame/cg_particles.o \
   $(B)/$(BASEGAME)/cgame/cg_players.o \
   $(B)/$(BASEGAME)/cgame/cg_playerstate.o \
+  $(B)/$(BASEGAME)/cgame/cg_polybus.o \
   $(B)/$(BASEGAME)/cgame/cg_predict.o \
   $(B)/$(BASEGAME)/cgame/cg_scoreboard.o \
   $(B)/$(BASEGAME)/cgame/cg_servercmds.o \
   $(B)/$(BASEGAME)/cgame/cg_snapshot.o \
+  $(B)/$(BASEGAME)/cgame/cg_spawn.o \
   $(B)/$(BASEGAME)/cgame/cg_view.o \
   $(B)/$(BASEGAME)/cgame/cg_weapons.o \
   \
@@ -2295,6 +2282,8 @@ MPCGOBJ_ = \
   $(B)/missionpack/cgame/bg_pmove.o \
   $(B)/missionpack/cgame/bg_slidemove.o \
   $(B)/missionpack/cgame/bg_lib.o \
+  $(B)/missionpack/cgame/bg_tracemap.o \
+  $(B)/missionpack/cgame/cg_atmospheric.o \
   $(B)/missionpack/cgame/cg_consolecmds.o \
   $(B)/missionpack/cgame/cg_newdraw.o \
   $(B)/missionpack/cgame/cg_draw.o \
@@ -2308,10 +2297,12 @@ MPCGOBJ_ = \
   $(B)/missionpack/cgame/cg_particles.o \
   $(B)/missionpack/cgame/cg_players.o \
   $(B)/missionpack/cgame/cg_playerstate.o \
+  $(B)/missionpack/cgame/cg_polybus.o \
   $(B)/missionpack/cgame/cg_predict.o \
   $(B)/missionpack/cgame/cg_scoreboard.o \
   $(B)/missionpack/cgame/cg_servercmds.o \
   $(B)/missionpack/cgame/cg_snapshot.o \
+  $(B)/missionpack/cgame/cg_spawn.o \
   $(B)/missionpack/cgame/cg_view.o \
   $(B)/missionpack/cgame/cg_weapons.o \
   $(B)/missionpack/ui/ui_shared.o \
@@ -2349,6 +2340,7 @@ Q3GOBJ_ = \
   $(B)/$(BASEGAME)/game/bg_pmove.o \
   $(B)/$(BASEGAME)/game/bg_slidemove.o \
   $(B)/$(BASEGAME)/game/bg_lib.o \
+  $(B)/$(BASEGAME)/game/bg_tracemap.o \
   $(B)/$(BASEGAME)/game/g_active.o \
   $(B)/$(BASEGAME)/game/g_arenas.o \
   $(B)/$(BASEGAME)/game/g_bot.o \
@@ -2405,6 +2397,7 @@ MPGOBJ_ = \
   $(B)/missionpack/game/bg_pmove.o \
   $(B)/missionpack/game/bg_slidemove.o \
   $(B)/missionpack/game/bg_lib.o \
+  $(B)/missionpack/game/bg_tracemap.o \
   $(B)/missionpack/game/g_active.o \
   $(B)/missionpack/game/g_arenas.o \
   $(B)/missionpack/game/g_bot.o \
@@ -2460,7 +2453,6 @@ Q3UIOBJ_ = \
   $(B)/$(BASEGAME)/ui/ui_cinematics.o \
   $(B)/$(BASEGAME)/ui/ui_confirm.o \
   $(B)/$(BASEGAME)/ui/ui_connect.o \
-  $(B)/$(BASEGAME)/ui/ui_controls.o \
   $(B)/$(BASEGAME)/ui/ui_controls2.o \
   $(B)/$(BASEGAME)/ui/ui_credits.o \
   $(B)/$(BASEGAME)/ui/ui_demo2.o \
@@ -2468,8 +2460,6 @@ Q3UIOBJ_ = \
   $(B)/$(BASEGAME)/ui/ui_gameinfo.o \
   $(B)/$(BASEGAME)/ui/ui_ingame.o \
   $(B)/$(BASEGAME)/ui/ui_ingame_server.o \
-  $(B)/$(BASEGAME)/ui/ui_ingame_setupplayers.o \
-  $(B)/$(BASEGAME)/ui/ui_joystick.o \
   $(B)/$(BASEGAME)/ui/ui_loadconfig.o \
   $(B)/$(BASEGAME)/ui/ui_menu.o \
   $(B)/$(BASEGAME)/ui/ui_mfield.o \

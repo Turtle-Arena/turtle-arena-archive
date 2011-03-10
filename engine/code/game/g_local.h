@@ -223,9 +223,6 @@ typedef enum {
 	SPECTATOR_FREE,
 	SPECTATOR_FOLLOW,
 	SPECTATOR_SCOREBOARD
-#ifdef TA_SPLITVIEW
-	,SPECTATOR_LOCAL_HIDE
-#endif
 } spectatorState_t;
 
 typedef enum {
@@ -582,7 +579,7 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags );
 //
 int		G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
-#ifdef IOQ3ZTM // Particles
+#ifdef IOQ3TM // Particles
 int		G_ParticleAreaIndex( char *str );
 #endif
 #ifdef TA_ENTSYS // MISC_OBJECT
@@ -850,9 +847,6 @@ void QDECL G_DPrintf( const char *fmt, ... );
 #endif
 void QDECL G_Printf( const char *fmt, ... );
 void QDECL G_Error( const char *fmt, ... );
-#ifdef IOQ3ZTM
-void G_CvarClearModification( vmCvar_t *vmCvar );
-#endif
 #ifdef IOQ3ZTM // MAP_ROTATION
 const char *G_GetMapRotationInfoByGametype( int gametype );
 #endif
@@ -1057,9 +1051,6 @@ extern	vmCvar_t	g_teleportFluxTime;
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 extern	vmCvar_t	g_laserTag;
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-extern	vmCvar_t	g_2dmode;
 #endif
 
 void	trap_Printf( const char *fmt );

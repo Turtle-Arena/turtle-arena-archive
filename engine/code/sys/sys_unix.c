@@ -55,27 +55,20 @@ char *Sys_DefaultHomePath(void)
 	{
 		if( ( p = getenv( "HOME" ) ) != NULL )
 		{
-			Com_sprintf(homePath, sizeof(homePath), "%s%c", p, PATH_SEP);
+			Q_strncpyz( homePath, p, sizeof( homePath ) );
+#ifdef TURTLEARENA
 #ifdef MACOS_X
-			Q_strcat(homePath, sizeof(homePath),
-					"Library/Application Support/");
-
-			if(com_homepath->string[0])
-				Q_strcat(homePath, sizeof(homePath), com_homepath->string);
-			else
-#ifdef TA_MAIN
-				Q_strcat(homePath, sizeof(homePath), "TurtleArena");
+			Q_strcat( homePath, sizeof( homePath ),
+					"/Library/Application Support/TurtleArena" );
 #else
-				Q_strcat(homePath, sizeof(homePath), "Quake3");
+			Q_strcat( homePath, sizeof( homePath ), "/.turtlearena" );
 #endif
 #else
-			if(com_homepath->string[0])
-				Q_strcat(homePath, sizeof(homePath), com_homepath->string);
-			else
-#ifdef TA_MAIN
-				Q_strcat(homePath, sizeof(homePath), ".turtlearena");
+#ifdef MACOS_X
+			Q_strcat( homePath, sizeof( homePath ),
+					"/Library/Application Support/Quake3" );
 #else
-				Q_strcat(homePath, sizeof(homePath), ".q3a");
+			Q_strcat( homePath, sizeof( homePath ), "/.q3a" );
 #endif
 #endif
 		}
@@ -108,7 +101,8 @@ Sys_Milliseconds
 */
 /* base time in seconds, that's our origin
    timeval:tv_sec is an int:
-   assuming this wraps every 0x7fffffff - ~68 years since the Epoch (1970) - we're safe till 2038 */
+   assuming this wraps every 0x7fffffff - ~68 years since the Epoch (1970) - we're safe till 2038
+   using unsigned long data type to work right with Sys_XTimeToSysTime */
 unsigned long sys_timeBase = 0;
 /* current time in ms, using sys_timeBase as origin
    NOTE: sys_timeBase*1000 + curtime -> ms since the Epoch
@@ -514,7 +508,11 @@ void Sys_ErrorDialog( const char *error )
 	unsigned int size;
 	int f = -1;
 	const char *homepath = Cvar_VariableString( "fs_homepath" );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use correct variable name
 	const char *gamedir = Cvar_VariableString( "fs_game" );
+#else
+	const char *gamedir = Cvar_VariableString( "fs_gamedir" );
+#endif
 	const char *fileName = "crashlog.txt";
 	char *ospath = FS_BuildOSPath( homepath, gamedir, fileName );
 
@@ -753,17 +751,6 @@ void Sys_PlatformInit( void )
 
 	stdinIsATTY = isatty( STDIN_FILENO ) &&
 		!( term && ( !strcmp( term, "raw" ) || !strcmp( term, "dumb" ) ) );
-}
-
-/*
-==============
-Sys_PlatformExit
-
-Unix specific deinitialisation
-==============
-*/
-void Sys_PlatformExit( void )
-{
 }
 
 /*

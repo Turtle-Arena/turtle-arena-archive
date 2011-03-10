@@ -191,7 +191,7 @@ cd $STARTDIR
 # Create install directory
 #
 
-ZIPNAME=turtlearena-0.5.0
+ZIPNAME=turtlearena-0.4.2
 ZIPDIR=$INSTALLDIR/$ZIPNAME
 
 mkdir -p $ZIPDIR/base

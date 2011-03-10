@@ -411,8 +411,8 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 	else if ( ( client->buttons & BUTTON_USE_HOLDABLE ) && ! ( client->oldbuttons & BUTTON_USE_HOLDABLE ) ) {
 		Cmd_FollowCycle_f( ent, -1 );
 	}
-	// Stop following client when jump or crouch is pressed.
-	else if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW && ucmd->upmove != 0 ) {
+	// Jump out of followed client
+	else if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW && ucmd->upmove > 0 ) {
 		StopFollowing(ent);
 	}
 #endif
@@ -633,7 +633,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		}
 #else
 		int weapList[]={WP_MACHINEGUN,WP_SHOTGUN,WP_GRENADE_LAUNCHER,WP_ROCKET_LAUNCHER,WP_LIGHTNING,WP_RAILGUN,WP_PLASMAGUN,WP_BFG,WP_NAILGUN,WP_PROX_LAUNCHER,WP_CHAINGUN};
-		int weapCount = ARRAY_LEN( weapList );
+		int weapCount = sizeof(weapList) / sizeof(int);
 #endif
 		//
 		for (i = 0; i < weapCount; i++) {
@@ -657,12 +657,21 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			} else {
 				t = bg_weapongroupinfo[w].weapon[0]->attackDelay;
 			}
-
-			if (t < 400) {
+			if (t < 400)
+			{
 				t += t * 0.01f;
 			}
 
 			t += bg_weapongroupinfo[w].weapon[0]->proj->damage * 0.01f;
+
+			if (t < 1000)
+			{
+				t = 1000;
+			}
+			else if (t > 4000)
+			{
+				t = 4000;
+			}
 #else
 			// Ugly, but supports; machinegun, shotgun, lightning. railgun, plasma
 			// rocket is close to Q3, 50 msec longer
@@ -676,20 +685,23 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			}
 
 			// shotgun/plasmagun hack, other wise would be 1000.
-			if (t == 1000 && bg_weapongroupinfo[w].weapon[0]->proj->damage >= 10) {
+			if (t == 1000
+				&& bg_weapongroupinfo[w].weapon[0]->proj->damage >= 10)
+			{
 				t = 1500;
 			}
 
 			if (t < 1000) {
-				if (bg_weapongroupinfo[w].weapon[0]->proj->instantDamage) {
+				if (bg_weapongroupinfo[w].weapon[0]->proj->instantDamage)
 					t += 1000;
-				} else {
+				else
 					t += bg_weapongroupinfo[w].weapon[0]->proj->speed;
-				}
+			}
+			// Just in case...
+			if (t > 4000) {
+				t = 4000;
 			}
 #endif
-
-			t = Com_Clamp(1000, 4000, t);
 #else
 			switch(w) {
 				case WP_MACHINEGUN: max = 50; inc = 4; t = 1000; break;
@@ -908,9 +920,6 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 					// Override weapon removal time.
 					drop->nextthink = level.time + 15000;
-#ifdef IOQ3ZTM // ITEMS_DISAPPEAR
-					drop->s.frame = 15000;
-#endif
 				}
 			}
 			break;
@@ -1312,11 +1321,9 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 		)
 	{
-#ifndef IOQ3ZTM
-		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD) {
+		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
 			return;
 		}
-#endif
 		SpectatorThink( ent, ucmd );
 		return;
 	}
@@ -1465,7 +1472,7 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 #endif
 #ifdef TA_PATHSYS
-	if (client->ps.pathMode == PATHMODE_SIDE || client->ps.pathMode == PATHMODE_BACK)
+	if (client->ps.eFlags & EF_PATHMODE)
 	{
 		// A_FaceTarget!
 		if (ent->client->pers.cmd.rightmove != 0)
@@ -1823,12 +1830,7 @@ void ClientThink_real( gentity_t *ent ) {
 			}
 		
 			// pressing attack or use is the normal respawn method
-#ifdef TA_MISC
-			if ( ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) || ucmd->upmove > 0 )
-#else
-			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) )
-#endif
-			{
+			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) {
 				respawn( ent );
 			}
 		}
@@ -2100,14 +2102,6 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 			}
 		}
 	}
-
-#ifdef TA_SPLITVIEW
-	if ( ent->client->sess.spectatorState == SPECTATOR_LOCAL_HIDE ) {
-		ent->client->ps.pm_flags |= PMF_LOCAL_HIDE;
-	} else {
-		ent->client->ps.pm_flags &= ~PMF_LOCAL_HIDE;
-	}
-#endif
 
 	if ( ent->client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
 		ent->client->ps.pm_flags |= PMF_SCOREBOARD;

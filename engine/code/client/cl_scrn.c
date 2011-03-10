@@ -359,6 +359,12 @@ void SCR_DrawBigString( int x, int y, const char *s, float alpha, qboolean noCol
 void SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, qboolean noColorEscape ) {
 	SCR_DrawFontStringExt( &cls.fontBig, x, y, s, color, qtrue, noColorEscape, qtrue, qtrue, 0 );
 }
+
+// Don't adjust for 640x480
+void SCR_DrawConsoleFontChar( float x, float y, int ch )
+{
+	SCR_DrawFontChar(&cls.fontSmall, x, y, ch, qfalse);
+}
 #else
 /*
 ** SCR_DrawChar

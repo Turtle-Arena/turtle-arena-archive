@@ -252,17 +252,11 @@ void Con_CheckResize (void)
 	int		i, j, width, oldwidth, oldtotallines, numlines, numchars;
 	short	tbuf[CON_TEXTSIZE];
 
-#ifdef IOQ3ZTM // FONT_REWRITE
-	if (cls.glconfig.vidWidth > 0)
-		width = (cls.glconfig.vidWidth / Com_FontCharWidth(&cls.fontSmall, '.')) - 2;
-	else
-#endif
 	width = (SCREEN_WIDTH / SMALLCHAR_WIDTH) - 2;
 
 	if (width == con.linewidth)
 		return;
 
-#ifndef IOQ3ZTM // IOQ3BUGFIX: Unused code
 	if (width < 1)			// video hasn't been initialized yet
 	{
 		width = DEFAULT_CONSOLE_WIDTH;
@@ -273,7 +267,6 @@ void Con_CheckResize (void)
 			con.text[i] = (ColorIndex(COLOR_WHITE)<<8) | ' ';
 	}
 	else
-#endif
 	{
 		oldwidth = con.linewidth;
 		con.linewidth = width;
@@ -319,7 +312,7 @@ Cmd_CompleteTxtName
 */
 void Cmd_CompleteTxtName( char *args, int argNum ) {
 	if( argNum == 2 ) {
-		Field_CompleteFilename( "", "txt", qfalse, qtrue );
+		Field_CompleteFilename( "", "txt", qfalse );
 	}
 }
 
@@ -395,11 +388,6 @@ void CL_ConsolePrint( char *txt ) {
 	int		color;
 	qboolean skipnotify = qfalse;		// NERVE - SMF
 	int prev;							// NERVE - SMF
-#ifdef IOQ3ZTM // FONT_REWRITE
-	float	lineWidth;
-	float	wordWidth;
-	int		i;
-#endif
 
 	// TTimo - prefix for text that shows up in console but not in notify
 	// backported from RTCW
@@ -441,28 +429,6 @@ void CL_ConsolePrint( char *txt ) {
 		}
 
 		// word wrap
-#ifdef IOQ3ZTM // FONT_REWRITE
-		// ZTM: FIXME?: (Not sure this can really be fixed) For this to work correctly at startup we need,
-		//   some cvars and the render started... Cvars can be easily fixed, but to load the font we need the render.
-		if (cls.glconfig.vidWidth && cl_conXOffset) {
-			int screenWidth = cls.glconfig.vidWidth;
-
-			lineWidth = con.xadjust + cl_conXOffset->integer + Com_FontCharWidth(&cls.fontSmall, ']');
-
-			for (i = 0; i < con.x; i++) {
-				lineWidth += Com_FontCharWidth(&cls.fontSmall, con.text[(con.current%con.totallines)*con.linewidth+i]&255);
-			}
-
-			wordWidth = Com_FontStringWidth(&cls.fontSmall, txt, l+1);
-
-			if (l != con.linewidth && (con.x + l >= con.linewidth)) {
-				Con_Linefeed(skipnotify);
-			} else if (lineWidth + wordWidth >= screenWidth) {
-				Con_Linefeed(skipnotify);
-			}
-		}
-		else
-#endif
 		if (l != con.linewidth && (con.x + l >= con.linewidth) ) {
 			Con_Linefeed(skipnotify);
 
@@ -482,8 +448,10 @@ void CL_ConsolePrint( char *txt ) {
 			y = con.current % con.totallines;
 			con.text[y*con.linewidth+con.x] = (color << 8) | c;
 			con.x++;
-			if(con.x >= con.linewidth)
+			if (con.x >= con.linewidth) {
 				Con_Linefeed(skipnotify);
+				con.x = 0;
+			}
 			break;
 		}
 	}
@@ -523,7 +491,6 @@ Draw the editline after a ] prompt
 */
 void Con_DrawInput (void) {
 	int		y;
-	int		x;
 
 	if ( cls.state != CA_DISCONNECTED && !(Key_GetCatcher( ) & KEYCATCH_CONSOLE ) ) {
 		return;
@@ -531,24 +498,22 @@ void Con_DrawInput (void) {
 
 #ifdef IOQ3ZTM // FONT_REWRITE
 	y = con.vislines - ( Com_FontCharHeight(&cls.fontSmall) * 2 );
-	x = con.xadjust + cl_conXOffset->integer + Com_FontCharWidth(&cls.fontSmall, ']');
 #else
 	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
-	x = con.xadjust + 2 * SMALLCHAR_WIDTH;
 #endif
 
 	re.SetColor( con.color );
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-	SCR_DrawFontChar(&cls.fontSmall, con.xadjust + cl_conXOffset->integer, y, ']', qfalse);
+	SCR_DrawConsoleFontChar( con.xadjust + cl_conXOffset->integer, y, ']' );
 
-	Field_Draw( &g_consoleField, x, y,
-		SCREEN_WIDTH - x - Com_FontCharWidth(&cls.fontSmall, ' '), qtrue, qtrue );
+	Field_Draw( &g_consoleField, con.xadjust + cl_conXOffset->integer + Com_FontCharWidth(&cls.fontSmall, ']'), y,
+		SCREEN_WIDTH - 3 * Com_FontCharWidth(&cls.fontSmall, ' '), qtrue, qtrue );
 #else
 	SCR_DrawSmallChar( con.xadjust + 1 * SMALLCHAR_WIDTH, y, ']' );
 
-	Field_Draw( &g_consoleField, x, y,
-		SCREEN_WIDTH - x - SMALLCHAR_WIDTH, qtrue, qtrue );
+	Field_Draw( &g_consoleField, con.xadjust + 2 * SMALLCHAR_WIDTH, y,
+		SCREEN_WIDTH - 3 * SMALLCHAR_WIDTH, qtrue, qtrue );
 #endif
 }
 
@@ -585,15 +550,6 @@ void Con_DrawNotify (void)
 			continue;
 		text = con.text + (i % con.totallines)*con.linewidth;
 
-#ifdef TA_SPLITVIEW // ZTM: FIXME: Test to find out if this should check all clients.
-		if (cl.snap.pss[0].pm_type != PM_INTERMISSION
-#ifdef TA_SP
-		&& cl.snap.pss[0].pm_type != PM_SPINTERMISSION
-#endif
-		&& Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
-			continue;
-		}
-#else
 		if (cl.snap.ps.pm_type != PM_INTERMISSION
 #ifdef TA_SP
 		&& cl.snap.ps.pm_type != PM_SPINTERMISSION
@@ -601,7 +557,6 @@ void Con_DrawNotify (void)
 		&& Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
 			continue;
 		}
-#endif
 
 #ifdef IOQ3ZTM // FONT_REWRITE
 		float currentWidthLocation = cl_conXOffset->integer;
@@ -617,7 +572,7 @@ void Con_DrawNotify (void)
 				re.SetColor( g_color_table[currentColor] );
 			}
 #ifdef IOQ3ZTM // FONT_REWRITE
-			SCR_DrawFontChar(&cls.fontSmall, con.xadjust + currentWidthLocation, v, text[x] & 0xff, qfalse);
+			SCR_DrawConsoleFontChar( con.xadjust + currentWidthLocation, v, text[x] & 0xff );
 			currentWidthLocation += Com_FontCharWidth( &cls.fontSmall, text[x] );
 #else
 			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH, v, text[x] & 0xff );
@@ -643,29 +598,16 @@ void Con_DrawNotify (void)
 		if (chat_team)
 		{
 			SCR_DrawBigString (8, v, "say_team:", 1.0f, qfalse );
-#ifdef IOQ3ZTM // FONT_REWRITE
-			skip = Com_FontStringWidth(&cls.fontBig, "say_team: ", 0);
-#else
 			skip = 10;
-#endif
 		}
 		else
 		{
 			SCR_DrawBigString (8, v, "say:", 1.0f, qfalse );
-#ifdef IOQ3ZTM // FONT_REWRITE
-			skip = Com_FontStringWidth(&cls.fontBig, "say: ", 0);
-#else
 			skip = 5;
-#endif
 		}
 
-#ifdef IOQ3ZTM // FONT_REWRITE
-		Field_BigDraw( &chatField, skip, v,
-			SCREEN_WIDTH - skip, qtrue, qtrue );
-#else
 		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, v,
 			SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, qtrue, qtrue );
-#endif
 
 		v += BIGCHAR_HEIGHT;
 	}
@@ -859,7 +801,7 @@ void Con_DrawSolidConsole( float frac ) {
 				re.SetColor( g_color_table[currentColor] );
 			}
 #ifdef IOQ3ZTM // FONT_REWRITE
-			SCR_DrawFontChar(&cls.fontSmall, con.xadjust + currentWidthLocation, y, text[x] & 0xff, qfalse);
+			SCR_DrawConsoleFontChar( con.xadjust + currentWidthLocation, y, text[x] & 0xff );
 			currentWidthLocation += Com_FontCharWidth(&cls.fontSmall, text[x]);
 #else
 			SCR_DrawSmallChar(  con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, text[x] & 0xff );

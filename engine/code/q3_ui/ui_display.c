@@ -35,10 +35,6 @@ DISPLAY OPTIONS MENU
 #define ART_FRAMER			"menu/art/frame1_r"
 #define ART_BACK0			"menu/art/back_0"
 #define ART_BACK1			"menu/art/back_1"
-#ifdef IOQ3ZTM
-#define ART_ACCEPT0			"menu/art/accept_0"
-#define ART_ACCEPT1			"menu/art/accept_1"
-#endif
 
 #define ID_GRAPHICS			10
 #define ID_DISPLAY			11
@@ -48,9 +44,8 @@ DISPLAY OPTIONS MENU
 #define ID_SCREENSIZE		15
 #define ID_BACK				16
 #ifdef IOQ3ZTM
-#define ID_APPLY			17
-#define ID_ANAGLYPH			18
-#define ID_GREYSCALE		19
+#define ID_ANAGLYPH			17
+#define ID_GREYSCALE		18
 #endif
 
 
@@ -74,11 +69,6 @@ typedef struct {
 #endif
 
 	menubitmap_s	back;
-#ifdef IOQ3ZTM
-	menubitmap_s	apply;
-
-	int				greyscale_default;
-#endif
 } displayOptionsInfo_t;
 
 static displayOptionsInfo_t	displayOptionsInfo;
@@ -127,12 +117,7 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 		break;
 
 	case ID_GREYSCALE:
-		break;
-
-	case ID_APPLY:
 		trap_Cvar_SetValue( "r_greyscale", displayOptionsInfo.greyscale.curvalue );
-
-		UI_ForceMenuOff();
 		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart\n" );
 		break;
 #endif
@@ -143,44 +128,6 @@ static void UI_DisplayOptionsMenu_Event( void* ptr, int event ) {
 	}
 }
 
-#ifdef IOQ3ZTM
-/*
-=================
-DisplayOptions_UpdateMenuItems
-=================
-*/
-static void DisplayOptions_UpdateMenuItems( void )
-{
-	/*if ( displayOptionsInfo.openal.curvalue == 1 )
-	{
-		displayOptionsInfo.quality.generic.flags |= QMF_GRAYED;
-	}
-	else
-	{
-		displayOptionsInfo.quality.generic.flags &= ~QMF_GRAYED;
-	}*/
-
-	displayOptionsInfo.apply.generic.flags |= QMF_HIDDEN|QMF_INACTIVE;
-
-	if ( displayOptionsInfo.greyscale_default != displayOptionsInfo.greyscale.curvalue )
-	{
-		displayOptionsInfo.apply.generic.flags &= ~(QMF_HIDDEN|QMF_INACTIVE);
-	}
-}
-
-/*
-================
-DisplayOptions_MenuDraw
-================
-*/
-void DisplayOptions_MenuDraw (void)
-{
-//APSFIX - rework this
-	DisplayOptions_UpdateMenuItems();
-
-	Menu_Draw( &displayOptionsInfo.menu );
-}
-#endif
 
 /*
 ===============
@@ -216,9 +163,6 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	UI_DisplayOptionsMenu_Cache();
 	displayOptionsInfo.menu.wrapAround = qtrue;
 	displayOptionsInfo.menu.fullscreen = qtrue;
-#ifdef IOQ3ZTM
-	displayOptionsInfo.menu.draw		= DisplayOptions_MenuDraw;
-#endif
 
 	displayOptionsInfo.banner.generic.type		= MTYPE_BTEXT;
 	displayOptionsInfo.banner.generic.flags		= QMF_CENTER_JUSTIFY;
@@ -284,11 +228,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.network.style				= UI_RIGHT;
 	displayOptionsInfo.network.color				= text_big_color;
 
-#ifdef IOQ3ZTM
-	y = 240 - 2 * (BIGCHAR_HEIGHT+2);
-#else
 	y = 240 - 1 * (BIGCHAR_HEIGHT+2);
-#endif
 	displayOptionsInfo.brightness.generic.type		= MTYPE_SLIDER;
 	displayOptionsInfo.brightness.generic.name		= "Brightness:";
 	displayOptionsInfo.brightness.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -348,19 +288,6 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.back.height				= 64;
 	displayOptionsInfo.back.focuspic			= ART_BACK1;
 
-#ifdef IOQ3ZTM
-	displayOptionsInfo.apply.generic.type		= MTYPE_BITMAP;
-	displayOptionsInfo.apply.generic.name		= ART_ACCEPT0;
-	displayOptionsInfo.apply.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_HIDDEN|QMF_INACTIVE;
-	displayOptionsInfo.apply.generic.callback	= UI_DisplayOptionsMenu_Event;
-	displayOptionsInfo.apply.generic.id			= ID_APPLY;
-	displayOptionsInfo.apply.generic.x			= 640;
-	displayOptionsInfo.apply.generic.y			= 480-64;
-	displayOptionsInfo.apply.width				= 128;
-	displayOptionsInfo.apply.height				= 64;
-	displayOptionsInfo.apply.focuspic			= ART_ACCEPT1;
-#endif
-
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.banner );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.framel );
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.framer );
@@ -375,9 +302,6 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.greyscale );
 #endif
 	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.back );
-#ifdef IOQ3ZTM
-	Menu_AddItem( &displayOptionsInfo.menu, ( void * ) &displayOptionsInfo.apply );
-#endif
 
 	displayOptionsInfo.brightness.curvalue  = trap_Cvar_VariableValue("r_gamma") * 10;
 	displayOptionsInfo.screensize.curvalue  = trap_Cvar_VariableValue( "cg_viewsize")/10;
@@ -387,9 +311,7 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 		displayOptionsInfo.anaglyph.curvalue = 0;
 	else if (displayOptionsInfo.anaglyph.curvalue > 6)
 		displayOptionsInfo.anaglyph.curvalue = 6;
-
-	displayOptionsInfo.greyscale.curvalue = displayOptionsInfo.greyscale_default
-			= (trap_Cvar_VariableValue( "r_greyscale") != 0);
+	displayOptionsInfo.greyscale.curvalue   = trap_Cvar_VariableValue( "r_greyscale") != 0;
 #endif
 }
 

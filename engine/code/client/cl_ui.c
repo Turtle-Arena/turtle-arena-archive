@@ -34,10 +34,6 @@ GetClientState
 ====================
 */
 static void GetClientState( uiClientState_t *state ) {
-#ifdef TA_SPLITVIEW
-	int		i;
-#endif
-
 	state->connectPacketCount = clc.connectPacketCount;
 	state->connState = cls.state;
 	Q_strncpyz( state->servername, cls.servername, sizeof( state->servername ) );
@@ -47,16 +43,6 @@ static void GetClientState( uiClientState_t *state ) {
 	state->clientNum = clc.clientNum;
 #else
 	state->clientNum = cl.snap.ps.clientNum;
-#endif
-
-#ifdef TA_SPLITVIEW
-	state->numLocalClients = 0;
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		state->lcIndex[i] = cl.snap.lcIndex[i];
-		if (state->lcIndex[i] != -1) {
-			state->numLocalClients++;
-		}
-	}
 #endif
 }
 
@@ -307,6 +293,9 @@ static void LAN_GetServerInfo( int source, int n, char *buf, int buflen ) {
 		Info_SetValueForKey( info, "hostname", server->hostName);
 		Info_SetValueForKey( info, "mapname", server->mapName);
 		Info_SetValueForKey( info, "clients", va("%i",server->clients));
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+		Info_SetValueForKey( info, "g_humanplayers", va("%i",server->g_humanplayers));
+#endif
 		Info_SetValueForKey( info, "sv_maxclients", va("%i",server->maxClients));
 		Info_SetValueForKey( info, "ping", va("%i",server->ping));
 		Info_SetValueForKey( info, "minping", va("%i",server->minPing));
@@ -318,8 +307,6 @@ static void LAN_GetServerInfo( int source, int n, char *buf, int buflen ) {
 #ifdef IOQUAKE3 // ZTM: punkbuster
 		Info_SetValueForKey( info, "punkbuster", va("%i", server->punkbuster));
 #endif
-		Info_SetValueForKey( info, "g_needpass", va("%i", server->g_needpass));
-		Info_SetValueForKey( info, "g_humanplayers", va("%i", server->g_humanplayers));
 		Q_strncpyz(buf, info, buflen);
 	} else {
 		if (buf) {
@@ -778,7 +765,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 	case UI_CVAR_SET:
-		Cvar_SetSafe( VMA(1), VMA(2) );
+		Cvar_Set( VMA(1), VMA(2) );
 		return 0;
 
 	case UI_CVAR_VARIABLEVALUE:
@@ -789,7 +776,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 	case UI_CVAR_SETVALUE:
-		Cvar_SetValueSafe( VMA(1), VMF(2) );
+		Cvar_SetValue( VMA(1), VMF(2) );
 		return 0;
 
 	case UI_CVAR_RESET:

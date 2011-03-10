@@ -120,11 +120,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 		}
 
 		if ( msg->readcount > msg->cursize ) {
-#ifdef IOQ3ZTM
-			Com_Error (ERR_DROP,"CL_ParsePacketEntities: end of message (newnum=%d, oldindex=%d)", newnum, oldindex);
-#else
 			Com_Error (ERR_DROP,"CL_ParsePacketEntities: end of message");
-#endif
 		}
 
 		while ( oldnum < newnum ) {
@@ -277,46 +273,11 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	// read playerinfo
 	SHOWNET( msg, "playerstate" );
-#ifdef TA_SPLITVIEW
-	if (newSnap.snapFlags & SNAPFLAG_MULTIPLE_PSS) {
-		newSnap.numPSs = MSG_ReadByte( msg );
-		if (newSnap.numPSs > MAX_SPLITVIEW) {
-			Com_DPrintf(S_COLOR_YELLOW "Warning: Got numPSs as %d (max=%d)\n", newSnap.numPSs, MAX_SPLITVIEW);
-			newSnap.numPSs = MAX_SPLITVIEW;
-		}
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			newSnap.lcIndex[i] = MSG_ReadByte( msg );
-
-			// -1 gets converted to 255 should be set to -1 (and so should all invalid values) 
-			if (newSnap.lcIndex[i] >= newSnap.numPSs) {
-				newSnap.lcIndex[i] = -1;
-			}
-		}
-	} else {
-		newSnap.numPSs = 1;
-		newSnap.lcIndex[0] = 0;
-		for (i = 1; i < MAX_SPLITVIEW; i++) {
-			newSnap.lcIndex[i] = -1;
-		}
-	}
-
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (newSnap.lcIndex[i] == -1) {
-			continue;
-		}
-		if ( old && old->lcIndex[i] != -1) {
-			MSG_ReadDeltaPlayerstate( msg, &old->pss[old->lcIndex[i]], &newSnap.pss[newSnap.lcIndex[i]] );
-		} else {
-			MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.pss[newSnap.lcIndex[i]] );
-		}
-	}
-#else
 	if ( old ) {
 		MSG_ReadDeltaPlayerstate( msg, &old->ps, &newSnap.ps );
 	} else {
 		MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.ps );
 	}
-#endif
 
 	// read packet entities
 	SHOWNET( msg, "packet entities" );
@@ -347,12 +308,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// calculate ping time
 	for ( i = 0 ; i < PACKET_BACKUP ; i++ ) {
 		packetNum = ( clc.netchan.outgoingSequence - 1 - i ) & PACKET_MASK;
-#ifdef TA_SPLITVIEW
-		if ( cl.snap.pss[0].commandTime >= cl.outPackets[ packetNum ].p_serverTime )
-#else
-		if ( cl.snap.ps.commandTime >= cl.outPackets[ packetNum ].p_serverTime )
-#endif
-		{
+		if ( cl.snap.ps.commandTime >= cl.outPackets[ packetNum ].p_serverTime ) {
 			cl.snap.ping = cls.realtime - cl.outPackets[ packetNum ].p_realtime;
 			break;
 		}
@@ -464,13 +420,13 @@ void CL_SystemInfoChanged( void ) {
 		else
 		{
 			// If this cvar may not be modified by a server discard the value.
-			if(!(cvar_flags & (CVAR_SYSTEMINFO | CVAR_SERVER_CREATED | CVAR_USER_CREATED)))
+			if(!(cvar_flags & (CVAR_SYSTEMINFO | CVAR_SERVER_CREATED)))
 			{
 				Com_Printf(S_COLOR_YELLOW "WARNING: server is not allowed to set %s=%s\n", key, value);
 				continue;
 			}
 
-			Cvar_SetSafe(key, value);
+			Cvar_Set(key, value);
 		}
 	}
 	// if game folder should not be set and it is set at the client side
