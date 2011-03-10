@@ -2208,7 +2208,7 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 			, "ogm", "ogv"
 #endif
 			};
-		int extNamesSize = sizeof( extensions ) / sizeof( extensions[0] );
+		int extNamesSize = ARRAY_LEN(extensions);
 		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
 
 #ifndef IOQ3ZTM_NO_COMPAT // Q3: Team Arena Mod compatibilty
@@ -2226,13 +2226,13 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 	else if (Q_stricmp(extension, "$images") == 0)
 	{
 		const char *extensions[] = { "png", "tga", "jpg", "jpeg", "pcx", "bmp" };
-		int extNamesSize = sizeof( extensions ) / sizeof( extensions[0] );
+		int extNamesSize = ARRAY_LEN(extensions);
 		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
 	}
 	else if (Q_stricmp(extension, "$sounds") == 0)
 	{
 		const char *extensions[] = { "wav", "ogg" };
-		int extNamesSize = sizeof( extensions ) / sizeof( extensions[0] );
+		int extNamesSize = ARRAY_LEN(extensions);
 		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
 	}
 	// Allow extension to be a list
