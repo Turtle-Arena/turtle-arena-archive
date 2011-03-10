@@ -1,0 +1,50 @@
+// Bots
+//
+// Normal fields;
+//   name - Name of the bot.
+//   model - Player model dir [/ skin] (Example: "dir/skin" or just "dir" to use "default" skin)
+//   aifile - Path in botfiles directory to the bot's main AI file.
+//
+// Other fields;
+//   headmodel (default: uses value from model field)
+//   gender (default:male) - May be "male", "female", or "it".
+//   color1 (default:4)		--unused
+//   color2 (default:5)		--unused
+
+{
+name		Raph
+model		raph/default
+aifile	bots/raph_c.c
+}
+
+{
+name		Casey
+model		casey/default
+aifile	bots/casey_c.c
+}
+
+{
+name		Don
+model		don/default
+aifile	bots/raph_c.c
+}
+
+{
+name		Leo
+model		leo/default
+aifile	bots/raph_c.c
+}
+
+{
+name		Mike
+model		mike/default
+aifile	bots/raph_c.c
+}
+
+{
+name		FugiTurtle
+model		raph/fugitoid
+headmodel	*fugitoid
+aifile	bots/raph_c.c
+}
+
