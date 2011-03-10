@@ -208,7 +208,7 @@ static char* gamenames[] = {
 	NULL
 };
 #ifdef IOQ3ZTM // Net gametype browse
-int numNetGametypes = (sizeof( gamenames ) / sizeof( gamenames[0] )) - 1; // gamenames(w/unknown) - NULL
+int numNetGametypes = ARRAY_LEN(gamenames) - 1; // gamenames(w/unknown) - NULL
 #endif
 
 static char* netnames[] = {
