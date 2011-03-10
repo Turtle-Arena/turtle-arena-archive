@@ -97,8 +97,6 @@
   * FIXME: Have bots attack func_brakeable when they are in the way, currently bots just walk into them (and keep walking into them even though they are not going anywhere).
 
 == Entities ==
-  * TODO: Allow func_breakable and misc_object to be pushable.
-
   * TODO: Improve misc object physics. (Use code from Q3Rally? bg_physics.c/h)
 
   * TODO: Driveable vehicles? (Base on Q3Rally)
@@ -256,10 +254,6 @@ Most of the mapobjects should be damageable.
     * TODO: Test Linux Portable Install on Ubuntu 10.04 (Lucid Lynx) 32-bit, OpenSUSE 11.3 (GNOME) 32-bit, and Fedora 12 (GNOME) 32-bit.
       * And add a note to the website 'tested on X'
 
-= Master Server =
-  * NOTE: dpmaster is a open source master server that supports quake3
-
-
 = Data =
   * DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
 		(Also it appears that the full version doesn't add data "for the engine",
@@ -316,7 +310,7 @@ Current Location: http://ztm.x10hosting.com/ta/
 
   * TODO: Update for Turtle Arena 0.4
 
-  * TODO: Add MediaWiki to website? (and use the same database as phpbb)
+  * TODO: Add MediaWiki to website? (and use the same mysql database as phpbb)
 
 = Packaging =
   * TODO: Add more options to the Win32 NSIS installer
