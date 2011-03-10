@@ -9,7 +9,7 @@ Homepage: http://turtlearena.googlecode.com/
 
 Package: turtlearena
 Architecture: any
-Depends: ${shlibs:Depends}, turtlearena-data (>= ${source:Upstream-Version})
+Depends: ${shlibs:Depends}, turtlearena-data (>= 0.4.1)
 Description: 3D Third-Person Arena Combat Game
  Turtle Arena is an open-source Ninja Turtle fangame based on ioquake3. It
  is a free stand-alone game.
@@ -18,7 +18,7 @@ Description: 3D Third-Person Arena Combat Game
 
 Package: turtlearena-server
 Architecture: any
-Depends: ${shlibs:Depends}, turtlearena-data (>= ${source:Upstream-Version})
+Depends: ${shlibs:Depends}, turtlearena-data (>= 0.4.1)
 Description: Dedicated server for Turtle Arena
  Turtle Arena is an open-source Ninja Turtle fangame based on ioquake3. It
  is a free stand-alone game.
