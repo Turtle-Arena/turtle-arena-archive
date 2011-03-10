@@ -13,10 +13,6 @@ For all platforms the first step is to get the source code.
   * Otherwise you can get the source code for a stable release or the current development version from the subversion repository.
 
 == Get the Source ==
-=== Zipped ===
-A zip file containing the source is included with the zipped releases, simply unzip it.
-
-=== Subversion ===
 You will need a subversion client to get the source, such as [http://tortoisesvn.tigris.org/ TortoiseSVN] (Windows), [http://www.rabbitvcs.org RabbitVCS] (Linux), or the command line program "svn"
 
 In Debian/Ubuntu you can install the command line program using
@@ -24,8 +20,11 @@ In Debian/Ubuntu you can install the command line program using
 
 Next you will need to do a source checkout, this varies by program.
 
-Using the command line program you can use the following
-	svn checkout http://turtlearena.googlecode.com/svn/trunk/ turtlearena-read-only
+Using the command line program you can use the following to get the latest development code
+	svn checkout http://turtlearena.googlecode.com/svn/trunk/ turtlearena-dev-read-only
+
+You can also get the source for released versions
+	svn checkout http://turtlearena.googlecode.com/svn/tags/0.4.2/ turtlearena-0.4.2-read-only
 
 = Windows =
 
