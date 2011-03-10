@@ -38,7 +38,7 @@ DEFAULT_MAINSVN="MAIN_SVN"
 USED_CFGFILE=0
 
 # Name of local file where "$MAINREVISION = ..." is stored.
-CFGFILE=""
+CFGFILE="Makefile"
 
 # Patch/log prefix, followed by '${CURRENT_REV}to$RESYNC_REV.ext'
 DEFAULT_OUTPREFIX="resync_"
