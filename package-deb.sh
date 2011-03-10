@@ -365,11 +365,14 @@ then
 	# Remave lcc as debian calls it non-free and removes it
 	rm -r $DEBINSTALL/$ORIGDIR/code/tools/lcc
 
-	# Remove non-free windows header
+	# Remove non-free Windows header
 	if [ -f $DEBINSTALL/$ORIGDIR/code/qcommon/wspiapi.h ]
 	then
 		rm $DEBINSTALL/$ORIGDIR/code/qcommon/wspiapi.h
 	fi
+
+	# Remove libs for win32 and mac
+	rm -r $DEBINSTALL/$ORIGDIR/code/libs/
 
 	# ZTM: Some of the music is non-commercial (CC-BY-NC and CC-BY-NC-SA)
 	#        which is considered non-free by the Debian project.
