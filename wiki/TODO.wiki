@@ -1,7 +1,7 @@
 #summary todo and bugs
 #labels Phase-Design
 
-*Turtle Arena TODO and BUGS*
+*Turtle Arena TODO and BUGS*, also see the issue tracker for more, [http://code.google.com/p/turtlearena/issues http://code.google.com/p/turtlearena/issues].
 
 = engine =
 == Weapons (and attacking) ==
@@ -9,7 +9,7 @@
 
   * TODO: Add a option to weapon group info to hold a weapon upside-down? (effect rendering and damaging)
 
-  * TODO: Attack movement flags. Stop, cut speed in half, double speed, turn right?, etc.
+  * TODO: Add attack movement flags? Stop, cut speed in half, double speed, turn right?, etc.
 
   * TODO: Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
     * Logic-wise `tag_hand_*` make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
@@ -17,8 +17,6 @@
   * TODO: Add Bow and Arrow? (Like LoZ:TP)
     * ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
   * TODO: Aiming mode for third-person, camera looks over player's shoulder (Like LoZ:TP)
-
-  * TODO: Render the secondary pickup weapon somewhere on the player when single handed
 
   * TODO: Add PD_CUSTOM projectile death type
     * pdModel (string), pdShader (string), pdSprite (bool), pdDuration (int), pdLight (int) (vec3), pdExpBase (int), pdExpAdd (int), pdExpOnPlayer (bool)
@@ -71,6 +69,8 @@
 
   * TODO: Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161
 
+  * TODO: Add camera controls to q3_ui controls menu.
+
 == Teamplay ==
   * TODO: Data: Create team skins for players (for Foot at least)
 
@@ -79,7 +79,7 @@
   * TODO: Per-team flag skins? (Team icon is on flag skin)
      * Would a shader remap work?
 
-  * TODO: Have a extra team (Needed for mp_ui), like (Purple) Dragon, or Guardian
+  * TODO: Have a extra team (Needed for mp_ui), such as (Purple) Dragon, Guardian, or something.
 
 == New Entities ==
   * TODO: Add misc_bubbles entity.
@@ -99,7 +99,7 @@
 == Entities ==
   * TODO: Improve misc object physics. (Use code from Q3Rally? bg_physics.c/h)
 
-  * TODO: Driveable vehicles? (Base on Q3Rally)
+  * TODO: Drivable vehicles? (Base on Q3Rally)
 
 == NiGHTS mode ==
   * STARTED (NIGHTSMODE): NiGHTS into Dreams mode
@@ -117,10 +117,10 @@
     * Supported by game, just needs cgame code and graphics.
 
 == Misc ==
-  * TODO: Add optional run animations for torso
+  * TODO: Add optional run animations for torso.
 
   * STARTED (TA_PATHSYS): Finish new path system "g_paths.c" for NPCs
-  * TODO: Support path_axis (orbit around ent), use TR_SINE?
+  * TODO: Support path_axis (orbit around ent), base on TR_SINE?
 
   * TODO (TA_PATHSYS): Modify G_SetupPath to allow starting at either end and in the middle of any path.
     * (If there is a super smash bros. level, we need to be able to spawn players in the middle of path.)
@@ -141,7 +141,7 @@
     * Name the character "Goy"? (Character name ZTurtleMan made up.)
     * NOTE: It turns out Goy is Modern Hebrew for non-Jew / gentile. (Which is pretty generic, which fits the propose of the character.)
 
-  * TODO: Add Jump/Land animations specificly for backflip, fallback to 'Jump/Land B' (jump backward)
+  * TODO: Add Jump/Land animations specifically for backflip, fallback to 'Jump/Land B' (jump backward)
     * For jumping backward in lock-on mode, like in LoZ:TP
     * (Should Turtle Arena players just have 'Jump/Land B' be a backflip?)
 
@@ -175,38 +175,37 @@
     * If so/dll/dylib are supported on pure servers is there any reason to included them in any installers?
       * Is there a reason to include in Linux/Win32 zip that comes with so/dll? (For other ports? such as Android/iPhone?)
 
-  * STARTED: Splitscreen (for local multiplayer) and splitview mode for viewing other clients in multiplayer.
+  * ALMOST-DONE: Splitscreen / local multiplayer
     * DONE: Need someway for client to tell server how many local client they want.
       * DONE: Need to create multiple clients from one connection
       * DONE?: Need controls, commands, and cvars for local clients.
-      * UI for configuring and adding local clients
+      * DONE?: UI for configuring and adding local clients
+
+  * Splitview mode for viewing multiple players online
     * Need someway to tell server which clients we want in splitview.
       * Probably a use a command, list clientNums, client names, or teams. (Like "splitview 1 john blue" for three splitview clients)
-        * If teams are supported add a command for changing to next team member.
-    * Need a way to differeniate between local clients (which we control and predict), and clients we are following.
-      * May be able to use PMF_FOLLOW flag? Currently it is game/cgame only, and the splitscreen is handled by server not game.
-        * But I could easily add it to bg_public.h and have the server set it.
+        * If teams are supported add a command for changing to next team member?
 
 == Objects ==
 Most of the mapobjects should be damageable.
 
-  * TODO: Make more mapobjects
+  * TODO: Make more map objects
     * Clump of tall grass (Like in TMNT2: Battle Nexus (GC) level 2 and LoZ:TP)
     * Animated flower bud
-    * Trees, bushes, flowers, tall-grasses,
-    * Traffic barrel-thingy? Traffic "saw-horse"-thingy
-    * Firehydroant, lightpole,
+    * Trees, bushes, flowers, tall-grasses
+    * Traffic barrel, Traffic barricade (single slat and possibly others)
+    * Fire hydrant, street light
     * street-signs (one-way, 3rd street, Stop, Yield, people crossing, speed limit)
-    * Torch Flame, wall torchs, etc et
+    * Torch Flame, wall torches, etc
     * Lamps and other light things
 
 == Testing! ==
-  * TODO: Test/use the "noise" and "random" waveforms that I copied from IOSTVEF
+  * TODO: Test/use the "noise" and "random" waveforms that I copied from IOSTVEF.
 
   * TODO: Check if "TA_WEAPSYS // BOT_ITEM_INFOS" breaks compatibility with q3 mods.
 
   * STARTED (TA_HOLDABLE): Make shurikens/holdable-projectiles general like weapons groups.
-    * (So they can be totally configured from .weap, and add new ones)
+    * (So they can be totally configured from .weap/.item, and add new ones)
 
 == Don't do? (Dead Ideas?) ==
   * TODO: Feet tags, for attack checking? And/or for attaching hoverboard to player?
@@ -246,7 +245,7 @@ Most of the mapobjects should be damageable.
 = Other =
   * TODO: Make some sort of manual to tell how to play, control the player (using default controls). Have it be simple.
 
-  * TODO: Portable (zip): Add a note (either on the website or in the readme) that removeing the "settings/portable" file will make it use the normal user app data directory, i.e. $HOME/.turtlearena
+  * TODO: Portable (zip): Add a note (either on the website or in the readme) that removing the "settings/portable" file will make it use the normal user app data directory, i.e. $HOME/.turtlearena
 
   * TODO: Portable Linux (zip): http://portablelinuxapps.org/
 	* Create portable linux app from .deb package
@@ -256,8 +255,7 @@ Most of the mapobjects should be damageable.
 
 = Data =
   * DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
-		(Also it appears that the full version doesn't add data "for the engine",
-			just players, maps, and textures, (etc?))
+    * (It appears that the full version doesn't add data "for the engine", just players, maps, and textures, etc)
 
   * TODO: Add announcer sound files (That sound like the Gyoji of the Battle Nexus?)
 
@@ -291,7 +289,7 @@ Most of the mapobjects should be damageable.
 = Misfit Model 3D =
 Stuff I'd like to do to the MD3 part of MM3D...
 
-  * BUG: After exporting a player I have to open, touch, and save the upper and head models (with no change) to fix model lighting.
+  * BUG: After exporting a md3 player I have to open, touch, and save the upper and head models (with no change) to fix model lighting.
 
   * TODO: Finish MDR export support for Misfit Model 3D.
     * TODO: Check if Elite Force supports uncompressed MDR models.
@@ -318,4 +316,3 @@ Current Location: http://ztm.x10hosting.com/ta/
 	* Allow desktop shortcut to be created?
 	* Allow Start Menu shortcuts not be created?
 	* Allow Start Menu folder name to be set?
-
