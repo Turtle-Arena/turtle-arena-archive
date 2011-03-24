@@ -40,7 +40,8 @@ float	pm_stopspeed = 100.0f;
 float	pm_duckScale = 0.25f;
 float	pm_swimScale = 0.50f;
 #ifdef IOQ3ZTM // LADDER
-float	pm_ladderScale = 0.80f;  // Set the max movement speed to 80% of normal
+float	pm_ladderScale = 0.80f;
+float	pm_ladderWaterScale = 0.50f;
 #endif
 
 float	pm_accelerate = 10.0f;
@@ -48,7 +49,7 @@ float	pm_airaccelerate = 1.0f;
 float	pm_wateraccelerate = 4.0f;
 float	pm_flyaccelerate = 8.0f;
 #ifdef IOQ3ZTM // LADDER
-float	pm_ladderAccelerate = 3000;  // The acceleration to friction ratio is 1:1
+float	pm_ladderAccelerate = 3000.0f;  // The acceleration to friction ratio is 1:1
 #endif
 
 float	pm_friction = 6.0f;
@@ -59,7 +60,7 @@ float	pm_watergroundfriction = 7.0f;
 float	pm_flightfriction = 3.0f;
 float	pm_spectatorfriction = 5.0f;
 #ifdef IOQ3ZTM // LADDER
-float	pm_ladderfriction = 3000;  // Friction is high enough so you don't slip down
+float	pm_ladderfriction = 3000.0f;  // Friction is high enough so you don't slip down
 #endif
 
 int		c_pmove = 0;
@@ -316,15 +317,16 @@ static void PM_Friction( void ) {
 		drop += speed*pm_waterfriction*pm->waterlevel*pml.frametime;
 	}
 
+#ifdef IOQ3ZTM // LADDER
+	if ( pml.ladder ) {
+		drop += speed*pm_ladderfriction*pml.frametime;  // Add ladder friction!
+	}
+	else
+#endif
 	// apply flying friction
 	if ( pm->ps->powerups[PW_FLIGHT]) {
 		drop += speed*pm_flightfriction*pml.frametime;
 	}
-#ifdef IOQ3ZTM // LADDER
-	else if ( pml.ladder ) {
-		drop += speed*pm_ladderfriction*pml.frametime;  // Add ladder friction!
-	}
-#endif
 
 	if ( pm->ps->pm_type == PM_SPECTATOR) {
 		drop += speed*pm_spectatorfriction*pml.frametime;
@@ -3021,6 +3023,7 @@ static void PM_LadderMove( void ) {
 	vec3_t wishvel;
 	float wishspeed;
 	vec3_t wishdir;
+	float speedScale;
 	float scale;
 	float vel;
 
@@ -3092,8 +3095,14 @@ static void PM_LadderMove( void ) {
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
 
-	if ( wishspeed > pm->ps->speed * pm_ladderScale ) {
-		wishspeed = pm->ps->speed * pm_ladderScale;
+	if ( pm->waterlevel > 1 ) {
+		speedScale = pm_ladderWaterScale;
+	} else {
+		speedScale = pm_ladderScale;
+	}
+
+	if ( wishspeed > pm->ps->speed * speedScale ) {
+		wishspeed = pm->ps->speed * speedScale;
 	}
 
 	PM_Accelerate (wishdir, wishspeed, pm_ladderAccelerate);
@@ -3501,6 +3510,13 @@ void PmoveSingle (pmove_t *pmove) {
 		if (pm->ps->pm_flags & PMF_GRAPPLE_PULL) {
 			PM_GrappleMove();
 		}
+		else
+#endif
+#ifdef IOQ3ZTM // LADDER
+		if (pml.ladder) {
+			PM_LadderMove();
+		}
+		else
 #endif
 		// flight powerup doesn't allow jump and has different friction
 		PM_FlyMove();
@@ -3510,6 +3526,10 @@ void PmoveSingle (pmove_t *pmove) {
 		PM_AirMove();
 	} else if (pm->ps->pm_flags & PMF_TIME_WATERJUMP) {
 		PM_WaterJumpMove();
+#ifdef IOQ3ZTM // LADDER
+	} else if (pml.ladder) {
+		PM_LadderMove();
+#endif
 	} else if ( pm->waterlevel > 1 ) {
 #ifdef IOQ3ZTM // WALK_UNDERWATER
 		if (pm->waterlevel == 3 &&
@@ -3522,10 +3542,6 @@ void PmoveSingle (pmove_t *pmove) {
 #endif
 		// swimming
 		PM_WaterMove();
-#ifdef IOQ3ZTM // LADDER // ZTM: Check ladder before water?
-	} else if (pml.ladder) {
-		PM_LadderMove();
-#endif
 	} else if ( pml.walking ) {
 		// walking on ground
 		PM_WalkMove();
