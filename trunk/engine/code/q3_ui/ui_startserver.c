@@ -1957,7 +1957,11 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.hostname.generic.flags      = QMF_SMALLFONT;
 		s_serveroptions.hostname.generic.x          = OPTIONS_X;
 		s_serveroptions.hostname.generic.y	        = y;
+#ifdef IOQ3ZTM // Make it alittle longer so "Turtle Arena server" fits without scrolling.
+		s_serveroptions.hostname.field.widthInChars = 20;
+#else
 		s_serveroptions.hostname.field.widthInChars = 18;
+#endif
 		s_serveroptions.hostname.field.maxchars     = 64;
 	}
 
