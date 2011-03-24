@@ -239,7 +239,7 @@ static cvarTable_t		gameCvarTable[] = {
 #endif
 #endif
 #ifdef TURTLEARENA // POWERS // PW_FLASHING
-	{ &g_teleportFluxTime, "g_teleportFluxTime", "5", CVAR_SERVERINFO, 0, qfalse},
+	{ &g_teleportFluxTime, "g_teleportFluxTime", "5", 0, 0, qfalse},
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 	{ &g_laserTag, "g_laserTag", "0", CVAR_SERVERINFO, qtrue, qfalse},
