@@ -61,6 +61,7 @@ jmp_buf abortframe;		// an ERR_DROP occured, exit the entire frame
 
 
 FILE *debuglogfile;
+static fileHandle_t pipefile;
 static fileHandle_t logfile;
 fileHandle_t	com_journalFile;			// events are written here
 fileHandle_t	com_journalDataFile;		// config files are written here
@@ -80,6 +81,7 @@ cvar_t	*com_timedemo;
 cvar_t	*com_sv_running;
 cvar_t	*com_cl_running;
 cvar_t	*com_logfile;		// 1 = buffer log, 2 = flush after each print
+cvar_t	*com_pipefile;
 cvar_t	*com_showtrace;
 cvar_t	*com_version;
 #ifndef NOBLOOD
@@ -479,7 +481,6 @@ be after execing the config and default.
 void Com_StartupVariable( const char *match ) {
 	int		i;
 	char	*s;
-	cvar_t	*cv;
 
 	for (i=0 ; i < com_numConsoleLines ; i++) {
 		Cmd_TokenizeString( com_consoleLines[i] );
@@ -488,11 +489,13 @@ void Com_StartupVariable( const char *match ) {
 		}
 
 		s = Cmd_Argv(1);
-		if ( !match || !strcmp( s, match ) ) {
-			Cvar_Set( s, Cmd_Argv(2) );
-			cv = Cvar_Get( s, "", 0 );
-			cv->flags |= CVAR_USER_CREATED;
-//			com_consoleLines[i] = 0;
+		
+		if(!match || !strcmp(s, match))
+		{
+			if(Cvar_Flags(s) == CVAR_NONEXISTENT)
+				Cvar_Get(s, Cmd_Argv(2), CVAR_USER_CREATED);
+			else
+				Cvar_Set(s, Cmd_Argv(2));
 		}
 	}
 }
@@ -2826,8 +2829,35 @@ void Com_Init( char *commandLine ) {
 	Com_Printf ("Altivec support is %s\n", com_altivec->integer ? "enabled" : "disabled");
 #endif
 
+	com_pipefile = Cvar_Get( "com_pipefile", "", CVAR_ARCHIVE|CVAR_LATCH );
+	if( com_pipefile->string[0] )
+	{
+		pipefile = FS_FCreateOpenPipeFile( com_pipefile->string );
+	}
+
 	Com_Printf ("--- Common Initialization Complete ---\n");
 }
+
+/*
+===============
+Com_ReadFromPipe
+
+Read whatever is in com_pipefile, if anything, and execute it
+===============
+*/
+void Com_ReadFromPipe( void )
+{
+	char buffer[MAX_STRING_CHARS] = {""};
+	qboolean read;
+
+	if( !pipefile )
+		return;
+
+	read = FS_Read( buffer, sizeof( buffer ), pipefile );
+	if( read )
+		Cbuf_ExecuteText( EXEC_APPEND, buffer );
+}
+
 
 //==================================================================
 
@@ -3161,6 +3191,8 @@ void Com_Frame( void ) {
 		c_pointcontents = 0;
 	}
 
+	Com_ReadFromPipe( );
+
 	com_frameNumber++;
 }
 
@@ -3178,6 +3210,11 @@ void Com_Shutdown (void) {
 	if ( com_journalFile ) {
 		FS_FCloseFile( com_journalFile );
 		com_journalFile = 0;
+	}
+
+	if( pipefile ) {
+		FS_FCloseFile( pipefile );
+		FS_HomeRemove( com_pipefile->string );
 	}
 
 }
