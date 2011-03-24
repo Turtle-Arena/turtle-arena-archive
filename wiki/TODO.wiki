@@ -279,9 +279,6 @@ Most of the mapobjects should be damageable.
     * After Raph is finished:
     * Reanimate raph_v9.mm3d for each Turtle? (Just a few of the animations...)
 
-  * TODO: Add a holder onto the back of Don's belt to hold his Bo when it is not in use
-    * Similar to the action figures.
-
 === Casey ====
   * TODO: Remake Casey Jones model
 
