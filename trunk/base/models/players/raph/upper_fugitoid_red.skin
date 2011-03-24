@@ -3,7 +3,7 @@ u_torso,models/players/fugitoid/body
 u_plastron,models/players/fugitoid/body
 u_arm_right,models/players/fugitoid/body
 u_arm_left,models/players/fugitoid/body
-u_belt,$(dir)/belt_red.png
+u_belt,models/players/fugitoid/red
 u_belt_buckle,textures/common/invisible
 tag_flag,
 tag_weapon,

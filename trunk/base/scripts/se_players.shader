@@ -326,6 +326,7 @@ models/players/mike/leg_red
 //
 // The Fugitoid!
 //
+
 // green eyes and mouth
 models/players/fugitoid/eyes_mouth
 {
@@ -355,6 +356,25 @@ models/players/fugitoid/body
 {
 	{
 		map textures/effects/tinfx_lighter.png
+		tcGen environment
+		rgbGen lightingDiffuse
+	}
+}
+
+// Raph fugitoid skin mask/belt shaders
+models/players/fugitoid/red
+{
+	{
+		map textures/effects/envmaproc.png
+		tcGen environment
+		rgbGen lightingDiffuse
+	}
+}
+
+models/players/fugitoid/blue
+{
+	{
+		map textures/effects/envmapblue.png
 		tcGen environment
 		rgbGen lightingDiffuse
 	}
