@@ -3,6 +3,7 @@ se_gfx
 se_icons
 se_menu
 se_models
+se_players
 se_powerups
 se_sprites
 se_teams
