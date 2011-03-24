@@ -107,9 +107,14 @@ Note: If headmodel starts with `*` ("`*`raph/fugitoid") the "heads" directory is
 ==== Team play ====
   * headmodel = raph/fugitoid
   * team = red
+  * g_redTeam cvar = Foot (blue team use g_blueTeam cvar, default Shell)
 
+  # models/players/raph/fugitoid/Foot/head_red.skin
+  # models/players/raph/Foot/head_red.skin
   # models/players/raph/fugitoid/head_red.skin
   # models/players/raph/head_red.skin
+  # models/players/heads/raph/fugitoid/Foot/head_red.skin
+  # models/players/heads/raph/Foot/head_red.skin
   # models/players/heads/raph/fugitoid/head_red.skin
   # models/players/heads/raph/head_red.skin
 
