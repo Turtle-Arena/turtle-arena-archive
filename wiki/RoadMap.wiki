@@ -4,7 +4,8 @@
 = Roadmap =
 Work-in-progress plans for future Turtle Arena releases.
 
-== 0.2 (Completed) ==
+== 0.2 series ==
+=== 0.2 (Completed) ===
 First stable playable release.
 
   * Standalone from Quake III: Arena
@@ -16,34 +17,37 @@ First stable playable release.
   * Shurikens (holdable items)
   * Maps for all gametypes
 
-== 0.4.x ==
-0.4.x series focuses on players, map themes, and multiplayer maps. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game (Comparable to TMNT: Mutant Melee and TMNT Smash-up in someways.)
-
+== 0.4 series ==
 === 0.4.0 (Completed) ===
   * Fixed bugs from 0.2
   * Added music
   * Readded player effect colors
     * Readded to ui and q3_ui
   * Reduced overall number of TODOs and FIXMEs in the source
-  * Begun work on 0.4.1 and 0.4.2
 
 === 0.4.1 (Completed) ===
   * Bug fix release
 
-=== 0.4.2 ===
+=== 0.4.2 (Completed) ===
+  * Bug fix release
+
+== 0.6 series ==
+0.6 series focuses on players, map themes, and multiplayer maps. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game. Comparable to TMNT: Mutant Melee and TMNT Smash-up in someways. The plan is to have development releases leading up to the completed 0.6 release.
+
+=== 0.5.0 ===
   * Four player splitscreen
     * Support multiple listeners, play sounds relative to all players.
   * Finished '2D mode' path system for players
   * Single camera mode for '2D maps' (set "2dmode" "1" in worldspawn to focus on local players), like the camera in Super Smash Bros. and TMNT Smash-up
 
-=== 0.4.3 ===
+=== 0.5.1 ===
   * Add support for single camera mode focusing on all players (set "2dmode" "1" in worldspawn for local clients or "2" for everyone)
   * Remodel and animate Casey
   * Finish breakable/pushable objects and brushes code
-  * (Haven't decided other goals, see 0.4.x for ideas)
+  * (Haven't decided other goals, see 0.5.x for ideas)
 
-=== 0.4.x ===
-Haven't decide what order these will be done in, but hopefully they will all get done in the 0.4.x series.
+=== 0.5.x ===
+Haven't decide what order these will be done in, but hopefully they will all get done for the 0.6 release.
 
 ==== Likely ====
   * Improve player models; each player should have some unique animations, etc
@@ -61,19 +65,17 @@ Haven't decide what order these will be done in, but hopefully they will all get
   * Multiple levels of detail for players and other models
     * (Add a LOD converter to Misfit Model 3D?)
 
-== 0.6 ==
+== 0.8 series ==
 Focus on Single Player / Co-op.
 
   * Enemies for Single Player
   * Single Player Maps
-  * Gimmicks
+  * Per-stage gimmicks
   * Save game system
   * Player Abilities
   * Remake UI with missionpack ui scripting?
 
-== 0.8 ==
+== 1.0 series ==
   * Single Player improvements
   * Multiplayer improvements
-
-== 1.0 ==
   * Polish overall game?
