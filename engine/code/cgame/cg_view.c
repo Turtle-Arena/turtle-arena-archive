@@ -1605,7 +1605,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #endif
 
 	// decide on third person view
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, if spectator always be in first person.
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, have spectator always be in first person.
 	cg.renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
 #ifdef TA_SPLITVIEW
 							&& (cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
