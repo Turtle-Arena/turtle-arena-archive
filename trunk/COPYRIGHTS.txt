@@ -13,12 +13,18 @@ All data, unless otherwise noted, is Copyright (C) 2009-2011 Zack "ZTurtleMan" M
 
 The data files that have other source files are included in base-src/
 
-The following use DejaVu Sans Bold Oblique, for font license see http://dejavu-fonts.org/wiki/License
+The following use DejaVu fonts, for font license see http://dejavu-fonts.org/wiki/License
+	Use DejaVu Sans Bold Oblique:
 base/icons/iconf_blu2.png
 base/icons/iconf_blu3.png
 base/icons/iconf_neutral3.png
 base/icons/iconf_red2.png
 base/icons/iconf_red3.png
+	Use DejaVu Serif:
+base/icons/defense.png
+base/menu/medals/medal_defend.png
+base-src/menu/medals/medal_defend.svg
+
 
 The 64 images listed below were created with GIMP using GNU FreeFonts, for the font license see the bottom of this file.
 base/menu/art/level_complete[1-5].png				FreeMono.ttf
