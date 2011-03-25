@@ -22,6 +22,7 @@ base/icons/iconf_red2.png
 base/icons/iconf_red3.png
 	Use DejaVu Serif:
 base/icons/defense.png
+base-src/icons/defense.svg
 base/menu/medals/medal_defend.png
 base-src/menu/medals/medal_defend.svg
 
