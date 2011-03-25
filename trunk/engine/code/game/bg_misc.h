@@ -743,6 +743,8 @@ typedef struct
 	weapontype_t weapontype;
 	int mod;			///< Means of Death (MOD_* enum)
 	int attackDelay;
+	int barrelSpin; // BS_*
+	vec3_t flashColor;
 
 	// sounds
 	char flashSoundName[4][MAX_QPATH];
@@ -752,12 +754,9 @@ typedef struct
 
 	// gun only
 	int splashMod;
-	vec3_t flashColor;
 	bg_projectileinfo_t *proj;
 	int projnum; // bg_projectileinfo[projnum]
-	// aimOffset is the weapon aim offset for bots
-	vec3_t aimOffset;
-	int barrelSpin; // BS_*
+	vec3_t aimOffset; // aimOffset is the weapon aim offset for bots
 
 	// melee only
 	bg_bladeinfo_t blades[MAX_WEAPON_BLADES];
@@ -772,13 +771,11 @@ typedef struct
 #define MAX_WG_ATK_ANIMS 5 // Max Weapon Group attack animations
 typedef struct
 {
-	// todo string
 	int standAnim;
 	int attackAnim[MAX_WG_ATK_ANIMS];
 	unsigned int numAttackAnims;
 } bg_weapongroup_anims_t;
 
-// cgame "_hands.md3"
 typedef struct
 {
 	char name[MAX_QPATH]; // Example; "wp_none"
@@ -787,6 +784,9 @@ typedef struct
 
 	// Item info
 	bg_iteminfo_t *item;
+
+	// Models
+	char handsModelName[MAX_QPATH]; // Model's tags are used to position weapons in first person
 
 	// Sounds
 	char readySoundName[MAX_QPATH];
@@ -799,7 +799,6 @@ typedef struct
 
 	// Animations
 	bg_weapongroup_anims_t normalAnims; // Normal set of animations
-	//bg_weapongroup_anims_t altAnims; // Alt set of animations (For different attacks)
 	bg_weapongroup_anims_t primaryAnims; // Set of animations while holding flag
 
 } bg_weapongroupinfo_t;

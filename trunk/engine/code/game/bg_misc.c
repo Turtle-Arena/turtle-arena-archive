@@ -2869,6 +2869,7 @@ static qboolean WeaponGroup_Parse(char **p) {
 		else PARSE_INTEGER(token, "pickupAmmo", weaponItem.quantity)
 		// ITEM END
 		else PARSE_INTEGER(token, "randomSpawn", weaponGroup.randomSpawn)
+		else PARSE_STRING(token, "handsModel", weaponGroup.handsModelName)
 		else PARSE_STRING(token, "readySound", weaponGroup.readySoundName)
 		else PARSE_STRING(token, "firingSound", weaponGroup.firingSoundName)
 		else PARSE_STRING(token, "firingStoppedSound", weaponGroup.firingStoppedSoundName)
@@ -3141,6 +3142,7 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tpickupName \"%s\"\r\n", weaponGroup->item->pickup_name);
 		FS_Printf2("\tpickupAmmo %i\r\n", weaponGroup->item->quantity);
 
+		FS_Printf2("\thandsModel \"%s\"\r\n", weaponGroup->handsModelName);
 		FS_Printf2("\treadySound \"%s\"\r\n", weaponGroup->readySoundName);
 		FS_Printf2("\tfiringSound \"%s\"\r\n", weaponGroup->firingSoundName);
 		FS_Printf2("\tfiringStoppedSound \"%s\"\r\n", weaponGroup->firingStoppedSoundName);

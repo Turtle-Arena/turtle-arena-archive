@@ -1537,7 +1537,11 @@ void CG_RegisterWeapon( int weaponNum )
 #endif
 
 #ifdef TA_WEAPSYS
-	if (item)
+	if (bg_weapongroupinfo[weaponNum].handsModelName[0] != '\0') {
+		weaponInfo->handsModel = trap_R_RegisterModel( bg_weapongroupinfo[weaponNum].handsModelName );
+	}
+
+	if (item && !weaponInfo->handsModel)
 	{
 #endif
 	strcpy( path, item->world_model[0] );
@@ -2293,29 +2297,15 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, entityState_t *state )
 	// add powerup effects
 #ifdef TURTLEARENA // POWERS
 	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
-#if 1 // ZTM: Don't have player be transparent
-		trap_R_AddRefEntityToScene( gun );
-
-		gun->customShader = cgs.media.playerTeleportShader;
-		trap_R_AddRefEntityToScene( gun );
-#else
-		int alpha;
-
 		if (state->otherEntityNum2 > 0) {
-			// Body fad-out alpha (When dead)
-			alpha = state->otherEntityNum2;
-		} else {
-			alpha = 64;
+			// Death fade out
+			gun->renderfx |= RF_FORCE_ENT_ALPHA;
+			gun->shaderRGBA[3] = state->otherEntityNum2;
 		}
-
-		gun->renderfx |= RF_FORCE_ENT_ALPHA;
-		gun->shaderRGBA[3] = alpha/2;
 		trap_R_AddRefEntityToScene( gun );
 
-		gun->shaderRGBA[3] = alpha;
 		gun->customShader = cgs.media.playerTeleportShader;
 		trap_R_AddRefEntityToScene( gun );
-#endif
 	} else
 #endif
 	if ( state->powerups & ( 1 << PW_INVIS ) ) {
