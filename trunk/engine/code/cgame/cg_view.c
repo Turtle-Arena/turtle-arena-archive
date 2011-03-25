@@ -1514,7 +1514,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 #ifdef TA_SPLITVIEW
 	// Single camera mode only uses one viewport for viewing all local clients or all clients on server.
-	cg.singleCamera = (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2));
+	cg.singleCamera = (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2))
+						|| (cgs.gametype != GT_SINGLE_PLAYER && cg.snap->pss[0].pm_type == PM_INTERMISSION);
 
 	cg.numViewports = 0;
 	for (i = 0; i < MAX_SPLITVIEW; i++) {

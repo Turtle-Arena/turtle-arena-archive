@@ -2115,6 +2115,9 @@ void CG_DrawLetterbox(void);
 // cg_snapshot.c
 //
 void CG_ProcessSnapshots( void );
+#ifdef TA_SPLITVIEW
+int CG_LocalClient(int clientNum);
+#endif
 
 //
 // cg_info.c
