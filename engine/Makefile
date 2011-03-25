@@ -894,9 +894,9 @@ ifeq ($(PLATFORM),mingw32)
     endif
 
     # Extra libs, easier to just include in source tree
+    CLIENT_CFLAGS += -I$(LIBSDIR)/win32/include
     ifeq ($(ARCH), x86)
       ifeq ($(USE_CODEC_VORBIS),1)
-        CLIENT_CFLAGS += -I$(LIBSDIR)/win32/include
         CLIENT_LIBS += $(LIBSDIR)/win32/libvorbisfile.a \
                         $(LIBSDIR)/win32/libvorbis.a\
 						$(LIBSDIR)/win32/libogg.a
@@ -906,7 +906,6 @@ ifeq ($(PLATFORM),mingw32)
       endif
     else
       ifeq ($(USE_CODEC_VORBIS),1)
-        CLIENT_CFLAGS += -I$(LIBSDIR)/win64/include
         CLIENT_LIBS += $(LIBSDIR)/win64/libvorbisfile.a \
                         $(LIBSDIR)/win64/libvorbis.a\
 						$(LIBSDIR)/win64/libogg.a
