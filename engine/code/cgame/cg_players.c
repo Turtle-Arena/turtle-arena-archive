@@ -3008,6 +3008,13 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane )
 	// fade the shadow out with height
 	alpha = 1.0 - trace.fraction;
 
+#ifdef TURTLEARENA // POWERS
+	if ( (cent->currentState.powerups & ( 1 << PW_FLASHING )) && cent->currentState.otherEntityNum2 > 0) {
+		// Fade out shadow when dead body is fading out.
+		alpha *= (float)cent->currentState.otherEntityNum2 / 128.0f;
+	}
+#endif
+
 	// hack / FPE - bogus planes?
 	//assert( DotProduct( trace.plane.normal, trace.plane.normal ) != 0.0f ) 
 
@@ -3120,29 +3127,15 @@ Also called by CG_Missile for quad rockets, but nobody can tell...
 void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
 #ifdef TURTLEARENA // POWERS
 	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
-#if 1 // ZTM: Don't have player be transparent
-		trap_R_AddRefEntityToScene( ent );
-
-		ent->customShader = cgs.media.playerTeleportShader;
-		trap_R_AddRefEntityToScene( ent );
-#else
-		int alpha;
-
 		if (state->otherEntityNum2 > 0) {
-			// Body fad-out alpha (When dead)
-			alpha = state->otherEntityNum2;
-		} else {
-			alpha = 64;
+			// Death fade out
+			ent->renderfx |= RF_FORCE_ENT_ALPHA;
+			ent->shaderRGBA[3] = state->otherEntityNum2;
 		}
-
-		ent->renderfx |= RF_FORCE_ENT_ALPHA;
-		ent->shaderRGBA[3] = alpha/2;
 		trap_R_AddRefEntityToScene( ent );
 
-		ent->shaderRGBA[3] = alpha;
 		ent->customShader = cgs.media.playerTeleportShader;
 		trap_R_AddRefEntityToScene( ent );
-#endif
 	} else
 #endif
 	if ( state->powerups & ( 1 << PW_INVIS ) ) {
