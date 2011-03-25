@@ -12,44 +12,6 @@
    width="256"
    height="256"
    id="svg4571">
-  <defs
-     id="defs4573">
-    <linearGradient
-       id="linearGradient5206">
-      <stop
-         id="stop5208"
-         style="stop-color:#c4a000;stop-opacity:1"
-         offset="0" />
-      <stop
-         id="stop5210"
-         style="stop-color:#edd400;stop-opacity:1"
-         offset="1" />
-    </linearGradient>
-    <linearGradient
-       x1="64.612122"
-       y1="126.30727"
-       x2="63.72102"
-       y2="59.637203"
-       id="linearGradient5490"
-       xlink:href="#linearGradient5206"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       x1="64.612122"
-       y1="126.30727"
-       x2="63.72102"
-       y2="59.637203"
-       id="linearGradient5520"
-       xlink:href="#linearGradient5206"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       x1="64.612122"
-       y1="126.30727"
-       x2="63.72102"
-       y2="59.637203"
-       id="linearGradient5529"
-       xlink:href="#linearGradient5206"
-       gradientUnits="userSpaceOnUse" />
-  </defs>
   <metadata
      id="metadata4576">
     <rdf:RDF>
