@@ -911,6 +911,9 @@ SV_ClientEnterWorld
 void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	int		clientNum;
 	sharedEntity_t *ent;
+#ifdef TA_SPLITVIEW
+	int		i;
+#endif
 
 	Com_DPrintf( "Going from CS_PRIMED to CS_ACTIVE for %s\n", client->name );
 	client->state = CS_ACTIVE;
@@ -924,6 +927,12 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	ent = SV_GentityNum( clientNum );
 	ent->s.number = clientNum;
 	client->gentity = ent;
+#ifdef TA_SPLITVIEW
+	// Set local client indexes (must be done after game resets ent->r).
+	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+		client->gentity->r.local_clients[i] = client->local_clients[i];
+	}
+#endif
 
 	client->deltaMessage = -1;
 	client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
