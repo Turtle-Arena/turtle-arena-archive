@@ -74,20 +74,6 @@ const char	*CG_PlaceString( int rank ) {
 	return str;
 }
 
-#ifdef TA_SPLITVIEW
-int CG_LocalClient(int clientNum) {
-	int i;
-
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[cg.snap->lcIndex[i]].clientNum == clientNum) {
-			return i;
-		}
-	}
-
-	return -1;
-}
-#endif
-
 /*
 =============
 CG_Obituary
