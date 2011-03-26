@@ -2512,6 +2512,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_LoadFont(&cgs.media.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
 	CG_LoadFont(&cgs.media.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, 0);
+#ifndef TA_DATA
+	CG_LoadFont(&cgs.media.fontPropGlowSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
+	CG_LoadFont(&cgs.media.fontPropGlowBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT, 22*0.66f, 0);
+#endif
 
 	cgs.media.whiteShader		= trap_R_RegisterShader( "white" );
 #else

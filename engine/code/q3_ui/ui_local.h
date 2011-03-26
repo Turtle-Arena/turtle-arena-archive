@@ -669,6 +669,10 @@ typedef struct {
 	font_t				fontGiant;
 	font_t				fontPropSmall;
 	font_t				fontPropBig;
+#ifndef TA_DATA
+	font_t				fontPropGlowSmall;
+	font_t				fontPropGlowBig;
+#endif
 	font_t				fontBanner;
 #else
 	qhandle_t			charset;

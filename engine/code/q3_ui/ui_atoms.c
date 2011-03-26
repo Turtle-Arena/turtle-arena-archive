@@ -220,7 +220,12 @@ void UI_DrawFontBannerString( font_t *font, int x, int y, const char* str, int s
 UI_DrawFontProportionalString
 =================
 */
-void UI_DrawFontProportionalString( font_t *font, int x, int y, const char* str, int style, vec4_t color ) {
+void UI_DrawFontProportionalString( font_t *font,
+#ifndef TA_DATA
+				font_t *fontGlow,
+#endif
+				int x, int y, const char* str, int style, vec4_t color )
+{
 	vec4_t	drawcolor;
 	int		width;
 
@@ -272,11 +277,11 @@ void UI_DrawFontProportionalString( font_t *font, int x, int y, const char* str,
 		drawcolor[2] = color[2];
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
-//#ifdef TA_DATA
+#ifdef TA_DATA
 		UI_DrawFontStringColor( font, x, y, str, drawcolor );
-//#else
-//		CG_DrawFontStringColor( fontGlow, x, y, str, drawcolor );
-//#endif
+#else
+		UI_DrawFontStringColor( fontGlow, x, y, str, drawcolor );
+#endif
 		return;
 	}
 
@@ -919,14 +924,28 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	qhandle_t charsetProp;
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
+#ifndef TA_DATA
+	font_t *fontGlow;
+#endif
 
-	if (style & UI_SMALLFONT)
+	if (style & UI_SMALLFONT) {
 		font = &uis.fontPropSmall;
-	else
+#ifndef TA_DATA
+		fontGlow = &uis.fontPropGlowSmall;
+#endif
+	} else {
 		font = &uis.fontPropBig;
+#ifndef TA_DATA
+		fontGlow = &uis.fontPropGlowBig;
+#endif
+	}
 
 	if (font->fontInfo.name[0]) {
-		UI_DrawFontProportionalString(font, x, y, str, style, color);
+		UI_DrawFontProportionalString(font,
+#ifndef TA_DATA
+				fontGlow,
+#endif
+				x, y, str, style, color);
 		return;
 	}
 
@@ -986,8 +1005,10 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[2] = color[2];
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
-#if defined TA_DATA || defined IOQ3ZTM // ZTM: FIXME: IOQ3ZTM: Add glow font for quake3?
+#ifdef TA_DATA
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, charsetProp );
+#elif defined IOQ3ZTM // FONT_REWRITE
+		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, fontGlow->fontShader );
 #else
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, uis.charsetPropGlow );
 #endif
