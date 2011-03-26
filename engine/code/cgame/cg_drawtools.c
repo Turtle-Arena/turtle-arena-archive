@@ -1545,7 +1545,7 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 #elif defined IOQ3ZTM // FONT_REWRITE
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, fontGlow->fontShader );
 #else
-		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, uis.charsetPropGlow );
+		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow );
 #endif
 		return;
 	}
