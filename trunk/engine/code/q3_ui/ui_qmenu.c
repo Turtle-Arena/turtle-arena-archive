@@ -1914,6 +1914,10 @@ void Menu_Cache( void )
 
 	UI_LoadFont(&uis.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, PROP_GAP_WIDTH);
 	UI_LoadFont(&uis.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, PROP_GAP_WIDTH);
+#ifndef TA_DATA
+	UI_LoadFont(&uis.fontPropGlowSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
+	UI_LoadFont(&uis.fontPropGlowBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT, 22*0.66f, 0);
+#endif
 
 	UI_LoadFont(&uis.fontBanner, "fonts/FreeSerif.ttf", "menu/art/font2_prop.tga", 48, 32, 0);
 #else
