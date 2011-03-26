@@ -197,7 +197,7 @@ static void R_Bloom_DrawEffect( int x, int y, int w, int h )
 	GL_Bind( bloom.effect.texture );
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE );
 	qglColor4f( r_bloom_alpha->value, r_bloom_alpha->value, r_bloom_alpha->value, 1.0f );
-	R_Bloom_Quad( x, y - glConfig.vidHeight - h, w, h, x / (float)glConfig.vidWidth, (1.0f / (glConfig.vidHeight / h)) - (y / glConfig.vidHeight),
+	R_Bloom_Quad( x, y - (glConfig.vidHeight - h), w, h, x / (float)glConfig.vidWidth, (1.0f / (glConfig.vidHeight / (float)h)) - (y / (float)glConfig.vidHeight),
 			(w / (float)glConfig.vidWidth) * bloom.effect.readW, (h / (float)glConfig.vidHeight) * bloom.effect.readH );
 }
 
