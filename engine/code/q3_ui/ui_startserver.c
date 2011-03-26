@@ -1094,7 +1094,12 @@ static void ServerOptions_Start( void ) {
 
 	trap_Cvar_SetValue( "sv_maxclients", Com_Clamp( 0, 12, maxclients ) );
 #ifdef IOQ3ZTM // SV_PUBLIC
-	trap_Cvar_SetValue( "sv_public", Com_Clamp( 0, 1, publicserver ) );
+	if (s_serveroptions.multiplayer) {
+		trap_Cvar_SetValue( "ui_publicServer", Com_Clamp( 0, 1, publicserver ) );
+		trap_Cvar_SetValue( "sv_public", Com_Clamp( 0, 1, publicserver ) );
+	} else {
+		trap_Cvar_SetValue( "sv_public", 0 );
+	}
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 1, dedicated ) );
 #else
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, dedicated ) );
@@ -1696,6 +1701,9 @@ static void ServerOptions_SetMenuItems( void ) {
 #endif
 	}
 
+#ifdef IOQ3ZTM // SV_PUBLIC
+	s_serveroptions.publicserver.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_publicServer" ) );
+#endif
 	Q_strncpyz( s_serveroptions.hostname.field.buffer, UI_Cvar_VariableString( "sv_hostname" ), sizeof( s_serveroptions.hostname.field.buffer ) );
 	s_serveroptions.pure.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_pure" ) );
 
