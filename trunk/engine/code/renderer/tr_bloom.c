@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tr_local.h"
 
-#ifdef OA_BLOOM
+#ifdef TA_BLOOM
 
 static cvar_t *r_bloom;
 static cvar_t *r_bloom_sample_size;
@@ -84,10 +84,8 @@ static struct {
 		int		width, height;
 	} work;
 	qboolean started;
-#ifdef IOQ3ZTM
 	qboolean fullscreen;
 	int		startWidth, startHeight;
-#endif
 } bloom;
 
 
@@ -124,11 +122,9 @@ static void R_Bloom_InitTextures( void )
 {
 	byte	*data;
 
-#ifdef IOQ3ZTM
 	bloom.fullscreen = r_fullscreen->integer;
 	bloom.startWidth = glConfig.vidWidth;
 	bloom.startHeight = glConfig.vidHeight;
-#endif
 
 	// find closer power of 2 to screen size 
 	for (bloom.screen.width = 1;bloom.screen.width< glConfig.vidWidth;bloom.screen.width *= 2);
@@ -277,13 +273,8 @@ static void R_Bloom_WarsowEffect( void )
 			if( intensity < 0.01f )
 				continue;
 			qglColor4f( intensity, intensity, intensity, 1.0 );
-#ifdef IOQ3ZTM
 			x = (i - k) * ( 2 / (float)bloom.startWidth ) * bloom.effect.readW;
 			y = (j - k) * ( 2 / (float)bloom.startHeight ) * bloom.effect.readH;
-#else
-			x = (i - k) * ( 2 / 640.0f ) * bloom.effect.readW;
-			y = (j - k) * ( 2 / 480.0f ) * bloom.effect.readH;
-#endif
 
 			R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, x, y, bloom.effect.readW, bloom.effect.readH );
 		}
@@ -404,18 +395,16 @@ R_BloomScreen
 */
 void R_BloomScreen( int x, int y, int w, int h )
 {
-	if( !r_bloom->integer )
+	if (!r_bloom->integer)
 		return;
-	if( !bloom.started
-#ifdef IOQ3ZTM // Check if we need to restart bloom
+
+	// Check if we need to (re)start bloom
+	if (!bloom.started
 		|| bloom.fullscreen != r_fullscreen->integer
 		|| bloom.startWidth != glConfig.vidWidth
-		|| bloom.startHeight != glConfig.vidHeight
-#endif
-	) {
-#ifdef IOQ3ZTM
+		|| bloom.startHeight != glConfig.vidHeight)
+	{
 		bloom.started = qfalse;
-#endif
 		R_Bloom_InitTextures();
 		if( !bloom.started )
 			return;
@@ -455,22 +444,18 @@ void R_BloomInit( void ) {
 	memset( &bloom, 0, sizeof( bloom ));
 
 	r_bloom = ri.Cvar_Get( "r_bloom", "0", CVAR_ARCHIVE );
-#ifdef IOQ3ZTM // ZTM: AlienArena values
+#if 1 // ZTM: AlienArena values
 	r_bloom_alpha = ri.Cvar_Get( "r_bloom_alpha", "0.2", CVAR_ARCHIVE );
-	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
 	r_bloom_intensity = ri.Cvar_Get( "r_bloom_intensity", "0.5", CVAR_ARCHIVE );
 	r_bloom_darken = ri.Cvar_Get( "r_bloom_darken", "8", CVAR_ARCHIVE );
-	r_bloom_sample_size = ri.Cvar_Get( "r_bloom_sample_size", "128", CVAR_ARCHIVE|CVAR_LATCH );
-	r_bloom_fast_sample = ri.Cvar_Get( "r_bloom_fast_sample", "0", CVAR_ARCHIVE|CVAR_LATCH );
 #else // OpenArena values
 	r_bloom_alpha = ri.Cvar_Get( "r_bloom_alpha", "0.3", CVAR_ARCHIVE );
-	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
 	r_bloom_intensity = ri.Cvar_Get( "r_bloom_intensity", "1.3", CVAR_ARCHIVE );
 	r_bloom_darken = ri.Cvar_Get( "r_bloom_darken", "4", CVAR_ARCHIVE );
+#endif
+	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
 	r_bloom_sample_size = ri.Cvar_Get( "r_bloom_sample_size", "128", CVAR_ARCHIVE|CVAR_LATCH );
 	r_bloom_fast_sample = ri.Cvar_Get( "r_bloom_fast_sample", "0", CVAR_ARCHIVE|CVAR_LATCH );
-#endif
 }
 
-#endif // OA_BLOOM
-
+#endif // TA_BLOOM

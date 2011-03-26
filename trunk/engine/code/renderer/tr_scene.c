@@ -412,11 +412,12 @@ void RE_RenderScene( const refdef_t *fd ) {
 
 	R_RenderView( &parms );
 
-#ifdef OA_BLOOM // IOQ3ZTM
+#ifdef TA_BLOOM
 	if (!(tr.refdef.rdflags & RDF_NOWORLDMODEL))
 	{
 		bloomCommand_t	*cmd;
 
+		// Apply bloom after world is drawn.
 		cmd = R_GetCommandBuffer( sizeof( *cmd ) );
 		if ( !cmd ) {
 			return;

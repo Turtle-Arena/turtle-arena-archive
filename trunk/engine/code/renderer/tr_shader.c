@@ -2280,7 +2280,7 @@ static void FixRenderCommandList( int newShader ) {
 				curCmd = (const void *)(sb_cmd + 1);
 				break;
 				}
-#ifdef OA_BLOOM // IOQ3ZTM
+#ifdef TA_BLOOM
 			case RC_BLOOM:
 				{
 				const bloomCommand_t *b_cmd = (const bloomCommand_t *)curCmd;

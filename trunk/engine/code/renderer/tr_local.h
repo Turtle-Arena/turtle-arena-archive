@@ -1700,7 +1700,7 @@ typedef struct
 	int commandId;
 } clearDepthCommand_t;
 
-#ifdef OA_BLOOM // IOQ3ZTM
+#ifdef TA_BLOOM
 typedef struct {
 	int		commandId;
 	float	x, y;
@@ -1719,7 +1719,7 @@ typedef enum {
 	RC_VIDEOFRAME,
 	RC_COLORMASK,
 	RC_CLEARDEPTH
-#ifdef OA_BLOOM // IOQ3ZTM
+#ifdef TA_BLOOM
 	,RC_BLOOM
 #endif
 } renderCommand_t;
@@ -1767,7 +1767,7 @@ void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
 void RE_SetColor( const float *rgba );
 void RE_StretchPic ( float x, float y, float w, float h, 
 					  float s1, float t1, float s2, float t2, qhandle_t hShader );
-#ifdef OA_BLOOM
+#ifdef TA_BLOOM
 void RB_SetGL2D (void);
 #endif
 void RE_BeginFrame( stereoFrame_t stereoFrame );
@@ -1783,8 +1783,8 @@ void R_InitFreeType( void );
 void R_DoneFreeType( void );
 void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font);
 
-#ifdef OA_BLOOM
-//Bloom Stuff
+#ifdef TA_BLOOM
+// bloom stuff
 void R_BloomInit( void );
 void R_BloomScreen( int x, int y, int w, int h );
 #endif

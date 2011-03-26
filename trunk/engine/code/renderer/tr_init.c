@@ -1238,7 +1238,7 @@ void R_Init( void ) {
 
 	R_Register();
 
-#ifdef OA_BLOOM
+#ifdef TA_BLOOM
 	R_BloomInit();
 #endif
 
