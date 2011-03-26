@@ -735,6 +735,9 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Stop sun from flickering
+		tess.vertexColors[tess.numVertexes][3] = 255;
+#endif
 		tess.numVertexes++;
 
 		VectorCopy( origin, temp );
@@ -746,6 +749,9 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Stop sun from flickering
+		tess.vertexColors[tess.numVertexes][3] = 255;
+#endif
 		tess.numVertexes++;
 
 		VectorCopy( origin, temp );
@@ -757,6 +763,9 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Stop sun from flickering
+		tess.vertexColors[tess.numVertexes][3] = 255;
+#endif
 		tess.numVertexes++;
 
 		VectorCopy( origin, temp );
@@ -768,6 +777,9 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Stop sun from flickering
+		tess.vertexColors[tess.numVertexes][3] = 255;
+#endif
 		tess.numVertexes++;
 
 		tess.indexes[tess.numIndexes++] = 0;
