@@ -412,6 +412,24 @@ void RE_RenderScene( const refdef_t *fd ) {
 
 	R_RenderView( &parms );
 
+#ifdef OA_BLOOM // IOQ3ZTM
+	if (!(tr.refdef.rdflags & RDF_NOWORLDMODEL))
+	{
+		bloomCommand_t	*cmd;
+
+		cmd = R_GetCommandBuffer( sizeof( *cmd ) );
+		if ( !cmd ) {
+			return;
+		}
+		cmd->commandId = RC_BLOOM;
+
+		cmd->x = fd->x;
+		cmd->y = fd->y;
+		cmd->w = fd->width;
+		cmd->h = fd->height;
+	}
+#endif
+
 	// the next scene rendered in this frame will tack on after this one
 	r_firstSceneDrawSurf = tr.refdef.numDrawSurfs;
 	r_firstSceneEntity = r_numentities;

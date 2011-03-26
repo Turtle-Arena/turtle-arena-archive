@@ -913,10 +913,6 @@ typedef struct {
 	qboolean	projection2D;	// if qtrue, drawstretchpic doesn't need to change modes
 	byte		color2D[4];
 	qboolean	vertexes2D;		// shader needs to be finished
-#ifdef OA_BLOOM
-	qboolean	doneBloom;		// done bloom this frame
-	qboolean	doneSurfaces;   // done any 3d surfaces already
-#endif
 	trRefEntity_t	entity2D;	// currentEntity will point at this when doing 2D rendering
 } backEndState_t;
 
@@ -1704,6 +1700,14 @@ typedef struct
 	int commandId;
 } clearDepthCommand_t;
 
+#ifdef OA_BLOOM // IOQ3ZTM
+typedef struct {
+	int		commandId;
+	float	x, y;
+	float	w, h;
+} bloomCommand_t;
+#endif
+
 typedef enum {
 	RC_END_OF_LIST,
 	RC_SET_COLOR,
@@ -1715,6 +1719,9 @@ typedef enum {
 	RC_VIDEOFRAME,
 	RC_COLORMASK,
 	RC_CLEARDEPTH
+#ifdef OA_BLOOM // IOQ3ZTM
+	,RC_BLOOM
+#endif
 } renderCommand_t;
 
 
@@ -1779,7 +1786,7 @@ void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font);
 #ifdef OA_BLOOM
 //Bloom Stuff
 void R_BloomInit( void );
-void R_BloomScreen( void );
+void R_BloomScreen( int x, int y, int w, int h );
 #endif
 
 #endif //TR_LOCAL_H
