@@ -114,7 +114,7 @@ ifeq ($(QUAKE3),1)
 							-DTA_WEAPSYS -DTA_PLAYERSYS \
 							-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 							-DTA_WEAPSYS_EX_COMPAT \
-							-DOA_BLOOM -DTA_SPLITVIEW
+							-DTA_BLOOM -DTA_SPLITVIEW
 
 		QUAKE3_CFLAGS =
 
@@ -152,7 +152,7 @@ ifeq ($(QUAKE3),1)
 			#   and currently doesn't support Q3 mods.
 			BUILD_DEFINES = -DIOQUAKE3 -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
 								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
-								-DTA_ITEMSYS -DTA_ITEMSYS_USE_INTERNAL -DTA_WEAPSYS -DOA_BLOOM -DTA_SPLITVIEW
+								-DTA_ITEMSYS -DTA_ITEMSYS_USE_INTERNAL -DTA_WEAPSYS -DTA_BLOOM -DTA_SPLITVIEW
 
 			VERSION=1.36ztm
 
@@ -251,6 +251,7 @@ else # END QUAKE3
 	# ANALOG				Allows players to rotate the camera and move based on the camera angles, not full analog control yet
 	# NET_COMPAT			Working on having Turtle Arena and ioq3turtle run on the same engine.
 	# THIRD_PERSON			Game defaults to third person instead of first person
+	# TA_BLOOM				Post-process bloom light effect, based on code from Open Arena.
 	#####
 	# TA_ITEMSYS			Load items from external text files. Required for TA_WEAPSYS.
 	# TA_ITEMSYS_USE_INTERNAL Use the internal item data. The data can be overriden by external items.
@@ -299,7 +300,7 @@ else # END QUAKE3
 						-DTA_WEAPSYS -DTA_PLAYERSYS \
 						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 						-DTA_WEAPSYS_EX_COMPAT \
-						-DOA_BLOOM -DTA_SPLITVIEW
+						-DTA_BLOOM -DTA_SPLITVIEW
 
 	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
 						-DTA_WEAPSYS_EX -DTA_PLAYERS -DTA_DATA \

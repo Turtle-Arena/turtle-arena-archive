@@ -1147,7 +1147,7 @@ const void	*RB_SwapBuffers( const void *data ) {
 	return (const void *)(cmd + 1);
 }
 
-#ifdef OA_BLOOM // IOQ3ZTM
+#ifdef TA_BLOOM
 /*
 =============
 RB_Bloom
@@ -1214,7 +1214,7 @@ void RB_ExecuteRenderCommands( const void *data ) {
 		case RC_CLEARDEPTH:
 			data = RB_ClearDepth(data);
 			break;
-#ifdef OA_BLOOM // IOQ3ZTM
+#ifdef TA_BLOOM
 		case RC_BLOOM:
 			data = RB_Bloom(data);
 			break;
