@@ -487,10 +487,12 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 		max = 0;
 	}
 
-	// ZTM: FIXME: How should adjust and kerning be delt with?
 	if (adjust <= 0) {
-		adjust = font->kerning;
+		adjust = 0;
 	}
+
+	// Add pre-font kerning to adjust.
+	adjust += font->kerning;
 
 	maxChars = strlen(string);
 	if (limit > 0 && maxChars > limit) {
