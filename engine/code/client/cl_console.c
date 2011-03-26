@@ -585,7 +585,7 @@ void Con_DrawNotify (void)
 			continue;
 		text = con.text + (i % con.totallines)*con.linewidth;
 
-#ifdef TA_SPLITVIEW // ZTM: FIXME: Test to find out if this should check all clients.
+#ifdef TA_SPLITVIEW
 		if (cl.snap.pss[0].pm_type != PM_INTERMISSION
 #ifdef TA_SP
 		&& cl.snap.pss[0].pm_type != PM_SPINTERMISSION
