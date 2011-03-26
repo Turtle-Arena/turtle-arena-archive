@@ -384,7 +384,11 @@ static void DrawSkySide( struct image_s *image, const int mins[2], const int max
 	}
 }
 
+#ifdef IOQ3ZTM // INNER_SKYBOX
+static void DrawSkyBox( shader_t *shader, struct image_s **images )
+#else
 static void DrawSkyBox( shader_t *shader )
+#endif
 {
 	int		i;
 
@@ -447,7 +451,11 @@ static void DrawSkyBox( shader_t *shader )
 			}
 		}
 
+#ifdef IOQ3ZTM // INNER_SKYBOX
+		DrawSkySide( images[sky_texorder[i]],
+#else
 		DrawSkySide( shader->sky.outerbox[sky_texorder[i]],
+#endif
 			         sky_mins_subd,
 					 sky_maxs_subd );
 	}
@@ -708,6 +716,7 @@ void RB_DrawSun( void ) {
 	if ( !r_drawSun->integer ) {
 		return;
 	}
+
 	qglLoadMatrixf( backEnd.viewParms.world.modelMatrix );
 	qglTranslatef (backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2]);
 
@@ -735,7 +744,7 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Stop sun from flickering
+#ifdef IOQ3ZTM // ZTM: Should set alpha too, right?
 		tess.vertexColors[tess.numVertexes][3] = 255;
 #endif
 		tess.numVertexes++;
@@ -749,7 +758,7 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Stop sun from flickering
+#ifdef IOQ3ZTM
 		tess.vertexColors[tess.numVertexes][3] = 255;
 #endif
 		tess.numVertexes++;
@@ -763,7 +772,7 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Stop sun from flickering
+#ifdef IOQ3ZTM
 		tess.vertexColors[tess.numVertexes][3] = 255;
 #endif
 		tess.numVertexes++;
@@ -777,7 +786,7 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Stop sun from flickering
+#ifdef IOQ3ZTM
 		tess.vertexColors[tess.numVertexes][3] = 255;
 #endif
 		tess.numVertexes++;
@@ -834,7 +843,11 @@ void RB_StageIteratorSky( void ) {
 		GL_State( 0 );
 		qglTranslatef (backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2]);
 
+#ifdef IOQ3ZTM // INNER_SKYBOX
+		DrawSkyBox( tess.shader, tess.shader->sky.outerbox );
+#else
 		DrawSkyBox( tess.shader );
+#endif
 
 		qglPopMatrix();
 	}
@@ -846,7 +859,19 @@ void RB_StageIteratorSky( void ) {
 	RB_StageIteratorGeneric();
 
 	// draw the inner skybox
+#ifdef IOQ3ZTM // INNER_SKYBOX
+	if ( tess.shader->sky.innerbox[0] && tess.shader->sky.innerbox[0] != tr.defaultImage ) {
+		qglColor3f( tr.identityLight, tr.identityLight, tr.identityLight );
+		
+		qglPushMatrix ();
+		GL_State( 0 );
+		qglTranslatef (backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2]);
 
+		DrawSkyBox( tess.shader, tess.shader->sky.innerbox );
+
+		qglPopMatrix();
+	}
+#endif
 
 	// back to normal depth range
 	qglDepthRange( 0.0, 1.0 );
