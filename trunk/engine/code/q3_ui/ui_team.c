@@ -166,7 +166,11 @@ void TeamMain_MenuInit( void )
 	s_teammain.joinred.generic.callback = TeamMain_MenuEvent;
 	s_teammain.joinred.generic.x        = 320;
 	s_teammain.joinred.generic.y        = y;
+#ifdef TA_MISC
+	s_teammain.joinred.string           = "Join Red";
+#else
 	s_teammain.joinred.string           = "JOIN RED";
+#endif
 	s_teammain.joinred.style            = UI_CENTER|UI_SMALLFONT;
 	s_teammain.joinred.color            = colorRed;
 	y += 20;
@@ -177,7 +181,11 @@ void TeamMain_MenuInit( void )
 	s_teammain.joinblue.generic.callback = TeamMain_MenuEvent;
 	s_teammain.joinblue.generic.x        = 320;
 	s_teammain.joinblue.generic.y        = y;
+#ifdef TA_MISC
+	s_teammain.joinblue.string           = "Join Blue";
+#else
 	s_teammain.joinblue.string           = "JOIN BLUE";
+#endif
 	s_teammain.joinblue.style            = UI_CENTER|UI_SMALLFONT;
 	s_teammain.joinblue.color            = colorRed;
 	y += 20;
@@ -188,7 +196,11 @@ void TeamMain_MenuInit( void )
 	s_teammain.joingame.generic.callback = TeamMain_MenuEvent;
 	s_teammain.joingame.generic.x        = 320;
 	s_teammain.joingame.generic.y        = y;
+#ifdef TA_MISC
+	s_teammain.joingame.string           = "Join Game";
+#else
 	s_teammain.joingame.string           = "JOIN GAME";
+#endif
 	s_teammain.joingame.style            = UI_CENTER|UI_SMALLFONT;
 	s_teammain.joingame.color            = colorRed;
 	y += 20;
@@ -199,7 +211,11 @@ void TeamMain_MenuInit( void )
 	s_teammain.spectate.generic.callback = TeamMain_MenuEvent;
 	s_teammain.spectate.generic.x        = 320;
 	s_teammain.spectate.generic.y        = y;
+#ifdef TA_MISC
+	s_teammain.spectate.string           = "Spectate";
+#else
 	s_teammain.spectate.string           = "SPECTATE";
+#endif
 	s_teammain.spectate.style            = UI_CENTER|UI_SMALLFONT;
 	s_teammain.spectate.color            = colorRed;
 	y += 20;
@@ -211,7 +227,11 @@ void TeamMain_MenuInit( void )
 	s_teammain.hide.generic.callback = TeamMain_MenuEvent;
 	s_teammain.hide.generic.x        = 320;
 	s_teammain.hide.generic.y        = y;
-	s_teammain.hide.string           = "HIDE";
+#ifdef TA_MISC
+	s_teammain.hide.string           = "Hide Viewport";
+#else
+	s_teammain.hide.string           = "HIDE VIEWPORT";
+#endif
 	s_teammain.hide.style            = UI_CENTER|UI_SMALLFONT;
 	s_teammain.hide.color            = colorRed;
 	y += 20;
