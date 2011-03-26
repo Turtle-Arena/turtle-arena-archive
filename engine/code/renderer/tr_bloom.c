@@ -91,10 +91,7 @@ static struct {
 } bloom;
 
 
-static ID_INLINE void R_Bloom_Quad( int width, int height, float texX, float texY, float texWidth, float texHeight ) {
-	int x = 0;
-	int y = 0;
-	x = 0;
+static ID_INLINE void R_Bloom_Quad( int x, int y, int width, int height, float texX, float texY, float texWidth, float texHeight ) {
 	y += glConfig.vidHeight - height;
 	width += x;
 	height += y;
@@ -195,12 +192,13 @@ void R_InitBloomTextures( void )
 R_Bloom_DrawEffect
 =================
 */
-static void R_Bloom_DrawEffect( void )
+static void R_Bloom_DrawEffect( int x, int y, int w, int h )
 {
 	GL_Bind( bloom.effect.texture );
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE );
 	qglColor4f( r_bloom_alpha->value, r_bloom_alpha->value, r_bloom_alpha->value, 1.0f );
-	R_Bloom_Quad( glConfig.vidWidth, glConfig.vidHeight, 0, 0, bloom.effect.readW, bloom.effect.readH );
+	R_Bloom_Quad( x, y - glConfig.vidHeight - h, w, h, x / (float)glConfig.vidWidth, (1.0f / (glConfig.vidHeight / h)) - (y / glConfig.vidHeight),
+			(w / (float)glConfig.vidWidth) * bloom.effect.readW, (h / (float)glConfig.vidHeight) * bloom.effect.readH );
 }
 
 
@@ -219,7 +217,7 @@ static void R_Bloom_WarsowEffect( void )
 	//Take the backup texture and downscale it
 	GL_Bind( bloom.screen.texture );
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO );
-	R_Bloom_Quad( bloom.work.width, bloom.work.height, 0, 0, bloom.screen.readW, bloom.screen.readH );
+	R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 0, 0, bloom.screen.readW, bloom.screen.readH );
 	//Copy downscaled framebuffer into a texture
 	GL_Bind( bloom.effect.texture );
 	qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, bloom.work.width, bloom.work.height );
@@ -229,7 +227,7 @@ static void R_Bloom_WarsowEffect( void )
 		GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO );
 
 		for( i = 0; i < r_bloom_darken->integer; i++ ) {
-			R_Bloom_Quad( bloom.work.width, bloom.work.height, 
+			R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 
 				0, 0, 
 				bloom.effect.readW, bloom.effect.readH );
 		}
@@ -287,7 +285,7 @@ static void R_Bloom_WarsowEffect( void )
 			y = (j - k) * ( 2 / 480.0f ) * bloom.effect.readH;
 #endif
 
-			R_Bloom_Quad( bloom.work.width, bloom.work.height, x, y, bloom.effect.readW, bloom.effect.readH );
+			R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, x, y, bloom.effect.readW, bloom.effect.readH );
 		}
 	}
 	qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, bloom.work.width, bloom.work.height );
@@ -313,7 +311,7 @@ static void R_Bloom_RestoreScreen( void ) {
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO );
 	GL_Bind( bloom.screen.texture );
 	qglColor4f( 1, 1, 1, 1 );
-	R_Bloom_Quad( bloom.work.width, bloom.work.height, 0, 0,
+	R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 0, 0,
 		bloom.work.width / (float)bloom.screen.width,
 		bloom.work.height / (float)bloom.screen.height );
 }
@@ -333,7 +331,7 @@ Scale the copied screen back to the sample size used for subsequent passes
 	GL_Bind( bloom.screen.texture );
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO );
 	//Downscale it
-	R_Bloom_Quad( bloom.work.width, bloom.work.height, 0, 0, bloom.screen.readW, bloom.screen.readH );
+	R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 0, 0, bloom.screen.readW, bloom.screen.readH );
 #if 1
 	GL_Bind( bloom.effect.texture );
 	qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, bloom.work.width, bloom.work.height );
@@ -343,7 +341,7 @@ Scale the copied screen back to the sample size used for subsequent passes
 		GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO );
 
 		for( i = 0; i < r_bloom_darken->integer; i++ ) {
-			R_Bloom_Quad( bloom.work.width, bloom.work.height, 
+			R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 
 				0, 0, 
 				bloom.effect.readW, bloom.effect.readH );
 		}
@@ -388,7 +386,7 @@ static void R_Bloom_CreateEffect( void ) {
 			r = 2.0f /(range*2+1)*(1 - x*x/(float)(range*range));
 //			r *= r_bloom_darken->value;
 			qglColor4f(r, r, r, 1);
-			R_Bloom_Quad( bloom.work.width, bloom.work.height, 
+			R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 
 				xoffset, yoffset, 
 				bloom.effect.readW, bloom.effect.readH );
 //				bloom.screen.readW, bloom.screen.readH );
@@ -404,15 +402,10 @@ static void R_Bloom_CreateEffect( void ) {
 R_BloomScreen
 =================
 */
-void R_BloomScreen( void )
+void R_BloomScreen( int x, int y, int w, int h )
 {
 	if( !r_bloom->integer )
 		return;
-	if ( backEnd.doneBloom )
-		return;
-	if ( !backEnd.doneSurfaces )
-		return;
-	backEnd.doneBloom = qtrue;
 	if( !bloom.started
 #ifdef IOQ3ZTM // Check if we need to restart bloom
 		|| bloom.fullscreen != r_fullscreen->integer
@@ -454,7 +447,7 @@ void R_BloomScreen( void )
 	// restore the screen-backup to the screen
 	R_Bloom_RestoreScreen();
 	// Do the final pass using the bloom texture for the final effect
-	R_Bloom_DrawEffect ();
+	R_Bloom_DrawEffect (x, y, w, h);
 }
 
 
