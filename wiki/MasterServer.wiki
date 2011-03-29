@@ -1,0 +1,3 @@
+#summary Turtle Arena master server
+
+Turtle Arena's current master server is located at dpmaster.splintertown.org (sponsored by MasterSplinter from the forums). It run a modified dpmaster called dpmaster-ta. dpmaster-ta source code is located on bitbucket at https://bitbucket.org/zturtleman/dpmaster-ta/
