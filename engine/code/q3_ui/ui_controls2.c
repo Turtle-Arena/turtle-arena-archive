@@ -296,7 +296,11 @@ static vec4_t controls_binding_color  = {1.00f, 0.43f, 0.00f, 1.00f};
 static bind_t g_bindings[] = 
 {
 	{"+scores",			"show scores",		ID_SHOWSCORES,	ANIM_IDLE,		K_TAB,			-1,		-1, -1},
+#ifdef IOQ3ZTM
+	{"+button2",		"use item",			ID_USEITEM,		ANIM_IDLE,		K_ENTER,	K_MOUSE2,	-1, -1},
+#else
 	{"+button2",		"use item",			ID_USEITEM,		ANIM_IDLE,		K_ENTER,		-1,		-1, -1},
+#endif
 #ifdef TURTLEARENA // ALWAYS_RUN // NO_SPEED_KEY
 	{"+forward", 		"forward",			ID_FORWARD,		ANIM_RUN,		K_UPARROW,		-1,		-1, -1},
 #else
@@ -304,19 +308,30 @@ static bind_t g_bindings[] =
 	{"+forward", 		"walk forward",		ID_FORWARD,		ANIM_WALK,		K_UPARROW,		-1,		-1, -1},
 #endif
 	{"+back", 			"backpedal",		ID_BACKPEDAL,	ANIM_BACK,		K_DOWNARROW,	-1,		-1, -1},
+#ifdef IOQ3ZTM
+	{"+moveleft", 		"step left",		ID_MOVELEFT,	ANIM_STEPLEFT,	'a',			-1,		-1, -1},
+	{"+moveright", 		"step right",		ID_MOVERIGHT,	ANIM_STEPRIGHT,	'd',			-1,		-1, -1},
+	{"+moveup",			"up / jump",		ID_MOVEUP,		ANIM_JUMP,		K_SPACE,		'/',	-1, -1},
+	{"+movedown",		"down / crouch",	ID_MOVEDOWN,	ANIM_CROUCH,	'c',			'.',	-1, -1},
+#else
 	{"+moveleft", 		"step left",		ID_MOVELEFT,	ANIM_STEPLEFT,	',',			-1,		-1, -1},
 	{"+moveright", 		"step right",		ID_MOVERIGHT,	ANIM_STEPRIGHT,	'.',			-1,		-1, -1},
 	{"+moveup",			"up / jump",		ID_MOVEUP,		ANIM_JUMP,		K_SPACE,		-1,		-1, -1},
 	{"+movedown",		"down / crouch",	ID_MOVEDOWN,	ANIM_CROUCH,	'c',			-1,		-1, -1},
+#endif
 	{"+left", 			"turn left",		ID_LEFT,		ANIM_TURNLEFT,	K_LEFTARROW,	-1,		-1, -1},
 	{"+right", 			"turn right",		ID_RIGHT,		ANIM_TURNRIGHT,	K_RIGHTARROW,	-1,		-1, -1},
 	{"+strafe", 		"sidestep / turn",	ID_STRAFE,		ANIM_IDLE,		K_ALT,			-1,		-1, -1},
 	{"+lookup", 		"look up",			ID_LOOKUP,		ANIM_LOOKUP,	K_PGDN,			-1,		-1, -1},
 	{"+lookdown", 		"look down",		ID_LOOKDOWN,	ANIM_LOOKDOWN,	K_DEL,			-1,		-1, -1},
+#ifdef IOQ3ZTM
+	{"+mlook", 			"mouse look",		ID_MOUSELOOK,	ANIM_IDLE,		'\\',			-1,		-1, -1},
+#else
 	{"+mlook", 			"mouse look",		ID_MOUSELOOK,	ANIM_IDLE,		'/',			-1,		-1, -1},
+#endif
 	{"centerview", 		"center view",		ID_CENTERVIEW,	ANIM_IDLE,		K_END,			-1,		-1, -1},
 #ifdef TURTLEARENA // LOCKON
-	{"+lockon", 		"lock-on",			ID_LOCKON,		ANIM_IDLE,		K_MOUSE3,		'l',	-1, -1},
+	{"+lockon", 		"lock-on",			ID_LOCKON,		ANIM_IDLE,		K_SHIFT,		-1,		-1, -1},
 #endif
 #ifndef TURTLEARENA // NOZOOM
 	{"+zoom", 			"zoom view",		ID_ZOOMVIEW,	ANIM_IDLE,		-1,				-1,		-1, -1},
@@ -332,14 +347,22 @@ static bind_t g_bindings[] =
 	{"weapon 8",		"plasma gun",		ID_WEAPON8,		ANIM_WEAPON8,	'8',			-1,		-1, -1},
 	{"weapon 9",		"BFG",				ID_WEAPON9,		ANIM_WEAPON9,	'9',			-1,		-1, -1},
 #endif
+#ifdef IOQ3ZTM
+	{"+attack", 		"attack",			ID_ATTACK,		ANIM_ATTACK,	K_CTRL,		K_MOUSE1,	-1, -1},
+#else
 	{"+attack", 		"attack",			ID_ATTACK,		ANIM_ATTACK,	K_CTRL,			-1,		-1, -1},
+#endif
 #ifdef TA_WEAPSYS_EX
-	{"+button13",		"drop weapon",		ID_WEAPDROP,	ANIM_IDLE,		';',			-1,		-1, -1},
+	{"+button13",		"drop weapon",		ID_WEAPDROP,	ANIM_IDLE,		'e',			';',	-1, -1},
 #else
 	{"weapprev",		"prev weapon",		ID_WEAPPREV,	ANIM_IDLE,		'[',			-1,		-1, -1},
 	{"weapnext", 		"next weapon",		ID_WEAPNEXT,	ANIM_IDLE,		']',			-1,		-1, -1},
 #endif
+#ifdef IOQ3ZTM
+	{"+button3", 		"gesture",			ID_GESTURE,		ANIM_GESTURE,	-1,				-1,		-1, -1},
+#else
 	{"+button3", 		"gesture",			ID_GESTURE,		ANIM_GESTURE,	K_MOUSE3,		-1,		-1, -1},
+#endif
 	{"messagemode", 	"chat",				ID_CHAT,		ANIM_CHAT,		't',			-1,		-1, -1},
 #ifdef TA_MISC // team chat
 	{"messagemode2", 	"chat - team",		ID_CHAT2,		ANIM_CHAT,		'y',				-1,		-1, -1},
