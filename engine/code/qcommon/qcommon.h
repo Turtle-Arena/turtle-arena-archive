@@ -258,7 +258,7 @@ PROTOCOL
 // 4 TA 0.4
 // 3 TA 0.3 development
 // 2 TA 0.2
-// 1 Initial release
+// 68 Initial release
 #else
 #define	PROTOCOL_VERSION	68
 // 1.31 - 67
