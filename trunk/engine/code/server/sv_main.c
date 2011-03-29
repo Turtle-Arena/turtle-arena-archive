@@ -356,6 +356,12 @@ void SV_MasterHeartbeat(const char *message)
 #endif
 	int			netenabled;
 
+#ifdef IOQ3ZTM // SV_PUBLIC
+	// Do not send heartbeats in single player.
+	if (Cvar_VariableValue("ui_singlePlayerActive"))
+		return;
+#endif
+
 	netenabled = Cvar_VariableIntegerValue("net_enabled");
 
 #ifdef IOQ3ZTM // SV_PUBLIC
