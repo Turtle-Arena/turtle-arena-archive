@@ -18,6 +18,7 @@
 = Misc =
 
   * NewFeatures
+  * MasterServer
 
 = Tools =
 Toots used to create Turtle Arena.
