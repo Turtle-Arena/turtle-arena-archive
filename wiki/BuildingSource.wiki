@@ -41,4 +41,4 @@ See [BuildingSourceOnLinux Building source on Linux].
 
 = Mac OS X =
 
-See [BuildingSourceOnMacOXS Building source on Mac OS X].
+See [BuildingSourceOnMacOSX Building source on Mac OS X].
