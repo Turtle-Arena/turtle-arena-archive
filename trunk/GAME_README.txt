@@ -1,4 +1,4 @@
-Turtle Arena is a open-source cross-platform Ninja Turtle fangame using a modified version of the ioquake3 engine.
+Turtle Arena is a free and open source cross-platform third-person action game using a modified version of the ioquake3 engine.
 
 == Installing ==
 Extract Turtle Arena into a directory. It can be placed anywhere, but suggestions below
