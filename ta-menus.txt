@@ -1,4 +1,4 @@
-Turtle Arena menu design. Somethings are done, others have not.
+Turtle Arena menu design. Somethings are done, others are not.
 
 :MAIN
 PLAY
