@@ -93,7 +93,11 @@ void InServer_Event( void *ptr, int notification ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_CHANGEMAP:
-		UI_StartServerMenu( trap_Cvar_VariableValue("ui_singlePlayerActive") == 0 );
+#ifdef IOQ3ZTM // SV_PUBLIC
+		UI_StartServerMenu( trap_Cvar_VariableValue("sv_public") != -2 );
+#else
+		UI_StartServerMenu( trap_Cvar_VariableValue("g_gametype") != GT_SINGLE_PLAYER );
+#endif
 		break;
 
 	case ID_RESTART:

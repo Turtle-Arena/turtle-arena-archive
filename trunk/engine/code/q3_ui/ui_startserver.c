@@ -1019,14 +1019,6 @@ static void ServerOptions_Start( void ) {
 	trap_Cvar_SetValue( "cl_localClients", localClients );
 #endif
 
-#ifdef TA_SP
-	// Don't allow clients to join in non-multiplayer.
-	if (!s_serveroptions.multiplayer)
-		trap_Cvar_SetValue( "ui_singlePlayerActive", 2 );
-	else
-		trap_Cvar_SetValue( "ui_singlePlayerActive", 0 );
-#endif
-
 	switch( s_serveroptions.gametype ) {
 	case GT_FFA:
 	default:
@@ -1098,7 +1090,8 @@ static void ServerOptions_Start( void ) {
 		trap_Cvar_SetValue( "ui_publicServer", Com_Clamp( 0, 1, publicserver ) );
 		trap_Cvar_SetValue( "sv_public", Com_Clamp( 0, 1, publicserver ) );
 	} else {
-		trap_Cvar_SetValue( "sv_public", 0 );
+		// Don't allow clients to join in non-multiplayer.
+		trap_Cvar_SetValue( "sv_public", -2 );
 	}
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 1, dedicated ) );
 #else
