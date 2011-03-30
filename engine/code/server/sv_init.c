@@ -852,6 +852,9 @@ void SV_Shutdown( char *finalmsg ) {
 
 	Cvar_Set( "sv_running", "0" );
 	Cvar_Set("ui_singlePlayerActive", "0");
+#ifdef IOQ3ZTM // SV_PUBLIC
+	Cvar_Set("sv_public", "0");
+#endif
 
 	Com_Printf( "---------------------------\n" );
 
