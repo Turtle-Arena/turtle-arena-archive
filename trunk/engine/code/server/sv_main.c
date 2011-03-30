@@ -358,8 +358,14 @@ void SV_MasterHeartbeat(const char *message)
 
 #ifdef IOQ3ZTM // SV_PUBLIC
 	// Do not send heartbeats in single player.
-	if (Cvar_VariableValue("ui_singlePlayerActive"))
+	if (Cvar_VariableValue("ui_singlePlayerActive")
+#ifndef TA_SP
+		|| Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER
+#endif
+		)
+	{
 		return;
+	}
 #endif
 
 	netenabled = Cvar_VariableIntegerValue("net_enabled");
