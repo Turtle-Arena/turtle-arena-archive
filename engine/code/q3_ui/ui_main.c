@@ -250,7 +250,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE | CVAR_LATCH },
 
 #ifdef TA_SP
-	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
+	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_ROM},
 	{ &ui_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM },
 	{ &ui_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO },
 #endif

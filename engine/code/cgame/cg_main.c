@@ -482,7 +482,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_enableDust, "g_enableDust", "0", CVAR_SERVERINFO},
 	{ &cg_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO},
 #ifdef TA_SP
-	{ &cg_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
+	{ &cg_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_ROM},
 #else
 	{ &cg_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_USERINFO},
 #endif
