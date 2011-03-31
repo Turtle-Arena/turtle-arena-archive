@@ -563,7 +563,12 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 	int		len;
 
 	// shift-insert is paste
-	if ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keys[K_SHIFT].down ) {
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+	if ( ( ( key == K_INS ) || ( ( key == K_KP_INS && !keys[K_KP_NUMLOCK].down ) ) ) && keys[K_SHIFT].down )
+#else
+	if ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keys[K_SHIFT].down )
+#endif
+	{
 		Field_Paste( edit );
 		return;
 	}
@@ -773,7 +778,12 @@ void Console_Key (int key) {
 
 	// command history (ctrl-p ctrl-n for unix style)
 
-	if ( (key == K_MWHEELUP && keys[K_SHIFT].down) || ( key == K_UPARROW ) || ( key == K_KP_UPARROW ) ||
+	if ( (key == K_MWHEELUP && keys[K_SHIFT].down) || ( key == K_UPARROW ) ||
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		( key == K_KP_UPARROW && !keys[K_KP_NUMLOCK].down) ||
+#else
+		( key == K_KP_UPARROW ) ||
+#endif
 		 ( ( tolower(key) == 'p' ) && keys[K_CTRL].down ) ) {
 		if ( nextHistoryLine - historyLine < COMMAND_HISTORY 
 			&& historyLine > 0 ) {
@@ -783,7 +793,12 @@ void Console_Key (int key) {
 		return;
 	}
 
-	if ( (key == K_MWHEELDOWN && keys[K_SHIFT].down) || ( key == K_DOWNARROW ) || ( key == K_KP_DOWNARROW ) ||
+	if ( (key == K_MWHEELDOWN && keys[K_SHIFT].down) || ( key == K_DOWNARROW ) ||
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		( key == K_KP_DOWNARROW && !keys[K_KP_NUMLOCK].down) ||
+#else
+		( key == K_KP_DOWNARROW ) ||
+#endif
 		 ( ( tolower(key) == 'n' ) && keys[K_CTRL].down ) ) {
 		historyLine++;
 		if (historyLine >= nextHistoryLine) {
