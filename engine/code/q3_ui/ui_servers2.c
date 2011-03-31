@@ -1537,7 +1537,13 @@ static sfxHandle_t ArenaServers_MenuKey( int key ) {
 		return menu_move_sound;
 	}
 
-	if( ( key == K_DEL || key == K_KP_DEL ) && ( g_servertype == UIAS_FAVORITES ) &&
+	if( ( key == K_DEL || 
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		(key == K_KP_DEL && !trap_Key_IsDown(K_KP_NUMLOCK))
+#else
+		key == K_KP_DEL
+#endif
+		) && ( g_servertype == UIAS_FAVORITES ) &&
 		( Menu_ItemAtCursor( &g_arenaservers.menu) == &g_arenaservers.list ) ) {
 		ArenaServers_Remove();
 		ArenaServers_UpdateMenu();

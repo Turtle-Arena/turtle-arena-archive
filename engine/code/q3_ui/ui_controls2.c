@@ -1550,9 +1550,14 @@ static sfxHandle_t Controls_MenuKey( int key )
 	{
 		switch (key)
 		{
+			case K_KP_DEL:
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
+				break;
+			}
+#endif
 			case K_BACKSPACE:
 			case K_DEL:
-			case K_KP_DEL:
 				key = -1;
 				break;
 		
