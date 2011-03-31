@@ -141,11 +141,19 @@ MULTIPLAYER MENU (SERVER BROWSER)
 
 static const char *master_items[] = {
 	"Local",
+#ifdef IOQ3ZTM // MASTER_NAMES
+	"Master Server",
+	"Master Server 2",
+	"Master Server 3",
+	"Master Server 4",
+	"Master Server 5",
+#else
 	"Internet1",
 	"Internet2",
 	"Internet3",
 	"Internet4",
 	"Internet5",
+#endif
 	"Favorites",
 	NULL
 };
@@ -1595,7 +1603,11 @@ static void ArenaServers_MenuInit( void ) {
 
 	y = 80;
 	g_arenaservers.master.generic.type			= MTYPE_SPINCONTROL;
+#ifdef IOQ3ZTM // MASTER_NAMES
+	g_arenaservers.master.generic.name			= "Source:";
+#else
 	g_arenaservers.master.generic.name			= "Servers:";
+#endif
 	g_arenaservers.master.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	g_arenaservers.master.generic.callback		= ArenaServers_Event;
 	g_arenaservers.master.generic.id			= ID_MASTER;
