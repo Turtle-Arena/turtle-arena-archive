@@ -577,6 +577,12 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 	len = strlen( edit->buffer );
 
 	switch ( key ) {
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		case K_KP_DEL:
+			if (keys[K_KP_NUMLOCK].down) {
+				break;
+			}
+#endif
 		case K_DEL:
 			if ( edit->cursor < len ) {
 				memmove( edit->buffer + edit->cursor, 
@@ -584,26 +590,56 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 			}
 			break;
 
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		case K_KP_RIGHTARROW:
+			if (keys[K_KP_NUMLOCK].down) {
+				break;
+			}
+#endif
 		case K_RIGHTARROW:
 			if ( edit->cursor < len ) {
 				edit->cursor++;
 			}
 			break;
 
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		case K_KP_LEFTARROW:
+			if (keys[K_KP_NUMLOCK].down) {
+				break;
+			}
+#endif
 		case K_LEFTARROW:
 			if ( edit->cursor > 0 ) {
 				edit->cursor--;
 			}
 			break;
 
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		case K_KP_HOME:
+			if (keys[K_KP_NUMLOCK].down) {
+				break;
+			}
+#endif
 		case K_HOME:
 			edit->cursor = 0;
 			break;
 
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		case K_KP_END:
+			if (keys[K_KP_NUMLOCK].down) {
+				break;
+			}
+#endif
 		case K_END:
 			edit->cursor = len;
 			break;
 
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		case K_KP_INS:
+			if (keys[K_KP_NUMLOCK].down) {
+				break;
+			}
+#endif
 		case K_INS:
 			key_overstrikeMode = !key_overstrikeMode;
 			break;
@@ -812,12 +848,22 @@ void Console_Key (int key) {
 	}
 
 	// console scrolling
-	if ( key == K_PGUP ) {
+	if ( key == K_PGUP
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		|| ( key == K_KP_PGUP && !keys[K_KP_NUMLOCK].down)
+#endif
+		)
+	{
 		Con_PageUp();
 		return;
 	}
 
-	if ( key == K_PGDN) {
+	if ( key == K_PGDN
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+		|| ( key == K_KP_PGDN && !keys[K_KP_NUMLOCK].down)
+#endif
+		)
+	{
 		Con_PageDown();
 		return;
 	}
@@ -841,13 +887,23 @@ void Console_Key (int key) {
 	}
 
 	// ctrl-home = top of console
-	if ( key == K_HOME && keys[K_CTRL].down ) {
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+	if ( ( key == K_HOME || ( key == K_KP_HOME && !keys[K_KP_NUMLOCK].down) ) &&  keys[K_CTRL].down )
+#else
+	if ( key == K_HOME && keys[K_CTRL].down )
+#endif
+	{
 		Con_Top();
 		return;
 	}
 
 	// ctrl-end = bottom of console
-	if ( key == K_END && keys[K_CTRL].down ) {
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+	if ( ( key == K_END || ( key == K_KP_END && !keys[K_KP_NUMLOCK].down) ) &&  keys[K_CTRL].down )
+#else
+	if ( key == K_END && keys[K_CTRL].down )
+#endif
+	{
 		Con_Bottom();
 		return;
 	}
