@@ -1486,6 +1486,12 @@ void Key_ClearStates (void)
 	anykeydown = 0;
 
 	for ( i=0 ; i < MAX_KEYS ; i++ ) {
+#ifdef IOQ3ZTM // LOCK_STATE
+		if (i == K_SCROLLOCK || i == K_KP_NUMLOCK || i == K_CAPSLOCK) {
+			continue;
+		}
+#endif
+
 		if ( keys[i].down ) {
 			CL_KeyEvent( i, qfalse, 0 );
 
