@@ -1379,7 +1379,11 @@ void CL_KeyDownEvent( int key, unsigned time )
 {
 	keys[key].down = qtrue;
 		keys[key].repeats++;
-	if( keys[key].repeats == 1 )
+	if( keys[key].repeats == 1
+#ifdef IOQ3ZTM // LOCK_STATE
+		&& key != K_SCROLLOCK && key != K_KP_NUMLOCK && key != K_CAPSLOCK
+#endif
+		)
 			anykeydown++;
 
 	if( keys[K_ALT].down && key == K_ENTER )
@@ -1472,6 +1476,9 @@ void CL_KeyUpEvent( int key, unsigned time )
 {
 	keys[key].repeats = 0;
 	keys[key].down = qfalse;
+#ifdef IOQ3ZTM // LOCK_STATE
+	if (key != K_SCROLLOCK && key != K_KP_NUMLOCK && key != K_CAPSLOCK)
+#endif
 	anykeydown--;
 	if (anykeydown < 0) {
 		anykeydown = 0;
