@@ -227,7 +227,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_proxMineTimeout, "g_proxMineTimeout", "20000", 0, 0, qfalse },
 #endif
 #ifdef TA_SP
-	{ &g_singlePlayer, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM, 0, qfalse, qfalse  },
+	{ &g_singlePlayer, "ui_singlePlayerActive", "0", CVAR_ROM, 0, qfalse, qfalse  },
 	{ &g_spSaveData, "g_spSaveData", "", CVAR_SYSTEMINFO, 0, qfalse, qfalse  },
 	{ &g_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM, 0, 0, qfalse },
 	{ &g_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO, 0, 0, qfalse },
