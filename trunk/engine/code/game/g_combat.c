@@ -353,6 +353,7 @@ TossClientCubes
 */
 extern gentity_t	*neutralObelisk;
 
+#ifdef MISSIONPACK_HARVESTER
 void TossClientCubes( gentity_t *self ) {
 	gitem_t		*item;
 	gentity_t	*drop;
@@ -396,6 +397,7 @@ void TossClientCubes( gentity_t *self ) {
 	drop->think = G_FreeEntity;
 	drop->spawnflags = self->client->sess.sessionTeam;
 }
+#endif
 
 
 /*

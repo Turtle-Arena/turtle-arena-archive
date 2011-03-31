@@ -1030,7 +1030,9 @@ extern	vmCvar_t	g_obeliskHealth;
 extern	vmCvar_t	g_obeliskRegenPeriod;
 extern	vmCvar_t	g_obeliskRegenAmount;
 extern	vmCvar_t	g_obeliskRespawnDelay;
+#ifdef MISSIONPACK_HARVESTER
 extern	vmCvar_t	g_cubeTimeout;
+#endif
 extern	vmCvar_t	g_redteam;
 extern	vmCvar_t	g_blueteam;
 extern	vmCvar_t	g_smoothClients;
