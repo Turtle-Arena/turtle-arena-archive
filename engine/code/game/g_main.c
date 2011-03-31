@@ -92,7 +92,9 @@ vmCvar_t	g_obeliskHealth;
 vmCvar_t	g_obeliskRegenPeriod;
 vmCvar_t	g_obeliskRegenAmount;
 vmCvar_t	g_obeliskRespawnDelay;
+#ifdef MISSIONPACK_HARVESTER
 vmCvar_t	g_cubeTimeout;
+#endif
 vmCvar_t	g_redteam;
 vmCvar_t	g_blueteam;
 #ifndef TA_SP
@@ -207,7 +209,9 @@ static cvarTable_t		gameCvarTable[] = {
 #endif
 	{ &g_obeliskRespawnDelay, "g_obeliskRespawnDelay", "10", CVAR_SERVERINFO, 0, qfalse },
 
+#ifdef MISSIONPACK_HARVESTER
 	{ &g_cubeTimeout, "g_cubeTimeout", "30", 0, 0, qfalse },
+#endif
 #ifndef IOQ3ZTM // DEFAULT_TEAMS
 	{ &g_redteam, "g_redteam", "Stroggs", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
 	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
