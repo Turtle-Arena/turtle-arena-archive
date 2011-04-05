@@ -35,13 +35,16 @@ First stable playable release.
 0.6 series focuses on players, map themes, and multiplayer maps. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game. Comparable to TMNT: Mutant Melee and TMNT Smash-up in someways. The plan is to have development releases leading up to the completed 0.6 release.
 
 === 0.5.0 ===
-  * Four player splitscreen
-    * Support multiple listeners, play sounds relative to all players.
+  * DONE: Four player splitscreen.
+  * DONE: Allow server public (internet) status to be changed anytime.
+  * DONE: Allow non-dedicated internet servers.
   * Finished '2D mode' path system for players
   * Single camera mode for '2D maps' (set "2dmode" "1" in worldspawn to focus on local players), like the camera in Super Smash Bros. and TMNT Smash-up
 
 === 0.5.1 ===
-  * Add support for single camera mode focusing on all players (set "2dmode" "1" in worldspawn for local clients or "2" for everyone)
+  * Finish '2D mode'
+    * Draw HUDs for all local players.
+    * Focus on all local players (or all players in level depending on map settings).
   * Remodel and animate Casey
   * Finish breakable/pushable objects and brushes code
   * (Haven't decided other goals, see 0.5.x for ideas)
