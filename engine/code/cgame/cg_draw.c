@@ -3005,7 +3005,7 @@ static void CG_DrawSPIntermission( void ) {
 	CG_HudPlacement(HUD_CENTER);
 
 	if (cg_singlePlayerActive.integer) {
-		if (p[0] == '*') {
+		if (cgs.clientinfo[ cg.cur_ps->clientNum ].headModelName[0] == '*') {
 			Q_strncpyz(name, cgs.clientinfo[ cg.cur_ps->clientNum ].headModelName+1, sizeof (name));
 		} else {
 			Q_strncpyz(name, cgs.clientinfo[ cg.cur_ps->clientNum ].headModelName, sizeof (name));
