@@ -160,7 +160,7 @@ wantonpatrol
 
 oncamp
 {
-	sound/voices/male1/imcampinghere.ogg	"I'm campin here"
+	sound/voices/male1/imcampinghere.ogg	"I'm camping here"
 }
 
 onfollow
