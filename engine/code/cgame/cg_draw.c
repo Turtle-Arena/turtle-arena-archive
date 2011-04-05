@@ -2990,7 +2990,7 @@ CG_DrawIntermission
 */
 static void CG_DrawSPIntermission( void ) {
 	char		str[1024];
-	char		*name;
+	char		name[64];
 	vec4_t		color;
 
 	if (!cg.cur_ps->persistant[PERS_LIVES] && !cg.cur_ps->persistant[PERS_CONTINUES]) {
@@ -3005,13 +3005,15 @@ static void CG_DrawSPIntermission( void ) {
 	CG_HudPlacement(HUD_CENTER);
 
 	if (cg_singlePlayerActive.integer) {
-		name = cgs.clientinfo[ cg.cur_ps->clientNum ].headModelName;
-		if (name[0] == '*') {
-			name++;
+		if (p[0] == '*') {
+			Q_strncpyz(name, cgs.clientinfo[ cg.cur_ps->clientNum ].headModelName+1, sizeof (name));
+		} else {
+			Q_strncpyz(name, cgs.clientinfo[ cg.cur_ps->clientNum ].headModelName, sizeof (name));
 		}
+
 		name[0] = toupper(name[0]);
 	} else {
-		name = cgs.clientinfo[ cg.cur_ps->clientNum ].name;
+		Q_strncpyz(name, cgs.clientinfo[ cg.cur_ps->clientNum ].name, sizeof (name));
 	}
 
 	Com_sprintf(str, sizeof (str), "%s got through the level", name);
