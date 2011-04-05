@@ -1139,7 +1139,7 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	// set model
 #ifdef TA_SP // SPMODEL
-	if ( g_singlePlayer.integer == 1 ) {
+	if ( g_singlePlayer.integer ) {
 		Q_strncpyz( model, Info_ValueForKey (userinfo, "spmodel"), sizeof( model ) );
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "spheadmodel"), sizeof( headModel ) );
 	} else
@@ -1249,8 +1249,9 @@ void ClientUserinfoChanged( int clientNum ) {
 
 #ifdef TA_PLAYERSYS
 	// In single player use player model's prefcolors
+	// ZTM: TODO: Add option to use 'auto color' from player.
 #ifdef TA_SP
-	if (g_singlePlayer.integer == 1)
+	if (g_singlePlayer.integer)
 #else
 	if (g_gametype.integer == GT_SINGLE_PLAYER)
 #endif
@@ -1385,6 +1386,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if ( firstTime )
 #endif
 	{
+		// ZTM: TODO: Have a different message for when splitscreen player joins?
 		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 	}
 
@@ -2258,7 +2260,7 @@ qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap)
 	// Reached the end of the single player levels
 	if (Q_stricmp(nextMap, "sp_end") == 0)
 	{
-		if (g_singlePlayer.integer == 1)
+		if (g_singlePlayer.integer)
 		{
 			// Return to the title screen.
 			trap_Cvar_Set("nextmap", "disconnect; sp_complete");

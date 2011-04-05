@@ -1063,6 +1063,9 @@ extern	vmCvar_t	g_laserTag;
 #ifdef TA_PATHSYS // 2DMODE
 extern	vmCvar_t	g_2dmode;
 #endif
+#ifdef IOQ3ZTM // SV_PUBLIC
+extern	vmCvar_t	g_public;
+#endif
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );

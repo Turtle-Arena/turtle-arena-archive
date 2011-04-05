@@ -1091,7 +1091,7 @@ static void ServerOptions_Start( void ) {
 		trap_Cvar_SetValue( "sv_public", Com_Clamp( 0, 1, publicserver ) );
 	} else {
 		// Don't allow clients to join in non-multiplayer.
-		trap_Cvar_SetValue( "sv_public", -2 );
+		trap_Cvar_SetValue( "sv_public", -3 );
 	}
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 1, dedicated ) );
 #else
