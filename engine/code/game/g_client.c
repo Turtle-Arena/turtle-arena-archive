@@ -1645,7 +1645,11 @@ void ClientSpawn(gentity_t *ent) {
 	}
 #endif
 
+#ifdef TURTLEARENA // DROWNING
+	client->ps.powerups[PW_AIR] = level.time + 31000;
+#else
 	client->airOutTime = level.time + 12000;
+#endif
 
 	trap_GetUserinfo( index, userinfo, sizeof(userinfo) );
 	// set max health

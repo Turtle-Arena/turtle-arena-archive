@@ -306,7 +306,7 @@ typedef enum {
 typedef enum {
 	PW_NONE,
 #ifdef TURTLEARENA // POWERS
-	// TODO: Limited time version of PW_AMMOREGEN?
+	// ZTM: TODO: Limited time version of PW_AMMOREGEN?
 	// pw_infinity, // Green [White in TMNT3] crystal: Unlimited Shuriken for a limited period.
 
 	// Limited time powerups
@@ -351,6 +351,10 @@ typedef enum {
 	PW_DOUBLER,
 	PW_AMMOREGEN,
 	PW_INVULNERABILITY,
+#endif
+
+#ifdef TURTLEARENA // DROWNING
+	PW_AIR,
 #endif
 
 	PW_NUM_POWERUPS

@@ -802,6 +802,27 @@ void CG_DrawFieldSmall(int x, int y, int width, int value)
 }
 #endif
 
+#ifdef TURTLEARENA // DROWNING
+/*
+================
+CG_DrawAirBar
+================
+*/
+void CG_DrawAirBar( int x, int y, int w, int h, int borderSize, float frac )
+{
+	vec4_t		borderColor = { 0.5f, 0.5f, 0.5f, 0.33f };
+	vec4_t		airColor = { 0.42f, 0.64f, 0.76f, 0.67f };
+
+	trap_R_SetColor( borderColor );
+	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
+	trap_R_SetColor( NULL );
+
+	trap_R_SetColor( airColor );
+	CG_DrawPic( x+borderSize, y+borderSize, frac * (w-borderSize*2), h-borderSize*2, cgs.media.teamStatusBar );
+	trap_R_SetColor( NULL );
+}
+#endif
+
 /*
 ================
 CG_DrawStatusBar
@@ -1015,20 +1036,22 @@ static void CG_DrawStatusBar( void ) {
 		}
 #endif
 	}
-	else
-	{
-		x += ICON_SIZE;
-		x += (2 * (CHAR_WIDTH/2));
+
+	x = start_x;
+	y = HUD_Y+HUD_HEIGHT;
+
+#ifdef TURTLEARENA // DROWNING
+	// LINE4: Air bar
+	if (cg.cur_ps->powerups[PW_AIR] - 30000 < cg.time) {
+		CG_DrawAirBar(x, HUD_Y+HUD_HEIGHT, HUD_WIDTH, 12, 2, (cg.cur_ps->powerups[PW_AIR] - cg.time) / 30000.0f);
 	}
+	y += 12;
+#endif
 
 #ifdef TA_SP
-	// LINE4: Lives (Single Player and Co-op only)
+	// LINE5: Lives (Single Player and Co-op only)
 	if (cgs.gametype == GT_SINGLE_PLAYER)
 	{
-		// Space between line 3 and 4
-		y += GIANT_HEIGHT;
-		x = start_x;
-
 		CG_DrawSmallString( x, y, va("Lives %d", ps->persistant[PERS_LIVES]), 1.0F );
 
 		value = ps->persistant[PERS_CONTINUES];

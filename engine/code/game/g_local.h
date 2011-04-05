@@ -43,6 +43,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	SP_INTERMISSION_DELAY_TIME	5000
 
 // gentity->flags
+#ifdef TURTLEARENA // DROWNING
+#define	FL_DROWNING_WARNING		0x00000001
+#endif
 #define	FL_GODMODE				0x00000010
 #define	FL_NOTARGET				0x00000020
 #define	FL_TEAMSLAVE			0x00000400	// not the first on the team
@@ -371,7 +374,9 @@ struct gclient_s {
 	qboolean	inactivityWarning;	// qtrue if the five seoond warning has been given
 	int			rewardTime;			// clear the EF_AWARD_IMPRESSIVE, etc when time > this
 
+#ifndef TURTLEARENA // DROWNING
 	int			airOutTime;
+#endif
 
 #ifndef TURTLEARENA // AWARDS
 	int			lastKillTime;		// for multiple kill rewards

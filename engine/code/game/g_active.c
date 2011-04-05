@@ -115,7 +115,11 @@ void P_WorldEffects( gentity_t *ent ) {
 	int			waterlevel;
 
 	if ( ent->client->noclip ) {
+#ifdef TURTLEARENA // DROWNING
+		ent->client->ps.powerups[PW_AIR] = level.time + 31000;	// don't need air
+#else
 		ent->client->airOutTime = level.time + 12000;	// don't need air
+#endif
 		return;
 	}
 
@@ -137,10 +141,26 @@ void P_WorldEffects( gentity_t *ent ) {
 #endif
 
 		// if out of air, start drowning
-		if ( ent->client->airOutTime < level.time) {
+#ifdef TURTLEARENA // DROWNING
+		if (ent->client->ps.powerups[PW_AIR] < level.time)
+#else
+		if ( ent->client->airOutTime < level.time)
+#endif
+		{
 			// drown!
+#ifndef TURTLEARENA // DROWNING
 			ent->client->airOutTime += 1000;
+#endif
 			if ( ent->health > 0 ) {
+#ifdef TURTLEARENA // DROWNING
+				G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
+
+				// don't play a normal pain sound
+				ent->pain_debounce_time = level.time + 200;
+
+				G_Damage (ent, NULL, NULL, NULL, NULL, 
+					10000, DAMAGE_NO_ARMOR, MOD_WATER);
+#else
 				// take more damage the longer underwater
 				ent->damage += 2;
 				if (ent->damage > 15)
@@ -168,10 +188,45 @@ void P_WorldEffects( gentity_t *ent ) {
 
 				G_Damage (ent, NULL, NULL, NULL, NULL, 
 					ent->damage, DAMAGE_NO_ARMOR, MOD_WATER);
+#endif
 			}
 		}
+#ifdef TURTLEARENA // DROWNING
+		// Low air warning
+		else if (ent->client->ps.powerups[PW_AIR] < level.time + 5000 && !(ent->flags & FL_DROWNING_WARNING)) {
+			ent->flags |= FL_DROWNING_WARNING;
+			if (rand()&1) {
+#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
+				G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp1.wav"));
+#else
+				G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
+#endif
+			} else {
+#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
+				G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp2.wav"));
+#else
+				G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
+#endif
+			}
+
+			// don't play a normal pain sound
+			ent->pain_debounce_time = level.time + 200;
+
+			G_Damage (ent, NULL, NULL, NULL, NULL, 
+				2, DAMAGE_NO_ARMOR, MOD_WATER);
+		}
+#endif
 	} else {
+#ifdef TURTLEARENA // DROWNING
+		ent->flags &= ~FL_DROWNING_WARNING;
+		if (ent->client->ps.powerups[PW_AIR]+1000 < level.time + 31000) {
+			ent->client->ps.powerups[PW_AIR] += 1000;
+		} else {
+			ent->client->ps.powerups[PW_AIR] = level.time + 31000;
+		}
+#else
 		ent->client->airOutTime = level.time + 12000;
+#endif
 		ent->damage = 2;
 	}
 
