@@ -1363,7 +1363,7 @@ void CG_NewClientInfo( int clientNum ) {
 			Q_strncpyz( newInfo.skinName, "default", sizeof( newInfo.skinName ) );
 		} else {
 #ifdef TA_SP // SPMODEL
-			if ( cg_singlePlayerActive.integer == 1 )
+			if ( cg_singlePlayerActive.integer )
 				trap_Cvar_VariableStringBuffer( "spmodel", modelStr, sizeof( modelStr ) );
 			else
 #endif

@@ -123,6 +123,9 @@ vmCvar_t	g_laserTag;
 #ifdef TA_PATHSYS // 2DMODE
 vmCvar_t	g_2dmode;
 #endif
+#ifdef IOQ3ZTM // SV_PUBLIC
+vmCvar_t	g_public;
+#endif
 
 static cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -250,6 +253,9 @@ static cvarTable_t		gameCvarTable[] = {
 #endif
 #ifdef TA_PATHSYS // 2DMODE
 	{ &g_2dmode, "g_2dmode", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
+#endif
+#ifdef IOQ3ZTM // SV_PUBLIC
+	{ &g_public, "sv_public", "0", 0, 0, 0, qfalse },
 #endif
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},
@@ -637,8 +643,7 @@ void G_AdvanceMapRotation(void)
 
 #ifdef TA_SP
 	// Single player doesn't rotate maps like the other gametypes.
-	if (g_gametype.integer == GT_SINGLE_PLAYER
-		|| trap_Cvar_VariableValue( "ui_singlePlayerActive" ))
+	if (g_gametype.integer == GT_SINGLE_PLAYER || g_singlePlayer.integer)
 	{
 		return;
 	}
@@ -1322,7 +1327,7 @@ void BeginIntermission( void ) {
 
 #ifdef TA_SP
 	// if custom game and not co-op
-	if (g_singlePlayer.integer == 2 && g_gametype.integer != GT_SINGLE_PLAYER) {
+	if (g_public.integer <= -3 && g_gametype.integer != GT_SINGLE_PLAYER) {
 		UpdateTournamentInfo();
 	}
 #elif defined MISSIONPACK
@@ -1481,9 +1486,11 @@ Append information about this game to the log file
 void LogExit( const char *string ) {
 	int				i, numSorted;
 	gclient_t		*cl;
+#ifndef TA_SP
 #ifdef MISSIONPACK
 	qboolean won = qtrue;
 	team_t team = TEAM_RED; // Default team is red in Team Arena and blue in Quake3
+#endif
 #endif
 	G_LogPrintf( "Exit: %s\n", string );
 
@@ -1519,6 +1526,7 @@ void LogExit( const char *string ) {
 		ping = cl->ps.ping < 999 ? cl->ps.ping : 999;
 
 		G_LogPrintf( "score: %i  ping: %i  client: %i %s\n", cl->ps.persistant[PERS_SCORE], ping, level.sortedClients[i],	cl->pers.netname );
+#ifndef TA_SP
 #ifdef MISSIONPACK
 		if (g_singlePlayer.integer && !(g_entities[cl - level.clients].r.svFlags & SVF_BOT)) {
 			team = cl->sess.sessionTeam;
@@ -1528,23 +1536,14 @@ void LogExit( const char *string ) {
 				won = qfalse;
 			}
 		}
-#ifdef TA_SP
-		if (g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER) {
-			if (!cl->ps.persistant[PERS_LIVES] && !cl->ps.persistant[PERS_CONTINUES]) {
-				won = qfalse;
-			}
-		}
 #endif
 #endif
 
 	}
 
+#ifndef TA_SP
 #ifdef MISSIONPACK
-	if (g_singlePlayer.integer
-#ifdef TA_SP // ZTM: NOTE: Custom Game (skirmish) uses 2 while Single Player uses 1.
-		== 2
-#endif
-		) {
+	if (g_singlePlayer.integer) {
 		if (g_gametype.integer >= GT_CTF) {
 			if (team == TEAM_BLUE)
 				won = level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED];
@@ -1553,6 +1552,7 @@ void LogExit( const char *string ) {
 		}
 		trap_SendConsoleCommand( EXEC_APPEND, (won) ? "spWin\n" : "spLose\n" );
 	}
+#endif
 #endif
 
 
@@ -1576,7 +1576,7 @@ void CheckIntermissionExit( void ) {
 	int			readyMask;
 
 #ifdef TA_SP
-	if ( g_singlePlayer.integer == 2 && g_gametype.integer != GT_SINGLE_PLAYER ) {
+	if (g_public.integer <= -3 && g_gametype.integer != GT_SINGLE_PLAYER ) {
 		return;
 	}
 #else
@@ -1779,7 +1779,7 @@ void CheckExitRules( void ) {
 		// Check for Game Over
 		if (numClients > 0 && numClients == deadClients)
 		{
-			if (g_singlePlayer.integer == 1)
+			if (g_singlePlayer.integer)
 			{
 				// Return to the title screen.
 				trap_Cvar_Set("nextmap", "disconnect; sp_gameover");

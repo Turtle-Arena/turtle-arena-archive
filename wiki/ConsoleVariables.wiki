@@ -38,6 +38,7 @@ List of *Console variables* (also called Cvars) that have been added and removed
     * 0: Doesn't list on master server, but replies to direct status requests (like if server is added as a favorite). Technical: Server doesn't send heartbeats to master servers.
     * -1: Don't replay to status requests, server will not show in the in-game server list. Other programs such as XQF it will show the server, but think the server is down (as it doesn't reply to status requests).
     * -2: Don't allow clients to join the game.
+    * -3: (game/q3_ui/ui) Offline multiplayer mode, uses q3_ui/ui postgame.
 	* Note: If the server had "sv_public" set to 1 (public) and then is change to 0/-1/-2 (private) it will still be sent to clients by dpmaster master servers for up to 15 more minutes. Turtle Arena's MasterServer solves this issue, server will be sent out only 2 more seconds instead of upto 15 minutes.
 
 = Removed =

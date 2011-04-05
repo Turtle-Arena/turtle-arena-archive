@@ -3019,7 +3019,7 @@ static void UI_StartSkirmish(qboolean next) {
 	k = UI_TeamIndexFromName(UI_Cvar_VariableString("ui_opponentName"));
 
 #ifdef IOQ3ZTM // SV_PUBLIC
-	trap_Cvar_Set("sv_public", "-2");
+	trap_Cvar_Set("sv_public", "-3");
 #else
 	trap_Cvar_Set("ui_singlePlayerActive", "1");
 #endif

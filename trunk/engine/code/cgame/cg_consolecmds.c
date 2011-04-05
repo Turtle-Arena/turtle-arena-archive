@@ -156,6 +156,7 @@ static void CG_scrollScoresUp_f( void) {
 }
 #endif
 
+#ifndef TA_SP
 #ifdef MISSIONPACK
 static void CG_spWin_f( void) {
 #ifdef IOQ3ZTM // NEW_CAM
@@ -209,6 +210,7 @@ static void CG_spLose_f( void) {
 #endif
 }
 
+#endif
 #endif
 
 static void CG_TellTarget_f( void ) {
@@ -760,8 +762,10 @@ static consoleCommand_t	commands[] = {
 #ifndef TURTLEARENA // WEAPONS
 	{ "tauntGauntlet", CG_TauntGauntlet_f },
 #endif
+#ifndef TA_SP
 	{ "spWin", CG_spWin_f },
 	{ "spLose", CG_spLose_f },
+#endif
 #ifdef MISSIONPACK_HUD
 	{ "scoresDown", CG_scrollScoresDown_f },
 	{ "scoresUp", CG_scrollScoresUp_f },

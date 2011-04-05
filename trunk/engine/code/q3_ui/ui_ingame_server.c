@@ -94,7 +94,7 @@ void InServer_Event( void *ptr, int notification ) {
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_CHANGEMAP:
 #ifdef IOQ3ZTM // SV_PUBLIC
-		UI_StartServerMenu( trap_Cvar_VariableValue("sv_public") != -2 );
+		UI_StartServerMenu( trap_Cvar_VariableValue("sv_public") != -3 );
 #else
 		UI_StartServerMenu( trap_Cvar_VariableValue("g_gametype") != GT_SINGLE_PLAYER );
 #endif
@@ -186,7 +186,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.addbots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
 #ifdef TA_SP
-	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
+	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
@@ -206,7 +206,7 @@ void InServer_MenuInit( void ) {
 	s_inserver.removebots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "bot_enable" )
 #ifdef TA_SP
-	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
+	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
