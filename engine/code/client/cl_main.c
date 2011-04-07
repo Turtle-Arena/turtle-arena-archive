@@ -3530,7 +3530,9 @@ void CL_Init( void ) {
 #endif
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("teamtask", "0", CVAR_USERINFO );
+#ifndef IOQ3ZTM // UNUSED_USERINFO
 	Cvar_Get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
+#endif
 	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
 
 	Cvar_Get ("password", "", CVAR_USERINFO_ALL);
@@ -3566,7 +3568,9 @@ void CL_Init( void ) {
 #endif
 	Cvar_Get ("2handicap", "100", CVAR_USERINFO2 | CVAR_ARCHIVE );
 	Cvar_Get ("2teamtask", "0", CVAR_USERINFO2 );
+#ifndef IOQ3ZTM // UNUSED_USERINFO
 	Cvar_Get ("2sex", "male", CVAR_USERINFO2 | CVAR_ARCHIVE );
+#endif
 
 	// Third local client
 	Cvar_Get ("3name", "UnnamedPlayer3", CVAR_USERINFO3 | CVAR_ARCHIVE );
@@ -3597,7 +3601,9 @@ void CL_Init( void ) {
 #endif
 	Cvar_Get ("3handicap", "100", CVAR_USERINFO3 | CVAR_ARCHIVE );
 	Cvar_Get ("3teamtask", "0", CVAR_USERINFO3 );
+#ifndef IOQ3ZTM // UNUSED_USERINFO
 	Cvar_Get ("3sex", "male", CVAR_USERINFO3 | CVAR_ARCHIVE );
+#endif
 
 	// Fourth local client
 	Cvar_Get ("4name", "UnnamedPlayer4", CVAR_USERINFO4 | CVAR_ARCHIVE );
@@ -3628,7 +3634,9 @@ void CL_Init( void ) {
 #endif
 	Cvar_Get ("4handicap", "100", CVAR_USERINFO4 | CVAR_ARCHIVE );
 	Cvar_Get ("4teamtask", "0", CVAR_USERINFO4 );
+#ifndef IOQ3ZTM // UNUSED_USERINFO
 	Cvar_Get ("4sex", "male", CVAR_USERINFO4 | CVAR_ARCHIVE );
+#endif
 #endif
 
 #ifdef USE_MUMBLE
