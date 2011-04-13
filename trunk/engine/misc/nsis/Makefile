@@ -17,14 +17,14 @@ endif
 all: turtlearena-$(VERSION)-$(RELEASE).$(ARCH).exe
 
 turtlearena.nsi: turtlearena.nsi.in
-	sed 's/XXXVERSIONXXX/$(VERSION)/;s/XXXRELEASEXXX/$(RELEASE)/;s/x86/$(ARCH)/;s/XXXASSETSXXX/$(ASSETS)/g' < $< > $@
+	sed 's|XXXVERSIONXXX|$(VERSION)|;s|XXXRELEASEXXX|$(RELEASE)|;s|x86|$(ARCH)|;s|XXXASSETSXXX|$(ASSETS)|g' < $< > $@
 
 turtlearena-$(VERSION)-$(RELEASE).$(ARCH).exe: turtlearena.nsi
 	cp "../../../COPYING.txt" .
 	cp "../../../COPYRIGHTS.txt" .
 	cp "../../../CREDITS.txt" .
 	cp "../../../GAME_README.txt" "README.txt"
-	todos "*.txt"
+	todos "$(CURDIR)/*.txt"
 	makensis turtlearena.nsi
 
 clean:
