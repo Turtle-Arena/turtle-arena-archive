@@ -316,12 +316,9 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 #ifdef TA_WEAPSYS
 	int		weaponNum;
 
-	if ( ent->item->giTag == WP_DEFAULT)
-	{
+	if ( ent->item->giTag == WP_DEFAULT) {
 		weaponNum = other->client->ps.stats[STAT_DEFAULTWEAPON];
-	}
-	else
-	{
+	} else {
 		weaponNum = ent->item->giTag;
 	}
 #endif

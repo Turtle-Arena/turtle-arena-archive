@@ -1482,7 +1482,7 @@ void CL_KeyUpEvent( int key, unsigned time )
 	anykeydown--;
 	if (anykeydown < 0) {
 		anykeydown = 0;
-		}
+	}
 
 	// don't process key-up events for the console key
 	if ( key == K_CONSOLE || ( key == K_ESCAPE && keys[K_SHIFT].down ) )
@@ -1565,9 +1565,8 @@ void Key_ClearStates (void)
 
 	for ( i=0 ; i < MAX_KEYS ; i++ ) {
 #ifdef IOQ3ZTM // LOCK_STATE
-		if (i == K_SCROLLOCK || i == K_KP_NUMLOCK || i == K_CAPSLOCK) {
+		if (i == K_SCROLLOCK || i == K_KP_NUMLOCK || i == K_CAPSLOCK)
 			continue;
-		}
 #endif
 
 		if ( keys[i].down ) {
