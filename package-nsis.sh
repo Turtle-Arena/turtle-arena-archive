@@ -119,11 +119,8 @@ cd misc/nsis/
 # Clean up
 make clean
 
-# Change filename so it is okay for sed... ZTM: FIXME: Do this in engine/misc/nsis/Makefile
-ASSETS0=`echo "../../../$DATADIR/base/assets0.pk3" | sed 's:[]\[\^\$\.\*\/]:\\\\&:g'`
-
 # Build installer
-make ASSETS=$ASSETS0
+make ASSETS="$STARTDIR/$DATADIR/base/assets0.pk3"
 
 # Move to trunk
 make install INSTALLDIR=$STARTDIR/$INSTALLDIR/nsis

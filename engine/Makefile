@@ -2749,9 +2749,15 @@ OBJ+= $(SPLINESOBJ)
 endif
 
 copyfiles: release
+ifeq ($(QUAKE3),1)
 	@if [ ! -d $(COPYDIR)/$(BASEGAME) ]; then echo "You need to set COPYDIR to where your Quake3 data is!"; fi
+endif
+ifneq ($(BUILD_BASEGAME),0)
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/$(BASEGAME)
+endif
+ifneq ($(BUILD_MISSIONPACK),0)
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack
+endif
 
 ifneq ($(BUILD_CLIENT),0)
 	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/$(CLIENTBIN)$(FULLBINEXT) $(COPYBINDIR)/$(CLIENTBIN)$(FULLBINEXT)
@@ -2774,7 +2780,7 @@ ifneq ($(BUILD_GAME_SO),0)
 					$(COPYDIR)/$(BASEGAME)/.
 	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/$(BASEGAME)/qagame$(SHLIBNAME) \
 					$(COPYDIR)/$(BASEGAME)/.
-	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/baseq3/ui$(SHLIBNAME) \
+	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/$(BASEGAME)/ui$(SHLIBNAME) \
 					$(COPYDIR)/$(BASEGAME)/.
   endif
   ifneq ($(BUILD_MISSIONPACK),0)

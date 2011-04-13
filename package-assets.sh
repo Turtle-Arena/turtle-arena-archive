@@ -109,6 +109,7 @@ then
 	if [ $OVERWRITE -eq 0 ]
 	then
 		echo "assets0.pk3 already exists, not overwriting"
+		exit 1
 	fi
 fi
 
