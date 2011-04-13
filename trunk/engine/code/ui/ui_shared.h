@@ -473,4 +473,8 @@ int			trap_PC_FreeSource( int handle );
 int			trap_PC_ReadToken( int handle, pc_token_t *pc_token );
 int			trap_PC_SourceFileAndLine( int handle, char *filename, int *line );
 
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+qboolean		trap_Key_IsDown( int keynum );
+#endif
+
 #endif
