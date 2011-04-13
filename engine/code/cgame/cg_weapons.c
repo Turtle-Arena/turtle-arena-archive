@@ -3757,7 +3757,7 @@ void CG_Weapon_f( void )
 	num = atoi( CG_Argv( 1 ) );
 
 #ifdef TA_WEAPSYS
-	// Special case for WP_DEFAULT
+	// Special case for default
 	if (num == WP_DEFAULT) {
 		num = ps->stats[STAT_DEFAULTWEAPON];
 	}

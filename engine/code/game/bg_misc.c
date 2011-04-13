@@ -4436,7 +4436,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	case IT_AMMO:
 #ifdef TA_WEAPSYS_EX
 		{
-			int stat = -1;
+			int stat;
 
 			if (item->giTag == ps->weapon)
 				stat = STAT_AMMO;
@@ -4447,7 +4447,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 			else
 				return qfalse; // no where to put ammo.
 
-			if ( stat && ps->stats[ stat ] >= 200 ) {
+			if ( ps->stats[ stat ] >= 200 ) {
 				return qfalse;		// can't hold any more
 			}
 		}
