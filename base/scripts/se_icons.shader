@@ -236,11 +236,11 @@ icons/iconw_bamboo
 	}
 }
 
-icons/iconw_gun
+icons/iconw_triblaster
 {
 	nopicmip
 	{
-		map icons/iconw_gun.png
+		map icons/iconw_triblaster.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 	}
 }
@@ -329,7 +329,6 @@ icons/iconh_mega
 
 // CTF FLAG ICONS
 // Images have no alpha
-//blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 icons/iconf_red1
 {
 	nopicmip
@@ -413,10 +412,9 @@ icons/iconi_sphere
 	}
 }
 
-
+// SCOREBOARD ICONS
 scoreboardName
 {
-	nopicmip
 	nomipmaps
 	{
 		clampmap menu/tab/name.png
@@ -426,7 +424,6 @@ scoreboardName
 
 scoreboardScore
 {
-	nopicmip
 	nomipmaps
 	{
 		clampmap menu/tab/score.png
@@ -436,7 +433,6 @@ scoreboardScore
 
 scoreboardTime
 {
-	nopicmip
 	nomipmaps
 	{
 		clampmap menu/tab/time.png
@@ -446,7 +442,6 @@ scoreboardTime
 
 scoreboardPing
 {
-	nopicmip
 	nomipmaps
 	{
 		clampmap menu/tab/ping.png
