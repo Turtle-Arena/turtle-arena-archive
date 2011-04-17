@@ -506,6 +506,7 @@ This allows a server to do a map_restart without changing memory allocation
 vm_t *VM_Restart( vm_t *vm ) {
 	vmHeader_t	*header;
 
+#ifndef NO_NATIVE_SUPPORT
 	// DLL's can't be restarted in place
 	if ( vm->dllHandle ) {
 		char	name[MAX_QPATH];
@@ -519,6 +520,7 @@ vm_t *VM_Restart( vm_t *vm ) {
 		vm = VM_Create( name, systemCall, VMI_NATIVE );
 		return vm;
 	}
+#endif
 
 	// load the image
 	Com_Printf( "VM_Restart()\n" );
@@ -579,6 +581,9 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 	vm->systemCall = systemCalls;
 
 	if ( interpret == VMI_NATIVE ) {
+#ifdef NO_NATIVE_SUPPORT
+		Com_Printf( "Native dll not supported, looking for qvm.\n" );
+#else
 		// try to load as a system dll
 #ifdef IOQ3ZTM // LESS_VERBOSE
 		Com_DPrintf( "Loading dll file %s.\n", vm->name );
@@ -591,6 +596,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 		}
 
 		Com_Printf( "Failed to load dll, looking for qvm.\n" );
+#endif
 		interpret = VMI_COMPILED;
 	}
 
@@ -667,10 +673,12 @@ void VM_Free( vm_t *vm ) {
 	if(vm->destroy)
 		vm->destroy(vm);
 
+#ifndef NO_NATIVE_SUPPORT
 	if ( vm->dllHandle ) {
 		Sys_UnloadDll( vm->dllHandle );
 		Com_Memset( vm, 0, sizeof( *vm ) );
 	}
+#endif
 #if 0	// now automatically freed by hunk
 	if ( vm->codeBase ) {
 		Z_Free( vm->codeBase );
@@ -911,10 +919,12 @@ void VM_VmInfo_f( void ) {
 			break;
 		}
 		Com_Printf( "%s : ", vm->name );
+#ifndef NO_NATIVE_SUPPORT
 		if ( vm->dllHandle ) {
 			Com_Printf( "native\n" );
 			continue;
 		}
+#endif
 		if ( vm->compiled ) {
 			Com_Printf( "compiled on load\n" );
 		} else {

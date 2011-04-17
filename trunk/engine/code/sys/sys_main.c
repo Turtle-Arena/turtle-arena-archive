@@ -391,6 +391,7 @@ int Sys_FileTime( char *path )
 	return buf.st_mtime;
 }
 
+#ifndef NO_NATIVE_SUPPORT
 /*
 =================
 Sys_UnloadDll
@@ -468,6 +469,7 @@ void *Sys_LoadDll( const char *name,
 
 	return libHandle;
 }
+#endif
 
 /*
 =================
@@ -593,7 +595,11 @@ int main( int argc, char **argv )
 	Com_Init( commandLine );
 	NET_Init( );
 
+#ifdef __wii__
+	wiiCON_Init( );
+#else
 	CON_Init( );
+#endif
 
 	signal( SIGILL, Sys_SigHandler );
 	signal( SIGFPE, Sys_SigHandler );

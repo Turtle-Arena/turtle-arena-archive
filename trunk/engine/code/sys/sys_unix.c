@@ -31,11 +31,19 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdio.h>
 #include <dirent.h>
 #include <unistd.h>
+#ifndef __wii__
 #include <sys/mman.h>
+#endif
 #include <sys/time.h>
 #include <pwd.h>
 #include <libgen.h>
 #include <fcntl.h>
+
+#ifdef __wii__
+#include <network.h>
+
+#define select net_select
+#endif
 
 qboolean stdinIsATTY;
 
@@ -188,12 +196,16 @@ Sys_GetCurrentUser
 */
 char *Sys_GetCurrentUser( void )
 {
+#ifdef __wii__
+	return "player";
+#else
 	struct passwd *p;
 
 	if ( (p = getpwuid( getuid() )) == NULL ) {
 		return "player";
 	}
 	return p->pw_name;
+#endif
 }
 
 /*
@@ -237,7 +249,26 @@ Sys_Dirname
 */
 const char *Sys_Dirname( char *path )
 {
+#if __wii__
+	// From DOSBOX Wii
+	static char tmp[MAXPATHLEN];
+	int len;
+
+	if(!path || path[0] == 0)
+		return ".";
+
+	char * sep = strrchr(path, '/');
+	if (sep == NULL)
+		sep = strrchr(path, '\\');
+	if (sep == NULL)
+		return ".";
+
+	len = (int)(sep - path);
+	strncpy(tmp, path, len+1);
+	return tmp;
+#else
 	return dirname( path );
+#endif
 }
 
 /*
@@ -260,6 +291,12 @@ qboolean Sys_Mkdir( const char *path )
 Sys_Mkfifo
 ==================
 */
+#ifdef __wii__
+FILE *Sys_Mkfifo( const char *ospath )
+{
+	return NULL;
+}
+#else
 FILE *Sys_Mkfifo( const char *ospath )
 {
 	FILE	*fifo;
@@ -284,6 +321,7 @@ FILE *Sys_Mkfifo( const char *ospath )
 
 	return fifo;
 }
+#endif
 
 /*
 ==================

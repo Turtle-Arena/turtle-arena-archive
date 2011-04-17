@@ -1193,6 +1193,77 @@ ifeq ($(PLATFORM),sunos)
 else # ifeq sunos
 
 #############################################################################
+# SETUP AND BUILD -- wii
+#############################################################################
+
+ifeq ($(PLATFORM),wii)
+
+# $(DEVKITPPC)/wii_rules
+ifeq ($(strip $(DEVKITPPC)),)
+  $(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPro/devkitPPC)
+endif
+
+export LIBOGC_INC :=	$(DEVKITPRO)/libogc/include
+export LIBOGC_LIB :=	$(DEVKITPRO)/libogc/lib/wii
+
+  MACHDEP =  -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float
+
+# $(DEVKITPPC)/base_rules
+#---------------------------------------------------------------------------------
+# path to tools 
+#---------------------------------------------------------------------------------
+export PORTLIBS := $(DEVKITPRO)/portlibs/ppc
+export PATH := $(DEVKITPPC)/bin:$(PORTLIBS)/bin:$(PATH)
+
+#---------------------------------------------------------------------------------
+# the prefix on the compiler executables
+#---------------------------------------------------------------------------------
+export PREFIX	:=	powerpc-eabi-
+
+export AS	:=	$(PREFIX)as
+export CC	:=	$(PREFIX)gcc
+export CXX	:=	$(PREFIX)g++
+export AR	:=	$(PREFIX)ar
+export OBJCOPY	:=	$(PREFIX)objcopy
+
+CFLAGS	= -g -O2 -Wall $(MACHDEP) -I$(LIBOGC_INC)
+CXXFLAGS	=	$(CFLAGS)
+
+LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
+
+LIBPATHS = -L$(LIBOGC_LIB)
+
+  LIBS = -lwiiuse -lbte -logc -lm
+
+# ZTM: FIXME: Support qvms!
+  #HAVE_VM_COMPILED = true
+
+  ifneq ($(HAVE_VM_COMPILED),true)
+    BASE_CFLAGS += -DNO_VM_COMPILED
+  endif
+
+  # Wii doesn't support native libs
+  BUILD_GAME_SO=0
+
+  # Client doesn't build as of yet.
+ifneq ($(BUILD_CLIENT),1)
+  BUILD_CLIENT=0
+endif
+
+  ARCH=ppc
+
+  FULLBINEXT=.dol
+
+  BASE_CFLAGS += -MMD -MP -MF -DNO_NATIVE_SUPPORT
+  SERVER_CFLAGS =
+  CLIENT_CFLAGS =
+
+  #CLIENT_LDFLAGS += $(LDFLAGS)
+  #CLIENT_LIBS +=$(SDL_LIBS)
+
+else # ifeq wii
+
+#############################################################################
 # SETUP AND BUILD -- GENERIC
 #############################################################################
   BASE_CFLAGS=-DNO_VM_COMPILED
@@ -1210,6 +1281,7 @@ endif #OpenBSD
 endif #NetBSD
 endif #IRIX
 endif #SunOS
+endif #wii
 
 TARGETS =
 
@@ -2259,9 +2331,20 @@ ifeq ($(PLATFORM),darwin)
     $(B)/ded/sys_osx.o
 endif
 
+
+ifeq ($(PLATFORM),wii)
+$(B)/$(SERVERBIN).dol: $(B)/$(SERVERBIN).elf
+	$(echo_cmd) "ELF2DOL $@"
+	$(Q)elf2dol $< $@
+
+$(B)/$(SERVERBIN).elf: $(Q3DOBJ)
+	$(echo_cmd) "LD $@"
+	$(Q)$(CC) $^ $(LDFLAGS) $(LIBPATHS) $(LIBS) -o $@
+else
 $(B)/$(SERVERBIN)$(FULLBINEXT): $(Q3DOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3DOBJ) $(LIBS)
+endif
 
 
 

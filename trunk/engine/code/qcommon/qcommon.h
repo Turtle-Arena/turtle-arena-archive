@@ -1108,9 +1108,11 @@ typedef enum {
 void	Sys_Init (void);
 
 // general development dll loading for virtual machine testing
+#ifndef NO_NATIVE_SUPPORT
 void	* QDECL Sys_LoadDll( const char *name, intptr_t (QDECL **entryPoint)(int, ...),
 				  intptr_t (QDECL *systemcalls)(intptr_t, ...) );
 void	Sys_UnloadDll( void *dllHandle );
+#endif
 
 void	Sys_UnloadGame( void );
 void	*Sys_GetGameAPI( void *parms );

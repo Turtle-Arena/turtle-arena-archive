@@ -25,7 +25,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "qcommon.h"
 #include <setjmp.h>
 #ifndef _WIN32
+#ifndef __wii__
 #include <netinet/in.h>
+#endif
 #include <sys/stat.h> // umask
 #else
 #include <winsock.h>

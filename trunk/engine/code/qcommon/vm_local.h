@@ -141,8 +141,10 @@ struct vm_s {
    
     char		name[MAX_QPATH];
 
+#ifndef NO_NATIVE_SUPPORT
 	// for dynamic linked modules
 	void		*dllHandle;
+#endif
 	intptr_t			(QDECL *entryPoint)( int callNum, ... );
 	void (*destroy)(vm_t* self);
 

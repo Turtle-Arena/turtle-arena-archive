@@ -26,9 +26,67 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <unistd.h>
 #include <signal.h>
+#ifndef __wii__
 #include <termios.h>
+#endif
 #include <fcntl.h>
 #include <sys/time.h>
+
+#ifdef __wii__
+#include <network.h>
+
+#define select net_select
+
+// devkitproPPC is missing termios.h
+typedef unsigned char	cc_t;
+typedef unsigned int	speed_t;
+typedef unsigned int	tcflag_t;
+
+#define NCCS 32
+struct termios
+  {
+    tcflag_t c_iflag;		/* input mode flags */
+    tcflag_t c_oflag;		/* output mode flags */
+    tcflag_t c_cflag;		/* control mode flags */
+    tcflag_t c_lflag;		/* local mode flags */
+    cc_t c_line;			/* line discipline */
+    cc_t c_cc[NCCS];		/* control characters */
+    speed_t c_ispeed;		/* input speed */
+    speed_t c_ospeed;		/* output speed */
+#define _HAVE_STRUCT_TERMIOS_C_ISPEED 1
+#define _HAVE_STRUCT_TERMIOS_C_OSPEED 1
+  };
+
+/* c_cc characters */
+#define VINTR 0
+#define VQUIT 1
+#define VERASE 2
+#define VKILL 3
+#define VEOF 4
+#define VTIME 5
+#define VMIN 6
+#define VSWTC 7
+#define VSTART 8
+#define VSTOP 9
+#define VSUSP 10
+#define VEOL 11
+#define VREPRINT 12
+#define VDISCARD 13
+#define VWERASE 14
+#define VLNEXT 15
+#define VEOL2 16
+
+/* tcsetattr uses these */
+#define	TCSADRAIN	1
+
+/* c_lflag bits */
+#define ICANON	0000002
+#define ECHO	0000010
+
+/* c_iflag bits */
+#define INPCK	0000020
+#define ISTRIP	0000040
+#endif
 
 /*
 =============================================================
@@ -256,7 +314,11 @@ set attributes if user did CTRL+Z and then does fg again.
 
 void CON_SigCont(int signum)
 {
+#ifdef __wii__
+	wiiCON_Init();
+#else
 	CON_Init();
+#endif
 }
 
 /*
@@ -266,7 +328,11 @@ CON_Init
 Initialize the console input (tty mode if possible)
 ==================
 */
+#ifdef __wii__
+void wiiCON_Init( void )
+#else
 void CON_Init( void )
+#endif
 {
 	struct termios tc;
 
