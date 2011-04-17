@@ -63,17 +63,21 @@ static qboolean	winsockInitialized = qfalse;
 #		define _BSD_SOCKLEN_T_
 #	endif
 
+#   ifndef __wii__
 #	include <arpa/inet.h>
+#   endif
 #	include <errno.h>
+#   ifndef __wii__
 #	include <netdb.h>
 #	include <netinet/in.h>
 #	include <sys/socket.h>
 #	include <net/if.h>
 #	include <sys/ioctl.h>
+#   endif
 #	include <sys/types.h>
 #	include <sys/time.h>
 #	include <unistd.h>
-#	if !defined(__sun) && !defined(__sgi)
+#	if !defined(__sun) && !defined(__sgi) && !defined(__wii__)
 #		include <ifaddrs.h>
 #	endif
 
@@ -81,9 +85,95 @@ static qboolean	winsockInitialized = qfalse;
 #		include <sys/filio.h>
 #	endif
 
+#ifdef __wii__
+#   include <network.h>
+
+#define gethostbyname net_gethostbyname
+
+struct addrinfo {
+    int     ai_flags;
+    int     ai_family;
+    int     ai_socktype;
+    int     ai_protocol;
+    size_t  ai_addrlen;
+    struct  sockaddr *ai_addr;
+    char    *ai_canonname;     /* canonical name */
+    struct  addrinfo *ai_next; /* this struct can form a linked list */
+};
+
+#define __u8 u8
+#define __u32 u32
+#define __be16 u16
+#define __be32 u32
+/*
+ *      IPv6 address structure
+ */
+struct in6_addr
+{
+        union
+        {
+                __u8            u6_addr8[16];
+                __be16          u6_addr16[8];
+                __be32          u6_addr32[4];
+        } in6_u;
+#define s6_addr                 in6_u.u6_addr8
+#define s6_addr16               in6_u.u6_addr16
+#define s6_addr32               in6_u.u6_addr32
+};
+
+struct sockaddr_in6 {
+        unsigned short int      sin6_family;    /* AF_INET6 */
+        __be16                  sin6_port;      /* Transport layer port # */
+        __be32                  sin6_flowinfo;  /* IPv6 flow information */
+        struct in6_addr         sin6_addr;      /* IPv6 address */
+        __u32                   sin6_scope_id;  /* scope id (new in RFC2553) */
+};
+
+struct ipv6_mreq {
+       /* IPv6 multicast address of group */
+        struct in6_addr ipv6mr_multiaddr;
+
+       /* local IPv6 address of interface */
+        int             ipv6mr_interface; //int ipv6mr_ifindex;
+};
+
+const struct in6_addr in6addr_any = { 0 }; // ZTM: FIXME: Does this need to be initiated?...
+
+typedef unsigned short sa_family_t;
+
+#define ss_family sa_family
+
+#define AF_INET6 AF_UNSPEC // ZTM: FIXME?
+#define PF_INET6 AF_INET6
+
+#define IPV6_MULTICAST_IF 17
+#define IPV6_JOIN_GROUP -1 // ZTM: FIXME
+#define IPV6_LEAVE_GROUP -1 // ZTM: FIXME
+
+#define NI_NUMERICHOST 2
+
+#define IPPROTO_IPV6   41
+
+#define sockaddr_storage sockaddr
+
+#define socket net_socket
+#define bind net_bind
+#define connect net_connect
+#define send net_send
+#define sendto net_sendto
+#define recv net_recv
+#define recvfrom net_recvfrom
+#define select net_select
+#define setsockopt net_setsockopt
+#define ioctl net_ioctl
+
+#endif
+
 typedef int SOCKET;
+#ifndef __wii__
 #	define INVALID_SOCKET		-1
 #	define SOCKET_ERROR			-1
+#endif
 #	define closesocket			close
 #	define ioctlsocket			ioctl
 typedef int	ioctlarg_t;
@@ -1000,7 +1090,7 @@ void NET_SetMulticast6(void)
 
 	if(*net_mcast6iface->string)
 	{
-#ifdef _WIN32
+#if defined _WIN32 || defined __wii__
 		curgroup.ipv6mr_interface = net_mcast6iface->integer;
 #else
 		curgroup.ipv6mr_interface = if_nametoindex(net_mcast6iface->string);
@@ -1319,6 +1409,14 @@ static void NET_GetLocalAddress(void)
 		Sys_ShowIP();
 	}
 }
+#elif defined __wii__
+static void NET_GetLocalAddress( void ) {
+	// ZTM: TODO: Startup network and get ip of host.
+	net_init();
+	//if_config( char *local_ip, char *netmask, char *gateway, qtrue);
+	
+	//NET_AddLocalAddress("", search->ai_addr, (struct sockaddr *) &mask4);
+}
 #else
 static void NET_GetLocalAddress( void ) {
 	char				hostname[256];
@@ -1476,7 +1574,7 @@ static qboolean NET_GetCvars( void ) {
 	modified += net_mcast6addr->modified;
 	net_mcast6addr->modified = qfalse;
 
-#ifdef _WIN32
+#if defined _WIN32 || defined __wii__
 	net_mcast6iface = Cvar_Get( "net_mcast6iface", "0", CVAR_LATCH | CVAR_ARCHIVE );
 #else
 	net_mcast6iface = Cvar_Get( "net_mcast6iface", "", CVAR_LATCH | CVAR_ARCHIVE );

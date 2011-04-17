@@ -205,6 +205,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define DLL_EXT ".so"
 
+#elif defined __wii__
+
+#define OS_STRING "wii"
+
+#define ID_INLINE inline
+#define PATH_SEP '/'
+
+#define __powerpc__
+#define ARCH_STRING "ppc"
+#define Q3_BIG_ENDIAN
+
+#define DLL_EXT ".so" // lies, there are no native libs
 #endif
 
 //=================================================================== BSD ===
