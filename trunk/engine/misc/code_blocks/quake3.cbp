@@ -832,6 +832,7 @@
 		<Unit filename="../../code/qcommon/q_math.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/qcommon/q_platform.h" />
 		<Unit filename="../../code/qcommon/q_shared.c">
 			<Option compilerVar="CC" />
 		</Unit>
