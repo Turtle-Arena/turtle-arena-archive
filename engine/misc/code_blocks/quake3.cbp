@@ -1006,6 +1006,11 @@
 		<Unit filename="../../code/sys/con_passive.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/sys/con_tty.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../../code/sys/sys_main.c">
 			<Option compilerVar="CC" />
 		</Unit>
