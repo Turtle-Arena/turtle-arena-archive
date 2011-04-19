@@ -1229,14 +1229,14 @@ export OBJCOPY	:=	$(PREFIX)objcopy
 CFLAGS	= -g -O2 -Wall $(MACHDEP) -I$(LIBOGC_INC)
 CXXFLAGS	=	$(CFLAGS)
 
-LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(notdir $@).map
+LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(B)/$(notdir $@).map
 
 LIBPATHS = -L$(LIBOGC_LIB)
 
-  LIBS = -lwiiuse -lbte -logc -lm
+  LIBS = -lwiiuse -lbte -lfat -logc -lm
 
 # ZTM: FIXME: Support qvms!
-  #HAVE_VM_COMPILED = true
+  HAVE_VM_COMPILED = true
 
   ifneq ($(HAVE_VM_COMPILED),true)
     BASE_CFLAGS += -DNO_VM_COMPILED
@@ -1254,7 +1254,7 @@ endif
 
   FULLBINEXT=.dol
 
-  BASE_CFLAGS += -MMD -MP -MF -DNO_NATIVE_SUPPORT
+  BASE_CFLAGS += -DNO_NATIVE_SUPPORT -MMD -MP -MF -DDUMMYFLAG
   SERVER_CFLAGS =
   CLIENT_CFLAGS =
 
