@@ -920,7 +920,7 @@ void Sys_PlatformInit( void )
 	printf("\x1b[2;0H");
 
 	if(!fatInitDefault()) {
-		WII_wait("Error: fat init failed");
+		Sys_Wait("Error: fat init failed");
 	}
 #endif
 }
