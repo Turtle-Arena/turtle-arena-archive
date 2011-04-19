@@ -47,6 +47,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 
+#ifdef __wii__
+void Sys_Wait(const char *message);
+void Sys_BeginFrame(void);
+void Sys_EndFrame(void);
+#endif
+
 static char binaryPath[ MAX_OSPATH ] = { 0 };
 static char installPath[ MAX_OSPATH ] = { 0 };
 
@@ -206,6 +212,11 @@ static void Sys_Exit( int exitCode )
 		// Normal exit
 		remove( Sys_PIDFileName( ) );
 	}
+#ifdef __wii__
+	else {
+		Sys_Wait("Sys_Exit: abnormal exit!");
+	}
+#endif
 
 	Sys_PlatformExit( );
 
@@ -607,10 +618,20 @@ int main( int argc, char **argv )
 	signal( SIGTERM, Sys_SigHandler );
 	signal( SIGINT, Sys_SigHandler );
 
+#ifdef __wii__
+	Sys_Wait("Ready to enter main loop");
+#endif
+
 	while( 1 )
 	{
+#ifdef __wii__
+		Sys_BeginFrame( );
+#endif
 		IN_Frame( );
 		Com_Frame( );
+#ifdef __wii__
+		Sys_EndFrame( );
+#endif
 	}
 
 	return 0;

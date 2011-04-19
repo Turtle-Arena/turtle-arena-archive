@@ -229,7 +229,9 @@ void CON_Shutdown( void )
 	if (ttycon_on)
 	{
 		CON_Back(); // Delete "]"
+#ifndef __wii__ // ZTM: FIXME: wii
 		tcsetattr (STDIN_FILENO, TCSADRAIN, &TTY_tc);
+#endif
 	}
 
 	// Restore blocking to stdin reads
@@ -356,6 +358,7 @@ void CON_Init( void )
 	}
 
 	Field_Clear(&TTY_con);
+#ifndef __wii__ // ZTM: FIXME: wii
 	tcgetattr (STDIN_FILENO, &TTY_tc);
 	TTY_erase = TTY_tc.c_cc[VERASE];
 	TTY_eof = TTY_tc.c_cc[VEOF];
@@ -380,6 +383,7 @@ void CON_Init( void )
 	tc.c_cc[VMIN] = 1;
 	tc.c_cc[VTIME] = 0;
 	tcsetattr (STDIN_FILENO, TCSADRAIN, &tc);
+#endif
 	ttycon_on = qtrue;
 }
 
