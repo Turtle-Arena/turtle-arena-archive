@@ -5687,8 +5687,10 @@ void BotCheckSnapshot(bot_state_t *bs) {
 
 	//remove all avoid spots
 	trap_BotAddAvoidSpot(bs->ms, vec3_origin, 0, AVOID_CLEAR);
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	//reset kamikaze body
 	bs->kamikazebody = 0;
+#endif
 	//reset number of proxmines
 	bs->numproxmines = 0;
 	//

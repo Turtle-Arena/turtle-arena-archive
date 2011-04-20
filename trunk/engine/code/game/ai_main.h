@@ -132,7 +132,11 @@ typedef struct bot_state_s
 	playerState_t cur_ps;							//current player state
 	int last_eFlags;								//last ps flags
 	usercmd_t lastucmd;								//usercmd from last frame
+#ifdef IOQ3ZTM // IOQ3BUGFIX: (not really a bugfix, but should probably be changed in ioq3.)
+	int entityeventTime[MAX_GENTITIES];				//last entity event time
+#else
 	int entityeventTime[1024];						//last entity event time
+#endif
 	//
 	bot_settings_t settings;						//several bot settings
 	int (*ainode)(struct bot_state_s *bs);			//current AI node
@@ -178,7 +182,9 @@ typedef struct bot_state_s
 	float check_time;								//time to check for nearby items
 	float stand_time;								//time the bot is standing still
 	float lastchat_time;							//time the bot last selected a chat
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	float kamikaze_time;							//time to check for kamikaze usage
+#endif
 #ifndef TURTLEARENA // POWERS
 	float invulnerability_time;						//time to check for invulnerability usage
 #endif
@@ -194,7 +200,9 @@ typedef struct bot_state_s
 	float defendaway_range;							//max travel time away from defend area
 	float rushbaseaway_time;						//time away from rushing to the base
 	float attackaway_time;							//time away from attacking the enemy base
+#ifdef MISSIONPACK_HARVESTER
 	float harvestaway_time;							//time away from harvesting
+#endif
 	float ctfroam_time;								//time the bot is roaming in ctf
 	float killedenemy_time;							//time the bot killed the enemy
 	float arrive_time;								//time arrived (at companion)
@@ -213,7 +221,9 @@ typedef struct bot_state_s
 	vec3_t enemyvelocity;							//enemy velocity 0.5 secs ago during battle
 	vec3_t enemyorigin;								//enemy origin 0.5 secs ago during battle
 	//
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	int kamikazebody;								//kamikaze body
+#endif
 	int proxmines[MAX_PROXMINES];
 	int numproxmines;
 	//
@@ -275,11 +285,13 @@ typedef struct bot_state_s
 	int ctfstrategy;								//ctf strategy
 	char subteam[32];								//sub team name
 	float formation_dist;							//formation team mate intervening space
+#ifndef IOQ3ZTM // UNUSED
 	char formation_teammate[16];					//netname of the team mate the bot uses for relative positioning
 	float formation_angle;							//angle relative to the formation team mate
 	vec3_t formation_dir;							//the direction the formation is moving in
 	vec3_t formation_origin;						//origin the bot uses for relative positioning
 	bot_goal_t formation_goal;						//formation goal
+#endif
 
 	bot_activategoal_t *activatestack;				//first activate goal on the stack
 	bot_activategoal_t activategoalheap[MAX_ACTIVATESTACK];	//activate goal heap
