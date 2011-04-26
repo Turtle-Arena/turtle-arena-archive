@@ -1810,9 +1810,10 @@ void RB_SetGL2D (void);
 #endif
 void RE_BeginFrame( stereoFrame_t stereoFrame );
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
-void RE_SaveJPG(char * filename, int quality, int image_width, int image_height, unsigned char *image_buffer);
+void RE_SaveJPG(char * filename, int quality, int image_width, int image_height,
+                unsigned char *image_buffer, int padding);
 size_t RE_SaveJPGToBuffer(byte *buffer, size_t bufSize, int quality,
-		int image_width, int image_height, byte *image_buffer);
+		          int image_width, int image_height, byte *image_buffer, int padding);
 void RE_TakeVideoFrame( int width, int height,
 		byte *captureBuffer, byte *encodeBuffer, qboolean motionJpeg );
 

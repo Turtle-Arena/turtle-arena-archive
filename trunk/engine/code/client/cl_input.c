@@ -688,6 +688,9 @@ CL_JoystickMove
 void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 	int		movespeed;
 	float	anglespeed;
+#ifdef TA_SPLITVIEW
+	size_t	lcNum = lc - cl.localClients;
+#endif
 
 #ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
 	if (!ci->in_lockon.active)
@@ -722,15 +725,39 @@ void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 #endif
 		)
 	{
-		lc->viewangles[YAW] += anglespeed * cl_yawspeed->value * lc->joystickAxis[AXIS_SIDE];
+#ifdef TA_SPLITVIEW
+		lc->viewangles[YAW] += anglespeed * j_yaw[lcNum]->value * lc->joystickAxis[j_yaw_axis[lcNum]->integer];
+		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_side[lcNum]->value * lc->joystickAxis[j_side_axis[lcNum]->integer]) );
+#else
+		lc->viewangles[YAW] += anglespeed * j_yaw->value * lc->joystickAxis[j_yaw_axis->integer];
+		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_side->value * lc->joystickAxis[j_side_axis->integer]) );
+#endif
 	} else {
-		cmd->rightmove = ClampChar( cmd->rightmove + lc->joystickAxis[AXIS_SIDE] );
+#ifdef TA_SPLITVIEW
+		lc->viewangles[YAW] += anglespeed * j_side[lcNum]->value * lc->joystickAxis[j_side_axis[lcNum]->integer];
+		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_yaw[lcNum]->value * lc->joystickAxis[j_yaw_axis[lcNum]->integer]) );
+#else
+		lc->viewangles[YAW] += anglespeed * j_side->value * lc->joystickAxis[j_side_axis->integer];
+		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_yaw->value * lc->joystickAxis[j_yaw_axis->integer]) );
+#endif
 	}
 
 	if ( in_mlooking ) {
-		lc->viewangles[PITCH] += anglespeed * cl_pitchspeed->value * lc->joystickAxis[AXIS_FORWARD];
+#ifdef TA_SPLITVIEW
+		lc->viewangles[PITCH] += anglespeed * j_forward[lcNum]->value * lc->joystickAxis[j_forward_axis[lcNum]->integer];
+		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_pitch[lcNum]->value * lc->joystickAxis[j_pitch_axis[lcNum]->integer]) );
+#else
+		lc->viewangles[PITCH] += anglespeed * j_forward->value * lc->joystickAxis[j_forward_axis->integer];
+		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_pitch->value * lc->joystickAxis[j_pitch_axis->integer]) );
+#endif
 	} else {
-		cmd->forwardmove = ClampChar( cmd->forwardmove + lc->joystickAxis[AXIS_FORWARD] );
+#ifdef TA_SPLITVIEW
+		lc->viewangles[PITCH] += anglespeed * j_pitch[lcNum]->value * lc->joystickAxis[j_pitch_axis[lcNum]->integer];
+		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_forward[lcNum]->value * lc->joystickAxis[j_forward_axis[lcNum]->integer]) );
+#else
+		lc->viewangles[PITCH] += anglespeed * j_pitch->value * lc->joystickAxis[j_pitch_axis->integer];
+		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_forward->value * lc->joystickAxis[j_forward_axis->integer]) );
+#endif
 	}
 
 	cmd->upmove = ClampChar( cmd->upmove + lc->joystickAxis[AXIS_UP] );

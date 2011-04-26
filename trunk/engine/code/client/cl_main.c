@@ -83,6 +83,26 @@ cvar_t	*m_forward;
 cvar_t	*m_side;
 cvar_t	*m_filter;
 
+#ifdef TA_SPLITVIEW
+cvar_t	*j_pitch[MAX_SPLITVIEW];
+cvar_t	*j_yaw[MAX_SPLITVIEW];
+cvar_t	*j_forward[MAX_SPLITVIEW];
+cvar_t	*j_side[MAX_SPLITVIEW];
+cvar_t	*j_pitch_axis[MAX_SPLITVIEW];
+cvar_t	*j_yaw_axis[MAX_SPLITVIEW];
+cvar_t	*j_forward_axis[MAX_SPLITVIEW];
+cvar_t	*j_side_axis[MAX_SPLITVIEW];
+#else
+cvar_t	*j_pitch;
+cvar_t	*j_yaw;
+cvar_t	*j_forward;
+cvar_t	*j_side;
+cvar_t	*j_pitch_axis;
+cvar_t	*j_yaw_axis;
+cvar_t	*j_forward_axis;
+cvar_t	*j_side_axis;
+#endif
+
 cvar_t	*cl_activeAction;
 
 cvar_t	*cl_motdString;
@@ -3356,10 +3376,8 @@ CL_Init
 ====================
 */
 void CL_Init( void ) {
-#if !defined TA_WEAPSYS_EX && !defined TURTLEARENA // ALWAYS_RUN
 #ifdef TA_SPLITVIEW
 	int		i;
-#endif
 #endif
 	Com_Printf( "----- Client Initialization -----\n" );
 
@@ -3468,6 +3486,28 @@ void CL_Init( void ) {
 	m_filter = Cvar_Get ("m_filter", "1", CVAR_ARCHIVE);
 #else
 	m_filter = Cvar_Get ("m_filter", "0", CVAR_ARCHIVE);
+#endif
+
+#ifdef TA_SPLITVIEW
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		j_pitch[i] =        Cvar_Get (Com_LocalClientCvarName(i, "j_pitch"),        "0.022", CVAR_ARCHIVE);
+		j_yaw[i] =          Cvar_Get (Com_LocalClientCvarName(i, "j_yaw"),          "-0.022", CVAR_ARCHIVE);
+		j_forward[i] =      Cvar_Get (Com_LocalClientCvarName(i, "j_forward"),      "-0.25", CVAR_ARCHIVE);
+		j_side[i] =         Cvar_Get (Com_LocalClientCvarName(i, "j_side"),         "0.25", CVAR_ARCHIVE);
+		j_pitch_axis[i] =   Cvar_Get (Com_LocalClientCvarName(i, "j_pitch_axis"),   "3", CVAR_ARCHIVE);
+		j_yaw_axis[i] =     Cvar_Get (Com_LocalClientCvarName(i, "j_yaw_axis"),     "4", CVAR_ARCHIVE);
+		j_forward_axis[i] = Cvar_Get (Com_LocalClientCvarName(i, "j_forward_axis"), "1", CVAR_ARCHIVE);
+		j_side_axis[i] =    Cvar_Get (Com_LocalClientCvarName(i, "j_side_axis"),    "0", CVAR_ARCHIVE);
+	}
+#else
+	j_pitch =        Cvar_Get ("j_pitch",        "0.022", CVAR_ARCHIVE);
+	j_yaw =          Cvar_Get ("j_yaw",          "-0.022", CVAR_ARCHIVE);
+	j_forward =      Cvar_Get ("j_forward",      "-0.25", CVAR_ARCHIVE);
+	j_side =         Cvar_Get ("j_side",         "0.25", CVAR_ARCHIVE);
+	j_pitch_axis =   Cvar_Get ("j_pitch_axis",   "3", CVAR_ARCHIVE);
+	j_yaw_axis =     Cvar_Get ("j_yaw_axis",     "4", CVAR_ARCHIVE);
+	j_forward_axis = Cvar_Get ("j_forward_axis", "1", CVAR_ARCHIVE);
+	j_side_axis =    Cvar_Get ("j_side_axis",    "0", CVAR_ARCHIVE);
 #endif
 
 	cl_motdString = Cvar_Get( "cl_motdString", "", CVAR_ROM );
