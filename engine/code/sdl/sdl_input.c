@@ -72,11 +72,13 @@ static cvar_t *in_joystick[MAX_SPLITVIEW] 			= {NULL, NULL, NULL, NULL};
 static cvar_t *in_joystickDebug[MAX_SPLITVIEW]		= {NULL, NULL, NULL, NULL};
 static cvar_t *in_joystickThreshold[MAX_SPLITVIEW]	= {NULL, NULL, NULL, NULL};
 static cvar_t *in_joystickNo[MAX_SPLITVIEW]			= {NULL, NULL, NULL, NULL};
+static cvar_t *in_joystickUseAnalog[MAX_SPLITVIEW]	= {NULL, NULL, NULL, NULL};
 #else
 static cvar_t *in_joystick          = NULL;
 static cvar_t *in_joystickDebug     = NULL;
 static cvar_t *in_joystickThreshold = NULL;
 static cvar_t *in_joystickNo        = NULL;
+static cvar_t *in_joystickUseAnalog = NULL;
 #endif
 
 static int vidRestartTime = 0;
@@ -683,6 +685,7 @@ struct
 {
 	qboolean buttons[16];  // !!! FIXME: these might be too many.
 	unsigned int oldaxes;
+	int oldaaxes[16];
 	unsigned int oldhats;
 }
 #ifdef TA_SPLITVIEW
@@ -786,6 +789,8 @@ static void IN_InitJoystick( void )
 		if( in_joystickNo[i]->integer < 0 || in_joystickNo[i]->integer >= total )
 			Cvar_Set( Com_LocalClientCvarName(i, "in_joystickNo"), "0" );
 
+		in_joystickUseAnalog[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystickUseAnalog"), "0", CVAR_ARCHIVE );
+
 		stick[i] = SDL_JoystickOpen( in_joystickNo[i]->integer );
 
 		if (stick[i] == NULL) {
@@ -794,16 +799,19 @@ static void IN_InitJoystick( void )
 		}
 
 		Com_DPrintf( "Joystick %d opened for player %d\n", in_joystickNo[i]->integer, i+1 );
-		Com_DPrintf( "Name:    %s\n", SDL_JoystickName(in_joystickNo[i]->integer) );
-		Com_DPrintf( "Axes:    %d\n", SDL_JoystickNumAxes(stick[i]) );
-		Com_DPrintf( "Hats:    %d\n", SDL_JoystickNumHats(stick[i]) );
-		Com_DPrintf( "Buttons: %d\n", SDL_JoystickNumButtons(stick[i]) );
-		Com_DPrintf( "Balls: %d\n", SDL_JoystickNumBalls(stick[i]) );
+		Com_DPrintf( "Name:       %s\n", SDL_JoystickName(in_joystickNo[i]->integer) );
+		Com_DPrintf( "Axes:       %d\n", SDL_JoystickNumAxes(stick[i]) );
+		Com_DPrintf( "Hats:       %d\n", SDL_JoystickNumHats(stick[i]) );
+		Com_DPrintf( "Buttons:    %d\n", SDL_JoystickNumButtons(stick[i]) );
+		Com_DPrintf( "Balls:      %d\n", SDL_JoystickNumBalls(stick[i]) );
+		Com_DPrintf( "Use Analog: %s\n", in_joystickUseAnalog[i]->integer ? "Yes" : "No" );
 	}
 #else
 	in_joystickNo = Cvar_Get( "in_joystickNo", "0", CVAR_ARCHIVE );
 	if( in_joystickNo->integer < 0 || in_joystickNo->integer >= total )
 		Cvar_Set( "in_joystickNo", "0" );
+
+	in_joystickUseAnalog = Cvar_Get( "in_joystickUseAnalog", "0", CVAR_ARCHIVE );
 
 	stick = SDL_JoystickOpen( in_joystickNo->integer );
 
@@ -813,11 +821,12 @@ static void IN_InitJoystick( void )
 	}
 
 	Com_DPrintf( "Joystick %d opened\n", in_joystickNo->integer );
-	Com_DPrintf( "Name:    %s\n", SDL_JoystickName(in_joystickNo->integer) );
-	Com_DPrintf( "Axes:    %d\n", SDL_JoystickNumAxes(stick) );
-	Com_DPrintf( "Hats:    %d\n", SDL_JoystickNumHats(stick) );
-	Com_DPrintf( "Buttons: %d\n", SDL_JoystickNumButtons(stick) );
-	Com_DPrintf( "Balls: %d\n", SDL_JoystickNumBalls(stick) );
+	Com_DPrintf( "Name:       %s\n", SDL_JoystickName(in_joystickNo->integer) );
+	Com_DPrintf( "Axes:       %d\n", SDL_JoystickNumAxes(stick) );
+	Com_DPrintf( "Hats:       %d\n", SDL_JoystickNumHats(stick) );
+	Com_DPrintf( "Buttons:    %d\n", SDL_JoystickNumButtons(stick) );
+	Com_DPrintf( "Balls:      %d\n", SDL_JoystickNumBalls(stick) );
+	Com_DPrintf( "Use Analog: %s\n", in_joystickUseAnalog->integer ? "Yes" : "No" );
 #endif
 
 	SDL_JoystickEventState(SDL_QUERY);
@@ -1092,20 +1101,50 @@ static void IN_JoyMove( void )
 #else
 			Sint16 axis = SDL_JoystickGetAxis(stick, i);
 #endif
-			float f = ( (float) axis ) / 32767.0f;
+
 #ifdef TA_SPLITVIEW
-			if( f < -in_joystickThreshold[joy]->value ) {
-				axes |= ( 1 << ( i * 2 ) );
-			} else if( f > in_joystickThreshold[joy]->value ) {
-				axes |= ( 1 << ( ( i * 2 ) + 1 ) );
-			}
+			if (in_joystickUseAnalog[joy]->integer)
 #else
-			if( f < -in_joystickThreshold->value ) {
-				axes |= ( 1 << ( i * 2 ) );
-			} else if( f > in_joystickThreshold->value ) {
-				axes |= ( 1 << ( ( i * 2 ) + 1 ) );
-			}
+			if (in_joystickUseAnalog->integer)
 #endif
+			{
+				float f = ( (float) abs(axis) ) / 32767.0f;
+				
+#ifdef TA_SPLITVIEW
+				if( f < in_joystickThreshold[joy]->value ) axis = 0;
+
+				if ( axis != stick_state[joy].oldaaxes[i] )
+				{
+					Com_QueueEvent( 0, SE_JOYSTICK_AXIS, i, axis, 0, NULL );
+					stick_state[joy].oldaaxes[i] = axis;
+				}
+#else
+				if( f < in_joystickThreshold->value ) axis = 0;
+
+				if ( axis != stick_state.oldaaxes[i] )
+				{
+					Com_QueueEvent( 0, SE_JOYSTICK_AXIS, i, axis, 0, NULL );
+					stick_state.oldaaxes[i] = axis;
+				}
+#endif
+			}
+			else
+			{
+				float f = ( (float) axis ) / 32767.0f;
+#ifdef TA_SPLITVIEW
+				if( f < -in_joystickThreshold[joy]->value ) {
+					axes |= ( 1 << ( i * 2 ) );
+				} else if( f > in_joystickThreshold[joy]->value ) {
+					axes |= ( 1 << ( ( i * 2 ) + 1 ) );
+				}
+#else
+				if( f < -in_joystickThreshold->value ) {
+					axes |= ( 1 << ( i * 2 ) );
+				} else if( f > in_joystickThreshold->value ) {
+					axes |= ( 1 << ( ( i * 2 ) + 1 ) );
+				}
+#endif
+			}
 		}
 	}
 
@@ -1291,7 +1330,6 @@ void IN_Frame( void )
 	}
 }
 
-#ifdef IOQ3ZTM // LOCK_STATE
 /*
 ===============
 IN_InitKeyLockStates
@@ -1305,7 +1343,6 @@ void IN_InitKeyLockStates( void )
 	keys[K_KP_NUMLOCK].down = keystate[SDLK_NUMLOCK];
 	keys[K_CAPSLOCK].down = keystate[SDLK_CAPSLOCK];
 }
-#endif
 
 /*
 ===============
@@ -1376,9 +1413,7 @@ void IN_Init( void )
 	Cvar_SetValue( "com_unfocused",	!( appState & SDL_APPINPUTFOCUS ) );
 	Cvar_SetValue( "com_minimized", !( appState & SDL_APPACTIVE ) );
 
-#ifdef IOQ3ZTM // LOCK_STATE
 	IN_InitKeyLockStates( );
-#endif
 
 	IN_InitJoystick( );
 	Com_DPrintf( "------------------------------------\n" );

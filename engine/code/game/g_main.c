@@ -959,7 +959,7 @@ void AddTournamentPlayer( void ) {
 
 /*
 =======================
-RequeueTournamentLoser
+AddTournamentQueue
 
 Add client to end of tournament queue
 =======================
