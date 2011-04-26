@@ -68,6 +68,8 @@ ifelse(HAVE_PPC64,yes,dnl
       shared data
       <files>
 	base/assets0.pk3
+	base/assets1-qvms.pk3
+	base/assets2-music.pk3
 	turtlearena.png
 	COPYING
 	COPYRIGHTS

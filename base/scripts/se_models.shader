@@ -28,6 +28,13 @@ models/powerups/holdable/shuriken
 {
 	{
 		map models/powerups/holdable/shuriken_1.png
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -35,6 +42,13 @@ models/powerups/holdable/shurikenfire
 {
 	{
 		map models/powerups/holdable/shurikenfire_1.png
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -42,6 +56,13 @@ models/powerups/holdable/shurikenelectric
 {
 	{
 		map models/powerups/holdable/shurikenelectric_1.png
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -49,6 +70,13 @@ models/powerups/holdable/shurikenlaser
 {
 	{
 		map models/powerups/holdable/shurikenlaser_1.png
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -56,6 +84,13 @@ models/shurikens/shuriken
 {
 	{
 		map models/powerups/holdable/shuriken_1.png
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -63,6 +98,13 @@ models/shurikens/shurikenfire
 {
 	{
 		map models/powerups/holdable/shurikenfire_1.png
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -70,6 +112,13 @@ models/shurikens/shurikenelectric
 {
 	{
 		map models/powerups/holdable/shurikenelectric_1.png
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -77,6 +126,13 @@ models/shurikens/shurikenlaser
 {
 	{
 		map models/powerups/holdable/shurikenlaser_1.png
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -98,7 +154,13 @@ models/mapobjects/traffic_cone/traffic_cone
 {
 	{
 		map models/mapobjects/traffic_cone/traffic_cone.jpg
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -114,7 +176,13 @@ models/mapobjects/vent/vent_grid
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		alphaFunc GT0
 		depthWrite
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -122,7 +190,13 @@ models/powerups/health/health
 {
 	{
 		map models/powerups/health/health.png
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -249,10 +323,16 @@ models/powerups/score/sphere
 	{
 		map models/powerups/score/sphere.png
 		//blendfunc GL_ONE GL_ONE
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
 		tcMod turb 0 0.15 0 0.25
 		tcGen environment
 		//alphaGen wave sin .6 .2 0 .6
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -267,19 +347,14 @@ models/weapons2/katana_leo/w_katana
 	{
 		map models/weapons2/katana_leo/w_katana.png
 		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
 	}
-	//{
-	//	map models/weapons2/katana_leo/w_katana_spec.png
-	//	blendFunc GL_SRC_ALPHA GL_ONE
-	//	detail
-	//	alphaGen lightingSpecular
-	//}
-	//{
-	//	map models/weapons2/blade_enviro.jpg
-	//	blendFunc GL_DST_COLOR GL_SRC_COLOR
-	//	tcGen environment
-	//}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
+	}
 }
 
 models/weapons2/sai/w_sai
@@ -287,19 +362,14 @@ models/weapons2/sai/w_sai
 	{
 		map models/weapons2/sai/w_sai.png
 		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
 	}
-	//{
-	//	map models/weapons2/sai/w_sai_spec.png
-	//	blendFunc GL_SRC_ALPHA GL_ONE
-	//	detail
-	//	alphaGen lightingSpecular
-	//}
-	//{
-	//	map models/weapons2/blade_enviro.jpg
-	//	blendFunc GL_DST_COLOR GL_SRC_COLOR
-	//	tcGen environment
-	//}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
+	}
 }
 
 models/weapons2/nunchuck/w_nunchuck
@@ -309,19 +379,31 @@ models/weapons2/nunchuck/w_nunchuck
 		blendFunc GL_ONE GL_ZERO
 		rgbGen lightingDiffuse
 	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
+	}
 }
 
 models/weapons2/nunchuck/chain
 {
-	//{
-	//	map $whiteimage
-	//	rgbGen const ( 0.4 0.4 0.4 )
-	//}
-	{
-		map textures/effects/tinfx_lighter.png
-		tcGen environment
-		rgbGen lightingDiffuse
+//	{
+//		map textures/effects/tinfx_lighter.png
+//		tcGen environment
+//		rgbGen lightingDiffuse
 		//alphaGen wave sin .6 .2 0 .6
+//	}
+	{
+		map $whiteimage
+		rgbGen const ( 0.5 0.5 0.5 )
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -335,7 +417,13 @@ models/weapons2/railgun/railgun
 	{
 		map models/weapons2/railgun/railgun
 		blendfunc blend
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -389,7 +477,13 @@ models/materials/dirt
 	{
 		map models/materials/dirt.png
 		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -400,7 +494,13 @@ models/materials/grass
 	{
 		map models/materials/grass.png
 		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -411,7 +511,13 @@ models/materials/wood
 	{
 		map models/materials/wood.png
 		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -422,7 +528,13 @@ models/materials/stone
 	{
 		map models/materials/stone.png
 		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -433,7 +545,13 @@ models/materials/metal
 	{
 		map models/materials/metal.png
 		blendFunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -459,23 +577,43 @@ models/materials/glass
 // Below CTF flag shaders are from MISSIONPACK demo pak0.pk3/scripts/models.shader
 models/flags/pole
 {
+//	{
+//		// ZTM: Changed image.
+//		map textures/effects/tinfx.png
+//		//map models/flags/pole.png
+//		tcGen environment
+//		rgbGen identityLighting
+//	}
 	{
-		// ZTM: Changed image.
-		map textures/effects/tinfx.png
-		//map models/flags/pole.png
-		tcGen environment
-		rgbGen lightingDiffuse
+		map $whiteimage
+		rgbGen const ( 0.8 0.8 0.8 )
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
 models/flags/skull
 {
+//	{
+//		// ZTM: Changed image.
+//		map textures/effects/envmapmach.png
+//		//map models/flags/skull.png
+//		tcGen environment
+//		rgbGen lightingDiffuse
+//	}
 	{
-		// ZTM: Changed image.
-		map textures/effects/envmapmach.png
-		//map models/flags/skull.png
-		tcGen environment
-		rgbGen lightingDiffuse
+		map $whiteimage
+		rgbGen const ( 1.0 0.9 0.0 )
+	}
+	{
+		map textures/sfx/celshader_2_levels.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -488,7 +626,7 @@ models/flags/r_flag2
 
 	{
 		map models/flags/r_flag2.png
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flags/red_fx.png
@@ -497,19 +635,18 @@ models/flags/r_flag2
 		//tcmod scroll .1 .7
 
 		blendFunc GL_ONE GL_ONE
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flags/r_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
-		map textures/sfx/shadow.jpg
-		tcGen environment
-		//blendFunc GL_ONE GL_ONE
-		blendFunc GL_DST_COLOR GL_ZERO
-		rgbGen identity
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -522,7 +659,7 @@ models/flags/b_flag2
 
 	{
 		map models/flags/b_flag2.png
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flags/blue_fx.png
@@ -530,19 +667,18 @@ models/flags/b_flag2
 		//tcmod scale 9 3
 		//tcmod scroll .1 .7
 		blendFunc GL_ONE GL_ONE
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flags/b_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
-		map textures/sfx/shadow.jpg
-		tcGen environment
-		//blendFunc GL_ONE GL_ONE
-		blendFunc GL_DST_COLOR GL_ZERO
-		rgbGen identity
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -557,24 +693,24 @@ models/flags/n_flag2
 
 	{
 		map models/flags/n_flag2.png
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flags/neutral_fx.png
 		tcGen environment
 		blendFunc GL_ONE GL_ONE
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flags/n_flag2.png
 		blendFunc blend
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
-		map textures/sfx/shadow.jpg
-		tcGen environment
-		blendFunc GL_DST_COLOR GL_ZERO
-		rgbGen identity
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -587,7 +723,7 @@ models/flag2/r_flag2
 
 	{
 		map models/flag2/r_flag2.png
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flag2/red_fx.png
@@ -596,19 +732,18 @@ models/flag2/r_flag2
 		//tcmod scroll .1 .7
 
 		blendFunc GL_ONE GL_ONE
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flag2/r_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
-		map textures/sfx/shadow.jpg
-		tcGen environment
-		//blendFunc GL_ONE GL_ONE
-		blendFunc GL_DST_COLOR GL_ZERO
-		rgbGen identity
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -621,7 +756,7 @@ models/flag2/b_flag2
 
 	{
 		map models/flag2/b_flag2.png
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flag2/blue_fx.png
@@ -629,19 +764,18 @@ models/flag2/b_flag2
 		//tcmod scale 9 3
 		//tcmod scroll .1 .7
 		blendFunc GL_ONE GL_ONE
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flag2/b_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
-		map textures/sfx/shadow.jpg
-		tcGen environment
-		//blendFunc GL_ONE GL_ONE
-		blendFunc GL_DST_COLOR GL_ZERO
-		rgbGen identity
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -654,7 +788,7 @@ models/flag2/w_flag2
 
 	{
 		map models/flag2/w_flag2.png
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flag2/neutral_fx.png
@@ -663,19 +797,18 @@ models/flag2/w_flag2
 		//tcmod scroll .1 .7
 
 		blendFunc GL_ONE GL_ONE
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/flag2/w_flag2.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
-		map textures/sfx/shadow.jpg
-		tcGen environment
-		//blendFunc GL_ONE GL_ONE
-		blendFunc GL_DST_COLOR GL_ZERO
-		rgbGen identity
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -685,12 +818,18 @@ models/powerups/ob2_1
 {
 	{
 		map models/powerups/overload_base.png
-		rgbGen identity
+		rgbGen identityLighting
 	}
 	{
 		map models/powerups/overload_base_glow.png
 		blendfunc add
 		rgbGen wave sin 0.8 0.1 0 0.8
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -714,6 +853,12 @@ models/powerups/ob2_3
 		tcMod rotate 36
 		rgbGen entity
 		//rgbGen wave sin 1 0.2 0 0.8
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -758,7 +903,13 @@ models/mapobjects/flagbase/base_blue
 	{
 		map models/mapobjects/flagbase/base_blue.png
 		blendFunc blend
-		rgbGen lightingdiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -781,7 +932,13 @@ models/mapobjects/flagbase/base_red
 	{
 		map models/mapobjects/flagbase/base_red.png
 		blendFunc blend
-		rgbGen lightingdiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -804,7 +961,13 @@ models/mapobjects/flagbase/base_ntrl
 	{
 		map models/mapobjects/flagbase/base_ntrl.png
 		blendFunc blend
-		rgbGen lightingdiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -857,7 +1020,13 @@ models/powerups/ammo1
 		map textures/effects/envmapgreen.png
 		tcGen environment
 		blendfunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -882,7 +1051,13 @@ models/powerups/scout1
 		map textures/effects/envmapblue.png
 		tcGen environment
 		blendfunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 
@@ -904,7 +1079,13 @@ models/powerups/guard1
 		map textures/effects/envmapmach.png
 		tcGen environment
 		blendfunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 models/powerups/guard2
@@ -924,7 +1105,13 @@ models/powerups/doubler1
 		map textures/effects/envmaproc.png
 		tcGen environment
 		blendfunc GL_ONE GL_ZERO
-		rgbGen lightingDiffuse
+		rgbGen identityLighting
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
 	}
 }
 models/powerups/doubler2

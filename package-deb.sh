@@ -254,11 +254,16 @@ then
 		ORIGDIR=$GAMENAME-data-$version
 	fi
 
+	# ZTM: Some of the music is non-commercial (CC-BY-NC and CC-BY-NC-SA)
+	#        which is considered non-free by the Debian project.
+	#      Should the "non-free" music be packaged in a separate deb (turtlearena-data-non-free)?
+	#        (and in its own assets#.pk3?)
+
 	# ZTM: FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
 	# Build assets0.pk3 if not already built
 	if [ ! -f $DATADIR/base/assets0.pk3 ]
 	then
-		./package-assets.sh --installdir $DATADIR
+		make assets INSTALLDIR=$DATADIR
 
 		echo "Go run Turtle Arena and update the checksum for assets0.pk3 if"
 		echo "    needed, near the top of engine/code/qcommon/files.c"
@@ -266,12 +271,12 @@ then
 	fi
 
 	mkdir -p $DEBINSTALL/$ORIGDIR/base
-	cp $DATADIR/base/assets0.pk3 $DEBINSTALL/$ORIGDIR/base
+	cp $DATADIR/base/assets*.pk3 $DEBINSTALL/$ORIGDIR/base
 
 	cd $DEBINSTALL/$ORIGDIR
 
 	# Copy text files into $DEBINSTALL/$ORIGDIR/ like README, CREDITS, and stuff
-	cp $STARTDIR/GAME_README.txt README
+	cp $STARTDIR/INSTALLER_README.txt README
 	cp $STARTDIR/CREDITS.txt CREDITS
 	cp $STARTDIR/COPYRIGHTS.txt COPYRIGHTS
 	cp $STARTDIR/COPYING.txt COPYING
@@ -377,11 +382,6 @@ then
 
 	# Remove libs for win32 and mac
 	rm -r $DEBINSTALL/$ORIGDIR/code/libs/
-
-	# ZTM: Some of the music is non-commercial (CC-BY-NC and CC-BY-NC-SA)
-	#        which is considered non-free by the Debian project.
-	#      Should the "non-free" music be packaged in a separate deb (turtlearena-data-non-free)?
-	#        (and in its own assets1.pk3?)
 
 	#
 	# Create orig.tar.gz

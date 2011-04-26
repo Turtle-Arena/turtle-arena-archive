@@ -1233,7 +1233,7 @@ LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(B)/$(notdir $@).map
 
 LIBPATHS = -L$(LIBOGC_LIB)
 
-  LIBS = -lwiiuse -lbte -lfat -logc -lm
+  LIBS = -lwiiuse -lbte -lfat -lwiikeyboard -logc -lm
 
 # ZTM: FIXME: Support qvms!
   HAVE_VM_COMPILED = true
@@ -2147,6 +2147,17 @@ Q3POBJ += \
 Q3POBJ_SMP += \
   $(B)/clientsmp/sdl_glimp.o
 
+ifeq ($(PLATFORM),wii)
+$(B)/$(CLIENTBIN).dol: $(B)/$(CLIENTBIN).elf
+	$(echo_cmd) "ELF2DOL $@"
+	$(Q)elf2dol $< $@
+
+$(B)/$(CLIENTBIN).elf: $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+	$(echo_cmd) "LD $@"
+	$(Q)$(CC) $^ $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
+		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
+		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
+else
 ifeq ($(BUILD_SPLINES),1)
 # TTimo: splines code requires C++ linking, but splines have
 # not been officially included in the codebase
@@ -2174,6 +2185,7 @@ $(B)/$(CLIENTBIN)-smp$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
 		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
+endif
 endif
 
 ifneq ($(strip $(LIBSDLMAIN)),)

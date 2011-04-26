@@ -899,6 +899,40 @@ void RB_CalcFogTexCoords( float *st ) {
 
 
 
+#ifdef IOQ3ZTM // ZEQ2_CEL
+/*
+** RB_CalcEnvironmentCelShadeTexCoords
+**
+** RiO; celshade 1D environment map
+*/
+//vec3_t lightOrigin = { -960, 1980, 96 };		// FIXME: track dynamically
+void RB_CalcEnvironmentCelShadeTexCoords( float *st ) 
+{
+    int    i;
+    float  *v, *normal;
+    vec3_t lightDir;
+    float  d;
+
+    normal = tess.normal[0];
+	v = tess.xyz[0];
+
+	// Calculate only once
+//	VectorCopy( backEnd.currentEntity->lightDir, lightDir );
+//	if ( backEnd.currentEntity == &tr.worldEntity )
+//		VectorSubtract( lightOrigin, v, lightDir );
+//	else
+		VectorCopy( backEnd.currentEntity->lightDir, lightDir );
+	VectorNormalizeFast( lightDir );
+
+    for (i = 0 ; i < tess.numVertexes ; i++, v += 4, normal += 4, st += 2 ) {
+		d= DotProduct( normal, lightDir );
+
+		st[0] = 0.5 + d * 0.5;
+		st[1] = 0.5;
+    }
+}
+#endif
+
 /*
 ** RB_CalcEnvironmentTexCoords
 */

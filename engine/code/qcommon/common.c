@@ -223,7 +223,11 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 			time( &aclock );
 			newtime = localtime( &aclock );
 
+#ifdef TURTLEARENA // BRANDING
+			logfile = FS_FOpenFileWrite( "console.log" );
+#else
 			logfile = FS_FOpenFileWrite( "qconsole.log" );
+#endif
 			
 			if(logfile)
 			{
@@ -1001,8 +1005,13 @@ void *Z_TagMalloc( int size, int tag ) {
 			Z_LogHeap();
 #endif
 			// scaned all the way around the list
+#ifdef ZONE_DEBUG
+			Com_Error( ERR_FATAL, "Z_Malloc: failed on allocation of %i bytes from the %s zone (%s: line: %d (%s))",
+								size, zone == smallzone ? "small" : "main", file, line, label);
+#else
 			Com_Error( ERR_FATAL, "Z_Malloc: failed on allocation of %i bytes from the %s zone",
 								size, zone == smallzone ? "small" : "main");
+#endif
 			return NULL;
 		}
 		if (rover->tag) {

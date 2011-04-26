@@ -422,32 +422,7 @@ typedef enum {
 #define MAX_SHURIKENS 99
 #endif
 
-#ifdef TA_WEAPSYS
-// Weapon type
-typedef enum
-{
-    WT_NONE, // Dummy type
-
-	// ZTM: NOTE: Gauntlet code hasn't been tested...
-	WT_GAUNTLET, // Uses primary hand only
-    WT_GUN, // One gun, both hands.
-	WT_MELEE,
-    WT_MAX
-
-} weapontype_t;
-
-// Default weapon if animation.cfg doesn't set one.
-#ifdef TURTLEARENA // WEAPONS
-#define DEFAULT_DEFAULT_WEAPON "WP_FISTS"
-#else
-#define DEFAULT_DEFAULT_WEAPON "WP_GAUNTLET" // "WP_MACHINEGUN"
-#endif
-
-// WP_DEFAULT will need to be remapped to the default weapon.
-#define WP_DEFAULT	-1
-#define WP_NONE		0
-#define weapon_t	int
-#else
+#ifndef TA_WEAPSYS
 typedef enum {
 	WP_NONE,
 
@@ -704,6 +679,18 @@ typedef struct
 
 } bg_projectileinfo_t;
 
+// Weapon type
+typedef enum
+{
+    WT_NONE, // Dummy type
+
+	WT_GAUNTLET,
+    WT_GUN,
+	WT_MELEE,
+    WT_MAX
+
+} weapontype_t;
+
 #define TRAIL_NONE 0
 #define TRAIL_DEFAULT 1
 typedef struct
@@ -806,6 +793,18 @@ typedef struct
 	bg_weapongroup_anims_t primaryAnims; // Set of animations while holding flag
 
 } bg_weapongroupinfo_t;
+
+// Default weapon if animation.cfg doesn't set one.
+#ifdef TURTLEARENA // WEAPONS
+#define DEFAULT_DEFAULT_WEAPON "WP_FISTS"
+#else
+#define DEFAULT_DEFAULT_WEAPON "WP_GAUNTLET" // "WP_MACHINEGUN"
+#endif
+
+// WP_DEFAULT will need to be remapped to the default weapon.
+#define WP_DEFAULT	-1
+#define WP_NONE		0
+#define weapon_t	int
 
 #ifdef TA_WEAPSYS_EX
 #define MAX_BG_PROJ 64

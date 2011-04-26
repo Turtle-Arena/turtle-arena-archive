@@ -46,15 +46,25 @@ long myftol( float f );
 // parallel on a dual cpu machine
 #define	SMP_FRAMES		2
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Comment is wrong.
+// 14 bits
+// can't be increased without changing bit packing for drawsurfs
+// see QSORT_SHADERNUM_SHIFT
+#define SHADERNUM_BITS			14
+#define	MAX_SHADERS				(1<<SHADERNUM_BITS)
+#else
 // 12 bits
 // see QSORT_SHADERNUM_SHIFT
 #define	MAX_SHADERS				16384
+#endif
 
 //#define MAX_SHADER_STATES 2048
 #define MAX_STATES_PER_SHADER 32
 #define MAX_STATE_NAME 32
 
+#ifndef IOQ3ZTM // IOQ3BUGFIX: Move comment
 // can't be increased without changing bit packing for drawsurfs
+#endif
 
 
 typedef struct dlight_s {
@@ -216,6 +226,9 @@ typedef enum {
 	TCGEN_ENVIRONMENT_MAPPED,
 	TCGEN_FOG,
 	TCGEN_VECTOR			// S and T from world coordinates
+#ifdef IOQ3ZTM // ZEQ2_CEL
+	,TCGEN_ENVIRONMENT_CELSHADE_MAPPED
+#endif
 } texCoordGen_t;
 
 typedef enum {
@@ -843,13 +856,35 @@ the bits are allocated as follows:
 2-6   : fog index
 0-1   : dlightmap index
 */
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-#define	QSORT_ORDER_SHIFT		17 // Only uses 5 bits
+#ifdef IOQ3ZTM
+	#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+	/*
+	Turtle Arena
+	17-21 : sorted order value
+	7-16  : entity index
+	2-6   : fog index
+	0-1   : dlightmap index
+	*/
+	#endif
+
+	#define	QSORT_FOGNUM_SHIFT		2
+	#define	QSORT_ENTITYNUM_SHIFT	7
+	#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+		#define	QSORT_ORDER_SHIFT	(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
+		#if (QSORT_ORDER_SHIFT+5) > 32 // sort order is 5 bit
+			#error "Need to update sorting, too many bits."
+		#endif
+	#else
+		#define	QSORT_SHADERNUM_SHIFT	(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
+		#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 32
+			#error "Need to update sorting, too many bits."
+		#endif
+	#endif
 #else
-#define	QSORT_SHADERNUM_SHIFT	17
+	#define	QSORT_SHADERNUM_SHIFT	17
+	#define	QSORT_ENTITYNUM_SHIFT	7
+	#define	QSORT_FOGNUM_SHIFT		2
 #endif
-#define	QSORT_ENTITYNUM_SHIFT	7
-#define	QSORT_FOGNUM_SHIFT		2
 
 extern	int			gl_filter_min, gl_filter_max;
 
@@ -1579,6 +1614,9 @@ void	R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t
 
 void	RB_DeformTessGeometry( void );
 
+#ifdef IOQ3ZTM // ZEQ2_CEL
+void	RB_CalcEnvironmentCelShadeTexCoords( float *dstTexCoords );
+#endif
 void	RB_CalcEnvironmentTexCoords( float *dstTexCoords );
 void	RB_CalcFogTexCoords( float *dstTexCoords );
 void	RB_CalcScrollTexCoords( const float scroll[2], float *dstTexCoords );

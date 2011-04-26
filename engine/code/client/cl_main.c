@@ -1317,7 +1317,12 @@ void CL_Disconnect( qboolean showMainMenu ) {
 #endif
 
 	// Stop recording any video
-	if( CL_VideoRecording( ) ) {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: It can record the main menu, etc, when not playing demo.
+	if( clc.demoplaying && CL_VideoRecording( ) )
+#else
+	if( CL_VideoRecording( ) )
+#endif
+	{
 		// Finish rendering current frame
 		SCR_UpdateScreen( );
 		CL_CloseAVI( );
@@ -2895,7 +2900,12 @@ void CL_Frame ( int msec ) {
 	// if recording an avi, lock to a fixed fps
 	if ( CL_VideoRecording( ) && cl_aviFrameRate->integer && msec) {
 		// save the current screen
-		if ( cls.state == CA_ACTIVE || cl_forceavidemo->integer) {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: It can record the main menu, etc, when not playing demo.
+		if ( !clc.demoplaying || cls.state == CA_ACTIVE || cl_forceavidemo->integer )
+#else
+		if ( cls.state == CA_ACTIVE || cl_forceavidemo->integer)
+#endif
+		{
 			CL_TakeVideoFrame( );
 
 			// fixed time for next frame'
@@ -3241,13 +3251,7 @@ void CL_Video_f( void )
   char  filename[ MAX_OSPATH ];
   int   i, last;
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: It can record the main menu, so allow and tell user how.
-  if (!clc.demoplaying && !cl_forceavidemo->integer)
-  {
-    Com_Printf( "The video command can only be used when playing back demos or cl_forceavidemo is enabled\n" );
-    return;
-  }
-#else
+#ifndef IOQ3ZTM // IOQ3BUGFIX: It can record the main menu, etc, when not playing demo.
   if( !clc.demoplaying )
   {
     Com_Printf( "The video command can only be used when playing back demos\n" );

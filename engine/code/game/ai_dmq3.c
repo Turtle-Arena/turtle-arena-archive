@@ -1659,8 +1659,9 @@ void BotChooseWeapon(bot_state_t *bs) {
 #else
 		newweaponnum = trap_BotChooseBestFightWeapon(bs->ws, bs->inventory);
 #endif
-		if (bs->weaponnum != newweaponnum) bs->weaponchange_time = FloatTime();
-			bs->weaponnum = newweaponnum;
+		if (bs->weaponnum != newweaponnum)
+			bs->weaponchange_time = FloatTime();
+		bs->weaponnum = newweaponnum;
 		//BotAI_Print(PRT_MESSAGE, "bs->weaponnum = %d\n", bs->weaponnum);
 	}
 #else

@@ -541,11 +541,31 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	int			i;
 	gentity_t	*ent;
 	char		*s, *value, *gametypeName;
-#ifdef TA_MISC // tornament to duel, obelisk to overload
-	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "overload", "harvester", "teamtournament"};
+	static char *gametypeNames[] = {
+		"ffa",
+#ifdef TA_MISC // tornament to duel
+		"duel",
 #else
-	static char *gametypeNames[] = {"ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
+		"tournament",
 #endif
+#ifdef TA_SP
+		"coop",
+#else
+		"single",
+#endif
+		"team",
+		"ctf",
+		"oneflag",
+#ifdef TA_MISC // tornament to duel, obelisk to overload
+		"overload",
+#else
+		"obelisk",
+#endif
+		"harvester"
+#ifndef IOQ3ZTM
+		,"teamtournament"
+#endif
+	};
 
 	// get the next free entity
 	ent = G_Spawn();
@@ -555,7 +575,12 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	}
 
 	// check for "notsingle" flag
-	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
+#ifdef TA_SP
+	if ( g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER )
+#else
+	if ( g_gametype.integer == GT_SINGLE_PLAYER )
+#endif
+	{
 		G_SpawnInt( "notsingle", "0", &i );
 		if ( i ) {
 			G_FreeEntity( ent );
@@ -599,16 +624,40 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 #endif
 #endif
 
+#ifdef TA_SP // ZTM: Support single player and coop separately?
+	if ( g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER )
+		gametypeName = "single";
+	else if ( g_gametype.integer >= 0 && g_gametype.integer < ARRAY_LEN(gametypeNames) ) {
+		gametypeName = gametypeNames[g_gametype.integer];
+	} else {
+		gametypeName = NULL;
+	}
+#endif
+
+#ifdef IOQ3ZTM // ZTM: Allow not spawning in only some gametypes. Copied from OpenArena (oax)
+	if( G_SpawnString( "!gametype", NULL, &value ) ) {
+		//if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
+		//	gametypeName = gametypeNames[g_gametype.integer];
+
+			s = strstr( value, gametypeName );
+			if( s ) {
+				G_FreeEntity( ent );
+				return;
+			}
+		//}
+	}
+#endif
+
 	if( G_SpawnString( "gametype", NULL, &value ) ) {
-		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
-			gametypeName = gametypeNames[g_gametype.integer];
+		//if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
+		//	gametypeName = gametypeNames[g_gametype.integer];
 
 			s = strstr( value, gametypeName );
 			if( !s ) {
 				G_FreeEntity( ent );
 				return;
 			}
-		}
+		//}
 	}
 
 	// move editor origin to pos
