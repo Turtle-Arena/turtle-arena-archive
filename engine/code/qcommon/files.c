@@ -175,40 +175,41 @@ or configs will never get loaded from disk!
 // every time a new demo pk3 file is built, this checksum must be updated.
 // the easiest way to get it is to just run the game and see what it spits out
 #if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-#define PAK_REQUIRED 0
-#define PAK_OPTIONAL 1 // ZTM: TODO: Allow Language paks and/or other net-safe paks
+#define PAK_OPTIONAL 1	// Optional pak only used by client which isn't needed to play the game.
+//#define PAK_MUSIC 2		// ZTM: TODO: Pak may only contain music and doesn't check checksum. Allows users to add whatever music they want.
 
 typedef struct
 {
 	char *gamename;
 	char *pakname;
 	unsigned checksum;
-	int status;
+	int flags;
 } purePak_t;
 
 const purePak_t com_purePaks[] =
 {
-#ifdef TA_MAIN // Turtle Arena and ioq3turtle use assets0.pk3
-	{BASEGAME, "assets0", 4075197396u, PAK_REQUIRED},
-	//{BASEGAME, "assets1-cc-by-nc", 0, PAK_OPTIONAL},
+#ifdef TA_MAIN // Turtle Arena and ioq3turtle use assets#.pk3
+	{BASEGAME, "assets0", 3558319239u, 0},
+	{BASEGAME, "assets1-qvms", 3642285333u, 0},
+	{BASEGAME, "assets2-music", 549660614u, PAK_OPTIONAL},
 #else
-	{BASEQ3, "pak0", 1566731103u, PAK_REQUIRED},
-	{BASEQ3, "pak1", 298122907u, PAK_REQUIRED},
-	{BASEQ3, "pak2", 412165236u, PAK_REQUIRED},
-	{BASEQ3, "pak3", 2991495316u, PAK_REQUIRED},
-	{BASEQ3, "pak4", 1197932710u, PAK_REQUIRED},
-	{BASEQ3, "pak5", 4087071573u, PAK_REQUIRED},
-	{BASEQ3, "pak6", 3709064859u, PAK_REQUIRED},
-	{BASEQ3, "pak7", 908855077u, PAK_REQUIRED},
-	{BASEQ3, "pak8", 977125798u, PAK_REQUIRED},
+	{BASEQ3, "pak0", 1566731103u, 0},
+	{BASEQ3, "pak1", 298122907u, 0},
+	{BASEQ3, "pak2", 412165236u, 0},
+	{BASEQ3, "pak3", 2991495316u, 0},
+	{BASEQ3, "pak4", 1197932710u, 0},
+	{BASEQ3, "pak5", 4087071573u, 0},
+	{BASEQ3, "pak6", 3709064859u, 0},
+	{BASEQ3, "pak7", 908855077u, 0},
+	{BASEQ3, "pak8", 977125798u, 0},
 
 	#define	DEMO_PAK0_CHECKSUM	2985612116u
-	{"demoq3", "pak0", DEMO_PAK0_CHECKSUM, PAK_REQUIRED},
+	{"demoq3", "pak0", DEMO_PAK0_CHECKSUM, 0},
 
-	{BASETA, "pak0", 2430342401u, PAK_REQUIRED},
-	{BASETA, "pak1", 511014160u, PAK_REQUIRED},
-	{BASETA, "pak2", 2662638993u, PAK_REQUIRED},
-	{BASETA, "pak3", 1438664554u, PAK_REQUIRED},
+	{BASETA, "pak0", 2430342401u, 0},
+	{BASETA, "pak1", 511014160u, 0},
+	{BASETA, "pak2", 2662638993u, 0},
+	{BASETA, "pak3", 1438664554u, 0},
 #endif
 
 	{NULL, NULL, 0, 0}
@@ -362,6 +363,30 @@ qboolean FS_Initialized( void ) {
 	return (fs_searchpaths != NULL);
 }
 
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+/*
+=================
+FS_PakIsOptional
+=================
+*/
+qboolean FS_PakIsOptional(pack_t *pack) {
+	int i;
+
+	for ( i = 0 ; com_purePaks[i].pakname != NULL ; i++ ) {
+		if ((com_purePaks[i].flags & PAK_OPTIONAL)
+			&& !Q_stricmp(com_purePaks[i].gamename, pack->pakGamename)
+			&& !Q_stricmp(com_purePaks[i].pakname, pack->pakBasename)
+			&& pack->checksum == com_purePaks[i].checksum
+			&& !(pack->referenced & (FS_CGAME_REF | FS_UI_REF))) {
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+#endif
+
+
 /*
 =================
 FS_PakIsPure
@@ -379,6 +404,11 @@ qboolean FS_PakIsPure( pack_t *pack ) {
 				return qtrue;		// on the aproved list
 			}
 		}
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+		if (FS_PakIsOptional(pack)) {
+			return qtrue;
+		}
+#endif
 		return qfalse;	// not on the pure server pak list
 	}
 	return qtrue;
@@ -1214,6 +1244,9 @@ int FS_FOpenFileRead( const char *filename, fileHandle_t *file, qboolean uniqueF
 						   !FS_IsExt(filename, ".bot", l) &&
 						   !FS_IsExt(filename, ".arena", l) &&
 						   !FS_IsExt(filename, ".menu", l) &&
+#ifdef IOQ3ZTM
+						   !strstr(filename, "music") &&
+#endif
 						   !strstr(filename, "levelshots"))
 						{
 							pak->referenced |= FS_GENERAL_REF;
@@ -3280,7 +3313,7 @@ static void FS_Startup( const char *gameName )
 #ifdef TA_MAIN
 		Cvar_Set("fs_basepath", "/usr/share/games/turtlearena" );
 #else
-		Cvar_Set("fs_basepath", "/usr/share/games/ioquake3" );
+		Cvar_Set("fs_basepath", "/usr/share/games/quake3" );
 #endif
 	}
 #endif
@@ -3596,7 +3629,7 @@ static void FS_CheckPaks( void )
 
 	// Add up total value of foundPak
 	for (pak = 0; com_purePaks[pak].pakname != NULL; pak++) {
-		if (com_purePaks[pak].status != PAK_REQUIRED) {
+		if (com_purePaks[pak].flags & PAK_OPTIONAL) {
 			continue;
 		}
 
@@ -3833,6 +3866,11 @@ const char *FS_ReferencedPakPureChecksums( void ) {
 		for ( search = fs_searchpaths ; search ; search = search->next ) {
 			// is the element a pak file and has it been referenced based on flag?
 			if ( search->pack && (search->pack->referenced & nFlags)) {
+#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
+				if (FS_PakIsOptional(search->pack)) {
+					continue;
+				}
+#endif
 				Q_strcat( info, sizeof( info ), va("%i ", search->pack->pure_checksum ) );
 				if (nFlags & (FS_CGAME_REF | FS_UI_REF)) {
 					break;
