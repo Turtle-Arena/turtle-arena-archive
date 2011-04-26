@@ -407,8 +407,15 @@ extern	cvar_t	*cl_timeNudge;
 extern	cvar_t	*cl_showTimeDelta;
 extern	cvar_t	*cl_freezeDemo;
 
+#ifdef TA_SPLITVIEW
+extern	cvar_t	*cl_yawspeed[MAX_SPLITVIEW];
+extern	cvar_t	*cl_pitchspeed[MAX_SPLITVIEW];
+extern	cvar_t	*cl_anglespeedkey[MAX_SPLITVIEW];
+#else
 extern	cvar_t	*cl_yawspeed;
 extern	cvar_t	*cl_pitchspeed;
+extern	cvar_t	*cl_anglespeedkey;
+#endif
 #ifndef TURTLEARENA // ALWAYS_RUN
 #ifdef TA_SPLITVIEW
 extern	cvar_t	*cl_run[MAX_SPLITVIEW];
@@ -416,7 +423,6 @@ extern	cvar_t	*cl_run[MAX_SPLITVIEW];
 extern	cvar_t	*cl_run;
 #endif
 #endif
-extern	cvar_t	*cl_anglespeedkey;
 
 extern	cvar_t	*cl_sensitivity;
 extern	cvar_t	*cl_freelook;
