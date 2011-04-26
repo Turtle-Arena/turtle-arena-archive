@@ -3620,7 +3620,9 @@ static void FS_CheckPaks( void )
 	searchpath_t	*path;
 	unsigned foundPak = 0;
 	unsigned invalidPak = 0;
+#ifndef DEDICATED
 	qboolean hasPakFile = qfalse;
+#endif
 	int pak, total = 0;
 
 	// If we're not pure don't check
@@ -3651,7 +3653,9 @@ static void FS_CheckPaks( void )
 		if (!path->pack)
 			continue;
 
+#ifndef DEDICATED
 		hasPakFile = qtrue;
+#endif
 
 		for (pak = 0; com_purePaks[pak].pakname != NULL; pak++)
 		{
