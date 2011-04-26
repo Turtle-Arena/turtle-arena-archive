@@ -190,13 +190,7 @@ models/powerups/health/health
 {
 	{
 		map models/powerups/health/health.png
-		rgbGen identityLighting
-	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc filter
-		rgbGen identityLighting
-		tcGen cel
+		rgbGen lightingDiffuse
 	}
 }
 
