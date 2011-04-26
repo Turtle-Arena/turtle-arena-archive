@@ -22,7 +22,7 @@ The Turtle Arena source code and data are licensed under the GNU General Public 
 	(See COPYING.txt for full license)
 
 == Credits ==
-id software, ioquake3 developers, Thilo Schulz, Open Arena, Xreal project, Smokin' Guns, Mercenaries Guild Client for Tremulous, GNU FreeFonts, rfactory.org, "inolan.com", Zack "ZTurtleMan" Middleton
+id software, ioquake3 developers, Thilo Schulz, Open Arena, Xreal project, Smokin' Guns, Mercenaries Guild Client for Tremulous, ZEQ2-lite, The Mulletz, GNU FreeFonts, rfactory.org, "inolan.com", Zack "ZTurtleMan" Middleton
 
 See CREDITS.txt for details.
 
