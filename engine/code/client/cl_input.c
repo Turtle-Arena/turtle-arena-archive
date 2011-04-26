@@ -527,12 +527,23 @@ void IN_CenterView (void) {
 
 //==========================================================================
 
+#ifndef IOQ3ZTM // UNUSED
 cvar_t	*cl_upspeed;
 cvar_t	*cl_forwardspeed;
 cvar_t	*cl_sidespeed;
+#endif
 
+#ifdef TA_SPLITVIEW
+cvar_t	*cl_yawspeed[MAX_SPLITVIEW];
+cvar_t	*cl_pitchspeed[MAX_SPLITVIEW];
+
+cvar_t	*cl_anglespeedkey[MAX_SPLITVIEW];
+#else
 cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
+
+cvar_t	*cl_anglespeedkey;
+#endif
 
 #ifndef TURTLEARENA // ALWAYS_RUN
 #ifdef TA_SPLITVIEW
@@ -541,9 +552,6 @@ cvar_t	*cl_run[MAX_SPLITVIEW];
 cvar_t	*cl_run;
 #endif
 #endif
-
-cvar_t	*cl_anglespeedkey;
-
 
 /*
 ================
@@ -554,6 +562,9 @@ Moves the local angle positions
 */
 void CL_AdjustAngles( calc_t *lc, clientInput_t *ci ) {
 	float	speed;
+#ifdef TA_SPLITVIEW
+	size_t	lcNum = lc - cl.localClients;
+#endif
 	
 #ifdef TURTLEARENA // LOCKON // NO_SPEED_KEY
 	if ( !ci->in_lockon.active )
@@ -561,7 +572,11 @@ void CL_AdjustAngles( calc_t *lc, clientInput_t *ci ) {
 	if ( ci->in_speed.active )
 #endif
 	{
+#ifdef TA_SPLITVIEW
+		speed = 0.001 * cls.frametime * cl_anglespeedkey[lcNum]->value;
+#else
 		speed = 0.001 * cls.frametime * cl_anglespeedkey->value;
+#endif
 	} else {
 		speed = 0.001 * cls.frametime;
 	}
@@ -572,12 +587,22 @@ void CL_AdjustAngles( calc_t *lc, clientInput_t *ci ) {
 #endif
 		)
 	{
+#ifdef TA_SPLITVIEW
+		lc->viewangles[YAW] -= speed*cl_yawspeed[lcNum]->value*CL_KeyState (&ci->in_right);
+		lc->viewangles[YAW] += speed*cl_yawspeed[lcNum]->value*CL_KeyState (&ci->in_left);
+#else
 		lc->viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&ci->in_right);
 		lc->viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&ci->in_left);
+#endif
 	}
 
+#ifdef TA_SPLITVIEW
+	lc->viewangles[PITCH] -= speed*cl_pitchspeed[lcNum]->value * CL_KeyState (&ci->in_lookup);
+	lc->viewangles[PITCH] += speed*cl_pitchspeed[lcNum]->value * CL_KeyState (&ci->in_lookdown);
+#else
 	lc->viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&ci->in_lookup);
 	lc->viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&ci->in_lookdown);
+#endif
 }
 
 /*
@@ -714,7 +739,11 @@ void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 	if ( ci->in_speed.active )
 #endif
 	{
+#ifdef TA_SPLITVIEW
+		anglespeed = 0.001 * cls.frametime * cl_anglespeedkey[lcNum]->value;
+#else
 		anglespeed = 0.001 * cls.frametime * cl_anglespeedkey->value;
+#endif
 	} else {
 		anglespeed = 0.001 * cls.frametime;
 	}
