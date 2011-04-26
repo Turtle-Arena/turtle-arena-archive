@@ -1005,7 +1005,7 @@ void *Z_TagMalloc( int size, int tag ) {
 			Z_LogHeap();
 #endif
 			// scaned all the way around the list
-#ifdef ZONE_DEBUG
+#if defined IOQ3ZTM && defined ZONE_DEBUG
 			Com_Error( ERR_FATAL, "Z_Malloc: failed on allocation of %i bytes from the %s zone (%s: line: %d (%s))",
 								size, zone == smallzone ? "small" : "main", file, line, label);
 #else
