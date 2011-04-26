@@ -1044,8 +1044,8 @@ typedef enum {
 #define MAX_PARTICLES_AREAS 64
 #endif
 
-#if 0 //#ifdef IOQ3ZTM_NO_COMPAT // ZTM: Support more gentities // ZTM: FIXME: Client fails to Z_TagMalloc memory...
-#define GENTITYNUM_BITS		11		// don't need to send any more
+#ifdef IOQ3ZTM_NO_COMPAT // MORE_GENTITIES // ZTM: Support more gentities
+#define GENTITYNUM_BITS		12		// don't need to send any more
 #else
 #define	GENTITYNUM_BITS		10		// don't need to send any more
 #endif

@@ -856,14 +856,13 @@ the bits are allocated as follows:
 2-6   : fog index
 0-1   : dlightmap index
 */
-#ifdef IOQ3ZTM
-	#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+#if 1 //#ifdef IOQ3ZTM
+	#ifdef IOQ3ZTM_NO_COMPAT // MORE_GENTITIES
 	/*
-	Turtle Arena
-	17-21 : sorted order value
-	7-16  : entity index
-	2-6   : fog index
-	0-1   : dlightmap index
+	19-23 : sorted order value (5 bits)
+	7-18  : entity index (12 bits)
+	2-6   : fog index (5 bits)
+	0-1   : dlightmap index (2 bits)
 	*/
 	#endif
 
