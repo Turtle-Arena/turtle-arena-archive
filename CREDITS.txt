@@ -10,6 +10,7 @@ Turtle Arena credits.
 * GNU FreeFonts			(For FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf)
 * Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)
 * The Mulletz			(For music)
+* ZEQ2-lite				(For cel shading tcGen code)
 * Zack "ZTurtleMan" Middleton
 
 
@@ -18,7 +19,7 @@ Most of the Turtle Arena source code is licensed under the GNU General Public Li
 	(See COPYING file for full license)
 
 Most of the data is licensed under the GNU GPLv2 or later and/or licensed under the Creative Commons ShareAlike 3.0,
-	see COPYRIGHTS file full details.
+	see COPYRIGHTS file for details.
 
 
 == Data ==
@@ -54,6 +55,9 @@ ioq3 is mostly GPLv2 or later, but also includes code under other licenses.
 
 * Mercenaries Guild Client 1.011 for Tremulous: http://projects.mercenariesguild.net/projects/mgclient
 ** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some parts, ...)
+
+* ZEQ2-lite (ZEQ2_CEL): http://zeq2.com/lite/
+** Cel shading texture coord generation code, "tcGen cel".
 
 === Other ===
 Code based on guides, etc.
