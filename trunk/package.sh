@@ -284,7 +284,7 @@ if [ ! -f $INSTALLDIR/base/assets0.pk3 ]
 then
 	echo "Data..."
 
-	./package-assets.sh --installdir $INSTALLDIR
+	make assets INSTALLDIR=$DATADIR
 
 	if [ -f $INSTALLDIR/base/assets0.pk3 ]
 	then
@@ -358,11 +358,9 @@ if [ ! -d $ZIPDIR/base ]
 then
 	mkdir $ZIPDIR/base
 fi
-if [ -f $ZIPDIR/base/assets0.pk3 ]
-then
-	rm $ZIPDIR/base/assets0.pk3
+rm -f $ZIPDIR/base/assets*.pk3
 fi
-cp $INSTALLDIR/base/assets0.pk3 $ZIPDIR/base
+cp $INSTALLDIR/base/assets*.pk3 $ZIPDIR/base
 
 if [ $LINUX -eq 1 ]
 then

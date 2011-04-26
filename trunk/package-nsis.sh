@@ -94,7 +94,7 @@ fi
 # Build assets0.pk3 if not already built
 if [ ! -f $DATADIR/base/assets0.pk3 ]
 then
-	./package-assets.sh --installdir $DATADIR
+	make assets INSTALLDIR=$DATADIR
 
 	echo "Go run Turtle Arena and update the checksum for assets0.pk3 if"
 	echo "    needed, near the top of engine/code/qcommon/files.c!"
@@ -120,10 +120,10 @@ cd misc/nsis/
 make clean
 
 # Build installer
-make ASSETS="$STARTDIR/$DATADIR/base/assets0.pk3"
+make ASSETPATH="$STARTDIR/$DATADIR/base/"
 
 # Move to trunk
-make install INSTALLDIR=$STARTDIR/$INSTALLDIR/nsis
+make install INSTALLDIR="$STARTDIR/$INSTALLDIR/nsis"
 
 # Don't leave it a mess
 make clean

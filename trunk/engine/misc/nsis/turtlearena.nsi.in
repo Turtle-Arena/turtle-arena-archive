@@ -112,7 +112,9 @@ Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
   File "README.txt"
 
   SetOutPath "$INSTDIR\${MODDIR}"
-  File "/oname=assets0.pk3" "XXXASSETSXXX"
+  File "XXXASSETPATHXXX/assets0.pk3"
+  File "XXXASSETPATHXXX/assets1-qvms.pk3"
+  File "XXXASSETPATHXXX/assets2-music.pk3"
   File "../../build/release-mingw32-x86/${MODDIR}/cgamex86.dll"
   File "../../build/release-mingw32-x86/${MODDIR}/qagamex86.dll"
   File "../../build/release-mingw32-x86/${MODDIR}/uix86.dll"
@@ -142,7 +144,7 @@ Section "Start Menu Shortcuts"
 
 SectionEnd
 
-Section "SDL.dll"
+Section "SDL library"
 
   SetOutPath $INSTDIR
 
@@ -150,7 +152,7 @@ Section "SDL.dll"
 
 SectionEnd
 
-Section "libcurl"
+Section "cURL library"
 
   SetOutPath $INSTDIR
 
@@ -178,6 +180,8 @@ Section "Uninstall"
 
   ; Remove files and uninstaller
   Delete $INSTDIR\${MODDIR}\assets0.pk3
+  Delete $INSTDIR\${MODDIR}\assets1-qvms.pk3
+  Delete $INSTDIR\${MODDIR}\assets2-music.pk3
   Delete $INSTDIR\${MODDIR}\cgamex86.dll
   Delete $INSTDIR\${MODDIR}\qagamex86.dll
   Delete $INSTDIR\${MODDIR}\uix86.dll

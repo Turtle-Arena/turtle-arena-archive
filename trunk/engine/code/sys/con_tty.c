@@ -25,68 +25,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "sys_local.h"
 
 #include <unistd.h>
-#include <signal.h>
-#ifndef __wii__
-#include <termios.h>
-#endif
-#include <fcntl.h>
 #include <sys/time.h>
-
 #ifdef __wii__
-#include <network.h>
-
-#define select net_select
-
-// devkitproPPC is missing termios.h
-typedef unsigned char	cc_t;
-typedef unsigned int	speed_t;
-typedef unsigned int	tcflag_t;
-
-#define NCCS 32
-struct termios
-  {
-    tcflag_t c_iflag;		/* input mode flags */
-    tcflag_t c_oflag;		/* output mode flags */
-    tcflag_t c_cflag;		/* control mode flags */
-    tcflag_t c_lflag;		/* local mode flags */
-    cc_t c_line;			/* line discipline */
-    cc_t c_cc[NCCS];		/* control characters */
-    speed_t c_ispeed;		/* input speed */
-    speed_t c_ospeed;		/* output speed */
-#define _HAVE_STRUCT_TERMIOS_C_ISPEED 1
-#define _HAVE_STRUCT_TERMIOS_C_OSPEED 1
-  };
-
-/* c_cc characters */
-#define VINTR 0
-#define VQUIT 1
-#define VERASE 2
-#define VKILL 3
-#define VEOF 4
-#define VTIME 5
-#define VMIN 6
-#define VSWTC 7
-#define VSTART 8
-#define VSTOP 9
-#define VSUSP 10
-#define VEOL 11
-#define VREPRINT 12
-#define VDISCARD 13
-#define VWERASE 14
-#define VLNEXT 15
-#define VEOL2 16
-
-/* tcsetattr uses these */
-#define	TCSADRAIN	1
-
-/* c_lflag bits */
-#define ICANON	0000002
-#define ECHO	0000010
-
-/* c_iflag bits */
-#define INPCK	0000020
-#define ISTRIP	0000040
+#include <string.h>
+#include <gctypes.h>
+#include <wiikeyboard/keyboard.h>
+#else
+#include <signal.h>
+#include <termios.h>
+#include <fcntl.h>
 #endif
+
+
 
 /*
 =============================================================
@@ -98,17 +48,26 @@ called before and after a stdout or stderr output
 =============================================================
 */
 
+#ifdef __wii__
+// general flag to tell about keyboard state
+static qboolean keyboard_connected = qfalse;
+
+static FILE *con_log;
+#else
 extern qboolean stdinIsATTY;
 static qboolean stdin_active;
+#endif
 // general flag to tell about tty console mode
 static qboolean ttycon_on = qfalse;
 static int ttycon_hide = 0;
 
+#ifndef __wii__
 // some key codes that the terminal may be using, initialised on start up
 static int TTY_erase;
 static int TTY_eof;
 
 static struct termios TTY_tc;
+#endif
 
 static field_t TTY_con;
 
@@ -226,16 +185,20 @@ Never exit without calling this, or your terminal will be left in a pretty bad s
 */
 void CON_Shutdown( void )
 {
+#ifdef __wii__
+  CON_Back(); // Delete "]"
+  KEYBOARD_Deinit();
+  fclose(con_log);
+#else
 	if (ttycon_on)
 	{
 		CON_Back(); // Delete "]"
-#ifndef __wii__ // ZTM: FIXME: wii
 		tcsetattr (STDIN_FILENO, TCSADRAIN, &TTY_tc);
-#endif
 	}
 
 	// Restore blocking to stdin reads
 	fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL, 0) & ~O_NONBLOCK);
+#endif
 }
 
 /*
@@ -336,6 +299,23 @@ void wiiCON_Init( void )
 void CON_Init( void )
 #endif
 {
+#ifdef __wii__
+	int ret;
+
+	ret = KEYBOARD_Init(NULL);
+
+	if (ret >= 1) {
+		keyboard_connected = qtrue;
+	} else {
+		keyboard_connected = qfalse;
+	}
+
+	con_log = fopen("/ta-log.txt", "wb");
+
+	Field_Clear(&TTY_con);
+
+	ttycon_on = qtrue;
+#else
 	struct termios tc;
 
 	// If the process is backgrounded (running non interactively)
@@ -358,7 +338,6 @@ void CON_Init( void )
 	}
 
 	Field_Clear(&TTY_con);
-#ifndef __wii__ // ZTM: FIXME: wii
 	tcgetattr (STDIN_FILENO, &TTY_tc);
 	TTY_erase = TTY_tc.c_cc[VERASE];
 	TTY_eof = TTY_tc.c_cc[VEOF];
@@ -383,8 +362,8 @@ void CON_Init( void )
 	tc.c_cc[VMIN] = 1;
 	tc.c_cc[VTIME] = 0;
 	tcsetattr (STDIN_FILENO, TCSADRAIN, &tc);
-#endif
 	ttycon_on = qtrue;
+#endif
 }
 
 /*
@@ -398,18 +377,36 @@ char *CON_Input( void )
 	static char text[MAX_EDIT_LINE];
 	int avail;
 	char key;
+#ifndef __wii__
 	field_t *history;
+#endif
 	size_t size;
+#ifdef __wii__
+	keyboard_event event;
+
+	//
+#endif
 
 	if(ttycon_on)
 	{
+#ifdef __wii__
+		avail = KEYBOARD_GetEvent(&event);
+		if (avail && event.type == KEYBOARD_PRESSED)
+		{
+			key = event.keycode;
+#else
 		avail = read(STDIN_FILENO, &key, 1);
 		if (avail != -1)
 		{
+#endif
 			// we have something
 			// backspace?
 			// NOTE TTimo testing a lot of values .. seems it's the only way to get it to work everywhere
-			if ((key == TTY_erase) || (key == 127) || (key == 8))
+			if (
+#ifndef __wii__
+				(key == TTY_erase) ||
+#endif
+				(key == 127) || (key == 8))
 			{
 				if (TTY_con.cursor > 0)
 				{
@@ -440,6 +437,9 @@ char *CON_Input( void )
 					CON_Show();
 					return NULL;
 				}
+#ifdef __wii__
+				Com_DPrintf("droping ISCTL sequence: %d\n", key);
+#else
 				avail = read(STDIN_FILENO, &key, 1);
 				if (avail != -1)
 				{
@@ -485,6 +485,7 @@ char *CON_Input( void )
 					}
 				}
 				Com_DPrintf("droping ISCTL sequence: %d, TTY_erase: %d\n", key, TTY_erase);
+#endif
 				CON_FlushIn();
 				return NULL;
 			}
@@ -493,12 +494,15 @@ char *CON_Input( void )
 			// push regular character
 			TTY_con.buffer[TTY_con.cursor] = key;
 			TTY_con.cursor++;
+#ifndef __wii__
 			// print the current line (this is differential)
 			size = write(STDOUT_FILENO, &key, 1);
+#endif
 		}
 
 		return NULL;
 	}
+#ifndef __wii__
 	else if (stdin_active)
 	{
 		int     len;
@@ -525,6 +529,7 @@ char *CON_Input( void )
 
 		return text;
 	}
+#endif
 	return NULL;
 }
 
@@ -535,6 +540,11 @@ CON_Print
 */
 void CON_Print( const char *msg )
 {
+#ifdef __wii__
+	printf(msg);
+	fputs(msg, con_log);
+	fflush(con_log);
+#else
 	CON_Hide( );
 
 	if( com_ansiColor && com_ansiColor->integer )
@@ -543,4 +553,5 @@ void CON_Print( const char *msg )
 		fputs( msg, stderr );
 
 	CON_Show( );
+#endif
 }

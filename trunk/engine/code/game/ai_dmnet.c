@@ -118,6 +118,9 @@ int BotGetAirGoal(bot_state_t *bs, bot_goal_t *goal) {
 	vec3_t end, mins = {-15, -15, -2}, maxs = {15, 15, 2};
 	int areanum;
 
+#ifdef TURTLEARENA // DROWNING // ZTM: TODO: If bubble spawning entity is added check for near by bubbles we well as surface.
+#endif
+
 	//trace up until we hit solid
 	VectorCopy(bs->origin, end);
 	end[2] += 1000;
@@ -157,7 +160,12 @@ int BotGoForAir(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 	bot_goal_t goal;
 
 	//if the bot needs air
-	if (bs->lastair_time < FloatTime() - 6) {
+#ifdef TURTLEARENA // DROWNING
+	if (bs->lastair_time < FloatTime() - 20)
+#else
+	if (bs->lastair_time < FloatTime() - 6)
+#endif
+	{
 		//
 #ifdef DEBUG
 		//BotAI_Print(PRT_MESSAGE, "going for air\n");
@@ -683,10 +691,12 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
 				}
 				bs->ltgtype = 0;
 			}
+#ifndef IOQ3ZTM // UNUSED
 			//
 			if (bs->camp_range > 0) {
 				//FIXME: move around a bit
 			}
+#endif
 			//
 			trap_BotResetAvoidReach(bs->ms);
 			return qfalse;

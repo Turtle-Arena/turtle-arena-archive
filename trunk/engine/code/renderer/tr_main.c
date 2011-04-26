@@ -1164,8 +1164,8 @@ R_DecomposeSort
 void R_DecomposeSort( const drawSurf_t *drawSurf, int *entityNum, shader_t **shader, 
 					 int *fogNum, int *dlightMap, int *sortOrder) {
 	*fogNum = ( drawSurf->sort >> QSORT_FOGNUM_SHIFT ) & 31;
-	*sortOrder = ( drawSurf->sort >> QSORT_ORDER_SHIFT );
-	*entityNum = ( drawSurf->sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
+	*sortOrder = ( drawSurf->sort >> QSORT_ORDER_SHIFT ) & 31;
+	*entityNum = ( drawSurf->sort >> QSORT_ENTITYNUM_SHIFT ) & (MAX_GENTITIES-1);
 	*dlightMap = drawSurf->sort & 3;
 
 	*shader = tr.shaders[ drawSurf->shaderIndex ];
@@ -1192,7 +1192,11 @@ void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
 					 int *fogNum, int *dlightMap ) {
 	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
 	*shader = tr.sortedShaders[ ( sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
+#ifdef IOQ3ZTM // IOQ3BUGFIX: (should probably be changed in ioq3)
+	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & (MAX_GENTITIES-1);
+#else
 	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
+#endif
 	*dlightMap = sort & 3;
 }
 #endif

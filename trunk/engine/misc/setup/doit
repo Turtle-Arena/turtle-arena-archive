@@ -24,6 +24,7 @@ rm -f image/turtlearena.png
 cp ../quake3.png image/turtlearena.png
 
 ### binaries
+# engine top directory
 topdir="../.."
 
 echo "changequote(\`[', \`]')dnl" > defines.m4
@@ -86,12 +87,14 @@ install -m 755 /usr/bin/xdg-desktop-menu image/xdg-desktop-menu
 install -m 644 turtlearena.desktop image/turtlearena.desktop.in
 
 ### README, COPYING and EULA
-install -m 644 ../$topdir/GAME_README.txt image/README
+install -m 644 ../$topdir/INSTALLER_README.txt image/README
 install -m 644 ../$topdir/COPYING.txt image/COPYING
 install -m 644 ../$topdir/COPYRIGHTS.txt image/COPYRIGHTS
 install -m 644 ../$topdir/CREDITS.txt image/CREDITS
 mkdir image/base
 install -m 644 ../$topdir/install/base/assets0.pk3 image/base/assets0.pk3
+install -m 644 ../$topdir/install/base/assets1-qvms.pk3 image/base/assets1-qvms.pk3
+install -m 644 ../$topdir/install/base/assets2-music.pk3 image/base/assets2-music.pk3
 
 # create setup.xml
 m4 defines.m4 setup.xml.in > image/setup.data/setup.xml
