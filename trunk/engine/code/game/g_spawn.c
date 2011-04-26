@@ -624,7 +624,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 #endif
 #endif
 
-#ifdef TA_SP // ZTM: Support single player and coop separately?
+#ifdef TA_SP // ZTM: Support single player and coop separately.
 	if ( g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER )
 		gametypeName = "single";
 	else if ( g_gametype.integer >= 0 && g_gametype.integer < ARRAY_LEN(gametypeNames) ) {
@@ -636,28 +636,36 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 
 #ifdef IOQ3ZTM // ZTM: Allow not spawning in only some gametypes. Copied from OpenArena (oax)
 	if( G_SpawnString( "!gametype", NULL, &value ) ) {
-		//if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
-		//	gametypeName = gametypeNames[g_gametype.integer];
+#ifndef TA_SP
+		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
+			gametypeName = gametypeNames[g_gametype.integer];
+#endif
 
 			s = strstr( value, gametypeName );
 			if( s ) {
 				G_FreeEntity( ent );
 				return;
 			}
-		//}
+#ifndef TA_SP
+		}
+#endif
 	}
 #endif
 
 	if( G_SpawnString( "gametype", NULL, &value ) ) {
-		//if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
-		//	gametypeName = gametypeNames[g_gametype.integer];
+#ifndef TA_SP
+		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
+			gametypeName = gametypeNames[g_gametype.integer];
+#endif
 
 			s = strstr( value, gametypeName );
 			if( !s ) {
 				G_FreeEntity( ent );
 				return;
 			}
-		//}
+#ifndef TA_SP
+		}
+#endif
 	}
 
 	// move editor origin to pos
