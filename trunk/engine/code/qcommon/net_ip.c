@@ -404,9 +404,7 @@ static void Sys_SockaddrToString(char *dest, int destlen, struct sockaddr *input
 	else
 		inputlen = sizeof(struct sockaddr_in);
 
-#ifndef __wii__ // ZTM: FIXME: wii
 	if(getnameinfo(input, inputlen, dest, destlen, NULL, 0, NI_NUMERICHOST) && destlen > 0)
-#endif
 		*dest = '\0';
 #endif
 }

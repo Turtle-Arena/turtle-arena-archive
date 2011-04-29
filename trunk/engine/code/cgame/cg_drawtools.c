@@ -590,7 +590,6 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 	trap_R_SetColor( NULL );
 }
 
-// ZTM: TODO: Replace using CG_DrawStringExt, string width is often used with it (and it not right when using ttf fonts)
 void CG_DrawStringExt( int x, int y, const char *string, const float *setColor, 
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars )
 {
