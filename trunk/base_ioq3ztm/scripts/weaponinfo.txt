@@ -267,6 +267,7 @@ weapon "w_lightning"
 	attackDelay 50
 	flashColor 0.6 0.6 1
 	continuousFlash 1
+	initialEffectOnly 1
 	flashSound0 "sound/weapons/lightning/lg_fire.wav"
 	projectile "p_lightning bolt"
 }

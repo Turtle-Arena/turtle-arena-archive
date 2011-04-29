@@ -716,6 +716,8 @@ typedef struct
 #define WIF_EJECT_SMOKE2			256		// Shotgun smoke
 //
 #define WIF_BARREL_IDLE_USE_GRAVITY	512
+#define WIF_INITIAL_EFFECT_ONLY		1024	// when holding the attack button the flash sound
+											// and brass eject would happen only on the first press.
 
 // Barrel Spin
 #define BS_PITCH PITCH // 0
