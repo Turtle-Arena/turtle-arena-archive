@@ -2644,6 +2644,7 @@ static qboolean Weapon_Parse(char **p) {
 		else PARSE_STRING(token, "flashSound3", weapon.flashSoundName[3])
 		else PARSE_LIST(token, "barrelSpin", weapon.barrelSpin, barrelSpinNames)
 		else PARSE_BIT(token, "barrelIdleUseGravity", weapon.flags, WIF_BARREL_IDLE_USE_GRAVITY)
+		else PARSE_BIT(token, "initialEffectOnly", weapon.flags, WIF_INITIAL_EFFECT_ONLY)
 		else PARSE_STRING(token, "impactSound0", weapon.impactSoundName[0])
 		else PARSE_STRING(token, "impactSound1", weapon.impactSoundName[1])
 		else PARSE_STRING(token, "impactSound2", weapon.impactSoundName[2])
@@ -3088,6 +3089,7 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tejectSmoke %d\r\n", (weapon->flags & WIF_EJECT_SMOKE));
 		FS_Printf2("\tejectSmoke2 %d\r\n", (weapon->flags & WIF_EJECT_SMOKE2));
 		FS_Printf2("\tbarrelIdleUseGravity %d\r\n", (weapon->flags & WIF_BARREL_IDLE_USE_GRAVITY));
+		FS_Printf2("\tinitialEffectOnly %d\r\n", (weapon->flags & WIF_INITIAL_EFFECT_ONLY));
 
 		FS_Printf2("\tsplashMod %s\r\n", modNames[weapon->splashMod]);
 		if (weapon->flashColor[0] == (float)'c' && weapon->flashColor[1] == 1.0f && weapon->flashColor[2] == 0)

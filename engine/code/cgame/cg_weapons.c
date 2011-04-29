@@ -3870,7 +3870,7 @@ void CG_WeaponUseEffect( centity_t *cent, int handSide, int weaponNum )
 	bg_weaponinfo_t *weap;
 	int		contents;
 
-	if (weaponNum <= 0 || weaponNum > BG_NumWeapons())
+	if (weaponNum < 0 || weaponNum >= BG_NumWeapons())
 	{
 		return;
 	}
@@ -3926,6 +3926,8 @@ void CG_FireWeapon( centity_t *cent ) {
 	int				c;
 #ifdef TA_WEAPSYS
 	weaponGroupInfo_t	*weap;
+	int				hand;
+	qboolean		firstValid = qtrue;
 #else
 	weaponInfo_t	*weap;
 #endif
@@ -3957,20 +3959,7 @@ void CG_FireWeapon( centity_t *cent ) {
 	// append the flash to the weapon model
 	cent->muzzleFlashTime = cg.time;
 
-#ifdef TA_WEAPSYS // ZTM: TODO: Add a flag for this?
-						// The flag would make it so that when holding the attack
-						//   button the flash sound and brass ecj would happen only on
-						//   the first press.
-						// Well for now check for lightning trail and instantDamge...
-	// lightning gun only does this this on initial press
-	if (bg_weapongroupinfo[ent->weapon].weapon[0]->proj->trailType == PT_LIGHTNING
-		&& bg_weapongroupinfo[ent->weapon].weapon[0]->proj->instantDamage)
-	{
-		if ( cent->pe.lightningFiring ) {
-			return;
-		}
-	}
-#else
+#ifndef TA_WEAPSYS
 	// lightning gun only does this this on initial press
 	if ( ent->weapon == WP_LIGHTNING ) {
 		if ( cent->pe.lightningFiring ) {
@@ -3979,17 +3968,32 @@ void CG_FireWeapon( centity_t *cent ) {
 	}
 #endif
 
+#ifdef TA_WEAPSYS
+	for (hand = 0; hand < MAX_HANDS; hand++)
+	{
+		if ((bg_weapongroupinfo[ent->weapon].weapon[hand]->flags & WF_INITIAL_EFFECT_ONLY)
+			&& cent->pe.lightningFiring)
+		{
+			continue;
+		}
+#endif
 #ifndef TURTLEARENA // POWERS
 	// play quad sound if needed
 	if ( cent->currentState.powerups & ( 1 << PW_QUAD ) ) {
+#ifdef TA_WEAPSYS
+		if (firstValid)
+#endif
 		trap_S_StartSound (NULL, cent->currentState.number, CHAN_ITEM, cgs.media.quadSound );
+#ifdef TA_WEAPSYS
+		firstValid = qfalse;
+#endif
 	}
 #endif
 
 	// play a sound
 	for ( c = 0 ; c < 4 ; c++ ) {
 #ifdef TA_WEAPSYS
-		if ( !cg_weapons[bg_weapongroupinfo[ent->weapon].weaponnum[0]].flashSound[c] )
+		if ( !cg_weapons[bg_weapongroupinfo[ent->weapon].weaponnum[hand]].flashSound[c] )
 #else
 		if ( !weap->flashSound[c] )
 #endif
@@ -4000,14 +4004,14 @@ void CG_FireWeapon( centity_t *cent ) {
 	if ( c > 0 ) {
 		c = rand() % c;
 #ifdef TA_WEAPSYS
-		if ( cg_weapons[bg_weapongroupinfo[ent->weapon].weaponnum[0]].flashSound[c] )
+		if ( cg_weapons[bg_weapongroupinfo[ent->weapon].weaponnum[hand]].flashSound[c] )
 #else
 		if ( weap->flashSound[c] )
 #endif
 		{
 			trap_S_StartSound( NULL, ent->number, CHAN_WEAPON,
 #ifdef TA_WEAPSYS
-					cg_weapons[bg_weapongroupinfo[ent->weapon].weaponnum[0]].flashSound[c]
+					cg_weapons[bg_weapongroupinfo[ent->weapon].weaponnum[hand]].flashSound[c]
 #else
 					weap->flashSound[c]
 #endif
@@ -4017,8 +4021,7 @@ void CG_FireWeapon( centity_t *cent ) {
 
 	// do brass ejection
 #ifdef TA_WEAPSYS
-	for (c = 0; c < MAX_HANDS; c++) {
-		CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.handSide[c], bg_weapongroupinfo[ent->weapon].weaponnum[c]);
+		CG_WeaponUseEffect(cent, cgs.clientinfo[cent->currentState.number].playercfg.handSide[hand], bg_weapongroupinfo[ent->weapon].weaponnum[hand]);
 	}
 #else
 	if ( weap->ejectBrassFunc && cg_brassTime.integer > 0 ) {
