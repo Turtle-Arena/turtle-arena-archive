@@ -3927,7 +3927,9 @@ void CG_FireWeapon( centity_t *cent ) {
 #ifdef TA_WEAPSYS
 	weaponGroupInfo_t	*weap;
 	int				hand;
+#ifndef TURTLEARENA // POWERS
 	qboolean		firstValid = qtrue;
+#endif
 #else
 	weaponInfo_t	*weap;
 #endif
@@ -3971,7 +3973,7 @@ void CG_FireWeapon( centity_t *cent ) {
 #ifdef TA_WEAPSYS
 	for (hand = 0; hand < MAX_HANDS; hand++)
 	{
-		if ((bg_weapongroupinfo[ent->weapon].weapon[hand]->flags & WF_INITIAL_EFFECT_ONLY)
+		if ((bg_weapongroupinfo[ent->weapon].weapon[hand]->flags & WIF_INITIAL_EFFECT_ONLY)
 			&& cent->pe.lightningFiring)
 		{
 			continue;
