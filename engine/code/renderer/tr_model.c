@@ -208,10 +208,10 @@ void MC_UnCompress(float mat[3][4],const unsigned char * comp);
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Fall back to MDR/MD4
 /*
 ====================
-RE_RegisterMD3
+R_RegisterMD3
 ====================
 */
-qhandle_t RE_RegisterMD3(const char *name, model_t *mod) {
+qhandle_t R_RegisterMD3(const char *name, model_t *mod) {
 	union {
 		unsigned *u;
 		void *v;
@@ -261,7 +261,7 @@ qhandle_t RE_RegisterMD3(const char *name, model_t *mod) {
 #else
 				ri.Printf (PRINT_WARNING,"RE_RegisterMD3: unknown fileid for %s\n", name);
 #endif
-				return 0;
+				goto fail;
 			}
 
 			loaded = R_LoadMD3( mod, lod, buf.u, name );
@@ -275,7 +275,7 @@ qhandle_t RE_RegisterMD3(const char *name, model_t *mod) {
 
 		if ( !loaded ) {
 			if ( lod == 0 ) {
-				return 0;
+				goto fail;
 			} else {
 				break;
 			}
@@ -311,16 +311,18 @@ qhandle_t RE_RegisterMD3(const char *name, model_t *mod) {
 	}
 #endif
 
+fail:
+	mod->type = MOD_BAD;
 	return 0;
 }
 
 #ifdef RAVENMD4
 /*
 ====================
-RE_RegisterMDR
+R_RegisterMDR
 ====================
 */
-qhandle_t RE_RegisterMDR(const char *name, model_t *mod) {
+qhandle_t R_RegisterMDR(const char *name, model_t *mod) {
 	union {
 		unsigned *u;
 		void *v;
@@ -336,6 +338,7 @@ qhandle_t RE_RegisterMDR(const char *name, model_t *mod) {
 #endif
 	if(!buf.u)
 	{
+		mod->type = MOD_BAD;
 		return 0;
 	}
 	
@@ -356,6 +359,7 @@ qhandle_t RE_RegisterMDR(const char *name, model_t *mod) {
 #else
 		ri.Printf(PRINT_WARNING,"RE_RegisterMDR: couldn't load mdr file %s\n", name);
 #endif
+		mod->type = MOD_BAD;
 		return 0;
 	}
 	
@@ -374,10 +378,10 @@ typedef struct
 static modelExtToLoaderMap_t modelLoaders[ ] =
 {
 #ifdef RAVENMD4
-	{ "mdr", RE_RegisterMDR },
+	{ "mdr", R_RegisterMDR },
 #endif
-	{ "md4", RE_RegisterMD3 },
-	{ "md3", RE_RegisterMD3 }
+	{ "md4", R_RegisterMD3 },
+	{ "md3", R_RegisterMD3 }
 };
 
 static int numModelLoaders = ARRAY_LEN(modelLoaders);
@@ -496,6 +500,7 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	R_SyncRenderThread();
 #endif
 
+	mod->type = MOD_BAD;
 	mod->numLods = 0;
 
 	//
@@ -565,9 +570,6 @@ qhandle_t RE_RegisterModel( const char *name ) {
 			break;
 		}
 	}
-
-	if ( !hModel )
-		mod->type = MOD_BAD;
 
 	return hModel;
 #else
