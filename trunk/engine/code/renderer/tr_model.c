@@ -261,12 +261,12 @@ typedef struct
 // when there are multiple models of different formats available
 static modelExtToLoaderMap_t modelLoaders[ ] =
 {
+	{ "iqm", R_RegisterIQM },
 #ifdef RAVENMD4
 	{ "mdr", R_RegisterMDR },
 #endif
 	{ "md4", R_RegisterMD3 },
-	{ "md3", R_RegisterMD3 },
-	{ "iqm", R_RegisterIQM }
+	{ "md3", R_RegisterMD3 }
 };
 
 static int numModelLoaders = ARRAY_LEN(modelLoaders);
