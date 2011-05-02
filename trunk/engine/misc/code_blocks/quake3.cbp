@@ -930,6 +930,9 @@
 		<Unit filename="../../code/renderer/tr_model.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/renderer/tr_model_iqm.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/renderer/tr_noise.c">
 			<Option compilerVar="CC" />
 		</Unit>

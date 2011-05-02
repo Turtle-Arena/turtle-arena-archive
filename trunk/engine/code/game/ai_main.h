@@ -132,11 +132,7 @@ typedef struct bot_state_s
 	playerState_t cur_ps;							//current player state
 	int last_eFlags;								//last ps flags
 	usercmd_t lastucmd;								//usercmd from last frame
-#ifdef IOQ3ZTM // IOQ3BUGFIX: (not really a bugfix, but should probably be changed in ioq3.)
 	int entityeventTime[MAX_GENTITIES];				//last entity event time
-#else
-	int entityeventTime[1024];						//last entity event time
-#endif
 	//
 	bot_settings_t settings;						//several bot settings
 	int (*ainode)(struct bot_state_s *bs);			//current AI node

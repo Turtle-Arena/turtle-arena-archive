@@ -1192,11 +1192,7 @@ void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
 					 int *fogNum, int *dlightMap ) {
 	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
 	*shader = tr.sortedShaders[ ( sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
-#ifdef IOQ3ZTM // IOQ3BUGFIX: (should probably be changed in ioq3)
 	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & (MAX_GENTITIES-1);
-#else
-	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
-#endif
 	*dlightMap = sort & 3;
 }
 #endif
@@ -1386,6 +1382,9 @@ void R_AddEntitySurfaces (void) {
 					R_MDRAddAnimSurfaces( ent );
 					break;
 #endif
+				case MOD_IQM:
+					R_AddIQMSurfaces( ent );
+					break;
 				case MOD_BRUSH:
 #ifdef IOQ3ZTM // RENDERFLAGS
 					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
