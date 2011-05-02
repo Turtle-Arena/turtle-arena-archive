@@ -868,6 +868,7 @@
 			<Option target="Release Linux x86_64" />
 			<Option target="Debug Linux x86_64" />
 		</Unit>
+		<Unit filename="../../code/renderer/iqm.h" />
 		<Unit filename="../../code/renderer/qgl.h" />
 		<Unit filename="../../code/renderer/tr_animation.c">
 			<Option compilerVar="CC" />
