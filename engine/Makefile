@@ -78,7 +78,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 1948
+IOQ3_REVISION = 1957
 
 #
 # Start build type
@@ -269,7 +269,7 @@ else # END QUAKE3
 	# TA_PATHSYS			General path system using entities like path_corner
 	# TA_ENTSYS				Adds new entities and allows all ET_MOVER entities to be breakable.
 	# TA_NPCSYS   			WIP NPC system, based on TDC_NPC system and code in Quake3
-	# TA_ATMEFFECTS			TODO Atmospheric fffects.
+	# TA_ATMEFFECTS			TODO Atmospheric effects.
 	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
 	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
 	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
@@ -1951,6 +1951,7 @@ Q3OBJ = \
   $(B)/client/tr_image_tga.o \
   $(B)/client/tr_image_pcx.o \
   $(B)/client/tr_init.o \
+  $(B)/client/tr_model_iqm.o \
   $(B)/client/tr_light.o \
   $(B)/client/tr_main.o \
   $(B)/client/tr_marks.o \
@@ -2287,7 +2288,8 @@ endif
 #ZTM: if TA_GAME_TAGS
 ifeq ($(DED_USE_MODELS),1)
 Q3DOBJ += \
-      $(B)/ded/tr_model.o
+      $(B)/ded/tr_model.o \
+      $(B)/ded/tr_model_iqm.o
 endif
 
 ifeq ($(USE_INTERNAL_ZLIB),1)

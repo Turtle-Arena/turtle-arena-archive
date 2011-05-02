@@ -1525,8 +1525,7 @@ static imageExtToLoaderMap_t imageLoaders[ ] =
 	{ "bmp",  R_LoadBMP }
 };
 
-static int numImageLoaders = sizeof( imageLoaders ) /
-		sizeof( imageLoaders[ 0 ] );
+static int numImageLoaders = ARRAY_LEN( imageLoaders );
 
 /*
 =================
@@ -1539,9 +1538,11 @@ Loads any of the supported image types into a cannonical
 void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 {
 	qboolean orgNameFailed = qfalse;
+	int orgLoader = -1;
 	int i;
 	char localName[ MAX_QPATH ];
 	const char *ext;
+	char *altName;
 
 	*pic = NULL;
 	*width = 0;
@@ -1572,6 +1573,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 				// Loader failed, most likely because the file isn't there;
 				// try again without the extension
 				orgNameFailed = qtrue;
+				orgLoader = i;
 				COM_StripExtension( name, localName, MAX_QPATH );
 			}
 			else
@@ -1586,7 +1588,10 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 	// the image formats supported
 	for( i = 0; i < numImageLoaders; i++ )
 	{
-		char *altName = va( "%s.%s", localName, imageLoaders[ i ].ext );
+		if (i == orgLoader)
+			continue;
+
+		altName = va( "%s.%s", localName, imageLoaders[ i ].ext );
 
 		// Load
 		imageLoaders[ i ].ImageLoader( altName, pic, width, height );
