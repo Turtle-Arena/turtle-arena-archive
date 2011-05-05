@@ -26,33 +26,28 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#ifdef STANDALONE
-  #ifdef TURTLEARENA
-    #define PRODUCT_NAME			"Turtle Arena"
-    #define BASEGAME				"base"
-    #define CLIENT_WINDOW_TITLE     "Turtle Arena"
-    #define CLIENT_WINDOW_MIN_TITLE "Turtle Arena"
-    #define GAMENAME_FOR_MASTER		"TurtleArena"
-    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER "-1"
-    #define FLATLINE_FOR_MASTER		GAMENAME_FOR_MASTER "Flatline-1"
-  #elif defined IOQ3ZTM
-	// Standalone IOQ3ZTM is a mod for Turtle Arena
-    #define PRODUCT_NAME			"ioq3turtle"
-    #define BASEGAME				"base"
-    #define CLIENT_WINDOW_TITLE     "ioquake3turtle"
-    #define CLIENT_WINDOW_MIN_TITLE "ioq3turtle"
-    #define GAMENAME_FOR_MASTER		"TurtleArena"
-    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER "-1"
-    #define FLATLINE_FOR_MASTER		GAMENAME_FOR_MASTER "Flatline-1"
-  #else
-    #define PRODUCT_NAME			"iofoo3"
-    #define BASEGAME			"foobar"
-    #define CLIENT_WINDOW_TITLE     	"changeme"
-    #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
-    #define GAMENAME_FOR_MASTER		"iofoo3"		// must NOT contain whitespaces
-    #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER
-    #define FLATLINE_FOR_MASTER		GAMENAME_FOR_MASTER "dead"
-  #endif
+#ifdef TA_MAIN
+  #define PRODUCT_NAME				"Turtle Arena"
+  #define BASEGAME					"base"
+  #define CLIENT_WINDOW_TITLE		"Turtle Arena"
+  #define CLIENT_WINDOW_MIN_TITLE	"Turtle Arena"
+  #define GAMENAME_FOR_MASTER		"TurtleArena"
+  #define HEARTBEAT_FOR_MASTER		GAMENAME_FOR_MASTER "-1"
+  #define FLATLINE_FOR_MASTER		GAMENAME_FOR_MASTER "Flatline-1"
+  #define HOMEPATH_NAME_UNIX		".turtlearena"
+  #define HOMEPATH_NAME_WIN			"TurtleArena"
+  #define HOMEPATH_NAME_MACOSX		HOMEPATH_NAME_WIN
+#elif defined STANDALONE
+  #define PRODUCT_NAME			"iofoo3"
+  #define BASEGAME			"foobar"
+  #define CLIENT_WINDOW_TITLE     	"changeme"
+  #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
+  #define GAMENAME_FOR_MASTER		"iofoo3"		// must NOT contain whitespaces
+  #define HEARTBEAT_FOR_MASTER	GAMENAME_FOR_MASTER
+  #define FLATLINE_FOR_MASTER		GAMENAME_FOR_MASTER "dead"
+  #define HOMEPATH_NAME_UNIX		".foo"
+  #define HOMEPATH_NAME_WIN		"FooBar"
+  #define HOMEPATH_NAME_MACOSX		HOMEPATH_NAME_WIN
 #else
   #define PRODUCT_NAME			"ioq3"
   #define BASEGAME			"baseq3"
@@ -61,6 +56,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define GAMENAME_FOR_MASTER		"Quake3Arena"
   #define HEARTBEAT_FOR_MASTER		"QuakeArena-1"
   #define FLATLINE_FOR_MASTER		HEARTBEAT_FOR_MASTER
+  #define HOMEPATH_NAME_UNIX		".q3a"
+  #define HOMEPATH_NAME_WIN		"Quake3"
+  #define HOMEPATH_NAME_MACOSX		HOMEPATH_NAME_WIN
 #endif
 
 // ZTM: id software basegames to not auto download
@@ -68,7 +66,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define BASETA						"missionpack"
 
 #ifdef TA_SP
-  // Its really "fs_game\\saves", so each mod has its own saves dir.
+  // It's really "fs_game\\saves", so each mod has its own saves dir.
   #define SAVEGAMEDIR "saves"
 #endif
 

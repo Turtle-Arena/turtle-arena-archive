@@ -94,11 +94,7 @@ char *Sys_DefaultHomePath( void )
 		if(com_homepath->string[0])
 			Q_strcat(homePath, sizeof(homePath), com_homepath->string);
 		else
-#ifdef TA_MAIN
-			Q_strcat(homePath, sizeof(homePath), "TurtleArena");
-#else
-			Q_strcat(homePath, sizeof(homePath), "Quake3");
-#endif
+			Q_strcat(homePath, sizeof(homePath), HOMEPATH_NAME_WIN);
 
 		FreeLibrary(shfolder);
 	}
