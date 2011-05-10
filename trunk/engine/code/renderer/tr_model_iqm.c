@@ -195,8 +195,13 @@ qboolean R_LoadIQM( model_t *mod, void *buffer, int filesize, const char *mod_na
 
 	// check ioq3 joint limit
 	if ( header->num_joints > IQM_MAX_JOINTS ) {
+#ifdef RENDERLESS_MODELS
+		Com_Printf("R_LoadIQM: %s has more than %d joints (%d).\n",
+				mod_name, IQM_MAX_JOINTS, header->num_joints);
+#else
 		ri.Printf(PRINT_WARNING, "R_LoadIQM: %s has more than %d joints (%d).\n",
 				mod_name, IQM_MAX_JOINTS, header->num_joints);
+#endif
 		return qfalse;
 	}
 
@@ -316,14 +321,24 @@ qboolean R_LoadIQM( model_t *mod, void *buffer, int filesize, const char *mod_na
 		// check ioq3 limits
 		if ( mesh->num_vertexes > SHADER_MAX_VERTEXES ) 
 		{
+#ifdef RENDERLESS_MODELS
+			Com_Printf("R_LoadIQM: %s has more than %i verts on a surface (%i).\n",
+				  mod_name, SHADER_MAX_VERTEXES, mesh->num_vertexes );
+#else
 			ri.Printf(PRINT_WARNING, "R_LoadIQM: %s has more than %i verts on a surface (%i).\n",
 				  mod_name, SHADER_MAX_VERTEXES, mesh->num_vertexes );
+#endif
 			return qfalse;
 		}
 		if ( mesh->num_triangles*3 > SHADER_MAX_INDEXES ) 
 		{
+#ifdef RENDERLESS_MODELS
+			Com_Printf("R_LoadIQM: %s has more than %i triangles on a surface (%i).\n",
+				  mod_name, SHADER_MAX_INDEXES / 3, mesh->num_triangles );
+#else
 			ri.Printf(PRINT_WARNING, "R_LoadIQM: %s has more than %i triangles on a surface (%i).\n",
 				  mod_name, SHADER_MAX_INDEXES / 3, mesh->num_triangles );
+#endif
 			return qfalse;
 		}
 
@@ -837,7 +852,21 @@ void R_AddIQMSurfaces( trRefEntity_t *ent ) {
 			{
 				if (!strcmp(skin->surfaces[j]->name, surface->name))
 				{
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+					int index;
+
+					if (ent->e.skinFraction == 1.0f) {
+						index = skin->surfaces[j]->numShaders-1;
+					} else if (ent->e.skinFraction == 0.0f) {
+						index = 0;
+					} else { // >= 0 && < 1
+						index = (ent->e.skinFraction * skin->surfaces[j]->numShaders);
+					}
+
+					shader = skin->surfaces[j]->shaders[index];
+#else
 					shader = skin->surfaces[j]->shader;
+#endif
 					break;
 				}
 			}
