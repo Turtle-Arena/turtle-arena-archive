@@ -281,8 +281,9 @@ else # END QUAKE3
 
 	# Turtle Arena specific defines
 	#####
-	# TURTLEARENA			Turtle Arena branding, version, file/directory name, and more
-	# TA_MAIN				Must be defined for Turtle Arena and Turtle Arena mods
+	# TA_MAIN				Turtle Arena branding, version, file/directory name, and more
+	#							Must be defined for Turtle Arena and Turtle Arena mods
+	# TURTLEARENA			Turtle Arena game logic changes (and things that should be TA_MAIN...)
 	# TA_MISC				Stuff that I don't want in ioq3ztm, but would use in another standalone mod
 	#							(Like a NiGHTS into Dreams clone or Sonic Robo Blast Arena...)
 	# TA_SP					Single player / co-op mode code

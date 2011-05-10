@@ -682,7 +682,7 @@ void S_Init( void )
 	Com_Printf( "------ Initializing Sound ------\n" );
 
 	s_volume = Cvar_Get( "s_volume", "0.8", CVAR_ARCHIVE );
-#ifdef TURTLEARENA // ZTM: Increase music volume, same as missionpack now
+#ifdef TA_MAIN // ZTM: Increase music volume, same as missionpack now
 	s_musicVolume = Cvar_Get( "s_musicvolume", "0.5", CVAR_ARCHIVE );
 #else
 	s_musicVolume = Cvar_Get( "s_musicvolume", "0.25", CVAR_ARCHIVE );
