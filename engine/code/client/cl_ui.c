@@ -1191,10 +1191,6 @@ void CL_InitUI( void ) {
 		// init for this gamestate
 		VM_Call( uivm, UI_INIT, (cls.state >= CA_AUTHORIZING && cls.state < CA_ACTIVE) );
 	}
-
-	// reset any CVAR_CHEAT cvars registered by ui
-	if ( !clc.demoplaying && !cl_connectedToCheatServer ) 
-		Cvar_SetCheatState();
 }
 
 #ifdef IOQUAKE3 // ZTM: CDKEY
