@@ -223,7 +223,7 @@ void QDECL Com_Printf( const char *fmt, ... ) {
 			time( &aclock );
 			newtime = localtime( &aclock );
 
-#ifdef TURTLEARENA // BRANDING
+#ifdef TA_MAIN // BRANDING
 			logfile = FS_FOpenFileWrite( "console.log" );
 #else
 			logfile = FS_FOpenFileWrite( "qconsole.log" );

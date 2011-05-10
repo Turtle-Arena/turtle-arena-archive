@@ -71,7 +71,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #ifndef PRODUCT_VERSION
-  #ifdef TURTLEARENA
+  #ifdef TA_MAIN
     #define PRODUCT_VERSION "0.5.0"
   #else
     #define PRODUCT_VERSION "1.36"

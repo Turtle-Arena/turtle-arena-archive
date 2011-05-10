@@ -326,7 +326,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	}
 
 	// bonus items and view weapons have a fixed minimum add
-#ifdef TURTLEARENA // ZTM: Have players be darker. So they can hide in shadows better?
+#ifdef TA_MAIN // ZTM: Have players be darker. So they can hide in shadows better?
 	if ( ent->e.renderfx & RF_MINLIGHT )
 #else
 	if ( 1 /* ent->e.renderfx & RF_MINLIGHT */ )
@@ -337,7 +337,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 		ent->ambientLight[1] += tr.identityLight * 32;
 		ent->ambientLight[2] += tr.identityLight * 32;
 	}
-#ifdef TURTLEARENA
+#ifdef TA_MAIN
 	else
 	{
 		ent->ambientLight[0] += tr.identityLight * 16;

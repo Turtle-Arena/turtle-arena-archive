@@ -1597,7 +1597,7 @@ void Key_SetCatcher( int catcher ) {
 
 // This must not exceed MAX_CMD_LINE
 #define			MAX_CONSOLE_SAVE_BUFFER	1024
-#ifdef TURTLEARENA // BRANDING
+#ifdef TA_MAIN // BRANDING
 #define			CONSOLE_HISTORY_FILE    "history"
 #else
 #define			CONSOLE_HISTORY_FILE    "q3history"
