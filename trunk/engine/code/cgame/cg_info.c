@@ -79,6 +79,13 @@ CG_LoadingItem
 void CG_LoadingItem( int itemNum ) {
 	gitem_t		*item;
 
+#ifdef TA_SP
+	if (cgs.gametype == GT_SINGLE_PLAYER)
+	{
+		return;
+	}
+#endif
+
 #ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
@@ -186,9 +193,11 @@ void CG_LoadingClient( int clientNum ) {
 	Q_strncpyz( personality, Info_ValueForKey( info, "n" ), sizeof(personality) );
 	Q_CleanStr( personality );
 
+#ifndef TA_SP
 	if( cgs.gametype == GT_SINGLE_PLAYER ) {
 		trap_S_RegisterSound( va( "sound/player/announce/%s.wav", personality ), qtrue );
 	}
+#endif
 
 	CG_LoadingString( personality );
 }
