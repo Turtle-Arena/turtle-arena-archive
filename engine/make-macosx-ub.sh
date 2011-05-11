@@ -23,6 +23,8 @@ BASE_OBJ="
 	build/release-darwin-ppc/$BASEDIR/qagameppc.dylib
 	build/release-darwin-i386/$BASEDIR/qagamei386.dylib
 	../install/$BASEDIR/assets0.pk3
+	../install/$BASEDIR/assets1-qvms.pk3
+	../install/$BASEDIR/assets2-music.pk3
 "
 
 cd `dirname $0`
@@ -31,14 +33,12 @@ if [ ! -f Makefile ]; then
 	exit 1
 fi
 
-# ZTM: Build assets0.pk3 if needed.
+# Build game assets if needed.
 if [ ! -f ../install/$BASEDIR/assets0.pk3 ]; then
-	echo "Building ../install/$BASEDIR/assest0.pk3..."
-	cd ..
-	sh package.sh --no-win32 --no-linux
-	cd engine
+	echo "Building assets..."
+	(make -C .. assets) || exit 1;
 	if [ ! -f ../install/$BASEDIR/assets0.pk3 ]; then
-		echo "Error: Failed to build ../install/$BASEDIR/assest0.pk3"
+		echo "Error: Failed to build assets"
 		exit 1
 	fi
 fi
