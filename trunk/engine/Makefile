@@ -1236,20 +1236,21 @@ LIBPATHS = -L$(LIBOGC_LIB)
 
   LIBS = -lwiiuse -lbte -lfat -lwiikeyboard -logc -lm
 
-# ZTM: FIXME: Support qvms!
   HAVE_VM_COMPILED = true
 
   ifneq ($(HAVE_VM_COMPILED),true)
     BASE_CFLAGS += -DNO_VM_COMPILED
   endif
 
-  # Wii doesn't support native libs
-  BUILD_GAME_SO=0
+  # No OpenAL or cURL support
+  USE_OPENAL=0
+  USE_CURL=0
 
-  # Client doesn't build as of yet.
-ifneq ($(BUILD_CLIENT),1)
-  BUILD_CLIENT=0
-endif
+  # Doesn't support native libs
+  BUILD_GAME_SO=0
+  USE_MUMBLE=0
+  USE_OPENAL_DLOPEN=0
+  USE_CURL_DLOPEN=0
 
   ARCH=ppc
 
@@ -1257,10 +1258,10 @@ endif
 
   BASE_CFLAGS += -DNO_NATIVE_SUPPORT -MMD -MP -MF -DDUMMYFLAG
   SERVER_CFLAGS =
-  CLIENT_CFLAGS =
+  CLIENT_CFLAGS = -I$(LIBOGC_INC)/SDL
 
-  #CLIENT_LDFLAGS += $(LDFLAGS)
-  #CLIENT_LIBS +=$(SDL_LIBS)
+  CLIENT_LDFLAGS += $(LDFLAGS)
+  CLIENT_LIBS +=$(SDL_LIBS) -lgl2gx
 
 else # ifeq wii
 
@@ -2156,9 +2157,9 @@ $(B)/$(CLIENTBIN).dol: $(B)/$(CLIENTBIN).elf
 
 $(B)/$(CLIENTBIN).elf: $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $^ $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
-		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
-		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
+	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(LIBPATHS) \
+		-o $@ $(Q3OBJ) $(Q3POBJ) \
+		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 else
 ifeq ($(BUILD_SPLINES),1)
 # TTimo: splines code requires C++ linking, but splines have

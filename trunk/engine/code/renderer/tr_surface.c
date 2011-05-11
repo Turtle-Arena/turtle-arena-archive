@@ -1249,9 +1249,11 @@ static void RB_SurfaceFlare(srfFlare_t *surf)
 }
 
 static void RB_SurfaceDisplayList( srfDisplayList_t *surf ) {
+#ifndef __wii__
 	// all apropriate state must be set in RB_BeginSurface
 	// this isn't implemented yet...
 	qglCallList( surf->listNum );
+#endif
 }
 
 static void RB_SurfaceSkip( void *surf ) {

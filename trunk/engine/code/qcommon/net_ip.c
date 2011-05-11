@@ -880,13 +880,19 @@ qboolean Sys_IsLANAddress( netadr_t adr ) {
 	return qfalse;
 }
 
-#ifndef __wii__
 /*
 ==================
 Sys_ShowIP
 ==================
 */
 void Sys_ShowIP(void) {
+#ifdef __wii__
+	u32 ip;
+	u8 *splitip = (u8 *)&ip;
+
+	ip = net_gethostip();
+	Com_Printf("IP: %d.%d.%d.%d\n", splitip[0], splitip[1], splitip[2], splitip[3]);
+#else
 	int i;
 	char addrbuf[NET_ADDRSTRMAXLEN];
 
@@ -899,8 +905,8 @@ void Sys_ShowIP(void) {
 		else if(localIP[i].type == NA_IP6)
 			Com_Printf( "IP6: %s\n", addrbuf);
 	}
-}
 #endif
+}
 
 
 //=============================================================================
@@ -1727,8 +1733,6 @@ void NET_Init( void ) {
 	extern void Sys_Wait(const char *message);
 
 	int i, ret;
-	u32 ip;
-	u8 *splitip = (u8 *)&ip;
 
 	printf("Starting Net_Init()...\n");
 
@@ -1744,8 +1748,7 @@ void NET_Init( void ) {
 	}
 	printf("Net_Init() successful.\n");
 
-	ip = net_gethostip();
-	printf("IP address is %d.%d.%d.%d\n", splitip[0], splitip[1], splitip[2], splitip[3]);
+	Sys_ShowIP();
 #endif
 
 	NET_Config( qtrue );
