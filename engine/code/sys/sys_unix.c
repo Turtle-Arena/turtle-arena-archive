@@ -20,6 +20,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
+#ifdef __wii__
+#include <gccore.h>
+// Undefine libogc's colors, conflicts with q3 defines.
+#undef COLOR_BLACK
+#undef COLOR_GREEN
+#undef COLOR_RED
+#undef COLOR_YELLOW
+#undef COLOR_BLUE
+#undef COLOR_WHITE
+#endif
+
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "sys_local.h"
@@ -42,7 +53,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef __wii__
 #include <stdio.h>
 #include <stdlib.h>
-#include <gccore.h>
 #include <wiiuse/wpad.h>
 #include <fat.h>
 #include <network.h>
@@ -961,5 +971,9 @@ Sys_PIDIsRunning
 */
 qboolean Sys_PIDIsRunning( int pid )
 {
+#ifdef __wii__
+	return qfalse;
+#else
 	return kill( pid, 0 ) == 0;
+#endif
 }

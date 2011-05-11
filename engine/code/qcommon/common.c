@@ -2795,7 +2795,6 @@ void Com_Init( char *commandLine ) {
 
 	Sys_Init();
 
-#ifndef __wii__
 	if( Sys_WritePIDFile( ) ) {
 #ifndef DEDICATED
 		const char *message = "The last time " CLIENT_WINDOW_TITLE " ran, "
@@ -2807,7 +2806,6 @@ void Com_Init( char *commandLine ) {
 		}
 #endif
 	}
-#endif
 
 	// Pick a random port value
 	Com_RandomBytes( (byte*)&qport, sizeof(int) );
