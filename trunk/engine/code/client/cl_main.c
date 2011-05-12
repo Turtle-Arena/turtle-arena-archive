@@ -3066,6 +3066,61 @@ void CL_ShutdownRef( void ) {
 	Com_Memset( &re, 0, sizeof( re ) );
 }
 
+#ifdef TA_DATA // LOADING_SCREEN
+/*
+==========
+CL_DrawPicFullScreen
+
+Repeat image horizontally without changing the aspect (as normal scaling would).
+
+Based on UI_DrawPicFullScreen in q3_ui
+==========
+*/
+void CL_DrawPicFullScreen(qhandle_t hShader)
+{
+	float x = 0, y = 0, w = cls.glconfig.vidWidth, h = cls.glconfig.vidHeight;
+	const float picX = SCREEN_WIDTH;
+	const float picY = SCREEN_HEIGHT;
+	float scale = h / picY; // scale shader to fit vertically
+	float s1, t1, s2, t2;
+	float sDelta, tDelta;
+
+	// Get aspect correct coords
+	s1 = x/(picX * scale);
+	t1 = y/(picY * scale);
+	s2 = (x+w)/(picX * scale);
+	t2 = (y+h)/(picY * scale);
+
+	// Center pic
+	sDelta = (1.0f - s2) / 2.0f;
+	tDelta = (1.0f - t2) / 2.0f;
+	s1 += sDelta;
+	s2 += sDelta;
+	t1 += tDelta;
+	t2 += tDelta;
+
+	re.DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
+}
+
+/*
+============
+CL_DrawLoadingScreen
+============
+*/
+void CL_DrawLoadingScreen(void)
+{
+	re.BeginFrame( STEREO_CENTER );
+
+	CL_DrawPicFullScreen(re.RegisterShaderNoMip("clientLoading"));
+
+	if ( com_speeds->integer ) {
+		re.EndFrame( &time_frontend, &time_backend );
+	} else {
+		re.EndFrame( NULL, NULL );
+	}
+}
+#endif
+
 /*
 ============
 CL_InitRenderer
@@ -3074,6 +3129,14 @@ CL_InitRenderer
 void CL_InitRenderer( void ) {
 	// this sets up the renderer and calls R_Init
 	re.BeginRegistration( &cls.glconfig );
+
+#ifdef TA_DATA // LOADING_SCREEN
+	// Draw loading screen the first time the game starts.
+	extern qboolean	com_fullyInitialized;
+	if (!com_fullyInitialized) {
+		CL_DrawLoadingScreen();
+	}
+#endif
 
 	// load character sets
 #ifdef IOQ3ZTM // FONT_REWRITE

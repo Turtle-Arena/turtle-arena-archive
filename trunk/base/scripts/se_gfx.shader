@@ -122,33 +122,6 @@ sparkTrail
 	}
 }
 
-console
-{
-	nopicmip
-	nomipmaps
-	{
-		map gfx/misc/console01.png
-		blendFunc blend
-		tcMod scroll -0.01 0
-	}
-	{
-		map menu/art/menuback2.png
-		blendFunc blend
-		tcMod scale 1 1
-		tcMod scroll -0.02 -0.01
-		alphaGen const 0.4
-	}
-}
-
-white
-{
-	{
-		map *white
-		blendfunc	GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbgen vertex
-	}
-}
-
 lagometer
 {
 	nopicmip
