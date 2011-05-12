@@ -483,9 +483,11 @@ static void CG_UseItem( centity_t *cent ) {
 			continue;
 		cg.cur_lc = &cg.localClients[i];
 #endif
+#ifndef TA_HOLDSYS
 		if ( !itemNum ) {
 			CG_CenterPrint( "No item to use", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 		} else
+#endif
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
 		if (!BG_ProjectileIndexForHoldable(itemNum))
 #endif

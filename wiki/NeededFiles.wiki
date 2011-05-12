@@ -6,12 +6,12 @@ Files that are missing or "TEMP:" if I haven't decide if its finished yet. List 
 <wiki:toc max_depth="3" />
 
 = Sounds =
-Note: Added a dummy sound at sound/feedback/hit.wav so unmoded Quake3 can start with only Turtle Arena sounds.
+Note: Added a dummy sound at sound/feedback/hit.wav so unmodified Quake3 can start with only Turtle Arena sounds.
 
 == Note: Copies ==
   * misc/menu1.ogg and misc/menu3.ogg are a louder-copy of player/footsteps/clank2.ogg
 
-  * items/use_nothing.ogg is a copy of misc/menu4.ogg  (items/use_nothing is unused by Turtle Arena?...)
+  * items/use_nothing.ogg is a copy of misc/menu4.ogg
 
   * weapons/melee_swing.ogg is a louder-version of weapons/change.ogg (For testing...)
 
@@ -180,14 +180,10 @@ NOTE: %d is replaced with 1 through 4. (i.e. sound/player/footsteps/step1.wav, s
     * TEMP: shurikenlaser.md3
 
   * models/powerups/instant/
-    * TEMP: defense.md3  Defense - TODO: Shield?
-    * TEMP: strength.md3  Strength - TODO: Arm showing stregth? Or red glowing transparent sword?
-    * TEMP: speed.md3  Speed - TODO: Zippy Lad's Headgear thing? A blue glowing transparent bunny?...
-    * TEMP: invis.md3  Invisibility - TODO: Foot Tech belt, around waist over shoulder with foot logo on over-shoulder-part?
-    * TEMP: invul.md3  Invulnerability - TODO: White sphere?
+    * TEMP: strength.md3  Strength - TODO: Arm showing strength? Or red glowing transparent sword?
+    * TEMP: invul.md3  Invulnerability - ?
 
 == MISSIONPACK CTF flags ==
-  * DONE: models/flag2/flagflap3.md3
   * TEMP: models/mapobjects/flagbase/red_base.md3
   * TEMP: models/mapobjects/flagbase/blue_base.md3
   * TEMP: models/mapobjects/flagbase/ntrl_base.md3
