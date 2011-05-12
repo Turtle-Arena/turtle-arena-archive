@@ -1537,8 +1537,6 @@ e_status CIN_RunCinematic (int handle)
 	return cinTable[currentHandle].status;
 }
 
-char *S_FileExtension(const char *fni);
-
 #ifdef IOQ3ZTM
 // Also see S_TheCheckExtension
 qboolean CIN_TheCheckExtension(char *filename)
@@ -1641,7 +1639,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	unsigned short RoQID;
 	char	name[MAX_OSPATH];
 #if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
-	char	*fileextPtr;
+	const char	*ext;
 #endif
 	int		i;
 
@@ -1679,8 +1677,8 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	strcpy(cinTable[currentHandle].fileName, name);
 
 #if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
-	fileextPtr = S_FileExtension(name);
-	if (!Q_stricmp(fileextPtr, ".ogm") || !Q_stricmp(fileextPtr, ".ogv"))
+	ext = COM_GetExtension(name);
+	if (!Q_stricmp(ext, "ogm") || !Q_stricmp(ext, "ogv"))
 	{
 		if (Cin_OGM_Init(name))
 		{
