@@ -999,6 +999,8 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 #endif
 			switch (itemNum)
 			{
+				case HI_NONE:
+					break;
 #endif // TA_HOLDSYS
 
 #ifndef TA_HOLDABLE // no q3 teleprter

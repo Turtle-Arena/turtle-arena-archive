@@ -2470,7 +2470,7 @@ static void PM_Weapon( void ) {
 		! ( pm->ps->pm_flags & PMF_USE_ITEM_HELD )
 #endif
 #ifdef TA_HOLDSYS
-			&& pm->ps->holdable[pm->ps->holdableIndex] != 0
+			&& (pm->ps->holdable[pm->ps->holdableIndex] != 0 || !pm->ps->holdableIndex)
 #endif
 #ifdef TA_ENTSYS // FUNC_USE
 			&& !(pm->ps->eFlags & EF_USE_ENT)
