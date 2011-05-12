@@ -198,13 +198,11 @@ models/powerups/health/health
 models/powerups/instant/invis
 {
 	{
-		//map models/powerups/instant/invis.png
 		map textures/effects/invismap.png
 		blendfunc GL_ONE GL_ONE
 		rgbGen lightingDiffuse
 		tcMod turb 0 0.15 0 0.25
 		tcGen environment
-		alphaGen wave sin .6 .2 0 .6
 	}
 }
 
@@ -212,11 +210,9 @@ models/powerups/instant/defense
 {
 	{
 		map models/powerups/instant/defense.png
-		blendfunc GL_ONE GL_ONE
 		rgbGen lightingDiffuse
 		tcMod turb 0 0.15 0 0.25
 		tcGen environment
-		alphaGen wave sin .6 .2 0 .6
 	}
 }
 
@@ -224,11 +220,9 @@ models/powerups/instant/invul
 {
 	{
 		map models/powerups/instant/invul.png
-		blendfunc GL_ONE GL_ONE
 		rgbGen lightingDiffuse
 		tcMod turb 0 0.15 0 0.25
 		tcGen environment
-		alphaGen wave sin .6 .2 0 .6
 	}
 }
 
@@ -236,11 +230,9 @@ models/powerups/instant/speed
 {
 	{
 		map models/powerups/instant/speed.png
-		blendfunc GL_ONE GL_ONE
 		rgbGen lightingDiffuse
 		tcMod turb 0 0.15 0 0.25
 		tcGen environment
-		alphaGen wave sin .6 .2 0 .6
 	}
 }
 
@@ -248,11 +240,9 @@ models/powerups/instant/strength
 {
 	{
 		map models/powerups/instant/strength.png
-		blendfunc GL_ONE GL_ONE
 		rgbGen lightingDiffuse
 		tcMod turb 0 0.15 0 0.25
 		tcGen environment
-		alphaGen wave sin .5 .4 0 .6
 	}
 }
 
@@ -311,22 +301,14 @@ models/powerups/shield/red
 	}
 }
 
+//
 // Score Items
+//
 models/powerups/score/sphere
 {
 	{
 		map models/powerups/score/sphere.png
-		//blendfunc GL_ONE GL_ONE
-		rgbGen identityLighting
-		tcMod turb 0 0.15 0 0.25
-		tcGen environment
-		//alphaGen wave sin .6 .2 0 .6
-	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc filter
-		rgbGen identityLighting
-		tcGen cel
+		rgbGen lightingDiffuse
 	}
 }
 
@@ -387,7 +369,6 @@ models/weapons2/nunchuck/chain
 //		map textures/effects/tinfx_lighter.png
 //		tcGen environment
 //		rgbGen lightingDiffuse
-		//alphaGen wave sin .6 .2 0 .6
 //	}
 	{
 		map $whiteimage
@@ -1007,7 +988,7 @@ models/mapobjects/flagbase/beam_red
 // Missionpack powerups
 //
 
-// Note: Yallow/orange in Q3/TA
+// Note: Yallow/orange in Q3:Team Arena
 models/powerups/ammo1
 {
 	{
@@ -1038,7 +1019,7 @@ models/powerups/ammo2
 }
 
 
-// Note: Green in Q3/TA
+// Note: Green in Q3:Team Arena
 models/powerups/scout1
 {
 	{
@@ -1066,7 +1047,7 @@ models/powerups/scout2
 	}
 }
 
-// Note: Blue in Q3/TA
+// Note: Blue in Q3:Team Arena
 models/powerups/guard1
 {
 	{
