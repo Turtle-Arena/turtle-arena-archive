@@ -6679,6 +6679,10 @@ bg_objectcfg_t *BG_NewObjectCfg(void) {
 	objectcfg->lerpframes = qfalse;
 	objectcfg->scale = 1.0f;
 
+	objectcfg->explosionDamage = 0;
+	objectcfg->explosionRadius = 300;
+	objectcfg->deathDelay = 0;
+
 	animations = objectcfg->animations;
 
 	// Use first frame for all animations.
@@ -7028,6 +7032,30 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 			if (Sounds_Parse(&text_p, filename, &objectcfg->sounds, AP_OBJECT, objectAnimationDefs)) {
 				continue;
 			}
+		}
+		else if ( Q_stricmp( token, "explosionDamage" ) == 0 ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			objectcfg->explosionDamage = atoi(token);
+			continue;
+		}
+		else if ( Q_stricmp( token, "explosionRadius" ) == 0 ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			objectcfg->explosionRadius = atof(token);
+			continue;
+		}
+		else if ( Q_stricmp( token, "deathDelay" ) == 0 ) {
+			token = COM_Parse( &text_p );
+			if ( !*token ) {
+				break;
+			}
+			objectcfg->deathDelay = atoi(token);
+			continue;
 		}
 		else
 		{

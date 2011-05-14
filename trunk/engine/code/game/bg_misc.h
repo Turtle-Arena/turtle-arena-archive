@@ -1516,12 +1516,15 @@ typedef struct
 	qboolean heavy;
 
 	// config only
-	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
-	qboolean unsolidOnDeath;
-	qboolean invisibleUnsolidDeath;
-	qboolean lerpframes; // Use raw frames, don't interperate them.
-	float scale; // Uniform scale
-	bg_sounds_t sounds;
+	animation_t	animations[MAX_MISC_OBJECT_ANIMATIONS];
+	qboolean	unsolidOnDeath;
+	qboolean	invisibleUnsolidDeath;
+	qboolean	lerpframes; // Use raw frames, don't interperate them.
+	float		scale; // Uniform scale
+	bg_sounds_t	sounds;
+	int			explosionDamage;
+	float		explosionRadius;
+	int			deathDelay;
 
 	// ZTM: TODO: For NPCs
 	// Speed control, some characters are faster then others.
