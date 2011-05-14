@@ -672,6 +672,36 @@ void ObjectRemove(gentity_t *self)
 	G_FreeEntity(self);
 }
 
+void ObjectDeath(gentity_t *self)
+{
+	// Explosion
+	if (self->objectcfg->explosionDamage > 0 && self->objectcfg->explosionRadius > 0) {
+		// ZTM: TODO: Cue explosion! (size based on explosionRadius)
+#ifdef TA_WEAPSYS
+		G_RadiusDamage(self->s.origin, self, self->activator, self->objectcfg->explosionDamage, self->objectcfg->explosionRadius, self, MOD_EXPLOSION);
+#else
+		G_RadiusDamage(self->s.origin, self->activator, self->objectcfg->explosionDamage, self->objectcfg->explosionRadius, self, MOD_EXPLOSION);
+#endif
+	}
+
+	// if respawn
+	if (self->wait > 0) {
+		// Respawn after X seconds
+		self->nextthink = level.time + (self->wait * 1000);
+		self->think = ObjectRespawn;
+		if (self->objectcfg->invisibleUnsolidDeath) {
+			// Invisible non-solid
+			self->r.contents = 0;
+			trap_UnlinkEntity(self);
+		}
+	} else if (self->wait < 0) {
+		// Remove after X seconds
+		self->wait = abs(self->wait);
+		self->nextthink = level.time + (self->wait * 1000);
+		self->think = ObjectRemove;
+	}
+}
+
 void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
 {
 	int anim;
@@ -721,21 +751,17 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 		}
 	}
 
-	// if respawn
-	if (self->wait > 0) {
-		// Respawn after X seconds
-		self->nextthink = level.time + (self->wait * 1000);
-		self->think = ObjectRespawn;
-		if (self->objectcfg->invisibleUnsolidDeath) {
-			// Invisible non-solid
-			self->r.contents = 0;
-			trap_UnlinkEntity(self);
+	self->activator = attacker;
+
+	if (self->objectcfg->deathDelay > 0) {
+		self->nextthink = level.time + (self->objectcfg->deathDelay * 1000);
+		self->think = ObjectDeath;
+
+		if (self->objectcfg->explosionDamage > 0 && self->objectcfg->explosionRadius > 0) {
+			// ZTM: TODO: Cue smoke stream! (size based on explosionRadius, have puffs be 0.25 size of explosion or something)
 		}
-	} else if (self->wait < 0) {
-		// Remove after X seconds
-		self->wait = abs(self->wait);
-		self->nextthink = level.time + (self->wait * 1000);
-		self->think = ObjectRemove;
+	} else {
+		ObjectDeath(self);
 	}
 }
 
@@ -804,7 +830,7 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 		trap_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID );
 		if ( tr.startsolid ) {
 			ent->s.origin[2] -= 1;
-			G_Printf( "Misc_object: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin) );
+			G_Printf( "ObjectSpawn: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin) );
 
 			ent->s.groundEntityNum = ENTITYNUM_NONE;
 			G_SetOrigin( ent, ent->s.origin );
