@@ -602,19 +602,23 @@ void DropPortalSource( gentity_t *player ) {
 
 void ObjectPain(gentity_t *self, gentity_t *attacker, int damage)
 {
-	int health;
+	int maxHealth;
 
 	// Default health
-	health = self->splashRadius;
+	maxHealth = self->splashRadius;
 
 	// Change to damge animation at X health
-	if (self->health < (health/5) * 2) {
+	if (self->health < (maxHealth/5) * 2) {
 		G_SetMiscAnim(self, OBJECT_DEATH3);
-	} else if (self->health < (health/5) * 3) {
+	} else if (self->health < (maxHealth/5) * 3) {
 		G_SetMiscAnim(self, OBJECT_DEATH2);
-	} else if (self->health < (health/5) * 4) {
+	} else if (self->health < (maxHealth/5) * 4) {
 		G_SetMiscAnim(self, OBJECT_DEATH1);
 	}
+
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	self->s.skinFraction = 1.0f - ((float)self->health / (float)maxHealth);
+#endif
 }
 
 gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles, int flags);
@@ -716,6 +720,9 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 
 	// Change to dead animation.
 	G_SetMiscAnim(self, anim);
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	self->s.skinFraction = 1.0f;
+#endif
 
 	if (self->objectcfg->unsolidOnDeath && !self->objectcfg->invisibleUnsolidDeath) {
 		self->r.contents = 0;
@@ -798,6 +805,9 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 
 	// undamaged animation
 	G_SetMiscAnim(ent, OBJECT_IDLE);
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	ent->s.skinFraction = 0.0f;
+#endif
 
 	if (health > 0) {
 		//G_Printf("ObjectSpawn: animated damagable\n");

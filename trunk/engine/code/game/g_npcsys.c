@@ -168,6 +168,9 @@ static void G_NPC_Die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 	self->takedamage = qfalse;
 
 	G_SetMiscAnim(self, OBJECT_DEATH1+rand()%3);
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	self->s.skinFraction = 1.0f;
+#endif
 
 	AddScore(attacker, self->r.currentOrigin, 1);
 
@@ -217,6 +220,9 @@ void G_NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 
 	G_SetMiscAnim(self, OBJECT_PAIN);
 	self->bgNPC.npc_ps.legsTimer = BG_AnimationTime(&self->bgNPC.info->animations[OBJECT_PAIN]);
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	self->s.skinFraction = 1.0f - ((float)self->health / (float)self->bgNPC.info.health);
+#endif
 
 	if (!attacker || (!attacker->client && !attacker->bgNPC.info)) {
 		return;
@@ -291,6 +297,9 @@ void FinishSpawningNPC( gentity_t *ent ) {
 	ent->pain = G_NPC_Pain;
 
 	G_SetMiscAnim(ent, OBJECT_IDLE);
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+	self->s.skinFraction = 0.0f;
+#endif
 
 	ent->bgNPC.npc_ps.viewheight = ent->bgNPC.info->viewheight;
 
