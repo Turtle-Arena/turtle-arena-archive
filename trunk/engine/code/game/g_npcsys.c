@@ -221,7 +221,7 @@ void G_NPC_Pain( gentity_t *self, gentity_t *attacker, int damage ) {
 	G_SetMiscAnim(self, OBJECT_PAIN);
 	self->bgNPC.npc_ps.legsTimer = BG_AnimationTime(&self->bgNPC.info->animations[OBJECT_PAIN]);
 #ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-	self->s.skinFraction = 1.0f - ((float)self->health / (float)self->bgNPC.info.health);
+	self->s.skinFraction = 1.0f - ((float)self->health / (float)self->bgNPC.info->health);
 #endif
 
 	if (!attacker || (!attacker->client && !attacker->bgNPC.info)) {
@@ -298,7 +298,7 @@ void FinishSpawningNPC( gentity_t *ent ) {
 
 	G_SetMiscAnim(ent, OBJECT_IDLE);
 #ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-	self->s.skinFraction = 0.0f;
+	ent->s.skinFraction = 0.0f;
 #endif
 
 	ent->bgNPC.npc_ps.viewheight = ent->bgNPC.info->viewheight;
