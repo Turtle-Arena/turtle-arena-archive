@@ -1445,6 +1445,7 @@ city/road
 "origin" "-463.999939 -423.999878 3.999006"
 "model" "models/mapobjects/car/car.md3"
 "angles" "-0.000000 -89.999992 3.722170"
+"skin" "models/mapobjects/car/red.skin"
 }
 // entity 18
 {
