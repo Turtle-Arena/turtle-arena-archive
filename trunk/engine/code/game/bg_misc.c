@@ -6683,6 +6683,8 @@ bg_objectcfg_t *BG_NewObjectCfg(void) {
 	objectcfg->explosionRadius = 300;
 	objectcfg->deathDelay = 0;
 
+	objectcfg->skin[0] = '\0';
+
 	animations = objectcfg->animations;
 
 	// Use first frame for all animations.
@@ -7055,6 +7057,11 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 				break;
 			}
 			objectcfg->deathDelay = atoi(token);
+			continue;
+		}
+		else if ( Q_stricmp( token, "skin" ) == 0 ) {
+			token = COM_Parse( &text_p );
+			Q_strncpyz(objectcfg->skin, token, MAX_QPATH);
 			continue;
 		}
 		else
