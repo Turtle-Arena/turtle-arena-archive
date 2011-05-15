@@ -944,9 +944,12 @@ void SP_misc_object( gentity_t *ent ) {
 		Com_SetExt(filename, ".cfg");
 
 		if (G_SpawnString( "config", "", &config) && *config) {
-			ent->s.modelindex2 = G_StringIndex( config );
-			trap_GetConfigstring( CS_STRINGS + ent->s.modelindex2, filename, sizeof(filename));
-			ent->s.modelindex2 = (ent->s.modelindex2*-1)-1; // Tell cgame modelindex2 is string
+			Q_strncpyz(filename, config, sizeof(filename));
+			ent->s.modelindex2 = G_StringIndex( config )+1; // Tell cgame modelindex2 is string
+		}
+
+		if (G_SpawnString("skin", "", &config) && *config) {
+			ent->s.time2 = G_StringIndex( config )+1; // Tell cgame time2 is string
 		}
 
 		if (!(ent->objectcfg = BG_ParseObjectCFGFile(filename))) {

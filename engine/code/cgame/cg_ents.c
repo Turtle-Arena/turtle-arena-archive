@@ -369,8 +369,8 @@ static void CG_MiscObject( centity_t *cent ) {
 		cent->oe.speed = 1.0f;
 
 		// Check if modelindex2 is config filename
-		if (s1->modelindex2 < 0) {
-			Q_strncpyz(filename, CG_ConfigString( CS_STRINGS + ((s1->modelindex2*-1)+1) ), MAX_QPATH);
+		if (s1->modelindex2 > 0) {
+			Q_strncpyz(filename, CG_ConfigString( CS_STRINGS + s1->modelindex2 - 1 ), MAX_QPATH);
 		} else {
 			// Use modelName with .cfg extension
 #ifdef TA_NPCSYS
@@ -406,6 +406,17 @@ static void CG_MiscObject( centity_t *cent ) {
 		{
 			cent->oe.model = cgs.gameModels[s1->modelindex];
 			cent->oe.skin = 0;
+
+			// Check for skin set in entity
+			if (s1->time2 > 0) {
+				const char *skin = CG_ConfigString( CS_STRINGS + s1->time2 - 1 );
+				cent->oe.skin = trap_R_RegisterSkin(skin);
+			}
+
+			// Check for default skin
+			if (!cent->oe.skin && *cent->objectcfg->skin) {
+				cent->oe.skin = trap_R_RegisterSkin(cent->objectcfg->skin);
+			}
 		}
 	}
 
@@ -435,7 +446,7 @@ static void CG_MiscObject( centity_t *cent ) {
 
 	ent.nonNormalizedAxes = qfalse;
 
-	// increase the size
+	// change the size
 	if ( scale != 1.0f ) {
 		VectorScale( ent.axis[0], scale, ent.axis[0] );
 		VectorScale( ent.axis[1], scale, ent.axis[1] );

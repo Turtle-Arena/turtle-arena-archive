@@ -102,7 +102,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
 #define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
 #ifdef TA_ENTSYS // MISC_OBJECT
-#define MAX_STRINGS 128
+#define MAX_STRINGS 256
 #ifdef IOQ3ZTM // Particles
 #define CS_STRINGS				(CS_PARTICLES+MAX_PARTICLES_AREAS)
 #else
@@ -1525,6 +1525,8 @@ typedef struct
 	int			explosionDamage;
 	float		explosionRadius;
 	int			deathDelay;
+
+	char		skin[MAX_QPATH];
 
 	// ZTM: TODO: For NPCs
 	// Speed control, some characters are faster then others.
