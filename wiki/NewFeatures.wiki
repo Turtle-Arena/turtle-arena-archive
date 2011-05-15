@@ -60,7 +60,7 @@ tag_torso,
 === Damage Shaders ===
 _Search for "IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS" in the code to see implantation._
 
-Player skins can have extra shaders that are used when the player is damaged. There can be up to 10 shaders.
+Player/NPC/misc_object skins can have extra shaders that are used when the player is damaged. There can be up to 10 shaders.
 
 If there are 3 shaders, the first is used when health is 66-100, the second is used when health is 33-66, the last is used when health is 0-33. If there are 4 shaders, the first is 75-100, the second is 50-75, the third is 25-50, the last is 0-25. This continues for up to 10 shaders.
 
@@ -77,7 +77,7 @@ tag_torso,
 == Damage AlphaGen ==
 _Search for "IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS_AGEN" in the code to see implantation._
 
-Instead of having separate player damage shaders you can have a single shader and have one image become more (or less) visible as damaged.
+Instead of having separate damage shaders (for players, NPCs, and misc_objects) you can have a single shader and have one image become more (or less) visible as damaged.
 
 "alphaGen damage" causes image to become more visible as damaged. There is also "alphaGen oneMinusDamage", which is the inverse of "alphaGen damage", becomes less visible as damaged.
 
