@@ -446,6 +446,9 @@ static void CG_MiscObject( centity_t *cent ) {
 
 	ent.nonNormalizedAxes = qfalse;
 
+	// convert angles to axis
+	AnglesToAxis( cent->lerpAngles, ent.axis );
+
 	// change the size
 	if ( scale != 1.0f ) {
 		VectorScale( ent.axis[0], scale, ent.axis[0] );
@@ -460,18 +463,15 @@ static void CG_MiscObject( centity_t *cent ) {
 	ent.hModel = cent->oe.model;
 	ent.customSkin = cent->oe.skin;
 #ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-	ent.skinFraction = cent->currentState.skinFraction;
+	ent.skinFraction = s1->skinFraction;
 #endif
 
 	// Flags for only drawing or not drawing a object in mirrors
-	if (cent->currentState.eFlags & EF_ONLY_MIRROR) {
+	if (s1->eFlags & EF_ONLY_MIRROR) {
 		ent.renderfx |= RF_ONLY_MIRROR;
-	} else if (cent->currentState.eFlags & EF_NOT_MIRROR) {
+	} else if (s1->eFlags & EF_NOT_MIRROR) {
 		ent.renderfx |= RF_NOT_MIRROR;
 	}
-
-	// convert angles to axis
-	AnglesToAxis( cent->lerpAngles, ent.axis );
 
 	// add to refresh list
 	trap_R_AddRefEntityToScene (&ent);
