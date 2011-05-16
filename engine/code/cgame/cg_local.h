@@ -1220,6 +1220,10 @@ typedef struct {
 #endif
 	qhandle_t	invulnerabilityPowerupModel;
 
+#ifdef TA_DATA // EXP_SCALE
+	qhandle_t	smokeModel;
+#endif
+
 	// scoreboard headers
 	qhandle_t	scoreboardName;
 	qhandle_t	scoreboardPing;
@@ -2106,6 +2110,9 @@ void CG_Bleed( vec3_t origin, int entityNum );
 localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 								qhandle_t hModel, qhandle_t shader, int msec,
 								qboolean isSprite );
+#ifdef TA_ENTSYS // EXP_SCALE
+void CG_ExplosionEffect(vec3_t origin, int radius, int entity);
+#endif
 #ifdef CAMERASCRIPT
 void CG_Fade( int a, int time, int duration );
 void CG_DrawFlashFade( void );

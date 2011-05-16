@@ -1464,6 +1464,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		CG_ImpactParticles(position, dir, es->otherEntityNum, es->time2, es->otherEntityNum2);
 #endif
 		break;
+	case EV_EXPLOSION:
+		DEBUGNAME("EV_EXPLOSION");
+		CG_ExplosionEffect(position, es->time2, es->otherEntityNum);
+		break;
 #endif
 
 	//

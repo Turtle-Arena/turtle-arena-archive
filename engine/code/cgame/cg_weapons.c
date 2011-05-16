@@ -4372,11 +4372,17 @@ void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			sfx = cgs.media.sfx_plasmaexp;
 			break;
 		case PD_ROCKET:
+#ifdef TA_DATA // EXP_SCALE
+			mod = cgs.media.smokeModel;
+			shader = 0;
+			isSprite = qfalse;
+#else
 			mod = cgs.media.dishFlashModel;
 			shader = cgs.media.rocketExplosionShader;
+			isSprite = qtrue;
+#endif
 			sfx = cgs.media.sfx_rockexp;
 			light = 300;
-			isSprite = qtrue;
 			duration = 1000;
 			lightColor[0] = 1;
 			lightColor[1] = 0.75;
@@ -4391,15 +4397,21 @@ void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 			}
 			break;
 		case PD_ROCKET_SMALL: // Smaller explosion
-			exp_base = 30 / 2;
-			exp_add = 42 / 2;
 			VectorScale( dir, 0.5f, dir );
 
+#ifdef TA_DATA // EXP_SCALE
+			mod = cgs.media.smokeModel;
+			shader = 0;
+			isSprite = qfalse;
+#else
 			mod = cgs.media.dishFlashModel;
 			shader = cgs.media.rocketExplosionShader;
+			isSprite = qtrue;
+			exp_base = 30 / 2;
+			exp_add = 42 / 2;
+#endif
 			sfx = cgs.media.sfx_rockexp;
 			light = 300 / 2;
-			isSprite = qtrue;
 			duration = 1000;
 			lightColor[0] = 1;
 			lightColor[1] = 0.75;
@@ -4649,6 +4661,13 @@ void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 
 		radius = 8;
 		break;
+	}
+#endif
+
+#ifdef TA_ENTSYS // EXP_SCALE
+	if (!isSprite) {
+		exp_base = bg_projectileinfo[weapon].splashRadius / 10.0f * 0.2f;
+		exp_add = bg_projectileinfo[weapon].splashRadius / 10.0f * 0.8f;
 	}
 #endif
 
@@ -5039,8 +5058,10 @@ void CG_WeaponImpact( int weaponGroup, int hand, int clientNum, vec3_t origin, v
 #endif
 			}
 #ifdef TA_WEAPSYS // SPR_EXP_SCALE
-			le->radius = exp_base;
-			le->refEntity.radius = exp_add;
+			if (isSprite) {
+				le->radius = exp_base;
+				le->refEntity.radius = exp_add;
+			}
 #endif
 		}
 	} else {

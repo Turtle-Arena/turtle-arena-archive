@@ -1506,6 +1506,10 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.medalAssist = trap_R_RegisterShaderNoMip( "medal_assist" );
 	cgs.media.medalCapture = trap_R_RegisterShaderNoMip( "medal_capture" );
 
+#ifdef TA_DATA // EXP_SCALE
+	cgs.media.smokeModel = trap_R_RegisterModel("models/misc/smoke.md3");
+#endif
+
 #ifdef TA_MISC // MATERIALS
 	// Load models for materials
 	for (i = 0 ; i < NUM_MATERIAL_MODELS; i++)

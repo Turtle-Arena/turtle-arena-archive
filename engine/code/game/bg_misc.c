@@ -4849,8 +4849,9 @@ char *eventnames[] = {
 #if defined TURTLEARENA || defined NET_COMPAT// NIGHTS_ITEMS
 	"EV_CHAINPLUM",
 #endif
-#ifdef TA_ENTSYS // BREAKABLE
+#ifdef TA_ENTSYS // BREAKABLE MISC_OBJECT
 	"EV_SPAWN_DEBRIS",
+	"EV_EXPLOSION",
 #endif
 
 //#ifdef MISSIONPACK
