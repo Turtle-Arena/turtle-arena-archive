@@ -21,6 +21,25 @@ models/misc/telep
 }
 
 //
+// SMOKE
+//
+models/misc/smoke
+{
+	{
+		map models/misc/smoke.png
+		rgbGen identityLighting
+		//alphaGen entity
+	}
+	{
+		map textures/sfx/celshader.png
+		blendfunc filter
+		rgbGen identityLighting
+		tcGen cel
+		//alphaGen entity
+	}
+}
+
+//
 // SHURIKENS
 //
 

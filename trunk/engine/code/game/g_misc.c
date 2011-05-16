@@ -680,7 +680,13 @@ void ObjectDeath(gentity_t *self)
 {
 	// Explosion
 	if (self->objectcfg->explosionDamage > 0 && self->objectcfg->explosionRadius > 0) {
-		// ZTM: TODO: Cue explosion! (size based on explosionRadius)
+		gentity_t *tent;
+
+		tent = G_TempEntity( self->s.origin, EV_EXPLOSION );
+		//tent->s.eventParm = 0; // ZTM: TODO: Set explosion type?
+		tent->s.time2 = self->objectcfg->explosionRadius;
+		tent->s.otherEntityNum = self->s.number;
+
 #ifdef TA_WEAPSYS
 		G_RadiusDamage(self->s.origin, self, self->activator, self->objectcfg->explosionDamage, self->objectcfg->explosionRadius, self, MOD_EXPLOSION);
 #else

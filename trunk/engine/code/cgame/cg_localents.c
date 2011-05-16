@@ -484,9 +484,36 @@ CG_AddExplosion
 ================
 */
 static void CG_AddExplosion( localEntity_t *ex ) {
+#ifdef TA_ENTSYS // EXP_SCALE
+	refEntity_t	re;
+	refEntity_t	*ent;
+	float c;
+
+	re = ex->refEntity;
+	ent = &re;
+
+	c = ( ex->endTime - cg.time ) / ( float ) ( ex->endTime - ex->startTime );
+	if ( c > 1 ) {
+		c = 1.0;	// can happen during connection problems
+	}
+
+	ent->shaderRGBA[0] = 0xff;
+	ent->shaderRGBA[1] = 0xff;
+	ent->shaderRGBA[2] = 0xff;
+	ent->shaderRGBA[3] = 0xff * c * 0.33;
+
+	ent->radius = ent->radius * ( 1.0 - c ) + ex->radius;
+	if (ent->radius != 1.0f) {
+		VectorScale( ent->axis[0], re.radius, ent->axis[0] );
+		VectorScale( ent->axis[1], re.radius, ent->axis[1] );
+		VectorScale( ent->axis[2], re.radius, ent->axis[2] );
+		ent->nonNormalizedAxes = qtrue;
+	}
+#else
 	refEntity_t	*ent;
 
 	ent = &ex->refEntity;
+#endif
 
 	// add the entity
 	trap_R_AddRefEntityToScene(ent);
@@ -531,7 +558,6 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 
 	re.reType = RT_SPRITE;
 #ifdef TA_WEAPSYS // SPR_EXP_SCALE
-	// CG_MakeExplosion
 	re.radius = le->refEntity.radius * ( 1.0 - c ) + le->radius;
 #else
 	re.radius = 42 * ( 1.0 - c ) + 30;
