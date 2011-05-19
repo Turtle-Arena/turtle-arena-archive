@@ -66,15 +66,11 @@ Lock-on sounds like in LOZ:TP
   * TEMP: sound/feedback/vote_failed.wav - Announcer: "Vote failed."
 
   * TEMP: sound/feedback/takenlead.wav - Announcer: "You have taken the lead."
-  * TEMP: sound/feedback/tiedlead.wav - Announcer: "Your tied for the lead."
+  * TEMP: sound/feedback/tiedlead.wav - Announcer: "You're tied for the lead."
   * TEMP: sound/feedback/lostlead.wav - Announcer: "You lost the lead."
 
   * TEMP: sound/feedback/assist.wav - Announcer: "Assist."
   * TEMP: sound/feedback/defense.wav - Announcer: "Defense."
-
-=== Single Player Skirmish (aka Custom Game, aka Vs. Bots) ===
-  * sound/feedback/voc_youwin.wav - Announcer: "You win."
-  * sound/feedback/voc_youlose.wav - Announcer: "You lose."
 
 === TEAM/CTF/1FCTF/Overload ===
   * TEMP: sound/feedback/redleads.wav - Announcer: "Red leads."
@@ -82,8 +78,8 @@ Lock-on sounds like in LOZ:TP
   * TEMP: sound/feedback/teamstied.wav - Announcer: "Teams are tied."
   * sound/feedback/hit_teammate.wav - sfx
 
-  * sound/teamplay/voc_red_scores.wav - Announcer: "Red scores."
-  * sound/teamplay/voc_blue_scores.wav - Announcer: "Blue scores."
+  * TEMP: sound/teamplay/voc_red_scores.wav - Announcer: "Red scores."
+  * TEMP: sound/teamplay/voc_blue_scores.wav - Announcer: "Blue scores."
 
   * sound/teamplay/flagcapture_yourteam.wav - sfx
   * sound/teamplay/flagcapture_opponent.wav - sfx
@@ -95,17 +91,17 @@ Lock-on sounds like in LOZ:TP
   * sound/teamplay/flagtaken_opponent.wav - sfx 'different alarm'
 
 === CTF ===
-  * sound/teamplay/voc_red_returned.wav - Announcer: "Red flag return."
-  * sound/teamplay/voc_blue_returned.wav - Announcer: "Blue flag return."
-  * sound/teamplay/voc_enemy_flag.wav - Announcer: "Thee enemy has your flag."
-  * sound/teamplay/voc_team_flag.wav - Announcer: "Your team has the enemy flag."
+  * TEMP: sound/teamplay/voc_red_returned.wav - Announcer: "Red flag return."
+  * TEMP: sound/teamplay/voc_blue_returned.wav - Announcer: "Blue flag return."
+  * TEMP: sound/teamplay/voc_enemy_flag.wav - Announcer: "Thee enemy has your flag."
+  * TEMP: sound/teamplay/voc_team_flag.wav - Announcer: "Your team has the enemy flag."
 
 === 1 Flag CTF ===
-  * sound/teamplay/voc_team_1flag.wav - Announcer: "Your team has the flag."
-  * sound/teamplay/voc_enemy_1flag.wav - Announcer: "Thee enemy has the flag."
+  * TEMP: sound/teamplay/voc_team_1flag.wav - Announcer: "Your team has the flag."
+  * TEMP: sound/teamplay/voc_enemy_1flag.wav - Announcer: "Thee enemy has the flag."
 
 === CTF and 1FCTF ===
-  * sound/teamplay/voc_you_flag.wav - Announcer: "You have the flag!"
+  * TEMP: sound/teamplay/voc_you_flag.wav - Announcer: "You have the flag!"
 
 === Overload ===
   * TEMP: sound/teamplay/voc_base_attack.wav - Announcer: "Your base is under attack!"

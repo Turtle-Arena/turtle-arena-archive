@@ -1294,8 +1294,10 @@ typedef struct {
 	sfxHandle_t obeliskHitSound2;
 	sfxHandle_t obeliskHitSound3;
 	sfxHandle_t	obeliskRespawnSound;
+#ifndef TA_SP
 	sfxHandle_t	winnerSound;
 	sfxHandle_t	loserSound;
+#endif
 #ifndef IOQ3ZTM // UNUSED
 	sfxHandle_t	youSuckSound;
 #endif
