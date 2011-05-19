@@ -54,10 +54,27 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 	trace_t	tr;
 	int		mask;
 
+#ifdef IOQ3ZTM
+	// shrink bounds so it is not coplanar,
+	// otherwise may result in startsolid when it should not.
+	if (ent->r.bmodel) {
+		ent->r.mins[0] += 2;
+		ent->r.mins[1] += 2;
+		ent->r.mins[2] += 2;
+		ent->r.maxs[0] -= 2;
+		ent->r.maxs[1] -= 2;
+		ent->r.maxs[2] -= 2;
+	}
+#endif
+
 	if ( ent->clipmask ) {
 		mask = ent->clipmask;
 	} else {
+#ifdef IOQ3ZTM // Don't push brushes inside of players!
+		mask = MASK_PLAYERSOLID;
+#else
 		mask = MASK_SOLID;
+#endif
 	}
 	if ( ent->client ) {
 		trap_Trace( &tr, ent->client->ps.origin, ent->r.mins, ent->r.maxs, ent->client->ps.origin, ent->s.number, mask );
@@ -65,6 +82,17 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 		trap_Trace( &tr, ent->s.pos.trBase, ent->r.mins, ent->r.maxs, ent->s.pos.trBase, ent->s.number, mask );
 	}
 	
+#ifdef IOQ3ZTM
+	if (ent->r.bmodel) {
+		ent->r.mins[0] -= 2;
+		ent->r.mins[1] -= 2;
+		ent->r.mins[2] -= 2;
+		ent->r.maxs[0] += 2;
+		ent->r.maxs[1] += 2;
+		ent->r.maxs[2] += 2;
+	}
+#endif
+
 	if (tr.startsolid)
 		return &g_entities[ tr.entityNum ];
 		
@@ -1622,6 +1650,8 @@ void SP_func_button( gentity_t *ent ) {
 	if ( G_SpawnString( "noiseEnd", "100", &sound ) ) {
 		ent->soundPos2 = G_SoundIndex(sound);
 	}
+
+	// ZTM: TODO: Sounds for sound2to1 and soundPos1 ?
 #else
 	ent->sound1to2 = G_SoundIndex("sound/movers/switches/butn2.wav");
 #endif
