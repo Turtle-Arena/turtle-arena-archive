@@ -1625,10 +1625,31 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		{
 			cglc_t *lc;
 #ifdef TA_SPLITVIEW // ZTM: FIXME: These checks don't really work with more than one local client...
+			qboolean localHasBlue = qfalse;
+			qboolean localHasRed = qfalse;
+			qboolean localHasNeutral = qfalse;
+
 			lc = &cg.localClients[0];
+
+			for (i = 0; i < MAX_SPLITVIEW; i++) {
+				if (cg.snap->lcIndex[i] == -1) {
+					continue;
+				}
+
+				if (cg.localClients[i].predictedPlayerState.powerups[PW_BLUEFLAG]) {
+					localHasBlue = qtrue;
+				}
+				if (cg.localClients[i].predictedPlayerState.powerups[PW_REDFLAG]) {
+					localHasRed = qtrue;
+				}
+				if (cg.localClients[i].predictedPlayerState.powerups[PW_NEUTRALFLAG]) {
+					localHasNeutral = qtrue;
+				}
+			}
 #else
 			lc = &cg.localClient;
 #endif
+
 			switch( es->eventParm ) {
 				case GTS_RED_CAPTURE: // CTF: red team captured the blue flag, 1FCTF: red team captured the neutral flag
 					if ( cgs.clientinfo[lc->clientNum].team == TEAM_RED )
@@ -1661,7 +1682,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 				case GTS_RED_TAKEN: // CTF: red team took blue flag, 1FCTF: blue team took the neutral flag
 					// if this player picked up the flag then a sound is played in CG_CheckLocalSounds
-					if (cg.cur_ps->powerups[PW_BLUEFLAG] || cg.cur_ps->powerups[PW_NEUTRALFLAG]) {
+#ifdef TA_SPLITVIEW
+					if (localHasBlue || localHasNeutral)
+#else
+					if (cg.cur_ps->powerups[PW_BLUEFLAG] || cg.cur_ps->powerups[PW_NEUTRALFLAG])
+#endif
+					{
 					}
 					else {
 					if (cgs.clientinfo[lc->clientNum].team == TEAM_BLUE) {
@@ -1684,7 +1710,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					break;
 				case GTS_BLUE_TAKEN: // CTF: blue team took the red flag, 1FCTF red team took the neutral flag
 					// if this player picked up the flag then a sound is played in CG_CheckLocalSounds
-					if (cg.cur_ps->powerups[PW_REDFLAG] || cg.cur_ps->powerups[PW_NEUTRALFLAG]) {
+#ifdef TA_SPLITVIEW
+					if (localHasRed || localHasNeutral)
+#else
+					if (cg.cur_ps->powerups[PW_REDFLAG] || cg.cur_ps->powerups[PW_NEUTRALFLAG])
+#endif
+					{
 					}
 					else {
 						if (cgs.clientinfo[lc->clientNum].team == TEAM_RED) {
