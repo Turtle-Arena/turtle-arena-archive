@@ -1249,7 +1249,7 @@ void CG_DrawScoreChain(void)
 	CG_ColorForChain(cg.cur_ps->chain, color);
 	color[3] = fadeColor[3];
 
-	s = va("%d Link", cg.cur_ps->chain); // ZTM: FIXME: Should be chain-1, but then colors don't make sense?
+	s = va("%d Link", cg.cur_ps->chain-1);
 
 	y = SCREEN_HEIGHT - 32 - CG_Text_Height(s, frac, 0);
 	CG_Text_Paint(CENTER_X, y, frac, color, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);

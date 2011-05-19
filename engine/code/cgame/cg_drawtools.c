@@ -971,54 +971,50 @@ void CG_ColorForChain(int chain, vec3_t color)
 	//  limit to colors 0 though 11
 	index = ((chain-1) / 5) % 12;
 
-	VectorClear(color);
-
 	switch (index)
 	{
-		case 3: // blue
-			VectorSet( color, 0, 0, 1 );
-			break;
-		case 7: // green
-			VectorSet( color, 0, 1, 0 );
-			break;
-		case 5: // cyen
-			VectorSet( color, 0, 1, 1 );
-			break;
-		case 11: // red
-			VectorSet( color, 1, 0, 0 );
-			break;
-		case 1: // magenta
-			VectorSet( color, 1, 0, 1 );
-			break;
-		case 9: // yellow
-			VectorSet( color, 1, 1, 0 );
-			break;
-		//case 12: // white
-		//	VectorSet( color, 1, 1, 1 );
-		//	break;
-
-		case 10: // orange
+		case 0: // orange
 			VectorSet( color, 1, 0.5f, 0 );
 			break;
-		case 8: // Lime
-			VectorSet( color, 0.5f, 1, 0 );
-			break;
-		case 6: // Vivid green
-			VectorSet( color, 0, 1, 0.5f );
-			break;
-		case 4: // light blue
+		case 1: // light blue
 			VectorSet( color, 0, 0.5f, 1 );
 			break;
-		case 2: // purple
-			VectorSet( color, 0.5f, 0, 1 );
+		case 2: // green
+			VectorSet( color, 0, 1, 0 );
 			break;
-		case 0: // pink
+		case 3: // cyen
+			VectorSet( color, 0, 1, 1 );
+			break;
+		case 4: // pink
 			VectorSet( color, 1, 0, 0.5f );
 			break;
 
-		//default: // fall back to white
-		//	VectorSet( color, 1, 1, 1 );
-		//	break;
+		case 5: // red
+			VectorSet( color, 1, 0, 0 );
+			break;
+		case 6: // blue
+			VectorSet( color, 0, 0, 1 );
+			break;
+		case 7: // Lime
+			VectorSet( color, 0.5f, 1, 0 );
+			break;
+		case 8: // Vivid green
+			VectorSet( color, 0, 1, 0.5f );
+			break;
+		case 9: // purple
+			VectorSet( color, 0.5f, 0, 1 );
+			break;
+
+		case 10: // yellow
+			VectorSet( color, 1, 1, 0 );
+			break;
+		case 11: // magenta
+			VectorSet( color, 1, 0, 1 );
+			break;
+
+		default: // white
+			VectorSet( color, 1, 1, 1 );
+			break;
 	}
 }
 #endif
