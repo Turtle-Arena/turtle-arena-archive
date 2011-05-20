@@ -813,7 +813,7 @@ void R_ScreenShotJPEG_f (void) {
 #ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
 	if (levelshot)
 	{
-		sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
+		sprintf( checkname, "levelshots/%s.jpg", tr.world->baseName );
 	}
 	else
 #endif
