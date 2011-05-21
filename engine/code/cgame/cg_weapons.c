@@ -2948,13 +2948,13 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		// add weapon ready sound
 		cent->pe.lightningFiring = qfalse;
 		if ( ( cent->currentState.eFlags & EF_FIRING )
-#ifndef IOQ3ZTM
+#ifndef IOQ3ZTM // IOQ3BUGFIX: Do not play ready sound while firing!
 			&& weapon->firingSound
 #endif
 			) {
 #ifdef TA_WEAPSYS
 			if (cg_weapongroups[weaponNum].firingSound)
-#elif defined IOQ3ZTM
+#elif defined IOQ3ZTM // IOQ3BUGFIX: Do not play ready sound while firing!
 			if (weapon->firingSound)
 #endif
 			// lightning gun and guantlet make a different sound when fire is held down

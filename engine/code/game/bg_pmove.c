@@ -3038,7 +3038,7 @@ static void PM_LadderMove( void ) {
 	origin[2] -= 20;
 
 	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, origin,
-		pm->ps->clientNum, MASK_PLAYERSOLID);
+		pm->ps->clientNum, pm->tracemask);
 
 	if(trace.fraction < 1)
 		backwards = qtrue;
@@ -3224,7 +3224,7 @@ void CheckLadder( void )
 	origin[2] -= 30;
 
 	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, origin,
-		pm->ps->clientNum, MASK_PLAYERSOLID);
+		pm->ps->clientNum, pm->tracemask);
 
 	if(trace.fraction == 1)
 		backwards = qtrue;
@@ -3243,7 +3243,7 @@ void CheckLadder( void )
 	VectorMA (origin, 2, flatforward, spot);
 
 	pm->trace (&trace, origin, pm->mins, pm->maxs, spot,
-		pm->ps->clientNum, MASK_PLAYERSOLID);
+		pm->ps->clientNum, pm->tracemask);
 
 	if ((trace.fraction < 1) && (trace.surfaceFlags & SURF_LADDER)) {
 		pml.ladder = qtrue;
