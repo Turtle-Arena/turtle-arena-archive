@@ -2604,7 +2604,11 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	PNG_ChunkCRC			CRC;
 	void					*crcPtr;
 	size_t					numtEXt = 0;
+#ifdef TA_SPLITVIEW
+	#define					NUMTEXT 6+MAX_SPLITVIEW
+#else
 	#define					NUMTEXT 7
+#endif
 	struct
 	{
 		char key[80]; // PNG limits to 79+'\0'.
@@ -2661,9 +2665,21 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	Q_strncpyz(tEXt[numtEXt].key, "Mapname", sizeof (tEXt[numtEXt].key));
 	ri.CL_GetMapMessage(tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text));
 	numtEXt++;
+#ifdef TA_SPLITVIEW
+	Q_strncpyz(tEXt[numtEXt].key, "Location", sizeof (tEXt[numtEXt].key));
+	ri.CL_GetClientLocation(tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text), 0);
+	numtEXt++;
+	for (i = 1; i < MAX_SPLITVIEW; i++) {
+		if (ri.CL_GetClientLocation(tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text), i)) {
+			snprintf(tEXt[numtEXt].key, sizeof (tEXt[numtEXt].key), "Location %d", i+1);
+			numtEXt++;
+		}
+	}
+#else
 	Q_strncpyz(tEXt[numtEXt].key, "Location", sizeof (tEXt[numtEXt].key));
 	ri.CL_GetClientLocation(tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text));
 	numtEXt++;
+#endif
 
 
 	/*

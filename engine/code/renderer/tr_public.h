@@ -162,7 +162,11 @@ typedef struct {
 	void	(*CL_WriteAVIVideoFrame)( const byte *buffer, int size );
 #ifdef IOQ3ZTM // PNG_SCREENSHOTS
 	void	(*CL_GetMapMessage)(char *buf, int bufLength);
-	void	(*CL_GetClientLocation)(char *buf, int bufLength);
+#ifdef TA_SPLITVIEW
+	qboolean (*CL_GetClientLocation)(char *buf, int bufLength, int localClientNum);
+#else
+	qboolean (*CL_GetClientLocation)(char *buf, int bufLength);
+#endif
 #endif
 } refimport_t;
 
