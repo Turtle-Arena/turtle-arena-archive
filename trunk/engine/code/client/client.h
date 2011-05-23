@@ -727,6 +727,10 @@ qboolean CL_VideoRecording( void );
 void CL_WriteDemoMessage ( msg_t *msg, int headerBytes );
 #ifdef IOQ3ZTM // PNG_SCREENSHOTS
 void CL_GetMapMessage(char *buf, int bufLength);
-void CL_GetClientLocation(char *buf, int bufLength);
+#ifdef TA_SPLITVIEW
+qboolean CL_GetClientLocation(char *buf, int bufLength, int localClientNum);
+#else
+qboolean CL_GetClientLocation(char *buf, int bufLength);
+#endif
 #endif
 
