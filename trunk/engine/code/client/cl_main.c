@@ -3260,6 +3260,10 @@ void CL_InitRef( void ) {
 	ri.CIN_RunCinematic = CIN_RunCinematic;
   
 	ri.CL_WriteAVIVideoFrame = CL_WriteAVIVideoFrame;
+#ifdef IOQ3ZTM // PNG_SCREENSHOTS
+	ri.CL_GetMapMessage = CL_GetMapMessage;
+	ri.CL_GetClientLocation = CL_GetClientLocation;
+#endif
 
 	ret = GetRefAPI( REF_API_VERSION, &ri );
 
@@ -4814,3 +4818,57 @@ qboolean CL_CDKeyValidate( const char *key, const char *checksum ) {
 	return qfalse;
 #endif
 }
+
+#ifdef IOQ3ZTM // PNG_SCREENSHOTS
+/*
+=================
+CL_GetMapMessage
+=================
+*/
+void CL_GetMapMessage(char *buf, int bufLength)
+{
+	int		offset;
+
+	offset = cl.gameState.stringOffsets[CS_MESSAGE];
+	if (!offset) {
+		if( bufLength ) {
+			Q_strncpyz( buf, "Unknown", bufLength);
+		}
+		return;
+	}
+
+	Q_strncpyz( buf, cl.gameState.stringData+offset, bufLength);
+}
+
+/*
+=================
+CL_GetClientLocation
+=================
+*/
+void CL_GetClientLocation(char *buf, int bufLength)
+{
+	float	minZ = -24; // ZTM: FIXME: Get from playercfg?
+	int		i;
+
+	if (!cl.snap.valid || cl.snap.numPSs < 1) {
+		Q_strncpyz(buf, "Unknown", bufLength);
+		return;
+	}
+
+#ifdef TA_SPLITVIEW
+	snprintf(buf, bufLength, "X:%d Y:%d Z:%d A:%d", (int)cl.snap.pss[0].origin[0],
+			(int)cl.snap.pss[0].origin[1], (int)(cl.snap.pss[0].origin[2]+minZ),
+			(int)(cl.snap.pss[0].viewangles[YAW]+360)%360);
+
+	for (i = 1; i < cl.snap.numPSs; i++) {
+		snprintf(buf, bufLength, "%s; X:%d Y:%d Z:%d A:%d", buf, (int)cl.snap.pss[i].origin[0],
+				(int)cl.snap.pss[i].origin[1], (int)(cl.snap.pss[i].origin[2]+minZ),
+				(int)(cl.snap.pss[i].viewangles[YAW]+360)%360);
+	}
+#else
+	snprintf(buf, bufLength, "X:%d Y:%d Z:%d A:%d", (int)cl.snap.ps.origin[0],
+			(int)cl.snap.ps.origin[1], (int)(cl.snap.ps.origin[2]+minZ),
+			(int)(cl.snap.ps.viewangles[YAW]+360)%360);
+#endif
+}
+#endif

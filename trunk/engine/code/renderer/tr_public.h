@@ -160,6 +160,10 @@ typedef struct {
 	e_status (*CIN_RunCinematic) (int handle);
 
 	void	(*CL_WriteAVIVideoFrame)( const byte *buffer, int size );
+#ifdef IOQ3ZTM // PNG_SCREENSHOTS
+	void	(*CL_GetMapMessage)(char *buf, int bufLength);
+	void	(*CL_GetClientLocation)(char *buf, int bufLength);
+#endif
 } refimport_t;
 
 

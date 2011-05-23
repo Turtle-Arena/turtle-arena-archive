@@ -725,4 +725,8 @@ qboolean CL_VideoRecording( void );
 // cl_main.c
 //
 void CL_WriteDemoMessage ( msg_t *msg, int headerBytes );
+#ifdef IOQ3ZTM // PNG_SCREENSHOTS
+void CL_GetMapMessage(char *buf, int bufLength);
+void CL_GetClientLocation(char *buf, int bufLength);
+#endif
 
