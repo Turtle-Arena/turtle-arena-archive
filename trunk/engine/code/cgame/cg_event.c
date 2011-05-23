@@ -791,6 +791,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifdef TA_SPLITVIEW
 	int				i;
 #endif
+	int				thisClientNum;
 
 	es = &cent->currentState;
 	event = es->event & ~EV_EVENT_BITS;
@@ -809,6 +810,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		clientNum = 0;
 	}
 	ci = &cgs.clientinfo[ clientNum ];
+
+#ifdef TA_SPLITVIEW
+	thisClientNum = cg.snap->pss[0].clientNum;
+#else
+	thisClientNum = cg.snap->ps.clientNum;
+#endif
 
 	switch ( event ) {
 	//
@@ -1142,14 +1149,14 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			// powerup pickups are global
 			if( item->pickup_sound[0] ) {
-				trap_S_StartSound (NULL, cg.cur_ps->clientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
+				trap_S_StartSound (NULL, thisClientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
 			}
 #else
 			item = &bg_itemlist[ index ];
 
 			// powerup pickups are global
 			if( item->pickup_sound ) {
-				trap_S_StartSound (NULL, cg.cur_ps->clientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
+				trap_S_StartSound (NULL, thisClientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
 			}
 #endif
 
@@ -1613,10 +1620,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_GLOBAL_SOUND:	// play from the player's head so it never diminishes
 		DEBUGNAME("EV_GLOBAL_SOUND");
 		if ( cgs.gameSounds[ es->eventParm ] ) {
-			trap_S_StartSound (NULL, cg.cur_ps->clientNum, CHAN_AUTO, cgs.gameSounds[ es->eventParm ] );
+			trap_S_StartSound (NULL, thisClientNum, CHAN_AUTO, cgs.gameSounds[ es->eventParm ] );
 		} else {
 			s = CG_ConfigString( CS_SOUNDS + es->eventParm );
-			trap_S_StartSound (NULL, cg.cur_ps->clientNum, CHAN_AUTO, CG_CustomSound( es->number, s ) );
+			trap_S_StartSound (NULL, thisClientNum, CHAN_AUTO, CG_CustomSound( es->number, s ) );
 		}
 		break;
 
@@ -1685,7 +1692,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifdef TA_SPLITVIEW
 					if (localHasBlue || localHasNeutral)
 #else
-					if (cg.cur_ps->powerups[PW_BLUEFLAG] || cg.cur_ps->powerups[PW_NEUTRALFLAG])
+					if (cg.snap->ps.powerups[PW_BLUEFLAG] || cg.snap->ps.powerups[PW_NEUTRALFLAG])
 #endif
 					{
 					}
@@ -1713,7 +1720,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifdef TA_SPLITVIEW
 					if (localHasRed || localHasNeutral)
 #else
-					if (cg.cur_ps->powerups[PW_REDFLAG] || cg.cur_ps->powerups[PW_NEUTRALFLAG])
+					if (cg.snap->ps.powerups[PW_REDFLAG] || cg.snap->ps.powerups[PW_NEUTRALFLAG])
 #endif
 					{
 					}
@@ -1804,7 +1811,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifndef TURTLEARENA // NOZOOM
 #ifdef IOQ3ZTM
 		// check for death of the current clientNum
-		if ( es->otherEntityNum == cg.cur_ps->clientNum ) {
+		if ( es->otherEntityNum == cg.snap->ps.clientNum ) {
 			// if zoomed in, zoom out
 			CG_ZoomUp_f();
 		}
@@ -1826,7 +1833,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			}
 		}
 #else
-		if ( es->number == cg.cur_ps->clientNum ) {
+		if ( es->number == cg.snap->ps.clientNum ) {
 			cg.localClient.powerupActive = PW_QUAD;
 			cg.localClient.powerupTime = cg.time;
 		}
@@ -1843,7 +1850,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			}
 		}
 #else
-		if ( es->number == cg.cur_ps->clientNum ) {
+		if ( es->number == cg.snap->ps.clientNum ) {
 			cg.localClient.powerupActive = PW_BATTLESUIT;
 			cg.localClient.powerupTime = cg.time;
 		}
@@ -1861,7 +1868,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			}
 		}
 #else
-		if ( es->number == cg.cur_ps->clientNum ) {
+		if ( es->number == cg.snap->ps.clientNum ) {
 			cg.localClient.powerupActive = PW_REGEN;
 			cg.localClient.powerupTime = cg.time;
 		}
@@ -1880,7 +1887,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			}
 		}
 #else
-		if ( es->number == cg.cur_ps->clientNum ) {
+		if ( es->number == cg.snap->ps.clientNum ) {
 			cg.localClient.powerupActive = PW_INVUL;
 			cg.localClient.powerupTime = cg.time;
 		}
