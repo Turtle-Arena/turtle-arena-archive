@@ -411,6 +411,29 @@ byte *RB_ReadPixels(int x, int y, int width, int height, size_t *offset, int *pa
 	return buffer;
 }
 
+#ifdef IOQ3ZTM // PNG_SCREENSHOTS
+/* 
+================== 
+RB_TakeScreenshot
+================== 
+*/
+void RB_TakeScreenshot(int x, int y, int width, int height, char *fileName)
+{
+	byte *buffer;
+	size_t offset = 0, memcount;
+	int padlen;
+
+	buffer = RB_ReadPixels(x, y, width, height, &offset, &padlen);
+	memcount = (width * 3 + padlen) * height;
+
+	// gamma correct
+	if(glConfig.deviceSupportsGamma)
+		R_GammaCorrect(buffer + offset, memcount);
+
+	RE_SavePNG(fileName, width, height, buffer + offset, padlen);
+	ri.Hunk_FreeTempMemory(buffer);
+}
+#else
 /* 
 ================== 
 RB_TakeScreenshot
@@ -471,6 +494,7 @@ void RB_TakeScreenshot(int x, int y, int width, int height, char *fileName)
 
 	ri.Hunk_FreeTempMemory(allbuf);
 }
+#endif
 
 /* 
 ================== 
@@ -546,7 +570,11 @@ void R_ScreenshotFilename( int lastNumber, char *fileName ) {
 	int		a,b,c,d;
 
 	if ( lastNumber < 0 || lastNumber > 9999 ) {
+#ifdef IOQ3ZTM // PNG_SCREENSHOTS
+		Com_sprintf( fileName, MAX_OSPATH, "screenshots/shot9999.png" );
+#else
 		Com_sprintf( fileName, MAX_OSPATH, "screenshots/shot9999.tga" );
+#endif
 		return;
 	}
 
@@ -558,8 +586,13 @@ void R_ScreenshotFilename( int lastNumber, char *fileName ) {
 	lastNumber -= c*10;
 	d = lastNumber;
 
+#ifdef IOQ3ZTM // PNG_SCREENSHOTS
+	Com_sprintf( fileName, MAX_OSPATH, "screenshots/shot%i%i%i%i.png"
+		, a, b, c, d );
+#else
 	Com_sprintf( fileName, MAX_OSPATH, "screenshots/shot%i%i%i%i.tga"
 		, a, b, c, d );
+#endif
 }
 
 /* 
@@ -738,16 +771,20 @@ void R_ScreenShot_f (void) {
 		silent = qfalse;
 	}
 
-#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS PNG_SCREENSHOTS
 	if (levelshot)
 	{
-		sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
+		sprintf( checkname, "levelshots/%s.png", tr.world->baseName );
 	}
 	else
 #endif
 	if ( ri.Cmd_Argc() == 2 && !silent ) {
 		// explicit filename
+#ifdef IOQ3ZTM // PNG_SCREENSHOTS
+		Com_sprintf( checkname, MAX_OSPATH, "screenshots/%s.png", ri.Cmd_Argv( 1 ) );
+#else
 		Com_sprintf( checkname, MAX_OSPATH, "screenshots/%s.tga", ri.Cmd_Argv( 1 ) );
+#endif
 	} else {
 		// scan for a free filename
 

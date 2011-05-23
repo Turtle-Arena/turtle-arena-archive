@@ -41,6 +41,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define PMF_FOLLOW			4096	// spectate following another player
 
 // client only
+#define	CS_MESSAGE				3		// from the map worldspawn's message field
+
 #define PM_INTERMISSION 5 // bg_misc.h enum pmtype_t
 #define PM_SPINTERMISSION 6 // bg_misc.h enum pmtype_t
 

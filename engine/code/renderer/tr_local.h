@@ -1867,6 +1867,9 @@ void RB_SetGL2D (void);
 #endif
 void RE_BeginFrame( stereoFrame_t stereoFrame );
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
+#ifdef IOQ3ZTM // PNG_SCREENSHOTS
+void RE_SavePNG(const char *filename, int width, int height, byte *data, int padding);
+#endif
 void RE_SaveJPG(char * filename, int quality, int image_width, int image_height,
                 unsigned char *image_buffer, int padding);
 size_t RE_SaveJPGToBuffer(byte *buffer, size_t bufSize, int quality,
