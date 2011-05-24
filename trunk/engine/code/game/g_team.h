@@ -84,7 +84,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 int OtherTeam(int team);
 const char *TeamName(int team);
+#ifndef IOQ3ZTM // UNUSED
 const char *OtherTeamName(int team);
+#endif
 const char *TeamColorString(int team);
 void AddTeamScore(vec3_t origin, int team, int score);
 
