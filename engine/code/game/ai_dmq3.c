@@ -2512,12 +2512,12 @@ qboolean BotCanUseShurikens(bot_state_t *bs)
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
 /*
 ==================
-BotWantUseShurikens
+BotWantUseShuriken
 
-Returns qtrue if bots wants to use shurikens on target.
+Returns qtrue if bots wants to throw shurikens at target.
 ==================
 */
-qboolean BotWantUseShurikens(bot_state_t *bs, int target, aas_entityinfo_t *entinfo) {
+qboolean BotWantUseShuriken(bot_state_t *bs, int target, aas_entityinfo_t *entinfo) {
 	vec3_t	dist;
 	int		projNum;
 	float	range;
@@ -3195,7 +3195,7 @@ bot_moveresult_t BotAttackMove(bot_state_t *bs, int tfl) {
 		}
 	}
 #ifdef TA_WEAPSYS
-	if (BG_WeaponHasMelee(bs->cur_ps.weapon) && !BotCanUseShurikens(bs))
+	if (BG_WeaponHasMelee(bs->cur_ps.weapon))
 #else
 	if (bs->cur_ps.weapon == WP_GAUNTLET)
 #endif
@@ -4127,7 +4127,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	vec3_t offset;
 	bg_projectileinfo_t *bgProj;
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
-	qboolean firedShuriken = qfalse;
+	qboolean useHoldable = qfalse;
 #endif
 #else
 	weaponinfo_t wi;
@@ -4173,11 +4173,24 @@ void BotCheckAttack(bot_state_t *bs) {
 		}
 	}
 	//
+#ifdef TA_WEAPSYS
+	bgProj = NULL;
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+	if (BotWantUseShuriken(bs, attackentity, &entinfo))
+	{
+		int projnum = BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex);
+		if (projnum > 0) {
+			bgProj = &bg_projectileinfo[projnum];
+			useHoldable = qtrue;
+		}
+	}
+#endif
+#endif
 	//
 	VectorSubtract(bs->aimtarget, bs->eye, dir);
 	//
 #ifdef TA_WEAPSYS
-	if (BG_WeaponHasMelee(bs->cur_ps.weapon) && !BotCanUseShurikens(bs))
+	if (!useHoldable && BG_WeaponHasMelee(bs->cur_ps.weapon))
 #else
 	if (bs->weaponnum == WP_GAUNTLET)
 #endif
@@ -4199,23 +4212,11 @@ void BotCheckAttack(bot_state_t *bs) {
 		return;
 
 #ifdef TA_WEAPSYS
-	bgProj = NULL;
+	if (
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
-	if (BotWantUseShurikens(bs, attackentity, &entinfo))
-	{
-		int projnum = BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex);
-		if (projnum > 0) {
-			bgProj = &bg_projectileinfo[projnum];
-			firedShuriken = qtrue;
-		}
-	}
-	if (firedShuriken)
-	{
-		// Do nothing...
-	}
-	else
+		!useHoldable &&
 #endif
-	if (!BG_WeaponHasMelee(bs->cur_ps.weapon))
+		!BG_WeaponHasMelee(bs->cur_ps.weapon))
 	{
 		bgProj = bg_weapongroupinfo[bs->weaponnum].weapon[0]->proj;
 	}
@@ -4251,7 +4252,7 @@ void BotCheckAttack(bot_state_t *bs) {
 		AngleVectors(bs->viewangles, forward, right, NULL);
 #ifdef TA_WEAPSYS
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
-		if (firedShuriken)
+		if (useHoldable)
 			VectorClear(offset);
 		else
 #endif
@@ -4308,7 +4309,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	}
 #endif
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
-	if (firedShuriken)
+	if (useHoldable)
 	{
 		trap_EA_Use(bs->client, bs->cur_ps.holdableIndex);
 		return;
