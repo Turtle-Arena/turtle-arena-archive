@@ -2490,13 +2490,17 @@ int TeamPlayIsOn(void) {
 }
 
 #ifdef TA_WEAPSYS
+/*
+==================
+BotCanUseShurikens
+==================
+*/
 qboolean BotCanUseShurikens(bot_state_t *bs)
 {
+	// ZTM: TODO: Check all 
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
-	if (bs->inventory[ENEMY_HORIZONTAL_DIST] >= 256
-		&& bs->inventory[ENEMY_HORIZONTAL_DIST] <= 768 // LOCKON range
-		&& BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex)
-		&& bs->cur_ps.holdable[bs->cur_ps.holdableIndex] > 0)
+	if (BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex)
+		&& bs->cur_ps.holdable[bs->cur_ps.holdableIndex] != 0)
 	{
 		return qtrue;
 	}
@@ -2504,6 +2508,53 @@ qboolean BotCanUseShurikens(bot_state_t *bs)
 
 	return qfalse;
 }
+
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+/*
+==================
+BotWantUseShurikens
+
+Returns qtrue if bots wants to use shurikens on target.
+==================
+*/
+qboolean BotWantUseShurikens(bot_state_t *bs, int target, aas_entityinfo_t *entinfo) {
+	vec3_t	dist;
+	int		projNum;
+	float	range;
+
+	if (BotSameTeam(bs, target)) {
+		return qfalse;
+	}
+
+	if (!BotCanUseShurikens(bs)) {
+		return qfalse;
+	}
+
+	if (!BG_WeaponHasMelee(bs->cur_ps.weapon)) {
+		// do not use shurikens while holding gun.
+		return qfalse;
+	}
+
+	VectorSubtract(bs->cur_ps.origin, entinfo->origin, dist);
+
+	projNum = BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex);
+
+	if (bg_projectileinfo[projNum].instantDamage)
+		range = bg_projectileinfo[projNum].speed;
+	else
+		range = 768;
+
+	if (VectorLength(dist) > range*0.90) {
+		return qfalse;
+	}
+
+	if (VectorLength(dist) < 80) {
+		return qfalse;
+	}
+
+	return qtrue;
+}
+#endif
 #endif
 
 /*
@@ -4150,7 +4201,7 @@ void BotCheckAttack(bot_state_t *bs) {
 #ifdef TA_WEAPSYS
 	bgProj = NULL;
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
-	if (BotCanUseShurikens(bs))
+	if (BotWantUseShurikens(bs, attackentity, &entinfo))
 	{
 		int projnum = BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex);
 		if (projnum > 0) {
@@ -4199,7 +4250,12 @@ void BotCheckAttack(bot_state_t *bs) {
 		start[2] += bs->cur_ps.viewheight;
 		AngleVectors(bs->viewangles, forward, right, NULL);
 #ifdef TA_WEAPSYS
-		VectorCopy(bg_weapongroupinfo[bs->weaponnum].weapon[0]->aimOffset, offset);
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+		if (firedShuriken)
+			VectorClear(offset);
+		else
+#endif
+			VectorCopy(bg_weapongroupinfo[bs->weaponnum].weapon[0]->aimOffset, offset);
 
 		start[0] += forward[0] * offset[0] + right[0] * offset[1];
 		start[1] += forward[1] * offset[0] + right[1] * offset[1];
@@ -4226,7 +4282,7 @@ void BotCheckAttack(bot_state_t *bs) {
 		if (trace.ent != attackentity || attackentity >= MAX_CLIENTS) {
 			//if the projectile does radial damage
 #ifdef TA_WEAPSYS
-			if (bgProj && bgProj->splashRadius > 0 && bgProj->splashDamage > 0)
+			if (bgProj->splashRadius > 0 && bgProj->splashDamage > 0)
 			{
 				if (trace.fraction * 1000 < bgProj->splashRadius) {
 					points = (bgProj->splashDamage - 0.5 * trace.fraction * 1000) * 0.5;
@@ -4255,9 +4311,10 @@ void BotCheckAttack(bot_state_t *bs) {
 	if (firedShuriken)
 	{
 		trap_EA_Use(bs->client, bs->cur_ps.holdableIndex);
+		return;
 	}
-	else
 #endif
+
 	//if fire has to be release to activate weapon
 #ifdef TA_WEAPSYS
 	// Grappling hook must be release and pressed again to fire.
