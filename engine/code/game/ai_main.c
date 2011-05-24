@@ -939,9 +939,6 @@ void BotUpdateInput(bot_state_t *bs, int time, int elapsed_time) {
 	for (j = 0; j < 3; j++) {
 		bs->viewangles[j] = AngleMod(bs->viewangles[j] - SHORT2ANGLE(bs->cur_ps.delta_angles[j]));
 	}
-#ifdef TA_HOLDSYS
-	trap_EA_Use(bs->client, HI_NO_SELECT);
-#endif
 }
 
 /*
