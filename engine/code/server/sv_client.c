@@ -1599,6 +1599,16 @@ void SV_UserinfoChanged( client_t *cl ) {
 			cl->rate = 3000;
 		}
 	}
+#ifdef TA_SP // HANDICAP
+	if (Cvar_VariableValue("ui_singlePlayerActive")
+		&& cl->netchan.remoteAddress.type != NA_BOT)
+	{
+		// Humans do not use handicap in single player
+		Info_SetValueForKey( cl->userinfo, "handicap", "100" );
+	}
+	else
+	{
+#endif
 	val = Info_ValueForKey (cl->userinfo, "handicap");
 	if (strlen(val)) {
 		i = atoi(val);
@@ -1606,6 +1616,9 @@ void SV_UserinfoChanged( client_t *cl ) {
 			Info_SetValueForKey( cl->userinfo, "handicap", "100" );
 		}
 	}
+#ifdef TA_SP
+	}
+#endif
 
 	// snaps command
 	val = Info_ValueForKey (cl->userinfo, "snaps");
