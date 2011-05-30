@@ -1,7 +1,8 @@
 /*
 ===========================================================================
-ioquake3 png decoder
+ioquake3 png decoder and encoder
 Copyright (C) 2007,2008 Joerg Dietrich
+Copyright (C) 2011 Zack "ZTurtleMan" Middleton
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -2502,6 +2503,7 @@ void R_LoadPNG(const char *name, byte **pic, int *width, int *height)
 /*
  * Encode a non-interlaced 8-bit true color image
  */
+
 static qboolean EncodeImageNonInterlaced8True(uint32_t IHDR_Width, uint32_t IHDR_Height,
 		byte                  *InBuffer,
 		uint32_t			  InBytesPerPixel,
@@ -2572,33 +2574,64 @@ static qboolean EncodeImageNonInterlaced8True(uint32_t IHDR_Width, uint32_t IHDR
 	return(qtrue);
 }
 
+/*
+ * Write data to buffer.
+ */
+
 void WriteToBuffer(void **buffer, const void *data, size_t length)
 {
 	memcpy(*buffer, data, length);
 	*buffer += length;
 }
 
+/*
+ * Write PNG chuck header to buffer.
+ */
+
 void WriteChunkHeader(void **buffer, void **crcPtr, PNG_ChunkCRC *CRC, int type, int length)
 {
 	struct PNG_ChunkHeader	CH;
+
+	/*
+	 *  Write chuck header
+	 */
 
 	CH.Type = BigLong(type);
 	CH.Length = BigLong(length);
 
 	WriteToBuffer(buffer, &CH, PNG_ChunkHeader_Size);
 
+	/*
+	 *  Init CRC
+	 */
+
 	*CRC = crc32(0, Z_NULL, 0);
 	*CRC = crc32(*CRC, *buffer-4, 4);
 	*crcPtr = *buffer;
 }
 
+/*
+ * Write CRC to buffer.
+ */
+
 void WriteCRC(void **buffer, void **crcPtr, PNG_ChunkCRC CRC)
 {
+	/*
+	 *  Update CRC
+	 */
 	if (*buffer-*crcPtr > 0)
 		CRC = crc32(CRC, *crcPtr, *buffer-*crcPtr);
+
+	/*
+	 *  Write CRC
+	 */
 	CRC = BigLong(CRC);
 	WriteToBuffer(buffer, &CRC, PNG_ChunkCRC_Size);
 }
+
+/*
+ * The PNG saver
+ */
 
 void RE_SavePNG(const char *filename, int width, int height, byte *data, int padding) {
 	void					*pngData;
