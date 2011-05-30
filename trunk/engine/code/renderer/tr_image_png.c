@@ -2572,34 +2572,38 @@ static qboolean EncodeImageNonInterlaced8True(uint32_t IHDR_Width, uint32_t IHDR
 	return(qtrue);
 }
 
-int WriteToBuffer(void *buffer, const void *data, size_t length)
+void WriteToBuffer(void **buffer, const void *data, size_t length)
 {
-	memcpy(buffer, data, length);
-	return length;
+	memcpy(*buffer, data, length);
+	*buffer += length;
 }
 
-// ZTM: FIXME: Get rid of define!
-#define WriteChunkHeader(_type, _length) \
-	CH.Type = BigLong(_type); \
-	CH.Length = BigLong(_length); \
-	buffer += WriteToBuffer(buffer, &CH, PNG_ChunkHeader_Size); \
-	CRC = crc32(0, Z_NULL, 0); \
-	CRC = crc32(CRC, buffer-4, 4); \
-	crcPtr = buffer;
-
-int WriteCRC(void *buffer, void *crcPtr, uint32_t CRC)
+void WriteChunkHeader(void **buffer, void **crcPtr, PNG_ChunkCRC *CRC, int type, int length)
 {
-	if (buffer-crcPtr > 0)
-		CRC = crc32(CRC, crcPtr, buffer-crcPtr);
+	struct PNG_ChunkHeader	CH;
+
+	CH.Type = BigLong(type);
+	CH.Length = BigLong(length);
+
+	WriteToBuffer(buffer, &CH, PNG_ChunkHeader_Size);
+
+	*CRC = crc32(0, Z_NULL, 0);
+	*CRC = crc32(*CRC, *buffer-4, 4);
+	*crcPtr = *buffer;
+}
+
+void WriteCRC(void **buffer, void **crcPtr, PNG_ChunkCRC CRC)
+{
+	if (*buffer-*crcPtr > 0)
+		CRC = crc32(CRC, *crcPtr, *buffer-*crcPtr);
 	CRC = BigLong(CRC);
-	return WriteToBuffer(buffer, &CRC, PNG_ChunkCRC_Size);
+	WriteToBuffer(buffer, &CRC, PNG_ChunkCRC_Size);
 }
 
 void RE_SavePNG(const char *filename, int width, int height, byte *data, int padding) {
 	void					*pngData;
 	size_t					pngSize;
 	void					*buffer;
-	struct PNG_ChunkHeader	CH;
 	struct PNG_Chunk_IHDR	IHDR;
 	PNG_ChunkCRC			CRC;
 	void					*crcPtr;
@@ -2671,7 +2675,7 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	numtEXt++;
 	for (i = 1; i < MAX_SPLITVIEW; i++) {
 		if (ri.CL_GetClientLocation(tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text), i)) {
-			snprintf(tEXt[numtEXt].key, sizeof (tEXt[numtEXt].key), "Location %d", i+1);
+			snprintf(tEXt[numtEXt].key, sizeof (tEXt[numtEXt].key), "Location %lu", i+1);
 			numtEXt++;
 		}
 	}
@@ -2716,9 +2720,9 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	 *  Header
 	 */
 
-	buffer += WriteToBuffer(buffer, PNG_Signature, PNG_Signature_Size);
+	WriteToBuffer(&buffer, PNG_Signature, PNG_Signature_Size);
 
-	WriteChunkHeader(PNG_ChunkType_IHDR, PNG_Chunk_IHDR_Size);
+	WriteChunkHeader(&buffer, &crcPtr, &CRC, PNG_ChunkType_IHDR, PNG_Chunk_IHDR_Size);
 	IHDR.Width = BigLong(width);
 	IHDR.Height = BigLong(height);
 	IHDR.BitDepth = PNG_BitDepth_8;
@@ -2726,36 +2730,36 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	IHDR.CompressionMethod = PNG_CompressionMethod_0;
 	IHDR.FilterMethod = PNG_FilterMethod_0;
 	IHDR.InterlaceMethod = PNG_InterlaceMethod_NonInterlaced;
-	buffer += WriteToBuffer(buffer, &IHDR, PNG_Chunk_IHDR_Size);
-	buffer += WriteCRC(buffer, crcPtr, CRC);
+	WriteToBuffer(&buffer, &IHDR, PNG_Chunk_IHDR_Size);
+	WriteCRC(&buffer, &crcPtr, CRC);
 
 	/*
 	 *  tEXt, Textual data.
 	 */
 	for (i = 0; i < numtEXt; i++) {
-		WriteChunkHeader(PNG_ChunkType_tEXt, strlen(tEXt[i].key)+1 + strlen(tEXt[i].text));
+		WriteChunkHeader(&buffer, &crcPtr, &CRC, PNG_ChunkType_tEXt, strlen(tEXt[i].key)+1 + strlen(tEXt[i].text));
 
 		/*
 		 *  Write string data.
 		 */
-		buffer += WriteToBuffer(buffer, tEXt[i].key, strlen(tEXt[i].key)+1);
-		buffer += WriteToBuffer(buffer, tEXt[i].text, strlen(tEXt[i].text));
+		WriteToBuffer(&buffer, tEXt[i].key, strlen(tEXt[i].key)+1);
+		WriteToBuffer(&buffer, tEXt[i].text, strlen(tEXt[i].text));
 
-		buffer += WriteCRC(buffer, crcPtr, CRC);
+		WriteCRC(&buffer, &crcPtr, CRC);
 	}
 
 	/*
 	 *  IDAT, Image Data.
 	 */
-	WriteChunkHeader(PNG_ChunkType_IDAT, compressedDataLength);
-	buffer += WriteToBuffer(buffer, compressedData, compressedDataLength);
-	buffer += WriteCRC(buffer, crcPtr, CRC);
+	WriteChunkHeader(&buffer, &crcPtr, &CRC, PNG_ChunkType_IDAT, compressedDataLength);
+	WriteToBuffer(&buffer, compressedData, compressedDataLength);
+	WriteCRC(&buffer, &crcPtr, CRC);
 
 	/*
 	 *  IEND, Image End.
 	 */
-	WriteChunkHeader(PNG_ChunkType_IEND, 0);
-	buffer += WriteCRC(buffer, crcPtr, CRC);
+	WriteChunkHeader(&buffer, &crcPtr, &CRC, PNG_ChunkType_IEND, 0);
+	WriteCRC(&buffer, &crcPtr, CRC);
 
 	/*
 	 *  Write the image to file.
