@@ -506,7 +506,7 @@ void Sys_ParseArgs( int argc, char **argv )
 }
 
 #ifndef DEFAULT_BASEDIR
-#	if defined MACOS_X && !defined TA_DATA // Turtle Arena data goes in same dir with game binary
+#	ifdef MACOS_X
 #		define DEFAULT_BASEDIR Sys_StripAppBundle(Sys_BinaryPath())
 #	else
 #		define DEFAULT_BASEDIR Sys_BinaryPath()
