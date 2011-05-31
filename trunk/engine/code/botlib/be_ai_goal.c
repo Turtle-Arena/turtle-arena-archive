@@ -349,7 +349,7 @@ int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
 	fuzzyseperator_t *fs;
 	int index;
 
-	if (iwc->numweights >= MAX_WEIGHTS || !item->defaultWeight) {
+	if (iwc->numweights >= MAX_WEIGHTS || item->defaultWeight <= 0) {
 		return -1;
 	}
 
@@ -358,7 +358,6 @@ int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
 	iwc->weights[index].name = (char *) GetClearedMemory(strlen(item->classname) + 1);
 	strcpy(iwc->weights[index].name, item->classname);
 
-#if 0 // ZTM: FIXME: Causes SIGBUS error in FuzzyWeightUndecided_r
 	if (item->inventory)
 	{
 		fuzzyseperator_t *firstfs = NULL;
@@ -408,7 +407,6 @@ int CreateFuzzyWeight(weightconfig_t *iwc, iteminfo_t *item)
 		iwc->numweights++;
 		return index;
 	}
-#endif
 
 	// Setup fuzzyseperator
 	fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
@@ -454,7 +452,7 @@ int *ItemWeightIndex(weightconfig_t *iwc, itemconfig_t *ic)
 	{
 		index[i] = FindFuzzyWeight(iwc, ic->iteminfo[i].classname);
 #ifdef TA_WEAPSYS // BOT_ITEM_INFOS
-		if (index[i] < 0 && ic->iteminfo[i].defaultWeight > 0)
+		if (index[i] < 0)
 		{
 			index[i] = CreateFuzzyWeight(iwc, &ic->iteminfo[i]);
 		}
