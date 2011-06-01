@@ -1,8 +1,9 @@
 //
-// menu defs for the main menu.
+// menudefs for the main menu.
 //
 {
 	loadMenu { "ui/out_main.menu" }
+	loadMenu { "ui/out_connect.menu" }
 
 	loadMenu { "ui/out_play.menu" }
 	//loadMenu { "ui/out_newgame.menu" }
@@ -24,3 +25,4 @@
 
 	loadMenu { "ui/out_quit.menu" }
 }
+

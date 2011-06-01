@@ -625,7 +625,9 @@ typedef struct {
 	qboolean		debug;
 	qhandle_t		whiteShader;
 	qhandle_t		menuBackShader;
+#ifndef IOQ3ZTM // UNUSED
 	qhandle_t		menuBackShader2;
+#endif
 #ifndef TA_DATA
 	qhandle_t		menuBackNoLogoShader;
 #endif
