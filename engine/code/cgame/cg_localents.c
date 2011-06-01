@@ -923,6 +923,14 @@ void CG_AddLocalEntities( void ) {
 			CG_FreeLocalEntity( le );
 			continue;
 		}
+
+#ifdef TA_SPLITVIEW
+		// Check if local entity should be rendered by this local client.
+		if (le->localClients && !(le->localClients & (1<<cg.cur_localClientNum))) {
+			continue;
+		}
+#endif
+
 #ifdef IOQ3ZTM // ZTM: Anything glows!
 		// add the dlight
 		if ( le->light ) {
@@ -938,6 +946,7 @@ void CG_AddLocalEntities( void ) {
 			trap_R_AddLightToScene(le->refEntity.origin, light, le->lightColor[0], le->lightColor[1], le->lightColor[2] );
 		}
 #endif
+
 		switch ( le->leType ) {
 		default:
 			CG_Error( "Bad leType: %i", le->leType );
