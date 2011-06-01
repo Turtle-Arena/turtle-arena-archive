@@ -145,7 +145,7 @@ qboolean UI_CanShowVideo(const char *video)
 	stringlen = strlen(filename);
 
 	strncpy(fn, filename, stringlen+1);
-	extptr = Q_strrchr(fn, '.');
+	extptr = strrchr(fn, '.');
 
 	len = trap_FS_FOpenFile( fn, &hnd, FS_READ );
 

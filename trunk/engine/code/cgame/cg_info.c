@@ -138,7 +138,7 @@ void CG_LoadingClient( int clientNum ) {
 #else
 		Q_strncpyz( model, Info_ValueForKey( info, "model" ), sizeof( model ) );
 #endif
-		skin = Q_strrchr( model, '/' );
+		skin = strrchr( model, '/' );
 		if ( skin ) {
 			*skin++ = '\0';
 		} else {
