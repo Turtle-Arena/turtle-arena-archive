@@ -472,7 +472,7 @@ void CG_ScorePlum( int client, vec3_t org, int score ) {
 	refEntity_t		*re;
 	vec3_t			angles;
 #ifdef TA_SPLITVIEW
-	int				i;
+	int				lc, localClients;
 #endif
 	static vec3_t lastPos;
 
@@ -484,18 +484,22 @@ void CG_ScorePlum( int client, vec3_t org, int score ) {
 		cg_scorePlum.integer == 0) {
 		return;
 	}
-#ifdef TA_SPLITVIEW // ZTM: FIXME: Local players can see each other's scores.
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (cg.snap->lcIndex[i] != -1 && client == cg.localClients[i].predictedPlayerState.clientNum) {
-			break;
+#ifdef TA_SPLITVIEW
+	localClients = 0;
+	for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
+		if (cg.snap->lcIndex[lc] != -1 && client == cg.localClients[lc].predictedPlayerState.clientNum) {
+			localClients |= (1<<lc);
 		}
 	}
-	if (i == MAX_SPLITVIEW) {
+	if (!localClients) {
 		return;
 	}
 #endif
 
 	le = CG_AllocLocalEntity();
+#ifdef TA_SPLITVIEW
+	le->localClients = localClients;
+#endif
 	le->leFlags = 0;
 	le->leType = LE_SCOREPLUM;
 	le->startTime = cg.time;

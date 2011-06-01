@@ -386,6 +386,10 @@ typedef struct localEntity_s {
 	leBounceSoundType_t	leBounceSoundType;
 
 	refEntity_t		refEntity;		
+
+#ifdef TA_SPLITVIEW
+	int				localClients; // 0 means all, else check if localClients & (1<<lc)
+#endif
 } localEntity_t;
 
 //======================================================================
