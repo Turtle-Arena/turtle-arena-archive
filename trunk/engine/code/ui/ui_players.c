@@ -1529,6 +1529,12 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 		*slash = '\0';
 	}
 
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+	if (!headModelName[0]) {
+		Q_strncpyz( headModelName, modelName, sizeof( headModelName ) );
+	}
+#endif
+
 	// load cmodels before models so filecache works
 
 #ifdef IOQ3ZTM // PLAYER_DIR // Same code in CG_RegisterClientModelname and q3_ui
