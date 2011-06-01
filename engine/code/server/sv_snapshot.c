@@ -374,12 +374,13 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		// entities can be flagged to be sent to only one client
 		if ( ent->r.svFlags & SVF_SINGLECLIENT ) {
 #ifdef TA_SPLITVIEW
+			// If it's for one of client's ps, send it.
 			for (i = 0; i < frame->numPSs; i++) {
-				if ( ent->r.singleClient != frame->pss[i].clientNum ) {
+				if ( ent->r.singleClient == frame->pss[i].clientNum ) {
 					break;
 				}
 			}
-			if (i != frame->numPSs) {
+			if (i == frame->numPSs) {
 				continue;
 			}
 #else
@@ -391,12 +392,13 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		// entities can be flagged to be sent to everyone but one client
 		if ( ent->r.svFlags & SVF_NOTSINGLECLIENT ) {
 #ifdef TA_SPLITVIEW
+			// If it's for one of client's ps, send it.
 			for (i = 0; i < frame->numPSs; i++) {
-				if ( ent->r.singleClient == frame->pss[i].clientNum ) {
+				if ( ent->r.singleClient != frame->pss[i].clientNum ) {
 					break;
 				}
 			}
-			if (i != frame->numPSs) {
+			if (i == frame->numPSs) {
 				continue;
 			}
 #else
