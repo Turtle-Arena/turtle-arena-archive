@@ -835,7 +835,7 @@ Forces a client's skin (for teamplay)
 static void ForceClientSkin( gclient_t *client, char *model, const char *skin ) {
 	char *p;
 
-	if ((p = Q_strrchr(model, '/')) != 0) {
+	if ((p = strrchr(model, '/')) != 0) {
 		*p = 0;
 	}
 
@@ -938,10 +938,10 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 	Q_strncpyz(headModel, inHeadModel, MAX_QPATH);
 
     // Remove skin
-	if ((p = Q_strrchr(model, '/')) != 0) {
+	if ((p = strrchr(model, '/')) != 0) {
 		*p = 0;
 	}
-	if ((p = Q_strrchr(headModel, '/')) != 0) {
+	if ((p = strrchr(headModel, '/')) != 0) {
 		*p = 0;
 	}
 

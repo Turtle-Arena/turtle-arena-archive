@@ -181,7 +181,7 @@ static void PlayerIcon( const char *modelAndSkin, char *iconName, int iconNameMa
 #else
 	Q_strncpyz( model, modelAndSkin, sizeof(model));
 #endif
-	skin = Q_strrchr( model, '/' );
+	skin = strrchr( model, '/' );
 	if ( skin ) {
 		*skin++ = '\0';
 	}

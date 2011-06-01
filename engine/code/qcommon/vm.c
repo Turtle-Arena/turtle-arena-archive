@@ -526,7 +526,7 @@ vm_t *VM_Restart( vm_t *vm ) {
 	Com_Printf( "VM_Restart()\n" );
 
 	if( !( header = VM_LoadQVM( vm, qfalse ) ) ) {
-		Com_Error( ERR_DROP, "VM_Restart failed.\n" );
+		Com_Error( ERR_DROP, "VM_Restart failed" );
 		return NULL;
 	}
 
@@ -607,7 +607,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 
 	// allocate space for the jump targets, which will be filled in by the compile/prep functions
 	vm->instructionCount = header->instructionCount;
-	vm->instructionPointers = Hunk_Alloc( vm->instructionCount*4, h_high );
+	vm->instructionPointers = Hunk_Alloc(vm->instructionCount * sizeof(*vm->instructionPointers), h_high);
 
 	// copy or compile the instructions
 	vm->codeLength = header->codeLength;

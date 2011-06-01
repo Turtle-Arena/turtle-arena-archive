@@ -412,7 +412,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 #ifdef TA_SPLITVIEW
 			for (i = 0; i < frame->numPSs; i++) {
 				if (frame->pss[i].clientNum >= 32)
-					Com_Error( ERR_DROP, "SVF_CLIENTMASK: clientNum >= 32\n" );
+					Com_Error( ERR_DROP, "SVF_CLIENTMASK: clientNum >= 32" );
 				if (~ent->r.singleClient & (1 << frame->pss[i].clientNum))
 					break;
 			}
@@ -421,7 +421,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 			}
 #else
 			if (frame->ps.clientNum >= 32)
-				Com_Error( ERR_DROP, "SVF_CLIENTMASK: clientNum >= 32\n" );
+				Com_Error( ERR_DROP, "SVF_CLIENTMASK: clientNum >= 32" );
 			if (~ent->r.singleClient & (1 << frame->ps.clientNum))
 				continue;
 #endif
@@ -484,7 +484,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		// add it
 		SV_AddEntToSnapshot( svEnt, ent, eNums );
 
-		// if its a portal entity, add everything visible from its camera position
+		// if it's a portal entity, add everything visible from its camera position
 		if ( ent->r.svFlags & SVF_PORTAL ) {
 			if ( ent->s.generic1 ) {
 				vec3_t dir;
