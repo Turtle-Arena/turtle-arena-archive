@@ -11,7 +11,7 @@ All data, unless otherwise noted, is Copyright (C) 2009-2011 Zack "ZTurtleMan" M
 	(at your option) any later version and licensed under the Creative Commons ShareAlike 3.0.
 	You may use the data as GPLv2+ and/or CC-BY-SA-3.0.
 
-The data files that have other source files are included in base-src/
+The data files that have other source files are included in the base-src directory.
 
 The following use DejaVu fonts, for font license see http://dejavu-fonts.org/wiki/License
 	Use DejaVu Sans Bold Oblique:
@@ -20,6 +20,7 @@ base/icons/iconf_blu3.png
 base/icons/iconf_neutral3.png
 base/icons/iconf_red2.png
 base/icons/iconf_red3.png
+base-src/icons/iconf.svg
 	Use DejaVu Serif:
 base/icons/defense.png
 base-src/icons/defense.svg
@@ -107,20 +108,8 @@ The following are from OpenArena,
 base/menu/art/font1_prop.tga
 base/gfx/2d/bigchars.png
 
-base/models/weapons2/triblaster/triblaster_hand.md3 (Copied from OA's base/models/weapons2/shotgun/shotgun_hand.md3)
-
 base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
-
-base/textures/sfx/flame1.tga
-base/textures/sfx/flame2.tga
-base/textures/sfx/flame3.tga
-base/textures/sfx/flame4.tga
-base/textures/sfx/flame5.tga
-base/textures/sfx/flame6.tga
-base/textures/sfx/flame7.tga
-base/textures/sfx/flame8.tga
-base/textures/sfx/flameball.jpg
 
 base/sound/player/watr_in.wav
 base/sound/player/watr_out.wav
