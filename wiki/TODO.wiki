@@ -92,8 +92,6 @@
 == Bots ==
   * TODO: Support bots using func_use (use via holdable item button)
 
-  * FIXME: Have bots attack func_brakeable when they are in the way, currently bots just walk into them (and keep walking into them even though they are not going anywhere).
-
 == Entities ==
   * TODO: Improve misc object physics. (Use code from Q3Rally? bg_physics.c/h)
 
