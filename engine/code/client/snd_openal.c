@@ -1822,7 +1822,7 @@ static ALuint musicBuffers[NUM_MUSIC_BUFFERS];
 
 static snd_stream_t *mus_stream;
 static snd_stream_t *intro_stream;
-#ifdef IOQ3ZTM // MUSIC_SCRIPT
+#ifdef IOQ3ZTM // MUSIC_SCRIPTS
 static float s_backgroundVolume = 1.0f; // volume multiplier for this track
 #endif
 static char s_backgroundLoop[MAX_QPATH];
