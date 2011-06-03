@@ -118,7 +118,7 @@ int BotGetAirGoal(bot_state_t *bs, bot_goal_t *goal) {
 	vec3_t end, mins = {-15, -15, -2}, maxs = {15, 15, 2};
 	int areanum;
 
-#ifdef TURTLEARENA // DROWNING // ZTM: TODO: If bubble spawning entity is added check for near by bubbles we well as surface.
+#ifdef TURTLEARENA // DROWNING // ZTM: TODO: If bubble spawning entity is added check for near by bubbles as well as surface.
 #endif
 
 	//trace up until we hit solid
@@ -1550,6 +1550,9 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 	int targetvisible;
 	bsp_trace_t bsptrace;
 	aas_entityinfo_t entinfo;
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+	int wantUseShuriken;
+#endif
 
 	if (BotIsObserver(bs)) {
 		BotClearActivateGoalStack(bs);
@@ -1585,30 +1588,81 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 	}
 	//
 	goal = &bs->activatestack->goal;
+#ifdef TA_ENTSYS // BREAKABLE
+	// update shoot goal status
+	if (bs->activatestack->shoot) {
+		//if the bot's current goal is dead
+		if (g_entities[goal->entitynum].health <= 0) {
+#ifdef DEBUG
+			BotAI_Print(PRT_MESSAGE, "goal is dead\n");
+#endif //DEBUG
+			bs->activatestack->time = 0;
+		}
+	}
+#endif
 	// initialize target being visible to false
 	targetvisible = qfalse;
 	// if the bot has to shoot at a target to activate something
-	if (bs->activatestack->shoot) {
+	if (bs->activatestack->shoot
+#ifdef TA_ENTSYS // BREAKABLE
+		&& bs->activatestack->time
+#endif
+		) {
 		//
 		BotAI_Trace(&bsptrace, bs->eye, NULL, NULL, bs->activatestack->target, bs->entitynum, MASK_SHOT);
 		// if the shootable entity is visible from the current position
 		if (bsptrace.fraction >= 1.0 || bsptrace.ent == goal->entitynum) {
 			targetvisible = qtrue;
+#ifdef TA_HOLDABLE
+			BotEntityInfo(goal->entitynum, &entinfo);
+#endif
 			// if holding the right weapon
 			if (bs->cur_ps.weapon == bs->activatestack->weapon) {
 				VectorSubtract(bs->activatestack->target, bs->eye, dir);
 				vectoangles(dir, ideal_viewangles);
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+				wantUseShuriken = BotWantUseShuriken(bs, goal->entitynum, &entinfo);
+#endif
+#ifdef IOQ3ZTM // ATTACK_WITH_MELEE
+				// check if too far to attack
+				if (
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+					!wantUseShuriken &&
+#endif
+					VectorLength(dir) > 80 &&
+#ifdef TA_WEAPSYS
+					!BG_WeaponHasType(bs->cur_ps.weapon, WT_GUN)
+#else
+					bs->cur_ps.weapon == WP_GAUNTLET
+#endif
+					)
+				{
+					// keep moving toward goal until it is close enough to melee attack
+					targetvisible = 2;
+				}
+				else
+#endif
 				// if the bot is pretty close with its aim
 				if (InFieldOfVision(bs->viewangles, 20, ideal_viewangles)) {
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+					if (wantUseShuriken) {
+						trap_EA_Use(bs->client, wantUseShuriken);
+					} else {
+#endif
 					trap_EA_Attack(bs->client);
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+					}
+#endif
 				}
 			}
 		}
 	}
 	// if the shoot target is visible
 	if (targetvisible) {
+#ifndef TA_HOLDABLE
 		// get the entity info of the entity the bot is shooting at
 		BotEntityInfo(goal->entitynum, &entinfo);
+#endif
 		// if the entity the bot shoots at moved
 		if (!VectorCompare(bs->activatestack->origin, entinfo.origin)) {
 #ifdef DEBUG
@@ -1627,6 +1681,12 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 			AIEnter_Seek_NBG(bs, "activate entity: time out");
 			return qfalse;
 		}
+#ifdef IOQ3ZTM // ATTACK_WITH_MELEE
+		if (targetvisible == 2) {
+			BotSetupForMovement(bs);
+			trap_BotMoveInDirection(bs->ms, dir, 400, MOVE_WALK);
+		}
+#endif
 		memset(&moveresult, 0, sizeof(bot_moveresult_t));
 	}
 	else {

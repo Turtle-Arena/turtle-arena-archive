@@ -100,6 +100,10 @@ int BotWantsToHelp(bot_state_t *bs);
 //returns true if the bot can and wants to rocketjump
 int BotCanAndWantsToRocketJump(bot_state_t *bs);
 #endif
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+// returns holdableNum of shuriken bot wants to use, or 0 if does not want to use shuriken.
+int BotWantUseShuriken(bot_state_t *bs, int target, aas_entityinfo_t *entinfo);
+#endif
 // returns true if the bot has a persistant powerup and a weapon
 int BotHasPersistantPowerupAndWeapon(bot_state_t *bs);
 //returns true if the bot wants to and goes camping

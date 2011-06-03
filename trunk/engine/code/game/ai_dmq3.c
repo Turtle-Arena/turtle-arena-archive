@@ -2514,45 +2514,50 @@ qboolean BotCanUseShurikens(bot_state_t *bs)
 ==================
 BotWantUseShuriken
 
-Returns qtrue if bots wants to throw shurikens at target.
+Returns 0 if bot cannot or does not want to use shuriken on target
+	else returns holdableNum of shuriken to use.
 ==================
 */
-qboolean BotWantUseShuriken(bot_state_t *bs, int target, aas_entityinfo_t *entinfo) {
+int BotWantUseShuriken(bot_state_t *bs, int target, aas_entityinfo_t *entinfo) {
 	vec3_t	dist;
 	int		projNum;
 	float	range;
+	int		holdableNum;
 
 	if (BotSameTeam(bs, target)) {
-		return qfalse;
+		return 0;
 	}
 
 	if (!BotCanUseShurikens(bs)) {
-		return qfalse;
+		return 0;
 	}
 
-	if (!BG_WeaponHasMelee(bs->cur_ps.weapon)) {
+	if (BG_WeaponHasType(bs->cur_ps.weapon, WT_GUN)) {
 		// do not use shurikens while holding gun.
-		return qfalse;
+		return 0;
 	}
+
+	// ZTM: FIXME: Select shuriken to use, return 0 if have none.
+	holdableNum = bs->cur_ps.holdableIndex;
 
 	VectorSubtract(bs->cur_ps.origin, entinfo->origin, dist);
 
-	projNum = BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex);
+	projNum = BG_ProjectileIndexForHoldable(holdableNum);
 
 	if (bg_projectileinfo[projNum].instantDamage)
 		range = bg_projectileinfo[projNum].speed;
 	else
 		range = 768;
 
-	if (VectorLength(dist) > range*0.90) {
-		return qfalse;
+	if (VectorLength(dist) > range*0.9) {
+		return 0;
 	}
 
 	if (VectorLength(dist) < 80) {
-		return qfalse;
+		return 0;
 	}
 
-	return qtrue;
+	return holdableNum;
 }
 #endif
 #endif
@@ -4128,6 +4133,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	bg_projectileinfo_t *bgProj;
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	qboolean useHoldable = qfalse;
+	int holdableNum;
 #endif
 #else
 	weaponinfo_t wi;
@@ -4176,9 +4182,9 @@ void BotCheckAttack(bot_state_t *bs) {
 #ifdef TA_WEAPSYS
 	bgProj = NULL;
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
-	if (BotWantUseShuriken(bs, attackentity, &entinfo))
+	if ((holdableNum = BotWantUseShuriken(bs, attackentity, &entinfo)))
 	{
-		int projnum = BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex);
+		int projnum = BG_ProjectileIndexForHoldable(holdableNum);
 		if (projnum > 0) {
 			bgProj = &bg_projectileinfo[projnum];
 			useHoldable = qtrue;
@@ -4311,7 +4317,7 @@ void BotCheckAttack(bot_state_t *bs) {
 #ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	if (useHoldable)
 	{
-		trap_EA_Use(bs->client, bs->cur_ps.holdableIndex);
+		trap_EA_Use(bs->client, holdableNum);
 		return;
 	}
 #endif
@@ -4904,14 +4910,27 @@ int BotGetActivateGoal(bot_state_t *bs, int entitynum, bot_activategoal_t *activ
 			}
 		}
 	}
+#ifdef TA_ENTSYS // BREAKABLE
+	else
+#endif
 	// if the bot is blocked by or standing on top of a button
 	if (!strcmp(classname, "func_button")) {
 		return 0;
 	}
 #ifdef TA_ENTSYS // BREAKABLE
-	// if it is a breakable, okay for bot to damage it.
- 	if (!strcmp(classname, "func_breakable")) {
- 		return ent;
+	// if it is a breakable
+ 	else if (!Q_stricmpn(classname, "func_", 5) && trap_AAS_FloatForBSPEpairKey(ent, "health", &health)) {
+ 		//if the breakable has health then it must be destroyed to get past
+ 		if (health > 0) {
+ 			//check current health too
+			health = g_entities[entitynum].health;
+			if (health > 0) {
+				BotFuncDoorActivateGoal(bs, ent, activategoal);
+				return ent;
+			}
+ 		}
+
+ 		return 0;
  	}
 #endif
 	// get the targetname so we can find an entity with a matching target
