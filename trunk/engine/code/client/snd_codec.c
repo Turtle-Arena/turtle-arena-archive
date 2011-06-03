@@ -110,7 +110,11 @@ static void *S_CodecGetSound(const char *filename, snd_info_t *info)
 		}
 	}
 
+#ifdef IOQ3ZTM
+	Com_DPrintf(S_COLOR_YELLOW "WARNING: Failed to %s sound %s!\n", info ? "load" : "open", filename);
+#else
 	Com_Printf(S_COLOR_YELLOW "WARNING: Failed to %s sound %s!\n", info ? "load" : "open", filename);
+#endif
 
 	return NULL;
 }
@@ -201,7 +205,9 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	length = FS_FOpenFileRead(filename, &hnd, qtrue);
 	if(!hnd)
 	{
+#ifndef IOQ3ZTM
 		Com_Printf("Can't read sound file %s\n", filename);
+#endif
 		return NULL;
 	}
 
