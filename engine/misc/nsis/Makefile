@@ -20,7 +20,8 @@ turtlearena.nsi: turtlearena.nsi.in
 	sed 's|XXXVERSIONXXX|$(VERSION)|;s|XXXRELEASEXXX|$(RELEASE)|;s|x86|$(ARCH)|;s|XXXASSETPATHXXX|$(ASSETPATH)|g' < $< > $@
 
 turtlearena-$(VERSION)-$(RELEASE).$(ARCH).exe: turtlearena.nsi
-	cp "../../../COPYING.txt" .
+	cp "../../../GPL-2.txt" .
+	cp "../../../CC-BY-SA-3.0.txt" .
 	cp "../../../COPYRIGHTS.txt" .
 	cp "../../../CREDITS.txt" .
 	cp "../../../INSTALLER_README.txt" "README.txt"

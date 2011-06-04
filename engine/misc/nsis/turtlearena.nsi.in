@@ -106,7 +106,8 @@ Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
   ; Put file there
   File "../../build/release-mingw32-x86/${SERVER}"
   File "../../build/release-mingw32-x86/${CLIENT}"
-  File "COPYING.txt"
+  File "GPL-2.txt"
+  File "CC-BY-SA-3.0.txt"
   File "COPYRIGHTS.txt"
   File "CREDITS.txt"
   File "README.txt"
@@ -114,7 +115,6 @@ Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
   SetOutPath "$INSTDIR\${MODDIR}"
   File "XXXASSETPATHXXX/assets0.pk3"
   File "XXXASSETPATHXXX/assets1-qvms.pk3"
-  File "XXXASSETPATHXXX/assets2-music.pk3"
   File "../../build/release-mingw32-x86/${MODDIR}/cgamex86.dll"
   File "../../build/release-mingw32-x86/${MODDIR}/qagamex86.dll"
   File "../../build/release-mingw32-x86/${MODDIR}/uix86.dll"
@@ -136,6 +136,14 @@ Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
 SectionEnd
 
 ; Optional section (can be disabled by the user)
+Section "Music"
+
+  SetOutPath "$INSTDIR\${MODDIR}"
+
+  File "XXXASSETPATHXXX/assets2-music.pk3"
+
+SectionEnd
+
 Section "Start Menu Shortcuts"
 
   CreateDirectory "$SMPROGRAMS\${GAMENAME}"
@@ -188,7 +196,8 @@ Section "Uninstall"
   Delete $INSTDIR\${CLIENT}
   Delete $INSTDIR\${SERVER}
 
-  Delete $INSTDIR\COPYING.txt
+  Delete $INSTDIR\GPL-2.txt
+  Delete $INSTDIR\CC-BY-SA-3.0.txt
   Delete $INSTDIR\COPYRIGHTS.txt
   Delete $INSTDIR\CREDITS.txt
   Delete $INSTDIR\README.txt

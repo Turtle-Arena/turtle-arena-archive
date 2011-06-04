@@ -15,11 +15,13 @@ Turtle Arena credits.
 
 
 == License ==
-Most of the Turtle Arena source code is licensed under the GNU General Public License version 2 or later.
-	(See COPYING file for full license)
+Most of the Turtle Arena source code is licensed under the GNU General Public
+	License version 2 or later. See GPL-2 file for license text.
 
-Most of the data is licensed under the GNU GPLv2 or later and/or licensed under the Creative Commons ShareAlike 3.0,
-	see COPYRIGHTS file for details.
+Most of the Turtle Arena data is licensed under the GNU GPLv2 or later and/or
+	licensed under the Creative Commons Attribution-ShareAlike 3.0, see
+	COPYRIGHTS file for details. See GPL-2 and CC-BY-SA-3.0 files for license
+	text.
 
 
 == Data ==
