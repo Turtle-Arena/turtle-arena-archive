@@ -1,6 +1,5 @@
 #
-# Turtle Arena
-# Cross-platform packaging system.
+# Turtle Arena packaging system
 #
 # See engine/Makefile for building the game.
 #
@@ -24,14 +23,26 @@ ifeq ($(COMPILE_PLATFORM),mingw32)
   endif
 endif
 
+ifndef MINGWMAKE
+ifeq ($(PLATFORM),mingw32)
+MINGWMAKE=make
+else
+MINGWMAKE=exec engine/cross-make-mingw.sh
+endif
+endif
+
 # Directory to put the files for release
 ifndef INSTALLDIR
 INSTALLDIR=install
 endif
 
-# Directory containing base/assets#.pk3
+# Directory containing base/assets*.pk3
 ifndef DATADIR
 DATADIR=install
+endif
+
+ifndef ZIPNAME
+ZIPNAME=turtlearena-0.5.0
 endif
 
 #############################################################################
@@ -92,19 +103,15 @@ ASSETS0=1
 ASSETS1=1
 ASSETS2=1
 
-# doesn't work?
 if [ -f $(DATADIR)/base/assets0.pk3 ]; then \
-	echo "make assets0"; \
 	export ASSETS0=0; \
 	ASSETS0=0; \
 fi
 if [ -f $(DATADIR)/base/assets1-qvms.pk3 ]; then \
-	echo "make assets1"; \
 	export ASSETS1=0; \
 	ASSETS1=0; \
 fi
 if [ -f $(DATADIR)/base/assets2-music.pk3 ]; then \
-	echo "make assets2"; \
 	export ASSETS2=0; \
 	ASSETS2=0; \
 fi
@@ -120,11 +127,23 @@ ifeq ($(ASSETS2),1)
 	ASSETS+=$(DATADIR)/base/assets2-music.pk3
 endif
 
+
+#
+# QVMs
+#
+qvms:
+	$(MAKE) -C engine BUILD_GAME_SO=0 BUILD_SERVER=0 BUILD_CLIENT=0 BUILD_GAME_QVM=1 BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
+
 qvms-clean:
 	$(MAKE) -C engine clean BUILD_GAME_SO=0 BUILD_SERVER=0 BUILD_CLIENT=0 BUILD_GAME_QVM=1 --jobs=$(JOBS)
 
-qvms:
-	$(MAKE) -C engine BUILD_GAME_SO=0 BUILD_SERVER=0 BUILD_CLIENT=0 BUILD_GAME_QVM=1 BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
+#
+# Asset packages (pk3 files)
+#
+assets: $(ASSETS)
+
+assets-clean: qvms-clean
+	rm -fr $(DATADIR)/base/
 
 $(DATADIR)/base/assets0.pk3:
 	$(Q)echo "  Coping base data (temporary files)..."
@@ -173,43 +192,62 @@ $(DATADIR)/base/assets2-music.pk3:
 	$(Q)cd $(DATADIR)/base/assets2/ && zip -qmr ../assets2-music.pk3 .
 	$(Q)rm -r $(DATADIR)/base/assets2/
 
-assets-clean:
-	rm -fr $(DATADIR)/base/
 
-assets: $(ASSETS)
-
-zip-clean:
-	$(Q)rm -fr $(INSTALLDIR)/turtlearena-0.5.0
-	$(MAKE) -C engine clean --jobs=$(JOBS)
-ifneq ($(PLATFORM),mingw32)
-ifeq ($(ARCH),x86_64)
-	$(MAKE) -C engine ARCH=i386 clean
-endif
-endif
-
+#
+# Create portable zip for win32 and linux32/64
+#
 zip: assets
-	$(Q)mkdir -p $(INSTALLDIR)/turtlearena-0.5.0
+	$(Q)mkdir -p $(INSTALLDIR)/$(ZIPNAME)/base/
+	$(Q)cp $(INSTALLDIR)/base/*.pk3 $(INSTALLDIR)/$(ZIPNAME)/base/
+	$(Q)cp INSTALLER_README.txt $(INSTALLDIR)/$(ZIPNAME)/README.txt
+	$(Q)cp GPL-2.txt $(INSTALLDIR)/$(ZIPNAME)/
+	$(Q)cp CC-BY-SA-3.0.txt $(INSTALLDIR)/$(ZIPNAME)/
+	$(Q)cp COPYRIGHTS.txt $(INSTALLDIR)/$(ZIPNAME)/
+	$(Q)cp CREDITS.txt $(INSTALLDIR)/$(ZIPNAME)/
+	$(Q)todos $(INSTALLDIR)/$(ZIPNAME)/*.txt
+	$(Q)mkdir $(INSTALLDIR)/$(ZIPNAME)/settings
+	$(Q)echo "yes" > $(INSTALLDIR)/$(ZIPNAME)/settings/portable
 	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
-	$(MAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/turtlearena-0.5.0" --jobs=$(JOBS)
+	$(MAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" --jobs=$(JOBS)
+	$(Q)cp engine/misc/nsis/*.dll $(INSTALLDIR)/$(ZIPNAME)/
 ifneq ($(PLATFORM),mingw32)
 ifeq ($(ARCH),x86_64)
 	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
-	$(MAKE) -C engine ARCH=i386 copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/turtlearena-0.5.0" --jobs=$(JOBS)
+	$(MAKE) -C engine ARCH=i386 copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" --jobs=$(JOBS)
 endif
-endif
-
-nsis-clean:
-	$(Q)rm -fr "$(CURDIR)/$(INSTALLDIR)/nsis"
-ifeq ($(PLATFORM),mingw32)
-	$(MAKE) -C engine/misc/nsis clean --jobs=$(JOBS)
+	$(MINGWMAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
+	$(MINGWMAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" --jobs=$(JOBS)
+	$(Q)cp extras/turtlearena.sh $(INSTALLDIR)/$(ZIPNAME)/
 endif
 
+zip-clean:
+	$(Q)rm -fr $(INSTALLDIR)/$(ZIPNAME)
+
+
+#
+# Create win32 NSIS installer
+#
 nsis: assets
+	$(MINGWMAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
+	$(MINGWMAKE) -C engine/misc/nsis ASSETPATH="$(CURDIR)/$(DATADIR)/base/" --jobs=$(JOBS)
+	$(MINGWMAKE) -C engine/misc/nsis install INSTALLDIR="$(CURDIR)/$(INSTALLDIR)/nsis" --jobs=$(JOBS)
+
+nsis-clean: assets-clean
+	$(Q)rm -fr "$(CURDIR)/$(INSTALLDIR)/nsis"
+	$(MINGWMAKE) -C engine/misc/nsis clean --jobs=$(JOBS)
+
+#
+# Create linux32/64 installer
+#
+loki: assets
 ifeq ($(PLATFORM),mingw32)
-	$(MAKE) -C engine/misc/nsis ASSETPATH="$(CURDIR)/$(DATADIR)/base/" --jobs=$(JOBS)
-	$(MAKE) -C engine/misc/nsis install INSTALLDIR="$(CURDIR)/$(INSTALLDIR)/nsis" --jobs=$(JOBS)
+	@echo "Loki setup creation is not supported on this platform."
 else
-	@echo "Use cross-make-mingw.sh nsis"
+	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
+ifeq ($(ARCH),x86_64)
+	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
+endif
+	$(MAKE) -C engine/misc/setup --jobs=$(JOBS)
 endif
 
 loki-clean:
@@ -219,26 +257,44 @@ else
 	$(MAKE) -C engine/misc/setup clean --jobs=$(JOBS)
 endif
 
-loki: assets
+
+#
+# Create Debian/Ubuntu packages
+# ZTM: TODO: Rewrite deb packaging to use Makefile?
+#
+deb: assets
 ifeq ($(PLATFORM),mingw32)
-	@echo "Loki setup creation is not supported on this platform."
+	@echo "Debian/Ubuntu package creation is not supported on this platform."
 else
-	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
-ifneq ($(PLATFORM),mingw32)
-ifeq ($(ARCH),x86_64)
-	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
-endif
-endif
-	$(MAKE) -C engine/misc/setup --jobs=$(JOBS)
+	exec package-deb.sh --installdir $(INSTALLDIR) --datadir $(DATADIR)
 endif
 
 deb-clean:
+ifeq ($(PLATFORM),mingw32)
+	@echo "Debian/Ubuntu package cleaning is not supported on this platform."
+else
+	$(Q)rm -rf $(INSTALLDIR)/deb/
+endif
 
-deb: assets
-#ZTM: TODO: Rewrite deb packaging, for now use package-deb.sh ?
 
-clean: assets-clean nsis-clean loki-clean deb-clean
+#
+# Create source code tarball
+#
+dist:
+	$(MAKE) -C engine dist BUILD_FINAL=$(BUILD_FINAL)
+	$(Q)mkdir $(INSTALLDIR)/tarball
+	$(Q)mv engine/*.tar.bz2 $(INSTALLDIR)/tarball
 
-package: zip loki nsis deb
+dist-clean:
+	$(Q)rm -rf $(INSTALLDIR)/tarball/
+
+
+#
+# Defaults
+#
+clean: dist-clean zip-clean nsis-clean loki-clean deb-clean
+
+package: dist zip nsis loki deb
 
 default: package
+
