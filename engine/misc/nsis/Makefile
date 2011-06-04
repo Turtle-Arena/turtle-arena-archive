@@ -29,7 +29,7 @@ turtlearena-$(VERSION)-$(RELEASE).$(ARCH).exe: turtlearena.nsi
 	makensis turtlearena.nsi
 
 clean:
-	rm -rf *.exe turtlearena.nsi COPYING.txt COPYRIGHTS.txt CREDITS.txt README.txt
+	rm -rf *.exe turtlearena.nsi GPL-2.txt CC-BY-SA-3.0.txt COPYRIGHTS.txt CREDITS.txt README.txt
 
 .PHONY: all clean
 
