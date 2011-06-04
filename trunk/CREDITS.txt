@@ -7,10 +7,12 @@ Turtle Arena credits.
 * Open Arena			(For botfiles, images, shaders, ...)
 * Xreal project			(For homing rockets and shootable rockets)
 * Smokin' Guns			(For some breakable respawn code and a minor animation time fix)
-* GNU FreeFonts			(For FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf)
 * Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)
-* The Mulletz			(For music)
 * ZEQ2-lite				(For cel shading tcGen code)
+* GNU FreeFonts			(For FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf)
+* DejaVu fonts			(For DejaVu Serif and DejaVu Sans Bold Oblique)
+* The Mulletz			(For music)
+* zero-project			(For music)
 * Zack "ZTurtleMan" Middleton
 
 
