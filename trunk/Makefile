@@ -205,7 +205,7 @@ zip: assets
 	$(Q)cp COPYRIGHTS.txt $(INSTALLDIR)/$(ZIPNAME)/
 	$(Q)cp CREDITS.txt $(INSTALLDIR)/$(ZIPNAME)/
 	$(Q)todos $(INSTALLDIR)/$(ZIPNAME)/*.txt
-	$(Q)mkdir $(INSTALLDIR)/$(ZIPNAME)/settings
+	$(Q)mkdir -p $(INSTALLDIR)/$(ZIPNAME)/settings
 	$(Q)echo "yes" > $(INSTALLDIR)/$(ZIPNAME)/settings/portable
 	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
 	$(MAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" --jobs=$(JOBS)
@@ -282,7 +282,7 @@ endif
 #
 dist:
 	$(MAKE) -C engine dist BUILD_FINAL=$(BUILD_FINAL)
-	$(Q)mkdir $(INSTALLDIR)/tarball
+	$(Q)mkdir -p $(INSTALLDIR)/tarball
 	$(Q)mv engine/*.tar.bz2 $(INSTALLDIR)/tarball
 
 dist-clean:
