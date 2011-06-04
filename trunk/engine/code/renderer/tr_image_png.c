@@ -2708,7 +2708,7 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	numtEXt++;
 	for (i = 1; i < MAX_SPLITVIEW; i++) {
 		if (ri.CL_GetClientLocation(tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text), i)) {
-			snprintf(tEXt[numtEXt].key, sizeof (tEXt[numtEXt].key), "Location %lu", i+1);
+			snprintf(tEXt[numtEXt].key, sizeof (tEXt[numtEXt].key), "Location %zu", i+1);
 			numtEXt++;
 		}
 	}
