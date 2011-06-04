@@ -182,7 +182,7 @@ static void UI_CreditMenu_Draw( void ) {
 
 	UI_DrawProportionalString( 320, y, "Fonts", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "GNU FreeFonts", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "GNU FreeFonts, DejaVu fonts", UI_CENTER|UI_SMALLFONT, color_white );
 #else
 	y = 12;
 	UI_DrawProportionalString( 320, y, "id Software is:", UI_CENTER|UI_SMALLFONT, color_white );
