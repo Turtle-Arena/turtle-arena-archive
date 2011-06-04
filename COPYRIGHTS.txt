@@ -104,7 +104,6 @@ base/gfx/2d/numbers/eight_32b.png
 base/gfx/2d/numbers/nine_32b.png
 
 Based on OpenArena images, GPLv2+ only (not CC-BY-SA-3.0).
-base/gfx/damage/bullet_mrk.png was drawn over OpenArena's gfx/damage/bullet_mrk
 base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
 
 == The Mulletz ==
