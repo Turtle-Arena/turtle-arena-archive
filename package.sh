@@ -204,7 +204,7 @@ mkdir -p $ZIPDIR/base
 if [ $LINUX -eq 1 ] || [ $WIN32 -eq 1 ]
 then
 
-	echo "Coping binaries..."
+	echo "Copying binaries..."
 
 	if [ $LINUX -eq 1 ]
 	then
