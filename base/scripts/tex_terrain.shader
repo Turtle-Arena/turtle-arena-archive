@@ -7,13 +7,11 @@ textures/terrain/dirt1
 {
 	//q3map_nonplanar
 	q3map_shadeangle 120
-	qer_editorimage textures/terrain/dirt1.png
-	{
-		map $lightmap
-		rgbGen identity
-	}
 	{
 		map textures/terrain/dirt1.png
+	}
+	{
+		map $lightmap
 		blendFunc filter
 	}
 }
@@ -22,13 +20,11 @@ textures/terrain/snow
 {
 	//q3map_nonplanar
 	q3map_shadeangle 120
-	qer_editorimage textures/terrain/snow.png
-	{
-		map $lightmap
-		rgbGen identity
-	}
 	{
 		map textures/terrain/snow.png
+	}
+	{
+		map $lightmap
 		blendFunc filter
 	}
 }
