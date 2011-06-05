@@ -1237,7 +1237,11 @@ static void SV_DumpUser_f( void ) {
 	}
 
 	if ( Cmd_Argc() != 2 ) {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Wrong command name in usage.
+		Com_Printf ("Usage: dumpuser <userid>\n");
+#else
 		Com_Printf ("Usage: info <userid>\n");
+#endif
 		return;
 	}
 
