@@ -2,23 +2,6 @@
 #include "ui/menudef.h"
 
 {
-	assetGlobalDef
-	{
-		font "fonts/font" 16
-		smallFont "fonts/smallfont" 12
-		bigFont "fonts/bigfont" 20
-		cursor "ui/assets/3_cursor3"
-		itemFocusSound THEME_SND_FOCUS
-		// ZTM: menu*Sound only loads sound, does not use it
-		//menuEnterSound THEME_SND_MENU_ENTER
-		//menuExitSound THEME_SND_MENU_EXIT
-		//menuBuzzSound THEME_SND_BUZZ
-
-		fadeClamp 1.0
-		fadeCycle 1
-		fadeAmount 0.1
-	}
-
 	menuDef
 	{
 		name "play"
@@ -27,15 +10,10 @@
 		style WINDOW_STYLE_SHADER
 		focusColor 1 0.43 0 1.25
 
-		onOpen
-		{
-			playlooped "music/menu.wav" ;
-		}
-
 		onESC
 		{
-			close "play";
-			open "main"
+			close "play" ;
+			open "main" ;
 		}
 
 		//

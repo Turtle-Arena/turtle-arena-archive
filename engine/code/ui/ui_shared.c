@@ -1054,6 +1054,12 @@ static void Menu_RunCloseScript(menuDef_t *menu) {
     item.parent = menu;
     Item_RunScript(&item, menu->onClose);
 	}
+
+#ifdef IOQ3ZTM
+	if (DC->Assets.menuExitSound) {
+		DC->startLocalSound(DC->Assets.menuExitSound, CHAN_LOCAL_SOUND);
+	}
+#endif
 }
 
 void Menus_CloseByName(const char *p) {
@@ -2638,6 +2644,12 @@ void  Menus_Activate(menuDef_t *menu) {
 		item.parent = menu;
 		Item_RunScript(&item, menu->onOpen);
 	}
+
+#ifdef IOQ3ZTM
+	if (DC->Assets.menuEnterSound) {
+		DC->startLocalSound(DC->Assets.menuEnterSound, CHAN_LOCAL_SOUND);
+	}
+#endif
 
 	if (menu->soundName && *menu->soundName) {
 //		DC->stopBackgroundTrack();					// you don't want to do this since it will reset s_rawend
