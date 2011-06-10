@@ -10,9 +10,9 @@
 		bigFont "fonts/bigfont" 20
 		cursor "ui/assets/3_cursor3"
 		itemFocusSound THEME_SND_FOCUS
-		// ZTM: menu*Sound only loads sound, does not use it
-		//menuEnterSound THEME_SND_MENU_ENTER
-		//menuExitSound THEME_SND_MENU_EXIT
+		menuEnterSound THEME_SND_MENU_ENTER
+		menuExitSound THEME_SND_MENU_EXIT
+		// ZTM: menuBuzzSound only loads sound, does not use it
 		//menuBuzzSound THEME_SND_BUZZ
 
 		fadeClamp 1.0
@@ -32,8 +32,6 @@
 		{
 			playlooped "music/menu.wav" ;
 			//setcvar "ui_q3model" 1 ;
-			//setcvar "model" raph ;
-			//setcvar "headmodel" raph ;
 		}
 
 		/*onESC
