@@ -571,7 +571,7 @@ static void PlayerModel_SetMenuItems( void )
 	trap_Cvar_VariableStringBuffer( "model", s_playermodel.modelskin, 64 );
 #endif
 
-#ifdef IOQ3ZTM
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Selecet model even if skin is not set.
 	// Add "/default" if no skin is set.
 	if (!strchr(s_playermodel.modelskin, '/')) {
 		Q_strcat(s_playermodel.modelskin, 64, "/default");
