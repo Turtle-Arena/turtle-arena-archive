@@ -4,7 +4,7 @@ Turtle Arena credits.
 * id software			(For making and releasing Quake III Arena's source code)
 * ioquake3 devoplers	(For improving, fixing, and cleaning up Quake 3's source code)
 * ioSTVEF				(For "noise" and "random" waveform keywords, and RF_FORCE_ENT_ALPHA render flag)
-* Open Arena			(For botfiles, images, shaders, ...)
+* OpenArena				(For botfiles, images, shaders, ...)
 * Xreal project			(For homing rockets and shootable rockets)
 * Smokin' Guns			(For some breakable respawn code and a minor animation time fix)
 * Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)

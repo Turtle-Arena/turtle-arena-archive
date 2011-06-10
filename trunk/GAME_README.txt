@@ -18,11 +18,14 @@ Mac OS X: /Users/$USERNAME/Library/Application Support/TurtleArena/
 Linux: /home/$USERNAME/.turtlearena/
 
 == License ==
-The Turtle Arena source code and data are licensed under the GNU General Public License version 2 or later.
+The Turtle Arena source code is licensed under the GNU General Public License version 2 or later.
 	(See COPYING.txt for full license)
 
+The Turtle Arena data is a mix of GPL2+ and CC-BY-SA-3.0.
+	(See COPYRIGHTS.txt for data copyrights and licenses.)
+
 == Credits ==
-id software, ioquake3 developers, Thilo Schulz, Open Arena, Xreal project, Smokin' Guns, Mercenaries Guild Client for Tremulous, ZEQ2-lite, The Mulletz, GNU FreeFonts, rfactory.org, "inolan.com", Zack "ZTurtleMan" Middleton
+id software, ioquake3 developers, Thilo Schulz, OpenArena, Xreal project, Smokin' Guns, Mercenaries Guild Client for Tremulous, ZEQ2-lite, GNU FreeFonts, DejaVu fonts, zero-project, Zack "ZTurtleMan" Middleton
 
 See CREDITS.txt for details.
 
