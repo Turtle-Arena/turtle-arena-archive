@@ -78,7 +78,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 2003
+IOQ3_REVISION = 2016
 
 #
 # Start build type
@@ -1012,11 +1012,10 @@ else # ifeq freebsd
 
 ifeq ($(PLATFORM),openbsd)
 
-  #default to i386, no tests done on anything else
-  ARCH=i386
+  ARCH=$(shell uname -m)
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
-    -DUSE_ICON
+    -DUSE_ICON -DMAP_ANONYMOUS=MAP_ANON
   CLIENT_CFLAGS = $(SDL_CFLAGS)
   SERVER_CFLAGS = 
 
@@ -1110,7 +1109,7 @@ else # ifeq netbsd
 
 ifeq ($(PLATFORM),irix64)
 
-  ARCH=mips  #default to MIPS
+  ARCH=mips
 
   CC = c99
   MKDIR = mkdir -p

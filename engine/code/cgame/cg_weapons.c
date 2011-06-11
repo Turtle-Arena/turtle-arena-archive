@@ -1595,9 +1595,6 @@ void CG_RegisterWeapon( int weaponNum )
 		break;
 
 	case WP_GRAPPLING_HOOK:
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Load trail shader
-		cgs.media.lightningShader = trap_R_RegisterShader( "lightningBoltNew");
-#endif
 		MAKERGB( weaponInfo->flashDlightColor, 0.6f, 0.6f, 1.0f );
 		weaponInfo->missileModel = trap_R_RegisterModel( "models/ammo/rocket/rocket.md3" );
 		weaponInfo->missileTrailFunc = CG_GrappleTrail;
@@ -1609,6 +1606,7 @@ void CG_RegisterWeapon( int weaponNum )
 		MAKERGB( weaponInfo->missileDlightColor, 1, 0.75f, 0 );
 		weaponInfo->readySound = trap_S_RegisterSound( "sound/weapons/melee/fsthum.wav", qfalse );
 		weaponInfo->firingSound = trap_S_RegisterSound( "sound/weapons/melee/fstrun.wav", qfalse );
+		cgs.media.lightningShader = trap_R_RegisterShader( "lightningBoltNew");
 		break;
 
 #ifdef MISSIONPACK
@@ -5110,8 +5108,8 @@ static void CG_ShotgunPellet( vec3_t start, vec3_t end, int skipNum ) {
 
 	CG_Trace( &tr, start, NULL, NULL, end, skipNum, MASK_SHOT );
 
-	sourceContentType = trap_CM_PointContents( start, 0 );
-	destContentType = trap_CM_PointContents( tr.endpos, 0 );
+	sourceContentType = CG_PointContents( start, 0 );
+	destContentType = CG_PointContents( tr.endpos, 0 );
 
 	// FIXME: should probably move this cruft into CG_BubbleTrail
 	if ( sourceContentType == destContentType ) {
@@ -5202,7 +5200,7 @@ void CG_ShotgunFire( entityState_t *es ) {
 		// ragepro can't alpha fade, so don't even bother with smoke
 		vec3_t			up;
 
-		contents = trap_CM_PointContents( es->pos.trBase, 0 );
+		contents = CG_PointContents( es->pos.trBase, 0 );
 		if ( !( contents & CONTENTS_WATER ) ) {
 			VectorSet( up, 0, 0, 8 );
 			CG_SmokePuff( v, up, 32, 1, 1, 1, 0.33f, 900, cg.time, 0, LEF_PUFF_DONT_SCALE, cgs.media.shotgunSmokePuffShader );
@@ -5384,8 +5382,8 @@ void CG_Bullet( vec3_t end, int sourceEntityNum, vec3_t normal, qboolean flesh, 
 	// do trail effects
 	if ( sourceEntityNum >= 0 && cg_tracerChance.value > 0 ) {
 		if ( CG_CalcMuzzlePoint( sourceEntityNum, start ) ) {
-			sourceContentType = trap_CM_PointContents( start, 0 );
-			destContentType = trap_CM_PointContents( end, 0 );
+			sourceContentType = CG_PointContents( start, 0 );
+			destContentType = CG_PointContents( end, 0 );
 
 			// do a complete bubble trail if necessary
 			if ( ( sourceContentType == destContentType ) && ( sourceContentType & CONTENTS_WATER ) ) {
