@@ -153,8 +153,13 @@ qboolean R_LoadIQM( model_t *mod, void *buffer, int filesize, const char *mod_na
 
 	LL( header->version );
 	if( header->version != IQM_VERSION ) {
+#ifdef RENDERLESS_MODELS
+		Com_Printf("R_LoadIQM: %s is a unsupported IQM version (%d), only version %d is supported.\n",
+				mod_name, header->version, IQM_VERSION);
+#else
 		ri.Printf(PRINT_WARNING, "R_LoadIQM: %s is a unsupported IQM version (%d), only version %d is supported.\n",
 				mod_name, header->version, IQM_VERSION);
+#endif
 		return qfalse;
 	}
 
@@ -750,7 +755,7 @@ R_ComputeIQMFogNum
 int R_ComputeIQMFogNum( iqmData_t *data, trRefEntity_t *ent ) {
 	int			i, j;
 	fog_t			*fog;
-	vec_t			*bounds;
+	const vec_t		*bounds;
 	const vec_t		defaultBounds[6] = { -8, -8, -8, 8, 8, 8 };
 	vec3_t			diag, center;
 	vec3_t			localOrigin;
