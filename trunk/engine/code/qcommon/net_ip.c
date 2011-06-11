@@ -84,11 +84,11 @@ typedef unsigned short int sa_family_t;
 #		define _BSD_SOCKLEN_T_
 #	endif
 
-#	include <arpa/inet.h>
+#	include <sys/socket.h>
 #	include <errno.h>
 #	include <netdb.h>
 #	include <netinet/in.h>
-#	include <sys/socket.h>
+#	include <arpa/inet.h>
 #	include <net/if.h>
 #	include <sys/ioctl.h>
 #	include <sys/types.h>
