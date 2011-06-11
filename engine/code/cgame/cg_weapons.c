@@ -3887,7 +3887,7 @@ void CG_WeaponUseEffect( centity_t *cent, int handSide, int weaponNum )
 		CG_ShotgunEjectBrass( cent, handSide );
 	}
 
-	contents = trap_CM_PointContents( cent->currentState.pos.trBase, 0 );
+	contents = CG_PointContents( cent->currentState.pos.trBase, 0 );
 
 	// ragepro can't alpha fade, so don't even bother with smoke
 	if ( !( contents & CONTENTS_WATER ) && cgs.glconfig.hardwareType != GLHW_RAGEPRO)

@@ -121,8 +121,8 @@ qboolean CG_BulletBubbleTrail( vec3_t start, vec3_t end, int skipNum ) {
 
 	CG_Trace( &tr, start, NULL, NULL, end, skipNum, MASK_SHOT );
 
-	sourceContentType = trap_CM_PointContents( start, 0 );
-	destContentType = trap_CM_PointContents( tr.endpos, 0 );
+	sourceContentType = CG_PointContents( start, 0 );
+	destContentType = CG_PointContents( tr.endpos, 0 );
 
 	// do a complete bubble trail if necessary
 	if ( sourceContentType == destContentType ) {

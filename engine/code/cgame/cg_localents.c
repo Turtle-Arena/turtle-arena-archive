@@ -601,7 +601,7 @@ void CG_BubbleThink( localEntity_t *le ) {
 	// trace a line from previous position to new position
 	CG_Trace( &trace, le->refEntity.origin, NULL, NULL, newOrigin, -1, CONTENTS_SOLID );
 
-	contents = trap_CM_PointContents( trace.endpos, 0 );
+	contents = CG_PointContents( trace.endpos, 0 );
 	if ( !( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) ) {
 		// Bubble isn't in water (or slime/lava) anymore, remove it.
 		CG_FreeLocalEntity( le );
