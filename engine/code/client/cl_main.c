@@ -3071,9 +3071,8 @@ void CL_ShutdownRef( void ) {
 ==========
 CL_DrawPicFullScreen
 
-Repeat image horizontally without changing the aspect (as normal scaling would).
-
-Based on UI_DrawPicFullScreen in q3_ui
+Draw shader fullscreen (including in widescreen), in widescreen center shader
+and repeat horizontally without changing the aspect.
 ==========
 */
 void CL_DrawPicFullScreen(qhandle_t hShader)
