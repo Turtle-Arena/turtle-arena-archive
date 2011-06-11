@@ -243,14 +243,6 @@ Exit game credits
 ===============
 */
 void UI_CreditMenu( void ) {
-#ifndef IOQ3ZTM // I fixed widescreen background, hack no longer needed.
-	/* This UI_FillRect() hack will blank the borders if you're in widescreen,
-	   so you get a completely black background instead of stripes from the
-	   previous frame on each side of the credits.. */
-	const float black[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	UI_FillRect(0 - uis.bias, 0, (640.0f / uis.xscale) * 2.0f, 480.0f / uis.yscale, black);
-#endif
-
 	memset( &s_credits, 0 ,sizeof(s_credits) );
 
 #ifdef TURTLEARENA

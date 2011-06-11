@@ -1387,17 +1387,10 @@ void UI_MouseEvent( int dx, int dy )
 
 	// update mouse screen position
 	uis.cursorx += dx;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Allow cursor to go to real edge of screen in widescreen, it just looks better.
 	if (uis.cursorx < -uis.bias)
 		uis.cursorx = -uis.bias;
 	else if (uis.cursorx > SCREEN_WIDTH+uis.bias)
 		uis.cursorx = SCREEN_WIDTH+uis.bias;
-#else
-	if (uis.cursorx < 0)
-		uis.cursorx = 0;
-	else if (uis.cursorx > SCREEN_WIDTH)
-		uis.cursorx = SCREEN_WIDTH;
-#endif
 
 	uis.cursory += dy;
 	if (uis.cursory < 0)
@@ -1695,14 +1688,16 @@ void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
 	trap_R_DrawStretchPic( x, y, w, h, s0, t0, s1, t1, hShader );
 }
 
+#ifdef TA_DATA
 /*
 ==========
 UI_DrawPicFullScreen
+
+Draw shader fullscreen (including in widescreen), in widescreen center shader
+and repeat horizontally without changing the aspect.
 ==========
 */
 void UI_DrawPicFullScreen(qhandle_t hShader) {
-#ifdef IOQ3ZTM // IOQ3BUGFIX: In widescreen fill whole screen not just 4:3 area.
-#ifdef TA_DATA // Repeat image horizontally without changing the aspect (as normal scaling would).
 	float x = 0, y = 0, w = uis.glconfig.vidWidth, h = uis.glconfig.vidHeight;
 	const float picX = SCREEN_WIDTH;
 	const float picY = SCREEN_HEIGHT;
@@ -1725,22 +1720,8 @@ void UI_DrawPicFullScreen(qhandle_t hShader) {
 	t2 += tDelta;
 
 	trap_R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
-#else
-	// draw black shader in widescreen to clear the screen
-	if (uis.bias) {
-		const float black[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-
-		trap_R_SetColor( black );
-		trap_R_DrawStretchPic( 0, 0, uis.glconfig.vidWidth, uis.glconfig.vidHeight, 0, 0, 0, 0, uis.whiteShader );
-		trap_R_SetColor( NULL );
-	}
-
-	UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hShader );
-#endif
-#else
-	UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hShader );
-#endif
 }
+#endif
 
 /*
 ================
@@ -1811,10 +1792,10 @@ void UI_Refresh( int realtime )
 			UI_DrawPicFullScreen( uis.menuBackShader );
 #else
 			if( uis.activemenu->showlogo ) {
-				UI_DrawPicFullScreen( uis.menuBackShader );
+				UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackShader );
 			}
 			else {
-				UI_DrawPicFullScreen( uis.menuBackNoLogoShader );
+				UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackNoLogoShader );
 			}
 #endif
 		}
