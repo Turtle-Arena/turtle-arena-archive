@@ -78,7 +78,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 2018
+IOQ3_REVISION = 2019
 
 #
 # Start build type
