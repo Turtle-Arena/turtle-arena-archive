@@ -691,6 +691,7 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 		case K_KP_LEFTARROW:
 #ifdef IOQ3ZTM // CHECK_NUMLOCK
 			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
+				sound = 0;
 				break;
 			}
 #endif
@@ -710,6 +711,7 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 		case K_KP_RIGHTARROW:
 #ifdef IOQ3ZTM // CHECK_NUMLOCK
 			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
+				sound = 0;
 				break;
 			}
 #endif
