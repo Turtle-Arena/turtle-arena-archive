@@ -490,6 +490,9 @@ NSISDIR=misc/nsis
 SDLHDIR=$(MOUNT_DIR)/SDL12
 LIBSDIR=$(MOUNT_DIR)/libs
 SPLNDIR=$(MOUNT_DIR)/splines
+OGGDIR=$(MOUNT_DIR)/libogg
+VORBISDIR=$(MOUNT_DIR)/libvorbis
+THEORADIR=$(MOUNT_DIR)/libtheora
 
 bin_path=$(shell which $(1) 2> /dev/null)
 
@@ -862,17 +865,19 @@ ifeq ($(PLATFORM),mingw32)
     CLIENT_LIBS += -lfreetype
   endif
 
+  ifeq ($(ARCH),x86)
+    WINLIBDIR=$(LIBSDIR)/win32
+  else
+    WINLIBDIR=$(LIBSDIR)/win64
+  endif
+
   ifeq ($(USE_CURL),1)
     CLIENT_CFLAGS += -DUSE_CURL
     CLIENT_CFLAGS += $(CURL_CFLAGS)
     ifneq ($(USE_CURL_DLOPEN),1)
       ifeq ($(USE_LOCAL_HEADERS),1)
         CLIENT_CFLAGS += -DCURL_STATICLIB
-        ifeq ($(ARCH),x64)
-	  CLIENT_LIBS += $(LIBSDIR)/win64/libcurl.a
-	else
-          CLIENT_LIBS += $(LIBSDIR)/win32/libcurl.a
-        endif
+        CLIENT_LIBS += $(WINLIBDIR)/libcurl.a
       else
         CLIENT_LIBS += $(CURL_LIBS)
       endif
@@ -890,35 +895,24 @@ ifeq ($(PLATFORM),mingw32)
   CLIENT_LIBS += -lmingw32
   ifeq ($(USE_LOCAL_HEADERS),1)
     CLIENT_CFLAGS += -I$(SDLHDIR)/include
-    ifeq ($(ARCH), x86)
-    CLIENT_LIBS += $(LIBSDIR)/win32/libSDLmain.a \
-                      $(LIBSDIR)/win32/libSDL.dll.a
-    else
-    CLIENT_LIBS += $(LIBSDIR)/win64/libSDLmain.a \
-                      $(LIBSDIR)/win64/libSDL.dll.a \
-                      $(LIBSDIR)/win64/libSDL.a
+    CLIENT_LIBS += $(WINLIBDIR)/libSDLmain.a \
+                      $(WINLIBDIR)/libSDL.dll.a
+
+    ifneq ($(ARCH),x86)
+      CLIENT_LIBS += $(WINLIBDIR)/libSDL.a
     endif
 
     # Extra libs, easier to just include in source tree
-    CLIENT_CFLAGS += -I$(LIBSDIR)/win32/include
-    ifeq ($(ARCH), x86)
-      ifeq ($(USE_CODEC_VORBIS),1)
-        CLIENT_LIBS += $(LIBSDIR)/win32/libvorbisfile.a \
-                        $(LIBSDIR)/win32/libvorbis.a\
-						$(LIBSDIR)/win32/libogg.a
-      endif
-      ifeq ($(USE_CODEC_THEORA),1)
-        CLIENT_LIBS += $(LIBSDIR)/win32/libtheora.a
-      endif
-    else
-      ifeq ($(USE_CODEC_VORBIS),1)
-        CLIENT_LIBS += $(LIBSDIR)/win64/libvorbisfile.a \
-                        $(LIBSDIR)/win64/libvorbis.a\
-						$(LIBSDIR)/win64/libogg.a
-      endif
-      ifeq ($(USE_CODEC_THEORA),1)
-        CLIENT_LIBS += $(LIBSDIR)/win64/libtheora.a
-      endif
+    ifeq ($(USE_CODEC_VORBIS),1)
+      CLIENT_CFLAGS += -I$(OGGDIR)/include \
+                      -I$(VORBISDIR)/include
+      CLIENT_LIBS += $(WINLIBDIR)/libvorbisfile.a \
+                      $(WINLIBDIR)/libvorbis.a\
+                      $(WINLIBDIR)/libogg.a
+    endif
+    ifeq ($(USE_CODEC_THEORA),1)
+      CLIENT_CFLAGS += -I$(THEORADIR)/include
+      CLIENT_LIBS += $(WINLIBDIR)/libtheora.a
     endif
 
   else
