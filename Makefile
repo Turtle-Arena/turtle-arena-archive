@@ -207,16 +207,16 @@ zip: assets
 	$(Q)todos $(INSTALLDIR)/$(ZIPNAME)/*.txt
 	$(Q)mkdir -p $(INSTALLDIR)/$(ZIPNAME)/settings
 	$(Q)echo "yes" > $(INSTALLDIR)/$(ZIPNAME)/settings/portable
-	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
-	$(MAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" --jobs=$(JOBS)
+	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
+	$(MAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
 	$(Q)cp engine/misc/nsis/*.dll $(INSTALLDIR)/$(ZIPNAME)/
 ifneq ($(PLATFORM),mingw32)
 ifeq ($(ARCH),x86_64)
-	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
-	$(MAKE) -C engine ARCH=i386 copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" --jobs=$(JOBS)
+	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
+	$(MAKE) -C engine ARCH=i386 copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
 endif
-	$(MINGWMAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
-	$(MINGWMAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" --jobs=$(JOBS)
+	$(MINGWMAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
+	$(MINGWMAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
 	$(Q)cp extras/turtlearena.sh $(INSTALLDIR)/$(ZIPNAME)/
 endif
 

@@ -115,9 +115,6 @@ Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
   SetOutPath "$INSTDIR\${MODDIR}"
   File "XXXASSETPATHXXX/assets0.pk3"
   File "XXXASSETPATHXXX/assets1-qvms.pk3"
-  File "../../build/release-mingw32-x86/${MODDIR}/cgamex86.dll"
-  File "../../build/release-mingw32-x86/${MODDIR}/qagamex86.dll"
-  File "../../build/release-mingw32-x86/${MODDIR}/uix86.dll"
 
   ; Write the installation path into the registry
   WriteRegStr SHCTX "Software\${GAME_FSNAME}" ${MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_VALUENAME} "$INSTDIR"
@@ -190,9 +187,6 @@ Section "Uninstall"
   Delete $INSTDIR\${MODDIR}\assets0.pk3
   Delete $INSTDIR\${MODDIR}\assets1-qvms.pk3
   Delete $INSTDIR\${MODDIR}\assets2-music.pk3
-  Delete $INSTDIR\${MODDIR}\cgamex86.dll
-  Delete $INSTDIR\${MODDIR}\qagamex86.dll
-  Delete $INSTDIR\${MODDIR}\uix86.dll
   Delete $INSTDIR\${CLIENT}
   Delete $INSTDIR\${SERVER}
 

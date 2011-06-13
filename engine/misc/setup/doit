@@ -72,7 +72,6 @@ for arch in "${archs[@]}"; do
 	mkdir $dst/base
 	install -m 755 $topdir/build/release-linux-$arch/turtlearena.$arch $dst/turtlearena.$arch
 	install -m 755 $topdir/build/release-linux-$arch/turtlearena-server.$arch $dst/turtlearena-server.$arch
-	install -m 644 $topdir/build/release-linux-$arch/base/*.so $dst/base
 
 	tar --owner=root --group=root -C $dst -cf ./image/turtlearena.$arch.tar .
 	rm -rf ./image/tmp
