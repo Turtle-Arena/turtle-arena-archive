@@ -279,7 +279,7 @@ then
 	cp $STARTDIR/INSTALLER_README.txt README
 	cp $STARTDIR/CREDITS.txt CREDITS
 	cp $STARTDIR/COPYRIGHTS.txt COPYRIGHTS
-	cp $STARTDIR/COPYING.txt COPYING
+	cp $STARTDIR/CC-BY-SA-3.0.txt CC-BY-SA-3.0
 
 	#
 	# Create debian data source directory
