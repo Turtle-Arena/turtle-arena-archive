@@ -2640,7 +2640,7 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	struct PNG_Chunk_IHDR	IHDR;
 	PNG_ChunkCRC			CRC;
 	void					*crcPtr;
-	size_t					numtEXt = 0;
+	int						numtEXt = 0;
 #ifdef TA_SPLITVIEW
 	#define					NUMTEXT 6+MAX_SPLITVIEW
 #else
@@ -2651,7 +2651,7 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 		char key[80]; // PNG limits to 79+'\0'.
 		char text[256]; // PNG allows any length.
 	} tEXt[NUMTEXT];
-	size_t					i;
+	int						i;
 	uint8_t					*imageData;
 	uint32_t				imageLength;
 	Bytef					*compressedData = NULL;
@@ -2708,7 +2708,7 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	numtEXt++;
 	for (i = 1; i < MAX_SPLITVIEW; i++) {
 		if (ri.CL_GetClientLocation(tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text), i)) {
-			snprintf(tEXt[numtEXt].key, sizeof (tEXt[numtEXt].key), "Location %zu", i+1);
+			snprintf(tEXt[numtEXt].key, sizeof (tEXt[numtEXt].key), "Location %d", i+1);
 			numtEXt++;
 		}
 	}
