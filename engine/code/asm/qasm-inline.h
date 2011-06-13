@@ -19,19 +19,21 @@ along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-#ifndef __ASM_I386__
-#define __ASM_I386__
+#ifndef __ASM_INLINE_I386__
+#define __ASM_INLINE_I386__
 
 #include "../qcommon/q_platform.h"
 
-#ifdef __ELF__
-.section .note.GNU-stack,"",@progbits
-#endif
-
-#if defined(__ELF__) || (defined(__WIN64__) && !defined(__MINGW64__))
-#define C(label) label
+#ifdef idx64
+  #define EAX "%%rax"
+  #define EBX "%%rbx"
+  #define ESP "%%rsp"
+  #define EDI "%%rdi"
 #else
-#define C(label) _##label
+  #define EAX "%%eax"
+  #define EBX "%%ebx"
+  #define ESP "%%esp"
+  #define EDI "%%edi"
 #endif
 
 #endif
