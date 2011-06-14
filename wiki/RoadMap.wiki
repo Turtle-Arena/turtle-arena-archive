@@ -64,9 +64,9 @@ Haven't decide what order these will be done in, but hopefully they will all get
   * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution. (Many are already 2x or 4x quake3 resolution.)
 
 ==== Unlikely ====
-  * Have player models be MDR (Finish Misfit Model 3D MDR exporting)
+  * Have player models be MDR (Finish Maverick Model 3D MDR exporting)
   * Multiple levels of detail for players and other models
-    * (Add a LOD converter to Misfit Model 3D?)
+    * (Add a LOD converter to Maverick Model 3D?)
 
 == 0.8 series ==
 Focus on Single Player / Co-op.

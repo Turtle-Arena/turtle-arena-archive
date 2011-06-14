@@ -36,7 +36,7 @@ Toots used to create Turtle Arena.
 == 3D Models ==
 
   * Wings3D — 3D modeler
-  * Misfit Model 3D — 3D modeler and animator
+  * [http://code.google.com/p/maverick-model-3d/ Maverick Model 3D] — 3D modeler and animator
 
 == 2D Graphics ==
 

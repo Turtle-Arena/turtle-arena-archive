@@ -14,7 +14,7 @@ Contributed data (models, images, audio, etc) are required to be licensed as [ht
 It is recommended to use the software used to create most of the existing data. There are many source files for them in the source repository already.
   * 3D Models
     * Wings3D — 3D modeler (`*.wings`)
-    * Misfit Model 3D — 3D modeler and animator (`*.mm3d`)
+    * [http://code.google.com/p/maverick-model-3d/ Maverick Model 3D] — 3D modeler and animator (`*.mm3d`)
   * 2D Graphics
     * GIMP — Raster graphics (`*.xcf`)
     * Inkscape — Scalable Vector Graphics (`*.svg`)
