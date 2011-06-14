@@ -7,7 +7,7 @@
 == Weapons (and attacking) ==
   * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
 
-  * TODO: Add a option to weapon group info to hold a weapon upside-down? (effect rendering and damaging)
+  * TODO: Add a option to weapon group info to hold a weapon upside-down? (affect rendering and damaging)
 
   * TODO: Add attack movement flags? Stop, cut speed in half, double speed, turn right?, etc.
 
@@ -30,7 +30,7 @@
       * If (!(animations[run].prefixType & AP_LEGS)) PM_ContinueAnim(LEGS_RUN);
 
 == Single Player ==
-  * TODO: True Single Player mode with NPCs and all that.
+  * TODO: Added enemy NPCs
 
   * TODO: Finish savegames for single player
     * When starting single player have user pick save slot and/or enter name to set g_saveFilename. (Like SRB2 2.0)
@@ -40,27 +40,14 @@
     * Have it be more like in Team Arena then Q3, using ".game" files instead of cvars in config.
     * Or one single data file with all of the sp data (Or SP data files -like SRB2 2.0)
 
-  * TODO: Mouser NPC, or call it 'A Better Mouse Trap' (and/or ABMT)?
-
   * TODO (STARTED): Have a completed game menu/screen
     * sp_complete and sp_gameover
 
-== Single Player (NiGHTS) ==
-  * TODO: Chet into Dreams...  (A boy dreams of his lost turtles.)
-    * NiGHTS would replaced with a Ninja Turtle?
-    * The level could be set inside an aquarium (With the aquarium at very large scale)
-    * Before the dream Chet could be replaying the events of how he lost his turtles
-       * Afterword the people around him, and the TCRI truck, could turn into nightmarens. (The truck could turn into the boss)
-    * After the dream Chet would see the Turtles outside his window.
-
 == Render ==
-  * TODO: Add real-time cel-shading, like Jet Set Redio! (Maybe add other NPR rendering options too?)
-    * Maybe NPRQuake could be of some help? it has some cool looking NPR renders.
-
   * BUG: When there are multiple ghost models they may not be sorted into correct order
     * Requires depth sorting to fix
 
-  * TODO: Add Vertex Buffer Object (VBO) support? (patch is in ioq3 bugzilla, wait till its added in ioq3?)
+  * BUG: Forcing entity to be transparent doesn't work if entity uses cel-shading.
 
   * BUG: At the beginning of q3dm0 the portal can be seen though the mirror
 
@@ -77,7 +64,7 @@
   * TODO: Per-team flag skins? (Team icon is on flag skin)
      * Would a shader remap work?
 
-  * TODO: Have a extra team (Needed for mp_ui), such as (Purple) Dragon, Guardian, or something.
+  * TODO: Have a extra team. (Currently needed for missionpack ui, though I could probably fix it so it isn't needed.)
 
 == New Entities ==
   * TODO: Add misc_bubbles entity.
@@ -85,8 +72,6 @@
   * TODO: Add misc_dripper entity.
 
 == Code Cleanup ==
-  * TODO: Reduce overall number of TODOs and FIXMEs in the source
-
   * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
 
 == Bots ==
@@ -95,19 +80,16 @@
 == Entities ==
   * TODO: Improve misc object physics. (Use code from Q3Rally? bg_physics.c/h)
 
-  * TODO: Drivable vehicles? (Base on Q3Rally)
-
 == NiGHTS mode ==
-  * STARTED (NIGHTSMODE): NiGHTS into Dreams mode
+  * STARTED (NIGHTSMODE): NiGHTS into Dreams mode.
 
-  * TODO: Use different model for player when in NiGHTS mode
-    * Maybe instead of NiGHTS use a dragon-form like in TMNT 2003 Season 5, Dragons are sort of like Nightmarens...
+  * TODO: Use different model for player when in NiGHTS mode.
 
   * TODO: NiGHTS HUD mode, check for nights_start to see if level is a NiGHTS level to use NiGHTS HUD.
 
-  * TODO: When player is in bonus time, change blue sphere to golden (change model/skin and icon)
+  * TODO: When player is in bonus time, change blue sphere to golden (change model/skin and icon).
 
-  * Data: TODO: Add models for sphere and star items
+  * Data: TODO: Add models for star item.
 
   * TODO: Have NiGHTS-like link score plums? or just use floating numbers like quake3?
     * Supported by game, just needs cgame code and graphics.
@@ -128,10 +110,6 @@
   * TODO: New gametypes; Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
 
   * TODO: Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
-
-  * TODO: Make a original character (In case the Ninja Turtles have to be removed at some point)
-    * Name the character "Goy"? (Character name ZTurtleMan made up.)
-    * NOTE: It turns out Goy is Modern Hebrew for non-Jew / gentile. (Which is pretty generic, which fits the propose of the character.)
 
   * TODO: Add Jump/Land animations specifically for backflip, fallback to 'Jump/Land B' (jump backward)
     * For jumping backward in lock-on mode, like in LoZ:TP
@@ -155,11 +133,9 @@
 
   * TODO: Allow voicechat filename to be set in animations.cfg
 
-  * TODO: Add MD5 model support
-    * MD5 use single model and skeleton
-    * The animations can move any part of the model
-    * Multiple animations can animate at the same time
-  * TODO-after-above: Re-rig and reanimate players in Blender for MD5? (or add MD5 export to MM3D?)
+  * TODO: Add support for using a single model for players.
+    * Add support for animation blending for IQM.
+  * TODO-after-above: Re-rig and reanimate players in Blender for single IQM? (and/or add IQM export to Maverick Model 3D?)
 
   * TODO: Support using .so, .dll, and .dylib, on pure servers? (Wolf-ET does?)
   * TODO: Have qvms in a separate pk3 and have it be optional.
@@ -167,7 +143,7 @@
     * If so/dll/dylib are supported on pure servers is there any reason to included them in any installers?
       * Is there a reason to include in Linux/Win32 zip that comes with so/dll? (For other ports? such as Android/iPhone?)
 
-  * TODO: Allow set splitscreen clients for joinning in Multiplayer Search menu?
+  * TODO: Allow setting splitscreen clients for joinning in Multiplayer Search menu?
     * Allows filtering out servers without enough player slots
 
   * TODO: Tell which clients are splitscreen players
@@ -176,7 +152,7 @@
 
   * TODO: Remove say, say_team, and tell for splitscreen clients?
 
-  * TODO: Allow splitscreen in 'single player'? If so, add to q3_ui.
+  * TODO: Add support for starting splitscreen in 'single player' in q3_ui
 
   * Splitview mode for viewing multiple players online
     * Need someway to tell server which clients we want in splitview.
@@ -241,8 +217,6 @@ Most of the mapobjects should be damageable.
     * Only spawn weapons with a classname, have flags for melee and gun weapon spawning.
   * TODO: ...also allow list of weapons in message field?
 
-  * WORKING(NotDone?): Have bots use shurikens. (They are used *to much* now.)
-
 = Other =
   * TODO: Make some sort of manual to tell how to play, control the player (using default controls). Have it be simple.
 
@@ -268,21 +242,6 @@ Most of the mapobjects should be damageable.
 
   * TODO: Get free scenery objects from the Internet. Make most damageable.
     * http://virtualworlds.wikia.com
-
-== Players ==
-  * TODO: Add Leo, Don, Mike, and Casey bot chats.
-
-=== Raph ====
-  * TODO: Finish animating raph_v9.mm3d
-
-=== Other Turtles ===
-  * TODO: Finish Turtle player models
-    * After Raph is finished:
-    * Reanimate raph_v9.mm3d for each Turtle? (Just a few of the animations...)
-
-=== Casey ====
-  * TODO: Remake Casey Jones model
-
 
 = Website =
 Current Location: http://ztm.x10hosting.com/ta/
