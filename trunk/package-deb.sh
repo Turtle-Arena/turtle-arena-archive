@@ -254,13 +254,8 @@ then
 		ORIGDIR=$GAMENAME-data-$version
 	fi
 
-	# ZTM: Some of the music is non-commercial (CC-BY-NC and CC-BY-NC-SA)
-	#        which is considered non-free by the Debian project.
-	#      Should the "non-free" music be packaged in a separate deb (turtlearena-data-non-free)?
-	#        (and in its own assets#.pk3?)
-
-	# ZTM: FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
-	# Build assets0.pk3 if not already built
+	# ZTM: FIXME: This script doesn't support creating updated deb with new assets. It just doesn't work.
+	# Build assets if not already built
 	if [ ! -f $DATADIR/base/assets0.pk3 ]
 	then
 		make assets INSTALLDIR=$DATADIR
