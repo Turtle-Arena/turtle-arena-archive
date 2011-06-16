@@ -4,28 +4,36 @@
 Turtle Arena is released using a few different installers/packages, this page describes how to create them. To create any of the packages you need the Turtle Arena source code and the ability to compile Turtle Arena (using 'make').
 
 == Types ==
-Turtle Arena is currently released using three methods; zip archive, Debian packages, and a Win32 NSIS installer.
+Turtle Arena is currently released using four methods; zip archive, Win32 NSIS installer, Debian packages, and loki setup Linux Installer.
 
 == All ==
 To create all of the packages at once, you must use Linux.
 
   # You need to have nsis installed to build to Win32 NSIS installer
-  # If you are building a released version (as apposed to from subversion trunk), copy assests0.pk3 into install/base/
-  # Run ./package.sh (It will guide building the packages.)
+  # If you are building a released version (as apposed to from subversion trunk), copy assests*.pk3 into install/base/
+  # Run make in the directory containing engine/ and extras/
   # Packages will be in the install directory.
 
 == Zip Archive ==
-Currently the zip archive is created by running './package.sh' like in the "All" method described above and manually zipping the proper files in the 'install' directory.
+The zip archive can be created by running 'make zip' and manually zipping the proper files in the 'install' directory.
 
-  # Run ./package.sh
+  # If you are building a released version (as apposed to from subversion trunk), copy assests*.pk3 into install/base/
+  # Run 'make all'
   # Open 'install' directory
-  # Zip the 'base' and 'setting' directories along with the files in 'install' directory.
+  # Zip the 'turtlearena-x.x.x' directory (where x.x.x is the version, such as 0.4.2).
+
+== Loki Setup ==
+Linux Installer.
+
+  # If you are building a released version (as apposed to from subversion trunk), copy assests*.pk3 into install/base/
+  # Run 'make loki'
+  # Open 'install/loki' directory
 
 == Debian/Ubuntu Packages ==
 If you are building from subversion trunk it is recommended you use the "All" method described above.
 
-  # If you are building a released version (as apposed to from subversion trunk), copy assests0.pk3 into install/base/
-  # Run ./package-deb.sh
+  # If you are building a released version (as apposed to from subversion trunk), copy assests*.pk3 into install/base/
+  # Run './package-deb.sh'
   # Open 'install/deb' directory
 
 == Windows NSIS Installer ==
@@ -33,9 +41,11 @@ To create the Windows NSIS Installer you need to install NSIS and the Turtle Are
 
   # Install NSIS 2.44 (2.46 doesn't create a valid installer) (NOTE: Ubuntu 10.04 (lucid) has 2.46 in its package repository so you will need to install a older 2.44 package from Ubuntu 9.10 (karmic))
   # Download the Turtle Arena source code if you do not already have it
-  # Copy assets0.pk3 into the engine/misc/nsis/ directory inside of the Turtle Arena source
+  # Copy the assets*.pk3 files into the engine/misc/nsis/ directory inside of the Turtle Arena source
   # Open a terminal and change to the engine/misc/nsis/ directory inside of the Turtle Arena source
   # Run 'make'
+
+There should now be a turtlearena-x.x.x-0.x86.exe in the engine/misc/nsis/ directory.
 
 == Windows NSIS Mod Installer ==
 Turtle Arena modifications (mods) can have their own Windows NSIS Installer.
@@ -47,4 +57,3 @@ Turtle Arena modifications (mods) can have their own Windows NSIS Installer.
   # Run 'makensis trutlearena-yourmodname.nsi'
 
 If all went well, you should have a installer/uninstaller for your mod now.
-
