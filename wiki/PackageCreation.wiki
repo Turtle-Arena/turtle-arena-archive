@@ -10,14 +10,14 @@ Turtle Arena is currently released using four methods; zip archive, Win32 NSIS i
 To create all of the packages at once, you must use Linux.
 
   # You need to have nsis installed to build to Win32 NSIS installer
-  # If you are building a released version (as apposed to from subversion trunk), copy assests*.pk3 into install/base/
+  # If you are building a released version (as apposed to from subversion trunk), copy `assests*.pk3` into install/base/
   # Run make in the directory containing engine/ and extras/
   # Packages will be in the install directory.
 
 == Zip Archive ==
 The zip archive can be created by running 'make zip' and manually zipping the proper files in the 'install' directory.
 
-  # If you are building a released version (as apposed to from subversion trunk), copy assests*.pk3 into install/base/
+  # If you are building a released version (as apposed to from subversion trunk), copy `assests*.pk3` into install/base/
   # Run 'make all'
   # Open 'install' directory
   # Zip the 'turtlearena-x.x.x' directory (where x.x.x is the version, such as 0.4.2).
@@ -25,14 +25,14 @@ The zip archive can be created by running 'make zip' and manually zipping the pr
 == Loki Setup ==
 Linux Installer.
 
-  # If you are building a released version (as apposed to from subversion trunk), copy assests*.pk3 into install/base/
+  # If you are building a released version (as apposed to from subversion trunk), copy `assests*.pk3` into install/base/
   # Run 'make loki'
   # Open 'install/loki' directory
 
 == Debian/Ubuntu Packages ==
 If you are building from subversion trunk it is recommended you use the "All" method described above.
 
-  # If you are building a released version (as apposed to from subversion trunk), copy assests*.pk3 into install/base/
+  # If you are building a released version (as apposed to from subversion trunk), copy `assests*.pk3` into install/base/
   # Run './package-deb.sh'
   # Open 'install/deb' directory
 
@@ -41,7 +41,7 @@ To create the Windows NSIS Installer you need to install NSIS and the Turtle Are
 
   # Install NSIS 2.44 (2.46 doesn't create a valid installer) (NOTE: Ubuntu 10.04 (lucid) has 2.46 in its package repository so you will need to install a older 2.44 package from Ubuntu 9.10 (karmic))
   # Download the Turtle Arena source code if you do not already have it
-  # Copy the assets*.pk3 files into the engine/misc/nsis/ directory inside of the Turtle Arena source
+  # Copy the `assets*.pk3` files into the engine/misc/nsis/ directory inside of the Turtle Arena source
   # Open a terminal and change to the engine/misc/nsis/ directory inside of the Turtle Arena source
   # Run 'make'
 
