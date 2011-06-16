@@ -45,18 +45,16 @@ First stable playable release.
   * Finish '2D mode'
     * Draw HUDs for all local players.
     * Focus on all local players (or all players in level depending on map settings).
-  * Remodel and animate Casey
   * Finish breakable/pushable objects and brushes code
   * (Haven't decided other goals, see 0.5.x for ideas)
 
 === 0.5.x ===
 Haven't decide what order these will be done in, but hopefully they will all get done for the 0.6 release.
 
-==== Likely ====
-  * Improve player models; each player should have some unique animations, etc
-  * Add more players (Mirage comic based); Foot Ninja, Foot Elite, and The Shredder
-    * Room for originality, give different names? Evil Ninja, Elite Evil Ninja, and The Slayer?
+=== Undecided ===
+  * Create new original players, remove current Ninja Turtle ones.
 
+==== Likely ====
   * Create scenery objects and brushes
   * Map Themes (Sets of textures, sky, models, misc_objects, and music)
   * New multiplayer maps using the new map themes
