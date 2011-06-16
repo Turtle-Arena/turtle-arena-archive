@@ -910,12 +910,12 @@ the bits are allocated as follows:
 	#define	QSORT_ENTITYNUM_SHIFT	7
 	#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 		#define	QSORT_ORDER_SHIFT	(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
-		#if (QSORT_ORDER_SHIFT+5) > 31 // sort order is 5 bit
+		#if (QSORT_ORDER_SHIFT+5) > 32 // sort order is 5 bit
 			#error "Need to update sorting, too many bits."
 		#endif
 	#else
 		#define	QSORT_SHADERNUM_SHIFT	(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
-		#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 31
+		#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 32
 			#error "Need to update sorting, too many bits."
 		#endif
 	#endif
