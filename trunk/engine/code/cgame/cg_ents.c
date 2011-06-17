@@ -184,7 +184,11 @@ static void CG_EntityEffects( centity_t *cent ) {
 		g = ( cl >> 8 ) & 255;
 		b = ( cl >> 16 ) & 255;
 		i = ( ( cl >> 24 ) & 255 ) * 4;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: rgb should be 0 to 1, not 0 to 255. Fixed by Eraesr of EntityPlus.
+		trap_R_AddLightToScene( cent->lerpOrigin, i, r / 255, g / 255, b / 255 );
+#else
 		trap_R_AddLightToScene( cent->lerpOrigin, i, r, g, b );
+#endif
 	}
 
 }
