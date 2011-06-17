@@ -1342,7 +1342,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	// loaddeferred can be both a servercmd and a consolecmd
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Why hasn't this been corrected?
+#ifdef IOQ3ZTM_NO_COMPAT // SPELLING
 	if ( !strcmp( cmd, "loaddeferred" ) )
 #else
 	if ( !strcmp( cmd, "loaddefered" ) ) 	// FIXME: spelled wrong, but not changing for demo
