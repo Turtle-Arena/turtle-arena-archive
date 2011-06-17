@@ -323,10 +323,6 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 			ent->touch( ent, other, &trace );
 		}
 
-#ifdef TA_ENTSYS // PUSHABLE
-		G_PlayerPushEntity(other, ent);
-#endif
-
 		if ( !other->touch ) {
 			continue;
 		}
@@ -1719,11 +1715,9 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.pmove_fixed = pmove_fixed.integer | client->pers.pmoveFixed;
 	pm.pmove_msec = pmove_msec.integer;
 
-#if 0 // #ifdef TURTLEARENA // TEST: push players
+#if 0 //#ifdef TA_ENTSYS // PUSHABLE
 	if ( !client->noclip )
 	{
-		// XXX
-		extern qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obstacle );
 		gentity_t *obstacle;
 		vec3_t move;
 		vec3_t amove;
@@ -1738,13 +1732,7 @@ void ClientThink_real( gentity_t *ent ) {
 		VectorCopy( client->ps.viewangles, ent->r.currentAngles );
 		ent->r.currentAngles[YAW] -= amove[YAW];
 
-		if (!G_MoverPush(ent, move, amove, &obstacle))
-		{
-			// blocked, do nothing
-		}
-		else if ( !client->ps.powerups[PW_FLASHING] ) {
-			client->ps.powerups[PW_FLASHING] = 1;
-		}
+		G_PlayerPush(ent, move, amove, &obstacle);
 	}
 	client->oldYaw = client->ps.viewangles[YAW];
 #endif
