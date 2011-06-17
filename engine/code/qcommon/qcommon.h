@@ -138,8 +138,8 @@ NET
 
 #define	PORT_ANY			-1
 
-#ifdef TA_SPLITVIEW
-#define	MAX_RELIABLE_COMMANDS	128			// max string commands buffered for restransmit
+#ifdef TA_SPLITVIEW // ZTM: TODO: Have extra local clients use their own seperate reliableCommands.
+#define	MAX_RELIABLE_COMMANDS	(64*MAX_SPLITVIEW) // max string commands buffered for restransmit
 #else
 #define	MAX_RELIABLE_COMMANDS	64			// max string commands buffered for restransmit
 #endif
