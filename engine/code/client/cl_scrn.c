@@ -740,7 +740,11 @@ void SCR_DrawScreenField( stereoFrame_t stereoFrame ) {
 
 	re.BeginFrame( stereoFrame );
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Safety check
+	uiFullscreen = (uivm && VM_Call( uivm, UI_IS_FULLSCREEN ));
+#else
 	uiFullscreen = VM_Call( uivm, UI_IS_FULLSCREEN );
+#endif
 
 	// wide aspect ratio screens need to have the sides cleared
 	// unless they are displaying game renderings
