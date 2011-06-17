@@ -1292,6 +1292,15 @@ long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_
 						   !FS_IsExt(filename, ".ttf", len) &&
 						   !FS_IsExt(filename, ".otf", len) &&
 #endif
+#ifdef TA_ITEMSYS
+						   !FS_IsExt(filename, ".item", len) &&
+#ifdef TA_WEAPSYS
+						   !FS_IsExt(filename, ".weap", len) &&
+#endif
+#endif
+#ifdef TA_NPCSYS
+						   !FS_IsExt(filename, ".npc", len) &&
+#endif
 						   !strstr(filename, "levelshots"))
 						{
 							pak->referenced |= FS_GENERAL_REF;
