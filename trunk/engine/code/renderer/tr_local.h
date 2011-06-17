@@ -48,25 +48,16 @@ typedef unsigned int glIndex_t;
 // parallel on a dual cpu machine
 #define	SMP_FRAMES		2
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Comment is wrong.
 // 14 bits
 // can't be increased without changing bit packing for drawsurfs
 // see QSORT_SHADERNUM_SHIFT
 #define SHADERNUM_BITS			14
 #define	MAX_SHADERS				(1<<SHADERNUM_BITS)
-#else
-// 12 bits
-// see QSORT_SHADERNUM_SHIFT
-#define	MAX_SHADERS				16384
-#endif
 
 //#define MAX_SHADER_STATES 2048
 #define MAX_STATES_PER_SHADER 32
 #define MAX_STATE_NAME 32
 
-#ifndef IOQ3ZTM // IOQ3BUGFIX: Move comment
-// can't be increased without changing bit packing for drawsurfs
-#endif
 
 
 typedef struct dlight_s {
@@ -884,45 +875,38 @@ compared quickly during the qsorting process
 
 the bits are allocated as follows:
 
-21 - 31	: sorted shader index
-11 - 20	: entity index
-2 - 6	: fog index
-//2		: used to be clipped flag REMOVED - 03.21.00 rad
 0 - 1	: dlightmap index
+//2		: used to be clipped flag REMOVED - 03.21.00 rad
+2 - 6	: fog index
+11 - 20	: entity index
+21 - 31	: sorted shader index
 
 	TTimo - 1.32
-17-31 : sorted shader index
-7-16  : entity index
-2-6   : fog index
 0-1   : dlightmap index
+2-6   : fog index
+7-16  : entity index
+17-31 : sorted shader index
 */
-#if 1 //#ifdef IOQ3ZTM
-	#ifdef IOQ3ZTM_NO_COMPAT // MORE_GENTITIES
-	/*
-	19-23 : sorted order value (5 bits)
-	7-18  : entity index (12 bits)
-	2-6   : fog index (5 bits)
-	0-1   : dlightmap index (2 bits)
-	*/
-	#endif
-
-	#define	QSORT_FOGNUM_SHIFT		2
-	#define	QSORT_ENTITYNUM_SHIFT	7
-	#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-		#define	QSORT_ORDER_SHIFT	(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
-		#if (QSORT_ORDER_SHIFT+5) > 32 // sort order is 5 bit
-			#error "Need to update sorting, too many bits."
-		#endif
-	#else
-		#define	QSORT_SHADERNUM_SHIFT	(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
-		#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 32
-			#error "Need to update sorting, too many bits."
-		#endif
-	#endif
+#ifdef IOQ3ZTM_NO_COMPAT // MORE_GENTITIES
+/*
+0-1   : dlightmap index (2 bits)
+2-6   : fog index (5 bits)
+7-18  : entity index (12 bits)
+19-23 : sorted order value (5 bits)
+*/
+#endif
+#define	QSORT_FOGNUM_SHIFT		2
+#define	QSORT_ENTITYNUM_SHIFT	7
+#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+#define	QSORT_ORDER_SHIFT		(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
+#if (QSORT_ORDER_SHIFT+5) > 32 // sort order is 5 bit
+	#error "Need to update sorting, too many bits."
+#endif
 #else
-	#define	QSORT_SHADERNUM_SHIFT	17
-	#define	QSORT_ENTITYNUM_SHIFT	7
-	#define	QSORT_FOGNUM_SHIFT		2
+#define	QSORT_SHADERNUM_SHIFT	(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
+#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 32
+	#error "Need to update sorting, too many bits."
+#endif
 #endif
 
 extern	int			gl_filter_min, gl_filter_max;

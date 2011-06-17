@@ -126,9 +126,9 @@ cvar_t	*cl_thirdPersonAngle;
 cvar_t	*cl_thirdPersonAnalog;
 #endif
 
-#if defined(idx64) 
+#if idx64
   void (*Q_VMftol)(void);
-#elif defined(id386)
+#elif id386
 	long (QDECL *Q_ftol)(float f);
 	void (QDECL *Q_VMftol)(void);
 	void (QDECL *Q_SnapVector)(vec3_t vec);
@@ -2645,11 +2645,11 @@ Find out whether we have SSE support for Q_ftol function
 =================
 */
 
-#if defined(id386) || defined(idx64)
+#if id386 || idx64
 
 static void Com_DetectSSE(void)
 {
-#ifndef idx64
+#if !idx64
 	cpuFeatures_t feat;
 	
 	feat = Sys_GetProcessorFeatures();
@@ -2666,7 +2666,7 @@ static void Com_DetectSSE(void)
 		Q_VMftol = qvmftolsse;
 
 		Com_Printf("Have SSE support\n");
-#ifndef idx64
+#if !idx64
 	}
 	else
 	{
