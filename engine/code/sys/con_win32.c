@@ -225,7 +225,11 @@ void CON_Init( void )
 	GetConsoleScreenBufferInfo( qconsole_hout, &info );
 	qconsole_attrib = info.wAttributes;
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use game name
+	SetConsoleTitle(CLIENT_WINDOW_TITLE " Dedicated Server Console");
+#else
 	SetConsoleTitle("ioquake3 Dedicated Server Console");
+#endif
 
 	// make cursor invisible
 	GetConsoleCursorInfo( qconsole_hout, &qconsole_orig_cursorinfo );
