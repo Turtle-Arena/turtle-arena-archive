@@ -35,7 +35,6 @@
 					<Add directory="../../code/libs/win32/include" />
 				</Compiler>
 				<Linker>
-					<Add library="../../build/splines_release/libsplines.a" />
 					<Add library="mingw32" />
 					<Add library="user32" />
 					<Add library="advapi32" />
@@ -61,8 +60,8 @@
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
 				<Option projectLinkerOptionsRelation="1" />
 				<Compiler>
-					<Add option="-W" />
 					<Add option="-g" />
+					<Add option="-W" />
 					<Add option="-O0" />
 					<Add option="-DWIN32" />
 					<Add option="-DWIN32_MISC_ICON_PATH" />
@@ -82,7 +81,6 @@
 					<Add directory="../../code/libs/win32/include" />
 				</Compiler>
 				<Linker>
-					<Add library="../../build/splines_debug/libsplines.a" />
 					<Add library="mingw32" />
 					<Add library="user32" />
 					<Add library="advapi32" />
@@ -123,7 +121,6 @@
 					<Add option="-DUSE_ALLOCA" />
 				</Compiler>
 				<Linker>
-					<Add library="../../build/splines_release/libsplines.a" />
 					<Add library="GL" />
 				</Linker>
 			</Target>
@@ -135,8 +132,8 @@
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
 				<Compiler>
-					<Add option="-W" />
 					<Add option="-g" />
+					<Add option="-W" />
 					<Add option="-O0" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
@@ -152,7 +149,6 @@
 					<Add option="-DUSE_ALLOCA" />
 				</Compiler>
 				<Linker>
-					<Add library="../../build/splines_debug/libsplines.a" />
 					<Add library="GL" />
 				</Linker>
 			</Target>
@@ -180,7 +176,6 @@
 					<Add option="-DUSE_ALLOCA" />
 				</Compiler>
 				<Linker>
-					<Add library="../../build/splines_release/libsplines.a" />
 					<Add library="GL" />
 				</Linker>
 			</Target>
@@ -192,8 +187,8 @@
 				<Option compiler="gcc" />
 				<Option parameters="+set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0" />
 				<Compiler>
-					<Add option="-W" />
 					<Add option="-g" />
+					<Add option="-W" />
 					<Add option="-O0" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
@@ -209,7 +204,6 @@
 					<Add option="-DUSE_ALLOCA" />
 				</Compiler>
 				<Linker>
-					<Add library="../../build/splines_debug/libsplines.a" />
 					<Add library="GL" />
 				</Linker>
 			</Target>
@@ -217,6 +211,7 @@
 		<Compiler>
 			<Add option="-static" />
 			<Add option="-DRELATIVE_WIN32_ICON_PATH" />
+			<Add option="-DUSE_INTERNAL_JPEG" />
 			<Add option="-DSTANDALONE" />
 			<Add option="-DRAVENMD4" />
 			<Add option="-DTA_MAIN" />
@@ -270,21 +265,34 @@
 			<Add directory="../../code/AL" />
 			<Add directory="../../code/libspeex" />
 		</Linker>
-		<Unit filename="../../code/asm/ftola.s">
+		<Unit filename="../../code/asm/ftola.asm">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../code/asm/ftola.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler -g $options -x assembler-with-cpp $includes -c $file -o $object" />
 		</Unit>
 		<Unit filename="../../code/asm/matha.s">
 			<Option compilerVar="CC" />
 			<Option compiler="gcc" use="1" buildCommand="$compiler -g $options -x assembler-with-cpp $includes -c $file -o $object" />
 		</Unit>
-		<Unit filename="../../code/asm/snapvectora.s">
+		<Unit filename="../../code/asm/qasm-inline.h" />
+		<Unit filename="../../code/asm/qasm.h" />
+		<Unit filename="../../code/asm/snapvector.asm">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../../code/asm/snapvector.c">
 			<Option compilerVar="CC" />
-			<Option compiler="gcc" use="1" buildCommand="$compiler -g $options -x assembler-with-cpp $includes -c $file -o $object" />
 		</Unit>
 		<Unit filename="../../code/asm/snd_mixa.s">
 			<Option compilerVar="CC" />
 			<Option compiler="gcc" use="1" buildCommand="$compiler -g $options -x assembler-with-cpp $includes -c $file -o $object" />
+		</Unit>
+		<Unit filename="../../code/asm/vm_x86_64.asm">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../code/botlib/aasfile.h" />
 		<Unit filename="../../code/botlib/be_aas.h" />
@@ -486,128 +494,154 @@
 		</Unit>
 		<Unit filename="../../code/game/bg_public.h" />
 		<Unit filename="../../code/game/g_public.h" />
-		<Unit filename="../../code/jpeg-6b/jcapimin.c">
+		<Unit filename="../../code/jpeg-8c/README" />
+		<Unit filename="../../code/jpeg-8c/jaricom.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jcapistd.c">
+		<Unit filename="../../code/jpeg-8c/jcapimin.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jccoefct.c">
+		<Unit filename="../../code/jpeg-8c/jcapistd.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jccolor.c">
+		<Unit filename="../../code/jpeg-8c/jcarith.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jcdctmgr.c">
+		<Unit filename="../../code/jpeg-8c/jccoefct.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jchuff.c">
+		<Unit filename="../../code/jpeg-8c/jccolor.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jchuff.h" />
-		<Unit filename="../../code/jpeg-6b/jcinit.c">
+		<Unit filename="../../code/jpeg-8c/jcdctmgr.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jcmainct.c">
+		<Unit filename="../../code/jpeg-8c/jchuff.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jcmarker.c">
+		<Unit filename="../../code/jpeg-8c/jcinit.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jcmaster.c">
+		<Unit filename="../../code/jpeg-8c/jcmainct.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jcomapi.c">
+		<Unit filename="../../code/jpeg-8c/jcmarker.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jconfig.h" />
-		<Unit filename="../../code/jpeg-6b/jcparam.c">
+		<Unit filename="../../code/jpeg-8c/jcmaster.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jcphuff.c">
+		<Unit filename="../../code/jpeg-8c/jcomapi.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jcprepct.c">
+		<Unit filename="../../code/jpeg-8c/jconfig.h" />
+		<Unit filename="../../code/jpeg-8c/jcparam.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jcsample.c">
+		<Unit filename="../../code/jpeg-8c/jcprepct.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jctrans.c">
+		<Unit filename="../../code/jpeg-8c/jcsample.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdapimin.c">
+		<Unit filename="../../code/jpeg-8c/jctrans.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdapistd.c">
+		<Unit filename="../../code/jpeg-8c/jdapimin.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdatadst.c">
+		<Unit filename="../../code/jpeg-8c/jdapistd.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdatasrc.c">
+		<Unit filename="../../code/jpeg-8c/jdarith.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdcoefct.c">
+		<Unit filename="../../code/jpeg-8c/jdatadst.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdcolor.c">
+		<Unit filename="../../code/jpeg-8c/jdatasrc.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdct.h" />
-		<Unit filename="../../code/jpeg-6b/jddctmgr.c">
+		<Unit filename="../../code/jpeg-8c/jdcoefct.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdhuff.c">
+		<Unit filename="../../code/jpeg-8c/jdcolor.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdhuff.h" />
-		<Unit filename="../../code/jpeg-6b/jdinput.c">
+		<Unit filename="../../code/jpeg-8c/jdct.h" />
+		<Unit filename="../../code/jpeg-8c/jddctmgr.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdmainct.c">
+		<Unit filename="../../code/jpeg-8c/jdhuff.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdmarker.c">
+		<Unit filename="../../code/jpeg-8c/jdinput.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdmaster.c">
+		<Unit filename="../../code/jpeg-8c/jdmainct.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdpostct.c">
+		<Unit filename="../../code/jpeg-8c/jdmarker.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdsample.c">
+		<Unit filename="../../code/jpeg-8c/jdmaster.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jdtrans.c">
+		<Unit filename="../../code/jpeg-8c/jdmerge.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jerror.c">
+		<Unit filename="../../code/jpeg-8c/jdpostct.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jerror.h" />
-		<Unit filename="../../code/jpeg-6b/jfdctflt.c">
+		<Unit filename="../../code/jpeg-8c/jdsample.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jidctflt.c">
+		<Unit filename="../../code/jpeg-8c/jdtrans.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jinclude.h" />
-		<Unit filename="../../code/jpeg-6b/jmemmgr.c">
+		<Unit filename="../../code/jpeg-8c/jerror.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jmemnobs.c">
+		<Unit filename="../../code/jpeg-8c/jerror.h" />
+		<Unit filename="../../code/jpeg-8c/jfdctflt.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jmemsys.h" />
-		<Unit filename="../../code/jpeg-6b/jmorecfg.h" />
-		<Unit filename="../../code/jpeg-6b/jpegint.h" />
-		<Unit filename="../../code/jpeg-6b/jpeglib.h" />
-		<Unit filename="../../code/jpeg-6b/jutils.c">
+		<Unit filename="../../code/jpeg-8c/jfdctfst.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/jpeg-6b/jversion.h" />
+		<Unit filename="../../code/jpeg-8c/jfdctint.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/jpeg-8c/jidctflt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/jpeg-8c/jidctfst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/jpeg-8c/jidctint.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/jpeg-8c/jinclude.h" />
+		<Unit filename="../../code/jpeg-8c/jmemmgr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/jpeg-8c/jmemnobs.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/jpeg-8c/jmemsys.h" />
+		<Unit filename="../../code/jpeg-8c/jmorecfg.h" />
+		<Unit filename="../../code/jpeg-8c/jpegint.h" />
+		<Unit filename="../../code/jpeg-8c/jpeglib.h" />
+		<Unit filename="../../code/jpeg-8c/jquant1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/jpeg-8c/jquant2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/jpeg-8c/jutils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/jpeg-8c/jversion.h" />
 		<Unit filename="../../code/libspeex/_kiss_fft_guts.h" />
 		<Unit filename="../../code/libspeex/arch.h" />
 		<Unit filename="../../code/libspeex/bits.c">
@@ -853,18 +887,18 @@
 		<Unit filename="../../code/qcommon/vm_local.h" />
 		<Unit filename="../../code/qcommon/vm_x86.c">
 			<Option compilerVar="CC" />
-			<Option target="Release Win32" />
-			<Option target="Debug Win32" />
-			<Option target="Release Linux i386" />
-			<Option target="Debug Linux i386" />
 		</Unit>
 		<Unit filename="../../code/qcommon/vm_x86_64.c">
 			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
 			<Option target="Release Linux x86_64" />
 			<Option target="Debug Linux x86_64" />
 		</Unit>
 		<Unit filename="../../code/qcommon/vm_x86_64_assembler.c">
 			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
 			<Option target="Release Linux x86_64" />
 			<Option target="Debug Linux x86_64" />
 		</Unit>
@@ -1040,10 +1074,17 @@
 		<Unit filename="../../code/zlib/adler32.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/zlib/compress.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/zlib/crc32.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/zlib/crc32.h" />
+		<Unit filename="../../code/zlib/deflate.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/zlib/deflate.h" />
 		<Unit filename="../../code/zlib/inffast.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -1057,6 +1098,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/zlib/inftrees.h" />
+		<Unit filename="../../code/zlib/trees.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/zlib/trees.h" />
 		<Unit filename="../../code/zlib/zconf.h" />
 		<Unit filename="../../code/zlib/zlib.h" />
 		<Unit filename="../../code/zlib/zutil.c">
