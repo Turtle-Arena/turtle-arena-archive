@@ -1002,34 +1002,131 @@ void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 }
 #endif
 
-#ifdef TA_ENTSYS // PUSHABLE
-// other is the pusher, should be a player
-// ZTM: TODO: Look at G_MoverPush
-qboolean G_PlayerPushEntity(gentity_t *self, gentity_t *other) {
+#if 0 //#ifdef TA_ENTSYS // PUSHABLE
+/*
+============
+G_PlayerPush
 
-	if ( /*self->s.eType != ET_ITEM && self->s.eType != ET_PLAYER && */
-//#ifdef TA_ENTSYS // PUSHABLE
-		!(self->flags & FL_PUSHABLE) &&
-//#endif
-#ifdef TA_NPCSYS
-		self->s.eType != ET_NPC &&
-#endif
-		!self->physicsObject ) {
-		return qfalse;
-	}
+Objects need to be moved back on a failed push,
+otherwise riders would continue to slide.
+If qfalse is returned, *obstacle will be the blocking entity
+============
+*/
+qboolean G_PlayerPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obstacle ) {
+	int			i, e;
+	gentity_t	*check;
+	vec3_t		mins, maxs;
+	pushed_t	*p;
+	int			entityList[MAX_GENTITIES];
+	int			listedEntities;
+	vec3_t		totalMins, totalMaxs;
 
-	// If object is heavy must have strength to push it.
-	if ((self->flags & FL_HEAVY) && (!other->client || other->client->pers.playercfg.ability != ABILITY_STRENGTH)) {
-		return qfalse;
-	}
+	*obstacle = NULL;
 
-	if (self->s.solid == SOLID_BMODEL) {
-		// ZTM: TODO: Support pushing brushes
-		return qfalse;
+	pushed_p = pushed;
+
+	// mins/maxs are the bounds at the destination
+	// totalMins / totalMaxs are the bounds for the entire move
+	if ( pusher->r.currentAngles[0] || pusher->r.currentAngles[1] || pusher->r.currentAngles[2]
+		|| amove[0] || amove[1] || amove[2] ) {
+		float		radius;
+
+		radius = RadiusFromBounds( pusher->r.mins, pusher->r.maxs );
+		for ( i = 0 ; i < 3 ; i++ ) {
+			mins[i] = pusher->r.currentOrigin[i] + move[i] - radius;
+			maxs[i] = pusher->r.currentOrigin[i] + move[i] + radius;
+			totalMins[i] = mins[i] - move[i];
+			totalMaxs[i] = maxs[i] - move[i];
+		}
 	} else {
-		// ZTM: TODO: Push entity if not standing on it.
+		for (i=0 ; i<3 ; i++) {
+			mins[i] = pusher->r.absmin[i] + move[i];
+			maxs[i] = pusher->r.absmax[i] + move[i];
+		}
+
+		VectorCopy( pusher->r.absmin, totalMins );
+		VectorCopy( pusher->r.absmax, totalMaxs );
+		for (i=0 ; i<3 ; i++) {
+			if ( move[i] > 0 ) {
+				totalMaxs[i] += move[i];
+			} else {
+				totalMins[i] += move[i];
+			}
+		}
+	}
+
+	// unlink the pusher so we don't get it in the entityList
+	trap_UnlinkEntity( pusher );
+
+	listedEntities = trap_EntitiesInBox( totalMins, totalMaxs, entityList, MAX_GENTITIES );
+
+	// move the pusher to its final position
+	VectorAdd( pusher->r.currentOrigin, move, pusher->r.currentOrigin );
+	VectorAdd( pusher->r.currentAngles, amove, pusher->r.currentAngles );
+	trap_LinkEntity( pusher );
+
+	// see if any solid entities are inside the final position
+	for ( e = 0 ; e < listedEntities ; e++ ) {
+		check = &g_entities[ entityList[ e ] ];
+
+		// only push the pushable objects
+		if (!(check->flags & FL_PUSHABLE) &&
+#ifdef TA_NPCSYS
+			check->s.eType != ET_NPC &&
+#endif
+			!check->physicsObject ) {
+			continue;
+		}
+
+		// if object is heavy must have strength to push it
+		if ((check->flags & FL_HEAVY) && (!pusher->client || pusher->client->pers.playercfg.ability != ABILITY_STRENGTH)) {
+			continue;
+		}
+
+		// if the entity is standing on the pusher, it will definitely be moved
+		if ( check->s.groundEntityNum != pusher->s.number ) {
+			// see if the ent needs to be tested
+			if ( check->r.absmin[0] >= maxs[0]
+			|| check->r.absmin[1] >= maxs[1]
+			|| check->r.absmin[2] >= maxs[2]
+			|| check->r.absmax[0] <= mins[0]
+			|| check->r.absmax[1] <= mins[1]
+			|| check->r.absmax[2] <= mins[2] ) {
+				continue;
+			}
+			// see if the ent's bbox is inside the pusher's final position
+			// this does allow a fast moving object to pass through a thin entity...
+			if (!G_TestEntityPosition (check)) {
+				continue;
+			}
+		}
+
+		// the entity needs to be pushed
+		if ( G_TryPushingEntity( check, pusher, move, amove ) ) {
+			continue;
+		}
+
+		// the move was blocked an entity
+
+		// move back any entities we already moved
+		// go backwards, so if the same entity was pushed
+		// twice, it goes back to the original position
+		for ( p=pushed_p-1 ; p>=pushed ; p-- ) {
+			VectorCopy (p->origin, p->ent->s.pos.trBase);
+			VectorCopy (p->angles, p->ent->s.apos.trBase);
+			if ( p->ent->client ) {
+				p->ent->client->ps.delta_angles[YAW] = p->deltayaw;
+				VectorCopy (p->origin, p->ent->client->ps.origin);
+			}
+			trap_LinkEntity (p->ent);
+		}
+
+		// save off the obstacle so we can call the block function (crush, etc)
+		*obstacle = check;
 		return qfalse;
 	}
+
+	return qtrue;
 }
 #endif
 
@@ -2315,30 +2412,7 @@ void VoodooTouch(gentity_t *self, gentity_t *other, trace_t *trace)
 {
 	if (self->target_ent) {
 		if (self->target_ent->touch) {
-#if 0 // ZTM: TODO: Make voodoo bush move...
-			vec3_t start;
-
-			VectorCopy(self->target_ent->s.origin, start);
-
 			self->target_ent->touch(self->target_ent, other, trace);
-
-			if (!(self->spawnflags & VOODOO_STAY_SOLID) && self->target_ent->flags & FL_PUSHABLE) {
-				vec3_t move;
-
-				VectorSubtract(start, self->target_ent->s.origin, move);
-				VectorAdd(self->s.pos.trBase, move, self->r.currentOrigin);
-
-				VectorCopy(self->r.currentOrigin, self->s.origin);
-				VectorCopy(self->r.currentOrigin, self->s.pos.trBase);
-				trap_LinkEntity (self);
-			}
-#else
-#ifdef TA_ENTSYS // PUSHABLE
-			G_PlayerPushEntity(self->target_ent, other);
-#endif
-
-			self->target_ent->touch(self->target_ent, other, trace);
-#endif
 		}
 	} else {
 		gentity_t *ent = NULL;
@@ -2348,10 +2422,6 @@ void VoodooTouch(gentity_t *self, gentity_t *other, trace_t *trace)
 			ent = G_Find (ent, FOFS(targetname), self->target);
 			if (!ent)
 				break;
-
-#ifdef TA_ENTSYS // PUSHABLE
-			G_PlayerPushEntity(ent, other);
-#endif
 
 			if (ent->touch) {
 				ent->touch(ent, other, trace);

@@ -335,7 +335,7 @@ struct gclient_s {
 	int			latched_buttons;
 
 	vec3_t		oldOrigin;
-#if 0 //#ifdef TURTLEARENA // TEST: push players
+#if 0 //#ifdef TA_ENTSYS // PUSHABLE
 	float		oldYaw;
 #endif
 
@@ -710,7 +710,7 @@ void Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace );
 qboolean G_SeenByHumans( gentity_t *ent );
 #endif
 #ifdef TA_ENTSYS // PUSHABLE
-qboolean G_PlayerPushEntity(gentity_t *self, gentity_t *other);
+qboolean G_PlayerPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obstacle );
 #endif
 
 //
