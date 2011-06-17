@@ -280,13 +280,37 @@ endif
 #
 # Create source code tarball
 #
-dist:
+engine-dist:
 	$(MAKE) -C engine dist BUILD_FINAL=$(BUILD_FINAL)
 	$(Q)mkdir -p $(INSTALLDIR)/tarball
-	$(Q)mv engine/*.tar.bz2 $(INSTALLDIR)/tarball
+	$(Q)mv engine/*.tar.bz2 $(INSTALLDIR)/engine-tarball
+
+engine-dist-clean:
+	$(Q)rm -rf $(INSTALLDIR)/engine-tarball/
+
+
+#
+# Create source tarball
+#
+# Does not include base directory as data is in base/assets.pk3
+#   uses a lot less space this way.
+dist:
+	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src
+	$(Q)svn export . $(INSTALLDIR)/$(ZIPNAME)-src
+	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src/base
+	$(Q)tar -C $(INSTALLDIR) --owner=root --group=root --force-local -cjf $(INSTALLDIR)/$(ZIPNAME)-src.tar.bz2 $(ZIPNAME)-src
+	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src
+
+# Includes base data directory.
+distdata:
+	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src
+	$(Q)svn export . $(INSTALLDIR)/$(ZIPNAME)-src
+	$(Q)tar -C $(INSTALLDIR) --owner=root --group=root --force-local -cjf $(INSTALLDIR)/$(ZIPNAME)-src.tar.bz2 $(ZIPNAME)-src
+	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src
 
 dist-clean:
-	$(Q)rm -rf $(INSTALLDIR)/tarball/
+	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src/
+	$(Q)rm -f $(INSTALLDIR)/$(ZIPNAME)-src.tar.bz2
 
 
 #
