@@ -200,6 +200,7 @@ typedef enum {
 	K_3JOY30,
 	K_3JOY31,
 	K_3JOY32,
+
 	K_4JOY1,
 	K_4JOY2,
 	K_4JOY3,
