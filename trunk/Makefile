@@ -231,7 +231,7 @@ zip-clean:
 # Create win32 NSIS installer
 #
 nsis: assets
-	$(MINGWMAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
+	$(MINGWMAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
 	$(MINGWMAKE) -C engine/misc/nsis ASSETPATH="$(CURDIR)/$(DATADIR)/base/" --jobs=$(JOBS)
 	$(MINGWMAKE) -C engine/misc/nsis install INSTALLDIR="$(CURDIR)/$(INSTALLDIR)/nsis" --jobs=$(JOBS)
 
@@ -246,7 +246,7 @@ loki: assets
 ifeq ($(PLATFORM),mingw32)
 	@echo "Loki setup creation is not supported on this platform."
 else
-	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
+	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
 ifeq ($(ARCH),x86_64)
 	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
 endif
