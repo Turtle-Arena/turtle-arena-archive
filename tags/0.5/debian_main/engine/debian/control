@@ -1,0 +1,26 @@
+Source: turtlearena
+Section: games
+Priority: optional
+Maintainer: Zack "ZTurtleMan" Middleton <ZTurtleMan@gmail.com>
+Uploaders: Zack "ZTurtleMan" Middleton <ZTurtleMan@gmail.com>
+Build-Depends: debhelper (>= 5.0.51), libsdl1.2-dev, libopenal-dev, imagemagick, libcurl4-gnutls-dev, libvorbis-dev, libtheora-dev, libspeexdsp-dev
+Standards-Version: 3.8.3
+Homepage: http://turtlearena.googlecode.com/
+
+Package: turtlearena
+Architecture: any
+Depends: ${shlibs:Depends}, turtlearena-data (>= ${source:Upstream-Version})
+Description: 3D Third-Person Arena Combat Game
+ Turtle Arena is an free and open source third person action game based on
+ ioquake3. It is a free stand-alone game.
+ .
+ This package installs the Turtle Arena client.
+
+Package: turtlearena-server
+Architecture: any
+Depends: ${shlibs:Depends}, turtlearena-data (>= ${source:Upstream-Version})
+Description: Dedicated server for Turtle Arena
+ Turtle Arena is an free and open source third person action game based on
+ ioquake3. It is a free stand-alone game.
+ .
+ This package installs the Turtle Arena dedicated server.
