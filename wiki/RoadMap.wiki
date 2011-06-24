@@ -4,8 +4,7 @@
 = Roadmap =
 Work-in-progress plans for future Turtle Arena releases.
 
-== 0.2 series ==
-=== 0.2 (Completed) ===
+== 0.2 (Completed) ==
 First stable playable release.
 
   * Standalone from Quake III: Arena
@@ -17,66 +16,77 @@ First stable playable release.
   * Shurikens (holdable items)
   * Maps for all gametypes
 
-== 0.4 series ==
-=== 0.4.0 (Completed) ===
+== 0.4.0 (Completed) ==
   * Fixed bugs from 0.2
   * Added music
   * Readded player effect colors
     * Readded to ui and q3_ui
   * Reduced overall number of TODOs and FIXMEs in the source
 
-=== 0.4.1 (Completed) ===
+== 0.4.1 (Completed) ==
   * Bug fix release
 
-=== 0.4.2 (Completed) ===
+== 0.4.2 (Completed) ==
   * Bug fix release
 
-== 0.6 series ==
-0.6 series focuses on players, map themes, and multiplayer maps. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game. Comparable to TMNT: Mutant Melee and TMNT Smash-up in someways. The plan is to have development releases leading up to the completed 0.6 release.
+== 0.5 series ==
+The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with more often releases.
 
-=== 0.5.0 ===
+=== 0.5.0 (Completed) ===
   * DONE: Four player splitscreen.
   * DONE: Allow server public (internet) status to be changed anytime.
   * DONE: Allow non-dedicated internet servers.
-  * Finished '2D mode' path system for players
-  * Single camera mode for '2D maps' (set "2dmode" "1" in worldspawn to focus on local players), like the camera in Super Smash Bros. and TMNT Smash-up
 
 === 0.5.1 ===
-  * Finish '2D mode'
-    * Draw HUDs for all local players.
-    * Focus on all local players (or all players in level depending on map settings).
-  * Finish breakable/pushable objects and brushes code
-  * (Haven't decided other goals, see 0.5.x for ideas)
+  * Decide what format player models should be and make it doable if not already.
+    * IQM? Multiple models or single with xreal-based skeleton animation blending?
+  * (more undecided things from 0.6 plans)
 
-=== 0.5.x ===
-Haven't decide what order these will be done in, but hopefully they will all get done for the 0.6 release.
+== 0.6 ==
+Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve other legality concerns.
 
-=== Undecided ===
-  * Create new original players, remove current Ninja Turtle ones.
+  * Rename the game (to hopefully its final name)
+  * Create new logo
+  * Create new icon, menu background, and loading screen?
 
-==== Likely ====
+  * 0.5.1: Decide what format player models should be and make it doable if not already.
+  * Remove the current players, replace with new characters designed for the game.
+  * Add weapons for new players if needed.
+  * Replace teams (names and icons), currently Katanas and Sais. Should per-team skins be added, or just stick with blue/red?
+
+  * Clean up / rewrite shaders (do not have clear licensing for them)
+  * Replace remaining OpenArena images and sounds.
+
+  * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution. (Many are already 2x or 4x quake3 resolution.)
+  * Remake all (non-texture) images that do not have a svg source file?
+  * Finish breakable/pushable objects and brushes code.
+  * Switch to missionpack ui?
+
+  * DONE: Four player splitscreen.
+
+== 0.8 ==
+Focus on map themes and multiplayer maps. Goal is the develop assets/skills for single player. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game, comparable to commercial games.
+
   * Create scenery objects and brushes
   * Map Themes (Sets of textures, sky, models, misc_objects, and music)
   * New multiplayer maps using the new map themes
 
-  * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution. (Many are already 2x or 4x quake3 resolution.)
+  * Finish '2D mode'
+    * Finish Path system for players
+    * Single camera mode for '2D maps' (set "2dmode" "1" in worldspawn to focus on local players), like the camera in Super Smash Bros. and TMNT Smash-up
+      * Draw HUDs for all local players.
+      * Focus on all local players (or all players in level depending on map settings).
 
-==== Unlikely ====
-  * Have player models be MDR (Finish Maverick Model 3D MDR exporting)
-  * Multiple levels of detail for players and other models
-    * (Add a LOD converter to Maverick Model 3D?)
-
-== 0.8 series ==
-Focus on Single Player / Co-op.
+== 1.0 ==
+Complete the majority of the Single Player / Co-op code and have it playable.
 
   * Enemies for Single Player
-  * Single Player Maps
+  * Single Player Maps (at least one stage would be good)
   * Per-stage gimmicks
   * Save game system
   * Player Abilities
   * Remake UI with missionpack ui scripting?
 
-== 1.0 series ==
-  * Single Player improvements
+== 1.2 ==
+  * Expand Single Player / Co-op
   * Multiplayer improvements
-  * Polish overall game?
