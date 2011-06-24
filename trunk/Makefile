@@ -44,8 +44,20 @@ ifndef DATADIR
 DATADIR=install
 endif
 
-ifndef ZIPNAME
-ZIPNAME=turtlearena-0.5.0
+# These currently only effect zip/full-source name
+ifndef GAMENAME
+GAMENAME=turtlearena
+endif
+ifndef VERSION
+VERSION=0.5.0
+endif
+ifndef RELEASE
+RELEASE=0
+endif
+
+# Used for zip directory name and full source archive name
+ifndef NAME
+NAME=$(GAMENAME)-$(VERSION)-$(RELEASE)
 endif
 
 #############################################################################
@@ -200,31 +212,31 @@ $(DATADIR)/base/assets2-music.pk3:
 # Create portable zip for win32 and linux32/64
 #
 zip: assets
-	$(Q)mkdir -p $(INSTALLDIR)/$(ZIPNAME)/base/
-	$(Q)cp $(INSTALLDIR)/base/*.pk3 $(INSTALLDIR)/$(ZIPNAME)/base/
-	$(Q)cp INSTALLER_README.txt $(INSTALLDIR)/$(ZIPNAME)/README.txt
-	$(Q)cp GPL-2.txt $(INSTALLDIR)/$(ZIPNAME)/
-	$(Q)cp CC-BY-SA-3.0.txt $(INSTALLDIR)/$(ZIPNAME)/
-	$(Q)cp COPYRIGHTS.txt $(INSTALLDIR)/$(ZIPNAME)/
-	$(Q)cp CREDITS.txt $(INSTALLDIR)/$(ZIPNAME)/
-	$(Q)todos $(INSTALLDIR)/$(ZIPNAME)/*.txt
-	$(Q)mkdir -p $(INSTALLDIR)/$(ZIPNAME)/settings
-	$(Q)echo "yes" > $(INSTALLDIR)/$(ZIPNAME)/settings/portable
+	$(Q)mkdir -p $(INSTALLDIR)/$(NAME)/base/
+	$(Q)cp $(INSTALLDIR)/base/*.pk3 $(INSTALLDIR)/$(NAME)/base/
+	$(Q)cp INSTALLER_README.txt $(INSTALLDIR)/$(NAME)/README.txt
+	$(Q)cp GPL-2.txt $(INSTALLDIR)/$(NAME)/
+	$(Q)cp CC-BY-SA-3.0.txt $(INSTALLDIR)/$(NAME)/
+	$(Q)cp COPYRIGHTS.txt $(INSTALLDIR)/$(NAME)/
+	$(Q)cp CREDITS.txt $(INSTALLDIR)/$(NAME)/
+	$(Q)todos $(INSTALLDIR)/$(NAME)/*.txt
+	$(Q)mkdir -p $(INSTALLDIR)/$(NAME)/settings
+	$(Q)echo "yes" > $(INSTALLDIR)/$(NAME)/settings/portable
 	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
-	$(MAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
-	$(Q)cp engine/misc/nsis/*.dll $(INSTALLDIR)/$(ZIPNAME)/
+	$(MAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(NAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
+	$(Q)cp engine/misc/nsis/*.dll $(INSTALLDIR)/$(NAME)/
 ifneq ($(PLATFORM),mingw32)
 ifeq ($(ARCH),x86_64)
 	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
-	$(MAKE) -C engine ARCH=i386 copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
+	$(MAKE) -C engine ARCH=i386 copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(NAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
 endif
 	$(MINGWMAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
-	$(MINGWMAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(ZIPNAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
-	$(Q)cp extras/turtlearena.sh $(INSTALLDIR)/$(ZIPNAME)/
+	$(MINGWMAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(NAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
+	$(Q)cp extras/turtlearena.sh $(INSTALLDIR)/$(NAME)/
 endif
 
 zip-clean:
-	$(Q)rm -fr $(INSTALLDIR)/$(ZIPNAME)
+	$(Q)rm -fr $(INSTALLDIR)/$(NAME)
 
 
 #
@@ -248,9 +260,11 @@ ifeq ($(PLATFORM),mingw32)
 else
 	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
 ifeq ($(ARCH),x86_64)
-	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) --jobs=$(JOBS)
+	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
 endif
 	$(MAKE) -C engine/misc/setup --jobs=$(JOBS)
+	$(Q)mkdir -p $(INSTALLDIR)/loki/
+	$(Q)mv engine/misc/setup/*.run $(INSTALLDIR)/loki/
 endif
 
 loki-clean:
@@ -269,7 +283,7 @@ deb: assets
 ifeq ($(PLATFORM),mingw32)
 	@echo "Debian/Ubuntu package creation is not supported on this platform."
 else
-	exec package-deb.sh --installdir $(INSTALLDIR) --datadir $(DATADIR)
+	exec ./package-deb.sh --installdir $(INSTALLDIR) --datadir $(DATADIR) $(DEBARGS)
 endif
 
 deb-clean:
@@ -298,22 +312,22 @@ engine-dist-clean:
 # Does not include base directory as data is in base/assets.pk3
 #   uses a lot less space this way.
 dist:
-	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src
-	$(Q)svn export . $(INSTALLDIR)/$(ZIPNAME)-src
-	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src/base
-	$(Q)tar -C $(INSTALLDIR) --owner=root --group=root --force-local -cjf $(INSTALLDIR)/$(ZIPNAME)-src.tar.bz2 $(ZIPNAME)-src
-	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src
+	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src
+	$(Q)svn export . $(INSTALLDIR)/$(NAME)-src
+	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src/base
+	$(Q)tar -C $(INSTALLDIR) --owner=root --group=root --force-local -cjf $(INSTALLDIR)/$(NAME)-src.tar.bz2 $(NAME)-src
+	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src
 
 # Includes base data directory.
 distdata:
-	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src
-	$(Q)svn export . $(INSTALLDIR)/$(ZIPNAME)-src
-	$(Q)tar -C $(INSTALLDIR) --owner=root --group=root --force-local -cjf $(INSTALLDIR)/$(ZIPNAME)-src.tar.bz2 $(ZIPNAME)-src
-	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src
+	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src
+	$(Q)svn export . $(INSTALLDIR)/$(NAME)-src
+	$(Q)tar -C $(INSTALLDIR) --owner=root --group=root --force-local -cjf $(INSTALLDIR)/$(NAME)-src.tar.bz2 $(NAME)-src
+	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src
 
 dist-clean:
-	$(Q)rm -rf $(INSTALLDIR)/$(ZIPNAME)-src/
-	$(Q)rm -f $(INSTALLDIR)/$(ZIPNAME)-src.tar.bz2
+	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src/
+	$(Q)rm -f $(INSTALLDIR)/$(NAME)-src.tar.bz2
 
 
 #

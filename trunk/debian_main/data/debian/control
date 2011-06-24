@@ -10,7 +10,7 @@ Homepage: http://turtlearena.googlecode.com/
 Package: turtlearena-data
 Architecture: all
 Depends: ${misc:Depends}
-Recommends: turtlearena (>= ${source:Upstream-Version}) | turtlearena-server (>= ${source:Upstream-Version})
+Recommends: turtlearena (>= ENGINE_VERSION) | turtlearena-server (>= ENGINE_VERSION)
 Description: Turtle Arena data files
  Turtle Arena is an free and open source third person action game based on
  ioquake3. It is a free stand-alone game.
