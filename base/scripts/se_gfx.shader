@@ -329,13 +329,12 @@ gfx/misc/tracer
 {
 	cull disable
 	{
-		map gfx/misc/tracer2.jpg
+		map gfx/misc/tracer2.png
 		blendfunc add
 		//blendFunc GL_ONE GL_ONE
 	}
 }
 
-// ZTM: Used by unfinished WP_GUN
 gfx/damage/bullet_mrk
 {
 	polygonoffset
