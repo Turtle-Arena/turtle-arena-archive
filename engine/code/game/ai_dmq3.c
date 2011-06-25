@@ -1833,7 +1833,7 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 }
 
 #if 0 // #ifdef TA_WEAPSYS
-// Find out if a bot has a weapon using its name (Example: "wp_rocket_launcher"
+// Find out if a bot has a weapon using its name (Example: "wp_rocket_launcher")
 int BotInventoryWeapon(bot_state_t *bs, const char *weaponGroup)
 {
 	int w;

@@ -1781,10 +1781,10 @@ int BotInitLibrary(void) {
 	if (strlen(buf)) trap_BotLibVarSet("homedir", buf);
 	//
 #ifdef TA_WEAPSYS // Use correct index
-	trap_BotLibVarSet("weapindex_rocket", va("%i", BG_WeaponGroupIndexForName("wp_rocket_launcher")));
+	trap_BotLibVarSet("weapindex_rocketlauncher", va("%i", BG_WeaponGroupIndexForName("wp_rocket_launcher")));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", BG_WeaponGroupIndexForName("wp_grappling_hook")));
 #elif defined IOQ3ZTM // ZTM: Always sure these are correct...
-	trap_BotLibVarSet("weapindex_rocket", va("%i", WP_ROCKET_LAUNCHER));
+	trap_BotLibVarSet("weapindex_rocketlauncher", va("%i", WP_ROCKET_LAUNCHER));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", WP_GRAPPLING_HOOK));
 #endif
 #ifdef TURTLEARENA
