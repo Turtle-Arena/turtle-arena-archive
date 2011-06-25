@@ -677,13 +677,23 @@ CG_ExplosionEffect
 void CG_ExplosionEffect(vec3_t origin, int radius, int entity)
 {
 	qhandle_t		mod;
+	qhandle_t		shader;
+	qboolean		isSprite;
 	sfxHandle_t		sfx;
 	int				duration;
 	vec3_t			lightColor;
 	vec3_t			dir;
 	localEntity_t	*le;
 
+#ifdef TA_DATA
 	mod = cgs.media.smokeModel;
+	shader = 0;
+	isSprite = qfalse;
+#else
+	mod = cgs.media.dishFlashModel;
+	shader = cgs.media.rocketExplosionShader;
+	isSprite = qtrue;
+#endif
 	sfx = cgs.media.sfx_rockexp;
 	duration = 1250;
 	VectorSet( lightColor, 1, 0.75f, 0 );
@@ -697,7 +707,7 @@ void CG_ExplosionEffect(vec3_t origin, int radius, int entity)
 	// create the explosion
 	//
 	if ( mod ) {
-		le = CG_MakeExplosion( origin, dir, mod, 0, duration, qfalse );
+		le = CG_MakeExplosion( origin, dir, mod, shader, duration, isSprite );
 		le->light = radius;
 		VectorCopy( lightColor, le->lightColor );
 

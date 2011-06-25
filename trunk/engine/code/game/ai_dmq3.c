@@ -4196,7 +4196,11 @@ void BotCheckAttack(bot_state_t *bs) {
 	VectorSubtract(bs->aimtarget, bs->eye, dir);
 	//
 #ifdef TA_WEAPSYS
-	if (!useHoldable && BG_WeaponHasMelee(bs->cur_ps.weapon))
+	if (
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+		!useHoldable &&
+#endif
+		BG_WeaponHasMelee(bs->cur_ps.weapon))
 #else
 	if (bs->weaponnum == WP_GAUNTLET)
 #endif

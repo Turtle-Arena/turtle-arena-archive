@@ -5,8 +5,6 @@
 
 = engine =
 == Weapons (and attacking) ==
-  * IOQ3ZTM: TODO: Support IMPRESSIVE awards in non-TURTLEARENA TA_WEAPSYS
-
   * TODO: Add a option to weapon group info to hold a weapon upside-down? (affect rendering and damaging)
 
   * TODO: Add attack movement flags? Stop, cut speed in half, double speed, turn right?, etc.
