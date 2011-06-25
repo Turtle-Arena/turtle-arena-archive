@@ -71,9 +71,6 @@
 
   * TODO: Add misc_dripper entity.
 
-== Code Cleanup ==
-  * TODO: Use or remove BotInventoryWeapon and BotInventoryAmmo?
-
 == Bots ==
   * TODO: Support bots using func_use (use via holdable item button)
 
