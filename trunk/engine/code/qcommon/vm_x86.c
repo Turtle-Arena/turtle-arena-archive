@@ -413,7 +413,8 @@ static void DoSyscall(void)
 
 	vm_t *savedVM;
 
-#if defined(_MSC_VER) && !idx64
+#if defined(_MSC_VER)
+  #if !idx64
 	__asm
 	{
 		mov	dword ptr syscallNum, eax
@@ -422,6 +423,7 @@ static void DoSyscall(void)
 		mov	dword ptr opStackBase, edi
 		mov	dword ptr arg, ecx
 	}
+  #endif
 #else
 	__asm__ volatile(
 		""
@@ -429,6 +431,11 @@ static void DoSyscall(void)
 		  "=c" (arg)
 		);
 #endif
+
+	// save currentVM so as to allow for recursive VM entry
+	savedVM = currentVM;
+	// modify VM stack pointer for recursive VM entry
+	currentVM->programStack = programStack - 4;
 
 	if(syscallNum < 0)
 	{
@@ -438,12 +445,7 @@ static void DoSyscall(void)
 		intptr_t args[11];
 #endif
 		
-		// save currentVM so as to allow for recursive VM entry
-		savedVM = currentVM;
 		data = (int *) (savedVM->dataBase + programStack + 4);
-
-		// modify VM stack pointer for recursive VM entry
-		savedVM->programStack = programStack - 4;
 
 #if idx64
 		args[0] = ~syscallNum;
@@ -455,8 +457,6 @@ static void DoSyscall(void)
 		data[0] = ~syscallNum;
 		opStackBase[opStackOfs + 1] = savedVM->systemCall(data);
 #endif
-
-		currentVM = savedVM;
 	}
 	else
 	{
@@ -476,6 +476,8 @@ static void DoSyscall(void)
 		break;
 		}
 	}
+
+	currentVM = savedVM;
 }
 
 /*

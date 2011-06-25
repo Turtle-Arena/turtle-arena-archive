@@ -127,10 +127,10 @@ cvar_t	*cl_thirdPersonAnalog;
 #endif
 
 #if idx64
-  void (*Q_VMftol)(void);
+	int (*Q_VMftol)(void);
 #elif id386
 	long (QDECL *Q_ftol)(float f);
-	void (QDECL *Q_VMftol)(void);
+	int (QDECL *Q_VMftol)(void);
 	void (QDECL *Q_SnapVector)(vec3_t vec);
 #endif
 
@@ -384,7 +384,7 @@ void QDECL Com_Error( int code, const char *fmt, ... ) {
 #endif
 	} else {
 		VM_Forced_Unload_Start();
-		CL_Shutdown (va("Client fatal crashed: %s", com_errorMessage));
+		CL_Shutdown (va("Client fatal crashed: %s", com_errorMessage), qtrue);
 		SV_Shutdown (va("Server fatal crashed: %s", com_errorMessage));
 		VM_Forced_Unload_Done();
 	}
@@ -408,8 +408,14 @@ void Com_Quit_f( void ) {
 	// don't try to shutdown if we are in a recursive error
 	char *p = Cmd_Args( );
 	if ( !com_errorEntered ) {
+		// Some VMs might execute "quit" command directly,
+		// which would trigger an unload of active VM error.
+		// Sys_Quit will kill this process anyways, so
+		// a corrupt call stack makes no difference
+		VM_Forced_Unload_Start();
 		SV_Shutdown (p[0] ? p : "Server quit");
-		CL_Shutdown (p[0] ? p : "Client quit");
+		CL_Shutdown (p[0] ? p : "Client quit", qtrue);
+		VM_Forced_Unload_Done();
 		Com_Shutdown ();
 		FS_Shutdown(qtrue);
 	}
@@ -521,7 +527,7 @@ void Com_StartupVariable( const char *match ) {
 			if(Cvar_Flags(s) == CVAR_NONEXISTENT)
 				Cvar_Get(s, Cmd_Argv(2), CVAR_USER_CREATED);
 			else
-				Cvar_Set(s, Cmd_Argv(2));
+				Cvar_Set2(s, Cmd_Argv(2), qfalse);
 		}
 	}
 }
@@ -2449,22 +2455,27 @@ Change to a new mod properly with cleaning up cvars before switching.
 ==================
 */
 
-void Com_GameRestart(int checksumFeed, qboolean clientRestart)
+void Com_GameRestart(int checksumFeed, qboolean disconnect)
 {
 	// make sure no recursion can be triggered
 	if(!com_gameRestarting && com_fullyInitialized)
 	{
-		com_gameRestarting = qtrue;
+		int clWasRunning;
 		
-		if(clientRestart)
-		{
-			CL_Disconnect(qfalse);
-			CL_ShutdownAll();
-		}
-
+		com_gameRestarting = qtrue;
+		clWasRunning = com_cl_running->integer;
+		
 		// Kill server if we have one
 		if(com_sv_running->integer)
 			SV_Shutdown("Game directory changed");
+
+		if(clWasRunning)
+		{
+			if(disconnect)
+				CL_Disconnect(qfalse);
+				
+			CL_Shutdown("Game directory changed", disconnect);
+		}
 
 		FS_Restart(checksumFeed);
 	
@@ -2472,11 +2483,19 @@ void Com_GameRestart(int checksumFeed, qboolean clientRestart)
 		Cvar_Restart(qtrue);
 		Com_ExecuteCfg();
 
-		// shut down sound system before restart
-		CL_Snd_Shutdown();
-		
-		if(clientRestart)
+		if(disconnect)
+		{
+			// We don't want to change any network settings if gamedir
+			// change was triggered by a connect to server because the
+			// new network settings might make the connection fail.
+			NET_Restart_f();
+		}
+
+		if(clWasRunning)
+		{
+			CL_Init();
 			CL_StartHunkUsers(qfalse);
+		}
 		
 		com_gameRestarting = qfalse;
 	}
@@ -2492,7 +2511,16 @@ Expose possibility to change current running mod to the user
 
 void Com_GameRestart_f(void)
 {
-	Cvar_Set("fs_game", Cmd_Argv(1));
+	if(!FS_FilenameCompare(Cmd_Argv(1), com_basegame->string))
+	{
+		// This is the standard base game. Servers and clients should
+		// use "" and not the standard basegame name because this messes
+		// up pak file negotiation and lots of other stuff
+		
+		Cvar_Set("fs_game", "");
+	}
+	else
+		Cvar_Set("fs_game", Cmd_Argv(1));
 
 	Com_GameRestart(0, qtrue);
 }
@@ -2760,7 +2788,6 @@ void Com_Init( char *commandLine ) {
 	if(!com_basegame->string[0])
 		Cvar_ForceReset("com_basegame");
 
-	// Com_StartupVariable(
 	FS_InitFilesystem ();
 
 	Com_InitJournaling();
@@ -2843,6 +2870,7 @@ void Com_Init( char *commandLine ) {
 	com_maxfpsMinimized = Cvar_Get( "com_maxfpsMinimized", "0", CVAR_ARCHIVE );
 	com_abnormalExit = Cvar_Get( "com_abnormalExit", "0", CVAR_ROM );
 	com_busyWait = Cvar_Get("com_busyWait", "0", CVAR_ARCHIVE);
+	Cvar_Get("com_errorMessage", "", CVAR_ROM | CVAR_NORESTART);
 
 	com_introPlayed = Cvar_Get( "com_introplayed", "0", CVAR_ARCHIVE);
 

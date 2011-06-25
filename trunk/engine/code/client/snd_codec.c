@@ -206,7 +206,7 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	if(!hnd)
 	{
 #ifndef IOQ3ZTM
-		Com_Printf("Can't read sound file %s\n", filename);
+		Com_DPrintf("Can't read sound file %s\n", filename);
 #endif
 		return NULL;
 	}

@@ -4265,9 +4265,12 @@ void FS_InitFilesystem( void ) {
 	// we have to specially handle this, because normal command
 	// line variable sets don't happen until after the filesystem
 	// has already been initialized
-	Com_StartupVariable( "fs_basepath" );
-	Com_StartupVariable( "fs_homepath" );
-	Com_StartupVariable( "fs_game" );
+	Com_StartupVariable("fs_basepath");
+	Com_StartupVariable("fs_homepath");
+	Com_StartupVariable("fs_game");
+
+	if(!FS_FilenameCompare(Cvar_VariableString("fs_game"), com_basegame->string))
+		Cvar_Set("fs_game", "");
 
 	// try to start up normally
 	FS_Startup(com_basegame->string);
@@ -4356,19 +4359,16 @@ FS_ConditionalRestart
 restart if necessary
 =================
 */
-qboolean FS_ConditionalRestart(int checksumFeed)
+qboolean FS_ConditionalRestart(int checksumFeed, qboolean disconnect)
 {
 	if(fs_gamedirvar->modified)
 	{
-		Com_GameRestart(checksumFeed, qfalse);
+		Com_GameRestart(checksumFeed, disconnect);
 		return qtrue;
 	}
 
 	else if(checksumFeed != fs_checksumFeed)
-	{
 		FS_Restart(checksumFeed);
-		return qtrue;
-	}
 	
 	return qfalse;
 }
