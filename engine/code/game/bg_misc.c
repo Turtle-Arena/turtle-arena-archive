@@ -1509,6 +1509,9 @@ strAnimationDef_t playerAnimationDefs[] = {
 	ANIMDEF(BOTH_LADDER_STAND),
 	ANIMDEF(BOTH_LADDER_UP),
 	ANIMDEF(BOTH_LADDER_DOWN),
+
+	ANIMDEF(LEGS_JUMPB_LOCKON),
+	ANIMDEF(LEGS_LANDB_LOCKON),
 #endif
 
 	// Quake3, not loaded from file
@@ -5548,6 +5551,17 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 		case BOTH_LADDER_DOWN:
 			anim[0] = BOTH_LADDER_UP;
 			reversed = qtrue;
+			break;
+
+		case LEGS_JUMPB_LOCKON:
+			anim[0] = LEGS_JUMPB;
+			anim[1] = LEGS_JUMP;
+			anim[2] = LEGS_IDLE;
+			break;
+		case LEGS_LANDB_LOCKON:
+			anim[0] = LEGS_LANDB;
+			anim[1] = LEGS_LAND;
+			anim[2] = LEGS_IDLE;
 			break;
 #endif
 	}
