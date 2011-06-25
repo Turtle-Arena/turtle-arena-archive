@@ -182,7 +182,13 @@ static cvarTable_t		gameCvarTable[] = {
 #else
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue  },
 #endif
+#ifdef TURTLEARENA
+	{ &g_weaponRespawn, "g_weaponRespawn", "15", 0, 0, qtrue  },
+#elif defined IOQ3ZTM // IOQ3BUGFIX: Cvar case change.
+	{ &g_weaponRespawn, "g_weaponRespawn", "5", 0, 0, qtrue  },
+#else
 	{ &g_weaponRespawn, "g_weaponrespawn", "5", 0, 0, qtrue  },
+#endif
 	{ &g_weaponTeamRespawn, "g_weaponTeamRespawn", "30", 0, 0, qtrue },
 	{ &g_forcerespawn, "g_forcerespawn", "20", 0, 0, qtrue },
 	{ &g_inactivity, "g_inactivity", "0", 0, 0, qtrue },
