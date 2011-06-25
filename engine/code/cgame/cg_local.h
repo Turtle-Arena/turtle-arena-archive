@@ -1780,6 +1780,8 @@ void CG_3ZoomDown_f( void );
 void CG_3ZoomUp_f( void );
 void CG_4ZoomDown_f( void );
 void CG_4ZoomUp_f( void );
+void CG_ZoomUp( int localClient );
+void CG_ZoomDown( int localClient );
 #endif
 #endif
 void CG_AddBufferedSound( sfxHandle_t sfx);

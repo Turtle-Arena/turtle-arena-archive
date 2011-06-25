@@ -450,8 +450,9 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			int			i, passent;
 			int			unlinked;
 			gentity_t	*unlinkedEntities[10];
+			int			hits;
 
-			unlinked = 0;
+			unlinked = hits = 0;
 
 			// Do a bullet trace instead of spawning a missile.
 			passent = self->s.number;
@@ -587,7 +588,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 						}
 
 						if( hitClient ) {
-							self->client->accuracy_hits++;
+							hits++;
 						}
 					}
 				}
@@ -614,6 +615,38 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			// link back in any entities we unlinked
 			for ( i = 0 ; i < unlinked ; i++ ) {
 				trap_LinkEntity( unlinkedEntities[i] );
+			}
+
+			if (self->client) {
+#ifndef TURTLEARENA // AWARDS
+				if (bg_projectileinfo[projnum].maxHits > 1) {
+					// give the shooter a reward sound if they have made two railgun hits in a row
+					if ( hits == 0 ) {
+						// complete miss
+						self->client->accurateCount = 0;
+					} else {
+						// check for "impressive" reward sound
+						self->client->accurateCount += hits;
+						if ( self->client->accurateCount >= 2 ) {
+							self->client->accurateCount -= 2;
+							self->client->ps.persistant[PERS_IMPRESSIVE_COUNT]++;
+							// add the sprite over the player's head
+#ifdef IOQ3ZTM
+							self->client->ps.eFlags &= ~EF_AWARD_BITS;
+#else
+							self->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
+#endif
+							self->client->ps.eFlags |= EF_AWARD_IMPRESSIVE;
+							self->client->rewardTime = level.time + REWARD_SPRITE_TIME;
+						}
+						self->client->accuracy_hits++;
+					}
+				}
+				else
+#endif
+				if (hits) {
+					self->client->accuracy_hits++;
+				}
 			}
 
 			// From weapon_railgun_fire

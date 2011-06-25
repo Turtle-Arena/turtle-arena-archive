@@ -1811,10 +1811,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifndef TURTLEARENA // NOZOOM
 #ifdef IOQ3ZTM
 		// check for death of the current clientNum
+#ifdef TA_SPLITVIEW
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && es->otherEntityNum == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
+				// if zoomed in, zoom out
+				CG_ZoomUp(i);
+			}
+		}
+#else
 		if ( es->otherEntityNum == cg.snap->ps.clientNum ) {
 			// if zoomed in, zoom out
 			CG_ZoomUp_f();
 		}
+#endif
 #endif
 #endif
 		CG_Obituary( es );
