@@ -1832,27 +1832,6 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 #endif
 }
 
-#if 0 // #ifdef TA_WEAPSYS
-// Find out if a bot has a weapon using its name (Example: "wp_rocket_launcher")
-int BotInventoryWeapon(bot_state_t *bs, const char *weaponGroup)
-{
-	int w;
-
-	w = BG_WeaponGroupIndexForName(weaponGroup);
-
-	return bs->inventory[INVENTORY_WEAPON_START+w-1];
-}
-
-int BotInventoryAmmo(bot_state_t *bs, const char *weaponGroup)
-{
-	int w;
-
-	w = BG_WeaponGroupIndexForName(weaponGroup);
-
-	return bs->inventory[INVENTORY_AMMO_START+w-1];
-}
-#endif
-
 /*
 ==================
 BotUpdateInventory
