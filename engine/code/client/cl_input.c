@@ -1807,4 +1807,204 @@ void CL_ShutdownInput(void)
 	Cmd_RemoveCommand("+voiprecord");
 	Cmd_RemoveCommand("-voiprecord");
 #endif
+
+#ifdef TA_SPLITVIEW
+	Cmd_RemoveCommand("2centerview");
+
+	Cmd_RemoveCommand("+2moveup");
+	Cmd_RemoveCommand("-2moveup");
+	Cmd_RemoveCommand("+2movedown");
+	Cmd_RemoveCommand("-2movedown");
+	Cmd_RemoveCommand("+2left");
+	Cmd_RemoveCommand("-2left");
+	Cmd_RemoveCommand("+2right");
+	Cmd_RemoveCommand("-2right");
+	Cmd_RemoveCommand("+2forward");
+	Cmd_RemoveCommand("-2forward");
+	Cmd_RemoveCommand("+2back");
+	Cmd_RemoveCommand("-2back");
+	Cmd_RemoveCommand("+2lookup");
+	Cmd_RemoveCommand("-2lookup");
+	Cmd_RemoveCommand("+2lookdown");
+	Cmd_RemoveCommand("-2lookdown");
+	Cmd_RemoveCommand("+2strafe");
+	Cmd_RemoveCommand("-2strafe");
+	Cmd_RemoveCommand("+2moveleft");
+	Cmd_RemoveCommand("-2moveleft");
+	Cmd_RemoveCommand("+2moveright");
+	Cmd_RemoveCommand("-2moveright");
+
+#ifndef TURTLEARENA // NO_SPEED_KEY
+	Cmd_RemoveCommand("+2speed");
+	Cmd_RemoveCommand("-2speed");
+#endif
+#ifdef TURTLEARENA // LOCKON
+	Cmd_RemoveCommand("+2lockon");
+	Cmd_RemoveCommand("-2lockon");
+#endif
+	Cmd_RemoveCommand("+2attack");
+	Cmd_RemoveCommand("-2attack");
+	Cmd_RemoveCommand("+2button0");
+	Cmd_RemoveCommand("-2button0");
+	Cmd_RemoveCommand("+2button1");
+	Cmd_RemoveCommand("-2button1");
+	Cmd_RemoveCommand("+2button2");
+	Cmd_RemoveCommand("-2button2");
+	Cmd_RemoveCommand("+2button3");
+	Cmd_RemoveCommand("-2button3");
+	Cmd_RemoveCommand("+2button4");
+	Cmd_RemoveCommand("-2button4");
+	Cmd_RemoveCommand("+2button5");
+	Cmd_RemoveCommand("-2button5");
+	Cmd_RemoveCommand("+2button6");
+	Cmd_RemoveCommand("-2button6");
+	Cmd_RemoveCommand("+2button7");
+	Cmd_RemoveCommand("-2button7");
+	Cmd_RemoveCommand("+2button8");
+	Cmd_RemoveCommand("-2button8");
+	Cmd_RemoveCommand("+2button9");
+	Cmd_RemoveCommand("-2button9");
+	Cmd_RemoveCommand("+2button10");
+	Cmd_RemoveCommand("-2button10");
+	Cmd_RemoveCommand("+2button11");
+	Cmd_RemoveCommand("-2button11");
+	Cmd_RemoveCommand("+2button12");
+	Cmd_RemoveCommand("-2button12");
+	Cmd_RemoveCommand("+2button13");
+	Cmd_RemoveCommand("-2button13");
+	Cmd_RemoveCommand("+2button14");
+	Cmd_RemoveCommand("-2button14");
+
+	Cmd_RemoveCommand("3centerview");
+
+	Cmd_RemoveCommand("+3moveup");
+	Cmd_RemoveCommand("-3moveup");
+	Cmd_RemoveCommand("+3movedown");
+	Cmd_RemoveCommand("-3movedown");
+	Cmd_RemoveCommand("+3left");
+	Cmd_RemoveCommand("-3left");
+	Cmd_RemoveCommand("+3right");
+	Cmd_RemoveCommand("-3right");
+	Cmd_RemoveCommand("+3forward");
+	Cmd_RemoveCommand("-3forward");
+	Cmd_RemoveCommand("+3back");
+	Cmd_RemoveCommand("-3back");
+	Cmd_RemoveCommand("+3lookup");
+	Cmd_RemoveCommand("-3lookup");
+	Cmd_RemoveCommand("+3lookdown");
+	Cmd_RemoveCommand("-3lookdown");
+	Cmd_RemoveCommand("+3strafe");
+	Cmd_RemoveCommand("-3strafe");
+	Cmd_RemoveCommand("+3moveleft");
+	Cmd_RemoveCommand("-3moveleft");
+	Cmd_RemoveCommand("+3moveright");
+	Cmd_RemoveCommand("-3moveright");
+
+#ifndef TURTLEARENA // NO_SPEED_KEY
+	Cmd_RemoveCommand("+3speed");
+	Cmd_RemoveCommand("-3speed");
+#endif
+#ifdef TURTLEARENA // LOCKON
+	Cmd_RemoveCommand("+3lockon");
+	Cmd_RemoveCommand("-3lockon");
+#endif
+	Cmd_RemoveCommand("+3attack");
+	Cmd_RemoveCommand("-3attack");
+	Cmd_RemoveCommand("+3button0");
+	Cmd_RemoveCommand("-3button0");
+	Cmd_RemoveCommand("+3button1");
+	Cmd_RemoveCommand("-3button1");
+	Cmd_RemoveCommand("+3button2");
+	Cmd_RemoveCommand("-3button2");
+	Cmd_RemoveCommand("+3button3");
+	Cmd_RemoveCommand("-3button3");
+	Cmd_RemoveCommand("+3button4");
+	Cmd_RemoveCommand("-3button4");
+	Cmd_RemoveCommand("+3button5");
+	Cmd_RemoveCommand("-3button5");
+	Cmd_RemoveCommand("+3button6");
+	Cmd_RemoveCommand("-3button6");
+	Cmd_RemoveCommand("+3button7");
+	Cmd_RemoveCommand("-3button7");
+	Cmd_RemoveCommand("+3button8");
+	Cmd_RemoveCommand("-3button8");
+	Cmd_RemoveCommand("+3button9");
+	Cmd_RemoveCommand("-3button9");
+	Cmd_RemoveCommand("+3button10");
+	Cmd_RemoveCommand("-3button10");
+	Cmd_RemoveCommand("+3button11");
+	Cmd_RemoveCommand("-3button11");
+	Cmd_RemoveCommand("+3button12");
+	Cmd_RemoveCommand("-3button12");
+	Cmd_RemoveCommand("+3button13");
+	Cmd_RemoveCommand("-3button13");
+	Cmd_RemoveCommand("+3button14");
+	Cmd_RemoveCommand("-3button14");
+
+	Cmd_RemoveCommand("4centerview");
+
+	Cmd_RemoveCommand("+4moveup");
+	Cmd_RemoveCommand("-4moveup");
+	Cmd_RemoveCommand("+4movedown");
+	Cmd_RemoveCommand("-4movedown");
+	Cmd_RemoveCommand("+4left");
+	Cmd_RemoveCommand("-4left");
+	Cmd_RemoveCommand("+4right");
+	Cmd_RemoveCommand("-4right");
+	Cmd_RemoveCommand("+4forward");
+	Cmd_RemoveCommand("-4forward");
+	Cmd_RemoveCommand("+4back");
+	Cmd_RemoveCommand("-4back");
+	Cmd_RemoveCommand("+4lookup");
+	Cmd_RemoveCommand("-4lookup");
+	Cmd_RemoveCommand("+4lookdown");
+	Cmd_RemoveCommand("-4lookdown");
+	Cmd_RemoveCommand("+4strafe");
+	Cmd_RemoveCommand("-4strafe");
+	Cmd_RemoveCommand("+4moveleft");
+	Cmd_RemoveCommand("-4moveleft");
+	Cmd_RemoveCommand("+4moveright");
+	Cmd_RemoveCommand("-4moveright");
+
+#ifndef TURTLEARENA // NO_SPEED_KEY
+	Cmd_RemoveCommand("+4speed");
+	Cmd_RemoveCommand("-4speed");
+#endif
+#ifdef TURTLEARENA // LOCKON
+	Cmd_RemoveCommand("+4lockon");
+	Cmd_RemoveCommand("-4lockon");
+#endif
+	Cmd_RemoveCommand("+4attack");
+	Cmd_RemoveCommand("-4attack");
+	Cmd_RemoveCommand("+4button0");
+	Cmd_RemoveCommand("-4button0");
+	Cmd_RemoveCommand("+4button1");
+	Cmd_RemoveCommand("-4button1");
+	Cmd_RemoveCommand("+4button2");
+	Cmd_RemoveCommand("-4button2");
+	Cmd_RemoveCommand("+4button3");
+	Cmd_RemoveCommand("-4button3");
+	Cmd_RemoveCommand("+4button4");
+	Cmd_RemoveCommand("-4button4");
+	Cmd_RemoveCommand("+4button5");
+	Cmd_RemoveCommand("-4button5");
+	Cmd_RemoveCommand("+4button6");
+	Cmd_RemoveCommand("-4button6");
+	Cmd_RemoveCommand("+4button7");
+	Cmd_RemoveCommand("-4button7");
+	Cmd_RemoveCommand("+4button8");
+	Cmd_RemoveCommand("-4button8");
+	Cmd_RemoveCommand("+4button9");
+	Cmd_RemoveCommand("-4button9");
+	Cmd_RemoveCommand("+4button10");
+	Cmd_RemoveCommand("-4button10");
+	Cmd_RemoveCommand("+4button11");
+	Cmd_RemoveCommand("-4button11");
+	Cmd_RemoveCommand("+4button12");
+	Cmd_RemoveCommand("-4button12");
+	Cmd_RemoveCommand("+4button13");
+	Cmd_RemoveCommand("-4button13");
+	Cmd_RemoveCommand("+4button14");
+	Cmd_RemoveCommand("-4button14");
+#endif
 }
