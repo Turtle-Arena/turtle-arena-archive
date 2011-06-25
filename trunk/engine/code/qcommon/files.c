@@ -176,7 +176,6 @@ or configs will never get loaded from disk!
 // the easiest way to get it is to just run the game and see what it spits out
 #if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 #define PAK_OPTIONAL 1	// Optional pak only used by client which isn't needed to play the game.
-//#define PAK_MUSIC 2		// ZTM: TODO: Pak may only contain music and doesn't check checksum. Allows users to add whatever music they want.
 
 typedef struct
 {

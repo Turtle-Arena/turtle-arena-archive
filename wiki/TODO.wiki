@@ -47,8 +47,6 @@
   * BUG: When there are multiple ghost models they may not be sorted into correct order
     * Requires depth sorting to fix
 
-  * BUG: Forcing entity to be transparent doesn't work if entity uses cel-shading.
-
   * BUG: At the beginning of q3dm0 the portal can be seen though the mirror
 
 == UI ==
@@ -134,12 +132,6 @@
     * Add support for animation blending for IQM.
   * TODO-after-above: Re-rig and reanimate players in Blender for single IQM? (and/or add IQM export to Maverick Model 3D?)
 
-  * TODO: Support using .so, .dll, and .dylib, on pure servers? (Wolf-ET does?)
-  * TODO: Have qvms in a separate pk3 and have it be optional.
-    * (Debian considers non-free, so don't included in debs)
-    * If so/dll/dylib are supported on pure servers is there any reason to included them in any installers?
-      * Is there a reason to include in Linux/Win32 zip that comes with so/dll? (For other ports? such as Android/iPhone?)
-
   * TODO: Allow setting splitscreen clients for joinning in Multiplayer Search menu?
     * Allows filtering out servers without enough player slots
 
@@ -172,18 +164,11 @@ Most of the mapobjects should be damageable.
 == Testing! ==
   * TODO: Test/use the "noise" and "random" waveforms that I copied from IOSTVEF.
 
-  * TODO: Check if "TA_WEAPSYS // BOT_ITEM_INFOS" breaks compatibility with q3 mods.
-
   * STARTED (TA_HOLDABLE): Make shurikens/holdable-projectiles general like weapons groups.
     * (So they can be totally configured from .weap/.item, and add new ones)
 
 == Don't do? (Dead Ideas?) ==
   * TODO: Feet tags, for attack checking? And/or for attaching hoverboard to player?
-
-  * TODO: Use vertex lighting on misc_model entities? http://xreal.svn.sourceforge.net/viewvc/xreal?view=rev&revision=3049
-    * ZTM: I could add a option so use vertex lighting, but normally use lightmapping?
-    *   OR Just use misc_object as they use vertex lighting.
-    * Misc_model is a way to insert a *static* model, so lightmap like the level.
 
   * TODO: Have Announcer use "voice chats" so that the text is printed as well as playing a sound.
     * TODO: Add option to disable Announcer voice and/or text
@@ -201,19 +186,6 @@ Most of the mapobjects should be damageable.
     * Using a special model for collision we could use group names to set what part of player is hit,
     * so shell takes less damage, banndana tails takes no damage, etc. We could say where a player got hit like Smokin' Guns?...
 
-  * TODO: Lua Scripting for NPCs? http://xreal.svn.sourceforge.net/viewvc/xreal/trunk/xreal/base/code/game/g_lua.c?view=markup
-
-  * TODO: Framebuffer object support? https://bugzilla.icculus.org/show_bug.cgi?id=3422
-
-  * TODO: http://code.google.com/p/oax/wiki/Dynamic_QVM_Memory_Allocation
-
-  * TODO: Word filter http://code.google.com/p/sgfork/source/detail?r=5
-
-== Done? ==
-  * DONE?: TA_WEAPSYS weapon_random entity that spawns a random weapon each time the weapon respawns
-    * Only spawn weapons with a classname, have flags for melee and gun weapon spawning.
-  * TODO: ...also allow list of weapons in message field?
-
 = Other =
   * TODO: Make some sort of manual to tell how to play, control the player (using default controls). Have it be simple.
 
@@ -226,13 +198,6 @@ Most of the mapobjects should be damageable.
       * And add a note to the website 'tested on X'
 
 = Data =
-  * DONE: Replace all of the data (that I need) in Demo Quake3's pak0.pk3
-    * (It appears that the full version doesn't add data "for the engine", just players, maps, and textures, etc)
-
-  * TODO: Add announcer sound files (That sound like the Gyoji of the Battle Nexus?)
-
-  * TODO: Add models for Daisho weapon group (See [NeededFiles])
-
   * TODO: Have a intro video (video/intro.roq or ogm) before the menu.
 
   * TODO: Have shurikens in all multi-player maps? (Having them be part of standard gameplay?)
@@ -240,16 +205,6 @@ Most of the mapobjects should be damageable.
   * TODO: Get free scenery objects from the Internet. Make most damageable.
     * http://virtualworlds.wikia.com
 
-= Website =
-Current Location: http://ztm.x10hosting.com/ta/
-
-  * TODO: Upgrade x10hosting?
-
-  * TODO: Get a domain name for Turtle Arena?
-
-  * TODO: Update for Turtle Arena 0.4
-
-  * TODO: Add MediaWiki to website? (and use the same mysql database as phpbb)
 
 = Packaging =
   * TODO: Add more options to the Win32 NSIS installer
