@@ -984,7 +984,12 @@ static void PM_WalkMove( void ) {
 	float		accelerate;
 	float		vel;
 
-	if ( pm->waterlevel > 2 && DotProduct( pml.forward, pml.groundTrace.plane.normal ) > 0 ) {
+	if ( pm->waterlevel > 2 && DotProduct( pml.forward, pml.groundTrace.plane.normal ) > 0
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+		&& !(pml.groundPlane || pm->ps->groundEntityNum != ENTITYNUM_NONE)
+#endif
+		)
+	{
 		// begin swimming
 		PM_WaterMove();
 		return;
