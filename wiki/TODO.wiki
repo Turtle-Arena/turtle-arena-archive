@@ -106,10 +106,6 @@
 
   * TODO: Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
 
-  * TODO: Add Jump/Land animations specifically for backflip, fallback to 'Jump/Land B' (jump backward)
-    * For jumping backward in lock-on mode, like in LoZ:TP
-    * (Should Turtle Arena players just have 'Jump/Land B' be a backflip?)
-
   * TODO: Improve camera system.
     * DONE: Controls for moving chase cam (left, right, up, down)
     * (NiGHTS: Journey of Dreams) Move camera if holding 'z' and move analog stick, can't look around while moving

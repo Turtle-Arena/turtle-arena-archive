@@ -628,6 +628,11 @@ static qboolean PM_CheckJump( void ) {
 			PM_ForceLegsAnim( OBJECT_JUMP );
 		} else
 #endif
+#ifdef TA_PLAYERS
+		if (pm->ps && pm->ps->eFlags & EF_LOCKON) {
+			PM_ForceLegsAnim( LEGS_JUMPB_LOCKON );
+		} else
+#endif
 		PM_ForceLegsAnim( LEGS_JUMPB );
 		pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
 	}
@@ -1445,6 +1450,11 @@ static void PM_GroundTraceMissed( void ) {
 					PM_ForceLegsAnim( OBJECT_JUMP );
 				} else
 #endif
+#ifdef TA_PLAYERS
+				if (pm->ps && pm->ps->eFlags & EF_LOCKON) {
+					PM_ForceLegsAnim( LEGS_JUMPB_LOCKON );
+				} else
+#endif
 				PM_ForceLegsAnim( LEGS_JUMPB );
 				pm->ps->pm_flags |= PMF_BACKWARDS_JUMP;
 			}
@@ -1511,6 +1521,11 @@ static void PM_GroundTrace( void ) {
 #ifdef TA_NPCSYS
 			if (pm->npc) {
 				PM_ForceLegsAnim( OBJECT_JUMP );
+			} else
+#endif
+#ifdef TA_PLAYERS
+			if (pm->ps && pm->ps->eFlags & EF_LOCKON) {
+				PM_ForceLegsAnim( LEGS_JUMPB_LOCKON );
 			} else
 #endif
 			PM_ForceLegsAnim( LEGS_JUMPB );
