@@ -27,7 +27,7 @@ models/players/raph/plastron
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting // ZEQ2 use rgbGen lightingUniform, not in ioq3
 		tcGen cel
 	}
@@ -41,7 +41,7 @@ models/players/raph/belt
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -55,7 +55,7 @@ models/players/raph/belt_blue
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -69,7 +69,7 @@ models/players/raph/belt_red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -87,7 +87,7 @@ models/players/raph/head
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -101,7 +101,7 @@ models/players/raph/carapace
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -115,7 +115,7 @@ models/players/raph/arm
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -129,7 +129,7 @@ models/players/raph/leg
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -143,7 +143,7 @@ models/players/raph/arm_blue
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -157,7 +157,7 @@ models/players/raph/leg_blue
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -171,7 +171,7 @@ models/players/raph/arm_red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -185,7 +185,7 @@ models/players/raph/leg_red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -203,7 +203,7 @@ models/players/don/head
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -217,7 +217,7 @@ models/players/don/carapace
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -231,7 +231,7 @@ models/players/don/arm
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -245,7 +245,7 @@ models/players/don/leg
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -259,7 +259,7 @@ models/players/don/arm_blue
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -273,7 +273,7 @@ models/players/don/leg_blue
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -287,7 +287,7 @@ models/players/don/arm_red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -301,7 +301,7 @@ models/players/don/leg_red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -319,7 +319,7 @@ models/players/leo/head
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -333,7 +333,7 @@ models/players/leo/carapace
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -347,7 +347,7 @@ models/players/leo/arm
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -361,7 +361,7 @@ models/players/leo/leg
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -375,7 +375,7 @@ models/players/leo/arm_blue
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -389,7 +389,7 @@ models/players/leo/leg_blue
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -403,7 +403,7 @@ models/players/leo/arm_red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -417,7 +417,7 @@ models/players/leo/leg_red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -435,7 +435,7 @@ models/players/mike/head
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -449,7 +449,7 @@ models/players/mike/carapace
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -463,7 +463,7 @@ models/players/mike/arm
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -477,7 +477,7 @@ models/players/mike/leg
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -491,7 +491,7 @@ models/players/mike/arm_blue
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -505,7 +505,7 @@ models/players/mike/leg_blue
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -519,7 +519,7 @@ models/players/mike/arm_red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -533,7 +533,7 @@ models/players/mike/leg_red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -581,7 +581,7 @@ models/players/fugitoid/body
 	}
 	{
 		map textures/sfx/celshader_2_levels.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -601,7 +601,7 @@ models/players/fugitoid/red
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
@@ -620,7 +620,7 @@ models/players/fugitoid/blue
 	}
 	{
 		map textures/sfx/celshader.png
-		blendfunc filter
+		blendfunc blend
 		rgbGen identityLighting
 		tcGen cel
 	}
