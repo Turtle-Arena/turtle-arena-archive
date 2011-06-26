@@ -71,7 +71,7 @@ weapongroup "wp_gauntlet"
 
 //
 // Machine Gun (Done)
-// ZTM: FIXME: Machine Gun does 7 damage in all gametypes, but in Q3 Team DM it should only do 5 damage.
+// ZTM: FIXME: Machine Gun should only do 5 damage in Team DM.
 //
 
 projectile "p_machinegun"
@@ -319,6 +319,7 @@ weapongroup "wp_railgun"
 	iconName "icons/iconw_railgun"
 	pickupAmmo 10
 	readySound "sound/weapons/railgun/rg_hum.wav"
+	firingSound "sound/weapons/railgun/rg_hum.wav"
 	weapon_primary "w_railgun"
 }
 
@@ -404,6 +405,7 @@ weapongroup "wp_bfg"
 	iconName "icons/iconw_bfg"
 	pickupAmmo 20
 	readySound "sound/weapons/bfg/bfg_hum.wav"
+	firingSound "sound/weapons/bfg/bfg_hum.wav"
 	weapon_primary "w_bfg"
 }
 
