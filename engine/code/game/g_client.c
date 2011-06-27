@@ -2277,9 +2277,9 @@ qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap)
 			nextMap = NULL;
 
 #ifdef IOQ3ZTM // MAP_ROTATION
-			info = G_GetMapRotationInfoByGametype(GT_SINGLE_PLAYER);
+			info = G_GetNextArenaInfoByGametype(NULL, GT_SINGLE_PLAYER);
 			if (info) {
-				nextMap = Info_ValueForKey(info, "m1");
+				nextMap = Info_ValueForKey(info, "map");
 			}
 #endif
 
