@@ -262,7 +262,7 @@ void Con_CheckResize (void)
 	if (width == con.linewidth)
 		return;
 
-#ifndef IOQ3ZTM // IOQ3BUGFIX: Unused code
+#ifndef IOQ3ZTM // UNUSED
 	if (width < 1)			// video hasn't been initialized yet
 	{
 		width = DEFAULT_CONSOLE_WIDTH;

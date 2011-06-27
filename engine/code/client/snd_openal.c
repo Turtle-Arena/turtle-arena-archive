@@ -307,7 +307,6 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, qboolean cache)
 	snd_info_t info;
 	alSfx_t *curSfx = &knownSfx[sfx];
 
-#ifndef IOQ3ZTM // IOQ3BUGFIX: Use default sound! (Check if already done first)
 	// Nothing?
 	if(curSfx->filename[0] == '\0')
 		return;
@@ -315,26 +314,10 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, qboolean cache)
 	// Player SFX
 	if(curSfx->filename[0] == '*')
 		return;
-#endif
 
 	// Already done?
 	if((curSfx->inMemory) || (curSfx->isDefault) || (!cache && curSfx->isDefaultChecked))
 		return;
-
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Use default sound!
-	// Nothing?
-	if(curSfx->filename[0] == '\0') {
-		S_AL_BufferUseDefault(sfx);
-		return;
-	}
-
-	// player specific sounds are never directly loaded
-	if(curSfx->filename[0] == '*')
-	{
-		S_AL_BufferUseDefault(sfx);
-		return;
-	}
-#endif
 
 	// Try to load
 	data = S_CodecLoad(curSfx->filename, &info);
