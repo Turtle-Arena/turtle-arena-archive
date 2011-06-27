@@ -752,6 +752,13 @@ typedef struct {
 	char		centerPrint[1024];
 	int			centerPrintLines;
 
+#ifdef TA_MISC // COMIC_ANNOUNCER
+#define MAX_ANNOUNCEMENTS 8
+	int			announcement;
+	int			announcementTime[MAX_ANNOUNCEMENTS];
+	char		announcementMessage[MAX_ANNOUNCEMENTS][128];
+#endif
+
 #ifndef TURTLEARENA // NO_AMMO_WARNINGS
 	// low ammo warning state
 	int			lowAmmoWarning;		// 1 = low, 2 = empty
@@ -774,7 +781,11 @@ typedef struct {
 	int			rewardTime;
 	int			rewardCount[MAX_REWARDSTACK];
 	qhandle_t	rewardShader[MAX_REWARDSTACK];
+#ifdef TA_MISC // COMIC_ANNOUNCER
+	int			rewardAnnoucement[MAX_REWARDSTACK];
+#else
 	qhandle_t	rewardSound[MAX_REWARDSTACK];
+#endif
 
 #ifdef TURTLEARENA // LOCKON
 	// lockon key
@@ -1586,6 +1597,10 @@ extern	vmCvar_t		cg_gibs;
 extern	vmCvar_t		cg_drawSpeed;
 #endif
 extern	vmCvar_t		cg_drawTimer;
+#ifdef TA_MISC // COMIC_ANNOUNCER
+extern	vmCvar_t		cg_announcerText;
+extern	vmCvar_t		cg_announcerVoice;
+#endif
 extern	vmCvar_t		cg_drawFPS;
 extern	vmCvar_t		cg_drawSnapshot;
 extern	vmCvar_t		cg_draw3dIcons;
@@ -1785,6 +1800,64 @@ void CG_ZoomDown( int localClient );
 #endif
 #endif
 void CG_AddBufferedSound( sfxHandle_t sfx);
+
+#ifdef TA_MISC // COMIC_ANNOUNCER
+typedef enum
+{
+	ANNOUNCE_PREPAREYOURSELFS,
+	ANNOUNCE_PREPAREYOURTEAM,
+
+	ANNOUNCE_VOTINGBEGUN,
+	ANNOUNCE_VOTEPASS,
+	ANNOUNCE_VOTEFAIL,
+
+	ANNOUNCE_YOUHAVETAKENTHELEAD,
+	ANNOUNCE_YOURTIEDFORTHELEAD,
+	ANNOUNCE_YOULOSTTHELEAD,
+
+	ANNOUNCE_CAPTURE,
+	ANNOUNCE_ASSIST,
+	ANNOUNCE_DEFENSE,
+
+	// TEAM/CTF/1FCTF/Overload
+	ANNOUNCE_REDLEADS,
+	ANNOUNCE_BLUELEADS,
+	ANNOUNCE_TEAMSTIED,
+
+	// CTF and one flag CTF
+	ANNOUNCE_YOUHAVETHEFLAG,
+	ANNOUNCE_REDSCORES,
+	ANNOUNCE_BLUESCORES,
+	ANNOUNCE_TEAMCAPTURE,
+	ANNOUNCE_ENEMYCAPTURE,
+	ANNOUNCE_YOURFLAGRETURNED,
+	ANNOUNCE_ENEMYFLAGRETURNED,
+	ANNOUNCE_YOURTEAMHASTAKENTHEFLAG,
+	ANNOUNCE_THEENEMYHASTAKENTHEFLAG,
+
+	// CTF
+	ANNOUNCE_REDFLAGRETURNED,
+	ANNOUNCE_BLUEFLAGRETURNED,
+	ANNOUNCE_ENEMYHASYOURFLAG,
+	ANNOUNCE_TEAMHASENEMYFLAG,
+
+	// One flag CTF
+	ANNOUNCE_TEAMHASTHEFLAG,
+	ANNOUNCE_ENEMYHASTHEFLAG,
+
+	// Overload
+	ANNOUNCE_BASEUNDERATTACK,
+
+	ANNOUNCE_MAX
+} announcement_e;
+
+#ifdef TA_SPLITVIEW
+void CG_AddAnnouncement(int announcement, int localClientNumber);
+#else
+void CG_AddAnnouncement(int announcement);
+#endif
+void CG_AddAnnouncementEx(cglc_t *lc, qhandle_t sfx, qboolean bufferedSfx, const char *message);
+#endif
 
 void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demoPlayback );
 

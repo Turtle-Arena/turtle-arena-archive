@@ -242,11 +242,27 @@ static void CG_ParseWarmup( void ) {
 		&& cgs.gametype <= GT_HARVESTER
 #endif
 		) {
+#ifdef TA_MISC // COMIC_ANNOUCER
+#ifdef TA_SPLITVIEW
+			CG_AddAnnouncement(ANNOUNCE_PREPAREYOURTEAM, -1);
+#else
+			CG_AddAnnouncement(ANNOUNCE_PREPAREYOURTEAM);
+#endif
+#else
 			trap_S_StartLocalSound( cgs.media.countPrepareTeamSound, CHAN_ANNOUNCER );
+#endif
 		} else
 #endif
 		{
+#ifdef TA_MISC // COMIC_ANNOUCER
+#ifdef TA_SPLITVIEW
+			CG_AddAnnouncement(ANNOUNCE_PREPAREYOURSELFS, -1);
+#else
+			CG_AddAnnouncement(ANNOUNCE_PREPAREYOURSELFS);
+#endif
+#else
 			trap_S_StartLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
+#endif
 		}
 	}
 
@@ -364,7 +380,15 @@ static void CG_ConfigStringModified( void ) {
 	} else if ( num == CS_VOTE_STRING ) {
 		Q_strncpyz( cgs.voteString, str, sizeof( cgs.voteString ) );
 #ifdef MISSIONPACK
+#ifdef TA_MISC // COMIC_ANNOUNCER
+#ifdef TA_SPLITVIEW
+		CG_AddAnnouncement(ANNOUNCE_VOTINGBEGUN, -1);
+#else
+		CG_AddAnnouncement(ANNOUNCE_VOTINGBEGUN)
+#endif
+#else
 		trap_S_StartLocalSound( cgs.media.voteNow, CHAN_ANNOUNCER );
+#endif
 #endif //MISSIONPACK
 	} else if ( num >= CS_TEAMVOTE_TIME && num <= CS_TEAMVOTE_TIME + 1) {
 		cgs.teamVoteTime[num-CS_TEAMVOTE_TIME] = atoi( str );
@@ -378,7 +402,15 @@ static void CG_ConfigStringModified( void ) {
 	} else if ( num >= CS_TEAMVOTE_STRING && num <= CS_TEAMVOTE_STRING + 1) {
 		Q_strncpyz( cgs.teamVoteString[num-CS_TEAMVOTE_STRING], str, sizeof( cgs.teamVoteString ) );
 #ifdef MISSIONPACK
+#ifdef TA_MISC // COMIC_ANNOUNCER
+#ifdef TA_SPLITVIEW
+		CG_AddAnnouncement(ANNOUNCE_VOTINGBEGUN, -1);
+#else
+		CG_AddAnnouncement(ANNOUNCE_VOTINGBEGUN)
+#endif
+#else
 		trap_S_StartLocalSound( cgs.media.voteNow, CHAN_ANNOUNCER );
+#endif
 #endif
 	} else if ( num == CS_INTERMISSION ) {
 		cg.intermissionStarted = atoi( str );
@@ -1208,6 +1240,34 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "print" ) ) {
+#ifdef MISSIONPACK
+		cmd = CG_Argv(start+1);			// yes, this is obviously a hack, but so is the way we hear about
+									// votes passing or failing
+		if ( !Q_stricmpn( cmd, "vote failed", 11 ) || !Q_stricmpn( cmd, "team vote failed", 16 )) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+#ifdef TA_SPLITVIEW
+			CG_AddAnnouncement(ANNOUNCE_VOTEFAIL, lc);
+#else
+			CG_AddAnnouncement(ANNOUNCE_VOTEFAIL);
+#endif
+			return;
+#else
+			trap_S_StartLocalSound( cgs.media.voteFailed, CHAN_ANNOUNCER );
+#endif
+		} else if ( !Q_stricmpn( cmd, "vote passed", 11 ) || !Q_stricmpn( cmd, "team vote passed", 16 ) ) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+#ifdef TA_SPLITVIEW
+			CG_AddAnnouncement(ANNOUNCE_VOTEPASS, lc);
+#else
+			CG_AddAnnouncement(ANNOUNCE_VOTEPASS);
+#endif
+			return;
+#else
+			trap_S_StartLocalSound( cgs.media.votePassed, CHAN_ANNOUNCER );
+#endif
+		}
+#endif
+
 #ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			// Show which client this is for.
@@ -1215,15 +1275,6 @@ static void CG_ServerCommand( void ) {
 		}
 #endif
 		CG_Printf( "%s", CG_Argv(start+1) );
-#ifdef MISSIONPACK
-		cmd = CG_Argv(start+1);			// yes, this is obviously a hack, but so is the way we hear about
-									// votes passing or failing
-		if ( !Q_stricmpn( cmd, "vote failed", 11 ) || !Q_stricmpn( cmd, "team vote failed", 16 )) {
-			trap_S_StartLocalSound( cgs.media.voteFailed, CHAN_ANNOUNCER );
-		} else if ( !Q_stricmpn( cmd, "vote passed", 11 ) || !Q_stricmpn( cmd, "team vote passed", 16 ) ) {
-			trap_S_StartLocalSound( cgs.media.votePassed, CHAN_ANNOUNCER );
-		}
-#endif
 		return;
 	}
 
