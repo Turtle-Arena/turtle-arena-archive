@@ -859,9 +859,6 @@ void QDECL G_Error( const char *fmt, ... );
 #ifdef IOQ3ZTM
 void G_CvarClearModification( vmCvar_t *vmCvar );
 #endif
-#ifdef IOQ3ZTM // MAP_ROTATION
-const char *G_GetMapRotationInfoByGametype( int gametype );
-#endif
 
 //
 // g_client.c
@@ -926,6 +923,11 @@ qboolean G_BotConnect( int clientNum, qboolean restart );
 void Svcmd_AddBot_f( void );
 void Svcmd_BotList_f( void );
 void BotInterbreedEndMatch( void );
+#ifdef IOQ3ZTM // MAP_ROTATION
+void G_LoadArenas( void );
+const char *G_GetNextArenaInfoByGametype( const char *map, gametype_t gametype );
+void G_AdvanceMap( void );
+#endif
 
 #ifdef TA_SP // Load/save
 //

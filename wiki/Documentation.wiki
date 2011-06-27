@@ -13,7 +13,6 @@
 = Maps =
 
   * MapSetup
-  * MapRotation
 
 = Misc =
 

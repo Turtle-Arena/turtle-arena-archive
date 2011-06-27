@@ -151,7 +151,10 @@ static void G_LoadArenasFromFile( char *filename ) {
 G_LoadArenas
 ===============
 */
-static void G_LoadArenas( void ) {
+#ifndef IOQ3ZTM // MAP_ROTATION
+static
+#endif
+void G_LoadArenas( void ) {
 	int			numdirs;
 	vmCvar_t	arenasFile;
 	char		filename[128];
@@ -207,6 +210,78 @@ const char *G_GetArenaInfoByMap( const char *map ) {
 
 	return NULL;
 }
+
+#ifdef IOQ3ZTM // MAP_ROTATION
+/*
+===============
+G_GetNextArenaInfoByGametype
+===============
+*/
+const char *G_GetNextArenaInfoByGametype( const char *map, gametype_t gametype ) {
+	int			i, n;
+	const char *type;
+	static char *gametypeNames[] = {"ffa", "tourney", "single", "team", "ctf", "oneflag", "overload", "harvester", "teamtournament"};
+
+	gametype = gametype % GT_MAX_GAME_TYPE;
+
+	n = 0;
+	if (map && map[0] != '\0') {
+		for( i = 0;  i < g_numArenas; i++ ) {
+			if( Q_stricmp( Info_ValueForKey( g_arenaInfos[i], "map" ), map ) == 0 ) {
+				n = i+1;
+				break;
+			}
+		}
+	}
+
+	for(i = 0; i < g_numArenas-1; i++, n++ ) {
+		if (n >= g_numArenas) {
+			n = 0;
+		}
+
+		type = Info_ValueForKey( g_arenaInfos[n], "type" );
+		// if no type specified, it will be treated as "ffa"
+		if( *type ) {
+			if( strstr( type, gametypeNames[gametype] ) ) {
+				return g_arenaInfos[n];
+			}
+		} else {
+			if( gametype == GT_FFA ) {
+				return g_arenaInfos[n];
+			}
+		}
+	}
+
+	return NULL;
+}
+
+/*
+=================
+G_AdvanceMap
+=================
+*/
+void G_AdvanceMap( void ) {
+	char		map[MAX_QPATH];
+	char		serverinfo[MAX_INFO_STRING];
+	const char	*info;
+
+#ifdef TA_SP
+	// Single player doesn't rotate maps like the other gametypes.
+	if (g_gametype.integer == GT_SINGLE_PLAYER || g_singlePlayer.integer) {
+		return;
+	}
+#endif
+
+	trap_GetServerinfo( serverinfo, sizeof(serverinfo) );
+	Q_strncpyz( map, Info_ValueForKey( serverinfo, "mapname" ), sizeof(map) );
+
+	// Get map info
+	info = G_GetNextArenaInfoByGametype(map, g_gametype.integer);
+	if (info) {
+		trap_Cvar_Set("nextmap", va("map %s", Info_ValueForKey( info, "map" )));
+	}
+}
+#endif
 
 
 /*
@@ -1103,7 +1178,9 @@ void G_InitBots( qboolean restart ) {
 	char		serverinfo[MAX_INFO_STRING];
 
 	G_LoadBots();
+#ifndef IOQ3ZTM // MAP_ROTATION
 	G_LoadArenas();
+#endif
 
 	trap_Cvar_Register( &bot_minplayers, "bot_minplayers", "0", CVAR_SERVERINFO );
 
