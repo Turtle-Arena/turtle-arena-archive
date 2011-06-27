@@ -890,9 +890,7 @@ void CG_InitConsoleCommands( void ) {
 #endif
 	trap_AddCommand ("teamtask");
 #endif
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Add correct command
-	trap_AddCommand ("loaddeferred");
-#else
+#ifndef IOQ3ZTM_NO_COMPAT // SPELLING
 	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
 #endif
 }
