@@ -1461,6 +1461,223 @@ static void CG_PlayBufferedSounds( void ) {
 	}
 }
 
+#ifdef TA_MISC // COMIC_ANNOUNCER
+const char *cg_announcementMessages[ANNOUNCE_MAX] = {
+	"Prepare your selfs.",	// ANNOUNCE_PREPAREYOURSELFS
+	"Prepare your team.",	// ANNOUNCE_PREPAREYOURTEAM
+
+	"Voting has begun.",	// ANNOUNCE_VOTINGBEGUN
+	"Vote passed.",			// ANNOUNCE_VOTEPASS
+	"Vote failed.",			// ANNOUNCE_VOTEFAIL
+
+	"You have taken the lead.",	// ANNOUNCE_YOUHAVETAKENTHELEAD
+	"Your tied for the lead.",	// ANNOUNCE_YOURTIEDFORTHELEAD
+	"You lost the lead.",		// ANNOUNCE_YOULOSTTHELEAD
+
+	"Capture!",				// ANNOUNCE_CAPTURE
+	"Assist.",				// ANNOUNCE_ASSIST
+	"Defense.",				// ANNOUNCE_DEFENSE
+
+	// TEAM/CTF/1FCTF/Overload
+	"Red leads.",			// ANNOUNCE_REDLEADS
+	"Blue Leads.",			// ANNOUNCE_BLUELEADS
+	"Teams are tied.",		// ANNOUNCE_TEAMSTIED
+	"You have the flag!",	// ANNOUNCE_YOUHAVETHEFLAG
+	"Red scores.",			// ANNOUNCE_REDSCORES
+	"Blue scores.",			// ANNOUNCE_BLUESCORES
+	"(missing message.)",	// ANNOUNCE_TEAMCAPTURE,
+	"(missing message.)",	// ANNOUNCE_ENEMYCAPTURE
+	"(missing message.)",	// ANNOUNCE_YOURFLAGRETURNED
+	"(missing message.)",	// ANNOUNCE_ENEMYFLAGRETURNED
+	"(missing message.)",	// ANNOUNCE_YOURTEAMHASTAKENTHEFLAG
+	"(missing message.)",	// ANNOUNCE_THEENEMYHASTAKENTHEFLAG
+
+	// CTF
+	"(missing message.)",	// ANNOUNCE_REDFLAGRETURNED
+	"(missing message.)",	// ANNOUNCE_BLUEFLAGRETURNED
+	"(missing message.)",	// ANNOUNCE_ENEMYHASYOURFLAG
+	"(missing message.)",	// ANNOUNCE_TEAMHASENEMYFLAG
+
+	// One flag CTF
+	"(missing message.)",	// ANNOUNCE_TEAMHASTHEFLAG
+	"(missing message.)",	// ANNOUNCE_ENEMYHASTHEFLAG
+
+	// Overload
+	"(missing message.)"	// ANNOUNCE_BASEUNDERATTACK
+};
+
+/*
+=================
+CG_AddAnnouncement
+
+Add announcement using ANNOUNCE_* enum.
+=================
+*/
+#ifdef TA_SPLITVIEW
+void CG_AddAnnouncement(int announcement, int localClientNumber)
+#else
+void CG_AddAnnouncement(int announcement)
+#endif
+{
+	qhandle_t	sfx;
+	qboolean	bufferedSfx;
+	cglc_t		*lc;
+
+	if (announcement < 0 || announcement >= ANNOUNCE_MAX) {
+		return;
+	}
+
+	bufferedSfx = qfalse;
+
+	switch (announcement)
+	{
+		case ANNOUNCE_PREPAREYOURSELFS:
+			sfx = cgs.media.countPrepareSound;
+			break;
+		case ANNOUNCE_PREPAREYOURTEAM:
+			sfx = cgs.media.countPrepareTeamSound;
+			break;
+		case ANNOUNCE_VOTINGBEGUN:
+			sfx = cgs.media.voteNow;
+			break;
+		case ANNOUNCE_VOTEPASS:
+			sfx = cgs.media.votePassed;
+			break;
+		case ANNOUNCE_VOTEFAIL:
+			sfx = cgs.media.voteFailed;
+			break;
+		case ANNOUNCE_YOUHAVETAKENTHELEAD:
+			sfx = cgs.media.takenLeadSound;
+			bufferedSfx = qtrue;
+			break;
+		case ANNOUNCE_YOURTIEDFORTHELEAD:
+			sfx = cgs.media.tiedLeadSound;
+			bufferedSfx = qtrue;
+			break;
+		case ANNOUNCE_YOULOSTTHELEAD:
+			sfx = cgs.media.lostLeadSound;
+			bufferedSfx = qtrue;
+			break;
+		case ANNOUNCE_CAPTURE:
+			sfx = cgs.media.captureAwardSound;
+			break;
+		case ANNOUNCE_ASSIST:
+			sfx = cgs.media.assistSound;
+			break;
+		case ANNOUNCE_DEFENSE:
+			sfx = cgs.media.defendSound;
+			break;
+		case ANNOUNCE_REDLEADS:
+			sfx = 0;
+			break;
+		case ANNOUNCE_BLUELEADS:
+			sfx = 0;
+			break;
+		case ANNOUNCE_TEAMSTIED:
+			sfx = 0;
+			break;
+		case ANNOUNCE_YOUHAVETHEFLAG:
+			sfx = 0;
+			break;
+		case ANNOUNCE_REDSCORES:
+			sfx = 0;
+			break;
+		case ANNOUNCE_BLUESCORES:
+			sfx = 0;
+			break;
+		case ANNOUNCE_TEAMCAPTURE:
+			sfx = 0;
+			break;
+		case ANNOUNCE_ENEMYCAPTURE:
+			sfx = 0;
+			break;
+		case ANNOUNCE_YOURFLAGRETURNED:
+			sfx = 0;
+			break;
+		case ANNOUNCE_ENEMYFLAGRETURNED:
+			sfx = 0;
+			break;
+		case ANNOUNCE_YOURTEAMHASTAKENTHEFLAG:
+			sfx = 0;
+			break;
+		case ANNOUNCE_THEENEMYHASTAKENTHEFLAG:
+			sfx = 0;
+			break;
+		case ANNOUNCE_REDFLAGRETURNED:
+			sfx = 0;
+			break;
+		case ANNOUNCE_BLUEFLAGRETURNED:
+			sfx = 0;
+			break;
+		case ANNOUNCE_ENEMYHASYOURFLAG:
+			sfx = 0;
+			break;
+		case ANNOUNCE_TEAMHASENEMYFLAG:
+			sfx = 0;
+			break;
+		case ANNOUNCE_TEAMHASTHEFLAG:
+			sfx = 0;
+			break;
+		case ANNOUNCE_ENEMYHASTHEFLAG:
+			sfx = 0;
+			break;
+		case ANNOUNCE_BASEUNDERATTACK:
+			sfx = 0;
+			break;
+		default:
+			sfx = 0;
+			break;
+	}
+
+#ifdef TA_SPLITVIEW
+	// Add for all local clients
+	if (localClientNumber < 0 || localClientNumber >= MAX_SPLITVIEW) {
+		int i;
+
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if (cg.snap->lcIndex[i] != -1) {
+				CG_AddAnnouncementEx(&cg.localClients[i], sfx, bufferedSfx, cg_announcementMessages[announcement]);
+			}
+		}
+	}
+
+	lc = &cg.localClients[localClientNumber];
+#else
+	lc = &cg.localClient;
+#endif
+
+	CG_AddAnnouncementEx(lc, sfx, bufferedSfx, cg_announcementMessages[announcement]);
+}
+
+/*
+=================
+CG_AddAnnouncementEx
+
+Add announcement for local client
+=================
+*/
+void CG_AddAnnouncementEx(cglc_t *lc, qhandle_t sfx, qboolean bufferedSfx, const char *message)
+{
+	if (cg_announcerVoice.integer) {
+		if (bufferedSfx) {
+			CG_AddBufferedSound( sfx );
+		} else {
+			trap_S_StartLocalSound( sfx, CHAN_ANNOUNCER );
+		}
+	}
+
+	if (message[0] != '\0') {
+		if (cg_announcerText.integer) {
+			CG_Printf("[skipnotify]" S_COLOR_YELLOW "Annoucement: %s\n", message);
+		}
+		lc->announcementTime[lc->announcement] = cg.time;
+		Q_strncpyz(lc->announcementMessage[lc->announcement], message, sizeof (lc->announcementMessage[lc->announcement]));
+
+		lc->announcement = (lc->announcement + 1) % MAX_ANNOUNCEMENTS;
+	}
+}
+#endif
+
 //=========================================================================
 
 /*

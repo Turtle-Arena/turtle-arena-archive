@@ -122,6 +122,10 @@ vmCvar_t	cg_gibs;
 vmCvar_t	cg_drawSpeed;
 #endif
 vmCvar_t	cg_drawTimer;
+#ifdef TA_MISC // COMIC_ANNOUNCER
+vmCvar_t	cg_announcerText;
+vmCvar_t	cg_announcerVoice;
+#endif
 vmCvar_t	cg_drawFPS;
 vmCvar_t	cg_drawSnapshot;
 vmCvar_t	cg_draw3dIcons;
@@ -317,6 +321,10 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawTimer, "cg_drawTimer", "1", CVAR_ARCHIVE  },
 #else
 	{ &cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE  },
+#endif
+#ifdef TA_MISC // COMIC_ANNOUNCER
+	{ &cg_announcerText, "cg_announcerText", "0", 0  },
+	{ &cg_announcerVoice, "cg_announcerVoice", "1", 0  },
 #endif
 	{ &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE  },
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },

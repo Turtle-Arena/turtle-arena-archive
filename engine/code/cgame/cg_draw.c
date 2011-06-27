@@ -677,10 +677,11 @@ static void CG_DrawStatusBarHead( float x ) {
 
 #ifdef TA_HUD
 	CG_DrawHead( x,  (HUD_Y+(ICON_SIZE * 1.25)) - size, size, size,
+				cg.cur_ps->clientNum, angles );
 #else
 	CG_DrawHead( x, 480 - size, size, size, 
-#endif
 				cg.cur_ps->clientNum, angles );
+#endif
 }
 #endif // MISSIONPACK_HUD
 
@@ -1400,6 +1401,37 @@ static float CG_DrawTimer( float y ) {
 	return y + BIGCHAR_HEIGHT + 4;
 }
 
+#ifdef TA_MISC // COMIC_ANNOUNCER
+/*
+=================
+CG_DrawAnnouncements
+=================
+*/
+int CG_DrawAnnouncements(int y)
+{
+	char	*s;
+	int		i, j;
+
+	for (j = 0, i = cg.cur_lc->announcement-1; j < MAX_ANNOUNCEMENTS; j++, i--)
+	{
+		if (i == -1) {
+			i = MAX_ANNOUNCEMENTS-1;
+		}
+
+		if (cg.cur_lc->announcementTime[i] <= 0 || cg.cur_lc->announcementTime[i] + 10000 < cg.time) {
+			break;
+		}
+
+		// Add announcement
+		s = va( "Announcement: %s", cg.cur_lc->announcementMessage[i] );
+		CG_DrawBigString( -5, y + 2, s, 1.0F);
+
+		y += BIGCHAR_HEIGHT + 4;
+	}
+
+	return y;
+}
+#endif
 
 /*
 =================
@@ -1646,6 +1678,11 @@ static void CG_DrawUpperRight(stereoFrame_t stereoFrame)
 	if ( cg_drawTimer.integer ) {
 		y = CG_DrawTimer( y );
 	}
+#ifdef TA_MISC // COMIC_ANNOUNCER
+	if ( cg_announcerText.integer ) {
+		y = CG_DrawAnnouncements(y);
+	}
+#endif
 	if ( cg_drawAttacker.integer ) {
 		y = CG_DrawAttacker( y );
 	}
@@ -2203,14 +2240,26 @@ static void CG_DrawReward( void ) {
 	if ( !color ) {
 		if (cg.cur_lc->rewardStack > 0) {
 			for(i = 0; i < cg.cur_lc->rewardStack; i++) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+				cg.cur_lc->rewardAnnoucement[i] = cg.cur_lc->rewardAnnoucement[i+1];
+#else
 				cg.cur_lc->rewardSound[i] = cg.cur_lc->rewardSound[i+1];
+#endif
 				cg.cur_lc->rewardShader[i] = cg.cur_lc->rewardShader[i+1];
 				cg.cur_lc->rewardCount[i] = cg.cur_lc->rewardCount[i+1];
 			}
 			cg.cur_lc->rewardTime = cg.time;
 			cg.cur_lc->rewardStack--;
 			color = CG_FadeColor( cg.cur_lc->rewardTime, REWARD_TIME );
+#ifdef TA_MISC // COMIC_ANNOUNCER
+#ifdef TA_SPLITVIEW
+			CG_AddAnnouncement(cg.cur_lc->rewardAnnoucement[0], cg.cur_lc - cg.localClients);
+#else
+			CG_AddAnnouncement(cg.cur_lc->rewardAnnoucement[0]);
+#endif
+#else
 			trap_S_StartLocalSound(cg.cur_lc->rewardSound[0], CHAN_ANNOUNCER);
+#endif
 		} else {
 			return;
 		}

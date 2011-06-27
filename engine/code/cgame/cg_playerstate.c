@@ -360,10 +360,19 @@ void CG_CheckChangedPredictableEvents( playerState_t *ps ) {
 pushReward
 ==================
 */
-static void pushReward(sfxHandle_t sfx, qhandle_t shader, int rewardCount) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+static void pushReward(int annoucement, qhandle_t shader, int rewardCount)
+#else
+static void pushReward(sfxHandle_t sfx, qhandle_t shader, int rewardCount)
+#endif
+{
 	if (cg.cur_lc->rewardStack < (MAX_REWARDSTACK-1)) {
 		cg.cur_lc->rewardStack++;
+#ifdef TA_MISC // COMIC_ANNOUNCER
+		cg.cur_lc->rewardAnnoucement[cg.cur_lc->rewardStack] = annoucement;
+#else
 		cg.cur_lc->rewardSound[cg.cur_lc->rewardStack] = sfx;
+#endif
 		cg.cur_lc->rewardShader[cg.cur_lc->rewardStack] = shader;
 		cg.cur_lc->rewardCount[cg.cur_lc->rewardStack] = rewardCount;
 	}
@@ -426,7 +435,11 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 	// reward sounds
 	reward = qfalse;
 	if (ps->persistant[PERS_CAPTURES] != ops->persistant[PERS_CAPTURES]) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+		pushReward(ANNOUNCE_CAPTURE, cgs.media.medalCapture, ps->persistant[PERS_CAPTURES]);
+#else
 		pushReward(cgs.media.captureAwardSound, cgs.media.medalCapture, ps->persistant[PERS_CAPTURES]);
+#endif
 		reward = qtrue;
 		//Com_Printf("capture\n");
 	}
@@ -475,12 +488,20 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 	}
 #endif
 	if (ps->persistant[PERS_DEFEND_COUNT] != ops->persistant[PERS_DEFEND_COUNT]) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+		pushReward(ANNOUNCE_DEFENSE, cgs.media.medalDefend, ps->persistant[PERS_DEFEND_COUNT]);
+#else
 		pushReward(cgs.media.defendSound, cgs.media.medalDefend, ps->persistant[PERS_DEFEND_COUNT]);
+#endif
 		reward = qtrue;
 		//Com_Printf("defend\n");
 	}
 	if (ps->persistant[PERS_ASSIST_COUNT] != ops->persistant[PERS_ASSIST_COUNT]) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+		pushReward(ANNOUNCE_ASSIST, cgs.media.medalAssist, ps->persistant[PERS_ASSIST_COUNT]);
+#else
 		pushReward(cgs.media.assistSound, cgs.media.medalAssist, ps->persistant[PERS_ASSIST_COUNT]);
+#endif
 		reward = qtrue;
 		//Com_Printf("assist\n");
 	}
@@ -528,15 +549,39 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 			if ( ps->persistant[PERS_RANK] != ops->persistant[PERS_RANK] ) {
 				if ( cgs.gametype < GT_TEAM) {
 					if (  ps->persistant[PERS_RANK] == 0 ) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+#ifdef TA_SPLITVIEW
+						CG_AddAnnouncement(ANNOUNCE_YOUHAVETAKENTHELEAD, cg.cur_lc-cg.localClients);
+#else
+						CG_AddAnnouncement(ANNOUNCE_YOUHAVETAKENTHELEAD);
+#endif
+#else
 						CG_AddBufferedSound(cgs.media.takenLeadSound);
+#endif
 					} else
 #ifdef TA_SPLITVIEW // ZTM: Don't play tied or lost lead when there are multiple local clients, multiple sounds play and its annoying.
 					if (cg.snap->numPSs <= 1) {
 #endif
 					if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+#ifdef TA_SPLITVIEW
+						CG_AddAnnouncement(ANNOUNCE_YOURTIEDFORTHELEAD, cg.cur_lc-cg.localClients);
+#else
+						CG_AddAnnouncement(ANNOUNCE_YOURTIEDFORTHELEAD);
+#endif
+#else
 						CG_AddBufferedSound(cgs.media.tiedLeadSound);
+#endif
 					} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
+#ifdef TA_MISC // COMIC_ANNOUNCER
+#ifdef TA_SPLITVIEW
+						CG_AddAnnouncement(ANNOUNCE_YOULOSTTHELEAD, cg.cur_lc-cg.localClients);
+#else
+						CG_AddAnnouncement(ANNOUNCE_YOULOSTTHELEAD);
+#endif
+#else
 						CG_AddBufferedSound(cgs.media.lostLeadSound);
+#endif
 					}
 #ifdef TA_SPLITVIEW
 					}
