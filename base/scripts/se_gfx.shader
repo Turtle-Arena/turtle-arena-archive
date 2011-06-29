@@ -312,7 +312,7 @@ gfx/damage/burn_med_mrk
 {
 	polygonoffset
 	{
-		map gfx/damage/burn_med_mrk.tga
+		map gfx/damage/burn_med_mrk.png
 		blendfunc gl_zero gl_one_minus_src_color
 		rgbGen Vertex
 	}
