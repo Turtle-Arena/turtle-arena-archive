@@ -50,7 +50,6 @@ base/menu/art/randombot_icon.png
 base/menu/art/unknownmap.png
 
 Images that use GNU FreeFont FreeSans:
-base/gfx/2d/crosshaira.png
 base/textures/common/alpha000.png
 base/textures/common/alpha025.png
 base/textures/common/alpha050.png
