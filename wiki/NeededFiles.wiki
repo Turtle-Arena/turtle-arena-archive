@@ -28,7 +28,6 @@ Lock-on sounds like in LOZ:TP
   * base/sound/player/don/
   * TEMP: base/sound/player/raph/
   * base/sound/player/mike/
-  * TEMP: base/sound/player/casey/
 
 === List of Sounds ===
   * death1.wav
@@ -124,10 +123,9 @@ Lock-on sounds like in LOZ:TP
   * TEMP:	cgs.media.talkSound = trap_S_RegisterSound( "sound/player/talk.wav", qfalse );
   * TEMP:	cgs.media.landSound = trap_S_RegisterSound( "sound/player/land1.wav", qfalse);
 
-// I used the sounds from OpenArena
-  * OA:	cgs.media.watrInSound = trap_S_RegisterSound( "sound/player/watr_in.wav", qfalse);
-  * OA:	cgs.media.watrOutSound = trap_S_RegisterSound( "sound/player/watr_out.wav", qfalse);
-  * OA:	cgs.media.watrUnSound = trap_S_RegisterSound( "sound/player/watr_un.wav", qfalse);
+  * cgs.media.watrInSound = trap_S_RegisterSound( "sound/player/watr_in.wav", qfalse);
+  * cgs.media.watrOutSound = trap_S_RegisterSound( "sound/player/watr_out.wav", qfalse);
+  * cgs.media.watrUnSound = trap_S_RegisterSound( "sound/player/watr_un.wav", qfalse);
 
 
   * cgs.media.respawnSound = trap_S_RegisterSound( "sound/items/respawn1.wav", qfalse );
@@ -156,11 +154,11 @@ Lock-on sounds like in LOZ:TP
 Footsteps sounds are in sound/player/footsteps/
 NOTE: %d is replaced with 1 through 4. (i.e. sound/player/footsteps/step1.wav, sound/player/footsteps/step2.wav, ...)
 
-  * OA: step%d (default)
+  * step%d (default)
   * boot%d
   * DONE: clank%d
   * DONE: flesh%d
-  * OA: splash%d
+  * splash%d
 
 
 = Models =
