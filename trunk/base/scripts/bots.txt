@@ -17,12 +17,6 @@ aifile	bots/raph_c.c
 }
 
 {
-name		Casey
-model		casey/default
-aifile	bots/casey_c.c
-}
-
-{
 name		Don
 model		don/default
 aifile	bots/raph_c.c

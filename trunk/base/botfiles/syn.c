@@ -188,14 +188,9 @@ CONTEXT_REPLY
 
 CONTEXT_NAMES
 {
-	// ZTM: Rewrote
 	[("Leo", 1),		("Leonardo", 0.4), ("Fearless Leader", 0.3)]
 	[("Don", 1),		("Donny", 0.6), ("Donatello", 0.4)]
 	[("Raph", 1),		("Raphael", 0.4), ("Hot-Head", 0.2)]
-	// Is Michelangelo ever called "Mike" in the 2003 series?
 	[("Mikey", 1),		("Mike", 0.6), ("Michelangelo",0.4)]
-	[("April", 1),		("April O'Neil", 0.2)]
-	[("Casey", 1),		("Casey Jones", 0.2)]
-	[("Splinter", 1),   ("Master Splinter", 0.4)]
 }
 
