@@ -185,12 +185,6 @@ Most of the mapobjects should be damageable.
 
   * TODO: Portable (zip): Add a note (either on the website or in the readme) that removing the "settings/portable" file will make it use the normal user app data directory, i.e. $HOME/.turtlearena
 
-  * TODO: Portable Linux (zip): http://portablelinuxapps.org/
-	* Create portable linux app from .deb package
-      * http://www.omgubuntu.co.uk/2010/07/distro-agnostic-packaging-making.html
-    * TODO: Test Linux Portable Install on Ubuntu 10.04 (Lucid Lynx) 32-bit, OpenSUSE 11.3 (GNOME) 32-bit, and Fedora 12 (GNOME) 32-bit.
-      * And add a note to the website 'tested on X'
-
 = Data =
   * TODO: Have a intro video (video/intro.roq or ogm) before the menu.
 
@@ -198,11 +192,3 @@ Most of the mapobjects should be damageable.
 
   * TODO: Get free scenery objects from the Internet. Make most damageable.
     * http://virtualworlds.wikia.com
-
-
-= Packaging =
-  * TODO: Add more options to the Win32 NSIS installer
-	* Allow install path to be set?
-	* Allow desktop shortcut to be created?
-	* Allow Start Menu shortcuts not be created?
-	* Allow Start Menu folder name to be set?

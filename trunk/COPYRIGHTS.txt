@@ -114,6 +114,8 @@ music/zero-project_-_Whispering_Wind.ogg
 		zero-project - Whispering Wind - CC-BY-SA-3.0 - http://www.jamendo.com/en/track/682363
 
 == OpenArena ==
+Some of the shaders in the base/scripts/*.shader files are from OpenArena.
+
 The following are from OpenArena and are copyright (c) 2006 Dmn_clown and are
 	licensed under the GNU General Public License; either version 2 of the
 	License, or (at your option) any later version.
@@ -121,22 +123,17 @@ The following are from OpenArena and are copyright (c) 2006 Dmn_clown and are
 base/botfiles/bots/default_c.c
 base/botfiles/bots/default_i.c
 base/botfiles/bots/default_t.c
-base/botfiles/bots/default_w.c
 base/botfiles/fuzi.c
-base/botfiles/fuzw.c
 base/botfiles/items.c
 base/botfiles/match.c
 base/botfiles/rchat.c
 base/botfiles/rnd.c
 base/botfiles/syn.c
 base/botfiles/teamplay.h
-base/botfiles/weapons.h
 
 The following are from OpenArena,
 	and are licensed under the GNU General Public License; either version 2 of
 	the License, or (at your option) any later version.
-
-Some of the shaders in the base/scripts/*.shader files are from OpenArena.
 
 base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
