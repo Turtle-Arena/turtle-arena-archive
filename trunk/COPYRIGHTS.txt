@@ -103,15 +103,13 @@ base/gfx/2d/numbers/seven_32b.png
 base/gfx/2d/numbers/eight_32b.png
 base/gfx/2d/numbers/nine_32b.png
 
-Based on an OpenArena image, GPLv2+ only (not CC-BY-SA-3.0).
-base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
-
 == zero-project.gr ==
 The following is copyright (c) 2010 zero-project and is licensed under the
 	Creative Commons Attribution-ShareAlike 3.0 Unported.
 
 music/zero-project_-_Whispering_Wind.ogg
-		zero-project - Whispering Wind - CC-BY-SA-3.0 - http://www.jamendo.com/en/track/682363
+		zero-project - Whispering Wind - CC-BY-SA-3.0
+		http://www.jamendo.com/en/track/682363
 
 == OpenArena ==
 Some of the shaders in the base/scripts/*.shader files are from OpenArena.
@@ -135,9 +133,7 @@ The following are from OpenArena,
 	and are licensed under the GNU General Public License; either version 2 of
 	the License, or (at your option) any later version.
 
-base/gfx/damage/burn_med_mrk.tga
-base/gfx/damage/hole_lg_mrk.tga
-
+base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
 
 == GNU FreeFont ==
 The following files were created from GNU Freefont fonts, and are licensed under
