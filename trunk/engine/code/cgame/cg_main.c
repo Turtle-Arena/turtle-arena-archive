@@ -342,7 +342,11 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE },
 	{ &cg_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
+#ifdef TA_DATA // Data actually support it now, so default to off.
+	{ &cg_crosshairHealth, "cg_crosshairHealth", "0", CVAR_ARCHIVE },
+#else
 	{ &cg_crosshairHealth, "cg_crosshairHealth", "1", CVAR_ARCHIVE },
+#endif
 	{ &cg_crosshairX, "cg_crosshairX", "0", CVAR_ARCHIVE },
 	{ &cg_crosshairY, "cg_crosshairY", "0", CVAR_ARCHIVE },
 	{ &cg_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
