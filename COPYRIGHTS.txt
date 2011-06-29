@@ -141,17 +141,6 @@ Some of the shaders in the base/scripts/*.shader files are from OpenArena.
 base/gfx/damage/burn_med_mrk.tga
 base/gfx/damage/hole_lg_mrk.tga
 
-base/sound/player/watr_in.wav
-base/sound/player/watr_out.wav
-base/sound/player/watr_un.wav
-base/sound/player/footsteps/splash1.wav
-base/sound/player/footsteps/splash2.wav
-base/sound/player/footsteps/splash3.wav
-base/sound/player/footsteps/splash4.wav
-base/sound/player/footsteps/step1.wav
-base/sound/player/footsteps/step2.wav
-base/sound/player/footsteps/step3.wav
-base/sound/player/footsteps/step4.wav
 
 == GNU FreeFont ==
 The following files were created from GNU Freefont fonts, and are licensed under
