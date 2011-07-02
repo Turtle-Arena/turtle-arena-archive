@@ -1430,11 +1430,7 @@ void R_GetAnimTag( mdrHeader_t *mod, int framenum, const char *tagName, md3Tag_t
 
 			// uncompressed model...
 			//
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Fixed warning when using amd64-mingw32
-			frameSize = (size_t)( &((mdrFrame_t *)0)->bones[ mod->numBones ] );
-#else
-			frameSize = (long)( &((mdrFrame_t *)0)->bones[ mod->numBones ] );
-#endif
+			frameSize = (intptr_t)( &((mdrFrame_t *)0)->bones[ mod->numBones ] );
 			frame = (mdrFrame_t *)((byte *)mod + mod->ofsFrames + framenum * frameSize );
 
 			for (j = 0; j < 3; j++)

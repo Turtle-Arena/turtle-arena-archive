@@ -210,6 +210,10 @@ typedef struct {
 	qboolean		railgunFlash;
 #endif
 
+#ifndef TA_WEAPSYS
+	int				railFireTime;
+#endif
+
 	// machinegun spinning
 	float			barrelAngle;
 	int				barrelTime;
@@ -471,6 +475,9 @@ typedef struct {
 
 	vec3_t			color1;
 	vec3_t			color2;
+	
+	byte c1RGBA[4];
+	byte c2RGBA[4];
 
 #ifdef TA_PLAYERSYS
 	vec3_t			prefcolor2;

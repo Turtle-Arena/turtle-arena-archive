@@ -2861,43 +2861,19 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	gun.renderfx = parent->renderfx;
 
 	// set custom shading for railgun refire rate
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black. (and use correct glow in third person)
-	if ( ( ps || cent->currentState.clientNum == cg.cur_lc->predictedPlayerState.clientNum ) &&
-		cg.cur_lc->predictedPlayerState.weapon == WP_RAILGUN && 
-		cg.cur_lc->predictedPlayerState.weaponstate == WEAPON_FIRING )
-	{
-		float	f;
-
-		f = (float)cg.cur_lc->predictedPlayerState.weaponTime / 1500;
-		gun.shaderRGBA[1] = 0;
-		gun.shaderRGBA[0] = 
-		gun.shaderRGBA[2] = 255 * ( 1.0 - f );
-	} else {
-		gun.shaderRGBA[0] = 255;
-		gun.shaderRGBA[1] = 255;
-		gun.shaderRGBA[2] = 255;
-		gun.shaderRGBA[3] = 255;
-	}
-#else
-	if ( ps ) {
-		if ( cg.cur_lc->predictedPlayerState.weapon == WP_RAILGUN &&
-			cg.cur_lc->predictedPlayerState.weaponstate == WEAPON_FIRING )
-		{
-			float	f;
-
-			f = (float)cg.cur_lc->predictedPlayerState.weaponTime / 1500;
-			gun.shaderRGBA[1] = 0;
-			gun.shaderRGBA[0] = 
-			gun.shaderRGBA[2] = 255 * ( 1.0 - f );
-		} else {
-			gun.shaderRGBA[0] = 255;
-			gun.shaderRGBA[1] = 255;
-			gun.shaderRGBA[2] = 255;
-			gun.shaderRGBA[3] = 255;
+	if( weaponNum == WP_RAILGUN ) {
+		clientInfo_t *ci = &cgs.clientinfo[cent->currentState.clientNum];
+		if( cent->pe.railFireTime + 1500 > cg.time ) {
+			int scale = 255 * ( cg.time - cent->pe.railFireTime ) / 1500;
+			gun.shaderRGBA[0] = ( ci->c1RGBA[0] * scale ) >> 8;
+			gun.shaderRGBA[1] = ( ci->c1RGBA[1] * scale ) >> 8;
+			gun.shaderRGBA[2] = ( ci->c1RGBA[2] * scale ) >> 8;
+ 			gun.shaderRGBA[3] = 255;
+ 		}
+		else {
+			Byte4Copy( ci->c1RGBA, gun.shaderRGBA );
 		}
-
-	}
-#endif
+ 	}
 #endif
 
 #ifdef IOQ3ZTM
@@ -2916,48 +2892,43 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		gun[i].renderfx = parent->renderfx;
 
 		// set custom shading for railgun refire rate
-		if ( ( ps || cent->currentState.clientNum == cg.cur_lc->predictedPlayerState.clientNum )
-			&& ((weaponGroup->weapon[i]->weapontype == WT_GUN && cg.cur_lc->predictedPlayerState.weaponstate == WEAPON_FIRING
-			&& weaponGroup->weapon[i]->attackDelay > 0) || weaponGroup->weapon[i]->weapontype != WT_GUN))
+		if (weaponGroup->weapon[i]->weapontype == WT_GUN)
 		{
-			float	f;
+			if (weaponGroup->weapon[i]->attackDelay > 0 &&
+				cent->muzzleFlashTime + weaponGroup->weapon[i]->attackDelay > cg.time)
+			{
+				int f = 255 * (cg.time - cent->muzzleFlashTime) / weaponGroup->weapon[i]->attackDelay;
 
-			if (weaponGroup->weapon[i]->weapontype == WT_GUN) {
-				f = (float)cg.cur_lc->predictedPlayerState.weaponTime / weaponGroup->weapon[i]->attackDelay;
-
-#if 1 // Use color2
 				// color2 is secondary color (primary is trail)
-				gun[i].shaderRGBA[0] = ci->color2[0] * 255 * ( 1.0 - f );
-				gun[i].shaderRGBA[1] = ci->color2[1] * 255 * ( 1.0 - f );
-				gun[i].shaderRGBA[2] = ci->color2[2] * 255 * ( 1.0 - f );
-#else // Use purple
-				gun[i].shaderRGBA[1] = 0;
-				gun[i].shaderRGBA[0] = 
-				gun[i].shaderRGBA[2] = 255 * ( 1.0 - f );
-#endif
+				gun[i].shaderRGBA[0] = ( ci->c2RGBA[0] * f ) >> 8;
+				gun[i].shaderRGBA[1] = ( ci->c2RGBA[1] * f ) >> 8;
+				gun[i].shaderRGBA[2] = ( ci->c2RGBA[2] * f ) >> 8;
+				gun[i].shaderRGBA[3] = 255;
 			} else {
-				f = (float)cg.cur_lc->predictedPlayerState.meleeTime / ((float)cg.cur_lc->predictedPlayerState.meleeLinkTime*0.66f);
+				Byte4Copy( ci->c2RGBA, gun[i].shaderRGBA );
+			}
+		} else {
+#if 0
+			int animTime = BG_AnimationTime(&ci->playercfg.animations[cent->currentState.torsoAnim]);
+
+			if (animTime > 0 && cent->muzzleFlashTime + animTime > cg.time)
+			{
+				int f = 255 * (cg.time - cent->muzzleFlashTime) / animTime;
 
 				if ((weaponGroup->weapon[i]->flags & WIF_ALWAYS_DAMAGE)) {
-					float scale;
-
-					scale = 0.005 + cent->currentState.number * 0.00001;
-					f = sin( ( cg.time + 1000 ) *  scale ) / 2;
-
-					f = Com_Clamp(0.1f, 0.5f, f );
+					f = 255 * Com_Clamp(0.5f, 1.0f, 0.5f + sin( ( cg.time / 1000 ) ) / 2 );
 				}
 
 				// color1 is primary
-				gun[i].shaderRGBA[0] = ci->color1[0] * 255 * ( 1.0 - f );
-				gun[i].shaderRGBA[1] = ci->color1[1] * 255 * ( 1.0 - f );
-				gun[i].shaderRGBA[2] = ci->color1[2] * 255 * ( 1.0 - f );
+				gun[i].shaderRGBA[0] = ( ci->c1RGBA[0] * f ) >> 8;
+				gun[i].shaderRGBA[1] = ( ci->c1RGBA[1] * f ) >> 8;
+				gun[i].shaderRGBA[2] = ( ci->c1RGBA[2] * f ) >> 8;
+				gun[i].shaderRGBA[3] = 255;
+			} else
+#endif
+			{
+				Byte4Copy( ci->c1RGBA, gun[i].shaderRGBA );
 			}
-
-		} else {
-			gun[i].shaderRGBA[0] = 255;
-			gun[i].shaderRGBA[1] = 255;
-			gun[i].shaderRGBA[2] = 255;
-			gun[i].shaderRGBA[3] = 255;
 		}
 
 		gun[i].hModel = cg_weapons[weaponGroup->weaponnum[i]].weaponModel;
@@ -4019,6 +3990,10 @@ void CG_FireWeapon( centity_t *cent ) {
 			return;
 		}
 	}
+
+	if( ent->weapon == WP_RAILGUN ) {
+		cent->pe.railFireTime = cg.time;
+	}
 #endif
 
 #ifdef TA_WEAPSYS
@@ -4741,12 +4716,10 @@ void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		{
 			// colorize with client color
 			VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
-#ifdef IOQ3ZTM // IOQ3BUGFIX: let use color
 			le->refEntity.shaderRGBA[0] = le->color[0] * 0xff;
 			le->refEntity.shaderRGBA[1] = le->color[1] * 0xff;
 			le->refEntity.shaderRGBA[2] = le->color[2] * 0xff;
 			le->refEntity.shaderRGBA[3] = 0xff;
-#endif
 		}
 #ifdef TA_WEAPSYS // SPR_EXP_SCALE
 		le->radius = exp_base;
@@ -4786,7 +4759,7 @@ void CG_MissileExplode( int weapon, int clientNum, vec3_t origin, vec3_t dir, im
 		float	*color;
 
 		// colorize with client color
-		color = cgs.clientinfo[clientNum].color2;
+		color = cgs.clientinfo[clientNum].color1;
 #ifdef TA_WEAPSYS
 		if (!CG_ImpactMark( mark, origin, dir, random()*360, color[0],color[1], color[2],1, alphaFade, radius, qfalse ))
 			return;
@@ -4915,7 +4888,7 @@ void CG_MissileImpact( int projnum, int clientNum, vec3_t origin, vec3_t dir, im
 		float	*color;
 
 		// colorize with client color
-		color = cgs.clientinfo[clientNum].color2;
+		color = cgs.clientinfo[clientNum].color1;
 		if (!CG_ImpactMark( mark, origin, dir, random()*360, color[0],color[1], color[2],1, alphaFade, radius, qfalse ))
 			return;
 	} else {
@@ -5067,7 +5040,7 @@ void CG_WeaponImpact( int weaponGroup, int hand, int clientNum, vec3_t origin, v
 		float	*color;
 
 		// colorize with client color
-		color = cgs.clientinfo[clientNum].color2;
+		color = cgs.clientinfo[clientNum].color1;
 		if (!CG_ImpactMark( mark, origin, dir, random()*360, color[0],color[1], color[2],1, alphaFade, radius, qfalse ))
 			return; // no impact
 	} else {
@@ -5101,12 +5074,10 @@ void CG_WeaponImpact( int weaponGroup, int hand, int clientNum, vec3_t origin, v
 			{
 				// colorize with client color
 				VectorCopy( cgs.clientinfo[clientNum].color1, le->color );
-#ifdef IOQ3ZTM // IOQ3BUGFIX: let use color
 				le->refEntity.shaderRGBA[0] = le->color[0] * 0xff;
 				le->refEntity.shaderRGBA[1] = le->color[1] * 0xff;
 				le->refEntity.shaderRGBA[2] = le->color[2] * 0xff;
 				le->refEntity.shaderRGBA[3] = 0xff;
-#endif
 			}
 #ifdef TA_WEAPSYS // SPR_EXP_SCALE
 			if (isSprite) {
