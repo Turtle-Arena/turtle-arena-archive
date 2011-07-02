@@ -441,6 +441,26 @@ enum
 };
 #endif
 
+#ifdef IOQ3ZTM // GHOST
+#define NUM_GHOST_REFS 10
+typedef struct
+{
+	int time;
+
+	vec3_t		axis[3];			// rotation vectors
+	qboolean	nonNormalizedAxes;	// axis are not normalized, i.e. they have scale
+	int			frame;				// also used as MODEL_BEAM's diameter
+
+	// previous data for frame interpolation
+	int			oldframe;
+	float		backlerp;			// 0.0 = current, 1.0 = old
+
+	float		shaderTime;
+	vec3_t		origin;
+
+} ghostRefData_t;
+#endif
+
 typedef struct {
 	qboolean		infoValid;
 
@@ -478,7 +498,8 @@ typedef struct {
 	int				invulnerabilityStopTime;
 #endif
 #ifdef IOQ3ZTM // GHOST
-	int				ghostTime;
+	int				ghostTime[MAX_HANDS];
+	ghostRefData_t	ghostWeapon[MAX_HANDS][NUM_GHOST_REFS];
 #endif
 
 	int				breathPuffTime;
@@ -2108,7 +2129,7 @@ void CG_DrawWeaponSelect( void );
 void CG_OutOfAmmoChange( void );	// should this be in pmove?
 #endif
 #ifdef IOQ3ZTM // GHOST
-localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive, byte *rgba);
+void CG_GhostRefEntity(refEntity_t *refEnt, ghostRefData_t *refs, int num, int *ghostTime);
 #endif
 
 //
