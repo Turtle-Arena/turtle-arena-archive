@@ -3700,16 +3700,12 @@ void CG_Player( centity_t *cent ) {
 	// add powerups floating behind the player
 	CG_PlayerPowerups( cent, &torso );
 
-#ifdef IOQ3ZTM // GHOST
+#if 0 //#ifdef IOQ3ZTM // ZTM: TODO: Add a speed effect?
 	if ((cent->currentState.powerups & ( 1 << PW_HASTE )
 		|| cent->currentState.powerups & ( 1 << PW_SCOUT ))
-		&& !(cent->currentState.powerups & ( 1 << PW_INVIS ))
-		&& cg.time - ci->ghostTime >= 10)
+		&& !(cent->currentState.powerups & ( 1 << PW_INVIS )))
 	{
-		ci->ghostTime = cg.time;
-		CG_GhostRefEntity(&legs, 50, legs.shaderRGBA);
-		CG_GhostRefEntity(&torso, 50, torso.shaderRGBA);
-		CG_GhostRefEntity(&head, 50, head.shaderRGBA);
+		// ...
 	}
 #endif
 }

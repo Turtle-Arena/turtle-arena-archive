@@ -2328,48 +2328,92 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, entityState_t *state )
 
 
 #ifdef IOQ3ZTM // GHOST
+static void VectorInterpolate( vec3_t a, vec3_t b, float lerp, vec3_t out ) {
+	out[0] = b[0] + (a[0] - b[0]) * lerp;
+	out[1] = b[1] + (a[1] - b[1]) * lerp;
+	out[2] = b[2] + (a[2] - b[2]) * lerp;
+}
+
+static void AxisInterpolate( vec3_t *a, vec3_t *b, float lerp, vec3_t *out ) {
+	VectorInterpolate(a[0], b[0], lerp, out[0]);
+	VectorInterpolate(a[1], b[1], lerp, out[1]);
+	VectorInterpolate(a[2], b[2], lerp, out[2]);
+}
+
 /*
 =============
 CG_GhostRefEntity
 =============
 */
-localEntity_t *CG_GhostRefEntity(refEntity_t *refEnt, int timetolive, byte *rgba)
+void CG_GhostRefEntity(refEntity_t *re, ghostRefData_t *refs, int num, int *ghostTime)
 {
-	localEntity_t	*le;
-	refEntity_t		*re;
+	const float		GHOST_TIME = 200.0f;
+	int				i;
+	ghostRefData_t	*refData = &refs[num];
+	vec3_t			dir;
+	float			dist;
+	float			frac;
 
-	le = CG_AllocLocalEntity();
-	le->leFlags = LEF_PUFF_DONT_SCALE;
-	le->leType = LE_MOVE_SCALE_FADE;
-	le->startTime = cg.time;
-	le->endTime = cg.time + timetolive;
-	le->lifeRate = 1.0 / ( le->endTime - le->startTime );
+	if (refData->time < cg.time) {
 
-	le->refEntity = *refEnt;
-	re = &le->refEntity;
+		if (*ghostTime >= cg.time)
+			return;
 
-	re->shaderTime = cg.time / 1000.0f;
+		// Check if too close to another ghost?
+		for (i = 0; i < NUM_GHOST_REFS; i++) {
+			if (refs[i].time >= cg.time) {
+				VectorSubtract(re->origin, refs[i].origin, dir);
+				dist = VectorLength(dir);
+				if (dist < 5.0f) {
+					// too close, don't add.
+					break;
+				}
+			}
+		}
 
-	re->radius = 5;
-	if (rgba) {
-		re->shaderRGBA[0] = rgba[0];
-		re->shaderRGBA[1] = rgba[1];
-		re->shaderRGBA[2] = rgba[2];
-		re->shaderRGBA[3] = rgba[3];
+		if (i < NUM_GHOST_REFS) {
+			*ghostTime = cg.time + 50;
+			return;
+		}
+
+		*ghostTime = cg.time + 100;
+
+		refData->time = cg.time + GHOST_TIME;
+
+		for (i = 0; i < 3; i++)
+			VectorCopy(re->axis[i], refData->axis[i]);
+
+		refData->nonNormalizedAxes = re->nonNormalizedAxes;
+		refData->frame = re->frame;
+
+		// previous data for frame interpolation
+		refData->oldframe = re->oldframe;
+		refData->backlerp = re->backlerp;
+
+		refData->shaderTime = re->shaderTime;
+		VectorCopy(re->origin, refData->origin);
+
+		frac = ((refData->time - cg.time) / GHOST_TIME);
 	} else {
-		re->shaderRGBA[0] = re->shaderRGBA[1] =
-		re->shaderRGBA[2] = re->shaderRGBA[3] = 0xff;
+		frac = ((refData->time - cg.time) / GHOST_TIME);
+
+		AxisInterpolate(refData->axis, re->axis, frac, re->axis);
+
+		re->nonNormalizedAxes = refData->nonNormalizedAxes;
+		re->frame = refData->frame;
+
+		// previous data for frame interpolation
+		re->oldframe = refData->oldframe;
+		re->backlerp = refData->backlerp;
+
+		re->shaderTime = refData->shaderTime;
+
+		VectorInterpolate(refData->origin, re->origin, frac, re->origin);
+		VectorCopy(re->origin, re->oldorigin);
 	}
+
+	re->shaderRGBA[3] = 0x80 * frac;
 	re->renderfx |= RF_FORCE_ENT_ALPHA | RF_NOSHADOW;
-
-	le->color[0] = le->color[1] = le->color[2] = le->color[3] = 1.0f;
-
-	le->pos.trType = TR_LINEAR;
-	le->pos.trTime = cg.time;
-	VectorCopy( refEnt->origin, le->pos.trBase );
-	VectorClear(le->pos.trDelta);
-
-	return le;
 }
 #endif
 
@@ -2557,15 +2601,10 @@ Add tranparent copies of the model when melee attacking
 */
 void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand, qboolean barrel)
 {
-	int anim;
-
-	static int trailOldTime[MAX_CLIENTS][MAX_HANDS];
-	static int weaponMoveDirInit = 0;
-	if (!weaponMoveDirInit)
-	{
-		weaponMoveDirInit = 1;
-		memset(&trailOldTime, 0, sizeof (trailOldTime));
-	}
+	int				anim;
+	clientInfo_t	*ci;
+	refEntity_t		ref;
+	int				i;
 
 	if (cent->currentState.powerups & ( 1 << PW_INVIS ))
 		return;
@@ -2589,15 +2628,26 @@ void CG_AddWeaponTrail(centity_t *cent, refEntity_t *gun, int weaponHand, qboole
 
 	anim = ( cent->currentState.torsoAnim & ~ANIM_TOGGLEBIT );
 
-	if (!BG_PlayerAttackAnim(anim))
-		return;
+	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 
-	if (cg.time > trailOldTime[cent->currentState.clientNum][weaponHand] // barrel will be same time
-		&& cg.time - trailOldTime[cent->currentState.clientNum][weaponHand] < 10)
-		return;
+	if (!BG_PlayerAttackAnim(anim)) {
+		if (ci->ghostTime[weaponHand] == 0)
+			return;
 
-	trailOldTime[cent->currentState.clientNum][weaponHand] = cg.time;
-	CG_GhostRefEntity(gun, 100, gun->shaderRGBA);
+		ci->ghostTime[weaponHand] = 0;
+
+		// Clear ghosts
+		for (i = 0; i < NUM_GHOST_REFS; i++) {
+			ci->ghostWeapon[weaponHand][i].time = 0;
+		}
+		return;
+	}
+
+	for (i = 0; i < NUM_GHOST_REFS; i++) {
+		ref = *gun;
+		CG_GhostRefEntity(&ref, ci->ghostWeapon[weaponHand], i, &ci->ghostTime[weaponHand]);
+		CG_AddWeaponWithPowerups(&ref, &cent->currentState);
+	}
 }
 #endif
 
