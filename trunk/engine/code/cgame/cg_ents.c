@@ -673,13 +673,6 @@ static void CG_Item( centity_t *cent ) {
 
 	memset (&ent, 0, sizeof(ent));
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black.
-	ent.shaderRGBA[0] = 255;
-	ent.shaderRGBA[1] = 255;
-	ent.shaderRGBA[2] = 255;
-	ent.shaderRGBA[3] = 255;
-#endif
-
 	// autorotate at one of two speeds
 	if ( item->giType == IT_HEALTH ) {
 		VectorCopy( cg.autoAnglesFast, cent->lerpAngles );
@@ -730,6 +723,38 @@ static void CG_Item( centity_t *cent ) {
 
 		cent->lerpOrigin[2] += 8;	// an extra height boost
 	}
+	
+#ifdef TA_WEAPSYS
+	if( item->giType == IT_WEAPON ) {
+#ifdef TA_SPLITVIEW
+		clientInfo_t *ci = &cgs.clientinfo[cg.snap->pss[0].clientNum];
+#else
+		clientInfo_t *ci = &cgs.clientinfo[cg.snap->ps.clientNum];
+#endif
+		if (BG_WeaponHasMelee(item->giTag)) {
+			Byte4Copy( ci->c1RGBA, ent.shaderRGBA );
+		} else {
+			Byte4Copy( ci->c2RGBA, ent.shaderRGBA );
+		}
+	}
+#else
+	if( item->giType == IT_WEAPON && item->giTag == WP_RAILGUN ) {
+#ifdef TA_SPLITVIEW
+		clientInfo_t *ci = &cgs.clientinfo[cg.snap->pss[0].clientNum];
+#else
+		clientInfo_t *ci = &cgs.clientinfo[cg.snap->ps.clientNum];
+#endif
+		Byte4Copy( ci->c1RGBA, ent.shaderRGBA );
+	}
+#endif
+#ifdef IOQ3ZTM // Have non-weapons use white
+	else {
+		ent.shaderRGBA[0] = 255;
+		ent.shaderRGBA[1] = 255;
+		ent.shaderRGBA[2] = 255;
+		ent.shaderRGBA[3] = 255;
+	}
+#endif
 
 	ent.hModel = cg_items[es->modelindex].models[0];
 #ifdef IOQ3ZTM // FLAG_MODEL
@@ -964,10 +989,8 @@ static void CG_Missile( centity_t *cent ) {
 	s1 = &cent->currentState;
 #ifdef TA_WEAPSYS
 	if ( s1->weapon >= BG_NumProjectiles() )
-#elif defined IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
-	if ( s1->weapon >= WP_NUM_WEAPONS )
 #else
-	if ( s1->weapon > WP_NUM_WEAPONS )
+	if ( s1->weapon >= WP_NUM_WEAPONS )
 #endif
 	{
 		s1->weapon = 0;
@@ -1216,10 +1239,8 @@ static void CG_Grapple( centity_t *cent ) {
 	s1 = &cent->currentState;
 #ifdef TA_WEAPSYS
 	if ( s1->weapon >= BG_NumProjectiles() )
-#elif defined IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
-	if ( s1->weapon >= WP_NUM_WEAPONS )
 #else
-	if ( s1->weapon > WP_NUM_WEAPONS )
+	if ( s1->weapon >= WP_NUM_WEAPONS )
 #endif
 	{
 		s1->weapon = 0;
