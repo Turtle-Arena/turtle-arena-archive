@@ -1388,6 +1388,11 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	{
 		// ZTM: TODO: Have a different message for when splitscreen player joins?
 		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
+
+#ifdef IOQ3ZTM
+		// show entered the game message
+		ent->flags |= FL_FIRST_TIME;
+#endif
 	}
 
 	if ( g_gametype.integer >= GT_TEAM &&
@@ -1420,6 +1425,9 @@ void ClientBegin( int clientNum ) {
 	gclient_t	*client;
 	gentity_t	*tent;
 	int			flags;
+#ifdef IOQ3ZTM
+	qboolean	firstTime;
+#endif
 
 	ent = g_entities + clientNum;
 
@@ -1469,24 +1477,34 @@ void ClientBegin( int clientNum ) {
 	G_LoadPlayer(clientNum, client->pers.playercfg.model, client->pers.playercfg.headModel);
 #endif
 
+#ifdef IOQ3ZTM
+	firstTime = (ent->flags & FL_FIRST_TIME);
+#endif
+
 	// locate ent at a spawn point
 	ClientSpawn( ent );
 
-	if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
-#ifdef TA_SP
-		if (!(g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER))
-		{
+#ifdef IOQ3ZTM
+	// show entered the game message
+	if (firstTime)
+#else
+	if ( client->sess.sessionTeam != TEAM_SPECTATOR )
 #endif
+	{
+#ifdef IOQ3ZTM
+		ent->flags &= FL_FIRST_TIME;
+#endif
+
 		// send event
 		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
 		tent->s.clientNum = ent->s.clientNum;
 
-		if ( g_gametype.integer != GT_TOURNAMENT  ) {
+#ifndef IOQ3ZTM
+		if ( g_gametype.integer != GT_TOURNAMENT  )
+#endif
+		{
 			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
 		}
-#ifdef TA_SP
-		}
-#endif
 	}
 	G_LogPrintf( "ClientBegin: %i\n", clientNum );
 

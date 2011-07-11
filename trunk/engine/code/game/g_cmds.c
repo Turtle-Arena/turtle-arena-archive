@@ -535,25 +535,41 @@ Let everyone know about a team change
 */
 void BroadcastTeamChange( gclient_t *client, int oldTeam )
 {
+#ifdef TA_MISC
+#define BCAST_CMD "print"
+#else
+#define BCAST_CMD "cp"
+#endif
+
+#ifndef IOQ3ZTM
 	if ( client->sess.sessionTeam == TEAM_RED ) {
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the red team.\n\"",
+		trap_SendServerCommand( -1, va(BCAST_CMD " \"%s" S_COLOR_WHITE " joined the red team.\n\"",
 			client->pers.netname) );
 	} else if ( client->sess.sessionTeam == TEAM_BLUE ) {
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the blue team.\n\"",
+		trap_SendServerCommand( -1, va(BCAST_CMD " \"%s" S_COLOR_WHITE " joined the blue team.\n\"",
 		client->pers.netname));
-	} else if ( client->sess.sessionTeam == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR ) {
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the spectators.\n\"",
+	} else
+#endif
+	if ( client->sess.sessionTeam == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR ) {
+		trap_SendServerCommand( -1, va(BCAST_CMD " \"%s" S_COLOR_WHITE " joined the spectators.\n\"",
 		client->pers.netname));
 	} else if ( client->sess.sessionTeam == TEAM_FREE ) {
-#ifdef TA_SP
-		if (g_gametype.integer == GT_SINGLE_PLAYER)
-			trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the game.\n\"",
-			client->pers.netname));
-		else
-#endif
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE " joined the battle.\n\"",
+#ifdef TA_MISC
+		trap_SendServerCommand( -1, va(BCAST_CMD " \"%s" S_COLOR_WHITE " joined the game.\n\"",
 		client->pers.netname));
+#else
+		trap_SendServerCommand( -1, va(BCAST_CMD " \"%s" S_COLOR_WHITE " joined the battle.\n\"",
+		client->pers.netname));
+#endif
 	}
+#ifdef IOQ3ZTM
+	else {
+		trap_SendServerCommand( -1, va(BCAST_CMD " \"%s" S_COLOR_WHITE " joined the %s team.\n\"",
+		client->pers.netname, TeamNameInColor(client->sess.sessionTeam)));
+	}
+#endif
+
+#undef BCAST_CMD
 }
 
 /*
@@ -671,7 +687,11 @@ void SetTeam( gentity_t *ent, char *s ) {
 		// Kill him (makes sure he loses flags, etc)
 		ent->flags &= ~FL_GODMODE;
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
+#ifdef IOQ3ZTM_NO_COMPAT
+		player_die (ent, ent, ent, 100000, MOD_SPECTATE);
+#else
 		player_die (ent, ent, ent, 100000, MOD_SUICIDE);
+#endif
 
 	}
 
