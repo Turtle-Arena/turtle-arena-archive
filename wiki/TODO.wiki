@@ -53,9 +53,9 @@
   * TODO: Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161
 
 == Teamplay ==
-  * TODO: Data: Create team skins for players (for Foot at least)
+  * TODO: Data: Create team skins for players?
 
-  * TODO: Data: Update flag skins for new default teams (Red: Foot, Blue: Shell)
+  * TODO: Data: Update flag skins for new default teams
 
   * TODO: Per-team flag skins? (Team icon is on flag skin)
      * Would a shader remap work?
