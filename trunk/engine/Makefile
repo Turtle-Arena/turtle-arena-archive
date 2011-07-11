@@ -215,12 +215,12 @@ else # END QUAKE3
 
 	##### ioquake3 defines
 	# STANDALONE			ioquake3 define to disable quake3 code for authenticating, and stuff.
-	# RAVENMD4				Enable support for loading MDR models when attempting to load *.mdr.
-	# MISSIONPACK			Quake3 expansion pack, Team Arena.
+	# RAVENMD4				Enable support for loading MDR models.
+	# MISSIONPACK			Code for the official Quake III Arena expansion pack, Quake III: Team Arena.
 	##### "new ioquake3 defines"
 	# IOQUAKE3				Enables CD key check and punkbuster UI code
-	# MISSIONPACK_HUD		Use MISSIONPACK ui scripting in cgame for hud and menus. (ZTM: Split from MISSIONPACK define)
-	# MISSIONPACK_HARVESTER	Enable MISSIONPACK harevester gametype (ZTM: Split from MISSIONPACK define)
+	# MISSIONPACK_HUD		Use MISSIONPACK UI scripting in cgame for hud and menus. (ZTM: Split from MISSIONPACK define)
+	# MISSIONPACK_HARVESTER	Enable MISSIONPACK harvester gametype (ZTM: Split from MISSIONPACK define)
 
 
 	# Turtle Arena "general" defines
@@ -264,7 +264,7 @@ else # END QUAKE3
 	# TA_PATHSYS			General path system using entities like path_corner
 	# TA_ENTSYS				Adds new entities and allows all ET_MOVER entities to be breakable.
 	# TA_NPCSYS   			WIP NPC system, based on TDC_NPC system and code in Quake3
-	# TA_ATMEFFECTS			TODO Atmospheric effects.
+	# TA_ATMEFFECTS			TODO: Atmospheric effects.
 	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
 	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
 	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
@@ -287,7 +287,7 @@ else # END QUAKE3
 	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
 
 	BUILD_DEFINES = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
-						-DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
+						-DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
 						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DTA_HOLDSYS -DTA_ITEMSYS \
 						-DTA_WEAPSYS -DTA_PLAYERSYS \
@@ -323,8 +323,8 @@ else # END QUAKE3
 	BASEGAME_FLAGS = -DMISSIONPACK
 	MISSIONPACK_FLAGS= -DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
 
-	# Disable building scriptable hud and scriptable ui versions of cgame/ui
-	#    game is unchanged.
+	# Disable building scriptable hud and scriptable ui versions of cgame/ui,
+	#    game is the same.
 	ifneq ($(BUILD_MISSIONPACK),1)
 		BUILD_MISSIONPACK=0
 	endif
