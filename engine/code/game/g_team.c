@@ -81,6 +81,16 @@ const char *TeamName(int team)  {
 		return "spector";
 	return "free";
 }
+
+const char *TeamNameInColor(int team)  {
+	if (team==TEAM_RED)
+		return S_COLOR_RED "red" S_COLOR_WHITE;
+	else if (team==TEAM_BLUE)
+		return S_COLOR_BLUE "blue" S_COLOR_WHITE;
+	else if (team==TEAM_SPECTATOR)
+		return "spector";
+	return "free";
+}
 #else
 const char *TeamName(int team)  {
 	if (team==TEAM_RED)
@@ -840,8 +850,8 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 #ifdef IOQ3ZTM // FLAG_MESSAGES
 		otherTeam = OtherTeam(team);
 
-		PrintMsg( NULL, "[skipnotify]%s" S_COLOR_WHITE " captured the %s%s" S_COLOR_WHITE " flag.\n", cl->pers.netname, TeamColorString(otherTeam), TeamName(otherTeam));
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE "\ncaptured the %s%s" S_COLOR_WHITE " flag.\n\"", cl->pers.netname, TeamColorString(otherTeam), TeamName(otherTeam)) );
+		PrintMsg( NULL, "[skipnotify]%s" S_COLOR_WHITE " captured the %s flag.\n", cl->pers.netname, TeamNameInColor(otherTeam));
+		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE "\ncaptured the %s flag.\n\"", cl->pers.netname, TeamNameInColor(otherTeam)) );
 #else
 	PrintMsg( NULL, "%s" S_COLOR_WHITE " captured the %s flag!\n", cl->pers.netname, TeamName(OtherTeam(team)));
 #endif
@@ -957,8 +967,8 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 	else{
 #endif
 #ifdef IOQ3ZTM // FLAG_MESSAGES
-		PrintMsg (NULL, "%s" S_COLOR_WHITE " picked up the %s%s" S_COLOR_WHITE " flag!\n",
-			other->client->pers.netname, TeamColorString(team), TeamName(team));
+		PrintMsg (NULL, "%s" S_COLOR_WHITE " picked up the %s flag!\n",
+			other->client->pers.netname, TeamNameInColor(team));
 #else
 		PrintMsg (NULL, "%s" S_COLOR_WHITE " got the %s flag!\n",
 			other->client->pers.netname, TeamName(team));

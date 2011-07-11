@@ -46,6 +46,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef TURTLEARENA // DROWNING
 #define	FL_DROWNING_WARNING		0x00000001
 #endif
+#ifdef IOQ3ZTM
+#define	FL_FIRST_TIME			0x00000002
+#endif
 #define	FL_GODMODE				0x00000010
 #define	FL_NOTARGET				0x00000020
 #define	FL_TEAMSLAVE			0x00000400	// not the first on the team

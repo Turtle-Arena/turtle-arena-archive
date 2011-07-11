@@ -697,6 +697,10 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		killer, self->s.number, meansOfDeath, killerName, 
 		self->client->pers.netname, obit );
 
+#ifdef IOQ3ZTM_NO_COMPAT
+	// Don't send death obituary when swiching to spactator mode.
+	if (meansOfDeath != MOD_SPECTATE) {
+#endif
 	// broadcast the death event to everyone
 	ent = G_TempEntity( self->r.currentOrigin, EV_OBITUARY );
 	ent->s.eventParm = meansOfDeath;
@@ -734,6 +738,9 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	}
 #endif
 	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
+#ifdef IOQ3ZTM_NO_COMPAT
+	}
+#endif
 
 	self->enemy = attacker;
 
@@ -819,8 +826,14 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	// Add team bonuses
 	Team_FragBonuses(self, inflictor, attacker);
 
+#ifndef TA_MISC // DROP_FLAG
 	// if I committed suicide, the flag does not fall, it returns.
-	if (meansOfDeath == MOD_SUICIDE) {
+	if (meansOfDeath == MOD_SUICIDE
+#ifdef IOQ3ZTM_NO_COMPAT
+		|| meansOfDeath == MOD_SPECTATE
+#endif
+		)
+	{
 		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
 			Team_ReturnFlag( TEAM_FREE );
 			self->client->ps.powerups[PW_NEUTRALFLAG] = 0;
@@ -834,6 +847,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			self->client->ps.powerups[PW_BLUEFLAG] = 0;
 		}
 	}
+#endif
 
 	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
 	contents = trap_PointContents( self->r.currentOrigin, -1 );

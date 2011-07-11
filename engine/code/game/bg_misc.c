@@ -1344,6 +1344,9 @@ char	*modNames[MOD_MAX] = {
 	"MOD_TELEFRAG",
 	"MOD_FALLING",
 	"MOD_SUICIDE",
+#ifdef IOQ3ZTM_NO_COMPAT
+	"MOD_SPECTATE",
+#endif
 	"MOD_TARGET_LASER",
 	"MOD_TRIGGER_HURT",
 #ifdef TA_ENTSYS
@@ -4822,7 +4825,7 @@ char *eventnames[] = {
 #ifndef TA_WEAPSYS
 	"EV_SHOTGUN",
 #endif
-#ifndef IOQ3ZTM_NO_COMPAT
+#ifndef IOQ3ZTM_NO_COMPAT // UNUSED
 	"EV_BULLET",				// otherEntity is the shooter
 #endif
 
