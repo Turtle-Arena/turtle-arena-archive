@@ -598,7 +598,7 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t 
 
 void UI_ShowPostGame(qboolean newHigh) {
 	trap_Cvar_Set ("cg_cameraOrbit", "0");
-#ifdef THIRD_PERSON // Set thirdPerson to On. // Should it be off here?
+#ifdef TURTLEARENA // THIRD_PERSON // Set thirdPerson to On. // Should it be off here?
 	trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
@@ -3051,7 +3051,7 @@ static void UI_StartSkirmish(qboolean next) {
 	trap_Cvar_Set("ui_pure", va("%i", temp));
 
 	trap_Cvar_Set("cg_cameraOrbit", "0");
-#ifdef THIRD_PERSON // Set thirdPerson to On.
+#ifdef TURTLEARENA // THIRD_PERSON // Set thirdPerson to On.
 	trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 	trap_Cvar_Set("cg_thirdPerson", "0");
@@ -3224,7 +3224,7 @@ static void UI_RunMenuScript(char **args) {
 		if (Q_stricmp(name, "StartServer") == 0) {
 			int i, clients, oldclients;
 			float skill;
-#ifdef THIRD_PERSON // Set thirdPerson to On.
+#ifdef TURTLEARENA // THIRD_PERSON // Set thirdPerson to On.
 			trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 			trap_Cvar_Set("cg_thirdPerson", "0");
@@ -3421,7 +3421,7 @@ static void UI_RunMenuScript(char **args) {
 			uiInfo.serverStatusInfo.numLines = 0;
 			Menu_SetFeederSelection(NULL, FEEDER_FINDPLAYER, 0, NULL);
 		} else if (Q_stricmp(name, "JoinServer") == 0) {
-#ifdef THIRD_PERSON // Set thirdPerson to On.
+#ifdef TURTLEARENA // THIRD_PERSON // Set thirdPerson to On.
 			trap_Cvar_Set("cg_thirdPerson", "1");
 #else
 			trap_Cvar_Set("cg_thirdPerson", "0");

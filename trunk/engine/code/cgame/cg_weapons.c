@@ -75,7 +75,7 @@ void CG_NextHoldable_f( void )
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
 		if (
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 		lc->holdableSelect == HI_KAMIKAZE ||
 #endif
 		lc->holdableSelect == HI_PORTAL
@@ -147,7 +147,7 @@ void CG_PrevHoldable_f( void )
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
 		if (
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 		lc->holdableSelect == HI_KAMIKAZE ||
 #endif
 		lc->holdableSelect == HI_PORTAL
@@ -1075,15 +1075,13 @@ static void CG_SparkTrail( centity_t *ent, const projectileInfo_t *wi )
 }
 #endif
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 // Currently this should only be called by CG_RegisterItemVisuals
 void CG_RegisterHoldable( int holdableNum )
 {
 	//CG_RegisterItemVisuals(BG_ItemNumForHoldableNum(holdableNum));
 
-#ifdef TA_WEAPSYS
 	CG_RegisterProjectile(BG_ProjectileIndexForHoldable(holdableNum));
-#endif
 }
 #endif
 
@@ -1779,7 +1777,7 @@ void CG_RegisterItemVisuals( int itemNum ) {
 		CG_RegisterWeapon( item->giTag );
 #endif
 	}
-#ifdef TA_HOLDABLE
+#ifdef TURTLEARENA // HOLDABLE
 	if ( item->giType == IT_HOLDABLE ) {
 		CG_RegisterHoldable( item->giTag );
 	}
@@ -2816,7 +2814,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	clientInfo_t		*ci;
 	qboolean			foundModel;
 	vec3_t				flashColor;
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 	char *newTagNames[3] = { "tag_hand_primary", "tag_hand_secondary", NULL };
 	int newTagInfo[3] = {TI_TAG_HAND_PRIMARY, TI_TAG_HAND_SECONDARY, 0};
 #endif
@@ -3009,7 +3007,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		drawWeapon[i] = ((cent->currentState.weaponHands & HAND_TO_HB(i)) && gun[i].hModel);
 
 		if (!originalTagNames[i]
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 			|| !newTagNames[i]
 #endif
 			)
@@ -3021,7 +3019,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		{
 			// Use ci->tagInfo to speed up tests
 			if (
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 				(!(ci->tagInfo & newTagInfo[i]) || !CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, newTagNames[i])) &&
 #endif
 				(!(ci->tagInfo & originalTagInfo[i]) || !CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, originalTagNames[i])))

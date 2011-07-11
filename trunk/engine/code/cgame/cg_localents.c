@@ -611,7 +611,7 @@ void CG_BubbleThink( localEntity_t *le ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 /*
 ====================
 CG_AddKamikaze
@@ -997,7 +997,7 @@ void CG_AddLocalEntities( void ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 		case LE_KAMIKAZE:
 			CG_AddKamikaze( le );
 			break;

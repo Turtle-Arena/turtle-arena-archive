@@ -915,7 +915,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #ifdef TA_WEAPSYS
 	int				i;
 	vec3_t			angles;
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 	char *newTagNames[3] = { "tag_hand_primary", "tag_hand_secondary", NULL };
 #endif
 	char *originalTagNames[3] = { "tag_weapon", "tag_flag", NULL };
@@ -1063,7 +1063,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 			gun[i].renderfx = renderfx;
 
 			if (!originalTagNames[i]
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 				|| !newTagNames[i]
 #endif
 				)
@@ -1076,7 +1076,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 			}
 
 			if (
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, newTagNames[i]) &&
 #endif
 				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, originalTagNames[i]))

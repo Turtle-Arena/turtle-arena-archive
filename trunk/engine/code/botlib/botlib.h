@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 // ZTM: Botlib is not compatible with (io)quake3 (or anyone else)
-#if defined TA_WEAPSYS || defined TA_WEAPSYS_NOCOMPAT || (defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT) || defined TA_HOLDSYS
+#if defined TA_WEAPSYS || defined IOQ3ZTM_NO_COMPAT || (defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT) || defined TA_HOLDSYS
 	
 	#ifdef TA_WEAPSYS // & 4
 		#define BOTLIB_API_BIT4 4
@@ -38,7 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		#define BOTLIB_API_BIT4 0
 	#endif
 
-	#ifdef TA_WEAPSYS_NOCOMPAT // & 32
+	#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS // & 32
 		#define BOTLIB_API_BIT32 32
 	#else
 		#define BOTLIB_API_BIT32 0
@@ -445,7 +445,7 @@ typedef struct ai_export_s
 	void	(*BotFreeMoveState)(int handle);
 	void	(*BotInitMoveState)(int handle, struct bot_initmove_s *initmove);
 	void	(*BotAddAvoidSpot)(int movestate, vec3_t origin, float radius, int type);
-#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
+#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
 	//-----------------------------------
 	// be_ai_weap.h
 	//-----------------------------------
@@ -575,7 +575,7 @@ name:						default:			module(s):			description:
 "cmd_grappleon"				"grappleon"			be_ai_move.c		command to activate off hand grapple
 "cmd_grappleoff"			"grappleoff"		be_ai_move.c		command to deactivate off hand grapple
 "itemconfig"				"items.c"			be_ai_goal.c		item configuration file
-#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
+#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
 "weaponconfig"				"weapons.c"			be_ai_weap.c		weapon configuration file
 #endif
 "synfile"					"syn.c"				be_ai_chat.c		file with synonyms
@@ -583,7 +583,7 @@ name:						default:			module(s):			description:
 "matchfile"					"match.c"			be_ai_chat.c		file with match strings
 "nochat"					"0"					be_ai_chat.c		disable chats
 "max_messages"				"1024"				be_ai_chat.c		console message heap size
-#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
+#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
 "max_weaponinfo"			"32"				be_ai_weap.c		maximum number of weapon info
 "max_projectileinfo"		"32"				be_ai_weap.c		maximum number of projectile info
 #endif

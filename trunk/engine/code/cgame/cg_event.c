@@ -188,7 +188,7 @@ static void CG_Obituary( entityState_t *ent ) {
 
 	if (attacker == target) {
 		switch (mod) {
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE:
 			message = "goes out with a bang";
 			break;
@@ -351,7 +351,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		case MOD_GRAPPLE:
 			message = "was caught by";
 			break;
-#ifndef TURTLEARENA // MOD
+#ifndef TURTLEARENA // MOD NO_KAMIKAZE_ITEM POWERS
 		case MOD_GAUNTLET:
 			message = "was pummeled by";
 			break;
@@ -396,9 +396,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was blasted by";
 			message2 = "'s BFG";
 			break;
-#endif
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // MOD
 		case MOD_NAIL:
 			message = "was nailed by";
 			break;
@@ -410,14 +408,10 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was too close to";
 			message2 = "'s Prox Mine";
 			break;
-#endif
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE:
 			message = "falls to";
 			message2 = "'s Kamikaze blast";
 			break;
-#endif
-#ifndef TURTLEARENA // POWERS
 		case MOD_JUICED:
 			message = "was juiced by";
 			break;
@@ -488,7 +482,7 @@ static void CG_UseItem( centity_t *cent ) {
 			CG_CenterPrint( "No item to use", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 		} else
 #endif
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 		if (!BG_ProjectileIndexForHoldable(itemNum))
 #endif
 		{
@@ -509,7 +503,7 @@ static void CG_UseItem( centity_t *cent ) {
 
 	switch ( itemNum ) {
 	default:
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 		// ZTM: Play shuriken use sound
 		if (BG_ProjectileIndexForHoldable(itemNum)) {
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.shurikenSound );
@@ -520,7 +514,7 @@ static void CG_UseItem( centity_t *cent ) {
 		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.useNothingSound );
 		break;
 
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA // HOLDABLE // no q3 teleprter
 	case HI_TELEPORTER:
 		break;
 #endif
@@ -535,7 +529,7 @@ static void CG_UseItem( centity_t *cent ) {
 		break;
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	case HI_KAMIKAZE:
 		break;
 #endif
@@ -1358,7 +1352,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.wstbactvSound );
 		break;
 #endif
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	case EV_KAMIKAZE:
 		DEBUGNAME("EV_KAMIKAZE");
 		CG_KamikazeEffect( cent->lerpOrigin );
@@ -1769,7 +1763,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				case GTS_TEAMS_ARE_TIED:
 					CG_AddBufferedSound( cgs.media.teamsTiedSound );
 					break;
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 				case GTS_KAMIKAZE:
 					trap_S_StartLocalSound(cgs.media.kamikazeFarSound, CHAN_ANNOUNCER);
 					break;
@@ -1909,7 +1903,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifndef NOTRATEDM // No gibs.
 	case EV_GIB_PLAYER:
 		DEBUGNAME("EV_GIB_PLAYER");
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 		// don't play gib sound when using the kamikaze because it interferes
 		// with the kamikaze sound, downside is that the gib sound will also
 		// not be played when someone is gibbed while just carrying the kamikaze

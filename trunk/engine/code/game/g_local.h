@@ -185,7 +185,7 @@ struct gentity_s {
 	gentity_t	*teamchain;		// next entity in team
 	gentity_t	*teammaster;	// master of the team
 
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 	int			kamikazeTime;
 	int			kamikazeShockTime;
 #endif
@@ -408,7 +408,7 @@ struct gclient_s {
 #else
 	int			ammoTimes[WP_NUM_WEAPONS];
 #endif
-#ifdef TA_HOLDABLE // REGEN_SHURIKENS
+#ifdef TURTLEARENA // REGEN_SHURIKENS
 	int			holdableTimes[MAX_HOLDABLE];
 #endif
 #ifndef TURTLEARENA // POWERS
@@ -553,7 +553,7 @@ qboolean G_AllowPeaking(void);
 #define	RESPAWN_SCORE		25
 #endif
 #define	RESPAWN_AMMO		40
-#ifdef TA_HOLDABLE
+#ifdef TURTLEARENA // HOLDABLE
 #define	RESPAWN_HOLDABLE	35
 #else
 #define	RESPAWN_HOLDABLE	60
@@ -674,7 +674,7 @@ void TossClientCubes( gentity_t *self );
 void G_RunMissile( gentity_t *ent );
 
 #ifdef TA_WEAPSYS
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward,
 		vec3_t right, vec3_t up, holdable_t holdable);
 #endif
@@ -738,10 +738,8 @@ void DropPortalDestination( gentity_t *ent );
 qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker );
 void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint );
 void SnapVectorTowards( vec3_t v, vec3_t to );
-#ifdef TURTLEARENA // LOCKON
+#ifdef TURTLEARENA // LOCKON HOLD_SHURIKEN
 void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t right, vec3_t up);
-#endif
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable);
 #endif
 #ifdef TA_WEAPSYS // MELEEATTACK
@@ -809,7 +807,7 @@ qboolean G_FilterPacket (char *from);
 // g_weapon.c
 //
 void FireWeapon( gentity_t *ent );
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 void G_StartKamikaze( gentity_t *ent );
 #endif
 

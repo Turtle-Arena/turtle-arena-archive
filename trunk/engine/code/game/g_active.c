@@ -795,8 +795,8 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #endif
     }
 #endif
-#ifdef TA_HOLDABLE // REGEN_SHURIKENS
-		// Team Arena Ammo Regen for Shurikens
+#ifdef TURTLEARENA // REGEN_SHURIKENS
+		// Shuriken regen
 		{
 			int h;
 
@@ -878,7 +878,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 	gclient_t *client;
 	int		damage;
 	vec3_t	dir;
-#ifndef TA_HOLDABLE // no q3 teleporter
+#ifndef TURTLEARENA // HOLDABLE // no q3 teleporter
 	vec3_t	origin, angles;
 #endif
 //	qboolean	fired;
@@ -990,7 +990,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 		case EV_USE_ITEM15:
 		{
 			itemNum = (event & ~EV_EVENT_BITS) - EV_USE_ITEM0;
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 			G_ThrowShuriken(ent, itemNum);
 #endif
 			switch (itemNum)
@@ -999,7 +999,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 					break;
 #endif // TA_HOLDSYS
 
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA // HOLDABLE // no q3 teleprter
 #ifdef TA_HOLDSYS
 				case HI_TELEPORTER:
 #else
@@ -1013,7 +1013,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 #endif
 			TeleportPlayer( ent, origin, angles );
 			break;
-#endif // !TA_HOLDABLE
+#endif
 
 #ifdef TA_HOLDSYS
 				case HI_MEDKIT:
@@ -1025,16 +1025,14 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			break;
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // POWERS NO_KAMIKAZE_ITEM
 #ifdef TA_HOLDSYS
 				case HI_KAMIKAZE:
 #else
 		case EV_USE_ITEM3:		// kamikaze
 #endif
-#ifndef TURTLEARENA // POWERS
 			// make sure the invulnerability is off
 			ent->client->invulnerabilityTime = 0;
-#endif
 			// start the kamikze
 			G_StartKamikaze( ent );
 			break;
@@ -1067,7 +1065,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 #ifdef TA_HOLDSYS
 				default:
-#ifdef TA_HOLDABLE
+#ifdef TURTLEARENA // HOLDABLE
 					if (!BG_ProjectileIndexForHoldable(itemNum))
 #endif
 						G_Printf("  EV_USE_ITEM: No code for holdable %d.\n", itemNum);
@@ -1637,7 +1635,7 @@ void ClientThink_real( gentity_t *ent ) {
 		ent->client->ps.eFlags |= EF_USE_ENT;
 
 		if ((ucmd->buttons & BUTTON_USE_HOLDABLE) &&
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 			ent->client->ps.holdableTime <= 0
 #else
 			! ( ent->client->ps.pm_flags & PMF_USE_ITEM_HELD )
@@ -1647,7 +1645,7 @@ void ClientThink_real( gentity_t *ent ) {
 			if (useEnt->use) {
 				useEnt->use(useEnt, ent, ent);
 			}
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 			ent->client->ps.holdableTime = 500;
 #else
 			ent->client->ps.pm_flags |= PMF_USE_ITEM_HELD;

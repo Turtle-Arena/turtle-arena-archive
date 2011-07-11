@@ -1771,7 +1771,7 @@ static qboolean ParseShader( char **text )
 			ParseSort( text );
 			continue;
 		}
-#ifdef CELSHADING // ZTM: Allow per-shader celoutline.
+#ifdef IOQ3ZTM // CELSHADING
 		// celoutline
 		else if ( !Q_stricmp( token, "celoutline" ) )
 		{
@@ -3132,7 +3132,7 @@ For menu graphics that should never be picmiped
 */
 qhandle_t RE_RegisterShaderNoMip( const char *name ) {
 	shader_t	*sh;
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 	// Remember previous value
 	int			old_r_celshadalgo;
 
@@ -3152,7 +3152,7 @@ qhandle_t RE_RegisterShaderNoMip( const char *name ) {
 
 	sh = R_FindShader( name, LIGHTMAP_2D, qfalse );
 
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 	// Restore value
 	r_celshadalgo->integer=old_r_celshadalgo;
 #endif

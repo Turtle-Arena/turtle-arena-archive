@@ -178,7 +178,7 @@ typedef struct bot_state_s
 	float check_time;								//time to check for nearby items
 	float stand_time;								//time the bot is standing still
 	float lastchat_time;							//time the bot last selected a chat
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	float kamikaze_time;							//time to check for kamikaze usage
 #endif
 #ifndef TURTLEARENA // POWERS
@@ -219,7 +219,7 @@ typedef struct bot_state_s
 	vec3_t enemyvelocity;							//enemy velocity 0.5 secs ago during battle
 	vec3_t enemyorigin;								//enemy origin 0.5 secs ago during battle
 	//
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	int kamikazebody;								//kamikaze body
 #endif
 	int proxmines[MAX_PROXMINES];

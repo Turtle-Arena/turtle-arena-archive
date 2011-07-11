@@ -193,7 +193,7 @@ static void PM_StartAnim( int anim ) {
 }
 #endif
 
-#ifdef TA_PLAYERS // LADDER
+#ifdef TURTLEARENA // LADDER
 static void PM_ContinueAnim( int anim ) {
 #ifdef IOQ3ZTM // Needed for TA_WEAPSYS
 	if (anim < 0) {
@@ -628,7 +628,7 @@ static qboolean PM_CheckJump( void ) {
 			PM_ForceLegsAnim( OBJECT_JUMP );
 		} else
 #endif
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 		if (pm->ps && pm->ps->eFlags & EF_LOCKON) {
 			PM_ForceLegsAnim( LEGS_JUMPB_LOCKON );
 		} else
@@ -1450,7 +1450,7 @@ static void PM_GroundTraceMissed( void ) {
 					PM_ForceLegsAnim( OBJECT_JUMP );
 				} else
 #endif
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 				if (pm->ps && pm->ps->eFlags & EF_LOCKON) {
 					PM_ForceLegsAnim( LEGS_JUMPB_LOCKON );
 				} else
@@ -1523,7 +1523,7 @@ static void PM_GroundTrace( void ) {
 				PM_ForceLegsAnim( OBJECT_JUMP );
 			} else
 #endif
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 			if (pm->ps && pm->ps->eFlags & EF_LOCKON) {
 				PM_ForceLegsAnim( LEGS_JUMPB_LOCKON );
 			} else
@@ -1862,7 +1862,7 @@ static void PM_Footsteps( void ) {
 	}
 
 	// if not trying to move
-#if defined TA_PLAYERS && defined IOQ3ZTM // LADDER
+#if defined TURTLEARENA && defined IOQ3ZTM // LADDER
 	if( pml.ladder) {
 		if ( !pm->cmd.forwardmove && !pm->cmd.upmove && !pm->cmd.rightmove ) {
 			PM_ContinueAnim( BOTH_LADDER_STAND );
@@ -1913,7 +1913,7 @@ static void PM_Footsteps( void ) {
 
 	footstep = qfalse;
 
-#if defined TA_PLAYERS && defined IOQ3ZTM // LADDER
+#if defined TURTLEARENA && defined IOQ3ZTM // LADDER
 	if(pml.ladder) {
 		bobmove = 0.3f;	// walking bobs slow
 		if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
@@ -2079,7 +2079,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 
 	PM_AddEvent( EV_CHANGE_WEAPON );
 	pm->ps->weaponstate = WEAPON_DROPPING;
-#ifdef TA_PLAYERS // WEAPONS
+#ifdef TURTLEARENA // WEAPONS
 	{
 		animNumber_t anim = TORSO_DROP;
 
@@ -2153,7 +2153,7 @@ static void PM_FinishWeaponChange( void ) {
 #ifdef TA_WEAPSYS
 	pm->ps->weaponHands = BG_WeaponHandsForPlayerState(pm->ps);
 #endif
-#ifdef TA_PLAYERS // WEAPONS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TURTLEARENA // WEAPONS // PLAYERCFG_ANIMATION_TIMES
 	{
 		animNumber_t anim = TORSO_RAISE;
 
@@ -2215,7 +2215,7 @@ static void PM_FinishWeaponChange( void ) {
 #endif
 }
 
-#ifdef TA_PLAYERS // WEAPONS
+#ifdef TURTLEARENA // WEAPONS
 /*
 ===============
 PM_BeginWeaponChange
@@ -2414,7 +2414,7 @@ static void PM_NextHoldable(void)
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
 		if (
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 		pm->ps->holdableIndex == HI_KAMIKAZE ||
 #endif
 		pm->ps->holdableIndex == HI_PORTAL
@@ -2474,7 +2474,7 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	// make holdable function
 	if ( pm->ps->holdableTime > 0 ) {
 		pm->ps->holdableTime -= pml.msec;
@@ -2484,7 +2484,7 @@ static void PM_Weapon( void ) {
 	// check for item using
 	if ( pm->cmd.buttons & BUTTON_USE_HOLDABLE ) {
 		if (
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 		pm->ps->holdableTime <= 0
 #else
 		! ( pm->ps->pm_flags & PMF_USE_ITEM_HELD )
@@ -2510,7 +2510,7 @@ static void PM_Weapon( void ) {
 				&& pm->ps->stats[STAT_HEALTH] >= (pm->ps->stats[STAT_MAX_HEALTH] + 25) ) {
 				// don't use medkit if at max health
 			} else {
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 				pm->ps->holdableTime = 500;
 #else
 				pm->ps->pm_flags |= PMF_USE_ITEM_HELD;
@@ -2524,7 +2524,7 @@ static void PM_Weapon( void ) {
 #endif
 #ifdef TA_HOLDSYS
 				if (pm->ps->holdable[pm->ps->holdableIndex] > 0
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN // Grappling shurikens don't use ammo
+#ifdef TURTLEARENA // HOLD_SHURIKEN // Grappling shurikens don't use ammo
 					&& !bg_projectileinfo[BG_ProjectileIndexForHoldable(pm->ps->holdableIndex)].grappling
 #endif
 				) {
@@ -2585,7 +2585,7 @@ static void PM_Weapon( void ) {
 			PM_BeginWeaponChange( pm->cmd.weapon );
 		}
 #endif
-#ifdef TA_PLAYERS // WEAPONS
+#ifdef TURTLEARENA // WEAPONS
 		// Just check the ones we can do it in?
 		if (pm->ps->weaponstate != WEAPON_DROPPING
 			&& pm->ps->weaponstate != WEAPON_HAND_CHANGE)
@@ -2625,7 +2625,7 @@ static void PM_Weapon( void ) {
 		return;
 	}
 
-#ifdef TA_PLAYERS // WEAPONS
+#ifdef TURTLEARENA // WEAPONS
 	if ( pm->ps->weaponstate == WEAPON_HAND_CHANGE ) {
 		PM_FinishWeaponHandsChange();
 		return;

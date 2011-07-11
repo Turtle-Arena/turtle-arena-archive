@@ -590,7 +590,7 @@ just like the existing corpse to leave behind.
 =============
 */
 void CopyToBodyQue( gentity_t *ent ) {
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 	gentity_t	*e;
 	int i;
 #endif
@@ -613,7 +613,7 @@ void CopyToBodyQue( gentity_t *ent ) {
 
 	body->s = ent->s;
 	body->s.eFlags = EF_DEAD;		// clear EF_TALK, etc
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 	if ( ent->s.eFlags & EF_KAMIKAZE ) {
 		body->s.eFlags |= EF_KAMIKAZE;
 
@@ -1599,7 +1599,7 @@ void ClientSpawn(gentity_t *ent) {
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	// always clear the kamikaze flag
 	ent->s.eFlags &= ~EF_KAMIKAZE;
 #endif
@@ -1702,7 +1702,8 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.clientNum = index;
 
 #ifdef TA_HOLDSYS
-#ifdef TA_HOLDABLE // Start with 10 shurikens!
+#ifdef TURTLEARENA // HOLDABLE
+	// Start with 10 shurikens!
 #ifdef IOQ3ZTM // LASERTAG
 	if (g_laserTag.integer) {
 		client->ps.holdableIndex = HI_NONE;

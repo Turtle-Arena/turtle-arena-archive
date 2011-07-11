@@ -167,7 +167,7 @@ static void CG_spWin_f( void) {
 #endif
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
-#ifndef THIRD_PERSON
+#ifndef TURTLEARENA // THIRD_PERSON
 	trap_Cvar_Set("cg_thirdPersonRange", "100");
 #endif
 	CG_AddBufferedSound(cgs.media.winnerSound);
@@ -177,7 +177,7 @@ static void CG_spWin_f( void) {
 #else
 	cg.cur_lc = &cg.localClient;
 #endif
-#ifndef MISSIONPACK_HUD2
+#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
 	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, 0);
@@ -193,7 +193,7 @@ static void CG_spLose_f( void) {
 #endif
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
-#ifndef THIRD_PERSON
+#ifndef TURTLEARENA // THIRD_PERSON
 	trap_Cvar_Set("cg_thirdPersonRange", "100");
 #endif
 	CG_AddBufferedSound(cgs.media.loserSound);
@@ -203,7 +203,7 @@ static void CG_spLose_f( void) {
 #else
 	cg.cur_lc = &cg.localClient;
 #endif
-#ifndef MISSIONPACK_HUD2
+#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, 0);
@@ -466,14 +466,14 @@ static void CG_StartOrbit_f( void ) {
 	}
 	if (cg_cameraOrbit.value != 0) {
 		trap_Cvar_Set ("cg_cameraOrbit", "0");
-#ifndef THIRD_PERSON
+#ifndef TURTLEARENA // THIRD_PERSON
 		trap_Cvar_Set("cg_thirdPerson", "0");
 #endif
 	} else {
 		trap_Cvar_Set("cg_cameraOrbit", "5");
 		trap_Cvar_Set("cg_thirdPerson", "1");
 		trap_Cvar_Set("cg_thirdPersonAngle", "0");
-#ifndef THIRD_PERSON
+#ifndef TURTLEARENA // THIRD_PERSON
 		trap_Cvar_Set("cg_thirdPersonRange", "100");
 #endif
 	}

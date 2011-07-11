@@ -418,7 +418,7 @@ static cvarTable_t cvarTable[] = {
 #endif
 #endif
 #ifdef TA_SPLITVIEW
-#ifdef THIRD_PERSON
+#ifdef TURTLEARENA // THIRD_PERSON
 	{ &cg_thirdPerson[0], "cg_thirdPerson", "1", 0 },
 	{ &cg_thirdPerson[1], "2cg_thirdPerson", "1", 0 },
 	{ &cg_thirdPerson[2], "3cg_thirdPerson", "1", 0 },
@@ -431,7 +431,7 @@ static cvarTable_t cvarTable[] = {
 #endif
 	{ &cg_splitviewVertical, "cg_splitviewVertical", "0", CVAR_ARCHIVE },
 #else
-#ifdef THIRD_PERSON
+#ifdef TURTLEARENA // THIRD_PERSON
 	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },
 #else
 	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
@@ -1054,7 +1054,7 @@ static void CG_RegisterSounds( void ) {
 	// FIXME: only needed with item
 	cgs.media.flightSound = trap_S_RegisterSound( "sound/items/flight.wav", qfalse );
 	cgs.media.medkitSound = trap_S_RegisterSound ("sound/items/use_medkit.wav", qfalse);
-#ifdef TA_HOLDABLE
+#ifdef TURTLEARENA // HOLDABLE
 	cgs.media.shurikenSound = trap_S_RegisterSound ("sound/items/use_shuriken.wav", qfalse);
 #endif
 	cgs.media.quadSound = trap_S_RegisterSound("sound/items/damage3.wav", qfalse);
@@ -1079,7 +1079,7 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.sfx_chghitmetal = trap_S_RegisterSound( "sound/weapons/vulcan/wvulimpm.wav", qfalse );
 #endif
 	cgs.media.weaponHoverSound = trap_S_RegisterSound( "sound/weapons/weapon_hover.wav", qfalse );
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	cgs.media.kamikazeExplodeSound = trap_S_RegisterSound( "sound/items/kam_explode.wav", qfalse );
 	cgs.media.kamikazeImplodeSound = trap_S_RegisterSound( "sound/items/kam_implode.wav", qfalse );
 	cgs.media.kamikazeFarSound = trap_S_RegisterSound( "sound/items/kam_explode_far.wav", qfalse );
@@ -1376,7 +1376,7 @@ static void CG_RegisterGraphics( void ) {
 	}
 #endif
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	cgs.media.redKamikazeShader = trap_R_RegisterShader( "models/weaphits/kamikred" );
 #endif
 	cgs.media.dustPuffShader = trap_R_RegisterShader("hasteSmokePuff" );
@@ -1400,22 +1400,18 @@ static void CG_RegisterGraphics( void ) {
 #else
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/foe" );
 #endif
-#ifndef TURTLEARENA // POWERS
+#ifndef TURTLEARENA
 		cgs.media.redQuadShader = trap_R_RegisterShader("powerups/blueflag" );
-#endif
-#ifndef TA_HUD
 		cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar.tga" );
 #endif
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 		cgs.media.blueKamikazeShader = trap_R_RegisterShader( "models/weaphits/kamikblu" );
 #endif
 	}
 
-#ifdef TA_HUD
+#ifdef TURTLEARENA
 	cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar.png" );
-#endif
-
-#ifndef TURTLEARENA // NOARMOR
+#else
 	cgs.media.armorModel = trap_R_RegisterModel( "models/powerups/armor/armor_yel.md3" );
 	cgs.media.armorIcon  = trap_R_RegisterShaderNoMip( "icons/iconr_yellow" );
 #endif
@@ -2696,7 +2692,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	trap_S_ClearLoopingSounds( qtrue );
 
-#if defined IOQ3ZTM && defined THIRD_PERSON // LASERTAG
+#if defined IOQ3ZTM && defined TURTLEARENA // THIRD_PERSON LASERTAG
 	if (cg_laserTag.integer)
 		trap_Cvar_Set("cg_thirdPerson", "0");
 	else

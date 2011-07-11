@@ -371,7 +371,7 @@ void CG_CamUpdate(void)
 	}
 #endif
 
-#ifdef TA_CAMERA
+#ifdef TURTLEARENA // CAMERA
 	// First person
 #ifdef TA_SPLITVIEW
 	if (!cg_thirdPerson[cg.cur_localClientNum].integer)
@@ -456,7 +456,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 	cg.refdef.vieworg[2] += cg.cur_lc->predictedPlayerState.viewheight;
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
-#ifdef TA_CAMERA
+#ifdef TURTLEARENA // CAMERA
 	distance = cg.cur_lc->camDistance;
 #else
 #ifdef TA_SPLITVIEW
@@ -617,7 +617,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 		if ( trace.fraction != 1.0 ) {
 			VectorCopy( trace.endpos, view );
-#ifdef TA_CAMERA
+#ifdef TURTLEARENA // CAMERA
 			cg.cur_lc->camDistance = cg.cur_lc->camDistance * trace.fraction;
 			if (cg.cur_lc->camDistance < 10) {
 				cg.cur_lc->camDistance = 10;
@@ -1827,12 +1827,12 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
 #ifdef TA_SPLITVIEW
 							&& (cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
-#ifdef TA_CAMERA // When switching to first person, zoom the camera in
+#ifdef TURTLEARENA // CAMERA // When switching to first person, zoom the camera in
 								|| (!cg_thirdPerson[cg.cur_localClientNum].integer && cg.cur_lc->camDistance > 10)
 #endif
 #else
 							&& (cg_thirdPerson.integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
-#ifdef TA_CAMERA // When switching to first person, zoom the camera in
+#ifdef TURTLEARENA // CAMERA // When switching to first person, zoom the camera in
 								|| (!cg_thirdPerson.integer && cg.cur_lc->camDistance > 10)
 #endif
 #endif

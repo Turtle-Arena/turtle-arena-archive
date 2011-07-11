@@ -2406,13 +2406,6 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 		}
 	}
 #endif
-#elif defined TA_PLAYERS
-	if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_hand_secondary" ))
-	{
-#ifdef TA_DATA // FLAG_MODEL
-		trailItem = qfalse;
-#endif
-	}
 #elif defined IOQ3ZTM
 	if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" ))
 	{
@@ -2423,6 +2416,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #else
 	CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" );
 #endif
+
 #ifdef TA_DATA // FLAG_MODEL
 	if (trailItem)
 	{
@@ -3259,15 +3253,13 @@ void CG_Player( centity_t *cent ) {
 	refEntity_t		powerup;
 #endif
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM POWERS
 	refEntity_t		skull;
-#endif
-#ifndef TURTLEARENA // POWERS
 	refEntity_t		powerup;
 #endif
 	int				t;
 	float			c;
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	float			angle;
 	vec3_t			dir, angles;
 #else
@@ -3410,7 +3402,7 @@ void CG_Player( centity_t *cent ) {
 
 	CG_AddRefEntityWithPowerups( &torso, &cent->currentState, ci->team );
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	if ( cent->currentState.eFlags & EF_KAMIKAZE ) {
 
 		memset( &skull, 0, sizeof(skull) );
@@ -3519,7 +3511,7 @@ void CG_Player( centity_t *cent ) {
 			trap_R_AddRefEntityToScene( &skull );
 		}
 	}
-#endif // TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#endif
 
 #ifdef IOQ3ZTM
 	if ( !(cent->currentState.powerups & ( 1 << PW_INVIS ) ) ) {

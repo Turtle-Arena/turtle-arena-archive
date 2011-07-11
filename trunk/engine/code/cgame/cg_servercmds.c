@@ -591,7 +591,7 @@ static void CG_MapRestart( void ) {
 #endif
 #ifdef TA_SPLITVIEW
 	for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
-#ifdef THIRD_PERSON
+#ifdef TURTLEARENA // THIRD_PERSON
 #ifdef IOQ3ZTM // LASERTAG
 		if (cg_laserTag.integer)
 			trap_Cvar_Set(Com_LocalClientCvarName(lc, "cg_thirdPerson"), "0");
@@ -606,7 +606,7 @@ static void CG_MapRestart( void ) {
 #endif
 	}
 #else
-#ifdef THIRD_PERSON
+#ifdef TURTLEARENA // THIRD_PERSON
 #ifdef IOQ3ZTM // LASERTAG
 	if (cg_laserTag.integer)
 		trap_Cvar_Set("cg_thirdPerson", "0");
@@ -1221,7 +1221,7 @@ static void CG_ServerCommand( void ) {
 #else
 		cg.cur_lc = &cg.localClient;
 #endif
-#ifndef MISSIONPACK_HUD2
+#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 		CG_CenterPrint( CG_Argv(start+1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 #else
 		CG_CenterPrint( CG_Argv(start+1), SCREEN_HEIGHT * 0.30, 0 );

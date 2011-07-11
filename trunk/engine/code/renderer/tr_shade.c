@@ -199,7 +199,7 @@ static void R_DrawElements( int numIndexes, const glIndex_t *indexes ) {
 	// anything else will cause no drawing
 }
 
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 float EvalWaveForm( const waveForm_t *wf );
 float EvalWaveFormClamped( const waveForm_t *wf );
 
@@ -565,7 +565,7 @@ liquids look solid instead of... liquid.
 
 */
 }
-#endif // CELSHADING
+#endif
 
 /*
 =============================================================
@@ -611,7 +611,7 @@ static void R_BindAnimatedImage( textureBundle_t *bundle ) {
 	GL_Bind( bundle->image[ index ] );
 }
 
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 //DRAWCEL
 static void DrawCel (shaderCommands_t *input, float lineWidth, const celoutline_t *celoutline) {
 
@@ -638,7 +638,7 @@ static void DrawCel (shaderCommands_t *input, float lineWidth, const celoutline_
 	}
 
 }
-#endif // CELSHADING
+#endif
 
 /*
 ================
@@ -1654,9 +1654,9 @@ void RB_StageIteratorGeneric( void )
 		qglPolygonOffset( r_offsetFactor->value, r_offsetUnits->value );
 	}
 
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 	// Draw cel outlines. There has to be a better place to put this.
-	// ZTM: Set r_celoutline to -1 to disable per-shader celoutlines
+	// Set r_celoutline to -1 to disable per-shader celoutlines
 	if (r_celoutline->integer != -1) {
 		if (input->shader->celoutline.width > 0) {
 			DrawCel(&tess, input->shader->celoutline.width, &input->shader->celoutline);
