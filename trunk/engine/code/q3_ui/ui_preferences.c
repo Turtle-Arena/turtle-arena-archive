@@ -54,7 +54,7 @@ GAME OPTIONS MENU
 #ifdef TA_ATMEFFECTSYS
 #define ID_ATMEFFECTS			139
 #endif
-#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 #define ID_SHOWBLOOD			140
 #endif
@@ -97,7 +97,7 @@ typedef struct {
 #ifdef TA_ATMEFFECTSYS
 	menulist_s			atmeffects;
 #endif
-#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	menuradiobutton_s	showblood;
 #endif
@@ -166,7 +166,7 @@ static void Preferences_SetMenuItems( void ) {
 	else if (s_preferences.atmeffects.curvalue > 2)
 		s_preferences.atmeffects.curvalue = 2;
 #endif
-#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	s_preferences.showblood.curvalue	= trap_Cvar_VariableValue( "com_blood" ) != 0;
 #endif
@@ -253,7 +253,7 @@ static void Preferences_Event( void* ptr, int notification ) {
 		break;
 #endif
 
-#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	case ID_SHOWBLOOD:
 		trap_Cvar_SetValue( "com_blood", s_preferences.showblood.curvalue );
@@ -495,7 +495,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.atmeffects.itemnames			= atmeffects_names;
 #endif
 
-#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.showblood.generic.type     = MTYPE_RADIOBUTTON;
@@ -551,7 +551,7 @@ static void Preferences_MenuInit( void ) {
 #ifdef TA_ATMEFFECTSYS
 	Menu_AddItem( &s_preferences.menu, &s_preferences.atmeffects );
 #endif
-#ifdef IOQ3ZTM // CONTANT_FILTERING
+#ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	Menu_AddItem( &s_preferences.menu, &s_preferences.showblood );
 #endif
