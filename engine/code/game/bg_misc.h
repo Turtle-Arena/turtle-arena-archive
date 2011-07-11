@@ -250,7 +250,7 @@ typedef enum {
 #endif
 #define	EF_NODRAW			0x00000080		// may have an event, but no model (unspawned items)
 #define	EF_FIRING			0x00000100		// for lightning gun
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 #define	EF_KAMIKAZE			0x00000200
 #endif
 #ifdef TA_PATHSYS // 2DMODE
@@ -371,13 +371,13 @@ typedef enum {
 typedef enum {
 	HI_NONE,
 
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA // no q3 teleprter
 	HI_TELEPORTER,
 #elif !defined TA_HOLDSYS
 	HI_TELEPORTER_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
 	HI_MEDKIT,
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	HI_KAMIKAZE,
 #elif !defined TA_HOLDSYS
 	HI_KAMIKAZE_REMOVED, // Q3 want them in this order in "game" qvm
@@ -391,7 +391,7 @@ typedef enum {
 	HI_INVULNERABILITY_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	// Shurikens
 	HI_SHURIKEN,
 	HI_ELECTRICSHURIKEN,
@@ -820,7 +820,7 @@ typedef struct
 extern bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 extern bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 extern bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 int BG_ProjectileIndexForHoldable(int holdable);
 #endif
 int BG_ProjectileIndexForName(const char *name);
@@ -993,7 +993,7 @@ typedef enum {
 	EV_PROXIMITY_MINE_STICK,
 	EV_PROXIMITY_MINE_TRIGGER,
 #endif
-#if !defined TA_HOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
+#if !defined TURTLEARENA || defined NET_COMPAT // NO_KAMIKAZE_ITEM
 	EV_KAMIKAZE,			// kamikaze explodes
 #endif
 	EV_OBELISKEXPLODE,		// obelisk explodes
@@ -1039,13 +1039,13 @@ typedef enum {
 	GTS_REDTEAM_TOOK_LEAD,
 	GTS_BLUETEAM_TOOK_LEAD,
 	GTS_TEAMS_ARE_TIED,
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	GTS_KAMIKAZE
 #endif
 } global_team_sound_t;
 
 // animations
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 // ZTM: NOTE: In animation.cfg I call some animations by other names;
 // * TORSO_ATTACK_GUN is TORSO_ATTACK
 // * TORSO_ATTACK_GAUNTLET is TORSO_ATTACK2
@@ -1099,7 +1099,7 @@ typedef enum {
 	TORSO_AFFIRMATIVE,
 	TORSO_NEGATIVE,
 
-#ifdef TA_PLAYERS // New Turtle Arena player animations
+#ifdef TURTLEARENA // PLAYERS
 	// Place default weapons somewhere on there person while there not used.
 	// TORSO_***DEFAULT_SECONDARY for Don should be
 	//  switching to/from two handed Bo to using one hand.
@@ -1789,16 +1789,12 @@ typedef enum {
 	MOD_EXPLOSION,
 #endif
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // MOD
+#ifndef TURTLEARENA // MOD NO_KAMIKAZE_ITEM POWERS
 	MOD_NAIL,
 	MOD_CHAINGUN,
 	MOD_PROXIMITY_MINE,
-#endif
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	MOD_KAMIKAZE,
-#endif
-#ifndef TURTLEARENA // POWERS
 	MOD_JUICED,
 #endif
 #endif

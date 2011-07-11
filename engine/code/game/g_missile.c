@@ -346,7 +346,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 	if (self && self->client && bg_projectileinfo[projnum].grappling)
 	{
 #ifdef IOQ3ZTM
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 		if (handSide == HS_CENTER) // Shuriken holdable item
 		{
 			if ((self->client->ps.pm_flags & PMF_USE_ITEM_HELD) || self->client->hook) {
@@ -843,7 +843,7 @@ qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir, int weaponnum
 }
 #endif
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 /*
 =================
 fire_shuriken
@@ -851,7 +851,6 @@ fire_shuriken
 */
 qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable)
 {
-#ifdef TA_WEAPSYS
 	int projnum;
 	float s_quadFactor;
 
@@ -868,13 +867,10 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 
 	projnum = BG_ProjectileIndexForHoldable(holdable);
 
-#ifdef TURTLEARENA // LOCKON
 	G_AutoAim(self, projnum, start, forward, right, up);
-#endif
 
 	return fire_projectile(self, start, forward, right, up, projnum,
 				s_quadFactor, MOD_UNKNOWN, MOD_UNKNOWN, HS_CENTER);
-#endif
 }
 #endif
 

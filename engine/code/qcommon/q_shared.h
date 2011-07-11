@@ -1215,7 +1215,7 @@ typedef struct playerState_s {
 #ifdef TA_HOLDSYS
 	int			holdableIndex; // Index of holdable items, for shurikens.
 #endif
-#if defined TA_HOLDABLE || defined NET_COMPAT // HOLD_SHURIKEN
+#if defined TURTLEARENA || defined NET_COMPAT // HOLD_SHURIKEN
 	int			holdableTime;  // Like weaponTime, but for shurikens.
 #endif
 

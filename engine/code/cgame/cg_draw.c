@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
-#ifdef MISSIONPACK_HUD2
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
 #include "../ui/ui_shared.h"
 #endif
 
@@ -37,11 +37,11 @@ menuDef_t *menuScoreboard = NULL;
 int drawTeamOverlayModificationCount = -1;
 #endif
 
-#ifdef TA_HUD
+#ifdef TURTLEARENA
 #define HUD_X 40
 #define HUD_Y 55 // letterbox view shouldn't overlap hud
 #define HUD_WIDTH 150
-#define HUD_HEIGHT 2+(CHAR_HEIGHT/2)+2+(CHAR_HEIGHT/2)+2+ICON_SIZE // was 60
+#define HUD_HEIGHT 2+(CHAR_HEIGHT/2)+2+(CHAR_HEIGHT/2)+2+ICON_SIZE
 #define HUD_HEAD_OFFSET_X -20
 #endif
 
@@ -51,8 +51,6 @@ int	numSortedTeamPlayers;
 char systemChat[256];
 char teamChat1[256];
 char teamChat2[256];
-
-#ifdef MISSIONPACK_HUD2
 
 #ifdef IOQ3ZTM // FONT_REWRITE
 font_t *CG_FontForScale(float scale) {
@@ -110,7 +108,7 @@ void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t colo
 
 	CG_DrawFontStringExt( font, scale, x, y, text, color, qfalse, qfalse, 0, qtrue, adjust, limit, maxX );
 }
-#else
+#elif defined MISSIONPACK_HUD
 int CG_Text_Width(const char *text, float scale, int limit) {
 	int count,len;
 	float out;
@@ -277,9 +275,6 @@ void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text
 		trap_R_SetColor( NULL );
 	}
 }
-#endif
-
-
 #endif
 
 /*
@@ -675,7 +670,7 @@ static void CG_DrawStatusBarHead( float x ) {
 	angles[YAW] = cg.cur_lc->headStartYaw + ( cg.cur_lc->headEndYaw - cg.cur_lc->headStartYaw ) * frac;
 	angles[PITCH] = cg.cur_lc->headStartPitch + ( cg.cur_lc->headEndPitch - cg.cur_lc->headStartPitch ) * frac;
 
-#ifdef TA_HUD
+#ifdef TURTLEARENA
 	CG_DrawHead( x,  (HUD_Y+(ICON_SIZE * 1.25)) - size, size, size,
 				cg.cur_ps->clientNum, angles );
 #else
@@ -693,7 +688,7 @@ CG_DrawStatusBarFlag
 */
 #ifndef MISSIONPACK_HUD
 static void CG_DrawStatusBarFlag( float x, int team ) {
-#ifdef TA_HUD
+#ifdef TURTLEARENA
 	CG_DrawFlagModel( x, HUD_Y, ICON_SIZE, ICON_SIZE, team, qfalse );
 #else
 	CG_DrawFlagModel( x, 480 - ICON_SIZE, ICON_SIZE, ICON_SIZE, team, qfalse );
@@ -721,7 +716,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, i
 		hcolor[1] = 0;
 		hcolor[2] = 1;
 	} else {
-#ifdef TA_HUD
+#ifdef TURTLEARENA
 		if (clientNum < 0 || clientNum >= MAX_CLIENTS) {
 			clientNum = 0;
 		}
@@ -744,7 +739,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, i
 	trap_R_SetColor( NULL );
 }
 
-#ifdef TA_HUD
+#ifdef TURTLEARENA
 void CG_DrawFieldSmall(int x, int y, int width, int value)
 {
 	char	num[16], *ptr;
@@ -801,9 +796,7 @@ void CG_DrawFieldSmall(int x, int y, int width, int value)
 		l--;
 	}
 }
-#endif
 
-#ifdef TURTLEARENA // DROWNING
 /*
 ================
 CG_DrawAirBar
@@ -836,11 +829,11 @@ static void CG_DrawStatusBar( void ) {
 	centity_t	*cent;
 	playerState_t	*ps;
 	int			value;
-#ifndef TA_HUD
+#ifndef TURTLEARENA
 	vec4_t		hcolor;
 #endif
 	vec3_t		angles;
-#ifdef TA_HUD
+#ifdef TURTLEARENA
 	int			start_x;
 	int			x;
 	int			y;
@@ -880,7 +873,7 @@ static void CG_DrawStatusBar( void ) {
 	}
 #endif
 
-#ifdef TA_HUD
+#ifdef TURTLEARENA
 	CG_HudPlacement(HUD_LEFT);
 
 	start_x = x = HUD_X;
@@ -1003,7 +996,7 @@ static void CG_DrawStatusBar( void ) {
 #ifdef TA_HOLDSYS
 		// draw value
 
-#ifdef TA_HOLDABLE // Grappling shuriken use no ammo.
+#ifdef TURTLEARENA // Grappling shuriken use no ammo.
 		if (!bg_projectileinfo[BG_ProjectileIndexForHoldable(cg.cur_ps->holdableIndex)].grappling)
 #endif
 		{
@@ -1041,13 +1034,11 @@ static void CG_DrawStatusBar( void ) {
 	x = start_x;
 	y = HUD_Y+HUD_HEIGHT;
 
-#ifdef TURTLEARENA // DROWNING
 	// LINE4: Air bar
 	if (cg.cur_ps->powerups[PW_AIR] - 30000 < cg.time) {
 		CG_DrawAirBar(x, HUD_Y+HUD_HEIGHT, HUD_WIDTH, 12, 2, (cg.cur_ps->powerups[PW_AIR] - cg.time) / 30000.0f);
 	}
 	y += 12;
-#endif
 
 #ifdef TA_SP
 	// LINE5: Lives (Single Player and Co-op only)
@@ -1102,7 +1093,6 @@ static void CG_DrawStatusBar( void ) {
 		CG_DrawStatusBarFlag( 185 + CHAR_WIDTH*3 + TEXT_ICON_SPACE + ICON_SIZE, TEAM_FREE );
 	}
 
-#ifndef TURTLEARENA // NOARMOR
 	if ( ps->stats[ STAT_ARMOR ] ) {
 		origin[0] = 90;
 		origin[1] = 0;
@@ -1111,7 +1101,6 @@ static void CG_DrawStatusBar( void ) {
 		CG_Draw3DModel( 370 + CHAR_WIDTH*3 + TEXT_ICON_SPACE, 432, ICON_SIZE, ICON_SIZE,
 					   cgs.media.armorModel, 0, origin, angles );
 	}
-#endif
 	//
 	// ammo
 	//
@@ -1171,7 +1160,6 @@ static void CG_DrawStatusBar( void ) {
 	trap_R_SetColor( hcolor );
 
 
-#ifndef TURTLEARENA // NOARMOR
 	//
 	// armor
 	//
@@ -1187,7 +1175,6 @@ static void CG_DrawStatusBar( void ) {
 
 	}
 #endif
-#endif // TA_HUD
 }
 #endif // MISSIONPACK_HUD
 
@@ -1812,7 +1799,7 @@ static float CG_DrawScores( float y ) {
 #endif
 
 	} else
-#ifdef TA_HUD // Not ffa or sp, but still in tournament?
+#if 0 //#ifdef TURTLEARENA // Not ffa or sp, but still in tournament?
 	if (cgs.gametype == GT_TOURNAMENT)
 #endif
 	{
@@ -2174,7 +2161,7 @@ CG_DrawHoldableItem
 ===================
 */
 #ifndef MISSIONPACK_HUD
-#ifndef TA_HUD
+#ifndef TURTLEARENA
 static void CG_DrawHoldableItem( void ) { 
 	int		value;
 
@@ -2208,7 +2195,7 @@ static void CG_DrawPersistantPowerup( void ) {
 	value = cg.cur_ps->stats[STAT_PERSISTANT_POWERUP];
 	if ( value ) {
 		CG_RegisterItemVisuals( value );
-#ifdef TA_HUD
+#ifdef TURTLEARENA
 		CG_DrawPic( HUD_X, (SCREEN_HEIGHT-ICON_SIZE)/2 - ICON_SIZE, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
 #else
 		CG_DrawPic( 640-ICON_SIZE, (SCREEN_HEIGHT-ICON_SIZE)/2 - ICON_SIZE, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
@@ -2557,7 +2544,7 @@ void CG_CenterPrint( const char *str, int y, int charWidth ) {
 
 	cg.cur_lc->centerPrintTime = cg.time;
 	cg.cur_lc->centerPrintY = y;
-#ifndef MISSIONPACK_HUD2
+#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 	cg.cur_lc->centerPrintCharWidth = charWidth;
 #endif
 
@@ -2581,7 +2568,7 @@ static void CG_DrawCenterString( void ) {
 	char	*start;
 	int		l;
 	int		y;
-#ifdef MISSIONPACK_HUD2
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
 	int		h;
 #endif
 	float	*color;
@@ -2614,7 +2601,7 @@ static void CG_DrawCenterString( void ) {
 		}
 		linebuffer[l] = 0;
 
-#ifdef MISSIONPACK_HUD2
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
 		h = CG_Text_Height(linebuffer, 0.5, 0);
 		CG_Text_Paint(CENTER_X, y + h, 0.5, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 		y += h + 6;
@@ -2863,7 +2850,7 @@ static void CG_DrawCrosshairNames( void ) {
 	}
 
 	name = cgs.clientinfo[ cg.cur_lc->crosshairClientNum ].name;
-#ifdef MISSIONPACK_HUD2
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
 	color[3] *= 0.5f;
 	CG_Text_Paint( CENTER_X, 190, 0.3f, color, name, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
 #else
@@ -3090,7 +3077,7 @@ static void CG_DrawSPIntermission( void ) {
 
 	Com_sprintf(str, sizeof (str), "%s got through the level", name);
 
-#ifdef MISSIONPACK_HUD2
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
 	CG_Text_Paint( CENTER_X, 210, 0.3f, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
 #else
 	CG_DrawBigString( CENTER_X, 210, str, color[3] );
@@ -3272,7 +3259,7 @@ static void CG_DrawWarmup( void ) {
 	int			i;
 	float scale;
 	clientInfo_t	*ci1, *ci2;
-#ifndef MISSIONPACK_HUD2
+#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 	int			w;
 #endif
 	int			cw;
@@ -3308,7 +3295,7 @@ static void CG_DrawWarmup( void ) {
 
 		if ( ci1 && ci2 ) {
 			s = va( "%s vs %s", ci1->name, ci2->name );
-#ifdef MISSIONPACK_HUD2
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
 			CG_Text_Paint(CENTER_X, 60, 0.6f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 #else
 			w = CG_DrawStrlen( s );
@@ -3341,7 +3328,7 @@ static void CG_DrawWarmup( void ) {
 		} else {
 			s = "";
 		}
-#ifdef MISSIONPACK_HUD2
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
 		CG_Text_Paint(CENTER_X, 90, 0.6f, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 #else
 		w = CG_DrawStrlen( s );
@@ -3397,7 +3384,7 @@ static void CG_DrawWarmup( void ) {
 		break;
 	}
 
-#ifdef MISSIONPACK_HUD2
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
 	CG_Text_Paint(CENTER_X, 125, scale, colorWhite, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 #else
 	CG_DrawStringExt( CENTER_X, 70, s, colorWhite, 
@@ -3449,13 +3436,13 @@ void CG_DrawGameOver(void)
 	if (!ps->persistant[PERS_LIVES] && !ps->persistant[PERS_CONTINUES])
 	{
 		int	y;
-#ifndef MISSIONPACK_HUD2
+#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 		int charWidth;
 #endif
 		vec4_t color = {1,1,1,1};
 		const char *str = "Game Over";
 
-#ifdef MISSIONPACK_HUD2
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
 		y = 120 + CG_Text_Height(str, 0.5, 0) / 2;
 		CG_Text_Paint(CENTER_X, y, 0.5, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 #else
@@ -3524,7 +3511,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 	} else {
 		// don't draw any status if dead or the scoreboard is being explicitly shown
 		if (
-#ifndef TA_HUD
+#ifndef TURTLEARENA
 		!cg.showScores &&
 #endif
 		cg.cur_ps->stats[STAT_HEALTH] > 0 ) {
@@ -3560,7 +3547,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 			CG_DrawWeaponSelect();
 #endif
 #ifndef MISSIONPACK_HUD
-#ifndef TA_HUD
+#ifndef TURTLEARENA
 			CG_DrawHoldableItem();
 #endif
 #ifdef MISSIONPACK // IOQ3ZTM // ZTM: For playing MISSIONPACK without new HUD.

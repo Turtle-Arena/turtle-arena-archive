@@ -364,7 +364,7 @@ typedef struct {
 	float	depthForOpaque;
 } fogParms_t;
 
-#ifdef CELSHADING // ZTM
+#ifdef IOQ3ZTM // CELSHADING
 typedef struct
 {
 	float			width;				// Width of cel outline.
@@ -412,7 +412,7 @@ typedef struct shader_s {
 
 	int			multitextureEnv;		// 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
 
-#ifdef CELSHADING // ZTM
+#ifdef IOQ3ZTM // CELSHADING
 	celoutline_t celoutline;
 #endif
 
@@ -1181,7 +1181,7 @@ extern	cvar_t	*r_vertexLight;					// vertex lighting mode for better performance
 extern	cvar_t	*r_uiFullScreen;				// ui is running fullscreen
 
 extern	cvar_t	*r_logFile;						// number of frames to emit GL logs
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 extern	cvar_t	*r_celshadalgo;					// Cel shading, Chooses method: 0 = disabled, 1 = whiteTexture, 10 = kuwahara, 20 = snn.
 extern	cvar_t	*r_celoutline;					// Cel outline. The integer value is the width of the cel outline to draw.
 #endif

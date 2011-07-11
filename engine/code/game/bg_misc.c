@@ -584,12 +584,7 @@ gitem_t	bg_itemlist[] =
 	},
 #endif
 
-#ifdef TA_HOLDABLE // no q3 teleprter
-#ifndef TURTLEARENA
-	// Keep the model indexs correct for items after teleporter.
-	{ EMPTY_GITEM },
-#endif
-#else
+#ifndef TURTLEARENA // HOLDABLE // no q3 teleprter
 	//
 	// HOLDABLE ITEMS
 	//
@@ -643,10 +638,7 @@ gitem_t	bg_itemlist[] =
 /* sounds */ "sound/items/use_medkit.wav"
 	},
 
-#ifdef TA_HOLDABLE
-#ifndef TURTLEARENA
-#warning: "Model indexs will not match Quake3 botfiles/inv.h!"
-#endif
+#ifdef TURTLEARENA // HOLDABLE
 /*QUAKED holdable_shuriken (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -933,11 +925,7 @@ Only in CTF games
 	},
 
 #ifdef MISSIONPACK
-#ifdef TA_HOLDABLE // NO_KAMIKAZE_ITEM
-#ifndef TURTLEARENA
-	{ EMPTY_GITEM },
-#endif
-#else
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 /*QUAKED holdable_kamikaze (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -1353,15 +1341,11 @@ char	*modNames[MOD_MAX] = {
 	"MOD_EXPLOSION",
 #endif
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // MOD
+#ifndef TURTLEARENA // MOD NO_KAMIKAZE_ITEM POWERS
 	"MOD_NAIL",
 	"MOD_CHAINGUN",
 	"MOD_PROXIMITY_MINE",
-#endif
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	"MOD_KAMIKAZE",
-#endif
-#ifndef TURTLEARENA // POWERS
 	"MOD_JUICED",
 #endif
 #endif
@@ -1431,8 +1415,7 @@ strAnimationDef_t playerAnimationDefs[] = {
 	ANIMDEF(TORSO_AFFIRMATIVE),
 	ANIMDEF(TORSO_NEGATIVE),
 
-	// TURTLEARENA
-#ifdef TA_PLAYERS // New TURTLEARENA player animations
+#ifdef TURTLEARENA // PLAYERS
 	// Place default weapons somewhere on there person while there not used.
 	ANIMDEF(TORSO_PUTDEFAULT_BOTH),
 	ANIMDEF(TORSO_PUTDEFAULT_PRIMARY),
@@ -1532,7 +1515,7 @@ strAnimationDef_t playerAnimationDefs[] = {
 	{ TORSO_ATTACK, "TORSO_ATTACK_GUN" },
 	{ TORSO_ATTACK2, "TORSO_ATTACK_GAUNTLET" },
 
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 	{ BOTH_LADDER_UP, "BOTH_LADDER" },
 #endif
 
@@ -1660,7 +1643,7 @@ int BG_NumHoldableItems(void)
 	return bg_numholdables;
 }
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 int BG_ProjectileIndexForHoldable(int holdable)
 {
 	int projnum;
@@ -2018,13 +2001,13 @@ const char *weapon_names[WP_NUM_WEAPONS+1] =
 const char *holdable_names[HI_NUM_HOLDABLE+1] =
 {
 	"HI_NONE",
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA // no q3 teleprter
 	"HI_TELEPORTER",
 #elif !defined TA_HOLDSYS
 	"HI_TELEPORTER_REMOVED", // do not use
 #endif
 	"HI_MEDKIT",
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	"HI_KAMIKAZE",
 #elif !defined TA_HOLDSYS
 	"HI_KAMIKAZE_REMOVED", // do not use
@@ -2037,7 +2020,7 @@ const char *holdable_names[HI_NUM_HOLDABLE+1] =
 #elif !defined TA_HOLDSYS
 	"HI_INVULNERABILITY_REMOVED", // do not use
 #endif
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	// Shurikens
 	"HI_SHURIKEN",
 	"HI_ELECTRICSHURIKEN",
@@ -3986,7 +3969,7 @@ qboolean BG_PlayerAttackAnim(animNumber_t aa)
 	return qfalse;
 #else
 	return (a == TORSO_ATTACK || a == TORSO_ATTACK2
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 	|| (a >= TORSO_ATTACK_GUN_PRIMARY && a <= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C)
 #endif
 	);
@@ -4022,7 +4005,7 @@ qboolean BG_PlayerStandAnim(bg_playercfg_t *playercfg, int prefixBit, animNumber
 #else
 	return (((((prefixBit & AP_TORSO) && (a == TORSO_STAND || a == TORSO_STAND2))
 			|| ((prefixBit & AP_LEGS) && a == LEGS_IDLE))
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 		|| (a >= TORSO_STAND_GUN_PRIMARY && a <= TORSO_STAND_NUNCHUCKS1_PRIMARY)
 #endif
 		) && (playercfg->animations[a].prefixType & prefixBit));
@@ -4865,7 +4848,7 @@ char *eventnames[] = {
 	"EV_PROXIMITY_MINE_STICK",
 	"EV_PROXIMITY_MINE_TRIGGER",
 #endif
-#if !defined TA_HOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
+#if !defined TURTLEARENA || defined NET_COMPAT // NO_KAMIKAZE_ITEM
 	"EV_KAMIKAZE",			// kamikaze explodes
 #endif
 	"EV_OBELISKEXPLODE",		// obelisk explodes
@@ -5542,7 +5525,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 			flipflop = qtrue;
 			break;
 
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 		case BOTH_LADDER_STAND:
 			anim[0] = LEGS_IDLE;
 			break;
@@ -5570,7 +5553,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 	}
 
 
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 	// Set defaults for Turtle Arena animations
 	// default weapon, put away
 	if (index >= TORSO_PUTDEFAULT_BOTH && index <= TORSO_PUTDEFAULT_SECONDARY)

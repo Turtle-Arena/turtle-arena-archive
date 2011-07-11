@@ -301,7 +301,7 @@ void CG_LightningBoltBeam( vec3_t start, vec3_t end )
 }
 #endif
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 /*
 ==================
 CG_KamikazeEffect

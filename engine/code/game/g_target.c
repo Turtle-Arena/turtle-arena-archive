@@ -504,9 +504,7 @@ void SP_target_level_end( gentity_t *self ) {
 	self->use = target_level_end_use;
 
 	// Check for invalid map name on spawn, easier to find bugs in maps.
-	if (self->message == NULL || *self->message == '\0')
-	{
-		// Invalid map name.
+	if (self->message == NULL || *self->message == '\0') {
 		G_Printf("target_level_end: Invalid map name.\n");
 	}
 }
@@ -539,12 +537,12 @@ void target_start_camera_use(gentity_t *ent, gentity_t *other, gentity_t *activa
 	}
 
 	// Team only camera?
-		if ( ent->spawnflags & 1 ) {
-			G_TeamCommand( TEAM_RED, va("camera \"%s\"", ent->message) );
+	if ( ent->spawnflags & 1 ) {
+		G_TeamCommand( TEAM_RED, va("camera \"%s\"", ent->message) );
 		return;
-		}
-		if ( ent->spawnflags & 2 ) {
-			G_TeamCommand( TEAM_BLUE, va("camera \"%s\"", ent->message) );
+	}
+	if ( ent->spawnflags & 2 ) {
+		G_TeamCommand( TEAM_BLUE, va("camera \"%s\"", ent->message) );
 		return;
 	}
 
@@ -557,9 +555,7 @@ void SP_target_start_camera( gentity_t *self ) {
 	self->use = target_start_camera_use;
 
 	// Check for invalid script filename on spawn, easier to find bugs in maps.
-	if (scrname == NULL || *scrname == '\0')
-	{
-		// Invalid map name.
+	if (scrname == NULL || *scrname == '\0') {
 		G_Printf("target_start_camera: Invalid script filename.\n");
 	}
 }

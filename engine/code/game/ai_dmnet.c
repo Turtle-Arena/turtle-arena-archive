@@ -1409,7 +1409,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 	bsp_trace_t bsptrace;
 	entityState_t state;
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	// if there is a dead body wearing kamikze nearby
 	if (bs->kamikazebody) {
 		// if the bot's view angles and weapon are not used for movement
@@ -1550,7 +1550,7 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 	int targetvisible;
 	bsp_trace_t bsptrace;
 	aas_entityinfo_t entinfo;
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	int wantUseShuriken;
 #endif
 
@@ -1613,20 +1613,20 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 		// if the shootable entity is visible from the current position
 		if (bsptrace.fraction >= 1.0 || bsptrace.ent == goal->entitynum) {
 			targetvisible = qtrue;
-#ifdef TA_HOLDABLE
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 			BotEntityInfo(goal->entitynum, &entinfo);
 #endif
 			// if holding the right weapon
 			if (bs->cur_ps.weapon == bs->activatestack->weapon) {
 				VectorSubtract(bs->activatestack->target, bs->eye, dir);
 				vectoangles(dir, ideal_viewangles);
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 				wantUseShuriken = BotWantUseShuriken(bs, goal->entitynum, &entinfo);
 #endif
 #ifdef IOQ3ZTM // ATTACK_WITH_MELEE
 				// check if too far to attack
 				if (
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 					!wantUseShuriken &&
 #endif
 					VectorLength(dir) > 80 &&
@@ -1644,13 +1644,13 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 #endif
 				// if the bot is pretty close with its aim
 				if (InFieldOfVision(bs->viewangles, 20, ideal_viewangles)) {
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 					if (wantUseShuriken) {
 						trap_EA_Use(bs->client, wantUseShuriken);
 					} else {
 #endif
 					trap_EA_Attack(bs->client);
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 					}
 #endif
 				}
@@ -1659,7 +1659,7 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 	}
 	// if the shoot target is visible
 	if (targetvisible) {
-#ifndef TA_HOLDABLE
+#ifndef TURTLEARENA // HOLD_SHURIKEN
 		// get the entity info of the entity the bot is shooting at
 		BotEntityInfo(goal->entitynum, &entinfo);
 #endif

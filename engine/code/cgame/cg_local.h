@@ -327,10 +327,8 @@ typedef enum {
 	LE_BUBBLE,
 #endif
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM POWERS
 	LE_KAMIKAZE,
-#endif
-#ifndef TURTLEARENA // POWERS
 	LE_INVULIMPACT,
 	LE_INVULJUICED,
 #endif
@@ -341,7 +339,7 @@ typedef enum {
 typedef enum {
 	LEF_PUFF_DONT_SCALE  = 0x0001,			// do not scale size over time
 	LEF_TUMBLE			 = 0x0002,			// tumble over time, used for ejecting shells
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	LEF_SOUND1			 = 0x0004,			// sound 1 for kamikaze
 	LEF_SOUND2			 = 0x0008			// sound 2 for kamikaze
 #endif
@@ -773,7 +771,7 @@ typedef struct {
 
 	// centerprinting
 	int			centerPrintTime;
-#ifndef MISSIONPACK_HUD2
+#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 	int			centerPrintCharWidth;
 #endif
 	int			centerPrintY;
@@ -868,7 +866,7 @@ typedef struct {
 	qboolean camLeft;
 	qboolean camRight;
 	qboolean camReseting;
-#ifdef TA_CAMERA
+#ifdef TURTLEARENA // CAMERA
 	float camDistance; // Distance from client to put camera
 #endif
 #endif
@@ -1202,7 +1200,7 @@ typedef struct {
 	qhandle_t	battleWeaponShader;
 #endif
 	qhandle_t	hastePuffShader;
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	qhandle_t	redKamikazeShader;
 	qhandle_t	blueKamikazeShader;
 #endif
@@ -1312,7 +1310,7 @@ typedef struct {
 	sfxHandle_t	sfx_rockexp;
 	sfxHandle_t	sfx_plasmaexp;
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // WEAPONS
+#ifndef TURTLEARENA // WEAPONS NO_KAMIKAZE_ITEM POWERS
 	sfxHandle_t	sfx_proxexp;
 	sfxHandle_t	sfx_nghit;
 	sfxHandle_t	sfx_nghitflesh;
@@ -1320,13 +1318,9 @@ typedef struct {
 	sfxHandle_t	sfx_chghit;
 	sfxHandle_t	sfx_chghitflesh;
 	sfxHandle_t	sfx_chghitmetal;
-#endif
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	sfxHandle_t kamikazeExplodeSound;
 	sfxHandle_t kamikazeImplodeSound;
 	sfxHandle_t kamikazeFarSound;
-#endif
-#ifndef TURTLEARENA // POWERS
 	sfxHandle_t useInvulnerabilitySound;
 	sfxHandle_t invulnerabilityImpactSound1;
 	sfxHandle_t invulnerabilityImpactSound2;
@@ -1409,7 +1403,7 @@ typedef struct {
 
 	sfxHandle_t flightSound;
 	sfxHandle_t medkitSound;
-#ifdef TA_HOLDABLE
+#ifdef TURTLEARENA // HOLDABLE
 	sfxHandle_t shurikenSound;
 #endif
 
@@ -2090,7 +2084,7 @@ void CG_4Weapon_f( void );
 #endif
 #endif
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 void CG_RegisterHoldable( int holdableNum );
 #endif
 #ifdef TA_WEAPSYS
@@ -2185,7 +2179,7 @@ qboolean CG_BulletBubbleTrail( vec3_t start, vec3_t end, int skipNum );
 #endif
 void CG_SpawnEffect( vec3_t org );
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 void CG_KamikazeEffect( vec3_t org );
 #endif
 void CG_ObeliskExplode( vec3_t org, int entityNum );

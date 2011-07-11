@@ -61,7 +61,7 @@ static float *TableForFunc( genFunc_t func )
 **
 ** Evaluates a given waveForm_t, referencing backEnd.refdef.time directly
 */
-#ifndef CELSHADING // ZTM
+#ifndef IOQ3ZTM // CELSHADING
 static
 #endif
 float EvalWaveForm( const waveForm_t *wf )
@@ -73,7 +73,7 @@ float EvalWaveForm( const waveForm_t *wf )
 	return WAVEVALUE( table, wf->base, wf->amplitude, wf->phase, wf->frequency );
 }
 
-#ifndef CELSHADING // ZTM
+#ifndef IOQ3ZTM // CELSHADING
 static
 #endif
 float EvalWaveFormClamped( const waveForm_t *wf )

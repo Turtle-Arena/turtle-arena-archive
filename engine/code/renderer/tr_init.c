@@ -114,7 +114,7 @@ cvar_t	*r_singleShader;
 cvar_t	*r_roundImagesDown;
 cvar_t	*r_colorMipLevels;
 cvar_t	*r_picmip;
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 cvar_t	*r_celshadalgo; // Cel shading algorithm selection.
 cvar_t	*r_celoutline; // Cel border width.
 #endif
@@ -1311,7 +1311,7 @@ void R_Register( void )
 	r_logFile = ri.Cvar_Get( "r_logFile", "0", CVAR_CHEAT );
 	r_debugSurface = ri.Cvar_Get ("r_debugSurface", "0", CVAR_CHEAT);
 	r_nobind = ri.Cvar_Get ("r_nobind", "0", CVAR_CHEAT);
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 	r_celshadalgo = ri.Cvar_Get ("r_celshadalgo", "0", CVAR_ARCHIVE|CVAR_LATCH);
 	r_celoutline = ri.Cvar_Get("r_celoutline","0", CVAR_ARCHIVE);
 #endif

@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // tr_image.c
 #include "tr_local.h"
 
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 /**
  * Headers for cell shading
  * @author Jordi Prats Catala
@@ -859,7 +859,7 @@ image_t *R_CreateImage( const char *name, const byte *pic, int width, int height
 	return image;
 }
 
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 /****************************
 RGB GET/SET
 ****************************/
@@ -1498,7 +1498,7 @@ static void snn(int columns, int rows, byte *targa_rgba)
 		}
 	}
 }
-#endif // CELSHADING
+#endif
 
 //===================================================================
 
@@ -1608,7 +1608,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 		}
 	}
 
-#ifdef CELSHADING
+#ifdef IOQ3ZTM // CELSHADING
 	switch (r_celshadalgo->integer)
 	{
 		case 1:
@@ -1652,7 +1652,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 		default:
 			break;
 	}
-#endif // CELSHADING
+#endif
 }
 
 

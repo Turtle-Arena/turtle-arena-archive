@@ -246,7 +246,7 @@ void CG_Respawn( int clientNum ) {
 		cg.localClients[i].camLeft = qfalse;
 		cg.localClients[i].camRight = qfalse;
 		cg.localClients[i].camReseting = qfalse;
-#ifdef TA_CAMERA
+#ifdef TURTLEARENA // CAMERA
 		cg.localClients[i].camDistance = 0;
 #endif
 #endif
@@ -272,7 +272,7 @@ void CG_Respawn( void ) {
 	cg.localClient.camLeft = qfalse;
 	cg.localClient.camRight = qfalse;
 	cg.localClient.camReseting = qfalse;
-#ifdef TA_CAMERA
+#ifdef TURTLEARENA // CAMERA
 	cg.localClient.camDistance = 0;
 #endif
 #endif

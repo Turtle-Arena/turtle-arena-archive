@@ -295,7 +295,7 @@ qboolean EntityHasQuad(aas_entityinfo_t *entinfo) {
 }
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 /*
 ==================
 EntityHasKamikze
@@ -1735,7 +1735,7 @@ void BotCheckItemPickup(bot_state_t *bs, int *oldinventory) {
 		return;
 
 	offence = -1;
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	// go into offence if picked up the kamikaze or invulnerability
 	if (!oldinventory[INVENTORY_KAMIKAZE] && bs->inventory[INVENTORY_KAMIKAZE] >= 1) {
 		offence = qtrue;
@@ -1912,12 +1912,12 @@ void BotUpdateInventory(bot_state_t *bs) {
 	//powerups
 	bs->inventory[INVENTORY_HEALTH] = bs->cur_ps.stats[STAT_HEALTH];
 #ifdef TA_HOLDSYS
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA // HOLDABLE // no q3 teleprter
 	bs->inventory[INVENTORY_TELEPORTER] = bs->cur_ps.holdable[HI_TELEPORTER];
 #endif
 	bs->inventory[INVENTORY_MEDKIT] = bs->cur_ps.holdable[HI_MEDKIT];
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	bs->inventory[INVENTORY_KAMIKAZE] = bs->cur_ps.holdable[HI_KAMIKAZE];
 #endif
 	bs->inventory[INVENTORY_PORTAL] = bs->cur_ps.holdable[HI_PORTAL];
@@ -1930,7 +1930,7 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_TELEPORTER] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_HOLDABLE_ITEM])->giTag == HI_TELEPORTER;
 	bs->inventory[INVENTORY_MEDKIT] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_HOLDABLE_ITEM])->giTag == HI_MEDKIT;
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	bs->inventory[INVENTORY_KAMIKAZE] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_HOLDABLE_ITEM])->giTag == HI_KAMIKAZE;
 #endif
 	bs->inventory[INVENTORY_PORTAL] = BG_ItemForItemNum(bs->cur_ps.stats[STAT_HOLDABLE_ITEM])->giTag == HI_PORTAL;
@@ -1942,7 +1942,7 @@ void BotUpdateInventory(bot_state_t *bs) {
 	bs->inventory[INVENTORY_TELEPORTER] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_TELEPORTER;
 	bs->inventory[INVENTORY_MEDKIT] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_MEDKIT;
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	bs->inventory[INVENTORY_KAMIKAZE] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_KAMIKAZE;
 #endif
 	bs->inventory[INVENTORY_PORTAL] = bs->cur_ps.stats[STAT_HOLDABLE_ITEM] == MODELINDEX_PORTAL;
@@ -2015,7 +2015,7 @@ void BotUpdateBattleInventory(bot_state_t *bs, int enemy) {
 }
 
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM POWERS
 /*
 ==================
 BotUseKamikaze
@@ -2147,9 +2147,7 @@ void BotUseKamikaze(bot_state_t *bs) {
 		return;
 	}
 }
-#endif
 
-#ifndef TURTLEARENA // POWERS // INVENTORY_INVULNERABILITY is disabled
 /*
 ==================
 BotUseInvulnerability
@@ -2275,7 +2273,7 @@ void BotUseInvulnerability(bot_state_t *bs) {
 	}
 #endif
 }
-#endif // TURTLEARENA // POWERS
+#endif // TURTLEARENA
 #endif
 
 /*
@@ -2284,7 +2282,7 @@ BotBattleUseItems
 ==================
 */
 void BotBattleUseItems(bot_state_t *bs) {
-#ifndef TA_HOLDABLE // no q3 teleporter
+#ifndef TURTLEARENA // HOLDABLE // no q3 teleporter
 	if (bs->inventory[INVENTORY_HEALTH] < 40) {
 		if (bs->inventory[INVENTORY_TELEPORTER] > 0) {
 			if (!BotCTFCarryingFlag(bs)
@@ -2314,10 +2312,8 @@ void BotBattleUseItems(bot_state_t *bs) {
 		}
 	}
 #ifdef MISSIONPACK
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM POWERS
 	BotUseKamikaze(bs);
-#endif
-#ifndef TURTLEARENA // POWERS
 	BotUseInvulnerability(bs);
 #endif
 #endif
@@ -2477,7 +2473,7 @@ BotCanUseShurikens
 qboolean BotCanUseShurikens(bot_state_t *bs)
 {
 	// ZTM: TODO: Check all 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	if (BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex)
 		&& bs->cur_ps.holdable[bs->cur_ps.holdableIndex] != 0)
 	{
@@ -2488,7 +2484,7 @@ qboolean BotCanUseShurikens(bot_state_t *bs)
 	return qfalse;
 }
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 /*
 ==================
 BotWantUseShuriken
@@ -2576,7 +2572,7 @@ float BotAggression(bot_state_t *bs) {
 		if (bs->inventory[INVENTORY_ARMOR] < 40) return 0;
 	}
 #endif
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	if (BotCanUseShurikens(bs)) {
 		return 80;
 	}
@@ -4110,7 +4106,7 @@ void BotCheckAttack(bot_state_t *bs) {
 #ifdef TA_WEAPSYS
 	vec3_t offset;
 	bg_projectileinfo_t *bgProj;
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	qboolean useHoldable = qfalse;
 	int holdableNum;
 #endif
@@ -4160,7 +4156,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	//
 #ifdef TA_WEAPSYS
 	bgProj = NULL;
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	if ((holdableNum = BotWantUseShuriken(bs, attackentity, &entinfo)))
 	{
 		int projnum = BG_ProjectileIndexForHoldable(holdableNum);
@@ -4176,7 +4172,7 @@ void BotCheckAttack(bot_state_t *bs) {
 	//
 #ifdef TA_WEAPSYS
 	if (
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 		!useHoldable &&
 #endif
 		BG_WeaponHasMelee(bs->cur_ps.weapon))
@@ -4202,7 +4198,7 @@ void BotCheckAttack(bot_state_t *bs) {
 
 #ifdef TA_WEAPSYS
 	if (
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 		!useHoldable &&
 #endif
 		!BG_WeaponHasMelee(bs->cur_ps.weapon))
@@ -4240,7 +4236,7 @@ void BotCheckAttack(bot_state_t *bs) {
 		start[2] += bs->cur_ps.viewheight;
 		AngleVectors(bs->viewangles, forward, right, NULL);
 #ifdef TA_WEAPSYS
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 		if (useHoldable)
 			VectorClear(offset);
 		else
@@ -4297,7 +4293,7 @@ void BotCheckAttack(bot_state_t *bs) {
 #ifdef TA_WEAPSYS
 	}
 #endif
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	if (useHoldable)
 	{
 		trap_EA_Use(bs->client, holdableNum);
@@ -5455,7 +5451,7 @@ void BotCheckForProxMines(bot_state_t *bs, entityState_t *state) {
 	bs->numproxmines++;
 }
 
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 /*
 ==================
 BotCheckForKamikazeBody
@@ -5660,7 +5656,7 @@ void BotCheckEvents(bot_state_t *bs, entityState_t *state) {
 		}
 		case EV_GENERAL_SOUND:
 		{
-#ifndef TA_HOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA // HOLDABLE // no q3 teleprter
 			//if this sound is played on the bot
 			if (state->number == bs->client) {
 				if (state->eventParm < 0 || state->eventParm > MAX_SOUNDS) {
@@ -5748,7 +5744,7 @@ void BotCheckSnapshot(bot_state_t *bs) {
 
 	//remove all avoid spots
 	trap_BotAddAvoidSpot(bs->ms, vec3_origin, 0, AVOID_CLEAR);
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	//reset kamikaze body
 	bs->kamikazebody = 0;
 #endif
@@ -5765,7 +5761,7 @@ void BotCheckSnapshot(bot_state_t *bs) {
 #ifdef MISSIONPACK
 		//check for proximity mines which the bot should deactivate
 		BotCheckForProxMines(bs, &state);
-#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 		//check for dead bodies with the kamikaze effect which should be gibbed
 		BotCheckForKamikazeBody(bs, &state);
 #endif

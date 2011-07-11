@@ -124,7 +124,7 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 }
 #endif
 
-#ifdef TA_HOLDABLE // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 /*
 ================
 G_ThrowShuriken
@@ -420,12 +420,12 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		}
 #ifdef TA_GAME_MODELS // TA_WEAPSYS
 		// put weapon on torso
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_primary"))
 #endif
 		{
-#if !defined TA_PLAYERS || defined TA_SUPPORTQ3
+#if !defined TURTLEARENA || defined TA_SUPPORTQ3 // PLAYERS
 			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 				torsoOrientation, ent->client->pers.torsoModel, "tag_weapon"))
 #endif
@@ -450,12 +450,12 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		}
 #ifdef TA_GAME_MODELS // TA_WEAPSYS
 		// put weapon on torso
-#ifdef TA_PLAYERS
+#ifdef TURTLEARENA // PLAYERS
 		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_secondary"))
 #endif
 		{
-#if !defined TA_PLAYERS || defined TA_SUPPORTQ3
+#if !defined TURTLEARENA || defined TA_SUPPORTQ3 // PLAYERS
 			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 				torsoOrientation, ent->client->pers.torsoModel, "tag_flag"))
 #endif
@@ -1770,7 +1770,7 @@ void FireWeapon( gentity_t *ent ) {
 }
 
 
-#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 
 /*
 ===============
