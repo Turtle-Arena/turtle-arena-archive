@@ -622,8 +622,9 @@ static void CG_Item( centity_t *cent ) {
 #endif
 
 #ifdef IOQ3ZTM // move icons as well as models.
-#ifdef TURTLEARENA // NIGHTS_ITEMS
-	if (item->giType == IT_SCORE)
+#ifdef TURTLEARENA
+	// CTF flags and score items do not bob.
+	if ((item->giType == IT_TEAM && item->giTag != 0) || item->giType == IT_SCORE)
 		itemBob = qfalse;
 	else
 #endif
@@ -673,6 +674,13 @@ static void CG_Item( centity_t *cent ) {
 
 	memset (&ent, 0, sizeof(ent));
 
+#ifdef TURTLEARENA
+	// CTF flags use real angles
+	if (item->giType == IT_TEAM && item->giTag != 0) {
+		VectorCopy(cent->currentState.angles, cent->lerpAngles);
+		AnglesToAxis( cent->lerpAngles, ent.axis );
+	} else
+#endif
 	// autorotate at one of two speeds
 	if ( item->giType == IT_HEALTH ) {
 		VectorCopy( cg.autoAnglesFast, cent->lerpAngles );

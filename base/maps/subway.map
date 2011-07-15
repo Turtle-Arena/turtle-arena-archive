@@ -3431,8 +3431,9 @@ base_floor/grate_rust
 // entity 4
 {
 "classname" "team_CTF_redflag"
-"origin" "2368.000000 0.000000 32.000000"
+"origin" "2368.000244 0.000240 32.000000"
 "gametype" "ctf,oneflag"
+"angle" "90"
 }
 // entity 5
 {
@@ -3824,6 +3825,7 @@ base_floor/grate_rust
 "classname" "team_CTF_blueflag"
 "origin" "-832.000000 0.000000 32.000000"
 "gametype" "ctf,oneflag"
+"angle" "-90"
 }
 // entity 66
 {
