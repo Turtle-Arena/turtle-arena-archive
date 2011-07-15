@@ -254,6 +254,13 @@ static void CG_Obituary( entityState_t *ent ) {
 #ifdef TA_SP // Don't show in single player
 		cgs.gametype != GT_SINGLE_PLAYER &&
 #endif
+#ifdef IOQ3ZTM // Main goal isn't to kill others, so do not show kill messages.
+		cgs.gametype != GT_CTF &&
+#ifdef MISSIONPACK
+		cgs.gametype != GT_1FCTF &&
+		cgs.gametype != GT_OBELISK &&
+#endif
+#endif
 #ifdef TA_SPLITVIEW
 		CG_LocalClient(attacker) != -1
 #else
