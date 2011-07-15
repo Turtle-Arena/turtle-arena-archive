@@ -893,13 +893,19 @@ gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
 	drop = LaunchItem( item, ent->s.pos.trBase, velocity );
 
 #ifdef TURTLEARENA
-	// Show message when client drops CTF flag.
+	// Dropped CTF flag
 #ifdef MISSIONPACK
 	if ((g_gametype.integer == GT_CTF || g_gametype.integer == GT_1FCTF) && item->giType == IT_TEAM) {
 #else
 	if (g_gametype.integer == GT_CTF && item->giType == IT_TEAM) {
 #endif
 		if (ent->client) {
+			// Flip CTF flag when going backward
+			if (ent->client->ps.pm_flags & PMF_BACKWARDS_RUN) {
+				angles[YAW] += 180;
+			}
+
+			// Show message when client drops CTF flag.
 			if( item->giTag == PW_NEUTRALFLAG ) {
 				PrintMsg (NULL, "%s" S_COLOR_WHITE " dropped the flag!\n", ent->client->pers.netname );
 			} else {
@@ -908,6 +914,11 @@ gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
 			}
 		}
 	}
+#endif
+
+#ifdef IOQ3ZTM
+	// Save angles to allow cgame to render using real angles.
+	VectorCopy(angles, drop->s.angles);
 #endif
 
 #ifdef IOQ3ZTM // DROP_ITEM_FIX
