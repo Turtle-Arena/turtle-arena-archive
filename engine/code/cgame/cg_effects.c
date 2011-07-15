@@ -347,7 +347,7 @@ void CG_ObeliskExplode( vec3_t org, int entityNum ) {
 	VectorCopy( org, origin );
 	origin[2] += 64;
 #ifdef TA_DATA // EXP_SCALE
-	le = CG_MakeExplosion( origin, vec3_origin,
+	le = CG_MakeExplosion( origin, NULL,
 						   cgs.media.smokeModel,
 						   0,
 						   600, qfalse );
