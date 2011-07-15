@@ -892,6 +892,24 @@ gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
 
 	drop = LaunchItem( item, ent->s.pos.trBase, velocity );
 
+#ifdef TURTLEARENA
+	// Show message when client drops CTF flag.
+#ifdef MISSIONPACK
+	if ((g_gametype.integer == GT_CTF || g_gametype.integer == GT_1FCTF) && item->giType == IT_TEAM) {
+#else
+	if (g_gametype.integer == GT_CTF && item->giType == IT_TEAM) {
+#endif
+		if (ent->client) {
+			if( item->giTag == PW_NEUTRALFLAG ) {
+				PrintMsg (NULL, "%s" S_COLOR_WHITE " dropped the flag!\n", ent->client->pers.netname );
+			} else {
+				PrintMsg (NULL, "%s" S_COLOR_WHITE " dropped the %s flag!\n",
+					ent->client->pers.netname, TeamNameInColor(item->giTag == PW_REDFLAG ? TEAM_RED : TEAM_BLUE));
+			}
+		}
+	}
+#endif
+
 #ifdef IOQ3ZTM // DROP_ITEM_FIX
 	// Save the player who drop the item, so we can wait till the
 	//  player isn't touching it to allow them to pick it up.
