@@ -315,6 +315,15 @@ void TossClientGametypeItems(gentity_t *ent)
 			drop->count = 1;
 		}
 		ent->client->ps.powerups[ j ] = 0;
+
+#ifdef TURTLEARENA
+		if( j == PW_NEUTRALFLAG ) {
+			PrintMsg (NULL, "%s" S_COLOR_WHITE " dropped the flag!\n", ent->client->pers.netname );
+		} else {
+			PrintMsg (NULL, "%s" S_COLOR_WHITE " dropped the %s flag!\n",
+				ent->client->pers.netname, TeamNameInColor(OtherTeam(ent->client->sess.sessionTeam)));
+		}
+#endif
 	}
 
 #ifdef MISSIONPACK_HARVESTER
@@ -1431,7 +1440,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			}
 		}
 #ifdef TA_WEAPSYS
-		if (inflictor && bg_projectileinfo[inflictor->s.weapon].explosionType == PE_PROX) {
+		if (bg_projectileinfo[inflictor->s.weapon].explosionType == PE_PROX) {
 			if (inflictor->parent && OnSameTeam(targ, inflictor->parent)) {
 				return qfalse;
 			}
@@ -1545,6 +1554,13 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			VectorCopy ( targ->r.currentOrigin, client->damage_from );
 			client->damage_fromWorld = qtrue;
 		}
+
+#ifdef TURTLEARENA
+		// Drop CTF flag (and other gametype items) if hit by missile or explosion.
+		if (inflictor->s.eType == ET_MISSILE || (dflags & DAMAGE_RADIUS)) {
+			TossClientGametypeItems(targ);
+		}
+#endif
 	}
 
 	// See if it's the player hurting the emeny flag carrier
