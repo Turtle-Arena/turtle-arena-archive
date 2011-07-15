@@ -740,11 +740,15 @@ void Team_CaptureFlagSound( gentity_t *ent, int team ) {
 void Team_ReturnFlag( int team ) {
 	Team_ReturnFlagSound(Team_ResetFlag(team), team);
 	if( team == TEAM_FREE ) {
+#ifdef IOQ3ZTM // FLAG_MESSAGES
+		PrintMsg(NULL, "The flag has returned to base.\n" );
+#else
 		PrintMsg(NULL, "The flag has returned!\n" );
+#endif
 	}
 	else {
 #ifdef IOQ3ZTM // FLAG_MESSAGES
-		PrintMsg(NULL, "The %s flag has returned!\n", TeamNameInColor(team));
+		PrintMsg(NULL, "The %s flag has returned to base.\n", TeamNameInColor(team));
 #else
 		PrintMsg(NULL, "The %s flag has returned!\n", TeamName(team));
 #endif
@@ -773,6 +777,9 @@ Flags are unique in that if they are dropped, the base flag must be respawned wh
 ==============
 */
 void Team_DroppedFlagThink(gentity_t *ent) {
+#ifdef IOQ3ZTM
+	Team_FreeEntity(ent);
+#else
 	int		team = TEAM_FREE;
 
 	if( ent->item->giTag == PW_REDFLAG ) {
@@ -787,6 +794,7 @@ void Team_DroppedFlagThink(gentity_t *ent) {
 
 	Team_ReturnFlagSound( Team_ResetFlag( team ), team );
 	// Reset Flag will delete this entity
+#endif
 }
 
 
