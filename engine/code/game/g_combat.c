@@ -315,15 +315,6 @@ void TossClientGametypeItems(gentity_t *ent)
 			drop->count = 1;
 		}
 		ent->client->ps.powerups[ j ] = 0;
-
-#ifdef TURTLEARENA
-		if( j == PW_NEUTRALFLAG ) {
-			PrintMsg (NULL, "%s" S_COLOR_WHITE " dropped the flag!\n", ent->client->pers.netname );
-		} else {
-			PrintMsg (NULL, "%s" S_COLOR_WHITE " dropped the %s flag!\n",
-				ent->client->pers.netname, TeamNameInColor(OtherTeam(ent->client->sess.sessionTeam)));
-		}
-#endif
 	}
 
 #ifdef MISSIONPACK_HARVESTER

@@ -743,7 +743,11 @@ void Team_ReturnFlag( int team ) {
 		PrintMsg(NULL, "The flag has returned!\n" );
 	}
 	else {
+#ifdef IOQ3ZTM // FLAG_MESSAGES
+		PrintMsg(NULL, "The %s flag has returned!\n", TeamNameInColor(team));
+#else
 		PrintMsg(NULL, "The %s flag has returned!\n", TeamName(team));
+#endif
 	}
 }
 
