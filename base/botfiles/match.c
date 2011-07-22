@@ -6,12 +6,12 @@ This file is part of Turtle Arena and is based upon botfiles by
 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com)) from Open Arena which
 are based on Mr. Elusive's fuzzy logic system found in Quake 3 Arena.
 
-Turtle Arena is free software; you can redistribute it
+This file is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena is distributed in the hope that it will be
+This file is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
@@ -244,43 +244,6 @@ MTCONTEXT_INITIALTEAMCHAT
 	// suicide
 	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": suicide" = (MSG_SUICIDE, 0);
 	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " suicide" = (MSG_SUICIDE, $evalint(ST_ADDRESSED));
-	
-	//anti-bigot bot suicide code (I hope I am not acting as the thought police...)
-	
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, " nigger "|" nigr "|" niger "|"wop"|"macaca"|"monkey", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "kyke"|"kykes"|"kike"|"kikes"|"jewish pig"|"judan"|"jews"|"jew"|"jew lover"|"ex-slaves"|"slaves"|"slave"|"ex-slave"|"xslave"|"xslaves"|"red sea pedestrians"|"red sea pedestrian", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "niggers"|"nigrs"|"nigers"|"wops"|"macacas", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "rag head"|"raghead"|"rag-head"|"camel jockey"|"cml jky"|"cmljky", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "rag heads"|"ragheads"|"rag-heads"|"camel jokeys"|"cml jkys"|"cmljkys", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "towel head"|"towel heads"|"towel-head"|"towel-heads"|"towelhead"|"towelheads", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "homo"|"gay"|"gaygrrl"|"gaygirl"|"faggit"|"gay-girl"|"gay-grrl", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "faggot"|"fagit"|"fagot"|"queer"|"gayboy"|"gayboi", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "dyke"|"dike"|"lez"|"les"|"lezbo"|"lesbo"|"fags"|"fagz", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "homos"|"dykes"|"dikes"|"lesbos"|"lezbos"|"fagots"|"faggots"|"faggits"|"fagits", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE,  "sand-nigger"|"sand-niger"|"sndngr"|"sand-niggers"|"sand-nigers"|"sndngrs", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "red skins"|"red-skins"|"braves"|"chiefs"|"red skin"|"red-skin"|"chief", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "bean-picker"|"bean picker"|"beanpicker"|"wet back"|"wetback"|"wet-back", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", "bean-pickers"|"beanpickers"|"bean pickers"|"wet backs"|"wetbacks"|"wet-backs", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "spook"|"gook"|"slant"|"mamasan", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, "spooks"|"gooks"|"slants"|"mamasans"|"hitler", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	// not a good solution but it does work in certain situations...
-	NETNAME, EC": ", MORE_CRAP,  "sand-nigger"|"sand-niger"|"sndngr"|"sand-niggers"|"sand-nigers"|" sndngrs ", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, "red skins"|"red-skins"|" braves "|" chiefs "|"red skin"|" red-skin "|" chief ", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " bean-picker "|" bean picker "|" beanpicker "|"wet back"|" wetback "|"wet-back", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " bean-pickers "|" beanpickers "|"bean pickers"|"wet backs"|" wetbacks "|"wet-backs", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " spook "|" gook "|" slant "|" mamasan ", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " spooks "|" gooks "|" slants "|" mamasans ", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " homo "|" gay "|" gaygrrl "|" gaygirl "|" gay-girl "|" gay-grrl "|" faggit ", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " faggot "|" fagit "|" fagot "|" queer "|" gayboy "|" gayboi ", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " dyke "|" dike "|" lez "|" les "|" lezbo "|" lesbo "|" fags "|" fagz ", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " homos "|" dykes "|" dikes "|" lesbos "|" lezbos "|" faggots "|" fagots "|" faggits "|" fagits ", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " rag head"|" raghead"|" rag-head"|" camel jockey"|" cml jky"|" cmljky", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " rag heads"|" ragheads "|" rag-heads"|" camel jokeys"|" cml jkys", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " towel head"|" towel heads"|" towel-head"|" towel-heads"|" towelhead"|" towelheads", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " nigrs "|" nigers "|"wops"|" macacas ", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " kyke "|" kykes "|" kike "|" kikes "|"jewish pig"|"judan"|" jew "|" jews "|"jew lover"|"ex-slaves"|"slaves"|"slave"|"ex-slave"|"xslave"|"xslaves"|"red sea pedestrians"|"red sea pedestrian", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-	NETNAME, EC": ", MORE_CRAP, " nigger"|" nigr "|" niger "|"wop"|" macaca "|" monkey"|" hitler", PURE_CRAP = (MSG_SUICIDE, ST_TEAM);
-
 } 
 
 MTCONTEXT_CTF
