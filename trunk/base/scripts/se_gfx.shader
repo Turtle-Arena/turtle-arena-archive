@@ -122,22 +122,22 @@ projectionShadow
 	}
 }
 
-// ZTM: In OpenArena this is called "oldwake", see OA for their new wake.
+// Water splash
 wake
 {
 	{
 		clampmap sprites/splash.png
 		blendfunc add
-		rgbGen wave sin 0.7 0.3 0.25 0.5
-		tcMod rotate 250
-		tcMod stretch sin 0.9 0.1 0 0.7
+		rgbGen wave inversesawtooth 0 1 0 0.5
+		tcMod rotate 25
+		tcMod stretch sawtooth 0.45 0.55 0 0.5
 	}
 	{
 		clampmap sprites/splash.png
 		blendfunc add
-		rgbGen wave sin 0.7 0.3 0.25 0.4
-		tcMod rotate -230
-		tcMod stretch sin 0.9 0.05 0 0.9
+		rgbGen wave inversesawtooth 0 1 0.5 0.5
+		tcMod rotate 25
+		tcMod stretch sawtooth 0.45 0.55 0.5 0.5
 	}
 }
 

@@ -113,13 +113,17 @@ music/zero-project_-_Whispering_Wind.ogg
 == OpenArena ==
 Some of the shaders in the base/scripts/*.shader files are from OpenArena.
 
-The following are from OpenArena and are copyright (c) 2006 Dmn_clown and are
-	licensed under the GNU General Public License; either version 2 of the
-	License, or (at your option) any later version.
+The following are based on files from OpenArena and are
+	copyright (c) 2006 Dmn_clown and 2009-2011 Zack "ZTurtleMan" Middleton
+	and are licensed under the GNU General Public License; either version 2 of
+	the License, or (at your option) any later version.
 
 base/botfiles/bots/default_c.c
 base/botfiles/bots/default_i.c
 base/botfiles/bots/default_t.c
+base/botfiles/bots/raph_c.c
+base/botfiles/bots/raph_i.c
+base/botfiles/bots/raph_t.c
 base/botfiles/fuzi.c
 base/botfiles/items.c
 base/botfiles/match.c
@@ -127,12 +131,6 @@ base/botfiles/rchat.c
 base/botfiles/rnd.c
 base/botfiles/syn.c
 base/botfiles/teamplay.h
-
-The following are from OpenArena,
-	and are licensed under the GNU General Public License; either version 2 of
-	the License, or (at your option) any later version.
-
-base/sprites/splash.png is a SVG'd, gray'd, and brightened, version of OpenArena's sprites/splash.tga
 
 == GNU FreeFont ==
 The following files were created from GNU Freefont fonts, and are licensed under
