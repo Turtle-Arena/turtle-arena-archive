@@ -144,6 +144,32 @@ endif
 
 
 #
+# Misc
+#
+default:
+	@echo "This is the game's packaging makefile;"
+	@echo "Run 'make -C engine' to build the game, or 'make help' for how to build packages"
+
+help:
+	@echo "Usage;"
+	@echo "  Run 'make packages' to build all packages."
+	@echo "  Run 'make clean' to delete all packages."
+	@echo "  Run 'make *-clean' to delete a single package type"
+	@echo "          (where * is dist, zip, etc. e.g. dist-clean)."
+	@echo "  Run 'make engine-dist' to create engine source code tarball."
+	@echo "  Run 'make dist' to create engine+data source tarball."
+	@echo "  Run 'make distdata' to create engine+data source tarball,"
+	@echo "          plus data 'base' directory."
+	@echo "  Run 'make zip' to create portable install for zip archive distrobution."
+	@echo "  Run 'make nsis' to create win32 NSIS installer."
+	@echo "  Run 'make loki' to create linux loki-setup installer."
+	@echo "  Run 'make deb' to create debian packages."
+
+packages: dist zip nsis loki deb
+
+clean: dist-clean zip-clean nsis-clean loki-clean deb-clean
+
+#
 # QVMs
 #
 qvms:
@@ -163,7 +189,7 @@ assets-clean: qvms-clean
 $(DATADIR)/base/assets0.pk3:
 	$(Q)echo "  Coping base data (temporary files)..."
 	@if [ -d base/.svn ]; then \
-		echo "  NOTE: Using data files from svn, unversioned files not included."; \
+		echo "  NOTE: Using data files from svn, unversioned files/changes not included."; \
 		mkdir -p $(DATADIR)/base; \
 		rm -fr $(DATADIR)/base/assets0; \
 		svn export base $(DATADIR)/base/assets0; \
@@ -195,7 +221,7 @@ $(DATADIR)/base/assets1-qvms.pk3: qvms
 $(DATADIR)/base/assets2-music.pk3:
 	$(Q)echo "  Coping music files (temporary files)..."
 	@if [ -d base/.svn ]; then \
-		echo "  NOTE: Using music files from svn, unversioned files not included."; \
+		echo "  NOTE: Using music files from svn, unversioned files/changes not included."; \
 		mkdir -p $(DATADIR)/base/assets2; \
 		rm -fr $(DATADIR)/base/assets2/music; \
 		svn export base/music $(DATADIR)/base/assets2/music; \
@@ -272,6 +298,7 @@ ifeq ($(PLATFORM),mingw32)
 	@echo "Loki setup cleaning is not supported on this platform."
 else
 	$(MAKE) -C engine/misc/setup clean --jobs=$(JOBS)
+	$(Q)rm -rf $(INSTALLDIR)/loki/
 endif
 
 
@@ -313,15 +340,16 @@ engine-dist-clean:
 #   uses a lot less space this way.
 dist:
 	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src
-	$(Q)svn export . $(INSTALLDIR)/$(NAME)-src
+	@if [ -d .svn ]; then \
+		echo "  NOTE: Using files from svn, unversioned files/changes not included."; \
+		mkdir -p $(INSTALLDIR); \
+		svn export . $(INSTALLDIR)/$(NAME)-src; \
+	else \
+		mkdir -p $(INSTALLDIR)/$(NAME)-src; \
+		cp -r . $(INSTALLDIR)/$(NAME)-src; \
+		rm -fr $(INSTALLDIR)/$(NAME)-src/engine/build; \
+	fi
 	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src/base
-	$(Q)tar -C $(INSTALLDIR) --owner=root --group=root --force-local -cjf $(INSTALLDIR)/$(NAME)-src.tar.bz2 $(NAME)-src
-	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src
-
-# Includes base data directory.
-distdata:
-	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src
-	$(Q)svn export . $(INSTALLDIR)/$(NAME)-src
 	$(Q)tar -C $(INSTALLDIR) --owner=root --group=root --force-local -cjf $(INSTALLDIR)/$(NAME)-src.tar.bz2 $(NAME)-src
 	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src
 
@@ -329,13 +357,22 @@ dist-clean:
 	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src/
 	$(Q)rm -f $(INSTALLDIR)/$(NAME)-src.tar.bz2
 
+# Include 'base' data directory.
+distdata:
+	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src-with-data
+	@if [ -d .svn ]; then \
+		echo "  NOTE: Using files from svn, unversioned files/changes not included."; \
+		mkdir -p $(INSTALLDIR); \
+		svn export . $(INSTALLDIR)/$(NAME)-src-with-data; \
+	else \
+		mkdir -p $(INSTALLDIR)/$(NAME)-src-with-data; \
+		cp -r . $(INSTALLDIR)/$(NAME)-src-with-data; \
+		rm -fr $(INSTALLDIR)/$(NAME)-src-with-data/engine/build; \
+	fi
+	$(Q)tar -C $(INSTALLDIR) --owner=root --group=root --force-local -cjf $(INSTALLDIR)/$(NAME)-src-with-data.tar.bz2 $(NAME)-src-with-data
+	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src-with-data
 
-#
-# Defaults
-#
-clean: dist-clean zip-clean nsis-clean loki-clean deb-clean
-
-package: dist zip nsis loki deb
-
-default: package
+distdata-clean:
+	$(Q)rm -rf $(INSTALLDIR)/$(NAME)-src-with-data/
+	$(Q)rm -f $(INSTALLDIR)/$(NAME)-src-with-data.tar.bz2
 
