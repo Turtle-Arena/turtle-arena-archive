@@ -4,12 +4,12 @@ Copyright (C) 1999-2005 Id Software, Inc.
 
 This file is part of Turtle Arena.
 
-Turtle Arena is free software; you can redistribute it
+Turtle Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena is distributed in the hope that it will be
+Turtle Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
