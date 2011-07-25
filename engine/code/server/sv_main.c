@@ -1281,7 +1281,7 @@ SV_FrameMsec
 Return time in millseconds until processing of the next server frame.
 ==================
 */
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Missing void.
+#ifdef IOQ3ZTM
 int SV_FrameMsec( void )
 #else
 int SV_FrameMsec()

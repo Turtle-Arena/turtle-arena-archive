@@ -1083,7 +1083,7 @@ void RB_CalcSpecularAlpha( unsigned char *alphas ) {
 	int			b;
 	vec3_t		lightDir;
 	int			numVertexes;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Dynamic lightOrigin for Specular (This may not be proper, but its better)
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Dynamic lightOrigin for Specular (This may not be proper, but it's better)
 	vec3_t		lightOrigin;
 	trRefEntity_t	*ent;
 
