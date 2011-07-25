@@ -1036,7 +1036,16 @@ static void CG_DrawStatusBar( void ) {
 
 	// LINE4: Air bar
 	if (cg.cur_ps->powerups[PW_AIR] - 30000 < cg.time) {
-		CG_DrawAirBar(x, HUD_Y+HUD_HEIGHT, HUD_WIDTH, 12, 2, (cg.cur_ps->powerups[PW_AIR] - cg.time) / 30000.0f);
+		// Air time left
+		value = cg.cur_ps->powerups[PW_AIR] - cg.time;
+
+		// Don't have less than zero air left
+		if (value < 0) {
+			value = 0;
+		}
+
+		// Draw the air bar
+		CG_DrawAirBar(x, HUD_Y+HUD_HEIGHT, HUD_WIDTH, 12, 2, value / 30000.0f);
 	}
 	y += 12;
 
