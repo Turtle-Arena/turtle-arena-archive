@@ -1277,11 +1277,40 @@ int BotWalkInDirection(bot_movestate_t *ms, vec3_t dir, float speed, int type)
 int BotMoveInDirection(int movestate, vec3_t dir, float speed, int type)
 {
 	bot_movestate_t *ms;
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+	qboolean swimming;
+#endif
 
 	ms = BotMoveStateFromHandle(movestate);
 	if (!ms) return qfalse;
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+	//check if swimming
+	swimming = AAS_Swimming(ms->origin);
+	//player walks on ground underwater
+	if (swimming)
+	{
+		if (AAS_OnGround(ms->origin, ms->presencetype, ms->entitynum)) ms->moveflags |= MFL_ONGROUND;
+		//if the bot is on the ground
+		if (ms->moveflags & MFL_ONGROUND)
+		{
+			if (dir[2] > 0)
+			{
+				//need to jump off ground to swim
+				EA_Jump(ms->client);
+			}
+			else
+			{
+				//walk underwater instead
+				swimming = qfalse;
+			}
+		}
+	}
+	//if swimming
+	if (swimming)
+#else
 	//if swimming
 	if (AAS_Swimming(ms->origin))
+#endif
 	{
 		return BotSwimInDirection(ms, dir, speed, type);
 	} //end if
