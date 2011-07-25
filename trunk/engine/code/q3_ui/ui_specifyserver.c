@@ -120,6 +120,8 @@ static void SpecifyServer_Event( void* ptr, int event )
 			if (s_specifyserver.domain.field.buffer[0])
 			{
 				strcpy(buff,s_specifyserver.domain.field.buffer);
+				if (s_specifyserver.port.field.buffer[0])
+					Com_sprintf( buff+strlen(buff), 128, ":%s", s_specifyserver.port.field.buffer );
 
 				// From serverinfo
 				{
@@ -191,11 +193,19 @@ void SpecifyServer_MenuInit( void )
 	s_specifyserver.banner.generic.y     = 16;
 #ifdef IOQ3ZTM // SPECIFY_FAV
 	if (s_specifyserverFav)
-	s_specifyserver.banner.string		 = "SPECIFY FAVORITE";
+#ifdef TA_DATA
+		s_specifyserver.banner.string		 = "NEW FAVORITE";
+#else
+		s_specifyserver.banner.string		 = "SPECIFY FAVORITE";
+#endif
 	else
 #endif
 	s_specifyserver.banner.string		 = "SPECIFY SERVER";
+#ifdef IOQ3ZTM
 	s_specifyserver.banner.color  		 = text_banner_color;
+#else
+	s_specifyserver.banner.color  		 = color_white;
+#endif
 	s_specifyserver.banner.style  		 = UI_CENTER;
 
 	s_specifyserver.framel.generic.type  = MTYPE_BITMAP;
@@ -223,17 +233,6 @@ void SpecifyServer_MenuInit( void )
 	s_specifyserver.domain.field.maxchars     = 80;
 
 	s_specifyserver.port.generic.type       = MTYPE_FIELD;
-#if defined IOQ3ZTM && !defined TA_MISC // SPECIFY_FAV
-	if (s_specifyserverFav)
-	{
-#ifdef TA_DATA // NO_MENU_FIGHT
-		s_specifyserver.port.generic.name	    = "Port (Join only):";
-#else
-		s_specifyserver.port.generic.name	    = "Port (Fight only):";
-#endif
-	}
-	else
-#endif
 	s_specifyserver.port.generic.name	    = "Port:";
 	s_specifyserver.port.generic.flags	    = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NUMBERSONLY;
 	s_specifyserver.port.generic.x	        = 206;
@@ -318,9 +317,6 @@ void SpecifyServer_MenuInit( void )
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.framel );
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.framer );
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.domain );
-#ifdef TA_MISC // SPECIFY_FAV
-	if (!s_specifyserverFav)
-#endif
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.port );
 #if defined IOQ3ZTM && !defined TA_MISC // SPECIFY_FAV
 	Menu_AddItem( &s_specifyserver.menu, &s_specifyserver.add );
