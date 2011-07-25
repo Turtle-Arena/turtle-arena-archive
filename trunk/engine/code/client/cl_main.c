@@ -2361,7 +2361,7 @@ void CL_CheckForResend( void ) {
 			Q_strncpyz( info, Cvar_InfoString( cvarflag[i] ), sizeof( info ) );
 
 			// ZTM: Do we need to set these for more than the first client?
-			Info_SetValueForKey( info, "protocol", va("%i", PROTOCOL_VERSION ) );
+			Info_SetValueForKey( info, "protocol", va("%i", com_protocol->integer ) );
 			Info_SetValueForKey( info, "qport", va("%i", port ) );
 			Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
 
