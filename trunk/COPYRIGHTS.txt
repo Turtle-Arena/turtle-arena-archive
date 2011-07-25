@@ -112,6 +112,7 @@ music/zero-project_-_Whispering_Wind.ogg
 
 == OpenArena ==
 Some of the shaders in the base/scripts/*.shader files are from OpenArena.
+base/scripts/male1.voice is based on file from OpenArena.
 
 The following are based on files from OpenArena and are
 	copyright (c) 2006 Dmn_clown and 2009-2011 Zack "ZTurtleMan" Middleton

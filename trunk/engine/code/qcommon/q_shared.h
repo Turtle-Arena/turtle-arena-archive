@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define BASEGAME					"base"
   #define CLIENT_WINDOW_TITLE		"Turtle Arena"
   #define CLIENT_WINDOW_MIN_TITLE	"Turtle Arena"
-  #define GAMENAME_FOR_MASTER		"TurtleArena"
+  #define GAMENAME_FOR_MASTER		"TurtleArena"		// must NOT contain whitespaces
   #define HEARTBEAT_FOR_MASTER		GAMENAME_FOR_MASTER "-1"
   #define FLATLINE_FOR_MASTER		GAMENAME_FOR_MASTER "Flatline-1"
   #define HOMEPATH_NAME_UNIX		".turtlearena"

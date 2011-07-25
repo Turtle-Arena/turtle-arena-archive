@@ -38,9 +38,7 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
   * DONE: Allow non-dedicated internet servers.
 
 === 0.5.1 ===
-  * Decide what format player models should be and make it doable if not already.
-    * IQM? Multiple models or single with xreal-based skeleton animation blending?
-  * (more undecided things from 0.6 plans)
+  * DONE: Remove remaining OpenArena images and sounds.
 
 == 0.6 ==
 Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve other legality concerns.
@@ -49,13 +47,14 @@ Focus on finalizing the game's branding (name, logo, etc), making it completely 
   * Create new logo
   * Create new icon, menu background, and loading screen?
 
-  * 0.5.1: Decide what format player models should be and make it doable if not already.
+  * Decide what format player models should be and make it doable if not already.
+    * IQM? Multiple models or single with xreal-based skeleton animation blending?
   * Remove the current players, replace with new characters designed for the game.
   * Add weapons for new players if needed.
   * Replace teams (names and icons), currently Katanas and Sais. Should per-team skins be added, or just stick with blue/red?
 
   * Clean up / rewrite shaders (do not have clear licensing for them)
-  * Replace remaining OpenArena images and sounds.
+  * DONE: Remove remaining OpenArena images and sounds.
 
   * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution. (Many are already 2x or 4x quake3 resolution.)
   * Remake all (non-texture) images that do not have a svg source file?
