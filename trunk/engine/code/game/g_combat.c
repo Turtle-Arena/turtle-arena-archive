@@ -1311,9 +1311,15 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	client = targ->client;
 
 	if ( client ) {
+#ifdef IOQ3ZTM
+		if ( client->noclip && (targ->flags & FL_GODMODE) ) {
+			return qfalse;
+		}
+#else
 		if ( client->noclip ) {
 			return qfalse;
 		}
+#endif
 #ifdef TURTLEARENA // POWERS
 		if ( client->ps.powerups[PW_FLASHING] && !(dflags & DAMAGE_NO_PROTECTION)) {
 			return qfalse;

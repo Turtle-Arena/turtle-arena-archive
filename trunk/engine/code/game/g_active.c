@@ -114,7 +114,12 @@ void P_WorldEffects( gentity_t *ent ) {
 #endif
 	int			waterlevel;
 
-	if ( ent->client->noclip ) {
+#ifdef IOQ3ZTM // Drowned in noclip, but not godmode.
+	if ( ent->flags & FL_GODMODE )
+#else
+	if ( ent->client->noclip )
+#endif
+	{
 #ifdef TURTLEARENA // DROWNING
 		ent->client->ps.powerups[PW_AIR] = level.time + 31000;	// don't need air
 #else
