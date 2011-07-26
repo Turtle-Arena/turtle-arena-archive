@@ -1053,7 +1053,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 			gun[i].hModel = pi->weaponModel[i];
 			VectorCopy( origin, gun[i].lightingOrigin );
 			gun[i].renderfx = renderfx;
-			Byte4Copy( pi->c1RGBA, gun.shaderRGBA );
+			Byte4Copy( pi->c1RGBA, gun[i].shaderRGBA );
 
 			if (!originalTagNames[i]
 #ifdef TURTLEARENA // PLAYERS
