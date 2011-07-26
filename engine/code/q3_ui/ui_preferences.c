@@ -184,12 +184,6 @@ static void Preferences_Event( void* ptr, int notification ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_CROSSHAIR:
-#ifndef TA_MISC // MENU: Support right mouse button = prev crosshair
-		s_preferences.crosshair.curvalue++;
-		if( s_preferences.crosshair.curvalue == NUM_CROSSHAIRS ) {
-			s_preferences.crosshair.curvalue = 0;
-		}
-#endif
 		trap_Cvar_SetValue( "cg_drawCrosshair", s_preferences.crosshair.curvalue );
 		break;
 
@@ -356,11 +350,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.framer.height  	   = 334;
 
 	y = 144;
-#ifdef TA_MISC // MENU: Support right mouse button = prev crosshair
 	s_preferences.crosshair.generic.type		= MTYPE_SPINCONTROL;
-#else
-	s_preferences.crosshair.generic.type		= MTYPE_TEXT;
-#endif
 	s_preferences.crosshair.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NODEFAULTINIT|QMF_OWNERDRAW;
 	s_preferences.crosshair.generic.x			= PREFERENCES_X_POS;
 	s_preferences.crosshair.generic.y			= y;
@@ -372,9 +362,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.crosshair.generic.bottom		= y + 20;
 	s_preferences.crosshair.generic.left		= PREFERENCES_X_POS - ( ( strlen(s_preferences.crosshair.generic.name) + 1 ) * SMALLCHAR_WIDTH );
 	s_preferences.crosshair.generic.right		= PREFERENCES_X_POS + 48;
-#ifdef TA_MISC // MENU: Support right mouse button = prev crosshair
 	s_preferences.crosshair.numitems			= NUM_CROSSHAIRS;
-#endif
 
 	y += BIGCHAR_HEIGHT+2+4;
 	s_preferences.simpleitems.generic.type        = MTYPE_RADIOBUTTON;

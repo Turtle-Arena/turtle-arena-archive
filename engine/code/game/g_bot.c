@@ -220,7 +220,7 @@ G_GetNextArenaInfoByGametype
 const char *G_GetNextArenaInfoByGametype( const char *map, gametype_t gametype ) {
 	int			i, n;
 	const char *type;
-	static char *gametypeNames[] = {"ffa", "tourney", "single", "team", "ctf", "oneflag", "overload", "harvester", "teamtournament"};
+	static char *gametypeNames[] = {"ffa", "tourney", "single", "team", "ctf", "oneflag", "overload", "harvester"};
 
 	gametype = gametype % GT_MAX_GAME_TYPE;
 

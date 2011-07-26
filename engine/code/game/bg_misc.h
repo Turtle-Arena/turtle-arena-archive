@@ -146,9 +146,6 @@ typedef enum {
 #ifdef MISSIONPACK_HARVESTER
 	GT_HARVESTER,
 #endif
-#if 0 // ZTM: In the gametype name arrays there is a Team Tournament.
-	GT_TEAMTOURNAMENT,
-#endif
 	GT_MAX_GAME_TYPE
 } gametype_t;
 

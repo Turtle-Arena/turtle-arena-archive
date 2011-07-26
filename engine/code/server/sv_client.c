@@ -55,8 +55,10 @@ void SV_GetChallenge(netadr_t from)
 	int		i;
 	int		oldest;
 	int		oldestTime;
-	const char *clientChallenge = Cmd_Argv(1);
+	int		oldestClientTime;
+	int		clientChallenge;
 	challenge_t	*challenge;
+	qboolean wasfound = qfalse;
 
 #ifdef IOQ3ZTM // SV_PUBLIC
 	// Don't allow players to connect if sv_public is -2
@@ -75,15 +77,30 @@ void SV_GetChallenge(netadr_t from)
 	}
 
 	oldest = 0;
-	oldestTime = 0x7fffffff;
+	oldestClientTime = oldestTime = 0x7fffffff;
 
 	// see if we already have a challenge for this ip
 	challenge = &svs.challenges[0];
-	for (i = 0 ; i < MAX_CHALLENGES ; i++, challenge++) {
-		if (!challenge->connected && NET_CompareAdr( from, challenge->adr ) ) {
+	clientChallenge = atoi(Cmd_Argv(1));
+
+	for(i = 0 ; i < MAX_CHALLENGES ; i++, challenge++)
+	{
+		if(!challenge->connected && NET_CompareAdr(from, challenge->adr))
+		{
+			wasfound = qtrue;
+			
+			if(challenge->time < oldestClientTime)
+				oldestClientTime = challenge->time;
+		}
+		
+		if(wasfound && i >= MAX_CHALLENGES_MULTI)
+		{
+			i = MAX_CHALLENGES;
 			break;
 		}
-		if ( challenge->time < oldestTime ) {
+		
+		if(challenge->time < oldestTime)
+		{
 			oldestTime = challenge->time;
 			oldest = i;
 		}
@@ -93,17 +110,16 @@ void SV_GetChallenge(netadr_t from)
 	{
 		// this is the first time this client has asked for a challenge
 		challenge = &svs.challenges[oldest];
-		challenge->clientChallenge = 0;
+		challenge->clientChallenge = clientChallenge;
 		challenge->adr = from;
 		challenge->firstTime = svs.time;
-		challenge->time = svs.time;
 		challenge->connected = qfalse;
 	}
 
 	// always generate a new challenge number, so the client cannot circumvent sv_maxping
 	challenge->challenge = ( (rand() << 16) ^ rand() ) ^ svs.time;
 	challenge->wasrefused = qfalse;
-
+	challenge->time = svs.time;
 
 #ifndef STANDALONE
 	// Drop the authorize stuff if this client is coming in via v6 as the auth server does not support ipv6.
@@ -132,7 +148,7 @@ void SV_GetChallenge(netadr_t from)
 		// if they have been challenging for a long time and we
 		// haven't heard anything from the authorize server, go ahead and
 		// let them in, assuming the id server is down
-		else if(svs.time - challenge->firstTime > AUTHORIZE_TIMEOUT)
+		else if(svs.time - oldestClientTime > AUTHORIZE_TIMEOUT)
 			Com_DPrintf( "authorize server timed out\n" );
 		else
 		{
@@ -140,10 +156,6 @@ void SV_GetChallenge(netadr_t from)
 			cvar_t	*fs;
 			char	game[1024];
 
-			// If the client provided us with a client challenge, store it...
-			if(*clientChallenge)
-				challenge->clientChallenge = atoi(clientChallenge);
-			
 			Com_DPrintf( "sending getIpAuthorize for %s\n", NET_AdrToString( from ));
 		
 			strcpy(game, BASEGAME);
@@ -164,7 +176,8 @@ void SV_GetChallenge(netadr_t from)
 #endif
 
 	challenge->pingTime = svs.time;
-	NET_OutOfBandPrint( NS_SERVER, challenge->adr, "challengeResponse %i %s", challenge->challenge, clientChallenge);
+	NET_OutOfBandPrint(NS_SERVER, challenge->adr, "challengeResponse %d %d",
+			   challenge->challenge, clientChallenge);
 }
 
 #ifndef STANDALONE
@@ -1060,21 +1073,19 @@ static void SV_BeginDownload_f( client_t *cl ) {
 SV_WriteDownloadToClient
 
 Check to see if the client wants a file, open it if needed and start pumping the client
-Fill up msg with data 
+Fill up msg with data, return number of download blocks added
 ==================
 */
-void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
+int SV_WriteDownloadToClient(client_t *cl, msg_t *msg)
 {
 	int curindex;
-	int rate;
-	int blockspersnap;
 	int unreferenced = 1;
 	char errorMessage[1024];
 	char pakbuf[MAX_QPATH], *pakptr;
 	int numRefPaks;
 
 	if (!*cl->downloadName)
-		return;	// Nothing being downloaded
+		return 0;	// Nothing being downloaded
 
 	if(!cl->download)
 	{
@@ -1194,7 +1205,7 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 			if(cl->download)
 				FS_FCloseFile(cl->download);
 			
-			return;
+			return 0;
 		}
  
 		Com_Printf( "clientDownload: %d : beginning \"%s\"\n", (int) (cl - svs.clients), cl->downloadName );
@@ -1239,81 +1250,85 @@ void SV_WriteDownloadToClient( client_t *cl , msg_t *msg )
 		cl->downloadEOF = qtrue;  // We have added the EOF block
 	}
 
-	// Loop up to window size times based on how many blocks we can fit in the
-	// client snapMsec and rate
+	if (cl->downloadClientBlock == cl->downloadCurrentBlock)
+		return 0; // Nothing to transmit
 
-	// based on the rate, how many bytes can we fit in the snapMsec time of the client
-	// normal rate / snapshotMsec calculation
-	rate = cl->rate;
-	if ( sv_maxRate->integer ) {
-		if ( sv_maxRate->integer < 1000 ) {
-			Cvar_Set( "sv_MaxRate", "1000" );
-		}
-		if ( sv_maxRate->integer < rate ) {
-			rate = sv_maxRate->integer;
-		}
-	}
-	if ( sv_minRate->integer ) {
-		if ( sv_minRate->integer < 1000 )
-			Cvar_Set( "sv_minRate", "1000" );
-		if ( sv_minRate->integer > rate )
-			rate = sv_minRate->integer;
+	// Write out the next section of the file, if we have already reached our window,
+	// automatically start retransmitting
+	if (cl->downloadXmitBlock == cl->downloadCurrentBlock)
+	{
+		// We have transmitted the complete window, should we start resending?
+		if (svs.time - cl->downloadSendTime > 1000)
+			cl->downloadXmitBlock = cl->downloadClientBlock;
+		else
+			return 0;
 	}
 
-	if (!rate) {
-		blockspersnap = 1;
-	} else {
-		blockspersnap = ( (rate * cl->snapshotMsec) / 1000 + MAX_DOWNLOAD_BLKSIZE ) /
-			MAX_DOWNLOAD_BLKSIZE;
-	}
+	// Send current block
+	curindex = (cl->downloadXmitBlock % MAX_DOWNLOAD_WINDOW);
 
-	if (blockspersnap < 0)
-		blockspersnap = 1;
+	MSG_WriteByte( msg, svc_download );
+	MSG_WriteShort( msg, cl->downloadXmitBlock );
 
-	while (blockspersnap--) {
+	// block zero is special, contains file size
+	if ( cl->downloadXmitBlock == 0 )
+		MSG_WriteLong( msg, cl->downloadSize );
 
-		// Write out the next section of the file, if we have already reached our window,
-		// automatically start retransmitting
+	MSG_WriteShort( msg, cl->downloadBlockSize[curindex] );
 
-		if (cl->downloadClientBlock == cl->downloadCurrentBlock)
-			return; // Nothing to transmit
+	// Write the block
+	if(cl->downloadBlockSize[curindex])
+		MSG_WriteData(msg, cl->downloadBlocks[curindex], cl->downloadBlockSize[curindex]);
 
-		if (cl->downloadXmitBlock == cl->downloadCurrentBlock) {
-			// We have transmitted the complete window, should we start resending?
+	Com_DPrintf( "clientDownload: %d : writing block %d\n", (int) (cl - svs.clients), cl->downloadXmitBlock );
 
-			//FIXME:  This uses a hardcoded one second timeout for lost blocks
-			//the timeout should be based on client rate somehow
-			if (svs.time - cl->downloadSendTime > 1000)
-				cl->downloadXmitBlock = cl->downloadClientBlock;
+	// Move on to the next block
+	// It will get sent with next snap shot.  The rate will keep us in line.
+	cl->downloadXmitBlock++;
+	cl->downloadSendTime = svs.time;
+
+	return 1;
+}
+
+/*
+==================
+SV_SendDownloadMessages
+
+Send download messages to all clients
+==================
+*/
+
+int SV_SendDownloadMessages(void)
+{
+	int i, numDLs = 0, retval;
+	client_t *cl;
+	msg_t msg;
+	byte msgBuffer[MAX_MSGLEN];
+	
+	for(i=0, cl = svs.clients ; i < sv_maxclients->integer ; i++, cl++)
+	{
+		if(cl->state && *cl->downloadName)
+		{
+			if(cl->netchan.unsentFragments)
+				SV_Netchan_TransmitNextFragment(cl);
 			else
-				return;
+			{
+				MSG_Init(&msg, msgBuffer, sizeof(msgBuffer));
+				MSG_WriteLong(&msg, cl->lastClientCommand);
+			
+				retval = SV_WriteDownloadToClient(cl, &msg);
+				
+				if(retval)
+				{
+					MSG_WriteByte(&msg, svc_EOF);
+					SV_Netchan_Transmit(cl, &msg);
+					numDLs += retval;
+				}
+			}
 		}
-
-		// Send current block
-		curindex = (cl->downloadXmitBlock % MAX_DOWNLOAD_WINDOW);
-
-		MSG_WriteByte( msg, svc_download );
-		MSG_WriteShort( msg, cl->downloadXmitBlock );
-
-		// block zero is special, contains file size
-		if ( cl->downloadXmitBlock == 0 )
-			MSG_WriteLong( msg, cl->downloadSize );
- 
-		MSG_WriteShort( msg, cl->downloadBlockSize[curindex] );
-
-		// Write the block
-		if ( cl->downloadBlockSize[curindex] ) {
-			MSG_WriteData( msg, cl->downloadBlocks[curindex], cl->downloadBlockSize[curindex] );
-		}
-
-		Com_DPrintf( "clientDownload: %d : writing block %d\n", (int) (cl - svs.clients), cl->downloadXmitBlock );
-
-		// Move on to the next block
-		// It will get sent with next snap shot.  The rate will keep us in line.
-		cl->downloadXmitBlock++;
-
-		cl->downloadSendTime = svs.time;
 	}
+
+	return numDLs;
 }
 
 #ifdef USE_VOIP

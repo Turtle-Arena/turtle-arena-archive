@@ -512,8 +512,12 @@ void G_ParseField( const char *key, const char *value, gentity_t *ent ) {
 	}
 }
 
-
-
+#define ADJUST_AREAPORTAL() \
+	if(ent->s.eType == ET_MOVER) \
+	{ \
+		trap_LinkEntity(ent); \
+		trap_AdjustAreaPortalState(ent, qtrue); \
+	}
 
 /*
 ===================
@@ -548,9 +552,6 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 		"obelisk",
 #endif
 		"harvester"
-#ifndef IOQ3ZTM
-		,"teamtournament"
-#endif
 	};
 
 	// get the next free entity
@@ -569,6 +570,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	{
 		G_SpawnInt( "notsingle", "0", &i );
 		if ( i ) {
+			ADJUST_AREAPORTAL();
 			G_FreeEntity( ent );
 			return;
 		}
@@ -577,12 +579,14 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	if ( g_gametype.integer >= GT_TEAM ) {
 		G_SpawnInt( "notteam", "0", &i );
 		if ( i ) {
+			ADJUST_AREAPORTAL();
 			G_FreeEntity( ent );
 			return;
 		}
 	} else {
 		G_SpawnInt( "notfree", "0", &i );
 		if ( i ) {
+			ADJUST_AREAPORTAL();
 			G_FreeEntity( ent );
 			return;
 		}
@@ -591,6 +595,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 #ifdef TURTLEARENA
 	G_SpawnInt( "notturtlearena", "0", &i );
 	if ( i ) {
+		ADJUST_AREAPORTAL();
 		G_FreeEntity( ent );
 		return;
 	}
@@ -598,12 +603,14 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 #ifdef MISSIONPACK
 	G_SpawnInt( "notta", "0", &i );
 	if ( i ) {
+		ADJUST_AREAPORTAL();
 		G_FreeEntity( ent );
 		return;
 	}
 #else
 	G_SpawnInt( "notq3a", "0", &i );
 	if ( i ) {
+		ADJUST_AREAPORTAL();
 		G_FreeEntity( ent );
 		return;
 	}
@@ -629,6 +636,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 
 			s = strstr( value, gametypeName );
 			if( s ) {
+				ADJUST_AREAPORTAL();
 				G_FreeEntity( ent );
 				return;
 			}
@@ -646,6 +654,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 
 			s = strstr( value, gametypeName );
 			if( !s ) {
+				ADJUST_AREAPORTAL();
 				G_FreeEntity( ent );
 				return;
 			}

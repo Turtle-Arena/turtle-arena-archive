@@ -934,7 +934,6 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 	sound = 0;
 	switch (key)
 	{
-#ifdef TA_MISC // MENU: listbox goes around.
 		case K_KP_RIGHTARROW:
 #ifdef IOQ3ZTM // CHECK_NUMLOCK
 			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
@@ -942,7 +941,6 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 			}
 #endif
 		case K_RIGHTARROW:
-#endif
 		case K_MOUSE1:
 			s->curvalue++;
 			if (s->curvalue >= s->numitems)
@@ -960,39 +958,11 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
-#ifdef TA_MISC // MENU: listbox goes around.
 			s->curvalue--;
 			if (s->curvalue < 0)
 				s->curvalue = s->numitems-1;
 			sound = menu_move_sound;
-#else
-			if (s->curvalue > 0)
-			{
-				s->curvalue--;
-				sound = menu_move_sound;
-			}
-			else
-				sound = menu_buzz_sound;
-#endif
 			break;
-
-#ifndef TA_MISC // MENU: listbox goes around.
-		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
-		case K_RIGHTARROW:
-			if (s->curvalue < s->numitems-1)
-			{
-				s->curvalue++;
-				sound = menu_move_sound;
-			}
-			else
-				sound = menu_buzz_sound;
-			break;
-#endif
 	}
 
 	if ( sound && s->generic.callback )
