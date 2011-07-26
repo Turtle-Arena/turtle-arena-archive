@@ -81,7 +81,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 2089
+IOQ3_REVISION = 2096
 
 #
 # Start build type
@@ -1392,6 +1392,11 @@ else
 endif
 
 BASE_CFLAGS += -DPRODUCT_VERSION=\\\"$(VERSION)\\\"
+BASE_CFLAGS += -Wformat=2 -Wno-format-zero-length -Wformat-security -Wno-format-nonliteral
+BASE_CFLAGS += -Wstrict-aliasing=2 -Wmissing-format-attribute
+BASE_CFLAGS += -Wdisabled-optimization
+BASE_CFLAGS += -Werror-implicit-function-declaration
+
 BASE_CFLAGS += $(BUILD_DEFINES)
 
 ifeq ($(V),1)

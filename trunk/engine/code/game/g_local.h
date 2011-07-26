@@ -850,13 +850,13 @@ void SetLeader(int team, int client);
 void CheckTeamLeader( int team );
 void G_RunThink (gentity_t *ent);
 void AddTournamentQueue(gclient_t *client);
-void QDECL G_LogPrintf( const char *fmt, ... );
+void QDECL G_LogPrintf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
 void SendScoreboardMessageToAllClients( void );
 #ifdef IOQ3ZTM // LESS_VERBOSE
 void QDECL G_DPrintf( const char *fmt, ... );
 #endif
-void QDECL G_Printf( const char *fmt, ... );
-void QDECL G_Error( const char *fmt, ... );
+void QDECL G_Printf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
+void QDECL G_Error( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
 #ifdef IOQ3ZTM
 void G_CvarClearModification( vmCvar_t *vmCvar );
 #endif
