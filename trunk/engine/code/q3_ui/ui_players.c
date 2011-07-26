@@ -111,10 +111,7 @@ tryagain:
 		strcat( path, "_flash.md3" );
 		pi->flashModel[i] = trap_R_RegisterModel( path );
 
-		MAKERGB( pi->flashDlightColor[i],
-				bg_weapongroupinfo[weaponNum].weapon[i]->flashColor[0],
-				bg_weapongroupinfo[weaponNum].weapon[i]->flashColor[1],
-				bg_weapongroupinfo[weaponNum].weapon[i]->flashColor[2] );
+		VectorCopy(bg_weapongroupinfo[weaponNum].weapon[i]->flashColor, pi->flashDlightColor[i]);
 	}
 #else
 #ifdef TA_ITEMSYS
