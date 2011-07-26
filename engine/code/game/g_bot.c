@@ -183,7 +183,7 @@ void G_LoadArenas( void ) {
 		G_LoadArenasFromFile(filename);
 	}
 #ifdef IOQ3ZTM // LESS_VERBOSE
-	G_DPrintf( va( "%i arenas parsed\n", g_numArenas ) );
+	G_DPrintf( "%i arenas parsed\n", g_numArenas );
 #else
 	trap_Printf( va( "%i arenas parsed\n", g_numArenas ) );
 #endif
@@ -1122,7 +1122,7 @@ static void G_LoadBots( void ) {
 		G_LoadBotsFromFile(filename);
 	}
 #ifdef IOQ3ZTM // LESS_VERBOSE
-	G_DPrintf( va( "%i bots parsed\n", g_numBots ) );
+	G_DPrintf( "%i bots parsed\n", g_numBots );
 #else
 	trap_Printf( va( "%i bots parsed\n", g_numBots ) );
 #endif
