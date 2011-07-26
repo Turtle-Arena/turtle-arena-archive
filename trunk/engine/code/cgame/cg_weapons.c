@@ -3048,7 +3048,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	if(ps && cg_drawGun.integer == 2)
 		VectorMA(gun.origin, -lerped.origin[1], parent->axis[1], gun.origin);
 	else if(!ps || cg_drawGun.integer != 3)
-		VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
+	       	VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
 
 	VectorMA(gun.origin, lerped.origin[2], parent->axis[2], gun.origin);
 
@@ -4800,6 +4800,8 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 	case PD_GRENADE:
 	case PD_ROCKET:
 	case PD_ROCKET_SMALL:
+	case PD_PLASMA:
+	case PD_BFG:
 	case PD_NONE_EXP_PLAYER:
 		CG_MissileExplode( weapon, 0, origin, dir, IMPACTSOUND_FLESH );
 		break;
@@ -4810,6 +4812,8 @@ void CG_MissileHitPlayer( int weapon, vec3_t origin, vec3_t dir, int entityNum )
 	switch ( weapon ) {
 	case WP_GRENADE_LAUNCHER:
 	case WP_ROCKET_LAUNCHER:
+	case WP_PLASMAGUN:
+	case WP_BFG:
 #ifdef MISSIONPACK
 	case WP_NAILGUN:
 	case WP_CHAINGUN:
