@@ -567,10 +567,10 @@ typedef struct {
 #endif
 
 #ifdef TA_WEAPSYS
-	qhandle_t		weaponModel[2];
-	qhandle_t		barrelModel[2];
-	qhandle_t		flashModel[2];
-	vec3_t			flashDlightColor[2];
+	qhandle_t		weaponModel[MAX_HANDS];
+	qhandle_t		barrelModel[MAX_HANDS];
+	qhandle_t		flashModel[MAX_HANDS];
+	vec3_t			flashDlightColor[MAX_HANDS];
 #else
 	qhandle_t		weaponModel;
 	qhandle_t		barrelModel;
@@ -578,6 +578,11 @@ typedef struct {
 	vec3_t			flashDlightColor;
 #endif
 	int				muzzleFlashTime;
+
+#ifdef IOQ3ZTM
+	vec3_t			color1;
+	byte			c1RGBA[4];
+#endif
 
 	// currently in use drawing parms
 	vec3_t			viewAngles;
