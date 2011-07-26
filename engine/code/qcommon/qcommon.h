@@ -204,7 +204,8 @@ void		NET_Sleep(int msec);
 #define MAX_DOWNLOAD_WINDOW		48	// ACK window of 48 download chunks. Cannot set this higher, or clients
 						// will overflow the reliable commands buffer
 #define MAX_DOWNLOAD_BLKSIZE		1024	// 896 byte block chunks
- 
+
+#define NETCHAN_GENCHECKSUM(challenge, sequence) ((challenge) ^ ((sequence) * (challenge)))
 
 /*
 Netchan handles packet fragmentation and out of order / duplicate suppression
@@ -233,10 +234,18 @@ typedef struct {
 	int			unsentFragmentStart;
 	int			unsentLength;
 	byte		unsentBuffer[MAX_MSGLEN];
+
+	int			challenge;
+	int		lastSentTime;
+	int		lastSentSize;
+
+#ifdef LEGACY_PROTOCOL
+	qboolean	compat;
+#endif
 } netchan_t;
 
 void Netchan_Init( int qport );
-void Netchan_Setup( netsrc_t sock, netchan_t *chan, netadr_t adr, int qport );
+void Netchan_Setup(netsrc_t sock, netchan_t *chan, netadr_t adr, int qport, int challenge, qboolean compat);
 
 void Netchan_Transmit( netchan_t *chan, int length, const byte *data );
 void Netchan_TransmitNextFragment( netchan_t *chan );
@@ -254,6 +263,7 @@ PROTOCOL
 
 #ifdef TA_MAIN
 #define	PROTOCOL_VERSION	6
+#define PROTOCOL_LEGACY_VERSION	0
 // 6 TA 0.5 development
 // 5 TA 0.4.1 / 0.4.2
 // 4 TA 0.4
@@ -261,7 +271,8 @@ PROTOCOL
 // 2 TA 0.2
 // 1 Initial release
 #else
-#define	PROTOCOL_VERSION	68
+#define	PROTOCOL_VERSION	70
+#define PROTOCOL_LEGACY_VERSION	68
 // 1.31 - 67
 #endif
 
@@ -315,9 +326,7 @@ enum svc_ops_e {
 	svc_snapshot,
 	svc_EOF,
 
-	// svc_extension follows a svc_EOF, followed by another svc_* ...
-	//  this keeps legacy clients compatible.
-	svc_extension,
+// new commands, supported only by ioquake3 protocol but not legacy
 	svc_voip,     // not wrapped in USE_VOIP, so this value is reserved.
 };
 
@@ -333,13 +342,11 @@ enum clc_ops_e {
 	clc_clientCommand,		// [string] message
 	clc_EOF,
 
-	// clc_extension follows a clc_EOF, followed by another clc_* ...
-	//  this keeps legacy servers compatible.
-	clc_extension,
+// new commands, supported only by ioquake3 protocol but not legacy
 	clc_voip,   // not wrapped in USE_VOIP, so this value is reserved.
 //#ifdef TA_SPLITVIEW
-	clc_moveLocal,			// [[usercmd_t] for extra local clients
-	clc_moveLocalNoDelta,	// [[usercmd_t] for extra local clients
+	clc_moveLocal,			// [[usercmd_t] for an extra local client
+	clc_moveLocalNoDelta,	// [[usercmd_t] for an extra local client
 //#endif
 };
 
@@ -921,6 +928,9 @@ extern	cvar_t	*cl_packetdelay;
 extern	cvar_t	*sv_packetdelay;
 
 extern	cvar_t	*com_protocol;
+#ifdef LEGACY_PROTOCOL
+extern	cvar_t	*com_legacyprotocol;
+#endif
 
 // com_speeds times
 extern	int		time_game;
@@ -1090,8 +1100,7 @@ void SV_Frame( int msec );
 void SV_PacketEvent( netadr_t from, msg_t *msg );
 int SV_FrameMsec(void);
 qboolean SV_GameCommand( void );
-int SV_SendDownloadMessages(void);
-
+int SV_SendQueuedPackets(void);
 
 //
 // UI interface

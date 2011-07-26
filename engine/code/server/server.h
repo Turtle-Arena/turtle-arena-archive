@@ -32,6 +32,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	MAX_ENT_CLUSTERS	16
 
 #ifdef USE_VOIP
+#define VOIP_QUEUE_LENGTH 64
+
 typedef struct voipServerPacket_s
 {
 	int generation;
@@ -126,6 +128,9 @@ typedef enum {
 typedef struct netchan_buffer_s {
 	msg_t           msg;
 	byte            msgBuffer[MAX_MSGLEN];
+#ifdef LEGACY_PROTOCOL
+	char		clientCommandString[MAX_STRING_CHARS];	// valid command string for SV_Netchan_Encode
+#endif
 	struct netchan_buffer_s *next;
 } netchan_buffer_t;
 
@@ -166,7 +171,7 @@ typedef struct client_s {
 	int				nextReliableTime;	// svs.time when another reliable command will be allowed
 	int				lastPacketTime;		// svs.time when packet was last received
 	int				lastConnectTime;	// svs.time when connection started
-	int				nextSnapshotTime;	// send another snapshot when svs.time >= nextSnapshotTime
+	int				lastSnapshotTime;	// svs.time of last sent snapshot
 	qboolean		rateDelayed;		// true if nextSnapshotTime was set based on rate instead of snapshotMsec
 	int				timeoutCount;		// must timeout a few frames in a row so debugging doesn't break
 	clientSnapshot_t	frames[PACKET_BACKUP];	// updates can be delta'd from here
@@ -187,8 +192,9 @@ typedef struct client_s {
 	qboolean hasVoip;
 	qboolean muteAllVoip;
 	qboolean ignoreVoipFromClient[MAX_CLIENTS];
-	voipServerPacket_t voipPacket[64]; // !!! FIXME: WAY too much memory!
+	voipServerPacket_t *voipPacket[VOIP_QUEUE_LENGTH];
 	int queuedVoipPackets;
+	int queuedVoipIndex;
 #endif
 
 #ifdef TA_SPLITVIEW
@@ -198,7 +204,11 @@ typedef struct client_s {
 #endif
 
 	int				oldServerTime;
-	qboolean			csUpdated[MAX_CONFIGSTRINGS+1];	
+	qboolean		csUpdated[MAX_CONFIGSTRINGS+1];	
+	
+#ifdef LEGACY_PROTOCOL
+	qboolean		compat;
+#endif
 } client_t;
 
 //=============================================================================
@@ -285,6 +295,7 @@ extern	cvar_t	*sv_mapChecksum;
 extern	cvar_t	*sv_serverid;
 extern	cvar_t	*sv_minRate;
 extern	cvar_t	*sv_maxRate;
+extern	cvar_t	*sv_dlRate;
 extern	cvar_t	*sv_minPing;
 extern	cvar_t	*sv_maxPing;
 extern	cvar_t	*sv_gametype;
@@ -324,6 +335,7 @@ void SV_RemoveOperatorCommands (void);
 
 
 void SV_MasterShutdown (void);
+int SV_RateMsec(client_t *client);
 
 
 
@@ -357,12 +369,15 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg );
 void SV_UserinfoChanged( client_t *cl );
 
 void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd );
+void SV_FreeClient(client_t *client);
 void SV_DropClient( client_t *drop, const char *reason );
 
 void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK );
 void SV_ClientThink (client_t *cl, usercmd_t *cmd);
 
 int SV_WriteDownloadToClient(client_t *cl , msg_t *msg);
+int SV_SendDownloadMessages(void);
+int SV_SendQueuedMessages(void);
 
 #ifdef USE_VOIP
 void SV_WriteVoipToClient( client_t *cl, msg_t *msg );
@@ -473,6 +488,6 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 // sv_net_chan.c
 //
 void SV_Netchan_Transmit( client_t *client, msg_t *msg);
-void SV_Netchan_TransmitNextFragment( client_t *client );
+int SV_Netchan_TransmitNextFragment(client_t *client);
 qboolean SV_Netchan_Process( client_t *client, msg_t *msg );
-
+void SV_Netchan_FreeQueue(client_t *client);
