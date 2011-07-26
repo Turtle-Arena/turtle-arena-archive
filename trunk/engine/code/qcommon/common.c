@@ -34,11 +34,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #ifdef TA_MAIN
+// List of demo protocols that are supported for playback.
+// Also plays protocol com_protocol
 int demo_protocols[] =
 { PROTOCOL_VERSION, 0 };
 #else
 int demo_protocols[] =
-{ 66, 67, 68, 0 };
+{ 67, 66, 0 };
 #endif
 
 #define MAX_NUM_ARGVS	50
@@ -107,7 +109,6 @@ cvar_t	*cl_paused;
 cvar_t	*sv_paused;
 cvar_t  *cl_packetdelay;
 cvar_t  *sv_packetdelay;
-cvar_t  *sv_dlRate;
 cvar_t	*com_cameraMode;
 cvar_t	*com_ansiColor;
 cvar_t	*com_unfocused;
@@ -117,6 +118,9 @@ cvar_t	*com_maxfpsMinimized;
 cvar_t	*com_abnormalExit;
 cvar_t	*com_standalone;
 cvar_t	*com_protocol;
+#ifdef LEGACY_PROTOCOL
+cvar_t	*com_legacyprotocol;
+#endif
 cvar_t	*com_basegame;
 cvar_t  *com_homepath;
 cvar_t	*com_busyWait;
@@ -2860,7 +2864,6 @@ void Com_Init( char *commandLine ) {
 	sv_paused = Cvar_Get ("sv_paused", "0", CVAR_ROM);
 	cl_packetdelay = Cvar_Get ("cl_packetdelay", "0", CVAR_CHEAT);
 	sv_packetdelay = Cvar_Get ("sv_packetdelay", "0", CVAR_CHEAT);
-	sv_dlRate = Cvar_Get ("sv_dlRate", "100", CVAR_ARCHIVE);
 	com_sv_running = Cvar_Get ("sv_running", "0", CVAR_ROM);
 	com_cl_running = Cvar_Get ("cl_running", "0", CVAR_ROM);
 	com_buildScript = Cvar_Get( "com_buildScript", "0", 0 );
@@ -2878,7 +2881,16 @@ void Com_Init( char *commandLine ) {
 
 	s = va("%s %s %s", Q3_VERSION, PLATFORM_STRING, __DATE__ );
 	com_version = Cvar_Get ("version", s, CVAR_ROM | CVAR_SERVERINFO );
-	com_protocol = Cvar_Get ("protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO | CVAR_INIT);
+	com_protocol = Cvar_Get("com_protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO | CVAR_INIT);
+#ifdef LEGACY_PROTOCOL
+	com_legacyprotocol = Cvar_Get("com_legacyprotocol", va("%i", PROTOCOL_LEGACY_VERSION), CVAR_INIT);
+
+	// Keep for compatibility with old mods / mods that haven't updated yet.
+	if(com_legacyprotocol->integer > 0)
+		Cvar_Get("protocol", com_legacyprotocol->string, CVAR_ROM);
+	else
+#endif
+		Cvar_Get("protocol", com_protocol->string, CVAR_ROM);
 
 	Sys_Init();
 
@@ -3107,16 +3119,33 @@ int Com_ModifyMsec( int msec ) {
 
 /*
 =================
+Com_TimeVal
+=================
+*/
+
+int Com_TimeVal(int minMsec)
+{
+	int timeVal;
+
+	timeVal = Sys_Milliseconds() - com_frameTime;
+
+	if(timeVal >= minMsec)
+		timeVal = 0;
+	else
+		timeVal = minMsec - timeVal;
+
+	return timeVal;
+}
+
+/*
+=================
 Com_Frame
 =================
 */
 void Com_Frame( void ) {
 
 	int		msec, minMsec;
-	int		timeVal;
-	int		numBlocks = 1;
-	int		dlStart, deltaT, delayT;
-	static int	dlNextRound = 0;
+	int		timeVal, timeValSV;
 	static int	lastTime = 0, bias = 0;
  
 	int		timeBeforeFirstEvents;
@@ -3177,79 +3206,25 @@ void Com_Frame( void ) {
 		minMsec = 1;
 
 	timeVal = 0;
-	
 	do
 	{
-		// Busy sleep the last millisecond for better timeout precision
-		if(timeVal < 2)
+		if(com_sv_running->integer)
+		{
+			timeValSV = SV_SendQueuedPackets();
+			
+			timeVal = Com_TimeVal(minMsec);
+
+			if(timeValSV < timeVal)
+				timeVal = timeValSV;
+		}
+		else
+			timeVal = Com_TimeVal(minMsec);
+		
+		if(com_busyWait->integer || timeVal < 1)
 			NET_Sleep(0);
 		else
-		{
-			if(com_sv_running->integer)
-			{
-				// Send out download messages now that we're idle
-				if(sv_dlRate->integer)
-				{
-					// Rate limiting. This is very imprecise for high
-					// download rates due to millisecond timedelta resolution
-					dlStart = Sys_Milliseconds();
-					deltaT = dlNextRound - dlStart;
-
-					if(deltaT > 0)
-					{
-						if(deltaT < timeVal)
-							timeVal = deltaT + 1;
-					}
-					else
-					{
-						numBlocks = SV_SendDownloadMessages();
-
-						if(numBlocks)
-						{
-							// There are active downloads
-							deltaT = Sys_Milliseconds() - dlStart;
-
-							delayT = 1000 * numBlocks * MAX_DOWNLOAD_BLKSIZE;
-							delayT /= sv_dlRate->integer * 1024;
-
-							if(delayT <= deltaT + 1)
-							{
-								// Sending the last round of download messages
-								// took too long for given rate, don't wait for
-								// next round, but always enforce a 1ms delay
-								// between DL message rounds so we don't hog
-								// all of the bandwidth. This will result in an
-								// effective maximum rate of 1MB/s per user, but the
-								// low download window size limits this anyways.
-								timeVal = 2;
-								dlNextRound = dlStart + deltaT + 1;
-							}
-							else
-							{
-								dlNextRound = dlStart + delayT;
-								timeVal = delayT - deltaT;
-							}
-						}
-					}
-				}
-				else
-					SV_SendDownloadMessages();
-			}
-
-			if(com_busyWait->integer)
-				NET_Sleep(0);
-			else
-				NET_Sleep(timeVal - 1);
-		}
-
-		msec = Sys_Milliseconds() - com_frameTime;
-		
-		if(msec >= minMsec)
-			timeVal = 0;
-		else
-			timeVal = minMsec - msec;
-
-	} while(timeVal > 0);
+			NET_Sleep(timeVal - 1);
+	} while(Com_TimeVal(minMsec));
 	
 	lastTime = com_frameTime;
 	com_frameTime = Com_EventLoop();
