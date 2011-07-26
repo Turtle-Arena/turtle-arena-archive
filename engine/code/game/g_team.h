@@ -83,7 +83,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // Prototypes
 
 #ifdef TURTLEARENA
-void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... );
+void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) __attribute__ ((format (printf, 2, 3)));
 #endif
 
 int OtherTeam(int team);
