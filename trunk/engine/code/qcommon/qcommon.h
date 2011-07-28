@@ -262,9 +262,10 @@ PROTOCOL
 */
 
 #ifdef TA_MAIN
-#define	PROTOCOL_VERSION	6
+#define	PROTOCOL_VERSION	7
 #define PROTOCOL_LEGACY_VERSION	0
-// 6 TA 0.5 development
+// 7 TA 0.5 development
+// 6 TA 0.5.0
 // 5 TA 0.4.1 / 0.4.2
 // 4 TA 0.4
 // 3 TA 0.3 development
