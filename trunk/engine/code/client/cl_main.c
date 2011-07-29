@@ -126,8 +126,6 @@ cvar_t  *cl_consoleFontSize;
 cvar_t  *cl_consoleFontKerning;
 #endif
 
-cvar_t  *cl_gamename;
-
 clientActive_t		cl;
 clientConnection_t	clc;
 clientStatic_t		cls;
@@ -471,9 +469,7 @@ void CL_CaptureVoip(void)
 	// try to get more audio data from the sound card...
 
 	if (initialFrame) {
-		float gain = cl_voipGainDuringCapture->value;
-		if (gain < 0.0f) gain = 0.0f; else if (gain >= 1.0f) gain = 1.0f;
-		S_MasterGain(cl_voipGainDuringCapture->value);
+		S_MasterGain(Com_Clamp(0.0f, 1.0f, cl_voipGainDuringCapture->value));
 		S_StartCapture();
 		CL_VoipNewGeneration();
 		CL_VoipParseTargets();
@@ -613,9 +609,8 @@ CL_ChangeReliableCommand
 ======================
 */
 void CL_ChangeReliableCommand( void ) {
-	int r, index, l;
+	int index, l;
 
-	r = clc.reliableSequence - (random() * 5);
 	index = clc.reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
 	l = strlen(clc.reliableCommands[ index ]);
 	if ( l >= MAX_STRING_CHARS - 1 ) {
@@ -2448,9 +2443,9 @@ void CL_CheckForResend( void ) {
 #endif
 
 		// The challenge request shall be followed by a client challenge so no malicious server can hijack this connection.
-		// Add the heartbeat gamename so the server knows we're running the correct game and can reject the client
+		// Add the gamename so the server knows we're running the correct game or can reject the client
 		// with a meaningful message
-		Com_sprintf(data, sizeof(data), "getchallenge %d %s", clc.challenge, Cvar_VariableString("sv_heartbeat"));
+		Com_sprintf(data, sizeof(data), "getchallenge %d %s", clc.challenge, com_gamename->string);
 
 		NET_OutOfBandPrint(NS_CLIENT, clc.serverAddress, "%s", data);
 		break;
@@ -3232,7 +3227,7 @@ void CL_Frame ( int msec ) {
 	cls.realtime += cls.frametime;
 
 	if ( cl_timegraph->integer ) {
-		SCR_DebugGraph ( cls.realFrametime * 0.25, 0 );
+		SCR_DebugGraph ( cls.realFrametime * 0.25 );
 	}
 
 	// see if we need to update any userinfo
@@ -3856,8 +3851,6 @@ void CL_Init( void ) {
 	Cvar_Get ("cl_localClients", "1", 0 );
 #endif
 
-	cl_gamename = Cvar_Get("cl_gamename", GAMENAME_FOR_MASTER, CVAR_TEMP);
-
 	// userinfo
 	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("rate", "25000", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
@@ -4229,8 +4222,18 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	char	info[MAX_INFO_STRING];
 	char	*infoString;
 	int		prot;
+	char	*gamename;
 
 	infoString = MSG_ReadString( msg );
+
+	// if this isn't the correct gamename, ignore it
+	gamename = Info_ValueForKey( infoString, "gamename" );
+
+	if (gamename && *gamename && strcmp(gamename, com_gamename->string))
+	{
+		Com_DPrintf( "Game mismatch in info packet: %s\n", infoString );
+		return;
+	}
 
 	// if this isn't the correct protocol version, ignore it
 	prot = atoi( Info_ValueForKey( infoString, "protocol" ) );
@@ -4335,10 +4338,8 @@ CL_GetServerStatus
 ===================
 */
 serverStatus_t *CL_GetServerStatus( netadr_t from ) {
-	serverStatus_t *serverStatus;
 	int i, oldest, oldestTime;
 
-	serverStatus = NULL;
 	for (i = 0; i < MAX_SERVERSTATUSREQUESTS; i++) {
 		if ( NET_CompareAdr( from, cl_serverStatusList[i].address ) ) {
 			return &cl_serverStatusList[i];
@@ -4615,21 +4616,17 @@ void CL_GlobalServers_f( void ) {
 		if(v4enabled)
 		{
 			Com_sprintf(command, sizeof(command), "getserversExt %s %s",
-				cl_gamename->string, Cmd_Argv(2));
+				com_gamename->string, Cmd_Argv(2));
 		}
 		else
 		{
 			Com_sprintf(command, sizeof(command), "getserversExt %s %s ipv6",
-				cl_gamename->string, Cmd_Argv(2));
+				com_gamename->string, Cmd_Argv(2));
 		}
 	}
 	else
-#if defined STANDALONE && defined IOQ3ZTM // All standalone games use dpmaster, right? So we can use gamename instead of having dpmaster guess based on protocol?
 		Com_sprintf(command, sizeof(command), "getservers %s %s",
-			cl_gamename->string, Cmd_Argv(2));
-#else
-		Com_sprintf(command, sizeof(command), "getservers %s", Cmd_Argv(2));
-#endif
+			com_gamename->string, Cmd_Argv(2));
 
 	for (i=3; i < count; i++)
 	{
@@ -4867,7 +4864,6 @@ qboolean CL_UpdateVisiblePings_f(int source) {
 	if (slots < MAX_PINGREQUESTS) {
 		serverInfo_t *server = NULL;
 
-		max = (source == AS_GLOBAL) ? MAX_GLOBAL_SERVERS : MAX_OTHER_SERVERS;
 		switch (source) {
 			case AS_LOCAL :
 				server = &cls.localServers[0];

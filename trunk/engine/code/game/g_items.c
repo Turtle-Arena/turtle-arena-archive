@@ -422,9 +422,9 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	// small and mega healths will go over the max
 #ifdef MISSIONPACK
 #ifdef TA_ITEMSYS
-	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
+	if( BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
-	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
+	if( bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
 #endif
 	{
 		max = other->client->ps.stats[STAT_MAX_HEALTH];

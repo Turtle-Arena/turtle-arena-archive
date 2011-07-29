@@ -381,7 +381,6 @@ void MenuField_Draw( menufield_s *f )
 	int		x;
 	int		y;
 	int		w;
-	int		h;
 	int		style;
 	qboolean focus;
 	float	*color;
@@ -398,7 +397,6 @@ void MenuField_Draw( menufield_s *f )
 	y =	f->generic.y;
 #ifdef IOQ3ZTM // FONT_REWRITE
 	w = font->shaderCharWidth;
-	h = Com_FontCharHeight(font);
 
 	if (f->generic.flags & QMF_SMALLFONT) {
 		style = UI_SMALLFONT;
@@ -409,13 +407,11 @@ void MenuField_Draw( menufield_s *f )
 	if (f->generic.flags & QMF_SMALLFONT)
 	{
 		w = SMALLCHAR_WIDTH;
-		h = SMALLCHAR_HEIGHT;
 		style = UI_SMALLFONT;
 	}
 	else
 	{
 		w = BIGCHAR_WIDTH;
-		h = BIGCHAR_HEIGHT;
 		style = UI_BIGFONT;
 	}	
 #endif

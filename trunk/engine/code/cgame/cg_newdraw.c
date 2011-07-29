@@ -171,52 +171,42 @@ void CG_SelectPrevPlayer( void ) {
 #ifdef MISSIONPACK_HUD
 #ifndef TURTLEARENA // NOARMOR
 static void CG_DrawPlayerArmorIcon( rectDef_t *rect, qboolean draw2D ) {
-	centity_t	*cent;
-	playerState_t	*ps;
 	vec3_t		angles;
 	vec3_t		origin;
 
-  if ( cg_drawStatus.integer == 0 ) {
+	if ( cg_drawStatus.integer == 0 ) {
 		return;
 	}
 
-	cent = &cg_entities[cg.cur_ps->clientNum];
-	ps = cg.cur_ps;
-
 	if ( draw2D || ( !cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 		CG_DrawPic( rect->x, rect->y + rect->h/2 + 1, rect->w, rect->h, cgs.media.armorIcon );
-  } else if (cg_draw3dIcons.integer) {
-	  VectorClear( angles );
-    origin[0] = 90;
-  	origin[1] = 0;
-  	origin[2] = -10;
-  	angles[YAW] = ( cg.time & 2047 ) * 360 / 2048.0;
-  
-    CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h, cgs.media.armorModel, 0, origin, angles );
-  }
-
+	} else if (cg_draw3dIcons.integer) {
+		VectorClear( angles );
+		origin[0] = 90;
+		origin[1] = 0;
+		origin[2] = -10;
+		angles[YAW] = ( cg.time & 2047 ) * 360 / 2048.0f;
+		CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h, cgs.media.armorModel, 0, origin, angles );
+	}
 }
 
 static void CG_DrawPlayerArmorValue(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
 	char	num[16];
-  int value;
-	centity_t	*cent;
+	int		value;
 	playerState_t	*ps;
 
-  cent = &cg_entities[cg.cur_ps->clientNum];
-	ps = cg.cur_ps;
+	ps = &cg.snap->ps;
 
 	value = ps->stats[STAT_ARMOR];
-  
 
 	if (shader) {
-    trap_R_SetColor( color );
+		trap_R_SetColor( color );
 		CG_DrawPic(rect->x, rect->y, rect->w, rect->h, shader);
-	  trap_R_SetColor( NULL );
+		trap_R_SetColor( NULL );
 	} else {
 		Com_sprintf (num, sizeof(num), "%i", value);
 		value = CG_Text_Width(num, scale, 0);
-	  CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
+		CG_Text_Paint(rect->x + (rect->w - value) / 2, rect->y + rect->h, scale, color, num, 0, 0, textStyle);
 	}
 }
 #endif // !TURTLEARENA
@@ -232,15 +222,13 @@ static float healthColors[4][4] = {
 
 static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 	centity_t	*cent;
-	playerState_t	*ps;
 	vec3_t		angles;
 	vec3_t		origin;
 
-	cent = &cg_entities[cg.cur_ps->clientNum];
-	ps = cg.cur_ps;
+	cent = &cg_entities[cg.snap->ps.clientNum];
 
 	if ( draw2D || (!cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
-	  qhandle_t	icon;
+		qhandle_t	icon;
 #ifdef TA_WEAPSYS
 #ifdef TURTLEARENA // WEAPONS
 		icon = cg_weapongroups[ cg.cur_lc->predictedPlayerState.weapon ].weaponIcon;
@@ -251,58 +239,59 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 		icon = cg_weapons[ cg.cur_lc->predictedPlayerState.weapon ].ammoIcon;
 #endif
 		if ( icon ) {
-		  CG_DrawPic( rect->x, rect->y, rect->w, rect->h, icon );
+			CG_DrawPic( rect->x, rect->y, rect->w, rect->h, icon );
 		}
-  } else if (cg_draw3dIcons.integer) {
-  	if ( cent->currentState.weapon &&
+	} else if (cg_draw3dIcons.integer) {
+		if ( cent->currentState.weapon &&
 #ifdef TA_WEAPSYS
 #ifdef TURTLEARENA // WEAPONS
-		cg_weapongroups[ cent->currentState.weapon ].weaponModel
+			cg_weapongroups[ cent->currentState.weapon ].weaponModel
 #else
-		cg_weapongroups[ cent->currentState.weapon ].ammoModel
+			cg_weapongroups[ cent->currentState.weapon ].ammoModel
 #endif
 #else
-		cg_weapons[ cent->currentState.weapon ].ammoModel
+			cg_weapons[ cent->currentState.weapon ].ammoModel
 #endif
-  	) {
-	    VectorClear( angles );
-#ifdef TURTLEARENA // WEAPONS
-		angles[YAW] = 20 * sin( cg.time / 1000.0 );
-
-	  	if (bg_weapongroupinfo[ cent->currentState.weapon ].weapon[0]->weapontype == WT_GUN) {
-			origin[0] = 80;
-			origin[1] = -20;
-	  	} else {
-			origin[0] = 50;
-			origin[1] = 0;
-		}
-  		origin[2] = -10;
-
-  		// If it doesn't have a special pickup weapon model...
-		if (cg_weapongroups[ cent->currentState.weapon ].weaponModel ==
-			cg_weapons[bg_weapongroupinfo[ cent->currentState.weapon ].weaponnum[0]].weaponModel)
+			)
 		{
-			angles[YAW] += 25 + 90;
-		}
+			VectorClear( angles );
+#ifdef TURTLEARENA // WEAPONS
+			angles[YAW] = 20 * sin( cg.time / 1000.0 );
+
+		  	if (bg_weapongroupinfo[ cent->currentState.weapon ].weapon[0]->weapontype == WT_GUN) {
+				origin[0] = 80;
+				origin[1] = -20;
+		  	} else {
+				origin[0] = 50;
+				origin[1] = 0;
+			}
+	  		origin[2] = -10;
+
+	  		// If it doesn't have a special pickup weapon model...
+			if (cg_weapongroups[ cent->currentState.weapon ].weaponModel ==
+				cg_weapons[bg_weapongroupinfo[ cent->currentState.weapon ].weaponnum[0]].weaponModel)
+			{
+				angles[YAW] += 25 + 90;
+			}
 #else
-	  	origin[0] = 70;
-  		origin[1] = 0;
-  		origin[2] = 0;
-  		angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
+			origin[0] = 70;
+			origin[1] = 0;
+			origin[2] = 0;
+			angles[YAW] = 90 + 20 * sin( cg.time / 1000.0 );
 #endif
-  		CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h,
+  			CG_Draw3DModel( rect->x, rect->y, rect->w, rect->h,
 #ifdef TA_WEAPSYS
 #ifdef TURTLEARENA // WEAPONS
-			cg_weapongroups[ cent->currentState.weapon ].weaponModel,
+				cg_weapongroups[ cent->currentState.weapon ].weaponModel,
 #else
-			cg_weapongroups[ cent->currentState.weapon ].ammoModel,
+				cg_weapongroups[ cent->currentState.weapon ].ammoModel,
 #endif
 #else
-			cg_weapons[ cent->currentState.weapon ].ammoModel,
+				cg_weapons[ cent->currentState.weapon ].ammoModel,
 #endif
-			0, origin, angles );
-  	}
-  }
+				0, origin, angles );
+		}
+	}
 }
 
 static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle) {
@@ -429,7 +418,7 @@ static void CG_DrawSelectedPlayerArmor( rectDef_t *rect, float scale, vec4_t col
 #endif // !TURTLEARENA
 
 qhandle_t CG_StatusHandle(int task) {
-	qhandle_t h = cgs.media.assaultShader;
+	qhandle_t h;
 	switch (task) {
 		case TEAMTASK_OFFENSE :
 			h = cgs.media.assaultShader;

@@ -101,16 +101,6 @@ const char *TeamName(int team)  {
 		return "SPECTATOR";
 	return "FREE";
 }
-
-const char *OtherTeamName(int team) {
-	if (team==TEAM_RED)
-		return "BLUE";
-	else if (team==TEAM_BLUE)
-		return "RED";
-	else if (team==TEAM_SPECTATOR)
-		return "SPECTATOR";
-	return "FREE";
-}
 #endif
 
 const char *TeamColorString(int team) {
@@ -445,7 +435,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		targ->client->pers.teamState.lasthurtcarrier = 0;
 
 		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
-		team = attacker->client->sess.sessionTeam;
 		// add the sprite over the player's head
 #ifdef IOQ3ZTM
 		attacker->client->ps.eFlags &= ~EF_AWARD_BITS;
@@ -467,7 +456,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		targ->client->pers.teamState.lasthurtcarrier = 0;
 
 		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
-		team = attacker->client->sess.sessionTeam;
 		// add the sprite over the player's head
 #ifdef IOQ3ZTM
 		attacker->client->ps.eFlags &= ~EF_AWARD_BITS;

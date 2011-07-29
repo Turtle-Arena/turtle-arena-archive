@@ -1720,7 +1720,6 @@ int VM_CallCompiled(vm_t *vm, int *args)
 {
 	byte	stack[OPSTACK_SIZE + 15];
 	void	*entryPoint;
-	int		programCounter;
 	int		programStack, stackOnEntry;
 	byte	*image;
 	int	*opStack;
@@ -1736,8 +1735,6 @@ int VM_CallCompiled(vm_t *vm, int *args)
 
 	// set up the stack frame 
 	image = vm->dataBase;
-
-	programCounter = 0;
 
 	programStack -= 48;
 

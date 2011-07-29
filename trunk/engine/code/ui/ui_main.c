@@ -5203,7 +5203,6 @@ UI_Init
 */
 void _UI_Init( qboolean inGameLoad ) {
 	const char *menuSet;
-	int start;
 
 	//uiInfo.inGameLoad = inGameLoad;
 
@@ -5289,8 +5288,6 @@ void _UI_Init( qboolean inGameLoad ) {
 	uiInfo.uiDC.whiteShader = trap_R_RegisterShaderNoMip( "white" );
 
 	AssetCache();
-
-	start = trap_Milliseconds();
 
   uiInfo.teamCount = 0;
   uiInfo.characterCount = 0;
@@ -5683,9 +5680,6 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 		yStart = 130;
 		scale = 0.5f;
 	} else {
-		centerPoint = 320;
-		yStart = 32;
-		scale = 0.6f;
 		return;
 	}
 
