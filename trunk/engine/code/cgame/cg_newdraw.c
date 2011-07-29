@@ -195,7 +195,11 @@ static void CG_DrawPlayerArmorValue(rectDef_t *rect, float scale, vec4_t color, 
 	int		value;
 	playerState_t	*ps;
 
+#ifdef TA_SPLITVIEW
+	ps = cg.cur_ps;
+#else
 	ps = &cg.snap->ps;
+#endif
 
 	value = ps->stats[STAT_ARMOR];
 
@@ -225,7 +229,11 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 	vec3_t		angles;
 	vec3_t		origin;
 
+#ifdef TA_SPLITVIEW
+	cent = &cg_entities[cg.cur_ps->clientNum];
+#else
 	cent = &cg_entities[cg.snap->ps.clientNum];
+#endif
 
 	if ( draw2D || (!cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 		qhandle_t	icon;

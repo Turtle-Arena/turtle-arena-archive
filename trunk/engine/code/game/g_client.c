@@ -2114,9 +2114,9 @@ void G_SavePersistant(char *nextmap)
 			trap_Cvar_Set("g_spSaveData", "");
 
 			if (g_singlePlayer.value)
-				G_Error("Saving SP client data failed\ntoo much data! (%lu/%i)\n%s\n", strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
+				G_Error("Saving SP client data failed\ntoo much data! (%i/%i)\n%s\n", (int)strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
 			else // Don't error to network
-				G_Printf("Saving co-op client data failed\ntoo much data! (%lu/%i)\n%s\n", strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
+				G_Printf("Saving co-op client data failed\ntoo much data! (%i/%i)\n%s\n", (int)strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
 
 			return;
 		}
