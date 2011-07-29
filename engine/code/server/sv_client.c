@@ -81,10 +81,10 @@ void SV_GetChallenge(netadr_t from)
 	if(gameName && *gameName)
 	{
 		// reject client if the heartbeat string sent by the client doesn't match ours
-		if(strcmp(gameName, sv_heartbeat->string))
+		if(strcmp(gameName, com_gamename->string))
 		{
  			NET_OutOfBandPrint(NS_SERVER, from, "print\nGame mismatch: This is a %s server\n",
- 				sv_heartbeat->string);
+ 				com_gamename->string);
 			return;
 		}
 	}
@@ -1462,7 +1462,6 @@ static void SV_VerifyPaks_f( client_t *cl ) {
 	//
 	if ( sv_pure->integer != 0 ) {
 
-		bGood = qtrue;
 		nChkSum1 = nChkSum2 = 0;
 		// we run the game, so determine which cgame and ui the client "should" be running
 		bGood = (FS_FileIsInPAK("vm/cgame.qvm", &nChkSum1) == 1);

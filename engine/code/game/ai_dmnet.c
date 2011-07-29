@@ -691,12 +691,8 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
 				}
 				bs->ltgtype = 0;
 			}
-#ifndef IOQ3ZTM // UNUSED
 			//
-			if (bs->camp_range > 0) {
-				//FIXME: move around a bit
-			}
-#endif
+			//FIXME: move around a bit
 			//
 			trap_BotResetAvoidReach(bs->ms);
 			return qfalse;

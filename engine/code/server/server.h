@@ -307,8 +307,6 @@ extern	cvar_t	*sv_lanForceRate;
 extern	cvar_t	*sv_strictAuth;
 #endif
 extern	cvar_t	*sv_banFile;
-extern	cvar_t	*sv_heartbeat;
-extern	cvar_t	*sv_flatline;
 
 #ifdef IOQ3ZTM // SV_PUBLIC
 extern	cvar_t	*sv_public;

@@ -527,12 +527,6 @@ void IN_CenterView (void) {
 
 //==========================================================================
 
-#ifndef IOQ3ZTM // UNUSED
-cvar_t	*cl_upspeed;
-cvar_t	*cl_forwardspeed;
-cvar_t	*cl_sidespeed;
-#endif
-
 #ifdef TA_SPLITVIEW
 cvar_t	*cl_yawspeed[MAX_SPLITVIEW];
 cvar_t	*cl_pitchspeed[MAX_SPLITVIEW];
@@ -711,25 +705,21 @@ CL_JoystickMove
 =================
 */
 void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
-	int		movespeed;
 	float	anglespeed;
 #ifdef TA_SPLITVIEW
 	size_t	lcNum = lc - cl.localClients;
 #endif
 
 #ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
-	if (!ci->in_lockon.active)
+	if (ci->in_lockon.active)
 #else
 #ifdef TA_SPLITVIEW
-	if ( ci->in_speed.active ^ cl_run[ci-cis]->integer )
+	if ( !(ci->in_speed.active ^ cl_run[ci-cis]->integer) )
 #else
-	if ( ci->in_speed.active ^ cl_run->integer )
+	if ( !(ci->in_speed.active ^ cl_run->integer) )
 #endif
 #endif
 	{
-		movespeed = 2;
-	} else {
-		movespeed = 1;
 		cmd->buttons |= BUTTON_WALKING;
 	}
 
@@ -1037,10 +1027,10 @@ usercmd_t CL_CreateCmd( void )
 	// draw debug graphs of turning for mouse testing
 	if ( cl_debugMove->integer ) {
 		if ( cl_debugMove->integer == 1 ) {
-			SCR_DebugGraph( abs(lc->viewangles[YAW] - oldAngles[YAW]), 0 );
+			SCR_DebugGraph( abs(lc->viewangles[YAW] - oldAngles[YAW]) );
 		}
 		if ( cl_debugMove->integer == 2 ) {
-			SCR_DebugGraph( abs(lc->viewangles[PITCH] - oldAngles[PITCH]), 0 );
+			SCR_DebugGraph( abs(lc->viewangles[PITCH] - oldAngles[PITCH]) );
 		}
 	}
 
@@ -1058,8 +1048,6 @@ Create a new usercmd_t structure for this frame
 void CL_CreateNewCommands( void ) {
 #ifdef TA_SPLITVIEW // CONTROLS
 	int			i;
-#else
-	usercmd_t	*cmd;
 #endif
 	int			cmdNum;
 
@@ -1090,7 +1078,6 @@ void CL_CreateNewCommands( void ) {
 	}
 #else
 	cl.cmds[cmdNum] = CL_CreateCmd ();
-	cmd = &cl.cmds[cmdNum];
 #endif
 }
 

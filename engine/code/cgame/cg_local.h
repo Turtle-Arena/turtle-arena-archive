@@ -204,12 +204,6 @@ typedef struct {
 	meleeTrail_t weaponTrails[MAX_WEAPON_TRAILS];
 #endif
 
-#ifndef IOQ3ZTM // Unused-rail
-	// railgun trail spawning
-	vec3_t			railgunImpact;
-	qboolean		railgunFlash;
-#endif
-
 #ifndef TA_WEAPSYS
 	int				railFireTime;
 #endif
@@ -683,9 +677,6 @@ typedef struct weaponInfo_s {
 
 	sfxHandle_t		readySound;
 	sfxHandle_t		firingSound;
-#ifndef IOQ3ZTM // unused
-	qboolean		loopFireSound;
-#endif
 } weaponInfo_t;
 #endif
 
@@ -1304,9 +1295,7 @@ typedef struct {
 	sfxHandle_t	sfx_ric1;
 	sfxHandle_t	sfx_ric2;
 	sfxHandle_t	sfx_ric3;
-#ifndef IOQ3ZTM // UNUSED
-	sfxHandle_t	sfx_railg;
-#endif
+	//sfxHandle_t	sfx_railg;
 	sfxHandle_t	sfx_rockexp;
 	sfxHandle_t	sfx_plasmaexp;
 #ifdef MISSIONPACK
@@ -1334,9 +1323,6 @@ typedef struct {
 #ifndef TA_SP
 	sfxHandle_t	winnerSound;
 	sfxHandle_t	loserSound;
-#endif
-#ifndef IOQ3ZTM // UNUSED
-	sfxHandle_t	youSuckSound;
 #endif
 #endif
 #ifndef NOTRATEDM // No gibs.

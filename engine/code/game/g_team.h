@@ -91,9 +91,6 @@ const char *TeamName(int team);
 #ifdef IOQ3ZTM
 const char *TeamNameInColor(int team);
 #endif
-#ifndef IOQ3ZTM // UNUSED
-const char *OtherTeamName(int team);
-#endif
 const char *TeamColorString(int team);
 void AddTeamScore(vec3_t origin, int team, int score);
 

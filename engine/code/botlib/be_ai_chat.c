@@ -847,7 +847,6 @@ void BotReplaceReplySynonyms(char *string, unsigned long int context)
 			if (!(syn->context & context)) continue;
 			for (synonym = syn->firstsynonym->next; synonym; synonym = synonym->next)
 			{
-				str2 = synonym->string;
 				//if the synonym is not at the front of the string continue
 				str2 = StringContainsWord(str1, synonym->string, qfalse);
 				if (!str2 || str2 != str1) continue;
@@ -2954,7 +2953,6 @@ int BotAllocChatState(void)
 //========================================================================
 void BotFreeChatState(int handle)
 {
-	bot_chatstate_t *cs;
 	bot_consolemessage_t m;
 	int h;
 
@@ -2968,7 +2966,6 @@ void BotFreeChatState(int handle)
 		botimport.Print(PRT_FATAL, "invalid chat state %d\n", handle);
 		return;
 	} //end if
-	cs = botchatstates[handle];
 	if (LibVarGetValue("bot_reloadcharacters"))
 	{
 		BotFreeChatFile(handle);
