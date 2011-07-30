@@ -689,7 +689,7 @@ qboolean fire_weapon(gentity_t *self, vec3_t start, vec3_t forward,
 qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir,
 		int weaponnum, float quadFactor, int handSide);
 #else
-#ifndef IOQ3ZTM // unused
+#ifndef IOQ3ZTM // UNUSED
 gentity_t *fire_blaster (gentity_t *self, vec3_t start, vec3_t aimdir);
 #endif
 gentity_t *fire_plasma (gentity_t *self, vec3_t start, vec3_t aimdir);
