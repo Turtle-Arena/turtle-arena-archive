@@ -77,6 +77,22 @@ void SV_GetChallenge(netadr_t from)
 		return;
 	}
 
+#ifdef IOQ3ZTM // ZTM: If not supporting legacy protocol require gamename
+	gameName = Cmd_Argv(2);
+
+	// reject client if the gamename string sent by the client doesn't match ours
+#ifdef LEGACY_PROTOCOL
+	if ((com_legacyprotocol->integer && gameName && *gameName && strcmp(gameName, com_gamename->string))
+		|| (!com_legacyprotocol->integer && (!gameName || !*gameName || strcmp(gameName, com_gamename->string))))
+#else
+	if(!gameName || !*gameName || strcmp(gameName, com_gamename->string))
+#endif
+ 	{
+		NET_OutOfBandPrint(NS_SERVER, from, "print\nGame mismatch: This is a %s server%s\n",
+ 			com_gamename->string, (gameName && *gameName) ? va(" (not %s)", gameName) : "");
+		return;
+	}
+#else
 	gameName = Cmd_Argv(2);
 	if(gameName && *gameName)
 	{
@@ -88,6 +104,7 @@ void SV_GetChallenge(netadr_t from)
 			return;
 		}
 	}
+#endif
 
 	oldest = 0;
 	oldestClientTime = oldestTime = 0x7fffffff;
