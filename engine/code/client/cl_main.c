@@ -4229,11 +4229,24 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	// if this isn't the correct gamename, ignore it
 	gamename = Info_ValueForKey( infoString, "gamename" );
 
+#ifdef IOQ3ZTM // ZTM: If not supporting legacy protocol require gamename
+#ifdef LEGACY_PROTOCOL
+	if ((com_legacyprotocol->integer && *gamename && strcmp(gamename, com_gamename->string))
+		|| (!com_legacyprotocol->integer && (!*gamename || strcmp(gamename, com_gamename->string))))
+#else
+	if (!*gamename || strcmp(gamename, com_gamename->string))
+#endif
+	{
+		Com_DPrintf( "Game mismatch in info packet: %s\n", infoString );
+		return;
+	}
+#else
 	if (gamename && *gamename && strcmp(gamename, com_gamename->string))
 	{
 		Com_DPrintf( "Game mismatch in info packet: %s\n", infoString );
 		return;
 	}
+#endif
 
 	// if this isn't the correct protocol version, ignore it
 	prot = atoi( Info_ValueForKey( infoString, "protocol" ) );
