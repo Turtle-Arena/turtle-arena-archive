@@ -202,17 +202,29 @@ static const char *sortkey_items[] = {
 };
 
 static char* gamenames[] = {
+#ifdef IOQ3ZTM // ZTM: Lets be consistent.
+	"FFA ",	// free for all
+#else
 	"DM ",	// deathmatch
+#endif
+#ifdef TA_MISC // tournament to duel
+	"Duel", // duel
+#else
 	"1v1",	// tournament
+#endif
 #ifdef TA_SP
-	"Co-op",	// single player
+	"Coop",	// single player
 #else
 	"SP ",	// single player
 #endif
 	"Team DM",	// team deathmatch
 	"CTF",	// capture the flag
 	"One Flag CTF",		// one flag ctf
+#ifdef IOQ3ZTM // Look better.
+	"Overload",				// Overload
+#else
 	"OverLoad",				// Overload
+#endif
 	"Harvester",			// Harvester
 #ifndef TURTLEARENA
 	"Rocket Arena 3",	// Rocket Arena 3
@@ -440,6 +452,62 @@ static int QDECL ArenaServers_Compare( const void *arg1, const void *arg2 ) {
 	return 0;
 }
 
+#ifdef IOQ3ZTM
+/*
+=================
+ArenaServers_GametypeForGames
+=================
+*/
+int ArenaServers_GametypeForGames(int games) {
+	int gametype;
+
+	switch( games ) {
+	default:
+	case GAMES_ALL:
+		gametype = -1;
+		break;
+
+	case GAMES_FFA:
+		gametype = GT_FFA;
+		break;
+
+	case GAMES_TOURNEY:
+		gametype = GT_TOURNAMENT;
+		break;
+
+#ifdef TURTLEARENA // MP_GAMETYPES
+	case GAMES_COOP:
+		gametype = GT_SINGLE_PLAYER;
+		break;
+#endif
+
+	case GAMES_TEAMPLAY:
+		gametype = GT_TEAM;
+		break;
+
+	case GAMES_CTF:
+		gametype = GT_CTF;
+		break;
+
+#ifdef MISSIONPACK // MP_GAMETYPES
+	case GAMES_1FCTF:
+		gametype = GT_1FCTF;
+		break;
+
+	case GAMES_OBELISK:
+		gametype = GT_OBELISK;
+		break;
+#ifdef MISSIONPACK_HARVESTER
+	case GAMES_OBELISK:
+		gametype = GT_HARVESTER;
+		break;
+#endif
+#endif
+	}
+
+	return gametype;
+}
+#endif
 
 /*
 =================
@@ -498,6 +566,9 @@ static void ArenaServers_UpdateMenu( void ) {
 	table_t*		tableptr;
 	char			*pingColor;
 	int				clients;
+#ifdef IOQ3ZTM
+	int				gametype;
+#endif
 
 	if( g_arenaservers.numqueriedservers > 0 ) {
 		// servers found
@@ -654,6 +725,12 @@ static void ArenaServers_UpdateMenu( void ) {
 			continue;
 		}
 
+#ifdef IOQ3ZTM
+		gametype = ArenaServers_GametypeForGames(g_gametype);
+		if( gametype != -1 && servernodeptr->gametype != gametype ) {
+			continue;
+		}
+#else
 		switch( g_gametype ) {
 		case GAMES_ALL:
 			break;
@@ -664,13 +741,11 @@ static void ArenaServers_UpdateMenu( void ) {
 			}
 			break;
 
-#ifndef TURTLEARENA // MP_GAMETYPES
 		case GAMES_TEAMPLAY:
 			if( servernodeptr->gametype != GT_TEAM ) {
 				continue;
 			}
 			break;
-#endif
 
 		case GAMES_TOURNEY:
 			if( servernodeptr->gametype != GT_TOURNAMENT ) {
@@ -678,47 +753,13 @@ static void ArenaServers_UpdateMenu( void ) {
 			}
 			break;
 
-#ifdef TURTLEARENA // MP_GAMETYPES
-		case GAMES_COOP:
-			if( servernodeptr->gametype != GT_SINGLE_PLAYER ) {
-				continue;
-			}
-			break;
-
-		case GAMES_TEAMPLAY:
-			if( servernodeptr->gametype != GT_TEAM ) {
-				continue;
-			}
-			break;
-#endif
-
 		case GAMES_CTF:
 			if( servernodeptr->gametype != GT_CTF ) {
 				continue;
 			}
 			break;
-
-#ifdef MISSIONPACK // MP_GAMETYPES
-		case GAMES_1FCTF:
-			if( servernodeptr->gametype != GT_1FCTF ) {
-				continue;
-			}
-			break;
-
-		case GAMES_OBELISK:
-			if( servernodeptr->gametype != GT_OBELISK ) {
-				continue;
-			}
-			break;
-#ifdef MISSIONPACK_HARVESTER
-		case GAMES_HARVESTER:
-			if( servernodeptr->gametype != GT_HARVESTER ) {
-				continue;
-			}
-			break;
-#endif
-#endif
 		}
+#endif
 
 		if( servernodeptr->pingtime < servernodeptr->minPing ) {
 			pingColor = S_COLOR_BLUE;
@@ -1249,7 +1290,16 @@ void ArenaServers_StartRefresh( void )
 	}
 
 	if( g_servertype >= UIAS_GLOBAL1 && g_servertype <= UIAS_GLOBAL5 ) {
-		// ZTM: FIXME: Use dpmaster style gametype=X instead of "ffa" etc
+#ifdef IOQ3ZTM
+		int gametype = ArenaServers_GametypeForGames(g_arenaservers.gametype.curvalue);
+
+		// Add requested gametype to args for dpmaster
+		if (gametype != -1) {
+			Com_sprintf( myargs, sizeof (myargs), " gametype=%i", gametype );
+		} else {
+			myargs[0] = '\0';
+		}
+#else
 		switch( g_arenaservers.gametype.curvalue ) {
 		default:
 		case GAMES_ALL:
@@ -1260,46 +1310,19 @@ void ArenaServers_StartRefresh( void )
 			strcpy( myargs, " ffa" );
 			break;
 
-#ifndef TURTLEARENA // MP_GAMETYPES
 		case GAMES_TEAMPLAY:
 			strcpy( myargs, " team" );
 			break;
-#endif
 
 		case GAMES_TOURNEY:
 			strcpy( myargs, " tourney" );
 			break;
 
-#ifdef TURTLEARENA // MP_GAMETYPES
-		case GAMES_COOP:
-			strcpy( myargs, " coop" );
-			break;
-
-		case GAMES_TEAMPLAY:
-			strcpy( myargs, " team" );
-			break;
-#endif
-
 		case GAMES_CTF:
 			strcpy( myargs, " ctf" );
 			break;
-
-#ifdef MISSIONPACK // MP_GAMETYPES
-		case GAMES_1FCTF:
-			strcpy( myargs, " 1flag" );
-			break;
-
-		case GAMES_OBELISK:
-			strcpy( myargs, " overload" );
-			break;
-#ifdef MISSIONPACK_HARVESTER
-		case GAMES_OBELISK:
-			strcpy( myargs, " harvester" );
-			break;
-#endif
-#endif
 		}
-
+#endif
 
 		if (g_emptyservers) {
 			strcat(myargs, " empty");
