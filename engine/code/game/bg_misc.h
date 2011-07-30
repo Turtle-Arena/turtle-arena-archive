@@ -263,7 +263,7 @@ typedef enum {
 #endif
 #define	EF_AWARD_DEFEND		0x00010000		// draw a defend sprite
 #define	EF_AWARD_ASSIST		0x00020000		// draw a assist sprite
-#ifndef IOQ3ZTM // unused
+#ifndef IOQ3ZTM // UNUSED
 #define EF_AWARD_DENIED		0x00040000		// denied
 #endif
 #ifdef TA_WEAPSYS
