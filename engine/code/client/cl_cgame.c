@@ -833,6 +833,12 @@ void CL_InitCGame( void ) {
 	}
 	clc.state = CA_LOADING;
 
+#ifdef IOQ3ZTM
+	if (!com_sv_running->integer) {
+		Com_Printf("Loading level %s...\n", mapname);
+	}
+#endif
+
 	// init for this gamestate
 	// use the lastExecutedServerCommand instead of the serverCommandSequence
 	// otherwise server commands sent just before a gamestate are dropped
