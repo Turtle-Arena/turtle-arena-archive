@@ -66,6 +66,7 @@ LAN_LoadCachedServers
 ====================
 */
 void LAN_LoadCachedServers( void ) {
+#ifndef TURTLEARENA // Don't cache servers, just always get new list.
 	int size;
 	fileHandle_t fileIn;
 	cls.numglobalservers = cls.numfavoriteservers = 0;
@@ -83,6 +84,7 @@ void LAN_LoadCachedServers( void ) {
 		}
 		FS_FCloseFile(fileIn);
 	}
+#endif
 }
 
 /*
@@ -91,6 +93,7 @@ LAN_SaveServersToCache
 ====================
 */
 void LAN_SaveServersToCache( void ) {
+#ifndef TURTLEARENA // Don't cache servers, just always get new list.
 	int size;
 	fileHandle_t fileOut = FS_SV_FOpenFileWrite("servercache.dat");
 	FS_Write(&cls.numglobalservers, sizeof(int), fileOut);
@@ -100,6 +103,7 @@ void LAN_SaveServersToCache( void ) {
 	FS_Write(&cls.globalServers, sizeof(cls.globalServers), fileOut);
 	FS_Write(&cls.favoriteServers, sizeof(cls.favoriteServers), fileOut);
 	FS_FCloseFile(fileOut);
+#endif
 }
 
 
