@@ -414,7 +414,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	SV_ShutdownGameProgs();
 
 #ifdef IOQ3ZTM // LESS_VERBOSE
-	Com_Printf ("Loading map %s...\n", server);
+	Com_Printf ("Loading level %s...\n", server);
 	Com_DPrintf ("------ Server Initialization ------\n");
 	Com_DPrintf ("Server: %s\n",server);
 #else
