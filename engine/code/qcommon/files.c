@@ -188,8 +188,8 @@ typedef struct
 const purePak_t com_purePaks[] =
 {
 #ifdef TA_MAIN // Turtle Arena uses assets*.pk3
-	{BASEGAME, "assets0", 2825852278u, 0},
-	{BASEGAME, "assets1-qvms", 51038285u, 0},
+	{BASEGAME, "assets0", 2635514408u, 0},
+	{BASEGAME, "assets1-qvms", 3659620526u, 0},
 	{BASEGAME, "assets2-music", 4232451485u, PAK_OPTIONAL},
 #else
 	{BASEQ3, "pak0", 1566731103u, 0},
