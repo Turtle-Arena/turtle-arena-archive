@@ -478,7 +478,11 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
 #endif
 #endif
+#ifdef IOQ3ZTM // IOQ3BUGFIX: fix updating cvar
+	{ &cg_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO },
+#else
 	{ &cg_synchronousClients, "g_synchronousClients", "0", 0 },	// communicated by systeminfo
+#endif
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 	{ &cg_redTeamName, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
@@ -516,8 +520,13 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_smoothClients, "cg_smoothClients", "0", CVAR_USERINFO | CVAR_ARCHIVE},
 	{ &cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT},
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: fix updating cvars
+	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO},
+	{ &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO},
+#else
 	{ &pmove_fixed, "pmove_fixed", "0", 0},
 	{ &pmove_msec, "pmove_msec", "8", 0},
+#endif
 	{ &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE},
 	{ &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE},
 	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
