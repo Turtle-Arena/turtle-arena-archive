@@ -1,0 +1,155 @@
+Turtle Arena menu design. Somethings are done, others are not.
+
+:MAIN
+PLAY
+MULTIPLAYER
+OPTIONS
+QUIT
+
+== PLAY ==
+=== NEW GAME ===
+[File select like SRB2 1.1? (Which is like Sonic 3 and Knuckles...)]
+Player select menu. (Do after stage select?)
+Stage select.
+If the there is more then one area and the first has been cleared, allow area select.
+Start map.
+
+=== LOAD GAME ===
+Show list of save games, like DEMOS menu.
+Load savegame.
+
+=== DEMOS ===
+Show a list of demos, start a demo, ect.
+
+=== CINEMATICS ===
+List cinematics (either auto list or use predefined list).
+	If using predefined list, disable cinematic if video file doesn't exist.
+
+=== MODS ===
+List Mods, load Mod.
+
+== MULTIPLAYER ==
+
+=== Create Game ===
+:Or Host Game?
+
+=== Join Game (Search) ===
+
+=== Join Game (Specify IP) ===
+
+=== Setup Player 1 ===
+
+=== Setup Player 2 ===
+
+=== Setup Player 3 ===
+
+=== Setup Player 4 ===
+
+== OPTIONS ==
+:Quake3 SETUP menu, less player setup.
+
+=== CONTROLS ===
+
+==== Player 1 ====
+==== Player 2 ====
+==== Player 3 ====
+==== Player 4 ====
+==== Game Controls ====
+TODO: Just list controls here in "CONTROLS" menu?
+Note: Currenly with Player 1 controls.
+
+* Show scores
+* Chat
+* Chat - Team
+* Chat - Target
+* Chat - Attacker
+
+=== CREDITS ===
+
+
+== EXIT ==
+Ask for confirm, exit program.
+
+
+
+:INGAME
+Resume Game
+: if only one local client and gametype < GT_TEAM
+:: if spectator
+Join Game
+:: else
+Spectate
+: else
+Change Team(s)
+: end if
+TODO: Vote --Like in missionpack
+Local Players --Add and drop local clients!
+Options
+Player Setup(s)
+Server
+Server Info
+Leave Game (to be removed?)
+Exit
+
+:INGAMESP
+Resume Game
+Save Game?
+Load Game?
+Local Players --Add and drop local clients!
+Options
+Leave Game (to be removed?)
+Exit
+
+== Resume Game ==
+Close ingame menu.
+
+== Change Team ==
+Open menu with teams.
+
+== Player ==
+Change player model [and headmodel?] and player skin and colors.
+
+/* SP ONLY
+=== SAVE GAME ===
+//Only allow usage if in a spgame
+Have user select/typein filename.
+Save game.
+
+=== LOAD GAME ===
+Show list of save games, like DEMOS menu.
+Load savegame.
+*/
+
+== Options ==
+Like the out_options only not fullscreen.
+
+== Server ==
+: Server-only admin menu
+
+=== Change Map ===
+
+=== Add Bot ===
+
+=== Remove Bot ===
+
+=== Restart Level ===
+
+== Server Info ==
+Open [message] box with info.
+
+== Leave Game ==
+: To be removed?
+Ask for confirm.
+Exit back to main menu.
+
+== Exit ==
+=== Main Menu ===
+:Replace Level Game
+
+=== Exit Game ===
+Ask for confirm.
+Exit the whole game, back to OS.
+
+=== Cancel ===
+Close "Exit" popup menu.
+
