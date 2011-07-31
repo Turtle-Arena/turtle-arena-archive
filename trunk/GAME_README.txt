@@ -19,7 +19,7 @@ Linux: /home/$USERNAME/.turtlearena/
 
 == License ==
 The Turtle Arena source code is licensed under the GNU General Public License version 2 or later.
-	(See COPYING.txt for full license)
+	(See GPL-2.txt for full license)
 
 The Turtle Arena data is a mix of GPL2+ and CC-BY-SA-3.0.
 	(See COPYRIGHTS.txt for data copyrights and licenses.)
