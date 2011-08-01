@@ -158,6 +158,9 @@ void P_WorldEffects( gentity_t *ent ) {
 #endif
 			if ( ent->health > 0 ) {
 #ifdef TURTLEARENA // DROWNING
+				// don't play a normal pain sound
+				ent->pain_debounce_time = level.time + 200;
+
 				G_Damage (ent, NULL, NULL, NULL, NULL, 
 					10000, DAMAGE_NO_ARMOR, MOD_WATER);
 #else
@@ -178,6 +181,9 @@ void P_WorldEffects( gentity_t *ent ) {
 		// Low air warning
 		else if (ent->client->ps.powerups[PW_AIR] < level.time + 5000 && !(ent->flags & FL_DROWNING_WARNING)) {
 			ent->flags |= FL_DROWNING_WARNING;
+
+			// don't play a normal pain sound
+			ent->pain_debounce_time = level.time + 200;
 
 			G_Damage (ent, NULL, NULL, NULL, NULL, 
 				2, DAMAGE_NO_ARMOR, MOD_WATER);
