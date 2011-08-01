@@ -312,8 +312,10 @@ else # END QUAKE3
 	# Turtle Arena's intro video will be ogg theora
 	USE_CODEC_THEORA=1
 
-	# Currently doesn't work with Turtle Arena changes...
-	USE_RENDERER_DLOPEN=0
+	# Turtle Arena currently just keeps renderer internal
+	ifneq ($(USE_RENDERER_DLOPEN), 1)
+		USE_RENDERER_DLOPEN=0
+	endif
 
 	# Turtle Arena version
 	VERSION=0.5.1
@@ -2016,6 +2018,14 @@ ifneq ($(USE_RENDERER_DLOPEN), 0)
     $(B)/renderer/puff.o \
     $(B)/renderer/q_math.o \
     $(B)/renderer/tr_subs.o
+
+#ZTM: if TA_GAME_MODELS
+# client (with built in server) needs model loading too
+ifeq ($(DED_USE_MODELS),1)
+Q3OBJ += \
+      $(B)/ded/tr_model.o \
+      $(B)/ded/tr_model_iqm.o
+endif
 endif
 
 ifneq ($(USE_INTERNAL_JPEG),0)
