@@ -280,7 +280,11 @@ void UI_LoadBots( void ) {
 		strcat(filename, dirptr);
 		UI_LoadBotsFromFile(filename);
 	}
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf("%i bots parsed\n", ui_numBots);
+#else
 	trap_Print( va( "%i bots parsed\n", ui_numBots ) );
+#endif
 }
 
 
