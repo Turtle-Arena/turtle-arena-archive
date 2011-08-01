@@ -2075,7 +2075,7 @@ void R_LoadPNG(const char *name, byte **pic, int *width, int *height)
 	{
 		CloseBufferedFile(ThePNG);
 
-		Com_Printf(S_COLOR_YELLOW "%s: invalid image size\n", name);
+		ri.Printf( PRINT_WARNING, "%s: invalid image size\n", name );
 
 		return; 
 	}
@@ -2603,8 +2603,8 @@ void WriteChunkHeader(void **buffer, void **crcPtr, PNG_ChunkCRC *CRC, int type,
 	 *  Init CRC
 	 */
 
-	*CRC = crc32(0, Z_NULL, 0);
-	*CRC = crc32(*CRC, *buffer-4, 4);
+	*CRC = ri.zlib_crc32(0, Z_NULL, 0);
+	*CRC = ri.zlib_crc32(*CRC, *buffer-4, 4);
 	*crcPtr = *buffer;
 }
 
@@ -2618,7 +2618,7 @@ void WriteCRC(void **buffer, void **crcPtr, PNG_ChunkCRC CRC)
 	 *  Update CRC
 	 */
 	if (*buffer-*crcPtr > 0)
-		CRC = crc32(CRC, *crcPtr, *buffer-*crcPtr);
+		CRC = ri.zlib_crc32(CRC, *crcPtr, *buffer-*crcPtr);
 
 	/*
 	 *  Write CRC
@@ -2671,7 +2671,7 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	compressedDataLength = imageLength * 1.01f + 12;
 	compressedData = ri.Malloc(compressedDataLength);
 
-	if (compress(compressedData, &compressedDataLength, imageData, imageLength) != Z_OK) {
+	if (ri.zlib_compress(compressedData, &compressedDataLength, imageData, imageLength) != Z_OK) {
 		ri.Free(compressedData);
 		ri.Free(imageData);
 		ri.Printf(PRINT_WARNING, "RE_SavePNG: Failed to compress image data.\n");
@@ -2686,16 +2686,16 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	Q_strncpyz(tEXt[numtEXt].text, Q3_VERSION, sizeof (tEXt[numtEXt].text));
 	numtEXt++;
 	Q_strncpyz(tEXt[numtEXt].key, "Author", sizeof (tEXt[numtEXt].key));
-	Cvar_VariableStringBuffer("username", tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text));
+	ri.Cvar_VariableStringBuffer("username", tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text));
 	numtEXt++;
 	Q_strncpyz(tEXt[numtEXt].key, "Description", sizeof (tEXt[numtEXt].key));
 	Q_strncpyz(tEXt[numtEXt].text, PRODUCT_NAME " Screenshot", sizeof (tEXt[numtEXt].text));
 	numtEXt++;
 	Q_strncpyz(tEXt[numtEXt].key, "Playername", sizeof (tEXt[numtEXt].key));
-	Cvar_VariableStringBuffer("name", tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text));
+	ri.Cvar_VariableStringBuffer("name", tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text));
 	numtEXt++;
 	Q_strncpyz(tEXt[numtEXt].key, "Map", sizeof (tEXt[numtEXt].key));
-	Cvar_VariableStringBuffer("mapname", tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text));
+	ri.Cvar_VariableStringBuffer("mapname", tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text));
 	numtEXt++;
 	Q_strncpyz(tEXt[numtEXt].key, "Mapname", sizeof (tEXt[numtEXt].key));
 	ri.CL_GetMapMessage(tEXt[numtEXt].text, sizeof (tEXt[numtEXt].text));
@@ -2744,7 +2744,7 @@ void RE_SavePNG(const char *filename, int width, int height, byte *data, int pad
 	 *  Setup CRC.
 	 */
 
-	CRC = crc32(0, Z_NULL, 0);
+	CRC = ri.zlib_crc32(0, Z_NULL, 0);
 	crcPtr = buffer + PNG_Signature_Size + 4;
 
 	/*

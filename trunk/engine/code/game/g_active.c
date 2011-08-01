@@ -158,11 +158,6 @@ void P_WorldEffects( gentity_t *ent ) {
 #endif
 			if ( ent->health > 0 ) {
 #ifdef TURTLEARENA // DROWNING
-				G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
-
-				// don't play a normal pain sound
-				ent->pain_debounce_time = level.time + 200;
-
 				G_Damage (ent, NULL, NULL, NULL, NULL, 
 					10000, DAMAGE_NO_ARMOR, MOD_WATER);
 #else
@@ -170,23 +165,6 @@ void P_WorldEffects( gentity_t *ent ) {
 				ent->damage += 2;
 				if (ent->damage > 15)
 					ent->damage = 15;
-
-				// play a gurp sound instead of a normal pain sound
-				if (ent->health <= ent->damage) {
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
-				} else if (rand()&1) {
-#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp1.wav"));
-#else
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
-#endif
-				} else {
-#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp2.wav"));
-#else
-					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
-#endif
-				}
 
 				// don't play a normal pain sound
 				ent->pain_debounce_time = level.time + 200;
@@ -200,22 +178,6 @@ void P_WorldEffects( gentity_t *ent ) {
 		// Low air warning
 		else if (ent->client->ps.powerups[PW_AIR] < level.time + 5000 && !(ent->flags & FL_DROWNING_WARNING)) {
 			ent->flags |= FL_DROWNING_WARNING;
-			if (rand()&1) {
-#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
-				G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp1.wav"));
-#else
-				G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
-#endif
-			} else {
-#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
-				G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp2.wav"));
-#else
-				G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
-#endif
-			}
-
-			// don't play a normal pain sound
-			ent->pain_debounce_time = level.time + 200;
 
 			G_Damage (ent, NULL, NULL, NULL, NULL, 
 				2, DAMAGE_NO_ARMOR, MOD_WATER);
@@ -1849,12 +1811,12 @@ void ClientThink_real( gentity_t *ent ) {
 					{
 						client->ps.persistant[PERS_CONTINUES]--;
 						client->ps.persistant[PERS_LIVES] += 3;
-						respawn( ent );
+						ClientRespawn( ent );
 					}
 				}
 				else
 				{
-					respawn( ent );
+					ClientRespawn( ent );
 				}
 			}
 			return;
@@ -1864,7 +1826,7 @@ void ClientThink_real( gentity_t *ent ) {
 		if ( level.time > client->respawnTime ) {
 			// forcerespawn is to prevent users from waiting out powerups
 			if ( g_forcerespawn.integer > 0 && ( level.time - client->respawnTime ) > g_forcerespawn.integer * 1000 ) {
-				respawn( ent );
+				ClientRespawn( ent );
 				return;
 			}
 		
@@ -1875,7 +1837,7 @@ void ClientThink_real( gentity_t *ent ) {
 			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) )
 #endif
 			{
-				respawn( ent );
+				ClientRespawn( ent );
 			}
 		}
 		return;

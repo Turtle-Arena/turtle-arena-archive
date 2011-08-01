@@ -340,14 +340,8 @@ static void CG_TouchItem( centity_t *cent ) {
 			return;
 		}
 	}
-	if( cgs.gametype == GT_CTF
-#ifdef MISSIONPACK_HARVESTER
-	|| cgs.gametype == GT_HARVESTER
 #endif
-	) {
-#else
 	if( cgs.gametype == GT_CTF ) {
-#endif
 		if (cg.cur_lc->predictedPlayerState.persistant[PERS_TEAM] == TEAM_RED &&
 			item->giTag == PW_REDFLAG)
 			return;

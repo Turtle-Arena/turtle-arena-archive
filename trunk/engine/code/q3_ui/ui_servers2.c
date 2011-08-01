@@ -1446,13 +1446,8 @@ int ArenaServers_SetType( int type )
 		g_arenaservers.currentping       = *g_arenaservers.numservers;
 		g_arenaservers.numqueriedservers = *g_arenaservers.numservers; 
 		ArenaServers_UpdateMenu();
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Only show message if not auto refreshing!
 		strcpy(g_arenaservers.status.string,"hit refresh to update");
-#endif
 	}
-#ifndef IOQ3ZTM // IOQ3BUGFIX: Only show message if not auto refreshing!
-	strcpy(g_arenaservers.status.string,"hit refresh to update");
-#endif
 	
 	return type;
 }
