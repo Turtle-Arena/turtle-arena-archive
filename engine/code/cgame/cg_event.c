@@ -710,7 +710,6 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	}
 	// play a gurp sound instead of a normal pain sound
 	if (CG_WaterLevel(cent) >= 1) {
-			if (rand()&1) {
 #ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
 		if (rand()&1) {
 			trap_S_StartSound(NULL, cent->currentState.number, CHAN_VOICE, CG_CustomSound(cent->currentState.number, "*gurp1.wav"));
