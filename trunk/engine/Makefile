@@ -81,7 +81,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 2120
+IOQ3_REVISION = 2121
 
 #
 # Start build type
@@ -860,8 +860,9 @@ ifeq ($(PLATFORM),mingw32)
 
   LIBS= -lws2_32 -lwinmm -lpsapi
   CLIENT_LDFLAGS += -mwindows
-  CLIENT_LIBS = -lgdi32 -lole32 -lopengl32
-
+  CLIENT_LIBS = -lgdi32 -lole32
+  RENDERER_LIBS = -lgdi32 -lole32 -lopengl32
+  
   ifeq ($(USE_FREETYPE),1)
 	ifeq ($(COMPILE_PLATFORM),mingw32)
 		BASE_CFLAGS += -Ifreetype2/
@@ -900,6 +901,8 @@ ifeq ($(PLATFORM),mingw32)
 
   # libmingw32 must be linked before libSDLmain
   CLIENT_LIBS += -lmingw32
+  RENDERER_LIBS += -lmingw32
+  
   ifeq ($(USE_LOCAL_HEADERS),1)
     CLIENT_CFLAGS += -I$(SDLHDIR)/include
     CLIENT_LIBS += $(WINLIBDIR)/libSDLmain.a
@@ -907,6 +910,13 @@ ifeq ($(PLATFORM),mingw32)
       CLIENT_LIBS += $(WINLIBDIR)/libSDL64.dll.a
     else
       CLIENT_LIBS += $(WINLIBDIR)/libSDL.dll.a
+    endif
+
+    RENDERER_LIBS += $(WINLIBDIR)/libSDLmain.a
+    ifeq ($(ARCH),x64)
+      RENDERER_LIBS += $(WINLIBDIR)/libSDL64.dll.a
+    else
+      RENDERER_LIBS += $(WINLIBDIR)/libSDL.dll.a
     endif
 
     # Extra libs, easier to just include in source tree
@@ -925,6 +935,7 @@ ifeq ($(PLATFORM),mingw32)
   else
     CLIENT_CFLAGS += $(SDL_CFLAGS)
     CLIENT_LIBS += $(SDL_LIBS)
+    RENDERER_LIBS += $(SDL_LIBS)
     ifeq ($(USE_CODEC_VORBIS),1)
       CLIENT_LIBS += -lvorbisfile -lvorbis -logg
     endif
