@@ -236,7 +236,7 @@ static char* gamenames[] = {
 	NULL
 };
 #ifdef IOQ3ZTM // Net gametype browse
-int numNetGametypes = ARRAY_LEN(gamenames) - 1; // gamenames(w/unknown) - NULL
+int numNetGametypes = ARRAY_LEN(gamenames) - 2;
 #endif
 
 static char* netnames[] = {
@@ -1773,7 +1773,11 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.arrows.generic.name			= ART_ARROWS0;
 	g_arenaservers.arrows.generic.flags			= QMF_LEFT_JUSTIFY|QMF_INACTIVE;
 	g_arenaservers.arrows.generic.callback		= ArenaServers_Event;
+#ifdef IOQ3ZTM
+	g_arenaservers.arrows.generic.x				= 588;
+#else
 	g_arenaservers.arrows.generic.x				= 512+48;
+#endif
 	g_arenaservers.arrows.generic.y				= 240-64+16;
 	g_arenaservers.arrows.width					= 64;
 	g_arenaservers.arrows.height				= 128;
@@ -1782,7 +1786,11 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.up.generic.flags				= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_MOUSEONLY;
 	g_arenaservers.up.generic.callback			= ArenaServers_Event;
 	g_arenaservers.up.generic.id				= ID_SCROLL_UP;
+#ifdef IOQ3ZTM
+	g_arenaservers.up.generic.x					= 588;
+#else
 	g_arenaservers.up.generic.x					= 512+48;
+#endif
 	g_arenaservers.up.generic.y					= 240-64+16;
 	g_arenaservers.up.width						= 64;
 	g_arenaservers.up.height					= 64;
@@ -1792,7 +1800,11 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.down.generic.flags			= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_MOUSEONLY;
 	g_arenaservers.down.generic.callback		= ArenaServers_Event;
 	g_arenaservers.down.generic.id				= ID_SCROLL_DOWN;
+#ifdef IOQ3ZTM
+	g_arenaservers.down.generic.x				= 588;
+#else
 	g_arenaservers.down.generic.x				= 512+48;
+#endif
 	g_arenaservers.down.generic.y				= 240+16;
 	g_arenaservers.down.width					= 64;
 	g_arenaservers.down.height					= 64;
