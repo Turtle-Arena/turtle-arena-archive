@@ -886,7 +886,11 @@ void UI_ParseMenu(const char *menuFile) {
 	int handle;
 	pc_token_t token;
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf("Parsing menu file:%s\n", menuFile);
+#else
 	Com_Printf("Parsing menu file:%s\n", menuFile);
+#endif
 
 	handle = trap_PC_LoadSource(menuFile);
 	if (!handle) {
@@ -998,7 +1002,11 @@ void UI_LoadMenus(const char *menuFile, qboolean reset) {
 		}
 	}
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
+#else
 	Com_Printf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
+#endif
 
 	trap_PC_FreeSource( handle );
 }
@@ -4689,7 +4697,11 @@ static qboolean Team_Parse(char **p) {
 				}
 			}
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+      Com_DPrintf("Loaded team %s with team icon %s.\n", uiInfo.teamList[uiInfo.teamCount].teamName, tempStr);
+#else
       Com_Printf("Loaded team %s with team icon %s.\n", uiInfo.teamList[uiInfo.teamCount].teamName, tempStr);
+#endif
       if (uiInfo.teamCount < MAX_TEAMS) {
         uiInfo.teamCount++;
       } else {
@@ -4749,7 +4761,11 @@ static qboolean Character_Parse(char **p) {
         uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("%s",tempStr));
 	  }
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+      Com_DPrintf("Loaded %s character %s.\n", uiInfo.characterList[uiInfo.characterCount].base, uiInfo.characterList[uiInfo.characterCount].name);
+#else
       Com_Printf("Loaded %s character %s.\n", uiInfo.characterList[uiInfo.characterCount].base, uiInfo.characterList[uiInfo.characterCount].name);
+#endif
       if (uiInfo.characterCount < MAX_HEADS) {
         uiInfo.characterCount++;
       } else {
@@ -4793,7 +4809,11 @@ static qboolean Alias_Parse(char **p) {
         return qfalse;
       }
     
+#ifdef IOQ3ZTM // LESS_VERBOSE
+      Com_DPrintf("Loaded character alias %s using character ai %s.\n", uiInfo.aliasList[uiInfo.aliasCount].name, uiInfo.aliasList[uiInfo.aliasCount].ai);
+#else
       Com_Printf("Loaded character alias %s using character ai %s.\n", uiInfo.aliasList[uiInfo.aliasCount].name, uiInfo.aliasList[uiInfo.aliasCount].ai);
+#endif
       if (uiInfo.aliasCount < MAX_ALIASES) {
         uiInfo.aliasCount++;
       } else {
