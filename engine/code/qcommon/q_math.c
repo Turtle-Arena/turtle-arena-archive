@@ -366,37 +366,6 @@ void RotateAroundDirection( vec3_t axis[3], float yaw ) {
 	CrossProduct( axis[0], axis[1], axis[2] );
 }
 
-
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS // XREAL?
-/*
-=====================
-Q_acos
-
-the msvc acos doesn't always return a value between -PI and PI:
-
-int i;
-i = 1065353246;
-acos(*(float*) &i) == -1.#IND0
-=====================
-*/
-float Q_acos(float c)
-{
-	float           angle;
-
-	angle = acos(c);
-
-	if (angle > M_PI)
-	{
-		return (float)M_PI;
-	}
-	else if (angle < -M_PI)
-	{
-		return (float)M_PI;
-	}
-	return angle;
-}
-#endif
-
 void vectoangles( const vec3_t value1, vec3_t angles ) {
 	float	forward;
 	float	yaw, pitch;
@@ -1069,3 +1038,32 @@ int Q_isnan( float x )
 
 	return (int)( (unsigned int)fi.ui >> 31 );
 }
+//------------------------------------------------------------------------
+
+#if !defined Q3_VM || defined IOQ3ZTM_NO_COMPAT // FIXED_ACOS
+/*
+=====================
+Q_acos
+
+the msvc acos doesn't always return a value between -PI and PI:
+
+int i;
+i = 1065353246;
+acos(*(float*) &i) == -1.#IND0
+
+=====================
+*/
+float Q_acos(float c) {
+	float angle;
+
+	angle = acos(c);
+
+	if (angle > M_PI) {
+		return (float)M_PI;
+	}
+	if (angle < -M_PI) {
+		return (float)M_PI;
+	}
+	return angle;
+}
+#endif

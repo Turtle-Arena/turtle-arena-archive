@@ -609,8 +609,6 @@ void CopyToBodyQue( gentity_t *ent ) {
 	body = level.bodyQue[ level.bodyQueIndex ];
 	level.bodyQueIndex = (level.bodyQueIndex + 1) % BODY_QUEUE_SIZE;
 
-	trap_UnlinkEntity (body);
-
 	body->s = ent->s;
 	body->s.eFlags = EF_DEAD;		// clear EF_TALK, etc
 #if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
@@ -724,24 +722,14 @@ void SetClientViewAngle( gentity_t *ent, vec3_t angle ) {
 
 /*
 ================
-respawn
+ClientRespawn
 ================
 */
-void respawn( gentity_t *ent ) {
+void ClientRespawn( gentity_t *ent ) {
 	gentity_t	*tent;
 
 	CopyToBodyQue (ent);
 	ClientSpawn(ent);
-
-#if 0 //#ifdef TA_SP // No teleport effect in Single Player
-    if (g_gametype.integer == GT_SINGLE_PLAYER)
-    {
-        return;
-    }
-#endif
-	// add a teleportation effect
-	tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
-	tent->s.clientNum = ent->s.clientNum;
 }
 
 /*
@@ -1423,7 +1411,6 @@ and on transition between teams, but doesn't happen on respawns
 void ClientBegin( int clientNum ) {
 	gentity_t	*ent;
 	gclient_t	*client;
-	gentity_t	*tent;
 	int			flags;
 #ifdef IOQ3ZTM
 	qboolean	firstTime;
@@ -1493,13 +1480,7 @@ void ClientBegin( int clientNum ) {
 	{
 #ifdef IOQ3ZTM
 		ent->flags &= FL_FIRST_TIME;
-#endif
-
-		// send event
-		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
-		tent->s.clientNum = ent->s.clientNum;
-
-#ifndef IOQ3ZTM
+#else
 		if ( g_gametype.integer != GT_TOURNAMENT  )
 #endif
 		{
@@ -1530,6 +1511,7 @@ void ClientSpawn(gentity_t *ent) {
 	clientSession_t		savedSess;
 	int		persistant[MAX_PERSISTANT];
 	gentity_t	*spawnPoint;
+	gentity_t *tent;
 	int		flags;
 	int		savedPing;
 //	char	*savedAreaBits;
@@ -1836,34 +1818,6 @@ void ClientSpawn(gentity_t *ent) {
 	trap_GetUsercmd( client - level.clients, &ent->client->pers.cmd );
 	SetClientViewAngle( ent, spawn_angles );
 
-	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
-
-	} else {
-#ifdef TURTLEARENA // POWERS
-		// Only kill box if client is solid.
-		if (!client->ps.powerups[PW_FLASHING])
-#endif
-		G_KillBox( ent );
-		trap_LinkEntity (ent);
-
-		// force the base weapon up
-#ifdef TA_WEAPSYS // ZTM: Set ready weapon to default weapon.
-		// ZTM: Start with default weapon.
-		client->ps.weapon = client->ps.stats[STAT_DEFAULTWEAPON];
-		// Set default hands.
-		client->ps.weaponHands = BG_WeaponHandsForWeaponNum(client->ps.stats[STAT_DEFAULTWEAPON]);
-#else
-#ifdef IOQ3ZTM // LASERTAG
-		if (g_laserTag.integer)
-			client->ps.weapon = WP_RAILGUN;
-		else
-#endif
-		client->ps.weapon = WP_MACHINEGUN;
-#endif
-		client->ps.weaponstate = WEAPON_READY;
-
-	}
-
 	// don't allow full run speed for a bit
 	client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 	client->ps.pm_time = 100;
@@ -1881,30 +1835,56 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.legsAnim = LEGS_IDLE;
 #endif
 
-	if ( level.intermissiontime ) {
-		MoveClientToIntermission( ent );
-	} else {
-		// fire the targets of the spawn point
-		G_UseTargets( spawnPoint, ent );
-
-#ifndef TA_WEAPSYS_EX
-		// select the highest weapon number available, after any
-		// spawn given items have fired
-#ifdef TA_WEAPSYS
-		for ( i = BG_NumWeaponGroups() - 1 ; i > 0 ; i-- )
+	if (!level.intermissiontime) {
+		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
+#ifdef TURTLEARENA // POWERS
+			// Only kill box if client is solid.
+			if (!client->ps.powerups[PW_FLASHING])
+#endif
+			G_KillBox(ent);
+			// force the base weapon up
+#ifdef TA_WEAPSYS // ZTM: Set ready weapon to default weapon.
+			client->ps.weapon = client->ps.stats[STAT_DEFAULTWEAPON];
+			client->ps.weaponHands = BG_WeaponHandsForWeaponNum(client->ps.stats[STAT_DEFAULTWEAPON]);
 #else
-		client->ps.weapon = 1;
-		for ( i = WP_NUM_WEAPONS - 1 ; i > 0 ; i-- )
+#ifdef IOQ3ZTM // LASERTAG
+			if (g_laserTag.integer)
+				client->ps.weapon = WP_RAILGUN;
+			else
 #endif
-		{
-			if ( client->ps.stats[STAT_WEAPONS] & ( 1 << i ) ) {
-				client->ps.weapon = i;
-				break;
-			}
-		}
+			client->ps.weapon = WP_MACHINEGUN;
 #endif
-	}
+			client->ps.weaponstate = WEAPON_READY;
+			// fire the targets of the spawn point
+			G_UseTargets(spawnPoint, ent);
+#ifndef TA_WEAPSYS_EX
+			// select the highest weapon number available, after any spawn given items have fired
+			client->ps.weapon = 1;
 
+#ifdef TA_WEAPSYS
+			for (i = BG_NumWeaponGroups() - 1 ; i > 0 ; i--)
+#else
+			for (i = WP_NUM_WEAPONS - 1 ; i > 0 ; i--)
+#endif
+			{
+				if (client->ps.stats[STAT_WEAPONS] & (1 << i)) {
+					client->ps.weapon = i;
+					break;
+				}
+			}
+#endif
+			// positively link the client, even if the command times are weird
+			VectorCopy(ent->client->ps.origin, ent->r.currentOrigin);
+
+			tent = G_TempEntity(ent->client->ps.origin, EV_PLAYER_TELEPORT_IN);
+			tent->s.clientNum = ent->s.clientNum;
+
+			trap_LinkEntity (ent);
+		}
+	} else {
+		// move players to intermission
+		MoveClientToIntermission(ent);
+	}
 	// run a client frame to drop exactly to the floor,
 	// initialize animations and other things
 	client->ps.commandTime = level.time - 100;

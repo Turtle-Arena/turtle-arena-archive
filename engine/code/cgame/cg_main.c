@@ -478,11 +478,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
 #endif
 #endif
-#ifdef IOQ3ZTM // IOQ3BUGFIX: fix updating cvar
 	{ &cg_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO },
-#else
-	{ &cg_synchronousClients, "g_synchronousClients", "0", 0 },	// communicated by systeminfo
-#endif
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 	{ &cg_redTeamName, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
@@ -520,13 +516,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_smoothClients, "cg_smoothClients", "0", CVAR_USERINFO | CVAR_ARCHIVE},
 	{ &cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT},
 
-#ifdef IOQ3ZTM // IOQ3BUGFIX: fix updating cvars
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO},
 	{ &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO},
-#else
-	{ &pmove_fixed, "pmove_fixed", "0", 0},
-	{ &pmove_msec, "pmove_msec", "8", 0},
-#endif
 	{ &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE},
 	{ &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE},
 	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
@@ -1357,6 +1348,10 @@ static void CG_RegisterGraphics( void ) {
 	}
 
 	if ( cgs.gametype == GT_OBELISK || cg_buildScript.integer ) {
+#ifdef TA_WEAPSYS
+		cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
+#endif
+		cgs.media.rocketExplosionShader = trap_R_RegisterShader("rocketExplosion");
 		cgs.media.overloadBaseModel = trap_R_RegisterModel( "models/powerups/overload_base.md3" );
 		cgs.media.overloadTargetModel = trap_R_RegisterModel( "models/powerups/overload_target.md3" );
 		cgs.media.overloadLightsModel = trap_R_RegisterModel( "models/powerups/overload_lights.md3" );
@@ -1459,24 +1454,10 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.missileHitShader[1] = trap_R_RegisterShader( "missileHit2" );
 #endif
 
-#ifdef TA_WEAPSYS
-#ifdef MISSIONPACK
-	// Load explosion model and shader for Obelisk death.
-	if ( cgs.gametype == GT_OBELISK || cg_buildScript.integer ) {
-		cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
-		cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
-	}
-#endif
-#else
+#ifndef TA_WEAPSYS
 	cgs.media.bulletFlashModel = trap_R_RegisterModel("models/weaphits/bullet.md3");
 	cgs.media.ringFlashModel = trap_R_RegisterModel("models/weaphits/ring02.md3");
 	cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
-#if defined IOQ3ZTM && defined MISSIONPACK
-	if ( cgs.gametype == GT_OBELISK || cg_buildScript.integer ) {
-		// Load explosion shader for Obelisk death.
-		cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
-	}
-#endif
 #endif
 #ifdef TURTLEARENA
 	cgs.media.teleportEffectModel = trap_R_RegisterModel( "models/misc/telep.md3" );
@@ -1804,7 +1785,7 @@ char *CG_GetMenuBuffer(const char *filename) {
 		return NULL;
 	}
 	if ( len >= MAX_MENUFILE ) {
-		trap_Print( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE ) );
+		trap_Print( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i\n", filename, len, MAX_MENUFILE ) );
 		trap_FS_FCloseFile( f );
 		return NULL;
 	}
@@ -2074,7 +2055,7 @@ void CG_LoadMenus(const char *menuFile) {
 	}
 
 	if ( len >= MAX_MENUDEFFILE ) {
-		trap_Error( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE ) );
+		trap_Error( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i\n", menuFile, len, MAX_MENUDEFFILE ) );
 		trap_FS_FCloseFile( f );
 		return;
 	}

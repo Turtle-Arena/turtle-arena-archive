@@ -1034,7 +1034,7 @@ void CL_InitKeyCommands( void );
 
 void CL_Init( void );
 void CL_Disconnect( qboolean showMainMenu );
-void CL_Shutdown(char *finalmsg, qboolean disconnect);
+void CL_Shutdown(char *finalmsg, qboolean disconnect, qboolean quit);
 void CL_Frame( int msec );
 qboolean CL_GameCommand( void );
 void CL_KeyEvent (int key, qboolean down, unsigned time);
@@ -1136,8 +1136,8 @@ void	Sys_Init (void);
 
 // general development dll loading for virtual machine testing
 #ifndef NO_NATIVE_SUPPORT
-void	* QDECL Sys_LoadDll( const char *name, intptr_t (QDECL **entryPoint)(int, ...),
-				  intptr_t (QDECL *systemcalls)(intptr_t, ...) );
+void	* QDECL Sys_LoadQVMDll( const char *name, intptr_t (QDECL **entryPoint)(int, ...),
+ 				  intptr_t (QDECL *systemcalls)(intptr_t, ...) );
 void	Sys_UnloadDll( void *dllHandle );
 #endif
 

@@ -689,9 +689,6 @@ qboolean fire_weapon(gentity_t *self, vec3_t start, vec3_t forward,
 qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir,
 		int weaponnum, float quadFactor, int handSide);
 #else
-#ifndef IOQ3ZTM // UNUSED
-gentity_t *fire_blaster (gentity_t *self, vec3_t start, vec3_t aimdir);
-#endif
 gentity_t *fire_plasma (gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_rocket (gentity_t *self, vec3_t start, vec3_t dir);
@@ -772,7 +769,7 @@ gentity_t *SelectSpawnPoint (gentity_t *ent, vec3_t origin, vec3_t angles, qbool
 gentity_t *SelectSpawnPoint (vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot);
 #endif
 void CopyToBodyQue( gentity_t *ent );
-void respawn (gentity_t *ent);
+void ClientRespawn(gentity_t *ent);
 void BeginIntermission (void);
 void InitClientPersistant (gclient_t *client);
 void InitClientResp (gclient_t *client);

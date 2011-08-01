@@ -345,7 +345,11 @@ qhandle_t RE_RegisterModel( const char *name ) {
 	}
 
 	if ( strlen( name ) >= MAX_QPATH ) {
+#ifdef RENDERLESS_MODELS
 		Com_Printf( "Model name exceeds MAX_QPATH\n" );
+#else
+		ri.Printf( PRINT_ALL, "Model name exceeds MAX_QPATH\n" );
+#endif
 		return 0;
 	}
 
@@ -1326,21 +1330,11 @@ void R_ModelInit( void ) {
 	mod->type = MOD_BAD;
 
 #ifdef TA_GAME_MODELS
-	// Models in game are no longer valid
-	if (Cvar_VariableValue("sv_running") && gvm)
-	{
-		int i;
-
-		for (i = 0; i < sv_maxclients->integer; i++)
-		{
-			if (svs.clients[i].state != CS_ACTIVE) {
-				continue;
-			}
-
-			// call prog code to reload player model
-			VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, i );
-		}
-	}
+#ifdef RENDERLESS_MODELS
+	SV_UpdateUserinfos();
+#else
+	ri.ServerUpdateUserinfos();
+#endif
 #endif
 }
 

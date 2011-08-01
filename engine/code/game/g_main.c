@@ -683,15 +683,11 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_Printf ("-----------------------------------\n");
 #endif
 
-	if( g_gametype.integer == GT_SINGLE_PLAYER || trap_Cvar_VariableIntegerValue( "com_buildScript" ) ) {
 #ifndef TA_SP
+	if( g_gametype.integer == GT_SINGLE_PLAYER || trap_Cvar_VariableIntegerValue( "com_buildScript" ) ) {
 		G_ModelIndex( SP_PODIUM_MODEL );
-#endif
-#ifndef IOQ3ZTM // MORE_PLAYER_SOUNDS
-		G_SoundIndex( "sound/player/gurp1.wav" );
-		G_SoundIndex( "sound/player/gurp2.wav" );
-#endif
 	}
+#endif
 
 	if ( trap_Cvar_VariableIntegerValue( "bot_enable" ) ) {
 		BotAISetup( restart );
@@ -1141,7 +1137,7 @@ void MoveClientToIntermission( gentity_t *ent ) {
 		StopFollowing( ent );
 	}
 
-
+	FindIntermissionPoint();
 	// move to the spot
 	VectorCopy( level.intermission_origin, ent->s.origin );
 	VectorCopy( level.intermission_origin, ent->client->ps.origin );
@@ -1213,7 +1209,23 @@ void BeginIntermission( void ) {
 	}
 
 	level.intermissiontime = level.time;
-	FindIntermissionPoint();
+
+	// move all clients to the intermission point
+	for (i=0 ; i< level.maxclients ; i++) {
+		client = g_entities + i;
+		if (!client->inuse)
+			continue;
+		// respawn if dead
+		if (client->health <= 0
+#ifdef TA_SP
+			&& g_gametype.integer != GT_SINGLE_PLAYER
+#endif
+			)
+		{
+			ClientRespawn(client);
+		}
+		MoveClientToIntermission( client );
+	}
 
 #ifdef TA_SP
 	// if custom game and not co-op
@@ -1232,26 +1244,6 @@ void BeginIntermission( void ) {
 		SpawnModelsOnVictoryPads();
 	}
 #endif
-
-
-	// move all clients to the intermission point
-	for (i=0 ; i< level.maxclients ; i++) {
-		client = g_entities + i;
-		if (!client->inuse)
-			continue;
-
-		// respawn if dead
-		if (client->health <= 0
-#ifdef TA_SP
-			&& g_gametype.integer != GT_SINGLE_PLAYER
-#endif
-			)
-		{
-			respawn(client);
-		}
-		MoveClientToIntermission( client );
-	}
-
 	// send the current scoring to all clients
 	SendScoreboardMessageToAllClients();
 

@@ -2934,12 +2934,21 @@ static void CG_DrawTeamVote(void) {
 	int		sec, cs_offset;
 	float	y;
 
-	if ( cgs.clientinfo->team == TEAM_RED )
+#ifdef TA_SPLITVIEW
+	if ( cgs.clientinfo[cg.cur_localClientNum].team == TEAM_RED )
 		cs_offset = 0;
-	else if ( cgs.clientinfo->team == TEAM_BLUE )
+	else if ( cgs.clientinfo[cg.cur_localClientNum].team == TEAM_BLUE )
 		cs_offset = 1;
 	else
 		return;
+#else
+	if ( cgs.clientinfo[cg.clientNum].team == TEAM_RED )
+		cs_offset = 0;
+	else if ( cgs.clientinfo[cg.clientNum].team == TEAM_BLUE )
+		cs_offset = 1;
+	else
+		return;
+#endif
 
 	if ( !cgs.teamVoteTime[cs_offset] ) {
 		return;
