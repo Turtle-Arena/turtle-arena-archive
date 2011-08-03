@@ -1559,7 +1559,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 	}
 
 	if ( Q_stricmp (cmd, "sp_complete") == 0 ) {
-		trap_Cvar_Set( "com_errorMessage", "Game Complete!" );
+		trap_Cvar_Set( "com_errorMessage", "Completed single player platformer test!" );
 		return qtrue;
 	}
 
