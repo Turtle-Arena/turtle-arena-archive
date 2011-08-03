@@ -1604,6 +1604,18 @@ static void SV_VerifyPaks_f( client_t *cl ) {
 
 		if (bGood) {
 			cl->pureAuthentic = 1;
+
+#ifdef TA_SPLITVIEW
+			// Copy pure info to extra local clients
+			for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+				if (cl->local_clients[i] == -1) {
+					continue;
+				}
+
+				svs.clients[cl->local_clients[i]].gotCP = qtrue;
+				svs.clients[cl->local_clients[i]].pureAuthentic = 1;
+			}
+#endif
 		} 
 		else {
 			cl->pureAuthentic = 0;
