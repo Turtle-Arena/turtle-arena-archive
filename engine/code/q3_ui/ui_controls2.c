@@ -65,8 +65,15 @@ typedef struct
 #define C_LOOKING		1
 #define C_WEAPONS		2
 #define C_MISC			3
+#ifdef IOQ3ZTM // NEW_CAM
+#define C_CAMERA		4
+#endif
 #ifndef TA_SPLITVIEW
+#ifdef IOQ3ZTM // NEW_CAM
+#define C_MAX			5
+#else
 #define C_MAX			4
+#endif
 #endif
 
 #define ID_MOVEMENT		100
@@ -77,6 +84,9 @@ typedef struct
 #define ID_BACK			105
 #define ID_SAVEANDEXIT	106
 #define ID_EXIT			107
+#ifdef IOQ3ZTM // NEW_CAM
+#define ID_CAMERA		108
+#endif
 
 // bindable actions
 enum {
@@ -134,12 +144,22 @@ enum {
 #ifdef TA_MISC // DROP_FLAG
 	ID_DROPFLAG,
 #endif
+#ifdef IOQ3ZTM // NEW_CAM
+	ID_CAMRESET,
+	ID_CAMTOGGLE,
+	ID_CAMRIGHT,
+	ID_CAMLEFT,
+	ID_CAMZOOMIN,
+	ID_CAMZOOMOUT,
+#endif
 	ID_FREELOOK,
 	ID_INVERTMOUSE,
 #ifndef TURTLEARENA // ALWAYS_RUN
 	ID_ALWAYSRUN,
 #endif
+#ifndef TA_WEAPSYS_EX
 	ID_AUTOSWITCH,
+#endif
 	ID_MOUSESPEED,
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
 	ID_SELECTJOY,
@@ -192,6 +212,9 @@ typedef struct
 	menutext_s			looking;
 	menutext_s			weapons;
 	menutext_s			misc;
+#ifdef IOQ3ZTM // NEW_CAM
+	menutext_s			camera;
+#endif
 #ifdef IOQ3ZTM
 	menutext_s			defaults;
 #endif
@@ -262,6 +285,14 @@ typedef struct
 	menuaction_s		chat2;
 	menuaction_s		chat3;
 	menuaction_s		chat4;
+#ifdef IOQ3ZTM // NEW_CAM
+	menuaction_s		camreset;
+	menuaction_s		camtoggle;
+	menuaction_s		camright;
+	menuaction_s		camleft;
+	menuaction_s		camzoomin;
+	menuaction_s		camzoomout;
+#endif
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
 	menutext_s			selectjoy;
 #else
@@ -378,6 +409,14 @@ static bind_t g_bindings[] =
 #ifdef TA_MISC // DROP_FLAG
 	{"dropflag",		"drop flag",		ID_DROPFLAG,	ANIM_IDLE,		'f',			'\'',	-1, -1},
 #endif
+#ifdef IOQ3ZTM // NEW_CAM
+	{"camreset",		"Reset camera",		ID_CAMRESET,	ANIM_IDLE,		K_KP_5,			-1,		-1, -1},
+	{"toggle cg_thirdperson","Toggle third person",ID_CAMTOGGLE,ANIM_IDLE,	K_KP_HOME,		-1,		-1, -1},
+	{"+camright",		"Turn camera right",ID_CAMRIGHT,	ANIM_IDLE,		K_KP_RIGHTARROW,-1,		-1, -1},
+	{"+camleft",		"Turn camera left",	ID_CAMLEFT,		ANIM_IDLE,		K_KP_LEFTARROW,	-1,		-1, -1},
+	{"+camZoomIn",		"Zoom in",			ID_CAMZOOMIN,	ANIM_IDLE,		K_KP_UPARROW,	-1,		-1, -1},
+	{"+camZoomOut",		"Zoom out",			ID_CAMZOOMOUT,	ANIM_IDLE,		K_KP_DOWNARROW,	-1,		-1, -1},
+#endif
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
 };
 
@@ -440,6 +479,14 @@ static bind_t g_bindings2[] =
 #ifdef TA_MISC // DROP_FLAG
 	MINIBIND(ID_DROPFLAG, -1, -1),
 #endif
+#ifdef IOQ3ZTM // NEW_CAM
+	MINIBIND(ID_CAMRESET, -1, -1),
+	MINIBIND(ID_CAMTOGGLE, -1, -1),
+	MINIBIND(ID_CAMRIGHT, -1, -1),
+	MINIBIND(ID_CAMLEFT, -1, -1),
+	MINIBIND(ID_CAMZOOMIN, -1, -1),
+	MINIBIND(ID_CAMZOOMOUT, -1, -1),
+#endif
 	MINIBIND(0, -1, -1),
 };
 
@@ -499,6 +546,14 @@ static bind_t g_bindings3[] =
 #ifdef TA_MISC // DROP_FLAG
 	MINIBIND(ID_DROPFLAG, -1, -1),
 #endif
+#ifdef IOQ3ZTM // NEW_CAM
+	MINIBIND(ID_CAMRESET, -1, -1),
+	MINIBIND(ID_CAMTOGGLE, -1, -1),
+	MINIBIND(ID_CAMRIGHT, -1, -1),
+	MINIBIND(ID_CAMLEFT, -1, -1),
+	MINIBIND(ID_CAMZOOMIN, -1, -1),
+	MINIBIND(ID_CAMZOOMOUT, -1, -1),
+#endif
 	MINIBIND(0, -1, -1),
 };
 
@@ -557,6 +612,14 @@ static bind_t g_bindings4[] =
 #endif
 #ifdef TA_MISC // DROP_FLAG
 	MINIBIND(ID_DROPFLAG, -1, -1),
+#endif
+#ifdef IOQ3ZTM // NEW_CAM
+	MINIBIND(ID_CAMRESET, -1, -1),
+	MINIBIND(ID_CAMTOGGLE, -1, -1),
+	MINIBIND(ID_CAMRIGHT, -1, -1),
+	MINIBIND(ID_CAMLEFT, -1, -1),
+	MINIBIND(ID_CAMZOOMIN, -1, -1),
+	MINIBIND(ID_CAMZOOMOUT, -1, -1),
 #endif
 	MINIBIND(0, -1, -1),
 };
@@ -695,11 +758,26 @@ static menucommon_s *g_misc_controls[] = {
 	NULL,
 };
 
+#ifdef IOQ3ZTM // NEW_CAMERA
+static menucommon_s *g_camera_controls[] = {
+	(menucommon_s *)&s_controls.camreset,
+	(menucommon_s *)&s_controls.camtoggle,
+	(menucommon_s *)&s_controls.camright,
+	(menucommon_s *)&s_controls.camleft,
+	(menucommon_s *)&s_controls.camzoomin,
+	(menucommon_s *)&s_controls.camzoomout,
+	NULL,
+};
+#endif
+
 static menucommon_s **g_controls[] = {
 	g_movement_controls,
 	g_looking_controls,
 	g_weapons_controls,
 	g_misc_controls,
+#ifdef IOQ3ZTM // NEW_CAMERA
+	g_camera_controls,
+#endif
 #ifdef TA_SPLITVIEW
 	NULL,
 #endif
@@ -757,6 +835,9 @@ static menucommon_s **g_mini_controls[] = {
 	g_looking_mini_controls,
 	g_weapons_controls,
 	g_misc_mini_controls,
+#ifdef IOQ3ZTM // NEW_CAMERA
+	g_camera_controls,
+#endif
 	g_unused_controls, // dummy controls that are not used but are disabled so they are not seen.
 	NULL
 };
@@ -1065,11 +1146,17 @@ static void Controls_Update( void ) {
 	s_controls.movement.generic.flags &= ~(QMF_GRAYED|QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
 	s_controls.weapons.generic.flags  &= ~(QMF_GRAYED|QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
 	s_controls.misc.generic.flags     &= ~(QMF_GRAYED|QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
+#ifdef IOQ3ZTM // NEW_CAM
+	s_controls.camera.generic.flags     &= ~(QMF_GRAYED|QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
+#endif
 
 	s_controls.looking.generic.flags  |= QMF_PULSEIFFOCUS;
 	s_controls.movement.generic.flags |= QMF_PULSEIFFOCUS;
 	s_controls.weapons.generic.flags  |= QMF_PULSEIFFOCUS;
 	s_controls.misc.generic.flags     |= QMF_PULSEIFFOCUS;
+#ifdef IOQ3ZTM // NEW_CAM
+	s_controls.camera.generic.flags     |= QMF_PULSEIFFOCUS;
+#endif
 
 	// set buttons
 	switch( s_controls.section ) {
@@ -1092,6 +1179,13 @@ static void Controls_Update( void ) {
 		s_controls.misc.generic.flags &= ~QMF_PULSEIFFOCUS;
 		s_controls.misc.generic.flags |= (QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
 		break;
+
+#ifdef IOQ3ZTM // NEW_CAM
+	case C_CAMERA:
+		s_controls.camera.generic.flags &= ~QMF_PULSEIFFOCUS;
+		s_controls.camera.generic.flags |= (QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
+		break;
+#endif
 	}
 }
 
@@ -1751,6 +1845,16 @@ static void Controls_MenuEvent( void* ptr, int event )
 			}
 			break;
 
+#ifdef IOQ3ZTM // NEW_CAM
+		case ID_CAMERA:
+			if (event == QM_ACTIVATED)
+			{
+				s_controls.section = C_CAMERA; 
+				Controls_Update();
+			}
+			break;
+#endif
+
 		case ID_DEFAULTS:
 			if (event == QM_ACTIVATED)
 			{
@@ -1910,6 +2014,7 @@ static void Controls_MenuInit( void )
 #endif
 {
 	static char playername[32];
+	int			y;
 
 	// zero set all our globals
 	memset( &s_controls, 0 ,sizeof(controls_t) );
@@ -1963,32 +2068,40 @@ static void Controls_MenuInit( void )
 	s_controls.framer.width  	    = 256;
 	s_controls.framer.height  	    = 334;
 
+#ifdef IOQ3ZTM // NEW_CAM
+	y = 240 - 2.5f * PROP_HEIGHT;
+#else
+	y = 240 - 2 * PROP_HEIGHT;
+#endif
+
 	s_controls.looking.generic.type     = MTYPE_PTEXT;
 	s_controls.looking.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_controls.looking.generic.id	    = ID_LOOKING;
 	s_controls.looking.generic.callback	= Controls_MenuEvent;
 	s_controls.looking.generic.x	    = 152;
-	s_controls.looking.generic.y	    = 240 - 2 * PROP_HEIGHT;
+	s_controls.looking.generic.y	    = y;
 	s_controls.looking.string			= "LOOK";
 	s_controls.looking.style			= UI_RIGHT;
 	s_controls.looking.color			= text_big_color;
 
+	y += PROP_HEIGHT;
 	s_controls.movement.generic.type     = MTYPE_PTEXT;
 	s_controls.movement.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_controls.movement.generic.id	     = ID_MOVEMENT;
 	s_controls.movement.generic.callback = Controls_MenuEvent;
 	s_controls.movement.generic.x	     = 152;
-	s_controls.movement.generic.y	     = 240 - PROP_HEIGHT;
+	s_controls.movement.generic.y	     = y;
 	s_controls.movement.string			= "MOVE";
 	s_controls.movement.style			= UI_RIGHT;
 	s_controls.movement.color			= text_big_color;
 
+	y += PROP_HEIGHT;
 	s_controls.weapons.generic.type	    = MTYPE_PTEXT;
 	s_controls.weapons.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_controls.weapons.generic.id	    = ID_WEAPONS;
 	s_controls.weapons.generic.callback	= Controls_MenuEvent;
 	s_controls.weapons.generic.x	    = 152;
-	s_controls.weapons.generic.y	    = 240;
+	s_controls.weapons.generic.y	    = y;
 #ifdef TURTLEARENA
 	s_controls.weapons.string			= "ATTACK";
 #else
@@ -1997,23 +2110,38 @@ static void Controls_MenuInit( void )
 	s_controls.weapons.style			= UI_RIGHT;
 	s_controls.weapons.color			= text_big_color;
 
+	y += PROP_HEIGHT;
 	s_controls.misc.generic.type	 = MTYPE_PTEXT;
 	s_controls.misc.generic.flags    = QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_controls.misc.generic.id	     = ID_MISC;
 	s_controls.misc.generic.callback = Controls_MenuEvent;
 	s_controls.misc.generic.x		 = 152;
-	s_controls.misc.generic.y		 = 240 + PROP_HEIGHT;
+	s_controls.misc.generic.y		 = y;
 	s_controls.misc.string			= "MISC";
 	s_controls.misc.style			= UI_RIGHT;
 	s_controls.misc.color			= text_big_color;
 
+#ifdef IOQ3ZTM // NEW_CAM
+	y += PROP_HEIGHT;
+	s_controls.camera.generic.type		= MTYPE_PTEXT;
+	s_controls.camera.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_controls.camera.generic.id		= ID_CAMERA;
+	s_controls.camera.generic.callback	= Controls_MenuEvent;
+	s_controls.camera.generic.x			= 152;
+	s_controls.camera.generic.y			= y;
+	s_controls.camera.string			= "CAMERA";
+	s_controls.camera.style				= UI_RIGHT;
+	s_controls.camera.color				= text_big_color;
+#endif
+
 #ifdef IOQ3ZTM
+	y += PROP_HEIGHT;
 	s_controls.defaults.generic.type		= MTYPE_PTEXT;
 	s_controls.defaults.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_controls.defaults.generic.id			= ID_DEFAULTS;
 	s_controls.defaults.generic.callback	= Controls_MenuEvent;
 	s_controls.defaults.generic.x			= 152;
-	s_controls.defaults.generic.y			= 240 + 2*PROP_HEIGHT;
+	s_controls.defaults.generic.y			= y;
 	s_controls.defaults.string				= "RESET";
 	s_controls.defaults.style				= UI_RIGHT;
 	s_controls.defaults.color				= text_big_color;
@@ -2340,6 +2468,44 @@ static void Controls_MenuInit( void )
 	s_controls.chat4.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.chat4.generic.id        = ID_CHAT4;
 
+#ifdef IOQ3ZTM // NEW_CAM
+	s_controls.camreset.generic.type	  = MTYPE_ACTION;
+	s_controls.camreset.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.camreset.generic.callback  = Controls_ActionEvent;
+	s_controls.camreset.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.camreset.generic.id        = ID_CAMRESET;
+
+	s_controls.camtoggle.generic.type      = MTYPE_ACTION;
+	s_controls.camtoggle.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.camtoggle.generic.callback  = Controls_ActionEvent;
+	s_controls.camtoggle.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.camtoggle.generic.id        = ID_CAMTOGGLE;
+
+	s_controls.camright.generic.type      = MTYPE_ACTION;
+	s_controls.camright.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.camright.generic.callback  = Controls_ActionEvent;
+	s_controls.camright.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.camright.generic.id        = ID_CAMRIGHT;
+
+	s_controls.camleft.generic.type      = MTYPE_ACTION;
+	s_controls.camleft.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.camleft.generic.callback  = Controls_ActionEvent;
+	s_controls.camleft.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.camleft.generic.id        = ID_CAMLEFT;
+
+	s_controls.camzoomin.generic.type      = MTYPE_ACTION;
+	s_controls.camzoomin.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.camzoomin.generic.callback  = Controls_ActionEvent;
+	s_controls.camzoomin.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.camzoomin.generic.id        = ID_CAMZOOMIN;
+
+	s_controls.camzoomout.generic.type      = MTYPE_ACTION;
+	s_controls.camzoomout.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.camzoomout.generic.callback  = Controls_ActionEvent;
+	s_controls.camzoomout.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.camzoomout.generic.id        = ID_CAMZOOMOUT;
+#endif
+
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
 	s_controls.selectjoy.generic.type		= MTYPE_PTEXT;
 	s_controls.selectjoy.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -2388,6 +2554,9 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.movement );
 	Menu_AddItem( &s_controls.menu, &s_controls.weapons );
 	Menu_AddItem( &s_controls.menu, &s_controls.misc );
+#ifdef IOQ3ZTM // NEW_CAM
+	Menu_AddItem( &s_controls.menu, &s_controls.camera );
+#endif
 #ifdef IOQ3ZTM
 	Menu_AddItem( &s_controls.menu, &s_controls.defaults );
 #endif
@@ -2461,6 +2630,14 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.chat2 );
 	Menu_AddItem( &s_controls.menu, &s_controls.chat3 );
 	Menu_AddItem( &s_controls.menu, &s_controls.chat4 );
+#ifdef IOQ3ZTM // NEW_CAM
+	Menu_AddItem( &s_controls.menu, &s_controls.camreset );
+	Menu_AddItem( &s_controls.menu, &s_controls.camtoggle );
+	Menu_AddItem( &s_controls.menu, &s_controls.camright );
+	Menu_AddItem( &s_controls.menu, &s_controls.camleft );
+	Menu_AddItem( &s_controls.menu, &s_controls.camzoomin );
+	Menu_AddItem( &s_controls.menu, &s_controls.camzoomout );
+#endif
 
 	Menu_AddItem( &s_controls.menu, &s_controls.back );
 
