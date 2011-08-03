@@ -242,13 +242,14 @@ void CG_Respawn( int clientNum ) {
 		cg.localClients[i].holdableSelect = cg.snap->pss[cg.snap->lcIndex[i]].holdableIndex;
 #endif
 #ifdef IOQ3ZTM // NEW_CAM
+		cg.localClients[i].camZoomDir = 0;
+		cg.localClients[i].camZoomIn = qfalse;
+		cg.localClients[i].camZoomOut = qfalse;
 		cg.localClients[i].camRotDir = 0;
 		cg.localClients[i].camLeft = qfalse;
 		cg.localClients[i].camRight = qfalse;
 		cg.localClients[i].camReseting = qfalse;
-#ifdef TURTLEARENA // CAMERA
 		cg.localClients[i].camDistance = 0;
-#endif
 #endif
 	}
 }
@@ -268,13 +269,14 @@ void CG_Respawn( void ) {
 	cg.localClient.holdableSelect = cg.snap->ps.holdableIndex;
 #endif
 #ifdef IOQ3ZTM // NEW_CAM
+	cg.localClient.camZoomDir = 0;
+	cg.localClient.camZoomIn = qfalse;
+	cg.localClient.camZoomOut = qfalse;
 	cg.localClient.camRotDir = 0;
 	cg.localClient.camLeft = qfalse;
 	cg.localClient.camRight = qfalse;
 	cg.localClient.camReseting = qfalse;
-#ifdef TURTLEARENA // CAMERA
 	cg.localClient.camDistance = 0;
-#endif
 #endif
 }
 #endif
