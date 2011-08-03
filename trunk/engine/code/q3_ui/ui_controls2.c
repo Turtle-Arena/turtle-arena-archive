@@ -144,6 +144,12 @@ enum {
 #ifdef TA_MISC // DROP_FLAG
 	ID_DROPFLAG,
 #endif
+#ifdef IOQ3ZTM
+	ID_VOTEYES,
+	ID_VOTENO,
+	ID_FOLLOWPLAYER,
+	ID_TAKESCREENSHOT,
+#endif
 #ifdef IOQ3ZTM // NEW_CAM
 	ID_CAMRESET,
 	ID_CAMTOGGLE,
@@ -285,6 +291,12 @@ typedef struct
 	menuaction_s		chat2;
 	menuaction_s		chat3;
 	menuaction_s		chat4;
+#ifdef IOQ3ZTM
+	menuaction_s		voteYes;
+	menuaction_s		voteNo;
+	menuaction_s		followPlayer;
+	menuaction_s		takeScreenshot;
+#endif
 #ifdef IOQ3ZTM // NEW_CAM
 	menuaction_s		camreset;
 	menuaction_s		camtoggle;
@@ -409,13 +421,19 @@ static bind_t g_bindings[] =
 #ifdef TA_MISC // DROP_FLAG
 	{"dropflag",		"drop flag",		ID_DROPFLAG,	ANIM_IDLE,		'f',			'\'',	-1, -1},
 #endif
+#ifdef IOQ3ZTM
+	{"vote yes",		"vote yes",			ID_VOTEYES,		ANIM_IDLE,		K_F1,			-1,		-1, -1},
+	{"vote no",			"vote no",			ID_VOTENO,		ANIM_IDLE,		K_F2,			-1,		-1, -1},
+	{"follownext",		"view another player",ID_FOLLOWPLAYER,ANIM_IDLE,	K_F12,			-1,		-1, -1},
+	{"screenshot",		"take screenshot",	ID_TAKESCREENSHOT,ANIM_IDLE,	K_F11,			-1,		-1, -1},
+#endif
 #ifdef IOQ3ZTM // NEW_CAM
-	{"camreset",		"Reset camera",		ID_CAMRESET,	ANIM_IDLE,		K_KP_5,			-1,		-1, -1},
-	{"toggle cg_thirdperson","Toggle third person",ID_CAMTOGGLE,ANIM_IDLE,	K_KP_HOME,		-1,		-1, -1},
-	{"+camright",		"Turn camera right",ID_CAMRIGHT,	ANIM_IDLE,		K_KP_RIGHTARROW,-1,		-1, -1},
-	{"+camleft",		"Turn camera left",	ID_CAMLEFT,		ANIM_IDLE,		K_KP_LEFTARROW,	-1,		-1, -1},
-	{"+camZoomIn",		"Zoom in",			ID_CAMZOOMIN,	ANIM_IDLE,		K_KP_UPARROW,	-1,		-1, -1},
-	{"+camZoomOut",		"Zoom out",			ID_CAMZOOMOUT,	ANIM_IDLE,		K_KP_DOWNARROW,	-1,		-1, -1},
+	{"camreset",		"reset camera",		ID_CAMRESET,	ANIM_IDLE,		K_KP_5,			-1,		-1, -1},
+	{"toggle cg_thirdperson","toggle third person",ID_CAMTOGGLE,ANIM_IDLE,	K_KP_HOME,		-1,		-1, -1},
+	{"+camright",		"turn camera right",ID_CAMRIGHT,	ANIM_IDLE,		K_KP_RIGHTARROW,-1,		-1, -1},
+	{"+camleft",		"turn camera left",	ID_CAMLEFT,		ANIM_IDLE,		K_KP_LEFTARROW,	-1,		-1, -1},
+	{"+camZoomIn",		"zoom in",			ID_CAMZOOMIN,	ANIM_IDLE,		K_KP_UPARROW,	-1,		-1, -1},
+	{"+camZoomOut",		"zoom out",			ID_CAMZOOMOUT,	ANIM_IDLE,		K_KP_DOWNARROW,	-1,		-1, -1},
 #endif
 	{(char*)NULL,		(char*)NULL,		0,				0,				-1,				-1,		-1,	-1},
 };
@@ -478,6 +496,12 @@ static bind_t g_bindings2[] =
 #endif
 #ifdef TA_MISC // DROP_FLAG
 	MINIBIND(ID_DROPFLAG, -1, -1),
+#endif
+#ifdef IOQ3ZTM
+	MINIBIND(ID_VOTEYES, -1, -1),
+	MINIBIND(ID_VOTENO, -1, -1),
+	MINIBIND(ID_FOLLOWPLAYER, -1, -1),
+	MINIBIND(ID_TAKESCREENSHOT, -1, -1),
 #endif
 #ifdef IOQ3ZTM // NEW_CAM
 	MINIBIND(ID_CAMRESET, -1, -1),
@@ -546,6 +570,12 @@ static bind_t g_bindings3[] =
 #ifdef TA_MISC // DROP_FLAG
 	MINIBIND(ID_DROPFLAG, -1, -1),
 #endif
+#ifdef IOQ3ZTM
+	MINIBIND(ID_VOTEYES, -1, -1),
+	MINIBIND(ID_VOTENO, -1, -1),
+	MINIBIND(ID_FOLLOWPLAYER, -1, -1),
+	MINIBIND(ID_TAKESCREENSHOT, -1, -1),
+#endif
 #ifdef IOQ3ZTM // NEW_CAM
 	MINIBIND(ID_CAMRESET, -1, -1),
 	MINIBIND(ID_CAMTOGGLE, -1, -1),
@@ -612,6 +642,12 @@ static bind_t g_bindings4[] =
 #endif
 #ifdef TA_MISC // DROP_FLAG
 	MINIBIND(ID_DROPFLAG, -1, -1),
+#endif
+#ifdef IOQ3ZTM
+	MINIBIND(ID_VOTEYES, -1, -1),
+	MINIBIND(ID_VOTENO, -1, -1),
+	MINIBIND(ID_FOLLOWPLAYER, -1, -1),
+	MINIBIND(ID_TAKESCREENSHOT, -1, -1),
 #endif
 #ifdef IOQ3ZTM // NEW_CAM
 	MINIBIND(ID_CAMRESET, -1, -1),
@@ -716,6 +752,16 @@ static menucommon_s *g_weapons_controls[] = {
 	(menucommon_s *)&s_controls.plasma,           
 	(menucommon_s *)&s_controls.bfg,              
 #endif
+#ifdef TA_MISC // DROP_FLAG
+	(menucommon_s *)&s_controls.dropflag,
+#endif
+#ifdef TA_MISC
+	(menucommon_s *)&s_controls.useitem,
+#endif
+#ifdef TA_HOLDSYS/*2*/
+	(menucommon_s *)&s_controls.nextitem,
+	(menucommon_s *)&s_controls.previtem,
+#endif
 	NULL,
 };
 
@@ -742,19 +788,20 @@ static menucommon_s *g_looking_controls[] = {
 
 static menucommon_s *g_misc_controls[] = {
 	(menucommon_s *)&s_controls.showscores, 
-#ifdef TA_MISC // DROP_FLAG
-	(menucommon_s *)&s_controls.dropflag,
-#endif
+#ifndef TA_MISC
 	(menucommon_s *)&s_controls.useitem,
-#ifdef TA_HOLDSYS/*2*/
-	(menucommon_s *)&s_controls.nextitem,
-	(menucommon_s *)&s_controls.previtem,
 #endif
 	(menucommon_s *)&s_controls.gesture,
 	(menucommon_s *)&s_controls.chat,
 	(menucommon_s *)&s_controls.chat2,
 	(menucommon_s *)&s_controls.chat3,
 	(menucommon_s *)&s_controls.chat4,
+#ifdef IOQ3ZTM
+	(menucommon_s *)&s_controls.voteYes,
+	(menucommon_s *)&s_controls.voteNo,
+	(menucommon_s *)&s_controls.followPlayer,
+	(menucommon_s *)&s_controls.takeScreenshot,
+#endif
 	NULL,
 };
 
@@ -801,15 +848,15 @@ static menucommon_s *g_looking_mini_controls[] = {
 };
 
 static menucommon_s *g_misc_mini_controls[] = {
-#ifdef TA_MISC // DROP_FLAG
-	(menucommon_s *)&s_controls.dropflag,
-#endif
+#ifndef TA_MISC
 	(menucommon_s *)&s_controls.useitem,
-#ifdef TA_HOLDSYS/*2*/
-	(menucommon_s *)&s_controls.nextitem,
-	(menucommon_s *)&s_controls.previtem,
 #endif
 	(menucommon_s *)&s_controls.gesture,
+#ifdef IOQ3ZTM
+	(menucommon_s *)&s_controls.voteYes,
+	(menucommon_s *)&s_controls.voteNo,
+	(menucommon_s *)&s_controls.followPlayer,
+#endif
 	NULL,
 };
 
@@ -827,6 +874,9 @@ static menucommon_s *g_unused_controls[] = {
 	(menucommon_s *)&s_controls.chat2,
 	(menucommon_s *)&s_controls.chat3,
 	(menucommon_s *)&s_controls.chat4,
+#ifdef IOQ3ZTM
+	(menucommon_s *)&s_controls.takeScreenshot,
+#endif
 	NULL,
 };
 
@@ -2102,8 +2152,8 @@ static void Controls_MenuInit( void )
 	s_controls.weapons.generic.callback	= Controls_MenuEvent;
 	s_controls.weapons.generic.x	    = 152;
 	s_controls.weapons.generic.y	    = y;
-#ifdef TURTLEARENA
-	s_controls.weapons.string			= "ATTACK";
+#ifdef TA_MISC
+	s_controls.weapons.string			= "ITEMS";
 #else
 	s_controls.weapons.string			= "SHOOT";
 #endif
@@ -2468,6 +2518,32 @@ static void Controls_MenuInit( void )
 	s_controls.chat4.generic.ownerdraw = Controls_DrawKeyBinding;
 	s_controls.chat4.generic.id        = ID_CHAT4;
 
+#ifdef IOQ3ZTM
+	s_controls.voteYes.generic.type	     = MTYPE_ACTION;
+	s_controls.voteYes.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.voteYes.generic.callback  = Controls_ActionEvent;
+	s_controls.voteYes.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.voteYes.generic.id        = ID_VOTEYES;
+
+	s_controls.voteNo.generic.type	    = MTYPE_ACTION;
+	s_controls.voteNo.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.voteNo.generic.callback  = Controls_ActionEvent;
+	s_controls.voteNo.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.voteNo.generic.id        = ID_VOTENO;
+
+	s_controls.followPlayer.generic.type	  = MTYPE_ACTION;
+	s_controls.followPlayer.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.followPlayer.generic.callback  = Controls_ActionEvent;
+	s_controls.followPlayer.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.followPlayer.generic.id        = ID_FOLLOWPLAYER;
+
+	s_controls.takeScreenshot.generic.type	    = MTYPE_ACTION;
+	s_controls.takeScreenshot.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
+	s_controls.takeScreenshot.generic.callback  = Controls_ActionEvent;
+	s_controls.takeScreenshot.generic.ownerdraw = Controls_DrawKeyBinding;
+	s_controls.takeScreenshot.generic.id        = ID_TAKESCREENSHOT;
+#endif
+
 #ifdef IOQ3ZTM // NEW_CAM
 	s_controls.camreset.generic.type	  = MTYPE_ACTION;
 	s_controls.camreset.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
@@ -2630,6 +2706,12 @@ static void Controls_MenuInit( void )
 	Menu_AddItem( &s_controls.menu, &s_controls.chat2 );
 	Menu_AddItem( &s_controls.menu, &s_controls.chat3 );
 	Menu_AddItem( &s_controls.menu, &s_controls.chat4 );
+#ifdef IOQ3ZTM
+	Menu_AddItem( &s_controls.menu, &s_controls.voteYes );
+	Menu_AddItem( &s_controls.menu, &s_controls.voteNo );
+	Menu_AddItem( &s_controls.menu, &s_controls.followPlayer );
+	Menu_AddItem( &s_controls.menu, &s_controls.takeScreenshot );
+#endif
 #ifdef IOQ3ZTM // NEW_CAM
 	Menu_AddItem( &s_controls.menu, &s_controls.camreset );
 	Menu_AddItem( &s_controls.menu, &s_controls.camtoggle );
