@@ -290,6 +290,12 @@ static void CG_CalcVrect (void) {
 //==============================================================================
 
 #ifdef IOQ3ZTM // NEW_CAM
+#ifdef TURTLEARENA // FOV
+#define DEFAULT_CAM_DIST 120
+#else
+#define DEFAULT_CAM_DIST 40
+#endif
+
 /*
 =================
 CG_CamUpdate
@@ -299,14 +305,24 @@ Update camera.
 */
 void CG_CamUpdate(void)
 {
-	float angle;
+	qboolean thirdPerson;
+	float angle, dist;
 	float f = ((float)cg.frametime) / 1000;
+	qboolean angleReset, distReset;
 
 #ifdef TA_SPLITVIEW
+	thirdPerson = (cg_thirdPerson[cg.cur_localClientNum].value != 0);
 	angle = cg_thirdPersonAngle[cg.cur_localClientNum].value;
+	dist = cg_thirdPersonRange[cg.cur_localClientNum].value;
 #else
+	thirdPerson = (cg_thirdPerson.value != 0);
 	angle = cg_thirdPersonAngle.value;
+	dist = cg_thirdPersonRange.value;
 #endif
+
+	if (!cg.cur_lc->camDistance) {
+		cg.cur_lc->camDistance = dist;
+	}
 
 	if (cg_cameraOrbit.integer) {
 		// cg_cameraOrbit holds angle to move in one second
@@ -315,24 +331,36 @@ void CG_CamUpdate(void)
 
 	if (cg.cur_lc->camReseting)
 	{
-		float speed = 120.0f * f;
+		float speed = 200.0f * f;
 
-		if (angle >= 360 - speed || angle <= speed)
-		{
+		angleReset = (angle >= 360 - speed || angle <= speed);
+		if (angleReset) {
 			angle = 0;
 			cg.cur_lc->camRotDir = 0;
-			cg.cur_lc->camReseting = qfalse;
-		}
-		else if (angle > 180)
+		} else if (angle > 180) {
 			angle += speed;
-		else if (angle > speed)
+		} else if (angle > speed) {
 			angle -= speed;
+		}
+
+		distReset = (dist >= DEFAULT_CAM_DIST - speed && dist <= DEFAULT_CAM_DIST + speed);
+		if (distReset) {
+			dist = DEFAULT_CAM_DIST;
+			cg.cur_lc->camZoomDir = 0;
+		} else if (dist < DEFAULT_CAM_DIST) {
+			dist += speed;
+		} else if (dist > DEFAULT_CAM_DIST) {
+			dist -= speed;
+		}
 	}
 	else
 	{
-		float speed1x = 30.0f * f;
+		float speed1x = 200.0f * f;
 		float speed2x = speed1x * 2.0f;
 
+		angleReset = distReset = qfalse;
+
+		// Spin
 		if (cg.cur_lc->camLeft)
 			cg.cur_lc->camRotDir += speed2x;
 		else if (cg.cur_lc->camRotDir >= speed1x)
@@ -353,79 +381,90 @@ void CG_CamUpdate(void)
 			cg.cur_lc->camRotDir = -100;
 
 		angle += cg.cur_lc->camRotDir * f;
+
+		// Zoom
+		if (cg.cur_lc->camZoomOut)
+			cg.cur_lc->camZoomDir += speed2x;
+		else if (cg.cur_lc->camZoomDir >= speed1x)
+			cg.cur_lc->camZoomDir -= speed1x;
+
+		if (cg.cur_lc->camZoomIn)
+			cg.cur_lc->camZoomDir -= speed2x;
+		else if (cg.cur_lc->camZoomDir <= -speed1x)
+			cg.cur_lc->camZoomDir += speed1x;
+
+		if (!cg.cur_lc->camZoomOut && !cg.cur_lc->camZoomIn &&
+				cg.cur_lc->camZoomDir >= -speed2x && cg.cur_lc->camZoomDir <= speed2x)
+			cg.cur_lc->camZoomDir = 0;
+
+		if (cg.cur_lc->camZoomDir > 100)
+			cg.cur_lc->camZoomDir = 100;
+		else if (cg.cur_lc->camZoomDir < -100)
+			cg.cur_lc->camZoomDir = -100;
+
+		dist += cg.cur_lc->camZoomDir * f;
 	}
 
 	if (angle > 360)
 		angle -= 360;
-	if (angle < 0)
+	else if (angle < 0)
 		angle += 360;
 
-	// Update the cvar...
+	if (dist > 500)
+		dist = 500;
+	else if (dist < 10)
+		dist = 10;
+
+	// Update the cvars...
 #ifdef TA_SPLITVIEW
 	if (cg_thirdPersonAngle[cg.cur_localClientNum].value != angle) {
 		trap_Cvar_Set(Com_LocalClientCvarName(cg.cur_localClientNum, "cg_thirdPersonAngle"), va("%f", angle));
+	}
+	if (cg_thirdPersonRange[cg.cur_localClientNum].value != dist) {
+		trap_Cvar_Set(Com_LocalClientCvarName(cg.cur_localClientNum, "cg_thirdPersonRange"), va("%f", dist));
 	}
 #else
 	if (cg_thirdPersonAngle.value != angle) {
 		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", angle));
 	}
+	if (cg_thirdPersonRange.value != dist) {
+		trap_Cvar_Set("cg_thirdPersonRange", va("%f", dist));
+	}
 #endif
 
-#ifdef TURTLEARENA // CAMERA
-	// First person
-#ifdef TA_SPLITVIEW
-	if (!cg_thirdPerson[cg.cur_localClientNum].integer)
-#else
-	if (!cg_thirdPerson.integer)
-#endif
+	if (thirdPerson)
 	{
-		if (cg.cur_lc->camDistance > 11)
-			cg.cur_lc->camDistance -= 2;
-		else
-			cg.cur_lc->camDistance = 10;
-	}
-	else
-	{
-		float range;
-		float speed1x = 20.0f * f;
+		float speed1x = 200.0f * f;
 		float speed2x = speed1x * 2.0f;
 
-#ifdef TA_SPLITVIEW
-		range = cg_thirdPersonRange[cg.cur_localClientNum].value;
-#else
-		range = cg_thirdPersonRange.value;
-#endif
-
-		if (cg.cur_lc->camDistance == 0) {
-			cg.cur_lc->camDistance = range;
-		}
-
 		// Third person range was made shorter, zoom in
-		if (cg.cur_lc->camDistance > range + speed2x)
+		if (cg.cur_lc->camDistance > dist + speed2x)
 			cg.cur_lc->camDistance -= speed2x;
-		else if (cg.cur_lc->camDistance > range)
-			cg.cur_lc->camDistance = range;
+		else if (cg.cur_lc->camDistance > dist)
+			cg.cur_lc->camDistance = dist;
 		// Zoom back out
-		else if (cg.cur_lc->camDistance < range)
+		else if (cg.cur_lc->camDistance < dist)
 		{
-#if 0
 			// NiGHTS: Journey of Dreams Visitor style camera distance.
 			//  When next to a wall the camera is closer (like Quake3),
 			//  but only zooms back out when the player is moving
 
 			// If player is moving on xy zoom out a little
-			if (cg.xyspeed != 0)
-#endif
+			if (cg.xyspeed != 0 || cg.cur_lc->camReseting || cg.cur_lc->camZoomDir > 0)
 			{
-				if (cg.cur_lc->camDistance < range - speed1x)
+				if (cg.cur_lc->camDistance < dist - speed1x)
 					cg.cur_lc->camDistance += speed1x;
 				else
-					cg.cur_lc->camDistance = range;
+					cg.cur_lc->camDistance = dist;
 			}
-
 		}
+
+		distReset = (cg.cur_lc->camDistance >= DEFAULT_CAM_DIST - speed1x && cg.cur_lc->camDistance <= DEFAULT_CAM_DIST + speed1x);
 	}
-#endif
+
+	if (angleReset && distReset) {
+		cg.cur_lc->camReseting = qfalse;
+	}
 }
 #endif
 
@@ -456,7 +495,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 	cg.refdef.vieworg[2] += cg.cur_lc->predictedPlayerState.viewheight;
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
-#ifdef TURTLEARENA // CAMERA
+#ifdef IOQ3ZTM // NEW_CAM
 	distance = cg.cur_lc->camDistance;
 #else
 #ifdef TA_SPLITVIEW
@@ -617,7 +656,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 		if ( trace.fraction != 1.0 ) {
 			VectorCopy( trace.endpos, view );
-#ifdef TURTLEARENA // CAMERA
+#ifdef IOQ3ZTM // NEW_CAM
 			cg.cur_lc->camDistance = cg.cur_lc->camDistance * trace.fraction;
 			if (cg.cur_lc->camDistance < 10) {
 				cg.cur_lc->camDistance = 10;
@@ -1827,14 +1866,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
 #ifdef TA_SPLITVIEW
 							&& (cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
-#ifdef TURTLEARENA // CAMERA // When switching to first person, zoom the camera in
-								|| (!cg_thirdPerson[cg.cur_localClientNum].integer && cg.cur_lc->camDistance > 10)
-#endif
 #else
 							&& (cg_thirdPerson.integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
-#ifdef TURTLEARENA // CAMERA // When switching to first person, zoom the camera in
-								|| (!cg_thirdPerson.integer && cg.cur_lc->camDistance > 10)
-#endif
 #endif
 								);
 #else

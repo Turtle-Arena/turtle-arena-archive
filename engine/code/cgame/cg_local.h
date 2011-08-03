@@ -853,13 +853,14 @@ typedef struct {
 	vec3_t		kick_origin;
 
 #ifdef IOQ3ZTM // NEW_CAM
+	float camZoomDir;
+	qboolean camZoomIn;
+	qboolean camZoomOut;
 	float camRotDir;
 	qboolean camLeft;
 	qboolean camRight;
 	qboolean camReseting;
-#ifdef TURTLEARENA // CAMERA
 	float camDistance; // Distance from client to put camera
-#endif
 #endif
 
 #ifdef CAMERASCRIPT
