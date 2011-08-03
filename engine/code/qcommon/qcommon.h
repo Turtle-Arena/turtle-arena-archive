@@ -289,7 +289,7 @@ extern int demo_protocols[];
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
 #ifdef TA_MAIN
-#define MASTER_SERVER_NAME	"dpmaster.splintertown.org"
+#define MASTER_SERVER_NAME	"dpmaster.deathmask.net"
 #else
 #define MASTER_SERVER_NAME	"master.quake3arena.com"
 #endif
