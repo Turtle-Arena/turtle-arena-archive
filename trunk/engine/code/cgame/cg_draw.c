@@ -1001,7 +1001,7 @@ static void CG_DrawStatusBar( void ) {
 	CG_DrawAirBar(x + 60, y+64-22-12, HUD_WIDTH-60-4, 12);
 
 	// Health bar
-	CG_DrawHealthBar(x + 56, y+64-22, HUD_WIDTH-56, 22);
+	CG_DrawHealthBar(x + 56, y+64-22, (HUD_WIDTH-56) * ps->stats[STAT_MAX_HEALTH] / 100.0f, 22);
 
 	// Draw head on top of everything else
 	CG_DrawStatusBarHead( x );
