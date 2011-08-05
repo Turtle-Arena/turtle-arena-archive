@@ -3341,7 +3341,7 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	// set the firing flag for continuous beam weapons
-	if ( !(pm->ps->pm_flags & PMF_RESPAWNED) && pm->ps->pm_type != PM_INTERMISSION && (!pm->ps->pm_type == PM_NOCLIP)
+	if ( !(pm->ps->pm_flags & PMF_RESPAWNED) && pm->ps->pm_type != PM_INTERMISSION && pm->ps->pm_type != PM_NOCLIP
 #ifdef TA_WEAPSYS
 		&& ( pm->ps->meleeTime ||
 			(( pm->cmd.buttons & BUTTON_ATTACK )
