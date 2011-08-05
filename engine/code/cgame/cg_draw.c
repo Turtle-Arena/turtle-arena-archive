@@ -2291,7 +2291,7 @@ static void CG_DrawPersistantPowerup( void ) {
 	if ( value ) {
 		CG_RegisterItemVisuals( value );
 #ifdef TURTLEARENA
-		CG_DrawPic( HUD_X, HUD_Y+HUD_HEIGHT+4, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
+		CG_DrawPic( HUD_X + 16, HUD_Y+HUD_HEIGHT+4, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
 #else
 		CG_DrawPic( 640-ICON_SIZE, (SCREEN_HEIGHT-ICON_SIZE)/2 - ICON_SIZE, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
 #endif
