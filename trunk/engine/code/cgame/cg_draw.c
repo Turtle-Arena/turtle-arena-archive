@@ -719,6 +719,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, i
 		if (clientNum < 0 || clientNum >= MAX_CLIENTS) {
 			clientNum = 0;
 		}
+
 		// Use client's effect color2
 		VectorCopy(cgs.clientinfo[clientNum].prefcolor2, hcolor);
 #else
@@ -739,6 +740,11 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, i
 }
 
 #ifdef TURTLEARENA
+/*
+================
+CG_DrawFieldSmall
+================
+*/
 void CG_DrawFieldSmall(int x, int y, int width, int value)
 {
 	char	num[16], *ptr;
@@ -804,12 +810,48 @@ void CG_DrawFieldSmall(int x, int y, int width, int value)
 	}
 }
 
+/*
+================
+CG_GetHudColor
+
+Returns qtrue if hcolor is set.
+================
+*/
+qboolean CG_GetHudColor(vec4_t hcolor)
+{
+	int team;
+
+	team = cg.cur_ps->persistant[PERS_TEAM];
+
+	if ( team == TEAM_RED ) {
+		hcolor[0] = 1;
+		hcolor[1] = 0;
+		hcolor[2] = 0;
+		hcolor[3] = 1;
+	} else if ( team == TEAM_BLUE ) {
+		hcolor[0] = 0;
+		hcolor[1] = 0;
+		hcolor[2] = 1;
+		hcolor[3] = 1;
+	} else {
+		return qfalse;
+	}
+
+	return qtrue;
+}
+
+/*
+================
+CG_DrawHealthBar
+================
+*/
 void CG_DrawHealthBar(int x, int y, int w, int h)
 {
 	vec4_t color_high = {1, 1, 1, 0.5f}; // white
 	vec4_t color_normal = {1, 0.5f, 0, 1.0f}; // orange
 	vec4_t color_normalflash = {1, 0.5f, 0, 0.5f}; // orange, half alpha
 	vec4_t color_empty = {1.0f, 0.2f, 0.2f, 1.0f}; // red
+	vec4_t color_hud;
 	playerState_t *ps;
 	int health, maxHealth;
 	float healthFrac, healthExtraFrac;
@@ -825,14 +867,13 @@ void CG_DrawHealthBar(int x, int y, int w, int h)
 		healthExtraFrac = 1.0f;
 	}
 
+	// Colorize hud background and healthbar
+	if (CG_GetHudColor(color_hud)) {
+		trap_R_SetColor(color_hud);
+	}
+
 	// Draw healthbar background
 	CG_DrawPic( x, y, w, h, cgs.media.hudBarBackgroundShader );
-
-#if 0
-	// Use client's effect color2
-	VectorCopy(cgs.clientinfo[cg.cur_ps->clientNum].prefcolor2, color_normal);
-	VectorCopy(cgs.clientinfo[cg.cur_ps->clientNum].prefcolor2, color_normalflash);
-#endif
 
 	if (healthFrac > 0.25f) {
 		trap_R_SetColor( color_normal );
@@ -867,6 +908,7 @@ void CG_DrawAirBar( int x, int y, int w, int h )
 {
 	vec4_t		color_air = { 0.42f, 0.64f, 0.76f, 1.0f };
 	vec4_t		color_empty = { 0.2f, 0.2f, 0.9f, 1.0f };
+	vec4_t		color_hud;
 	const int	borderSize = 2;
 	int value;
 	float frac;
@@ -883,6 +925,11 @@ void CG_DrawAirBar( int x, int y, int w, int h )
 		frac = value / 30000.0f;
 	} else {
 		frac = 1.0f;
+	}
+
+	// Colorize hud background
+	if (CG_GetHudColor(color_hud)) {
+		trap_R_SetColor(color_hud);
 	}
 
 	// Draw healthbar background
@@ -917,6 +964,7 @@ static void CG_DrawStatusBar( void ) {
 	int			start_x;
 	int			x;
 	int			y;
+	vec4_t		color_hud;
 #else
 	vec4_t		hcolor;
 	vec3_t		angles;
@@ -964,6 +1012,9 @@ static void CG_DrawStatusBar( void ) {
 	start_x = x = HUD_X;
 	y = HUD_Y;
 
+	// Draw hud background
+	//CG_DrawTeamBackground( HUD_X, HUD_Y, HUD_WIDTH, HUD_HEIGHT, 0.33f, cg.cur_ps->persistant[PERS_TEAM], cg.cur_ps->clientNum );
+
 	// Flag
 	if( cg.cur_lc->predictedPlayerState.powerups[PW_REDFLAG] ) {
 		CG_DrawStatusBarFlag( x + HUD_WIDTH + TEXT_ICON_SPACE, TEAM_RED );
@@ -988,14 +1039,18 @@ static void CG_DrawStatusBar( void ) {
 	// Score
 	CG_DrawFieldSmall(x + HUD_WIDTH - 78, y+64-22-12-CHAR_HEIGHT/2-4, 6, ps->persistant[PERS_SCORE]);
 
-	// Draw hud background
-	//CG_DrawTeamBackground( HUD_X, HUD_Y, HUD_WIDTH, HUD_HEIGHT, 0.33f, cg.cur_ps->persistant[PERS_TEAM], cg.cur_ps->clientNum );
+	// Colorize hud background
+	if (CG_GetHudColor(color_hud)) {
+		trap_R_SetColor(color_hud);
+	}
 
 	// Head background
 	CG_DrawPic( x + 2, y, 64, 64, cgs.media.hudHeadBackgroundShader );
 
 	// Make healthbar connect seemlessly
 	CG_DrawPic( x + 34, y+64-22, 22, 22, cgs.media.hudBarBackgroundShader );
+
+	trap_R_SetColor( NULL );
 
 	// Air bar
 	CG_DrawAirBar(x + 60, y+64-22-12, HUD_WIDTH-60-4, 12);
