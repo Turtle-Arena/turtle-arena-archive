@@ -1472,6 +1472,13 @@ typedef struct {
 	qhandle_t	weaponTrailShader;
 #endif
 
+#ifdef TURTLEARENA
+	qhandle_t	hudHeadBackgroundShader;
+	qhandle_t	hudBarShader;
+	qhandle_t	hudBar2Shader;
+	qhandle_t	hudBarBackgroundShader;
+#endif
+
 } cgMedia_t;
 
 

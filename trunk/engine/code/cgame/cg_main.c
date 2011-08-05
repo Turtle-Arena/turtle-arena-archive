@@ -1409,7 +1409,11 @@ static void CG_RegisterGraphics( void ) {
 	}
 
 #ifdef TURTLEARENA
-	cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar.png" );
+	cgs.media.hudHeadBackgroundShader = trap_R_RegisterShader( "gfx/2d/hudHeadBack" );
+	cgs.media.hudBarShader = trap_R_RegisterShader( "gfx/2d/hudBar" );
+	cgs.media.hudBar2Shader = trap_R_RegisterShader( "gfx/2d/hudBar2" );
+	cgs.media.hudBarBackgroundShader = trap_R_RegisterShader( "gfx/2d/hudBarBack" );
+	cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar" );
 #else
 	cgs.media.armorModel = trap_R_RegisterModel( "models/powerups/armor/armor_yel.md3" );
 	cgs.media.armorIcon  = trap_R_RegisterShaderNoMip( "icons/iconr_yellow" );

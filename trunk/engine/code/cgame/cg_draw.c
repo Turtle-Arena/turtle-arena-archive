@@ -38,11 +38,10 @@ int drawTeamOverlayModificationCount = -1;
 #endif
 
 #ifdef TURTLEARENA
-#define HUD_X 40
+#define HUD_X 18
 #define HUD_Y 55 // letterbox view shouldn't overlap hud
-#define HUD_WIDTH 150
-#define HUD_HEIGHT 2+(CHAR_HEIGHT/2)+2+(CHAR_HEIGHT/2)+2+ICON_SIZE
-#define HUD_HEAD_OFFSET_X -20
+#define HUD_WIDTH 172
+#define HUD_HEIGHT (64 + 4 + ICON_SIZE)
 #endif
 
 int sortedTeamPlayers[TEAM_MAXOVERLAY];
@@ -753,8 +752,8 @@ void CG_DrawFieldSmall(int x, int y, int width, int value)
 	}
 
 	// draw number string
-	if ( width > 5 ) {
-		width = 5;
+	if ( width > 6 ) {
+		width = 6;
 	}
 
 	switch ( width ) {
@@ -774,13 +773,21 @@ void CG_DrawFieldSmall(int x, int y, int width, int value)
 		value = value > 9999 ? 9999 : value;
 		value = value < -999 ? -999 : value;
 		break;
+	case 5:
+		value = value > 99999 ? 99999 : value;
+		value = value < -9999 ? -9999 : value;
+		break;
+	case 6:
+		value = value > 999999 ? 999999 : value;
+		value = value < -99999 ? -99999 : value;
+		break;
 	}
 
 	Com_sprintf (num, sizeof(num), "%i", value);
 	l = strlen(num);
 	if (l > width)
 		l = width;
-	x += 2 + char_width*(width - l);
+	x += 2 + (char_width*0.75f)*(width - l);
 
 	ptr = num;
 	while (*ptr && l)
@@ -791,10 +798,64 @@ void CG_DrawFieldSmall(int x, int y, int width, int value)
 			frame = *ptr -'0';
 
 		CG_DrawPic( x,y, char_width, char_height, cgs.media.numberShaders[frame] );
-		x += char_width;
+		x += (char_width*0.75f);
 		ptr++;
 		l--;
 	}
+}
+
+void CG_DrawHealthBar(int x, int y, int w, int h)
+{
+	vec4_t color_high = {1, 1, 1, 0.5f}; // white
+	vec4_t color_normal = {1, 0.5f, 0, 1.0f}; // orange
+	vec4_t color_normalflash = {1, 0.5f, 0, 0.5f}; // orange, half alpha
+	vec4_t color_empty = {1.0f, 0.2f, 0.2f, 1.0f}; // red
+	playerState_t *ps;
+	int health, maxHealth;
+	float healthFrac, healthExtraFrac;
+	
+	ps = cg.cur_ps;
+
+	health = ps->stats[STAT_HEALTH];
+	maxHealth = ps->stats[STAT_MAX_HEALTH];
+
+	healthFrac = (health > maxHealth ? maxHealth : health) / (float)maxHealth;
+	healthExtraFrac = (health > maxHealth ? health - maxHealth : 0) / (float)maxHealth;
+	if (healthExtraFrac > 1.0f) {
+		healthExtraFrac = 1.0f;
+	}
+
+	// Draw healthbar background
+	CG_DrawPic( x, y, w, h, cgs.media.hudBarBackgroundShader );
+
+#if 0
+	// Use client's effect color2
+	VectorCopy(cgs.clientinfo[cg.cur_ps->clientNum].prefcolor2, color_normal);
+	VectorCopy(cgs.clientinfo[cg.cur_ps->clientNum].prefcolor2, color_normalflash);
+#endif
+
+	if (healthFrac > 0.25f) {
+		trap_R_SetColor( color_normal );
+	} else if ((cg.time >> 8) & 1) {
+		trap_R_SetColor( color_normalflash );
+	} else {
+		trap_R_SetColor( color_normal );
+	}
+
+	// Draw healthbar for 0% to 100%
+	CG_DrawPic( x+2, y+2, healthFrac * (w-4), h-4, cgs.media.hudBarShader );
+
+	if (healthFrac < 1.0f) {
+		trap_R_SetColor( color_empty );
+		CG_DrawPic( x+2 + healthFrac * (w-4), y+2, (1.0f - healthFrac) * (w-4), h-4, cgs.media.hudBar2Shader );
+	}
+	// Draw extra healthbar for over 100%
+	else if (healthExtraFrac > 0.0f) {
+		trap_R_SetColor( color_high );
+		CG_DrawPic( x+2, y+2, healthExtraFrac * (w-4), h-4, cgs.media.hudBarShader );
+	}
+
+	trap_R_SetColor( NULL );
 }
 
 /*
@@ -802,17 +863,40 @@ void CG_DrawFieldSmall(int x, int y, int width, int value)
 CG_DrawAirBar
 ================
 */
-void CG_DrawAirBar( int x, int y, int w, int h, int borderSize, float frac )
+void CG_DrawAirBar( int x, int y, int w, int h )
 {
-	vec4_t		borderColor = { 0.5f, 0.5f, 0.5f, 0.33f };
-	vec4_t		airColor = { 0.42f, 0.64f, 0.76f, 0.67f };
+	vec4_t		color_air = { 0.42f, 0.64f, 0.76f, 1.0f };
+	vec4_t		color_empty = { 0.2f, 0.2f, 0.9f, 1.0f };
+	const int	borderSize = 2;
+	int value;
+	float frac;
 
-	trap_R_SetColor( borderColor );
-	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
-	trap_R_SetColor( NULL );
+	// Air time left
+	value = cg.cur_ps->powerups[PW_AIR] - cg.time;
 
-	trap_R_SetColor( airColor );
-	CG_DrawPic( x+borderSize, y+borderSize, frac * (w-borderSize*2), h-borderSize*2, cgs.media.teamStatusBar );
+	// Don't have less than zero air left
+	if (value < 0) {
+		value = 0;
+	}
+
+	if (value < 30000) {
+		frac = value / 30000.0f;
+	} else {
+		frac = 1.0f;
+	}
+
+	// Draw healthbar background
+	CG_DrawPic( x, y, w, h, cgs.media.hudBarBackgroundShader );
+
+	trap_R_SetColor( color_air );
+	CG_DrawPic( x+borderSize, y+borderSize, frac * (w-borderSize*2), h-borderSize*2, cgs.media.hudBarShader );
+
+	if (frac < 1.0f) {
+		trap_R_SetColor( color_empty );
+		CG_DrawPic( x+borderSize + frac * (w-borderSize*2), y+borderSize,
+					(1.0f - frac) * (w-borderSize*2), h-borderSize*2, cgs.media.hudBar2Shader );
+	}
+
 	trap_R_SetColor( NULL );
 }
 #endif
@@ -829,15 +913,13 @@ static void CG_DrawStatusBar( void ) {
 	centity_t	*cent;
 	playerState_t	*ps;
 	int			value;
-#ifndef TURTLEARENA
-	vec4_t		hcolor;
-#endif
-	vec3_t		angles;
 #ifdef TURTLEARENA
 	int			start_x;
 	int			x;
 	int			y;
 #else
+	vec4_t		hcolor;
+	vec3_t		angles;
 	vec3_t		origin;
 #endif
 
@@ -876,17 +958,13 @@ static void CG_DrawStatusBar( void ) {
 #ifdef TURTLEARENA
 	CG_HudPlacement(HUD_LEFT);
 
-	start_x = x = HUD_X;
-	y = HUD_Y;
-
-	// draw hud background
-	CG_DrawTeamBackground( x, y, HUD_WIDTH, HUD_HEIGHT, 0.33f, cg.cur_ps->persistant[PERS_TEAM], cg.cur_ps->clientNum );
-
 	cent = &cg_entities[cg.cur_ps->clientNum];
 	ps = cg.cur_ps;
 
-	VectorClear( angles );
+	start_x = x = HUD_X;
+	y = HUD_Y;
 
+	// Flag
 	if( cg.cur_lc->predictedPlayerState.powerups[PW_REDFLAG] ) {
 		CG_DrawStatusBarFlag( x + HUD_WIDTH + TEXT_ICON_SPACE, TEAM_RED );
 	} else if( cg.cur_lc->predictedPlayerState.powerups[PW_BLUEFLAG] ) {
@@ -895,51 +973,51 @@ static void CG_DrawStatusBar( void ) {
 		CG_DrawStatusBarFlag( x + HUD_WIDTH + TEXT_ICON_SPACE, TEAM_FREE );
 	}
 
-	CG_DrawStatusBarHead( x + HUD_HEAD_OFFSET_X);
+#ifdef TA_SP
+	// Lives (Single Player and Co-op only)
+	if (cgs.gametype == GT_SINGLE_PLAYER) {
+		value = ps->persistant[PERS_LIVES];
+		if (value > 99) {
+			value = 99;
+		}
 
-	y += 2;
-
-	// LINE 1: Score
-	value = ps->persistant[PERS_SCORE];
-	CG_DrawFieldSmall(x+25, y, 5, value);
-	x += (3 * (CHAR_WIDTH/2));
-
-	// Space between line 1 and 3
-	y += CHAR_HEIGHT/2;
-	x = start_x;
-
-	// LINE2: Health
-	value = ps->stats[STAT_HEALTH];
-	if ( value > 100 ) {
-		trap_R_SetColor( colors[3] );		// white
-	} else if (value > 25) {
-		trap_R_SetColor( colors[0] );	// green
-	} else if (value > 0) {
-		color = (cg.time >> 8) & 1;	// flash
-		trap_R_SetColor( colors[color] );
-	} else {
-		trap_R_SetColor( colors[1] );	// red
+		CG_DrawSmallString( x + 68, y+64-22-12-22, va("x %d", value), 1.0F );
 	}
+#endif
 
-	// stretch the health up when taking damage
-	CG_DrawFieldSmall(x + 25, y, 5, value);
-	x += (3 * (CHAR_WIDTH/2));
+	// Score
+	CG_DrawFieldSmall(x + HUD_WIDTH - 78, y+64-22-12-CHAR_HEIGHT/2-4, 6, ps->persistant[PERS_SCORE]);
 
-	//CG_ColorForHealth( hcolor );
-	//trap_R_SetColor( hcolor );
-	trap_R_SetColor( NULL );
+	// Draw hud background
+	//CG_DrawTeamBackground( HUD_X, HUD_Y, HUD_WIDTH, HUD_HEIGHT, 0.33f, cg.cur_ps->persistant[PERS_TEAM], cg.cur_ps->clientNum );
 
-	// Space between line 2 and 3
-	y += CHAR_HEIGHT/2 + (CHAR_HEIGHT/2)/8;
-	x = start_x;
+	// Head background
+	CG_DrawPic( x + 2, y, 64, 64, cgs.media.hudHeadBackgroundShader );
 
-	// LINE3: Weapon
+	// Make healthbar connect seemlessly
+	CG_DrawPic( x + 34, y+64-22, 22, 22, cgs.media.hudBarBackgroundShader );
+
+	// Air bar
+	CG_DrawAirBar(x + 60, y+64-22-12, HUD_WIDTH-60-4, 12);
+
+	// Health bar
+	CG_DrawHealthBar(x + 56, y+64-22, HUD_WIDTH-56, 22);
+
+	// Draw head on top of everything else
+	CG_DrawStatusBarHead( x );
+
+	// Below healthbar
+	y = HUD_Y + 64 + 4;
+	x = start_x + 16;
+
+	// Weapon icon and ammo
 	if ( cent->currentState.weapon ) {
 #ifdef TA_WEAPSYS_EX
 		value = ps->stats[STAT_AMMO];
 #else
 		value = ps->ammo[cent->currentState.weapon];
 #endif
+
 		// Draw weapon icon
 #ifdef TA_WEAPSYS
 		if ( cg_weapongroups[cent->currentState.weapon].weaponIcon ) {
@@ -974,13 +1052,14 @@ static void CG_DrawStatusBar( void ) {
 			}
 			trap_R_SetColor( colors[color] );
 
-			CG_DrawFieldSmall(x-CHAR_WIDTH/2, y, 3, value);
+			CG_DrawFieldSmall(x - CHAR_WIDTH/2 * 0.75f, y, 3, value);
 			trap_R_SetColor( NULL );
 		}
-			x += (2 * (CHAR_WIDTH/2));
+
+		x += (2 * (CHAR_WIDTH/2) * 0.75f) + 4;
 	}
 
-	// LINE3: Holdable item
+	// Holdable item and use count
 #ifdef TA_HOLDSYS
 	value = BG_ItemNumForHoldableNum(cg.cur_ps->holdableIndex);
 #else
@@ -995,16 +1074,9 @@ static void CG_DrawStatusBar( void ) {
 
 #ifdef TA_HOLDSYS
 		// draw value
-
-#ifdef TURTLEARENA // Grappling shuriken use no ammo.
 		if (!bg_projectileinfo[BG_ProjectileIndexForHoldable(cg.cur_ps->holdableIndex)].grappling)
-#endif
 		{
-#ifdef TA_ITEMSYS
 			int giveQuantity = BG_ItemForItemNum(value)->quantity;
-#else
-			int giveQuantity = bg_itemlist[ value ].quantity;
-#endif
 			int useCount = cg.cur_ps->holdable[cg.cur_ps->holdableIndex];
 
 			if ((giveQuantity > 0 && useCount > 0)
@@ -1025,43 +1097,12 @@ static void CG_DrawStatusBar( void ) {
 
 				CG_DrawFieldSmall(x, y, 2, useCount);
 				trap_R_SetColor( NULL );
-				x += (2 * (CHAR_WIDTH/2));
 			}
 		}
+
+		//x += (2 * (CHAR_WIDTH/2) * 0.75f) + 4;
 #endif
 	}
-
-	x = start_x;
-	y = HUD_Y+HUD_HEIGHT;
-
-	// LINE4: Air bar
-	if (cg.cur_ps->powerups[PW_AIR] - 30000 < cg.time) {
-		// Air time left
-		value = cg.cur_ps->powerups[PW_AIR] - cg.time;
-
-		// Don't have less than zero air left
-		if (value < 0) {
-			value = 0;
-		}
-
-		// Draw the air bar
-		CG_DrawAirBar(x, HUD_Y+HUD_HEIGHT, HUD_WIDTH, 12, 2, value / 30000.0f);
-	}
-	y += 12;
-
-#ifdef TA_SP
-	// LINE5: Lives (Single Player and Co-op only)
-	if (cgs.gametype == GT_SINGLE_PLAYER)
-	{
-		CG_DrawSmallString( x, y, va("Lives %d", ps->persistant[PERS_LIVES]), 1.0F );
-
-		value = ps->persistant[PERS_CONTINUES];
-		if (value) {
-			y += SMALLCHAR_HEIGHT;
-			CG_DrawSmallString( x, y, va("Continues %d", value), 1.0F );
-		}
-	}
-#endif
 #else
 	CG_HudPlacement(HUD_CENTER);
 
@@ -2195,7 +2236,7 @@ static void CG_DrawPersistantPowerup( void ) {
 	if ( value ) {
 		CG_RegisterItemVisuals( value );
 #ifdef TURTLEARENA
-		CG_DrawPic( HUD_X, (SCREEN_HEIGHT-ICON_SIZE)/2 - ICON_SIZE, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
+		CG_DrawPic( HUD_X, HUD_Y+HUD_HEIGHT+4, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
 #else
 		CG_DrawPic( 640-ICON_SIZE, (SCREEN_HEIGHT-ICON_SIZE)/2 - ICON_SIZE, ICON_SIZE, ICON_SIZE, cg_items[ value ].icon );
 #endif
