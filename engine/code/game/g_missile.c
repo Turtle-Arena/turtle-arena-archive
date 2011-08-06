@@ -618,7 +618,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 				trap_LinkEntity( unlinkedEntities[i] );
 			}
 
-			if (self->client) {
+			if (self && self->client) {
 #ifndef TURTLEARENA // AWARDS
 				if (bg_projectileinfo[projnum].maxHits > 1) {
 					// give the shooter a reward sound if they have made two railgun hits in a row
@@ -744,7 +744,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		}
 		bolt->parent = self;
 		// grapple
-		bolt->s.otherEntityNum = self->s.number; // use to match beam in client
+		bolt->s.otherEntityNum = bolt->r.ownerNum; // use to match beam in client
 
 		if (!bg_projectileinfo[projnum].damageAttacker) {
 			bolt->flags |= FL_MISSILE_NO_DAMAGE_PARENT;
@@ -797,15 +797,15 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		// Save handSide in missile
 		bolt->s.weaponHands = handSide;
 
-		// Taken from Q3's fire_prox;
-		// ZTM: Used by prox mines so that if that player changes teams the mines
-		//        don't "change" teams as well (or something...).
-		//id: FIXME: we prolly wanna abuse another field
-		bolt->s.generic1 = self->client->sess.sessionTeam;
-
-		// Needed for stickOnImpact projectiles
 		if (self && self->client)
 		{
+			// Taken from Q3's fire_prox;
+			// ZTM: Used by prox mines so that if that player changes teams the mines
+			//        don't "change" teams as well (or something...).
+			//id: FIXME: we prolly wanna abuse another field
+			bolt->s.generic1 = self->client->sess.sessionTeam;
+
+			// Needed for stickOnImpact projectiles
 			bolt->s.angles[0] = self->client->ps.viewangles[0];
 			bolt->s.angles[1] = self->client->ps.viewangles[1];
 			bolt->s.angles[2] = self->client->ps.viewangles[2];

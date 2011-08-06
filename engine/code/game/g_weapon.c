@@ -1324,8 +1324,10 @@ void G_GrapplingHookReturnThink (gentity_t *ent)
 		return;
 	}
 
-	// Pervent player from firing, it doesn't effect game's grappling hook but does cgame does fire effects.
-	ent->parent->client->ps.weaponTime = HOOK_RETURN_THINK_TIME + 50;
+	if (ent->parent->client) {
+		// Pervent player from firing, it doesn't effect game's grappling hook but does cgame does fire effects.
+		ent->parent->client->ps.weaponTime = HOOK_RETURN_THINK_TIME + 50;
+	}
 
 	// for exact trajectory calculation, set current point to base.
 	VectorCopy(ent->r.currentOrigin, ent->s.pos.trBase);

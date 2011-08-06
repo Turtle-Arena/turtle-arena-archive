@@ -922,10 +922,12 @@ gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
 #endif
 
 #ifdef IOQ3ZTM // DROP_ITEM_FIX
-	// Save the player who drop the item, so we can wait till the
-	//  player isn't touching it to allow them to pick it up.
-	//  Becuase otherwise they pickup the item as soon as they drop it.
-	drop->s.generic1 = ent->client->ps.clientNum+1;
+	if (ent->client) {
+		// Save the player who drop the item, so we can wait till the
+		//  player isn't touching it to allow them to pick it up.
+		//  Becuase otherwise they pickup the item as soon as they drop it.
+		drop->s.generic1 = ent->client->ps.clientNum+1;
+	}
 	drop->s.time2 = level.time + 1000;
 #endif
 
