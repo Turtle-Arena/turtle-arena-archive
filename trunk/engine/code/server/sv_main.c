@@ -478,7 +478,7 @@ void SV_CheckPublicStatus(void) {
 	static int publicOld = 0;
 
 	// Check if public status changed.
-	if (sv_public && sv_public->modified) {
+	if (sv_public->modified) {
 		// Check if switched to or from public.
 		if (sv_public->integer > 0 || publicOld > 0) {
 			// Send heartbeat

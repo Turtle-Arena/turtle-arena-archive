@@ -136,6 +136,12 @@ void TossClientItems( gentity_t *self ) {
 	int			i;
 	gentity_t	*drop;
 
+#ifdef IOQ3ZTM
+	if (!self || !self->client) {
+		return;
+	}
+#endif
+
 #ifdef TA_WEAPSYS_EX
 	int statAmmo = -1;
 
@@ -710,7 +716,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			ent->s.weapon = inflictor->s.weapon;
 		}
 		// Check for instant damage guns
-		else if (inflictor == attacker && (attacker->client
+		else if (attacker && attacker == inflictor && (attacker->client
 #ifdef TA_NPCSYS
 			|| attacker->s.eType == ET_NPC
 #endif
