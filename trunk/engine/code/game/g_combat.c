@@ -135,6 +135,9 @@ void TossClientItems( gentity_t *self ) {
 	float		angle;
 	int			i;
 	gentity_t	*drop;
+#ifdef TA_WEAPSYS_EX
+	int statAmmo = -1;
+#endif
 
 #ifdef IOQ3ZTM
 	if (!self || !self->client) {
@@ -143,8 +146,6 @@ void TossClientItems( gentity_t *self ) {
 #endif
 
 #ifdef TA_WEAPSYS_EX
-	int statAmmo = -1;
-
 	if (self->client)
 	{
 		// Clients can have two weapon, pickup and default,
@@ -633,7 +634,9 @@ player_die
 void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
 	gentity_t	*ent;
 	int			anim;
+#ifndef NOTRATEDM // No gibs.
 	int			contents;
+#endif
 	int			killer;
 	int			i;
 	char		*killerName, *obit;
