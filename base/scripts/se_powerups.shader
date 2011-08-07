@@ -75,11 +75,10 @@ playerTeleportEffect
 
 	{
 		map models/misc/telep.png
-		blendfunc GL_ONE GL_ONE
-		rgbGen lightingDiffuse
+		blendfunc add
 		//tcMod turb 0 0.15 0 0.25
-		tcGen environment
-		//alphaGen wave sin .6 .2 0 .6
+		//tcGen environment
+		rgbGen wave sin .5 .3 0 .6
 		alphaGen entity
 	}
 }
