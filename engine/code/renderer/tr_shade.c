@@ -207,21 +207,36 @@ float EvalWaveFormClamped( const waveForm_t *wf );
 // modified version of static void ComputeColors( shaderStage_t *pStage )
 void R_SetCelOutlineColors(const celoutline_t *celoutline, byte *colors)
 {
-	int i;
+	colorGen_t	rgbGen;
+	alphaGen_t	alphaGen;
+	int			i;
 
 	if (!colors)
 		return;
 
-	colors[0] = colors[1] = colors[2] = 0; // Black RGB
-	colors[3] = 0xff; // Full alpha
+	if (!celoutline) {
+		colors[0] = colors[1] = colors[2] = 0; // Black RGB
 
-	if (!celoutline)
+		if (backEnd.currentEntity && backEnd.currentEntity->e.renderfx & RF_FORCE_ENT_ALPHA) {
+			colors[3] = backEnd.currentEntity->e.shaderRGBA[3];
+		} else {
+			colors[3] = 0xff; // Full alpha
+		}
+
 		return;
+	}
+
+	rgbGen = celoutline->rgbGen;
+	alphaGen = celoutline->alphaGen;
+
+	if (backEnd.currentEntity && backEnd.currentEntity->e.renderfx & RF_FORCE_ENT_ALPHA) {
+		alphaGen = AGEN_ENTITY;
+	}
 
 	//
 	// rgbGen
 	//
-	switch ( celoutline->rgbGen )
+	switch ( rgbGen )
 	{
 		case CGEN_IDENTITY: // done
 			colors[0] = colors[1] = colors[2] = colors[3] = 0xff;
@@ -344,20 +359,20 @@ void R_SetCelOutlineColors(const celoutline_t *celoutline, byte *colors)
 	//
 	// alphaGen
 	//
-	switch ( celoutline->alphaGen )
+	switch ( alphaGen )
 	{
 	case AGEN_SKIP:
 		break;
 	case AGEN_IDENTITY: // done
-		if ( celoutline->rgbGen != CGEN_IDENTITY ) {
-			if ( ( celoutline->rgbGen == CGEN_VERTEX && tr.identityLight != 1 ) ||
-				 celoutline->rgbGen != CGEN_VERTEX ) {
+		if ( rgbGen != CGEN_IDENTITY ) {
+			if ( ( rgbGen == CGEN_VERTEX && tr.identityLight != 1 ) ||
+				 rgbGen != CGEN_VERTEX ) {
 				colors[3] = 0xff;
 			}
 		}
 		break;
 	case AGEN_CONST: // done
-		if ( celoutline->rgbGen != CGEN_CONST ) {
+		if ( rgbGen != CGEN_CONST ) {
 			colors[3] = celoutline->constantColor[3];
 		}
 		break;
