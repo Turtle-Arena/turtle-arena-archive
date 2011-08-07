@@ -214,13 +214,12 @@ void R_SetCelOutlineColors(const celoutline_t *celoutline, byte *colors)
 	if (!colors)
 		return;
 
-	if (!celoutline) {
-		colors[0] = colors[1] = colors[2] = 0; // Black RGB
+	colors[0] = colors[1] = colors[2] = 0; // Black RGB
+	colors[3] = 0xff; // Full alpha
 
+	if (!celoutline) {
 		if (backEnd.currentEntity && backEnd.currentEntity->e.renderfx & RF_FORCE_ENT_ALPHA) {
 			colors[3] = backEnd.currentEntity->e.shaderRGBA[3];
-		} else {
-			colors[3] = 0xff; // Full alpha
 		}
 
 		return;
