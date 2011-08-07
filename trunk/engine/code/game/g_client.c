@@ -1630,7 +1630,7 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.persistant[PERS_TEAM] = client->sess.sessionTeam;
 
 #ifdef TURTLEARENA // POWERS
-	if (g_teleportFluxTime.integer
+	if (g_teleportFluxTime.integer && client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR
 #ifdef TA_SP // In single-player/co-op, boss bots don't get PW_FLASHING
 		&& !(g_gametype.integer == GT_SINGLE_PLAYER && client->ps.persistant[PERS_TEAM] != TEAM_FREE)
 #endif
