@@ -723,8 +723,6 @@ ClientRespawn
 ================
 */
 void ClientRespawn( gentity_t *ent ) {
-	gentity_t	*tent;
-
 	CopyToBodyQue (ent);
 	ClientSpawn(ent);
 }
