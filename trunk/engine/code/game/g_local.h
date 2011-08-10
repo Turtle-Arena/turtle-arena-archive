@@ -39,6 +39,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CARNAGE_REWARD_TIME	3000
 #define REWARD_SPRITE_TIME	2000
 
+#ifdef TURTLEARENA // PLAYERS
+#define TIME_BEFORE_WAITING_ANIMATION 7000
+#endif
+
 #define	INTERMISSION_DELAY_TIME	1000
 #define	SP_INTERMISSION_DELAY_TIME	5000
 
@@ -376,6 +380,10 @@ struct gclient_s {
 	int			inactivityTime;		// kick players when time > this
 	qboolean	inactivityWarning;	// qtrue if the five seoond warning has been given
 	int			rewardTime;			// clear the EF_AWARD_IMPRESSIVE, etc when time > this
+
+#ifdef TURTLEARENA // PLAYERS
+	int			idleTime;			// swich to BOTH_WAITING animation after awhile
+#endif
 
 #ifndef TURTLEARENA // DROWNING
 	int			airOutTime;

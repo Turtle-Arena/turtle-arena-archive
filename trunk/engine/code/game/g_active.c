@@ -460,6 +460,9 @@ qboolean ClientInactivityTimer( gclient_t *client ) {
 	} else if ( client->pers.cmd.forwardmove || 
 		client->pers.cmd.rightmove || 
 		client->pers.cmd.upmove ||
+#ifdef IOQ3ZTM
+		(client->pers.cmd.buttons & BUTTON_USE_HOLDABLE) ||
+#endif
 		(client->pers.cmd.buttons & BUTTON_ATTACK) ) {
 		client->inactivityTime = level.time + g_inactivity.integer * 1000;
 		client->inactivityWarning = qfalse;
@@ -1347,6 +1350,18 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( !ClientInactivityTimer( client ) ) {
 		return;
 	}
+
+#ifdef TURTLEARENA // PLAYERS
+	// switch to using waiting animation if idling for awhile.
+	if (client->pers.cmd.forwardmove || client->pers.cmd.rightmove || client->pers.cmd.upmove
+		|| (client->pers.cmd.buttons & BUTTON_USE_HOLDABLE) || (client->pers.cmd.buttons & BUTTON_ATTACK)
+		|| client->damage_blood || (client->ps.pm_flags & PMF_TIME_KNOCKBACK)) {
+		client->idleTime = level.time;
+		client->ps.eFlags &= ~EF_PLAYER_WAITING;
+	} else if (level.time > client->idleTime + TIME_BEFORE_WAITING_ANIMATION) {
+		client->ps.eFlags |= EF_PLAYER_WAITING;
+	}
+#endif
 
 	// clear the rewards if time
 	if ( level.time > client->rewardTime ) {

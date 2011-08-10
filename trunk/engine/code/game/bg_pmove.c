@@ -2386,7 +2386,7 @@ PM_TorsoAnimation
 static void PM_TorsoAnimation( void ) {
 	if ( pm->ps->weaponstate == WEAPON_READY ) {
 #ifdef TA_WEAPSYS // ZTM: Weapon type code.
-		PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
+		PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps, pm->playercfg) );
 #else
 		if ( pm->ps->weapon == WP_GAUNTLET ) {
 			PM_ContinueTorsoAnim( TORSO_STAND2 );
@@ -2612,7 +2612,7 @@ static void PM_Weapon( void ) {
 	if ( pm->ps->weaponstate == WEAPON_RAISING ) {
 #ifdef TA_WEAPSYS
 		pm->ps->weaponstate = WEAPON_READY;
-		PM_StartTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
+		PM_StartTorsoAnim( BG_TorsoStandForPlayerState(pm->ps, pm->playercfg) );
 		PM_StartLegsAnim( BG_LegsStandForPlayerState(pm->ps, pm->playercfg) );
 #else
 		pm->ps->weaponstate = WEAPON_READY;
@@ -2645,7 +2645,7 @@ static void PM_Weapon( void ) {
 		if (pm->ps->pm_flags & PMF_FIRE_HELD)
 		{
 #ifdef TA_WEAPSYS
-			PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
+			PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps, pm->playercfg) );
 #else
 			PM_ContinueTorsoAnim( TORSO_STAND );
 #endif

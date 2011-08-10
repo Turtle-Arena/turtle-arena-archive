@@ -181,7 +181,7 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 	body->s.groundEntityNum = ENTITYNUM_WORLD;
 #ifdef TA_WEAPSYS
 	body->s.legsAnim = BG_LegsStandForPlayerState(&ent->client->ps, &ent->client->pers.playercfg);
-	body->s.torsoAnim = BG_TorsoStandForPlayerState(&ent->client->ps);
+	body->s.torsoAnim = BG_TorsoStandForPlayerState(&ent->client->ps, &ent->client->pers.playercfg);
 	if( body->s.weapon == WP_NONE || body->s.weapon == WP_DEFAULT) {
 		body->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
 	}
@@ -230,7 +230,7 @@ static void CelebrateStop( gentity_t *player ) {
 	int		anim;
 
 #ifdef TA_WEAPSYS
-	anim = BG_TorsoStandForPlayerState(&player->client->ps);
+	anim = BG_TorsoStandForPlayerState(&player->client->ps, &player->client->pers.playercfg);
 #else
 	if( player->s.weapon == WP_GAUNTLET) {
 		anim = TORSO_STAND2;

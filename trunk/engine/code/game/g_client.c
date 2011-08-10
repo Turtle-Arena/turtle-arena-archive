@@ -1823,7 +1823,7 @@ void ClientSpawn(gentity_t *ent) {
 
 	// set default animations
 #ifdef TA_WEAPSYS
-	client->ps.torsoAnim = BG_TorsoStandForPlayerState(&client->ps);
+	client->ps.torsoAnim = BG_TorsoStandForPlayerState(&client->ps, &client->pers.playercfg);
 	client->ps.legsAnim = BG_LegsStandForPlayerState(&client->ps, &client->pers.playercfg);
 #else
 	client->ps.torsoAnim = TORSO_STAND;
