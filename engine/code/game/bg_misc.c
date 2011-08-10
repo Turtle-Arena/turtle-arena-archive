@@ -1498,6 +1498,8 @@ strAnimationDef_t playerAnimationDefs[] = {
 
 	ANIMDEF(LEGS_JUMPB_LOCKON),
 	ANIMDEF(LEGS_LANDB_LOCKON),
+
+	ANIMDEF(BOTH_WAITING),
 #endif
 
 	// Quake3, not loaded from file
@@ -3791,12 +3793,18 @@ void BG_InitNPCInfo(void)
 BG_TorsoStandForPlayerState
 ==============
 */
-animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps)
+animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg)
 {
-	if (ps == NULL || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
+	if (!ps || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups() || !playercfg)
 	{
 		return TORSO_STAND;
 	}
+
+#ifdef TURTLEARENA // PLAYERS
+	if ((ps->eFlags & EF_PLAYER_WAITING) && (playercfg->animations[BOTH_WAITING].prefixType & AP_TORSO)) {
+		return BOTH_WAITING;
+	}
+#endif
 
 	if (ps->eFlags & EF_PRIMARY_HAND)
 	{
@@ -3814,7 +3822,7 @@ animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps)
 {
 	int atkIndex;
 
-	if (ps == NULL || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
+	if (!ps || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
 	{
 		return TORSO_ATTACK;
 	}
@@ -3850,6 +3858,12 @@ animNumber_t BG_LegsStandForPlayerState(playerState_t *ps, bg_playercfg_t *playe
 	{
 		return LEGS_IDLE;
 	}
+
+#ifdef TURTLEARENA // PLAYERS
+	if ((ps->eFlags & EF_PLAYER_WAITING) && (playercfg->animations[BOTH_WAITING].prefixType & AP_LEGS)) {
+		return BOTH_WAITING;
+	}
+#endif
 
 	if (ps->eFlags & EF_PRIMARY_HAND) {
 		anim = bg_weapongroupinfo[ps->weapon].primaryAnims.standAnim;

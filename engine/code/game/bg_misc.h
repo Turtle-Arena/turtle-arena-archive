@@ -258,6 +258,9 @@ typedef enum {
 #define	EF_TALK				0x00001000		// draw a talk balloon
 #define	EF_CONNECTION		0x00002000		// draw a connection trouble sprite
 #define	EF_VOTED			0x00004000		// already cast a vote
+#ifdef TURTLEARENA // PLAYERS
+#define	EF_PLAYER_WAITING	0x00008000
+#endif
 #ifndef TURTLEARENA // AWARDS
 #define	EF_AWARD_IMPRESSIVE	0x00008000		// draw an impressive sprite
 #endif
@@ -1193,6 +1196,9 @@ typedef enum {
 
 	LEGS_JUMPB_LOCKON,
 	LEGS_LANDB_LOCKON,
+
+	// If player idles long enough, switch to waiting animation.
+	BOTH_WAITING,
 #endif
 
 	MAX_ANIMATIONS,
@@ -1485,7 +1491,7 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 
 #ifdef TA_WEAPSYS
 // For bg/game/cgame
-animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps);
+animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
 animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps);
 animNumber_t BG_LegsStandForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
 animNumber_t BG_LegsAttackForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
