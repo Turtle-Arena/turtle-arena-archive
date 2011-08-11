@@ -173,7 +173,7 @@ typedef enum {
 	// 1.32
 	CG_FS_SEEK,
 
-#if 1 // #if defined CAMERASCRIPT || defined TA_WEAPSYS
+#if 1 // #ifdef TA_WEAPSYS
 	CG_LOADCAMERA,
 	CG_STARTCAMERA,
 	CG_GETCAMERAINFO,

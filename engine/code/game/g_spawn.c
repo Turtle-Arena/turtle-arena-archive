@@ -170,9 +170,6 @@ void SP_target_push (gentity_t *ent);
 #ifdef TA_SP
 void SP_target_level_end (gentity_t *ent);
 #endif
-#ifdef CAMERASCRIPT // ZTM: i made this
-void SP_target_start_camera (gentity_t *ent);
-#endif
 
 void SP_light (gentity_t *self);
 void SP_info_null (gentity_t *self);
@@ -282,9 +279,6 @@ spawn_t	spawns[] = {
 	{"target_push", SP_target_push},
 #ifdef TA_SP
 	{"target_level_end", SP_target_level_end},
-#endif
-#ifdef CAMERASCRIPT // ZTM: i made this
-	{"target_start_camera", SP_target_start_camera},
 #endif
 
 	{"light", SP_light},

@@ -67,9 +67,6 @@ endif
 ifndef USE_FREETYPE
   USE_FREETYPE=0
 endif
-ifndef BUILD_SPLINES
-  BUILD_SPLINES=
-endif
 ifndef BUILD_DEFINES
   BUILD_DEFINES=
 endif
@@ -298,9 +295,6 @@ else # END QUAKE3
 	BUILD_DEFINES += -DTURTLEARENA -DTA_MISC -DTA_SP \
 						-DTA_WEAPSYS_EX -DTA_DATA \
 						-DNIGHTSMODE
-
-	# Currently Turtle Arena doesn't use camera scripts.
-	#BUILD_SPLINES=1 # Adds -DCAMERASCRIPT
 
 	# Use model tags for true melee attacking
 	DED_USE_MODELS=1
@@ -1228,12 +1222,6 @@ ifeq ($(IOQ3TURTLE),1)
   SERVER_CFLAGS+=$(ENGINE_CFLAGS)
 endif
 
-ifeq ($(BUILD_SPLINES),1)
-  TARGETS += $(B)/splines/libsplines.a
-  BUILD_DEFINES += -DCAMERASCRIPT
-  CLIENT_LIBS += $(B)/splines/libsplines.a
-endif
-
 ifeq ($(USE_FREETYPE),1)
   BASE_CFLAGS += -DBUILD_FREETYPE
 endif
@@ -1598,9 +1586,6 @@ endif
 	@if [ ! -d $(B)/tools/rcc ];then $(MKDIR) $(B)/tools/rcc;fi
 	@if [ ! -d $(B)/tools/cpp ];then $(MKDIR) $(B)/tools/cpp;fi
 	@if [ ! -d $(B)/tools/lburg ];then $(MKDIR) $(B)/tools/lburg;fi
-ifeq ($(BUILD_SPLINES),1)
-	@if [ ! -d $(B)/splines ];then $(MKDIR) $(B)/splines;fi
-endif
 
 #############################################################################
 # QVM BUILD TOOLS
@@ -1772,53 +1757,6 @@ $(B)/tools/asm/%.o: $(Q3ASMDIR)/%.c
 $(Q3ASM): $(Q3ASMOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(TOOLS_CFLAGS) $(TOOLS_LDFLAGS) -o $@ $^ $(TOOLS_LIBS)
-
-#############################################################################
-# SPLINES
-#############################################################################
-# ZTM
-
-SPLINESOBJ =
-
-ifeq ($(BUILD_SPLINES),1)
-
-SPLINESCFLAGS = -W -O2 -c -DNDEBUG -D_LIB
-
-ifeq ($(PLATFORM),mingw32)
-SPLINESCFLAGS += -DWIN32
-endif
-
-define DO_SPLINES_CXX
-$(echo_cmd) "SPLINES_CXX $<"
-$(Q)$(CXX) $(SPLINESCFLAGS) -o $@ $<
-endef
-
-$(B)/splines/%.o: $(SPLNDIR)/%.cpp
-	$(DO_SPLINES_CXX)
-
-SPLINESOBJ = \
-    $(B)/splines/math_angles.o\
-    $(B)/splines/math_matrix.o\
-    $(B)/splines/math_quaternion.o\
-    $(B)/splines/math_vector.o\
-    $(B)/splines/q_parse.o\
-    $(B)/splines/q_shared.o\
-    $(B)/splines/splines.o\
-    $(B)/splines/util_str.o
-
-# Set defaults
-ifndef AR
-AR=ar
-endif
-ifndef RANLIB
-RANLIB=ranlib
-endif
-
-$(B)/splines/libsplines.a: $(SPLINESOBJ)
-	$(echo_cmd) "LD $@"
-	$(AR) rc $@ $^
-	$(RANLIB) $@
-endif
 
 #############################################################################
 # CLIENT/SERVER
@@ -2201,22 +2139,6 @@ $(B)/$(CLIENTBIN).elf: $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 		-o $@ $(Q3OBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 else
-ifeq ($(BUILD_SPLINES),1)
-# TTimo: splines code requires C++ linking, but splines have
-# not been officially included in the codebase
-# ZTM: now it has, so use C++ linking.
-$(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
-	$(echo_cmd) "LD $@"
-	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
-		-o $@ $(Q3OBJ) $(Q3POBJ) \
-		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
-
-$(B)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
-	$(echo_cmd) "LD $@"
-	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
-		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
-		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
-else
 ifneq ($(USE_RENDERER_DLOPEN),0)
 $(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
@@ -2246,7 +2168,6 @@ $(B)/$(CLIENTBIN)-smp$(FULLBINEXT): $(Q3OBJ) $(Q3ROBJ) $(Q3POBJ_SMP) $(LIBSDLMAI
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3ROBJ) $(Q3POBJ_SMP) \
 		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(RENDERER_LIBS) $(LIBS)
-endif
 endif
 endif
 
@@ -2956,10 +2877,6 @@ OBJ = $(Q3OBJ) $(Q3POBJ) $(Q3POBJ_SMP) $(Q3ROBJ) $(Q3DOBJ) \
   $(MPGOBJ) $(Q3GOBJ) $(Q3CGOBJ) $(MPCGOBJ) $(Q3UIOBJ) $(MPUIOBJ) \
   $(MPGVMOBJ) $(Q3GVMOBJ) $(Q3CGVMOBJ) $(MPCGVMOBJ) $(Q3UIVMOBJ) $(MPUIVMOBJ)
 TOOLSOBJ = $(LBURGOBJ) $(Q3CPPOBJ) $(Q3RCCOBJ) $(Q3LCCOBJ) $(Q3ASMOBJ)
-
-ifeq ($(BUILD_SPLINES),1)
-OBJ+= $(SPLINESOBJ)
-endif
 
 copyfiles: release
 ifeq ($(QUAKE3),1)
