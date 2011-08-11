@@ -248,6 +248,7 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		}
 	}
 
+#ifdef IOQ3ZTM
 	if( videoInfo->current_h > 0 ) {
 		glConfig.vidWidth = videoInfo->current_w;
 		glConfig.vidHeight = videoInfo->current_h;
@@ -257,6 +258,7 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		ri.Printf( PRINT_ALL,
 				"Cannot determine display resolution, assuming 640x480\n" );
 	}
+#endif
 
 	ri.Printf (PRINT_ALL, "...setting mode %d:", mode );
 
