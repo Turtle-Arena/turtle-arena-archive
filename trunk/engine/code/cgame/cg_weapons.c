@@ -3282,12 +3282,8 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	}
 
 	// no gun if in third person view or a camera is active
-#ifdef CAMERASCRIPT
-	if ( cg.renderingThirdPerson || cg.cameraMode) {
-#else
 	//if ( cg.renderingThirdPerson || cg.cameraMode) {
 	if ( cg.renderingThirdPerson ) {
-#endif
 		return;
 	}
 

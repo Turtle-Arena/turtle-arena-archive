@@ -479,39 +479,6 @@ static void CG_StartOrbit_f( void ) {
 	}
 }
 
-#ifdef CAMERASCRIPT
-/*
-==============
-CG_StartCamera
-==============
-*/
-void CG_StartCamera( const char *name, qboolean startBlack, qboolean endBlack) {
-	char lname[MAX_QPATH];
-	COM_StripExtension(name, lname, MAX_QPATH);
-	Q_strcat( lname, sizeof(lname), ".camera" );
-	if (trap_loadCamera(va("cameras/%s", lname))) {
-		cg.cameraMode = qtrue;
-		if(startBlack) {
-			CG_Fade(255, 0, 0);	// go black
-			CG_Fade(0, cg.time, 1500);
-		}
-
-#ifdef IOQ3ZTM // LETTERBOX
-		CG_ToggleLetterbox(qtrue, startBlack);
-#endif
-		cg.cameraEndBlack = endBlack;
-		trap_startCamera(cg.time);	// camera on in client
-	} else {
-		CG_Printf ("Unable to load camera %s\n",name);
-	}
-}
-
-static void CG_Camera_f( void ) {
-	char name[MAX_QPATH];
-	trap_Argv( 1, name, sizeof(name));
-	CG_StartCamera(name, qfalse, qfalse );
-}
-#else
 /*
 static void CG_Camera_f( void ) {
 	char name[1024];
@@ -524,7 +491,6 @@ static void CG_Camera_f( void ) {
 	}
 }
 */
-#endif
 
 #ifdef IOQ3ZTM // NEW_CAM
 void CG_CamZoomIn(int localClient, qboolean down)
@@ -881,11 +847,7 @@ static consoleCommand_t	commands[] = {
 #endif
 #endif
 	{ "startOrbit", CG_StartOrbit_f },
-#ifdef CAMERASCRIPT
-	{ "camera", CG_Camera_f },
-#else
 	//{ "camera", CG_Camera_f },
-#endif
 	{ "loaddeferred", CG_LoadDeferredPlayers } 
 };
 

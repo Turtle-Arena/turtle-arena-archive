@@ -1253,15 +1253,9 @@ static void CG_DamageBlendBlob( void ) {
 		return;
 	}
 
-#ifdef CAMERASCRIPT
-	if (cg.cameraMode) {
-		return;
-	}
-#else
 	//if (cg.cameraMode) {
 	//	return;
 	//}
-#endif
 
 	// ragePro systems can't fade blends, so don't obscure the screen
 	if ( cgs.glconfig.hardwareType == GLHW_RAGEPRO ) {
@@ -1318,35 +1312,6 @@ static int CG_CalcViewValues( void ) {
 	CG_CalcVrect();
 
 	ps = &cg.cur_lc->predictedPlayerState;
-#ifdef CAMERASCRIPT
-	if (cg.cameraMode) {
-		vec3_t origin, angles;
-		float fov = 90;
-		float x;
-		if (trap_getCameraInfo(cg.time, &origin, &angles, &fov)) {
-			VectorCopy(origin, cg.refdef.vieworg);
-			angles[ROLL] = 0;
-			angles[PITCH] = -angles[PITCH]; // Bug Fix for GtkRadiant cameras
-			VectorCopy(angles, cg.refdefViewAngles);
-			AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
-			x = cg.refdef.width / tan( fov / 360 * M_PI );
-			cg.refdef.fov_y = atan2( cg.refdef.height, x );
-			cg.refdef.fov_y = cg.refdef.fov_y * 360 / M_PI;
-			cg.refdef.fov_x = fov;
-			return 0;
-		} else {
-			cg.cameraMode = qfalse;
-			if (cg.cameraEndBlack) {
-				CG_Fade(255, 0, 0);				// go black
-				CG_Fade(0, cg.time + 200, 1500);	// then fadeup
-			}
-
-#ifdef IOQ3ZTM // LETTERBOX
-			CG_ToggleLetterbox(qfalse, cg.cameraEndBlack);
-#endif
-		}
-	}
-#else
 /*
 	if (cg.cameraMode) {
 		vec3_t origin, angles;
@@ -1361,7 +1326,6 @@ static int CG_CalcViewValues( void ) {
 		}
 	}
 */
-#endif
 	// intermission view
 	if ( ps->pm_type == PM_INTERMISSION
 #ifdef TA_SP

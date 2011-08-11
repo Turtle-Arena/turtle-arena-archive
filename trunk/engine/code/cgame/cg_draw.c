@@ -3599,17 +3599,11 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 		return;
 	}
 
-#ifdef CAMERASCRIPT
-	if (cg.cameraMode) {
-		return;
-	}
-#else
 /*
 	if (cg.cameraMode) {
 		return;
 	}
 */
-#endif
 	if ( cg.cur_ps->persistant[PERS_TEAM] == TEAM_SPECTATOR ) {
 		CG_DrawSpectator();
 
@@ -3707,9 +3701,6 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 #endif
 		CG_DrawCenterString();
 	}
-#ifdef CAMERASCRIPT
-	CG_DrawFlashFade();
-#endif
 }
 
 
@@ -3753,52 +3744,6 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	// draw status bar and other floating elements
  	CG_Draw2D(stereoView);
 }
-
-#ifdef CAMERASCRIPT
-/*
-=================
-CG_Fade
-=================
-*/
-void CG_Fade( int a, int time, int duration ) {
-	cgs.scrFadeAlpha = (float)a / 255.0f;
-	cgs.scrFadeStartTime = time;
-	cgs.scrFadeDuration = duration;
-	if (cgs.scrFadeStartTime + cgs.scrFadeDuration <= cg.time) {
-		cgs.scrFadeAlphaCurrent = cgs.scrFadeAlpha;
-	}
-	return;
-}
-
-void CG_DrawFlashFade( void ) {
-	static int lastTime;
-	int elapsed, time;
-	vec4_t col;
-	if (cgs.scrFadeStartTime + cgs.scrFadeDuration < cg.time) {
-		cgs.scrFadeAlphaCurrent = cgs.scrFadeAlpha;
-	} else if (cgs.scrFadeAlphaCurrent != cgs.scrFadeAlpha) {
-     elapsed = (time = trap_Milliseconds()) - lastTime;
-		lastTime = time;
-		if (elapsed < 500 && elapsed > 0) {
-			if (cgs.scrFadeAlphaCurrent > cgs.scrFadeAlpha) {
-				cgs.scrFadeAlphaCurrent -= ((float)elapsed/(float)cgs.scrFadeDuration);
-				if (cgs.scrFadeAlphaCurrent < cgs.scrFadeAlpha)
-					cgs.scrFadeAlphaCurrent = cgs.scrFadeAlpha;
-			} else {
-				cgs.scrFadeAlphaCurrent += ((float)elapsed/(float)cgs.scrFadeDuration);
-				if (cgs.scrFadeAlphaCurrent > cgs.scrFadeAlpha)
-					cgs.scrFadeAlphaCurrent = cgs.scrFadeAlpha;
-			}
-		}
-	}
-	// now draw the fade
-	if (cgs.scrFadeAlphaCurrent > 0.0) {
-		VectorClear( col );
-		col[3] = cgs.scrFadeAlphaCurrent;
-		CG_FillRectFit( 0, 0, 640, 480, col );
-	}
-}
-#endif
 
 #ifdef IOQ3ZTM // LETTERBOX
 /*

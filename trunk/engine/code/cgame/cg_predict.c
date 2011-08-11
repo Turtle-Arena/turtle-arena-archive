@@ -662,17 +662,6 @@ void CG_PredictPlayerState( void ) {
 			cg_pmove.cmd.serverTime = ((cg_pmove.cmd.serverTime + pmove_msec.integer-1) / pmove_msec.integer) * pmove_msec.integer;
 		}
 
-#ifdef CAMERASCRIPT
-		if (cgs.scrFadeAlphaCurrent) {
-			cg_pmove.cmd.buttons = 0;
-			cg_pmove.cmd.forwardmove = 0;
-			cg_pmove.cmd.rightmove = 0;
-			cg_pmove.cmd.upmove = 0;
-			if (cg_pmove.cmd.serverTime - cg.cur_lc->predictedPlayerState.commandTime > 1)
-				cg_pmove.cmd.serverTime = cg.cur_lc->predictedPlayerState.commandTime + 1;
-		}
-#endif
-
 		Pmove (&cg_pmove);
 
 		moved = qtrue;

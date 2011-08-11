@@ -1206,15 +1206,6 @@ static void CG_ServerCommand( void ) {
 	}
 #endif
 
-#ifdef CAMERASCRIPT
-	if ( !strcmp( cmd, "startCam" ) ) {
-#ifdef TA_SPLITVIEW // ZTM: FIXME: Add support for multiple local clients.
-#endif
-		CG_StartCamera( CG_Argv(start+1), atoi(CG_Argv(start+2)), atoi(CG_Argv(start+3)) );
-		return;
-	}
-#endif
-
 	if ( !strcmp( cmd, "cp" ) ) {
 #ifdef TA_SPLITVIEW
 		cg.cur_lc = &cg.localClients[lc];

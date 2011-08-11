@@ -863,12 +863,8 @@ typedef struct {
 	float camDistance; // Distance from client to put camera
 #endif
 
-#ifdef CAMERASCRIPT
-	qboolean cameraMode;		// if rendering from a loaded camera
-	qboolean cameraEndBlack;	// go black after camera ends.
-#else
 	//qboolean cameraMode;		// if rendering from a loaded camera
-#endif
+
 #ifdef IOQ3ZTM // LETTERBOX
 	// Use CG_ToggleLetterbox to change letterbox mode
 	qboolean letterbox;	// qtrue if moving onto the screen, or is done moving on.
@@ -1569,11 +1565,6 @@ typedef struct {
 	int acceptTask;
 	int acceptLeader;
 	char acceptVoice[MAX_NAME_LENGTH];
-#ifdef CAMERASCRIPT
-	float	scrFadeAlpha, scrFadeAlphaCurrent;
-	int		scrFadeStartTime;
-	int		scrFadeDuration;
-#endif
 
 	// media
 	cgMedia_t		media;
@@ -2210,10 +2201,6 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 #ifdef TA_ENTSYS // EXP_SCALE
 void CG_ExplosionEffect(vec3_t origin, int radius, int entity);
 #endif
-#ifdef CAMERASCRIPT
-void CG_Fade( int a, int time, int duration );
-void CG_DrawFlashFade( void );
-#endif
 #ifdef IOQ3ZTM // LETTERBOX
 void CG_ToggleLetterbox(qboolean onscreen, qboolean instant);
 void CG_DrawLetterbox(void);
@@ -2485,12 +2472,9 @@ void trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
 
 void trap_SnapVector( float *v );
 
+#ifndef IOQ3ZTM
 qboolean	trap_loadCamera(const char *name);
 void		trap_startCamera(int time);
-#ifdef CAMERASCRIPT
-qboolean	trap_getCameraInfo(int time, vec3_t *origin, vec3_t *angles, float *fov);
-void		CG_StartCamera(const char *name, qboolean startBlack, qboolean endBlack );
-#else
 qboolean	trap_getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 #endif
 

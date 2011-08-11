@@ -29,11 +29,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 extern	botlib_export_t	*botlib_export;
 
+#ifndef IOQ3ZTM
 extern qboolean loadCamera(const char *name);
 extern void startCamera(int time);
-#ifdef CAMERASCRIPT
-extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles, float *fov);
-#else
 extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 #endif
 
@@ -759,18 +757,6 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_R_REMAP_SHADER:
 		re.RemapShader( VMA(1), VMA(2), VMA(3) );
 		return 0;
-
-#ifdef CAMERASCRIPT
-	case CG_LOADCAMERA:
-		return loadCamera(VMA(1));
-
-	case CG_STARTCAMERA:
-		startCamera(args[1]);
-		return 0;
-
-	case CG_GETCAMERAINFO:
-		return getCameraInfo(args[1], VMA(2), VMA(3), VMA(4));
-#else
 /*
 	case CG_LOADCAMERA:
 		return loadCamera(VMA(1));
@@ -782,7 +768,6 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_GETCAMERAINFO:
 		return getCameraInfo(args[1], VMA(2), VMA(3));
 */
-#endif
 	case CG_GET_ENTITY_TOKEN:
 		return re.GetEntityToken( VMA(1), args[2] );
 	case CG_R_INPVS:
