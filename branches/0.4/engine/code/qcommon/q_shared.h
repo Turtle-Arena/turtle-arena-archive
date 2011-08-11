@@ -669,6 +669,7 @@ float Com_Clamp( float min, float max, float value );
 char	*COM_SkipPath( char *pathname );
 const char	*COM_GetExtension( const char *name );
 void	COM_StripExtension(const char *in, char *out, int destsize);
+qboolean COM_CompareExtension(const char *in, const char *ext);
 void	COM_DefaultExtension( char *path, int maxSize, const char *extension );
 #ifdef IOQ3ZTM
 void Com_SetExt(char *filename, char *ext);
