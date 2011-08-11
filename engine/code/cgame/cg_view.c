@@ -1678,6 +1678,8 @@ void CG_AddAnnouncement(int announcement)
 				CG_AddAnnouncementEx(&cg.localClients[i], sfx, bufferedSfx, cg_announcementMessages[announcement]);
 			}
 		}
+
+		return;
 	}
 
 	lc = &cg.localClients[localClientNumber];
