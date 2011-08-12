@@ -29,6 +29,9 @@ First stable playable release.
 == 0.4.2 (Completed) ==
   * Bug fix release
 
+== 0.4.3 ==
+  * Bug fix release
+
 == 0.5 series ==
 The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with more often releases.
 
@@ -37,8 +40,43 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
   * DONE: Allow server public (internet) status to be changed anytime.
   * DONE: Allow non-dedicated internet servers.
 
-=== 0.5.1 ===
+=== 0.5.1 (Completed) ===
   * DONE: Remove remaining OpenArena images and sounds.
+
+=== 0.5.2 ===
+  * DONE: Redesign HUD (with health bar)
+  * Fixed various usability issues.
+
+=== 0.5.3 ===
+  * Add head model animation support.
+  * Make changes to player model system for future models.
+  * Make sure IQM support is fully working.
+  * Create test single model IQM player that uses skeleton blending (for testing and demonstration new player model animation system).
+  * Start making new player models.
+
+=== 0.5.4 ===
+  * Remove the TMNT player models.
+  * Add a new player model designed for the game.
+  * Add weapon for new player if needed.
+
+=== 0.5.5 ===
+  * Add new player model(s).
+  * Add weapon(s) for new player(s) if needed.
+  * Finish breakable/pushable objects and brushes code.
+
+=== 0.5.6 ===
+  * (Finish four main player models)
+  * Rename the game (to hopefully its final name)
+  * Create new logo
+  * Create new icon, menu background, and loading screen?
+  * Replace teams (names and icons), currently Katanas and Sais.
+
+=== 0.5.7 ===
+0.5.7 may be kind of a Release Candidate for 0.6.
+
+  * Improve current maps
+  * Create some new maps?
+  * Fix any issues that are found.
 
 == 0.6 ==
 Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve other legality concerns.
@@ -46,22 +84,25 @@ Focus on finalizing the game's branding (name, logo, etc), making it completely 
   * Rename the game (to hopefully its final name)
   * Create new logo
   * Create new icon, menu background, and loading screen?
+  * Replace teams (names and icons), currently Katanas and Sais.
 
-  * Decide what format player models should be and make it doable if not already.
-    * IQM? Multiple models or single with xreal-based skeleton animation blending?
+  * Make changes to player model system for future models.
+  * Make sure IQM support is fully working.
+
   * Remove the current players, replace with new characters designed for the game.
   * Add weapons for new players if needed.
-  * Replace teams (names and icons), currently Katanas and Sais. Should per-team skins be added, or just stick with blue/red?
 
-  * Clean up / rewrite shaders (do not have clear licensing for them)
   * DONE: Remove remaining OpenArena images and sounds.
-
   * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution. (Many are already 2x or 4x quake3 resolution.)
-  * Remake all (non-texture) images that do not have a svg source file?
+
   * Finish breakable/pushable objects and brushes code.
-  * Switch to missionpack ui?
 
   * DONE: Four player splitscreen.
+
+Optional goal;
+  * Clean up / rewrite shaders (do not have clear licensing for them)?
+  * Remake all (non-texture) images that do not have a svg source file?
+  * Switch to missionpack ui?
 
 == 0.8 ==
 Focus on map themes and multiplayer maps. Goal is the develop assets/skills for single player. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game, comparable to commercial games.
