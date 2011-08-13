@@ -1,0 +1,90 @@
+Turtle Arena credits.
+
+== Credits ==
+* id software			(For making and releasing Quake III Arena's source code)
+* ioquake3 devoplers	(For improving, fixing, and cleaning up Quake 3's source code)
+* Wolf-ET				(For snow and rain atmospheric effects)
+* ioSTVEF				(For "noise" and "random" waveform keywords, and RF_FORCE_ENT_ALPHA render flag)
+* Open Arena			(For botfiles, images, shaders, ...)
+* Xreal project			(For homing rockets and shootable rockets)
+* Smokin' Guns			(For some breakable respawn code and a minor animation time fix)
+* GNU FreeFonts			(For FreeSans.ttf, FreeSansBold.ttf, and FreeMono.ttf)
+* Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)
+* The Mulletz			(For music)
+* Zack "ZTurtleMan" Middleton
+
+
+== License ==
+Most of the Turtle Arena source code is licensed under the GNU General Public License version 2 or later.
+	(See COPYING file for full license) The code in the WOLFET ifdefs is licensed under the GNU GPLv3 or later.
+
+Most of the data is licensed under the GNU GPLv2 or later, but some is license under the Creative Commons,
+	see COPYRIGHTS file full details.
+
+
+== Data ==
+See COPYRIGHTS file for data per-file copyrights.
+
+
+== Code ==
+Turtle Arena uses code directly or based on the following.
+
+=== GPLv2 or later ===
+* ioquake3 (Base engine): http://ioquake3.org/
+
+* ioSTVEF (IOSTVEF): http://thilo.kickchat.com/efport-progress/
+** (IOSTVEF_NOISE) Adds support for "noise" and "random" waveform keywords
+** RF_FORCE_ENT_ALPHA, it will be used so items/weapons fad out when dispearing.
+
+* OpenArena (OPENARENA): http://openarena.ws
+** Changed default sound filename. Load Ogg Vorbis sounds (when no wav is found).
+** (OA_BLOOM) OpenArena's bloom effect, disabled by default. (r_bloom 1 to enable)
+
+* Xreal (XREAL): http://www.xreal-project.net/
+** Homing rockets (Xreal svn r2785)
+** Fired rockets and homing-rockets can be destroyed (Xreal svn r > 2785)
+** Used Xreal to find what to change to add per-player bounding boxes (Xreal svn r3050)
+** Jeff "Jeffro11" Attwood (EXTERNAL_LIGHTMAPS): http://ioquake.org/forums/viewtopic.php?f=2&t=100
+
+* Smokin' Guns (SMOKIN_GUNS): http://www.smokin-guns.net/
+** Fixed animation timing based on PM_AnimLength from Smokin' Guns' bg_pmove.c
+** Used some of Smokin' Guns' breakable respawn code for my breakables
+
+* Mercenaries Guild Client 1.011 for Tremulous: http://projects.mercenariesguild.net/projects/mgclient
+** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some parts, ...)
+
+=== GPLv3 or later ===
+* Wolf-ET (WOLFET)
+** Adds snow and rain atmospheric effects
+** Adds pushable objects (misc_object)
+
+=== Other ===
+Code based on guides, etc.
+
+* The Reaction Factory: http://www.rfactory.org/
+** The Dark Conjunction (via rfactory): http://tdc.planetquake.gamespy.com/news.htm
+
+* "inolan.com", basic breakable brush code: http://www.quake3hut.co.uk/q3coding/Breakable%20Glass.htm
+
+
+== Software used ==
+Software used to create the Turtle Arena data files.
+
+=== Text ===
+* Code::Blocks
+* gedit (GNOME Text Editor)
+* Microsoft Windows Notepad and Wordpad
+
+=== 3D Models ===
+* Wings3D
+* Misfit Model 3D
+
+=== 2D Graphics ===
+* GIMP
+* Inkscape
+
+== Maps ==
+* GtkRadiant
+* NetRadiant
+* GenSurf
+

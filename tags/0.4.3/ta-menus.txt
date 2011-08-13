@@ -1,0 +1,140 @@
+Turtle Arena's new WIP menu idea, for when I make the menu using Team Arena menu scripting.
+		...or if stick with quake3's ui.
+
+TODO: Finished doing this to the q3 ui so I can remove this file.
+
+:MAIN
+PLAY
+MULTIPLAYER - or NETWORK GAME?
+OPTIONS
+QUIT
+
+== PLAY ==
+=== NEW GAME ===
+[File select like SRB2 1.1? (Which is like Sonic 3 and Knuckles...)]
+Player select menu. (Do after stage select?)
+Stage select.
+If the there is more then one area and the first has been cleared, allow area select.
+Start map.
+
+=== LOAD GAME ===
+Show list of save games, like DEMOS menu.
+Load savegame.
+
+=== DEMOS ===
+Show a list of demos, start a demo, ect.
+
+=== CINEMATICS ===
+Currently don't have any. Disable for now.
+
+=== MODS ===
+List Mods, load Mod.
+
+== MULTIPLAYER ==
+:Or Network Game?
+
+=== Create Game ===
+:Or Host Game?
+
+=== Join Game (Search) ===
+
+=== Join Game (Specify IP) ===
+
+=== Setup Player ===
+
+
+== OPTIONS ==
+:Like the Q3 SETUP menu, less player setup.
+
+=== CONTROLS ===
+
+==== Player 1 ====
+//==== Player 2 ====
+//==== Player 3 ====
+//==== Player 4 ====
+==== Game Controls ==== --Just list controls here in "CONTROLS" menu.
+* Show scores
+* Chat
+* Chat - Team
+* Chat - Target
+* Chat - Attacker
+
+=== CREDITS ===
+:Not needed at all?
+
+
+== EXIT ==
+Ask for confirm, exit program.
+
+
+
+:INGAME
+Resume Game
+: if gametype < GT_TEAM
+:: if spectator
+Join Game
+:: else
+Spectate
+: else
+Team Select --Was "Join", but new name still isn't lot more good-er.'
+: end if
+Add/Remove Bots --server/admin only?
+Player
+Vote --Like in missionpack
+Options
+Server Info -- Put in options or do players want to see it a lot?
+Exit
+
+:INGAMESP
+Resume Game
+Save Game
+Load Game?
+Options
+Exit
+
+== Resume Game ==
+Close ingame menu.
+
+== Join ==
+Open menu with teams.
+
+== Add/Remove Bot ==
+
+== Player ==
+Change player model [and headmodel?] and player skin and colors.
+
+/* SP ONLY
+=== SAVE GAME ===
+//Only allow usage if in a spgame
+Have user select/typein filename.
+Save game.
+
+=== LOAD GAME ===
+Show list of save games, like DEMOS menu.
+Load savegame.
+*/
+
+== Options ==
+Like the out_options only not fullscreen.
+
+== Server Info ==
+Open [message] box with info.
+
+== Leave Game ==
+Ask for confirm.
+Exit back to main menu.
+
+== Exit ==
+=== Restart Game ===
+: Not in Single Player (or Co-op?), don't have in any menu? -- Not something that seems needed, to me that is.
+
+=== Main Menu ===
+:Leave Arena
+
+=== Exit Game ===
+Ask for confirm.
+Exit the whole game, back to OS.
+
+=== Cancel ===
+Close "Exit" popup menu.
+

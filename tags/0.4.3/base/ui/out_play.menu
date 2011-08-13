@@ -1,0 +1,304 @@
+// Turtle Arena
+// Play menu
+// Base on rfactory.org out_main.menu
+#include "ui/menudef.h"
+
+{
+	assetGlobalDef
+	{
+		font "fonts/font" 16
+		smallFont "fonts/smallfont" 12
+		bigFont "fonts/bigfont" 20
+		cursor "ui/assets/3_cursor3"
+		itemFocusSound "sound/misc/menu2.wav"
+
+		fadeClamp 1.0
+		fadeCycle 1
+		fadeAmount 0.1
+	}
+
+	menuDef
+	{
+		name "play"
+		fullScreen MENU_TRUE
+		focusColor 1 0.43 0 1.25
+
+		onOpen
+		{
+			playlooped "music/menu.wav" ;
+		}
+
+		onESC
+		{
+			close "play";
+			open "main"
+		}
+
+		//
+		// menu background
+		//
+		itemDef
+		{
+			name background
+			style WINDOW_STYLE_SHADER
+			rect 0 0 640 480
+			background "ui/assets/out_menuback"
+			visible MENU_TRUE
+			decoration
+		}
+
+		//
+		// Title Banner
+		//
+		itemDef
+		{
+			name titlebanner
+			style WINDOW_STYLE_SHADER
+			rect 192 12 256 128
+			background "ui/assets/titlebanner"
+			visible MENU_TRUE
+			decoration
+		}
+
+		//
+		// New Game Button
+		//
+		itemDef
+		{
+			name newgamebutton
+			type ITEM_TYPE_BUTTON
+			rect 255 235 130 24
+			text "New Game"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show newgametext
+			}
+			mouseExit
+			{
+				hide newgametext
+			}
+			action
+			{
+				close "play";
+				//open "newgame"
+				exec "model raph";
+				exec "headmodel raph";
+				exec "spmap sp1a1"
+			}
+		}
+
+		//
+		// Load Game Button
+		//
+		itemDef
+		{
+			name loadgamebutton
+			text "Load Game"
+			type ITEM_TYPE_BUTTON
+			rect 255 265 130 24
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show loadgametext
+			}
+			mouseExit
+			{
+				hide loadgametext
+			}
+			action
+			{
+				close "play";
+				open "loadgame"
+			}
+		}
+
+		//
+		// Demos Button
+		//
+		itemDef
+		{
+			name demosbutton
+			text "Demos"
+			type ITEM_TYPE_BUTTON
+			rect 255 295 130 24
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show demostext
+			}
+			mouseExit
+			{
+				hide demostext
+			}
+			action
+			{
+				close "play";
+				open "demos"
+			}
+		}
+
+		//
+		// Cinematics Button
+		//
+		itemDef
+		{
+			name cinematicsbutton
+			text "Cinematics"
+			type ITEM_TYPE_BUTTON
+			rect 255 325 130 24
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show cinematicstext
+			}
+			mouseExit
+			{
+				hide cinematicstext
+			}
+			action
+			{
+				close "play";
+				open "cinematics"
+			}
+		}
+
+		//
+		// Back Button
+		//
+		itemDef
+		{
+			name backbutton
+			text "Back"
+			type ITEM_TYPE_BUTTON
+			rect 255 355 130 24
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show backtext
+			}
+			mouseExit
+			{
+				hide backtext
+			}
+			action
+			{
+				close "play";
+				open "main"
+			}
+		}
+
+		//
+		// Focus Text for the buttons
+		//
+		itemDef
+		{
+			name newgametext
+			rect 0 444 640 24
+			text "Start a new game"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+
+		itemDef
+		{
+			name loadgametext
+			rect 0 444 640 24
+			text "Load a saved game"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+
+		itemDef
+		{
+			name demostext
+			rect 0 444 640 24
+			text "View demos"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+
+		itemDef
+		{
+			name cinematicstext
+			rect 0 444 640 24
+			text "View cinematics"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+
+		itemDef
+		{
+			name backtext
+			rect 0 444 640 24
+			text "Return to main menu"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+	}
+}

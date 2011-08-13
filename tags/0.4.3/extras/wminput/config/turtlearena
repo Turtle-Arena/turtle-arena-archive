@@ -1,0 +1,70 @@
+# turtlearena - Wiimote held forward
+# Also see;
+# turtlearena_side - Wiimote held sideways
+# turtlearena_nun - Wiimote + Nunchuck
+
+# Show that it is on
+Plugin.led.Led1 = 1
+
+#acc_ptr
+Plugin.acc.X	= REL_X
+Plugin.acc.Y	= REL_Y
+
+# buttons
+Wiimote.A		= KEY_SPACE # Jump
+Wiimote.B		= BTN_LEFT # Attack
+Wiimote.Minus	= KEY_LEFTBRACE # Previous item
+Wiimote.Plus	= KEY_RIGHTBRACE # Next item
+Wiimote.Home	= KEY_ESC # Open menu
+
+# Wiimote only
+Wiimote.Up		= KEY_UP # Move forward
+Wiimote.Down	= KEY_DOWN # Move backward
+Wiimote.Left	= KEY_LEFT # Turn left
+Wiimote.Right	= KEY_RIGHT # Turn right
+Wiimote.1		= KEY_ENTER # Use Item
+Wiimote.2		= KEY_SEMICOLON # Drop weapon
+
+# Has Nunchuck (See turtlearena_nun)
+#Wiimote.Up		= KEY_SEMICOLON # Drop weapon
+#Wiimote.Down	= KEY_ENTER # Use Item
+#Wiimote.Left	= KEY_A # Move left
+#Wiimote.Right	= KEY_D # Move right
+#Wiimote.1		= KEY_F # Drop flag
+#Wiimote.2		= KEY_KP7 # Toggle third person
+
+Nunchuk.C               = KEY_C # Duck
+Nunchuk.Z               = KEY_L # Lock-on
+
+#plugin for nunchuk stick
+Plugin.nunchuk_stick2btn.Up		= KEY_UP
+Plugin.nunchuk_stick2btn.Down	= KEY_DOWN
+Plugin.nunchuk_stick2btn.Left	= KEY_LEFT
+Plugin.nunchuk_stick2btn.Right	= KEY_RIGHT
+
+
+# Classic controler
+Classic.Up		= KEY_UP # Move forward
+Classic.Down	= KEY_DOWN # Move backward
+Classic.Left	= KEY_LEFT # Turn left
+Classic.Right	= KEY_RIGHT # Turn right
+Classic.Minus	= KEY_LEFTBRACE # Previous item
+Classic.Plus	= KEY_RIGHTBRACE # Next item
+Classic.Home	= KEY_ESC # Open menu
+Classic.A		= KEY_SPACE # Jump
+Classic.B		= BTN_LEFT # Attack
+Classic.X		= KEY_ENTER # Use Item
+Classic.Y		= KEY_SEMICOLON # Drop weapon
+Classic.ZL		= KEY_L # Lock-on
+Classic.ZR		= KEY_C # Duck
+Classic.L		= KEY_A # Move left
+Classic.R		= KEY_D # Move right
+
+# TODO: Move with left joy?
+Classic.LStick.X = REL_X
+Classic.LStick.Y = REL_Y
+
+# Control view with right joy
+Classic.RStick.X = REL_X
+Classic.RStick.Y = REL_Y
+
