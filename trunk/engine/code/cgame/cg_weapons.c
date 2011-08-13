@@ -2809,8 +2809,6 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 	// add the weapon
 	memset( &gun, 0, sizeof( gun ) );
 
-#ifdef TA_SPLITVIEW // ZTM: TODO: We should check and use weaponTime of all of the local clients.
-#endif
 #ifndef TA_WEAPSYS
 	VectorCopy( parent->lightingOrigin, gun.lightingOrigin );
 	gun.shadowPlane = parent->shadowPlane;
