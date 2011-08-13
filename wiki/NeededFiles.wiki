@@ -174,7 +174,6 @@ NOTE: %d is replaced with 1 through 4. (i.e. sound/player/footsteps/step1.wav, s
     * TEMP: shurikenlaser.md3
 
   * models/powerups/instant/
-    * TEMP: strength.md3  Strength - TODO: Arm showing strength? Or red glowing transparent sword?
     * TEMP: invul.md3  Invulnerability - ?
 
 == MISSIONPACK CTF flags ==
