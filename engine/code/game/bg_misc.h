@@ -318,7 +318,7 @@ typedef enum {
 
 	PW_FLIGHT,		// Allow player to fly around the level.
 
-	PW_INVUL,		// New invulerrability
+	PW_INVUL,		// Invulerrability
 	PW_FLASHING,	// Given on spawn/teleport/dead, take no damge and glow/flash blue.
 					// (Named after SRB2's pw_flashing.)
 
@@ -328,8 +328,8 @@ typedef enum {
 
 	// Persistant powers.
 	PW_SCOUT,		// Speed
-	PW_GUARD,		// 200 health (handy cap*2?) and health regen
-	PW_DOUBLER,		// Doubles attack power
+	PW_GUARD,		// 200 health, health items give 2x health.
+	PW_DOUBLER,		// Double attack power
 	PW_AMMOREGEN,	// Regen ammo and shurikens --What about Melee weapons?
 					//    Give melee weapons limited uses? So that ammo give no limit?
 					//    Give melee weapons time-to-live? So that ammo give no limit?
