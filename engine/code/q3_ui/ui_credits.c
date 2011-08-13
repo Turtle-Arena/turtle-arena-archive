@@ -123,7 +123,7 @@ static void UI_CreditMenu_Draw_Legal( void ) {
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "no way affiliated with", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "Viacom, Nickelodeon, or Ubisoft.", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "Viacom, Ubisoft, or Mirage Studios.", UI_CENTER|UI_SMALLFONT, color_white );
 
 	// Copyright
 	y += (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
@@ -158,7 +158,7 @@ static void UI_CreditMenu_Draw( void ) {
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "Xreal, Smokin' Guns, Mercenaries Guild,", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "ZEQ2-lite, The Reaction Factory, \"inolan.com\",", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, " Wolf-ET, The Reaction Factory, \"inolan.com\",", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "Zack \"ZTurtleMan\" Middleton", UI_CENTER|UI_SMALLFONT, color_white );
 
@@ -173,6 +173,8 @@ static void UI_CreditMenu_Draw( void ) {
 	y += (PROP_HEIGHT * PROP_SMALL_SIZE_SCALE) * 2;
 
 	UI_DrawProportionalString( 320, y, "Music", UI_CENTER|UI_SMALLFONT, color_white );
+	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
+	UI_DrawProportionalString( 320, y, "The Mulletz - ccmixter.org/people/NeilCrowe/", UI_CENTER|UI_SMALLFONT, color_white );
 	y += PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 	UI_DrawProportionalString( 320, y, "zero-project - zero-project.gr", UI_CENTER|UI_SMALLFONT, color_white );
 
@@ -180,7 +182,7 @@ static void UI_CreditMenu_Draw( void ) {
 
 	UI_DrawProportionalString( 320, y, "Fonts", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
-	UI_DrawProportionalString( 320, y, "GNU FreeFonts, DejaVu fonts", UI_CENTER|UI_SMALLFONT, color_white );
+	UI_DrawProportionalString( 320, y, "GNU FreeFonts", UI_CENTER|UI_SMALLFONT, color_white );
 #else
 	y = 12;
 	UI_DrawProportionalString( 320, y, "id Software is:", UI_CENTER|UI_SMALLFONT, color_white );
@@ -243,6 +245,14 @@ Exit game credits
 ===============
 */
 void UI_CreditMenu( void ) {
+#ifndef IOQ3ZTM // I fixed widescreen background, hack no longer needed.
+	/* This UI_FillRect() hack will blank the borders if you're in widescreen,
+	   so you get a completely black background instead of stripes from the
+	   previous frame on each side of the credits.. */
+	const float black[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	UI_FillRect(0 - uis.bias, 0, (640.0f / uis.xscale) * 2.0f, 480.0f / uis.yscale, black);
+#endif
+
 	memset( &s_credits, 0 ,sizeof(s_credits) );
 
 #ifdef TURTLEARENA

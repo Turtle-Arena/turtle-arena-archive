@@ -20,17 +20,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
-#ifdef __wii__
-#include <gccore.h>
-// Undefine libogc's colors, conflicts with q3 defines.
-#undef COLOR_BLACK
-#undef COLOR_GREEN
-#undef COLOR_RED
-#undef COLOR_YELLOW
-#undef COLOR_BLUE
-#undef COLOR_WHITE
-#endif
-
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 #include "sys_local.h"
@@ -42,69 +31,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdio.h>
 #include <dirent.h>
 #include <unistd.h>
-#ifndef __wii__
 #include <sys/mman.h>
-#endif
 #include <sys/time.h>
 #include <pwd.h>
 #include <libgen.h>
 #include <fcntl.h>
-#include <fenv.h>
 #include <sys/wait.h>
-
-#ifdef __wii__
-#include <stdio.h>
-#include <stdlib.h>
-#include <wiiuse/wpad.h>
-#include <fat.h>
-#include <network.h>
-
-#define select net_select
-
-static void *xfb = NULL;
-static GXRModeObj *rmode = NULL;
-
-// Wait for button press so user can read screen.
-void Sys_Wait(const char *message) {
-	qboolean waiting = qtrue;
-
-	printf("\n%s\nPress A to continue\n", message);
-
-	while( waiting )
-	{
-		// Call WPAD_ScanPads each loop, this reads the latest controller states
-		WPAD_ScanPads();
-
-		// WPAD_ButtonsDown tells us which buttons were pressed in this loop
-		// this is a "one shot" state which will not fire again until the button has been released
-		u32 pressed = WPAD_ButtonsDown(0);
-
-		// We return to the launcher application via exit
-		if ( pressed & WPAD_BUTTON_HOME ) exit(0);
-		if ( pressed & WPAD_BUTTON_A ) waiting = qfalse;
-
-		// Wait for the next frame
-		VIDEO_WaitVSync();
-	}
-}
-
-void Sys_BeginFrame(void) {
-	// Call WPAD_ScanPads each loop, this reads the latest controller states
-	WPAD_ScanPads();
-
-	// WPAD_ButtonsDown tells us which buttons were pressed in this loop
-	// this is a "one shot" state which will not fire again until the button has been released
-	u32 pressed = WPAD_ButtonsDown(0);
-
-	// We return to the launcher application via exit
-	if ( pressed & WPAD_BUTTON_HOME ) exit(0);
-}
-
-void Sys_EndFrame(void) {
-	// Wait for the next frame
-	VIDEO_WaitVSync();
-}
-#endif
 
 qboolean stdinIsATTY;
 
@@ -118,40 +50,32 @@ Sys_DefaultHomePath
 */
 char *Sys_DefaultHomePath(void)
 {
-#ifdef __wii__
-	if( !*homePath )
-	{
-		Q_strncpyz(homePath, Sys_Cwd(), sizeof(homePath));
-	}
-
-	return homePath;
-#else
 	char *p;
 
 	if( !*homePath )
 	{
 		if( ( p = getenv( "HOME" ) ) != NULL )
 		{
-			Com_sprintf(homePath, sizeof(homePath), "%s%c", p, PATH_SEP);
+			Q_strncpyz( homePath, p, sizeof( homePath ) );
+#ifdef TURTLEARENA
 #ifdef MACOS_X
-			Q_strcat(homePath, sizeof(homePath),
-					"Library/Application Support/");
-
-			if(com_homepath->string[0])
-				Q_strcat(homePath, sizeof(homePath), com_homepath->string);
-			else
-				Q_strcat(homePath, sizeof(homePath), HOMEPATH_NAME_MACOSX);
+			Q_strcat( homePath, sizeof( homePath ),
+					"/Library/Application Support/TurtleArena" );
 #else
-			if(com_homepath->string[0])
-				Q_strcat(homePath, sizeof(homePath), com_homepath->string);
-			else
-				Q_strcat(homePath, sizeof(homePath), HOMEPATH_NAME_UNIX);
+			Q_strcat( homePath, sizeof( homePath ), "/.turtlearena" );
+#endif
+#else
+#ifdef MACOS_X
+			Q_strcat( homePath, sizeof( homePath ),
+					"/Library/Application Support/Quake3" );
+#else
+			Q_strcat( homePath, sizeof( homePath ), "/.q3a" );
+#endif
 #endif
 		}
 	}
 
 	return homePath;
-#endif
 }
 
 #ifndef MACOS_X
@@ -178,7 +102,8 @@ Sys_Milliseconds
 */
 /* base time in seconds, that's our origin
    timeval:tv_sec is an int:
-   assuming this wraps every 0x7fffffff - ~68 years since the Epoch (1970) - we're safe till 2038 */
+   assuming this wraps every 0x7fffffff - ~68 years since the Epoch (1970) - we're safe till 2038
+   using unsigned long data type to work right with Sys_XTimeToSysTime */
 unsigned long sys_timeBase = 0;
 /* current time in ms, using sys_timeBase as origin
    NOTE: sys_timeBase*1000 + curtime -> ms since the Epoch
@@ -202,6 +127,31 @@ int Sys_Milliseconds (void)
 
 	return curtime;
 }
+
+#if !id386
+/*
+==================
+fastftol
+==================
+*/
+long fastftol( float f )
+{
+	return (long)f;
+}
+
+/*
+==================
+Sys_SnapVector
+==================
+*/
+void Sys_SnapVector( float *v )
+{
+	v[0] = rint(v[0]);
+	v[1] = rint(v[1]);
+	v[2] = rint(v[2]);
+}
+#endif
+
 
 /*
 ==================
@@ -233,16 +183,12 @@ Sys_GetCurrentUser
 */
 char *Sys_GetCurrentUser( void )
 {
-#ifdef __wii__
-	return "player";
-#else
 	struct passwd *p;
 
 	if ( (p = getpwuid( getuid() )) == NULL ) {
 		return "player";
 	}
 	return p->pw_name;
-#endif
 }
 
 /*
@@ -286,26 +232,7 @@ Sys_Dirname
 */
 const char *Sys_Dirname( char *path )
 {
-#if __wii__
-	// From DOSBOX Wii
-	static char tmp[MAXPATHLEN];
-	int len;
-
-	if(!path || path[0] == 0)
-		return ".";
-
-	char * sep = strrchr(path, '/');
-	if (sep == NULL)
-		sep = strrchr(path, '\\');
-	if (sep == NULL)
-		return ".";
-
-	len = (int)(sep - path);
-	strncpy(tmp, path, len+1);
-	return tmp;
-#else
 	return dirname( path );
-#endif
 }
 
 /*
@@ -322,43 +249,6 @@ qboolean Sys_Mkdir( const char *path )
 
 	return qtrue;
 }
-
-/*
-==================
-Sys_Mkfifo
-==================
-*/
-#ifdef __wii__
-FILE *Sys_Mkfifo( const char *ospath )
-{
-	return NULL;
-}
-#else
-FILE *Sys_Mkfifo( const char *ospath )
-{
-	FILE	*fifo;
-	int	result;
-	int	fn;
-	struct	stat buf;
-
-	// if file already exists AND is a pipefile, remove it
-	if( !stat( ospath, &buf ) && S_ISFIFO( buf.st_mode ) )
-		FS_Remove( ospath );
-
-	result = mkfifo( ospath, 0600 );
-	if( result != 0 )
-		return NULL;
-
-	fifo = fopen( ospath, "w+" );
-	if( fifo )
-	{
-		fn = fileno( fifo );
-		fcntl( fn, F_SETFL, O_NONBLOCK );
-	}
-
-	return fifo;
-}
-#endif
 
 /*
 ==================
@@ -511,9 +401,9 @@ char **Sys_ListFiles( const char *directory, const char *extension, char *filter
 			continue;
 
 		if (*extension) {
-			if ( strlen( d->d_name ) < extLen ||
+			if ( strlen( d->d_name ) < strlen( extension ) ||
 				Q_stricmp(
-					d->d_name + strlen( d->d_name ) - extLen,
+					d->d_name + strlen( d->d_name ) - strlen( extension ),
 					extension ) ) {
 				continue; // didn't match
 			}
@@ -619,7 +509,11 @@ void Sys_ErrorDialog( const char *error )
 	unsigned int size;
 	int f = -1;
 	const char *homepath = Cvar_VariableString( "fs_homepath" );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Use correct variable name
 	const char *gamedir = Cvar_VariableString( "fs_game" );
+#else
+	const char *gamedir = Cvar_VariableString( "fs_gamedir" );
+#endif
 	const char *fileName = "crashlog.txt";
 	char *ospath = FS_BuildOSPath( homepath, gamedir, fileName );
 
@@ -914,12 +808,6 @@ void Sys_GLimpInit( void )
 	// NOP
 }
 
-void Sys_SetFloatEnv(void)
-{
-	// rounding towards 0
-	fesetround(FE_TOWARDZERO);
-}
-
 /*
 ==============
 Sys_PlatformInit
@@ -939,61 +827,6 @@ void Sys_PlatformInit( void )
 
 	stdinIsATTY = isatty( STDIN_FILENO ) &&
 		!( term && ( !strcmp( term, "raw" ) || !strcmp( term, "dumb" ) ) );
-
-#ifdef __wii__
-	// Initialise the video system
-	VIDEO_Init();
-
-	// This function initialises the attached controllers
-	WPAD_Init();
-
-	// Obtain the preferred video mode from the system
-	// This will correspond to the settings in the Wii menu
-	rmode = VIDEO_GetPreferredMode(NULL);
-
-	// Allocate memory for the display in the uncached region
-	xfb = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
-
-	// Initialise the console, required for printf
-	console_init(xfb,20,20,rmode->fbWidth,rmode->xfbHeight,rmode->fbWidth*VI_DISPLAY_PIX_SZ);
-
-	// Set up the video registers with the chosen mode
-	VIDEO_Configure(rmode);
-
-	// Tell the video hardware where our display memory is
-	VIDEO_SetNextFramebuffer(xfb);
-
-	// Make the display visible
-	VIDEO_SetBlack(FALSE);
-
-	// Flush the video register changes to the hardware
-	VIDEO_Flush();
-
-	// Wait for Video setup to complete
-	VIDEO_WaitVSync();
-	if(rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
-
-	// The console understands VT terminal escape codes
-	// This positions the cursor on row 2, column 0
-	// we can use variables for this with format codes too
-	// e.g. printf ("\x1b[%d;%dH", row, column );
-	printf("\x1b[2;0H");
-
-	if(!fatInitDefault()) {
-		Sys_Wait("Error: fat init failed");
-	}
-#endif
-}
-
-/*
-==============
-Sys_PlatformExit
-
-Unix specific deinitialisation
-==============
-*/
-void Sys_PlatformExit( void )
-{
 }
 
 /*
@@ -1029,9 +862,5 @@ Sys_PIDIsRunning
 */
 qboolean Sys_PIDIsRunning( int pid )
 {
-#ifdef __wii__
-	return qfalse;
-#else
 	return kill( pid, 0 ) == 0;
-#endif
 }

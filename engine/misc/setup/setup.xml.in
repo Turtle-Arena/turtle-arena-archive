@@ -55,12 +55,6 @@ ifelse(HAVE_PPC64,yes,dnl
     </option>
 )dnl
     <option install="true">
-     Music
-     <files>
-       base/assets2-music.pk3
-     </files>
-    </option>
-    <option install="true">
      Desktop menu entries
      <files mode="0755">
        xdg-desktop-menu
@@ -74,7 +68,6 @@ ifelse(HAVE_PPC64,yes,dnl
       shared data
       <files>
 	base/assets0.pk3
-	base/assets1-qvms.pk3
 	turtlearena.png
 	COPYING
 	COPYRIGHTS

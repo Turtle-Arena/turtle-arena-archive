@@ -131,10 +131,6 @@ vmCvar_t	ui_harvester_friendly;
 #endif
 #endif
 
-#ifdef IOQ3ZTM // SV_PUBLIC
-vmCvar_t	ui_publicServer;
-#endif
-
 vmCvar_t	ui_arenasFile;
 vmCvar_t	ui_botsFile;
 vmCvar_t	ui_spScores1;
@@ -234,10 +230,6 @@ static cvarTable_t		cvarTable[] = {
 #endif
 #endif
 
-#ifdef IOQ3ZTM // SV_PUBLIC
-	{ &ui_publicServer, "ui_publicServer", "1", CVAR_ARCHIVE },
-#endif
-
 	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM },
 	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM },
 	{ &ui_spScores1, "g_spScores1", "", CVAR_ARCHIVE },
@@ -250,7 +242,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_spSkill, "g_spSkill", "2", CVAR_ARCHIVE | CVAR_LATCH },
 
 #ifdef TA_SP
-	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_ROM},
+	{ &ui_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
 	{ &ui_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM },
 	{ &ui_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO },
 #endif
@@ -297,7 +289,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_ioq3, "ui_ioq3", "1", CVAR_ROM }
 };
 
-static int cvarTableSize = ARRAY_LEN( cvarTable );
+static int cvarTableSize = sizeof(cvarTable) / sizeof(cvarTable[0]);
 
 
 /*

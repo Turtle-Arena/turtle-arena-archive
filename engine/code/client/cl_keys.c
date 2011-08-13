@@ -139,107 +139,6 @@ keyname_t keynames[] =
 	{"JOY31", K_JOY31},
 	{"JOY32", K_JOY32},
 
-#ifdef TA_SPLITVIEW
-	{"2JOY1", K_2JOY1},
-	{"2JOY2", K_2JOY2},
-	{"2JOY3", K_2JOY3},
-	{"2JOY4", K_2JOY4},
-	{"2JOY5", K_2JOY5},
-	{"2JOY6", K_2JOY6},
-	{"2JOY7", K_2JOY7},
-	{"2JOY8", K_2JOY8},
-	{"2JOY9", K_2JOY9},
-	{"2JOY10", K_2JOY10},
-	{"2JOY11", K_2JOY11},
-	{"2JOY12", K_2JOY12},
-	{"2JOY13", K_2JOY13},
-	{"2JOY14", K_2JOY14},
-	{"2JOY15", K_2JOY15},
-	{"2JOY16", K_2JOY16},
-	{"2JOY17", K_2JOY17},
-	{"2JOY18", K_2JOY18},
-	{"2JOY19", K_2JOY19},
-	{"2JOY20", K_2JOY20},
-	{"2JOY21", K_2JOY21},
-	{"2JOY22", K_2JOY22},
-	{"2JOY23", K_2JOY23},
-	{"2JOY24", K_2JOY24},
-	{"2JOY25", K_2JOY25},
-	{"2JOY26", K_2JOY26},
-	{"2JOY27", K_2JOY27},
-	{"2JOY28", K_2JOY28},
-	{"2JOY29", K_2JOY29},
-	{"2JOY30", K_2JOY30},
-	{"2JOY31", K_2JOY31},
-	{"2JOY32", K_2JOY32},
-
-	{"3JOY1", K_3JOY1},
-	{"3JOY2", K_3JOY2},
-	{"3JOY3", K_3JOY3},
-	{"3JOY4", K_3JOY4},
-	{"3JOY5", K_3JOY5},
-	{"3JOY6", K_3JOY6},
-	{"3JOY7", K_3JOY7},
-	{"3JOY8", K_3JOY8},
-	{"3JOY9", K_3JOY9},
-	{"3JOY10", K_3JOY10},
-	{"3JOY11", K_3JOY11},
-	{"3JOY12", K_3JOY12},
-	{"3JOY13", K_3JOY13},
-	{"3JOY14", K_3JOY14},
-	{"3JOY15", K_3JOY15},
-	{"3JOY16", K_3JOY16},
-	{"3JOY17", K_3JOY17},
-	{"3JOY18", K_3JOY18},
-	{"3JOY19", K_3JOY19},
-	{"3JOY20", K_3JOY20},
-	{"3JOY21", K_3JOY21},
-	{"3JOY22", K_3JOY22},
-	{"3JOY23", K_3JOY23},
-	{"3JOY24", K_3JOY24},
-	{"3JOY25", K_3JOY25},
-	{"3JOY26", K_3JOY26},
-	{"3JOY27", K_3JOY27},
-	{"3JOY28", K_3JOY28},
-	{"3JOY29", K_3JOY29},
-	{"3JOY30", K_3JOY30},
-	{"3JOY31", K_3JOY31},
-	{"3JOY32", K_3JOY32},
-
-	{"4JOY1", K_4JOY1},
-	{"4JOY2", K_4JOY2},
-	{"4JOY3", K_4JOY3},
-	{"4JOY4", K_4JOY4},
-	{"4JOY5", K_4JOY5},
-	{"4JOY6", K_4JOY6},
-	{"4JOY7", K_4JOY7},
-	{"4JOY8", K_4JOY8},
-	{"4JOY9", K_4JOY9},
-	{"4JOY10", K_4JOY10},
-	{"4JOY11", K_4JOY11},
-	{"4JOY12", K_4JOY12},
-	{"4JOY13", K_4JOY13},
-	{"4JOY14", K_4JOY14},
-	{"4JOY15", K_4JOY15},
-	{"4JOY16", K_4JOY16},
-	{"4JOY17", K_4JOY17},
-	{"4JOY18", K_4JOY18},
-	{"4JOY19", K_4JOY19},
-	{"4JOY20", K_4JOY20},
-	{"4JOY21", K_4JOY21},
-	{"4JOY22", K_4JOY22},
-	{"4JOY23", K_4JOY23},
-	{"4JOY24", K_4JOY24},
-	{"4JOY25", K_4JOY25},
-	{"4JOY26", K_4JOY26},
-	{"4JOY27", K_4JOY27},
-	{"4JOY28", K_4JOY28},
-	{"4JOY29", K_4JOY29},
-	{"4JOY30", K_4JOY30},
-	{"4JOY31", K_4JOY31},
-	{"4JOY32", K_4JOY32},
-#endif
-
 	{"AUX1", K_AUX1},
 	{"AUX2", K_AUX2},
 	{"AUX3", K_AUX3},
@@ -500,9 +399,9 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 		float strWidth = 0;
 		int id;
 		for (id = 0; id < (edit->cursor - prestep - i); i++) {
-			strWidth += Com_FontCharWidth( font, str[i] );
+			strWidth += Com_FontCharWidth( &cls.fontSmall, str[i] );
 		}
-		SCR_DrawFontChar(font, x + strWidth, y, cursorChar, qfalse);
+		SCR_DrawConsoleFontChar( x + strWidth, y, cursorChar );
 #else
 		if ( size == SMALLCHAR_WIDTH ) {
 			SCR_DrawSmallChar( x + ( edit->cursor - prestep - i ) * size, y, cursorChar );
@@ -563,12 +462,7 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 	int		len;
 
 	// shift-insert is paste
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	if ( ( ( key == K_INS ) || ( ( key == K_KP_INS && !keys[K_KP_NUMLOCK].down ) ) ) && keys[K_SHIFT].down )
-#else
-	if ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keys[K_SHIFT].down )
-#endif
-	{
+	if ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keys[K_SHIFT].down ) {
 		Field_Paste( edit );
 		return;
 	}
@@ -577,12 +471,6 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 	len = strlen( edit->buffer );
 
 	switch ( key ) {
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_DEL:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_DEL:
 			if ( edit->cursor < len ) {
 				memmove( edit->buffer + edit->cursor, 
@@ -590,56 +478,26 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 			}
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_RIGHTARROW:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
 			if ( edit->cursor < len ) {
 				edit->cursor++;
 			}
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_LEFTARROW:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_LEFTARROW:
 			if ( edit->cursor > 0 ) {
 				edit->cursor--;
 			}
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_HOME:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_HOME:
 			edit->cursor = 0;
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_END:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_END:
 			edit->cursor = len;
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_INS:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_INS:
 			key_overstrikeMode = !key_overstrikeMode;
 			break;
@@ -709,14 +567,12 @@ void Field_CharEvent( field_t *edit, int ch ) {
 	}
 
 	if ( key_overstrikeMode ) {	
-		// - 2 to leave room for the leading slash and trailing \0
-		if ( edit->cursor == MAX_EDIT_LINE - 2 )
+		if ( edit->cursor == MAX_EDIT_LINE - 1 )
 			return;
 		edit->buffer[edit->cursor] = ch;
 		edit->cursor++;
 	} else {	// insert mode
-		// - 2 to leave room for the leading slash and trailing \0
-		if ( len == MAX_EDIT_LINE - 2 ) {
+		if ( len == MAX_EDIT_LINE - 1 ) {
 			return; // all full
 		}
 		memmove( edit->buffer + edit->cursor + 1, 
@@ -760,10 +616,8 @@ void Console_Key (int key) {
 	// enter finishes the line
 	if ( key == K_ENTER || key == K_KP_ENTER ) {
 		// if not in the game explicitly prepend a slash if needed
-		if ( clc.state != CA_ACTIVE &&
-				g_consoleField.buffer[0] &&
-				g_consoleField.buffer[0] != '\\' &&
-				g_consoleField.buffer[0] != '/' ) {
+		if ( cls.state != CA_ACTIVE && g_consoleField.buffer[0] != '\\' 
+			&& g_consoleField.buffer[0] != '/' ) {
 			char	temp[MAX_EDIT_LINE-1];
 
 			Q_strncpyz( temp, g_consoleField.buffer, sizeof( temp ) );
@@ -799,7 +653,7 @@ void Console_Key (int key) {
 
 		CL_SaveConsoleHistory( );
 
-		if ( clc.state == CA_DISCONNECTED ) {
+		if ( cls.state == CA_DISCONNECTED ) {
 			SCR_UpdateScreen ();	// force an update, because the command
 		}							// may take some time
 		return;
@@ -814,12 +668,7 @@ void Console_Key (int key) {
 
 	// command history (ctrl-p ctrl-n for unix style)
 
-	if ( (key == K_MWHEELUP && keys[K_SHIFT].down) || ( key == K_UPARROW ) ||
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		( key == K_KP_UPARROW && !keys[K_KP_NUMLOCK].down) ||
-#else
-		( key == K_KP_UPARROW ) ||
-#endif
+	if ( (key == K_MWHEELUP && keys[K_SHIFT].down) || ( key == K_UPARROW ) || ( key == K_KP_UPARROW ) ||
 		 ( ( tolower(key) == 'p' ) && keys[K_CTRL].down ) ) {
 		if ( nextHistoryLine - historyLine < COMMAND_HISTORY 
 			&& historyLine > 0 ) {
@@ -829,12 +678,7 @@ void Console_Key (int key) {
 		return;
 	}
 
-	if ( (key == K_MWHEELDOWN && keys[K_SHIFT].down) || ( key == K_DOWNARROW ) ||
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		( key == K_KP_DOWNARROW && !keys[K_KP_NUMLOCK].down) ||
-#else
-		( key == K_KP_DOWNARROW ) ||
-#endif
+	if ( (key == K_MWHEELDOWN && keys[K_SHIFT].down) || ( key == K_DOWNARROW ) || ( key == K_KP_DOWNARROW ) ||
 		 ( ( tolower(key) == 'n' ) && keys[K_CTRL].down ) ) {
 		historyLine++;
 		if (historyLine >= nextHistoryLine) {
@@ -848,22 +692,12 @@ void Console_Key (int key) {
 	}
 
 	// console scrolling
-	if ( key == K_PGUP
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		|| ( key == K_KP_PGUP && !keys[K_KP_NUMLOCK].down)
-#endif
-		)
-	{
+	if ( key == K_PGUP ) {
 		Con_PageUp();
 		return;
 	}
 
-	if ( key == K_PGDN
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		|| ( key == K_KP_PGDN && !keys[K_KP_NUMLOCK].down)
-#endif
-		)
-	{
+	if ( key == K_PGDN) {
 		Con_PageDown();
 		return;
 	}
@@ -887,23 +721,13 @@ void Console_Key (int key) {
 	}
 
 	// ctrl-home = top of console
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	if ( ( key == K_HOME || ( key == K_KP_HOME && !keys[K_KP_NUMLOCK].down) ) &&  keys[K_CTRL].down )
-#else
-	if ( key == K_HOME && keys[K_CTRL].down )
-#endif
-	{
+	if ( key == K_HOME && keys[K_CTRL].down ) {
 		Con_Top();
 		return;
 	}
 
 	// ctrl-end = bottom of console
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	if ( ( key == K_END || ( key == K_KP_END && !keys[K_KP_NUMLOCK].down) ) &&  keys[K_CTRL].down )
-#else
-	if ( key == K_END && keys[K_CTRL].down )
-#endif
-	{
+	if ( key == K_END && keys[K_CTRL].down ) {
 		Con_Bottom();
 		return;
 	}
@@ -935,7 +759,7 @@ void Message_Key( int key ) {
 
 	if ( key == K_ENTER || key == K_KP_ENTER )
 	{
-		if ( chatField.buffer[0] && clc.state == CA_ACTIVE ) {
+		if ( chatField.buffer[0] && cls.state == CA_ACTIVE ) {
 			if (chat_playerNum != -1 )
 
 				Com_sprintf( buffer, sizeof( buffer ), "tell %i \"%s\"\n", chat_playerNum, chatField.buffer );
@@ -1379,7 +1203,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 {
 	keys[key].down = qtrue;
 		keys[key].repeats++;
-	if( keys[key].repeats == 1 && key != K_SCROLLOCK && key != K_KP_NUMLOCK && key != K_CAPSLOCK )
+	if( keys[key].repeats == 1 )
 			anykeydown++;
 
 	if( keys[K_ALT].down && key == K_ENTER )
@@ -1400,7 +1224,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 
 	// keys can still be used for bound actions
 	if ( ( key < 128 || key == K_MOUSE1 ) &&
-		( clc.demoplaying || clc.state == CA_CINEMATIC ) && Key_GetCatcher( ) == 0 ) {
+		( clc.demoplaying || cls.state == CA_CINEMATIC ) && Key_GetCatcher( ) == 0 ) {
 
 		if (Cvar_VariableValue ("com_cameraMode") == 0) {
 			Cvar_Set ("nextdemo","");
@@ -1424,10 +1248,10 @@ void CL_KeyDownEvent( int key, unsigned time )
 		}
 
 		if ( !( Key_GetCatcher( ) & KEYCATCH_UI ) ) {
-			if ( clc.state == CA_ACTIVE && !clc.demoplaying ) {
+			if ( cls.state == CA_ACTIVE && !clc.demoplaying ) {
 				VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_INGAME );
 			}
-			else if ( clc.state != CA_DISCONNECTED ) {
+			else if ( cls.state != CA_DISCONNECTED ) {
 				CL_Disconnect_f();
 				S_StopAllSounds();
 				VM_Call( uivm, UI_SET_ACTIVE_MENU, UIMENU_MAIN );
@@ -1452,7 +1276,7 @@ void CL_KeyDownEvent( int key, unsigned time )
 		} 
 	} else if ( Key_GetCatcher( ) & KEYCATCH_MESSAGE ) {
 		Message_Key( key );
-	} else if ( clc.state == CA_DISCONNECTED ) {
+	} else if ( cls.state == CA_DISCONNECTED ) {
 		Console_Key( key );
 	} else {
 		// send the bound action
@@ -1472,12 +1296,10 @@ void CL_KeyUpEvent( int key, unsigned time )
 {
 	keys[key].repeats = 0;
 	keys[key].down = qfalse;
-	if (key != K_SCROLLOCK && key != K_KP_NUMLOCK && key != K_CAPSLOCK)
-		anykeydown--;
-
+	anykeydown--;
 	if (anykeydown < 0) {
 		anykeydown = 0;
-	}
+		}
 
 	// don't process key-up events for the console key
 	if ( key == K_CONSOLE || ( key == K_ESCAPE && keys[K_SHIFT].down ) )
@@ -1489,7 +1311,7 @@ void CL_KeyUpEvent( int key, unsigned time )
 	// console mode and menu mode, to keep the character from continuing
 	// an action started before a mode switch.
 	//
-	if( clc.state != CA_DISCONNECTED )
+	if( cls.state != CA_DISCONNECTED )
 		CL_ParseBinding( key, qfalse, time );
 
 	if ( Key_GetCatcher( ) & KEYCATCH_UI && uivm ) {
@@ -1540,7 +1362,7 @@ void CL_CharEvent( int key ) {
 	{
 		Field_CharEvent( &chatField, key );
 	}
-	else if ( clc.state == CA_DISCONNECTED )
+	else if ( cls.state == CA_DISCONNECTED )
 	{
 		Field_CharEvent( &g_consoleField, key );
 	}
@@ -1559,9 +1381,6 @@ void Key_ClearStates (void)
 	anykeydown = 0;
 
 	for ( i=0 ; i < MAX_KEYS ; i++ ) {
-		if (i == K_SCROLLOCK || i == K_KP_NUMLOCK || i == K_CAPSLOCK)
-			continue;
-
 		if ( keys[i].down ) {
 			CL_KeyEvent( i, qfalse, 0 );
 
@@ -1597,7 +1416,7 @@ void Key_SetCatcher( int catcher ) {
 
 // This must not exceed MAX_CMD_LINE
 #define			MAX_CONSOLE_SAVE_BUFFER	1024
-#ifdef TA_MAIN // BRANDING
+#ifdef TURTLEARENA // BRANDING
 #define			CONSOLE_HISTORY_FILE    "history"
 #else
 #define			CONSOLE_HISTORY_FILE    "q3history"

@@ -24,10 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "tr_types.h"
 
-#ifdef IOQ3ZTM // PNG_SCREENSHOTS
-#include "../zlib/zlib.h"
-#endif
-
 #define	REF_API_VERSION		8
 
 //
@@ -68,6 +64,9 @@ typedef struct {
 	void	(*ClearScene)( void );
 	void	(*AddRefEntityToScene)( const refEntity_t *re );
 	void	(*AddPolyToScene)( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
+#ifdef WOLFET
+	void	(*AddPolyBufferToScene)( polyBuffer_t* pPolyBuffer );
+#endif
 	int		(*LightForPoint)( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
 	void	(*AddLightToScene)( const vec3_t org, float intensity, float r, float g, float b );
 	void	(*AddAdditiveLightToScene)( const vec3_t org, float intensity, float r, float g, float b );
@@ -110,10 +109,10 @@ typedef struct {
 //
 typedef struct {
 	// print message on the local console
-	void	(QDECL *Printf)( int printLevel, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+	void	(QDECL *Printf)( int printLevel, const char *fmt, ...);
 
 	// abort the game
-	void	(QDECL *Error)( int errorLevel, const char *fmt, ...) __attribute__ ((noreturn, format (printf, 2, 3)));
+	void	(QDECL *Error)( int errorLevel, const char *fmt, ...);
 
 	// milliseconds should only be used for profiling, never
 	// for anything game related.  Get time from the refdef
@@ -135,14 +134,7 @@ typedef struct {
 
 	cvar_t	*(*Cvar_Get)( const char *name, const char *value, int flags );
 	void	(*Cvar_Set)( const char *name, const char *value );
-	void	(*Cvar_SetValue) (const char *name, float value);
 	void	(*Cvar_CheckRange)( cvar_t *cv, float minVal, float maxVal, qboolean shouldBeIntegral );
-
-	int		(*Cvar_VariableIntegerValue) (const char *var_name);
-
-#ifdef IOQ3ZTM // PNG_SCREENSHOTS
-	void	(*Cvar_VariableStringBuffer) (const char *var_name, char *buffer, int bufsize);
-#endif
 
 	void	(*Cmd_AddCommand)( const char *name, void(*cmd)(void) );
 	void	(*Cmd_RemoveCommand)( const char *name );
@@ -152,15 +144,13 @@ typedef struct {
 
 	void	(*Cmd_ExecuteText) (int exec_when, const char *text);
 
-	byte	*(*CM_ClusterPVS)(int cluster);
-
 	// visualization for debugging collision detection
 	void	(*CM_DrawDebugSurface)( void (*drawPoly)(int color, int numPoints, float *points) );
 
 	// a -1 return means the file does not exist
 	// NULL can be passed for buf to just determine existance
 	int		(*FS_FileIsInPAK)( const char *name, int *pCheckSum );
-	long		(*FS_ReadFile)( const char *name, void **buf );
+	int		(*FS_ReadFile)( const char *name, void **buf );
 	void	(*FS_FreeFile)( void *buf );
 	char **	(*FS_ListFiles)( const char *name, const char *extension, int *numfilesfound );
 	void	(*FS_FreeFileList)( char **filelist );
@@ -173,49 +163,12 @@ typedef struct {
 	e_status (*CIN_RunCinematic) (int handle);
 
 	void	(*CL_WriteAVIVideoFrame)( const byte *buffer, int size );
-
-	// input event handling
-	void	(*IN_Init)( void );
-	void	(*IN_Shutdown)( void );
-	void	(*IN_Restart)( void );
-
-	// math
-	long    (*ftol)(float f);
-
-	// system stuff
-	void	(*Sys_SetEnv)( const char *name, const char *value );
-	void	(*Sys_GLimpSafeInit)( void );
-	void	(*Sys_GLimpInit)( void );
-	qboolean (*Sys_LowPhysicalMemory)( void );
-
-#ifdef IOQ3ZTM // PNG_SCREENSHOTS
-	// zlib for png screenshots
-	int (*zlib_compress) (Bytef *dest, uLongf *destLen, const Bytef *source, uLong sourceLen);
-	uLong (*zlib_crc32) (uLong crc, const Bytef *buf, uInt len);
-
-	// get extra info for png screenshots
-	void	(*CL_GetMapMessage)(char *buf, int bufLength);
-#ifdef TA_SPLITVIEW
-	qboolean (*CL_GetClientLocation)(char *buf, int bufLength, int localClientNum);
-#else
-	qboolean (*CL_GetClientLocation)(char *buf, int bufLength);
-#endif
-#endif
-
-#ifdef TA_GAME_MODELS
-	// server stuff
-	void	(*ServerUpdateUserinfos)(void);
-#endif
 } refimport_t;
 
 
 // this is the only function actually exported at the linker level
 // If the module can't init to a valid rendering state, NULL will be
 // returned.
-#ifdef USE_RENDERER_DLOPEN
-typedef	refexport_t* (QDECL *GetRefAPI_t) (int apiVersion, refimport_t * rimp);
-#else
 refexport_t*GetRefAPI( int apiVersion, refimport_t *rimp );
-#endif
 
 #endif	// __TR_PUBLIC_H

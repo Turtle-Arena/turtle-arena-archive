@@ -326,7 +326,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	}
 
 	// bonus items and view weapons have a fixed minimum add
-#ifdef TA_MAIN // ZTM: Have players be darker. So they can hide in shadows better?
+#ifdef TURTLEARENA // ZTM: Have players be darker. So they can hide in shadows better?
 	if ( ent->e.renderfx & RF_MINLIGHT )
 #else
 	if ( 1 /* ent->e.renderfx & RF_MINLIGHT */ )
@@ -337,7 +337,7 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 		ent->ambientLight[1] += tr.identityLight * 32;
 		ent->ambientLight[2] += tr.identityLight * 32;
 	}
-#ifdef TA_MAIN
+#ifdef TURTLEARENA
 	else
 	{
 		ent->ambientLight[0] += tr.identityLight * 16;
@@ -379,9 +379,9 @@ void R_SetupEntityLighting( const trRefdef_t *refdef, trRefEntity_t *ent ) {
 	}
 
 	// save out the byte packet version
-	((byte *)&ent->ambientLightInt)[0] = ri.ftol(ent->ambientLight[0]);
-	((byte *)&ent->ambientLightInt)[1] = ri.ftol(ent->ambientLight[1]);
-	((byte *)&ent->ambientLightInt)[2] = ri.ftol(ent->ambientLight[2]);
+	((byte *)&ent->ambientLightInt)[0] = myftol( ent->ambientLight[0] );
+	((byte *)&ent->ambientLightInt)[1] = myftol( ent->ambientLight[1] );
+	((byte *)&ent->ambientLightInt)[2] = myftol( ent->ambientLight[2] );
 	((byte *)&ent->ambientLightInt)[3] = 0xff;
 	
 	// transform the direction to local space

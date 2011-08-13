@@ -134,7 +134,7 @@ static void G_LoadArenasFromFile( char *filename ) {
 		return;
 	}
 	if ( len >= MAX_ARENAS_TEXT ) {
-		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i\n", filename, len, MAX_ARENAS_TEXT ) );
+		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_ARENAS_TEXT ) );
 		trap_FS_FCloseFile( f );
 		return;
 	}
@@ -151,10 +151,7 @@ static void G_LoadArenasFromFile( char *filename ) {
 G_LoadArenas
 ===============
 */
-#ifndef IOQ3ZTM // MAP_ROTATION
-static
-#endif
-void G_LoadArenas( void ) {
+static void G_LoadArenas( void ) {
 	int			numdirs;
 	vmCvar_t	arenasFile;
 	char		filename[128];
@@ -183,7 +180,7 @@ void G_LoadArenas( void ) {
 		G_LoadArenasFromFile(filename);
 	}
 #ifdef IOQ3ZTM // LESS_VERBOSE
-	G_DPrintf( "%i arenas parsed\n", g_numArenas );
+	G_DPrintf( va( "%i arenas parsed\n", g_numArenas ) );
 #else
 	trap_Printf( va( "%i arenas parsed\n", g_numArenas ) );
 #endif
@@ -211,78 +208,6 @@ const char *G_GetArenaInfoByMap( const char *map ) {
 	return NULL;
 }
 
-#ifdef IOQ3ZTM // MAP_ROTATION
-/*
-===============
-G_GetNextArenaInfoByGametype
-===============
-*/
-const char *G_GetNextArenaInfoByGametype( const char *map, gametype_t gametype ) {
-	int			i, n;
-	const char *type;
-	static char *gametypeNames[] = {"ffa", "tourney", "single", "team", "ctf", "oneflag", "overload", "harvester"};
-
-	gametype = gametype % GT_MAX_GAME_TYPE;
-
-	n = 0;
-	if (map && map[0] != '\0') {
-		for( i = 0;  i < g_numArenas; i++ ) {
-			if( Q_stricmp( Info_ValueForKey( g_arenaInfos[i], "map" ), map ) == 0 ) {
-				n = i+1;
-				break;
-			}
-		}
-	}
-
-	for(i = 0; i < g_numArenas-1; i++, n++ ) {
-		if (n >= g_numArenas) {
-			n = 0;
-		}
-
-		type = Info_ValueForKey( g_arenaInfos[n], "type" );
-		// if no type specified, it will be treated as "ffa"
-		if( *type ) {
-			if( strstr( type, gametypeNames[gametype] ) ) {
-				return g_arenaInfos[n];
-			}
-		} else {
-			if( gametype == GT_FFA ) {
-				return g_arenaInfos[n];
-			}
-		}
-	}
-
-	return NULL;
-}
-
-/*
-=================
-G_AdvanceMap
-=================
-*/
-void G_AdvanceMap( void ) {
-	char		map[MAX_QPATH];
-	char		serverinfo[MAX_INFO_STRING];
-	const char	*info;
-
-#ifdef TA_SP
-	// Single player doesn't rotate maps like the other gametypes.
-	if (g_gametype.integer == GT_SINGLE_PLAYER || g_singlePlayer.integer) {
-		return;
-	}
-#endif
-
-	trap_GetServerinfo( serverinfo, sizeof(serverinfo) );
-	Q_strncpyz( map, Info_ValueForKey( serverinfo, "mapname" ), sizeof(map) );
-
-	// Get map info
-	info = G_GetNextArenaInfoByGametype(map, g_gametype.integer);
-	if (info) {
-		trap_Cvar_Set("nextmap", va("map %s", Info_ValueForKey( info, "map" )));
-	}
-}
-#endif
-
 
 /*
 =================
@@ -294,7 +219,7 @@ static void PlayerIntroSound( const char *modelAndSkin ) {
 	char	*skin;
 
 	Q_strncpyz( model, modelAndSkin, sizeof(model) );
-	skin = strrchr( model, '/' );
+	skin = Q_strrchr( model, '/' );
 	if ( skin ) {
 		*skin++ = '\0';
 	}
@@ -799,14 +724,12 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	Info_SetValueForKey( userinfo, key, headmodel );
 #endif
 
-#ifndef IOQ3ZTM // UNUSED_USERINFO
 	key = "gender";
 	s = Info_ValueForKey( botinfo, key );
 	if ( !*s ) {
 		s = "male";
 	}
 	Info_SetValueForKey( userinfo, "sex", s );
-#endif
 
 	key = "color1";
 	s = Info_ValueForKey( botinfo, key );
@@ -839,7 +762,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	// have the server allocate a client slot
 	clientNum = trap_BotAllocateClient();
 	if ( clientNum == -1 ) {
-		G_Printf( S_COLOR_RED "Unable to add bot. All player slots are in use.\n" );
+		G_Printf( S_COLOR_RED "Unable to add bot.  All player slots are in use.\n" );
 		G_Printf( S_COLOR_RED "Start server with more 'open' slots (or check setting of sv_maxclients cvar).\n" );
 		return;
 	}
@@ -938,7 +861,7 @@ void Svcmd_AddBot_f( void ) {
 	// go ahead and load the bot's media immediately
 	if ( level.time - level.startTime > 1000 &&
 		trap_Cvar_VariableIntegerValue( "cl_running" ) ) {
-#ifdef IOQ3ZTM_NO_COMPAT // SPELLING
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Why hasn't this been corrected?
 		trap_SendServerCommand( -1, "loaddeferred\n" );
 #else
 		trap_SendServerCommand( -1, "loaddefered\n" );	// FIXME: spelled wrong, but not changing for demo
@@ -1072,7 +995,7 @@ static void G_LoadBotsFromFile( char *filename ) {
 		return;
 	}
 	if ( len >= MAX_BOTS_TEXT ) {
-		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i\n", filename, len, MAX_BOTS_TEXT ) );
+		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_BOTS_TEXT ) );
 		trap_FS_FCloseFile( f );
 		return;
 	}
@@ -1122,7 +1045,7 @@ static void G_LoadBots( void ) {
 		G_LoadBotsFromFile(filename);
 	}
 #ifdef IOQ3ZTM // LESS_VERBOSE
-	G_DPrintf( "%i bots parsed\n", g_numBots );
+	G_DPrintf( va( "%i bots parsed\n", g_numBots ) );
 #else
 	trap_Printf( va( "%i bots parsed\n", g_numBots ) );
 #endif
@@ -1178,9 +1101,7 @@ void G_InitBots( qboolean restart ) {
 	char		serverinfo[MAX_INFO_STRING];
 
 	G_LoadBots();
-#ifndef IOQ3ZTM // MAP_ROTATION
 	G_LoadArenas();
-#endif
 
 	trap_Cvar_Register( &bot_minplayers, "bot_minplayers", "0", CVAR_SERVERINFO );
 

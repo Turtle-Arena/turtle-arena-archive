@@ -46,7 +46,6 @@ void G_BounceMissile( gentity_t *ent, trace_t *trace ) {
 		// check for stop
 		if ( trace->plane.normal[2] > 0.2 && VectorLength( ent->s.pos.trDelta ) < 40 ) {
 			G_SetOrigin( ent, trace->endpos );
-			ent->s.time = level.time / 4;
 			return;
 		}
 	}
@@ -236,9 +235,6 @@ void G_HomingMissile(gentity_t * ent)
 		if(blip->health <= 0)
 			continue;
 
-		if(blip->flags & FL_NOTARGET)
-			continue;
-
 		if(blip->client->sess.sessionTeam >= TEAM_SPECTATOR)
 			continue;
 
@@ -346,7 +342,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 	if (self && self->client && bg_projectileinfo[projnum].grappling)
 	{
 #ifdef IOQ3ZTM
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 		if (handSide == HS_CENTER) // Shuriken holdable item
 		{
 			if ((self->client->ps.pm_flags & PMF_USE_ITEM_HELD) || self->client->hook) {
@@ -451,9 +447,8 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			int			i, passent;
 			int			unlinked;
 			gentity_t	*unlinkedEntities[10];
-			int			hits;
 
-			unlinked = hits = 0;
+			unlinked = 0;
 
 			// Do a bullet trace instead of spawning a missile.
 			passent = self->s.number;
@@ -589,7 +584,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 						}
 
 						if( hitClient ) {
-							hits++;
+							self->client->accuracy_hits++;
 						}
 					}
 				}
@@ -616,38 +611,6 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 			// link back in any entities we unlinked
 			for ( i = 0 ; i < unlinked ; i++ ) {
 				trap_LinkEntity( unlinkedEntities[i] );
-			}
-
-			if (self && self->client) {
-#ifndef TURTLEARENA // AWARDS
-				if (bg_projectileinfo[projnum].maxHits > 1) {
-					// give the shooter a reward sound if they have made two railgun hits in a row
-					if ( hits == 0 ) {
-						// complete miss
-						self->client->accurateCount = 0;
-					} else {
-						// check for "impressive" reward sound
-						self->client->accurateCount += hits;
-						if ( self->client->accurateCount >= 2 ) {
-							self->client->accurateCount -= 2;
-							self->client->ps.persistant[PERS_IMPRESSIVE_COUNT]++;
-							// add the sprite over the player's head
-#ifdef IOQ3ZTM
-							self->client->ps.eFlags &= ~EF_AWARD_BITS;
-#else
-							self->client->ps.eFlags &= ~(EF_AWARD_IMPRESSIVE | EF_AWARD_EXCELLENT | EF_AWARD_GAUNTLET | EF_AWARD_ASSIST | EF_AWARD_DEFEND | EF_AWARD_CAP );
-#endif
-							self->client->ps.eFlags |= EF_AWARD_IMPRESSIVE;
-							self->client->rewardTime = level.time + REWARD_SPRITE_TIME;
-						}
-						self->client->accuracy_hits++;
-					}
-				}
-				else
-#endif
-				if (hits) {
-					self->client->accuracy_hits++;
-				}
 			}
 
 			// From weapon_railgun_fire
@@ -744,7 +707,7 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		}
 		bolt->parent = self;
 		// grapple
-		bolt->s.otherEntityNum = bolt->r.ownerNum; // use to match beam in client
+		bolt->s.otherEntityNum = self->s.number; // use to match beam in client
 
 		if (!bg_projectileinfo[projnum].damageAttacker) {
 			bolt->flags |= FL_MISSILE_NO_DAMAGE_PARENT;
@@ -797,15 +760,15 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		// Save handSide in missile
 		bolt->s.weaponHands = handSide;
 
+		// Taken from Q3's fire_prox;
+		// ZTM: Used by prox mines so that if that player changes teams the mines
+		//        don't "change" teams as well (or something...).
+		//id: FIXME: we prolly wanna abuse another field
+		bolt->s.generic1 = self->client->sess.sessionTeam;
+
+		// Needed for stickOnImpact projectiles
 		if (self && self->client)
 		{
-			// Taken from Q3's fire_prox;
-			// ZTM: Used by prox mines so that if that player changes teams the mines
-			//        don't "change" teams as well (or something...).
-			//id: FIXME: we prolly wanna abuse another field
-			bolt->s.generic1 = self->client->sess.sessionTeam;
-
-			// Needed for stickOnImpact projectiles
 			bolt->s.angles[0] = self->client->ps.viewangles[0];
 			bolt->s.angles[1] = self->client->ps.viewangles[1];
 			bolt->s.angles[2] = self->client->ps.viewangles[2];
@@ -843,7 +806,7 @@ qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir, int weaponnum
 }
 #endif
 
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 /*
 =================
 fire_shuriken
@@ -851,6 +814,7 @@ fire_shuriken
 */
 qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t right, vec3_t up, holdable_t holdable)
 {
+#ifdef TA_WEAPSYS
 	int projnum;
 	float s_quadFactor;
 
@@ -867,10 +831,13 @@ qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward, vec3_t ri
 
 	projnum = BG_ProjectileIndexForHoldable(holdable);
 
+#ifdef TURTLEARENA // LOCKON
 	G_AutoAim(self, projnum, start, forward, right, up);
+#endif
 
 	return fire_projectile(self, start, forward, right, up, projnum,
 				s_quadFactor, MOD_UNKNOWN, MOD_UNKNOWN, HS_CENTER);
+#endif
 }
 #endif
 

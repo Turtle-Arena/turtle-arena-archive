@@ -39,20 +39,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	CARNAGE_REWARD_TIME	3000
 #define REWARD_SPRITE_TIME	2000
 
-#ifdef TURTLEARENA // PLAYERS
-#define TIME_BEFORE_WAITING_ANIMATION 7000
-#endif
-
 #define	INTERMISSION_DELAY_TIME	1000
 #define	SP_INTERMISSION_DELAY_TIME	5000
 
 // gentity->flags
-#ifdef TURTLEARENA // DROWNING
-#define	FL_DROWNING_WARNING		0x00000001
-#endif
-#ifdef IOQ3ZTM
-#define	FL_FIRST_TIME			0x00000002
-#endif
 #define	FL_GODMODE				0x00000010
 #define	FL_NOTARGET				0x00000020
 #define	FL_TEAMSLAVE			0x00000400	// not the first on the team
@@ -189,7 +179,7 @@ struct gentity_s {
 	gentity_t	*teamchain;		// next entity in team
 	gentity_t	*teammaster;	// master of the team
 
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	int			kamikazeTime;
 	int			kamikazeShockTime;
 #endif
@@ -233,9 +223,6 @@ typedef enum {
 	SPECTATOR_FREE,
 	SPECTATOR_FOLLOW,
 	SPECTATOR_SCOREBOARD
-#ifdef TA_SPLITVIEW
-	,SPECTATOR_LOCAL_HIDE
-#endif
 } spectatorState_t;
 
 typedef enum {
@@ -272,7 +259,7 @@ typedef struct {
 // MUST be dealt with in G_InitSessionData() / G_ReadSessionData() / G_WriteSessionData()
 typedef struct {
 	team_t		sessionTeam;
-	int			spectatorNum;		// for determining next-in-line to play
+	int			spectatorTime;		// for determining next-in-line to play
 	spectatorState_t	spectatorState;
 	int			spectatorClient;	// for chasecam and follow mode
 	int			wins, losses;		// tournament stats
@@ -342,7 +329,7 @@ struct gclient_s {
 	int			latched_buttons;
 
 	vec3_t		oldOrigin;
-#if 0 //#ifdef TA_ENTSYS // PUSHABLE
+#if 0 //#ifdef TURTLEARENA // TEST: push players
 	float		oldYaw;
 #endif
 
@@ -381,13 +368,7 @@ struct gclient_s {
 	qboolean	inactivityWarning;	// qtrue if the five seoond warning has been given
 	int			rewardTime;			// clear the EF_AWARD_IMPRESSIVE, etc when time > this
 
-#ifdef TURTLEARENA // PLAYERS
-	int			idleTime;			// swich to BOTH_WAITING animation after awhile
-#endif
-
-#ifndef TURTLEARENA // DROWNING
 	int			airOutTime;
-#endif
 
 #ifndef TURTLEARENA // AWARDS
 	int			lastKillTime;		// for multiple kill rewards
@@ -416,7 +397,7 @@ struct gclient_s {
 #else
 	int			ammoTimes[WP_NUM_WEAPONS];
 #endif
-#ifdef TURTLEARENA // REGEN_SHURIKENS
+#ifdef TA_HOLDABLE // REGEN_SHURIKENS
 	int			holdableTimes[MAX_HOLDABLE];
 #endif
 #ifndef TURTLEARENA // POWERS
@@ -450,7 +431,7 @@ typedef struct {
 
 	struct gentity_s	*gentities;
 	int			gentitySize;
-	int			num_entities;		// MAX_CLIENTS <= num_entities <= ENTITYNUM_MAX_NORMAL
+	int			num_entities;		// current number, <= MAX_GENTITIES
 
 	int			warmupTime;			// restart match at this time
 
@@ -561,7 +542,7 @@ qboolean G_AllowPeaking(void);
 #define	RESPAWN_SCORE		25
 #endif
 #define	RESPAWN_AMMO		40
-#ifdef TURTLEARENA // HOLDABLE
+#ifdef TA_HOLDABLE
 #define	RESPAWN_HOLDABLE	35
 #else
 #define	RESPAWN_HOLDABLE	60
@@ -598,7 +579,7 @@ gitem_t *G_RandomWeaponItem( gentity_t *ent, int flags );
 //
 int		G_ModelIndex( char *name );
 int		G_SoundIndex( char *name );
-#ifdef IOQ3ZTM // Particles
+#ifdef IOQ3TM // Particles
 int		G_ParticleAreaIndex( char *str );
 #endif
 #ifdef TA_ENTSYS // MISC_OBJECT
@@ -682,7 +663,7 @@ void TossClientCubes( gentity_t *self );
 void G_RunMissile( gentity_t *ent );
 
 #ifdef TA_WEAPSYS
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 qboolean fire_shuriken (gentity_t *self, vec3_t start, vec3_t forward,
 		vec3_t right, vec3_t up, holdable_t holdable);
 #endif
@@ -697,6 +678,9 @@ qboolean fire_weapon(gentity_t *self, vec3_t start, vec3_t forward,
 qboolean fire_weaponDir(gentity_t *self, vec3_t start, vec3_t dir,
 		int weaponnum, float quadFactor, int handSide);
 #else
+#ifndef IOQ3ZTM // unused
+gentity_t *fire_blaster (gentity_t *self, vec3_t start, vec3_t aimdir);
+#endif
 gentity_t *fire_plasma (gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t aimdir);
 gentity_t *fire_rocket (gentity_t *self, vec3_t start, vec3_t dir);
@@ -718,7 +702,7 @@ void Touch_DoorTrigger( gentity_t *ent, gentity_t *other, trace_t *trace );
 qboolean G_SeenByHumans( gentity_t *ent );
 #endif
 #ifdef TA_ENTSYS // PUSHABLE
-qboolean G_PlayerPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obstacle );
+qboolean G_PlayerPushEntity(gentity_t *self, gentity_t *other);
 #endif
 
 //
@@ -743,8 +727,10 @@ void DropPortalDestination( gentity_t *ent );
 qboolean LogAccuracyHit( gentity_t *target, gentity_t *attacker );
 void CalcMuzzlePoint ( gentity_t *ent, vec3_t forward, vec3_t right, vec3_t up, vec3_t muzzlePoint );
 void SnapVectorTowards( vec3_t v, vec3_t to );
-#ifdef TURTLEARENA // LOCKON HOLD_SHURIKEN
+#ifdef TURTLEARENA // LOCKON
 void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t right, vec3_t up);
+#endif
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 void G_ThrowShuriken(gentity_t *ent, holdable_t holdable);
 #endif
 #ifdef TA_WEAPSYS // MELEEATTACK
@@ -777,7 +763,7 @@ gentity_t *SelectSpawnPoint (gentity_t *ent, vec3_t origin, vec3_t angles, qbool
 gentity_t *SelectSpawnPoint (vec3_t avoidPoint, vec3_t origin, vec3_t angles, qboolean isbot);
 #endif
 void CopyToBodyQue( gentity_t *ent );
-void ClientRespawn(gentity_t *ent);
+void respawn (gentity_t *ent);
 void BeginIntermission (void);
 void InitClientPersistant (gclient_t *client);
 void InitClientResp (gclient_t *client);
@@ -812,7 +798,7 @@ qboolean G_FilterPacket (char *from);
 // g_weapon.c
 //
 void FireWeapon( gentity_t *ent );
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 void G_StartKamikaze( gentity_t *ent );
 #endif
 
@@ -854,16 +840,15 @@ void FindIntermissionPoint( void );
 void SetLeader(int team, int client);
 void CheckTeamLeader( int team );
 void G_RunThink (gentity_t *ent);
-void AddTournamentQueue(gclient_t *client);
-void QDECL G_LogPrintf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
+void QDECL G_LogPrintf( const char *fmt, ... );
 void SendScoreboardMessageToAllClients( void );
 #ifdef IOQ3ZTM // LESS_VERBOSE
-void QDECL G_DPrintf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
+void QDECL G_DPrintf( const char *fmt, ... );
 #endif
-void QDECL G_Printf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
-void QDECL G_Error( const char *fmt, ... ) __attribute__ ((noreturn, format (printf, 1, 2)));
-#ifdef IOQ3ZTM
-void G_CvarClearModification( vmCvar_t *vmCvar );
+void QDECL G_Printf( const char *fmt, ... );
+void QDECL G_Error( const char *fmt, ... );
+#ifdef IOQ3ZTM // MAP_ROTATION
+const char *G_GetMapRotationInfoByGametype( int gametype );
 #endif
 
 //
@@ -929,11 +914,6 @@ qboolean G_BotConnect( int clientNum, qboolean restart );
 void Svcmd_AddBot_f( void );
 void Svcmd_BotList_f( void );
 void BotInterbreedEndMatch( void );
-#ifdef IOQ3ZTM // MAP_ROTATION
-void G_LoadArenas( void );
-const char *G_GetNextArenaInfoByGametype( const char *map, gametype_t gametype );
-void G_AdvanceMap( void );
-#endif
 
 #ifdef TA_SP // Load/save
 //
@@ -1044,9 +1024,7 @@ extern	vmCvar_t	g_obeliskHealth;
 extern	vmCvar_t	g_obeliskRegenPeriod;
 extern	vmCvar_t	g_obeliskRegenAmount;
 extern	vmCvar_t	g_obeliskRespawnDelay;
-#ifdef MISSIONPACK_HARVESTER
 extern	vmCvar_t	g_cubeTimeout;
-#endif
 extern	vmCvar_t	g_redteam;
 extern	vmCvar_t	g_blueteam;
 extern	vmCvar_t	g_smoothClients;
@@ -1074,15 +1052,9 @@ extern	vmCvar_t	g_teleportFluxTime;
 #ifdef IOQ3ZTM // LASERTAG
 extern	vmCvar_t	g_laserTag;
 #endif
-#ifdef TA_PATHSYS // 2DMODE
-extern	vmCvar_t	g_2dmode;
-#endif
-#ifdef IOQ3ZTM // SV_PUBLIC
-extern	vmCvar_t	g_public;
-#endif
 
 void	trap_Printf( const char *fmt );
-void trap_Error(const char *fmt) __attribute__((noreturn));
+void	trap_Error( const char *fmt );
 int		trap_Milliseconds( void );
 int	trap_RealTime( qtime_t *qtime );
 int		trap_Argc( void );

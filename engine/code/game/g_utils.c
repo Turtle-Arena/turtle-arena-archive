@@ -282,6 +282,19 @@ void G_UseTargets2( gentity_t *ent, gentity_t *activator, const char *target ) {
 			G_Printf("entity was removed while using targets\n");
 			return;
 		}
+#ifdef TA_WEAPSYS // Check if weapon_default was given.
+        if (ent->s.weapon == WP_DEFAULT)
+        {
+            if (ent->client)
+            {
+                ent->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
+            }
+            else
+            {
+                ent->s.weapon = WP_NONE;
+            }
+        }
+#endif
 	}
 }
 
@@ -322,6 +335,19 @@ void G_UseTargets( gentity_t *ent, gentity_t *activator ) {
 			G_Printf("entity was removed while using targets\n");
 			return;
 		}
+#ifdef TA_WEAPSYS // Check if weapon_default was given.
+        if (ent->s.weapon == WP_DEFAULT)
+        {
+            if (ent->client)
+            {
+                ent->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
+			}
+            else
+            {
+                ent->s.weapon = WP_NONE;
+            }
+        }
+#endif
 	}
 }
 #endif
@@ -782,9 +808,6 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 		return qfalse;
 
 	if (target == source)
-		return qfalse;
-
-	if (target->flags & FL_NOTARGET)
 		return qfalse;
 
 	// ZTM: Target players, overload base, and NPCs.

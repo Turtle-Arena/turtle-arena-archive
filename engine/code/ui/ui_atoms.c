@@ -51,23 +51,6 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	trap_Print( va("%s", text) );
 }
 
-#ifdef IOQ3ZTM
-void QDECL Com_DPrintf( const char *msg, ... ) {
-	va_list		argptr;
-	char		text[1024];
-
-	if (!trap_Cvar_VariableValue("developer")) {
-		return;			// don't confuse non-developers with techie stuff...
-	}
-
-	va_start (argptr, msg);
-	Q_vsnprintf (text, sizeof(text), msg, argptr);
-	va_end (argptr);
-
-	trap_Print( va("%s", text) );
-}
-#endif
-
 qboolean newUI = qfalse;
 
 
@@ -173,13 +156,10 @@ void UI_SetBestScores(postGameInfo_t *newInfo, qboolean postGame) {
 	}
 }
 
-void UI_LoadBestScores(const char *map, int game)
-{
+void UI_LoadBestScores(const char *map, int game) {
 	char		fileName[MAX_QPATH];
 	fileHandle_t f;
 	postGameInfo_t newInfo;
-	int protocol, protocolLegacy;
-	
 	memset(&newInfo, 0, sizeof(postGameInfo_t));
 	Com_sprintf(fileName, MAX_QPATH, "games/%s_%i.game", map, game);
 	if (trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0) {
@@ -192,30 +172,11 @@ void UI_LoadBestScores(const char *map, int game)
 	}
 	UI_SetBestScores(&newInfo, qfalse);
 
+	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.dm_%d", map, game, (int)trap_Cvar_VariableValue("protocol"));
 	uiInfo.demoAvailable = qfalse;
-
-	protocolLegacy = trap_Cvar_VariableValue("com_legacyprotocol");
-	protocol = trap_Cvar_VariableValue("com_protocol");
-
-	if(!protocol)
-		protocol = trap_Cvar_VariableValue("protocol");
-	if(protocolLegacy == protocol)
-		protocolLegacy = 0;
-
-	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.%s%d", map, game, DEMOEXT, protocol);
-	if(trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0)
-	{
+	if (trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0) {
 		uiInfo.demoAvailable = qtrue;
 		trap_FS_FCloseFile(f);
-	}
-	else if(protocolLegacy > 0)
-	{
-		Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.%s%d", map, game, DEMOEXT, protocolLegacy);
-		if (trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0)
-		{
-			uiInfo.demoAvailable = qtrue;
-			trap_FS_FCloseFile(f);
-		}
 	} 
 }
 

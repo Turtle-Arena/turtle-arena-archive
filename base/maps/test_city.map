@@ -2,6 +2,9 @@
 // entity 0
 {
 "classname" "worldspawn"
+"mapcoordsmins" "-2048 2048"
+"mapcoordsmaxs" "2048 -2048"
+"atmosphere" "T=RAIN,B=5 10,C=0.5,G=0.5 2,BV=50 50,GV=200 200,W=1 2,D=1000"
 "music" "music/city"
 "message" "Test City"
 // brush 0
@@ -1445,7 +1448,6 @@ city/road
 "origin" "-463.999939 -423.999878 3.999006"
 "model" "models/mapobjects/car/car.md3"
 "angles" "-0.000000 -89.999992 3.722170"
-"skin" "models/mapobjects/car/red.skin"
 }
 // entity 18
 {

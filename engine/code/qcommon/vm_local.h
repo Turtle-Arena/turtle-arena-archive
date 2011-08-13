@@ -22,9 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "q_shared.h"
 #include "qcommon.h"
 
-// don't change, this is hardcoded into x86 VMs, opStack protection relies
-// on this
-#define	OPSTACK_SIZE	1024
+#define	OPSTACK_SIZE	256
 #define	OPSTACK_MASK	(OPSTACK_SIZE-1)
 
 // don't change
@@ -141,13 +139,10 @@ struct vm_s {
 
 	//------------------------------------
    
-	char		name[MAX_QPATH];
-	void	*searchPath;				// hint for FS_ReadFileDir()
+    char		name[MAX_QPATH];
 
-#ifndef NO_NATIVE_SUPPORT
 	// for dynamic linked modules
 	void		*dllHandle;
-#endif
 	intptr_t			(QDECL *entryPoint)( int callNum, ... );
 	void (*destroy)(vm_t* self);
 
@@ -156,10 +151,9 @@ struct vm_s {
 
 	qboolean	compiled;
 	byte		*codeBase;
-	int			entryOfs;
 	int			codeLength;
 
-	intptr_t	*instructionPointers;
+	int			*instructionPointers;
 	int			instructionCount;
 
 	byte		*dataBase;
@@ -173,6 +167,8 @@ struct vm_s {
 	int			callLevel;		// counts recursive VM_Call
 	int			breakFunction;		// increment breakCount on function entry to this
 	int			breakCount;
+
+	char		fqpath[MAX_QPATH+1] ;
 
 	byte		*jumpTableTargets;
 	int			numJumpTableTargets;
@@ -192,5 +188,3 @@ vmSymbol_t *VM_ValueToFunctionSymbol( vm_t *vm, int value );
 int VM_SymbolToValue( vm_t *vm, const char *symbol );
 const char *VM_ValueToSymbol( vm_t *vm, int value );
 void VM_LogSyscalls( int *args );
-
-void VM_BlockCopy(unsigned int dest, unsigned int src, size_t n);

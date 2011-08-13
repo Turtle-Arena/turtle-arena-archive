@@ -52,24 +52,6 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	trap_Print( va("%s", text) );
 }
 
-#ifdef IOQ3ZTM
-void QDECL Com_DPrintf( const char *msg, ... ) {
-	va_list		argptr;
-	char		text[1024];
-
-	if (!trap_Cvar_VariableValue("developer")) {
-		return;			// don't confuse non-developers with techie stuff...
-	}
-
-	va_start (argptr, msg);
-	Q_vsnprintf (text, sizeof(text), msg, argptr);
-	va_end (argptr);
-
-	trap_Print( va("%s", text) );
-}
-#endif
-
-
 /*
 =================
 UI_ClampCvar
@@ -237,12 +219,7 @@ void UI_DrawFontBannerString( font_t *font, int x, int y, const char* str, int s
 UI_DrawFontProportionalString
 =================
 */
-void UI_DrawFontProportionalString( font_t *font,
-#ifndef TA_DATA
-				font_t *fontGlow,
-#endif
-				int x, int y, const char* str, int style, vec4_t color )
-{
+void UI_DrawFontProportionalString( font_t *font, int x, int y, const char* str, int style, vec4_t color ) {
 	vec4_t	drawcolor;
 	int		width;
 
@@ -294,11 +271,11 @@ void UI_DrawFontProportionalString( font_t *font,
 		drawcolor[2] = color[2];
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
-#ifdef TA_DATA
+//#ifdef TA_DATA
 		UI_DrawFontStringColor( font, x, y, str, drawcolor );
-#else
-		UI_DrawFontStringColor( fontGlow, x, y, str, drawcolor );
-#endif
+//#else
+//		CG_DrawFontStringColor( fontGlow, x, y, str, drawcolor );
+//#endif
 		return;
 	}
 
@@ -836,7 +813,7 @@ UI_ProportionalSizeScale
 float UI_ProportionalSizeScale( int style ) {
 #ifdef IOQ3ZTM // FONT_REWRITE
 	if (style & UI_SMALLFONT) {
-		return (float)uis.fontPropSmall.pointSize / (float)uis.fontPropBig.pointSize;
+		return uis.fontPropSmall.pointSize / uis.fontPropBig.pointSize;
 	}
 #else
 	if(  style & UI_SMALLFONT ) {
@@ -941,32 +918,19 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	qhandle_t charsetProp;
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
-#ifndef TA_DATA
-	font_t *fontGlow;
-#endif
 
-	if (style & UI_SMALLFONT) {
+	if (style & UI_SMALLFONT)
 		font = &uis.fontPropSmall;
-#ifndef TA_DATA
-		fontGlow = &uis.fontPropGlowSmall;
-#endif
-	} else {
+	else
 		font = &uis.fontPropBig;
-#ifndef TA_DATA
-		fontGlow = &uis.fontPropGlowBig;
-#endif
-	}
 
 	if (font->fontInfo.name[0]) {
-		UI_DrawFontProportionalString(font,
-#ifndef TA_DATA
-				fontGlow,
-#endif
-				x, y, str, style, color);
+		UI_DrawFontProportionalString(font, x, y, str, style, color);
 		return;
 	}
 
-	charsetProp = font->fontShader;
+	// ZTM: TODO: Use font->fontShader
+	charsetProp = uis.fontPropBig.fontShader;
 #else
 	charsetProp = uis.charsetProp;
 #endif
@@ -1022,10 +986,8 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[2] = color[2];
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
-#ifdef TA_DATA
+#if defined TA_DATA || defined IOQ3ZTM // ZTM: FIXME: IOQ3ZTM: Add glow font for quake3?
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, charsetProp );
-#elif defined IOQ3ZTM // FONT_REWRITE
-		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, fontGlow->fontShader );
 #else
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, uis.charsetPropGlow );
 #endif
@@ -1404,10 +1366,17 @@ void UI_MouseEvent( int dx, int dy )
 
 	// update mouse screen position
 	uis.cursorx += dx;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Allow cursor to go to real edge of screen in widescreen, it just looks better.
 	if (uis.cursorx < -uis.bias)
 		uis.cursorx = -uis.bias;
 	else if (uis.cursorx > SCREEN_WIDTH+uis.bias)
 		uis.cursorx = SCREEN_WIDTH+uis.bias;
+#else
+	if (uis.cursorx < 0)
+		uis.cursorx = 0;
+	else if (uis.cursorx > SCREEN_WIDTH)
+		uis.cursorx = SCREEN_WIDTH;
+#endif
 
 	uis.cursory += dy;
 	if (uis.cursory < 0)
@@ -1482,16 +1451,10 @@ void UI_Cache_f( void ) {
 #ifdef TA_MISC // INGAME_SERVER_MENU
 	InServer_Cache();
 #endif
-#if defined TA_MISC && defined TA_SPLITVIEW
-	SetupPlayers_Cache();
-#endif
 	ConfirmMenu_Cache();
 	PlayerModel_Cache();
 	PlayerSettings_Cache();
 	Controls_Cache();
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	UI_Joystick_Cache();
-#endif
 	Demos_Cache();
 	UI_CinematicsMenu_Cache();
 	Preferences_Cache();
@@ -1539,9 +1502,6 @@ UI_ConsoleCommand
 qboolean UI_ConsoleCommand( int realTime ) {
 	char	*cmd;
 
-	uis.frametime = realTime - uis.realtime;
-	uis.realtime = realTime;
-
 	cmd = UI_Argv( 0 );
 
 	// ensure minimum menu data is available
@@ -1559,7 +1519,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 	}
 
 	if ( Q_stricmp (cmd, "sp_complete") == 0 ) {
-		trap_Cvar_Set( "com_errorMessage", "Completed single player platformer test!" );
+		trap_Cvar_Set( "com_errorMessage", "Game Complete!" );
 		return qtrue;
 	}
 
@@ -1708,16 +1668,14 @@ void UI_DrawHandlePic( float x, float y, float w, float h, qhandle_t hShader ) {
 	trap_R_DrawStretchPic( x, y, w, h, s0, t0, s1, t1, hShader );
 }
 
-#ifdef TA_DATA
 /*
 ==========
 UI_DrawPicFullScreen
-
-Draw shader fullscreen (including in widescreen), in widescreen center shader
-and repeat horizontally without changing the aspect.
 ==========
 */
-void UI_DrawPicFullScreen(qhandle_t hShader) {
+void UI_DrawPicFullScreen(qhandle_t hShader)
+{
+#ifdef IOQ3ZTM // IOQ3BUGFIX: In widescreen fill whole screen not just 4:3 area.
 	float x = 0, y = 0, w = uis.glconfig.vidWidth, h = uis.glconfig.vidHeight;
 	const float picX = SCREEN_WIDTH;
 	const float picY = SCREEN_HEIGHT;
@@ -1740,8 +1698,10 @@ void UI_DrawPicFullScreen(qhandle_t hShader) {
 	t2 += tDelta;
 
 	trap_R_DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
-}
+#else
+	UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, hShader );
 #endif
+}
 
 /*
 ================
@@ -1812,10 +1772,10 @@ void UI_Refresh( int realtime )
 			UI_DrawPicFullScreen( uis.menuBackShader );
 #else
 			if( uis.activemenu->showlogo ) {
-				UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackShader );
+				UI_DrawPicFullScreen( uis.menuBackShader );
 			}
 			else {
-				UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackNoLogoShader );
+				UI_DrawPicFullScreen( uis.menuBackNoLogoShader );
 			}
 #endif
 		}

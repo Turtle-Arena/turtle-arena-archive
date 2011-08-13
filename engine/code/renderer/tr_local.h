@@ -24,40 +24,37 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef TR_LOCAL_H
 #define TR_LOCAL_H
 
-#if defined TA_GAME_MODELS && defined DEDICATED
-#define RENDERLESS_MODELS // ZTM: Ded server needs the tags for melee attacks
-#endif
-
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qfiles.h"
 #include "../qcommon/qcommon.h"
 #include "tr_public.h"
-#ifdef RENDERLESS_MODELS
-#define GLuint unsigned int
-#define GLboolean qboolean
-#else
 #include "qgl.h"
-#endif
-#include "iqm.h"
 
 #define GL_INDEX_TYPE		GL_UNSIGNED_INT
 typedef unsigned int glIndex_t;
+
+// fast float to int conversion
+#if id386 && !defined(__GNUC__)
+long myftol( float f );
+#else
+#define	myftol(x) ((int)(x))
+#endif
+
 
 // everything that is needed by the backend needs
 // to be double buffered to allow it to run in
 // parallel on a dual cpu machine
 #define	SMP_FRAMES		2
 
-// 14 bits
-// can't be increased without changing bit packing for drawsurfs
+// 12 bits
 // see QSORT_SHADERNUM_SHIFT
-#define SHADERNUM_BITS			14
-#define	MAX_SHADERS				(1<<SHADERNUM_BITS)
+#define	MAX_SHADERS				16384
 
 //#define MAX_SHADER_STATES 2048
 #define MAX_STATES_PER_SHADER 32
 #define MAX_STATE_NAME 32
 
+// can't be increased without changing bit packing for drawsurfs
 
 
 typedef struct dlight_s {
@@ -219,9 +216,6 @@ typedef enum {
 	TCGEN_ENVIRONMENT_MAPPED,
 	TCGEN_FOG,
 	TCGEN_VECTOR			// S and T from world coordinates
-#ifdef IOQ3ZTM // ZEQ2_CEL
-	,TCGEN_ENVIRONMENT_CELSHADE_MAPPED
-#endif
 } texCoordGen_t;
 
 typedef enum {
@@ -364,7 +358,7 @@ typedef struct {
 	float	depthForOpaque;
 } fogParms_t;
 
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING // ZTM
 typedef struct
 {
 	float			width;				// Width of cel outline.
@@ -412,7 +406,7 @@ typedef struct shader_s {
 
 	int			multitextureEnv;		// 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
 
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING // ZTM
 	celoutline_t celoutline;
 #endif
 
@@ -492,6 +486,11 @@ typedef struct {
 	int			numPolys;
 	struct srfPoly_s	*polys;
 
+#ifdef WOLFET
+	int			numPolyBuffers;
+	struct srfPolyBuffer_s	*polybuffers;
+#endif
+
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
 
@@ -570,12 +569,14 @@ typedef enum {
 	SF_GRID,
 	SF_TRIANGLES,
 	SF_POLY,
+#ifdef WOLFET
+	SF_POLYBUFFER,
+#endif
 	SF_MD3,
 	SF_MD4,
 #ifdef RAVENMD4
 	SF_MDR,
 #endif
-	SF_IQM,
 	SF_FLARE,
 	SF_ENTITY,				// beams, rails, lightning, etc that can be determined by entity
 	SF_DISPLAY_LIST,
@@ -606,6 +607,14 @@ typedef struct srfPoly_s {
 	int				numVerts;
 	polyVert_t		*verts;
 } srfPoly_t;
+
+#ifdef WOLFET
+typedef struct srfPolyBuffer_s {
+	surfaceType_t surfaceType;
+	int fogIndex;
+	polyBuffer_t *pPolyBuffer;
+} srfPolyBuffer_t;
+#endif
 
 typedef struct srfDisplayList_s {
 	surfaceType_t	surfaceType;
@@ -684,40 +693,6 @@ typedef struct {
 	int				numVerts;
 	drawVert_t		*verts;
 } srfTriangles_t;
-
-// inter-quake-model
-typedef struct {
-	int		num_vertexes;
-	int		num_triangles;
-	int		num_frames;
-	int		num_surfaces;
-	int		num_joints;
-	struct srfIQModel_s	*surfaces;
-
-	float		*positions;
-	float		*texcoords;
-	float		*normals;
-	float		*tangents;
-	byte		*blendIndexes;
-	byte		*blendWeights;
-	byte		*colors;
-	int		*triangles;
-
-	int		*jointParents;
-	float		*poseMats;
-	float		*bounds;
-	char		*names;
-} iqmData_t;
-
-// inter-quake-model surface
-typedef struct srfIQModel_s {
-	surfaceType_t	surfaceType;
-	char		name[MAX_QPATH];
-	shader_t	*shader;
-	iqmData_t	*data;
-	int		first_vertex, num_vertexes;
-	int		first_triangle, num_triangles;
-} srfIQModel_t;
 
 
 extern	void (*rb_surfaceTable[SF_NUM_SURFACE_TYPES])(void *);
@@ -827,20 +802,19 @@ typedef enum {
 	MOD_MESH,
 	MOD_MD4,
 #ifdef RAVENMD4
-	MOD_MDR,
+	MOD_MDR
 #endif
-	MOD_IQM
 } modtype_t;
 
 typedef struct model_s {
 	char		name[MAX_QPATH];
 	modtype_t	type;
-	int			index;		// model = tr.models[model->index]
+	int			index;				// model = tr.models[model->index]
 
-	int			dataSize;	// just for listing purposes
-	bmodel_t	*bmodel;		// only if type == MOD_BRUSH
+	int			dataSize;			// just for listing purposes
+	bmodel_t	*bmodel;			// only if type == MOD_BRUSH
 	md3Header_t	*md3[MD3_MAX_LODS];	// only if type == MOD_MESH
-	void	*modelData;			// only if type == (MOD_MD4 | MOD_MDR | MOD_IQM)
+	void	*md4;				// only if type == (MOD_MD4 | MOD_MDR)
 
 	int			 numLods;
 } model_t;
@@ -857,11 +831,10 @@ void		R_ModelBounds( qhandle_t handle, vec3_t mins, vec3_t maxs );
 void		R_Modellist_f (void);
 
 //====================================================
-#ifndef RENDERLESS_MODELS
 extern	refimport_t		ri;
-#endif
 
 #define	MAX_DRAWIMAGES			2048
+#define	MAX_LIGHTMAPS			256
 #define	MAX_SKINS				1024
 
 
@@ -875,39 +848,25 @@ compared quickly during the qsorting process
 
 the bits are allocated as follows:
 
-0 - 1	: dlightmap index
-//2		: used to be clipped flag REMOVED - 03.21.00 rad
-2 - 6	: fog index
-11 - 20	: entity index
 21 - 31	: sorted shader index
+11 - 20	: entity index
+2 - 6	: fog index
+//2		: used to be clipped flag REMOVED - 03.21.00 rad
+0 - 1	: dlightmap index
 
 	TTimo - 1.32
-0-1   : dlightmap index
-2-6   : fog index
-7-16  : entity index
 17-31 : sorted shader index
+7-16  : entity index
+2-6   : fog index
+0-1   : dlightmap index
 */
-#ifdef IOQ3ZTM_NO_COMPAT // MORE_GENTITIES
-/*
-0-1   : dlightmap index (2 bits)
-2-6   : fog index (5 bits)
-7-18  : entity index (12 bits)
-19-23 : sorted order value (5 bits)
-*/
-#endif
-#define	QSORT_FOGNUM_SHIFT		2
-#define	QSORT_ENTITYNUM_SHIFT	7
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-#define	QSORT_ORDER_SHIFT		(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
-#if (QSORT_ORDER_SHIFT+5) > 32 // sort order is 5 bit
-	#error "Need to update sorting, too many bits."
-#endif
+#define	QSORT_ORDER_SHIFT		17 // Only uses 5 bits
 #else
-#define	QSORT_SHADERNUM_SHIFT	(QSORT_ENTITYNUM_SHIFT+GENTITYNUM_BITS)
-#if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 32
-	#error "Need to update sorting, too many bits."
+#define	QSORT_SHADERNUM_SHIFT	17
 #endif
-#endif
+#define	QSORT_ENTITYNUM_SHIFT	7
+#define	QSORT_FOGNUM_SHIFT		2
 
 extern	int			gl_filter_min, gl_filter_max;
 
@@ -971,6 +930,10 @@ typedef struct {
 	qboolean	projection2D;	// if qtrue, drawstretchpic doesn't need to change modes
 	byte		color2D[4];
 	qboolean	vertexes2D;		// shader needs to be finished
+#ifdef OA_BLOOM
+	qboolean	doneBloom;		// done bloom this frame
+	qboolean	doneSurfaces;   // done any 3d surfaces already
+#endif
 	trRefEntity_t	entity2D;	// currentEntity will point at this when doing 2D rendering
 } backEndState_t;
 
@@ -983,7 +946,6 @@ typedef struct {
 ** by the frontend.
 */
 typedef struct {
-#ifndef RENDERLESS_MODELS
 	qboolean				registered;		// cleared at shutdown, set at beginRegistration
 
 	int						visCount;		// incremented every time a new vis cluster is entered
@@ -1017,7 +979,7 @@ typedef struct {
 	shader_t				*sunShader;
 
 	int						numLightmaps;
-	image_t					**lightmaps;
+	image_t					*lightmaps[MAX_LIGHTMAPS];
 
 	trRefEntity_t			*currentEntity;
 	trRefEntity_t			worldEntity;		// point currentEntity at this when rendering world
@@ -1047,11 +1009,9 @@ typedef struct {
 	// put large tables at the end, so most elements will be
 	// within the +/32K indexed range on risc processors
 	//
-#endif
 	model_t					*models[MAX_MOD_KNOWN];
 	int						numModels;
 
-#ifndef RENDERLESS_MODELS
 	int						numImages;
 	image_t					*images[MAX_DRAWIMAGES];
 
@@ -1074,7 +1034,6 @@ typedef struct {
 	float					noiseTable[FUNCTABLE_SIZE];
 #endif
 	float					fogTable[FOG_TABLE_SIZE];
-#endif
 } trGlobals_t;
 
 extern backEndState_t	backEnd;
@@ -1170,6 +1129,7 @@ extern	cvar_t	*r_colorMipLevels;				// development aid to see texture mip usage
 extern	cvar_t	*r_picmip;						// controls picmip values
 extern	cvar_t	*r_finish;
 extern	cvar_t	*r_drawBuffer;
+extern  cvar_t  *r_glDriver;
 extern	cvar_t	*r_swapInterval;
 extern	cvar_t	*r_textureMode;
 extern	cvar_t	*r_offsetFactor;
@@ -1181,7 +1141,7 @@ extern	cvar_t	*r_vertexLight;					// vertex lighting mode for better performance
 extern	cvar_t	*r_uiFullScreen;				// ui is running fullscreen
 
 extern	cvar_t	*r_logFile;						// number of frames to emit GL logs
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING
 extern	cvar_t	*r_celshadalgo;					// Cel shading, Chooses method: 0 = disabled, 1 = whiteTexture, 10 = kuwahara, 20 = snn.
 extern	cvar_t	*r_celoutline;					// Cel outline. The integer value is the width of the cel outline to draw.
 #endif
@@ -1226,6 +1186,8 @@ extern	cvar_t	*r_saveFontData;
 
 extern cvar_t	*r_marksOnTriangleMeshes;
 
+extern	cvar_t	*r_GLlibCoolDownMsec;
+
 //====================================================================
 
 float R_NoiseGet4f( float x, float y, float z, float t );
@@ -1245,6 +1207,9 @@ void R_AddRailSurfaces( trRefEntity_t *e, qboolean isUnderwater );
 void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
 void R_AddPolygonSurfaces( void );
+#ifdef WOLFET
+void R_AddPolygonBufferSurfaces( void );
+#endif
 
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 void R_ComposeSort( drawSurf_t *drawSurf, int entityNum, shader_t *shader, 
@@ -1398,7 +1363,6 @@ void		GLimp_FrontEndSleep( void );
 void		GLimp_WakeRenderer( void *data );
 
 void		GLimp_LogComment( char *comment );
-void		GLimp_Minimize(void);
 
 // NOTE TTimo linux works with float gamma value, not the gamma table
 //   the params won't be used, getting the r_gamma cvar directly
@@ -1425,19 +1389,19 @@ typedef struct stageVars
 
 typedef struct shaderCommands_s 
 {
-	glIndex_t	indexes[SHADER_MAX_INDEXES] QALIGN(16);
-	vec4_t		xyz[SHADER_MAX_VERTEXES] QALIGN(16);
-	vec4_t		normal[SHADER_MAX_VERTEXES] QALIGN(16);
-	vec2_t		texCoords[SHADER_MAX_VERTEXES][2] QALIGN(16);
-	color4ub_t	vertexColors[SHADER_MAX_VERTEXES] QALIGN(16);
-	int			vertexDlightBits[SHADER_MAX_VERTEXES] QALIGN(16);
+	glIndex_t	indexes[SHADER_MAX_INDEXES] ALIGN(16);
+	vec4_t		xyz[SHADER_MAX_VERTEXES] ALIGN(16);
+	vec4_t		normal[SHADER_MAX_VERTEXES] ALIGN(16);
+	vec2_t		texCoords[SHADER_MAX_VERTEXES][2] ALIGN(16);
+	color4ub_t	vertexColors[SHADER_MAX_VERTEXES] ALIGN(16);
+	int			vertexDlightBits[SHADER_MAX_VERTEXES] ALIGN(16);
 
-	stageVars_t	svars QALIGN(16);
+	stageVars_t	svars ALIGN(16);
 
-	color4ub_t	constantColor255[SHADER_MAX_VERTEXES] QALIGN(16);
+	color4ub_t	constantColor255[SHADER_MAX_VERTEXES] ALIGN(16);
 
 	shader_t	*shader;
-	float		shaderTime;
+  float   shaderTime;
 	int			fogNum;
 
 	int			dlightBits;	// or together of all vertexDlightBits
@@ -1577,6 +1541,9 @@ void R_ToggleSmpFrame( void );
 void RE_ClearScene( void );
 void RE_AddRefEntityToScene( const refEntity_t *ent );
 void RE_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
+#ifdef WOLFET
+void RE_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer );
+#endif
 void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_RenderScene( const refdef_t *fd );
@@ -1617,12 +1584,6 @@ void RB_SurfaceAnim( md4Surface_t *surfType );
 void R_MDRAddAnimSurfaces( trRefEntity_t *ent );
 void RB_MDRSurfaceAnim( md4Surface_t *surface );
 #endif
-qboolean R_LoadIQM (model_t *mod, void *buffer, int filesize, const char *name );
-void R_AddIQMSurfaces( trRefEntity_t *ent );
-void RB_IQMSurfaceAnim( surfaceType_t *surface );
-int R_IQMLerpTag( orientation_t *tag, iqmData_t *data,
-                  int startFrame, int endFrame,
-                  float frac, const char *tagName );
 
 /*
 =============================================================
@@ -1648,9 +1609,6 @@ void	R_TransformClipToWindow( const vec4_t clip, const viewParms_t *view, vec4_t
 
 void	RB_DeformTessGeometry( void );
 
-#ifdef IOQ3ZTM // ZEQ2_CEL
-void	RB_CalcEnvironmentCelShadeTexCoords( float *dstTexCoords );
-#endif
 void	RB_CalcEnvironmentTexCoords( float *dstTexCoords );
 void	RB_CalcFogTexCoords( float *dstTexCoords );
 void	RB_CalcScrollTexCoords( const float scroll[2], float *dstTexCoords );
@@ -1772,14 +1730,6 @@ typedef struct
 	int commandId;
 } clearDepthCommand_t;
 
-#ifdef TA_BLOOM
-typedef struct {
-	int		commandId;
-	float	x, y;
-	float	w, h;
-} bloomCommand_t;
-#endif
-
 typedef enum {
 	RC_END_OF_LIST,
 	RC_SET_COLOR,
@@ -1791,9 +1741,6 @@ typedef enum {
 	RC_VIDEOFRAME,
 	RC_COLORMASK,
 	RC_CLEARDEPTH
-#ifdef TA_BLOOM
-	,RC_BLOOM
-#endif
 } renderCommand_t;
 
 
@@ -1813,11 +1760,17 @@ typedef struct {
 	trRefEntity_t	entities[MAX_ENTITIES];
 	srfPoly_t	*polys;//[MAX_POLYS];
 	polyVert_t	*polyVerts;//[MAX_POLYVERTS];
+#ifdef WOLFET // ZTM: Modified to fit with source
+	srfPolyBuffer_t *polybuffers;//[MAX_POLYS];
+#endif
 	renderCommandList_t	commands;
 } backEndData_t;
 
 extern	int		max_polys;
 extern	int		max_polyverts;
+#ifdef WOLFET
+extern	int		max_polybuffers;
+#endif
 
 extern	backEndData_t	*backEndData[SMP_FRAMES];	// the second one may not be allocated
 
@@ -1839,18 +1792,15 @@ void R_AddDrawSurfCmd( drawSurf_t *drawSurfs, int numDrawSurfs );
 void RE_SetColor( const float *rgba );
 void RE_StretchPic ( float x, float y, float w, float h, 
 					  float s1, float t1, float s2, float t2, qhandle_t hShader );
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 void RB_SetGL2D (void);
 #endif
 void RE_BeginFrame( stereoFrame_t stereoFrame );
 void RE_EndFrame( int *frontEndMsec, int *backEndMsec );
-#ifdef IOQ3ZTM // PNG_SCREENSHOTS
-void RE_SavePNG(const char *filename, int width, int height, byte *data, int padding);
-#endif
-void RE_SaveJPG(char * filename, int quality, int image_width, int image_height,
-                unsigned char *image_buffer, int padding);
-size_t RE_SaveJPGToBuffer(byte *buffer, size_t bufSize, int quality,
-		          int image_width, int image_height, byte *image_buffer, int padding);
+void SaveJPG(char * filename, int quality, int image_width, int image_height, unsigned char *image_buffer);
+int SaveJPGToBuffer( byte *buffer, int quality,
+		int image_width, int image_height,
+		byte *image_buffer );
 void RE_TakeVideoFrame( int width, int height,
 		byte *captureBuffer, byte *encodeBuffer, qboolean motionJpeg );
 
@@ -1859,10 +1809,10 @@ void R_InitFreeType( void );
 void R_DoneFreeType( void );
 void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font);
 
-#ifdef TA_BLOOM
-// bloom stuff
+#ifdef OA_BLOOM
+//Bloom Stuff
 void R_BloomInit( void );
-void R_BloomScreen( int x, int y, int w, int h );
+void R_BloomScreen( void );
 #endif
 
 #endif //TR_LOCAL_H

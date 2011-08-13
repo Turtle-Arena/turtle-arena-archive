@@ -28,11 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "g_local.h"
 
 
-#ifdef IOQ3ZTM
-#define POOLSIZE	(512 * 1024)
-#else
 #define POOLSIZE	(256 * 1024)
-#endif
 
 static char		memoryPool[POOLSIZE];
 static int		allocPoint;
@@ -45,10 +41,7 @@ void *G_Alloc( int size ) {
 	}
 
 	if ( allocPoint + size > POOLSIZE ) {
-#ifdef IOQ3ZTM
-		Svcmd_GameMem_f();
-#endif
-		G_Error( "G_Alloc: failed on allocation of %i bytes\n", size );
+	  G_Error( "G_Alloc: failed on allocation of %i bytes\n", size );
 		return NULL;
 	}
 

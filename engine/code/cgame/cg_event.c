@@ -90,9 +90,6 @@ static void CG_Obituary( entityState_t *ent ) {
 	char		attackerName[32];
 	gender_t	gender;
 	clientInfo_t	*ci;
-#ifdef TA_SPLITVIEW
-	int				i;
-#endif
 
 	target = ent->otherEntityNum;
 	attacker = ent->otherEntityNum2;
@@ -188,7 +185,7 @@ static void CG_Obituary( entityState_t *ent ) {
 
 	if (attacker == target) {
 		switch (mod) {
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE:
 			message = "goes out with a bang";
 			break;
@@ -226,7 +223,7 @@ static void CG_Obituary( entityState_t *ent ) {
 			if( gender == GENDER_FEMALE ) {
 				message = "found her prox mine";
 			} else if ( gender == GENDER_NEUTER ) {
-				message = "found its prox mine";
+				message = "found it's prox mine";
 			} else {
 				message = "found his prox mine";
 			}
@@ -254,45 +251,22 @@ static void CG_Obituary( entityState_t *ent ) {
 #ifdef TA_SP // Don't show in single player
 		cgs.gametype != GT_SINGLE_PLAYER &&
 #endif
-#ifdef IOQ3ZTM // Main goal isn't to kill others, so do not show kill messages.
-		cgs.gametype != GT_CTF &&
-#ifdef MISSIONPACK
-		cgs.gametype != GT_1FCTF &&
-		cgs.gametype != GT_OBELISK &&
-#endif
-#endif
-#ifdef TA_SPLITVIEW
-		CG_LocalClient(attacker) != -1
-#else
-		attacker == cg.snap->ps.clientNum
-#endif
-		)
-	{
+		attacker == cg.snap->ps.clientNum ) {
 		char	*s;
-		playerState_t	*ps;
 
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if (cg.snap->lcIndex[i] == -1 || attacker != cg.snap->pss[cg.snap->lcIndex[i]].clientNum)
-				continue;
-			cg.cur_lc = &cg.localClients[i];
-			ps = &cg.snap->pss[cg.snap->lcIndex[i]];
-#else
-			ps = &cg.snap->ps;
-#endif
 #ifdef NOTRATEDM // frag to KO
 		if ( cgs.gametype < GT_TEAM ) {
 			s = va("You knocked out %s\n%s place with %i", targetName,
-				CG_PlaceString( ps->persistant[PERS_RANK] + 1 ),
-				ps->persistant[PERS_SCORE] );
+				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
+				cg.snap->ps.persistant[PERS_SCORE] );
 		} else {
 			s = va("You knocked out %s", targetName );
 		}
 #else
 		if ( cgs.gametype < GT_TEAM ) {
 			s = va("You fragged %s\n%s place with %i", targetName, 
-				CG_PlaceString( ps->persistant[PERS_RANK] + 1 ),
-				ps->persistant[PERS_SCORE] );
+				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
+				cg.snap->ps.persistant[PERS_SCORE] );
 		} else {
 			s = va("You fragged %s", targetName );
 		}
@@ -303,10 +277,6 @@ static void CG_Obituary( entityState_t *ent ) {
 		} 
 #else
 		CG_CenterPrint( s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
-#endif
-#ifdef TA_SPLITVIEW
-		}
-		cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 #endif
 
 		// print the text message as well
@@ -320,17 +290,9 @@ static void CG_Obituary( entityState_t *ent ) {
 		Q_strncpyz( attackerName, Info_ValueForKey( attackerInfo, "n" ), sizeof(attackerName) - 2);
 		strcat( attackerName, S_COLOR_WHITE );
 		// check for kill messages about the current clientNum
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && target == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-				Q_strncpyz( cg.localClients[i].killerName, attackerName, sizeof( cg.localClients[i].killerName ) );
-			}
-		}
-#else
 		if ( target == cg.snap->ps.clientNum ) {
-			Q_strncpyz( cg.localClient.killerName, attackerName, sizeof( cg.localClient.killerName ) );
+			Q_strncpyz( cg.killerName, attackerName, sizeof( cg.killerName ) );
 		}
-#endif
 	}
 
 	if ( attacker != ENTITYNUM_WORLD ) {
@@ -358,7 +320,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		case MOD_GRAPPLE:
 			message = "was caught by";
 			break;
-#ifndef TURTLEARENA // MOD NO_KAMIKAZE_ITEM POWERS
+#ifndef TURTLEARENA // MOD
 		case MOD_GAUNTLET:
 			message = "was pummeled by";
 			break;
@@ -403,7 +365,9 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was blasted by";
 			message2 = "'s BFG";
 			break;
+#endif
 #ifdef MISSIONPACK
+#ifndef TURTLEARENA // MOD
 		case MOD_NAIL:
 			message = "was nailed by";
 			break;
@@ -415,10 +379,14 @@ static void CG_Obituary( entityState_t *ent ) {
 			message = "was too close to";
 			message2 = "'s Prox Mine";
 			break;
+#endif
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		case MOD_KAMIKAZE:
 			message = "falls to";
 			message2 = "'s Kamikaze blast";
 			break;
+#endif
+#ifndef TURTLEARENA // POWERS
 		case MOD_JUICED:
 			message = "was juiced by";
 			break;
@@ -456,9 +424,6 @@ static void CG_UseItem( centity_t *cent ) {
 	int			itemNum, clientNum;
 	gitem_t		*item;
 	entityState_t *es;
-#ifdef TA_SPLITVIEW
-	int			i;
-#endif
 
 	es = &cent->currentState;
 	
@@ -473,23 +438,11 @@ static void CG_UseItem( centity_t *cent ) {
 	}
 
 	// print a message if the local player
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < MAX_SPLITVIEW; i++)
-#else
-	if ( es->number == cg.snap->ps.clientNum )
-#endif
-	{
-#ifdef TA_SPLITVIEW
-		if ( cg.snap->lcIndex[i] == -1 || es->number != cg.snap->pss[cg.snap->lcIndex[i]].clientNum )
-			continue;
-		cg.cur_lc = &cg.localClients[i];
-#endif
-#ifndef TA_HOLDSYS
+	if ( es->number == cg.snap->ps.clientNum ) {
 		if ( !itemNum ) {
 			CG_CenterPrint( "No item to use", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 		} else
-#endif
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 		if (!BG_ProjectileIndexForHoldable(itemNum))
 #endif
 		{
@@ -504,13 +457,10 @@ static void CG_UseItem( centity_t *cent ) {
 			}
 		}
 	}
-#ifdef TA_SPLITVIEW
-	cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
-#endif
 
 	switch ( itemNum ) {
 	default:
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 		// ZTM: Play shuriken use sound
 		if (BG_ProjectileIndexForHoldable(itemNum)) {
 			trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.shurikenSound );
@@ -521,7 +471,7 @@ static void CG_UseItem( centity_t *cent ) {
 		trap_S_StartSound (NULL, es->number, CHAN_BODY, cgs.media.useNothingSound );
 		break;
 
-#ifndef TURTLEARENA // HOLDABLE // no q3 teleprter
+#ifndef TA_HOLDABLE // no q3 teleprter
 	case HI_TELEPORTER:
 		break;
 #endif
@@ -536,7 +486,7 @@ static void CG_UseItem( centity_t *cent ) {
 		break;
 
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	case HI_KAMIKAZE:
 		break;
 #endif
@@ -572,30 +522,30 @@ static void CG_ItemPickup( int itemNum ) {
 #endif
 #ifdef TURTLEARENA // NIGTHS_ITEMS
 	if (item->giType == IT_SCORE) {
-		cg.cur_lc->scorePickupTime = cg.time;
+		cg.scorePickupTime = cg.time;
 		return; // Do not count as a pickup item
 	}
 #endif
-	cg.cur_lc->itemPickup = itemNum;
-	cg.cur_lc->itemPickupTime = cg.time;
-	cg.cur_lc->itemPickupBlendTime = cg.time;
+	cg.itemPickup = itemNum;
+	cg.itemPickupTime = cg.time;
+	cg.itemPickupBlendTime = cg.time;
 
 #ifdef TA_HOLDSYS
 	if (item->giType == IT_HOLDABLE)
 	{
 #ifdef TA_HOLDSYS/*2*/
 		// Select the holdable
-		cg.cur_lc->holdableSelect = item->giTag;
+		cg.holdableSelect = item->giTag;
 #endif
 
 		// holdable is really given in game, but do it anyway...
 		if (item->quantity == 0)
-			cg.cur_lc->predictedPlayerState.holdable[item->giTag] = 1;
+			cg.predictedPlayerState.holdable[item->giTag] = 1;
 		else
-			cg.cur_lc->predictedPlayerState.holdable[item->giTag] += item->quantity;
+			cg.predictedPlayerState.holdable[item->giTag] += item->quantity;
 
-		if (cg.cur_lc->predictedPlayerState.holdable[item->giTag] > MAX_SHURIKENS)
-			cg.cur_lc->predictedPlayerState.holdable[item->giTag] = MAX_SHURIKENS;
+		if (cg.predictedPlayerState.holdable[item->giTag] > MAX_SHURIKENS)
+			cg.predictedPlayerState.holdable[item->giTag] = MAX_SHURIKENS;
 	}
 #endif
 	// see if it should be the grabbed weapon
@@ -608,14 +558,6 @@ static void CG_ItemPickup( int itemNum ) {
 		// select it immediately
 #ifdef TA_WEAPSYS_EX
 		// always switch
-#elif defined TA_SPLITVIEW
-#if defined TA_WEAPSYS || defined IOQ3ZTM
-		if ( cg_autoswitch[cg.cur_lc-cg.localClients].integer )
-#elif defined TA_ITEMSYS
-		if ( cg_autoswitch[cg.cur_lc-cg.localClients].integer && item->giTag != WP_MACHINEGUN )
-#else
-		if ( cg_autoswitch[cg.cur_lc-cg.localClients].integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN )
-#endif
 #elif defined TA_WEAPSYS || defined IOQ3ZTM
 		if ( cg_autoswitch.integer )
 #elif defined TA_ITEMSYS
@@ -625,64 +567,19 @@ static void CG_ItemPickup( int itemNum ) {
 #endif
 		{
 #ifdef TA_WEAPSYS_EX // The weapon "should" be selected in game and sent in the next snap too
-			cg.cur_lc->predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
+			cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
 #else
-			cg.cur_lc->weaponSelectTime = cg.time;
+			cg.weaponSelectTime = cg.time;
 #ifdef TA_ITEMSYS
-			cg.cur_lc->weaponSelect = item->giTag;
+			cg.weaponSelect = item->giTag;
 #else
-			cg.cur_lc->weaponSelect = bg_itemlist[itemNum].giTag;
+			cg.weaponSelect = bg_itemlist[itemNum].giTag;
 #endif
 #endif
 		}
 	}
 }
 
-/*
-================
-CG_WaterLevel
-
-Returns waterlevel for entity origin
-================
-*/
-int CG_WaterLevel(centity_t *cent) {
-	vec3_t point;
-	int contents, sample1, sample2, anim, waterlevel;
-
-	// get waterlevel, accounting for ducking
-	waterlevel = 0;
-	VectorCopy(cent->lerpOrigin, point);
-	point[2] += MINS_Z + 1;
-	anim = cent->currentState.legsAnim & ~ANIM_TOGGLEBIT;
-
-	if (anim == LEGS_WALKCR || anim == LEGS_IDLECR) {
-		point[2] += CROUCH_VIEWHEIGHT;
-	} else {
-		point[2] += DEFAULT_VIEWHEIGHT;
-	}
-
-	contents = CG_PointContents(point, -1);
-
-	if (contents & MASK_WATER) {
-		sample2 = point[2] - MINS_Z;
-		sample1 = sample2 / 2;
-		waterlevel = 1;
-		point[2] = cent->lerpOrigin[2] + MINS_Z + sample1;
-		contents = CG_PointContents(point, -1);
-
-		if (contents & MASK_WATER) {
-			waterlevel = 2;
-			point[2] = cent->lerpOrigin[2] + MINS_Z + sample2;
-			contents = CG_PointContents(point, -1);
-
-			if (contents & MASK_WATER) {
-				waterlevel = 3;
-			}
-		}
-	}
-
-	return waterlevel;
-}
 
 /*
 ================
@@ -708,24 +605,9 @@ void CG_PainEvent( centity_t *cent, int health ) {
 	} else {
 		snd = "*pain100_1.wav";
 	}
-	// play a gurp sound instead of a normal pain sound
-	if (CG_WaterLevel(cent) >= 1) {
-#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
-		if (rand()&1) {
-			trap_S_StartSound(NULL, cent->currentState.number, CHAN_VOICE, CG_CustomSound(cent->currentState.number, "*gurp1.wav"));
-		} else {
-			trap_S_StartSound(NULL, cent->currentState.number, CHAN_VOICE, CG_CustomSound(cent->currentState.number, "*gurp2.wav"));
-		}
-#else
-		if (rand()&1) {
-			trap_S_StartSound(NULL, cent->currentState.number, CHAN_VOICE, CG_CustomSound(cent->currentState.number, "sound/player/gurp1.wav"));
-		} else {
-			trap_S_StartSound(NULL, cent->currentState.number, CHAN_VOICE, CG_CustomSound(cent->currentState.number, "sound/player/gurp2.wav"));
-		}
-#endif
-	} else {
-		trap_S_StartSound(NULL, cent->currentState.number, CHAN_VOICE, CG_CustomSound(cent->currentState.number, snd));
-	}
+	trap_S_StartSound( NULL, cent->currentState.number, CHAN_VOICE, 
+		CG_CustomSound( cent->currentState.number, snd ) );
+
 	// save pain time for programitic twitch animation
 	cent->pe.painTime = cg.time;
 	cent->pe.painDirection ^= 1;
@@ -849,10 +731,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	const char		*s;
 	int				clientNum;
 	clientInfo_t	*ci;
-#ifdef TA_SPLITVIEW
-	int				i;
-#endif
-	int				thisClientNum;
 
 	es = &cent->currentState;
 	event = es->event & ~EV_EVENT_BITS;
@@ -871,12 +749,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		clientNum = 0;
 	}
 	ci = &cgs.clientinfo[ clientNum ];
-
-#ifdef TA_SPLITVIEW
-	thisClientNum = cg.snap->pss[0].clientNum;
-#else
-	thisClientNum = cg.snap->ps.clientNum;
-#endif
 
 	switch ( event ) {
 	//
@@ -930,61 +802,31 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #else
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.landSound );
 #endif
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && clientNum == cg.localClients[i].predictedPlayerState.clientNum ) {
-				// smooth landing z changes
-				cg.localClients[i].landChange = -8;
-				cg.localClients[i].landTime = cg.time;
-			}
-		}
-#else
-		if ( clientNum == cg.localClient.predictedPlayerState.clientNum ) {
+		if ( clientNum == cg.predictedPlayerState.clientNum ) {
 			// smooth landing z changes
-			cg.localClient.landChange = -8;
-			cg.localClient.landTime = cg.time;
+			cg.landChange = -8;
+			cg.landTime = cg.time;
 		}
-#endif
 		break;
 	case EV_FALL_MEDIUM:
 		DEBUGNAME("EV_FALL_MEDIUM");
 		// use normal pain sound
 		trap_S_StartSound( NULL, es->number, CHAN_VOICE, CG_CustomSound( es->number, "*pain100_1.wav" ) );
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && clientNum == cg.localClients[i].predictedPlayerState.clientNum ) {
-				// smooth landing z changes
-				cg.localClients[i].landChange = -16;
-				cg.localClients[i].landTime = cg.time;
-			}
-		}
-#else
-		if ( clientNum == cg.localClient.predictedPlayerState.clientNum ) {
+		if ( clientNum == cg.predictedPlayerState.clientNum ) {
 			// smooth landing z changes
-			cg.localClient.landChange = -16;
-			cg.localClient.landTime = cg.time;
+			cg.landChange = -16;
+			cg.landTime = cg.time;
 		}
-#endif
 		break;
 	case EV_FALL_FAR:
 		DEBUGNAME("EV_FALL_FAR");
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, CG_CustomSound( es->number, "*fall1.wav" ) );
 		cent->pe.painTime = cg.time;	// don't play a pain sound right after this
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && clientNum == cg.localClients[i].predictedPlayerState.clientNum ) {
-				// smooth landing z changes
-				cg.localClients[i].landChange = -24;
-				cg.localClients[i].landTime = cg.time;
-			}
-		}
-#else
-		if ( clientNum == cg.localClient.predictedPlayerState.clientNum ) {
+		if ( clientNum == cg.predictedPlayerState.clientNum ) {
 			// smooth landing z changes
-			cg.localClient.landChange = -24;
-			cg.localClient.landTime = cg.time;
+			cg.landChange = -24;
+			cg.landTime = cg.time;
 		}
-#endif
 		break;
 
 	case EV_STEP_4:
@@ -996,47 +838,30 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		float	oldStep;
 		int		delta;
 		int		step;
-		cglc_t	*lc;
-		playerState_t *ps;
 
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if (cg.snap->lcIndex[i] == -1) {
-				continue;
-			}
-			lc = &cg.localClients[i];
-			ps = &cg.snap->pss[cg.snap->lcIndex[i]];
-#else
-		lc = &cg.localClient;
-		ps = &cg.snap->ps;
-#endif
-		if ( clientNum != lc->predictedPlayerState.clientNum ) {
+		if ( clientNum != cg.predictedPlayerState.clientNum ) {
 			break;
 		}
-
 		// if we are interpolating, we don't need to smooth steps
-		if ( cg.demoPlayback || (ps->pm_flags & PMF_FOLLOW) ||
+		if ( cg.demoPlayback || (cg.snap->ps.pm_flags & PMF_FOLLOW) ||
 			cg_nopredict.integer || cg_synchronousClients.integer ) {
 			break;
 		}
 		// check for stepping up before a previous step is completed
-		delta = cg.time - lc->stepTime;
+		delta = cg.time - cg.stepTime;
 		if (delta < STEP_TIME) {
-			oldStep = lc->stepChange * (STEP_TIME - delta) / STEP_TIME;
+			oldStep = cg.stepChange * (STEP_TIME - delta) / STEP_TIME;
 		} else {
 			oldStep = 0;
 		}
 
 		// add this amount
 		step = 4 * (event - EV_STEP_4 + 1 );
-		lc->stepChange = oldStep + step;
-		if ( lc->stepChange > MAX_STEP_CHANGE ) {
-			lc->stepChange = MAX_STEP_CHANGE;
+		cg.stepChange = oldStep + step;
+		if ( cg.stepChange > MAX_STEP_CHANGE ) {
+			cg.stepChange = MAX_STEP_CHANGE;
 		}
-		lc->stepTime = cg.time;
-#ifdef TA_SPLITVIEW
-		}
-#endif
+		cg.stepTime = cg.time;
 		break;
 	}
 
@@ -1044,10 +869,11 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		DEBUGNAME("EV_JUMP_PAD");
 //		CG_Printf( "EV_JUMP_PAD w/effect #%i\n", es->eventParm );
 		{
+			localEntity_t	*smoke;
 			vec3_t			up = {0, 0, 1};
 
 
-			CG_SmokePuff( cent->lerpOrigin, up, 
+			smoke = CG_SmokePuff( cent->lerpOrigin, up, 
 						  32, 
 						  1, 1, 1, 0.33f,
 						  1000, 
@@ -1172,19 +998,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
 
 			// show icon and name on status bar
-#ifdef TA_SPLITVIEW
-			for (i = 0; i < MAX_SPLITVIEW; i++) {
-				if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-					cg.cur_lc = &cg.localClients[i];
-					CG_ItemPickup( index );
-				}
-			}
-			cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
-#else
 			if ( es->number == cg.snap->ps.clientNum ) {
 				CG_ItemPickup( index );
 			}
-#endif
 		}
 		break;
 
@@ -1209,31 +1025,21 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			// powerup pickups are global
 			if( item->pickup_sound[0] ) {
-				trap_S_StartSound (NULL, thisClientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
+				trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
 			}
 #else
 			item = &bg_itemlist[ index ];
 
 			// powerup pickups are global
 			if( item->pickup_sound ) {
-				trap_S_StartSound (NULL, thisClientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
+				trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, trap_S_RegisterSound( item->pickup_sound, qfalse ) );
 			}
 #endif
 
 			// show icon and name on status bar
-#ifdef TA_SPLITVIEW
-			for (i = 0; i < MAX_SPLITVIEW; i++) {
-				if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-					cg.cur_lc = &cg.localClients[i];
-					CG_ItemPickup( index );
-				}
-			}
-			cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
-#else
 			if ( es->number == cg.snap->ps.clientNum ) {
 				CG_ItemPickup( index );
 			}
-#endif
 		}
 		break;
 
@@ -1249,21 +1055,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_NOAMMO:
 		DEBUGNAME("EV_NOAMMO");
 //		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.noAmmoSound );
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-				cg.cur_lc = &cg.localClients[i];
-				cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[i]];
-				CG_OutOfAmmoChange();
-			}
-		}
-		cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
-		cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[cg.cur_localClientNum]];
-#else
 		if ( es->number == cg.snap->ps.clientNum ) {
 			CG_OutOfAmmoChange();
 		}
-#endif
 		break;
 #endif
 	case EV_CHANGE_WEAPON:
@@ -1418,7 +1212,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.wstbactvSound );
 		break;
 #endif
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	case EV_KAMIKAZE:
 		DEBUGNAME("EV_KAMIKAZE");
 		CG_KamikazeEffect( cent->lerpOrigin );
@@ -1443,13 +1237,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		break;
 	case EV_LIGHTNINGBOLT:
 		DEBUGNAME("EV_LIGHTNINGBOLT");
-#ifdef TA_WEAPSYS
-		if (es->weapon >= 0 && es->weapon < BG_NumProjectiles()) {
-			CG_LightningBoltBeam(&cg_projectiles[es->weapon], es->origin2, es->pos.trBase);
-		}
-#else
 		CG_LightningBoltBeam(es->origin2, es->pos.trBase);
-#endif
 		break;
 #endif
 #endif
@@ -1530,10 +1318,6 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifdef TA_MISC // MATERIALS
 		CG_ImpactParticles(position, dir, es->otherEntityNum, es->time2, es->otherEntityNum2);
 #endif
-		break;
-	case EV_EXPLOSION:
-		DEBUGNAME("EV_EXPLOSION");
-		CG_ExplosionEffect(position, es->time2, es->otherEntityNum);
 		break;
 #endif
 
@@ -1680,58 +1464,31 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_GLOBAL_SOUND:	// play from the player's head so it never diminishes
 		DEBUGNAME("EV_GLOBAL_SOUND");
 		if ( cgs.gameSounds[ es->eventParm ] ) {
-			trap_S_StartSound (NULL, thisClientNum, CHAN_AUTO, cgs.gameSounds[ es->eventParm ] );
+			trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, cgs.gameSounds[ es->eventParm ] );
 		} else {
 			s = CG_ConfigString( CS_SOUNDS + es->eventParm );
-			trap_S_StartSound (NULL, thisClientNum, CHAN_AUTO, CG_CustomSound( es->number, s ) );
+			trap_S_StartSound (NULL, cg.snap->ps.clientNum, CHAN_AUTO, CG_CustomSound( es->number, s ) );
 		}
 		break;
 
 	case EV_GLOBAL_TEAM_SOUND:	// play from the player's head so it never diminishes
-		DEBUGNAME("EV_GLOBAL_TEAM_SOUND");
 		{
-			cglc_t *lc;
-#ifdef TA_SPLITVIEW // ZTM: FIXME: These checks don't really work with more than one local client...
-			qboolean localHasBlue = qfalse;
-			qboolean localHasRed = qfalse;
-			qboolean localHasNeutral = qfalse;
-
-			lc = &cg.localClients[0];
-
-			for (i = 0; i < MAX_SPLITVIEW; i++) {
-				if (cg.snap->lcIndex[i] == -1) {
-					continue;
-				}
-
-				if (cg.localClients[i].predictedPlayerState.powerups[PW_BLUEFLAG]) {
-					localHasBlue = qtrue;
-				}
-				if (cg.localClients[i].predictedPlayerState.powerups[PW_REDFLAG]) {
-					localHasRed = qtrue;
-				}
-				if (cg.localClients[i].predictedPlayerState.powerups[PW_NEUTRALFLAG]) {
-					localHasNeutral = qtrue;
-				}
-			}
-#else
-			lc = &cg.localClient;
-#endif
-
+			DEBUGNAME("EV_GLOBAL_TEAM_SOUND");
 			switch( es->eventParm ) {
 				case GTS_RED_CAPTURE: // CTF: red team captured the blue flag, 1FCTF: red team captured the neutral flag
-					if ( cgs.clientinfo[lc->clientNum].team == TEAM_RED )
+					if ( cgs.clientinfo[cg.clientNum].team == TEAM_RED )
 						CG_AddBufferedSound( cgs.media.captureYourTeamSound );
 					else
 						CG_AddBufferedSound( cgs.media.captureOpponentSound );
 					break;
 				case GTS_BLUE_CAPTURE: // CTF: blue team captured the red flag, 1FCTF: blue team captured the neutral flag
-					if ( cgs.clientinfo[lc->clientNum].team == TEAM_BLUE )
+					if ( cgs.clientinfo[cg.clientNum].team == TEAM_BLUE )
 						CG_AddBufferedSound( cgs.media.captureYourTeamSound );
 					else
 						CG_AddBufferedSound( cgs.media.captureOpponentSound );
 					break;
 				case GTS_RED_RETURN: // CTF: blue flag returned, 1FCTF: never used
-					if ( cgs.clientinfo[lc->clientNum].team == TEAM_RED )
+					if ( cgs.clientinfo[cg.clientNum].team == TEAM_RED )
 						CG_AddBufferedSound( cgs.media.returnYourTeamSound );
 					else
 						CG_AddBufferedSound( cgs.media.returnOpponentSound );
@@ -1739,7 +1496,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					CG_AddBufferedSound( cgs.media.blueFlagReturnedSound );
 					break;
 				case GTS_BLUE_RETURN: // CTF red flag returned, 1FCTF: neutral flag returned
-					if ( cgs.clientinfo[lc->clientNum].team == TEAM_BLUE )
+					if ( cgs.clientinfo[cg.clientNum].team == TEAM_BLUE )
 						CG_AddBufferedSound( cgs.media.returnYourTeamSound );
 					else
 						CG_AddBufferedSound( cgs.media.returnOpponentSound );
@@ -1749,15 +1506,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 				case GTS_RED_TAKEN: // CTF: red team took blue flag, 1FCTF: blue team took the neutral flag
 					// if this player picked up the flag then a sound is played in CG_CheckLocalSounds
-#ifdef TA_SPLITVIEW
-					if (localHasBlue || localHasNeutral)
-#else
-					if (cg.snap->ps.powerups[PW_BLUEFLAG] || cg.snap->ps.powerups[PW_NEUTRALFLAG])
-#endif
-					{
+					if (cg.snap->ps.powerups[PW_BLUEFLAG] || cg.snap->ps.powerups[PW_NEUTRALFLAG]) {
 					}
 					else {
-					if (cgs.clientinfo[lc->clientNum].team == TEAM_BLUE) {
+					if (cgs.clientinfo[cg.clientNum].team == TEAM_BLUE) {
 #ifdef MISSIONPACK
 							if (cgs.gametype == GT_1FCTF) 
 								CG_AddBufferedSound( cgs.media.yourTeamTookTheFlagSound );
@@ -1765,7 +1517,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
 						 	CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
 						}
-						else if (cgs.clientinfo[lc->clientNum].team == TEAM_RED) {
+						else if (cgs.clientinfo[cg.clientNum].team == TEAM_RED) {
 #ifdef MISSIONPACK
 							if (cgs.gametype == GT_1FCTF)
 								CG_AddBufferedSound( cgs.media.enemyTookTheFlagSound );
@@ -1777,15 +1529,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					break;
 				case GTS_BLUE_TAKEN: // CTF: blue team took the red flag, 1FCTF red team took the neutral flag
 					// if this player picked up the flag then a sound is played in CG_CheckLocalSounds
-#ifdef TA_SPLITVIEW
-					if (localHasRed || localHasNeutral)
-#else
-					if (cg.snap->ps.powerups[PW_REDFLAG] || cg.snap->ps.powerups[PW_NEUTRALFLAG])
-#endif
-					{
+					if (cg.snap->ps.powerups[PW_REDFLAG] || cg.snap->ps.powerups[PW_NEUTRALFLAG]) {
 					}
 					else {
-						if (cgs.clientinfo[lc->clientNum].team == TEAM_RED) {
+						if (cgs.clientinfo[cg.clientNum].team == TEAM_RED) {
 #ifdef MISSIONPACK
 							if (cgs.gametype == GT_1FCTF)
 								CG_AddBufferedSound( cgs.media.yourTeamTookTheFlagSound );
@@ -1793,7 +1540,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
 							CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
 						}
-						else if (cgs.clientinfo[lc->clientNum].team == TEAM_BLUE) {
+						else if (cgs.clientinfo[cg.clientNum].team == TEAM_BLUE) {
 #ifdef MISSIONPACK
 							if (cgs.gametype == GT_1FCTF)
 								CG_AddBufferedSound( cgs.media.enemyTookTheFlagSound );
@@ -1804,12 +1551,12 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					}
 					break;
 				case GTS_REDOBELISK_ATTACKED: // Overload: red obelisk is being attacked
-					if (cgs.clientinfo[lc->clientNum].team == TEAM_RED) {
+					if (cgs.clientinfo[cg.clientNum].team == TEAM_RED) {
 						CG_AddBufferedSound( cgs.media.yourBaseIsUnderAttackSound );
 					}
 					break;
 				case GTS_BLUEOBELISK_ATTACKED: // Overload: blue obelisk is being attacked
-					if (cgs.clientinfo[lc->clientNum].team == TEAM_BLUE) {
+					if (cgs.clientinfo[cg.clientNum].team == TEAM_BLUE) {
 						CG_AddBufferedSound( cgs.media.yourBaseIsUnderAttackSound );
 					}
 					break;
@@ -1829,7 +1576,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				case GTS_TEAMS_ARE_TIED:
 					CG_AddBufferedSound( cgs.media.teamsTiedSound );
 					break;
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 				case GTS_KAMIKAZE:
 					trap_S_StartLocalSound(cgs.media.kamikazeFarSound, CHAN_ANNOUNCER);
 					break;
@@ -1844,30 +1591,17 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 		// local player sounds are triggered in CG_CheckLocalSounds,
 		// so ignore events on the player
 		DEBUGNAME("EV_PAIN");
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && cent->currentState.number != cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-				CG_PainEvent( cent, es->eventParm );
-			}
-		}
-#else
 		if ( cent->currentState.number != cg.snap->ps.clientNum ) {
 			CG_PainEvent( cent, es->eventParm );
 		}
-#endif
 		break;
 
 	case EV_DEATH1:
 	case EV_DEATH2:
 	case EV_DEATH3:
 		DEBUGNAME("EV_DEATHx");
-
-		if (CG_WaterLevel(cent) >= 1) {
-			trap_S_StartSound(NULL, es->number, CHAN_VOICE, CG_CustomSound(es->number, "*drown.wav"));
-		} else {
-			trap_S_StartSound(NULL, es->number, CHAN_VOICE, CG_CustomSound(es->number, va("*death%i.wav", event - EV_DEATH1 + 1)));
-		}
-
+		trap_S_StartSound( NULL, es->number, CHAN_VOICE, 
+				CG_CustomSound( es->number, va("*death%i.wav", event - EV_DEATH1 + 1) ) );
 		break;
 
 
@@ -1876,19 +1610,10 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifndef TURTLEARENA // NOZOOM
 #ifdef IOQ3ZTM
 		// check for death of the current clientNum
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && es->otherEntityNum == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-				// if zoomed in, zoom out
-				CG_ZoomUp(i);
-			}
-		}
-#else
 		if ( es->otherEntityNum == cg.snap->ps.clientNum ) {
 			// if zoomed in, zoom out
 			CG_ZoomUp_f();
 		}
-#endif
 #endif
 #endif
 		CG_Obituary( es );
@@ -1899,73 +1624,37 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	//
 	case EV_POWERUP_QUAD:
 		DEBUGNAME("EV_POWERUP_QUAD");
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-				cg.localClients[cg.snap->lcIndex[i]].powerupActive = PW_QUAD;
-				cg.localClients[cg.snap->lcIndex[i]].powerupTime = cg.time;
-			}
-		}
-#else
 		if ( es->number == cg.snap->ps.clientNum ) {
-			cg.localClient.powerupActive = PW_QUAD;
-			cg.localClient.powerupTime = cg.time;
+			cg.powerupActive = PW_QUAD;
+			cg.powerupTime = cg.time;
 		}
-#endif
 		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.quadSound );
 		break;
 	case EV_POWERUP_BATTLESUIT:
 		DEBUGNAME("EV_POWERUP_BATTLESUIT");
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-				cg.localClients[cg.snap->lcIndex[i]].powerupActive = PW_BATTLESUIT;
-				cg.localClients[cg.snap->lcIndex[i]].powerupTime = cg.time;
-			}
-		}
-#else
 		if ( es->number == cg.snap->ps.clientNum ) {
-			cg.localClient.powerupActive = PW_BATTLESUIT;
-			cg.localClient.powerupTime = cg.time;
+			cg.powerupActive = PW_BATTLESUIT;
+			cg.powerupTime = cg.time;
 		}
-#endif
 		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.protectSound );
 		break;
 	case EV_POWERUP_REGEN:
 		DEBUGNAME("EV_POWERUP_REGEN");
 #ifndef TURTLEARENA // POWERS
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-				cg.localClients[cg.snap->lcIndex[i]].powerupActive = PW_REGEN;
-				cg.localClients[cg.snap->lcIndex[i]].powerupTime = cg.time;
-			}
-		}
-#else
 		if ( es->number == cg.snap->ps.clientNum ) {
-			cg.localClient.powerupActive = PW_REGEN;
-			cg.localClient.powerupTime = cg.time;
+			cg.powerupActive = PW_REGEN;
+			cg.powerupTime = cg.time;
 		}
-#endif
 #endif
 		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.regenSound );
 		break;
 #ifdef TURTLEARENA // POWERS
 	case EV_POWERUP_INVUL:
 		DEBUGNAME("EV_POWERUP_INVUL");
-#ifdef TA_SPLITVIEW
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-				cg.localClients[cg.snap->lcIndex[i]].powerupActive = PW_INVUL;
-				cg.localClients[cg.snap->lcIndex[i]].powerupTime = cg.time;
-			}
-		}
-#else
 		if ( es->number == cg.snap->ps.clientNum ) {
-			cg.localClient.powerupActive = PW_INVUL;
-			cg.localClient.powerupTime = cg.time;
+			cg.powerupActive = PW_INVUL;
+			cg.powerupTime = cg.time;
 		}
-#endif
 		// ZTM: New sound?
 		trap_S_StartSound (NULL, es->number, CHAN_ITEM, cgs.media.protectSound );
 		break;
@@ -1974,7 +1663,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifndef NOTRATEDM // No gibs.
 	case EV_GIB_PLAYER:
 		DEBUGNAME("EV_GIB_PLAYER");
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		// don't play gib sound when using the kamikaze because it interferes
 		// with the kamikaze sound, downside is that the gib sound will also
 		// not be played when someone is gibbed while just carrying the kamikaze

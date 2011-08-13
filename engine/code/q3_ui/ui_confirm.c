@@ -92,13 +92,8 @@ ConfirmMenu_Key
 static sfxHandle_t ConfirmMenu_Key( int key ) {
 	switch ( key ) {
 	case K_KP_LEFTARROW:
-	case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-			break;
-		}
-#endif
 	case K_LEFTARROW:
+	case K_KP_RIGHTARROW:
 	case K_RIGHTARROW:
 		key = K_TAB;
 		break;

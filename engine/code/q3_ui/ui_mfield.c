@@ -166,21 +166,16 @@ Key events are used for non-printable characters, others are gotten from char ev
 */
 void MField_KeyDownEvent( mfield_t *edit, int key ) {
 	int		len;
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	qboolean numLock = trap_Key_IsDown(K_KP_NUMLOCK);
-#else
-	const qboolean numLock = qfalse;
-#endif
 
 	// shift-insert is paste
-	if ( ( ( key == K_INS ) || ( key == K_KP_INS && !numLock ) ) && trap_Key_IsDown( K_SHIFT ) ) {
+	if ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && trap_Key_IsDown( K_SHIFT ) ) {
 		MField_Paste( edit );
 		return;
 	}
 
 	len = strlen( edit->buffer );
 
-	if ( key == K_DEL || ( key == K_KP_DEL && !numLock ) ) {
+	if ( key == K_DEL || key == K_KP_DEL ) {
 		if ( edit->cursor < len ) {
 			memmove( edit->buffer + edit->cursor, 
 				edit->buffer + edit->cursor + 1, len - edit->cursor );
@@ -188,7 +183,7 @@ void MField_KeyDownEvent( mfield_t *edit, int key ) {
 		return;
 	}
 
-	if ( key == K_RIGHTARROW || ( key == K_KP_RIGHTARROW && !numLock ) ) 
+	if ( key == K_RIGHTARROW || key == K_KP_RIGHTARROW ) 
 	{
 		if ( edit->cursor < len ) {
 			edit->cursor++;
@@ -200,7 +195,7 @@ void MField_KeyDownEvent( mfield_t *edit, int key ) {
 		return;
 	}
 
-	if ( key == K_LEFTARROW || ( key == K_KP_LEFTARROW && !numLock ) ) 
+	if ( key == K_LEFTARROW || key == K_KP_LEFTARROW ) 
 	{
 		if ( edit->cursor > 0 ) {
 			edit->cursor--;
@@ -212,13 +207,13 @@ void MField_KeyDownEvent( mfield_t *edit, int key ) {
 		return;
 	}
 
-	if ( key == K_HOME || ( key == K_KP_HOME && !numLock ) || ( tolower(key) == 'a' && trap_Key_IsDown( K_CTRL ) ) ) {
+	if ( key == K_HOME || key == K_KP_HOME || ( tolower(key) == 'a' && trap_Key_IsDown( K_CTRL ) ) ) {
 		edit->cursor = 0;
 		edit->scroll = 0;
 		return;
 	}
 
-	if ( key == K_END || ( key == K_KP_END && !numLock ) || ( tolower(key) == 'e' && trap_Key_IsDown( K_CTRL ) ) ) {
+	if ( key == K_END || key == K_KP_END || ( tolower(key) == 'e' && trap_Key_IsDown( K_CTRL ) ) ) {
 		edit->cursor = len;
 		edit->scroll = len - edit->widthInChars + 1;
 		if (edit->scroll < 0)
@@ -226,7 +221,7 @@ void MField_KeyDownEvent( mfield_t *edit, int key ) {
 		return;
 	}
 
-	if ( key == K_INS || ( key == K_KP_INS && !numLock ) ) {
+	if ( key == K_INS || key == K_KP_INS ) {
 		trap_Key_SetOverstrikeMode( !trap_Key_GetOverstrikeMode() );
 		return;
 	}
@@ -381,6 +376,7 @@ void MenuField_Draw( menufield_s *f )
 	int		x;
 	int		y;
 	int		w;
+	int		h;
 	int		style;
 	qboolean focus;
 	float	*color;
@@ -397,6 +393,7 @@ void MenuField_Draw( menufield_s *f )
 	y =	f->generic.y;
 #ifdef IOQ3ZTM // FONT_REWRITE
 	w = font->shaderCharWidth;
+	h = Com_FontCharHeight(font);
 
 	if (f->generic.flags & QMF_SMALLFONT) {
 		style = UI_SMALLFONT;
@@ -407,11 +404,13 @@ void MenuField_Draw( menufield_s *f )
 	if (f->generic.flags & QMF_SMALLFONT)
 	{
 		w = SMALLCHAR_WIDTH;
+		h = SMALLCHAR_HEIGHT;
 		style = UI_SMALLFONT;
 	}
 	else
 	{
 		w = BIGCHAR_WIDTH;
+		h = BIGCHAR_HEIGHT;
 		style = UI_BIGFONT;
 	}	
 #endif
@@ -465,36 +464,16 @@ sfxHandle_t MenuField_Key( menufield_s* m, int* key )
 		case K_JOY2:
 		case K_JOY3:
 		case K_JOY4:
-#ifdef TA_SPLITVIEW
-		case K_2JOY1:
-		case K_2JOY2:
-		case K_2JOY3:
-		case K_2JOY4:
-		case K_3JOY1:
-		case K_3JOY2:
-		case K_3JOY3:
-		case K_3JOY4:
-		case K_4JOY1:
-		case K_4JOY2:
-		case K_4JOY3:
-		case K_4JOY4:
-#endif
 			// have enter go to next cursor point
 			*key = K_TAB;
 			break;
 
 		case K_TAB:
+		case K_KP_DOWNARROW:
 		case K_DOWNARROW:
+		case K_KP_UPARROW:
 		case K_UPARROW:
 			break;
-
-		case K_KP_DOWNARROW:
-		case K_KP_UPARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 
 		default:
 			if ( keycode & K_CHAR_FLAG )

@@ -51,19 +51,16 @@ GAME OPTIONS MENU
 #define ID_DRAWTEAMOVERLAY		136
 #define ID_ALLOWDOWNLOAD			137
 #define ID_BACK					138
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 #define ID_ATMEFFECTS			139
 #endif
-#ifdef IOQ3ZTM // CONTENT_FILTERING
+#ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 #define ID_SHOWBLOOD			140
 #endif
 #ifndef NOTRATEDM
 #define ID_SHOWGIBS				141
 #endif
-#endif
-#ifdef TA_SPLITVIEW
-#define ID_SPLITVERTICAL		142
 #endif
 
 #ifdef TA_DATA
@@ -91,13 +88,10 @@ typedef struct {
 	menuradiobutton_s	forcemodel;
 	menulist_s			drawteamoverlay;
 	menuradiobutton_s	allowdownload;
-#ifdef TA_SPLITVIEW
-	menulist_s			splitvertical;
-#endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	menulist_s			atmeffects;
 #endif
-#ifdef IOQ3ZTM // CONTENT_FILTERING
+#ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 	menuradiobutton_s	showblood;
 #endif
@@ -121,16 +115,7 @@ static const char *teamoverlay_names[] =
 	NULL
 };
 
-#ifdef TA_SPLITVIEW
-static const char *splitvertical_names[] =
-{
-	"horizontal",
-	"vertical",
-	NULL
-};
-#endif
-
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 static const char *atmeffects_names[] =
 {
 	"off",
@@ -156,17 +141,14 @@ static void Preferences_SetMenuItems( void ) {
 #endif
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
-#ifdef TA_SPLITVIEW
-	s_preferences.splitvertical.curvalue	= trap_Cvar_VariableValue( "cg_splitviewVertical" ) != 0;
-#endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	s_preferences.atmeffects.curvalue		= 2*trap_Cvar_VariableValue( "cg_atmosphericEffects" );
 	if (s_preferences.atmeffects.curvalue < 0)
 		s_preferences.atmeffects.curvalue = 0;
 	else if (s_preferences.atmeffects.curvalue > 2)
 		s_preferences.atmeffects.curvalue = 2;
 #endif
-#ifdef IOQ3ZTM // CONTENT_FILTERING
+#ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 	s_preferences.showblood.curvalue	= trap_Cvar_VariableValue( "com_blood" ) != 0;
 #endif
@@ -184,6 +166,12 @@ static void Preferences_Event( void* ptr, int notification ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_CROSSHAIR:
+#ifndef TA_MISC // MENU: Support right mouse button = prev crosshair
+		s_preferences.crosshair.curvalue++;
+		if( s_preferences.crosshair.curvalue == NUM_CROSSHAIRS ) {
+			s_preferences.crosshair.curvalue = 0;
+		}
+#endif
 		trap_Cvar_SetValue( "cg_drawCrosshair", s_preferences.crosshair.curvalue );
 		break;
 
@@ -235,19 +223,13 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "sv_allowDownload", s_preferences.allowdownload.curvalue );
 		break;
 
-#ifdef TA_SPLITVIEW
-	case ID_SPLITVERTICAL:
-		trap_Cvar_SetValue( "cg_splitviewVertical", s_preferences.splitvertical.curvalue );
-		break;
-#endif
-
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	case ID_ATMEFFECTS:
 		trap_Cvar_SetValue( "cg_atmosphericEffects", (float)s_preferences.atmeffects.curvalue/2.0f );
 		break;
 #endif
 
-#ifdef IOQ3ZTM // CONTENT_FILTERING
+#ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 	case ID_SHOWBLOOD:
 		trap_Cvar_SetValue( "com_blood", s_preferences.showblood.curvalue );
@@ -350,7 +332,11 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.framer.height  	   = 334;
 
 	y = 144;
+#ifdef TA_MISC // MENU: Support right mouse button = prev crosshair
 	s_preferences.crosshair.generic.type		= MTYPE_SPINCONTROL;
+#else
+	s_preferences.crosshair.generic.type		= MTYPE_TEXT;
+#endif
 	s_preferences.crosshair.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_NODEFAULTINIT|QMF_OWNERDRAW;
 	s_preferences.crosshair.generic.x			= PREFERENCES_X_POS;
 	s_preferences.crosshair.generic.y			= y;
@@ -362,7 +348,9 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.crosshair.generic.bottom		= y + 20;
 	s_preferences.crosshair.generic.left		= PREFERENCES_X_POS - ( ( strlen(s_preferences.crosshair.generic.name) + 1 ) * SMALLCHAR_WIDTH );
 	s_preferences.crosshair.generic.right		= PREFERENCES_X_POS + 48;
+#ifdef TA_MISC // MENU: Support right mouse button = prev crosshair
 	s_preferences.crosshair.numitems			= NUM_CROSSHAIRS;
+#endif
 
 	y += BIGCHAR_HEIGHT+2+4;
 	s_preferences.simpleitems.generic.type        = MTYPE_RADIOBUTTON;
@@ -459,19 +447,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.allowdownload.generic.x	       = PREFERENCES_X_POS;
 	s_preferences.allowdownload.generic.y	       = y;
 
-#ifdef TA_SPLITVIEW
-	y += BIGCHAR_HEIGHT+2;
-	s_preferences.splitvertical.generic.type		= MTYPE_SPINCONTROL;
-	s_preferences.splitvertical.generic.name		= "Splitview Mode:";
-	s_preferences.splitvertical.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	s_preferences.splitvertical.generic.callback	= Preferences_Event;
-	s_preferences.splitvertical.generic.id			= ID_SPLITVERTICAL;
-	s_preferences.splitvertical.generic.x			= PREFERENCES_X_POS;
-	s_preferences.splitvertical.generic.y			= y;
-	s_preferences.splitvertical.itemnames			= splitvertical_names;
-#endif
-
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.atmeffects.generic.type		= MTYPE_SPINCONTROL;
 	s_preferences.atmeffects.generic.name		= "Snow/Rain:";
@@ -483,7 +459,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.atmeffects.itemnames			= atmeffects_names;
 #endif
 
-#ifdef IOQ3ZTM // CONTENT_FILTERING
+#ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.showblood.generic.type     = MTYPE_RADIOBUTTON;
@@ -533,13 +509,10 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.forcemodel );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
-#ifdef TA_SPLITVIEW
-	Menu_AddItem( &s_preferences.menu, &s_preferences.splitvertical );
-#endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	Menu_AddItem( &s_preferences.menu, &s_preferences.atmeffects );
 #endif
-#ifdef IOQ3ZTM // CONTENT_FILTERING
+#ifdef IOQ3ZTM // CONTANT_FILTERING
 #ifndef NOBLOOD
 	Menu_AddItem( &s_preferences.menu, &s_preferences.showblood );
 #endif

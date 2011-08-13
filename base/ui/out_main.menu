@@ -1,4 +1,5 @@
-// Turtle Arena main menu
+// Turtle Arena
+// Main menu
 // Base on rfactory.org out_main.menu
 #include "ui/menudef.h"
 
@@ -9,11 +10,7 @@
 		smallFont "fonts/smallfont" 12
 		bigFont "fonts/bigfont" 20
 		cursor "ui/assets/3_cursor3"
-		itemFocusSound THEME_SND_FOCUS
-		menuEnterSound THEME_SND_MENU_ENTER
-		menuExitSound THEME_SND_MENU_EXIT
-		// ZTM: menuBuzzSound only loads sound, does not use it
-		//menuBuzzSound THEME_SND_BUZZ
+		itemFocusSound "sound/misc/menu2.wav"
 
 		fadeClamp 1.0
 		fadeCycle 1
@@ -23,15 +20,14 @@
 	menuDef
 	{
 		name "main"
-		background THEME_BACKGROUND
 		fullScreen MENU_TRUE
-		style WINDOW_STYLE_SHADER
 		focusColor 1 0.43 0 1.25
-
 		onOpen
 		{
-			playlooped "music/menu.wav" ;
+			//playlooped "music/menu.wav" ;
 			//setcvar "ui_q3model" 1 ;
+			//setcvar "model" raph ;
+			//setcvar "headmodel" raph ;
 		}
 
 		/*onESC
@@ -52,13 +48,26 @@
 		}
 
 		//
+		// menu background
+		//
+		itemDef
+		{
+			name background
+			style WINDOW_STYLE_SHADER
+			rect 0 0 640 480
+			background "ui/assets/out_menuback"
+			visible MENU_TRUE
+			decoration
+		}
+
+		//
 		// Title Banner
 		//
 		itemDef
 		{
 			name titlebanner
 			style WINDOW_STYLE_SHADER
-			rect 64 32 512 256
+			rect 192 12 256 128
 			background "menu/art/titlebanner"
 			visible MENU_TRUE
 			decoration
@@ -71,9 +80,9 @@
 		{
 			name newgamebutton
 			type ITEM_TYPE_BUTTON
-			rect 255 275 130 24
+			rect 255 235 130 24
 			text "Play"
-			textscale 0.5
+			textscale 0.33
 			textaligny 20
 			textalign ITEM_ALIGN_CENTER
 			textstyle ITEM_TEXTSTYLE_SHADOWED
@@ -103,8 +112,8 @@
 			name multiplayerbutton
 			text "Multiplayer"
 			type ITEM_TYPE_BUTTON
-			rect 255 305 130 24
-			textscale 0.5
+			rect 255 265 130 24
+			textscale 0.33
 			textaligny 20
 			textalign ITEM_ALIGN_CENTER
 			textstyle ITEM_TEXTSTYLE_SHADOWED
@@ -135,8 +144,8 @@
 			name optionsbutton
 			text "Options"
 			type ITEM_TYPE_BUTTON
-			rect 255 335 130 24
-			textscale 0.5
+			rect 255 295 130 24
+			textscale 0.33
 			textaligny 20
 			textalign ITEM_ALIGN_CENTER
 			textstyle ITEM_TEXTSTYLE_SHADOWED
@@ -160,6 +169,38 @@
 		}
 
 		//
+		// Credits button, replace with MODS?
+		//
+		itemDef
+		{
+			name creditbutton
+			text "Credits"
+			type ITEM_TYPE_BUTTON
+			rect 255 325 130 24
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 65
+			forecolor 0.9 0.9 0.9 1
+			visible MENU_TRUE
+
+			mouseEnter
+			{
+				show credittext
+			}
+			mouseExit
+			{
+				hide credittext
+			}
+			action
+			{
+				close "main";
+				open "credits"
+			}
+		}
+
+		//
 		// Quit button
 		//
 		itemDef
@@ -167,8 +208,8 @@
 			name exitbutton
 			text "Quit"
 			type ITEM_TYPE_BUTTON
-			rect 255 365 130 24
-			textscale 0.5
+			rect 255 355 130 24
+			textscale 0.33
 			textaligny 20
 			textalign ITEM_ALIGN_CENTER
 			textstyle ITEM_TEXTSTYLE_SHADOWED
@@ -192,13 +233,13 @@
 		}
 
 		//
-		// Focus text for the buttons
+		// Focus Text for the buttons
 		//
 		itemDef
 		{
 			name newgametext
 			rect 0 444 640 24
-			text "Play main game, demos, etc"
+			text "Play a game"
 			textscale 0.33
 			textaligny 20
 			textalign ITEM_ALIGN_CENTER
@@ -241,6 +282,21 @@
 
 		itemDef
 		{
+			name credittext
+			rect 0 444 640 24
+			text "Show game credits"
+			textscale 0.33
+			textaligny 20
+			textalign ITEM_ALIGN_CENTER
+			textstyle ITEM_TEXTSTYLE_SHADOWED
+			textalignx 320
+			forecolor 1 1 1 1
+			visible MENU_FALSE
+			decoration
+		}
+
+		itemDef
+		{
 			name exittext
 			rect 0 444 640 24
 			text "Exit game"
@@ -255,4 +311,3 @@
 		}
 	}
 }
-

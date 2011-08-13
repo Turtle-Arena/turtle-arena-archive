@@ -1,16 +1,10 @@
 #
 # Turtle Arena Makefile
 #
-# Multiple games can be built;
-#	Turtle Arena. Use make as usual.
-#	ioq3turtle (ioq3 mode for Turtle Arena). make BUILD_IOQ3TURTLE=1
-#	ioq3ztm (Turtle Arena stuff in ioq3, not net compatible with either games). make BUILD_IOQ3ZTM=1
-#	ioquake3 (Unmodified ioq3, any changes are accidental). make BUILD_IOQ3=1
-#
 # GNU Make required
 #
 
-COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
+COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]')
 
 COMPILE_ARCH=$(shell uname -m | sed -e s/i.86/i386/)
 
@@ -26,9 +20,6 @@ endif
 ifeq ($(COMPILE_PLATFORM),mingw32)
   ifeq ($(COMPILE_ARCH),i386)
     COMPILE_ARCH=x86
-  endif
-  ifeq ($(COMPILE_ARCH),x86_64)
-    COMPILE_ARCH=x64
   endif
 endif
 
@@ -67,6 +58,9 @@ endif
 ifndef USE_FREETYPE
   USE_FREETYPE=0
 endif
+ifndef BUILD_SPLINES
+  BUILD_SPLINES=
+endif
 ifndef BUILD_DEFINES
   BUILD_DEFINES=
 endif
@@ -78,7 +72,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 2147
+IOQ3_REVISION = 1795
 
 #
 # Start build type
@@ -108,13 +102,13 @@ ifeq ($(QUAKE3),1)
 
 		# Copied from Turtle Arena BUILD_DEFINES
 		ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
-							-DNOTRATEDM -DANALOG -DNET_COMPAT \
+							-DCELSHADING -DNOTRATEDM -DANALOG -DNET_COMPAT \
 							-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-							-DTA_HOLDSYS -DTA_ITEMSYS \
+							-DTA_HOLDSYS -DTA_ITEMSYS -DTA_WEAPSYS_NOCOMPAT \
 							-DTA_WEAPSYS -DTA_PLAYERSYS \
 							-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 							-DTA_WEAPSYS_EX_COMPAT \
-							-DTA_BLOOM -DTA_SPLITVIEW
+							-DOA_BLOOM 
 
 		QUAKE3_CFLAGS =
 
@@ -129,7 +123,7 @@ ifeq ($(QUAKE3),1)
 		# Enable most of the MISSIONPACK in 'baseq3'
 		BASEGAME_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) -DMISSIONPACK
 		MISSIONPACK_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) \
-					-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+					-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD -DMISSIONPACK_HUD2
 		ifndef COPYDIR
 			COPYDIR="/usr/local/games/turtlearena"
 		endif
@@ -150,15 +144,15 @@ ifeq ($(QUAKE3),1)
 		ifeq ($(BUILD_IOQ3ZTM),1)
 			# Build modified ioquake3, it only runs using its own sever/client binaries
 			#   and currently doesn't support Q3 mods.
-			BUILD_DEFINES = -DIOQUAKE3 -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
+			BUILD_DEFINES = -DIOQUAKE3 -DCELSHADING -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
 								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
-								-DTA_ITEMSYS -DTA_ITEMSYS_USE_INTERNAL -DTA_WEAPSYS -DTA_BLOOM -DTA_SPLITVIEW
+								-DTA_ITEMSYS -DTA_ITEMSYS_USE_INTERNAL -DTA_WEAPSYS -DOA_BLOOM
 
 			VERSION=1.36ztm
 
 			BASEGAME=baseq3
 			BASEGAME_FLAGS =
-			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD -DMISSIONPACK_HUD2
 			ifndef COPYDIR
 				COPYDIR="/usr/local/games/quake3"
 			endif
@@ -190,7 +184,7 @@ ifeq ($(QUAKE3),1)
 
 			BASEGAME=baseq3
 			BASEGAME_FLAGS =
-			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
+			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD -DMISSIONPACK_HUD2
 
 			ifndef COPYDIR
 				COPYDIR="/usr/local/games/quake3"
@@ -211,18 +205,22 @@ else # END QUAKE3
 	# USE_FREETYPE Currently doesn't work when using pk3 files instead of using unzipped files?
 
 	##### ioquake3 defines
-	# STANDALONE			ioquake3 define to disable quake3 code for authenticating, and stuff.
-	# RAVENMD4				Enable support for loading MDR models.
-	# MISSIONPACK			Code for the official Quake III Arena expansion pack, Quake III: Team Arena.
+	# STANDALONE			ioquake3 define to disable quake3 code for authicating, and stuff.
+	# RAVENMD4				Enable support for loading MDR models when atempting to load *.mdr.
+	#							It isn't ever used, as ioq3 only asks for .md3 (However, IOQ3ZTM checks for mdr before loading md3)
+	# MISSIONPACK			Quake3 expansion pack, Team Arena.
 	##### "new ioquake3 defines"
-	# IOQUAKE3				Enables CD key check and punkbuster UI code
-	# MISSIONPACK_HUD		Use MISSIONPACK UI scripting in cgame for hud and menus. (ZTM: Split from MISSIONPACK define)
-	# MISSIONPACK_HARVESTER	Enable MISSIONPACK harvester gametype (ZTM: Split from MISSIONPACK define)
+	# IOQUAKE3				Enables CD key check and punkbuster ui code
+	# MISSIONPACK_HUD		Use MISSIONPACK ui scripting in cgame for hud and menus. (ZTM: Split from MISSIONPACK define)
+	# MISSIONPACK_HARVESTER	Enable MISSIONPACK harevester gametype (ZTM: Split from MISSIONPACK define)
+	# MISSIONPACK_HUD2		Use MISSIONPACK text drawing in cgame. (ZTM: Split from MISSIONPACK_HUD define)
+	#							Requires MISSIONPACK_HUD or IOQ3ZTM
 
 
 	# Turtle Arena "general" defines
 	#####
 	# IOQ3ZTM				ZTurtleMan's misc changes and fixes to IOQuake3 (Should be q3 mod compatible)
+	# IOQ3ZTM // RANDOMBOT	Adds a hardcoded bot, Random. Adding the bot "Random" will add a bot choosen randomly.
 	# IOQ3ZTM_NO_COMPAT		Changes that are not compatible with quake3 mods
 	#
 	#   1. EAR_IN_ENTITY; It fixes checking if we are in first person in sound code.
@@ -238,6 +236,7 @@ else # END QUAKE3
 	#
 	# IOQ3ZTM_NO_TEAM_MODEL	Removes team_model and team_headmodel cvars. (Could break Quake III: Team Arena and other mods?)
 	#####
+	# CELSHADING			"Cel-shaing" and cel outlines, based on the celshading patch for ioquake3
 	# NOTRATEDM				Disable stuff in Quake3 engine that made it rated M. (default blood to off, remove gibs,
 	#							remove strong lang) This however doesn't change the gamedata, like the botfiles strong lang,
 	#							bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
@@ -245,15 +244,17 @@ else # END QUAKE3
 	# NOBLOOD				Removes blood. If this is defined, NOTRATEDM must also be defined.
 	# ANALOG				Allows players to rotate the camera and move based on the camera angles, not full analog control yet
 	# NET_COMPAT			Working on having Turtle Arena and ioq3turtle run on the same engine.
-	# TA_BLOOM				Post-process bloom light effect, based on code from OpenArena.
+	# THIRD_PERSON			Game defaults to third person instead of first person
 	#####
 	# TA_ITEMSYS			Load items from external text files. Required for TA_WEAPSYS.
 	# TA_ITEMSYS_USE_INTERNAL Use the internal item data. The data can be overriden by external items.
 	# TA_WEAPSYS			This is the core changes to the weapon system
 	#							loads the weapons from a text file, allowing for easy modifing,
 	#							and new custom default weapons for players.
+	# TA_WEAPSYS_NOCOMPAT	Removes botlib weapon weight code because when TA_WEAPSYS is define
+	#  							"game" does its own weapon weight stuff.
 	# TA_WEAPSYS_EX			Changes from holding multiple weapons to only one default and one pickup.
-	# TA_WEAPSYS_EX_COMPAT	Keeps compatibility with mods not using TA_WEAPSYS_EX
+	# TA_WEAPSYS_EX_COMPAT	Keeps compatiblity with mods not using TA_WEAPSYS_EX
 	# TA_GAME_MODELS		Allow "game" to use model tags. Player tags are used for melee weapon attacking.
 	# TA_HOLDSYS			Allow players to hold multiple holdable items and change to any holdable.
 	#							(Based on Q3's weapon changing)
@@ -261,40 +262,42 @@ else # END QUAKE3
 	# TA_PATHSYS			General path system using entities like path_corner
 	# TA_ENTSYS				Adds new entities and allows all ET_MOVER entities to be breakable.
 	# TA_NPCSYS   			WIP NPC system, based on TDC_NPC system and code in Quake3
-	# TA_ATMEFFECTS			TODO: Atmospheric effects.
 	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
 	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
 	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
 	#							Kinda pointless. (Note: TA_PLAYERSYS adds support for Elite Force soundpath keyword in animations.cfg,
-	#													must also define RAVENMD4)
-	# TA_SPLITVIEW			Allow a single game client to connect and play using multiple local clients, commonly called splitscreen.
-	#						TODO: Split view system for viewing multiple network clients at once.
+	#													must also define RAVENMD4 and IOQ3ZTM)
 
 
 	# Turtle Arena specific defines
 	#####
-	# TA_MAIN				Turtle Arena branding, version, file/directory name, and more
-	#							Must be defined for Turtle Arena and Turtle Arena mods
-	# TURTLEARENA			Turtle Arena game logic changes (and things that should be TA_MAIN?)
+	# TURTLEARENA			Turtle Arena branding, version, file/directory name, and more
+	# TA_MAIN				Must be defined for Turtle Arena and Turtle Arena mods
 	# TA_MISC				Stuff that I don't want in ioq3ztm, but would use in another standalone mod
 	#							(Like a NiGHTS into Dreams clone or Sonic Robo Blast Arena...)
 	# TA_SP					Single player / co-op mode code
+	# TA_HOLDABLE			Turtle Arena holdable items. Shurikens and Pizza-to-Go.
+	# TA_PLAYERS			Turtle Arena player animations and tags
 	# TA_DATA				Changes for Turtle Arena data.
+	# TA_HUD				Replaces Quake3 HUD with one for Turtle Arena.
 	#####
 	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
 
 	BUILD_DEFINES = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
-						-DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
+						-DCELSHADING -DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
 						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-						-DTA_HOLDSYS -DTA_ITEMSYS \
+						-DTA_HOLDSYS -DTA_ITEMSYS -DTA_WEAPSYS_NOCOMPAT \
 						-DTA_WEAPSYS -DTA_PLAYERSYS \
 						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
 						-DTA_WEAPSYS_EX_COMPAT \
-						-DTA_BLOOM -DTA_SPLITVIEW
+						-DOA_BLOOM
 
-	BUILD_DEFINES += -DTURTLEARENA -DTA_MISC -DTA_SP \
-						-DTA_WEAPSYS_EX -DTA_DATA \
-						-DNIGHTSMODE
+	BUILD_DEFINES += -DTHIRD_PERSON -DTURTLEARENA -DTA_MISC -DTA_SP -DTA_HOLDABLE \
+						-DTA_WEAPSYS_EX -DTA_PLAYERS -DTA_DATA \
+						-DNIGHTSMODE -DTA_CAMERA -DWOLFET -DMISSIONPACK_HUD2
+
+	# Currently Turtle Arena doesn't use camera scripts.
+	#BUILD_SPLINES=1 # Adds -DCAMERASCRIPT
 
 	# Use model tags for true melee attacking
 	DED_USE_MODELS=1
@@ -306,24 +309,19 @@ else # END QUAKE3
 	# Turtle Arena's intro video will be ogg theora
 	USE_CODEC_THEORA=1
 
-	# Turtle Arena currently just keeps renderer internal
-	ifneq ($(USE_RENDERER_DLOPEN), 1)
-		USE_RENDERER_DLOPEN=0
-	endif
-
 	# Turtle Arena version
-	VERSION=0.5.1
+	VERSION=0.4.3
 
 	# Turtle Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"
 	SERVERBIN=turtlearena-server
 	CLIENTBIN=turtlearena
 	BASEGAME=base
-	BASEGAME_FLAGS = -DMISSIONPACK
+	BASEGAME_FLAGS = -DMISSIONPACK -DTA_HUD
 	MISSIONPACK_FLAGS= -DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
 
-	# Disable building scriptable hud and scriptable ui versions of cgame/ui,
-	#    game is the same.
+	# Disable building scriptable hud and scriptable ui versions of cgame/ui
+	#    game is unchanged.
 	ifneq ($(BUILD_MISSIONPACK),1)
 		BUILD_MISSIONPACK=0
 	endif
@@ -383,10 +381,6 @@ ifndef MOUNT_DIR
 MOUNT_DIR=code
 endif
 
-ifndef TEMPDIR
-TEMPDIR=/tmp
-endif
-
 ifndef GENERATE_DEPENDENCIES
 GENERATE_DEPENDENCIES=1
 endif
@@ -435,24 +429,12 @@ ifndef USE_INTERNAL_ZLIB
 USE_INTERNAL_ZLIB=1
 endif
 
-ifndef USE_INTERNAL_JPEG
-USE_INTERNAL_JPEG=1
-endif
-
 ifndef USE_LOCAL_HEADERS
 USE_LOCAL_HEADERS=1
 endif
 
-ifndef USE_RENDERER_DLOPEN
-USE_RENDERER_DLOPEN=1
-endif
-
 ifndef DEBUG_CFLAGS
 DEBUG_CFLAGS=-g -O0
-endif
-
-ifndef USE_OLD_VM64
-USE_OLD_VM64=0
 endif
 
 #############################################################################
@@ -472,7 +454,7 @@ BLIBDIR=$(MOUNT_DIR)/botlib
 NDIR=$(MOUNT_DIR)/null
 UIDIR=$(MOUNT_DIR)/ui
 Q3UIDIR=$(MOUNT_DIR)/q3_ui
-JPDIR=$(MOUNT_DIR)/jpeg-8c
+JPDIR=$(MOUNT_DIR)/jpeg-6b
 SPEEXDIR=$(MOUNT_DIR)/libspeex
 ZDIR=$(MOUNT_DIR)/zlib
 Q3ASMDIR=$(MOUNT_DIR)/tools/asm
@@ -484,9 +466,8 @@ LOKISETUPDIR=misc/setup
 NSISDIR=misc/nsis
 SDLHDIR=$(MOUNT_DIR)/SDL12
 LIBSDIR=$(MOUNT_DIR)/libs
-OGGDIR=$(MOUNT_DIR)/libogg
-VORBISDIR=$(MOUNT_DIR)/libvorbis
-THEORADIR=$(MOUNT_DIR)/libtheora
+TEMPDIR=/tmp
+SPLNDIR=$(MOUNT_DIR)/splines
 
 bin_path=$(shell which $(1) 2> /dev/null)
 
@@ -544,10 +525,10 @@ LIB=lib
 INSTALL=install
 MKDIR=mkdir
 
-ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
+ifeq ($(PLATFORM),linux)
 
-  ifeq ($(ARCH),axp)
-    ARCH=alpha
+  ifeq ($(ARCH),alpha)
+    ARCH=axp
   else
   ifeq ($(ARCH),x86_64)
     LIB=lib64
@@ -564,10 +545,32 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
     -pipe -DUSE_ICON
-  CLIENT_CFLAGS += $(SDL_CFLAGS)
+  CLIENT_CFLAGS = $(SDL_CFLAGS)
+  SERVER_CFLAGS =
+
+  ifeq ($(USE_OPENAL),1)
+    CLIENT_CFLAGS += -DUSE_OPENAL
+    ifeq ($(USE_OPENAL_DLOPEN),1)
+      CLIENT_CFLAGS += -DUSE_OPENAL_DLOPEN
+    endif
+  endif
 
   ifeq ($(USE_FREETYPE),1)
     CLIENT_CFLAGS += $(shell freetype-config --cflags)
+  endif
+
+  ifeq ($(USE_CURL),1)
+    CLIENT_CFLAGS += -DUSE_CURL
+    ifeq ($(USE_CURL_DLOPEN),1)
+      CLIENT_CFLAGS += -DUSE_CURL_DLOPEN
+    endif
+  endif
+
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
+  endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_CFLAGS += -DUSE_CIN_THEORA
   endif
 
   OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer
@@ -600,12 +603,11 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
     OPTIMIZEVM += -mtune=ultrasparc3 -mv8plus
     HAVE_VM_COMPILED=true
   endif
-  ifeq ($(ARCH),alpha)
-    # According to http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=410555
-    # -ffast-math will cause the client to die with SIGFPE on Alpha
-    OPTIMIZE = $(OPTIMIZEVM)
   endif
   endif
+
+  ifneq ($(HAVE_VM_COMPILED),true)
+    BASE_CFLAGS += -DNO_VM_COMPILED
   endif
 
   SHLIBEXT=so
@@ -615,8 +617,7 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
   THREAD_LIBS=-lpthread
   LIBS=-ldl -lm
 
-  CLIENT_LIBS=$(SDL_LIBS)
-  RENDERER_LIBS = $(SDL_LIBS) -lGL
+  CLIENT_LIBS=$(SDL_LIBS) -lGL
 
   ifeq ($(USE_OPENAL),1)
     ifneq ($(USE_OPENAL_DLOPEN),1)
@@ -668,10 +669,11 @@ ifeq ($(PLATFORM),darwin)
   HAVE_VM_COMPILED=true
   LIBS = -framework Cocoa
   CLIENT_LIBS=
-  RENDERER_LIBS=
   OPTIMIZEVM=
   
   BASE_CFLAGS = -Wall -Wimplicit -Wstrict-prototypes
+  CLIENT_CFLAGS = 
+  SERVER_CFLAGS =
 
   ifeq ($(ARCH),ppc)
     BASE_CFLAGS += -faltivec
@@ -684,10 +686,7 @@ ifeq ($(PLATFORM),darwin)
     OPTIMIZEVM += -march=prescott -mfpmath=sse
     # x86 vm will crash without -mstackrealign since MMX instructions will be
     # used no matter what and they corrupt the frame pointer in VM calls
-    BASE_CFLAGS += -m32 -mstackrealign
-  endif
-  ifeq ($(ARCH),x86_64)
-    OPTIMIZEVM += -mfpmath=sse
+    BASE_CFLAGS += -mstackrealign
   endif
 
   BASE_CFLAGS += -fno-strict-aliasing -DMACOS_X -fno-common -pipe
@@ -697,14 +696,20 @@ ifeq ($(PLATFORM),darwin)
   endif
 
   ifeq ($(USE_OPENAL),1)
+    BASE_CFLAGS += -DUSE_OPENAL
     ifneq ($(USE_OPENAL_DLOPEN),1)
       CLIENT_LIBS += -framework OpenAL
+    else
+      CLIENT_CFLAGS += -DUSE_OPENAL_DLOPEN
     endif
   endif
 
   ifeq ($(USE_CURL),1)
+    CLIENT_CFLAGS += -DUSE_CURL
     ifneq ($(USE_CURL_DLOPEN),1)
       CLIENT_LIBS += -lcurl
+    else
+      CLIENT_CFLAGS += -DUSE_CURL_DLOPEN
     endif
   endif
 
@@ -713,9 +718,11 @@ ifeq ($(PLATFORM),darwin)
   endif
 
   ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
     CLIENT_LIBS += -lvorbisfile -lvorbis -logg
   endif
   ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_CFLAGS += -DUSE_CIN_THEORA
     CLIENT_LIBS += -ltheora
   endif
 
@@ -729,12 +736,15 @@ ifeq ($(PLATFORM),darwin)
   #  the file has been modified by each build.
   LIBSDLMAIN=$(B)/libSDLmain.a
   LIBSDLMAINSRC=$(LIBSDIR)/macosx/libSDLmain.a
-  CLIENT_LIBS += -framework IOKit \
+  CLIENT_LIBS += -framework IOKit -framework OpenGL \
     $(LIBSDIR)/macosx/libSDL-1.2.0.dylib
-  RENDERER_LIBS += -framework OpenGL $(LIBSDIR)/macosx/libSDL-1.2.0.dylib
 
   OPTIMIZEVM += -falign-loops=16
   OPTIMIZE = $(OPTIMIZEVM) -ffast-math
+
+  ifneq ($(HAVE_VM_COMPILED),true)
+    BASE_CFLAGS += -DNO_VM_COMPILED
+  endif
 
   SHLIBEXT=dylib
   SHLIBCFLAGS=-fPIC -fno-common
@@ -758,13 +768,15 @@ ifeq ($(PLATFORM),mingw32)
   ifeq ($(call bin_path, $(CC)),)
     CC=gcc
   endif
-  
+
   ifndef WINDRES
     WINDRES=windres
   endif
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
     -DUSE_ICON
+  CLIENT_CFLAGS =
+  SERVER_CFLAGS =
 
   # In the absence of wspiapi.h, require Windows XP or later
   ifeq ($(shell test -e $(CMDIR)/wspiapi.h; echo $$?),1)
@@ -772,10 +784,20 @@ ifeq ($(PLATFORM),mingw32)
   endif
 
   ifeq ($(USE_OPENAL),1)
+    CLIENT_CFLAGS += -DUSE_OPENAL
     CLIENT_CFLAGS += $(OPENAL_CFLAGS)
-    ifneq ($(USE_OPENAL_DLOPEN),1)
+    ifeq ($(USE_OPENAL_DLOPEN),1)
+      CLIENT_CFLAGS += -DUSE_OPENAL_DLOPEN
+    else
       CLIENT_LDFLAGS += $(OPENAL_LDFLAGS)
     endif
+  endif
+
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
+  endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_CFLAGS += -DUSE_CIN_THEORA
   endif
 
   ifeq ($(ARCH),x64)
@@ -800,10 +822,9 @@ ifeq ($(PLATFORM),mingw32)
   BINEXT=.exe
 
   LIBS= -lws2_32 -lwinmm -lpsapi
-  CLIENT_LDFLAGS += -mwindows
-  CLIENT_LIBS = -lgdi32 -lole32
-  RENDERER_LIBS = -lgdi32 -lole32 -lopengl32
-  
+  CLIENT_LDFLAGS = -mwindows
+  CLIENT_LIBS = -lgdi32 -lole32 -lopengl32
+
   ifeq ($(USE_FREETYPE),1)
 	ifeq ($(COMPILE_PLATFORM),mingw32)
 		BASE_CFLAGS += -Ifreetype2/
@@ -814,18 +835,17 @@ ifeq ($(PLATFORM),mingw32)
     CLIENT_LIBS += -lfreetype
   endif
 
-  ifeq ($(ARCH),x86)
-    WINLIBDIR=$(LIBSDIR)/win32
-  else
-    WINLIBDIR=$(LIBSDIR)/win64
-  endif
-
   ifeq ($(USE_CURL),1)
+    CLIENT_CFLAGS += -DUSE_CURL
     CLIENT_CFLAGS += $(CURL_CFLAGS)
     ifneq ($(USE_CURL_DLOPEN),1)
       ifeq ($(USE_LOCAL_HEADERS),1)
         CLIENT_CFLAGS += -DCURL_STATICLIB
-        CLIENT_LIBS += $(WINLIBDIR)/libcurl.a
+        ifeq ($(ARCH),x64)
+	  CLIENT_LIBS += $(LIBSDIR)/win64/libcurl.a
+	else
+          CLIENT_LIBS += $(LIBSDIR)/win32/libcurl.a
+        endif
       else
         CLIENT_LIBS += $(CURL_LIBS)
       endif
@@ -841,41 +861,43 @@ ifeq ($(PLATFORM),mingw32)
 
   # libmingw32 must be linked before libSDLmain
   CLIENT_LIBS += -lmingw32
-  RENDERER_LIBS += -lmingw32
-  
   ifeq ($(USE_LOCAL_HEADERS),1)
     CLIENT_CFLAGS += -I$(SDLHDIR)/include
-    CLIENT_LIBS += $(WINLIBDIR)/libSDLmain.a
-    ifeq ($(ARCH),x64)
-      CLIENT_LIBS += $(WINLIBDIR)/libSDL64.dll.a
+    ifeq ($(ARCH), x86)
+    CLIENT_LIBS += $(LIBSDIR)/win32/libSDLmain.a \
+                      $(LIBSDIR)/win32/libSDL.dll.a
     else
-      CLIENT_LIBS += $(WINLIBDIR)/libSDL.dll.a
-    endif
-
-    RENDERER_LIBS += $(WINLIBDIR)/libSDLmain.a
-    ifeq ($(ARCH),x64)
-      RENDERER_LIBS += $(WINLIBDIR)/libSDL64.dll.a
-    else
-      RENDERER_LIBS += $(WINLIBDIR)/libSDL.dll.a
+    CLIENT_LIBS += $(LIBSDIR)/win64/libSDLmain.a \
+                      $(LIBSDIR)/win64/libSDL.dll.a \
+                      $(LIBSDIR)/win64/libSDL.a
     endif
 
     # Extra libs, easier to just include in source tree
-    ifeq ($(USE_CODEC_VORBIS),1)
-      CLIENT_CFLAGS += -I$(OGGDIR)/include \
-                      -I$(VORBISDIR)/include
-      CLIENT_LIBS += $(WINLIBDIR)/libvorbisfile.a \
-                      $(WINLIBDIR)/libvorbis.a\
-                      $(WINLIBDIR)/libogg.a
-    endif
-    ifeq ($(USE_CODEC_THEORA),1)
-      CLIENT_CFLAGS += -I$(THEORADIR)/include
-      CLIENT_LIBS += $(WINLIBDIR)/libtheora.a
+    ifeq ($(ARCH), x86)
+      ifeq ($(USE_CODEC_VORBIS),1)
+        CLIENT_CFLAGS += -I$(LIBSDIR)/win32/include
+        CLIENT_LIBS += $(LIBSDIR)/win32/libvorbisfile.a \
+                        $(LIBSDIR)/win32/libvorbis.a\
+						$(LIBSDIR)/win32/libogg.a
+      endif
+      ifeq ($(USE_CODEC_THEORA),1)
+        CLIENT_LIBS += $(LIBSDIR)/win32/libtheora.a
+      endif
+    else
+      ifeq ($(USE_CODEC_VORBIS),1)
+        CLIENT_CFLAGS += -I$(LIBSDIR)/win64/include
+        CLIENT_LIBS += $(LIBSDIR)/win64/libvorbisfile.a \
+                        $(LIBSDIR)/win64/libvorbis.a\
+						$(LIBSDIR)/win64/libogg.a
+      endif
+      ifeq ($(USE_CODEC_THEORA),1)
+        CLIENT_LIBS += $(LIBSDIR)/win64/libtheora.a
+      endif
     endif
 
   else
     CLIENT_CFLAGS += $(SDL_CFLAGS)
     CLIENT_LIBS += $(SDL_LIBS)
-    RENDERER_LIBS += $(SDL_LIBS)
     ifeq ($(USE_CODEC_VORBIS),1)
       CLIENT_LIBS += -lvorbisfile -lvorbis -logg
     endif
@@ -900,11 +922,12 @@ ifeq ($(PLATFORM),freebsd)
   BASE_CFLAGS = $(shell env MACHINE_ARCH=$(ARCH) make -f /dev/null -VCFLAGS) \
     -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
     -DUSE_ICON -DMAP_ANONYMOUS=MAP_ANON
-  CLIENT_CFLAGS += $(SDL_CFLAGS)
+  CLIENT_CFLAGS = $(SDL_CFLAGS)
+  SERVER_CFLAGS = 
   HAVE_VM_COMPILED = true
 
-  OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer
-  OPTIMIZE = $(OPTIMIZEVM) -ffast-math
+  OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer -ffast-math
+  OPTIMIZE = $(OPTIMIZEVM)
 
   SHLIBEXT=so
   SHLIBCFLAGS=-fPIC
@@ -916,20 +939,27 @@ ifeq ($(PLATFORM),freebsd)
 
   CLIENT_LIBS =
 
-  CLIENT_LIBS += $(SDL_LIBS)
-  RENDERER_LIBS = $(SDL_LIBS) -lGL
+  CLIENT_LIBS += $(SDL_LIBS) -lGL
 
   # optional features/libraries
   ifeq ($(USE_OPENAL),1)
+    CLIENT_CFLAGS += -DUSE_OPENAL
     ifeq ($(USE_OPENAL_DLOPEN),1)
+      CLIENT_CFLAGS += -DUSE_OPENAL_DLOPEN
       CLIENT_LIBS += $(THREAD_LIBS) -lopenal
     endif
   endif
 
   ifeq ($(USE_CURL),1)
+    CLIENT_CFLAGS += -DUSE_CURL
     ifeq ($(USE_CURL_DLOPEN),1)
+      CLIENT_CFLAGS += -DUSE_CURL_DLOPEN
       CLIENT_LIBS += -lcurl
     endif
+  endif
+
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
   endif
 
   ifeq ($(USE_CODEC_VORBIS),1)
@@ -956,16 +986,35 @@ else # ifeq freebsd
 
 ifeq ($(PLATFORM),openbsd)
 
-  ARCH=$(shell uname -m)
+  #default to i386, no tests done on anything else
+  ARCH=i386
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
-    -DUSE_ICON -DMAP_ANONYMOUS=MAP_ANON
-  CLIENT_CFLAGS += $(SDL_CFLAGS)
+    -DUSE_ICON
+  CLIENT_CFLAGS = $(SDL_CFLAGS)
+  SERVER_CFLAGS = 
+
+  ifeq ($(USE_OPENAL),1)
+    CLIENT_CFLAGS += -DUSE_OPENAL
+    ifeq ($(USE_OPENAL_DLOPEN),1)
+      CLIENT_CFLAGS += -DUSE_OPENAL_DLOPEN
+    endif
+  endif
+
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
+  endif
+  ifeq ($(USE_CODEC_THEORA),1)
+    CLIENT_CFLAGS += -DUSE_CIN_THEORA
+  endif
 
   ifeq ($(USE_CURL),1)
-    CLIENT_CFLAGS += $(CURL_CFLAGS)
+    CLIENT_CFLAGS += -DUSE_CURL $(CURL_CFLAGS)
     USE_CURL_DLOPEN=0
   endif
+
+  BASE_CFLAGS += -DNO_VM_COMPILED
+  HAVE_VM_COMPILED=false
 
   SHLIBEXT=so
   SHLIBNAME=.$(SHLIBEXT)
@@ -977,8 +1026,7 @@ ifeq ($(PLATFORM),openbsd)
 
   CLIENT_LIBS =
 
-  CLIENT_LIBS += $(SDL_LIBS)
-  RENDERER_LIBS = $(SDL_LIBS) -lGL
+  CLIENT_LIBS += $(SDL_LIBS) -lGL
 
   ifeq ($(USE_OPENAL),1)
     ifneq ($(USE_OPENAL_DLOPEN),1)
@@ -1018,12 +1066,15 @@ ifeq ($(PLATFORM),netbsd)
   THREAD_LIBS=-lpthread
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes
+  CLIENT_CFLAGS =
+  SERVER_CFLAGS =
 
-  ifeq ($(ARCH),i386)
-    HAVE_VM_COMPILED=true
+  ifneq ($(ARCH),i386)
+    BASE_CFLAGS += -DNO_VM_COMPILED
   endif
 
   BUILD_CLIENT = 0
+  BUILD_GAME_QVM = 0
 
 else # ifeq netbsd
 
@@ -1033,14 +1084,14 @@ else # ifeq netbsd
 
 ifeq ($(PLATFORM),irix64)
 
-  ARCH=mips
+  ARCH=mips  #default to MIPS
 
   CC = c99
   MKDIR = mkdir -p
 
   BASE_CFLAGS=-Dstricmp=strcasecmp -Xcpluscomm -woff 1185 \
-    -I. -I$(ROOT)/usr/include
-  CLIENT_CFLAGS += $(SDL_CFLAGS)
+    -I. -I$(ROOT)/usr/include -DNO_VM_COMPILED
+  CLIENT_CFLAGS = $(SDL_CFLAGS)
   OPTIMIZE = -O3
   
   SHLIBEXT=so
@@ -1049,9 +1100,8 @@ ifeq ($(PLATFORM),irix64)
 
   LIBS=-ldl -lm -lgen
   # FIXME: The X libraries probably aren't necessary?
-  CLIENT_LIBS=-L/usr/X11/$(LIB) $(SDL_LIBS) \
+  CLIENT_LIBS=-L/usr/X11/$(LIB) $(SDL_LIBS) -lGL \
     -lX11 -lXext -lm
-  RENDERER_LIBS = $(SDL_LIBS) -lGL
 
 else # ifeq IRIX
 
@@ -1080,7 +1130,8 @@ ifeq ($(PLATFORM),sunos)
 
   BASE_CFLAGS = -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes \
     -pipe -DUSE_ICON
-  CLIENT_CFLAGS += $(SDL_CFLAGS)
+  CLIENT_CFLAGS = $(SDL_CFLAGS)
+  SERVER_CFLAGS =
 
   OPTIMIZEVM = -O3 -funroll-loops
 
@@ -1103,6 +1154,10 @@ ifeq ($(PLATFORM),sunos)
   
   OPTIMIZE = $(OPTIMIZEVM) -ffast-math
 
+  ifneq ($(HAVE_VM_COMPILED),true)
+    BASE_CFLAGS += -DNO_VM_COMPILED
+  endif
+
   SHLIBEXT=so
   SHLIBCFLAGS=-fPIC
   SHLIBLDFLAGS=-shared $(LDFLAGS)
@@ -1112,87 +1167,14 @@ ifeq ($(PLATFORM),sunos)
 
   BOTCFLAGS=-O0
 
-  CLIENT_LIBS +=$(SDL_LIBS) -lX11 -lXext -liconv -lm
-  RENDERER_LIBS = $(SDL_LIBS) -lGL
+  CLIENT_LIBS +=$(SDL_LIBS) -lGL -lX11 -lXext -liconv -lm
 
 else # ifeq sunos
 
 #############################################################################
-# SETUP AND BUILD -- wii
-#############################################################################
-
-ifeq ($(PLATFORM),wii)
-
-# $(DEVKITPPC)/wii_rules
-ifeq ($(strip $(DEVKITPPC)),)
-  $(error "Please set DEVKITPPC in your environment. export DEVKITPPC=<path to>devkitPro/devkitPPC)
-endif
-
-export LIBOGC_INC :=	$(DEVKITPRO)/libogc/include
-export LIBOGC_LIB :=	$(DEVKITPRO)/libogc/lib/wii
-
-  MACHDEP =  -DGEKKO -mrvl -mcpu=750 -meabi -mhard-float
-
-# $(DEVKITPPC)/base_rules
-#---------------------------------------------------------------------------------
-# path to tools 
-#---------------------------------------------------------------------------------
-export PORTLIBS := $(DEVKITPRO)/portlibs/ppc
-export PATH := $(DEVKITPPC)/bin:$(PORTLIBS)/bin:$(PATH)
-
-#---------------------------------------------------------------------------------
-# the prefix on the compiler executables
-#---------------------------------------------------------------------------------
-export PREFIX	:=	powerpc-eabi-
-
-export AS	:=	$(PREFIX)as
-export CC	:=	$(PREFIX)gcc
-export CXX	:=	$(PREFIX)g++
-export AR	:=	$(PREFIX)ar
-export OBJCOPY	:=	$(PREFIX)objcopy
-
-CFLAGS	= -g -O2 -Wall $(MACHDEP) -I$(LIBOGC_INC)
-CXXFLAGS	=	$(CFLAGS)
-
-LDFLAGS	=	-g $(MACHDEP) -Wl,-Map,$(B)/$(notdir $@).map
-
-LIBPATHS = -L$(LIBOGC_LIB)
-
-  LIBS = -lwiiuse -lbte -lfat -lwiikeyboard -logc -lm
-
-  HAVE_VM_COMPILED = true
-
-  ifneq ($(HAVE_VM_COMPILED),true)
-    BASE_CFLAGS += -DNO_VM_COMPILED
-  endif
-
-  # No OpenAL or cURL support
-  USE_OPENAL=0
-  USE_CURL=0
-
-  # Doesn't support native libs
-  BUILD_GAME_SO=0
-  USE_MUMBLE=0
-  USE_OPENAL_DLOPEN=0
-  USE_CURL_DLOPEN=0
-
-  ARCH=ppc
-
-  FULLBINEXT=.dol
-
-  BASE_CFLAGS += -DNO_NATIVE_SUPPORT -MMD -MP -MF -DDUMMYFLAG
-  SERVER_CFLAGS =
-  CLIENT_CFLAGS = -I$(LIBOGC_INC)/SDL
-
-  CLIENT_LDFLAGS += $(LDFLAGS)
-  CLIENT_LIBS +=$(SDL_LIBS) -lgl2gx
-
-else # ifeq wii
-
-#############################################################################
 # SETUP AND BUILD -- GENERIC
 #############################################################################
-  BASE_CFLAGS=
+  BASE_CFLAGS=-DNO_VM_COMPILED
   OPTIMIZE = -O3
 
   SHLIBEXT=so
@@ -1207,18 +1189,18 @@ endif #OpenBSD
 endif #NetBSD
 endif #IRIX
 endif #SunOS
-endif #wii
-
-ifneq ($(HAVE_VM_COMPILED),true)
-  BASE_CFLAGS += -DNO_VM_COMPILED
-  BUILD_GAME_QVM=0
-endif
 
 TARGETS =
 
 ifeq ($(IOQ3TURTLE),1)
   CLIENT_CFLAGS+=$(ENGINE_CFLAGS)
   SERVER_CFLAGS+=$(ENGINE_CFLAGS)
+endif
+
+ifeq ($(BUILD_SPLINES),1)
+  TARGETS += $(B)/splines/libsplines.a
+  BUILD_DEFINES += -DCAMERASCRIPT
+  CLIENT_LIBS += $(B)/splines/libsplines.a
 endif
 
 ifeq ($(USE_FREETYPE),1)
@@ -1238,16 +1220,9 @@ ifneq ($(BUILD_SERVER),0)
 endif
 
 ifneq ($(BUILD_CLIENT),0)
-  ifneq ($(USE_RENDERER_DLOPEN),0)
-    TARGETS += $(B)/$(CLIENTBIN)$(FULLBINEXT) $(B)/renderer_opengl1_$(SHLIBNAME)
-    ifneq ($(BUILD_CLIENT_SMP),0)
-      TARGETS += $(B)/renderer_opengl1_smp_$(SHLIBNAME)
-    endif
-  else
-    TARGETS += $(B)/$(CLIENTBIN)$(FULLBINEXT)
-    ifneq ($(BUILD_CLIENT_SMP),0)
-      TARGETS += $(B)/$(CLIENTBIN)-smp$(FULLBINEXT)
-    endif
+  TARGETS += $(B)/$(CLIENTBIN)$(FULLBINEXT)
+  ifneq ($(BUILD_CLIENT_SMP),0)
+    TARGETS += $(B)/$(CLIENTBIN)-smp$(FULLBINEXT)
   endif
 endif
 
@@ -1283,32 +1258,6 @@ ifneq ($(BUILD_GAME_QVM),0)
   endif
 endif
 
-ifeq ($(USE_OPENAL),1)
-  CLIENT_CFLAGS += -DUSE_OPENAL
-  ifeq ($(USE_OPENAL_DLOPEN),1)
-    CLIENT_CFLAGS += -DUSE_OPENAL_DLOPEN
-  endif
-endif
-
-ifeq ($(USE_CURL),1)
-  CLIENT_CFLAGS += -DUSE_CURL
-  ifeq ($(USE_CURL_DLOPEN),1)
-    CLIENT_CFLAGS += -DUSE_CURL_DLOPEN
-  endif
-endif
-
-ifeq ($(USE_CODEC_VORBIS),1)
-  CLIENT_CFLAGS += -DUSE_CODEC_VORBIS
-endif
-
-ifeq ($(USE_CODEC_THEORA),1)
-  CLIENT_CFLAGS += -DUSE_CIN_THEORA
-endif
-
-ifeq ($(USE_RENDERER_DLOPEN),1)
-  CLIENT_CFLAGS += -DUSE_RENDERER_DLOPEN
-endif
-
 ifeq ($(USE_MUMBLE),1)
   CLIENT_CFLAGS += -DUSE_MUMBLE
 endif
@@ -1330,13 +1279,6 @@ else
   LIBS += -lz
 endif
 
-ifeq ($(USE_INTERNAL_JPEG),1)
-  BASE_CFLAGS += -DUSE_INTERNAL_JPEG
-  BASE_CFLAGS += -I$(JPDIR)
-else
-  RENDERER_LIBS += -ljpeg
-endif
-
 ifdef DEFAULT_BASEDIR
   BASE_CFLAGS += -DDEFAULT_BASEDIR=\\\"$(DEFAULT_BASEDIR)\\\"
 endif
@@ -1346,7 +1288,7 @@ ifeq ($(USE_LOCAL_HEADERS),1)
 endif
 
 ifeq ($(BUILD_STANDALONE),1)
-  BUILD_DEFINES += -DSTANDALONE
+  BASE_CFLAGS += -DSTANDALONE
 endif
 
 ifeq ($(GENERATE_DEPENDENCIES),1)
@@ -1362,11 +1304,6 @@ else
 endif
 
 BASE_CFLAGS += -DPRODUCT_VERSION=\\\"$(VERSION)\\\"
-BASE_CFLAGS += -Wformat=2 -Wno-format-zero-length -Wformat-security -Wno-format-nonliteral
-BASE_CFLAGS += -Wstrict-aliasing=2 -Wmissing-format-attribute
-BASE_CFLAGS += -Wdisabled-optimization
-BASE_CFLAGS += -Werror-implicit-function-declaration
-
 BASE_CFLAGS += $(BUILD_DEFINES)
 
 ifeq ($(V),1)
@@ -1382,14 +1319,9 @@ $(echo_cmd) "CC $<"
 $(Q)$(CC) $(NOTSHLIBCFLAGS) $(CFLAGS) $(CLIENT_CFLAGS) $(OPTIMIZE) -o $@ -c $<
 endef
 
-define DO_REF_CC
-$(echo_cmd) "REF_CC $<"
-$(Q)$(CC) $(SHLIBCFLAGS) $(CFLAGS) $(CLIENT_CFLAGS) $(OPTIMIZE) -o $@ -c $<
-endef
-
 define DO_SMP_CC
 $(echo_cmd) "SMP_CC $<"
-$(Q)$(CC) $(SHLIBCFLAGS) $(CFLAGS) $(CLIENT_CFLAGS) $(OPTIMIZE) -DSMP -o $@ -c $<
+$(Q)$(CC) $(NOTSHLIBCFLAGS) $(CFLAGS) $(CLIENT_CFLAGS) $(OPTIMIZE) -DSMP -o $@ -c $<
 endef
 
 define DO_BOT_CC
@@ -1461,7 +1393,7 @@ endef
 
 define DO_WINDRES
 $(echo_cmd) "WINDRES $<"
-$(Q)$(WINDRES) -DWIN32_MISC_ICON_PATH -i $< -o $@
+$(Q)$(WINDRES) -i $< -o $@
 endef
 
 
@@ -1556,8 +1488,7 @@ makedirs:
 	@if [ ! -d $(BUILD_DIR) ];then $(MKDIR) $(BUILD_DIR);fi
 	@if [ ! -d $(B) ];then $(MKDIR) $(B);fi
 	@if [ ! -d $(B)/client ];then $(MKDIR) $(B)/client;fi
-	@if [ ! -d $(B)/renderer ];then $(MKDIR) $(B)/renderer;fi
-	@if [ ! -d $(B)/renderersmp ];then $(MKDIR) $(B)/renderersmp;fi
+	@if [ ! -d $(B)/clientsmp ];then $(MKDIR) $(B)/clientsmp;fi
 	@if [ ! -d $(B)/ded ];then $(MKDIR) $(B)/ded;fi
 ifneq ($(BUILD_BASEGAME),0)
 	@if [ ! -d $(B)/$(BASEGAME) ];then $(MKDIR) $(B)/$(BASEGAME);fi
@@ -1585,6 +1516,9 @@ endif
 	@if [ ! -d $(B)/tools/rcc ];then $(MKDIR) $(B)/tools/rcc;fi
 	@if [ ! -d $(B)/tools/cpp ];then $(MKDIR) $(B)/tools/cpp;fi
 	@if [ ! -d $(B)/tools/lburg ];then $(MKDIR) $(B)/tools/lburg;fi
+ifeq ($(BUILD_SPLINES),1)
+	@if [ ! -d $(B)/splines ];then $(MKDIR) $(B)/splines;fi
+endif
 
 #############################################################################
 # QVM BUILD TOOLS
@@ -1758,6 +1692,53 @@ $(Q3ASM): $(Q3ASMOBJ)
 	$(Q)$(CC) $(TOOLS_CFLAGS) $(TOOLS_LDFLAGS) -o $@ $^ $(TOOLS_LIBS)
 
 #############################################################################
+# SPLINES
+#############################################################################
+# ZTM
+
+SPLINESOBJ =
+
+ifeq ($(BUILD_SPLINES),1)
+
+SPLINESCFLAGS = -W -O2 -c -DNDEBUG -D_LIB
+
+ifeq ($(PLATFORM),mingw32)
+SPLINESCFLAGS += -DWIN32
+endif
+
+define DO_SPLINES_CXX
+$(echo_cmd) "SPLINES_CXX $<"
+$(Q)$(CXX) $(SPLINESCFLAGS) -o $@ $<
+endef
+
+$(B)/splines/%.o: $(SPLNDIR)/%.cpp
+	$(DO_SPLINES_CXX)
+
+SPLINESOBJ = \
+    $(B)/splines/math_angles.o\
+    $(B)/splines/math_matrix.o\
+    $(B)/splines/math_quaternion.o\
+    $(B)/splines/math_vector.o\
+    $(B)/splines/q_parse.o\
+    $(B)/splines/q_shared.o\
+    $(B)/splines/splines.o\
+    $(B)/splines/util_str.o
+
+# Set defaults
+ifndef AR
+AR=ar
+endif
+ifndef RANLIB
+RANLIB=ranlib
+endif
+
+$(B)/splines/libsplines.a: $(SPLINESOBJ)
+	$(echo_cmd) "LD $@"
+	$(AR) rc $@ $^
+	$(RANLIB) $@
+endif
+
+#############################################################################
 # CLIENT/SERVER
 #############################################################################
 
@@ -1856,6 +1837,73 @@ Q3OBJ = \
   $(B)/client/l_script.o \
   $(B)/client/l_struct.o \
   \
+  $(B)/client/jcapimin.o \
+  $(B)/client/jcapistd.o \
+  $(B)/client/jccoefct.o  \
+  $(B)/client/jccolor.o \
+  $(B)/client/jcdctmgr.o \
+  $(B)/client/jchuff.o   \
+  $(B)/client/jcinit.o \
+  $(B)/client/jcmainct.o \
+  $(B)/client/jcmarker.o \
+  $(B)/client/jcmaster.o \
+  $(B)/client/jcomapi.o \
+  $(B)/client/jcparam.o \
+  $(B)/client/jcphuff.o \
+  $(B)/client/jcprepct.o \
+  $(B)/client/jcsample.o \
+  $(B)/client/jdapimin.o \
+  $(B)/client/jdapistd.o \
+  $(B)/client/jdatasrc.o \
+  $(B)/client/jdcoefct.o \
+  $(B)/client/jdcolor.o \
+  $(B)/client/jddctmgr.o \
+  $(B)/client/jdhuff.o \
+  $(B)/client/jdinput.o \
+  $(B)/client/jdmainct.o \
+  $(B)/client/jdmarker.o \
+  $(B)/client/jdmaster.o \
+  $(B)/client/jdpostct.o \
+  $(B)/client/jdsample.o \
+  $(B)/client/jdtrans.o \
+  $(B)/client/jerror.o \
+  $(B)/client/jfdctflt.o \
+  $(B)/client/jidctflt.o \
+  $(B)/client/jmemmgr.o \
+  $(B)/client/jmemnobs.o \
+  $(B)/client/jutils.o \
+  \
+  $(B)/client/tr_animation.o \
+  $(B)/client/tr_backend.o \
+  $(B)/client/tr_bloom.o \
+  $(B)/client/tr_bsp.o \
+  $(B)/client/tr_cmds.o \
+  $(B)/client/tr_curve.o \
+  $(B)/client/tr_flares.o \
+  $(B)/client/tr_font.o \
+  $(B)/client/tr_image.o \
+  $(B)/client/tr_image_png.o \
+  $(B)/client/tr_image_jpg.o \
+  $(B)/client/tr_image_bmp.o \
+  $(B)/client/tr_image_tga.o \
+  $(B)/client/tr_image_pcx.o \
+  $(B)/client/tr_init.o \
+  $(B)/client/tr_light.o \
+  $(B)/client/tr_main.o \
+  $(B)/client/tr_marks.o \
+  $(B)/client/tr_mesh.o \
+  $(B)/client/tr_model.o \
+  $(B)/client/tr_noise.o \
+  $(B)/client/tr_scene.o \
+  $(B)/client/tr_shade.o \
+  $(B)/client/tr_shade_calc.o \
+  $(B)/client/tr_shader.o \
+  $(B)/client/tr_shadows.o \
+  $(B)/client/tr_sky.o \
+  $(B)/client/tr_surface.o \
+  $(B)/client/tr_world.o \
+  \
+  $(B)/client/sdl_gamma.o \
   $(B)/client/sdl_input.o \
   $(B)/client/sdl_snd.o \
   \
@@ -1863,134 +1911,19 @@ Q3OBJ = \
   $(B)/client/con_log.o \
   $(B)/client/sys_main.o
 
-Q3ROBJ = \
-  $(B)/renderer/tr_animation.o \
-  $(B)/renderer/tr_backend.o \
-  $(B)/renderer/tr_bloom.o \
-  $(B)/renderer/tr_bsp.o \
-  $(B)/renderer/tr_cmds.o \
-  $(B)/renderer/tr_curve.o \
-  $(B)/renderer/tr_flares.o \
-  $(B)/renderer/tr_font.o \
-  $(B)/renderer/tr_image.o \
-  $(B)/renderer/tr_image_png.o \
-  $(B)/renderer/tr_image_jpg.o \
-  $(B)/renderer/tr_image_bmp.o \
-  $(B)/renderer/tr_image_tga.o \
-  $(B)/renderer/tr_image_pcx.o \
-  $(B)/renderer/tr_init.o \
-  $(B)/renderer/tr_light.o \
-  $(B)/renderer/tr_main.o \
-  $(B)/renderer/tr_marks.o \
-  $(B)/renderer/tr_mesh.o \
-  $(B)/renderer/tr_model.o \
-  $(B)/renderer/tr_model_iqm.o \
-  $(B)/renderer/tr_noise.o \
-  $(B)/renderer/tr_scene.o \
-  $(B)/renderer/tr_shade.o \
-  $(B)/renderer/tr_shade_calc.o \
-  $(B)/renderer/tr_shader.o \
-  $(B)/renderer/tr_shadows.o \
-  $(B)/renderer/tr_sky.o \
-  $(B)/renderer/tr_surface.o \
-  $(B)/renderer/tr_world.o \
-  \
-  $(B)/renderer/sdl_gamma.o
-  
-ifneq ($(USE_RENDERER_DLOPEN), 0)
-  Q3ROBJ += \
-    $(B)/renderer/q_shared.o \
-    $(B)/renderer/puff.o \
-    $(B)/renderer/q_math.o \
-    $(B)/renderer/tr_subs.o
-
-#ZTM: if TA_GAME_MODELS
-# client (with built in server) needs model loading too
-ifeq ($(DED_USE_MODELS),1)
-Q3OBJ += \
-      $(B)/ded/tr_model.o \
-      $(B)/ded/tr_model_iqm.o
-endif
-endif
-
-ifneq ($(USE_INTERNAL_JPEG),0)
-  Q3ROBJ += \
-    $(B)/renderer/jaricom.o \
-    $(B)/renderer/jcapimin.o \
-    $(B)/renderer/jcapistd.o \
-    $(B)/renderer/jcarith.o \
-    $(B)/renderer/jccoefct.o  \
-    $(B)/renderer/jccolor.o \
-    $(B)/renderer/jcdctmgr.o \
-    $(B)/renderer/jchuff.o   \
-    $(B)/renderer/jcinit.o \
-    $(B)/renderer/jcmainct.o \
-    $(B)/renderer/jcmarker.o \
-    $(B)/renderer/jcmaster.o \
-    $(B)/renderer/jcomapi.o \
-    $(B)/renderer/jcparam.o \
-    $(B)/renderer/jcprepct.o \
-    $(B)/renderer/jcsample.o \
-    $(B)/renderer/jctrans.o \
-    $(B)/renderer/jdapimin.o \
-    $(B)/renderer/jdapistd.o \
-    $(B)/renderer/jdarith.o \
-    $(B)/renderer/jdatadst.o \
-    $(B)/renderer/jdatasrc.o \
-    $(B)/renderer/jdcoefct.o \
-    $(B)/renderer/jdcolor.o \
-    $(B)/renderer/jddctmgr.o \
-    $(B)/renderer/jdhuff.o \
-    $(B)/renderer/jdinput.o \
-    $(B)/renderer/jdmainct.o \
-    $(B)/renderer/jdmarker.o \
-    $(B)/renderer/jdmaster.o \
-    $(B)/renderer/jdmerge.o \
-    $(B)/renderer/jdpostct.o \
-    $(B)/renderer/jdsample.o \
-    $(B)/renderer/jdtrans.o \
-    $(B)/renderer/jerror.o \
-    $(B)/renderer/jfdctflt.o \
-    $(B)/renderer/jfdctfst.o \
-    $(B)/renderer/jfdctint.o \
-    $(B)/renderer/jidctflt.o \
-    $(B)/renderer/jidctfst.o \
-    $(B)/renderer/jidctint.o \
-    $(B)/renderer/jmemmgr.o \
-    $(B)/renderer/jmemnobs.o \
-    $(B)/renderer/jquant1.o \
-    $(B)/renderer/jquant2.o \
-    $(B)/renderer/jutils.o
-endif
-
 ifeq ($(ARCH),i386)
   Q3OBJ += \
     $(B)/client/snd_mixa.o \
     $(B)/client/matha.o \
-    $(B)/client/snapvector.o \
-    $(B)/client/ftola.o
+    $(B)/client/ftola.o \
+    $(B)/client/snapvectora.o
 endif
 ifeq ($(ARCH),x86)
   Q3OBJ += \
     $(B)/client/snd_mixa.o \
     $(B)/client/matha.o \
-    $(B)/client/snapvector.o \
-    $(B)/client/ftola.o
-endif
-ifeq ($(ARCH),x86_64)
-  Q3OBJ += \
-    $(B)/client/snapvector.o \
-    $(B)/client/ftola.o
-endif
-ifeq ($(ARCH),amd64)
-  Q3OBJ += \
-    $(B)/client/snapvector.o \
-    $(B)/client/ftola.o
-endif
-ifeq ($(ARCH),x64)
-  Q3OBJ += \
-    $(B)/client/snapvector.o \
-    $(B)/client/ftola.o
+    $(B)/client/ftola.o \
+    $(B)/client/snapvectora.o
 endif
 
 ifeq ($(USE_VOIP),1)
@@ -2042,54 +1975,28 @@ endif
 ifeq ($(USE_INTERNAL_ZLIB),1)
 Q3OBJ += \
   $(B)/client/adler32.o \
-  $(B)/client/compress.o \
   $(B)/client/crc32.o \
-  $(B)/client/deflate.o \
   $(B)/client/inffast.o \
   $(B)/client/inflate.o \
   $(B)/client/inftrees.o \
-  $(B)/client/trees.o \
   $(B)/client/zutil.o
 endif
 
 ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),i386)
-    Q3OBJ += \
-      $(B)/client/vm_x86.o
+    Q3OBJ += $(B)/client/vm_x86.o
   endif
   ifeq ($(ARCH),x86)
-    Q3OBJ += \
-      $(B)/client/vm_x86.o
+    Q3OBJ += $(B)/client/vm_x86.o
   endif
   ifeq ($(ARCH),x86_64)
-    ifeq ($(USE_OLD_VM64),1)
-      Q3OBJ += \
-        $(B)/client/vm_x86_64.o \
-        $(B)/client/vm_x86_64_assembler.o
-    else
-      Q3OBJ += \
-        $(B)/client/vm_x86.o
-    endif
+    Q3OBJ += $(B)/client/vm_x86_64.o $(B)/client/vm_x86_64_assembler.o
   endif
   ifeq ($(ARCH),amd64)
-    ifeq ($(USE_OLD_VM64),1)
-      Q3OBJ += \
-        $(B)/client/vm_x86_64.o \
-        $(B)/client/vm_x86_64_assembler.o
-    else
-      Q3OBJ += \
-        $(B)/client/vm_x86.o
-    endif
+    Q3OBJ += $(B)/client/vm_x86_64.o $(B)/client/vm_x86_64_assembler.o
   endif
   ifeq ($(ARCH),x64)
-    ifeq ($(USE_OLD_VM64),1)
-      Q3OBJ += \
-        $(B)/client/vm_x86_64.o \
-        $(B)/client/vm_x86_64_assembler.o
-    else
-      Q3OBJ += \
-        $(B)/client/vm_x86.o
-    endif
+    Q3OBJ += $(B)/client/vm_x86_64.o $(B)/client/vm_x86_64_assembler.o
   endif
   ifeq ($(ARCH),ppc)
     Q3OBJ += $(B)/client/vm_powerpc.o $(B)/client/vm_powerpc_asm.o
@@ -2122,52 +2029,38 @@ ifeq ($(USE_MUMBLE),1)
 endif
 
 Q3POBJ += \
-  $(B)/renderer/sdl_glimp.o
+  $(B)/client/sdl_glimp.o
 
 Q3POBJ_SMP += \
-  $(B)/renderersmp/sdl_glimp.o
+  $(B)/clientsmp/sdl_glimp.o
 
-ifeq ($(PLATFORM),wii)
-$(B)/$(CLIENTBIN).dol: $(B)/$(CLIENTBIN).elf
-	$(echo_cmd) "ELF2DOL $@"
-	$(Q)elf2dol $< $@
-
-$(B)/$(CLIENTBIN).elf: $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+ifeq ($(BUILD_SPLINES),1)
+# TTimo: splines code requires C++ linking, but splines have
+# not been officially included in the codebase
+# ZTM: now it has, so use C++ linking.
+$(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(LIBPATHS) \
+	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
 		-o $@ $(Q3OBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
+
+$(B)/$(CLIENTBIN)-smp.$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
+	$(echo_cmd) "LD $@"
+	$(Q)$(CXX) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
+		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
+		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 else
-ifneq ($(USE_RENDERER_DLOPEN),0)
-$(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN).$(ARCH)$(BINEXT): $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
-		-o $@ $(Q3OBJ) \
+		-o $@ $(Q3OBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 
 $(B)/$(CLIENTBIN)-smp$(FULLBINEXT): $(Q3OBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
-$(B)/renderer_opengl1_$(SHLIBNAME): $(Q3ROBJ) $(Q3POBJ)
-	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3ROBJ) $(Q3POBJ) \
-		$(THREAD_LIBS) $(LIBSDLMAIN) $(RENDERER_LIBS) $(LIBS)
-
-$(B)/renderer_opengl1_smp_$(SHLIBNAME): $(Q3ROBJ) $(Q3POBJ_SMP)
-	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CFLAGS) $(SHLIBLDFLAGS) -o $@ $(Q3ROBJ) $(Q3POBJ_SMP) \
-		$(THREAD_LIBS) $(LIBSDLMAIN) $(RENDERER_LIBS) $(LIBS)
-else
-$(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(Q3ROBJ) $(Q3POBJ) $(LIBSDLMAIN)
-	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) \
-		-o $@ $(Q3OBJ) $(Q3ROBJ) $(Q3POBJ) \
-		$(LIBSDLMAIN) $(CLIENT_LIBS) $(RENDERER_LIBS) $(LIBS)
-
-$(B)/$(CLIENTBIN)-smp$(FULLBINEXT): $(Q3OBJ) $(Q3ROBJ) $(Q3POBJ_SMP) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(THREAD_LDFLAGS) \
-		-o $@ $(Q3OBJ) $(Q3ROBJ) $(Q3POBJ_SMP) \
-		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(RENDERER_LIBS) $(LIBS)
-endif
+		-o $@ $(Q3OBJ) $(Q3POBJ_SMP) \
+		$(THREAD_LIBS) $(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 endif
 
 ifneq ($(strip $(LIBSDLMAIN)),)
@@ -2256,37 +2149,20 @@ Q3DOBJ = \
 
 ifeq ($(ARCH),i386)
   Q3DOBJ += \
-      $(B)/ded/matha.o \
-      $(B)/ded/snapvector.o \
-      $(B)/ded/ftola.o
+      $(B)/ded/ftola.o \
+      $(B)/ded/snapvectora.o \
+      $(B)/ded/matha.o
 endif
 ifeq ($(ARCH),x86)
   Q3DOBJ += \
-      $(B)/ded/matha.o \
-      $(B)/ded/snapvector.o \
-      $(B)/ded/ftola.o 
+      $(B)/ded/ftola.o \
+      $(B)/ded/snapvectora.o \
+      $(B)/ded/matha.o
 endif
-ifeq ($(ARCH),x86_64)
-  Q3DOBJ += \
-      $(B)/ded/snapvector.o \
-      $(B)/ded/ftola.o 
-endif
-ifeq ($(ARCH),amd64)
-  Q3DOBJ += \
-      $(B)/ded/snapvector.o \
-      $(B)/ded/ftola.o 
-endif
-ifeq ($(ARCH),x64)
-  Q3DOBJ += \
-      $(B)/ded/snapvector.o \
-      $(B)/ded/ftola.o 
-endif
-
-#ZTM: if TA_GAME_MODELS
+#ZTM: if TA_GAME_TAGS
 ifeq ($(DED_USE_MODELS),1)
 Q3DOBJ += \
-      $(B)/ded/tr_model.o \
-      $(B)/ded/tr_model_iqm.o
+      $(B)/ded/tr_model.o
 endif
 
 ifeq ($(USE_INTERNAL_ZLIB),1)
@@ -2301,42 +2177,19 @@ endif
 
 ifeq ($(HAVE_VM_COMPILED),true)
   ifeq ($(ARCH),i386)
-    Q3DOBJ += \
-      $(B)/ded/vm_x86.o
+    Q3DOBJ += $(B)/ded/vm_x86.o
   endif
   ifeq ($(ARCH),x86)
-    Q3DOBJ += \
-      $(B)/ded/vm_x86.o
+    Q3DOBJ += $(B)/ded/vm_x86.o
   endif
   ifeq ($(ARCH),x86_64)
-    ifeq ($(USE_OLD_VM64),1)
-      Q3DOBJ += \
-        $(B)/ded/vm_x86_64.o \
-        $(B)/ded/vm_x86_64_assembler.o
-    else
-      Q3DOBJ += \
-        $(B)/ded/vm_x86.o
-    endif
+    Q3DOBJ += $(B)/ded/vm_x86_64.o $(B)/ded/vm_x86_64_assembler.o
   endif
   ifeq ($(ARCH),amd64)
-    ifeq ($(USE_OLD_VM64),1)
-      Q3DOBJ += \
-        $(B)/ded/vm_x86_64.o \
-        $(B)/ded/vm_x86_64_assembler.o
-    else
-      Q3DOBJ += \
-        $(B)/ded/vm_x86.o
-    endif
+    Q3DOBJ += $(B)/ded/vm_x86_64.o $(B)/ded/vm_x86_64_assembler.o
   endif
   ifeq ($(ARCH),x64)
-    ifeq ($(USE_OLD_VM64),1)
-      Q3DOBJ += \
-        $(B)/ded/vm_x86_64.o \
-        $(B)/ded/vm_x86_64_assembler.o
-    else
-      Q3DOBJ += \
-        $(B)/ded/vm_x86.o
-    endif
+    Q3DOBJ += $(B)/ded/vm_x86_64.o $(B)/ded/vm_x86_64_assembler.o
   endif
   ifeq ($(ARCH),ppc)
     Q3DOBJ += $(B)/ded/vm_powerpc.o $(B)/ded/vm_powerpc_asm.o
@@ -2365,20 +2218,9 @@ ifeq ($(PLATFORM),darwin)
     $(B)/ded/sys_osx.o
 endif
 
-
-ifeq ($(PLATFORM),wii)
-$(B)/$(SERVERBIN).dol: $(B)/$(SERVERBIN).elf
-	$(echo_cmd) "ELF2DOL $@"
-	$(Q)elf2dol $< $@
-
-$(B)/$(SERVERBIN).elf: $(Q3DOBJ)
-	$(echo_cmd) "LD $@"
-	$(Q)$(CC) $^ $(LDFLAGS) $(LIBPATHS) $(LIBS) -o $@
-else
 $(B)/$(SERVERBIN)$(FULLBINEXT): $(Q3DOBJ)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(Q3DOBJ) $(LIBS)
-endif
 
 
 
@@ -2392,6 +2234,8 @@ Q3CGOBJ_ = \
   $(B)/$(BASEGAME)/cgame/bg_pmove.o \
   $(B)/$(BASEGAME)/cgame/bg_slidemove.o \
   $(B)/$(BASEGAME)/cgame/bg_lib.o \
+  $(B)/$(BASEGAME)/cgame/bg_tracemap.o \
+  $(B)/$(BASEGAME)/cgame/cg_atmospheric.o \
   $(B)/$(BASEGAME)/cgame/cg_consolecmds.o \
   $(B)/$(BASEGAME)/cgame/cg_newdraw.o \
   $(B)/$(BASEGAME)/cgame/cg_draw.o \
@@ -2405,10 +2249,12 @@ Q3CGOBJ_ = \
   $(B)/$(BASEGAME)/cgame/cg_particles.o \
   $(B)/$(BASEGAME)/cgame/cg_players.o \
   $(B)/$(BASEGAME)/cgame/cg_playerstate.o \
+  $(B)/$(BASEGAME)/cgame/cg_polybus.o \
   $(B)/$(BASEGAME)/cgame/cg_predict.o \
   $(B)/$(BASEGAME)/cgame/cg_scoreboard.o \
   $(B)/$(BASEGAME)/cgame/cg_servercmds.o \
   $(B)/$(BASEGAME)/cgame/cg_snapshot.o \
+  $(B)/$(BASEGAME)/cgame/cg_spawn.o \
   $(B)/$(BASEGAME)/cgame/cg_view.o \
   $(B)/$(BASEGAME)/cgame/cg_weapons.o \
   \
@@ -2436,6 +2282,8 @@ MPCGOBJ_ = \
   $(B)/missionpack/cgame/bg_pmove.o \
   $(B)/missionpack/cgame/bg_slidemove.o \
   $(B)/missionpack/cgame/bg_lib.o \
+  $(B)/missionpack/cgame/bg_tracemap.o \
+  $(B)/missionpack/cgame/cg_atmospheric.o \
   $(B)/missionpack/cgame/cg_consolecmds.o \
   $(B)/missionpack/cgame/cg_newdraw.o \
   $(B)/missionpack/cgame/cg_draw.o \
@@ -2449,10 +2297,12 @@ MPCGOBJ_ = \
   $(B)/missionpack/cgame/cg_particles.o \
   $(B)/missionpack/cgame/cg_players.o \
   $(B)/missionpack/cgame/cg_playerstate.o \
+  $(B)/missionpack/cgame/cg_polybus.o \
   $(B)/missionpack/cgame/cg_predict.o \
   $(B)/missionpack/cgame/cg_scoreboard.o \
   $(B)/missionpack/cgame/cg_servercmds.o \
   $(B)/missionpack/cgame/cg_snapshot.o \
+  $(B)/missionpack/cgame/cg_spawn.o \
   $(B)/missionpack/cgame/cg_view.o \
   $(B)/missionpack/cgame/cg_weapons.o \
   $(B)/missionpack/ui/ui_shared.o \
@@ -2490,6 +2340,7 @@ Q3GOBJ_ = \
   $(B)/$(BASEGAME)/game/bg_pmove.o \
   $(B)/$(BASEGAME)/game/bg_slidemove.o \
   $(B)/$(BASEGAME)/game/bg_lib.o \
+  $(B)/$(BASEGAME)/game/bg_tracemap.o \
   $(B)/$(BASEGAME)/game/g_active.o \
   $(B)/$(BASEGAME)/game/g_arenas.o \
   $(B)/$(BASEGAME)/game/g_bot.o \
@@ -2546,6 +2397,7 @@ MPGOBJ_ = \
   $(B)/missionpack/game/bg_pmove.o \
   $(B)/missionpack/game/bg_slidemove.o \
   $(B)/missionpack/game/bg_lib.o \
+  $(B)/missionpack/game/bg_tracemap.o \
   $(B)/missionpack/game/g_active.o \
   $(B)/missionpack/game/g_arenas.o \
   $(B)/missionpack/game/g_bot.o \
@@ -2601,7 +2453,6 @@ Q3UIOBJ_ = \
   $(B)/$(BASEGAME)/ui/ui_cinematics.o \
   $(B)/$(BASEGAME)/ui/ui_confirm.o \
   $(B)/$(BASEGAME)/ui/ui_connect.o \
-  $(B)/$(BASEGAME)/ui/ui_controls.o \
   $(B)/$(BASEGAME)/ui/ui_controls2.o \
   $(B)/$(BASEGAME)/ui/ui_credits.o \
   $(B)/$(BASEGAME)/ui/ui_demo2.o \
@@ -2609,8 +2460,6 @@ Q3UIOBJ_ = \
   $(B)/$(BASEGAME)/ui/ui_gameinfo.o \
   $(B)/$(BASEGAME)/ui/ui_ingame.o \
   $(B)/$(BASEGAME)/ui/ui_ingame_server.o \
-  $(B)/$(BASEGAME)/ui/ui_ingame_setupplayers.o \
-  $(B)/$(BASEGAME)/ui/ui_joystick.o \
   $(B)/$(BASEGAME)/ui/ui_loadconfig.o \
   $(B)/$(BASEGAME)/ui/ui_menu.o \
   $(B)/$(BASEGAME)/ui/ui_mfield.o \
@@ -2691,10 +2540,6 @@ $(B)/missionpack/vm/ui.qvm: $(MPUIVMOBJ) $(UIDIR)/ui_syscalls.asm $(Q3ASM)
 $(B)/client/%.o: $(ASMDIR)/%.s
 	$(DO_AS)
 
-# k8 so inline assembler knows about SSE
-$(B)/client/%.o: $(ASMDIR)/%.c
-	$(DO_CC) -march=k8
-
 $(B)/client/%.o: $(CDIR)/%.c
 	$(DO_CC)
 
@@ -2707,16 +2552,22 @@ $(B)/client/%.o: $(CMDIR)/%.c
 $(B)/client/%.o: $(BLIBDIR)/%.c
 	$(DO_BOT_CC)
 
+$(B)/client/%.o: $(JPDIR)/%.c
+	$(DO_CC)
+
 $(B)/client/%.o: $(SPEEXDIR)/%.c
 	$(DO_CC)
 
 $(B)/client/%.o: $(ZDIR)/%.c
 	$(DO_CC)
 
+$(B)/client/%.o: $(RDIR)/%.c
+	$(DO_CC)
+
 $(B)/client/%.o: $(SDLDIR)/%.c
 	$(DO_CC)
 
-$(B)/renderersmp/%.o: $(SDLDIR)/%.c
+$(B)/clientsmp/%.o: $(SDLDIR)/%.c
 	$(DO_SMP_CC)
 
 $(B)/client/%.o: $(SYSDIR)/%.c
@@ -2729,26 +2580,8 @@ $(B)/client/%.o: $(SYSDIR)/%.rc
 	$(DO_WINDRES)
 
 
-$(B)/renderer/%.o: $(CMDIR)/%.c
-	$(DO_REF_CC)
-
-$(B)/renderer/%.o: $(SDLDIR)/%.c
-	$(DO_REF_CC)
-
-$(B)/renderer/%.o: $(JPDIR)/%.c
-	$(DO_REF_CC)
-
-$(B)/renderer/%.o: $(RDIR)/%.c
-	$(DO_REF_CC)
-
-
-
 $(B)/ded/%.o: $(ASMDIR)/%.s
 	$(DO_AS)
-
-# k8 so inline assembler knows about SSE
-$(B)/ded/%.o: $(ASMDIR)/%.c
-	$(DO_CC) -march=k8
 
 $(B)/ded/%.o: $(SDIR)/%.c
 	$(DO_DED_CC)
@@ -2774,7 +2607,7 @@ $(B)/ded/%.o: $(SYSDIR)/%.rc
 $(B)/ded/%.o: $(NDIR)/%.c
 	$(DO_DED_CC)
 
-# ZTM: TA_GAME_MODELS ded
+# ZTM: TA_GAME_TAGS ded
 ifeq ($(DED_USE_MODELS),1)
 $(B)/ded/%.o: $(RDIR)/%.c
 	$(DO_DED_CC)
@@ -2872,39 +2705,28 @@ $(B)/missionpack/qcommon/%.asm: $(CMDIR)/%.c $(Q3LCC)
 # MISC
 #############################################################################
 
-OBJ = $(Q3OBJ) $(Q3POBJ) $(Q3POBJ_SMP) $(Q3ROBJ) $(Q3DOBJ) \
+OBJ = $(Q3OBJ) $(Q3POBJ) $(Q3POBJ_SMP) $(Q3DOBJ) \
   $(MPGOBJ) $(Q3GOBJ) $(Q3CGOBJ) $(MPCGOBJ) $(Q3UIOBJ) $(MPUIOBJ) \
   $(MPGVMOBJ) $(Q3GVMOBJ) $(Q3CGVMOBJ) $(MPCGVMOBJ) $(Q3UIVMOBJ) $(MPUIVMOBJ)
 TOOLSOBJ = $(LBURGOBJ) $(Q3CPPOBJ) $(Q3RCCOBJ) $(Q3LCCOBJ) $(Q3ASMOBJ)
 
+ifeq ($(BUILD_SPLINES),1)
+OBJ+= $(SPLINESOBJ)
+endif
+
 copyfiles: release
-ifeq ($(QUAKE3),1)
 	@if [ ! -d $(COPYDIR)/$(BASEGAME) ]; then echo "You need to set COPYDIR to where your Quake3 data is!"; fi
-endif
-ifneq ($(BUILD_GAME_SO),0)
-  ifneq ($(BUILD_BASEGAME),0)
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/$(BASEGAME)
-  endif
-  ifneq ($(BUILD_MISSIONPACK),0)
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/missionpack
-  endif
-endif
 
 ifneq ($(BUILD_CLIENT),0)
 	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/$(CLIENTBIN)$(FULLBINEXT) $(COPYBINDIR)/$(CLIENTBIN)$(FULLBINEXT)
-  ifneq ($(USE_RENDERER_DLOPEN),0)
-	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/renderer_opengl1_$(SHLIBNAME) $(COPYBINDIR)/renderer_opengl1_$(SHLIBNAME)
-  endif
 endif
 
 # Don't copy the SMP until it's working together with SDL.
-ifneq ($(BUILD_CLIENT_SMP),0)
-  ifneq ($(USE_RENDERER_DLOPEN),0)
-	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/renderer_opengl1_smp_$(SHLIBNAME) $(COPYBINDIR)/renderer_opengl1_smp_$(SHLIBNAME)
-  else
-	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/$(CLIENTBIN)-smp$(FULLBINEXT) $(COPYBINDIR)/$(CLIENTBIN)-smp$(FULLBINEXT)
-  endif
-endif
+#ifneq ($(BUILD_CLIENT_SMP),0)
+#	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/$(CLIENTBIN)-smp$(FULLBINEXT) $(COPYBINDIR)/$(CLIENTBIN)-smp$(FULLBINEXT)
+#endif
 
 ifneq ($(BUILD_SERVER),0)
 	@if [ -f $(BR)/$(SERVERBIN)$(FULLBINEXT) ]; then \
@@ -2918,7 +2740,7 @@ ifneq ($(BUILD_GAME_SO),0)
 					$(COPYDIR)/$(BASEGAME)/.
 	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/$(BASEGAME)/qagame$(SHLIBNAME) \
 					$(COPYDIR)/$(BASEGAME)/.
-	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/$(BASEGAME)/ui$(SHLIBNAME) \
+	$(INSTALL) $(STRIP_FLAG) -m 0755 $(BR)/baseq3/ui$(SHLIBNAME) \
 					$(COPYDIR)/$(BASEGAME)/.
   endif
   ifneq ($(BUILD_MISSIONPACK),0)

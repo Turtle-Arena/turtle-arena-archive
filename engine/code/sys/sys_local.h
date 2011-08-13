@@ -36,11 +36,7 @@ void IN_Restart( void );
 
 // Console
 void CON_Shutdown( void );
-#ifdef __wii__
-void wiiCON_Init( void );
-#else
 void CON_Init( void );
-#endif
 char *CON_Input( void );
 void CON_Print( const char *message );
 
@@ -55,8 +51,7 @@ char *Sys_StripAppBundle( char *pwd );
 void Sys_GLimpSafeInit( void );
 void Sys_GLimpInit( void );
 void Sys_PlatformInit( void );
-void Sys_PlatformExit( void );
-void Sys_SigHandler( int signal ) __attribute__ ((noreturn));
+void Sys_SigHandler( int signal );
 void Sys_ErrorDialog( const char *error );
 void Sys_AnsiColorPrint( const char *msg );
 

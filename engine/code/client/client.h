@@ -58,13 +58,7 @@ typedef struct {
 	byte			areamask[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
 
 	int				cmdNum;			// the next cmdNum the server is expecting
-#ifdef TA_SPLITVIEW
-	int				numPSs;
-	playerState_t	pss[MAX_SPLITVIEW];		// complete information about the current players at this time
-	int				lcIndex[MAX_SPLITVIEW];
-#else
 	playerState_t	ps;						// complete information about the current player at this time
-#endif
 
 	int				numEntities;			// all of the entities that need to be presented
 	int				parseEntitiesNum;		// at the time of this snapshot
@@ -93,37 +87,9 @@ typedef struct {
 // the parseEntities array must be large enough to hold PACKET_BACKUP frames of
 // entities, so that when a delta compressed message arives from the server
 // it can be un-deltad from the original 
-#ifdef IOQ3ZTM // IOQ3BUGFIX?: Make sure MAX_PARSE_ENTITIES is bigger than MAX_GENTITIES.
-#define	MAX_PARSE_ENTITIES	(MAX_GENTITIES*2)
-#else
 #define	MAX_PARSE_ENTITIES	2048
-#endif
 
 extern int g_console_field_width;
-
-// Client Active Local Client
-typedef struct {
-	int			mouseDx[2], mouseDy[2];	// added to by mouse events
-	int			mouseIndex;
-	int			joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
-
-	// cgame communicates a few values to the client system
-#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
-	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
-#endif
-#ifdef TA_HOLDSYS/*2*/
-	int			cgameHoldableValue;	// current holdable to add to usercmd_t
-#endif
-	float		cgameSensitivity;
-
-	// the client maintains its own idea of view angles, which are
-	// sent to the server each frame.  It is cleared to 0 upon entering each level.
-	// the server sends a delta each frame which is added to the locally
-	// tracked view angles to account for standing on rotating objects,
-	// and teleport direction changes
-	vec3_t		viewangles;
-
-} calc_t;
 
 typedef struct {
 	int			timeoutcount;		// it requres several frames in a timeout condition
@@ -145,23 +111,33 @@ typedef struct {
 
 	int			parseEntitiesNum;	// index (not anded off) into cl_parse_entities[]
 
-#ifdef TA_SPLITVIEW
-	calc_t		localClients[MAX_SPLITVIEW];
-#else
-	calc_t		localClient;
+	int			mouseDx[2], mouseDy[2];	// added to by mouse events
+	int			mouseIndex;
+	int			joystickAxis[MAX_JOYSTICK_AXIS];	// set by joystick events
+
+	// cgame communicates a few values to the client system
+#if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
+	int			cgameUserCmdValue;	// current weapon to add to usercmd_t
 #endif
+#ifdef TA_HOLDSYS/*2*/
+	int			cgameHoldableValue;	// current holdable to add to usercmd_t
+#endif
+	float		cgameSensitivity;
 
 	// cmds[cmdNumber] is the predicted command, [cmdNumber-1] is the last
 	// properly generated command
-#ifdef TA_SPLITVIEW
-	usercmd_t	cmdss[MAX_SPLITVIEW][CMD_BACKUP];	// each mesage will send several old cmds
-#else
 	usercmd_t	cmds[CMD_BACKUP];	// each mesage will send several old cmds
-#endif
 	int			cmdNumber;			// incremented each frame, because multiple
 									// frames may need to be packed into a single packet
 
 	outPacket_t	outPackets[PACKET_BACKUP];	// information about each packet we have sent out
+
+	// the client maintains its own idea of view angles, which are
+	// sent to the server each frame.  It is cleared to 0 upon entering each level.
+	// the server sends a delta each frame which is added to the locally
+	// tracked view angles to account for standing on rotating objects,
+	// and teleport direction changes
+	vec3_t		viewangles;
 
 	int			serverId;			// included in each client message so the server
 												// can tell if it is for a prior map_restart
@@ -191,13 +167,10 @@ demo through a file.
 
 typedef struct {
 
-	connstate_t	state;				// connection status
-
 	int			clientNum;
 	int			lastPacketSentTime;			// for retransmits during connection
 	int			lastPacketTime;				// for timeouts
 
-	char		servername[MAX_OSPATH];		// name of server from original connect (used by reconnect)
 	netadr_t	serverAddress;
 	int			connectTime;				// for connection retransmits
 	int			connectPacketCount;			// for display on connection dialog
@@ -263,7 +236,6 @@ typedef struct {
 	unsigned char	timeDemoDurations[ MAX_TIMEDEMO_DURATIONS ];	// log of frame durations
 
 #ifdef USE_VOIP
-	qboolean voipEnabled;
 	qboolean speexInitialized;
 	int speexFrameSize;
 	int speexSampleRate;
@@ -279,10 +251,9 @@ typedef struct {
 	qboolean voipMuteAll;
 
 	// outgoing data...
-	// if voipTargets[i / 8] & (1 << (i % 8)),
-	// then we are sending to clientnum i.
-	uint8_t voipTargets[(MAX_CLIENTS + 7) / 8];
-	uint8_t voipFlags;
+	int voipTarget1;  // these three ints make up a bit mask of 92 bits.
+	int voipTarget2;  //  the bits say who a VoIP pack is addressed to:
+	int voipTarget3;  //  (1 << clientnum). See cl_voipSendTarget cvar.
 	SpeexPreprocessState *speexPreprocessor;
 	SpeexBits speexEncoderBits;
 	void *speexEncoder;
@@ -292,10 +263,6 @@ typedef struct {
 	byte voipOutgoingGeneration;
 	byte voipOutgoingData[1024];
 	float voipPower;
-#endif
-
-#ifdef LEGACY_PROTOCOL
-	qboolean compat;
 #endif
 
 	// big stuff at end of structure so most offsets are 15 bits or less
@@ -328,6 +295,9 @@ typedef struct {
 	int			netType;
 	int			gameType;
 	int		  	clients;
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+	int			g_humanplayers;
+#endif
 	int		  	maxClients;
 	int			minPing;
 	int			maxPing;
@@ -336,14 +306,16 @@ typedef struct {
 #ifdef IOQUAKE3 // ZTM: punkbuster
 	int			punkbuster;
 #endif
-	int			g_humanplayers;
-	int			g_needpass;
 } serverInfo_t;
 
 typedef struct {
+	connstate_t	state;				// connection status
+
 #ifdef IOQUAKE3 // ZTM: CDKEY
 	qboolean	cddialog;			// bring up the cd needed dialog next frame
 #endif
+
+	char		servername[MAX_OSPATH];		// name of server from original connect (used by reconnect)
 
 	// when the server clears the hunk, all of these must be restarted
 	qboolean	rendererStarted;
@@ -371,9 +343,6 @@ typedef struct {
 	serverInfo_t	favoriteServers[MAX_OTHER_SERVERS];
 
 	int pingUpdateSource;		// source currently pinging or updating
-	
-	char		oldGame[MAX_QPATH];
-	qboolean	oldGameSet;
 
 	// update server info
 	netadr_t	updateServer;
@@ -419,22 +388,10 @@ extern	cvar_t	*cl_timeNudge;
 extern	cvar_t	*cl_showTimeDelta;
 extern	cvar_t	*cl_freezeDemo;
 
-#ifdef TA_SPLITVIEW
-extern	cvar_t	*cl_yawspeed[MAX_SPLITVIEW];
-extern	cvar_t	*cl_pitchspeed[MAX_SPLITVIEW];
-extern	cvar_t	*cl_anglespeedkey[MAX_SPLITVIEW];
-#else
 extern	cvar_t	*cl_yawspeed;
 extern	cvar_t	*cl_pitchspeed;
-extern	cvar_t	*cl_anglespeedkey;
-#endif
-#ifndef TURTLEARENA // ALWAYS_RUN
-#ifdef TA_SPLITVIEW
-extern	cvar_t	*cl_run[MAX_SPLITVIEW];
-#else
 extern	cvar_t	*cl_run;
-#endif
-#endif
+extern	cvar_t	*cl_anglespeedkey;
 
 extern	cvar_t	*cl_sensitivity;
 extern	cvar_t	*cl_freelook;
@@ -449,26 +406,6 @@ extern	cvar_t	*m_yaw;
 extern	cvar_t	*m_forward;
 extern	cvar_t	*m_side;
 extern	cvar_t	*m_filter;
-
-#ifdef TA_SPLITVIEW
-extern	cvar_t	*j_pitch[MAX_SPLITVIEW];
-extern	cvar_t	*j_yaw[MAX_SPLITVIEW];
-extern	cvar_t	*j_forward[MAX_SPLITVIEW];
-extern	cvar_t	*j_side[MAX_SPLITVIEW];
-extern	cvar_t	*j_pitch_axis[MAX_SPLITVIEW];
-extern	cvar_t	*j_yaw_axis[MAX_SPLITVIEW];
-extern	cvar_t	*j_forward_axis[MAX_SPLITVIEW];
-extern	cvar_t	*j_side_axis[MAX_SPLITVIEW];
-#else
-extern	cvar_t	*j_pitch;
-extern	cvar_t	*j_yaw;
-extern	cvar_t	*j_forward;
-extern	cvar_t	*j_side;
-extern	cvar_t	*j_pitch_axis;
-extern	cvar_t	*j_yaw_axis;
-extern	cvar_t	*j_forward_axis;
-extern	cvar_t	*j_side_axis;
-#endif
 
 extern	cvar_t	*cl_timedemo;
 extern	cvar_t	*cl_aviFrameRate;
@@ -518,6 +455,8 @@ extern	cvar_t	*cl_voip;
 //
 
 void CL_Init (void);
+void CL_FlushMemory(void);
+void CL_ShutdownAll(void);
 void CL_AddReliableCommand(const char *cmd, qboolean isDisconnectCmd);
 
 void CL_StartHunkUsers( qboolean rendererOnly );
@@ -541,7 +480,9 @@ int CL_GetPingQueueCount( void );
 
 void CL_ShutdownRef( void );
 void CL_InitRef( void );
+#ifndef STANDALONE
 qboolean CL_CDKeyValidate( const char *key, const char *checksum );
+#endif
 int CL_ServerStatus( char *serverAddress, char *serverStatusString, int maxLen );
 
 qboolean CL_CheckPaused(void);
@@ -557,18 +498,15 @@ typedef struct {
 	qboolean	wasPressed;		// set when down, not cleared when up
 } kbutton_t;
 
-#if 0
 extern	kbutton_t	in_mlook, in_klook;
 extern 	kbutton_t 	in_strafe;
 extern 	kbutton_t 	in_speed;
-#endif
 
 #ifdef USE_VOIP
 extern 	kbutton_t 	in_voiprecord;
 #endif
 
-void CL_InitInput(void);
-void CL_ShutdownInput(void);
+void CL_InitInput (void);
 void CL_SendCmd (void);
 void CL_ClearState (void);
 void CL_ReadPackets (void);
@@ -589,6 +527,7 @@ extern int cl_connectedToPureServer;
 extern int cl_connectedToCheatServer;
 
 #ifdef USE_VOIP
+extern int cl_connectedToVoipServer;
 void CL_Voip_f( void );
 #endif
 
@@ -611,8 +550,7 @@ qboolean CL_UpdateVisiblePings_f( int source );
 void Con_DrawCharacter (int cx, int line, int num);
 
 void Con_CheckResize (void);
-void Con_Init(void);
-void Con_Shutdown(void);
+void Con_Init (void);
 void Con_Clear_f (void);
 void Con_ToggleConsole_f (void);
 void Con_DrawNotify (void);
@@ -634,7 +572,7 @@ void CL_SaveConsoleHistory( void );
 void	SCR_Init (void);
 void	SCR_UpdateScreen (void);
 
-void	SCR_DebugGraph (float value);
+void	SCR_DebugGraph (float value, int color);
 
 int		SCR_GetBigStringWidth( const char *str );	// returns in virtual 640x480 coordinates
 
@@ -652,6 +590,7 @@ void	SCR_DrawFontStringExt( font_t *font, float x, float y, const char *string, 
 				qboolean noColorEscape, qboolean drawShadow, qboolean adjustFrom640, int maxChars );
 void	SCR_DrawFontString( font_t *font, int x, int y, const char *s, float alpha );
 void	SCR_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color );
+void    SCR_DrawConsoleFontChar( float x, float y, int ch );
 #endif
 void	SCR_DrawBigString( int x, int y, const char *s, float alpha, qboolean noColorEscape );			// draws a string with embedded color control characters with fade
 void	SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, qboolean noColorEscape );	// ignores embedded color control characters
@@ -719,6 +658,7 @@ void LAN_SaveServersToCache( void );
 // cl_net_chan.c
 //
 void CL_Netchan_Transmit( netchan_t *chan, msg_t* msg);	//int length, const byte *data );
+void CL_Netchan_TransmitNextFragment( netchan_t *chan );
 qboolean CL_Netchan_Process( netchan_t *chan, msg_t *msg );
 
 //
@@ -735,12 +675,4 @@ qboolean CL_VideoRecording( void );
 // cl_main.c
 //
 void CL_WriteDemoMessage ( msg_t *msg, int headerBytes );
-#ifdef IOQ3ZTM // PNG_SCREENSHOTS
-void CL_GetMapMessage(char *buf, int bufLength);
-#ifdef TA_SPLITVIEW
-qboolean CL_GetClientLocation(char *buf, int bufLength, int localClientNum);
-#else
-qboolean CL_GetClientLocation(char *buf, int bufLength);
-#endif
-#endif
 

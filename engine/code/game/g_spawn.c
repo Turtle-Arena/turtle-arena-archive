@@ -75,43 +75,50 @@ qboolean	G_SpawnVector( const char *key, const char *defaultString, float *out )
 // fields are needed for spawning from the entity string
 //
 typedef enum {
-	F_INT,
+	F_INT, 
 	F_FLOAT,
-	F_STRING,
+	F_LSTRING,			// string on disk, pointer in memory, TAG_LEVEL
+	F_GSTRING,			// string on disk, pointer in memory, TAG_GAME
 	F_VECTOR,
-	F_ANGLEHACK
+	F_ANGLEHACK,
+	F_ENTITY,			// index on disk, pointer in memory
+	F_ITEM,				// index on disk, pointer in memory
+	F_CLIENT,			// index on disk, pointer in memory
+	F_IGNORE
 } fieldtype_t;
 
 typedef struct
 {
 	char	*name;
-	size_t	ofs;
+	int		ofs;
 	fieldtype_t	type;
+	int		flags;
 } field_t;
 
 field_t fields[] = {
-    {"classname", FOFS(classname), F_STRING},
-    {"origin", FOFS(s.origin), F_VECTOR},
-    {"model", FOFS(model), F_STRING},
-    {"model2", FOFS(model2), F_STRING},
-    {"spawnflags", FOFS(spawnflags), F_INT},
-    {"speed", FOFS(speed), F_FLOAT},
-    {"target", FOFS(target), F_STRING},
+	{"classname", FOFS(classname), F_LSTRING},
+	{"origin", FOFS(s.origin), F_VECTOR},
+	{"model", FOFS(model), F_LSTRING},
+	{"model2", FOFS(model2), F_LSTRING},
+	{"spawnflags", FOFS(spawnflags), F_INT},
+	{"speed", FOFS(speed), F_FLOAT},
+	{"target", FOFS(target), F_LSTRING},
 #ifdef TA_ENTSYS
-	{"paintarget", FOFS(paintarget), F_STRING},
+	{"paintarget", FOFS(paintarget), F_LSTRING},
 #endif
-    {"targetname", FOFS(targetname), F_STRING},
-    {"message", FOFS(message), F_STRING},
-    {"team", FOFS(team), F_STRING},
-    {"wait", FOFS(wait), F_FLOAT},
-    {"random", FOFS(random), F_FLOAT},
-    {"count", FOFS(count), F_INT},
-    {"health", FOFS(health), F_INT},
-    {"dmg", FOFS(damage), F_INT},
-    {"angles", FOFS(s.angles), F_VECTOR},
-    {"angle", FOFS(s.angles), F_ANGLEHACK},
-    {"targetShaderName", FOFS(targetShaderName), F_STRING},
-    {"targetShaderNewName", FOFS(targetShaderNewName), F_STRING},
+	{"targetname", FOFS(targetname), F_LSTRING},
+	{"message", FOFS(message), F_LSTRING},
+	{"team", FOFS(team), F_LSTRING},
+	{"wait", FOFS(wait), F_FLOAT},
+	{"random", FOFS(random), F_FLOAT},
+	{"count", FOFS(count), F_INT},
+	{"health", FOFS(health), F_INT},
+	{"light", 0, F_IGNORE},
+	{"dmg", FOFS(damage), F_INT},
+	{"angles", FOFS(s.angles), F_VECTOR},
+	{"angle", FOFS(s.angles), F_ANGLEHACK},
+	{"targetShaderName", FOFS(targetShaderName), F_LSTRING},
+	{"targetShaderNewName", FOFS(targetShaderNewName), F_LSTRING},
 #ifdef TA_WEAPSYS // WIF_CUTS
 	{"mustcut", FOFS(mustcut), F_INT},
 #endif
@@ -128,6 +135,10 @@ typedef struct {
 void SP_info_player_start (gentity_t *ent);
 void SP_info_player_deathmatch (gentity_t *ent);
 void SP_info_player_intermission (gentity_t *ent);
+void SP_info_firstplace(gentity_t *ent);
+void SP_info_secondplace(gentity_t *ent);
+void SP_info_thirdplace(gentity_t *ent);
+void SP_info_podium(gentity_t *ent);
 
 void SP_func_plat (gentity_t *ent);
 void SP_func_static (gentity_t *ent);
@@ -160,6 +171,7 @@ void SP_target_delay (gentity_t *ent);
 void SP_target_speaker (gentity_t *ent);
 void SP_target_print (gentity_t *ent);
 void SP_target_laser (gentity_t *self);
+void SP_target_character (gentity_t *ent);
 void SP_target_score( gentity_t *ent );
 void SP_target_teleporter( gentity_t *ent );
 void SP_target_relay (gentity_t *ent);
@@ -169,6 +181,9 @@ void SP_target_location (gentity_t *ent);
 void SP_target_push (gentity_t *ent);
 #ifdef TA_SP
 void SP_target_level_end (gentity_t *ent);
+#endif
+#ifdef CAMERASCRIPT // ZTM: i made this
+void SP_target_start_camera (gentity_t *ent);
 #endif
 
 void SP_light (gentity_t *self);
@@ -279,6 +294,9 @@ spawn_t	spawns[] = {
 	{"target_push", SP_target_push},
 #ifdef TA_SP
 	{"target_level_end", SP_target_level_end},
+#endif
+#ifdef CAMERASCRIPT // ZTM: i made this
+	{"target_start_camera", SP_target_start_camera},
 #endif
 
 	{"light", SP_light},
@@ -479,7 +497,7 @@ void G_ParseField( const char *key, const char *value, gentity_t *ent ) {
 			b = (byte *)ent;
 
 			switch( f->type ) {
-			case F_STRING:
+			case F_LSTRING:
 				*(char **)(b+f->ofs) = G_NewString (value);
 				break;
 			case F_VECTOR:
@@ -500,18 +518,17 @@ void G_ParseField( const char *key, const char *value, gentity_t *ent ) {
 				((float *)(b+f->ofs))[1] = v;
 				((float *)(b+f->ofs))[2] = 0;
 				break;
+			default:
+			case F_IGNORE:
+				break;
 			}
 			return;
 		}
 	}
 }
 
-#define ADJUST_AREAPORTAL() \
-	if(ent->s.eType == ET_MOVER) \
-	{ \
-		trap_LinkEntity(ent); \
-		trap_AdjustAreaPortalState(ent, qtrue); \
-	}
+
+
 
 /*
 ===================
@@ -525,28 +542,11 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	int			i;
 	gentity_t	*ent;
 	char		*s, *value, *gametypeName;
-	static char *gametypeNames[] = {
-		"ffa",
-#ifdef TA_MISC // tornament to duel
-		"duel",
-#else
-		"tournament",
-#endif
-#ifdef TA_SP
-		"coop",
-#else
-		"single",
-#endif
-		"team",
-		"ctf",
-		"oneflag",
 #ifdef TA_MISC // tornament to duel, obelisk to overload
-		"overload",
+	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "overload", "harvester", "teamtournament"};
 #else
-		"obelisk",
+	static char *gametypeNames[] = {"ffa", "tournament", "single", "team", "ctf", "oneflag", "obelisk", "harvester", "teamtournament"};
 #endif
-		"harvester"
-	};
 
 	// get the next free entity
 	ent = G_Spawn();
@@ -556,15 +556,9 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	}
 
 	// check for "notsingle" flag
-#ifdef TA_SP
-	if ( g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER )
-#else
-	if ( g_gametype.integer == GT_SINGLE_PLAYER )
-#endif
-	{
+	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
 		G_SpawnInt( "notsingle", "0", &i );
 		if ( i ) {
-			ADJUST_AREAPORTAL();
 			G_FreeEntity( ent );
 			return;
 		}
@@ -573,14 +567,12 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	if ( g_gametype.integer >= GT_TEAM ) {
 		G_SpawnInt( "notteam", "0", &i );
 		if ( i ) {
-			ADJUST_AREAPORTAL();
 			G_FreeEntity( ent );
 			return;
 		}
 	} else {
 		G_SpawnInt( "notfree", "0", &i );
 		if ( i ) {
-			ADJUST_AREAPORTAL();
 			G_FreeEntity( ent );
 			return;
 		}
@@ -589,7 +581,6 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 #ifdef TURTLEARENA
 	G_SpawnInt( "notturtlearena", "0", &i );
 	if ( i ) {
-		ADJUST_AREAPORTAL();
 		G_FreeEntity( ent );
 		return;
 	}
@@ -597,64 +588,28 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 #ifdef MISSIONPACK
 	G_SpawnInt( "notta", "0", &i );
 	if ( i ) {
-		ADJUST_AREAPORTAL();
 		G_FreeEntity( ent );
 		return;
 	}
 #else
 	G_SpawnInt( "notq3a", "0", &i );
 	if ( i ) {
-		ADJUST_AREAPORTAL();
 		G_FreeEntity( ent );
 		return;
 	}
 #endif
 #endif
 
-#ifdef TA_SP // ZTM: Support single player and coop separately.
-	if ( g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER )
-		gametypeName = "single";
-	else if ( g_gametype.integer >= 0 && g_gametype.integer < ARRAY_LEN(gametypeNames) ) {
-		gametypeName = gametypeNames[g_gametype.integer];
-	} else {
-		gametypeName = NULL;
-	}
-#endif
-
-#ifdef IOQ3ZTM // ZTM: Allow not spawning in only some gametypes. Copied from OpenArena (oax)
-	if( G_SpawnString( "!gametype", NULL, &value ) ) {
-#ifndef TA_SP
-		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
-			gametypeName = gametypeNames[g_gametype.integer];
-#endif
-
-			s = strstr( value, gametypeName );
-			if( s ) {
-				ADJUST_AREAPORTAL();
-				G_FreeEntity( ent );
-				return;
-			}
-#ifndef TA_SP
-		}
-#endif
-	}
-#endif
-
 	if( G_SpawnString( "gametype", NULL, &value ) ) {
-#ifndef TA_SP
 		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
 			gametypeName = gametypeNames[g_gametype.integer];
-#endif
 
 			s = strstr( value, gametypeName );
 			if( !s ) {
-				ADJUST_AREAPORTAL();
 				G_FreeEntity( ent );
 				return;
 			}
-#ifndef TA_SP
 		}
-#endif
 	}
 
 	// move editor origin to pos
@@ -680,7 +635,7 @@ char *G_AddSpawnVarToken( const char *string ) {
 
 	l = strlen( string );
 	if ( level.numSpawnVarChars + l + 1 > MAX_SPAWN_VARS_CHARS ) {
-		G_Error( "G_AddSpawnVarToken: MAX_SPAWN_VARS" );
+		G_Error( "G_AddSpawnVarToken: MAX_SPAWN_CHARS" );
 	}
 
 	dest = level.spawnVarChars + level.numSpawnVarChars;
@@ -779,39 +734,23 @@ void SP_worldspawn( void ) {
 
 	G_SpawnString( "gravity", "800", &s );
 	trap_Cvar_Set( "g_gravity", s );
-#ifdef IOQ3ZTM // Don't print message about map changing gravity.
-	G_CvarClearModification(&g_gravity);
-#endif
 
-#ifdef MISSIONPACK
 	G_SpawnString( "enableDust", "0", &s );
 	trap_Cvar_Set( "g_enableDust", s );
-#ifdef IOQ3ZTM // Don't print message about map changing dust.
-	G_CvarClearModification(&g_enableDust);
-#endif
 
 	G_SpawnString( "enableBreath", "0", &s );
 	trap_Cvar_Set( "g_enableBreath", s );
-#ifdef IOQ3ZTM // Don't print message about map changing breath.
-	G_CvarClearModification(&g_enableBreath);
-#endif
-#endif
 
-#ifdef TA_PATHSYS // 2DMODE
-	G_SpawnString( "2dmode", "0", &s );
-	trap_Cvar_Set( "g_2dmode", s );
-#ifdef IOQ3ZTM // Don't print message about map changing 2d mode.
-	G_CvarClearModification(&g_2dmode);
-#endif
+#if 0 //#ifdef WOLFET // ZTM: Currently game doesn't need the tracemap
+	level.mapcoordsValid = qfalse;
+	if ( G_SpawnVector2D( "mapcoordsmins", "-128 128", level.mapcoordsMins ) &&  // top left
+		 G_SpawnVector2D( "mapcoordsmaxs", "128 -128", level.mapcoordsMaxs ) ) { // bottom right
+		level.mapcoordsValid = qtrue;
+	}
 #endif
 
 	g_entities[ENTITYNUM_WORLD].s.number = ENTITYNUM_WORLD;
-	g_entities[ENTITYNUM_WORLD].r.ownerNum = ENTITYNUM_NONE;
 	g_entities[ENTITYNUM_WORLD].classname = "worldspawn";
-
-	g_entities[ENTITYNUM_NONE].s.number = ENTITYNUM_NONE;
-	g_entities[ENTITYNUM_NONE].r.ownerNum = ENTITYNUM_NONE;
-	g_entities[ENTITYNUM_NONE].classname = "nothing";
 
 	// see if we want a warmup time
 	trap_SetConfigstring( CS_WARMUP, "" );

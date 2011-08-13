@@ -90,7 +90,7 @@ GLimp_Shutdown
 */
 void GLimp_Shutdown( void )
 {
-	ri.IN_Shutdown();
+	IN_Shutdown();
 
 	SDL_QuitSubSystem( SDL_INIT_VIDEO );
 	screen = NULL;
@@ -98,19 +98,6 @@ void GLimp_Shutdown( void )
 	Com_Memset( &glConfig, 0, sizeof( glConfig ) );
 	Com_Memset( &glState, 0, sizeof( glState ) );
 }
-
-/*
-===============
-GLimp_Minimize
-
-Minimize the game so that user is back at the desktop
-===============
-*/
-void GLimp_Minimize(void)
-{
-	SDL_WM_IconifyWindow();
-}
-
 
 /*
 ===============
@@ -247,18 +234,6 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 					"Cannot estimate display aspect, assuming 1.333\n" );
 		}
 	}
-
-#ifdef IOQ3ZTM
-	if( videoInfo->current_h > 0 ) {
-		glConfig.vidWidth = videoInfo->current_w;
-		glConfig.vidHeight = videoInfo->current_h;
-	} else {
-		glConfig.vidWidth = 480;
-		glConfig.vidHeight = 640;
-		ri.Printf( PRINT_ALL,
-				"Cannot determine display resolution, assuming 640x480\n" );
-	}
-#endif
 
 	ri.Printf (PRINT_ALL, "...setting mode %d:", mode );
 
@@ -476,10 +451,10 @@ static qboolean GLimp_StartDriverAndSetMode(int mode, qboolean fullscreen, qbool
 
 		SDL_VideoDriverName( driverName, sizeof( driverName ) - 1 );
 		ri.Printf( PRINT_ALL, "SDL using driver \"%s\"\n", driverName );
-		ri.Cvar_Set( "r_sdlDriver", driverName );
+		Cvar_Set( "r_sdlDriver", driverName );
 	}
 
-	if (fullscreen && ri.Cvar_VariableIntegerValue( "in_nograb" ) )
+	if (fullscreen && Cvar_VariableIntegerValue( "in_nograb" ) )
 	{
 		ri.Printf( PRINT_ALL, "Fullscreen not allowed with in_nograb 1\n");
 		ri.Cvar_Set( "r_fullscreen", "0" );
@@ -698,7 +673,7 @@ void GLimp_Init( void )
 	r_allowResize = ri.Cvar_Get( "r_allowResize", "0", CVAR_ARCHIVE );
 	r_centerWindow = ri.Cvar_Get( "r_centerWindow", "0", CVAR_ARCHIVE );
 
-	if( ri.Cvar_VariableIntegerValue( "com_abnormalExit" ) )
+	if( Cvar_VariableIntegerValue( "com_abnormalExit" ) )
 	{
 		ri.Cvar_Set( "r_mode", va( "%d", R_MODE_FALLBACK ) );
 		ri.Cvar_Set( "r_fullscreen", "0" );
@@ -706,16 +681,16 @@ void GLimp_Init( void )
 		ri.Cvar_Set( "com_abnormalExit", "0" );
 	}
 
-	ri.Sys_SetEnv( "SDL_VIDEO_CENTERED", r_centerWindow->integer ? "1" : "" );
+	Sys_SetEnv( "SDL_VIDEO_CENTERED", r_centerWindow->integer ? "1" : "" );
 
-	ri.Sys_GLimpInit( );
+	Sys_GLimpInit( );
 
 	// Create the window and set up the context
 	if(GLimp_StartDriverAndSetMode(r_mode->integer, r_fullscreen->integer, r_noborder->integer))
 		goto success;
 
 	// Try again, this time in a platform specific "safe mode"
-	ri.Sys_GLimpSafeInit( );
+	Sys_GLimpSafeInit( );
 
 	if(GLimp_StartDriverAndSetMode(r_mode->integer, r_fullscreen->integer, qfalse))
 		goto success;
@@ -731,7 +706,7 @@ void GLimp_Init( void )
 	}
 
 	// Nothing worked, give up
-	ri.Error( ERR_FATAL, "GLimp_Init() - could not load OpenGL subsystem" );
+	ri.Error( ERR_FATAL, "GLimp_Init() - could not load OpenGL subsystem\n" );
 
 success:
 	// This values force the UI to disable driver selection
@@ -759,7 +734,7 @@ success:
 	ri.Cvar_Get( "r_availableModes", "", CVAR_ROM );
 
 	// This depends on SDL_INIT_VIDEO, hence having it here
-	ri.IN_Init( );
+	IN_Init( );
 }
 
 
@@ -790,7 +765,7 @@ void GLimp_EndFrame( void )
 			// Find out the current state
 			fullscreen = !!( s->flags & SDL_FULLSCREEN );
 				
-			if( r_fullscreen->integer && ri.Cvar_VariableIntegerValue( "in_nograb" ) )
+			if( r_fullscreen->integer && Cvar_VariableIntegerValue( "in_nograb" ) )
 			{
 				ri.Printf( PRINT_ALL, "Fullscreen not allowed with in_nograb 1\n");
 				ri.Cvar_Set( "r_fullscreen", "0" );
@@ -808,9 +783,9 @@ void GLimp_EndFrame( void )
 		{
 			// SDL_WM_ToggleFullScreen didn't work, so do it the slow way
 			if( !sdlToggled )
-				ri.Cmd_ExecuteText(EXEC_APPEND, "vid_restart");
+				Cbuf_AddText( "vid_restart" );
 
-			ri.IN_Restart( );
+			IN_Restart( );
 		}
 
 		r_fullscreen->modified = qfalse;

@@ -185,10 +185,12 @@ int R_ComputeLOD( trRefEntity_t *ent ) {
 		// and use that as a criteria for selecting LOD
 
 #ifdef RAVENMD4
-		if(tr.currentModel->type == MOD_MDR)
+		// This is an MDR model.
+		
+		if(tr.currentModel->md4)
 		{
 			int frameSize;
-			mdr = (mdrHeader_t *) tr.currentModel->modelData;
+			mdr = (mdrHeader_t *) tr.currentModel->md4;
 			frameSize = (size_t) (&((mdrFrame_t *)0)->bones[mdr->numBones]);
 			
 			mdrframe = (mdrFrame_t *) ((byte *) mdr + mdr->ofsFrames + frameSize * ent->e.frame);
@@ -218,7 +220,7 @@ int R_ComputeLOD( trRefEntity_t *ent ) {
 		}
 
 		flod *= tr.currentModel->numLods;
-		lod = ri.ftol(flod);
+		lod = myftol( flod );
 
 		if ( lod < 0 )
 		{

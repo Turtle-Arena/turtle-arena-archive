@@ -51,9 +51,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static int			dp_realtime;
 static float		jumpHeight;
-#ifdef TA_WEAPSYS
-static int			atkAnim;
-#endif
 
 
 /*
@@ -111,7 +108,10 @@ tryagain:
 		strcat( path, "_flash.md3" );
 		pi->flashModel[i] = trap_R_RegisterModel( path );
 
-		VectorCopy(bg_weapongroupinfo[weaponNum].weapon[i]->flashColor, pi->flashDlightColor[i]);
+		MAKERGB( pi->flashDlightColor[i],
+				bg_weapongroupinfo[weaponNum].weapon[i]->flashColor[0],
+				bg_weapongroupinfo[weaponNum].weapon[i]->flashColor[1],
+				bg_weapongroupinfo[weaponNum].weapon[i]->flashColor[2] );
 	}
 #else
 #ifdef TA_ITEMSYS
@@ -910,7 +910,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #ifdef TA_WEAPSYS
 	int				i;
 	vec3_t			angles;
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 	char *newTagNames[3] = { "tag_hand_primary", "tag_hand_secondary", NULL };
 #endif
 	char *originalTagNames[3] = { "tag_weapon", "tag_flag", NULL };
@@ -1050,10 +1050,9 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 			gun[i].hModel = pi->weaponModel[i];
 			VectorCopy( origin, gun[i].lightingOrigin );
 			gun[i].renderfx = renderfx;
-			Byte4Copy( pi->c1RGBA, gun[i].shaderRGBA );
 
 			if (!originalTagNames[i]
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 				|| !newTagNames[i]
 #endif
 				)
@@ -1066,7 +1065,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 			}
 
 			if (
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, newTagNames[i]) &&
 #endif
 				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, originalTagNames[i]))
@@ -1080,12 +1079,6 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #else
 		memset( &gun, 0, sizeof(gun) );
 		gun.hModel = pi->weaponModel;
-		if( pi->currentWeapon == WP_RAILGUN ) {
-			Byte4Copy( pi->c1RGBA, gun.shaderRGBA );
-		}
-		else {
-			Byte4Copy( colorWhite, gun.shaderRGBA );
-		}
 		VectorCopy( origin, gun.lightingOrigin );
 		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
 		gun.renderfx = renderfx;
@@ -1158,7 +1151,6 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 			memset( &flash, 0, sizeof(flash) );
 			flash.hModel = pi->flashModel[i];
 			flashDlightColor = &pi->flashDlightColor[i];
-			Byte4Copy( pi->c1RGBA, flash.shaderRGBA );
 
 			if (!flash.hModel)
 				continue;
@@ -1178,12 +1170,6 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		if ( pi->flashModel ) {
 			memset( &flash, 0, sizeof(flash) );
 			flash.hModel = pi->flashModel;
-			if( pi->currentWeapon == WP_RAILGUN ) {
-				Byte4Copy( pi->c1RGBA, flash.shaderRGBA );
-			}
-			else {
-				Byte4Copy( colorWhite, flash.shaderRGBA );
-			}
 			VectorCopy( origin, flash.lightingOrigin );
 			UI_PositionEntityOnTag( &flash, &gun, pi->weaponModel, "tag_flash");
 			flash.renderfx = renderfx;
@@ -1388,7 +1374,7 @@ static qboolean UI_ParseAnimationFile( const char *filename, animation_t *animat
 	}
 
 	if ( i != MAX_ANIMATIONS ) {
-		Com_Printf( "Error parsing animation file: %s\n", filename );
+		Com_Printf( "Error parsing animation file: %s", filename );
 		return qfalse;
 	}
 
@@ -1572,35 +1558,8 @@ UI_PlayerInfo_SetInfo
 void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_t viewAngles, vec3_t moveAngles, weapon_t weaponNumber, qboolean chat ) {
 	int			currentAnim;
 	weapon_t	weaponNum;
-	int			c;
 
 	pi->chat = chat;
-
-	c = (int)trap_Cvar_VariableValue( "color1" );
- 
-	VectorClear( pi->color1 );
-
-	if( c < 1 || c > 7 ) {
-		VectorSet( pi->color1, 1, 1, 1 );
-	}
-	else {
-		if( c & 1 ) {
-			pi->color1[2] = 1.0f;
-		}
-
-		if( c & 2 ) {
-			pi->color1[1] = 1.0f;
-		}
-
-		if( c & 4 ) {
-			pi->color1[0] = 1.0f;
-		}
-	}
-
-	pi->c1RGBA[0] = 255 * pi->color1[0];
-	pi->c1RGBA[1] = 255 * pi->color1[1];
-	pi->c1RGBA[2] = 255 * pi->color1[2];
-	pi->c1RGBA[3] = 255;
 
 	// view angles
 	VectorCopy( viewAngles, pi->viewAngles );
@@ -1611,9 +1570,6 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	if ( pi->newModel ) {
 		pi->newModel = qfalse;
 
-#ifdef TA_WEAPSYS
-		atkAnim = 0;
-#endif
 		jumpHeight = 0;
 		pi->pendingLegsAnim = 0;
 		UI_ForceLegsAnim( pi, legsAnim );
@@ -1665,17 +1621,6 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 	}
 
 	// leg animation
-#ifdef TA_WEAPSYS
-	if (BG_PlayerAttackAnim(torsoAnim))
-	{
-		// if torso is attacking, possibly need to animate legs too.
-		currentAnim = BG_LegsAttackForWeapon(&pi->playercfg, weaponNum, atkAnim);
-		if (currentAnim != -1) {
-			legsAnim = currentAnim;
-		}
-	}
-#endif
-
 	currentAnim = pi->legsAnim & ~ANIM_TOGGLEBIT;
 	if ( legsAnim != LEGS_JUMP && ( currentAnim == LEGS_JUMP || currentAnim == LEGS_LAND ) ) {
 		pi->pendingLegsAnim = legsAnim;
@@ -1706,14 +1651,12 @@ void UI_PlayerInfo_SetInfo( playerInfo_t *pi, int legsAnim, int torsoAnim, vec3_
 #ifdef TA_WEAPSYS
 	if (BG_PlayerAttackAnim(torsoAnim))
 	{
-		torsoAnim = BG_TorsoAttackForWeapon(weaponNum, atkAnim);
+		torsoAnim = BG_TorsoAttackForWeapon(weaponNum);
 		if (!BG_WeaponHasMelee(weaponNum))
 		{
 			pi->muzzleFlashTime = dp_realtime + UI_TIMER_MUZZLE_FLASH;
 		}
 		//FIXME play firing sound here
-
-		atkAnim++;
 	}
 #else
 	if ( torsoAnim == TORSO_ATTACK || torsoAnim == TORSO_ATTACK2 ) {

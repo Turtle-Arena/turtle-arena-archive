@@ -50,32 +50,10 @@ typedef unsigned short sa_family_t;
 #	define EADDRNOTAVAIL	WSAEADDRNOTAVAIL
 #	define EAFNOSUPPORT		WSAEAFNOSUPPORT
 #	define ECONNRESET			WSAECONNRESET
-typedef u_long	ioctlarg_t;
 #	define socketError		WSAGetLastError( )
 
 static WSADATA	winsockdata;
 static qboolean	winsockInitialized = qfalse;
-
-#elif defined __wii__
-#include <errno.h>
-#include <network.h>
-#include <sys/types.h>
-
-typedef int SOCKET;
-typedef unsigned short int sa_family_t;
-
-# define socketError			errno
-# define closesocket			net_close
-# define sockaddr_storage sockaddr_in
-
-#define ioctlarg_t u_long
-#define sendto net_sendto
-#define select net_select
-#define recvfrom net_recvfrom
-#define socket net_socket
-#define ioctlsocket net_ioctl
-#define setsockopt net_setsockopt
-#define bind net_bind
 
 #else
 
@@ -84,11 +62,11 @@ typedef unsigned short int sa_family_t;
 #		define _BSD_SOCKLEN_T_
 #	endif
 
-#	include <sys/socket.h>
+#	include <arpa/inet.h>
 #	include <errno.h>
 #	include <netdb.h>
 #	include <netinet/in.h>
-#	include <arpa/inet.h>
+#	include <sys/socket.h>
 #	include <net/if.h>
 #	include <sys/ioctl.h>
 #	include <sys/types.h>
@@ -107,62 +85,44 @@ typedef int SOCKET;
 #	define SOCKET_ERROR			-1
 #	define closesocket			close
 #	define ioctlsocket			ioctl
-typedef int	ioctlarg_t;
 #	define socketError			errno
 
 #endif
 
-#ifndef __wii__
 static qboolean usingSocks = qfalse;
-#endif
 static int networkingEnabled = 0;
 
 static cvar_t	*net_enabled;
 
-#ifndef __wii__
 static cvar_t	*net_socksEnabled;
 static cvar_t	*net_socksServer;
 static cvar_t	*net_socksPort;
 static cvar_t	*net_socksUsername;
 static cvar_t	*net_socksPassword;
-#endif
 
 static cvar_t	*net_ip;
-#ifndef __wii__
 static cvar_t	*net_ip6;
-#endif
 static cvar_t	*net_port;
-#ifndef __wii__
 static cvar_t	*net_port6;
 static cvar_t	*net_mcast6addr;
 static cvar_t	*net_mcast6iface;
-#endif
 
-static cvar_t	*net_dropsim;
-
-#ifndef __wii__
 static struct sockaddr	socksRelayAddr;
-#endif
 
 static SOCKET	ip_socket = INVALID_SOCKET;
-#ifndef __wii__
 static SOCKET	ip6_socket = INVALID_SOCKET;
-#endif
 static SOCKET	socks_socket = INVALID_SOCKET;
-#ifndef __wii__
 static SOCKET	multicast6_socket = INVALID_SOCKET;
 
 // Keep track of currently joined multicast group.
 static struct ipv6_mreq curgroup;
 // And the currently bound address.
 static struct sockaddr_in6 boundto;
-#endif
 
 #ifndef IF_NAMESIZE
   #define IF_NAMESIZE 16
 #endif
 
-#ifndef __wii__
 // use an admin local address per default so that network admins can decide on how to handle quake3 traffic.
 #define NET_MULTICAST_IP6 "ff04::696f:7175:616b:6533"
 
@@ -180,8 +140,6 @@ typedef struct
 
 static nip_localaddr_t localIP[MAX_IPS];
 static int numIP;
-
-#endif
 
 
 //=============================================================================
@@ -243,7 +201,7 @@ char *NET_ErrorString( void ) {
 		default: return "NO ERROR";
 	}
 #else
-	return strerror(socketError);
+	return strerror (errno);
 #endif
 }
 
@@ -258,7 +216,6 @@ static void NetadrToSockadr( netadr_t *a, struct sockaddr *s ) {
 		((struct sockaddr_in *)s)->sin_addr.s_addr = *(int *)&a->ip;
 		((struct sockaddr_in *)s)->sin_port = a->port;
 	}
-#ifndef __wii__
 	else if( a->type == NA_IP6 ) {
 		((struct sockaddr_in6 *)s)->sin6_family = AF_INET6;
 		((struct sockaddr_in6 *)s)->sin6_addr = * ((struct in6_addr *) &a->ip6);
@@ -271,7 +228,6 @@ static void NetadrToSockadr( netadr_t *a, struct sockaddr *s ) {
 		((struct sockaddr_in6 *)s)->sin6_addr = curgroup.ipv6mr_multiaddr;
 		((struct sockaddr_in6 *)s)->sin6_port = a->port;
 	}
-#endif
 }
 
 
@@ -281,7 +237,6 @@ static void SockadrToNetadr( struct sockaddr *s, netadr_t *a ) {
 		*(int *)&a->ip = ((struct sockaddr_in *)s)->sin_addr.s_addr;
 		a->port = ((struct sockaddr_in *)s)->sin_port;
 	}
-#ifndef __wii__
 	else if(s->sa_family == AF_INET6)
 	{
 		a->type = NA_IP6;
@@ -289,11 +244,9 @@ static void SockadrToNetadr( struct sockaddr *s, netadr_t *a ) {
 		a->port = ((struct sockaddr_in6 *)s)->sin6_port;
 		a->scope_id = ((struct sockaddr_in6 *)s)->sin6_scope_id;
 	}
-#endif
 }
 
 
-#ifndef __wii__
 static struct addrinfo *SearchAddrInfo(struct addrinfo *hints, sa_family_t family)
 {
 	while(hints)
@@ -306,7 +259,6 @@ static struct addrinfo *SearchAddrInfo(struct addrinfo *hints, sa_family_t famil
 	
 	return NULL;
 }
-#endif
 
 /*
 =============
@@ -315,13 +267,6 @@ Sys_StringToSockaddr
 */
 static qboolean Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int sadr_len, sa_family_t family)
 {
-#ifdef __wii__
-	struct sockaddr_in *sadr_in = (struct sockaddr_in *)sadr;
-
-	sadr->sa_family = family;
-
-	return inet_aton(s, &sadr_in->sin_addr);
-#else
 	struct addrinfo hints;
 	struct addrinfo *res = NULL;
 	struct addrinfo *search = NULL;
@@ -364,11 +309,11 @@ static qboolean Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int s
 
 		if(search)
 		{
-			if(search->ai_addrlen > sadr_len)
-				search->ai_addrlen = sadr_len;
+			if(res->ai_addrlen > sadr_len)
+				res->ai_addrlen = sadr_len;
 				
-			memcpy(sadr, search->ai_addr, search->ai_addrlen);
-			freeaddrinfo(search);
+			memcpy(sadr, res->ai_addr, res->ai_addrlen);
+			freeaddrinfo(res);
 			
 			return qtrue;
 		}
@@ -382,7 +327,6 @@ static qboolean Sys_StringToSockaddr(const char *s, struct sockaddr *sadr, int s
 		freeaddrinfo(res);
 	
 	return qfalse;
-#endif
 }
 
 /*
@@ -392,11 +336,6 @@ Sys_SockaddrToString
 */
 static void Sys_SockaddrToString(char *dest, int destlen, struct sockaddr *input)
 {
-#ifdef __wii__
-	struct sockaddr_in *sadr_in = (struct sockaddr_in *)input;
-
-	Q_strncpyz(dest, inet_ntoa(sadr_in->sin_addr), destlen);
-#else
 	socklen_t inputlen;
 
 	if (input->sa_family == AF_INET6)
@@ -406,7 +345,6 @@ static void Sys_SockaddrToString(char *dest, int destlen, struct sockaddr *input
 
 	if(getnameinfo(input, inputlen, dest, destlen, NULL, 0, NI_NUMERICHOST) && destlen > 0)
 		*dest = '\0';
-#endif
 }
 
 /*
@@ -418,24 +356,14 @@ qboolean Sys_StringToAdr( const char *s, netadr_t *a, netadrtype_t family ) {
 	struct sockaddr_storage sadr;
 	sa_family_t fam;
 	
-#ifdef __wii__ // ZTM: FIXME: Unneeded?
-	if (!strcmp (s, "localhost")) {
-		memset (a, 0, sizeof(*a));
-		a->type = NA_LOOPBACK;
-		return qtrue;
-	}
-#endif
-
 	switch(family)
 	{
 		case NA_IP:
 			fam = AF_INET;
 		break;
-#ifndef __wii__
 		case NA_IP6:
 			fam = AF_INET6;
 		break;
-#endif
 		default:
 			fam = AF_UNSPEC;
 		break;
@@ -457,6 +385,7 @@ Compare without port, and up to the bit number given in netmask.
 */
 qboolean NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 {
+	qboolean differed;
 	byte cmpmask, *addra, *addrb;
 	int curbyte;
 	
@@ -474,7 +403,6 @@ qboolean NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 		if(netmask < 0 || netmask > 32)
 			netmask = 32;
 	}
-#ifndef __wii__
 	else if(a.type == NA_IP6)
 	{
 		addra = (byte *) &a.ip6;
@@ -483,19 +411,30 @@ qboolean NET_CompareBaseAdrMask(netadr_t a, netadr_t b, int netmask)
 		if(netmask < 0 || netmask > 128)
 			netmask = 128;
 	}
-#endif
 	else
 	{
 		Com_Printf ("NET_CompareBaseAdr: bad address type\n");
 		return qfalse;
 	}
 
-	curbyte = netmask >> 3;
+	differed = qfalse;
+	curbyte = 0;
 
-	if(curbyte && memcmp(addra, addrb, curbyte))
-			return qfalse;
+	while(netmask > 7)
+	{
+		if(addra[curbyte] != addrb[curbyte])
+		{
+			differed = qtrue;
+			break;
+		}
 
-	netmask &= 0x07;
+		curbyte++;
+		netmask -= 8;
+	}
+
+	if(differed)
+		return qfalse;
+
 	if(netmask)
 	{
 		cmpmask = (1 << netmask) - 1;
@@ -585,17 +524,16 @@ qboolean	NET_IsLocalAddress( netadr_t adr ) {
 
 /*
 ==================
-NET_GetPacket
+Sys_GetPacket
 
-Receive one packet
+Never called by the game logic, just the system event queing
 ==================
 */
 #ifdef _DEBUG
 int	recvfromCount;
 #endif
 
-qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
-{
+qboolean Sys_GetPacket( netadr_t *net_from, msg_t *net_message ) {
 	int 	ret;
 	struct sockaddr_storage from;
 	socklen_t	fromlen;
@@ -605,7 +543,7 @@ qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
 	recvfromCount++;		// performance check
 #endif
 	
-	if(ip_socket != INVALID_SOCKET && FD_ISSET(ip_socket, fdr))
+	if(ip_socket != INVALID_SOCKET)
 	{
 		fromlen = sizeof(from);
 		ret = recvfrom( ip_socket, (void *)net_message->data, net_message->maxsize, 0, (struct sockaddr *) &from, &fromlen );
@@ -622,7 +560,6 @@ qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
 
 			memset( ((struct sockaddr_in *)&from)->sin_zero, 0, 8 );
 		
-#ifndef __wii__
 			if ( usingSocks && memcmp( &from, &socksRelayAddr, fromlen ) == 0 ) {
 				if ( ret < 10 || net_message->data[0] != 0 || net_message->data[1] != 0 || net_message->data[2] != 0 || net_message->data[3] != 1 ) {
 					return qfalse;
@@ -636,15 +573,11 @@ qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
 				net_message->readcount = 10;
 			}
 			else {
-#endif
 				SockadrToNetadr( (struct sockaddr *) &from, net_from );
 				net_message->readcount = 0;
-#ifndef __wii__
 			}
-#endif
 		
-
-			if( ret >= net_message->maxsize ) {
+			if( ret == net_message->maxsize ) {
 				Com_Printf( "Oversize packet from %s\n", NET_AdrToString (*net_from) );
 				return qfalse;
 			}
@@ -654,8 +587,7 @@ qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
 		}
 	}
 	
-#ifndef __wii__
-	if(ip6_socket != INVALID_SOCKET && FD_ISSET(ip6_socket, fdr))
+	if(ip6_socket != INVALID_SOCKET)
 	{
 		fromlen = sizeof(from);
 		ret = recvfrom(ip6_socket, (void *)net_message->data, net_message->maxsize, 0, (struct sockaddr *) &from, &fromlen);
@@ -672,7 +604,7 @@ qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
 			SockadrToNetadr((struct sockaddr *) &from, net_from);
 			net_message->readcount = 0;
 		
-			if(ret >= net_message->maxsize)
+			if(ret == net_message->maxsize)
 			{
 				Com_Printf( "Oversize packet from %s\n", NET_AdrToString (*net_from) );
 				return qfalse;
@@ -683,7 +615,7 @@ qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
 		}
 	}
 
-	if(multicast6_socket != INVALID_SOCKET && multicast6_socket != ip6_socket && FD_ISSET(multicast6_socket, fdr))
+	if(multicast6_socket != INVALID_SOCKET && multicast6_socket != ip6_socket)
 	{
 		fromlen = sizeof(from);
 		ret = recvfrom(multicast6_socket, (void *)net_message->data, net_message->maxsize, 0, (struct sockaddr *) &from, &fromlen);
@@ -700,7 +632,7 @@ qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
 			SockadrToNetadr((struct sockaddr *) &from, net_from);
 			net_message->readcount = 0;
 		
-			if(ret >= net_message->maxsize)
+			if(ret == net_message->maxsize)
 			{
 				Com_Printf( "Oversize packet from %s\n", NET_AdrToString (*net_from) );
 				return qfalse;
@@ -710,7 +642,6 @@ qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
 			return qtrue;
 		}
 	}
-#endif
 	
 	
 	return qfalse;
@@ -718,9 +649,7 @@ qboolean NET_GetPacket(netadr_t *net_from, msg_t *net_message, fd_set *fdr)
 
 //=============================================================================
 
-#ifndef __wii__
 static char socksBuf[4096];
-#endif
 
 /*
 ==================
@@ -737,10 +666,6 @@ void Sys_SendPacket( int length, const void *data, netadr_t to ) {
 		return;
 	}
 
-#ifdef __wii__
-	if(ip_socket == INVALID_SOCKET && to.type == NA_IP)
-		return;
-#else
 	if( (ip_socket == INVALID_SOCKET && to.type == NA_IP) ||
 		(ip6_socket == INVALID_SOCKET && to.type == NA_IP6) ||
 		(ip6_socket == INVALID_SOCKET && to.type == NA_MULTICAST6) )
@@ -748,12 +673,10 @@ void Sys_SendPacket( int length, const void *data, netadr_t to ) {
 
 	if(to.type == NA_MULTICAST6 && (net_enabled->integer & NET_DISABLEMCAST))
 		return;
-#endif
 
 	memset(&addr, 0, sizeof(addr));
 	NetadrToSockadr( &to, (struct sockaddr *) &addr );
 
-#ifndef __wii__
 	if( usingSocks && to.type == NA_IP ) {
 		socksBuf[0] = 0;	// reserved
 		socksBuf[1] = 0;
@@ -766,13 +689,10 @@ void Sys_SendPacket( int length, const void *data, netadr_t to ) {
 	}
 	else {
 		if(addr.ss_family == AF_INET)
-#endif
 			ret = sendto( ip_socket, data, length, 0, (struct sockaddr *) &addr, sizeof(struct sockaddr_in) );
-#ifndef __wii__
 		else if(addr.ss_family == AF_INET6)
 			ret = sendto( ip6_socket, data, length, 0, (struct sockaddr *) &addr, sizeof(struct sockaddr_in6) );
 	}
-#endif
 	if( ret == SOCKET_ERROR ) {
 		int err = socketError;
 
@@ -801,11 +721,9 @@ LAN clients will have their rate var ignored
 ==================
 */
 qboolean Sys_IsLANAddress( netadr_t adr ) {
-#ifndef __wii__
 	int		index, run, addrsize;
 	qboolean differed;
 	byte *compareadr, *comparemask, *compareip;
-#endif
 
 	if( adr.type == NA_LOOPBACK ) {
 		return qtrue;
@@ -827,7 +745,6 @@ qboolean Sys_IsLANAddress( netadr_t adr ) {
 		if(adr.ip[0] == 127)
 			return qtrue;
 	}
-#ifndef __wii__
 	else if(adr.type == NA_IP6)
 	{
 		if(adr.ip6[0] == 0xfe && (adr.ip6[1] & 0xc0) == 0x80)
@@ -876,7 +793,6 @@ qboolean Sys_IsLANAddress( netadr_t adr ) {
 		}
 	}
 	
-#endif
 	return qfalse;
 }
 
@@ -886,13 +802,6 @@ Sys_ShowIP
 ==================
 */
 void Sys_ShowIP(void) {
-#ifdef __wii__
-	u32 ip;
-	u8 *splitip = (u8 *)&ip;
-
-	ip = net_gethostip();
-	Com_Printf("IP: %d.%d.%d.%d\n", splitip[0], splitip[1], splitip[2], splitip[3]);
-#else
 	int i;
 	char addrbuf[NET_ADDRSTRMAXLEN];
 
@@ -905,7 +814,6 @@ void Sys_ShowIP(void) {
 		else if(localIP[i].type == NA_IP6)
 			Com_Printf( "IP6: %s\n", addrbuf);
 	}
-#endif
 }
 
 
@@ -920,7 +828,7 @@ NET_IPSocket
 int NET_IPSocket( char *net_interface, int port, int *err ) {
 	SOCKET				newsocket;
 	struct sockaddr_in	address;
-	ioctlarg_t			_true = 1;
+	u_long				_true = 1;
 	int					i = 1;
 
 	*err = 0;
@@ -980,7 +888,6 @@ int NET_IPSocket( char *net_interface, int port, int *err ) {
 	return newsocket;
 }
 
-#ifndef __wii__
 /*
 ====================
 NET_IP6Socket
@@ -989,7 +896,7 @@ NET_IP6Socket
 int NET_IP6Socket( char *net_interface, int port, struct sockaddr_in6 *bindto, int *err ) {
 	SOCKET				newsocket;
 	struct sockaddr_in6	address;
-	ioctlarg_t			_true = 1;
+	u_long				_true = 1;
 
 	*err = 0;
 
@@ -1063,7 +970,6 @@ int NET_IP6Socket( char *net_interface, int port, struct sockaddr_in6 *bindto, i
 
 	return newsocket;
 }
-#endif
 
 /*
 ====================
@@ -1073,7 +979,6 @@ Set the current multicast group
 */
 void NET_SetMulticast6(void)
 {
-#ifndef __wii__
 	struct sockaddr_in6 addr;
 
 	if(!*net_mcast6addr->string || !Sys_StringToSockaddr(net_mcast6addr->string, (struct sockaddr *) &addr, sizeof(addr), AF_INET6))
@@ -1090,7 +995,7 @@ void NET_SetMulticast6(void)
 
 	if(*net_mcast6iface->string)
 	{
-#if defined _WIN32 || defined __wii__
+#ifdef _WIN32
 		curgroup.ipv6mr_interface = net_mcast6iface->integer;
 #else
 		curgroup.ipv6mr_interface = if_nametoindex(net_mcast6iface->string);
@@ -1098,7 +1003,6 @@ void NET_SetMulticast6(void)
 	}
 	else
 		curgroup.ipv6mr_interface = 0;
-#endif
 }
 
 /*
@@ -1109,22 +1013,11 @@ Join an ipv6 multicast group
 */
 void NET_JoinMulticast6(void)
 {
-#ifndef __wii__
 	int err;
 	
 	if(ip6_socket == INVALID_SOCKET || multicast6_socket != INVALID_SOCKET || (net_enabled->integer & NET_DISABLEMCAST))
 		return;
 	
-#ifdef __wii__
-// From Linux's in.h, GPL 2.1 or later
-#define IN6_IS_ADDR_UNSPECIFIED(a) \
-	(((__const uint32_t *) (a))[0] == 0				      \
-	 && ((__const uint32_t *) (a))[1] == 0				      \
-	 && ((__const uint32_t *) (a))[2] == 0				      \
-	 && ((__const uint32_t *) (a))[3] == 0)
-
-#define IN6_IS_ADDR_MULTICAST(a) (((__const uint8_t *) (a))[0] == 0xff)
-#endif
 	if(IN6_IS_ADDR_MULTICAST(&boundto.sin6_addr) || IN6_IS_ADDR_UNSPECIFIED(&boundto.sin6_addr))
 	{
 		// The way the socket was bound does not prohibit receiving multi-cast packets. So we don't need to open a new one.
@@ -1166,12 +1059,10 @@ void NET_JoinMulticast6(void)
 			return;
 		}
 	}
-#endif
 }
 
 void NET_LeaveMulticast6()
 {
-#ifndef __wii__
 	if(multicast6_socket != INVALID_SOCKET)
 	{
 		if(multicast6_socket != ip6_socket)
@@ -1181,10 +1072,8 @@ void NET_LeaveMulticast6()
 
 		multicast6_socket = INVALID_SOCKET;
 	}
-#endif
 }
 
-#ifndef __wii__
 /*
 ====================
 NET_OpenSocks
@@ -1192,6 +1081,7 @@ NET_OpenSocks
 */
 void NET_OpenSocks( int port ) {
 	struct sockaddr_in	address;
+	int					err;
 	struct hostent		*h;
 	int					len;
 	qboolean			rfc1929;
@@ -1202,12 +1092,14 @@ void NET_OpenSocks( int port ) {
 	Com_Printf( "Opening connection to SOCKS server.\n" );
 
 	if ( ( socks_socket = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP ) ) == INVALID_SOCKET ) {
+		err = socketError;
 		Com_Printf( "WARNING: NET_OpenSocks: socket: %s\n", NET_ErrorString() );
 		return;
 	}
 
 	h = gethostbyname( net_socksServer->string );
 	if ( h == NULL ) {
+		err = socketError;
 		Com_Printf( "WARNING: NET_OpenSocks: gethostbyname: %s\n", NET_ErrorString() );
 		return;
 	}
@@ -1220,6 +1112,7 @@ void NET_OpenSocks( int port ) {
 	address.sin_port = htons( (short)net_socksPort->integer );
 
 	if ( connect( socks_socket, (struct sockaddr *)&address, sizeof( address ) ) == SOCKET_ERROR ) {
+		err = socketError;
 		Com_Printf( "NET_OpenSocks: connect: %s\n", NET_ErrorString() );
 		return;
 	}
@@ -1247,6 +1140,7 @@ void NET_OpenSocks( int port ) {
 		buf[2] = 2;		// method #2 - method id #02: username/password
 	}
 	if ( send( socks_socket, (void *)buf, len, 0 ) == SOCKET_ERROR ) {
+		err = socketError;
 		Com_Printf( "NET_OpenSocks: send: %s\n", NET_ErrorString() );
 		return;
 	}
@@ -1254,6 +1148,7 @@ void NET_OpenSocks( int port ) {
 	// get the response
 	len = recv( socks_socket, (void *)buf, 64, 0 );
 	if ( len == SOCKET_ERROR ) {
+		err = socketError;
 		Com_Printf( "NET_OpenSocks: recv: %s\n", NET_ErrorString() );
 		return;
 	}
@@ -1292,6 +1187,7 @@ void NET_OpenSocks( int port ) {
 
 		// send it
 		if ( send( socks_socket, (void *)buf, 3 + ulen + plen, 0 ) == SOCKET_ERROR ) {
+			err = socketError;
 			Com_Printf( "NET_OpenSocks: send: %s\n", NET_ErrorString() );
 			return;
 		}
@@ -1299,6 +1195,7 @@ void NET_OpenSocks( int port ) {
 		// get the response
 		len = recv( socks_socket, (void *)buf, 64, 0 );
 		if ( len == SOCKET_ERROR ) {
+			err = socketError;
 			Com_Printf( "NET_OpenSocks: recv: %s\n", NET_ErrorString() );
 			return;
 		}
@@ -1320,6 +1217,7 @@ void NET_OpenSocks( int port ) {
 	*(int *)&buf[4] = INADDR_ANY;
 	*(short *)&buf[8] = htons( (short)port );		// port
 	if ( send( socks_socket, (void *)buf, 10, 0 ) == SOCKET_ERROR ) {
+		err = socketError;
 		Com_Printf( "NET_OpenSocks: send: %s\n", NET_ErrorString() );
 		return;
 	}
@@ -1327,6 +1225,7 @@ void NET_OpenSocks( int port ) {
 	// get the response
 	len = recv( socks_socket, (void *)buf, 64, 0 );
 	if( len == SOCKET_ERROR ) {
+		err = socketError;
 		Com_Printf( "NET_OpenSocks: recv: %s\n", NET_ErrorString() );
 		return;
 	}
@@ -1399,8 +1298,6 @@ static void NET_GetLocalAddress(void)
 {
 	struct ifaddrs *ifap, *search;
 
-	numIP = 0;
-
 	if(getifaddrs(&ifap))
 		Com_Printf("NET_GetLocalAddress: Unable to get list of network interfaces: %s\n", NET_ErrorString());
 	else
@@ -1422,8 +1319,6 @@ static void NET_GetLocalAddress( void ) {
 	char				hostname[256];
 	struct addrinfo	hint;
 	struct addrinfo	*res = NULL;
-
-	numIP = 0;
 
 	if(gethostname( hostname, 256 ) == SOCKET_ERROR)
 		return;
@@ -1467,7 +1362,6 @@ static void NET_GetLocalAddress( void ) {
 		freeaddrinfo(res);
 }
 #endif
-#endif
 
 /*
 ====================
@@ -1478,22 +1372,17 @@ void NET_OpenIP( void ) {
 	int		i;
 	int		err;
 	int		port;
-#ifndef __wii__
 	int		port6;
-#endif
 
 	port = net_port->integer;
-#ifndef __wii__
 	port6 = net_port6->integer;
 
 	NET_GetLocalAddress();
-#endif
 
 	// automatically scan for a valid port, so multiple
 	// dedicated servers can be started without requiring
 	// a different net_port for each one
 
-#ifndef __wii__
 	if(net_enabled->integer & NET_ENABLEV6)
 	{
 		for( i = 0 ; i < 10 ; i++ )
@@ -1513,7 +1402,6 @@ void NET_OpenIP( void ) {
 		if(ip6_socket == INVALID_SOCKET)
 			Com_Printf( "WARNING: Couldn't bind to a v6 ip address.\n");
 	}
-#endif
 
 	if(net_enabled->integer & NET_ENABLEV4)
 	{
@@ -1522,10 +1410,8 @@ void NET_OpenIP( void ) {
 			if (ip_socket != INVALID_SOCKET) {
 				Cvar_SetValue( "net_port", port + i );
 
-#ifndef __wii__
 				if (net_socksEnabled->integer)
 					NET_OpenSocks( port + i );
-#endif
 
 				break;
 			}
@@ -1568,17 +1454,14 @@ static qboolean NET_GetCvars( void ) {
 	modified += net_ip->modified;
 	net_ip->modified = qfalse;
 	
-#ifndef __wii__
 	net_ip6 = Cvar_Get( "net_ip6", "::", CVAR_LATCH );
 	modified += net_ip6->modified;
 	net_ip6->modified = qfalse;
-#endif
 	
 	net_port = Cvar_Get( "net_port", va( "%i", PORT_SERVER ), CVAR_LATCH );
 	modified += net_port->modified;
 	net_port->modified = qfalse;
 	
-#ifndef __wii__
 	net_port6 = Cvar_Get( "net_port6", va( "%i", PORT_SERVER ), CVAR_LATCH );
 	modified += net_port6->modified;
 	net_port6->modified = qfalse;
@@ -1615,9 +1498,6 @@ static qboolean NET_GetCvars( void ) {
 	net_socksPassword = Cvar_Get( "net_socksPassword", "", CVAR_LATCH | CVAR_ARCHIVE );
 	modified += net_socksPassword->modified;
 	net_socksPassword->modified = qfalse;
-#endif
-
-	net_dropsim = Cvar_Get("net_dropsim", "", CVAR_TEMP);
 
 	return modified ? qtrue : qfalse;
 }
@@ -1673,7 +1553,6 @@ void NET_Config( qboolean enableNetworking ) {
 			ip_socket = INVALID_SOCKET;
 		}
 
-#ifndef __wii__
 		if(multicast6_socket)
 		{
 			if(multicast6_socket != ip6_socket)
@@ -1686,7 +1565,6 @@ void NET_Config( qboolean enableNetworking ) {
 			closesocket( ip6_socket );
 			ip6_socket = INVALID_SOCKET;
 		}
-#endif
 
 		if ( socks_socket != INVALID_SOCKET ) {
 			closesocket( socks_socket );
@@ -1723,26 +1601,6 @@ void NET_Init( void ) {
 
 	winsockInitialized = qtrue;
 	Com_Printf( "Winsock Initialized\n" );
-#elif defined __wii__
-	extern void Sys_Wait(const char *message);
-
-	int i, ret;
-
-	printf("Starting Net_Init()...\n");
-
-	for(i=0; i<10; i++) {
-		ret = net_init();
-		if(ret < 0) {
-			printf("Net_Init() failed. Press A to retry, Home to quit.\n");
-			Sys_Wait("waiting...");
-			continue;
-		} else {
-			break;
-		}
-	}
-	printf("Net_Init() successful.\n");
-
-	Sys_ShowIP();
 #endif
 
 	NET_Config( qtrue );
@@ -1769,42 +1627,6 @@ void NET_Shutdown( void ) {
 #endif
 }
 
-/*
-====================
-NET_Event
-
-Called from NET_Sleep which uses select() to determine which sockets have seen action.
-====================
-*/
-
-void NET_Event(fd_set *fdr)
-{
-	byte bufData[MAX_MSGLEN + 1];
-	netadr_t from;
-	msg_t netmsg;
-	
-	while(1)
-	{
-		MSG_Init(&netmsg, bufData, sizeof(bufData));
-
-		if(NET_GetPacket(&from, &netmsg, fdr))
-		{
-			if(net_dropsim->value > 0.0f && net_dropsim->value <= 100.0f)
-			{
-				// com_dropsim->value percent of incoming packets get dropped.
-				if(rand() < (int) (((double) RAND_MAX) / 100.0 * (double) net_dropsim->value))
-					continue;          // drop this packet
-                        }
-
-			if(com_sv_running->integer)
-				Com_RunAndTimeServerPacket(&from, &netmsg);
-			else
-				CL_PacketEvent(from, &netmsg);
-		}
-		else
-			break;
-	}
-}
 
 /*
 ====================
@@ -1813,56 +1635,41 @@ NET_Sleep
 Sleeps msec or until something happens on the network
 ====================
 */
-void NET_Sleep(int msec)
-{
+void NET_Sleep( int msec ) {
 	struct timeval timeout;
-	fd_set fdr;
-	int highestfd = -1, retval;
+	fd_set	fdset;
+	int highestfd = -1;
 
-	if(msec < 0)
-		msec = 0;
+	if (!com_dedicated->integer)
+		return; // we're not a server, just run full speed
 
-	FD_ZERO(&fdr);
+	if (ip_socket == INVALID_SOCKET && ip6_socket == INVALID_SOCKET)
+		return;
+
+	if (msec < 0 )
+		return;
+
+	FD_ZERO(&fdset);
 
 	if(ip_socket != INVALID_SOCKET)
 	{
-		FD_SET(ip_socket, &fdr);
+		FD_SET(ip_socket, &fdset);
 
 		highestfd = ip_socket;
 	}
-#ifndef __wii__
 	if(ip6_socket != INVALID_SOCKET)
 	{
-		FD_SET(ip6_socket, &fdr);
+		FD_SET(ip6_socket, &fdset);
 		
 		if(ip6_socket > highestfd)
 			highestfd = ip6_socket;
 	}
-#endif
 
 	timeout.tv_sec = msec/1000;
 	timeout.tv_usec = (msec%1000)*1000;
-	
-#ifdef _WIN32
-	if(highestfd < 0)
-	{
-		// windows ain't happy when select is called without valid FDs
-		SleepEx(msec, 0);
-		return;
-	}
-#endif
-
-	retval = select(highestfd + 1, &fdr, NULL, NULL, &timeout);
-	
-	if(retval < 0)
-#ifdef __wii__ // ZTM: FIXME: ?
-		;
-#else
-		Com_Printf("Warning: select() syscall failed: %s\n", NET_ErrorString());
-#endif
-	else if(retval > 0)
-		NET_Event(&fdr);
+	select(highestfd + 1, &fdset, NULL, NULL, &timeout);
 }
+
 
 /*
 ====================

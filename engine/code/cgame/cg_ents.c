@@ -175,17 +175,16 @@ static void CG_EntityEffects( centity_t *cent ) {
 
 
 	// constant light glow
-	if(cent->currentState.constantLight)
-	{
+	if ( cent->currentState.constantLight ) {
 		int		cl;
-		float		i, r, g, b;
+		int		i, r, g, b;
 
 		cl = cent->currentState.constantLight;
-		r = (float) (cl & 0xFF) / 255.0;
-		g = (float) ((cl >> 8) & 0xFF) / 255.0;
-		b = (float) ((cl >> 16) & 0xFF) / 255.0;
-		i = (float) ((cl >> 24) & 0xFF) * 4.0;
-		trap_R_AddLightToScene(cent->lerpOrigin, i, r, g, b);
+		r = cl & 255;
+		g = ( cl >> 8 ) & 255;
+		b = ( cl >> 16 ) & 255;
+		i = ( ( cl >> 24 ) & 255 ) * 4;
+		trap_R_AddLightToScene( cent->lerpOrigin, i, r, g, b );
 	}
 
 }
@@ -221,7 +220,7 @@ static void CG_General( centity_t *cent ) {
 	ent.hModel = cgs.gameModels[s1->modelindex];
 
 	// player model
-	if (s1->number == cg.cur_ps->clientNum) {
+	if (s1->number == cg.snap->ps.clientNum) {
 #ifdef IOQ3ZTM // RENDERFLAGS
 		ent.renderfx |= RF_ONLY_MIRROR;
 #else
@@ -370,8 +369,8 @@ static void CG_MiscObject( centity_t *cent ) {
 		cent->oe.speed = 1.0f;
 
 		// Check if modelindex2 is config filename
-		if (s1->modelindex2 > 0) {
-			Q_strncpyz(filename, CG_ConfigString( CS_STRINGS + s1->modelindex2 - 1 ), MAX_QPATH);
+		if (s1->modelindex2 < 0) {
+			Q_strncpyz(filename, CG_ConfigString( CS_STRINGS + ((s1->modelindex2*-1)+1) ), MAX_QPATH);
 		} else {
 			// Use modelName with .cfg extension
 #ifdef TA_NPCSYS
@@ -407,17 +406,6 @@ static void CG_MiscObject( centity_t *cent ) {
 		{
 			cent->oe.model = cgs.gameModels[s1->modelindex];
 			cent->oe.skin = 0;
-
-			// Check for skin set in entity
-			if (s1->time2 > 0) {
-				const char *skin = CG_ConfigString( CS_STRINGS + s1->time2 - 1 );
-				cent->oe.skin = trap_R_RegisterSkin(skin);
-			}
-
-			// Check for default skin
-			if (!cent->oe.skin && *cent->objectcfg->skin) {
-				cent->oe.skin = trap_R_RegisterSkin(cent->objectcfg->skin);
-			}
 		}
 	}
 
@@ -447,10 +435,7 @@ static void CG_MiscObject( centity_t *cent ) {
 
 	ent.nonNormalizedAxes = qfalse;
 
-	// convert angles to axis
-	AnglesToAxis( cent->lerpAngles, ent.axis );
-
-	// change the size
+	// increase the size
 	if ( scale != 1.0f ) {
 		VectorScale( ent.axis[0], scale, ent.axis[0] );
 		VectorScale( ent.axis[1], scale, ent.axis[1] );
@@ -463,23 +448,23 @@ static void CG_MiscObject( centity_t *cent ) {
 
 	ent.hModel = cent->oe.model;
 	ent.customSkin = cent->oe.skin;
-#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-	ent.skinFraction = s1->skinFraction;
-#endif
 
 	// Flags for only drawing or not drawing a object in mirrors
-	if (s1->eFlags & EF_ONLY_MIRROR) {
+	if (cent->currentState.eFlags & EF_ONLY_MIRROR) {
 		ent.renderfx |= RF_ONLY_MIRROR;
-	} else if (s1->eFlags & EF_NOT_MIRROR) {
+	} else if (cent->currentState.eFlags & EF_NOT_MIRROR) {
 		ent.renderfx |= RF_NOT_MIRROR;
 	}
+
+	// convert angles to axis
+	AnglesToAxis( cent->lerpAngles, ent.axis );
 
 	// add to refresh list
 	trap_R_AddRefEntityToScene (&ent);
 
 #ifdef TA_NPCSYS
 	// Add NPC's weapon
-	// ZTM: TODO: Reuse the player weapon drawing code?
+	// ZTM: TODO: Can I reuse the player weapon drawing code?
 	// ZTM: TODO: Support secondary weapon model.
 	if (isNPC && s1->weapon > WP_NONE && s1->weapon < BG_NumWeaponGroups())
 	{
@@ -622,9 +607,8 @@ static void CG_Item( centity_t *cent ) {
 #endif
 
 #ifdef IOQ3ZTM // move icons as well as models.
-#ifdef TURTLEARENA
-	// CTF flags and score items do not bob.
-	if ((item->giType == IT_TEAM && item->giTag != 0) || item->giType == IT_SCORE)
+#ifdef TURTLEARENA // NIGHTS_ITEMS
+	if (item->giType == IT_SCORE)
 		itemBob = qfalse;
 	else
 #endif
@@ -674,13 +658,13 @@ static void CG_Item( centity_t *cent ) {
 
 	memset (&ent, 0, sizeof(ent));
 
-#ifdef TURTLEARENA
-	// CTF flags use real angles
-	if (item->giType == IT_TEAM && item->giTag != 0) {
-		VectorCopy(cent->currentState.angles, cent->lerpAngles);
-		AnglesToAxis( cent->lerpAngles, ent.axis );
-	} else
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have the railgun glow be black.
+	ent.shaderRGBA[0] = 255;
+	ent.shaderRGBA[1] = 255;
+	ent.shaderRGBA[2] = 255;
+	ent.shaderRGBA[3] = 255;
 #endif
+
 	// autorotate at one of two speeds
 	if ( item->giType == IT_HEALTH ) {
 		VectorCopy( cg.autoAnglesFast, cent->lerpAngles );
@@ -731,38 +715,6 @@ static void CG_Item( centity_t *cent ) {
 
 		cent->lerpOrigin[2] += 8;	// an extra height boost
 	}
-	
-#ifdef TA_WEAPSYS
-	if( item->giType == IT_WEAPON ) {
-#ifdef TA_SPLITVIEW
-		clientInfo_t *ci = &cgs.clientinfo[cg.snap->pss[0].clientNum];
-#else
-		clientInfo_t *ci = &cgs.clientinfo[cg.snap->ps.clientNum];
-#endif
-		if (BG_WeaponHasMelee(item->giTag)) {
-			Byte4Copy( ci->c1RGBA, ent.shaderRGBA );
-		} else {
-			Byte4Copy( ci->c2RGBA, ent.shaderRGBA );
-		}
-	}
-#else
-	if( item->giType == IT_WEAPON && item->giTag == WP_RAILGUN ) {
-#ifdef TA_SPLITVIEW
-		clientInfo_t *ci = &cgs.clientinfo[cg.snap->pss[0].clientNum];
-#else
-		clientInfo_t *ci = &cgs.clientinfo[cg.snap->ps.clientNum];
-#endif
-		Byte4Copy( ci->c1RGBA, ent.shaderRGBA );
-	}
-#endif
-#ifdef IOQ3ZTM // Have non-weapons use white
-	else {
-		ent.shaderRGBA[0] = 255;
-		ent.shaderRGBA[1] = 255;
-		ent.shaderRGBA[2] = 255;
-		ent.shaderRGBA[3] = 255;
-	}
-#endif
 
 	ent.hModel = cg_items[es->modelindex].models[0];
 #ifdef IOQ3ZTM // FLAG_MODEL
@@ -778,8 +730,10 @@ static void CG_Item( centity_t *cent ) {
 #ifdef IOQ3ZTM // ITEMS_DISAPPEAR
 	if (cent->currentState.modelindex2 != 0) // This is non-zero is it's a dropped item
 	{
-		// cent->currentState.frame is the msec till entity will be removed
-		msec = (cg.time - cent->miscTime - cent->currentState.frame) * -1;
+		if (cent->currentState.time2 > 0) // Dropped weapon by keypress
+			msec = (cg.time - cent->miscTime - 15000) * -1;
+		else
+			msec = (cg.time - cent->miscTime - 30000) * -1;
 	}
 	else
 #endif
@@ -844,7 +798,7 @@ static void CG_Item( centity_t *cent ) {
 #endif
 	}
 
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	if ( item->giType == IT_HOLDABLE && item->giTag == HI_KAMIKAZE ) {
 		VectorScale( ent.axis[0], 2, ent.axis[0] );
 		VectorScale( ent.axis[1], 2, ent.axis[1] );
@@ -997,8 +951,10 @@ static void CG_Missile( centity_t *cent ) {
 	s1 = &cent->currentState;
 #ifdef TA_WEAPSYS
 	if ( s1->weapon >= BG_NumProjectiles() )
-#else
+#elif defined IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
 	if ( s1->weapon >= WP_NUM_WEAPONS )
+#else
+	if ( s1->weapon > WP_NUM_WEAPONS )
 #endif
 	{
 		s1->weapon = 0;
@@ -1108,7 +1064,7 @@ static void CG_Missile( centity_t *cent ) {
 	} else if (s1->generic1 == TEAM_RED) {
 		ent.hModel = projectile->missileModelRed;
 	} else {
-		ent.hModel = projectile->missileModel;
+	ent.hModel = projectile->missileModel;
 	}
 	ent.renderfx = projectile->missileRenderfx | RF_NOSHADOW;
 #else
@@ -1247,8 +1203,10 @@ static void CG_Grapple( centity_t *cent ) {
 	s1 = &cent->currentState;
 #ifdef TA_WEAPSYS
 	if ( s1->weapon >= BG_NumProjectiles() )
-#else
+#elif defined IOQ3ZTM // IOQ3BUGFIX: Invalid weapon get run.
 	if ( s1->weapon >= WP_NUM_WEAPONS )
+#else
+	if ( s1->weapon > WP_NUM_WEAPONS )
 #endif
 	{
 		s1->weapon = 0;
@@ -1439,8 +1397,7 @@ Also called by client movement prediction code
 void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out ) {
 	centity_t	*cent;
 	vec3_t	oldOrigin, origin, deltaOrigin;
-	vec3_t	oldAngles, angles;
-	//vec3_t	deltaAngles;
+	vec3_t	oldAngles, angles, deltaAngles;
 
 	if ( moverNum <= 0 || moverNum >= ENTITYNUM_MAX_NORMAL ) {
 		VectorCopy( in, out );
@@ -1460,7 +1417,7 @@ void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int
 	BG_EvaluateTrajectory( &cent->currentState.apos, toTime, angles );
 
 	VectorSubtract( origin, oldOrigin, deltaOrigin );
-	//VectorSubtract( angles, oldAngles, deltaAngles );
+	VectorSubtract( angles, oldAngles, deltaAngles );
 
 	VectorAdd( in, deltaOrigin, out );
 
@@ -1539,9 +1496,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	// adjust for riding a mover if it wasn't rolled into the predicted
 	// player state
-#ifdef TA_SPLITVIEW // ZTM: Should check all local clients?
-#endif
-	if ( cent != &cg.cur_lc->predictedPlayerEntity ) {
+	if ( cent != &cg.predictedPlayerEntity ) {
 		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
 		cg.snap->serverTime, cg.time, cent->lerpOrigin );
 	}
@@ -1859,26 +1814,12 @@ void CG_AddPacketEntities( void ) {
 	AnglesToAxis( cg.autoAnglesFast, cg.autoAxisFast );
 
 	// generate and add the entity from the playerstate
-#ifdef TA_SPLITVIEW
-	for ( num = 0 ; num < MAX_SPLITVIEW ; num++ ) {
-		if (cg.snap->lcIndex[num] == -1) {
-			continue;
-		}
-		ps = &cg.localClients[num].predictedPlayerState;
-		BG_PlayerStateToEntityState( ps, &cg.localClients[num].predictedPlayerEntity.currentState, qfalse );
-		CG_AddCEntity( &cg.localClients[num].predictedPlayerEntity );
-
-		// lerp the non-predicted value for lightning gun origins
-		CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->pss[cg.snap->lcIndex[num]].clientNum ] );
-	}
-#else
-	ps = &cg.cur_lc->predictedPlayerState;
-	BG_PlayerStateToEntityState( ps, &cg.cur_lc->predictedPlayerEntity.currentState, qfalse );
-	CG_AddCEntity( &cg.cur_lc->predictedPlayerEntity );
+	ps = &cg.predictedPlayerState;
+	BG_PlayerStateToEntityState( ps, &cg.predictedPlayerEntity.currentState, qfalse );
+	CG_AddCEntity( &cg.predictedPlayerEntity );
 
 	// lerp the non-predicted value for lightning gun origins
-	CG_CalcEntityLerpPositions( &cg_entities[ cg.cur_ps->clientNum ] );
-#endif
+	CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->ps.clientNum ] );
 
 	// add each entity sent over by the server
 	for ( num = 0 ; num < cg.snap->numEntities ; num++ ) {

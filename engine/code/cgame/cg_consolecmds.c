@@ -156,28 +156,18 @@ static void CG_scrollScoresUp_f( void) {
 }
 #endif
 
-#ifndef TA_SP
 #ifdef MISSIONPACK
 static void CG_spWin_f( void) {
-#ifdef IOQ3ZTM // NEW_CAM
-	trap_Cvar_Set("cg_cameraOrbit", "60");
-#else
 	trap_Cvar_Set("cg_cameraOrbit", "2");
 	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
-#endif
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
-#ifndef TURTLEARENA // THIRD_PERSON
+#ifndef THIRD_PERSON
 	trap_Cvar_Set("cg_thirdPersonRange", "100");
 #endif
 	CG_AddBufferedSound(cgs.media.winnerSound);
 	//trap_S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
-#ifdef TA_SPLITVIEW
-	cg.cur_lc = &cg.localClients[0];
-#else
-	cg.cur_lc = &cg.localClient;
-#endif
-#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
+#ifndef MISSIONPACK_HUD2
 	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
 	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, 0);
@@ -185,32 +175,22 @@ static void CG_spWin_f( void) {
 }
 
 static void CG_spLose_f( void) {
-#ifdef IOQ3ZTM // NEW_CAM
-	trap_Cvar_Set("cg_cameraOrbit", "60");
-#else
 	trap_Cvar_Set("cg_cameraOrbit", "2");
 	trap_Cvar_Set("cg_cameraOrbitDelay", "35");
-#endif
 	trap_Cvar_Set("cg_thirdPerson", "1");
 	trap_Cvar_Set("cg_thirdPersonAngle", "0");
-#ifndef TURTLEARENA // THIRD_PERSON
+#ifndef THIRD_PERSON
 	trap_Cvar_Set("cg_thirdPersonRange", "100");
 #endif
 	CG_AddBufferedSound(cgs.media.loserSound);
 	//trap_S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
-#ifdef TA_SPLITVIEW
-	cg.cur_lc = &cg.localClients[0];
-#else
-	cg.cur_lc = &cg.localClient;
-#endif
-#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
+#ifndef MISSIONPACK_HUD2
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, 0);
 #endif
 }
 
-#endif
 #endif
 
 static void CG_TellTarget_f( void ) {
@@ -285,21 +265,12 @@ static void CG_PrevTeamMember_f( void ) {
 // ASS U ME's enumeration order as far as task specific orders, OFFENSE is zero, CAMP is last
 //
 static void CG_NextOrder_f( void ) {
-#ifdef TA_SPLITVIEW
-	clientInfo_t *ci = cgs.clientinfo + cg.snap->pss[0].clientNum;
-	if (ci) {
-		if (!ci->teamLeader && sortedTeamPlayers[cg_currentSelectedPlayer.integer] != cg.snap->pss[0].clientNum) {
-			return;
-		}
-	}
-#else
 	clientInfo_t *ci = cgs.clientinfo + cg.snap->ps.clientNum;
 	if (ci) {
 		if (!ci->teamLeader && sortedTeamPlayers[cg_currentSelectedPlayer.integer] != cg.snap->ps.clientNum) {
 			return;
 		}
 	}
-#endif
 	if (cgs.currentOrder < TEAMTASK_CAMP) {
 		cgs.currentOrder++;
 
@@ -466,19 +437,52 @@ static void CG_StartOrbit_f( void ) {
 	}
 	if (cg_cameraOrbit.value != 0) {
 		trap_Cvar_Set ("cg_cameraOrbit", "0");
-#ifndef TURTLEARENA // THIRD_PERSON
+#ifndef THIRD_PERSON
 		trap_Cvar_Set("cg_thirdPerson", "0");
 #endif
 	} else {
 		trap_Cvar_Set("cg_cameraOrbit", "5");
 		trap_Cvar_Set("cg_thirdPerson", "1");
 		trap_Cvar_Set("cg_thirdPersonAngle", "0");
-#ifndef TURTLEARENA // THIRD_PERSON
+#ifndef THIRD_PERSON
 		trap_Cvar_Set("cg_thirdPersonRange", "100");
 #endif
 	}
 }
 
+#ifdef CAMERASCRIPT
+/*
+==============
+CG_StartCamera
+==============
+*/
+void CG_StartCamera( const char *name, qboolean startBlack, qboolean endBlack) {
+	char lname[MAX_QPATH];
+	COM_StripExtension(name, lname, MAX_QPATH);
+	Q_strcat( lname, sizeof(lname), ".camera" );
+	if (trap_loadCamera(va("cameras/%s", lname))) {
+		cg.cameraMode = qtrue;
+		if(startBlack) {
+			CG_Fade(255, 0, 0);	// go black
+			CG_Fade(0, cg.time, 1500);
+		}
+
+#ifdef IOQ3ZTM // LETTERBOX
+		CG_ToggleLetterbox(qtrue, startBlack);
+#endif
+		cg.cameraEndBlack = endBlack;
+		trap_startCamera(cg.time);	// camera on in client
+	} else {
+		CG_Printf ("Unable to load camera %s\n",name);
+	}
+}
+
+static void CG_Camera_f( void ) {
+	char name[MAX_QPATH];
+	trap_Argv( 1, name, sizeof(name));
+	CG_StartCamera(name, qfalse, qfalse );
+}
+#else
 /*
 static void CG_Camera_f( void ) {
 	char name[1024];
@@ -491,218 +495,84 @@ static void CG_Camera_f( void ) {
 	}
 }
 */
+#endif
+
+#ifdef IOQ3ZTM // LETTERBOX
+void CG_Letterbox(void)
+{
+	qboolean onscreen, instant;
+	char name[MAX_QPATH];
+
+	trap_Argv( 1, name, sizeof(name));
+	onscreen = atoi(name);
+	trap_Argv( 2, name, sizeof(name));
+	instant = atoi(name);
+
+	CG_ToggleLetterbox( onscreen, instant );
+}
+#endif
 
 #ifdef IOQ3ZTM // NEW_CAM
-void CG_CamZoomIn(int localClient, qboolean down)
+void CG_CamMoveLeft(qboolean down)
 {
-#ifdef TA_SPLITVIEW
-	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
-#endif
-	lc->camZoomIn = down;
+	cg.camLeft = down;
 	if (down) {
-		lc->camZoomDir -= 1.0f;
-		lc->camReseting = qfalse;
+		cg.camRotDir += 1.0f;
+		cg.camReseting = qfalse;
 	}
 }
 
-void CG_CamZoomOut(int localClient, qboolean down)
+void CG_CamMoveRight(qboolean down)
 {
-#ifdef TA_SPLITVIEW
-	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
-#endif
-	lc->camZoomOut = down;
+	cg.camRight = down;
 	if (down) {
-		lc->camZoomDir += 1.0f;
-		lc->camReseting = qfalse;
+		cg.camRotDir -= 1.0f;
+		cg.camReseting = qfalse;
 	}
 }
 
-void CG_CamLeft(int localClient, qboolean down)
+
+void CG_CamLeftDown_f(void)
 {
-#ifdef TA_SPLITVIEW
-	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
+	CG_CamMoveLeft(qtrue);
+}
+
+void CG_CamLeftUp_f(void)
+{
+	CG_CamMoveLeft(qfalse);
+}
+
+void CG_CamRightDown_f(void)
+{
+	CG_CamMoveRight(qtrue);
+}
+
+void CG_CamRightUp_f(void)
+{
+	CG_CamMoveRight(qfalse);
+}
+
+void CG_CamReset_f(void)
+{
+	cg.camReseting = qtrue;
+	cg.camRotDir = 0;
+}
 #endif
-	lc->camLeft = down;
-	if (down) {
-		lc->camRotDir += 1.0f;
-		lc->camReseting = qfalse;
+
+#ifdef WOLFET
+void CG_GenerateTracemap(void)
+{
+	bgGenTracemap_t gen;
+
+	if ( !cg.mapcoordsValid ) {
+		CG_Printf( "Need valid mapcoords in the worldspawn to be able to generate a tracemap.\n" );
+		return;
 	}
-}
 
-void CG_CamRight(int localClient, qboolean down)
-{
-#ifdef TA_SPLITVIEW
-	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
-#endif
-	lc->camRight = down;
-	if (down) {
-		lc->camRotDir -= 1.0f;
-		lc->camReseting = qfalse;
-	}
-}
+	gen.trace = CG_Trace;
+	gen.pointcontents = CG_PointContents;
 
-void CG_CamReset(int localClient)
-{
-#ifdef TA_SPLITVIEW
-	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
-#endif
-	lc->camReseting = qtrue;
-	lc->camZoomDir = 0;
-	lc->camRotDir = 0;
-}
-
-void CG_CamZoomInDown_f(void) {
-	CG_CamZoomIn(0, qtrue);
-}
-
-void CG_CamZoomInUp_f(void) {
-	CG_CamZoomIn(0, qfalse);
-}
-
-void CG_CamZoomOutDown_f(void) {
-	CG_CamZoomOut(0, qtrue);
-}
-
-void CG_CamZoomOutUp_f(void) {
-	CG_CamZoomOut(0, qfalse);
-}
-
-void CG_CamLeftDown_f(void) {
-	CG_CamLeft(0, qtrue);
-}
-
-void CG_CamLeftUp_f(void) {
-	CG_CamLeft(0, qfalse);
-}
-
-void CG_CamRightDown_f(void) {
-	CG_CamRight(0, qtrue);
-}
-
-void CG_CamRightUp_f(void) {
-	CG_CamRight(0, qfalse);
-}
-
-void CG_CamReset_f(void) {
-	CG_CamReset(0);
-}
-
-void CG_2CamZoomInDown_f(void) {
-	CG_CamZoomIn(1, qtrue);
-}
-
-void CG_2CamZoomInUp_f(void) {
-	CG_CamZoomIn(1, qfalse);
-}
-
-void CG_2CamZoomOutDown_f(void) {
-	CG_CamZoomOut(1, qtrue);
-}
-
-void CG_2CamZoomOutUp_f(void) {
-	CG_CamZoomOut(1, qfalse);
-}
-
-void CG_2CamLeftDown_f(void) {
-	CG_CamLeft(1, qtrue);
-}
-
-void CG_2CamLeftUp_f(void) {
-	CG_CamLeft(1, qfalse);
-}
-
-void CG_2CamRightDown_f(void) {
-	CG_CamRight(1, qtrue);
-}
-
-void CG_2CamRightUp_f(void) {
-	CG_CamRight(1, qfalse);
-}
-
-void CG_2CamReset_f(void) {
-	CG_CamReset(1);
-}
-
-void CG_3CamZoomInDown_f(void) {
-	CG_CamZoomIn(2, qtrue);
-}
-
-void CG_3CamZoomInUp_f(void) {
-	CG_CamZoomIn(2, qfalse);
-}
-
-void CG_3CamZoomOutDown_f(void) {
-	CG_CamZoomOut(2, qtrue);
-}
-
-void CG_3CamZoomOutUp_f(void) {
-	CG_CamZoomOut(2, qfalse);
-}
-
-void CG_3CamLeftDown_f(void) {
-	CG_CamLeft(2, qtrue);
-}
-
-void CG_3CamLeftUp_f(void) {
-	CG_CamLeft(2, qfalse);
-}
-
-void CG_3CamRightDown_f(void) {
-	CG_CamRight(2, qtrue);
-}
-
-void CG_3CamRightUp_f(void) {
-	CG_CamRight(2, qfalse);
-}
-
-void CG_3CamReset_f(void) {
-	CG_CamReset(2);
-}
-
-void CG_4CamZoomInDown_f(void) {
-	CG_CamZoomIn(3, qtrue);
-}
-
-void CG_4CamZoomInUp_f(void) {
-	CG_CamZoomIn(3, qfalse);
-}
-
-void CG_4CamZoomOutDown_f(void) {
-	CG_CamZoomOut(3, qtrue);
-}
-
-void CG_4CamZoomOutUp_f(void) {
-	CG_CamZoomOut(3, qfalse);
-}
-
-void CG_4CamLeftDown_f(void) {
-	CG_CamLeft(3, qtrue);
-}
-
-void CG_4CamLeftUp_f(void) {
-	CG_CamLeft(3, qfalse);
-}
-
-void CG_4CamRightDown_f(void) {
-	CG_CamRight(3, qtrue);
-}
-
-void CG_4CamRightUp_f(void) {
-	CG_CamRight(3, qfalse);
-}
-
-void CG_4CamReset_f(void) {
-	CG_CamReset(3);
+	BG_GenerateTracemap(cgs.mapname, cg.mapcoordsMins, cg.mapcoordsMaxs, &gen);
 }
 #endif
 
@@ -724,14 +594,6 @@ static consoleCommand_t	commands[] = {
 #ifndef TURTLEARENA // NOZOOM
 	{ "+zoom", CG_ZoomDown_f },
 	{ "-zoom", CG_ZoomUp_f },
-#ifdef TA_SPLITVIEW
-	{ "+2zoom", CG_2ZoomDown_f },
-	{ "-2zoom", CG_2ZoomUp_f },
-	{ "+3zoom", CG_3ZoomDown_f },
-	{ "-3zoom", CG_3ZoomUp_f },
-	{ "+4zoom", CG_4ZoomDown_f },
-	{ "-4zoom", CG_4ZoomUp_f },
-#endif
 #endif
 #ifdef IOQ3ZTM // NEW_CAM
 	{ "camreset", CG_CamReset_f },
@@ -739,39 +601,6 @@ static consoleCommand_t	commands[] = {
 	{ "-camleft", CG_CamLeftUp_f },
 	{ "+camright", CG_CamRightDown_f },
 	{ "-camright", CG_CamRightUp_f },
-	{ "+camzoomin", CG_CamZoomInDown_f },
-	{ "-camzoomin", CG_CamZoomInUp_f },
-	{ "+camzoomout", CG_CamZoomOutDown_f },
-	{ "-camzoomout", CG_CamZoomOutUp_f },
-#ifdef TA_SPLITVIEW
-	{ "2camreset", CG_2CamReset_f },
-	{ "+2camleft", CG_2CamLeftDown_f },
-	{ "-2camleft", CG_2CamLeftUp_f },
-	{ "+2camright", CG_2CamRightDown_f },
-	{ "-2camright", CG_2CamRightUp_f },
-	{ "+2camzoomin", CG_2CamZoomInDown_f },
-	{ "-2camzoomin", CG_2CamZoomInUp_f },
-	{ "+2camzoomout", CG_2CamZoomOutDown_f },
-	{ "-2camzoomout", CG_2CamZoomOutUp_f },
-	{ "3camreset", CG_3CamReset_f },
-	{ "+3camleft", CG_3CamLeftDown_f },
-	{ "-3camleft", CG_3CamLeftUp_f },
-	{ "+3camright", CG_3CamRightDown_f },
-	{ "-3camright", CG_3CamRightUp_f },
-	{ "+3camzoomin", CG_3CamZoomInDown_f },
-	{ "-3camzoomin", CG_3CamZoomInUp_f },
-	{ "+3camzoomout", CG_3CamZoomOutDown_f },
-	{ "-3camzoomout", CG_3CamZoomOutUp_f },
-	{ "4camreset", CG_4CamReset_f },
-	{ "+4camleft", CG_4CamLeftDown_f },
-	{ "-4camleft", CG_4CamLeftUp_f },
-	{ "+4camright", CG_4CamRightDown_f },
-	{ "-4camright", CG_4CamRightUp_f },
-	{ "+4camzoomin", CG_4CamZoomInDown_f },
-	{ "-4camzoomin", CG_4CamZoomInUp_f },
-	{ "+4camzoomout", CG_4CamZoomOutDown_f },
-	{ "-4camzoomout", CG_4CamZoomOutUp_f },
-#endif
 #endif
 	{ "sizeup", CG_SizeUp_f },
 	{ "sizedown", CG_SizeDown_f },
@@ -779,33 +608,11 @@ static consoleCommand_t	commands[] = {
 	{ "weapnext", CG_NextWeapon_f },
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },
-#ifdef TA_SPLITVIEW
-	{ "2weapnext", CG_2NextWeapon_f },
-	{ "2weapprev", CG_2PrevWeapon_f },
-	{ "2weapon", CG_2Weapon_f },
-	{ "3weapnext", CG_3NextWeapon_f },
-	{ "3weapprev", CG_3PrevWeapon_f },
-	{ "3weapon", CG_3Weapon_f },
-	{ "4weapnext", CG_4NextWeapon_f },
-	{ "4weapprev", CG_4PrevWeapon_f },
-	{ "4weapon", CG_4Weapon_f },
-#endif
 #endif
 #ifdef TA_HOLDSYS/*2*/
 	{ "holdnext", CG_NextHoldable_f },
 	{ "holdprev", CG_PrevHoldable_f },
 	{ "holdable", CG_Holdable_f },
-#ifdef TA_SPLITVIEW
-	{ "2holdnext", CG_2NextHoldable_f },
-	{ "2holdprev", CG_2PrevHoldable_f },
-	{ "2holdable", CG_2Holdable_f },
-	{ "3holdnext", CG_3NextHoldable_f },
-	{ "3holdprev", CG_3PrevHoldable_f },
-	{ "3holdable", CG_3Holdable_f },
-	{ "4holdnext", CG_4NextHoldable_f },
-	{ "4holdprev", CG_4PrevHoldable_f },
-	{ "4holdable", CG_4Holdable_f },
-#endif
 #endif
 	{ "tell_target", CG_TellTarget_f },
 	{ "tell_attacker", CG_TellAttacker_f },
@@ -837,17 +644,25 @@ static consoleCommand_t	commands[] = {
 #ifndef TURTLEARENA // WEAPONS
 	{ "tauntGauntlet", CG_TauntGauntlet_f },
 #endif
-#ifndef TA_SP
 	{ "spWin", CG_spWin_f },
 	{ "spLose", CG_spLose_f },
-#endif
 #ifdef MISSIONPACK_HUD
 	{ "scoresDown", CG_scrollScoresDown_f },
 	{ "scoresUp", CG_scrollScoresUp_f },
 #endif
 #endif
 	{ "startOrbit", CG_StartOrbit_f },
+#ifdef CAMERASCRIPT
+	{ "camera", CG_Camera_f },
+#else
 	//{ "camera", CG_Camera_f },
+#endif
+#ifdef IOQ3ZTM // LETTERBOX
+	{ "letterbox", CG_Letterbox },
+#endif
+#ifdef WOLFET
+	{ "generateTracemap", CG_GenerateTracemap },
+#endif
 	{ "loaddeferred", CG_LoadDeferredPlayers } 
 };
 
@@ -866,7 +681,7 @@ qboolean CG_ConsoleCommand( void ) {
 
 	cmd = CG_Argv(0);
 
-	for ( i = 0 ; i < ARRAY_LEN( commands ) ; i++ ) {
+	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {
 		if ( !Q_stricmp( cmd, commands[i].cmd ) ) {
 			commands[i].function();
 			return qtrue;
@@ -875,6 +690,7 @@ qboolean CG_ConsoleCommand( void ) {
 
 	return qfalse;
 }
+
 
 /*
 =================
@@ -887,7 +703,7 @@ so it can perform tab completion
 void CG_InitConsoleCommands( void ) {
 	int		i;
 
-	for ( i = 0 ; i < ARRAY_LEN( commands ) ; i++ ) {
+	for ( i = 0 ; i < sizeof( commands ) / sizeof( commands[0] ) ; i++ ) {
 		trap_AddCommand( commands[i].cmd );
 	}
 
@@ -895,42 +711,6 @@ void CG_InitConsoleCommands( void ) {
 	// the game server will interpret these commands, which will be automatically
 	// forwarded to the server after they are not recognized locally
 	//
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		trap_AddCommand(Com_LocalClientCvarName(i, "say"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "say_team"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "tell"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "vsay"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "vsay_team"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "vtell"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "vosay"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "vosay_team"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "votell"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "vtaunt"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "give"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "god"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "notarget"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "noclip"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "kill"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "teamtask"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "levelshot"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "follow"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "follownext"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "followprev"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "team"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "callvote"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "vote"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "callteamvote"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "teamvote"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "setviewpos"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "stats"));
-#ifdef TA_MISC // DROP_FLAG
-		trap_AddCommand(Com_LocalClientCvarName(i, "dropflag"));
-#endif
-	}
-
-	trap_AddCommand ("addbot");
-#else
 	trap_AddCommand ("kill");
 	trap_AddCommand ("say");
 	trap_AddCommand ("say_team");
@@ -960,8 +740,12 @@ void CG_InitConsoleCommands( void ) {
 	trap_AddCommand ("dropflag");
 #endif
 	trap_AddCommand ("teamtask");
-#endif
-#ifndef IOQ3ZTM_NO_COMPAT // SPELLING
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Why hasn't this been corrected?
+	trap_AddCommand ("loaddeferred");
+#else
 	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
+#endif
+#ifdef IOQ3ZTM // LETTERBOX
+	trap_AddCommand ("letterbox" );
 #endif
 }

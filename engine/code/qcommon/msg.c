@@ -140,28 +140,23 @@ void MSG_WriteBits( msg_t *msg, int value, int bits ) {
 		bits = -bits;
 	}
 	if (msg->oob) {
-		if(bits==8)
-		{
+		if (bits==8) {
 			msg->data[msg->cursize] = value;
 			msg->cursize += 1;
 			msg->bit += 8;
-		}
-		else if(bits==16)
-		{
-			short temp = value;
-			
-			CopyLittleShort(&msg->data[msg->cursize], &temp);
+		} else if (bits==16) {
+			unsigned short *sp = (unsigned short *)&msg->data[msg->cursize];
+			*sp = LittleShort(value);
 			msg->cursize += 2;
 			msg->bit += 16;
-		}
-		else if(bits==32)
-		{
-			CopyLittleLong(&msg->data[msg->cursize], &value);
+		} else if (bits==32) {
+			unsigned int *ip = (unsigned int *)&msg->data[msg->cursize];
+			*ip = LittleLong(value);
 			msg->cursize += 4;
 			msg->bit += 32;
+		} else {
+			Com_Error(ERR_DROP, "can't read %d bits\n", bits);
 		}
-		else 
-			Com_Error(ERR_DROP, "can't write %d bits", bits);
 	} else {
 //		fp = fopen("c:\\netchan.bin", "a");
 		value &= (0xffffffff>>(32-bits));
@@ -203,29 +198,23 @@ int MSG_ReadBits( msg_t *msg, int bits ) {
 	}
 
 	if (msg->oob) {
-		if(bits==8)
-		{
+		if (bits==8) {
 			value = msg->data[msg->readcount];
 			msg->readcount += 1;
 			msg->bit += 8;
-		}
-		else if(bits==16)
-		{
-			short temp;
-			
-			CopyLittleShort(&temp, &msg->data[msg->readcount]);
-			value = temp;
+		} else if (bits==16) {
+			unsigned short *sp = (unsigned short *)&msg->data[msg->readcount];
+			value = LittleShort(*sp);
 			msg->readcount += 2;
 			msg->bit += 16;
-		}
-		else if(bits==32)
-		{
-			CopyLittleLong(&value, &msg->data[msg->readcount]);
+		} else if (bits==32) {
+			unsigned int *ip = (unsigned int *)&msg->data[msg->readcount];
+			value = LittleLong(*ip);
 			msg->readcount += 4;
 			msg->bit += 32;
+		} else {
+			Com_Error(ERR_DROP, "can't read %d bits\n", bits);
 		}
-		else
-			Com_Error(ERR_DROP, "can't read %d bits", bits);
 	} else {
 		nbits = 0;
 		if (bits&7) {
@@ -947,7 +936,7 @@ void MSG_WriteDeltaEntity( msg_t *msg, struct entityState_s *from, struct entity
 	float		fullFloat;
 	int			*fromF, *toF;
 
-	numFields = ARRAY_LEN( entityStateFields );
+	numFields = sizeof(entityStateFields)/sizeof(entityStateFields[0]);
 
 	// all fields should be 32 bits to avoid any compiler packing issues
 	// the "number" field is not part of the field list
@@ -1092,7 +1081,7 @@ void MSG_ReadDeltaEntity( msg_t *msg, entityState_t *from, entityState_t *to,
 		return;
 	}
 
-	numFields = ARRAY_LEN( entityStateFields );
+	numFields = sizeof(entityStateFields)/sizeof(entityStateFields[0]);
 	lc = MSG_ReadByte(msg);
 
 	if ( lc > numFields || lc < 0 ) {
@@ -1249,7 +1238,7 @@ netField_t	playerStateFields[] =
 #ifdef TA_HOLDSYS
 ,{ PSF(holdableIndex), 5 }
 #endif
-#if defined TURTLEARENA || defined NET_COMPAT // HOLD_SHURIKEN
+#if defined TA_HOLDABLE || defined NET_COMPAT // HOLD_SHURIKEN
 ,{ PSF(holdableTime), -16 }
 #endif
 #if defined TURTLEARENA || defined NET_COMPAT // LOCKON
@@ -1265,15 +1254,12 @@ netField_t	playerStateFields[] =
 { PSF(meleeLinkTime), 16 },
 { PSF(chain), 16 },
 { PSF(chainTime), 16 },
-{ PSF(weaponHands), 4 }
+{ PSF(weaponHands), 4 },
 #endif
 #ifdef TA_PLAYERSYS // LADDER
-,{ PSF(origin2[2]), 0 },
+{ PSF(origin2[2]), 0 },
 { PSF(origin2[0]), 0 },
-{ PSF(origin2[1]), 0 }
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-,{ PSF(pathMode), 8 }
+{ PSF(origin2[1]), 0 },
 #endif
 };
 
@@ -1294,6 +1280,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 	int				holdablebits;
 #endif
 	int				numFields;
+	int				c;
 	netField_t		*field;
 	int				*fromF, *toF;
 	float			fullFloat;
@@ -1304,7 +1291,9 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 		Com_Memset (&dummy, 0, sizeof(dummy));
 	}
 
-	numFields = ARRAY_LEN( playerStateFields );
+	c = msg->cursize;
+
+	numFields = sizeof( playerStateFields ) / sizeof( playerStateFields[0] );
 
 	lc = 0;
 	for ( i = 0, field = playerStateFields ; i < numFields ; i++, field++ ) {
@@ -1351,6 +1340,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 			MSG_WriteBits( msg, *toF, field->bits );
 		}
 	}
+	c = msg->cursize - c;
 
 
 	//
@@ -1494,7 +1484,7 @@ void MSG_ReadDeltaPlayerstate (msg_t *msg, playerState_t *from, playerState_t *t
 		print = 0;
 	}
 
-	numFields = ARRAY_LEN( playerStateFields );
+	numFields = sizeof( playerStateFields ) / sizeof( playerStateFields[0] );
 	lc = MSG_ReadByte(msg);
 
 	if ( lc > numFields || lc < 0 ) {

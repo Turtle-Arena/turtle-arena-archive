@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="8.00"
 	Name="q3_ui"
 	ProjectGUID="{D454C4C7-7765-4149-ABAD-05FDEB9D94F8}"
-	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -84,8 +83,6 @@
 				GenerateMapFile="true"
 				MapFileName="$(IntDir)\uix86.map"
 				BaseAddress="0x40000000"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				ImportLibrary="$(IntDir)\uix86.lib"
 				TargetMachine="1"
 			/>
@@ -106,6 +103,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -177,8 +177,6 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile="q3_ui.def"
 				ProgramDatabaseFile="$(IntDir)\uix86_old.pdb"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				ImportLibrary="$(IntDir)\q3_ui.lib"
 				TargetMachine="1"
 			/>
@@ -199,6 +197,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -270,8 +271,6 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\q3_ui.def"
 				ProgramDatabaseFile="$(IntDir)\uix86.pdb"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				ImportLibrary="$(IntDir)\uix86.lib"
 				TargetMachine="1"
 			/>
@@ -292,6 +291,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -367,8 +369,6 @@
 				GenerateMapFile="true"
 				MapFileName="$(IntDir)\uix86.map"
 				BaseAddress="0x40000000"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
 				ImportLibrary="$(IntDir)\uix86.lib"
 				TargetMachine="1"
 			/>
@@ -389,6 +389,9 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

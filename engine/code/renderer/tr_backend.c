@@ -189,7 +189,7 @@ void GL_TexEnv( int env )
 		qglTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD );
 		break;
 	default:
-		ri.Error( ERR_DROP, "GL_TexEnv: invalid env '%d' passed", env );
+		ri.Error( ERR_DROP, "GL_TexEnv: invalid env '%d' passed\n", env );
 		break;
 	}
 }
@@ -264,7 +264,7 @@ void GL_State( unsigned long stateBits )
 				break;
 			default:
 				srcFactor = GL_ONE;		// to get warning to shut up
-				ri.Error( ERR_DROP, "GL_State: invalid src blend state bits" );
+				ri.Error( ERR_DROP, "GL_State: invalid src blend state bits\n" );
 				break;
 			}
 
@@ -296,7 +296,7 @@ void GL_State( unsigned long stateBits )
 				break;
 			default:
 				dstFactor = GL_ONE;		// to get warning to shut up
-				ri.Error( ERR_DROP, "GL_State: invalid dst blend state bits" );
+				ri.Error( ERR_DROP, "GL_State: invalid dst blend state bits\n" );
 				break;
 			}
 
@@ -445,6 +445,11 @@ void RB_BeginDrawingView (void) {
 	// 2D images again
 	backEnd.projection2D = qfalse;
 
+	//
+	// set the modelview matrix for the viewer
+	//
+	SetViewportAndScissor();
+
 	// ensures that depth writes are enabled for the depth clear
 	GL_State( GLS_DEFAULT );
 	// clear relevant buffers
@@ -464,11 +469,6 @@ void RB_BeginDrawingView (void) {
 #endif
 	}
 	qglClear( clearBits );
-
-	//
-	// set the modelview matrix for the viewer
-	//
-	SetViewportAndScissor();
 
 	if ( ( backEnd.refdef.rdflags & RDF_HYPERSPACE ) )
 	{
@@ -774,7 +774,7 @@ void RE_StretchRaw (int x, int y, int w, int h, int cols, int rows, const byte *
 	// we definately want to sync every frame for the cinematics
 	qglFinish();
 
-	start = 0;
+	start = end = 0;
 	if ( r_speeds->integer ) {
 		start = ri.Milliseconds();
 	}
@@ -964,6 +964,10 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 	backEnd.refdef = cmd->refdef;
 	backEnd.viewParms = cmd->viewParms;
+#ifdef OA_BLOOM
+	//TODO Maybe check for rdf_noworld stuff but q3mme has full 3d ui
+	backEnd.doneSurfaces = qtrue;
+#endif
 
 	RB_RenderDrawSurfList( cmd->drawSurfs, cmd->numDrawSurfs );
 
@@ -1143,28 +1147,13 @@ const void	*RB_SwapBuffers( const void *data ) {
 	GLimp_EndFrame();
 
 	backEnd.projection2D = qfalse;
-
-	return (const void *)(cmd + 1);
-}
-
-#ifdef TA_BLOOM
-/*
-=============
-RB_Bloom
-
-=============
-*/
-const void	*RB_Bloom( const void *data ) {
-	const bloomCommand_t	*cmd;
-
-	cmd = (const bloomCommand_t *)data;
-
-	// Do the bloom effect
-	R_BloomScreen(cmd->x, cmd->y, cmd->w, cmd->h);
-
-	return (const void *)(cmd + 1);
-}
+#ifdef OA_BLOOM
+	backEnd.doneBloom = qfalse;
+	backEnd.doneSurfaces = qfalse;
 #endif
+
+	return (const void *)(cmd + 1);
+}
 
 /*
 ====================
@@ -1186,13 +1175,15 @@ void RB_ExecuteRenderCommands( const void *data ) {
 	}
 
 	while ( 1 ) {
-		data = PADP(data, sizeof(void *));
-
 		switch ( *(const int *)data ) {
 		case RC_SET_COLOR:
 			data = RB_SetColor( data );
 			break;
 		case RC_STRETCH_PIC:
+#ifdef OA_BLOOM
+			//Check if it's time for BLOOM!
+			R_BloomScreen();
+#endif
 			data = RB_StretchPic( data );
 			break;
 		case RC_DRAW_SURFS:
@@ -1202,6 +1193,10 @@ void RB_ExecuteRenderCommands( const void *data ) {
 			data = RB_DrawBuffer( data );
 			break;
 		case RC_SWAP_BUFFERS:
+#ifdef OA_BLOOM
+			//Check if it's time for BLOOM!
+			R_BloomScreen();
+#endif
 			data = RB_SwapBuffers( data );
 			break;
 		case RC_SCREENSHOT:
@@ -1216,11 +1211,6 @@ void RB_ExecuteRenderCommands( const void *data ) {
 		case RC_CLEARDEPTH:
 			data = RB_ClearDepth(data);
 			break;
-#ifdef TA_BLOOM
-		case RC_BLOOM:
-			data = RB_Bloom(data);
-			break;
-#endif
 		case RC_END_OF_LIST:
 		default:
 			// stop rendering on this thread

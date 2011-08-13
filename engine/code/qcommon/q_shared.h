@@ -26,56 +26,43 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#ifdef TA_MAIN
-  #define PRODUCT_NAME				"Turtle Arena"
-  #define BASEGAME					"base"
-  #define CLIENT_WINDOW_TITLE		"Turtle Arena"
-  #define CLIENT_WINDOW_MIN_TITLE	"Turtle Arena"
-  #define HOMEPATH_NAME_UNIX		".turtlearena"
-  #define HOMEPATH_NAME_WIN			"TurtleArena"
-  #define HOMEPATH_NAME_MACOSX		HOMEPATH_NAME_WIN
-  #define GAMENAME_FOR_MASTER		"TurtleArena"		// must NOT contain whitespaces
-//  #define LEGACY_PROTOCOL
-#elif defined STANDALONE
-  #define PRODUCT_NAME			"iofoo3"
-  #define BASEGAME			"foobar"
-  #define CLIENT_WINDOW_TITLE     	"changeme"
-  #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
-  #define HOMEPATH_NAME_UNIX		".foo"
-  #define HOMEPATH_NAME_WIN		"FooBar"
-  #define HOMEPATH_NAME_MACOSX		HOMEPATH_NAME_WIN
- #define GAMENAME_FOR_MASTER		"foobar"	// must NOT contain whitespace
-//  #define LEGACY_PROTOCOL	// You probably don't need this for your standalone game
+#ifdef STANDALONE
+  #ifdef TURTLEARENA
+    #define PRODUCT_NAME			"Turtle Arena"
+    #define BASEGAME				"base"
+    #define CLIENT_WINDOW_TITLE     "Turtle Arena"
+    #define CLIENT_WINDOW_MIN_TITLE "Turtle Arena"
+    #define GAMENAME_FOR_MASTER		"TurtleArena"
+  #elif defined IOQ3ZTM
+	// Standalone IOQ3ZTM is a mod for Turtle Arena
+    #define PRODUCT_NAME			"ioq3turtle"
+    #define BASEGAME				"base"
+    #define CLIENT_WINDOW_TITLE     "ioquake3turtle"
+    #define CLIENT_WINDOW_MIN_TITLE "ioq3turtle"
+    #define GAMENAME_FOR_MASTER		"TurtleArena"
+  #else
+    #define PRODUCT_NAME			"iofoo3"
+    #define BASEGAME			"foobar"
+    #define CLIENT_WINDOW_TITLE     	"changeme"
+    #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
+    #define GAMENAME_FOR_MASTER		"iofoo3"	// must NOT contain whitespaces
+  #endif
 #else
   #define PRODUCT_NAME			"ioq3"
   #define BASEGAME			"baseq3"
   #define CLIENT_WINDOW_TITLE     	"ioquake3"
   #define CLIENT_WINDOW_MIN_TITLE 	"ioq3"
-  #define HOMEPATH_NAME_UNIX		".q3a"
-  #define HOMEPATH_NAME_WIN		"Quake3"
-  #define HOMEPATH_NAME_MACOSX		HOMEPATH_NAME_WIN
   #define GAMENAME_FOR_MASTER		"Quake3Arena"
-  #define LEGACY_PROTOCOL
 #endif
-
-// Heartbeat for dpmaster protocol. You shouldn't change this unless you know what you're doing
-#define HEARTBEAT_FOR_MASTER		"DarkPlaces"
-#ifdef IOQ3ZTM // SV_PUBLIC
-#define FLATLINE_FOR_MASTER			HEARTBEAT_FOR_MASTER
-#endif
-
-// ZTM: id software basegames to not auto download
-#define BASEQ3						"baseq3"
-#define BASETA						"missionpack"
 
 #ifdef TA_SP
-  // It's really "fs_game\\saves", so each mod has its own saves dir.
+  // Its really "fs_game\\saves", so each mod has its own saves dir.
   #define SAVEGAMEDIR "saves"
 #endif
 
 #ifndef PRODUCT_VERSION
-  #ifdef TA_MAIN
-    #define PRODUCT_VERSION "0.5.1"
+  #ifdef TURTLEARENA
+    #define PRODUCT_VERSION "0.4.3"
   #else
     #define PRODUCT_VERSION "1.36"
   #endif
@@ -83,10 +70,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define Q3_VERSION PRODUCT_NAME " " PRODUCT_VERSION
 
-#define MAX_TEAMNAME		32
-#define MAX_MASTER_SERVERS      5	// number of supported master servers
-
-#define DEMOEXT	"dm_"			// standard demo extension
+#define MAX_TEAMNAME 32
 
 #ifdef _MSC_VER
 
@@ -165,6 +149,16 @@ typedef int intptr_t;
 #include <ctype.h>
 #include <limits.h>
 
+// vsnprintf is ISO/IEC 9899:1999
+// abstracting this to make it portable
+#ifdef _WIN32
+  #define Q_vsnprintf _vsnprintf
+  #define Q_snprintf _snprintf
+#else
+  #define Q_vsnprintf vsnprintf
+  #define Q_snprintf snprintf
+#endif
+
 #ifdef _MSC_VER
   #include <io.h>
 
@@ -176,14 +170,8 @@ typedef int intptr_t;
   typedef unsigned __int32 uint32_t;
   typedef unsigned __int16 uint16_t;
   typedef unsigned __int8 uint8_t;
-
-  // vsnprintf is ISO/IEC 9899:1999
-  // abstracting this to make it portable
-  int Q_vsnprintf(char *str, size_t size, const char *format, va_list ap);
 #else
   #include <stdint.h>
-
-  #define Q_vsnprintf vsnprintf
 #endif
 
 #endif
@@ -208,15 +196,12 @@ typedef int		sfxHandle_t;
 typedef int		fileHandle_t;
 typedef int		clipHandle_t;
 
-#define PAD(base, alignment)	(((base)+(alignment)-1) & ~((alignment)-1))
-#define PADLEN(base, alignment)	(PAD((base), (alignment)) - (base))
-
-#define PADP(base, alignment)	((void *) PAD((intptr_t) (base), (alignment)))
+#define PAD(x,y) (((x)+(y)-1) & ~((y)-1))
 
 #ifdef __GNUC__
-#define QALIGN(x) __attribute__((aligned(x)))
+#define ALIGN(x) __attribute__((aligned(x)))
 #else
-#define QALIGN(x)
+#define ALIGN(x)
 #endif
 
 #ifndef NULL
@@ -230,8 +215,8 @@ typedef int		clipHandle_t;
 #define	MAX_QINT			0x7fffffff
 #define	MIN_QINT			(-MAX_QINT-1)
 
-#define ARRAY_LEN(x)			(sizeof(x) / sizeof(*(x)))
-#define STRARRAY_LEN(x)			(ARRAY_LEN(x) - 1)
+#define ARRAY_LEN(x)			(sizeof(x) / sizeof(*x))
+
 
 // angle indexes
 #define	PITCH				0		// up / down
@@ -408,11 +393,7 @@ extern	vec4_t		colorMdGrey;
 extern	vec4_t		colorDkGrey;
 
 #define Q_COLOR_ESCAPE	'^'
-#ifdef IOQ3ZTM // ZTM: Only be true if it is a real color string.
-#define Q_IsColorString(p)	((p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) && (*((p)+1) >= '0' && *((p)+1) <= '7')) // ^[0-7]
-#else
 #define Q_IsColorString(p)	((p) && *(p) == Q_COLOR_ESCAPE && *((p)+1) && isalnum(*((p)+1))) // ^[0-9a-zA-Z]
-#endif
 
 #define COLOR_BLACK	'0'
 #define COLOR_RED	'1'
@@ -449,60 +430,6 @@ extern	vec3_t	axisDefault[3];
 #define	nanmask (255<<23)
 
 #define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
-
-int Q_isnan(float x);
-
-#if idx64
-  extern long qftolsse(float f);
-  extern int qvmftolsse(void);
-  extern void qsnapvectorsse(vec3_t vec);
-
-  #define Q_ftol qftolsse
-  #define Q_SnapVector qsnapvectorsse
-
-  extern int (*Q_VMftol)(void);
-#elif id386
-  extern long QDECL qftolx87(float f);
-  extern long QDECL qftolsse(float f);
-  extern int QDECL qvmftolx87(void);
-  extern int QDECL qvmftolsse(void);
-  extern void QDECL qsnapvectorx87(vec3_t vec);
-  extern void QDECL qsnapvectorsse(vec3_t vec);
-
-  extern long (QDECL *Q_ftol)(float f);
-  extern int (QDECL *Q_VMftol)(void);
-  extern void (QDECL *Q_SnapVector)(vec3_t vec);
-#else
-  // Q_ftol must expand to a function name so the pluggable renderer can take
-  // its address
-  #define Q_ftol lrintf
-  #define Q_SnapVector(vec)\
-	do\
-	{\
-		vec3_t *temp = (vec);\
-		\
-		(*temp)[0] = round((*temp)[0]);\
-		(*temp)[1] = round((*temp)[1]);\
-		(*temp)[2] = round((*temp)[2]);\
-	} while(0)
-#endif
-/*
-// if your system does not have lrintf() and round() you can try this block. Please also open a bug report at bugzilla.icculus.org
-// or write a mail to the ioq3 mailing list.
-#else
-  #define Q_ftol(v) ((long) (v))
-  #define Q_round(v) do { if((v) < 0) (v) -= 0.5f; else (v) += 0.5f; (v) = Q_ftol((v)); } while(0)
-  #define Q_SnapVector(vec) \
-	do\
-	{\
-		vec3_t *temp = (vec);\
-		\
-		Q_round((*temp)[0]);\
-		Q_round((*temp)[1]);\
-		Q_round((*temp)[2]);\
-	} while(0)
-#endif
-*/
 
 #if idppc
 
@@ -577,8 +504,6 @@ typedef struct {
 #define VectorNegate(a,b)		((b)[0]=-(a)[0],(b)[1]=-(a)[1],(b)[2]=-(a)[2])
 #define VectorSet(v, x, y, z)	((v)[0]=(x), (v)[1]=(y), (v)[2]=(z))
 #define Vector4Copy(a,b)		((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
-
-#define Byte4Copy(a,b)			((b)[0]=(a)[0],(b)[1]=(a)[1],(b)[2]=(a)[2],(b)[3]=(a)[3])
 
 #define	SnapVector(v) {v[0]=((int)(v[0]));v[1]=((int)(v[1]));v[2]=((int)(v[2]));}
 // just in case you do't want to use the macros
@@ -734,14 +659,8 @@ void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
 void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);
 void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 void PerpendicularVector( vec3_t dst, const vec3_t src );
+int Q_isnan( float x );
 
-#ifndef MAX
-#define MAX(x,y) ((x)>(y)?(x):(y))
-#endif
-
-#ifndef MIN
-#define MIN(x,y) ((x)<(y)?(x):(y))
-#endif
 
 //=============================================
 
@@ -802,7 +721,7 @@ void Parse2DMatrix (char **buf_p, int y, int x, float *m);
 void Parse3DMatrix (char **buf_p, int z, int y, int x, float *m);
 int Com_HexStrToInt( const char *str );
 
-int QDECL Com_sprintf (char *dest, int size, const char *fmt, ...) __attribute__ ((format (printf, 3, 4)));
+void	QDECL Com_sprintf (char *dest, int size, const char *fmt, ...) __attribute__ ((format (printf, 3, 4)));
 
 char *Com_SkipTokens( char *s, int numTokens, char *sep );
 char *Com_SkipCharset( char *s, char *sep );
@@ -838,6 +757,7 @@ int		Q_strncmp (const char *s1, const char *s2, int n);
 int		Q_stricmpn (const char *s1, const char *s2, int n);
 char	*Q_strlwr( char *s1 );
 char	*Q_strupr( char *s1 );
+char	*Q_strrchr( const char* string, int c );
 const char	*Q_stristr( const char *s, const char *find);
 
 // buffer size safe library replacements
@@ -899,11 +819,8 @@ qboolean Info_Validate( const char *s );
 void Info_NextPair( const char **s, char *key, char *value );
 
 // this is only here so the functions in q_shared.c and bg_*.c can link
-void	QDECL Com_Error( int level, const char *error, ... ) __attribute__ ((noreturn, format(printf, 2, 3)));
+void	QDECL Com_Error( int level, const char *error, ... ) __attribute__ ((format (printf, 2, 3)));
 void	QDECL Com_Printf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
-#ifdef IOQ3ZTM
-void	QDECL Com_DPrintf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
-#endif
 
 
 /*
@@ -938,19 +855,7 @@ default values.
 
 #define CVAR_SERVER_CREATED	0x0800	// cvar was created by a server the client connected to.
 #define CVAR_VM_CREATED		0x1000	// cvar was created exclusively in one of the VMs.
-#define CVAR_PROTECTED		0x2000	// prevent modifying this var from VMs or the server
-#ifdef TA_SPLITVIEW
-#define CVAR_USERINFO2		0x4000 // userinfo for second local client
-#define CVAR_USERINFO3		0x8000 // userinfo for third local client
-#define CVAR_USERINFO4		0x10000 // userinfo for fourth local client
-#endif
 #define CVAR_NONEXISTENT	0xFFFFFFFF	// Cvar doesn't exist.
-
-#ifdef TA_SPLITVIEW
-#define CVAR_USERINFO_ALL	(CVAR_USERINFO|CVAR_USERINFO2|CVAR_USERINFO3|CVAR_USERINFO4)
-#else
-#define CVAR_USERINFO_ALL	(CVAR_USERINFO)
-#endif
 
 // nothing outside the Cvar_*() functions should modify these fields!
 typedef struct cvar_s cvar_t;
@@ -990,23 +895,6 @@ typedef struct {
 	int			integer;
 	char		string[MAX_CVAR_VALUE_STRING];
 } vmCvar_t;
-
-
-/*
-==============================================================
-
-VoIP
-
-==============================================================
-*/
-
-// if you change the count of flags be sure to also change VOIP_FLAGNUM
-#define VOIP_SPATIAL		0x01		// spatialized voip message
-#define VOIP_DIRECT		0x02		// non-spatialized voip message
-
-// number of flags voip knows. You will have to bump protocol version number if you
-// change this.
-#define VOIP_FLAGCNT		2
 
 /*
 ==============================================================
@@ -1116,9 +1004,6 @@ typedef enum {
 #define	SNAPFLAG_RATE_DELAYED	1
 #define	SNAPFLAG_NOT_ACTIVE		2	// snapshot used during connection and for zombies
 #define SNAPFLAG_SERVERCOUNT	4	// toggled every map_restart so transitions can be detected
-#ifdef TA_SPLITVIEW
-#define SNAPFLAG_MULTIPLE_PSS	8	// snap contains multiple playerstates
-#endif
 
 //
 // per-level limits
@@ -1129,11 +1014,7 @@ typedef enum {
 #define MAX_PARTICLES_AREAS 64
 #endif
 
-#if 0 //#ifdef IOQ3ZTM_NO_COMPAT // MORE_GENTITIES // ZTM: TODO: Support more gentities
-#define GENTITYNUM_BITS		12		// don't need to send any more
-#else
 #define	GENTITYNUM_BITS		10		// don't need to send any more
-#endif
 #define	MAX_GENTITIES		(1<<GENTITYNUM_BITS)
 
 // entitynums are communicated with GENTITY_BITS, so any reserved
@@ -1241,7 +1122,7 @@ typedef struct playerState_s {
 #ifdef TA_HOLDSYS
 	int			holdableIndex; // Index of holdable items, for shurikens.
 #endif
-#if defined TURTLEARENA || defined NET_COMPAT // HOLD_SHURIKEN
+#if defined TA_HOLDABLE || defined NET_COMPAT // HOLD_SHURIKEN
 	int			holdableTime;  // Like weaponTime, but for shurikens.
 #endif
 
@@ -1293,9 +1174,6 @@ typedef struct playerState_s {
 #ifdef TA_PLAYERSYS // LADDER
 	vec3_t		origin2;
 #endif
-#ifdef TA_PATHSYS // 2DMODE
-	int			pathMode;
-#endif
 
 	// not communicated over the net at all
 	int			ping;			// server to game info for scoreboard
@@ -1304,16 +1182,6 @@ typedef struct playerState_s {
 	int			entityEventSequence;
 } playerState_t;
 
-#ifdef TA_PATHSYS // 2DMODE
-#define PATHMODE_NONE 0
-#define PATHMODE_SIDE 1
-#define PATHMODE_TOP 2
-#define PATHMODE_BACK 3
-#endif
-
-#ifdef TA_SPLITVIEW
-#define MAX_SPLITVIEW 4
-#endif
 
 //====================================================================
 
@@ -1510,12 +1378,6 @@ float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean 
 float Com_FontStringHeight( font_t *font, const char *s, int limit );
 #endif
 
-#ifdef TA_SPLITVIEW
-#ifndef QAGAME
-char *Com_LocalClientCvarName(int localClient, char *in_cvarName);
-#endif
-#endif
-
 #define Square(x) ((x)*(x))
 
 // real time
@@ -1577,8 +1439,5 @@ typedef enum _flag_status {
 #define CDKEY_LEN 16
 #define CDCHKSUM_LEN 2
 #endif
-
-#define LERP( a, b, w ) ( ( a ) * ( 1.0f - ( w ) ) + ( b ) * ( w ) )
-#define LUMA( red, green, blue ) ( 0.2126f * ( red ) + 0.7152f * ( green ) + 0.0722f * ( blue ) )
 
 #endif	// __Q_SHARED_H

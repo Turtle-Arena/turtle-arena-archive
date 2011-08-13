@@ -181,7 +181,7 @@ static void PlayerIcon( const char *modelAndSkin, char *iconName, int iconNameMa
 #else
 	Q_strncpyz( model, modelAndSkin, sizeof(model));
 #endif
-	skin = strrchr( model, '/' );
+	skin = Q_strrchr( model, '/' );
 	if ( skin ) {
 		*skin++ = '\0';
 	}
@@ -529,11 +529,7 @@ static void UI_SPLevelMenu_PlayerEvent( void* ptr, int notification ) {
 		return;
 	}
 
-#ifdef TA_SPLITVIEW
-	UI_PlayerSettingsMenu(0);
-#else
 	UI_PlayerSettingsMenu();
-#endif
 }
 #endif
 
@@ -664,7 +660,8 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 	// draw player award levels
 	y = AWARDS_Y;
 	i = 0;
-	for( n = 0; n < MAX_UI_AWARDS; n++ ) {
+	for( n = 0; n < MAX_UI_AWARDS; n++ )
+	{
 		level = levelMenuInfo.awardLevels[n];
 		if( level > 0 ) {
 			if( i & 1 ) {
@@ -800,7 +797,8 @@ void UI_SPLevelMenu_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_CUSTOM1 );
 
 #ifndef TA_SP
-	for( n = 0; n < MAX_UI_AWARDS; n++ ) {
+	for( n = 0; n < MAX_UI_AWARDS; n++ )
+	{
 		trap_R_RegisterShaderNoMip( ui_medalPicNames[n] );
 		levelMenuInfo.awardSounds[n] = trap_S_RegisterSound( ui_medalSounds[n], qfalse );
 	}
@@ -833,6 +831,7 @@ static void UI_SPLevelMenu_Init( void ) {
 	skill = (int)trap_Cvar_VariableValue( "g_spSkill" );
 	if( skill < 1 || skill > 5 ) {
 		trap_Cvar_Set( "g_spSkill", "2" );
+		skill = 2;
 	}
 
 	memset( &levelMenuInfo, 0, sizeof(levelMenuInfo) );
@@ -850,7 +849,7 @@ static void UI_SPLevelMenu_Init( void ) {
 #else
 	levelMenuInfo.item_banner.string				= "CHOOSE LEVEL";
 #endif
-#ifdef IOQ3ZTM
+#ifdef TA_MISC
 	levelMenuInfo.item_banner.color					= text_banner_color;
 #else
 	levelMenuInfo.item_banner.color					= color_red;
@@ -914,10 +913,6 @@ static void UI_SPLevelMenu_Init( void ) {
 	levelMenuInfo.item_maps[3].height				= 96;
 #endif
 
-#if ARENAS_PER_TIER > 4
-#error "Need to setup more levelMenuInfo.item_maps[n]"
-#endif
-
 	levelMenuInfo.item_rightarrow.generic.type		= MTYPE_BITMAP;
 	levelMenuInfo.item_rightarrow.generic.name		= ART_ARROW;
 	levelMenuInfo.item_rightarrow.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -944,14 +939,16 @@ static void UI_SPLevelMenu_Init( void ) {
 #endif
 
 #ifndef TA_SP
-	for( n = 0; n < MAX_UI_AWARDS; n++ ) {
+	for( n = 0; n < MAX_UI_AWARDS; n++ )
+	{
 		levelMenuInfo.awardLevels[n] = UI_GetAwardLevel( n );
 	}
 	levelMenuInfo.awardLevels[AWARD_FRAGS] = 100 * (levelMenuInfo.awardLevels[AWARD_FRAGS] / 100);
 
 	y = AWARDS_Y;
 	count = 0;
-	for( n = 0; n < MAX_UI_AWARDS; n++ ) {
+	for( n = 0; n < MAX_UI_AWARDS; n++ )
+	{
 		if( levelMenuInfo.awardLevels[n] ) {
 			if( count & 1 ) {
 				x = 224 - (count - 1 ) / 2 * (48 + 16);
@@ -1030,10 +1027,26 @@ static void UI_SPLevelMenu_Init( void ) {
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_banner );
 
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_leftarrow );
-	for (n = 0; n < ARENAS_PER_TIER; n++) {
-		Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_maps[n] );
-		levelMenuInfo.item_maps[n].generic.bottom += 18;
-	}
+	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_maps[0] );
+#if ARENAS_PER_TIER > 1
+	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_maps[1] );
+#endif
+#if ARENAS_PER_TIER > 2
+	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_maps[2] );
+#endif
+#if ARENAS_PER_TIER > 3
+	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_maps[3] );
+#endif
+	levelMenuInfo.item_maps[0].generic.bottom += 18;
+#if ARENAS_PER_TIER > 1
+	levelMenuInfo.item_maps[1].generic.bottom += 18;
+#endif
+#if ARENAS_PER_TIER > 2
+	levelMenuInfo.item_maps[2].generic.bottom += 18;
+#endif
+#if ARENAS_PER_TIER > 3
+	levelMenuInfo.item_maps[3].generic.bottom += 18;
+#endif
 	Menu_AddItem( &levelMenuInfo.menu, &levelMenuInfo.item_rightarrow );
 
 #ifndef TA_SP // SPMODEL

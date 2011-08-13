@@ -428,13 +428,12 @@ void SP_trigger_hurt( gentity_t *self ) {
 
 	self->r.contents = CONTENTS_TRIGGER;
 
-	self->use = hurt_use;
+	if ( self->spawnflags & 2 ) {
+		self->use = hurt_use;
+	}
 
 	// link in to the world if starting active
-	if ( self->spawnflags & 1 ) {
-		trap_UnlinkEntity (self);
-	}
-	else {
+	if ( ! (self->spawnflags & 1) ) {
 		trap_LinkEntity (self);
 	}
 }

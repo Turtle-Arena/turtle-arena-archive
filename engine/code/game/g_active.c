@@ -114,17 +114,8 @@ void P_WorldEffects( gentity_t *ent ) {
 #endif
 	int			waterlevel;
 
-#ifdef IOQ3ZTM // Drowned in noclip, but not godmode.
-	if ( ent->flags & FL_GODMODE )
-#else
-	if ( ent->client->noclip )
-#endif
-	{
-#ifdef TURTLEARENA // DROWNING
-		ent->client->ps.powerups[PW_AIR] = level.time + 31000;	// don't need air
-#else
+	if ( ent->client->noclip ) {
 		ent->client->airOutTime = level.time + 12000;	// don't need air
-#endif
 		return;
 	}
 
@@ -146,60 +137,41 @@ void P_WorldEffects( gentity_t *ent ) {
 #endif
 
 		// if out of air, start drowning
-#ifdef TURTLEARENA // DROWNING
-		if (ent->client->ps.powerups[PW_AIR] < level.time)
-#else
-		if ( ent->client->airOutTime < level.time)
-#endif
-		{
+		if ( ent->client->airOutTime < level.time) {
 			// drown!
-#ifndef TURTLEARENA // DROWNING
 			ent->client->airOutTime += 1000;
-#endif
 			if ( ent->health > 0 ) {
-#ifdef TURTLEARENA // DROWNING
-				// don't play a normal pain sound
-				ent->pain_debounce_time = level.time + 200;
-
-				G_Damage (ent, NULL, NULL, NULL, NULL, 
-					10000, DAMAGE_NO_ARMOR, MOD_WATER);
-#else
 				// take more damage the longer underwater
 				ent->damage += 2;
 				if (ent->damage > 15)
 					ent->damage = 15;
+
+				// play a gurp sound instead of a normal pain sound
+				if (ent->health <= ent->damage) {
+					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*drown.wav"));
+				} else if (rand()&1) {
+#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
+					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp1.wav"));
+#else
+					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp1.wav"));
+#endif
+				} else {
+#ifdef IOQ3ZTM // MORE_PLAYER_SOUNDS
+					G_Sound(ent, CHAN_VOICE, G_SoundIndex("*gurp2.wav"));
+#else
+					G_Sound(ent, CHAN_VOICE, G_SoundIndex("sound/player/gurp2.wav"));
+#endif
+				}
 
 				// don't play a normal pain sound
 				ent->pain_debounce_time = level.time + 200;
 
 				G_Damage (ent, NULL, NULL, NULL, NULL, 
 					ent->damage, DAMAGE_NO_ARMOR, MOD_WATER);
-#endif
 			}
 		}
-#ifdef TURTLEARENA // DROWNING
-		// Low air warning
-		else if (ent->client->ps.powerups[PW_AIR] < level.time + 5000 && !(ent->flags & FL_DROWNING_WARNING)) {
-			ent->flags |= FL_DROWNING_WARNING;
-
-			// don't play a normal pain sound
-			ent->pain_debounce_time = level.time + 200;
-
-			G_Damage (ent, NULL, NULL, NULL, NULL, 
-				2, DAMAGE_NO_ARMOR, MOD_WATER);
-		}
-#endif
 	} else {
-#ifdef TURTLEARENA // DROWNING
-		ent->flags &= ~FL_DROWNING_WARNING;
-		if (ent->client->ps.powerups[PW_AIR]+1000 < level.time + 31000) {
-			ent->client->ps.powerups[PW_AIR] += 1000;
-		} else {
-			ent->client->ps.powerups[PW_AIR] = level.time + 31000;
-		}
-#else
 		ent->client->airOutTime = level.time + 12000;
-#endif
 		ent->damage = 2;
 	}
 
@@ -295,6 +267,10 @@ void ClientImpacts( gentity_t *ent, pmove_t *pm ) {
 		if ( ( ent->r.svFlags & SVF_BOT ) && ( ent->touch ) ) {
 			ent->touch( ent, other, &trace );
 		}
+
+#ifdef TA_ENTSYS // PUSHABLE
+		G_PlayerPushEntity(other, ent);
+#endif
 
 		if ( !other->touch ) {
 			continue;
@@ -435,8 +411,8 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 	else if ( ( client->buttons & BUTTON_USE_HOLDABLE ) && ! ( client->oldbuttons & BUTTON_USE_HOLDABLE ) ) {
 		Cmd_FollowCycle_f( ent, -1 );
 	}
-	// Stop following client when jump or crouch is pressed.
-	else if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW && ucmd->upmove != 0 ) {
+	// Jump out of followed client
+	else if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW && ucmd->upmove > 0 ) {
 		StopFollowing(ent);
 	}
 #endif
@@ -460,9 +436,6 @@ qboolean ClientInactivityTimer( gclient_t *client ) {
 	} else if ( client->pers.cmd.forwardmove || 
 		client->pers.cmd.rightmove || 
 		client->pers.cmd.upmove ||
-#ifdef IOQ3ZTM
-		(client->pers.cmd.buttons & BUTTON_USE_HOLDABLE) ||
-#endif
 		(client->pers.cmd.buttons & BUTTON_ATTACK) ) {
 		client->inactivityTime = level.time + g_inactivity.integer * 1000;
 		client->inactivityWarning = qfalse;
@@ -660,7 +633,7 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 		}
 #else
 		int weapList[]={WP_MACHINEGUN,WP_SHOTGUN,WP_GRENADE_LAUNCHER,WP_ROCKET_LAUNCHER,WP_LIGHTNING,WP_RAILGUN,WP_PLASMAGUN,WP_BFG,WP_NAILGUN,WP_PROX_LAUNCHER,WP_CHAINGUN};
-		int weapCount = ARRAY_LEN( weapList );
+		int weapCount = sizeof(weapList) / sizeof(int);
 #endif
 		//
 		for (i = 0; i < weapCount; i++) {
@@ -684,12 +657,21 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			} else {
 				t = bg_weapongroupinfo[w].weapon[0]->attackDelay;
 			}
-
-			if (t < 400) {
+			if (t < 400)
+			{
 				t += t * 0.01f;
 			}
 
 			t += bg_weapongroupinfo[w].weapon[0]->proj->damage * 0.01f;
+
+			if (t < 1000)
+			{
+				t = 1000;
+			}
+			else if (t > 4000)
+			{
+				t = 4000;
+			}
 #else
 			// Ugly, but supports; machinegun, shotgun, lightning. railgun, plasma
 			// rocket is close to Q3, 50 msec longer
@@ -703,20 +685,23 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 			}
 
 			// shotgun/plasmagun hack, other wise would be 1000.
-			if (t == 1000 && bg_weapongroupinfo[w].weapon[0]->proj->damage >= 10) {
+			if (t == 1000
+				&& bg_weapongroupinfo[w].weapon[0]->proj->damage >= 10)
+			{
 				t = 1500;
 			}
 
 			if (t < 1000) {
-				if (bg_weapongroupinfo[w].weapon[0]->proj->instantDamage) {
+				if (bg_weapongroupinfo[w].weapon[0]->proj->instantDamage)
 					t += 1000;
-				} else {
+				else
 					t += bg_weapongroupinfo[w].weapon[0]->proj->speed;
-				}
+			}
+			// Just in case...
+			if (t > 4000) {
+				t = 4000;
 			}
 #endif
-
-			t = Com_Clamp(1000, 4000, t);
 #else
 			switch(w) {
 				case WP_MACHINEGUN: max = 50; inc = 4; t = 1000; break;
@@ -771,8 +756,8 @@ void ClientTimerActions( gentity_t *ent, int msec ) {
 #endif
     }
 #endif
-#ifdef TURTLEARENA // REGEN_SHURIKENS
-		// Shuriken regen
+#ifdef TA_HOLDABLE // REGEN_SHURIKENS
+		// Team Arena Ammo Regen for Shurikens
 		{
 			int h;
 
@@ -853,7 +838,8 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 	int		event;
 	gclient_t *client;
 	int		damage;
-#ifndef TURTLEARENA // HOLDABLE // no q3 teleporter
+	vec3_t	dir;
+#ifndef TA_HOLDABLE // no q3 teleporter
 	vec3_t	origin, angles;
 #endif
 //	qboolean	fired;
@@ -887,6 +873,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			} else {
 				damage = 5;
 			}
+			VectorSet (dir, 0, 0, 1);
 			ent->pain_debounce_time = level.time + 200;	// no normal pain sound
 			G_Damage (ent, NULL, NULL, NULL, NULL, damage, 0, MOD_FALLING);
 			break;
@@ -933,9 +920,6 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 					// Override weapon removal time.
 					drop->nextthink = level.time + 15000;
-#ifdef IOQ3ZTM // ITEMS_DISAPPEAR
-					drop->s.frame = 15000;
-#endif
 				}
 			}
 			break;
@@ -964,16 +948,14 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 		case EV_USE_ITEM15:
 		{
 			itemNum = (event & ~EV_EVENT_BITS) - EV_USE_ITEM0;
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 			G_ThrowShuriken(ent, itemNum);
 #endif
 			switch (itemNum)
 			{
-				case HI_NONE:
-					break;
 #endif // TA_HOLDSYS
 
-#ifndef TURTLEARENA // HOLDABLE // no q3 teleprter
+#ifndef TA_HOLDABLE // no q3 teleprter
 #ifdef TA_HOLDSYS
 				case HI_TELEPORTER:
 #else
@@ -987,7 +969,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 #endif
 			TeleportPlayer( ent, origin, angles );
 			break;
-#endif
+#endif // !TA_HOLDABLE
 
 #ifdef TA_HOLDSYS
 				case HI_MEDKIT:
@@ -999,14 +981,16 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 			break;
 
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // POWERS NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 #ifdef TA_HOLDSYS
 				case HI_KAMIKAZE:
 #else
 		case EV_USE_ITEM3:		// kamikaze
 #endif
+#ifndef TURTLEARENA // POWERS
 			// make sure the invulnerability is off
 			ent->client->invulnerabilityTime = 0;
+#endif
 			// start the kamikze
 			G_StartKamikaze( ent );
 			break;
@@ -1039,7 +1023,7 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 #ifdef TA_HOLDSYS
 				default:
-#ifdef TURTLEARENA // HOLDABLE
+#ifdef TA_HOLDABLE
 					if (!BG_ProjectileIndexForHoldable(itemNum))
 #endif
 						G_Printf("  EV_USE_ITEM: No code for holdable %d.\n", itemNum);
@@ -1337,11 +1321,9 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 		)
 	{
-#ifndef IOQ3ZTM
-		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD) {
+		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
 			return;
 		}
-#endif
 		SpectatorThink( ent, ucmd );
 		return;
 	}
@@ -1350,18 +1332,6 @@ void ClientThink_real( gentity_t *ent ) {
 	if ( !ClientInactivityTimer( client ) ) {
 		return;
 	}
-
-#ifdef TURTLEARENA // PLAYERS
-	// switch to using waiting animation if idling for awhile.
-	if (client->pers.cmd.forwardmove || client->pers.cmd.rightmove || client->pers.cmd.upmove
-		|| (client->pers.cmd.buttons & BUTTON_USE_HOLDABLE) || (client->pers.cmd.buttons & BUTTON_ATTACK)
-		|| client->damage_blood || (client->ps.pm_flags & PMF_TIME_KNOCKBACK)) {
-		client->idleTime = level.time;
-		client->ps.eFlags &= ~EF_PLAYER_WAITING;
-	} else if (level.time > client->idleTime + TIME_BEFORE_WAITING_ANIMATION) {
-		client->ps.eFlags |= EF_PLAYER_WAITING;
-	}
-#endif
 
 	// clear the rewards if time
 	if ( level.time > client->rewardTime ) {
@@ -1502,7 +1472,7 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 #endif
 #ifdef TA_PATHSYS
-	if (client->ps.pathMode == PATHMODE_SIDE || client->ps.pathMode == PATHMODE_BACK)
+	if (client->ps.eFlags & EF_PATHMODE)
 	{
 		// A_FaceTarget!
 		if (ent->client->pers.cmd.rightmove != 0)
@@ -1621,7 +1591,7 @@ void ClientThink_real( gentity_t *ent ) {
 		ent->client->ps.eFlags |= EF_USE_ENT;
 
 		if ((ucmd->buttons & BUTTON_USE_HOLDABLE) &&
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 			ent->client->ps.holdableTime <= 0
 #else
 			! ( ent->client->ps.pm_flags & PMF_USE_ITEM_HELD )
@@ -1631,7 +1601,7 @@ void ClientThink_real( gentity_t *ent ) {
 			if (useEnt->use) {
 				useEnt->use(useEnt, ent, ent);
 			}
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 			ent->client->ps.holdableTime = 500;
 #else
 			ent->client->ps.pm_flags |= PMF_USE_ITEM_HELD;
@@ -1699,9 +1669,11 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.pmove_fixed = pmove_fixed.integer | client->pers.pmoveFixed;
 	pm.pmove_msec = pmove_msec.integer;
 
-#if 0 //#ifdef TA_ENTSYS // PUSHABLE
+#if 0 // #ifdef TURTLEARENA // TEST: push players
 	if ( !client->noclip )
 	{
+		// XXX
+		extern qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obstacle );
 		gentity_t *obstacle;
 		vec3_t move;
 		vec3_t amove;
@@ -1716,7 +1688,13 @@ void ClientThink_real( gentity_t *ent ) {
 		VectorCopy( client->ps.viewangles, ent->r.currentAngles );
 		ent->r.currentAngles[YAW] -= amove[YAW];
 
-		G_PlayerPush(ent, move, amove, &obstacle);
+		if (!G_MoverPush(ent, move, amove, &obstacle))
+		{
+			// blocked, do nothing
+		}
+		else if ( !client->ps.powerups[PW_FLASHING] ) {
+			client->ps.powerups[PW_FLASHING] = 1;
+		}
 	}
 	client->oldYaw = client->ps.viewangles[YAW];
 #endif
@@ -1832,12 +1810,12 @@ void ClientThink_real( gentity_t *ent ) {
 					{
 						client->ps.persistant[PERS_CONTINUES]--;
 						client->ps.persistant[PERS_LIVES] += 3;
-						ClientRespawn( ent );
+						respawn( ent );
 					}
 				}
 				else
 				{
-					ClientRespawn( ent );
+					respawn( ent );
 				}
 			}
 			return;
@@ -1847,18 +1825,13 @@ void ClientThink_real( gentity_t *ent ) {
 		if ( level.time > client->respawnTime ) {
 			// forcerespawn is to prevent users from waiting out powerups
 			if ( g_forcerespawn.integer > 0 && ( level.time - client->respawnTime ) > g_forcerespawn.integer * 1000 ) {
-				ClientRespawn( ent );
+				respawn( ent );
 				return;
 			}
 		
 			// pressing attack or use is the normal respawn method
-#ifdef TA_MISC
-			if ( ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) || ucmd->upmove > 0 )
-#else
-			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) )
-#endif
-			{
-				ClientRespawn( ent );
+			if ( ucmd->buttons & ( BUTTON_ATTACK | BUTTON_USE_HOLDABLE ) ) {
+				respawn( ent );
 			}
 		}
 		return;
@@ -2130,14 +2103,6 @@ void SpectatorClientEndFrame( gentity_t *ent ) {
 		}
 	}
 
-#ifdef TA_SPLITVIEW
-	if ( ent->client->sess.spectatorState == SPECTATOR_LOCAL_HIDE ) {
-		ent->client->ps.pm_flags |= PMF_LOCAL_HIDE;
-	} else {
-		ent->client->ps.pm_flags &= ~PMF_LOCAL_HIDE;
-	}
-#endif
-
 	if ( ent->client->sess.spectatorState == SPECTATOR_SCOREBOARD ) {
 		ent->client->ps.pm_flags |= PMF_SCOREBOARD;
 	} else {
@@ -2156,6 +2121,7 @@ while a slow client may have multiple ClientEndFrame between ClientThink.
 */
 void ClientEndFrame( gentity_t *ent ) {
 	int			i;
+	clientPersistant_t	*pers;
 
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR
 #ifdef IOQ3ZTM // PEAKING
@@ -2166,6 +2132,8 @@ void ClientEndFrame( gentity_t *ent ) {
 		SpectatorClientEndFrame( ent );
 		return;
 	}
+
+	pers = &ent->client->pers;
 
 	// turn off any expired powerups
 	for ( i = 0 ; i < MAX_POWERUPS ; i++ ) {

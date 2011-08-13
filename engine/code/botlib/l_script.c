@@ -421,7 +421,7 @@ int PS_ReadEscapeCharacter(script_t *script, char *ch)
 	script->script_p++;
 	//store the escape character
 	*ch = c;
-	//successfully read escape character
+	//succesfully read escape character
 	return 1;
 } //end of the function PS_ReadEscapeCharacter
 //============================================================================
@@ -431,7 +431,7 @@ int PS_ReadEscapeCharacter(script_t *script, char *ch)
 //
 // Parameter:				script		: script to read from
 //								token			: buffer to store the string
-// Returns:					qtrue when a string was read successfully
+// Returns:					qtrue when a string was read succesfully
 // Changes Globals:		-
 //============================================================================
 int PS_ReadString(script_t *script, token_t *token, int quote)
@@ -912,7 +912,7 @@ int PS_ReadToken(script_t *script, token_t *token)
 	} //end if
 	//copy the token into the script structure
 	Com_Memcpy(&script->token, token, sizeof(token_t));
-	//successfully read a token
+	//succesfully read a token
 	return 1;
 } //end of the function PS_ReadToken
 //============================================================================
@@ -990,7 +990,7 @@ int PS_ExpectTokenType(script_t *script, int type, int subtype, token_t *token)
 		if (token->subtype != subtype)
 		{
 			ScriptError(script, "expected %s, found %s",
-							script->punctuations[subtype].p, token->string);
+							script->punctuations[subtype], token->string);
 			return 0;
 		} //end if
 	} //end else if
@@ -1158,7 +1158,7 @@ float ReadSignedFloat(script_t *script)
 	{
 		if(!PS_ExpectAnyToken(script, &token))
 		{
-			ScriptError(script, "Missing float value\n");
+			ScriptError(script, "Missing float value\n", token.string);
 			return 0;
 		}
 
@@ -1189,7 +1189,7 @@ signed long int ReadSignedInt(script_t *script)
 	{
 		if(!PS_ExpectAnyToken(script, &token))
 		{
-			ScriptError(script, "Missing integer value\n");
+			ScriptError(script, "Missing integer value\n", token.string);
 			return 0;
 		}
 

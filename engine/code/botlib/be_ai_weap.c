@@ -47,7 +47,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //#define DEBUG_AI_WEAP
 
-#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 //structure field offsets
 #define WEAPON_OFS(x) (size_t)&(((weaponinfo_t *)0)->x)
 #define PROJECTILE_OFS(x) (size_t)&(((projectileinfo_t *)0)->x)
@@ -84,7 +84,11 @@ static fielddef_t weaponinfo_fields[] =
 static fielddef_t projectileinfo_fields[] =
 {
 {"name", PROJECTILE_OFS(name), FT_STRING},					//name of the projectile
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Loading model string would overwrite wrong memory
 {"model", PROJECTILE_OFS(model), FT_STRING},					//model of the projectile
+#else
+{"model", WEAPON_OFS(model), FT_STRING},						//model of the projectile
+#endif
 {"flags", PROJECTILE_OFS(flags), FT_INT},						//special flags
 {"gravity", PROJECTILE_OFS(gravity), FT_FLOAT},				//amount of gravity applied to the projectile [0,1]
 {"damage", PROJECTILE_OFS(damage), FT_INT},					//damage of the projectile

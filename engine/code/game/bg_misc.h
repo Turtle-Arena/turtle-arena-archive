@@ -102,7 +102,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define CS_LOCATIONS			(CS_PLAYERS+MAX_CLIENTS)
 #define CS_PARTICLES			(CS_LOCATIONS+MAX_LOCATIONS)
 #ifdef TA_ENTSYS // MISC_OBJECT
-#define MAX_STRINGS 256
+#define MAX_STRINGS 128
 #ifdef IOQ3ZTM // Particles
 #define CS_STRINGS				(CS_PARTICLES+MAX_PARTICLES_AREAS)
 #else
@@ -145,6 +145,9 @@ typedef enum {
 	GT_OBELISK,
 #ifdef MISSIONPACK_HARVESTER
 	GT_HARVESTER,
+#endif
+#if 0 // ZTM: In the gametype name arrays there is a Team Tournament.
+	GT_TEAMTOURNAMENT,
 #endif
 	GT_MAX_GAME_TYPE
 } gametype_t;
@@ -247,7 +250,7 @@ typedef enum {
 #endif
 #define	EF_NODRAW			0x00000080		// may have an event, but no model (unspawned items)
 #define	EF_FIRING			0x00000100		// for lightning gun
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 #define	EF_KAMIKAZE			0x00000200
 #endif
 #ifdef TA_PATHSYS // 2DMODE
@@ -258,15 +261,12 @@ typedef enum {
 #define	EF_TALK				0x00001000		// draw a talk balloon
 #define	EF_CONNECTION		0x00002000		// draw a connection trouble sprite
 #define	EF_VOTED			0x00004000		// already cast a vote
-#ifdef TURTLEARENA // PLAYERS
-#define	EF_PLAYER_WAITING	0x00008000
-#endif
 #ifndef TURTLEARENA // AWARDS
 #define	EF_AWARD_IMPRESSIVE	0x00008000		// draw an impressive sprite
 #endif
 #define	EF_AWARD_DEFEND		0x00010000		// draw a defend sprite
 #define	EF_AWARD_ASSIST		0x00020000		// draw a assist sprite
-#ifndef IOQ3ZTM // UNUSED
+#ifndef IOQ3ZTM // unused
 #define EF_AWARD_DENIED		0x00040000		// denied
 #endif
 #ifdef TA_WEAPSYS
@@ -306,7 +306,7 @@ typedef enum {
 typedef enum {
 	PW_NONE,
 #ifdef TURTLEARENA // POWERS
-	// ZTM: TODO: Limited time version of PW_AMMOREGEN?
+	// TODO: Limited time version of PW_AMMOREGEN?
 	// pw_infinity, // Green [White in TMNT3] crystal: Unlimited Shuriken for a limited period.
 
 	// Limited time powerups
@@ -318,7 +318,7 @@ typedef enum {
 
 	PW_FLIGHT,		// Allow player to fly around the level.
 
-	PW_INVUL,		// Invulerrability
+	PW_INVUL,		// New invulerrability
 	PW_FLASHING,	// Given on spawn/teleport/dead, take no damge and glow/flash blue.
 					// (Named after SRB2's pw_flashing.)
 
@@ -328,8 +328,8 @@ typedef enum {
 
 	// Persistant powers.
 	PW_SCOUT,		// Speed
-	PW_GUARD,		// 200 health, health items give 2x health.
-	PW_DOUBLER,		// Double attack power
+	PW_GUARD,		// 200 health (handy cap*2?) and health regen
+	PW_DOUBLER,		// Doubles attack power
 	PW_AMMOREGEN,	// Regen ammo and shurikens --What about Melee weapons?
 					//    Give melee weapons limited uses? So that ammo give no limit?
 					//    Give melee weapons time-to-live? So that ammo give no limit?
@@ -353,10 +353,6 @@ typedef enum {
 	PW_INVULNERABILITY,
 #endif
 
-#ifdef TURTLEARENA // DROWNING
-	PW_AIR,
-#endif
-
 	PW_NUM_POWERUPS
 
 } powerup_t;
@@ -371,13 +367,13 @@ typedef enum {
 typedef enum {
 	HI_NONE,
 
-#ifndef TURTLEARENA // no q3 teleprter
+#ifndef TA_HOLDABLE // no q3 teleprter
 	HI_TELEPORTER,
 #elif !defined TA_HOLDSYS
 	HI_TELEPORTER_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
 	HI_MEDKIT,
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // no q3 teleprter
 	HI_KAMIKAZE,
 #elif !defined TA_HOLDSYS
 	HI_KAMIKAZE_REMOVED, // Q3 want them in this order in "game" qvm
@@ -391,7 +387,7 @@ typedef enum {
 	HI_INVULNERABILITY_REMOVED, // Q3 want them in this order in "game" qvm
 #endif
 
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	// Shurikens
 	HI_SHURIKEN,
 	HI_ELECTRICSHURIKEN,
@@ -422,7 +418,32 @@ typedef enum {
 #define MAX_SHURIKENS 99
 #endif
 
-#ifndef TA_WEAPSYS
+#ifdef TA_WEAPSYS
+// Weapon type
+typedef enum
+{
+    WT_NONE, // Dummy type
+
+	// ZTM: NOTE: Gauntlet code hasn't been tested...
+	WT_GAUNTLET, // Uses primary hand only
+    WT_GUN, // One gun, both hands.
+	WT_MELEE,
+    WT_MAX
+
+} weapontype_t;
+
+// Default weapon if animation.cfg doesn't set one.
+#ifdef TURTLEARENA // WEAPONS
+#define DEFAULT_DEFAULT_WEAPON "WP_FISTS"
+#else
+#define DEFAULT_DEFAULT_WEAPON "WP_GAUNTLET" // "WP_MACHINEGUN"
+#endif
+
+// WP_DEFAULT will need to be remapped to the default weapon.
+#define WP_DEFAULT	-1
+#define WP_NONE		0
+#define weapon_t	int
+#else
 typedef enum {
 	WP_NONE,
 
@@ -679,18 +700,6 @@ typedef struct
 
 } bg_projectileinfo_t;
 
-// Weapon type
-typedef enum
-{
-    WT_NONE, // Dummy type
-
-	WT_GAUNTLET,
-    WT_GUN,
-	WT_MELEE,
-    WT_MAX
-
-} weapontype_t;
-
 #define TRAIL_NONE 0
 #define TRAIL_DEFAULT 1
 typedef struct
@@ -716,8 +725,6 @@ typedef struct
 #define WIF_EJECT_SMOKE2			256		// Shotgun smoke
 //
 #define WIF_BARREL_IDLE_USE_GRAVITY	512
-#define WIF_INITIAL_EFFECT_ONLY		1024	// when holding the attack button the flash sound
-											// and brass eject would happen only on the first press.
 
 // Barrel Spin
 #define BS_PITCH PITCH // 0
@@ -736,8 +743,6 @@ typedef struct
 	weapontype_t weapontype;
 	int mod;			///< Means of Death (MOD_* enum)
 	int attackDelay;
-	int barrelSpin; // BS_*
-	vec3_t flashColor;
 
 	// sounds
 	char flashSoundName[4][MAX_QPATH];
@@ -747,9 +752,12 @@ typedef struct
 
 	// gun only
 	int splashMod;
+	vec3_t flashColor;
 	bg_projectileinfo_t *proj;
 	int projnum; // bg_projectileinfo[projnum]
-	vec3_t aimOffset; // aimOffset is the weapon aim offset for bots
+	// aimOffset is the weapon aim offset for bots
+	vec3_t aimOffset;
+	int barrelSpin; // BS_*
 
 	// melee only
 	bg_bladeinfo_t blades[MAX_WEAPON_BLADES];
@@ -764,11 +772,12 @@ typedef struct
 #define MAX_WG_ATK_ANIMS 5 // Max Weapon Group attack animations
 typedef struct
 {
+	// todo string
 	int standAnim;
 	int attackAnim[MAX_WG_ATK_ANIMS];
-	unsigned int numAttackAnims;
 } bg_weapongroup_anims_t;
 
+// cgame "_hands.md3"
 typedef struct
 {
 	char name[MAX_QPATH]; // Example; "wp_none"
@@ -777,9 +786,6 @@ typedef struct
 
 	// Item info
 	bg_iteminfo_t *item;
-
-	// Models
-	char handsModelName[MAX_QPATH]; // Model's tags are used to position weapons in first person
 
 	// Sounds
 	char readySoundName[MAX_QPATH];
@@ -792,21 +798,10 @@ typedef struct
 
 	// Animations
 	bg_weapongroup_anims_t normalAnims; // Normal set of animations
+	//bg_weapongroup_anims_t altAnims; // Alt set of animations (For different attacks)
 	bg_weapongroup_anims_t primaryAnims; // Set of animations while holding flag
 
 } bg_weapongroupinfo_t;
-
-// Default weapon if animation.cfg doesn't set one.
-#ifdef TURTLEARENA // WEAPONS
-#define DEFAULT_DEFAULT_WEAPON "WP_FISTS"
-#else
-#define DEFAULT_DEFAULT_WEAPON "WP_GAUNTLET" // "WP_MACHINEGUN"
-#endif
-
-// WP_DEFAULT will need to be remapped to the default weapon.
-#define WP_DEFAULT	-1
-#define WP_NONE		0
-#define weapon_t	int
 
 #ifdef TA_WEAPSYS_EX
 #define MAX_BG_PROJ 64
@@ -820,7 +815,7 @@ typedef struct
 extern bg_projectileinfo_t bg_projectileinfo[MAX_BG_PROJ];
 extern bg_weaponinfo_t bg_weaponinfo[MAX_BG_WEAPONS];
 extern bg_weapongroupinfo_t bg_weapongroupinfo[MAX_BG_WEAPON_GROUPS];
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 int BG_ProjectileIndexForHoldable(int holdable);
 #endif
 int BG_ProjectileIndexForName(const char *name);
@@ -953,7 +948,7 @@ typedef enum {
 #ifndef TA_WEAPSYS
 	EV_SHOTGUN,
 #endif
-#ifndef IOQ3ZTM_NO_COMPAT // UNUSED
+#ifndef IOQ3ZTM_NO_COMPAT
 	EV_BULLET,				// otherEntity is the shooter
 #endif
 
@@ -983,9 +978,8 @@ typedef enum {
 #if defined TURTLEARENA || defined NET_COMPAT// NIGHTS_ITEMS
 	EV_CHAINPLUM,
 #endif
-#ifdef TA_ENTSYS // BREAKABLE MISC_OBJECT
+#ifdef TA_ENTSYS // BREAKABLE
 	EV_SPAWN_DEBRIS,
-	EV_EXPLOSION,
 #endif
 
 //#ifdef MISSIONPACK
@@ -993,7 +987,7 @@ typedef enum {
 	EV_PROXIMITY_MINE_STICK,
 	EV_PROXIMITY_MINE_TRIGGER,
 #endif
-#if !defined TURTLEARENA || defined NET_COMPAT // NO_KAMIKAZE_ITEM
+#if !defined TA_HOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
 	EV_KAMIKAZE,			// kamikaze explodes
 #endif
 	EV_OBELISKEXPLODE,		// obelisk explodes
@@ -1039,13 +1033,13 @@ typedef enum {
 	GTS_REDTEAM_TOOK_LEAD,
 	GTS_BLUETEAM_TOOK_LEAD,
 	GTS_TEAMS_ARE_TIED,
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	GTS_KAMIKAZE
 #endif
 } global_team_sound_t;
 
 // animations
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 // ZTM: NOTE: In animation.cfg I call some animations by other names;
 // * TORSO_ATTACK_GUN is TORSO_ATTACK
 // * TORSO_ATTACK_GAUNTLET is TORSO_ATTACK2
@@ -1099,7 +1093,7 @@ typedef enum {
 	TORSO_AFFIRMATIVE,
 	TORSO_NEGATIVE,
 
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS // New Turtle Arena player animations
 	// Place default weapons somewhere on there person while there not used.
 	// TORSO_***DEFAULT_SECONDARY for Don should be
 	//  switching to/from two handed Bo to using one hand.
@@ -1193,12 +1187,6 @@ typedef enum {
 	BOTH_LADDER_STAND,
 	BOTH_LADDER_UP,
 	BOTH_LADDER_DOWN,
-
-	LEGS_JUMPB_LOCKON,
-	LEGS_LANDB_LOCKON,
-
-	// If player idles long enough, switch to waiting animation.
-	BOTH_WAITING,
 #endif
 
 	MAX_ANIMATIONS,
@@ -1408,7 +1396,7 @@ extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 
 #ifdef TURTLEARENA // DEFAULT_TEAMS
 #define DEFAULT_REDTEAM_NAME		"Foot"
-#define DEFAULT_BLUETEAM_NAME		"Shell"
+#define DEFAULT_BLUETEAM_NAME		"Katanas"
 #else
 #define DEFAULT_REDTEAM_NAME		"Stroggs"
 #define DEFAULT_BLUETEAM_NAME		"Pagans"
@@ -1491,15 +1479,14 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 
 #ifdef TA_WEAPSYS
 // For bg/game/cgame
-animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
+animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps);
 animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps);
 animNumber_t BG_LegsStandForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
 animNumber_t BG_LegsAttackForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg);
 // For ui/q3_ui
 animNumber_t BG_TorsoStandForWeapon(weapon_t weaponnum);
-animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum, unsigned int atkIndex);
+animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum);
 animNumber_t BG_LegsStandForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum);
-animNumber_t BG_LegsAttackForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum, unsigned int atkIndex);
 
 qboolean BG_PlayerAttackAnim(animNumber_t aa);
 qboolean BG_PlayerStandAnim(bg_playercfg_t *playercfg, int prefixBit, animNumber_t aa);
@@ -1523,17 +1510,12 @@ typedef struct
 	qboolean heavy;
 
 	// config only
-	animation_t	animations[MAX_MISC_OBJECT_ANIMATIONS];
-	qboolean	unsolidOnDeath;
-	qboolean	invisibleUnsolidDeath;
-	qboolean	lerpframes; // Use raw frames, don't interperate them.
-	float		scale; // Uniform scale
-	bg_sounds_t	sounds;
-	int			explosionDamage;
-	float		explosionRadius;
-	int			deathDelay;
-
-	char		skin[MAX_QPATH];
+	animation_t animations[MAX_MISC_OBJECT_ANIMATIONS];
+	qboolean unsolidOnDeath;
+	qboolean invisibleUnsolidDeath;
+	qboolean lerpframes; // Use raw frames, don't interperate them.
+	float scale; // Uniform scale
+	bg_sounds_t sounds;
 
 	// ZTM: TODO: For NPCs
 	// Speed control, some characters are faster then others.
@@ -1669,9 +1651,6 @@ typedef struct
 #define	PMF_BACKWARDS_RUN	16		// coast down to backwards run
 #define	PMF_TIME_LAND		32		// pm_time is time before rejump
 #define	PMF_TIME_KNOCKBACK	64		// pm_time is an air-accelerate only time
-#ifdef TA_SPLITVIEW
-#define PMF_LOCAL_HIDE		128
-#endif
 #define	PMF_TIME_WATERJUMP	256		// pm_time is waterjump
 #define	PMF_RESPAWNED		512		// clear after attack and jump buttons come up
 #define	PMF_USE_ITEM_HELD	1024
@@ -1783,21 +1762,22 @@ typedef enum {
 	MOD_TELEFRAG,
 	MOD_FALLING,
 	MOD_SUICIDE,
-#ifdef IOQ3ZTM_NO_COMPAT
-	MOD_SPECTATE,
-#endif
 	MOD_TARGET_LASER,
 	MOD_TRIGGER_HURT,
 #ifdef TA_ENTSYS
 	MOD_EXPLOSION,
 #endif
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // MOD NO_KAMIKAZE_ITEM POWERS
+#ifndef TURTLEARENA // MOD
 	MOD_NAIL,
 	MOD_CHAINGUN,
 	MOD_PROXIMITY_MINE,
+#endif
 
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	MOD_KAMIKAZE,
+#endif
+#ifndef TURTLEARENA // POWERS
 	MOD_JUICED,
 #endif
 #endif
@@ -1943,4 +1923,30 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 // Set as defaults for g_saveVersions so server can tell if can load savefile.
 // They are setup in q3_ui/ui and game
 #define BG_SAVE_VERSIONS "5" // Example: "0;1;2;3"
+#endif
+
+#ifdef WOLFET
+#define MAX_MAP_SIZE 65536
+
+//
+// bg_tracemap.c
+//
+// ZTM: Add sturcture based on pmove_t to properly call trace and pointcontents
+typedef struct
+{
+	// callbacks to test the world
+	// these will be different functions during game and cgame
+	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
+	int			(*pointcontents)( const vec3_t point, int passEntityNum );
+} bgGenTracemap_t;
+
+void BG_GenerateTracemap(const char *mapname, vec3_t mapcoordsMins, vec3_t mapcoordsMaxs, bgGenTracemap_t *gen);
+
+qboolean BG_LoadTraceMap( char *rawmapname, vec2_t world_mins, vec2_t world_maxs );
+float BG_GetSkyHeightAtPoint( vec3_t pos );
+float BG_GetSkyGroundHeightAtPoint( vec3_t pos );
+float BG_GetGroundHeightAtPoint( vec3_t pos );
+int BG_GetTracemapGroundFloor( void );
+int BG_GetTracemapGroundCeil( void );
+void etpro_FinalizeTracemapClamp( int *x, int *y );
 #endif

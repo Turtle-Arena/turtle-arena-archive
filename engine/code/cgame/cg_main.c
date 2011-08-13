@@ -36,7 +36,7 @@ int forceModelModificationCount = -1;
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
 #ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
-int CG_ViewType( int entityNum );
+int CG_ViewType(void);
 #endif
 
 
@@ -81,7 +81,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		return 0;
 #ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
 	case CG_VIEW_TYPE:
-		return CG_ViewType(arg0);
+		return CG_ViewType();
 #endif
 	default:
 		CG_Error( "vmMain: unknown command %i", command );
@@ -122,10 +122,6 @@ vmCvar_t	cg_gibs;
 vmCvar_t	cg_drawSpeed;
 #endif
 vmCvar_t	cg_drawTimer;
-#ifdef TA_MISC // COMIC_ANNOUNCER
-vmCvar_t	cg_announcerText;
-vmCvar_t	cg_announcerVoice;
-#endif
 vmCvar_t	cg_drawFPS;
 vmCvar_t	cg_drawSnapshot;
 vmCvar_t	cg_draw3dIcons;
@@ -165,11 +161,7 @@ vmCvar_t	cg_tracerChance;
 vmCvar_t	cg_tracerWidth;
 vmCvar_t	cg_tracerLength;
 #ifndef TA_WEAPSYS_EX
-#ifdef TA_SPLITVIEW
-vmCvar_t	cg_autoswitch[MAX_SPLITVIEW];
-#else
 vmCvar_t	cg_autoswitch;
-#endif
 #endif
 vmCvar_t	cg_ignore;
 vmCvar_t	cg_simpleItems;
@@ -177,21 +169,11 @@ vmCvar_t	cg_fov;
 #ifndef TURTLEARENA // NOZOOM
 vmCvar_t	cg_zoomFov;
 #endif
-#ifdef TA_SPLITVIEW
-vmCvar_t	cg_thirdPerson[MAX_SPLITVIEW];
-vmCvar_t	cg_thirdPersonRange[MAX_SPLITVIEW];
-vmCvar_t	cg_thirdPersonAngle[MAX_SPLITVIEW];
-#ifdef ANALOG // cg var
-vmCvar_t	cg_thirdPersonAnalog[MAX_SPLITVIEW];
-#endif
-vmCvar_t	cg_splitviewVertical;
-#else
 vmCvar_t	cg_thirdPerson;
 vmCvar_t	cg_thirdPersonRange;
 vmCvar_t	cg_thirdPersonAngle;
 #ifdef ANALOG // cg var
 vmCvar_t	cg_thirdPersonAnalog;
-#endif
 #endif
 vmCvar_t	cg_lagometer;
 vmCvar_t	cg_drawAttacker;
@@ -224,9 +206,7 @@ vmCvar_t	pmove_msec;
 vmCvar_t	cg_pmove_msec;
 vmCvar_t	cg_cameraMode;
 vmCvar_t	cg_cameraOrbit;
-#ifndef IOQ3ZTM // NEW_CAM
 vmCvar_t	cg_cameraOrbitDelay;
-#endif
 vmCvar_t	cg_timescaleFadeEnd;
 vmCvar_t	cg_timescaleFadeSpeed;
 vmCvar_t	cg_timescale;
@@ -261,18 +241,11 @@ vmCvar_t	cg_obeliskRespawnDelay;
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 vmCvar_t	cg_drawMeleeWeaponTrails;
 #endif
-#ifdef TA_MISC // MATERIALS 
-vmCvar_t	cg_impactDebris;
-#endif
 #ifdef IOQ3ZTM // LASERTAG
 vmCvar_t	cg_laserTag;
 #endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 vmCvar_t	cg_atmosphericEffects;
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-vmCvar_t	cg_2dmode;
-vmCvar_t	cg_2dmodeOverride;
 #endif
 
 typedef struct {
@@ -285,17 +258,10 @@ typedef struct {
 static cvarTable_t cvarTable[] = {
 	{ &cg_ignore, "cg_ignore", "0", 0 },	// used for debugging
 #ifndef TA_WEAPSYS_EX
-#ifdef TA_SPLITVIEW
-	{ &cg_autoswitch[0], "cg_autoswitch", "1", CVAR_ARCHIVE },
-	{ &cg_autoswitch[1], "2cg_autoswitch", "1", CVAR_ARCHIVE },
-	{ &cg_autoswitch[2], "3cg_autoswitch", "1", CVAR_ARCHIVE },
-	{ &cg_autoswitch[3], "4cg_autoswitch", "1", CVAR_ARCHIVE },
-#else
 	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
 #endif
-#endif
-#ifdef TURTLEARENA
-	{ &cg_drawGun, "cg_drawViewWeapons", "1", CVAR_ARCHIVE },
+#ifdef TURTLEARENA // First person weapons are currently unsupported.
+	{ &cg_drawGun, "cg_drawGun", "0", CVAR_ARCHIVE },
 #else
 	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
 #endif
@@ -322,10 +288,6 @@ static cvarTable_t cvarTable[] = {
 #else
 	{ &cg_drawTimer, "cg_drawTimer", "0", CVAR_ARCHIVE  },
 #endif
-#ifdef TA_MISC // COMIC_ANNOUNCER
-	{ &cg_announcerText, "cg_announcerText", "0", 0  },
-	{ &cg_announcerVoice, "cg_announcerVoice", "1", 0  },
-#endif
 	{ &cg_drawFPS, "cg_drawFPS", "0", CVAR_ARCHIVE  },
 	{ &cg_drawSnapshot, "cg_drawSnapshot", "0", CVAR_ARCHIVE  },
 	{ &cg_draw3dIcons, "cg_draw3dIcons", "1", CVAR_ARCHIVE  },
@@ -342,11 +304,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_drawCrosshairNames, "cg_drawCrosshairNames", "1", CVAR_ARCHIVE },
 	{ &cg_drawRewards, "cg_drawRewards", "1", CVAR_ARCHIVE },
 	{ &cg_crosshairSize, "cg_crosshairSize", "24", CVAR_ARCHIVE },
-#ifdef TA_DATA // Data actually support it now, so default to off.
-	{ &cg_crosshairHealth, "cg_crosshairHealth", "0", CVAR_ARCHIVE },
-#else
 	{ &cg_crosshairHealth, "cg_crosshairHealth", "1", CVAR_ARCHIVE },
-#endif
 	{ &cg_crosshairX, "cg_crosshairX", "0", CVAR_ARCHIVE },
 	{ &cg_crosshairY, "cg_crosshairY", "0", CVAR_ARCHIVE },
 	{ &cg_brassTime, "cg_brassTime", "2500", CVAR_ARCHIVE },
@@ -379,63 +337,19 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
 #ifdef ANALOG // cg var
-#ifdef TA_SPLITVIEW
-	{ &cg_thirdPersonAnalog[0], "cg_thirdPersonAnalog", "0", 0 },
-	{ &cg_thirdPersonAnalog[1], "2cg_thirdPersonAnalog", "0", 0 },
-	{ &cg_thirdPersonAnalog[2], "3cg_thirdPersonAnalog", "0", 0 },
-	{ &cg_thirdPersonAnalog[3], "4cg_thirdPersonAnalog", "0", 0 },
-#else
 	{ &cg_thirdPersonAnalog, "cg_thirdPersonAnalog", "0", 0 },
 #endif
-#endif
 #ifdef TURTLEARENA // FOV
-#ifdef TA_SPLITVIEW
-	{ &cg_thirdPersonRange[0], "cg_thirdPersonRange", "120", 0 },
-	{ &cg_thirdPersonAngle[0], "cg_thirdPersonAngle", "0", 0 },
-	{ &cg_thirdPersonRange[1], "2cg_thirdPersonRange", "120", 0 },
-	{ &cg_thirdPersonAngle[1], "2cg_thirdPersonAngle", "0", 0 },
-	{ &cg_thirdPersonRange[2], "3cg_thirdPersonRange", "120", 0 },
-	{ &cg_thirdPersonAngle[2], "3cg_thirdPersonAngle", "0", 0 },
-	{ &cg_thirdPersonRange[3], "4cg_thirdPersonRange", "120", 0 },
-	{ &cg_thirdPersonAngle[3], "4cg_thirdPersonAngle", "0", 0 },
-#else
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "120", 0 },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", 0 },
-#endif
-#else
-#ifdef TA_SPLITVIEW
-	{ &cg_thirdPersonRange[0], "cg_thirdPersonRange", "40", CVAR_CHEAT },
-	{ &cg_thirdPersonAngle[0], "cg_thirdPersonAngle", "0", CVAR_CHEAT },
-	{ &cg_thirdPersonRange[1], "2cg_thirdPersonRange", "40", CVAR_CHEAT },
-	{ &cg_thirdPersonAngle[1], "2cg_thirdPersonAngle", "0", CVAR_CHEAT },
-	{ &cg_thirdPersonRange[2], "3cg_thirdPersonRange", "40", CVAR_CHEAT },
-	{ &cg_thirdPersonAngle[2], "3cg_thirdPersonAngle", "0", CVAR_CHEAT },
-	{ &cg_thirdPersonRange[3], "4cg_thirdPersonRange", "40", CVAR_CHEAT },
-	{ &cg_thirdPersonAngle[3], "4cg_thirdPersonAngle", "0", CVAR_CHEAT },
 #else
 	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
 	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 #endif
-#endif
-#ifdef TA_SPLITVIEW
-#ifdef TURTLEARENA // THIRD_PERSON
-	{ &cg_thirdPerson[0], "cg_thirdPerson", "1", 0 },
-	{ &cg_thirdPerson[1], "2cg_thirdPerson", "1", 0 },
-	{ &cg_thirdPerson[2], "3cg_thirdPerson", "1", 0 },
-	{ &cg_thirdPerson[3], "4cg_thirdPerson", "1", 0 },
-#else
-	{ &cg_thirdPerson[0], "cg_thirdPerson", "0", 0 },
-	{ &cg_thirdPerson[1], "2cg_thirdPerson", "0", 0 },
-	{ &cg_thirdPerson[2], "3cg_thirdPerson", "0", 0 },
-	{ &cg_thirdPerson[3], "4cg_thirdPerson", "0", 0 },
-#endif
-	{ &cg_splitviewVertical, "cg_splitviewVertical", "0", CVAR_ARCHIVE },
-#else
-#ifdef TURTLEARENA // THIRD_PERSON
+#ifdef THIRD_PERSON
 	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },
 #else
 	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
-#endif
 #endif
 #ifdef IOQ3ZTM // TEAM_CHAT_CON // con_notifytime
 	{ &cg_teamChatTime, "cg_teamChatTime", "5", CVAR_ARCHIVE  },
@@ -461,7 +375,7 @@ static cvarTable_t cvarTable[] = {
 #else
 	{ &cg_drawTeamOverlay, "cg_drawTeamOverlay", "0", CVAR_ARCHIVE },
 #endif
-	{ &cg_teamOverlayUserinfo, "teamoverlay", "0", CVAR_ROM | CVAR_USERINFO_ALL },
+	{ &cg_teamOverlayUserinfo, "teamoverlay", "0", CVAR_ROM | CVAR_USERINFO },
 	{ &cg_stats, "cg_stats", "0", 0 },
 	{ &cg_drawFriend, "cg_drawFriend", "1", CVAR_ARCHIVE },
 	{ &cg_teamChatsOnly, "cg_teamChatsOnly", "0", CVAR_ARCHIVE },
@@ -478,7 +392,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_blood, "com_blood", "1", CVAR_ARCHIVE },
 #endif
 #endif
-	{ &cg_synchronousClients, "g_synchronousClients", "0", CVAR_SYSTEMINFO },
+	{ &cg_synchronousClients, "g_synchronousClients", "0", 0 },	// communicated by systeminfo
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 	{ &cg_redTeamName, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
@@ -494,7 +408,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_enableDust, "g_enableDust", "0", CVAR_SERVERINFO},
 	{ &cg_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO},
 #ifdef TA_SP
-	{ &cg_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_ROM},
+	{ &cg_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM},
 #else
 	{ &cg_singlePlayerActive, "ui_singlePlayerActive", "0", CVAR_USERINFO},
 #endif
@@ -506,9 +420,7 @@ static cvarTable_t cvarTable[] = {
 #endif
 #endif
 	{ &cg_cameraOrbit, "cg_cameraOrbit", "0", CVAR_CHEAT},
-#ifndef IOQ3ZTM // NEW_CAM
 	{ &cg_cameraOrbitDelay, "cg_cameraOrbitDelay", "50", CVAR_ARCHIVE},
-#endif
 	{ &cg_timescaleFadeEnd, "cg_timescaleFadeEnd", "1", 0},
 	{ &cg_timescaleFadeSpeed, "cg_timescaleFadeSpeed", "0", 0},
 	{ &cg_timescale, "timescale", "1", 0},
@@ -516,8 +428,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_smoothClients, "cg_smoothClients", "0", CVAR_USERINFO | CVAR_ARCHIVE},
 	{ &cg_cameraMode, "com_cameraMode", "0", CVAR_CHEAT},
 
-	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO},
-	{ &pmove_msec, "pmove_msec", "8", CVAR_SYSTEMINFO},
+	{ &pmove_fixed, "pmove_fixed", "0", 0},
+	{ &pmove_msec, "pmove_msec", "8", 0},
 	{ &cg_noTaunt, "cg_noTaunt", "0", CVAR_ARCHIVE},
 	{ &cg_noProjectileTrail, "cg_noProjectileTrail", "0", CVAR_ARCHIVE},
 	{ &cg_smallFont, "ui_smallFont", "0.25", CVAR_ARCHIVE},
@@ -536,22 +448,15 @@ static cvarTable_t cvarTable[] = {
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 	,{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "1", CVAR_ARCHIVE}
 #endif
-#ifdef TA_MISC // MATERIALS 
-	,{ &cg_impactDebris, "cg_impactDebris", "1", CVAR_ARCHIVE}
-#endif
 #ifdef IOQ3ZTM // LASERTAG
 	,{ &cg_laserTag, "g_laserTag", "0", CVAR_SERVERINFO }
 #endif
-#ifdef TA_ATMEFFECTSYS
+#ifdef WOLFET
 	,{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE }
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-	,{ &cg_2dmode, "g_2dmode", "0", CVAR_SERVERINFO}
-	,{ &cg_2dmodeOverride, "cg_2dmodeOverride", "0", 0}
 #endif
 };
 
-static int  cvarTableSize = ARRAY_LEN( cvarTable );
+static int  cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
 
 /*
 =================
@@ -577,8 +482,8 @@ void CG_RegisterCvars( void ) {
 #endif
 
 #ifdef TA_SP // SPMODEL
-	trap_Cvar_Register(NULL, "spmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ROM );
-	trap_Cvar_Register(NULL, "spheadmodel", "", CVAR_USERINFO | CVAR_ROM );
+	trap_Cvar_Register(NULL, "spmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
+	trap_Cvar_Register(NULL, "spheadmodel", "", CVAR_USERINFO | CVAR_ARCHIVE | CVAR_ROM );
 #endif
 	trap_Cvar_Register(NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
@@ -628,7 +533,7 @@ void CG_UpdateCvars( void ) {
 
 	// check for modications here
 
-	// If team overlay is on, ask for updates from the server.  If it's off,
+	// If team overlay is on, ask for updates from the server.  If its off,
 	// let the server know so we don't receive it
 	if ( drawTeamOverlayModificationCount != cg_drawTeamOverlay.modificationCount ) {
 		drawTeamOverlayModificationCount = cg_drawTeamOverlay.modificationCount;
@@ -650,31 +555,17 @@ void CG_UpdateCvars( void ) {
 }
 
 int CG_CrosshairPlayer( void ) {
-#ifdef TA_SPLITVIEW
-	if ( cg.time > ( cg.localClients[0].crosshairClientTime + 1000 ) ) {
+	if ( cg.time > ( cg.crosshairClientTime + 1000 ) ) {
 		return -1;
 	}
-	return cg.localClients[0].crosshairClientNum;
-#else
-	if ( cg.time > ( cg.localClient.crosshairClientTime + 1000 ) ) {
-		return -1;
-	}
-	return cg.localClient.crosshairClientNum;
-#endif
+	return cg.crosshairClientNum;
 }
 
 int CG_LastAttacker( void ) {
-#ifdef TA_SPLITVIEW
-	if ( !cg.localClients[0].attackerTime ) {
-		return -1;
-	}
-	return cg.snap->pss[0].persistant[PERS_ATTACKER];
-#else
-	if ( !cg.localClient.attackerTime ) {
+	if ( !cg.attackerTime ) {
 		return -1;
 	}
 	return cg.snap->ps.persistant[PERS_ATTACKER];
-#endif
 }
 
 #ifdef IOQ3ZTM // LESS_VERBOSE
@@ -1054,7 +945,7 @@ static void CG_RegisterSounds( void ) {
 	// FIXME: only needed with item
 	cgs.media.flightSound = trap_S_RegisterSound( "sound/items/flight.wav", qfalse );
 	cgs.media.medkitSound = trap_S_RegisterSound ("sound/items/use_medkit.wav", qfalse);
-#ifdef TURTLEARENA // HOLDABLE
+#ifdef TA_HOLDABLE
 	cgs.media.shurikenSound = trap_S_RegisterSound ("sound/items/use_shuriken.wav", qfalse);
 #endif
 	cgs.media.quadSound = trap_S_RegisterSound("sound/items/damage3.wav", qfalse);
@@ -1062,7 +953,9 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.sfx_ric1 = trap_S_RegisterSound ("sound/weapons/machinegun/ric1.wav", qfalse);
 	cgs.media.sfx_ric2 = trap_S_RegisterSound ("sound/weapons/machinegun/ric2.wav", qfalse);
 	cgs.media.sfx_ric3 = trap_S_RegisterSound ("sound/weapons/machinegun/ric3.wav", qfalse);
-	//cgs.media.sfx_railg = trap_S_RegisterSound ("sound/weapons/railgun/railgf1a.wav", qfalse);
+#ifndef IOQ3ZTM // UNUSED
+	cgs.media.sfx_railg = trap_S_RegisterSound ("sound/weapons/railgun/railgf1a.wav", qfalse);
+#endif
 	cgs.media.sfx_rockexp = trap_S_RegisterSound ("sound/weapons/rocket/rocklx1a.wav", qfalse);
 	cgs.media.sfx_plasmaexp = trap_S_RegisterSound ("sound/weapons/plasma/plasmx1a.wav", qfalse);
 #endif
@@ -1077,14 +970,15 @@ static void CG_RegisterSounds( void ) {
 	cgs.media.sfx_chghitmetal = trap_S_RegisterSound( "sound/weapons/vulcan/wvulimpm.wav", qfalse );
 #endif
 	cgs.media.weaponHoverSound = trap_S_RegisterSound( "sound/weapons/weapon_hover.wav", qfalse );
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	cgs.media.kamikazeExplodeSound = trap_S_RegisterSound( "sound/items/kam_explode.wav", qfalse );
 	cgs.media.kamikazeImplodeSound = trap_S_RegisterSound( "sound/items/kam_implode.wav", qfalse );
 	cgs.media.kamikazeFarSound = trap_S_RegisterSound( "sound/items/kam_explode_far.wav", qfalse );
 #endif
-#ifndef TA_SP
 	cgs.media.winnerSound = trap_S_RegisterSound( "sound/feedback/voc_youwin.wav", qfalse );
 	cgs.media.loserSound = trap_S_RegisterSound( "sound/feedback/voc_youlose.wav", qfalse );
+#ifndef IOQ3ZTM // UNUSED
+	cgs.media.youSuckSound = trap_S_RegisterSound( "sound/misc/yousuck.wav", qfalse );
 #endif
 
 #ifndef TA_WEAPSYS
@@ -1179,6 +1073,12 @@ static void CG_RegisterGraphics( void ) {
 
 	trap_R_LoadWorldMap( cgs.mapname );
 
+#ifdef WOLFET
+	CG_LoadingString( "entities" );
+
+	CG_ParseEntitiesFromString();
+#endif
+
 	// precache status bar pics
 	CG_LoadingString( "game media" );
 
@@ -1262,17 +1162,27 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.playerTeleportShader = trap_R_RegisterShader("playerTeleportEffect" );
 #endif
 
-#ifdef MISSIONPACK_HARVESTER
+#ifdef MISSIONPACK_HARVESTER // ZTM: THIS IS MISSIONPACK STUFF.
+#ifdef IOQ3ZTM
 	if ( cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
+#elif defined MISSIONPACK
+	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
+#else
+	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
+#endif
 		cgs.media.redCubeModel = trap_R_RegisterModel( "models/powerups/orb/r_orb.md3" );
 		cgs.media.blueCubeModel = trap_R_RegisterModel( "models/powerups/orb/b_orb.md3" );
 		cgs.media.redCubeIcon = trap_R_RegisterShader( "icons/skull_red" );
 		cgs.media.blueCubeIcon = trap_R_RegisterShader( "icons/skull_blue" );
 	}
+#endif
 
- 	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
-#elif defined MISSIONPACK
-	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF || cg_buildScript.integer ) {
+#ifdef MISSIONPACK
+	if ( cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF
+#ifdef MISSIONPACK_HARVESTER
+	|| cgs.gametype == GT_HARVESTER
+#endif
+	|| cg_buildScript.integer ) {
 #else
 	if ( cgs.gametype == GT_CTF || cg_buildScript.integer ) {
 #endif
@@ -1348,10 +1258,6 @@ static void CG_RegisterGraphics( void ) {
 	}
 
 	if ( cgs.gametype == GT_OBELISK || cg_buildScript.integer ) {
-#ifdef TA_WEAPSYS
-		cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
-#endif
-		cgs.media.rocketExplosionShader = trap_R_RegisterShader("rocketExplosion");
 		cgs.media.overloadBaseModel = trap_R_RegisterModel( "models/powerups/overload_base.md3" );
 		cgs.media.overloadTargetModel = trap_R_RegisterModel( "models/powerups/overload_target.md3" );
 		cgs.media.overloadLightsModel = trap_R_RegisterModel( "models/powerups/overload_lights.md3" );
@@ -1375,7 +1281,7 @@ static void CG_RegisterGraphics( void ) {
 	}
 #endif
 
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	cgs.media.redKamikazeShader = trap_R_RegisterShader( "models/weaphits/kamikred" );
 #endif
 	cgs.media.dustPuffShader = trap_R_RegisterShader("hasteSmokePuff" );
@@ -1399,22 +1305,22 @@ static void CG_RegisterGraphics( void ) {
 #else
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/foe" );
 #endif
-#ifndef TURTLEARENA
+#ifndef TURTLEARENA // POWERS
 		cgs.media.redQuadShader = trap_R_RegisterShader("powerups/blueflag" );
+#endif
+#ifndef TA_HUD
 		cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar.tga" );
 #endif
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		cgs.media.blueKamikazeShader = trap_R_RegisterShader( "models/weaphits/kamikblu" );
 #endif
 	}
 
-#ifdef TURTLEARENA
-	cgs.media.hudHeadBackgroundShader = trap_R_RegisterShader( "gfx/2d/hudHeadBack" );
-	cgs.media.hudBarShader = trap_R_RegisterShader( "gfx/2d/hudBar" );
-	cgs.media.hudBar2Shader = trap_R_RegisterShader( "gfx/2d/hudBar2" );
-	cgs.media.hudBarBackgroundShader = trap_R_RegisterShader( "gfx/2d/hudBarBack" );
-	cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar" );
-#else
+#ifdef TA_HUD
+	cgs.media.teamStatusBar = trap_R_RegisterShader( "gfx/2d/colorbar.png" );
+#endif
+
+#ifndef TURTLEARENA // NOARMOR
 	cgs.media.armorModel = trap_R_RegisterModel( "models/powerups/armor/armor_yel.md3" );
 	cgs.media.armorIcon  = trap_R_RegisterShaderNoMip( "icons/iconr_yellow" );
 #endif
@@ -1458,10 +1364,24 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.missileHitShader[1] = trap_R_RegisterShader( "missileHit2" );
 #endif
 
-#ifndef TA_WEAPSYS
+#ifdef TA_WEAPSYS
+#ifdef MISSIONPACK
+	// Load explosion model and shader for Obelisk death.
+	if ( cgs.gametype == GT_OBELISK || cg_buildScript.integer ) {
+		cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
+		cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
+	}
+#endif
+#else
 	cgs.media.bulletFlashModel = trap_R_RegisterModel("models/weaphits/bullet.md3");
 	cgs.media.ringFlashModel = trap_R_RegisterModel("models/weaphits/ring02.md3");
 	cgs.media.dishFlashModel = trap_R_RegisterModel("models/weaphits/boom01.md3");
+#if defined IOQ3ZTM && defined MISSIONPACK
+	if ( cgs.gametype == GT_OBELISK || cg_buildScript.integer ) {
+		// Load explosion shader for Obelisk death.
+		cgs.media.rocketExplosionShader = trap_R_RegisterShader( "rocketExplosion" );
+	}
+#endif
 #endif
 #ifdef TURTLEARENA
 	cgs.media.teleportEffectModel = trap_R_RegisterModel( "models/misc/telep.md3" );
@@ -1504,10 +1424,6 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.medalDefend = trap_R_RegisterShaderNoMip( "medal_defend" );
 	cgs.media.medalAssist = trap_R_RegisterShaderNoMip( "medal_assist" );
 	cgs.media.medalCapture = trap_R_RegisterShaderNoMip( "medal_capture" );
-
-#ifdef TA_DATA // EXP_SCALE
-	cgs.media.smokeModel = trap_R_RegisterModel("models/misc/smoke.md3");
-#endif
 
 #ifdef TA_MISC // MATERIALS
 	// Load models for materials
@@ -1703,36 +1619,16 @@ CG_RegisterClients
 */
 static void CG_RegisterClients( void ) {
 	int		i;
-#ifdef TA_SPLITVIEW
-	int		j;
-	int		numLocalClients = 1; // cg.snap->numPSs; ZTM: FIXME?: cg.snap is NULL here, how can we get number?
 
-	for (i = 0; i < numLocalClients; i++) {
-		CG_LoadingClient(cg.localClients[i].clientNum);
-		CG_NewClientInfo(cg.localClients[i].clientNum);
-	}
-#else
-	CG_LoadingClient(cg.localClient.clientNum);
-	CG_NewClientInfo(cg.localClient.clientNum);
-#endif
+	CG_LoadingClient(cg.clientNum);
+	CG_NewClientInfo(cg.clientNum);
 
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
 		const char		*clientInfo;
 
-#ifdef TA_SPLITVIEW
-		for (j = 0; j < numLocalClients; j++) {
-			if (cg.localClients[j].clientNum == i) {
-				break;
-			}
-		}
-		if (j != numLocalClients) {
+		if (cg.clientNum == i) {
 			continue;
 		}
-#else
-		if (cg.localClient.clientNum == i) {
-			continue;
-		}
-#endif
 
 		clientInfo = CG_ConfigString( CS_PLAYERS+i );
 		if ( !clientInfo[0]) {
@@ -1789,7 +1685,7 @@ char *CG_GetMenuBuffer(const char *filename) {
 		return NULL;
 	}
 	if ( len >= MAX_MENUFILE ) {
-		trap_Print( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i\n", filename, len, MAX_MENUFILE ) );
+		trap_Print( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", filename, len, MAX_MENUFILE ) );
 		trap_FS_FCloseFile( f );
 		return NULL;
 	}
@@ -2051,7 +1947,11 @@ void CG_LoadMenus(const char *menuFile) {
 
 	len = trap_FS_FOpenFile( menuFile, &f, FS_READ );
 	if ( !f ) {
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Can't try default if we error first...
 		Com_Printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
+#else
+		trap_Error( va( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile ) );
+#endif
 		len = trap_FS_FOpenFile( "ui/hud.txt", &f, FS_READ );
 		if (!f) {
 			trap_Error( va( S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n") );
@@ -2059,7 +1959,7 @@ void CG_LoadMenus(const char *menuFile) {
 	}
 
 	if ( len >= MAX_MENUDEFFILE ) {
-		trap_Error( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i\n", menuFile, len, MAX_MENUDEFFILE ) );
+		trap_Error( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE ) );
 		trap_FS_FCloseFile( f );
 		return;
 	}
@@ -2138,7 +2038,7 @@ static int CG_FeederCount(float feederID) {
 
 void CG_SetScoreSelection(void *p) {
 	menuDef_t *menu = (menuDef_t*)p;
-	playerState_t *ps = cg.cur_ps;
+	playerState_t *ps = &cg.snap->ps;
 	int i, red, blue;
 	red = blue = 0;
 	for (i = 0; i < cg.numScores; i++) {
@@ -2235,7 +2135,7 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 				}
 		  break;
 			case 2:
-				if ( cg.cur_ps->stats[ STAT_CLIENTS_READY ] & ( 1 << sp->client ) ) {
+				if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << sp->client ) ) {
 					return "Ready";
 				}
 				if (team == -1) {
@@ -2473,9 +2373,6 @@ Will perform callbacks to make the loading info screen update.
 */
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	const char	*s;
-#ifdef TA_SPLITVIEW
-	int			i;
-#endif
 
 	// clear everything
 	memset( &cgs, 0, sizeof( cgs ) );
@@ -2493,15 +2390,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( cg_npcs, 0, sizeof(cg_npcs) );
 #endif
 
-#ifdef TA_SPLITVIEW
-	cg.numViewports = 1;
-
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		cg.localClients[i].clientNum = clientNum;
-	}
-#else
-	cg.localClient.clientNum = clientNum;
-#endif
+	cg.clientNum = clientNum;
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;
@@ -2515,10 +2404,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_LoadFont(&cgs.media.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
 	CG_LoadFont(&cgs.media.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, 0);
-#ifndef TA_DATA
-	CG_LoadFont(&cgs.media.fontPropGlowSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
-	CG_LoadFont(&cgs.media.fontPropGlowBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT, 22*0.66f, 0);
-#endif
 
 	cgs.media.whiteShader		= trap_R_RegisterShader( "white" );
 #else
@@ -2535,39 +2420,20 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_InitConsoleCommands();
 
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
 #ifdef TA_HOLDSYS/*2*/
-		cg.localClients[i].holdableSelect = HI_NO_SELECT;
-#endif
-#if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
-		// Select our default weapon.
-		cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[cg.localClients[i].clientNum].playercfg.default_weapon;
-#ifdef TA_WEAPSYS_EX
-		cg.localClients[i].predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON];
-#else
-		cg.localClients[i].weaponSelect = cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON];
-#endif
-#else
-		cg.localClients[i].weaponSelect = WP_MACHINEGUN;
-#endif
-	}
-#else // !TA_SPLITVIEW
-#ifdef TA_HOLDSYS/*2*/
-	cg.localClient.holdableSelect = HI_NO_SELECT;
+	cg.holdableSelect = HI_NO_SELECT;
 #endif
 #if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
 	// Select our default weapon.
-	cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
+	cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
 #ifdef TA_WEAPSYS_EX
-	cg.localClient.predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+	cg.predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #else
-	cg.localClient.weaponSelect = cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
+	cg.weaponSelect = cg.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
 #endif
 #else
-	cg.localClient.weaponSelect = WP_MACHINEGUN;
+	cg.weaponSelect = WP_MACHINEGUN;
 #endif
-#endif // !TA_SPLITVIEW
 
 	cgs.redflag = cgs.blueflag = -1; // For compatibily, default to unset for
 	cgs.flagStatus = -1;
@@ -2681,7 +2547,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	trap_S_ClearLoopingSounds( qtrue );
 
-#if defined IOQ3ZTM && defined TURTLEARENA // THIRD_PERSON LASERTAG
+#if defined IOQ3ZTM && defined THIRD_PERSON // LASERTAG
 	if (cg_laserTag.integer)
 		trap_Cvar_Set("cg_thirdPerson", "0");
 	else
@@ -2696,33 +2562,25 @@ CG_ViewType
 
 Called by CG_VIEW_TYPE.
 
-Return -1 if not our client.
 Return 0 if in first person.
 Return 1 if in third person.
+Return 2 if in third person using analog control.
 =================
 */
-int CG_ViewType( int entityNum ) {
-#ifdef TA_SPLITVIEW
-	int i;
-
-	if (!cg.snap) {
-		return -1;
-	}
-
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[cg.snap->lcIndex[i]].clientNum == entityNum) {
-			return cg_thirdPerson[cg.snap->lcIndex[i]].integer;
+int CG_ViewType(void)
+{
+#ifdef ANALOG
+	if (cg.renderingThirdPerson)
+	{
+		// ZTM: Check if analog is on
+		if (cg_thirdPersonAnalog.integer)
+		{
+			return 2;
 		}
 	}
-
-	return -1;
-#else
-	if (cg.snap && cg.snap->ps.clientNum != entityNum) {
-		return -1;
-	}
+#endif
 
 	return cg.renderingThirdPerson;
-#endif
 }
 #endif
 

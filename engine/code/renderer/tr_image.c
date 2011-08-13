@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // tr_image.c
 #include "tr_local.h"
 
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING
 /**
  * Headers for cell shading
  * @author Jordi Prats Catala
@@ -579,27 +579,6 @@ static void Upload32( unsigned *data,
 	scan = ((byte *)data);
 	samples = 3;
 
-	if( r_greyscale->integer )
-	{
-		for ( i = 0; i < c; i++ )
-		{
-			byte luma = LUMA(scan[i*4], scan[i*4 + 1], scan[i*4 + 2]);
-			scan[i*4] = luma;
-			scan[i*4 + 1] = luma;
-			scan[i*4 + 2] = luma;
-		}
-	}
-	else if( r_greyscale->value )
-	{
-		for ( i = 0; i < c; i++ )
-		{
-			float luma = LUMA(scan[i*4], scan[i*4 + 1], scan[i*4 + 2]);
-			scan[i*4] = LERP(scan[i*4], luma, r_greyscale->value);
-			scan[i*4 + 1] = LERP(scan[i*4 + 1], luma, r_greyscale->value);
-			scan[i*4 + 2] = LERP(scan[i*4 + 2], luma, r_greyscale->value);
-		}
-	}
-
 	if(lightMap)
 	{
 		if(r_greyscale->integer)
@@ -799,14 +778,14 @@ image_t *R_CreateImage( const char *name, const byte *pic, int width, int height
 	long		hash;
 
 	if (strlen(name) >= MAX_QPATH ) {
-		ri.Error (ERR_DROP, "R_CreateImage: \"%s\" is too long", name);
+		ri.Error (ERR_DROP, "R_CreateImage: \"%s\" is too long\n", name);
 	}
 	if ( !strncmp( name, "*lightmap", 9 ) ) {
 		isLightmap = qtrue;
 	}
 
 	if ( tr.numImages == MAX_DRAWIMAGES ) {
-		ri.Error( ERR_DROP, "R_CreateImage: MAX_DRAWIMAGES hit");
+		ri.Error( ERR_DROP, "R_CreateImage: MAX_DRAWIMAGES hit\n");
 	}
 
 	image = tr.images[tr.numImages] = ri.Hunk_Alloc( sizeof( image_t ), h_low );
@@ -859,7 +838,7 @@ image_t *R_CreateImage( const char *name, const byte *pic, int width, int height
 	return image;
 }
 
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING
 /****************************
 RGB GET/SET
 ****************************/
@@ -1498,7 +1477,7 @@ static void snn(int columns, int rows, byte *targa_rgba)
 		}
 	}
 }
-#endif
+#endif // CELSHADING
 
 //===================================================================
 
@@ -1525,7 +1504,8 @@ static imageExtToLoaderMap_t imageLoaders[ ] =
 	{ "bmp",  R_LoadBMP }
 };
 
-static int numImageLoaders = ARRAY_LEN( imageLoaders );
+static int numImageLoaders = sizeof( imageLoaders ) /
+		sizeof( imageLoaders[ 0 ] );
 
 /*
 =================
@@ -1538,11 +1518,9 @@ Loads any of the supported image types into a cannonical
 void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 {
 	qboolean orgNameFailed = qfalse;
-	int orgLoader = -1;
 	int i;
 	char localName[ MAX_QPATH ];
 	const char *ext;
-	char *altName;
 
 	*pic = NULL;
 	*width = 0;
@@ -1573,7 +1551,6 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 				// Loader failed, most likely because the file isn't there;
 				// try again without the extension
 				orgNameFailed = qtrue;
-				orgLoader = i;
 				COM_StripExtension( name, localName, MAX_QPATH );
 			}
 			else
@@ -1588,10 +1565,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 	// the image formats supported
 	for( i = 0; i < numImageLoaders; i++ )
 	{
-		if (i == orgLoader)
-			continue;
-
-		altName = va( "%s.%s", localName, imageLoaders[ i ].ext );
+		char *altName = va( "%s.%s", localName, imageLoaders[ i ].ext );
 
 		// Load
 		imageLoaders[ i ].ImageLoader( altName, pic, width, height );
@@ -1608,7 +1582,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 		}
 	}
 
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING
 	switch (r_celshadalgo->integer)
 	{
 		case 1:
@@ -1652,7 +1626,7 @@ void R_LoadImage( const char *name, byte **pic, int *width, int *height )
 		default:
 			break;
 	}
-#endif
+#endif // CELSHADING
 }
 
 
@@ -1809,10 +1783,13 @@ R_CreateFogImage
 static void R_CreateFogImage( void ) {
 	int		x,y;
 	byte	*data;
+	float	g;
 	float	d;
 	float	borderColor[4];
 
 	data = ri.Hunk_AllocateTempMemory( FOG_S * FOG_T * 4 );
+
+	g = 2.0;
 
 	// S is distance, T is depth
 	for (x=0 ; x<FOG_S ; x++) {
@@ -2146,7 +2123,7 @@ static char *CommaParse( char **data_p ) {
 
 	if (len == MAX_TOKEN_CHARS)
 	{
-//		ri.Printf (PRINT_DEVELOPER, "Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS);
+//		Com_Printf ("Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS);
 		len = 0;
 	}
 	com_token[len] = 0;
@@ -2174,21 +2151,19 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	char		*text_p;
 	char		*token;
 	char		surfName[MAX_QPATH];
-#ifdef IOQ3ZTM // PARSE_SKINS
-	char		shaderName[MAX_QPATH];
-#endif
 #ifdef IOQ3ZTM // $DIR_IN_SKIN
 	char		path[MAX_QPATH];
+	char		shaderName[MAX_QPATH];
 	int			i;
 #endif
 
 	if ( !name || !name[0] ) {
-		ri.Printf( PRINT_DEVELOPER, "Empty name passed to RE_RegisterSkin\n" );
+		Com_Printf( "Empty name passed to RE_RegisterSkin\n" );
 		return 0;
 	}
 
 	if ( strlen( name ) >= MAX_QPATH ) {
-		ri.Printf( PRINT_DEVELOPER, "Skin name exceeds MAX_QPATH\n" );
+		Com_Printf( "Skin name exceeds MAX_QPATH\n" );
 		return 0;
 	}
 
@@ -2281,7 +2256,6 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		// parse the shader name
 #ifdef IOQ3ZTM // PARSE_SKINS
 		token = COM_ParseExt2( &text_p, qfalse, ',' );
-		Q_strncpyz( shaderName, token, sizeof( shaderName ) );
 #else
 		token = CommaParse( &text_p );
 #endif
@@ -2332,8 +2306,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 			surf->shader = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
 		}
 		else {
-			// IOQ3ZTM // PARSE_SKIN // Use shaderName instead of token
-			surf->shader = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
+			surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );
 		}
 #else
 		surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );

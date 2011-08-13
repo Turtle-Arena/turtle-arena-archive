@@ -919,6 +919,7 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 	for ( i = 0; i < tess.numIndexes; i += 3 )
 	{
 		vec3_t normal;
+		float dot;
 		float len;
 
 		VectorSubtract( tess.xyz[tess.indexes[i]], tr.viewParms.or.origin, normal );
@@ -929,7 +930,7 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 			shortest = len;
 		}
 
-		if ( DotProduct( normal, tess.normal[tess.indexes[i]] ) >= 0 )
+		if ( ( dot = DotProduct( normal, tess.normal[tess.indexes[i]] ) ) >= 0 )
 		{
 			numTriangles--;
 		}
@@ -1163,8 +1164,8 @@ R_DecomposeSort
 void R_DecomposeSort( const drawSurf_t *drawSurf, int *entityNum, shader_t **shader, 
 					 int *fogNum, int *dlightMap, int *sortOrder) {
 	*fogNum = ( drawSurf->sort >> QSORT_FOGNUM_SHIFT ) & 31;
-	*sortOrder = ( drawSurf->sort >> QSORT_ORDER_SHIFT ) & 31;
-	*entityNum = ( drawSurf->sort >> QSORT_ENTITYNUM_SHIFT ) & (MAX_GENTITIES-1);
+	*sortOrder = ( drawSurf->sort >> QSORT_ORDER_SHIFT );
+	*entityNum = ( drawSurf->sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
 	*dlightMap = drawSurf->sort & 3;
 
 	*shader = tr.shaders[ drawSurf->shaderIndex ];
@@ -1191,7 +1192,7 @@ void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader,
 					 int *fogNum, int *dlightMap ) {
 	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
 	*shader = tr.sortedShaders[ ( sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
-	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & (MAX_GENTITIES-1);
+	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & 1023;
 	*dlightMap = sort & 3;
 }
 #endif
@@ -1381,9 +1382,6 @@ void R_AddEntitySurfaces (void) {
 					R_MDRAddAnimSurfaces( ent );
 					break;
 #endif
-				case MOD_IQM:
-					R_AddIQMSurfaces( ent );
-					break;
 				case MOD_BRUSH:
 #ifdef IOQ3ZTM // RENDERFLAGS
 					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
@@ -1402,6 +1400,7 @@ void R_AddEntitySurfaces (void) {
 						break;
 					}
 #endif
+					shader = R_GetShaderByHandle( ent->e.customShader );
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 					R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0, R_SortOrder(ent) );
 #else
@@ -1431,6 +1430,10 @@ void R_GenerateDrawSurfs( void ) {
 	R_AddWorldSurfaces ();
 
 	R_AddPolygonSurfaces();
+
+#ifdef WOLFET
+	R_AddPolygonBufferSurfaces();
+#endif
 
 	// set the projection matrix with the minimum zfar
 	// now that we have the world bounded

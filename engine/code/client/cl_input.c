@@ -47,40 +47,25 @@ at the same time.
 */
 
 
-typedef struct
-{
-	kbutton_t	in_left, in_right, in_forward, in_back;
-	kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
+kbutton_t	in_left, in_right, in_forward, in_back;
+kbutton_t	in_lookup, in_lookdown, in_moveleft, in_moveright;
 #ifdef TURTLEARENA // NO_SPEED_KEY
-	kbutton_t	in_strafe;
+kbutton_t	in_strafe;
 #else
-	kbutton_t	in_strafe, in_speed;
+kbutton_t	in_strafe, in_speed;
 #endif
-	kbutton_t	in_up, in_down;
-
-#ifdef TURTLEARENA // LOCKON
-	kbutton_t	in_lockon;
-#endif
-
-	kbutton_t	in_buttons[16];
-
-#ifdef TA_PATHSYS // 2DMODE
-	int pathMode;
-#endif
-
-	// NOTE: in_mlooking should be moved here if multiple mice are supported.
-} clientInput_t;
-
-#ifdef TA_SPLITVIEW // CONTROLS
-clientInput_t cis[MAX_SPLITVIEW];
-#else
-clientInput_t cis[1];
-#endif
-
+kbutton_t	in_up, in_down;
 
 #ifdef USE_VOIP
 kbutton_t	in_voiprecord;
 #endif
+
+#ifdef TURTLEARENA // LOCKON
+kbutton_t	in_lockon;
+#endif
+
+kbutton_t	in_buttons[16];
+
 
 qboolean	in_mlooking;
 
@@ -217,134 +202,37 @@ float CL_KeyState( kbutton_t *key ) {
 
 
 
-void IN_UpDown(void) {IN_KeyDown(&cis[0].in_up);}
-void IN_UpUp(void) {IN_KeyUp(&cis[0].in_up);}
-void IN_DownDown(void) {IN_KeyDown(&cis[0].in_down);}
-void IN_DownUp(void) {IN_KeyUp(&cis[0].in_down);}
-void IN_LeftDown(void) {IN_KeyDown(&cis[0].in_left);}
-void IN_LeftUp(void) {IN_KeyUp(&cis[0].in_left);}
-void IN_RightDown(void) {IN_KeyDown(&cis[0].in_right);}
-void IN_RightUp(void) {IN_KeyUp(&cis[0].in_right);}
-void IN_ForwardDown(void) {IN_KeyDown(&cis[0].in_forward);}
-void IN_ForwardUp(void) {IN_KeyUp(&cis[0].in_forward);}
-void IN_BackDown(void) {IN_KeyDown(&cis[0].in_back);}
-void IN_BackUp(void) {IN_KeyUp(&cis[0].in_back);}
-void IN_LookupDown(void) {IN_KeyDown(&cis[0].in_lookup);}
-void IN_LookupUp(void) {IN_KeyUp(&cis[0].in_lookup);}
-void IN_LookdownDown(void) {IN_KeyDown(&cis[0].in_lookdown);}
-void IN_LookdownUp(void) {IN_KeyUp(&cis[0].in_lookdown);}
-void IN_MoveleftDown(void) {IN_KeyDown(&cis[0].in_moveleft);}
-void IN_MoveleftUp(void) {IN_KeyUp(&cis[0].in_moveleft);}
-void IN_MoverightDown(void) {IN_KeyDown(&cis[0].in_moveright);}
-void IN_MoverightUp(void) {IN_KeyUp(&cis[0].in_moveright);}
+void IN_UpDown(void) {IN_KeyDown(&in_up);}
+void IN_UpUp(void) {IN_KeyUp(&in_up);}
+void IN_DownDown(void) {IN_KeyDown(&in_down);}
+void IN_DownUp(void) {IN_KeyUp(&in_down);}
+void IN_LeftDown(void) {IN_KeyDown(&in_left);}
+void IN_LeftUp(void) {IN_KeyUp(&in_left);}
+void IN_RightDown(void) {IN_KeyDown(&in_right);}
+void IN_RightUp(void) {IN_KeyUp(&in_right);}
+void IN_ForwardDown(void) {IN_KeyDown(&in_forward);}
+void IN_ForwardUp(void) {IN_KeyUp(&in_forward);}
+void IN_BackDown(void) {IN_KeyDown(&in_back);}
+void IN_BackUp(void) {IN_KeyUp(&in_back);}
+void IN_LookupDown(void) {IN_KeyDown(&in_lookup);}
+void IN_LookupUp(void) {IN_KeyUp(&in_lookup);}
+void IN_LookdownDown(void) {IN_KeyDown(&in_lookdown);}
+void IN_LookdownUp(void) {IN_KeyUp(&in_lookdown);}
+void IN_MoveleftDown(void) {IN_KeyDown(&in_moveleft);}
+void IN_MoveleftUp(void) {IN_KeyUp(&in_moveleft);}
+void IN_MoverightDown(void) {IN_KeyDown(&in_moveright);}
+void IN_MoverightUp(void) {IN_KeyUp(&in_moveright);}
 
 #ifndef TURTLEARENA // NO_SPEED_KEY
-void IN_SpeedDown(void) {IN_KeyDown(&cis[0].in_speed);}
-void IN_SpeedUp(void) {IN_KeyUp(&cis[0].in_speed);}
+void IN_SpeedDown(void) {IN_KeyDown(&in_speed);}
+void IN_SpeedUp(void) {IN_KeyUp(&in_speed);}
 #endif
-void IN_StrafeDown(void) {IN_KeyDown(&cis[0].in_strafe);}
-void IN_StrafeUp(void) {IN_KeyUp(&cis[0].in_strafe);}
+void IN_StrafeDown(void) {IN_KeyDown(&in_strafe);}
+void IN_StrafeUp(void) {IN_KeyUp(&in_strafe);}
+
 #ifdef TURTLEARENA // LOCKON
-void IN_LockonDown(void) {IN_KeyDown(&cis[0].in_lockon);IN_KeyDown(&cis[0].in_strafe);}
-void IN_LockonUp(void) {IN_KeyUp(&cis[0].in_lockon);IN_KeyUp(&cis[0].in_strafe);}
-#endif
-
-#ifdef TA_SPLITVIEW
-void IN_2UpDown(void) {IN_KeyDown(&cis[1].in_up);}
-void IN_2UpUp(void) {IN_KeyUp(&cis[1].in_up);}
-void IN_2DownDown(void) {IN_KeyDown(&cis[1].in_down);}
-void IN_2DownUp(void) {IN_KeyUp(&cis[1].in_down);}
-void IN_2LeftDown(void) {IN_KeyDown(&cis[1].in_left);}
-void IN_2LeftUp(void) {IN_KeyUp(&cis[1].in_left);}
-void IN_2RightDown(void) {IN_KeyDown(&cis[1].in_right);}
-void IN_2RightUp(void) {IN_KeyUp(&cis[1].in_right);}
-void IN_2ForwardDown(void) {IN_KeyDown(&cis[1].in_forward);}
-void IN_2ForwardUp(void) {IN_KeyUp(&cis[1].in_forward);}
-void IN_2BackDown(void) {IN_KeyDown(&cis[1].in_back);}
-void IN_2BackUp(void) {IN_KeyUp(&cis[1].in_back);}
-void IN_2LookupDown(void) {IN_KeyDown(&cis[1].in_lookup);}
-void IN_2LookupUp(void) {IN_KeyUp(&cis[1].in_lookup);}
-void IN_2LookdownDown(void) {IN_KeyDown(&cis[1].in_lookdown);}
-void IN_2LookdownUp(void) {IN_KeyUp(&cis[1].in_lookdown);}
-void IN_2MoveleftDown(void) {IN_KeyDown(&cis[1].in_moveleft);}
-void IN_2MoveleftUp(void) {IN_KeyUp(&cis[1].in_moveleft);}
-void IN_2MoverightDown(void) {IN_KeyDown(&cis[1].in_moveright);}
-void IN_2MoverightUp(void) {IN_KeyUp(&cis[1].in_moveright);}
-
-#ifndef TURTLEARENA // NO_SPEED_KEY
-void IN_2SpeedDown(void) {IN_KeyDown(&cis[1].in_speed);}
-void IN_2SpeedUp(void) {IN_KeyUp(&cis[1].in_speed);}
-#endif
-void IN_2StrafeDown(void) {IN_KeyDown(&cis[1].in_strafe);}
-void IN_2StrafeUp(void) {IN_KeyUp(&cis[1].in_strafe);}
-#ifdef TURTLEARENA // LOCKON
-void IN_2LockonDown(void) {IN_KeyDown(&cis[1].in_lockon);IN_KeyDown(&cis[1].in_strafe);}
-void IN_2LockonUp(void) {IN_KeyUp(&cis[1].in_lockon);IN_KeyUp(&cis[1].in_strafe);}
-#endif
-
-void IN_3UpDown(void) {IN_KeyDown(&cis[2].in_up);}
-void IN_3UpUp(void) {IN_KeyUp(&cis[2].in_up);}
-void IN_3DownDown(void) {IN_KeyDown(&cis[2].in_down);}
-void IN_3DownUp(void) {IN_KeyUp(&cis[2].in_down);}
-void IN_3LeftDown(void) {IN_KeyDown(&cis[2].in_left);}
-void IN_3LeftUp(void) {IN_KeyUp(&cis[2].in_left);}
-void IN_3RightDown(void) {IN_KeyDown(&cis[2].in_right);}
-void IN_3RightUp(void) {IN_KeyUp(&cis[2].in_right);}
-void IN_3ForwardDown(void) {IN_KeyDown(&cis[2].in_forward);}
-void IN_3ForwardUp(void) {IN_KeyUp(&cis[2].in_forward);}
-void IN_3BackDown(void) {IN_KeyDown(&cis[2].in_back);}
-void IN_3BackUp(void) {IN_KeyUp(&cis[2].in_back);}
-void IN_3LookupDown(void) {IN_KeyDown(&cis[2].in_lookup);}
-void IN_3LookupUp(void) {IN_KeyUp(&cis[2].in_lookup);}
-void IN_3LookdownDown(void) {IN_KeyDown(&cis[2].in_lookdown);}
-void IN_3LookdownUp(void) {IN_KeyUp(&cis[2].in_lookdown);}
-void IN_3MoveleftDown(void) {IN_KeyDown(&cis[2].in_moveleft);}
-void IN_3MoveleftUp(void) {IN_KeyUp(&cis[2].in_moveleft);}
-void IN_3MoverightDown(void) {IN_KeyDown(&cis[2].in_moveright);}
-void IN_3MoverightUp(void) {IN_KeyUp(&cis[2].in_moveright);}
-
-#ifndef TURTLEARENA // NO_SPEED_KEY
-void IN_3SpeedDown(void) {IN_KeyDown(&cis[2].in_speed);}
-void IN_3SpeedUp(void) {IN_KeyUp(&cis[2].in_speed);}
-#endif
-void IN_3StrafeDown(void) {IN_KeyDown(&cis[2].in_strafe);}
-void IN_3StrafeUp(void) {IN_KeyUp(&cis[2].in_strafe);}
-#ifdef TURTLEARENA // LOCKON
-void IN_3LockonDown(void) {IN_KeyDown(&cis[2].in_lockon);IN_KeyDown(&cis[2].in_strafe);}
-void IN_3LockonUp(void) {IN_KeyUp(&cis[2].in_lockon);IN_KeyUp(&cis[2].in_strafe);}
-#endif
-
-void IN_4UpDown(void) {IN_KeyDown(&cis[3].in_up);}
-void IN_4UpUp(void) {IN_KeyUp(&cis[3].in_up);}
-void IN_4DownDown(void) {IN_KeyDown(&cis[3].in_down);}
-void IN_4DownUp(void) {IN_KeyUp(&cis[3].in_down);}
-void IN_4LeftDown(void) {IN_KeyDown(&cis[3].in_left);}
-void IN_4LeftUp(void) {IN_KeyUp(&cis[3].in_left);}
-void IN_4RightDown(void) {IN_KeyDown(&cis[3].in_right);}
-void IN_4RightUp(void) {IN_KeyUp(&cis[3].in_right);}
-void IN_4ForwardDown(void) {IN_KeyDown(&cis[3].in_forward);}
-void IN_4ForwardUp(void) {IN_KeyUp(&cis[3].in_forward);}
-void IN_4BackDown(void) {IN_KeyDown(&cis[3].in_back);}
-void IN_4BackUp(void) {IN_KeyUp(&cis[3].in_back);}
-void IN_4LookupDown(void) {IN_KeyDown(&cis[3].in_lookup);}
-void IN_4LookupUp(void) {IN_KeyUp(&cis[3].in_lookup);}
-void IN_4LookdownDown(void) {IN_KeyDown(&cis[3].in_lookdown);}
-void IN_4LookdownUp(void) {IN_KeyUp(&cis[3].in_lookdown);}
-void IN_4MoveleftDown(void) {IN_KeyDown(&cis[3].in_moveleft);}
-void IN_4MoveleftUp(void) {IN_KeyUp(&cis[3].in_moveleft);}
-void IN_4MoverightDown(void) {IN_KeyDown(&cis[3].in_moveright);}
-void IN_4MoverightUp(void) {IN_KeyUp(&cis[3].in_moveright);}
-
-#ifndef TURTLEARENA // NO_SPEED_KEY
-void IN_4SpeedDown(void) {IN_KeyDown(&cis[3].in_speed);}
-void IN_4SpeedUp(void) {IN_KeyUp(&cis[3].in_speed);}
-#endif
-void IN_4StrafeDown(void) {IN_KeyDown(&cis[3].in_strafe);}
-void IN_4StrafeUp(void) {IN_KeyUp(&cis[3].in_strafe);}
-#ifdef TURTLEARENA // LOCKON
-void IN_4LockonDown(void) {IN_KeyDown(&cis[3].in_lockon);IN_KeyDown(&cis[3].in_strafe);}
-void IN_4LockonUp(void) {IN_KeyUp(&cis[3].in_lockon);IN_KeyUp(&cis[3].in_strafe);}
-#endif
+void IN_LockonDown(void) {IN_KeyDown(&in_lockon);IN_KeyDown(&in_strafe);}
+void IN_LockonUp(void) {IN_KeyUp(&in_lockon);IN_KeyUp(&in_strafe);}
 #endif
 
 #ifdef USE_VOIP
@@ -361,191 +249,64 @@ void IN_VoipRecordUp(void)
 }
 #endif
 
-void IN_Button0Down(void) {IN_KeyDown(&cis[0].in_buttons[0]);}
-void IN_Button0Up(void) {IN_KeyUp(&cis[0].in_buttons[0]);}
-void IN_Button1Down(void) {IN_KeyDown(&cis[0].in_buttons[1]);}
-void IN_Button1Up(void) {IN_KeyUp(&cis[0].in_buttons[1]);}
-void IN_Button2Down(void) {IN_KeyDown(&cis[0].in_buttons[2]);}
-void IN_Button2Up(void) {IN_KeyUp(&cis[0].in_buttons[2]);}
-void IN_Button3Down(void) {IN_KeyDown(&cis[0].in_buttons[3]);}
-void IN_Button3Up(void) {IN_KeyUp(&cis[0].in_buttons[3]);}
-void IN_Button4Down(void) {IN_KeyDown(&cis[0].in_buttons[4]);}
-void IN_Button4Up(void) {IN_KeyUp(&cis[0].in_buttons[4]);}
-void IN_Button5Down(void) {IN_KeyDown(&cis[0].in_buttons[5]);}
-void IN_Button5Up(void) {IN_KeyUp(&cis[0].in_buttons[5]);}
-void IN_Button6Down(void) {IN_KeyDown(&cis[0].in_buttons[6]);}
-void IN_Button6Up(void) {IN_KeyUp(&cis[0].in_buttons[6]);}
-void IN_Button7Down(void) {IN_KeyDown(&cis[0].in_buttons[7]);}
-void IN_Button7Up(void) {IN_KeyUp(&cis[0].in_buttons[7]);}
-void IN_Button8Down(void) {IN_KeyDown(&cis[0].in_buttons[8]);}
-void IN_Button8Up(void) {IN_KeyUp(&cis[0].in_buttons[8]);}
-void IN_Button9Down(void) {IN_KeyDown(&cis[0].in_buttons[9]);}
-void IN_Button9Up(void) {IN_KeyUp(&cis[0].in_buttons[9]);}
-void IN_Button10Down(void) {IN_KeyDown(&cis[0].in_buttons[10]);}
-void IN_Button10Up(void) {IN_KeyUp(&cis[0].in_buttons[10]);}
-void IN_Button11Down(void) {IN_KeyDown(&cis[0].in_buttons[11]);}
-void IN_Button11Up(void) {IN_KeyUp(&cis[0].in_buttons[11]);}
-void IN_Button12Down(void) {IN_KeyDown(&cis[0].in_buttons[12]);}
-void IN_Button12Up(void) {IN_KeyUp(&cis[0].in_buttons[12]);}
-void IN_Button13Down(void) {IN_KeyDown(&cis[0].in_buttons[13]);}
-void IN_Button13Up(void) {IN_KeyUp(&cis[0].in_buttons[13]);}
-void IN_Button14Down(void) {IN_KeyDown(&cis[0].in_buttons[14]);}
-void IN_Button14Up(void) {IN_KeyUp(&cis[0].in_buttons[14]);}
-void IN_Button15Down(void) {IN_KeyDown(&cis[0].in_buttons[15]);}
-void IN_Button15Up(void) {IN_KeyUp(&cis[0].in_buttons[15]);}
+void IN_Button0Down(void) {IN_KeyDown(&in_buttons[0]);}
+void IN_Button0Up(void) {IN_KeyUp(&in_buttons[0]);}
+void IN_Button1Down(void) {IN_KeyDown(&in_buttons[1]);}
+void IN_Button1Up(void) {IN_KeyUp(&in_buttons[1]);}
+void IN_Button2Down(void) {IN_KeyDown(&in_buttons[2]);}
+void IN_Button2Up(void) {IN_KeyUp(&in_buttons[2]);}
+void IN_Button3Down(void) {IN_KeyDown(&in_buttons[3]);}
+void IN_Button3Up(void) {IN_KeyUp(&in_buttons[3]);}
+void IN_Button4Down(void) {IN_KeyDown(&in_buttons[4]);}
+void IN_Button4Up(void) {IN_KeyUp(&in_buttons[4]);}
+void IN_Button5Down(void) {IN_KeyDown(&in_buttons[5]);}
+void IN_Button5Up(void) {IN_KeyUp(&in_buttons[5]);}
+void IN_Button6Down(void) {IN_KeyDown(&in_buttons[6]);}
+void IN_Button6Up(void) {IN_KeyUp(&in_buttons[6]);}
+void IN_Button7Down(void) {IN_KeyDown(&in_buttons[7]);}
+void IN_Button7Up(void) {IN_KeyUp(&in_buttons[7]);}
+void IN_Button8Down(void) {IN_KeyDown(&in_buttons[8]);}
+void IN_Button8Up(void) {IN_KeyUp(&in_buttons[8]);}
+void IN_Button9Down(void) {IN_KeyDown(&in_buttons[9]);}
+void IN_Button9Up(void) {IN_KeyUp(&in_buttons[9]);}
+void IN_Button10Down(void) {IN_KeyDown(&in_buttons[10]);}
+void IN_Button10Up(void) {IN_KeyUp(&in_buttons[10]);}
+void IN_Button11Down(void) {IN_KeyDown(&in_buttons[11]);}
+void IN_Button11Up(void) {IN_KeyUp(&in_buttons[11]);}
+void IN_Button12Down(void) {IN_KeyDown(&in_buttons[12]);}
+void IN_Button12Up(void) {IN_KeyUp(&in_buttons[12]);}
+void IN_Button13Down(void) {IN_KeyDown(&in_buttons[13]);}
+void IN_Button13Up(void) {IN_KeyUp(&in_buttons[13]);}
+void IN_Button14Down(void) {IN_KeyDown(&in_buttons[14]);}
+void IN_Button14Up(void) {IN_KeyUp(&in_buttons[14]);}
+void IN_Button15Down(void) {IN_KeyDown(&in_buttons[15]);}
+void IN_Button15Up(void) {IN_KeyUp(&in_buttons[15]);}
 
-#ifdef TA_SPLITVIEW
-void IN_2Button0Down(void) {IN_KeyDown(&cis[1].in_buttons[0]);}
-void IN_2Button0Up(void) {IN_KeyUp(&cis[1].in_buttons[0]);}
-void IN_2Button1Down(void) {IN_KeyDown(&cis[1].in_buttons[1]);}
-void IN_2Button1Up(void) {IN_KeyUp(&cis[1].in_buttons[1]);}
-void IN_2Button2Down(void) {IN_KeyDown(&cis[1].in_buttons[2]);}
-void IN_2Button2Up(void) {IN_KeyUp(&cis[1].in_buttons[2]);}
-void IN_2Button3Down(void) {IN_KeyDown(&cis[1].in_buttons[3]);}
-void IN_2Button3Up(void) {IN_KeyUp(&cis[1].in_buttons[3]);}
-void IN_2Button4Down(void) {IN_KeyDown(&cis[1].in_buttons[4]);}
-void IN_2Button4Up(void) {IN_KeyUp(&cis[1].in_buttons[4]);}
-void IN_2Button5Down(void) {IN_KeyDown(&cis[1].in_buttons[5]);}
-void IN_2Button5Up(void) {IN_KeyUp(&cis[1].in_buttons[5]);}
-void IN_2Button6Down(void) {IN_KeyDown(&cis[1].in_buttons[6]);}
-void IN_2Button6Up(void) {IN_KeyUp(&cis[1].in_buttons[6]);}
-void IN_2Button7Down(void) {IN_KeyDown(&cis[1].in_buttons[7]);}
-void IN_2Button7Up(void) {IN_KeyUp(&cis[1].in_buttons[7]);}
-void IN_2Button8Down(void) {IN_KeyDown(&cis[1].in_buttons[8]);}
-void IN_2Button8Up(void) {IN_KeyUp(&cis[1].in_buttons[8]);}
-void IN_2Button9Down(void) {IN_KeyDown(&cis[1].in_buttons[9]);}
-void IN_2Button9Up(void) {IN_KeyUp(&cis[1].in_buttons[9]);}
-void IN_2Button10Down(void) {IN_KeyDown(&cis[1].in_buttons[10]);}
-void IN_2Button10Up(void) {IN_KeyUp(&cis[1].in_buttons[10]);}
-void IN_2Button11Down(void) {IN_KeyDown(&cis[1].in_buttons[11]);}
-void IN_2Button11Up(void) {IN_KeyUp(&cis[1].in_buttons[11]);}
-void IN_2Button12Down(void) {IN_KeyDown(&cis[1].in_buttons[12]);}
-void IN_2Button12Up(void) {IN_KeyUp(&cis[1].in_buttons[12]);}
-void IN_2Button13Down(void) {IN_KeyDown(&cis[1].in_buttons[13]);}
-void IN_2Button13Up(void) {IN_KeyUp(&cis[1].in_buttons[13]);}
-void IN_2Button14Down(void) {IN_KeyDown(&cis[1].in_buttons[14]);}
-void IN_2Button14Up(void) {IN_KeyUp(&cis[1].in_buttons[14]);}
-void IN_2Button15Down(void) {IN_KeyDown(&cis[1].in_buttons[15]);}
-void IN_2Button15Up(void) {IN_KeyUp(&cis[1].in_buttons[15]);}
-
-void IN_3Button0Down(void) {IN_KeyDown(&cis[2].in_buttons[0]);}
-void IN_3Button0Up(void) {IN_KeyUp(&cis[2].in_buttons[0]);}
-void IN_3Button1Down(void) {IN_KeyDown(&cis[2].in_buttons[1]);}
-void IN_3Button1Up(void) {IN_KeyUp(&cis[2].in_buttons[1]);}
-void IN_3Button2Down(void) {IN_KeyDown(&cis[2].in_buttons[2]);}
-void IN_3Button2Up(void) {IN_KeyUp(&cis[2].in_buttons[2]);}
-void IN_3Button3Down(void) {IN_KeyDown(&cis[2].in_buttons[3]);}
-void IN_3Button3Up(void) {IN_KeyUp(&cis[2].in_buttons[3]);}
-void IN_3Button4Down(void) {IN_KeyDown(&cis[2].in_buttons[4]);}
-void IN_3Button4Up(void) {IN_KeyUp(&cis[2].in_buttons[4]);}
-void IN_3Button5Down(void) {IN_KeyDown(&cis[2].in_buttons[5]);}
-void IN_3Button5Up(void) {IN_KeyUp(&cis[2].in_buttons[5]);}
-void IN_3Button6Down(void) {IN_KeyDown(&cis[2].in_buttons[6]);}
-void IN_3Button6Up(void) {IN_KeyUp(&cis[2].in_buttons[6]);}
-void IN_3Button7Down(void) {IN_KeyDown(&cis[2].in_buttons[7]);}
-void IN_3Button7Up(void) {IN_KeyUp(&cis[2].in_buttons[7]);}
-void IN_3Button8Down(void) {IN_KeyDown(&cis[2].in_buttons[8]);}
-void IN_3Button8Up(void) {IN_KeyUp(&cis[2].in_buttons[8]);}
-void IN_3Button9Down(void) {IN_KeyDown(&cis[2].in_buttons[9]);}
-void IN_3Button9Up(void) {IN_KeyUp(&cis[2].in_buttons[9]);}
-void IN_3Button10Down(void) {IN_KeyDown(&cis[2].in_buttons[10]);}
-void IN_3Button10Up(void) {IN_KeyUp(&cis[2].in_buttons[10]);}
-void IN_3Button11Down(void) {IN_KeyDown(&cis[2].in_buttons[11]);}
-void IN_3Button11Up(void) {IN_KeyUp(&cis[2].in_buttons[11]);}
-void IN_3Button12Down(void) {IN_KeyDown(&cis[2].in_buttons[12]);}
-void IN_3Button12Up(void) {IN_KeyUp(&cis[2].in_buttons[12]);}
-void IN_3Button13Down(void) {IN_KeyDown(&cis[2].in_buttons[13]);}
-void IN_3Button13Up(void) {IN_KeyUp(&cis[2].in_buttons[13]);}
-void IN_3Button14Down(void) {IN_KeyDown(&cis[2].in_buttons[14]);}
-void IN_3Button14Up(void) {IN_KeyUp(&cis[2].in_buttons[14]);}
-void IN_3Button15Down(void) {IN_KeyDown(&cis[2].in_buttons[15]);}
-void IN_3Button15Up(void) {IN_KeyUp(&cis[2].in_buttons[15]);}
-
-void IN_4Button0Down(void) {IN_KeyDown(&cis[3].in_buttons[0]);}
-void IN_4Button0Up(void) {IN_KeyUp(&cis[3].in_buttons[0]);}
-void IN_4Button1Down(void) {IN_KeyDown(&cis[3].in_buttons[1]);}
-void IN_4Button1Up(void) {IN_KeyUp(&cis[3].in_buttons[1]);}
-void IN_4Button2Down(void) {IN_KeyDown(&cis[3].in_buttons[2]);}
-void IN_4Button2Up(void) {IN_KeyUp(&cis[3].in_buttons[2]);}
-void IN_4Button3Down(void) {IN_KeyDown(&cis[3].in_buttons[3]);}
-void IN_4Button3Up(void) {IN_KeyUp(&cis[3].in_buttons[3]);}
-void IN_4Button4Down(void) {IN_KeyDown(&cis[3].in_buttons[4]);}
-void IN_4Button4Up(void) {IN_KeyUp(&cis[3].in_buttons[4]);}
-void IN_4Button5Down(void) {IN_KeyDown(&cis[3].in_buttons[5]);}
-void IN_4Button5Up(void) {IN_KeyUp(&cis[3].in_buttons[5]);}
-void IN_4Button6Down(void) {IN_KeyDown(&cis[3].in_buttons[6]);}
-void IN_4Button6Up(void) {IN_KeyUp(&cis[3].in_buttons[6]);}
-void IN_4Button7Down(void) {IN_KeyDown(&cis[3].in_buttons[7]);}
-void IN_4Button7Up(void) {IN_KeyUp(&cis[3].in_buttons[7]);}
-void IN_4Button8Down(void) {IN_KeyDown(&cis[3].in_buttons[8]);}
-void IN_4Button8Up(void) {IN_KeyUp(&cis[3].in_buttons[8]);}
-void IN_4Button9Down(void) {IN_KeyDown(&cis[3].in_buttons[9]);}
-void IN_4Button9Up(void) {IN_KeyUp(&cis[3].in_buttons[9]);}
-void IN_4Button10Down(void) {IN_KeyDown(&cis[3].in_buttons[10]);}
-void IN_4Button10Up(void) {IN_KeyUp(&cis[3].in_buttons[10]);}
-void IN_4Button11Down(void) {IN_KeyDown(&cis[3].in_buttons[11]);}
-void IN_4Button11Up(void) {IN_KeyUp(&cis[3].in_buttons[11]);}
-void IN_4Button12Down(void) {IN_KeyDown(&cis[3].in_buttons[12]);}
-void IN_4Button12Up(void) {IN_KeyUp(&cis[3].in_buttons[12]);}
-void IN_4Button13Down(void) {IN_KeyDown(&cis[3].in_buttons[13]);}
-void IN_4Button13Up(void) {IN_KeyUp(&cis[3].in_buttons[13]);}
-void IN_4Button14Down(void) {IN_KeyDown(&cis[3].in_buttons[14]);}
-void IN_4Button14Up(void) {IN_KeyUp(&cis[3].in_buttons[14]);}
-void IN_4Button15Down(void) {IN_KeyDown(&cis[3].in_buttons[15]);}
-void IN_4Button15Up(void) {IN_KeyUp(&cis[3].in_buttons[15]);}
-#endif
-
-#ifdef TA_SPLITVIEW
-void IN_CenterView_Main(int localClientNum) {
-	if (localClientNum >= MAX_SPLITVIEW || cl.snap.lcIndex[localClientNum] == -1) {
-		return;
-	}
-	cl.localClients[localClientNum].viewangles[PITCH] = -SHORT2ANGLE(cl.snap.pss[cl.snap.lcIndex[localClientNum]].delta_angles[PITCH]);
-}
+void IN_ButtonDown (void) {
+	IN_KeyDown(&in_buttons[1]);}
+void IN_ButtonUp (void) {
+	IN_KeyUp(&in_buttons[1]);}
 
 void IN_CenterView (void) {
-	IN_CenterView_Main(0);
+	cl.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
 }
-
-void IN_2CenterView (void) {
-	IN_CenterView_Main(1);
-}
-
-void IN_3CenterView (void) {
-	IN_CenterView_Main(2);
-}
-
-void IN_4CenterView (void) {
-	IN_CenterView_Main(3);
-}
-#else
-void IN_CenterView (void) {
-	cl.localClient.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
-}
-#endif
 
 
 //==========================================================================
 
-#ifdef TA_SPLITVIEW
-cvar_t	*cl_yawspeed[MAX_SPLITVIEW];
-cvar_t	*cl_pitchspeed[MAX_SPLITVIEW];
+cvar_t	*cl_upspeed;
+cvar_t	*cl_forwardspeed;
+cvar_t	*cl_sidespeed;
 
-cvar_t	*cl_anglespeedkey[MAX_SPLITVIEW];
-#else
 cvar_t	*cl_yawspeed;
 cvar_t	*cl_pitchspeed;
 
-cvar_t	*cl_anglespeedkey;
-#endif
-
 #ifndef TURTLEARENA // ALWAYS_RUN
-#ifdef TA_SPLITVIEW
-cvar_t	*cl_run[MAX_SPLITVIEW];
-#else
 cvar_t	*cl_run;
 #endif
-#endif
+
+cvar_t	*cl_anglespeedkey;
+
 
 /*
 ================
@@ -554,49 +315,27 @@ CL_AdjustAngles
 Moves the local angle positions
 ================
 */
-void CL_AdjustAngles( calc_t *lc, clientInput_t *ci ) {
+void CL_AdjustAngles( void ) {
 	float	speed;
-#ifdef TA_SPLITVIEW
-	size_t	lcNum = lc - cl.localClients;
-#endif
 	
 #ifdef TURTLEARENA // LOCKON // NO_SPEED_KEY
-	if ( !ci->in_lockon.active )
+	if ( !in_lockon.active )
 #else
-	if ( ci->in_speed.active )
+	if ( in_speed.active )
 #endif
 	{
-#ifdef TA_SPLITVIEW
-		speed = 0.001 * cls.frametime * cl_anglespeedkey[lcNum]->value;
-#else
 		speed = 0.001 * cls.frametime * cl_anglespeedkey->value;
-#endif
 	} else {
 		speed = 0.001 * cls.frametime;
 	}
 
-	if ( !ci->in_strafe.active
-#ifdef TA_PATHSYS // 2DMODE
-		&& ci->pathMode != PATHMODE_SIDE && ci->pathMode != PATHMODE_BACK
-#endif
-		)
-	{
-#ifdef TA_SPLITVIEW
-		lc->viewangles[YAW] -= speed*cl_yawspeed[lcNum]->value*CL_KeyState (&ci->in_right);
-		lc->viewangles[YAW] += speed*cl_yawspeed[lcNum]->value*CL_KeyState (&ci->in_left);
-#else
-		lc->viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&ci->in_right);
-		lc->viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&ci->in_left);
-#endif
+	if ( !in_strafe.active ) {
+		cl.viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&in_right);
+		cl.viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&in_left);
 	}
 
-#ifdef TA_SPLITVIEW
-	lc->viewangles[PITCH] -= speed*cl_pitchspeed[lcNum]->value * CL_KeyState (&ci->in_lookup);
-	lc->viewangles[PITCH] += speed*cl_pitchspeed[lcNum]->value * CL_KeyState (&ci->in_lookdown);
-#else
-	lc->viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&ci->in_lookup);
-	lc->viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&ci->in_lookdown);
-#endif
+	cl.viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&in_lookup);
+	cl.viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&in_lookdown);
 }
 
 /*
@@ -606,7 +345,7 @@ CL_KeyMove
 Sets the usercmd_t based on key states
 ================
 */
-void CL_KeyMove( clientInput_t *ci, usercmd_t *cmd ) {
+void CL_KeyMove( usercmd_t *cmd ) {
 	int		movespeed;
 	int		forward, side, up;
 
@@ -616,13 +355,9 @@ void CL_KeyMove( clientInput_t *ci, usercmd_t *cmd ) {
 	// even during acceleration and develeration
 	//
 #ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
-	if (!ci->in_lockon.active)
+	if (!in_lockon.active)
 #else
-#ifdef TA_SPLITVIEW
-	if ( ci->in_speed.active ^ cl_run[ci-cis]->integer )
-#else
-	if ( ci->in_speed.active ^ cl_run->integer )
-#endif
+	if ( in_speed.active ^ cl_run->integer )
 #endif
 	{
 		movespeed = 127;
@@ -635,25 +370,20 @@ void CL_KeyMove( clientInput_t *ci, usercmd_t *cmd ) {
 	forward = 0;
 	side = 0;
 	up = 0;
-	if ( ci->in_strafe.active
-#ifdef TA_PATHSYS // 2DMODE
-		|| ci->pathMode == PATHMODE_SIDE || ci->pathMode == PATHMODE_BACK
-#endif
-		)
-	{
-		side += movespeed * CL_KeyState (&ci->in_right);
-		side -= movespeed * CL_KeyState (&ci->in_left);
+	if ( in_strafe.active ) {
+		side += movespeed * CL_KeyState (&in_right);
+		side -= movespeed * CL_KeyState (&in_left);
 	}
 
-	side += movespeed * CL_KeyState (&ci->in_moveright);
-	side -= movespeed * CL_KeyState (&ci->in_moveleft);
+	side += movespeed * CL_KeyState (&in_moveright);
+	side -= movespeed * CL_KeyState (&in_moveleft);
 
 
-	up += movespeed * CL_KeyState (&ci->in_up);
-	up -= movespeed * CL_KeyState (&ci->in_down);
+	up += movespeed * CL_KeyState (&in_up);
+	up -= movespeed * CL_KeyState (&in_down);
 
-	forward += movespeed * CL_KeyState (&ci->in_forward);
-	forward -= movespeed * CL_KeyState (&ci->in_back);
+	forward += movespeed * CL_KeyState (&in_forward);
+	forward -= movespeed * CL_KeyState (&in_back);
 
 	cmd->forwardmove = ClampChar( forward );
 	cmd->rightmove = ClampChar( side );
@@ -671,13 +401,8 @@ void CL_MouseEvent( int dx, int dy, int time ) {
 	} else if (Key_GetCatcher( ) & KEYCATCH_CGAME) {
 		VM_Call (cgvm, CG_MOUSE_EVENT, dx, dy);
 	} else {
-#ifdef TA_SPLITVIEW
-		cl.localClients[0].mouseDx[cl.localClients[0].mouseIndex] += dx;
-		cl.localClients[0].mouseDy[cl.localClients[0].mouseIndex] += dy;
-#else
-		cl.localClient.mouseDx[cl.localClient.mouseIndex] += dx;
-		cl.localClient.mouseDy[cl.localClient.mouseIndex] += dy;
-#endif
+		cl.mouseDx[cl.mouseIndex] += dx;
+		cl.mouseDy[cl.mouseIndex] += dy;
 	}
 }
 
@@ -692,11 +417,7 @@ void CL_JoystickEvent( int axis, int value, int time ) {
 	if ( axis < 0 || axis >= MAX_JOYSTICK_AXIS ) {
 		Com_Error( ERR_DROP, "CL_JoystickEvent: bad axis %i", axis );
 	}
-#ifdef TA_SPLITVIEW
-	cl.localClients[0].joystickAxis[axis] = value;
-#else
-	cl.localClient.joystickAxis[axis] = value;
-#endif
+	cl.joystickAxis[axis] = value;
 }
 
 /*
@@ -704,82 +425,46 @@ void CL_JoystickEvent( int axis, int value, int time ) {
 CL_JoystickMove
 =================
 */
-void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
+void CL_JoystickMove( usercmd_t *cmd ) {
+	int		movespeed;
 	float	anglespeed;
-#ifdef TA_SPLITVIEW
-	size_t	lcNum = lc - cl.localClients;
-#endif
 
 #ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
-	if (ci->in_lockon.active)
+	if (!in_lockon.active)
 #else
-#ifdef TA_SPLITVIEW
-	if ( !(ci->in_speed.active ^ cl_run[ci-cis]->integer) )
-#else
-	if ( !(ci->in_speed.active ^ cl_run->integer) )
-#endif
+	if ( in_speed.active ^ cl_run->integer )
 #endif
 	{
+		movespeed = 2;
+	} else {
+		movespeed = 1;
 		cmd->buttons |= BUTTON_WALKING;
 	}
 
 #ifdef TURTLEARENA // LOCKON // NO_SPEED_KEY
-	if ( !ci->in_lockon.active )
+	if ( !in_lockon.active )
 #else
-	if ( ci->in_speed.active )
+	if ( in_speed.active )
 #endif
 	{
-#ifdef TA_SPLITVIEW
-		anglespeed = 0.001 * cls.frametime * cl_anglespeedkey[lcNum]->value;
-#else
 		anglespeed = 0.001 * cls.frametime * cl_anglespeedkey->value;
-#endif
 	} else {
 		anglespeed = 0.001 * cls.frametime;
 	}
 
-	if ( !ci->in_strafe.active
-#ifdef TA_PATHSYS // 2DMODE
-		&& ci->pathMode != PATHMODE_SIDE && ci->pathMode != PATHMODE_BACK
-#endif
-		)
-	{
-#ifdef TA_SPLITVIEW
-		lc->viewangles[YAW] += anglespeed * j_yaw[lcNum]->value * lc->joystickAxis[j_yaw_axis[lcNum]->integer];
-		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_side[lcNum]->value * lc->joystickAxis[j_side_axis[lcNum]->integer]) );
-#else
-		lc->viewangles[YAW] += anglespeed * j_yaw->value * lc->joystickAxis[j_yaw_axis->integer];
-		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_side->value * lc->joystickAxis[j_side_axis->integer]) );
-#endif
+	if ( !in_strafe.active ) {
+		cl.viewangles[YAW] += anglespeed * cl_yawspeed->value * cl.joystickAxis[AXIS_SIDE];
 	} else {
-#ifdef TA_SPLITVIEW
-		lc->viewangles[YAW] += anglespeed * j_side[lcNum]->value * lc->joystickAxis[j_side_axis[lcNum]->integer];
-		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_yaw[lcNum]->value * lc->joystickAxis[j_yaw_axis[lcNum]->integer]) );
-#else
-		lc->viewangles[YAW] += anglespeed * j_side->value * lc->joystickAxis[j_side_axis->integer];
-		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_yaw->value * lc->joystickAxis[j_yaw_axis->integer]) );
-#endif
+		cmd->rightmove = ClampChar( cmd->rightmove + cl.joystickAxis[AXIS_SIDE] );
 	}
 
 	if ( in_mlooking ) {
-#ifdef TA_SPLITVIEW
-		lc->viewangles[PITCH] += anglespeed * j_forward[lcNum]->value * lc->joystickAxis[j_forward_axis[lcNum]->integer];
-		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_pitch[lcNum]->value * lc->joystickAxis[j_pitch_axis[lcNum]->integer]) );
-#else
-		lc->viewangles[PITCH] += anglespeed * j_forward->value * lc->joystickAxis[j_forward_axis->integer];
-		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_pitch->value * lc->joystickAxis[j_pitch_axis->integer]) );
-#endif
+		cl.viewangles[PITCH] += anglespeed * cl_pitchspeed->value * cl.joystickAxis[AXIS_FORWARD];
 	} else {
-#ifdef TA_SPLITVIEW
-		lc->viewangles[PITCH] += anglespeed * j_pitch[lcNum]->value * lc->joystickAxis[j_pitch_axis[lcNum]->integer];
-		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_forward[lcNum]->value * lc->joystickAxis[j_forward_axis[lcNum]->integer]) );
-#else
-		lc->viewangles[PITCH] += anglespeed * j_pitch->value * lc->joystickAxis[j_pitch_axis->integer];
-		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_forward->value * lc->joystickAxis[j_forward_axis->integer]) );
-#endif
+		cmd->forwardmove = ClampChar( cmd->forwardmove + cl.joystickAxis[AXIS_FORWARD] );
 	}
 
-	cmd->upmove = ClampChar( cmd->upmove + lc->joystickAxis[AXIS_UP] );
+	cmd->upmove = ClampChar( cmd->upmove + cl.joystickAxis[AXIS_UP] );
 }
 
 /*
@@ -788,25 +473,25 @@ CL_MouseMove
 =================
 */
 
-void CL_MouseMove(calc_t *lc, clientInput_t *ci, usercmd_t *cmd)
+void CL_MouseMove(usercmd_t *cmd)
 {
 	float mx, my;
 
 	// allow mouse smoothing
 	if (m_filter->integer)
 	{
-		mx = (lc->mouseDx[0] + lc->mouseDx[1]) * 0.5f;
-		my = (lc->mouseDy[0] + lc->mouseDy[1]) * 0.5f;
+		mx = (cl.mouseDx[0] + cl.mouseDx[1]) * 0.5f;
+		my = (cl.mouseDy[0] + cl.mouseDy[1]) * 0.5f;
 	}
 	else
 	{
-		mx = lc->mouseDx[lc->mouseIndex];
-		my = lc->mouseDy[lc->mouseIndex];
+		mx = cl.mouseDx[cl.mouseIndex];
+		my = cl.mouseDy[cl.mouseIndex];
 	}
 	
-	lc->mouseIndex ^= 1;
-	lc->mouseDx[lc->mouseIndex] = 0;
-	lc->mouseDy[lc->mouseIndex] = 0;
+	cl.mouseIndex ^= 1;
+	cl.mouseDx[cl.mouseIndex] = 0;
+	cl.mouseDy[cl.mouseIndex] = 0;
 
 	if (mx == 0.0f && my == 0.0f)
 		return;
@@ -856,20 +541,15 @@ void CL_MouseMove(calc_t *lc, clientInput_t *ci, usercmd_t *cmd)
 	}
 
 	// ingame FOV
-	mx *= lc->cgameSensitivity;
-	my *= lc->cgameSensitivity;
+	mx *= cl.cgameSensitivity;
+	my *= cl.cgameSensitivity;
 
 	// add mouse X/Y movement to cmd
-	if(ci->in_strafe.active
-#ifdef TA_PATHSYS // 2DMODE
-		|| ci->pathMode == PATHMODE_SIDE || ci->pathMode == PATHMODE_BACK
-#endif
-		)
-	{
+	if(in_strafe.active) {
 		cmd->rightmove = ClampChar(cmd->rightmove + m_side->value * mx);
 #ifdef TURTLEARENA // LOCKON
 		// if walking, don't go over 64 side move
-		if (ci->in_lockon.active)
+		if (in_lockon.active)
 		{
 			if (cmd->rightmove > 64)
 				cmd->rightmove = 64;
@@ -879,19 +559,16 @@ void CL_MouseMove(calc_t *lc, clientInput_t *ci, usercmd_t *cmd)
 #endif
 	}
 	else
-		lc->viewangles[YAW] -= m_yaw->value * mx;
+		cl.viewangles[YAW] -= m_yaw->value * mx;
 
 	if ((in_mlooking || cl_freelook->integer)
 #ifdef TURTLEARENA // LOCKON
-		&& (ci->in_lockon.active || !ci->in_strafe.active)
+		&& (in_lockon.active || !in_strafe.active)
 #else
-		&& !ci->in_strafe.active
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-		&& ci->pathMode != PATHMODE_SIDE && ci->pathMode != PATHMODE_BACK
+		&& !in_strafe.active
 #endif
 		)
-		lc->viewangles[PITCH] += m_pitch->value * my;
+		cl.viewangles[PITCH] += m_pitch->value * my;
 	else
 		cmd->forwardmove = ClampChar(cmd->forwardmove - m_forward->value * my);
 }
@@ -902,7 +579,7 @@ void CL_MouseMove(calc_t *lc, clientInput_t *ci, usercmd_t *cmd)
 CL_CmdButtons
 ==============
 */
-void CL_CmdButtons( clientInput_t *ci, usercmd_t *cmd ) {
+void CL_CmdButtons( usercmd_t *cmd ) {
 	int		i;
 
 	//
@@ -911,10 +588,10 @@ void CL_CmdButtons( clientInput_t *ci, usercmd_t *cmd ) {
 	// less than a frame
 	//	
 	for (i = 0 ; i < 15 ; i++) {
-		if ( ci->in_buttons[i].active || ci->in_buttons[i].wasPressed ) {
+		if ( in_buttons[i].active || in_buttons[i].wasPressed ) {
 			cmd->buttons |= 1 << i;
 		}
-		ci->in_buttons[i].wasPressed = qfalse;
+		in_buttons[i].wasPressed = qfalse;
 	}
 
 	if ( Key_GetCatcher( ) ) {
@@ -934,15 +611,15 @@ void CL_CmdButtons( clientInput_t *ci, usercmd_t *cmd ) {
 CL_FinishMove
 ==============
 */
-void CL_FinishMove( calc_t *lc, usercmd_t *cmd ) {
+void CL_FinishMove( usercmd_t *cmd ) {
 	int		i;
 
 	// copy the state that the cgame is currently sending
 #if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
-	cmd->weapon = lc->cgameUserCmdValue;
+	cmd->weapon = cl.cgameUserCmdValue;
 #endif
 #ifdef TA_HOLDSYS/*2*/
-	cmd->holdable = lc->cgameHoldableValue;
+	cmd->holdable = cl.cgameHoldableValue;
 #endif
 
 	// send the current server time so the amount of movement
@@ -954,13 +631,13 @@ void CL_FinishMove( calc_t *lc, usercmd_t *cmd ) {
 	{
 		if (cmd->forwardmove || cmd->rightmove || cmd->upmove)
 		{
-			lc->viewangles[YAW] -= cl_thirdPersonAngle->value;
+			cl.viewangles[YAW] -= cl_thirdPersonAngle->value;
 			Cvar_Set("cg_thirdPersonAngle", "0");
 		}
 	}
 #endif
 	for (i=0 ; i<3 ; i++) {
-		cmd->angles[i] = ANGLE2SHORT(lc->viewangles[i]);
+		cmd->angles[i] = ANGLE2SHORT(cl.viewangles[i]);
 	}
 }
 
@@ -970,67 +647,45 @@ void CL_FinishMove( calc_t *lc, usercmd_t *cmd ) {
 CL_CreateCmd
 =================
 */
-#ifdef TA_SPLITVIEW // CONTROLS
-usercmd_t CL_CreateCmd( int localClientNum )
-#else
-usercmd_t CL_CreateCmd( void )
-#endif
-{
+usercmd_t CL_CreateCmd( void ) {
 	usercmd_t	cmd;
 	vec3_t		oldAngles;
-	calc_t		*lc;
-	clientInput_t *ci;
-#ifdef TA_SPLITVIEW // CONTROLS
-	lc = &cl.localClients[localClientNum];
-	ci = &cis[localClientNum];
-#else
-	lc = &cl.localClient;
-	ci = &cis[0];
-#endif
 
-#ifdef TA_PATHSYS // 2DMODE
-#ifdef TA_SPLITVIEW
-	ci->pathMode = cl.snap.pss[cl.snap.lcIndex[localClientNum]].pathMode;
-#else
-	ci->pathMode = cl.snap.ps.pathMode;
-#endif
-#endif
-
-	VectorCopy( lc->viewangles, oldAngles );
+	VectorCopy( cl.viewangles, oldAngles );
 
 	// keyboard angle adjustment
-	CL_AdjustAngles (lc, ci);
+	CL_AdjustAngles ();
 	
 	Com_Memset( &cmd, 0, sizeof( cmd ) );
 
-	CL_CmdButtons( ci, &cmd );
+	CL_CmdButtons( &cmd );
 
 	// get basic movement from keyboard
-	CL_KeyMove( ci, &cmd );
+	CL_KeyMove( &cmd );
 
 	// get basic movement from mouse
-	CL_MouseMove( lc, ci, &cmd );
+	CL_MouseMove( &cmd );
 
 	// get basic movement from joystick
-	CL_JoystickMove( lc, ci, &cmd );
+	CL_JoystickMove( &cmd );
 
 	// check to make sure the angles haven't wrapped
-	if ( lc->viewangles[PITCH] - oldAngles[PITCH] > 90 ) {
-		lc->viewangles[PITCH] = oldAngles[PITCH] + 90;
-	} else if ( oldAngles[PITCH] - lc->viewangles[PITCH] > 90 ) {
-		lc->viewangles[PITCH] = oldAngles[PITCH] - 90;
+	if ( cl.viewangles[PITCH] - oldAngles[PITCH] > 90 ) {
+		cl.viewangles[PITCH] = oldAngles[PITCH] + 90;
+	} else if ( oldAngles[PITCH] - cl.viewangles[PITCH] > 90 ) {
+		cl.viewangles[PITCH] = oldAngles[PITCH] - 90;
 	} 
 
 	// store out the final values
-	CL_FinishMove( lc, &cmd );
+	CL_FinishMove( &cmd );
 
 	// draw debug graphs of turning for mouse testing
 	if ( cl_debugMove->integer ) {
 		if ( cl_debugMove->integer == 1 ) {
-			SCR_DebugGraph( abs(lc->viewangles[YAW] - oldAngles[YAW]) );
+			SCR_DebugGraph( abs(cl.viewangles[YAW] - oldAngles[YAW]), 0 );
 		}
 		if ( cl_debugMove->integer == 2 ) {
-			SCR_DebugGraph( abs(lc->viewangles[PITCH] - oldAngles[PITCH]) );
+			SCR_DebugGraph( abs(cl.viewangles[PITCH] - oldAngles[PITCH]), 0 );
 		}
 	}
 
@@ -1046,13 +701,11 @@ Create a new usercmd_t structure for this frame
 =================
 */
 void CL_CreateNewCommands( void ) {
-#ifdef TA_SPLITVIEW // CONTROLS
-	int			i;
-#endif
+	usercmd_t	*cmd;
 	int			cmdNum;
 
 	// no need to create usercmds until we have a gamestate
-	if ( clc.state < CA_PRIMED ) {
+	if ( cls.state < CA_PRIMED ) {
 		return;
 	}
 
@@ -1069,16 +722,8 @@ void CL_CreateNewCommands( void ) {
 	// generate a command for this frame
 	cl.cmdNumber++;
 	cmdNum = cl.cmdNumber & CMD_MASK;
-#ifdef TA_SPLITVIEW // CONTROLS
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (cl.snap.valid && cl.snap.lcIndex[i] == -1) {
-			continue;
-		}
-		cl.cmdss[i][cmdNum] = CL_CreateCmd(i);
-	}
-#else
 	cl.cmds[cmdNum] = CL_CreateCmd ();
-#endif
+	cmd = &cl.cmds[cmdNum];
 }
 
 /*
@@ -1097,7 +742,7 @@ qboolean CL_ReadyToSendPacket( void ) {
 	int		delta;
 
 	// don't send anything if playing back a demo
-	if ( clc.demoplaying || clc.state == CA_CINEMATIC ) {
+	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {
 		return qfalse;
 	}
 
@@ -1109,8 +754,8 @@ qboolean CL_ReadyToSendPacket( void ) {
 
 	// if we don't have a valid gamestate yet, only send
 	// one packet a second
-	if ( clc.state != CA_ACTIVE && 
-		clc.state != CA_PRIMED && 
+	if ( cls.state != CA_ACTIVE && 
+		cls.state != CA_PRIMED && 
 		!*clc.downloadTempName &&
 		cls.realtime - clc.lastPacketSentTime < 1000 ) {
 		return qfalse;
@@ -1174,7 +819,7 @@ void CL_WritePacket( void ) {
 	int			count, key;
 
 	// don't send anything if playing back a demo
-	if ( clc.demoplaying || clc.state == CA_CINEMATIC ) {
+	if ( clc.demoplaying || cls.state == CA_CINEMATIC ) {
 		return;
 	}
 
@@ -1219,53 +864,87 @@ void CL_WritePacket( void ) {
 	}
 
 #ifdef USE_VOIP
-	if (clc.voipOutgoingDataSize > 0)
-	{
-		if((clc.voipFlags & VOIP_SPATIAL) || Com_IsVoipTarget(clc.voipTargets, sizeof(clc.voipTargets), -1))
-		{
-			MSG_WriteByte (&buf, clc_voip);
-			MSG_WriteByte (&buf, clc.voipOutgoingGeneration);
-			MSG_WriteLong (&buf, clc.voipOutgoingSequence);
-			MSG_WriteByte (&buf, clc.voipOutgoingDataFrames);
-			MSG_WriteData (&buf, clc.voipTargets, sizeof(clc.voipTargets));
-			MSG_WriteByte(&buf, clc.voipFlags);
-			MSG_WriteShort (&buf, clc.voipOutgoingDataSize);
-			MSG_WriteData (&buf, clc.voipOutgoingData, clc.voipOutgoingDataSize);
+	if (clc.voipOutgoingDataSize > 0) {  // only send if data.
+		// Move cl_voipSendTarget from a string to the bitmasks if needed.
+		if (cl_voipSendTarget->modified) {
+			char buffer[32];
+			const char *target = cl_voipSendTarget->string;
 
-			// If we're recording a demo, we have to fake a server packet with
-			//  this VoIP data so it gets to disk; the server doesn't send it
-			//  back to us, and we might as well eliminate concerns about dropped
-			//  and misordered packets here.
-			if(clc.demorecording && !clc.demowaiting)
-			{
-				const int voipSize = clc.voipOutgoingDataSize;
-				msg_t fakemsg;
-				byte fakedata[MAX_MSGLEN];
-				MSG_Init (&fakemsg, fakedata, sizeof (fakedata));
-				MSG_Bitstream (&fakemsg);
-				MSG_WriteLong (&fakemsg, clc.reliableAcknowledge);
-				MSG_WriteByte (&fakemsg, svc_voip);
-				MSG_WriteShort (&fakemsg, clc.clientNum);
-				MSG_WriteByte (&fakemsg, clc.voipOutgoingGeneration);
-				MSG_WriteLong (&fakemsg, clc.voipOutgoingSequence);
-				MSG_WriteByte (&fakemsg, clc.voipOutgoingDataFrames);
-				MSG_WriteShort (&fakemsg, clc.voipOutgoingDataSize );
-				MSG_WriteData (&fakemsg, clc.voipOutgoingData, voipSize);
-				MSG_WriteByte (&fakemsg, svc_EOF);
-				CL_WriteDemoMessage (&fakemsg, 0);
+			if (Q_stricmp(target, "attacker") == 0) {
+				int player = VM_Call( cgvm, CG_LAST_ATTACKER );
+				Com_sprintf(buffer, sizeof (buffer), "%d", player);
+				target = buffer;
+			} else if (Q_stricmp(target, "crosshair") == 0) {
+				int player = VM_Call( cgvm, CG_CROSSHAIR_PLAYER );
+				Com_sprintf(buffer, sizeof (buffer), "%d", player);
+				target = buffer;
 			}
 
-			clc.voipOutgoingSequence += clc.voipOutgoingDataFrames;
-			clc.voipOutgoingDataSize = 0;
-			clc.voipOutgoingDataFrames = 0;
+			if ((*target == '\0') || (Q_stricmp(target, "all") == 0)) {
+				const int all = 0x7FFFFFFF;
+				clc.voipTarget1 = clc.voipTarget2 = clc.voipTarget3 = all;
+			} else if (Q_stricmp(target, "none") == 0) {
+				clc.voipTarget1 = clc.voipTarget2 = clc.voipTarget3 = 0;
+			} else {
+				const char *ptr = target;
+				clc.voipTarget1 = clc.voipTarget2 = clc.voipTarget3 = 0;
+				do {
+					if ((*ptr == ',') || (*ptr == '\0')) {
+						const int val = atoi(target);
+						target = ptr + 1;
+						if ((val >= 0) && (val < 31)) {
+							clc.voipTarget1 |= (1 << (val-0));
+						} else if ((val >= 31) && (val < 62)) {
+							clc.voipTarget2 |= (1 << (val-31));
+						} else if ((val >= 62) && (val < 93)) {
+							clc.voipTarget3 |= (1 << (val-62));
+						}
+					}
+				} while (*(ptr++));
+			}
+			cl_voipSendTarget->modified = qfalse;
 		}
-		else
-		{
-			// We have data, but no targets. Silently discard all data
-			clc.voipOutgoingDataSize = 0;
-			clc.voipOutgoingDataFrames = 0;
+
+		MSG_WriteByte (&buf, clc_EOF);  // placate legacy servers.
+		MSG_WriteByte (&buf, clc_extension);
+		MSG_WriteByte (&buf, clc_voip);
+		MSG_WriteByte (&buf, clc.voipOutgoingGeneration);
+		MSG_WriteLong (&buf, clc.voipOutgoingSequence);
+		MSG_WriteByte (&buf, clc.voipOutgoingDataFrames);
+		MSG_WriteLong (&buf, clc.voipTarget1);
+		MSG_WriteLong (&buf, clc.voipTarget2);
+		MSG_WriteLong (&buf, clc.voipTarget3);
+		MSG_WriteShort (&buf, clc.voipOutgoingDataSize);
+		MSG_WriteData (&buf, clc.voipOutgoingData, clc.voipOutgoingDataSize);
+
+		// If we're recording a demo, we have to fake a server packet with
+		//  this VoIP data so it gets to disk; the server doesn't send it
+		//  back to us, and we might as well eliminate concerns about dropped
+		//  and misordered packets here.
+		if ( clc.demorecording && !clc.demowaiting ) {
+			const int voipSize = clc.voipOutgoingDataSize;
+			msg_t fakemsg;
+			byte fakedata[MAX_MSGLEN];
+			MSG_Init (&fakemsg, fakedata, sizeof (fakedata));
+			MSG_Bitstream (&fakemsg);
+			MSG_WriteLong (&fakemsg, clc.reliableAcknowledge);
+			MSG_WriteByte (&fakemsg, svc_EOF);
+			MSG_WriteByte (&fakemsg, svc_extension);
+			MSG_WriteByte (&fakemsg, svc_voip);
+			MSG_WriteShort (&fakemsg, clc.clientNum);
+			MSG_WriteByte (&fakemsg, clc.voipOutgoingGeneration);
+			MSG_WriteLong (&fakemsg, clc.voipOutgoingSequence);
+			MSG_WriteByte (&fakemsg, clc.voipOutgoingDataFrames);
+			MSG_WriteShort (&fakemsg, clc.voipOutgoingDataSize );
+			MSG_WriteData (&fakemsg, clc.voipOutgoingData, voipSize);
+			MSG_WriteByte (&fakemsg, svc_EOF);
+			CL_WriteDemoMessage (&fakemsg, 0);
 		}
-	}
+
+		clc.voipOutgoingSequence += clc.voipOutgoingDataFrames;
+		clc.voipOutgoingDataSize = 0;
+		clc.voipOutgoingDataFrames = 0;
+	} else
 #endif
 
 	if ( count >= 1 ) {
@@ -1294,58 +973,10 @@ void CL_WritePacket( void ) {
 		// write all the commands, including the predicted command
 		for ( i = 0 ; i < count ; i++ ) {
 			j = (cl.cmdNumber - count + i + 1) & CMD_MASK;
-#ifdef TA_SPLITVIEW // CONTROLS
-			cmd = &cl.cmdss[0][j];
-#else
 			cmd = &cl.cmds[j];
-#endif
 			MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
 			oldcmd = cmd;
 		}
-
-#ifdef TA_SPLITVIEW
-#ifdef LEGACY_PROTOCOL
-		if (!clc.compat)
-#endif
-		{
-			int lc;
-
-			for (lc = 1; lc < MAX_SPLITVIEW; lc++) {
-				if (cl.snap.valid && cl.snap.lcIndex[lc] == -1) {
-					continue;
-				}
-
-				// begin a client move command
-				if ( cl_nodelta->integer || !cl.snap.valid || clc.demowaiting
-					|| clc.serverMessageSequence != cl.snap.messageNum ) {
-					MSG_WriteByte (&buf, clc_moveLocalNoDelta);
-				} else {
-					MSG_WriteByte (&buf, clc_moveLocal);
-				}
-
-				MSG_WriteByte (&buf, lc-1); // localClient-1
-
-				// write the command count
-				MSG_WriteByte( &buf, count );
-
-				Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
-				oldcmd = &nullcmd;
-
-				// write all the commands, including the predicted command
-				for ( i = 0 ; i < count ; i++ ) {
-					j = (cl.cmdNumber - count + i + 1) & CMD_MASK;
-#if 0
-					if (qtrue) // Have all clients use the same usercmd_t
-						cmd = &cl.cmdss[0][j];
-					else
-#endif
-						cmd = &cl.cmdss[lc][j];
-					MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
-					oldcmd = cmd;
-				}
-			}
-		}
-#endif
 	}
 
 	//
@@ -1362,6 +993,16 @@ void CL_WritePacket( void ) {
 	}
 
 	CL_Netchan_Transmit (&clc.netchan, &buf);	
+
+	// clients never really should have messages large enough
+	// to fragment, but in case they do, fire them all off
+	// at once
+	// TTimo: this causes a packet burst, which is bad karma for winsock
+	// added a WARNING message, we'll see if there are legit situations where this happens
+	while ( clc.netchan.unsentFragments ) {
+		Com_DPrintf( "WARNING: #462 unsent fragments (not supposed to happen!)\n" );
+		CL_Netchan_TransmitNextFragment( &clc.netchan );
+	}
 }
 
 /*
@@ -1373,7 +1014,7 @@ Called every frame to builds and sends a command packet to the server.
 */
 void CL_SendCmd( void ) {
 	// don't send any message if not connected
-	if ( clc.state < CA_CONNECTED ) {
+	if ( cls.state < CA_CONNECTED ) {
 		return;
 	}
 
@@ -1474,480 +1115,6 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-voiprecord", IN_VoipRecordUp);
 #endif
 
-#ifdef TA_SPLITVIEW
-	Cmd_AddCommand ("2centerview",IN_2CenterView);
-
-	Cmd_AddCommand ("+2moveup",IN_2UpDown);
-	Cmd_AddCommand ("-2moveup",IN_2UpUp);
-	Cmd_AddCommand ("+2movedown",IN_2DownDown);
-	Cmd_AddCommand ("-2movedown",IN_2DownUp);
-	Cmd_AddCommand ("+2left",IN_2LeftDown);
-	Cmd_AddCommand ("-2left",IN_2LeftUp);
-	Cmd_AddCommand ("+2right",IN_2RightDown);
-	Cmd_AddCommand ("-2right",IN_2RightUp);
-	Cmd_AddCommand ("+2forward",IN_2ForwardDown);
-	Cmd_AddCommand ("-2forward",IN_2ForwardUp);
-	Cmd_AddCommand ("+2back",IN_2BackDown);
-	Cmd_AddCommand ("-2back",IN_2BackUp);
-	Cmd_AddCommand ("+2lookup", IN_2LookupDown);
-	Cmd_AddCommand ("-2lookup", IN_2LookupUp);
-	Cmd_AddCommand ("+2lookdown", IN_2LookdownDown);
-	Cmd_AddCommand ("-2lookdown", IN_2LookdownUp);
-	Cmd_AddCommand ("+2strafe", IN_2StrafeDown);
-	Cmd_AddCommand ("-2strafe", IN_2StrafeUp);
-	Cmd_AddCommand ("+2moveleft", IN_2MoveleftDown);
-	Cmd_AddCommand ("-2moveleft", IN_2MoveleftUp);
-	Cmd_AddCommand ("+2moveright", IN_2MoverightDown);
-	Cmd_AddCommand ("-2moveright", IN_2MoverightUp);
-
-#ifndef TURTLEARENA // NO_SPEED_KEY
-	Cmd_AddCommand ("+2speed", IN_2SpeedDown);
-	Cmd_AddCommand ("-2speed", IN_2SpeedUp);
-#endif
-#ifdef TURTLEARENA // LOCKON
-	Cmd_AddCommand ("+2lockon", IN_2LockonDown);
-	Cmd_AddCommand ("-2lockon", IN_2LockonUp);
-#endif
-	Cmd_AddCommand ("+2attack", IN_2Button0Down);
-	Cmd_AddCommand ("-2attack", IN_2Button0Up);
-	Cmd_AddCommand ("+2button0", IN_2Button0Down);
-	Cmd_AddCommand ("-2button0", IN_2Button0Up);
-	Cmd_AddCommand ("+2button1", IN_2Button1Down);
-	Cmd_AddCommand ("-2button1", IN_2Button1Up);
-	Cmd_AddCommand ("+2button2", IN_2Button2Down);
-	Cmd_AddCommand ("-2button2", IN_2Button2Up);
-	Cmd_AddCommand ("+2button3", IN_2Button3Down);
-	Cmd_AddCommand ("-2button3", IN_2Button3Up);
-	Cmd_AddCommand ("+2button4", IN_2Button4Down);
-	Cmd_AddCommand ("-2button4", IN_2Button4Up);
-	Cmd_AddCommand ("+2button5", IN_2Button5Down);
-	Cmd_AddCommand ("-2button5", IN_2Button5Up);
-	Cmd_AddCommand ("+2button6", IN_2Button6Down);
-	Cmd_AddCommand ("-2button6", IN_2Button6Up);
-	Cmd_AddCommand ("+2button7", IN_2Button7Down);
-	Cmd_AddCommand ("-2button7", IN_2Button7Up);
-	Cmd_AddCommand ("+2button8", IN_2Button8Down);
-	Cmd_AddCommand ("-2button8", IN_2Button8Up);
-	Cmd_AddCommand ("+2button9", IN_2Button9Down);
-	Cmd_AddCommand ("-2button9", IN_2Button9Up);
-	Cmd_AddCommand ("+2button10", IN_2Button10Down);
-	Cmd_AddCommand ("-2button10", IN_2Button10Up);
-	Cmd_AddCommand ("+2button11", IN_2Button11Down);
-	Cmd_AddCommand ("-2button11", IN_2Button11Up);
-	Cmd_AddCommand ("+2button12", IN_2Button12Down);
-	Cmd_AddCommand ("-2button12", IN_2Button12Up);
-	Cmd_AddCommand ("+2button13", IN_2Button13Down);
-	Cmd_AddCommand ("-2button13", IN_2Button13Up);
-	Cmd_AddCommand ("+2button14", IN_2Button14Down);
-	Cmd_AddCommand ("-2button14", IN_2Button14Up);
-
-	Cmd_AddCommand ("3centerview",IN_3CenterView);
-
-	Cmd_AddCommand ("+3moveup",IN_3UpDown);
-	Cmd_AddCommand ("-3moveup",IN_3UpUp);
-	Cmd_AddCommand ("+3movedown",IN_3DownDown);
-	Cmd_AddCommand ("-3movedown",IN_3DownUp);
-	Cmd_AddCommand ("+3left",IN_3LeftDown);
-	Cmd_AddCommand ("-3left",IN_3LeftUp);
-	Cmd_AddCommand ("+3right",IN_3RightDown);
-	Cmd_AddCommand ("-3right",IN_3RightUp);
-	Cmd_AddCommand ("+3forward",IN_3ForwardDown);
-	Cmd_AddCommand ("-3forward",IN_3ForwardUp);
-	Cmd_AddCommand ("+3back",IN_3BackDown);
-	Cmd_AddCommand ("-3back",IN_3BackUp);
-	Cmd_AddCommand ("+3lookup", IN_3LookupDown);
-	Cmd_AddCommand ("-3lookup", IN_3LookupUp);
-	Cmd_AddCommand ("+3lookdown", IN_3LookdownDown);
-	Cmd_AddCommand ("-3lookdown", IN_3LookdownUp);
-	Cmd_AddCommand ("+3strafe", IN_3StrafeDown);
-	Cmd_AddCommand ("-3strafe", IN_3StrafeUp);
-	Cmd_AddCommand ("+3moveleft", IN_3MoveleftDown);
-	Cmd_AddCommand ("-3moveleft", IN_3MoveleftUp);
-	Cmd_AddCommand ("+3moveright", IN_3MoverightDown);
-	Cmd_AddCommand ("-3moveright", IN_3MoverightUp);
-
-#ifndef TURTLEARENA // NO_SPEED_KEY
-	Cmd_AddCommand ("+3speed", IN_3SpeedDown);
-	Cmd_AddCommand ("-3speed", IN_3SpeedUp);
-#endif
-#ifdef TURTLEARENA // LOCKON
-	Cmd_AddCommand ("+3lockon", IN_3LockonDown);
-	Cmd_AddCommand ("-3lockon", IN_3LockonUp);
-#endif
-	Cmd_AddCommand ("+3attack", IN_3Button0Down);
-	Cmd_AddCommand ("-3attack", IN_3Button0Up);
-	Cmd_AddCommand ("+3button0", IN_3Button0Down);
-	Cmd_AddCommand ("-3button0", IN_3Button0Up);
-	Cmd_AddCommand ("+3button1", IN_3Button1Down);
-	Cmd_AddCommand ("-3button1", IN_3Button1Up);
-	Cmd_AddCommand ("+3button2", IN_3Button2Down);
-	Cmd_AddCommand ("-3button2", IN_3Button2Up);
-	Cmd_AddCommand ("+3button3", IN_3Button3Down);
-	Cmd_AddCommand ("-3button3", IN_3Button3Up);
-	Cmd_AddCommand ("+3button4", IN_3Button4Down);
-	Cmd_AddCommand ("-3button4", IN_3Button4Up);
-	Cmd_AddCommand ("+3button5", IN_3Button5Down);
-	Cmd_AddCommand ("-3button5", IN_3Button5Up);
-	Cmd_AddCommand ("+3button6", IN_3Button6Down);
-	Cmd_AddCommand ("-3button6", IN_3Button6Up);
-	Cmd_AddCommand ("+3button7", IN_3Button7Down);
-	Cmd_AddCommand ("-3button7", IN_3Button7Up);
-	Cmd_AddCommand ("+3button8", IN_3Button8Down);
-	Cmd_AddCommand ("-3button8", IN_3Button8Up);
-	Cmd_AddCommand ("+3button9", IN_3Button9Down);
-	Cmd_AddCommand ("-3button9", IN_3Button9Up);
-	Cmd_AddCommand ("+3button10", IN_3Button10Down);
-	Cmd_AddCommand ("-3button10", IN_3Button10Up);
-	Cmd_AddCommand ("+3button11", IN_3Button11Down);
-	Cmd_AddCommand ("-3button11", IN_3Button11Up);
-	Cmd_AddCommand ("+3button12", IN_3Button12Down);
-	Cmd_AddCommand ("-3button12", IN_3Button12Up);
-	Cmd_AddCommand ("+3button13", IN_3Button13Down);
-	Cmd_AddCommand ("-3button13", IN_3Button13Up);
-	Cmd_AddCommand ("+3button14", IN_3Button14Down);
-	Cmd_AddCommand ("-3button14", IN_3Button14Up);
-
-	Cmd_AddCommand ("4centerview",IN_4CenterView);
-
-	Cmd_AddCommand ("+4moveup",IN_4UpDown);
-	Cmd_AddCommand ("-4moveup",IN_4UpUp);
-	Cmd_AddCommand ("+4movedown",IN_4DownDown);
-	Cmd_AddCommand ("-4movedown",IN_4DownUp);
-	Cmd_AddCommand ("+4left",IN_4LeftDown);
-	Cmd_AddCommand ("-4left",IN_4LeftUp);
-	Cmd_AddCommand ("+4right",IN_4RightDown);
-	Cmd_AddCommand ("-4right",IN_4RightUp);
-	Cmd_AddCommand ("+4forward",IN_4ForwardDown);
-	Cmd_AddCommand ("-4forward",IN_4ForwardUp);
-	Cmd_AddCommand ("+4back",IN_4BackDown);
-	Cmd_AddCommand ("-4back",IN_4BackUp);
-	Cmd_AddCommand ("+4lookup", IN_4LookupDown);
-	Cmd_AddCommand ("-4lookup", IN_4LookupUp);
-	Cmd_AddCommand ("+4lookdown", IN_4LookdownDown);
-	Cmd_AddCommand ("-4lookdown", IN_4LookdownUp);
-	Cmd_AddCommand ("+4strafe", IN_4StrafeDown);
-	Cmd_AddCommand ("-4strafe", IN_4StrafeUp);
-	Cmd_AddCommand ("+4moveleft", IN_4MoveleftDown);
-	Cmd_AddCommand ("-4moveleft", IN_4MoveleftUp);
-	Cmd_AddCommand ("+4moveright", IN_4MoverightDown);
-	Cmd_AddCommand ("-4moveright", IN_4MoverightUp);
-
-#ifndef TURTLEARENA // NO_SPEED_KEY
-	Cmd_AddCommand ("+4speed", IN_4SpeedDown);
-	Cmd_AddCommand ("-4speed", IN_4SpeedUp);
-#endif
-#ifdef TURTLEARENA // LOCKON
-	Cmd_AddCommand ("+4lockon", IN_4LockonDown);
-	Cmd_AddCommand ("-4lockon", IN_4LockonUp);
-#endif
-	Cmd_AddCommand ("+4attack", IN_4Button0Down);
-	Cmd_AddCommand ("-4attack", IN_4Button0Up);
-	Cmd_AddCommand ("+4button0", IN_4Button0Down);
-	Cmd_AddCommand ("-4button0", IN_4Button0Up);
-	Cmd_AddCommand ("+4button1", IN_4Button1Down);
-	Cmd_AddCommand ("-4button1", IN_4Button1Up);
-	Cmd_AddCommand ("+4button2", IN_4Button2Down);
-	Cmd_AddCommand ("-4button2", IN_4Button2Up);
-	Cmd_AddCommand ("+4button3", IN_4Button3Down);
-	Cmd_AddCommand ("-4button3", IN_4Button3Up);
-	Cmd_AddCommand ("+4button4", IN_4Button4Down);
-	Cmd_AddCommand ("-4button4", IN_4Button4Up);
-	Cmd_AddCommand ("+4button5", IN_4Button5Down);
-	Cmd_AddCommand ("-4button5", IN_4Button5Up);
-	Cmd_AddCommand ("+4button6", IN_4Button6Down);
-	Cmd_AddCommand ("-4button6", IN_4Button6Up);
-	Cmd_AddCommand ("+4button7", IN_4Button7Down);
-	Cmd_AddCommand ("-4button7", IN_4Button7Up);
-	Cmd_AddCommand ("+4button8", IN_4Button8Down);
-	Cmd_AddCommand ("-4button8", IN_4Button8Up);
-	Cmd_AddCommand ("+4button9", IN_4Button9Down);
-	Cmd_AddCommand ("-4button9", IN_4Button9Up);
-	Cmd_AddCommand ("+4button10", IN_4Button10Down);
-	Cmd_AddCommand ("-4button10", IN_4Button10Up);
-	Cmd_AddCommand ("+4button11", IN_4Button11Down);
-	Cmd_AddCommand ("-4button11", IN_4Button11Up);
-	Cmd_AddCommand ("+4button12", IN_4Button12Down);
-	Cmd_AddCommand ("-4button12", IN_4Button12Up);
-	Cmd_AddCommand ("+4button13", IN_4Button13Down);
-	Cmd_AddCommand ("-4button13", IN_4Button13Up);
-	Cmd_AddCommand ("+4button14", IN_4Button14Down);
-	Cmd_AddCommand ("-4button14", IN_4Button14Up);
-#endif
-
 	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0);
 	cl_debugMove = Cvar_Get ("cl_debugMove", "0", 0);
-}
-
-/*
-============
-CL_ShutdownInput
-============
-*/
-void CL_ShutdownInput(void)
-{
-	Cmd_RemoveCommand("centerview");
-
-	Cmd_RemoveCommand("+moveup");
-	Cmd_RemoveCommand("-moveup");
-	Cmd_RemoveCommand("+movedown");
-	Cmd_RemoveCommand("-movedown");
-	Cmd_RemoveCommand("+left");
-	Cmd_RemoveCommand("-left");
-	Cmd_RemoveCommand("+right");
-	Cmd_RemoveCommand("-right");
-	Cmd_RemoveCommand("+forward");
-	Cmd_RemoveCommand("-forward");
-	Cmd_RemoveCommand("+back");
-	Cmd_RemoveCommand("-back");
-	Cmd_RemoveCommand("+lookup");
-	Cmd_RemoveCommand("-lookup");
-	Cmd_RemoveCommand("+lookdown");
-	Cmd_RemoveCommand("-lookdown");
-	Cmd_RemoveCommand("+strafe");
-	Cmd_RemoveCommand("-strafe");
-	Cmd_RemoveCommand("+moveleft");
-	Cmd_RemoveCommand("-moveleft");
-	Cmd_RemoveCommand("+moveright");
-	Cmd_RemoveCommand("-moveright");
-	Cmd_RemoveCommand("+speed");
-	Cmd_RemoveCommand("-speed");
-	Cmd_RemoveCommand("+attack");
-	Cmd_RemoveCommand("-attack");
-	Cmd_RemoveCommand("+button0");
-	Cmd_RemoveCommand("-button0");
-	Cmd_RemoveCommand("+button1");
-	Cmd_RemoveCommand("-button1");
-	Cmd_RemoveCommand("+button2");
-	Cmd_RemoveCommand("-button2");
-	Cmd_RemoveCommand("+button3");
-	Cmd_RemoveCommand("-button3");
-	Cmd_RemoveCommand("+button4");
-	Cmd_RemoveCommand("-button4");
-	Cmd_RemoveCommand("+button5");
-	Cmd_RemoveCommand("-button5");
-	Cmd_RemoveCommand("+button6");
-	Cmd_RemoveCommand("-button6");
-	Cmd_RemoveCommand("+button7");
-	Cmd_RemoveCommand("-button7");
-	Cmd_RemoveCommand("+button8");
-	Cmd_RemoveCommand("-button8");
-	Cmd_RemoveCommand("+button9");
-	Cmd_RemoveCommand("-button9");
-	Cmd_RemoveCommand("+button10");
-	Cmd_RemoveCommand("-button10");
-	Cmd_RemoveCommand("+button11");
-	Cmd_RemoveCommand("-button11");
-	Cmd_RemoveCommand("+button12");
-	Cmd_RemoveCommand("-button12");
-	Cmd_RemoveCommand("+button13");
-	Cmd_RemoveCommand("-button13");
-	Cmd_RemoveCommand("+button14");
-	Cmd_RemoveCommand("-button14");
-	Cmd_RemoveCommand("+mlook");
-	Cmd_RemoveCommand("-mlook");
-
-#ifdef USE_VOIP
-	Cmd_RemoveCommand("+voiprecord");
-	Cmd_RemoveCommand("-voiprecord");
-#endif
-
-#ifdef TA_SPLITVIEW
-	Cmd_RemoveCommand("2centerview");
-
-	Cmd_RemoveCommand("+2moveup");
-	Cmd_RemoveCommand("-2moveup");
-	Cmd_RemoveCommand("+2movedown");
-	Cmd_RemoveCommand("-2movedown");
-	Cmd_RemoveCommand("+2left");
-	Cmd_RemoveCommand("-2left");
-	Cmd_RemoveCommand("+2right");
-	Cmd_RemoveCommand("-2right");
-	Cmd_RemoveCommand("+2forward");
-	Cmd_RemoveCommand("-2forward");
-	Cmd_RemoveCommand("+2back");
-	Cmd_RemoveCommand("-2back");
-	Cmd_RemoveCommand("+2lookup");
-	Cmd_RemoveCommand("-2lookup");
-	Cmd_RemoveCommand("+2lookdown");
-	Cmd_RemoveCommand("-2lookdown");
-	Cmd_RemoveCommand("+2strafe");
-	Cmd_RemoveCommand("-2strafe");
-	Cmd_RemoveCommand("+2moveleft");
-	Cmd_RemoveCommand("-2moveleft");
-	Cmd_RemoveCommand("+2moveright");
-	Cmd_RemoveCommand("-2moveright");
-
-#ifndef TURTLEARENA // NO_SPEED_KEY
-	Cmd_RemoveCommand("+2speed");
-	Cmd_RemoveCommand("-2speed");
-#endif
-#ifdef TURTLEARENA // LOCKON
-	Cmd_RemoveCommand("+2lockon");
-	Cmd_RemoveCommand("-2lockon");
-#endif
-	Cmd_RemoveCommand("+2attack");
-	Cmd_RemoveCommand("-2attack");
-	Cmd_RemoveCommand("+2button0");
-	Cmd_RemoveCommand("-2button0");
-	Cmd_RemoveCommand("+2button1");
-	Cmd_RemoveCommand("-2button1");
-	Cmd_RemoveCommand("+2button2");
-	Cmd_RemoveCommand("-2button2");
-	Cmd_RemoveCommand("+2button3");
-	Cmd_RemoveCommand("-2button3");
-	Cmd_RemoveCommand("+2button4");
-	Cmd_RemoveCommand("-2button4");
-	Cmd_RemoveCommand("+2button5");
-	Cmd_RemoveCommand("-2button5");
-	Cmd_RemoveCommand("+2button6");
-	Cmd_RemoveCommand("-2button6");
-	Cmd_RemoveCommand("+2button7");
-	Cmd_RemoveCommand("-2button7");
-	Cmd_RemoveCommand("+2button8");
-	Cmd_RemoveCommand("-2button8");
-	Cmd_RemoveCommand("+2button9");
-	Cmd_RemoveCommand("-2button9");
-	Cmd_RemoveCommand("+2button10");
-	Cmd_RemoveCommand("-2button10");
-	Cmd_RemoveCommand("+2button11");
-	Cmd_RemoveCommand("-2button11");
-	Cmd_RemoveCommand("+2button12");
-	Cmd_RemoveCommand("-2button12");
-	Cmd_RemoveCommand("+2button13");
-	Cmd_RemoveCommand("-2button13");
-	Cmd_RemoveCommand("+2button14");
-	Cmd_RemoveCommand("-2button14");
-
-	Cmd_RemoveCommand("3centerview");
-
-	Cmd_RemoveCommand("+3moveup");
-	Cmd_RemoveCommand("-3moveup");
-	Cmd_RemoveCommand("+3movedown");
-	Cmd_RemoveCommand("-3movedown");
-	Cmd_RemoveCommand("+3left");
-	Cmd_RemoveCommand("-3left");
-	Cmd_RemoveCommand("+3right");
-	Cmd_RemoveCommand("-3right");
-	Cmd_RemoveCommand("+3forward");
-	Cmd_RemoveCommand("-3forward");
-	Cmd_RemoveCommand("+3back");
-	Cmd_RemoveCommand("-3back");
-	Cmd_RemoveCommand("+3lookup");
-	Cmd_RemoveCommand("-3lookup");
-	Cmd_RemoveCommand("+3lookdown");
-	Cmd_RemoveCommand("-3lookdown");
-	Cmd_RemoveCommand("+3strafe");
-	Cmd_RemoveCommand("-3strafe");
-	Cmd_RemoveCommand("+3moveleft");
-	Cmd_RemoveCommand("-3moveleft");
-	Cmd_RemoveCommand("+3moveright");
-	Cmd_RemoveCommand("-3moveright");
-
-#ifndef TURTLEARENA // NO_SPEED_KEY
-	Cmd_RemoveCommand("+3speed");
-	Cmd_RemoveCommand("-3speed");
-#endif
-#ifdef TURTLEARENA // LOCKON
-	Cmd_RemoveCommand("+3lockon");
-	Cmd_RemoveCommand("-3lockon");
-#endif
-	Cmd_RemoveCommand("+3attack");
-	Cmd_RemoveCommand("-3attack");
-	Cmd_RemoveCommand("+3button0");
-	Cmd_RemoveCommand("-3button0");
-	Cmd_RemoveCommand("+3button1");
-	Cmd_RemoveCommand("-3button1");
-	Cmd_RemoveCommand("+3button2");
-	Cmd_RemoveCommand("-3button2");
-	Cmd_RemoveCommand("+3button3");
-	Cmd_RemoveCommand("-3button3");
-	Cmd_RemoveCommand("+3button4");
-	Cmd_RemoveCommand("-3button4");
-	Cmd_RemoveCommand("+3button5");
-	Cmd_RemoveCommand("-3button5");
-	Cmd_RemoveCommand("+3button6");
-	Cmd_RemoveCommand("-3button6");
-	Cmd_RemoveCommand("+3button7");
-	Cmd_RemoveCommand("-3button7");
-	Cmd_RemoveCommand("+3button8");
-	Cmd_RemoveCommand("-3button8");
-	Cmd_RemoveCommand("+3button9");
-	Cmd_RemoveCommand("-3button9");
-	Cmd_RemoveCommand("+3button10");
-	Cmd_RemoveCommand("-3button10");
-	Cmd_RemoveCommand("+3button11");
-	Cmd_RemoveCommand("-3button11");
-	Cmd_RemoveCommand("+3button12");
-	Cmd_RemoveCommand("-3button12");
-	Cmd_RemoveCommand("+3button13");
-	Cmd_RemoveCommand("-3button13");
-	Cmd_RemoveCommand("+3button14");
-	Cmd_RemoveCommand("-3button14");
-
-	Cmd_RemoveCommand("4centerview");
-
-	Cmd_RemoveCommand("+4moveup");
-	Cmd_RemoveCommand("-4moveup");
-	Cmd_RemoveCommand("+4movedown");
-	Cmd_RemoveCommand("-4movedown");
-	Cmd_RemoveCommand("+4left");
-	Cmd_RemoveCommand("-4left");
-	Cmd_RemoveCommand("+4right");
-	Cmd_RemoveCommand("-4right");
-	Cmd_RemoveCommand("+4forward");
-	Cmd_RemoveCommand("-4forward");
-	Cmd_RemoveCommand("+4back");
-	Cmd_RemoveCommand("-4back");
-	Cmd_RemoveCommand("+4lookup");
-	Cmd_RemoveCommand("-4lookup");
-	Cmd_RemoveCommand("+4lookdown");
-	Cmd_RemoveCommand("-4lookdown");
-	Cmd_RemoveCommand("+4strafe");
-	Cmd_RemoveCommand("-4strafe");
-	Cmd_RemoveCommand("+4moveleft");
-	Cmd_RemoveCommand("-4moveleft");
-	Cmd_RemoveCommand("+4moveright");
-	Cmd_RemoveCommand("-4moveright");
-
-#ifndef TURTLEARENA // NO_SPEED_KEY
-	Cmd_RemoveCommand("+4speed");
-	Cmd_RemoveCommand("-4speed");
-#endif
-#ifdef TURTLEARENA // LOCKON
-	Cmd_RemoveCommand("+4lockon");
-	Cmd_RemoveCommand("-4lockon");
-#endif
-	Cmd_RemoveCommand("+4attack");
-	Cmd_RemoveCommand("-4attack");
-	Cmd_RemoveCommand("+4button0");
-	Cmd_RemoveCommand("-4button0");
-	Cmd_RemoveCommand("+4button1");
-	Cmd_RemoveCommand("-4button1");
-	Cmd_RemoveCommand("+4button2");
-	Cmd_RemoveCommand("-4button2");
-	Cmd_RemoveCommand("+4button3");
-	Cmd_RemoveCommand("-4button3");
-	Cmd_RemoveCommand("+4button4");
-	Cmd_RemoveCommand("-4button4");
-	Cmd_RemoveCommand("+4button5");
-	Cmd_RemoveCommand("-4button5");
-	Cmd_RemoveCommand("+4button6");
-	Cmd_RemoveCommand("-4button6");
-	Cmd_RemoveCommand("+4button7");
-	Cmd_RemoveCommand("-4button7");
-	Cmd_RemoveCommand("+4button8");
-	Cmd_RemoveCommand("-4button8");
-	Cmd_RemoveCommand("+4button9");
-	Cmd_RemoveCommand("-4button9");
-	Cmd_RemoveCommand("+4button10");
-	Cmd_RemoveCommand("-4button10");
-	Cmd_RemoveCommand("+4button11");
-	Cmd_RemoveCommand("-4button11");
-	Cmd_RemoveCommand("+4button12");
-	Cmd_RemoveCommand("-4button12");
-	Cmd_RemoveCommand("+4button13");
-	Cmd_RemoveCommand("-4button13");
-	Cmd_RemoveCommand("+4button14");
-	Cmd_RemoveCommand("-4button14");
-#endif
 }

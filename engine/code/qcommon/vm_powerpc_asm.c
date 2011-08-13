@@ -39,7 +39,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
 
-#include "vm_local.h"
 #include "vm_powerpc_asm.h"
 
 #include <string.h>
@@ -65,6 +64,7 @@ struct powerpc_opcode
 };
 
 static const struct powerpc_opcode powerpc_opcodes[];
+static const int powerpc_num_opcodes;
 
 #define PPC_OPCODE_PPC			 1
 #define PPC_OPCODE_POWER		 2
@@ -111,6 +111,7 @@ struct powerpc_operand
 };
 
 static const struct powerpc_operand powerpc_operands[];
+static const unsigned int num_powerpc_operands;
 
 #define PPC_OPERAND_SIGNED (0x1)
 #define PPC_OPERAND_SIGNOPT (0x2)
@@ -388,6 +389,8 @@ static const struct powerpc_operand powerpc_operands[] =
 
 };
 
+static const unsigned int num_powerpc_operands =
+	(sizeof (powerpc_operands) / sizeof (powerpc_operands[0]));
 
 /* The functions used to insert and extract complicated operands.  */
 
@@ -1001,3 +1004,6 @@ static const struct powerpc_opcode powerpc_opcodes[] = {
 { "fsub",    A(63,20,0), AFRC_MASK,	PPCCOM,		{ FRT, FRA, FRB } },
 { "fneg",    XRC(63,40,0), XRA_MASK,	COM,		{ FRT, FRB } },
 };
+
+static const int powerpc_num_opcodes =
+	sizeof (powerpc_opcodes) / sizeof (powerpc_opcodes[0]);

@@ -6,9 +6,8 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Release Win32">
-				<Option platforms="Windows;" />
-				<Option output="../../build/cgame_release/cgamex86.dll" prefix_auto="0" extension_auto="0" />
+			<Target title="Release">
+				<Option output="../../build/cgame_release/cgamex86" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/cgame_release" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -17,7 +16,6 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add option="-W" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -26,17 +24,16 @@
 					<Add option="-DTA_HUD" />
 				</Compiler>
 			</Target>
-			<Target title="Debug Win32">
-				<Option platforms="Windows;" />
-				<Option output="../../build/cgame_debug/cgamex86.dll" prefix_auto="0" extension_auto="0" />
+			<Target title="Debug">
+				<Option output="../../build/cgame_debug/cgamex86" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/cgame_debug" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
-					<Add option="-g" />
 					<Add option="-W" />
+					<Add option="-g" />
 					<Add option="-O0" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
@@ -46,9 +43,8 @@
 					<Add option="-DTA_HUD" />
 				</Compiler>
 			</Target>
-			<Target title="Release TA_UI Win32">
-				<Option platforms="Windows;" />
-				<Option output="../../build/cgame_release_ta/cgamex86.dll" prefix_auto="0" extension_auto="0" />
+			<Target title="Release TA_UI">
+				<Option output="../../build/cgame_release_ta/cgamex86" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/cgame_release_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -57,7 +53,6 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add option="-W" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -66,9 +61,8 @@
 					<Add option="-DMISSIONPACK_HUD" />
 				</Compiler>
 			</Target>
-			<Target title="Debug TA_UI Win32">
-				<Option platforms="Windows;" />
-				<Option output="../../build/cgame_debug_ta/cgamex86.dll" prefix_auto="0" extension_auto="0" />
+			<Target title="Debug TA_UI">
+				<Option output="../../build/cgame_debug_ta/cgamex86" prefix_auto="1" extension_auto="1" />
 				<Option object_output="../../build/cgame_debug_ta" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -77,174 +71,6 @@
 				<Compiler>
 					<Add option="-W" />
 					<Add option="-g" />
-					<Add option="-O0" />
-					<Add option="-DWIN32" />
-					<Add option="-D_DEBUG" />
-					<Add option="-D_WINDOWS" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DMISSIONPACK" />
-					<Add option="-DMISSIONPACK_HUD" />
-				</Compiler>
-			</Target>
-			<Target title="Release Linux i386">
-				<Option platforms="Unix;" />
-				<Option output="../../build/cgame_release/cgamei386.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/cgame_release" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-Wall" />
-					<Add option="-fPIC" />
-					<Add option="-W" />
-					<Add option="-DWIN32" />
-					<Add option="-DNDEBUG" />
-					<Add option="-D_WINDOWS" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DMISSIONPACK" />
-					<Add option="-DTA_HUD" />
-				</Compiler>
-			</Target>
-			<Target title="Debug Linux i386">
-				<Option platforms="Unix;" />
-				<Option output="../../build/cgame_debug/cgamei386.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/cgame_debug" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-g" />
-					<Add option="-fPIC" />
-					<Add option="-W" />
-					<Add option="-O0" />
-					<Add option="-DWIN32" />
-					<Add option="-D_DEBUG" />
-					<Add option="-D_WINDOWS" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DMISSIONPACK" />
-					<Add option="-DTA_HUD" />
-				</Compiler>
-			</Target>
-			<Target title="Release TA_UI Linux i386">
-				<Option platforms="Unix;" />
-				<Option output="../../build/cgame_release_ta/cgamei386.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/cgame_release_ta" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-Wall" />
-					<Add option="-fPIC" />
-					<Add option="-W" />
-					<Add option="-DWIN32" />
-					<Add option="-DNDEBUG" />
-					<Add option="-D_WINDOWS" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DMISSIONPACK" />
-					<Add option="-DMISSIONPACK_HUD" />
-				</Compiler>
-			</Target>
-			<Target title="Debug TA_UI Linux i386">
-				<Option platforms="Unix;" />
-				<Option output="../../build/cgame_debug_ta/cgamei386.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/cgame_debug_ta" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-g" />
-					<Add option="-fPIC" />
-					<Add option="-W" />
-					<Add option="-O0" />
-					<Add option="-DWIN32" />
-					<Add option="-D_DEBUG" />
-					<Add option="-D_WINDOWS" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DMISSIONPACK" />
-					<Add option="-DMISSIONPACK_HUD" />
-				</Compiler>
-			</Target>
-			<Target title="Release Linux x86_64">
-				<Option platforms="Unix;" />
-				<Option output="../../build/cgame_release/cgamex86_64.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/cgame_release" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-Wall" />
-					<Add option="-fPIC" />
-					<Add option="-W" />
-					<Add option="-DWIN32" />
-					<Add option="-DNDEBUG" />
-					<Add option="-D_WINDOWS" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DMISSIONPACK" />
-					<Add option="-DTA_HUD" />
-				</Compiler>
-			</Target>
-			<Target title="Debug Linux x86_64">
-				<Option platforms="Unix;" />
-				<Option output="../../build/cgame_debug/cgamex86_64.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/cgame_debug" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-g" />
-					<Add option="-fPIC" />
-					<Add option="-W" />
-					<Add option="-O0" />
-					<Add option="-DWIN32" />
-					<Add option="-D_DEBUG" />
-					<Add option="-D_WINDOWS" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DMISSIONPACK" />
-					<Add option="-DTA_HUD" />
-				</Compiler>
-			</Target>
-			<Target title="Release TA_UI Linux x86_64">
-				<Option platforms="Unix;" />
-				<Option output="../../build/cgame_release_ta/cgamex86_64.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/cgame_release_ta" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-O2" />
-					<Add option="-Wall" />
-					<Add option="-fPIC" />
-					<Add option="-W" />
-					<Add option="-DWIN32" />
-					<Add option="-DNDEBUG" />
-					<Add option="-D_WINDOWS" />
-					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
-					<Add option="-DMISSIONPACK" />
-					<Add option="-DMISSIONPACK_HUD" />
-				</Compiler>
-			</Target>
-			<Target title="Debug TA_UI Linux x86_64">
-				<Option platforms="Unix;" />
-				<Option output="../../build/cgame_debug_ta/cgamex86_64.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="../../build/cgame_debug_ta" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
-				<Compiler>
-					<Add option="-g" />
-					<Add option="-fPIC" />
-					<Add option="-W" />
 					<Add option="-O0" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
@@ -291,8 +117,15 @@
 			<Add option="-DWOLFET" />
 			<Add option="-DMISSIONPACK_HUD2" />
 			<Add option="-DTA_GAME_MODELS" />
-			<Add option="-DTA_SPLITVIEW" />
 		</Compiler>
+		<Linker>
+			<Add library="odbc32" />
+			<Add library="odbccp32" />
+			<Add library="SDL" />
+		</Linker>
+		<Unit filename="../../code/cgame/cg_atmospheric.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/cgame/cg_consolecmds.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -336,6 +169,9 @@
 		<Unit filename="../../code/cgame/cg_playerstate.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/cgame/cg_polybus.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/cgame/cg_predict.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -347,6 +183,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/cgame/cg_snapshot.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/cgame/cg_spawn.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/cgame/cg_syscalls.c">
@@ -370,6 +209,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/game/bg_slidemove.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/game/bg_tracemap.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/qcommon/q_math.c">

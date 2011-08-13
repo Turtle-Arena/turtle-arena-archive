@@ -384,11 +384,7 @@ static void DrawSkySide( struct image_s *image, const int mins[2], const int max
 	}
 }
 
-#ifdef IOQ3ZTM // INNER_SKYBOX
-static void DrawSkyBox( shader_t *shader, struct image_s **images )
-#else
 static void DrawSkyBox( shader_t *shader )
-#endif
 {
 	int		i;
 
@@ -451,11 +447,7 @@ static void DrawSkyBox( shader_t *shader )
 			}
 		}
 
-#ifdef IOQ3ZTM // INNER_SKYBOX
-		DrawSkySide( images[sky_texorder[i]],
-#else
 		DrawSkySide( shader->sky.outerbox[sky_texorder[i]],
-#endif
 			         sky_mins_subd,
 					 sky_maxs_subd );
 	}
@@ -483,7 +475,7 @@ static void FillCloudySkySide( const int mins[2], const int maxs[2], qboolean ad
 
 			if ( tess.numVertexes >= SHADER_MAX_VERTEXES )
 			{
-				ri.Error( ERR_DROP, "SHADER_MAX_VERTEXES hit in FillCloudySkySide()" );
+				ri.Error( ERR_DROP, "SHADER_MAX_VERTEXES hit in FillCloudySkySide()\n" );
 			}
 		}
 	}
@@ -561,10 +553,10 @@ static void FillCloudBox( const shader_t *shader, int stage )
 			continue;
 		}
 
-		sky_mins_subd[0] = ri.ftol(sky_mins[0][i] * HALF_SKY_SUBDIVISIONS);
-		sky_mins_subd[1] = ri.ftol(sky_mins[1][i] * HALF_SKY_SUBDIVISIONS);
-		sky_maxs_subd[0] = ri.ftol(sky_maxs[0][i] * HALF_SKY_SUBDIVISIONS);
-		sky_maxs_subd[1] = ri.ftol(sky_maxs[1][i] * HALF_SKY_SUBDIVISIONS);
+		sky_mins_subd[0] = myftol( sky_mins[0][i] * HALF_SKY_SUBDIVISIONS );
+		sky_mins_subd[1] = myftol( sky_mins[1][i] * HALF_SKY_SUBDIVISIONS );
+		sky_maxs_subd[0] = myftol( sky_maxs[0][i] * HALF_SKY_SUBDIVISIONS );
+		sky_maxs_subd[1] = myftol( sky_maxs[1][i] * HALF_SKY_SUBDIVISIONS );
 
 		if ( sky_mins_subd[0] < -HALF_SKY_SUBDIVISIONS ) 
 			sky_mins_subd[0] = -HALF_SKY_SUBDIVISIONS;
@@ -626,14 +618,14 @@ void R_BuildCloudData( shaderCommands_t *input )
 	tess.numIndexes = 0;
 	tess.numVertexes = 0;
 
-	if ( shader->sky.cloudHeight )
+	if ( input->shader->sky.cloudHeight )
 	{
 		for ( i = 0; i < MAX_SHADER_STAGES; i++ )
 		{
 			if ( !tess.xstages[i] ) {
 				break;
 			}
-			FillCloudBox( shader, i );
+			FillCloudBox( input->shader, i );
 		}
 	}
 }
@@ -716,7 +708,6 @@ void RB_DrawSun( void ) {
 	if ( !r_drawSun->integer ) {
 		return;
 	}
-
 	qglLoadMatrixf( backEnd.viewParms.world.modelMatrix );
 	qglTranslatef (backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2]);
 
@@ -744,9 +735,6 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
-#ifdef IOQ3ZTM // ZTM: Should set alpha too, right?
-		tess.vertexColors[tess.numVertexes][3] = 255;
-#endif
 		tess.numVertexes++;
 
 		VectorCopy( origin, temp );
@@ -758,9 +746,6 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
-#ifdef IOQ3ZTM
-		tess.vertexColors[tess.numVertexes][3] = 255;
-#endif
 		tess.numVertexes++;
 
 		VectorCopy( origin, temp );
@@ -772,9 +757,6 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
-#ifdef IOQ3ZTM
-		tess.vertexColors[tess.numVertexes][3] = 255;
-#endif
 		tess.numVertexes++;
 
 		VectorCopy( origin, temp );
@@ -786,9 +768,6 @@ void RB_DrawSun( void ) {
 		tess.vertexColors[tess.numVertexes][0] = 255;
 		tess.vertexColors[tess.numVertexes][1] = 255;
 		tess.vertexColors[tess.numVertexes][2] = 255;
-#ifdef IOQ3ZTM
-		tess.vertexColors[tess.numVertexes][3] = 255;
-#endif
 		tess.numVertexes++;
 
 		tess.indexes[tess.numIndexes++] = 0;
@@ -843,11 +822,7 @@ void RB_StageIteratorSky( void ) {
 		GL_State( 0 );
 		qglTranslatef (backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2]);
 
-#ifdef IOQ3ZTM // INNER_SKYBOX
-		DrawSkyBox( tess.shader, tess.shader->sky.outerbox );
-#else
 		DrawSkyBox( tess.shader );
-#endif
 
 		qglPopMatrix();
 	}
@@ -859,19 +834,7 @@ void RB_StageIteratorSky( void ) {
 	RB_StageIteratorGeneric();
 
 	// draw the inner skybox
-#ifdef IOQ3ZTM // INNER_SKYBOX
-	if ( tess.shader->sky.innerbox[0] && tess.shader->sky.innerbox[0] != tr.defaultImage ) {
-		qglColor3f( tr.identityLight, tr.identityLight, tr.identityLight );
-		
-		qglPushMatrix ();
-		GL_State( 0 );
-		qglTranslatef (backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2]);
 
-		DrawSkyBox( tess.shader, tess.shader->sky.innerbox );
-
-		qglPopMatrix();
-	}
-#endif
 
 	// back to normal depth range
 	qglDepthRange( 0.0, 1.0 );

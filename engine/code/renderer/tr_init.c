@@ -114,7 +114,7 @@ cvar_t	*r_singleShader;
 cvar_t	*r_roundImagesDown;
 cvar_t	*r_colorMipLevels;
 cvar_t	*r_picmip;
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING
 cvar_t	*r_celshadalgo; // Cel shading algorithm selection.
 cvar_t	*r_celoutline; // Cel border width.
 #endif
@@ -160,16 +160,14 @@ cvar_t	*r_saveFontData;
 
 cvar_t	*r_marksOnTriangleMeshes;
 
-cvar_t	*r_aviMotionJpegQuality;
-cvar_t	*r_screenshotJpegQuality;
-
-cvar_t	*r_aviMotionJpegQuality;
-cvar_t	*r_screenshotJpegQuality;
-
 cvar_t	*r_maxpolys;
 int		max_polys;
 cvar_t	*r_maxpolyverts;
 int		max_polyverts;
+#ifdef WOLFET // ZTM: New
+cvar_t	*r_maxpolybuffers;
+int		max_polybuffers;
+#endif
 
 /*
 ** InitOpenGL
@@ -306,30 +304,19 @@ vidmode_t r_vidModes[] =
 	{ "Mode 10: 2048x1536",		2048,	1536,	1 },
 	{ "Mode 11: 856x480 (wide)",856,	480,	1 }
 };
-static int	s_numVidModes = ARRAY_LEN( r_vidModes );
+static int	s_numVidModes = ( sizeof( r_vidModes ) / sizeof( r_vidModes[0] ) );
 
 qboolean R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
 	vidmode_t	*vm;
 	float			pixelAspect;
 
-#ifdef IOQ3ZTM
-	if ( mode < -2 )
-#else
-	if ( mode < -1 )
-#endif
-	{
+	if ( mode < -1 ) {
 		return qfalse;
 	}
 	if ( mode >= s_numVidModes ) {
 		return qfalse;
 	}
 
-#ifdef IOQ3ZTM
-	if ( mode == -2 ) {
-		// Must set width and height to display size before calling this function!
-		pixelAspect = 1.0f;
-	} else
-#endif
 	if ( mode == -1 ) {
 		*width = r_customwidth->integer;
 		*height = r_customheight->integer;
@@ -384,85 +371,15 @@ FIXME: the statics don't get a reinit between fs_game changes
 
 /* 
 ================== 
-RB_ReadPixels
-
-Reads an image but takes care of alignment issues for reading RGB images.
-
-Reads a minimum offset for where the RGB data starts in the image from
-integer stored at pointer offset. When the function has returned the actual
-offset was written back to address offset. This address will always have an
-alignment of packAlign to ensure efficient copying.
-
-Stores the length of padding after a line of pixels to address padlen
-
-Return value must be freed with ri.Hunk_FreeTempMemory()
-================== 
-*/  
-
-byte *RB_ReadPixels(int x, int y, int width, int height, size_t *offset, int *padlen)
-{
-	byte *buffer, *bufstart;
-	int padwidth, linelen;
-	GLint packAlign;
-	
-	qglGetIntegerv(GL_PACK_ALIGNMENT, &packAlign);
-	
-	linelen = width * 3;
-	padwidth = PAD(linelen, packAlign);
-	
-	// Allocate a few more bytes so that we can choose an alignment we like
-	buffer = ri.Hunk_AllocateTempMemory(padwidth * height + *offset + packAlign - 1);
-	
-	bufstart = PADP((intptr_t) buffer + *offset, packAlign);
-	qglReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, bufstart);
-	
-	*offset = bufstart - buffer;
-	*padlen = padwidth - linelen;
-	
-	return buffer;
-}
-
-#ifdef IOQ3ZTM // PNG_SCREENSHOTS
-/* 
-================== 
-RB_TakeScreenshot
-================== 
-*/
-void RB_TakeScreenshot(int x, int y, int width, int height, char *fileName)
-{
-	byte *buffer;
-	size_t offset = 0, memcount;
-	int padlen;
-
-	buffer = RB_ReadPixels(x, y, width, height, &offset, &padlen);
-	memcount = (width * 3 + padlen) * height;
-
-	// gamma correct
-	if(glConfig.deviceSupportsGamma)
-		R_GammaCorrect(buffer + offset, memcount);
-
-	RE_SavePNG(fileName, width, height, buffer + offset, padlen);
-	ri.Hunk_FreeTempMemory(buffer);
-}
-#else
-/* 
-================== 
 RB_TakeScreenshot
 ================== 
 */  
-void RB_TakeScreenshot(int x, int y, int width, int height, char *fileName)
-{
-	byte *allbuf, *buffer;
-	byte *srcptr, *destptr;
-	byte *endline, *endmem;
-	byte temp;
-	
-	int linelen, padlen;
-	size_t offset = 18, memcount;
+void RB_TakeScreenshot( int x, int y, int width, int height, char *fileName ) {
+	byte		*buffer;
+	int			i, c, temp;
 		
-	allbuf = RB_ReadPixels(x, y, width, height, &offset, &padlen);
-	buffer = allbuf + offset - 18;
-	
+	buffer = ri.Hunk_AllocateTempMemory(glConfig.vidWidth*glConfig.vidHeight*3+18);
+
 	Com_Memset (buffer, 0, 18);
 	buffer[2] = 2;		// uncompressed type
 	buffer[12] = width & 255;
@@ -471,63 +388,47 @@ void RB_TakeScreenshot(int x, int y, int width, int height, char *fileName)
 	buffer[15] = height >> 8;
 	buffer[16] = 24;	// pixel size
 
-	// swap rgb to bgr and remove padding from line endings
-	linelen = width * 3;
-	
-	srcptr = destptr = allbuf + offset;
-	endmem = srcptr + (linelen + padlen) * height;
-	
-	while(srcptr < endmem)
-	{
-		endline = srcptr + linelen;
+	qglReadPixels( x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer+18 ); 
 
-		while(srcptr < endline)
-		{
-			temp = srcptr[0];
-			*destptr++ = srcptr[2];
-			*destptr++ = srcptr[1];
-			*destptr++ = temp;
-			
-			srcptr += 3;
-		}
-		
-		// Skip the pad
-		srcptr += padlen;
+	// swap rgb to bgr
+	c = 18 + width * height * 3;
+	for (i=18 ; i<c ; i+=3) {
+		temp = buffer[i];
+		buffer[i] = buffer[i+2];
+		buffer[i+2] = temp;
 	}
 
-	memcount = linelen * height;
-
 	// gamma correct
-	if(glConfig.deviceSupportsGamma)
-		R_GammaCorrect(allbuf + offset, memcount);
+	if ( glConfig.deviceSupportsGamma ) {
+		R_GammaCorrect( buffer + 18, glConfig.vidWidth * glConfig.vidHeight * 3 );
+	}
 
-	ri.FS_WriteFile(fileName, buffer, memcount + 18);
+	ri.FS_WriteFile( fileName, buffer, c );
 
-	ri.Hunk_FreeTempMemory(allbuf);
+	ri.Hunk_FreeTempMemory( buffer );
 }
-#endif
 
 /* 
 ================== 
 RB_TakeScreenshotJPEG
 ================== 
-*/
+*/  
+void RB_TakeScreenshotJPEG( int x, int y, int width, int height, char *fileName ) {
+	byte		*buffer;
 
-void RB_TakeScreenshotJPEG(int x, int y, int width, int height, char *fileName)
-{
-	byte *buffer;
-	size_t offset = 0, memcount;
-	int padlen;
+	buffer = ri.Hunk_AllocateTempMemory(glConfig.vidWidth*glConfig.vidHeight*4);
 
-	buffer = RB_ReadPixels(x, y, width, height, &offset, &padlen);
-	memcount = (width * 3 + padlen) * height;
+	qglReadPixels( x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer ); 
 
 	// gamma correct
-	if(glConfig.deviceSupportsGamma)
-		R_GammaCorrect(buffer + offset, memcount);
+	if ( glConfig.deviceSupportsGamma ) {
+		R_GammaCorrect( buffer, glConfig.vidWidth * glConfig.vidHeight * 4 );
+	}
 
-	RE_SaveJPG(fileName, r_screenshotJpegQuality->integer, width, height, buffer + offset, padlen);
-	ri.Hunk_FreeTempMemory(buffer);
+	ri.FS_WriteFile( fileName, buffer, 1 );		// create path
+	SaveJPG( fileName, 90, glConfig.vidWidth, glConfig.vidHeight, buffer);
+
+	ri.Hunk_FreeTempMemory( buffer );
 }
 
 /*
@@ -581,11 +482,7 @@ void R_ScreenshotFilename( int lastNumber, char *fileName ) {
 	int		a,b,c,d;
 
 	if ( lastNumber < 0 || lastNumber > 9999 ) {
-#ifdef IOQ3ZTM // PNG_SCREENSHOTS
-		Com_sprintf( fileName, MAX_OSPATH, "screenshots/shot9999.png" );
-#else
 		Com_sprintf( fileName, MAX_OSPATH, "screenshots/shot9999.tga" );
-#endif
 		return;
 	}
 
@@ -597,13 +494,8 @@ void R_ScreenshotFilename( int lastNumber, char *fileName ) {
 	lastNumber -= c*10;
 	d = lastNumber;
 
-#ifdef IOQ3ZTM // PNG_SCREENSHOTS
-	Com_sprintf( fileName, MAX_OSPATH, "screenshots/shot%i%i%i%i.png"
-		, a, b, c, d );
-#else
 	Com_sprintf( fileName, MAX_OSPATH, "screenshots/shot%i%i%i%i.tga"
 		, a, b, c, d );
-#endif
 }
 
 /* 
@@ -639,147 +531,80 @@ levelshots are specialized 128*128 thumbnails for
 the menu system, sampled down from full screen distorted images
 ====================
 */
-#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS PNG_SCREENSHOTS
-void R_LevelShot( qboolean jpg ) {
-	char		fileName[MAX_OSPATH];
-	byte		*source;
-	byte		*resample, *resamplestart;
-	size_t		offset = 0, memcount;
-	int			spadlen, rpadlen;
-	int			padwidth, linelen;
-	GLint		packAlign;
-	byte		*src, *dst;
-	int			x, y;
-	int			r, g, b;
-	float		xScale, yScale;
-	int			xx, yy;
-	int			arg;
-	// ZTM: NOTE: Q3 used 128x128, Team Arena used 192x192
 #ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
-	int width = 192;
-	int height = 192;
+// Q3 used 128x128, Team Arena used 192x192
+#if 1 // Team Arena
+#define LEVELSHOT_HEIGHT	192
+#define LEVELSHOT_WIDTH		192
 #else
-	int width = 128;
-	int height = 128;
+#define LEVELSHOT_HEIGHT	128
+#define LEVELSHOT_WIDTH		128
 #endif
-
-	// Allow custom resample width/height
-	arg = atoi(ri.Cmd_Argv(2));
-	if (arg > 0)
-		width = height = arg;
-
-	arg = atoi(ri.Cmd_Argv(3));
-	if (arg > 0)
-		height = arg;
-
-	if (width > glConfig.vidWidth)
-		width = glConfig.vidWidth;
-	if (height > glConfig.vidHeight)
-		height = glConfig.vidHeight;
-
-#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
-	Com_sprintf(fileName, sizeof(fileName), "levelshots/%s_small.%s", tr.world->baseName, jpg ? "jpg" : "png");
-#else
-	Com_sprintf(fileName, sizeof(fileName), "levelshots/%s.%s", tr.world->baseName, jpg ? "jpg" : "png");
 #endif
-
-	source = RB_ReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, &offset, &spadlen);
-
-	//
-	// Based on RB_ReadPixels
-	qglGetIntegerv(GL_PACK_ALIGNMENT, &packAlign);
-
-	linelen = width * 3;
-	padwidth = PAD(linelen, packAlign);
-
-	// Allocate a few more bytes so that we can choose an alignment we like
-	resample = ri.Hunk_AllocateTempMemory(padwidth * height + offset + packAlign - 1);
-
-	resamplestart = PADP((intptr_t) resample + offset, packAlign);
-
-	offset = resamplestart - resample;
-	rpadlen = padwidth - linelen;
-	//
-
-	// resample from source
-	xScale = glConfig.vidWidth / (float)(width * 4.0f);
-	yScale = glConfig.vidHeight / (float)(height * 3.0f);
-	for ( y = 0 ; y < height ; y++ ) {
-		for ( x = 0 ; x < width ; x++ ) {
-			r = g = b = 0;
-			for ( yy = 0 ; yy < 3 ; yy++ ) {
-				for ( xx = 0 ; xx < 4 ; xx++ ) {
-					src = source + (3 * glConfig.vidWidth + spadlen) * (int)((y*3 + yy) * yScale) +
-						3 * (int) ((x*4 + xx) * xScale);
-					r += src[0];
-					g += src[1];
-					b += src[2];
-				}
-			}
-			dst = resample + 3 * ( y * width + x );
-			dst[0] = r / 12;
-			dst[1] = g / 12;
-			dst[2] = b / 12;
-		}
-	}
-
-	memcount = (width * 3 + rpadlen) * height;
-
-	// gamma correct
-	if(glConfig.deviceSupportsGamma)
-		R_GammaCorrect(resample + offset, memcount);
-
-	if (jpg)
-		RE_SaveJPG(fileName, r_screenshotJpegQuality->integer, width, height, resample + offset, rpadlen);
-	else
-		RE_SavePNG(fileName, width, height, resample + offset, rpadlen);
-
-	ri.Hunk_FreeTempMemory(resample);
-	ri.Hunk_FreeTempMemory(source);
-
-	ri.Printf( PRINT_ALL, "Wrote %s\n", fileName );
-}
-#else
 void R_LevelShot( void ) {
 	char		checkname[MAX_OSPATH];
 	byte		*buffer;
-	byte		*source, *allsource;
+	byte		*source;
 	byte		*src, *dst;
-	size_t			offset = 0;
-	int			padlen;
 	int			x, y;
 	int			r, g, b;
 	float		xScale, yScale;
 	int			xx, yy;
 
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	Com_sprintf(checkname, sizeof(checkname), "levelshots/%s_small.tga", tr.world->baseName);
+#else
 	Com_sprintf(checkname, sizeof(checkname), "levelshots/%s.tga", tr.world->baseName);
+#endif
 
-	allsource = RB_ReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, &offset, &padlen);
-	source = allsource + offset;
+	source = ri.Hunk_AllocateTempMemory( glConfig.vidWidth * glConfig.vidHeight * 3 );
 
-	buffer = ri.Hunk_AllocateTempMemory(128 * 128*3 + 18);
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	buffer = ri.Hunk_AllocateTempMemory( LEVELSHOT_HEIGHT * LEVELSHOT_WIDTH*3 + 18);
+#else
+	buffer = ri.Hunk_AllocateTempMemory( 128 * 128*3 + 18);
+#endif
 	Com_Memset (buffer, 0, 18);
 	buffer[2] = 2;		// uncompressed type
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	buffer[12] = LEVELSHOT_WIDTH & 255;
+	buffer[13] = LEVELSHOT_WIDTH >> 8;
+	buffer[14] = LEVELSHOT_HEIGHT & 255;
+	buffer[15] = LEVELSHOT_HEIGHT >> 8;
+#else
 	buffer[12] = 128;
 	buffer[14] = 128;
+#endif
 	buffer[16] = 24;	// pixel size
 
+	qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGB, GL_UNSIGNED_BYTE, source ); 
+
 	// resample from source
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	xScale = glConfig.vidWidth / (float)(LEVELSHOT_HEIGHT * 4.0f);
+	yScale = glConfig.vidHeight / (float)(LEVELSHOT_WIDTH * 3.0f);
+	for ( y = 0 ; y < LEVELSHOT_HEIGHT ; y++ ) {
+		for ( x = 0 ; x < LEVELSHOT_WIDTH ; x++ ) {
+#else
 	xScale = glConfig.vidWidth / 512.0f;
 	yScale = glConfig.vidHeight / 384.0f;
 	for ( y = 0 ; y < 128 ; y++ ) {
 		for ( x = 0 ; x < 128 ; x++ ) {
+#endif
 			r = g = b = 0;
 			for ( yy = 0 ; yy < 3 ; yy++ ) {
 				for ( xx = 0 ; xx < 4 ; xx++ ) {
-					src = source + (3 * glConfig.vidWidth + padlen) * (int)((y*3 + yy) * yScale) +
-						3 * (int) ((x*4 + xx) * xScale);
+					src = source + 3 * ( glConfig.vidWidth * (int)( (y*3+yy)*yScale ) + (int)( (x*4+xx)*xScale ) );
 					r += src[0];
 					g += src[1];
 					b += src[2];
 				}
 			}
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+			dst = buffer + 18 + 3 * ( y * LEVELSHOT_WIDTH + x );
+#else
 			dst = buffer + 18 + 3 * ( y * 128 + x );
+#endif
 			dst[0] = b / 12;
 			dst[1] = g / 12;
 			dst[2] = r / 12;
@@ -788,17 +613,24 @@ void R_LevelShot( void ) {
 
 	// gamma correct
 	if ( glConfig.deviceSupportsGamma ) {
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+		R_GammaCorrect( buffer + 18, LEVELSHOT_HEIGHT * LEVELSHOT_WIDTH * 3 );
+#else
 		R_GammaCorrect( buffer + 18, 128 * 128 * 3 );
+#endif
 	}
 
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
+	ri.FS_WriteFile( checkname, buffer, LEVELSHOT_HEIGHT * LEVELSHOT_WIDTH*3 + 18 );
+#else
 	ri.FS_WriteFile( checkname, buffer, 128 * 128*3 + 18 );
+#endif
 
-	ri.Hunk_FreeTempMemory(buffer);
-	ri.Hunk_FreeTempMemory(allsource);
+	ri.Hunk_FreeTempMemory( buffer );
+	ri.Hunk_FreeTempMemory( source );
 
 	ri.Printf( PRINT_ALL, "Wrote %s\n", checkname );
 }
-#endif
 
 /* 
 ================== 
@@ -821,11 +653,10 @@ void R_ScreenShot_f (void) {
 #endif
 
 	if ( !strcmp( ri.Cmd_Argv(1), "levelshot" ) ) {
+		R_LevelShot();
 #ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
-		R_LevelShot(qfalse);
 		levelshot = qtrue;
 #else
-		R_LevelShot();
 		return;
 #endif
 	}
@@ -841,20 +672,16 @@ void R_ScreenShot_f (void) {
 		silent = qfalse;
 	}
 
-#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS PNG_SCREENSHOTS
+#ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
 	if (levelshot)
 	{
-		sprintf( checkname, "levelshots/%s.png", tr.world->baseName );
+		sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
 	}
 	else
 #endif
 	if ( ri.Cmd_Argc() == 2 && !silent ) {
 		// explicit filename
-#ifdef IOQ3ZTM // PNG_SCREENSHOTS
-		Com_sprintf( checkname, MAX_OSPATH, "screenshots/%s.png", ri.Cmd_Argv( 1 ) );
-#else
 		Com_sprintf( checkname, MAX_OSPATH, "screenshots/%s.tga", ri.Cmd_Argv( 1 ) );
-#endif
 	} else {
 		// scan for a free filename
 
@@ -898,11 +725,10 @@ void R_ScreenShotJPEG_f (void) {
 #endif
 
 	if ( !strcmp( ri.Cmd_Argv(1), "levelshot" ) ) {
+		R_LevelShot();
 #ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
-		R_LevelShot(qtrue);
 		levelshot = qtrue;
 #else
-		R_LevelShot();
 		return;
 #endif
 	}
@@ -921,7 +747,7 @@ void R_ScreenShotJPEG_f (void) {
 #ifdef IOQ3ZTM // TEAMARENA_LEVELSHOTS
 	if (levelshot)
 	{
-		sprintf( checkname, "levelshots/%s.jpg", tr.world->baseName );
+		sprintf( checkname, "levelshots/%s.tga", tr.world->baseName );
 	}
 	else
 #endif
@@ -972,70 +798,36 @@ RB_TakeVideoFrameCmd
 const void *RB_TakeVideoFrameCmd( const void *data )
 {
 	const videoFrameCommand_t	*cmd;
-	byte				*cBuf;
-	size_t				memcount, linelen;
-	int				padwidth, avipadwidth, padlen, avipadlen;
-	GLint packAlign;
+	int												frameSize;
+	int												i;
 	
 	cmd = (const videoFrameCommand_t *)data;
 	
-	qglGetIntegerv(GL_PACK_ALIGNMENT, &packAlign);
-
-	linelen = cmd->width * 3;
-
-	// Alignment stuff for glReadPixels
-	padwidth = PAD(linelen, packAlign);
-	padlen = padwidth - linelen;
-	// AVI line padding
-	avipadwidth = PAD(linelen, AVI_LINE_PADDING);
-	avipadlen = avipadwidth - linelen;
-
-	cBuf = PADP(cmd->captureBuffer, packAlign);
-		
-	qglReadPixels(0, 0, cmd->width, cmd->height, GL_RGB,
-		GL_UNSIGNED_BYTE, cBuf);
-
-	memcount = padwidth * cmd->height;
+	qglReadPixels( 0, 0, cmd->width, cmd->height, GL_RGBA,
+			GL_UNSIGNED_BYTE, cmd->captureBuffer );
 
 	// gamma correct
-	if(glConfig.deviceSupportsGamma)
-		R_GammaCorrect(cBuf, memcount);
+	if( glConfig.deviceSupportsGamma )
+		R_GammaCorrect( cmd->captureBuffer, cmd->width * cmd->height * 4 );
 
-	if(cmd->motionJpeg)
+	if( cmd->motionJpeg )
 	{
-		memcount = RE_SaveJPGToBuffer(cmd->encodeBuffer, linelen * cmd->height,
-			r_aviMotionJpegQuality->integer,
-			cmd->width, cmd->height, cBuf, padlen);
-		ri.CL_WriteAVIVideoFrame(cmd->encodeBuffer, memcount);
+		frameSize = SaveJPGToBuffer( cmd->encodeBuffer, 90,
+				cmd->width, cmd->height, cmd->captureBuffer );
+		ri.CL_WriteAVIVideoFrame( cmd->encodeBuffer, frameSize );
 	}
 	else
 	{
-		byte *lineend, *memend;
-		byte *srcptr, *destptr;
-	
-		srcptr = cBuf;
-		destptr = cmd->encodeBuffer;
-		memend = srcptr + memcount;
-		
-		// swap R and B and remove line paddings
-		while(srcptr < memend)
+		frameSize = cmd->width * cmd->height;
+
+		for( i = 0; i < frameSize; i++)    // Pack to 24bpp and swap R and B
 		{
-			lineend = srcptr + linelen;
-			while(srcptr < lineend)
-			{
-				*destptr++ = srcptr[2];
-				*destptr++ = srcptr[1];
-				*destptr++ = srcptr[0];
-				srcptr += 3;
-			}
-			
-			Com_Memset(destptr, '\0', avipadlen);
-			destptr += avipadlen;
-			
-			srcptr += padlen;
+			cmd->encodeBuffer[ i*3 ]     = cmd->captureBuffer[ i*4 + 2 ];
+			cmd->encodeBuffer[ i*3 + 1 ] = cmd->captureBuffer[ i*4 + 1 ];
+			cmd->encodeBuffer[ i*3 + 2 ] = cmd->captureBuffer[ i*4 ];
 		}
-		
-		ri.CL_WriteAVIVideoFrame(cmd->encodeBuffer, avipadwidth * cmd->height);
+
+		ri.CL_WriteAVIVideoFrame( cmd->encodeBuffer, frameSize * 3 );
 	}
 
 	return (const void *)(cmd + 1);	
@@ -1215,19 +1007,15 @@ void R_Register( void )
 	r_depthbits = ri.Cvar_Get( "r_depthbits", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_ext_multisample = ri.Cvar_Get( "r_ext_multisample", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	ri.Cvar_CheckRange( r_ext_multisample, 0, 4, qtrue );
-#ifdef TA_MAIN // Default "r_overBrightBits" to 0.
+#ifdef TURTLEARENA // Default "r_overBrightBits" to 0.
 	r_overBrightBits = ri.Cvar_Get ("r_overBrightBits", "0", CVAR_ARCHIVE | CVAR_LATCH );
 #else
 	r_overBrightBits = ri.Cvar_Get ("r_overBrightBits", "1", CVAR_ARCHIVE | CVAR_LATCH );
 #endif
 	r_ignorehwgamma = ri.Cvar_Get( "r_ignorehwgamma", "0", CVAR_ARCHIVE | CVAR_LATCH);
-#ifdef IOQ3ZTM // ZTM: Default to display resolution!
-	r_mode = ri.Cvar_Get( "r_mode", "-2", CVAR_ARCHIVE | CVAR_LATCH );
-#else
 	r_mode = ri.Cvar_Get( "r_mode", "3", CVAR_ARCHIVE | CVAR_LATCH );
-#endif
 	r_fullscreen = ri.Cvar_Get( "r_fullscreen", "1", CVAR_ARCHIVE );
-	r_noborder = ri.Cvar_Get("r_noborder", "0", CVAR_ARCHIVE);
+	r_noborder = Cvar_Get("r_noborder", "0", CVAR_ARCHIVE);
 	r_customwidth = ri.Cvar_Get( "r_customwidth", "1600", CVAR_ARCHIVE | CVAR_LATCH );
 	r_customheight = ri.Cvar_Get( "r_customheight", "1024", CVAR_ARCHIVE | CVAR_LATCH );
 	r_customPixelAspect = ri.Cvar_Get( "r_customPixelAspect", "1", CVAR_ARCHIVE | CVAR_LATCH );
@@ -1239,13 +1027,12 @@ void R_Register( void )
 	r_stereoEnabled = ri.Cvar_Get( "r_stereoEnabled", "0", CVAR_ARCHIVE | CVAR_LATCH);
 	r_ignoreFastPath = ri.Cvar_Get( "r_ignoreFastPath", "1", CVAR_ARCHIVE | CVAR_LATCH );
 	r_greyscale = ri.Cvar_Get("r_greyscale", "0", CVAR_ARCHIVE | CVAR_LATCH);
-	ri.Cvar_CheckRange(r_greyscale, 0, 1, qfalse);
 
 	//
 	// temporary latched variables that can only change over a restart
 	//
 	r_fullbright = ri.Cvar_Get ("r_fullbright", "0", CVAR_LATCH|CVAR_CHEAT );
-#ifdef TA_MAIN // Default "r_mapOverBrightBits" to 1.
+#ifdef TURTLEARENA // Default "r_mapOverBrightBits" to 1.
 	r_mapOverBrightBits = ri.Cvar_Get ("r_mapOverBrightBits", "1", CVAR_LATCH );
 #else
 	r_mapOverBrightBits = ri.Cvar_Get ("r_mapOverBrightBits", "2", CVAR_LATCH );
@@ -1326,7 +1113,7 @@ void R_Register( void )
 	r_logFile = ri.Cvar_Get( "r_logFile", "0", CVAR_CHEAT );
 	r_debugSurface = ri.Cvar_Get ("r_debugSurface", "0", CVAR_CHEAT);
 	r_nobind = ri.Cvar_Get ("r_nobind", "0", CVAR_CHEAT);
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING
 	r_celshadalgo = ri.Cvar_Get ("r_celshadalgo", "0", CVAR_ARCHIVE|CVAR_LATCH);
 	r_celoutline = ri.Cvar_Get("r_celoutline","0", CVAR_ARCHIVE);
 #endif
@@ -1341,21 +1128,16 @@ void R_Register( void )
 	r_noportals = ri.Cvar_Get ("r_noportals", "0", CVAR_CHEAT);
 	r_shadows = ri.Cvar_Get( "cg_shadows", "1", 0 );
 
-#ifdef TA_MAIN // Enable marks on triangle meshes.
+#ifdef TURTLEARENA // Enable marks on triangle meshes.
 	r_marksOnTriangleMeshes = ri.Cvar_Get("r_marksOnTriangleMeshes", "1", CVAR_ARCHIVE);
 #else
 	r_marksOnTriangleMeshes = ri.Cvar_Get("r_marksOnTriangleMeshes", "0", CVAR_ARCHIVE);
 #endif
 
-	r_aviMotionJpegQuality = ri.Cvar_Get("r_aviMotionJpegQuality", "90", CVAR_ARCHIVE);
-	r_screenshotJpegQuality = ri.Cvar_Get("r_screenshotJpegQuality", "90", CVAR_ARCHIVE);
-
-#ifdef TA_SPLITVIEW // Need more polys when there are more views.
-	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS*MAX_SPLITVIEW), 0);
-	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS*MAX_SPLITVIEW), 0);
-#else
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);
+#ifdef WOLFET // ZTM: New
+	r_maxpolybuffers = ri.Cvar_Get( "r_maxpolybuffers", va("%d", MAX_POLYS), 0);
 #endif
 
 	// make sure all the commands added here are also
@@ -1368,7 +1150,6 @@ void R_Register( void )
 	ri.Cmd_AddCommand( "screenshot", R_ScreenShot_f );
 	ri.Cmd_AddCommand( "screenshotJPEG", R_ScreenShotJPEG_f );
 	ri.Cmd_AddCommand( "gfxinfo", GfxInfo_f );
-	ri.Cmd_AddCommand( "minimize", GLimp_Minimize );
 }
 
 /*
@@ -1393,12 +1174,14 @@ void R_Init( void ) {
 	Com_Memset( &tess, 0, sizeof( tess ) );
 
 	if(sizeof(glconfig_t) != 11332)
-		ri.Error( ERR_FATAL, "Mod ABI incompatible: sizeof(glconfig_t) == %u != 11332", (unsigned int) sizeof(glconfig_t));
+	{
+		ri.Error( ERR_FATAL, "Mod ABI incompatible: sizeof(glconfig_t) == %zd != 11332", sizeof(glconfig_t));
+	}
 
 //	Swap_Init();
 
 	if ( (intptr_t)tess.xyz & 15 ) {
-		ri.Printf( PRINT_WARNING, "tess.xyz not 16 byte aligned\n" );
+		Com_Printf( "WARNING: tess.xyz not 16 byte aligned\n" );
 	}
 	Com_Memset( tess.constantColor255, 255, sizeof( tess.constantColor255 ) );
 
@@ -1444,7 +1227,7 @@ void R_Init( void ) {
 
 	R_Register();
 
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	R_BloomInit();
 #endif
 
@@ -1456,15 +1239,37 @@ void R_Init( void ) {
 	if (max_polyverts < MAX_POLYVERTS)
 		max_polyverts = MAX_POLYVERTS;
 
+#ifdef WOLFET // ZTM: New
+	max_polybuffers = r_maxpolybuffers->integer;
+	if (max_polybuffers < MAX_POLYS)
+		max_polybuffers = MAX_POLYS;
+
+	ptr = ri.Hunk_Alloc( sizeof( *backEndData[0] ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts
+			+ sizeof(srfPolyBuffer_t) * max_polybuffers, h_low);
+#else
 	ptr = ri.Hunk_Alloc( sizeof( *backEndData[0] ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts, h_low);
+#endif
 	backEndData[0] = (backEndData_t *) ptr;
 	backEndData[0]->polys = (srfPoly_t *) ((char *) ptr + sizeof( *backEndData[0] ));
 	backEndData[0]->polyVerts = (polyVert_t *) ((char *) ptr + sizeof( *backEndData[0] ) + sizeof(srfPoly_t) * max_polys);
+#ifdef WOLFET // ZTM: New
+	backEndData[0]->polybuffers = (srfPolyBuffer_t *) ((char *) ptr + sizeof( *backEndData[0] ) + sizeof(srfPoly_t) * max_polys
+			+ sizeof(polyVert_t) * max_polyverts);
+#endif
 	if ( r_smp->integer ) {
+#ifdef WOLFET // ZTM: New
+		ptr = ri.Hunk_Alloc( sizeof( *backEndData[1] ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts
+				+ sizeof(srfPolyBuffer_t) * max_polybuffers, h_low);
+#else
 		ptr = ri.Hunk_Alloc( sizeof( *backEndData[1] ) + sizeof(srfPoly_t) * max_polys + sizeof(polyVert_t) * max_polyverts, h_low);
+#endif
 		backEndData[1] = (backEndData_t *) ptr;
 		backEndData[1]->polys = (srfPoly_t *) ((char *) ptr + sizeof( *backEndData[1] ));
 		backEndData[1]->polyVerts = (polyVert_t *) ((char *) ptr + sizeof( *backEndData[1] ) + sizeof(srfPoly_t) * max_polys);
+#ifdef WOLFET // ZTM: New
+		backEndData[1]->polybuffers = (srfPolyBuffer_t *) ((char *) ptr + sizeof( *backEndData[1] ) + sizeof(srfPoly_t) * max_polys
+				+ sizeof(polyVert_t) * max_polyverts);
+#endif
 	} else {
 		backEndData[1] = NULL;
 	}
@@ -1514,7 +1319,6 @@ void RE_Shutdown( qboolean destroyWindow ) {
 	ri.Cmd_RemoveCommand ("shaderlist");
 	ri.Cmd_RemoveCommand ("skinlist");
 	ri.Cmd_RemoveCommand ("gfxinfo");
-	ri.Cmd_RemoveCommand("minimize");
 	ri.Cmd_RemoveCommand( "modelist" );
 	ri.Cmd_RemoveCommand( "shaderstate" );
 
@@ -1545,7 +1349,7 @@ Touch all images to make sure they are resident
 */
 void RE_EndRegistration( void ) {
 	R_SyncRenderThread();
-	if (!ri.Sys_LowPhysicalMemory()) {
+	if (!Sys_LowPhysicalMemory()) {
 		RB_ShowImages();
 	}
 }
@@ -1557,12 +1361,7 @@ GetRefAPI
 
 @@@@@@@@@@@@@@@@@@@@@
 */
-#ifdef USE_RENDERER_DLOPEN
-Q_EXPORT refexport_t QDECL *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
-#else
 refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
-#endif
-
 	static refexport_t	re;
 
 	ri = *rimp;
@@ -1598,6 +1397,9 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.ClearScene = RE_ClearScene;
 	re.AddRefEntityToScene = RE_AddRefEntityToScene;
 	re.AddPolyToScene = RE_AddPolyToScene;
+#ifdef WOLFET
+	re.AddPolyBufferToScene = RE_AddPolyBufferToScene;
+#endif
 	re.LightForPoint = R_LightForPoint;
 	re.AddLightToScene = RE_AddLightToScene;
 	re.AddAdditiveLightToScene = RE_AddAdditiveLightToScene;

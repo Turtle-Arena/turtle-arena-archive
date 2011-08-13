@@ -139,6 +139,18 @@ static void LoadGame_MenuEvent( void *ptr, int event ) {
 }
 
 
+/*
+=================
+UI_DemosMenu_Key
+=================
+*/
+static sfxHandle_t UI_LoadGameMenu_Key( int key ) {
+	menucommon_s	*item;
+
+	item = Menu_ItemAtCursor( &s_savegames.menu );
+
+	return Menu_DefaultKey( &s_savegames.menu, key );
+}
 
 
 /*
@@ -152,6 +164,7 @@ static void LoadGame_MenuInit( void ) {
 	char	*demoname/*, extension[32]*/;
 
 	memset( &s_savegames, 0 ,sizeof(savegames_t) );
+	s_savegames.menu.key = UI_LoadGameMenu_Key;
 
 	LoadGame_Cache();
 

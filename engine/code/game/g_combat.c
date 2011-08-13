@@ -135,17 +135,10 @@ void TossClientItems( gentity_t *self ) {
 	float		angle;
 	int			i;
 	gentity_t	*drop;
+
 #ifdef TA_WEAPSYS_EX
 	int statAmmo = -1;
-#endif
 
-#ifdef IOQ3ZTM
-	if (!self || !self->client) {
-		return;
-	}
-#endif
-
-#ifdef TA_WEAPSYS_EX
 	if (self->client)
 	{
 		// Clients can have two weapon, pickup and default,
@@ -360,7 +353,6 @@ TossClientCubes
 */
 extern gentity_t	*neutralObelisk;
 
-#ifdef MISSIONPACK_HARVESTER
 void TossClientCubes( gentity_t *self ) {
 	gitem_t		*item;
 	gentity_t	*drop;
@@ -404,7 +396,6 @@ void TossClientCubes( gentity_t *self ) {
 	drop->think = G_FreeEntity;
 	drop->spawnflags = self->client->sess.sessionTeam;
 }
-#endif
 
 
 /*
@@ -443,6 +434,7 @@ LookAtKiller
 */
 void LookAtKiller( gentity_t *self, gentity_t *inflictor, gentity_t *attacker ) {
 	vec3_t		dir;
+	vec3_t		angles;
 
 	if ( attacker && attacker != self ) {
 		VectorSubtract (attacker->s.pos.trBase, self->s.pos.trBase, dir);
@@ -454,6 +446,10 @@ void LookAtKiller( gentity_t *self, gentity_t *inflictor, gentity_t *attacker ) 
 	}
 
 	self->client->ps.stats[STAT_DEAD_YAW] = vectoyaw ( dir );
+
+	angles[YAW] = vectoyaw ( dir );
+	angles[PITCH] = 0; 
+	angles[ROLL] = 0;
 }
 
 #ifndef NOTRATEDM // No gibs.
@@ -466,7 +462,7 @@ void GibEntity( gentity_t *self, int killer ) {
 	gentity_t *ent;
 	int i;
 
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	//if this entity still has kamikaze
 	if (self->s.eFlags & EF_KAMIKAZE) {
 		// check if there is a kamikaze timer around for this owner
@@ -510,7 +506,7 @@ void body_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 }
 
 
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 Kamikaze_DeathActivate
@@ -634,9 +630,7 @@ player_die
 void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int meansOfDeath ) {
 	gentity_t	*ent;
 	int			anim;
-#ifndef NOTRATEDM // No gibs.
 	int			contents;
-#endif
 	int			killer;
 	int			i;
 	char		*killerName, *obit;
@@ -701,10 +695,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		killer, self->s.number, meansOfDeath, killerName, 
 		self->client->pers.netname, obit );
 
-#ifdef IOQ3ZTM_NO_COMPAT
-	// Don't send death obituary when swiching to spactator mode.
-	if (meansOfDeath != MOD_SPECTATE) {
-#endif
 	// broadcast the death event to everyone
 	ent = G_TempEntity( self->r.currentOrigin, EV_OBITUARY );
 	ent->s.eventParm = meansOfDeath;
@@ -719,7 +709,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			ent->s.weapon = inflictor->s.weapon;
 		}
 		// Check for instant damage guns
-		else if (attacker && attacker == inflictor && (attacker->client
+		else if (inflictor == attacker && (attacker->client
 #ifdef TA_NPCSYS
 			|| attacker->s.eType == ET_NPC
 #endif
@@ -742,9 +732,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	}
 #endif
 	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
-#ifdef IOQ3ZTM_NO_COMPAT
-	}
-#endif
 
 	self->enemy = attacker;
 
@@ -830,14 +817,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	// Add team bonuses
 	Team_FragBonuses(self, inflictor, attacker);
 
-#ifndef TA_MISC // DROP_FLAG
 	// if I committed suicide, the flag does not fall, it returns.
-	if (meansOfDeath == MOD_SUICIDE
-#ifdef IOQ3ZTM_NO_COMPAT
-		|| meansOfDeath == MOD_SPECTATE
-#endif
-		)
-	{
+	if (meansOfDeath == MOD_SUICIDE) {
 		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
 			Team_ReturnFlag( TEAM_FREE );
 			self->client->ps.powerups[PW_NEUTRALFLAG] = 0;
@@ -851,9 +832,23 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 			self->client->ps.powerups[PW_BLUEFLAG] = 0;
 		}
 	}
-#endif
 
-	TossClientItems( self );
+	// if client is in a nodrop area, don't drop anything (but return CTF flags!)
+	contents = trap_PointContents( self->r.currentOrigin, -1 );
+	if ( !( contents & CONTENTS_NODROP )) {
+		TossClientItems( self );
+	}
+	else {
+		if ( self->client->ps.powerups[PW_NEUTRALFLAG] ) {		// only happens in One Flag CTF
+			Team_ReturnFlag( TEAM_FREE );
+		}
+		else if ( self->client->ps.powerups[PW_REDFLAG] ) {		// only happens in standard CTF
+			Team_ReturnFlag( TEAM_RED );
+		}
+		else if ( self->client->ps.powerups[PW_BLUEFLAG] ) {	// only happens in standard CTF
+			Team_ReturnFlag( TEAM_BLUE );
+		}
+	}
 #ifdef MISSIONPACK
 	TossClientPersistantPowerups( self );
 #ifdef MISSIONPACK_HARVESTER
@@ -917,8 +912,6 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	// never gib in a nodrop
 #ifndef NOTRATEDM // No gibs.
-	contents = trap_PointContents( self->r.currentOrigin, -1 );
-
 	if ( (self->health <= GIB_HEALTH && !(contents & CONTENTS_NODROP) && g_blood.integer) || meansOfDeath == MOD_SUICIDE) {
 		// gib death
 		GibEntity( self, killer );
@@ -967,7 +960,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		// globally cycle through the different death animations
 		i = ( i + 1 ) % 3;
 
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		if (self->s.eFlags & EF_KAMIKAZE) {
 			Kamikaze_DeathTimer( self );
 		}
@@ -1204,6 +1197,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			   vec3_t dir, vec3_t point, int damage, int dflags, int mod ) {
 	gclient_t	*client;
 	int			take;
+	int			save;
 #ifndef TURTLEARENA // NOARMOR
 	int			asave;
 #endif
@@ -1301,15 +1295,9 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	client = targ->client;
 
 	if ( client ) {
-#ifdef IOQ3ZTM
-		if ( client->noclip && (targ->flags & FL_GODMODE) ) {
-			return qfalse;
-		}
-#else
 		if ( client->noclip ) {
 			return qfalse;
 		}
-#endif
 #ifdef TURTLEARENA // POWERS
 		if ( client->ps.powerups[PW_FLASHING] && !(dflags & DAMAGE_NO_PROTECTION)) {
 			return qfalse;
@@ -1427,7 +1415,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			}
 		}
 #ifdef TA_WEAPSYS
-		if (bg_projectileinfo[inflictor->s.weapon].explosionType == PE_PROX) {
+		if (inflictor && bg_projectileinfo[inflictor->s.weapon].explosionType == PE_PROX) {
 			if (inflictor->parent && OnSameTeam(targ, inflictor->parent)) {
 				return qfalse;
 			}
@@ -1502,6 +1490,7 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		damage = 1;
 	}
 	take = damage;
+	save = 0;
 
 #ifndef TURTLEARENA // NOARMOR
 	// save some from armor
@@ -1540,13 +1529,6 @@ qboolean G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 			VectorCopy ( targ->r.currentOrigin, client->damage_from );
 			client->damage_fromWorld = qtrue;
 		}
-
-#ifdef TURTLEARENA
-		// Drop CTF flag (and other gametype items) if hit by missile or explosion.
-		if (inflictor->s.eType == ET_MISSILE || (dflags & DAMAGE_RADIUS)) {
-			TossClientGametypeItems(targ);
-		}
-#endif
 	}
 
 	// See if it's the player hurting the emeny flag carrier

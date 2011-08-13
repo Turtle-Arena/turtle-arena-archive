@@ -274,11 +274,12 @@ typedef struct {
 	menuslider_s	tq;
 	menulist_s  	fs;
 	menulist_s  	lighting;
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	menulist_s  	bloom;
 #endif
 	menulist_s  	allow_extensions;
 	menulist_s  	texturebits;
+	menulist_s  	colordepth;
 	menulist_s  	geometry;
 	menulist_s  	filter;
 	menutext_s		driverinfo;
@@ -293,12 +294,13 @@ typedef struct
 	qboolean fullscreen;
 	int tq;
 	int lighting;
+	int colordepth;
 	int texturebits;
 	int geometry;
 	int filter;
 	int driver;
 	qboolean extensions;
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	int bloom;
 #endif
 } InitialVideoOptions_s;
@@ -308,52 +310,48 @@ static graphicsoptions_t		s_graphicsoptions;
 
 static InitialVideoOptions_s s_ivo_templates[] =
 {
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	{
-		6, qtrue, 3, 0, 2, 2, 1, 0, qtrue, 0	// Note: If r_availableModes is found, mode is changed to -2.
+		6, qtrue, 3, 0, 2, 2, 2, 1, 0, qtrue, 0
 	},
 	{
-		4, qtrue, 2, 0, 2, 1, 1, 0, qtrue, 0	// JDC: this was tq 3
+		4, qtrue, 2, 0, 2, 2, 1, 1, 0, qtrue, 0	// JDC: this was tq 3
 	},
 	{
-		3, qtrue, 2, 0, 0, 1, 0, 0, qtrue, 0
+		3, qtrue, 2, 0, 0, 0, 1, 0, 0, qtrue, 0
 	},
 	{
-		2, qtrue, 1, 0, 0, 0, 0, 0, qtrue, 0
+		2, qtrue, 1, 0, 1, 0, 0, 0, 0, qtrue, 0
 	},
 	{
-		2, qtrue, 1, 1, 0, 0, 0, 0, qtrue, 0
+		2, qtrue, 1, 1, 1, 0, 0, 0, 0, qtrue, 0
 	},
 	{
-		3, qtrue, 1, 0, 0, 1, 0, 0, qtrue, 0
+		3, qtrue, 1, 0, 0, 0, 1, 0, 0, qtrue, 0
 	}
 #else
 	{
-#ifdef IOQ3ZTM
-		6, qtrue, 3, 0, 2, 2, 1, 0, qtrue	// Note: If r_availableModes is found, mode is changed to -2.
-#else
-		6, qtrue, 3, 0, 2, 2, 1, 0, qtrue
-#endif
+		6, qtrue, 3, 0, 2, 2, 2, 1, 0, qtrue
 	},
 	{
-		4, qtrue, 2, 0, 2, 1, 1, 0, qtrue	// JDC: this was tq 3
+		4, qtrue, 2, 0, 2, 2, 1, 1, 0, qtrue	// JDC: this was tq 3
 	},
 	{
-		3, qtrue, 2, 0, 0, 1, 0, 0, qtrue
+		3, qtrue, 2, 0, 0, 0, 1, 0, 0, qtrue
 	},
 	{
-		2, qtrue, 1, 0, 0, 0, 0, 0, qtrue
+		2, qtrue, 1, 0, 1, 0, 0, 0, 0, qtrue
 	},
 	{
-		2, qtrue, 1, 1, 0, 0, 0, 0, qtrue
+		2, qtrue, 1, 1, 1, 0, 0, 0, 0, qtrue
 	},
 	{
-		3, qtrue, 1, 0, 0, 1, 0, 0, qtrue
+		3, qtrue, 1, 0, 0, 0, 1, 0, 0, qtrue
 	}
 #endif
 };
 
-#define NUM_IVO_TEMPLATES ( ARRAY_LEN( s_ivo_templates ) )
+#define NUM_IVO_TEMPLATES ( sizeof( s_ivo_templates ) / sizeof( s_ivo_templates[0] ) )
 
 static const char *builtinResolutions[ ] =
 {
@@ -409,12 +407,6 @@ static int GraphicsOptions_FindBuiltinResolution( int mode )
 	if( !resolutionsDetected )
 		return mode;
 
-#ifdef IOQ3ZTM
-	// Display resolution
-	if( mode == 0 )
-		return -2;
-#endif
-
 	if( mode < 0 )
 		return -1;
 
@@ -439,12 +431,6 @@ static int GraphicsOptions_FindDetectedResolution( int mode )
 	if( !resolutionsDetected )
 		return mode;
 
-#ifdef IOQ3ZTM
-	// Display resolution
-	if( mode == -2 )
-		return 0;
-#endif
-
 	if( mode < 0 )
 		return -1;
 
@@ -465,42 +451,21 @@ GraphicsOptions_GetAspectRatios
 static void GraphicsOptions_GetAspectRatios( void )
 {
 	int i, r;
-
+	
 	// build ratio list from resolutions
 	for( r = 0; resolutions[r]; r++ )
 	{
 		int w, h;
 		char *x;
 		char str[ sizeof(ratioBuf[0]) ];
-
+		
 		// calculate resolution's aspect ratio
-#ifdef IOQ3ZTM
-		x = strchr( resolutions[r], 'x' );
-		if (x) {
-			x++;
-			Q_strncpyz( str, resolutions[r], x-resolutions[r] );
-			w = atoi( str );
-			h = atoi( x );
-			Com_sprintf( str, sizeof(str), "%.2f:1", (float)w / (float)h );
-		} else {
-			Q_strncpyz(str, "Unknown", sizeof(str));
-		}
-#else
 		x = strchr( resolutions[r], 'x' ) + 1;
 		Q_strncpyz( str, resolutions[r], x-resolutions[r] );
 		w = atoi( str );
 		h = atoi( x );
 		Com_sprintf( str, sizeof(str), "%.2f:1", (float)w / (float)h );
-#endif
-
-		// rename common ratios ("1.33:1" -> "4:3")
-		for( i = 0; knownRatios[i][0]; i++ ) {
-			if( !Q_stricmp( str, knownRatios[i][0] ) ) {
-				Q_strncpyz( str, knownRatios[i][1], sizeof( str ) );
-				break;
-			}
-		}
-
+		
 		// add ratio to list if it is new
 		// establish res/ratio relationship
 		for( i = 0; ratioBuf[i][0]; i++ )
@@ -513,11 +478,23 @@ static void GraphicsOptions_GetAspectRatios( void )
 			Q_strncpyz( ratioBuf[i], str, sizeof(ratioBuf[i]) );
 			ratioToRes[i] = r;
 		}
-
-		ratios[r] = ratioBuf[r]; 
-		resToRatio[r] = i; 
+		resToRatio[r] = i;
 	}
-
+	
+	// prepare itemlist pointer array
+	// rename common ratios ("1.33:1" -> "4:3")
+	for( r = 0; ratioBuf[r][0]; r++ )
+	{
+		for( i = 0; knownRatios[i][0]; i++ )
+		{
+			if( !Q_stricmp( ratioBuf[r], knownRatios[i][0] ) )
+			{
+				Q_strncpyz( ratioBuf[r], knownRatios[i][1], sizeof(ratioBuf[r]) );
+				break;
+			}
+		}
+		ratios[r] = ratioBuf[r];
+	}
 	ratios[r] = NULL;
 }
 
@@ -528,13 +505,14 @@ GraphicsOptions_GetInitialVideo
 */
 static void GraphicsOptions_GetInitialVideo( void )
 {
+	s_ivo.colordepth  = s_graphicsoptions.colordepth.curvalue;
 	s_ivo.driver      = s_graphicsoptions.driver.curvalue;
 	s_ivo.mode        = s_graphicsoptions.mode.curvalue;
 	s_ivo.fullscreen  = s_graphicsoptions.fs.curvalue;
 	s_ivo.extensions  = s_graphicsoptions.allow_extensions.curvalue;
 	s_ivo.tq          = s_graphicsoptions.tq.curvalue;
 	s_ivo.lighting    = s_graphicsoptions.lighting.curvalue;
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	s_ivo.bloom    = s_graphicsoptions.bloom.curvalue;
 #endif
 	s_ivo.geometry    = s_graphicsoptions.geometry.curvalue;
@@ -554,16 +532,7 @@ static void GraphicsOptions_GetResolutions( void )
 	{
 		char* s = resbuf;
 		unsigned int i = 0;
-
-#ifdef IOQ3ZTM
-		// Add display resolution video mode
-		detectedResolutions[i++] = "Display Resolution";
-
-		// Use display resolution in "Very High Quality" template
-		s_ivo_templates[0].mode = -2;
-#endif
-
-		while( s && i < ARRAY_LEN(detectedResolutions)-1 )
+		while( s && i < sizeof(detectedResolutions)/sizeof(detectedResolutions[0])-1)
 		{
 			detectedResolutions[i++] = s;
 			s = strchr(s, ' ');
@@ -591,6 +560,8 @@ static void GraphicsOptions_CheckConfig( void )
 
 	for ( i = 0; i < NUM_IVO_TEMPLATES-1; i++ )
 	{
+		if ( s_ivo_templates[i].colordepth != s_graphicsoptions.colordepth.curvalue )
+			continue;
 		if ( s_ivo_templates[i].driver != s_graphicsoptions.driver.curvalue )
 			continue;
 		if ( GraphicsOptions_FindDetectedResolution(s_ivo_templates[i].mode) != s_graphicsoptions.mode.curvalue )
@@ -601,7 +572,7 @@ static void GraphicsOptions_CheckConfig( void )
 			continue;
 		if ( s_ivo_templates[i].lighting != s_graphicsoptions.lighting.curvalue )
 			continue;
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 		if ( s_ivo_templates[i].bloom != s_graphicsoptions.bloom.curvalue )
 			continue;
 #endif
@@ -630,10 +601,21 @@ static void GraphicsOptions_UpdateMenuItems( void )
 	{
 		s_graphicsoptions.fs.curvalue = 1;
 		s_graphicsoptions.fs.generic.flags |= QMF_GRAYED;
+		s_graphicsoptions.colordepth.curvalue = 1;
 	}
 	else
 	{
 		s_graphicsoptions.fs.generic.flags &= ~QMF_GRAYED;
+	}
+
+	if ( s_graphicsoptions.fs.curvalue == 0 || s_graphicsoptions.driver.curvalue == 1 )
+	{
+		s_graphicsoptions.colordepth.curvalue = 0;
+		s_graphicsoptions.colordepth.generic.flags |= QMF_GRAYED;
+	}
+	else
+	{
+		s_graphicsoptions.colordepth.generic.flags &= ~QMF_GRAYED;
 	}
 
 	if ( s_graphicsoptions.allow_extensions.curvalue == 0 )
@@ -666,12 +648,16 @@ static void GraphicsOptions_UpdateMenuItems( void )
 	{
 		s_graphicsoptions.apply.generic.flags &= ~(QMF_HIDDEN|QMF_INACTIVE);
 	}
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	if ( s_ivo.bloom != s_graphicsoptions.bloom.curvalue )
 	{
 		s_graphicsoptions.apply.generic.flags &= ~(QMF_HIDDEN|QMF_INACTIVE);
 	}
 #endif
+	if ( s_ivo.colordepth != s_graphicsoptions.colordepth.curvalue )
+	{
+		s_graphicsoptions.apply.generic.flags &= ~(QMF_HIDDEN|QMF_INACTIVE);
+	}
 	if ( s_ivo.driver != s_graphicsoptions.driver.curvalue )
 	{
 		s_graphicsoptions.apply.generic.flags &= ~(QMF_HIDDEN|QMF_INACTIVE);
@@ -722,7 +708,7 @@ static void GraphicsOptions_ApplyChanges( void *unused, int notification )
 		// search for builtin mode that matches the detected mode
 		int mode;
 		if ( s_graphicsoptions.mode.curvalue == -1
-			|| s_graphicsoptions.mode.curvalue >= ARRAY_LEN( detectedResolutions ) )
+			|| s_graphicsoptions.mode.curvalue >= sizeof(detectedResolutions)/sizeof(detectedResolutions[0]) )
 			s_graphicsoptions.mode.curvalue = 0;
 
 		mode = GraphicsOptions_FindBuiltinResolution( s_graphicsoptions.mode.curvalue );
@@ -743,13 +729,15 @@ static void GraphicsOptions_ApplyChanges( void *unused, int notification )
 		trap_Cvar_SetValue( "r_mode", s_graphicsoptions.mode.curvalue );
 
 	trap_Cvar_SetValue( "r_fullscreen", s_graphicsoptions.fs.curvalue );
-
-	trap_Cvar_Reset("r_colorbits");
-	trap_Cvar_Reset("r_depthbits");
-	trap_Cvar_Reset("r_stencilbits");
-
+	trap_Cvar_SetValue( "r_colorbits", 0 );
+	trap_Cvar_SetValue( "r_depthbits", 0 );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix for cg_shadows 2
+	trap_Cvar_SetValue( "r_stencilbits", 8 );
+#else
+	trap_Cvar_SetValue( "r_stencilbits", 0 );
+#endif
 	trap_Cvar_SetValue( "r_vertexLight", s_graphicsoptions.lighting.curvalue );
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	trap_Cvar_SetValue( "r_bloom", s_graphicsoptions.bloom.curvalue );
 #endif
 
@@ -820,9 +808,10 @@ static void GraphicsOptions_Event( void* ptr, int event ) {
 			resToRatio[ s_graphicsoptions.mode.curvalue ];
 		s_graphicsoptions.tq.curvalue          = ivo->tq;
 		s_graphicsoptions.lighting.curvalue    = ivo->lighting;
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 		s_graphicsoptions.bloom.curvalue       = ivo->bloom;
 #endif
+		s_graphicsoptions.colordepth.curvalue  = ivo->colordepth;
 		s_graphicsoptions.texturebits.curvalue = ivo->texturebits;
 		s_graphicsoptions.geometry.curvalue    = ivo->geometry;
 		s_graphicsoptions.filter.curvalue      = ivo->filter;
@@ -936,7 +925,7 @@ static void GraphicsOptions_SetMenuItems( void )
 	}
 
 	s_graphicsoptions.lighting.curvalue = trap_Cvar_VariableValue( "r_vertexLight" ) != 0;
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	s_graphicsoptions.bloom.curvalue = trap_Cvar_VariableValue( "r_bloom" ) != 0;
 #endif
 	switch ( ( int ) trap_Cvar_VariableValue( "r_texturebits" ) )
@@ -976,6 +965,29 @@ static void GraphicsOptions_SetMenuItems( void )
 	else
 	{
 		s_graphicsoptions.geometry.curvalue = 2;
+	}
+
+	switch ( ( int ) trap_Cvar_VariableValue( "r_colorbits" ) )
+	{
+	default:
+	case 0:
+		s_graphicsoptions.colordepth.curvalue = 0;
+		break;
+	case 16:
+		s_graphicsoptions.colordepth.curvalue = 1;
+		break;
+	case 32:
+		s_graphicsoptions.colordepth.curvalue = 2;
+		break;
+	}
+
+	if ( s_graphicsoptions.fs.curvalue == 0 )
+	{
+		s_graphicsoptions.colordepth.curvalue = 0;
+	}
+	if ( s_graphicsoptions.driver.curvalue == 1 )
+	{
+		s_graphicsoptions.colordepth.curvalue = 1;
 	}
 }
 
@@ -1021,6 +1033,14 @@ void GraphicsOptions_MenuInit( void )
 		"Lightmap",
 		"Vertex",
 #endif
+		NULL
+	};
+
+	static const char *colordepth_names[] =
+	{
+		"Default",
+		"16 bit",
+		"32 bit",
 		NULL
 	};
 
@@ -1171,6 +1191,15 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.mode.generic.id       = ID_MODE;
 	y += BIGCHAR_HEIGHT+2;
 
+	// references "r_colorbits"
+	s_graphicsoptions.colordepth.generic.type     = MTYPE_SPINCONTROL;
+	s_graphicsoptions.colordepth.generic.name     = "Color Depth:";
+	s_graphicsoptions.colordepth.generic.flags    = QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+	s_graphicsoptions.colordepth.generic.x        = 400;
+	s_graphicsoptions.colordepth.generic.y        = y;
+	s_graphicsoptions.colordepth.itemnames        = colordepth_names;
+	y += BIGCHAR_HEIGHT+2;
+
 	// references/modifies "r_fullscreen"
 	s_graphicsoptions.fs.generic.type     = MTYPE_SPINCONTROL;
 	s_graphicsoptions.fs.generic.name	  = "Fullscreen:";
@@ -1189,7 +1218,7 @@ void GraphicsOptions_MenuInit( void )
 	s_graphicsoptions.lighting.itemnames     = lighting_names;
 	y += BIGCHAR_HEIGHT+2;
 
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	// references/modifies "r_bloom"
 	s_graphicsoptions.bloom.generic.type  = MTYPE_SPINCONTROL;
 	s_graphicsoptions.bloom.generic.name	 = "Bloom:";
@@ -1284,9 +1313,10 @@ void GraphicsOptions_MenuInit( void )
 	Menu_AddItem( &s_graphicsoptions.menu, ( void * ) &s_graphicsoptions.allow_extensions );
 	Menu_AddItem( &s_graphicsoptions.menu, ( void * ) &s_graphicsoptions.ratio );
 	Menu_AddItem( &s_graphicsoptions.menu, ( void * ) &s_graphicsoptions.mode );
+	Menu_AddItem( &s_graphicsoptions.menu, ( void * ) &s_graphicsoptions.colordepth );
 	Menu_AddItem( &s_graphicsoptions.menu, ( void * ) &s_graphicsoptions.fs );
 	Menu_AddItem( &s_graphicsoptions.menu, ( void * ) &s_graphicsoptions.lighting );
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 	Menu_AddItem( &s_graphicsoptions.menu, ( void * ) &s_graphicsoptions.bloom );
 #endif
 	Menu_AddItem( &s_graphicsoptions.menu, ( void * ) &s_graphicsoptions.geometry );

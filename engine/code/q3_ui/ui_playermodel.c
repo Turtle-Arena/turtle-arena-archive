@@ -108,10 +108,6 @@ typedef struct
 	int				numpages;
 	char			modelskin[64];
 	int				selectedmodel;
-#ifdef TA_SPLITVIEW
-	int				localClient;
-	char			bannerString[32];
-#endif
 } playermodel_t;
 
 static playermodel_t s_playermodel;
@@ -211,36 +207,11 @@ PlayerModel_SaveChanges
 */
 static void PlayerModel_SaveChanges( void )
 {
-#ifdef TA_SPLITVIEW
-	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "model"), s_playermodel.modelskin );
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "headmodel"), "" );
-#else
-	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "headmodel"), s_playermodel.modelskin );
-#endif
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "team_model"), s_playermodel.modelskin );
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "team_headmodel"), "" );
-#else
-	trap_Cvar_Set( Com_LocalClientCvarName(s_playermodel.localClient, "team_headmodel"), s_playermodel.modelskin );
-#endif
-#endif
-#else
 	trap_Cvar_Set( "model", s_playermodel.modelskin );
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	trap_Cvar_Set( "headmodel", "" );
-#else
 	trap_Cvar_Set( "headmodel", s_playermodel.modelskin );
-#endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
 	trap_Cvar_Set( "team_model", s_playermodel.modelskin );
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	trap_Cvar_Set( "team_headmodel", "" );
-#else
 	trap_Cvar_Set( "team_headmodel", s_playermodel.modelskin );
-#endif
-#endif
 #endif
 }
 
@@ -291,16 +262,11 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 
 	switch (key)
 	{
-		case K_KP_LEFTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
-		case K_LEFTARROW:
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
+		case K_KP_LEFTARROW:
+		case K_LEFTARROW:
 			m = Menu_ItemAtCursor(&s_playermodel.menu);
 			picnum = m->id - ID_PLAYERPIC0;
 			if (picnum >= 0 && picnum <= 15)
@@ -324,11 +290,6 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 			break;
 
 		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
 			m = Menu_ItemAtCursor(&s_playermodel.menu);
 			picnum = m->id - ID_PLAYERPIC0;
@@ -557,24 +518,11 @@ static void PlayerModel_SetMenuItems( void )
 	char*			pdest;
 
 	// name
-#ifdef TA_SPLITVIEW
-	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_playermodel.localClient, "name"), s_playermodel.playername.string, 16 );
-#else
 	trap_Cvar_VariableStringBuffer( "name", s_playermodel.playername.string, 16 );
-#endif
 	Q_CleanStr( s_playermodel.playername.string );
 
 	// model
-#ifdef TA_SPLITVIEW
-	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_playermodel.localClient, "model"), s_playermodel.modelskin, 64 );
-#else
 	trap_Cvar_VariableStringBuffer( "model", s_playermodel.modelskin, 64 );
-#endif
-	
-	// use default skin if none is set
-	if (!strchr(s_playermodel.modelskin, '/')) {
-		Q_strcat(s_playermodel.modelskin, 64, "/default");
-	}
 	
 	// find model in our list
 	for (i=0; i<s_playermodel.nummodels; i++)
@@ -619,11 +567,7 @@ static void PlayerModel_SetMenuItems( void )
 PlayerModel_MenuInit
 =================
 */
-#ifdef TA_SPLITVIEW
-static void PlayerModel_MenuInit( int localClient )
-#else
 static void PlayerModel_MenuInit( void )
-#endif
 {
 	int			i;
 	int			j;
@@ -636,10 +580,6 @@ static void PlayerModel_MenuInit( void )
 
 	// zero set all our globals
 	memset( &s_playermodel, 0 ,sizeof(playermodel_t) );
-
-#ifdef TA_SPLITVIEW
-	s_playermodel.localClient = localClient;
-#endif
 
 	PlayerModel_Cache();
 
@@ -654,12 +594,7 @@ static void PlayerModel_MenuInit( void )
 #else
 	s_playermodel.banner.generic.y     = 16;
 #endif
-#ifdef TA_SPLITVIEW
-	Com_sprintf(s_playermodel.bannerString, sizeof (s_playermodel.bannerString), "PLAYER %d MODEL", s_playermodel.localClient+1);
-	s_playermodel.banner.string = s_playermodel.bannerString;
-#else
 	s_playermodel.banner.string        = "PLAYER MODEL";
-#endif
 	s_playermodel.banner.color         = text_banner_color;
 	s_playermodel.banner.style         = UI_CENTER;
 
@@ -866,17 +801,9 @@ void PlayerModel_Cache( void )
 	}
 }
 
-#ifdef TA_SPLITVIEW
-void UI_PlayerModelMenu(int localClient)
-#else
 void UI_PlayerModelMenu(void)
-#endif
 {
-#ifdef TA_SPLITVIEW
-	PlayerModel_MenuInit(localClient);
-#else
 	PlayerModel_MenuInit();
-#endif
 
 	UI_PushMenu( &s_playermodel.menu );
 

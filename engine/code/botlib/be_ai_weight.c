@@ -50,10 +50,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MAX_WEIGHT_FILES			128
 weightconfig_t	*weightFileList[MAX_WEIGHT_FILES];
 
-#ifdef __wii__
-#define ReadValue beReadValue
-#endif
-
 //===========================================================================
 //
 // Parameter:				-

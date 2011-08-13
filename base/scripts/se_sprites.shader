@@ -106,8 +106,8 @@ sun
 	//entityMergable // ZTM: Should be okay?
 	cull none
 	{
-		map gfx/misc/sun.png
-		blendfunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		map gfx/misc/sun.jpg
+		blendFunc GL_ONE GL_ONE
 		rgbGen vertex
 	}
 }

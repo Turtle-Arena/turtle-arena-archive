@@ -73,9 +73,3 @@ longname	"City theme test map"
 type		"ffa tourney team"
 }
 
-{
-map			"test_smash"
-longname	"2D-mode Smash test map"
-type		"ffa tourney team"
-}
-

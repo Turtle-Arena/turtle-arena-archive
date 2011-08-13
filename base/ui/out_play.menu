@@ -1,19 +1,50 @@
-// Turtle Arena play menu
+// Turtle Arena
+// Play menu
+// Base on rfactory.org out_main.menu
 #include "ui/menudef.h"
 
 {
+	assetGlobalDef
+	{
+		font "fonts/font" 16
+		smallFont "fonts/smallfont" 12
+		bigFont "fonts/bigfont" 20
+		cursor "ui/assets/3_cursor3"
+		itemFocusSound "sound/misc/menu2.wav"
+
+		fadeClamp 1.0
+		fadeCycle 1
+		fadeAmount 0.1
+	}
+
 	menuDef
 	{
 		name "play"
-		background THEME_BACKGROUND
 		fullScreen MENU_TRUE
-		style WINDOW_STYLE_SHADER
 		focusColor 1 0.43 0 1.25
+
+		onOpen
+		{
+			playlooped "music/menu.wav" ;
+		}
 
 		onESC
 		{
-			close "play" ;
-			open "main" ;
+			close "play";
+			open "main"
+		}
+
+		//
+		// menu background
+		//
+		itemDef
+		{
+			name background
+			style WINDOW_STYLE_SHADER
+			rect 0 0 640 480
+			background "ui/assets/out_menuback"
+			visible MENU_TRUE
+			decoration
 		}
 
 		//
@@ -23,8 +54,8 @@
 		{
 			name titlebanner
 			style WINDOW_STYLE_SHADER
-			rect 64 32 512 256
-			background "menu/art/titlebanner"
+			rect 192 12 256 128
+			background "ui/assets/titlebanner"
 			visible MENU_TRUE
 			decoration
 		}

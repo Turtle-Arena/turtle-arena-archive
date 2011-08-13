@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "tr_local.h"
 
-#ifdef TA_BLOOM
+#ifdef OA_BLOOM
 
 static cvar_t *r_bloom;
 static cvar_t *r_bloom_sample_size;
@@ -84,12 +84,17 @@ static struct {
 		int		width, height;
 	} work;
 	qboolean started;
+#ifdef IOQ3ZTM
 	qboolean fullscreen;
 	int		startWidth, startHeight;
+#endif
 } bloom;
 
 
-static ID_INLINE void R_Bloom_Quad( int x, int y, int width, int height, float texX, float texY, float texWidth, float texHeight ) {
+static ID_INLINE void R_Bloom_Quad( int width, int height, float texX, float texY, float texWidth, float texHeight ) {
+	int x = 0;
+	int y = 0;
+	x = 0;
 	y += glConfig.vidHeight - height;
 	width += x;
 	height += y;
@@ -122,9 +127,11 @@ static void R_Bloom_InitTextures( void )
 {
 	byte	*data;
 
+#ifdef IOQ3ZTM
 	bloom.fullscreen = r_fullscreen->integer;
 	bloom.startWidth = glConfig.vidWidth;
 	bloom.startHeight = glConfig.vidHeight;
+#endif
 
 	// find closer power of 2 to screen size 
 	for (bloom.screen.width = 1;bloom.screen.width< glConfig.vidWidth;bloom.screen.width *= 2);
@@ -188,13 +195,12 @@ void R_InitBloomTextures( void )
 R_Bloom_DrawEffect
 =================
 */
-static void R_Bloom_DrawEffect( int x, int y, int w, int h )
+static void R_Bloom_DrawEffect( void )
 {
 	GL_Bind( bloom.effect.texture );
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ONE );
 	qglColor4f( r_bloom_alpha->value, r_bloom_alpha->value, r_bloom_alpha->value, 1.0f );
-	R_Bloom_Quad( x, y - (glConfig.vidHeight - h), w, h, x / (float)glConfig.vidWidth, (1.0f / (glConfig.vidHeight / (float)h)) - (y / (float)glConfig.vidHeight),
-			(w / (float)glConfig.vidWidth) * bloom.effect.readW, (h / (float)glConfig.vidHeight) * bloom.effect.readH );
+	R_Bloom_Quad( glConfig.vidWidth, glConfig.vidHeight, 0, 0, bloom.effect.readW, bloom.effect.readH );
 }
 
 
@@ -213,7 +219,7 @@ static void R_Bloom_WarsowEffect( void )
 	//Take the backup texture and downscale it
 	GL_Bind( bloom.screen.texture );
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO );
-	R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 0, 0, bloom.screen.readW, bloom.screen.readH );
+	R_Bloom_Quad( bloom.work.width, bloom.work.height, 0, 0, bloom.screen.readW, bloom.screen.readH );
 	//Copy downscaled framebuffer into a texture
 	GL_Bind( bloom.effect.texture );
 	qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, bloom.work.width, bloom.work.height );
@@ -223,7 +229,7 @@ static void R_Bloom_WarsowEffect( void )
 		GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO );
 
 		for( i = 0; i < r_bloom_darken->integer; i++ ) {
-			R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 
+			R_Bloom_Quad( bloom.work.width, bloom.work.height, 
 				0, 0, 
 				bloom.effect.readW, bloom.effect.readH );
 		}
@@ -273,10 +279,15 @@ static void R_Bloom_WarsowEffect( void )
 			if( intensity < 0.01f )
 				continue;
 			qglColor4f( intensity, intensity, intensity, 1.0 );
+#ifdef IOQ3ZTM
 			x = (i - k) * ( 2 / (float)bloom.startWidth ) * bloom.effect.readW;
 			y = (j - k) * ( 2 / (float)bloom.startHeight ) * bloom.effect.readH;
+#else
+			x = (i - k) * ( 2 / 640.0f ) * bloom.effect.readW;
+			y = (j - k) * ( 2 / 480.0f ) * bloom.effect.readH;
+#endif
 
-			R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, x, y, bloom.effect.readW, bloom.effect.readH );
+			R_Bloom_Quad( bloom.work.width, bloom.work.height, x, y, bloom.effect.readW, bloom.effect.readH );
 		}
 	}
 	qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, bloom.work.width, bloom.work.height );
@@ -302,7 +313,7 @@ static void R_Bloom_RestoreScreen( void ) {
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO );
 	GL_Bind( bloom.screen.texture );
 	qglColor4f( 1, 1, 1, 1 );
-	R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 0, 0,
+	R_Bloom_Quad( bloom.work.width, bloom.work.height, 0, 0,
 		bloom.work.width / (float)bloom.screen.width,
 		bloom.work.height / (float)bloom.screen.height );
 }
@@ -322,7 +333,7 @@ Scale the copied screen back to the sample size used for subsequent passes
 	GL_Bind( bloom.screen.texture );
 	GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_ONE | GLS_DSTBLEND_ZERO );
 	//Downscale it
-	R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 0, 0, bloom.screen.readW, bloom.screen.readH );
+	R_Bloom_Quad( bloom.work.width, bloom.work.height, 0, 0, bloom.screen.readW, bloom.screen.readH );
 #if 1
 	GL_Bind( bloom.effect.texture );
 	qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, bloom.work.width, bloom.work.height );
@@ -332,7 +343,7 @@ Scale the copied screen back to the sample size used for subsequent passes
 		GL_State( GLS_DEPTHTEST_DISABLE | GLS_SRCBLEND_DST_COLOR | GLS_DSTBLEND_ZERO );
 
 		for( i = 0; i < r_bloom_darken->integer; i++ ) {
-			R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 
+			R_Bloom_Quad( bloom.work.width, bloom.work.height, 
 				0, 0, 
 				bloom.effect.readW, bloom.effect.readH );
 		}
@@ -377,7 +388,7 @@ static void R_Bloom_CreateEffect( void ) {
 			r = 2.0f /(range*2+1)*(1 - x*x/(float)(range*range));
 //			r *= r_bloom_darken->value;
 			qglColor4f(r, r, r, 1);
-			R_Bloom_Quad( 0, 0, bloom.work.width, bloom.work.height, 
+			R_Bloom_Quad( bloom.work.width, bloom.work.height, 
 				xoffset, yoffset, 
 				bloom.effect.readW, bloom.effect.readH );
 //				bloom.screen.readW, bloom.screen.readH );
@@ -393,18 +404,25 @@ static void R_Bloom_CreateEffect( void ) {
 R_BloomScreen
 =================
 */
-void R_BloomScreen( int x, int y, int w, int h )
+void R_BloomScreen( void )
 {
-	if (!r_bloom->integer)
+	if( !r_bloom->integer )
 		return;
-
-	// Check if we need to (re)start bloom
-	if (!bloom.started
+	if ( backEnd.doneBloom )
+		return;
+	if ( !backEnd.doneSurfaces )
+		return;
+	backEnd.doneBloom = qtrue;
+	if( !bloom.started
+#ifdef IOQ3ZTM // Check if we need to restart bloom
 		|| bloom.fullscreen != r_fullscreen->integer
 		|| bloom.startWidth != glConfig.vidWidth
-		|| bloom.startHeight != glConfig.vidHeight)
-	{
+		|| bloom.startHeight != glConfig.vidHeight
+#endif
+	) {
+#ifdef IOQ3ZTM
 		bloom.started = qfalse;
+#endif
 		R_Bloom_InitTextures();
 		if( !bloom.started )
 			return;
@@ -436,7 +454,7 @@ void R_BloomScreen( int x, int y, int w, int h )
 	// restore the screen-backup to the screen
 	R_Bloom_RestoreScreen();
 	// Do the final pass using the bloom texture for the final effect
-	R_Bloom_DrawEffect (x, y, w, h);
+	R_Bloom_DrawEffect ();
 }
 
 
@@ -444,18 +462,22 @@ void R_BloomInit( void ) {
 	memset( &bloom, 0, sizeof( bloom ));
 
 	r_bloom = ri.Cvar_Get( "r_bloom", "0", CVAR_ARCHIVE );
-#if 1 // ZTM: AlienArena values
+#ifdef IOQ3ZTM // ZTM: AlienArena values
 	r_bloom_alpha = ri.Cvar_Get( "r_bloom_alpha", "0.2", CVAR_ARCHIVE );
+	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
 	r_bloom_intensity = ri.Cvar_Get( "r_bloom_intensity", "0.5", CVAR_ARCHIVE );
 	r_bloom_darken = ri.Cvar_Get( "r_bloom_darken", "8", CVAR_ARCHIVE );
-#else // OpenArena values
-	r_bloom_alpha = ri.Cvar_Get( "r_bloom_alpha", "0.3", CVAR_ARCHIVE );
-	r_bloom_intensity = ri.Cvar_Get( "r_bloom_intensity", "1.3", CVAR_ARCHIVE );
-	r_bloom_darken = ri.Cvar_Get( "r_bloom_darken", "4", CVAR_ARCHIVE );
-#endif
-	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
 	r_bloom_sample_size = ri.Cvar_Get( "r_bloom_sample_size", "128", CVAR_ARCHIVE|CVAR_LATCH );
 	r_bloom_fast_sample = ri.Cvar_Get( "r_bloom_fast_sample", "0", CVAR_ARCHIVE|CVAR_LATCH );
+#else // OpenArena values
+	r_bloom_alpha = ri.Cvar_Get( "r_bloom_alpha", "0.3", CVAR_ARCHIVE );
+	r_bloom_diamond_size = ri.Cvar_Get( "r_bloom_diamond_size", "8", CVAR_ARCHIVE );
+	r_bloom_intensity = ri.Cvar_Get( "r_bloom_intensity", "1.3", CVAR_ARCHIVE );
+	r_bloom_darken = ri.Cvar_Get( "r_bloom_darken", "4", CVAR_ARCHIVE );
+	r_bloom_sample_size = ri.Cvar_Get( "r_bloom_sample_size", "128", CVAR_ARCHIVE|CVAR_LATCH );
+	r_bloom_fast_sample = ri.Cvar_Get( "r_bloom_fast_sample", "0", CVAR_ARCHIVE|CVAR_LATCH );
+#endif
 }
 
-#endif // TA_BLOOM
+#endif // OA_BLOOM
+

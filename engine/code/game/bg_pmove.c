@@ -39,9 +39,9 @@ pml_t		pml;
 float	pm_stopspeed = 100.0f;
 float	pm_duckScale = 0.25f;
 float	pm_swimScale = 0.50f;
+float	pm_wadeScale = 0.70f;
 #ifdef IOQ3ZTM // LADDER
-float	pm_ladderScale = 0.80f;
-float	pm_ladderWaterScale = 0.50f;
+float	pm_ladderScale = 0.80f;  // Set the max movement speed to 80% of normal
 #endif
 
 float	pm_accelerate = 10.0f;
@@ -49,7 +49,7 @@ float	pm_airaccelerate = 1.0f;
 float	pm_wateraccelerate = 4.0f;
 float	pm_flyaccelerate = 8.0f;
 #ifdef IOQ3ZTM // LADDER
-float	pm_ladderAccelerate = 3000.0f;  // The acceleration to friction ratio is 1:1
+float	pm_ladderAccelerate = 3000;  // The acceleration to friction ratio is 1:1
 #endif
 
 float	pm_friction = 6.0f;
@@ -60,7 +60,7 @@ float	pm_watergroundfriction = 7.0f;
 float	pm_flightfriction = 3.0f;
 float	pm_spectatorfriction = 5.0f;
 #ifdef IOQ3ZTM // LADDER
-float	pm_ladderfriction = 3000.0f;  // Friction is high enough so you don't slip down
+float	pm_ladderfriction = 3000;  // Friction is high enough so you don't slip down
 #endif
 
 int		c_pmove = 0;
@@ -193,7 +193,7 @@ static void PM_StartAnim( int anim ) {
 }
 #endif
 
-#ifdef TURTLEARENA // LADDER
+#ifdef TA_PLAYERS // LADDER
 static void PM_ContinueAnim( int anim ) {
 #ifdef IOQ3ZTM // Needed for TA_WEAPSYS
 	if (anim < 0) {
@@ -317,16 +317,15 @@ static void PM_Friction( void ) {
 		drop += speed*pm_waterfriction*pm->waterlevel*pml.frametime;
 	}
 
-#ifdef IOQ3ZTM // LADDER
-	if ( pml.ladder ) {
-		drop += speed*pm_ladderfriction*pml.frametime;  // Add ladder friction!
-	}
-	else
-#endif
 	// apply flying friction
 	if ( pm->ps->powerups[PW_FLIGHT]) {
 		drop += speed*pm_flightfriction*pml.frametime;
 	}
+#ifdef IOQ3ZTM // LADDER
+	else if ( pml.ladder ) {
+		drop += speed*pm_ladderfriction*pml.frametime;  // Add ladder friction!
+	}
+#endif
 
 	if ( pm->ps->pm_type == PM_SPECTATOR) {
 		drop += speed*pm_spectatorfriction*pml.frametime;
@@ -473,13 +472,25 @@ static void PM_SetMovementDir( void ) {
 }
 
 #ifdef TA_PATHSYS // 2DMODE
+// Nights Move style
+// ZTM: FIXME: Make this selectable by map path (instead of hardcoded to side view)
+enum
+{
+	NM_SIDE,
+	NM_TOP,
+	NM_BACK
+};
+
 static void PM_PathMoveInital( void ) {
+	int style;
 	//vec3_t angles;
 
-	if (!pm->ps->pathMode) {
+	if (!(pm->ps->eFlags & EF_PATHMODE)) {
 		return;
 	}
 
+	// default...
+	style = NM_SIDE;
 	//VectorClear(angles);
 
 	// if on axis, instead of a line {
@@ -491,12 +502,17 @@ static void PM_PathMoveInital( void ) {
 	// }
 
 	// Controls
-	if (pm->ps->pathMode == PATHMODE_TOP) {
+	if (style == NM_TOP)
+	{
 		pm->cmd.upmove = 0;
-	} else if (pm->ps->pathMode == PATHMODE_BACK) {
+	}
+	else if (style == NM_BACK)
+	{
 		pm->cmd.upmove = pm->cmd.forwardmove;
 		pm->cmd.forwardmove = 0;
-	} else { // PATHMODE_SIDE
+	}
+	else // NM_SIDE
+	{
 		// If 2D side view mode
 		pm->cmd.upmove = pm->cmd.forwardmove;
 		pm->cmd.forwardmove = pm->cmd.rightmove;
@@ -511,7 +527,7 @@ void PM_SetupPathWishVel(vec3_t wishvel, const vec3_t wishdir) {
 	vec3_t v, vel;
 	int move;
 
-	if (!pm->ps->pathMode) {
+	if (!(pm->ps->eFlags & EF_PATHMODE)) {
 		return;
 	}
 
@@ -560,9 +576,6 @@ static qboolean PM_CheckJump( void ) {
 
 	pml.groundPlane = qfalse;		// jumping away
 	pml.walking = qfalse;
-#ifdef IOQ3ZTM // WALK_UNDERWATER
-	if (pm->waterlevel < 3)
-#endif
 	pm->ps->pm_flags |= PMF_JUMP_HELD;
 
 	pm->ps->groundEntityNum = ENTITYNUM_NONE;
@@ -612,7 +625,7 @@ static qboolean PM_CheckJump( void ) {
 
 	if ( pm->cmd.forwardmove >= 0
 #ifdef TA_PATHSYS // 2DMODE
-			|| pm->ps->pathMode == PATHMODE_SIDE
+			|| (pm->ps->eFlags & EF_PATHMODE)
 #endif
 	 ) {
 #ifdef TA_NPCSYS
@@ -626,11 +639,6 @@ static qboolean PM_CheckJump( void ) {
 #ifdef TA_NPCSYS
 		if (pm->npc) {
 			PM_ForceLegsAnim( OBJECT_JUMP );
-		} else
-#endif
-#ifdef TURTLEARENA // PLAYERS
-		if (pm->ps && pm->ps->eFlags & EF_LOCKON) {
-			PM_ForceLegsAnim( LEGS_JUMPB_LOCKON );
 		} else
 #endif
 		PM_ForceLegsAnim( LEGS_JUMPB );
@@ -673,7 +681,7 @@ static qboolean	PM_CheckWaterJump( void ) {
 
 	spot[2] += 16;
 	cont = pm->pointcontents (spot, pm->ps->clientNum );
-	if ( cont & (CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_BODY) ) {
+	if ( cont ) {
 		return qfalse;
 	}
 
@@ -989,12 +997,7 @@ static void PM_WalkMove( void ) {
 	float		accelerate;
 	float		vel;
 
-	if ( pm->waterlevel > 2 && DotProduct( pml.forward, pml.groundTrace.plane.normal ) > 0
-#ifdef IOQ3ZTM // WALK_UNDERWATER
-		&& !(pml.groundPlane || pm->ps->groundEntityNum != ENTITYNUM_NONE)
-#endif
-		)
-	{
+	if ( pm->waterlevel > 2 && DotProduct( pml.forward, pml.groundTrace.plane.normal ) > 0 ) {
 		// begin swimming
 		PM_WaterMove();
 		return;
@@ -1074,15 +1077,10 @@ static void PM_WalkMove( void ) {
 		pm->xyspeed = sqrt( pm->ps->velocity[0] * pm->ps->velocity[0]
 			+  pm->ps->velocity[1] * pm->ps->velocity[1] );
 
-		// if not running, less movement while melee attacking, based on LoZ:TP
-		if (pm->xyspeed < 200) {
-			if (BG_MaxAttackIndex(pm->ps)-1 == BG_AttackIndexForPlayerState(pm->ps) && pm->ps->meleeDelay) {
-				accelerate = 0;
-			} else if (pm->ps->meleeTime) {
-				accelerate = pm_accelerate/4;
-			} else {
-				accelerate = pm_accelerate;
-			}
+		// if !running AND melee attacking; based on LoZ:TP
+		if (pm->xyspeed < 200 && (pm->ps->meleeTime || pm->ps->meleeDelay))
+		{
+			accelerate = pm_accelerate/4;
 		}
 		else
 #endif
@@ -1434,7 +1432,7 @@ static void PM_GroundTraceMissed( void ) {
 		if ( trace.fraction == 1.0 ) {
 			if ( pm->cmd.forwardmove >= 0 
 #ifdef TA_PATHSYS // 2DMODE
-			|| pm->ps->pathMode == PATHMODE_SIDE
+			|| (pm->ps->eFlags & EF_PATHMODE)
 #endif
 			) {
 #ifdef TA_NPCSYS
@@ -1448,11 +1446,6 @@ static void PM_GroundTraceMissed( void ) {
 #ifdef TA_NPCSYS
 				if (pm->npc) {
 					PM_ForceLegsAnim( OBJECT_JUMP );
-				} else
-#endif
-#ifdef TURTLEARENA // PLAYERS
-				if (pm->ps && pm->ps->eFlags & EF_LOCKON) {
-					PM_ForceLegsAnim( LEGS_JUMPB_LOCKON );
 				} else
 #endif
 				PM_ForceLegsAnim( LEGS_JUMPB );
@@ -1507,7 +1500,7 @@ static void PM_GroundTrace( void ) {
 		// go into jump animation
 		if ( pm->cmd.forwardmove >= 0 
 #ifdef TA_PATHSYS // 2DMODE
-			|| pm->ps->pathMode == PATHMODE_SIDE
+			|| (pm->ps->eFlags & EF_PATHMODE)
 #endif
 		) {
 #ifdef TA_NPCSYS
@@ -1521,11 +1514,6 @@ static void PM_GroundTrace( void ) {
 #ifdef TA_NPCSYS
 			if (pm->npc) {
 				PM_ForceLegsAnim( OBJECT_JUMP );
-			} else
-#endif
-#ifdef TURTLEARENA // PLAYERS
-			if (pm->ps && pm->ps->eFlags & EF_LOCKON) {
-				PM_ForceLegsAnim( LEGS_JUMPB_LOCKON );
 			} else
 #endif
 			PM_ForceLegsAnim( LEGS_JUMPB );
@@ -1862,7 +1850,7 @@ static void PM_Footsteps( void ) {
 	}
 
 	// if not trying to move
-#if defined TURTLEARENA && defined IOQ3ZTM // LADDER
+#if defined TA_PLAYERS && defined IOQ3ZTM // LADDER
 	if( pml.ladder) {
 		if ( !pm->cmd.forwardmove && !pm->cmd.upmove && !pm->cmd.rightmove ) {
 			PM_ContinueAnim( BOTH_LADDER_STAND );
@@ -1913,7 +1901,7 @@ static void PM_Footsteps( void ) {
 
 	footstep = qfalse;
 
-#if defined TURTLEARENA && defined IOQ3ZTM // LADDER
+#if defined TA_PLAYERS && defined IOQ3ZTM // LADDER
 	if(pml.ladder) {
 		bobmove = 0.3f;	// walking bobs slow
 		if ( pm->ps->pm_flags & PMF_BACKWARDS_RUN ) {
@@ -2079,7 +2067,7 @@ static void PM_BeginWeaponChange( int weapon ) {
 
 	PM_AddEvent( EV_CHANGE_WEAPON );
 	pm->ps->weaponstate = WEAPON_DROPPING;
-#ifdef TURTLEARENA // WEAPONS
+#ifdef TA_PLAYERS // WEAPONS
 	{
 		animNumber_t anim = TORSO_DROP;
 
@@ -2153,7 +2141,7 @@ static void PM_FinishWeaponChange( void ) {
 #ifdef TA_WEAPSYS
 	pm->ps->weaponHands = BG_WeaponHandsForPlayerState(pm->ps);
 #endif
-#ifdef TURTLEARENA // WEAPONS // PLAYERCFG_ANIMATION_TIMES
+#ifdef TA_PLAYERS // WEAPONS // PLAYERCFG_ANIMATION_TIMES
 	{
 		animNumber_t anim = TORSO_RAISE;
 
@@ -2215,7 +2203,7 @@ static void PM_FinishWeaponChange( void ) {
 #endif
 }
 
-#ifdef TURTLEARENA // WEAPONS
+#ifdef TA_PLAYERS // WEAPONS
 /*
 ===============
 PM_BeginWeaponChange
@@ -2386,7 +2374,7 @@ PM_TorsoAnimation
 static void PM_TorsoAnimation( void ) {
 	if ( pm->ps->weaponstate == WEAPON_READY ) {
 #ifdef TA_WEAPSYS // ZTM: Weapon type code.
-		PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps, pm->playercfg) );
+		PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
 #else
 		if ( pm->ps->weapon == WP_GAUNTLET ) {
 			PM_ContinueTorsoAnim( TORSO_STAND2 );
@@ -2414,7 +2402,7 @@ static void PM_NextHoldable(void)
 
 #ifndef MISSIONPACK // if not MP skip its holdables.
 		if (
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		pm->ps->holdableIndex == HI_KAMIKAZE ||
 #endif
 		pm->ps->holdableIndex == HI_PORTAL
@@ -2474,7 +2462,7 @@ static void PM_Weapon( void ) {
 	}
 #endif
 
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	// make holdable function
 	if ( pm->ps->holdableTime > 0 ) {
 		pm->ps->holdableTime -= pml.msec;
@@ -2484,13 +2472,13 @@ static void PM_Weapon( void ) {
 	// check for item using
 	if ( pm->cmd.buttons & BUTTON_USE_HOLDABLE ) {
 		if (
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 		pm->ps->holdableTime <= 0
 #else
 		! ( pm->ps->pm_flags & PMF_USE_ITEM_HELD )
 #endif
 #ifdef TA_HOLDSYS
-			&& (pm->ps->holdable[pm->ps->holdableIndex] != 0 || !pm->ps->holdableIndex)
+			&& pm->ps->holdable[pm->ps->holdableIndex] != 0
 #endif
 #ifdef TA_ENTSYS // FUNC_USE
 			&& !(pm->ps->eFlags & EF_USE_ENT)
@@ -2510,7 +2498,7 @@ static void PM_Weapon( void ) {
 				&& pm->ps->stats[STAT_HEALTH] >= (pm->ps->stats[STAT_MAX_HEALTH] + 25) ) {
 				// don't use medkit if at max health
 			} else {
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 				pm->ps->holdableTime = 500;
 #else
 				pm->ps->pm_flags |= PMF_USE_ITEM_HELD;
@@ -2524,7 +2512,7 @@ static void PM_Weapon( void ) {
 #endif
 #ifdef TA_HOLDSYS
 				if (pm->ps->holdable[pm->ps->holdableIndex] > 0
-#ifdef TURTLEARENA // HOLD_SHURIKEN // Grappling shurikens don't use ammo
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN // Grappling shurikens don't use ammo
 					&& !bg_projectileinfo[BG_ProjectileIndexForHoldable(pm->ps->holdableIndex)].grappling
 #endif
 				) {
@@ -2585,7 +2573,7 @@ static void PM_Weapon( void ) {
 			PM_BeginWeaponChange( pm->cmd.weapon );
 		}
 #endif
-#ifdef TURTLEARENA // WEAPONS
+#ifdef TA_PLAYERS // WEAPONS
 		// Just check the ones we can do it in?
 		if (pm->ps->weaponstate != WEAPON_DROPPING
 			&& pm->ps->weaponstate != WEAPON_HAND_CHANGE)
@@ -2612,7 +2600,7 @@ static void PM_Weapon( void ) {
 	if ( pm->ps->weaponstate == WEAPON_RAISING ) {
 #ifdef TA_WEAPSYS
 		pm->ps->weaponstate = WEAPON_READY;
-		PM_StartTorsoAnim( BG_TorsoStandForPlayerState(pm->ps, pm->playercfg) );
+		PM_StartTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
 		PM_StartLegsAnim( BG_LegsStandForPlayerState(pm->ps, pm->playercfg) );
 #else
 		pm->ps->weaponstate = WEAPON_READY;
@@ -2625,7 +2613,7 @@ static void PM_Weapon( void ) {
 		return;
 	}
 
-#ifdef TURTLEARENA // WEAPONS
+#ifdef TA_PLAYERS // WEAPONS
 	if ( pm->ps->weaponstate == WEAPON_HAND_CHANGE ) {
 		PM_FinishWeaponHandsChange();
 		return;
@@ -2633,7 +2621,7 @@ static void PM_Weapon( void ) {
 #endif
 
 
-#ifdef IOQ3ZTM
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Fix Grapple-Attack player animation.
 	// Handle grapple
 #ifdef TA_WEAPSYS
 	if (bg_weapongroupinfo[pm->ps->weapon].weapon[0]->proj->grappling)
@@ -2645,7 +2633,7 @@ static void PM_Weapon( void ) {
 		if (pm->ps->pm_flags & PMF_FIRE_HELD)
 		{
 #ifdef TA_WEAPSYS
-			PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps, pm->playercfg) );
+			PM_ContinueTorsoAnim( BG_TorsoStandForPlayerState(pm->ps) );
 #else
 			PM_ContinueTorsoAnim( TORSO_STAND );
 #endif
@@ -3008,7 +2996,7 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd ) {
 	// circularly clamp the angles with deltas
 	for (i=0 ; i<3 ; i++) {
 #ifdef TA_PATHSYS // 2DMODE
-		if (ps->pathMode == PATHMODE_SIDE && i == YAW)
+		if ((ps->eFlags & EF_PATHMODE) && i == YAW)
 			continue;
 #endif
 		temp = cmd->angles[i] + ps->delta_angles[i];
@@ -3043,7 +3031,6 @@ static void PM_LadderMove( void ) {
 	vec3_t wishvel;
 	float wishspeed;
 	vec3_t wishdir;
-	float speedScale;
 	float scale;
 	float vel;
 
@@ -3058,7 +3045,7 @@ static void PM_LadderMove( void ) {
 	origin[2] -= 20;
 
 	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, origin,
-		pm->ps->clientNum, pm->tracemask);
+		pm->ps->clientNum, MASK_PLAYERSOLID);
 
 	if(trace.fraction < 1)
 		backwards = qtrue;
@@ -3075,7 +3062,7 @@ static void PM_LadderMove( void ) {
 		wishvel[2] = 0;
 
 		// Snap to 8 unit grid, so player always holds onto ladder correctly!
-		//  (But only if not moving and if on a vertical ladder)
+		//  (But only if not moving and if on a verticle ladder)
 		if (!VectorLength(pm->ps->velocity) && pm->ps->origin2[2] == 0)
 		{
 			float baseZ = (pm->ps->origin[2] + pm->mins[2]);
@@ -3115,14 +3102,8 @@ static void PM_LadderMove( void ) {
 	VectorCopy (wishvel, wishdir);
 	wishspeed = VectorNormalize(wishdir);
 
-	if ( pm->waterlevel > 1 ) {
-		speedScale = pm_ladderWaterScale;
-	} else {
-		speedScale = pm_ladderScale;
-	}
-
-	if ( wishspeed > pm->ps->speed * speedScale ) {
-		wishspeed = pm->ps->speed * speedScale;
+	if ( wishspeed > pm->ps->speed * pm_ladderScale ) {
+		wishspeed = pm->ps->speed * pm_ladderScale;
 	}
 
 	PM_Accelerate (wishdir, wishspeed, pm_ladderAccelerate);
@@ -3244,7 +3225,7 @@ void CheckLadder( void )
 	origin[2] -= 30;
 
 	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, origin,
-		pm->ps->clientNum, pm->tracemask);
+		pm->ps->clientNum, MASK_PLAYERSOLID);
 
 	if(trace.fraction == 1)
 		backwards = qtrue;
@@ -3263,7 +3244,7 @@ void CheckLadder( void )
 	VectorMA (origin, 2, flatforward, spot);
 
 	pm->trace (&trace, origin, pm->mins, pm->maxs, spot,
-		pm->ps->clientNum, pm->tracemask);
+		pm->ps->clientNum, MASK_PLAYERSOLID);
 
 	if ((trace.fraction < 1) && (trace.surfaceFlags & SURF_LADDER)) {
 		pml.ladder = qtrue;
@@ -3341,7 +3322,7 @@ void PmoveSingle (pmove_t *pmove) {
 	}
 
 	// set the firing flag for continuous beam weapons
-	if ( !(pm->ps->pm_flags & PMF_RESPAWNED) && pm->ps->pm_type != PM_INTERMISSION && pm->ps->pm_type != PM_NOCLIP
+	if ( !(pm->ps->pm_flags & PMF_RESPAWNED) && pm->ps->pm_type != PM_INTERMISSION
 #ifdef TA_WEAPSYS
 		&& ( pm->ps->meleeTime ||
 			(( pm->cmd.buttons & BUTTON_ATTACK )
@@ -3426,7 +3407,7 @@ void PmoveSingle (pmove_t *pmove) {
 
 	// decide if backpedaling animations should be used
 #ifdef TA_PATHSYS // 2DMODE
-	if (pm->ps->pathMode == PATHMODE_SIDE) {
+	if (pm->ps->eFlags & EF_PATHMODE) {
 		pm->ps->pm_flags &= ~PMF_BACKWARDS_RUN;
 	} else
 #endif
@@ -3530,13 +3511,6 @@ void PmoveSingle (pmove_t *pmove) {
 		if (pm->ps->pm_flags & PMF_GRAPPLE_PULL) {
 			PM_GrappleMove();
 		}
-		else
-#endif
-#ifdef IOQ3ZTM // LADDER
-		if (pml.ladder) {
-			PM_LadderMove();
-		}
-		else
 #endif
 		// flight powerup doesn't allow jump and has different friction
 		PM_FlyMove();
@@ -3546,10 +3520,6 @@ void PmoveSingle (pmove_t *pmove) {
 		PM_AirMove();
 	} else if (pm->ps->pm_flags & PMF_TIME_WATERJUMP) {
 		PM_WaterJumpMove();
-#ifdef IOQ3ZTM // LADDER
-	} else if (pml.ladder) {
-		PM_LadderMove();
-#endif
 	} else if ( pm->waterlevel > 1 ) {
 #ifdef IOQ3ZTM // WALK_UNDERWATER
 		if (pm->waterlevel == 3 &&
@@ -3562,6 +3532,10 @@ void PmoveSingle (pmove_t *pmove) {
 #endif
 		// swimming
 		PM_WaterMove();
+#ifdef IOQ3ZTM // LADDER // ZTM: Check ladder before water?
+	} else if (pml.ladder) {
+		PM_LadderMove();
+#endif
 	} else if ( pml.walking ) {
 		// walking on ground
 		PM_WalkMove();

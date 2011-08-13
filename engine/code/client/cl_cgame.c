@@ -29,9 +29,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 extern	botlib_export_t	*botlib_export;
 
-#ifndef IOQ3ZTM
 extern qboolean loadCamera(const char *name);
 extern void startCamera(int time);
+#ifdef CAMERASCRIPT
+extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles, float *fov);
+#else
 extern qboolean getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 #endif
 
@@ -59,12 +61,7 @@ void CL_GetGlconfig( glconfig_t *glconfig ) {
 CL_GetUserCmd
 ====================
 */
-#ifdef TA_SPLITVIEW // CONTROLS
-qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClient )
-#else
-qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd )
-#endif
-{
+qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
 	// cmds[cmdNumber] is the last properly generated command
 
 	// can't return anything that we haven't created yet
@@ -78,11 +75,7 @@ qboolean CL_GetUserCmd( int cmdNumber, usercmd_t *ucmd )
 		return qfalse;
 	}
 
-#ifdef TA_SPLITVIEW // CONTROLS
-	*ucmd = cl.cmdss[localClient][ cmdNumber & CMD_MASK ];
-#else
 	*ucmd = cl.cmds[ cmdNumber & CMD_MASK ];
-#endif
 
 	return qtrue;
 }
@@ -159,17 +152,7 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 	snapshot->ping = clSnap->ping;
 	snapshot->serverTime = clSnap->serverTime;
 	Com_Memcpy( snapshot->areamask, clSnap->areamask, sizeof( snapshot->areamask ) );
-#ifdef TA_SPLITVIEW
-	snapshot->numPSs = clSnap->numPSs;
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		snapshot->lcIndex[i] = clSnap->lcIndex[i];
-	}
-	for (i = 0; i < snapshot->numPSs; i++) {
-		snapshot->pss[i] = clSnap->pss[i];
-	}
-#else
 	snapshot->ps = clSnap->ps;
-#endif
 	count = clSnap->numEntities;
 	if ( count > MAX_ENTITIES_IN_SNAPSHOT ) {
 		Com_DPrintf( "CL_GetSnapshot: truncated %i entities to %i\n", count, MAX_ENTITIES_IN_SNAPSHOT );
@@ -191,32 +174,17 @@ qboolean	CL_GetSnapshot( int snapshotNumber, snapshot_t *snapshot ) {
 CL_SetUserCmdValue
 =====================
 */
-#ifdef TA_SPLITVIEW // CONTROLS
-#ifdef TA_HOLDSYS/*2*/
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int holdableValue, int localClientNum ) {
-	cl.localClients[localClientNum].cgameUserCmdValue = userCmdValue;
-	cl.localClients[localClientNum].cgameSensitivity = sensitivityScale;
-	cl.localClients[localClientNum].cgameHoldableValue = holdableValue;
-}
-#else
-void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int localClientNum ) {
-	cl.localClients[localClientNum].cgameUserCmdValue = userCmdValue;
-	cl.localClients[localClientNum].cgameSensitivity = sensitivityScale;
-}
-#endif
-#else
 #ifdef TA_HOLDSYS/*2*/
 void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale, int holdableValue ) {
-	cl.localClient.cgameUserCmdValue = userCmdValue;
-	cl.localClient.cgameSensitivity = sensitivityScale;
-	cl.localClient.cgameHoldableValue = holdableValue;
+	cl.cgameUserCmdValue = userCmdValue;
+	cl.cgameSensitivity = sensitivityScale;
+	cl.cgameHoldableValue = holdableValue;
 }
 #else
 void CL_SetUserCmdValue( int userCmdValue, float sensitivityScale ) {
-	cl.localClient.cgameUserCmdValue = userCmdValue;
-	cl.localClient.cgameSensitivity = sensitivityScale;
+	cl.cgameUserCmdValue = userCmdValue;
+	cl.cgameSensitivity = sensitivityScale;
 }
-#endif
 #endif
 
 /*
@@ -344,7 +312,7 @@ rescan:
 		if ( argc >= 2 )
 			Com_Error( ERR_SERVERDISCONNECT, "Server disconnected - %s", Cmd_Argv( 1 ) );
 		else
-			Com_Error( ERR_SERVERDISCONNECT, "Server disconnected" );
+			Com_Error( ERR_SERVERDISCONNECT, "Server disconnected\n" );
 	}
 
 	if ( !strcmp( cmd, "bcs0" ) ) {
@@ -385,11 +353,7 @@ rescan:
 		Con_ClearNotify();
 		// reparse the string, because Con_ClearNotify() may have done another Cmd_TokenizeString()
 		Cmd_TokenizeString( s );
-#ifdef TA_SPLITVIEW // CONTROLS
-		Com_Memset( cl.cmdss, 0, sizeof( cl.cmdss ) );
-#else
 		Com_Memset( cl.cmds, 0, sizeof( cl.cmds ) );
-#endif
 		return qtrue;
 	}
 
@@ -479,7 +443,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		Cvar_Update( VMA(1) );
 		return 0;
 	case CG_CVAR_SET:
-		Cvar_SetSafe( VMA(1), VMA(2) );
+		Cvar_Set( VMA(1), VMA(2) );
 		return 0;
 	case CG_CVAR_VARIABLESTRINGBUFFER:
 		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
@@ -516,7 +480,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		CL_AddCgameCommand( VMA(1) );
 		return 0;
 	case CG_REMOVECOMMAND:
-		Cmd_RemoveCommandSafe( VMA(1) );
+		Cmd_RemoveCommand( VMA(1) );
 		return 0;
 	case CG_SENDCLIENTCOMMAND:
 		CL_AddReliableCommand(VMA(1), qfalse);
@@ -580,11 +544,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		S_UpdateEntityPosition( args[1], VMA(2) );
 		return 0;
 	case CG_S_RESPATIALIZE:
-		S_Respatialize( args[1], VMA(2), VMA(3), args[4]
-#ifdef TA_SPLITVIEW
-			, args[5]
-#endif
-			);
+		S_Respatialize( args[1], VMA(2), VMA(3), args[4] );
 		return 0;
 	case CG_S_REGISTERSOUND:
 		return S_RegisterSound( VMA(1), args[2] );
@@ -604,7 +564,6 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		return re.RegisterShaderNoMip( VMA(1) );
 	case CG_R_REGISTERFONT:
 		re.RegisterFont( VMA(1), args[2], VMA(3));
-		return 0;
 	case CG_R_CLEARSCENE:
 		re.ClearScene();
 		return 0;
@@ -617,6 +576,11 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_R_ADDPOLYSTOSCENE:
 		re.AddPolyToScene( args[1], args[2], VMA(3), args[4] );
 		return 0;
+#ifdef WOLFET
+	case CG_R_ADDPOLYBUFFERTOSCENE:
+		re.AddPolyBufferToScene( VMA( 1 ) );
+		break;
+#endif
 	case CG_R_LIGHTFORPOINT:
 		return re.LightForPoint( VMA(1), VMA(2), VMA(3), VMA(4) );
 	case CG_R_ADDLIGHTTOSCENE:
@@ -655,22 +619,12 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_GETCURRENTCMDNUMBER:
 		return CL_GetCurrentCmdNumber();
 	case CG_GETUSERCMD:
-#ifdef TA_SPLITVIEW // CONTROLS
-		return CL_GetUserCmd( args[1], VMA(2), args[3] );
-	case CG_SETUSERCMDVALUE:
-#if defined TA_HOLDSYS/*2*/
-		CL_SetUserCmdValue( args[1], VMF(2), args[3], args[4] );
-#else
-		CL_SetUserCmdValue( args[1], VMF(2), args[3] );
-#endif
-#else
 		return CL_GetUserCmd( args[1], VMA(2) );
 	case CG_SETUSERCMDVALUE:
 #if defined TA_HOLDSYS/*2*/
 		CL_SetUserCmdValue( args[1], VMF(2), args[3] );
 #else
 		CL_SetUserCmdValue( args[1], VMF(2) );
-#endif
 #endif
 		return 0;
 	case CG_MEMORY_REMAINING:
@@ -734,7 +688,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_REAL_TIME:
 		return Com_RealTime( VMA(1) );
 	case CG_SNAPVECTOR:
-		Q_SnapVector(VMA(1));
+		Sys_SnapVector( VMA(1) );
 		return 0;
 
 	case CG_CIN_PLAYCINEMATIC:
@@ -757,6 +711,18 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_R_REMAP_SHADER:
 		re.RemapShader( VMA(1), VMA(2), VMA(3) );
 		return 0;
+
+#ifdef CAMERASCRIPT
+	case CG_LOADCAMERA:
+		return loadCamera(VMA(1));
+
+	case CG_STARTCAMERA:
+		startCamera(args[1]);
+		return 0;
+
+	case CG_GETCAMERAINFO:
+		return getCameraInfo(args[1], VMA(2), VMA(3), VMA(4));
+#else
 /*
 	case CG_LOADCAMERA:
 		return loadCamera(VMA(1));
@@ -768,6 +734,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_GETCAMERAINFO:
 		return getCameraInfo(args[1], VMA(2), VMA(3));
 */
+#endif
 	case CG_GET_ENTITY_TOKEN:
 		return re.GetEntityToken( VMA(1), args[2] );
 	case CG_R_INPVS:
@@ -816,13 +783,7 @@ void CL_InitCGame( void ) {
 	if ( !cgvm ) {
 		Com_Error( ERR_DROP, "VM_Create on cgame failed" );
 	}
-	clc.state = CA_LOADING;
-
-#ifdef IOQ3ZTM
-	if (!com_sv_running->integer) {
-		Com_Printf("Loading level %s...\n", mapname);
-	}
-#endif
+	cls.state = CA_LOADING;
 
 	// init for this gamestate
 	// use the lastExecutedServerCommand instead of the serverCommandSequence
@@ -835,7 +796,7 @@ void CL_InitCGame( void ) {
 
 	// we will send a usercmd this frame, which
 	// will cause the server to send us the first snapshot
-	clc.state = CA_PRIMED;
+	cls.state = CA_PRIMED;
 
 	t2 = Sys_Milliseconds();
 
@@ -910,6 +871,7 @@ or bursted delayed packets.
 #define	RESET_TIME	500
 
 void CL_AdjustTimeDelta( void ) {
+	int		resetTime;
 	int		newDelta;
 	int		deltaDelta;
 
@@ -918,6 +880,13 @@ void CL_AdjustTimeDelta( void ) {
 	// the delta never drifts when replaying a demo
 	if ( clc.demoplaying ) {
 		return;
+	}
+
+	// if the current time is WAY off, just correct to the current value
+	if ( com_sv_running->integer ) {
+		resetTime = 100;
+	} else {
+		resetTime = RESET_TIME;
 	}
 
 	newDelta = cl.snap.serverTime - cls.realtime;
@@ -969,7 +938,7 @@ void CL_FirstSnapshot( void ) {
 	if ( cl.snap.snapFlags & SNAPFLAG_NOT_ACTIVE ) {
 		return;
 	}
-	clc.state = CA_ACTIVE;
+	cls.state = CA_ACTIVE;
 
 	// set the timedelta so we are exactly on this first frame
 	cl.serverTimeDelta = cl.snap.serverTime - cls.realtime;
@@ -1027,8 +996,8 @@ void CL_FirstSnapshot( void ) {
 		clc.speexInitialized = qtrue;
 		clc.voipMuteAll = qfalse;
 		Cmd_AddCommand ("voip", CL_Voip_f);
-		Cvar_Set("cl_voipSendTarget", "spatial");
-		Com_Memset(clc.voipTargets, ~0, sizeof(clc.voipTargets));
+		Cvar_Set("cl_voipSendTarget", "all");
+		clc.voipTarget1 = clc.voipTarget2 = clc.voipTarget3 = 0x7FFFFFFF;
 	}
 #endif
 }
@@ -1040,8 +1009,8 @@ CL_SetCGameTime
 */
 void CL_SetCGameTime( void ) {
 	// getting a valid frame message ends the connection process
-	if ( clc.state != CA_ACTIVE ) {
-		if ( clc.state != CA_PRIMED ) {
+	if ( cls.state != CA_ACTIVE ) {
+		if ( cls.state != CA_PRIMED ) {
 			return;
 		}
 		if ( clc.demoplaying ) {
@@ -1057,7 +1026,7 @@ void CL_SetCGameTime( void ) {
 			cl.newSnapshots = qfalse;
 			CL_FirstSnapshot();
 		}
-		if ( clc.state != CA_ACTIVE ) {
+		if ( cls.state != CA_ACTIVE ) {
 			return;
 		}
 	}	
@@ -1170,7 +1139,7 @@ void CL_SetCGameTime( void ) {
 		// feed another messag, which should change
 		// the contents of cl.snap
 		CL_ReadDemoMessage();
-		if ( clc.state != CA_ACTIVE ) {
+		if ( cls.state != CA_ACTIVE ) {
 			return;		// end of demo
 		}
 	}

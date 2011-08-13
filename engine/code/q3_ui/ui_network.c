@@ -41,12 +41,7 @@ NETWORK OPTIONS MENU
 #define ID_SOUND			12
 #define ID_NETWORK			13
 #define ID_RATE				14
-#ifdef IOQ3ZTM // VOIP
-#define ID_VOIP				15
-#define ID_BACK				16
-#else
 #define ID_BACK				15
-#endif
 
 
 static const char *rate_items[] = {
@@ -71,9 +66,6 @@ typedef struct {
 	menutext_s		network;
 
 	menulist_s		rate;
-#ifdef IOQ3ZTM // VOIP
-	menuradiobutton_s voip;
-#endif
 
 	menubitmap_s	back;
 } networkOptionsInfo_t;
@@ -111,13 +103,6 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 		break;
 
 	case ID_RATE:
-#ifdef IOQ3ZTM // VOIP
-		if (networkOptionsInfo.rate.curvalue == 4) {
-			networkOptionsInfo.voip.generic.flags &= ~QMF_GRAYED;
-		} else {
-			networkOptionsInfo.voip.generic.flags |= QMF_GRAYED;
-		}
-#endif
 		if( networkOptionsInfo.rate.curvalue == 0 ) {
 			trap_Cvar_SetValue( "rate", 2500 );
 		}
@@ -134,12 +119,6 @@ static void UI_NetworkOptionsMenu_Event( void* ptr, int event ) {
 			trap_Cvar_SetValue( "rate", 25000 );
 		}
 		break;
-
-#ifdef IOQ3ZTM // VOIP
-	case ID_VOIP:
-		trap_Cvar_SetValue( "cl_voip", (networkOptionsInfo.voip.curvalue) ? 1 : 0 );
-		break;
-#endif
 
 	case ID_BACK:
 		UI_PopMenu();
@@ -237,22 +216,6 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	networkOptionsInfo.rate.generic.y			= y;
 	networkOptionsInfo.rate.itemnames			= rate_items;
 
-#ifdef IOQ3ZTM // VOIP
-	y += BIGCHAR_HEIGHT+2;
-	networkOptionsInfo.voip.generic.type		= MTYPE_RADIOBUTTON;
-#if 0 // ZTM: TODO: Allow changing cl_voip anytime.
-	networkOptionsInfo.voip.generic.name		= "Voice chat (VoIP):";
-	networkOptionsInfo.voip.generic.x			= 400;
-#else
-	networkOptionsInfo.voip.generic.name		= "Voice chat (requires restart):";
-	networkOptionsInfo.voip.generic.x			= 500;
-#endif
-	networkOptionsInfo.voip.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	networkOptionsInfo.voip.generic.callback	= UI_NetworkOptionsMenu_Event;
-	networkOptionsInfo.voip.generic.id			= ID_VOIP;
-	networkOptionsInfo.voip.generic.y			= y;
-#endif
-
 	networkOptionsInfo.back.generic.type		= MTYPE_BITMAP;
 	networkOptionsInfo.back.generic.name		= ART_BACK0;
 	networkOptionsInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -272,9 +235,6 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.sound );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.network );
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.rate );
-#ifdef IOQ3ZTM // VOIP
-	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.voip );
-#endif
 	Menu_AddItem( &networkOptionsInfo.menu, ( void * ) &networkOptionsInfo.back );
 
 	rate = trap_Cvar_VariableValue( "rate" );
@@ -293,10 +253,6 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 	else {
 		networkOptionsInfo.rate.curvalue = 4;
 	}
-
-#ifdef IOQ3ZTM // VOIP
-	networkOptionsInfo.voip.curvalue			= (trap_Cvar_VariableValue( "cl_voip" ) == 1);
-#endif
 }
 
 

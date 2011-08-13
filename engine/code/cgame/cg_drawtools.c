@@ -32,41 +32,6 @@ Adjusted for resolution, doesn't keep screen aspect ratio
 ================
 */
 void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
-#ifdef TA_SPLITVIEW
-	if (cg.numViewports != 1 && cg.snap) {
-		qboolean right = qfalse;
-		qboolean down = qfalse;
-
-		if (cg.numViewports == 2) {
-			if (cg.viewport == 1) {
-				down = qtrue;
-			}
-		}
-		else if (cg.numViewports == 3 && cg.viewport == 2) {
-			down = qtrue;
-		}
-		else if (cg.numViewports <= 4) {
-			if (cg.viewport == 1 || cg.viewport == 3) {
-				right = qtrue;
-			}
-			if (cg.viewport == 2 || cg.viewport == 3) {
-				down = qtrue;
-			}
-		}
-
-		if (cg.viewport != 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
-			right = !right;
-			down = !down;
-		}
-
-		if (right) {
-			*x += SCREEN_WIDTH;
-		}
-		if (down) {
-			*y += SCREEN_HEIGHT;
-		}
-	}
-#endif
 	// scale for screen sizes
 	*x *= cgs.screenXScaleFit;
 	*y *= cgs.screenYScaleFit;
@@ -101,44 +66,6 @@ Adjusted for resolution and screen aspect ratio
 ================
 */
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
-#ifdef TA_SPLITVIEW
-	int viewXBias = 0;
-
-	if (cg.numViewports != 1 && cg.snap) {
-		qboolean right = qfalse;
-		qboolean down = qfalse;
-
-		if (cg.numViewports == 2) {
-			if (cg.viewport == 1) {
-				down = qtrue;
-			}
-		}
-		else if (cg.numViewports == 3 && cg.viewport == 2) {
-			down = qtrue;
-		}
-		else if (cg.numViewports <= 4) {
-			if (cg.viewport == 1 || cg.viewport == 3) {
-				right = qtrue;
-			}
-			if (cg.viewport == 2 || cg.viewport == 3) {
-				down = qtrue;
-			}
-		}
-
-		if (cg.viewport != 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
-			right = !right;
-			down = !down;
-		}
-
-		if (right) {
-			viewXBias = 2;
-			*x += SCREEN_WIDTH;
-		}
-		if (down) {
-			*y += SCREEN_HEIGHT;
-		}
-	}
-#endif
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
 	if (cg_hudPlacement == HUD_LEFT)
 		*x = *x * cgs.screenXScale;
@@ -159,11 +86,6 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	*y *= cgs.screenYScale;
 	*w *= cgs.screenXScale;
 	*h *= cgs.screenYScale;
-
-#ifdef TA_SPLITVIEW
-	// Offset for widescreen
-	*x += cgs.screenXBias*(viewXBias);
-#endif
 }
 
 /*
@@ -278,12 +200,7 @@ void CG_DrawPicFit( float x, float y, float width, float height, qhandle_t hShad
 UI_DrawFontProportionalString
 =================
 */
-void UI_DrawFontProportionalString( font_t *font,
-#ifndef TA_DATA
-				font_t *fontGlow,
-#endif
-				int x, int y, const char* str, int style, vec4_t color )
-{
+void UI_DrawFontProportionalString( font_t *font, int x, int y, const char* str, int style, vec4_t color ) {
 	vec4_t	drawcolor;
 	int		width;
 
@@ -337,11 +254,11 @@ void UI_DrawFontProportionalString( font_t *font,
 		drawcolor[2] = color[2];
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( cg.time / PULSE_DIVISOR );
-#ifdef TA_DATA
+//#ifdef TA_DATA
 		CG_DrawFontStringColor( font, x, y, str, drawcolor );
-#else
-		CG_DrawFontStringColor( fontGlow, x, y, str, drawcolor );
-#endif
+//#else
+//		CG_DrawFontStringColor( fontGlow, x, y, str, drawcolor );
+//#endif
 		return;
 	}
 
@@ -492,12 +409,10 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 		max = 0;
 	}
 
+	// ZTM: FIXME: How should adjust and kerning be delt with?
 	if (adjust <= 0) {
-		adjust = 0;
+		adjust = font->kerning;
 	}
-
-	// Add pre-font kerning to adjust.
-	adjust += font->kerning;
 
 	maxChars = strlen(string);
 	if (limit > 0 && maxChars > limit) {
@@ -512,7 +427,10 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 	if (font->fontInfo.name[0]) {
 		useScale = scale * font->fontInfo.glyphScale;
 	} else {
-		useScale = scale * (48.0f / font->pointSize);
+		//float dpi = 72.0f;
+		//float dpiScale = 72.0f / dpi;
+
+		useScale = scale * (48.0f / font->pointSize);// * dpiScale;
 	}
 
 	if (x == CENTER_X) {
@@ -590,6 +508,7 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 	trap_R_SetColor( NULL );
 }
 
+// ZTM: TODO: Replace using CG_DrawStringExt, string width is often used with it (and it not right when using ttf fonts)
 void CG_DrawStringExt( int x, int y, const char *string, const float *setColor, 
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars )
 {
@@ -895,16 +814,10 @@ void CG_TileClear( void ) {
 	w = cgs.glconfig.vidWidth;
 	h = cgs.glconfig.vidHeight;
 
-#ifdef TA_SPLITVIEW
-	if (cg.cur_ps->pm_type == PM_INTERMISSION || cg_viewsize.integer >= 100 || cg.viewport != 0) {
-		return;		// full screen rendering
-	}
-#else
 	if ( cg.refdef.x == 0 && cg.refdef.y == 0 && 
 		cg.refdef.width == w && cg.refdef.height == h ) {
 		return;		// full screen rendering
 	}
-#endif
 
 	top = cg.refdef.y;
 	bottom = top + cg.refdef.height-1;
@@ -971,50 +884,54 @@ void CG_ColorForChain(int chain, vec3_t color)
 	//  limit to colors 0 though 11
 	index = ((chain-1) / 5) % 12;
 
+	VectorClear(color);
+
 	switch (index)
 	{
-		case 0: // orange
-			VectorSet( color, 1, 0.5f, 0 );
+		case 3: // blue
+			VectorSet( color, 0, 0, 1 );
 			break;
-		case 1: // light blue
-			VectorSet( color, 0, 0.5f, 1 );
-			break;
-		case 2: // green
+		case 7: // green
 			VectorSet( color, 0, 1, 0 );
 			break;
-		case 3: // cyen
+		case 5: // cyen
 			VectorSet( color, 0, 1, 1 );
 			break;
-		case 4: // pink
+		case 11: // red
+			VectorSet( color, 1, 0, 0 );
+			break;
+		case 1: // magenta
+			VectorSet( color, 1, 0, 1 );
+			break;
+		case 9: // yellow
+			VectorSet( color, 1, 1, 0 );
+			break;
+		//case 12: // white
+		//	VectorSet( color, 1, 1, 1 );
+		//	break;
+
+		case 10: // orange
+			VectorSet( color, 1, 0.5f, 0 );
+			break;
+		case 8: // Lime
+			VectorSet( color, 0.5f, 1, 0 );
+			break;
+		case 6: // Vivid green
+			VectorSet( color, 0, 1, 0.5f );
+			break;
+		case 4: // light blue
+			VectorSet( color, 0, 0.5f, 1 );
+			break;
+		case 2: // purple
+			VectorSet( color, 0.5f, 0, 1 );
+			break;
+		case 0: // pink
 			VectorSet( color, 1, 0, 0.5f );
 			break;
 
-		case 5: // red
-			VectorSet( color, 1, 0, 0 );
-			break;
-		case 6: // blue
-			VectorSet( color, 0, 0, 1 );
-			break;
-		case 7: // Lime
-			VectorSet( color, 0.5f, 1, 0 );
-			break;
-		case 8: // Vivid green
-			VectorSet( color, 0, 1, 0.5f );
-			break;
-		case 9: // purple
-			VectorSet( color, 0.5f, 0, 1 );
-			break;
-
-		case 10: // yellow
-			VectorSet( color, 1, 1, 0 );
-			break;
-		case 11: // magenta
-			VectorSet( color, 1, 0, 1 );
-			break;
-
-		default: // white
-			VectorSet( color, 1, 1, 1 );
-			break;
+		//default: // fall back to white
+		//	VectorSet( color, 1, 1, 1 );
+		//	break;
 	}
 }
 #endif
@@ -1101,10 +1018,10 @@ CG_ColorForHealth
 void CG_ColorForHealth( vec4_t hcolor ) {
 
 #ifdef TURTLEARENA // NOARMOR
-	CG_GetColorForHealth( cg.cur_ps->stats[STAT_HEALTH], hcolor );
+	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], hcolor );
 #else
-	CG_GetColorForHealth( cg.cur_ps->stats[STAT_HEALTH], 
-		cg.cur_ps->stats[STAT_ARMOR], hcolor );
+	CG_GetColorForHealth( cg.snap->ps.stats[STAT_HEALTH], 
+		cg.snap->ps.stats[STAT_ARMOR], hcolor );
 #endif
 }
 
@@ -1283,7 +1200,11 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 	trap_R_SetColor( color );
 	
 	ax = x * cgs.screenXScale + cgs.screenXBias;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Does this cause a problem?
 	ay = y * cgs.screenYScale;
+#else
+	ay = y * cgs.screenXScale;
+#endif
 
 	s = str;
 	while ( *s )
@@ -1299,7 +1220,11 @@ static void UI_DrawBannerString2( int x, int y, const char* str, vec4_t color )
 			fwidth = (float)propMapB[ch][2] / 256.0f;
 			fheight = (float)PROPB_HEIGHT / 256.0f;
 			aw = (float)propMapB[ch][2] * cgs.screenXScale;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Does this cause a problem?
 			ah = (float)PROPB_HEIGHT * cgs.screenYScale;
+#else
+			ah = (float)PROPB_HEIGHT * cgs.screenXScale;
+#endif
 			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, cgs.media.charsetPropB );
 			ax += (aw + (float)PROPB_GAP_WIDTH * cgs.screenXScale);
 		}
@@ -1408,7 +1333,11 @@ static void UI_DrawProportionalString2( int x, int y, const char* str, vec4_t co
 			fwidth = (float)propMap[ch][2] / 256.0f;
 			fheight = (float)PROP_HEIGHT / 256.0f;
 			aw = (float)propMap[ch][2] * cgs.screenXScale * sizeScale;
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Does this cause a problem?
 			ah = (float)PROP_HEIGHT * cgs.screenYScale * sizeScale;
+#else
+			ah = (float)PROP_HEIGHT * cgs.screenXScale * sizeScale;
+#endif
 			trap_R_DrawStretchPic( ax, ay, aw, ah, fcol, frow, fcol+fwidth, frow+fheight, charset );
 		} else {
 			aw = 0;
@@ -1427,15 +1356,9 @@ UI_ProportionalSizeScale
 =================
 */
 float UI_ProportionalSizeScale( int style ) {
-#ifdef IOQ3ZTM // FONT_REWRITE
-	if (style & UI_SMALLFONT) {
-		return (float)cgs.media.fontPropSmall.pointSize / (float)cgs.media.fontPropBig.pointSize;
-	}
-#else
 	if(  style & UI_SMALLFONT ) {
 		return 0.75;
 	}
-#endif
 
 	return 1.00;
 }
@@ -1453,28 +1376,14 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	qhandle_t charsetProp;
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
-#ifndef TA_DATA
-	font_t *fontGlow;
-#endif
 
-	if (style & UI_SMALLFONT) {
+	if (style & UI_SMALLFONT)
 		font = &cgs.media.fontPropSmall;
-#ifndef TA_DATA
-		fontGlow = &cgs.media.fontPropGlowSmall;
-#endif
-	} else {
+	else
 		font = &cgs.media.fontPropBig;
-#ifndef TA_DATA
-		fontGlow = &cgs.media.fontPropGlowBig;
-#endif
-	}
 
 	if (font->fontInfo.name[0]) {
-		UI_DrawFontProportionalString(font,
-#ifndef TA_DATA
-				fontGlow,
-#endif
-				x, y, str, style, color);
+		UI_DrawFontProportionalString(font, x, y, str, style, color);
 		return;
 	}
 
@@ -1535,10 +1444,8 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 		drawcolor[2] = color[2];
 #endif
 		drawcolor[3] = 0.5 + 0.5 * sin( cg.time / PULSE_DIVISOR );
-#ifdef TA_DATA
+#if defined TA_DATA || defined IOQ3ZTM // ZTM: FIXME: IOQ3ZTM: Add glow font for quake3?
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, charsetProp );
-#elif defined IOQ3ZTM // FONT_REWRITE
-		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, fontGlow->fontShader );
 #else
 		UI_DrawProportionalString2( x, y, str, drawcolor, sizeScale, cgs.media.charsetPropGlow );
 #endif

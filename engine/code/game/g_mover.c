@@ -54,27 +54,10 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 	trace_t	tr;
 	int		mask;
 
-#ifdef IOQ3ZTM
-	// shrink bounds so it is not coplanar,
-	// otherwise may result in startsolid when it should not.
-	if (ent->r.bmodel) {
-		ent->r.mins[0] += 2;
-		ent->r.mins[1] += 2;
-		ent->r.mins[2] += 2;
-		ent->r.maxs[0] -= 2;
-		ent->r.maxs[1] -= 2;
-		ent->r.maxs[2] -= 2;
-	}
-#endif
-
 	if ( ent->clipmask ) {
 		mask = ent->clipmask;
 	} else {
-#ifdef IOQ3ZTM // Don't push brushes inside of players!
-		mask = MASK_PLAYERSOLID;
-#else
 		mask = MASK_SOLID;
-#endif
 	}
 	if ( ent->client ) {
 		trap_Trace( &tr, ent->client->ps.origin, ent->r.mins, ent->r.maxs, ent->client->ps.origin, ent->s.number, mask );
@@ -82,17 +65,6 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 		trap_Trace( &tr, ent->s.pos.trBase, ent->r.mins, ent->r.maxs, ent->s.pos.trBase, ent->s.number, mask );
 	}
 	
-#ifdef IOQ3ZTM
-	if (ent->r.bmodel) {
-		ent->r.mins[0] -= 2;
-		ent->r.mins[1] -= 2;
-		ent->r.mins[2] -= 2;
-		ent->r.maxs[0] += 2;
-		ent->r.maxs[1] += 2;
-		ent->r.maxs[2] += 2;
-	}
-#endif
-
 	if (tr.startsolid)
 		return &g_entities[ tr.entityNum ];
 		
@@ -338,7 +310,7 @@ qboolean G_MoverPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **
 
 	listedEntities = trap_EntitiesInBox( totalMins, totalMaxs, entityList, MAX_GENTITIES );
 
-	// move the pusher to its final position
+	// move the pusher to it's final position
 	VectorAdd( pusher->r.currentOrigin, move, pusher->r.currentOrigin );
 	VectorAdd( pusher->r.currentAngles, amove, pusher->r.currentAngles );
 	trap_LinkEntity( pusher );
@@ -1002,131 +974,100 @@ void G_BreakableDie( gentity_t *self, gentity_t *inflictor, gentity_t *attacker,
 }
 #endif
 
-#if 0 //#ifdef TA_ENTSYS // PUSHABLE
-/*
-============
-G_PlayerPush
+#ifdef TA_ENTSYS // PUSHABLE
+#ifdef WOLFET
+// From Wolf-ET's game/g_props.c: GPLv3 or later
+void moveit( gentity_t *ent, float yaw, float dist ) {
+	vec3_t move;
+	vec3_t origin;
+	trace_t tr;
+	vec3_t mins, maxs;
+	vec3_t currentOrigin;
 
-Objects need to be moved back on a failed push,
-otherwise riders would continue to slide.
-If qfalse is returned, *obstacle will be the blocking entity
-============
-*/
-qboolean G_PlayerPush( gentity_t *pusher, vec3_t move, vec3_t amove, gentity_t **obstacle ) {
-	int			i, e;
-	gentity_t	*check;
-	vec3_t		mins, maxs;
-	pushed_t	*p;
-	int			entityList[MAX_GENTITIES];
-	int			listedEntities;
-	vec3_t		totalMins, totalMaxs;
-
-	*obstacle = NULL;
-
-	pushed_p = pushed;
-
-	// mins/maxs are the bounds at the destination
-	// totalMins / totalMaxs are the bounds for the entire move
-	if ( pusher->r.currentAngles[0] || pusher->r.currentAngles[1] || pusher->r.currentAngles[2]
-		|| amove[0] || amove[1] || amove[2] ) {
-		float		radius;
-
-		radius = RadiusFromBounds( pusher->r.mins, pusher->r.maxs );
-		for ( i = 0 ; i < 3 ; i++ ) {
-			mins[i] = pusher->r.currentOrigin[i] + move[i] - radius;
-			maxs[i] = pusher->r.currentOrigin[i] + move[i] + radius;
-			totalMins[i] = mins[i] - move[i];
-			totalMaxs[i] = maxs[i] - move[i];
-		}
+	if (ent->client) {
+		VectorCopy(ent->client->ps.origin, currentOrigin);
 	} else {
-		for (i=0 ; i<3 ; i++) {
-			mins[i] = pusher->r.absmin[i] + move[i];
-			maxs[i] = pusher->r.absmax[i] + move[i];
-		}
-
-		VectorCopy( pusher->r.absmin, totalMins );
-		VectorCopy( pusher->r.absmax, totalMaxs );
-		for (i=0 ; i<3 ; i++) {
-			if ( move[i] > 0 ) {
-				totalMaxs[i] += move[i];
-			} else {
-				totalMins[i] += move[i];
-			}
-		}
+		VectorCopy(ent->r.currentOrigin, currentOrigin);
 	}
 
-	// unlink the pusher so we don't get it in the entityList
-	trap_UnlinkEntity( pusher );
+	yaw = yaw * M_PI * 2 / 360;
 
-	listedEntities = trap_EntitiesInBox( totalMins, totalMaxs, entityList, MAX_GENTITIES );
+	move[0] = cos( yaw ) * dist;
+	move[1] = sin( yaw ) * dist;
+	move[2] = 0;
 
-	// move the pusher to its final position
-	VectorAdd( pusher->r.currentOrigin, move, pusher->r.currentOrigin );
-	VectorAdd( pusher->r.currentAngles, amove, pusher->r.currentAngles );
-	trap_LinkEntity( pusher );
+	VectorAdd( currentOrigin, move, origin );
 
-	// see if any solid entities are inside the final position
-	for ( e = 0 ; e < listedEntities ; e++ ) {
-		check = &g_entities[ entityList[ e ] ];
+	mins[0] = ent->r.mins[0];
+	mins[1] = ent->r.mins[1];
+	mins[2] = ent->r.mins[2] + .01;
 
-		// only push the pushable objects
-		if (!(check->flags & FL_PUSHABLE) &&
-#ifdef TA_NPCSYS
-			check->s.eType != ET_NPC &&
+	maxs[0] = ent->r.maxs[0];
+	maxs[1] = ent->r.maxs[1];
+	maxs[2] = ent->r.maxs[2] - .01;
+
+	trap_Trace( &tr, currentOrigin, mins, maxs, origin, ent->s.number, MASK_SHOT );
+
+	if ( ( tr.endpos[0] != origin[0] ) || ( tr.endpos[1] != origin[1] ) ) {
+		mins[0] = ent->r.mins[0] - 2.0;
+		mins[1] = ent->r.mins[1] - 2.0;
+		maxs[0] = ent->r.maxs[0] + 2.0;
+		maxs[1] = ent->r.maxs[1] + 2.0;
+
+		trap_Trace( &tr, currentOrigin, mins, maxs, origin, ent->s.number, MASK_SHOT );
+	}
+
+	VectorCopy( tr.endpos, ent->r.currentOrigin );
+	if (ent->client) {
+		VectorCopy( currentOrigin, ent->client->ps.origin );
+	}
+
+	VectorCopy( currentOrigin, ent->s.pos.trBase );
+
+	trap_LinkEntity( ent );
+
+	//DropToFloor( ent );
+}
 #endif
-			!check->physicsObject ) {
-			continue;
-		}
 
-		// if object is heavy must have strength to push it
-		if ((check->flags & FL_HEAVY) && (!pusher->client || pusher->client->pers.playercfg.ability != ABILITY_STRENGTH)) {
-			continue;
-		}
+// other is the pusher, should be a player
+// ZTM: TODO: Look at G_MoverPush
+qboolean G_PlayerPushEntity(gentity_t *self, gentity_t *other) {
 
-		// if the entity is standing on the pusher, it will definitely be moved
-		if ( check->s.groundEntityNum != pusher->s.number ) {
-			// see if the ent needs to be tested
-			if ( check->r.absmin[0] >= maxs[0]
-			|| check->r.absmin[1] >= maxs[1]
-			|| check->r.absmin[2] >= maxs[2]
-			|| check->r.absmax[0] <= mins[0]
-			|| check->r.absmax[1] <= mins[1]
-			|| check->r.absmax[2] <= mins[2] ) {
-				continue;
-			}
-			// see if the ent's bbox is inside the pusher's final position
-			// this does allow a fast moving object to pass through a thin entity...
-			if (!G_TestEntityPosition (check)) {
-				continue;
-			}
-		}
-
-		// the entity needs to be pushed
-		if ( G_TryPushingEntity( check, pusher, move, amove ) ) {
-			continue;
-		}
-
-		// the move was blocked an entity
-
-		// move back any entities we already moved
-		// go backwards, so if the same entity was pushed
-		// twice, it goes back to the original position
-		for ( p=pushed_p-1 ; p>=pushed ; p-- ) {
-			VectorCopy (p->origin, p->ent->s.pos.trBase);
-			VectorCopy (p->angles, p->ent->s.apos.trBase);
-			if ( p->ent->client ) {
-				p->ent->client->ps.delta_angles[YAW] = p->deltayaw;
-				VectorCopy (p->origin, p->ent->client->ps.origin);
-			}
-			trap_LinkEntity (p->ent);
-		}
-
-		// save off the obstacle so we can call the block function (crush, etc)
-		*obstacle = check;
+	if ( /*self->s.eType != ET_ITEM && self->s.eType != ET_PLAYER && */
+#ifdef TA_ENTSYS // PUSHABLE
+		!(self->flags & FL_PUSHABLE) &&
+#endif
+#ifdef TA_NPCSYS
+		self->s.eType != ET_NPC &&
+#endif
+		!self->physicsObject ) {
 		return qfalse;
 	}
 
-	return qtrue;
+	// If object is heavy must have strength to push it.
+	if ((self->flags & FL_HEAVY) && (!other->client || other->client->pers.playercfg.ability != ABILITY_STRENGTH)) {
+		return qfalse;
+	}
+
+	if (self->s.solid == SOLID_BMODEL) {
+		// ZTM: TODO: Support pushing brushes
+		return qfalse;
+	} else {
+#ifdef WOLFET
+		float ratio;
+		vec3_t v;
+
+		if ( other->r.currentOrigin[2] + other->r.mins[2] > ( self->r.currentOrigin[2] + self->r.mins[2] + self->r.maxs[2]*0.4f ) ) {
+			return qfalse;
+		}
+
+		ratio = 2.5;
+		VectorSubtract( self->r.currentOrigin, other->r.currentOrigin, v );
+		moveit( self, vectoyaw( v ), ( 20 * ratio * FRAMETIME ) * .001);
+		return qtrue;
+#endif
+	}
 }
 #endif
 
@@ -1338,26 +1279,26 @@ Touch_DoorTriggerSpectator
 ================
 */
 static void Touch_DoorTriggerSpectator( gentity_t *ent, gentity_t *other, trace_t *trace ) {
-	int axis;
-	float doorMin, doorMax;
-	vec3_t origin;
+	int i, axis;
+	vec3_t origin, dir, angles;
 
 	axis = ent->count;
-	// the constants below relate to constants in Think_SpawnNewDoorTrigger()
-	doorMin = ent->r.absmin[axis] + 100;
-	doorMax = ent->r.absmax[axis] - 100;
-
-	VectorCopy(other->client->ps.origin, origin);
-
-	if (origin[axis] < doorMin || origin[axis] > doorMax) return;
-
-	if (fabs(origin[axis] - doorMax) < fabs(origin[axis] - doorMin)) {
-		origin[axis] = doorMin - 10;
-	} else {
-		origin[axis] = doorMax + 10;
+	VectorClear(dir);
+	if (fabs(other->s.origin[axis] - ent->r.absmax[axis]) <
+		fabs(other->s.origin[axis] - ent->r.absmin[axis])) {
+		origin[axis] = ent->r.absmin[axis] - 10;
+		dir[axis] = -1;
 	}
-
-	TeleportPlayer(other, origin, tv(10000000.0, 0, 0));
+	else {
+		origin[axis] = ent->r.absmax[axis] + 10;
+		dir[axis] = 1;
+	}
+	for (i = 0; i < 3; i++) {
+		if (i == axis) continue;
+		origin[i] = (ent->r.absmin[i] + ent->r.absmax[i]) * 0.5;
+	}
+	vectoangles(dir, angles);
+	TeleportPlayer(other, origin, angles );
 }
 
 /*
@@ -1518,6 +1459,14 @@ void SP_func_door (gentity_t *ent) {
 	ent->nextthink = level.time + FRAMETIME;
 
 	if ( ! (ent->flags & FL_TEAMSLAVE ) ) {
+#ifdef TA_ENTSYS // BREAKABLE // Doors are not killable...
+		if (ent->health)
+		{
+			ent->takedamage = qtrue;
+			ent->health = -1;
+		}
+		if ( ent->targetname || ent->takedamage )
+#else
 		int health;
 
 		G_SpawnInt( "health", "0", &health );
@@ -1525,6 +1474,7 @@ void SP_func_door (gentity_t *ent) {
 			ent->takedamage = qtrue;
 		}
 		if ( ent->targetname || health )
+#endif
 		{
 			// non touch/shoot doors
 			ent->think = Think_MatchTeam;
@@ -1532,9 +1482,6 @@ void SP_func_door (gentity_t *ent) {
 			ent->think = Think_SpawnNewDoorTrigger;
 		}
 	}
-#ifdef TA_ENTSYS // BREAKABLE // Doors are not killable...
-	ent->health = -1;
-#endif
 
 
 }
@@ -1719,7 +1666,7 @@ void Touch_Button(gentity_t *ent, gentity_t *other, trace_t *trace ) {
 
 
 /*QUAKED func_button (0 .5 .8) ?
-When a button is touched, it moves some distance in the direction of its angle, triggers all of its targets, waits some time, then returns to its original position where it can be triggered again.
+When a button is touched, it moves some distance in the direction of it's angle, triggers all of it's targets, waits some time, then returns to it's original position where it can be triggered again.
 
 "model2"	.md3 model to also draw
 "angle"		determines the opening direction
@@ -1747,8 +1694,6 @@ void SP_func_button( gentity_t *ent ) {
 	if ( G_SpawnString( "noiseEnd", "100", &sound ) ) {
 		ent->soundPos2 = G_SoundIndex(sound);
 	}
-
-	// ZTM: TODO: Sounds for sound2to1 and soundPos1 ?
 #else
 	ent->sound1to2 = G_SoundIndex("sound/movers/switches/butn2.wav");
 #endif
@@ -2035,19 +1980,15 @@ A bmodel that just sits there, doing nothing.  Can be used for conditional walls
 */
 void SP_func_static( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
-#ifdef IOQ3ZTM // BREAKABLE
+#ifdef IOQ3TM // BREAKABLE
 	VectorCopy( ent->s.origin, ent->pos1);
 	VectorCopy( ent->s.origin, ent->pos2);
 #endif
-	
 	InitMover( ent );
-	
-#ifdef IOQ3ZTM // BREAKABLE
+#ifdef IOQ3TM // BREAKABLE
 	VectorCopy( ent->s.origin, ent->s.pos.trBase );
 	VectorCopy( ent->s.origin, ent->r.currentOrigin );
 #endif
-	
-	trap_LinkEntity(ent);
 }
 
 
@@ -2081,10 +2022,7 @@ void SP_func_breakable( gentity_t *ent ) {
 	trap_SetBrushModel( ent, ent->model );
 	VectorCopy( ent->s.origin, ent->pos1);
 	VectorCopy( ent->s.origin, ent->pos2);
-
 	InitMover( ent );
-
-	trap_LinkEntity(ent);
 }
 #endif
 
@@ -2412,7 +2350,30 @@ void VoodooTouch(gentity_t *self, gentity_t *other, trace_t *trace)
 {
 	if (self->target_ent) {
 		if (self->target_ent->touch) {
+#if 0 // ZTM: TODO: Make voodoo bush move...
+			vec3_t start;
+
+			VectorCopy(self->target_ent->s.origin, start);
+
 			self->target_ent->touch(self->target_ent, other, trace);
+
+			if (!(self->spawnflags & VOODOO_STAY_SOLID) && self->target_ent->flags & FL_PUSHABLE) {
+				vec3_t move;
+
+				VectorSubtract(start, self->target_ent->s.origin, move);
+				VectorAdd(self->s.pos.trBase, move, self->r.currentOrigin);
+
+				VectorCopy(self->r.currentOrigin, self->s.origin);
+				VectorCopy(self->r.currentOrigin, self->s.pos.trBase);
+				trap_LinkEntity (self);
+			}
+#else
+#ifdef TA_ENTSYS // PUSHABLE
+			G_PlayerPushEntity(self->target_ent, other);
+#endif
+
+			self->target_ent->touch(self->target_ent, other, trace);
+#endif
 		}
 	} else {
 		gentity_t *ent = NULL;
@@ -2422,6 +2383,10 @@ void VoodooTouch(gentity_t *self, gentity_t *other, trace_t *trace)
 			ent = G_Find (ent, FOFS(targetname), self->target);
 			if (!ent)
 				break;
+
+#ifdef TA_ENTSYS // PUSHABLE
+			G_PlayerPushEntity(ent, other);
+#endif
 
 			if (ent->touch) {
 				ent->touch(ent, other, trace);

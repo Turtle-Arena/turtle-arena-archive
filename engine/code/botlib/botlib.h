@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 // ZTM: Botlib is not compatible with (io)quake3 (or anyone else)
-#if defined TA_WEAPSYS || defined IOQ3ZTM_NO_COMPAT || (defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT) || defined TA_HOLDSYS
+#if defined TA_WEAPSYS || defined TA_WEAPSYS_NOCOMPAT || (defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT) || defined TA_HOLDSYS
 	
 	#ifdef TA_WEAPSYS // & 4
 		#define BOTLIB_API_BIT4 4
@@ -38,7 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 		#define BOTLIB_API_BIT4 0
 	#endif
 
-	#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS // & 32
+	#ifdef TA_WEAPSYS_NOCOMPAT // & 32
 		#define BOTLIB_API_BIT32 32
 	#else
 		#define BOTLIB_API_BIT32 0
@@ -109,30 +109,29 @@ struct weaponinfo_s;
 #define BLERR_CANNOTLOADWEAPONCONFIG	12	//cannot load weapon config
 
 //action flags
-#define ACTION_ATTACK			0x00000001
-#define ACTION_USE			0x00000002
-#define ACTION_RESPAWN			0x00000008
-#define ACTION_JUMP			0x00000010
-#define ACTION_MOVEUP			0x00000020
-#define ACTION_CROUCH			0x00000080
-#define ACTION_MOVEDOWN			0x00000100
-#define ACTION_MOVEFORWARD		0x00000200
-#define ACTION_MOVEBACK			0x00000800
-#define ACTION_MOVELEFT			0x00001000
-#define ACTION_MOVERIGHT		0x00002000
-#define ACTION_DELAYEDJUMP		0x00008000
-#define ACTION_TALK			0x00010000
-#define ACTION_GESTURE			0x00020000
-#define ACTION_WALK			0x00080000
-#define ACTION_AFFIRMATIVE		0x00100000
-#define ACTION_NEGATIVE			0x00200000
-#define ACTION_GETFLAG			0x00800000
-#define ACTION_GUARDBASE		0x01000000
-#define ACTION_PATROL			0x02000000
-#define ACTION_FOLLOWME			0x08000000
-#define ACTION_JUMPEDLASTFRAME		0x10000000
+#define ACTION_ATTACK			0x0000001
+#define ACTION_USE				0x0000002
+#define ACTION_RESPAWN			0x0000008
+#define ACTION_JUMP				0x0000010
+#define ACTION_MOVEUP			0x0000020
+#define ACTION_CROUCH			0x0000080
+#define ACTION_MOVEDOWN			0x0000100
+#define ACTION_MOVEFORWARD		0x0000200
+#define ACTION_MOVEBACK			0x0000800
+#define ACTION_MOVELEFT			0x0001000
+#define ACTION_MOVERIGHT		0x0002000
+#define ACTION_DELAYEDJUMP		0x0008000
+#define ACTION_TALK				0x0010000
+#define ACTION_GESTURE			0x0020000
+#define ACTION_WALK				0x0080000
+#define ACTION_AFFIRMATIVE		0x0100000
+#define ACTION_NEGATIVE			0x0200000
+#define ACTION_GETFLAG			0x0800000
+#define ACTION_GUARDBASE		0x1000000
+#define ACTION_PATROL			0x2000000
+#define ACTION_FOLLOWME			0x8000000
 #ifdef TA_WEAPSYS_EX // BOTLIB
-#define ACTION_DROP_WEAPON		0x20000000
+#define ACTION_DROP_WEAPON		0x10000000
 #endif
 
 //the bot input, will be converted to an usercmd_t
@@ -223,7 +222,7 @@ typedef struct
 typedef struct botlib_import_s
 {
 	//print messages from the bot library
-	void		(QDECL *Print)(int type, char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+	void		(QDECL *Print)(int type, char *fmt, ...);
 	//trace a bbox through the world
 	void		(*Trace)(bsp_trace_t *trace, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int passent, int contentmask);
 	//trace a bbox against a specific entity
@@ -445,7 +444,7 @@ typedef struct ai_export_s
 	void	(*BotFreeMoveState)(int handle);
 	void	(*BotInitMoveState)(int handle, struct bot_initmove_s *initmove);
 	void	(*BotAddAvoidSpot)(int movestate, vec3_t origin, float radius, int type);
-#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 	//-----------------------------------
 	// be_ai_weap.h
 	//-----------------------------------
@@ -575,7 +574,7 @@ name:						default:			module(s):			description:
 "cmd_grappleon"				"grappleon"			be_ai_move.c		command to activate off hand grapple
 "cmd_grappleoff"			"grappleoff"		be_ai_move.c		command to deactivate off hand grapple
 "itemconfig"				"items.c"			be_ai_goal.c		item configuration file
-#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 "weaponconfig"				"weapons.c"			be_ai_weap.c		weapon configuration file
 #endif
 "synfile"					"syn.c"				be_ai_chat.c		file with synonyms
@@ -583,7 +582,7 @@ name:						default:			module(s):			description:
 "matchfile"					"match.c"			be_ai_chat.c		file with match strings
 "nochat"					"0"					be_ai_chat.c		disable chats
 "max_messages"				"1024"				be_ai_chat.c		console message heap size
-#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 "max_weaponinfo"			"32"				be_ai_weap.c		maximum number of weapon info
 "max_projectileinfo"		"32"				be_ai_weap.c		maximum number of projectile info
 #endif

@@ -99,6 +99,9 @@ equ trap_getCameraInfo					-93
 ;;ZTM: TA_WEAPSYS
 equ trap_FS_GetFileList					-94
 
+;;ZTM: WOLFET
+equ trap_R_AddPolyBufferToScene			-95
+
 equ	memset						-101
 equ	memcpy						-102
 equ	strncpy						-103

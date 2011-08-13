@@ -16,7 +16,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Quake III Arena source code; if not, write to the Free Software
+along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -129,10 +129,11 @@ S_RawSamples
 =================
 */
 void S_RawSamples (int stream, int samples, int rate, int width, int channels,
-		   const byte *data, float volume, int entityNum)
+		   const byte *data, float volume)
 {
-	if(si.RawSamples)
-		si.RawSamples(stream, samples, rate, width, channels, data, volume, entityNum);
+	if( si.RawSamples ) {
+		si.RawSamples( stream, samples, rate, width, channels, data, volume );
+	}
 }
 
 /*
@@ -203,18 +204,10 @@ S_Respatialize
 =================
 */
 void S_Respatialize( int entityNum, const vec3_t origin,
-		vec3_t axis[3], int inwater
-#ifdef TA_SPLITVIEW
-		, int listener
-#endif
-		)
+		vec3_t axis[3], int inwater )
 {
 	if( si.Respatialize ) {
-		si.Respatialize( entityNum, origin, axis, inwater
-#ifdef TA_SPLITVIEW
-					, listener
-#endif
-					);
+		si.Respatialize( entityNum, origin, axis, inwater );
 	}
 }
 
@@ -417,9 +410,12 @@ void S_Play_f( void ) {
 
 	i = 1;
 	while ( i<Cmd_Argc() ) {
-		Q_strncpyz( name, Cmd_Argv(i), sizeof(name) );
+		if ( !Q_strrchr(Cmd_Argv(i), '.') ) {
+			Com_sprintf( name, sizeof(name), "%s.wav", Cmd_Argv(1) );
+		} else {
+			Q_strncpyz( name, Cmd_Argv(i), sizeof(name) );
+		}
 		h = si.RegisterSound( name, qfalse );
-
 		if( h ) {
 			si.StartLocalSound( h, CHAN_LOCAL_SOUND );
 		}
@@ -681,7 +677,7 @@ void S_Init( void )
 	Com_Printf( "------ Initializing Sound ------\n" );
 
 	s_volume = Cvar_Get( "s_volume", "0.8", CVAR_ARCHIVE );
-#ifdef TA_MAIN // ZTM: Increase music volume, same as missionpack now
+#ifdef TURTLEARENA // ZTM: Increase music volume, same as missionpack now
 	s_musicVolume = Cvar_Get( "s_musicvolume", "0.5", CVAR_ARCHIVE );
 #else
 	s_musicVolume = Cvar_Get( "s_musicvolume", "0.25", CVAR_ARCHIVE );
@@ -720,7 +716,7 @@ void S_Init( void )
 
 		if( started ) {
 			if( !S_ValidSoundInterface( &si ) ) {
-				Com_Error( ERR_FATAL, "Sound interface invalid" );
+				Com_Error( ERR_FATAL, "Sound interface invalid." );
 			}
 
 			S_SoundInfo( );

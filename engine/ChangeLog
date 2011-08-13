@@ -17,20 +17,20 @@
 	+ Added Shurikens (Holdable items with multiple uses)
 	+ Disabled HI_TELEPORTER Quake3's personal teleporter
 	+ Per-player Bounding box (Stored in animation.cfg "boundingbox minX minY minZ maxX maxY maxZ")
-	+ Atempt to load MDR models before MD3, allowing any model to be a MDR model
+	+ Atemp to load MDR models before MD3, allowing any model to be a MDR model
 	+ models/players/*dir*/icon_*skin*.tga files no longer are limited to TGA,
 		now supports PNG, TGA, JPG, JPEG, PCX, and BMP
 	+ Support Elite Force "soundpath" keyword in player animation.cfg
 	+ Support voice chat files other then male[1-5].voice and female[1-3].voice
 	+ Disabled missionpack's HI_INVUL and HI_KAMIKAZE
 	+ Use item sprite when no item model is loaded
-	+ Elite Force style team friend shaders, "sprites/team_red" and "sprites/team_blue", falls back to "sprites/foe"
+	+ Elite Force style team firend shaders, "sprites/team_red" and "sprites/team_blue", falls back to "sprites/foe"
 	+ If loaded "sprites/team_blue" and a spectator draw team icon for all players.
 	+ New define MISSIONPACK_HUD, mostly renamed MISSIONPACK ifdef's
 	++ by NOT defining it, you can use the Quake3 hud in the MISSIONPACK.
 	+ Disabled blood code
-	+ Atempt to load a Ogg sound if no wave sound file.
-	+ In menus, right mouse button no longer goes to the previous menu. Now it has listboxes goes left.
+	+ Atemp to load a Ogg sound if no wave sound file.
+	+ In menus Right mouse button no longer goes to the pervious menu, now it has listboxes go left
 	+ ...and much more
 
 2008-04-04 Various contributors
@@ -515,7 +515,7 @@
 2002-7-31 Timothee Besset <ttimo@idsoftware.com>
 	+ https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=513
 		https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=506
-		porting fix from RTCW codebase. client re-orders its pk3s to scan in the same order than the server
+		porting fix from RTCW codebase. client re-orders it's pk3s to scan in the same order than the server
 		this eliminates several 'Invalid .PK3 file referenced' situations (caused by client not referencing the same thing as server)
 	+ fixed border remnants in ta ui
 	+ https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=517
@@ -540,7 +540,7 @@
 	+ fix broken link in Linux FAQ	
 
 2002-7-27 Timothee Besset <ttimo@idsoftware.com>
-	+ ta ui: PB display in the browser, in its additional tab, with sorting
+	+ ta ui: PB display in the browser, in it's additional tab, with sorting
 
 2002-7-26 Timothee Besset <ttimo@idsoftware.com>
 	+ PB UI: for baseq3/ AND missionpack/
@@ -2810,7 +2810,7 @@
 	Can't find menu/art/unknownmap.tga
 
 	* Q3TA: after nearly 6 months, a code update from id. SOS access 
-	even. Got it to compile, link and start, but it's currently broken
+	even. Got it to compile, link and start, but its currently broken
 	(menu doesn't render in full, can't get into game etc.). Need
 	a baseline 1.17 to diff against. Last code dump was May 16, with 
 	bspc code updated May 19. Checking working directory of bk000520

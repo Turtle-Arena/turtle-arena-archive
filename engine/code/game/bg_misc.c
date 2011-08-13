@@ -43,14 +43,14 @@ An item fires all of its targets when it is picked up.  If the toucher can't car
 */
 
 #ifdef TA_WEAPSYS
-#define EMPTY_GITEM "item_dummy", \
+#define EMPTY_GITEM "item_health_small", \
 		"sound/items/s_health.wav", \
-        { "models/powerups/holdable/medkit.md3", \
+        { "models/powerups/health/small.md3", \
 		NULL, \
 		NULL, NULL }, \
-		"icons/iconh_mega", \
-		"Dummy", \
-		1, \
+		"icons/iconh_small", \
+		"5 Health", \
+		5, \
 		IT_HEALTH, \
 		0, \
 		"", \
@@ -584,7 +584,12 @@ gitem_t	bg_itemlist[] =
 	},
 #endif
 
-#ifndef TURTLEARENA // HOLDABLE // no q3 teleprter
+#ifdef TA_HOLDABLE // no q3 teleprter
+#ifndef TURTLEARENA
+	// Keep the model indexs correct for items after teleporter.
+	{ EMPTY_GITEM },
+#endif
+#else
 	//
 	// HOLDABLE ITEMS
 	//
@@ -638,7 +643,10 @@ gitem_t	bg_itemlist[] =
 /* sounds */ "sound/items/use_medkit.wav"
 	},
 
-#ifdef TURTLEARENA // HOLDABLE
+#ifdef TA_HOLDABLE
+#ifndef TURTLEARENA
+#warning: "Model indexs will not match Quake3 botfiles/inv.h!"
+#endif
 /*QUAKED holdable_shuriken (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -925,7 +933,11 @@ Only in CTF games
 	},
 
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifdef TA_HOLDABLE // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA
+	{ EMPTY_GITEM },
+#endif
+#else
 /*QUAKED holdable_kamikaze (.3 .3 1) (-16 -16 -16) (16 16 16) suspended
 */
 	{
@@ -1305,7 +1317,7 @@ Only in One Flag CTF games
 	{NULL}
 };
 
-int		bg_numItems = ARRAY_LEN( bg_itemlist ) - 1;
+int		bg_numItems = sizeof(bg_itemlist) / sizeof(bg_itemlist[0]) - 1;
 #endif
 
 char	*modNames[MOD_MAX] = {
@@ -1332,20 +1344,21 @@ char	*modNames[MOD_MAX] = {
 	"MOD_TELEFRAG",
 	"MOD_FALLING",
 	"MOD_SUICIDE",
-#ifdef IOQ3ZTM_NO_COMPAT
-	"MOD_SPECTATE",
-#endif
 	"MOD_TARGET_LASER",
 	"MOD_TRIGGER_HURT",
 #ifdef TA_ENTSYS
 	"MOD_EXPLOSION",
 #endif
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // MOD NO_KAMIKAZE_ITEM POWERS
+#ifndef TURTLEARENA // MOD
 	"MOD_NAIL",
 	"MOD_CHAINGUN",
 	"MOD_PROXIMITY_MINE",
+#endif
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	"MOD_KAMIKAZE",
+#endif
+#ifndef TURTLEARENA // POWERS
 	"MOD_JUICED",
 #endif
 #endif
@@ -1357,7 +1370,7 @@ char	*modNames[MOD_MAX] = {
 	"MOD_WEAPON_SECONDARY"
 #endif
 };
-int modNamesSize = ARRAY_LEN( modNames );
+int modNamesSize = sizeof( modNames ) / sizeof( modNames[0] );
 
 #if defined TA_WEAPSYS || defined TA_PLAYERSYS || defined TA_ENTSYS
 typedef struct
@@ -1415,7 +1428,8 @@ strAnimationDef_t playerAnimationDefs[] = {
 	ANIMDEF(TORSO_AFFIRMATIVE),
 	ANIMDEF(TORSO_NEGATIVE),
 
-#ifdef TURTLEARENA // PLAYERS
+	// TURTLEARENA
+#ifdef TA_PLAYERS // New TURTLEARENA player animations
 	// Place default weapons somewhere on there person while there not used.
 	ANIMDEF(TORSO_PUTDEFAULT_BOTH),
 	ANIMDEF(TORSO_PUTDEFAULT_PRIMARY),
@@ -1495,11 +1509,6 @@ strAnimationDef_t playerAnimationDefs[] = {
 	ANIMDEF(BOTH_LADDER_STAND),
 	ANIMDEF(BOTH_LADDER_UP),
 	ANIMDEF(BOTH_LADDER_DOWN),
-
-	ANIMDEF(LEGS_JUMPB_LOCKON),
-	ANIMDEF(LEGS_LANDB_LOCKON),
-
-	ANIMDEF(BOTH_WAITING),
 #endif
 
 	// Quake3, not loaded from file
@@ -1517,7 +1526,7 @@ strAnimationDef_t playerAnimationDefs[] = {
 	{ TORSO_ATTACK, "TORSO_ATTACK_GUN" },
 	{ TORSO_ATTACK2, "TORSO_ATTACK_GAUNTLET" },
 
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 	{ BOTH_LADDER_UP, "BOTH_LADDER" },
 #endif
 
@@ -1645,7 +1654,7 @@ int BG_NumHoldableItems(void)
 	return bg_numholdables;
 }
 
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 int BG_ProjectileIndexForHoldable(int holdable)
 {
 	int projnum;
@@ -2003,13 +2012,13 @@ const char *weapon_names[WP_NUM_WEAPONS+1] =
 const char *holdable_names[HI_NUM_HOLDABLE+1] =
 {
 	"HI_NONE",
-#ifndef TURTLEARENA // no q3 teleprter
+#ifndef TA_HOLDABLE // no q3 teleprter
 	"HI_TELEPORTER",
 #elif !defined TA_HOLDSYS
 	"HI_TELEPORTER_REMOVED", // do not use
 #endif
 	"HI_MEDKIT",
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // no q3 teleprter
 	"HI_KAMIKAZE",
 #elif !defined TA_HOLDSYS
 	"HI_KAMIKAZE_REMOVED", // do not use
@@ -2022,7 +2031,7 @@ const char *holdable_names[HI_NUM_HOLDABLE+1] =
 #elif !defined TA_HOLDSYS
 	"HI_INVULNERABILITY_REMOVED", // do not use
 #endif
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 	// Shurikens
 	"HI_SHURIKEN",
 	"HI_ELECTRICSHURIKEN",
@@ -2635,7 +2644,6 @@ static qboolean Weapon_Parse(char **p) {
 		else PARSE_STRING(token, "flashSound3", weapon.flashSoundName[3])
 		else PARSE_LIST(token, "barrelSpin", weapon.barrelSpin, barrelSpinNames)
 		else PARSE_BIT(token, "barrelIdleUseGravity", weapon.flags, WIF_BARREL_IDLE_USE_GRAVITY)
-		else PARSE_BIT(token, "initialEffectOnly", weapon.flags, WIF_INITIAL_EFFECT_ONLY)
 		else PARSE_STRING(token, "impactSound0", weapon.impactSoundName[0])
 		else PARSE_STRING(token, "impactSound1", weapon.impactSoundName[1])
 		else PARSE_STRING(token, "impactSound2", weapon.impactSoundName[2])
@@ -2661,17 +2669,6 @@ static qboolean WeaponGroupAnims_Parse(char **p, bg_weapongroup_anims_t *anims) 
 		token = COM_ParseExt(p, qtrue);
 
 		if (Q_stricmp(token, "}") == 0) {
-			// Count the number of valid attack animations
-			for (anims->numAttackAnims = 0; anims->numAttackAnims < MAX_WG_ATK_ANIMS; anims->numAttackAnims++) {
-				if (anims->attackAnim[anims->numAttackAnims] == 0) {
-					break;
-				}
-			}
-			if (anims->numAttackAnims < 1) {
-				anims->attackAnim[0] = TORSO_ATTACK;
-				anims->numAttackAnims = 1;
-			}
-
 			return qtrue;
 		}
 
@@ -2745,10 +2742,8 @@ static void BG_SetupWeaponGroup(bg_weapongroupinfo_t *weaponGroup, bg_iteminfo_t
 		// Setup Animations
 		weaponGroup->normalAnims.standAnim = TORSO_STAND;
 		weaponGroup->normalAnims.attackAnim[0] = TORSO_ATTACK;
-		weaponGroup->normalAnims.numAttackAnims = 1;
 		weaponGroup->primaryAnims.standAnim = TORSO_STAND2;
 		weaponGroup->primaryAnims.attackAnim[0] = TORSO_ATTACK2;
-		weaponGroup->primaryAnims.numAttackAnims = 1;
 
 		// Set item pointer to non-NULL
 		weaponGroup->item = &bg_iteminfo[0];
@@ -2861,7 +2856,6 @@ static qboolean WeaponGroup_Parse(char **p) {
 		else PARSE_INTEGER(token, "pickupAmmo", weaponItem.quantity)
 		// ITEM END
 		else PARSE_INTEGER(token, "randomSpawn", weaponGroup.randomSpawn)
-		else PARSE_STRING(token, "handsModel", weaponGroup.handsModelName)
 		else PARSE_STRING(token, "readySound", weaponGroup.readySoundName)
 		else PARSE_STRING(token, "firingSound", weaponGroup.firingSoundName)
 		else PARSE_STRING(token, "firingStoppedSound", weaponGroup.firingStoppedSoundName)
@@ -2976,9 +2970,9 @@ void BG_DumpWeaponInfo(void)
 	}
 
 #define FS_Printf1(x) { text[0] = 0; trap_FS_Write(x, strlen(x)+1, f); }
-#define FS_Printf2(x, y) { text[0] = 0; Com_sprintf(text, sizeof (text), x, y); trap_FS_Write(text, strlen(text)+1, f); }
-#define FS_Printf3(x, y, z) { text[0] = 0; Com_sprintf(text, sizeof (text), x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
-#define FS_Printf4(w, x, y, z) { text[0] = 0; Com_sprintf(text, sizeof (text), w, x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf2(x, y) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf3(x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
+#define FS_Printf4(w, x, y, z) { text[0] = 0; Q_snprintf(text, sizeof (text), w, x, y, z); trap_FS_Write(text, strlen(text)+1, f); }
 
 	FS_Printf1("// ZTM: TODO: Dump items\n\n");
 
@@ -3080,7 +3074,6 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tejectSmoke %d\r\n", (weapon->flags & WIF_EJECT_SMOKE));
 		FS_Printf2("\tejectSmoke2 %d\r\n", (weapon->flags & WIF_EJECT_SMOKE2));
 		FS_Printf2("\tbarrelIdleUseGravity %d\r\n", (weapon->flags & WIF_BARREL_IDLE_USE_GRAVITY));
-		FS_Printf2("\tinitialEffectOnly %d\r\n", (weapon->flags & WIF_INITIAL_EFFECT_ONLY));
 
 		FS_Printf2("\tsplashMod %s\r\n", modNames[weapon->splashMod]);
 		if (weapon->flashColor[0] == (float)'c' && weapon->flashColor[1] == 1.0f && weapon->flashColor[2] == 0)
@@ -3135,7 +3128,6 @@ void BG_DumpWeaponInfo(void)
 		FS_Printf2("\tpickupName \"%s\"\r\n", weaponGroup->item->pickup_name);
 		FS_Printf2("\tpickupAmmo %i\r\n", weaponGroup->item->quantity);
 
-		FS_Printf2("\thandsModel \"%s\"\r\n", weaponGroup->handsModelName);
 		FS_Printf2("\treadySound \"%s\"\r\n", weaponGroup->readySoundName);
 		FS_Printf2("\tfiringSound \"%s\"\r\n", weaponGroup->firingSoundName);
 		FS_Printf2("\tfiringStoppedSound \"%s\"\r\n", weaponGroup->firingStoppedSoundName);
@@ -3239,9 +3231,7 @@ void BG_InitItemInfo(void)
 		}
 
 		strcpy(bg_iteminfo[num].classname, bg_itemlist[i].classname);
-		if (bg_itemlist[i].pickup_sound != NULL) {
-			strcpy(bg_iteminfo[num].pickup_sound, bg_itemlist[i].pickup_sound);
-		}
+		strcpy(bg_iteminfo[num].pickup_sound, bg_itemlist[i].pickup_sound);
 
 		for (j = 0; j < MAX_ITEM_MODELS; j++) {
 			if (bg_itemlist[i].world_model[j] != NULL) {
@@ -3249,12 +3239,8 @@ void BG_InitItemInfo(void)
 			}
 		}
 
-		if (bg_itemlist[i].icon != NULL) {
-			strcpy(bg_iteminfo[num].icon, bg_itemlist[i].icon);
-		}
-		if (bg_itemlist[i].pickup_name != NULL) {
-			strcpy(bg_iteminfo[num].pickup_name, bg_itemlist[i].pickup_name);
-		}
+		strcpy(bg_iteminfo[num].icon, bg_itemlist[i].icon);
+		strcpy(bg_iteminfo[num].pickup_name, bg_itemlist[i].pickup_name);
 
 		bg_iteminfo[num].quantity = bg_itemlist[i].quantity;
 		bg_iteminfo[num].giType = bg_itemlist[i].giType;
@@ -3375,6 +3361,7 @@ BG_MaxAttackIndex
 int BG_MaxAttackIndex(playerState_t *ps)
 {
 	bg_weapongroup_anims_t *anims;
+	int max_combo;
 
 	// Select animations to count
 	if (ps->eFlags & EF_PRIMARY_HAND) {
@@ -3383,7 +3370,18 @@ int BG_MaxAttackIndex(playerState_t *ps)
 		anims = &bg_weapongroupinfo[ps->weapon].normalAnims;
 	}
 
-	return anims->numAttackAnims;
+	// Count the number of valid attack animations
+	for (max_combo = 0; max_combo < MAX_WG_ATK_ANIMS; max_combo++) {
+		if (anims->attackAnim[max_combo] == 0) {
+			break;
+		}
+	}
+
+	if (max_combo < 1) {
+		max_combo = 1;
+	}
+
+	return max_combo;
 }
 
 /*
@@ -3398,7 +3396,7 @@ int BG_AttackIndexForPlayerState(playerState_t *ps)
 	int max_combo = BG_MaxAttackIndex(ps);
 	int atkIndex;
 
-	if (max_combo <= 1) {
+	if (max_combo == 1) {
 		return 0;
 	}
 
@@ -3793,18 +3791,12 @@ void BG_InitNPCInfo(void)
 BG_TorsoStandForPlayerState
 ==============
 */
-animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps, bg_playercfg_t *playercfg)
+animNumber_t BG_TorsoStandForPlayerState(playerState_t *ps)
 {
-	if (!ps || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups() || !playercfg)
+	if (ps == NULL || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
 	{
 		return TORSO_STAND;
 	}
-
-#ifdef TURTLEARENA // PLAYERS
-	if ((ps->eFlags & EF_PLAYER_WAITING) && (playercfg->animations[BOTH_WAITING].prefixType & AP_TORSO)) {
-		return BOTH_WAITING;
-	}
-#endif
 
 	if (ps->eFlags & EF_PRIMARY_HAND)
 	{
@@ -3822,7 +3814,7 @@ animNumber_t BG_TorsoAttackForPlayerState(playerState_t *ps)
 {
 	int atkIndex;
 
-	if (!ps || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
+	if (ps == NULL || ps->weapon < 0 || ps->weapon >= BG_NumWeaponGroups())
 	{
 		return TORSO_ATTACK;
 	}
@@ -3858,12 +3850,6 @@ animNumber_t BG_LegsStandForPlayerState(playerState_t *ps, bg_playercfg_t *playe
 	{
 		return LEGS_IDLE;
 	}
-
-#ifdef TURTLEARENA // PLAYERS
-	if ((ps->eFlags & EF_PLAYER_WAITING) && (playercfg->animations[BOTH_WAITING].prefixType & AP_LEGS)) {
-		return BOTH_WAITING;
-	}
-#endif
 
 	if (ps->eFlags & EF_PRIMARY_HAND) {
 		anim = bg_weapongroupinfo[ps->weapon].primaryAnims.standAnim;
@@ -3929,10 +3915,9 @@ BG_TorsoAttackForWeapon
 For ui/q3_ui
 ==============
 */
-animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum, unsigned int atkIndex)
+animNumber_t BG_TorsoAttackForWeapon(weapon_t weaponnum)
 {
-	atkIndex = atkIndex % bg_weapongroupinfo[weaponnum].normalAnims.numAttackAnims;
-	return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[atkIndex];
+	return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[0];
 }
 
 /*
@@ -3951,23 +3936,6 @@ animNumber_t BG_LegsStandForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum
 	return LEGS_IDLE;
 }
 
-/*
-==============
-BG_LegsAttackForWeapon
-
-For ui/q3_ui
-==============
-*/
-animNumber_t BG_LegsAttackForWeapon(bg_playercfg_t *playercfg, weapon_t weaponnum, unsigned int atkIndex)
-{
-	atkIndex = atkIndex % bg_weapongroupinfo[weaponnum].normalAnims.numAttackAnims;
-	if (playercfg && playercfg->animations[bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[atkIndex]].prefixType & AP_LEGS) {
-		return (animNumber_t)bg_weapongroupinfo[weaponnum].normalAnims.attackAnim[atkIndex];
-	}
-
-	return -1;
-}
-
 qboolean BG_PlayerAttackAnim(animNumber_t aa)
 {
 	animNumber_t a = (aa & ~ANIM_TOGGLEBIT);
@@ -3983,7 +3951,7 @@ qboolean BG_PlayerAttackAnim(animNumber_t aa)
 	return qfalse;
 #else
 	return (a == TORSO_ATTACK || a == TORSO_ATTACK2
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 	|| (a >= TORSO_ATTACK_GUN_PRIMARY && a <= TORSO_ATTACK_NUNCHUCKS1_PRIMARY_C)
 #endif
 	);
@@ -4019,7 +3987,7 @@ qboolean BG_PlayerStandAnim(bg_playercfg_t *playercfg, int prefixBit, animNumber
 #else
 	return (((((prefixBit & AP_TORSO) && (a == TORSO_STAND || a == TORSO_STAND2))
 			|| ((prefixBit & AP_LEGS) && a == LEGS_IDLE))
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 		|| (a >= TORSO_STAND_GUN_PRIMARY && a <= TORSO_STAND_NUNCHUCKS1_PRIMARY)
 #endif
 		) && (playercfg->animations[a].prefixType & prefixBit));
@@ -4093,7 +4061,7 @@ qboolean BG_WeaponHasType(weapon_t weaponnum, weapontype_t wt)
 qboolean BG_WeapUseAmmo(weapon_t w)
 {
 	// Check if the weapon group uses ammo
-	return (bg_weapongroupinfo[w].item && bg_weapongroupinfo[w].item->quantity > 0);
+	return (bg_weapongroupinfo[w].item->quantity > 0);
 }
 
 /*
@@ -4441,7 +4409,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 	case IT_AMMO:
 #ifdef TA_WEAPSYS_EX
 		{
-			int stat;
+			int stat = -1;
 
 			if (item->giTag == ps->weapon)
 				stat = STAT_AMMO;
@@ -4452,7 +4420,7 @@ qboolean BG_CanItemBeGrabbed( int gametype, const entityState_t *ent, const play
 			else
 				return qfalse; // no where to put ammo.
 
-			if ( ps->stats[ stat ] >= 200 ) {
+			if ( stat && ps->stats[ stat ] >= 200 ) {
 				return qfalse;		// can't hold any more
 			}
 		}
@@ -4822,7 +4790,7 @@ char *eventnames[] = {
 #ifndef TA_WEAPSYS
 	"EV_SHOTGUN",
 #endif
-#ifndef IOQ3ZTM_NO_COMPAT // UNUSED
+#ifndef IOQ3ZTM_NO_COMPAT
 	"EV_BULLET",				// otherEntity is the shooter
 #endif
 
@@ -4852,9 +4820,8 @@ char *eventnames[] = {
 #if defined TURTLEARENA || defined NET_COMPAT// NIGHTS_ITEMS
 	"EV_CHAINPLUM",
 #endif
-#ifdef TA_ENTSYS // BREAKABLE MISC_OBJECT
+#ifdef TA_ENTSYS // BREAKABLE
 	"EV_SPAWN_DEBRIS",
-	"EV_EXPLOSION",
 #endif
 
 //#ifdef MISSIONPACK
@@ -4862,7 +4829,7 @@ char *eventnames[] = {
 	"EV_PROXIMITY_MINE_STICK",
 	"EV_PROXIMITY_MINE_TRIGGER",
 #endif
-#if !defined TURTLEARENA || defined NET_COMPAT // NO_KAMIKAZE_ITEM
+#if !defined TA_HOLDABLE || defined NET_COMPAT // NO_KAMIKAZE_ITEM
 	"EV_KAMIKAZE",			// kamikaze explodes
 #endif
 	"EV_OBELISKEXPLODE",		// obelisk explodes
@@ -5539,7 +5506,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 			flipflop = qtrue;
 			break;
 
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 		case BOTH_LADDER_STAND:
 			anim[0] = LEGS_IDLE;
 			break;
@@ -5552,22 +5519,11 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 			anim[0] = BOTH_LADDER_UP;
 			reversed = qtrue;
 			break;
-
-		case LEGS_JUMPB_LOCKON:
-			anim[0] = LEGS_JUMPB;
-			anim[1] = LEGS_JUMP;
-			anim[2] = LEGS_IDLE;
-			break;
-		case LEGS_LANDB_LOCKON:
-			anim[0] = LEGS_LANDB;
-			anim[1] = LEGS_LAND;
-			anim[2] = LEGS_IDLE;
-			break;
 #endif
 	}
 
 
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 	// Set defaults for Turtle Arena animations
 	// default weapon, put away
 	if (index >= TORSO_PUTDEFAULT_BOTH && index <= TORSO_PUTDEFAULT_SECONDARY)
@@ -6694,12 +6650,6 @@ bg_objectcfg_t *BG_NewObjectCfg(void) {
 	objectcfg->lerpframes = qfalse;
 	objectcfg->scale = 1.0f;
 
-	objectcfg->explosionDamage = 0;
-	objectcfg->explosionRadius = 300;
-	objectcfg->deathDelay = 0;
-
-	objectcfg->skin[0] = '\0';
-
 	animations = objectcfg->animations;
 
 	// Use first frame for all animations.
@@ -6738,8 +6688,9 @@ strAnimationDef_t objectAnimationDefs[] = {
 	ANIMDEF(OBJECT_DEAD2),
 	ANIMDEF(OBJECT_DEAD3),
 	ANIMDEF(OBJECT_LAND),
-	ANIMDEF(OBJECT_PAIN),
+	ANIMDEF(OBJECT_PAIN)
 #ifdef TA_NPCSYS
+	,
 	ANIMDEF(OBJECT_TAUNT),
 	ANIMDEF(OBJECT_ATTACK_FAR),
 	ANIMDEF(OBJECT_ATTACK_MELEE),
@@ -7049,35 +7000,6 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 			if (Sounds_Parse(&text_p, filename, &objectcfg->sounds, AP_OBJECT, objectAnimationDefs)) {
 				continue;
 			}
-		}
-		else if ( Q_stricmp( token, "explosionDamage" ) == 0 ) {
-			token = COM_Parse( &text_p );
-			if ( !*token ) {
-				break;
-			}
-			objectcfg->explosionDamage = atoi(token);
-			continue;
-		}
-		else if ( Q_stricmp( token, "explosionRadius" ) == 0 ) {
-			token = COM_Parse( &text_p );
-			if ( !*token ) {
-				break;
-			}
-			objectcfg->explosionRadius = atof(token);
-			continue;
-		}
-		else if ( Q_stricmp( token, "deathDelay" ) == 0 ) {
-			token = COM_Parse( &text_p );
-			if ( !*token ) {
-				break;
-			}
-			objectcfg->deathDelay = atoi(token);
-			continue;
-		}
-		else if ( Q_stricmp( token, "skin" ) == 0 ) {
-			token = COM_Parse( &text_p );
-			Q_strncpyz(objectcfg->skin, token, MAX_QPATH);
-			continue;
 		}
 		else
 		{

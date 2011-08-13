@@ -226,7 +226,7 @@ int Pickup_Holdable( gentity_t *ent, gentity_t *other ) {
 #endif
 #endif
 
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	if( ent->item->giTag == HI_KAMIKAZE ) {
 		other->client->ps.eFlags |= EF_KAMIKAZE;
 	}
@@ -316,9 +316,12 @@ int Pickup_Weapon (gentity_t *ent, gentity_t *other) {
 #ifdef TA_WEAPSYS
 	int		weaponNum;
 
-	if ( ent->item->giTag == WP_DEFAULT) {
+	if ( ent->item->giTag == WP_DEFAULT)
+	{
 		weaponNum = other->client->ps.stats[STAT_DEFAULTWEAPON];
-	} else {
+	}
+	else
+	{
 		weaponNum = ent->item->giTag;
 	}
 #endif
@@ -422,9 +425,9 @@ int Pickup_Health (gentity_t *ent, gentity_t *other) {
 	// small and mega healths will go over the max
 #ifdef MISSIONPACK
 #ifdef TA_ITEMSYS
-	if( BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
+	if( other->client && BG_ItemForItemNum(other->client->ps.stats[STAT_PERSISTANT_POWERUP])->giTag == PW_GUARD )
 #else
-	if( bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
+	if( other->client && bg_itemlist[other->client->ps.stats[STAT_PERSISTANT_POWERUP]].giTag == PW_GUARD )
 #endif
 	{
 		max = other->client->ps.stats[STAT_MAX_HEALTH];
@@ -621,7 +624,7 @@ void RespawnItem( gentity_t *ent ) {
 		te->r.svFlags |= SVF_BROADCAST;
 	}
 
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	if ( ent->item->giType == IT_HOLDABLE && ent->item->giTag == HI_KAMIKAZE ) {
 		// play powerup spawn sound to all clients
 		gentity_t	*te;
@@ -854,10 +857,6 @@ gentity_t *LaunchItem( gitem_t *item, vec3_t origin, vec3_t velocity ) {
 		dropped->nextthink = level.time + 30000;
 	}
 
-#ifdef IOQ3ZTM // ITEMS_DISAPPEAR
-	dropped->s.frame = 30000;
-#endif
-
 	dropped->flags = FL_DROPPED_ITEM;
 
 	trap_LinkEntity (dropped);
@@ -892,42 +891,11 @@ gentity_t *Drop_Item( gentity_t *ent, gitem_t *item, float angle ) {
 
 	drop = LaunchItem( item, ent->s.pos.trBase, velocity );
 
-#ifdef TURTLEARENA
-	// Dropped CTF flag
-#ifdef MISSIONPACK
-	if ((g_gametype.integer == GT_CTF || g_gametype.integer == GT_1FCTF) && item->giType == IT_TEAM) {
-#else
-	if (g_gametype.integer == GT_CTF && item->giType == IT_TEAM) {
-#endif
-		if (ent->client) {
-			// Flip CTF flag when going backward
-			if (ent->client->ps.pm_flags & PMF_BACKWARDS_RUN) {
-				angles[YAW] += 180;
-			}
-
-			// Show message when client drops CTF flag.
-			if( item->giTag == PW_NEUTRALFLAG ) {
-				PrintMsg (NULL, "%s" S_COLOR_WHITE " dropped the flag!\n", ent->client->pers.netname );
-			} else {
-				PrintMsg (NULL, "%s" S_COLOR_WHITE " dropped the %s flag!\n",
-					ent->client->pers.netname, TeamNameInColor(item->giTag == PW_REDFLAG ? TEAM_RED : TEAM_BLUE));
-			}
-		}
-	}
-#endif
-
-#ifdef IOQ3ZTM
-	// Save angles to allow cgame to render using real angles.
-	VectorCopy(angles, drop->s.angles);
-#endif
-
 #ifdef IOQ3ZTM // DROP_ITEM_FIX
-	if (ent->client) {
-		// Save the player who drop the item, so we can wait till the
-		//  player isn't touching it to allow them to pick it up.
-		//  Becuase otherwise they pickup the item as soon as they drop it.
-		drop->s.generic1 = ent->client->ps.clientNum+1;
-	}
+	// Save the player who drop the item, so we can wait till the
+	//  player isn't touching it to allow them to pick it up.
+	//  Becuase otherwise they pickup the item as soon as they drop it.
+	drop->s.generic1 = ent->client->ps.clientNum+1;
 	drop->s.time2 = level.time + 1000;
 #endif
 
@@ -1046,7 +1014,7 @@ void G_CheckTeamItems( void ) {
 		if ( !item || !itemRegistered[ item - bg_itemlist ] )
 #endif
 		{
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
 		}
 		item = BG_FindItem( "Blue Flag" );
 #ifdef IOQ3ZTM
@@ -1055,7 +1023,7 @@ void G_CheckTeamItems( void ) {
 		if ( !item || !itemRegistered[ item - bg_itemlist ] )
 #endif
 		{
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
 		}
 	}
 #ifdef MISSIONPACK
@@ -1070,7 +1038,7 @@ void G_CheckTeamItems( void ) {
 		if ( !item || !itemRegistered[ item - bg_itemlist ] )
 #endif
 		{
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_redflag in map" );
 		}
 		item = BG_FindItem( "Blue Flag" );
 #ifdef IOQ3ZTM
@@ -1079,7 +1047,7 @@ void G_CheckTeamItems( void ) {
 		if ( !item || !itemRegistered[ item - bg_itemlist ] )
 #endif
 		{
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_blueflag in map" );
 		}
 		item = BG_FindItem( "Neutral Flag" );
 #ifdef IOQ3ZTM
@@ -1088,7 +1056,7 @@ void G_CheckTeamItems( void ) {
 		if ( !item || !itemRegistered[ item - bg_itemlist ] )
 #endif
 		{
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_neutralflag in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_CTF_neutralflag in map" );
 		}
 	}
 
@@ -1099,13 +1067,13 @@ void G_CheckTeamItems( void ) {
 		ent = NULL;
 		ent = G_Find( ent, FOFS(classname), "team_redobelisk" );
 		if( !ent ) {
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_redobelisk in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_redobelisk in map" );
 		}
 
 		ent = NULL;
 		ent = G_Find( ent, FOFS(classname), "team_blueobelisk" );
 		if( !ent ) {
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_blueobelisk in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_blueobelisk in map" );
 		}
 	}
 
@@ -1117,19 +1085,19 @@ void G_CheckTeamItems( void ) {
 		ent = NULL;
 		ent = G_Find( ent, FOFS(classname), "team_redobelisk" );
 		if( !ent ) {
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_redobelisk in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_redobelisk in map" );
 		}
 
 		ent = NULL;
 		ent = G_Find( ent, FOFS(classname), "team_blueobelisk" );
 		if( !ent ) {
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_blueobelisk in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_blueobelisk in map" );
 		}
 
 		ent = NULL;
 		ent = G_Find( ent, FOFS(classname), "team_neutralobelisk" );
 		if( !ent ) {
-			G_Printf( S_COLOR_YELLOW "WARNING: No team_neutralobelisk in map\n" );
+			G_Printf( S_COLOR_YELLOW "WARNING: No team_neutralobelisk in map" );
 		}
 	}
 #endif
@@ -1145,8 +1113,7 @@ void ClearRegisteredItems( void ) {
 	memset( itemRegistered, 0, sizeof( itemRegistered ) );
 
 	// players always start with the base weapon
-#ifdef TURTLEARENA // HOLDABLE
-	// Start with shurikens
+#ifdef TA_HOLDABLE // Start with shurikens
 #ifdef IOQ3ZTM // LASERTAG
 	if (!g_laserTag.integer)
 #endif

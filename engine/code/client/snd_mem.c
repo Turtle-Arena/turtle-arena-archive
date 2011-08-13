@@ -100,12 +100,6 @@ void SND_setup(void) {
 	Com_Printf("Sound memory manager started\n");
 }
 
-void SND_shutdown(void)
-{
-		free(sfxScratchBuffer);
-		free(buffer);
-}
-
 /*
 ================
 ResampleSfx
@@ -268,7 +262,7 @@ qboolean S_LoadSound( sfx_t *sfx )
 	}
 	
 	Hunk_FreeTempMemory(samples);
-	Hunk_FreeTempMemory(data);
+	Z_Free(data);
 
 	return qtrue;
 }

@@ -92,9 +92,7 @@ vmCvar_t	g_obeliskHealth;
 vmCvar_t	g_obeliskRegenPeriod;
 vmCvar_t	g_obeliskRegenAmount;
 vmCvar_t	g_obeliskRespawnDelay;
-#ifdef MISSIONPACK_HARVESTER
 vmCvar_t	g_cubeTimeout;
-#endif
 vmCvar_t	g_redteam;
 vmCvar_t	g_blueteam;
 #ifndef TA_SP
@@ -119,12 +117,6 @@ vmCvar_t	g_teleportFluxTime;
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 vmCvar_t	g_laserTag;
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-vmCvar_t	g_2dmode;
-#endif
-#ifdef IOQ3ZTM // SV_PUBLIC
-vmCvar_t	g_public;
 #endif
 
 static cvarTable_t		gameCvarTable[] = {
@@ -161,7 +153,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_teamForceBalance, "g_teamForceBalance", "0", CVAR_ARCHIVE  },
 
 	{ &g_warmup, "g_warmup", "20", CVAR_ARCHIVE, 0, qtrue  },
-	{ &g_doWarmup, "g_doWarmup", "0", CVAR_ARCHIVE, 0, qtrue  },
+	{ &g_doWarmup, "g_doWarmup", "0", 0, 0, qtrue  },
 	{ &g_logfile, "g_log", "games.log", CVAR_ARCHIVE, 0, qfalse  },
 	{ &g_logfileSync, "g_logsync", "0", CVAR_ARCHIVE, 0, qfalse  },
 
@@ -182,13 +174,7 @@ static cvarTable_t		gameCvarTable[] = {
 #else
 	{ &g_quadfactor, "g_quadfactor", "3", 0, 0, qtrue  },
 #endif
-#ifdef TURTLEARENA
-	{ &g_weaponRespawn, "g_weaponRespawn", "15", 0, 0, qtrue  },
-#elif defined IOQ3ZTM // IOQ3BUGFIX: Cvar case change.
-	{ &g_weaponRespawn, "g_weaponRespawn", "5", 0, 0, qtrue  },
-#else
 	{ &g_weaponRespawn, "g_weaponrespawn", "5", 0, 0, qtrue  },
-#endif
 	{ &g_weaponTeamRespawn, "g_weaponTeamRespawn", "30", 0, 0, qtrue },
 	{ &g_forcerespawn, "g_forcerespawn", "20", 0, 0, qtrue },
 	{ &g_inactivity, "g_inactivity", "0", 0, 0, qtrue },
@@ -218,9 +204,7 @@ static cvarTable_t		gameCvarTable[] = {
 #endif
 	{ &g_obeliskRespawnDelay, "g_obeliskRespawnDelay", "10", CVAR_SERVERINFO, 0, qfalse },
 
-#ifdef MISSIONPACK_HARVESTER
 	{ &g_cubeTimeout, "g_cubeTimeout", "30", 0, 0, qfalse },
-#endif
 #ifndef IOQ3ZTM // DEFAULT_TEAMS
 	{ &g_redteam, "g_redteam", "Stroggs", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
 	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
@@ -236,7 +220,7 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_proxMineTimeout, "g_proxMineTimeout", "20000", 0, 0, qfalse },
 #endif
 #ifdef TA_SP
-	{ &g_singlePlayer, "ui_singlePlayerActive", "0", CVAR_ROM, 0, qfalse, qfalse  },
+	{ &g_singlePlayer, "ui_singlePlayerActive", "0", CVAR_SERVERINFO|CVAR_ROM, 0, qfalse, qfalse  },
 	{ &g_spSaveData, "g_spSaveData", "", CVAR_SYSTEMINFO, 0, qfalse, qfalse  },
 	{ &g_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM, 0, 0, qfalse },
 	{ &g_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO, 0, 0, qfalse },
@@ -245,23 +229,17 @@ static cvarTable_t		gameCvarTable[] = {
 #ifdef IOQ3ZTM
 #ifdef TURTLEARENA // DEFAULT_TEAMS
 	{ &g_redteam, "g_redteam", "Foot", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
-	{ &g_blueteam, "g_blueteam", "Shell", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
+	{ &g_blueteam, "g_blueteam", "Katanas", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #else
 	{ &g_redteam, "g_redteam", "Stroggs", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
 	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #endif
 #endif
 #ifdef TURTLEARENA // POWERS // PW_FLASHING
-	{ &g_teleportFluxTime, "g_teleportFluxTime", "5", 0, 0, qfalse},
+	{ &g_teleportFluxTime, "g_teleportFluxTime", "5", CVAR_SERVERINFO, 0, qfalse},
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 	{ &g_laserTag, "g_laserTag", "0", CVAR_SERVERINFO, qtrue, qfalse},
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-	{ &g_2dmode, "g_2dmode", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
-#endif
-#ifdef IOQ3ZTM // SV_PUBLIC
-	{ &g_public, "sv_public", "0", 0, 0, 0, qfalse },
 #endif
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},
@@ -271,7 +249,7 @@ static cvarTable_t		gameCvarTable[] = {
 
 };
 
-static int gameCvarTableSize = ARRAY_LEN( gameCvarTable );
+static int gameCvarTableSize = sizeof( gameCvarTable ) / sizeof( gameCvarTable[0] );
 
 
 void G_InitGame( int levelTime, int randomSeed, int restart );
@@ -525,30 +503,149 @@ void G_UpdateCvars( void ) {
 	}
 }
 
-#ifdef IOQ3ZTM
+#ifdef IOQ3ZTM // MAP_ROTATION
+#define MAX_MAPS_PER_ROTATION	32
+#define MAX_MAPROTATIONS		16 // MAX_ARENAS // 1024
+#define	MAX_MAPROTATIONS_TEXT	4096 // MAX_ARENAS_TEXT // 8192
+
+int				g_numMapRotations;
+static char		*g_mapRotationInfos[MAX_MAPROTATIONS];
+
+int G_ParseInfos( char *buf, int max, char *infos[] );
+
 /*
-=================
-G_CvarClearModification
-
-Useful for disabling "Server: $cvarNmae changed to $value" messaged caused by vmCvar_t::trackChange.
-=================
+===============
+G_LoadMapRotationsFromFile
+===============
 */
-void G_CvarClearModification( vmCvar_t *vmCvar ) {
-	int			i;
-	cvarTable_t	*cv;
+static void G_LoadMapRotationsFromFile( char *filename ) {
+	int				len;
+	fileHandle_t	f;
+	char			buf[MAX_MAPROTATIONS_TEXT];
 
-	if (!vmCvar) {
+	len = trap_FS_FOpenFile( filename, &f, FS_READ );
+	if ( !f ) {
+		trap_Printf( va( S_COLOR_RED "file not found: %s\n", filename ) );
+		return;
+	}
+	if ( len >= MAX_ARENAS_TEXT ) {
+		trap_Printf( va( S_COLOR_RED "file too large: %s is %i, max allowed is %i", filename, len, MAX_MAPROTATIONS_TEXT ) );
+		trap_FS_FCloseFile( f );
 		return;
 	}
 
-	for ( i = 0, cv = gameCvarTable ; i < gameCvarTableSize ; i++, cv++ ) {
-		if ( cv->vmCvar == vmCvar ) {
-			trap_Cvar_Update( cv->vmCvar );
+	trap_FS_Read( buf, len, f );
+	buf[len] = 0;
+	trap_FS_FCloseFile( f );
 
-			if ( cv->modificationCount != cv->vmCvar->modificationCount ) {
-				cv->modificationCount = cv->vmCvar->modificationCount;
-				break;
+	g_numMapRotations += G_ParseInfos( buf, MAX_MAPROTATIONS - g_numMapRotations, &g_mapRotationInfos[g_numMapRotations] );
+}
+
+/*
+===============
+G_GetMapRotationInfoByGametype
+===============
+*/
+const char *G_GetMapRotationInfoByGametype( int gametype ) {
+	int			n;
+	// TA_MISC gametypeNames from G_SpawnGEntityFromSpawnVars
+	static char *gametypeNames[] = {"ffa", "duel", "single", "team", "ctf", "oneflag", "overload", "harvester", "teamtournament"};
+
+	// Find rotation for the current gametype
+	for( n = 0; n < g_numMapRotations; n++ ) {
+		if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[gametype] ) == 0 ) {
+			return g_mapRotationInfos[n];
+		}
+	}
+
+	// oneflag, overload, and harvester default to CTF
+	if (gametype > GT_CTF)
+	{
+		for( n = 0; n < g_numMapRotations; n++ ) {
+			if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[GT_CTF] ) == 0 ) {
+				return g_mapRotationInfos[n];
 			}
+		}
+	}
+
+	// Default to ffa
+	for( n = 0; n < g_numMapRotations; n++ ) {
+		if( Q_stricmp( Info_ValueForKey( g_mapRotationInfos[n], "type" ), gametypeNames[GT_FFA] ) == 0 ) {
+			return g_mapRotationInfos[n];
+		}
+	}
+
+	return NULL;
+}
+
+void G_InitMapRotation(void)
+{
+	g_numMapRotations = 0;
+
+	G_LoadMapRotationsFromFile("map_rotations.cfg");
+}
+
+void G_AdvanceMapRotation(void)
+{
+	char		map[MAX_QPATH];
+	char		serverinfo[MAX_INFO_STRING];
+	const char	*info;
+	char		*str;
+	int			i;
+	qboolean	foundMap;
+
+	foundMap = qfalse;
+
+#ifdef TA_SP
+	// Single player doesn't rotate maps like the other gametypes.
+	if (g_gametype.integer == GT_SINGLE_PLAYER
+		|| trap_Cvar_VariableValue( "ui_singlePlayerActive" ))
+	{
+		return;
+	}
+#endif
+
+	// Get map rotation info
+	info = G_GetMapRotationInfoByGametype(g_gametype.integer);
+	if (info)
+	{
+		trap_GetServerinfo( serverinfo, sizeof(serverinfo) );
+		Q_strncpyz( map, Info_ValueForKey( serverinfo, "mapname" ), sizeof(map) );
+
+		// Find current map
+		for (i = 1; i < MAX_MAPS_PER_ROTATION+1; i++)
+		{
+			str = Info_ValueForKey(info, va("m%d", i));
+
+			// if str is blank
+			if (!str || !strlen(str))
+				continue;
+
+			if (foundMap) {
+				trap_Cvar_Set("nextmap", va("map %s", str));
+				return;
+			}
+			if( !Q_stricmp( str, map ) ) {
+				foundMap = qtrue;
+			}
+		}
+		// Found currently but didn't find next map
+		if (foundMap)
+		{
+			// Set nextmap to the first map in the rotation
+			str = Info_ValueForKey(info, "m1");
+
+			if (!str || !strlen(str))
+				return;
+
+			if (!Q_stricmp( str, map ))
+			{
+				// First and last map are the same, just restart.
+				return;
+			}
+
+			trap_Cvar_Set("nextmap", va("map %s", str));
+			return;
 		}
 	}
 }
@@ -633,10 +730,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// range are NEVER anything but clients
 	level.num_entities = MAX_CLIENTS;
 
-	for ( i=0 ; i<MAX_CLIENTS ; i++ ) {
-		g_entities[i].classname = "clientslot";
-	}
-
 	// let the server system know where the entites are
 	trap_LocateGameData( level.gentities, level.num_entities, sizeof( gentity_t ), 
 		&level.clients[0].ps, sizeof( level.clients[0] ) );
@@ -658,7 +751,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	BG_InitNPCInfo();
 #endif
 #ifdef IOQ3ZTM // MAP_ROTATION
-	G_LoadArenas();
+	G_InitMapRotation();
 #endif
 
 	// parse the key/value pairs and spawn gentities
@@ -683,11 +776,15 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_Printf ("-----------------------------------\n");
 #endif
 
-#ifndef TA_SP
 	if( g_gametype.integer == GT_SINGLE_PLAYER || trap_Cvar_VariableIntegerValue( "com_buildScript" ) ) {
+#ifndef TA_SP
 		G_ModelIndex( SP_PODIUM_MODEL );
-	}
 #endif
+#ifndef IOQ3ZTM // MORE_PLAYER_SOUNDS
+		G_SoundIndex( "sound/player/gurp1.wav" );
+		G_SoundIndex( "sound/player/gurp2.wav" );
+#endif
+	}
 
 	if ( trap_Cvar_VariableIntegerValue( "bot_enable" ) ) {
 		BotAISetup( restart );
@@ -717,7 +814,6 @@ void G_ShutdownGame( int restart ) {
 		G_LogPrintf("ShutdownGame:\n" );
 		G_LogPrintf("------------------------------------------------------------\n" );
 		trap_FS_FCloseFile( level.logFile );
-		level.logFile = 0;
 	}
 
 	// write all the client session data so we can get it back
@@ -796,15 +892,13 @@ void AddTournamentPlayer( void ) {
 		}
 		// never select the dedicated follow or scoreboard clients
 		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD || 
-#ifdef TA_SPLITVIEW
-			client->sess.spectatorState == SPECTATOR_LOCAL_HIDE || 
-#endif
 			client->sess.spectatorClient < 0  ) {
 			continue;
 		}
 
-		if(!nextInLine || client->sess.spectatorNum > nextInLine->sess.spectatorNum)
+		if ( !nextInLine || client->sess.spectatorTime < nextInLine->sess.spectatorTime ) {
 			nextInLine = client;
+		}
 	}
 
 	if ( !nextInLine ) {
@@ -815,33 +909,6 @@ void AddTournamentPlayer( void ) {
 
 	// set them to free-for-all team
 	SetTeam( &g_entities[ nextInLine - level.clients ], "f" );
-}
-
-/*
-=======================
-AddTournamentQueue
-
-Add client to end of tournament queue
-=======================
-*/
-
-void AddTournamentQueue(gclient_t *client)
-{
-	int index;
-	gclient_t *curclient;
-	
-	for(index = 0; index < level.maxclients; index++)
-	{
-		curclient = &level.clients[index];
-		
-		if(curclient->pers.connected != CON_DISCONNECTED)
-		{
-			if(curclient == client)
-				curclient->sess.spectatorNum = 0;
-			else if(curclient->sess.sessionTeam == TEAM_SPECTATOR)
-				curclient->sess.spectatorNum++;
-		}
-	}
 }
 
 /*
@@ -943,10 +1010,10 @@ int QDECL SortRanks( const void *a, const void *b ) {
 
 	// then spectators
 	if ( ca->sess.sessionTeam == TEAM_SPECTATOR && cb->sess.sessionTeam == TEAM_SPECTATOR ) {
-		if ( ca->sess.spectatorNum > cb->sess.spectatorNum ) {
+		if ( ca->sess.spectatorTime < cb->sess.spectatorTime ) {
 			return -1;
 		}
-		if ( ca->sess.spectatorNum < cb->sess.spectatorNum ) {
+		if ( ca->sess.spectatorTime > cb->sess.spectatorTime ) {
 			return 1;
 		}
 		return 0;
@@ -992,10 +1059,9 @@ void CalculateRanks( void ) {
 	level.numNonSpectatorClients = 0;
 	level.numPlayingClients = 0;
 	level.numVotingClients = 0;		// don't count bots
-
-	for (i = 0; i < ARRAY_LEN(level.numteamVotingClients); i++)
+	for ( i = 0; i < TEAM_NUM_TEAMS; i++ ) {
 		level.numteamVotingClients[i] = 0;
-
+	}
 	for ( i = 0 ; i < level.maxclients ; i++ ) {
 		if ( level.clients[i].pers.connected != CON_DISCONNECTED ) {
 			level.sortedClients[level.numConnectedClients] = i;
@@ -1137,7 +1203,7 @@ void MoveClientToIntermission( gentity_t *ent ) {
 		StopFollowing( ent );
 	}
 
-	FindIntermissionPoint();
+
 	// move to the spot
 	VectorCopy( level.intermission_origin, ent->s.origin );
 	VectorCopy( level.intermission_origin, ent->client->ps.origin );
@@ -1209,27 +1275,11 @@ void BeginIntermission( void ) {
 	}
 
 	level.intermissiontime = level.time;
-
-	// move all clients to the intermission point
-	for (i=0 ; i< level.maxclients ; i++) {
-		client = g_entities + i;
-		if (!client->inuse)
-			continue;
-		// respawn if dead
-		if (client->health <= 0
-#ifdef TA_SP
-			&& g_gametype.integer != GT_SINGLE_PLAYER
-#endif
-			)
-		{
-			ClientRespawn(client);
-		}
-		MoveClientToIntermission( client );
-	}
+	FindIntermissionPoint();
 
 #ifdef TA_SP
 	// if custom game and not co-op
-	if (g_public.integer <= -3 && g_gametype.integer != GT_SINGLE_PLAYER) {
+	if (g_singlePlayer.integer == 2 && g_gametype.integer != GT_SINGLE_PLAYER) {
 		UpdateTournamentInfo();
 	}
 #elif defined MISSIONPACK
@@ -1244,6 +1294,26 @@ void BeginIntermission( void ) {
 		SpawnModelsOnVictoryPads();
 	}
 #endif
+
+
+	// move all clients to the intermission point
+	for (i=0 ; i< level.maxclients ; i++) {
+		client = g_entities + i;
+		if (!client->inuse)
+			continue;
+
+		// respawn if dead
+		if (client->health <= 0
+#ifdef TA_SP
+			&& g_gametype.integer != GT_SINGLE_PLAYER
+#endif
+			)
+		{
+			respawn(client);
+		}
+		MoveClientToIntermission( client );
+	}
+
 	// send the current scoring to all clients
 	SendScoreboardMessageToAllClients();
 
@@ -1282,7 +1352,7 @@ void ExitLevel (void) {
 	}
 
 #ifdef IOQ3ZTM // MAP_ROTATION
-	G_AdvanceMap();
+	G_AdvanceMapRotation();
 #endif
 
 	trap_Cvar_VariableStringBuffer( "nextmap", nextmap, sizeof(nextmap) );
@@ -1334,7 +1404,7 @@ void QDECL G_LogPrintf( const char *fmt, ... ) {
 	char		string[1024];
 	int			min, tens, sec;
 
-	sec = ( level.time - level.startTime ) / 1000;
+	sec = level.time / 1000;
 
 	min = sec / 60;
 	sec -= min * 60;
@@ -1368,11 +1438,9 @@ Append information about this game to the log file
 void LogExit( const char *string ) {
 	int				i, numSorted;
 	gclient_t		*cl;
-#ifndef TA_SP
 #ifdef MISSIONPACK
 	qboolean won = qtrue;
 	team_t team = TEAM_RED; // Default team is red in Team Arena and blue in Quake3
-#endif
 #endif
 	G_LogPrintf( "Exit: %s\n", string );
 
@@ -1408,7 +1476,6 @@ void LogExit( const char *string ) {
 		ping = cl->ps.ping < 999 ? cl->ps.ping : 999;
 
 		G_LogPrintf( "score: %i  ping: %i  client: %i %s\n", cl->ps.persistant[PERS_SCORE], ping, level.sortedClients[i],	cl->pers.netname );
-#ifndef TA_SP
 #ifdef MISSIONPACK
 		if (g_singlePlayer.integer && !(g_entities[cl - level.clients].r.svFlags & SVF_BOT)) {
 			team = cl->sess.sessionTeam;
@@ -1418,14 +1485,23 @@ void LogExit( const char *string ) {
 				won = qfalse;
 			}
 		}
+#ifdef TA_SP
+		if (g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER) {
+			if (!cl->ps.persistant[PERS_LIVES] && !cl->ps.persistant[PERS_CONTINUES]) {
+				won = qfalse;
+			}
+		}
 #endif
 #endif
 
 	}
 
-#ifndef TA_SP
 #ifdef MISSIONPACK
-	if (g_singlePlayer.integer) {
+	if (g_singlePlayer.integer
+#ifdef TA_SP // ZTM: NOTE: Custom Game (skirmish) uses 2 while Single Player uses 1.
+		== 2
+#endif
+		) {
 		if (g_gametype.integer >= GT_CTF) {
 			if (team == TEAM_BLUE)
 				won = level.teamScores[TEAM_BLUE] > level.teamScores[TEAM_RED];
@@ -1434,7 +1510,6 @@ void LogExit( const char *string ) {
 		}
 		trap_SendConsoleCommand( EXEC_APPEND, (won) ? "spWin\n" : "spLose\n" );
 	}
-#endif
 #endif
 
 
@@ -1458,7 +1533,7 @@ void CheckIntermissionExit( void ) {
 	int			readyMask;
 
 #ifdef TA_SP
-	if (g_public.integer <= -3 && g_gametype.integer != GT_SINGLE_PLAYER ) {
+	if ( g_singlePlayer.integer == 2 && g_gametype.integer != GT_SINGLE_PLAYER ) {
 		return;
 	}
 #else
@@ -1661,7 +1736,7 @@ void CheckExitRules( void ) {
 		// Check for Game Over
 		if (numClients > 0 && numClients == deadClients)
 		{
-			if (g_singlePlayer.integer)
+			if (g_singlePlayer.integer == 1)
 			{
 				// Return to the title screen.
 				trap_Cvar_Set("nextmap", "disconnect; sp_gameover");
@@ -1678,9 +1753,9 @@ void CheckExitRules( void ) {
 				str = NULL;
 
 #ifdef IOQ3ZTM // MAP_ROTATION
-				info = G_GetNextArenaInfoByGametype(NULL, GT_SINGLE_PLAYER);
+				info = G_GetMapRotationInfoByGametype(GT_SINGLE_PLAYER);
 				if (info) {
-					str = Info_ValueForKey(info, "map");
+					str = Info_ValueForKey(info, "m1");
 				}
 #endif
 
@@ -1729,11 +1804,9 @@ void CheckExitRules( void ) {
 		}
 	}
 
-#ifndef IOQ3ZTM // ZTM: This annoys me.
 	if ( level.numPlayingClients < 2 ) {
 		return;
 	}
-#endif
 
 	if ( g_gametype.integer < GT_CTF && g_fraglimit.integer ) {
 		if ( level.teamScores[TEAM_RED] >= g_fraglimit.integer ) {
@@ -2136,6 +2209,8 @@ Advances the non-player objects in the world
 void G_RunFrame( int levelTime ) {
 	int			i;
 	gentity_t	*ent;
+	int			msec;
+int start, end;
 
 	// if we are waiting for the level to restart, do nothing
 	if ( level.restarted ) {
@@ -2145,6 +2220,7 @@ void G_RunFrame( int levelTime ) {
 	level.framenum++;
 	level.previousTime = level.time;
 	level.time = levelTime;
+	msec = level.time - level.previousTime;
 
 	// get any cvar changes
 	G_UpdateCvars();
@@ -2152,6 +2228,7 @@ void G_RunFrame( int levelTime ) {
 	//
 	// go through all allocated objects
 	//
+	start = trap_Milliseconds();
 	ent = &g_entities[0];
 	for (i=0 ; i<level.num_entities ; i++, ent++) {
 		if ( !ent->inuse ) {
@@ -2243,7 +2320,9 @@ void G_RunFrame( int levelTime ) {
 
 		G_RunThink( ent );
 	}
+end = trap_Milliseconds();
 
+start = trap_Milliseconds();
 	// perform final fixups on the players
 	ent = &g_entities[0];
 	for (i=0 ; i < level.maxclients ; i++, ent++ ) {
@@ -2251,6 +2330,7 @@ void G_RunFrame( int levelTime ) {
 			ClientEndFrame( ent );
 		}
 	}
+end = trap_Milliseconds();
 
 	// see if it is time to do a tournement restart
 	CheckTournament();

@@ -102,9 +102,6 @@ typedef struct
 	qboolean	fixed_origin;	// use origin instead of fetching entnum's origin
 	sfx_t		*thesfx;		// sfx structure
 	qboolean	doppler;
-#ifdef TA_SPLITVIEW
-	qboolean	fullVolume;
-#endif
 } channel_t;
 
 
@@ -128,17 +125,13 @@ typedef struct
 	void (*StartLocalSound)( sfxHandle_t sfx, int channelNum );
 	void (*StartBackgroundTrack)( const char *intro, const char *loop );
 	void (*StopBackgroundTrack)( void );
-	void (*RawSamples)(int stream, int samples, int rate, int width, int channels, const byte *data, float volume, int entityNum);
+	void (*RawSamples)(int stream, int samples, int rate, int width, int channels, const byte *data, float volume);
 	void (*StopAllSounds)( void );
 	void (*ClearLoopingSounds)( qboolean killall );
 	void (*AddLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*AddRealLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*StopLoopingSound)(int entityNum );
-#ifdef TA_SPLITVIEW
-	void (*Respatialize)( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, int listener );
-#else
 	void (*Respatialize)( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater );
-#endif
 	void (*UpdateEntityPosition)( int entityNum, const vec3_t origin );
 	void (*Update)( void );
 	void (*DisableSounds)( void );
@@ -193,7 +186,7 @@ extern	vec3_t	listener_up;
 extern	dma_t	dma;
 
 #define	MAX_RAW_SAMPLES	16384
-#define MAX_RAW_STREAMS (MAX_CLIENTS * 2 + 1)
+#define MAX_RAW_STREAMS 128
 extern	portable_samplepair_t s_rawsamples[MAX_RAW_STREAMS][MAX_RAW_SAMPLES];
 extern	int		s_rawend[MAX_RAW_STREAMS];
 
@@ -209,7 +202,6 @@ qboolean S_LoadSound( sfx_t *sfx );
 void		SND_free(sndBuffer *v);
 sndBuffer*	SND_malloc( void );
 void		SND_setup( void );
-void		SND_shutdown(void);
 
 void S_PaintChannels(int endtime);
 

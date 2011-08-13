@@ -32,8 +32,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define	MAX_ENT_CLUSTERS	16
 
 #ifdef USE_VOIP
-#define VOIP_QUEUE_LENGTH 64
-
 typedef struct voipServerPacket_s
 {
 	int generation;
@@ -41,7 +39,6 @@ typedef struct voipServerPacket_s
 	int frames;
 	int len;
 	int sender;
-	int flags;
 	byte data[1024];
 } voipServerPacket_t;
 #endif
@@ -101,13 +98,7 @@ typedef struct {
 typedef struct {
 	int				areabytes;
 	byte			areabits[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
-#ifdef TA_SPLITVIEW
-	int				numPSs;
-	playerState_t	pss[MAX_SPLITVIEW];
-	int				lcIndex[MAX_SPLITVIEW];
-#else
 	playerState_t	ps;
-#endif
 	int				num_entities;
 	int				first_entity;		// into the circular sv_packet_entities[]
 										// the entities MUST be in increasing state number
@@ -129,9 +120,6 @@ typedef enum {
 typedef struct netchan_buffer_s {
 	msg_t           msg;
 	byte            msgBuffer[MAX_MSGLEN];
-#ifdef LEGACY_PROTOCOL
-	char		clientCommandString[MAX_STRING_CHARS];	// valid command string for SV_Netchan_Encode
-#endif
 	struct netchan_buffer_s *next;
 } netchan_buffer_t;
 
@@ -172,7 +160,7 @@ typedef struct client_s {
 	int				nextReliableTime;	// svs.time when another reliable command will be allowed
 	int				lastPacketTime;		// svs.time when packet was last received
 	int				lastConnectTime;	// svs.time when connection started
-	int				lastSnapshotTime;	// svs.time of last sent snapshot
+	int				nextSnapshotTime;	// send another snapshot when svs.time >= nextSnapshotTime
 	qboolean		rateDelayed;		// true if nextSnapshotTime was set based on rate instead of snapshotMsec
 	int				timeoutCount;		// must timeout a few frames in a row so debugging doesn't break
 	clientSnapshot_t	frames[PACKET_BACKUP];	// updates can be delta'd from here
@@ -193,23 +181,12 @@ typedef struct client_s {
 	qboolean hasVoip;
 	qboolean muteAllVoip;
 	qboolean ignoreVoipFromClient[MAX_CLIENTS];
-	voipServerPacket_t *voipPacket[VOIP_QUEUE_LENGTH];
+	voipServerPacket_t voipPacket[64]; // !!! FIXME: WAY too much memory!
 	int queuedVoipPackets;
-	int queuedVoipIndex;
-#endif
-
-#ifdef TA_SPLITVIEW
-	int	owner; // If not -1 this client is splitscreen with owner
-	int local_clients[MAX_SPLITVIEW-1]; // If any are not -1 this client is splitscreen main client,
-										// local_clients are there splitscreen players.
 #endif
 
 	int				oldServerTime;
-	qboolean		csUpdated[MAX_CONFIGSTRINGS+1];	
-	
-#ifdef LEGACY_PROTOCOL
-	qboolean		compat;
-#endif
+	qboolean			csUpdated[MAX_CONFIGSTRINGS+1];	
 } client_t;
 
 //=============================================================================
@@ -218,11 +195,7 @@ typedef struct client_s {
 // MAX_CHALLENGES is made large to prevent a denial
 // of service attack that could cycle all of them
 // out before legitimate users connected
-#define	MAX_CHALLENGES	2048
-// Allow a certain amount of challenges to have the same IP address
-// to make it a bit harder to DOS one single IP address from connecting
-// while not allowing a single ip to grab all challenge resources
-#define MAX_CHALLENGES_MULTI (MAX_CHALLENGES / 2)
+#define	MAX_CHALLENGES	1024
 
 #define	AUTHORIZE_TIMEOUT	5000
 
@@ -236,6 +209,10 @@ typedef struct {
 	qboolean	wasrefused;
 	qboolean	connected;
 } challenge_t;
+
+
+#define	MAX_MASTERS	8				// max recipients for heartbeat packets
+
 
 // this structure will be cleared only when the game dll changes
 typedef struct {
@@ -276,6 +253,8 @@ extern	serverStatic_t	svs;				// persistant server info across maps
 extern	server_t		sv;					// cleared each map
 extern	vm_t			*gvm;				// game virtual machine
 
+#define	MAX_MASTER_SERVERS	5
+
 extern	cvar_t	*sv_fps;
 extern	cvar_t	*sv_timeout;
 extern	cvar_t	*sv_zombietime;
@@ -296,21 +275,14 @@ extern	cvar_t	*sv_mapChecksum;
 extern	cvar_t	*sv_serverid;
 extern	cvar_t	*sv_minRate;
 extern	cvar_t	*sv_maxRate;
-extern	cvar_t	*sv_dlRate;
 extern	cvar_t	*sv_minPing;
 extern	cvar_t	*sv_maxPing;
 extern	cvar_t	*sv_gametype;
 extern	cvar_t	*sv_pure;
 extern	cvar_t	*sv_floodProtect;
 extern	cvar_t	*sv_lanForceRate;
-#ifndef STANDALONE
 extern	cvar_t	*sv_strictAuth;
-#endif
 extern	cvar_t	*sv_banFile;
-
-#ifdef IOQ3ZTM // SV_PUBLIC
-extern	cvar_t	*sv_public;
-#endif
 
 extern	serverBan_t serverBans[SERVER_MAXBANS];
 extern	int serverBansCount;
@@ -326,15 +298,16 @@ extern	cvar_t	*sv_voip;
 // sv_main.c
 //
 void SV_FinalMessage (char *message);
-void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...);
 
 
 void SV_AddOperatorCommands (void);
 void SV_RemoveOperatorCommands (void);
 
 
+void SV_MasterHeartbeat (void);
 void SV_MasterShutdown (void);
-int SV_RateMsec(client_t *client);
+
 
 
 
@@ -366,20 +339,18 @@ void SV_AuthorizeIpPacket( netadr_t from );
 
 void SV_ExecuteClientMessage( client_t *cl, msg_t *msg );
 void SV_UserinfoChanged( client_t *cl );
-#ifdef TA_GAME_MODELS
-void SV_UpdateUserinfos(void);
-#endif
 
 void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd );
-void SV_FreeClient(client_t *client);
 void SV_DropClient( client_t *drop, const char *reason );
 
 void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK );
 void SV_ClientThink (client_t *cl, usercmd_t *cmd);
 
-int SV_WriteDownloadToClient(client_t *cl , msg_t *msg);
-int SV_SendDownloadMessages(void);
-int SV_SendQueuedMessages(void);
+void SV_WriteDownloadToClient( client_t *cl , msg_t *msg );
+
+#ifdef USE_VOIP
+void SV_WriteVoipToClient( client_t *cl, msg_t *msg );
+#endif
 
 
 //
@@ -486,6 +457,6 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 // sv_net_chan.c
 //
 void SV_Netchan_Transmit( client_t *client, msg_t *msg);
-int SV_Netchan_TransmitNextFragment(client_t *client);
+void SV_Netchan_TransmitNextFragment( client_t *client );
 qboolean SV_Netchan_Process( client_t *client, msg_t *msg );
-void SV_Netchan_FreeQueue(client_t *client);
+

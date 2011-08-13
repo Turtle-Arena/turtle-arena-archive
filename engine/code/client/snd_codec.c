@@ -28,93 +28,70 @@ static snd_codec_t *codecs;
 
 /*
 =================
-S_CodecGetSound
-
-Opens/loads a sound, tries codec based on the sound's file extension
-then tries all supported codecs.
+S_FileExtension
 =================
 */
-static void *S_CodecGetSound(const char *filename, snd_info_t *info)
+char *S_FileExtension(const char *fni)
 {
-	snd_codec_t *codec;
-	snd_codec_t *orgCodec = NULL;
-	qboolean	orgNameFailed = qfalse;
-	char		localName[ MAX_QPATH ];
-	const char	*ext;
-	char		altName[ MAX_QPATH ];
-	void		*rtn = NULL;
+	// we should search from the ending to the last '/'
 
-	Q_strncpyz(localName, filename, MAX_QPATH);
+	char *fn = (char *) fni + strlen(fni) - 1;
+	char *eptr = NULL;
 
-	ext = COM_GetExtension(localName);
-
-	if( *ext )
+	while(*fn != '/' && fn != fni)
 	{
-		// Look for the correct loader and use it
-		for( codec = codecs; codec; codec = codec->next )
+		if(*fn == '.')
 		{
-			if( !Q_stricmp( ext, codec->ext ) )
-			{
-				// Load
-				if( info )
-					rtn = codec->load(localName, info);
-				else
-					rtn = codec->open(localName);
-				break;
-			}
+			eptr = fn;
+			break;
 		}
-
-		// A loader was found
-		if( codec )
-		{
-			if( !rtn )
-			{
-				// Loader failed, most likely because the file isn't there;
-				// try again without the extension
-				orgNameFailed = qtrue;
-				orgCodec = codec;
-				COM_StripExtension( filename, localName, MAX_QPATH );
-			}
-			else
-			{
-				// Something loaded
-				return rtn;
-			}
-		}
+		fn--;
 	}
 
-	// Try and find a suitable match using all
-	// the sound codecs supported
-	for( codec = codecs; codec; codec = codec->next )
+	return eptr;
+}
+
+/*
+=================
+S_FindCodecForFile
+
+Select an appropriate codec for a file based on its extension
+=================
+*/
+static snd_codec_t *S_FindCodecForFile(const char *filename)
+{
+	char *ext = S_FileExtension(filename);
+	snd_codec_t *codec = codecs;
+
+	if(!ext)
 	{
-		if( codec == orgCodec )
-			continue;
-
-		Com_sprintf( altName, sizeof (altName), "%s.%s", localName, codec->ext );
-
-		// Load
-		if( info )
-			rtn = codec->load(altName, info);
-		else
-			rtn = codec->open(altName);
-
-		if( rtn )
+		// No extension - auto-detect
+		while(codec)
 		{
-			if( orgNameFailed )
-			{
-				Com_DPrintf(S_COLOR_YELLOW "WARNING: %s not present, using %s instead\n",
-						filename, altName );
-			}
+			char fn[MAX_QPATH];
+			
+			// there is no extension so we do not need to subtract 4 chars
+			Q_strncpyz(fn, filename, MAX_QPATH);
+			COM_DefaultExtension(fn, MAX_QPATH, codec->ext);
 
-			return rtn;
+			// Check it exists
+			if(FS_ReadFile(fn, NULL) != -1)
+				return codec;
+
+			// Nope. Next!
+			codec = codec->next;
 		}
+
+		// Nothin'
+		return NULL;
 	}
 
-#ifdef IOQ3ZTM
-	Com_DPrintf(S_COLOR_YELLOW "WARNING: Failed to %s sound %s!\n", info ? "load" : "open", filename);
-#else
-	Com_Printf(S_COLOR_YELLOW "WARNING: Failed to %s sound %s!\n", info ? "load" : "open", filename);
-#endif
+	while(codec)
+	{
+		if(!Q_stricmp(ext, codec->ext))
+			return codec;
+		codec = codec->next;
+	}
 
 	return NULL;
 }
@@ -127,13 +104,10 @@ S_CodecInit
 void S_CodecInit()
 {
 	codecs = NULL;
-
+	S_CodecRegister(&wav_codec);
 #ifdef USE_CODEC_VORBIS
 	S_CodecRegister(&ogg_codec);
 #endif
-
-// Register wav codec last so that it is always tried first when a file extension was not found
-	S_CodecRegister(&wav_codec);
 }
 
 /*
@@ -157,6 +131,56 @@ void S_CodecRegister(snd_codec_t *codec)
 	codecs = codec;
 }
 
+#ifdef IOQ3ZTM // OPENARENA // Load Ogg sounds
+// STOLEN FROM IOSTVOY by thilo!!!!  HA HA HA but it works :(
+qboolean S_TheCheckExtension(char *filename)
+{
+	fileHandle_t hnd;
+	char fn[MAX_QPATH];
+	int stringlen = strlen(filename);
+	char *extptr;
+
+	strncpy(fn, filename, stringlen+1);
+	extptr = S_FileExtension(fn);
+
+	if (!extptr) {
+		extptr = &fn[stringlen];
+
+		extptr[0] = '.';
+		extptr[1] = 'w';
+		extptr[2] = 'a';
+		extptr[3] = 'v';
+		extptr[4] = '\0';
+
+		stringlen += 4;
+	}
+
+	FS_FOpenFileRead(fn, &hnd, qtrue);
+
+	if (!hnd) {
+		if (!strcmp(++extptr, "wav")) {
+			extptr[0] = 'o';
+			extptr[1] = 'g';
+			extptr[2] = 'g';
+			extptr[3] = '\0';
+
+			FS_FOpenFileRead(fn, &hnd, qtrue);
+
+			if(!hnd) {
+				return qfalse;
+			}
+		} else {
+			return qfalse;
+		}
+	}
+
+	FS_FCloseFile(hnd);
+	strcpy(filename, fn);
+
+	return qtrue;
+}
+#endif
+
 /*
 =================
 S_CodecLoad
@@ -164,7 +188,33 @@ S_CodecLoad
 */
 void *S_CodecLoad(const char *filename, snd_info_t *info)
 {
-	return S_CodecGetSound(filename, info);
+	snd_codec_t *codec;
+	char fn[MAX_QPATH];
+
+#ifdef IOQ3ZTM // OPENARENA // Load Ogg sounds
+	codec = NULL;
+	strncpy(fn, filename, sizeof(fn));
+	if (!S_TheCheckExtension(fn))
+	{
+		// Didn't find file.
+		return NULL;
+	}
+	codec = S_FindCodecForFile(fn);
+#else
+	codec = S_FindCodecForFile(filename);
+#endif
+	if(!codec)
+	{
+		Com_Printf("Unknown extension for %s\n", filename);
+		return NULL;
+	}
+
+#ifndef IOQ3ZTM	// OPENARENA // Load Ogg sounds
+	strncpy(fn, filename, sizeof(fn));
+	COM_DefaultExtension(fn, sizeof(fn), codec->ext);
+#endif
+
+	return codec->load(fn, info);
 }
 
 /*
@@ -174,7 +224,32 @@ S_CodecOpenStream
 */
 snd_stream_t *S_CodecOpenStream(const char *filename)
 {
-	return S_CodecGetSound(filename, NULL);
+	snd_codec_t *codec;
+	char fn[MAX_QPATH];
+
+#ifdef IOQ3ZTM // OPENARENA // Load Ogg sounds
+	codec = NULL;
+	strncpy(fn, filename, sizeof(fn));
+	if (!S_TheCheckExtension(fn))
+	{
+		// Didn't find file.
+		Com_Printf("Couldn't find %s\n", filename);
+		return NULL;
+	}
+	codec = S_FindCodecForFile(fn);
+#else
+	codec = S_FindCodecForFile(filename);
+#endif
+	if(!codec)
+	{
+		Com_Printf("Unknown extension for %s\n", filename);
+		return NULL;
+	}
+
+	strncpy(fn, filename, sizeof(fn));
+	COM_DefaultExtension(fn, sizeof(fn), codec->ext);
+
+	return codec->open(fn);
 }
 
 void S_CodecCloseStream(snd_stream_t *stream)
@@ -205,9 +280,7 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 	length = FS_FOpenFileRead(filename, &hnd, qtrue);
 	if(!hnd)
 	{
-#ifndef IOQ3ZTM
-		Com_DPrintf("Can't read sound file %s\n", filename);
-#endif
+		Com_Printf("Can't read sound file %s\n", filename);
 		return NULL;
 	}
 

@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 
-#define	WAVEVALUE( table, base, amplitude, phase, freq )  ((base) + table[ ri.ftol( ( ( (phase) + tess.shaderTime * (freq) ) * FUNCTABLE_SIZE ) ) & FUNCTABLE_MASK ] * (amplitude))
+#define	WAVEVALUE( table, base, amplitude, phase, freq )  ((base) + table[ myftol( ( ( (phase) + tess.shaderTime * (freq) ) * FUNCTABLE_SIZE ) ) & FUNCTABLE_MASK ] * (amplitude))
 
 static float *TableForFunc( genFunc_t func ) 
 {
@@ -52,7 +52,7 @@ static float *TableForFunc( genFunc_t func )
 		break;
 	}
 
-	ri.Error( ERR_DROP, "TableForFunc called with invalid function '%d' in shader '%s'", func, tess.shader->name );
+	ri.Error( ERR_DROP, "TableForFunc called with invalid function '%d' in shader '%s'\n", func, tess.shader->name );
 	return NULL;
 }
 
@@ -61,7 +61,7 @@ static float *TableForFunc( genFunc_t func )
 **
 ** Evaluates a given waveForm_t, referencing backEnd.refdef.time directly
 */
-#ifndef IOQ3ZTM // CELSHADING
+#ifndef CELSHADING // ZTM
 static
 #endif
 float EvalWaveForm( const waveForm_t *wf )
@@ -73,7 +73,7 @@ float EvalWaveForm( const waveForm_t *wf )
 	return WAVEVALUE( table, wf->base, wf->amplitude, wf->phase, wf->frequency );
 }
 
-#ifndef IOQ3ZTM // CELSHADING
+#ifndef CELSHADING // ZTM
 static
 #endif
 float EvalWaveFormClamped( const waveForm_t *wf )
@@ -644,7 +644,7 @@ void RB_CalcColorFromOneMinusEntity( unsigned char *dstColors )
 
 	for ( i = 0; i < tess.numVertexes; i++, pColors++ )
 	{
-		*pColors = c;
+		*pColors = * ( int * ) invModulate;
 	}
 }
 
@@ -713,7 +713,7 @@ void RB_CalcWaveColor( const waveForm_t *wf, unsigned char *dstColors )
 		glow = 1;
 	}
 
-	v = ri.ftol(255 * glow);
+	v = myftol( 255 * glow );
 	color[0] = color[1] = color[2] = v;
 	color[3] = 255;
 	v = *(int *)color;
@@ -899,40 +899,6 @@ void RB_CalcFogTexCoords( float *st ) {
 
 
 
-#ifdef IOQ3ZTM // ZEQ2_CEL
-/*
-** RB_CalcEnvironmentCelShadeTexCoords
-**
-** RiO; celshade 1D environment map
-*/
-//vec3_t lightOrigin = { -960, 1980, 96 };		// FIXME: track dynamically
-void RB_CalcEnvironmentCelShadeTexCoords( float *st ) 
-{
-    int    i;
-    float  *v, *normal;
-    vec3_t lightDir;
-    float  d;
-
-    normal = tess.normal[0];
-	v = tess.xyz[0];
-
-	// Calculate only once
-//	VectorCopy( backEnd.currentEntity->lightDir, lightDir );
-//	if ( backEnd.currentEntity == &tr.worldEntity )
-//		VectorSubtract( lightOrigin, v, lightDir );
-//	else
-		VectorCopy( backEnd.currentEntity->lightDir, lightDir );
-	VectorNormalizeFast( lightDir );
-
-    for (i = 0 ; i < tess.numVertexes ; i++, v += 4, normal += 4, st += 2 ) {
-		d= DotProduct( normal, lightDir );
-
-		st[0] = 0.5 + d * 0.5;
-		st[1] = 0.5;
-    }
-}
-#endif
-
 /*
 ** RB_CalcEnvironmentTexCoords
 */
@@ -1066,6 +1032,21 @@ void RB_CalcRotateTexCoords( float degsPerSecond, float *st )
 }
 
 
+
+
+
+
+#if id386 && !defined(__GNUC__)
+
+long myftol( float f ) {
+	static int tmp;
+	__asm fld f
+	__asm fistp tmp
+	__asm mov eax, tmp
+}
+
+#endif
+
 /*
 ** RB_CalcSpecularAlpha
 **
@@ -1083,7 +1064,7 @@ void RB_CalcSpecularAlpha( unsigned char *alphas ) {
 	int			b;
 	vec3_t		lightDir;
 	int			numVertexes;
-#ifdef IOQ3ZTM // IOQ3BUGFIX: Dynamic lightOrigin for Specular (This may not be proper, but it's better)
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Dynamic lightOrigin for Specular (This may not be proper, but its better)
 	vec3_t		lightOrigin;
 	trRefEntity_t	*ent;
 
@@ -1259,19 +1240,19 @@ static void RB_CalcDiffuseColor_scalar( unsigned char *colors )
 			*(int *)&colors[i*4] = ambientLightInt;
 			continue;
 		} 
-		j = ri.ftol(ambientLight[0] + incoming * directedLight[0]);
+		j = myftol( ambientLight[0] + incoming * directedLight[0] );
 		if ( j > 255 ) {
 			j = 255;
 		}
 		colors[i*4+0] = j;
 
-		j = ri.ftol(ambientLight[1] + incoming * directedLight[1]);
+		j = myftol( ambientLight[1] + incoming * directedLight[1] );
 		if ( j > 255 ) {
 			j = 255;
 		}
 		colors[i*4+1] = j;
 
-		j = ri.ftol(ambientLight[2] + incoming * directedLight[2]);
+		j = myftol( ambientLight[2] + incoming * directedLight[2] );
 		if ( j > 255 ) {
 			j = 255;
 		}

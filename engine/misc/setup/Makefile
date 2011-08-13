@@ -1,5 +1,5 @@
 ifndef VERSION
-VERSION=0.5.1
+VERSION=0.4.3
 endif
 ifndef RELEASE
 RELEASE=0
@@ -14,6 +14,6 @@ sign:
 	done
 
 clean:
-	rm -rf *.run image defines.m4
+	rm -rf *.run image
 
 .PHONY: all sign clean

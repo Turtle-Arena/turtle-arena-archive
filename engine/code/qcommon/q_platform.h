@@ -24,8 +24,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define __Q_PLATFORM_H
 
 // this is for determining if we have an asm version of a C function
-#define idx64 0
-
 #ifdef Q3_VM
 
 #define id386 0
@@ -73,20 +71,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // for windows fastcall option
 #define QDECL
-#define QCALL
 
 //================================================================= WIN64/32 ===
 
-#if defined(_WIN64) || defined(__WIN64__)
-
-#undef idx64
-#define idx64 1
+#ifdef __WIN64__
 
 #undef QDECL
 #define QDECL __cdecl
-
-#undef QCALL
-#define QCALL __stdcall
 
 #if defined( _MSC_VER )
 #define OS_STRING "win_msvc64"
@@ -94,11 +85,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define OS_STRING "win_mingw64"
 #endif
 
-#define ID_INLINE __inline
+#define ID_INLINE inline
 #define PATH_SEP '\\'
 
 #if defined( __WIN64__ ) 
-#define ARCH_STRING "x64"
+#define ARCH_STRING "x86_64"
 #elif defined _M_ALPHA
 #define ARCH_STRING "AXP"
 #endif
@@ -107,13 +98,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define DLL_EXT ".dll"
 
-#elif defined(_WIN32) || defined(__WIN32__)
+#elif __WIN32__
 
 #undef QDECL
 #define QDECL __cdecl
-
-#undef QCALL
-#define QCALL __stdcall
 
 #if defined( _MSC_VER )
 #define OS_STRING "win_msvc"
@@ -136,7 +124,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #endif
 
-
 //============================================================== MAC OS X ===
 
 #if defined(MACOS_X) || defined(__APPLE_CC__)
@@ -157,8 +144,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define ARCH_STRING "i386"
 #define Q3_LITTLE_ENDIAN
 #elif defined __x86_64__
-#undef idx64
-#define idx64 1
 #define ARCH_STRING "x86_64"
 #define Q3_LITTLE_ENDIAN
 #endif
@@ -169,24 +154,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //================================================================= LINUX ===
 
-#if defined(__linux__) || defined(__FreeBSD_kernel__)
+#ifdef __linux__
 
 #include <endian.h>
 
-#if defined(__linux__)
 #define OS_STRING "linux"
-#else
-#define OS_STRING "kFreeBSD"
-#endif
-
 #define ID_INLINE inline
 #define PATH_SEP '/'
 
 #if defined __i386__
 #define ARCH_STRING "i386"
 #elif defined __x86_64__
-#undef idx64
-#define idx64 1
 #define ARCH_STRING "x86_64"
 #elif defined __powerpc64__
 #define ARCH_STRING "ppc64"
@@ -222,18 +200,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define DLL_EXT ".so"
 
-#elif defined __wii__
-
-#define OS_STRING "wii"
-
-#define ID_INLINE inline
-#define PATH_SEP '/'
-
-#define __powerpc__
-#define ARCH_STRING "ppc"
-#define Q3_BIG_ENDIAN
-
-#define DLL_EXT ".so" // lies, there are no native libs
 #endif
 
 //=================================================================== BSD ===
@@ -261,8 +227,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef __i386__
 #define ARCH_STRING "i386"
 #elif defined __amd64__
-#undef idx64
-#define idx64 1
 #define ARCH_STRING "amd64"
 #elif defined __axp__
 #define ARCH_STRING "alpha"
@@ -360,8 +324,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 //endianness
-void CopyShortSwap (void *dest, void *src);
-void CopyLongSwap (void *dest, void *src);
 short ShortSwap (short l);
 int LongSwap (int l);
 float FloatSwap (const float *f);
@@ -370,8 +332,6 @@ float FloatSwap (const float *f);
 #error "Endianness defined as both big and little"
 #elif defined( Q3_BIG_ENDIAN )
 
-#define CopyLittleShort(dest, src) CopyShortSwap(dest, src)
-#define CopyLittleLong(dest, src) CopyLongSwap(dest, src)
 #define LittleShort(x) ShortSwap(x)
 #define LittleLong(x) LongSwap(x)
 #define LittleFloat(x) FloatSwap(&x)
@@ -381,8 +341,6 @@ float FloatSwap (const float *f);
 
 #elif defined( Q3_LITTLE_ENDIAN )
 
-#define CopyLittleShort(dest, src) Com_Memcpy(dest, src, 2)
-#define CopyLittleLong(dest, src) Com_Memcpy(dest, src, 4)
 #define LittleShort
 #define LittleLong
 #define LittleFloat

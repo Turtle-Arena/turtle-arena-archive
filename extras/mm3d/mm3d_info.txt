@@ -1,0 +1,46 @@
+md3filter.cc/h are from Misfit Model 3D, they have been modified by ZTurtleMan to add support for non-quake3 md3 players.
+mm3d_changes.diff contains changes for other files that have been changed.
+
+Adds support for Quake III: Team Arena and others mods (like Turtle Arena).
+
+These changes are required to export the Turtle Arena players from mm3d to md3.
+
+= Changes =
+Incomplete list of changes.
+
+== Fixes ==
+* Fixed saving MD3 player models with no frame animations.
+
+== MDR ==
+Unfinished support for MDR models. MDR model are basically skeleton animated MD3 models.
+
+Compressed MDR models only allow bone joints in the range of -512 to 511.
+If your model is bigger set MDR_compressed to 0.
+
+== Animation Looping ==
+* "Loop" in the Animation Mode is now per-animation (with undo support)
+* Loop is read and wrote to and fro .mm3d files (compatible with current .mm3d files)
+* Per-animation loop is supported by md3filter (No more handcoded list)
+
+== Head model animations ==
+Added support for "HEAD_" (animates head model, like TORSO_ and LEGS_) and "ALL_" (animates torso, legs, and head, like BOTH_) animations.
+
+== Animations.cfg ==
+Animation names are loaded from the animations.cfg, with fallback to default Quake3 names, instead of just a hardcoded list.
+
+Reads/Saves all of the animations instead of just the first 25 (MD3_ANIMATIONS).
+
+== Metadata ==
+Changes add suppport for MD3_CFG_* metadata to insert data into animations.cfg
+	(Still supports hardcoded MD3_footsteps, MD3_headoffset, etc et)
+
+if MD3_NoSyncWarning value is 1 does not add sync warning to animations in animations.cfg
+
+If MD3_EliteLoop value is 1 uses STV: Elite Force Single Player style loopframes
+	(Where 0 is loop, and -1 is don't loop in animations.cfg)
+
+If MD3_AnimKeyword value is 1 uses Elite Force Single Player style animation list
+Example: "BOTH_DEATH1 0 5 5 15"
+
+If MDR_compressed value is 0 does not compress the MDR model(s).
+

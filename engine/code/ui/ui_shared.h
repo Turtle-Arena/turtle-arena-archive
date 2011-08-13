@@ -379,8 +379,8 @@ typedef struct {
 	void (*getBindingBuf)( int keynum, char *buf, int buflen );
 	void (*setBinding)( int keynum, const char *binding );
 	void (*executeText)(int exec_when, const char *text );	
-	void (*Error)(int level, const char *error, ...) __attribute__ ((noreturn, format (printf, 2, 3)));
-	void (*Print)(const char *msg, ...) __attribute__ ((format (printf, 1, 2)));
+	void (*Error)(int level, const char *error, ...);
+	void (*Print)(const char *msg, ...);
 	void (*Pause)(qboolean b);
 	int (*ownerDrawWidth)(int ownerDraw, float scale);
 	sfxHandle_t (*registerSound)(const char *name, qboolean compressed);
@@ -472,9 +472,5 @@ int			trap_PC_LoadSource( const char *filename );
 int			trap_PC_FreeSource( int handle );
 int			trap_PC_ReadToken( int handle, pc_token_t *pc_token );
 int			trap_PC_SourceFileAndLine( int handle, char *filename, int *line );
-
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-qboolean		trap_Key_IsDown( int keynum );
-#endif
 
 #endif

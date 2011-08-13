@@ -829,10 +829,11 @@ void BotInputToUserCommand(bot_input_t *bi, usercmd_t *ucmd, int delta_angles[3]
 	vec3_t angles, forward, right;
 	short temp;
 	int j;
-	float f, r, u, m;
 
 	//clear the whole structure
 	memset(ucmd, 0, sizeof(usercmd_t));
+	//
+	//Com_Printf("dir = %f %f %f speed = %f\n", bi->dir[0], bi->dir[1], bi->dir[2], bi->speed);
 	//the duration for the user command in milli seconds
 	ucmd->serverTime = time;
 	//
@@ -894,37 +895,21 @@ void BotInputToUserCommand(bot_input_t *bi, usercmd_t *ucmd, int delta_angles[3]
 	//bot input speed is in the range [0, 400]
 	bi->speed = bi->speed * 127 / 400;
 	//set the view independent movement
-	f = DotProduct(forward, bi->dir);
-	r = DotProduct(right, bi->dir);
-	u = abs(forward[2]) * bi->dir[2];
-	m = fabs(f);
-
-	if (fabs(r) > m) {
-		m = fabs(r);
-	}
-
-	if (fabs(u) > m) {
-		m = fabs(u);
-	}
-
-	if (m > 0) {
-		f *= bi->speed / m;
-		r *= bi->speed / m;
-		u *= bi->speed / m;
-	}
-
-	ucmd->forwardmove = f;
-	ucmd->rightmove = r;
-	ucmd->upmove = u;
-
-	if (bi->actionflags & ACTION_MOVEFORWARD) ucmd->forwardmove = 127;
-	if (bi->actionflags & ACTION_MOVEBACK) ucmd->forwardmove = -127;
-	if (bi->actionflags & ACTION_MOVELEFT) ucmd->rightmove = -127;
-	if (bi->actionflags & ACTION_MOVERIGHT) ucmd->rightmove = 127;
+	ucmd->forwardmove = DotProduct(forward, bi->dir) * bi->speed;
+	ucmd->rightmove = DotProduct(right, bi->dir) * bi->speed;
+	ucmd->upmove = abs(forward[2]) * bi->dir[2] * bi->speed;
+	//normal keyboard movement
+	if (bi->actionflags & ACTION_MOVEFORWARD) ucmd->forwardmove += 127;
+	if (bi->actionflags & ACTION_MOVEBACK) ucmd->forwardmove -= 127;
+	if (bi->actionflags & ACTION_MOVELEFT) ucmd->rightmove -= 127;
+	if (bi->actionflags & ACTION_MOVERIGHT) ucmd->rightmove += 127;
 	//jump/moveup
-	if (bi->actionflags & ACTION_JUMP) ucmd->upmove = 127;
+	if (bi->actionflags & ACTION_JUMP) ucmd->upmove += 127;
 	//crouch/movedown
-	if (bi->actionflags & ACTION_CROUCH) ucmd->upmove = -127;
+	if (bi->actionflags & ACTION_CROUCH) ucmd->upmove -= 127;
+	//
+	//Com_Printf("forward = %d right = %d up = %d\n", ucmd.forwardmove, ucmd.rightmove, ucmd.upmove);
+	//Com_Printf("ucmd->serverTime = %d\n", ucmd->serverTime);
 }
 
 /*
@@ -954,6 +939,9 @@ void BotUpdateInput(bot_state_t *bs, int time, int elapsed_time) {
 	for (j = 0; j < 3; j++) {
 		bs->viewangles[j] = AngleMod(bs->viewangles[j] - SHORT2ANGLE(bs->cur_ps.delta_angles[j]));
 	}
+#ifdef TA_HOLDSYS
+	trap_EA_Use(bs->client, HI_NO_SELECT);
+#endif
 }
 
 /*
@@ -1796,10 +1784,10 @@ int BotInitLibrary(void) {
 	if (strlen(buf)) trap_BotLibVarSet("homedir", buf);
 	//
 #ifdef TA_WEAPSYS // Use correct index
-	trap_BotLibVarSet("weapindex_rocketlauncher", va("%i", BG_WeaponGroupIndexForName("wp_rocket_launcher")));
+	trap_BotLibVarSet("weapindex_rocket", va("%i", BG_WeaponGroupIndexForName("wp_rocket_launcher")));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", BG_WeaponGroupIndexForName("wp_grappling_hook")));
 #elif defined IOQ3ZTM // ZTM: Always sure these are correct...
-	trap_BotLibVarSet("weapindex_rocketlauncher", va("%i", WP_ROCKET_LAUNCHER));
+	trap_BotLibVarSet("weapindex_rocket", va("%i", WP_ROCKET_LAUNCHER));
 	trap_BotLibVarSet("weapindex_grapple", va("%i", WP_GRAPPLING_HOOK));
 #endif
 #ifdef TURTLEARENA

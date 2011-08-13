@@ -34,29 +34,15 @@ GetClientState
 ====================
 */
 static void GetClientState( uiClientState_t *state ) {
-#ifdef TA_SPLITVIEW
-	int		i;
-#endif
-
 	state->connectPacketCount = clc.connectPacketCount;
-	state->connState = clc.state;
-	Q_strncpyz( state->servername, clc.servername, sizeof( state->servername ) );
+	state->connState = cls.state;
+	Q_strncpyz( state->servername, cls.servername, sizeof( state->servername ) );
 	Q_strncpyz( state->updateInfoString, cls.updateInfoString, sizeof( state->updateInfoString ) );
 	Q_strncpyz( state->messageString, clc.serverMessage, sizeof( state->messageString ) );
 #ifdef IOQ3ZTM // SPECTATOR_FIX // Correct clientNum
 	state->clientNum = clc.clientNum;
 #else
 	state->clientNum = cl.snap.ps.clientNum;
-#endif
-
-#ifdef TA_SPLITVIEW
-	state->numLocalClients = 0;
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		state->lcIndex[i] = cl.snap.lcIndex[i];
-		if (state->lcIndex[i] != -1) {
-			state->numLocalClients++;
-		}
-	}
 #endif
 }
 
@@ -66,7 +52,6 @@ LAN_LoadCachedServers
 ====================
 */
 void LAN_LoadCachedServers( void ) {
-#ifndef TURTLEARENA // Don't cache servers, just always get new list.
 	int size;
 	fileHandle_t fileIn;
 	cls.numglobalservers = cls.numfavoriteservers = 0;
@@ -84,7 +69,6 @@ void LAN_LoadCachedServers( void ) {
 		}
 		FS_FCloseFile(fileIn);
 	}
-#endif
 }
 
 /*
@@ -93,7 +77,6 @@ LAN_SaveServersToCache
 ====================
 */
 void LAN_SaveServersToCache( void ) {
-#ifndef TURTLEARENA // Don't cache servers, just always get new list.
 	int size;
 	fileHandle_t fileOut = FS_SV_FOpenFileWrite("servercache.dat");
 	FS_Write(&cls.numglobalservers, sizeof(int), fileOut);
@@ -103,7 +86,6 @@ void LAN_SaveServersToCache( void ) {
 	FS_Write(&cls.globalServers, sizeof(cls.globalServers), fileOut);
 	FS_Write(&cls.favoriteServers, sizeof(cls.favoriteServers), fileOut);
 	FS_FCloseFile(fileOut);
-#endif
 }
 
 
@@ -311,6 +293,9 @@ static void LAN_GetServerInfo( int source, int n, char *buf, int buflen ) {
 		Info_SetValueForKey( info, "hostname", server->hostName);
 		Info_SetValueForKey( info, "mapname", server->mapName);
 		Info_SetValueForKey( info, "clients", va("%i",server->clients));
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+		Info_SetValueForKey( info, "g_humanplayers", va("%i",server->g_humanplayers));
+#endif
 		Info_SetValueForKey( info, "sv_maxclients", va("%i",server->maxClients));
 		Info_SetValueForKey( info, "ping", va("%i",server->ping));
 		Info_SetValueForKey( info, "minping", va("%i",server->minPing));
@@ -322,8 +307,6 @@ static void LAN_GetServerInfo( int source, int n, char *buf, int buflen ) {
 #ifdef IOQUAKE3 // ZTM: punkbuster
 		Info_SetValueForKey( info, "punkbuster", va("%i", server->punkbuster));
 #endif
-		Info_SetValueForKey( info, "g_needpass", va("%i", server->g_needpass));
-		Info_SetValueForKey( info, "g_humanplayers", va("%i", server->g_humanplayers));
 		Q_strncpyz(buf, info, buflen);
 	} else {
 		if (buf) {
@@ -782,7 +765,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 	case UI_CVAR_SET:
-		Cvar_SetSafe( VMA(1), VMA(2) );
+		Cvar_Set( VMA(1), VMA(2) );
 		return 0;
 
 	case UI_CVAR_VARIABLEVALUE:
@@ -793,7 +776,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 	case UI_CVAR_SETVALUE:
-		Cvar_SetValueSafe( VMA(1), VMF(2) );
+		Cvar_SetValue( VMA(1), VMF(2) );
 		return 0;
 
 	case UI_CVAR_RESET:
@@ -1185,7 +1168,7 @@ void CL_InitUI( void ) {
 	if (v == UI_OLD_API_VERSION) {
 //		Com_Printf(S_COLOR_YELLOW "WARNING: loading old Quake III Arena User Interface version %d\n", v );
 		// init for this gamestate
-		VM_Call( uivm, UI_INIT, (clc.state >= CA_AUTHORIZING && clc.state < CA_ACTIVE));
+		VM_Call( uivm, UI_INIT, (cls.state >= CA_AUTHORIZING && cls.state < CA_ACTIVE));
 	}
 	else if (v != UI_API_VERSION) {
 		Com_Error( ERR_DROP, "User Interface is version %d, expected %d", v, UI_API_VERSION );
@@ -1193,8 +1176,12 @@ void CL_InitUI( void ) {
 	}
 	else {
 		// init for this gamestate
-		VM_Call( uivm, UI_INIT, (clc.state >= CA_AUTHORIZING && clc.state < CA_ACTIVE) );
+		VM_Call( uivm, UI_INIT, (cls.state >= CA_AUTHORIZING && cls.state < CA_ACTIVE) );
 	}
+
+	// reset any CVAR_CHEAT cvars registered by ui
+	if ( !clc.demoplaying && !cl_connectedToCheatServer ) 
+		Cvar_SetCheatState();
 }
 
 #ifdef IOQUAKE3 // ZTM: CDKEY

@@ -79,13 +79,6 @@ CG_LoadingItem
 void CG_LoadingItem( int itemNum ) {
 	gitem_t		*item;
 
-#ifdef TA_SP
-	if (cgs.gametype == GT_SINGLE_PLAYER)
-	{
-		return;
-	}
-#endif
-
 #ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(itemNum);
 #else
@@ -138,7 +131,7 @@ void CG_LoadingClient( int clientNum ) {
 #else
 		Q_strncpyz( model, Info_ValueForKey( info, "model" ), sizeof( model ) );
 #endif
-		skin = strrchr( model, '/' );
+		skin = Q_strrchr( model, '/' );
 		if ( skin ) {
 			*skin++ = '\0';
 		} else {
@@ -193,11 +186,9 @@ void CG_LoadingClient( int clientNum ) {
 	Q_strncpyz( personality, Info_ValueForKey( info, "n" ), sizeof(personality) );
 	Q_CleanStr( personality );
 
-#ifndef TA_SP
 	if( cgs.gametype == GT_SINGLE_PLAYER ) {
 		trap_S_RegisterSound( va( "sound/player/announce/%s.wav", personality ), qtrue );
 	}
-#endif
 
 	CG_LoadingString( personality );
 }
@@ -309,7 +300,7 @@ void CG_DrawInformation( void ) {
 		break;
 	case GT_SINGLE_PLAYER:
 #ifdef TA_SP
-		if (cg_singlePlayerActive.integer)
+		if (cg_singlePlayerActive.integer != 1)
 			s = "Cooperative";
 		else
 #endif

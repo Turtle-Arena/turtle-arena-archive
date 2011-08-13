@@ -1,6 +1,6 @@
 /*
 ===========================================================================
-Copyright (C) 2009-2011 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009-2010 Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena source code.
 
@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 //
-// Gauntlet (Done)
+// Gauntlet (Done; but need to check blade)
 //
 
 weapon "w_gauntlet"
@@ -38,11 +38,12 @@ weapon "w_gauntlet"
 	flashSound0 "sound/weapons/melee/fstatck.wav"
 	//barrelSpin BS_PITCH
 
+	// Blade location hasn't been tested.
 	blade 0
 	{
 		damage 50
 		origin 0 -5 0
-		tip 5 20 0
+		tip 0 5 0
 		trailStyle none
 	}
 }
@@ -71,7 +72,7 @@ weapongroup "wp_gauntlet"
 
 //
 // Machine Gun (Done)
-// ZTM: FIXME: Machine Gun should only do 5 damage in Team DM.
+// FIXME: Machine Gun does 7 damage in all gametypes, but in Q3 Team DM it should only do 5 damage.
 //
 
 projectile "p_machinegun"
@@ -267,7 +268,6 @@ weapon "w_lightning"
 	attackDelay 50
 	flashColor 0.6 0.6 1
 	continuousFlash 1
-	initialEffectOnly 1
 	flashSound0 "sound/weapons/lightning/lg_fire.wav"
 	projectile "p_lightning bolt"
 }
@@ -319,7 +319,6 @@ weapongroup "wp_railgun"
 	iconName "icons/iconw_railgun"
 	pickupAmmo 10
 	readySound "sound/weapons/railgun/rg_hum.wav"
-	firingSound "sound/weapons/railgun/rg_hum.wav"
 	weapon_primary "w_railgun"
 }
 
@@ -405,7 +404,6 @@ weapongroup "wp_bfg"
 	iconName "icons/iconw_bfg"
 	pickupAmmo 20
 	readySound "sound/weapons/bfg/bfg_hum.wav"
-	firingSound "sound/weapons/bfg/bfg_hum.wav"
 	weapon_primary "w_bfg"
 }
 
@@ -501,7 +499,7 @@ weapongroup "wp_nailgun"
 
 //
 // Prox Mine Launcher (Done)
-// ZTM: WONTFIX?: Stick mines to players.
+// WONTFIX?: Stick mines to players.
 //
 
 projectile "p_prox mine"

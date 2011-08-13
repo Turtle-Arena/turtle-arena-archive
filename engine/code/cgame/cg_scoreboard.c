@@ -184,22 +184,17 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 #endif
 
 	// highlight your position
-	if ( score->client == cg.cur_ps->clientNum
-#ifdef TA_SPLITVIEW
-		|| (cg.singleCamera && CG_LocalClient(score->client) != -1)
-#endif
-		)
-	{
+	if ( score->client == cg.snap->ps.clientNum ) {
 		float	hcolor[4];
 		int		rank;
 
 		localClient = qtrue;
 
-		if ( cg.cur_ps->persistant[PERS_TEAM] == TEAM_SPECTATOR 
+		if ( cg.snap->ps.persistant[PERS_TEAM] == TEAM_SPECTATOR 
 			|| cgs.gametype >= GT_TEAM ) {
 			rank = -1;
 		} else {
-			rank = cg.cur_ps->persistant[PERS_RANK] & ~RANK_TIED_FLAG;
+			rank = cg.snap->ps.persistant[PERS_RANK] & ~RANK_TIED_FLAG;
 		}
 		if ( rank == 0 ) {
 			hcolor[0] = 0;
@@ -254,7 +249,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 #endif
 
 	// add the "ready" marker for intermission exiting
-	if ( cg.cur_ps->stats[ STAT_CLIENTS_READY ] & ( 1 << score->client ) ) {
+	if ( cg.snap->ps.stats[ STAT_CLIENTS_READY ] & ( 1 << score->client ) ) {
 		CG_DrawBigStringColor( iconx, y, "READY", color );
 	}
 }
@@ -315,7 +310,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 		return qfalse;
 	}
 
-	if ( cgs.gametype == GT_SINGLE_PLAYER && cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
+	if ( cgs.gametype == GT_SINGLE_PLAYER && cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		cg.deferredPlayerLoading = 0;
 		return qfalse;
 	}
@@ -326,7 +321,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 	}
 
 #ifdef TA_SP
-	if ( cgs.gametype == GT_SINGLE_PLAYER && cg.cur_lc->predictedPlayerState.stats[STAT_HEALTH] <= 0
+	if ( cgs.gametype == GT_SINGLE_PLAYER && cg.predictedPlayerState.stats[STAT_HEALTH] <= 0
 		&& !cg.showScores )
 	{
 		cg.deferredPlayerLoading = 0;
@@ -334,8 +329,8 @@ qboolean CG_DrawOldScoreboard( void ) {
 	}
 #endif
 
-	if ( cg.showScores || cg.cur_lc->predictedPlayerState.pm_type == PM_DEAD ||
-		 cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
+	if ( cg.showScores || cg.predictedPlayerState.pm_type == PM_DEAD ||
+		 cg.predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		fade = 1.0;
 		fadeColor = colorWhite;
 	} else {
@@ -344,7 +339,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 		if ( !fadeColor ) {
 			// next time scoreboard comes up, don't print killer
 			cg.deferredPlayerLoading = 0;
-			cg.cur_lc->killerName[0] = 0;
+			cg.killerName[0] = 0;
 			return qfalse;
 		}
 		fade = *fadeColor;
@@ -352,11 +347,11 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 
 	// fragged by ... line
-	if ( cg.cur_lc->killerName[0] ) {
+	if ( cg.killerName[0] ) {
 #ifdef NOTRATEDM // frag to KO
-		s = va("Knocked out by %s", cg.cur_lc->killerName );
+		s = va("Knocked out by %s", cg.killerName );
 #else
-		s = va("Fragged by %s", cg.cur_lc->killerName );
+		s = va("Fragged by %s", cg.killerName );
 #endif
 		y = 40;
 		CG_DrawBigString( CENTER_X, y, s, fade );
@@ -364,15 +359,15 @@ qboolean CG_DrawOldScoreboard( void ) {
 
 	// current rank
 	if ( cgs.gametype < GT_TEAM) {
-		if (cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
+		if (cg.snap->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR
 #ifdef TA_SP
 			&& cgs.gametype != GT_SINGLE_PLAYER
 #endif
 			)
 		{
 			s = va("%s place with %i",
-				CG_PlaceString( cg.cur_ps->persistant[PERS_RANK] + 1 ),
-				cg.cur_ps->persistant[PERS_SCORE] );
+				CG_PlaceString( cg.snap->ps.persistant[PERS_RANK] + 1 ),
+				cg.snap->ps.persistant[PERS_SCORE] );
 			y = 60;
 			CG_DrawBigString( CENTER_X, y, s, fade );
 		}
@@ -455,7 +450,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 	if (!localClient) {
 		// draw local client at the bottom
 		for ( i = 0 ; i < cg.numScores ; i++ ) {
-			if ( cg.scores[i].client == cg.cur_ps->clientNum ) {
+			if ( cg.scores[i].client == cg.snap->ps.clientNum ) {
 				CG_DrawClientScore( y, &cg.scores[i], fadeColor, fade, lineHeight == SB_NORMAL_HEIGHT );
 				break;
 			}
@@ -509,6 +504,13 @@ void CG_DrawOldTourneyScoreboard( void ) {
 		trap_SendClientCommand( "score" );
 	}
 
+#ifndef IOQ3ZTM // IOQ3BUGFIX: Show text!
+	color[0] = 1;
+	color[1] = 1;
+	color[2] = 1;
+	color[3] = 1;
+#endif
+
 	// draw the dialog background
 	color[0] = color[1] = color[2] = 0;
 	color[3] = 1;
@@ -518,10 +520,12 @@ void CG_DrawOldTourneyScoreboard( void ) {
 	CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
 #endif
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Show text!
 	color[0] = 1;
 	color[1] = 1;
 	color[2] = 1;
 	color[3] = 1;
+#endif
 
 	// print the mesage of the day
 	s = CG_ConfigString( CS_MOTD );

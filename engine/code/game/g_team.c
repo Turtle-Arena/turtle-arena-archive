@@ -71,27 +71,6 @@ int OtherTeam(int team) {
 	return team;
 }
 
-#ifdef IOQ3ZTM // FLAG_MESSAGES
-const char *TeamName(int team)  {
-	if (team==TEAM_RED)
-		return "red";
-	else if (team==TEAM_BLUE)
-		return "blue";
-	else if (team==TEAM_SPECTATOR)
-		return "spector";
-	return "free";
-}
-
-const char *TeamNameInColor(int team)  {
-	if (team==TEAM_RED)
-		return S_COLOR_RED "red" S_COLOR_WHITE;
-	else if (team==TEAM_BLUE)
-		return S_COLOR_BLUE "blue" S_COLOR_WHITE;
-	else if (team==TEAM_SPECTATOR)
-		return "spector";
-	return "free";
-}
-#else
 const char *TeamName(int team)  {
 	if (team==TEAM_RED)
 		return "RED";
@@ -101,7 +80,16 @@ const char *TeamName(int team)  {
 		return "SPECTATOR";
 	return "FREE";
 }
-#endif
+
+const char *OtherTeamName(int team) {
+	if (team==TEAM_RED)
+		return "BLUE";
+	else if (team==TEAM_BLUE)
+		return "RED";
+	else if (team==TEAM_SPECTATOR)
+		return "SPECTATOR";
+	return "FREE";
+}
 
 const char *TeamColorString(int team) {
 	if (team==TEAM_RED)
@@ -114,18 +102,13 @@ const char *TeamColorString(int team) {
 }
 
 // NULL for everyone
-#ifdef TURTLEARENA
-void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... )
-#else
-static __attribute__ ((format (printf, 2, 3))) void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... )
-#endif
-{
+void QDECL PrintMsg( gentity_t *ent, const char *fmt, ... ) {
 	char		msg[1024];
 	va_list		argptr;
 	char		*p;
 	
 	va_start (argptr,fmt);
-	if (Q_vsnprintf (msg, sizeof(msg), fmt, argptr) >= sizeof(msg)) {
+	if (Q_vsnprintf (msg, sizeof(msg), fmt, argptr) > sizeof(msg)) {
 		G_Error ( "PrintMsg overrun" );
 	}
 	va_end (argptr);
@@ -342,9 +325,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 	gentity_t *ent;
 	int flag_pw, enemy_flag_pw;
 	int otherteam;
-#ifdef MISSIONPACK_HARVESTER
 	int tokens;
-#endif
 	gentity_t *flag, *carrier = NULL;
 	char *c;
 	vec3_t v1, v2;
@@ -373,8 +354,8 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 	} 
 
 	// did the attacker frag the flag carrier?
-#ifdef MISSIONPACK_HARVESTER
 	tokens = 0;
+#ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
 		tokens = targ->client->ps.generic1;
 	}
@@ -400,7 +381,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		return;
 	}
 
-#ifdef MISSIONPACK_HARVESTER
 	// did the attacker frag a head carrier? other->client->ps.generic1
 	if (tokens) {
 		attacker->client->pers.teamState.lastfraggedcarrier = level.time;
@@ -422,7 +402,6 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		}
 		return;
 	}
-#endif
 
 	if (targ->client->pers.teamState.lasthurtcarrier &&
 		level.time - targ->client->pers.teamState.lasthurtcarrier < CTF_CARRIER_DANGER_PROTECT_TIMEOUT &&
@@ -435,6 +414,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		targ->client->pers.teamState.lasthurtcarrier = 0;
 
 		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
+		team = attacker->client->sess.sessionTeam;
 		// add the sprite over the player's head
 #ifdef IOQ3ZTM
 		attacker->client->ps.eFlags &= ~EF_AWARD_BITS;
@@ -456,6 +436,7 @@ void Team_FragBonuses(gentity_t *targ, gentity_t *inflictor, gentity_t *attacker
 		targ->client->pers.teamState.lasthurtcarrier = 0;
 
 		attacker->client->ps.persistant[PERS_DEFEND_COUNT]++;
+		team = attacker->client->sess.sessionTeam;
 		// add the sprite over the player's head
 #ifdef IOQ3ZTM
 		attacker->client->ps.eFlags &= ~EF_AWARD_BITS;
@@ -733,18 +714,10 @@ void Team_CaptureFlagSound( gentity_t *ent, int team ) {
 void Team_ReturnFlag( int team ) {
 	Team_ReturnFlagSound(Team_ResetFlag(team), team);
 	if( team == TEAM_FREE ) {
-#ifdef IOQ3ZTM // FLAG_MESSAGES
-		PrintMsg(NULL, "The flag has returned to base.\n" );
-#else
 		PrintMsg(NULL, "The flag has returned!\n" );
-#endif
 	}
 	else {
-#ifdef IOQ3ZTM // FLAG_MESSAGES
-		PrintMsg(NULL, "The %s flag has returned to base.\n", TeamNameInColor(team));
-#else
 		PrintMsg(NULL, "The %s flag has returned!\n", TeamName(team));
-#endif
 	}
 }
 
@@ -770,9 +743,6 @@ Flags are unique in that if they are dropped, the base flag must be respawned wh
 ==============
 */
 void Team_DroppedFlagThink(gentity_t *ent) {
-#ifdef IOQ3ZTM
-	Team_FreeEntity(ent);
-#else
 	int		team = TEAM_FREE;
 
 	if( ent->item->giTag == PW_REDFLAG ) {
@@ -787,7 +757,6 @@ void Team_DroppedFlagThink(gentity_t *ent) {
 
 	Team_ReturnFlagSound( Team_ResetFlag( team ), team );
 	// Reset Flag will delete this entity
-#endif
 }
 
 
@@ -801,9 +770,6 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 	gentity_t	*player;
 	gclient_t	*cl = other->client;
 	int			enemy_flag;
-#ifdef IOQ3ZTM // FLAG_MESSAGES
-	int otherTeam;
-#endif
 
 #ifdef MISSIONPACK
 	if( g_gametype.integer == GT_1FCTF ) {
@@ -818,14 +784,9 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 	}
 
 	if ( ent->flags & FL_DROPPED_ITEM ) {
-		// hey, it's not home.  return it by teleporting it back
-#ifdef IOQ3ZTM // FLAG_MESSAGES
-		PrintMsg( NULL, "%s" S_COLOR_WHITE " returned the %s%s" S_COLOR_WHITE " flag to base.\n", 
-			cl->pers.netname, TeamColorString(team), TeamName(team));
-#else
+		// hey, its not home.  return it by teleporting it back
 		PrintMsg( NULL, "%s" S_COLOR_WHITE " returned the %s flag!\n", 
 			cl->pers.netname, TeamName(team));
-#endif
 		AddScore(other, ent->r.currentOrigin, CTF_RECOVERY_BONUS);
 		other->client->pers.teamState.flagrecovery++;
 		other->client->pers.teamState.lastreturnedflag = level.time;
@@ -843,23 +804,11 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 		return 0; // We don't have the flag
 #ifdef MISSIONPACK
 	if( g_gametype.integer == GT_1FCTF ) {
-#ifdef IOQ3ZTM // FLAG_MESSAGES
-		PrintMsg( NULL, "[skipnotify]%s" S_COLOR_WHITE " captured the flag.\n", cl->pers.netname );
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE "\ncaptured the flag.\n\"", cl->pers.netname) );
-#else
 		PrintMsg( NULL, "%s" S_COLOR_WHITE " captured the flag!\n", cl->pers.netname );
-#endif
 	}
 	else {
 #endif
-#ifdef IOQ3ZTM // FLAG_MESSAGES
-		otherTeam = OtherTeam(team);
-
-		PrintMsg( NULL, "[skipnotify]%s" S_COLOR_WHITE " captured the %s flag.\n", cl->pers.netname, TeamNameInColor(otherTeam));
-		trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE "\ncaptured the %s flag.\n\"", cl->pers.netname, TeamNameInColor(otherTeam)) );
-#else
 	PrintMsg( NULL, "%s" S_COLOR_WHITE " captured the %s flag!\n", cl->pers.netname, TeamName(OtherTeam(team)));
-#endif
 #ifdef MISSIONPACK
 	}
 #endif
@@ -926,8 +875,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 				player->client->ps.eFlags |= EF_AWARD_ASSIST;
 				player->client->rewardTime = level.time + REWARD_SPRITE_TIME;
 
-			} 
-			if (player->client->pers.teamState.lastfraggedcarrier + 
+			} else if (player->client->pers.teamState.lastfraggedcarrier + 
 				CTF_FRAG_CARRIER_ASSIST_TIMEOUT > level.time) {
 				AddScore(player, ent->r.currentOrigin, CTF_FRAG_CARRIER_ASSIST_BONUS);
 				other->client->pers.teamState.assists++;
@@ -955,11 +903,7 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 
 #ifdef MISSIONPACK
 	if( g_gametype.integer == GT_1FCTF ) {
-#ifdef IOQ3ZTM // FLAG_MESSAGES
-		PrintMsg (NULL, "%s" S_COLOR_WHITE " picked up the flag!\n", other->client->pers.netname );
-#else
 		PrintMsg (NULL, "%s" S_COLOR_WHITE " got the flag!\n", other->client->pers.netname );
-#endif
 
 		cl->ps.powerups[PW_NEUTRALFLAG] = INT_MAX; // flags never expire
 
@@ -972,13 +916,8 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 	}
 	else{
 #endif
-#ifdef IOQ3ZTM // FLAG_MESSAGES
-		PrintMsg (NULL, "%s" S_COLOR_WHITE " picked up the %s flag!\n",
-			other->client->pers.netname, TeamNameInColor(team));
-#else
 		PrintMsg (NULL, "%s" S_COLOR_WHITE " got the %s flag!\n",
 			other->client->pers.netname, TeamName(team));
-#endif
 
 		if (team == TEAM_RED)
 			cl->ps.powerups[PW_REDFLAG] = INT_MAX; // flags never expire
@@ -1304,7 +1243,7 @@ void TeamplayInfoMessage( gentity_t *ent ) {
 				player->client->ps.weapon, player->s.powerups);
 #endif
 			j = strlen(entry);
-			if (stringlength + j >= sizeof(string))
+			if (stringlength + j > sizeof(string))
 				break;
 			strcpy (string + stringlength, entry);
 			stringlength += j;
@@ -1451,11 +1390,6 @@ static void ObeliskDie( gentity_t *self, gentity_t *inflictor, gentity_t *attack
 
 	teamgame.redObeliskAttackedTime = 0;
 	teamgame.blueObeliskAttackedTime = 0;
-
-#ifdef IOQ3ZTM
-	PrintMsg( NULL, "[skipnotify]%s" S_COLOR_WHITE " destroyed the %s obelisk.\n", attacker->client->pers.netname, TeamNameInColor(OtherTeam(attacker->client->sess.sessionTeam)));
-	trap_SendServerCommand( -1, va("cp \"%s" S_COLOR_WHITE "\ndestroyed the %s obelisk.\n\"", attacker->client->pers.netname, TeamNameInColor(OtherTeam(attacker->client->sess.sessionTeam))));
-#endif
 }
 
 

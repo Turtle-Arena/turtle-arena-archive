@@ -124,7 +124,7 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 }
 #endif
 
-#ifdef TURTLEARENA // HOLD_SHURIKEN
+#ifdef TA_HOLDABLE // HOLD_SHURIKEN
 /*
 ================
 G_ThrowShuriken
@@ -163,6 +163,19 @@ void G_StartMeleeAttack(gentity_t *ent)
 	{
 		return;
 	}
+
+	// Must press the button each time to attack...
+#ifdef IOQ3ZTM
+	if (client->ps.pm_flags & PMF_FIRE_HELD) {
+		return;
+	}
+	client->ps.pm_flags |= PMF_FIRE_HELD;
+#else
+	if (client->fireHeld) {
+		return;
+	}
+	client->fireHeld = qtrue;
+#endif
 
 	// Next attack animation
 	client->ps.meleeAttack++;
@@ -420,12 +433,12 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		}
 #ifdef TA_GAME_MODELS // TA_WEAPSYS
 		// put weapon on torso
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_primary"))
 #endif
 		{
-#if !defined TURTLEARENA || defined TA_SUPPORTQ3 // PLAYERS
+#if !defined TA_PLAYERS || defined TA_SUPPORTQ3
 			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 				torsoOrientation, ent->client->pers.torsoModel, "tag_weapon"))
 #endif
@@ -450,12 +463,12 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 		}
 #ifdef TA_GAME_MODELS // TA_WEAPSYS
 		// put weapon on torso
-#ifdef TURTLEARENA // PLAYERS
+#ifdef TA_PLAYERS
 		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_secondary"))
 #endif
 		{
-#if !defined TURTLEARENA || defined TA_SUPPORTQ3 // PLAYERS
+#if !defined TA_PLAYERS || defined TA_SUPPORTQ3
 			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
 				torsoOrientation, ent->client->pers.torsoModel, "tag_flag"))
 #endif
@@ -552,14 +565,15 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 			float	mass;
 			int knockback;
 
+			ent->client->ps.meleeTime /= 2;
+			if (ent->client->ps.meleeTime < 1)
+				ent->client->ps.meleeTime = 1;
 			knockback = 5+damage*1.5f;
 
 			mass = 200;
 
 			VectorScale (tr.plane.normal, g_knockback.value * (float)knockback / mass, kvel);
 			VectorAdd (ent->client->ps.velocity, kvel, ent->client->ps.velocity);
-
-			ent->client->ps.meleeDelay = 1000;
 
 			// set the timer so that the other client can't cancel
 			// out the movement immediately
@@ -573,6 +587,8 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 				if ( t > 200 ) {
 					t = 200;
 				}
+
+				ent->client->ps.meleeDelay = t;
 
 				ent->client->ps.pm_time = t;
 				ent->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
@@ -757,10 +773,6 @@ qboolean CheckGauntletAttack( gentity_t *ent ) {
 		return qfalse;
 	}
 
-	if ( ent->client->noclip ) {
-		return qfalse;
-	}
-
 	traceEnt = &g_entities[ tr.entityNum ];
 
 	// send blood impact
@@ -819,9 +831,9 @@ void SnapVectorTowards( vec3_t v, vec3_t to ) {
 
 	for ( i = 0 ; i < 3 ; i++ ) {
 		if ( to[i] <= v[i] ) {
-			v[i] = floor(v[i]);
+			v[i] = (int)v[i];
 		} else {
-			v[i] = ceil(v[i]);
+			v[i] = (int)v[i] + 1;
 		}
 	}
 }
@@ -1011,6 +1023,9 @@ void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 	float		r, u;
 	vec3_t		end;
 	vec3_t		forward, right, up;
+#ifndef IOQ3ZTM // unused
+	int			oldScore;
+#endif
 	qboolean	hitClient = qfalse;
 
 	// derive the right and up vectors from the forward vector, because
@@ -1018,6 +1033,10 @@ void ShotgunPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 	VectorNormalize2( origin2, forward );
 	PerpendicularVector( right, forward );
 	CrossProduct( forward, right, up );
+
+#ifndef IOQ3ZTM // unused
+	oldScore = ent->client->ps.persistant[PERS_SCORE];
+#endif
 
 	// generate the "random" spread pattern
 	for ( i = 0 ; i < DEFAULT_SHOTGUN_COUNT ; i++ ) {
@@ -1324,10 +1343,8 @@ void G_GrapplingHookReturnThink (gentity_t *ent)
 		return;
 	}
 
-	if (ent->parent->client) {
-		// Pervent player from firing, it doesn't effect game's grappling hook but does cgame does fire effects.
-		ent->parent->client->ps.weaponTime = HOOK_RETURN_THINK_TIME + 50;
-	}
+	// Pervent player from firing, it doesn't effect game's grappling hook but does cgame does fire effects.
+	ent->parent->client->ps.weaponTime = HOOK_RETURN_THINK_TIME + 50;
 
 	// for exact trajectory calculation, set current point to base.
 	VectorCopy(ent->r.currentOrigin, ent->s.pos.trBase);
@@ -1769,7 +1786,7 @@ void FireWeapon( gentity_t *ent ) {
 }
 
 
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 
 /*
 ===============

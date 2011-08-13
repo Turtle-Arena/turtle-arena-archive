@@ -45,10 +45,8 @@ void	trap_Printf( const char *fmt ) {
 	syscall( G_PRINT, fmt );
 }
 
-void trap_Error(const char *fmt)
-{
-	syscall(G_ERROR, fmt);
-	exit(1);
+void	trap_Error( const char *fmt ) {
+	syscall( G_ERROR, fmt );
 }
 
 int		trap_Milliseconds( void ) {

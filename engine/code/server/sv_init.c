@@ -112,7 +112,7 @@ void SV_SetConfigstring (int index, const char *val) {
 	client_t	*client;
 
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
-		Com_Error (ERR_DROP, "SV_SetConfigstring: bad index %i", index);
+		Com_Error (ERR_DROP, "SV_SetConfigstring: bad index %i\n", index);
 	}
 
 	if ( !val ) {
@@ -160,7 +160,7 @@ void SV_GetConfigstring( int index, char *buffer, int bufferSize ) {
 		Com_Error( ERR_DROP, "SV_GetConfigstring: bufferSize == %i", bufferSize );
 	}
 	if ( index < 0 || index >= MAX_CONFIGSTRINGS ) {
-		Com_Error (ERR_DROP, "SV_GetConfigstring: bad index %i", index);
+		Com_Error (ERR_DROP, "SV_GetConfigstring: bad index %i\n", index);
 	}
 	if ( !sv.configstrings[index] ) {
 		buffer[0] = 0;
@@ -179,7 +179,7 @@ SV_SetUserinfo
 */
 void SV_SetUserinfo( int index, const char *val ) {
 	if ( index < 0 || index >= sv_maxclients->integer ) {
-		Com_Error (ERR_DROP, "SV_SetUserinfo: bad index %i", index);
+		Com_Error (ERR_DROP, "SV_SetUserinfo: bad index %i\n", index);
 	}
 
 	if ( !val ) {
@@ -203,7 +203,7 @@ void SV_GetUserinfo( int index, char *buffer, int bufferSize ) {
 		Com_Error( ERR_DROP, "SV_GetUserinfo: bufferSize == %i", bufferSize );
 	}
 	if ( index < 0 || index >= sv_maxclients->integer ) {
-		Com_Error (ERR_DROP, "SV_GetUserinfo: bad index %i", index);
+		Com_Error (ERR_DROP, "SV_GetUserinfo: bad index %i\n", index);
 	}
 	Q_strncpyz( buffer, svs.clients[ index ].userinfo, bufferSize );
 }
@@ -414,7 +414,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	SV_ShutdownGameProgs();
 
 #ifdef IOQ3ZTM // LESS_VERBOSE
-	Com_Printf ("Loading level %s...\n", server);
+	Com_Printf ("Loading map %s...\n", server);
 	Com_DPrintf ("------ Server Initialization ------\n");
 	Com_DPrintf ("Server: %s\n",server);
 #else
@@ -427,7 +427,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	CL_MapLoading();
 
 	// make sure all the client stuff is unloaded
-	CL_ShutdownAll(qfalse);
+	CL_ShutdownAll();
 
 	// clear the whole hunk because we're (re)loading the server
 	Hunk_Clear();
@@ -573,7 +573,7 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 					client->gentity = ent;
 
 					client->deltaMessage = -1;
-					client->lastSnapshotTime = 0;	// generate a snapshot immediately
+					client->nextSnapshotTime = svs.time;	// generate a snapshot immediately
 
 					VM_Call( gvm, GAME_CLIENT_BEGIN, i );
 				}
@@ -599,7 +599,8 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 
 #if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 	// Force sv_pure to off.
-	if (sv_pure->integer && !com_fs_pure->integer) {
+	if (sv_pure->integer && !com_fs_pure->integer)
+	{
 		Cvar_Set( "sv_pure", "0" );
 	}
 #endif
@@ -694,10 +695,7 @@ SV_Init
 Only called at main exe startup, not for each game
 ===============
 */
-void SV_Init (void)
-{
-	int index;
-
+void SV_Init (void) {
 	SV_AddOperatorCommands ();
 
 	// serverinfo vars
@@ -710,18 +708,14 @@ void SV_Init (void)
 	Cvar_Get ("timelimit", "0", CVAR_SERVERINFO);
 	sv_gametype = Cvar_Get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_LATCH );
 	Cvar_Get ("sv_keywords", "", CVAR_SERVERINFO);
+	Cvar_Get ("protocol", va("%i", PROTOCOL_VERSION), CVAR_SERVERINFO | CVAR_ROM);
 	sv_mapname = Cvar_Get ("mapname", "nomap", CVAR_SERVERINFO | CVAR_ROM);
 	sv_privateClients = Cvar_Get ("sv_privateClients", "0", CVAR_SERVERINFO);
-#ifdef IOQ3ZTM // ZTM: Nicer looking than 'noname'
-	sv_hostname = Cvar_Get ("sv_hostname", PRODUCT_NAME " server", CVAR_SERVERINFO | CVAR_ARCHIVE );
-#else
 	sv_hostname = Cvar_Get ("sv_hostname", "noname", CVAR_SERVERINFO | CVAR_ARCHIVE );
-#endif
 	sv_maxclients = Cvar_Get ("sv_maxclients", "8", CVAR_SERVERINFO | CVAR_LATCH);
 
 	sv_minRate = Cvar_Get ("sv_minRate", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_maxRate = Cvar_Get ("sv_maxRate", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
-	sv_dlRate = Cvar_Get("sv_dlRate", "100", CVAR_ARCHIVE | CVAR_SERVERINFO);
 	sv_minPing = Cvar_Get ("sv_minPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_maxPing = Cvar_Get ("sv_maxPing", "0", CVAR_ARCHIVE | CVAR_SERVERINFO );
 	sv_floodProtect = Cvar_Get ("sv_floodProtect", "1", CVAR_ARCHIVE | CVAR_SERVERINFO );
@@ -730,14 +724,16 @@ void SV_Init (void)
 	Cvar_Get ("sv_cheats", "1", CVAR_SYSTEMINFO | CVAR_ROM );
 	sv_serverid = Cvar_Get ("sv_serverid", "0", CVAR_SYSTEMINFO | CVAR_ROM );
 #if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-	if (com_fs_pure && !com_fs_pure->integer) {
+	if (com_fs_pure && !com_fs_pure->integer)
+	{
 		sv_pure = Cvar_Get ("sv_pure", "0", CVAR_SYSTEMINFO | CVAR_ROM );
-	} else
+	}
+	else
 #endif
 	sv_pure = Cvar_Get ("sv_pure", "1", CVAR_SYSTEMINFO );
 #ifdef USE_VOIP
-	sv_voip = Cvar_Get("sv_voip", "1", CVAR_SYSTEMINFO | CVAR_LATCH);
-	Cvar_CheckRange(sv_voip, 0, 1, qtrue);
+	sv_voip = Cvar_Get ("sv_voip", "1", CVAR_SYSTEMINFO | CVAR_LATCH);
+	Cvar_CheckRange( sv_voip, 0, 1, qtrue );
 #endif
 	Cvar_Get ("sv_paks", "", CVAR_SYSTEMINFO | CVAR_ROM );
 	Cvar_Get ("sv_pakNames", "", CVAR_SYSTEMINFO | CVAR_ROM );
@@ -754,25 +750,19 @@ void SV_Init (void)
 
 	sv_allowDownload = Cvar_Get ("sv_allowDownload", "0", CVAR_SERVERINFO);
 	Cvar_Get ("sv_dlURL", "", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	
-	sv_master[0] = Cvar_Get("sv_master1", MASTER_SERVER_NAME, 0);
-	for(index = 1; index < MAX_MASTER_SERVERS; index++)
-		sv_master[index] = Cvar_Get(va("sv_master%d", index + 1), "", CVAR_ARCHIVE);
-
+	sv_master[0] = Cvar_Get ("sv_master1", MASTER_SERVER_NAME, 0 );
+	sv_master[1] = Cvar_Get ("sv_master2", "", CVAR_ARCHIVE );
+	sv_master[2] = Cvar_Get ("sv_master3", "", CVAR_ARCHIVE );
+	sv_master[3] = Cvar_Get ("sv_master4", "", CVAR_ARCHIVE );
+	sv_master[4] = Cvar_Get ("sv_master5", "", CVAR_ARCHIVE );
 	sv_reconnectlimit = Cvar_Get ("sv_reconnectlimit", "3", 0);
 	sv_showloss = Cvar_Get ("sv_showloss", "0", 0);
 	sv_padPackets = Cvar_Get ("sv_padPackets", "0", 0);
 	sv_killserver = Cvar_Get ("sv_killserver", "0", 0);
 	sv_mapChecksum = Cvar_Get ("sv_mapChecksum", "", CVAR_ROM);
 	sv_lanForceRate = Cvar_Get ("sv_lanForceRate", "1", CVAR_ARCHIVE );
-#ifndef STANDALONE
 	sv_strictAuth = Cvar_Get ("sv_strictAuth", "1", CVAR_ARCHIVE );
-#endif
 	sv_banFile = Cvar_Get("sv_banFile", "serverbans.dat", CVAR_ARCHIVE);
-
-#ifdef IOQ3ZTM // SV_PUBLIC
-	sv_public = Cvar_Get("sv_public", (com_dedicated->integer == 2) ? "1" : "0", 0 );
-#endif
 
 	// initialize bot cvars so they are listed and can be set before loading the botlib
 	SV_BotInitCvars();
@@ -809,7 +799,7 @@ void SV_FinalMessage( char *message ) {
 					SV_SendServerCommand( cl, "disconnect \"%s\"", message );
 				}
 				// force a snapshot to be sent
-				cl->lastSnapshotTime = 0;
+				cl->nextSnapshotTime = -1;
 				SV_SendClientSnapshot( cl );
 			}
 		}
@@ -846,22 +836,13 @@ void SV_Shutdown( char *finalmsg ) {
 	SV_ClearServer();
 
 	// free server static data
-	if(svs.clients)
-	{
-		int index;
-		
-		for(index = 0; index < sv_maxclients->integer; index++)
-			SV_FreeClient(&svs.clients[index]);
-		
-		Z_Free(svs.clients);
+	if ( svs.clients ) {
+		Z_Free( svs.clients );
 	}
 	Com_Memset( &svs, 0, sizeof( svs ) );
 
 	Cvar_Set( "sv_running", "0" );
 	Cvar_Set("ui_singlePlayerActive", "0");
-#ifdef IOQ3ZTM // SV_PUBLIC
-	Cvar_Set("sv_public", "0");
-#endif
 
 	Com_Printf( "---------------------------\n" );
 

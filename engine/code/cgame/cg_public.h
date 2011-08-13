@@ -44,13 +44,7 @@ typedef struct {
 
 	byte			areamask[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
 
-#ifdef TA_SPLITVIEW
-	int				numPSs;
-	playerState_t	pss[MAX_SPLITVIEW];		// complete information about the current player at this time
-	int				lcIndex[MAX_SPLITVIEW];		// Local Client Indexes
-#else
 	playerState_t	ps;						// complete information about the current player at this time
-#endif
 
 	int				numEntities;			// all of the entities that need to be presented
 	entityState_t	entities[MAX_ENTITIES_IN_SNAPSHOT];	// at the time of this snapshot
@@ -173,7 +167,7 @@ typedef enum {
 	// 1.32
 	CG_FS_SEEK,
 
-#if 1 // #ifdef TA_WEAPSYS
+#if 1 // #if defined CAMERASCRIPT || defined TA_WEAPSYS
 	CG_LOADCAMERA,
 	CG_STARTCAMERA,
 	CG_GETCAMERAINFO,
@@ -187,6 +181,10 @@ typedef enum {
 
 //#ifdef TA_WEAPSYS
 	CG_FS_GETFILELIST,
+//#endif
+
+//#ifdef WOLFET
+	CG_R_ADDPOLYBUFFERTOSCENE,
 //#endif
 
 	CG_MEMSET = 100,

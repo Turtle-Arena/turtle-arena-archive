@@ -47,12 +47,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../qcommon/q_shared.h"
 #include "../qcommon/qcommon.h"
 
-#ifdef __wii__
-void Sys_Wait(const char *message);
-void Sys_BeginFrame(void);
-void Sys_EndFrame(void);
-#endif
-
 static char binaryPath[ MAX_OSPATH ] = { 0 };
 static char installPath[ MAX_OSPATH ] = { 0 };
 
@@ -168,16 +162,17 @@ qboolean Sys_WritePIDFile( void )
 		char  pidBuffer[ 64 ] = { 0 };
 		int   pid;
 
-		pid = fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f );
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Shut up warning
+		if (fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f ) != sizeof( pidBuffer ) - 1) {
+			// ZTM: Read error, but we don't care?
+		}
+#else
+		fread( pidBuffer, sizeof( char ), sizeof( pidBuffer ) - 1, f );
+#endif
 		fclose( f );
 
-		if(pid > 0)
-		{
-			pid = atoi( pidBuffer );
-			if( !Sys_PIDIsRunning( pid ) )
-				stale = qtrue;
-		}
-		else
+		pid = atoi( pidBuffer );
+		if( !Sys_PIDIsRunning( pid ) )
 			stale = qtrue;
 	}
 
@@ -199,7 +194,7 @@ Sys_Exit
 Single exit point (regular exit or in case of error)
 =================
 */
-static __attribute__ ((noreturn)) void Sys_Exit( int exitCode )
+static void Sys_Exit( int exitCode )
 {
 	CON_Shutdown( );
 
@@ -212,13 +207,6 @@ static __attribute__ ((noreturn)) void Sys_Exit( int exitCode )
 		// Normal exit
 		remove( Sys_PIDFileName( ) );
 	}
-#ifdef __wii__
-	else {
-		Sys_Wait("Sys_Exit: abnormal exit!");
-	}
-#endif
-
-	Sys_PlatformExit( );
 
 	exit( exitCode );
 }
@@ -362,18 +350,18 @@ void Sys_Error( const char *error, ... )
 	Q_vsnprintf (string, sizeof(string), error, argptr);
 	va_end (argptr);
 
+	CL_Shutdown( string );
 	Sys_ErrorDialog( string );
 
 	Sys_Exit( 3 );
 }
 
-#if 0
 /*
 =================
 Sys_Warn
 =================
 */
-static __attribute__ ((format (printf, 1, 2))) void Sys_Warn( char *warning, ... )
+void Sys_Warn( char *warning, ... )
 {
 	va_list argptr;
 	char    string[1024];
@@ -384,7 +372,6 @@ static __attribute__ ((format (printf, 1, 2))) void Sys_Warn( char *warning, ...
 
 	CON_Print( va( "Warning: %s", string ) );
 }
-#endif
 
 /*
 ============
@@ -403,7 +390,6 @@ int Sys_FileTime( char *path )
 	return buf.st_mtime;
 }
 
-#ifndef NO_NATIVE_SUPPORT
 /*
 =================
 Sys_UnloadDll
@@ -422,81 +408,68 @@ void Sys_UnloadDll( void *dllHandle )
 
 /*
 =================
-Sys_LoadDll
-
-First try to load library name from system library path,
-from executable path, then fs_basepath.
+Sys_TryLibraryLoad
 =================
 */
-
-void *Sys_LoadDll(const char *name, qboolean useSystemLib)
+static void* Sys_TryLibraryLoad(const char* base, const char* gamedir, const char* fname, char* fqpath )
 {
-	void *dllhandle;
-	
-	if(useSystemLib)
-		Com_Printf("Trying to load \"%s\"...\n", name);
-	
-	if(!useSystemLib || !(dllhandle = Sys_LoadLibrary(name)))
-	{
-		const char *topDir;
-		char libPath[MAX_OSPATH];
+	void* libHandle;
+	char* fn;
 
-		topDir = Sys_BinaryPath();
+	*fqpath = 0;
 
-		if(!*topDir)
-			topDir = ".";
+	fn = FS_BuildOSPath( base, gamedir, fname );
+	Com_Printf( "Sys_LoadDll(%s)... \n", fn );
 
-		Com_Printf("Trying to load \"%s\" from \"%s\"...\n", name, topDir);
-		Com_sprintf(libPath, sizeof(libPath), "%s%c%s", topDir, PATH_SEP, name);
+	libHandle = Sys_LoadLibrary(fn);
 
-		if(!(dllhandle = Sys_LoadLibrary(libPath)))
-		{
-			const char *basePath = Cvar_VariableString("fs_basepath");
-			
-			if(!basePath || !*basePath)
-				basePath = ".";
-			
-			if(FS_FilenameCompare(topDir, basePath))
-			{
-				Com_Printf("Trying to load \"%s\" from \"%s\"...\n", name, basePath);
-				Com_sprintf(libPath, sizeof(libPath), "%s%c%s", basePath, PATH_SEP, name);
-				dllhandle = Sys_LoadLibrary(libPath);
-			}
-			
-			if(!dllhandle)
-				Com_Printf("Loading \"%s\" failed\n", name);
-		}
+	if(!libHandle) {
+		Com_Printf( "Sys_LoadDll(%s) failed:\n\"%s\"\n", fn, Sys_LibraryError() );
+		return NULL;
 	}
-	
-	return dllhandle;
+
+	Com_Printf ( "Sys_LoadDll(%s): succeeded ...\n", fn );
+	Q_strncpyz ( fqpath , fn , MAX_QPATH ) ;
+
+	return libHandle;
 }
 
 /*
 =================
-Sys_LoadGameDll
+Sys_LoadDll
 
 Used to load a development dll instead of a virtual machine
+#1 look in fs_homepath
+#2 look in fs_basepath
 =================
 */
-void *Sys_LoadGameDll(const char *name,
-	intptr_t (QDECL **entryPoint)(int, ...),
-	intptr_t (*systemcalls)(intptr_t, ...))
+void *Sys_LoadDll( const char *name, char *fqpath ,
+	intptr_t (**entryPoint)(int, ...),
+	intptr_t (*systemcalls)(intptr_t, ...) )
 {
-	void *libHandle;
-	void (*dllEntry)(intptr_t (*syscallptr)(intptr_t, ...));
+	void  *libHandle;
+	void  (*dllEntry)( intptr_t (*syscallptr)(intptr_t, ...) );
+	char  fname[MAX_OSPATH];
+	char  *basepath;
+	char  *homepath;
+	char  *gamedir;
 
-	assert(name);
+	assert( name );
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	Com_DPrintf( "Loading DLL file: %s\n", name);
-#else
-	Com_Printf( "Loading DLL file: %s\n", name);
-#endif
-	libHandle = Sys_LoadLibrary(name);
+	Q_snprintf (fname, sizeof(fname), "%s" ARCH_STRING DLL_EXT, name);
 
-	if(!libHandle)
-	{
-		Com_Printf("Sys_LoadGameDll(%s) failed:\n\"%s\"\n", name, Sys_LibraryError());
+	// TODO: use fs_searchpaths from files.c
+	basepath = Cvar_VariableString( "fs_basepath" );
+	homepath = Cvar_VariableString( "fs_homepath" );
+	gamedir = Cvar_VariableString( "fs_game" );
+
+	libHandle = Sys_TryLibraryLoad(homepath, gamedir, fname, fqpath);
+
+	if(!libHandle && basepath)
+		libHandle = Sys_TryLibraryLoad(basepath, gamedir, fname, fqpath);
+
+	if(!libHandle) {
+		Com_Printf ( "Sys_LoadDll(%s) failed to load library\n", name );
 		return NULL;
 	}
 
@@ -505,22 +478,17 @@ void *Sys_LoadGameDll(const char *name,
 
 	if ( !*entryPoint || !dllEntry )
 	{
-		Com_Printf ( "Sys_LoadGameDll(%s) failed to find vmMain function:\n\"%s\" !\n", name, Sys_LibraryError( ) );
+		Com_Printf ( "Sys_LoadDll(%s) failed to find vmMain function:\n\"%s\" !\n", name, Sys_LibraryError( ) );
 		Sys_UnloadLibrary(libHandle);
 
 		return NULL;
 	}
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	Com_DPrintf ( "Sys_LoadGameDll(%s) found vmMain function at %p\n", name, *entryPoint );
-#else
-	Com_Printf ( "Sys_LoadGameDll(%s) found vmMain function at %p\n", name, *entryPoint );
-#endif
+	Com_Printf ( "Sys_LoadDll(%s) found vmMain function at %p\n", name, *entryPoint );
 	dllEntry( systemcalls );
 
 	return libHandle;
 }
-#endif
 
 /*
 =================
@@ -571,9 +539,9 @@ void Sys_SigHandler( int signal )
 	{
 		signalcaught = qtrue;
 #ifndef DEDICATED
-		CL_Shutdown(va("Received signal %d", signal), qtrue, qtrue);
+		CL_Shutdown( va( "Received signal %d", signal ) );
 #endif
-		SV_Shutdown(va("Received signal %d", signal) );
+		SV_Shutdown( va( "Received signal %d", signal ) );
 	}
 
 	if( signal == SIGTERM || signal == SIGINT )
@@ -646,11 +614,7 @@ int main( int argc, char **argv )
 	Com_Init( commandLine );
 	NET_Init( );
 
-#ifdef __wii__
-	wiiCON_Init( );
-#else
 	CON_Init( );
-#endif
 
 	signal( SIGILL, Sys_SigHandler );
 	signal( SIGFPE, Sys_SigHandler );
@@ -658,20 +622,10 @@ int main( int argc, char **argv )
 	signal( SIGTERM, Sys_SigHandler );
 	signal( SIGINT, Sys_SigHandler );
 
-#ifdef __wii__
-	Sys_Wait("Ready to enter main loop");
-#endif
-
 	while( 1 )
 	{
-#ifdef __wii__
-		Sys_BeginFrame( );
-#endif
 		IN_Frame( );
 		Com_Frame( );
-#ifdef __wii__
-		Sys_EndFrame( );
-#endif
 	}
 
 	return 0;

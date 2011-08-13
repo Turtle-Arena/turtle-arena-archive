@@ -42,6 +42,7 @@ void UpdateTournamentInfo( void ) {
 	gentity_t	*player;
 	int			playerClientNum;
 	int			n, accuracy, perfect,	msglen;
+	int			buflen;
 #ifdef MISSIONPACK
   int score1, score2;
 	qboolean won;
@@ -144,8 +145,8 @@ void UpdateTournamentInfo( void ) {
 	for( i = 0; i < level.numNonSpectatorClients; i++ ) {
 		n = level.sortedClients[i];
 		Com_sprintf( buf, sizeof(buf), " %i %i %i", n, level.clients[n].ps.persistant[PERS_RANK], level.clients[n].ps.persistant[PERS_SCORE] );
-		msglen += strlen( buf );
-		if( msglen >= sizeof(msg) ) {
+		buflen = strlen( buf );
+		if( msglen + buflen + 1 >= sizeof(msg) ) {
 			break;
 		}
 		strcat( msg, buf );
@@ -181,7 +182,7 @@ static gentity_t *SpawnModelOnVictoryPad( gentity_t *pad, vec3_t offset, gentity
 	body->s.groundEntityNum = ENTITYNUM_WORLD;
 #ifdef TA_WEAPSYS
 	body->s.legsAnim = BG_LegsStandForPlayerState(&ent->client->ps, &ent->client->pers.playercfg);
-	body->s.torsoAnim = BG_TorsoStandForPlayerState(&ent->client->ps, &ent->client->pers.playercfg);
+	body->s.torsoAnim = BG_TorsoStandForPlayerState(&ent->client->ps);
 	if( body->s.weapon == WP_NONE || body->s.weapon == WP_DEFAULT) {
 		body->s.weapon = ent->client->ps.stats[STAT_DEFAULTWEAPON];
 	}
@@ -230,7 +231,7 @@ static void CelebrateStop( gentity_t *player ) {
 	int		anim;
 
 #ifdef TA_WEAPSYS
-	anim = BG_TorsoStandForPlayerState(&player->client->ps, &player->client->pers.playercfg);
+	anim = BG_TorsoStandForPlayerState(&player->client->ps);
 #else
 	if( player->s.weapon == WP_GAUNTLET) {
 		anim = TORSO_STAND2;

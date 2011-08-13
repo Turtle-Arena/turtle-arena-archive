@@ -144,7 +144,7 @@ void R_IssueRenderCommands( qboolean runPerformanceCounters ) {
 	}
 
 	// at this point, the back end thread is idle, so it is ok
-	// to look at its performance counters
+	// to look at it's performance counters
 	if ( runPerformanceCounters ) {
 		R_PerformanceCounters();
 	}
@@ -195,7 +195,6 @@ void *R_GetCommandBuffer( int bytes ) {
 	renderCommandList_t	*cmdList;
 
 	cmdList = &backEndData[tr.smpFrame]->commands;
-	bytes = PAD(bytes, sizeof(void *));
 
 	// always leave room for the end of list command
 	if ( cmdList->used + bytes + 4 > MAX_RENDER_COMMANDS ) {
@@ -411,7 +410,7 @@ void RE_BeginFrame( stereoFrame_t stereoFrame ) {
 
 		R_SyncRenderThread();
 		if ((err = qglGetError()) != GL_NO_ERROR)
-			ri.Error(ERR_FATAL, "RE_BeginFrame() - glGetError() failed (0x%x)!", err);
+			ri.Error(ERR_FATAL, "RE_BeginFrame() - glGetError() failed (0x%x)!\n", err);
 	}
 
 	if (glConfig.stereoEnabled) {

@@ -2,6 +2,9 @@
 // entity 0
 {
 "classname" "worldspawn"
+"mapcoordsmins" "-1600 1600"
+"mapcoordsmaxs" "1600 -1600"
+"atmosphere" "T=SNOW,B=5 10,C=0.5,G=0.3 2,BV=20 30,GV=25 40,W=3 5,D=2000"
 "music" "music/snow"
 // brush 0
 {
@@ -348,7 +351,7 @@
 // brush 38
 {
 ( 752 848 0 ) ( 752 880 0 ) ( 912 848 0 ) base_floor/space 0 0 0 0.5 0.5 0 0 0
-( 784 848 -176 ) ( 944 848 -176 ) ( 784 848 -192 ) base_floor/space 0 0 0 0.5 0.5 0 0 0
+( 784 848 -176 ) ( 944 848 -176 ) ( 784 848 -192 ) common/mirror2 0 0 0 0.5 0.5 0 0 0
 ( 784 848 -176 ) ( 784 848 -192 ) ( 784 880 -176 ) base_floor/space 0 0 0 0.5 0.5 0 0 0
 ( 944 880 -192 ) ( 784 880 -192 ) ( 944 848 -192 ) common/caulk 0 0 0 0.5 0.5 0 0 0
 ( 944 880 -192 ) ( 944 880 -176 ) ( 784 880 -192 ) base_floor/space 0 0 0 0.5 0.5 0 0 0
@@ -705,6 +708,12 @@
 }
 }
 // entity 51
+{
+"classname" "misc_portal_surface"
+"origin" "1208.000000 -624.000000 -112.000000"
+"angle" "-179.999985"
+}
+// entity 52
 {
 "classname" "func_group"
 // brush 0
@@ -2004,7 +2013,7 @@
 ( -456 910 -174 ) ( -342 1024 -208 ) ( -342 910 -132 ) terrain/snow 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 52
+// entity 53
 {
 "classname" "func_breakable"
 "mustcut" "1"
@@ -2020,17 +2029,17 @@
 ( 1347.4630126953 533.1596069336 -192 ) ( 1220.6459960938 755.5408935547 -192 ) ( 1347.4630126953 533.1596069336 -128 ) base_wall/crate_metal 94.2470703125 146.2857055664 0 0.18686378 0.2187499851 0 0 0
 }
 }
-// entity 53
+// entity 54
 {
 "classname" "weapon_nunchucks"
 "origin" "-576.000000 -16.000000 -176.000000"
 }
-// entity 54
+// entity 55
 {
 "classname" "item_health_small"
 "origin" "40.000000 744.000000 -168.000000"
 }
-// entity 55
+// entity 56
 {
 "classname" "func_breakable"
 "health" "10"
@@ -2046,14 +2055,14 @@
 ( 1282 320 -200 ) ( 1282 576 -200 ) ( 1282 320 -136 ) base_wall/glass01 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 56
+// entity 57
 {
 "classname" "target_score"
 "origin" "160.000000 904.000000 -128.000000"
 "count" "1"
 "targetname" "computer"
 }
-// entity 57
+// entity 58
 {
 "classname" "func_use"
 "target" "computer"
@@ -2068,7 +2077,7 @@
 ( 128 960 -184 ) ( 128 896 -176 ) ( 128 896 -184 ) tech/terminal_grey 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 58
+// entity 59
 {
 "classname" "func_bobbing"
 "height" "128"
@@ -2082,7 +2091,7 @@
 ( 1280 192 -64 ) ( 1280 376 -64 ) ( 1280 192 64 ) tech/terminal_grey 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 59
+// entity 60
 {
 "classname" "path_corner"
 "origin" "1240.000000 -728.000000 -176.000000"
@@ -2090,7 +2099,7 @@
 "target" "path_corner2"
 "angle" "-90.000000"
 }
-// entity 60
+// entity 61
 {
 "classname" "path_corner"
 "origin" "1240.000000 -536.000000 -176.000000"
@@ -2098,7 +2107,7 @@
 "target" "nights_target1"
 "angle" "-90.000000"
 }
-// entity 61
+// entity 62
 {
 "classname" "nights_target"
 "origin" "1056.000000 -536.000000 -176.000000"
@@ -2106,7 +2115,7 @@
 "target" "nights_start1"
 "angle" "-90.000000"
 }
-// entity 62
+// entity 63
 {
 "classname" "path_corner"
 "origin" "1056.000000 -728.000000 -176.000000"
@@ -2114,7 +2123,7 @@
 "targetname" "nights_start1"
 "angle" "-90.000000"
 }
-// entity 63
+// entity 64
 {
 "classname" "path_corner"
 "origin" "1256.000000 -744.000000 -176.000000"
@@ -2122,7 +2131,7 @@
 "target" "path_corner1"
 "angle" "90.000000"
 }
-// entity 64
+// entity 65
 {
 "classname" "path_corner"
 "origin" "1256.000000 -936.000000 -176.000000"
@@ -2130,7 +2139,7 @@
 "target" "nights_target2"
 "angle" "90.000000"
 }
-// entity 65
+// entity 66
 {
 "classname" "nights_target"
 "origin" "1440.000000 -936.000000 -176.000000"
@@ -2138,7 +2147,7 @@
 "target" "nights_start2"
 "angle" "90.000000"
 }
-// entity 66
+// entity 67
 {
 "classname" "path_corner"
 "origin" "1440.000000 -744.000000 -176.000000"
@@ -2146,14 +2155,14 @@
 "targetname" "nights_start2"
 "angle" "90.000000"
 }
-// entity 67
+// entity 68
 {
 "classname" "path_corner"
 "origin" "416.000000 -752.000000 -160.000000"
 "targetname" "train2"
 "target" "train3"
 }
-// entity 68
+// entity 69
 {
 "classname" "func_train"
 "target" "train1"
@@ -2178,66 +2187,72 @@
 ( 464 -856 -88 ) ( 464 -792 -88 ) ( 464 -856 -56 ) common/origin 16 16 0 0.5 0.5 0 0 0
 }
 }
-// entity 69
+// entity 70
 {
 "classname" "path_end"
 "origin" "256.000000 -752.000000 -160.000000"
 "targetname" "train3"
 "target" "train4"
 }
-// entity 70
+// entity 71
 {
 "classname" "path_start"
 "origin" "544.000000 -800.000000 -160.000000"
 "targetname" "train1"
 "target" "train2"
 }
-// entity 71
+// entity 72
 {
 "classname" "nights_start"
 "origin" "1248.000000 -736.000000 -168.000000"
 "message" "test"
 }
-// entity 72
+// entity 73
 {
 "classname" "item_star"
 "origin" "1208.000000 -728.000000 -120.000000"
 "angle" "90.000000"
 "spawnflags" "1"
 }
-// entity 73
+// entity 74
 {
 "classname" "item_sphere"
 "origin" "1408.000000 -744.000000 64.000000"
 "spawnflags" "1"
 }
-// entity 74
+// entity 75
 {
 "classname" "item_sphere"
 "origin" "1352.000000 -744.000000 64.000000"
 "spawnflags" "1"
 }
-// entity 75
+// entity 76
 {
 "classname" "item_sphere"
 "origin" "1296.000000 -744.000000 64.000000"
 "spawnflags" "1"
 }
-// entity 76
+// entity 77
 {
 "classname" "item_star"
 "origin" "1152.000000 -728.000000 -120.000000"
 "angle" "90.000000"
 "spawnflags" "1"
 }
-// entity 77
+// entity 78
 {
 "classname" "item_star"
 "origin" "1088.000000 -728.000000 -120.000000"
 "angle" "90.000000"
 "spawnflags" "1"
 }
-// entity 78
+// entity 79
+{
+"classname" "misc_portal_surface"
+"origin" "856.000000 824.000000 -96.000000"
+"angle" "90.000000"
+}
+// entity 80
 {
 "classname" "trigger_multiple"
 "target" "trigger_2dpath_start"
@@ -2251,27 +2266,27 @@
 ( 1408 -448 -192 ) ( 1408 -384 -192 ) ( 1408 -448 -176 ) common/trigger 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 79
+// entity 81
 {
 "classname" "path_start"
 "origin" "1440.000000 -416.000000 -160.000000"
 "targetname" "2dpath_start"
 "target" "2dpath_1"
 }
-// entity 80
+// entity 82
 {
 "classname" "path_corner"
 "origin" "1440.000000 -288.000000 -160.000000"
 "targetname" "2dpath_1"
 "target" "2dpath_end"
 }
-// entity 81
+// entity 83
 {
 "classname" "path_end"
 "origin" "1440.000000 -152.000000 -160.000000"
 "targetname" "2dpath_end"
 }
-// entity 82
+// entity 84
 {
 "classname" "trigger_multiple"
 "target" "trigger_2dpath_end"
@@ -2285,21 +2300,21 @@
 ( 1408 -192 -192 ) ( 1408 -128 -192 ) ( 1408 -192 -176 ) common/trigger 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 83
+// entity 85
 {
 "classname" "target_setpath"
 "origin" "1352.000000 -160.000000 -160.000000"
 "targetname" "trigger_2dpath_end"
 "target" "2dpath_end"
 }
-// entity 84
+// entity 86
 {
 "classname" "target_setpath"
 "origin" "1352.000000 -416.000000 -160.000000"
 "targetname" "trigger_2dpath_start"
 "target" "2dpath_start"
 }
-// entity 85
+// entity 87
 {
 "classname" "func_voodoo"
 "target" "misc_object_car"
@@ -2324,7 +2339,7 @@
 ( 696 -864 -200 ) ( 696 -800 -200 ) ( 696 -864 -192 ) common/invisible 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 86
+// entity 88
 {
 "classname" "misc_object"
 "origin" "808.000000 -824.000000 -208.000000"
@@ -2332,7 +2347,7 @@
 "targetname" "misc_object_car"
 "spawnflags" "2"
 }
-// entity 87
+// entity 89
 {
 "classname" "func_voodoo"
 "target" "misc_gamemodel1"
@@ -2347,14 +2362,14 @@
 ( 696 -744 -208 ) ( 696 -712 -208 ) ( 696 -744 -200 ) base_floor/sewer_dirt 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 88
+// entity 90
 {
 "classname" "misc_gamemodel"
 "origin" "744.000000 -728.000000 -168.000000"
 "model" "models/mapobjects/vent/vent.md3"
 "targetname" "misc_gamemodel1"
 }
-// entity 89
+// entity 91
 {
 "classname" "func_breakable"
 "pushable" "1"
@@ -2377,212 +2392,206 @@
 ( 344 -816 -208 ) ( 344 -792 -208 ) ( 344 -816 -144 ) common/origin 0 0 0 0.5 0.5 0 0 0
 }
 }
-// entity 90
+// entity 92
 {
 "classname" "item_sphere"
 "origin" "1288.000000 -936.000000 -120.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 91
+// entity 93
 {
 "classname" "item_sphere"
 "origin" "1344.000000 -936.000000 -120.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 92
+// entity 94
 {
 "classname" "item_sphere"
 "origin" "1400.000000 -936.000000 -120.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 93
+// entity 95
 {
 "classname" "item_sphere"
 "origin" "1288.000000 -936.000000 -24.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 94
+// entity 96
 {
 "classname" "item_sphere"
 "origin" "1344.000000 -936.000000 -24.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 95
+// entity 97
 {
 "classname" "item_sphere"
 "origin" "1400.000000 -936.000000 -24.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 96
+// entity 98
 {
 "classname" "item_sphere"
 "origin" "1440.000000 -776.000000 -80.000000"
 "spawnflags" "1"
 "angle" "90.000000"
 }
-// entity 97
+// entity 99
 {
 "classname" "item_sphere"
 "origin" "1440.000000 -832.000000 -80.000000"
 "spawnflags" "1"
 "angle" "90.000000"
 }
-// entity 98
+// entity 100
 {
 "classname" "item_sphere"
 "origin" "1440.000000 -888.000000 -80.000000"
 "spawnflags" "1"
 "angle" "90.000000"
 }
-// entity 99
+// entity 101
 {
 "classname" "item_sphere"
 "origin" "1056.000000 -640.000000 -80.000000"
 "spawnflags" "1"
 "angle" "-90.000000"
 }
-// entity 100
+// entity 102
 {
 "classname" "item_sphere"
 "origin" "1152.000000 -536.000000 -120.000000"
 "spawnflags" "1"
 }
-// entity 101
+// entity 103
 {
 "classname" "item_star"
 "origin" "1240.000000 -696.000000 -120.000000"
 "spawnflags" "1"
 }
-// entity 102
+// entity 104
 {
 "classname" "item_sphere"
 "origin" "1088.000000 -728.000000 64.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 103
+// entity 105
 {
 "classname" "item_sphere"
 "origin" "1144.000000 -728.000000 64.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 104
+// entity 106
 {
 "classname" "item_sphere"
 "origin" "1200.000000 -728.000000 64.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 105
+// entity 107
 {
 "classname" "item_star"
 "origin" "1240.000000 -640.000000 -120.000000"
 "mirrorType" "2"
 "spawnflags" "1"
 }
-// entity 106
+// entity 108
 {
 "classname" "item_star"
 "origin" "1240.000000 -576.000000 -120.000000"
 "mirrorType" "1"
 "spawnflags" "1"
 }
-// entity 107
+// entity 109
 {
 "classname" "item_sphere"
 "origin" "1096.000000 -536.000000 -120.000000"
 "spawnflags" "1"
 }
-// entity 108
+// entity 110
 {
 "classname" "item_sphere"
 "origin" "1208.000000 -536.000000 -24.000000"
 "spawnflags" "1"
 }
-// entity 109
+// entity 111
 {
 "classname" "item_sphere"
 "origin" "1056.000000 -584.000000 -80.000000"
 "spawnflags" "1"
 "angle" "-90.000000"
 }
-// entity 110
+// entity 112
 {
 "classname" "item_sphere"
 "origin" "1152.000000 -536.000000 -24.000000"
 "spawnflags" "1"
 }
-// entity 111
+// entity 113
 {
 "classname" "item_sphere"
 "origin" "1056.000000 -696.000000 -80.000000"
 "spawnflags" "1"
 "angle" "-90.000000"
 }
-// entity 112
+// entity 114
 {
 "classname" "item_sphere"
 "origin" "1096.000000 -536.000000 -24.000000"
 "spawnflags" "1"
 }
-// entity 113
+// entity 115
 {
 "classname" "item_sphere"
 "origin" "1208.000000 -536.000000 -120.000000"
 "spawnflags" "1"
 }
-// entity 114
+// entity 116
 {
 "classname" "item_star"
 "origin" "1256.000000 -776.000000 -120.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 115
+// entity 117
 {
 "classname" "item_star"
 "origin" "1256.000000 -832.000000 -120.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 116
+// entity 118
 {
 "classname" "item_star"
 "origin" "1256.000000 -896.000000 -120.000000"
 "spawnflags" "1"
 "angle" "180.000000"
 }
-// entity 117
+// entity 119
 {
 "classname" "item_star"
 "origin" "1408.000000 -744.000000 -120.000000"
 "angle" "90.000000"
 "spawnflags" "1"
 }
-// entity 118
+// entity 120
 {
 "classname" "item_star"
 "origin" "1352.000000 -744.000000 -120.000000"
 "angle" "90.000000"
 "spawnflags" "1"
 }
-// entity 119
+// entity 121
 {
 "classname" "item_star"
 "origin" "1288.000000 -744.000000 -120.000000"
 "angle" "90.000000"
 "spawnflags" "1"
-}
-// entity 120
-{
-"classname" "misc_portal_surface"
-"origin" "1208.000000 -624.000000 -112.000000"
-"angle" "-179.999985"
 }

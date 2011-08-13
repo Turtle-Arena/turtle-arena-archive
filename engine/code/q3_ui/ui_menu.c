@@ -150,17 +150,13 @@ void Main_MenuEvent (void* ptr, int event) {
 		break;
 
 	case ID_TEAMARENA:
-		trap_Cvar_Set( "fs_game", BASETA);
+		trap_Cvar_Set( "fs_game", "missionpack");
 		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart;" );
 		break;
 #endif
 
 	case ID_EXIT:
-#ifdef TA_MISC
-		UI_ConfirmMenu( "Exit Game?", 0, MainMenu_ExitAction );
-#else
 		UI_ConfirmMenu( "EXIT GAME?", 0, MainMenu_ExitAction );
-#endif
 		break;
 	}
 }
@@ -303,7 +299,7 @@ static qboolean UI_TeamArenaExists( void ) {
 	for( i = 0; i < numdirs; i++ ) {
 		dirlen = strlen( dirptr ) + 1;
     descptr = dirptr + dirlen;
-		if (Q_stricmp(dirptr, BASETA) == 0) {
+		if (Q_stricmp(dirptr, "missionpack") == 0) {
 			return qtrue;
 		}
     dirptr += dirlen + strlen(descptr) + 1;
@@ -419,7 +415,7 @@ void UI_MainMenu( void ) {
 	s_main.singleplayer.generic.id			= ID_SINGLEPLAYER;
 	s_main.singleplayer.generic.callback	= Main_MenuEvent; 
 #ifdef TA_SP // Moved to PLAY Menu.
-	s_main.singleplayer.string				= "Play";
+	s_main.singleplayer.string				= "PLAY";
 #else
 	s_main.singleplayer.string				= "SINGLE PLAYER";
 #endif
@@ -433,11 +429,7 @@ void UI_MainMenu( void ) {
 	s_main.multiplayer.generic.y			= y;
 	s_main.multiplayer.generic.id			= ID_MULTIPLAYER;
 	s_main.multiplayer.generic.callback		= Main_MenuEvent; 
-#ifdef TA_MISC
-	s_main.multiplayer.string				= "Multiplayer";
-#else
 	s_main.multiplayer.string				= "MULTIPLAYER";
-#endif
 	s_main.multiplayer.color				= text_big_color;
 	s_main.multiplayer.style				= style;
 
@@ -449,7 +441,7 @@ void UI_MainMenu( void ) {
 	s_main.setup.generic.id					= ID_SETUP;
 	s_main.setup.generic.callback			= Main_MenuEvent; 
 #ifdef TA_SP // Moved to OPTIONS Menu.
-	s_main.setup.string						= "Options";
+	s_main.setup.string						= "OPTIONS";
 #else
 	s_main.setup.string						= "SETUP";
 #endif
@@ -512,11 +504,7 @@ void UI_MainMenu( void ) {
 	s_main.exit.generic.y					= y;
 	s_main.exit.generic.id					= ID_EXIT;
 	s_main.exit.generic.callback			= Main_MenuEvent; 
-#ifdef TA_MISC
-	s_main.exit.string						= "Exit";
-#else
 	s_main.exit.string						= "EXIT";
-#endif
 	s_main.exit.color						= text_big_color;
 	s_main.exit.style						= style;
 

@@ -1,13 +1,18 @@
-This package was debianized from http://turtlearena.googlecode.com/
+This package was debianized by Zack "ZTurtleMan" Middleton <ZTurtleMan@gmail.com> on
+Fri, 28 May 2010 13:01:28 +0500.
 
-Copyright 2009 - 2011 Turtle Arena Developers
+It was downloaded from http://turtlearena.googlecode.com/
 
-Mixed CC-BY-SA-3.0 and GPL-2 license.
+Copyright 2008-2010  Turtle Arena Developers
 
-See /usr/share/docs/turtlearena-data/COPYRIGHTS for details.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
 
-You can find the CC-BY-SA-3.0 license text on your system under
-/usr/share/docs/turtlearena-data/CC-BY-SA-3.0
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 You can find the GPL license text on a Debian system under
-/usr/share/common-licenses/GPL-2
+/usr/share/common-licenses/GPL.

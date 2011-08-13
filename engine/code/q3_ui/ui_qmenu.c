@@ -49,9 +49,6 @@ vec4_t color_blue	    = {0.00f, 0.00f, 1.00f, 1.00f};
 vec4_t color_lightOrange    = {1.00f, 0.68f, 0.00f, 1.00f };
 vec4_t color_orange	    = {1.00f, 0.43f, 0.00f, 1.00f};
 vec4_t color_red	    = {1.00f, 0.00f, 0.00f, 1.00f};
-#ifdef TA_SPLITVIEW
-vec4_t color_green	    = {0.00f, 1.00f, 0.00f, 1.00f};
-#endif
 vec4_t color_dim	    = {0.00f, 0.00f, 0.00f, 0.25f};
 
 // current color scheme
@@ -201,6 +198,11 @@ static void PText_Init( menutext_s *t )
 		font = &uis.fontPropSmall;
 	else
 		font = &uis.fontPropBig;
+
+	if (font->fontInfo.name[0]) {
+		sizeScale = 1.0f;
+	}
+	else
 #endif
 	sizeScale = UI_ProportionalSizeScale( t->style );
 
@@ -523,37 +525,15 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 			if (!(rb->generic.flags & QMF_HASMOUSEFOCUS))
 				break;
 
-		case K_KP_LEFTARROW:
-		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if ((key == K_KP_LEFTARROW || key == K_KP_RIGHTARROW)
-				&& trap_Key_IsDown(K_KP_NUMLOCK))
-			{
-				break;
-			}
-#endif
-
 		case K_JOY1:
 		case K_JOY2:
 		case K_JOY3:
 		case K_JOY4:
-#ifdef TA_SPLITVIEW
-		case K_2JOY1:
-		case K_2JOY2:
-		case K_2JOY3:
-		case K_2JOY4:
-		case K_3JOY1:
-		case K_3JOY2:
-		case K_3JOY3:
-		case K_3JOY4:
-		case K_4JOY1:
-		case K_4JOY2:
-		case K_4JOY3:
-		case K_4JOY4:
-#endif
 		case K_ENTER:
 		case K_KP_ENTER:
+		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
+		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 			rb->curvalue = !rb->curvalue;
 			if ( rb->generic.callback )
@@ -688,17 +668,11 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 				sound = 0;
 			break;
 
-		case K_KP_LEFTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				sound = 0;
-				break;
-			}
-#endif
-		case K_LEFTARROW:
 #if 0 //#ifdef TA_MISC // MENU: Right Mouse button = left arrow // NOT HERE.
 		case K_MOUSE2:
 #endif
+		case K_KP_LEFTARROW:
+		case K_LEFTARROW:
 			if (s->curvalue > s->minvalue)
 			{
 				s->curvalue--;
@@ -709,12 +683,6 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 			break;			
 
 		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				sound = 0;
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
 			if (s->curvalue < s->maxvalue)
 			{
@@ -934,35 +902,50 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 	sound = 0;
 	switch (key)
 	{
-		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
-		case K_RIGHTARROW:
 		case K_MOUSE1:
+#ifdef TA_MISC // MENU: listbox goes around.
+		case K_KP_RIGHTARROW:
+		case K_RIGHTARROW:
+#endif
 			s->curvalue++;
 			if (s->curvalue >= s->numitems)
 				s->curvalue = 0;
 			sound = menu_move_sound;
 			break;
 		
-		case K_KP_LEFTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
-		case K_LEFTARROW:
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
+		case K_KP_LEFTARROW:
+		case K_LEFTARROW:
+#ifdef TA_MISC // MENU: listbox goes around.
 			s->curvalue--;
 			if (s->curvalue < 0)
 				s->curvalue = s->numitems-1;
 			sound = menu_move_sound;
+#else
+			if (s->curvalue > 0)
+			{
+				s->curvalue--;
+				sound = menu_move_sound;
+			}
+			else
+				sound = menu_buzz_sound;
+#endif
 			break;
+
+#ifndef TA_MISC // MENU: listbox goes around.
+		case K_KP_RIGHTARROW:
+		case K_RIGHTARROW:
+			if (s->curvalue < s->numitems-1)
+			{
+				s->curvalue++;
+				sound = menu_move_sound;
+			}
+			else
+				sound = menu_buzz_sound;
+			break;
+#endif
 	}
 
 	if ( sound && s->generic.callback )
@@ -1116,11 +1099,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			break;
 
 		case K_KP_HOME:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_HOME:
 			l->oldvalue = l->curvalue;
 			l->curvalue = 0;
@@ -1134,11 +1112,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			return (menu_buzz_sound);
 
 		case K_KP_END:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_END:
 			l->oldvalue = l->curvalue;
 			l->curvalue = l->numitems-1;
@@ -1159,13 +1132,8 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			}
 			return (menu_buzz_sound);
 
-		case K_KP_PGUP:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_PGUP:
+		case K_KP_PGUP:
 			if( l->columns > 1 ) {
 				return menu_null_sound;
 			}
@@ -1187,14 +1155,8 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			}
 			return (menu_buzz_sound);
 
-
-		case K_KP_PGDN:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_PGDN:
+		case K_KP_PGDN:
 			if( l->columns > 1 ) {
 				return menu_null_sound;
 			}
@@ -1217,11 +1179,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			return (menu_buzz_sound);
 
 		case K_KP_UPARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_UPARROW:
 			if( l->curvalue == 0 ) {
 				return menu_buzz_sound;
@@ -1246,11 +1203,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			return (menu_move_sound);
 
 		case K_KP_DOWNARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_DOWNARROW:
 			if( l->curvalue == l->numitems - 1 ) {
 				return menu_buzz_sound;
@@ -1274,16 +1226,11 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 
 			return menu_move_sound;
 
-		case K_KP_LEFTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
-		case K_LEFTARROW:
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
+		case K_KP_LEFTARROW:
+		case K_LEFTARROW:
 			if( l->columns == 1 ) {
 				return menu_null_sound;
 			}
@@ -1306,11 +1253,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			return menu_move_sound;
 
 		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
 			if( l->columns == 1 ) {
 				return menu_null_sound;
@@ -1869,13 +1811,7 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 			trap_Cmd_ExecuteText(EXEC_APPEND, "screenshot\n");
 			break;
 #endif
-
 		case K_KP_UPARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_UPARROW:
 			cursor_prev    = m->cursor;
 			m->cursor_prev = m->cursor;
@@ -1887,14 +1823,9 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 			}
 			break;
 
-		case K_KP_DOWNARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
-		case K_DOWNARROW:
 		case K_TAB:
+		case K_KP_DOWNARROW:
+		case K_DOWNARROW:
 			cursor_prev    = m->cursor;
 			m->cursor_prev = m->cursor;
 			m->cursor++;
@@ -1916,20 +1847,6 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 		case K_JOY2:
 		case K_JOY3:
 		case K_JOY4:
-#ifdef TA_SPLITVIEW
-		case K_2JOY1:
-		case K_2JOY2:
-		case K_2JOY3:
-		case K_2JOY4:
-		case K_3JOY1:
-		case K_3JOY2:
-		case K_3JOY3:
-		case K_3JOY4:
-		case K_4JOY1:
-		case K_4JOY2:
-		case K_4JOY3:
-		case K_4JOY4:
-#endif
 		case K_AUX1:
 		case K_AUX2:
 		case K_AUX3:
@@ -1971,10 +1888,6 @@ void Menu_Cache( void )
 
 	UI_LoadFont(&uis.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, PROP_GAP_WIDTH);
 	UI_LoadFont(&uis.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, PROP_GAP_WIDTH);
-#ifndef TA_DATA
-	UI_LoadFont(&uis.fontPropGlowSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
-	UI_LoadFont(&uis.fontPropGlowBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT, 22*0.66f, 0);
-#endif
 
 	UI_LoadFont(&uis.fontBanner, "fonts/FreeSerif.ttf", "menu/art/font2_prop.tga", 48, 32, 0);
 #else

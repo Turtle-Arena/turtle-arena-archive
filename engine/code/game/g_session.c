@@ -46,7 +46,7 @@ void G_WriteClientSessionData( gclient_t *client ) {
 
 	s = va("%i %i %i %i %i %i %i", 
 		client->sess.sessionTeam,
-		client->sess.spectatorNum,
+		client->sess.spectatorTime,
 		client->sess.spectatorState,
 		client->sess.spectatorClient,
 		client->sess.wins,
@@ -78,7 +78,7 @@ void G_ReadSessionData( gclient_t *client ) {
 
 	sscanf( s, "%i %i %i %i %i %i %i",
 		&sessionTeam,
-		&client->sess.spectatorNum,
+		&client->sess.spectatorTime,
 		&spectatorState,
 		&client->sess.spectatorClient,
 		&client->sess.wins,
@@ -144,7 +144,7 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 	}
 
 	sess->spectatorState = SPECTATOR_FREE;
-	AddTournamentQueue(client);
+	sess->spectatorTime = level.time;
 
 	G_WriteClientSessionData( client );
 }

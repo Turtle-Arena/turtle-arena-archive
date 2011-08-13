@@ -144,19 +144,16 @@ int Export_BotLibSetup(void)
 
 	if(botDeveloper)
 	{
-		char *homedir, *gamedir, *basedir;
+		char *homedir, *gamedir;
 		char logfilename[MAX_OSPATH];
 
 		homedir = LibVarGetString("homedir");
 		gamedir = LibVarGetString("gamedir");
-		basedir = LibVarGetString("com_basegame");
 
 		if (*homedir)
 		{
 			if(*gamedir)
 				Com_sprintf(logfilename, sizeof(logfilename), "%s%c%s%cbotlib.log", homedir, PATH_SEP, gamedir, PATH_SEP);
-			else if(*basedir)
-				Com_sprintf(logfilename, sizeof(logfilename), "%s%c%s%cbotlib.log", homedir, PATH_SEP, basedir, PATH_SEP);
 			else
 				Com_sprintf(logfilename, sizeof(logfilename), "%s%c" BASEGAME "%cbotlib.log", homedir, PATH_SEP, PATH_SEP);
 		}
@@ -178,7 +175,7 @@ int Export_BotLibSetup(void)
 	if (errnum != BLERR_NOERROR) return errnum;
 	errnum = EA_Setup();			//be_ea.c
 	if (errnum != BLERR_NOERROR) return errnum;
-#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT
 	errnum = BotSetupWeaponAI();	//be_ai_weap.c
 	if (errnum != BLERR_NOERROR)return errnum;
 #endif
@@ -210,7 +207,7 @@ int Export_BotLibShutdown(void)
 	BotShutdownChatAI();		//be_ai_chat.c
 	BotShutdownMoveAI();		//be_ai_move.c
 	BotShutdownGoalAI();		//be_ai_goal.c
-#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT
 	BotShutdownWeaponAI();		//be_ai_weap.c
 #endif
 	BotShutdownWeights();		//be_ai_weight.c
@@ -880,7 +877,7 @@ static void Init_AI_Export( ai_export_t *ai ) {
 	ai->BotFreeMoveState = BotFreeMoveState;
 	ai->BotInitMoveState = BotInitMoveState;
 	ai->BotAddAvoidSpot = BotAddAvoidSpot;
-#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS
+#ifndef TA_WEAPSYS_NOCOMPAT // BOT_WEAP_WEIGHTS
 	//-----------------------------------
 	// be_ai_weap.h
 	//-----------------------------------

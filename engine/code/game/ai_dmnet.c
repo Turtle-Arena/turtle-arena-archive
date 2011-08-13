@@ -118,9 +118,6 @@ int BotGetAirGoal(bot_state_t *bs, bot_goal_t *goal) {
 	vec3_t end, mins = {-15, -15, -2}, maxs = {15, 15, 2};
 	int areanum;
 
-#ifdef TURTLEARENA // DROWNING // ZTM: TODO: If bubble spawning entity is added check for near by bubbles as well as surface.
-#endif
-
 	//trace up until we hit solid
 	VectorCopy(bs->origin, end);
 	end[2] += 1000;
@@ -160,12 +157,7 @@ int BotGoForAir(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 	bot_goal_t goal;
 
 	//if the bot needs air
-#ifdef TURTLEARENA // DROWNING
-	if (bs->lastair_time < FloatTime() - 20)
-#else
-	if (bs->lastair_time < FloatTime() - 6)
-#endif
-	{
+	if (bs->lastair_time < FloatTime() - 6) {
 		//
 #ifdef DEBUG
 		//BotAI_Print(PRT_MESSAGE, "going for air\n");
@@ -201,15 +193,8 @@ int BotNearbyGoal(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 
 	//check if the bot should go for air
 	if (BotGoForAir(bs, tfl, ltg, range)) return qtrue;
-	// if the bot is carrying a flag or cubes
-	if (BotCTFCarryingFlag(bs)
-#ifdef MISSIONPACK
-		|| Bot1FCTFCarryingFlag(bs)
-#ifdef MISSIONPACK_HARVESTER
-		|| BotHarvesterCarryingCubes(bs)
-#endif
-#endif
-		) {
+	//if the bot is carrying the enemy flag
+	if (BotCTFCarryingFlag(bs)) {
 		//if the bot is just a few secs away from the base 
 		if (trap_AAS_AreaTravelTimeToGoalArea(bs->areanum, bs->origin,
 				bs->teamgoal.areanum, TFL_DEFAULT) < 300) {
@@ -699,7 +684,9 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
 				bs->ltgtype = 0;
 			}
 			//
-			//FIXME: move around a bit
+			if (bs->camp_range > 0) {
+				//FIXME: move around a bit
+			}
 			//
 			trap_BotResetAvoidReach(bs->ms);
 			return qfalse;
@@ -1355,11 +1342,7 @@ int BotSelectActivateWeapon(bot_state_t *bs) {
 		return WEAPONINDEX_CHAINGUN;
 	else if (bs->inventory[INVENTORY_NAILGUN] > 0 && bs->inventory[INVENTORY_NAILS] > 0)
 		return WEAPONINDEX_NAILGUN;
-	else if (bs->inventory[INVENTORY_PROXLAUNCHER] > 0 && bs->inventory[INVENTORY_MINES] > 0)
-		return WEAPONINDEX_PROXLAUNCHER;
 #endif
-	else if (bs->inventory[INVENTORY_GRENADELAUNCHER] > 0 && bs->inventory[INVENTORY_GRENADES] > 0)
-		return WEAPONINDEX_GRENADE_LAUNCHER;
 	else if (bs->inventory[INVENTORY_RAILGUN] > 0 && bs->inventory[INVENTORY_SLUGS] > 0)
 		return WEAPONINDEX_RAILGUN;
 	else if (bs->inventory[INVENTORY_ROCKETLAUNCHER] > 0 && bs->inventory[INVENTORY_ROCKETS] > 0)
@@ -1416,7 +1399,6 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 	bsp_trace_t bsptrace;
 	entityState_t state;
 
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	// if there is a dead body wearing kamikze nearby
 	if (bs->kamikazebody) {
 		// if the bot's view angles and weapon are not used for movement
@@ -1438,7 +1420,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 				moveresult->flags |= MOVERESULT_MOVEMENTWEAPON | MOVERESULT_MOVEMENTVIEW;
 				// if holding the right weapon
 				if (bs->cur_ps.weapon == moveresult->weapon) {
-					// if the bot is pretty close with its aim
+					// if the bot is pretty close with it's aim
 					if (InFieldOfVision(bs->viewangles, 20, moveresult->ideal_viewangles)) {
 						//
 						BotAI_Trace(&bsptrace, bs->eye, NULL, NULL, target, bs->entitynum, MASK_SHOT);
@@ -1452,7 +1434,6 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 			}
 		}
 	}
-#endif
 	if (moveresult->flags & MOVERESULT_BLOCKEDBYAVOIDSPOT) {
 		bs->blockedbyavoidspot_time = FloatTime() + 5;
 	}
@@ -1519,7 +1500,7 @@ void BotClearPath(bot_state_t *bs, bot_moveresult_t *moveresult) {
 				moveresult->flags |= MOVERESULT_MOVEMENTWEAPON | MOVERESULT_MOVEMENTVIEW;
 				// if holding the right weapon
 				if (bs->cur_ps.weapon == moveresult->weapon) {
-					// if the bot is pretty close with its aim
+					// if the bot is pretty close with it's aim
 					if (InFieldOfVision(bs->viewangles, 20, moveresult->ideal_viewangles)) {
 						//
 						BotAI_Trace(&bsptrace, bs->eye, NULL, NULL, target, bs->entitynum, MASK_SHOT);
@@ -1557,9 +1538,6 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 	int targetvisible;
 	bsp_trace_t bsptrace;
 	aas_entityinfo_t entinfo;
-#ifdef TURTLEARENA // HOLD_SHURIKEN
-	int wantUseShuriken;
-#endif
 
 	if (BotIsObserver(bs)) {
 		BotClearActivateGoalStack(bs);
@@ -1595,81 +1573,30 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 	}
 	//
 	goal = &bs->activatestack->goal;
-#ifdef TA_ENTSYS // BREAKABLE
-	// update shoot goal status
-	if (bs->activatestack->shoot) {
-		//if the bot's current goal is dead
-		if (g_entities[goal->entitynum].health <= 0) {
-#ifdef DEBUG
-			BotAI_Print(PRT_MESSAGE, "goal is dead\n");
-#endif //DEBUG
-			bs->activatestack->time = 0;
-		}
-	}
-#endif
 	// initialize target being visible to false
 	targetvisible = qfalse;
 	// if the bot has to shoot at a target to activate something
-	if (bs->activatestack->shoot
-#ifdef TA_ENTSYS // BREAKABLE
-		&& bs->activatestack->time
-#endif
-		) {
+	if (bs->activatestack->shoot) {
 		//
 		BotAI_Trace(&bsptrace, bs->eye, NULL, NULL, bs->activatestack->target, bs->entitynum, MASK_SHOT);
 		// if the shootable entity is visible from the current position
 		if (bsptrace.fraction >= 1.0 || bsptrace.ent == goal->entitynum) {
 			targetvisible = qtrue;
-#ifdef TURTLEARENA // HOLD_SHURIKEN
-			BotEntityInfo(goal->entitynum, &entinfo);
-#endif
 			// if holding the right weapon
 			if (bs->cur_ps.weapon == bs->activatestack->weapon) {
 				VectorSubtract(bs->activatestack->target, bs->eye, dir);
 				vectoangles(dir, ideal_viewangles);
-#ifdef TURTLEARENA // HOLD_SHURIKEN
-				wantUseShuriken = BotWantUseShuriken(bs, goal->entitynum, &entinfo);
-#endif
-#ifdef IOQ3ZTM // ATTACK_WITH_MELEE
-				// check if too far to attack
-				if (
-#ifdef TURTLEARENA // HOLD_SHURIKEN
-					!wantUseShuriken &&
-#endif
-					VectorLength(dir) > 80 &&
-#ifdef TA_WEAPSYS
-					!BG_WeaponHasType(bs->cur_ps.weapon, WT_GUN)
-#else
-					bs->cur_ps.weapon == WP_GAUNTLET
-#endif
-					)
-				{
-					// keep moving toward goal until it is close enough to melee attack
-					targetvisible = 2;
-				}
-				else
-#endif
-				// if the bot is pretty close with its aim
+				// if the bot is pretty close with it's aim
 				if (InFieldOfVision(bs->viewangles, 20, ideal_viewangles)) {
-#ifdef TURTLEARENA // HOLD_SHURIKEN
-					if (wantUseShuriken) {
-						trap_EA_Use(bs->client, wantUseShuriken);
-					} else {
-#endif
 					trap_EA_Attack(bs->client);
-#ifdef TURTLEARENA // HOLD_SHURIKEN
-					}
-#endif
 				}
 			}
 		}
 	}
 	// if the shoot target is visible
 	if (targetvisible) {
-#ifndef TURTLEARENA // HOLD_SHURIKEN
 		// get the entity info of the entity the bot is shooting at
 		BotEntityInfo(goal->entitynum, &entinfo);
-#endif
 		// if the entity the bot shoots at moved
 		if (!VectorCompare(bs->activatestack->origin, entinfo.origin)) {
 #ifdef DEBUG
@@ -1688,12 +1615,6 @@ int AINode_Seek_ActivateEntity(bot_state_t *bs) {
 			AIEnter_Seek_NBG(bs, "activate entity: time out");
 			return qfalse;
 		}
-#ifdef IOQ3ZTM // ATTACK_WITH_MELEE
-		if (targetvisible == 2) {
-			BotSetupForMovement(bs);
-			trap_BotMoveInDirection(bs->ms, dir, 400, MOVE_WALK);
-		}
-#endif
 		memset(&moveresult, 0, sizeof(bot_moveresult_t));
 	}
 	else {
@@ -2140,12 +2061,11 @@ void AIEnter_Battle_Fight(bot_state_t *bs, char *s) {
 	BotRecordNodeSwitch(bs, "battle fight", "", s);
 	trap_BotResetLastAvoidReach(bs->ms);
 	bs->ainode = AINode_Battle_Fight;
-	bs->flags &= ~BFL_FIGHTSUICIDAL;
 }
 
 /*
 ==================
-AIEnter_Battle_SuicidalFight
+AIEnter_Battle_Fight
 ==================
 */
 void AIEnter_Battle_SuicidalFight(bot_state_t *bs, char *s) {
@@ -2262,12 +2182,6 @@ int AINode_Battle_Fight(bot_state_t *bs) {
 	}
 	//if the enemy is not visible
 	if (!BotEntityVisible(bs->entitynum, bs->eye, bs->viewangles, 360, bs->enemy)) {
-#ifdef MISSIONPACK
-		if (bs->enemy == redobelisk.entitynum || bs->enemy == blueobelisk.entitynum) {
-			AIEnter_Battle_Chase(bs, "battle fight: obelisk out of sight");
-			return qfalse;
-		}
-#endif
 		if (BotWantsToChase(bs)) {
 			AIEnter_Battle_Chase(bs, "battle fight: enemy out of sight");
 			return qfalse;

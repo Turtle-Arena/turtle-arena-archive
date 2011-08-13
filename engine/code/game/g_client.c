@@ -236,9 +236,12 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 #ifdef TA_PLAYERSYS
 	vec3_t avoidPoint;
 
-	if (ent->client) {
+	if (ent && ent->client)
+	{
 		VectorCopy(ent->client->ps.origin, avoidPoint);
-	} else {
+	}
+	else
+	{
 		VectorCopy(vec3_origin, avoidPoint);
 	}
 #endif
@@ -587,7 +590,7 @@ just like the existing corpse to leave behind.
 =============
 */
 void CopyToBodyQue( gentity_t *ent ) {
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	gentity_t	*e;
 	int i;
 #endif
@@ -606,9 +609,11 @@ void CopyToBodyQue( gentity_t *ent ) {
 	body = level.bodyQue[ level.bodyQueIndex ];
 	level.bodyQueIndex = (level.bodyQueIndex + 1) % BODY_QUEUE_SIZE;
 
+	trap_UnlinkEntity (body);
+
 	body->s = ent->s;
 	body->s.eFlags = EF_DEAD;		// clear EF_TALK, etc
-#if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
+#if defined MISSIONPACK && !defined TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	if ( ent->s.eFlags & EF_KAMIKAZE ) {
 		body->s.eFlags |= EF_KAMIKAZE;
 
@@ -719,12 +724,24 @@ void SetClientViewAngle( gentity_t *ent, vec3_t angle ) {
 
 /*
 ================
-ClientRespawn
+respawn
 ================
 */
-void ClientRespawn( gentity_t *ent ) {
+void respawn( gentity_t *ent ) {
+	gentity_t	*tent;
+
 	CopyToBodyQue (ent);
 	ClientSpawn(ent);
+
+#if 0 //#ifdef TA_SP // No teleport effect in Single Player
+    if (g_gametype.integer == GT_SINGLE_PLAYER)
+    {
+        return;
+    }
+#endif
+	// add a teleportation effect
+	tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
+	tent->s.clientNum = ent->s.clientNum;
 }
 
 /*
@@ -818,7 +835,7 @@ Forces a client's skin (for teamplay)
 static void ForceClientSkin( gclient_t *client, char *model, const char *skin ) {
 	char *p;
 
-	if ((p = strrchr(model, '/')) != 0) {
+	if ((p = Q_strrchr(model, '/')) != 0) {
 		*p = 0;
 	}
 
@@ -921,10 +938,10 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 	Q_strncpyz(headModel, inHeadModel, MAX_QPATH);
 
     // Remove skin
-	if ((p = strrchr(model, '/')) != 0) {
+	if ((p = Q_strrchr(model, '/')) != 0) {
 		*p = 0;
 	}
-	if ((p = strrchr(headModel, '/')) != 0) {
+	if ((p = Q_strrchr(headModel, '/')) != 0) {
 		*p = 0;
 	}
 
@@ -1057,6 +1074,7 @@ void ClientUserinfoChanged( int clientNum ) {
 	char	redTeam[MAX_INFO_STRING];
 	char	blueTeam[MAX_INFO_STRING];
 	char	userinfo[MAX_INFO_STRING];
+	char    guid[MAX_INFO_STRING];
 
 	ent = g_entities + clientNum;
 	client = ent->client;
@@ -1122,7 +1140,7 @@ void ClientUserinfoChanged( int clientNum ) {
 
 	// set model
 #ifdef TA_SP // SPMODEL
-	if ( g_singlePlayer.integer ) {
+	if ( g_singlePlayer.integer == 1 ) {
 		Q_strncpyz( model, Info_ValueForKey (userinfo, "spmodel"), sizeof( model ) );
 		Q_strncpyz( headModel, Info_ValueForKey (userinfo, "spheadmodel"), sizeof( headModel ) );
 	} else
@@ -1232,20 +1250,20 @@ void ClientUserinfoChanged( int clientNum ) {
 
 #ifdef TA_PLAYERSYS
 	// In single player use player model's prefcolors
-	// ZTM: TODO: Add option to use 'auto color' from player.
 #ifdef TA_SP
-	if (g_singlePlayer.integer)
+	if (g_singlePlayer.integer == 1)
 #else
 	if (g_gametype.integer == GT_SINGLE_PLAYER)
 #endif
 	{
-		Com_sprintf(c1, sizeof (c1), "%d", client->pers.playercfg.prefcolor1);
-		Com_sprintf(c2, sizeof (c2), "%d", client->pers.playercfg.prefcolor2);
+		Q_snprintf(c1, sizeof (c1), "%d", client->pers.playercfg.prefcolor1);
+		Q_snprintf(c2, sizeof (c2), "%d", client->pers.playercfg.prefcolor2);
 	}
 #endif
 
 	strcpy(redTeam, Info_ValueForKey( userinfo, "g_redteam" ));
 	strcpy(blueTeam, Info_ValueForKey( userinfo, "g_blueteam" ));
+	strcpy(guid, Info_ValueForKey(userinfo, "cl_guid"));
 	
 	// send over a subset of the userinfo keys so other clients can
 	// print scoreboards, display models, and play custom sounds
@@ -1258,8 +1276,8 @@ void ClientUserinfoChanged( int clientNum ) {
 	}
 	else
 	{
-		s = va("n\\%s\\t\\%i\\model\\%s\\hmodel\\%s\\g_redteam\\%s\\g_blueteam\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d",
-			client->pers.netname, client->sess.sessionTeam, model, headModel, redTeam, blueTeam, c1, c2, 
+		s = va("n\\%s\\guid\\%s\\t\\%i\\model\\%s\\hmodel\\%s\\g_redteam\\%s\\g_blueteam\\%s\\c1\\%s\\c2\\%s\\hc\\%i\\w\\%i\\l\\%i\\tt\\%d\\tl\\%d",
+			client->pers.netname, guid, client->sess.sessionTeam, model, headModel, redTeam, blueTeam, c1, c2, 
 			client->pers.maxHealth, client->sess.wins, client->sess.losses, teamTask, teamLeader);
 	}
 
@@ -1369,13 +1387,7 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	if ( firstTime )
 #endif
 	{
-		// ZTM: TODO: Have a different message for when splitscreen player joins?
 		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
-
-#ifdef IOQ3ZTM
-		// show entered the game message
-		ent->flags |= FL_FIRST_TIME;
-#endif
 	}
 
 	if ( g_gametype.integer >= GT_TEAM &&
@@ -1406,10 +1418,8 @@ and on transition between teams, but doesn't happen on respawns
 void ClientBegin( int clientNum ) {
 	gentity_t	*ent;
 	gclient_t	*client;
+	gentity_t	*tent;
 	int			flags;
-#ifdef IOQ3ZTM
-	qboolean	firstTime;
-#endif
 
 	ent = g_entities + clientNum;
 
@@ -1459,28 +1469,24 @@ void ClientBegin( int clientNum ) {
 	G_LoadPlayer(clientNum, client->pers.playercfg.model, client->pers.playercfg.headModel);
 #endif
 
-#ifdef IOQ3ZTM
-	firstTime = (ent->flags & FL_FIRST_TIME);
-#endif
-
 	// locate ent at a spawn point
 	ClientSpawn( ent );
 
-#ifdef IOQ3ZTM
-	// show entered the game message
-	if (firstTime)
-#else
-	if ( client->sess.sessionTeam != TEAM_SPECTATOR )
-#endif
-	{
-#ifdef IOQ3ZTM
-		ent->flags &= FL_FIRST_TIME;
-#else
-		if ( g_gametype.integer != GT_TOURNAMENT  )
-#endif
+	if ( client->sess.sessionTeam != TEAM_SPECTATOR ) {
+#ifdef TA_SP
+		if (!(g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER))
 		{
+#endif
+		// send event
+		tent = G_TempEntity( ent->client->ps.origin, EV_PLAYER_TELEPORT_IN );
+		tent->s.clientNum = ent->s.clientNum;
+
+		if ( g_gametype.integer != GT_TOURNAMENT  ) {
 			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
 		}
+#ifdef TA_SP
+		}
+#endif
 	}
 	G_LogPrintf( "ClientBegin: %i\n", clientNum );
 
@@ -1506,7 +1512,6 @@ void ClientSpawn(gentity_t *ent) {
 	clientSession_t		savedSess;
 	int		persistant[MAX_PERSISTANT];
 	gentity_t	*spawnPoint;
-	gentity_t *tent;
 	int		flags;
 	int		savedPing;
 //	char	*savedAreaBits;
@@ -1576,7 +1581,7 @@ void ClientSpawn(gentity_t *ent) {
 	}
 	client->pers.teamState.state = TEAM_ACTIVE;
 
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 	// always clear the kamikaze flag
 	ent->s.eFlags &= ~EF_KAMIKAZE;
 #endif
@@ -1628,7 +1633,7 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.persistant[PERS_TEAM] = client->sess.sessionTeam;
 
 #ifdef TURTLEARENA // POWERS
-	if (g_teleportFluxTime.integer && client->ps.persistant[PERS_TEAM] != TEAM_SPECTATOR
+	if (g_teleportFluxTime.integer
 #ifdef TA_SP // In single-player/co-op, boss bots don't get PW_FLASHING
 		&& !(g_gametype.integer == GT_SINGLE_PLAYER && client->ps.persistant[PERS_TEAM] != TEAM_FREE)
 #endif
@@ -1640,11 +1645,7 @@ void ClientSpawn(gentity_t *ent) {
 	}
 #endif
 
-#ifdef TURTLEARENA // DROWNING
-	client->ps.powerups[PW_AIR] = level.time + 31000;
-#else
 	client->airOutTime = level.time + 12000;
-#endif
 
 	trap_GetUserinfo( index, userinfo, sizeof(userinfo) );
 	// set max health
@@ -1679,8 +1680,7 @@ void ClientSpawn(gentity_t *ent) {
 	client->ps.clientNum = index;
 
 #ifdef TA_HOLDSYS
-#ifdef TURTLEARENA // HOLDABLE
-	// Start with 10 shurikens!
+#ifdef TA_HOLDABLE // Start with 10 shurikens!
 #ifdef IOQ3ZTM // LASERTAG
 	if (g_laserTag.integer) {
 		client->ps.holdableIndex = HI_NONE;
@@ -1813,6 +1813,34 @@ void ClientSpawn(gentity_t *ent) {
 	trap_GetUsercmd( client - level.clients, &ent->client->pers.cmd );
 	SetClientViewAngle( ent, spawn_angles );
 
+	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
+
+	} else {
+#ifdef TURTLEARENA // POWERS
+		// Only kill box if client is solid.
+		if (!client->ps.powerups[PW_FLASHING])
+#endif
+		G_KillBox( ent );
+		trap_LinkEntity (ent);
+
+		// force the base weapon up
+#ifdef TA_WEAPSYS // ZTM: Set ready weapon to default weapon.
+		// ZTM: Start with default weapon.
+		client->ps.weapon = client->ps.stats[STAT_DEFAULTWEAPON];
+		// Set default hands.
+		client->ps.weaponHands = BG_WeaponHandsForWeaponNum(client->ps.stats[STAT_DEFAULTWEAPON]);
+#else
+#ifdef IOQ3ZTM // LASERTAG
+		if (g_laserTag.integer)
+			client->ps.weapon = WP_RAILGUN;
+		else
+#endif
+		client->ps.weapon = WP_MACHINEGUN;
+#endif
+		client->ps.weaponstate = WEAPON_READY;
+
+	}
+
 	// don't allow full run speed for a bit
 	client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 	client->ps.pm_time = 100;
@@ -1823,63 +1851,37 @@ void ClientSpawn(gentity_t *ent) {
 
 	// set default animations
 #ifdef TA_WEAPSYS
-	client->ps.torsoAnim = BG_TorsoStandForPlayerState(&client->ps, &client->pers.playercfg);
+	client->ps.torsoAnim = BG_TorsoStandForPlayerState(&client->ps);
 	client->ps.legsAnim = BG_LegsStandForPlayerState(&client->ps, &client->pers.playercfg);
 #else
 	client->ps.torsoAnim = TORSO_STAND;
 	client->ps.legsAnim = LEGS_IDLE;
 #endif
 
-	if (!level.intermissiontime) {
-		if (ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
-#ifdef TURTLEARENA // POWERS
-			// Only kill box if client is solid.
-			if (!client->ps.powerups[PW_FLASHING])
-#endif
-			G_KillBox(ent);
-			// force the base weapon up
-#ifdef TA_WEAPSYS // ZTM: Set ready weapon to default weapon.
-			client->ps.weapon = client->ps.stats[STAT_DEFAULTWEAPON];
-			client->ps.weaponHands = BG_WeaponHandsForWeaponNum(client->ps.stats[STAT_DEFAULTWEAPON]);
-#else
-#ifdef IOQ3ZTM // LASERTAG
-			if (g_laserTag.integer)
-				client->ps.weapon = WP_RAILGUN;
-			else
-#endif
-			client->ps.weapon = WP_MACHINEGUN;
-#endif
-			client->ps.weaponstate = WEAPON_READY;
-			// fire the targets of the spawn point
-			G_UseTargets(spawnPoint, ent);
-#ifndef TA_WEAPSYS_EX
-			// select the highest weapon number available, after any spawn given items have fired
-			client->ps.weapon = 1;
-
-#ifdef TA_WEAPSYS
-			for (i = BG_NumWeaponGroups() - 1 ; i > 0 ; i--)
-#else
-			for (i = WP_NUM_WEAPONS - 1 ; i > 0 ; i--)
-#endif
-			{
-				if (client->ps.stats[STAT_WEAPONS] & (1 << i)) {
-					client->ps.weapon = i;
-					break;
-				}
-			}
-#endif
-			// positively link the client, even if the command times are weird
-			VectorCopy(ent->client->ps.origin, ent->r.currentOrigin);
-
-			tent = G_TempEntity(ent->client->ps.origin, EV_PLAYER_TELEPORT_IN);
-			tent->s.clientNum = ent->s.clientNum;
-
-			trap_LinkEntity (ent);
-		}
+	if ( level.intermissiontime ) {
+		MoveClientToIntermission( ent );
 	} else {
-		// move players to intermission
-		MoveClientToIntermission(ent);
+		// fire the targets of the spawn point
+		G_UseTargets( spawnPoint, ent );
+
+#ifndef TA_WEAPSYS_EX
+		// select the highest weapon number available, after any
+		// spawn given items have fired
+#ifdef TA_WEAPSYS
+		for ( i = BG_NumWeaponGroups() - 1 ; i > 0 ; i-- )
+#else
+		client->ps.weapon = 1;
+		for ( i = WP_NUM_WEAPONS - 1 ; i > 0 ; i-- )
+#endif
+		{
+			if ( client->ps.stats[STAT_WEAPONS] & ( 1 << i ) ) {
+				client->ps.weapon = i;
+				break;
+			}
+		}
+#endif
 	}
+
 	// run a client frame to drop exactly to the floor,
 	// initialize animations and other things
 	client->ps.commandTime = level.time - 100;
@@ -2089,9 +2091,9 @@ void G_SavePersistant(char *nextmap)
 			trap_Cvar_Set("g_spSaveData", "");
 
 			if (g_singlePlayer.value)
-				G_Error("Saving SP client data failed\ntoo much data! (%i/%i)\n%s\n", (int)strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
+				G_Error("Saving SP client data failed\ntoo much data! (%i/%i)\n%s\n", strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
 			else // Don't error to network
-				G_Printf("Saving co-op client data failed\ntoo much data! (%i/%i)\n%s\n", (int)strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
+				G_Printf("Saving co-op client data failed\ntoo much data! (%i/%i)\n%s\n", strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
 
 			return;
 		}
@@ -2169,7 +2171,7 @@ void G_LoadPersistant(int clientnum)
 	{
 		trap_Cvar_Set("g_spSkill", va("%i", skill));
 		// Map needs to be reloaded!
-		G_Printf(S_COLOR_YELLOW "Warning: SP skill mismatch, is %i should be %i.\n", trap_Cvar_VariableIntegerValue( "g_spSkill" ), skill);
+		G_Printf(S_COLOR_YELLOW "Warning: SP skill mismatch, is %i should be %i.\n", trap_Cvar_VariableValue( "g_spSkill" ), skill);
 	}
 
 	memset(savedata, 0, sizeof(savedata));
@@ -2258,7 +2260,7 @@ qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap)
 	// Reached the end of the single player levels
 	if (Q_stricmp(nextMap, "sp_end") == 0)
 	{
-		if (g_singlePlayer.integer)
+		if (g_singlePlayer.integer == 1)
 		{
 			// Return to the title screen.
 			trap_Cvar_Set("nextmap", "disconnect; sp_complete");
@@ -2271,9 +2273,9 @@ qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap)
 			nextMap = NULL;
 
 #ifdef IOQ3ZTM // MAP_ROTATION
-			info = G_GetNextArenaInfoByGametype(NULL, GT_SINGLE_PLAYER);
+			info = G_GetMapRotationInfoByGametype(GT_SINGLE_PLAYER);
 			if (info) {
-				nextMap = Info_ValueForKey(info, "map");
+				nextMap = Info_ValueForKey(info, "m1");
 			}
 #endif
 

@@ -94,13 +94,30 @@ qboolean CL_cURL_Init()
 
 
 	Com_Printf("Loading \"%s\"...", cl_cURLLib->string);
-	if(!(cURLLib = Sys_LoadDll(cl_cURLLib->string, qtrue)))
+	if( (cURLLib = Sys_LoadLibrary(cl_cURLLib->string)) == 0 )
 	{
+#ifdef _WIN32
+		return qfalse;
+#else
+		char fn[1024];
+
+		Q_strncpyz( fn, Sys_Cwd( ), sizeof( fn ) );
+		strncat(fn, "/", sizeof(fn)-strlen(fn)-1);
+		strncat(fn, cl_cURLLib->string, sizeof(fn)-strlen(fn)-1);
+
+		if((cURLLib = Sys_LoadLibrary(fn)) == 0)
+		{
 #ifdef ALTERNATE_CURL_LIB
-		// On some linux distributions there is no libcurl.so.3, but only libcurl.so.4. That one works too.
-		if(!(cURLLib = Sys_LoadDll(ALTERNATE_CURL_LIB, qtrue)))
-#endif
+			// On some linux distributions there is no libcurl.so.3, but only libcurl.so.4. That one works too.
+			if( (cURLLib = Sys_LoadLibrary(ALTERNATE_CURL_LIB)) == 0 )
+			{
+				return qfalse;
+			}
+#else
 			return qfalse;
+#endif
+		}
+#endif /* _WIN32 */
 	}
 
 	clc.cURLEnabled = qtrue;
@@ -234,13 +251,13 @@ void CL_cURL_BeginDownload( const char *localName, const char *remoteURL )
 	clc.downloadCURL = qcurl_easy_init();
 	if(!clc.downloadCURL) {
 		Com_Error(ERR_DROP, "CL_cURL_BeginDownload: qcurl_easy_init() "
-			"failed");
+			"failed\n");
 		return;
 	}
 	clc.download = FS_SV_FOpenFileWrite(clc.downloadTempName);
 	if(!clc.download) {
 		Com_Error(ERR_DROP, "CL_cURL_BeginDownload: failed to open "
-			"%s for writing", clc.downloadTempName);
+			"%s for writing\n", clc.downloadTempName);
 		return;
 	}
 	qcurl_easy_setopt(clc.downloadCURL, CURLOPT_WRITEDATA, clc.download);
@@ -267,7 +284,7 @@ void CL_cURL_BeginDownload( const char *localName, const char *remoteURL )
 		qcurl_easy_cleanup(clc.downloadCURL);
 		clc.downloadCURL = NULL;
 		Com_Error(ERR_DROP, "CL_cURL_BeginDownload: qcurl_multi_init() "
-			"failed");
+			"failed\n");
 		return;
 	}
 	qcurl_multi_add_handle(clc.downloadCURLM, clc.downloadCURL);

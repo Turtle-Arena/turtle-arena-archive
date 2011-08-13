@@ -310,7 +310,7 @@ void CG_AddFragment( localEntity_t *le ) {
 	// if it is in a nodrop zone, remove it
 	// this keeps gibs from waiting at the bottom of pits of death
 	// and floating levels
-	if ( CG_PointContents( trace.endpos, 0 ) & CONTENTS_NODROP ) {
+	if ( trap_CM_PointContents( trace.endpos, 0 ) & CONTENTS_NODROP ) {
 		CG_FreeLocalEntity( le );
 		return;
 	}
@@ -484,36 +484,9 @@ CG_AddExplosion
 ================
 */
 static void CG_AddExplosion( localEntity_t *ex ) {
-#ifdef TA_ENTSYS // EXP_SCALE
-	refEntity_t	re;
-	refEntity_t	*ent;
-	float c;
-
-	re = ex->refEntity;
-	ent = &re;
-
-	c = ( ex->endTime - cg.time ) / ( float ) ( ex->endTime - ex->startTime );
-	if ( c > 1 ) {
-		c = 1.0;	// can happen during connection problems
-	}
-
-	ent->shaderRGBA[0] = 0xff;
-	ent->shaderRGBA[1] = 0xff;
-	ent->shaderRGBA[2] = 0xff;
-	ent->shaderRGBA[3] = 0xff * c * 0.33;
-
-	ent->radius = ent->radius * ( 1.0 - c ) + ex->radius;
-	if (ent->radius != 1.0f) {
-		VectorScale( ent->axis[0], re.radius, ent->axis[0] );
-		VectorScale( ent->axis[1], re.radius, ent->axis[1] );
-		VectorScale( ent->axis[2], re.radius, ent->axis[2] );
-		ent->nonNormalizedAxes = qtrue;
-	}
-#else
 	refEntity_t	*ent;
 
 	ent = &ex->refEntity;
-#endif
 
 	// add the entity
 	trap_R_AddRefEntityToScene(ent);
@@ -558,6 +531,7 @@ static void CG_AddSpriteExplosion( localEntity_t *le ) {
 
 	re.reType = RT_SPRITE;
 #ifdef TA_WEAPSYS // SPR_EXP_SCALE
+	// CG_MakeExplosion
 	re.radius = le->refEntity.radius * ( 1.0 - c ) + le->radius;
 #else
 	re.radius = 42 * ( 1.0 - c ) + 30;
@@ -601,7 +575,7 @@ void CG_BubbleThink( localEntity_t *le ) {
 	// trace a line from previous position to new position
 	CG_Trace( &trace, le->refEntity.origin, NULL, NULL, newOrigin, -1, CONTENTS_SOLID );
 
-	contents = CG_PointContents( trace.endpos, 0 );
+	contents = trap_CM_PointContents( trace.endpos, 0 );
 	if ( !( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) ) {
 		// Bubble isn't in water (or slime/lava) anymore, remove it.
 		CG_FreeLocalEntity( le );
@@ -611,7 +585,7 @@ void CG_BubbleThink( localEntity_t *le ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ====================
 CG_AddKamikaze
@@ -703,6 +677,9 @@ void CG_AddKamikaze( localEntity_t *le ) {
 			le->angles.trBase[0] = random() * 360;
 			le->angles.trBase[1] = random() * 360;
 			le->angles.trBase[2] = random() * 360;
+		}
+		else {
+			c = 0;
 		}
 		memset(&shockwave, 0, sizeof(shockwave));
 		shockwave.hModel = cgs.media.kamikazeShockWave;
@@ -920,14 +897,6 @@ void CG_AddLocalEntities( void ) {
 			CG_FreeLocalEntity( le );
 			continue;
 		}
-
-#ifdef TA_SPLITVIEW
-		// Check if local entity should be rendered by this local client.
-		if (le->localClients && !(le->localClients & (1<<cg.cur_localClientNum))) {
-			continue;
-		}
-#endif
-
 #ifdef IOQ3ZTM // ZTM: Anything glows!
 		// add the dlight
 		if ( le->light ) {
@@ -943,7 +912,6 @@ void CG_AddLocalEntities( void ) {
 			trap_R_AddLightToScene(le->refEntity.origin, light, le->lightColor[0], le->lightColor[1], le->lightColor[2] );
 		}
 #endif
-
 		switch ( le->leType ) {
 		default:
 			CG_Error( "Bad leType: %i", le->leType );
@@ -994,7 +962,7 @@ void CG_AddLocalEntities( void ) {
 #endif
 
 #ifdef MISSIONPACK
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 		case LE_KAMIKAZE:
 			CG_AddKamikaze( le );
 			break;

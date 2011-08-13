@@ -44,12 +44,6 @@ UPLOAD_TO_PPA=0
 # PPA name (Only needed for --ppa)
 PPA_NAME="ppa:zturtleman/turtlearena-stable"
 
-# Set to -sd for no *orig.tar.gz uploading or -sa for uploading
-ORIGTAR=-sa
-
-# Ubuntu distribution
-SERIES=lucid
-
 # Key should be automatically found using name in changelog
 KEY=
 
@@ -98,12 +92,6 @@ do
 		continue
 	fi
 
-	if [ "$ARG" = "--no-tar" ] || [ "$ARG" = "-t" ]
-	then
-		ORIGTAR=-sd
-		continue
-	fi
-
 	if [ "$ARG" = "--ppa" ] || [ "$ARG" = "-p" ]
 	then
 		if [ $UPLOAD_TO_PPA -eq 0 ]
@@ -135,12 +123,6 @@ do
 		continue
 	fi
 
-	if [ "$ARG" = "--series" ] || [ "$ARG" = "-s" ]
-	then
-		NEXT_ARG="--series"
-		continue
-	fi
-
 	if [ "$ARG" = "--ppa" ] || [ "$ARG" = "-p" ]
 	then
 		NEXT_ARG="--ppa"
@@ -159,11 +141,7 @@ do
 			NEXT_ARG=""
 			;;
 		--datadir)
-			DATADIR="$ARG"
-			NEXT_ARG=""
-			;;
-		--series)
-			SERIES="$ARG"
+			INSTALLDIR="$ARG"
 			NEXT_ARG=""
 			;;
 		--ppa)
@@ -183,7 +161,7 @@ do
 
 done
 
-DEBINSTALL=$INSTALLDIR/deb/$SERIES
+DEBINSTALL=$INSTALLDIR/deb
 
 #
 # Show usage, the user asked to see it.
@@ -198,27 +176,18 @@ then
 	echo " -h --help         Show this help"
 	echo " -i --installdir [dir]  directory to put files"
 	echo "                          (default: \"install\")"
-	echo " -d --datadir [dir]  directory where \"base/assets0.pk3\" is located"
+	echo "    --datadir [dir]  directory where \"base/assets0.pk3\" is located"
 	echo "                          (default: \"install\")"
 	echo "    --no-data           Do not create data deb"
 	echo "    --no-engine         Do not create engine debs"
 	echo "    --no-wiimote        Do not create wiimote deb"
 	echo " -n --no-bin            Do not build install debs, only source"
-	echo " -s --series [dist]     Set Ubuntu distribution series"
-	echo "                          (default: \"lucid\")"
 	echo " -p --ppa [ppa]         Upload source packages to [ppa]"
 	echo "                          (default: \"ppa:zturtleman/turtlearena-stable\")"
 	echo " -u --upload-only       Only upload source to PPA, don't build anything"
-	echo " -t --no-tar            Do not include *.orig.tar.gz in source upload"
 	echo " -k --key [key]         Signing key for dpkg-buildpackage"
 	echo "                          (Example: \"85E7120F\")"
 
-	exit 1
-fi
-
-if [ $USAGE -eq 2 ]
-then
-	echo "Invalid usage, use $1 -h for help."
 	exit 1
 fi
 
@@ -228,85 +197,52 @@ then
 
 	if [ $MAKE_DATA_DEB -eq 1 ]
 	then
-		# Get version from main changelog. Example: 0.4-1
-		versionWithDebVersion=`head -n 1 ${DATA_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')' | cut -s -f 1 -d '~'`
-
 		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
-		version=`head -n 1 ${GAMENAME}-data-${versionWithDebVersion}/debian/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+		versionAndSeries=`head -n 1 ${DATA_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
 		# Upload data source to PPA
-		dput ${PPA_NAME} $DEBINSTALL/${GAMENAME}-data_${version}_source.changes
+		dput ${PPA_NAME} $DEBINSTALL/${GAMENAME}-data_${versionAndSeries}_source.changes
 	fi
 
 	if [ $MAKE_ENGINE_DEB -eq 1 ]
 	then
-		# Get version from main changelog. Example: 0.4-1
-		versionWithDebVersion=`head -n 1 ${ENGINE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')' | cut -s -f 1 -d '~'`
-
 		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
-		version=`head -n 1 ${GAMENAME}-${versionWithDebVersion}/debian/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+		versionAndSeries=`head -n 1 ${ENGINE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
 		# Upload engine source to PPA
-		dput ${PPA_NAME} $DEBINSTALL/${GAMENAME}_${version}_source.changes
+		dput ${PPA_NAME} $DEBINSTALL/${GAMENAME}_${versionAndSeries}_source.changes
 	fi
 
 	if [ $MAKE_WIIMOTE_DEB -eq 1 ]
 	then
-		# Get version from main changelog. Example: 0.4-1
-		versionWithDebVersion=`head -n 1 ${WIIMOTE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')' | cut -s -f 1 -d '~'`
-
 		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
-		version=`head -n 1 ${GAMENAME}-wiimote-${versionWithDebVersion}/debian/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+		versionAndSeries=`head -n 1 ${WIIMOTE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
 
 		# Upload wiimote source to PPA
-		dput ${PPA_NAME} $DEBINSTALL/${GAMENAME}-wiimote_${version}_source.changes
+		dput ${PPA_NAME} $DEBINSTALL/${GAMENAME}-wiimote_${versionAndSeries}_source.changes
 	fi
 
 	exit 0
 fi
 
-#
-# Get data version info from changelog
-#
-
-# Example: '0.2-1~maverick1' or '0.2-1'
-dataVersionAndSeries=`head -n 1 ${DATA_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
-
-# Drop '~maverick1', leaves '0.2-1'
-dataVersionWithDebVersion=`echo "${dataVersionAndSeries}" | cut -s -f 1 -d '~'`
-
-# Drop '0.2', leaves '1'
-dataDebVersion=`echo "${dataVersionWithDebVersion}" | cut -s -f 2 -d '-'`
-
-# Drop '-1', leaves '0.2'
-dataVersion=`echo "${dataVersionWithDebVersion}" | cut -s -f 1 -d '-'`
-
-#
-# Get engine version info from changelog
-#
-
-# Example: '0.2-1~maverick1' or '0.2-1'
-engineVersionAndSeries=`head -n 1 ${ENGINE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
-
-# Drop '~maverick1', leaves '0.2-1'
-engineVersionWithDebVersion=`echo "${engineVersionAndSeries}" | cut -s -f 1 -d '~'`
-
-# Drop '0.2', leaves '1'
-engineDebVersion=`echo "${engineVersionWithDebVersion}" | cut -s -f 2 -d '-'`
-
-# Drop '-1', leaves '0.2'
-engineVersion=`echo "${engineVersionWithDebVersion}" | cut -s -f 1 -d '-'`
-
 if [ $MAKE_DATA_DEB -eq 1 ]
 then
 
 	#
-	# Set version
+	# Get version info from changelog
 	#
-	versionAndSeries=$dataVersionAndSeries
-	versionWithDebVersion=$dataVersionWithDebVersion
-	debVersion=$dataDebVersion
-	version=$dataVersion
+
+	# Example: '0.2-1~maverick1' or '0.2-1'
+	versionAndSeries=`head -n 1 ${DATA_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+
+	# Drop '~maverick1', leaves '0.2-1'
+	versionWithDebVersion=`echo "${versionAndSeries}" | cut -s -f 1 -d '~'`
+
+	# Drop '0.2', leaves '1'
+	debVersion=`echo "${versionWithDebVersion}" | cut -s -f 2 -d '-'`
+
+	# Drop '-1', leaves '0.2'
+	version=`echo "${versionWithDebVersion}" | cut -s -f 1 -d '-'`
 
 	#
 	# Create orig data source directory
@@ -318,11 +254,11 @@ then
 		ORIGDIR=$GAMENAME-data-$version
 	fi
 
-	# ZTM: FIXME: This script doesn't support creating updated deb with new assets. It just doesn't work.
-	# Build assets if not already built
+	# ZTM: FIXME: This script doesn't support updating assets0.pk3. It just doesn't work.
+	# Build assets0.pk3 if not already built
 	if [ ! -f $DATADIR/base/assets0.pk3 ]
 	then
-		make assets INSTALLDIR=$DATADIR
+		./package-assets.sh --installdir $DATADIR
 
 		echo "Go run Turtle Arena and update the checksum for assets0.pk3 if"
 		echo "    needed, near the top of engine/code/qcommon/files.c"
@@ -330,15 +266,15 @@ then
 	fi
 
 	mkdir -p $DEBINSTALL/$ORIGDIR/base
-	cp $DATADIR/base/assets*.pk3 $DEBINSTALL/$ORIGDIR/base
+	cp $DATADIR/base/assets0.pk3 $DEBINSTALL/$ORIGDIR/base
 
 	cd $DEBINSTALL/$ORIGDIR
 
 	# Copy text files into $DEBINSTALL/$ORIGDIR/ like README, CREDITS, and stuff
-	cp $STARTDIR/INSTALLER_README.txt README
+	cp $STARTDIR/GAME_README.txt README
 	cp $STARTDIR/CREDITS.txt CREDITS
 	cp $STARTDIR/COPYRIGHTS.txt COPYRIGHTS
-	cp $STARTDIR/CC-BY-SA-3.0.txt CC-BY-SA-3.0
+	cp $STARTDIR/COPYING.txt COPYING
 
 	#
 	# Create debian data source directory
@@ -352,12 +288,6 @@ then
 		cp -r $DEBINSTALL/$ORIGDIR/* $DEBINSTALL/$DEBDIR/
 	fi
 	cp -r $DATA_DEB_CONFIG/* $DEBINSTALL/$DEBDIR/debian/
-	sed -e 's/ENGINE_VERSION/'${engineVersion}'/g;' -i $DEBINSTALL/$DEBDIR/debian/control
-	sed -e 's/lucid/'${SERIES}'/g;' -i $DEBINSTALL/$DEBDIR/debian/changelog
-	if [ ${SERIES} != 'lucid' ]
-	then
-		sed -e 's/(0.2-1)/(0.2-1~'${SERIES}'1)/g;' -i $DEBINSTALL/$DEBDIR/debian/changelog
-	fi
 
 	#
 	# Build debian package data
@@ -365,15 +295,12 @@ then
 	cd $STARTDIR
 	cd $DEBINSTALL/$DEBDIR
 
-	dpkg-buildpackage -S -rfakeroot $ORIGTAR $KEY
+	dpkg-buildpackage -S -rfakeroot $KEY
 
 	if [ $UPLOAD_TO_PPA -eq 1 ]
 	then
-		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
-		versionAndSeries=`head -n 1 debian/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
-
 		# Upload source to PPA
-		dput ${PPA_NAME} ../${GAMENAME}-data_${versionAndSeries}_source.changes
+		dput ${PPA_NAME} ${GAMENAME}-data_${versionAndSeries}_source.changes
 	fi
 
 	if [ $BIN -eq 1 ]
@@ -392,12 +319,20 @@ then
 	cd $STARTDIR
 
 	#
-	# Set version
+	# Get version info from changelog
 	#
-	versionAndSeries=$engineVersionAndSeries
-	versionWithDebVersion=$engineVersionWithDebVersion
-	debVersion=$engineDebVersion
-	version=$engineVersion
+
+	# Example: '0.2-1~maverick1' or '0.2-1'
+	versionAndSeries=`head -n 1 ${ENGINE_DEB_CONFIG}/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
+
+	# Drop '~maverick1', leaves '0.2-1'
+	versionWithDebVersion=`echo "${versionAndSeries}" | cut -s -f 1 -d '~'`
+
+	# Drop '0.2', leaves '1'
+	debVersion=`echo "${versionWithDebVersion}" | cut -s -f 2 -d '-'`
+
+	# Drop '-1', leaves '0.2'
+	version=`echo "${versionWithDebVersion}" | cut -s -f 1 -d '-'`
 
 	#
 	# Create orig engine source directory
@@ -408,22 +343,16 @@ then
 	else
 		ORIGDIR=$GAMENAME-$version
 	fi
+	mkdir -p $DEBINSTALL/$ORIGDIR
 
 	# Avoid copying build directory.
-	if [ -d .svn ]
-	then
-		mkdir -p $DEBINSTALL
-		svn export engine $DEBINSTALL/$ORIGDIR/
-	else
-		mkdir -p $DEBINSTALL/$ORIGDIR
-		mkdir $DEBINSTALL/$ORIGDIR/code
-		mkdir $DEBINSTALL/$ORIGDIR/misc
-		mkdir $DEBINSTALL/$ORIGDIR/ui
-		cp engine/* $DEBINSTALL/$ORIGDIR/
-		cp -r engine/code/* $DEBINSTALL/$ORIGDIR/code
-		cp -r engine/misc/* $DEBINSTALL/$ORIGDIR/misc
-		cp -r engine/ui/* $DEBINSTALL/$ORIGDIR/ui
-	fi
+	mkdir $DEBINSTALL/$ORIGDIR/code
+	mkdir $DEBINSTALL/$ORIGDIR/misc
+	mkdir $DEBINSTALL/$ORIGDIR/ui
+	cp engine/* $DEBINSTALL/$ORIGDIR/
+	cp -r engine/code/* $DEBINSTALL/$ORIGDIR/code
+	cp -r engine/misc/* $DEBINSTALL/$ORIGDIR/misc
+	cp -r engine/ui/* $DEBINSTALL/$ORIGDIR/ui
 
 	#
 	# File cleanup
@@ -433,11 +362,7 @@ then
 	find $DEBINSTALL/$ORIGDIR/ -type f -name '.svnignore' -exec rm -rf '{}' \; 2>/dev/null
 	find $DEBINSTALL/$ORIGDIR/ -type f -name '*~' -exec rm -rf '{}' \; 2>/dev/null
 
-	# Remove files Code::Blocks creates
-	find $DEBINSTALL/$ORIGDIR/misc/code_blocks/ -type f -name '*.layout' -exec rm -rf '{}' \; 2>/dev/null
-	find $DEBINSTALL/$ORIGDIR/misc/code_blocks/ -type f -name '*.depend' -exec rm -rf '{}' \; 2>/dev/null
-
-	# Remove lcc as Debian calls it non-free and removes it
+	# Remave lcc as debian calls it non-free and removes it
 	rm -r $DEBINSTALL/$ORIGDIR/code/tools/lcc
 
 	# Remove non-free Windows header
@@ -448,6 +373,11 @@ then
 
 	# Remove libs for win32 and mac
 	rm -r $DEBINSTALL/$ORIGDIR/code/libs/
+
+	# ZTM: Some of the music is non-commercial (CC-BY-NC and CC-BY-NC-SA)
+	#        which is considered non-free by the Debian project.
+	#      Should the "non-free" music be packaged in a separate deb (turtlearena-data-non-free)?
+	#        (and in its own assets1.pk3?)
 
 	#
 	# Create orig.tar.gz
@@ -472,12 +402,6 @@ then
 		cp -r $DEBINSTALL/$ORIGDIR/* $DEBINSTALL/$DEBDIR/
 	fi
 	cp -r $ENGINE_DEB_CONFIG/* $DEBINSTALL/$DEBDIR/debian/
-	sed -e 's/DATA_VERSION/'${dataVersion}'/g;' -i $DEBINSTALL/$DEBDIR/debian/control
-	sed -e 's/lucid/'${SERIES}'/g;' -i $DEBINSTALL/$DEBDIR/debian/changelog
-	if [ ${SERIES} != 'lucid' ]
-	then
-		sed -e 's/(0.2-1)/(0.2-1~'${SERIES}'1)/g;' -i $DEBINSTALL/$DEBDIR/debian/changelog
-	fi
 
 	#
 	# Build debian package data
@@ -485,15 +409,12 @@ then
 	cd $STARTDIR
 	cd $DEBINSTALL/$DEBDIR
 
-	dpkg-buildpackage -S -rfakeroot $ORIGTAR $KEY
+	dpkg-buildpackage -S -rfakeroot $KEY
 
 	if [ $UPLOAD_TO_PPA -eq 1 ]
 	then
-		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
-		versionAndSeries=`head -n 1 debian/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
-
 		# Upload source to PPA
-		dput ${PPA_NAME} ../${GAMENAME}_${versionAndSeries}_source.changes
+		dput ${PPA_NAME} ${GAMENAME}_${versionAndSeries}_source.changes
 	fi
 
 	if [ $BIN -eq 1 ]
@@ -567,12 +488,6 @@ then
 		cp -r $DEBINSTALL/$ORIGDIR/* $DEBINSTALL/$DEBDIR/
 	fi
 	cp -r $WIIMOTE_DEB_CONFIG/* $DEBINSTALL/$DEBDIR/debian/
-	rm -rf $DEBINSTALL/$DEBDIR/debian/.svn
-	sed -e 's/lucid/'${SERIES}'/g;' -i $DEBINSTALL/$DEBDIR/debian/changelog
-	if [ ${SERIES} != 'lucid' ]
-	then
-		sed -e 's/(0.2-1)/(0.2-1~'${SERIES}'1)/g;' -i $DEBINSTALL/$DEBDIR/debian/changelog
-	fi
 
 	#
 	# Build debian package data
@@ -580,15 +495,12 @@ then
 	cd $STARTDIR
 	cd $DEBINSTALL/$DEBDIR
 
-	dpkg-buildpackage -S -rfakeroot $ORIGTAR $KEY
+	dpkg-buildpackage -S -rfakeroot $KEY
 
 	if [ $UPLOAD_TO_PPA -eq 1 ]
 	then
-		# Get version (w/series) from changelog. Example: 0.4-1~maverick1 or 0.4-1
-		versionAndSeries=`head -n 1 debian/changelog | cut -s -f 2 -d '(' | cut -s -f 1 -d ')'`
-
 		# Upload source to PPA
-		dput ${PPA_NAME} ../${GAMENAME}-wiimote_${versionAndSeries}_source.changes
+		dput ${PPA_NAME} ${GAMENAME}-wiimote_${versionAndSeries}_source.changes
 	fi
 
 	if [ $BIN -eq 1 ]

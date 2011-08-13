@@ -78,9 +78,7 @@ TELEPORTERS
 
 void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	gentity_t	*tent;
-	qboolean noAngles;
 
-	noAngles = (angles[0] > 999999.0);
 	// use temp events at source and destination to prevent the effect
 	// from getting dropped by a second player event
 	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
@@ -97,15 +95,11 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	VectorCopy ( origin, player->client->ps.origin );
 	player->client->ps.origin[2] += 1;
 
-	if (!noAngles) {
-		// spit the player out
-		AngleVectors( angles, player->client->ps.velocity, NULL, NULL );
-		VectorScale( player->client->ps.velocity, 400, player->client->ps.velocity );
-		player->client->ps.pm_time = 160;		// hold time
-		player->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
-		// set angles
-		SetClientViewAngle(player, angles);
-	}
+	// spit the player out
+	AngleVectors( angles, player->client->ps.velocity, NULL, NULL );
+	VectorScale( player->client->ps.velocity, 400, player->client->ps.velocity );
+	player->client->ps.pm_time = 160;		// hold time
+	player->client->ps.pm_flags |= PMF_TIME_KNOCKBACK;
 
 	// toggle the teleport bit so the client knows to not lerp
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
@@ -117,6 +111,9 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 		player->r.contents &= ~CONTENTS_BODY;
 	}
 #endif
+
+	// set angles
+	SetClientViewAngle( player, angles );
 
 	// kill anything at the destination
 	if ( player->client->sess.sessionTeam != TEAM_SPECTATOR ) {
@@ -605,23 +602,19 @@ void DropPortalSource( gentity_t *player ) {
 
 void ObjectPain(gentity_t *self, gentity_t *attacker, int damage)
 {
-	int maxHealth;
+	int health;
 
 	// Default health
-	maxHealth = self->splashRadius;
+	health = self->splashRadius;
 
 	// Change to damge animation at X health
-	if (self->health < (maxHealth/5) * 2) {
+	if (self->health < (health/5) * 2) {
 		G_SetMiscAnim(self, OBJECT_DEATH3);
-	} else if (self->health < (maxHealth/5) * 3) {
+	} else if (self->health < (health/5) * 3) {
 		G_SetMiscAnim(self, OBJECT_DEATH2);
-	} else if (self->health < (maxHealth/5) * 4) {
+	} else if (self->health < (health/5) * 4) {
 		G_SetMiscAnim(self, OBJECT_DEATH1);
 	}
-
-#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-	self->s.skinFraction = 1.0f - ((float)self->health / (float)maxHealth);
-#endif
 }
 
 gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles, int flags);
@@ -679,42 +672,6 @@ void ObjectRemove(gentity_t *self)
 	G_FreeEntity(self);
 }
 
-void ObjectDeath(gentity_t *self)
-{
-	// Explosion
-	if (self->objectcfg->explosionDamage > 0 && self->objectcfg->explosionRadius > 0) {
-		gentity_t *tent;
-
-		tent = G_TempEntity( self->s.origin, EV_EXPLOSION );
-		//tent->s.eventParm = 0; // ZTM: TODO: Set explosion type?
-		tent->s.time2 = self->objectcfg->explosionRadius;
-		tent->s.otherEntityNum = self->s.number;
-
-#ifdef TA_WEAPSYS
-		G_RadiusDamage(self->s.origin, self, self->activator, self->objectcfg->explosionDamage, self->objectcfg->explosionRadius, self, MOD_EXPLOSION);
-#else
-		G_RadiusDamage(self->s.origin, self->activator, self->objectcfg->explosionDamage, self->objectcfg->explosionRadius, self, MOD_EXPLOSION);
-#endif
-	}
-
-	// if respawn
-	if (self->wait > 0) {
-		// Respawn after X seconds
-		self->nextthink = level.time + (self->wait * 1000);
-		self->think = ObjectRespawn;
-		if (self->objectcfg->invisibleUnsolidDeath) {
-			// Invisible non-solid
-			self->r.contents = 0;
-			trap_UnlinkEntity(self);
-		}
-	} else if (self->wait < 0) {
-		// Remove after X seconds
-		self->wait = abs(self->wait);
-		self->nextthink = level.time + (self->wait * 1000);
-		self->think = ObjectRemove;
-	}
-}
-
 void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod)
 {
 	int anim;
@@ -729,9 +686,6 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 
 	// Change to dead animation.
 	G_SetMiscAnim(self, anim);
-#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-	self->s.skinFraction = 1.0f;
-#endif
 
 	if (self->objectcfg->unsolidOnDeath && !self->objectcfg->invisibleUnsolidDeath) {
 		self->r.contents = 0;
@@ -767,17 +721,21 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 		}
 	}
 
-	self->activator = attacker;
-
-	if (self->objectcfg->deathDelay > 0) {
-		self->nextthink = level.time + (self->objectcfg->deathDelay * 1000);
-		self->think = ObjectDeath;
-
-		if (self->objectcfg->explosionDamage > 0 && self->objectcfg->explosionRadius > 0) {
-			// ZTM: TODO: Cue smoke stream! (size based on explosionRadius, have puffs be 0.25 size of explosion or something)
+	// if respawn
+	if (self->wait > 0) {
+		// Respawn after X seconds
+		self->nextthink = level.time + (self->wait * 1000);
+		self->think = ObjectRespawn;
+		if (self->objectcfg->invisibleUnsolidDeath) {
+			// Invisible non-solid
+			self->r.contents = 0;
+			trap_UnlinkEntity(self);
 		}
-	} else {
-		ObjectDeath(self);
+	} else if (self->wait < 0) {
+		// Remove after X seconds
+		self->wait = abs(self->wait);
+		self->nextthink = level.time + (self->wait * 1000);
+		self->think = ObjectRemove;
 	}
 }
 
@@ -814,9 +772,6 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 
 	// undamaged animation
 	G_SetMiscAnim(ent, OBJECT_IDLE);
-#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
-	ent->s.skinFraction = 0.0f;
-#endif
 
 	if (health > 0) {
 		//G_Printf("ObjectSpawn: animated damagable\n");
@@ -849,7 +804,7 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 		trap_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID );
 		if ( tr.startsolid ) {
 			ent->s.origin[2] -= 1;
-			G_Printf( "ObjectSpawn: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin) );
+			G_Printf( "Misc_object: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin) );
 
 			ent->s.groundEntityNum = ENTITYNUM_NONE;
 			G_SetOrigin( ent, ent->s.origin );
@@ -953,12 +908,9 @@ void SP_misc_object( gentity_t *ent ) {
 		Com_SetExt(filename, ".cfg");
 
 		if (G_SpawnString( "config", "", &config) && *config) {
-			Q_strncpyz(filename, config, sizeof(filename));
-			ent->s.modelindex2 = G_StringIndex( config )+1; // Tell cgame modelindex2 is string
-		}
-
-		if (G_SpawnString("skin", "", &config) && *config) {
-			ent->s.time2 = G_StringIndex( config )+1; // Tell cgame time2 is string
+			ent->s.modelindex2 = G_StringIndex( config );
+			trap_GetConfigstring( CS_STRINGS + ent->s.modelindex2, filename, sizeof(filename));
+			ent->s.modelindex2 = (ent->s.modelindex2*-1)-1; // Tell cgame modelindex2 is string
 		}
 
 		if (!(ent->objectcfg = BG_ParseObjectCFGFile(filename))) {

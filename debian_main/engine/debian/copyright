@@ -1,10 +1,13 @@
-This package was debianized from http://turtlearena.googlecode.com/
+This package was debianized by Zack "ZTurtleMan" Middleton <ZTurtleMan@gmail.com> on
+Fri, 28 May 2010 17:35:12 +0500.
+
+It was downloaded from http://turtlearena.googlecode.com/
 
 The tarball was repacked to leave out the non-free code/tools/lcc directory
 and the code/libs directory containing libraries for Mac OS X and Win32
 without source.
 
-Copyright 2009 - 2011 Turtle Arena Developers
+Copyright 2008 - 2010  Turtle Arena Developers
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -19,7 +22,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 Turtle Arena uses a modified ioquake3 engine, which contains parts under other 
 licenses than the GNU GPL:
 
-ioquake3 is copyright 1999-2005 id Software Inc., 2005-2011 ioquake3 Developers
+ioquake3 is copyright 1999 - 2005 id Software Inc., 2005 - 2010 ioquake3 Developers
 
    This package is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,7 +39,7 @@ ioquake3 is copyright 1999-2005 id Software Inc., 2005-2011 ioquake3 Developers
 
 
 You can find the GPL license text on a Debian system under
-/usr/share/common-licenses/GPL-2.
+/usr/share/common-licenses/GPL.
 
 
 NOTE: However, some parts of the source distribution are not covered by the GPL:
@@ -124,8 +127,8 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 JPEG library
 -----------------------------------------------------------------------------
-code/jpeg-8c
-Copyright (C) 1991-2011, Thomas G. Lane, Guido Vollbeding.
+code/jpeg-6b
+Copyright (C) 1991-1995, Thomas G. Lane
 
 Permission is hereby granted to use, copy, modify, and distribute this
 software (or portions thereof) for any purpose, without fee, subject to these

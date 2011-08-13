@@ -52,6 +52,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define MAX_VIDEO_HANDLES	16
 
+extern glconfig_t glConfig;
+
 
 static void RoQ_init( void );
 
@@ -986,6 +988,10 @@ static void setupQuad( long xOff, long yOff )
 	cin.oldysize = cinTable[currentHandle].ysize;
 	cin.oldxsize = cinTable[currentHandle].xsize;
 
+	numQuadCels  = (cinTable[currentHandle].CIN_WIDTH*cinTable[currentHandle].CIN_HEIGHT) / (16);
+	numQuadCels += numQuadCels/4 + numQuadCels/16;
+	numQuadCels += 64;							  // for overflow
+
 	numQuadCels  = (cinTable[currentHandle].xsize*cinTable[currentHandle].ysize) / (16);
 	numQuadCels += numQuadCels/4;
 	numQuadCels += 64;							  // for overflow
@@ -1040,7 +1046,7 @@ static void readQuadInfo( byte *qData )
         cinTable[currentHandle].drawY = cinTable[currentHandle].CIN_HEIGHT;
         
 	// rage pro is very slow at 512 wide textures, voodoo can't do it at all
-	if ( cls.glconfig.hardwareType == GLHW_RAGEPRO || cls.glconfig.maxTextureSize <= 256) {
+	if ( glConfig.hardwareType == GLHW_RAGEPRO || glConfig.maxTextureSize <= 256) {
                 if (cinTable[currentHandle].drawX>256) {
                         cinTable[currentHandle].drawX = 256;
                 }
@@ -1196,7 +1202,7 @@ redump:
 		case	ZA_SOUND_MONO:
 			if (!cinTable[currentHandle].silent) {
 				ssize = RllDecodeMonoToStereo( framedata, sbuf, cinTable[currentHandle].RoQFrameSize, 0, (unsigned short)cinTable[currentHandle].roq_flags);
-                                S_RawSamples(0, ssize, 22050, 2, 1, (byte *)sbuf, 1.0f, -1);
+                                S_RawSamples( 0, ssize, 22050, 2, 1, (byte *)sbuf, 1.0f );
 			}
 			break;
 		case	ZA_SOUND_STEREO:
@@ -1206,7 +1212,7 @@ redump:
 					s_rawend[0] = s_soundtime;
 				}
 				ssize = RllDecodeStereoToStereo( framedata, sbuf, cinTable[currentHandle].RoQFrameSize, 0, (unsigned short)cinTable[currentHandle].roq_flags);
-                                S_RawSamples(0, ssize, 22050, 2, 2, (byte *)sbuf, 1.0f, -1);
+                                S_RawSamples( 0, ssize, 22050, 2, 2, (byte *)sbuf, 1.0f );
 			}
 			break;
 		case	ROQ_QUAD_INFO:
@@ -1332,7 +1338,7 @@ static void RoQShutdown( void ) {
 	}
 
 	if (cinTable[currentHandle].alterGameState) {
-		clc.state = CA_DISCONNECTED;
+		cls.state = CA_DISCONNECTED;
 		// we can't just do a vstr nextmap, because
 		// if we are aborting the intro cinematic with
 		// a devmap command, nextmap would be valid by
@@ -1370,7 +1376,7 @@ e_status CIN_StopCinematic(int handle) {
 	}
 
 	if (cinTable[currentHandle].alterGameState) {
-		if ( clc.state != CA_CINEMATIC ) {
+		if ( cls.state != CA_CINEMATIC ) {
 			return cinTable[currentHandle].status;
 		}
 	}
@@ -1411,7 +1417,7 @@ e_status CIN_RunCinematic (int handle)
 	currentHandle = handle;
 
 	if (cinTable[currentHandle].alterGameState) {
-		if ( clc.state != CA_CINEMATIC ) {
+		if ( cls.state != CA_CINEMATIC ) {
 			return cinTable[currentHandle].status;
 		}
 	}
@@ -1448,7 +1454,7 @@ e_status CIN_RunCinematic (int handle)
 				cinTable[currentHandle].drawY = cinTable[currentHandle].CIN_HEIGHT;
 
 				// rage pro is very slow at 512 wide textures, voodoo can't do it at all
-				if ( cls.glconfig.hardwareType == GLHW_RAGEPRO || cls.glconfig.maxTextureSize <= 256) {
+				if ( glConfig.hardwareType == GLHW_RAGEPRO || glConfig.maxTextureSize <= 256) {
 					if (cinTable[currentHandle].drawX>256) {
 							cinTable[currentHandle].drawX = 256;
 					}
@@ -1531,6 +1537,8 @@ e_status CIN_RunCinematic (int handle)
 	return cinTable[currentHandle].status;
 }
 
+char *S_FileExtension(const char *fni);
+
 #ifdef IOQ3ZTM
 // Also see S_TheCheckExtension
 qboolean CIN_TheCheckExtension(char *filename)
@@ -1562,7 +1570,7 @@ qboolean CIN_TheCheckExtension(char *filename)
 	int i;
 
 	strncpy(fn, filename, stringlen+1);
-	extptr = strrchr(fn, '.');
+	extptr = Q_strrchr(fn, '.');
 
 	if(!extptr)
 	{
@@ -1633,7 +1641,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	unsigned short RoQID;
 	char	name[MAX_OSPATH];
 #if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
-	const char	*ext;
+	char	*fileextPtr;
 #endif
 	int		i;
 
@@ -1671,8 +1679,8 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 	strcpy(cinTable[currentHandle].fileName, name);
 
 #if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
-	ext = COM_GetExtension(name);
-	if (!Q_stricmp(ext, "ogm") || !Q_stricmp(ext, "ogv"))
+	fileextPtr = S_FileExtension(name);
+	if (!Q_stricmp(fileextPtr, ".ogm") || !Q_stricmp(fileextPtr, ".ogv"))
 	{
 		if (Cin_OGM_Init(name))
 		{
@@ -1713,7 +1721,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 
 		if (cinTable[currentHandle].alterGameState)
 		{
-			clc.state = CA_CINEMATIC;
+			cls.state = CA_CINEMATIC;
 		}
 
 		cinTable[currentHandle].status = FMV_PLAY;
@@ -1765,7 +1773,7 @@ int CIN_PlayCinematic( const char *arg, int x, int y, int w, int h, int systemBi
 		Com_DPrintf("trFMV::play(), playing %s\n", arg);
 
 		if (cinTable[currentHandle].alterGameState) {
-			clc.state = CA_CINEMATIC;
+			cls.state = CA_CINEMATIC;
 		}
 		
 		Con_Close();
@@ -1895,16 +1903,18 @@ void CIN_DrawCinematic (int handle) {
 
 void CL_PlayCinematic_f(void) {
 	char	*arg, *s;
+	qboolean	holdatend;
 	int bits = CIN_system;
 
 	Com_DPrintf("CL_PlayCinematic_f\n");
-	if (clc.state == CA_CINEMATIC) {
+	if (cls.state == CA_CINEMATIC) {
 		SCR_StopCinematic();
 	}
 
 	arg = Cmd_Argv( 1 );
 	s = Cmd_Argv(2);
 
+	holdatend = qfalse;
 	if ((s && s[0] == '1') || Q_stricmp(arg,"demoend.roq")==0 || Q_stricmp(arg,"end.roq")==0) {
 		bits |= CIN_hold;
 	}
@@ -1961,6 +1971,7 @@ void CIN_UploadCinematic(int handle) {
 			}
 		}
 
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Support non-256x256 videos in shaders
 		// Resample the video if needed
 		if (cinTable[handle].dirty && (cinTable[handle].CIN_WIDTH != cinTable[handle].drawX || cinTable[handle].CIN_HEIGHT != cinTable[handle].drawY))  {
 			int *buf2;
@@ -1978,6 +1989,9 @@ void CIN_UploadCinematic(int handle) {
 					cinTable[handle].buf, handle, cinTable[handle].dirty);
 			cinTable[handle].dirty = qfalse;
 		}
+#else
+		re.UploadCinematic( 256, 256, 256, 256, cinTable[handle].buf, handle, cinTable[handle].dirty);
+#endif
 
 		if (cl_inGameVideo->integer == 0 && cinTable[handle].playonwalls == 1) {
 			cinTable[handle].playonwalls--;

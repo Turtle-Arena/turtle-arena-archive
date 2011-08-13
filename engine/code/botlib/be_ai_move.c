@@ -894,6 +894,7 @@ int BotMovementViewTarget(int movestate, bot_goal_t *goal, int travelflags, floa
 
 	ms = BotMoveStateFromHandle(movestate);
 	if (!ms) return qfalse;
+	reachnum = 0;
 	//if the bot has no goal or no last reachability
 	if (!ms->lastreachnum || !goal) return qfalse;
 
@@ -1044,13 +1045,12 @@ void MoverBottomCenter(aas_reachability_t *reach, vec3_t bottomcenter)
 //===========================================================================
 float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum)
 {
-	int dist;
-	float startz;
+	float dist, startz;
 	vec3_t start, end;
 	aas_trace_t trace;
 
 	//do gap checking
-	//startz = origin[2];
+	startz = origin[2];
 	//this enables walking down stairs more fluidly
 	{
 		VectorCopy(origin, start);
@@ -1078,7 +1078,7 @@ float BotGapDistance(vec3_t origin, vec3_t hordir, int entnum)
 				end[2] -= 20;
 				if (AAS_PointContents(end) & CONTENTS_WATER) break;
 				//if a gap is found slow down
-				//botimport.Print(PRT_MESSAGE, "gap at %i\n", dist);
+				//botimport.Print(PRT_MESSAGE, "gap at %f\n", dist);
 				return dist;
 			} //end if
 			startz = trace.endpos[2];
@@ -1277,40 +1277,11 @@ int BotWalkInDirection(bot_movestate_t *ms, vec3_t dir, float speed, int type)
 int BotMoveInDirection(int movestate, vec3_t dir, float speed, int type)
 {
 	bot_movestate_t *ms;
-#ifdef IOQ3ZTM // WALK_UNDERWATER
-	qboolean swimming;
-#endif
 
 	ms = BotMoveStateFromHandle(movestate);
 	if (!ms) return qfalse;
-#ifdef IOQ3ZTM // WALK_UNDERWATER
-	//check if swimming
-	swimming = AAS_Swimming(ms->origin);
-	//player walks on ground underwater
-	if (swimming)
-	{
-		if (AAS_OnGround(ms->origin, ms->presencetype, ms->entitynum)) ms->moveflags |= MFL_ONGROUND;
-		//if the bot is on the ground
-		if (ms->moveflags & MFL_ONGROUND)
-		{
-			if (dir[2] > 0)
-			{
-				//need to jump off ground to swim
-				EA_Jump(ms->client);
-			}
-			else
-			{
-				//walk underwater instead
-				swimming = qfalse;
-			}
-		}
-	}
-	//if swimming
-	if (swimming)
-#else
 	//if swimming
 	if (AAS_Swimming(ms->origin))
-#endif
 	{
 		return BotSwimInDirection(ms, dir, speed, type);
 	} //end if
@@ -1557,6 +1528,7 @@ bot_moveresult_t BotTravel_BarrierJump(bot_movestate_t *ms, aas_reachability_t *
 //===========================================================================
 bot_moveresult_t BotFinishTravel_BarrierJump(bot_movestate_t *ms, aas_reachability_t *reach)
 {
+	float dist;
 	vec3_t hordir;
 	bot_moveresult_t_cleared( result );
 
@@ -1566,6 +1538,7 @@ bot_moveresult_t BotFinishTravel_BarrierJump(bot_movestate_t *ms, aas_reachabili
 		hordir[0] = reach->end[0] - ms->origin[0];
 		hordir[1] = reach->end[1] - ms->origin[1];
 		hordir[2] = 0;
+		dist = VectorNormalize(hordir);
 		//
 		BotCheckBlocked(ms, hordir, qtrue, &result);
 		//
@@ -1642,6 +1615,7 @@ bot_moveresult_t BotTravel_WaterJump(bot_movestate_t *ms, aas_reachability_t *re
 bot_moveresult_t BotFinishTravel_WaterJump(bot_movestate_t *ms, aas_reachability_t *reach)
 {
 	vec3_t dir, pnt;
+	float dist;
 	bot_moveresult_t_cleared( result );
 
 	//botimport.Print(PRT_MESSAGE, "BotFinishTravel_WaterJump\n");
@@ -1657,6 +1631,7 @@ bot_moveresult_t BotFinishTravel_WaterJump(bot_movestate_t *ms, aas_reachability
 	dir[0] += crandom() * 10;
 	dir[1] += crandom() * 10;
 	dir[2] += 70 + crandom() * 10;
+	dist = VectorNormalize(dir);
 	//elemantary actions
 	EA_Move(ms->client, dir, 400);
 	//set the ideal view angles
@@ -1794,6 +1769,7 @@ bot_moveresult_t BotFinishTravel_WalkOffLedge(bot_movestate_t *ms, aas_reachabil
 		VectorCopy(dir, hordir);
 		hordir[2] = 0;
 		//
+		dist = VectorNormalize(hordir);
 		speed = 400;
 	} //end if
 	//
@@ -1860,7 +1836,6 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
 bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
 {
 	vec3_t hordir, dir1, dir2, mins, maxs, start, end;
-	int gapdist;
 	float dist1, dist2, speed;
 	bot_moveresult_t_cleared( result );
 	bsp_trace_t trace;
@@ -1881,13 +1856,13 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
 	trace = AAS_Trace(start, mins, maxs, end, ms->entitynum, MASK_PLAYERSOLID);
 	if (trace.startsolid) VectorCopy(start, trace.endpos);
 	//check for a gap
-	for (gapdist = 0; gapdist < 80; gapdist += 10)
+	for (dist1 = 0; dist1 < 80; dist1 += 10)
 	{
-		VectorMA(start, gapdist+10, hordir, end);
+		VectorMA(start, dist1+10, hordir, end);
 		end[2] += 1;
 		if (AAS_PointAreaNum(end) != ms->reachareanum) break;
 	} //end for
-	if (gapdist < 80) VectorMA(reach->start, gapdist, hordir, trace.endpos);
+	if (dist1 < 80) VectorMA(reach->start, dist1, hordir, trace.endpos);
 //	dist1 = BotGapDistance(start, hordir, ms->entitynum);
 //	if (dist1 && dist1 <= trace.fraction * 80) VectorMA(reach->start, dist1-20, hordir, trace.endpos);
 	//
@@ -1933,7 +1908,6 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
 {
 	vec3_t hordir, dir1, dir2, start, end, runstart;
 //	vec3_t runstart, dir1, dir2, hordir;
-	int gapdist;
 	float dist1, dist2, speed;
 	bot_moveresult_t_cleared( result );
 
@@ -1949,13 +1923,13 @@ bot_moveresult_t BotTravel_Jump(bot_movestate_t *ms, aas_reachability_t *reach)
 	start[2] += 1;
 	VectorMA(reach->start, 80, hordir, runstart);
 	//check for a gap
-	for (gapdist = 0; gapdist < 80; gapdist += 10)
+	for (dist1 = 0; dist1 < 80; dist1 += 10)
 	{
-		VectorMA(start, gapdist+10, hordir, end);
+		VectorMA(start, dist1+10, hordir, end);
 		end[2] += 1;
 		if (AAS_PointAreaNum(end) != ms->reachareanum) break;
 	} //end for
-	if (gapdist < 80) VectorMA(reach->start, gapdist, hordir, runstart);
+	if (dist1 < 80) VectorMA(reach->start, dist1, hordir, runstart);
 	//
 	VectorSubtract(ms->origin, reach->start, dir1);
 	dir1[2] = 0;
@@ -2440,7 +2414,7 @@ bot_moveresult_t BotTravel_FuncBobbing(bot_movestate_t *ms, aas_reachability_t *
 		VectorSubtract(reach->start, ms->origin, dir1);
 		if (!(ms->moveflags & MFL_SWIMMING)) dir1[2] = 0;
 		dist1 = VectorNormalize(dir1);
-		//if func_bobbing is Not its start position
+		//if func_bobbing is Not it's start position
 		VectorSubtract(bob_origin, bob_start, dir);
 		if (VectorLength(dir) > 16)
 		{
@@ -2968,6 +2942,7 @@ bot_moveresult_t BotFinishTravel_WeaponJump(bot_movestate_t *ms, aas_reachabilit
 //===========================================================================
 bot_moveresult_t BotTravel_JumpPad(bot_movestate_t *ms, aas_reachability_t *reach)
 {
+	float dist, speed;
 	vec3_t hordir;
 	bot_moveresult_t_cleared( result );
 
@@ -2975,10 +2950,12 @@ bot_moveresult_t BotTravel_JumpPad(bot_movestate_t *ms, aas_reachability_t *reac
 	hordir[0] = reach->start[0] - ms->origin[0];
 	hordir[1] = reach->start[1] - ms->origin[1];
 	hordir[2] = 0;
+	dist = VectorNormalize(hordir);
 	//
 	BotCheckBlocked(ms, hordir, qtrue, &result);
+	speed = 400;
 	//elemantary action move in direction
-	EA_Move(ms->client, hordir, 400);
+	EA_Move(ms->client, hordir, speed);
 	VectorCopy(hordir, result.movedir);
 	//
 	return result;
@@ -3127,7 +3104,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 	ms = BotMoveStateFromHandle(movestate);
 	if (!ms) return;
 	//reset the grapple before testing if the bot has a valid goal
-	//because the bot could lose all its goals when stuck to a wall
+	//because the bot could loose all it's goals when stuck to a wall
 	BotResetGrapple(ms);
 	//
 	if (!goal)
@@ -3297,7 +3274,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			else if ((reach.traveltype & TRAVELTYPE_MASK) == TRAVEL_ELEVATOR ||
 				(reach.traveltype & TRAVELTYPE_MASK) == TRAVEL_FUNCBOB)
 			{
-				if ((result->flags & MOVERESULT_ONTOPOF_ELEVATOR) ||
+				if ((result->flags & MOVERESULT_ONTOPOF_FUNCBOB) ||
 					(result->flags & MOVERESULT_ONTOPOF_FUNCBOB))
 				{
 					ms->reachability_time = AAS_Time() + 5;
@@ -3619,7 +3596,7 @@ void BotResetLastAvoidReach(int movestate)
 	if (latesttime)
 	{
 		ms->avoidreachtimes[latest] = 0;
-		if (ms->avoidreachtries[latest] > 0) ms->avoidreachtries[latest]--;
+		if (ms->avoidreachtries[i] > 0) ms->avoidreachtries[latest]--;
 	} //end if
 } //end of the function BotResetLastAvoidReach
 //===========================================================================

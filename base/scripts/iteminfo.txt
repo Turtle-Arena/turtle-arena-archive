@@ -64,7 +64,7 @@ item holdable_shuriken
 	pickupSound "sound/items/holdable.wav"
 	model "models/powerups/holdable/shuriken.md3"
 	iconName "icons/shuriken"
-	pickupName "Shurikens"
+	pickupName "Pizza-to-Go"
 	quantity 10
 	type IT_HOLDABLE
 	tag HI_SHURIKEN

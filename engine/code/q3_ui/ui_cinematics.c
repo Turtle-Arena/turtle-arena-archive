@@ -141,11 +141,11 @@ qboolean UI_CanShowVideo(const char *video)
 	int i;
 	int len;
 
-	Com_sprintf(filename, MAX_QPATH, "video/%s.RoQ", video);
+	Q_snprintf(filename, MAX_QPATH, "video/%s.RoQ", video);
 	stringlen = strlen(filename);
 
 	strncpy(fn, filename, stringlen+1);
-	extptr = strrchr(fn, '.');
+	extptr = Q_strrchr(fn, '.');
 
 	len = trap_FS_FOpenFile( fn, &hnd, FS_READ );
 

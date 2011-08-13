@@ -247,13 +247,12 @@ void String_Init(void) {
 	}
 }
 
-#if 0
 /*
 =================
 PC_SourceWarning
 =================
 */
-static __attribute__ ((format (printf, 2, 3))) void PC_SourceWarning(int handle, char *format, ...) {
+void PC_SourceWarning(int handle, char *format, ...) {
 	int line;
 	char filename[128];
 	va_list argptr;
@@ -269,14 +268,13 @@ static __attribute__ ((format (printf, 2, 3))) void PC_SourceWarning(int handle,
 
 	Com_Printf(S_COLOR_YELLOW "WARNING: %s, line %d: %s\n", filename, line, string);
 }
-#endif
 
 /*
 =================
 PC_SourceError
 =================
 */
-static __attribute__ ((format (printf, 2, 3))) void PC_SourceError(int handle, char *format, ...) {
+void PC_SourceError(int handle, char *format, ...) {
 	int line;
 	char filename[128];
 	va_list argptr;
@@ -545,15 +543,9 @@ qboolean PC_Script_Parse(int handle, const char **out) {
 
 int UI_SelectForKey(int key)
 {
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	qboolean numLock = trap_Key_IsDown(K_KP_NUMLOCK);
-#else
-	const qboolean numLock = qfalse;
-#endif
-
 	if (key == K_MOUSE1 || key == K_ENTER || key == K_KP_ENTER
 #ifdef IOQ3ZTM // ARROWS
-			|| key == K_MOUSE3 || key == K_RIGHTARROW || ( key == K_KP_RIGHTARROW && !numLock )
+			|| key == K_MOUSE3 || key == K_RIGHTARROW || key == K_KP_RIGHTARROW
 #endif
 			)
 	{
@@ -562,7 +554,7 @@ int UI_SelectForKey(int key)
 	}
 	else if (key == K_MOUSE2
 #ifdef IOQ3ZTM // ARROWS
-			|| key == K_LEFTARROW || (key == K_KP_LEFTARROW && !numLock )
+			|| key == K_LEFTARROW || key == K_KP_LEFTARROW
 #endif
 			)
 	{
@@ -1056,12 +1048,6 @@ static void Menu_RunCloseScript(menuDef_t *menu) {
     item.parent = menu;
     Item_RunScript(&item, menu->onClose);
 	}
-
-#ifdef IOQ3ZTM
-	if (DC->Assets.menuExitSound) {
-		DC->startLocalSound(DC->Assets.menuExitSound, CHAN_LOCAL_SOUND);
-	}
-#endif
 }
 
 void Menus_CloseByName(const char *p) {
@@ -1306,7 +1292,7 @@ commandDef_t commandList[] =
   {"orbit", &Script_Orbit}                      // group/name
 };
 
-int scriptCommandCount = ARRAY_LEN(commandList);
+int scriptCommandCount = sizeof(commandList) / sizeof(commandDef_t);
 
 
 void Item_RunScript(itemDef_t *item, const char *s) {
@@ -1576,8 +1562,12 @@ int Item_Slider_OverSlider(itemDef_t *item, float x, float y) {
 
 int Item_ListBox_OverLB(itemDef_t *item, float x, float y) {
 	rectDef_t r;
+	listBoxDef_t *listPtr;
 	int thumbstart;
+	int count;
 
+	count = DC->feederCount(item->special);
+	listPtr = (listBoxDef_t*)item->typeData;
 	if (item->window.flags & WINDOW_HORIZONTAL) {
 		// check if on left arrow
 		r.x = item->window.rect.x;
@@ -1766,11 +1756,6 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
 	int count = DC->feederCount(item->special);
 	int max, viewmax;
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	qboolean numLock = trap_Key_IsDown(K_KP_NUMLOCK);
-#else
-	const qboolean numLock = qfalse;
-#endif
 
 #ifndef IOQ3ZTM // ARROWS // ZTM: NOTE: Force is unused now...
 	if (force || (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory) && item->window.flags & WINDOW_HASFOCUS))
@@ -1779,7 +1764,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 		max = Item_ListBox_MaxScroll(item);
 		if (item->window.flags & WINDOW_HORIZONTAL) {
 			viewmax = (item->window.rect.w / listPtr->elementWidth);
-			if ( key == K_LEFTARROW || ( key == K_KP_LEFTARROW && !numLock )
+			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW
 #if 0 //#ifdef TA_MISC // MENU: Right Mouse button = left arrow // not here
 				|| key == K_MOUSE2
 #endif
@@ -1806,7 +1791,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 				}
 				return qtrue;
 			}
-			if ( key == K_RIGHTARROW || ( key == K_KP_RIGHTARROW && !numLock ) ) 
+			if ( key == K_RIGHTARROW || key == K_KP_RIGHTARROW ) 
 			{
 				if (!listPtr->notselectable) {
 					listPtr->cursorPos++;
@@ -1832,7 +1817,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 		}
 		else {
 			viewmax = (item->window.rect.h / listPtr->elementHeight);
-			if ( key == K_UPARROW || ( key == K_KP_UPARROW && !numLock ) ) 
+			if ( key == K_UPARROW || key == K_KP_UPARROW ) 
 			{
 				if (!listPtr->notselectable) {
 					listPtr->cursorPos--;
@@ -1855,7 +1840,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 				}
 				return qtrue;
 			}
-			if ( key == K_DOWNARROW || ( key == K_KP_DOWNARROW && !numLock ) ) 
+			if ( key == K_DOWNARROW || key == K_KP_DOWNARROW ) 
 			{
 				if (!listPtr->notselectable) {
 					listPtr->cursorPos++;
@@ -1919,17 +1904,17 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 			}
 			return qtrue;
 		}
-		if ( key == K_HOME || ( key == K_KP_HOME && !numLock ) ) {
+		if ( key == K_HOME || key == K_KP_HOME) {
 			// home
 			listPtr->startPos = 0;
 			return qtrue;
 		}
-		if ( key == K_END || ( key == K_KP_END && !numLock ) ) {
+		if ( key == K_END || key == K_KP_END) {
 			// end
 			listPtr->startPos = max;
 			return qtrue;
 		}
-		if (key == K_PGUP || ( key == K_KP_PGUP && !numLock ) ) {
+		if (key == K_PGUP || key == K_KP_PGUP ) {
 			// page up
 			if (!listPtr->notselectable) {
 				listPtr->cursorPos -= viewmax;
@@ -1953,7 +1938,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 			}
 			return qtrue;
 		}
-		if ( key == K_PGDN || ( key == K_KP_PGDN && !numLock ) ) {
+		if ( key == K_PGDN || key == K_KP_PGDN ) {
 			// page down
 			if (!listPtr->notselectable) {
 				listPtr->cursorPos += viewmax;
@@ -2114,11 +2099,6 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 	int len;
 	itemDef_t *newItem = NULL;
 	editFieldDef_t *editPtr = (editFieldDef_t*)item->typeData;
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	qboolean numLock = trap_Key_IsDown(K_KP_NUMLOCK);
-#else
-	const qboolean numLock = qfalse;
-#endif
 
 	if (item->cvar) {
 
@@ -2182,7 +2162,7 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 
 		} else {
 
-			if ( key == K_DEL || ( key == K_KP_DEL && !numLock ) ) {
+			if ( key == K_DEL || key == K_KP_DEL ) {
 				if ( item->cursorPos < len ) {
 					memmove( buff + item->cursorPos, buff + item->cursorPos + 1, len - item->cursorPos);
 					DC->setCVar(item->cvar, buff);
@@ -2190,7 +2170,7 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 				return qtrue;
 			}
 
-			if ( key == K_RIGHTARROW || ( key == K_KP_RIGHTARROW && !numLock ) ) 
+			if ( key == K_RIGHTARROW || key == K_KP_RIGHTARROW ) 
 			{
 				if (editPtr->maxPaintChars && item->cursorPos >= editPtr->maxPaintChars && item->cursorPos < len) {
 					item->cursorPos++;
@@ -2203,7 +2183,7 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 				return qtrue;
 			}
 
-			if ( key == K_LEFTARROW || ( key == K_KP_LEFTARROW && !numLock )
+			if ( key == K_LEFTARROW || key == K_KP_LEFTARROW
 #if 0 // #ifdef TA_MISC // MENU: Right Mouse button = left arrow // NOT HERE
 				|| key == K_MOUSE2
 #endif
@@ -2218,13 +2198,13 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 				return qtrue;
 			}
 
-			if ( key == K_HOME || ( key == K_KP_HOME && !numLock ) ) {// || ( tolower(key) == 'a' && trap_Key_IsDown( K_CTRL ) ) ) {
+			if ( key == K_HOME || key == K_KP_HOME) {// || ( tolower(key) == 'a' && trap_Key_IsDown( K_CTRL ) ) ) {
 				item->cursorPos = 0;
 				editPtr->paintOffset = 0;
 				return qtrue;
 			}
 
-			if ( key == K_END || ( key == K_KP_END && !numLock ) )  {// ( tolower(key) == 'e' && trap_Key_IsDown( K_CTRL ) ) ) {
+			if ( key == K_END || key == K_KP_END)  {// ( tolower(key) == 'e' && trap_Key_IsDown( K_CTRL ) ) ) {
 				item->cursorPos = len;
 				if(item->cursorPos > editPtr->maxPaintChars) {
 					editPtr->paintOffset = len - editPtr->maxPaintChars;
@@ -2232,20 +2212,20 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 				return qtrue;
 			}
 
-			if ( key == K_INS || ( key == K_KP_INS && !numLock ) ) {
+			if ( key == K_INS || key == K_KP_INS ) {
 				DC->setOverstrikeMode(!DC->getOverstrikeMode());
 				return qtrue;
 			}
 		}
 
-		if (key == K_TAB || key == K_DOWNARROW || ( key == K_KP_DOWNARROW && !numLock ) ) {
+		if (key == K_TAB || key == K_DOWNARROW || key == K_KP_DOWNARROW) {
 			newItem = Menu_SetNextCursorItem(item->parent);
 			if (newItem && (newItem->type == ITEM_TYPE_EDITFIELD || newItem->type == ITEM_TYPE_NUMERICFIELD)) {
 				g_editItem = newItem;
 			}
 		}
 
-		if (key == K_UPARROW || ( key == K_KP_UPARROW && !numLock ) ) {
+		if (key == K_UPARROW || key == K_KP_UPARROW) {
 			newItem = Menu_SetPrevCursorItem(item->parent);
 			if (newItem && (newItem->type == ITEM_TYPE_EDITFIELD || newItem->type == ITEM_TYPE_NUMERICFIELD)) {
 				g_editItem = newItem;
@@ -2643,12 +2623,6 @@ void  Menus_Activate(menuDef_t *menu) {
 		Item_RunScript(&item, menu->onOpen);
 	}
 
-#ifdef IOQ3ZTM
-	if (DC->Assets.menuEnterSound) {
-		DC->startLocalSound(DC->Assets.menuEnterSound, CHAN_LOCAL_SOUND);
-	}
-#endif
-
 	if (menu->soundName && *menu->soundName) {
 //		DC->stopBackgroundTrack();					// you don't want to do this since it will reset s_rawend
 		DC->startBackgroundTrack(menu->soundName, menu->soundName);
@@ -2714,9 +2688,16 @@ static rectDef_t *Item_CorrectedTextRect(itemDef_t *item) {
 void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 	int i;
 	itemDef_t *item = NULL;
+	qboolean inHandler = qfalse;
 
+	if (inHandler) {
+		return;
+	}
+
+	inHandler = qtrue;
 	if (g_waitingForKey && down) {
 		Item_Bind_HandleKey(g_bindItem, key, down);
+		inHandler = qfalse;
 		return;
 	}
 
@@ -2724,6 +2705,7 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 		if (!Item_TextField_HandleKey(g_editItem, key)) {
 			g_editingField = qfalse;
 			g_editItem = NULL;
+			inHandler = qfalse;
 			return;
 		} else if (key == K_MOUSE1 || key == K_MOUSE2 || key == K_MOUSE3) {
 			g_editingField = qfalse;
@@ -2735,16 +2717,18 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 	}
 
 	if (menu == NULL) {
+		inHandler = qfalse;
 		return;
 	}
 
-	// see if the mouse is within the window bounds and if so is this a mouse click
+		// see if the mouse is within the window bounds and if so is this a mouse click
 	if (down && !(menu->window.flags & WINDOW_POPUP) && !Rect_ContainsPoint(&menu->window.rect, DC->cursorx, DC->cursory)) {
 		static qboolean inHandleKey = qfalse;
 		if (!inHandleKey && ( key == K_MOUSE1 || key == K_MOUSE2 || key == K_MOUSE3 ) ) {
 			inHandleKey = qtrue;
 			Menus_HandleOOBClick(menu, key, down);
 			inHandleKey = qfalse;
+			inHandler = qfalse;
 			return;
 		}
 	}
@@ -2759,11 +2743,13 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 	if (item != NULL) {
 		if (Item_HandleKey(item, key, down)) {
 			Item_Action(item);
+			inHandler = qfalse;
 			return;
 		}
 	}
 
 	if (!down) {
+		inHandler = qfalse;
 		return;
 	}
 
@@ -2792,13 +2778,7 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 			}
 			break;
 #endif
-
 		case K_KP_UPARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-			break;
-		}
-#endif
 		case K_UPARROW:
 			Menu_SetPrevCursorItem(menu);
 			break;
@@ -2810,13 +2790,8 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 		    Item_RunScript(&it, menu->onESC);
 			}
 			break;
-		case K_KP_DOWNARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-			break;
-		}
-#endif
 		case K_TAB:
+		case K_KP_DOWNARROW:
 		case K_DOWNARROW:
 			Menu_SetNextCursorItem(menu);
 			break;
@@ -2833,6 +2808,7 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 						item->cursorPos = 0;
 						g_editingField = qtrue;
 						g_editItem = item;
+						DC->setOverstrikeMode(qtrue);
 					}
 				} else {
 					if (Rect_ContainsPoint(&item->window.rect, DC->cursorx, DC->cursory)) {
@@ -2846,20 +2822,6 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 		case K_JOY2:
 		case K_JOY3:
 		case K_JOY4:
-#ifdef TA_SPLITVIEW
-		case K_2JOY1:
-		case K_2JOY2:
-		case K_2JOY3:
-		case K_2JOY4:
-		case K_3JOY1:
-		case K_3JOY2:
-		case K_3JOY3:
-		case K_3JOY4:
-		case K_4JOY1:
-		case K_4JOY2:
-		case K_4JOY3:
-		case K_4JOY4:
-#endif
 		case K_AUX1:
 		case K_AUX2:
 		case K_AUX3:
@@ -2884,12 +2846,14 @@ void Menu_HandleKey(menuDef_t *menu, int key, qboolean down) {
 					item->cursorPos = 0;
 					g_editingField = qtrue;
 					g_editItem = item;
+					DC->setOverstrikeMode(qtrue);
 				} else {
 						Item_Action(item);
 				}
 			}
 			break;
 	}
+	inHandler = qfalse;
 }
 
 void ToWindowCoords(float *x, float *y, windowDef_t *window) {
@@ -3181,6 +3145,8 @@ void Item_TextField_Paint(itemDef_t *item) {
 		DC->getCVarString(item->cvar, buff, sizeof(buff));
 	} 
 
+	parent = (menuDef_t*)item->parent;
+
 	if (item->window.flags & WINDOW_HASFOCUS) {
 		lowLight[0] = 0.8 * parent->focusColor[0]; 
 		lowLight[1] = 0.8 * parent->focusColor[1]; 
@@ -3254,6 +3220,7 @@ void Item_Multi_Paint(itemDef_t *item) {
 
 typedef struct {
 	char	*command;
+	int		id;
 	int		defaultbind1;
 	int		defaultbind2;
 	int		bind1;
@@ -3345,7 +3312,7 @@ static bind_t g_bindings[] =
 };
 
 
-static const int g_bindCount = ARRAY_LEN(g_bindings);
+static const int g_bindCount = sizeof(g_bindings) / sizeof(bind_t);
 
 #ifndef MISSIONPACK
 static configcvar_t g_configcvars[] =
@@ -3534,8 +3501,10 @@ void BindingFromName(const char *cvar) {
 
 void Item_Slider_Paint(itemDef_t *item) {
 	vec4_t newColor, lowLight;
-	float x, y;
+	float x, y, value;
 	menuDef_t *parent = (menuDef_t*)item->parent;
+
+	value = (item->cvar) ? DC->getCVarValue(item->cvar) : 0;
 
 	if (item->window.flags & WINDOW_HASFOCUS) {
 		lowLight[0] = 0.8 * parent->focusColor[0]; 
@@ -3559,16 +3528,20 @@ void Item_Slider_Paint(itemDef_t *item) {
 
 	x = Item_Slider_ThumbPosition(item);
 	DC->drawHandlePic( x - (SLIDER_THUMB_WIDTH / 2), y - 2, SLIDER_THUMB_WIDTH, SLIDER_THUMB_HEIGHT, DC->Assets.sliderThumb );
+
 }
 
 void Item_Bind_Paint(itemDef_t *item) {
 	vec4_t newColor, lowLight;
+	float value;
 	int maxChars = 0;
 	menuDef_t *parent = (menuDef_t*)item->parent;
 	editFieldDef_t *editPtr = (editFieldDef_t*)item->typeData;
 	if (editPtr) {
 		maxChars = editPtr->maxPaintChars;
 	}
+
+	value = (item->cvar) ? DC->getCVarValue(item->cvar) : 0;
 
 	if (item->window.flags & WINDOW_HASFOCUS) {
 		if (g_bindItem == item) {
@@ -3592,7 +3565,7 @@ void Item_Bind_Paint(itemDef_t *item) {
 		BindingFromName(item->cvar);
 		DC->drawText(item->textRect.x + item->textRect.w + 8, item->textRect.y, item->textscale, newColor, g_nameBind1, 0, maxChars, item->textStyle);
 	} else {
-		DC->drawText(item->textRect.x, item->textRect.y, item->textscale, newColor, "FIXME", 0, maxChars, item->textStyle);
+		DC->drawText(item->textRect.x, item->textRect.y, item->textscale, newColor, (value != 0) ? "FIXME" : "FIXME", 0, maxChars, item->textStyle);
 	}
 }
 
@@ -3797,8 +3770,7 @@ void Item_Image_Paint(itemDef_t *item) {
 }
 
 void Item_ListBox_Paint(itemDef_t *item) {
-	float x, y, size, thumb;
-	int	count, i;
+	float x, y, size, count, i, thumb;
 	qhandle_t image;
 	qhandle_t optionalImage;
 	listBoxDef_t *listPtr = (listBoxDef_t*)item->typeData;
@@ -3951,9 +3923,12 @@ void Item_ListBox_Paint(itemDef_t *item) {
 
 
 void Item_OwnerDraw_Paint(itemDef_t *item) {
+  menuDef_t *parent;
+
 	if (item == NULL) {
 		return;
 	}
+  parent = (menuDef_t*)item->parent;
 
 	if (DC->ownerDrawItem) {
 		vec4_t color, lowLight;

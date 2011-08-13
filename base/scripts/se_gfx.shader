@@ -1,5 +1,43 @@
 // Based on OpenArena's /scripts/decals.shader
 
+// Snow!
+gfx/misc/snow
+{
+	cull disable
+	{
+		map gfx/misc/snow
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+gfx/misc/snow1
+{
+	cull disable
+	{
+		map gfx/misc/snow1
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+gfx/misc/snow2
+{
+	cull disable
+	{
+		map gfx/misc/snow2
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+// raindrop
+gfx/misc/raindrop
+{
+	cull disable
+	{
+		map gfx/misc/raindrop
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
 // Melee Weapon Trail
 weaponTrail
 {
@@ -84,6 +122,33 @@ sparkTrail
 	}
 }
 
+console
+{
+	nopicmip
+	nomipmaps
+	{
+		map gfx/misc/console01.png
+		blendFunc blend
+		tcMod scroll -0.01 0
+	}
+	{
+		map menu/art/menuback2.png
+		blendFunc blend
+		tcMod scale 1 1
+		tcMod scroll -0.02 -0.01
+		alphaGen const 0.4
+	}
+}
+
+white
+{
+	{
+		map *white
+		blendfunc	GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		rgbgen vertex
+	}
+}
+
 lagometer
 {
 	nopicmip
@@ -122,22 +187,22 @@ projectionShadow
 	}
 }
 
-// Water splash
+// ZTM: In OpenArena this is called "oldwake", see OA for their new wake.
 wake
 {
 	{
 		clampmap sprites/splash.png
 		blendfunc add
-		rgbGen wave inversesawtooth 0 1 0 0.5
-		tcMod rotate 25
-		tcMod stretch sawtooth 0.45 0.55 0 0.5
+		rgbGen wave sin 0.7 0.3 0.25 0.5
+		tcMod rotate 250
+		tcMod stretch sin 0.9 0.1 0 0.7
 	}
 	{
 		clampmap sprites/splash.png
 		blendfunc add
-		rgbGen wave inversesawtooth 0 1 0.5 0.5
-		tcMod rotate 25
-		tcMod stretch sawtooth 0.45 0.55 0.5 0.5
+		rgbGen wave sin 0.7 0.3 0.25 0.4
+		tcMod rotate -230
+		tcMod stretch sin 0.9 0.05 0 0.9
 	}
 }
 
@@ -252,7 +317,7 @@ gfx/2d/crosshair
 	{
 		map gfx/2d/crosshair.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
+        rgbGen identity
 	}
 }
 
@@ -262,7 +327,7 @@ gfx/2d/crosshairb
 	{
 		map gfx/2d/crosshairb.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
+		rgbGen identity
 	}
 }
 
@@ -272,7 +337,7 @@ gfx/2d/crosshairc
 	{
 		map gfx/2d/crosshairc.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
+		rgbGen identity
 	}
 }
 
@@ -282,7 +347,7 @@ gfx/2d/crosshaird
 	{
 		map gfx/2d/crosshaird.png
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen vertex
+		rgbGen identity
 	}
 }
 
@@ -291,12 +356,13 @@ gfx/misc/tracer
 {
 	cull disable
 	{
-		map gfx/misc/tracer2.png
+		map gfx/misc/tracer2.jpg
 		blendfunc add
 		//blendFunc GL_ONE GL_ONE
 	}
 }
 
+// ZTM: Used by unfinished WP_GUN
 gfx/damage/bullet_mrk
 {
 	polygonoffset
@@ -312,7 +378,7 @@ gfx/damage/burn_med_mrk
 {
 	polygonoffset
 	{
-		map gfx/damage/burn_med_mrk.png
+		map gfx/damage/burn_med_mrk.tga
 		blendfunc gl_zero gl_one_minus_src_color
 		rgbGen Vertex
 	}
@@ -471,7 +537,7 @@ bloodExplosion		// spurt of blood at point of impact
 {
 	cull disable
 	{
-		animmap 5 models/weaphits/blood201.png models/weaphits/blood202.png models/weaphits/blood203.png models/weaphits/blood204.png models/weaphits/blood205.png
+		animmap 5 models/weaphits/blood201.tga models/weaphits/blood202.tga models/weaphits/blood203.tga models/weaphits/blood204.tga models/weaphits/blood205.tga
 		blendfunc blend
 	}
 }

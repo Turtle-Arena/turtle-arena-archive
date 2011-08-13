@@ -199,7 +199,7 @@ static void R_DrawElements( int numIndexes, const glIndex_t *indexes ) {
 	// anything else will cause no drawing
 }
 
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING
 float EvalWaveForm( const waveForm_t *wf );
 float EvalWaveFormClamped( const waveForm_t *wf );
 
@@ -207,9 +207,7 @@ float EvalWaveFormClamped( const waveForm_t *wf );
 // modified version of static void ComputeColors( shaderStage_t *pStage )
 void R_SetCelOutlineColors(const celoutline_t *celoutline, byte *colors)
 {
-	colorGen_t	rgbGen;
-	alphaGen_t	alphaGen;
-	int			i;
+	int i;
 
 	if (!colors)
 		return;
@@ -217,25 +215,13 @@ void R_SetCelOutlineColors(const celoutline_t *celoutline, byte *colors)
 	colors[0] = colors[1] = colors[2] = 0; // Black RGB
 	colors[3] = 0xff; // Full alpha
 
-	if (!celoutline) {
-		if (backEnd.currentEntity && backEnd.currentEntity->e.renderfx & RF_FORCE_ENT_ALPHA) {
-			colors[3] = backEnd.currentEntity->e.shaderRGBA[3];
-		}
-
+	if (!celoutline)
 		return;
-	}
-
-	rgbGen = celoutline->rgbGen;
-	alphaGen = celoutline->alphaGen;
-
-	if (backEnd.currentEntity && backEnd.currentEntity->e.renderfx & RF_FORCE_ENT_ALPHA) {
-		alphaGen = AGEN_ENTITY;
-	}
 
 	//
 	// rgbGen
 	//
-	switch ( rgbGen )
+	switch ( celoutline->rgbGen )
 	{
 		case CGEN_IDENTITY: // done
 			colors[0] = colors[1] = colors[2] = colors[3] = 0xff;
@@ -358,20 +344,20 @@ void R_SetCelOutlineColors(const celoutline_t *celoutline, byte *colors)
 	//
 	// alphaGen
 	//
-	switch ( alphaGen )
+	switch ( celoutline->alphaGen )
 	{
 	case AGEN_SKIP:
 		break;
 	case AGEN_IDENTITY: // done
-		if ( rgbGen != CGEN_IDENTITY ) {
-			if ( ( rgbGen == CGEN_VERTEX && tr.identityLight != 1 ) ||
-				 rgbGen != CGEN_VERTEX ) {
+		if ( celoutline->rgbGen != CGEN_IDENTITY ) {
+			if ( ( celoutline->rgbGen == CGEN_VERTEX && tr.identityLight != 1 ) ||
+				 celoutline->rgbGen != CGEN_VERTEX ) {
 				colors[3] = 0xff;
 			}
 		}
 		break;
 	case AGEN_CONST: // done
-		if ( rgbGen != CGEN_CONST ) {
+		if ( celoutline->rgbGen != CGEN_CONST ) {
 			colors[3] = celoutline->constantColor[3];
 		}
 		break;
@@ -579,7 +565,7 @@ liquids look solid instead of... liquid.
 
 */
 }
-#endif
+#endif // CELSHADING
 
 /*
 =============================================================
@@ -614,7 +600,7 @@ static void R_BindAnimatedImage( textureBundle_t *bundle ) {
 
 	// it is necessary to do this messy calc to make sure animations line up
 	// exactly with waveforms of the same frequency
-	index = ri.ftol(tess.shaderTime * bundle->imageAnimationSpeed * FUNCTABLE_SIZE);
+	index = myftol( tess.shaderTime * bundle->imageAnimationSpeed * FUNCTABLE_SIZE );
 	index >>= FUNCTABLE_SIZE2;
 
 	if ( index < 0 ) {
@@ -625,7 +611,7 @@ static void R_BindAnimatedImage( textureBundle_t *bundle ) {
 	GL_Bind( bundle->image[ index ] );
 }
 
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING
 //DRAWCEL
 static void DrawCel (shaderCommands_t *input, float lineWidth, const celoutline_t *celoutline) {
 
@@ -652,7 +638,7 @@ static void DrawCel (shaderCommands_t *input, float lineWidth, const celoutline_
 	}
 
 }
-#endif
+#endif // CELSHADING
 
 /*
 ================
@@ -869,17 +855,8 @@ static void ProjectDlightTexture_altivec( void ) {
 		{
 			float luminance;
 			
-			luminance = LUMA(dl->color[0], dl->color[1], dl->color[2]) * 255.0f;
+			luminance = (dl->color[0] * 255.0f + dl->color[1] * 255.0f + dl->color[2] * 255.0f) / 3;
 			floatColor[0] = floatColor[1] = floatColor[2] = luminance;
-		}
-		else if(r_greyscale->value)
-		{
-			float luminance;
-			
-			luminance = LUMA(dl->color[0], dl->color[1], dl->color[2]) * 255.0f;
-			floatColor[0] = LERP(dl->color[0] * 255.0f, luminance, r_greyscale->value);
-			floatColor[1] = LERP(dl->color[1] * 255.0f, luminance, r_greyscale->value);
-			floatColor[2] = LERP(dl->color[2] * 255.0f, luminance, r_greyscale->value);
 		}
 		else
 		{
@@ -1031,18 +1008,9 @@ static void ProjectDlightTexture_scalar( void ) {
 		if(r_greyscale->integer)
 		{
 			float luminance;
-
-			luminance = LUMA(dl->color[0], dl->color[1], dl->color[2]) * 255.0f;
-			floatColor[0] = floatColor[1] = floatColor[2] = luminance;
-		}
-		else if(r_greyscale->value)
-		{
-			float luminance;
 			
-			luminance = LUMA(dl->color[0], dl->color[1], dl->color[2]) * 255.0f;
-			floatColor[0] = LERP(dl->color[0] * 255.0f, luminance, r_greyscale->value);
-			floatColor[1] = LERP(dl->color[1] * 255.0f, luminance, r_greyscale->value);
-			floatColor[2] = LERP(dl->color[2] * 255.0f, luminance, r_greyscale->value);
+			luminance = (dl->color[0] * 255.0f + dl->color[1] * 255.0f + dl->color[2] * 255.0f) / 3;
+			floatColor[0] = floatColor[1] = floatColor[2] = luminance;
 		}
 		else
 		{
@@ -1099,9 +1067,9 @@ static void ProjectDlightTexture_scalar( void ) {
 				}
 			}
 			clipBits[i] = clip;
-			colors[0] = ri.ftol(floatColor[0] * modulate);
-			colors[1] = ri.ftol(floatColor[1] * modulate);
-			colors[2] = ri.ftol(floatColor[2] * modulate);
+			colors[0] = myftol(floatColor[0] * modulate);
+			colors[1] = myftol(floatColor[1] * modulate);
+			colors[2] = myftol(floatColor[2] * modulate);
 			colors[3] = 255;
 		}
 
@@ -1408,22 +1376,11 @@ static void ComputeColors( shaderStage_t *pStage )
 	if(r_greyscale->integer)
 	{
 		int scale;
-		for(i = 0; i < tess.numVertexes; i++)
-		{
-			scale = LUMA(tess.svars.colors[i][0], tess.svars.colors[i][1], tess.svars.colors[i][2]);
- 			tess.svars.colors[i][0] = tess.svars.colors[i][1] = tess.svars.colors[i][2] = scale;
-		}
-	}
-	else if(r_greyscale->value)
-	{
-		float scale;
 		
 		for(i = 0; i < tess.numVertexes; i++)
 		{
-			scale = LUMA(tess.svars.colors[i][0], tess.svars.colors[i][1], tess.svars.colors[i][2]);
-			tess.svars.colors[i][0] = LERP(tess.svars.colors[i][0], scale, r_greyscale->value);
-			tess.svars.colors[i][1] = LERP(tess.svars.colors[i][1], scale, r_greyscale->value);
-			tess.svars.colors[i][2] = LERP(tess.svars.colors[i][2], scale, r_greyscale->value);
+			scale = (tess.svars.colors[i][0] + tess.svars.colors[i][1] + tess.svars.colors[i][2]) / 3;
+			tess.svars.colors[i][0] = tess.svars.colors[i][1] = tess.svars.colors[i][2] = scale;
 		}
 	}
 }
@@ -1472,11 +1429,6 @@ static void ComputeTexCoords( shaderStage_t *pStage ) {
 		case TCGEN_ENVIRONMENT_MAPPED:
 			RB_CalcEnvironmentTexCoords( ( float * ) tess.svars.texcoords[b] );
 			break;
-#ifdef IOQ3ZTM // ZEQ2_CEL
-		case TCGEN_ENVIRONMENT_CELSHADE_MAPPED:
-			RB_CalcEnvironmentCelShadeTexCoords( ( float * ) tess.svars.texcoords[b] );
-			break;
-#endif
 		case TCGEN_BAD:
 			return;
 		}
@@ -1527,7 +1479,7 @@ static void ComputeTexCoords( shaderStage_t *pStage ) {
 				break;
 
 			default:
-				ri.Error( ERR_DROP, "ERROR: unknown texmod '%d' in shader '%s'", pStage->bundle[b].texMods[tm].type, tess.shader->name );
+				ri.Error( ERR_DROP, "ERROR: unknown texmod '%d' in shader '%s'\n", pStage->bundle[b].texMods[tm].type, tess.shader->name );
 				break;
 			}
 		}
@@ -1641,10 +1593,8 @@ static void RB_IterateStagesGeneric( shaderCommands_t *input )
 void RB_StageIteratorGeneric( void )
 {
 	shaderCommands_t *input;
-	shader_t		*shader;
 
 	input = &tess;
-	shader = input->shader;
 
 	RB_DeformTessGeometry();
 
@@ -1661,18 +1611,18 @@ void RB_StageIteratorGeneric( void )
 	//
 	// set face culling appropriately
 	//
-	GL_Cull( shader->cullType );
+	GL_Cull( input->shader->cullType );
 
 	// set polygon offset if necessary
-	if ( shader->polygonOffset )
+	if ( input->shader->polygonOffset )
 	{
 		qglEnable( GL_POLYGON_OFFSET_FILL );
 		qglPolygonOffset( r_offsetFactor->value, r_offsetUnits->value );
 	}
 
-#ifdef IOQ3ZTM // CELSHADING
+#ifdef CELSHADING
 	// Draw cel outlines. There has to be a better place to put this.
-	// Set r_celoutline to -1 to disable per-shader celoutlines
+	// ZTM: Set r_celoutline to -1 to disable per-shader celoutlines
 	if (r_celoutline->integer != -1) {
 		if (input->shader->celoutline.width > 0) {
 			DrawCel(&tess, input->shader->celoutline.width, &input->shader->celoutline);
@@ -1688,7 +1638,7 @@ void RB_StageIteratorGeneric( void )
 	// to avoid compiling those arrays since they will change
 	// during multipass rendering
 	//
-	if ( tess.numPasses > 1 || shader->multitextureEnv )
+	if ( tess.numPasses > 1 || input->shader->multitextureEnv )
 	{
 		setArraysOnce = qfalse;
 		qglDisableClientState (GL_COLOR_ARRAY);
@@ -1756,7 +1706,7 @@ void RB_StageIteratorGeneric( void )
 	//
 	// reset polygon offset
 	//
-	if ( shader->polygonOffset )
+	if ( input->shader->polygonOffset )
 	{
 		qglDisable( GL_POLYGON_OFFSET_FILL );
 	}
@@ -1772,6 +1722,7 @@ void RB_StageIteratorVertexLitTexture( void )
 	shader_t		*shader;
 
 	input = &tess;
+
 	shader = input->shader;
 
 	//
@@ -1792,7 +1743,7 @@ void RB_StageIteratorVertexLitTexture( void )
 	//
 	// set face culling appropriately
 	//
-	GL_Cull( shader->cullType );
+	GL_Cull( input->shader->cullType );
 
 	//
 	// set arrays and lock
@@ -1845,10 +1796,8 @@ void RB_StageIteratorVertexLitTexture( void )
 
 void RB_StageIteratorLightmappedMultitexture( void ) {
 	shaderCommands_t *input;
-	shader_t		*shader;
 
 	input = &tess;
-	shader = input->shader;
 
 	//
 	// log this call
@@ -1862,7 +1811,7 @@ void RB_StageIteratorLightmappedMultitexture( void ) {
 	//
 	// set face culling appropriately
 	//
-	GL_Cull( shader->cullType );
+	GL_Cull( input->shader->cullType );
 
 	//
 	// set color, pointers, and lock

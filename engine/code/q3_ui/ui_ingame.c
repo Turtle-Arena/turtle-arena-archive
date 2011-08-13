@@ -59,9 +59,6 @@ INGAME MENU
 #ifdef TA_MISC
 #define ID_CUSTOMIZEPLAYER		22
 #endif
-#ifdef TA_SPLITVIEW
-#define ID_LOCALPLAYERS			23
-#endif
 
 
 typedef struct {
@@ -85,9 +82,6 @@ typedef struct {
 	menutext_s		teamorders;
 	menutext_s		quit;
 	menutext_s		resume;
-#ifdef TA_SPLITVIEW
-	menutext_s		localPlayers;
-#endif
 } ingamemenu_t;
 
 static ingamemenu_t	s_ingame;
@@ -124,40 +118,6 @@ static void InGame_QuitAction( qboolean result ) {
 }
 
 
-#ifdef TA_SPLITVIEW
-/*
-=================
-UI_TogglePlayerIngame
-=================
-*/
-void UI_TogglePlayerIngame(int localClientNum)
-{
-	uiClientState_t	cs;
-	char	info[MAX_INFO_STRING];
-	int		team;
-
-	trap_GetClientState( &cs );
-
-	if (localClientNum == 0) {
-		trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
-
-		team = atoi( Info_ValueForKey( info, "t" ) );
-		if( team == TEAM_SPECTATOR ) {
-			// ZTM: FIXME: There is no way to know if client is hiding or just spectating.
-			trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team auto\n" );
-		} else {
-			trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team hide\n" );
-		}
-	} else if (cs.lcIndex[localClientNum] == -1) {
-		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", Com_LocalClientCvarName(localClientNum, "dropin")) );
-	} else {
-		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", Com_LocalClientCvarName(localClientNum, "dropout")) );
-	}
-
-	UI_ForceMenuOff ();
-}
-#endif
-
 /*
 =================
 InGame_Event
@@ -170,11 +130,7 @@ void InGame_Event( void *ptr, int notification ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_TEAM:
-#ifdef TA_SPLITVIEW
-		UI_SetupPlayersMenu(UI_TeamMainMenu, "CHANGE TEAM", qtrue);
-#else
 		UI_TeamMainMenu();
-#endif
 		break;
 
 #ifdef TA_MISC // SMART_JOIN_MENU
@@ -227,11 +183,7 @@ void InGame_Event( void *ptr, int notification ) {
 
 #ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
-#ifdef TA_SPLITVIEW
-		UI_SetupPlayersMenu(UI_PlayerSettingsMenu, "SETUP PLAYER", qtrue);
-#else
 		UI_PlayerSettingsMenu();
-#endif
 		break;
 #endif
 
@@ -242,12 +194,6 @@ void InGame_Event( void *ptr, int notification ) {
 	case ID_RESUME:
 		UI_PopMenu();
 		break;
-
-#ifdef TA_SPLITVIEW
-	case ID_LOCALPLAYERS:
-		UI_SetupPlayersMenu(UI_TogglePlayerIngame, "Add/Drop", qfalse);
-		break;
-#endif
 	}
 }
 
@@ -279,53 +225,26 @@ void InGame_MenuInit( void ) {
 	s_ingame.frame.height				= 332;//256;
 
 #ifdef TA_MISC // INGAME_SERVER_MENU
-#ifdef TA_SPLITVIEW
-	y = 88+INGAME_MENU_VERTICAL_SPACING/2;
-#else
 	y = 88+INGAME_MENU_VERTICAL_SPACING;
-#endif
 #else
 	//y = 96;
 	y = 88;
 #endif
-#ifdef TA_MISC
-	s_ingame.resume.generic.type			= MTYPE_PTEXT;
-	s_ingame.resume.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	s_ingame.resume.generic.x				= 320;
-	s_ingame.resume.generic.y				= y;
-	s_ingame.resume.generic.id				= ID_RESUME;
-	s_ingame.resume.generic.callback		= InGame_Event; 
-	s_ingame.resume.string					= "Resume Game";
-	s_ingame.resume.color					= text_big_color;
-	s_ingame.resume.style					= UI_CENTER|UI_SMALLFONT;
-
-	y += INGAME_MENU_VERTICAL_SPACING;
-#endif
 #ifdef TA_MISC // SMART_JOIN_MENU
-	trap_GetClientState( &cs );
-	trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
-
-	if(
-#ifdef TA_SPLITVIEW // Force if more than one local client
-		cs.numLocalClients > 1 ||
-#endif
-		(trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
+	if( (trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
 		s_ingame.team.generic.type			= MTYPE_PTEXT;
 		s_ingame.team.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 		s_ingame.team.generic.x				= 320;
 		s_ingame.team.generic.y				= y;
 		s_ingame.team.generic.id			= ID_TEAM;
 		s_ingame.team.generic.callback		= InGame_Event;
-#ifdef TA_SPLITVIEW
-		if (cs.numLocalClients > 1)
-			s_ingame.team.string			= "Change Teams";
-		else
-#endif
-		s_ingame.team.string				= "Change Team";
+		s_ingame.team.string				= "CHANGE TEAM";
 		s_ingame.team.color					= text_big_color;
 		s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 	}
 	else {
+		trap_GetClientState( &cs );
+		trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
 		team = atoi( Info_ValueForKey( info, "t" ) );
 		if( team == TEAM_SPECTATOR ) {
 			s_ingame.team.generic.type			= MTYPE_PTEXT;
@@ -334,7 +253,7 @@ void InGame_MenuInit( void ) {
 			s_ingame.team.generic.y				= y;
 			s_ingame.team.generic.id			= ID_JOINGAME;
 			s_ingame.team.generic.callback		= InGame_Event;
-			s_ingame.team.string				= "Join Game";
+			s_ingame.team.string				= "JOIN GAME";
 			s_ingame.team.color					= text_big_color;
 			s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 		}
@@ -346,7 +265,7 @@ void InGame_MenuInit( void ) {
 			s_ingame.team.generic.y				= y;
 			s_ingame.team.generic.id			= ID_SPECTATE;
 			s_ingame.team.generic.callback		= InGame_Event;
-			s_ingame.team.string				= "Spectate";
+			s_ingame.team.string				= "SPECTATE";
 			s_ingame.team.color					= text_big_color;
 			s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 		}
@@ -376,7 +295,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.addbots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" )
 #ifdef TA_SP
-	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
+	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
@@ -396,7 +315,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.removebots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" )
 #ifdef TA_SP
-	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
+	|| (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) == 1)
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
@@ -412,43 +331,20 @@ void InGame_MenuInit( void ) {
 	s_ingame.teamorders.generic.y			= y;
 	s_ingame.teamorders.generic.id			= ID_TEAMORDERS;
 	s_ingame.teamorders.generic.callback	= InGame_Event; 
-#ifdef TA_MISC
-	s_ingame.teamorders.string				= "Team Orders";
-#else
 	s_ingame.teamorders.string				= "TEAM ORDERS";
-#endif
 	s_ingame.teamorders.color				= text_big_color;
 	s_ingame.teamorders.style				= UI_CENTER|UI_SMALLFONT;
 	if( !(trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
 		s_ingame.teamorders.generic.flags |= QMF_GRAYED;
 	}
 	else {
-#ifndef TA_MISC // SMART_JOIN_MENU
 		trap_GetClientState( &cs );
 		trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
-#endif
 		team = atoi( Info_ValueForKey( info, "t" ) );
 		if( team == TEAM_SPECTATOR ) {
 			s_ingame.teamorders.generic.flags |= QMF_GRAYED;
 		}
 	}
-
-#ifdef TA_SPLITVIEW
-	y += INGAME_MENU_VERTICAL_SPACING;
-	s_ingame.localPlayers.generic.type		= MTYPE_PTEXT;
-	s_ingame.localPlayers.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	s_ingame.localPlayers.generic.x			= 320;
-	s_ingame.localPlayers.generic.y			= y;
-	s_ingame.localPlayers.generic.id		= ID_LOCALPLAYERS;
-	s_ingame.localPlayers.generic.callback	= InGame_Event;
-#ifdef TA_MISC
-	s_ingame.localPlayers.string			= "Local Players";
-#else
-	s_ingame.localPlayers.string			= "LOCAL PLAYERS";
-#endif
-	s_ingame.localPlayers.color				= text_big_color;
-	s_ingame.localPlayers.style				= UI_CENTER|UI_SMALLFONT;
-#endif
 
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.setup.generic.type			= MTYPE_PTEXT;
@@ -458,7 +354,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.setup.generic.id			= ID_SETUP;
 	s_ingame.setup.generic.callback		= InGame_Event; 
 #ifdef TA_SP // New menus
-	s_ingame.setup.string				= "Options";
+	s_ingame.setup.string				= "OPTIONS";
 #else
 	s_ingame.setup.string				= "SETUP";
 #endif
@@ -473,12 +369,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.setupplayer.generic.y			= y;
 	s_ingame.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
 	s_ingame.setupplayer.generic.callback	= InGame_Event; 
-#ifdef TA_SPLITVIEW
-	if (cs.numLocalClients > 1)
-		s_ingame.setupplayer.string			= "Setup Players";
-	else
-#endif
-	s_ingame.setupplayer.string				= "Setup Player";
+	s_ingame.setupplayer.string				= "PLAYER";
 	s_ingame.setupplayer.color				= text_big_color;
 	s_ingame.setupplayer.style				= UI_CENTER|UI_SMALLFONT;
 #endif
@@ -491,7 +382,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.inserver.generic.y			= y;
 	s_ingame.inserver.generic.id		= ID_SERVER;
 	s_ingame.inserver.generic.callback	= InGame_Event; 
-	s_ingame.inserver.string			= "Server";
+	s_ingame.inserver.string			= "SERVER";
 	s_ingame.inserver.color				= text_big_color;
 	s_ingame.inserver.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) ) {
@@ -506,11 +397,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.server.generic.y			= y;
 	s_ingame.server.generic.id			= ID_SERVERINFO;
 	s_ingame.server.generic.callback	= InGame_Event; 
-#ifdef TA_MISC
-	s_ingame.server.string				= "Server Info";
-#else
 	s_ingame.server.string				= "SERVER INFO";
-#endif
 	s_ingame.server.color				= text_big_color;
 	s_ingame.server.style				= UI_CENTER|UI_SMALLFONT;
 
@@ -530,7 +417,6 @@ void InGame_MenuInit( void ) {
 	}
 #endif
 
-#ifndef TA_MISC
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.resume.generic.type			= MTYPE_PTEXT;
 	s_ingame.resume.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -541,7 +427,6 @@ void InGame_MenuInit( void ) {
 	s_ingame.resume.string					= "RESUME GAME";
 	s_ingame.resume.color					= text_big_color;
 	s_ingame.resume.style					= UI_CENTER|UI_SMALLFONT;
-#endif
 
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.leave.generic.type			= MTYPE_PTEXT;
@@ -550,11 +435,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.leave.generic.y			= y;
 	s_ingame.leave.generic.id			= ID_LEAVEARENA;
 	s_ingame.leave.generic.callback		= InGame_Event; 
-#ifdef TA_MISC
-	s_ingame.leave.string				= "Leave Game";
-#else
 	s_ingame.leave.string				= "LEAVE ARENA";
-#endif
 	s_ingame.leave.color				= text_big_color;
 	s_ingame.leave.style				= UI_CENTER|UI_SMALLFONT;
 
@@ -565,27 +446,17 @@ void InGame_MenuInit( void ) {
 	s_ingame.quit.generic.y				= y;
 	s_ingame.quit.generic.id			= ID_QUIT;
 	s_ingame.quit.generic.callback		= InGame_Event; 
-#ifdef TA_MISC
-	s_ingame.quit.string				= "Exit";
-#else
 	s_ingame.quit.string				= "EXIT GAME";
-#endif
 	s_ingame.quit.color					= text_big_color;
 	s_ingame.quit.style					= UI_CENTER|UI_SMALLFONT;
 
 	Menu_AddItem( &s_ingame.menu, &s_ingame.frame );
-#ifdef TA_MISC
-	Menu_AddItem( &s_ingame.menu, &s_ingame.resume );
-#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.team );
 #ifndef TA_MISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.addbots );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.removebots );
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.teamorders );
-#ifdef TA_SPLITVIEW
-	Menu_AddItem( &s_ingame.menu, &s_ingame.localPlayers);
-#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setup );
 #ifdef TA_MISC
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setupplayer );
@@ -597,9 +468,7 @@ void InGame_MenuInit( void ) {
 #ifndef TA_MISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.restart );
 #endif
-#ifndef TA_MISC
 	Menu_AddItem( &s_ingame.menu, &s_ingame.resume );
-#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.leave );
 	Menu_AddItem( &s_ingame.menu, &s_ingame.quit );
 }

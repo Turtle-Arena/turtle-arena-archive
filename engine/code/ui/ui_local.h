@@ -65,6 +65,7 @@ extern vmCvar_t	ui_spSelection;
 
 extern vmCvar_t	ui_browserMaster;
 extern vmCvar_t	ui_browserGameType;
+extern vmCvar_t	ui_browserSortKey;
 extern vmCvar_t	ui_browserShowFull;
 extern vmCvar_t	ui_browserShowEmpty;
 #ifdef IOQ3ZTM // G_HUMANPLAYERS
@@ -567,10 +568,10 @@ typedef struct {
 #endif
 
 #ifdef TA_WEAPSYS
-	qhandle_t		weaponModel[MAX_HANDS];
-	qhandle_t		barrelModel[MAX_HANDS];
-	qhandle_t		flashModel[MAX_HANDS];
-	vec3_t			flashDlightColor[MAX_HANDS];
+	qhandle_t		weaponModel[2];
+	qhandle_t		barrelModel[2];
+	qhandle_t		flashModel[2];
+	vec3_t			flashDlightColor[2];
 #else
 	qhandle_t		weaponModel;
 	qhandle_t		barrelModel;
@@ -578,11 +579,6 @@ typedef struct {
 	vec3_t			flashDlightColor;
 #endif
 	int				muzzleFlashTime;
-
-#ifdef IOQ3ZTM
-	vec3_t			color1;
-	byte			c1RGBA[4];
-#endif
 
 	// currently in use drawing parms
 	vec3_t			viewAngles;
@@ -620,7 +616,7 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 //
 // ui_atoms.c
 //
-// this is only used in the old ui, the new ui has its own version
+// this is only used in the old ui, the new ui has it's own version
 typedef struct {
 	int					frametime;
 	int					realtime;
@@ -630,6 +626,7 @@ typedef struct {
 	qboolean		debug;
 	qhandle_t		whiteShader;
 	qhandle_t		menuBackShader;
+	qhandle_t		menuBackShader2;
 #ifndef TA_DATA
 	qhandle_t		menuBackNoLogoShader;
 #endif
@@ -679,7 +676,7 @@ typedef struct {
 #define MAPS_PER_TIER 3
 #define MAX_TIERS 16
 #define MAX_MODS 64
-#define MAX_DEMOS 512
+#define MAX_DEMOS 256
 #define MAX_MOVIES 256
 #define MAX_PLAYERMODELS 256
 
@@ -975,7 +972,7 @@ void UI_SPSkillMenu_Cache( void );
 // ui_syscalls.c
 //
 void			trap_Print( const char *string );
-void			trap_Error(const char *string) __attribute__((noreturn));
+void			trap_Error( const char *string );
 int				trap_Milliseconds( void );
 void			trap_Cvar_Register( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
 void			trap_Cvar_Update( vmCvar_t *vmCvar );

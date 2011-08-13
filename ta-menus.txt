@@ -1,8 +1,11 @@
-Turtle Arena menu design. Somethings are done, others are not.
+Turtle Arena's new WIP menu idea, for when I make the menu using Team Arena menu scripting.
+		...or if stick with quake3's ui.
+
+TODO: Finished doing this to the q3 ui so I can remove this file.
 
 :MAIN
 PLAY
-MULTIPLAYER
+MULTIPLAYER - or NETWORK GAME?
 OPTIONS
 QUIT
 
@@ -22,13 +25,13 @@ Load savegame.
 Show a list of demos, start a demo, ect.
 
 === CINEMATICS ===
-List cinematics (either auto list or use predefined list).
-	If using predefined list, disable cinematic if video file doesn't exist.
+Currently don't have any. Disable for now.
 
 === MODS ===
 List Mods, load Mod.
 
 == MULTIPLAYER ==
+:Or Network Game?
 
 === Create Game ===
 :Or Host Game?
@@ -37,27 +40,19 @@ List Mods, load Mod.
 
 === Join Game (Specify IP) ===
 
-=== Setup Player 1 ===
+=== Setup Player ===
 
-=== Setup Player 2 ===
-
-=== Setup Player 3 ===
-
-=== Setup Player 4 ===
 
 == OPTIONS ==
-:Quake3 SETUP menu, less player setup.
+:Like the Q3 SETUP menu, less player setup.
 
 === CONTROLS ===
 
 ==== Player 1 ====
-==== Player 2 ====
-==== Player 3 ====
-==== Player 4 ====
-==== Game Controls ====
-TODO: Just list controls here in "CONTROLS" menu?
-Note: Currenly with Player 1 controls.
-
+//==== Player 2 ====
+//==== Player 3 ====
+//==== Player 4 ====
+==== Game Controls ==== --Just list controls here in "CONTROLS" menu.
 * Show scores
 * Chat
 * Chat - Team
@@ -65,6 +60,7 @@ Note: Currenly with Player 1 controls.
 * Chat - Attacker
 
 === CREDITS ===
+:Not needed at all?
 
 
 == EXIT ==
@@ -74,37 +70,35 @@ Ask for confirm, exit program.
 
 :INGAME
 Resume Game
-: if only one local client and gametype < GT_TEAM
+: if gametype < GT_TEAM
 :: if spectator
 Join Game
 :: else
 Spectate
 : else
-Change Team(s)
+Team Select --Was "Join", but new name still isn't lot more good-er.'
 : end if
-TODO: Vote --Like in missionpack
-Local Players --Add and drop local clients!
+Add/Remove Bots --server/admin only?
+Player
+Vote --Like in missionpack
 Options
-Player Setup(s)
-Server
-Server Info
-Leave Game (to be removed?)
+Server Info -- Put in options or do players want to see it a lot?
 Exit
 
 :INGAMESP
 Resume Game
-Save Game?
+Save Game
 Load Game?
-Local Players --Add and drop local clients!
 Options
-Leave Game (to be removed?)
 Exit
 
 == Resume Game ==
 Close ingame menu.
 
-== Change Team ==
+== Join ==
 Open menu with teams.
+
+== Add/Remove Bot ==
 
 == Player ==
 Change player model [and headmodel?] and player skin and colors.
@@ -123,28 +117,19 @@ Load savegame.
 == Options ==
 Like the out_options only not fullscreen.
 
-== Server ==
-: Server-only admin menu
-
-=== Change Map ===
-
-=== Add Bot ===
-
-=== Remove Bot ===
-
-=== Restart Level ===
-
 == Server Info ==
 Open [message] box with info.
 
 == Leave Game ==
-: To be removed?
 Ask for confirm.
 Exit back to main menu.
 
 == Exit ==
+=== Restart Game ===
+: Not in Single Player (or Co-op?), don't have in any menu? -- Not something that seems needed, to me that is.
+
 === Main Menu ===
-:Replace Level Game
+:Leave Arena
 
 === Exit Game ===
 Ask for confirm.

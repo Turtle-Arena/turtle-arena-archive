@@ -121,8 +121,8 @@ qboolean CG_BulletBubbleTrail( vec3_t start, vec3_t end, int skipNum ) {
 
 	CG_Trace( &tr, start, NULL, NULL, end, skipNum, MASK_SHOT );
 
-	sourceContentType = CG_PointContents( start, 0 );
-	destContentType = CG_PointContents( tr.endpos, 0 );
+	sourceContentType = trap_CM_PointContents( start, 0 );
+	destContentType = trap_CM_PointContents( tr.endpos, 0 );
 
 	// do a complete bubble trail if necessary
 	if ( sourceContentType == destContentType ) {
@@ -301,7 +301,7 @@ void CG_LightningBoltBeam( vec3_t start, vec3_t end )
 }
 #endif
 
-#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
+#ifndef TA_HOLDABLE // NO_KAMIKAZE_ITEM
 /*
 ==================
 CG_KamikazeEffect
@@ -346,17 +346,10 @@ void CG_ObeliskExplode( vec3_t org, int entityNum ) {
 	// create an explosion
 	VectorCopy( org, origin );
 	origin[2] += 64;
-#ifdef TA_DATA // EXP_SCALE
-	le = CG_MakeExplosion( origin, NULL,
-						   cgs.media.smokeModel,
-						   0,
-						   600, qfalse );
-#else
 	le = CG_MakeExplosion( origin, vec3_origin,
 						   cgs.media.dishFlashModel,
 						   cgs.media.rocketExplosionShader,
 						   600, qtrue );
-#endif
 	le->light = 300;
 	le->lightColor[0] = 1;
 	le->lightColor[1] = 0.75;
@@ -471,35 +464,14 @@ void CG_ScorePlum( int client, vec3_t org, int score ) {
 	localEntity_t	*le;
 	refEntity_t		*re;
 	vec3_t			angles;
-#ifdef TA_SPLITVIEW
-	int				lc, localClients;
-#endif
 	static vec3_t lastPos;
 
 	// only visualize for the client that scored
-	if (
-#ifndef TA_SPLITVIEW
-		client != cg.localClient.predictedPlayerState.clientNum ||
-#endif
-		cg_scorePlum.integer == 0) {
+	if (client != cg.predictedPlayerState.clientNum || cg_scorePlum.integer == 0) {
 		return;
 	}
-#ifdef TA_SPLITVIEW
-	localClients = 0;
-	for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
-		if (cg.snap->lcIndex[lc] != -1 && client == cg.localClients[lc].predictedPlayerState.clientNum) {
-			localClients |= (1<<lc);
-		}
-	}
-	if (!localClients) {
-		return;
-	}
-#endif
 
 	le = CG_AllocLocalEntity();
-#ifdef TA_SPLITVIEW
-	le->localClients = localClients;
-#endif
 	le->leFlags = 0;
 	le->leType = LE_SCOREPLUM;
 	le->startTime = cg.time;
@@ -540,7 +512,8 @@ void CG_ChainPlum( int client, vec3_t org, int score, int chain, qboolean bonus 
 	vec3_t			angles;
 	static vec3_t lastPos;
 
-	if (cg_scorePlum.integer == 0) {
+	// only visualize for the client that scored
+	if (client != cg.predictedPlayerState.clientNum || cg_scorePlum.integer == 0) {
 		return;
 	}
 
@@ -626,7 +599,7 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 		VectorScale( dir, 16, tmpVec );
 		VectorAdd( tmpVec, origin, newOrigin );
 
-#ifdef TA_WEAPSYS // SPR_EXP_SCALE
+#ifdef TA_WEAPSYS
 		// Allow sprite explosion to be different sizes.
 		ex->radius = 30;
 		ex->refEntity.radius = 42;
@@ -643,11 +616,6 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 			VectorCopy( dir, ex->refEntity.axis[0] );
 			RotateAroundDirection( ex->refEntity.axis, ang );
 		}
-#ifdef TA_ENTSYS // EXP_SCALE
-		// Allow explosions to be different sizes.
-		ex->radius = 1.0f;
-		ex->refEntity.radius = 4.0f; // 0.0f
-#endif
 	}
 
 	ex->startTime = cg.time - offset;
@@ -668,56 +636,6 @@ localEntity_t *CG_MakeExplosion( vec3_t origin, vec3_t dir,
 	return ex;
 }
 
-#ifdef TA_ENTSYS // EXP_SCALE
-/*
-================
-CG_ExplosionEffect
-================
-*/
-void CG_ExplosionEffect(vec3_t origin, int radius, int entity)
-{
-	qhandle_t		mod;
-	qhandle_t		shader;
-	qboolean		isSprite;
-	sfxHandle_t		sfx;
-	int				duration;
-	vec3_t			lightColor;
-	vec3_t			dir;
-	localEntity_t	*le;
-
-#ifdef TA_DATA
-	mod = cgs.media.smokeModel;
-	shader = 0;
-	isSprite = qfalse;
-#else
-	mod = cgs.media.dishFlashModel;
-	shader = cgs.media.rocketExplosionShader;
-	isSprite = qtrue;
-#endif
-	sfx = cgs.media.sfx_rockexp;
-	duration = 1250;
-	VectorSet( lightColor, 1, 0.75f, 0 );
-	VectorSet( dir, 0, 0, 1 ); // up
-
-	if ( sfx ) {
-		trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
-	}
-
-	//
-	// create the explosion
-	//
-	if ( mod ) {
-		le = CG_MakeExplosion( origin, dir, mod, shader, duration, isSprite );
-		le->light = radius;
-		VectorCopy( lightColor, le->lightColor );
-
-		// Sprite explosion scaling, starts at "exp_base" and adds "exp_add" using time scaling.
-		//		so the bigest it will be is "exp_base"+"exp_add".
-		le->radius = (radius/10.f)*0.2f;
-		le->refEntity.radius = (radius/10.f)*0.8f;
-	}
-}
-#endif
 
 #ifndef TA_WEAPSYS
 #ifndef NOBLOOD

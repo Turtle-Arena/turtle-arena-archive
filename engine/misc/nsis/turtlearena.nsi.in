@@ -106,15 +106,16 @@ Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
   ; Put file there
   File "../../build/release-mingw32-x86/${SERVER}"
   File "../../build/release-mingw32-x86/${CLIENT}"
-  File "GPL-2.txt"
-  File "CC-BY-SA-3.0.txt"
+  File "COPYING.txt"
   File "COPYRIGHTS.txt"
   File "CREDITS.txt"
   File "README.txt"
 
   SetOutPath "$INSTDIR\${MODDIR}"
-  File "XXXASSETPATHXXX/assets0.pk3"
-  File "XXXASSETPATHXXX/assets1-qvms.pk3"
+  File "/oname=assets0.pk3" "XXXASSETSXXX"
+  File "../../build/release-mingw32-x86/${MODDIR}/cgamex86.dll"
+  File "../../build/release-mingw32-x86/${MODDIR}/qagamex86.dll"
+  File "../../build/release-mingw32-x86/${MODDIR}/uix86.dll"
 
   ; Write the installation path into the registry
   WriteRegStr SHCTX "Software\${GAME_FSNAME}" ${MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_VALUENAME} "$INSTDIR"
@@ -133,14 +134,6 @@ Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
 SectionEnd
 
 ; Optional section (can be disabled by the user)
-Section "Music"
-
-  SetOutPath "$INSTDIR\${MODDIR}"
-
-  File "XXXASSETPATHXXX/assets2-music.pk3"
-
-SectionEnd
-
 Section "Start Menu Shortcuts"
 
   CreateDirectory "$SMPROGRAMS\${GAMENAME}"
@@ -149,7 +142,7 @@ Section "Start Menu Shortcuts"
 
 SectionEnd
 
-Section "SDL library"
+Section "SDL.dll"
 
   SetOutPath $INSTDIR
 
@@ -157,7 +150,7 @@ Section "SDL library"
 
 SectionEnd
 
-Section "cURL library"
+Section "libcurl"
 
   SetOutPath $INSTDIR
 
@@ -185,13 +178,13 @@ Section "Uninstall"
 
   ; Remove files and uninstaller
   Delete $INSTDIR\${MODDIR}\assets0.pk3
-  Delete $INSTDIR\${MODDIR}\assets1-qvms.pk3
-  Delete $INSTDIR\${MODDIR}\assets2-music.pk3
+  Delete $INSTDIR\${MODDIR}\cgamex86.dll
+  Delete $INSTDIR\${MODDIR}\qagamex86.dll
+  Delete $INSTDIR\${MODDIR}\uix86.dll
   Delete $INSTDIR\${CLIENT}
   Delete $INSTDIR\${SERVER}
 
-  Delete $INSTDIR\GPL-2.txt
-  Delete $INSTDIR\CC-BY-SA-3.0.txt
+  Delete $INSTDIR\COPYING.txt
   Delete $INSTDIR\COPYRIGHTS.txt
   Delete $INSTDIR\CREDITS.txt
   Delete $INSTDIR\README.txt

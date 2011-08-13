@@ -204,9 +204,10 @@ static	int	neighbors[8][2] = {
 				VectorAdd( normal, sum, sum );
 				count++;
 			}
-			//if ( count == 0 ) {
-			//	printf("bad normal\n");
-			//}
+			if ( count == 0 ) {
+//printf("bad normal\n");
+				count = 1;
+			}
 			VectorNormalize2( sum, dv->normal );
 		}
 	}
