@@ -310,7 +310,7 @@ else # END QUAKE3
 	USE_CODEC_THEORA=1
 
 	# Turtle Arena version
-	VERSION=0.4.2
+	VERSION=0.4.3
 
 	# Turtle Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"
