@@ -126,12 +126,6 @@ cvar_t	*com_basegame;
 cvar_t  *com_homepath;
 cvar_t	*com_busyWait;
 
-#ifdef ANALOG // cl vars
-cvar_t	*cl_thirdPerson;
-cvar_t	*cl_thirdPersonAngle;
-cvar_t	*cl_thirdPersonAnalog;
-#endif
-
 #if idx64
 	int (*Q_VMftol)(void);
 #elif id386
@@ -2849,13 +2843,6 @@ void Com_Init( char *commandLine ) {
 	com_speeds = Cvar_Get ("com_speeds", "0", 0);
 	com_timedemo = Cvar_Get ("timedemo", "0", CVAR_CHEAT);
 	com_cameraMode = Cvar_Get ("com_cameraMode", "0", CVAR_CHEAT);
-
-#ifdef ANALOG // cl vars
-	// Get client game vars.
-	cl_thirdPerson = Cvar_Get ("cg_thirdPerson", "1", 0);
-	cl_thirdPersonAngle = Cvar_Get ("cg_thirdPersonAngle", "0", 0);
-	cl_thirdPersonAnalog = Cvar_Get ("cg_thirdPersonAnalog", "0", 0);
-#endif
 
 	cl_paused = Cvar_Get ("cl_paused", "0", CVAR_ROM);
 	sv_paused = Cvar_Get ("sv_paused", "0", CVAR_ROM);

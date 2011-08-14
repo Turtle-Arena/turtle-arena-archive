@@ -108,7 +108,7 @@ ifeq ($(QUAKE3),1)
 
 		# Copied from Turtle Arena BUILD_DEFINES
 		ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
-							-DNOTRATEDM -DANALOG -DNET_COMPAT \
+							-DNOTRATEDM -DNET_COMPAT \
 							-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 							-DTA_HOLDSYS -DTA_ITEMSYS \
 							-DTA_WEAPSYS -DTA_PLAYERSYS \
@@ -243,7 +243,6 @@ else # END QUAKE3
 	#							bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
 	#							ZTM: TODO: Rename this define to ...?
 	# NOBLOOD				Removes blood. If this is defined, NOTRATEDM must also be defined.
-	# ANALOG				Allows players to rotate the camera and move based on the camera angles, not full analog control yet
 	# NET_COMPAT			Working on having Turtle Arena and ioq3turtle run on the same engine.
 	# TA_BLOOM				Post-process bloom light effect, based on code from OpenArena.
 	#####
@@ -284,7 +283,7 @@ else # END QUAKE3
 	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
 
 	BUILD_DEFINES = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
-						-DNOTRATEDM -DNOBLOOD -DANALOG -DNET_COMPAT \
+						-DNOTRATEDM -DNOBLOOD -DNET_COMPAT \
 						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DTA_HOLDSYS -DTA_ITEMSYS \
 						-DTA_WEAPSYS -DTA_PLAYERSYS \

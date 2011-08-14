@@ -917,12 +917,6 @@ extern	cvar_t	*com_standalone;
 extern	cvar_t	*com_basegame;
 extern	cvar_t	*com_homepath;
 
-#ifdef ANALOG // cl vars
-extern	cvar_t	*cl_thirdPerson;
-extern	cvar_t	*cl_thirdPersonAngle;
-extern	cvar_t	*cl_thirdPersonAnalog;
-#endif
-
 // both client and server must agree to pause
 extern	cvar_t	*cl_paused;
 extern	cvar_t	*sv_paused;

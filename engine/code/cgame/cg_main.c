@@ -181,17 +181,11 @@ vmCvar_t	cg_zoomFov;
 vmCvar_t	cg_thirdPerson[MAX_SPLITVIEW];
 vmCvar_t	cg_thirdPersonRange[MAX_SPLITVIEW];
 vmCvar_t	cg_thirdPersonAngle[MAX_SPLITVIEW];
-#ifdef ANALOG // cg var
-vmCvar_t	cg_thirdPersonAnalog[MAX_SPLITVIEW];
-#endif
 vmCvar_t	cg_splitviewVertical;
 #else
 vmCvar_t	cg_thirdPerson;
 vmCvar_t	cg_thirdPersonRange;
 vmCvar_t	cg_thirdPersonAngle;
-#ifdef ANALOG // cg var
-vmCvar_t	cg_thirdPersonAnalog;
-#endif
 #endif
 vmCvar_t	cg_lagometer;
 vmCvar_t	cg_drawAttacker;
@@ -378,16 +372,6 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_tracerChance, "cg_tracerchance", "0.4", CVAR_CHEAT },
 	{ &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
-#ifdef ANALOG // cg var
-#ifdef TA_SPLITVIEW
-	{ &cg_thirdPersonAnalog[0], "cg_thirdPersonAnalog", "0", 0 },
-	{ &cg_thirdPersonAnalog[1], "2cg_thirdPersonAnalog", "0", 0 },
-	{ &cg_thirdPersonAnalog[2], "3cg_thirdPersonAnalog", "0", 0 },
-	{ &cg_thirdPersonAnalog[3], "4cg_thirdPersonAnalog", "0", 0 },
-#else
-	{ &cg_thirdPersonAnalog, "cg_thirdPersonAnalog", "0", 0 },
-#endif
-#endif
 #ifdef TURTLEARENA // FOV
 #ifdef TA_SPLITVIEW
 	{ &cg_thirdPersonRange[0], "cg_thirdPersonRange", "120", 0 },

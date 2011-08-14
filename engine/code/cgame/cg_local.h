@@ -1666,17 +1666,11 @@ extern	vmCvar_t		cg_zoomFov;
 extern	vmCvar_t		cg_thirdPersonRange[MAX_SPLITVIEW];
 extern	vmCvar_t		cg_thirdPersonAngle[MAX_SPLITVIEW];
 extern	vmCvar_t		cg_thirdPerson[MAX_SPLITVIEW];
-#ifdef ANALOG // cg var
-extern	vmCvar_t		cg_thirdPersonAnalog[MAX_SPLITVIEW];
-#endif
 extern	vmCvar_t		cg_splitviewVertical;
 #else
 extern	vmCvar_t		cg_thirdPersonRange;
 extern	vmCvar_t		cg_thirdPersonAngle;
 extern	vmCvar_t		cg_thirdPerson;
-#ifdef ANALOG // cg var
-extern	vmCvar_t		cg_thirdPersonAnalog;
-#endif
 #endif
 extern	vmCvar_t		cg_lagometer;
 extern	vmCvar_t		cg_drawAttacker;

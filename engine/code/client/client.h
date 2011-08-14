@@ -492,6 +492,18 @@ extern	cvar_t  *cl_consoleFontSize;
 extern	cvar_t  *cl_consoleFontKerning;
 #endif
 
+#ifdef IOQ3ZTM // ANALOG
+#ifdef TA_SPLITVIEW
+extern	cvar_t	*cl_thirdPerson[MAX_SPLITVIEW];
+extern	cvar_t	*cl_thirdPersonAngle[MAX_SPLITVIEW];
+extern	cvar_t	*cl_thirdPersonAnalog[MAX_SPLITVIEW];
+#else
+extern	cvar_t	*cl_thirdPerson;
+extern	cvar_t	*cl_thirdPersonAngle;
+extern	cvar_t	*cl_thirdPersonAnalog;
+#endif
+#endif
+
 #ifdef USE_MUMBLE
 extern	cvar_t	*cl_useMumble;
 extern	cvar_t	*cl_mumbleScale;
