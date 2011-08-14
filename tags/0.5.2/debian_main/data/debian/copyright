@@ -1,0 +1,13 @@
+This package was debianized from http://turtlearena.googlecode.com/
+
+Copyright 2009 - 2011 Turtle Arena Developers
+
+Mixed CC-BY-SA-3.0 and GPL-2 license.
+
+See /usr/share/docs/turtlearena-data/COPYRIGHTS for details.
+
+You can find the CC-BY-SA-3.0 license text on your system under
+/usr/share/docs/turtlearena-data/CC-BY-SA-3.0
+
+You can find the GPL license text on a Debian system under
+/usr/share/common-licenses/GPL-2

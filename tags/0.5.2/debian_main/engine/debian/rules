@@ -1,0 +1,81 @@
+#!/usr/bin/make -f
+#export DH_VERBOSE=1
+
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+    NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+    MAKEFLAGS += -j$(NUMJOBS)
+endif
+
+Q3ARCH             := $(shell sh $(CURDIR)/debian/q3arch.sh arch     HOST)
+Q3PLATFORM         := $(shell sh $(CURDIR)/debian/q3arch.sh platform HOST)
+Q3COMPILE_ARCH     := $(shell sh $(CURDIR)/debian/q3arch.sh arch     BUILD)
+Q3COMPILE_PLATFORM := $(shell sh $(CURDIR)/debian/q3arch.sh platform BUILD)
+
+CFLAGS += -fsigned-char
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	$(MAKE) USE_CURL=1 \
+			USE_CURL_DLOPEN=0 \
+			USE_OPENAL=1 \
+			USE_OPENAL_DLOPEN=0 \
+			USE_VOIP=1 \
+			USE_INTERNAL_SPEEX=0 \
+			BUILD_CLIENT=1 \
+			BUILD_CLIENT_SMP=0 \
+			BUILD_SERVER=1 \
+			BUILD_GAME_SO=0 \
+			BUILD_GAME_QVM=0 \
+			USE_LOCAL_HEADERS=0 \
+			BUILD_FINAL=1 \
+			DEFAULT_BASEDIR=/usr/share/games/turtlearena \
+			ARCH=$(Q3ARCH) \
+			PLATFORM=$(Q3PLATFORM) \
+			COMPILE_ARCH=$(Q3COMPILE_ARCH) \
+			COMPILE_PLATFORM=$(Q3COMPILE_PLATFORM)
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	$(MAKE) distclean
+	rm -f debian/turtlearena32.xpm
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	mkdir -p debian/tmp
+	cp build/release-$(Q3PLATFORM)-$(Q3ARCH)/turtlearena.$(Q3ARCH) debian/tmp/turtlearena
+	cp build/release-$(Q3PLATFORM)-$(Q3ARCH)/turtlearena-server.$(Q3ARCH) debian/tmp/turtlearena-server
+	convert -scale 32x32 debian/turtlearena128.png debian/turtlearena32.xpm
+	dh_install
+	dh_installdirs
+
+
+binary-indep: build install
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_link
+	dh_installmenu
+	dh_installchangelogs
+	dh_installman -pturtlearena debian/turtlearena.6
+	dh_installman -pturtlearena-server debian/turtlearena-server.6
+	dh_icons -pturtlearena
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

@@ -1,0 +1,198 @@
+Turtle Arena data copyrights for base and base-src directories.
+
+All of the data is licensed under "the GNU General Public License;
+	either version 2 of the License, or (at your option) any later version"
+	and/or "Creative Commons Attribution-ShareAlike 3.0 Unported".
+
+== ZTM ==
+All data in the base and base-src directories, unless otherwise noted, are
+	copyright (c) 2009-2011 Zack "ZTurtleMan" Middleton and are licensed under
+	the GNU General Public License; either version 2 of the License, or (at your
+	option) any later version and licensed under the Creative Commons
+	Attribution-ShareAlike 3.0 Unported.
+	You may use the data as GPLv2+ and/or CC-BY-SA-3.0.
+
+The data files in the base directory that have other source files are included
+	in the base-src directory.
+
+The following use DejaVu fonts, for font license see
+	http://dejavu-fonts.org/wiki/License
+
+Images that use DejaVu Sans Bold Oblique:
+base/icons/iconf_blu2.png
+base/icons/iconf_blu3.png
+base/icons/iconf_neutral3.png
+base/icons/iconf_red2.png
+base/icons/iconf_red3.png
+base-src/icons/iconf.svg
+
+Images that use DejaVu Serif:
+base/icons/defense.png
+base/menu/medals/medal_defend.png
+base-src/icons/defense.svg
+base-src/menu/medals/medal_defend.svg
+
+The following use GNU FreeFont, for font license see
+	http://www.gnu.org/software/freefont/license.html
+
+Images that use GNU FreeFont FreeMono:
+base/menu/art/level_complete1.png
+base/menu/art/level_complete2.png
+base/menu/art/level_complete3.png
+base/menu/art/level_complete4.png
+base/menu/art/level_complete5.png
+base/menu/art/skill1.png
+base/menu/art/skill2.png
+base/menu/art/skill3.png
+base/menu/art/skill4.png
+base/menu/art/skill5.png
+base/menu/art/randombot_icon.png
+base/menu/art/unknownmap.png
+
+Images that use GNU FreeFont FreeSans:
+base/textures/common/alpha000.png
+base/textures/common/alpha025.png
+base/textures/common/alpha050.png
+base/textures/common/alpha075.png
+base/textures/common/alpha085.png
+base/textures/common/alpha100.png
+
+Images that use GNU FreeFont FreeSansBold:
+base/menu/art/accept_0.png
+base/menu/art/accept_1.png
+base/menu/art/back_0.png
+base/menu/art/back_1.png
+base/menu/art/delete_0.png
+base/menu/art/delete_1.png
+base/menu/art/join_0.png
+base/menu/art/join_1.png
+base/menu/art/load_0.png
+base/menu/art/load_1.png
+base/menu/art/menu_0.png
+base/menu/art/menu_1.png
+base/menu/art/model_0.png
+base/menu/art/model_1.png
+base/menu/art/next_0.png
+base/menu/art/next_1.png
+base/menu/art/play_0.png
+base/menu/art/play_1.png
+base/menu/art/refresh_0.png
+base/menu/art/refresh_1.png
+base/menu/art/replay_0.png
+base/menu/art/replay_1.png
+base/menu/art/reset_0.png
+base/menu/art/reset_1.png
+base/menu/art/save_0.png
+base/menu/art/save_1.png
+base/menu/art/specify_0.png
+base/menu/art/specify_1.png
+base/icons/ammo_regen.png
+base/icons/doubler.png
+base/icons/guard.png
+base/icons/scout.png
+base/gfx/2d/numbers/minus_32b.png
+base/gfx/2d/numbers/zero_32b.png
+base/gfx/2d/numbers/one_32b.png
+base/gfx/2d/numbers/two_32b.png
+base/gfx/2d/numbers/three_32b.png
+base/gfx/2d/numbers/four_32b.png
+base/gfx/2d/numbers/five_32b.png
+base/gfx/2d/numbers/six_32b.png
+base/gfx/2d/numbers/seven_32b.png
+base/gfx/2d/numbers/eight_32b.png
+base/gfx/2d/numbers/nine_32b.png
+
+== zero-project.gr ==
+The following is copyright (c) 2010 zero-project and is licensed under the
+	Creative Commons Attribution-ShareAlike 3.0 Unported.
+
+music/zero-project_-_Whispering_Wind.ogg
+		zero-project - Whispering Wind - CC-BY-SA-3.0
+		http://www.jamendo.com/en/track/682363
+
+== OpenArena ==
+Some of the shaders in the base/scripts/*.shader files are from OpenArena.
+base/scripts/male1.voice is based on file from OpenArena.
+
+The following are based on files from OpenArena and are
+	copyright (c) 2006 Dmn_clown and 2009-2011 Zack "ZTurtleMan" Middleton
+	and are licensed under the GNU General Public License; either version 2 of
+	the License, or (at your option) any later version.
+
+base/botfiles/bots/default_c.c
+base/botfiles/bots/default_i.c
+base/botfiles/bots/default_t.c
+base/botfiles/bots/raph_c.c
+base/botfiles/bots/raph_i.c
+base/botfiles/bots/raph_t.c
+base/botfiles/fuzi.c
+base/botfiles/items.c
+base/botfiles/match.c
+base/botfiles/rchat.c
+base/botfiles/rnd.c
+base/botfiles/syn.c
+base/botfiles/teamplay.h
+
+== GNU FreeFont ==
+The following files were created from GNU Freefont fonts, and are licensed under
+	the GNU General Public License; either version 2 of the License, or
+	(at your option) any later version. They also include the
+	special exception for fonts (see lisence at bottom of this file).
+
+The dat and tga files listed below were created by Turtle Arena, using freetype2
+
+Files that created from base/fonts/FreeSans.ttf:
+base/fonts/FreeSans_0_12.tga
+base/fonts/FreeSans_0_16.tga
+base/fonts/FreeSans_0_20.tga
+base/fonts/FreeSans_1_20.tga
+base/fonts/FreeSans_12.dat
+base/fonts/FreeSans_16.dat
+base/fonts/FreeSans_20.dat
+
+Copies of FreeSans_*.dat for compatability with Quake III: Team Arena
+base/fonts/fontImage_12.dat
+base/fonts/fontImage_16.dat
+base/fonts/fontImage_20.dat
+
+Files that created from base/fonts/FreeSansBold.ttf:
+base/fonts/FreeSansBold_0_16.tga
+base/fonts/FreeSansBold_16.dat
+
+Files that created from base/fonts/FreeSerif.ttf:
+base/fonts/FreeSerif_0_48.tga
+base/fonts/FreeSerif_48.dat
+
+TrueType Fonts from GNU FreeFont
+base/fonts/FreeSans.ttf
+base/fonts/FreeSansBold.ttf
+base/fonts/FreeSerif.ttf
+
+These versions are from the 2008-09-12 GPL version 2 (or later) release.
+
+License
+---------
+
+Free UCS scalable fonts is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+The fonts are distributed in the hope that they will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+As a special exception, if you create a document which uses this font, and
+embed this font or unaltered portions of this font into the document, this
+font does not by itself cause the resulting document to be covered by the
+GNU General Public License. This exception does not however invalidate any
+other reasons why the document might be covered by the GNU General Public
+License. If you modify this font, you may extend this exception to your
+version of the font, but you are not obligated to do so.  If you do not
+wish to do so, delete this exception statement from your version.
+
