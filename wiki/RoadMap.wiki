@@ -29,8 +29,8 @@ First stable playable release.
 == 0.4.2 (Completed) ==
   * Bug fix release
 
-== 0.4.3 ==
-  * Bug fix release
+== 0.4.3 (Completed) ==
+  * Security fix release
 
 == 0.5 series ==
 The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with more often releases.
