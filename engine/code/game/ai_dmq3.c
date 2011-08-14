@@ -2473,12 +2473,13 @@ BotCanUseShurikens
 */
 qboolean BotCanUseShurikens(bot_state_t *bs)
 {
-	// ZTM: TODO: Check all 
 #ifdef TURTLEARENA // HOLD_SHURIKEN
-	if (BG_ProjectileIndexForHoldable(bs->cur_ps.holdableIndex)
-		&& bs->cur_ps.holdable[bs->cur_ps.holdableIndex] != 0)
-	{
-		return qtrue;
+	int i;
+
+	for (i = 0; i < BG_NumHoldableItems(); i++) {
+		if (bs->cur_ps.holdable[i] != 0 && BG_ProjectileIndexForHoldable(i)) {
+			return qtrue;
+		}
 	}
 #endif
 
@@ -2499,6 +2500,7 @@ int BotWantUseShuriken(bot_state_t *bs, int target, aas_entityinfo_t *entinfo) {
 	int		projNum;
 	float	range;
 	int		holdableNum;
+	int		i;
 
 	if (BotSameTeam(bs, target)) {
 		return 0;
@@ -2513,8 +2515,20 @@ int BotWantUseShuriken(bot_state_t *bs, int target, aas_entityinfo_t *entinfo) {
 		return 0;
 	}
 
-	// ZTM: FIXME: Select shuriken to use, return 0 if have none.
+	// Select holdable type to use.
 	holdableNum = bs->cur_ps.holdableIndex;
+
+	// Check if current holdable is valid shuriken for use.
+	if (!(bs->cur_ps.holdable[holdableNum] != 0 && BG_ProjectileIndexForHoldable(holdableNum))) {
+		// Use first valid holdable type
+		// ZTM: TODO: Select best shuriken type?
+		for (i = 0; i < BG_NumHoldableItems(); i++) {
+			if (bs->cur_ps.holdable[i] != 0 && BG_ProjectileIndexForHoldable(i)) {
+				holdableNum = i;
+				break;
+			}
+		}
+	}
 
 	VectorSubtract(bs->cur_ps.origin, entinfo->origin, dist);
 
