@@ -41,6 +41,8 @@ List of *Console variables* (also called Cvars) that have been added and removed
     * -3: (game/q3_ui/ui) Offline multiplayer mode, uses q3_ui/ui postgame.
 	* Note: If the server had "sv_public" set to 1 (public) and then is change to 0/-1/-2 (private) it will still be sent to clients by dpmaster master servers for up to 15 more minutes. Turtle Arena's MasterServer solves this issue, server will be sent out only 2 more seconds instead of upto 15 minutes.
 
+  * cl_thirdPersonAnalog - Move player relative to camera.
+
 = Removed =
 
   * com_blood
@@ -54,3 +56,73 @@ List of *Console variables* (also called Cvars) that have been added and removed
   * cg_animSpeed
   * cg_debuganim
   * cg_forceModel
+
+
+= Splitscreen Players =
+Console variables and commands for splitscreen players begin "2", "3", or "4".
+
+List for player 2;
+  * 2dropflag
+  * 2stats
+  * 2setviewpos
+  * 2teamvote
+  * 2callteamvote
+  * 2vote
+  * 2callvote
+  * 2team
+  * 2followprev
+  * 2follownext
+  * 2follow
+  * 2levelshot
+  * 2teamtask
+  * 2kill
+  * 2noclip
+  * 2notarget
+  * 2god
+  * 2give
+  * 2vtaunt
+  * 2votell
+  * 2vosay_team
+  * 2vosay
+  * 2vtell
+  * 2vsay_team
+  * 2vsay
+  * 2tell
+  * 2say_team
+  * 2say
+  * 2holdable
+  * 2holdprev
+  * 2holdnext
+  * 2camreset
+  * 2dropin
+  * 2dropout
+  * 2centerview
+  * 2in_joystickDebug = "0"
+  * 2teamtask = "0"
+  * 2spheadmodel = ""
+  * 2spmodel = "mike"
+  * 2cg_thirdPersonRange = "120"
+  * 2cg_thirdPersonAngle = "0"
+  * 2cg_thirdPerson = "1"
+  * 2cl_anglespeedkey = "1.5"
+  * 2in_joystickUseAnalog = "0"
+  * 2in_joystickNo = "0"
+  * 2cl_yawspeed = "140"
+  * 2cl_pitchspeed = "140"
+  * 2j_pitch = "0.022"
+  * 2j_yaw = "-0.022"
+  * 2j_forward = "-0.25"
+  * 2j_side = "0.25"
+  * 2j_pitch_axis = "3"
+  * 2j_yaw_axis = "4"
+  * 2j_forward_axis = "1"
+  * 2j_side_axis = "0"
+  * 2name = "UnnamedPlayer2"
+  * 2model = "mike"
+  * 2headmodel = ""
+  * 2color1 = "5"
+  * 2color2 = "4"
+  * 2handicap = "100"
+  * 2in_joystick = "1"
+  * 2in_joystickThreshold = "0.150000"
+  * 2cl_thirdPersonAnalog = "1"

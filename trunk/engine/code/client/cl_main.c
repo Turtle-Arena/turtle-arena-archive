@@ -133,6 +133,18 @@ cvar_t  *cl_consoleFontSize;
 cvar_t  *cl_consoleFontKerning;
 #endif
 
+#ifdef IOQ3ZTM // ANALOG
+#ifdef TA_SPLITVIEW
+cvar_t	*cl_thirdPerson[MAX_SPLITVIEW];
+cvar_t	*cl_thirdPersonAngle[MAX_SPLITVIEW];
+cvar_t	*cl_thirdPersonAnalog[MAX_SPLITVIEW];
+#else
+cvar_t	*cl_thirdPerson;
+cvar_t	*cl_thirdPersonAngle;
+cvar_t	*cl_thirdPersonAnalog;
+#endif
+#endif
+
 clientActive_t		cl;
 clientConnection_t	clc;
 clientStatic_t		cls;
@@ -3918,6 +3930,20 @@ void CL_Init( void ) {
 	cl_consoleFont = Cvar_Get ("cl_consoleFont", "fonts/FreeSansBold.ttf", CVAR_ARCHIVE | CVAR_LATCH);
 	cl_consoleFontSize = Cvar_Get ("cl_consoleFontSize", "16", CVAR_ARCHIVE | CVAR_LATCH);
 	cl_consoleFontKerning = Cvar_Get ("cl_consoleFontKerning", "0", CVAR_ARCHIVE | CVAR_LATCH);
+#endif
+
+#ifdef IOQ3ZTM // ANALOG
+#ifdef TA_SPLITVIEW
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		cl_thirdPerson[i] = Cvar_Get (Com_LocalClientCvarName(i, "cg_thirdPerson"), "1", 0);
+		cl_thirdPersonAngle[i] = Cvar_Get (Com_LocalClientCvarName(i, "cg_thirdPersonAngle"), "0", 0);
+		cl_thirdPersonAnalog[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_thirdPersonAnalog"), "0", CVAR_ARCHIVE);
+	}
+#else
+	cl_thirdPerson = Cvar_Get ("cg_thirdPerson", "1", 0);
+	cl_thirdPersonAngle = Cvar_Get ("cg_thirdPersonAngle", "0", 0);
+	cl_thirdPersonAnalog = Cvar_Get ("cl_thirdPersonAnalog", "0", CVAR_ARCHIVE);
+#endif
 #endif
 
 #ifdef TA_SPLITVIEW

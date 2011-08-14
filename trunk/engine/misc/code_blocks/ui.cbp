@@ -136,7 +136,6 @@
 			<Add option="-DCELSHADING" />
 			<Add option="-DNOTRATEDM" />
 			<Add option="-DNOBLOOD" />
-			<Add option="-DANALOG" />
 			<Add option="-DNET_COMPAT" />
 			<Add option="-DIOQ3ZTM" />
 			<Add option="-DIOQ3ZTM_NO_COMPAT" />

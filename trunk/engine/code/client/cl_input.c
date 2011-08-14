@@ -949,13 +949,24 @@ void CL_FinishMove( calc_t *lc, usercmd_t *cmd ) {
 	// can be determined without allowing cheating
 	cmd->serverTime = cl.serverTime;
 
-#ifdef ANALOG // Do analog move!
+#ifdef IOQ3ZTM // ANALOG
+	// If cl_thirdPersonAnalog, always move relative to camera.
+#ifdef TA_SPLITVIEW
+	i = lc - cl.localClients;
+	if (cl_thirdPerson[i]->integer && cl_thirdPersonAnalog[i]->integer && cl_thirdPersonAngle[i]->value)
+#else
 	if (cl_thirdPerson->integer && cl_thirdPersonAnalog->integer && cl_thirdPersonAngle->value)
+#endif
 	{
 		if (cmd->forwardmove || cmd->rightmove || cmd->upmove)
 		{
+#ifdef TA_SPLITVIEW
+			lc->viewangles[YAW] -= cl_thirdPersonAngle[i]->value;
+			Cvar_Set(Com_LocalClientCvarName(i, "cg_thirdPersonAngle"), "0");
+#else
 			lc->viewangles[YAW] -= cl_thirdPersonAngle->value;
 			Cvar_Set("cg_thirdPersonAngle", "0");
+#endif
 		}
 	}
 #endif
