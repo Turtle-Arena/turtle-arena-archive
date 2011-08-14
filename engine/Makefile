@@ -311,7 +311,7 @@ else # END QUAKE3
 	endif
 
 	# Turtle Arena version
-	VERSION=0.5.1
+	VERSION=0.5.2
 
 	# Turtle Arena currently use MISSIONPACK game/cgame and baseq3-based ui
 	#  I have made the corrections needed so now MISSIONPACK is defined in "baseq3"
