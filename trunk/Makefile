@@ -49,7 +49,7 @@ ifndef GAMENAME
 GAMENAME=turtlearena
 endif
 ifndef VERSION
-VERSION=0.5.1
+VERSION=0.5.2
 endif
 ifndef RELEASE
 RELEASE=0
