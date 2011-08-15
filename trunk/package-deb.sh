@@ -218,7 +218,7 @@ fi
 
 if [ $USAGE -eq 2 ]
 then
-	echo "Invalid usage, use $1 -h for help."
+	echo "Invalid usage, use $0 -h for help."
 	exit 1
 fi
 
