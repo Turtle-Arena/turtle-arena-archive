@@ -43,7 +43,7 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
 === 0.5.1 (Completed) ===
   * DONE: Remove remaining OpenArena images and sounds.
 
-=== 0.5.2 ===
+=== 0.5.2 (Completed) ===
   * DONE: Redesign HUD (with health bar)
   * Fixed various usability issues.
 
