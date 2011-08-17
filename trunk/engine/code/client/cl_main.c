@@ -1570,20 +1570,12 @@ CL_RequestMotd
 ===================
 */
 void CL_RequestMotd( void ) {
+#ifdef UPDATE_SERVER_NAME // IOQ3ZTM
 	char		info[MAX_INFO_STRING];
 
 	if ( !cl_motd->integer ) {
 		return;
 	}
-
-#ifdef IOQ3ZTM
-	// ZTM: Check if there is there a valid motd server
-	//             Because in Turtle Arena there isn't.
-	if (strlen(UPDATE_SERVER_NAME) < 1)
-	{
-		return;
-	}
-#endif
 
 	Com_Printf( "Resolving %s\n", UPDATE_SERVER_NAME );
 	if ( !NET_StringToAdr( UPDATE_SERVER_NAME, &cls.updateServer, NA_IP ) ) {
@@ -1605,6 +1597,7 @@ void CL_RequestMotd( void ) {
 	Info_SetValueForKey( info, "version", com_version->string );
 
 	NET_OutOfBandPrint( NS_CLIENT, cls.updateServer, "getmotd \"%s\"\n", info );
+#endif
 }
 
 /*
