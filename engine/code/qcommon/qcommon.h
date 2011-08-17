@@ -281,10 +281,10 @@ PROTOCOL
 // NOTE: that stuff only works with two digits protocols
 extern int demo_protocols[];
 
-#ifdef TA_MAIN // ZTM: Don't talk to quake3arena.com
-#define	UPDATE_SERVER_NAME	""
-#else
+#if !defined STANDALONE && defined IOQ3ZTM // ZTM: Don't talk to quake3arena.com
+#ifndef UPDATE_SERVER_NAME
 #define	UPDATE_SERVER_NAME	"update.quake3arena.com"
+#endif
 #endif
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
