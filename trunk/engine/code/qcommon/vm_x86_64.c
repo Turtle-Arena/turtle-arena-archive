@@ -86,8 +86,13 @@ static intptr_t CROSSCALL callAsmCall(intptr_t callProgramStack, int64_t callSys
 {
 	vm_t *savedVM;
 	intptr_t ret = 0x77;
+#ifdef IOQ3ZTM // CONSISTENT_VM_ARGS
+	intptr_t args[16];
+//	int iargs[16];
+#else
 	intptr_t args[11];
 //	int iargs[11];
+#endif
 	int i;
 
 //	Dfprintf(stderr, "callAsmCall(%ld, %ld)\n", callProgramStack, callSyscallNum);
@@ -100,7 +105,11 @@ static intptr_t CROSSCALL callAsmCall(intptr_t callProgramStack, int64_t callSys
 
 	args[0] = callSyscallNum;
 //	iargs[0] = callSyscallNum;
+#ifdef IOQ3ZTM // CONSISTENT_VM_ARGS
+	for(i = 0; i < ARRAY_LEN(args); ++i)
+#else
 	for(i = 0; i < 10; ++i)
+#endif
 	{
 //		iargs[i+1] = *(int *)((byte *)currentVM->dataBase + callProgramStack + 8 + 4*i);
 		args[i+1] = *(int *)((byte *)currentVM->dataBase + callProgramStack + 8 + 4*i);
