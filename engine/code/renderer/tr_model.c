@@ -1374,6 +1374,337 @@ void R_Modellist_f( void ) {
 #endif
 
 
+#ifdef IOQ3ZTM // BONES
+//=============================================================================
+
+/*
+================
+RE_NumberOfBones
+================
+*/
+int RE_NumberOfBones(qhandle_t handle)
+{
+	model_t		*model;
+	int numBones;
+
+	model = R_GetModelByHandle( handle );
+
+	switch (model->type)
+	{
+		case MOD_IQM:
+			{
+				iqmData_t *iqmData;
+
+				iqmData = model->modelData;
+
+				numBones = iqmData->num_joints;
+				break;
+			}
+
+#ifdef RAVENMD4
+		case MOD_MDR:
+			{
+				mdrHeader_t		*mod;
+
+				mod = model->modelData;
+
+				numBones = mod->numBones;
+				break;
+			}
+#endif
+
+		default:
+			numBones = 0;
+			break;
+	}
+
+	return numBones;
+}
+
+/*
+================
+RE_BoneIndexForName
+
+Returns -1 if bone was not found.
+================
+*/
+int RE_BoneIndexForName(qhandle_t handle, const char *boneName)
+{
+	model_t		*model;
+	int			boneIndex;
+	int			i;
+
+	model = R_GetModelByHandle( handle );
+
+	switch (model->type)
+	{
+		case MOD_IQM:
+			{
+				iqmData_t *iqmData;
+				const char *str;
+
+				iqmData = model->modelData;
+				str = iqmData->names;
+
+				for (i = 0; i < iqmData->num_joints; i++)
+				{
+					if (!strcmp( str, boneName ) )
+					{
+						// Found bone
+						boneIndex = i;
+						break;
+					}
+
+					// Look at next joint name
+					str += strlen( str ) + 1;
+				}
+
+				// Bone not found
+				if (i == iqmData->num_joints)
+					boneIndex = -1;
+				break;
+			}
+
+#ifdef RAVENMD4
+		case MOD_MDR:
+			// MDR doesn't save bone names, but has 'tags' that are simply bone name and index.
+			// Can only find bone if it has a tag.
+			{
+				mdrHeader_t		*mod;
+				mdrTag_t		*tag;
+
+				mod = model->modelData;
+
+				tag = (mdrTag_t *)((byte *)mod + mod->ofsTags);
+				for ( i = 0 ; i < mod->numTags ; i++, tag++ )
+				{
+					if ( !strcmp( tag->name, boneName ) )
+					{
+						boneIndex = tag->boneIndex;
+						break;
+					}
+				}
+
+				// Bone not found
+				if (i == mod->numTags)
+					boneIndex = -1;
+				break;
+			}
+#endif
+
+		default:
+			boneIndex = -1;
+			break;
+	}
+
+	return boneIndex;
+}
+
+#if 0
+/*
+================
+RE_BoneName
+
+Returns NULL if invalid boneIndex or boneIndex doesn't have a name.
+================
+*/
+static const char *RE_BoneName(qhandle_t handle, int boneIndex)
+{
+	model_t *model;
+	const char *boneName;
+	int			i;
+
+	model = R_GetModelByHandle( handle );
+
+	if (boneIndex < 0 ||  boneIndex >= RE_NumberOfBones(handle))
+		return NULL;
+
+	switch (model->type)
+	{
+		case MOD_IQM:
+			{
+				iqmData_t *iqmData;
+				const char *str;
+
+				iqmData = model->modelData;
+				str = iqmData->names;
+
+				for (i = 0; i < boneIndex; i++)
+				{
+					// Next joint name
+					str += strlen( str ) + 1;
+				}
+
+				boneName = str;
+				break;
+			}
+
+#ifdef RAVENMD4
+		case MOD_MDR:
+			{
+				mdrHeader_t		*mod;
+				mdrTag_t		*tag;
+
+				mod = model->modelData;
+
+				tag = (mdrTag_t *)((byte *)mod + mod->ofsTags);
+				for ( i = 0 ; i < mod->numTags ; i++, tag++ )
+				{
+					if (tag->boneIndex == boneIndex)
+					{
+						boneName = tag->name;
+						break;
+					}
+				}
+
+				// Tag not found
+				if (i == mod->numTags)
+					boneName = NULL;
+				break;
+			}
+#endif
+
+		default:
+			boneName = NULL;
+			break;
+	}
+
+	return boneName;
+}
+#endif
+
+/*
+================
+RE_SetupSkeleton
+================
+*/
+qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp)
+{
+	model_t		*model;
+	int			numBones;
+	int			i;
+
+	model = R_GetModelByHandle( handle );
+
+	switch (model->type)
+	{
+		case MOD_IQM:
+		{
+			iqmData_t *iqmData;
+
+			iqmData = model->modelData;
+			numBones = iqmData->num_joints;
+
+			// ZTM: FIXME: Can there be a IQM with no joints?
+			if (!numBones)
+				return qfalse;
+
+			// Setup bones
+			for (i = 0; i < numBones; i++) {
+				// Setup matrix
+				ComputeJointMatsRelative(iqmData, frame, oldframe, backlerp, refSkel->bones[i].mat);
+			}
+
+			break;
+		}
+
+#if 0 //#ifdef RAVENMD4
+		// ZTM: TODO: Finish setting up MDR joints and support using custom skeleton.
+		case MOD_MDR:
+		{
+			mdrheader_t *mdrData;
+
+			mdrData = model->modelData;
+			numBones = mdrData->numBones;
+
+			// ZTM: FIXME: Can there be a MDR with no joints?
+			if (!numBones)
+				return qfalse;
+
+			// Setup bones
+			for (i = 0; i < numBones; i++) {
+				// Setup matrix
+				//ComputeJointMatsRelative(mdrData, frame, oldframe, backlerp, refSkel->bones[i].mat);
+			}
+
+			break;
+		}
+#endif
+
+		default:
+			return qfalse;
+	}
+
+	return qtrue;
+}
+
+/*
+================
+RE_SetupPlayerSkeleton
+================
+*/
+qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int legsFrame, int legsOldFrame, float legsBacklerp,
+								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
+								int headFrame, int headOldFrame, float headBacklerp)
+{
+	model_t		*model;
+	int			numBones;
+	int			i;
+	int			frame;
+	int			oldframe;
+	float		backlerp;
+
+	model = R_GetModelByHandle( handle );
+
+	switch (model->type)
+	{
+		case MOD_IQM:
+		{
+			iqmData_t *iqmData;
+			const char *str;
+
+			iqmData = model->modelData;
+			numBones = iqmData->num_joints;
+
+			// ZTM: FIXME: Can there be a IQM with no joints?
+			if (!numBones)
+				return qfalse;
+
+			// Setup bones using the three different animations
+			for (i = 0; i < numBones; i++) {
+				if (!strncasecmp(str, "l_", 2) || !strcasecmp(str, "tag_torso")) {
+					frame = legsFrame;
+					oldframe = legsOldFrame;
+					backlerp = legsBacklerp;
+				} else if (!strncasecmp(str, "u_", 2) || !strcasecmp(str, "tag_head")) {
+					frame = torsoFrame;
+					oldframe = torsoOldFrame;
+					backlerp = torsoBacklerp;
+				} else /*if (!strncasecmp(str "h_", 2))*/ {
+					// Use bones from head
+					frame = headFrame;
+					oldframe = headOldFrame;
+					backlerp = headBacklerp;
+				}
+
+				// Setup matrix
+				ComputeJointMatsRelative(iqmData, frame, oldframe, backlerp, refSkel->bones[i].mat);
+
+				// Next joint name
+				str += strlen( str ) + 1;
+			}
+
+			break;
+		}
+
+		default:
+			return qfalse;
+	}
+
+	return qtrue;
+}
+#endif
+
 //=============================================================================
 
 

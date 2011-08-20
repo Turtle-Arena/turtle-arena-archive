@@ -2474,6 +2474,17 @@ qboolean	trap_getCameraInfo(int time, vec3_t *origin, vec3_t *angles);
 
 qboolean	trap_GetEntityToken( char *buffer, int bufferSize );
 
+#ifdef IOQ3ZTM // BONES
+void		trap_R_AddRefEntityToScene_CustomSkeleton( const refEntity_t *re, const refSkeleton_t *rs );
+int			trap_R_NumberOfBones(qhandle_t handle);
+int			trap_R_BoneIndexForName(qhandle_t handle, const char *boneName);
+qboolean	trap_R_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
+qboolean	trap_R_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
+							int legsFrame, int legsOldFrame, float legsBacklerp,
+							int torsoFrame, int torsoOldFrame, float torsoBacklerp,
+							int headFrame, int headOldFrame, float headBacklerp);
+#endif
+
 void	CG_ClearParticles (void);
 void	CG_AddParticles (void);
 void	CG_ParticleSnow (qhandle_t pshader, vec3_t origin, vec3_t origin2, int turb, float range, int snum);

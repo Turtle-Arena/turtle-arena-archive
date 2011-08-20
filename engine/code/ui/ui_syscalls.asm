@@ -89,6 +89,13 @@ equ trap_LAN_CompareServers					-86
 equ trap_FS_Seek		-87
 equ trap_SetPbClStatus -88
 
+;; IOQ3ZTM // BONES
+equ trap_R_AddRefEntityToScene_CustomSkeleton -89
+equ trap_R_NumberOfBones					-90
+equ trap_R_BoneIndexForName					-91
+equ trap_R_SetupSkeleton					-92
+equ trap_R_SetupPlayerSkeleton				-93
+
 equ	memset						-101
 equ	memcpy						-102
 equ	strncpy						-103

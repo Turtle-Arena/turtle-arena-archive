@@ -25,6 +25,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "../botlib/botlib.h"
 
+#ifdef TA_GAME_MODELS
+#ifdef IOQ3ZTM // BONES
+#include "../renderer/tr_types.h"
+#endif
+#endif
+
 botlib_export_t	*botlib_export;
 
 // these functions must be used instead of pointer arithmetic, because
@@ -286,6 +292,14 @@ static int	FloatAsInt( float f ) {
 qhandle_t	RE_RegisterModel( const char *name );
 int			R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
 					 float frac, const char *tagName );
+#ifdef IOQ3ZTM // BONES
+int RE_NumberOfBones(qhandle_t handle);
+int RE_BoneIndexForName(qhandle_t handle, const char *boneName);
+qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
+qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int legsFrame, int legsOldFrame, float legsBacklerp,
+								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
+								int headFrame, int headOldFrame, float headBacklerp);
+#endif
 #endif
 
 /*
@@ -439,6 +453,19 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return RE_RegisterModel( VMA(1) );
 	case G_LERPTAG:
 		return R_LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
+
+#ifdef IOQ3ZTM // BONES
+	case G_NUMBEROFBONES:
+		return RE_NumberOfBones(args[1]);
+	case G_BONEINDEXFORNAME:
+		return RE_BoneIndexForName(args[1], VMA(2)); // VMF(#)
+	case G_SETUPSKELETON:
+		return RE_SetupSkeleton(args[1], VMA(2), args[3], args[4], VMF(5));
+	case G_SETUPPLAYERSKELETON:
+		return RE_SetupPlayerSkeleton(args[1], VMA(2), args[3], args[4], VMF(5),
+										args[6], args[7], VMF(8),
+										args[9], args[10], VMF(11));
+#endif
 #endif
 
 		//====================================

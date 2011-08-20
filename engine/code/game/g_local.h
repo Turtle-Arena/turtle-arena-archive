@@ -26,6 +26,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "bg_misc.h"
 #include "g_public.h"
 
+#ifdef TA_GAME_MODELS
+#ifdef IOQ3ZTM // BONES
+#include "../renderer/tr_types.h"
+#endif
+#endif
+
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
@@ -1135,6 +1141,16 @@ void	trap_DebugPolygonDelete(int id);
 qhandle_t trap_RegisterModel( const char *name );
 int trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
 					   float frac, const char *tagName );
+
+#ifdef IOQ3ZTM // BONES
+int trap_NumberOfBones(qhandle_t handle);
+int trap_BoneIndexForName(qhandle_t handle, const char *boneName);
+qboolean trap_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
+qboolean trap_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
+								int legsFrame, int legsOldFrame, float legsBacklerp,
+								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
+								int headFrame, int headOldFrame, float headBacklerp);
+#endif
 #endif
 
 int		trap_BotLibSetup( void );

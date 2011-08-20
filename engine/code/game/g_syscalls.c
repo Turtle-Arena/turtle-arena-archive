@@ -239,6 +239,33 @@ int		trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int end
 					   float frac, const char *tagName ) {
 	return syscall( G_LERPTAG, tag, handle, startFrame, endFrame, PASSFLOAT(frac), tagName );
 }
+
+#ifdef IOQ3ZTM // BONES
+int trap_NumberOfBones(qhandle_t handle)
+{
+	return syscall( G_NUMBEROFBONES, handle );
+}
+
+int trap_BoneIndexForName(qhandle_t handle, const char *boneName)
+{
+	return syscall( G_BONEINDEXFORNAME, handle, boneName );
+}
+
+qboolean trap_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp)
+{
+	return syscall( G_SETUPSKELETON, handle, refSkel, frame, oldframe, PASSFLOAT(backlerp) );
+}
+
+qboolean trap_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
+								int legsFrame, int legsOldFrame, float legsBacklerp,
+								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
+								int headFrame, int headOldFrame, float headBacklerp)
+{
+	return syscall( G_SETUPPLAYERSKELETON, handle, refSkel, legsFrame, legsOldFrame, PASSFLOAT(legsBacklerp),
+							torsoFrame, torsoOldFrame, PASSFLOAT(torsoBacklerp),
+							headFrame, headOldFrame, PASSFLOAT(headBacklerp));
+}
+#endif
 #endif
 
 // BotLib traps start here
