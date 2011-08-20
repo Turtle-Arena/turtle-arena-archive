@@ -976,6 +976,30 @@ static void ComputeJointMats( iqmData_t *data, int frame, int oldframe,
 	}
 }
 
+#ifdef IOQ3ZTM // BONES
+// Like ComputeJointMats, except it doesn't multiply times parent joint.
+void ComputeJointMatsRelative( iqmData_t *data, int frame, int oldframe,
+			      float backlerp, float *mat ) {
+	float	*mat1, *mat2;
+	int	i;
+
+	if ( oldframe == frame ) {
+		mat1 = data->poseMats + 12 * data->num_joints * frame;
+		for( i = 0; i < data->num_joints; i++ ) {
+			Com_Memcpy( mat + 12*i, mat1 + 12*i, 12 * sizeof(float) );
+		}
+	} else  {
+		mat1 = data->poseMats + 12 * data->num_joints * frame;
+		mat2 = data->poseMats + 12 * data->num_joints * oldframe;
+		
+		for( i = 0; i < data->num_joints; i++ ) {
+			InterpolateMatrix( mat1 + 12*i, mat2 + 12*i,
+					   backlerp, mat );
+		}
+	}
+}
+#endif
+
 
 #ifndef RENDERLESS_MODELS
 /*
@@ -996,6 +1020,35 @@ void RB_IQMSurfaceAnim( surfaceType_t *surface ) {
 	vec2_t		(*outTexCoord)[2] = &tess.texCoords[tess.numVertexes];
 	color4ub_t	*outColor = &tess.vertexColors[tess.numVertexes];
 
+#ifdef IOQ3ZTM // BONES
+	int		*tri;
+	glIndex_t	*ptr;
+	glIndex_t	base;
+
+	RB_CHECKOVERFLOW( surf->num_vertexes, surf->num_triangles * 3 );
+
+	if (backEnd.currentEntity->customSkeleton != -1) {
+		refSkeleton_t *refSkel = &backEnd.refdef.skeletons[backEnd.currentEntity->customSkeleton];
+		int	*joint = data->jointParents;
+
+		// Convert to absolute skeleton
+		for( i = 0; i < data->num_joints; i++, joint++ ) {
+			if( *joint >= 0 ) {
+				Matrix34Multiply( refSkel->bones[*joint].mat,
+						  refSkel->bones[i].mat, jointMats + 12*i );
+			} else {
+				Com_Memcpy( jointMats + 12*i, refSkel->bones[i].mat, 12 * sizeof(float) );
+			}
+		}
+	} else {
+		int	frame = backEnd.currentEntity->e.frame % data->num_frames;
+		int	oldframe = backEnd.currentEntity->e.oldframe % data->num_frames;
+		float	backlerp = backEnd.currentEntity->e.backlerp;
+
+		// compute interpolated joint matrices
+		ComputeJointMats( data, frame, oldframe, backlerp, jointMats );
+	}
+#else
 	int	frame = backEnd.currentEntity->e.frame % data->num_frames;
 	int	oldframe = backEnd.currentEntity->e.oldframe % data->num_frames;
 	float	backlerp = backEnd.currentEntity->e.backlerp;
@@ -1008,6 +1061,7 @@ void RB_IQMSurfaceAnim( surfaceType_t *surface ) {
 
 	// compute interpolated joint matrices
 	ComputeJointMats( data, frame, oldframe, backlerp, jointMats );
+#endif
 
 	// transform vertexes and fill other data
 	for( i = 0; i < surf->num_vertexes;

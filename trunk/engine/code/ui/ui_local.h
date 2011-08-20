@@ -1064,6 +1064,17 @@ qboolean		trap_VerifyCDKey( const char *key, const char *chksum);
 void			trap_SetPbClStatus( int status );
 #endif
 
+#ifdef IOQ3ZTM // BONES
+void			trap_R_AddRefEntityToScene_CustomSkeleton( const refEntity_t *re, const refSkeleton_t *rs );
+int				trap_R_NumberOfBones(qhandle_t handle);
+int				trap_R_BoneIndexForName(qhandle_t handle, const char *boneName);
+qboolean		trap_R_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
+qboolean		trap_R_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
+								int legsFrame, int legsOldFrame, float legsBacklerp,
+								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
+								int headFrame, int headOldFrame, float headBacklerp);
+#endif
+
 //
 // ui_addbots.c
 //

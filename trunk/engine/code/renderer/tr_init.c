@@ -1595,6 +1595,13 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.LerpTag = R_LerpTag;
 	re.ModelBounds = R_ModelBounds;
 
+#ifdef IOQ3ZTM // BONES
+	re.NumberOfBones = RE_NumberOfBones;
+	re.BoneIndexForName = RE_BoneIndexForName;
+	re.SetupSkeleton = RE_SetupSkeleton;
+	re.SetupPlayerSkeleton = RE_SetupPlayerSkeleton;
+#endif
+
 	re.ClearScene = RE_ClearScene;
 	re.AddRefEntityToScene = RE_AddRefEntityToScene;
 	re.AddPolyToScene = RE_AddPolyToScene;

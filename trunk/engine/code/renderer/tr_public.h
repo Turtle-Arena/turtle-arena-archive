@@ -66,7 +66,11 @@ typedef struct {
 	// a scene is built up by calls to R_ClearScene and the various R_Add functions.
 	// Nothing is drawn until R_RenderScene is called.
 	void	(*ClearScene)( void );
+#ifdef IOQ3ZTM // BONES
+	void	(*AddRefEntityToScene)( const refEntity_t *ent, const refSkeleton_t *customSkeleton );
+#else
 	void	(*AddRefEntityToScene)( const refEntity_t *re );
+#endif
 	void	(*AddPolyToScene)( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
 	int		(*LightForPoint)( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
 	void	(*AddLightToScene)( const vec3_t org, float intensity, float r, float g, float b );
@@ -93,6 +97,16 @@ typedef struct {
 	int		(*LerpTag)( orientation_t *tag,  qhandle_t model, int startFrame, int endFrame, 
 					 float frac, const char *tagName );
 	void	(*ModelBounds)( qhandle_t model, vec3_t mins, vec3_t maxs );
+
+#ifdef IOQ3ZTM // BONES
+	int		(*NumberOfBones)(qhandle_t handle);
+	int		(*BoneIndexForName)(qhandle_t handle, const char *boneName);
+	qboolean (*SetupSkeleton)(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
+	qboolean (*SetupPlayerSkeleton)(qhandle_t handle, refSkeleton_t *refSkel,
+								int legsFrame, int legsOldFrame, float legsBacklerp,
+								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
+								int headFrame, int headOldFrame, float headBacklerp);
+#endif
 
 #ifdef __USEA3D
 	void    (*A3D_RenderGeometry) (void *pVoidA3D, void *pVoidGeom, void *pVoidMat, void *pVoidGeomStatus);

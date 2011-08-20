@@ -866,8 +866,18 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 	case UI_R_ADDREFENTITYTOSCENE:
+#ifdef IOQ3ZTM // BONES
+		re.AddRefEntityToScene( VMA(1), NULL );
+#else
 		re.AddRefEntityToScene( VMA(1) );
+#endif
 		return 0;
+
+#ifdef IOQ3ZTM // BONES
+	case UI_R_ADDREFENTITYTOSCENE_CUSTOMSKELETON:
+		re.AddRefEntityToScene( VMA(1), VMA(2) );
+		return 0;
+#endif
 
 	case UI_R_ADDPOLYTOSCENE:
 		re.AddPolyToScene( args[1], args[2], VMA(3), 1 );
@@ -1048,6 +1058,19 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 	case UI_R_REGISTERFONT:
 		re.RegisterFont( VMA(1), args[2], VMA(3));
 		return 0;
+
+#ifdef IOQ3ZTM // BONES
+	case UI_R_NUMBEROFBONES:
+		return re.NumberOfBones(args[1]);
+	case UI_R_BONEINDEXFORNAME:
+		return re.BoneIndexForName(args[1], VMA(2)); // VMF(#)
+	case UI_R_SETUPSKELETON:
+		return re.SetupSkeleton(args[1], VMA(2), args[3], args[4], VMF(5));
+	case UI_R_SETUPPLAYERSKELETON:
+		return re.SetupPlayerSkeleton(args[1], VMA(2), args[3], args[4], VMF(5),
+										args[6], args[7], VMF(8),
+										args[9], args[10], VMF(11));
+#endif
 
 	case UI_MEMSET:
 		Com_Memset( VMA(1), args[2], args[3] );

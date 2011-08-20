@@ -609,8 +609,17 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		re.ClearScene();
 		return 0;
 	case CG_R_ADDREFENTITYTOSCENE:
+#ifdef IOQ3ZTM // BONES
+		re.AddRefEntityToScene( VMA(1), NULL );
+#else
 		re.AddRefEntityToScene( VMA(1) );
+#endif
 		return 0;
+#ifdef IOQ3ZTM // BONES
+	case CG_R_ADDREFENTITYTOSCENE_CUSTOMSKELETON:
+		re.AddRefEntityToScene( VMA(1), VMA(2) );
+		return 0;
+#endif
 	case CG_R_ADDPOLYTOSCENE:
 		re.AddPolyToScene( args[1], args[2], VMA(3), 1 );
 		return 0;
@@ -686,6 +695,18 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
   case CG_KEY_GETKEY:
 		return Key_GetKey( VMA(1) );
 
+#ifdef IOQ3ZTM // BONES
+  case CG_R_NUMBEROFBONES:
+		return re.NumberOfBones(args[1]);
+  case CG_R_BONEINDEXFORNAME:
+		return re.BoneIndexForName(args[1], VMA(2)); // VMF(#)
+  case CG_R_SETUPSKELETON:
+		return re.SetupSkeleton(args[1], VMA(2), args[3], args[4], VMF(5));
+  case CG_R_SETUPPLAYERSKELETON:
+		return re.SetupPlayerSkeleton(args[1], VMA(2), args[3], args[4], VMF(5),
+										args[6], args[7], VMF(8),
+										args[9], args[10], VMF(11));
+#endif
 
 
 	case CG_MEMSET:
