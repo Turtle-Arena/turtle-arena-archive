@@ -696,10 +696,10 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		return Key_GetKey( VMA(1) );
 
 #ifdef IOQ3ZTM // BONES
-  case CG_R_NUMBEROFBONES:
-		return re.NumberOfBones(args[1]);
-  case CG_R_BONEINDEXFORNAME:
-		return re.BoneIndexForName(args[1], VMA(2)); // VMF(#)
+  case CG_R_NUMBEROFJOINTS:
+		return re.NumberOfJoints(args[1]);
+  case CG_R_JOINTINDEXFORNAME:
+		return re.JointIndexForName(args[1], VMA(2));
   case CG_R_SETUPSKELETON:
 		return re.SetupSkeleton(args[1], VMA(2), args[3], args[4], VMF(5));
   case CG_R_SETUPPLAYERSKELETON:

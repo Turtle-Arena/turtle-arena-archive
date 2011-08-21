@@ -488,14 +488,14 @@ void trap_R_AddRefEntityToScene_CustomSkeleton( const refEntity_t *re, const ref
 	syscall( CG_R_ADDREFENTITYTOSCENE_CUSTOMSKELETON, re, rs );
 }
 
-int trap_R_NumberOfBones(qhandle_t handle)
+int trap_R_NumberOfJoints(qhandle_t handle)
 {
-	return syscall( CG_R_NUMBEROFBONES, handle );
+	return syscall( CG_R_NUMBEROFJOINTS, handle );
 }
 
-int trap_R_BoneIndexForName(qhandle_t handle, const char *boneName)
+int trap_R_JointIndexForName(qhandle_t handle, const char *jointName)
 {
-	return syscall( CG_R_BONEINDEXFORNAME, handle, boneName );
+	return syscall( CG_R_JOINTINDEXFORNAME, handle, jointName );
 }
 
 qboolean trap_R_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp)

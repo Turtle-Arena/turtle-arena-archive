@@ -91,8 +91,8 @@ equ trap_SetPbClStatus -88
 
 ;; IOQ3ZTM // BONES
 equ trap_R_AddRefEntityToScene_CustomSkeleton -89
-equ trap_R_NumberOfBones					-90
-equ trap_R_BoneIndexForName					-91
+equ trap_R_NumberOfJoints					-90
+equ trap_R_JointIndexForName				-91
 equ trap_R_SetupSkeleton					-92
 equ trap_R_SetupPlayerSkeleton				-93
 

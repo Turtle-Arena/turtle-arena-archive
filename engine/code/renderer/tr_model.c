@@ -1379,13 +1379,13 @@ void R_Modellist_f( void ) {
 
 /*
 ================
-RE_NumberOfBones
+RE_NumberOfJoints
 ================
 */
-int RE_NumberOfBones(qhandle_t handle)
+int RE_NumberOfJoints(qhandle_t handle)
 {
 	model_t		*model;
-	int numBones;
+	int numJoints;
 
 	model = R_GetModelByHandle( handle );
 
@@ -1397,7 +1397,7 @@ int RE_NumberOfBones(qhandle_t handle)
 
 				iqmData = model->modelData;
 
-				numBones = iqmData->num_joints;
+				numJoints = iqmData->num_joints;
 				break;
 			}
 
@@ -1408,30 +1408,30 @@ int RE_NumberOfBones(qhandle_t handle)
 
 				mod = model->modelData;
 
-				numBones = mod->numBones;
+				numJoints = mod->numBones;
 				break;
 			}
 #endif
 
 		default:
-			numBones = 0;
+			numJoints = 0;
 			break;
 	}
 
-	return numBones;
+	return numJoints;
 }
 
 /*
 ================
-RE_BoneIndexForName
+RE_JointIndexForName
 
-Returns -1 if bone was not found.
+Returns -1 if joint was not found.
 ================
 */
-int RE_BoneIndexForName(qhandle_t handle, const char *boneName)
+int RE_JointIndexForName(qhandle_t handle, const char *jointName)
 {
 	model_t		*model;
-	int			boneIndex;
+	int			jointIndex;
 	int			i;
 
 	model = R_GetModelByHandle( handle );
@@ -1448,10 +1448,10 @@ int RE_BoneIndexForName(qhandle_t handle, const char *boneName)
 
 				for (i = 0; i < iqmData->num_joints; i++)
 				{
-					if (!strcmp( str, boneName ) )
+					if (!strcmp( str, jointName ) )
 					{
-						// Found bone
-						boneIndex = i;
+						// Found joint
+						jointIndex = i;
 						break;
 					}
 
@@ -1461,14 +1461,14 @@ int RE_BoneIndexForName(qhandle_t handle, const char *boneName)
 
 				// Bone not found
 				if (i == iqmData->num_joints)
-					boneIndex = -1;
+					jointIndex = -1;
 				break;
 			}
 
 #ifdef RAVENMD4
 		case MOD_MDR:
-			// MDR doesn't save bone names, but has 'tags' that are simply bone name and index.
-			// Can only find bone if it has a tag.
+			// MDR doesn't save joint names, but has 'tags' that are simply joint name and index.
+			// Can only find joint if it has a tag.
 			{
 				mdrHeader_t		*mod;
 				mdrTag_t		*tag;
@@ -1478,45 +1478,45 @@ int RE_BoneIndexForName(qhandle_t handle, const char *boneName)
 				tag = (mdrTag_t *)((byte *)mod + mod->ofsTags);
 				for ( i = 0 ; i < mod->numTags ; i++, tag++ )
 				{
-					if ( !strcmp( tag->name, boneName ) )
+					if ( !strcmp( tag->name, jointName ) )
 					{
-						boneIndex = tag->boneIndex;
+						jointIndex = tag->boneIndex;
 						break;
 					}
 				}
 
 				// Bone not found
 				if (i == mod->numTags)
-					boneIndex = -1;
+					jointIndex = -1;
 				break;
 			}
 #endif
 
 		default:
-			boneIndex = -1;
+			jointIndex = -1;
 			break;
 	}
 
-	return boneIndex;
+	return jointIndex;
 }
 
 #if 0
 /*
 ================
-RE_BoneName
+RE_JointName
 
-Returns NULL if invalid boneIndex or boneIndex doesn't have a name.
+Returns NULL if invalid jointIndex or boneIndex doesn't have a name.
 ================
 */
-static const char *RE_BoneName(qhandle_t handle, int boneIndex)
+static const char *RE_JointName(qhandle_t handle, int jointIndex)
 {
 	model_t *model;
-	const char *boneName;
+	const char *jointName;
 	int			i;
 
 	model = R_GetModelByHandle( handle );
 
-	if (boneIndex < 0 ||  boneIndex >= RE_NumberOfBones(handle))
+	if (jointIndex < 0 ||  jointIndex >= RE_NumberOfJoints(handle))
 		return NULL;
 
 	switch (model->type)
@@ -1529,13 +1529,13 @@ static const char *RE_BoneName(qhandle_t handle, int boneIndex)
 				iqmData = model->modelData;
 				str = iqmData->names;
 
-				for (i = 0; i < boneIndex; i++)
+				for (i = 0; i < jointIndex; i++)
 				{
 					// Next joint name
 					str += strlen( str ) + 1;
 				}
 
-				boneName = str;
+				jointName = str;
 				break;
 			}
 
@@ -1550,26 +1550,26 @@ static const char *RE_BoneName(qhandle_t handle, int boneIndex)
 				tag = (mdrTag_t *)((byte *)mod + mod->ofsTags);
 				for ( i = 0 ; i < mod->numTags ; i++, tag++ )
 				{
-					if (tag->boneIndex == boneIndex)
+					if (tag->boneIndex == jointIndex)
 					{
-						boneName = tag->name;
+						jointName = tag->name;
 						break;
 					}
 				}
 
 				// Tag not found
 				if (i == mod->numTags)
-					boneName = NULL;
+					jointName = NULL;
 				break;
 			}
 #endif
 
 		default:
-			boneName = NULL;
+			jointName = NULL;
 			break;
 	}
 
-	return boneName;
+	return jointName;
 }
 #endif
 
@@ -1581,7 +1581,7 @@ RE_SetupSkeleton
 qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp)
 {
 	model_t		*model;
-	int			numBones;
+	int			numJoints;
 	int			i;
 
 	model = R_GetModelByHandle( handle );
@@ -1593,16 +1593,16 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 			iqmData_t *iqmData;
 
 			iqmData = model->modelData;
-			numBones = iqmData->num_joints;
+			numJoints = iqmData->num_joints;
 
 			// ZTM: FIXME: Can there be a IQM with no joints?
-			if (!numBones)
+			if (!numJoints)
 				return qfalse;
 
-			// Setup bones
-			for (i = 0; i < numBones; i++) {
+			// Setup skeleton
+			for (i = 0; i < numJoints; i++) {
 				// Setup matrix
-				ComputeJointMatsRelative(iqmData, frame, oldframe, backlerp, refSkel->bones[i].mat);
+				ComputeJointRelativeOrientation(iqmData, frame, oldframe, backlerp, i, &refSkel->joints[i]);
 			}
 
 			break;
@@ -1615,17 +1615,17 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 			mdrheader_t *mdrData;
 
 			mdrData = model->modelData;
-			numBones = mdrData->numBones;
+			numJoints = mdrData->numBones;
 
 			// ZTM: FIXME: Can there be a MDR with no joints?
-			if (!numBones)
+			if (!numJoints)
 				return qfalse;
 
-			// Setup bones
-			for (i = 0; i < numBones; i++) {
+			// Setup skeleton
+			//for (i = 0; i < numJoints; i++) {
 				// Setup matrix
-				//ComputeJointMatsRelative(mdrData, frame, oldframe, backlerp, refSkel->bones[i].mat);
-			}
+				//ComputeJointRelativeOrientation(mdrData, frame, oldframe, backlerp, i, &refSkel->joints[i]);
+			//}
 
 			break;
 		}
@@ -1648,7 +1648,7 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 								int headFrame, int headOldFrame, float headBacklerp)
 {
 	model_t		*model;
-	int			numBones;
+	int			numJoints;
 	int			i;
 	int			frame;
 	int			oldframe;
@@ -1664,14 +1664,14 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 			const char *str;
 
 			iqmData = model->modelData;
-			numBones = iqmData->num_joints;
+			numJoints = iqmData->num_joints;
 
 			// ZTM: FIXME: Can there be a IQM with no joints?
-			if (!numBones)
+			if (!numJoints)
 				return qfalse;
 
-			// Setup bones using the three different animations
-			for (i = 0; i < numBones; i++) {
+			// Setup skeleton using the three different animations
+			for (i = 0; i < numJoints; i++) {
 				if (!strncasecmp(str, "l_", 2) || !strcasecmp(str, "tag_torso")) {
 					frame = legsFrame;
 					oldframe = legsOldFrame;
@@ -1681,14 +1681,13 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 					oldframe = torsoOldFrame;
 					backlerp = torsoBacklerp;
 				} else /*if (!strncasecmp(str "h_", 2))*/ {
-					// Use bones from head
 					frame = headFrame;
 					oldframe = headOldFrame;
 					backlerp = headBacklerp;
 				}
 
 				// Setup matrix
-				ComputeJointMatsRelative(iqmData, frame, oldframe, backlerp, refSkel->bones[i].mat);
+				ComputeJointRelativeOrientation(iqmData, frame, oldframe, backlerp, i, &refSkel->joints[i]);
 
 				// Next joint name
 				str += strlen( str ) + 1;

@@ -99,8 +99,8 @@ typedef struct {
 	void	(*ModelBounds)( qhandle_t model, vec3_t mins, vec3_t maxs );
 
 #ifdef IOQ3ZTM // BONES
-	int		(*NumberOfBones)(qhandle_t handle);
-	int		(*BoneIndexForName)(qhandle_t handle, const char *boneName);
+	int		(*NumberOfJoints)(qhandle_t handle);
+	int		(*JointIndexForName)(qhandle_t handle, const char *jointName);
 	qboolean (*SetupSkeleton)(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
 	qboolean (*SetupPlayerSkeleton)(qhandle_t handle, refSkeleton_t *refSkel,
 								int legsFrame, int legsOldFrame, float legsBacklerp,
