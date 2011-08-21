@@ -50,8 +50,8 @@ equ trap_FS_Seek -46
 equ trap_RegisterModel		-47
 equ trap_LerpTag			-48
 ;; IOQ3ZTM // BONES
-equ trap_NumberOfBones		-49
-equ trap_BoneIndexForName	-50
+equ trap_NumberOfJoints		-49
+equ trap_JointIndexForName	-50
 equ trap_SetupSkeleton		-51
 equ trap_SetupPlayerSkeleton	-52
 

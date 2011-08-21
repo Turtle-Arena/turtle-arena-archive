@@ -1596,8 +1596,8 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.ModelBounds = R_ModelBounds;
 
 #ifdef IOQ3ZTM // BONES
-	re.NumberOfBones = RE_NumberOfBones;
-	re.BoneIndexForName = RE_BoneIndexForName;
+	re.NumberOfJoints = RE_NumberOfJoints;
+	re.JointIndexForName = RE_JointIndexForName;
 	re.SetupSkeleton = RE_SetupSkeleton;
 	re.SetupPlayerSkeleton = RE_SetupPlayerSkeleton;
 #endif

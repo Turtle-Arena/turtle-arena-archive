@@ -87,19 +87,12 @@ typedef enum {
 } refEntityType_t;
 
 #ifdef IOQ3ZTM_NO_COMPAT // BONES
-// ZTM: TODO: Use orientation_t instead of float[12]?
-typedef struct
-{
-	// 3x4 matrix (3x3 axis with origin is in [3] [7] [11])
-	float	mat[12];
-} refSkeletonBone_t;
-
 #define MAX_SKELETON_JOINTS 128 // see IQM_MAX_JOINTS
 // ZTM: TODO: Replace IQM_MAX_JOINTS with MAX_SKELETON_JOINTS?
 
 typedef struct
 {
-	refSkeletonBone_t	bones[MAX_SKELETON_JOINTS];
+	orientation_t	joints[MAX_SKELETON_JOINTS];
 } refSkeleton_t;
 #endif
 

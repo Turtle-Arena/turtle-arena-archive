@@ -241,14 +241,14 @@ int		trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int end
 }
 
 #ifdef IOQ3ZTM // BONES
-int trap_NumberOfBones(qhandle_t handle)
+int trap_NumberOfJoints(qhandle_t handle)
 {
-	return syscall( G_NUMBEROFBONES, handle );
+	return syscall( G_NUMBEROFJOINTS, handle );
 }
 
-int trap_BoneIndexForName(qhandle_t handle, const char *boneName)
+int trap_JointIndexForName(qhandle_t handle, const char *jointName)
 {
-	return syscall( G_BONEINDEXFORNAME, handle, boneName );
+	return syscall( G_JOINTINDEXFORNAME, handle, jointName );
 }
 
 qboolean trap_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp)

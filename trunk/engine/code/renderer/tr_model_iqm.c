@@ -977,26 +977,48 @@ static void ComputeJointMats( iqmData_t *data, int frame, int oldframe,
 }
 
 #ifdef IOQ3ZTM // BONES
-// Like ComputeJointMats, except it doesn't multiply times parent joint.
-void ComputeJointMatsRelative( iqmData_t *data, int frame, int oldframe,
-			      float backlerp, float *mat ) {
+// Convert orientation_t to matrix 3x4 (float[12])
+void OrientationToMatrix34(orientation_t orientation, float *mat) {
+	int i;
+
+	for (i = 0; i < 3; ++i) {
+		mat[4*i+0] = orientation.axis[i][0];
+		mat[4*i+1] = orientation.axis[i][1];
+		mat[4*i+2] = orientation.axis[i][2];
+		mat[4*i+3] = orientation.origin[i];
+	}
+}
+
+// Convert matrix 3x4 (float[12]) to orientation_t
+void Matrix34ToOrientation(const float *mat, orientation_t *orientation) {
+	int i;
+
+	for (i = 0; i < 3; ++i) {
+		orientation->axis[i][0] = mat[4*i+0];
+		orientation->axis[i][1] = mat[4*i+1];
+		orientation->axis[i][2] = mat[4*i+2];
+		orientation->origin[i] = mat[4*i+3];
+	}
+}
+
+void ComputeJointRelativeOrientation( iqmData_t *data, int frame, int oldframe,
+			      float backlerp, int joint, orientation_t *orientation ) {
+	float	mat[12];
 	float	*mat1, *mat2;
-	int	i;
 
 	if ( oldframe == frame ) {
 		mat1 = data->poseMats + 12 * data->num_joints * frame;
-		for( i = 0; i < data->num_joints; i++ ) {
-			Com_Memcpy( mat + 12*i, mat1 + 12*i, 12 * sizeof(float) );
-		}
+
+		Com_Memcpy( mat, mat1 + 12*joint, 12 * sizeof(float) );
 	} else  {
 		mat1 = data->poseMats + 12 * data->num_joints * frame;
 		mat2 = data->poseMats + 12 * data->num_joints * oldframe;
 		
-		for( i = 0; i < data->num_joints; i++ ) {
-			InterpolateMatrix( mat1 + 12*i, mat2 + 12*i,
-					   backlerp, mat );
-		}
+		InterpolateMatrix( mat1 + 12*joint, mat2 + 12*joint,
+				   backlerp, mat );
 	}
+
+	Matrix34ToOrientation(mat, orientation);
 }
 #endif
 
@@ -1030,14 +1052,16 @@ void RB_IQMSurfaceAnim( surfaceType_t *surface ) {
 	if (backEnd.currentEntity->customSkeleton != -1) {
 		refSkeleton_t *refSkel = &backEnd.refdef.skeletons[backEnd.currentEntity->customSkeleton];
 		int	*joint = data->jointParents;
+		float mat[12], parentMat[12];
 
 		// Convert to absolute skeleton
 		for( i = 0; i < data->num_joints; i++, joint++ ) {
+			OrientationToMatrix34(refSkel->joints[i], mat);
 			if( *joint >= 0 ) {
-				Matrix34Multiply( refSkel->bones[*joint].mat,
-						  refSkel->bones[i].mat, jointMats + 12*i );
+				OrientationToMatrix34(refSkel->joints[*joint], parentMat);
+				Matrix34Multiply( parentMat, mat, jointMats + 12*i );
 			} else {
-				Com_Memcpy( jointMats + 12*i, refSkel->bones[i].mat, 12 * sizeof(float) );
+				Com_Memcpy( jointMats + 12*i, mat, 12 * sizeof(float) );
 			}
 		}
 	} else {
