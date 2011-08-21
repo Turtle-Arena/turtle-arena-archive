@@ -1514,10 +1514,10 @@ static const char *RE_JointName(qhandle_t handle, int jointIndex)
 	const char *jointName;
 	int			i;
 
-	model = R_GetModelByHandle( handle );
-
 	if (jointIndex < 0 ||  jointIndex >= RE_NumberOfJoints(handle))
 		return NULL;
+
+	model = R_GetModelByHandle( handle );
 
 	switch (model->type)
 	{
@@ -1576,6 +1576,10 @@ static const char *RE_JointName(qhandle_t handle, int jointIndex)
 /*
 ================
 RE_SetupSkeleton
+
+Returns qfalse if didn't setup refSkel.
+
+Note: If only need to find the orientation of a single joint use R_LerpTag instead.
 ================
 */
 qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp)
@@ -1595,16 +1599,11 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 			iqmData = model->modelData;
 			numJoints = iqmData->num_joints;
 
-			// ZTM: FIXME: Can there be a IQM with no joints?
-			if (!numJoints)
-				return qfalse;
-
 			// Setup skeleton
 			for (i = 0; i < numJoints; i++) {
 				// Setup matrix
 				ComputeJointRelativeOrientation(iqmData, frame, oldframe, backlerp, i, &refSkel->joints[i]);
 			}
-
 			break;
 		}
 
@@ -1617,21 +1616,17 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 			mdrData = model->modelData;
 			numJoints = mdrData->numBones;
 
-			// ZTM: FIXME: Can there be a MDR with no joints?
-			if (!numJoints)
-				return qfalse;
-
 			// Setup skeleton
 			//for (i = 0; i < numJoints; i++) {
 				// Setup matrix
 				//ComputeJointRelativeOrientation(mdrData, frame, oldframe, backlerp, i, &refSkel->joints[i]);
 			//}
-
 			break;
 		}
 #endif
 
 		default:
+			Com_Memset(refSkel, 0, sizeof (refSkeleton_t));
 			return qfalse;
 	}
 
@@ -1641,6 +1636,8 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 /*
 ================
 RE_SetupPlayerSkeleton
+
+Returns qfalse if didn't setup refSkel.
 ================
 */
 qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int legsFrame, int legsOldFrame, float legsBacklerp,
@@ -1665,10 +1662,6 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 
 			iqmData = model->modelData;
 			numJoints = iqmData->num_joints;
-
-			// ZTM: FIXME: Can there be a IQM with no joints?
-			if (!numJoints)
-				return qfalse;
 
 			// Setup skeleton using the three different animations
 			for (i = 0; i < numJoints; i++) {
@@ -1697,6 +1690,7 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 		}
 
 		default:
+			Com_Memset(refSkel, 0, sizeof (refSkeleton_t));
 			return qfalse;
 	}
 
