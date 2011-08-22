@@ -911,13 +911,8 @@ void Cvar_WriteVariables(fileHandle_t f)
 
 	for (var = cvar_vars; var; var = var->next)
 	{
-#ifdef IOQUAKE3 // ZTM: CDKEY
-		if(!var->name || Q_stricmp( var->name, "cl_cdkey" ) == 0)
-			continue;
-#else
 		if(!var->name)
 			continue;
-#endif
 
 		if( var->flags & CVAR_ARCHIVE ) {
 			// write the latched value, even if it hasn't taken effect yet

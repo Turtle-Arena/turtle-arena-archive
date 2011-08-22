@@ -45,19 +45,18 @@ SETUP MENU
 #define ID_CUSTOMIZECONTROLS	11
 #define ID_SYSTEMCONFIG			12
 #define ID_GAME					13
-#define ID_CDKEY				14
-#define ID_LOAD					15
-#define ID_SAVE					16
-#define ID_DEFAULTS				17
-#define ID_BACK					18
+#define ID_LOAD					14
+#define ID_SAVE					15
+#define ID_DEFAULTS				16
+#define ID_BACK					17
 #ifdef TURTLEARENA // LONG_CREDITS
-#define ID_CREDITS				19
+#define ID_CREDITS				18
 #endif
 #ifdef TA_SPLITVIEW
-#define ID_CUSTOMIZEPLAYER		20
-#define ID_CUSTOMIZEPLAYER2		21
-#define ID_CUSTOMIZEPLAYER3		22
-#define ID_CUSTOMIZEPLAYER4		23
+#define ID_CUSTOMIZEPLAYER		19
+#define ID_CUSTOMIZEPLAYER2		20
+#define ID_CUSTOMIZEPLAYER3		21
+#define ID_CUSTOMIZEPLAYER4		22
 #endif
 
 
@@ -78,7 +77,6 @@ typedef struct {
 	menutext_s		setupcontrols;
 	menutext_s		setupsystem;
 	menutext_s		game;
-	menutext_s		cdkey;
 #ifdef TURTLEARENA // LONG_CREDITS
 	menutext_s		credits;
 #endif
@@ -163,12 +161,6 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 	case ID_GAME:
 		UI_PreferencesMenu();
 		break;
-
-#ifdef IOQUAKE3 // ZTM: CDKEY
-	case ID_CDKEY:
-		UI_CDKeyMenu();
-		break;
-#endif
 
 #ifdef TURTLEARENA // LONG_CREDITS
 	case ID_CREDITS:
@@ -337,19 +329,6 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.game.color						= text_big_color;
 	setupMenuInfo.game.style						= UI_CENTER;
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
-	y += SETUP_MENU_VERTICAL_SPACING;
-	setupMenuInfo.cdkey.generic.type				= MTYPE_PTEXT;
-	setupMenuInfo.cdkey.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	setupMenuInfo.cdkey.generic.x					= 320;
-	setupMenuInfo.cdkey.generic.y					= y;
-	setupMenuInfo.cdkey.generic.id					= ID_CDKEY;
-	setupMenuInfo.cdkey.generic.callback			= UI_SetupMenu_Event; 
-	setupMenuInfo.cdkey.string						= "CD Key";
-	setupMenuInfo.cdkey.color						= text_big_color;
-	setupMenuInfo.cdkey.style						= UI_CENTER;
-#endif
-
 #ifdef TURTLEARENA // LONG_CREDITS
 	y += SETUP_MENU_VERTICAL_SPACING;
 	setupMenuInfo.credits.generic.type				= MTYPE_PTEXT;
@@ -429,9 +408,6 @@ static void UI_SetupMenu_Init( void ) {
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupcontrols );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupsystem );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.game );
-#ifdef IOQUAKE3 // ZTM: CDKEY
-	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.cdkey );
-#endif
 #ifdef TURTLEARENA // LONG_CREDITS
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.credits );
 #endif
