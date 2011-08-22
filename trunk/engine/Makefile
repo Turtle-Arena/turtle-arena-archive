@@ -77,7 +77,7 @@ ifndef BUILD_IOQ3ZTM
 endif
 
 # ioquake3 svn version that this is based on
-IOQ3_REVISION = 2147
+IOQ3_REVISION = 2148
 
 #
 # Start build type
@@ -1461,10 +1461,7 @@ release:
 targets: makedirs
 	@echo ""
 	@echo "Building Turtle Arena in $(B):"
-ifdef IOQ3_REVISION
-# IOQ3_REVISION can be defined to keep track of the ioquake3 supported revision
 	@echo "  IOQ3_REVISION: $(IOQ3_REVISION)"
-endif
 	@echo "  PLATFORM: $(PLATFORM)"
 	@echo "  ARCH: $(ARCH)"
 	@echo "  VERSION: $(VERSION)"

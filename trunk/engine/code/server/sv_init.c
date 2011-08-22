@@ -597,50 +597,19 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	}
 #endif
 
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-	// Force sv_pure to off.
+	// Force sv_pure to off if invalid default pk3s
 	if (sv_pure->integer && !com_fs_pure->integer) {
 		Cvar_Set( "sv_pure", "0" );
 	}
-#endif
 
-#if !defined STANDALONE && defined IOQ3ZTM // ZTM: FS_PURE code replaces this.
-	// the server sends these to the clients so they will only
-	// load pk3s also loaded at the server
-	if (sv_pure->integer && (p = FS_LoadedPakChecksums()) && (strlen(p) > 0))
-	{
-		Cvar_Set( "sv_paks", p );
-		p = FS_LoadedPakNames();
-		Cvar_Set( "sv_pakNames", p );
-
-		// if a dedicated pure server we need to touch the cgame because it could be in a
-		// seperate pk3 file and the client will need to load the latest cgame.qvm
-		if ( com_dedicated->integer ) {
-			SV_TouchCGame();
-		}
-	}
-	else
-	{
-		if (sv_pure->integer)
-		{
-			// Can't be pure with no pk3 files.
-			Com_Printf( S_COLOR_YELLOW "WARNING: sv_pure set but no PK3 files loaded, disabling...\n" );
-			Cvar_Set( "sv_pure", "0" );
-		}
-		Cvar_Set( "sv_paks", "" );
-		Cvar_Set( "sv_pakNames", "" );
-	}
-#else
 	if ( sv_pure->integer ) {
 		// the server sends these to the clients so they will only
 		// load pk3s also loaded at the server
 		p = FS_LoadedPakChecksums();
 		Cvar_Set( "sv_paks", p );
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
 		if (strlen(p) == 0) {
 			Com_Printf( "WARNING: sv_pure set but no PK3 files loaded\n" );
 		}
-#endif
 		p = FS_LoadedPakNames();
 		Cvar_Set( "sv_pakNames", p );
 
@@ -654,7 +623,6 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 		Cvar_Set( "sv_paks", "" );
 		Cvar_Set( "sv_pakNames", "" );
 	}
-#endif
 	// the server sends these to the clients so they can figure
 	// out which pk3s should be auto-downloaded
 	p = FS_ReferencedPakChecksums();
@@ -729,12 +697,12 @@ void SV_Init (void)
 	// systeminfo
 	Cvar_Get ("sv_cheats", "1", CVAR_SYSTEMINFO | CVAR_ROM );
 	sv_serverid = Cvar_Get ("sv_serverid", "0", CVAR_SYSTEMINFO | CVAR_ROM );
-#if defined STANDALONE && defined IOQ3ZTM // FS_PURE
-	if (com_fs_pure && !com_fs_pure->integer) {
+
+	if (!com_fs_pure->integer)
 		sv_pure = Cvar_Get ("sv_pure", "0", CVAR_SYSTEMINFO | CVAR_ROM );
-	} else
-#endif
-	sv_pure = Cvar_Get ("sv_pure", "1", CVAR_SYSTEMINFO );
+	else
+		sv_pure = Cvar_Get ("sv_pure", "1", CVAR_SYSTEMINFO );
+
 #ifdef USE_VOIP
 	sv_voip = Cvar_Get("sv_voip", "1", CVAR_SYSTEMINFO | CVAR_LATCH);
 	Cvar_CheckRange(sv_voip, 0, 1, qtrue);
