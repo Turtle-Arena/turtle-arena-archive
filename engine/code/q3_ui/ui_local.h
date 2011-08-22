@@ -840,10 +840,6 @@ void			trap_S_StopBackgroundTrack( void );
 void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
 #endif
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
-void			trap_SetPbClStatus( int status );
-#endif
-
 #ifdef IOQ3ZTM // BONES
 void			trap_R_AddRefEntityToScene_CustomSkeleton( const refEntity_t *re, const refSkeleton_t *rs );
 int				trap_R_NumberOfJoints(qhandle_t handle);

@@ -5,7 +5,6 @@
 #	Turtle Arena. Use make as usual.
 #	ioq3turtle (ioq3 mode for Turtle Arena). make BUILD_IOQ3TURTLE=1
 #	ioq3ztm (Turtle Arena stuff in ioq3, not net compatible with either games). make BUILD_IOQ3ZTM=1
-#	ioquake3 (Unmodified ioq3, any changes are accidental). make BUILD_IOQ3=1
 #
 # GNU Make required
 #
@@ -89,9 +88,6 @@ endif
 ifeq ($(BUILD_IOQ3ZTM),1)
 QUAKE3=1
 endif
-ifeq ($(BUILD_IOQ3),1)
-QUAKE3=1
-endif
 ifeq ($(QUAKE3),1)
 
 	# Build ioq3ztm for running in Turtle Arena
@@ -150,7 +146,7 @@ ifeq ($(QUAKE3),1)
 		ifeq ($(BUILD_IOQ3ZTM),1)
 			# Build modified ioquake3, it only runs using its own sever/client binaries
 			#   and currently doesn't support Q3 mods.
-			BUILD_DEFINES = -DIOQUAKE3 -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
+			BUILD_DEFINES = -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
 								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
 								-DTA_ITEMSYS -DTA_ITEMSYS_USE_INTERNAL -DTA_WEAPSYS -DTA_BLOOM -DTA_SPLITVIEW
 
@@ -175,26 +171,6 @@ ifeq ($(QUAKE3),1)
 			ifndef BUILD_DIR
 				BUILD_DIR=build-ioq3ztm
 			endif
-		else
-			# Build unmodified ioquake3.
-			BUILD_DEFINES=-DIOQUAKE3
-
-			SERVERBIN=ioq3ded
-			CLIENTBIN=ioquake3
-
-			ifndef BUILD_DIR
-				BUILD_DIR=build-ioq3
-			endif
-
-			VERSION=1.36
-
-			BASEGAME=baseq3
-			BASEGAME_FLAGS =
-			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
-
-			ifndef COPYDIR
-				COPYDIR="/usr/local/games/quake3"
-			endif
 		endif
 	endif
 
@@ -215,7 +191,6 @@ else # END QUAKE3
 	# RAVENMD4				Enable support for loading MDR models.
 	# MISSIONPACK			Code for the official Quake III Arena expansion pack, Quake III: Team Arena.
 	##### "new ioquake3 defines"
-	# IOQUAKE3				Enables CD key check and punkbuster UI code
 	# MISSIONPACK_HUD		Use MISSIONPACK UI scripting in cgame for hud and menus. (ZTM: Split from MISSIONPACK define)
 	# MISSIONPACK_HARVESTER	Enable MISSIONPACK harvester gametype (ZTM: Split from MISSIONPACK define)
 
@@ -1485,11 +1460,7 @@ release:
 # an informational message, then start building
 targets: makedirs
 	@echo ""
-ifeq ($(QUAKE3),1)
-	@echo "Building ioquake3 in $(B):"
-else
 	@echo "Building Turtle Arena in $(B):"
-endif
 ifdef IOQ3_REVISION
 # IOQ3_REVISION can be defined to keep track of the ioquake3 supported revision
 	@echo "  IOQ3_REVISION: $(IOQ3_REVISION)"
@@ -2876,9 +2847,6 @@ OBJ = $(Q3OBJ) $(Q3POBJ) $(Q3POBJ_SMP) $(Q3ROBJ) $(Q3DOBJ) \
 TOOLSOBJ = $(LBURGOBJ) $(Q3CPPOBJ) $(Q3RCCOBJ) $(Q3LCCOBJ) $(Q3ASMOBJ)
 
 copyfiles: release
-ifeq ($(QUAKE3),1)
-	@if [ ! -d $(COPYDIR)/$(BASEGAME) ]; then echo "You need to set COPYDIR to where your Quake3 data is!"; fi
-endif
 ifneq ($(BUILD_GAME_SO),0)
   ifneq ($(BUILD_BASEGAME),0)
 	-$(MKDIR) -p -m 0755 $(COPYDIR)/$(BASEGAME)

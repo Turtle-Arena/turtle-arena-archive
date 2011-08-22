@@ -2543,9 +2543,6 @@ void CL_InitServerInfo( serverInfo_t *server, netadr_t *address ) {
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Why aren't all fields initialized here?
 	server->clients = 0;
 	//server->visible = qfalse; // ZTM: Don't touch?
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	server->punkbuster = 0;
-#endif
 	server->g_humanplayers = 0;
 	server->g_needpass = 0;
 #endif
@@ -4153,9 +4150,6 @@ static void CL_SetServerInfo(serverInfo_t *server, const char *info, int ping) {
 			server->netType = atoi(Info_ValueForKey(info, "nettype"));
 			server->minPing = atoi(Info_ValueForKey(info, "minping"));
 			server->maxPing = atoi(Info_ValueForKey(info, "maxping"));
-#ifdef IOQUAKE3 // ZTM: punkbuster
-			server->punkbuster = atoi(Info_ValueForKey(info, "punkbuster"));
-#endif
 			server->g_humanplayers = atoi(Info_ValueForKey(info, "g_humanplayers"));
 			server->g_needpass = atoi(Info_ValueForKey(info, "g_needpass"));
 		}
@@ -4304,9 +4298,6 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	cls.localServers[i].game[0] = '\0';
 	cls.localServers[i].gameType = 0;
 	cls.localServers[i].netType = from.type;
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	cls.localServers[i].punkbuster = 0;
-#endif
 	cls.localServers[i].g_humanplayers = 0;
 	cls.localServers[i].g_needpass = 0;
 									 

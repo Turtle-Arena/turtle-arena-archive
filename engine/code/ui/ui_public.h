@@ -124,9 +124,6 @@ typedef enum {
 	UI_LAN_COMPARESERVERS,
 	// 1.32
 	UI_FS_SEEK,
-//#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: punkbuster (MUST UPDATE ui_syscalls.asm!!)
-	UI_SET_PBCLSTATUS,
-//#endif
 
 //#ifdef IOQ3ZTM // BONES
 	UI_R_ADDREFENTITYTOSCENE_CUSTOMSKELETON,
@@ -164,9 +161,6 @@ typedef enum {
 #define SORT_CLIENTS		2
 #define SORT_GAME			3
 #define SORT_PING			4
-#ifdef IOQUAKE3 // ZTM: punkbuster
-#define SORT_PUNKBUSTER		5
-#endif
 
 typedef enum {
 	UI_GETAPIVERSION = 0,	// system reserved

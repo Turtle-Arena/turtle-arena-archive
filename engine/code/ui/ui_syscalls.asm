@@ -84,15 +84,14 @@ equ trap_LAN_GetServerPing					-81
 equ trap_LAN_ServerIsVisible				-82
 equ trap_LAN_CompareServers					-83
 equ trap_FS_Seek							-84
-equ trap_SetPbClStatus						-85
 
 ;; IOQ3ZTM // BONES
-equ trap_R_AddRefEntityToScene_CustomSkeleton -86
-equ trap_R_NumberOfJoints					-87
-equ trap_R_JointIndexForName				-88
-equ trap_R_SetupSkeleton					-89
-equ trap_R_SetupPlayerSkeleton				-90
-equ trap_R_MakeSkeletonAbsolute				-91
+equ trap_R_AddRefEntityToScene_CustomSkeleton -85
+equ trap_R_NumberOfJoints					-86
+equ trap_R_JointIndexForName				-87
+equ trap_R_SetupSkeleton					-88
+equ trap_R_SetupPlayerSkeleton				-89
+equ trap_R_MakeSkeletonAbsolute				-90
 
 equ	memset						-101
 equ	memcpy						-102
