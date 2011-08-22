@@ -265,6 +265,11 @@ qboolean trap_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
 							torsoFrame, torsoOldFrame, PASSFLOAT(torsoBacklerp),
 							headFrame, headOldFrame, PASSFLOAT(headBacklerp));
 }
+
+void trap_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out)
+{
+	syscall( G_MAKESKELETONABSOLUTE, in, out );
+}
 #endif
 #endif
 

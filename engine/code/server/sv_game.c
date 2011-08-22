@@ -299,6 +299,7 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int legsFrame, int legsOldFrame, float legsBacklerp,
 								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
 								int headFrame, int headOldFrame, float headBacklerp);
+void R_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out);
 #endif
 #endif
 
@@ -465,6 +466,9 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return RE_SetupPlayerSkeleton(args[1], VMA(2), args[3], args[4], VMF(5),
 										args[6], args[7], VMF(8),
 										args[9], args[10], VMF(11));
+	case G_MAKESKELETONABSOLUTE:
+		R_MakeSkeletonAbsolute(VMA(1), VMA(2));
+		return 0;
 #endif
 #endif
 

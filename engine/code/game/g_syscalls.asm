@@ -54,6 +54,7 @@ equ trap_NumberOfJoints		-49
 equ trap_JointIndexForName	-50
 equ trap_SetupSkeleton		-51
 equ trap_SetupPlayerSkeleton	-52
+equ trap_MakeSkeletonAbsolute	-53
 
 equ	memset					-101
 equ	memcpy					-102

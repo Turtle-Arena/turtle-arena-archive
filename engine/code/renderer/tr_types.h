@@ -90,9 +90,19 @@ typedef enum {
 #define MAX_SKELETON_JOINTS 128 // see IQM_MAX_JOINTS
 // ZTM: TODO: Replace IQM_MAX_JOINTS with MAX_SKELETON_JOINTS?
 
+typedef enum
+{
+	ST_NONE,
+	ST_RELATIVE,
+	ST_ABSOLUTE
+} skeletonType_t;
+
 typedef struct
 {
+	skeletonType_t	type;
+	int				numJoints;
 	orientation_t	joints[MAX_SKELETON_JOINTS];
+	int				jointParents[MAX_SKELETON_JOINTS];
 } refSkeleton_t;
 #endif
 

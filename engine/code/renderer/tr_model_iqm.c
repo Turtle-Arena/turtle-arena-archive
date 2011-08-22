@@ -977,6 +977,17 @@ static void ComputeJointMats( iqmData_t *data, int frame, int oldframe,
 }
 
 #ifdef IOQ3ZTM // BONES
+void OrientationMultiply( orientation_t a, orientation_t b, orientation_t *out ) {
+	int i, j;
+
+	for (i = 0; i < 3; ++i) {
+		for (j = 0; j < 3; ++j) {
+			out->axis[i][j] = a.axis[i][0] * b.axis[0][j] + a.axis[i][1] * b.axis[1][j] + a.axis[i][2] * b.axis[2][j];
+		}
+		out->origin[i] = a.axis[i][0] * b.origin[0] + a.axis[i][1] * b.origin[1] + a.axis[i][2] * b.origin[2] + a.origin[i];
+	}
+}
+
 // Convert orientation_t to matrix 3x4 (float[12])
 void OrientationToMatrix34(orientation_t orientation, float *mat) {
 	int i;
@@ -1051,18 +1062,10 @@ void RB_IQMSurfaceAnim( surfaceType_t *surface ) {
 
 	if (backEnd.currentEntity->customSkeleton != -1) {
 		refSkeleton_t *refSkel = &backEnd.refdef.skeletons[backEnd.currentEntity->customSkeleton];
-		int	*joint = data->jointParents;
-		float mat[12], parentMat[12];
 
-		// Convert to absolute skeleton
-		for( i = 0; i < data->num_joints; i++, joint++ ) {
-			OrientationToMatrix34(refSkel->joints[i], mat);
-			if( *joint >= 0 ) {
-				OrientationToMatrix34(refSkel->joints[*joint], parentMat);
-				Matrix34Multiply( parentMat, mat, jointMats + 12*i );
-			} else {
-				Com_Memcpy( jointMats + 12*i, mat, 12 * sizeof(float) );
-			}
+		// Convert to matrix 3x4
+		for( i = 0; i < data->num_joints; i++ ) {
+			OrientationToMatrix34(refSkel->joints[i], jointMats + 12*i);
 		}
 	} else {
 		int	frame = backEnd.currentEntity->e.frame % data->num_frames;
@@ -1198,8 +1201,12 @@ int R_IQMLerpTag( orientation_t *tag, iqmData_t *data,
 		return qfalse;
 	}
 
+	// ZTM: TODO: Only compute single joint!
 	ComputeJointMats( data, startFrame, endFrame, frac, jointMats );
 
+#ifdef IOQ3ZTM // BONES
+	Matrix34ToOrientation(&jointMats[12 * joint], tag);
+#else
 	tag->axis[0][0] = jointMats[12 * joint + 0];
 	tag->axis[1][0] = jointMats[12 * joint + 1];
 	tag->axis[2][0] = jointMats[12 * joint + 2];
@@ -1212,6 +1219,7 @@ int R_IQMLerpTag( orientation_t *tag, iqmData_t *data,
 	tag->axis[1][2] = jointMats[12 * joint + 9];
 	tag->axis[2][2] = jointMats[12 * joint + 10];
 	tag->origin[2] = jointMats[12 * joint + 11];
+#endif
 
 	return qtrue;
 }
