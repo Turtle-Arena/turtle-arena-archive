@@ -118,10 +118,6 @@ extern vmCvar_t	ui_server14;
 extern vmCvar_t	ui_server15;
 extern vmCvar_t	ui_server16;
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
-extern vmCvar_t	ui_cdkey;
-extern vmCvar_t	ui_cdkeychecked;
-#endif
 extern vmCvar_t	ui_ioq3;
 
 
@@ -475,15 +471,6 @@ extern void UI_ModsMenu_Cache( void );
 //
 extern void UI_MultiplayerMenu( void );
 extern void UI_Multiplayer_Cache( void );
-#endif
-
-#ifdef IOQUAKE3 // ZTM: CDKEY
-//
-// ui_cdkey.c
-//
-extern void UI_CDKeyMenu( void );
-extern void UI_CDKeyMenu_Cache( void );
-extern void UI_CDKeyMenu_f( void );
 #endif
 
 //
@@ -848,12 +835,6 @@ void			trap_LAN_ClearPing( int n );
 void			trap_LAN_GetPing( int n, char *buf, int buflen, int *pingtime );
 void			trap_LAN_GetPingInfo( int n, char *buf, int buflen );
 int				trap_MemoryRemaining( void );
-#ifdef IOQUAKE3 // ZTM: CDKEY
-void			trap_GetCDKey( char *buf, int buflen );
-void			trap_SetCDKey( char *buf );
-
-qboolean               trap_VerifyCDKey( const char *key, const char *chksum);
-#endif
 #ifdef TA_MISC
 void			trap_S_StopBackgroundTrack( void );
 void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);

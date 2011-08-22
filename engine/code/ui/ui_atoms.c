@@ -93,24 +93,6 @@ void UI_StartDemoLoop( void ) {
 }
 
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
-#ifndef MISSIONPACK
-static void NeedCDAction( qboolean result ) {
-	if ( !result ) {
-		trap_Cmd_ExecuteText( EXEC_APPEND, "quit\n" );
-	}
-}
-#endif // MISSIONPACK
-
-#ifndef MISSIONPACK
-static void NeedCDKeyAction( qboolean result ) {
-	if ( !result ) {
-		trap_Cmd_ExecuteText( EXEC_APPEND, "quit\n" );
-	}
-}
-#endif // MISSIONPACK
-#endif
-
 char *UI_Argv( int arg ) {
 	static char	buffer[MAX_STRING_CHARS];
 
@@ -436,14 +418,6 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		//UI_TeamOrdersMenu_f();
 		return qtrue;
 	}
-
-
-#ifdef IOQUAKE3 // ZTM: CDKEY
-	if ( Q_stricmp (cmd, "ui_cdkey") == 0 ) {
-		//UI_CDKeyMenu_f();
-		return qtrue;
-	}
-#endif
 
 	return qfalse;
 }

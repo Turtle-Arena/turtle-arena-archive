@@ -92,10 +92,6 @@ typedef enum {
 	UI_CVAR_REGISTER,
 	UI_CVAR_UPDATE,
 	UI_MEMORY_REMAINING,
-//#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: CDKEY (MUST UPDATE ui_syscalls.asm!!)
-	UI_GET_CDKEY,
-	UI_SET_CDKEY,
-//#endif
 	UI_R_REGISTERFONT,
 	UI_R_MODELBOUNDS,
 	UI_PC_ADD_GLOBAL_DEFINE,
@@ -122,9 +118,6 @@ typedef enum {
 	UI_CIN_DRAWCINEMATIC,
 	UI_CIN_SETEXTENTS,
 	UI_R_REMAP_SHADER,
-//#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: CDKEY (MUST UPDATE ui_syscalls.asm!!)
-	UI_VERIFY_CDKEY,
-//#endif
 	UI_LAN_SERVERSTATUS,
 	UI_LAN_GETSERVERPING,
 	UI_LAN_SERVERISVISIBLE,
@@ -162,10 +155,6 @@ typedef enum {
 	UIMENU_NONE,
 	UIMENU_MAIN,
 	UIMENU_INGAME,
-#ifdef IOQUAKE3 // ZTM: CDKEY
-	UIMENU_NEED_CD,
-	UIMENU_BAD_CD_KEY,
-#endif
 	UIMENU_TEAM,
 	UIMENU_POSTGAME
 } uiMenuCommand_t;
@@ -206,11 +195,8 @@ typedef enum {
 	UI_CONSOLE_COMMAND,
 //	qboolean UI_ConsoleCommand( int realTime );
 
-	UI_DRAW_CONNECT_SCREEN,
+	UI_DRAW_CONNECT_SCREEN
 //	void	UI_DrawConnectScreen( qboolean overlay );
-#ifdef IOQUAKE3 // ZTM: CDKEY
-	UI_HASUNIQUECDKEY
-#endif
 // if !overlay, the background will be drawn, otherwise it will be
 // overlayed over whatever the cgame has drawn.
 // a GetClientState syscall will be made to get the current strings

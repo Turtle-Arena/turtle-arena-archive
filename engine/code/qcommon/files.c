@@ -3367,13 +3367,6 @@ void FS_Shutdown( qboolean closemfp ) {
 #endif
 }
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
-#ifndef STANDALONE
-void Com_AppendCDKey( const char *filename );
-void Com_ReadCDKey( const char *filename );
-#endif
-#endif
-
 /*
 ================
 FS_ReorderPurePaks
@@ -3554,21 +3547,6 @@ static void FS_Startup( const char *gameName )
 			FS_AddGameDirectory(fs_homepath->string, fs_gamedirvar->string);
 		}
 	}
-
-#ifdef IOQUAKE3 // ZTM: CDKEY
-#ifndef STANDALONE
-	if(!com_standalone->integer)
-	{
-		cvar_t	*fs;
-
-		Com_ReadCDKey(BASEGAME);
-		fs = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
-		if (fs && fs->string[0] != 0) {
-			Com_AppendCDKey( fs->string );
-		}
-	}
-#endif
-#endif // ZTM: CDKEY
 
 	// add our commands
 	Cmd_AddCommand ("path", FS_Path_f);

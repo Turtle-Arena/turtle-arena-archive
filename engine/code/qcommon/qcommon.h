@@ -295,15 +295,6 @@ extern int demo_protocols[];
 #endif
 #endif
 
-#ifndef STANDALONE
-  #ifndef AUTHORIZE_SERVER_NAME
-    #define	AUTHORIZE_SERVER_NAME	"authorize.quake3arena.com"
-  #endif
-  #ifndef PORT_AUTHORIZE
-  #define	PORT_AUTHORIZE		27952
-  #endif
-#endif
-
 #define	PORT_MASTER			27950
 #define	PORT_UPDATE			27951
 #define	PORT_SERVER			27960
@@ -818,12 +809,6 @@ MISC
 ==============================================================
 */
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
-// centralizing the declarations for cl_cdkey
-// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=470
-extern char cl_cdkey[34];
-#endif
-
 // returned by Sys_GetProcessorFeatures
 typedef enum
 {
@@ -1055,11 +1040,6 @@ void	CL_ForwardCommandToServer( const char *string );
 // things like godmode, noclip, etc, are commands directed to the server,
 // so when they are typed in at the console, they will need to be forwarded.
 
-#ifdef IOQUAKE3 // ZTM: CDKEY
-void CL_CDDialog( void );
-// bring up the "need a cd to play" dialog
-#endif
-
 void CL_FlushMemory( void );
 // dump all memory on an error
 
@@ -1104,9 +1084,6 @@ int SV_SendQueuedPackets(void);
 // UI interface
 //
 qboolean UI_GameCommand( void );
-#ifdef IOQUAKE3 // ZTM: CDKEY
-qboolean UI_usesUniqueCDKey(void);
-#endif
 
 /*
 ==============================================================
