@@ -1577,6 +1577,7 @@ static const char *RE_JointName(qhandle_t handle, int jointIndex)
 ================
 RE_SetupSkeleton
 
+Creates relative joint skeleton using specified animation informaiton.
 Returns qfalse if didn't setup refSkel.
 
 Note: If only need to find the orientation of a single joint use R_LerpTag instead.
@@ -1585,7 +1586,6 @@ Note: If only need to find the orientation of a single joint use R_LerpTag inste
 qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp)
 {
 	model_t		*model;
-	int			numJoints;
 	int			i;
 
 	model = R_GetModelByHandle( handle );
@@ -1597,12 +1597,16 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 			iqmData_t *iqmData;
 
 			iqmData = model->modelData;
-			numJoints = iqmData->num_joints;
+
+			refSkel->type = ST_RELATIVE;
+			refSkel->numJoints = iqmData->num_joints;
 
 			// Setup skeleton
-			for (i = 0; i < numJoints; i++) {
+			for (i = 0; i < refSkel->numJoints; i++) {
 				// Setup matrix
 				ComputeJointRelativeOrientation(iqmData, frame, oldframe, backlerp, i, &refSkel->joints[i]);
+
+				refSkel->jointParents[i] = iqmData->jointParents[i];
 			}
 			break;
 		}
@@ -1614,13 +1618,16 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 			mdrheader_t *mdrData;
 
 			mdrData = model->modelData;
-			numJoints = mdrData->numBones;
+
+			refSkel->type = ST_ABSOLUTE;
+			refSkel->numJoints = mdrData->numBones;
 
 			// Setup skeleton
-			//for (i = 0; i < numJoints; i++) {
+			for (i = 0; i < numJoints; i++) {
 				// Setup matrix
-				//ComputeJointRelativeOrientation(mdrData, frame, oldframe, backlerp, i, &refSkel->joints[i]);
-			//}
+				//ComputeJointRelativeOrientation(iqmData, frame, oldframe, backlerp, i, &refSkel->joints[i]);
+				refSkel->jointParents[i] = -1;
+			}
 			break;
 		}
 #endif
@@ -1637,6 +1644,7 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 ================
 RE_SetupPlayerSkeleton
 
+Creates relative joint skeleton using specified animation informaiton.
 Returns qfalse if didn't setup refSkel.
 ================
 */
@@ -1645,7 +1653,6 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 								int headFrame, int headOldFrame, float headBacklerp)
 {
 	model_t		*model;
-	int			numJoints;
 	int			i;
 	int			frame;
 	int			oldframe;
@@ -1661,10 +1668,12 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 			const char *str;
 
 			iqmData = model->modelData;
-			numJoints = iqmData->num_joints;
+
+			refSkel->type = ST_RELATIVE;
+			refSkel->numJoints = iqmData->num_joints;
 
 			// Setup skeleton using the three different animations
-			for (i = 0; i < numJoints; i++) {
+			for (i = 0; i < refSkel->numJoints; i++) {
 				if (!strncasecmp(str, "l_", 2) || !strcasecmp(str, "tag_torso")) {
 					frame = legsFrame;
 					oldframe = legsOldFrame;
@@ -1682,6 +1691,8 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 				// Setup matrix
 				ComputeJointRelativeOrientation(iqmData, frame, oldframe, backlerp, i, &refSkel->joints[i]);
 
+				refSkel->jointParents[i] = iqmData->jointParents[i];
+
 				// Next joint name
 				str += strlen( str ) + 1;
 			}
@@ -1695,6 +1706,44 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 	}
 
 	return qtrue;
+}
+
+void OrientationMultiply( orientation_t a, orientation_t b, orientation_t *out );
+
+/*
+================
+R_MakeSkeletonAbsolute
+
+Makes relative skeleton into absolute skeleton.
+================
+*/
+void R_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out)
+{
+	int numJoints;
+	int i;
+	int parent;
+
+	if (in->type == ST_RELATIVE) {
+		numJoints = in->numJoints;
+
+		if (numJoints > MAX_SKELETON_JOINTS) {
+			numJoints = MAX_SKELETON_JOINTS;
+		}
+
+		for (i = 0; i < numJoints; ++i, parent = in->jointParents[i]) {
+			if( parent >= 0 ) {
+				OrientationMultiply(in->joints[parent], in->joints[i], &out->joints[i]);
+			} else {
+				Com_Memcpy(&out->joints[i], &in->joints[i], sizeof (orientation_t));
+			}
+		}
+
+		out->type = ST_ABSOLUTE;
+		out->numJoints = numJoints;
+		Com_Memcpy(out->jointParents, in->jointParents, sizeof (int) * MAX_SKELETON_JOINTS);
+	} else {
+		Com_Memcpy(out, in, sizeof (refSkeleton_t));
+	}
 }
 #endif
 

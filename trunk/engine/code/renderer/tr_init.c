@@ -1600,6 +1600,7 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.JointIndexForName = RE_JointIndexForName;
 	re.SetupSkeleton = RE_SetupSkeleton;
 	re.SetupPlayerSkeleton = RE_SetupPlayerSkeleton;
+	re.MakeSkeletonAbsolute = R_MakeSkeletonAbsolute;
 #endif
 
 	re.ClearScene = RE_ClearScene;

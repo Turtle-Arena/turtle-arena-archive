@@ -706,6 +706,9 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		return re.SetupPlayerSkeleton(args[1], VMA(2), args[3], args[4], VMF(5),
 										args[6], args[7], VMF(8),
 										args[9], args[10], VMF(11));
+  case CG_R_MAKESKELETONABSOLUTE:
+		re.MakeSkeletonAbsolute(VMA(1), VMA(2));
+		return 0;
 #endif
 
 

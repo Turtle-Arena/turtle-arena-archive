@@ -106,6 +106,7 @@ typedef struct {
 								int legsFrame, int legsOldFrame, float legsBacklerp,
 								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
 								int headFrame, int headOldFrame, float headBacklerp);
+	void	(*MakeSkeletonAbsolute)(const refSkeleton_t *in, refSkeleton_t *out);
 #endif
 
 #ifdef __USEA3D

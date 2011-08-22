@@ -870,6 +870,7 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int legsFrame, int legsOldFrame, float legsBacklerp,
 								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
 								int headFrame, int headOldFrame, float headBacklerp);
+void R_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out);
 #endif
 
 void		R_Modellist_f (void);

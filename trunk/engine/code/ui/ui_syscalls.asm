@@ -95,6 +95,7 @@ equ trap_R_NumberOfJoints					-90
 equ trap_R_JointIndexForName				-91
 equ trap_R_SetupSkeleton					-92
 equ trap_R_SetupPlayerSkeleton				-93
+equ trap_R_MakeSkeletonAbsolute				-94
 
 equ	memset						-101
 equ	memcpy						-102
