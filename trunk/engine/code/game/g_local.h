@@ -309,7 +309,7 @@ typedef struct {
     bg_playercfg_t playercfg;        // data loaded from animation.cfg
 #endif
 #ifdef TA_GAME_MODELS
-	// loaded using trap_RegisterModel, used in trap_LerpTag
+	// loaded using trap_R_RegisterModel, used in trap_R_LerpTag
 	qhandle_t	torsoModel;
 	qhandle_t	legsModel;
 
@@ -1138,19 +1138,19 @@ int		trap_DebugPolygonCreate(int color, int numPoints, vec3_t *points);
 void	trap_DebugPolygonDelete(int id);
 
 #ifdef TA_GAME_MODELS
-qhandle_t trap_RegisterModel( const char *name );
-int trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
+qhandle_t trap_R_RegisterModel( const char *name );
+int trap_R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
 					   float frac, const char *tagName );
 
 #ifdef IOQ3ZTM // BONES
-int trap_NumberOfJoints(qhandle_t handle);
-int trap_JointIndexForName(qhandle_t handle, const char *jointName);
-qboolean trap_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
-qboolean trap_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
+int trap_R_NumberOfJoints(qhandle_t handle);
+int trap_R_JointIndexForName(qhandle_t handle, const char *jointName);
+qboolean trap_R_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
+qboolean trap_R_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
 								int legsFrame, int legsOldFrame, float legsBacklerp,
 								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
 								int headFrame, int headOldFrame, float headBacklerp);
-void	trap_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out);
+void	trap_R_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out);
 #endif
 #endif
 

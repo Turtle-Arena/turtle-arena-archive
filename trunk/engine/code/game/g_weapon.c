@@ -194,7 +194,7 @@ qboolean G_PositionEntityOnTag( orientation_t *child, lerpFrame_t *parentLF,
 	qboolean rtn = qtrue;
 
 	// lerp the tag
-	if (!trap_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
+	if (!trap_R_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
 		1.0 - parentLF->backlerp, tagName ))
 	{
 		rtn = qfalse;
@@ -230,7 +230,7 @@ qboolean G_PositionRotatedEntityOnTag( orientation_t *child, lerpFrame_t *parent
 
 //AxisClear( entity->axis );
 	// lerp the tag
-	if (!trap_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
+	if (!trap_R_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
 		1.0 - parentLF->backlerp, tagName ))
 	{
 		rtn = qfalse;

@@ -941,31 +941,31 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 		if (i == 0 || !client->pers.torsoModel)
 		{
 			Com_sprintf( filename, sizeof( filename ), "%s/%s/upper.md3", bg_playerDirs[i], model );
-			client->pers.torsoModel = trap_RegisterModel(filename);
+			client->pers.torsoModel = trap_R_RegisterModel(filename);
 		}
 		if (i == 0 || !client->pers.legsModel)
 		{
 			Com_sprintf( filename, sizeof( filename ), "%s/%s/lower.md3", bg_playerDirs[i], model );
-			client->pers.legsModel = trap_RegisterModel(filename);
+			client->pers.legsModel = trap_R_RegisterModel(filename);
 		}
 	}
 #else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", model );
-	client->pers.torsoModel = trap_RegisterModel(filename);
+	client->pers.torsoModel = trap_R_RegisterModel(filename);
 
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", model );
-	client->pers.legsModel = trap_RegisterModel(filename);
+	client->pers.legsModel = trap_R_RegisterModel(filename);
 #endif
 	// Server doesn't have the player,,, fall back to DEFAULT_MODEL
 	if (!client->pers.torsoModel)
 	{
 		Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", DEFAULT_MODEL );
-		client->pers.torsoModel = trap_RegisterModel(filename);
+		client->pers.torsoModel = trap_R_RegisterModel(filename);
 	}
 	if (!client->pers.legsModel)
 	{
 		Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", DEFAULT_MODEL );
-		client->pers.legsModel = trap_RegisterModel(filename);
+		client->pers.legsModel = trap_R_RegisterModel(filename);
 	}
 #endif
 

@@ -47,14 +47,14 @@ equ trap_TraceCapsule		-44
 equ trap_EntityContactCapsule	-45
 equ trap_FS_Seek -46
 ;; ZTM: For TA_GAME_MODELS
-equ trap_RegisterModel		-47
-equ trap_LerpTag			-48
+equ trap_R_RegisterModel		-47
+equ trap_R_LerpTag				-48
 ;; IOQ3ZTM // BONES
-equ trap_NumberOfJoints		-49
-equ trap_JointIndexForName	-50
-equ trap_SetupSkeleton		-51
-equ trap_SetupPlayerSkeleton	-52
-equ trap_MakeSkeletonAbsolute	-53
+equ trap_R_NumberOfJoints		-49
+equ trap_R_JointIndexForName	-50
+equ trap_R_SetupSkeleton		-51
+equ trap_R_SetupPlayerSkeleton	-52
+equ trap_R_MakeSkeletonAbsolute	-53
 
 equ	memset					-101
 equ	memcpy					-102

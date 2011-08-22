@@ -231,32 +231,32 @@ void trap_SnapVector( float *v ) {
 }
 
 #ifdef TA_GAME_MODELS
-qhandle_t trap_RegisterModel( const char *name ) {
+qhandle_t trap_R_RegisterModel( const char *name ) {
 	return syscall( G_REGISTERMODEL, name );
 }
 
-int		trap_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
+int		trap_R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
 					   float frac, const char *tagName ) {
 	return syscall( G_LERPTAG, tag, handle, startFrame, endFrame, PASSFLOAT(frac), tagName );
 }
 
 #ifdef IOQ3ZTM // BONES
-int trap_NumberOfJoints(qhandle_t handle)
+int trap_R_NumberOfJoints(qhandle_t handle)
 {
 	return syscall( G_NUMBEROFJOINTS, handle );
 }
 
-int trap_JointIndexForName(qhandle_t handle, const char *jointName)
+int trap_R_JointIndexForName(qhandle_t handle, const char *jointName)
 {
 	return syscall( G_JOINTINDEXFORNAME, handle, jointName );
 }
 
-qboolean trap_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp)
+qboolean trap_R_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp)
 {
 	return syscall( G_SETUPSKELETON, handle, refSkel, frame, oldframe, PASSFLOAT(backlerp) );
 }
 
-qboolean trap_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
+qboolean trap_R_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
 								int legsFrame, int legsOldFrame, float legsBacklerp,
 								int torsoFrame, int torsoOldFrame, float torsoBacklerp,
 								int headFrame, int headOldFrame, float headBacklerp)
@@ -266,7 +266,7 @@ qboolean trap_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,
 							headFrame, headOldFrame, PASSFLOAT(headBacklerp));
 }
 
-void trap_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out)
+void trap_R_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out)
 {
 	syscall( G_MAKESKELETONABSOLUTE, in, out );
 }
