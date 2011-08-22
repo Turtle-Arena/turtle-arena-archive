@@ -64,9 +64,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define FLATLINE_FOR_MASTER			HEARTBEAT_FOR_MASTER
 #endif
 
-// ZTM: id software basegames to not auto download
-#define BASEQ3						"baseq3"
-#define BASETA						"missionpack"
+// id Software games to not auto download
+#define BASEQ3				"baseq3"
+#define BASETA				"missionpack"
 
 #ifdef TA_SP
   // It's really "fs_game\\saves", so each mod has its own saves dir.
