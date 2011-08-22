@@ -319,9 +319,6 @@ static void LAN_GetServerInfo( int source, int n, char *buf, int buflen ) {
 		Info_SetValueForKey( info, "gametype", va("%i",server->gameType));
 		Info_SetValueForKey( info, "nettype", va("%i",server->netType));
 		Info_SetValueForKey( info, "addr", NET_AdrToStringwPort(server->adr));
-#ifdef IOQUAKE3 // ZTM: punkbuster
-		Info_SetValueForKey( info, "punkbuster", va("%i", server->punkbuster));
-#endif
 		Info_SetValueForKey( info, "g_needpass", va("%i", server->g_needpass));
 		Info_SetValueForKey( info, "g_humanplayers", va("%i", server->g_humanplayers));
 		Q_strncpyz(buf, info, buflen);
@@ -991,11 +988,6 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 
 	case UI_MEMORY_REMAINING:
 		return Hunk_MemoryRemaining();
-
-#if defined IOQUAKE3 || !defined IOQ3ZTM_NO_COMPAT // ZTM: punkbuster
-	case UI_SET_PBCLSTATUS:
-		return 0;	
-#endif
 
 	case UI_R_REGISTERFONT:
 		re.RegisterFont( VMA(1), args[2], VMA(3));

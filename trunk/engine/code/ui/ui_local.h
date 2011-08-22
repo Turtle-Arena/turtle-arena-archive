@@ -1039,10 +1039,6 @@ void			trap_CIN_SetExtents (int handle, int x, int y, int w, int h);
 int				trap_RealTime(qtime_t *qtime);
 void			trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset );
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
-void			trap_SetPbClStatus( int status );
-#endif
-
 #ifdef IOQ3ZTM // BONES
 void			trap_R_AddRefEntityToScene_CustomSkeleton( const refEntity_t *re, const refSkeleton_t *rs );
 int				trap_R_NumberOfJoints(qhandle_t handle);

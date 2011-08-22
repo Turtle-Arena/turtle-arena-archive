@@ -74,9 +74,6 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #endif
 #define ART_REMOVE0				"menu/art/delete_0"
 #define ART_REMOVE1				"menu/art/delete_1"
-#ifdef IOQUAKE3 // ZTM: punkbuster
-#define ART_PUNKBUSTER		"menu/art/pblogo"
-#endif
 
 #define ID_MASTER			10
 #define ID_GAMETYPE			11
@@ -94,11 +91,8 @@ MULTIPLAYER MENU (SERVER BROWSER)
 #endif
 #define ID_CONNECT			22
 #define ID_REMOVE			23
-#ifdef IOQUAKE3 // ZTM: punkbuster
-#define ID_PUNKBUSTER 24
-#endif
 #ifdef IOQ3ZTM // G_HUMANPLAYERS
-#define ID_SHOW_BOTS		25
+#define ID_SHOW_BOTS		24
 #endif
 
 #define GR_LOGO				30
@@ -252,22 +246,6 @@ static char quake3worldMessage[] = "Visit turtlearena.googlecode.com for News an
 static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community, Events, Files";
 #endif
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
-const char* punkbuster_items[] = {
-	"Disabled",
-	"Enabled",
-	NULL
-};
-
-const char* punkbuster_msg[] = {
-	"PunkBuster will be",
-	"disabled the next time",
-	"Quake III Arena",
-	"is started.",
-	NULL
-};
-#endif
-
 typedef struct {
 	char	adrstr[MAX_ADDRESSLENGTH];
 	int		start;
@@ -288,9 +266,6 @@ typedef struct servernode_s {
 	int		nettype;
 	int		minPing;
 	int		maxPing;
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	qboolean bPB;
-#endif
 
 } servernode_t; 
 
@@ -348,11 +323,6 @@ typedef struct {
 	int					refreshtime;
 	char				favoriteaddresses[MAX_FAVORITESERVERS][MAX_ADDRESSLENGTH];
 	int					numfavoriteaddresses;
-
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	menulist_s		punkbuster;
-	menubitmap_s	pblogo;
-#endif
 } arenaservers_t;
 
 static arenaservers_t	g_arenaservers;
@@ -624,9 +594,6 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.refresh.generic.flags	&= ~QMF_GRAYED;
 #endif
 			g_arenaservers.go.generic.flags			&= ~QMF_GRAYED;
-#ifdef IOQUAKE3 // ZTM: punkbuster
-			g_arenaservers.punkbuster.generic.flags &= ~QMF_GRAYED;
-#endif
 
 			// update status bar
 			if( g_servertype >= UIAS_GLOBAL1 && g_servertype <= UIAS_GLOBAL5 ) {
@@ -667,9 +634,6 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.refresh.generic.flags	|= QMF_GRAYED;
 #endif
 			g_arenaservers.go.generic.flags			|= QMF_GRAYED;
-#ifdef IOQUAKE3 // ZTM: punkbuster
-			g_arenaservers.punkbuster.generic.flags |= QMF_GRAYED;
-#endif
 		}
 		else {
 			if( g_arenaservers.numqueriedservers < 0 ) {
@@ -706,9 +670,6 @@ static void ArenaServers_UpdateMenu( void ) {
 			g_arenaservers.refresh.generic.flags	&= ~QMF_GRAYED;
 #endif
 			g_arenaservers.go.generic.flags			|= QMF_GRAYED;
-#ifdef IOQUAKE3 // ZTM: punkbuster
-			g_arenaservers.punkbuster.generic.flags &= ~QMF_GRAYED;
-#endif
 		}
 
 		// zero out list box
@@ -799,17 +760,15 @@ static void ArenaServers_UpdateMenu( void ) {
 			pingColor = S_COLOR_RED;
 		}
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
-		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %4s%s%3d " S_COLOR_YELLOW "%s",
-			servernodeptr->hostname, servernodeptr->mapname, clients,
- 			servernodeptr->maxclients, servernodeptr->gamename,
-			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime, servernodeptr->bPB ? "Yes" : "No" );
-#else // ZTM: No punkbuster
 		Com_sprintf( buff, MAX_LISTBOXWIDTH, "%-20.20s %-12.12s %2d/%2d %-8.8s %4s%s%3d " S_COLOR_YELLOW "",
-			servernodeptr->hostname, servernodeptr->mapname, clients,
+			servernodeptr->hostname, servernodeptr->mapname,
+#ifdef IOQ3ZTM // G_HUMANPLAYERS
+			clients,
+#else
+			servernodeptr->numclients,
+#endif
  			servernodeptr->maxclients, servernodeptr->gamename,
 			netnames[servernodeptr->nettype], pingColor, servernodeptr->pingtime);
-#endif
 		j++;
 	}
 
@@ -932,9 +891,6 @@ static void ArenaServers_Insert( char* adrstr, char* info, int pingtime )
 	servernodeptr->pingtime   = pingtime;
 	servernodeptr->minPing    = atoi( Info_ValueForKey( info, "minPing") );
 	servernodeptr->maxPing    = atoi( Info_ValueForKey( info, "maxPing") );
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	servernodeptr->bPB = atoi( Info_ValueForKey( info, "punkbuster") );
-#endif
 
 	/*
 	s = Info_ValueForKey( info, "nettype" );
@@ -1474,30 +1430,6 @@ int ArenaServers_SetType( int type )
 	return type;
 }
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
-/*
-=================
-PunkBuster_Confirm
-=================
-*/
-static void Punkbuster_ConfirmEnable( qboolean result ) {
-	if (result)
-	{		
-		trap_SetPbClStatus(1);
-	}
-	g_arenaservers.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "cl_punkbuster" ) );
-}
-
-static void Punkbuster_ConfirmDisable( qboolean result ) {
-	if (result)
-	{
-		trap_SetPbClStatus(0);
-		UI_Message( punkbuster_msg );
-	}
-	g_arenaservers.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "cl_punkbuster" ) );
-}
-#endif
-
 /*
 =================
 ArenaServers_Event
@@ -1603,19 +1535,6 @@ static void ArenaServers_Event( void* ptr, int event ) {
 		ArenaServers_Remove();
 		ArenaServers_UpdateMenu();
 		break;
-	
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	case ID_PUNKBUSTER:
-		if (g_arenaservers.punkbuster.curvalue)			
-		{
-			UI_ConfirmMenu_Style( "Enable Punkbuster?",  UI_CENTER|UI_INVERSE|UI_SMALLFONT, 0, Punkbuster_ConfirmEnable );
-		}
-		else
-		{
-			UI_ConfirmMenu_Style( "Disable Punkbuster?", UI_CENTER|UI_INVERSE|UI_SMALLFONT, 0, Punkbuster_ConfirmDisable );
-		}
-		break;
-#endif
 	}
 }
 
@@ -1942,26 +1861,6 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.go.height				= 64;
 	g_arenaservers.go.focuspic				= ART_CONNECT1;
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	g_arenaservers.punkbuster.generic.type			= MTYPE_SPINCONTROL;
-	g_arenaservers.punkbuster.generic.name			= "Punkbuster:";
-	g_arenaservers.punkbuster.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-	g_arenaservers.punkbuster.generic.callback		= ArenaServers_Event;
-	g_arenaservers.punkbuster.generic.id			= ID_PUNKBUSTER;
-	g_arenaservers.punkbuster.generic.x				= 480+32;
-	g_arenaservers.punkbuster.generic.y				= 144;
-	g_arenaservers.punkbuster.itemnames				= punkbuster_items;
-	
-	g_arenaservers.pblogo.generic.type			= MTYPE_BITMAP;
-	g_arenaservers.pblogo.generic.name			= ART_PUNKBUSTER;
-	g_arenaservers.pblogo.generic.flags			= QMF_LEFT_JUSTIFY|QMF_INACTIVE;
-	g_arenaservers.pblogo.generic.x				= 526;
-	g_arenaservers.pblogo.generic.y				= 176;
-	g_arenaservers.pblogo.width					= 32;
-	g_arenaservers.pblogo.height				= 16;
-	g_arenaservers.pblogo.errorpic				= ART_UNKNOWNMAP;
-#endif
-	
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.banner );
 
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.master );
@@ -1994,11 +1893,6 @@ static void ArenaServers_MenuInit( void ) {
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.create );
 #endif
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.go );
-
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.punkbuster );
-	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.pblogo );
-#endif
 	
 	ArenaServers_LoadFavorites();
 
@@ -2019,10 +1913,6 @@ static void ArenaServers_MenuInit( void ) {
 #ifdef IOQ3ZTM // G_HUMANPLAYERS
 	g_showbots = Com_Clamp( 0, 1, ui_browserShowBots.integer );
 	g_arenaservers.showbots.curvalue = g_showbots;
-#endif
-
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	g_arenaservers.punkbuster.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "cl_punkbuster" ) );
 #endif
 
 	// force to initial state and refresh
@@ -2054,9 +1944,6 @@ void ArenaServers_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_ARROWS_UP );
 	trap_R_RegisterShaderNoMip( ART_ARROWS_DOWN );
 	trap_R_RegisterShaderNoMip( ART_UNKNOWNMAP );
-#ifdef IOQUAKE3 // ZTM: punkbuster
-	trap_R_RegisterShaderNoMip( ART_PUNKBUSTER );
-#endif
 }
 
 

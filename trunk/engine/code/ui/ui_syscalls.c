@@ -386,12 +386,6 @@ void	trap_R_RemapShader( const char *oldShader, const char *newShader, const cha
 	syscall( UI_R_REMAP_SHADER, oldShader, newShader, timeOffset );
 }
 
-#ifdef IOQUAKE3 // ZTM: punkbuster
-void trap_SetPbClStatus( int status ) {
-	syscall( UI_SET_PBCLSTATUS, status );
-}
-#endif
-
 #ifdef IOQ3ZTM // BONES
 void trap_R_AddRefEntityToScene_CustomSkeleton( const refEntity_t *re, const refSkeleton_t *rs ) {
 	syscall( UI_R_ADDREFENTITYTOSCENE_CUSTOMSKELETON, re, rs );
