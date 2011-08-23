@@ -5837,12 +5837,11 @@ int BG_LoadAnimation(char **text_p, int i, animation_t *animations, frameSkip_t 
 	return 1;
 }
 
-#ifdef TA_SUPPORTEF
 /*
 ===============
 BG_ConvertEFAnimationsToQ3
 
-Convert Elite Force loopFrames to Quake3 loopFrames
+Convert STV: Elite Force loopFrames to Quake3 loopFrames
 ===============
 */
 static void BG_ConvertEFAnimationsToQ3(animation_t *animations, int numanims)
@@ -5887,7 +5886,6 @@ static void BG_ConvertEFAnimationsToQ3(animation_t *animations, int numanims)
 		}
 	}
 }
-#endif
 
 #ifdef TA_PLAYERSYS
 /*
@@ -6441,9 +6439,7 @@ qboolean BG_ParsePlayerCFGFile(const char *filename, bg_playercfg_t *playercfg, 
 		}
 	}
 
-#ifdef TA_SUPPORTEF
 	BG_ConvertEFAnimationsToQ3(animations, MAX_TOTALANIMATIONS);
-#endif
 
 	return qtrue;
 }
@@ -7107,22 +7103,12 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 #endif
 
 #ifdef IOQ3ZTM // PLAYER_DIR
-// Quake3 (Team Arena) atemps to load players from
+// Quake3 (Team Arena) attempts to load players from
 //   "models/players" and "models/players/characters" but in the final game
-//   there is no "models/players/characters"
-// Elite Force has the Holomatch (Multiplayer) players in "models/players2"
-//   so I generlized the player dir code.
-//
-// Last pointer is NULL
-// NOTE: Only models/players and models/players2 are listed in the player select menus
-//  q3_ui: PlayerModel_BuildList    ui: UI_BuildQ3Model_List
+//   there is no players in "models/players/characters" ...
 const char *bg_playerDirs[MAX_PLAYER_DIRS] =
 {
 	"models/players",
-#ifdef TA_SUPPORTEF
-	"models/players2",
-#endif
-	// Players in the below directories are not listed in the player select menu.
 	"models/players/characters",
 	NULL
 };

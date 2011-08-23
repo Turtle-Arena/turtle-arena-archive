@@ -234,9 +234,6 @@ else # END QUAKE3
 	# TA_ATMEFFECTS			TODO: Atmospheric effects.
 	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
 	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
-	# TA_SUPPORTEF			Support Elite Force multiplayer players (Stored in "models/players2/"), animations.cfg, sounds, ect.
-	#							Kinda pointless. (Note: TA_PLAYERSYS adds support for Elite Force soundpath keyword in animations.cfg,
-	#													must also define RAVENMD4)
 	# TA_SPLITVIEW			Allow a single game client to connect and play using multiple local clients, commonly called splitscreen.
 	#						TODO: Split view system for viewing multiple network clients at once.
 

@@ -1376,12 +1376,7 @@ void BG_SwingAngles( float destination, float swingTolerance, float clampToleran
 #endif
 
 #ifdef IOQ3ZTM // PLAYER_DIR
-#define MAX_PLAYER_DIRS 4
-#ifdef TA_SUPPORTEF
-#define MAX_UI_PLAYERDIRS 2
-#else
-#define MAX_UI_PLAYERDIRS 1
-#endif
+#define MAX_PLAYER_DIRS 3
 extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
 #endif
 
