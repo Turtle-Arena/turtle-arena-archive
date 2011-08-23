@@ -20,17 +20,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
-// bg_public.h -- Included by server, client, and botlib (not by VMs)
+// bg_public.h -- Included by server, client, and botlib (not by QVMs)
 //    Instead of scattering defines/enums all over that must be the same
 //        in the server, client, and botlib as in the VMs, keep all in one place.
-
-// ZTM: The server/client/botlib doesn't need most of bg_misc.h
-// There is only like 10-12 bytes of data here. Could we get it from "game"?
-//                                      Add a VM_Call? or a cvar? (By adding a cvar we could support unmoded Q3 and games with the Cvar!)
-//                                      { "g_bg_data", "5 0 5 6 0 1 2 3 4 0 2 3 [etc]", CVAR_ROM } ?
-//                                        or as info-string "CS_WARMUP\5\PM_INTERMISSION\5\..." ?
-
-// 	sv_bg_data = Cvar_Get ("g_bg_data", "5 5 6 0 1 2 3 4 0 2 3", CVAR_SYSTEMINFO | CVAR_ROM );
 
 // server only
 #define	CS_WARMUP				5		// server time when the match will be restarted
@@ -47,7 +39,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define PM_SPINTERMISSION 6 // bg_misc.h enum pmtype_t
 
 // botlib only
-//NOTE: enum entityType_t in bg_public.h
+//NOTE: enum entityType_t in bg_misc.h
 //FIXME: these might change
 enum {
 	ET_GENERAL,
