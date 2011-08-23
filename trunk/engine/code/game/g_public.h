@@ -54,11 +54,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 typedef struct {
-#if !defined STANDALONE && !defined IOQ3ZTM // UNUSED
-	entityState_t	unused;			// apparently this field was put here accidentally
-									//  (and is kept only for compatibility, as a struct pad)
-#endif
-
 	qboolean	linked;				// qfalse if not in any good cluster
 	int			linkcount;
 
@@ -249,6 +244,8 @@ typedef enum {
 	G_MAKESKELETONABSOLUTE,
 #endif
 #endif
+
+	// See sharedTraps_t in qcommon.h for TRAP_MEMSET=100, etc
 
 	BOTLIB_SETUP = 200,				// ( void );
 	BOTLIB_SHUTDOWN,				// ( void );

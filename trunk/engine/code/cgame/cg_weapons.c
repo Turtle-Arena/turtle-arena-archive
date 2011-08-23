@@ -2211,11 +2211,7 @@ float CG_BarrelGravityAngle(centity_t *cent, refEntity_t *gun, lerpFrame_t *lerp
 		else if (d < -1.0f) {
 			d = -1.0f;
 		}
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 		ang = Q_acos(d);
-#else
-		ang = acos(d);
-#endif
 
 		d = DotProduct(gun->axis[1], dir);
 		if (d < 0) {
@@ -2481,11 +2477,7 @@ void CG_AddWeaponTrailOld(centity_t *cent, refEntity_t *gun, int weaponHand)
 			else if (d < -1.0f) {
 				d = -1.0f;
 			}
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 			angle = Q_acos(d);
-#else
-			angle = acos(d);
-#endif
 
 			d = DotProduct(gun->axis[1], dir);
 			if (d < 0) {
