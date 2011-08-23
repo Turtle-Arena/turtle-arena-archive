@@ -881,28 +881,14 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case TRAP_SQRT:
 		return FloatAsInt( sqrt( VMF(1) ) );
 
-	case TRAP_MATRIXMULTIPLY:
-		MatrixMultiply( VMA(1), VMA(2), VMA(3) );
-		return 0;
-
-	case TRAP_ANGLEVECTORS:
-		AngleVectors( VMA(1), VMA(2), VMA(3), VMA(4) );
-		return 0;
-
-	case TRAP_PERPENDICULARVECTOR:
-		PerpendicularVector( VMA(1), VMA(2) );
-		return 0;
-
 	case TRAP_FLOOR:
 		return FloatAsInt( floor( VMF(1) ) );
 
 	case TRAP_CEIL:
 		return FloatAsInt( ceil( VMF(1) ) );
 
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 	case TRAP_ACOS:
 		return FloatAsInt( acos( VMF(1) ) );
-#endif
 
 	default:
 		Com_Error( ERR_DROP, "Bad game system trap: %ld", (long int) args[0] );

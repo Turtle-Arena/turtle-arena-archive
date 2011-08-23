@@ -192,18 +192,7 @@ typedef enum {
 	CG_R_MAKESKELETONABSOLUTE,
 //#endif
 
-	CG_MEMSET = 100,
-	CG_MEMCPY,
-	CG_STRNCPY,
-	CG_SIN,
-	CG_COS,
-	CG_ATAN2,
-	CG_SQRT,
-	CG_FLOOR,
-	CG_CEIL,
-	CG_TESTPRINTINT,
-	CG_TESTPRINTFLOAT,
-	CG_ACOS
+	// See sharedTraps_t in qcommon.h for TRAP_MEMSET=100, etc
 } cgameImport_t;
 
 

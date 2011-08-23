@@ -1650,11 +1650,7 @@ static void CG_TeamBase( centity_t *cent ) {
 					cent->muzzleFlashTime = 1;
 				}
 				VectorCopy(cent->currentState.angles, angles);
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 				angles[YAW] += (float) 16 * Q_acos(1-c) * 180 / M_PI;
-#else
-				angles[YAW] += (float) 16 * acos(1-c) * 180 / M_PI;
-#endif
 				AnglesToAxis( angles, model.axis );
 
 				VectorScale( model.axis[0], c, model.axis[0]);

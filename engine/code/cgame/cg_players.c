@@ -2503,11 +2503,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 			else if (d < -1.0f) {
 				d = -1.0f;
 			}
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 			angle = Q_acos(d);
-#else
-			angle = acos(d);
-#endif
 
 			d = DotProduct(pole.axis[1], dir);
 			if (d < 0) {

@@ -1009,40 +1009,38 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 #endif
 
-	case UI_MEMSET:
+	case TRAP_MEMSET:
 		Com_Memset( VMA(1), args[2], args[3] );
 		return 0;
 
-	case UI_MEMCPY:
+	case TRAP_MEMCPY:
 		Com_Memcpy( VMA(1), VMA(2), args[3] );
 		return 0;
 
-	case UI_STRNCPY:
+	case TRAP_STRNCPY:
 		strncpy( VMA(1), VMA(2), args[3] );
 		return args[1];
 
-	case UI_SIN:
+	case TRAP_SIN:
 		return FloatAsInt( sin( VMF(1) ) );
 
-	case UI_COS:
+	case TRAP_COS:
 		return FloatAsInt( cos( VMF(1) ) );
 
-	case UI_ATAN2:
+	case TRAP_ATAN2:
 		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
 
-	case UI_SQRT:
+	case TRAP_SQRT:
 		return FloatAsInt( sqrt( VMF(1) ) );
 
-	case UI_FLOOR:
+	case TRAP_FLOOR:
 		return FloatAsInt( floor( VMF(1) ) );
 
-	case UI_CEIL:
+	case TRAP_CEIL:
 		return FloatAsInt( ceil( VMF(1) ) );
 
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
-	case UI_ACOS:
+	case TRAP_ACOS:
 		return FloatAsInt( acos( VMF(1) ) );
-#endif
 
 	case UI_PC_ADD_GLOBAL_DEFINE:
 		return botlib_export->PC_AddGlobalDefine( VMA(1) );

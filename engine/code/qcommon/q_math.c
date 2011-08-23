@@ -639,11 +639,7 @@ float AngleBetweenVectors(const vec3_t a, const vec3_t b)
 	// this results in:
 	//
 	// angle = acos( (a * b) / (|a| * |b|) )
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 	return RAD2DEG(Q_acos(DotProduct(a, b) / (alen * blen)));
-#else
-	return RAD2DEG(acos(DotProduct(a, b) / (alen * blen)));
-#endif
 }
 #endif
 
@@ -1040,7 +1036,6 @@ int Q_isnan( float x )
 }
 //------------------------------------------------------------------------
 
-#if !defined Q3_VM || defined IOQ3ZTM_NO_COMPAT // FIXED_ACOS
 /*
 =====================
 Q_acos
@@ -1066,4 +1061,3 @@ float Q_acos(float c) {
 	}
 	return angle;
 }
-#endif

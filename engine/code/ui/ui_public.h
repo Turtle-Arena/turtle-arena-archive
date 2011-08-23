@@ -134,18 +134,7 @@ typedef enum {
 	UI_R_MAKESKELETONABSOLUTE,
 //#endif
 
-	UI_MEMSET = 100,
-	UI_MEMCPY,
-	UI_STRNCPY,
-	UI_SIN,
-	UI_COS,
-	UI_ATAN2,
-	UI_SQRT,
-	UI_FLOOR,
-	UI_CEIL
-#ifdef IOQ3ZTM_NO_COMPAT // FIXED_ACOS
-	,UI_ACOS
-#endif
+	// See sharedTraps_t in qcommon.h for TRAP_MEMSET=100, etc
 } uiImport_t;
 
 typedef enum {

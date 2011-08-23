@@ -63,11 +63,9 @@ equ	sin						-104
 equ	cos						-105
 equ	atan2					-106
 equ	sqrt					-107
-equ floor					-111
-equ	ceil					-112
-equ	testPrintInt			-113
-equ	testPrintFloat			-114
-equ acos					-115
+equ floor					-108
+equ	ceil					-109
+equ acos					-110
 
 
 
