@@ -5122,9 +5122,6 @@ static void UI_BuildQ3Model_List( void )
 	char	scratch[256];
 	char*	dirptr;
 	char*	fileptr;
-#ifdef TA_SUPPORTEF
-	int		h;
-#endif
 	int		i;
 	int		j, k, dirty;
 	int		dirlen;
@@ -5132,15 +5129,8 @@ static void UI_BuildQ3Model_List( void )
 
 	uiInfo.q3HeadCount = 0;
 
-#ifdef TA_SUPPORTEF
-  for (h = 0; h < MAX_UI_PLAYERDIRS && bg_playerDirs[h] != NULL; h++)
-  {
-	// iterate directory of all player models
-	numdirs = trap_FS_GetFileList(bg_playerDirs[h], "/", dirlist, 2048 );
-#else
 	// iterate directory of all player models
 	numdirs = trap_FS_GetFileList("models/players", "/", dirlist, 2048 );
-#endif
 	dirptr  = dirlist;
 	for (i=0; i<numdirs && uiInfo.q3HeadCount < MAX_PLAYERMODELS; i++,dirptr+=dirlen+1)
 	{
@@ -5152,18 +5142,10 @@ static void UI_BuildQ3Model_List( void )
 			continue;
 			
 		// iterate all skin files in directory
-#ifdef TA_SUPPORTEF
-#ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
-		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "$images", filelist, 2048 );
-#else
-		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "tga", filelist, 2048 );
-#endif
-#else
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "$images", filelist, 2048 );
 #else
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );
-#endif
 #endif
 		fileptr  = filelist;
 		for (j=0; j<numfiles && uiInfo.q3HeadCount < MAX_PLAYERMODELS;j++,fileptr+=filelen+1)
@@ -5190,19 +5172,12 @@ static void UI_BuildQ3Model_List( void )
 				if (!dirty) {
 					Com_sprintf( uiInfo.q3HeadNames[uiInfo.q3HeadCount], sizeof(uiInfo.q3HeadNames[uiInfo.q3HeadCount]), "%s", scratch);
 					uiInfo.q3HeadIcons[uiInfo.q3HeadCount++] =
-#ifdef TA_SUPPORTEF
-							trap_R_RegisterShaderNoMip(va("%s/%s/%s",bg_playerDirs[h],dirptr,skinname));
-#else
 							trap_R_RegisterShaderNoMip(va("models/players/%s/%s",dirptr,skinname));
-#endif
 				}
 			}
 
 		}
 	}	
-#ifdef TA_SUPPORTEF
-  }
-#endif
 }
 
 

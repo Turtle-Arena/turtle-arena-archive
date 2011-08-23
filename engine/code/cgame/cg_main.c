@@ -1370,8 +1370,8 @@ static void CG_RegisterGraphics( void ) {
 #endif
 
 	if ( cgs.gametype >= GT_TEAM || cg_buildScript.integer ) {
-#ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS // TA_SUPPORTEF
-		// Sprites used by Elite Force
+#ifdef IOQ3ZTM // SHOW_TEAM_FRIENDS
+		// Sprites used by STV: Elite Force
 		cgs.media.blueFriendShader = trap_R_RegisterShader( "sprites/team_blue" );
 		cgs.media.friendShader = trap_R_RegisterShader( "sprites/team_red" );
 #if !defined TURTLEARENA || defined TA_SUPPORTQ3 // Fall back to Q3 friend shader

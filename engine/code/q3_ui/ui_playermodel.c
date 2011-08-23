@@ -393,10 +393,6 @@ static void PlayerModel_PicEvent( void* ptr, int event )
 	// get model and strip icon_
 	modelnum = s_playermodel.modelpage*MAX_MODELSPERPAGE + i;
 	buffptr  = s_playermodel.modelnames[modelnum] + strlen("models/players/");
-#ifdef TA_SUPPORTEF
-	if (buffptr[0] == '/') // models/players2/
-		buffptr++;
-#endif
 	pdest    = strstr(buffptr,"icon_");
 	if (pdest)
 	{
@@ -459,9 +455,6 @@ static void PlayerModel_BuildList( void )
 	char	skinname[MAX_QPATH];
 	char*	dirptr;
 	char*	fileptr;
-#ifdef TA_SUPPORTEF
-	int		h;
-#endif
 	int		i;
 	int		j;
 	int		dirlen;
@@ -473,15 +466,8 @@ static void PlayerModel_BuildList( void )
 	s_playermodel.modelpage = 0;
 	s_playermodel.nummodels = 0;
 
-#ifdef TA_SUPPORTEF
-  for (h = 0; h < MAX_UI_PLAYERDIRS && bg_playerDirs[h] != NULL; h++)
-  {
-	// iterate directory of all player models
-	numdirs = trap_FS_GetFileList(bg_playerDirs[h], "/", dirlist, 2048 );
-#else
 	// iterate directory of all player models
 	numdirs = trap_FS_GetFileList("models/players", "/", dirlist, 2048 );
-#endif
 	dirptr  = dirlist;
 	for (i=0; i<numdirs && s_playermodel.nummodels < MAX_PLAYERMODELS; i++,dirptr+=dirlen+1)
 	{
@@ -493,18 +479,10 @@ static void PlayerModel_BuildList( void )
 			continue;
 			
 		// iterate all skin files in directory
-#ifdef TA_SUPPORTEF
-#ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
-		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "$images", filelist, 2048 );
-#else
-		numfiles = trap_FS_GetFileList( va("%s/%s",bg_playerDirs[h],dirptr), "tga", filelist, 2048 );
-#endif
-#else
 #ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "$images", filelist, 2048 );
 #else
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );
-#endif
 #endif
 		fileptr  = filelist;
 		for (j=0; j<numfiles && s_playermodel.nummodels < MAX_PLAYERMODELS;j++,fileptr+=filelen+1)
@@ -518,11 +496,7 @@ static void PlayerModel_BuildList( void )
 			{
 				Com_sprintf( s_playermodel.modelnames[s_playermodel.nummodels++],
 					sizeof( s_playermodel.modelnames[s_playermodel.nummodels] ),
-#ifdef TA_SUPPORTEF
-					"%s/%s/%s", bg_playerDirs[h], dirptr, skinname );
-#else
 					"models/players/%s/%s", dirptr, skinname );
-#endif
 				//if (s_playermodel.nummodels >= MAX_PLAYERMODELS)
 				//	return;
 			}
@@ -532,9 +506,6 @@ static void PlayerModel_BuildList( void )
 			}
 		}
 	}	
-#ifdef TA_SUPPORTEF
-  }
-#endif
 
 	//APSFIXME - Degenerate no models case
 
