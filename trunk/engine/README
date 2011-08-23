@@ -1,15 +1,15 @@
-                   ,---------------------------------------.
-                   |   _                     _       ____  |
-                   |  (_)___  __ _ _  _ __ _| |_____|__ /  |
-                   |  | / _ \/ _` | || / _` | / / -_)|_ \  |
-                   |  |_\___/\__, |\_,_\__,_|_\_\___|___/  |
-                   |            |_|                        |
-                   |                                       |
-                   `---------- http://ioquake3.org --------'
+               ,-----------------------------------------------.
+               |   _           ____ _____  _______  _    _     |
+               |  (_)___  __ _|__ /|__   ||__   __|/ \  / \    |
+               |  | / _ \/ _` ||_ \   / /___ | |  /   \/   \   |
+               |  |_\___/\__, |___/  |______||_| /__/\__/\__\  |
+               |            |_|                                |
+               |                                               |
+               `------ http://code.google.com/p/ioq3ztm -------'
 
-The intent of this project is to provide a baseline Quake 3 which may be used
-for further development and baseq3 fun. 
-Some of the major features currently implemented are:
+The intent of this project is to provide a version of ioquake3 which may be used
+for further development of standalone games.
+Some of the major ioq3 features currently implemented are:
 
   * SDL backend
   * OpenAL sound API support (multiple speaker support and better sound
@@ -85,7 +85,6 @@ Makefile.local:
   BUILD_CLIENT_SMP   - build the 'ioquake3-smp' client binary
   BUILD_GAME_SO      - build the game shared libraries
   BUILD_GAME_QVM     - build the game qvms
-  BUILD_STANDALONE   - build binaries suited for stand-alone games
   USE_OPENAL         - use OpenAL where available
   USE_OPENAL_DLOPEN  - link with OpenAL at runtime
   USE_CURL           - use libcurl for http/ftp download support
@@ -175,12 +174,7 @@ New cvars
 
   com_ansiColor                     - enable use of ANSI escape codes in the tty
   com_altivec                       - enable use of altivec on PowerPC systems
-  com_standalone (read only)        - If set to 1, quake3 is running in
-                                      standalone mode
-  com_basegame                      - Use a different base than baseq3. If no
-                                      original Quake3 or TeamArena pak files
-                                      are found, this will enable running in
-                                      standalone mode
+  com_basegame                      - Use a different base than baseq3.
   com_homepath                      - Specify name that is to be appended to the
                                       home path
   com_legacyprotocol                - Specify protocol version number for
@@ -500,51 +494,18 @@ Creating mods compatible with Q3 1.32b
 Creating standalone games
   Have you finished the daunting task of removing all dependencies on the Q3
   game data? You probably now want to give your users the opportunity to play
-  the game without owning a copy of Q3, which consequently means removing cd-key
-  and authentication server checks. In addition to being a straightforward Q3
-  client, ioquake3 also purports to be a reliable and stable code base on which
-  to base your game project.
+  the game without owning a copy of Q3. This consequently means removing cd-key
+  and authentication server checks, which is already done in ioq3ztm.
 
   However, before you start compiling your own version of ioquake3, you have to
   ask yourself: Have we changed or will we need to change anything of importance
-  in the engine?
-
-  If your answer to this question is "no", it probably makes no sense to build
-  your own binaries. Instead, you can just use the pre-built binaries on the
-  website. Just make sure the game is called with:
-
-    +set com_basegame <yournewbase>
-    
-  in any links/scripts you install for your users to start the game. The
-  binary must not detect any original quake3 game pak files. If this
-  condition is met, the game will set com_standalone to 1 and is then running
-  in stand alone mode.
-  
-  If you want the engine to use a different directory in your homepath than
-  e.g. "Quake3" on Windows or ".q3a" on Linux, then set a new name at startup
-  by adding
-  
-    +set com_homepath <homedirname>
-  
-  to the command line. You can also control which game name to use when talking
-  to the master server:
-  
-    +set com_gamename <gamename>
-  
-  So clients requesting a server list will only receive servers that have a
-  matching game name.
-  
-  Example line:
-  
-    +set com_basegame basefoo +set com_homepath .foo
-    +set com_gamename foo
-
+  in the engine? If your answer to this question is "no", you should probably
+  just use ioquake3.
 
   If you really changed parts that would make vanilla ioquake3 incompatible with
   your mod, we have included another way to conveniently build a stand-alone
-  binary. Just run make with the option BUILD_STANDALONE=1. Don't forget to edit
-  the PRODUCT_NAME and subsequent #defines in qcommon/q_shared.h with
-  information appropriate for your project.
+  binary. Just run make. Don't forget to edit the PRODUCT_NAME and subsequent
+  #defines in qcommon/q_shared.h with information appropriate for your project.
 
   While a lot of work has been put into ioquake3 that you can benefit from free
   of charge, it does not mean that you have no obligations to fulfill. Please be

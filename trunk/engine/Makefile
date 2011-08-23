@@ -31,9 +31,6 @@ ifeq ($(COMPILE_PLATFORM),mingw32)
   endif
 endif
 
-ifndef BUILD_STANDALONE
-  BUILD_STANDALONE =
-endif
 ifndef BUILD_CLIENT
   BUILD_CLIENT     =
 endif
@@ -103,7 +100,7 @@ ifeq ($(QUAKE3),1)
 		endif
 
 		# Copied from Turtle Arena BUILD_DEFINES
-		ENGINE_CFLAGS = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
+		ENGINE_CFLAGS = -DRAVENMD4 -DTA_MAIN \
 							-DNOTRATEDM -DNET_COMPAT \
 							-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 							-DTA_HOLDSYS -DTA_ITEMSYS \
@@ -187,7 +184,6 @@ else # END QUAKE3
 	# USE_FREETYPE Currently doesn't work when using pk3 files instead of using unzipped files?
 
 	##### ioquake3 defines
-	# STANDALONE			ioquake3 define to disable quake3 code for authenticating, and stuff.
 	# RAVENMD4				Enable support for loading MDR models.
 	# MISSIONPACK			Code for the official Quake III Arena expansion pack, Quake III: Team Arena.
 	##### "new ioquake3 defines"
@@ -257,7 +253,7 @@ else # END QUAKE3
 	#####
 	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
 
-	BUILD_DEFINES = -DSTANDALONE -DRAVENMD4 -DTA_MAIN \
+	BUILD_DEFINES = -DRAVENMD4 -DTA_MAIN \
 						-DNOTRATEDM -DNOBLOOD -DNET_COMPAT \
 						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DTA_HOLDSYS -DTA_ITEMSYS \
@@ -1317,10 +1313,6 @@ endif
 
 ifeq ($(USE_LOCAL_HEADERS),1)
   BASE_CFLAGS += -DUSE_LOCAL_HEADERS
-endif
-
-ifeq ($(BUILD_STANDALONE),1)
-  BUILD_DEFINES += -DSTANDALONE
 endif
 
 ifeq ($(GENERATE_DEPENDENCIES),1)
