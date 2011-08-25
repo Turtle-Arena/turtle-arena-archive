@@ -2967,10 +2967,7 @@ static void UI_LoadMovies( void ) {
 		for ( i = 0; i < uiInfo.movieCount; i++ ) {
 			len = strlen( moviename );
 #ifdef IOQ3ZTM_NO_COMPAT // VIDEOLIST
-			// Remove extension, it could be .RoQ, .roq, .ogm, or .ogv
-			if (moviename[len-4] == '.') {
-				moviename[len-4] = '\0';
-			}
+			COM_StripExtension( moviename, moviename, len );
 #else
 			if (!Q_stricmp(moviename +  len - 4,".roq")) {
 				moviename[len-4] = '\0';
