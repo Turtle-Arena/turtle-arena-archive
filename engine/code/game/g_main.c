@@ -242,14 +242,9 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO, 0, 0, qfalse },
 	{ &g_saveMapname, "g_saveMapname", "", CVAR_ROM, 0, 0, qfalse },
 #endif
-#ifdef IOQ3ZTM
-#ifdef TURTLEARENA // DEFAULT_TEAMS
-	{ &g_redteam, "g_redteam", "Foot", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
-	{ &g_blueteam, "g_blueteam", "Shell", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
-#else
-	{ &g_redteam, "g_redteam", "Stroggs", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
-	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
-#endif
+#ifdef IOQ3ZTM // DEFAULT_TEAMS
+	{ &g_redteam, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
+	{ &g_blueteam, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #endif
 #ifdef TURTLEARENA // POWERS // PW_FLASHING
 	{ &g_teleportFluxTime, "g_teleportFluxTime", "5", 0, 0, qfalse},
@@ -433,7 +428,7 @@ void G_FindTeams( void ) {
 }
 
 void G_RemapTeamShaders( void ) {
-#if defined MISSIONPACK || defined IOQ3ZTM // TURTLEARENA? // ZTM: Do it in TURTLEARENA as well.
+#if defined MISSIONPACK || defined IOQ3ZTM
 	char string[1024];
 	float f = level.time * 0.001;
 	Com_sprintf( string, sizeof(string), "team_icon/%s_red", g_redteam.string );
