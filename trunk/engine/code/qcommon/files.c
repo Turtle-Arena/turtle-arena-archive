@@ -2457,11 +2457,7 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 
 #ifdef IOQ3ZTM
 	// VIDEOLIST
-	if (Q_stricmp(extension, "$videos") == 0
-#ifndef IOQ3ZTM_NO_COMPAT // Q3: Team Arena Mod compatibilty
-		|| Q_strncmp(extension, "roq", 3) == 0
-#endif
-		)
+	if (Q_stricmp(extension, "$videos") == 0)
 	{
 		const char *extensions[] = { "RoQ", "roq"
 #if defined(USE_CODEC_VORBIS) && (defined(USE_CIN_XVID) || defined(USE_CIN_THEORA))
@@ -2470,17 +2466,6 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 			};
 		int extNamesSize = ARRAY_LEN(extensions);
 		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
-
-#ifndef IOQ3ZTM_NO_COMPAT // Q3: Team Arena Mod compatibilty
-		if (Q_strncmp(extension, "roq", 3) == 0)
-		{
-			// Remove file extensions, Team Arena only removes .roq
-			for (i = 0; i < nFiles; i++) {
-				nLen = strlen(pFiles[i]);
-				pFiles[i][nLen-4] = '\0';
-			}
-		}
-#endif
 	}
 	// SUPPORT_ALL_FORMAT_SKIN_ICONS
 	else if (Q_stricmp(extension, "$images") == 0)
