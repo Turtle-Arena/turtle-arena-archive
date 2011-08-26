@@ -31,7 +31,7 @@ endif
 
 
 # ioq3ztm svn version that this is based on
-IOQ3ZTM_REVISION = 24
+IOQ3ZTM_REVISION = 27
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
