@@ -925,7 +925,11 @@ default values.
 #define CVAR_USERINFO3		0x8000 // userinfo for third local client
 #define CVAR_USERINFO4		0x10000 // userinfo for fourth local client
 #endif
-#define CVAR_NONEXISTENT	0xFFFFFFFF	// Cvar doesn't exist.
+
+// These flags are only returned by the Cvar_Flags() function
+#define CVAR_MODIFIED		0x40000000	// Cvar was modified
+#define CVAR_NONEXISTENT	0x80000000	// Cvar doesn't exist.
+
 
 #ifdef TA_SPLITVIEW
 #define CVAR_USERINFO_ALL	(CVAR_USERINFO|CVAR_USERINFO2|CVAR_USERINFO3|CVAR_USERINFO4)

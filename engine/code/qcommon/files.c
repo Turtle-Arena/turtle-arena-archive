@@ -2362,9 +2362,6 @@ char **FS_ListFiles( const char *path, const char *extension, int *numfiles ) {
 	return FS_ListFilteredFiles( path, extension, NULL, numfiles, qfalse );
 }
 
-#ifdef IOQ3ZTM // VIDEOLIST
-void FS_SortFileList(char **filelist, int numfiles);
-
 /*
 =================
 FS_ListFilesEx
@@ -2412,7 +2409,6 @@ char **FS_ListFilesEx( const char *path, const char **extensions, int numExts, i
 
 	return listCopy;
 }
-#endif
 
 /*
 =================
@@ -2455,8 +2451,6 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 		return FS_GetModList(listbuf, bufsize);
 	}
 
-#ifdef IOQ3ZTM
-	// VIDEOLIST
 	if (Q_stricmp(extension, "$videos") == 0)
 	{
 		const char *extensions[] = { "RoQ", "roq"
@@ -2467,7 +2461,6 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 		int extNamesSize = ARRAY_LEN(extensions);
 		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
 	}
-	// SUPPORT_ALL_FORMAT_SKIN_ICONS
 	else if (Q_stricmp(extension, "$images") == 0)
 	{
 		const char *extensions[] = { "png", "tga", "jpg", "jpeg", "pcx", "bmp" };
@@ -2539,8 +2532,9 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 		pFiles = FS_ListFilesEx(path, extensions, numExts, &nFiles, qfalse);
 	}
 	else
-#endif
-	pFiles = FS_ListFiles(path, extension, &nFiles);
+	{
+		pFiles = FS_ListFiles(path, extension, &nFiles);
+	}
 
 	for (i =0; i < nFiles; i++) {
 		nLen = strlen(pFiles[i]) + 1;
@@ -4074,13 +4068,13 @@ void FS_Restart( int checksumFeed ) {
 /*
 =================
 FS_ConditionalRestart
-restart if necessary
+
+Restart if necessary
+Return qtrue if restarting due to game directory changed, qfalse otherwise
 =================
 */
 qboolean FS_ConditionalRestart(int checksumFeed, qboolean disconnect)
 {
-	int retval;
-	
 	if(fs_gamedirvar->modified)
 	{
 		if(FS_FilenameCompare(lastValidGame, fs_gamedirvar->string) &&
@@ -4091,13 +4085,8 @@ qboolean FS_ConditionalRestart(int checksumFeed, qboolean disconnect)
 			return qtrue;
 		}
 		else
-		{
 			fs_gamedirvar->modified = qfalse;
-			retval = qtrue;
-		}
 	}
-	else
-		retval = qfalse;
 	
 	if(checksumFeed != fs_checksumFeed)
 		FS_Restart(checksumFeed);
