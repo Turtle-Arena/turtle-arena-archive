@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // q_shared.h -- included first by ALL program modules.
 // A user mod should never modify this file
 
-#ifdef TA_MAIN
+#if 1 // Change these for your standalone game
   #define PRODUCT_NAME				"Turtle Arena"
   #define BASEGAME					"base"
   #define CLIENT_WINDOW_TITLE		"Turtle Arena"
@@ -35,18 +35,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define HOMEPATH_NAME_WIN			"TurtleArena"
   #define HOMEPATH_NAME_MACOSX		HOMEPATH_NAME_WIN
   #define GAMENAME_FOR_MASTER		"TurtleArena"		// must NOT contain whitespaces
-//  #define LEGACY_PROTOCOL
-#elif defined STANDALONE
-  #define PRODUCT_NAME			"iofoo3"
-  #define BASEGAME			"foobar"
-  #define CLIENT_WINDOW_TITLE     	"changeme"
-  #define CLIENT_WINDOW_MIN_TITLE 	"changeme2"
-  #define HOMEPATH_NAME_UNIX		".foo"
-  #define HOMEPATH_NAME_WIN		"FooBar"
-  #define HOMEPATH_NAME_MACOSX		HOMEPATH_NAME_WIN
- #define GAMENAME_FOR_MASTER		"foobar"	// must NOT contain whitespace
 //  #define LEGACY_PROTOCOL	// You probably don't need this for your standalone game
-#else
+
+  #ifndef PRODUCT_VERSION
+    #define PRODUCT_VERSION "0.5.2"
+  #endif
+#else // ioquake3 defaults
   #define PRODUCT_NAME			"ioq3"
   #define BASEGAME			"baseq3"
   #define CLIENT_WINDOW_TITLE     	"ioquake3"
@@ -56,6 +50,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   #define HOMEPATH_NAME_MACOSX		HOMEPATH_NAME_WIN
   #define GAMENAME_FOR_MASTER		"Quake3Arena"
   #define LEGACY_PROTOCOL
+
+  #ifndef PRODUCT_VERSION
+    #define PRODUCT_VERSION "1.36"
+  #endif
 #endif
 
 // Heartbeat for dpmaster protocol. You shouldn't change this unless you know what you're doing
@@ -71,14 +69,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef TA_SP
   // It's really "fs_game\\saves", so each mod has its own saves dir.
   #define SAVEGAMEDIR "saves"
-#endif
-
-#ifndef PRODUCT_VERSION
-  #ifdef TA_MAIN
-    #define PRODUCT_VERSION "0.5.2"
-  #else
-    #define PRODUCT_VERSION "1.36"
-  #endif
 #endif
 
 #define Q3_VERSION PRODUCT_NAME " " PRODUCT_VERSION
