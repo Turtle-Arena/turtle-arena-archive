@@ -4822,9 +4822,6 @@ char *eventnames[] = {
 #ifndef TA_WEAPSYS
 	"EV_SHOTGUN",
 #endif
-#ifndef IOQ3ZTM_NO_COMPAT // UNUSED
-	"EV_BULLET",				// otherEntity is the shooter
-#endif
 
 #ifdef TA_WEAPSYS
 	"EV_WEAPON_HIT",
