@@ -1539,7 +1539,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	// adjust for riding a mover if it wasn't rolled into the predicted
 	// player state
-#ifdef TA_SPLITVIEW // ZTM: Should check all local clients?
+#ifdef TA_SPLITVIEW // ZTM: FIXME: Should check all local clients?
 #endif
 	if ( cent != &cg.cur_lc->predictedPlayerEntity ) {
 		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 

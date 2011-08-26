@@ -994,8 +994,6 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 #ifdef IOQ3ZTM // BONES
-	case UI_R_NUMBEROFJOINTS:
-		return re.NumberOfJoints(args[1]);
 	case UI_R_JOINTINDEXFORNAME:
 		return re.JointIndexForName(args[1], VMA(2));
 	case UI_R_SETUPSKELETON:

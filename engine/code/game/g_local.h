@@ -1143,7 +1143,6 @@ int trap_R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int en
 					   float frac, const char *tagName );
 
 #ifdef IOQ3ZTM // BONES
-int trap_R_NumberOfJoints(qhandle_t handle);
 int trap_R_JointIndexForName(qhandle_t handle, const char *jointName);
 qboolean trap_R_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
 qboolean trap_R_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,

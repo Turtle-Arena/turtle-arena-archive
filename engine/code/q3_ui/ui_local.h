@@ -839,7 +839,6 @@ void			trap_S_StartBackgroundTrack( const char *intro, const char *loop);
 
 #ifdef IOQ3ZTM // BONES
 void			trap_R_AddRefEntityToScene_CustomSkeleton( const refEntity_t *re, const refSkeleton_t *rs );
-int				trap_R_NumberOfJoints(qhandle_t handle);
 int				trap_R_JointIndexForName(qhandle_t handle, const char *jointName);
 qboolean		trap_R_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
 qboolean		trap_R_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel,

@@ -480,11 +480,6 @@ void trap_R_AddRefEntityToScene_CustomSkeleton( const refEntity_t *re, const ref
 	syscall( CG_R_ADDREFENTITYTOSCENE_CUSTOMSKELETON, re, rs );
 }
 
-int trap_R_NumberOfJoints(qhandle_t handle)
-{
-	return syscall( CG_R_NUMBEROFJOINTS, handle );
-}
-
 int trap_R_JointIndexForName(qhandle_t handle, const char *jointName)
 {
 	return syscall( CG_R_JOINTINDEXFORNAME, handle, jointName );
