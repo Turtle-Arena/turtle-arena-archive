@@ -2476,7 +2476,11 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 	}
 	else if (Q_stricmp(extension, "$sounds") == 0)
 	{
-		const char *extensions[] = { "wav", "ogg" };
+		const char *extensions[] = { "wav"
+#ifdef USE_CODEC_VORBIS
+			, "ogg"
+#endif
+			};
 		int extNamesSize = ARRAY_LEN(extensions);
 		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
 	}
