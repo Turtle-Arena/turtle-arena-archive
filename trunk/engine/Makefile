@@ -130,7 +130,6 @@ ifeq ($(QUAKE3),1)
 		#
 		# Server/Client-Only
 		#
-		USE_CODEC_VORBIS=1
 		USE_CODEC_THEORA=1
 
 		SERVERBIN=turtlearena-server
@@ -159,7 +158,6 @@ ifeq ($(QUAKE3),1)
 			#
 			# Server/Client-Only
 			#
-			USE_CODEC_VORBIS=1
 			USE_CODEC_THEORA=1
 
 			SERVERBIN=ioq3ztm-server
@@ -260,9 +258,6 @@ else # END QUAKE3
 	# Use model tags for true melee attacking
 	DED_USE_MODELS=1
 	BUILD_DEFINES += -DTA_GAME_MODELS
-
-	# Turtle Arena's sounds are ogg vorbis
-	USE_CODEC_VORBIS=1
 
 	# Turtle Arena's intro video will be ogg theora
 	USE_CODEC_THEORA=1
@@ -373,7 +368,7 @@ ifndef USE_CURL_DLOPEN
 endif
 
 ifndef USE_CODEC_VORBIS
-USE_CODEC_VORBIS=0
+USE_CODEC_VORBIS=1
 endif
 
 ifndef USE_CODEC_THEORA
@@ -775,10 +770,10 @@ ifeq ($(PLATFORM),mingw32)
     CLIENT_LIBS += -lfreetype
   endif
 
-  ifeq ($(ARCH),x86)
-    WINLIBDIR=$(LIBSDIR)/win32
-  else
+  ifeq ($(ARCH),x64)
     WINLIBDIR=$(LIBSDIR)/win64
+  else
+    WINLIBDIR=$(LIBSDIR)/win32
   endif
 
   ifeq ($(USE_CURL),1)
@@ -825,7 +820,7 @@ ifeq ($(PLATFORM),mingw32)
       CLIENT_CFLAGS += -I$(OGGDIR)/include \
                       -I$(VORBISDIR)/include
       CLIENT_LIBS += $(WINLIBDIR)/libvorbisfile.a \
-                      $(WINLIBDIR)/libvorbis.a\
+                      $(WINLIBDIR)/libvorbis.a \
                       $(WINLIBDIR)/libogg.a
     endif
     ifeq ($(USE_CODEC_THEORA),1)
@@ -844,8 +839,6 @@ ifeq ($(PLATFORM),mingw32)
       CLIENT_LIBS += -ltheora
     endif
   endif
-
-
 
   BUILD_CLIENT_SMP = 0
 
