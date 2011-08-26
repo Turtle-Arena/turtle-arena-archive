@@ -1413,6 +1413,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 		MSG_WriteBits( msg, 0, 1 );	// no change
 	}
 
+
 #if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
 	if ( ammobits ) {
 		MSG_WriteBits( msg, 1, 1 );	// changed
@@ -1424,6 +1425,7 @@ void MSG_WriteDeltaPlayerstate( msg_t *msg, struct playerState_s *from, struct p
 		MSG_WriteBits( msg, 0, 1 );	// no change
 	}
 #endif
+
 
 	if ( powerupbits ) {
 		MSG_WriteBits( msg, 1, 1 );	// changed
