@@ -73,8 +73,10 @@ ifndef BUILD_IOQ3ZTM
   BUILD_IOQ3ZTM=
 endif
 
-# ioquake3 svn version that this is based on
-IOQ3_REVISION = 2148
+
+# ioq3ztm svn version that this is based on
+IOQ3ZTM_REVISION = 23
+
 
 #
 # Start build type
@@ -485,8 +487,8 @@ ifneq ($(BUILD_FINAL),1)
 	endif
 	endif
 
-	ifdef IOQ3_REVISION
-	  VERSION:=$(VERSION)_IOQ3r$(IOQ3_REVISION)
+	ifdef IOQ3ZTM_REVISION
+	  VERSION:=$(VERSION)_IOQ3ZTMr$(IOQ3ZTM_REVISION)
 	endif
 endif
 
@@ -1437,7 +1439,7 @@ release:
 targets: makedirs
 	@echo ""
 	@echo "Building Turtle Arena in $(B):"
-	@echo "  IOQ3_REVISION: $(IOQ3_REVISION)"
+	@echo "  IOQ3ZTM_REVISION: $(IOQ3ZTM_REVISION)"
 	@echo "  PLATFORM: $(PLATFORM)"
 	@echo "  ARCH: $(ARCH)"
 	@echo "  VERSION: $(VERSION)"

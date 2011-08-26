@@ -50,15 +50,24 @@ SAVE_LOG=1
 #
 # ioquake3 resync specfic
 #
-DEFAULT_MAINNAME="ioquake3"
-
+#DEFAULT_MAINNAME="ioquake3"
 # Default SVN path
-DEFAULT_SVN_PATH="svn://svn.icculus.org/quake3/trunk/"
-
+#DEFAULT_SVN_PATH="svn://svn.icculus.org/quake3/trunk/"
 # Magic tokens
-DEFAULT_MAINREVISION="IOQ3_REVISION"
+#DEFAULT_MAINREVISION="IOQ3_REVISION"
 # For consistency...
-DEFAULT_MAINSVN="IOQ3_SVN"
+#DEFAULT_MAINSVN="IOQ3_SVN"
+
+#
+# ioq3ztm resync specfic
+#
+DEFAULT_MAINNAME="ioq3ztm"
+# Default SVN path
+DEFAULT_SVN_PATH="http://ioq3ztm.googlecode.com/svn/trunk/"
+# Magic tokens
+DEFAULT_MAINREVISION="IOQ3ZTM_REVISION"
+# For consistency...
+DEFAULT_MAINSVN="IOQ3ZTM_SVN"
 
 
 
