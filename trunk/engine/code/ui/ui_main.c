@@ -2953,11 +2953,7 @@ static void UI_LoadMovies( void ) {
 	char	*moviename;
 	int		i, len;
 
-#ifdef IOQ3ZTM_NO_COMPAT // VIDEOLIST
 	uiInfo.movieCount = trap_FS_GetFileList( "video", "$videos", movielist, 4096 );
-#else
-	uiInfo.movieCount = trap_FS_GetFileList( "video", "roq", movielist, 4096 );
-#endif
 
 	if (uiInfo.movieCount) {
 		if (uiInfo.movieCount > MAX_MOVIES) {
@@ -2966,13 +2962,7 @@ static void UI_LoadMovies( void ) {
 		moviename = movielist;
 		for ( i = 0; i < uiInfo.movieCount; i++ ) {
 			len = strlen( moviename );
-#ifdef IOQ3ZTM_NO_COMPAT // VIDEOLIST
 			COM_StripExtension( moviename, moviename, len );
-#else
-			if (!Q_stricmp(moviename +  len - 4,".roq")) {
-				moviename[len-4] = '\0';
-			}
-#endif
 #ifndef IOQ3ZTM // SUPPORT_LINUX_NO_PAK
 			Q_strupr(moviename);
 #endif
@@ -5139,11 +5129,7 @@ static void UI_BuildQ3Model_List( void )
 			continue;
 			
 		// iterate all skin files in directory
-#ifdef IOQ3ZTM // SUPPORT_ALL_FORMAT_SKIN_ICONS
 		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "$images", filelist, 2048 );
-#else
-		numfiles = trap_FS_GetFileList( va("models/players/%s",dirptr), "tga", filelist, 2048 );
-#endif
 		fileptr  = filelist;
 		for (j=0; j<numfiles && uiInfo.q3HeadCount < MAX_PLAYERMODELS;j++,fileptr+=filelen+1)
 		{
