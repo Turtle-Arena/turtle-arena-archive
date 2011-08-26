@@ -87,11 +87,10 @@ equ trap_FS_Seek							-84
 
 ;; IOQ3ZTM // BONES
 equ trap_R_AddRefEntityToScene_CustomSkeleton -85
-equ trap_R_NumberOfJoints					-86
-equ trap_R_JointIndexForName				-87
-equ trap_R_SetupSkeleton					-88
-equ trap_R_SetupPlayerSkeleton				-89
-equ trap_R_MakeSkeletonAbsolute				-90
+equ trap_R_JointIndexForName				-86
+equ trap_R_SetupSkeleton					-87
+equ trap_R_SetupPlayerSkeleton				-88
+equ trap_R_MakeSkeletonAbsolute				-89
 
 equ	memset						-101
 equ	memcpy						-102

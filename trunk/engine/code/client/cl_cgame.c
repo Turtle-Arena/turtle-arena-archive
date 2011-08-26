@@ -696,8 +696,6 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		return Key_GetKey( VMA(1) );
 
 #ifdef IOQ3ZTM // BONES
-  case CG_R_NUMBEROFJOINTS:
-		return re.NumberOfJoints(args[1]);
   case CG_R_JOINTINDEXFORNAME:
 		return re.JointIndexForName(args[1], VMA(2));
   case CG_R_SETUPSKELETON:

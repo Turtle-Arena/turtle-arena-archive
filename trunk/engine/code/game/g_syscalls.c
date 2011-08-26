@@ -241,11 +241,6 @@ int		trap_R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int e
 }
 
 #ifdef IOQ3ZTM // BONES
-int trap_R_NumberOfJoints(qhandle_t handle)
-{
-	return syscall( G_NUMBEROFJOINTS, handle );
-}
-
 int trap_R_JointIndexForName(qhandle_t handle, const char *jointName)
 {
 	return syscall( G_JOINTINDEXFORNAME, handle, jointName );

@@ -1379,50 +1379,6 @@ void R_Modellist_f( void ) {
 
 /*
 ================
-RE_NumberOfJoints
-================
-*/
-int RE_NumberOfJoints(qhandle_t handle)
-{
-	model_t		*model;
-	int numJoints;
-
-	model = R_GetModelByHandle( handle );
-
-	switch (model->type)
-	{
-		case MOD_IQM:
-			{
-				iqmData_t *iqmData;
-
-				iqmData = model->modelData;
-
-				numJoints = iqmData->num_joints;
-				break;
-			}
-
-#ifdef RAVENMD4
-		case MOD_MDR:
-			{
-				mdrHeader_t		*mod;
-
-				mod = model->modelData;
-
-				numJoints = mod->numBones;
-				break;
-			}
-#endif
-
-		default:
-			numJoints = 0;
-			break;
-	}
-
-	return numJoints;
-}
-
-/*
-================
 RE_JointIndexForName
 
 Returns -1 if joint was not found.

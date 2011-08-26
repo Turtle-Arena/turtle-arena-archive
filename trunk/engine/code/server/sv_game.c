@@ -293,7 +293,6 @@ qhandle_t	RE_RegisterModel( const char *name );
 int			R_LerpTag( orientation_t *tag, qhandle_t handle, int startFrame, int endFrame,
 					 float frac, const char *tagName );
 #ifdef IOQ3ZTM // BONES
-int RE_NumberOfJoints(qhandle_t handle);
 int RE_JointIndexForName(qhandle_t handle, const char *jointName);
 qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, int oldframe, float backlerp);
 qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int legsFrame, int legsOldFrame, float legsBacklerp,
@@ -456,8 +455,6 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return R_LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
 
 #ifdef IOQ3ZTM // BONES
-	case G_NUMBEROFJOINTS:
-		return RE_NumberOfJoints(args[1]);
 	case G_JOINTINDEXFORNAME:
 		return RE_JointIndexForName(args[1], VMA(2));
 	case G_SETUPSKELETON:
