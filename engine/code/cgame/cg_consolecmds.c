@@ -961,7 +961,4 @@ void CG_InitConsoleCommands( void ) {
 #endif
 	trap_AddCommand ("teamtask");
 #endif
-#ifndef IOQ3ZTM_NO_COMPAT // SPELLING
-	trap_AddCommand ("loaddefered");	// spelled wrong, but not changing for demo
-#endif
 }
