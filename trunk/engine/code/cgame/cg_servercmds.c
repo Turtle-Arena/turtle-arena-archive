@@ -1384,12 +1384,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	// loaddeferred can be both a servercmd and a consolecmd
-#ifdef IOQ3ZTM_NO_COMPAT // SPELLING
-	if ( !strcmp( cmd, "loaddeferred" ) )
-#else
-	if ( !strcmp( cmd, "loaddefered" ) ) 	// FIXME: spelled wrong, but not changing for demo
-#endif
-	{
+	if ( !strcmp( cmd, "loaddeferred" ) ) {
 #ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			return;
