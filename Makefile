@@ -34,6 +34,20 @@ MINGWMAKE=exec engine/cross-make-mingw.sh
 endif
 endif
 
+ifndef MINGW64MAKE
+MINGW64MAKE=exec engine/cross-make-mingw64.sh
+endif
+
+ifndef WIN64
+WIN64=0
+ifeq ($(ARCH),x86_64)
+WIN64=1
+endif
+ifeq ($(ARCH),x64)
+WIN64=1
+endif
+endif
+
 # Directory to put the files for release
 ifndef INSTALLDIR
 INSTALLDIR=install
@@ -162,10 +176,11 @@ help:
 	@echo "          plus data 'base' directory."
 	@echo "  Run 'make zip' to create portable install for zip archive distrobution."
 	@echo "  Run 'make nsis' to create win32 NSIS installer."
+	@echo "  Run 'make nsis64' to create win64 NSIS installer."
 	@echo "  Run 'make loki' to create linux loki-setup installer."
 	@echo "  Run 'make deb' to create debian packages."
 
-packages: dist zip nsis loki deb
+packages: dist zip nsis nsis64 loki deb
 
 clean: dist-clean zip-clean nsis-clean loki-clean deb-clean
 
@@ -235,7 +250,7 @@ $(DATADIR)/base/assets2-music.pk3:
 
 
 #
-# Create portable zip for win32 and linux32/64
+# Create portable zip for win32/64 and linux32/64
 #
 zip: assets
 	$(Q)mkdir -p $(INSTALLDIR)/$(NAME)/base/
@@ -250,7 +265,9 @@ zip: assets
 	$(Q)echo "yes" > $(INSTALLDIR)/$(NAME)/settings/portable
 	$(MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
 	$(MAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(NAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
-	$(Q)cp engine/misc/nsis/*.dll $(INSTALLDIR)/$(NAME)/
+	@if [ -f engine/misc/nsis/OpenAL32.dll ]; then \
+		cp engine/misc/nsis/*.dll $(INSTALLDIR)/$(NAME)/; \
+	fi
 ifneq ($(PLATFORM),mingw32)
 ifeq ($(ARCH),x86_64)
 	$(MAKE) -C engine ARCH=i386 BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
@@ -258,6 +275,10 @@ ifeq ($(ARCH),x86_64)
 endif
 	$(MINGWMAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
 	$(MINGWMAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(NAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
+ifeq ($(WIN64),1)
+	$(MINGW64MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
+	$(MINGW64MAKE) -C engine copyfiles COPYDIR="$(CURDIR)/$(INSTALLDIR)/$(NAME)" BUILD_GAME_SO=0 --jobs=$(JOBS)
+endif
 	$(Q)cp extras/turtlearena.sh $(INSTALLDIR)/$(NAME)/
 endif
 
@@ -276,6 +297,27 @@ nsis: assets
 nsis-clean: assets-clean
 	$(Q)rm -fr "$(CURDIR)/$(INSTALLDIR)/nsis"
 	$(MINGWMAKE) -C engine/misc/nsis clean --jobs=$(JOBS)
+
+#
+# Create win64 NSIS installer
+#
+nsis64: assets
+ifeq ($(WIN64),1)
+	$(MINGW64MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
+	$(MINGW64MAKE) -C engine/misc/nsis ASSETPATH="$(CURDIR)/$(DATADIR)/base/" --jobs=$(JOBS)
+	$(MINGW64MAKE) -C engine/misc/nsis install INSTALLDIR="$(CURDIR)/$(INSTALLDIR)/nsis" --jobs=$(JOBS)
+else
+	@echo "Win64 NSIS creation is not supported on this platform."
+endif
+
+nsis64-clean: assets-clean
+ifeq ($(WIN64),1)
+	$(Q)rm -fr "$(CURDIR)/$(INSTALLDIR)/nsis"
+	$(MINGW64MAKE) -C engine/misc/nsis clean --jobs=$(JOBS)
+else
+	@echo "Win64 NSIS cleaning is not supported on this platform."
+endif
+
 
 #
 # Create linux32/64 installer
