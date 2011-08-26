@@ -743,9 +743,7 @@ int		COM_GetCurrentParseLine( void );
 char	*COM_Parse( char **data_p );
 #endif
 char	*COM_ParseExt( char **data_p, qboolean allowLineBreaks );
-#ifdef IOQ3ZTM // PARSE_SKINS
 char	*COM_ParseExt2( char **data_p, qboolean allowLineBreaks, char delimiter );
-#endif
 int		COM_Compress( char *data_p );
 void	COM_ParseError( char *format, ... ) __attribute__ ((format (printf, 1, 2)));
 void	COM_ParseWarning( char *format, ... ) __attribute__ ((format (printf, 1, 2)));

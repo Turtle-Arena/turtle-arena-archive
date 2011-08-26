@@ -2047,116 +2047,6 @@ SKINS
 ============================================================================
 */
 
-#ifndef IOQ3ZTM // PARSE_SKINS
-/*
-==================
-CommaParse
-
-This is unfortunate, but the skin files aren't
-compatable with our normal parsing rules.
-==================
-*/
-static char *CommaParse( char **data_p ) {
-	int c = 0, len;
-	char *data;
-	static	char	com_token[MAX_TOKEN_CHARS];
-
-	data = *data_p;
-	len = 0;
-	com_token[0] = 0;
-
-	// make sure incoming data is valid
-	if ( !data ) {
-		*data_p = NULL;
-		return com_token;
-	}
-
-	while ( 1 ) {
-		// skip whitespace
-		while( (c = *data) <= ' ') {
-			if( !c ) {
-				break;
-			}
-			data++;
-		}
-
-
-		c = *data;
-
-		// skip double slash comments
-		if ( c == '/' && data[1] == '/' )
-		{
-			while (*data && *data != '\n')
-				data++;
-		}
-		// skip /* */ comments
-		else if ( c=='/' && data[1] == '*' ) 
-		{
-			while ( *data && ( *data != '*' || data[1] != '/' ) ) 
-			{
-				data++;
-			}
-			if ( *data ) 
-			{
-				data += 2;
-			}
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	if ( c == 0 ) {
-		return "";
-	}
-
-	// handle quoted strings
-	if (c == '\"')
-	{
-		data++;
-		while (1)
-		{
-			c = *data++;
-			if (c=='\"' || !c)
-			{
-				com_token[len] = 0;
-				*data_p = ( char * ) data;
-				return com_token;
-			}
-			if (len < MAX_TOKEN_CHARS)
-			{
-				com_token[len] = c;
-				len++;
-			}
-		}
-	}
-
-	// parse a regular word
-	do
-	{
-		if (len < MAX_TOKEN_CHARS)
-		{
-			com_token[len] = c;
-			len++;
-		}
-		data++;
-		c = *data;
-	} while (c>32 && c != ',' );
-
-	if (len == MAX_TOKEN_CHARS)
-	{
-//		ri.Printf (PRINT_DEVELOPER, "Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS);
-		len = 0;
-	}
-	com_token[len] = 0;
-
-	*data_p = ( char * ) data;
-	return com_token;
-}
-#endif
-
-
 /*
 ===============
 RE_RegisterSkin
@@ -2174,9 +2064,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	char		*text_p;
 	char		*token;
 	char		surfName[MAX_QPATH];
-#ifdef IOQ3ZTM // PARSE_SKINS
 	char		shaderName[MAX_QPATH];
-#endif
 #ifdef IOQ3ZTM // $DIR_IN_SKIN
 	char		path[MAX_QPATH];
 	int			i;
@@ -2256,11 +2144,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	text_p = text.c;
 	while ( text_p && *text_p ) {
 		// get surface name
-#ifdef IOQ3ZTM // PARSE_SKINS
 		token = COM_ParseExt2( &text_p, qtrue, ',' );
-#else
-		token = CommaParse( &text_p );
-#endif
 		Q_strncpyz( surfName, token, sizeof( surfName ) );
 
 		if ( !token[0] ) {
@@ -2279,12 +2163,8 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		
 #ifndef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
 		// parse the shader name
-#ifdef IOQ3ZTM // PARSE_SKINS
 		token = COM_ParseExt2( &text_p, qfalse, ',' );
 		Q_strncpyz( shaderName, token, sizeof( shaderName ) );
-#else
-		token = CommaParse( &text_p );
-#endif
 #endif
 
 		surf = skin->surfaces[ skin->numSurfaces ] = ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low );
@@ -2331,12 +2211,9 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 
 			surf->shader = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
 		}
-		else {
-			// IOQ3ZTM // PARSE_SKIN // Use shaderName instead of token
-			surf->shader = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
-		}
+		else
 #else
-		surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+		surf->shader = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
 #endif
 #endif
 		skin->numSurfaces++;
