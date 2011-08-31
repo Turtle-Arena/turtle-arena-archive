@@ -252,7 +252,7 @@ void RE_AddRefEntityToScene( const refEntity_t *ent )
 	// Custom skeleton
 	if (customSkeleton && r_numskeletons < MAX_CUSTOM_SKELETONS) {
 		backEndData[tr.smpFrame]->entities[r_numentities].customSkeleton = r_numskeletons;
-		 R_MakeSkeletonAbsolute(customSkeleton, &backEndData[tr.smpFrame]->skeletons[r_numskeletons]);
+		R_MakeSkeletonAbsolute(customSkeleton, &backEndData[tr.smpFrame]->skeletons[r_numskeletons]);
 		r_numskeletons++;
 	} else {
 		backEndData[tr.smpFrame]->entities[r_numentities].customSkeleton = -1;
