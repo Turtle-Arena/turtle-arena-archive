@@ -388,12 +388,7 @@ static void SV_Kick_f( void ) {
 				if ( !cl->state ) {
 					continue;
 				}
-				if( cl->netchan.remoteAddress.type == NA_LOOPBACK
-#ifdef TA_SPLITVIEW // Allow kicking extra local clients
-					&& cl->owner == -1
-#endif
-					)
-				{
+				if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 					continue;
 				}
 				SV_DropClient( cl, "was kicked" );
@@ -414,12 +409,7 @@ static void SV_Kick_f( void ) {
 		}
 		return;
 	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK
-#ifdef TA_SPLITVIEW // Allow kicking extra local clients
-		&& cl->owner == -1
-#endif
-		)
-	{
+	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
@@ -945,12 +935,7 @@ static void SV_KickNum_f( void ) {
 	if ( !cl ) {
 		return;
 	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK
-#ifdef TA_SPLITVIEW // Allow kicking extra local clients
-		&& cl->owner == -1
-#endif
-		)
-	{
+	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
