@@ -25,7 +25,7 @@ The Turtle Arena data is a mix of GPL2+ and CC-BY-SA-3.0.
 	(See COPYRIGHTS.txt for data copyrights and licenses.)
 
 == Credits ==
-id software, ioquake3 developers, Thilo Schulz, OpenArena, Xreal project, Smokin' Guns, Mercenaries Guild Client for Tremulous, ZEQ2-lite, GNU FreeFonts, DejaVu fonts, zero-project, Zack "ZTurtleMan" Middleton
+id software, ioquake3 developers, Thilo Schulz, OpenArena, Xreal project, Smokin' Guns, Mercenaries Guild Client for Tremulous, ZEQ2-lite, GNU FreeFonts, zero-project, Zack "ZTurtleMan" Middleton
 
 See CREDITS.txt for details.
 
