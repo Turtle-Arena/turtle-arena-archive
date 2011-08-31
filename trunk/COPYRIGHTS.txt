@@ -15,23 +15,6 @@ All data in the base and base-src directories, unless otherwise noted, are
 The data files in the base directory that have other source files are included
 	in the base-src directory.
 
-The following use DejaVu fonts, for font license see
-	http://dejavu-fonts.org/wiki/License
-
-Images that use DejaVu Sans Bold Oblique:
-base/icons/iconf_blu2.png
-base/icons/iconf_blu3.png
-base/icons/iconf_neutral3.png
-base/icons/iconf_red2.png
-base/icons/iconf_red3.png
-base-src/icons/iconf.svg
-
-Images that use DejaVu Serif:
-base/icons/defense.png
-base/menu/medals/medal_defend.png
-base-src/icons/defense.svg
-base-src/menu/medals/medal_defend.svg
-
 The following use GNU FreeFont, for font license see
 	http://www.gnu.org/software/freefont/license.html
 

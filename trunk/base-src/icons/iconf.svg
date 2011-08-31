@@ -7,15 +7,16 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    width="128"
    height="128"
    id="svg3896"
-   style="enable-background:new"
+   style="display:inline;enable-background:new"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="iconf_2.svg">
+   sodipodi:docname="iconf.svg">
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -30,12 +31,12 @@
      id="namedview4015"
      showgrid="false"
      inkscape:zoom="2.1171875"
-     inkscape:cx="50.392221"
-     inkscape:cy="62.390929"
+     inkscape:cx="45.334233"
+     inkscape:cy="83.888192"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer0" />
+     inkscape:current-layer="layer4" />
   <defs
      id="defs3898">
     <filter
@@ -129,32 +130,31 @@
   </g>
   <g
      inkscape:groupmode="layer"
-     id="layer3"
+     id="g3822"
      inkscape:label="?"
      style="display:inline">
-    <text
-       x="36.843811"
-       y="71.077904"
-       id="text3091"
-       xml:space="preserve"
-       style="font-size:48px;font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold Oblique"><tspan
-         x="36.843811"
-         y="71.077904"
-         id="tspan3093">?</tspan></text>
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:none"
+       d="m 48.436728,70.415687 -0.01159,-6.098522 6.343663,-0.02433 -0.02007,6.096563 -6.312008,0.02625 z"
+       id="path3864"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:6.30000019;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 44.640539,41.233292 c 0.658945,-1.397541 1.799449,-2.432679 3.044983,-3.117908 1.380284,-0.759361 2.887656,-1.23925 4.351059,-1.348344 1.580063,-0.11779 3.19012,0.111219 4.646751,0.844363 1.688459,0.849826 3.01421,2.679059 3.119803,4.457208 0.06957,1.17151 0.190417,4.175564 0.135139,5.430218 -0.196324,4.456028 -2.955193,5.20458 -7.572913,6.075817 -1.05115,0.198323 -0.798825,1.155323 -0.798825,2.159563 0,1.896677 0,3.793354 0,5.690031"
+       id="path3893"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cssssssss" />
   </g>
   <g
-     inkscape:groupmode="layer"
-     id="layer2"
+     style="display:none"
      inkscape:label="X"
-     style="display:none">
-    <text
-       x="33.4995"
-       y="71"
-       id="text2986"
-       xml:space="preserve"
-       style="font-size:48px;font-style:oblique;font-variant:normal;font-weight:bold;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:DejaVu Sans;-inkscape-font-specification:DejaVu Sans Bold Oblique"><tspan
-         x="33.4995"
-         y="71"
-         id="tspan2988">X</tspan></text>
+     id="g3037"
+     inkscape:groupmode="layer">
+    <path
+       inkscape:connector-curvature="0"
+       id="path3043"
+       d="M 63.000178,32.93428 52.112167,47.290022 41.343112,33.092988 35.570227,35.810239 48.130625,52.532153 35.40229,69.31178 41.846928,71.490389 52.112167,57.827185 62.489365,71.644287 68.934003,69.470486 56.08671,52.532153 68.766065,35.656342 63.000178,32.93428 z"
+       style="fill:#000000;fill-opacity:1;stroke:none" />
   </g>
 </svg>

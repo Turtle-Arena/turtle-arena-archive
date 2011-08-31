@@ -10,7 +10,6 @@ Turtle Arena credits.
 * Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)
 * ZEQ2-lite				(For cel shading tcGen code)
 * GNU FreeFonts			(For FreeSans, FreeSansBold, and FreeMono fonts)
-* DejaVu fonts			(For DejaVu Serif and DejaVu Sans Bold Oblique fonts)
 * zero-project			(For music)
 * Zack "ZTurtleMan" Middleton
 

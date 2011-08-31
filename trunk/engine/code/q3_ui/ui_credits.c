@@ -51,11 +51,7 @@ creditSection_t credits[] = {
 	{"Turtle Arena", { NULL } },
 	{"Designed by", { "Zack Middleton", NULL } },
 	{"Art by", { "Zack Middleton", NULL } },
-	{"Fonts from", {
-		"GNU FreeFonts",
-		"DejaVu fonts",
-		NULL
-	} },
+	{"Fonts from", { "GNU FreeFonts", NULL } },
 	{"Sound Effects by", { "Zack Middleton", NULL } },
 	{"Music by", { "zero-project - zero-project.gr", NULL } },
 	{"Programming by", {
