@@ -1536,6 +1536,8 @@ RE_SetupSkeleton
 Creates relative joint skeleton using specified animation informaiton.
 Returns qfalse if didn't setup refSkel.
 
+If refSkel is NULL returns qtrue if handle is valid model for skeleton animation.
+
 Note: If only need to find the orientation of a single joint use R_LerpTag instead.
 ================
 */
@@ -1551,6 +1553,11 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 		case MOD_IQM:
 		{
 			iqmData_t *iqmData;
+
+			// Model is valid for skeleton animation, return qtrue.
+			if (!refSkel) {
+				return qtrue;
+			}
 
 			iqmData = model->modelData;
 
@@ -1589,7 +1596,10 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 #endif
 
 		default:
-			Com_Memset(refSkel, 0, sizeof (refSkeleton_t));
+			if (refSkel) {
+				Com_Memset(refSkel, 0, sizeof (refSkeleton_t));
+			}
+			Com_Printf( S_COLOR_YELLOW "WARNING: Failed to setup model skeleton: %s\n", model->name );
 			return qfalse;
 	}
 
@@ -1602,6 +1612,8 @@ RE_SetupPlayerSkeleton
 
 Creates relative joint skeleton using specified animation informaiton.
 Returns qfalse if didn't setup refSkel.
+
+If refSkel is NULL returns qtrue if handle is valid model for player skeleton animation.
 ================
 */
 qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int legsFrame, int legsOldFrame, float legsBacklerp,
@@ -1622,6 +1634,11 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 		{
 			iqmData_t *iqmData;
 			const char *str;
+
+			// Model is valid for player skeleton animation, return qtrue.
+			if (!refSkel) {
+				return qtrue;
+			}
 
 			iqmData = model->modelData;
 
@@ -1657,7 +1674,10 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 		}
 
 		default:
-			Com_Memset(refSkel, 0, sizeof (refSkeleton_t));
+			if (refSkel) {
+				Com_Memset(refSkel, 0, sizeof (refSkeleton_t));
+			}
+			Com_Printf( S_COLOR_YELLOW "WARNING: Failed to setup player model skeleton: %s\n", model->name );
 			return qfalse;
 	}
 
