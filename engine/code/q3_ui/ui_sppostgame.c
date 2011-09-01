@@ -78,8 +78,8 @@ typedef struct {
 
 	int				level;
 	int				numClients;
-	int				won;
 #ifndef TA_SP
+	int				won;
 	int				numAwards;
 	int				awardsEarned[MAX_UI_AWARDS];
 	int				awardsLevels[MAX_UI_AWARDS];
@@ -620,9 +620,9 @@ void UI_SPPostgameMenu_f( void ) {
 		}
 	}
 
+#ifndef TA_SP
 	UI_SetBestScore( postgameMenuInfo.level, playerGameRank );
 
-#ifndef TA_SP
 	// process award stats and prepare presentation data
 	awardValues[AWARD_ACCURACY] = atoi( UI_Argv( 3 ) );
 #ifdef TURTLEARENA // AWARDS
@@ -683,7 +683,6 @@ void UI_SPPostgameMenu_f( void ) {
 		postgameMenuInfo.awardsLevels[postgameMenuInfo.numAwards] = 1;
 		postgameMenuInfo.numAwards++;
 	}
-#endif
 
 	if ( playerGameRank == 1 ) {
 		postgameMenuInfo.won = UI_TierCompleted( postgameMenuInfo.level );
@@ -691,6 +690,7 @@ void UI_SPPostgameMenu_f( void ) {
 	else {
 		postgameMenuInfo.won = -1;
 	}
+#endif
 
 	postgameMenuInfo.starttime = uis.realtime;
 	postgameMenuInfo.scoreboardtime = uis.realtime;

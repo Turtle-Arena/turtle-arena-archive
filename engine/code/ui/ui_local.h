@@ -1126,6 +1126,7 @@ int UI_GetNumBots( void );
 void UI_LoadBots( void );
 char *UI_GetBotNameByNumber( int num );
 
+#ifndef TA_SP
 void UI_GetBestScore( int level, int *score, int *skill );
 void UI_SetBestScore( int level, int score );
 int UI_TierCompleted( int levelWon );
@@ -1135,9 +1136,12 @@ int  UI_GetCurrentGame( void );
 void UI_NewGame( void );
 void UI_LogAwardData( int award, int data );
 int UI_GetAwardLevel( int award );
+#endif
 
 void UI_SPUnlock_f( void );
+#ifndef TA_SP
 void UI_SPUnlockMedals_f( void );
+#endif
 
 void UI_InitGameinfo( void );
 
