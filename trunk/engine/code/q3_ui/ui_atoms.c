@@ -1574,10 +1574,12 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		return qtrue;
 	}
 
+#ifndef TA_SP
 	if ( Q_stricmp (cmd, "iamamonkey") == 0 ) {
 		UI_SPUnlockMedals_f();
 		return qtrue;
 	}
+#endif
 
 	return qfalse;
 }

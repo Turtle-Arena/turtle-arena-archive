@@ -36,11 +36,13 @@ SINGLE PLAYER LEVEL SELECT MENU
 #define ART_ARROW					"menu/art/narrow_0"
 #define ART_ARROW_FOCUS				"menu/art/narrow_1"
 #define ART_MAP_UNKNOWN				"menu/art/unknownmap"
+#ifndef TA_SP
 #define ART_MAP_COMPLETE1			"menu/art/level_complete1"
 #define ART_MAP_COMPLETE2			"menu/art/level_complete2"
 #define ART_MAP_COMPLETE3			"menu/art/level_complete3"
 #define ART_MAP_COMPLETE4			"menu/art/level_complete4"
 #define ART_MAP_COMPLETE5			"menu/art/level_complete5"
+#endif
 #define ART_BACK0					"menu/art/back_0"
 #define ART_BACK1					"menu/art/back_1"	
 #ifdef TA_MISC // NO_MENU_FIGHT
@@ -108,11 +110,15 @@ typedef struct {
 	int				numMaps;
 	char			levelPicNames[ARENAS_PER_TIER][MAX_QPATH];
 	char			levelNames[ARENAS_PER_TIER][16];
+#ifndef TA_SP
 	int				levelScores[ARENAS_PER_TIER];
 	int				levelScoresSkill[ARENAS_PER_TIER];
+#endif
 	qhandle_t		levelSelectedPic;
 	qhandle_t		levelFocusPic;
+#ifndef TA_SP
 	qhandle_t		levelCompletePic[5];
+#endif
 
 	char			playerModel[MAX_QPATH];
 	char			playerPicName[MAX_QPATH];
@@ -302,10 +308,12 @@ static void UI_SPLevelMenu_SetMenuArena( int n, int level, const char *arenaInfo
 	Q_strupr( levelMenuInfo.levelNames[n] );
 #endif
 
+#ifndef TA_SP
 	UI_GetBestScore( level, &levelMenuInfo.levelScores[n], &levelMenuInfo.levelScoresSkill[n] );
 	if( levelMenuInfo.levelScores[n] > 8 ) {
 		levelMenuInfo.levelScores[n] = 8;
 	}
+#endif
 
 #ifdef TA_DATA // TEAMARENA_LEVELSHOTS
 	strcpy( levelMenuInfo.levelPicNames[n], va( "levelshots/%s_small", map ) );
@@ -720,9 +728,11 @@ static void UI_SPLevelMenu_MenuDraw( void ) {
 
 		UI_DrawString( x + 64, y + 96, levelMenuInfo.levelNames[n], UI_CENTER|UI_SMALLFONT, color_orange );
 
+#ifndef TA_SP
 		if( levelMenuInfo.levelScores[n] == 1 ) {
 			UI_DrawHandlePic( x, y, 128, 96, levelMenuInfo.levelCompletePic[levelMenuInfo.levelScoresSkill[n] - 1] ); 
 		}
+#endif
 
 		if ( n == selectedArena ) {
 			if( Menu_ItemAtCursor( &levelMenuInfo.menu ) == &levelMenuInfo.item_maps[n] ) {
@@ -785,11 +795,13 @@ void UI_SPLevelMenu_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_ARROW );
 	trap_R_RegisterShaderNoMip( ART_ARROW_FOCUS );
 	trap_R_RegisterShaderNoMip( ART_MAP_UNKNOWN );
+#ifndef TA_SP
 	trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE1 );
 	trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE2 );
 	trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE3 );
 	trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE4 );
 	trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE5 );
+#endif
 	trap_R_RegisterShaderNoMip( ART_BACK0 );
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
 	trap_R_RegisterShaderNoMip( ART_FIGHT0 );
@@ -808,11 +820,13 @@ void UI_SPLevelMenu_Cache( void ) {
 
 	levelMenuInfo.levelSelectedPic = trap_R_RegisterShaderNoMip( ART_LEVELFRAME_SELECTED );
 	levelMenuInfo.levelFocusPic = trap_R_RegisterShaderNoMip( ART_LEVELFRAME_FOCUS );
+#ifndef TA_SP
 	levelMenuInfo.levelCompletePic[0] = trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE1 );
 	levelMenuInfo.levelCompletePic[1] = trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE2 );
 	levelMenuInfo.levelCompletePic[2] = trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE3 );
 	levelMenuInfo.levelCompletePic[3] = trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE4 );
 	levelMenuInfo.levelCompletePic[4] = trap_R_RegisterShaderNoMip( ART_MAP_COMPLETE5 );
+#endif
 }
 
 
@@ -1101,6 +1115,12 @@ void UI_SPLevelMenu( void ) {
 		}
 	}
 
+#ifdef TA_SP
+	if (trainingLevel >= 0)
+		level = trainingLevel;
+	else
+		level = 0;
+#else
 	level = UI_GetCurrentGame();
 	if ( level == -1 ) {
 		level = UI_GetNumSPArenas() - 1;
@@ -1108,6 +1128,7 @@ void UI_SPLevelMenu( void ) {
 			level++;
 		}
 	}
+#endif
 
 	if( level == trainingLevel ) {
 		currentSet = -1;
