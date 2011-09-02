@@ -368,7 +368,7 @@ static void UI_SPMenu_Event( void *ptr, int event ) {
 	{
 		default:
 		case ID_SP_NEWGAME:
-			UI_SPSkillMenu(UI_GetArenaInfoByNumber(0));
+			UI_SPPlayerMenu(UI_GetArenaInfoByNumber(0));
 			break;
 
 		case ID_SP_LOADGAME:

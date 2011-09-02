@@ -755,12 +755,6 @@ void UI_SPMenu_Cache( void );
 void UI_SPPostgameMenu_Cache( void );
 void UI_SPPostgameMenu_f( void );
 
-//
-// ui_spSkill.c
-//
-void UI_SPSkillMenu( const char *arenaInfo );
-void UI_SPSkillMenu_Cache( void );
-
 #ifdef TA_SP
 //
 // ui_spPlayer.c
@@ -769,6 +763,12 @@ void UI_SPSkillMenu_Cache( void );
 extern const char *spPlayerNames[NUM_SPPLAYERS];
 void UI_SPPlayerMenu( const char *arenaInfo );
 void UI_SPPlayerMenu_Cache( void );
+#else
+//
+// ui_spSkill.c
+//
+void UI_SPSkillMenu( const char *arenaInfo );
+void UI_SPSkillMenu_Cache( void );
 #endif
 
 //
