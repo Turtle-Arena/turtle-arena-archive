@@ -309,7 +309,7 @@ void CG_DrawInformation( void ) {
 		break;
 	case GT_SINGLE_PLAYER:
 #ifdef TA_SP
-		if (cg_singlePlayerActive.integer)
+		if (!cg_singlePlayerActive.integer)
 			s = "Cooperative";
 		else
 #endif
