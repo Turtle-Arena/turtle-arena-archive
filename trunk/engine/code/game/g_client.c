@@ -236,7 +236,7 @@ gentity_t *SelectRandomFurthestSpawnPoint ( vec3_t avoidPoint, vec3_t origin, ve
 #ifdef TA_PLAYERSYS
 	vec3_t avoidPoint;
 
-	if (ent->client) {
+	if (ent && ent->client) {
 		VectorCopy(ent->client->ps.origin, avoidPoint);
 	} else {
 		VectorCopy(vec3_origin, avoidPoint);
