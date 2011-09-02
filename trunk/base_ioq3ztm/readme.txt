@@ -14,6 +14,16 @@ All data in the this directory (base_ioq3ztm), unless otherwise noted, are
 There are some source files are mixed in with the data. Some of the files were
 	created from source files in the ../base-src directory.
 
+The following use GNU FreeFont, for font license see
+	http://www.gnu.org/software/freefont/license.html
+
+Images that use GNU FreeFont FreeMono:
+base/menu/art/level_complete1.png
+base/menu/art/level_complete2.png
+base/menu/art/level_complete3.png
+base/menu/art/level_complete4.png
+base/menu/art/level_complete5.png
+
 == OpenArena ==
 The following are from OpenArena,
 	and are licensed under the GNU General Public License; either version 2 of
