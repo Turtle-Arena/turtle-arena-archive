@@ -1492,7 +1492,9 @@ void UI_Cache_f( void ) {
 	LoadGame_Cache();
 #endif
 	UI_SPLevelMenu_Cache();
+#ifndef TA_SP
 	UI_SPSkillMenu_Cache();
+#endif
 	UI_SPPostgameMenu_Cache();
 	TeamMain_Cache();
 	UI_AddBots_Cache();

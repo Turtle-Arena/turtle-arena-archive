@@ -583,7 +583,11 @@ static void UI_SPLevelMenu_NextEvent( void* ptr, int notification ) {
 		selectedArena = 0;
 	}
 
+#ifdef TA_SP
+	UI_SPPlayerMenu( levelMenuInfo.selectedArenaInfo );
+#else
 	UI_SPSkillMenu( levelMenuInfo.selectedArenaInfo );
+#endif
 }
 
 

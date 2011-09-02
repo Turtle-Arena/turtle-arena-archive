@@ -81,7 +81,7 @@ static playerMenuInfo_t	playerMenuInfo;
 
 /*
 =================
-UI_SPSkillMenu_SkillEvent
+UI_SPPlayerMenu_PlayerEvent
 =================
 */
 static void UI_SPPlayerMenu_PlayerEvent( void *ptr, int notification ) {
@@ -188,7 +188,7 @@ void UI_SPPlayerMenu_Cache( void ) {
 
 /*
 =================
-UI_SPSkillMenu_Init
+UI_SPPlayerMenu_Init
 =================
 */
 static void UI_SPPlayerMenu_Init( void ) {

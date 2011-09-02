@@ -30,6 +30,7 @@ SINGLE PLAYER SKILL MENU
 
 #include "ui_local.h"
 
+#ifndef TA_SP
 
 #define ART_FRAME					"menu/art/cut_frame"
 #define ART_BACK					"menu/art/back_0.tga"
@@ -390,3 +391,4 @@ void UI_SPSkillMenu( const char *arenaInfo ) {
 	UI_PushMenu( &skillMenuInfo.menu );
 	Menu_SetCursorToItem( &skillMenuInfo.menu, &skillMenuInfo.item_fight );
 }
+#endif
