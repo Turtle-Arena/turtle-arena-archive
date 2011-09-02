@@ -19,18 +19,11 @@ The following use GNU FreeFont, for font license see
 	http://www.gnu.org/software/freefont/license.html
 
 Images that use GNU FreeFont FreeMono:
-base/menu/art/level_complete1.png
-base/menu/art/level_complete2.png
-base/menu/art/level_complete3.png
-base/menu/art/level_complete4.png
-base/menu/art/level_complete5.png
 base/menu/art/skill1.png
 base/menu/art/skill2.png
 base/menu/art/skill3.png
 base/menu/art/skill4.png
 base/menu/art/skill5.png
-base/menu/art/randombot_icon.png
-base/menu/art/unknownmap.png
 
 Images that use GNU FreeFont FreeSans:
 base/textures/common/alpha000.png
