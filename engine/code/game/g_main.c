@@ -123,9 +123,6 @@ vmCvar_t	g_laserTag;
 #ifdef TA_PATHSYS // 2DMODE
 vmCvar_t	g_2dmode;
 #endif
-#ifdef IOQ3ZTM // SV_PUBLIC
-vmCvar_t	g_public;
-#endif
 
 static cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -254,9 +251,6 @@ static cvarTable_t		gameCvarTable[] = {
 #endif
 #ifdef TA_PATHSYS // 2DMODE
 	{ &g_2dmode, "g_2dmode", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
-#endif
-#ifdef IOQ3ZTM // SV_PUBLIC
-	{ &g_public, "sv_public", "0", 0, 0, 0, qfalse },
 #endif
 	{ &g_smoothClients, "g_smoothClients", "1", 0, 0, qfalse},
 	{ &pmove_fixed, "pmove_fixed", "0", CVAR_SYSTEMINFO, 0, qfalse},
@@ -1223,8 +1217,8 @@ void BeginIntermission( void ) {
 	}
 
 #ifdef TA_SP
-	// if custom game and not co-op
-	if (g_public.integer <= -3 && g_gametype.integer != GT_SINGLE_PLAYER) {
+	// Arcade mode
+	if (g_singlePlayer.integer && g_gametype.integer != GT_SINGLE_PLAYER) {
 		UpdateTournamentInfo();
 	}
 #elif defined MISSIONPACK
@@ -1453,7 +1447,8 @@ void CheckIntermissionExit( void ) {
 	int			readyMask;
 
 #ifdef TA_SP
-	if (g_public.integer <= -3 && g_gametype.integer != GT_SINGLE_PLAYER ) {
+	// Arcade mode has a menu instead
+	if (g_singlePlayer.integer && g_gametype.integer != GT_SINGLE_PLAYER ) {
 		return;
 	}
 #else

@@ -471,7 +471,7 @@ static void UI_SPMenu_Init( void ) {
 	// Extra space between, "single player" and the others
 	y += VERTICAL_SPACING;
 
-	// Moved here from SP arena select
+	// Moved here from q3 sp arena select
 	y += VERTICAL_SPACING;
 	spMenuInfo.sp_custom.generic.type				= MTYPE_PTEXT;
 	spMenuInfo.sp_custom.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -479,9 +479,14 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_custom.generic.y					= y;
 	spMenuInfo.sp_custom.generic.id					= ID_SP_CUSTOM;
 	spMenuInfo.sp_custom.generic.callback			= UI_SPMenu_Event;
-	spMenuInfo.sp_custom.string						= "Vs. Bots"; // Custom Game // Skirmish
+	spMenuInfo.sp_custom.string						= "Arcade"; // aka Vs. Bots / Custom Game / Skirmish
 	spMenuInfo.sp_custom.color						= text_big_color;
 	spMenuInfo.sp_custom.style						= UI_CENTER;
+
+	// ZTM: TOOD: Add menu for viewing arcade scores
+
+	// Extra space between, arcade and the others
+	y += VERTICAL_SPACING;
 
 	// Moved here from q3 main menu.
 	y += VERTICAL_SPACING;

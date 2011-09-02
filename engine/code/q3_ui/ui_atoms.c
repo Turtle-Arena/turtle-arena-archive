@@ -1528,7 +1528,7 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		return qtrue;
 	}
 
-	if ( Q_stricmp (cmd, "customgame") == 0 ) {
+	if ( Q_stricmp (cmd, "arcade") == 0 ) {
 		UI_StartServerMenu( qfalse );
 		return qtrue;
 	}

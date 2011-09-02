@@ -41,7 +41,11 @@ void UpdateTournamentInfo( void ) {
 	int			i;
 	gentity_t	*player;
 	int			playerClientNum;
+#ifdef TA_SP
+	int			n, msglen;
+#else
 	int			n, accuracy, perfect,	msglen;
+#endif
 #ifdef MISSIONPACK
   int score1, score2;
 	qboolean won;
@@ -70,26 +74,24 @@ void UpdateTournamentInfo( void ) {
 
 	if ( level.clients[playerClientNum].sess.sessionTeam == TEAM_SPECTATOR ) {
 #ifdef MISSIONPACK
-#ifdef TURTLEARENA // AWARDS
-		Com_sprintf( msg, sizeof(msg), "postgame %i %i 0 0 0 0 0 0 0 0", level.numNonSpectatorClients, playerClientNum );
+#ifdef TA_SP
+		Com_sprintf( msg, sizeof(msg), "postgame %i 0 0 %s %s 0 0", level.time, player->client->pers.netname, player->client->pers.playercfg.model );
 #else
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i 0 0 0 0 0 0 0 0 0 0 0", level.numNonSpectatorClients, playerClientNum );
 #endif
 #else
-#ifdef TURTLEARENA // AWARDS
-		Com_sprintf( msg, sizeof(msg), "postgame %i %i 0 0 0", level.numNonSpectatorClients, playerClientNum );
-#else
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i 0 0 0 0 0 0", level.numNonSpectatorClients, playerClientNum );
-#endif
 #endif
 	}
 	else {
+#ifndef TA_SP
 		if( player->client->accuracy_shots ) {
 			accuracy = player->client->accuracy_hits * 100 / player->client->accuracy_shots;
 		}
 		else {
 			accuracy = 0;
 		}
+#endif
 #ifdef MISSIONPACK
 		won = qfalse;
 		if (g_gametype.integer >= GT_CTF) {
@@ -110,17 +112,16 @@ void UpdateTournamentInfo( void ) {
 				score1 = level.clients[ level.sortedClients[1] ].ps.persistant[PERS_SCORE];
 			}
 		}
+#ifdef TA_SP
+		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %s %s %i %i", level.time, score1, score2, player->client->pers.netname,
+					player->client->pers.playercfg.model, player->client->ps.persistant[PERS_SCORE],
+					player->client->ps.persistant[PERS_CAPTURES]);
+#else
 		if (won && player->client->ps.persistant[PERS_KILLED] == 0) {
 			perfect = 1;
 		} else {
 			perfect = 0;
 		}
-#ifdef TURTLEARENA // AWARDS // ZTM: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
-		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
-			player->client->ps.persistant[PERS_SCORE], perfect,
-			player->client->ps.persistant[PERS_DEFEND_COUNT], player->client->ps.persistant[PERS_ASSIST_COUNT],
-			score1, score2, level.time, player->client->ps.persistant[PERS_CAPTURES] );
-#else
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
 			player->client->ps.persistant[PERS_IMPRESSIVE_COUNT], player->client->ps.persistant[PERS_EXCELLENT_COUNT],player->client->ps.persistant[PERS_DEFEND_COUNT],
 			player->client->ps.persistant[PERS_ASSIST_COUNT], player->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], player->client->ps.persistant[PERS_SCORE],
@@ -128,15 +129,10 @@ void UpdateTournamentInfo( void ) {
 #endif
 #else
 		perfect = ( level.clients[playerClientNum].ps.persistant[PERS_RANK] == 0 && player->client->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
-#ifdef TURTLEARENA // AWARDS // ZTM: Removed PERS_IMPRESSIVE_COUNT, PERS_GAUNTLET_FRAG_COUNT, and PERS_EXCELLENT_COUNT
-		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
-			player->client->ps.persistant[PERS_SCORE], perfect );
-#else
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,
 			player->client->ps.persistant[PERS_IMPRESSIVE_COUNT], player->client->ps.persistant[PERS_EXCELLENT_COUNT],
 			player->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], player->client->ps.persistant[PERS_SCORE],
 			perfect );
-#endif
 #endif
 	}
 

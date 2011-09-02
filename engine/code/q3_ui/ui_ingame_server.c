@@ -93,8 +93,8 @@ void InServer_Event( void *ptr, int notification ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_CHANGEMAP:
-#ifdef IOQ3ZTM // SV_PUBLIC
-		UI_StartServerMenu( trap_Cvar_VariableValue("sv_public") != -3 );
+#ifdef TA_SP // ARCADE
+		UI_StartServerMenu( !trap_Cvar_VariableValue("ui_singlePlayerActive") );
 #else
 		UI_StartServerMenu( trap_Cvar_VariableValue("g_gametype") != GT_SINGLE_PLAYER );
 #endif

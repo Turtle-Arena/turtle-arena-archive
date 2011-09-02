@@ -880,6 +880,9 @@ static void SpinControl_Init( menulist_s *s ) {
 	int	len;
 	int	l;
 	const char* str;
+#ifdef IOQ3ZTM
+	qboolean foundItem = qfalse;
+#endif
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
@@ -909,6 +912,14 @@ static void SpinControl_Init( menulist_s *s ) {
 		if (l > len)
 			len = l;
 
+#ifdef IOQ3ZTM
+		// Use first non-empty item.
+		if (!foundItem && strlen(s->itemnames[s->numitems]) > 0) {
+			s->curvalue = s->numitems;
+			foundItem = qtrue;
+		}
+#endif
+
 		s->numitems++;
 	}		
 
@@ -930,6 +941,9 @@ SpinControl_Key
 static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 {
 	sfxHandle_t	sound;
+#ifdef IOQ3ZTM
+	int			i;
+#endif
 
 	sound = 0;
 	switch (key)
@@ -942,9 +956,21 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 #endif
 		case K_RIGHTARROW:
 		case K_MOUSE1:
+#ifdef IOQ3ZTM
+			// Skip empty items
+			for (i = 0; i < s->numitems; i++) {
+				s->curvalue++;
+				if (s->curvalue >= s->numitems)
+					s->curvalue = 0;
+				if (strlen(s->itemnames[s->curvalue]) > 0) {
+					break;
+				}
+			}
+#else
 			s->curvalue++;
 			if (s->curvalue >= s->numitems)
 				s->curvalue = 0;
+#endif
 			sound = menu_move_sound;
 			break;
 		
@@ -958,9 +984,21 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
 #endif
+#ifdef IOQ3ZTM
+			// Skip empty items
+			for (i = 0; i < s->numitems; i++) {
+				s->curvalue--;
+				if (s->curvalue < 0)
+					s->curvalue = s->numitems-1;
+				if (strlen(s->itemnames[s->curvalue]) > 0) {
+					break;
+				}
+			}
+#else
 			s->curvalue--;
 			if (s->curvalue < 0)
 				s->curvalue = s->numitems-1;
+#endif
 			sound = menu_move_sound;
 			break;
 	}

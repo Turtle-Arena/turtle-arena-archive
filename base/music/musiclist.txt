@@ -22,6 +22,12 @@ music/menu
 	intro "music/zero-project_-_Whispering_Wind.ogg"
 }
 
+// Arcade mode post-game music
+music/postgame
+{
+	intro "music/zero-project_-_Whispering_Wind.ogg"
+}
+
 // Boss battle music
 music/boss
 {

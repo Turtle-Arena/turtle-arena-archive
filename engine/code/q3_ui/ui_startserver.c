@@ -107,9 +107,9 @@ static startserver_t s_startserver;
 #ifdef TURTLEARENA
 // Names of gametypes in "gametype select list", can be any gametypes in any order
 static const char *gametype_items[] = {
+	"Cooperative",
 	"Free For All",
 	"Duel", // tornament to duel // "Tournament",
-	"Cooperative",
 	"Team Deathmatch",
 	"Capture the Flag",
 #ifdef MISSIONPACK
@@ -124,9 +124,9 @@ static const char *gametype_items[] = {
 
 // Order of gametypes in "gametype select list", must match gametype_items
 static int gametype_remap[] = {
+	GT_SINGLE_PLAYER,
 	GT_FFA,
 	GT_TOURNAMENT,
-	GT_SINGLE_PLAYER,
 	GT_TEAM,
 	GT_CTF
 #ifdef MISSIONPACK
@@ -140,9 +140,9 @@ static int gametype_remap[] = {
 
 // Order of gametype_items, convert GT_* to gametype_items index
 static int gametype_remap2[] = {
-	0,		// Free For All
-	1,		// Duel
-	2,		// Cooperative
+	0,		// Cooperative
+	1,		// Free For All
+	2,		// Duel
 	3,		// Team Deathmatch
 	4		// Capture the Flag
 #ifdef MISSIONPACK
@@ -152,6 +152,23 @@ static int gametype_remap2[] = {
 	,7		// Harvester
 #endif
 #endif
+};
+
+// Don't allow sp/coop in arcade mode
+static const char *arcade_gametype_items[] = {
+	"", // No coop in arcade
+	"Free For All",
+	"Duel", // tornament to duel // "Tournament",
+	"Team Deathmatch",
+	"Capture the Flag",
+#ifdef MISSIONPACK
+	"1 Flag CTF",
+	"Overload",
+#ifdef MISSIONPACK_HARVESTER
+	"Harvester",
+#endif
+#endif
+	NULL
 };
 #else
 static const char *gametype_items[] = {
@@ -512,7 +529,12 @@ static void StartServer_LevelshotDraw( void *self ) {
 StartServer_MenuInit
 =================
 */
-static void StartServer_MenuInit( void ) {
+#ifdef TA_SP
+static void StartServer_MenuInit( qboolean multiplayer )
+#else
+static void StartServer_MenuInit( void )
+#endif
+{
 	int	i;
 	int	x;
 	int	y;
@@ -526,6 +548,10 @@ static void StartServer_MenuInit( void ) {
 
 	StartServer_Cache();
 
+#ifdef TA_SP
+	s_startserver.multiplayer = multiplayer;
+#endif
+
 	s_startserver.menu.wrapAround = qtrue;
 #ifdef TA_MISC
 	if (!inGame)
@@ -538,6 +564,11 @@ static void StartServer_MenuInit( void ) {
 #ifdef TA_MISC
 	if (inGame)
 		s_startserver.banner.string    = "CHANGE MAP";
+	else
+#endif
+#ifdef TA_SP
+	if (!multiplayer)
+		s_startserver.banner.string    = "ARCADE";
 	else
 #endif
 	s_startserver.banner.string        = "GAME SERVER";
@@ -567,6 +598,11 @@ static void StartServer_MenuInit( void ) {
 	s_startserver.gametype.generic.id		= ID_GAMETYPE;
 	s_startserver.gametype.generic.x		= 320 - 24;
 	s_startserver.gametype.generic.y		= 368;
+#ifdef TA_SP
+	if (!multiplayer)
+		s_startserver.gametype.itemnames	= arcade_gametype_items;
+	else
+#endif
 	s_startserver.gametype.itemnames		= gametype_items;
 #ifdef TA_MISC
 	if (inGame)
@@ -797,8 +833,12 @@ UI_StartServerMenu
 =================
 */
 void UI_StartServerMenu( qboolean multiplayer ) {
+#ifdef TA_SP
+	StartServer_MenuInit(multiplayer);
+#else
 	StartServer_MenuInit();
 	s_startserver.multiplayer = multiplayer;
+#endif
 	UI_PushMenu( &s_startserver.menu );
 }
 
@@ -1076,13 +1116,19 @@ static void ServerOptions_Start( void ) {
 	}
 
 	trap_Cvar_SetValue( "sv_maxclients", Com_Clamp( 0, 12, maxclients ) );
+#ifdef TA_SP
+	if (!s_serveroptions.multiplayer) {
+		// Aracde mode
+		trap_Cvar_SetValue( "ui_singlePlayerActive", 1 );
+	}
+#endif
 #ifdef IOQ3ZTM // SV_PUBLIC
-	if (s_serveroptions.multiplayer) {
+#ifdef TA_SP
+	else
+#endif
+	{
 		trap_Cvar_SetValue( "ui_publicServer", Com_Clamp( 0, 1, publicserver ) );
 		trap_Cvar_SetValue( "sv_public", Com_Clamp( 0, 1, publicserver ) );
-	} else {
-		// Don't allow clients to join in non-multiplayer.
-		trap_Cvar_SetValue( "sv_public", -3 );
 	}
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 1, dedicated ) );
 #else

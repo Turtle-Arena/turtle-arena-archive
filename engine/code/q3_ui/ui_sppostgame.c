@@ -46,12 +46,43 @@ SINGLE PLAYER POSTGAME MENU
 #define ART_MENU1		"menu/art/menu_1"
 #define ART_REPLAY0		"menu/art/replay_0"
 #define ART_REPLAY1		"menu/art/replay_1"
+#ifndef TA_SP
 #define ART_NEXT0		"menu/art/next_0"
 #define ART_NEXT1		"menu/art/next_1"
+#endif
 
 #define ID_AGAIN		10
+#ifndef TA_SP
 #define ID_NEXT			11
+#endif
 #define ID_MENU			12
+
+#ifdef TA_SP
+// Arcade map gamedata
+#define ARCADE_GAMEDATA_MAGIC "EBXARCADE"
+#define ARCADE_GAMEDATA_VERSION 0
+#define NUM_ARCADE_SCORES 5
+
+typedef struct
+{
+	char name[9];
+	char character[17];
+	int score;
+	int time;
+
+	// Additional CTF data
+	int captures;
+	int redScore;
+	int blueScore;
+} arcadeScore_t;
+
+typedef struct
+{
+	char magic[9];
+	int version;
+	arcadeScore_t scores[NUM_ARCADE_SCORES];
+} arcadeGameData_t;
+#endif
 
 typedef struct {
 	menuframework_s	menu;
@@ -68,17 +99,21 @@ typedef struct {
 	int				scoreboardtime;
 	int				serverId;
 
+#ifdef TA_SP
+	int				gametype;
+
+	arcadeGameData_t gamedata;
+	arcadeScore_t	newScore;
+	int				scoreIndex;
+#else
 	int				clientNums[MAX_SCOREBOARD_CLIENTS];
 	int				ranks[MAX_SCOREBOARD_CLIENTS];
 	int				scores[MAX_SCOREBOARD_CLIENTS];
 
-#ifndef TA_SP
 	char			placeNames[3][64];
-#endif
 
 	int				level;
 	int				numClients;
-#ifndef TA_SP
 	int				won;
 	int				numAwards;
 	int				awardsEarned[MAX_UI_AWARDS];
@@ -90,9 +125,9 @@ typedef struct {
 } postgameMenuInfo_t;
 
 static postgameMenuInfo_t	postgameMenuInfo;
+#ifndef TA_SP
 static char					arenainfo[MAX_INFO_VALUE];
 
-#ifndef TA_SP
 char	*ui_medalNames[] = {"Accuracy",
 #ifndef TURTLEARENA // AWARDS
 "Impressive", "Excellent", "Gauntlet",
@@ -194,7 +229,7 @@ static void UI_SPPostgameMenu_MenuEvent( void* ptr, int event )
 	}
 	UI_PopMenu();
 #ifdef TA_SP
-	trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; customgame\n" );
+	trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; arcade\n" );
 #else
 	trap_Cmd_ExecuteText( EXEC_APPEND, "disconnect; levelselect\n" );
 #endif
@@ -302,6 +337,93 @@ static void UI_SPPostgameMenu_DrawAwardsPresentation( int timer ) {
 #endif
 
 
+#ifdef IOQ3ZTM
+/*
+=================
+UI_SPPostgameMenu_MenuDrawScoreLine
+
+#1  1500  1:25 ZTM
+=================
+*/
+static void UI_SPPostgameMenu_MenuDrawScoreLine( int startx, int y, vec4_t color, int rank, arcadeScore_t *score ) {
+	int x = startx;
+	int minutes;
+	int seconds;
+
+	// Draw score rank
+	if (rank >= 0) {
+		UI_DrawString( x, y, va( "#%i:", rank ), UI_SMALLFONT, color );
+	}
+	x += SMALLCHAR_WIDTH * 5;
+
+	// Draw score (right justified)
+	x += SMALLCHAR_WIDTH * 6;
+	UI_DrawString( x, y, va( "%i", score->score ), UI_RIGHT|UI_SMALLFONT, color );
+
+	// Draw time (right justified)
+	minutes = score->time / 60;
+	seconds = score->time % 60;
+	x += SMALLCHAR_WIDTH * 7;
+	UI_DrawString( x, y, va( "%i:%s%i", minutes, seconds < 10 ? "0" : "", seconds ), UI_RIGHT|UI_SMALLFONT, color );
+
+	// Draw user's name
+	x += SMALLCHAR_WIDTH;
+	UI_DrawString( x, y, va( "%s", score->name ), UI_SMALLFONT, color );
+
+	// ZTM: TODO: Draw player model icon for score->character
+
+	if (postgameMenuInfo.gametype >= GT_CTF) {
+		// ZTM: TODO: Draw captures, redScore, and blueScore
+	}
+}
+
+/*
+=================
+UI_SPPostgameMenu_MenuDrawHighScores
+
+#1  1500  1:25 ZTM
+=================
+*/
+#define CENTER_X -640
+static void UI_SPPostgameMenu_MenuDrawHighScores( int startx, int y ) {
+	int x, centerx;
+	int n;
+
+	if (startx == CENTER_X) {
+		x = centerx = (640 - SMALLCHAR_WIDTH * 27) / 2;
+	} else {
+		x = startx;
+	}
+
+	// Draw header
+	x += SMALLCHAR_WIDTH * 4;
+	UI_DrawString( x, y, "Score", UI_SMALLFONT, color_white );
+	x += SMALLCHAR_WIDTH * 9;
+	UI_DrawString( x, y, "Time", UI_SMALLFONT, color_white );
+	x += SMALLCHAR_WIDTH * 6;
+	UI_DrawString( x, y, "Name", UI_SMALLFONT, color_white );
+
+	// Draw high score list
+	if (startx == CENTER_X) {
+		x = centerx;
+	} else {
+		x = startx;
+	}
+	y += SMALLCHAR_HEIGHT;
+
+	for (n = 0; n < NUM_ARCADE_SCORES; ++n) {
+		if (n == postgameMenuInfo.scoreIndex)
+			UI_SPPostgameMenu_MenuDrawScoreLine(x, 325+n*(SMALLCHAR_HEIGHT+10), color_yellow, n+1, &postgameMenuInfo.gamedata.scores[n]);
+		else
+			UI_SPPostgameMenu_MenuDrawScoreLine(x, 325+n*(SMALLCHAR_HEIGHT+10), color_white, n+1, &postgameMenuInfo.gamedata.scores[n]);
+	}
+
+	if (postgameMenuInfo.scoreIndex == -1) {
+		// Show new socre (which wasn't a high score)
+		UI_SPPostgameMenu_MenuDrawScoreLine(x, 325+NUM_ARCADE_SCORES*(SMALLCHAR_HEIGHT+10), color_yellow, -1, &postgameMenuInfo.newScore);
+	}
+}
+#else
 /*
 =================
 UI_SPPostgameMenu_MenuDrawScoreLine
@@ -331,6 +453,7 @@ static void UI_SPPostgameMenu_MenuDrawScoreLine( int n, int y ) {
 
 	UI_DrawString( 640 - 25 * SMALLCHAR_WIDTH, y, va( "#%i: %-16s %2i", rank + 1, name, postgameMenuInfo.scores[n] ), UI_LEFT|UI_SMALLFONT, color_white );
 }
+#endif
 
 
 /*
@@ -341,7 +464,9 @@ UI_SPPostgameMenu_MenuDraw
 static void UI_SPPostgameMenu_MenuDraw( void ) {
 	int		timer;
 	int		serverId;
+#ifndef TA_SP
 	int		n;
+#endif
 	char	info[MAX_INFO_STRING];
 
 	trap_GetConfigString( CS_SYSTEMINFO, info, sizeof(info) );
@@ -377,8 +502,13 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 
 	// phase 2
 	if( postgameMenuInfo.phase == 2 ) {
-#ifndef TA_SP
 		timer = uis.realtime - postgameMenuInfo.starttime;
+#ifdef TA_SP
+		if( timer >= 5000 ) {
+			postgameMenuInfo.phase = 3;
+			postgameMenuInfo.starttime = uis.realtime;
+		}
+#else
 		if( timer >= ( postgameMenuInfo.numAwards * AWARD_PRESENTATION_TIME ) ) {
 
 			if( timer < 5000 ) {
@@ -391,10 +521,12 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 		else {
 			UI_SPPostgameMenu_DrawAwardsPresentation( timer );
 		}
+#endif
 	}
 
 	// phase 3
 	if( postgameMenuInfo.phase == 3 ) {
+#ifndef TA_SP
 		if( uis.demoversion ) {
 			if( postgameMenuInfo.won == 1 && UI_ShowTierVideo( 8 )) {
 				trap_Cvar_Set( "nextmap", "" );
@@ -429,6 +561,9 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 		Menu_Draw( &postgameMenuInfo.menu );
 	}
 
+#ifdef TA_SP
+	UI_SPPostgameMenu_MenuDrawHighScores(CENTER_X, 310);
+#else
 	// draw the scoreboard
 	if( !trap_Cvar_VariableValue( "ui_spScoreboard" ) ) {
 		return;
@@ -444,6 +579,7 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 	UI_SPPostgameMenu_MenuDrawScoreLine( n, 0 );
 	UI_SPPostgameMenu_MenuDrawScoreLine( n + 1, 0 + SMALLCHAR_HEIGHT );
 	UI_SPPostgameMenu_MenuDrawScoreLine( n + 2, 0 + 2 * SMALLCHAR_HEIGHT );
+#endif
 }
 
 
@@ -455,34 +591,30 @@ UI_SPPostgameMenu_Cache
 void UI_SPPostgameMenu_Cache( void ) {
 #ifndef TA_SP
 	int			n;
-#endif
 	qboolean	buildscript;
 
 	buildscript = trap_Cvar_VariableValue("com_buildscript");
+#endif
 
 	trap_R_RegisterShaderNoMip( ART_MENU0 );
 	trap_R_RegisterShaderNoMip( ART_MENU1 );
 	trap_R_RegisterShaderNoMip( ART_REPLAY0 );
 	trap_R_RegisterShaderNoMip( ART_REPLAY1 );
+#ifndef TA_SP
 	trap_R_RegisterShaderNoMip( ART_NEXT0 );
 	trap_R_RegisterShaderNoMip( ART_NEXT1 );
-#ifndef TA_SP
 	for( n = 0; n < MAX_UI_AWARDS; n++ )
 	{
 		trap_R_RegisterShaderNoMip( ui_medalPicNames[n] );
 		trap_S_RegisterSound( ui_medalSounds[n], qfalse );
 	}
-#endif
 
 	if( buildscript ) {
-#ifdef TA_SP
-		trap_S_RegisterSound( "music/win.wav", qfalse );
-#else
 		trap_S_RegisterSound( "music/loss.wav", qfalse );
 		trap_S_RegisterSound( "music/win.wav", qfalse );
 		trap_S_RegisterSound( "sound/player/announce/youwin.wav", qfalse );
-#endif
 	}
+#endif
 }
 
 
@@ -547,7 +679,102 @@ static void UI_SPPostgameMenu_Init( void ) {
 }
 
 
-#ifndef TA_SP
+#ifdef TA_SP
+// Returns score pos, or -1 if didn't get high enough score to save it.
+int UI_AddArcadeScore(arcadeGameData_t *gamedata, arcadeScore_t *score)
+{
+	int index, i;
+
+	// Find where to put score
+	for (index = 0; index < NUM_ARCADE_SCORES; ++index) {
+		if (!gamedata->scores[index].time || score->score > gamedata->scores[index].score
+			|| (score->score == gamedata->scores[index].score && score->time < gamedata->scores[index].time)) {
+			// Empty score, higher score or same score and faster
+			break;
+		}
+	}
+
+	// Not a new high score
+	if (index == NUM_ARCADE_SCORES) {
+		return -1;
+	}
+
+	// Move slots to make room for new score
+	for (i = NUM_ARCADE_SCORES-2; i >= index; --i) {
+		memcpy(&gamedata->scores[i+1], &gamedata->scores[i], sizeof (arcadeScore_t));
+	}
+
+	// Add new score
+	memcpy(&gamedata->scores[index], score, sizeof (arcadeScore_t));
+
+	return index;
+}
+
+void UI_CalcPostGameStats(void)
+{
+	char		map[MAX_QPATH];
+	char		fileName[MAX_QPATH];
+	char		info[MAX_INFO_STRING];
+	fileHandle_t f;
+	qboolean	validData;
+	int time, redScore, blueScore;
+	static char *gametypeNames[] = {"ffa", "tourney", "single", "team", "ctf", "oneflag", "overload", "harvester"};
+	arcadeGameData_t *gamedata = &postgameMenuInfo.gamedata;
+	arcadeScore_t *newScore = &postgameMenuInfo.newScore;
+
+	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
+	Q_strncpyz( map, Info_ValueForKey( info, "mapname" ), sizeof(map) );
+	postgameMenuInfo.gametype = Com_Clamp(0, ARRAY_LEN(gametypeNames), atoi(Info_ValueForKey(info, "g_gametype")));
+
+	// compose file name
+	Com_sprintf(fileName, MAX_QPATH, "scores/%s_%s.score", map, gametypeNames[postgameMenuInfo.gametype]);
+	// see if we have one already
+	validData = qfalse;
+	if (trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0) {
+		trap_FS_Read(gamedata, sizeof(arcadeGameData_t), f);
+		trap_FS_FCloseFile(f);
+
+		if (!Q_strncmp(gamedata->magic, ARCADE_GAMEDATA_MAGIC, ARRAY_LEN(gamedata->magic)))
+		{
+			if (gamedata->version == ARCADE_GAMEDATA_VERSION) {
+				validData = qtrue;
+			}
+		}
+	}
+
+	if (!validData) {
+		memset(gamedata, 0, sizeof(arcadeGameData_t));
+	}
+
+	memcpy(gamedata->magic, ARCADE_GAMEDATA_MAGIC, ARRAY_LEN(gamedata->magic));
+	gamedata->version = ARCADE_GAMEDATA_VERSION;
+
+	time = (atoi(UI_Argv(1)) - trap_Cvar_VariableValue("ui_matchStartTime")) / 1000;
+	redScore = atoi(UI_Argv(2));
+	blueScore = atoi(UI_Argv(3));
+
+	// Setup newScore
+	Q_strncpyz(newScore->name, UI_Argv(4), STRARRAY_LEN(newScore->name));
+	Q_strncpyz(newScore->character, UI_Argv(5), STRARRAY_LEN(newScore->character));
+	newScore->score = atoi(UI_Argv(6));
+	newScore->time = time;
+
+	 // CTF
+	newScore->captures = atoi(UI_Argv(7));
+	newScore->redScore = redScore;
+	newScore->blueScore = blueScore;
+
+	// Add the score
+	postgameMenuInfo.scoreIndex = UI_AddArcadeScore(gamedata, newScore);
+	//trap_Cvar_Set("ui_scoreIndex", va("%d", postgameMenuInfo.scoreIndex));
+
+	// Write updated gamedata
+	if (trap_FS_FOpenFile(fileName, &f, FS_WRITE) >= 0) {
+		trap_FS_Write(gamedata, sizeof(arcadeGameData_t), f);
+		trap_FS_FCloseFile(f);
+	}
+}
+#else
 static void Prepname( int index ) {
 	int		len;
 	char	name[64];
@@ -574,17 +801,15 @@ UI_SPPostgameMenu_f
 =================
 */
 void UI_SPPostgameMenu_f( void ) {
+#ifndef TA_SP
 	int			playerGameRank;
 	int			playerClientNum;
 	int			n;
-#ifndef TA_SP
 	int			oldFrags, newFrags;
-#endif
 	const char	*arena;
-#ifndef TA_SP
 	int			awardValues[MAX_UI_AWARDS];
-#endif
 	char		map[MAX_QPATH];
+#endif
 	char		info[MAX_INFO_STRING];
 
 	memset( &postgameMenuInfo, 0, sizeof(postgameMenuInfo) );
@@ -592,6 +817,9 @@ void UI_SPPostgameMenu_f( void ) {
 	trap_GetConfigString( CS_SYSTEMINFO, info, sizeof(info) );
 	postgameMenuInfo.serverId = atoi( Info_ValueForKey( info, "sv_serverid" ) );
 
+#ifdef TA_SP // ARCADE_SCORE
+	UI_CalcPostGameStats();
+#else
 	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
 	Q_strncpyz( map, Info_ValueForKey( info, "mapname" ), sizeof(map) );
 	arena = UI_GetArenaInfoByMap( map );
@@ -620,7 +848,6 @@ void UI_SPPostgameMenu_f( void ) {
 		}
 	}
 
-#ifndef TA_SP
 	UI_SetBestScore( postgameMenuInfo.level, playerGameRank );
 
 	// process award stats and prepare presentation data
@@ -704,11 +931,7 @@ void UI_SPPostgameMenu_f( void ) {
 #ifdef TA_SP
 	Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_again );
 
-	if (trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER && playerGameRank != 1) {
-		trap_Cmd_ExecuteText( EXEC_APPEND, "music music/loss\n" );
-	} else {
-		trap_Cmd_ExecuteText( EXEC_APPEND, "music music/win\n" );
-	}
+	trap_Cmd_ExecuteText( EXEC_APPEND, "music music/postgame\n" );
 #else
 	if ( playerGameRank == 1 ) {
 		Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_next );
