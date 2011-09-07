@@ -266,61 +266,6 @@ models/powerups/instant/strength
 }
 
 //
-// Powerup rings
-//
-//models/powerups/instant/defense
-models/powerups/shield/yellow
-{
-	{
-		map models/powerups/instant/defense.png
-		blendfunc GL_ONE GL_ONE
-		rgbGen lightingDiffuse
-		tcMod turb 0 0.15 0 0.25
-		tcGen environment
-		alphaGen wave sin .6 .2 0 .6
-	}
-}
-
-//models/powerups/instant/invul
-models/powerups/shield/white
-{
-	{
-		map models/powerups/instant/invul.png
-		blendfunc GL_ONE GL_ONE
-		rgbGen lightingDiffuse
-		tcMod turb 0 0.15 0 0.25
-		tcGen environment
-		alphaGen wave sin .6 .2 0 .6
-	}
-}
-
-//models/powerups/instant/speed
-models/powerups/shield/blue
-{
-	{
-		map models/powerups/instant/speed.png
-		blendfunc GL_ONE GL_ONE
-		rgbGen lightingDiffuse
-		tcMod turb 0 0.15 0 0.25
-		tcGen environment
-		alphaGen wave sin .6 .2 0 .6
-	}
-}
-
-//models/powerups/instant/strength
-models/powerups/shield/red
-{
-	{
-		map models/powerups/instant/strength.png
-		blendfunc GL_ONE GL_ONE
-		rgbGen lightingDiffuse
-		tcMod turb 0 0.15 0 0.25
-		tcGen environment
-		alphaGen wave sin .5 .4 0 .6
-	}
-}
-
-//
 // Score Items
 //
 models/powerups/score/sphere
