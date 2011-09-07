@@ -51,6 +51,7 @@ void SV_GetChallenge(netadr_t from)
 	challenge_t	*challenge;
 	qboolean wasfound = qfalse;
 	char *gameName;
+	qboolean gameMismatch;
 
 #ifdef IOQ3ZTM // SV_PUBLIC
 	// Don't allow players to connect if sv_public is -2
@@ -68,34 +69,23 @@ void SV_GetChallenge(netadr_t from)
 		return;
 	}
 
-#ifdef IOQ3ZTM // ZTM: If not supporting legacy protocol require gamename
 	gameName = Cmd_Argv(2);
 
-	// reject client if the gamename string sent by the client doesn't match ours
 #ifdef LEGACY_PROTOCOL
-	if ((com_legacyprotocol->integer && gameName && *gameName && strcmp(gameName, com_gamename->string))
-		|| (!com_legacyprotocol->integer && (!gameName || !*gameName || strcmp(gameName, com_gamename->string))))
-#else
-	if(!gameName || !*gameName || strcmp(gameName, com_gamename->string))
+	// gamename is optional for legacy protocol
+	if (com_legacyprotocol->integer && !*gameName)
+		gameMismatch = qfalse;
+	else
 #endif
- 	{
-		NET_OutOfBandPrint(NS_SERVER, from, "print\nGame mismatch: This is a %s server%s\n",
- 			com_gamename->string, (gameName && *gameName) ? va(" (not %s)", gameName) : "");
+		gameMismatch = !*gameName || strcmp(gameName, com_gamename->string) != 0;
+
+	// reject client if the gamename string sent by the client doesn't match ours
+	if (gameMismatch)
+	{
+		NET_OutOfBandPrint(NS_SERVER, from, "print\nGame mismatch: This is a %s server\n",
+			com_gamename->string);
 		return;
 	}
-#else
-	gameName = Cmd_Argv(2);
-	if(gameName && *gameName)
-	{
-		// reject client if the heartbeat string sent by the client doesn't match ours
-		if(strcmp(gameName, com_gamename->string))
-		{
- 			NET_OutOfBandPrint(NS_SERVER, from, "print\nGame mismatch: This is a %s server\n",
- 				com_gamename->string);
-			return;
-		}
-	}
-#endif
 
 	oldest = 0;
 	oldestClientTime = oldestTime = 0x7fffffff;
@@ -196,6 +186,22 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	char		*password;
 	int			startIndex;
 	intptr_t		denied;
+
+#ifdef TA_SP
+	// Don't allow join in arcade mode
+	if (Cvar_VariableIntegerValue("ui_singlePlayerActive")
+		&& sv_gametype->integer != GT_SINGLE_PLAYER) {
+		Com_Printf("Additional local clients not allowed in arcade mode.\n");
+		return;
+	}
+#else
+	// Don't allow joining in single player
+	if (sv_gametype->integer == GT_SINGLE_PLAYER
+		|| Cvar_VariableIntegerValue("ui_singlePlayerActive")) {
+		Com_Printf("Additional local clients not allowed in single player mode.\n");
+		return;
+	}
+#endif
 
 	newcl = &temp;
 	Com_Memset (newcl, 0, sizeof(client_t));
