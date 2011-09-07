@@ -31,7 +31,7 @@ endif
 
 
 # ioq3ztm svn version that this is based on
-IOQ3ZTM_REVISION = 34
+IOQ3ZTM_REVISION = 36
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
@@ -2888,7 +2888,13 @@ distclean: clean toolsclean
 
 installer: release
 ifeq ($(PLATFORM),mingw32)
-	@$(MAKE) VERSION=$(VERSION) -C $(NSISDIR) V=$(V)
+	@$(MAKE) VERSION=$(VERSION) -C $(NSISDIR) V=$(V) \
+		USE_RENDERER_DLOPEN=$(USE_RENDERER_DLOPEN) \
+		USE_OPENAL_DLOPEN=$(USE_OPENAL_DLOPEN) \
+		USE_CURL_DLOPEN=$(USE_CURL_DLOPEN) \
+		USE_INTERNAL_SPEEX=$(USE_INTERNAL_SPEEX) \
+		USE_INTERNAL_ZLIB=$(USE_INTERNAL_ZLIB) \
+		USE_INTERNAL_JPEG=$(USE_INTERNAL_JPEG)
 else
 	@$(MAKE) VERSION=$(VERSION) -C $(LOKISETUPDIR) V=$(V)
 endif

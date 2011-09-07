@@ -3731,7 +3731,7 @@ void CL_Init( void ) {
 	cl_showMouseRate = Cvar_Get ("cl_showmouserate", "0", 0);
 
 	cl_allowDownload = Cvar_Get ("cl_allowDownload", "0", CVAR_ARCHIVE);
-#ifdef USE_CURL
+#ifdef USE_CURL_DLOPEN
 	cl_cURLLib = Cvar_Get("cl_cURLLib", DEFAULT_CURL_LIB, CVAR_ARCHIVE);
 #endif
 
@@ -4197,30 +4197,26 @@ void CL_ServerInfoPacket( netadr_t from, msg_t *msg ) {
 	char	*infoString;
 	int		prot;
 	char	*gamename;
+	qboolean gameMismatch;
 
 	infoString = MSG_ReadString( msg );
 
 	// if this isn't the correct gamename, ignore it
 	gamename = Info_ValueForKey( infoString, "gamename" );
 
-#ifdef IOQ3ZTM // ZTM: If not supporting legacy protocol require gamename
 #ifdef LEGACY_PROTOCOL
-	if ((com_legacyprotocol->integer && *gamename && strcmp(gamename, com_gamename->string))
-		|| (!com_legacyprotocol->integer && (!*gamename || strcmp(gamename, com_gamename->string))))
-#else
-	if (!*gamename || strcmp(gamename, com_gamename->string))
+	// gamename is optional for legacy protocol
+	if (com_legacyprotocol->integer && !*gamename)
+		gameMismatch = qfalse;
+	else
 #endif
+		gameMismatch = !*gamename || strcmp(gamename, com_gamename->string) != 0;
+
+	if (gameMismatch)
 	{
 		Com_DPrintf( "Game mismatch in info packet: %s\n", infoString );
 		return;
 	}
-#else
-	if (gamename && *gamename && strcmp(gamename, com_gamename->string))
-	{
-		Com_DPrintf( "Game mismatch in info packet: %s\n", infoString );
-		return;
-	}
-#endif
 
 	// if this isn't the correct protocol version, ignore it
 	prot = atoi( Info_ValueForKey( infoString, "protocol" ) );
