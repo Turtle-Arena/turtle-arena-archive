@@ -4,34 +4,6 @@
 = Roadmap =
 Work-in-progress plans for future Turtle Arena releases.
 
-== 0.2 (Completed) ==
-First stable playable release.
-
-  * Standalone from Quake III: Arena
-  * Bot support (botfiles based on OpenArena)
-  * All 4 Turtles (Leo, Don, Raph, and Mike)
-  * Melee weapons
-  * Reworked weapon system (Only hold 2 weapons, default and a pickup)
-  * Hold multiple holdable items
-  * Shurikens (holdable items)
-  * Maps for all gametypes
-
-== 0.4.0 (Completed) ==
-  * Fixed bugs from 0.2
-  * Added music
-  * Readded player effect colors
-    * Readded to ui and q3_ui
-  * Reduced overall number of TODOs and FIXMEs in the source
-
-== 0.4.1 (Completed) ==
-  * Bug fix release
-
-== 0.4.2 (Completed) ==
-  * Bug fix release
-
-== 0.4.3 (Completed) ==
-  * Security fix release
-
 == 0.5 series ==
 The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with more often releases.
 
@@ -74,12 +46,11 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
 === 0.5.7 ===
 0.5.7 may be kind of a Release Candidate for 0.6.
 
-  * Improve current maps
-  * Create some new maps?
+  * Improve current maps (but only a little if at all)
   * Fix any issues that are found.
 
 == 0.6 ==
-Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve other legality concerns.
+Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve all licensing concerns.
 
   * Rename the game (to hopefully its final name)
   * Create new logo
@@ -89,7 +60,7 @@ Focus on finalizing the game's branding (name, logo, etc), making it completely 
   * Make changes to player model system for future models.
   * Make sure IQM support is fully working.
 
-  * Remove the current players, replace with new characters designed for the game.
+  * Remove the current player models, replace with new player models designed for the game.
   * Add weapons for new players if needed.
 
   * DONE: Remove remaining OpenArena images and sounds.
@@ -99,10 +70,11 @@ Focus on finalizing the game's branding (name, logo, etc), making it completely 
 
   * DONE: Four player splitscreen.
 
-Optional goal;
+Optional goals;
   * Clean up / rewrite shaders (do not have clear licensing for them)?
   * Remake all (non-texture) images that do not have a svg source file?
   * Switch to missionpack ui?
+  * Remake some of the sound effects / add some of the missing sounds effects?
 
 == 0.8 ==
 Focus on map themes and multiplayer maps. Goal is the develop assets/skills for single player. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game, comparable to commercial games.
