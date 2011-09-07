@@ -179,9 +179,6 @@
 		<Unit filename="../../code/q3_ui/ui_atoms.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/q3_ui/ui_cdkey.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../code/q3_ui/ui_cinematics.c">
 			<Option compilerVar="CC" />
 		</Unit>
