@@ -303,7 +303,7 @@ nsis-clean: assets-clean
 #
 nsis64: assets
 ifeq ($(WIN64),1)
-	$(MINGWMAKE) -C engine installer BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 \
+	$(MING64WMAKE) -C engine installer BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 \
 			ASSETPATH="$(CURDIR)/$(DATADIR)/base/" --jobs=$(JOBS)
 	$(MINGW64MAKE) -C engine/misc/nsis install INSTALLDIR="$(CURDIR)/$(INSTALLDIR)/nsis" --jobs=$(JOBS)
 else
