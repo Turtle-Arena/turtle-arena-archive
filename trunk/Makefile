@@ -290,8 +290,8 @@ zip-clean:
 # Create win32 NSIS installer
 #
 nsis: assets
-	$(MINGWMAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
-	$(MINGWMAKE) -C engine/misc/nsis ASSETPATH="$(CURDIR)/$(DATADIR)/base/" --jobs=$(JOBS)
+	$(MINGWMAKE) -C engine installer BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 \
+			ASSETPATH="$(CURDIR)/$(DATADIR)/base/" --jobs=$(JOBS)
 	$(MINGWMAKE) -C engine/misc/nsis install INSTALLDIR="$(CURDIR)/$(INSTALLDIR)/nsis" --jobs=$(JOBS)
 
 nsis-clean: assets-clean
@@ -303,8 +303,8 @@ nsis-clean: assets-clean
 #
 nsis64: assets
 ifeq ($(WIN64),1)
-	$(MINGW64MAKE) -C engine BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 --jobs=$(JOBS)
-	$(MINGW64MAKE) -C engine/misc/nsis ASSETPATH="$(CURDIR)/$(DATADIR)/base/" --jobs=$(JOBS)
+	$(MINGWMAKE) -C engine installer BUILD_FINAL=$(BUILD_FINAL) BUILD_GAME_SO=0 BUILD_GAME_QVM=0 \
+			ASSETPATH="$(CURDIR)/$(DATADIR)/base/" --jobs=$(JOBS)
 	$(MINGW64MAKE) -C engine/misc/nsis install INSTALLDIR="$(CURDIR)/$(INSTALLDIR)/nsis" --jobs=$(JOBS)
 else
 	@echo "Win64 NSIS creation is not supported on this platform."
