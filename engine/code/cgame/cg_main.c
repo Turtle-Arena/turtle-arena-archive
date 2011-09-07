@@ -1233,18 +1233,21 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.noammoShader = trap_R_RegisterShader( "icons/noammo" );
 
 	// powerup shaders
-#ifndef TURTLEARENA // POWERS
+#ifdef TURTLEARENA // POWERS
+	cgs.media.quadWeaponShader = trap_R_RegisterShader("powerups/red" );
+	cgs.media.battleSuitShader = trap_R_RegisterShader("powerups/yellow" );
+	cgs.media.playerTeleportShader = trap_R_RegisterShader("powerups/blue" );
+#else
 	cgs.media.quadShader = trap_R_RegisterShader("powerups/quad" );
 	cgs.media.quadWeaponShader = trap_R_RegisterShader("powerups/quadWeapon" );
 	cgs.media.battleSuitShader = trap_R_RegisterShader("powerups/battleSuit" );
 	cgs.media.battleWeaponShader = trap_R_RegisterShader("powerups/battleWeapon" );
 #endif
 	cgs.media.invisShader = trap_R_RegisterShader("powerups/invisibility" );
+#ifndef TURTLEARENA // POWERS
 	cgs.media.regenShader = trap_R_RegisterShader("powerups/regen" );
-	cgs.media.hastePuffShader = trap_R_RegisterShader("hasteSmokePuff" );
-#ifdef TURTLEARENA // POWERS // PW_FLASHING
-	cgs.media.playerTeleportShader = trap_R_RegisterShader("playerTeleportEffect" );
 #endif
+	cgs.media.hastePuffShader = trap_R_RegisterShader("hasteSmokePuff" );
 
 #ifdef MISSIONPACK_HARVESTER
 	if ( cgs.gametype == GT_HARVESTER || cg_buildScript.integer ) {
@@ -1465,20 +1468,12 @@ static void CG_RegisterGraphics( void ) {
 	cgs.media.doublerPowerupModel = trap_R_RegisterModel( "models/powerups/doubler_player.md3" );
 	cgs.media.ammoRegenPowerupModel = trap_R_RegisterModel( "models/powerups/ammo_player.md3" );
 #ifndef TURTLEARENA // POWERS
+	cgs.media.invulnerabilityPowerupModel = trap_R_RegisterModel( "models/powerups/shield/shield.md3" );
 	cgs.media.invulnerabilityImpactModel = trap_R_RegisterModel( "models/powerups/shield/impact.md3" );
 	cgs.media.invulnerabilityJuicedModel = trap_R_RegisterModel( "models/powerups/shield/juicer.md3" );
 #endif
 	cgs.media.medkitUsageModel = trap_R_RegisterModel( "models/powerups/regen.md3" );
 	cgs.media.heartShader = trap_R_RegisterShaderNoMip( "ui/assets/statusbar/selectedhealth.tga" );
-#endif
-
-#ifdef TURTLEARENA // POWERS
-	cgs.media.strengthPowerupModel = trap_R_RegisterModel( "models/powerups/shield/strength.md3" );
-	cgs.media.defensePowerupModel = trap_R_RegisterModel( "models/powerups/shield/defense.md3" );
-	cgs.media.speedPowerupModel = trap_R_RegisterModel( "models/powerups/shield/speed.md3" );
-	cgs.media.invulnerabilityPowerupModel = trap_R_RegisterModel( "models/powerups/shield/invulnerability.md3" );
-#else
-	cgs.media.invulnerabilityPowerupModel = trap_R_RegisterModel( "models/powerups/shield/shield.md3" );
 #endif
 #ifndef TURTLEARENA // AWARDS
 	cgs.media.medalImpressive = trap_R_RegisterShaderNoMip( "medal_impressive" );

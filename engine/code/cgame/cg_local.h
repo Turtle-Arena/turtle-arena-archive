@@ -1179,12 +1179,14 @@ typedef struct {
 #ifndef TURTLEARENA // POWERS
 	qhandle_t	quadShader;
 	qhandle_t	redQuadShader;
-	qhandle_t	quadWeaponShader;
 #endif
+	qhandle_t	quadWeaponShader;
 	qhandle_t	invisShader;
-	qhandle_t	regenShader;
 #ifndef TURTLEARENA // POWERS
+	qhandle_t	regenShader;
+#endif
 	qhandle_t	battleSuitShader;
+#ifndef TURTLEARENA // POWERS
 	qhandle_t	battleWeaponShader;
 #endif
 	qhandle_t	hastePuffShader;
@@ -1235,6 +1237,7 @@ typedef struct {
 	qhandle_t	doublerPowerupModel;
 	qhandle_t	ammoRegenPowerupModel;
 #ifndef TURTLEARENA // POWERS
+	qhandle_t	invulnerabilityPowerupModel;
 	qhandle_t	invulnerabilityImpactModel;
 	qhandle_t	invulnerabilityJuicedModel;
 #endif
@@ -1242,12 +1245,6 @@ typedef struct {
 	qhandle_t	dustPuffShader;
 	qhandle_t	heartShader;
 #endif
-#ifdef TURTLEARENA // POWERS
-	qhandle_t	strengthPowerupModel;
-	qhandle_t	defensePowerupModel;
-	qhandle_t	speedPowerupModel;
-#endif
-	qhandle_t	invulnerabilityPowerupModel;
 
 #ifdef TA_DATA // EXP_SCALE
 	qhandle_t	smokeModel;

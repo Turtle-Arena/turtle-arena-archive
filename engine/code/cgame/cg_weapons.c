@@ -2269,11 +2269,11 @@ static void CG_AddWeaponWithPowerups( refEntity_t *gun, entityState_t *state )
 			gun->customShader = cgs.media.battleWeaponShader;
 			trap_R_AddRefEntityToScene( gun );
 		}
+#endif
 		if ( state->powerups & ( 1 << PW_QUAD ) ) {
 			gun->customShader = cgs.media.quadWeaponShader;
 			trap_R_AddRefEntityToScene( gun );
 		}
-#endif
 	}
 }
 

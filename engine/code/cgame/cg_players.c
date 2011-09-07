@@ -2649,27 +2649,7 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 		return;
 	}
 
-#ifdef TURTLEARENA // POWERS
-	// Add powerup dlights
-	// If one or two powers use haste light
-	if ( (powerups & ( 1 << PW_HASTE )) &&
-		(( !(powerups & ( 1 << PW_INVUL )) && !(powerups & ( 1 << PW_BATTLESUIT )))
-		|| ( !(powerups & ( 1 << PW_INVUL )) && !(powerups & ( 1 << PW_QUAD )))
-		|| ( !(powerups & ( 1 << PW_BATTLESUIT )) && !(powerups & ( 1 << PW_QUAD )))) )
-	{
-		// blue
-		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1 );
-	} else if ( powerups & ( 1 << PW_QUAD ) ) {
-		// red
-		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1, 0.2f, 0.2f );
-	} else if ( powerups & ( 1 << PW_INVUL ) ) {
-		// white
-		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1, 1, 1 );
-	} else if ( powerups & ( 1 << PW_BATTLESUIT ) ) {
-		// yellow
-		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 1, 1, 0.2f );
-	}
-#else
+#ifndef TURTLEARENA // POWERS
 	// quad gives a dlight
 	if ( powerups & ( 1 << PW_QUAD ) ) {
 		trap_R_AddLightToScene( cent->lerpOrigin, 200 + (rand()&31), 0.2f, 0.2f, 1 );
@@ -2823,6 +2803,7 @@ static void CG_PlayerSprites( centity_t *cent
 	}
 
 #ifdef TA_SP // ZTM: NOTE: Must disable talk balloon in sp intermission (not co-op), because there is a menu open.
+				// ZTM: FIXME: Check if this is still needed.
 	if ( (cent->currentState.eFlags & EF_TALK)
 			&& !(cg.intermissionStarted && cg_singlePlayerActive.integer
 			&& cg.cur_ps->pm_type == PM_SPINTERMISSION) )
@@ -3167,11 +3148,11 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 				trap_R_AddRefEntityToScene( ent );
 			}
 		}
+#endif
 		if ( state->powerups & ( 1 << PW_BATTLESUIT ) ) {
 			ent->customShader = cgs.media.battleSuitShader;
 			trap_R_AddRefEntityToScene( ent );
 		}
-#endif
 	}
 }
 
@@ -3616,45 +3597,6 @@ void CG_Player( centity_t *cent ) {
 		trap_R_AddRefEntityToScene( &powerup );
 	}
 #endif // MISSIONPACK
-#ifdef TURTLEARENA // POWERS
-	VectorClear(angles);
-	AnglesToAxis(angles, powerup.axis);
-	VectorCopy(cent->lerpOrigin, powerup.origin);
-
-	// Power rings
-	if ( cent->currentState.powerups & ( 1 << PW_INVUL ) ) {
-		memcpy(&powerup, &torso, sizeof(torso));
-		powerup.hModel = cgs.media.invulnerabilityPowerupModel;
-		powerup.frame = 0;
-		powerup.oldframe = 0;
-		powerup.customSkin = 0;
-		trap_R_AddRefEntityToScene( &powerup );
-	}
-	else if ( cent->currentState.powerups & ( 1 << PW_BATTLESUIT ) ) {
-		memcpy(&powerup, &torso, sizeof(torso));
-		powerup.hModel = cgs.media.defensePowerupModel;
-		powerup.frame = 0;
-		powerup.oldframe = 0;
-		powerup.customSkin = 0;
-		trap_R_AddRefEntityToScene( &powerup );
-	}
-	else if ( cent->currentState.powerups & ( 1 << PW_QUAD ) ) {
-		memcpy(&powerup, &torso, sizeof(torso));
-		powerup.hModel = cgs.media.strengthPowerupModel;
-		powerup.frame = 0;
-		powerup.oldframe = 0;
-		powerup.customSkin = 0;
-		trap_R_AddRefEntityToScene( &powerup );
-	}
-	else if ( cent->currentState.powerups & ( 1 << PW_HASTE ) ) {
-		memcpy(&powerup, &torso, sizeof(torso));
-		powerup.hModel = cgs.media.speedPowerupModel;
-		powerup.frame = 0;
-		powerup.oldframe = 0;
-		powerup.customSkin = 0;
-		trap_R_AddRefEntityToScene( &powerup );
-	}
-#endif
 
 	//
 	// add the head
