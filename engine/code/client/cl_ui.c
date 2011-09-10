@@ -763,11 +763,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 	case UI_CMD_EXECUTETEXT:
-#ifdef IOQ3ZTM
 		if(args[1] == EXEC_NOW
-#else
-		if(args[1] == 0
-#endif
 		&& (!strncmp(VMA(2), "snd_restart", 11)
 		|| !strncmp(VMA(2), "vid_restart", 11)
 		|| !strncmp(VMA(2), "quit", 5)))
