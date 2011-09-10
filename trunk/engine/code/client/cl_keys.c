@@ -139,7 +139,6 @@ keyname_t keynames[] =
 	{"JOY31", K_JOY31},
 	{"JOY32", K_JOY32},
 
-#ifdef TA_SPLITVIEW
 	{"2JOY1", K_2JOY1},
 	{"2JOY2", K_2JOY2},
 	{"2JOY3", K_2JOY3},
@@ -238,7 +237,6 @@ keyname_t keynames[] =
 	{"4JOY30", K_4JOY30},
 	{"4JOY31", K_4JOY31},
 	{"4JOY32", K_4JOY32},
-#endif
 
 	{"AUX1", K_AUX1},
 	{"AUX2", K_AUX2},
@@ -1354,8 +1352,8 @@ void CL_ParseBinding( int key, qboolean down, unsigned time )
 			char cmd[1024];
 			Com_sprintf( cmd, sizeof( cmd ), "%c%s %d %d\n",
 				( down ) ? '+' : '-', p + 1, key, time );
-				Cbuf_AddText (cmd);
-			}
+			Cbuf_AddText( cmd );
+		}
 		else if( down )
 		{
 			// normal commands only execute on key press
@@ -1378,16 +1376,16 @@ Called by CL_KeyEvent to handle a keypress
 void CL_KeyDownEvent( int key, unsigned time )
 {
 	keys[key].down = qtrue;
-		keys[key].repeats++;
+	keys[key].repeats++;
 	if( keys[key].repeats == 1 && key != K_SCROLLOCK && key != K_KP_NUMLOCK && key != K_CAPSLOCK )
-			anykeydown++;
+		anykeydown++;
 
 	if( keys[K_ALT].down && key == K_ENTER )
-			{
-				Cvar_SetValue( "r_fullscreen",
-						!Cvar_VariableIntegerValue( "r_fullscreen" ) );
-				return;
-			}
+	{
+		Cvar_SetValue( "r_fullscreen",
+			!Cvar_VariableIntegerValue( "r_fullscreen" ) );
+		return;
+	}
 
 	// console key is hardcoded, so the user can never unbind it
 	if( key == K_CONSOLE || ( keys[K_SHIFT].down && key == K_ESCAPE ) )
@@ -1457,9 +1455,9 @@ void CL_KeyDownEvent( int key, unsigned time )
 	} else {
 		// send the bound action
 		CL_ParseBinding( key, qtrue, time );
-				}
+	}
 	return;
-			}
+}
 
 /*
 ===================

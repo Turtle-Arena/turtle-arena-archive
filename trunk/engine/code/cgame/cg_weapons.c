@@ -26,16 +26,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #ifdef TA_HOLDSYS/*2*/
 /*
 ===============
-CG_NextHoldable_f
-Based on CG_NextWeapon_f
+CG_NextHoldable
+Based on CG_NextWeapon
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_NextHoldable( int localClient )
-#else
-void CG_NextHoldable_f( void )
-#endif
-{
+void CG_NextHoldable( int localClient ) {
 	int		i;
 	int		original;
 	playerState_t	*ps;
@@ -44,17 +39,13 @@ void CG_NextHoldable_f( void )
 	if ( !cg.snap ) {
 		return;
 	}
-#ifdef TA_SPLITVIEW
+
 	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
 	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
 
 	if ( ps->pm_flags & PMF_FOLLOW ) {
 		return;
@@ -98,16 +89,11 @@ void CG_NextHoldable_f( void )
 
 /*
 ===============
-CG_PrevHoldable_f
-Based on CG_PrevWeapon_f
+CG_PrevHoldable
+Based on CG_PrevWeapon
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_PrevHoldable( int localClient )
-#else
-void CG_PrevHoldable_f( void )
-#endif
-{
+void CG_PrevHoldable( int localClient ) {
 	int		i;
 	int		original;
 	playerState_t	*ps;
@@ -116,17 +102,13 @@ void CG_PrevHoldable_f( void )
 	if ( !cg.snap ) {
 		return;
 	}
-#ifdef TA_SPLITVIEW
+
 	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
 	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
 
 	if ( ps->pm_flags & PMF_FOLLOW ) {
 		return;
@@ -170,16 +152,11 @@ void CG_PrevHoldable_f( void )
 
 /*
 ===============
-CG_Holdable_f
-Based on CG_Weapon_f
+CG_Holdable
+Based on CG_Weapon
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_Holdable( int localClient )
-#else
-void CG_Holdable_f( void )
-#endif
-{
+void CG_Holdable( int localClient ) {
 	int		num;
 	playerState_t	*ps;
 	cglc_t			*lc;
@@ -188,17 +165,12 @@ void CG_Holdable_f( void )
 		return;
 	}
 
-#ifdef TA_SPLITVIEW
 	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
 	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
 
 	if ( ps->pm_flags & PMF_FOLLOW ) {
 		return;
@@ -217,7 +189,6 @@ void CG_Holdable_f( void )
 	lc->holdableSelect = num;
 }
 
-#ifdef TA_SPLITVIEW
 void CG_NextHoldable_f( void ) {
 	CG_NextHoldable( 0 );
 }
@@ -265,7 +236,6 @@ void CG_4PrevHoldable_f( void ) {
 void CG_4Holdable_f( void ) {
 	CG_Holdable( 3 );
 }
-#endif
 #endif
 
 /*
@@ -490,6 +460,7 @@ static void CG_NailgunEjectBrass( centity_t *cent
 	smoke->leType = LE_SCALE_FADE;
 }
 #endif
+
 
 /*
 ==========================
@@ -1580,6 +1551,7 @@ void CG_RegisterWeapon( int weaponNum )
 		cgs.media.sfx_lghit1 = trap_S_RegisterSound( "sound/weapons/lightning/lg_hit.wav", qfalse );
 		cgs.media.sfx_lghit2 = trap_S_RegisterSound( "sound/weapons/lightning/lg_hit2.wav", qfalse );
 		cgs.media.sfx_lghit3 = trap_S_RegisterSound( "sound/weapons/lightning/lg_hit3.wav", qfalse );
+
 		break;
 
 	case WP_GRAPPLING_HOOK:
@@ -2118,6 +2090,7 @@ static void CG_LightningBolt( centity_t *cent, vec3_t origin ) {
 }
 */
 
+
 /*
 ======================
 CG_MachinegunSpinAngle
@@ -2242,8 +2215,7 @@ float CG_BarrelGravityAngle(centity_t *cent, refEntity_t *gun, lerpFrame_t *lerp
 CG_AddWeaponWithPowerups
 ========================
 */
-static void CG_AddWeaponWithPowerups( refEntity_t *gun, entityState_t *state )
-{
+static void CG_AddWeaponWithPowerups( refEntity_t *gun, entityState_t *state ) {
 	// add powerup effects
 #ifdef TURTLEARENA // POWERS
 	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
@@ -2814,8 +2786,8 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			gun.shaderRGBA[0] = ( ci->c1RGBA[0] * scale ) >> 8;
 			gun.shaderRGBA[1] = ( ci->c1RGBA[1] * scale ) >> 8;
 			gun.shaderRGBA[2] = ( ci->c1RGBA[2] * scale ) >> 8;
- 			gun.shaderRGBA[3] = 255;
- 		}
+			gun.shaderRGBA[3] = 255;
+		}
 		else {
 			Byte4Copy( ci->c1RGBA, gun.shaderRGBA );
 		}
@@ -3525,8 +3497,8 @@ void CG_DrawWeaponSelect( void ) {
 #endif
 
 	trap_R_SetColor( NULL );
-
 }
+
 
 /*
 ===============
@@ -3546,15 +3518,10 @@ static qboolean CG_WeaponSelectable( playerState_t *ps, int i ) {
 
 /*
 ===============
-CG_NextWeapon_f
+CG_NextWeapon
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_NextWeapon( int localClient )
-#else
-void CG_NextWeapon_f( void )
-#endif
-{
+void CG_NextWeapon( int localClient ) {
 	int		i;
 	int		original;
 	playerState_t	*ps;
@@ -3564,17 +3531,12 @@ void CG_NextWeapon_f( void )
 		return;
 	}
 
-#ifdef TA_SPLITVIEW
 	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
 	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
 
 	if ( ps->pm_flags & PMF_FOLLOW ) {
 		return;
@@ -3610,15 +3572,10 @@ void CG_NextWeapon_f( void )
 
 /*
 ===============
-CG_PrevWeapon_f
+CG_PrevWeapon
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_PrevWeapon( int localClient )
-#else
-void CG_PrevWeapon_f( void )
-#endif
-{
+void CG_PrevWeapon( int localClient ) {
 	int		i;
 	int		original;
 	playerState_t	*ps;
@@ -3628,17 +3585,12 @@ void CG_PrevWeapon_f( void )
 		return;
 	}
 
-#ifdef TA_SPLITVIEW
 	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
 	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
 
 	if ( ps->pm_flags & PMF_FOLLOW ) {
 		return;
@@ -3674,15 +3626,10 @@ void CG_PrevWeapon_f( void )
 
 /*
 ===============
-CG_Weapon_f
+CG_Weapon
 ===============
 */
-#ifdef TA_SPLITVIEW
-void CG_Weapon( int localClient )
-#else
-void CG_Weapon_f( void )
-#endif
-{
+void CG_Weapon( int localClient ) {
 	int		num;
 	playerState_t	*ps;
 	cglc_t			*lc;
@@ -3691,17 +3638,12 @@ void CG_Weapon_f( void )
 		return;
 	}
 
-#ifdef TA_SPLITVIEW
 	if (localClient >= MAX_SPLITVIEW || cg.snap->lcIndex[localClient] == -1) {
 		return;
 	}
 
 	ps = &cg.snap->pss[cg.snap->lcIndex[localClient]];
 	lc = &cg.localClients[localClient];
-#else
-	ps = &cg.snap->ps;
-	lc = &cg.localClient;
-#endif
 
 	if ( ps->pm_flags & PMF_FOLLOW ) {
 		return;
@@ -3729,7 +3671,6 @@ void CG_Weapon_f( void )
 	lc->weaponSelect = num;
 }
 
-#ifdef TA_SPLITVIEW
 void CG_NextWeapon_f( void ) {
 	CG_NextWeapon( 0 );
 }
@@ -3777,7 +3718,6 @@ void CG_4PrevWeapon_f( void ) {
 void CG_4Weapon_f( void ) {
 	CG_Weapon( 3 );
 }
-#endif
 
 /*
 ===================
@@ -4060,12 +4000,9 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 	ex->refEntity.customShader = hShader;
 
 	// don't show player's own blood in view
-	if ( (cg.cur_ps && entityNum == cg.cur_ps->clientNum)
+	if ( CG_LocalClient(entityNum) != -1 && (!cg.snap || cg.snap->numPSs <= 1)
 #ifdef IOQ3ZTM // Show player their own blood in third person
 		&& !cg.renderingThirdPerson
-#endif
-#ifdef TA_SPLITVIEW
-		&& (!cg.snap || cg.snap->numPSs <= 1)
 #endif
 		)
 	{

@@ -276,7 +276,6 @@ void CL_ParseSnapshot( msg_t *msg ) {
 
 	// read playerinfo
 	SHOWNET( msg, "playerstate" );
-#ifdef TA_SPLITVIEW
 	if (newSnap.snapFlags & SNAPFLAG_MULTIPLE_PSS) {
 		newSnap.numPSs = MSG_ReadByte( msg );
 		if (newSnap.numPSs > MAX_SPLITVIEW) {
@@ -286,7 +285,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 		for (i = 0; i < MAX_SPLITVIEW; i++) {
 			newSnap.lcIndex[i] = MSG_ReadByte( msg );
 
-			// -1 gets converted to 255 should be set to -1 (and so should all invalid values) 
+			// -1 gets converted to 255 should be set to -1 (and so should all invalid values)
 			if (newSnap.lcIndex[i] >= newSnap.numPSs) {
 				newSnap.lcIndex[i] = -1;
 			}
@@ -309,13 +308,6 @@ void CL_ParseSnapshot( msg_t *msg ) {
 			MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.pss[newSnap.lcIndex[i]] );
 		}
 	}
-#else
-	if ( old ) {
-		MSG_ReadDeltaPlayerstate( msg, &old->ps, &newSnap.ps );
-	} else {
-		MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.ps );
-	}
-#endif
 
 	// read packet entities
 	SHOWNET( msg, "packet entities" );
@@ -346,12 +338,7 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	// calculate ping time
 	for ( i = 0 ; i < PACKET_BACKUP ; i++ ) {
 		packetNum = ( clc.netchan.outgoingSequence - 1 - i ) & PACKET_MASK;
-#ifdef TA_SPLITVIEW
-		if ( cl.snap.pss[0].commandTime >= cl.outPackets[ packetNum ].p_serverTime )
-#else
-		if ( cl.snap.ps.commandTime >= cl.outPackets[ packetNum ].p_serverTime )
-#endif
-		{
+		if ( cl.snap.pss[0].commandTime >= cl.outPackets[ packetNum ].p_serverTime ) {
 			cl.snap.ping = cls.realtime - cl.outPackets[ packetNum ].p_realtime;
 			break;
 		}

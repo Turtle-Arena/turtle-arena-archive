@@ -95,10 +95,8 @@ typedef struct {
 	playerInfo_t		playerinfo;
 	int					current_fx;
 	char				playerModel[MAX_QPATH];
-#ifdef TA_SPLITVIEW
 	int					localClient;
 	char				bannerString[32];
-#endif
 } playersettings_t;
 
 static playersettings_t	s_playersettings;
@@ -334,11 +332,7 @@ static void PlayerSettings_DrawPlayer( void *self ) {
 	vec3_t			viewangles;
 	char			buf[MAX_QPATH];
 
-#ifdef TA_SPLITVIEW
 	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_playersettings.localClient, "model"), buf, sizeof( buf ) );
-#else
-	trap_Cvar_VariableStringBuffer( "model", buf, sizeof( buf ) );
-#endif
 	if ( strcmp( buf, s_playersettings.playerModel ) != 0 ) {
 		UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, buf );
 		strcpy( s_playersettings.playerModel, buf );
@@ -368,33 +362,18 @@ PlayerSettings_SaveChanges
 */
 static void PlayerSettings_SaveChanges( void ) {
 	// name
-#ifdef TA_SPLITVIEW
 	trap_Cvar_Set( Com_LocalClientCvarName(s_playersettings.localClient, "name"), s_playersettings.name.field.buffer );
-#else
-	trap_Cvar_Set( "name", s_playersettings.name.field.buffer );
-#endif
 
 	// handicap
-#ifdef TA_SPLITVIEW
 	trap_Cvar_SetValue( Com_LocalClientCvarName(s_playersettings.localClient, "handicap"),
 			100 - s_playersettings.handicap.curvalue * 5 );
-#else
-	trap_Cvar_SetValue( "handicap", 100 - s_playersettings.handicap.curvalue * 5 );
-#endif
 
 	// effects color
-#ifdef TA_SPLITVIEW
 	trap_Cvar_SetValue( Com_LocalClientCvarName(s_playersettings.localClient, "color1"),
 			uitogamecode[s_playersettings.effects.curvalue] );
 #ifdef IOQ3ZTM // UI_COLOR2
 	trap_Cvar_SetValue( Com_LocalClientCvarName(s_playersettings.localClient, "color2"),
 			uitogamecode[s_playersettings.effects2.curvalue] );
-#endif
-#else
-	trap_Cvar_SetValue( "color1", uitogamecode[s_playersettings.effects.curvalue] );
-#ifdef IOQ3ZTM // UI_COLOR2
-	trap_Cvar_SetValue( "color2", uitogamecode[s_playersettings.effects2.curvalue] );
-#endif
 #endif
 }
 
@@ -427,31 +406,18 @@ static void PlayerSettings_SetMenuItems( void ) {
 	int		h;
 
 	// name
-#ifdef TA_SPLITVIEW
 	Q_strncpyz( s_playersettings.name.field.buffer, UI_Cvar_VariableString(
 			Com_LocalClientCvarName(s_playersettings.localClient, "name")), sizeof(s_playersettings.name.field.buffer) );
-#else
-	Q_strncpyz( s_playersettings.name.field.buffer, UI_Cvar_VariableString("name"), sizeof(s_playersettings.name.field.buffer) );
-#endif
-
 
 	// effects color
-#ifdef TA_SPLITVIEW
 	c = trap_Cvar_VariableValue( Com_LocalClientCvarName(s_playersettings.localClient, "color1") ) - 1;
-#else
-	c = trap_Cvar_VariableValue( "color1" ) - 1;
-#endif
 	if( c < 0 || c > NUM_COLOR_EFFECTS-1 ) {
 		c = NUM_COLOR_EFFECTS-1;
 	}
 	s_playersettings.effects.curvalue = gamecodetoui[c];
 
 #ifdef IOQ3ZTM // UI_COLOR2
-#ifdef TA_SPLITVIEW
 	c = trap_Cvar_VariableValue( Com_LocalClientCvarName(s_playersettings.localClient, "color2") ) - 1;
-#else
-	c = trap_Cvar_VariableValue( "color2" ) - 1;
-#endif
 	if( c < 0 || c > NUM_COLOR_EFFECTS-1 ) {
 		c = NUM_COLOR_EFFECTS-1;
 	}
@@ -465,12 +431,8 @@ static void PlayerSettings_SetMenuItems( void ) {
 	viewangles[PITCH] = 0;
 	viewangles[ROLL]  = 0;
 
-#ifdef TA_SPLITVIEW
 	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo,
 			UI_Cvar_VariableString( Com_LocalClientCvarName(s_playersettings.localClient, "model") ) );
-#else
-	UI_PlayerInfo_SetModel( &s_playersettings.playerinfo, UI_Cvar_VariableString( "model" ) );
-#endif
 #ifdef TA_WEAPSYS
 	UI_PlayerInfo_SetInfo( &s_playersettings.playerinfo,
 			BG_LegsStandForWeapon(&s_playersettings.playerinfo.playercfg, s_playersettings.playerinfo.weapon),
@@ -481,11 +443,7 @@ static void PlayerSettings_SetMenuItems( void ) {
 #endif
 
 	// handicap
-#ifdef TA_SPLITVIEW
 	h = Com_Clamp( 5, 100, trap_Cvar_VariableValue(Com_LocalClientCvarName(s_playersettings.localClient, "handicap")) );
-#else
-	h = Com_Clamp( 5, 100, trap_Cvar_VariableValue("handicap") );
-#endif
 	s_playersettings.handicap.curvalue = 20 - h / 5;
 }
 
@@ -502,21 +460,13 @@ static void PlayerSettings_MenuEvent( void* ptr, int event ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_HANDICAP:
-#ifdef TA_SPLITVIEW
 		trap_Cvar_Set( Com_LocalClientCvarName(s_playersettings.localClient, "handicap"),
 				va( "%i", 100 - 25 * s_playersettings.handicap.curvalue ) );
-#else
-		trap_Cvar_Set( "handicap", va( "%i", 100 - 25 * s_playersettings.handicap.curvalue ) );
-#endif
 		break;
 
 	case ID_MODEL:
 		PlayerSettings_SaveChanges();
-#ifdef TA_SPLITVIEW
 		UI_PlayerModelMenu(s_playersettings.localClient);
-#else
-		UI_PlayerModelMenu();
-#endif
 		break;
 
 	case ID_BACK:
@@ -532,19 +482,14 @@ static void PlayerSettings_MenuEvent( void* ptr, int event ) {
 PlayerSettings_MenuInit
 =================
 */
-#ifdef TA_SPLITVIEW
 static void PlayerSettings_MenuInit( int localClient )
-#else
-static void PlayerSettings_MenuInit( void )
-#endif
 {
 	int		y;
 
 	memset(&s_playersettings,0,sizeof(playersettings_t));
 
-#ifdef TA_SPLITVIEW
 	s_playersettings.localClient = localClient;
-#endif
+	Com_sprintf(s_playersettings.bannerString, sizeof (s_playersettings.bannerString), "PLAYER %d SETTINGS", s_playersettings.localClient+1);
 
 	PlayerSettings_Cache();
 
@@ -555,12 +500,7 @@ static void PlayerSettings_MenuInit( void )
 	s_playersettings.banner.generic.type  = MTYPE_BTEXT;
 	s_playersettings.banner.generic.x     = 320;
 	s_playersettings.banner.generic.y     = 16;
-#ifdef TA_SPLITVIEW
-	Com_sprintf(s_playersettings.bannerString, sizeof (s_playersettings.bannerString), "PLAYER %d SETTINGS", s_playersettings.localClient+1);
 	s_playersettings.banner.string = s_playersettings.bannerString;
-#else
-	s_playersettings.banner.string        = "PLAYER SETTINGS";
-#endif
 	s_playersettings.banner.color         = text_banner_color;
 	s_playersettings.banner.style         = UI_CENTER;
 
@@ -737,16 +677,7 @@ void PlayerSettings_Cache( void ) {
 UI_PlayerSettingsMenu
 =================
 */
-#ifdef TA_SPLITVIEW
-void UI_PlayerSettingsMenu( int localClient )
-#else
-void UI_PlayerSettingsMenu( void )
-#endif
-{
-#ifdef TA_SPLITVIEW
+void UI_PlayerSettingsMenu( int localClient ) {
 	PlayerSettings_MenuInit(localClient);
-#else
-	PlayerSettings_MenuInit();
-#endif
 	UI_PushMenu( &s_playersettings.menu );
 }

@@ -71,12 +71,7 @@ typedef struct
 	// NOTE: in_mlooking should be moved here if multiple mice are supported.
 } clientInput_t;
 
-#ifdef TA_SPLITVIEW // CONTROLS
 clientInput_t cis[MAX_SPLITVIEW];
-#else
-clientInput_t cis[1];
-#endif
-
 
 #ifdef USE_VOIP
 kbutton_t	in_voiprecord;
@@ -249,7 +244,6 @@ void IN_LockonDown(void) {IN_KeyDown(&cis[0].in_lockon);IN_KeyDown(&cis[0].in_st
 void IN_LockonUp(void) {IN_KeyUp(&cis[0].in_lockon);IN_KeyUp(&cis[0].in_strafe);}
 #endif
 
-#ifdef TA_SPLITVIEW
 void IN_2UpDown(void) {IN_KeyDown(&cis[1].in_up);}
 void IN_2UpUp(void) {IN_KeyUp(&cis[1].in_up);}
 void IN_2DownDown(void) {IN_KeyDown(&cis[1].in_down);}
@@ -345,7 +339,6 @@ void IN_4StrafeUp(void) {IN_KeyUp(&cis[3].in_strafe);}
 void IN_4LockonDown(void) {IN_KeyDown(&cis[3].in_lockon);IN_KeyDown(&cis[3].in_strafe);}
 void IN_4LockonUp(void) {IN_KeyUp(&cis[3].in_lockon);IN_KeyUp(&cis[3].in_strafe);}
 #endif
-#endif
 
 #ifdef USE_VOIP
 void IN_VoipRecordDown(void)
@@ -394,7 +387,6 @@ void IN_Button14Up(void) {IN_KeyUp(&cis[0].in_buttons[14]);}
 void IN_Button15Down(void) {IN_KeyDown(&cis[0].in_buttons[15]);}
 void IN_Button15Up(void) {IN_KeyUp(&cis[0].in_buttons[15]);}
 
-#ifdef TA_SPLITVIEW
 void IN_2Button0Down(void) {IN_KeyDown(&cis[1].in_buttons[0]);}
 void IN_2Button0Up(void) {IN_KeyUp(&cis[1].in_buttons[0]);}
 void IN_2Button1Down(void) {IN_KeyDown(&cis[1].in_buttons[1]);}
@@ -493,11 +485,9 @@ void IN_4Button14Down(void) {IN_KeyDown(&cis[3].in_buttons[14]);}
 void IN_4Button14Up(void) {IN_KeyUp(&cis[3].in_buttons[14]);}
 void IN_4Button15Down(void) {IN_KeyDown(&cis[3].in_buttons[15]);}
 void IN_4Button15Up(void) {IN_KeyUp(&cis[3].in_buttons[15]);}
-#endif
 
-#ifdef TA_SPLITVIEW
 void IN_CenterView_Main(int localClientNum) {
-	if (localClientNum >= MAX_SPLITVIEW || cl.snap.lcIndex[localClientNum] == -1) {
+	if (localClientNum < 0 || localClientNum >= MAX_SPLITVIEW || cl.snap.lcIndex[localClientNum] == -1) {
 		return;
 	}
 	cl.localClients[localClientNum].viewangles[PITCH] = -SHORT2ANGLE(cl.snap.pss[cl.snap.lcIndex[localClientNum]].delta_angles[PITCH]);
@@ -518,33 +508,17 @@ void IN_3CenterView (void) {
 void IN_4CenterView (void) {
 	IN_CenterView_Main(3);
 }
-#else
-void IN_CenterView (void) {
-	cl.localClient.viewangles[PITCH] = -SHORT2ANGLE(cl.snap.ps.delta_angles[PITCH]);
-}
-#endif
 
 
 //==========================================================================
 
-#ifdef TA_SPLITVIEW
 cvar_t	*cl_yawspeed[MAX_SPLITVIEW];
 cvar_t	*cl_pitchspeed[MAX_SPLITVIEW];
 
 cvar_t	*cl_anglespeedkey[MAX_SPLITVIEW];
-#else
-cvar_t	*cl_yawspeed;
-cvar_t	*cl_pitchspeed;
-
-cvar_t	*cl_anglespeedkey;
-#endif
 
 #ifndef TURTLEARENA // ALWAYS_RUN
-#ifdef TA_SPLITVIEW
 cvar_t	*cl_run[MAX_SPLITVIEW];
-#else
-cvar_t	*cl_run;
-#endif
 #endif
 
 /*
@@ -556,9 +530,7 @@ Moves the local angle positions
 */
 void CL_AdjustAngles( calc_t *lc, clientInput_t *ci ) {
 	float	speed;
-#ifdef TA_SPLITVIEW
-	size_t	lcNum = lc - cl.localClients;
-#endif
+	int		lcNum = lc - cl.localClients;
 	
 #ifdef TURTLEARENA // LOCKON // NO_SPEED_KEY
 	if ( !ci->in_lockon.active )
@@ -566,11 +538,7 @@ void CL_AdjustAngles( calc_t *lc, clientInput_t *ci ) {
 	if ( ci->in_speed.active )
 #endif
 	{
-#ifdef TA_SPLITVIEW
 		speed = 0.001 * cls.frametime * cl_anglespeedkey[lcNum]->value;
-#else
-		speed = 0.001 * cls.frametime * cl_anglespeedkey->value;
-#endif
 	} else {
 		speed = 0.001 * cls.frametime;
 	}
@@ -581,22 +549,12 @@ void CL_AdjustAngles( calc_t *lc, clientInput_t *ci ) {
 #endif
 		)
 	{
-#ifdef TA_SPLITVIEW
 		lc->viewangles[YAW] -= speed*cl_yawspeed[lcNum]->value*CL_KeyState (&ci->in_right);
 		lc->viewangles[YAW] += speed*cl_yawspeed[lcNum]->value*CL_KeyState (&ci->in_left);
-#else
-		lc->viewangles[YAW] -= speed*cl_yawspeed->value*CL_KeyState (&ci->in_right);
-		lc->viewangles[YAW] += speed*cl_yawspeed->value*CL_KeyState (&ci->in_left);
-#endif
 	}
 
-#ifdef TA_SPLITVIEW
 	lc->viewangles[PITCH] -= speed*cl_pitchspeed[lcNum]->value * CL_KeyState (&ci->in_lookup);
 	lc->viewangles[PITCH] += speed*cl_pitchspeed[lcNum]->value * CL_KeyState (&ci->in_lookdown);
-#else
-	lc->viewangles[PITCH] -= speed*cl_pitchspeed->value * CL_KeyState (&ci->in_lookup);
-	lc->viewangles[PITCH] += speed*cl_pitchspeed->value * CL_KeyState (&ci->in_lookdown);
-#endif
 }
 
 /*
@@ -618,11 +576,7 @@ void CL_KeyMove( clientInput_t *ci, usercmd_t *cmd ) {
 #ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
 	if (!ci->in_lockon.active)
 #else
-#ifdef TA_SPLITVIEW
 	if ( ci->in_speed.active ^ cl_run[ci-cis]->integer )
-#else
-	if ( ci->in_speed.active ^ cl_run->integer )
-#endif
 #endif
 	{
 		movespeed = 127;
@@ -671,13 +625,8 @@ void CL_MouseEvent( int dx, int dy, int time ) {
 	} else if (Key_GetCatcher( ) & KEYCATCH_CGAME) {
 		VM_Call (cgvm, CG_MOUSE_EVENT, dx, dy);
 	} else {
-#ifdef TA_SPLITVIEW
 		cl.localClients[0].mouseDx[cl.localClients[0].mouseIndex] += dx;
 		cl.localClients[0].mouseDy[cl.localClients[0].mouseIndex] += dy;
-#else
-		cl.localClient.mouseDx[cl.localClient.mouseIndex] += dx;
-		cl.localClient.mouseDy[cl.localClient.mouseIndex] += dy;
-#endif
 	}
 }
 
@@ -692,11 +641,7 @@ void CL_JoystickEvent( int axis, int value, int time ) {
 	if ( axis < 0 || axis >= MAX_JOYSTICK_AXIS ) {
 		Com_Error( ERR_DROP, "CL_JoystickEvent: bad axis %i", axis );
 	}
-#ifdef TA_SPLITVIEW
 	cl.localClients[0].joystickAxis[axis] = value;
-#else
-	cl.localClient.joystickAxis[axis] = value;
-#endif
 }
 
 /*
@@ -706,18 +651,12 @@ CL_JoystickMove
 */
 void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 	float	anglespeed;
-#ifdef TA_SPLITVIEW
-	size_t	lcNum = lc - cl.localClients;
-#endif
+	int		lcNum = lc - cl.localClients;
 
 #ifdef TURTLEARENA // LOCKON // ALWAYS_RUN // NO_SPEED_KEY
 	if (ci->in_lockon.active)
 #else
-#ifdef TA_SPLITVIEW
-	if ( !(ci->in_speed.active ^ cl_run[ci-cis]->integer) )
-#else
-	if ( !(ci->in_speed.active ^ cl_run->integer) )
-#endif
+	if ( !(ci->in_speed.active ^ cl_run[lcNum]->integer) )
 #endif
 	{
 		cmd->buttons |= BUTTON_WALKING;
@@ -729,11 +668,7 @@ void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 	if ( ci->in_speed.active )
 #endif
 	{
-#ifdef TA_SPLITVIEW
 		anglespeed = 0.001 * cls.frametime * cl_anglespeedkey[lcNum]->value;
-#else
-		anglespeed = 0.001 * cls.frametime * cl_anglespeedkey->value;
-#endif
 	} else {
 		anglespeed = 0.001 * cls.frametime;
 	}
@@ -744,39 +679,19 @@ void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 #endif
 		)
 	{
-#ifdef TA_SPLITVIEW
 		lc->viewangles[YAW] += anglespeed * j_yaw[lcNum]->value * lc->joystickAxis[j_yaw_axis[lcNum]->integer];
 		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_side[lcNum]->value * lc->joystickAxis[j_side_axis[lcNum]->integer]) );
-#else
-		lc->viewangles[YAW] += anglespeed * j_yaw->value * lc->joystickAxis[j_yaw_axis->integer];
-		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_side->value * lc->joystickAxis[j_side_axis->integer]) );
-#endif
 	} else {
-#ifdef TA_SPLITVIEW
 		lc->viewangles[YAW] += anglespeed * j_side[lcNum]->value * lc->joystickAxis[j_side_axis[lcNum]->integer];
 		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_yaw[lcNum]->value * lc->joystickAxis[j_yaw_axis[lcNum]->integer]) );
-#else
-		lc->viewangles[YAW] += anglespeed * j_side->value * lc->joystickAxis[j_side_axis->integer];
-		cmd->rightmove = ClampChar( cmd->rightmove + (int) (j_yaw->value * lc->joystickAxis[j_yaw_axis->integer]) );
-#endif
 	}
 
 	if ( in_mlooking ) {
-#ifdef TA_SPLITVIEW
 		lc->viewangles[PITCH] += anglespeed * j_forward[lcNum]->value * lc->joystickAxis[j_forward_axis[lcNum]->integer];
 		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_pitch[lcNum]->value * lc->joystickAxis[j_pitch_axis[lcNum]->integer]) );
-#else
-		lc->viewangles[PITCH] += anglespeed * j_forward->value * lc->joystickAxis[j_forward_axis->integer];
-		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_pitch->value * lc->joystickAxis[j_pitch_axis->integer]) );
-#endif
 	} else {
-#ifdef TA_SPLITVIEW
 		lc->viewangles[PITCH] += anglespeed * j_pitch[lcNum]->value * lc->joystickAxis[j_pitch_axis[lcNum]->integer];
 		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_forward[lcNum]->value * lc->joystickAxis[j_forward_axis[lcNum]->integer]) );
-#else
-		lc->viewangles[PITCH] += anglespeed * j_pitch->value * lc->joystickAxis[j_pitch_axis->integer];
-		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_forward->value * lc->joystickAxis[j_forward_axis->integer]) );
-#endif
 	}
 
 	cmd->upmove = ClampChar( cmd->upmove + lc->joystickAxis[AXIS_UP] );
@@ -803,7 +718,7 @@ void CL_MouseMove(calc_t *lc, clientInput_t *ci, usercmd_t *cmd)
 		mx = lc->mouseDx[lc->mouseIndex];
 		my = lc->mouseDy[lc->mouseIndex];
 	}
-	
+
 	lc->mouseIndex ^= 1;
 	lc->mouseDx[lc->mouseIndex] = 0;
 	lc->mouseDy[lc->mouseIndex] = 0;
@@ -936,6 +851,9 @@ CL_FinishMove
 */
 void CL_FinishMove( calc_t *lc, usercmd_t *cmd ) {
 	int		i;
+#ifdef IOQ3ZTM // ANALOG
+	int		localClientNum;
+#endif
 
 	// copy the state that the cgame is currently sending
 #if !defined TA_WEAPSYS_EX || defined TA_WEAPSYS_EX_COMPAT
@@ -951,22 +869,14 @@ void CL_FinishMove( calc_t *lc, usercmd_t *cmd ) {
 
 #ifdef IOQ3ZTM // ANALOG
 	// If cl_thirdPersonAnalog, always move relative to camera.
-#ifdef TA_SPLITVIEW
-	i = lc - cl.localClients;
-	if (cl_thirdPerson[i]->integer && cl_thirdPersonAnalog[i]->integer && cl_thirdPersonAngle[i]->value)
-#else
-	if (cl_thirdPerson->integer && cl_thirdPersonAnalog->integer && cl_thirdPersonAngle->value)
-#endif
+	localClientNum = lc - cl.localClients;
+	if (cl_thirdPerson[localClientNum]->integer && cl_thirdPersonAnalog[localClientNum]->integer
+		&& cl_thirdPersonAngle[localClientNum]->value)
 	{
 		if (cmd->forwardmove || cmd->rightmove || cmd->upmove)
 		{
-#ifdef TA_SPLITVIEW
-			lc->viewangles[YAW] -= cl_thirdPersonAngle[i]->value;
-			Cvar_Set(Com_LocalClientCvarName(i, "cg_thirdPersonAngle"), "0");
-#else
-			lc->viewangles[YAW] -= cl_thirdPersonAngle->value;
-			Cvar_Set("cg_thirdPersonAngle", "0");
-#endif
+			lc->viewangles[YAW] -= cl_thirdPersonAngle[localClientNum]->value;
+			Cvar_Set(Com_LocalClientCvarName(localClientNum, "cg_thirdPersonAngle"), "0");
 		}
 	}
 #endif
@@ -981,36 +891,23 @@ void CL_FinishMove( calc_t *lc, usercmd_t *cmd ) {
 CL_CreateCmd
 =================
 */
-#ifdef TA_SPLITVIEW // CONTROLS
-usercmd_t CL_CreateCmd( int localClientNum )
-#else
-usercmd_t CL_CreateCmd( void )
-#endif
-{
+usercmd_t CL_CreateCmd( int localClientNum ) {
 	usercmd_t	cmd;
 	vec3_t		oldAngles;
 	calc_t		*lc;
 	clientInput_t *ci;
-#ifdef TA_SPLITVIEW // CONTROLS
+
 	lc = &cl.localClients[localClientNum];
 	ci = &cis[localClientNum];
-#else
-	lc = &cl.localClient;
-	ci = &cis[0];
-#endif
 
 #ifdef TA_PATHSYS // 2DMODE
-#ifdef TA_SPLITVIEW
 	ci->pathMode = cl.snap.pss[cl.snap.lcIndex[localClientNum]].pathMode;
-#else
-	ci->pathMode = cl.snap.ps.pathMode;
-#endif
 #endif
 
 	VectorCopy( lc->viewangles, oldAngles );
 
 	// keyboard angle adjustment
-	CL_AdjustAngles (lc, ci);
+	CL_AdjustAngles(lc, ci);
 	
 	Com_Memset( &cmd, 0, sizeof( cmd ) );
 
@@ -1030,7 +927,7 @@ usercmd_t CL_CreateCmd( void )
 		lc->viewangles[PITCH] = oldAngles[PITCH] + 90;
 	} else if ( oldAngles[PITCH] - lc->viewangles[PITCH] > 90 ) {
 		lc->viewangles[PITCH] = oldAngles[PITCH] - 90;
-	} 
+	}
 
 	// store out the final values
 	CL_FinishMove( lc, &cmd );
@@ -1057,9 +954,7 @@ Create a new usercmd_t structure for this frame
 =================
 */
 void CL_CreateNewCommands( void ) {
-#ifdef TA_SPLITVIEW // CONTROLS
 	int			i;
-#endif
 	int			cmdNum;
 
 	// no need to create usercmds until we have a gamestate
@@ -1080,16 +975,13 @@ void CL_CreateNewCommands( void ) {
 	// generate a command for this frame
 	cl.cmdNumber++;
 	cmdNum = cl.cmdNumber & CMD_MASK;
-#ifdef TA_SPLITVIEW // CONTROLS
+
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		if (cl.snap.valid && cl.snap.lcIndex[i] == -1) {
 			continue;
 		}
 		cl.cmdss[i][cmdNum] = CL_CreateCmd(i);
 	}
-#else
-	cl.cmds[cmdNum] = CL_CreateCmd ();
-#endif
 }
 
 /*
@@ -1305,16 +1197,11 @@ void CL_WritePacket( void ) {
 		// write all the commands, including the predicted command
 		for ( i = 0 ; i < count ; i++ ) {
 			j = (cl.cmdNumber - count + i + 1) & CMD_MASK;
-#ifdef TA_SPLITVIEW // CONTROLS
 			cmd = &cl.cmdss[0][j];
-#else
-			cmd = &cl.cmds[j];
-#endif
 			MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
 			oldcmd = cmd;
 		}
 
-#ifdef TA_SPLITVIEW
 #ifdef LEGACY_PROTOCOL
 		if (!clc.compat)
 #endif
@@ -1345,18 +1232,12 @@ void CL_WritePacket( void ) {
 				// write all the commands, including the predicted command
 				for ( i = 0 ; i < count ; i++ ) {
 					j = (cl.cmdNumber - count + i + 1) & CMD_MASK;
-#if 0
-					if (qtrue) // Have all clients use the same usercmd_t
-						cmd = &cl.cmdss[0][j];
-					else
-#endif
-						cmd = &cl.cmdss[lc][j];
+					cmd = &cl.cmdss[lc][j];
 					MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
 					oldcmd = cmd;
 				}
 			}
 		}
-#endif
 	}
 
 	//
@@ -1485,7 +1366,6 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-voiprecord", IN_VoipRecordUp);
 #endif
 
-#ifdef TA_SPLITVIEW
 	Cmd_AddCommand ("2centerview",IN_2CenterView);
 
 	Cmd_AddCommand ("+2moveup",IN_2UpDown);
@@ -1510,7 +1390,6 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-2moveleft", IN_2MoveleftUp);
 	Cmd_AddCommand ("+2moveright", IN_2MoverightDown);
 	Cmd_AddCommand ("-2moveright", IN_2MoverightUp);
-
 #ifndef TURTLEARENA // NO_SPEED_KEY
 	Cmd_AddCommand ("+2speed", IN_2SpeedDown);
 	Cmd_AddCommand ("-2speed", IN_2SpeedUp);
@@ -1576,7 +1455,6 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-3moveleft", IN_3MoveleftUp);
 	Cmd_AddCommand ("+3moveright", IN_3MoverightDown);
 	Cmd_AddCommand ("-3moveright", IN_3MoverightUp);
-
 #ifndef TURTLEARENA // NO_SPEED_KEY
 	Cmd_AddCommand ("+3speed", IN_3SpeedDown);
 	Cmd_AddCommand ("-3speed", IN_3SpeedUp);
@@ -1642,7 +1520,6 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-4moveleft", IN_4MoveleftUp);
 	Cmd_AddCommand ("+4moveright", IN_4MoverightDown);
 	Cmd_AddCommand ("-4moveright", IN_4MoverightUp);
-
 #ifndef TURTLEARENA // NO_SPEED_KEY
 	Cmd_AddCommand ("+4speed", IN_4SpeedDown);
 	Cmd_AddCommand ("-4speed", IN_4SpeedUp);
@@ -1683,7 +1560,6 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-4button13", IN_4Button13Up);
 	Cmd_AddCommand ("+4button14", IN_4Button14Down);
 	Cmd_AddCommand ("-4button14", IN_4Button14Up);
-#endif
 
 	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0);
 	cl_debugMove = Cvar_Get ("cl_debugMove", "0", 0);
@@ -1762,7 +1638,6 @@ void CL_ShutdownInput(void)
 	Cmd_RemoveCommand("-voiprecord");
 #endif
 
-#ifdef TA_SPLITVIEW
 	Cmd_RemoveCommand("2centerview");
 
 	Cmd_RemoveCommand("+2moveup");
@@ -1787,7 +1662,6 @@ void CL_ShutdownInput(void)
 	Cmd_RemoveCommand("-2moveleft");
 	Cmd_RemoveCommand("+2moveright");
 	Cmd_RemoveCommand("-2moveright");
-
 #ifndef TURTLEARENA // NO_SPEED_KEY
 	Cmd_RemoveCommand("+2speed");
 	Cmd_RemoveCommand("-2speed");
@@ -1853,7 +1727,6 @@ void CL_ShutdownInput(void)
 	Cmd_RemoveCommand("-3moveleft");
 	Cmd_RemoveCommand("+3moveright");
 	Cmd_RemoveCommand("-3moveright");
-
 #ifndef TURTLEARENA // NO_SPEED_KEY
 	Cmd_RemoveCommand("+3speed");
 	Cmd_RemoveCommand("-3speed");
@@ -1919,7 +1792,6 @@ void CL_ShutdownInput(void)
 	Cmd_RemoveCommand("-4moveleft");
 	Cmd_RemoveCommand("+4moveright");
 	Cmd_RemoveCommand("-4moveright");
-
 #ifndef TURTLEARENA // NO_SPEED_KEY
 	Cmd_RemoveCommand("+4speed");
 	Cmd_RemoveCommand("-4speed");
@@ -1960,5 +1832,4 @@ void CL_ShutdownInput(void)
 	Cmd_RemoveCommand("-4button13");
 	Cmd_RemoveCommand("+4button14");
 	Cmd_RemoveCommand("-4button14");
-#endif
 }

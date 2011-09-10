@@ -598,7 +598,6 @@ void Con_DrawNotify (void)
 			continue;
 		text = con.text + (i % con.totallines)*con.linewidth;
 
-#ifdef TA_SPLITVIEW
 		if (cl.snap.pss[0].pm_type != PM_INTERMISSION
 #ifdef TA_SP
 		&& cl.snap.pss[0].pm_type != PM_SPINTERMISSION
@@ -606,15 +605,6 @@ void Con_DrawNotify (void)
 		&& Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
 			continue;
 		}
-#else
-		if (cl.snap.ps.pm_type != PM_INTERMISSION
-#ifdef TA_SP
-		&& cl.snap.ps.pm_type != PM_SPINTERMISSION
-#endif
-		&& Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
-			continue;
-		}
-#endif
 
 #ifdef IOQ3ZTM // FONT_REWRITE
 		float currentWidthLocation = cl_conXOffset->integer;

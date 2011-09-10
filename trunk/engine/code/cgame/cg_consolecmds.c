@@ -156,6 +156,7 @@ static void CG_scrollScoresUp_f( void) {
 }
 #endif
 
+
 #ifndef TA_SP
 #ifdef MISSIONPACK
 static void CG_spWin_f( void) {
@@ -172,11 +173,7 @@ static void CG_spWin_f( void) {
 #endif
 	CG_AddBufferedSound(cgs.media.winnerSound);
 	//trap_S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
-#ifdef TA_SPLITVIEW
 	cg.cur_lc = &cg.localClients[0];
-#else
-	cg.cur_lc = &cg.localClient;
-#endif
 #if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
@@ -198,11 +195,7 @@ static void CG_spLose_f( void) {
 #endif
 	CG_AddBufferedSound(cgs.media.loserSound);
 	//trap_S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
-#ifdef TA_SPLITVIEW
 	cg.cur_lc = &cg.localClients[0];
-#else
-	cg.cur_lc = &cg.localClient;
-#endif
 #if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
@@ -285,21 +278,12 @@ static void CG_PrevTeamMember_f( void ) {
 // ASS U ME's enumeration order as far as task specific orders, OFFENSE is zero, CAMP is last
 //
 static void CG_NextOrder_f( void ) {
-#ifdef TA_SPLITVIEW
 	clientInfo_t *ci = cgs.clientinfo + cg.snap->pss[0].clientNum;
 	if (ci) {
 		if (!ci->teamLeader && sortedTeamPlayers[cg_currentSelectedPlayer.integer] != cg.snap->pss[0].clientNum) {
 			return;
 		}
 	}
-#else
-	clientInfo_t *ci = cgs.clientinfo + cg.snap->ps.clientNum;
-	if (ci) {
-		if (!ci->teamLeader && sortedTeamPlayers[cg_currentSelectedPlayer.integer] != cg.snap->ps.clientNum) {
-			return;
-		}
-	}
-#endif
 	if (cgs.currentOrder < TEAMTASK_CAMP) {
 		cgs.currentOrder++;
 
@@ -495,11 +479,8 @@ static void CG_Camera_f( void ) {
 #ifdef IOQ3ZTM // NEW_CAM
 void CG_CamZoomIn(int localClient, qboolean down)
 {
-#ifdef TA_SPLITVIEW
 	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
-#endif
+
 	lc->camZoomIn = down;
 	if (down) {
 		lc->camZoomDir -= 1.0f;
@@ -509,11 +490,8 @@ void CG_CamZoomIn(int localClient, qboolean down)
 
 void CG_CamZoomOut(int localClient, qboolean down)
 {
-#ifdef TA_SPLITVIEW
 	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
-#endif
+
 	lc->camZoomOut = down;
 	if (down) {
 		lc->camZoomDir += 1.0f;
@@ -523,11 +501,8 @@ void CG_CamZoomOut(int localClient, qboolean down)
 
 void CG_CamLeft(int localClient, qboolean down)
 {
-#ifdef TA_SPLITVIEW
 	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
-#endif
+
 	lc->camLeft = down;
 	if (down) {
 		lc->camRotDir += 1.0f;
@@ -537,11 +512,8 @@ void CG_CamLeft(int localClient, qboolean down)
 
 void CG_CamRight(int localClient, qboolean down)
 {
-#ifdef TA_SPLITVIEW
 	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
-#endif
+
 	lc->camRight = down;
 	if (down) {
 		lc->camRotDir -= 1.0f;
@@ -551,11 +523,8 @@ void CG_CamRight(int localClient, qboolean down)
 
 void CG_CamReset(int localClient)
 {
-#ifdef TA_SPLITVIEW
 	cglc_t *lc = &cg.localClients[localClient];
-#else
-	cglc_t *lc = &cg.localClient;
-#endif
+
 	lc->camReseting = qtrue;
 	lc->camZoomDir = 0;
 	lc->camRotDir = 0;
@@ -724,14 +693,12 @@ static consoleCommand_t	commands[] = {
 #ifndef TURTLEARENA // NOZOOM
 	{ "+zoom", CG_ZoomDown_f },
 	{ "-zoom", CG_ZoomUp_f },
-#ifdef TA_SPLITVIEW
 	{ "+2zoom", CG_2ZoomDown_f },
 	{ "-2zoom", CG_2ZoomUp_f },
 	{ "+3zoom", CG_3ZoomDown_f },
 	{ "-3zoom", CG_3ZoomUp_f },
 	{ "+4zoom", CG_4ZoomDown_f },
 	{ "-4zoom", CG_4ZoomUp_f },
-#endif
 #endif
 #ifdef IOQ3ZTM // NEW_CAM
 	{ "camreset", CG_CamReset_f },
@@ -743,7 +710,6 @@ static consoleCommand_t	commands[] = {
 	{ "-camzoomin", CG_CamZoomInUp_f },
 	{ "+camzoomout", CG_CamZoomOutDown_f },
 	{ "-camzoomout", CG_CamZoomOutUp_f },
-#ifdef TA_SPLITVIEW
 	{ "2camreset", CG_2CamReset_f },
 	{ "+2camleft", CG_2CamLeftDown_f },
 	{ "-2camleft", CG_2CamLeftUp_f },
@@ -772,14 +738,12 @@ static consoleCommand_t	commands[] = {
 	{ "+4camzoomout", CG_4CamZoomOutDown_f },
 	{ "-4camzoomout", CG_4CamZoomOutUp_f },
 #endif
-#endif
 	{ "sizeup", CG_SizeUp_f },
 	{ "sizedown", CG_SizeDown_f },
 #ifndef TA_WEAPSYS_EX
 	{ "weapnext", CG_NextWeapon_f },
 	{ "weapprev", CG_PrevWeapon_f },
 	{ "weapon", CG_Weapon_f },
-#ifdef TA_SPLITVIEW
 	{ "2weapnext", CG_2NextWeapon_f },
 	{ "2weapprev", CG_2PrevWeapon_f },
 	{ "2weapon", CG_2Weapon_f },
@@ -790,12 +754,10 @@ static consoleCommand_t	commands[] = {
 	{ "4weapprev", CG_4PrevWeapon_f },
 	{ "4weapon", CG_4Weapon_f },
 #endif
-#endif
 #ifdef TA_HOLDSYS/*2*/
 	{ "holdnext", CG_NextHoldable_f },
 	{ "holdprev", CG_PrevHoldable_f },
 	{ "holdable", CG_Holdable_f },
-#ifdef TA_SPLITVIEW
 	{ "2holdnext", CG_2NextHoldable_f },
 	{ "2holdprev", CG_2PrevHoldable_f },
 	{ "2holdable", CG_2Holdable_f },
@@ -805,7 +767,6 @@ static consoleCommand_t	commands[] = {
 	{ "4holdnext", CG_4NextHoldable_f },
 	{ "4holdprev", CG_4PrevHoldable_f },
 	{ "4holdable", CG_4Holdable_f },
-#endif
 #endif
 	{ "tell_target", CG_TellTarget_f },
 	{ "tell_attacker", CG_TellAttacker_f },
@@ -848,7 +809,7 @@ static consoleCommand_t	commands[] = {
 #endif
 	{ "startOrbit", CG_StartOrbit_f },
 	//{ "camera", CG_Camera_f },
-	{ "loaddeferred", CG_LoadDeferredPlayers } 
+	{ "loaddeferred", CG_LoadDeferredPlayers }	
 };
 
 
@@ -876,6 +837,7 @@ qboolean CG_ConsoleCommand( void ) {
 	return qfalse;
 }
 
+
 /*
 =================
 CG_InitConsoleCommands
@@ -895,7 +857,6 @@ void CG_InitConsoleCommands( void ) {
 	// the game server will interpret these commands, which will be automatically
 	// forwarded to the server after they are not recognized locally
 	//
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		trap_AddCommand(Com_LocalClientCvarName(i, "say"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "say_team"));
@@ -930,35 +891,4 @@ void CG_InitConsoleCommands( void ) {
 	}
 
 	trap_AddCommand ("addbot");
-#else
-	trap_AddCommand ("kill");
-	trap_AddCommand ("say");
-	trap_AddCommand ("say_team");
-	trap_AddCommand ("tell");
-	trap_AddCommand ("vsay");
-	trap_AddCommand ("vsay_team");
-	trap_AddCommand ("vtell");
-	trap_AddCommand ("vtaunt");
-	trap_AddCommand ("vosay");
-	trap_AddCommand ("vosay_team");
-	trap_AddCommand ("votell");
-	trap_AddCommand ("give");
-	trap_AddCommand ("god");
-	trap_AddCommand ("notarget");
-	trap_AddCommand ("noclip");
-	trap_AddCommand ("team");
-	trap_AddCommand ("follow");
-	trap_AddCommand ("levelshot");
-	trap_AddCommand ("addbot");
-	trap_AddCommand ("setviewpos");
-	trap_AddCommand ("callvote");
-	trap_AddCommand ("vote");
-	trap_AddCommand ("callteamvote");
-	trap_AddCommand ("teamvote");
-	trap_AddCommand ("stats");
-#ifdef TA_MISC // DROP_FLAG
-	trap_AddCommand ("dropflag");
-#endif
-	trap_AddCommand ("teamtask");
-#endif
 }

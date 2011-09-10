@@ -165,11 +165,7 @@ vmCvar_t	cg_tracerChance;
 vmCvar_t	cg_tracerWidth;
 vmCvar_t	cg_tracerLength;
 #ifndef TA_WEAPSYS_EX
-#ifdef TA_SPLITVIEW
 vmCvar_t	cg_autoswitch[MAX_SPLITVIEW];
-#else
-vmCvar_t	cg_autoswitch;
-#endif
 #endif
 vmCvar_t	cg_ignore;
 vmCvar_t	cg_simpleItems;
@@ -177,16 +173,10 @@ vmCvar_t	cg_fov;
 #ifndef TURTLEARENA // NOZOOM
 vmCvar_t	cg_zoomFov;
 #endif
-#ifdef TA_SPLITVIEW
 vmCvar_t	cg_thirdPerson[MAX_SPLITVIEW];
 vmCvar_t	cg_thirdPersonRange[MAX_SPLITVIEW];
 vmCvar_t	cg_thirdPersonAngle[MAX_SPLITVIEW];
 vmCvar_t	cg_splitviewVertical;
-#else
-vmCvar_t	cg_thirdPerson;
-vmCvar_t	cg_thirdPersonRange;
-vmCvar_t	cg_thirdPersonAngle;
-#endif
 vmCvar_t	cg_lagometer;
 vmCvar_t	cg_drawAttacker;
 vmCvar_t	cg_synchronousClients;
@@ -279,14 +269,10 @@ typedef struct {
 static cvarTable_t cvarTable[] = {
 	{ &cg_ignore, "cg_ignore", "0", 0 },	// used for debugging
 #ifndef TA_WEAPSYS_EX
-#ifdef TA_SPLITVIEW
 	{ &cg_autoswitch[0], "cg_autoswitch", "1", CVAR_ARCHIVE },
 	{ &cg_autoswitch[1], "2cg_autoswitch", "1", CVAR_ARCHIVE },
 	{ &cg_autoswitch[2], "3cg_autoswitch", "1", CVAR_ARCHIVE },
 	{ &cg_autoswitch[3], "4cg_autoswitch", "1", CVAR_ARCHIVE },
-#else
-	{ &cg_autoswitch, "cg_autoswitch", "1", CVAR_ARCHIVE },
-#endif
 #endif
 #ifdef TURTLEARENA
 	{ &cg_drawGun, "cg_drawViewWeapons", "1", CVAR_ARCHIVE },
@@ -372,8 +358,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_tracerChance, "cg_tracerchance", "0.4", CVAR_CHEAT },
 	{ &cg_tracerWidth, "cg_tracerwidth", "1", CVAR_CHEAT },
 	{ &cg_tracerLength, "cg_tracerlength", "100", CVAR_CHEAT },
-#ifdef TURTLEARENA // FOV
-#ifdef TA_SPLITVIEW
+#ifdef TURTLEARENA // FOV // THIRD_PERSON
 	{ &cg_thirdPersonRange[0], "cg_thirdPersonRange", "120", 0 },
 	{ &cg_thirdPersonAngle[0], "cg_thirdPersonAngle", "0", 0 },
 	{ &cg_thirdPersonRange[1], "2cg_thirdPersonRange", "120", 0 },
@@ -382,12 +367,11 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_thirdPersonAngle[2], "3cg_thirdPersonAngle", "0", 0 },
 	{ &cg_thirdPersonRange[3], "4cg_thirdPersonRange", "120", 0 },
 	{ &cg_thirdPersonAngle[3], "4cg_thirdPersonAngle", "0", 0 },
+	{ &cg_thirdPerson[0], "cg_thirdPerson", "1", 0 },
+	{ &cg_thirdPerson[1], "2cg_thirdPerson", "1", 0 },
+	{ &cg_thirdPerson[2], "3cg_thirdPerson", "1", 0 },
+	{ &cg_thirdPerson[3], "4cg_thirdPerson", "1", 0 },
 #else
-	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "120", 0 },
-	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", 0 },
-#endif
-#else
-#ifdef TA_SPLITVIEW
 	{ &cg_thirdPersonRange[0], "cg_thirdPersonRange", "40", CVAR_CHEAT },
 	{ &cg_thirdPersonAngle[0], "cg_thirdPersonAngle", "0", CVAR_CHEAT },
 	{ &cg_thirdPersonRange[1], "2cg_thirdPersonRange", "40", CVAR_CHEAT },
@@ -396,31 +380,12 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_thirdPersonAngle[2], "3cg_thirdPersonAngle", "0", CVAR_CHEAT },
 	{ &cg_thirdPersonRange[3], "4cg_thirdPersonRange", "40", CVAR_CHEAT },
 	{ &cg_thirdPersonAngle[3], "4cg_thirdPersonAngle", "0", CVAR_CHEAT },
-#else
-	{ &cg_thirdPersonRange, "cg_thirdPersonRange", "40", CVAR_CHEAT },
-	{ &cg_thirdPersonAngle, "cg_thirdPersonAngle", "0", CVAR_CHEAT },
-#endif
-#endif
-#ifdef TA_SPLITVIEW
-#ifdef TURTLEARENA // THIRD_PERSON
-	{ &cg_thirdPerson[0], "cg_thirdPerson", "1", 0 },
-	{ &cg_thirdPerson[1], "2cg_thirdPerson", "1", 0 },
-	{ &cg_thirdPerson[2], "3cg_thirdPerson", "1", 0 },
-	{ &cg_thirdPerson[3], "4cg_thirdPerson", "1", 0 },
-#else
 	{ &cg_thirdPerson[0], "cg_thirdPerson", "0", 0 },
 	{ &cg_thirdPerson[1], "2cg_thirdPerson", "0", 0 },
 	{ &cg_thirdPerson[2], "3cg_thirdPerson", "0", 0 },
 	{ &cg_thirdPerson[3], "4cg_thirdPerson", "0", 0 },
 #endif
 	{ &cg_splitviewVertical, "cg_splitviewVertical", "0", CVAR_ARCHIVE },
-#else
-#ifdef TURTLEARENA // THIRD_PERSON
-	{ &cg_thirdPerson, "cg_thirdPerson", "1", 0 },
-#else
-	{ &cg_thirdPerson, "cg_thirdPerson", "0", 0 },
-#endif
-#endif
 #ifdef IOQ3ZTM // TEAM_CHAT_CON // con_notifytime
 	{ &cg_teamChatTime, "cg_teamChatTime", "5", CVAR_ARCHIVE  },
 #else
@@ -560,6 +525,7 @@ void CG_RegisterCvars( void ) {
 	forceModelModificationCount = cg_forceModel.modificationCount;
 #endif
 
+	// ZTM: FIXME: Add extra local clients, or can this be safely removed?
 #ifdef TA_SP // SPMODEL
 	trap_Cvar_Register(NULL, "spmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ROM );
 	trap_Cvar_Register(NULL, "spheadmodel", "", CVAR_USERINFO | CVAR_ROM );
@@ -634,31 +600,17 @@ void CG_UpdateCvars( void ) {
 }
 
 int CG_CrosshairPlayer( void ) {
-#ifdef TA_SPLITVIEW
 	if ( cg.time > ( cg.localClients[0].crosshairClientTime + 1000 ) ) {
 		return -1;
 	}
 	return cg.localClients[0].crosshairClientNum;
-#else
-	if ( cg.time > ( cg.localClient.crosshairClientTime + 1000 ) ) {
-		return -1;
-	}
-	return cg.localClient.crosshairClientNum;
-#endif
 }
 
 int CG_LastAttacker( void ) {
-#ifdef TA_SPLITVIEW
 	if ( !cg.localClients[0].attackerTime ) {
 		return -1;
 	}
 	return cg.snap->pss[0].persistant[PERS_ATTACKER];
-#else
-	if ( !cg.localClient.attackerTime ) {
-		return -1;
-	}
-	return cg.snap->ps.persistant[PERS_ATTACKER];
-#endif
 }
 
 #ifdef IOQ3ZTM // LESS_VERBOSE
@@ -1116,6 +1068,7 @@ static void CG_RegisterSounds( void ) {
 	trap_S_RegisterSound("sound/player/janet/fall1.wav", qfalse );
 	trap_S_RegisterSound("sound/player/janet/taunt.wav", qfalse );
 #endif
+
 }
 
 
@@ -1682,7 +1635,6 @@ CG_RegisterClients
 */
 static void CG_RegisterClients( void ) {
 	int		i;
-#ifdef TA_SPLITVIEW
 	int		j;
 	int		numLocalClients = 1; // cg.snap->numPSs; ZTM: FIXME?: cg.snap is NULL here, how can we get number?
 
@@ -1690,15 +1642,10 @@ static void CG_RegisterClients( void ) {
 		CG_LoadingClient(cg.localClients[i].clientNum);
 		CG_NewClientInfo(cg.localClients[i].clientNum);
 	}
-#else
-	CG_LoadingClient(cg.localClient.clientNum);
-	CG_NewClientInfo(cg.localClient.clientNum);
-#endif
 
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
 		const char		*clientInfo;
 
-#ifdef TA_SPLITVIEW
 		for (j = 0; j < numLocalClients; j++) {
 			if (cg.localClients[j].clientNum == i) {
 				break;
@@ -1707,11 +1654,6 @@ static void CG_RegisterClients( void ) {
 		if (j != numLocalClients) {
 			continue;
 		}
-#else
-		if (cg.localClient.clientNum == i) {
-			continue;
-		}
-#endif
 
 		clientInfo = CG_ConfigString( CS_PLAYERS+i );
 		if ( !clientInfo[0]) {
@@ -2452,9 +2394,7 @@ Will perform callbacks to make the loading info screen update.
 */
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	const char	*s;
-#ifdef TA_SPLITVIEW
 	int			i;
-#endif
 
 	// clear everything
 	memset( &cgs, 0, sizeof( cgs ) );
@@ -2472,15 +2412,11 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( cg_npcs, 0, sizeof(cg_npcs) );
 #endif
 
-#ifdef TA_SPLITVIEW
 	cg.numViewports = 1;
 
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		cg.localClients[i].clientNum = clientNum;
 	}
-#else
-	cg.localClient.clientNum = clientNum;
-#endif
 
 	cgs.processedSnapshotNum = serverMessageNum;
 	cgs.serverCommandSequence = serverCommandSequence;
@@ -2514,7 +2450,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_InitConsoleCommands();
 
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 #ifdef TA_HOLDSYS/*2*/
 		cg.localClients[i].holdableSelect = HI_NO_SELECT;
@@ -2531,22 +2466,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		cg.localClients[i].weaponSelect = WP_MACHINEGUN;
 #endif
 	}
-#else // !TA_SPLITVIEW
-#ifdef TA_HOLDSYS/*2*/
-	cg.localClient.holdableSelect = HI_NO_SELECT;
-#endif
-#if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
-	// Select our default weapon.
-	cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
-#ifdef TA_WEAPSYS_EX
-	cg.localClient.predictedPlayerState.stats[STAT_PENDING_WEAPON] = cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
-#else
-	cg.localClient.weaponSelect = cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON];
-#endif
-#else
-	cg.localClient.weaponSelect = WP_MACHINEGUN;
-#endif
-#endif // !TA_SPLITVIEW
 
 	cgs.redflag = cgs.blueflag = -1; // For compatibily, default to unset for
 	cgs.flagStatus = -1;
@@ -2690,6 +2609,7 @@ int CG_ViewType( int entityNum ) {
 
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[cg.snap->lcIndex[i]].clientNum == entityNum) {
+			// ZTM: FIXME: Check if spectator, and return 0
 			return cg_thirdPerson[cg.snap->lcIndex[i]].integer;
 		}
 	}

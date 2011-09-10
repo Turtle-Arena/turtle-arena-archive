@@ -34,9 +34,7 @@ GetClientState
 ====================
 */
 static void GetClientState( uiClientState_t *state ) {
-#ifdef TA_SPLITVIEW
 	int		i;
-#endif
 
 	state->connectPacketCount = clc.connectPacketCount;
 	state->connState = clc.state;
@@ -46,10 +44,9 @@ static void GetClientState( uiClientState_t *state ) {
 #ifdef IOQ3ZTM // SPECTATOR_FIX // Correct clientNum
 	state->clientNum = clc.clientNum;
 #else
-	state->clientNum = cl.snap.ps.clientNum;
+	state->clientNum = cl.snap.pss[0].clientNum;
 #endif
 
-#ifdef TA_SPLITVIEW
 	state->numLocalClients = 0;
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		state->lcIndex[i] = cl.snap.lcIndex[i];
@@ -57,7 +54,6 @@ static void GetClientState( uiClientState_t *state ) {
 			state->numLocalClients++;
 		}
 	}
-#endif
 }
 
 /*

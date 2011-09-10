@@ -49,7 +49,7 @@ vec4_t color_blue	    = {0.00f, 0.00f, 1.00f, 1.00f};
 vec4_t color_lightOrange    = {1.00f, 0.68f, 0.00f, 1.00f };
 vec4_t color_orange	    = {1.00f, 0.43f, 0.00f, 1.00f};
 vec4_t color_red	    = {1.00f, 0.00f, 0.00f, 1.00f};
-#ifdef TA_SPLITVIEW
+#ifdef TURTLEARENA
 vec4_t color_green	    = {0.00f, 1.00f, 0.00f, 1.00f};
 #endif
 vec4_t color_dim	    = {0.00f, 0.00f, 0.00f, 0.25f};
@@ -537,7 +537,6 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 		case K_JOY2:
 		case K_JOY3:
 		case K_JOY4:
-#ifdef TA_SPLITVIEW
 		case K_2JOY1:
 		case K_2JOY2:
 		case K_2JOY3:
@@ -550,7 +549,6 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 		case K_4JOY2:
 		case K_4JOY3:
 		case K_4JOY4:
-#endif
 		case K_ENTER:
 		case K_KP_ENTER:
 		case K_LEFTARROW:
@@ -1954,7 +1952,6 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 		case K_JOY2:
 		case K_JOY3:
 		case K_JOY4:
-#ifdef TA_SPLITVIEW
 		case K_2JOY1:
 		case K_2JOY2:
 		case K_2JOY3:
@@ -1967,7 +1964,6 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 		case K_4JOY2:
 		case K_4JOY3:
 		case K_4JOY4:
-#endif
 		case K_AUX1:
 		case K_AUX2:
 		case K_AUX3:

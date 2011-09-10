@@ -345,8 +345,7 @@ CG_Draw3DModel
 
 ================
 */
-void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles )
-{
+void CG_Draw3DModel( float x, float y, float w, float h, qhandle_t model, qhandle_t skin, vec3_t origin, vec3_t angles ) {
 	refdef_t		refdef;
 	refEntity_t		ent;
 
@@ -486,7 +485,6 @@ void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t head
 #else
 		CG_Draw3DModel( x, y, w, h, ci->headModel, ci->headSkin, origin, headAngles );
 #endif
-
 	} else if ( cg_drawIcons.integer ) {
 		CG_DrawPic( x, y, w, h, ci->modelIcon );
 	}
@@ -1006,8 +1004,8 @@ static void CG_DrawStatusBar( void ) {
 #ifdef TURTLEARENA
 	CG_HudPlacement(HUD_LEFT);
 
-	cent = &cg_entities[cg.cur_ps->clientNum];
 	ps = cg.cur_ps;
+	cent = &cg_entities[ps->clientNum];
 
 	start_x = x = HUD_X;
 	y = HUD_Y;
@@ -1161,11 +1159,11 @@ static void CG_DrawStatusBar( void ) {
 #else
 	CG_HudPlacement(HUD_CENTER);
 
-	// draw the team background
-	CG_DrawTeamBackground( 0, 420, 640, 60, 0.33f, cg.cur_ps->persistant[PERS_TEAM], cg.cur_ps->clientNum );
-
-	cent = &cg_entities[cg.cur_ps->clientNum];
 	ps = cg.cur_ps;
+	cent = &cg_entities[ps->clientNum];
+
+	// draw the team background
+	CG_DrawTeamBackground( 0, 420, 640, 60, 0.33f, ps->persistant[PERS_TEAM], ps->clientNum );
 
 	VectorClear( angles );
 
@@ -1436,11 +1434,10 @@ static float CG_DrawFPS( float y ) {
 	static	int	previous;
 	int		t, frameTime;
 
-#ifdef TA_SPLITVIEW
 	if (cg.viewport != 0) {
 		return y;
 	}
-#endif
+
 	// don't use serverTime, because that will be drifting to
 	// correct for internet lag changes, timescales, timedemos, etc
 	t = trap_Milliseconds();
@@ -1763,8 +1760,7 @@ static void CG_DrawUpperRight(stereoFrame_t stereoFrame)
 	if ( cg_drawSnapshot.integer ) {
 		y = CG_DrawSnapshot( y );
 	}
-	if (cg_drawFPS.integer && (stereoFrame == STEREO_CENTER || stereoFrame == STEREO_RIGHT) )
-	{
+	if (cg_drawFPS.integer && (stereoFrame == STEREO_CENTER || stereoFrame == STEREO_RIGHT)) {
 		y = CG_DrawFPS( y );
 	}
 	if ( cg_drawTimer.integer ) {
@@ -2009,6 +2005,7 @@ static float CG_DrawPowerups( float y ) {
 		if ( !ps->powerups[ i ] ) {
 			continue;
 		}
+
 #ifdef MISSIONPACK // IOQ3ZTM // ZTM: Skip persistant powerups!
 		if (i == PW_SCOUT
 			|| i == PW_GUARD
@@ -2018,6 +2015,7 @@ static float CG_DrawPowerups( float y ) {
 			continue;
 		}
 #endif
+
 		t = ps->powerups[ i ] - cg.time;
 		// ZOID--don't draw if the power up has unlimited time (999 seconds)
 		// This is true of the CTF flags
@@ -2334,11 +2332,7 @@ static void CG_DrawReward( void ) {
 			cg.cur_lc->rewardStack--;
 			color = CG_FadeColor( cg.cur_lc->rewardTime, REWARD_TIME );
 #ifdef TA_MISC // COMIC_ANNOUNCER
-#ifdef TA_SPLITVIEW
 			CG_AddAnnouncement(cg.cur_lc->rewardAnnoucement[0], cg.cur_lc - cg.localClients);
-#else
-			CG_AddAnnouncement(cg.cur_lc->rewardAnnoucement[0]);
-#endif
 #else
 			trap_S_StartLocalSound(cg.cur_lc->rewardSound[0], CHAN_ANNOUNCER);
 #endif
@@ -2350,21 +2344,21 @@ static void CG_DrawReward( void ) {
 	trap_R_SetColor( color );
 
 	/*
-	count = cg.rewardCount[0]/10;				// number of big rewards to draw
+	count = cg.cur_lc->rewardCount[0]/10;				// number of big rewards to draw
 
 	if (count) {
 		y = 4;
 		x = 320 - count * ICON_SIZE;
 		for ( i = 0 ; i < count ; i++ ) {
-			CG_DrawPic( x, y, (ICON_SIZE*2)-4, (ICON_SIZE*2)-4, cg.rewardShader[0] );
+			CG_DrawPic( x, y, (ICON_SIZE*2)-4, (ICON_SIZE*2)-4, cg.cur_lc->rewardShader[0] );
 			x += (ICON_SIZE*2);
 		}
 	}
 
-	count = cg.rewardCount[0] - count*10;		// number of small rewards to draw
+	count = cg.cur_lc->rewardCount[0] - count*10;		// number of small rewards to draw
 	*/
 
-	if ( cg.cur_lc->rewardCount[0] >= 0 ) {
+	if ( cg.cur_lc->rewardCount[0] >= 10 ) {
 		y = 56;
 		x = 320 - ICON_SIZE/2;
 		CG_DrawPic( x, y, ICON_SIZE-4, ICON_SIZE-4, cg.cur_lc->rewardShader[0] );
@@ -2468,11 +2462,7 @@ static void CG_DrawDisconnect( void ) {
 
 	// draw the phone jack if we are completely past our buffers
 	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
-#ifdef TA_SPLITVIEW // CONTROLS
 	trap_GetUserCmd( cmdNum, &cmd, cg.cur_localClientNum );
-#else
-	trap_GetUserCmd( cmdNum, &cmd );
-#endif
 	if ( cmd.serverTime <= cg.cur_ps->commandTime
 		|| cmd.serverTime > cg.time ) {	// special check for map_restart
 		return;
@@ -3030,21 +3020,12 @@ static void CG_DrawTeamVote(void) {
 	int		sec, cs_offset;
 	float	y;
 
-#ifdef TA_SPLITVIEW
-	if ( cgs.clientinfo[cg.cur_localClientNum].team == TEAM_RED )
+	if ( cgs.clientinfo[cg.cur_ps->clientNum].team == TEAM_RED )
 		cs_offset = 0;
-	else if ( cgs.clientinfo[cg.cur_localClientNum].team == TEAM_BLUE )
+	else if ( cgs.clientinfo[cg.cur_ps->clientNum].team == TEAM_BLUE )
 		cs_offset = 1;
 	else
 		return;
-#else
-	if ( cgs.clientinfo[cg.clientNum].team == TEAM_RED )
-		cs_offset = 0;
-	else if ( cgs.clientinfo[cg.clientNum].team == TEAM_BLUE )
-		cs_offset = 1;
-	else
-		return;
-#endif
 
 	if ( !cgs.teamVoteTime[cs_offset] ) {
 		return;

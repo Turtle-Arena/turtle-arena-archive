@@ -52,15 +52,13 @@ INGAME MENU
 #define ID_QUIT					17
 #define ID_RESUME				18
 #define ID_TEAMORDERS			19
+#define ID_LOCALPLAYERS			20
 #ifdef TA_MISC // SMART_JOIN_MENU
-#define ID_JOINGAME				20
-#define ID_SPECTATE				21
+#define ID_JOINGAME				21
+#define ID_SPECTATE				22
 #endif
 #ifdef TA_MISC
-#define ID_CUSTOMIZEPLAYER		22
-#endif
-#ifdef TA_SPLITVIEW
-#define ID_LOCALPLAYERS			23
+#define ID_CUSTOMIZEPLAYER		23
 #endif
 
 
@@ -85,9 +83,7 @@ typedef struct {
 	menutext_s		teamorders;
 	menutext_s		quit;
 	menutext_s		resume;
-#ifdef TA_SPLITVIEW
 	menutext_s		localPlayers;
-#endif
 } ingamemenu_t;
 
 static ingamemenu_t	s_ingame;
@@ -124,7 +120,6 @@ static void InGame_QuitAction( qboolean result ) {
 }
 
 
-#ifdef TA_SPLITVIEW
 /*
 =================
 UI_TogglePlayerIngame
@@ -156,7 +151,6 @@ void UI_TogglePlayerIngame(int localClientNum)
 
 	UI_ForceMenuOff ();
 }
-#endif
 
 /*
 =================
@@ -170,11 +164,7 @@ void InGame_Event( void *ptr, int notification ) {
 
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_TEAM:
-#ifdef TA_SPLITVIEW
-		UI_SetupPlayersMenu(UI_TeamMainMenu, "CHANGE TEAM", qtrue);
-#else
-		UI_TeamMainMenu();
-#endif
+		InSelectPlayerMenu(UI_TeamMainMenu, "CHANGE TEAM", qtrue);
 		break;
 
 #ifdef TA_MISC // SMART_JOIN_MENU
@@ -227,11 +217,7 @@ void InGame_Event( void *ptr, int notification ) {
 
 #ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
-#ifdef TA_SPLITVIEW
-		UI_SetupPlayersMenu(UI_PlayerSettingsMenu, "SETUP PLAYER", qtrue);
-#else
-		UI_PlayerSettingsMenu();
-#endif
+		InSelectPlayerMenu(UI_PlayerSettingsMenu, "SETUP PLAYER", qtrue);
 		break;
 #endif
 
@@ -243,11 +229,13 @@ void InGame_Event( void *ptr, int notification ) {
 		UI_PopMenu();
 		break;
 
-#ifdef TA_SPLITVIEW
 	case ID_LOCALPLAYERS:
-		UI_SetupPlayersMenu(UI_TogglePlayerIngame, "Add/Drop", qfalse);
-		break;
+#ifdef TA_MISC
+		InSelectPlayerMenu(UI_TogglePlayerIngame, "ADD/DROP", qfalse);
+#else
+		InSelectPlayerMenu(UI_TogglePlayerIngame, "ADD OR DROP", qfalse);
 #endif
+		break;
 	}
 }
 
@@ -279,11 +267,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.frame.height				= 332;//256;
 
 #ifdef TA_MISC // INGAME_SERVER_MENU
-#ifdef TA_SPLITVIEW
 	y = 88+INGAME_MENU_VERTICAL_SPACING/2;
-#else
-	y = 88+INGAME_MENU_VERTICAL_SPACING;
-#endif
 #else
 	//y = 96;
 	y = 88;
@@ -305,23 +289,18 @@ void InGame_MenuInit( void ) {
 	trap_GetClientState( &cs );
 	trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
 
-	if(
-#ifdef TA_SPLITVIEW // Force if more than one local client
-		cs.numLocalClients > 1 ||
-#endif
-		(trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
+	// Force if more than one local client
+	if (cs.numLocalClients > 1 || (trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
 		s_ingame.team.generic.type			= MTYPE_PTEXT;
 		s_ingame.team.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 		s_ingame.team.generic.x				= 320;
 		s_ingame.team.generic.y				= y;
 		s_ingame.team.generic.id			= ID_TEAM;
 		s_ingame.team.generic.callback		= InGame_Event;
-#ifdef TA_SPLITVIEW
 		if (cs.numLocalClients > 1)
 			s_ingame.team.string			= "Change Teams";
 		else
-#endif
-		s_ingame.team.string				= "Change Team";
+			s_ingame.team.string				= "Change Team";
 		s_ingame.team.color					= text_big_color;
 		s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 	}
@@ -433,7 +412,6 @@ void InGame_MenuInit( void ) {
 		}
 	}
 
-#ifdef TA_SPLITVIEW
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.localPlayers.generic.type		= MTYPE_PTEXT;
 	s_ingame.localPlayers.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -448,7 +426,16 @@ void InGame_MenuInit( void ) {
 #endif
 	s_ingame.localPlayers.color				= text_big_color;
 	s_ingame.localPlayers.style				= UI_CENTER|UI_SMALLFONT;
+
+#ifdef TA_SP
+	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) &&
+		trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER)
+#else
+	if (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
+	{
+		s_ingame.localPlayers.generic.flags |= QMF_GRAYED;
+	}
 
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.setup.generic.type			= MTYPE_PTEXT;
@@ -473,12 +460,10 @@ void InGame_MenuInit( void ) {
 	s_ingame.setupplayer.generic.y			= y;
 	s_ingame.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
 	s_ingame.setupplayer.generic.callback	= InGame_Event; 
-#ifdef TA_SPLITVIEW
 	if (cs.numLocalClients > 1)
 		s_ingame.setupplayer.string			= "Setup Players";
 	else
-#endif
-	s_ingame.setupplayer.string				= "Setup Player";
+		s_ingame.setupplayer.string				= "Setup Player";
 	s_ingame.setupplayer.color				= text_big_color;
 	s_ingame.setupplayer.style				= UI_CENTER|UI_SMALLFONT;
 #endif
@@ -583,9 +568,7 @@ void InGame_MenuInit( void ) {
 	Menu_AddItem( &s_ingame.menu, &s_ingame.removebots );
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.teamorders );
-#ifdef TA_SPLITVIEW
 	Menu_AddItem( &s_ingame.menu, &s_ingame.localPlayers);
-#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setup );
 #ifdef TA_MISC
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setupplayer );

@@ -39,9 +39,7 @@ SETUP MENU
 #define ART_FRAMEL		"menu/art/frame2_l"
 #define ART_FRAMER		"menu/art/frame1_r"
 
-#ifndef TA_SPLITVIEW
 #define ID_CUSTOMIZEPLAYER		10
-#endif
 #define ID_CUSTOMIZECONTROLS	11
 #define ID_SYSTEMCONFIG			12
 #define ID_GAME					13
@@ -52,12 +50,6 @@ SETUP MENU
 #ifdef TURTLEARENA // LONG_CREDITS
 #define ID_CREDITS				18
 #endif
-#ifdef TA_SPLITVIEW
-#define ID_CUSTOMIZEPLAYER		19
-#define ID_CUSTOMIZEPLAYER2		20
-#define ID_CUSTOMIZEPLAYER3		21
-#define ID_CUSTOMIZEPLAYER4		22
-#endif
 
 
 typedef struct {
@@ -67,12 +59,7 @@ typedef struct {
 	menubitmap_s	framel;
 	menubitmap_s	framer;
 #ifndef TA_MISC
-	menutext_s		setupplayer;
-#ifdef TA_SPLITVIEW
-	menutext_s		setupplayer2;
-	menutext_s		setupplayer3;
-	menutext_s		setupplayer4;
-#endif
+	menutext_s		setupplayers;
 #endif
 	menutext_s		setupcontrols;
 	menutext_s		setupsystem;
@@ -121,12 +108,6 @@ UI_SetupMenu_Event
 ===============
 */
 static void UI_SetupMenu_Event( void *ptr, int event ) {
-#ifndef TA_MISC
-#ifdef TA_SPLITVIEW
-	int		lc;
-#endif
-#endif
-
 	if( event != QM_ACTIVATED ) {
 		return;
 	}
@@ -134,24 +115,12 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 	switch( ((menucommon_s*)ptr)->id ) {
 #ifndef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
-#ifdef TA_SPLITVIEW
-	case ID_CUSTOMIZEPLAYER2:
-	case ID_CUSTOMIZEPLAYER3:
-	case ID_CUSTOMIZEPLAYER4:
-		lc = ((menucommon_s*)ptr)->id - ID_CUSTOMIZEPLAYER;
-		UI_PlayerSettingsMenu(lc);
-#else
-		UI_PlayerSettingsMenu();
-#endif
+		UI_SelectPlayerMenu(UI_PlayerSettingsMenu, "PLAYER SETTINGS");
 		break;
 #endif
 
 	case ID_CUSTOMIZECONTROLS:
-#if defined TA_MISC || defined TA_SPLITVIEW
-		UI_ControlsMainMenu();
-#else
-		UI_ControlsMenu();
-#endif
+		UI_SelectPlayerMenu(UI_ControlsMenu, "CONTROLS");
 		break;
 
 	case ID_SYSTEMCONFIG:
@@ -228,60 +197,17 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.framer.width  					= 256;
 	setupMenuInfo.framer.height  					= 334;
 
-#if !defined TA_MISC && defined TA_SPLITVIEW 
-	y = 94;
-#else
 	y = 134;
-#endif
 #ifndef TA_MISC
-	setupMenuInfo.setupplayer.generic.type			= MTYPE_PTEXT;
-	setupMenuInfo.setupplayer.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	setupMenuInfo.setupplayer.generic.x				= 320;
-	setupMenuInfo.setupplayer.generic.y				= y;
-	setupMenuInfo.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
-	setupMenuInfo.setupplayer.generic.callback		= UI_SetupMenu_Event; 
-#ifdef TA_SPLITVIEW 
-	setupMenuInfo.setupplayer.string				= "PLAYER 1";
-#else
-	setupMenuInfo.setupplayer.string				= "PLAYER";
-#endif
-	setupMenuInfo.setupplayer.color					= text_big_color;
-	setupMenuInfo.setupplayer.style					= UI_CENTER;
-
-#ifdef TA_SPLITVIEW
-	y += SETUP_MENU_VERTICAL_SPACING;
-	setupMenuInfo.setupplayer2.generic.type			= MTYPE_PTEXT;
-	setupMenuInfo.setupplayer2.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	setupMenuInfo.setupplayer2.generic.x			= 320;
-	setupMenuInfo.setupplayer2.generic.y			= y;
-	setupMenuInfo.setupplayer2.generic.id			= ID_CUSTOMIZEPLAYER2;
-	setupMenuInfo.setupplayer2.generic.callback		= UI_SetupMenu_Event; 
-	setupMenuInfo.setupplayer2.string				= "PLAYER 2";
-	setupMenuInfo.setupplayer2.color				= text_big_color;
-	setupMenuInfo.setupplayer2.style				= UI_CENTER;
-
-	y += SETUP_MENU_VERTICAL_SPACING;
-	setupMenuInfo.setupplayer3.generic.type			= MTYPE_PTEXT;
-	setupMenuInfo.setupplayer3.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	setupMenuInfo.setupplayer3.generic.x			= 320;
-	setupMenuInfo.setupplayer3.generic.y			= y;
-	setupMenuInfo.setupplayer3.generic.id			= ID_CUSTOMIZEPLAYER3;
-	setupMenuInfo.setupplayer3.generic.callback		= UI_SetupMenu_Event; 
-	setupMenuInfo.setupplayer3.string				= "PLAYER 3";
-	setupMenuInfo.setupplayer3.color				= text_big_color;
-	setupMenuInfo.setupplayer3.style				= UI_CENTER;
-
-	y += SETUP_MENU_VERTICAL_SPACING;
-	setupMenuInfo.setupplayer4.generic.type			= MTYPE_PTEXT;
-	setupMenuInfo.setupplayer4.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	setupMenuInfo.setupplayer4.generic.x			= 320;
-	setupMenuInfo.setupplayer4.generic.y			= y;
-	setupMenuInfo.setupplayer4.generic.id			= ID_CUSTOMIZEPLAYER4;
-	setupMenuInfo.setupplayer4.generic.callback		= UI_SetupMenu_Event; 
-	setupMenuInfo.setupplayer4.string				= "PLAYER 4";
-	setupMenuInfo.setupplayer4.color				= text_big_color;
-	setupMenuInfo.setupplayer4.style				= UI_CENTER;
-#endif
+	setupMenuInfo.setupplayers.generic.type			= MTYPE_PTEXT;
+	setupMenuInfo.setupplayers.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	setupMenuInfo.setupplayers.generic.x				= 320;
+	setupMenuInfo.setupplayers.generic.y				= y;
+	setupMenuInfo.setupplayers.generic.id			= ID_CUSTOMIZEPLAYER;
+	setupMenuInfo.setupplayers.generic.callback		= UI_SetupMenu_Event; 
+	setupMenuInfo.setupplayers.string				= "PLAYERS";
+	setupMenuInfo.setupplayers.color					= text_big_color;
+	setupMenuInfo.setupplayers.style					= UI_CENTER;
 #endif
 
 	y += SETUP_MENU_VERTICAL_SPACING;
@@ -398,12 +324,7 @@ static void UI_SetupMenu_Init( void ) {
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.framel );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.framer );
 #ifndef TA_MISC
-	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupplayer );
-#ifdef TA_SPLITVIEW
-	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupplayer2 );
-	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupplayer3 );
-	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupplayer4 );
-#endif
+	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupplayers );
 #endif
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupcontrols );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupsystem );

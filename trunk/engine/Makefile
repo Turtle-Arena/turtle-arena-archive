@@ -2523,15 +2523,14 @@ Q3UIOBJ_ = \
   $(B)/$(BASEGAME)/ui/ui_cinematics.o \
   $(B)/$(BASEGAME)/ui/ui_confirm.o \
   $(B)/$(BASEGAME)/ui/ui_connect.o \
-  $(B)/$(BASEGAME)/ui/ui_controls.o \
   $(B)/$(BASEGAME)/ui/ui_controls2.o \
   $(B)/$(BASEGAME)/ui/ui_credits.o \
   $(B)/$(BASEGAME)/ui/ui_demo2.o \
   $(B)/$(BASEGAME)/ui/ui_display.o \
   $(B)/$(BASEGAME)/ui/ui_gameinfo.o \
   $(B)/$(BASEGAME)/ui/ui_ingame.o \
+  $(B)/$(BASEGAME)/ui/ui_ingame_selectplayer.o \
   $(B)/$(BASEGAME)/ui/ui_ingame_server.o \
-  $(B)/$(BASEGAME)/ui/ui_ingame_setupplayers.o \
   $(B)/$(BASEGAME)/ui/ui_joystick.o \
   $(B)/$(BASEGAME)/ui/ui_loadconfig.o \
   $(B)/$(BASEGAME)/ui/ui_menu.o \
@@ -2547,6 +2546,7 @@ Q3UIOBJ_ = \
   $(B)/$(BASEGAME)/ui/ui_qmenu.o \
   $(B)/$(BASEGAME)/ui/ui_removebots.o \
   $(B)/$(BASEGAME)/ui/ui_saveconfig.o \
+  $(B)/$(BASEGAME)/ui/ui_selectplayer.o \
   $(B)/$(BASEGAME)/ui/ui_serverinfo.o \
   $(B)/$(BASEGAME)/ui/ui_servers2.o \
   $(B)/$(BASEGAME)/ui/ui_setup.o \

@@ -184,12 +184,7 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 #endif
 
 	// highlight your position
-	if ( score->client == cg.cur_ps->clientNum
-#ifdef TA_SPLITVIEW
-		|| (cg.singleCamera && CG_LocalClient(score->client) != -1)
-#endif
-		)
-	{
+	if ( score->client == cg.cur_ps->clientNum || (cg.singleCamera && CG_LocalClient(score->client) != -1) ) {
 		float	hcolor[4];
 		int		rank;
 

@@ -1035,17 +1035,11 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 
 #if defined TA_PLAYERSYS && defined TA_WEAPSYS // DEFAULT_DEFAULT_WEAPON
 	// If it is the local client update default weapon.
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		if (clientNum == cg.localClients[i].predictedPlayerState.clientNum) {
 			cg.localClients[i].predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
 		}
 	}
-#else
-	if (clientNum == cg.localClient.predictedPlayerState.clientNum) {
-		cg.localClient.predictedPlayerState.stats[STAT_DEFAULTWEAPON] = cgs.clientinfo[clientNum].playercfg.default_weapon;
-	}
-#endif
 #endif
 
 #ifdef TA_WEAPSYS
@@ -2271,12 +2265,7 @@ static void CG_TrailItem( centity_t *cent, qhandle_t hModel )
 
 #ifdef IOQ3ZTM // FLAG // Don't draw CTF flag for the holder in third person, blocks view.
 	if (cent->currentState.clientNum == cg.cur_lc->predictedPlayerState.clientNum
-#ifdef TA_SPLITVIEW
-		&& cg_thirdPerson[cg.cur_localClientNum].integer
-#else
-		&& cg_thirdPerson.integer
-#endif
-		)
+		&& cg_thirdPerson[cg.cur_localClientNum].integer)
 	{
 		// if its the current player and their in third person view,
 		//  don't draw the flag, it blocks their view.

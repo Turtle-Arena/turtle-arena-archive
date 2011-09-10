@@ -318,7 +318,7 @@ extern vec4_t		color_yellow;
 extern vec4_t		color_blue;
 extern vec4_t		color_orange;
 extern vec4_t		color_red;
-#ifdef TA_SPLITVIEW
+#ifdef TURTLEARENA
 extern vec4_t		color_green;
 #endif
 extern vec4_t		color_dim;
@@ -376,13 +376,11 @@ extern void InServer_Cache( void );
 extern void UI_InServerMenu(void);
 #endif
 
-#ifdef TA_SPLITVIEW
 //
-// ui_ingame_setupplayers.c
+// ui_ingame_selectplayer.c
 //
-extern void SetupPlayers_Cache( void );
-extern void UI_SetupPlayersMenu( void (*playerfunc)(int), const char *banner, qboolean disableMissingPlayers );
-#endif
+extern void InSelectPlayer_Cache( void );
+extern void InSelectPlayerMenu( void (*playerfunc)(int), const char *banner, qboolean disableMissingPlayers );
 
 //
 // ui_confirm.c
@@ -401,11 +399,7 @@ extern void UI_SetupMenu(void);
 //
 // ui_team.c
 //
-#ifdef TA_SPLITVIEW
 extern void UI_TeamMainMenu( int localClient );
-#else
-extern void UI_TeamMainMenu( void );
-#endif
 extern void TeamMain_Cache( void );
 
 //
@@ -413,33 +407,23 @@ extern void TeamMain_Cache( void );
 //
 extern void UI_DrawConnectScreen( qboolean overlay );
 
-#if defined TA_MISC || defined TA_SPLITVIEW
 //
-// ui_controls.c
+// ui_selectplayer.c
 //
-extern void UI_ControlsMainMenu( void );
-extern void UI_ControlsMain_Cache( void );
-#endif
+extern void UI_SelectPlayerMenu( void (*playerfunc)(int), const char *banner );
+extern void UI_SelectPlayer_Cache( void );
 
 //
 // ui_controls2.c
 //
-#ifdef TA_SPLITVIEW
 extern void UI_ControlsMenu( int localClient );
-#else
-extern void UI_ControlsMenu( void );
-#endif
 extern void Controls_Cache( void );
 
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
 //
 // ui_joystick.c
 //
-#ifdef TA_SPLITVIEW
 void UI_JoystickMenu( int localClient );
-#else
-void UI_JoystickMenu( void );
-#endif
 void UI_Joystick_Cache( void );
 #endif
 
@@ -473,21 +457,13 @@ extern void UI_Multiplayer_Cache( void );
 //
 // ui_playermodel.c
 //
-#ifdef TA_SPLITVIEW
 extern void UI_PlayerModelMenu( int localClient );
-#else
-extern void UI_PlayerModelMenu( void );
-#endif
 extern void PlayerModel_Cache( void );
 
 //
 // ui_playersettings.c
 //
-#ifdef TA_SPLITVIEW
 extern void UI_PlayerSettingsMenu( int localClient );
-#else
-extern void UI_PlayerSettingsMenu( void );
-#endif
 extern void PlayerSettings_Cache( void );
 
 //

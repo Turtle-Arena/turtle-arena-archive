@@ -50,11 +50,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 static cvar_t *in_keyboardDebug     = NULL;
 
-#ifdef TA_SPLITVIEW
 static SDL_Joystick *stick[MAX_SPLITVIEW] = {NULL, NULL, NULL, NULL};
-#else
-static SDL_Joystick *stick = NULL;
-#endif
 
 static qboolean mouseAvailable = qfalse;
 static qboolean mouseActive = qfalse;
@@ -67,19 +63,11 @@ static double originalMouseSpeed = -1.0;
 #endif
 static cvar_t *in_nograb;
 
-#ifdef TA_SPLITVIEW
 static cvar_t *in_joystick[MAX_SPLITVIEW] 			= {NULL, NULL, NULL, NULL};
 static cvar_t *in_joystickDebug[MAX_SPLITVIEW]		= {NULL, NULL, NULL, NULL};
 static cvar_t *in_joystickThreshold[MAX_SPLITVIEW]	= {NULL, NULL, NULL, NULL};
 static cvar_t *in_joystickNo[MAX_SPLITVIEW]			= {NULL, NULL, NULL, NULL};
 static cvar_t *in_joystickUseAnalog[MAX_SPLITVIEW]	= {NULL, NULL, NULL, NULL};
-#else
-static cvar_t *in_joystick          = NULL;
-static cvar_t *in_joystickDebug     = NULL;
-static cvar_t *in_joystickThreshold = NULL;
-static cvar_t *in_joystickNo        = NULL;
-static cvar_t *in_joystickUseAnalog = NULL;
-#endif
 
 static int vidRestartTime = 0;
 
@@ -543,12 +531,9 @@ static void IN_DeactivateMouse( void )
 	}
 }
 
-#ifdef TA_SPLITVIEW
 static int joyKeyStart[MAX_SPLITVIEW] = {K_JOY1, K_2JOY1, K_3JOY1, K_4JOY1};
-#endif
 
 // We translate axes movement into keypresses
-#ifdef TA_SPLITVIEW
 static int joy_keys[MAX_SPLITVIEW][16] = {
 	// Client 1
 	{
@@ -595,32 +580,9 @@ static int joy_keys[MAX_SPLITVIEW][16] = {
 		K_4JOY31, K_4JOY32
 	}
 };
-#else
-static int joy_keys[16] = {
-	K_LEFTARROW, K_RIGHTARROW,
-	K_UPARROW, K_DOWNARROW,
-#ifdef IOQ3ZTM // ZTM: Starting at 16 seemed odd after looking at hat_keys.
-	K_JOY17, K_JOY18,
-	K_JOY19, K_JOY20,
-	K_JOY21, K_JOY22,
-	K_JOY23, K_JOY24,
-	K_JOY25, K_JOY26,
-	K_JOY27, K_JOY28
-#else
-	K_JOY16, K_JOY17,
-	K_JOY18, K_JOY19,
-	K_JOY20, K_JOY21,
-	K_JOY22, K_JOY23,
-
-	K_JOY24, K_JOY25,
-	K_JOY26, K_JOY27
-#endif
-};
-#endif
 
 // translate hat events into keypresses
 // the 4 highest buttons are used for the first hat ...
-#ifdef TA_SPLITVIEW
 static int hat_keys[MAX_SPLITVIEW][16] = {
 	// Client 1
 	{
@@ -667,18 +629,6 @@ static int hat_keys[MAX_SPLITVIEW][16] = {
 		K_4JOY19, K_4JOY20
 	}
 };
-#else
-static int hat_keys[16] = {
-	K_JOY29, K_JOY30,
-	K_JOY31, K_JOY32,
-	K_JOY25, K_JOY26,
-	K_JOY27, K_JOY28,
-	K_JOY21, K_JOY22,
-	K_JOY23, K_JOY24,
-	K_JOY17, K_JOY18,
-	K_JOY19, K_JOY20
-};
-#endif
 
 
 struct
@@ -687,13 +637,7 @@ struct
 	unsigned int oldaxes;
 	int oldaaxes[16];
 	unsigned int oldhats;
-}
-#ifdef TA_SPLITVIEW
-stick_state[MAX_SPLITVIEW];
-#else
-stick_state;
-#endif
-
+} stick_state[MAX_SPLITVIEW];
 
 
 /*
@@ -706,7 +650,6 @@ static void IN_InitJoystick( void )
 	int i = 0;
 	int total = 0;
 	char buf[16384] = "";
-#ifdef TA_SPLITVIEW
 	qboolean joyEnabled = qfalse;
 
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
@@ -720,20 +663,6 @@ static void IN_InitJoystick( void )
 			joyEnabled = qtrue;
 		}
 	}
-#else
-	if (stick != NULL)
-		SDL_JoystickClose(stick);
-
-	stick = NULL;
-	memset(&stick_state, '\0', sizeof (stick_state));
-#endif
-
-#ifndef IOQ3ZTM // SELECT_JOYSTICK // ZTM: Init joystick and set in_availableJoysticks even if joysticks are currently disabled.
-	if ( !in_joystick->integer ) {
-		Com_DPrintf( "Joystick is not active.\n" );
-		return;
-	}
-#endif
 
 	if (!SDL_WasInit(SDL_INIT_JOYSTICK))
 	{
@@ -750,7 +679,8 @@ static void IN_InitJoystick( void )
 	Com_DPrintf("%d possible joysticks\n", total);
 
 	// Print list and build cvar to allow ui to select joystick.
-	for (i = 0; i < total; i++) {
+	for (i = 0; i < total; i++)
+	{
 #ifdef IOQ3ZTM // SELECT_JOYSTICK
 		Q_strcat( buf, sizeof( buf ), va( "\"%.61s\" ", SDL_JoystickName(i) ) );
 #else
@@ -768,18 +698,12 @@ static void IN_InitJoystick( void )
 
 	Cvar_Get( "in_availableJoysticks", buf, CVAR_ROM );
 
-#ifdef TA_SPLITVIEW
-	if ( !joyEnabled )
-#else
-	if ( !in_joystick->integer )
-#endif
-	{
+	if ( !joyEnabled ) {
 		Com_DPrintf( "Joystick is not active.\n" );
 		SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 		return;
 	}
 
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		if( !in_joystick[i]->integer ) {
 			continue;
@@ -806,28 +730,6 @@ static void IN_InitJoystick( void )
 		Com_DPrintf( "Balls:      %d\n", SDL_JoystickNumBalls(stick[i]) );
 		Com_DPrintf( "Use Analog: %s\n", in_joystickUseAnalog[i]->integer ? "Yes" : "No" );
 	}
-#else
-	in_joystickNo = Cvar_Get( "in_joystickNo", "0", CVAR_ARCHIVE );
-	if( in_joystickNo->integer < 0 || in_joystickNo->integer >= total )
-		Cvar_Set( "in_joystickNo", "0" );
-
-	in_joystickUseAnalog = Cvar_Get( "in_joystickUseAnalog", "0", CVAR_ARCHIVE );
-
-	stick = SDL_JoystickOpen( in_joystickNo->integer );
-
-	if (stick == NULL) {
-		Com_DPrintf( "No joystick opened.\n" );
-		return;
-	}
-
-	Com_DPrintf( "Joystick %d opened\n", in_joystickNo->integer );
-	Com_DPrintf( "Name:       %s\n", SDL_JoystickName(in_joystickNo->integer) );
-	Com_DPrintf( "Axes:       %d\n", SDL_JoystickNumAxes(stick) );
-	Com_DPrintf( "Hats:       %d\n", SDL_JoystickNumHats(stick) );
-	Com_DPrintf( "Buttons:    %d\n", SDL_JoystickNumButtons(stick) );
-	Com_DPrintf( "Balls:      %d\n", SDL_JoystickNumBalls(stick) );
-	Com_DPrintf( "Use Analog: %s\n", in_joystickUseAnalog->integer ? "Yes" : "No" );
-#endif
 
 	SDL_JoystickEventState(SDL_QUERY);
 }
@@ -839,7 +741,6 @@ IN_ShutdownJoystick
 */
 static void IN_ShutdownJoystick( void )
 {
-#ifdef TA_SPLITVIEW
 	int		i;
 
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
@@ -848,13 +749,6 @@ static void IN_ShutdownJoystick( void )
 			stick[i] = NULL;
 		}
 	}
-#else
-	if (stick)
-	{
-		SDL_JoystickClose(stick);
-		stick = NULL;
-	}
-#endif
 
 	SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
 }
@@ -866,16 +760,11 @@ IN_JoyMove
 */
 static void IN_JoyMove( void )
 {
-#ifdef TA_SPLITVIEW
 	qboolean joy_pressed[ARRAY_LEN(joy_keys[0])];
-#else
-	qboolean joy_pressed[ARRAY_LEN(joy_keys)];
-#endif
 	unsigned int axes = 0;
 	unsigned int hats = 0;
 	int total = 0;
 	int i = 0;
-#ifdef TA_SPLITVIEW
 	int joy;
 
 	for (joy = 0; joy < MAX_SPLITVIEW; joy++) {
@@ -887,302 +776,196 @@ static void IN_JoyMove( void )
 	if (joy == MAX_SPLITVIEW) {
 		return;
 	}
-#else
-	if (!stick)
-		return;
-#endif
 
 	SDL_JoystickUpdate();
 
 	memset(joy_pressed, '\0', sizeof (joy_pressed));
 
-#ifdef TA_SPLITVIEW
 	for (joy = 0; joy < MAX_SPLITVIEW; joy++) {
-	// update the ball state.
-	total = SDL_JoystickNumBalls(stick[joy]);
-#else
-	// update the ball state.
-	total = SDL_JoystickNumBalls(stick);
-#endif
-	if (total > 0)
-	{
-		int balldx = 0;
-		int balldy = 0;
-		for (i = 0; i < total; i++)
+		// update the ball state.
+		total = SDL_JoystickNumBalls(stick[joy]);
+		if (total > 0)
 		{
-			int dx = 0;
-			int dy = 0;
-#ifdef TA_SPLITVIEW
-			SDL_JoystickGetBall(stick[joy], i, &dx, &dy);
-#else
-			SDL_JoystickGetBall(stick, i, &dx, &dy);
-#endif
-			balldx += dx;
-			balldy += dy;
-		}
-		if (balldx || balldy)
-		{
-			// !!! FIXME: is this good for stick balls, or just mice?
-			// Scale like the mouse input...
-			if (abs(balldx) > 1)
-				balldx *= 2;
-			if (abs(balldy) > 1)
-				balldy *= 2;
-			Com_QueueEvent( 0, SE_MOUSE, balldx, balldy, 0, NULL );
-		}
-	}
-
-	// now query the stick buttons...
-#ifdef TA_SPLITVIEW
-	total = SDL_JoystickNumButtons(stick[joy]);
-#else
-	total = SDL_JoystickNumButtons(stick);
-#endif
-	if (total > 0)
-	{
-#ifdef TA_SPLITVIEW
-		if (total > ARRAY_LEN(stick_state[joy].buttons))
-			total = ARRAY_LEN(stick_state[joy].buttons);
-#else
-		if (total > ARRAY_LEN(stick_state.buttons))
-			total = ARRAY_LEN(stick_state.buttons);
-#endif
-		for (i = 0; i < total; i++)
-		{
-#ifdef TA_SPLITVIEW
-			qboolean pressed = (SDL_JoystickGetButton(stick[joy], i) != 0);
-			if (pressed != stick_state[joy].buttons[i])
+			int balldx = 0;
+			int balldy = 0;
+			for (i = 0; i < total; i++)
 			{
-				Com_QueueEvent( 0, SE_KEY, joyKeyStart[joy] + i, pressed, 0, NULL );
-				stick_state[joy].buttons[i] = pressed;
+				int dx = 0;
+				int dy = 0;
+				SDL_JoystickGetBall(stick[joy], i, &dx, &dy);
+				balldx += dx;
+				balldy += dy;
 			}
-#else
-			qboolean pressed = (SDL_JoystickGetButton(stick, i) != 0);
-			if (pressed != stick_state.buttons[i])
+			if (balldx || balldy)
 			{
-				Com_QueueEvent( 0, SE_KEY, K_JOY1 + i, pressed, 0, NULL );
-				stick_state.buttons[i] = pressed;
+				// !!! FIXME: is this good for stick balls, or just mice?
+				// Scale like the mouse input...
+				if (abs(balldx) > 1)
+					balldx *= 2;
+				if (abs(balldy) > 1)
+					balldy *= 2;
+				Com_QueueEvent( 0, SE_MOUSE, balldx, balldy, 0, NULL );
 			}
-#endif
 		}
-	}
 
-	// look at the hats...
-#ifdef TA_SPLITVIEW
-	total = SDL_JoystickNumHats(stick[joy]);
-#else
-	total = SDL_JoystickNumHats(stick);
-#endif
-	if (total > 0)
-	{
-		if (total > 4) total = 4;
-		for (i = 0; i < total; i++)
+		// now query the stick buttons...
+		total = SDL_JoystickNumButtons(stick[joy]);
+		if (total > 0)
 		{
-#ifdef TA_SPLITVIEW
-			((Uint8 *)&hats)[i] = SDL_JoystickGetHat(stick[joy], i);
-#else
-			((Uint8 *)&hats)[i] = SDL_JoystickGetHat(stick, i);
-#endif
-		}
-	}
-
-	// update hat state
-#ifdef TA_SPLITVIEW
-	if (hats != stick_state[joy].oldhats)
-#else
-	if (hats != stick_state.oldhats)
-#endif
-	{
-		for( i = 0; i < 4; i++ ) {
-#ifdef TA_SPLITVIEW
-			if( ((Uint8 *)&hats)[i] != ((Uint8 *)&stick_state[joy].oldhats)[i] )
-#else
-			if( ((Uint8 *)&hats)[i] != ((Uint8 *)&stick_state.oldhats)[i] )
-#endif
+			if (total > ARRAY_LEN(stick_state[joy].buttons))
+				total = ARRAY_LEN(stick_state[joy].buttons);
+			for (i = 0; i < total; i++)
 			{
-				// release event
-#ifdef TA_SPLITVIEW
-				switch( ((Uint8 *)&stick_state[joy].oldhats)[i] )
-#define _hat_keys hat_keys[joy]
-#else
-				switch( ((Uint8 *)&stick_state.oldhats)[i] )
-#define _hat_keys hat_keys
-#endif
+				qboolean pressed = (SDL_JoystickGetButton(stick[joy], i) != 0);
+				if (pressed != stick_state[joy].buttons[i])
 				{
-					case SDL_HAT_UP:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 0], qfalse, 0, NULL );
-						break;
-					case SDL_HAT_RIGHT:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 1], qfalse, 0, NULL );
-						break;
-					case SDL_HAT_DOWN:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 2], qfalse, 0, NULL );
-						break;
-					case SDL_HAT_LEFT:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 3], qfalse, 0, NULL );
-						break;
-					case SDL_HAT_RIGHTUP:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 0], qfalse, 0, NULL );
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 1], qfalse, 0, NULL );
-						break;
-					case SDL_HAT_RIGHTDOWN:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 2], qfalse, 0, NULL );
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 1], qfalse, 0, NULL );
-						break;
-					case SDL_HAT_LEFTUP:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 0], qfalse, 0, NULL );
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 3], qfalse, 0, NULL );
-						break;
-					case SDL_HAT_LEFTDOWN:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 2], qfalse, 0, NULL );
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 3], qfalse, 0, NULL );
-						break;
-					default:
-						break;
+					Com_QueueEvent( 0, SE_KEY, joyKeyStart[joy] + i, pressed, 0, NULL );
+					stick_state[joy].buttons[i] = pressed;
 				}
-				// press event
-				switch( ((Uint8 *)&hats)[i] ) {
-					case SDL_HAT_UP:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 0], qtrue, 0, NULL );
-						break;
-					case SDL_HAT_RIGHT:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 1], qtrue, 0, NULL );
-						break;
-					case SDL_HAT_DOWN:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 2], qtrue, 0, NULL );
-						break;
-					case SDL_HAT_LEFT:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 3], qtrue, 0, NULL );
-						break;
-					case SDL_HAT_RIGHTUP:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 0], qtrue, 0, NULL );
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 1], qtrue, 0, NULL );
-						break;
-					case SDL_HAT_RIGHTDOWN:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 2], qtrue, 0, NULL );
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 1], qtrue, 0, NULL );
-						break;
-					case SDL_HAT_LEFTUP:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 0], qtrue, 0, NULL );
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 3], qtrue, 0, NULL );
-						break;
-					case SDL_HAT_LEFTDOWN:
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 2], qtrue, 0, NULL );
-						Com_QueueEvent( 0, SE_KEY, _hat_keys[4*i + 3], qtrue, 0, NULL );
-						break;
-					default:
-						break;
-				}
-#undef _hat_keys
 			}
 		}
-	}
 
-	// save hat state
-#ifdef TA_SPLITVIEW
-	stick_state[joy].oldhats = hats;
-#else
-	stick_state.oldhats = hats;
-#endif
-
-	// finally, look at the axes...
-#ifdef TA_SPLITVIEW
-	total = SDL_JoystickNumAxes(stick[joy]);
-#else
-	total = SDL_JoystickNumAxes(stick);
-#endif
-	if (total > 0)
-	{
-		if (total > 16) total = 16;
-		for (i = 0; i < total; i++)
+		// look at the hats...
+		total = SDL_JoystickNumHats(stick[joy]);
+		if (total > 0)
 		{
-#ifdef TA_SPLITVIEW
-			Sint16 axis = SDL_JoystickGetAxis(stick[joy], i);
-#else
-			Sint16 axis = SDL_JoystickGetAxis(stick, i);
-#endif
-
-#ifdef TA_SPLITVIEW
-			if (in_joystickUseAnalog[joy]->integer)
-#else
-			if (in_joystickUseAnalog->integer)
-#endif
+			if (total > 4) total = 4;
+			for (i = 0; i < total; i++)
 			{
-				float f = ( (float) abs(axis) ) / 32767.0f;
-				
-#ifdef TA_SPLITVIEW
-				if( f < in_joystickThreshold[joy]->value ) axis = 0;
-
-				if ( axis != stick_state[joy].oldaaxes[i] )
-				{
-					Com_QueueEvent( 0, SE_JOYSTICK_AXIS, i, axis, 0, NULL );
-					stick_state[joy].oldaaxes[i] = axis;
-				}
-#else
-				if( f < in_joystickThreshold->value ) axis = 0;
-
-				if ( axis != stick_state.oldaaxes[i] )
-				{
-					Com_QueueEvent( 0, SE_JOYSTICK_AXIS, i, axis, 0, NULL );
-					stick_state.oldaaxes[i] = axis;
-				}
-#endif
-			}
-			else
-			{
-				float f = ( (float) axis ) / 32767.0f;
-#ifdef TA_SPLITVIEW
-				if( f < -in_joystickThreshold[joy]->value ) {
-					axes |= ( 1 << ( i * 2 ) );
-				} else if( f > in_joystickThreshold[joy]->value ) {
-					axes |= ( 1 << ( ( i * 2 ) + 1 ) );
-				}
-#else
-				if( f < -in_joystickThreshold->value ) {
-					axes |= ( 1 << ( i * 2 ) );
-				} else if( f > in_joystickThreshold->value ) {
-					axes |= ( 1 << ( ( i * 2 ) + 1 ) );
-				}
-#endif
+				((Uint8 *)&hats)[i] = SDL_JoystickGetHat(stick[joy], i);
 			}
 		}
-	}
 
-	/* Time to update axes state based on old vs. new. */
-#ifdef TA_SPLITVIEW
-	if (axes != stick_state[joy].oldaxes)
-#else
-	if (axes != stick_state.oldaxes)
-#endif
-	{
-		for( i = 0; i < 16; i++ ) {
-#ifdef TA_SPLITVIEW
-			if( ( axes & ( 1 << i ) ) && !( stick_state[joy].oldaxes & ( 1 << i ) ) ) {
-				Com_QueueEvent( 0, SE_KEY, joy_keys[joy][i], qtrue, 0, NULL );
+		// update hat state
+		if (hats != stick_state[joy].oldhats)
+		{
+			for( i = 0; i < 4; i++ ) {
+				if( ((Uint8 *)&hats)[i] != ((Uint8 *)&stick_state[joy].oldhats)[i] )
+				{
+					// release event
+					switch( ((Uint8 *)&stick_state[joy].oldhats)[i] )
+					{
+						case SDL_HAT_UP:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 0], qfalse, 0, NULL );
+							break;
+						case SDL_HAT_RIGHT:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 1], qfalse, 0, NULL );
+							break;
+						case SDL_HAT_DOWN:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 2], qfalse, 0, NULL );
+							break;
+						case SDL_HAT_LEFT:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 3], qfalse, 0, NULL );
+							break;
+						case SDL_HAT_RIGHTUP:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 0], qfalse, 0, NULL );
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 1], qfalse, 0, NULL );
+							break;
+						case SDL_HAT_RIGHTDOWN:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 2], qfalse, 0, NULL );
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 1], qfalse, 0, NULL );
+							break;
+						case SDL_HAT_LEFTUP:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 0], qfalse, 0, NULL );
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 3], qfalse, 0, NULL );
+							break;
+						case SDL_HAT_LEFTDOWN:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 2], qfalse, 0, NULL );
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 3], qfalse, 0, NULL );
+							break;
+						default:
+							break;
+					}
+					// press event
+					switch( ((Uint8 *)&hats)[i] ) {
+						case SDL_HAT_UP:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 0], qtrue, 0, NULL );
+							break;
+						case SDL_HAT_RIGHT:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 1], qtrue, 0, NULL );
+							break;
+						case SDL_HAT_DOWN:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 2], qtrue, 0, NULL );
+							break;
+						case SDL_HAT_LEFT:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 3], qtrue, 0, NULL );
+							break;
+						case SDL_HAT_RIGHTUP:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 0], qtrue, 0, NULL );
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 1], qtrue, 0, NULL );
+							break;
+						case SDL_HAT_RIGHTDOWN:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 2], qtrue, 0, NULL );
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 1], qtrue, 0, NULL );
+							break;
+						case SDL_HAT_LEFTUP:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 0], qtrue, 0, NULL );
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 3], qtrue, 0, NULL );
+							break;
+						case SDL_HAT_LEFTDOWN:
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 2], qtrue, 0, NULL );
+							Com_QueueEvent( 0, SE_KEY, hat_keys[joy][4*i + 3], qtrue, 0, NULL );
+							break;
+						default:
+							break;
+					}
+				}
 			}
-
-			if( !( axes & ( 1 << i ) ) && ( stick_state[joy].oldaxes & ( 1 << i ) ) ) {
-				Com_QueueEvent( 0, SE_KEY, joy_keys[joy][i], qfalse, 0, NULL );
-			}
-#else
-			if( ( axes & ( 1 << i ) ) && !( stick_state.oldaxes & ( 1 << i ) ) ) {
-				Com_QueueEvent( 0, SE_KEY, joy_keys[i], qtrue, 0, NULL );
-			}
-
-			if( !( axes & ( 1 << i ) ) && ( stick_state.oldaxes & ( 1 << i ) ) ) {
-				Com_QueueEvent( 0, SE_KEY, joy_keys[i], qfalse, 0, NULL );
-			}
-#endif
 		}
-	}
 
-	/* Save for future generations. */
-#ifdef TA_SPLITVIEW
-	stick_state[joy].oldaxes = axes;
-	} // end giant for-loop
-#else
-	stick_state.oldaxes = axes;
-#endif
+		// save hat state
+		stick_state[joy].oldhats = hats;
+
+		// finally, look at the axes...
+		total = SDL_JoystickNumAxes(stick[joy]);
+		if (total > 0)
+		{
+			if (total > 16) total = 16;
+			for (i = 0; i < total; i++)
+			{
+				Sint16 axis = SDL_JoystickGetAxis(stick[joy], i);
+
+				if (in_joystickUseAnalog[joy]->integer)
+				{
+					float f = ( (float) abs(axis) ) / 32767.0f;
+					
+					if( f < in_joystickThreshold[joy]->value ) axis = 0;
+
+					if ( axis != stick_state[joy].oldaaxes[i] )
+					{
+						Com_QueueEvent( 0, SE_JOYSTICK_AXIS, i, axis, 0, NULL );
+						stick_state[joy].oldaaxes[i] = axis;
+					}
+				}
+				else
+				{
+					float f = ( (float) axis ) / 32767.0f;
+					if( f < -in_joystickThreshold[joy]->value ) {
+						axes |= ( 1 << ( i * 2 ) );
+					} else if( f > in_joystickThreshold[joy]->value ) {
+						axes |= ( 1 << ( ( i * 2 ) + 1 ) );
+					}
+				}
+			}
+		}
+
+		/* Time to update axes state based on old vs. new. */
+		if (axes != stick_state[joy].oldaxes)
+		{
+			for( i = 0; i < 16; i++ ) {
+				if( ( axes & ( 1 << i ) ) && !( stick_state[joy].oldaxes & ( 1 << i ) ) ) {
+					Com_QueueEvent( 0, SE_KEY, joy_keys[joy][i], qtrue, 0, NULL );
+				}
+
+				if( !( axes & ( 1 << i ) ) && ( stick_state[joy].oldaxes & ( 1 << i ) ) ) {
+					Com_QueueEvent( 0, SE_KEY, joy_keys[joy][i], qfalse, 0, NULL );
+				}
+			}
+		}
+
+		/* Save for future generations. */
+		stick_state[joy].oldaxes = axes;
+	}
 }
 
 /*
@@ -1352,9 +1135,7 @@ IN_Init
 void IN_Init( void )
 {
 	int appState;
-#ifdef TA_SPLITVIEW
 	int i;
-#endif
 
 	if( !SDL_WasInit( SDL_INIT_VIDEO ) )
 	{
@@ -1370,7 +1151,6 @@ void IN_Init( void )
 	in_mouse = Cvar_Get( "in_mouse", "1", CVAR_ARCHIVE );
 	in_nograb = Cvar_Get( "in_nograb", "0", CVAR_ARCHIVE );
 
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		in_joystick[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystick"), "0", CVAR_ARCHIVE|CVAR_LATCH );
 		in_joystickDebug[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystickDebug"), "0", CVAR_TEMP );
@@ -1380,15 +1160,6 @@ void IN_Init( void )
 		in_joystickThreshold[i] = Cvar_Get( Com_LocalClientCvarName(i, "joy_threshold"), "0.15", CVAR_ARCHIVE );
 #endif
 	}
-#else
-	in_joystick = Cvar_Get( "in_joystick", "0", CVAR_ARCHIVE|CVAR_LATCH );
-	in_joystickDebug = Cvar_Get( "in_joystickDebug", "0", CVAR_TEMP );
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	in_joystickThreshold = Cvar_Get( "in_joystickThreshold", "0.15", CVAR_ARCHIVE );
-#else
-	in_joystickThreshold = Cvar_Get( "joy_threshold", "0.15", CVAR_ARCHIVE );
-#endif
-#endif
 
 #ifdef MACOS_X_ACCELERATION_HACK
 	in_disablemacosxmouseaccel = Cvar_Get( "in_disablemacosxmouseaccel", "1", CVAR_ARCHIVE );

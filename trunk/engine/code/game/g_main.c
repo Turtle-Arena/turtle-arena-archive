@@ -785,9 +785,7 @@ void AddTournamentPlayer( void ) {
 		}
 		// never select the dedicated follow or scoreboard clients
 		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD || 
-#ifdef TA_SPLITVIEW
 			client->sess.spectatorState == SPECTATOR_LOCAL_HIDE || 
-#endif
 			client->sess.spectatorClient < 0  ) {
 			continue;
 		}

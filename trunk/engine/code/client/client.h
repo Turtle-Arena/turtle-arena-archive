@@ -58,13 +58,10 @@ typedef struct {
 	byte			areamask[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
 
 	int				cmdNum;			// the next cmdNum the server is expecting
-#ifdef TA_SPLITVIEW
+
 	int				numPSs;
 	playerState_t	pss[MAX_SPLITVIEW];		// complete information about the current players at this time
 	int				lcIndex[MAX_SPLITVIEW];
-#else
-	playerState_t	ps;						// complete information about the current player at this time
-#endif
 
 	int				numEntities;			// all of the entities that need to be presented
 	int				parseEntitiesNum;		// at the time of this snapshot
@@ -145,19 +142,11 @@ typedef struct {
 
 	int			parseEntitiesNum;	// index (not anded off) into cl_parse_entities[]
 
-#ifdef TA_SPLITVIEW
 	calc_t		localClients[MAX_SPLITVIEW];
-#else
-	calc_t		localClient;
-#endif
 
 	// cmds[cmdNumber] is the predicted command, [cmdNumber-1] is the last
 	// properly generated command
-#ifdef TA_SPLITVIEW
 	usercmd_t	cmdss[MAX_SPLITVIEW][CMD_BACKUP];	// each mesage will send several old cmds
-#else
-	usercmd_t	cmds[CMD_BACKUP];	// each mesage will send several old cmds
-#endif
 	int			cmdNumber;			// incremented each frame, because multiple
 									// frames may need to be packed into a single packet
 
@@ -410,21 +399,11 @@ extern	cvar_t	*cl_timeNudge;
 extern	cvar_t	*cl_showTimeDelta;
 extern	cvar_t	*cl_freezeDemo;
 
-#ifdef TA_SPLITVIEW
 extern	cvar_t	*cl_yawspeed[MAX_SPLITVIEW];
 extern	cvar_t	*cl_pitchspeed[MAX_SPLITVIEW];
 extern	cvar_t	*cl_anglespeedkey[MAX_SPLITVIEW];
-#else
-extern	cvar_t	*cl_yawspeed;
-extern	cvar_t	*cl_pitchspeed;
-extern	cvar_t	*cl_anglespeedkey;
-#endif
 #ifndef TURTLEARENA // ALWAYS_RUN
-#ifdef TA_SPLITVIEW
 extern	cvar_t	*cl_run[MAX_SPLITVIEW];
-#else
-extern	cvar_t	*cl_run;
-#endif
 #endif
 
 extern	cvar_t	*cl_sensitivity;
@@ -441,7 +420,6 @@ extern	cvar_t	*m_forward;
 extern	cvar_t	*m_side;
 extern	cvar_t	*m_filter;
 
-#ifdef TA_SPLITVIEW
 extern	cvar_t	*j_pitch[MAX_SPLITVIEW];
 extern	cvar_t	*j_yaw[MAX_SPLITVIEW];
 extern	cvar_t	*j_forward[MAX_SPLITVIEW];
@@ -450,16 +428,6 @@ extern	cvar_t	*j_pitch_axis[MAX_SPLITVIEW];
 extern	cvar_t	*j_yaw_axis[MAX_SPLITVIEW];
 extern	cvar_t	*j_forward_axis[MAX_SPLITVIEW];
 extern	cvar_t	*j_side_axis[MAX_SPLITVIEW];
-#else
-extern	cvar_t	*j_pitch;
-extern	cvar_t	*j_yaw;
-extern	cvar_t	*j_forward;
-extern	cvar_t	*j_side;
-extern	cvar_t	*j_pitch_axis;
-extern	cvar_t	*j_yaw_axis;
-extern	cvar_t	*j_forward_axis;
-extern	cvar_t	*j_side_axis;
-#endif
 
 extern	cvar_t	*cl_timedemo;
 extern	cvar_t	*cl_aviFrameRate;
@@ -484,15 +452,9 @@ extern	cvar_t  *cl_consoleFontKerning;
 #endif
 
 #ifdef IOQ3ZTM // ANALOG
-#ifdef TA_SPLITVIEW
 extern	cvar_t	*cl_thirdPerson[MAX_SPLITVIEW];
 extern	cvar_t	*cl_thirdPersonAngle[MAX_SPLITVIEW];
 extern	cvar_t	*cl_thirdPersonAnalog[MAX_SPLITVIEW];
-#else
-extern	cvar_t	*cl_thirdPerson;
-extern	cvar_t	*cl_thirdPersonAngle;
-extern	cvar_t	*cl_thirdPersonAnalog;
-#endif
 #endif
 
 #ifdef USE_MUMBLE
@@ -559,11 +521,9 @@ typedef struct {
 	qboolean	wasPressed;		// set when down, not cleared when up
 } kbutton_t;
 
-#if 0
 extern	kbutton_t	in_mlook, in_klook;
 extern 	kbutton_t 	in_strafe;
 extern 	kbutton_t 	in_speed;
-#endif
 
 #ifdef USE_VOIP
 extern 	kbutton_t 	in_voiprecord;
