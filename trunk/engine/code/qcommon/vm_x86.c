@@ -442,11 +442,7 @@ static void DoSyscall(void)
 		int *data;
 #if idx64
 		int index;
-#ifdef IOQ3ZTM // CONSISTENT_VM_ARGS
 		intptr_t args[16];
-#else
-		intptr_t args[11];
-#endif
 #endif
 		
 		data = (int *) (savedVM->dataBase + programStack + 4);
