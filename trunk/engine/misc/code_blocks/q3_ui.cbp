@@ -188,9 +188,6 @@
 		<Unit filename="../../code/q3_ui/ui_connect.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/q3_ui/ui_controls.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../code/q3_ui/ui_controls2.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -209,10 +206,10 @@
 		<Unit filename="../../code/q3_ui/ui_ingame.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/q3_ui/ui_ingame_server.c">
+		<Unit filename="../../code/q3_ui/ui_ingame_selectplayer.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../code/q3_ui/ui_ingame_setupplayers.c">
+		<Unit filename="../../code/q3_ui/ui_ingame_server.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/q3_ui/ui_joystick.c">
@@ -265,6 +262,9 @@
 		<Unit filename="../../code/q3_ui/ui_saveconfig.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../../code/q3_ui/ui_selectplayer.c">
+			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/q3_ui/ui_serverinfo.c">
 			<Option compilerVar="CC" />
