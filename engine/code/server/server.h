@@ -28,7 +28,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 //=============================================================================
 
-
 #define	MAX_ENT_CLUSTERS	16
 
 #ifdef USE_VOIP
@@ -101,13 +100,9 @@ typedef struct {
 typedef struct {
 	int				areabytes;
 	byte			areabits[MAX_MAP_AREA_BYTES];		// portalarea visibility bits
-#ifdef TA_SPLITVIEW
 	int				numPSs;
 	playerState_t	pss[MAX_SPLITVIEW];
 	int				lcIndex[MAX_SPLITVIEW];
-#else
-	playerState_t	ps;
-#endif
 	int				num_entities;
 	int				first_entity;		// into the circular sv_packet_entities[]
 										// the entities MUST be in increasing state number
@@ -198,18 +193,16 @@ typedef struct client_s {
 	int queuedVoipIndex;
 #endif
 
-#ifdef TA_SPLITVIEW
-	int	owner; // If not -1 this client is splitscreen with owner
-	int local_clients[MAX_SPLITVIEW-1]; // If any are not -1 this client is splitscreen main client,
-										// local_clients are there splitscreen players.
-#endif
-
 	int				oldServerTime;
 	qboolean		csUpdated[MAX_CONFIGSTRINGS+1];	
 	
 #ifdef LEGACY_PROTOCOL
 	qboolean		compat;
 #endif
+
+	int	owner; // If not -1 this client is splitscreen with owner
+	int local_clients[MAX_SPLITVIEW-1]; // If any are not -1 this client is splitscreen main client,
+										// local_clients are there splitscreen players.
 } client_t;
 
 //=============================================================================
@@ -349,7 +342,7 @@ void SV_SpawnServer( char *server, qboolean killBots );
 //
 // sv_client.c
 //
-void SV_GetChallenge( netadr_t from );
+void SV_GetChallenge(netadr_t from);
 
 void SV_DirectConnect( netadr_t from );
 

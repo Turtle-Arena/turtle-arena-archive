@@ -218,16 +218,8 @@ void	trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin ) {
 	syscall( CG_S_UPDATEENTITYPOSITION, entityNum, origin );
 }
 
-void	trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater
-#ifdef TA_SPLITVIEW
-		, int listener
-#endif
-		) {
-	syscall( CG_S_RESPATIALIZE, entityNum, origin, axis, inwater
-#ifdef TA_SPLITVIEW
-			, listener
-#endif
-			);
+void	trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, int listener ) {
+	syscall( CG_S_RESPATIALIZE, entityNum, origin, axis, inwater, listener );
 }
 
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {
@@ -340,9 +332,8 @@ int			trap_GetCurrentCmdNumber( void ) {
 	return syscall( CG_GETCURRENTCMDNUMBER );
 }
 
-#ifdef TA_SPLITVIEW // CONTROLS
-qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClient ) {
-	return syscall( CG_GETUSERCMD, cmdNumber, ucmd, localClient );
+qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClientNum ) {
+	return syscall( CG_GETUSERCMD, cmdNumber, ucmd, localClientNum );
 }
 
 #if defined TA_HOLDSYS/*2*/
@@ -353,21 +344,6 @@ void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdable
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int localClientNum ) {
 	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale), localClientNum );
 }
-#endif
-#else
-qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd ) {
-	return syscall( CG_GETUSERCMD, cmdNumber, ucmd );
-}
-
-#if defined TA_HOLDSYS/*2*/
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue ) {
-	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale), holdableValue );
-}
-#else
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale ) {
-	syscall( CG_SETUSERCMDVALUE, stateValue, PASSFLOAT(sensitivityScale) );
-}
-#endif
 #endif
 
 int trap_MemoryRemaining( void ) {

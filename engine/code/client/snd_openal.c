@@ -249,7 +249,7 @@ static void S_AL_BufferUnload(sfxHandle_t sfx)
 	if(!knownSfx[sfx].inMemory)
 		return;
 
-	// Delete it
+	// Delete it 
 	S_AL_ClearError( qfalse );
 	qalDeleteBuffers(1, &knownSfx[sfx].buffer);
 	if(qalGetError() != AL_NO_ERROR)
@@ -510,13 +510,13 @@ ALuint S_AL_BufferGet(sfxHandle_t sfx)
 
 typedef struct src_s
 {
-	ALuint					alSource;		// OpenAL source object
-	sfxHandle_t 		sfx;				// Sound effect in use
+	ALuint		alSource;		// OpenAL source object
+	sfxHandle_t	sfx;			// Sound effect in use
 
-	int							lastUsedTime;		// Last time used
+	int		lastUsedTime;		// Last time used
 	alSrcPriority_t	priority;		// Priority
-	int							entity;			// Owning entity (-1 if none)
-	int							channel;		// Associated channel (-1 if none)
+	int		entity;			// Owning entity (-1 if none)
+	int		channel;		// Associated channel (-1 if none)
 
 	qboolean	isActive;		// Is this source currently in use?
 	qboolean	isPlaying;		// Is this source currently playing, or stopped?
@@ -525,14 +525,14 @@ typedef struct src_s
 	qboolean	isTracking;		// Is this object tracking its owner
 	qboolean	isStream;		// Is this source a stream
 
-	float							curGain;	// gain employed if source is within maxdistance.
-	float							scaleGain;	// Last gain value for this source. 0 if muted.
-
+	float		curGain;		// gain employed if source is within maxdistance.
+	float		scaleGain;		// Last gain value for this source. 0 if muted.
+	
 	float		lastTimePos;		// On stopped loops, the last position in the buffer
 	int		lastSampleTime;		// Time when this was stopped
 	vec3_t		loopSpeakerPos;		// Origin of the loop speaker
 	
-	qboolean				local;			// Is this local (relative to the cam)
+	qboolean	local;			// Is this local (relative to the cam)
 } src_t;
 
 #ifdef MACOS_X
@@ -701,7 +701,7 @@ qboolean S_AL_SrcInit( void )
 		limit = MAX_SRC;
 	else if(limit < 16)
 		limit = 16;
-
+ 
 	S_AL_ClearError( qfalse );
 	// Allocate as many sources as possible
 	for(i = 0; i < limit; i++)
@@ -948,7 +948,7 @@ static void S_AL_SrcKill(srcHandle_t src)
 		curSource->isLooping = qfalse;
 
 		if(curSource->entity != -1)
-	{
+		{
 			sentity_t *curEnt = &entityList[curSource->entity];
 			
 			curEnt->srcAllocated = qfalse;
@@ -1034,7 +1034,7 @@ srcHandle_t S_AL_SrcAlloc( alSrcPriority_t priority, int entnum, int channel )
 			}
 		}
 		else
-			{
+		{
 			weakest_isplaying = qfalse;
 			
 			if(weakest < 0 ||
@@ -1066,7 +1066,7 @@ srcHandle_t S_AL_SrcAlloc( alSrcPriority_t priority, int entnum, int channel )
 
 	if(empty == -1)
 		empty = weakest;
-
+	
 	if(empty >= 0)
 	{
 		S_AL_SrcKill(empty);
@@ -1210,22 +1210,22 @@ static void S_AL_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandl
 	if(origin)
 	{
 		if(S_AL_CheckInput(0, sfx))
-		return;
-
+			return;
+		
 		VectorCopy(origin, sorigin);
 	}
 	else
 	{
 		if(S_AL_CheckInput(entnum, sfx))
-		return;
+			return;
 
-		if( S_AL_HearingThroughEntity( entnum ) )
+		if(S_AL_HearingThroughEntity(entnum))
 		{
 			S_AL_StartLocalSound(sfx, entchannel);
 			return;
 		}
 		
-		VectorCopy( entityList[ entnum ].origin, sorigin );
+		VectorCopy(entityList[entnum].origin, sorigin);
 	}
 	
 	S_AL_SanitiseVector(sorigin);
@@ -1411,8 +1411,8 @@ void S_AL_SrcUpdate( void )
 	int i;
 	int entityNum;
 	ALint state;
-	src_t *curSource;	
-
+	src_t *curSource;
+	
 	for(i = 0; i < srcCount; i++)
 	{
 		entityNum = srcList[i].entity;
@@ -1425,9 +1425,9 @@ void S_AL_SrcUpdate( void )
 			continue;
 
 		// Update source parameters
-		if((s_alGain->modified)||(s_volume->modified))
+		if((s_alGain->modified) || (s_volume->modified))
 			curSource->curGain = s_alGain->value * s_volume->value;
-		if((s_alRolloff->modified)&&(!curSource->local))
+		if((s_alRolloff->modified) && (!curSource->local))
 			qalSourcef(curSource->alSource, AL_ROLLOFF_FACTOR, s_alRolloff->value);
 		if(s_alMinDistance->modified)
 			qalSourcef(curSource->alSource, AL_REFERENCE_DISTANCE, s_alMinDistance->value);
@@ -1459,11 +1459,11 @@ void S_AL_SrcUpdate( void )
 					S_AL_SrcSetup(i, sent->loopSfx, sent->loopPriority,
 							entityNum, -1, curSource->local);
 					curSource->isLooping = qtrue;
-
+					
 					knownSfx[curSource->sfx].loopCnt++;
 					sent->startLoopingSound = qfalse;
 				}
-
+				
 				curSfx = &knownSfx[curSource->sfx];
 
 				S_AL_ScaleGain(curSource, curSource->loopSpeakerPos);
@@ -1570,7 +1570,7 @@ void S_AL_SrcUpdate( void )
 				}
 			}
 			else
-				S_AL_SrcKill( i );
+				S_AL_SrcKill(i);
 
 			continue;
 		}
@@ -2196,22 +2196,16 @@ S_AL_Respatialize
 =================
 */
 static
-void S_AL_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater
-#ifdef TA_SPLITVIEW
-		, int listener
-#endif
-		)
+void S_AL_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, int listener )
 {
 	float		orientation[6];
 	vec3_t	sorigin;
 
-#ifdef TA_SPLITVIEW
 	if (listener != 0)
 	{
 		// ZTM: FIXME: Support multiple listeners!
 		return;
 	}
-#endif
 
 	VectorCopy( origin, sorigin );
 	S_AL_SanitiseVector( sorigin );

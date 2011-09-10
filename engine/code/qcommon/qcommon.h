@@ -138,11 +138,9 @@ NET
 
 #define	PORT_ANY			-1
 
-#ifdef TA_SPLITVIEW // ZTM: TODO: Have extra local clients use their own seperate reliableCommands.
+// ZTM: TODO: Have extra local clients use their own seperate reliableCommands.
+//#define	MAX_RELIABLE_COMMANDS	64			// max string commands buffered for restransmit
 #define	MAX_RELIABLE_COMMANDS	(64*MAX_SPLITVIEW) // max string commands buffered for restransmit
-#else
-#define	MAX_RELIABLE_COMMANDS	64			// max string commands buffered for restransmit
-#endif
 
 typedef enum {
 	NA_BAD = 0,					// an address lookup failed
@@ -193,13 +191,8 @@ void		NET_LeaveMulticast6(void);
 void		NET_Sleep(int msec);
 
 
-#ifdef TA_SPLITVIEW // Doubled MAX_MSGLEN, three playerstates was too much for old size.
 #define	MAX_MSGLEN				32768		// max length of a message, which may
 											// be fragmented into multiple packets
-#else
-#define	MAX_MSGLEN				16384		// max length of a message, which may
-											// be fragmented into multiple packets
-#endif
 
 #define MAX_DOWNLOAD_WINDOW		48	// ACK window of 48 download chunks. Cannot set this higher, or clients
 						// will overflow the reliable commands buffer
@@ -332,10 +325,8 @@ enum clc_ops_e {
 
 // new commands, supported only by ioquake3 protocol but not legacy
 	clc_voip,   // not wrapped in USE_VOIP, so this value is reserved.
-//#ifdef TA_SPLITVIEW
 	clc_moveLocal,			// [[usercmd_t] for an extra local client
 	clc_moveLocalNoDelta,	// [[usercmd_t] for an extra local client
-//#endif
 };
 
 /*

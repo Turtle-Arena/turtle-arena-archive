@@ -921,12 +921,10 @@ void CG_AddLocalEntities( void ) {
 			continue;
 		}
 
-#ifdef TA_SPLITVIEW
 		// Check if local entity should be rendered by this local client.
 		if (le->localClients && !(le->localClients & (1<<cg.cur_localClientNum))) {
 			continue;
 		}
-#endif
 
 #ifdef IOQ3ZTM // ZTM: Anything glows!
 		// add the dlight

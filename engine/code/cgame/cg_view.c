@@ -185,9 +185,7 @@ Sets the coordinates of the rendered window
 */
 static void CG_CalcVrect (void) {
 	int		size;
-#ifdef TA_SPLITVIEW
 	int		width, height;
-#endif
 
 	// the intermission should allways be full screen
 	if ( cg.cur_ps->pm_type == PM_INTERMISSION ) {
@@ -213,7 +211,8 @@ static void CG_CalcVrect (void) {
 
 	cg.refdef.x = (cgs.glconfig.vidWidth - cg.refdef.width)/2;
 	cg.refdef.y = (cgs.glconfig.vidHeight - cg.refdef.height)/2;
-#ifdef TA_SPLITVIEW
+
+	// Setup splitscreen viewports
 	if (cg.numViewports == 2) {
 		if (cg_splitviewVertical.integer) {
 			cg.refdef.width *= 0.5f;
@@ -270,8 +269,10 @@ static void CG_CalcVrect (void) {
 	height = cg.refdef.height * 100/size;
 	width = cg.refdef.width * 100/size;
 
+#ifdef IOQ3ZTM
 	cgs.screenXScaleFit = width * (1.0/640.0);
 	cgs.screenYScaleFit = height * (1.0/480.0);
+#endif
 	if ( width * 480 > height * 640 ) {
 		cgs.screenXScale = width * (1.0/640.0);
 		cgs.screenYScale = height * (1.0/480.0);
@@ -279,12 +280,16 @@ static void CG_CalcVrect (void) {
 		cgs.screenXBias = 0.5 * ( width - ( height * (640.0/480.0) ) );
 		cgs.screenXScale = cgs.screenYScale;
 	} else {
+#ifdef IOQ3ZTM
 		cgs.screenXScale = cgs.screenXScaleFit;
 		cgs.screenYScale = cgs.screenYScaleFit;
+#else
+		cgs.screenXScale = width * (1.0/640.0);
+		cgs.screenYScale = height * (1.0/480.0);
+#endif
 		// no wide screen
 		cgs.screenXBias = 0;
 	}
-#endif
 }
 
 //==============================================================================
@@ -310,15 +315,9 @@ void CG_CamUpdate(void)
 	float f = ((float)cg.frametime) / 1000;
 	qboolean angleReset, distReset;
 
-#ifdef TA_SPLITVIEW
 	thirdPerson = (cg_thirdPerson[cg.cur_localClientNum].value != 0);
 	angle = cg_thirdPersonAngle[cg.cur_localClientNum].value;
 	dist = cg_thirdPersonRange[cg.cur_localClientNum].value;
-#else
-	thirdPerson = (cg_thirdPerson.value != 0);
-	angle = cg_thirdPersonAngle.value;
-	dist = cg_thirdPersonRange.value;
-#endif
 
 	if (!cg.cur_lc->camDistance) {
 		cg.cur_lc->camDistance = dist;
@@ -416,21 +415,12 @@ void CG_CamUpdate(void)
 		dist = 10;
 
 	// Update the cvars...
-#ifdef TA_SPLITVIEW
 	if (cg_thirdPersonAngle[cg.cur_localClientNum].value != angle) {
 		trap_Cvar_Set(Com_LocalClientCvarName(cg.cur_localClientNum, "cg_thirdPersonAngle"), va("%f", angle));
 	}
 	if (cg_thirdPersonRange[cg.cur_localClientNum].value != dist) {
 		trap_Cvar_Set(Com_LocalClientCvarName(cg.cur_localClientNum, "cg_thirdPersonRange"), va("%f", dist));
 	}
-#else
-	if (cg_thirdPersonAngle.value != angle) {
-		trap_Cvar_Set("cg_thirdPersonAngle", va("%f", angle));
-	}
-	if (cg_thirdPersonRange.value != dist) {
-		trap_Cvar_Set("cg_thirdPersonRange", va("%f", dist));
-	}
-#endif
 
 	if (thirdPerson)
 	{
@@ -495,15 +485,7 @@ static void CG_OffsetThirdPersonView( void ) {
 
 	cg.refdef.vieworg[2] += cg.cur_lc->predictedPlayerState.viewheight;
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
-#ifdef IOQ3ZTM // NEW_CAM
 	distance = cg.cur_lc->camDistance;
-#else
-#ifdef TA_SPLITVIEW
-	distance = cg_thirdPersonRange[cg.cur_localClientNum].value;
-#else
-	distance = cg_thirdPersonRange.value;
-#endif
-#endif
 #endif
 
 #ifdef TA_PATHSYS
@@ -593,13 +575,8 @@ static void CG_OffsetThirdPersonView( void ) {
 #ifdef IOQ3ZTM // BETTER_THIRD_PERSON
 	else
 	{
-#ifdef TA_SPLITVIEW
 		focusAngles[YAW] -= cg_thirdPersonAngle[cg.cur_localClientNum].value;
 		cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle[cg.cur_localClientNum].value;
-#else
-		focusAngles[YAW] -= cg_thirdPersonAngle.value;
-		cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle.value;
-#endif
 	}
 #endif
 
@@ -628,10 +605,10 @@ static void CG_OffsetThirdPersonView( void ) {
 	// Move camera behind player
 	VectorMA( view, -distance, forward, view );
 #else
-	forwardScale = cos( cg_thirdPersonAngle.value / 180 * M_PI );
-	sideScale = sin( cg_thirdPersonAngle.value / 180 * M_PI );
-	VectorMA( view, -cg_thirdPersonRange.value * forwardScale, forward, view );
-	VectorMA( view, -cg_thirdPersonRange.value * sideScale, right, view );
+	forwardScale = cos( cg_thirdPersonAngle[cg.cur_localClientNum].value / 180 * M_PI );
+	sideScale = sin( cg_thirdPersonAngle[cg.cur_localClientNum].value / 180 * M_PI );
+	VectorMA( view, -cg_thirdPersonRange[cg.cur_localClientNum].value * forwardScale, forward, view );
+	VectorMA( view, -cg_thirdPersonRange[cg.cur_localClientNum].value * sideScale, right, view );
 #endif
 
 	// trace a ray from the origin to the viewpoint to make sure the view isn't
@@ -683,13 +660,13 @@ static void CG_OffsetThirdPersonView( void ) {
 	}
 	cg.refdefViewAngles[PITCH] = -180 / M_PI * atan2( focusPoint[2], focusDist );
 #ifndef IOQ3ZTM // BETTER_THIRD_PERSON
-	cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle.value;
+	cg.refdefViewAngles[YAW] -= cg_thirdPersonAngle[cg.cur_localClientNum].value;
 #endif
 }
 
+
 // this causes a compiler bug on mac MrC compiler
-static void CG_StepOffset( void )
-{
+static void CG_StepOffset( void ) {
 	int		timeDelta;
 	
 	// smooth out stair climbing
@@ -1030,17 +1007,8 @@ static void CG_OffsetMultiple2dModeView(qboolean everyone) {
 //======================================================================
 
 #ifndef TURTLEARENA // NOZOOM
-#ifdef TA_SPLITVIEW
-void CG_ZoomDown( int localClient )
-#else
-void CG_ZoomDown_f( void )
-#endif
-{ 
-#ifdef TA_SPLITVIEW
+void CG_ZoomDown( int localClient ) { 
 	cg.cur_lc = &cg.localClients[localClient];
-#else
-	cg.cur_lc = &cg.localClient;
-#endif
 
 	if ( cg.cur_lc->zoomed ) {
 		return;
@@ -1053,17 +1021,8 @@ void CG_ZoomDown_f( void )
 #endif
 }
 
-#ifdef TA_SPLITVIEW
-void CG_ZoomUp( int localClient )
-#else
-void CG_ZoomUp_f( void )
-#endif
-{ 
-#ifdef TA_SPLITVIEW
+void CG_ZoomUp( int localClient ) { 
 	cg.cur_lc = &cg.localClients[localClient];
-#else
-	cg.cur_lc = &cg.localClient;
-#endif
 	if ( !cg.cur_lc->zoomed ) {
 		return;
 	}
@@ -1074,7 +1033,6 @@ void CG_ZoomUp_f( void )
 #endif
 }
 
-#ifdef TA_SPLITVIEW
 void CG_ZoomDown_f( void ) { 
 	CG_ZoomDown(0);
 }
@@ -1106,7 +1064,6 @@ void CG_4ZoomDown_f( void ) {
 void CG_4ZoomUp_f( void ) { 
 	CG_ZoomUp(3);
 }
-#endif
 #endif
 
 
@@ -1184,7 +1141,6 @@ static int CG_CalcFov( void ) {
 #endif
 	}
 
-#ifdef TA_SPLITVIEW
 	// Do FOV Correction for some viewports
 	if ((cg.numViewports == 2) || (cg.numViewports == 3 && cg.viewport == 2)) {
 		if (cg_splitviewVertical.integer == 1) {
@@ -1195,7 +1151,6 @@ static int CG_CalcFov( void ) {
 			fov_x *= 1.4f; // 1.5 would be correct, but fov gets real big.
 		}
 	}
-#endif
 	x = cg.refdef.width / tan( fov_x / 360 * M_PI );
 	fov_y = atan2( cg.refdef.height, x );
 	fov_y = fov_y * 360 / M_PI;
@@ -1354,7 +1309,7 @@ static int CG_CalcViewValues( void ) {
 	if (cg_cameraOrbit.integer) {
 		if (cg.time > cg.nextOrbitTime) {
 			cg.nextOrbitTime = cg.time + cg_cameraOrbitDelay.integer;
-			cg_thirdPersonAngle.value += cg_cameraOrbit.value;
+			cg_thirdPersonAngle[cg.cur_localClientNum].value += cg_cameraOrbit.value;
 		}
 	}
 #endif
@@ -1516,11 +1471,7 @@ CG_AddAnnouncement
 Add announcement using ANNOUNCE_* enum.
 =================
 */
-#ifdef TA_SPLITVIEW
 void CG_AddAnnouncement(int announcement, int localClientNumber)
-#else
-void CG_AddAnnouncement(int announcement)
-#endif
 {
 	qhandle_t	sfx;
 	qboolean	bufferedSfx;
@@ -1632,7 +1583,6 @@ void CG_AddAnnouncement(int announcement)
 			break;
 	}
 
-#ifdef TA_SPLITVIEW
 	// Add for all local clients
 	if (localClientNumber < 0 || localClientNumber >= MAX_SPLITVIEW) {
 		int i;
@@ -1647,9 +1597,6 @@ void CG_AddAnnouncement(int announcement)
 	}
 
 	lc = &cg.localClients[localClientNumber];
-#else
-	lc = &cg.localClient;
-#endif
 
 	CG_AddAnnouncementEx(lc, sfx, bufferedSfx, cg_announcementMessages[announcement]);
 }
@@ -1696,10 +1643,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	int		inwater;
 	float	mouseSensitivity;
 	int		weaponSelect;
-#ifdef TA_SPLITVIEW
 	qboolean renderClientViewport[MAX_SPLITVIEW];
 	int		i;
-#endif
 
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
@@ -1734,10 +1679,14 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	// this counter will be bumped for every valid scene we generate
 	cg.clientFrame++;
 
-#ifdef TA_SPLITVIEW
+#ifdef TURTLEARENA
 	// Single camera mode only uses one viewport for viewing all local clients or all clients on server.
 	cg.singleCamera = (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2))
 						|| (cgs.gametype != GT_SINGLE_PLAYER && cg.snap->pss[0].pm_type == PM_INTERMISSION);
+#else
+	// Single camera mode only uses one viewport for viewing all local clients
+	cg.singleCamera = (cg.snap->pss[0].pm_type == PM_INTERMISSION);
+#endif
 
 	cg.numViewports = 0;
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
@@ -1756,59 +1705,45 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 			cg.numViewports++;
 			renderClientViewport[i] = qtrue;
 		}
-#else
-	cg.cur_lc = &cg.localClient;
-	cg.cur_ps = &cg.snap->ps;
-#endif
 
-	// let the client system know what our weapon and zoom settings are
+		// let the client system know what our weapon and zoom settings are
 #ifdef TURTLEARENA // NOZOOM
-	mouseSensitivity = 1;
+		mouseSensitivity = 1;
 #else
-	mouseSensitivity = cg.cur_lc->zoomSensitivity;
+		mouseSensitivity = cg.cur_lc->zoomSensitivity;
 #endif
 #ifdef TA_WEAPSYS_EX
-	weaponSelect = 0;
+		weaponSelect = 0;
 #else
-	weaponSelect = cg.cur_lc->weaponSelect;
+		weaponSelect = cg.cur_lc->weaponSelect;
 #endif
-#ifdef TA_SPLITVIEW // CONTROLS
 #ifdef TA_HOLDSYS/*2*/
-	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_lc->holdableSelect, cg.cur_localClientNum );
+		trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_lc->holdableSelect, cg.cur_localClientNum );
 #else
-	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_localClientNum );
-#endif
-#else
-#ifdef TA_HOLDSYS/*2*/
-	trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_lc->holdableSelect );
-#else
-	trap_SetUserCmdValue( weaponSelect, mouseSensitivity );
-#endif
+		trap_SetUserCmdValue( weaponSelect, mouseSensitivity, cg.cur_localClientNum );
 #endif
 
-	// update cg.predictedPlayerState
-	CG_PredictPlayerState();
+		// update cg.predictedPlayerState
+		CG_PredictPlayerState();
 
 #ifdef TURTLEARENA // LOCKON
-	if (!cg.cur_lc->lockedOn && (cg.cur_lc->predictedPlayerState.eFlags & EF_LOCKON))
-	{
-		cg.cur_lc->lockedOn = qtrue;
-		cg.cur_lc->lockonTime = cg.time;
+		if (!cg.cur_lc->lockedOn && (cg.cur_lc->predictedPlayerState.eFlags & EF_LOCKON))
+		{
+			cg.cur_lc->lockedOn = qtrue;
+			cg.cur_lc->lockonTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
-		CG_ToggleLetterbox(qtrue, qfalse);
+			CG_ToggleLetterbox(qtrue, qfalse);
 #endif
-	}
-	else if (cg.cur_lc->lockedOn && !(cg.cur_lc->predictedPlayerState.eFlags & EF_LOCKON))
-	{
-		cg.cur_lc->lockedOn = qfalse;
-		cg.cur_lc->lockonTime = cg.time;
+		}
+		else if (cg.cur_lc->lockedOn && !(cg.cur_lc->predictedPlayerState.eFlags & EF_LOCKON))
+		{
+			cg.cur_lc->lockedOn = qfalse;
+			cg.cur_lc->lockonTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
-		CG_ToggleLetterbox(qfalse, qfalse);
+			CG_ToggleLetterbox(qfalse, qfalse);
 #endif
-	}
+		}
 #endif
-
-#ifdef TA_SPLITVIEW
 	}
 
 	// If all local clients dropped out from playing still draw main local client.
@@ -1825,98 +1760,81 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		cg.cur_localClientNum = i;
 		cg.cur_lc = &cg.localClients[i];
 		cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[i]];
-#endif
 
-	// decide on third person view
+		// decide on third person view
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, have spectator always be in first person.
-	cg.renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
-#ifdef TA_SPLITVIEW
-							&& (cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
+		cg.renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
+							&& (cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0));
 #else
-							&& (cg_thirdPerson.integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0)
-#endif
-								);
-#else
-	cg.renderingThirdPerson = cg_thirdPerson.integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0);
+		cg.renderingThirdPerson = cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0);
 #endif
 
-	// build cg.refdef
-	inwater = CG_CalcViewValues();
+		// build cg.refdef
+		inwater = CG_CalcViewValues();
 
 #ifndef NOBLOOD
-	// first person blend blobs, done after AnglesToAxis
-	if ( !cg.renderingThirdPerson ) {
-		CG_DamageBlendBlob();
-	}
+		// first person blend blobs, done after AnglesToAxis
+		if ( !cg.renderingThirdPerson ) {
+			CG_DamageBlendBlob();
+		}
 #endif
 
-	// build the render lists
-	if ( !cg.cur_lc->hyperspace ) {
-		CG_AddPacketEntities();			// adter calcViewValues, so predicted player state is correct
-		CG_AddMarks();
-		CG_AddParticles ();
-		CG_AddLocalEntities();
-	}
-	CG_AddViewWeapon( &cg.cur_lc->predictedPlayerState );
-
-	// add buffered sounds
-	CG_PlayBufferedSounds();
-
-	// play buffered voice chats
-	CG_PlayBufferedVoiceChats();
-
-	// finish up the rest of the refdef
-	if ( cg.testModelEntity.hModel ) {
-		CG_AddTestModel();
-	}
-	cg.refdef.time = cg.time;
-	memcpy( cg.refdef.areamask, cg.snap->areamask, sizeof( cg.refdef.areamask ) );
-
-	// warning sounds when powerup is wearing off
-	CG_PowerupTimerSounds();
-
-	// update audio positions
-	trap_S_Respatialize( cg.cur_ps->clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater
-#ifdef TA_SPLITVIEW
-			, cg.cur_localClientNum
-#endif
-			);
-
-	// make sure the lagometerSample and frame timing isn't done twice when in stereo
-	if ( stereoView != STEREO_RIGHT
-#ifdef TA_SPLITVIEW
-		&& cg.viewport == 0
-#endif
-		)
-	{
-		cg.frametime = cg.time - cg.oldTime;
-		if ( cg.frametime < 0 ) {
-			cg.frametime = 0;
+		// build the render lists
+		if ( !cg.cur_lc->hyperspace ) {
+			CG_AddPacketEntities();			// adter calcViewValues, so predicted player state is correct
+			CG_AddMarks();
+			CG_AddParticles ();
+			CG_AddLocalEntities();
 		}
-		cg.oldTime = cg.time;
-		CG_AddLagometerFrameInfo();
-	}
-	if (cg_timescale.value != cg_timescaleFadeEnd.value) {
-		if (cg_timescale.value < cg_timescaleFadeEnd.value) {
-			cg_timescale.value += cg_timescaleFadeSpeed.value * ((float)cg.frametime) / 1000;
-			if (cg_timescale.value > cg_timescaleFadeEnd.value)
-				cg_timescale.value = cg_timescaleFadeEnd.value;
-		}
-		else {
-			cg_timescale.value -= cg_timescaleFadeSpeed.value * ((float)cg.frametime) / 1000;
-			if (cg_timescale.value < cg_timescaleFadeEnd.value)
-				cg_timescale.value = cg_timescaleFadeEnd.value;
-		}
-		if (cg_timescaleFadeSpeed.value) {
-			trap_Cvar_Set("timescale", va("%f", cg_timescale.value));
-		}
-	}
+		CG_AddViewWeapon( &cg.cur_lc->predictedPlayerState );
 
-	// actually issue the rendering calls
-	CG_DrawActive( stereoView );
-#ifdef TA_SPLITVIEW
+		// add buffered sounds
+		CG_PlayBufferedSounds();
+
+		// play buffered voice chats
+		CG_PlayBufferedVoiceChats();
+
+		// finish up the rest of the refdef
+		if ( cg.testModelEntity.hModel ) {
+			CG_AddTestModel();
+		}
+		cg.refdef.time = cg.time;
+		memcpy( cg.refdef.areamask, cg.snap->areamask, sizeof( cg.refdef.areamask ) );
+
+		// warning sounds when powerup is wearing off
+		CG_PowerupTimerSounds();
+
+		// update audio positions
+		trap_S_Respatialize( cg.cur_ps->clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater, cg.cur_localClientNum );
+
+		// make sure the lagometerSample and frame timing isn't done twice when in stereo
+		if ( stereoView != STEREO_RIGHT && cg.viewport == 0 ) {
+			cg.frametime = cg.time - cg.oldTime;
+			if ( cg.frametime < 0 ) {
+				cg.frametime = 0;
+			}
+			cg.oldTime = cg.time;
+			CG_AddLagometerFrameInfo();
+		}
+		if (cg_timescale.value != cg_timescaleFadeEnd.value) {
+			if (cg_timescale.value < cg_timescaleFadeEnd.value) {
+				cg_timescale.value += cg_timescaleFadeSpeed.value * ((float)cg.frametime) / 1000;
+				if (cg_timescale.value > cg_timescaleFadeEnd.value)
+					cg_timescale.value = cg_timescaleFadeEnd.value;
+			}
+			else {
+				cg_timescale.value -= cg_timescaleFadeSpeed.value * ((float)cg.frametime) / 1000;
+				if (cg_timescale.value < cg_timescaleFadeEnd.value)
+					cg_timescale.value = cg_timescaleFadeEnd.value;
+			}
+			if (cg_timescaleFadeSpeed.value) {
+				trap_Cvar_Set("timescale", va("%f", cg_timescale.value));
+			}
+		}
+
+		// actually issue the rendering calls
+		CG_DrawActive( stereoView );
 	}
-#endif
 
 	if ( cg_stats.integer ) {
 		CG_Printf( "cg.clientFrame:%i\n", cg.clientFrame );

@@ -105,12 +105,7 @@ void CG_CheckOrderPending(void) {
 			trap_SendConsoleCommand(va("cmd vsay_team %s\n", p2));
 		} else {
 			// for the player self
-#ifdef TA_SPLITVIEW
-			if (sortedTeamPlayers[cg_currentSelectedPlayer.integer] == cg.snap->pss[0].clientNum && p1)
-#else
-			if (sortedTeamPlayers[cg_currentSelectedPlayer.integer] == cg.snap->ps.clientNum && p1)
-#endif
-			{
+			if (sortedTeamPlayers[cg_currentSelectedPlayer.integer] == cg.snap->pss[0].clientNum && p1) {
 				trap_SendConsoleCommand(va("teamtask %i\n", cgs.currentOrder));
 				//trap_SendConsoleCommand(va("cmd say_team %s\n", p2));
 				trap_SendConsoleCommand(va("cmd vsay_team %s\n", p1));
@@ -192,11 +187,7 @@ static void CG_DrawPlayerArmorValue(rectDef_t *rect, float scale, vec4_t color, 
 	int		value;
 	playerState_t	*ps;
 
-#ifdef TA_SPLITVIEW
 	ps = cg.cur_ps;
-#else
-	ps = &cg.snap->ps;
-#endif
 
 	value = ps->stats[STAT_ARMOR];
 
@@ -226,11 +217,7 @@ static void CG_DrawPlayerAmmoIcon( rectDef_t *rect, qboolean draw2D ) {
 	vec3_t		angles;
 	vec3_t		origin;
 
-#ifdef TA_SPLITVIEW
 	cent = &cg_entities[cg.cur_ps->clientNum];
-#else
-	cent = &cg_entities[cg.snap->ps.clientNum];
-#endif
 
 	if ( draw2D || (!cg_draw3dIcons.integer && cg_drawIcons.integer) ) {
 		qhandle_t	icon;
@@ -328,6 +315,7 @@ static void CG_DrawPlayerAmmoValue(rectDef_t *rect, float scale, vec4_t color, q
 	}
 
 }
+
 
 
 static void CG_DrawPlayerHead(rectDef_t *rect, qboolean draw2D) {
@@ -1028,8 +1016,8 @@ float CG_GetValue(int ownerDraw) {
  	clientInfo_t *ci;
 	playerState_t	*ps;
 
-  cent = &cg_entities[cg.cur_ps->clientNum];
 	ps = cg.cur_ps;
+	cent = &cg_entities[ps->clientNum];
 
   switch (ownerDraw) {
 #ifndef TURTLEARENA // NOARMOR
@@ -1057,14 +1045,14 @@ float CG_GetValue(int ownerDraw) {
 #endif
     break;
   case CG_PLAYER_SCORE:
-	  return cg.cur_ps->persistant[PERS_SCORE];
+	  return ps->persistant[PERS_SCORE];
     break;
   case CG_PLAYER_HEALTH:
 		return ps->stats[STAT_HEALTH];
     break;
 #ifdef TA_HOLDSYS
   case CG_PLAYER_ITEM_VALUE:
-		return cg.cur_ps->holdable[cg.cur_ps->holdableIndex];
+		return ps->holdable[ps->holdableIndex];
     break;
 #endif
   case CG_RED_SCORE:
@@ -1082,11 +1070,7 @@ float CG_GetValue(int ownerDraw) {
 
 qboolean CG_OtherTeamHasFlag(void) {
 	if (cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF) {
-#ifdef TA_SPLITVIEW
 		int team = cg.snap->pss[0].persistant[PERS_TEAM];
-#else
-		int team = cg.snap->ps.persistant[PERS_TEAM];
-#endif
 		if (cgs.gametype == GT_1FCTF) {
 			if (team == TEAM_RED && cgs.flagStatus == FLAG_TAKEN_BLUE) {
 				return qtrue;
@@ -1110,11 +1094,7 @@ qboolean CG_OtherTeamHasFlag(void) {
 
 qboolean CG_YourTeamHasFlag(void) {
 	if (cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF) {
-#ifdef TA_SPLITVIEW
 		int team = cg.snap->pss[0].persistant[PERS_TEAM];
-#else
-		int team = cg.snap->ps.persistant[PERS_TEAM];
-#endif
 		if (cgs.gametype == GT_1FCTF) {
 			if (team == TEAM_RED && cgs.flagStatus == FLAG_TAKEN_RED) {
 				return qtrue;
@@ -1882,11 +1862,8 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
 void CG_MouseEvent(int x, int y) {
 	int n;
 	cglc_t *lc;
-#ifdef TA_SPLITVIEW
+
 	lc = &cg.localClients[0];
-#else
-	lc = &cg.localClient;
-#endif
 
 	if ( (lc->predictedPlayerState.pm_type == PM_NORMAL || lc->predictedPlayerState.pm_type == PM_SPECTATOR) && cg.showScores == qfalse) {
     trap_Key_SetCatcher(0);
@@ -2022,14 +1999,11 @@ void CG_RunMenuScript(char **args) {
 
 
 void CG_GetTeamColor(vec4_t *color) {
-  if (cg.cur_ps->persistant[PERS_TEAM] == TEAM_RED)
-  {
+  if (cg.cur_ps->persistant[PERS_TEAM] == TEAM_RED) {
     (*color)[0] = 1.0f;
     (*color)[3] = 0.25f;
     (*color)[1] = (*color)[2] = 0.0f;
-  }
-  else if (cg.cur_ps->persistant[PERS_TEAM] == TEAM_BLUE)
-  {
+  } else if (cg.cur_ps->persistant[PERS_TEAM] == TEAM_BLUE) {
     (*color)[0] = (*color)[1] = 0.0f;
     (*color)[2] = 1.0f;
     (*color)[3] = 0.25f;

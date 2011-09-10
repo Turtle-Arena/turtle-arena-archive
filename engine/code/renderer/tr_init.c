@@ -1347,13 +1347,8 @@ void R_Register( void )
 	r_aviMotionJpegQuality = ri.Cvar_Get("r_aviMotionJpegQuality", "90", CVAR_ARCHIVE);
 	r_screenshotJpegQuality = ri.Cvar_Get("r_screenshotJpegQuality", "90", CVAR_ARCHIVE);
 
-#ifdef TA_SPLITVIEW // Need more polys when there are more views.
 	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS*MAX_SPLITVIEW), 0);
 	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS*MAX_SPLITVIEW), 0);
-#else
-	r_maxpolys = ri.Cvar_Get( "r_maxpolys", va("%d", MAX_POLYS), 0);
-	r_maxpolyverts = ri.Cvar_Get( "r_maxpolyverts", va("%d", MAX_POLYVERTS), 0);
-#endif
 
 	// make sure all the commands added here are also
 	// removed in R_Shutdown

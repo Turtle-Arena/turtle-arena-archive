@@ -134,7 +134,6 @@ typedef enum {
 	K_JOY31,
 	K_JOY32,
 
-#ifdef TA_SPLITVIEW
 	K_2JOY1,
 	K_2JOY2,
 	K_2JOY3,
@@ -233,7 +232,6 @@ typedef enum {
 	K_4JOY30,
 	K_4JOY31,
 	K_4JOY32,
-#endif
 
 	K_AUX1,
 	K_AUX2,

@@ -63,9 +63,7 @@ typedef struct {
 	int				originalJoystick;
 	qboolean		changed;
 
-#ifdef TA_SPLITVIEW
-	int localClient;
-#endif
+	int				localClient;
 } joystickMenu_t;
 
 static joystickMenu_t	joystickMenu;
@@ -85,7 +83,6 @@ static void UI_JoystickMenu_Event( void *ptr, int event ) {
 		int joystick = ((menucommon_s*)ptr)->id - ID_JOYSTICK;
 		int i;
 
-#ifdef TA_SPLITVIEW
 		if (joystick == 0) {
 			// Disable joystick
 			trap_Cvar_SetValue(Com_LocalClientCvarName(joystickMenu.localClient, "in_joystick"), 0);
@@ -95,17 +92,6 @@ static void UI_JoystickMenu_Event( void *ptr, int event ) {
 			trap_Cvar_SetValue(Com_LocalClientCvarName(joystickMenu.localClient, "in_joystick"), 1);
 			trap_Cvar_SetValue(Com_LocalClientCvarName(joystickMenu.localClient, "in_joystickNo"), joystick-1);
 		}
-#else
-		if (joystick == 0) {
-			// Disable joystick
-			trap_Cvar_SetValue("in_joystick", 0);
-			trap_Cvar_SetValue("in_joystickNo", 0);
-		} else {
-			// Enable joystick
-			trap_Cvar_SetValue("in_joystick", 1);
-			trap_Cvar_SetValue("in_joystickNo", joystick-1);
-		}
-#endif
 
 		// Disable last selected joystick.
 		for (i = 0; i < MAX_JOYSTICKS; i++) {
@@ -279,12 +265,7 @@ static void UI_Joystick_GetNames( void ) {
 UI_Joystick_MenuInit
 ===============
 */
-#ifdef TA_SPLITVIEW
-static void UI_Joystick_MenuInit( int localClient )
-#else
-static void UI_Joystick_MenuInit( void )
-#endif
-{
+static void UI_Joystick_MenuInit( int localClient ) {
 	int				y;
 	int				i;
 	int				joystick;
@@ -295,9 +276,7 @@ static void UI_Joystick_MenuInit( void )
 
 	UI_Joystick_GetNames();
 
-#ifdef TA_SPLITVIEW
 	joystickMenu.localClient = localClient;
-#endif
 
 	joystickMenu.menu.wrapAround = qtrue;
 	joystickMenu.menu.fullscreen = qtrue;
@@ -367,19 +346,11 @@ static void UI_Joystick_MenuInit( void )
 	Menu_AddItem( &joystickMenu.menu, &joystickMenu.back );
 
 	// Store original joystick
-#ifdef TA_SPLITVIEW
 	if (trap_Cvar_VariableValue(Com_LocalClientCvarName(joystickMenu.localClient, "in_joystick")) == 0) {
 		joystick = 0;
 	} else {
 		joystick = 1 + (int)trap_Cvar_VariableValue(Com_LocalClientCvarName(joystickMenu.localClient, "in_joystickNo"));
 	}
-#else
-	if (trap_Cvar_VariableValue("in_joystick") == 0) {
-		joystick = 0;
-	} else {
-		joystick = 1 + (int)trap_Cvar_VariableValue("in_joystickNo");
-	}
-#endif
 
 	if (joystick < 0 || joystick >= joystickMenu.numJoysticks) {
 		joystick = 0;
@@ -410,17 +381,8 @@ void UI_Joystick_Cache( void )
 UI_JoystickMenu
 ===============
 */
-#ifdef TA_SPLITVIEW
-void UI_JoystickMenu( int localClient )
-#else
-void UI_JoystickMenu( void )
-#endif
-{
-#ifdef TA_SPLITVIEW
+void UI_JoystickMenu( int localClient ) {
 	UI_Joystick_MenuInit(localClient);
-#else
-	UI_Joystick_MenuInit();
-#endif
 	UI_PushMenu( &joystickMenu.menu );
 }
 

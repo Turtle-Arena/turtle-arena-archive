@@ -32,7 +32,6 @@ Adjusted for resolution, doesn't keep screen aspect ratio
 ================
 */
 void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
-#ifdef TA_SPLITVIEW
 	if (cg.numViewports != 1 && cg.snap) {
 		qboolean right = qfalse;
 		qboolean down = qfalse;
@@ -66,7 +65,7 @@ void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
 			*y += SCREEN_HEIGHT;
 		}
 	}
-#endif
+
 	// scale for screen sizes
 	*x *= cgs.screenXScaleFit;
 	*y *= cgs.screenYScaleFit;
@@ -101,7 +100,6 @@ Adjusted for resolution and screen aspect ratio
 ================
 */
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
-#ifdef TA_SPLITVIEW
 	int viewXBias = 0;
 
 	if (cg.numViewports != 1 && cg.snap) {
@@ -138,7 +136,7 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 			*y += SCREEN_HEIGHT;
 		}
 	}
-#endif
+
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
 	if (cg_hudPlacement == HUD_LEFT)
 		*x = *x * cgs.screenXScale;
@@ -160,10 +158,8 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 	*w *= cgs.screenXScale;
 	*h *= cgs.screenYScale;
 
-#ifdef TA_SPLITVIEW
 	// Offset for widescreen
 	*x += cgs.screenXBias*(viewXBias);
-#endif
 }
 
 /*
@@ -895,16 +891,9 @@ void CG_TileClear( void ) {
 	w = cgs.glconfig.vidWidth;
 	h = cgs.glconfig.vidHeight;
 
-#ifdef TA_SPLITVIEW
 	if (cg.cur_ps->pm_type == PM_INTERMISSION || cg_viewsize.integer >= 100 || cg.viewport != 0) {
 		return;		// full screen rendering
 	}
-#else
-	if ( cg.refdef.x == 0 && cg.refdef.y == 0 && 
-		cg.refdef.width == w && cg.refdef.height == h ) {
-		return;		// full screen rendering
-	}
-#endif
 
 	top = cg.refdef.y;
 	bottom = top + cg.refdef.height-1;

@@ -92,7 +92,6 @@ cvar_t	*m_forward;
 cvar_t	*m_side;
 cvar_t	*m_filter;
 
-#ifdef TA_SPLITVIEW
 cvar_t	*j_pitch[MAX_SPLITVIEW];
 cvar_t	*j_yaw[MAX_SPLITVIEW];
 cvar_t	*j_forward[MAX_SPLITVIEW];
@@ -101,16 +100,6 @@ cvar_t	*j_pitch_axis[MAX_SPLITVIEW];
 cvar_t	*j_yaw_axis[MAX_SPLITVIEW];
 cvar_t	*j_forward_axis[MAX_SPLITVIEW];
 cvar_t	*j_side_axis[MAX_SPLITVIEW];
-#else
-cvar_t	*j_pitch;
-cvar_t	*j_yaw;
-cvar_t	*j_forward;
-cvar_t	*j_side;
-cvar_t	*j_pitch_axis;
-cvar_t	*j_yaw_axis;
-cvar_t	*j_forward_axis;
-cvar_t	*j_side_axis;
-#endif
 
 cvar_t	*cl_activeAction;
 
@@ -136,15 +125,9 @@ cvar_t  *cl_consoleFontKerning;
 #endif
 
 #ifdef IOQ3ZTM // ANALOG
-#ifdef TA_SPLITVIEW
 cvar_t	*cl_thirdPerson[MAX_SPLITVIEW];
 cvar_t	*cl_thirdPersonAngle[MAX_SPLITVIEW];
 cvar_t	*cl_thirdPersonAnalog[MAX_SPLITVIEW];
-#else
-cvar_t	*cl_thirdPerson;
-cvar_t	*cl_thirdPersonAngle;
-cvar_t	*cl_thirdPersonAnalog;
-#endif
 #endif
 
 clientActive_t		cl;
@@ -197,19 +180,11 @@ void CL_UpdateMumble(void)
 		return;
 
 	// !!! FIXME: not sure if this is even close to correct.
-#ifdef TA_SPLITVIEW
 	AngleVectors( cl.snap.pss[0].viewangles, forward, NULL, up);
 
 	pos[0] = cl.snap.pss[0].origin[0] * scale;
 	pos[1] = cl.snap.pss[0].origin[2] * scale;
 	pos[2] = cl.snap.pss[0].origin[1] * scale;
-#else
-	AngleVectors( cl.snap.ps.viewangles, forward, NULL, up);
-
-	pos[0] = cl.snap.ps.origin[0] * scale;
-	pos[1] = cl.snap.ps.origin[2] * scale;
-	pos[2] = cl.snap.ps.origin[1] * scale;
-#endif
 
 	tmp = forward[1];
 	forward[1] = forward[2];
@@ -1565,7 +1540,6 @@ void CL_RequestMotd( void ) {
 	if ( !cl_motd->integer ) {
 		return;
 	}
-
 	Com_Printf( "Resolving %s\n", UPDATE_SERVER_NAME );
 	if ( !NET_StringToAdr( UPDATE_SERVER_NAME, &cls.updateServer, NA_IP ) ) {
 		Com_Printf( "Couldn't resolve address\n" );
@@ -1614,7 +1588,6 @@ void CL_ForwardToServer_f( void ) {
 	}
 }
 
-#ifdef TA_SPLITVIEW
 /*
 ==================
 CL_2DropOut_f
@@ -1698,7 +1671,6 @@ void CL_4DropIn_f( void ) {
 
 	CL_AddReliableCommand(va("dropin4 \"%s\"", Cvar_InfoString( CVAR_USERINFO4 )), qfalse);
 }
-#endif
 
 /*
 ==================
@@ -2332,11 +2304,10 @@ Resend a connect message if the last one has timed out
 */
 void CL_CheckForResend( void ) {
 	int		port, i;
-#ifdef TA_SPLITVIEW
 	int		size, j;
-	int		cvarflag[MAX_SPLITVIEW] = {CVAR_USERINFO, CVAR_USERINFO2, CVAR_USERINFO3, CVAR_USERINFO4};
+	const int cvarflag[MAX_SPLITVIEW] = {CVAR_USERINFO, CVAR_USERINFO2, CVAR_USERINFO3, CVAR_USERINFO4};
 	int		localClients;
-#endif
+	int		protocol;
 	char	info[MAX_INFO_STRING];
 	char	data[MAX_INFO_STRING];
 
@@ -2372,30 +2343,23 @@ void CL_CheckForResend( void ) {
 		// sending back the challenge
 		port = Cvar_VariableValue ("net_qport");
 
-#ifndef TA_SPLITVIEW
-		Q_strncpyz( info, Cvar_InfoString( CVAR_USERINFO ), sizeof( info ) );
-		
 #ifdef LEGACY_PROTOCOL
 		if(com_legacyprotocol->integer == com_protocol->integer)
 			clc.compat = qtrue;
 
 		if(clc.compat)
-			Info_SetValueForKey(info, "protocol", va("%i", com_legacyprotocol->integer));
+			protocol = com_legacyprotocol->integer;
 		else
 #endif
-			Info_SetValueForKey(info, "protocol", va("%i", com_protocol->integer));
-		Info_SetValueForKey( info, "qport", va("%i", port ) );
-		Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
-#endif
+			protocol = com_protocol->integer;
 		
 		strcpy(data, "connect ");
-#ifdef TA_SPLITVIEW
 		size = 8;
 
 		// Check how many local client user wants
 		localClients = Com_Clamp(1, (1<<MAX_SPLITVIEW)-1, Cvar_VariableIntegerValue("cl_localClients"));
 
-		// Reset cl_localClients (Set before each join)
+		// Reset cl_localClients (set before each join)
 		Cvar_Set("cl_localClients", "1");
 
 		for (i = 0; i < MAX_SPLITVIEW; i++) {
@@ -2413,8 +2377,8 @@ void CL_CheckForResend( void ) {
 
 			Q_strncpyz( info, Cvar_InfoString( cvarflag[i] ), sizeof( info ) );
 
-			// ZTM: Do we need to set these for more than the first client?
-			Info_SetValueForKey( info, "protocol", va("%i", com_protocol->integer ) );
+			// ZTM: FIXME: Do we need to set these for more than the first client?
+			Info_SetValueForKey( info, "protocol", va("%i", protocol ) );
 			Info_SetValueForKey( info, "qport", va("%i", port ) );
 			Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
 
@@ -2439,23 +2403,6 @@ void CL_CheckForResend( void ) {
 		// the most current userinfo has been sent, so watch for any
 		// newer changes to userinfo variables
 		cvar_modifiedFlags &= ~CVAR_USERINFO_ALL;
-#else
-    // TTimo adding " " around the userinfo string to avoid truncated userinfo on the server
-    //   (Com_TokenizeString tokenizes around spaces)
-    data[8] = '"';
-
-		for(i=0;i<strlen(info);i++) {
-			data[9+i] = info[i];	// + (clc.challenge)&0x3;
-		}
-    data[9+i] = '"';
-		data[10+i] = 0;
-
-    // NOTE TTimo don't forget to set the right data length!
-		NET_OutOfBandData( NS_CLIENT, clc.serverAddress, (byte *) &data[0], i+10 );
-		// the most current userinfo has been sent, so watch for any
-		// newer changes to userinfo variables
-		cvar_modifiedFlags &= ~CVAR_USERINFO;
-#endif
 		break;
 
 	default:
@@ -3008,7 +2955,6 @@ void CL_CheckUserinfo( void ) {
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
 		CL_AddReliableCommand(va("userinfo \"%s\"", Cvar_InfoString( CVAR_USERINFO ) ), qfalse);
 	}
-#ifdef TA_SPLITVIEW
 	if(cvar_modifiedFlags & CVAR_USERINFO2)
 	{
 		cvar_modifiedFlags &= ~CVAR_USERINFO2;
@@ -3024,7 +2970,6 @@ void CL_CheckUserinfo( void ) {
 		cvar_modifiedFlags &= ~CVAR_USERINFO4;
 		CL_AddReliableCommand(va("userinfo4 \"%s\"", Cvar_InfoString( CVAR_USERINFO4 ) ), qfalse);
 	}
-#endif
 }
 
 /*
@@ -3640,16 +3585,14 @@ static void CL_GenerateQKey(void)
 	}
 } 
 
-
 /*
 ====================
 CL_Init
 ====================
 */
 void CL_Init( void ) {
-#ifdef TA_SPLITVIEW
 	int		i;
-#endif
+
 	Com_Printf( "----- Client Initialization -----\n" );
 
 	Con_Init ();
@@ -3692,30 +3635,18 @@ void CL_Init( void ) {
 
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
 
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		cl_yawspeed[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_yawspeed"), "140", CVAR_ARCHIVE);
 		cl_pitchspeed[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_pitchspeed"), "140", CVAR_ARCHIVE);
 		cl_anglespeedkey[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_anglespeedkey"), "1.5", 0);
-	}
-#else
-	cl_yawspeed = Cvar_Get ("cl_yawspeed", "140", CVAR_ARCHIVE);
-	cl_pitchspeed = Cvar_Get ("cl_pitchspeed", "140", CVAR_ARCHIVE);
-	cl_anglespeedkey = Cvar_Get ("cl_anglespeedkey", "1.5", 0);
+#ifndef TURTLEARENA // ALWAYS_RUN
+		cl_run[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_run"), "1", CVAR_ARCHIVE);
 #endif
+	}
 
 	cl_maxpackets = Cvar_Get ("cl_maxpackets", "30", CVAR_ARCHIVE );
 	cl_packetdup = Cvar_Get ("cl_packetdup", "1", CVAR_ARCHIVE );
 
-#ifndef TURTLEARENA // ALWAYS_RUN
-#ifdef TA_SPLITVIEW
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		cl_run[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_run"), "1", CVAR_ARCHIVE);
-	}
-#else
-	cl_run = Cvar_Get ("cl_run", "1", CVAR_ARCHIVE);
-#endif
-#endif
 	cl_sensitivity = Cvar_Get ("sensitivity", "5", CVAR_ARCHIVE);
 	cl_mouseAccel = Cvar_Get ("cl_mouseAccel", "0", CVAR_ARCHIVE);
 	cl_freelook = Cvar_Get( "cl_freelook", "1", CVAR_ARCHIVE );
@@ -3752,13 +3683,9 @@ void CL_Init( void ) {
 #ifndef TA_WEAPSYS_EX
 	// init autoswitch so the ui will have it correctly even
 	// if the cgame hasn't been started
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		Cvar_Get (Com_LocalClientCvarName(i, "cg_autoswitch"), "1", CVAR_ARCHIVE);
 	}
-#else
-	Cvar_Get ("cg_autoswitch", "1", CVAR_ARCHIVE);
-#endif
 #endif
 
 	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);
@@ -3772,7 +3699,6 @@ void CL_Init( void ) {
 	m_filter = Cvar_Get ("m_filter", "0", CVAR_ARCHIVE);
 #endif
 
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		j_pitch[i] =        Cvar_Get (Com_LocalClientCvarName(i, "j_pitch"),        "0.022", CVAR_ARCHIVE);
 		j_yaw[i] =          Cvar_Get (Com_LocalClientCvarName(i, "j_yaw"),          "-0.022", CVAR_ARCHIVE);
@@ -3783,16 +3709,6 @@ void CL_Init( void ) {
 		j_forward_axis[i] = Cvar_Get (Com_LocalClientCvarName(i, "j_forward_axis"), "1", CVAR_ARCHIVE);
 		j_side_axis[i] =    Cvar_Get (Com_LocalClientCvarName(i, "j_side_axis"),    "0", CVAR_ARCHIVE);
 	}
-#else
-	j_pitch =        Cvar_Get ("j_pitch",        "0.022", CVAR_ARCHIVE);
-	j_yaw =          Cvar_Get ("j_yaw",          "-0.022", CVAR_ARCHIVE);
-	j_forward =      Cvar_Get ("j_forward",      "-0.25", CVAR_ARCHIVE);
-	j_side =         Cvar_Get ("j_side",         "0.25", CVAR_ARCHIVE);
-	j_pitch_axis =   Cvar_Get ("j_pitch_axis",   "3", CVAR_ARCHIVE);
-	j_yaw_axis =     Cvar_Get ("j_yaw_axis",     "4", CVAR_ARCHIVE);
-	j_forward_axis = Cvar_Get ("j_forward_axis", "1", CVAR_ARCHIVE);
-	j_side_axis =    Cvar_Get ("j_side_axis",    "0", CVAR_ARCHIVE);
-#endif
 
 	cl_motdString = Cvar_Get( "cl_motdString", "", CVAR_ROM );
 
@@ -3811,27 +3727,25 @@ void CL_Init( void ) {
 #endif
 
 #ifdef IOQ3ZTM // ANALOG
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		cl_thirdPerson[i] = Cvar_Get (Com_LocalClientCvarName(i, "cg_thirdPerson"), "1", 0);
 		cl_thirdPersonAngle[i] = Cvar_Get (Com_LocalClientCvarName(i, "cg_thirdPersonAngle"), "0", 0);
 		cl_thirdPersonAnalog[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_thirdPersonAnalog"), "0", CVAR_ARCHIVE);
 	}
-#else
-	cl_thirdPerson = Cvar_Get ("cg_thirdPerson", "1", 0);
-	cl_thirdPersonAngle = Cvar_Get ("cg_thirdPersonAngle", "0", 0);
-	cl_thirdPersonAnalog = Cvar_Get ("cl_thirdPersonAnalog", "0", CVAR_ARCHIVE);
-#endif
 #endif
 
-#ifdef TA_SPLITVIEW
+	// select which local client (using bits) should join a server on connect
 	Cvar_Get ("cl_localClients", "1", 0 );
-#endif
 
 	// userinfo
-	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("rate", "25000", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
 	Cvar_Get ("snaps", "20", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
+	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
+	Cvar_Get ("password", "", CVAR_USERINFO_ALL);
+	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
+
+	// Main local client userinfo
+	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
 #ifdef TURTLEARENA
 	// DEFAULT_PLAYER
 #ifdef TA_SP // SPMODEL
@@ -3873,13 +3787,8 @@ void CL_Init( void ) {
 #ifndef IOQ3ZTM // UNUSED_USERINFO
 	Cvar_Get ("sex", "male", CVAR_USERINFO | CVAR_ARCHIVE );
 #endif
-	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
 
-	Cvar_Get ("password", "", CVAR_USERINFO_ALL);
-	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
-
-#ifdef TA_SPLITVIEW
-	// Second local client
+	// Second local client userinfo
 	Cvar_Get ("2name", "UnnamedPlayer2", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
 	Cvar_Get ("2spmodel", "mike", CVAR_USERINFO2 | CVAR_ROM );
@@ -3912,7 +3821,7 @@ void CL_Init( void ) {
 	Cvar_Get ("2sex", "male", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #endif
 
-	// Third local client
+	// Third local client userinfo
 	Cvar_Get ("3name", "UnnamedPlayer3", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
 	Cvar_Get ("3spmodel", "leo", CVAR_USERINFO3 | CVAR_ROM );
@@ -3945,7 +3854,7 @@ void CL_Init( void ) {
 	Cvar_Get ("3sex", "male", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #endif
 
-	// Fourth local client
+	// Fourth local client userinfo
 	Cvar_Get ("4name", "UnnamedPlayer4", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
 	Cvar_Get ("4spmodel", "don", CVAR_USERINFO4 | CVAR_ROM );
@@ -3976,7 +3885,6 @@ void CL_Init( void ) {
 	Cvar_Get ("4teamtask", "0", CVAR_USERINFO4 );
 #ifndef IOQ3ZTM // UNUSED_USERINFO
 	Cvar_Get ("4sex", "male", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
 #endif
 
 #ifdef USE_MUMBLE
@@ -4024,14 +3932,12 @@ void CL_Init( void ) {
 	// register our commands
 	//
 	Cmd_AddCommand ("cmd", CL_ForwardToServer_f);
-#ifdef TA_SPLITVIEW
 	Cmd_AddCommand ("2dropout", CL_2DropOut_f);
 	Cmd_AddCommand ("3dropout", CL_3DropOut_f);
 	Cmd_AddCommand ("4dropout", CL_4DropOut_f);
 	Cmd_AddCommand ("2dropin", CL_2DropIn_f);
 	Cmd_AddCommand ("3dropin", CL_3DropIn_f);
 	Cmd_AddCommand ("4dropin", CL_4DropIn_f);
-#endif
 	Cmd_AddCommand ("configstrings", CL_Configstrings_f);
 	Cmd_AddCommand ("clientinfo", CL_Clientinfo_f);
 	Cmd_AddCommand ("snd_restart", CL_Snd_Restart_f);
@@ -4107,6 +4013,12 @@ void CL_Shutdown(char *finalmsg, qboolean disconnect, qboolean quit)
 	CL_Snd_Shutdown();
 
 	Cmd_RemoveCommand ("cmd");
+	Cmd_RemoveCommand ("2dropout");
+	Cmd_RemoveCommand ("3dropout");
+	Cmd_RemoveCommand ("4dropout");
+	Cmd_RemoveCommand ("2dropin");
+	Cmd_RemoveCommand ("3dropin");
+	Cmd_RemoveCommand ("4dropin");
 	Cmd_RemoveCommand ("configstrings");
 	Cmd_RemoveCommand ("clientinfo");
 	Cmd_RemoveCommand ("snd_restart");

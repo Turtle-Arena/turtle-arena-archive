@@ -142,7 +142,6 @@ not have future snapshot_t executed before it is executed
 */
 void SV_AddServerCommand( client_t *client, const char *cmd ) {
 	int		index, i;
-#ifdef TA_SPLITVIEW
 	int 	lc = 0;
 
 	// Send command to owner, but prepend it with "lc# "
@@ -158,7 +157,6 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 			}
 		}
 	}
-#endif
 
 	// this is very ugly but it's also a waste to for instance send multiple config string updates
 	// for the same config string index in one snapshot
@@ -180,22 +178,23 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 		for ( i = client->reliableAcknowledge + 1 ; i <= client->reliableSequence ; i++ ) {
 			Com_Printf( "cmd %5d: %s\n", i, client->reliableCommands[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 		}
-#ifdef TA_SPLITVIEW
+
 		if (lc != 0) {
 			Com_Printf( "cmd %5d: lc%d %s\n", i, lc, cmd );
-		} else
-#endif
-		Com_Printf( "cmd %5d: %s\n", i, cmd );
+		} else {
+			Com_Printf( "cmd %5d: %s\n", i, cmd );
+		}
+
 		SV_DropClient( client, "Server command overflow" );
 		return;
 	}
 	index = client->reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
-#ifdef TA_SPLITVIEW
+
 	if (lc != 0) {
 		Com_sprintf(client->reliableCommands[ index ], sizeof( client->reliableCommands[ index ] ), "lc%d %s", lc, cmd);
-	} else
-#endif
-	Q_strncpyz( client->reliableCommands[ index ], cmd, sizeof( client->reliableCommands[ index ] ) );
+	} else {
+		Q_strncpyz( client->reliableCommands[ index ], cmd, sizeof( client->reliableCommands[ index ] ) );
+	}
 }
 
 
@@ -238,12 +237,11 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 
 	// send the data to all relevent clients
 	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
-#ifdef TA_SPLITVIEW
-		// Don't sent print for each local client
+		// Don't sent print for extra local clients
 		if (client->owner != -1 && !strncmp( (char *)message, "print", 5)) {
 			continue;
 		}
-#endif
+
 		SV_AddServerCommand( client, (char *)message );
 	}
 }
@@ -1057,11 +1055,9 @@ SV_PacketEvent
 */
 void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 	int			i;
+	int			j;
 	client_t	*cl;
 	int			qport;
-#ifdef TA_SPLITVIEW
-	int			j;
-#endif
 
 	// check for connectionless packet (0xffffffff) first
 	if ( msg->cursize >= 4 && *(int *)msg->data == -1) {
@@ -1104,13 +1100,13 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 			// reliable message, but they don't do any other processing
 			if (cl->state != CS_ZOMBIE) {
 				cl->lastPacketTime = svs.time;	// don't timeout
-#ifdef TA_SPLITVIEW
+
 				for (j = 0; j < MAX_SPLITVIEW-1; j++) {
 					if (cl->local_clients[j] != -1) {
 						svs.clients[cl->local_clients[j]].lastPacketTime = svs.time;	// don't timeout
 					}
 				}
-#endif
+
 				SV_ExecuteClientMessage( cl, msg );
 			}
 		}
@@ -1135,12 +1131,11 @@ static void SV_CalcPings( void ) {
 
 	for (i=0 ; i < sv_maxclients->integer ; i++) {
 		cl = &svs.clients[i];
-#ifdef TA_SPLITVIEW
+
 		// Splitscreen client's ping is set by main client.
 		if (cl->owner != -1) {
 			continue;
 		}
-#endif
 		if ( cl->state != CS_ACTIVE ) {
 			cl->ping = 999;
 			continue;
@@ -1177,8 +1172,7 @@ static void SV_CalcPings( void ) {
 		ps = SV_GameClientNum( i );
 		ps->ping = cl->ping;
 
-#ifdef TA_SPLITVIEW
-		// Splitscreen client's ping is set by main client.
+		// Splitscreen clients' ping is set by main client.
 		for ( j = 0 ; j < MAX_SPLITVIEW-1 ; j++ ) {
 			if ( cl->local_clients[j] == -1 ) {
 				continue;
@@ -1187,7 +1181,6 @@ static void SV_CalcPings( void ) {
 			ps = SV_GameClientNum( cl->local_clients[j] );
 			ps->ping = cl->ping;
 		}
-#endif
 	}
 }
 
@@ -1257,11 +1250,10 @@ static qboolean SV_CheckPaused( void ) {
 	// only pause if there is just a single client connected
 	count = 0;
 	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
-#ifdef TA_SPLITVIEW // Don't count extra local clients, fixes pause so it works in splitscreen.
 		if ( cl->owner != -1) {
+			// Don't count extra local clients (allows pausing in splitscreen).
 			continue;
 		}
-#endif
 		if ( cl->state >= CS_CONNECTED && cl->netchan.remoteAddress.type != NA_BOT ) {
 			count++;
 		}

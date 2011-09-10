@@ -734,11 +734,7 @@ static void CG_Item( centity_t *cent ) {
 	
 #ifdef TA_WEAPSYS
 	if( item->giType == IT_WEAPON ) {
-#ifdef TA_SPLITVIEW
-		clientInfo_t *ci = &cgs.clientinfo[cg.snap->pss[0].clientNum];
-#else
-		clientInfo_t *ci = &cgs.clientinfo[cg.snap->ps.clientNum];
-#endif
+		clientInfo_t *ci = &cgs.clientinfo[cg.cur_ps->clientNum];
 		if (BG_WeaponHasMelee(item->giTag)) {
 			Byte4Copy( ci->c1RGBA, ent.shaderRGBA );
 		} else {
@@ -747,11 +743,7 @@ static void CG_Item( centity_t *cent ) {
 	}
 #else
 	if( item->giType == IT_WEAPON && item->giTag == WP_RAILGUN ) {
-#ifdef TA_SPLITVIEW
-		clientInfo_t *ci = &cgs.clientinfo[cg.snap->pss[0].clientNum];
-#else
-		clientInfo_t *ci = &cgs.clientinfo[cg.snap->ps.clientNum];
-#endif
+		clientInfo_t *ci = &cgs.clientinfo[cg.cur_ps->clientNum];
 		Byte4Copy( ci->c1RGBA, ent.shaderRGBA );
 	}
 #endif
@@ -1510,6 +1502,7 @@ CG_CalcEntityLerpPositions
 ===============
 */
 static void CG_CalcEntityLerpPositions( centity_t *cent ) {
+	int		i;
 
 	// if this player does not want to see extrapolated players
 	if ( !cg_smoothClients.integer ) {
@@ -1539,9 +1532,13 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	// adjust for riding a mover if it wasn't rolled into the predicted
 	// player state
-#ifdef TA_SPLITVIEW // ZTM: FIXME: Should check all local clients?
-#endif
-	if ( cent != &cg.cur_lc->predictedPlayerEntity ) {
+	for (i = 0; i < MAX_SPLITVIEW; ++i) {
+		if (cent == &cg.localClients[i].predictedPlayerEntity) {
+			break;
+		}
+	}
+
+	if ( i != MAX_SPLITVIEW ) {
 		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
 		cg.snap->serverTime, cg.time, cent->lerpOrigin );
 	}
@@ -1855,7 +1852,6 @@ void CG_AddPacketEntities( void ) {
 	AnglesToAxis( cg.autoAnglesFast, cg.autoAxisFast );
 
 	// generate and add the entity from the playerstate
-#ifdef TA_SPLITVIEW
 	for ( num = 0 ; num < MAX_SPLITVIEW ; num++ ) {
 		if (cg.snap->lcIndex[num] == -1) {
 			continue;
@@ -1867,14 +1863,6 @@ void CG_AddPacketEntities( void ) {
 		// lerp the non-predicted value for lightning gun origins
 		CG_CalcEntityLerpPositions( &cg_entities[ cg.snap->pss[cg.snap->lcIndex[num]].clientNum ] );
 	}
-#else
-	ps = &cg.cur_lc->predictedPlayerState;
-	BG_PlayerStateToEntityState( ps, &cg.cur_lc->predictedPlayerEntity.currentState, qfalse );
-	CG_AddCEntity( &cg.cur_lc->predictedPlayerEntity );
-
-	// lerp the non-predicted value for lightning gun origins
-	CG_CalcEntityLerpPositions( &cg_entities[ cg.cur_ps->clientNum ] );
-#endif
 
 	// add each entity sent over by the server
 	for ( num = 0 ; num < cg.snap->numEntities ; num++ ) {

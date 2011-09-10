@@ -219,7 +219,6 @@ CG_Respawn
 A respawn happened this snapshot
 ================
 */
-#ifdef TA_SPLITVIEW
 void CG_Respawn( int clientNum ) {
 	int i;
 
@@ -253,33 +252,6 @@ void CG_Respawn( int clientNum ) {
 #endif
 	}
 }
-#else
-void CG_Respawn( void ) {
-	// no error decay on player movement
-	cg.thisFrameTeleport = qtrue;
-
-#ifndef TA_WEAPSYS_EX
-	// display weapons available
-	cg.localClient.weaponSelectTime = cg.time;
-
-	// select the weapon the server says we are using
-	cg.localClient.weaponSelect = cg.snap->ps.weapon;
-#endif
-#ifdef TA_HOLDSYS/*2*/
-	cg.localClient.holdableSelect = cg.snap->ps.holdableIndex;
-#endif
-#ifdef IOQ3ZTM // NEW_CAM
-	cg.localClient.camZoomDir = 0;
-	cg.localClient.camZoomIn = qfalse;
-	cg.localClient.camZoomOut = qfalse;
-	cg.localClient.camRotDir = 0;
-	cg.localClient.camLeft = qfalse;
-	cg.localClient.camRight = qfalse;
-	cg.localClient.camReseting = qfalse;
-	cg.localClient.camDistance = 0;
-#endif
-}
-#endif
 
 extern char *eventnames[];
 
@@ -512,7 +484,8 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_DENIEDREWARD)) {
 			trap_S_StartLocalSound( cgs.media.deniedSound, CHAN_ANNOUNCER );
-		} else if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) !=
+		}
+		else if ((ps->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD) !=
 				(ops->persistant[PERS_PLAYEREVENTS] & PLAYEREVENT_GAUNTLETREWARD)) {
 			trap_S_StartLocalSound( cgs.media.humiliationSound, CHAN_ANNOUNCER );
 		}
@@ -550,42 +523,28 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 				if ( cgs.gametype < GT_TEAM) {
 					if (  ps->persistant[PERS_RANK] == 0 ) {
 #ifdef TA_MISC // COMIC_ANNOUNCER
-#ifdef TA_SPLITVIEW
 						CG_AddAnnouncement(ANNOUNCE_YOUHAVETAKENTHELEAD, cg.cur_lc-cg.localClients);
-#else
-						CG_AddAnnouncement(ANNOUNCE_YOUHAVETAKENTHELEAD);
-#endif
 #else
 						CG_AddBufferedSound(cgs.media.takenLeadSound);
 #endif
-					} else
-#ifdef TA_SPLITVIEW // ZTM: Don't play tied or lost lead when there are multiple local clients, multiple sounds play and its annoying.
-					if (cg.snap->numPSs <= 1) {
-#endif
-					if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
+					} else if (cg.snap->numPSs <= 1) {
+						// ZTM: Don't play tied or lost lead when there are multiple local clients
+						//      multiple sounds play and it's annoying.
+
+						if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
 #ifdef TA_MISC // COMIC_ANNOUNCER
-#ifdef TA_SPLITVIEW
-						CG_AddAnnouncement(ANNOUNCE_YOURTIEDFORTHELEAD, cg.cur_lc-cg.localClients);
+							CG_AddAnnouncement(ANNOUNCE_YOURTIEDFORTHELEAD, cg.cur_lc-cg.localClients);
 #else
-						CG_AddAnnouncement(ANNOUNCE_YOURTIEDFORTHELEAD);
+							CG_AddBufferedSound(cgs.media.tiedLeadSound);
 #endif
-#else
-						CG_AddBufferedSound(cgs.media.tiedLeadSound);
-#endif
-					} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
+						} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
 #ifdef TA_MISC // COMIC_ANNOUNCER
-#ifdef TA_SPLITVIEW
-						CG_AddAnnouncement(ANNOUNCE_YOULOSTTHELEAD, cg.cur_lc-cg.localClients);
+							CG_AddAnnouncement(ANNOUNCE_YOULOSTTHELEAD, cg.cur_lc-cg.localClients);
 #else
-						CG_AddAnnouncement(ANNOUNCE_YOULOSTTHELEAD);
+							CG_AddBufferedSound(cgs.media.lostLeadSound);
 #endif
-#else
-						CG_AddBufferedSound(cgs.media.lostLeadSound);
-#endif
+						}
 					}
-#ifdef TA_SPLITVIEW
-					}
-#endif
 				}
 			}
 		}
@@ -654,19 +613,11 @@ void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops ) {
 
 	// respawning
 	if ( ps->persistant[PERS_SPAWN_COUNT] != ops->persistant[PERS_SPAWN_COUNT] ) {
-#ifdef TA_SPLITVIEW // Don't reset all clients
 		CG_Respawn(ps->clientNum);
-#else
-		CG_Respawn();
-#endif
 	}
 
 	if ( cg.mapRestart ) {
-#ifdef TA_SPLITVIEW // Reset all clients
 		CG_Respawn(-1);
-#else
-		CG_Respawn();
-#endif
 		cg.mapRestart = qfalse;
 	}
 

@@ -30,13 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 static	pmove_t		cg_pmove;
 
 static	int			cg_numSolidEntities;
-#ifdef TA_SPLITVIEW
 static	centity_t	*cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT+MAX_SPLITVIEW];
-#elif defined IOQ3ZTM
-static	centity_t	*cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT+1];
-#else
-static	centity_t	*cg_solidEntities[MAX_ENTITIES_IN_SNAPSHOT];
-#endif
 static	int			cg_numTriggerEntities;
 static	centity_t	*cg_triggerEntities[MAX_ENTITIES_IN_SNAPSHOT];
 
@@ -86,7 +80,6 @@ void CG_BuildSolidList( void ) {
 		}
 	}
 
-#ifdef TA_SPLITVIEW
 	// Add local clients to solid entity list
 	for ( i = 0 ; i < snap->numPSs ; i++ ) {
 		cent = &cg_entities[ snap->pss[i].clientNum ];
@@ -96,15 +89,6 @@ void CG_BuildSolidList( void ) {
 			cg_numSolidEntities++;
 		}
 	}
-#elif IOQ3ZTM
-	// Add client to solid entity list
-	cent = &cg_entities[ snap->ps.clientNum ];
-	ent = &cent->currentState;
-	if ( ent->solid ) {
-		cg_solidEntities[cg_numSolidEntities] = cent;
-		cg_numSolidEntities++;
-	}
-#endif
 }
 
 /*
@@ -251,11 +235,7 @@ static void CG_InterpolatePlayerState( qboolean grabAngles ) {
 		int			cmdNum;
 
 		cmdNum = trap_GetCurrentCmdNumber();
-#ifdef TA_SPLITVIEW // CONTROLS
 		trap_GetUserCmd( cmdNum, &cmd, cg.cur_localClientNum );
-#else
-		trap_GetUserCmd( cmdNum, &cmd );
-#endif
 
 		PM_UpdateViewAngles( out, &cmd );
 	}
@@ -269,7 +249,6 @@ static void CG_InterpolatePlayerState( qboolean grabAngles ) {
 		return;
 	}
 
-#ifdef TA_SPLITVIEW
 	if (prev->lcIndex[cg.cur_localClientNum] == -1 ||
 		next->lcIndex[cg.cur_localClientNum] == -1) {
 		return;
@@ -277,10 +256,6 @@ static void CG_InterpolatePlayerState( qboolean grabAngles ) {
 
 	prevPS = &prev->pss[prev->lcIndex[cg.cur_localClientNum]];
 	nextPS = &next->pss[next->lcIndex[cg.cur_localClientNum]];
-#else
-	prevPS = &prev->ps;
-	nextPS = &next->ps;
-#endif
 
 	f = (float)( cg.time - prev->serverTime ) / ( next->serverTime - prev->serverTime );
 
@@ -526,11 +501,7 @@ void CG_PredictPlayerState( void ) {
 	// can't accurately predict a current position, so just freeze at
 	// the last good position we had
 	cmdNum = current - CMD_BACKUP + 1;
-#ifdef TA_SPLITVIEW // CONTROLS
 	trap_GetUserCmd( cmdNum, &oldestCmd, cg.cur_localClientNum );
-#else
-	trap_GetUserCmd( cmdNum, &oldestCmd );
-#endif
 	if ( oldestCmd.serverTime > cg.cur_ps->commandTime 
 		&& oldestCmd.serverTime < cg.time ) {	// special check for map_restart
 		if ( cg_showmiss.integer ) {
@@ -540,26 +511,15 @@ void CG_PredictPlayerState( void ) {
 	}
 
 	// get the latest command so we can know which commands are from previous map_restarts
-#ifdef TA_SPLITVIEW // CONTROLS
 	trap_GetUserCmd( current, &latestCmd, cg.cur_localClientNum );
-#else
-	trap_GetUserCmd( current, &latestCmd );
-#endif
 
 	// get the most recent information we have, even if
 	// the server time is beyond our current cg.time,
 	// because predicted player positions are going to 
 	// be ahead of everything else anyway
 	if ( cg.nextSnap && !cg.nextFrameTeleport && !cg.thisFrameTeleport
-#ifdef TA_SPLITVIEW
-		&& cg.nextSnap->lcIndex[cg.cur_localClientNum] != -1
-#endif
-		) {
-#ifdef TA_SPLITVIEW
+		&& cg.nextSnap->lcIndex[cg.cur_localClientNum] != -1) {
 		cg.cur_lc->predictedPlayerState = cg.nextSnap->pss[cg.nextSnap->lcIndex[cg.cur_localClientNum]];
-#else
-		cg.cur_lc->predictedPlayerState = cg.nextSnap->ps;
-#endif
 		cg.physicsTime = cg.nextSnap->serverTime;
 	} else {
 		cg.cur_lc->predictedPlayerState = *cg.cur_ps;
@@ -580,11 +540,7 @@ void CG_PredictPlayerState( void ) {
 	moved = qfalse;
 	for ( cmdNum = current - CMD_BACKUP + 1 ; cmdNum <= current ; cmdNum++ ) {
 		// get the command
-#ifdef TA_SPLITVIEW // CONTROLS
 		trap_GetUserCmd( cmdNum, &cg_pmove.cmd, cg.cur_localClientNum );
-#else
-		trap_GetUserCmd( cmdNum, &cg_pmove.cmd );
-#endif
 
 		if ( cg_pmove.pmove_fixed ) {
 			PM_UpdateViewAngles( cg_pmove.ps, &cg_pmove.cmd );

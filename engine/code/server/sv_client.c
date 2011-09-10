@@ -169,7 +169,6 @@ static qboolean SV_IsBanned(netadr_t *from, qboolean isexception)
 	return qfalse;
 }
 
-#ifdef TA_SPLITVIEW
 /*
 ==================
 SV_AddExtraLocalClient
@@ -317,7 +316,6 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	// gamestate message was not just sent, forcing a retransmit
 	newcl->gamestateMessageNum = -1;
 }
-#endif
 
 /*
 ==================
@@ -461,25 +459,6 @@ void SV_DirectConnect( netadr_t from ) {
 	newcl = &temp;
 	Com_Memset (newcl, 0, sizeof(client_t));
 
-	// find a client slot
-	// if "sv_privateClients" is set > 0, then that number
-	// of client slots will be reserved for connections that
-	// have "password" set to the value of "sv_privatePassword"
-	// Info requests will report the maxclients as if the private
-	// slots didn't exist, to prevent people from trying to connect
-	// to a full server.
-	// This is to allow us to reserve a couple slots here on our
-	// servers so we can play without having to kick people.
-
-	// check for privateClient password
-	password = Info_ValueForKey( userinfo, "password" );
-	if ( !strcmp( password, sv_privatePassword->string ) ) {
-		startIndex = 0;
-	} else {
-		// skip past the reserved slots
-		startIndex = sv_privateClients->integer;
-	}
-
 	// if there is already a slot for this ip, reuse it
 	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
 		if ( cl->state == CS_FREE ) {
@@ -499,6 +478,25 @@ void SV_DirectConnect( netadr_t from ) {
 			//
 			goto gotnewcl;
 		}
+	}
+
+	// find a client slot
+	// if "sv_privateClients" is set > 0, then that number
+	// of client slots will be reserved for connections that
+	// have "password" set to the value of "sv_privatePassword"
+	// Info requests will report the maxclients as if the private
+	// slots didn't exist, to prevent people from trying to connect
+	// to a full server.
+	// This is to allow us to reserve a couple slots here on our
+	// servers so we can play without having to kick people.
+
+	// check for privateClient password
+	password = Info_ValueForKey( userinfo, "password" );
+	if ( !strcmp( password, sv_privatePassword->string ) ) {
+		startIndex = 0;
+	} else {
+		// skip past the reserved slots
+		startIndex = sv_privateClients->integer;
 	}
 
 	newcl = NULL;
@@ -548,12 +546,11 @@ gotnewcl:
 	clientNum = newcl - svs.clients;
 	ent = SV_GentityNum( clientNum );
 	newcl->gentity = ent;
-#ifdef TA_SPLITVIEW
+
 	newcl->owner = newcl->gentity->r.owner = -1;
 	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 		newcl->local_clients[i] = newcl->gentity->r.local_clients[i] = -1;
 	}
-#endif
 
 	// save the challenge
 	newcl->challenge = challenge;
@@ -599,14 +596,12 @@ gotnewcl:
 	// gamestate message was not just sent, forcing a retransmit
 	newcl->gamestateMessageNum = -1;
 
-#ifdef TA_SPLITVIEW
 	// Client sends a userinfo string for each client they want.
 	count = Com_Clamp(1, MAX_SPLITVIEW, Cmd_Argc()-1);
 
 	for (i = 1; i < count; i++) {
 		SV_AddExtraLocalClient(newcl, i, Cmd_Argv(1+i));
 	}
-#endif
 
 	// if this was the first client on the server, or the last client
 	// the server can hold, send a heartbeat to the master.
@@ -661,8 +656,7 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	challenge_t	*challenge;
 	const qboolean isBot = drop->netchan.remoteAddress.type == NA_BOT;
 
-#ifdef TA_SPLITVIEW
-	// Kick client's splitscreen clients
+	// Kick client's extra local clients
 	if (drop->owner == -1) {
 		for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 			if (drop->local_clients[i] != -1) {
@@ -670,7 +664,6 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 			}
 		}
 	}
-#endif
 
 	if ( drop->state == CS_ZOMBIE ) {
 		return;		// already dropped
@@ -700,11 +693,8 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	// this will remove the body, among other things
 	VM_Call( gvm, GAME_CLIENT_DISCONNECT, drop - svs.clients );
 
-	// add the disconnect command
-#ifdef TA_SPLITVIEW // Allow kicking extra local clients
-	if (drop->owner != -1)
-	{
-		// Do cleanup for extra local client kick.
+	// Check if client is a extra local client
+	if (drop->owner != -1) {
 		client_t *cl = svs.clients + drop->owner;
 		int clientNum = drop - svs.clients;
 
@@ -716,10 +706,10 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 				cl->gentity->r.local_clients[i] = -1;
 			}
 		}
+	} else {
+		// add the disconnect command
+		SV_SendServerCommand( drop, "disconnect \"%s\"", reason);
 	}
-	else
-#endif
-	SV_SendServerCommand( drop, "disconnect \"%s\"", reason);
 
 	if ( isBot ) {
 		SV_BotFreeClient( drop - svs.clients );
@@ -766,10 +756,8 @@ static void SV_SendClientGameState( client_t *client ) {
 	entityState_t	*base, nullstate;
 	msg_t		msg;
 	byte		msgBuffer[MAX_MSGLEN];
-#ifdef TA_SPLITVIEW
 	int			i;
 	client_t	*lc;
-#endif
 
  	Com_DPrintf ("SV_SendClientGameState() for %s\n", client->name);
 	Com_DPrintf( "Going from CS_CONNECTED to CS_PRIMED for %s\n", client->name );
@@ -782,7 +770,6 @@ static void SV_SendClientGameState( client_t *client ) {
 	// gamestate message was not just sent, forcing a retransmit
 	client->gamestateMessageNum = client->netchan.outgoingSequence;
 
-#ifdef TA_SPLITVIEW
 	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 		if (client->local_clients[i] == -1) {
 			continue;
@@ -801,7 +788,6 @@ static void SV_SendClientGameState( client_t *client ) {
 		// gamestate message was not just sent, forcing a retransmit
 		lc->gamestateMessageNum = lc->netchan.outgoingSequence;
 	}
-#endif
 
 	MSG_Init( &msg, msgBuffer, sizeof( msgBuffer ) );
 
@@ -859,9 +845,7 @@ SV_ClientEnterWorld
 void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	int		clientNum;
 	sharedEntity_t *ent;
-#ifdef TA_SPLITVIEW
 	int		i;
-#endif
 
 	Com_DPrintf( "Going from CS_PRIMED to CS_ACTIVE for %s\n", client->name );
 	client->state = CS_ACTIVE;
@@ -875,12 +859,11 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	ent = SV_GentityNum( clientNum );
 	ent->s.number = clientNum;
 	client->gentity = ent;
-#ifdef TA_SPLITVIEW
+
 	// Set local client indexes (must be done after game resets ent->r).
 	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 		client->gentity->r.local_clients[i] = client->local_clients[i];
 	}
-#endif
 
 	client->deltaMessage = -1;
 	client->lastSnapshotTime = 0;	// generate a snapshot immediately
@@ -1280,16 +1263,6 @@ The client is going to disconnect, so remove the connection immediately  FIXME: 
 =================
 */
 static void SV_Disconnect_f( client_t *cl ) {
-#ifdef TA_SPLITVIEW
-	int i;
-
-	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
-		if (cl->local_clients[i] != -1) {
-			SV_DropClient( &svs.clients[cl->local_clients[i]], "disconnected" );
-		}
-	}
-#endif
-
 	SV_DropClient( cl, "disconnected" );
 }
 
@@ -1445,7 +1418,6 @@ static void SV_VerifyPaks_f( client_t *cl ) {
 		if (bGood) {
 			cl->pureAuthentic = 1;
 
-#ifdef TA_SPLITVIEW
 			// Copy pure info to extra local clients
 			for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 				if (cl->local_clients[i] == -1) {
@@ -1455,7 +1427,6 @@ static void SV_VerifyPaks_f( client_t *cl ) {
 				svs.clients[cl->local_clients[i]].gotCP = qtrue;
 				svs.clients[cl->local_clients[i]].pureAuthentic = 1;
 			}
-#endif
 		} 
 		else {
 			cl->pureAuthentic = 0;
@@ -1632,7 +1603,11 @@ static void SV_UpdateUserinfo_f( client_t *cl ) {
 	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, cl - svs.clients );
 }
 
-#ifdef TA_SPLITVIEW
+/*
+==================
+SV_UpdateUserinfo2_f
+==================
+*/
 static void SV_UpdateUserinfo2_f( client_t *cl ) {
 	client_t *lc;
 
@@ -1649,6 +1624,11 @@ static void SV_UpdateUserinfo2_f( client_t *cl ) {
 	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, lc - svs.clients );
 }
 
+/*
+==================
+SV_UpdateUserinfo3_f
+==================
+*/
 static void SV_UpdateUserinfo3_f( client_t *cl ) {
 	client_t *lc;
 
@@ -1665,6 +1645,11 @@ static void SV_UpdateUserinfo3_f( client_t *cl ) {
 	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, lc - svs.clients );
 }
 
+/*
+==================
+SV_UpdateUserinfo4_f
+==================
+*/
 static void SV_UpdateUserinfo4_f( client_t *cl ) {
 	client_t *lc;
 
@@ -1681,6 +1666,11 @@ static void SV_UpdateUserinfo4_f( client_t *cl ) {
 	VM_Call( gvm, GAME_CLIENT_USERINFO_CHANGED, lc - svs.clients );
 }
 
+/*
+==================
+SV_DropOut2_f
+==================
+*/
 void SV_DropOut2_f( client_t *cl ) {
 	client_t *lc;
 
@@ -1693,6 +1683,11 @@ void SV_DropOut2_f( client_t *cl ) {
 	SV_DropClient(lc, "dropped out");
 }
 
+/*
+==================
+SV_DropOut3_f
+==================
+*/
 void SV_DropOut3_f( client_t *cl ) {
 	client_t *lc;
 
@@ -1705,6 +1700,11 @@ void SV_DropOut3_f( client_t *cl ) {
 	SV_DropClient(lc, "dropped out");
 }
 
+/*
+==================
+SV_DropOut4_f
+==================
+*/
 void SV_DropOut4_f( client_t *cl ) {
 	client_t *lc;
 
@@ -1717,6 +1717,11 @@ void SV_DropOut4_f( client_t *cl ) {
 	SV_DropClient(lc, "dropped out");
 }
 
+/*
+==================
+SV_DropIn2_f
+==================
+*/
 void SV_DropIn2_f( client_t *cl ) {
 	if (cl->local_clients[0] != -1) {
 		return;
@@ -1725,6 +1730,11 @@ void SV_DropIn2_f( client_t *cl ) {
 	SV_AddExtraLocalClient(cl, 1, Cmd_Argv(1));
 }
 
+/*
+==================
+SV_DropIn3_f
+==================
+*/
 void SV_DropIn3_f( client_t *cl ) {
 	if (cl->local_clients[1] != -1) {
 		return;
@@ -1733,6 +1743,11 @@ void SV_DropIn3_f( client_t *cl ) {
 	SV_AddExtraLocalClient(cl, 2, Cmd_Argv(1));
 }
 
+/*
+==================
+SV_DropIn3_f
+==================
+*/
 void SV_DropIn4_f( client_t *cl ) {
 	if (cl->local_clients[2] != -1) {
 		return;
@@ -1740,7 +1755,6 @@ void SV_DropIn4_f( client_t *cl ) {
 
 	SV_AddExtraLocalClient(cl, 3, Cmd_Argv(1));
 }
-#endif
 
 
 #ifdef USE_VOIP
@@ -1782,7 +1796,6 @@ typedef struct {
 
 static ucmd_t ucmds[] = {
 	{"userinfo", SV_UpdateUserinfo_f},
-#ifdef TA_SPLITVIEW
 	{"userinfo2", SV_UpdateUserinfo2_f},
 	{"userinfo3", SV_UpdateUserinfo3_f},
 	{"userinfo4", SV_UpdateUserinfo4_f},
@@ -1792,7 +1805,6 @@ static ucmd_t ucmds[] = {
 	{"dropin2", SV_DropIn2_f},
 	{"dropin3", SV_DropIn3_f},
 	{"dropin4", SV_DropIn4_f},
-#endif
 	{"disconnect", SV_Disconnect_f},
 	{"cp", SV_VerifyPaks_f},
 	{"vdr", SV_ResetPureClient_f},
@@ -1929,7 +1941,7 @@ On very fast clients, there may be multiple usercmd packed into
 each of the backup packets.
 ==================
 */
-static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, client_t *encoder) {
+static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, client_t *encoder ) {
 	int			i, key;
 	int			cmdCount;
 	usercmd_t	nullcmd;
@@ -1992,7 +2004,7 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, client_t *enc
 		SV_ClientEnterWorld( cl, &cmds[0] );
 		// the moves can be processed normaly
 	}
-
+	
 	// a bad cp command was sent, drop the client
 	if (sv_pure->integer != 0 && cl->pureAuthentic == 0) {		
 		SV_DropClient( cl, "Cannot validate pure client!");
@@ -2206,11 +2218,6 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 		// gamestate we sent them, resend it
 		if ( cl->messageAcknowledge > cl->gamestateMessageNum ) {
 			Com_DPrintf( "%s : dropped gamestate, resending\n", cl->name );
-#ifdef TA_SPLITVIEW
-			Com_DPrintf( "client=%d\n", (int)(cl - svs.clients));
-			Com_DPrintf( "gamestateMessageNum=%d\n", cl->gamestateMessageNum );
-			Com_DPrintf( "messageAcknowledge=%d\n", cl->messageAcknowledge );
-#endif
 			SV_SendClientGameState( cl );
 		}
 		return;
@@ -2258,7 +2265,6 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 //		Com_Printf( "WARNING: Junk at end of packet for client %i\n", cl - svs.clients );
 //	}
 
-#ifdef TA_SPLITVIEW
 	// LocalClient move is included after normal move
 	if ( c != clc_EOF ) {
 		int i;
@@ -2285,5 +2291,4 @@ void SV_ExecuteClientMessage( client_t *cl, msg_t *msg ) {
 			}
 		}
 	}
-#endif
 }

@@ -3,20 +3,20 @@
 Copyright (C) 1999-2005 Id Software, Inc.
 Copyright (C) 2010-2011 by Zack "ZTurtleMan" Middleton
 
-This file is part of Turtle Arena source code.
+This file is part of Quake III Arena source code.
 
-Turtle Arena source code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena source code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena source code; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 /*
 =======================================================================
 
-SETUP PLAYERS MENU
+INGAME LOCAL CLIENT SELECT MENU
 
 This is a general select local client menu. Used for accessing menus for a specific local client.
 It runs a function, passing the selected client to the function.
@@ -36,8 +36,6 @@ If there is only one local client simply runs the function.
 
 
 #include "ui_local.h"
-
-#ifdef TA_SPLITVIEW
 
 //#define INGAME_FRAME					"menu/art/addbotframe"
 #define INGAME_FRAME					"menu/art/cut_frame"
@@ -66,10 +64,10 @@ static setupplayersmenu_t	s_setupplayers;
 
 /*
 =================
-SetupPlayers_Event
+InSelectPlayer_Event
 =================
 */
-void SetupPlayers_Event( void *ptr, int notification ) {
+void InSelectPlayer_Event( void *ptr, int notification ) {
 	if( notification != QM_ACTIVATED ) {
 		return;
 	}
@@ -89,10 +87,10 @@ void SetupPlayers_Event( void *ptr, int notification ) {
 
 /*
 =================
-UI_SetupPlayersMenu_Draw
+InSelectPlayerMenu_Draw
 =================
 */
-static void UI_SetupPlayersMenu_Draw( void ) {
+static void InSelectPlayerMenu_Draw( void ) {
 	UI_DrawBannerString( 320, 16, s_setupplayers.bannerString, UI_CENTER, text_banner_color );
 
 	// standard menu drawing
@@ -102,19 +100,19 @@ static void UI_SetupPlayersMenu_Draw( void ) {
 
 /*
 =================
-SetupPlayers_MenuInit
+InSelectPlayer_MenuInit
 =================
 */
-void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner, qboolean disableMissingPlayers ) {
+void InSelectPlayer_MenuInit( uiClientState_t *cs, const char *banner, qboolean disableMissingPlayers ) {
 	int		y;
 	int		i;
 
 	memset( &s_setupplayers, 0, sizeof(setupplayersmenu_t) );
 
-	SetupPlayers_Cache();
+	InSelectPlayer_Cache();
 
 	Q_strncpyz(s_setupplayers.bannerString, banner, sizeof (s_setupplayers.bannerString));
-	s_setupplayers.menu.draw = UI_SetupPlayersMenu_Draw;
+	s_setupplayers.menu.draw = InSelectPlayerMenu_Draw;
 	s_setupplayers.menu.wrapAround = qtrue;
 	s_setupplayers.menu.fullscreen = qfalse;
 
@@ -139,15 +137,24 @@ void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner, qboolean di
 		s_setupplayers.player[i].generic.x			= 320;
 		s_setupplayers.player[i].generic.y			= y;
 		s_setupplayers.player[i].generic.id			= ID_CUSTOMIZEPLAYER + i;
-		s_setupplayers.player[i].generic.callback	= SetupPlayers_Event;
+		s_setupplayers.player[i].generic.callback	= InSelectPlayer_Event;
 		s_setupplayers.player[i].string				= s_setupplayers.playerString[i];
 		if (!disableMissingPlayers) {
+#ifdef TURTLEARENA
 			// Have players in game be green and not ingame be red.
 			if (cs->lcIndex[i] == -1) {
 				s_setupplayers.player[i].color		= color_red;
 			} else {
 				s_setupplayers.player[i].color		= color_green;
 			}
+#else
+			// Have players in game be red and not ingame be white.
+			if (cs->lcIndex[i] == -1) {
+				s_setupplayers.player[i].color		= color_white;
+			} else {
+				s_setupplayers.player[i].color		= color_red;
+			}
+#endif
 		} else {
 			s_setupplayers.player[i].color			= text_big_color;
 		}
@@ -166,7 +173,7 @@ void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner, qboolean di
 	s_setupplayers.back.generic.x			= 320;
 	s_setupplayers.back.generic.y			= y;
 	s_setupplayers.back.generic.id			= ID_BACK;
-	s_setupplayers.back.generic.callback	= SetupPlayers_Event;
+	s_setupplayers.back.generic.callback	= InSelectPlayer_Event;
 	s_setupplayers.back.string				= "Back";
 	s_setupplayers.back.color				= text_big_color;
 	s_setupplayers.back.style				= UI_CENTER|UI_SMALLFONT;
@@ -183,20 +190,20 @@ void SetupPlayers_MenuInit( uiClientState_t *cs, const char *banner, qboolean di
 
 /*
 =================
-SetupPlayers_Cache
+InSelectPlayer_Cache
 =================
 */
-void SetupPlayers_Cache( void ) {
+void InSelectPlayer_Cache( void ) {
 	trap_R_RegisterShaderNoMip( INGAME_FRAME );
 }
 
 
 /*
 =================
-UI_SetupPlayersMenu
+InSelectPlayerMenu
 =================
 */
-void UI_SetupPlayersMenu( void (*playerfunc)(int), const char *banner, qboolean disableMissingPlayers ) {
+void InSelectPlayerMenu( void (*playerfunc)(int), const char *banner, qboolean disableMissingPlayers ) {
 	uiClientState_t	cs;
 
 	trap_GetClientState( &cs );
@@ -207,9 +214,8 @@ void UI_SetupPlayersMenu( void (*playerfunc)(int), const char *banner, qboolean 
 		return;
 	}
 
-	SetupPlayers_MenuInit( &cs, banner, disableMissingPlayers );
+	InSelectPlayer_MenuInit( &cs, banner, disableMissingPlayers );
 	s_setupplayers.playerfunc = playerfunc;
 	UI_PushMenu( &s_setupplayers.menu );
 }
-#endif
 

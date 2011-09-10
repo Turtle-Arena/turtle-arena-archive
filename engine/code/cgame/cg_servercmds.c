@@ -64,15 +64,7 @@ CG_ParseScores
 
 =================
 */
-#ifdef TA_SPLITVIEW
-static void CG_ParseScores( int start )
-#else
-static void CG_ParseScores( void )
-#endif
-{
-#ifndef TA_SPLITVIEW
-	const int	start = 0;
-#endif
+static void CG_ParseScores( int start ) {
 	int		i, powerups;
 
 	cg.numScores = atoi( CG_Argv( 1 + start) );
@@ -243,11 +235,7 @@ static void CG_ParseWarmup( void ) {
 #endif
 		) {
 #ifdef TA_MISC // COMIC_ANNOUCER
-#ifdef TA_SPLITVIEW
 			CG_AddAnnouncement(ANNOUNCE_PREPAREYOURTEAM, -1);
-#else
-			CG_AddAnnouncement(ANNOUNCE_PREPAREYOURTEAM);
-#endif
 #else
 			trap_S_StartLocalSound( cgs.media.countPrepareTeamSound, CHAN_ANNOUNCER );
 #endif
@@ -255,11 +243,7 @@ static void CG_ParseWarmup( void ) {
 #endif
 		{
 #ifdef TA_MISC // COMIC_ANNOUCER
-#ifdef TA_SPLITVIEW
 			CG_AddAnnouncement(ANNOUNCE_PREPAREYOURSELFS, -1);
-#else
-			CG_AddAnnouncement(ANNOUNCE_PREPAREYOURSELFS);
-#endif
 #else
 			trap_S_StartLocalSound( cgs.media.countPrepareSound, CHAN_ANNOUNCER );
 #endif
@@ -381,11 +365,7 @@ static void CG_ConfigStringModified( void ) {
 		Q_strncpyz( cgs.voteString, str, sizeof( cgs.voteString ) );
 #ifdef MISSIONPACK
 #ifdef TA_MISC // COMIC_ANNOUNCER
-#ifdef TA_SPLITVIEW
 		CG_AddAnnouncement(ANNOUNCE_VOTINGBEGUN, -1);
-#else
-		CG_AddAnnouncement(ANNOUNCE_VOTINGBEGUN)
-#endif
 #else
 		trap_S_StartLocalSound( cgs.media.voteNow, CHAN_ANNOUNCER );
 #endif
@@ -403,11 +383,7 @@ static void CG_ConfigStringModified( void ) {
 		Q_strncpyz( cgs.teamVoteString[num-CS_TEAMVOTE_STRING], str, sizeof( cgs.teamVoteString ) );
 #ifdef MISSIONPACK
 #ifdef TA_MISC // COMIC_ANNOUNCER
-#ifdef TA_SPLITVIEW
 		CG_AddAnnouncement(ANNOUNCE_VOTINGBEGUN, -1);
-#else
-		CG_AddAnnouncement(ANNOUNCE_VOTINGBEGUN)
-#endif
 #else
 		trap_S_StartLocalSound( cgs.media.voteNow, CHAN_ANNOUNCER );
 #endif
@@ -541,9 +517,7 @@ require a reload of all the media
 ===============
 */
 static void CG_MapRestart( void ) {
-#ifdef TA_SPLITVIEW
 	int lc;
-#endif
 
 	if ( cg_showmiss.integer ) {
 		CG_Printf( "CG_MapRestart\n" );
@@ -589,7 +563,7 @@ static void CG_MapRestart( void ) {
 		}
 	}
 #endif
-#ifdef TA_SPLITVIEW
+
 	for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
 #ifdef TURTLEARENA // THIRD_PERSON
 #ifdef IOQ3ZTM // LASERTAG
@@ -605,21 +579,6 @@ static void CG_MapRestart( void ) {
 		cg_thirdPersonAngle[lc].value = 0;
 #endif
 	}
-#else
-#ifdef TURTLEARENA // THIRD_PERSON
-#ifdef IOQ3ZTM // LASERTAG
-	if (cg_laserTag.integer)
-		trap_Cvar_Set("cg_thirdPerson", "0");
-	else
-#endif
-	trap_Cvar_Set("cg_thirdPerson", "1");
-#else
-	trap_Cvar_Set("cg_thirdPerson", "0");
-#endif
-#ifdef IOQ3ZTM
-	cg_thirdPersonAngle.value = 0;
-#endif
-#endif
 }
 
 #define MAX_VOICEFILESIZE	16384
@@ -1005,12 +964,7 @@ void CG_PlayVoiceChat( bufferedVoiceChat_t *vchat ) {
 
 	if ( !cg_noVoiceChats.integer ) {
 		trap_S_StartLocalSound( vchat->snd, CHAN_VOICE);
-#ifdef TA_SPLITVIEW
-		if (vchat->clientNum != cg.snap->pss[0].clientNum)
-#else
-		if (vchat->clientNum != cg.snap->ps.clientNum)
-#endif
-		{
+		if (vchat->clientNum != cg.snap->pss[0].clientNum) {
 			int orderTask = CG_ValidOrder(vchat->cmd);
 			if (orderTask > 0) {
 				cgs.acceptOrderTime = cg.time + 5000;
@@ -1181,9 +1135,7 @@ static void CG_ServerCommand( void ) {
 	const char	*cmd;
 	char		text[MAX_SAY_TEXT];
 	int			start = 0;
-#ifdef TA_SPLITVIEW
 	int			lc = 0;
-#endif
 
 	cmd = CG_Argv(start);
 
@@ -1192,8 +1144,7 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 
-#ifdef TA_SPLITVIEW
-	// lc#
+	// Commands for splitscreen clients begin "lc# "
 	if (cmd[0] == 'l' && cmd[1] =='c' && isdigit(cmd[2])) {
 		lc = atoi(&cmd[2]);
 
@@ -1201,17 +1152,13 @@ static void CG_ServerCommand( void ) {
 			return;
 		}
 
+		// Get command
 		start++;
 		cmd = CG_Argv(start);
 	}
-#endif
 
 	if ( !strcmp( cmd, "cp" ) ) {
-#ifdef TA_SPLITVIEW
 		cg.cur_lc = &cg.localClients[lc];
-#else
-		cg.cur_lc = &cg.localClient;
-#endif
 #if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
 		CG_CenterPrint( CG_Argv(start+1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 #else
@@ -1221,11 +1168,10 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "cs" ) ) {
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			return;
 		}
-#endif
+
 		CG_ConfigStringModified();
 		return;
 	}
@@ -1236,22 +1182,14 @@ static void CG_ServerCommand( void ) {
 									// votes passing or failing
 		if ( !Q_stricmpn( cmd, "vote failed", 11 ) || !Q_stricmpn( cmd, "team vote failed", 16 )) {
 #ifdef TA_MISC // COMIC_ANNOUNCER
-#ifdef TA_SPLITVIEW
 			CG_AddAnnouncement(ANNOUNCE_VOTEFAIL, lc);
-#else
-			CG_AddAnnouncement(ANNOUNCE_VOTEFAIL);
-#endif
 			return;
 #else
 			trap_S_StartLocalSound( cgs.media.voteFailed, CHAN_ANNOUNCER );
 #endif
 		} else if ( !Q_stricmpn( cmd, "vote passed", 11 ) || !Q_stricmpn( cmd, "team vote passed", 16 ) ) {
 #ifdef TA_MISC // COMIC_ANNOUNCER
-#ifdef TA_SPLITVIEW
 			CG_AddAnnouncement(ANNOUNCE_VOTEPASS, lc);
-#else
-			CG_AddAnnouncement(ANNOUNCE_VOTEPASS);
-#endif
 			return;
 #else
 			trap_S_StartLocalSound( cgs.media.votePassed, CHAN_ANNOUNCER );
@@ -1259,12 +1197,10 @@ static void CG_ServerCommand( void ) {
 		}
 #endif
 
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			// Show which client this is for.
 			CG_Printf("(For Local Client %d): ", lc+1);
 		}
-#endif
 		CG_Printf( "%s", CG_Argv(start+1) );
 		return;
 	}
@@ -1272,13 +1208,12 @@ static void CG_ServerCommand( void ) {
 	if ( !strcmp( cmd, "chat" ) ) {
 		if ( !cg_teamChatsOnly.integer ) {
 			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-#ifdef TA_SPLITVIEW
 			if (lc != 0) {
 				// Show which client this is for.
 				Com_sprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
-			} else
-#endif
-			Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
+			} else {
+				Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
+			}
 			CG_RemoveChatEscapeChar( text );
 			CG_Printf( "%s\n", text );
 		}
@@ -1287,13 +1222,12 @@ static void CG_ServerCommand( void ) {
 
 	if ( !strcmp( cmd, "tchat" ) ) {
 		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			// Show which client this is for.
 			Com_sprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
-		} else
-#endif
-		Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
+		} else {
+			Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
+		}
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );
 #ifndef IOQ3ZTM // TEAM_CHAT_CON
@@ -1302,71 +1236,61 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 	if ( !strcmp( cmd, "vchat" ) ) {
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			return;
 		}
-#endif
+
 		CG_VoiceChat( SAY_ALL );
 		return;
 	}
 
 	if ( !strcmp( cmd, "vtchat" ) ) {
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			return;
 		}
-#endif
+
 		CG_VoiceChat( SAY_TEAM );
 		return;
 	}
 
 	if ( !strcmp( cmd, "vtell" ) ) {
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			return;
 		}
-#endif
+
 		CG_VoiceChat( SAY_TELL );
 		return;
 	}
 
 	if ( !strcmp( cmd, "scores" ) ) {
-#ifdef TA_SPLITVIEW
 		CG_ParseScores(start);
-#else
-		CG_ParseScores();
-#endif
 		return;
 	}
 
 	if ( !strcmp( cmd, "tinfo" ) ) {
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			return;
 		}
-#endif
+
 		CG_ParseTeamInfo();
 		return;
 	}
 
 	if ( !strcmp( cmd, "map_restart" ) ) {
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			return;
 		}
-#endif
+
 		CG_MapRestart();
 		return;
 	}
 
 	if ( Q_stricmp (cmd, "remapShader") == 0 )
 	{
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			return;
 		}
-#endif
+
 		if (trap_Argc() == start+4)
 		{
 			char shader1[MAX_QPATH];
@@ -1385,11 +1309,10 @@ static void CG_ServerCommand( void ) {
 
 	// loaddeferred can be both a servercmd and a consolecmd
 	if ( !strcmp( cmd, "loaddeferred" ) ) {
-#ifdef TA_SPLITVIEW
 		if (lc != 0) {
 			return;
 		}
-#endif
+
 		CG_LoadDeferredPlayers();
 		return;
 	}

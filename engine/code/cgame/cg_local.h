@@ -224,6 +224,7 @@ typedef struct {
 
 //=================================================
 
+
 #ifdef TA_ENTSYS // MISC_OBJECT
 // misc_object/NPC data
 enum
@@ -383,9 +384,7 @@ typedef struct localEntity_s {
 
 	refEntity_t		refEntity;		
 
-#ifdef TA_SPLITVIEW
 	int				localClients; // 0 means all, else check if localClients & (1<<lc)
-#endif
 } localEntity_t;
 
 //======================================================================
@@ -923,13 +922,9 @@ typedef struct {
 	refdef_t	refdef;
 	vec3_t		refdefViewAngles;		// will be converted to refdef.viewaxis
 
-#ifdef TA_SPLITVIEW
-	int numViewports;
-	int viewport;
-#endif
-#ifdef TA_PATHSYS // 2DMODE
-	qboolean singleCamera; // Rending multiple clients using one viewport
-#endif
+	int			numViewports;
+	int			viewport;
+	qboolean	singleCamera; // Rending multiple clients using one viewport
 
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
@@ -979,7 +974,7 @@ typedef struct {
 	int			bobcycle;
 	float		xyspeed;
 #ifndef IOQ3ZTM // NEW_CAM
-	int     nextOrbitTime;
+	int     	nextOrbitTime;
 #endif
 
 	// development tool
@@ -990,13 +985,8 @@ typedef struct {
 	// Local client data, from events and such
 	cglc_t			*cur_lc;	// Current local client data we are working with
 	playerState_t	*cur_ps; // Like cur_lc, but for player state
-#ifdef TA_SPLITVIEW
 	int				cur_localClientNum;
 	cglc_t			localClients[MAX_SPLITVIEW];
-#else
-	cglc_t			localClient;
-#endif
-
 
 } cg_t;
 
@@ -1647,11 +1637,7 @@ extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
 extern	vmCvar_t		cg_tracerLength;
 #ifndef TA_WEAPSYS_EX
-#ifdef TA_SPLITVIEW
 extern	vmCvar_t		cg_autoswitch[MAX_SPLITVIEW];
-#else
-extern	vmCvar_t		cg_autoswitch;
-#endif
 #endif
 extern	vmCvar_t		cg_ignore;
 extern	vmCvar_t		cg_simpleItems;
@@ -1659,16 +1645,10 @@ extern	vmCvar_t		cg_fov;
 #ifndef TURTLEARENA // NOZOOM
 extern	vmCvar_t		cg_zoomFov;
 #endif
-#ifdef TA_SPLITVIEW
 extern	vmCvar_t		cg_thirdPersonRange[MAX_SPLITVIEW];
 extern	vmCvar_t		cg_thirdPersonAngle[MAX_SPLITVIEW];
 extern	vmCvar_t		cg_thirdPerson[MAX_SPLITVIEW];
 extern	vmCvar_t		cg_splitviewVertical;
-#else
-extern	vmCvar_t		cg_thirdPersonRange;
-extern	vmCvar_t		cg_thirdPersonAngle;
-extern	vmCvar_t		cg_thirdPerson;
-#endif
 extern	vmCvar_t		cg_lagometer;
 extern	vmCvar_t		cg_drawAttacker;
 extern	vmCvar_t		cg_synchronousClients;
@@ -1784,18 +1764,16 @@ void CG_TestModelPrevFrame_f (void);
 void CG_TestModelNextSkin_f (void);
 void CG_TestModelPrevSkin_f (void);
 #ifndef TURTLEARENA // NOZOOM
+void CG_ZoomUp( int localClient );
+void CG_ZoomDown( int localClient );
 void CG_ZoomDown_f( void );
 void CG_ZoomUp_f( void );
-#ifdef TA_SPLITVIEW
 void CG_2ZoomDown_f( void );
 void CG_2ZoomUp_f( void );
 void CG_3ZoomDown_f( void );
 void CG_3ZoomUp_f( void );
 void CG_4ZoomDown_f( void );
 void CG_4ZoomUp_f( void );
-void CG_ZoomUp( int localClient );
-void CG_ZoomDown( int localClient );
-#endif
 #endif
 void CG_AddBufferedSound( sfxHandle_t sfx);
 
@@ -1849,11 +1827,7 @@ typedef enum
 	ANNOUNCE_MAX
 } announcement_e;
 
-#ifdef TA_SPLITVIEW
 void CG_AddAnnouncement(int announcement, int localClientNumber);
-#else
-void CG_AddAnnouncement(int announcement);
-#endif
 void CG_AddAnnouncementEx(cglc_t *lc, qhandle_t sfx, qboolean bufferedSfx, const char *message);
 #endif
 
@@ -2029,23 +2003,25 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 void CG_NextHoldable_f( void );
 void CG_PrevHoldable_f( void );
 void CG_Holdable_f( void );
-#ifdef TA_SPLITVIEW
+
 void CG_2NextHoldable_f( void );
 void CG_2PrevHoldable_f( void );
 void CG_2Holdable_f( void );
+
 void CG_3NextHoldable_f( void );
 void CG_3PrevHoldable_f( void );
 void CG_3Holdable_f( void );
+
 void CG_4NextHoldable_f( void );
 void CG_4PrevHoldable_f( void );
 void CG_4Holdable_f( void );
 #endif
-#endif
+
 #ifndef TA_WEAPSYS_EX
 void CG_NextWeapon_f( void );
 void CG_PrevWeapon_f( void );
 void CG_Weapon_f( void );
-#ifdef TA_SPLITVIEW
+
 void CG_2NextWeapon_f( void );
 void CG_2PrevWeapon_f( void );
 void CG_2Weapon_f( void );
@@ -2057,7 +2033,6 @@ void CG_3Weapon_f( void );
 void CG_4NextWeapon_f( void );
 void CG_4PrevWeapon_f( void );
 void CG_4Weapon_f( void );
-#endif
 #endif
 
 #ifdef TURTLEARENA // HOLD_SHURIKEN
@@ -2201,9 +2176,7 @@ void CG_DrawLetterbox(void);
 // cg_snapshot.c
 //
 void CG_ProcessSnapshots( void );
-#ifdef TA_SPLITVIEW
-int CG_LocalClient(int clientNum);
-#endif
+int CG_LocalClient( int clientNum );
 
 //
 // cg_info.c
@@ -2239,11 +2212,7 @@ void CG_PlayBufferedVoiceChats( void );
 //
 // cg_playerstate.c
 //
-#ifdef TA_SPLITVIEW
 void CG_Respawn( int clientNum );
-#else
-void CG_Respawn( void );
-#endif
 void CG_TransitionPlayerState( playerState_t *ps, playerState_t *ops );
 void CG_CheckChangedPredictableEvents( playerState_t *ps );
 
@@ -2345,11 +2314,7 @@ void		trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin );
 
 // respatialize recalculates the volumes of sound as they should be heard by the
 // given entityNum and position
-void		trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater
-#ifdef TA_SPLITVIEW
-		, int listener
-#endif
-		);
+void		trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, int listener );
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed );		// returns buzz if not found
 void		trap_S_StartBackgroundTrack( const char *intro, const char *loop );	// empty name stops music
 void	trap_S_StopBackgroundTrack( void );
@@ -2414,8 +2379,7 @@ qboolean	trap_GetServerCommand( int serverCommandNumber );
 // a lagged connection
 int			trap_GetCurrentCmdNumber( void );	
 
-#ifdef TA_SPLITVIEW // CONTROLS
-qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClient );
+qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd, int localClientNum );
 
 #if defined TA_HOLDSYS/*2*/
 // used for the weapon select, holdable select, and zoom
@@ -2423,17 +2387,6 @@ void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdable
 #else
 // used for the weapon select and zoom
 void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int localClientNum );
-#endif
-#else
-qboolean	trap_GetUserCmd( int cmdNumber, usercmd_t *ucmd );
-
-#if defined TA_HOLDSYS/*2*/
-// used for the weapon select, holdable select, and zoom
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale, int holdableValue );
-#else
-// used for the weapon select and zoom
-void		trap_SetUserCmdValue( int stateValue, float sensitivityScale );
-#endif
 #endif
 
 // aids for VM testing

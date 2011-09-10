@@ -607,11 +607,9 @@ void SetTeam( gentity_t *ent, char *s ) {
 	} else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) ) {
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FREE;
-#ifdef TA_SPLITVIEW
 	} else if ( !Q_stricmp( s, "hide" ) || !Q_stricmp( s, "h" ) ) {
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_LOCAL_HIDE;
-#endif
 	} else if ( g_gametype.integer >= GT_TEAM
 #ifdef TA_SP // SP_BOSS
 			|| (g_gametype.integer == GT_SINGLE_PLAYER && (ent->r.svFlags & SVF_BOT))
@@ -1071,12 +1069,12 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	// send it to all the apropriate clients
 	for (j = 0; j < level.maxclients; j++) {
 		other = &g_entities[j];
-#ifdef TA_SPLITVIEW
+
 		// Don't send to extra local clients, would be printed multiple times.
 		if (other->r.owner != -1) {
 			continue;
 		}
-#endif
+
 		G_SayTo( ent, other, mode, color, name, text );
 	}
 }
@@ -1866,20 +1864,14 @@ ClientCommand
 */
 void ClientCommand( int clientNum ) {
 	gentity_t *ent;
-#ifdef TA_SPLITVIEW
 	char	*cmd;
 	char	buf[MAX_TOKEN_CHARS];
-#else
-	char	cmd[MAX_TOKEN_CHARS];
-#endif
 
 	ent = g_entities + clientNum;
 	if ( !ent->client ) {
 		return;		// not fully in game yet
 	}
 
-
-#ifdef TA_SPLITVIEW
 	trap_Argv( 0, buf, sizeof( buf ) );
 
 	cmd = &buf[0];
@@ -1903,9 +1895,6 @@ void ClientCommand( int clientNum ) {
 			return;		// not fully in game yet
 		}
 	}
-#else
-	trap_Argv( 0, cmd, sizeof( cmd ) );
-#endif
 
 	if (Q_stricmp (cmd, "say") == 0) {
 		Cmd_Say_f (ent, SAY_ALL, qfalse);
@@ -2001,9 +1990,5 @@ void ClientCommand( int clientNum ) {
 		Cmd_DropFlag_f( ent );
 #endif
 	else
-#ifdef TA_SPLITVIEW
 		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", buf ) );
-#else
-		trap_SendServerCommand( clientNum, va("print \"unknown cmd %s\n\"", cmd ) );
-#endif
 }
