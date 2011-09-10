@@ -49,8 +49,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pwd.h>
 #include <libgen.h>
 #include <fcntl.h>
+#ifndef __wii__
 #include <fenv.h>
 #include <sys/wait.h>
+#endif
 
 #ifdef __wii__
 #include <stdio.h>
@@ -656,7 +658,23 @@ void Sys_ErrorDialog( const char *error )
 	close( f );
 }
 
-#ifndef MACOS_X
+#ifdef __wii__
+/*
+==============
+Sys_Dialog
+
+Display message
+==============
+*/
+dialogResult_t Sys_Dialog( dialogType_t type, const char *message, const char *title )
+{
+	// ZTM: FIXME: Support DT_YES_NO and DT_OK_CANCEL ?
+	printf( "[%s]", title );
+	Sys_Wait(message);
+
+	return DR_OK;
+}
+#elif !defined MACOS_X
 static char execBuffer[ 1024 ];
 static char *execBufferPointer;
 static char *execArgv[ 16 ];
@@ -916,8 +934,10 @@ void Sys_GLimpInit( void )
 
 void Sys_SetFloatEnv(void)
 {
+#ifndef __wii__
 	// rounding towards 0
 	fesetround(FE_TOWARDZERO);
+#endif
 }
 
 /*
