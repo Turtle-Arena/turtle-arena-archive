@@ -508,8 +508,7 @@ to a fixed color.
 ==================
 */
 void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, qboolean forceColor,
-		qboolean noColorEscape )
-{
+		qboolean noColorEscape ) {
 	vec4_t		color;
 	const char	*s;
 	int			xx;
@@ -537,6 +536,7 @@ void SCR_DrawSmallStringExt( int x, int y, const char *string, float *setColor, 
 	re.SetColor( NULL );
 }
 #endif // !FONT_REWRITE
+
 
 
 /*
