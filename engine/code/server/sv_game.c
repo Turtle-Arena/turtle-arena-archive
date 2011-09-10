@@ -887,6 +887,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case TRAP_ACOS:
 		return FloatAsInt( acos( VMF(1) ) );
 
+
 	default:
 		Com_Error( ERR_DROP, "Bad game system trap: %ld", (long int) args[0] );
 	}

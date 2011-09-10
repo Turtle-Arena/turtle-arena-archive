@@ -250,7 +250,7 @@ static opparam_t params_ucomiss = { mrcode: 0x2e };
 /* ************************* */
 
 static unsigned hashkey(const char *string, unsigned len) {
-	register unsigned hash, i;
+	unsigned register hash, i;
 
 	hash = 0;
 	for (i = 0; i < len && string[i] != '\0'; ++i) {
@@ -1400,9 +1400,7 @@ void assemble_line(const char* input, size_t len)
 		}
 		o->func(opn, arg1, arg2, o->data);
 		if(assembler_pass)
-		{
 			debug("   - %s%s", cur_line, cur_line[strlen(cur_line)-1]=='\n'?"":"\n");
-		}
 	}
 }
 

@@ -85,11 +85,11 @@ static const serverFilter_t serverFilters[] = {
 	{"All", "" },
 #ifdef TA_MAIN
 	{"Turtle Arena", "" },
-	{"Quake 3 Arena", "baseq3" },
+	{"Quake 3 Arena", BASEQ3 },
 #else
 	{"Quake 3 Arena", "" },
 #endif
-	{"Team Arena", "missionpack" },
+	{"Team Arena", BASETA },
 	{"Rocket Arena", "arena" },
 	{"Alliance", "alliance20" },
 	{"Weapons Factory Arena", "wfa" },
