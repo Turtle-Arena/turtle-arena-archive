@@ -1096,10 +1096,6 @@ LIBPATHS = -L$(LIBOGC_LIB)
 
   HAVE_VM_COMPILED = true
 
-  ifneq ($(HAVE_VM_COMPILED),true)
-    BASE_CFLAGS += -DNO_VM_COMPILED
-  endif
-
   # No OpenAL or cURL support
   USE_OPENAL=0
   USE_CURL=0
@@ -1109,6 +1105,10 @@ LIBPATHS = -L$(LIBOGC_LIB)
   USE_MUMBLE=0
   USE_OPENAL_DLOPEN=0
   USE_CURL_DLOPEN=0
+
+  # Need to build static libs for libogc
+  USE_CODEC_VORBIS=0
+  USE_CODEC_THEORA=0
 
   ARCH=ppc
 
@@ -2056,10 +2056,10 @@ $(B)/$(CLIENTBIN).dol: $(B)/$(CLIENTBIN).elf
 	$(echo_cmd) "ELF2DOL $@"
 	$(Q)elf2dol $< $@
 
-$(B)/$(CLIENTBIN).elf: $(Q3OBJ) $(Q3POBJ) $(LIBSDLMAIN)
+$(B)/$(CLIENTBIN).elf: $(Q3OBJ) $(Q3ROBJ) $(Q3POBJ) $(LIBSDLMAIN)
 	$(echo_cmd) "LD $@"
 	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(LIBPATHS) \
-		-o $@ $(Q3OBJ) $(Q3POBJ) \
+		-o $@ $(Q3OBJ) $(Q3ROBJ) $(Q3POBJ) \
 		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
 else
 ifneq ($(USE_RENDERER_DLOPEN),0)

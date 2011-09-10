@@ -601,6 +601,9 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 		
 		if(retval == VMI_NATIVE)
 		{
+#ifdef NO_NATIVE_SUPPORT
+			Com_Printf("Skipping dll file %s, not supported\n", filename);
+#else
 #ifdef IOQ3ZTM // LESS_VERBOSE
 			Com_DPrintf("Try loading dll file %s\n", filename);
 #else
@@ -616,6 +619,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 			}
 			
 			Com_Printf("Failed loading dll, trying next\n");
+#endif
 		}
 		else if(retval == VMI_COMPILED)
 		{
