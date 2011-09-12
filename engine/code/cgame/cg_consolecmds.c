@@ -35,7 +35,7 @@ void CG_TargetCommand_f( void ) {
 	int		targetNum;
 	char	test[4];
 
-	targetNum = CG_CrosshairPlayer();
+	targetNum = CG_CrosshairPlayer(0);
 	if (!targetNum ) {
 		return;
 	}
@@ -211,7 +211,7 @@ static void CG_TellTarget_f( void ) {
 	char	command[128];
 	char	message[128];
 
-	clientNum = CG_CrosshairPlayer();
+	clientNum = CG_CrosshairPlayer(0);
 	if ( clientNum == -1 ) {
 		return;
 	}
@@ -226,7 +226,7 @@ static void CG_TellAttacker_f( void ) {
 	char	command[128];
 	char	message[128];
 
-	clientNum = CG_LastAttacker();
+	clientNum = CG_LastAttacker(0);
 	if ( clientNum == -1 ) {
 		return;
 	}
@@ -241,7 +241,7 @@ static void CG_VoiceTellTarget_f( void ) {
 	char	command[128];
 	char	message[128];
 
-	clientNum = CG_CrosshairPlayer();
+	clientNum = CG_CrosshairPlayer(0);
 	if ( clientNum == -1 ) {
 		return;
 	}
@@ -256,7 +256,7 @@ static void CG_VoiceTellAttacker_f( void ) {
 	char	command[128];
 	char	message[128];
 
-	clientNum = CG_LastAttacker();
+	clientNum = CG_LastAttacker(0);
 	if ( clientNum == -1 ) {
 		return;
 	}
@@ -393,7 +393,7 @@ static void CG_TaskSuicide_f (void ) {
 	int		clientNum;
 	char	command[128];
 
-	clientNum = CG_CrosshairPlayer();
+	clientNum = CG_CrosshairPlayer(0);
 	if ( clientNum == -1 ) {
 		return;
 	}

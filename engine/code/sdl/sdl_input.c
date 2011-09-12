@@ -804,7 +804,7 @@ static void IN_JoyMove( void )
 					balldx *= 2;
 				if (abs(balldy) > 1)
 					balldy *= 2;
-				Com_QueueEvent( 0, SE_MOUSE, balldx, balldy, 0, NULL );
+				Com_QueueEvent( 0, SE_MOUSE + joy, balldx, balldy, 0, NULL );
 			}
 		}
 
@@ -933,7 +933,7 @@ static void IN_JoyMove( void )
 
 					if ( axis != stick_state[joy].oldaaxes[i] )
 					{
-						Com_QueueEvent( 0, SE_JOYSTICK_AXIS, i, axis, 0, NULL );
+						Com_QueueEvent( 0, SE_JOYSTICK_AXIS + joy, i, axis, 0, NULL );
 						stick_state[joy].oldaaxes[i] = axis;
 					}
 				}

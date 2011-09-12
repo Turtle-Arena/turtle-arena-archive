@@ -224,16 +224,16 @@ typedef enum {
 	// If demoPlayback is set, local movement prediction will not be enabled
 
 	CG_CROSSHAIR_PLAYER,
-//	int (*CG_CrosshairPlayer)( void );
+//	int (*CG_CrosshairPlayer)( int localClientNum );
 
 	CG_LAST_ATTACKER,
-//	int (*CG_LastAttacker)( void );
+//	int (*CG_LastAttacker)( int localClientNum );
 
 	CG_KEY_EVENT, 
 //	void	(*CG_KeyEvent)( int key, qboolean down );
 
 	CG_MOUSE_EVENT,
-//	void	(*CG_MouseEvent)( int dx, int dy );
+//	void	(*CG_MouseEvent)( int localClientNum, int dx, int dy );
 	CG_EVENT_HANDLING,
 //	void (*CG_EventHandling)(int type);
 #ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY

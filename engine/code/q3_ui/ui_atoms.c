@@ -1372,10 +1372,15 @@ void UI_KeyEvent( int key, int down ) {
 UI_MouseEvent
 =================
 */
-void UI_MouseEvent( int dx, int dy )
+void UI_MouseEvent( int localClientNum, int dx, int dy )
 {
 	int				i;
 	menucommon_s*	m;
+
+	if (localClientNum != 0) {
+		// q3_ui currently only supports one cursor
+		return;
+	}
 
 	if (!uis.activemenu)
 		return;
@@ -1797,7 +1802,11 @@ void UI_Refresh( int realtime )
 			Menu_Draw( uis.activemenu );
 
 		if( uis.firstdraw ) {
-			UI_MouseEvent( 0, 0 );
+			int i;
+
+			for (i = 0; i < MAX_SPLITVIEW; ++i) {
+				UI_MouseEvent( i, 0, 0 );
+			}
 			uis.firstdraw = qfalse;
 		}
 	}

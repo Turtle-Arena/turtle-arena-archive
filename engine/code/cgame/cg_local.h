@@ -1742,11 +1742,11 @@ void CG_StartMusic( void );
 
 void CG_UpdateCvars( void );
 
-int CG_CrosshairPlayer( void );
-int CG_LastAttacker( void );
+int CG_CrosshairPlayer( int localClientNum );
+int CG_LastAttacker( int localClientNum );
 void CG_LoadMenus(const char *menuFile);
 void CG_KeyEvent(int key, qboolean down);
-void CG_MouseEvent(int x, int y);
+void CG_MouseEvent(int localClientNum, int x, int y);
 void CG_EventHandling(int type);
 void CG_RankRunFrame( void );
 void CG_SetScoreSelection(void *menu);
