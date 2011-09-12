@@ -619,14 +619,17 @@ void CL_KeyMove( clientInput_t *ci, usercmd_t *cmd ) {
 CL_MouseEvent
 =================
 */
-void CL_MouseEvent( int dx, int dy, int time ) {
+void CL_MouseEvent( int localClientNum, int dx, int dy, int time ) {
+	calc_t *lc;
+
 	if ( Key_GetCatcher( ) & KEYCATCH_UI ) {
-		VM_Call( uivm, UI_MOUSE_EVENT, dx, dy );
+		VM_Call(uivm, UI_MOUSE_EVENT, localClientNum, dx, dy);
 	} else if (Key_GetCatcher( ) & KEYCATCH_CGAME) {
-		VM_Call (cgvm, CG_MOUSE_EVENT, dx, dy);
+		VM_Call(cgvm, CG_MOUSE_EVENT, localClientNum, dx, dy);
 	} else {
-		cl.localClients[0].mouseDx[cl.localClients[0].mouseIndex] += dx;
-		cl.localClients[0].mouseDy[cl.localClients[0].mouseIndex] += dy;
+		lc = &cl.localClients[localClientNum];
+		lc->mouseDx[lc->mouseIndex] += dx;
+		lc->mouseDy[lc->mouseIndex] += dy;
 	}
 }
 
@@ -637,11 +640,11 @@ CL_JoystickEvent
 Joystick values stay set until changed
 =================
 */
-void CL_JoystickEvent( int axis, int value, int time ) {
+void CL_JoystickEvent( int localClientNum, int axis, int value, int time ) {
 	if ( axis < 0 || axis >= MAX_JOYSTICK_AXIS ) {
 		Com_Error( ERR_DROP, "CL_JoystickEvent: bad axis %i", axis );
 	}
-	cl.localClients[0].joystickAxis[axis] = value;
+	cl.localClients[localClientNum].joystickAxis[axis] = value;
 }
 
 /*

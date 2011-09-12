@@ -33,7 +33,7 @@ void CL_Init( void ) {
 	cl_shownet = Cvar_Get ("cl_shownet", "0", CVAR_TEMP );
 }
 
-void CL_MouseEvent( int dx, int dy, int time ) {
+void CL_MouseEvent( int localClientNum, int dx, int dy, int time ) {
 }
 
 void Key_WriteBindings( fileHandle_t f ) {
@@ -71,7 +71,7 @@ void CL_ForwardCommandToServer( const char *string ) {
 void CL_ConsolePrint( char *txt ) {
 }
 
-void CL_JoystickEvent( int axis, int value, int time ) {
+void CL_JoystickEvent( int localClientNum, int axis, int value, int time ) {
 }
 
 void CL_InitKeyCommands( void ) {

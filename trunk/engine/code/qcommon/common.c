@@ -2252,28 +2252,28 @@ int Com_EventLoop( void ) {
 			return ev.evTime;
 		}
 
-
-		switch(ev.evType)
+		if (ev.evType >= SE_MOUSE && ev.evType <= SE_MOUSE_LAST)
+			CL_MouseEvent( ev.evType - SE_MOUSE, ev.evValue, ev.evValue2, ev.evTime );
+		else if (ev.evType >= SE_JOYSTICK_AXIS && ev.evType <= SE_JOYSTICK_AXIS_LAST)
+			CL_JoystickEvent( ev.evType - SE_JOYSTICK_AXIS, ev.evValue, ev.evValue2, ev.evTime );
+		else
 		{
-			case SE_KEY:
-				CL_KeyEvent( ev.evValue, ev.evValue2, ev.evTime );
-			break;
-			case SE_CHAR:
-				CL_CharEvent( ev.evValue );
-			break;
-			case SE_MOUSE:
-				CL_MouseEvent( ev.evValue, ev.evValue2, ev.evTime );
-			break;
-			case SE_JOYSTICK_AXIS:
-				CL_JoystickEvent( ev.evValue, ev.evValue2, ev.evTime );
-			break;
-			case SE_CONSOLE:
-				Cbuf_AddText( (char *)ev.evPtr );
-				Cbuf_AddText( "\n" );
-			break;
-			default:
-				Com_Error( ERR_FATAL, "Com_EventLoop: bad event type %i", ev.evType );
-			break;
+			switch(ev.evType)
+			{
+				case SE_KEY:
+					CL_KeyEvent( ev.evValue, ev.evValue2, ev.evTime );
+				break;
+				case SE_CHAR:
+					CL_CharEvent( ev.evValue );
+				break;
+				case SE_CONSOLE:
+					Cbuf_AddText( (char *)ev.evPtr );
+					Cbuf_AddText( "\n" );
+				break;
+				default:
+					Com_Error( ERR_FATAL, "Com_EventLoop: bad event type %i", ev.evType );
+				break;
+			}
 		}
 
 		// free any block data

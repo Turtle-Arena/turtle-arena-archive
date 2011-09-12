@@ -811,7 +811,9 @@ typedef enum {
 	SE_KEY,			// evValue is a key code, evValue2 is the down flag
 	SE_CHAR,		// evValue is an ascii char
 	SE_MOUSE,		// evValue and evValue2 are reletive signed x / y moves
+	SE_MOUSE_LAST = SE_MOUSE + MAX_SPLITVIEW - 1, // Reserve values for SE_MOUSE events for splitscreen players
 	SE_JOYSTICK_AXIS,	// evValue is an axis number and evValue2 is the current state (-127 to 127)
+	SE_JOYSTICK_AXIS_LAST = SE_JOYSTICK_AXIS + MAX_SPLITVIEW - 1, // Reserve values for SE_JOYSTICK_AXIS events for splitscreen players
 	SE_CONSOLE		// evPtr is a char*
 } sysEventType_t;
 
@@ -997,9 +999,9 @@ void CL_KeyEvent (int key, qboolean down, unsigned time);
 void CL_CharEvent( int key );
 // char events are for field typing, not game control
 
-void CL_MouseEvent( int dx, int dy, int time );
+void CL_MouseEvent( int localClientNum, int dx, int dy, int time );
 
-void CL_JoystickEvent( int axis, int value, int time );
+void CL_JoystickEvent( int localClientNum, int axis, int value, int time );
 
 void CL_PacketEvent( netadr_t from, msg_t *msg );
 

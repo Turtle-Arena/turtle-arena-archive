@@ -355,12 +355,12 @@ void CL_VoipParseTargets(void)
 			{
 				if(!Q_stricmpn(target, "attacker", 8))
 				{
-					val = VM_Call(cgvm, CG_LAST_ATTACKER);
+					val = VM_Call(cgvm, CG_LAST_ATTACKER, 0);
 					target += 8;
 				}
 				else if(!Q_stricmpn(target, "crosshair", 9))
 				{
-					val = VM_Call(cgvm, CG_CROSSHAIR_PLAYER);
+					val = VM_Call(cgvm, CG_CROSSHAIR_PLAYER, 0);
 					target += 9;
 				}
 				else

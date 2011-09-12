@@ -174,7 +174,7 @@ vmCvar_t  ui_teamArenaFirstRun;
 void _UI_Init( qboolean );
 void _UI_Shutdown( void );
 void _UI_KeyEvent( int key, qboolean down );
-void _UI_MouseEvent( int dx, int dy );
+void _UI_MouseEvent( int localClientNum, int dx, int dy );
 void _UI_Refresh( int realtime );
 qboolean _UI_IsFullscreen( void );
 Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
@@ -195,7 +195,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		  return 0;
 
 	  case UI_MOUSE_EVENT:
-		  _UI_MouseEvent( arg0, arg1 );
+		  _UI_MouseEvent( arg0, arg1, arg2 );
 		  return 0;
 
 	  case UI_REFRESH:
@@ -5342,8 +5342,13 @@ void _UI_KeyEvent( int key, qboolean down ) {
 UI_MouseEvent
 =================
 */
-void _UI_MouseEvent( int dx, int dy )
+void _UI_MouseEvent( int localClientNum, int dx, int dy )
 {
+	if (localClientNum != 0) {
+		// ui currently only supports one cursor
+		return;
+	}
+
 	// update mouse screen position
 	uiInfo.uiDC.cursorx += dx;
 	if (uiInfo.uiDC.cursorx < 0)

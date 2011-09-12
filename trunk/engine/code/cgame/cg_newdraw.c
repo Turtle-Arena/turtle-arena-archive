@@ -1070,7 +1070,7 @@ float CG_GetValue(int ownerDraw) {
 
 qboolean CG_OtherTeamHasFlag(void) {
 	if (cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF) {
-		int team = cg.snap->pss[0].persistant[PERS_TEAM];
+		int team = cg.cur_ps->persistant[PERS_TEAM];
 		if (cgs.gametype == GT_1FCTF) {
 			if (team == TEAM_RED && cgs.flagStatus == FLAG_TAKEN_BLUE) {
 				return qtrue;
@@ -1094,7 +1094,7 @@ qboolean CG_OtherTeamHasFlag(void) {
 
 qboolean CG_YourTeamHasFlag(void) {
 	if (cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF) {
-		int team = cg.snap->pss[0].persistant[PERS_TEAM];
+		int team = cg.cur_ps->persistant[PERS_TEAM];
 		if (cgs.gametype == GT_1FCTF) {
 			if (team == TEAM_RED && cgs.flagStatus == FLAG_TAKEN_RED) {
 				return qtrue;
@@ -1859,9 +1859,17 @@ void CG_OwnerDraw(float x, float y, float w, float h, float text_x, float text_y
   }
 }
 
-void CG_MouseEvent(int x, int y) {
+void CG_MouseEvent(int localClientNum, int x, int y) {
 	int n;
 	cglc_t *lc;
+
+	if (localClientNum != 0) {
+		// Missionpack HUD currently only supports one cursor
+		return;
+	}
+
+	cgDC.cursorx = cgs.cursorX;
+	cgDC.cursory = cgs.cursorY;
 
 	lc = &cg.localClients[0];
 
