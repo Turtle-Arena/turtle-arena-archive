@@ -1168,6 +1168,32 @@ void UI_RankStatusMenu( void );
 
 #define ASSET_BACKGROUND "uiBackground"
 
+#ifdef TA_SP
+// Arcade map gamedata
+#define ARCADE_GAMEDATA_MAGIC "EBXARCADE"
+#define ARCADE_GAMEDATA_VERSION 0
+#define NUM_ARCADE_SCORES 5
+
+typedef struct
+{
+	char name[9];
+	char character[17];
+	int score;
+	int time;
+
+	// Additional CTF data
+	int captures;
+	int redScore;
+	int blueScore;
+} arcadeScore_t;
+
+typedef struct
+{
+	char magic[9];
+	int version;
+	arcadeScore_t scores[NUM_ARCADE_SCORES];
+} arcadeGameData_t;
+#else
 // for tracking sp game info in Team Arena
 typedef struct postGameInfo_s {
 	int score;
@@ -1191,6 +1217,7 @@ typedef struct postGameInfo_s {
 	int skillBonus;
 	int baseScore;
 } postGameInfo_t;
+#endif
 
 
 
