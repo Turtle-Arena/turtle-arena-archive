@@ -705,6 +705,7 @@ extern void			UI_StartDemoLoop( void );
 extern qboolean		m_entersound;
 extern uiStatic_t	uis;
 
+#ifndef TA_SP
 //
 // ui_spLevel.c
 //
@@ -712,6 +713,7 @@ void UI_SPLevelMenu_Cache( void );
 void UI_SPLevelMenu( void );
 void UI_SPLevelMenu_f( void );
 void UI_SPLevelMenu_ReInit( void );
+#endif
 
 //
 // ui_spArena.c

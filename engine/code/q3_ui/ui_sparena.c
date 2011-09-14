@@ -319,11 +319,10 @@ void UI_LoadGameMenu( void ) {
 #define ID_BACK				10
 #define ID_SP_NEWGAME		11
 #define ID_SP_LOADGAME		12
-#define ID_SP_LEVELSELECT	13
-#define ID_SP_CUSTOM		14
-#define ID_SP_DEMOS			15
-#define ID_SP_CINEMATICS	16
-#define ID_SP_MODS			17
+#define ID_SP_ARCADE		13
+#define ID_SP_DEMOS			14
+#define ID_SP_CINEMATICS	15
+#define ID_SP_MODS			16
 
 typedef struct {
 	menuframework_s	menu;
@@ -332,8 +331,7 @@ typedef struct {
 	menubitmap_s	framer;
 	menutext_s		sp_newgame;
 	menutext_s		sp_loadgame;
-	menutext_s		sp_levelselect;
-	menutext_s		sp_custom; // skirmish
+	menutext_s		sp_arcade;
 	menutext_s		sp_demos;
 	menutext_s		sp_cinematics;
 	menutext_s		sp_mods;
@@ -375,11 +373,7 @@ static void UI_SPMenu_Event( void *ptr, int event ) {
 			UI_LoadGameMenu();
 			break;
 
-		case ID_SP_LEVELSELECT:
-			UI_SPLevelMenu();
-			break;
-
-		case ID_SP_CUSTOM: // skirmish
+		case ID_SP_ARCADE:
 			UI_StartServerMenu( qfalse );
 			break;
 
@@ -457,31 +451,20 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.color				= text_big_color;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
 
-	y += VERTICAL_SPACING;
-	spMenuInfo.sp_levelselect.generic.type		= MTYPE_PTEXT;
-	spMenuInfo.sp_levelselect.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	spMenuInfo.sp_levelselect.generic.x			= 320;
-	spMenuInfo.sp_levelselect.generic.y			= y;
-	spMenuInfo.sp_levelselect.generic.id		= ID_SP_LEVELSELECT;
-	spMenuInfo.sp_levelselect.generic.callback	= UI_SPMenu_Event;
-	spMenuInfo.sp_levelselect.string			= "Level Select";
-	spMenuInfo.sp_levelselect.color				= text_big_color;
-	spMenuInfo.sp_levelselect.style				= UI_CENTER;
-
 	// Extra space between, "single player" and the others
 	y += VERTICAL_SPACING;
 
 	// Moved here from q3 sp arena select
 	y += VERTICAL_SPACING;
-	spMenuInfo.sp_custom.generic.type				= MTYPE_PTEXT;
-	spMenuInfo.sp_custom.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	spMenuInfo.sp_custom.generic.x					= 320;
-	spMenuInfo.sp_custom.generic.y					= y;
-	spMenuInfo.sp_custom.generic.id					= ID_SP_CUSTOM;
-	spMenuInfo.sp_custom.generic.callback			= UI_SPMenu_Event;
-	spMenuInfo.sp_custom.string						= "Arcade"; // aka Vs. Bots / Custom Game / Skirmish
-	spMenuInfo.sp_custom.color						= text_big_color;
-	spMenuInfo.sp_custom.style						= UI_CENTER;
+	spMenuInfo.sp_arcade.generic.type				= MTYPE_PTEXT;
+	spMenuInfo.sp_arcade.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	spMenuInfo.sp_arcade.generic.x					= 320;
+	spMenuInfo.sp_arcade.generic.y					= y;
+	spMenuInfo.sp_arcade.generic.id					= ID_SP_ARCADE;
+	spMenuInfo.sp_arcade.generic.callback			= UI_SPMenu_Event;
+	spMenuInfo.sp_arcade.string						= "Arcade";
+	spMenuInfo.sp_arcade.color						= text_big_color;
+	spMenuInfo.sp_arcade.style						= UI_CENTER;
 
 	// ZTM: TOOD: Add menu for viewing arcade scores
 
@@ -554,8 +537,7 @@ static void UI_SPMenu_Init( void ) {
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.framer );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_newgame );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_loadgame );
-	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_levelselect );
-	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_custom );
+	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_arcade );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_demos );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_cinematics );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_mods );

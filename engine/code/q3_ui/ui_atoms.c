@@ -1493,9 +1493,8 @@ void UI_Cache_f( void ) {
 	UI_SPMenu_Cache();
 	UI_SPPlayerMenu_Cache();
 	LoadGame_Cache();
-#endif
+#else
 	UI_SPLevelMenu_Cache();
-#ifndef TA_SP
 	UI_SPSkillMenu_Cache();
 #endif
 	UI_SPPostgameMenu_Cache();
@@ -1548,12 +1547,12 @@ qboolean UI_ConsoleCommand( int realTime ) {
 		trap_Cvar_Set( "com_errorMessage", "Game Over" );
 		return qtrue;
 	}
-#endif
-
+#else
 	if ( Q_stricmp (cmd, "levelselect") == 0 ) {
 		UI_SPLevelMenu_f();
 		return qtrue;
 	}
+#endif
 
 	if ( Q_stricmp (cmd, "postgame") == 0 ) {
 		UI_SPPostgameMenu_f();
