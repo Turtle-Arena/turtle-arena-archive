@@ -1,69 +1,41 @@
 #summary Map themes
 #labels Phase-Implementation
 
-One of the goals for Turtle Arena 0.4 is map themes.
+One of the goals for Turtle Arena 0.8 is map themes.
 
 == Overview ==
 Map themes are a combination of textures, skies, models/objects, sounds, and music.
 
 == City ==
-Ninja Turtle New York City theme.
+Big city theme (like New York, Chicago, etc)?
 
-=== Aboveground ===
-:Objects
-Vehicles
-  Car (`models/mapobjects/car/car.md3`)
-  Van
-  Pickup Truck
-Fire Hydrant // All good Turtle games need one.
-Grass
-Plants
-Trees
+===Objects===
+  * Vehicles
+    * Car (`models/mapobjects/car/car.md3`)
+    * Van
+    * Pickup Truck
+  * Fire Hydrant
+  * Grass
+  * Plants
+  * Trees
 
-Street Lights
-Traffic Cone (`models/mapobjects/traffic_cone/traffic_cone*md3`)
+  * Street Lights
+  * Traffic Cone (`models/mapobjects/traffic_cone/traffic_cone*md3`)
 
-:Textures
-Buildings
-Street (`textures/city/road.png`)
-Manhole Cover (`textures/city/manhole_*.png`)
+===Textures===
+  * Buildings
+  * Street (`textures/city/road.png`)
+  * Manhole Cover (`textures/city/manhole_*.png`)
 
+== Country / Forest ==
+===Objects===
+  * Grass
+  * Plants
+  * Trees
 
-=== Underground ===
-==== Turtle Lair ====
-==== Sewer ====
-Pipes
-Ladders // To manhole
-Dirty water
-
-
-==== Underground City ====
-Textures
-
-== Country ==
-:Objects
-House
-Barn
-Corn
-Hay
-Scarecrow
-Grass
-Plants
-Trees
-
-:Textures
-Dirt
-Grass
-
-== Forest ==
-:Objects
-Grass
-Plants
-Trees
-
-:Textures
-Dirt
-Grass
+===Textures===
+  * Dirt
+  * Grass
 
 == Desert ==
 
@@ -72,4 +44,3 @@ Grass
 == Snow ==
 
 == Space Station ==
-
