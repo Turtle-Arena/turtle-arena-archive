@@ -75,7 +75,7 @@ void UpdateTournamentInfo( void ) {
 	if ( level.clients[playerClientNum].sess.sessionTeam == TEAM_SPECTATOR ) {
 #ifdef MISSIONPACK
 #ifdef TA_SP
-		Com_sprintf( msg, sizeof(msg), "postgame %i 0 0 %s %s 0 0", level.time, player->client->pers.netname, player->client->pers.playercfg.model );
+		Com_sprintf( msg, sizeof(msg), "postgame %i 0 0 %s 0 0", level.time, player->client->pers.playercfg.model );
 #else
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i 0 0 0 0 0 0 0 0 0 0 0", level.numNonSpectatorClients, playerClientNum );
 #endif
@@ -113,7 +113,7 @@ void UpdateTournamentInfo( void ) {
 			}
 		}
 #ifdef TA_SP
-		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %s %s %i %i", level.time, score1, score2, player->client->pers.netname,
+		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %s %i %i", level.time, score1, score2,
 					player->client->pers.playercfg.model, player->client->ps.persistant[PERS_SCORE],
 					player->client->ps.persistant[PERS_CAPTURES]);
 #else
