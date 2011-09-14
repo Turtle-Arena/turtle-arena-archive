@@ -30,6 +30,7 @@ SINGLE PLAYER LEVEL SELECT MENU
 
 #include "ui_local.h"
 
+#ifndef TA_SP
 
 #define ART_LEVELFRAME_FOCUS		"menu/art/maps_select"
 #define ART_LEVELFRAME_SELECTED		"menu/art/maps_selected"
@@ -1165,3 +1166,5 @@ UI_SPLevelMenu_ReInit
 void UI_SPLevelMenu_ReInit( void ) {
 	levelMenuInfo.reinit = qtrue;
 }
+
+#endif
