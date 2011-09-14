@@ -604,7 +604,14 @@ void SetTeam( gentity_t *ent, char *s ) {
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FOLLOW;
 		specClient = -2;
-	} else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) ) {
+	}
+#ifdef TA_SP
+	else if (( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) )
+			&& !trap_Cvar_VariableIntegerValue("ui_singlePlayerActive"))
+#else
+	else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) )
+#endif
+	{
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FREE;
 	} else if ( !Q_stricmp( s, "hide" ) || !Q_stricmp( s, "h" ) ) {

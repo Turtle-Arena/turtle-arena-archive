@@ -170,6 +170,12 @@ void TeamMain_MenuInit( int localClient ) {
 	s_teammain.spectate.color            = colorRed;
 	y += 20;
 
+#ifdef TA_SP
+	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
+		s_teammain.spectate.generic.flags |= QMF_GRAYED;
+	}
+#endif
+
 	s_teammain.hide.generic.type     = MTYPE_PTEXT;
 	s_teammain.hide.generic.flags    = QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	s_teammain.hide.generic.id       = ID_HIDE;

@@ -328,6 +328,12 @@ void InGame_MenuInit( void ) {
 			s_ingame.team.string				= "Spectate";
 			s_ingame.team.color					= text_big_color;
 			s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
+
+#ifdef TA_SP
+			if (trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
+				s_ingame.team.generic.flags |= QMF_GRAYED;
+			}
+#endif
 		}
 	}
 #else
@@ -466,6 +472,10 @@ void InGame_MenuInit( void ) {
 		s_ingame.setupplayer.string				= "Setup Player";
 	s_ingame.setupplayer.color				= text_big_color;
 	s_ingame.setupplayer.style				= UI_CENTER|UI_SMALLFONT;
+
+	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
+		s_ingame.setupplayer.generic.flags |= QMF_GRAYED;
+	}
 #endif
 
 #ifdef TA_MISC // INGAME_SERVER_MENU
@@ -479,7 +489,8 @@ void InGame_MenuInit( void ) {
 	s_ingame.inserver.string			= "Server";
 	s_ingame.inserver.color				= text_big_color;
 	s_ingame.inserver.style				= UI_CENTER|UI_SMALLFONT;
-	if( !trap_Cvar_VariableValue( "sv_running" ) ) {
+	if( !trap_Cvar_VariableValue( "sv_running" )
+		|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
 		s_ingame.inserver.generic.flags |= QMF_GRAYED;
 	}
 #endif
@@ -498,6 +509,12 @@ void InGame_MenuInit( void ) {
 #endif
 	s_ingame.server.color				= text_big_color;
 	s_ingame.server.style				= UI_CENTER|UI_SMALLFONT;
+
+#ifdef TA_SP
+	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
+		s_ingame.server.generic.flags |= QMF_GRAYED;
+	}
+#endif
 
 #ifndef TA_MISC // INGAME_SERVER_MENU
 	y += INGAME_MENU_VERTICAL_SPACING;
