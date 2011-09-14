@@ -712,15 +712,19 @@ int UI_AddArcadeScore(arcadeGameData_t *gamedata, arcadeScore_t *score)
 
 void UI_CalcPostGameStats(void)
 {
+	static char *gametypeNames[] = {"ffa", "tourney", "single", "team", "ctf", "oneflag", "overload", "harvester"};
 	char		map[MAX_QPATH];
 	char		fileName[MAX_QPATH];
 	char		info[MAX_INFO_STRING];
+	char		name[9];
 	fileHandle_t f;
 	qboolean	validData;
-	int time, redScore, blueScore;
-	static char *gametypeNames[] = {"ffa", "tourney", "single", "team", "ctf", "oneflag", "overload", "harvester"};
-	arcadeGameData_t *gamedata = &postgameMenuInfo.gamedata;
-	arcadeScore_t *newScore = &postgameMenuInfo.newScore;
+	int			time, redScore, blueScore;
+	arcadeGameData_t *gamedata;
+	arcadeScore_t *newScore;
+
+	gamedata = &postgameMenuInfo.gamedata;
+	newScore = &postgameMenuInfo.newScore;
 
 	trap_GetConfigString( CS_SERVERINFO, info, sizeof(info) );
 	Q_strncpyz( map, Info_ValueForKey( info, "mapname" ), sizeof(map) );
@@ -746,6 +750,11 @@ void UI_CalcPostGameStats(void)
 		memset(gamedata, 0, sizeof(arcadeGameData_t));
 	}
 
+	// Get name
+	// TODO: Ask user to enter name
+	trap_Cvar_VariableStringBuffer("name", name, sizeof (name));
+
+	// Setup gamedata
 	memcpy(gamedata->magic, ARCADE_GAMEDATA_MAGIC, ARRAY_LEN(gamedata->magic));
 	gamedata->version = ARCADE_GAMEDATA_VERSION;
 
@@ -754,13 +763,13 @@ void UI_CalcPostGameStats(void)
 	blueScore = atoi(UI_Argv(3));
 
 	// Setup newScore
-	Q_strncpyz(newScore->name, UI_Argv(4), STRARRAY_LEN(newScore->name));
-	Q_strncpyz(newScore->character, UI_Argv(5), STRARRAY_LEN(newScore->character));
-	newScore->score = atoi(UI_Argv(6));
+	Q_strncpyz(newScore->name, name, STRARRAY_LEN(newScore->name));
+	Q_strncpyz(newScore->character, UI_Argv(4), STRARRAY_LEN(newScore->character));
+	newScore->score = atoi(UI_Argv(5));
 	newScore->time = time;
 
-	 // CTF
-	newScore->captures = atoi(UI_Argv(7));
+	// CTF
+	newScore->captures = atoi(UI_Argv(6));
 	newScore->redScore = redScore;
 	newScore->blueScore = blueScore;
 
