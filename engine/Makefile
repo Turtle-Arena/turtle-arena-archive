@@ -9,12 +9,12 @@ CLIENTBIN=turtlearena
 SERVERBIN=turtlearena-server
 
 BASEGAME=base
-BASEGAME_FLAGS = -DMISSIONPACK
+BASEGAME_FLAGS= -DMISSIONPACK
 
 MISSIONPACK=missionpack
 MISSIONPACK_FLAGS= -DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
 
-# Add "-DNAME" to define NAME in engine and game/cgame/ui.
+# Add "-DEXAMPLE" to define EXAMPLE in engine and game/cgame/ui.
 BUILD_DEFINES =
 
 # You can disable building basegame or missionpack by setting the following to 0
@@ -31,7 +31,7 @@ endif
 
 
 # ioq3ztm svn version that this is based on
-IOQ3ZTM_REVISION = 43
+IOQ3ZTM_REVISION = 46
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 

@@ -259,11 +259,9 @@ static void UI_CreditMenu_Draw_ioq3( void ) {
 		NULL
 	};
 
-#ifdef IOQ3ZTM // Center text verticly on screen!
+	// Center text vertically on the screen
 	y = (SCREEN_HEIGHT - ARRAY_LEN(names) * (1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE)) / 2;
-#else
-	y = 12;
-#endif
+
 	UI_DrawProportionalString( 320, y, "ioquake3 contributors:", UI_CENTER|UI_SMALLFONT, color_white );
 	y += 1.42 * PROP_HEIGHT * PROP_SMALL_SIZE_SCALE;
 
@@ -274,6 +272,7 @@ static void UI_CreditMenu_Draw_ioq3( void ) {
 
 	UI_DrawString( 320, 459, "http://www.ioquake3.org/", UI_CENTER|UI_SMALLFONT, color_red );
 }
+
 
 /*
 =================
@@ -293,6 +292,7 @@ static sfxHandle_t UI_CreditMenu_Key( int key ) {
 	}
 	return 0;
 }
+
 
 /*
 ===============
@@ -353,11 +353,10 @@ static void UI_CreditMenu_Draw( void ) {
 	UI_DrawString( 320, y, "Quake III Arena(c) 1999-2000, Id Software, Inc.  All Rights Reserved", UI_CENTER|UI_SMALLFONT, color_red );
 }
 
+
 /*
 ===============
 UI_CreditMenu
-
-Exit game credits
 ===============
 */
 void UI_CreditMenu( void ) {
