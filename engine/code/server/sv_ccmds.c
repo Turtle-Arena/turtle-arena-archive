@@ -1149,14 +1149,12 @@ static void SV_SaveGame_f(void) {
 	// Set savefile name.
 	if ( Cmd_Argc() < 2 ) {
 		strcpy(savegame, "autosave");
-	}
-	else
-	{
+	} else {
 		Cmd_ArgvBuffer( 1, savegame, sizeof( savegame ) );
 	}
 
 	if(!(curpos = Cvar_VariableString("fs_game")) || !*curpos)
-		curpos = BASEGAME;
+		curpos = com_basegame->string;
 
 	// path is "base/saves/name.sav"
 	Com_sprintf( filename, MAX_QPATH, "%s/%s/%s.sav", curpos, SAVEGAMEDIR, savegame );
@@ -1252,14 +1250,12 @@ static void SV_LoadGame_f(void) {
 	// Set savefile name.
 	if ( Cmd_Argc() < 2 ) {
 		strcpy(savegame, "autosave");
-	}
-	else
-	{
+	} else {
 		Cmd_ArgvBuffer( 1, savegame, sizeof( savegame ) );
 	}
 
 	if(!(curpos = Cvar_VariableString("fs_game")) || !*curpos)
-		curpos = BASEGAME;
+		curpos = com_basegame->string;
 
 	// path is "base/saves/name.sav"
 	Com_sprintf( filename, MAX_QPATH, "%s/%s/%s.sav", curpos, SAVEGAMEDIR, savegame );
