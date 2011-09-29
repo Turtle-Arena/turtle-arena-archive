@@ -440,12 +440,7 @@ void SP_target_position( gentity_t *self ){
 	G_SetOrigin( self, self->s.origin );
 }
 
-#ifdef TA_SP // Save/load
-void target_location_linkup(gentity_t *ent)
-#else
-static void target_location_linkup(gentity_t *ent)
-#endif
-{
+static void target_location_linkup(gentity_t *ent) {
 	int i;
 	int n;
 

@@ -187,11 +187,7 @@ control(Tokenrow *trp)
 		}
 		if (ifsatisfied[ifdepth]==2)
 			error(ERROR, "#else after #else");
-		if (trp->lp - trp->bp != 3
-#if 1 // ZTM: FIXME: Only happens on 64 bit Turtle Arena
-			&& trp->lp - trp->bp != 4
-#endif
-			)
+		if (trp->lp - trp->bp != 3)
 			error(ERROR, "Syntax error in #else");
 		skipping = ifsatisfied[ifdepth]? ifdepth: 0;
 		ifsatisfied[ifdepth] = 2;
@@ -204,11 +200,7 @@ control(Tokenrow *trp)
 		}
 		--ifdepth;
 		--cursource->ifdepth;
-		if (trp->lp - trp->bp != 3
-#if 1 // ZTM: FIXME: Only happens on 64 bit Turtle Arena
-			&& trp->lp - trp->bp != 4
-#endif
-			)
+		if (trp->lp - trp->bp != 3)
 			error(WARNING, "Syntax error in #endif");
 		break;
 
